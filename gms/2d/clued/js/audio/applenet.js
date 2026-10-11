@@ -1,6 +1,6 @@
 // Apple network chain (docs/notes/APPLEPROXY.md): direct with a short first-byte timeout, then the Clued
 // server proxy. The first time direct fails where the proxy works, the session goes straight to the proxy.
-import { dlog, modLoaded } from '../core/debuglog.js?v=202610111123';
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610111239';
 modLoaded('applenet', import.meta.url);
 
 const G = globalThis;

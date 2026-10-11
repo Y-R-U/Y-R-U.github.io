@@ -1,15 +1,15 @@
 // Online hub, join-by-name screen and host setup. Joining needs only a name.
-import { h } from '../ui/kit.js?v=202610111123';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610111123';
-import { sfx } from '../ui/fx.js?v=202610111123';
-import { toast } from '../ui/popup.js?v=202610111123';
-import { getFormat } from '../formats/registry.js?v=202610111123';
-import { rooms, friendly } from './api.js?v=202610111123';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610111123';
-import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss, myRooms, forgetRoom } from './util.js?v=202610111123';
-import { packInfo } from '../core/packs.js?v=202610111123';
-import { getTransport, hasTransport } from './transport.js?v=202610111123';
-import { signInPrompt, busyText } from './signin.js?v=202610111123';
+import { h } from '../ui/kit.js?v=202610111239';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610111239';
+import { sfx } from '../ui/fx.js?v=202610111239';
+import { toast } from '../ui/popup.js?v=202610111239';
+import { getFormat } from '../formats/registry.js?v=202610111239';
+import { rooms, friendly } from './api.js?v=202610111239';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610111239';
+import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss, myRooms, forgetRoom } from './util.js?v=202610111239';
+import { packInfo } from '../core/packs.js?v=202610111239';
+import { getTransport, hasTransport } from './transport.js?v=202610111239';
+import { signInPrompt, busyText } from './signin.js?v=202610111239';
 
 
 export function nameField(value = '') {

@@ -1,5 +1,5 @@
 import { syncLocalKeys } from '/lib/auth/localsync.js';
-import { SYNCED, getStats } from './store.js?v=202610111123';
+import { SYNCED, getStats } from './store.js?v=202610111239';
 
 let canPesterFn = () => false;
 export const setCanPester = fn => { canPesterFn = fn; };
