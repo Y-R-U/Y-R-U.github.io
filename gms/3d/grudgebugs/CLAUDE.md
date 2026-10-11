@@ -170,3 +170,8 @@ boot/modes/loop/flags.
 - Watch `pend` in `__state` — if it climbs past ~10 the shard chain is back.
 - A battle between AIs lasts 2–6 rounds; teams mostly die by knock-off
   (fall = full bug), which is intended Worms chaos.
+
+## Landscape setup screen (2026-10-11)
+- Short landscape (`orientation: landscape and max-height: 520px`): Quick Grudge rows go label-left/chips-right
+  with compact chips, and `#qk-start` is `position: sticky; bottom: 0` inside `.scr-body`, so Start is on screen
+  without scrolling at 844×390 and 915×412 (bottom ≈315 px). Portrait is untouched.

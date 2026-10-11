@@ -260,6 +260,14 @@ button.big.gold { background: #6b4d13e0; border-color: #c99a2e; color: #ffe9ad; 
   .menu-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   button.big { padding: 10px 14px; font-size: 15px; border-radius: 13px; }
   .menu-foot { margin-top: 8px; }
+  #quick .scr-head { padding-top: calc(env(safe-area-inset-top) + 6px); padding-bottom: 4px; }
+  #quick .scr-head h2 { font-size: 19px; }
+  #quick .scr-body { padding-bottom: env(safe-area-inset-bottom); }
+  #quick .form-row { display: grid; grid-template-columns: 104px 1fr; align-items: center; gap: 8px; margin: 0 0 7px; }
+  #quick .form-row label { margin: 0; }
+  #quick .chips { gap: 6px; }
+  #quick .chip { padding: 6px 11px; font-size: 13px; }
+  #qk-start { position: sticky; bottom: 0; margin: 6px 0 8px; padding: 10px 14px; z-index: 1; }
 }
 
 @media (min-width: 700px) {
