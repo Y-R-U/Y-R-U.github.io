@@ -56,3 +56,17 @@ just revalidates first, which is a cheap 304 when nothing changed.
 anonymous, and which storage Firebase actually settled on. An in-memory
 fallback looks perfectly healthy until the page is reloaded, so check here
 first when a sign-in "doesn't stick".
+
+## Ragdojo release preparation (2026-09-08, not deployed)
+
+Ragdojo is the first game with a minified release step. Run `npm ci && npm run build`
+inside `gms/2d/ragdojo` before deployment. `deploy.sh` checks that build exists before
+any remote action and ships `dist/home` at `/gms/2d/ragdojo/`. The source remains
+readable, and shared `/lib/auth/` must ship with it. A stale existing build is still
+possible: always rebuild from the reviewed commit immediately before deployment.
+
+Its test payment API is a separate Go/SQLite service in
+`/Users/aaronair/cc/ionos/ragdojo-payments`, proxied by Caddy at `/api/ragdojo/*`.
+The static deploy script does not install that service or its private environment.
+See `gms/2d/ragdojo/docs/MONETISATION.md` for the approved free/DARK split, build,
+verification boundaries and release approvals. Live payments remain disabled.

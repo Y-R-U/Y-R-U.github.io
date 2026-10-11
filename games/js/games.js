@@ -22,6 +22,12 @@ export const GAMES = [
     blurb: "26 quiz games across 70 topics: picture reveals, maps, music clips, Movie Moments and more. Pub quiz, daily challenge, kids mode, a Learn tab, and online rooms friends join by link.",
   },
   {
+    id: "ragdojo", name: "RAGDOJO", tag: "Stick fighting, on paper",
+    path: "/gms/2d/ragdojo/", shot: "ragdojo", accent: "#3d7fd6",
+    short: "Draw your moves. Send stick fighters flying.",
+    blurb: "Rise through the ranks with a flick of your thumb. Draw your special moves, send floppy fighters flying, and battle your way from LIGHT to DARK and beyond.",
+  },
+  {
     id: "silt", name: "SILT", tag: "Sand, lit not drawn",
     path: "/gms/2d/silt/", shot: "silt", accent: "#e0a24a",
     short: "Pour sand, span the board, watch it turn to light.",

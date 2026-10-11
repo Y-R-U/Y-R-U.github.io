@@ -15,6 +15,7 @@ SITE="/srv/apps/br8tgames/site"
 
 # Games that ship. Add a path here when you flip `soon` off in js/games.js.
 GAMES=(
+  "gms/2d/ragdojo"
   "gms/2d/silt"
   "gms/2d/racketeer"
   "gms/3d/opus5_ironhail"
@@ -30,6 +31,13 @@ GAMES=(
   "gms/3d/heirframe"
 )
 # SYNTHWILD is NOT listed: it ships (client + Go API) via gms/3d/synthwild/server/deploy.sh
+
+# Ragdojo releases are minified and omit developer tools. Build before any remote action.
+RAGDOJO_BUILD="$REPO/gms/2d/ragdojo/dist/home"
+if [[ ! -f "$RAGDOJO_BUILD/index.html" || ! -f "$RAGDOJO_BUILD/js/main.js" ]]; then
+  echo "Build Ragdojo first: cd gms/2d/ragdojo && npm ci && npm run build" >&2
+  exit 1
+fi
 
 echo ">> ensuring dirs"
 ssh "$HOST" "sudo install -d -o deploy -g deploy /srv/apps/br8tgames '$SITE'"
@@ -52,13 +60,15 @@ rsync -az --exclude='*.mjs' "$REPO/gms/lib/three/" "$HOST:$SITE/gms/lib/three/"
 for g in "${GAMES[@]}"; do
   echo ">> $g"
   ssh "$HOST" "install -d '$SITE/$g'"
+  GAME_SOURCE="$REPO/$g"
+  if [[ "$g" == "gms/2d/ragdojo" ]]; then GAME_SOURCE="$RAGDOJO_BUILD"; fi
   EXTRA=()
   # heirframe keeps ~90 MB of VO sources and refs under tools/ and refs/ that the game never loads
   if [[ "$g" == "gms/3d/heirframe" ]]; then EXTRA=(--exclude=/tools/ --exclude=/refs/ --exclude=/docs/); fi
   # silt keeps ~110 MB of review screenshots plus dev/tools/docs the game never loads
   if [[ "$g" == "gms/2d/silt" ]]; then EXTRA=(--exclude=/shots/ --exclude=/dev/ --exclude=/tools/ --exclude=/docs/); fi
   rsync -az --delete --exclude='PLAN.md' --exclude='*.md' ${EXTRA[@]+"${EXTRA[@]}"} \
-    "$REPO/$g/" "$HOST:$SITE/$g/"
+    "$GAME_SOURCE/" "$HOST:$SITE/$g/"
 done
 
 # Only the shots the hub actually references — the repo holds ~60 of them and

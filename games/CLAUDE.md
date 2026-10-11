@@ -200,3 +200,14 @@ more play testing first. Voidcast stays as a "coming soon" card.
   `pickSave()` only rules out the blank-save case.
 - `firebase deploy` needs Aaron to run `firebase login --reauth` when the
   firebase-tools token in `~/.config/configstore/` expires.
+
+## Ragdojo (live 2026-10-11)
+
+On the hub with LIGHT and DARK free; "Support the developer" unlocks CYBER and
+DEITIES. Payments are not live yet: with no `/api/ragdojo/*` route the game shows
+"coming soon" and makes no entitlement calls. It deploys minified
+`gms/2d/ragdojo/dist/home`, so `npm ci && npm run build` there first — deploy.sh
+refuses without a build. It uses the strict `slot.loadForUser/saveForUser` and
+`auth.getIdToken()` additions in `/lib/auth/`. See
+`gms/2d/ragdojo/docs/MONETISATION.md`; the payment service lives in
+`~/cc/ionos/ragdojo-payments` (its own local git, no remote).
