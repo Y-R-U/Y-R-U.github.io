@@ -1,5 +1,5 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested, nameArgs, catStmt, boolStmt } from './registry.js?v=202610101826';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610101826';
+import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested, nameArgs, catStmt, boolStmt, givesAway } from './registry.js?v=202610110402';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610110402';
 
 function sources(pack, gate) {
   const out = [];
@@ -55,6 +55,8 @@ function make(rng, pack, kind, difficulty) {
     };
   }
   const vals = [].concat(v).map(String);
+  // "The Basset Hound is a hound" is no question either way round
+  if (vals.some(x => givesAway(x, `${t.item.name} ${t.item.lname || ''}`))) return null;
   const truth = rng() < 0.5;
   let value = pick(rng, vals);
   if (!truth) {

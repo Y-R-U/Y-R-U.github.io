@@ -104,7 +104,7 @@ const PACK = {
   fakes: ['Crimson mason hornet', 'Glass-winged honey wasp', 'Northern velvet bumblebee hornet', 'Striped thunder bee', 'Silver paper hornet', 'Golden digger hornet'],
   questions: [
     { kind: 'number', prompt: 'How many legs does a bee have?', answer: 6, unit: 'legs', tolerance: 0, explain: 'Bees are insects, and all insects have six legs.', difficulty: 1 },
-    { kind: 'mc', prompt: 'What do honey bees make that people eat?', answer: 'Honey', wrong: ['Jam', 'Milk', 'Syrup'], explain: 'They turn flower nectar into honey to feed the hive.', difficulty: 1 },
+    { kind: 'mc', prompt: 'Bees turn flower nectar into which sweet food?', answer: 'Honey', wrong: ['Jam', 'Milk', 'Syrup'], explain: 'They turn flower nectar into honey to feed the hive.', difficulty: 1 },
     { kind: 'tf', prompt: 'A honey bee worker usually dies after stinging a person.', answer: true, explain: 'Its barbed sting stays in our skin and tears away from the bee.', difficulty: 1 },
     { kind: 'tf', prompt: 'Hoverflies can sting.', answer: false, explain: 'Hoverflies are harmless flies that copy wasp colours.', difficulty: 1 },
     { kind: 'mc', prompt: 'What does a honey bee\'s "waggle dance" tell the other bees?', answer: 'Where to find flowers', wrong: ['That the queen is hungry', 'That it is time to sleep', 'That a storm is coming'], explain: 'The angle and length of the dance show direction and distance.', difficulty: 2 },

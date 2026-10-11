@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, lcLabel, plainLabel } from './registry.js?v=202610101826';
-import { h, mediaBox } from '../ui/kit.js?v=202610101826';
-import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610101826';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, lcLabel, plainLabel } from './registry.js?v=202610110402';
+import { h, mediaBox } from '../ui/kit.js?v=202610110402';
+import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610110402';
 
 const CSS = `
 .nb{gap:12px}
@@ -97,6 +97,7 @@ function make(rng, pack, key, difficulty) {
   if (!pool.length) return null;
   const t = pick(rng, pool);
   const v = numOf(t.item, key);
+  if (Math.abs(v) >= 1000 && new RegExp(`(^|[^\\d.,])${v}([^\\d]|$)`).test(askFor(meta, t.item, pack))) return null;
   const range = rangeOf(pack, key);
   if (!(range.max > range.min)) return null;
   const sc = scaleFor(meta, range, v);
@@ -114,6 +115,7 @@ function fromQuestion(rng, pack, difficulty) {
   if (!qs.length) return null;
   const q = pick(rng, qs);
   const v = Number(q.answer);
+  if (Math.abs(v) >= 1000 && new RegExp(`(^|[^\\d.,])${v}([^\\d]|$)`).test(q.prompt)) return null;
   const year = /year/i.test(q.unit || '') || (Number.isInteger(v) && v > 1000 && v <= 2100 && !q.unit);
   const span = q.min != null && q.max != null ? { min: q.min, max: q.max } : year ? { min: Math.floor((v - 200) / 50) * 50, max: Math.min(2026, Math.ceil((v + 120) / 50) * 50) } : v > 0 ? { min: v / 10, max: v * 10 } : { min: v - 100, max: v + 100 };
   return {

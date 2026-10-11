@@ -104,15 +104,15 @@ const common = {
   born: { type: 'year', label: 'Born', higherLabel: 'Born later', askHigh: 'Which of these people was born most recently?', askLow: 'Which of these people was born first?' },
   died: { type: 'year', label: 'Died', higherLabel: 'Died later', askHigh: 'Which of these people died most recently?', askLow: 'Which of these people died first?' },
   nationality: { type: 'cat', label: 'Nationality', exclusive: false, ask: 'What nationality is {name}?', stmt: '{name}’s nationality: {value}.' },
-  era: { type: 'cat', label: 'Born in', ask: 'When was {name} born?', stmt: '{name} was born in the {value}.' },
+  era: { type: 'cat', label: 'Born in', ask: 'When was {name} born?', askReverse: 'Which of these people was born in the {value}?', stmt: '{name} was born in the {value}.' },
 };
 const FIELD = { type: 'cat', label: 'Field', ask: 'What field is {name} best known for?', stmt: '{name} is best known for {value}.' };
 const src = [{ name: 'Wikidata (birth/death dates, portraits)', url: 'https://www.wikidata.org' }, { name: 'Wikimedia Commons (portraits, licence-checked)', url: 'https://commons.wikimedia.org' }];
 const packs = [
-  ['people', 'Famous people', 'people', '🧑‍🔬', PEOPLE, { ...common, field: FIELD }],
+  ['people', 'Famous people', 'people', '🧑‍🔬', PEOPLE, { ...common, field: { ...FIELD, askReverse: 'Which of these people is best known for {value}?' } }],
   ['leaders', 'Leaders and rulers', 'people', '👑', LEADERS, { ...common, field: FIELD }],
   ['explorers', 'Explorers', 'people', '🧭', EXPLORERS, { ...common, field: FIELD }],
-  ['artists', 'Artists', 'art', '🎨', ARTISTS, { ...common, movement: { type: 'cat', label: 'Movement', exclusive: false, ask: 'Which style or movement is {name} linked with?', stmt: '{name} is linked with {value}.' } }],
+  ['artists', 'Artists', 'art', '🎨', ARTISTS, { ...common, movement: { type: 'cat', label: 'Movement', exclusive: false, ask: 'Which style or movement is {name} linked with?', askReverse: 'Which of these artists is linked with {value}?', stmt: '{name} is linked with {value}.' } }],
   ['actors', 'Actors', 'screen', '🎭', ACTORS, { ...common, films: { type: 'text', label: 'Known for' } }],
 ];
 for (const [id, title, theme, icon, text, factsMeta] of packs) {

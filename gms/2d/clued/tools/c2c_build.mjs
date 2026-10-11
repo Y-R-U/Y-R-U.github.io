@@ -6,10 +6,13 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { TOPICS } from './c2c_src/lib.mjs';
+import { dropGiveaways } from './q_giveaway.mjs';
 import GA from './c2c_src/general_a.mjs';
 import GB from './c2c_src/general_b.mjs';
 import GC from './c2c_src/general_c.mjs';
 import KIDS from './c2c_src/kids.mjs';
+import KB from './c2c_src/kids_b.mjs';
+import GD from './c2c_src/general_d.mjs';
 import { SUMMER, WINTER, WORLD_CUP, ATHLETES, QUESTIONS as SPORT_Q } from './c2c_src/sport.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -40,12 +43,13 @@ function toQuestion(prefix, q, { kidsTag = false } = {}) {
 }
 
 function write(id, pack) {
+  for (const q of dropGiveaways(pack)) console.warn(`  giveaway dropped ${id}/${q.id}: ${q.prompt}`);
   writeFileSync(join(ROOT, 'data/packs', `${id}.json`), JSON.stringify(pack, null, 1) + '\n');
   const qs = pack.questions.length, its = (pack.items || []).length;
   console.log(`${id}: ${qs} questions${its ? `, ${its} items` : ''}`);
 }
 
-const general = [...GA, ...GB, ...GC].map(q => toQuestion('gen', q));
+const general = [...GA, ...GB, ...GC, ...GD].map(q => toQuestion('gen', q));
 write('general', {
   id: 'general', title: 'General knowledge', theme: 'general', icon: '💡', kids: false, version: 1,
   questions: general,
@@ -53,7 +57,7 @@ write('general', {
 });
 
 const missing = [];
-const kids = KIDS.map(q => { const r = toQuestion('kid', q, { kidsTag: true }); if (!r) missing.push(q.img); return r; }).filter(Boolean);
+const kids = [...KIDS, ...KB].map(q => { const r = toQuestion('kid', q, { kidsTag: true }); if (!r) missing.push(q.img); return r; }).filter(Boolean);
 if (missing.length) console.warn(`kids: dropped ${missing.length} picture questions with no cached image: ${missing.join(', ')}`);
 write('kids', {
   id: 'kids', title: 'Kids quiz', theme: 'kids', icon: '🧸', kids: true, version: 1,
@@ -93,12 +97,12 @@ for (const [name, sport, nation, d, blurb] of ATHLETES) {
 write('sport', {
   id: 'sport', title: 'Sport', theme: 'sport', icon: '⚽', kids: false, version: 1, noun: 'sports star or event',
   factsMeta: {
-    host: { type: 'cat', label: 'Host city', ask: 'Which city hosted the {name}?', stmt: 'The {name} were held in {value}.' },
+    host: { type: 'cat', label: 'Host city', ask: 'Which city hosted the {name}?', askReverse: 'Which of these Olympics were held in {value}?', stmt: 'The {name} were held in {value}.' },
     winner: { type: 'cat', label: 'Winner', ask: 'Who won the {name}?', stmt: 'The {name} was won by {value}.' },
     runnerUp: { type: 'cat', label: 'Runner-up', ask: 'Who were the runners-up at the {name}?', stmt: '{value} were the runners-up at the {name}.' },
     wcHost: { type: 'cat', label: 'Host country', ask: 'Which country hosted the {name}?', stmt: 'The {name} was hosted by {value}.' },
-    sport: { type: 'cat', label: 'Sport', ask: 'Which sport is {name} famous for?', stmt: "{name}'s sport: {value}." },
-    nation: { type: 'cat', label: 'Country', ask: 'Which country did {name} represent?', stmt: '{name} represented {value}.' },
+    sport: { type: 'cat', label: 'Sport', ask: 'Which sport is {name} famous for?', askReverse: 'Which of these sports stars is famous for {lvalue}?', stmt: "{name}'s sport: {value}." },
+    nation: { type: 'cat', label: 'Country', ask: 'Which country did {name} represent?', askReverse: 'Which of these sports stars represented {value}?', stmt: '{name} represented {value}.' },
   },
   items,
   questions: SPORT_Q.map(q => toQuestion('spt', q)),

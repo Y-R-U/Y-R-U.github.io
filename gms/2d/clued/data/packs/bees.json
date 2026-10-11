@@ -1672,7 +1672,7 @@
   {
    "id": "q2",
    "kind": "mc",
-   "prompt": "What do honey bees make that people eat?",
+   "prompt": "Bees turn flower nectar into which sweet food?",
    "answer": "Honey",
    "wrong": [
     "Jam",

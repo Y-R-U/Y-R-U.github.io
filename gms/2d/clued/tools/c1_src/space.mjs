@@ -203,7 +203,7 @@ export default {
     { kind: 'mc', prompt: 'What causes the tides on Earth?', answer: 'Mainly the Moon\'s gravity', wrong: ['The wind', 'Earthquakes', 'The Earth\'s magnetic field'], explain: 'The Sun adds a smaller pull too.', difficulty: 2 },
     { kind: 'mc', prompt: 'Which is the closest star to the Sun?', answer: 'Proxima Centauri', wrong: ['Sirius', 'Polaris', 'Betelgeuse'], explain: 'It is about 4.2 light years away.', difficulty: 2 },
     { kind: 'mc', prompt: 'Which is the brightest star in the night sky?', answer: 'Sirius', wrong: ['Polaris', 'Betelgeuse', 'Vega'], explain: 'Polaris is not especially bright; it is famous for staying still.', difficulty: 2 },
-    { kind: 'mc', prompt: 'What is a light year?', answer: 'The distance light travels in a year', wrong: ['The time it takes to get to the Moon', 'A year on a planet with no night', 'The weight of a star'], explain: 'It is about 9.5 trillion km.', difficulty: 2 },
+    { kind: 'mc', leakOk: true, prompt: 'What is a light year?', answer: 'The distance light travels in a year', wrong: ['The time it takes to get to the Moon', 'A year on a planet with no night', 'The weight of a star'], explain: 'It is about 9.5 trillion km.', difficulty: 2 },
     { kind: 'mc', prompt: 'What is at the centre of our solar system?', answer: 'The Sun', wrong: ['The Earth', 'The Moon', 'Jupiter'], explain: 'All the planets orbit the Sun.', difficulty: 1 },
     { kind: 'mc', prompt: 'Which planet is the closest to the Sun?', answer: 'Mercury', wrong: ['Venus', 'Earth', 'Mars'], explain: 'Mercury orbits in just 88 days.', difficulty: 1 },
     { kind: 'tf', prompt: 'The Sun is a star.', answer: true, explain: 'It is a fairly ordinary yellow dwarf star.', difficulty: 1 },

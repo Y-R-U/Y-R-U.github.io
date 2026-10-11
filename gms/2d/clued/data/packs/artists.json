@@ -34,14 +34,16 @@
    "type": "cat",
    "label": "Born in",
    "ask": "When was {name} born?",
-   "stmt": "{name} was born in the {value}."
+   "stmt": "{name} was born in the {value}.",
+   "askReverse": "Which of these people was born in the {value}?"
   },
   "movement": {
    "type": "cat",
    "label": "Movement",
    "exclusive": false,
    "ask": "Which style or movement is {name} linked with?",
-   "stmt": "{name} is linked with {value}."
+   "stmt": "{name} is linked with {value}.",
+   "askReverse": "Which of these artists is linked with {value}?"
   }
  },
  "items": [

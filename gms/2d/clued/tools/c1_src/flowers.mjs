@@ -28,7 +28,7 @@ const PACK = {
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which flower is this?",
   tfImgPrompt: "This flower is {aName}.",
-  tpl: {"colour": {"ask": "What colour is the {lname} usually?", "stmt": "The {lname} is usually {lvalue}.", "exclusive": false}, "region": {"ask": "Where is the {lname} native to?", "askReverse": "Which of these is native to {value}?", "stmt": "The {lname} is native to {value}.", "exclusive": false}, "family": {"ask": "Which plant family does the {lname} belong to?", "askReverse": "Which of these flowers is in the {lvalue}?", "stmt": "The {lname} belongs to the {lvalue}."}, "emblem": {"ask": "The {lname} is the floral emblem of where?", "askReverse": "Which flower is the floral emblem of {value}?", "stmt": "The {lname} is the floral emblem of {value}."}},
+  tpl: {"colour": {"ask": "What colour is the {lname} usually?", "askReverse": "Which of these flowers is usually {lvalue}?", "stmt": "The {lname} is usually {lvalue}.", "exclusive": false}, "region": {"ask": "Where is the {lname} native to?", "askReverse": "Which of these is native to {value}?", "stmt": "The {lname} is native to {value}.", "exclusive": false}, "family": {"ask": "Which plant family does the {lname} belong to?", "askReverse": "Which of these flowers is in the {lvalue}?", "stmt": "The {lname} belongs to the {lvalue}."}, "emblem": {"ask": "The {lname} is the floral emblem of where?", "askReverse": "Which flower is the floral emblem of {value}?", "stmt": "The {lname} is the floral emblem of {value}."}},
   sources: [INAT, WD],
   items: [
     { n: 'Sunflower', alt: ['common sunflower'], sci: 'Helianthus annuus', g: 'daisy family', f: f('Yellow', NA), d: 1,

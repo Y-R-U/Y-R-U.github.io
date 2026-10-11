@@ -2741,24 +2741,6 @@
  ],
  "questions": [
   {
-   "id": "cur-afghanistan",
-   "kind": "mc",
-   "prompt": "What is the currency of Afghanistan?",
-   "answer": "Afghani",
-   "wrong": [
-    "Riyal",
-    "Sum",
-    "Taka"
-   ],
-   "explain": "Afghanistan uses the Afghan afghani (AFN).",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Riyal": "The riyal is used in Qatar and Saudi Arabia.",
-    "Sum": "The sum is used in Uzbekistan.",
-    "Taka": "The taka is used in Bangladesh."
-   }
-  },
-  {
    "id": "curr-afghanistan",
    "kind": "mc",
    "prompt": "Which country uses the Afghan afghani?",
@@ -3134,24 +3116,6 @@
     "Sol": "The sol is used in Peru.",
     "Real": "The real is used in Brazil.",
     "Peso": "The peso is used in Argentina, Chile, Colombia and 5 others."
-   }
-  },
-  {
-   "id": "cur-bosnia-and-herzegovina",
-   "kind": "mc",
-   "prompt": "What is the currency of Bosnia and Herzegovina?",
-   "answer": "Bosnia",
-   "wrong": [
-    "Krone",
-    "Forint",
-    "Koruna"
-   ],
-   "explain": "Bosnia and Herzegovina uses the Bosnia and Herzegovina convertible mark (BAM).",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Krone": "The krone is used in Denmark and Norway.",
-    "Forint": "The forint is used in Hungary.",
-    "Koruna": "The koruna is used in Czechia."
    }
   },
   {
@@ -5513,24 +5477,6 @@
    }
   },
   {
-   "id": "cur-sao-tome-and-principe",
-   "kind": "mc",
-   "prompt": "What is the currency of São Tomé and Príncipe?",
-   "answer": "Tomé",
-   "wrong": [
-    "Dalasi",
-    "Naira",
-    "Birr"
-   ],
-   "explain": "São Tomé and Príncipe uses the São Tomé and Príncipe dobra (STN).",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Dalasi": "The dalasi is used in Gambia.",
-    "Naira": "The naira is used in Nigeria.",
-    "Birr": "The birr is used in Ethiopia."
-   }
-  },
-  {
    "id": "cur-saudi-arabia",
    "kind": "mc",
    "prompt": "What is the currency of Saudi Arabia?",
@@ -5600,24 +5546,6 @@
     "Rand": "The rand is used in Lesotho, Namibia and South Africa.",
     "Naira": "The naira is used in Nigeria.",
     "Lilangeni": "The lilangeni is used in Eswatini."
-   }
-  },
-  {
-   "id": "cur-sierra-leone",
-   "kind": "mc",
-   "prompt": "What is the currency of Sierra Leone?",
-   "answer": "Leone",
-   "wrong": [
-    "Shilling",
-    "Ouguiya",
-    "Kwacha"
-   ],
-   "explain": "Sierra Leone uses the Sierra Leonean leone (SLE).",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Shilling": "The shilling is used in Kenya, Somalia, Tanzania and Uganda.",
-    "Ouguiya": "The ouguiya is used in Mauritania.",
-    "Kwacha": "The kwacha is used in Malawi and Zambia."
    }
   },
   {
@@ -6032,24 +5960,6 @@
     "Tālā": "The tālā is used in Samoa.",
     "Kina": "The kina is used in Papua New Guinea.",
     "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
-   }
-  },
-  {
-   "id": "cur-trinidad-and-tobago",
-   "kind": "mc",
-   "prompt": "What is the currency of Trinidad and Tobago?",
-   "answer": "Trinidad",
-   "wrong": [
-    "Córdoba",
-    "Lempira",
-    "Quetzal"
-   ],
-   "explain": "Trinidad and Tobago uses the Trinidad and Tobago dollar (TTD).",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Córdoba": "The córdoba is used in Nicaragua.",
-    "Lempira": "The lempira is used in Honduras.",
-    "Quetzal": "The quetzal is used in Guatemala."
    }
   },
   {

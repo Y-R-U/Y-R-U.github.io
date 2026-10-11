@@ -37,7 +37,8 @@
    "type": "cat",
    "label": "Continent",
    "ask": "Which continent is {name} in?",
-   "stmt": "{name} is in {value}."
+   "stmt": "{name} is in {value}.",
+   "askReverse": "Which of these capital cities is in {value}?"
   }
  },
  "items": [
@@ -2603,22 +2604,6 @@
    ]
   },
   {
-   "id": "cap-andorra-la-vella",
-   "kind": "mc",
-   "prompt": "What is the capital of Andorra?",
-   "answer": "Andorra la Vella",
-   "wrong": [
-    "Athens",
-    "Sarajevo",
-    "Bratislava"
-   ],
-   "explain": "Andorra la Vella is the capital of Andorra.",
-   "difficulty": 3,
-   "refs": [
-    "capitals/andorra-la-vella"
-   ]
-  },
-  {
    "id": "cap-luanda",
    "kind": "mc",
    "prompt": "What is the capital of Angola?",
@@ -3819,22 +3804,6 @@
    ]
   },
   {
-   "id": "cap-djibouti-city",
-   "kind": "mc",
-   "prompt": "What is the capital of Djibouti?",
-   "answer": "Djibouti",
-   "wrong": [
-    "Bangui",
-    "Freetown",
-    "Ouagadougou"
-   ],
-   "explain": "Djibouti is the capital of Djibouti.",
-   "difficulty": 3,
-   "refs": [
-    "capitals/djibouti-city"
-   ]
-  },
-  {
    "id": "cap-roseau",
    "kind": "mc",
    "prompt": "What is the capital of Dominica?",
@@ -3944,38 +3913,6 @@
    "difficulty": 1,
    "refs": [
     "capitals/cairo"
-   ]
-  },
-  {
-   "id": "cap-san-salvador",
-   "kind": "mc",
-   "prompt": "What is the capital of El Salvador?",
-   "answer": "San Salvador",
-   "wrong": [
-    "Kingston",
-    "Guatemala City",
-    "Port-au-Prince"
-   ],
-   "explain": "San Salvador is the capital of El Salvador.",
-   "difficulty": 2,
-   "refs": [
-    "capitals/san-salvador"
-   ]
-  },
-  {
-   "id": "capr-san-salvador",
-   "kind": "mc",
-   "prompt": "San Salvador is the capital of which country?",
-   "answer": "El Salvador",
-   "wrong": [
-    "Bahamas",
-    "Saint Vincent and the Grenadines",
-    "Mexico"
-   ],
-   "explain": "San Salvador is the capital of El Salvador.",
-   "difficulty": 2,
-   "refs": [
-    "capitals/san-salvador"
    ]
   },
   {
@@ -4331,38 +4268,6 @@
    ]
   },
   {
-   "id": "cap-guatemala-city",
-   "kind": "mc",
-   "prompt": "What is the capital of Guatemala?",
-   "answer": "Guatemala City",
-   "wrong": [
-    "Havana",
-    "Santo Domingo",
-    "Belmopan"
-   ],
-   "explain": "Guatemala City is the capital of Guatemala.",
-   "difficulty": 2,
-   "refs": [
-    "capitals/guatemala-city"
-   ]
-  },
-  {
-   "id": "capr-guatemala-city",
-   "kind": "mc",
-   "prompt": "Guatemala City is the capital of which country?",
-   "answer": "Guatemala",
-   "wrong": [
-    "Dominican Republic",
-    "Trinidad and Tobago",
-    "Nicaragua"
-   ],
-   "explain": "Guatemala City is the capital of Guatemala.",
-   "difficulty": 2,
-   "refs": [
-    "capitals/guatemala-city"
-   ]
-  },
-  {
    "id": "cap-conakry",
    "kind": "mc",
    "prompt": "What is the capital of Guinea?",
@@ -4392,22 +4297,6 @@
    "difficulty": 2,
    "refs": [
     "capitals/conakry"
-   ]
-  },
-  {
-   "id": "cap-bissau",
-   "kind": "mc",
-   "prompt": "What is the capital of Guinea-Bissau?",
-   "answer": "Bissau",
-   "wrong": [
-    "Juba",
-    "Victoria",
-    "Khartoum"
-   ],
-   "explain": "Bissau is the capital of Guinea-Bissau.",
-   "difficulty": 3,
-   "refs": [
-    "capitals/bissau"
    ]
   },
   {
@@ -4923,38 +4812,6 @@
    ]
   },
   {
-   "id": "cap-kuwait-city",
-   "kind": "mc",
-   "prompt": "What is the capital of Kuwait?",
-   "answer": "Kuwait City",
-   "wrong": [
-    "Bangkok",
-    "Astana",
-    "Tokyo"
-   ],
-   "explain": "Kuwait City is the capital of Kuwait.",
-   "difficulty": 2,
-   "refs": [
-    "capitals/kuwait-city"
-   ]
-  },
-  {
-   "id": "capr-kuwait-city",
-   "kind": "mc",
-   "prompt": "Kuwait City is the capital of which country?",
-   "answer": "Kuwait",
-   "wrong": [
-    "Lebanon",
-    "Laos",
-    "United Arab Emirates"
-   ],
-   "explain": "Kuwait City is the capital of Kuwait.",
-   "difficulty": 2,
-   "refs": [
-    "capitals/kuwait-city"
-   ]
-  },
-  {
    "id": "cap-bishkek",
    "kind": "mc",
    "prompt": "What is the capital of Kyrgyzstan?",
@@ -5176,22 +5033,6 @@
    "difficulty": 3,
    "refs": [
     "capitals/vilnius"
-   ]
-  },
-  {
-   "id": "cap-luxembourg-city",
-   "kind": "mc",
-   "prompt": "What is the capital of Luxembourg?",
-   "answer": "Luxembourg",
-   "wrong": [
-    "Helsinki",
-    "Paris",
-    "Valletta"
-   ],
-   "explain": "Luxembourg is the capital of Luxembourg.",
-   "difficulty": 3,
-   "refs": [
-    "capitals/luxembourg-city"
    ]
   },
   {
@@ -5419,38 +5260,6 @@
    ]
   },
   {
-   "id": "cap-mexico-city",
-   "kind": "mc",
-   "prompt": "What is the capital of Mexico?",
-   "answer": "Mexico City",
-   "wrong": [
-    "Washington, D.C.",
-    "Belmopan",
-    "Basseterre"
-   ],
-   "explain": "Mexico City is the capital of Mexico.",
-   "difficulty": 1,
-   "refs": [
-    "capitals/mexico-city"
-   ]
-  },
-  {
-   "id": "capr-mexico-city",
-   "kind": "mc",
-   "prompt": "Mexico City is the capital of which country?",
-   "answer": "Mexico",
-   "wrong": [
-    "Antigua and Barbuda",
-    "Dominica",
-    "Honduras"
-   ],
-   "explain": "Mexico City is the capital of Mexico.",
-   "difficulty": 1,
-   "refs": [
-    "capitals/mexico-city"
-   ]
-  },
-  {
    "id": "cap-palikir",
    "kind": "mc",
    "prompt": "What is the capital of Micronesia?",
@@ -5480,22 +5289,6 @@
    "difficulty": 3,
    "refs": [
     "capitals/chisinau"
-   ]
-  },
-  {
-   "id": "cap-monaco-city",
-   "kind": "mc",
-   "prompt": "What is the capital of Monaco?",
-   "answer": "Monaco",
-   "wrong": [
-    "Bratislava",
-    "Vilnius",
-    "Bern"
-   ],
-   "explain": "Monaco is the capital of Monaco.",
-   "difficulty": 3,
-   "refs": [
-    "capitals/monaco-city"
    ]
   },
   {
@@ -6027,38 +5820,6 @@
    ]
   },
   {
-   "id": "cap-panama-city",
-   "kind": "mc",
-   "prompt": "What is the capital of Panama?",
-   "answer": "Panama City",
-   "wrong": [
-    "San Salvador",
-    "Roseau",
-    "Guatemala City"
-   ],
-   "explain": "Panama City is the capital of Panama.",
-   "difficulty": 2,
-   "refs": [
-    "capitals/panama-city"
-   ]
-  },
-  {
-   "id": "capr-panama-city",
-   "kind": "mc",
-   "prompt": "Panama City is the capital of which country?",
-   "answer": "Panama",
-   "wrong": [
-    "United States",
-    "Honduras",
-    "Nicaragua"
-   ],
-   "explain": "Panama City is the capital of Panama.",
-   "difficulty": 2,
-   "refs": [
-    "capitals/panama-city"
-   ]
-  },
-  {
    "id": "cap-port-moresby",
    "kind": "mc",
    "prompt": "What is the capital of Papua New Guinea?",
@@ -6427,38 +6188,6 @@
    ]
   },
   {
-   "id": "cap-san-marino-city",
-   "kind": "mc",
-   "prompt": "What is the capital of San Marino?",
-   "answer": "San Marino",
-   "wrong": [
-    "Athens",
-    "Luxembourg",
-    "Bucharest"
-   ],
-   "explain": "San Marino is the capital of San Marino.",
-   "difficulty": 3,
-   "refs": [
-    "capitals/san-marino-city"
-   ]
-  },
-  {
-   "id": "cap-sao-tome",
-   "kind": "mc",
-   "prompt": "What is the capital of São Tomé and Príncipe?",
-   "answer": "São Tomé",
-   "wrong": [
-    "Asmara",
-    "Pretoria",
-    "Bangui"
-   ],
-   "explain": "São Tomé is the capital of São Tomé and Príncipe.",
-   "difficulty": 3,
-   "refs": [
-    "capitals/sao-tome"
-   ]
-  },
-  {
    "id": "cap-riyadh",
    "kind": "mc",
    "prompt": "What is the capital of Saudi Arabia?",
@@ -6600,22 +6329,6 @@
    "difficulty": 2,
    "refs": [
     "capitals/freetown"
-   ]
-  },
-  {
-   "id": "cap-singapore-city",
-   "kind": "mc",
-   "prompt": "What is the capital of Singapore?",
-   "answer": "Singapore",
-   "wrong": [
-    "Beirut",
-    "Tashkent",
-    "Kuala Lumpur"
-   ],
-   "explain": "Singapore is the capital of Singapore.",
-   "difficulty": 2,
-   "refs": [
-    "capitals/singapore-city"
    ]
   },
   {
@@ -7195,22 +6908,6 @@
    ]
   },
   {
-   "id": "cap-tunis",
-   "kind": "mc",
-   "prompt": "What is the capital of Tunisia?",
-   "answer": "Tunis",
-   "wrong": [
-    "Mogadishu",
-    "Harare",
-    "Yaoundé"
-   ],
-   "explain": "Tunis is the capital of Tunisia.",
-   "difficulty": 2,
-   "refs": [
-    "capitals/tunis"
-   ]
-  },
-  {
    "id": "capr-tunis",
    "kind": "mc",
    "prompt": "Tunis is the capital of which country?",
@@ -7544,22 +7241,6 @@
    "difficulty": 3,
    "refs": [
     "capitals/port-vila"
-   ]
-  },
-  {
-   "id": "cap-vatican-city-city",
-   "kind": "mc",
-   "prompt": "What is the capital of Vatican City?",
-   "answer": "Vatican City",
-   "wrong": [
-    "Bratislava",
-    "London",
-    "Oslo"
-   ],
-   "explain": "Vatican City is the capital of Vatican City.",
-   "difficulty": 3,
-   "refs": [
-    "capitals/vatican-city-city"
    ]
   },
   {

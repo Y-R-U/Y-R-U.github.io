@@ -95,7 +95,7 @@ writePack({
     author: { type: 'cat', label: 'Author', ask: 'Who wrote {name}?', askReverse: 'Which of these books was written by {value}?', stmt: '{name} was written by {value}.' },
     year: { type: 'year', label: 'First published', higherLabel: 'Newer', askHigh: 'Which of these books was published most recently?', askLow: 'Which of these books was published first?' },
     genre: { type: 'cat', label: 'Genre', exclusive: false },
-    century: { type: 'cat', label: 'Century', ask: 'In which century was {name} first published?', stmt: '{name} was first published in the {value}.' },
+    century: { type: 'cat', label: 'Century', ask: 'In which century was {name} first published?', askReverse: 'Which of these books was first published in the {value}?', stmt: '{name} was first published in the {value}.' },
     kids: { type: 'bool', label: "Children's book", yes: "Children's book", no: 'Not a children’s book', askBool: "Which of these is a children's book?", stmt: "{name} is a children's book." },
   },
   items, questions: qs,

@@ -53,7 +53,8 @@
    "type": "cat",
    "label": "Continent",
    "ask": "Which continent is {lname} in?",
-   "stmt": "{lname} is in {value}."
+   "stmt": "{lname} is in {value}.",
+   "askReverse": "Which of these countries is in {value}?"
   },
   "drivingSide": {
    "type": "cat",
@@ -71,7 +72,40 @@
   },
   "capital": {
    "type": "text",
-   "label": "Capital"
+   "label": "Capital",
+   "ask": "What is the capital of {lname}?",
+   "alt": {
+    "Sucre": [
+     "La Paz"
+    ],
+    "Yamoussoukro": [
+     "Abidjan"
+    ],
+    "Sri Jayawardenepura Kotte": [
+     "Kotte",
+     "Colombo"
+    ],
+    "Porto-Novo": [
+     "Cotonou"
+    ],
+    "Mbabane": [
+     "Lobamba"
+    ],
+    "Pretoria": [
+     "Cape Town",
+     "Bloemfontein"
+    ],
+    "Amsterdam": [
+     "The Hague"
+    ],
+    "Kuala Lumpur": [
+     "Putrajaya"
+    ],
+    "Washington, D.C.": [
+     "Washington",
+     "Washington DC"
+    ]
+   }
   },
   "currency": {
    "type": "text",
@@ -9089,22 +9123,6 @@
    ]
   },
   {
-   "id": "cont-central-african-republic",
-   "kind": "mc",
-   "prompt": "Which continent is the Central African Republic in?",
-   "answer": "Africa",
-   "wrong": [
-    "Europe",
-    "South America",
-    "North America"
-   ],
-   "explain": "The Central African Republic is in Africa.",
-   "difficulty": 2,
-   "refs": [
-    "countries/central-african-republic"
-   ]
-  },
-  {
    "id": "cont-chad",
    "kind": "mc",
    "prompt": "Which continent is Chad in?",
@@ -10590,22 +10608,6 @@
    "difficulty": 2,
    "refs": [
     "countries/somalia"
-   ]
-  },
-  {
-   "id": "cont-south-africa",
-   "kind": "mc",
-   "prompt": "Which continent is South Africa in?",
-   "answer": "Africa",
-   "wrong": [
-    "South America",
-    "Asia",
-    "Europe"
-   ],
-   "explain": "South Africa is in Africa.",
-   "difficulty": 1,
-   "refs": [
-    "countries/south-africa"
    ]
   },
   {

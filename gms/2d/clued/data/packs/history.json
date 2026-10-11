@@ -18,7 +18,8 @@
    "type": "cat",
    "label": "Century",
    "ask": "{name}. In which century did this happen?",
-   "stmt": "{name}. This happened in the {value}."
+   "stmt": "{name}. This happened in the {value}.",
+   "askReverse": "Which of these happened in the {value}?"
   },
   "era": {
    "type": "cat",

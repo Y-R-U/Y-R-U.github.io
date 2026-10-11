@@ -3915,34 +3915,6 @@
    ]
   },
   {
-   "id": "artist-whistler-s-mother",
-   "kind": "mc",
-   "prompt": "Who painted Whistler's Mother?",
-   "answer": "James McNeill Whistler",
-   "wrong": [
-    "Katsushika Hokusai",
-    "Henri Rousseau",
-    "Johannes Vermeer"
-   ],
-   "explain": "Whistler's Mother (1871) by James McNeill Whistler. It shows the painter's mother.",
-   "difficulty": 2,
-   "media": {
-    "img": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Whistlers_Mother_high_res.jpg/500px-Whistlers_Mother_high_res.jpg",
-      "w": 500,
-      "h": 445,
-      "credit": "James McNeill Whistler",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Whistlers_Mother_high_res.jpg"
-     }
-    ]
-   },
-   "refs": [
-    "paintings/whistler-s-mother"
-   ]
-  },
-  {
    "id": "name-whistler-s-mother",
    "kind": "mc",
    "prompt": "What is this painting called?",

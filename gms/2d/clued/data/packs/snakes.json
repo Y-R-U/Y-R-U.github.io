@@ -181,14 +181,6 @@
       "credit": "Bernard DUPONT",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/82211207"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/244026573/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Tom Field",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/244026573"
      }
     ]
    },
@@ -1322,14 +1314,6 @@
       "credit": "Tim",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/107893548"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/260047674/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/260047674"
      }
     ]
    },
@@ -1617,14 +1601,6 @@
       "credit": "John Barkla",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/9059877"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/539460735/medium.jpg",
-      "w": 500,
-      "h": 348,
-      "credit": "Debra Baker",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/539460735"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/538884887/medium.jpg",
@@ -3338,22 +3314,6 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/218050793"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/162920279/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Michael J. Papay",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/162920279"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/208458371/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Evan M. Raskin",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/208458371"
      }
     ]
    },
@@ -4312,14 +4272,6 @@
       "credit": "Leofleck at English Wikipedia",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Boa_leofleck.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Boa_constrictor_Natural_History_Museum_University_of_Pisa_B_2124.jpg/500px-Boa_constrictor_Natural_History_Museum_University_of_Pisa_B_2124.jpg",
-      "w": 500,
-      "h": 82,
-      "credit": "Stefano Puzzuoli",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Boa_constrictor_Natural_History_Museum_University_of_Pisa_B_2124.jpg"
      }
     ]
    },

@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, placeAnswer, collect, pick, sample, shuffle } from './registry.js?v=202610101826';
-import { layout, choiceGrid, h } from '../ui/kit.js?v=202610101826';
-import { norm, injectCSS } from './fkit.js?v=202610101826';
+import { register, poolItems, pickPack, byDifficulty, placeAnswer, collect, pick, sample, shuffle, givesAway } from './registry.js?v=202610110402';
+import { layout, choiceGrid, h } from '../ui/kit.js?v=202610110402';
+import { norm, injectCSS } from './fkit.js?v=202610110402';
 
 const CSS = `
 .qt-card{position:relative;margin:0;background:#fff;border:var(--line) solid var(--ink);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 18px 16px;font-size:clamp(19px,5.2vw,24px);line-height:1.3;font-weight:800;text-align:center;text-wrap:balance;animation:ch-in .4s cubic-bezier(.2,1.4,.4,1) both}
@@ -67,7 +67,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
   const pickLine = byDifficulty(linesOf(t.item, kind), difficulty, 1, x => x.difficulty || t.item.difficulty || 2);
   const lineObj = pick(rng, pickLine);
   const line = lineObj?.text;
-  if (!line || leaks(line, [t.item.name, ...(t.item.alt || [])])) return null;
+  if (!line || leaks(line, [t.item.name, ...(t.item.alt || [])]) || givesAway(t.item.name, line)) return null;
   let cands = all.filter(c => c !== t && !related(c.item.name, t.item.name));
   if (difficulty === 3 && t.item.group) {
     const same = cands.filter(c => c.item.group === t.item.group);

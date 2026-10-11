@@ -3375,9 +3375,9 @@
    "topic": "technology"
   },
   {
-   "id": "gen-tech-785cd7",
+   "id": "gen-tech-aaafcf",
    "kind": "mc",
-   "prompt": "Who co-founded Apple with Steve Jobs in 1976?",
+   "prompt": "Who co-founded Apple in 1976 and designed its first computers?",
    "answer": "Steve Wozniak",
    "wrong": [
     "Bill Gates",
@@ -3523,9 +3523,9 @@
    "topic": "technology"
   },
   {
-   "id": "gen-tech-862b79",
+   "id": "gen-tech-6f0207",
    "kind": "mc",
-   "prompt": "Who co-developed the Morse code used for telegraphs?",
+   "prompt": "Who co-developed the dot-and-dash telegraph code in the 1830s and 1840s?",
    "answer": "Samuel Morse",
    "wrong": [
     "Thomas Edison",
@@ -10197,6 +10197,1352 @@
     "animals"
    ],
    "topic": "animals"
+  },
+  {
+   "id": "gen-food-49708f",
+   "kind": "mc",
+   "prompt": "Guacamole is mainly made from which fruit?",
+   "answer": "Avocado",
+   "wrong": [
+    "Lime",
+    "Tomato",
+    "Mango"
+   ],
+   "explain": "Guacamole is a Mexican dip of mashed avocado.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-08f155",
+   "kind": "mc",
+   "prompt": "Which grain is used to make risotto?",
+   "answer": "Rice",
+   "wrong": [
+    "Wheat",
+    "Oats",
+    "Barley"
+   ],
+   "explain": "Risotto uses short-grain rice such as arborio.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-d2969c",
+   "kind": "mc",
+   "prompt": "Hummus is made mainly from which legume?",
+   "answer": "Chickpeas",
+   "wrong": [
+    "Lentils",
+    "Kidney beans",
+    "Peas"
+   ],
+   "explain": "Chickpeas are blended with tahini, lemon and garlic.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-0e2fdb",
+   "kind": "mc",
+   "prompt": "Tahini is a paste made from which seeds?",
+   "answer": "Sesame seeds",
+   "wrong": [
+    "Sunflower seeds",
+    "Pumpkin seeds",
+    "Poppy seeds"
+   ],
+   "explain": "Tahini is ground sesame.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-f3b7b9",
+   "kind": "mc",
+   "prompt": "Which country is the origin of sushi?",
+   "answer": "Japan",
+   "wrong": [
+    "China",
+    "Korea",
+    "Thailand"
+   ],
+   "explain": "Sushi is a Japanese dish of vinegared rice.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-f18d8b",
+   "kind": "mc",
+   "prompt": "Kimchi, a fermented vegetable dish, comes from which country?",
+   "answer": "Korea",
+   "wrong": [
+    "Japan",
+    "Vietnam",
+    "China"
+   ],
+   "explain": "Kimchi is usually made with napa cabbage and chilli.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-d43eb6",
+   "kind": "mc",
+   "prompt": "Which nut is used to make marzipan?",
+   "answer": "Almond",
+   "wrong": [
+    "Walnut",
+    "Peanut",
+    "Cashew"
+   ],
+   "explain": "Marzipan is almond meal and sugar.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-034b50",
+   "kind": "mc",
+   "prompt": "Which spice gives paella and many curries a yellow colour?",
+   "answer": "Saffron or turmeric",
+   "wrong": [
+    "Cinnamon",
+    "Nutmeg",
+    "Cloves"
+   ],
+   "explain": "Saffron colours paella; turmeric colours many curries.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-aecaf7",
+   "kind": "mc",
+   "prompt": "What is the main ingredient of a traditional omelette?",
+   "answer": "Eggs",
+   "wrong": [
+    "Flour",
+    "Rice",
+    "Potatoes"
+   ],
+   "explain": "An omelette is beaten eggs cooked in a pan.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-9abf7b",
+   "kind": "mc",
+   "prompt": "Which cheese is traditionally used on a Margherita pizza?",
+   "answer": "Mozzarella",
+   "wrong": [
+    "Cheddar",
+    "Brie",
+    "Feta"
+   ],
+   "explain": "Tomato, mozzarella and basil: the colours of the Italian flag.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-1bb243",
+   "kind": "mc",
+   "prompt": "Feta cheese is most closely linked with which country?",
+   "answer": "Greece",
+   "wrong": [
+    "France",
+    "Switzerland",
+    "Netherlands"
+   ],
+   "explain": "Feta is a brined Greek cheese, often made from sheep's milk.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-8f94e8",
+   "kind": "mc",
+   "prompt": "Which cheese is famous for having holes?",
+   "answer": "Emmental",
+   "wrong": [
+    "Cheddar",
+    "Parmesan",
+    "Stilton"
+   ],
+   "explain": "Gas bubbles from bacteria leave the holes in Emmental.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-520c77",
+   "kind": "mc",
+   "prompt": "Which drink is made by brewing roasted beans?",
+   "answer": "Coffee",
+   "wrong": [
+    "Tea",
+    "Cocoa",
+    "Cola"
+   ],
+   "explain": "Coffee beans are the seeds of the coffee plant, roasted and ground.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-eead4a",
+   "kind": "mc",
+   "prompt": "Chocolate is made from the beans of which plant?",
+   "answer": "Cacao",
+   "wrong": [
+    "Coffee",
+    "Vanilla",
+    "Carob"
+   ],
+   "explain": "Cacao beans grow in pods on the cacao tree.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-e646a2",
+   "kind": "mc",
+   "prompt": "Vanilla comes from which kind of plant?",
+   "answer": "An orchid",
+   "wrong": [
+    "A palm tree",
+    "A lily",
+    "A grass"
+   ],
+   "explain": "Vanilla pods are the fruit of a climbing orchid.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-2e17e0",
+   "kind": "mc",
+   "prompt": "Which vegetable is the main ingredient of borscht?",
+   "answer": "Beetroot",
+   "wrong": [
+    "Cabbage",
+    "Carrot",
+    "Potato"
+   ],
+   "explain": "Borscht gets its deep red colour from beetroot.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-bacb61",
+   "kind": "mc",
+   "prompt": "Which fruit is dried to make raisins?",
+   "answer": "Grapes",
+   "wrong": [
+    "Plums",
+    "Cherries",
+    "Apricots"
+   ],
+   "explain": "Raisins are dried grapes; prunes are dried plums.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-31df76",
+   "kind": "mc",
+   "prompt": "Prunes are dried versions of which fruit?",
+   "answer": "Plums",
+   "wrong": [
+    "Grapes",
+    "Figs",
+    "Dates"
+   ],
+   "explain": "Prunes are dried plums.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-b41787",
+   "kind": "mc",
+   "prompt": "What is the main ingredient of the Middle Eastern dish falafel?",
+   "answer": "Chickpeas or fava beans",
+   "wrong": [
+    "Lamb",
+    "Rice",
+    "Aubergine"
+   ],
+   "explain": "Falafel are fried balls of ground chickpeas or fava beans.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-65ac42",
+   "kind": "mc",
+   "prompt": "Which country gave the world the croissant as we know it?",
+   "answer": "France",
+   "wrong": [
+    "Belgium",
+    "Italy",
+    "Germany"
+   ],
+   "explain": "The croissant was inspired by the Austrian kipferl but perfected in France.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-6d6733",
+   "kind": "tf",
+   "prompt": "Peanuts are true nuts.",
+   "answer": false,
+   "explain": "Peanuts are legumes, related to peas and beans.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-0805c9",
+   "kind": "tf",
+   "prompt": "Honey can stay edible for a very long time if kept sealed.",
+   "answer": true,
+   "explain": "Its low water content and acidity stop most microbes growing.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-633398",
+   "kind": "tf",
+   "prompt": "Rice grows in flooded fields called paddies in many countries.",
+   "answer": true,
+   "explain": "Flooding helps control weeds around the rice plants.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-d9cec2",
+   "kind": "mc",
+   "prompt": "Which vitamin are citrus fruits like oranges famous for?",
+   "answer": "Vitamin C",
+   "wrong": [
+    "Vitamin D",
+    "Vitamin K",
+    "Vitamin B12"
+   ],
+   "explain": "A lack of vitamin C causes scurvy.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-4803c8",
+   "kind": "mc",
+   "prompt": "Basmati rice is traditionally grown in India and which neighbouring country?",
+   "answer": "Pakistan",
+   "wrong": [
+    "Thailand",
+    "Japan",
+    "Egypt"
+   ],
+   "explain": "Basmati grows in the foothills of the Himalayas in India and Pakistan.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-nat-851e33",
+   "kind": "mc",
+   "prompt": "What do we call an animal that eats only plants?",
+   "answer": "Herbivore",
+   "wrong": [
+    "Carnivore",
+    "Omnivore",
+    "Predator"
+   ],
+   "explain": "Cows and rabbits are herbivores.",
+   "difficulty": 1,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-9c272c",
+   "kind": "mc",
+   "prompt": "What do we call an animal that eats both plants and meat?",
+   "answer": "Omnivore",
+   "wrong": [
+    "Herbivore",
+    "Carnivore",
+    "Insectivore"
+   ],
+   "explain": "Bears and humans are omnivores.",
+   "difficulty": 1,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-6252d3",
+   "kind": "mc",
+   "prompt": "What is the long winter sleep of some animals called?",
+   "answer": "Hibernation",
+   "wrong": [
+    "Migration",
+    "Metamorphosis",
+    "Camouflage"
+   ],
+   "explain": "Hedgehogs and dormice hibernate.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-dcac1c",
+   "kind": "mc",
+   "prompt": "What do we call the change from caterpillar to butterfly?",
+   "answer": "Metamorphosis",
+   "wrong": [
+    "Hibernation",
+    "Evolution",
+    "Pollination"
+   ],
+   "explain": "Inside the chrysalis the body is rebuilt.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-07ebad",
+   "kind": "mc",
+   "prompt": "What is the largest ocean on Earth?",
+   "answer": "Pacific",
+   "wrong": [
+    "Atlantic",
+    "Indian",
+    "Arctic"
+   ],
+   "explain": "The Pacific covers about a third of Earth's surface.",
+   "difficulty": 1,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-b6b044",
+   "kind": "mc",
+   "prompt": "Which animal is the largest living land animal?",
+   "answer": "African bush elephant",
+   "wrong": [
+    "White rhinoceros",
+    "Hippopotamus",
+    "Giraffe"
+   ],
+   "explain": "Males can weigh around 6 tonnes.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-f6ce16",
+   "kind": "mc",
+   "prompt": "Which is the only mammal that can truly fly?",
+   "answer": "Bat",
+   "wrong": [
+    "Flying squirrel",
+    "Sugar glider",
+    "Colugo"
+   ],
+   "explain": "Gliders glide; only bats flap their wings to fly.",
+   "difficulty": 1,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-48cfac",
+   "kind": "mc",
+   "prompt": "What is a group of wolves called?",
+   "answer": "A pack",
+   "wrong": [
+    "A pride",
+    "A pod",
+    "A colony"
+   ],
+   "explain": "Wolf packs are usually a family.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-d3b5cd",
+   "kind": "mc",
+   "prompt": "What is a group of whales or dolphins called?",
+   "answer": "A pod",
+   "wrong": [
+    "A flock",
+    "A pack",
+    "A swarm"
+   ],
+   "explain": "Orcas live in pods led by older females.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-943e36",
+   "kind": "mc",
+   "prompt": "What is a group of fish swimming together called?",
+   "answer": "A school or shoal",
+   "wrong": [
+    "A herd",
+    "A pride",
+    "A troop"
+   ],
+   "explain": "Swimming together helps fish avoid predators.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-faeffb",
+   "kind": "mc",
+   "prompt": "What is a young goose called?",
+   "answer": "Gosling",
+   "wrong": [
+    "Cygnet",
+    "Eaglet",
+    "Poult"
+   ],
+   "explain": "Goslings are covered in soft yellow down.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-00d390",
+   "kind": "mc",
+   "prompt": "What is a male deer called?",
+   "answer": "Stag or buck",
+   "wrong": [
+    "Doe",
+    "Ewe",
+    "Sow"
+   ],
+   "explain": "A female deer is a doe or hind.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-9a28c9",
+   "kind": "mc",
+   "prompt": "Which part of a plant makes seeds?",
+   "answer": "The flower",
+   "wrong": [
+    "The root",
+    "The stem",
+    "The bark"
+   ],
+   "explain": "After pollination, flowers form seeds and fruit.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-3dbf71",
+   "kind": "tf",
+   "prompt": "Whales are mammals.",
+   "answer": true,
+   "explain": "They breathe air and feed their young on milk.",
+   "difficulty": 1,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-1053a3",
+   "kind": "tf",
+   "prompt": "A spider is an insect.",
+   "answer": false,
+   "explain": "Spiders are arachnids with eight legs; insects have six.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-1eac17",
+   "kind": "tf",
+   "prompt": "Koalas are bears.",
+   "answer": false,
+   "explain": "Koalas are marsupials; their young grow in a pouch.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-f90b54",
+   "kind": "tf",
+   "prompt": "Penguins live in the wild in the Arctic.",
+   "answer": false,
+   "explain": "Wild penguins live in the southern hemisphere.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-231087",
+   "kind": "tf",
+   "prompt": "Bamboo is a type of grass.",
+   "answer": true,
+   "explain": "Some bamboos can grow nearly a metre in a day.",
+   "difficulty": 1,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-sci-812d88",
+   "kind": "mc",
+   "prompt": "At what temperature does pure water boil at sea level?",
+   "answer": "100 °C",
+   "wrong": [
+    "90 °C",
+    "50 °C",
+    "212 °C"
+   ],
+   "explain": "That is 212 °F.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-c5ff07",
+   "kind": "mc",
+   "prompt": "At what temperature does pure water freeze?",
+   "answer": "0 °C",
+   "wrong": [
+    "10 °C",
+    "4 °C",
+    "32 °C"
+   ],
+   "explain": "That is 32 °F.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-a05ea9",
+   "kind": "mc",
+   "prompt": "Which part of an atom has a negative charge?",
+   "answer": "Electron",
+   "wrong": [
+    "Proton",
+    "Neutron",
+    "Nucleus"
+   ],
+   "explain": "Protons are positive and neutrons have no charge.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-b4dd9c",
+   "kind": "mc",
+   "prompt": "What do we call a substance that speeds up a chemical reaction without being used up?",
+   "answer": "Catalyst",
+   "wrong": [
+    "Solvent",
+    "Isotope",
+    "Polymer"
+   ],
+   "explain": "Enzymes are the catalysts of living things.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-17f831",
+   "kind": "mc",
+   "prompt": "Sound cannot travel through which of these?",
+   "answer": "A vacuum",
+   "wrong": [
+    "Water",
+    "Steel",
+    "Air"
+   ],
+   "explain": "Sound needs something to vibrate through.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-794db5",
+   "kind": "mc",
+   "prompt": "How many colours are traditionally named in a rainbow?",
+   "answer": "Seven",
+   "wrong": [
+    "Five",
+    "Six",
+    "Nine"
+   ],
+   "explain": "Red, orange, yellow, green, blue, indigo and violet.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-space-7678e4",
+   "kind": "mc",
+   "prompt": "Which is the largest planet in our solar system?",
+   "answer": "Jupiter",
+   "wrong": [
+    "Saturn",
+    "Neptune",
+    "Earth"
+   ],
+   "explain": "More than 1,300 Earths could fit inside it.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-ab15a1",
+   "kind": "number",
+   "prompt": "How many planets are there in our solar system?",
+   "answer": 8,
+   "unit": "planets",
+   "tolerance": 0,
+   "explain": "Pluto was reclassified as a dwarf planet in 2006.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-geo-135075",
+   "kind": "mc",
+   "prompt": "What is the longest river in South America?",
+   "answer": "Amazon",
+   "wrong": [
+    "Paraná",
+    "Orinoco",
+    "São Francisco"
+   ],
+   "explain": "The Amazon carries more water than any other river.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-11ff2a",
+   "kind": "mc",
+   "prompt": "Which mountain range separates Europe from Asia in Russia?",
+   "answer": "The Urals",
+   "wrong": [
+    "The Alps",
+    "The Carpathians",
+    "The Pyrenees"
+   ],
+   "explain": "The Ural Mountains run north to south for about 2,500 km.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-a4a183",
+   "kind": "mc",
+   "prompt": "Which mountain range lies between France and Spain?",
+   "answer": "The Pyrenees",
+   "wrong": [
+    "The Alps",
+    "The Apennines",
+    "The Urals"
+   ],
+   "explain": "The small country of Andorra sits in the Pyrenees.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-a6736d",
+   "kind": "mc",
+   "prompt": "Which country has the most people?",
+   "answer": "India",
+   "wrong": [
+    "China",
+    "United States",
+    "Indonesia"
+   ],
+   "explain": "India passed China in 2023, according to UN estimates.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-3cfe6a",
+   "kind": "mc",
+   "prompt": "Which canal links the Mediterranean Sea and the Red Sea?",
+   "answer": "Suez Canal",
+   "wrong": [
+    "Panama Canal",
+    "Kiel Canal",
+    "Corinth Canal"
+   ],
+   "explain": "It opened in 1869.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-7c27c1",
+   "kind": "mc",
+   "prompt": "In which country are the ancient pyramids of Giza?",
+   "answer": "Egypt",
+   "wrong": [
+    "Mexico",
+    "Sudan",
+    "Iraq"
+   ],
+   "explain": "They stand on the edge of Cairo.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-575728",
+   "kind": "mc",
+   "prompt": "Which US state is made up of islands in the Pacific Ocean?",
+   "answer": "Hawaii",
+   "wrong": [
+    "Alaska",
+    "Florida",
+    "California"
+   ],
+   "explain": "Hawaii became the 50th state in 1959.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-78cc40",
+   "kind": "tf",
+   "prompt": "Iceland is in the European Union.",
+   "answer": false,
+   "explain": "Iceland is not an EU member, though it is in the European Economic Area.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-his-b9c422",
+   "kind": "mc",
+   "prompt": "Which ancient people built Machu Picchu?",
+   "answer": "The Incas",
+   "wrong": [
+    "The Aztecs",
+    "The Maya",
+    "The Olmecs"
+   ],
+   "explain": "It was built in the 1400s.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-18778d",
+   "kind": "mc",
+   "prompt": "Which ship sank on its first voyage in April 1912?",
+   "answer": "Titanic",
+   "wrong": [
+    "Lusitania",
+    "Britannic",
+    "Olympic"
+   ],
+   "explain": "It struck an iceberg in the North Atlantic.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-2ec3fe",
+   "kind": "mc",
+   "prompt": "The Great Wall was mainly built to protect which country?",
+   "answer": "China",
+   "wrong": [
+    "Japan",
+    "Mongolia",
+    "Korea"
+   ],
+   "explain": "Its best-known sections were built under the Ming dynasty.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-001d50",
+   "kind": "mc",
+   "prompt": "Which empire was ruled from Constantinople after the fall of Rome in the west?",
+   "answer": "The Byzantine Empire",
+   "wrong": [
+    "The Ottoman Empire",
+    "The Holy Roman Empire",
+    "The Persian Empire"
+   ],
+   "explain": "It lasted until the Ottomans took the city in 1453.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-art-269748",
+   "kind": "mc",
+   "prompt": "Which Dutch painter cut off part of his own ear?",
+   "answer": "Vincent van Gogh",
+   "wrong": [
+    "Rembrandt",
+    "Johannes Vermeer",
+    "Piet Mondrian"
+   ],
+   "explain": "It happened in Arles in 1888.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-a8399a",
+   "kind": "mc",
+   "prompt": "Which colours are the three traditional primary colours in painting?",
+   "answer": "Red, yellow and blue",
+   "wrong": [
+    "Red, green and blue",
+    "Black, white and grey",
+    "Orange, green and purple"
+   ],
+   "explain": "Mixing them gives the secondary colours.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-mus-9f427b",
+   "kind": "mc",
+   "prompt": "How many strings does a standard violin have?",
+   "answer": "Four",
+   "wrong": [
+    "Five",
+    "Six",
+    "Three"
+   ],
+   "explain": "They are tuned G, D, A and E.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-6fbe3c",
+   "kind": "mc",
+   "prompt": "Which instrument family does the clarinet belong to?",
+   "answer": "Woodwind",
+   "wrong": [
+    "Brass",
+    "Strings",
+    "Percussion"
+   ],
+   "explain": "It has a single reed.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-lit-bebcb7",
+   "kind": "mc",
+   "prompt": "Which detective lived at 221B Baker Street?",
+   "answer": "Sherlock Holmes",
+   "wrong": [
+    "Hercule Poirot",
+    "Miss Marple",
+    "Inspector Morse"
+   ],
+   "explain": "Arthur Conan Doyle created him in 1887.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-d4ffe8",
+   "kind": "mc",
+   "prompt": "In Greek myth, who flew too close to the Sun on wings of wax?",
+   "answer": "Icarus",
+   "wrong": [
+    "Perseus",
+    "Theseus",
+    "Jason"
+   ],
+   "explain": "His father Daedalus made the wings.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-c7146c",
+   "kind": "mc",
+   "prompt": "In Greek myth, who was the king of the gods?",
+   "answer": "Zeus",
+   "wrong": [
+    "Poseidon",
+    "Hades",
+    "Apollo"
+   ],
+   "explain": "He ruled from Mount Olympus.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-83274b",
+   "kind": "mc",
+   "prompt": "In Norse myth, what is the name of Thor's hammer?",
+   "answer": "Mjölnir",
+   "wrong": [
+    "Gungnir",
+    "Excalibur",
+    "Gram"
+   ],
+   "explain": "It always returned to his hand.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-body-f8fa65",
+   "kind": "mc",
+   "prompt": "Where in the body is the smallest bone?",
+   "answer": "The ear",
+   "wrong": [
+    "The nose",
+    "The toe",
+    "The finger"
+   ],
+   "explain": "The stapes is about 3 mm long.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-61fdc5",
+   "kind": "mc",
+   "prompt": "What is the common name for the patella?",
+   "answer": "Kneecap",
+   "wrong": [
+    "Shoulder blade",
+    "Collarbone",
+    "Shin bone"
+   ],
+   "explain": "It protects the front of the knee joint.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-lang-d75165",
+   "kind": "mc",
+   "prompt": "What is the opposite of 'ancient'?",
+   "answer": "Modern",
+   "wrong": [
+    "Old",
+    "Antique",
+    "Historic"
+   ],
+   "explain": "Ancient means very old.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-d5772e",
+   "kind": "mc",
+   "prompt": "What is a word that means the same as another word called?",
+   "answer": "A synonym",
+   "wrong": [
+    "An antonym",
+    "A homophone",
+    "An acronym"
+   ],
+   "explain": "'Big' and 'large' are synonyms.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-eb362e",
+   "kind": "mc",
+   "prompt": "What is a word that sounds like another but is spelt differently called?",
+   "answer": "A homophone",
+   "wrong": [
+    "A synonym",
+    "An antonym",
+    "A palindrome"
+   ],
+   "explain": "'Sea' and 'see' are homophones.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-52f7bf",
+   "kind": "mc",
+   "prompt": "What is a word that reads the same backwards called?",
+   "answer": "A palindrome",
+   "wrong": [
+    "An anagram",
+    "A homophone",
+    "A haiku"
+   ],
+   "explain": "'Level' and 'racecar' are palindromes.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-math-8cbff9",
+   "kind": "mc",
+   "prompt": "How many sides does a hexagon have?",
+   "answer": "Six",
+   "wrong": [
+    "Five",
+    "Seven",
+    "Eight"
+   ],
+   "explain": "Honeycomb cells are hexagons.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-f89627",
+   "kind": "mc",
+   "prompt": "How many degrees are in a right angle?",
+   "answer": "90",
+   "wrong": [
+    "45",
+    "180",
+    "360"
+   ],
+   "explain": "A full turn is 360 degrees.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-aebc81",
+   "kind": "mc",
+   "prompt": "What do the angles of a triangle add up to?",
+   "answer": "180 degrees",
+   "wrong": [
+    "90 degrees",
+    "360 degrees",
+    "270 degrees"
+   ],
+   "explain": "This is true for every flat triangle.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-tech-90e5fa",
+   "kind": "mc",
+   "prompt": "What does 'www' stand for in a web address?",
+   "answer": "World Wide Web",
+   "wrong": [
+    "Wide World Web",
+    "Web World Wide",
+    "World Web Window"
+   ],
+   "explain": "Tim Berners-Lee invented the web in 1989.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-d5ec80",
+   "kind": "mc",
+   "prompt": "Which company makes the iPhone?",
+   "answer": "Apple",
+   "wrong": [
+    "Samsung",
+    "Google",
+    "Microsoft"
+   ],
+   "explain": "The first iPhone came out in 2007.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
   }
  ],
  "sources": [

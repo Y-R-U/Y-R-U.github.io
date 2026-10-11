@@ -4,7 +4,8 @@
    "https://www.inaturalist.org/photos/1206214"
   ],
   "coastal-taipan": [
-   "https://www.inaturalist.org/photos/633202983"
+   "https://www.inaturalist.org/photos/633202983",
+   "https://www.inaturalist.org/photos/244026573"
   ],
   "eastern-brown-snake": [
    "https://www.inaturalist.org/photos/346795945",
@@ -31,14 +32,16 @@
    "https://www.inaturalist.org/photos/624486858"
   ],
   "common-tree-snake": [
-   "https://www.inaturalist.org/photos/63484417"
+   "https://www.inaturalist.org/photos/63484417",
+   "https://www.inaturalist.org/photos/260047674"
   ],
   "brown-tree-snake": [
    "https://www.inaturalist.org/photos/122330406"
   ],
   "olive-sea-snake": [
    "https://www.inaturalist.org/photos/447199740",
-   "https://www.inaturalist.org/photos/669423935"
+   "https://www.inaturalist.org/photos/669423935",
+   "https://www.inaturalist.org/photos/539460735"
   ],
   "common-krait": [
    "https://www.inaturalist.org/photos/445688552",
@@ -61,7 +64,9 @@
    "https://www.inaturalist.org/photos/171300495"
   ],
   "timber-rattlesnake": [
-   "https://www.inaturalist.org/photos/663038667"
+   "https://www.inaturalist.org/photos/663038667",
+   "https://www.inaturalist.org/photos/162920279",
+   "https://www.inaturalist.org/photos/208458371"
   ],
   "sidewinder": [
    "https://www.inaturalist.org/photos/631497413",
@@ -120,8 +125,16 @@
    "gopher-snake": 2,
    "fer-de-lance": 2,
    "common-krait": 2,
-   "sidewinder": 2
-  }
+   "sidewinder": 2,
+   "boa-constrictor": 2,
+   "common-tree-snake": 2,
+   "olive-sea-snake": 2,
+   "coastal-taipan": 2,
+   "timber-rattlesnake": 1
+  },
+  "boa-constrictor": [
+   "https://commons.wikimedia.org/wiki/File:Boa_constrictor_Natural_History_Museum_University_of_Pisa_B_2124.jpg"
+  ]
  },
  "spiders": {
   "peacock-spider": [
@@ -143,7 +156,8 @@
    "https://www.inaturalist.org/photos/5655389"
   ],
   "six-eyed-sand-spider": [
-   "https://www.inaturalist.org/photos/285086997"
+   "https://www.inaturalist.org/photos/285086997",
+   "https://www.inaturalist.org/photos/550744529"
   ],
   "yellow-garden-spider": [
    "https://www.inaturalist.org/photos/208881445"
@@ -158,12 +172,27 @@
    "sydney-funnel-web-spider": 2,
    "huntsman-spider": 2,
    "australian-golden-orb-weaver": 1,
-   "six-eyed-sand-spider": 2,
+   "six-eyed-sand-spider": 1,
    "yellow-garden-spider": 2,
    "brown-recluse": 2,
    "indian-ornamental-tarantula": 2,
-   "money-spider": 2
-  }
+   "money-spider": 2,
+   "redback-spider": 2,
+   "white-tailed-spider": 3,
+   "christmas-spider": 1,
+   "net-casting-spider": 2
+  },
+  "white-tailed-spider": [
+   "https://www.inaturalist.org/photos/11193750",
+   "https://www.inaturalist.org/photos/11193749"
+  ],
+  "christmas-spider": [
+   "https://www.inaturalist.org/photos/40720897",
+   "https://www.inaturalist.org/photos/105719819"
+  ],
+  "net-casting-spider": [
+   "https://www.inaturalist.org/photos/168184484"
+  ]
  },
  "sharks": {
   "great-white-shark": [
@@ -292,7 +321,8 @@
  },
  "insects": {
   "monarch-butterfly": [
-   "https://www.inaturalist.org/photos/111043173"
+   "https://www.inaturalist.org/photos/111043173",
+   "https://commons.wikimedia.org/wiki/File:Monarch_caterpillar_(23229).jpg"
   ],
   "painted-lady": [
    "https://www.inaturalist.org/photos/3347095",
@@ -304,10 +334,12 @@
   ],
   "ulysses-butterfly": [
    "https://www.inaturalist.org/photos/7945775",
-   "https://www.inaturalist.org/photos/111699379"
+   "https://www.inaturalist.org/photos/111699379",
+   "https://www.inaturalist.org/photos/383236105"
   ],
   "deaths-head-hawkmoth": [
-   "https://www.inaturalist.org/photos/28549593"
+   "https://www.inaturalist.org/photos/28549593",
+   "https://www.inaturalist.org/photos/116435397"
   ],
   "orchid-mantis": [
    "https://www.inaturalist.org/photos/53268667",
@@ -318,7 +350,8 @@
    "https://www.inaturalist.org/photos/575342058"
   ],
   "antlion": [
-   "https://www.inaturalist.org/photos/287217788"
+   "https://www.inaturalist.org/photos/287217788",
+   "https://www.inaturalist.org/photos/615762331"
   ],
   "acorn-weevil": [
    "https://www.inaturalist.org/photos/160041513"
@@ -347,12 +380,23 @@
    "painted-lady": 2,
    "red-admiral": 1,
    "small-white": 2,
-   "ulysses-butterfly": 2,
+   "ulysses-butterfly": 1,
    "giant-weta": 2,
    "common-pond-skater": 2,
    "spiny-leaf-insect": 2,
-   "emperor-dragonfly": 2
-  }
+   "emperor-dragonfly": 2,
+   "monarch-butterfly": 2,
+   "deaths-head-hawkmoth": 2,
+   "old-world-swallowtail": 2,
+   "hercules-beetle": 2,
+   "antlion": 2
+  },
+  "old-world-swallowtail": [
+   "https://www.inaturalist.org/photos/198537155"
+  ],
+  "hercules-beetle": [
+   "https://www.inaturalist.org/photos/52637945"
+  ]
  },
  "birds": {
   "southern-cassowary": [

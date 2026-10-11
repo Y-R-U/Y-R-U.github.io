@@ -7,11 +7,12 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { rng, sample, slug } from './c2_lib.mjs';
+import { dropGiveaways } from './q_giveaway.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PACKS = join(ROOT, 'data/packs');
 const read = id => JSON.parse(readFileSync(join(PACKS, id + '.json'), 'utf8'));
-const write = pack => writeFileSync(join(PACKS, pack.id + '.json'), JSON.stringify(pack, null, 1) + '\n');
+const write = pack => dropGiveaways(pack) && writeFileSync(join(PACKS, pack.id + '.json'), JSON.stringify(pack, null, 1) + '\n');
 
 const EXEMPT = new Set('people peoples republic state states united islands island kingdom democratic federal federated saint new north south east west central great and the of'.split(' '));
 const toks = s => (s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().match(/[a-z]+/g) || []).filter(t => t.length >= 3 && !EXEMPT.has(t));

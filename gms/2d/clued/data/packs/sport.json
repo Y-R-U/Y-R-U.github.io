@@ -11,6 +11,7 @@
    "type": "cat",
    "label": "Host city",
    "ask": "Which city hosted the {name}?",
+   "askReverse": "Which of these Olympics were held in {value}?",
    "stmt": "The {name} were held in {value}."
   },
   "winner": {
@@ -35,12 +36,14 @@
    "type": "cat",
    "label": "Sport",
    "ask": "Which sport is {name} famous for?",
+   "askReverse": "Which of these sports stars is famous for {lvalue}?",
    "stmt": "{name}'s sport: {value}."
   },
   "nation": {
    "type": "cat",
    "label": "Country",
    "ask": "Which country did {name} represent?",
+   "askReverse": "Which of these sports stars represented {value}?",
    "stmt": "{name} represented {value}."
   }
  },

@@ -17,6 +17,7 @@
    "type": "cat",
    "label": "Usual colour",
    "ask": "What colour is the {lname} usually?",
+   "askReverse": "Which of these flowers is usually {lvalue}?",
    "stmt": "The {lname} is usually {lvalue}.",
    "exclusive": false
   },

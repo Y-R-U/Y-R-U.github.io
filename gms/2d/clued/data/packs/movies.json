@@ -26,11 +26,13 @@
    "type": "cat",
    "label": "Decade",
    "ask": "In which decade was {name} released?",
-   "stmt": "{name} came out in the {value}."
+   "stmt": "{name} came out in the {value}.",
+   "askReverse": "Which of these films came out in the {value}?"
   },
   "director": {
    "type": "text",
-   "label": "Director"
+   "label": "Director",
+   "ask": "Who directed {name}?"
   },
   "topOfYear": {
    "type": "bool",
@@ -6942,22 +6944,6 @@
    "difficulty": 2,
    "refs": [
     "movies/jurassic-world"
-   ]
-  },
-  {
-   "id": "year-the-lion-king-2019",
-   "kind": "mc",
-   "prompt": "In which year was The Lion King (2019) released?",
-   "answer": "2019",
-   "wrong": [
-    "2021",
-    "2017",
-    "2020"
-   ],
-   "explain": "The Lion King (2019) (2019), directed by Jon Favreau. It is a remake of a 1994 animated film about a lion cub. Worldwide gross about $1.66 billion.",
-   "difficulty": 2,
-   "refs": [
-    "movies/the-lion-king-2019"
    ]
   },
   {

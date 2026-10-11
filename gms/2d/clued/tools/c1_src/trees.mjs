@@ -159,7 +159,7 @@ export default {
     { kind: 'mc', prompt: 'What gas do trees take in to make food?', answer: 'Carbon dioxide', wrong: ['Oxygen', 'Helium', 'Nitrogen'], explain: 'Photosynthesis uses carbon dioxide, water and sunlight, and releases oxygen.', difficulty: 1 },
     { kind: 'mc', prompt: 'You can tell a tree\'s age by counting what?', answer: 'Its growth rings', wrong: ['Its leaves', 'Its branches', 'Its roots'], explain: 'Most trees add one ring of wood a year.', difficulty: 1 },
     { kind: 'mc', prompt: 'Which tree, known only from fossils, was found alive near Sydney in 1994?', answer: 'Wollemi pine', wrong: ['Monkey puzzle tree', 'Ginkgo', 'Kauri'], explain: 'Fewer than 100 grow in the wild, in a secret gorge.', difficulty: 2 },
-    { kind: 'mc', prompt: 'Which tree\'s bark is used to make wine corks?', answer: 'Cork oak', wrong: ['Birch', 'Yew', 'Plane'], explain: 'It can be stripped every nine years or so without killing the tree.', difficulty: 2 },
+    { kind: 'mc', prompt: 'Which tree\'s bark is used to make wine bottle stoppers?', answer: 'Cork oak', wrong: ['Birch', 'Yew', 'Plane'], explain: 'It can be stripped every nine years or so without killing the tree.', difficulty: 2 },
     { kind: 'tf', prompt: 'Maple syrup is made from tree sap.', answer: true, explain: 'Sap from sugar maples is boiled down.', difficulty: 1 },
     { kind: 'mc', prompt: 'What is Australia\'s national floral emblem?', answer: 'Golden wattle', wrong: ['Waratah', 'Jacaranda', 'Eucalyptus'], explain: 'It was proclaimed in 1988; Wattle Day is 1 September.', difficulty: 2 },
   ],

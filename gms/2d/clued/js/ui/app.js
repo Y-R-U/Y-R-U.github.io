@@ -1,7 +1,7 @@
 // Screen manager: one screen at a time, a back stack, and the hardware/browser back button.
-import { h } from './kit.js?v=202610101826';
-import { closeAll } from './popup.js?v=202610101826';
-import { showBanner, reloadFresh } from './update.js?v=202610101826';
+import { h } from './kit.js?v=202610110402';
+import { closeAll } from './popup.js?v=202610110402';
+import { showBanner, reloadFresh } from './update.js?v=202610110402';
 
 // State lives on globalThis: a module loaded across a deploy can import a second copy of this file,
 // and that copy must still drive the same screens.
@@ -54,7 +54,7 @@ export async function go(name, params = {}, { replace = false, fromHistory = fal
   }
   if (!fromHistory && !replace && prev) history.pushState({ clued: ++N.depth }, '');
   const el = h('section.screen', { class: `scr-${name} ${def.cls}`, dataset: { screen: name } });
-  N.root.querySelectorAll('.screen').forEach(s => { s.classList.add('leaving'); setTimeout(() => s.remove(), 180); });
+  N.root.querySelectorAll('.screen').forEach(s => { s.classList.add('leaving'); s.inert = true; setTimeout(() => s.remove(), 180); });
   N.root.append(el);
   const me = N.cur = { name, params, el, cleanup: null, guard: null };
   document.body.dataset.screen = name;

@@ -2398,6 +2398,7 @@
   {
    "id": "q17",
    "kind": "mc",
+   "leakOk": true,
    "prompt": "What is a light year?",
    "answer": "The distance light travels in a year",
    "wrong": [

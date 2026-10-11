@@ -20,13 +20,15 @@
    "type": "cat",
    "label": "Country of origin",
    "ask": "Which country does {name} come from?",
-   "stmt": "Country of origin of {name}: {value}."
+   "stmt": "Country of origin of {name}: {value}.",
+   "askReverse": "Which of these TV shows comes from {value}?"
   },
   "decade": {
    "type": "cat",
    "label": "Decade",
    "ask": "In which decade did {name} start?",
-   "stmt": "{name} started in the {value}."
+   "stmt": "{name} started in the {value}.",
+   "askReverse": "Which of these TV shows started in the {value}?"
   },
   "kids": {
    "type": "bool",
@@ -3169,9 +3171,9 @@
    "explain": "He is from Barcelona."
   },
   {
-   "id": "tvq-a5b770ba",
+   "id": "tvq-7a2eabfe",
    "kind": "mc",
-   "prompt": "In Only Fools and Horses, what is the Trotters' company called?",
+   "prompt": "In Only Fools and Horses, what is Del Boy's company called?",
    "difficulty": 3,
    "answer": "Trotters Independent Traders",
    "wrong": [

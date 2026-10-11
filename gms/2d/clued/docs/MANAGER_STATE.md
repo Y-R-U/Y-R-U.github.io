@@ -129,12 +129,20 @@ in games/js/games.js ONLY if that file is no longer dirty from another session, 
   5. Sessions drop repeated prompt+answer across packs (spec.js dupKey). 6. wrongNotes on the reveal card ("The lek is used in Albania."). 7. Phone-landscape home fits one screen. 8. Room questions stored once in rooms.questions column; state flush excludes them; pre-split rows migrate on next flush.
   Not done (not approved): player keys in ?k=, long-poll cap. Seen but out of scope: first-line questions for Alice in Wonderland / The Time Machine also name the title; s_challenge_e2e link-reply name check fails ("Player Two" instead of typed "Replier", code untouched here).
 
-## STATE @ 2026-10-11 — all committed, pushed, deployed
-BUILD 202610101826 live on games.br8t.com + yru.br8t.com (Pages); server healthy, debug logging OFF; tree clean.
-Static deploy = rsync command in this log (excludes docs/server/tools/*.md + media/song-pictures, media/book-moments).
+- 2026-10-11 HUB REVIEW round 2 (Aaron's list, BUILD 202610110402; movie-moment JSON hotfix commit 67abe25b after another agent's SILT commit fd2dc2c3 swept in my staged media renames):
+  1. Answer giveaways: new `tools/leak_scan.mjs` (exit 1 on any leak). Before → after: our media files named after the answer 295 → 0 (movie-moments renamed to hashed names via tools/mv_paths.mjs), pack questions 66 → 0, generated questions 505 → 0 (of ~38k distinct checked). Formats call `givesAway()` (registry.js) in mc/type/tf/ladder/quote/number; builders drop leaky pack questions via `tools/q_giveaway.mjs` (Alice/Time Machine first lines, Mexico City, Afghani, Greek script, eponyms…). Eponym, Augustus, Trotters, honey, Maine Coon, Nobel, GFP, Wozniak, Morse, kids questions rewritten instead of dropped. Remote image URLs that name the answer (1,773, Wikimedia) can't be shown: every `.play img` blocks long-press/context menus.
+  2. Variety (saturated count of distinct prompt+answer pairs, non-combinatorial formats, normal+easy+kids): 90,114 → 91,165 overall (+1.2%, net of ~1,100 giveaways removed), kids mode 26,126 → 27,442 (+5%). Thin/kids packs: kids-nature 92 → 181 (+97%), kids 249 → 326 (+31%; kids-mode +69%), general 616 → 697 (+13%), capitals/movies/tv +9%. New: tools/c2c_src/general_d.mjs (87 q), kids_b.mjs (77 q), 89 kids-nature q, 26 reverse templates (Which of these countries is in Asia?…), countries capital + movies director typed questions. mc now falls back to `mix` for question-only packs, so kids MC can use the kids quiz packs at all (caps.formatsKids.mc was 0). +25% NOT reached: big gains need new items, which needs the network-dependent C2/C1 builders.
+  3. Kids 💡 Help (runner): one per question, removes a wrong answer + "It starts with “G” and has 5 letters: G _ _ _ _"; spoken; never in online rooms.
+  4. "Player Two": not a name bug — a second route to the challenge already on screen rebuilt it and dropped the typed name. Net routes are idempotent (goOnce / openLinkChallenge), leaving screens are `inert`. s_challenge_e2e 12/12.
+  5. Redback: female (Laurence Grayson, CC BY 2.0) + Toby Hudson female close-up; male and a juvenile dropped. White-tail: CC0 female dorsal + CC BY male + iNat full-body (head close-ups dropped). `.q-media img` is now absolute + contain, so the reveal no longer clips the picture (the tail was cut there). Choice/hilo/sort/match/order thumbnails contain, not cover. Contact-sheet review of spiders/snakes/insects: dropped 16 poor photos (museum strip boa, caterpillars for monarch/death's-head/Ulysses/swallowtail, tiny/blurred christmas spider, net-casting, sand spider, timber rattlesnake ×2, olive sea snake, coastal taipan, common tree snake, hercules beetle, antlion).
+
+## STATE @ 2026-10-11 (round 2) — committed, pushed, deployed
+BUILD 202610110402 live on games.br8t.com + yru.br8t.com (Pages); server unchanged (no server code touched).
+Static deploy: `rsync -az --delete --exclude='docs/' --exclude='server/' --exclude='tools/' --exclude='*.md' --exclude='.DS_Store' --exclude='media/song-pictures/' --exclude='media/book-moments/' gms/2d/clued/ br8t:/srv/apps/br8tgames/site/gms/2d/clued/` (from the site root).
 Server deploy = server/deploy.sh (builds from WORKING TREE — make sure no other lane's half-done server edits are present).
+Checks: `node tools/leak_scan.mjs` must exit 0 after any pack edit. C2 builders are NOT offline-reproducible (Wikidata drift): patch JSON + source together.
 Open / optional:
-- media/song-pictures + media/book-moments (113 Flux images) unreviewed, gitignored, no packs.
+- Variety +25% needs new items (C1/C2 builders with network) — not done.
+- media/song-pictures + media/book-moments (113 Flux images, now hashed names) unreviewed, gitignored, no packs.
 - Landscape: result card partly covers ladder clue list / chain portraits (POLISH note).
-- Firebase authorised domains lack yru.br8t.com (Aaron to add in console; all links point at games.br8t.com anyway).
-- Hub card is live; another session's RAGDOJO card in games/js/games.js is still uncommitted (theirs).
+- Firebase authorised domains lack yru.br8t.com (Aaron to add).

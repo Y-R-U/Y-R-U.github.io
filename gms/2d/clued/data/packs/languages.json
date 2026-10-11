@@ -11,19 +11,22 @@
    "type": "cat",
    "label": "Language family",
    "ask": "Which language family does {name} belong to?",
-   "stmt": "{name} belongs to the {value} family."
+   "stmt": "{name} belongs to the {value} family.",
+   "askReverse": "Which of these languages belongs to the {value} family?"
   },
   "branch": {
    "type": "cat",
    "label": "Branch",
    "ask": "Which branch of its family does {name} belong to?",
-   "stmt": "{name} belongs to the {value} branch of its language family."
+   "stmt": "{name} belongs to the {value} branch of its language family.",
+   "askReverse": "Which of these languages belongs to the {value} branch?"
   },
   "script": {
    "type": "cat",
    "label": "Script",
    "ask": "Which script is {name} normally written in?",
-   "stmt": "{name} is normally written in the {value} script."
+   "stmt": "{name} is normally written in the {value} script.",
+   "askReverse": "Which of these languages is normally written in the {value} script?"
   },
   "countries": {
    "type": "num",
@@ -2189,24 +2192,6 @@
    }
   },
   {
-   "id": "lang-czechia",
-   "kind": "mc",
-   "prompt": "Which of these is a main language of Czechia?",
-   "answer": "Czech",
-   "wrong": [
-    "German",
-    "Polish",
-    "Slovak"
-   ],
-   "explain": "Main language of Czechia: Czech.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
-    "Polish": "Polish is a main language in Poland.",
-    "Slovak": "Slovak is a main language in Slovakia."
-   }
-  },
-  {
    "id": "lang-denmark",
    "kind": "mc",
    "prompt": "Which of these is a main language of Denmark?",
@@ -2528,24 +2513,6 @@
     "Armenian": "Armenian is a main language in Armenia.",
     "Azerbaijani": "Azerbaijani is a main language in Azerbaijan.",
     "Turkish": "Turkish is a main language in Cyprus and Turkey."
-   }
-  },
-  {
-   "id": "lang-germany",
-   "kind": "mc",
-   "prompt": "Which of these is a main language of Germany?",
-   "answer": "German",
-   "wrong": [
-    "French",
-    "Danish",
-    "Czech"
-   ],
-   "explain": "Main language of Germany: German.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
-    "Danish": "Danish is a main language in Denmark.",
-    "Czech": "Czech is a main language in Czechia."
    }
   },
   {
@@ -3212,24 +3179,6 @@
     "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
     "Swahili": "Swahili is a main language in Kenya, Tanzania and Uganda.",
     "Norwegian": "Norwegian is a main language in Norway."
-   }
-  },
-  {
-   "id": "lang-malaysia",
-   "kind": "mc",
-   "prompt": "Which of these is a main language of Malaysia?",
-   "answer": "Malay",
-   "wrong": [
-    "Indonesian",
-    "Thai",
-    "Vietnamese"
-   ],
-   "explain": "Main language of Malaysia: Malay.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Indonesian": "Indonesian is a main language in Indonesia.",
-    "Thai": "Thai is a main language in Thailand.",
-    "Vietnamese": "Vietnamese is a main language in Vietnam."
    }
   },
   {
@@ -4187,24 +4136,6 @@
    }
   },
   {
-   "id": "lang-slovakia",
-   "kind": "mc",
-   "prompt": "Which of these is a main language of Slovakia?",
-   "answer": "Slovak",
-   "wrong": [
-    "German",
-    "Ukrainian",
-    "Polish"
-   ],
-   "explain": "Main language of Slovakia: Slovak.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
-    "Ukrainian": "Ukrainian is a main language in Ukraine.",
-    "Polish": "Polish is a main language in Poland."
-   }
-  },
-  {
    "id": "lang-slovenia",
    "kind": "mc",
    "prompt": "Which of these is a main language of Slovenia?",
@@ -4439,24 +4370,6 @@
    }
   },
   {
-   "id": "lang-tajikistan",
-   "kind": "mc",
-   "prompt": "Which of these is a main language of Tajikistan?",
-   "answer": "Tajik",
-   "wrong": [
-    "Uzbek",
-    "Mandarin Chinese",
-    "Dari"
-   ],
-   "explain": "Main language of Tajikistan: Tajik.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Uzbek": "Uzbek is a main language in Uzbekistan.",
-    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore.",
-    "Dari": "Dari is a main language in Afghanistan."
-   }
-  },
-  {
    "id": "lang-tanzania",
    "kind": "mc",
    "prompt": "Which of these is a main language of Tanzania?",
@@ -4472,24 +4385,6 @@
     "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
     "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
     "Kinyarwanda": "Kinyarwanda is a main language in Rwanda."
-   }
-  },
-  {
-   "id": "lang-thailand",
-   "kind": "mc",
-   "prompt": "Which of these is a main language of Thailand?",
-   "answer": "Thai",
-   "wrong": [
-    "Burmese",
-    "Khmer",
-    "Lao"
-   ],
-   "explain": "Main language of Thailand: Thai.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Burmese": "Burmese is a main language in Myanmar.",
-    "Khmer": "Khmer is a main language in Cambodia.",
-    "Lao": "Lao is a main language in Laos."
    }
   },
   {
@@ -4601,24 +4496,6 @@
    }
   },
   {
-   "id": "lang-turkmenistan",
-   "kind": "mc",
-   "prompt": "Which of these is a main language of Turkmenistan?",
-   "answer": "Turkmen",
-   "wrong": [
-    "Kazakh",
-    "Dari",
-    "Pashto"
-   ],
-   "explain": "Main language of Turkmenistan: Turkmen.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Kazakh": "Kazakh is a main language in Kazakhstan.",
-    "Dari": "Dari is a main language in Afghanistan.",
-    "Pashto": "Pashto is a main language in Afghanistan."
-   }
-  },
-  {
    "id": "lang-tuvalu",
    "kind": "mc",
    "prompt": "Which of these is a main language of Tuvalu?",
@@ -4706,24 +4583,6 @@
     "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City.",
     "Romanian": "Romanian is a main language in Moldova and Romania.",
     "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
-   }
-  },
-  {
-   "id": "lang-uzbekistan",
-   "kind": "mc",
-   "prompt": "Which of these is a main language of Uzbekistan?",
-   "answer": "Uzbek",
-   "wrong": [
-    "Kyrgyz",
-    "Dari",
-    "Tajik"
-   ],
-   "explain": "Main language of Uzbekistan: Uzbek.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Kyrgyz": "Kyrgyz is a main language in Kyrgyzstan.",
-    "Dari": "Dari is a main language in Afghanistan.",
-    "Tajik": "Tajik is a main language in Tajikistan."
    }
   },
   {
@@ -5039,24 +4898,6 @@
    "difficulty": 3
   },
   {
-   "id": "langc-icelandic",
-   "kind": "mc",
-   "prompt": "In which of these countries is Icelandic a main language?",
-   "answer": "Iceland",
-   "wrong": [
-    "Norway",
-    "Moldova",
-    "Spain"
-   ],
-   "explain": "Icelandic is an Indo-European language written in the Latin script, and a main language of Iceland.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Norway": "The main language of Norway: Norwegian.",
-    "Moldova": "The main language of Moldova: Romanian.",
-    "Spain": "The main language of Spain: Spanish."
-   }
-  },
-  {
    "id": "langs-icelandic",
    "kind": "mc",
    "prompt": "Which script is Icelandic normally written in?",
@@ -5349,24 +5190,6 @@
    "difficulty": 3
   },
   {
-   "id": "langc-bulgarian",
-   "kind": "mc",
-   "prompt": "In which of these countries is Bulgarian a main language?",
-   "answer": "Bulgaria",
-   "wrong": [
-    "Serbia",
-    "Greece",
-    "North Macedonia"
-   ],
-   "explain": "Bulgarian is an Indo-European language written in the Cyrillic script, and a main language of Bulgaria.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Serbia": "The main language of Serbia: Serbian.",
-    "Greece": "The main language of Greece: Greek.",
-    "North Macedonia": "The main languages of North Macedonia: Macedonian and Albanian."
-   }
-  },
-  {
    "id": "langs-bulgarian",
    "kind": "mc",
    "prompt": "Which script is Bulgarian normally written in?",
@@ -5522,19 +5345,6 @@
    }
   },
   {
-   "id": "langs-greek",
-   "kind": "mc",
-   "prompt": "Which script is Greek normally written in?",
-   "answer": "Greek",
-   "wrong": [
-    "Thai",
-    "Chinese characters",
-    "Burmese"
-   ],
-   "explain": "Greek is an Indo-European language written in the Greek script, and a main language of Cyprus and Greece.",
-   "difficulty": 2
-  },
-  {
    "id": "langc-albanian",
    "kind": "mc",
    "prompt": "In which of these countries is Albanian a main language?",
@@ -5563,37 +5373,6 @@
     "Bengali"
    ],
    "explain": "Albanian is an Indo-European language written in the Latin script, and a main language of Albania and North Macedonia.",
-   "difficulty": 3
-  },
-  {
-   "id": "langc-armenian",
-   "kind": "mc",
-   "prompt": "In which of these countries is Armenian a main language?",
-   "answer": "Armenia",
-   "wrong": [
-    "Georgia",
-    "Turkey",
-    "Iran"
-   ],
-   "explain": "Armenian is an Indo-European language written in the Armenian script, and a main language of Armenia.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Georgia": "The main language of Georgia: Georgian.",
-    "Turkey": "The main language of Turkey: Turkish.",
-    "Iran": "The main language of Iran: Persian."
-   }
-  },
-  {
-   "id": "langs-armenian",
-   "kind": "mc",
-   "prompt": "Which script is Armenian normally written in?",
-   "answer": "Armenian",
-   "wrong": [
-    "Tamil",
-    "Latin",
-    "Thai"
-   ],
-   "explain": "Armenian is an Indo-European language written in the Armenian script, and a main language of Armenia.",
    "difficulty": 3
   },
   {
@@ -5646,19 +5425,6 @@
    }
   },
   {
-   "id": "langs-bengali",
-   "kind": "mc",
-   "prompt": "Which script is Bengali normally written in?",
-   "answer": "Bengali",
-   "wrong": [
-    "Burmese",
-    "Armenian",
-    "Tamil"
-   ],
-   "explain": "Bengali is an Indo-European language written in the Bengali script, and a main language of Bangladesh.",
-   "difficulty": 3
-  },
-  {
    "id": "langc-urdu",
    "kind": "mc",
    "prompt": "In which of these countries is Urdu a main language?",
@@ -5690,24 +5456,6 @@
    "difficulty": 3
   },
   {
-   "id": "langc-nepali",
-   "kind": "mc",
-   "prompt": "In which of these countries is Nepali a main language?",
-   "answer": "Nepal",
-   "wrong": [
-    "India",
-    "China",
-    "United Arab Emirates"
-   ],
-   "explain": "Nepali is an Indo-European language written in the Devanagari script, and a main language of Nepal.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "India": "The main languages of India: Hindi and English.",
-    "China": "The main language of China: Mandarin Chinese.",
-    "United Arab Emirates": "The main language of United Arab Emirates: Arabic."
-   }
-  },
-  {
    "id": "langs-nepali",
    "kind": "mc",
    "prompt": "Which script is Nepali normally written in?",
@@ -5737,19 +5485,6 @@
     "South Korea": "The main language of South Korea: Korean.",
     "Timor-Leste": "The main languages of Timor-Leste: Tetum and Portuguese."
    }
-  },
-  {
-   "id": "langs-sinhala",
-   "kind": "mc",
-   "prompt": "Which script is Sinhala normally written in?",
-   "answer": "Sinhala",
-   "wrong": [
-    "Burmese",
-    "Lao",
-    "Kanji and kana"
-   ],
-   "explain": "Sinhala is an Indo-European language written in the Sinhala script, and a main language of Sri Lanka.",
-   "difficulty": 3
   },
   {
    "id": "langc-persian",
@@ -5832,19 +5567,6 @@
    }
   },
   {
-   "id": "langs-arabic",
-   "kind": "mc",
-   "prompt": "Which script is Arabic normally written in?",
-   "answer": "Arabic",
-   "wrong": [
-    "Lao",
-    "Tamil",
-    "Greek"
-   ],
-   "explain": "Arabic is an Afro-Asiatic language written in the Arabic script, and a main language of Algeria, Bahrain, Chad, Comoros and Djibouti and others.",
-   "difficulty": 2
-  },
-  {
    "id": "langc-hebrew",
    "kind": "mc",
    "prompt": "In which of these countries is Hebrew a main language?",
@@ -5861,19 +5583,6 @@
     "Lebanon": "The main language of Lebanon: Arabic.",
     "Syria": "The main language of Syria: Arabic."
    }
-  },
-  {
-   "id": "langs-hebrew",
-   "kind": "mc",
-   "prompt": "Which script is Hebrew normally written in?",
-   "answer": "Hebrew",
-   "wrong": [
-    "Lao",
-    "Arabic",
-    "Kanji and kana"
-   ],
-   "explain": "Hebrew is an Afro-Asiatic language written in the Hebrew script, and a main language of Israel.",
-   "difficulty": 3
   },
   {
    "id": "langc-amharic",
@@ -6031,24 +5740,6 @@
    "difficulty": 2
   },
   {
-   "id": "langc-azerbaijani",
-   "kind": "mc",
-   "prompt": "In which of these countries is Azerbaijani a main language?",
-   "answer": "Azerbaijan",
-   "wrong": [
-    "Georgia",
-    "Turkey",
-    "Russia"
-   ],
-   "explain": "Azerbaijani is a Turkic language written in the Latin script, and a main language of Azerbaijan.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Georgia": "The main language of Georgia: Georgian.",
-    "Turkey": "The main language of Turkey: Turkish.",
-    "Russia": "The main language of Russia: Russian."
-   }
-  },
-  {
    "id": "langs-azerbaijani",
    "kind": "mc",
    "prompt": "Which script is Azerbaijani normally written in?",
@@ -6124,24 +5815,6 @@
    "difficulty": 3
   },
   {
-   "id": "langc-estonian",
-   "kind": "mc",
-   "prompt": "In which of these countries is Estonian a main language?",
-   "answer": "Estonia",
-   "wrong": [
-    "Russia",
-    "Latvia",
-    "Moldova"
-   ],
-   "explain": "Estonian is an Uralic language written in the Latin script, and a main language of Estonia.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Russia": "The main language of Russia: Russian.",
-    "Latvia": "The main language of Latvia: Latvian.",
-    "Moldova": "The main language of Moldova: Romanian."
-   }
-  },
-  {
    "id": "langs-estonian",
    "kind": "mc",
    "prompt": "Which script is Estonian normally written in?",
@@ -6186,37 +5859,6 @@
    "difficulty": 3
   },
   {
-   "id": "langc-georgian",
-   "kind": "mc",
-   "prompt": "In which of these countries is Georgian a main language?",
-   "answer": "Georgia",
-   "wrong": [
-    "Azerbaijan",
-    "Armenia",
-    "Russia"
-   ],
-   "explain": "Georgian is a Kartvelian language written in the Georgian script, and a main language of Georgia.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Azerbaijan": "The main language of Azerbaijan: Azerbaijani.",
-    "Armenia": "The main language of Armenia: Armenian.",
-    "Russia": "The main language of Russia: Russian."
-   }
-  },
-  {
-   "id": "langs-georgian",
-   "kind": "mc",
-   "prompt": "Which script is Georgian normally written in?",
-   "answer": "Georgian",
-   "wrong": [
-    "Devanagari",
-    "Kanji and kana",
-    "Cyrillic"
-   ],
-   "explain": "Georgian is a Kartvelian language written in the Georgian script, and a main language of Georgia.",
-   "difficulty": 3
-  },
-  {
    "id": "langc-mandarin-chinese",
    "kind": "mc",
    "prompt": "In which of these countries is Mandarin Chinese a main language?",
@@ -6233,19 +5875,6 @@
     "Armenia": "The main language of Armenia: Armenian.",
     "Pakistan": "The main languages of Pakistan: Urdu and English."
    }
-  },
-  {
-   "id": "langs-mandarin-chinese",
-   "kind": "mc",
-   "prompt": "Which script is Mandarin Chinese normally written in?",
-   "answer": "Chinese characters",
-   "wrong": [
-    "Lao",
-    "Khmer",
-    "Hangul"
-   ],
-   "explain": "Mandarin Chinese is a Sino-Tibetan language written in the Chinese characters script, and a main language of China and Singapore.",
-   "difficulty": 2
   },
   {
    "id": "langc-burmese",
@@ -6266,37 +5895,6 @@
    }
   },
   {
-   "id": "langs-burmese",
-   "kind": "mc",
-   "prompt": "Which script is Burmese normally written in?",
-   "answer": "Burmese",
-   "wrong": [
-    "Lao",
-    "Georgian",
-    "Khmer"
-   ],
-   "explain": "Burmese is a Sino-Tibetan language written in the Burmese script, and a main language of Myanmar.",
-   "difficulty": 3
-  },
-  {
-   "id": "langc-japanese",
-   "kind": "mc",
-   "prompt": "In which of these countries is Japanese a main language?",
-   "answer": "Japan",
-   "wrong": [
-    "Mongolia",
-    "Azerbaijan",
-    "Georgia"
-   ],
-   "explain": "Japanese is a Japonic language written in the Kanji and kana script, and a main language of Japan.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Mongolia": "The main language of Mongolia: Mongolian.",
-    "Azerbaijan": "The main language of Azerbaijan: Azerbaijani.",
-    "Georgia": "The main language of Georgia: Georgian."
-   }
-  },
-  {
    "id": "langs-japanese",
    "kind": "mc",
    "prompt": "Which script is Japanese normally written in?",
@@ -6308,24 +5906,6 @@
    ],
    "explain": "Japanese is a Japonic language written in the Kanji and kana script, and a main language of Japan.",
    "difficulty": 2
-  },
-  {
-   "id": "langc-korean",
-   "kind": "mc",
-   "prompt": "In which of these countries is Korean a main language?",
-   "answer": "South Korea",
-   "wrong": [
-    "Oman",
-    "Israel",
-    "Singapore"
-   ],
-   "explain": "Korean is a Koreanic language written in the Hangul script, and a main language of North Korea and South Korea.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Oman": "The main language of Oman: Arabic.",
-    "Israel": "The main language of Israel: Hebrew.",
-    "Singapore": "The main languages of Singapore: English, Malay, Mandarin Chinese and Tamil."
-   }
   },
   {
    "id": "langs-korean",
@@ -6359,19 +5939,6 @@
    }
   },
   {
-   "id": "langs-thai",
-   "kind": "mc",
-   "prompt": "Which script is Thai normally written in?",
-   "answer": "Thai",
-   "wrong": [
-    "Burmese",
-    "Bengali",
-    "Cyrillic"
-   ],
-   "explain": "Thai is a Kra-Dai language written in the Thai script, and a main language of Thailand.",
-   "difficulty": 3
-  },
-  {
    "id": "langc-lao",
    "kind": "mc",
    "prompt": "In which of these countries is Lao a main language?",
@@ -6387,37 +5954,6 @@
     "Vietnam": "The main language of Vietnam: Vietnamese.",
     "Cambodia": "The main language of Cambodia: Khmer.",
     "Myanmar": "The main language of Myanmar: Burmese."
-   }
-  },
-  {
-   "id": "langs-lao",
-   "kind": "mc",
-   "prompt": "Which script is Lao normally written in?",
-   "answer": "Lao",
-   "wrong": [
-    "Bengali",
-    "Latin",
-    "Thai"
-   ],
-   "explain": "Lao is a Kra-Dai language written in the Lao script, and a main language of Laos.",
-   "difficulty": 3
-  },
-  {
-   "id": "langc-vietnamese",
-   "kind": "mc",
-   "prompt": "In which of these countries is Vietnamese a main language?",
-   "answer": "Vietnam",
-   "wrong": [
-    "Cambodia",
-    "Laos",
-    "China"
-   ],
-   "explain": "Vietnamese is an Austroasiatic language written in the Latin script, and a main language of Vietnam.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Cambodia": "The main language of Cambodia: Khmer.",
-    "Laos": "The main language of Laos: Lao.",
-    "China": "The main language of China: Mandarin Chinese."
    }
   },
   {
@@ -6452,19 +5988,6 @@
    }
   },
   {
-   "id": "langs-khmer",
-   "kind": "mc",
-   "prompt": "Which script is Khmer normally written in?",
-   "answer": "Khmer",
-   "wrong": [
-    "Georgian",
-    "Arabic",
-    "Burmese"
-   ],
-   "explain": "Khmer is an Austroasiatic language written in the Khmer script, and a main language of Cambodia.",
-   "difficulty": 3
-  },
-  {
    "id": "langc-malay",
    "kind": "mc",
    "prompt": "In which of these countries is Malay a main language?",
@@ -6494,24 +6017,6 @@
    ],
    "explain": "Malay is an Austronesian language written in the Latin script, and a main language of Brunei, Malaysia and Singapore.",
    "difficulty": 3
-  },
-  {
-   "id": "langc-indonesian",
-   "kind": "mc",
-   "prompt": "In which of these countries is Indonesian a main language?",
-   "answer": "Indonesia",
-   "wrong": [
-    "Papua New Guinea",
-    "Timor-Leste",
-    "Malaysia"
-   ],
-   "explain": "Indonesian is an Austronesian language written in the Latin script, and a main language of Indonesia.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Papua New Guinea": "The main languages of Papua New Guinea: English, Tok Pisin and Hiri Motu.",
-    "Timor-Leste": "The main languages of Timor-Leste: Tetum and Portuguese.",
-    "Malaysia": "The main language of Malaysia: Malay."
-   }
   },
   {
    "id": "langs-indonesian",
@@ -6618,24 +6123,6 @@
    ],
    "explain": "Māori is an Austronesian language written in the Latin script, and a main language of New Zealand.",
    "difficulty": 3
-  },
-  {
-   "id": "langc-samoan",
-   "kind": "mc",
-   "prompt": "In which of these countries is Samoan a main language?",
-   "answer": "Samoa",
-   "wrong": [
-    "Marshall Islands",
-    "Solomon Islands",
-    "Micronesia"
-   ],
-   "explain": "Samoan is an Austronesian language written in the Latin script, and a main language of Samoa.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "Marshall Islands": "The main languages of Marshall Islands: Marshallese and English.",
-    "Solomon Islands": "The main language of Solomon Islands: English.",
-    "Micronesia": "The main language of Micronesia: English."
-   }
   },
   {
    "id": "langs-samoan",
@@ -6821,37 +6308,6 @@
     "Israel": "The main language of Israel: Hebrew.",
     "Philippines": "The main languages of Philippines: Filipino and English.",
     "Laos": "The main language of Laos: Lao."
-   }
-  },
-  {
-   "id": "langs-tamil",
-   "kind": "mc",
-   "prompt": "Which script is Tamil normally written in?",
-   "answer": "Tamil",
-   "wrong": [
-    "Khmer",
-    "Georgian",
-    "Hebrew"
-   ],
-   "explain": "Tamil is a Dravidian language written in the Tamil script, and a main language of Singapore and Sri Lanka.",
-   "difficulty": 3
-  },
-  {
-   "id": "langc-mongolian",
-   "kind": "mc",
-   "prompt": "In which of these countries is Mongolian a main language?",
-   "answer": "Mongolia",
-   "wrong": [
-    "China",
-    "Russia",
-    "Maldives"
-   ],
-   "explain": "Mongolian is a Mongolic language written in the Cyrillic script, and a main language of Mongolia.",
-   "difficulty": 1,
-   "wrongNotes": {
-    "China": "The main language of China: Mandarin Chinese.",
-    "Russia": "The main language of Russia: Russian.",
-    "Maldives": "The main language of Maldives: Dhivehi."
    }
   },
   {

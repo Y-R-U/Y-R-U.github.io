@@ -2935,7 +2935,7 @@
   {
    "id": "q9",
    "kind": "mc",
-   "prompt": "Which city is the hamburger named after?",
+   "prompt": "Which German city gave its name to a famous beef-patty sandwich?",
    "answer": "Hamburg",
    "wrong": [
     "Berlin",

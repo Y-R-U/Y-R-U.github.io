@@ -1682,12 +1682,12 @@
   {
    "id": "named-sandwich",
    "kind": "mc",
-   "prompt": "The word “sandwich” is named after whom?",
-   "answer": "The Earl of Sandwich",
+   "prompt": "Which word is named after an 18th-century earl who is said to have eaten beef between bread so he could keep playing cards?",
+   "answer": "sandwich",
    "wrong": [
-    "The Duke of Wellington",
-    "Lord Cardigan",
-    "Queen Victoria"
+    "cardigan",
+    "pasteurise",
+    "volt"
    ],
    "explain": "“sandwich” is named after the Earl of Sandwich. John Montagu, 4th Earl of Sandwich, is said to have eaten beef between bread so he could keep playing cards.",
    "difficulty": 1,
@@ -1698,12 +1698,12 @@
   {
    "id": "named-cardigan",
    "kind": "mc",
-   "prompt": "The word “cardigan” is named after whom?",
-   "answer": "The Earl of Cardigan",
+   "prompt": "Which word is named after the earl who led the Charge of the Light Brigade?",
+   "answer": "cardigan",
    "wrong": [
-    "The Earl of Sandwich",
-    "Adolphe Sax",
-    "Lord Byron"
+    "guillotine",
+    "pasteurise",
+    "leotard"
    ],
    "explain": "“cardigan” is named after the Earl of Cardigan. The 7th Earl of Cardigan, who led the Charge of the Light Brigade.",
    "difficulty": 2,
@@ -1714,12 +1714,12 @@
   {
    "id": "named-boycott",
    "kind": "mc",
-   "prompt": "The word “boycott” is named after whom?",
-   "answer": "Charles Boycott",
+   "prompt": "Which word is named after an Irish land agent shunned by his community in 1880?",
+   "answer": "boycott",
    "wrong": [
-    "Louis Braille",
-    "Rudolf Diesel",
-    "Jules Léotard"
+    "leotard",
+    "diesel",
+    "teddy bear"
    ],
    "explain": "“boycott” is named after Charles Boycott. An Irish land agent shunned by his community in 1880.",
    "difficulty": 2,
@@ -1730,12 +1730,12 @@
   {
    "id": "named-leotard",
    "kind": "mc",
-   "prompt": "The word “leotard” is named after whom?",
-   "answer": "Jules Léotard",
+   "prompt": "Which word is named after a French trapeze artist of the 1800s?",
+   "answer": "leotard",
    "wrong": [
-    "Charles Boycott",
-    "Joseph Guillotin",
-    "Adolphe Sax"
+    "teddy bear",
+    "boycott",
+    "saxophone"
    ],
    "explain": "“leotard” is named after Jules Léotard. A French trapeze artist of the 1800s.",
    "difficulty": 3,
@@ -1746,12 +1746,12 @@
   {
    "id": "named-saxophone",
    "kind": "mc",
-   "prompt": "The word “saxophone” is named after whom?",
-   "answer": "Adolphe Sax",
+   "prompt": "Which word is named after a Belgian instrument maker who patented his new wind instrument in 1846?",
+   "answer": "saxophone",
    "wrong": [
-    "Rudolf Diesel",
-    "Anders Celsius",
-    "Jules Léotard"
+    "diesel",
+    "silhouette",
+    "pasteurise"
    ],
    "explain": "“saxophone” is named after Adolphe Sax. A Belgian instrument maker who patented it in 1846.",
    "difficulty": 2,
@@ -1762,12 +1762,12 @@
   {
    "id": "named-braille",
    "kind": "mc",
-   "prompt": "The word “braille” is named after whom?",
-   "answer": "Louis Braille",
+   "prompt": "Which word is named after a Frenchman, blind from childhood, who invented the raised-dot alphabet?",
+   "answer": "braille",
    "wrong": [
-    "Samuel Morse",
-    "Louis Pasteur",
-    "Charles Boycott"
+    "diesel",
+    "cardigan",
+    "saxophone"
    ],
    "explain": "“braille” is named after Louis Braille. A Frenchman, blind from childhood, who invented the raised-dot alphabet.",
    "difficulty": 1,
@@ -1778,12 +1778,12 @@
   {
    "id": "named-diesel",
    "kind": "mc",
-   "prompt": "The word “diesel” is named after whom?",
-   "answer": "Rudolf Diesel",
+   "prompt": "Which word is named after a German engineer who invented a new kind of engine in the 1890s?",
+   "answer": "diesel",
    "wrong": [
-    "Adolphe Sax",
-    "James Watt",
-    "Henry Ford"
+    "boycott",
+    "braille",
+    "nicotine"
    ],
    "explain": "“diesel” is named after Rudolf Diesel. The German engineer who invented the engine.",
    "difficulty": 2,
@@ -1794,12 +1794,12 @@
   {
    "id": "named-guillotine",
    "kind": "mc",
-   "prompt": "The word “guillotine” is named after whom?",
-   "answer": "Joseph-Ignace Guillotin",
+   "prompt": "Which word is named after a French doctor who proposed a quicker, more humane method of execution?",
+   "answer": "guillotine",
    "wrong": [
-    "Louis Pasteur",
-    "Étienne de Silhouette",
-    "Charles Boycott"
+    "shrapnel",
+    "pasteurise",
+    "cardigan"
    ],
    "explain": "“guillotine” is named after Joseph-Ignace Guillotin. A French doctor who proposed a quicker, more humane method of execution.",
    "difficulty": 2,
@@ -1810,12 +1810,12 @@
   {
    "id": "named-silhouette",
    "kind": "mc",
-   "prompt": "The word “silhouette” is named after whom?",
-   "answer": "Étienne de Silhouette",
+   "prompt": "Which word is named after a penny-pinching French finance minister of 1759?",
+   "answer": "silhouette",
    "wrong": [
-    "Joseph-Ignace Guillotin",
-    "Louis Braille",
-    "Jules Léotard"
+    "diesel",
+    "teddy bear",
+    "nicotine"
    ],
    "explain": "“silhouette” is named after Étienne de Silhouette. A penny-pinching French finance minister of 1759.",
    "difficulty": 3,
@@ -1826,12 +1826,12 @@
   {
    "id": "named-teddy-bear",
    "kind": "mc",
-   "prompt": "The word “teddy bear” is named after whom?",
-   "answer": "Theodore Roosevelt",
+   "prompt": "Which word is named after a US president who, the story goes, refused to shoot a captive animal on a 1902 hunting trip?",
+   "answer": "teddy bear",
    "wrong": [
-    "Winston Churchill",
-    "Edward VII",
-    "Teddy Sheringham"
+    "sandwich",
+    "leotard",
+    "volt"
    ],
    "explain": "“teddy bear” is named after Theodore Roosevelt. The US president who, the story goes, refused to shoot a captive bear.",
    "difficulty": 1,
@@ -1842,12 +1842,12 @@
   {
    "id": "named-nicotine",
    "kind": "mc",
-   "prompt": "The word “nicotine” is named after whom?",
-   "answer": "Jean Nicot",
+   "prompt": "Which word is named after a French diplomat who sent tobacco to Paris in 1560?",
+   "answer": "nicotine",
    "wrong": [
-    "Louis Pasteur",
-    "Rudolf Diesel",
-    "Anders Celsius"
+    "guillotine",
+    "silhouette",
+    "teddy bear"
    ],
    "explain": "“nicotine” is named after Jean Nicot. A French diplomat who sent tobacco to Paris in 1560.",
    "difficulty": 3,
@@ -1858,12 +1858,12 @@
   {
    "id": "named-watt",
    "kind": "mc",
-   "prompt": "The word “watt” is named after whom?",
-   "answer": "James Watt",
+   "prompt": "Which word is named after the Scottish inventor who improved the steam engine?",
+   "answer": "watt",
    "wrong": [
-    "Alessandro Volta",
-    "André-Marie Ampère",
-    "Isaac Newton"
+    "leotard",
+    "volt",
+    "sandwich"
    ],
    "explain": "“watt” is named after James Watt. The Scottish inventor who improved the steam engine.",
    "difficulty": 2,
@@ -1874,12 +1874,12 @@
   {
    "id": "named-pasteurise",
    "kind": "mc",
-   "prompt": "The word “pasteurise” is named after whom?",
-   "answer": "Louis Pasteur",
+   "prompt": "Which word is named after the French scientist who showed heating could kill germs in drinks?",
+   "answer": "pasteurise",
    "wrong": [
-    "Marie Curie",
-    "Joseph Lister",
-    "Jean Nicot"
+    "watt",
+    "silhouette",
+    "leotard"
    ],
    "explain": "“pasteurise” is named after Louis Pasteur. The French scientist who showed heating could kill germs in drinks.",
    "difficulty": 2,
@@ -1890,12 +1890,12 @@
   {
    "id": "named-volt",
    "kind": "mc",
-   "prompt": "The word “volt” is named after whom?",
-   "answer": "Alessandro Volta",
+   "prompt": "Which word is named after the Italian physicist who built the first battery?",
+   "answer": "volt",
    "wrong": [
-    "James Watt",
-    "Michael Faraday",
-    "Galileo Galilei"
+    "sandwich",
+    "watt",
+    "leotard"
    ],
    "explain": "“volt” is named after Alessandro Volta. The Italian physicist who built the first battery.",
    "difficulty": 3,
@@ -1906,12 +1906,12 @@
   {
    "id": "named-shrapnel",
    "kind": "mc",
-   "prompt": "The word “shrapnel” is named after whom?",
-   "answer": "Henry Shrapnel",
+   "prompt": "Which word is named after a British army officer who invented an exploding shell?",
+   "answer": "shrapnel",
    "wrong": [
-    "Rudolf Diesel",
-    "Charles Boycott",
-    "Joseph Guillotin"
+    "volt",
+    "pasteurise",
+    "leotard"
    ],
    "explain": "“shrapnel” is named after Henry Shrapnel. A British army officer who invented an exploding shell.",
    "difficulty": 3,
@@ -2145,9 +2145,9 @@
    "explain": "The Romans renamed the month Quintilis in his honour."
   },
   {
-   "id": "wq-0ab9f9a6",
+   "id": "wq-a3a47728",
    "kind": "mc",
-   "prompt": "Which month is named after the emperor Augustus?",
+   "prompt": "Which month was renamed in honour of Rome's first emperor?",
    "difficulty": 2,
    "answer": "August",
    "wrong": [

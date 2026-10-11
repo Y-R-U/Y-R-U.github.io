@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, comparison, capFirst, factPhrase, whenPhrase } from './registry.js?v=202610101826';
-import { h, imgEl } from '../ui/kit.js?v=202610101826';
-import { numericKeys, numOf, spreadSet, rangeOf, fmtFact, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610101826';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, comparison, capFirst, factPhrase, whenPhrase } from './registry.js?v=202610110402';
+import { h, imgEl } from '../ui/kit.js?v=202610110402';
+import { numericKeys, numOf, spreadSet, rangeOf, fmtFact, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610110402';
 
 const CSS = `
 .or-wrap{display:flex;flex-direction:column;gap:6px}
@@ -8,7 +8,7 @@ const CSS = `
 .or-list{position:relative;display:flex;flex-direction:column;gap:8px;list-style:none;margin:0;padding:0}
 .or-it{position:relative;display:flex;align-items:center;gap:10px;min-height:58px;padding:6px 8px 6px 6px;background:#fff;border:var(--line) solid var(--ink);border-radius:14px;box-shadow:var(--shadow-sm);font-weight:900;font-size:17px;line-height:1.15;touch-action:none;user-select:none;cursor:grab;animation:ch-in .35s cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--i)*40ms)}
 .or-it .pos{flex:none;width:30px;height:30px;border-radius:9px;background:var(--grape);color:#fff;display:grid;place-items:center;font-family:var(--font-display);font-weight:400;font-size:17px;border:2px solid var(--ink)}
-.or-it img{flex:none;width:58px;height:44px;object-fit:cover;border-radius:8px;border:2px solid var(--ink);background:#eee}
+.or-it img{flex:none;width:58px;height:44px;object-fit:contain;border-radius:8px;border:2px solid var(--ink);background:#eee}
 .or-it .nm{flex:1;min-width:4.5em;overflow-wrap:break-word;hyphens:auto}
 .or-it .val{flex:none;font-family:var(--font-display);font-weight:400;font-size:17px;color:var(--grape);display:none}
 .or-it .mv{flex:none;display:flex;flex-direction:column;gap:2px}

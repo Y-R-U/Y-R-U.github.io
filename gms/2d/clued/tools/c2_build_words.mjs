@@ -3,7 +3,7 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, fetchJSON, writePack, slug, rng, sample, parseQuestions } from './c2_lib.mjs';
-import { LOANWORDS, EPONYMS, WORD_QS } from './c2_src/words.mjs';
+import { LOANWORDS, EPONYMS, WORD_QS, EPONYM_DESC } from './c2_src/words.mjs';
 
 const report = [];
 const note = s => report.push(s);
@@ -28,6 +28,7 @@ for (const r of epos) {
   if (!r.ok) note(`eponym NOT verified on Wiktionary, dropped: ${r.word} (${r.kw})`);
 }
 const quoteW = w => `“${w}”`;
+export const eponymDesc = x => EPONYM_DESC[x.word] || x.story.charAt(0).toLowerCase() + x.story.slice(1);
 const items = [
   ...loans.filter(r => r.ok).map(r => ({ id: slug(r.word), name: r.word, group: 'loanword', facts: { origin: r.lang, kind: 'Borrowed from another language' }, blurb: `${quoteW(r.word)} comes from ${r.lang}. ${r.story}.`, difficulty: r.d })),
   ...epos.filter(r => r.ok).map(r => ({ id: slug(r.word), name: r.word, group: 'eponym', facts: { namedAfter: r.who, kind: 'Named after a person' }, blurb: `${quoteW(r.word)} is named after ${r.who.replace(/^The /, 'the ')}. ${r.story}.`, difficulty: r.d })),
@@ -41,9 +42,12 @@ for (const x of loans.filter(x => x.ok)) {
   const wrong = sample(r, LANGS.filter(l => !mentioned(l)), 3);
   questions.push({ id: `origin-${it.id}`, kind: 'mc', prompt: `The English word ${quoteW(x.word)} comes from which language?`, answer: x.lang, wrong, explain: it.blurb, difficulty: x.d, refs: [`words/${it.id}`] });
 }
+// "Is named after whom?" is a giveaway (the word is the surname), so ask the other way round.
+const re = rng('words-eponyms');
 for (const x of epos.filter(x => x.ok)) {
   const it = items.find(i => i.name === x.word);
-  questions.push({ id: `named-${it.id}`, kind: 'mc', prompt: `The word ${quoteW(x.word)} is named after whom?`, answer: x.who, wrong: x.wrong, explain: it.blurb, difficulty: x.d, refs: [`words/${it.id}`] });
+  const wrong = sample(re, epos.filter(y => y.ok && y.word !== x.word).map(y => y.word), 3);
+  questions.push({ id: `named-${it.id}`, kind: 'mc', prompt: `Which word is named after ${eponymDesc(x)}?`, answer: x.word, wrong, explain: it.blurb, difficulty: x.d, refs: [`words/${it.id}`] });
 }
 writePack({
   id: 'words', title: 'Word origins', theme: 'books', icon: '🔤', kids: false, version: 1,

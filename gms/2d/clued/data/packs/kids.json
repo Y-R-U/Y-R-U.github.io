@@ -2935,9 +2935,9 @@
    }
   },
   {
-   "id": "kid-weather-d7b5d3",
+   "id": "kid-weather-280912",
    "kind": "mc",
-   "prompt": "Which comes first in a storm, the flash or the bang?",
+   "prompt": "In a thunderstorm, which do you notice first?",
    "answer": "The lightning flash",
    "wrong": [
     "The thunder bang",
@@ -3510,9 +3510,9 @@
    "topic": "fairy tales"
   },
   {
-   "id": "kid-tale-90335e",
+   "id": "kid-tale-af4bc8",
    "kind": "mc",
-   "prompt": "Which animal does Alice follow down a rabbit hole?",
+   "prompt": "Which animal does Alice follow into Wonderland?",
    "answer": "The White Rabbit",
    "wrong": [
     "The Cheshire Cat",
@@ -4267,9 +4267,9 @@
    "topic": "science"
   },
   {
-   "id": "kid-sci-27b072",
+   "id": "kid-sci-71f47a",
    "kind": "mc",
-   "prompt": "What do you need to switch on to light up a dark room?",
+   "prompt": "What do you switch on when a room gets dark?",
    "answer": "A light",
    "wrong": [
     "A tap",
@@ -4453,6 +4453,1274 @@
     "science"
    ],
    "topic": "science"
+  },
+  {
+   "id": "kid-ani-348f39",
+   "kind": "mc",
+   "prompt": "Which animal says 'oink'?",
+   "answer": "Pig",
+   "wrong": [
+    "Duck",
+    "Horse"
+   ],
+   "explain": "Pigs love to roll in mud to keep cool.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-5f0321",
+   "kind": "mc",
+   "prompt": "Which animal says 'neigh'?",
+   "answer": "Horse",
+   "wrong": [
+    "Cow",
+    "Goat"
+   ],
+   "explain": "Horses can sleep standing up.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-f851eb",
+   "kind": "mc",
+   "prompt": "Which animal hoots at night?",
+   "answer": "Owl",
+   "wrong": [
+    "Eagle",
+    "Parrot"
+   ],
+   "explain": "Owls hunt at night with their big eyes.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-5e61fc",
+   "kind": "mc",
+   "prompt": "Which animal hops and has long ears?",
+   "answer": "Rabbit",
+   "wrong": [
+    "Mouse",
+    "Cat"
+   ],
+   "explain": "Rabbits use their long ears to listen for danger.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-12db21",
+   "kind": "mc",
+   "prompt": "Which animal lives in a hive?",
+   "answer": "Bee",
+   "wrong": [
+    "Ant",
+    "Spider"
+   ],
+   "explain": "Thousands of bees can live in one hive.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-b8f5c6",
+   "kind": "mc",
+   "prompt": "Which animal spins a web?",
+   "answer": "Spider",
+   "wrong": [
+    "Snail",
+    "Worm"
+   ],
+   "explain": "Spiders make silk to build webs that catch insects.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-7e9d80",
+   "kind": "mc",
+   "prompt": "Which animal is known as the king of the jungle?",
+   "answer": "Lion",
+   "wrong": [
+    "Tiger",
+    "Monkey"
+   ],
+   "explain": "Lions actually live on grassy plains, not in jungles!",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-7d7f83",
+   "kind": "mc",
+   "prompt": "Which bird is famous for copying words?",
+   "answer": "Parrot",
+   "wrong": [
+    "Penguin",
+    "Owl"
+   ],
+   "explain": "Some parrots can learn lots of words.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-0ceb97",
+   "kind": "mc",
+   "prompt": "What is a baby duck called?",
+   "answer": "Duckling",
+   "wrong": [
+    "Chick",
+    "Cub"
+   ],
+   "explain": "Ducklings follow their mum in a line.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-cff6b0",
+   "kind": "mc",
+   "prompt": "What is a baby bear called?",
+   "answer": "Cub",
+   "wrong": [
+    "Calf",
+    "Kitten"
+   ],
+   "explain": "Bear cubs are born in winter dens.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-42cf81",
+   "kind": "mc",
+   "prompt": "What is a baby goat called?",
+   "answer": "Kid",
+   "wrong": [
+    "Lamb",
+    "Foal"
+   ],
+   "explain": "Baby goats love to jump and climb.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-5a5ed9",
+   "kind": "mc",
+   "prompt": "What is a baby pig called?",
+   "answer": "Piglet",
+   "wrong": [
+    "Puppy",
+    "Joey"
+   ],
+   "explain": "Piglets drink their mum's milk.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-8f1251",
+   "kind": "mc",
+   "prompt": "What is a baby owl called?",
+   "answer": "Owlet",
+   "wrong": [
+    "Duckling",
+    "Cub"
+   ],
+   "explain": "Owlets are fluffy and grey or white.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-f32e15",
+   "kind": "mc",
+   "prompt": "Which animal has a shell and moves very slowly?",
+   "answer": "Snail",
+   "wrong": [
+    "Mouse",
+    "Bird"
+   ],
+   "explain": "A snail carries its home on its back.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-030126",
+   "kind": "mc",
+   "prompt": "Which animal has stripes and is a big cat?",
+   "answer": "Tiger",
+   "wrong": [
+    "Lion",
+    "Leopard"
+   ],
+   "explain": "No two tigers have the same stripes.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-6fbb4c",
+   "kind": "mc",
+   "prompt": "Which animal has spots and is a big cat?",
+   "answer": "Leopard",
+   "wrong": [
+    "Tiger",
+    "Zebra"
+   ],
+   "explain": "Leopards can climb trees with their food.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-b98bd7",
+   "kind": "mc",
+   "prompt": "Which animal has a very long neck?",
+   "answer": "Giraffe",
+   "wrong": [
+    "Hippo",
+    "Bear"
+   ],
+   "explain": "A giraffe's neck has seven bones, just like ours.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-ee1788",
+   "kind": "mc",
+   "prompt": "Which animal lives in the sea and has eight arms?",
+   "answer": "Octopus",
+   "wrong": [
+    "Crab",
+    "Starfish"
+   ],
+   "explain": "An octopus can squirt ink to escape.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-84beb1",
+   "kind": "mc",
+   "prompt": "Which animal has a hump on its back and lives in the desert?",
+   "answer": "Camel",
+   "wrong": [
+    "Horse",
+    "Cow"
+   ],
+   "explain": "A camel's hump stores fat, not water.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-748a5e",
+   "kind": "mc",
+   "prompt": "Which animal has black and white fur and eats bamboo?",
+   "answer": "Giant panda",
+   "wrong": [
+    "Polar bear",
+    "Zebra"
+   ],
+   "explain": "Pandas eat bamboo for most of the day.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-91c19f",
+   "kind": "mc",
+   "prompt": "Which animal has a long, sticky tongue for catching flies?",
+   "answer": "Frog",
+   "wrong": [
+    "Rabbit",
+    "Duck"
+   ],
+   "explain": "A frog's tongue flips out in a flash.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-86743b",
+   "kind": "mc",
+   "prompt": "What do caterpillars mostly eat?",
+   "answer": "Leaves",
+   "wrong": [
+    "Fish",
+    "Seeds"
+   ],
+   "explain": "Caterpillars munch leaves to grow big.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-68cf52",
+   "kind": "mc",
+   "prompt": "What do squirrels love to collect?",
+   "answer": "Nuts",
+   "wrong": [
+    "Stones",
+    "Feathers"
+   ],
+   "explain": "Squirrels bury nuts to eat in winter.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-78dbe9",
+   "kind": "mc",
+   "prompt": "What do rabbits love to eat?",
+   "answer": "Grass and plants",
+   "wrong": [
+    "Meat",
+    "Fish"
+   ],
+   "explain": "Rabbits eat grass, leaves and vegetables.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-f82802",
+   "kind": "mc",
+   "prompt": "Which animal is a reptile?",
+   "answer": "Lizard",
+   "wrong": [
+    "Dog",
+    "Parrot"
+   ],
+   "explain": "Reptiles have dry, scaly skin.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-1f8303",
+   "kind": "mc",
+   "prompt": "Which animal is a bird?",
+   "answer": "Ostrich",
+   "wrong": [
+    "Bat",
+    "Butterfly"
+   ],
+   "explain": "Ostriches are birds, even though they can't fly.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-bd02fb",
+   "kind": "mc",
+   "prompt": "Which animal has a mane?",
+   "answer": "Horse",
+   "wrong": [
+    "Pig",
+    "Sheep"
+   ],
+   "explain": "Male lions have manes too!",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-e83a99",
+   "kind": "mc",
+   "prompt": "Which of these animals lives on a farm?",
+   "answer": "Cow",
+   "wrong": [
+    "Lion",
+    "Penguin"
+   ],
+   "explain": "Cows, sheep and hens live on farms.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-78b1b6",
+   "kind": "mc",
+   "prompt": "Which of these animals lives in the Arctic?",
+   "answer": "Polar bear",
+   "wrong": [
+    "Kangaroo",
+    "Camel"
+   ],
+   "explain": "Polar bears have thick fur and fat to stay warm.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-fc5dec",
+   "kind": "mc",
+   "prompt": "Which of these animals lives in Australia?",
+   "answer": "Koala",
+   "wrong": [
+    "Panda",
+    "Polar bear"
+   ],
+   "explain": "Koalas sleep for up to 20 hours a day.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-4eed3d",
+   "kind": "tf",
+   "prompt": "A dolphin is a fish.",
+   "answer": false,
+   "explain": "Dolphins are mammals. They breathe air through a blowhole.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-e38c15",
+   "kind": "tf",
+   "prompt": "Owls can turn their heads a long way round.",
+   "answer": true,
+   "explain": "Owls can turn their heads about three quarters of the way round.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-80b6e0",
+   "kind": "tf",
+   "prompt": "Elephants are the biggest animals living on land.",
+   "answer": true,
+   "explain": "African elephants are the biggest land animals.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-291c80",
+   "kind": "tf",
+   "prompt": "Fish can breathe air like us.",
+   "answer": false,
+   "explain": "Most fish use gills to take oxygen from water.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-2bb954",
+   "kind": "tf",
+   "prompt": "Caterpillars turn into butterflies or moths.",
+   "answer": true,
+   "explain": "They change inside a chrysalis or cocoon.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-e54b21",
+   "kind": "tf",
+   "prompt": "Cats can see better than people in the dark.",
+   "answer": true,
+   "explain": "Cats' eyes are made to collect lots of light.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-body-3f91ea",
+   "kind": "mc",
+   "prompt": "What do you smell with?",
+   "answer": "Nose",
+   "wrong": [
+    "Ears",
+    "Elbow"
+   ],
+   "explain": "Your nose can tell apart lots of different smells.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-d3b132",
+   "kind": "mc",
+   "prompt": "What do you taste with?",
+   "answer": "Tongue",
+   "wrong": [
+    "Nose",
+    "Knees"
+   ],
+   "explain": "Your tongue has taste buds.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-8e1f07",
+   "kind": "mc",
+   "prompt": "How many teeth does a grown-up usually have?",
+   "answer": "32",
+   "wrong": [
+    "20",
+    "10"
+   ],
+   "explain": "Children have 20 baby teeth.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-2d58a7",
+   "kind": "mc",
+   "prompt": "What is inside your body that helps you think?",
+   "answer": "Brain",
+   "wrong": [
+    "Heart",
+    "Stomach"
+   ],
+   "explain": "Your brain controls everything you do.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-584121",
+   "kind": "mc",
+   "prompt": "Which part of your body has a heel and toes?",
+   "answer": "Foot",
+   "wrong": [
+    "Hand",
+    "Head"
+   ],
+   "explain": "Each foot has five toes.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-d15559",
+   "kind": "mc",
+   "prompt": "What do bones make together inside your body?",
+   "answer": "A skeleton",
+   "wrong": [
+    "A muscle",
+    "A tooth"
+   ],
+   "explain": "Your skeleton holds you up.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-fc69ff",
+   "kind": "mc",
+   "prompt": "Which of these keeps your teeth healthy?",
+   "answer": "Brushing twice a day",
+   "wrong": [
+    "Eating lots of sweets",
+    "Never drinking water"
+   ],
+   "explain": "Brush in the morning and at bedtime.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-57f09d",
+   "kind": "mc",
+   "prompt": "What should you do before eating?",
+   "answer": "Wash your hands",
+   "wrong": [
+    "Jump up and down",
+    "Close your eyes"
+   ],
+   "explain": "Washing hands gets rid of germs.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-252e52",
+   "kind": "tf",
+   "prompt": "You have more than one bone in your body.",
+   "answer": true,
+   "explain": "Grown-ups have about 206 bones.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-shape-2e93d0",
+   "kind": "mc",
+   "prompt": "Which shape is a wheel?",
+   "answer": "Circle",
+   "wrong": [
+    "Square",
+    "Triangle"
+   ],
+   "explain": "Circles roll smoothly.",
+   "difficulty": 1,
+   "tags": [
+    "kids"
+   ],
+   "topic": "shapes"
+  },
+  {
+   "id": "kid-count-ea1b24",
+   "kind": "mc",
+   "prompt": "What is 10 − 3?",
+   "answer": "7",
+   "wrong": [
+    "6",
+    "8"
+   ],
+   "explain": "10 take away 3 is 7.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "counting"
+  },
+  {
+   "id": "kid-count-0e6ba3",
+   "kind": "mc",
+   "prompt": "How many legs do two birds have altogether?",
+   "answer": "4",
+   "wrong": [
+    "2",
+    "6"
+   ],
+   "explain": "Each bird has 2 legs: 2 + 2 = 4.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "counting"
+  },
+  {
+   "id": "kid-count-8f71b5",
+   "kind": "mc",
+   "prompt": "Which number comes before 10?",
+   "answer": "9",
+   "wrong": [
+    "11",
+    "8"
+   ],
+   "explain": "9, then 10.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "counting"
+  },
+  {
+   "id": "kid-count-154a7d",
+   "kind": "mc",
+   "prompt": "How many seconds are in a minute?",
+   "answer": "60",
+   "wrong": [
+    "100",
+    "30"
+   ],
+   "explain": "Count to 60 and a minute has passed.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "counting"
+  },
+  {
+   "id": "kid-count-3d6cbe",
+   "kind": "mc",
+   "prompt": "Which of these numbers is the biggest?",
+   "answer": "50",
+   "wrong": [
+    "15",
+    "5"
+   ],
+   "explain": "50 is more than 15 and 5.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "counting"
+  },
+  {
+   "id": "kid-sci-197909",
+   "kind": "mc",
+   "prompt": "What does a thermometer measure?",
+   "answer": "How hot or cold it is",
+   "wrong": [
+    "How heavy it is",
+    "How long it is"
+   ],
+   "explain": "Thermometers measure temperature.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-45e93b",
+   "kind": "mc",
+   "prompt": "Which of these is a magnet attracted to?",
+   "answer": "An iron nail",
+   "wrong": [
+    "A paper cup",
+    "A rubber band"
+   ],
+   "explain": "Magnets attract iron and steel.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-50bea7",
+   "kind": "mc",
+   "prompt": "What do plants give out that we need to breathe?",
+   "answer": "Oxygen",
+   "wrong": [
+    "Smoke",
+    "Sand"
+   ],
+   "explain": "Plants make oxygen when they make food from sunlight.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-a50efa",
+   "kind": "mc",
+   "prompt": "Which of these melts in the sun?",
+   "answer": "An ice cube",
+   "wrong": [
+    "A stone",
+    "A spoon"
+   ],
+   "explain": "Ice melts into water when it warms up.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-500ec4",
+   "kind": "mc",
+   "prompt": "What do we use to see very tiny things up close?",
+   "answer": "A microscope",
+   "wrong": [
+    "A telescope",
+    "A ruler"
+   ],
+   "explain": "Telescopes help us see far away.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-bc05a1",
+   "kind": "mc",
+   "prompt": "What do we use to look at stars far away?",
+   "answer": "A telescope",
+   "wrong": [
+    "A microscope",
+    "A spoon"
+   ],
+   "explain": "Telescopes collect lots of light.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-1d84cb",
+   "kind": "mc",
+   "prompt": "Which of these is made of wood?",
+   "answer": "A pencil",
+   "wrong": [
+    "A window",
+    "A coin"
+   ],
+   "explain": "Pencils are wood around a graphite middle.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-833855",
+   "kind": "mc",
+   "prompt": "What is the name for water falling from clouds as tiny balls of ice?",
+   "answer": "Hail",
+   "wrong": [
+    "Fog",
+    "Dew"
+   ],
+   "explain": "Hailstones can bounce when they land.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-weather-53dbf9",
+   "kind": "mc",
+   "prompt": "In which season is it usually hottest?",
+   "answer": "Summer",
+   "wrong": [
+    "Winter",
+    "Autumn"
+   ],
+   "explain": "Summer has the longest days.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "nature"
+   ],
+   "topic": "weather"
+  },
+  {
+   "id": "kid-weather-921af3",
+   "kind": "tf",
+   "prompt": "Snow is made of frozen water.",
+   "answer": true,
+   "explain": "Snowflakes are tiny ice crystals.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "nature"
+   ],
+   "topic": "weather"
+  },
+  {
+   "id": "kid-sci-5907a7",
+   "kind": "tf",
+   "prompt": "Metal spoons can be picked up by a magnet if they contain iron.",
+   "answer": true,
+   "explain": "Many steel spoons stick to magnets.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-space-fd3b23",
+   "kind": "mc",
+   "prompt": "What goes around the Earth and lights up the night sky?",
+   "answer": "The Moon",
+   "wrong": [
+    "The Sun",
+    "Mars"
+   ],
+   "explain": "The Moon goes round the Earth about once a month.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "kid-space-8c6c63",
+   "kind": "tf",
+   "prompt": "People have walked on the Moon.",
+   "answer": true,
+   "explain": "Twelve astronauts walked on the Moon between 1969 and 1972.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "kid-world-2644b9",
+   "kind": "mc",
+   "prompt": "What is the frozen land at the bottom of the world called?",
+   "answer": "Antarctica",
+   "wrong": [
+    "Africa",
+    "Asia"
+   ],
+   "explain": "Antarctica is covered in thick ice.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-0ef50a",
+   "kind": "mc",
+   "prompt": "In which city is the Eiffel Tower?",
+   "answer": "Paris",
+   "wrong": [
+    "London",
+    "Rome"
+   ],
+   "explain": "The Eiffel Tower was finished in 1889.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-b57d43",
+   "kind": "mc",
+   "prompt": "What is a very big hill called?",
+   "answer": "A mountain",
+   "wrong": [
+    "A river",
+    "A beach"
+   ],
+   "explain": "The tallest mountain is Mount Everest.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-78782c",
+   "kind": "mc",
+   "prompt": "What is a place with lots of sand and very little rain called?",
+   "answer": "A desert",
+   "wrong": [
+    "A forest",
+    "A lake"
+   ],
+   "explain": "The Sahara is a huge desert.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-22a7cd",
+   "kind": "mc",
+   "prompt": "Which language do people mainly speak in Spain?",
+   "answer": "Spanish",
+   "wrong": [
+    "French",
+    "German"
+   ],
+   "explain": "Spanish is spoken in many countries.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-tale-2d272b",
+   "kind": "mc",
+   "prompt": "Who climbed a beanstalk to a giant's castle?",
+   "answer": "Jack",
+   "wrong": [
+    "Hansel",
+    "Peter Pan"
+   ],
+   "explain": "Jack swapped the family cow for magic beans.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-a69152",
+   "kind": "mc",
+   "prompt": "Who let down her long hair from a tower?",
+   "answer": "Rapunzel",
+   "wrong": [
+    "Cinderella",
+    "Goldilocks"
+   ],
+   "explain": "The prince climbed up her hair.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-1f866e",
+   "kind": "mc",
+   "prompt": "Whose porridge did Goldilocks eat?",
+   "answer": "The three bears'",
+   "wrong": [
+    "The three little pigs'",
+    "The seven dwarfs'"
+   ],
+   "explain": "Baby Bear's porridge was just right.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-8489cc",
+   "kind": "mc",
+   "prompt": "In the story, what did the three little pigs build their houses from?",
+   "answer": "Straw, sticks and bricks",
+   "wrong": [
+    "Snow, ice and glass",
+    "Paper, cloth and sand"
+   ],
+   "explain": "Only the brick house was strong enough.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-f6c8e5",
+   "kind": "mc",
+   "prompt": "Who wanted to blow the pigs' houses down?",
+   "answer": "The big bad wolf",
+   "wrong": [
+    "The fox",
+    "The giant"
+   ],
+   "explain": "He huffed and he puffed!",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-fd01e0",
+   "kind": "mc",
+   "prompt": "Whose nose grew when he told a lie?",
+   "answer": "Pinocchio",
+   "wrong": [
+    "Peter Pan",
+    "Jack"
+   ],
+   "explain": "Pinocchio was a wooden puppet.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-232b9b",
+   "kind": "mc",
+   "prompt": "Who ate a poisoned apple and fell into a deep sleep?",
+   "answer": "Snow White",
+   "wrong": [
+    "Cinderella",
+    "Little Red Riding Hood"
+   ],
+   "explain": "She lived with seven dwarfs.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-a91e7e",
+   "kind": "mc",
+   "prompt": "What did Hansel and Gretel find in the forest?",
+   "answer": "A house made of sweets",
+   "wrong": [
+    "A golden castle",
+    "A magic bean"
+   ],
+   "explain": "A witch lived inside it.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
   }
  ],
  "sources": [

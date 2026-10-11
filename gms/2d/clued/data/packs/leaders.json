@@ -34,7 +34,8 @@
    "type": "cat",
    "label": "Born in",
    "ask": "When was {name} born?",
-   "stmt": "{name} was born in the {value}."
+   "stmt": "{name} was born in the {value}.",
+   "askReverse": "Which of these people was born in the {value}?"
   },
   "field": {
    "type": "cat",

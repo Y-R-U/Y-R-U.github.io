@@ -145,7 +145,7 @@ export default {
     { kind: 'mc', prompt: 'What is the biggest lizard?', answer: 'Komodo dragon', wrong: ['Green iguana', 'Perentie', 'Gila monster'], explain: 'Komodo dragons can be about 3 m long.', difficulty: 1 },
     { kind: 'tf', prompt: 'A frog is a reptile.', answer: false, explain: 'Frogs are amphibians; they start life in water.', difficulty: 1 },
     { kind: 'tf', prompt: 'Chameleons can move each eye on its own.', answer: true, explain: 'They can look in two directions at once.', difficulty: 1 },
-    { kind: 'mc', prompt: 'Why were cane toads brought to Australia in 1935?', answer: 'To eat beetles on sugar cane', wrong: ['As pets', 'For food', 'To eat mosquitoes'], explain: 'It failed, and the toads spread across northern Australia.', difficulty: 2 },
+    { kind: 'mc', prompt: 'Why were cane toads brought to Australia in 1935?', answer: 'To eat beetles that damaged sugar crops', wrong: ['As pets', 'For food', 'To eat mosquitoes'], explain: 'It failed, and the toads spread across northern Australia.', difficulty: 2 },
     { kind: 'mc', prompt: 'Which animal can regrow its legs, tail and even parts of its heart?', answer: 'Axolotl', wrong: ['Tuatara', 'Cane toad', 'Gharial'], explain: 'Axolotls are famous for regeneration.', difficulty: 2 },
     { kind: 'mc', prompt: 'What decides whether baby alligators are male or female?', answer: 'The temperature of the nest', wrong: ['The size of the egg', 'The month they hatch', 'The colour of the mother'], explain: 'Warmer and cooler nests produce different sexes.', difficulty: 3 },
     { kind: 'mc', prompt: 'Which famous tortoise was the last of his kind on Pinta Island?', answer: 'Lonesome George', wrong: ['Harriet', 'Jonathan', 'Speedy'], explain: 'He died in 2012.', difficulty: 3 },

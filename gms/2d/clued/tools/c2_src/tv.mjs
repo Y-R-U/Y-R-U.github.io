@@ -77,7 +77,7 @@ tf|1|Game of Thrones is based on books by George R. R. Martin.|true|The book ser
 mc|1|In Breaking Bad, what subject does Walter White teach?|Chemistry|Biology;Physics;History|He teaches at a high school in Albuquerque.
 tf|2|Breaking Bad is set in Las Vegas.|false|It is set in Albuquerque, New Mexico.
 mc|2|In Fawlty Towers, what is the name of the Spanish waiter?|Manuel|Pedro;Carlos;Miguel|He is from Barcelona.
-mc|3|In Only Fools and Horses, what is the Trotters' company called?|Trotters Independent Traders|Peckham Traders Ltd;Del Boy Enterprises;Trotter & Son|The van says New York, Paris, Peckham.
+mc|3|In Only Fools and Horses, what is Del Boy's company called?|Trotters Independent Traders|Peckham Traders Ltd;Del Boy Enterprises;Trotter & Son|The van says New York, Paris, Peckham.
 mc|2|In Top Gear (from 2002), what is the masked racing driver called?|The Stig|The Hamster;Captain Slow;The Driver|His identity was kept secret.
 mc|2|What are the surnames of the two FBI agents in The X-Files (1993)?|Mulder and Scully|Starsky and Hutch;Cagney and Lacey;Cooper and Truman|Fox Mulder and Dana Scully.
 mc|1|What kind of car does Mr. Bean drive?|A Mini|A Beetle;A Ferrari;A Land Rover|His Mini is green, with a padlock on the door.

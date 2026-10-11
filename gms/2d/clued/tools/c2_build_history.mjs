@@ -61,7 +61,7 @@ writePack({
   id: 'history', title: 'History', theme: 'history', icon: '🏛️', kids: false, version: 1,
   factsMeta: {
     year: { type: 'year', label: 'Year', higherLabel: 'Later', askNumber: '{name}. In what year did this happen?', askHigh: 'Which of these happened most recently?', askLow: 'Which of these happened first?' },
-    century: { type: 'cat', label: 'Century', ask: '{name}. In which century did this happen?', stmt: '{name}. This happened in the {value}.' },
+    century: { type: 'cat', label: 'Century', ask: '{name}. In which century did this happen?', askReverse: 'Which of these happened in the {value}?', stmt: '{name}. This happened in the {value}.' },
     era: { type: 'cat', label: 'Era', exclusive: false },
   },
   items, questions: questions.filter(x => !seen.has(x.id) && seen.add(x.id)),

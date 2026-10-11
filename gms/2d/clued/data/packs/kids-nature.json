@@ -859,6 +859,1256 @@
    }
   },
   {
+   "id": "pic35",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Cheetah",
+   "wrong": [
+    "Tiger",
+    "Lion",
+    "Wolf"
+   ],
+   "explain": "Cheetahs are the fastest animals on land.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/Cheetah_%28Acinonyx_jubatus%29_female_2.jpg/500px-Cheetah_%28Acinonyx_jubatus%29_female_2.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cheetah_(Acinonyx_jubatus)_female_2.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic36",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Hippo",
+   "wrong": [
+    "Rhino",
+    "Elephant",
+    "Pig"
+   ],
+   "explain": "Hippos spend hot days resting in rivers.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Hippo_%28Hippopotamus_amphibius%29_%2816485955207%29.jpg/500px-Hippo_%28Hippopotamus_amphibius%29_%2816485955207%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Bernard DUPONT from FRANCE",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hippo_(Hippopotamus_amphibius)_(16485955207).jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic37",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Rhino",
+   "wrong": [
+    "Hippo",
+    "Elephant",
+    "Buffalo"
+   ],
+   "explain": "A rhino's horn is made of the same stuff as your fingernails.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/White_rhinoceros_africa.jpg/500px-White_rhinoceros_africa.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Payamfarahani",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:White_rhinoceros_africa.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic38",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Gorilla",
+   "wrong": [
+    "Chimpanzee",
+    "Bear",
+    "Orangutan"
+   ],
+   "explain": "Gorillas are the biggest apes.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Gorille.jpg/500px-Gorille.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Macinate",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gorille.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic39",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Chimpanzee",
+   "wrong": [
+    "Gorilla",
+    "Lemur",
+    "Bear"
+   ],
+   "explain": "Chimpanzees use sticks as tools.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/013_Alpha_male_chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg/500px-013_Alpha_male_chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:013_Alpha_male_chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic40",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Orangutan",
+   "wrong": [
+    "Gorilla",
+    "Chimpanzee",
+    "Panda"
+   ],
+   "explain": "Orangutans spend most of their lives in trees.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/d3/OrangutanP1.jpg",
+      "w": 500,
+      "h": 648,
+      "credit": "Ltshears",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:OrangutanP1.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic41",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Meerkat",
+   "wrong": [
+    "Squirrel",
+    "Rabbit",
+    "Fox"
+   ],
+   "explain": "Meerkats take turns to stand guard.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Meerkat_%28Suricata_suricatta%29.jpg/500px-Meerkat_%28Suricata_suricatta%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Hans Hillewaert",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Meerkat_(Suricata_suricatta).jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic42",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Fox",
+   "wrong": [
+    "Wolf",
+    "Dog",
+    "Cat"
+   ],
+   "explain": "Foxes have bushy tails.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Fox_at_the_British_Wildlife_Centre%2C_Newchapel%2C_Surrey_-_geograph.org.uk_-_2221750.jpg/330px-Fox_at_the_British_Wildlife_Centre%2C_Newchapel%2C_Surrey_-_geograph.org.uk_-_2221750.jpg",
+      "w": 330,
+      "h": 496,
+      "credit": "Peter Trimming",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fox_at_the_British_Wildlife_Centre,_Newchapel,_Surrey_-_geograph.org.uk_-_2221750.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic43",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Wolf",
+   "wrong": [
+    "Fox",
+    "Bear",
+    "Lion"
+   ],
+   "explain": "Wolves live and hunt in packs.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Eurasian_wolf_2.jpg/500px-Eurasian_wolf_2.jpg",
+      "w": 500,
+      "h": 387,
+      "credit": "User:Mas3cf",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eurasian_wolf_2.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic44",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Bear",
+   "wrong": [
+    "Wolf",
+    "Gorilla",
+    "Moose"
+   ],
+   "explain": "Brown bears love to catch salmon.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Kamchatka_Brown_Bear_near_Dvuhyurtochnoe_on_2015-07-23.jpg/500px-Kamchatka_Brown_Bear_near_Dvuhyurtochnoe_on_2015-07-23.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Robert F. Tobler",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kamchatka_Brown_Bear_near_Dvuhyurtochnoe_on_2015-07-23.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic45",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Moose",
+   "wrong": [
+    "Horse",
+    "Camel",
+    "Bear"
+   ],
+   "explain": "Moose are the biggest kind of deer.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Elk-telemark.jpg/500px-Elk-telemark.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Badzil",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Elk-telemark.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic46",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Reindeer",
+   "wrong": [
+    "Horse",
+    "Goat",
+    "Cow"
+   ],
+   "explain": "Both male and female reindeer grow antlers.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Caribou.jpg/500px-Caribou.jpg",
+      "w": 500,
+      "h": 328,
+      "credit": "Dean Biggins (U.S. Fish and Wildlife Service)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Caribou.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic47",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Hedgehog",
+   "wrong": [
+    "Mouse",
+    "Squirrel",
+    "Rabbit"
+   ],
+   "explain": "Hedgehogs roll into a prickly ball.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Erinaceus_europaeus_%28Linnaeus%2C_1758%29.jpg/500px-Erinaceus_europaeus_%28Linnaeus%2C_1758%29.jpg",
+      "w": 500,
+      "h": 387,
+      "credit": "Michael Gäbler",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Erinaceus_europaeus_(Linnaeus,_1758).jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic48",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Squirrel",
+   "wrong": [
+    "Rabbit",
+    "Hedgehog",
+    "Mouse"
+   ],
+   "explain": "Squirrels bury nuts for winter.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Squirrel_posing.jpg/500px-Squirrel_posing.jpg",
+      "w": 500,
+      "h": 418,
+      "credit": "Peter Trimming",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Squirrel_posing.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic49",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Rabbit",
+   "wrong": [
+    "Squirrel",
+    "Mouse",
+    "Hedgehog"
+   ],
+   "explain": "Rabbits live in burrows under the ground.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Oryctolagus_cuniculus_Tasmania_2_%28cropped%29.jpg/330px-Oryctolagus_cuniculus_Tasmania_2_%28cropped%29.jpg",
+      "w": 330,
+      "h": 450,
+      "credit": "JJ Harrison",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Oryctolagus_cuniculus_Tasmania_2_(cropped).jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic50",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Llama",
+   "wrong": [
+    "Horse",
+    "Sheep",
+    "Camel"
+   ],
+   "explain": "Llamas live in South America.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Lama_glama_Laguna_Colorada_2.jpg/500px-Lama_glama_Laguna_Colorada_2.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "kallerna",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lama_glama_Laguna_Colorada_2.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic51",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Sloth",
+   "wrong": [
+    "Monkey",
+    "Koala",
+    "Bear"
+   ],
+   "explain": "Sloths hang upside down and move very slowly.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Bradypus.jpg/330px-Bradypus.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Stefan Laube (Tauchgurke)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bradypus.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic52",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Raccoon",
+   "wrong": [
+    "Fox",
+    "Badger",
+    "Cat"
+   ],
+   "explain": "Raccoons have a black mask around their eyes.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Raccoon_in_Central_Park_%2835264%29.jpg/500px-Raccoon_in_Central_Park_%2835264%29.jpg",
+      "w": 500,
+      "h": 392,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Raccoon_in_Central_Park_(35264).jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic53",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Camel",
+   "wrong": [
+    "Horse",
+    "Llama",
+    "Donkey"
+   ],
+   "explain": "This camel has one hump.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Camelcalf-feeding.jpg/500px-Camelcalf-feeding.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Garrondo",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Camelcalf-feeding.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic54",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Echidna",
+   "wrong": [
+    "Hedgehog",
+    "Porcupine",
+    "Mouse"
+   ],
+   "explain": "Echidnas are spiny mammals that lay eggs.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/14939394/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/14939394"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic55",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Ostrich",
+   "wrong": [
+    "Emu",
+    "Flamingo",
+    "Penguin"
+   ],
+   "explain": "Ostriches are the biggest birds.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/92/Ostriches_cape_point_cropped.jpg",
+      "w": 500,
+      "h": 352,
+      "credit": "Andrew massyn",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ostriches_cape_point_cropped.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic56",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Eagle",
+   "wrong": [
+    "Owl",
+    "Parrot",
+    "Crow"
+   ],
+   "explain": "Eagles have amazing eyesight.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Bald_Eagle_%28Haliaeetus_leucocephalus%29_Kachemak_Bay%2C_Alaska.jpg/500px-Bald_Eagle_%28Haliaeetus_leucocephalus%29_Kachemak_Bay%2C_Alaska.jpg",
+      "w": 500,
+      "h": 578,
+      "credit": "Andy Morffew from Itchen Abbas, Hampshire, UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bald_Eagle_(Haliaeetus_leucocephalus)_Kachemak_Bay,_Alaska.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic57",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Toucan",
+   "wrong": [
+    "Parrot",
+    "Penguin",
+    "Owl"
+   ],
+   "explain": "A toucan has a huge colourful beak.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/006_Toco_toucan_in_Encontro_das_%C3%81guas_State_Park_Photo_by_Giles_Laurent.jpg/500px-006_Toco_toucan_in_Encontro_das_%C3%81guas_State_Park_Photo_by_Giles_Laurent.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:006_Toco_toucan_in_Encontro_das_%C3%81guas_State_Park_Photo_by_Giles_Laurent.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic58",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Peacock",
+   "wrong": [
+    "Parrot",
+    "Swan",
+    "Chicken"
+   ],
+   "explain": "Peacocks show off their long tail feathers.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/Indian_Peacock_in_Tholpetty_Wildlife_Sanctuary_01.JPG/500px-Indian_Peacock_in_Tholpetty_Wildlife_Sanctuary_01.JPG",
+      "w": 500,
+      "h": 313,
+      "credit": "Praveenp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Indian_Peacock_in_Tholpetty_Wildlife_Sanctuary_01.JPG"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic59",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Swan",
+   "wrong": [
+    "Duck",
+    "Goose",
+    "Flamingo"
+   ],
+   "explain": "Swans have long, curved necks.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Mute_Swan_Emsworth2.JPG/500px-Mute_Swan_Emsworth2.JPG",
+      "w": 500,
+      "h": 379,
+      "credit": "Geni",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mute_Swan_Emsworth2.JPG"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic60",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Duck",
+   "wrong": [
+    "Swan",
+    "Owl",
+    "Pigeon"
+   ],
+   "explain": "Ducks have waterproof feathers.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Male_mallard3.jpg/500px-Male_mallard3.jpg",
+      "w": 500,
+      "h": 323,
+      "credit": "Calibas (edit by Aqwis)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Male_mallard3.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic61",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Puffin",
+   "wrong": [
+    "Penguin",
+    "Parrot",
+    "Toucan"
+   ],
+   "explain": "Puffins have bright orange beaks in summer.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Puffin_%28Fratercula_arctica%29.jpg/500px-Puffin_%28Fratercula_arctica%29.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Puffin_(Fratercula_arctica).jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic62",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Chicken",
+   "wrong": [
+    "Duck",
+    "Turkey",
+    "Pigeon"
+   ],
+   "explain": "Farm chickens come from this wild bird.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Red_jungle_fowl.png/500px-Red_jungle_fowl.png",
+      "w": 500,
+      "h": 343,
+      "credit": "Subramanya C K",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Red_jungle_fowl.png"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic63",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Orca",
+   "wrong": [
+    "Shark",
+    "Dolphin",
+    "Seal"
+   ],
+   "explain": "Orcas are also called killer whales.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Killerwhales_jumping.jpg/500px-Killerwhales_jumping.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Robert Pittman",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Killerwhales_jumping.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic64",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Whale",
+   "wrong": [
+    "Shark",
+    "Dolphin",
+    "Seal"
+   ],
+   "explain": "Humpback whales sing long songs.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Humpback_whales_in_singing_position.jpg/500px-Humpback_whales_in_singing_position.jpg",
+      "w": 500,
+      "h": 338,
+      "credit": "Dr. Louis M. Herman.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Humpback_whales_in_singing_position.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic65",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Walrus",
+   "wrong": [
+    "Seal",
+    "Hippo",
+    "Otter"
+   ],
+   "explain": "Walruses have long tusks.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Walrus_in_the_Russian_Arctic_National_Park%2C_Novaya_Zemlya_2015-2.jpg/500px-Walrus_in_the_Russian_Arctic_National_Park%2C_Novaya_Zemlya_2015-2.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Nixette",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Walrus_in_the_Russian_Arctic_National_Park,_Novaya_Zemlya_2015-2.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic66",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Otter",
+   "wrong": [
+    "Seal",
+    "Beaver",
+    "Walrus"
+   ],
+   "explain": "Sea otters float on their backs.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Sea_otter_cropped.jpg/500px-Sea_otter_cropped.jpg",
+      "w": 500,
+      "h": 389,
+      "credit": "Mike Baird from Morro Bay, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sea_otter_cropped.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic67",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Seahorse",
+   "wrong": [
+    "Octopus",
+    "Shrimp",
+    "Starfish"
+   ],
+   "explain": "Seahorse dads carry the babies.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Sketchbook_of_fishes_-_18._%28Pot_bellied%29_Sea_horse_-_William_Buelow_Gould%2C_c1832.jpg/330px-Sketchbook_of_fishes_-_18._%28Pot_bellied%29_Sea_horse_-_William_Buelow_Gould%2C_c1832.jpg",
+      "w": 330,
+      "h": 476,
+      "credit": "William Buelow Gould (1801 - 1853).Reproduction by the Allport Library and Museum of Fi…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sketchbook_of_fishes_-_18._(Pot_bellied)_Sea_horse_-_William_Buelow_Gould,_c1832.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic68",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Lobster",
+   "wrong": [
+    "Crab",
+    "Spider",
+    "Starfish"
+   ],
+   "explain": "Lobsters have big claws.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Nur01521_-_Flickr_-_NOAA_Photo_Library.jpg/500px-Nur01521_-_Flickr_-_NOAA_Photo_Library.jpg",
+      "w": 500,
+      "h": 330,
+      "credit": "OAR/National Undersea Research Program (NURP).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Nur01521_-_Flickr_-_NOAA_Photo_Library.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic69",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Praying mantis",
+   "wrong": [
+    "Grasshopper",
+    "Ant",
+    "Spider"
+   ],
+   "explain": "A mantis holds its front legs as if praying.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Mantis_religiosa_MHNT_enti%C3%A8re.jpg/500px-Mantis_religiosa_MHNT_enti%C3%A8re.jpg",
+      "w": 500,
+      "h": 349,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mantis_religiosa_MHNT_enti%C3%A8re.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic70",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Dragonfly",
+   "wrong": [
+    "Butterfly",
+    "Bee",
+    "Fly"
+   ],
+   "explain": "Dragonflies are super-fast flyers.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Anax_imperator_qtl2.jpg/500px-Anax_imperator_qtl2.jpg",
+      "w": 500,
+      "h": 383,
+      "credit": "Quartl",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Anax_imperator_qtl2.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic71",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Beetle",
+   "wrong": [
+    "Ant",
+    "Spider",
+    "Bee"
+   ],
+   "explain": "Stag beetles have huge jaws like antlers.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Lucanus_cervus_ed.JPG/500px-Lucanus_cervus_ed.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "No machine-readable author provided. E.Dauscher assumed (based on copyright claims).",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Lucanus_cervus_ed.JPG"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic72",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Alligator",
+   "wrong": [
+    "Lizard",
+    "Snake",
+    "Frog"
+   ],
+   "explain": "Alligators live in rivers and swamps.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/American_Alligator.jpg/330px-American_Alligator.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "User:Postdlf",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:American_Alligator.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic73",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Tortoise",
+   "wrong": [
+    "Frog",
+    "Crab",
+    "Snail"
+   ],
+   "explain": "Giant tortoises can live for over 100 years.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Galapagos_Geochelone_nigra_porteri.jpg/500px-Galapagos_Geochelone_nigra_porteri.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "The original uploader was Pandanus at German Wikipedia.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Galapagos_Geochelone_nigra_porteri.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic74",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Chameleon",
+   "wrong": [
+    "Frog",
+    "Snake",
+    "Fish"
+   ],
+   "explain": "Chameleons can change colour.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Panther_chameleon_%28Furcifer_pardalis%29_male_Nosy_Be.jpg/500px-Panther_chameleon_%28Furcifer_pardalis%29_male_Nosy_Be.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Panther_chameleon_(Furcifer_pardalis)_male_Nosy_Be.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic75",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Axolotl",
+   "wrong": [
+    "Fish",
+    "Snake",
+    "Snail"
+   ],
+   "explain": "Axolotls can regrow lost body parts.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Axolotl_Wild_Type.jpg/500px-Axolotl_Wild_Type.jpg",
+      "w": 500,
+      "h": 139,
+      "credit": "Mariblubb",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Axolotl_Wild_Type.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic76",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Triceratops",
+   "wrong": [
+    "T. rex",
+    "Stegosaurus",
+    "Diplodocus"
+   ],
+   "explain": "Triceratops had three horns on its face.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/LA-Triceratops_mount-2.jpg/500px-LA-Triceratops_mount-2.jpg",
+      "w": 500,
+      "h": 379,
+      "credit": "Source: Allie_Caulfield Derivative: User:MathKnight",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:LA-Triceratops_mount-2.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic77",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Stegosaurus",
+   "wrong": [
+    "Triceratops",
+    "T. rex",
+    "Diplodocus"
+   ],
+   "explain": "Stegosaurus had big plates along its back.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Stegosaurus_stenops_Life_Reconstruction.png/500px-Stegosaurus_stenops_Life_Reconstruction.png",
+      "w": 500,
+      "h": 241,
+      "credit": "Fred Wierum",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Stegosaurus_stenops_Life_Reconstruction.png"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic78",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Woolly mammoth",
+   "wrong": [
+    "Elephant",
+    "Rhino",
+    "Bear"
+   ],
+   "explain": "Mammoths had shaggy fur for the Ice Age.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Woolly_mammoth_model_Royal_BC_Museum_in_Victoria.jpg/500px-Woolly_mammoth_model_Royal_BC_Museum_in_Victoria.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Thomas Quine",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Woolly_mammoth_model_Royal_BC_Museum_in_Victoria.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic79",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Rose",
+   "wrong": [
+    "Tulip",
+    "Daisy",
+    "Sunflower"
+   ],
+   "explain": "Roses have thorns on their stems.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Rosa_rugosa_Sakhalin_1.JPG/500px-Rosa_rugosa_Sakhalin_1.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Vihljun",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Rosa_rugosa_Sakhalin_1.JPG"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic80",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Daisy",
+   "wrong": [
+    "Rose",
+    "Tulip",
+    "Sunflower"
+   ],
+   "explain": "Daisies close up at night.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/Belis_peremnis_-_panoramio.jpg/500px-Belis_peremnis_-_panoramio.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "m.dolores paderne sa…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Belis_peremnis_-_panoramio.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic81",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Dandelion",
+   "wrong": [
+    "Daisy",
+    "Rose",
+    "Tulip"
+   ],
+   "explain": "You can blow dandelion seeds into the wind.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/DandelionFlower.jpg/500px-DandelionFlower.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Greg Hume",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:DandelionFlower.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic82",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Mars",
+   "wrong": [
+    "Earth",
+    "Saturn",
+    "The Moon"
+   ],
+   "explain": "Mars is called the red planet.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png/500px-Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png",
+      "w": 500,
+      "h": 500,
+      "credit": "Kevin Gill from Los Angeles, CA, United States",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic83",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Earth",
+   "wrong": [
+    "Mars",
+    "The Moon",
+    "The Sun"
+   ],
+   "explain": "Earth is our home planet.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/The_Blue_Marble_%285052124705%29.jpg/500px-The_Blue_Marble_%285052124705%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "NASA on The Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Blue_Marble_(5052124705).jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic84",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Jupiter",
+   "wrong": [
+    "Earth",
+    "Mars",
+    "Saturn"
+   ],
+   "explain": "Jupiter is the biggest planet.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Jupiter_OPAL_2024.png/500px-Jupiter_OPAL_2024.png",
+      "w": 500,
+      "h": 453,
+      "credit": "NASA/STSCI (S.T.A.R.S)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jupiter_OPAL_2024.png"
+     }
+    ]
+   }
+  },
+  {
    "id": "snd1",
    "kind": "mc",
    "prompt": "Listen! Which animal makes this sound?",
@@ -1597,6 +2847,357 @@
    "difficulty": 1
   },
   {
+   "id": "f43",
+   "kind": "mc",
+   "prompt": "How many legs does a dog have?",
+   "answer": "4",
+   "wrong": [
+    "2",
+    "6",
+    "8"
+   ],
+   "explain": "Dogs walk on four legs.",
+   "difficulty": 1
+  },
+  {
+   "id": "f44",
+   "kind": "mc",
+   "prompt": "How many legs does a snake have?",
+   "answer": "0",
+   "wrong": [
+    "2",
+    "4",
+    "100"
+   ],
+   "explain": "Snakes have no legs at all.",
+   "difficulty": 1
+  },
+  {
+   "id": "f45",
+   "kind": "mc",
+   "prompt": "How many humps does a dromedary camel have?",
+   "answer": "1",
+   "wrong": [
+    "2",
+    "3",
+    "0"
+   ],
+   "explain": "Bactrian camels have two humps.",
+   "difficulty": 1
+  },
+  {
+   "id": "f46",
+   "kind": "mc",
+   "prompt": "What is a baby goat called?",
+   "answer": "Kid",
+   "wrong": [
+    "Lamb",
+    "Foal",
+    "Calf"
+   ],
+   "explain": "Baby goats are called kids.",
+   "difficulty": 1
+  },
+  {
+   "id": "f47",
+   "kind": "mc",
+   "prompt": "What is a baby horse called?",
+   "answer": "Foal",
+   "wrong": [
+    "Calf",
+    "Cub",
+    "Kid"
+   ],
+   "explain": "A foal can stand soon after it is born.",
+   "difficulty": 1
+  },
+  {
+   "id": "f48",
+   "kind": "mc",
+   "prompt": "What is a baby bear called?",
+   "answer": "Cub",
+   "wrong": [
+    "Foal",
+    "Kitten",
+    "Chick"
+   ],
+   "explain": "Lion and fox babies are cubs too.",
+   "difficulty": 1
+  },
+  {
+   "id": "f49",
+   "kind": "mc",
+   "prompt": "What is a baby swan called?",
+   "answer": "Cygnet",
+   "wrong": [
+    "Duckling",
+    "Chick",
+    "Gosling"
+   ],
+   "explain": "Cygnets are fluffy and grey.",
+   "difficulty": 1
+  },
+  {
+   "id": "f50",
+   "kind": "mc",
+   "prompt": "Which animal makes a dam in rivers?",
+   "answer": "Beaver",
+   "wrong": [
+    "Otter",
+    "Duck",
+    "Frog"
+   ],
+   "explain": "Beavers cut down trees with their teeth.",
+   "difficulty": 1
+  },
+  {
+   "id": "f51",
+   "kind": "mc",
+   "prompt": "Which animal has a long trunk and big ears?",
+   "answer": "Elephant",
+   "wrong": [
+    "Mouse",
+    "Horse",
+    "Bear"
+   ],
+   "explain": "African elephants have the biggest ears.",
+   "difficulty": 1
+  },
+  {
+   "id": "f52",
+   "kind": "mc",
+   "prompt": "Which animal can live for over 100 years?",
+   "answer": "Giant tortoise",
+   "wrong": [
+    "Mouse",
+    "Rabbit",
+    "Hamster"
+   ],
+   "explain": "Some giant tortoises have lived more than 150 years.",
+   "difficulty": 1
+  },
+  {
+   "id": "f53",
+   "kind": "mc",
+   "prompt": "Which of these is an insect?",
+   "answer": "Ant",
+   "wrong": [
+    "Spider",
+    "Snail",
+    "Worm"
+   ],
+   "explain": "Ants have six legs, so they are insects.",
+   "difficulty": 1
+  },
+  {
+   "id": "f54",
+   "kind": "mc",
+   "prompt": "Which of these is a fish?",
+   "answer": "Shark",
+   "wrong": [
+    "Dolphin",
+    "Whale",
+    "Seal"
+   ],
+   "explain": "Sharks breathe with gills.",
+   "difficulty": 1
+  },
+  {
+   "id": "f55",
+   "kind": "mc",
+   "prompt": "Which of these lays eggs?",
+   "answer": "Hen",
+   "wrong": [
+    "Cow",
+    "Dog",
+    "Horse"
+   ],
+   "explain": "Birds lay eggs.",
+   "difficulty": 1
+  },
+  {
+   "id": "f56",
+   "kind": "mc",
+   "prompt": "Which animal is black and white?",
+   "answer": "Panda",
+   "wrong": [
+    "Lion",
+    "Fox",
+    "Frog"
+   ],
+   "explain": "Giant pandas live in the mountains of China.",
+   "difficulty": 1
+  },
+  {
+   "id": "f57",
+   "kind": "mc",
+   "prompt": "Which animal has prickly spines?",
+   "answer": "Hedgehog",
+   "wrong": [
+    "Rabbit",
+    "Mouse",
+    "Squirrel"
+   ],
+   "explain": "Hedgehogs roll into a ball to stay safe.",
+   "difficulty": 1
+  },
+  {
+   "id": "f58",
+   "kind": "mc",
+   "prompt": "Which animal lives in a burrow under the ground?",
+   "answer": "Rabbit",
+   "wrong": [
+    "Eagle",
+    "Monkey",
+    "Dolphin"
+   ],
+   "explain": "Lots of rabbit burrows together make a warren.",
+   "difficulty": 1
+  },
+  {
+   "id": "f59",
+   "kind": "mc",
+   "prompt": "What do spiders make to catch food?",
+   "answer": "Webs",
+   "wrong": [
+    "Nests",
+    "Holes",
+    "Shells"
+   ],
+   "explain": "Spider silk is very strong.",
+   "difficulty": 1
+  },
+  {
+   "id": "f60",
+   "kind": "mc",
+   "prompt": "What do birds build to lay their eggs in?",
+   "answer": "Nests",
+   "wrong": [
+    "Webs",
+    "Burrows",
+    "Hives"
+   ],
+   "explain": "Nests are made of twigs, grass and mud.",
+   "difficulty": 1
+  },
+  {
+   "id": "f61",
+   "kind": "mc",
+   "prompt": "What covers a bird's body?",
+   "answer": "Feathers",
+   "wrong": [
+    "Fur",
+    "Scales",
+    "Shell"
+   ],
+   "explain": "Feathers help birds fly and stay warm.",
+   "difficulty": 1
+  },
+  {
+   "id": "f62",
+   "kind": "mc",
+   "prompt": "What covers a fish's body?",
+   "answer": "Scales",
+   "wrong": [
+    "Feathers",
+    "Fur",
+    "Wool"
+   ],
+   "explain": "Scales protect fish like armour.",
+   "difficulty": 1
+  },
+  {
+   "id": "f63",
+   "kind": "mc",
+   "prompt": "What does a sheep grow that we make jumpers from?",
+   "answer": "Wool",
+   "wrong": [
+    "Silk",
+    "Leather",
+    "Cotton"
+   ],
+   "explain": "Sheep are sheared once a year.",
+   "difficulty": 1
+  },
+  {
+   "id": "f64",
+   "kind": "mc",
+   "prompt": "Which part of a plant is under the ground?",
+   "answer": "Roots",
+   "wrong": [
+    "Petals",
+    "Leaves",
+    "Flowers"
+   ],
+   "explain": "Roots drink water from the soil.",
+   "difficulty": 1
+  },
+  {
+   "id": "f65",
+   "kind": "mc",
+   "prompt": "What colour are most sunflowers?",
+   "answer": "Yellow",
+   "wrong": [
+    "Blue",
+    "Black",
+    "Green"
+   ],
+   "explain": "Sunflower heads follow the Sun when they are young.",
+   "difficulty": 1
+  },
+  {
+   "id": "f66",
+   "kind": "mc",
+   "prompt": "Which tree do acorns come from?",
+   "answer": "Oak",
+   "wrong": [
+    "Palm",
+    "Pine",
+    "Apple"
+   ],
+   "explain": "An acorn can grow into a giant oak.",
+   "difficulty": 1
+  },
+  {
+   "id": "f67",
+   "kind": "mc",
+   "prompt": "Which fruit grows on palm trees?",
+   "answer": "Coconut",
+   "wrong": [
+    "Apple",
+    "Pear",
+    "Cherry"
+   ],
+   "explain": "Coconuts can float across the sea.",
+   "difficulty": 1
+  },
+  {
+   "id": "f68",
+   "kind": "mc",
+   "prompt": "What is the closest star to Earth?",
+   "answer": "The Sun",
+   "wrong": [
+    "The Moon",
+    "Mars",
+    "The North Star"
+   ],
+   "explain": "The Sun is our very own star.",
+   "difficulty": 1
+  },
+  {
+   "id": "f69",
+   "kind": "mc",
+   "prompt": "Which planet has rings?",
+   "answer": "Saturn",
+   "wrong": [
+    "Mars",
+    "Earth",
+    "Mercury"
+   ],
+   "explain": "Saturn's rings are made of ice and rock.",
+   "difficulty": 1
+  },
+  {
    "id": "tf1",
    "kind": "tf",
    "prompt": "A whale is a fish.",
@@ -1658,6 +3259,102 @@
    "prompt": "Snakes have legs.",
    "answer": false,
    "explain": "Snakes slither on their bellies.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf9",
+   "kind": "tf",
+   "prompt": "A shark is a fish.",
+   "answer": true,
+   "explain": "Sharks breathe with gills.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf10",
+   "kind": "tf",
+   "prompt": "Elephants can fly.",
+   "answer": false,
+   "explain": "Elephants are far too heavy to fly!",
+   "difficulty": 1
+  },
+  {
+   "id": "tf11",
+   "kind": "tf",
+   "prompt": "Kangaroos carry their babies in a pouch.",
+   "answer": true,
+   "explain": "Baby kangaroos are called joeys.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf12",
+   "kind": "tf",
+   "prompt": "Bees make honey.",
+   "answer": true,
+   "explain": "They make it from flower nectar.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf13",
+   "kind": "tf",
+   "prompt": "Snakes have fur.",
+   "answer": false,
+   "explain": "Snakes have scales.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf14",
+   "kind": "tf",
+   "prompt": "A dolphin breathes air.",
+   "answer": true,
+   "explain": "Dolphins come up to breathe through a blowhole.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf15",
+   "kind": "tf",
+   "prompt": "The Moon is a planet.",
+   "answer": false,
+   "explain": "The Moon goes around the Earth. It is a moon, not a planet.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf16",
+   "kind": "tf",
+   "prompt": "Trees need water to grow.",
+   "answer": true,
+   "explain": "Their roots soak up water from the soil.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf17",
+   "kind": "tf",
+   "prompt": "Butterflies have six legs.",
+   "answer": true,
+   "explain": "Butterflies are insects, and all insects have six legs.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf18",
+   "kind": "tf",
+   "prompt": "A tomato grows under the ground.",
+   "answer": false,
+   "explain": "Tomatoes grow on plants above the ground.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf19",
+   "kind": "tf",
+   "prompt": "Penguins are birds.",
+   "answer": true,
+   "explain": "Penguins are birds that swim instead of fly.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf20",
+   "kind": "tf",
+   "prompt": "All birds can fly.",
+   "answer": false,
+   "explain": "Penguins, ostriches and emus cannot fly.",
    "difficulty": 1
   }
  ],

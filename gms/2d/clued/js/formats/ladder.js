@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, byDifficulty, distractors, imageOf, placeAnswer, collect, pick, isIucn } from './registry.js?v=202610101826';
-import { h, choiceGrid, typeBox } from '../ui/kit.js?v=202610101826';
-import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610101826';
-import { norm, injectCSS, baseCSS, stages, once, hasImg } from './fkit.js?v=202610101826';
+import { register, poolItems, pickPack, byDifficulty, distractors, imageOf, placeAnswer, collect, pick, isIucn, givesAway } from './registry.js?v=202610110402';
+import { h, choiceGrid, typeBox } from '../ui/kit.js?v=202610110402';
+import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610110402';
+import { norm, injectCSS, baseCSS, stages, once, hasImg } from './fkit.js?v=202610110402';
 
 const CSS = `
 .ld{gap:10px}
@@ -46,7 +46,7 @@ function spread(list, n) {
 
 const clueCache = new WeakMap();
 const usableClues = it => {
-  if (!clueCache.has(it)) clueCache.set(it, (it.clues || []).filter(c => typeof c === 'string' && c.trim() && !leak(c, answersFor(it))));
+  if (!clueCache.has(it)) clueCache.set(it, (it.clues || []).filter(c => typeof c === 'string' && c.trim() && !leak(c, answersFor(it)) && !givesAway(it.name, c)));
   return clueCache.get(it);
 };
 

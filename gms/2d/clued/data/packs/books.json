@@ -32,7 +32,8 @@
    "type": "cat",
    "label": "Century",
    "ask": "In which century was {name} first published?",
-   "stmt": "{name} was first published in the {value}."
+   "stmt": "{name} was first published in the {value}.",
+   "askReverse": "Which of these books was first published in the {value}?"
   },
   "kids": {
    "type": "bool",
@@ -2534,22 +2535,6 @@
    ]
   },
   {
-   "id": "first-alice-s-adventures-in-wonderland",
-   "kind": "mc",
-   "prompt": "Which book begins: “Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do…”",
-   "answer": "Alice's Adventures in Wonderland",
-   "wrong": [
-    "Treasure Island",
-    "Wuthering Heights",
-    "The Picture of Dorian Gray"
-   ],
-   "explain": "Alice's Adventures in Wonderland (1865) by Lewis Carroll. A bored girl tumbles down a rabbit hole into a nonsense world of shrinking potions, a Cheshire Cat, a Mad Hatter and a furious Queen of Hearts.",
-   "difficulty": 2,
-   "refs": [
-    "books/alice-s-adventures-in-wonderland"
-   ]
-  },
-  {
    "id": "author-frankenstein",
    "kind": "mc",
    "prompt": "Who wrote Frankenstein?",
@@ -3142,22 +3127,6 @@
    ]
   },
   {
-   "id": "first-adventures-of-huckleberry-finn",
-   "kind": "mc",
-   "prompt": "Which book begins: “You don't know about me without you have read a book by the name of The Adventures of Tom Sawyer; but that ain't no matter.”",
-   "answer": "Adventures of Huckleberry Finn",
-   "wrong": [
-    "Treasure Island",
-    "The Metamorphosis",
-    "The Call of the Wild"
-   ],
-   "explain": "Adventures of Huckleberry Finn (1884) by Mark Twain. Huck fakes his death to escape his father and rafts down the Mississippi with Jim, a man escaping slavery.",
-   "difficulty": 3,
-   "refs": [
-    "books/adventures-of-huckleberry-finn"
-   ]
-  },
-  {
    "id": "year-adventures-of-huckleberry-finn",
    "kind": "mc",
    "prompt": "Roughly when was Adventures of Huckleberry Finn first published?",
@@ -3473,22 +3442,6 @@
    ],
    "explain": "The Time Machine (1895) by H. G. Wells. A Victorian inventor travels hundreds of thousands of years into the future and finds humanity split into two strange species.",
    "difficulty": 2,
-   "refs": [
-    "books/the-time-machine"
-   ]
-  },
-  {
-   "id": "first-the-time-machine",
-   "kind": "mc",
-   "prompt": "Which book begins: “The Time Traveller (for so it will be convenient to speak of him) was expounding a recondite matter to us.”",
-   "answer": "The Time Machine",
-   "wrong": [
-    "Peter Pan",
-    "Robinson Crusoe",
-    "A Christmas Carol"
-   ],
-   "explain": "The Time Machine (1895) by H. G. Wells. A Victorian inventor travels hundreds of thousands of years into the future and finds humanity split into two strange species.",
-   "difficulty": 3,
    "refs": [
     "books/the-time-machine"
    ]
@@ -6222,22 +6175,6 @@
     "L. Frank Baum",
     "Yann Martel",
     "Julia Donaldson"
-   ],
-   "explain": "The Diary of a Young Girl (1947) by Anne Frank. The real diary of a Jewish teenager hiding with her family in a secret annex in Amsterdam during the Nazi occupation.",
-   "difficulty": 2,
-   "refs": [
-    "books/the-diary-of-a-young-girl"
-   ]
-  },
-  {
-   "id": "plot-the-diary-of-a-young-girl",
-   "kind": "mc",
-   "prompt": "Which book is this? The real diary of a Jewish teenager hiding with her family in a secret annex in Amsterdam during the Nazi occupation.",
-   "answer": "The Diary of a Young Girl",
-   "wrong": [
-    "Of Mice and Men",
-    "David Copperfield",
-    "Gulliver's Travels"
    ],
    "explain": "The Diary of a Young Girl (1947) by Anne Frank. The real diary of a Jewish teenager hiding with her family in a secret annex in Amsterdam during the Nazi occupation.",
    "difficulty": 2,

@@ -1,8 +1,8 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
-  spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk,
-} from './registry.js?v=202610101826';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610101826';
+  spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk, givesAway,
+} from './registry.js?v=202610110402';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610110402';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
@@ -33,7 +33,7 @@ function sources(pack, n, src, gate = {}) {
 
 function fromQuestion(rng, pack, n, difficulty) {
   // kids-bank questions carry only 2 wrong answers: a 4-answer game falls back to 3 rather than finding nothing
-  const mcs = (pack.questions || []).filter(q => (q.kind || 'mc') === 'mc');
+  const mcs = (pack.questions || []).filter(q => (q.kind || 'mc') === 'mc' && !givesAway(q.answer, q.prompt, q.wrong));
   const full = mcs.filter(q => (q.wrong || []).length >= n - 1);
   const qs = byDifficulty(full.length ? full : mcs.filter(q => (q.wrong || []).length >= 2), difficulty, 1);
   if (!qs.length) return null;
@@ -81,9 +81,11 @@ function fromItems(rng, pack, kind, n, difficulty) {
     if (type === 'cat') {
       const others = shuffle(rng, [...new Set(pool.flatMap(c => [].concat(fv(c.item)).map(String)))].filter(v => !vals.includes(v) && !vals.some(x => nested(x, v))));
       if (others.length < n - 1) return null;
+      const prompt = fill(catAsk(meta), { name: t.item.name, lname: t.item.lname, label: meta.label, value });
+      if (givesAway(value, prompt, others.slice(0, n - 1))) return null;
       const { options, answer } = placeAnswer(rng, value, others.slice(0, n - 1));
       return {
-        format: 'mc', id: `mc:cat:${key}:${t.ref}`, prompt: fill(catAsk(meta), { name: t.item.name, lname: t.item.lname, label: meta.label, value }),
+        format: 'mc', id: `mc:cat:${key}:${t.ref}`, prompt,
         media: hasImg(t.item) && meta.showImg ? { img: [imageOf(t.item, rng)] } : undefined,
         options: options.map(text => ({ text })), answer, answerText: value,
         explain: t.item.blurb, refs: [t.ref], hint: `It starts with “${value.charAt(0)}”`,
@@ -91,9 +93,11 @@ function fromItems(rng, pack, kind, n, difficulty) {
     }
     const wrong = distractors(rng, t, pool, n - 1, { reject: it => [].concat(fv(it)).map(String).includes(value) });
     if (!wrong) return null;
+    const prompt = fill(meta.askReverse, { name: t.item.name, lname: t.item.lname, label: meta.label, value });
+    if (givesAway(t.item.name, prompt, wrong.map(c => c.item.name))) return null;
     const { options, answer } = placeAnswer(rng, t, wrong);
     return {
-      format: 'mc', id: `mc:rev:${key}:${t.ref}`, prompt: fill(meta.askReverse, { name: t.item.name, lname: t.item.lname, label: meta.label, value }),
+      format: 'mc', id: `mc:rev:${key}:${t.ref}`, prompt,
       options: options.map(c => ({ text: c.item.name })), answer, answerText: t.item.name,
       explain: t.item.blurb, refs: [t.ref, ...wrong.map(c => c.ref)], hint: `It starts with “${t.item.name.charAt(0)}”`,
     };
@@ -134,7 +138,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
 }
 
 function hintFor(item, pack) {
-  const clues = (item.clues || []).filter(c => !c.toLowerCase().includes(item.name.toLowerCase()));
+  const clues = (item.clues || []).filter(c => !c.toLowerCase().includes(item.name.toLowerCase()) && !givesAway(item.name, c));
   if (clues.length) return clues[clues.length - 1];
   const meta = pack.factsMeta || {};
   for (const [k, v] of Object.entries(item.facts || {})) if (meta[k] && meta[k].type !== 'num') return `${meta[k].label}: ${factText(meta[k], v)}`;
@@ -159,7 +163,9 @@ export default register({
     let n = ANSWERS.includes(+opts.answers) ? +opts.answers : 4;
     if (kids) n = Math.min(n, 3);
     const src = opts.source || 'mix';
-    const usable = packs.map(p => ({ p, s: sources(p, n, src, { kids, difficulty }).map(([k, w]) => [k, kids && /img|Img/.test(k) ? w * 3 : w]) }))
+    // a question-only pack (the kids quizzes) has no item pictures: fall back to everything it does have
+    const srcOf = p => { const s = sources(p, n, src, { kids, difficulty }); return s.length || src === 'mix' ? s : sources(p, n, 'mix', { kids, difficulty }); };
+    const usable = packs.map(p => ({ p, s: srcOf(p).map(([k, w]) => [k, kids && /img|Img/.test(k) ? w * 3 : w]) }))
       .filter(x => x.s.length);
     if (!usable.length) return [];
     return collect(count, () => {

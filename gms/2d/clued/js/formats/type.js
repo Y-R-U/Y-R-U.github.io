@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, fill, collect, pick, factAllowed } from './registry.js?v=202610101826';
-import { h, layout, typeBox } from '../ui/kit.js?v=202610101826';
-import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610101826';
-import { norm, injectCSS, once, hasImg } from './fkit.js?v=202610101826';
+import { register, poolItems, pickPack, byDifficulty, imageOf, fill, collect, pick, factAllowed, givesAway } from './registry.js?v=202610110402';
+import { h, layout, typeBox } from '../ui/kit.js?v=202610110402';
+import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610110402';
+import { norm, injectCSS, once, hasImg } from './fkit.js?v=202610110402';
 
 const CSS = `
 .ty-pat{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-family:var(--font-display);font-size:22px;letter-spacing:4px;color:var(--ink-2)}
@@ -66,7 +66,7 @@ function make(rng, pack, kind, difficulty) {
   const all = poolItems([pack]);
   const base = { format: 'type', pack: pack.id };
   if (kind === 'q') {
-    const qs = byDifficulty((pack.questions || []).filter(q => (q.kind || 'mc') === 'mc' && SHORT(q.answer) && !CONTEXT.test(q.prompt)), difficulty, 1);
+    const qs = byDifficulty((pack.questions || []).filter(q => (q.kind || 'mc') === 'mc' && SHORT(q.answer) && !CONTEXT.test(q.prompt) && !givesAway(q.answer, q.prompt, q.wrong)), difficulty, 1);
     if (!qs.length) return null;
     const q = pick(rng, qs);
     return { ...base, id: `type:${pack.id}/q:${q.id}`, prompt: q.prompt, media: q.media && Object.keys(q.media).length ? q.media : undefined,
@@ -79,7 +79,9 @@ function make(rng, pack, kind, difficulty) {
     const t = pick(rng, pool);
     if (!t) return null;
     const v = t.item.facts[key];
-    return { ...base, id: `type:${key}:${t.ref}`, prompt: fill(meta.ask, { name: t.item.name, lname: t.item.lname, label: meta.label }),
+    const prompt = fill(meta.ask, { name: t.item.name, lname: t.item.lname, label: meta.label });
+    if (givesAway(v, prompt, [...new Set(pool.map(c => c.item.facts[key]))].filter(x => x !== v))) return null;
+    return { ...base, id: `type:${key}:${t.ref}`, prompt,
       answer: v, answerText: v, explain: t.item.blurb, refs: [t.ref], data: { accept: withAliases([v, ...(meta.alt?.[v] || [])]), level: difficulty } };
   }
   const pool = byDifficulty(all.filter(c => SHORT(c.item.name) && (kind === 'img' ? hasImg(c.item) : (c.item.clues || []).length >= 3)), difficulty, 4, c => c.item.difficulty || 2);
@@ -90,7 +92,7 @@ function make(rng, pack, kind, difficulty) {
       media: { img: [imageOf(t.item, rng)] }, answer: t.item.name, answerText: t.item.name, explain: t.item.blurb, refs: [t.ref],
       data: { accept: answersFor(t.item), level: difficulty } };
   }
-  const clues = t.item.clues.filter(c => !leaks(c, answersFor(t.item)) && !/starts with|letters?\)|answer has/i.test(c));
+  const clues = t.item.clues.filter(c => !leaks(c, answersFor(t.item)) && !givesAway(t.item.name, c) && !/starts with|letters?\)|answer has/i.test(c));
   if (clues.length < 3) return null;
   const shown = clues.slice(-(difficulty === 3 ? 2 : 3));
   return { ...base, id: `type:clue:${t.ref}`, prompt: `Name the ${pack.noun || String(pack.title || 'thing').toLowerCase().replace(/s$/, '')}`,

@@ -34,13 +34,15 @@
    "type": "cat",
    "label": "Born in",
    "ask": "When was {name} born?",
-   "stmt": "{name} was born in the {value}."
+   "stmt": "{name} was born in the {value}.",
+   "askReverse": "Which of these people was born in the {value}?"
   },
   "field": {
    "type": "cat",
    "label": "Field",
    "ask": "What field is {name} best known for?",
-   "stmt": "{name} is best known for {value}."
+   "stmt": "{name} is best known for {value}.",
+   "askReverse": "Which of these people is best known for {value}?"
   }
  },
  "items": [

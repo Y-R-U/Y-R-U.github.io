@@ -1,5 +1,5 @@
 {
- "build": "202610101807",
+ "build": "202610110327",
  "themes": [
   {
    "id": "animals",
@@ -150,7 +150,8 @@
    "title": "Food & drink",
    "icon": "🍜",
    "packs": [
-    "dishes"
+    "dishes",
+    "general~food"
    ]
   },
   {
@@ -643,7 +644,7 @@
    "icon": "📚",
    "kids": false,
    "items": 90,
-   "questions": 313,
+   "questions": 309,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -662,7 +663,7 @@
     "fakes": 8,
     "quotes": 43,
     "qkinds": {
-     "mc": 308,
+     "mc": 304,
      "tf": 5
     },
     "easy": 104,
@@ -707,7 +708,7 @@
      "quote": 14
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "match": 0,
      "ladder": 20,
@@ -731,7 +732,7 @@
    "icon": "🏛️",
    "kids": false,
    "items": 190,
-   "questions": 338,
+   "questions": 318,
    "notice": "Contested capitals (Israel, Palestine, Yemen) and Nauru (no official capital) are left out.",
    "caps": {
     "img": 0,
@@ -748,9 +749,9 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 338
+     "mc": 318
     },
-    "easy": 120,
+    "easy": 118,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
@@ -777,7 +778,7 @@
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "match": 0,
      "odd": 20,
@@ -882,7 +883,7 @@
    "icon": "🌍",
    "kids": false,
    "items": 195,
-   "questions": 202,
+   "questions": 200,
    "notice": "Covers the 193 UN member states plus the two observer states. Populations are World Bank estimates.",
    "caps": {
     "img": 194,
@@ -907,9 +908,9 @@
     "fakes": 15,
     "quotes": 0,
     "qkinds": {
-     "mc": 202
+     "mc": 200
     },
-    "easy": 77,
+    "easy": 76,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
@@ -976,7 +977,7 @@
    "icon": "💱",
    "kids": false,
    "items": 142,
-   "questions": 250,
+   "questions": 245,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -994,11 +995,11 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 205,
+     "mc": 200,
      "number": 1,
      "tf": 44
     },
-    "easy": 91,
+    "easy": 86,
     "kidsItems": 0,
     "multi": [
      "continent"
@@ -1027,7 +1028,7 @@
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 11,
      "match": 0,
      "ladder": 20,
@@ -1720,7 +1721,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 647,
+   "questions": 729,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -1733,12 +1734,12 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 404,
-     "number": 111,
-     "tf": 101,
+     "mc": 476,
+     "number": 112,
+     "tf": 110,
      "order": 31
     },
-    "easy": 225,
+    "easy": 249,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -1757,7 +1758,7 @@
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "order": 8,
      "number": 20,
@@ -1772,7 +1773,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 243,
+   "questions": 258,
    "virtual": {
     "of": "general",
     "tag": "science"
@@ -1789,12 +1790,12 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 141,
-     "number": 60,
+     "mc": 155,
+     "number": 61,
      "tf": 34,
      "order": 8
     },
-    "easy": 71,
+    "easy": 76,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -1813,7 +1814,7 @@
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 8,
      "order": 0,
      "number": 20,
@@ -1828,7 +1829,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 66,
+   "questions": 74,
    "virtual": {
     "of": "general",
     "tag": "geography"
@@ -1845,9 +1846,9 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 46,
+     "mc": 53,
      "number": 7,
-     "tf": 7,
+     "tf": 8,
      "order": 6
     },
     "easy": 19,
@@ -1856,7 +1857,7 @@
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 7,
+     "tf": 8,
      "order": 6,
      "number": 7,
      "type": 20
@@ -1869,7 +1870,7 @@
      "type": 14
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 14,
      "tf": 2,
      "order": 2,
      "number": 1,
@@ -1884,7 +1885,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 78,
+   "questions": 82,
    "virtual": {
     "of": "general",
     "tag": "history"
@@ -1902,7 +1903,7 @@
     "quotes": 0,
     "qkinds": {
      "number": 19,
-     "mc": 44,
+     "mc": 48,
      "tf": 9,
      "order": 6
     },
@@ -1925,7 +1926,7 @@
      "type": 17
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 19,
      "tf": 3,
      "order": 2,
      "number": 7,
@@ -1940,7 +1941,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 31,
+   "questions": 33,
    "virtual": {
     "of": "general",
     "tag": "art"
@@ -1957,7 +1958,7 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 23,
+     "mc": 25,
      "tf": 8
     },
     "easy": 10,
@@ -1975,7 +1976,7 @@
      "type": 5
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 5,
      "tf": 5,
      "type": 5
     }
@@ -1988,7 +1989,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 35,
+   "questions": 37,
    "virtual": {
     "of": "general",
     "tag": "music"
@@ -2005,35 +2006,35 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 16,
+     "mc": 18,
      "number": 7,
      "tf": 7,
      "order": 5
     },
-    "easy": 14,
+    "easy": 15,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
-     "mc": 16,
+     "mc": 18,
      "tf": 7,
      "order": 5,
      "number": 7,
-     "type": 16
+     "type": 18
     },
     "formatsEasy": {
-     "mc": 7,
+     "mc": 8,
      "tf": 4,
      "order": 1,
      "number": 2,
-     "type": 7
+     "type": 8
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 8,
      "tf": 4,
      "order": 1,
      "number": 2,
-     "type": 7
+     "type": 8
     }
    }
   },
@@ -2044,7 +2045,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 74,
+   "questions": 82,
    "virtual": {
     "of": "general",
     "tag": "books"
@@ -2061,11 +2062,11 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 60,
+     "mc": 68,
      "number": 6,
      "tf": 8
     },
-    "easy": 25,
+    "easy": 26,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -2082,7 +2083,7 @@
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 3,
      "number": 1,
      "type": 20
@@ -2137,7 +2138,7 @@
      "type": 7
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 9,
      "tf": 5,
      "order": 3,
      "number": 0,
@@ -2152,7 +2153,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 21,
+   "questions": 39,
    "virtual": {
     "of": "general",
     "tag": "nature"
@@ -2169,27 +2170,27 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 15,
-     "tf": 6
+     "mc": 28,
+     "tf": 11
     },
-    "easy": 8,
+    "easy": 14,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
-     "mc": 15,
-     "tf": 6,
-     "type": 15
+     "mc": 20,
+     "tf": 11,
+     "type": 20
     },
     "formatsEasy": {
-     "mc": 5,
-     "tf": 3,
-     "type": 5
+     "mc": 9,
+     "tf": 5,
+     "type": 9
     },
     "formatsKids": {
-     "mc": 0,
-     "tf": 3,
-     "type": 5
+     "mc": 9,
+     "tf": 5,
+     "type": 9
     }
    }
   },
@@ -2238,10 +2239,58 @@
      "type": 19
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 2,
      "number": 4,
      "type": 19
+    }
+   }
+  },
+  "general~food": {
+   "path": "packs/general.json",
+   "title": "Food & drink questions",
+   "theme": "food",
+   "icon": "💡",
+   "kids": false,
+   "items": 0,
+   "questions": 31,
+   "virtual": {
+    "of": "general",
+    "tag": "food"
+   },
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {},
+    "groups": 0,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 26,
+     "tf": 5
+    },
+    "easy": 15,
+    "kidsItems": 0,
+    "multi": [],
+    "catBins": {},
+    "formats": {
+     "mc": 20,
+     "tf": 5,
+     "type": 20
+    },
+    "formatsEasy": {
+     "mc": 13,
+     "tf": 2,
+     "type": 13
+    },
+    "formatsKids": {
+     "mc": 13,
+     "tf": 2,
+     "type": 13
     }
    }
   },
@@ -2308,7 +2357,7 @@
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "match": 0,
      "hilo": 20,
@@ -2579,9 +2628,9 @@
    "icon": "🧸",
    "kids": true,
    "items": 0,
-   "questions": 92,
+   "questions": 181,
    "caps": {
-    "img": 34,
+    "img": 84,
     "audio": 8,
     "itemImg": 0,
     "itemAudio": 0,
@@ -2592,28 +2641,28 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 84,
-     "tf": 8
+     "mc": 161,
+     "tf": 20
     },
-    "easy": 92,
+    "easy": 181,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 8,
+     "tf": 20,
      "listen": 8,
      "type": 20
     },
     "formatsEasy": {
      "mc": 20,
-     "tf": 8,
+     "tf": 20,
      "listen": 8,
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
-     "tf": 8,
+     "mc": 20,
+     "tf": 20,
      "listen": 8,
      "type": 20
     }
@@ -2626,7 +2675,7 @@
    "icon": "🧸",
    "kids": true,
    "items": 0,
-   "questions": 249,
+   "questions": 326,
    "caps": {
     "img": 25,
     "audio": 0,
@@ -2639,10 +2688,10 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 229,
-     "tf": 20
+     "mc": 296,
+     "tf": 30
     },
-    "easy": 214,
+    "easy": 286,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -2653,12 +2702,12 @@
     },
     "formatsEasy": {
      "mc": 20,
-     "tf": 14,
+     "tf": 20,
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
-     "tf": 14,
+     "mc": 20,
+     "tf": 20,
      "type": 20
     }
    }
@@ -2670,7 +2719,7 @@
    "icon": "🗿",
    "kids": true,
    "items": 102,
-   "questions": 102,
+   "questions": 98,
    "caps": {
     "img": 99,
     "audio": 0,
@@ -2688,9 +2737,9 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 102
+     "mc": 98
     },
-    "easy": 42,
+    "easy": 41,
     "kidsItems": 21,
     "multi": [
      "kind"
@@ -2718,7 +2767,7 @@
      "mc": 20,
      "tf": 20,
      "match": 20,
-     "ladder": 19,
+     "ladder": 18,
      "hilo": 20,
      "order": 20,
      "odd": 20,
@@ -2733,7 +2782,7 @@
      "mc": 20,
      "tf": 20,
      "match": 20,
-     "ladder": 19,
+     "ladder": 18,
      "hilo": 20,
      "order": 20,
      "odd": 20,
@@ -2753,7 +2802,7 @@
    "icon": "🗣️",
    "kids": false,
    "items": 67,
-   "questions": 327,
+   "questions": 293,
    "notice": "\"Main languages\" are the official or most widely used languages of each country, simplified.",
    "caps": {
     "img": 0,
@@ -2772,9 +2821,9 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 327
+     "mc": 293
     },
-    "easy": 129,
+    "easy": 108,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
@@ -2811,7 +2860,7 @@
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "match": 0,
      "ladder": 14,
@@ -3087,7 +3136,7 @@
    "icon": "🎬",
    "kids": false,
    "items": 77,
-   "questions": 331,
+   "questions": 330,
    "notice": "Box office figures are worldwide grosses, not adjusted for inflation, as listed on Wikipedia in October 2026; they include re-releases where listed.",
    "caps": {
     "img": 0,
@@ -3109,7 +3158,7 @@
     "fakes": 10,
     "quotes": 45,
     "qkinds": {
-     "mc": 331
+     "mc": 330
     },
     "easy": 74,
     "kidsItems": 16,
@@ -3150,7 +3199,7 @@
      "quote": 20
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "match": 0,
      "ladder": 20,
@@ -3254,9 +3303,9 @@
    "icon": "🖼️",
    "kids": false,
    "items": 57,
-   "questions": 114,
+   "questions": 113,
    "caps": {
-    "img": 171,
+    "img": 170,
     "audio": 0,
     "itemImg": 57,
     "itemAudio": 0,
@@ -3272,7 +3321,7 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 114
+     "mc": 113
     },
     "easy": 45,
     "kidsItems": 0,
@@ -3459,7 +3508,7 @@
      "quote": 18
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 18,
      "tf": 5,
      "blitz60": 1,
      "type": 16,
@@ -4085,7 +4134,7 @@
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "match": 0,
      "order": 1,
@@ -4249,7 +4298,7 @@
      "quote": 5
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "match": 0,
      "ladder": 17,
@@ -4322,7 +4371,7 @@
      "type": 20
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "match": 0,
      "odd": 20,
@@ -4384,7 +4433,7 @@
      "blitz60": 7
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 15,
      "match": 0,
@@ -4452,7 +4501,7 @@
      "blitz60": 1
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -4523,7 +4572,7 @@
      "blitz60": 2
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 10,
      "tf": 20,
      "listen": 10,
      "match": 0,
@@ -4598,7 +4647,7 @@
      "blitz60": 4
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -4673,7 +4722,7 @@
      "blitz60": 4
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -4748,7 +4797,7 @@
      "blitz60": 5
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -4822,7 +4871,7 @@
      "blitz60": 4
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -4896,7 +4945,7 @@
      "blitz60": 5
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -4970,7 +5019,7 @@
      "blitz60": 5
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -5044,7 +5093,7 @@
      "blitz60": 5
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -5185,7 +5234,7 @@
      "blitz60": 3
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -5252,7 +5301,7 @@
      "blitz60": 9
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -5361,7 +5410,7 @@
      "blitz60": 6
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 0,
@@ -5509,7 +5558,7 @@
      "blitz60": 8
     },
     "formatsKids": {
-     "mc": 0,
+     "mc": 20,
      "tf": 20,
      "listen": 18,
      "match": 0,

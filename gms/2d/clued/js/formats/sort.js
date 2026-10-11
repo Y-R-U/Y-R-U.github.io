@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, factText, collect, pick, shuffle, sample, factAllowed, lcLabel, factHeading, valueText } from './registry.js?v=202610101826';
-import { h, imgEl } from '../ui/kit.js?v=202610101826';
-import { norm, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610101826';
+import { register, poolItems, pickPack, byDifficulty, imageOf, factText, collect, pick, shuffle, sample, factAllowed, lcLabel, factHeading, valueText } from './registry.js?v=202610110402';
+import { h, imgEl } from '../ui/kit.js?v=202610110402';
+import { norm, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610110402';
 
 const CSS = `
 .so{gap:10px}
@@ -10,7 +10,7 @@ const CSS = `
 .so-dots i.ok{background:var(--good)}.so-dots i.bad{background:var(--bad)}
 .so-deck{position:relative;flex:1 1 auto;min-height:190px;display:grid;place-items:center}
 .so-card{position:absolute;width:min(78%,300px);display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:10px;background:#fff;border:var(--line) solid var(--ink);border-radius:22px;box-shadow:var(--shadow);text-align:center;font-family:var(--font-display);font-size:24px;line-height:1.1;touch-action:none;user-select:none;cursor:grab;transition:transform .32s cubic-bezier(.3,1.2,.5,1),opacity .3s}
-.so-card img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;border:2px solid var(--ink);background:#eee}
+.so-card img{width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:14px;border:2px solid var(--ink);background:#eee}
 .so-card.text{padding:28px 14px}
 .so-card.next{transform:translateY(10px) scale(.94);opacity:.6;pointer-events:none;filter:saturate(.6)}
 .so-card.dragging{transition:none;cursor:grabbing}

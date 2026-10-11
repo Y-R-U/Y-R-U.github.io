@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { leakStems, findLeak, ALLOWED_LICENSE } from './c1_schema.mjs';
+import { dropGiveaways } from './q_giveaway.mjs';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const PACKS = join(ROOT, 'data/packs');
@@ -167,6 +168,7 @@ function tidyPack(pack) {
 export function writePack(pack) {
   if (!pack.noun && PACK_NOUNS[pack.id]) pack.noun = PACK_NOUNS[pack.id];
   tidyPack(pack);
+  for (const q of dropGiveaways(pack)) console.warn(`  giveaway dropped ${pack.id}/${q.id}: ${q.prompt}`);
   const before = gateLog.length;
   gatePack(pack);
   const gl = gateLog.slice(before);

@@ -145,14 +145,6 @@
       "credit": "Didier Descouens",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Danaus_plexippus_MHNT.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Monarch_caterpillar_%2823229%29.jpg/500px-Monarch_caterpillar_%2823229%29.jpg",
-      "w": 500,
-      "h": 371,
-      "credit": "Rhododendrites",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Monarch_caterpillar_(23229).jpg"
      }
     ]
    },
@@ -451,14 +443,6 @@
       "page": "https://www.inaturalist.org/photos/30565267"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/198537155/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Marino Linić",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/198537155"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/280989662/medium.jpeg",
       "w": 500,
       "h": 400,
@@ -513,14 +497,6 @@
       "credit": "Terra Occ",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/45110154"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/383236105/medium.jpeg",
-      "w": 500,
-      "h": 328,
-      "credit": "Jane C Frost",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/383236105"
      }
     ]
    },
@@ -672,14 +648,6 @@
       "credit": "Emad Tahaei",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/586365614"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/116435397/medium.jpeg",
-      "w": 500,
-      "h": 249,
-      "credit": "Tony Rebelo",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/116435397"
      }
     ]
    },
@@ -931,14 +899,6 @@
       "credit": "TOUROULT Julien",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/18333696"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/52637945/medium.jpeg",
-      "w": 500,
-      "h": 460,
-      "credit": "Philip Schaeffer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/52637945"
      }
     ]
    },
@@ -2685,14 +2645,6 @@
       "credit": "Jared Shorma",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/241115462"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/615762331/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Suvarna Parbhoo Mohan",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/615762331"
      }
     ]
    },

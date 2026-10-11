@@ -2677,7 +2677,7 @@
   {
    "id": "q8",
    "kind": "mc",
-   "prompt": "Which tree's bark is used to make wine corks?",
+   "prompt": "Which tree's bark is used to make wine bottle stoppers?",
    "answer": "Cork oak",
    "wrong": [
     "Birch",

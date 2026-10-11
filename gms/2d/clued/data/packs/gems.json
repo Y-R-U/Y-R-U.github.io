@@ -35,6 +35,7 @@
    "type": "cat",
    "label": "Best-known colour",
    "ask": "What colour is {lname} best known for?",
+   "askReverse": "Which of these is best known for being {lvalue}?",
    "stmt": "{name} is best known for being {lvalue}."
   },
   "mohs": {

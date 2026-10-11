@@ -1,15 +1,15 @@
 // The question runner: plays a list of questions with HUD, timer, reveal and scoring.
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
-import { getFormat } from '../formats/registry.js?v=202610101826';
-import { createTimer } from '../core/timer.js?v=202610101826';
-import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610101826';
-import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610101826';
-import { getSettings } from '../core/store.js?v=202610101826';
-import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610101826';
-import { popup, confirmPop } from '../ui/popup.js?v=202610101826';
-import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610101826';
-import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610101826';
-import { dlog, debugCheck } from '../core/debuglog.js?v=202610101826';
+import { getFormat } from '../formats/registry.js?v=202610110402';
+import { createTimer } from '../core/timer.js?v=202610110402';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610110402';
+import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610110402';
+import { getSettings } from '../core/store.js?v=202610110402';
+import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610110402';
+import { popup, confirmPop } from '../ui/popup.js?v=202610110402';
+import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610110402';
+import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610110402';
+import { dlog, debugCheck } from '../core/debuglog.js?v=202610110402';
 
 const KIND_RIGHT = ['Brilliant!', 'You got it!', 'Super!', 'Yes!', 'Amazing!'];
 const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];
@@ -76,6 +76,9 @@ export function createRunner(host, cfg = {}) {
   const streakEl = h('span.streak');
   const livesEl = h('span.lives');
   const clockEl = h('span.clock');
+  // Kids: one Help per question (one wrong answer goes, plus the first letter and the letter count). Never in online rooms.
+  const helpBtn = h('button.lifeline.kids-help', { type: 'button', hidden: true, dataset: { act: 'help' }, 'aria-label': 'Help', onclick: () => useKidsHelp() }, h('span', {}, '💡'), h('small', {}, 'Help'));
+  let helpUsed = false;
   const moreBtn = h('button.btn.small.sun.more-btn', { type: 'button', hidden: true, dataset: { act: 'more' }, onclick: () => requestMore() });
   const speakBtn = canSpeak() ? h('button.icon-btn.speak', { type: 'button', 'aria-label': 'Read aloud', onclick: () => readAloud() }, '🔊') : null;
   const lifeBox = h('span.lifelines');
@@ -85,7 +88,7 @@ export function createRunner(host, cfg = {}) {
     lifeBox.append(h('button.lifeline', { type: 'button', dataset: { id }, 'aria-label': label, onclick: () => useLifeline(id) }, h('span', {}, icon), h('small', {}, label)));
   }
   hud.append(h('div.hud-row1', {}, cfg.quit === false ? h('span.bar-gap') : quitBtn, prog, h('div.hud-right', {}, speakBtn || '', ring, scoreEl)));
-  row2.append(playerChip, streakEl, livesEl, clockEl, lifeBox, moreBtn);
+  row2.append(playerChip, streakEl, livesEl, clockEl, lifeBox, helpBtn, moreBtn);
   hud.append(row2);
 
   const offKeys = onKey(e => {
@@ -108,7 +111,7 @@ export function createRunner(host, cfg = {}) {
     streakEl.classList.toggle('hot', st >= 3);
     livesEl.innerHTML = state.lives != null ? Array.from({ length: state.maxLives }, (_, k) => `<i class="${k < state.lives ? '' : 'lost'}">♥</i>`).join('') : '';
     lifeBox.querySelectorAll('.lifeline').forEach(b => { b.disabled = used.has(b.dataset.id); });
-    row2.hidden = !(players.length > 1 || st >= 2 || state.lives != null || cfg.deadline || lifelines.size || (sg.n && !cfg.stagesAuto));
+    row2.hidden = !(players.length > 1 || st >= 2 || state.lives != null || cfg.deadline || lifelines.size || (sg.n && !cfg.stagesAuto) || !helpBtn.hidden);
   }
   function drawTimer(r) {
     const k = fullLimit ? Math.max(0, Math.min(1, r / fullLimit)) : 0;
@@ -237,7 +240,11 @@ export function createRunner(host, cfg = {}) {
       ring.hidden = !useTimer || !!fmt.manualTimer;   // manual-timer formats show it when they call api.timer.start
       ring.querySelector('.rf').style.strokeDasharray = String(RING_LEN);
       fullLimit = limit;
+      helpUsed = false;
+      helpBtn.disabled = false;
+      helpBtn.hidden = !kidsHelpFor(q);
       drawMore();
+      drawHud();
       if (ext) timer.start(Math.max(0, ext - nowFn()));
       else if (useTimer && !fmt.manualTimer) timer.start(limit);
       if (kids || settings.readAloud) setTimeout(readAloud, 250);
@@ -351,6 +358,36 @@ export function createRunner(host, cfg = {}) {
     try { cfg.onAnswer && cfg.onAnswer(rec, state); } catch (e) { console.error(e); }
     drawHud();
     return rec;
+  }
+
+  const LETTER_FORMATS = new Set(['type', 'ladder', 'reveal', 'silhouette', 'listen', 'number', 'quote', 'lookalike', 'mc']);
+  function kidsHelpFor(q) {
+    if (!kids || api.mode === 'online' || cfg.kidsHelp === false || q.hidden || typeof q.answer === 'boolean') return false;
+    return !!ctrl?.eliminate || (LETTER_FORMATS.has(q.format) && !!kidsHintText(q));
+  }
+  // "It starts with P: P _ _ _ _ _ _" (each word's first letter shown), or the number of digits.
+  function kidsHintText(q) {
+    const a = String(answerLine(q) || '').trim();
+    if (!a || a.length > 32 || /→|·/.test(a)) return '';
+    if (/^[\d,.]+$/.test(a)) { const d = a.replace(/\D/g, '').length; return `It's a number with ${d} digit${d === 1 ? '' : 's'}.`; }
+    const words = a.split(/\s+/);
+    const tiles = words.map(w => [...w].map((c, i) => (i === 0 || !/\p{L}|\d/u.test(c) ? c.toUpperCase() : '_')).join(' ')).join('   ');
+    const n = (a.match(/[\p{L}\d]/gu) || []).length;
+    return `It starts with “${a.charAt(0).toUpperCase()}” and has ${n} letters: ${tiles}`;
+  }
+  function useKidsHelp() {
+    const q = questions[state.i];
+    if (helpUsed || !answerResolve || !q) return;
+    helpUsed = true;
+    helpBtn.disabled = true;
+    if (ctrl?.eliminate && (q.options?.length || 0) > 2) { try { ctrl.eliminate(1); } catch (e) {} }
+    const text = kidsHintText(q);
+    stage.querySelector('.hint-bubble')?.remove();
+    if (text) {
+      stage.prepend(h('div.hint-bubble.kids-hint', {}, '💡 ', text));
+      speak(text.replace(/:.*$/, '.'), { kids: true });
+    }
+    sfx('tap');
   }
 
   function answerLine(q) {

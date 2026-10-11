@@ -229,7 +229,7 @@ export default {
     { kind: 'mc', prompt: 'Which vegetable makes borscht red?', answer: 'Beetroot', wrong: ['Tomato', 'Red pepper', 'Red cabbage'], explain: 'Borscht is a beetroot soup.', difficulty: 2 },
     { kind: 'mc', prompt: 'Which spice makes paella yellow?', answer: 'Saffron', wrong: ['Turmeric', 'Paprika', 'Cumin'], explain: 'Saffron comes from crocus flowers.', difficulty: 2 },
     { kind: 'mc', prompt: 'Who is the pavlova named after?', answer: 'A Russian ballerina', wrong: ['A French chef', 'An Italian queen', 'A New Zealand prime minister'], explain: 'Anna Pavlova toured Australia and New Zealand in the 1920s.', difficulty: 2 },
-    { kind: 'mc', prompt: 'Which city is the hamburger named after?', answer: 'Hamburg', wrong: ['Berlin', 'Frankfurt', 'New York'], explain: 'It is linked to the "Hamburg steak".', difficulty: 2 },
+    { kind: 'mc', prompt: 'Which German city gave its name to a famous beef-patty sandwich?', answer: 'Hamburg', wrong: ['Berlin', 'Frankfurt', 'New York'], explain: 'It is linked to the "Hamburg steak".', difficulty: 2 },
     { kind: 'mc', prompt: 'What does "tiramisu" mean in Italian?', answer: 'Pick me up', wrong: ['Sweet dream', 'Coffee cake', 'Little cloud'], explain: 'It contains coffee and cocoa.', difficulty: 3 },
     { kind: 'mc', prompt: 'What is Vegemite made from?', answer: 'Brewer\'s yeast extract', wrong: ['Black olives', 'Dried seaweed', 'Burnt sugar'], explain: 'It was first made in Melbourne in 1923.', difficulty: 2 },
     { kind: 'mc', prompt: 'What are the sprinkles on fairy bread called in Australia?', answer: 'Hundreds and thousands', wrong: ['Jimmies', 'Glitter drops', 'Rainbow crumbs'], explain: 'Fairy bread is a party classic.', difficulty: 1 },

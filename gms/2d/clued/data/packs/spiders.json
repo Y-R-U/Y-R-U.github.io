@@ -162,12 +162,12 @@
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Latrodectus_hasselti_male.png/500px-Latrodectus_hasselti_male.png",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Latrodectus_hasselti_-Sydney%2C_Australia-8.jpg/500px-Latrodectus_hasselti_-Sydney%2C_Australia-8.jpg",
       "w": 500,
-      "h": 354,
-      "credit": "Wocky",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Latrodectus_hasselti_male.png"
+      "h": 360,
+      "credit": "Laurence Grayson from Suffolk, UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Latrodectus_hasselti_-Sydney,_Australia-8.jpg"
      },
      {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Latrodectus_hasselti_close.jpg/500px-Latrodectus_hasselti_close.jpg",
@@ -176,14 +176,6 @@
       "credit": "Toby Hudson",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Latrodectus_hasselti_close.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/341431303/medium.jpg",
-      "w": 500,
-      "h": 456,
-      "credit": "Paul Whitington",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/341431303"
      }
     ]
    },
@@ -217,28 +209,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Lampona_cylindrata_female_dorsal.jpg/500px-Lampona_cylindrata_female_dorsal.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "carey-knox-southern-scales",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lampona_cylindrata_female_dorsal.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Lampona_cylindrata_male.jpeg/500px-Lampona_cylindrata_male.jpeg",
+      "w": 500,
+      "h": 368,
+      "credit": "ecoman",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lampona_cylindrata_male.jpeg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1327295/medium.jpg",
       "w": 493,
       "h": 500,
       "credit": "Steve Kerr",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/1327295"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11193750/medium.jpg",
-      "w": 500,
-      "h": 433,
-      "credit": "Steve Kerr",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/11193750"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11193749/medium.jpg",
-      "w": 500,
-      "h": 364,
-      "credit": "Steve Kerr",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/11193749"
      }
     ]
    },
@@ -812,22 +804,6 @@
       "credit": "Connor Margetts",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/256778844"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/40720897/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Sean Frey",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/40720897"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/105719819/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Kym Nicolson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/105719819"
      }
     ]
    },
@@ -1160,14 +1136,6 @@
       "credit": "Ansie Dippenaar-Schoeman",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/550742892"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/550744529/medium.jpg",
-      "w": 500,
-      "h": 335,
-      "credit": "Ansie Dippenaar-Schoeman",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/550744529"
      }
     ]
    },
@@ -2005,14 +1973,6 @@
       "credit": "Zac Peterson",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/262774372"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/168184484/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/168184484"
      }
     ]
    },

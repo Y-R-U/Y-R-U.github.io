@@ -32,6 +32,10 @@ body[data-screen=play] { --br8t-account-space: 0px; }
 .lifeline { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 2px 10px; border: 2px solid var(--ink); border-radius: 999px; background: #fff; font-weight: 900; box-shadow: 0 2px 0 var(--ink); }
 .lifeline small { font-size: 11px; }
 .lifeline:disabled { opacity: .3; text-decoration: line-through; box-shadow: none; }
+.kids-help { margin-left: auto; min-height: 42px; background: #fff8d6; }
+.kids-help[hidden] { display: none; }
+.kids-help:disabled { text-decoration: none; }
+.hint-bubble.kids-hint { font-size: 18px; line-height: 1.35; }
 .hud .speak { width: 36px; height: 36px; font-size: 16px; box-shadow: 0 2px 0 var(--ink); }
 
 .ring { position: relative; width: 44px; height: 44px; flex: none; }
@@ -63,8 +67,11 @@ body[data-screen=play] { --br8t-account-space: 0px; }
   display: grid; place-items: center;
 }
 .q-media::before { content: ''; position: absolute; inset: -20px; background: var(--fill) center/cover; filter: blur(18px) saturate(1.2); opacity: .7; }
-.q-media img { position: relative; max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; display: block; }
+/* absolute, so a shrinking box (the reveal) scales the whole picture down instead of clipping it */
+.q-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
 .q-media img.broken { opacity: 0; }
+/* a long-press or right-click menu would show the picture's file name */
+.play img, .l-card img, .l-quiz-img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; pointer-events: none; }
 .audio-btn { position: relative; width: 96px; height: 96px; border-radius: 50%; border: var(--line) solid var(--ink); background: var(--sun); font-size: 36px; box-shadow: var(--shadow); }
 .audio-btn.playing { animation: flame .5s infinite alternate; }
 
@@ -108,7 +115,7 @@ body[data-screen=play] { --br8t-account-space: 0px; }
 .choices.images { grid-template-columns: 1fr 1fr; }
 .choices.images.n2, .choices.images.n3 { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
 .choices.images .choice { flex-direction: column; padding: 6px; min-height: 0; gap: 6px; align-items: stretch; }
-.choices.images .choice img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; border: 2px solid var(--ink); background: #eee; }
+.choices.images .choice img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; border-radius: 10px; border: 2px solid var(--ink); background: #eee; }
 .choices.images .choice .badge { position: absolute; top: 10px; left: 10px; z-index: 1; }
 .choices.images .choice .label { display: none; text-align: center; font-size: 15px; }
 .choices.images.revealed .choice .label { display: block; }
@@ -293,3 +300,4 @@ body.kids-on {
 .play.kids .reveal.bad .rv-mark::after { content: ''; }
 .play.kids .choice.wrong { background: #ffe9a8; color: var(--ink); animation: wobble .5s; }
 @keyframes wobble { 30% { transform: rotate(-2deg); } 60% { transform: rotate(2deg); } }
+@media (orientation: landscape) and (max-height: 500px) { .hint-bubble.kids-hint { font-size: 15px; padding: 4px 10px; top: 2px; } }

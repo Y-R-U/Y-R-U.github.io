@@ -1955,7 +1955,7 @@
   {
    "id": "q4",
    "kind": "mc",
-   "prompt": "Which inventor's fortune created the Nobel Prizes?",
+   "prompt": "Whose fortune, made largely from dynamite, pays for the prizes awarded each year in Stockholm and Oslo?",
    "answer": "Alfred Nobel",
    "wrong": [
     "Thomas Edison",

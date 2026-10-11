@@ -1899,7 +1899,7 @@
   {
    "id": "q7",
    "kind": "mc",
-   "prompt": "Which breed is the state cat of Maine?",
+   "prompt": "Which large breed with tufted ears is an official US state cat?",
    "answer": "Maine Coon",
    "wrong": [
     "American Shorthair",
@@ -1954,7 +1954,7 @@
   {
    "id": "q12",
    "kind": "mc",
-   "prompt": "Which cat breed has ears that fold forward?",
+   "prompt": "Which cat breed has ears that bend forward and down, giving it an owl-like face?",
    "answer": "Scottish Fold",
    "wrong": [
     "Siamese",

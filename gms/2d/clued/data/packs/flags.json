@@ -11,7 +11,8 @@
    "type": "cat",
    "label": "Continent",
    "ask": "Which continent is {lname} in?",
-   "stmt": "{lname} is in {value}."
+   "stmt": "{lname} is in {value}.",
+   "askReverse": "Which of these countries is in {value}?"
   },
   "flagDisputed": {
    "type": "bool",

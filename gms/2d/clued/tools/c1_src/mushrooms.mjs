@@ -127,7 +127,7 @@ export default {
   fakes: ['Silver bell cap', 'Crimson moon puffball', 'Golden widow\'s veil', 'Northern glass morel', 'Spotted thunder bolete', 'Velvet ghost chanterelle'],
   questions: [
     { kind: 'tf', prompt: 'A mushroom is a kind of plant.', answer: false, explain: 'Fungi are a separate kingdom; they cannot make food from sunlight.', difficulty: 1 },
-    { kind: 'mc', prompt: 'Which mushroom causes the most deaths from mushroom poisoning?', answer: 'Death cap', wrong: ['Fly agaric', 'Button mushroom', 'Giant puffball'], explain: 'Its toxins destroy the liver, and cooking does not remove them.', difficulty: 1 },
+    { kind: 'mc', prompt: 'Which mushroom causes the most fatal poisonings?', answer: 'Death cap', wrong: ['Fly agaric', 'Button mushroom', 'Giant puffball'], explain: 'Its toxins destroy the liver, and cooking does not remove them.', difficulty: 1 },
     { kind: 'tf', prompt: 'Cooking a death cap makes it safe to eat.', answer: false, explain: 'Its amatoxins are not destroyed by heat.', difficulty: 2 },
     { kind: 'mc', prompt: 'Which red mushroom with white spots appears in fairy tales and "Super Mario"?', answer: 'Fly agaric', wrong: ['Death cap', 'Chanterelle', 'Shiitake'], explain: 'It is poisonous despite its friendly look.', difficulty: 1 },
     { kind: 'mc', prompt: 'What do mushrooms release to make new fungi?', answer: 'Spores', wrong: ['Seeds', 'Eggs', 'Pollen'], explain: 'Spores are tiny and spread by wind, water and animals.', difficulty: 1 },

@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, factAllowed, factPhrase } from './registry.js?v=202610101826';
-import { h, imgEl } from '../ui/kit.js?v=202610101826';
-import { norm, injectCSS, baseCSS, once, fmtFact, uniqueByName, hasImg } from './fkit.js?v=202610101826';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, factAllowed, factPhrase } from './registry.js?v=202610110402';
+import { h, imgEl } from '../ui/kit.js?v=202610110402';
+import { norm, injectCSS, baseCSS, once, fmtFact, uniqueByName, hasImg } from './fkit.js?v=202610110402';
 
 const CSS = `
 .mt-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;align-items:start}
@@ -8,7 +8,7 @@ const CSS = `
 .mt-col h3{font-size:14px;font-family:var(--font);font-weight:900;color:var(--ink-2);text-align:center;margin:0}
 .mt-t{--c:#fff;position:relative;display:flex;align-items:center;gap:8px;min-height:54px;padding:6px 10px;border:var(--line) solid var(--ink);border-radius:14px;background:#fff;box-shadow:var(--shadow-sm);font-weight:900;font-size:16px;line-height:1.15;text-align:left;transition:transform .1s,background .2s,box-shadow .1s;animation:ch-in .35s cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--i)*35ms);touch-action:manipulation}
 .mt-t .lbl{flex:1;min-width:0;overflow-wrap:break-word;hyphens:auto}
-.mt-t img{width:100%;height:76px;object-fit:cover;border-radius:9px;border:2px solid var(--ink);background:#eee;display:block}
+.mt-t img{width:100%;height:76px;object-fit:contain;border-radius:9px;border:2px solid var(--ink);background:#eee;display:block}
 .mt-t.pic{flex-direction:column;align-items:stretch;padding:5px}
 .mt-t.pic .lbl{display:none}
 .mt-t .key{flex:none;width:24px;height:24px;border-radius:7px;border:2px solid var(--ink);background:#f1edff;display:grid;place-items:center;font-size:12px;font-weight:900}

@@ -216,10 +216,10 @@ const geoSources = [
 const countryFactsMeta = {
   population: { type: 'num', label: 'Population', unit: 'people', higherLabel: 'More people', source: 'World Bank, latest year', askHigh: 'Which of these countries has the most people?', askLow: 'Which of these countries has the fewest people?' },
   areaKm2: { type: 'num', label: 'Area', unit: 'km²', higherLabel: 'Bigger', askHigh: 'Which of these countries is the biggest by area?', askLow: 'Which of these countries is the smallest by area?' },
-  continent: { type: 'cat', label: 'Continent', ask: 'Which continent is {lname} in?', stmt: '{lname} is in {value}.' },
+  continent: { type: 'cat', label: 'Continent', ask: 'Which continent is {lname} in?', askReverse: 'Which of these countries is in {value}?', stmt: '{lname} is in {value}.' },
   drivingSide: { type: 'cat', label: 'Drives on', ask: 'On which side of the road do people drive in {lname}?', stmt: 'In {lname}, people drive on the {value}.' },
   landlocked: { type: 'bool', label: 'Landlocked', yes: 'Landlocked', no: 'Has a coast', askBool: 'Which of these countries has no coastline?', stmt: '{lname} has no coastline.' },
-  capital: { type: 'text', label: 'Capital' },
+  capital: { type: 'text', label: 'Capital', ask: 'What is the capital of {lname}?', alt: {'Sucre': ['La Paz'], 'Yamoussoukro': ['Abidjan'], 'Sri Jayawardenepura Kotte': ['Kotte', 'Colombo'], 'Porto-Novo': ['Cotonou'], 'Mbabane': ['Lobamba'], 'Pretoria': ['Cape Town', 'Bloemfontein'], 'Amsterdam': ['The Hague'], 'Kuala Lumpur': ['Putrajaya'], 'Washington, D.C.': ['Washington', 'Washington DC']} },
   currency: { type: 'text', label: 'Currency' },
   languages: { type: 'text', label: 'Main languages' },
   callingCode: { type: 'text', label: 'Calling code' },
@@ -276,7 +276,7 @@ function countryQuestions() {
 writePack({
   id: 'flags', title: 'Flags', theme: 'geography', icon: '🏳️', version: 1,
   kids: true, notice: 'Afghanistan’s flag is contested (two flags in use), so it appears on its learn card but not in flag questions.',
-  factsMeta: { continent: { type: 'cat', label: 'Continent', ask: 'Which continent is {lname} in?', stmt: '{lname} is in {value}.' }, flagDisputed: { type: 'bool', label: 'Flag contested', yes: 'Two flags in use', no: 'One national flag' } },
+  factsMeta: { continent: { type: 'cat', label: 'Continent', ask: 'Which continent is {lname} in?', askReverse: 'Which of these countries is in {value}?', stmt: '{lname} is in {value}.' }, flagDisputed: { type: 'bool', label: 'Flag contested', yes: 'Two flags in use', no: 'One national flag' } },
   imgPrompt: 'Which is the flag of {lname}?', nameImgPrompt: 'Which country has this flag?', tfImgPrompt: 'This is the flag of {lname}.',
   items: countryItems.filter(i => i.media.img.length || i.flagDisputed).map(i => ({ id: i.id, name: i.name, lname: i.lname, alt: i.alt, iso2: i.iso2, iso3: i.iso3, group: i.group,
     facts: { continent: i.facts.continent, ...(i.flagDisputed ? { flagDisputed: true } : {}) },
@@ -363,7 +363,7 @@ function capitalQuestions() {
 writePack({
   id: 'capitals', title: 'Capitals', theme: 'geography', icon: '🏛️', kids: false, version: 1,
   notice: 'Contested capitals (Israel, Palestine, Yemen) and Nauru (no official capital) are left out.',
-  leakExempt: GEO_EXEMPT, factsMeta: { country: { type: 'text', label: 'Country' }, continent: { type: 'cat', label: 'Continent', ask: 'Which continent is {name} in?', stmt: '{name} is in {value}.' } },
+  leakExempt: GEO_EXEMPT, factsMeta: { country: { type: 'text', label: 'Country' }, continent: { type: 'cat', label: 'Continent', ask: 'Which continent is {name} in?', askReverse: 'Which of these capital cities is in {value}?', stmt: '{name} is in {value}.' } },
   items: capItems, questions: capitalQuestions(), sources: geoSources,
 });
 
@@ -483,7 +483,7 @@ function languageQuestions() {
 writePack({
   id: 'languages', title: 'Languages', theme: 'geography', icon: '🗣️', kids: false, version: 1,
   notice: '"Main languages" are the official or most widely used languages of each country, simplified.',
-  factsMeta: { family: { type: 'cat', label: 'Language family', ask: 'Which language family does {name} belong to?', stmt: '{name} belongs to the {value} family.' }, branch: { type: 'cat', label: 'Branch', ask: 'Which branch of its family does {name} belong to?', stmt: '{name} belongs to the {value} branch of its language family.' }, script: { type: 'cat', label: 'Script', ask: 'Which script is {name} normally written in?', stmt: '{name} is normally written in the {value} script.' }, countries: { type: 'num', label: 'Countries where it is a main language', higherLabel: 'More countries', askNumber: 'In how many countries is {name} a main language?', askHigh: 'Which of these is a main language in the most countries?' } },
+  factsMeta: { family: { type: 'cat', label: 'Language family', ask: 'Which language family does {name} belong to?', askReverse: 'Which of these languages belongs to the {value} family?', stmt: '{name} belongs to the {value} family.' }, branch: { type: 'cat', label: 'Branch', ask: 'Which branch of its family does {name} belong to?', askReverse: 'Which of these languages belongs to the {value} branch?', stmt: '{name} belongs to the {value} branch of its language family.' }, script: { type: 'cat', label: 'Script', ask: 'Which script is {name} normally written in?', askReverse: 'Which of these languages is normally written in the {value} script?', stmt: '{name} is normally written in the {value} script.' }, countries: { type: 'num', label: 'Countries where it is a main language', higherLabel: 'More countries', askNumber: 'In how many countries is {name} a main language?', askHigh: 'Which of these is a main language in the most countries?' } },
   items: langItems, questions: languageQuestions(), sources: geoSources,
 });
 
@@ -522,7 +522,7 @@ function landmarkQuestions() {
 writePack({
   id: 'landmarks', title: 'Landmarks', theme: 'geography', icon: '🗿', kids: true, version: 1, leakExempt: [...LM_STOP, ...GEO_EXEMPT],
   nameImgPrompt: 'Which landmark is this?', imgPrompt: 'Which of these is {lname}?', tfImgPrompt: 'This is {lname}.',
-  factsMeta: { country: { type: 'cat', label: 'Country', ask: 'In which country is {lname}?', askReverse: 'Which of these is in {value}?', stmt: '{lname} is in {value}.' }, continent: { type: 'cat', label: 'Continent', ask: 'On which continent is {lname}?', stmt: '{lname} is in {value}.' }, kind: { type: 'cat', label: 'Type', exclusive: false }, built: { type: 'year', label: 'Completed', higherLabel: 'Newer', askHigh: 'Which of these was completed most recently?', askLow: 'Which of these is the oldest?' } },
+  factsMeta: { country: { type: 'cat', label: 'Country', ask: 'In which country is {lname}?', askReverse: 'Which of these is in {value}?', stmt: '{lname} is in {value}.' }, continent: { type: 'cat', label: 'Continent', ask: 'On which continent is {lname}?', askReverse: 'Which of these landmarks is in {value}?', stmt: '{lname} is in {value}.' }, kind: { type: 'cat', label: 'Type', exclusive: false }, built: { type: 'year', label: 'Completed', higherLabel: 'Newer', askHigh: 'Which of these was completed most recently?', askLow: 'Which of these is the oldest?' } },
   items: lmItems, questions: landmarkQuestions(), sources: [{ name: 'Wikidata (coordinates, dates)', url: 'https://www.wikidata.org' }, { name: 'Wikimedia Commons (photos)', url: 'https://commons.wikimedia.org' }],
 });
 

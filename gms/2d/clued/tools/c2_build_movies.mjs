@@ -154,8 +154,8 @@ writePack({
   factsMeta: {
     year: { type: 'year', label: 'Released', higherLabel: 'Newer', askHigh: 'Which of these films came out most recently?', askLow: 'Which of these films came out first?' },
     boxOfficeUSD: { type: 'num', label: 'Worldwide box office', unit: 'USD', higherLabel: 'Earned more', askHigh: 'Which of these films took the most money worldwide?', askLow: 'Which of these films took the least money worldwide?' },
-    decade: { type: 'cat', label: 'Decade', ask: 'In which decade was {name} released?', stmt: '{name} came out in the {value}.' },
-    director: { type: 'text', label: 'Director' },
+    decade: { type: 'cat', label: 'Decade', ask: 'In which decade was {name} released?', askReverse: 'Which of these films came out in the {value}?', stmt: '{name} came out in the {value}.' },
+    director: { type: 'text', label: 'Director', ask: 'Who directed {name}?' },
     topOfYear: { type: 'bool', label: 'Top film of its year', yes: 'Year’s top earner', no: 'Not the year’s top earner', askBool: 'Which of these films was the highest-grossing film of its release year?', stmt: '{name} was the highest-grossing film of its release year.' },
     decadeRank: { type: 'num', label: 'Rank in its decade', lowerIsBetter: true, askHigh: 'Which of these was furthest down its decade’s box-office top 10?', askLow: 'Which of these ranked highest in its decade’s box-office top 10?' },
     kids: { type: 'bool', label: 'Family film', yes: 'Family', no: 'Not specifically for children', askBool: 'Which of these is a family film?', stmt: '{name} is a family film.' },

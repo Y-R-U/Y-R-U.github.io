@@ -1,12 +1,12 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, comparison, lcLabel, plainLabel } from './registry.js?v=202610101826';
-import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=202610101826';
-import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=202610101826';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, comparison, lcLabel, plainLabel } from './registry.js?v=202610110402';
+import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=202610110402';
+import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=202610110402';
 
 const CSS = `
 .hl-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
 .hl-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;padding:10px;background:#fff;border:var(--line) solid var(--ink);border-radius:var(--r);box-shadow:var(--shadow);min-height:150px;text-align:center;animation:ch-in .35s cubic-bezier(.2,1.4,.4,1) both}
 .hl-card.b{animation-delay:.08s}
-.hl-card img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;border:2px solid var(--ink);background:#eee}
+.hl-card img{width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:12px;border:2px solid var(--ink);background:#eee}
 .hl-name{font-family:var(--font-display);font-size:20px;line-height:1.1}
 .hl-val{font-family:var(--font-display);font-size:24px;color:var(--grape);min-height:30px}
 .hl-val.q{color:var(--ink-3)}

@@ -1,5 +1,5 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610101826';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610110402';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -321,6 +321,24 @@ export function collect(count, make, avoid, attempts = count * 12) {
     out.push(q);
   }
   return out;
+}
+
+// Does `text` give `answer` away? True when a telling word of the answer (4+ letters, not a filler word and not a word
+// the wrong options share) starts a word of the text: "the Basset Hound" → Hound, "Tunisia" → Tunis, "Armenian" → Armenia.
+const GIVE_STOP = new Set('the and of a an de la le el du von van der den des di da in on or to for with from this that these which what who is are was were its his her their one two three four five common great little lake ocean river island islands mountain building family group team century style type kind sort part main real true false yes no first world king queen prince princess lord lady saint'.split(' '));
+const gWords = s => String(s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/[^a-z0-9]+/).filter(Boolean);
+// A prompt that lists the choices ("a solid, liquid or gas?") or asks for the word ("Which vitamin…", "How dangerous…")
+// gives nothing away.
+export function givesAway(answer, text, others = []) {
+  const t = gWords(text), ts = ` ${t.join(' ')} `, a = gWords(answer).join(' ');
+  if (!t.length || !a) return false;
+  if (/^\d{4}$/.test(a)) return ts.includes(` ${a} `);
+  const listed = s => others.some(o => { const p = gWords(o).join(' '); return p && s.includes(` ${p} `); });
+  const asked = new Set(t.filter((x, i) => (i && /^(which|what|how)$/.test(t[i - 1])) || (i > 1 && /^(which|what)$/.test(t[i - 2]))));
+  if (ts.includes(` ${a} `) && !asked.has(a.split(' ')[0]) && !listed(ts.replace(` ${a} `, ' '))) return true;
+  if (listed(ts)) return false;
+  const shared = new Set(others.flatMap(gWords));
+  return gWords(answer).some(w => w.length >= 4 && !GIVE_STOP.has(w) && !shared.has(w) && !asked.has(w) && !/^\d+$/.test(w) && t.some(x => x.startsWith(w)));
 }
 
 export { pick, shuffle, sample, weightedPick };

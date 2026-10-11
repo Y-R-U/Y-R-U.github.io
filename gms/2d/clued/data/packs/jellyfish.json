@@ -1543,7 +1543,7 @@
    "id": "q8",
    "kind": "mc",
    "prompt": "What does a blue-ringed octopus do when it is alarmed?",
-   "answer": "Flashes bright blue rings",
+   "answer": "Its rings flash brightly",
    "wrong": [
     "Squirts red ink",
     "Puffs up like a ball",
@@ -1568,7 +1568,7 @@
   {
    "id": "q10",
    "kind": "mc",
-   "prompt": "Which famous glowing protein came from a jellyfish and won a Nobel Prize?",
+   "prompt": "Which famous glowing substance came from a jellyfish and won a Nobel Prize?",
    "answer": "Green fluorescent protein",
    "wrong": [
     "Insulin",

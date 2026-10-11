@@ -2002,7 +2002,7 @@
   {
    "id": "q2",
    "kind": "mc",
-   "prompt": "Which mushroom causes the most deaths from mushroom poisoning?",
+   "prompt": "Which mushroom causes the most fatal poisonings?",
    "answer": "Death cap",
    "wrong": [
     "Fly agaric",

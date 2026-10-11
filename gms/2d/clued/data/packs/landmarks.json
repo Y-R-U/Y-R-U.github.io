@@ -96,7 +96,8 @@
    "type": "cat",
    "label": "Continent",
    "ask": "On which continent is {lname}?",
-   "stmt": "{lname} is in {value}."
+   "stmt": "{lname} is in {value}.",
+   "askReverse": "Which of these landmarks is in {value}?"
   },
   "kind": {
    "type": "cat",
@@ -4212,22 +4213,6 @@
    ]
   },
   {
-   "id": "lmc-great-wall-of-china",
-   "kind": "mc",
-   "prompt": "In which country is the Great Wall of China?",
-   "answer": "China",
-   "wrong": [
-    "Bolivia",
-    "Malaysia",
-    "Guatemala"
-   ],
-   "explain": "Great Wall of China, China. It snakes across northern China. It was built to protect against raids from the northern steppe.",
-   "difficulty": 1,
-   "refs": [
-    "landmarks/great-wall-of-china"
-   ]
-  },
-  {
    "id": "lmc-taj-mahal",
    "kind": "mc",
    "prompt": "In which country is the Taj Mahal?",
@@ -5012,22 +4997,6 @@
    ]
   },
   {
-   "id": "lmc-gateway-of-india",
-   "kind": "mc",
-   "prompt": "In which country is the Gateway of India?",
-   "answer": "India",
-   "wrong": [
-    "Croatia",
-    "Guatemala",
-    "Morocco"
-   ],
-   "explain": "Gateway of India, India. It is an arch on the waterfront in Mumbai. The last British troops left India through it in 1948.",
-   "difficulty": 3,
-   "refs": [
-    "landmarks/gateway-of-india"
-   ]
-  },
-  {
    "id": "lmc-abu-simbel",
    "kind": "mc",
    "prompt": "In which country is Abu Simbel?",
@@ -5057,22 +5026,6 @@
    "difficulty": 1,
    "refs": [
     "landmarks/great-sphinx-of-giza"
-   ]
-  },
-  {
-   "id": "lmc-burj-al-arab",
-   "kind": "mc",
-   "prompt": "In which country is the Burj Al Arab?",
-   "answer": "United Arab Emirates",
-   "wrong": [
-    "Poland",
-    "Singapore",
-    "Russia"
-   ],
-   "explain": "Burj Al Arab, United Arab Emirates. It is a luxury hotel on the Dubai coast. Its shape is designed to look like a ship's sail.",
-   "difficulty": 2,
-   "refs": [
-    "landmarks/burj-al-arab"
    ]
   },
   {
@@ -5121,22 +5074,6 @@
    "difficulty": 3,
    "refs": [
     "landmarks/tikal"
-   ]
-  },
-  {
-   "id": "lmc-panama-canal",
-   "kind": "mc",
-   "prompt": "In which country is the Panama Canal?",
-   "answer": "Panama",
-   "wrong": [
-    "Bolivia",
-    "Canada",
-    "Denmark"
-   ],
-   "explain": "Panama Canal, Panama. It links the Atlantic and Pacific oceans across a narrow isthmus. It was controlled by the United States until 1999.",
-   "difficulty": 2,
-   "refs": [
-    "landmarks/panama-canal"
    ]
   },
   {

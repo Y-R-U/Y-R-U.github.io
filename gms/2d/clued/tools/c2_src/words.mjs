@@ -83,6 +83,15 @@ volt|Alessandro Volta|James Watt;Michael Faraday;Galileo Galilei|3|Volta|The Ita
 shrapnel|Henry Shrapnel|Rudolf Diesel;Charles Boycott;Joseph Guillotin|3|Shrapnel|A British army officer who invented an exploding shell
 `;
 
+// For "Which word is named after …?" where the story would name the word itself.
+export const EPONYM_DESC = {
+  sandwich: 'an 18th-century earl who is said to have eaten beef between bread so he could keep playing cards',
+  cardigan: 'the earl who led the Charge of the Light Brigade',
+  saxophone: 'a Belgian instrument maker who patented his new wind instrument in 1846',
+  diesel: 'a German engineer who invented a new kind of engine in the 1890s',
+  'teddy bear': 'a US president who, the story goes, refused to shoot a captive animal on a 1902 hunting trip',
+};
+
 // True/false word facts (DSL from c2_lib.parseQuestions).
 export const WORD_QS = `
 tf|2|The word "emoji" comes from the English word "emotion".|false|It is Japanese: e ("picture") plus moji ("character"). The likeness is a coincidence.
@@ -110,7 +119,7 @@ mc|2|Which day of the week is named after the god Woden (Odin)?|Wednesday|Tuesda
 mc|2|Which day of the week is named after the Roman god Saturn?|Saturday|Sunday;Tuesday;Friday|Saturday is "Saturn's day".
 mc|2|Which month is named after Janus, the two-faced Roman god of doorways?|January|June;July;March|Janus looks both back to the old year and forward to the new.
 mc|2|Which month is named after Julius Caesar?|July|June;August;March|The Romans renamed the month Quintilis in his honour.
-mc|2|Which month is named after the emperor Augustus?|August|July;April;September|The month Sextilis was renamed in his honour.
+mc|2|Which month was renamed in honour of Rome's first emperor?|August|July;April;September|The month Sextilis was renamed in his honour.
 mc|3|October comes from the Latin word for which number?|Eight|Ten;Six;Twelve|October was the eighth month of the early Roman calendar, which began in March.
 mc|2|The word "panic" comes from which Greek god?|Pan|Zeus;Ares;Hermes|Pan was believed to cause sudden fear in lonely places.
 mc|3|The word "cereal" comes from which Roman goddess?|Ceres|Juno;Venus;Minerva|Ceres was the goddess of grain and farming.
