@@ -38,9 +38,11 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
  * agents a collision is close to certain, and a collision is silent — the second
  * Chrome simply fails to bind and /json/list serves the first one's targets.
  */
+// SILT_CDP_LO / SILT_CDP_SPAN pin the range when parallel agents are given one.
+const CDP_LO = +process.env.SILT_CDP_LO || 9200, CDP_SPAN = +process.env.SILT_CDP_SPAN || 600;
 async function freePort() {
   for (let i = 0; i < 40; i++) {
-    const port = 9200 + Math.floor(Math.random() * 600);
+    const port = CDP_LO + Math.floor(Math.random() * CDP_SPAN);
     const ok = await new Promise((res) => {
       const s = createServer();
       s.once('error', () => res(false));
@@ -48,7 +50,7 @@ async function freePort() {
     });
     if (ok) return port;
   }
-  throw new Error('no free devtools port in 9200-9799 after 40 tries');
+  throw new Error(`no free devtools port in ${CDP_LO}-${CDP_LO + CDP_SPAN - 1} after 40 tries`);
 }
 
 const MIME = {
@@ -260,7 +262,7 @@ export class CDP {
 
 /** Launch a server + Chrome and hand both back, closed together. */
 export async function harness(opts = {}) {
-  const srv = await serve(opts.root || ROOT);
+  const srv = await serve(opts.root || ROOT, +process.env.SILT_HTTP_PORT || 0);
   const cdp = await CDP.launch(opts);
   const close = () => { cdp.close(); srv.close(); };
   process.on('exit', close);

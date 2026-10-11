@@ -127,3 +127,45 @@ Under `?auto` the account layer is never imported, so soak runs stay hermetic.
   484 s (267-600). Its arm is `--break patient`, which starts at fallRate 90 with fallMax 240 and
   fallTime 1.2. That gives 70 s and goes red.
   The bot and patient JELLY lines print under the mode table.
+
+## RUSH, 2026-10-11
+
+A seventh mode: score attack against a clock (`js/modes/rush.js`). JELLY was
+not touched.
+
+- **Clock:** 120 s of sim time (`world.t`), so pausing stops it. At 0 the mode
+  sets `world.over` with `world.rush.timeUp = true`. A top-out ends the run
+  earlier and pays no bell.
+- **HEAT:** a piece that lands in under half its gravity time (and has fallen
+  at least 24 rows) adds 0.2 heat, up to x3. Heat starts to bleed at 0.6/s
+  once 2.5 s pass without a quick drop. Heat multiplies chain awards (through
+  `scorer.award(..., heat)`), and each quick drop also pays `3 x heat`.
+- **Bell:** reaching the bell doubles the score (`bellBonus: 1`). The drop and
+  bell bonuses are published as `world.rush.bonus`, so S1 checks
+  `score === awarded + bonus`.
+- **World:** fallRate 40, fallAccel 0.5, fallTime 0.03, fallMax 90. Biome kiln.
+- **Tuning (16 seeds per agent; "delay" = seconds before acting on a piece):**
+  - hard drops at 1.2 s reach the bell 14/16, mean 3.9k
+  - at 0.8 s: 10/16, mean 7.0k
+  - at 0.3 s: 3/16, mean 9.6k, ceiling 34k
+  - medians sit at 6.0-7.0k across paces, so rushing buys the ceiling and costs
+    the bell
+  - an instant, superhuman masher tops out in about 30 s with a similar mean,
+    and no human can drop that fast
+- **HUD:** field `'clock'` gives the `.clk` panel: a countdown, a HEAT chip and
+  a depleting bar. It turns amber at 30 s, and in the last 10 s it turns red
+  and pulses, the board ring lights (`.flipring.is-rush`), and a tick plays for
+  each of the last 5 s.
+- **Results:** the kicker reads `time · bell ×2 +N` or `buried with Ns left`.
+- **Best score:** stored in `silt.best.rush`. It already rides cloud save,
+  because `silt.best` is in `SAVE_KEYS`.
+- **Gate R1** (`node tools/modesim.mjs --mode rush`):
+  - a patient run ends at exactly 120 s
+  - the score never falls, and the bell is paid once and at the right size
+  - a masher tops out early with no bell
+  - arms: `--break rushclock` and `--break rushtop`, both proven red
+- **uishot:** now expects seven cards and a `clk` panel. The `--flow --falsify`
+  arm needs 13 checks to go red.
+- **Ports:** `tools/cdp.mjs` honours `SILT_CDP_LO`, `SILT_CDP_SPAN` and
+  `SILT_HTTP_PORT` when parallel agents are given a port range.
+- **Favicon:** `favicon.svg` was added.

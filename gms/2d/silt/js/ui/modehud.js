@@ -97,6 +97,19 @@ export function createModeHud() {
     h('div', { class: 'flip-head' }, flipGlyph, flipLab, flipCount, flipNum),
     h('div', { class: 'flip-bar' }, flipFill));
 
+  /* ------------------------------------------------------------- clock (RUSH) */
+
+  const clkNum = h('span', { class: 'clk-num t-num' });
+  const clkHeat = h('b', { class: 'clk-heat t-num', text: 'x1.0' });
+  const clkFill = h('i');
+  const clk = h('div', { class: 'panel clk hide' },
+    h('div', { class: 'clk-head' },
+      h('span', { class: 'flip-glyph clk-glyph' }, icon(MODE_GLYPH.rush)),
+      h('span', { class: 'clk-lab', text: 'bell ×2' }),
+      h('span', { class: 'clk-chip' }, 'heat', clkHeat),
+      clkNum),
+    h('div', { class: 'clk-bar' }, clkFill));
+
   /** An inset glow on the board rect, so the flip is telegraphed without one
    *  pixel of sand being covered. */
   const flipring = h('div', { class: 'flipring' });
@@ -112,7 +125,8 @@ export function createModeHud() {
 
   // Cached so the DOM is only touched when a number actually moves; setHud runs
   // every rAF and this panel is on screen for whole minutes at a time.
-  let lastObj = '', lastFlip = '', lastTide = -1, lastRailCls = '';
+  let lastObj = '', lastFlip = '', lastTide = -1, lastRailCls = '', lastClk = '', lastSec = -1;
+  let ringFlip = false, ringClk = false;
   // The last piece count seen, so a SPEND can be told from a repaint, and the
   // star currently on offer, so the shell can say something about it losing one
   // without this file deciding what that something is.
@@ -211,7 +225,30 @@ export function createModeHud() {
     const now = g.settling || (!g.settling && left <= 2.5);
     flip.classList.toggle('is-soon', soon && !now);
     flip.classList.toggle('is-now', now);
-    flipring.classList.toggle('on', now);
+    ringFlip = now;
+  }
+
+  function setClock(r) {
+    const left = Math.max(0, r.left || 0);
+    const frac = Math.max(0, Math.min(1, left / (r.duration || 120)));
+    const heat = Math.round((r.heat || 1) * 10) / 10;
+    const key = [Math.round(left * 10), heat, r.timeUp].join('|');
+    if (key === lastClk) return;
+    lastClk = key;
+    clkNum.textContent = r.timeUp ? 'TIME' : clock(left);
+    clkFill.style.width = (frac * 100).toFixed(1) + '%';
+    clkHeat.textContent = 'x' + heat.toFixed(1);
+    clk.classList.toggle('is-hot', heat >= 2);
+    const soon = left <= 30 && left > 10, last = left <= 10 && !r.timeUp;
+    clk.classList.toggle('is-soon', soon);
+    clk.classList.toggle('is-now', last);
+    ringClk = last;
+    // A tick for each of the last five seconds, so the bell can be heard coming.
+    const sec = Math.ceil(left);
+    if (last && sec <= 5 && sec !== lastSec && lastSec !== -1) {
+      try { const a = window.__game && window.__game.audio; a && a.sfx && a.sfx('rotate'); } catch (e) {}
+    }
+    lastSec = sec;
   }
 
   function setTide(t) {
@@ -229,7 +266,7 @@ export function createModeHud() {
   return {
     /** Panels that hang off the BOARD rect, not the control frame. */
     boardEls: [rail, flipring],
-    panels: [objective, flip],
+    panels: [objective, flip, clk],
 
     /**
      * @param s the whole setHud payload. `fields` is the mode's own hud[] as a
@@ -239,15 +276,22 @@ export function createModeHud() {
       const wantObj = !!s.alchemy && (!fields || fields.has('objective'));
       const wantFlip = !!s.hourglass && (!fields || fields.has('flip'));
       const wantTide = !!s.tide && (!fields || fields.has('tide'));
+      const wantClk = !!s.rush && (!fields || fields.has('clock'));
 
       objective.classList.toggle('hide', !wantObj);
       flip.classList.toggle('hide', !wantFlip);
+      clk.classList.toggle('hide', !wantClk);
       rail.classList.toggle('hide', !wantTide);
-      if (!wantFlip && flipring.classList.contains('on')) flipring.classList.remove('on');
+      if (!wantFlip) ringFlip = false;
+      if (!wantClk) ringClk = false;
 
       if (wantObj) setObjective(s.alchemy);
       if (wantFlip) setFlip(s.hourglass);
+      if (wantClk) setClock(s.rush);
       if (wantTide) setTide(s.tide);
+      const ring = ringFlip || ringClk;
+      if (ring !== flipring.classList.contains('on')) flipring.classList.toggle('on', ring);
+      flipring.classList.toggle('is-rush', ringClk);
       return wantTide ? s.tide : null;
     },
 
@@ -258,7 +302,9 @@ export function createModeHud() {
       lastObj = ''; lastUsed = -1; offer = 0;
       objPieces.classList.remove('spend');
       for (const p of objStars.children) p.classList.remove('out');
-      flipring.classList.remove('on');
+      flipring.classList.remove('on', 'is-rush');
+      ringFlip = ringClk = false; lastClk = ''; lastSec = -1;
+      clk.classList.remove('is-now', 'is-soon');
     },
   };
 }

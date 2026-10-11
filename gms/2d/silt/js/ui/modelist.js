@@ -1,4 +1,4 @@
-// The six modes as the SHELL knows them: name, one line, a feel.
+// The seven modes as the SHELL knows them: name, one line, a feel.
 //
 // This is a catalogue, not a source of truth. Lane C owns js/modes/**, and the
 // modes land one at a time — so anything present there wins (name, blurb), and
@@ -20,6 +20,10 @@ export const CATALOGUE = [
   {
     id: 'hourglass', name: 'HOURGLASS', tag: 'gravity',
     blurb: 'Gravity turns on a timer. Everything you built falls the other way.',
+  },
+  {
+    id: 'rush', name: 'RUSH', tag: '2 minutes',
+    blurb: 'Two minutes. Drop fast for heat; survive to the bell to double it.',
   },
   {
     id: 'alchemy', name: 'ALCHEMY', tag: 'puzzles',

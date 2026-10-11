@@ -281,15 +281,15 @@ function endGame() {
   if (window.SiltCloud && window.SiltCloud.setPlaying) window.SiltCloud.setPlaying(false);
   const isBest = save.recordGame(mode.id, world.score, world.chains, world.cellsCleared);
   const a = world.alchemy;
-  const won = !!(a && a.won);
-  if (won && a.id) save.recordLevel(a.id, a.stars || 1);
+  const won = !!(a && a.won) || !!(world.rush && world.rush.timeUp);
+  if (won && a && a.id) save.recordLevel(a.id, a.stars || 1);
   AUDIO.sfx(won ? 'chain' : 'fail', won ? 800 : undefined);
   if (window.SiltCloud && window.SiltCloud.gameFinished) window.SiltCloud.gameFinished();
   UI && UI.results({
     score: world.score, chains: world.chains, best: save.bestFor(mode.id), isBest,
     mode: mode.name, modeId: mode.id,
-    won, alchemy: a || null,
-    stars: won ? (a.stars || 1) : 0,
+    won, alchemy: a || null, rush: world.rush || null,
+    stars: won && a ? (a.stars || 1) : 0,
     bestStars: a && a.id ? save.starsFor(a.id) : 0,
   });
 }
@@ -399,7 +399,7 @@ function frame(now) {
       next: world.nextPiece, mode: mode.name, modeId: mode.id,
       hud: mode.hud,
       // modes publish their own state; the shell shows what it recognises
-      tide: world.tide, hourglass: world.hourglass, alchemy: world.alchemy, zen: world.zen, jelly: world.jelly,
+      tide: world.tide, hourglass: world.hourglass, alchemy: world.alchemy, zen: world.zen, jelly: world.jelly, rush: world.rush,
       chain: lastChainAt,
     });
   }

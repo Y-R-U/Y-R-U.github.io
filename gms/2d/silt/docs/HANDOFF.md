@@ -1768,3 +1768,63 @@ objective the campaign no longer contains. A9 is what stops it coming back.
 - A comment containing backticks, added inside a `cdp.eval` template literal,
   silently ended the literal — `node --check` catches this in a second and is
   worth running on this file after any edit.
+
+---
+
+## RUSH: a timed score-attack mode, 2026-10-11
+
+Aaron asked for "highest score against a timer", where dropping faster scores
+more but leaves the sand less time to settle, so that playing fast can lose the
+run. He said to leave JELLY alone.
+
+### Design
+
+- **Clock:** 120 s of sim time. The bell doubles the run.
+- **HEAT:** a quick drop (landed in under half its gravity time) adds +0.2, up
+  to x3. It bleeds at 0.6/s once 2.5 s pass without one. Heat multiplies chain
+  awards, and each quick drop also pays 3 x heat.
+- **Top-out:** still ends the run, with the clock left on it and no bell. That
+  is the price of rushing.
+
+### Tuning
+
+The tuning agents were the shipping bot with a reaction delay, used either for
+hard drops or for soft drops. There were 16 seeds per agent and two seed
+families.
+
+First finding: everyone hit max heat, so heat by itself does not separate
+paces. What separates them is the bell.
+
+| bell bonus | 1.2 s drops | 0.8 s drops | 0.3 s drops |
+|---|---|---|---|
+| +50% | mean 3.0k | mean 5.4k | mean 8.1k |
+| x2 | mean 3.9k, bell 14/16 | mean 7.0k, bell 10/16 | mean 9.6k, bell 3/16, ceiling 34k |
+
+With the bell at x2, the medians land within 6.0-7.0k at every pace. No pace
+wins outright: a careful player scores less but finishes, and a rusher has the
+ceiling and usually dies.
+
+90 s was also tried. Careful agents reached the bell every time and rushers
+almost never did, but 120 s matched the brief's suggestion and the tension held
+there too.
+
+The fall-ramp knobs barely moved survival, because top-outs are the bot's own
+stacking. They were left gentle: fallRate 40, fallTime 0.03, fallAccel 0.5.
+
+### Known limit
+
+An instant masher (modesim's `masher`, about 5 pieces/s with flat placement)
+tops out in about 28 s with a mean similar to the bot's full runs. No human can
+drop at that rate. A human-paced masher (0.4 s) reaches the bell 3 times in 16,
+with a median of 3.5k against 6-7k for considered play. If real players find
+that mashing pays, the lever to pull is a heat condition on settled sand, not a
+smaller bell.
+
+### Gates
+
+- New gate R1 in modesim, with its arms `rushclock` and `rushtop`.
+- S1 now adds `world.rush.bonus` to the mode's awards.
+- The other modes' modesim lines are unchanged, figure for figure.
+- uishot has 7 cards, a RUSH panel row, and ALCHEMY at card index 5.
+- The 390x844 home-bar sheet first overflowed by 10 px. The RUSH blurb was
+  shortened to two lines, and it fits again.

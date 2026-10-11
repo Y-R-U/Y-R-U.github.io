@@ -5,13 +5,14 @@ import jelly from './jelly.js';
 import hourglass from './hourglass.js';
 import alchemy from './alchemy.js';
 import zen from './zen.js';
+import rush from './rush.js';
 import { safeApi } from './api.js';
 import { DEFAULT_BIOME, getBiome } from '../data/biomes.js';
 
 export { safeApi } from './api.js';
 export { chainPoints, makeScorer } from './score.js';
 
-export const MODES = [flow, tide, jelly, hourglass, alchemy, zen];
+export const MODES = [flow, tide, jelly, hourglass, rush, alchemy, zen];
 export const MODE_IDS = MODES.map((m) => m.id);
 export const byId = (id) => MODES.find((m) => m.id === id) || flow;
 

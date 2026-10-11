@@ -34,6 +34,7 @@ const HINT = {
   // merely counts down — the sentence has to name BOTH halves: the drop costs
   // something, and the thinking does not.
   alchemy: 'each drop spends a piece · thinking costs nothing',
+  rush: 'drop fast for heat · reach the bell for ×2',
 };
 
 // A run that has not chained yet is a run scoring nothing, and after half a
@@ -246,7 +247,7 @@ export function createUI(handlers = {}) {
 
   /* -------------------------------------------------------------- sheets */
 
-  const modeSheet = createSheet('MODES', 'six ways for sand to fall');
+  const modeSheet = createSheet('MODES', 'seven ways for sand to fall');
   const dailySheet = createSheet('EVENTS', 'today and this device');
   const levelSheet = createLevelPicker((n) => playLevel(n));
   const settings = createSettings({ blip: () => { const a = window.__game && window.__game.audio; a && a.sfx && a.sfx('rotate'); } });
@@ -743,7 +744,7 @@ export function createUI(handlers = {}) {
     // A mode panel occupies the band the banner used to drop into, and a banner
     // landing on the objective is how ALCHEMY's "COMPLETE" ended up printed
     // twice, on top of itself. Move the banners below the panel instead.
-    root.classList.toggle('has-panel', !F || F.has('objective') || F.has('flip'));
+    root.classList.toggle('has-panel', !F || F.has('objective') || F.has('flip') || F.has('clock'));
 
     // The best-run rail. ALCHEMY already answers "am I getting anywhere" with an
     // objective bar and a piece budget, so it does not get a second one; ZEN has no
@@ -954,7 +955,10 @@ export function createUI(handlers = {}) {
         resChains.textContent = fmt(r.chains);
         resBest.textContent = fmt(Math.max(r.best || 0, r.score || 0));
         resRibbon.classList.toggle('hide', !r.isBest);
-        resKicker.textContent = 'run over';
+        const ru = r.rush;
+        resKicker.textContent = !ru ? 'run over'
+          : ru.timeUp ? 'time · bell ×2 +' + fmt(ru.bell)
+          : 'buried with ' + Math.ceil(ru.left) + 's left';
       }
       show('results');
     },

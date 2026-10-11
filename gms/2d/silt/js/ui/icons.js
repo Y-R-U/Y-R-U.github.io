@@ -31,10 +31,11 @@ export const MODE_GLYPH = {
   jelly:     '<path d="M12 3.6c4.6 0 7.6 3.1 7.6 7.4 0 4.5-2.8 9.4-7.6 9.4S4.4 15.5 4.4 11c0-4.3 3-7.4 7.6-7.4Z"/><path d="M8.7 8.4c.5-1.4 1.8-2.2 3.1-2.3"/>',
   hourglass: '<path d="M6.4 3h11.2M6.4 21h11.2"/><path d="M7.6 3c0 4.8 4.4 5.9 4.4 9s-4.4 4.2-4.4 9"/><path d="M16.4 3c0 4.8-4.4 5.9-4.4 9s4.4 4.2 4.4 9"/><path d="M9.6 18.4h4.8"/>',
   alchemy:   '<path d="M9.6 3v6.2L4.5 17.9A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-3.1L14.4 9.2V3"/><path d="M8.4 3h7.2M7.6 15.2h8.8"/>',
+  rush:      '<circle cx="12" cy="13.4" r="7.4"/><path d="M12 13.4V9.2M10 2.8h4M12 2.8v3.2M18.2 6.6l1.4-1.4"/>',
   zen:       '<circle cx="12" cy="12" r="8.6" opacity=".38"/><circle cx="12" cy="12" r="5.2" opacity=".7"/><circle cx="12" cy="12" r="1.9" style="fill:currentColor;stroke:none"/>',
 };
 
 export const MODE_ACCENT = {
   flow: '#f2b33d', tide: '#41e8c4', jelly: '#ff7fb0',
-  hourglass: '#ff8a3c', alchemy: '#b189d6', zen: '#a8d8c6',
+  hourglass: '#ff8a3c', alchemy: '#b189d6', zen: '#a8d8c6', rush: '#ff5f57',
 };

@@ -231,7 +231,7 @@ async function probe() {
 
   await q('window.__ui.openModes()');
   const cards = await q('document.querySelectorAll(".sheet-wrap.is-on .mcard").length');
-  ok('mode sheet lists six modes', cards === 6, String(cards));
+  ok('mode sheet lists seven modes', cards === 7, String(cards));
   await click('.sheet-wrap.is-on .mcard', 1);           // TIDE
   ok('a mode card starts that mode', (await q('window.__state.mode')) === 'tide',
     String(await q('window.__state.mode')));
@@ -318,7 +318,7 @@ async function probe() {
   await q('window.__game.attract()');
   await q('window.__ui.openModes()');
   await new Promise((r) => setTimeout(r, 240));
-  await click('.sheet-wrap.is-on .mcard', 4);            // ALCHEMY
+  await click('.sheet-wrap.is-on .mcard', 5);            // ALCHEMY
   await new Promise((r) => setTimeout(r, 320));
   const total = await q('document.querySelectorAll(".sheet--lv .lvt").length');
   ok('the ALCHEMY card opens the campaign rather than level 1',
@@ -565,12 +565,13 @@ async function modeShots(tag) {
  * other five, passes every screenshot check ever written.
  */
 const PANELS = {
-  flow:      { obj: 0, flip: 0, rail: 0, pal: 0, score: 1, next: 1 },
-  tide:      { obj: 0, flip: 0, rail: 1, pal: 0, score: 1, next: 1 },
-  jelly:     { obj: 0, flip: 0, rail: 0, pal: 0, score: 1, next: 1 },
-  hourglass: { obj: 0, flip: 1, rail: 0, pal: 0, score: 1, next: 1 },
-  alchemy:   { obj: 1, flip: 0, rail: 0, pal: 0, score: 1, next: 1 },
-  zen:       { obj: 0, flip: 0, rail: 0, pal: 1, score: 0, next: 0 },
+  flow:      { obj: 0, flip: 0, rail: 0, pal: 0, score: 1, next: 1, clk: 0 },
+  tide:      { obj: 0, flip: 0, rail: 1, pal: 0, score: 1, next: 1, clk: 0 },
+  jelly:     { obj: 0, flip: 0, rail: 0, pal: 0, score: 1, next: 1, clk: 0 },
+  hourglass: { obj: 0, flip: 1, rail: 0, pal: 0, score: 1, next: 1, clk: 0 },
+  rush:      { obj: 0, flip: 0, rail: 0, pal: 0, score: 1, next: 1, clk: 1 },
+  alchemy:   { obj: 1, flip: 0, rail: 0, pal: 0, score: 1, next: 1, clk: 0 },
+  zen:       { obj: 0, flip: 0, rail: 0, pal: 1, score: 0, next: 0, clk: 0 },
 };
 
 /** The results card as it was before ALCHEMY had one of its own. */
@@ -606,7 +607,7 @@ async function endToEnd() {
       const f = window.__ui.setHud;
       window.__ui.setHud = (s) => f({ ...s,
         hud: ['score', 'chains', 'combo', 'next'], modeId: undefined,
-        tide: undefined, hourglass: undefined, alchemy: undefined, zen: undefined });
+        tide: undefined, hourglass: undefined, alchemy: undefined, zen: undefined, rush: undefined });
       return 1; })()`);
     // ...and the results card as it was BEFORE this work: score, chains, best,
     // and no idea which mode produced them.
@@ -618,13 +619,13 @@ async function endToEnd() {
   await q('window.__ui.openModes()');
   await new Promise((r) => setTimeout(r, 420));
   const cards = await q('document.querySelectorAll(".sheet-wrap.is-on .mcard:not(.locked)").length');
-  ok('mode sheet offers all six modes', cards === 6, String(cards));
+  ok('mode sheet offers all seven modes', cards === 7, String(cards));
 
   const order = await q(`JSON.stringify([...document.querySelectorAll('.sheet-wrap.is-on .mcard')]
     .map(e => e.querySelector('.mcard-name').textContent))`);
   console.log('  cards: ' + order);
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 7; i++) {
     await q('window.__ui.openModes()');
     await new Promise((r) => setTimeout(r, 220));
     await click('.sheet-wrap.is-on .mcard', i);
@@ -661,6 +662,7 @@ async function endToEnd() {
       obj: +(await q(on('.obj'))), flip: +(await q(on('.flip'))),
       rail: +(await q(on('.rail'))), pal: +(await q(on('.zen-pal'))),
       score: +(await q(on('.hud-score'))), next: +(await q(on('.next'))),
+      clk: +(await q(on('.clk'))),
     };
     const want = PANELS[id];
     ok(`${id}: HUD shows exactly what the mode declared`,
@@ -764,15 +766,15 @@ async function endToEnd() {
   }
 
   if (args.falsify) {
-    // Twelve: the four "HUD shows exactly what the mode declared" lines for
-    // TIDE, HOURGLASS, ALCHEMY and ZEN, plus the eight detail checks that read
+    // Thirteen: the five "HUD shows exactly what the mode declared" lines for
+    // TIDE, HOURGLASS, RUSH, ALCHEMY and ZEN, plus the eight detail checks that read
     // the objective text, ALCHEMY's piece budget in the banner, in the panel, as
     // it runs down and as it costs a star, the rail height, the flip clock and
     // the palette. FLOW and JELLY stay green on
     // purpose — they declare no mode panel, so the arm cannot change what their
     // HUD should look like, and a gate that went red for them would be
     // measuring something other than what it claims.
-    const MUST = 12;
+    const MUST = 13;
     console.log(`\nfalsification arm: ${fails.length} checks went red, ${MUST} required`);
     if (fails.length < MUST) { console.log('ARM TOO WEAK — these checks are not evidence'); process.exitCode = 1; }
     else console.log('arm ok: every per-mode panel check is capable of failing');
@@ -934,7 +936,7 @@ async function sheetFit(S, ok) {
   await cdp.eval(`document.documentElement.style.removeProperty('--sab')`);
   await cdp.viewport(S.w, S.h, 1, true);
 
-  const fits = got.every(([, , m]) => m && m.cards === 6 && m.overflow === 0 && m.minCard >= 44);
+  const fits = got.every(([, , m]) => m && m.cards === 7 && m.overflow === 0 && m.minCard >= 44);
   ok(`${tag}: the mode sheet fits without scrolling, cards still 44 px`, fits,
     got.map(([n, h, m]) => m ? `${n} ${S.w}x${h} ${m.sheetH}/${m.cap} over ${m.overflow}` : `${n} no sheet`)
       .join(' · ') + (got[0][2] ? ` · card ${got[0][2].minCard}` : ''));
@@ -1116,7 +1118,7 @@ async function hitGate() {
   if (fails.length) process.exitCode = 1;
 }
 
-const LAYOUT_MODES = ['flow', 'tide', 'jelly', 'hourglass', 'alchemy', 'zen'];
+const LAYOUT_MODES = ['flow', 'tide', 'jelly', 'hourglass', 'rush', 'alchemy', 'zen'];
 
 async function layoutGate() {
   const fails = [];

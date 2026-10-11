@@ -23,7 +23,7 @@
 //   node tools/modesim.mjs --break <gate>      falsification arm: that gate MUST go red
 //
 // break gates: ledger  score  stall  rng  tide  zen  slots  trivial  unwinnable  span
-//              aspect  headroom  grace  budget  masher  patient
+//              aspect  headroom  grace  budget  masher  patient  rushclock  rushtop
 
 import { World, SIM_HZ, DEFAULT_CFG } from '../js/sim/world.js';
 import { Grid, F_CLEARING } from '../js/sim/grid.js';
@@ -39,6 +39,7 @@ import { safeApi } from '../js/modes/api.js';
 import alchemy, { setLevels, starsFor, budgetOf, ALCHEMY_CFG } from '../js/modes/alchemy.js';
 import jelly from '../js/modes/jelly.js';
 import zen from '../js/modes/zen.js';
+import rush, { RUSH_CFG } from '../js/modes/rush.js';
 import { genLevels, sceneSpans, applyScene, makeTracker, CALIBRATION_PIECES } from '../js/data/levelgen.js';
 import { LEVELS as SHIPPED } from '../js/data/levels.js';
 import { BIOMES, MAX_TINTS, BRINE_FIRST, BRINE_COUNT } from '../js/data/biomes.js';
@@ -350,8 +351,10 @@ async function gateModes() {
       if (r.stalled) fail('M3-stall', `${mode.id} seed ${r.seed} board unchanged for 12s at t=${r.s.toFixed(0)}s`);
       // S1: every point on the board must have come through the mode scorer.
       // If the engine's own award leaked through, these disagree.
-      if (mode.id !== 'zen' && r.awards.length && r.score !== r.awarded) {
-        fail('S1-score', `${mode.id} seed ${r.seed} world.score=${r.score} but mode awarded ${r.awarded}`);
+      // RUSH pays drop and bell bonuses outside onChain and publishes their total.
+      const extra = r.world.rush ? r.world.rush.bonus : 0;
+      if (mode.id !== 'zen' && r.awards.length && r.score !== r.awarded + extra) {
+        fail('S1-score', `${mode.id} seed ${r.seed} world.score=${r.score} but mode awarded ${r.awarded}+${extra}`);
       }
       if (mode.id === 'zen' && r.score !== 0) fail('Z1-zen', `zen scored ${r.score}`);
     }
@@ -391,6 +394,61 @@ async function gateJellyPatient(botRuns) {
     `  score ${Math.round(mean(rs.map((r) => r.score)))}` +
     `  tempo peak ${mean(rs.map((r) => r.tempoPeak)).toFixed(2)}`;
   return [line('bot', botRuns || []), line('patient', runs)];
+}
+
+// ------------------------------------------------- R1: RUSH, the clock mode
+//
+// Three properties, each with its own arm:
+//   clock   a run nobody tops out ends AT the bell, not before or after
+//           (patient agent; --break rushclock takes the bell away)
+//   score   points only ever accumulate and the bell bonus is paid once
+//   topout  a masher still tops out early, with no bell and no bonus
+//           (--break rushtop makes the mode absolve a top-out, like ZEN does)
+
+async function gateRush() {
+  if (ONLY && ONLY !== 'rush') return null;
+  const saved = RUSH_CFG.duration;
+  if (BREAK === 'rushclock') RUSH_CFG.duration = 1e9;
+  const D = saved;
+  const watch = (w) => {
+    if (w.score < w.__lastScore) w.__fell = (w.__fell || 0) + 1;
+    w.__lastScore = w.score;
+  };
+  const mode = BREAK !== 'rushtop' ? rush : {
+    ...rush,
+    onTick(w, a) { rush.onTick.call(this, w, a); if (w.over && !w.rush.timeUp) { w.over = false; w.piece = null; } },
+  };
+  const calm = [], mash = [], bot = [];
+  for (let i = 0; i < GAMES; i++) {
+    const seed = 400 + i * 137;
+    calm.push(await playMode(mode, { seed, capS: D + 60, agent: 'patient', sample: watch }));
+    mash.push(await playMode(mode, { seed, capS: D + 60, agent: 'masher', sample: watch }));
+    bot.push(await playMode(mode, { seed, capS: D + 60, sample: watch }));
+  }
+  RUSH_CFG.duration = saved;
+  const tick = 1 / SIM_HZ;
+  for (const r of calm) {
+    const w = r.world;
+    if (!w.rush.timeUp || Math.abs(r.s - D) > 2 * tick) fail('R1-clock', `rush/patient seed ${r.seed} ended at ${r.s.toFixed(2)}s, bell ${w.rush.timeUp} (clock ${D}s)`);
+  }
+  for (const r of [...calm, ...mash, ...bot]) {
+    const w = r.world;
+    if (r.err) fail('M1-ledger', r.err);
+    if (w.__fell) fail('R1-score', `rush seed ${r.seed} score fell ${w.__fell}x`);
+    if (r.score !== r.awarded + w.rush.bonus) fail('S1-score', `rush seed ${r.seed} world.score=${r.score} but mode awarded ${r.awarded}+${w.rush.bonus}`);
+    if (w.rush.timeUp && w.rush.bell !== Math.round((r.score - w.rush.bell) * RUSH_CFG.bellBonus)) fail('R1-score', `rush seed ${r.seed} bell bonus ${w.rush.bell} is not ${RUSH_CFG.bellBonus} of ${r.score - w.rush.bell}`);
+  }
+  if (mean(bot.map((r) => r.score)) <= 0) fail('R1-score', 'rush/bot scored nothing');
+  for (const r of mash) {
+    const w = r.world;
+    if (!(r.over && !w.rush.timeUp && r.s < D - 1)) fail('R1-topout', `rush/masher seed ${r.seed} did not top out early: ${r.s.toFixed(1)}s, bell ${w.rush.timeUp}`);
+    else if (w.rush.bell) fail('R1-topout', `rush/masher seed ${r.seed} paid a bell bonus on a top-out`);
+  }
+  const line = (tag, rs) => `  rush/${tag.padEnd(8)}` +
+    ` len ${mean(rs.map((r) => r.s)).toFixed(0)}s [${rs.map((r) => r.s.toFixed(0)).join(',')}]` +
+    `  bell ${rs.filter((r) => r.world.rush.timeUp).length}/${rs.length}` +
+    `  score ${Math.round(mean(rs.map((r) => r.score)))}  heat peak x${mean(rs.map((r) => r.world.rush.peak)).toFixed(2)}`;
+  return [line('patient', calm), line('bot', bot), line('masher', mash)];
 }
 
 // --------------------------------------------------- M2 determinism per mode
@@ -1341,6 +1399,7 @@ if (MASHER) {
   const tideProbe = gateTide();
   const rows = await gateModes();
   const jp = await gateJellyPatient((rows.find((r) => r.mode.id === 'jelly') || {}).runs);
+  const rl = await gateRush();
   await gateDeterminism();
   const flips = await gateHourglass();
   const z = await gateZen();
@@ -1488,6 +1547,7 @@ if (MASHER) {
   console.log('');
   fmtRuns(rows);
   if (jp) { console.log(''); for (const l of jp) console.log(l); }
+  if (rl) { console.log(''); for (const l of rl) console.log(l); }
   console.log(`\n  tide: bare tide self-clears 0x; tinted water bridges a sand run (${tideProbe.bridged} cells). engine treats tint 0 as inert: ${tideProbe.inertZero}. highest tint emitted ${BRINE_FIRST + BRINE_COUNT - 1} of ${slots} renderer slots`);
   console.log(`  hourglass flips in 150s: ${flips}`);
   console.log(`  zen: no fail state over 120s, vented ${z.vented}x`);
