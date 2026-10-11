@@ -40,3 +40,11 @@ when the asset list changes; `mpgate` checks `ASSETS` against index.html.
 - Death screen names the killer ("Eaten by X, your regular" for regulars,
   "You hit the edge of the arena"); `#rival-toast` for killing a regular or a
   regular overtaking you (8 s between toasts, 30 s per regular; kills always show).
+
+## Safe spawns (2026-10-11)
+`Snake.placeSafely(snakes)` (snake.js) runs for every bot, room player and
+remote player before it joins. The new body stays `SPAWN_HUMAN_AHEAD` (650px)
+clear of a human's head in its forward cone, `SPAWN_HUMAN_SIDE` elsewhere,
+`SPAWN_BOT_GAP` from bot heads; the new head stays clear of every body and
+faces away from the nearest human. Up to `SPAWN_TRIES` samples, else the
+roomiest. Before: ~3% of spawns landed in reach of the player's head.

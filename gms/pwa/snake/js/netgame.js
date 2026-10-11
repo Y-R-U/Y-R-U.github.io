@@ -211,6 +211,7 @@ class NetGame {
         const g = this.game;
         const s = this._makePlayerSnake(this.net.id, g.saveData.username || 'Player',
             g.saveData.selectedSkin, this._myStats());
+        s.placeSafely(g.snakes);
         g.snakes.push(s);
         this.adopt(s);
         this.myNid = s.nid;
@@ -233,6 +234,7 @@ class NetGame {
                 boostCostReduction: Utils.clamp(+st.boostCostReduction || 0, 0, 0.7)
             });
         s.remote = true;
+        s.placeSafely(g.snakes);
         g.snakes.push(s);
         this.adopt(s);
         if (peer) {

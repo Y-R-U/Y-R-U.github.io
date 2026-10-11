@@ -86,6 +86,14 @@ const CONFIG = {
     // AI
     BOT_COUNT: 15,
     BOT_RESPAWN_DELAY: 3000,
+
+    // A new snake keeps this far (px, edge to edge) from every head. Ahead of
+    // a human's head the gap is ~1.5 s of boosting, so it can always be dodged.
+    SPAWN_HUMAN_AHEAD: 650,
+    SPAWN_HUMAN_SIDE: 300,
+    SPAWN_HUMAN_CONE: 0.5,           // cos of the half-angle that counts as "ahead"
+    SPAWN_BOT_GAP: 140,
+    SPAWN_TRIES: 60,
     BOT_DETECTION_RADIUS: 300,
     BOT_FOOD_DETECTION: 350,
     BOT_DECISION_INTERVAL: 500,      // fallback; real value comes from the skill tier

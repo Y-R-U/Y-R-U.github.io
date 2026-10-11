@@ -430,6 +430,7 @@ class Game {
         const rival = this._openRivalSlot();
         if (rival) rival.bonusSpeed = Rivals.speedBonus(rival, this._playerSpeedEdge());
         const bot = AI.createBot(this.saveData, this._leaderMass(), rival);
+        bot.placeSafely(this.snakes);
         this.snakes.push(bot);
         this.ai.register(bot, undefined, rival ? rival.tier : undefined);
         if (this.inRoom) this.mp.adopt(bot);

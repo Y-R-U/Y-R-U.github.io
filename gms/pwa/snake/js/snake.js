@@ -183,6 +183,73 @@ class Snake {
         this._solveSegments();
     }
 
+    /**
+     * Move somewhere no one can die on arrival: the new body stays clear of
+     * every head (well clear ahead of a human's), the new head clear of every
+     * body, and it faces away from the nearest human. Falls back to the
+     * roomiest spot tried.
+     */
+    placeSafely(snakes) {
+        const others = snakes.filter(s => s && s !== this && s.alive);
+        if (!others.length) return;
+        let best = null, bestScore = -Infinity;
+        for (let t = 0; t < CONFIG.SPAWN_TRIES; t++) {
+            const p = Utils.randInCircle(CONFIG.WORLD_RADIUS * 0.7);
+            let angle = Math.random() * Math.PI * 2, near = Infinity;
+            for (const s of others) {
+                if (!Snake._human(s)) continue;
+                const d = Math.hypot(p.x - s.x, p.y - s.y);
+                if (d < near) { near = d; angle = Math.atan2(p.y - s.y, p.x - s.x) + (Math.random() - 0.5) * 1.6; }
+            }
+            const score = this._spawnClearance(p.x, p.y, angle, others);
+            if (score > bestScore) { bestScore = score; best = { x: p.x, y: p.y, angle }; }
+            if (score >= 0) break;
+        }
+        this.x = best.x;
+        this.y = best.y;
+        this.angle = this.targetAngle = this.eyeAngle = best.angle;
+        this._initBody();
+    }
+
+    static _human(s) { return !!(s.isPlayer || s.owner); }
+
+    /** Smallest spare gap (px) for a spawn at x,y facing angle; negative = unsafe. */
+    _spawnClearance(x, y, angle, others) {
+        const cx = Math.cos(angle), cy = Math.sin(angle);
+        const len = this.bodyDistance;
+        const step = Math.max(this.spacing, len / 24);
+        const reach = CONFIG.SPAWN_HUMAN_AHEAD + 200;
+        let worst = Infinity;
+        for (const s of others) {
+            const sLen = s.bodyDistance;
+            if (Math.hypot(x - s.x, y - s.y) > len + sLen + reach) continue;
+            // Their head against our body.
+            const sh = Snake._human(s);
+            const hx = Math.cos(s.angle), hy = Math.sin(s.angle);
+            for (let d = 0; d <= len + 0.1; d += step) {
+                const px = x - cx * d - s.x, py = y - cy * d - s.y;
+                const dist = Math.hypot(px, py);
+                worst = Math.min(worst, dist - s.headRadius - this.bodyRadius -
+                    Snake._gap(sh, dist, (px * hx + py * hy) / (dist || 1)));
+            }
+            // Our head against their body.
+            const me = Snake._human(this);
+            const stride = Math.max(1, Math.floor(s.segCount / 60));
+            for (let i = 0; i < s.segCount; i += stride) {
+                const px = s.segX[i] - x, py = s.segY[i] - y;
+                const dist = Math.hypot(px, py);
+                worst = Math.min(worst, dist - this.headRadius - s.bodyRadius -
+                    Snake._gap(me, dist, (px * cx + py * cy) / (dist || 1)));
+            }
+        }
+        return worst;
+    }
+
+    static _gap(human, dist, cosAhead) {
+        if (!human) return CONFIG.SPAWN_BOT_GAP;
+        return cosAhead > CONFIG.SPAWN_HUMAN_CONE ? CONFIG.SPAWN_HUMAN_AHEAD : CONFIG.SPAWN_HUMAN_SIDE;
+    }
+
     _ensurePath(capacity) {
         if (this.pathX.length >= capacity) return;
         const size = Math.max(capacity, this.pathX.length * 2);
