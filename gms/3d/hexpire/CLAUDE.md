@@ -115,5 +115,7 @@ JSON-serializable (powers autosave/Continue and the node-side balance sim):
 - Short landscape (`max-height: 560px`): `#sk-random` becomes a two-column grid (map style/size/rivals/seed left,
   rival personalities right) with compact chips, and `#sk-start` is sticky at the bottom, so Begin Conquest is on
   screen without scrolling at 844×390 and 915×412 even with 5 rivals. Portrait is untouched.
-- Known, not fixed: in portrait the account avatar half-covers the Custom tab, and the landscape home menu scrolls
-  (Skirmish sits below the fold).
+- `.scr-head` pads right by `var(--br8t-account-space)`, so the Random/Custom tabs wrap clear of the account avatar
+  in portrait.
+- Short landscape home menu: logo + empire name/colour on the left, the six buttons in a 2×3 grid on the right; no
+  scrolling at 844×390 or 915×412, even with Continue showing.
