@@ -4,6 +4,7 @@ import {
 } from './const.js';
 import { clamp } from './util.js';
 import { drawSprite, bakeBall, BALL_SIZE, BALL_FRAMES } from './sprites.js';
+import { crowdForMatch, updateCrowd, drawCrowd } from './crowd.js';
 
 export class Renderer {
   constructor(canvas) {
@@ -55,6 +56,15 @@ export class Renderer {
 
     // pitch
     if (this.pitchCanvas) ctx.drawImage(this.pitchCanvas, 0, 0);
+    const viewTop = cam.y - this.h / 2 / cam.scale - 60;
+    const viewBot = cam.y + this.h / 2 / cam.scale + 60;
+
+    // landscape: big animated side stands in the margins
+    updateCrowd(dt);
+    if (this.w > this.h) {
+      crowdForMatch(match);
+      drawCrowd(ctx, viewTop, viewBot);
+    }
 
     // top goal (net behind entities)
     this._goalNet(ctx, PY, -1);
@@ -118,8 +128,6 @@ export class Renderer {
     // ---- entities (players + ball) sorted by y ----
     const list = this.drawList;
     list.length = 0;
-    const viewTop = cam.y - this.h / 2 / cam.scale - 60;
-    const viewBot = cam.y + this.h / 2 / cam.scale + 60;
     for (const f of match.all) {
       if (f.y < viewTop || f.y > viewBot) continue;
       list.push(f);
@@ -222,6 +230,10 @@ export class Renderer {
     const k = inp.kickAnchor;
     if (k) {
       const held = inp.kick.held;
+      if (this.w > this.h) {   // backing disc so it reads over the crowd
+        ctx.fillStyle = 'rgba(6,14,9,0.75)';
+        ctx.beginPath(); ctx.arc(k.x, k.y, k.r + 4, 0, Math.PI * 2); ctx.fill();
+      }
       ctx.globalAlpha = held ? 0.85 : 0.4;
       ctx.fillStyle = held ? '#ffde59' : '#ffffff';
       ctx.beginPath(); ctx.arc(k.x, k.y, k.r * (held ? 0.94 : 1), 0, Math.PI * 2);
@@ -256,8 +268,8 @@ export class Renderer {
       rx = margin >= rw + 20 ? (margin - rw) / 2 : 12;
       ry = 56;
     }
-    ctx.globalAlpha = 0.75;
-    ctx.fillStyle = 'rgba(10,25,14,0.65)';
+    ctx.globalAlpha = this.w > this.h ? 0.95 : 0.75;
+    ctx.fillStyle = this.w > this.h ? 'rgba(10,25,14,0.92)' : 'rgba(10,25,14,0.65)';
     this._rr(ctx, rx, ry, rw, rh, 5); ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.4)';
     ctx.lineWidth = 1;

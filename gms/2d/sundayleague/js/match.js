@@ -14,6 +14,7 @@ import { Footballer } from './footballer.js';
 import { teamThink, spotWorld } from './ai.js';
 import { genSquad, resolveKits } from './teams.js';
 import { bakePlayerSheet } from './sprites.js';
+import { CROWD } from './crowd.js';
 import { AUDIO } from './audio.js';
 
 const TMP = { x: 0, y: 0 };
@@ -179,6 +180,7 @@ export class Match {
     T.stats.shots++;
     this.event('shot', { f });
     AUDIO.bump(0.3);
+    CROWD.surge(0.4, f.team);
   }
 
   clear(f) {
@@ -325,6 +327,7 @@ export class Match {
       this.teams[1 - gk.team].stats.onTarget++;
       this.event('save', { f: gk });
       AUDIO.ooh();
+      CROWD.surge(0.6);
     }
   }
 
@@ -344,6 +347,7 @@ export class Match {
     this.fx.text(gk.x, gk.y, 'PARRIED!', '#8af0ff');
     this.event('save', { f: gk });
     AUDIO.ooh();
+    CROWD.surge(0.6);
   }
 
   _keeperDistribute(dt) {
@@ -987,6 +991,7 @@ export class Match {
     if (this.postCD > 0) return;
     this.postCD = 0.3;
     AUDIO.post();
+    CROWD.surge(0.75);
     this.fx.text(x, y, 'POST!', '#ffd94a');
     this.fx.addShake(4);
     this.event('post', {});
@@ -1079,6 +1084,7 @@ export class Match {
       }
     }
     AUDIO.cheer(); AUDIO.net();
+    CROWD.surge(1, scoringTi);
     this.fx.bigText('GOAL!', { sub: scorerName + ' ' + Math.floor(this.clockMin) + "'", color: '#ffd94a' });
     this.fx.confetti(b.x, goalLineY, [team.kit.shirt, team.kit.sleeve, '#fff', '#ffd94a']);
     this.fx.addShake(9);
@@ -1267,11 +1273,13 @@ export class Match {
         }
       }
       AUDIO.cheer();
+      CROWD.surge(1, p.attackTi);
       this.fx.bigText('GOAL!', { sub: p.kicker.person.name, color: '#ffd94a' });
       this.fx.confetti(this.ball.x, p.goalY, [this.teams[p.attackTi].kit.shirt, '#fff', '#ffd94a']);
       p.kicker.celebrate(p.kicker.x + rand(-40, 40), p.kicker.y - p.atkDir * 90);
     } else {
       AUDIO.aww();
+      CROWD.surge(0.8, 1 - p.attackTi);
       this.fx.bigText(label, { color: '#8af0ff' });
     }
     if (this.pens) {

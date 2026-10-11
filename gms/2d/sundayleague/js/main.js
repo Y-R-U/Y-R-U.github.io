@@ -340,7 +340,12 @@ function resize() {
   const land = w > hgt;
   renderer.resize(w, hgt, dpr);
   camera.resize(w, hgt, land ? 'far' : app.settings.zoom, land);
-  input.layout(w, hgt, land ? Math.max(0, (w - WORLD_W * hgt / ZOOMS.far) / 2) : 0);
+  const margin = land ? Math.max(0, (w - WORLD_W * hgt / ZOOMS.far) / 2) : 0;
+  input.layout(w, hgt, margin);
+  // wide stands: the scoreboard moves off the pitch into the right-hand stand
+  const hud = document.getElementById('hud');
+  hud.classList.toggle('side', margin >= 130);
+  hud.style.setProperty('--sm', margin + 'px');
   orientHint(land && hgt < 480);
 }
 
