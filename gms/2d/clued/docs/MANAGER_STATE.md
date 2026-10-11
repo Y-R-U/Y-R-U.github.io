@@ -152,3 +152,4 @@ Open / optional:
 - Room final screen: "💾 Save these rounds as a set" for everyone (host and players).
 - Full-screen toggle (SVG corners) in every top bar (`header()` right slot, beside 🚪 when present) and the game HUD; hidden where unsupported (iPhone Safari).
 - Tests: `tools/sets_e2e.mjs` (new), p2p_e2e checks the save button on the podium.
+- 2026-10-11: read-aloud 🔊 sits before the `.q-prompt` text (runner prepends it), not in the HUD. Home: eye-off chips hide the kids switch / daily card (`homeKids`, `homeDaily` settings; Settings → Home page restores). Test: `tools/hide_e2e.mjs`.

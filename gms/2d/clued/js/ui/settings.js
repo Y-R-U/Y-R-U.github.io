@@ -1,14 +1,14 @@
-import { h, esc } from './kit.js?v=202610111239';
-import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610111239';
-import { defineScreen, header, back, go } from './app.js?v=202610111239';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610111239';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610111239';
-import { applyAudioSettings, sfx } from './fx.js?v=202610111239';
-import { applyKids } from './home.js?v=202610111239';
-import { loadLearn, loadNet } from './net.js?v=202610111239';
-import { BUILD } from '../build.js?v=202610111239';
-import { canSpeak, speak } from './speech.js?v=202610111239';
-import { streakOption } from './streakopt.js?v=202610111239';
+import { h, esc } from './kit.js?v=202610111253';
+import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610111253';
+import { defineScreen, header, back, go } from './app.js?v=202610111253';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610111253';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610111253';
+import { applyAudioSettings, sfx } from './fx.js?v=202610111253';
+import { applyKids } from './home.js?v=202610111253';
+import { loadLearn, loadNet } from './net.js?v=202610111253';
+import { BUILD } from '../build.js?v=202610111253';
+import { canSpeak, speak } from './speech.js?v=202610111253';
+import { streakOption } from './streakopt.js?v=202610111253';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -47,6 +47,9 @@ defineScreen('settings', el => {
     canFullscreen() ? h('div.opt-row', {}, h('span.lbl', {}, 'Full screen'), h('button.btn.small', { type: 'button', onclick: () => toggleFullscreen() }, 'Toggle')) : null,
     toggleRow('Kids mode', 'Easy picture questions, no timer, stickers', 'kids', applyAll),
   ));
+  el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'Home page'), h('div.panel.set-list', {},
+    toggleRow('Show the kids mode switch', 'Kids mode itself is in the list above', 'homeKids'),
+    toggleRow('Show the daily challenge', null, 'homeDaily')));
   el.append(h('div.panel.set-list', { style: { marginTop: '14px' } }, h('div.opt-row', {}, h('span.lbl', {}, 'Your stats', h('small', {}, 'Games, accuracy, streaks, topics and history')),
     h('button.btn.small', { type: 'button', dataset: { act: 'stats' }, onclick: () => go('stats') }, '📊 Open'))));
   el.append(h('p.muted.tiny.center', { style: { marginTop: '18px' } }, `Clued build ${BUILD} · ${Object.values(getIndex()?.packs || {}).filter(p => !p.virtual).length} packs`));

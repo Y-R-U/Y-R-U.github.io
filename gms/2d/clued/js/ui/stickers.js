@@ -1,5 +1,5 @@
 // Kids reward loop: stars from correct answers unlock stickers. Stored inside clued.stats so it syncs.
-import { getStats, updateStats } from '../core/store.js?v=202610111239';
+import { getStats, updateStats } from '../core/store.js?v=202610111253';
 
 export const STICKERS = ['🦁', '🐼', '🦄', '🐙', '🦖', '🐸', '🦋', '🐢', '🦊', '🐧', '🐝', '🦉', '🐬', '🦒', '🐨', '🌈', '🚀', '🌟', '🍩', '🎈', '🏆', '👑', '🐳', '🦜'];
 export const STARS_PER = 10;

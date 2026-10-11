@@ -43,6 +43,14 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
 .daily-card:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
 
 .play-btn { margin: 14px 0 6px; }
+.hideable { position: relative; }
+.hide-chip {
+  position: absolute; top: -9px; right: -7px; z-index: 2; width: 30px; height: 30px; padding: 0; display: grid; place-items: center;
+  border: 2px solid var(--ink); border-radius: 50%; background: var(--card); color: var(--ink-2); box-shadow: var(--shadow-sm); cursor: pointer;
+}
+.hide-chip:hover { color: var(--ink); }
+.hide-chip:active { transform: translateY(1px); box-shadow: none; }
+.hide-chip svg { display: block; }
 .play-btn .btn { width: 100%; min-height: 76px; font-size: 32px; border-radius: 26px; }
 .play-btn .btn .wobble { display: inline-block; animation: wob 2.6s ease-in-out infinite; }
 @keyframes wob { 0%, 80%, 100% { transform: rotate(0); } 85% { transform: rotate(-10deg) scale(1.1); } 92% { transform: rotate(8deg); } }

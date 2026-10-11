@@ -1,16 +1,16 @@
 // The question runner: plays a list of questions with HUD, timer, reveal and scoring.
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
-import { getFormat } from '../formats/registry.js?v=202610111239';
-import { createTimer } from '../core/timer.js?v=202610111239';
-import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610111239';
-import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610111239';
-import { getSettings } from '../core/store.js?v=202610111239';
-import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610111239';
-import { popup, confirmPop } from '../ui/popup.js?v=202610111239';
-import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610111239';
-import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610111239';
-import { dlog, debugCheck } from '../core/debuglog.js?v=202610111239';
-import { fsButton } from '../ui/toggles.js?v=202610111239';
+import { getFormat } from '../formats/registry.js?v=202610111253';
+import { createTimer } from '../core/timer.js?v=202610111253';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610111253';
+import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610111253';
+import { getSettings } from '../core/store.js?v=202610111253';
+import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610111253';
+import { popup, confirmPop } from '../ui/popup.js?v=202610111253';
+import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610111253';
+import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610111253';
+import { dlog, debugCheck } from '../core/debuglog.js?v=202610111253';
+import { fsButton } from '../ui/toggles.js?v=202610111253';
 
 const KIND_RIGHT = ['Brilliant!', 'You got it!', 'Super!', 'Yes!', 'Amazing!'];
 const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];
