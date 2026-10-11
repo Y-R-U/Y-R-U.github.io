@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, factText, placeAnswer, collect, pick, sample, factAllowed, nested, factPhrase } from './registry.js?v=202610110402';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610110402';
-import { uniqueByName, norm, hasImg } from './fkit.js?v=202610110402';
+import { register, poolItems, pickPack, byDifficulty, imageOf, factText, placeAnswer, collect, pick, sample, factAllowed, nested, factPhrase } from './registry.js?v=202610111123';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610111123';
+import { uniqueByName, norm, hasImg } from './fkit.js?v=202610111123';
 
 const vals = v => [].concat(v).map(String);
 

@@ -80,6 +80,11 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing:
 }
 .bar-title { text-align: center; font-size: 26px; line-height: 1.1; }
 .bar-gap { width: 44px; height: 44px; }
+.bar:has(.bar-right) { grid-template-columns: 96px 1fr 96px; }
+.bar-right { display: flex; gap: 6px; justify-content: flex-end; }
+.fs-btn svg { display: block; margin: auto; }
+.fs-btn.hud-fs svg { width: 18px; height: 18px; }
+.fs-btn.hud-fs { width: 36px; height: 36px; min-height: 36px; font-size: 17px; }
 
 /* buttons */
 .btn {

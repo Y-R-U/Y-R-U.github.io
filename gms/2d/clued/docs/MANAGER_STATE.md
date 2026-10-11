@@ -146,3 +146,9 @@ Open / optional:
 - media/song-pictures + media/book-moments (113 Flux images, now hashed names) unreviewed, gitignored, no packs.
 - Landscape: result card partly covers ladder clue list / chain portraits (POLISH note).
 - Firebase authorised domains lack yru.br8t.com (Aaron to add).
+
+## 2026-10-11 · Saved sets + full-screen everywhere
+- Host screen: 💾 Save set (named; same name overwrites) / 📂 Saved sets (N) popup to load (✕ deletes). Stores rounds + answer time, gap, streak per mode in `clued.sets` (synced key). Logic in `js/net/sets.js`.
+- Room final screen: "💾 Save these rounds as a set" for everyone (host and players).
+- Full-screen toggle (SVG corners) in every top bar (`header()` right slot, beside 🚪 when present) and the game HUD; hidden where unsupported (iPhone Safari).
+- Tests: `tools/sets_e2e.mjs` (new), p2p_e2e checks the save button on the podium.

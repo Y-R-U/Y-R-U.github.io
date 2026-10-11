@@ -1,8 +1,8 @@
-import { register, collect, pick } from '../../formats/registry.js?v=202610110402';
+import { register, collect, pick } from '../../formats/registry.js?v=202610111123';
 import {
   geo, countryIds, regionMembers, REGIONS, STATE_VIEWS, createMap, frame, message, revealCard, isKids, cname, byLevel,
   stateDifficulty, REGION_CHOICES, REGION_LABELS, STATE_CHOICES, STATE_LABELS, refFor, supportsGeo, theName,
-} from './common.js?v=202610110402';
+} from './common.js?v=202610111123';
 
 const EASY_STATES = ['USA', 'CAN', 'AUS', 'BRA', 'IND', 'GBR', 'DEU', 'ITA', 'ESP', 'FRA', 'MEX', 'CHN', 'JPN'];
 

@@ -201,6 +201,7 @@ async function main() {
   const sig = s => s.players.map(p => `${p.name}:${p.score}`).join(',');
   ok(finals.every(f => sig(f) === sig(finals[0])), 'every screen shows the same final scores', finals.map(sig).join(' | '));
   await sleep(2500);
+  ok((await Promise.all(pages.map(p => p.eval('!!document.querySelector("[data-act=save-set]")')))).every(Boolean), 'every final screen offers "save these rounds as a set"');
   await host.shot('final-host-portrait.png');
   await j2.shot('final-joiner-portrait.png');
 

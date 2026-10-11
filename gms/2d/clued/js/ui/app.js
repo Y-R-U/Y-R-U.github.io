@@ -1,7 +1,8 @@
 // Screen manager: one screen at a time, a back stack, and the hardware/browser back button.
-import { h } from './kit.js?v=202610110402';
-import { closeAll } from './popup.js?v=202610110402';
-import { showBanner, reloadFresh } from './update.js?v=202610110402';
+import { h } from './kit.js?v=202610111123';
+import { closeAll } from './popup.js?v=202610111123';
+import { showBanner, reloadFresh } from './update.js?v=202610111123';
+import { fsButton } from './toggles.js?v=202610111123';
 
 // State lives on globalThis: a module loaded across a deploy can import a second copy of this file,
 // and that copy must still drive the same screens.
@@ -91,5 +92,10 @@ export function header(title, { backBtn = true, right = null } = {}) {
   return h('header.bar', {},
     backBtn ? h('button.icon-btn.back', { type: 'button', 'aria-label': 'Back', onclick: () => back() }, h('span', { html: '‹' })) : h('span.bar-gap'),
     h('h1.bar-title', {}, title),
-    right || h('span.bar-gap'));
+    barRight(right));
+}
+function barRight(right) {
+  const fs = fsButton();
+  if (!right) return fs || h('span.bar-gap');
+  return fs ? h('div.bar-right', {}, fs, right) : right;
 }

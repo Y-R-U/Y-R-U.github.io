@@ -1,13 +1,13 @@
 // Lane S entry points. Importing this module registers the screens: online, join, host, room, challenge, linkchallenge.
-import { go, current } from '../ui/app.js?v=202610110402';
-import './room.js?v=202610110402';
-import './join.js?v=202610110402';
-import './host.js?v=202610110402';   // host setup: round list + room settings
-import './p2p.js?v=202610110402';   // lane P2P: registers the device-hosted transport
-import { createChallenge as create, challengeButton } from './challenge.js?v=202610110402';
-import { cleanCode } from './util.js?v=202610110402';
-import { openLinkChallenge as openLink, linkChallengeShare, createLinkChallenge } from './linkchallenge.js?v=202610110402';
-export { registerTransport, getTransport, fallback } from './transport.js?v=202610110402';
+import { go, current } from '../ui/app.js?v=202610111123';
+import './room.js?v=202610111123';
+import './join.js?v=202610111123';
+import './host.js?v=202610111123';   // host setup: round list + room settings
+import './p2p.js?v=202610111123';   // lane P2P: registers the device-hosted transport
+import { createChallenge as create, challengeButton } from './challenge.js?v=202610111123';
+import { cleanCode } from './util.js?v=202610111123';
+import { openLinkChallenge as openLink, linkChallengeShare, createLinkChallenge } from './linkchallenge.js?v=202610111123';
+export { registerTransport, getTransport, fallback } from './transport.js?v=202610111123';
 export { createLinkChallenge };
 
 export { challengeButton };
@@ -21,7 +21,7 @@ export function createChallenge(a, b) {
   }
   return create(a);
 }
-export { API } from './api.js?v=202610110402';
+export { API } from './api.js?v=202610111123';
 
 // Boot routing: ?join=CODE and ?c=ID.
 // A's boot route calls joinRoom(code, ctx) / openChallenge(id, ctx).
@@ -47,7 +47,7 @@ export const openLinkChallenge = hash => openLink(hash || location.hash, go);
 // Results screen: "send a link challenge" (no server). Same payload shape as createChallenge(ctx, {...}).
 export async function linkChallenge(a, b) {
   const x = b || a;
-  const { suggestedName } = await import('./ident.js?v=202610110402');
+  const { suggestedName } = await import('./ident.js?v=202610111123');
   const name = (await suggestedName()) || 'Player';
   const answers = x.answers || x.result?.answers || [];
   const out = x.result ? x : { spec: x.spec, title: x.title, choice: x.choice, result: { questions: x.questions, score: x.score, answers, correct: x.correct ?? answers.filter(r => r.correct).length } };
