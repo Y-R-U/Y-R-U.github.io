@@ -39,3 +39,11 @@ Not done: Steal the Bandana / KotH / LMS / ghost fights (listed "coming soon"; `
 hooks), host migration (keyframes are complete, `applyState` rebuilds exactly), LAN→prod upload job,
 leaderboard UI, browser-side spend (the server spends with the player's own token instead).
 Deploy steps: see CLAUDE.md "Online arena".
+
+## Phase 2 (started 2026-10-13)
+- **C — multiplayer modes**: Last Man Standing (2–8, countdown at 4), Steal the Bandana, King of the Hill,
+  host migration for multi-player. Owns match.js, js/net/fight.js, js/net/wire.js, js/net/client.js,
+  server/hub.go (+ its tests).
+- **D — ghosts + leaderboards + stats UI**: ghost fights (Brain with a real player's loadout, labelled GHOST),
+  leaderboard/stats panels. Owns js/net/panel.js, ai.js, server/store.go, server/names.go, new js/net/ghost.js
+  and js/net/boards.js. Exposes `openMode(id)`-style hooks; C flips its modes from "coming soon" by calling them.
