@@ -153,3 +153,14 @@ Open / optional:
 - Full-screen toggle (SVG corners) in every top bar (`header()` right slot, beside 🚪 when present) and the game HUD; hidden where unsupported (iPhone Safari).
 - Tests: `tools/sets_e2e.mjs` (new), p2p_e2e checks the save button on the podium.
 - 2026-10-11: read-aloud 🔊 sits before the `.q-prompt` text (runner prepends it), not in the HUD. Home: eye-off chips hide the kids switch / daily card (`homeKids`, `homeDaily` settings; Settings → Home page restores). Test: `tools/hide_e2e.mjs`.
+
+## STATE @ 2026-10-12 — committed, pushed, deployed (BUILD 202610111253)
+Live on games.br8t.com + yru.br8t.com (Pages). Server unchanged since round 2; debug logging OFF. No local test servers or waiters left running.
+Shipped since round 2 (all from Aaron's requests):
+- Saved sets (host screen save/load, save from the podium) — `js/net/sets.js`, synced key `clued.sets`, max 20 per mode, same name overwrites.
+- Full-screen button in every top bar + game HUD (`fsButton()` in js/ui/toggles.js; absent on iPhone Safari).
+- 🔊 read-aloud prepended to `.q-prompt` (it was in the HUD; Aaron thought it was music).
+- Home hide chips for kids switch / daily card → Settings › Home page.
+Tests to rerun after UI changes: `node tools/a_e2e.mjs <out> portrait|landscape`, `tools/sets_e2e.mjs`, `tools/hide_e2e.mjs`, `tools/p2p_e2e.mjs` (needs :8888 server + `~/.claude/bin/cdp start --port 9401 -- --use-angle=metal`; restart cdp if ECONNREFUSED).
+Open / optional (unchanged): variety +25% needs new items; unreviewed Flux song-pictures/book-moments; landscape result card overlaps ladder/chain; Firebase authorised domains lack yru.br8t.com (Aaron).
+Untested by hand: loading a set saved from the podium into the host screen.

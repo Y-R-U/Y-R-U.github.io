@@ -11,3 +11,6 @@ Trivia + learning game. Manager-run: read `docs/MANAGER_STATE.md` first, then `d
 - C2 builders refetch Wikidata/Wiktionary and are NOT reproducible offline: patch the pack JSON and the builder source together. c1_build (cached) and c2c_build are deterministic.
 - In-game pictures: `.q-media img` is absolute + contain (the reveal shrinks the box, never crops); `.play img` has no long-press/context menu (it would show the file name).
 - Kids mode: one 💡 Help per question (runner `kidsHelpFor`/`useKidsHelp`): removes a wrong answer and shows the first letter + letter count. Never online. Kids-only question packs fall back to `mix` in mc (they have no item pictures).
+- Online saved sets: `js/net/sets.js` (`clued.sets`, synced). Host screen loads/saves; the room podium saves `st.spec.rounds` minus the `online`/`kids` opts.
+- Full screen: `fsButton()` (js/ui/toggles.js) sits in every `header()` right slot and the runner HUD. Read-aloud 🔊 is prepended to the question's `.q-prompt` by the runner, not in the HUD.
+- Home hide chips: settings `homeKids` / `homeDaily` (default true), restored in Settings › Home page.
