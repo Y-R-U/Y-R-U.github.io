@@ -108,3 +108,5 @@ Served from a `192.*` address (the family setup, like the purchase skip), the ar
 playable with no internet services: it uses an arena server running on that LAN machine,
 peers connect directly on LAN candidates (no TURN), no sign-in, no daily limit, and stats stay
 in the local server's own database. A start script launches site + arena server on the LAN.
+LAN results may later upload to the production stats under the player's account (Aaron: fine,
+low priority, whenever): the local DB keeps an optional uid + an uploaded flag per result.
