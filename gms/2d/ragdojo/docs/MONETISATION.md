@@ -1,7 +1,33 @@
 # Ragdojo monetisation — local review package
 
-Prepared 8 September 2026. **No deployment, publishing, account creation, live
-payments or spending has been performed.** Price and currency remain undecided.
+Prepared 8 September 2026; payments section revised 12 October 2026. **Payments are
+built and rehearsed in Stripe TEST mode only; nothing is deployed.**
+
+## Payments (decided 12 October 2026 — supersedes the price/tax notes below)
+
+- **Stripe account BR8T.COM** (acct_1UPc1kRFADho7PSJ), **Managed Payments**: Stripe is
+  merchant of record and collects/remits GST/VAT; the customer sees "Sold through Link"
+  (statement `LINK.COM*`). Hosted Checkout only. Prices are **tax-inclusive AUD**.
+- **RAGDOJO Supporter** (`ragdojo_supporter`): A$1.99 one-off, product tax code
+  `txcd_10201000`. Unlocks CYBER + DEITIES, forever.
+- **br8t Pass** (`br8t_pass_monthly` A$1.49/month, `br8t_pass_yearly` A$4.99/year,
+  `txcd_10201004`): everything across br8t games, including RAGDOJO's paid worlds and future
+  paid features; free online play allowance is unlimited with it.
+- The client treats **either** entitlement as owning CYBER + DEITIES. The upgrade panel
+  offers both (warm "two ways to say thanks" copy), shows Manage subscription (Stripe
+  customer portal) for Pass holders, Restore purchases, and terms/privacy links.
+- Pass lifecycle: works while active/trialing, and for 7 days of past_due while Stripe
+  retries a failed renewal; cancel = runs to period end; full refund of the latest payment
+  or an open/lost dispute removes it until the next paid renewal.
+- 14-day no-questions refund applies to the supporter payment and the **first Pass
+  payment**; renewals can be cancelled any time in the portal (or at link.com).
+- Free daily allowance API (`/api/br8t/allowance`, default 3/day for `ragdojo`) exists
+  server-side for future online battles; **not wired into the game**.
+- API: the client now calls **`/api/br8t/*`** (offer/entitlement/checkout/portal/analytics);
+  the server keeps `/api/ragdojo/*` as an alias for the build already on games.br8t.com.
+  Still graceful when the API is absent: one offer probe, "coming soon", no polling.
+- Service, endpoints, webhook list, deploy steps and the real test-mode rehearsal:
+  `~/cc/ionos/ragdojo-payments/README.md`.
 
 ## Product decision (revised 11 October 2026 — supersedes the September DARK gate)
 
@@ -20,8 +46,8 @@ deleted, while access is unavailable (signed out, refunded, offline); a parked r
 in DARK if you have a DARK run, else LIGHT (`parkPaid()` in main.js). Skill caps follow
 the same split: DARK's +5 levels are free; the +1 per later world needs the upgrade.
 
-**Payments are not live** (no price, no Stripe keys, no Firebase Admin credential). The
-client probes `GET /api/ragdojo/offer` once; if it is missing or unconfigured, CYBER and
+**Payments are not deployed** (test-mode service built; Firebase Admin credential and the
+deployed webhook endpoint still needed). The client probes `GET /api/br8t/offer` once; if it is missing or unconfigured, CYBER and
 DEITIES show "support the dev · soon", the panel says support is coming soon, checkout is
 a disabled "SUPPORT · COMING SOON" button, Restore is hidden, and no entitlement request
 is ever sent (no retry/focus polling). Off games.br8t.com (GitHub Pages, LAN, itch) there
@@ -49,13 +75,16 @@ already revokes on a full refund); progress is kept. After 14 days, help only if
 something is broken. "This doesn't affect your rights under the Australian Consumer Law."
 Because a 14-day refund is offered, no EU withdrawal-waiver checkbox is needed.
 Draft page: `terms.html` (next to `privacy.html`, linked from the upgrade panel); support
-contact support@br8t.com; **business name is a marked placeholder**. Link it in Stripe
+contact support@br8t.com; business name **BR8T.COM (trading as BR8T)**, no ABN shown.
+Updated 12 October for the Pass (cancel any time via the portal; first Pass payment also
+14-day refundable; renewals not auto-refunded; ACL line kept). Link it in Stripe
 (see the payments README: Public details + Checkout policies).
 
 ### Future plans — TODO only, not built
 
 - **Events**: some free, some paid.
-- **Online battles**: a couple of free battles per day; unlimited for owners (supporters).
+- **Online battles**: a couple of free battles per day; unlimited with the br8t Pass
+  (server allowance API exists; game not wired).
 
 ### Original September notes (DARK gate — superseded)
 
@@ -197,12 +226,12 @@ DEITIES) and the 14-day no-questions refund policy.
 
 Still open:
 
-1. **One-time price and currency.** Needed to create the Stripe test Price.
-2. **Stripe test keys:** sandbox account, API/webhook secrets, Price ID — configured
-   privately on the machine, never in chat. Then the real test-mode rehearsal.
+1. ~~Price and currency~~ (A$1.99 / A$1.49 / A$4.99, decided 2026-10-12).
+2. ~~Stripe test keys~~ (in the service's private `.env`); the **deployed webhook signing
+   secret** is created when the test endpoint is registered.
 3. **Firebase Admin credential** with `firebaseauth.users.get` for revocation checks.
-4. **Business name** (placeholder in `terms.html` and `privacy.html`).
-5. **Sales countries and tax treatment** (Stripe Tax / GST) and purchase-record retention.
+4. ~~Business name~~ (BR8T.COM; ABN to add when one exists).
+5. ~~Tax treatment~~ (Managed Payments); purchase-record retention policy still open.
 6. itch creator account/slug and listing review; no upload yet.
 7. **Approval to deploy** the game to games.br8t.com and the test service, and separately
    to publish itch. Live mode requires another explicit review: this executable rejects

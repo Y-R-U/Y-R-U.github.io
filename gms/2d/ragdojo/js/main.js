@@ -18,7 +18,7 @@ import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
 import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
-import { Purchases } from './purchases.js?v=20261011-supporter';
+import { Purchases, API } from './purchases.js?v=20261012-pass';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
 const qs = new URLSearchParams(location.search);
@@ -916,22 +916,60 @@ function applyCloud() {
 function purchaseStatus(text) { $('purchaseStatus').textContent = text; }
 const SOON = `Supporting the developer is coming soon — thank you for looking! Until then ${PAID_NAMES} stay locked, and LIGHT and DARK are free.`;
 /** One cheap probe of the purchase API; nothing else asks it anything until this says yes. */
+let offerItems = {};
 async function probePayments() {
   if (DEMO || !ACCOUNTS) return false;
   try {
-    const res = await fetch('/api/ragdojo/offer', { cache: 'no-store' });
+    const res = await fetch(API + 'offer', { cache: 'no-store' });
     const offer = res.ok ? await res.json() : null;
-    paymentsUp = !!(offer && offer.testMode && offer.product === 'ragdojo_supporter' && offer.currency && offer.amount > 0);
+    offerItems = {};
+    for (const it of (offer?.testMode && Array.isArray(offer.items) ? offer.items : []))
+      if (it && typeof it.key === 'string' && typeof it.currency === 'string' && it.amount > 0) offerItems[it.key] = it;
+    paymentsUp = Object.keys(offerItems).length > 0;
     return paymentsUp ? offer : false;
   } catch { paymentsUp = false; return false; }
+}
+function money(it) {
+  const f = new Intl.NumberFormat('en', { style: 'currency', currency: it.currency.toUpperCase() });
+  return f.format(it.amount / 10 ** f.resolvedOptions().maximumFractionDigits);
+}
+/** Buttons follow what the server sells and what this account already has. */
+function paintOffers() {
+  const sup = offerItems.ragdojo_supporter, mon = offerItems.br8t_pass_monthly, yr = offerItems.br8t_pass_yearly;
+  const signedIn = !!account?.auth.signedIn, p = purchases;
+  const passLive = !!p?.pass && !['canceled', 'incomplete_expired'].includes(p.pass.status);
+  $('btnCheckout').classList.toggle('hidden', !sup);
+  if (sup) {
+    $('btnCheckout').textContent = p?.supporter ? 'SUPPORTER ✓ THANK YOU' : `SUPPORT (TEST) · ${money(sup)}`;
+    $('btnCheckout').disabled = !signedIn || !!p?.supporter;
+    $('priceSupporter').textContent = `— ${money(sup)} once.`;
+  }
+  $('btnPass').classList.toggle('hidden', !mon && !yr);
+  $('btnPassYear').classList.toggle('hidden', !mon || !yr || !!p?.passActive);
+  const first = mon || yr;
+  if (first) {
+    $('btnPass').textContent = p?.passActive ? 'BR8T PASS ✓ ACTIVE' : `BR8T PASS (TEST) · ${money(first)}/${mon ? 'MONTH' : 'YEAR'}`;
+    $('btnPass').disabled = !signedIn || !!p?.passActive || passLive;
+    $('pricePass').textContent = mon && yr ? `— from ${money(mon)}/month, or ${money(yr)}/year.` : `— ${money(first)}/${mon ? 'month' : 'year'}.`;
+  }
+  if (yr) { $('btnPassYear').textContent = `OR ${money(yr)}/YEAR`; $('btnPassYear').disabled = !signedIn || passLive; }
+  $('btnManage').classList.toggle('hidden', !signedIn || !passLive);
+  $('btnRestore').classList.remove('hidden');
+}
+function ownedMessage() {
+  const p = purchases, end = p?.pass?.periodEnd ? new Date(p.pass.periodEnd * 1000).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  if (p?.passActive) return `Your br8t Pass is active${p.pass?.cancelAtPeriodEnd && end ? ` until ${end} (cancelled, no more charges)` : ''} — thank you! ${PAID_NAMES} open as you earn them; earned progress is kept.`;
+  if (p?.supporter) return `Thank you — your support is restored. ${PAID_NAMES} open as you earn them; earned progress is kept.`;
+  if (p?.pass?.status === 'past_due' || p?.pass?.status === 'unpaid') return 'Your br8t Pass renewal did not go through. Use Manage subscription to update your card; earned progress is kept.';
+  return 'No purchase found on this account. Sign in with the same Google or email account used at checkout.';
 }
 async function restorePurchase() {
   if (!purchases) { purchaseStatus('Use the account button to sign in on games.br8t.com.'); return; }
   if (!paymentsUp) { if (paymentsUp === false && !familyAccess.available) purchaseStatus(SOON); return; }
   try {
-    const owned = await purchases.refresh();
-    purchaseStatus(owned ? `Thank you — your support is restored. ${PAID_NAMES} open as you earn them; earned progress is kept.` : 'No purchase found on this account. Sign in with the same Google or email account used at checkout.');
-    $('btnCheckout').disabled = !!owned || !account?.auth.signedIn;
+    await purchases.refresh();
+    purchaseStatus(ownedMessage());
+    paintOffers();
     refreshHub();
   } catch (e) { purchaseStatus(e.message); }
 }
@@ -946,7 +984,7 @@ function openUpgrade(forWorld = null) {
   $('btnFamilySkip').classList.toggle('hidden', !familyAccess.available);
   $('btnFamilySkip').disabled = familyAccess.active;
   $('btnFamilySkip').textContent = familyAccess.active ? 'FAMILY ACCESS ENABLED' : 'Skip payment — I’m a family member';
-  $('btnRestore').classList.add('hidden');
+  for (const id of ['btnRestore', 'btnManage', 'btnPass', 'btnPassYear']) $(id).classList.add('hidden');
   $('btnCheckout').classList.toggle('hidden', DEMO || !ACCOUNTS);
   $('btnCheckout').textContent = 'SUPPORT · COMING SOON';
   $('btnCheckout').disabled = true;
@@ -959,11 +997,8 @@ function openUpgrade(forWorld = null) {
   void probePayments().then(async offer => {
     if (!$('premium').classList.contains('show')) return;
     if (!offer) { if (!familyAccess.available) purchaseStatus(SOON); return; }
-    const digits = new Intl.NumberFormat('en', { style: 'currency', currency: offer.currency }).resolvedOptions().maximumFractionDigits;
-    $('btnCheckout').textContent = 'SUPPORT (TEST) · ' + new Intl.NumberFormat('en', { style: 'currency', currency: offer.currency }).format(offer.amount / 10 ** digits);
-    $('btnCheckout').disabled = !account?.auth.signedIn || !!purchases?.owned;
-    $('btnRestore').classList.remove('hidden');
-    if (!familyAccess.available) purchaseStatus('Test checkout only. Sign in using the account button before buying or restoring.');
+    paintOffers();
+    if (!familyAccess.available) purchaseStatus('Test mode: no real money moves. Sign in using the account button (Google or email) before supporting, subscribing or restoring.');
     if (account?.auth.signedIn) await restorePurchase();
   });
 }
@@ -980,11 +1015,21 @@ $('btnFamilySkip').onclick = () => {
   }
 };
 $('premiumHome').href = HOME + '?from=itch';
-$('btnRestore').onclick = restorePurchase;
-$('btnCheckout').onclick = async () => {
-  $('btnCheckout').disabled = true;
-  try { location.assign(await purchases.checkout({ visitor: visitor(), source })); }
-  catch (e) { purchaseStatus(e.message); $('btnCheckout').disabled = !account?.auth.signedIn; }
+$('btnRestore').onclick = () => { click(); void restorePurchase(); };
+const buy = (btn, product) => async () => {
+  click();
+  btn.disabled = true;
+  try { location.assign(await purchases.checkout(typeof product === 'function' ? product() : product, { visitor: visitor(), source })); }
+  catch (e) { purchaseStatus(e.message); paintOffers(); }
+};
+$('btnCheckout').onclick = buy($('btnCheckout'), 'ragdojo_supporter');
+$('btnPass').onclick = buy($('btnPass'), () => offerItems.br8t_pass_monthly ? 'br8t_pass_monthly' : 'br8t_pass_yearly');
+$('btnPassYear').onclick = buy($('btnPassYear'), 'br8t_pass_yearly');
+$('btnManage').onclick = async () => {
+  click();
+  $('btnManage').disabled = true;
+  try { location.assign(await purchases.portal()); }
+  catch (e) { purchaseStatus(e.message); $('btnManage').disabled = false; }
 };
 
 /**

@@ -264,6 +264,12 @@ html, body {
 .corner.tr, #pauseBtn { right: calc(max(10px, env(safe-area-inset-right)) + var(--br8t-account-space, 0px)); }
 #premium p { margin: 8px 0; }
 #premium .rows { font-size: 19px; }
+#premium .offer { margin: 6px 0; padding: 6px 10px; border: 1.5px dashed var(--ink-soft); border-radius: 10px 7px 11px 6px; text-align: left; font-size: .9em; }
+#premium .vicbtns { gap: 8px; }
+#premium .vicbtns .btn { font-size: 18px; padding: 5px 13px; }
+#premium .vicbtns .btn.small { font-size: 15px; padding: 4px 11px; }
+#premium .vicbtns + .vicbtns { margin-top: 6px; }
+@media (max-height: 470px), (orientation: portrait) and (max-width: 860px) { #premium .vicbtns .btn { font-size: 15px; padding: 4px 10px; } #premium .vicbtns .btn.small { font-size: 13px; } }
 #cloudChoice { max-height: 160px; overflow: auto; }
 
 /* The app rotates in portrait, so panel bounds must follow its actual dimensions. */

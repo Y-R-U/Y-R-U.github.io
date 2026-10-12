@@ -15,7 +15,7 @@ export function visitor() {
 export const source = new URLSearchParams(location.search).get('from') === 'itch' ? 'itch' : 'direct';
 export function track(event, save, outcome = '') {
   const id = visitor(); if (!id) return;
-  void fetch('/api/ragdojo/analytics', {
+  void fetch('/api/br8t/analytics', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true,
     body: JSON.stringify({ id: crypto.randomUUID(), visitor: id, event, theme: save.theme, level: Math.min(44, Math.max(0, save.bully ? save.bullyLevel : save.level)), outcome, source }),
   }).catch(() => {});

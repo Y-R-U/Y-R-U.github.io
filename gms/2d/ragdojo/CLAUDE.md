@@ -383,28 +383,33 @@ Fourteen Suno v5.5 instrumental tracks in `assets/audio/`, wired through `js/mus
 See `docs/MUSIC.md` for the prompts and the regeneration recipe. Missing files are tolerated —
 `audio.js` stays silent for any id whose mp3 is absent, so the game runs fine without them.
 
-## Monetisation (model revised 2026-10-11; payments NOT live)
+## Monetisation (model 2026-10-11, payments 2026-10-12; TEST mode, NOT deployed)
 
 Read `docs/MONETISATION.md` and `docs/VERIFICATION.md` before payment/release work.
 
 - **LIGHT and DARK are free.** DARK shows a dismissible "support the developer" note in the
   hub (`#nudge`, `maybeNudge()`): on entering DARK or returning to the hub after a DARK
   win, at most once per 48 h (`ragdojo.nudge.v1`), never mid-fight, never for supporters.
-- **CYBER and DEITIES are paid** ("Support the developer", one-time, product
-  `ragdojo_supporter`): `PAID_WORLDS` / `isPaid` / `worldOpen` / `parkPaid()` in main.js.
+- **CYBER and DEITIES are paid**, opened by EITHER entitlement: `ragdojo_supporter`
+  (A$1.99 one-off, "Support the developer") or an active `br8t_pass` (A$1.49/mo or
+  A$4.99/yr, everything on br8t). `js/purchases.js` reads `entitlements` from the server
+  (never the legacy `owned` flag); `paintOffers()` / `ownedMessage()` in main.js drive the
+  panel (Support, Pass, Or yearly, Manage subscription → Stripe portal, Restore). Gating: `PAID_WORLDS` / `isPaid` / `worldOpen` / `parkPaid()` in main.js.
   World prerequisites still apply. Unpaid paid-world runs are parked (to DARK if you have a
   DARK run, else LIGHT), never deleted. `perkMax`/`moveMaxLv(..., premium)`: DARK's +5 levels
   are free; each paid world's +1 needs `premium`.
-- The purchase API is probed once (`probePayments()` → `/api/ragdojo/offer`). Unavailable =
+- The purchase API is probed once (`probePayments()` → `/api/br8t/offer`; server keeps
+  `/api/ragdojo/*` as an alias). Unavailable =
   "coming soon" copy, disabled checkout, hidden Restore, **no entitlement requests**. Only
   games.br8t.com (or localhost under /gms/2d/ragdojo/) talks to accounts/payments at all.
 - `192.*` family skip stands in for the purchase; it walks into the world it was opened from.
-- Refunds: 14 days, no questions; draft `terms.html` (business name placeholder).
+- Refunds: 14 days, no questions (also the first Pass payment); `terms.html` names BR8T.COM.
 - Release builds (`npm ci && npm run build`, `dist/` gitignored) minify, drop dev hooks;
   itch now ships DARK (and its music) too. Never store entitlement flags in a save.
-- Payment service: `~/cc/ionos/ragdojo-payments` (own local git, no remote; outside the site repo).
+- Payment service: `~/cc/ionos/ragdojo-payments` (br8t-payments; own local git, no remote;
+  Stripe Managed Payments; read its README).
 - Gates for the model: `releasegate`, `accountgate`, `familygate` (built output), plus
   `darkgate` for free-DARK skill caps. Localhost source is DEV: everything is open there.
 
-Do not deploy/publish or enable live payments without Aaron's approval. No price yet.
+Do not deploy/publish or enable live payments without Aaron's approval.
 Aaron confirmed commercial-use rights for the Suno soundtrack.

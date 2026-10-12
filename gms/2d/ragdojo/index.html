@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20261011-supporter">
+<link rel="stylesheet" href="css/style.css?v=20261012-pass">
 </head>
 <body>
 <div id="app">
@@ -68,13 +68,16 @@
         <button class="icon close" id="btnPremiumClose" aria-label="Close upgrade">✕</button>
         <h2>SUPPORT THE DEV</h2>
         <div class="rows">
-          <p>LIGHT and DARK are free — 90 fights, both move sets, BULLY and THUG replays. RAGDOJO is made by one developer; if you enjoy it, a one-time thank-you keeps it going. As thanks, it opens the two worlds beyond: CYBER and DEITIES, with their moves, music and deeper training.</p>
-          <p>Supporting does not skip the climb: win a THUG run to open CYBER, then a SIMULANT run for DEITIES. Earned progress there is always kept.</p>
+          <p>LIGHT and DARK are free. RAGDOJO is made by one developer — if you enjoy it, either way of saying thanks opens the worlds beyond: CYBER and DEITIES, with their moves, music and deeper training.</p>
+          <div class="offer"><b>Support the developer</b> <span id="priceSupporter">— a one-time thank-you.</span> Opens CYBER + DEITIES in RAGDOJO, yours to keep.</div>
+          <div class="offer"><b>br8t Pass</b> <span id="pricePass">— monthly or yearly.</span> Everything across br8t games, RAGDOJO's worlds included, plus whatever comes next. Cancel any time.</div>
+          <p>Neither skips the climb: win THUG for CYBER, then SIMULANT for DEITIES. Earned progress is always kept.</p>
           <p id="purchaseStatus" role="status"></p>
           <a id="premiumHome" class="btn hidden" href="https://games.br8t.com/gms/2d/ragdojo/?from=itch" target="_blank" rel="noopener">PLAY ON GAMES.BR8T.COM</a>
-          <p class="fine">Tied to your signed-in br8t account. Changed your mind? Full refund within 14 days, no questions asked (it closes CYBER and DEITIES again; progress is kept). No subscription. No ads. <a href="terms.html" target="_blank" rel="noopener">Terms &amp; refunds</a> · <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>
+          <p class="fine">Tied to your signed-in br8t account. Prices include GST/VAT where it applies; Stripe's Link handles the payment and the tax. Changed your mind? Full refund within 14 days, no questions asked — the first Pass payment too (a refund closes CYBER and DEITIES again; progress is kept). Cancel the Pass any time under Manage subscription; it runs to the end of the period you paid for. No ads. <a href="terms.html" target="_blank" rel="noopener">Terms &amp; refunds</a> · <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>
         </div>
-        <div class="vicbtns"><button id="btnCheckout" class="btn" disabled>SUPPORT · COMING SOON</button><button id="btnRestore" class="btn hidden">RESTORE PURCHASE</button></div>
+        <div class="vicbtns"><button id="btnCheckout" class="btn" disabled>SUPPORT · COMING SOON</button><button id="btnPass" class="btn hidden">BR8T PASS</button><button id="btnPassYear" class="btn small hidden">OR YEARLY</button></div>
+        <div class="vicbtns"><button id="btnManage" class="btn small hidden">MANAGE SUBSCRIPTION</button><button id="btnRestore" class="btn small hidden">RESTORE PURCHASES</button></div>
         <div class="vicbtns"><button id="btnFamilySkip" class="btn hidden">Skip payment — I’m a family member</button></div>
       </div>
     </div>
@@ -212,6 +215,6 @@
   }, 12000);
 })();
 </script>
-<script type="module" src="js/main.js?v=20261011-supporter"></script>
+<script type="module" src="js/main.js?v=20261012-pass"></script>
 </body>
 </html>

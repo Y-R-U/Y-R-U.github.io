@@ -1,5 +1,5 @@
 // Browser integration against explicit local service fixtures. No real users or payments.
-// DARK is free; the supporter entitlement opens CYBER/DEITIES; a missing purchase API is calm.
+// DARK is free; either entitlement (supporter or br8t Pass) opens CYBER/DEITIES; a missing purchase API is calm.
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -7,8 +7,8 @@ import { join } from 'node:path';
 import { CDP, ROOT } from './cdp.mjs';
 import { DEFAULT } from '../js/save.js';
 const saves = new Map([['alice', { revision: 'cloud-alice', owner: 'alice', save: { ...DEFAULT(), level: 10, wins: 10, everWon: true, completed: true, darkUnlocked: true, thugWon: true, stash: { dark: { level: 5, wins: 5 } } } }]]);
-let owned = true, cloudFail = false, apiDown = true;
-const hits = { offer: 0, entitlement: 0 };
+let owned = true, passOwned = false, cloudFail = false, apiDown = true;
+const hits = { offer: 0, entitlement: 0, portal: 0 };
 const authModule = `const listeners=new Set();let uid=localStorage.getItem('fixture_uid');export const auth={get user(){return uid?{uid,anon:false}:null},get signedIn(){return !!uid},ready:async()=>auth.user,getIdToken:async()=>uid,onChange(fn){listeners.add(fn);fn(auth.user);return()=>listeners.delete(fn)}};export function setUser(value){uid=value;if(uid)localStorage.setItem('fixture_uid',uid);else localStorage.removeItem('fixture_uid');for(const fn of listeners)fn(auth.user)}`;
 const cloudModule = `export const cloud={game(){return {async loadForUser(uid){const r=await fetch('/fixture/save?uid='+uid);if(!r.ok)throw Error('offline');return r.json()},async saveForUser(uid,data,revision){const r=await fetch('/fixture/save?uid='+uid,{method:'POST',body:JSON.stringify({data,revision})});if(!r.ok)throw Error('conflict')}}}}`;
 const uiModule = `import {setUser} from './auth.js';export function mountAccount(){const b=document.createElement('button');b.id='fixtureLogin';b.textContent='Fixture sign in';b.onclick=()=>setUser('alice');document.body.append(b)};export function matchCompleted(){}`;
@@ -22,8 +22,8 @@ const srv = createServer(async (req,res) => {
     if(req.method==='POST') {let body='';for await(const c of req)body+=c;const {data,revision}=JSON.parse(body);if((saves.get(uid)?.revision||null)!==revision){json(409,{});return}saves.set(uid,data);json(200,{});return}
     json(200,saves.get(uid)||null);return;
   }
-  if(url.pathname==='/api/ragdojo/entitlement'){hits.entitlement++;if(apiDown){json(503,{error:'upgrade is not configured yet'});return}json(200,{product:'ragdojo_supporter',owned:req.headers.authorization==='Bearer alice'&&owned,testMode:true});return}
-  if(url.pathname==='/api/ragdojo/offer'){hits.offer++;if(apiDown){json(503,{error:'upgrade is not configured yet'});return}json(200,{product:'ragdojo_supporter',testMode:true,currency:'aud',amount:500});return}
+  if(url.pathname==='/api/br8t/entitlement'){hits.entitlement++;if(apiDown){json(503,{error:'upgrade is not configured yet'});return}const alice=req.headers.authorization==='Bearer alice';json(200,{testMode:true,product:'ragdojo_supporter',owned:alice&&(owned||passOwned),entitlements:{ragdojo_supporter:alice&&owned,br8t_pass:alice&&passOwned},pass:alice&&passOwned?{active:true,status:'active',interval:'month',periodEnd:1800000000,cancelAtPeriodEnd:false,manage:true}:null});return}
+  if(url.pathname==='/api/br8t/offer'){hits.offer++;if(apiDown){json(503,{error:'upgrade is not configured yet'});return}json(200,{testMode:true,product:'ragdojo_supporter',currency:'aud',amount:199,items:[{key:'ragdojo_supporter',currency:'aud',amount:199},{key:'br8t_pass_monthly',currency:'aud',amount:149,interval:'month'},{key:'br8t_pass_yearly',currency:'aud',amount:499,interval:'year'}]});return}
   const modules={'/lib/auth/auth.js':authModule,'/lib/auth/cloud.js':cloudModule,'/lib/auth/ui.js':uiModule};
   if(modules[url.pathname]){res.writeHead(200,{'content-type':'text/javascript'});res.end(modules[url.pathname]);return}
   try {const p=url.pathname.startsWith(prefix)?url.pathname.slice(prefix.length):'missing';const data=await readFile(join(ROOT,'dist/home',p||'index.html'));const ext=p.split('.').pop();res.writeHead(200,{'content-type':({js:'text/javascript',html:'text/html',css:'text/css',mp3:'audio/mpeg',ttf:'font/ttf'})[ext]||(p?'application/octet-stream':'text/html')});res.end(data)}catch{res.writeHead(404);res.end()}
@@ -73,10 +73,24 @@ try {
  assert.ok(await c.waitFor("!document.getElementById('app').classList.contains('cyborg')"),'refund parks CYBER safely');
  assert.ok(await appIs('dark'),'into free DARK');
  assert.ok(await c.eval("JSON.parse(localStorage.getItem('ragdojo.save.v2')).thugWon"),'refund keeps earned progression');
+ assert.ok(await c.eval("document.getElementById('btnManage').classList.contains('hidden')"),'no Manage subscription without a Pass');
+ assert.ok(await c.eval("document.getElementById('btnPass').textContent.includes('A$1.49/MONTH') && document.getElementById('btnPassYear').textContent.includes('A$4.99/YEAR') && document.getElementById('btnCheckout').textContent.includes('A$1.99')"),await c.eval("[...document.querySelectorAll('#premium button')].map(b=>b.textContent).join(' | ')"));
+ assert.ok(await c.eval("document.querySelector('#premium a[href=\"terms.html\"]') && document.querySelector('#premium a[href=\"privacy.html\"]')"),'terms and privacy linked');
+ passOwned=true;
+ await c.eval("document.getElementById('btnRestore').click()");
+ assert.ok(await c.waitFor("document.getElementById('purchaseStatus').textContent.includes('br8t Pass is active')"),await c.eval("document.getElementById('purchaseStatus').textContent"));
+ assert.ok(await c.eval("!document.getElementById('btnManage').classList.contains('hidden') && document.getElementById('btnPass').disabled && document.getElementById('btnPassYear').classList.contains('hidden') && !document.getElementById('btnCheckout').disabled"),'Pass holder: Manage shown, no second Pass, supporting still possible');
+ await c.eval("document.getElementById('btnPremiumClose').click()");
+ await world('cyborg');
+ assert.ok(await c.waitFor("document.getElementById('app').classList.contains('cyborg')"),'a br8t Pass opens CYBER');
+ passOwned=false;
+ await c.eval("document.getElementById('btnUpgrade').click();document.getElementById('btnRestore').click()");
+ assert.ok(await c.waitFor("!document.getElementById('app').classList.contains('cyborg')"),'a lapsed Pass parks CYBER');
+ await c.eval("document.getElementById('btnPremiumClose').click()");
  await c.eval("import('/lib/auth/auth.js').then(m => m.setUser('bob'))");
  assert.ok(await c.waitFor("!document.getElementById('cloudChoice').classList.contains('hidden')"),'switching to another account requires save choice');
  assert.equal(saves.has('bob'),false,'previous account save not automatically copied');
  const before=navigations;await new Promise(r=>setTimeout(r,12000));assert.equal(navigations,before,'no signed-in reload loop');
  assert.equal(c.errors.length,0,c.errors.join('\n'));assert.equal(second.errors.length,0,second.errors.join('\n'));
- console.log(`PASS home account fixtures: free DARK; purchase API down = calm 'coming soon', ${downPolls} entitlement polls / ${downProbes} offer probes while down; restore opens CYBER; two profiles restore saves + purchase; refund parks CYBER; account-switch choice; 12-second reload guard; no runtime errors`);
+ console.log(`PASS home account fixtures: free DARK; purchase API down = calm 'coming soon', ${downPolls} entitlement polls / ${downProbes} offer probes while down; restore opens CYBER; two profiles restore saves + purchase; refund parks CYBER; Pass opens CYBER + Manage, lapse parks it; account-switch choice; 12-second reload guard; no runtime errors`);
 } finally {c.close();second?.close();srv.close();}
