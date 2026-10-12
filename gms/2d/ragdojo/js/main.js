@@ -18,10 +18,10 @@ import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
 import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
-import { Purchases, API } from './purchases.js?v=20261013-f2';
+import { Purchases, API, ownerPollNext } from './purchases.js?v=20261013-f4';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
-import { mountArena } from './net/panel.js?v=20261013-f2';
+import { mountArena } from './net/panel.js?v=20261013-f4';
 import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261013-events';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
@@ -198,7 +198,9 @@ function startDemo() {
   match = new Match({
     level, demo: true,
     save: { perks: { hp: 3, atk: 3, spd: 2, armor: 2 }, moves: {}, theme: S.theme, carryDark: S.carryDark },
-    onEnd: () => { if (mode === 'hub') setTimeout(startDemo, 700); },
+    // Checked again when it fires: an online fight may have started in the meantime (a master
+    // whose match the demo replaced froze the whole room).
+    onEnd: () => { if (mode === 'hub') setTimeout(() => { if (mode === 'hub') startDemo(); }, 700); },
   });
 }
 
@@ -1159,11 +1161,12 @@ if (ACCOUNTS && !DEV) {
       }, 2500);
     } else if (qs.get('checkout') === 'cancel') { openUpgrade(); purchaseStatus('Checkout cancelled. Your progress is unchanged.'); }
     addEventListener('focus', () => { void restorePurchase(); });
-    // Owners are re-checked every 2 minutes; a failed check retries sooner (15 s, doubling).
-    let pollMs = 120000;
+    // Owners are re-checked every 2 minutes; a failed check retries sooner (ownerPollNext).
+    let pollMs = 120000, failing = false;
     const poll = () => setTimeout(async () => {
       const ok = (purchases.owned || purchases.unknown) ? await restorePurchase() : true;
-      pollMs = ok ? 120000 : Math.min(120000, pollMs >= 120000 ? 15000 : pollMs * 2);
+      pollMs = ownerPollNext(pollMs, ok, failing);
+      failing = !ok;
       poll();
     }, pollMs);
     poll();

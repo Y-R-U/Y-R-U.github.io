@@ -6,6 +6,11 @@ const CHECKOUT_ORIGIN = 'https://checkout.stripe.com';
 const PORTAL_ORIGIN = 'https://billing.stripe.com';
 export const PRODUCTS = ['ragdojo_supporter', 'br8t_pass_monthly', 'br8t_pass_yearly'];
 
+/** The owner re-check: 2 minutes; after a failure 15 s, doubling, and it settles back at 2 minutes. */
+export function ownerPollNext(ms, ok, failing) {
+  return ok ? 120000 : failing ? Math.min(120000, ms * 2) : 15000;
+}
+
 export class Purchases {
   constructor(auth, request = fetch, changed = () => {}) { this.auth = auth; this.request = (...args) => request(...args); this.changed = changed; this.reset(); this.generation = 0; this.uid = null; }
   reset() { this.owned = false; this.supporter = false; this.passActive = false; this.pass = null; }

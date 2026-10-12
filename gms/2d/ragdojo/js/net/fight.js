@@ -465,9 +465,14 @@ export class NetFight {
 
   /** A resumed socket hears this round's go again: keep the fight, catch up on master and leavers. */
   resync(g) {
+    this.suspended = false;
     (g.out || []).forEach((o, i) => { if (o) this.onOut(i); });
     if (g.master !== this.masterSlot) this.migrate(g.master);
   }
+
+  /** A room master whose tab was hidden: the server has handed the room on. Step nothing until
+   * the resumed socket's go says who runs it now (us, as a guest, in all likelihood). */
+  suspend() { if (this.mode !== 'duel' && this.isMaster) this.suspended = true; }
 
   /** The server: this seat left (or never came back). Its fighter is out for good. */
   onOut(slot) {
@@ -491,6 +496,7 @@ export class NetFight {
     this.m.migrations++;
     if (this.isMaster && !was) this.takeOver();
     else if (!this.isMaster) {
+      if (was) this.unrecord();
       // A new clock to sync to, and a new body of truth for our own fighter. The feel numbers
       // restart too; the hand-over gap is measured on its own.
       this.gapFrom = this.buf.length ? this.buf[this.buf.length - 1].recv : performance.now();
@@ -561,6 +567,7 @@ export class NetFight {
       inp = botInput(mp, mp.player, mp.time, this.bot);
       inp.acts = inp.acts.map((a) => (a === W.ACT.SPECIAL ? W.ACT.SPECIAL + (Math.random() < 0.5 ? 0 : 1) : a));
     }
+    if (this.suspended) return;
     if (this.isMaster) this.stepMaster(dt, now, inp);
     else this.stepGuest(dt, now, inp);
     this.client.pingLinks(now, 500);
@@ -601,11 +608,15 @@ export class NetFight {
     if (this.rec) return;
     const rec = this.rec = [];
     const fx = this.match.fx;
+    this.fxOrig = {};
     for (const k of ['burst', 'shakeBy', 'stop', 'spawn', 'text', 'mark', 'scuff']) {
+      const own = Object.prototype.hasOwnProperty.call(fx, k) ? fx[k] : undefined;
+      this.fxOrig[k] = own;
       const orig = fx[k].bind(fx);
       fx[k] = (...a) => { rec.push(['fx', k, ...a]); return orig(...a); };
     }
     const say = this.match.say.bind(this.match);
+    this.sayOrig = Object.prototype.hasOwnProperty.call(this.match, 'say') ? this.match.say : undefined;
     this.match.say = (t, s) => { rec.push(['say', t, s]); say(t, s); };
     this.sfxOrig = {};
     for (const k of Object.keys(sfx)) {
@@ -613,6 +624,16 @@ export class NetFight {
       const orig = this.sfxOrig[k] = sfx[k];
       sfx[k] = (...a) => { if (!this.dead) rec.push(['sfx', k, ...a]); return orig.apply(sfx, a); };
     }
+  }
+
+  /** Demoted to guest (a hand-over while we were hidden or stalled): stop recording for broadcast. */
+  unrecord() {
+    if (!this.rec) return;
+    const fx = this.match.fx;
+    for (const [k, v] of Object.entries(this.fxOrig || {})) { if (v === undefined) delete fx[k]; else fx[k] = v; }
+    if (this.sayOrig === undefined) delete this.match.say; else this.match.say = this.sayOrig;
+    if (this.sfxOrig) Object.assign(sfx, this.sfxOrig);
+    this.rec = null; this.sfxOrig = null;
   }
 
   stepMaster(dt, now, inp) {
@@ -957,11 +978,19 @@ export class NetFight {
       const t = f.respawnT > 0 ? `back in ${Math.ceil(f.respawnT)}…` : mp.modeId === 'lms' ? 'you are out — watching to the end' : '';
       if (t) handText(ctx, t, vw / 2, vh * 0.3, 30, '#c0392b', 'center');
     }
-    // 10 s of our own stall reports: the server counts a QUIT as the master's forfeit, not ours.
-    const n = this.awayNote || (this.masterQuiet ? (this.mode !== 'duel' ? 'the host stopped answering — handing over…'
-      : this.masterQuiet >= 10000 + STALL_MS ? 'their game stopped answering — QUIT now counts as their forfeit' : 'their game stopped answering — waiting…')
-      : this.stalled ? 'connection stalled…' : '');
+    const n = this.hudNote();
     if (n) handText(ctx, n, vw / 2, vh * 0.5, 26, '#c0392b', 'center');
+  }
+
+  // 10 s of our own stall reports: a QUIT is the master's forfeit if the server also stopped
+  // hearing it (serverSilent, from its reply), otherwise no result for either of us.
+  hudNote() {
+    const q = this.masterQuiet;
+    if (q >= 10000 + STALL_MS && this.mode === 'duel') {
+      return this.serverSilent ? 'their game stopped answering — QUIT now counts as their forfeit' : 'no picture from their game — QUIT ends it with no result';
+    }
+    return this.awayNote || (this.suspended ? 'reconnecting…' : q ? (this.mode !== 'duel' ? 'the host stopped answering — handing over…' : 'their game stopped answering — waiting…')
+      : this.stalled ? 'connection stalled…' : '');
   }
 
   stats() {

@@ -192,6 +192,7 @@ export function mountArena(h) {
       fight?.onOut(m.slot);
     });
     c.on('master', (m) => { if (fight) { fight.migrate(m.master, m.gone); fight.awayNote = ''; } });
+    c.on('stall', (m) => { if (fight && m.match === fight.matchId) fight.serverSilent = !!m.silent; });
     c.on('result', (r) => {
       result = r; matchId = r.match; wantRematch = oppRematch = false;
       r.eventPts = arenaBattle(r);
@@ -519,7 +520,8 @@ export function mountArena(h) {
   // Running the fight and sent to the background: hang up so the others are not left frozen.
   document.addEventListener('visibilitychange', () => {
     if (!client) return;
-    if (document.hidden) { if (fight?.isMaster) client.hide(); } else client.show();
+    // A room hands the master role on and keeps the seat: back inside the grace, we resume as a guest.
+    if (document.hidden) { if (fight?.isMaster) { fight.suspend(); client.hide(); } } else client.show();
   });
 
   btn?.addEventListener('click', () => {

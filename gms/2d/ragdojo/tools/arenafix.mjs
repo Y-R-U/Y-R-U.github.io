@@ -6,8 +6,11 @@
  *             panel never pops over the campaign fight that follows, whatever the other side does (M2)
  *   hidden    a 1v1 master whose tab goes to the background hangs up at once: the guest hears
  *             `away` within ~2 s instead of waiting out the pings, and wins if it never comes back (H1)
- *   roomhide  a room master sent to the background is handed over within ~3 s (H1)
- *   stall     a master that freezes WITHOUT a visibility change (rAF stopped): the guest tells the server (H1)
+ *   roomhide  a room master sent to the background is handed over within ~3 s (H1), and when the tab
+ *             comes back it plays on as a guest instead of being out (R4)
+ *   stall     a master that freezes WITHOUT a visibility change (rAF stopped): the guest tells the server (H1);
+ *             a QUIT is the master's forfeit only if the server stopped hearing it too (JS paused),
+ *             otherwise a void (R4: a forged stall used to steal the win)
  *   pause     PAUSE pauses practice vs bots (it is offline); an online round never pauses
  *
  *   node tools/arenafix.mjs [--only=return,hidden,...]
@@ -37,7 +40,9 @@ if (args.falsify) {
       "setTimeout(() => { const had = true; stopFight(); view = 'result'; if (had) open(); else closeIdle();", 'a result after QUIT pops the panel'],
     ['return', 'js/net/panel.js', '    if (client && !fight) { client.unwait(); client.leave(); client.lobby(false); closeIdle(); view = \'home\'; }',
       '    if (client && !fight && view !== \'result\') { client.unwait(); client.leave(); client.lobby(false); view = \'home\'; }', 'the X keeps the line open'],
-    ['hidden', 'js/net/panel.js', "if (document.hidden) { if (fight?.isMaster) client.hide(); }", 'if (false) {}', 'a hidden master stays on the line'],
+    ['hidden', 'js/net/panel.js', "if (document.hidden) { if (fight?.isMaster) { fight.suspend(); client.hide(); } }", 'if (false) {}', 'a hidden master stays on the line'],
+    ['roomhide', 'js/net/fight.js', '    this.suspended = false;\n', '', 'the returning master never resumes'],
+    ['stall', 'js/net/panel.js', "    c.on('stall', (m) => { if (fight && m.match === fight.matchId) fight.serverSilent = !!m.silent; });\n", '', 'the guest never hears whether the server agrees'],
     ['roomhide', 'js/net/client.js', '    this.ws.close(4001);', '', 'hide() does not hang up'],
     ['stall', 'js/net/fight.js', '    if (!this.isMaster) this.watchMaster(now);\n', '', 'guests never report a quiet master'],
     ['pause', 'js/main.js', 'if (match.net.client || !paused) match.net.step', 'match.net.step', 'practice runs on under PAUSE'],
@@ -206,6 +211,13 @@ if (only.includes('roomhide')) {
     const a = await c.eval('window.__net.m.snaps'); await sleep(1500); return (await c.eval('window.__net.m.snaps')) - a > 20;
   }));
   ok('roomhide: and the fight flows again from the new master', flowing.every(Boolean));
+  // The tab comes back inside the grace: it resumes as a guest, still in the room.
+  await M.eval(`(()=>{ Object.defineProperty(document,'hidden',{configurable:true,get:()=>false}); Object.defineProperty(document,'visibilityState',{configurable:true,get:()=>'visible'});
+    window.requestAnimationFrame = window.__raf; const cb = window.__held; window.__held = null; document.dispatchEvent(new Event('visibilitychange')); if (cb) requestAnimationFrame(cb); })()`);
+  const rejoined = await M.waitFor(`window.__net && !window.__net.isMaster && !window.__net.suspended && window.__net.m.snaps > 20`, 8000, 200);
+  const mst = await M.eval(`({master: window.__net?.isMaster, suspended: window.__net?.suspended, snaps: window.__net?.m.snaps, out: (window.__heard||[]).some(h=>h.t==='out' && h.you)})`);
+  ok('roomhide: the old master comes back as a guest, still in, and draws the new master\'s fight', rejoined && !mst.out, JSON.stringify(mst));
+  ok('roomhide: zero console errors on the returning master', !M.errors.length, M.errors.slice(0, 2).join(' / '));
   // A room QUIT, straight into the campaign: the server's "you are out" must not pop the panel.
   const Q = guests[0];
   await click(Q, '#btnPause'); await click(Q, '#btnQuit');
@@ -234,16 +246,31 @@ if (only.includes('stall')) {
   await M.eval(`(()=>{ window.requestAnimationFrame = window.__raf; const cb = window.__held; window.__held = null; if (cb) requestAnimationFrame(cb); })()`);
   const cleared = await G.waitFor(`window.__wsSent.some(s=>/"t":"stall"/.test(s) && JSON.parse(s).ms === 0)`, 6000, 100);
   ok('stall: ms 0 when the master is back', cleared);
-  // Frozen for good: after 10 s of reports a QUIT is the master's forfeit, and the HUD says so.
+  // No picture for good, but the master's socket still answers: the server cannot tell that from a
+  // lie, so a QUIT after 13 s is a void, and the HUD says so.
   await M.eval(FREEZE);
-  const told = await G.waitFor(`/QUIT now counts as their forfeit/.test(window.__net && window.__net.masterQuiet >= 13000 ? 'QUIT now counts as their forfeit' : '')`, 20000, 250);
-  ok('stall: after 13 s quiet the guest is told quitting is not its loss', told);
-  const gslot = await G.eval('window.__net.you');
+  const told = await G.waitFor(`window.__net && window.__net.masterQuiet >= 13000 && /QUIT ends it with no result/.test(window.__net.hudNote())`, 20000, 250);
+  ok('stall: socket alive, after 13 s the guest is told a QUIT ends it with no result', told, await G.eval('window.__net && window.__net.hudNote()'));
   await click(G, '#btnPause'); await click(G, '#btnQuit');
-  const res = await G.waitFor(`(window.__heard||[]).some(h=>h.t==='result')`, 8000, 200);
-  const r = await G.eval(`(window.__heard||[]).find(h=>h.t==='result') || null`);
-  ok('stall: and the server records it as the frozen master\'s forfeit', res && r.winner === gslot && r.forfeit && r.why === 'stall' && r.by !== gslot, JSON.stringify(r && { winner: r.winner, by: r.by, why: r.why }));
+  const vd = await G.waitFor(`(window.__heard||[]).some(h=>h.t==='void' || h.t==='result')`, 8000, 200);
+  const v = await G.eval(`(window.__heard||[]).find(h=>h.t==='void' || h.t==='result') || null`);
+  ok('stall: and the server voids it (no forfeit for either side)', vd && v.t === 'void' && v.why === 'stall', JSON.stringify(v));
   ok('stall: zero console errors on the guest', !G.errors.length, G.errors.slice(0, 2).join(' / '));
+  await close();
+  // Really frozen: the master's JS stops (pongs too). After 13 s a QUIT is the master's forfeit.
+  const [M2, G2] = await duel('arenabot=1&arenahp=6&arenasecs=90');
+  await sleep(1500);
+  await M2.send('Debugger.enable');
+  await M2.send('Debugger.pause');
+  const told2 = await G2.waitFor(`window.__net && window.__net.masterQuiet >= 13000 && /QUIT now counts as their forfeit/.test(window.__net.hudNote())`, 22000, 250);
+  ok('stall: master frozen for real, after 13 s the guest is told quitting is not its loss', told2, await G2.eval('window.__net && window.__net.hudNote()'));
+  const gslot = await G2.eval('window.__net.you');
+  await click(G2, '#btnPause'); await click(G2, '#btnQuit');
+  const res = await G2.waitFor(`(window.__heard||[]).some(h=>h.t==='result')`, 8000, 200);
+  const r = await G2.eval(`(window.__heard||[]).find(h=>h.t==='result') || null`);
+  ok('stall: and the server records it as the frozen master\'s forfeit', res && r.winner === gslot && r.forfeit && r.why === 'stall' && r.by !== gslot, JSON.stringify(r && { winner: r.winner, by: r.by, why: r.why }));
+  ok('stall: zero console errors on the guest', !G2.errors.length, G2.errors.slice(0, 2).join(' / '));
+  await M2.send('Debugger.resume').catch(() => {});
   await close();
 }
 

@@ -7,6 +7,9 @@
  *   tie / hill / rest      LMS time-up ties, standing on the hill, the bandana clear of the stick
  *   focus / arrows         the objective stays on screen, or an arrow points at it (M4)
  *   left / bots / connect  'N LEFT' in respawn modes, ?bots=0, a WebSocket that throws
+ *   demote / stallnote     (F4, R4) a hidden room master comes back as a guest; the 1v1 QUIT note
+ *                          follows the server's own view of the master
+ *   poll                   the owner re-check backs off 15 s, doubling, and settles at 2 minutes
  *
  *   node tools/netfixgate.mjs
  *   node tools/netfixgate.mjs --falsify    undo each fix; its section must go red
@@ -44,6 +47,11 @@ if (process.argv.includes('--falsify')) {
     ['arrows', 'net/modes.js', '  drawEdgeArrows(ctx, vw, vh, m);\n', ''],
     ['left', 'ui.js', 'm.modeDef?.respawn ? \'\' : ', ''],
     ['bots', 'net/panel.js', 'return Number.isFinite(n) ? Math.max(1, Math.min(7, n)) : 3;', 'return n || 3;'],
+    ['demote', 'net/fight.js', '      if (was) this.unrecord();\n', ''],
+    ['demote', 'net/fight.js', '    this.suspended = false;\n', ''],
+    ['demote', 'net/fight.js', '    if (this.suspended) return;\n', ''],
+    ['stallnote', 'net/fight.js', "return this.serverSilent ? 'their game", "return true ? 'their game"],
+    ['poll', 'purchases.js', '  return ok ? 120000 : failing ? Math.min(120000, ms * 2) : 15000;', '  return ok ? 120000 : Math.min(120000, ms >= 120000 ? 15000 : ms * 2);'],
   ];
   let bad = 0;
   for (const [section, file, from, to] of MUTANTS) {
@@ -276,6 +284,51 @@ const snapOf = (m, seq, t) => W.unSnap(W.snap(seq, t, m.phase, m.clock, m.timeUp
   sockets[0]?.open({ t: 'welcome', id: 'me', tok: 't' });
   await p2.catch(() => {});
   c.wantOpen = false;
+}
+
+// ── R4: a hidden room master is handed over and comes back as a guest ──
+{
+  const cl = stubClient();
+  const g = new NetFight({ client: cl, go: { ...GO('lms', 0), out: [false, false, false] }, loadout: ALL });
+  g.match.begin();
+  const fx = g.match.fx;
+  ok('demote', 'a room master records its fx for the guests', g.isMaster && Array.isArray(g.rec));
+  g.suspend();
+  const t0 = g.match.time;
+  for (let i = 0; i < 30; i++) g.step(1 / 60, null);
+  ok('demote', 'hidden: the master steps nothing until the server says who runs the room', g.suspended && g.match.time === t0 && cl.sent === 0, `t ${t0} -> ${g.match.time}, sent ${cl.sent}`);
+  g.resync({ match: 'm1', round: 1, master: 1, out: [false, false, false] });
+  ok('demote', 'back: it is a guest of the new master, still in', !g.suspended && !g.isMaster && g.masterSlot === 1 && !g.gone.has(0));
+  fx.text(0, 0, 'x', {});
+  ok('demote', 'and no longer records fx for broadcast', g.rec === null && !Object.prototype.hasOwnProperty.call(fx, 'text'));
+  for (let i = 0; i < 5; i++) g.step(1 / 60, null);
+  ok('demote', 'and steps as a guest', cl.sent > 0, `sent ${cl.sent}`);
+  g.destroy();
+  const d = new NetFight({ client: stubClient(), go: GO('duel', 0), loadout: ALL });
+  d.suspend();
+  ok('demote', 'a 1v1 master is not suspended (its seat waits for it)', !d.suspended);
+  d.destroy();
+}
+{
+  const g = new NetFight({ client: stubClient(), go: GO('duel', 1), loadout: ALL });
+  g.masterQuiet = 14000;
+  g.serverSilent = false;
+  const live = g.hudNote();
+  g.serverSilent = true;
+  const dead = g.hudNote();
+  g.awayNote = 'opponent disconnected — waiting for them…';
+  const away = g.hudNote();
+  ok('stallnote', 'the server still hears the master: QUIT is no result, not their forfeit', /no result/.test(live) && !/forfeit/.test(live), live);
+  ok('stallnote', 'the server stopped hearing it too: QUIT counts as their forfeit', /their forfeit/.test(dead), dead);
+  ok('stallnote', 'and that wins over the away note', away === dead, away);
+  g.destroy();
+}
+{
+  const { ownerPollNext } = await imp('purchases.js');
+  let ms = 120000, failing = false;
+  const seq = [];
+  for (const ok of [false, false, false, false, false, false, true]) { ms = ownerPollNext(ms, ok, failing); failing = !ok; seq.push(ms / 1000); }
+  ok('poll', 'a failing owner check backs off 15, 30, 60, 120 s and settles there; success is 2 min', JSON.stringify(seq) === '[15,30,60,120,120,120,120]', JSON.stringify(seq));
 }
 
 // ── ties, the hill, the bandana's resting place ────────────────────────
