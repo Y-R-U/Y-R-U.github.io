@@ -380,7 +380,7 @@ const cells = 25
 
 // The code-drawn placeholder picture (a flying kick) is used until Aaron approves art for an
 // event; its answer is public anyway (js/events/reveal.js PICTURES.heroic).
-const placeholderPic, placeholderAnswer = "heroic", "A FLYING KICK"
+const placeholderPic, placeholderAnswer = "heroic", "A PENCIL DUEL"
 
 func guessesLeft(open, guesses int, solved bool) int {
 	if solved {
@@ -457,6 +457,8 @@ var (
 func evLock(uid, ev string) *sync.Mutex { return &evLocks[hash32(uid+"|"+ev)%uint32(len(evLocks))] }
 
 var evMinGap = 250 * time.Millisecond // tests set 0 to reach the lock behind it
+
+var evAfterLoad = func() {} // tests: widen the load-to-save window
 
 // evLimit: evMinGap between calls of one kind, per player and event.
 func (h *hub) evLimit(key string) bool {
@@ -1071,6 +1073,7 @@ func (h *hub) eventGuess(w http.ResponseWriter, r *http.Request) {
 		reply(w, 503, map[string]string{"error": "unavailable"})
 		return
 	}
+	evAfterLoad()
 	if len(p.battles) == 0 {
 		reply(w, 409, map[string]any{"error": "play first", "guessesLeft": guessesLeft(len(p.openCells), len(p.guesses), p.solved)})
 		return

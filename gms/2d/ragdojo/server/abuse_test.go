@@ -565,7 +565,7 @@ func TestGuessRaceAllowsOneGuess(t *testing.T) {
 	var wg sync.WaitGroup
 	var oks atomic.Int32
 	for round := 0; round < 4; round++ {
-		for _, c := range []string{"A FLYING KICK", "A TEA PARTY", "A CAT", "A BOAT"} {
+		for _, c := range []string{placeholderAnswer, "A TEA PARTY", "A CAT", "A BOAT"} {
 			wg.Add(1)
 			go func(c string) {
 				defer wg.Done()

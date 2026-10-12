@@ -448,7 +448,7 @@ func TestEventsRevealAndGuess(t *testing.T) {
 		return call(t, "POST", r.srv.URL+prefix+"/events/guess", "dev:me", map[string]any{"event": rw, "pic": pic, "choice": choice})
 	}
 	// The client shows art the server has no answer for: not guessable, nothing spent.
-	if code, g := guess("art", "A FLYING KICK"); code != 200 || g["guessable"] != false || g["right"] != false || len(g["guesses"].([]any)) != 0 {
+	if code, g := guess("art", "A PENCIL DUEL"); code != 200 || g["guessable"] != false || g["right"] != false || len(g["guesses"].([]any)) != 0 {
 		t.Fatalf("art guess without an answer on the server: %d %v", code, g)
 	}
 	code, g := guess("heroic", "A TEA PARTY")
@@ -460,7 +460,7 @@ func TestEventsRevealAndGuess(t *testing.T) {
 	}
 	// Aaron approves art: now the server holds a different answer, and a placeholder guess is refused.
 	os.WriteFile(evAnswers.path, []byte(`{"answers":{"`+rw+`":"A PAPER NINJA"}}`), 0o600)
-	if code, _ := guess("heroic", "A FLYING KICK"); code != 409 {
+	if code, _ := guess("heroic", placeholderAnswer); code != 409 {
 		t.Fatalf("placeholder guess after art approved: %d", code)
 	}
 	code, g = guess("art", "a paper ninja")
