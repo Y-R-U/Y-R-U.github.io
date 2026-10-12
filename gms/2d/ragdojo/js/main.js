@@ -957,8 +957,8 @@ function paintOffers() {
   $('btnRestore').classList.remove('hidden');
 }
 function ownedMessage() {
-  const p = purchases, end = p?.pass?.periodEnd ? new Date(p.pass.periodEnd * 1000).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
-  if (p?.passActive) return `Your br8t Pass is active${p.pass?.cancelAtPeriodEnd && end ? ` until ${end} (cancelled, no more charges)` : ''} — thank you! ${PAID_NAMES} open as you earn them; earned progress is kept.`;
+  const p = purchases, endTs = p?.pass?.cancelAt || p?.pass?.periodEnd, end = endTs ? new Date(endTs * 1000).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  if (p?.passActive) return `Your br8t Pass is active${(p.pass?.cancelAtPeriodEnd || p.pass?.cancelAt) && end ? ` until ${end} (cancelled, no more charges)` : ''} — thank you! ${PAID_NAMES} open as you earn them; earned progress is kept.`;
   if (p?.supporter) return `Thank you — your support is restored. ${PAID_NAMES} open as you earn them; earned progress is kept.`;
   if (p?.pass?.status === 'past_due' || p?.pass?.status === 'unpaid') return 'Your br8t Pass renewal did not go through. Use Manage subscription to update your card; earned progress is kept.';
   return 'No purchase found on this account. Sign in with the same Google or email account used at checkout.';
