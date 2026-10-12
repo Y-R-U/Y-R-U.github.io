@@ -38,7 +38,7 @@ Aaron's brief, plus the manager's defaults where he left a choice open. Defaults
    invite them to theirs.
 2. **Challenge a friend by link** (like Clued rooms). Same match code as 1v1.
 3. **Last Man Standing**, up to 8. Countdown starts when 4 are waiting; joins allowed until it
-   ends or 8 is reached. Master = best ping; if the master drops the match is void.
+   ends or 8 is reached. Master = best ping; if the master drops, host migration hands the fight to the best-ping remaining player (built 2026-10-13).
 4. **Ghost fights (approved)**. Fight an AI using a real player's name and unlocked specials. The
    arena lists players' ghosts you can challenge any time, not only when nobody is waiting. Always
    labelled GHOST, never passed off as live, no ranked stats.
