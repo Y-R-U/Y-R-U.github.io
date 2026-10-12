@@ -24,6 +24,7 @@ import { randomBytes, randomInt } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { EVENT_DEFS, windowOf, eventIdOf } from '../../js/events/calendar.js';
 import { PICTURES } from '../../js/events/reveal.js';
+import { cleanOverlay } from '../../js/events/overlay.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const GAME = join(HERE, '../..');
@@ -179,12 +180,31 @@ function approve(c) {
   const man = readJSON(MANIFEST, { v: 1, pictures: {} });
   man.v = 1; man.pictures ||= {};
   man.pictures[t.event] = { img: name + '.webp', jpg: name + '.jpg', w: 1024, h: 640, choices: shuffle([answer, ...decoys.slice(0, 3)]) };
+  if (c.overlay) man.pictures[t.event].overlay = c.overlay;
   writeJSON(MANIFEST, man);
   const ans = readJSON(ANSWERS, { v: 1, answers: {} });
   ans.answers[t.event] = answer;
   writeJSON(ANSWERS, ans);
   for (const x of state.candidates) if (x.status === 'approved' && state.themes[x.theme]?.event === t.event) x.status = 'pending';
   c.status = 'approved'; c.approvedFor = t.event; c.approvedAt = Date.now();
+  save();
+}
+
+/** The overlay may say anything but the answer: it is drawn on the picture itself. */
+function setOverlay(c, raw) {
+  if (raw === null) delete c.overlay;
+  else {
+    const ov = cleanOverlay(raw);
+    if (!ov) throw new Error('overlay needs x, y, w, h inside the picture (fractions 0-1)');
+    const words = String(state.themes[c.theme]?.answer || '').toUpperCase().split(/\s+/).filter((w) => w.length > 3);
+    if (words.some((w) => ov.text.toUpperCase().includes(w))) throw new Error('the overlay text would give the answer away');
+    c.overlay = ov;
+  }
+  if (c.status === 'approved') {
+    const man = readJSON(MANIFEST, { v: 1, pictures: {} });
+    const e = man.pictures?.[c.approvedFor];
+    if (e) { if (c.overlay) e.overlay = c.overlay; else delete e.overlay; writeJSON(MANIFEST, man); }
+  }
   save();
 }
 
@@ -218,6 +238,9 @@ const send = (res, code, body, type = 'application/json') => {
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   if (url.pathname === '/' || url.pathname === '/index.html') return send(res, 200, readFileSync(join(HERE, 'index.html')), 'text/html; charset=utf-8');
+  // The game's own overlay drawing (public repo code), so the preview matches the game exactly.
+  const GAMEJS = { '/game/js/ink.js': 'js/ink.js', '/game/js/events/overlay.js': 'js/events/overlay.js' };
+  if (GAMEJS[url.pathname]) return send(res, 200, readFileSync(join(GAME, GAMEJS[url.pathname])), 'text/javascript; charset=utf-8');
   const key = url.searchParams.get('k') || req.headers['x-key'];
   if (key !== KEY) return send(res, 403, { error: 'open the link printed when the tool started (it carries the key)' });
   if (req.method === 'GET' && url.pathname.startsWith('/img/')) {
@@ -236,6 +259,7 @@ const server = createServer(async (req, res) => {
       case '/api/approve': if (!c) throw new Error('no such candidate'); approve(c); break;
       case '/api/revoke': if (!c || c.status !== 'approved') throw new Error('not approved'); revoke(c); break;
       case '/api/reject': if (!c) throw new Error('no such candidate'); if (c.status === 'approved') revoke(c); c.status = c.status === 'rejected' ? 'pending' : 'rejected'; save(); break;
+      case '/api/overlay': if (!c) throw new Error('no such candidate'); setOverlay(c, body.overlay ?? null); break;
       case '/api/prompt': if (!c || typeof body.prompt !== 'string' || body.prompt.length < 10) throw new Error('prompt too short'); c.prompt = body.prompt.slice(0, 2000); save(); break;
       case '/api/regenerate': if (!c) throw new Error('no such candidate'); return send(res, 200, { ok: true, candidate: newCandidate(c.theme, c.prompt) });
       case '/api/theme': {

@@ -83,6 +83,11 @@ seeded with the 12 phase-1 candidates. NOTHING APPROVED — the game shows the d
 Gates: go test (events_test.go), eventsvectors --check, eventsgofalsify (13/13 red), eventsgame (58, real touch,
 landscape + rotated portrait, offline + online; --falsify 4/4 red), eventartgate (26 incl. a real Flux
 regeneration; --falsify 3/3 red); dev/events.html now draws through js/events/render.js (eventsshot green).
+Added (coordinator request): the player's name written into art (`overlay` in the manifest,
+js/events/overlay.js, review-page NAME ON IT editor with live preview; dojo_2's scroll box set);
+`tools/overlaygate.mjs` 10 checks, --falsify 3/3; eventartgate 27, --falsify 4/4. Incident: my
+`pkill -f eventart/server.mjs` killed the manager's review server on 8023 — gates now only ever kill
+their own PIDs on 9500-9549 with temp data dirs.
 Open for Aaron: pick the art (recommended heroic_2, halloween_1, dojo_2; heroic → reveal-week W43, dojo → W44,
 halloween → halloween:2026 by default — change on the page); arena `oppDmg` is client-claimed (≤ +1 point per
 agreed loss) until hub.go's round report carries HP (C's file); signing in mid-event re-seats the stick man on

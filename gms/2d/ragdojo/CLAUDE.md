@@ -602,7 +602,19 @@ then open the printed `http://192.168.0.236:8023/?k=<key>` on the phone. Data li
 `~/.ragdojo/eventart/` (candidates, state, key, answers.json), seeded with the 12 phase-1 candidates;
 approving writes `assets/events/` in this repo (commit it) and the answer to answers.json (copied
 to the box by `server/deploy.sh`, read directly by `server/lan.sh`). Regenerate queues on
-mflux-queue :7867 (waits for LTX to go idle first; no lock). Nothing is approved yet.
+mflux-queue :7867 (waits for LTX to go idle first; no lock). Aaron approves live from his phone.
+
+**The player's name in the art** (`js/events/overlay.js`, Aaron's idea for the blank dojo
+scroll): a manifest entry may carry `overlay: {x, y, w, h (image fractions), rot (deg ±20), text
+("{NAME}" = the arena name, else YOU; "\n" breaks), layout: "stack" | "lines"}`. The panel bakes it
+into the picture once per name (`composite`) in Caveat via ink.js's jitter, so the squares over the
+scroll reveal the name as they open; the backdrop prize gets it too. Stacked letters read best on a
+hanging scroll; long names shrink to 1/9 of the box, then get cut ("lines" shrinks to fit, then
+"…"). Generic: any blank sign or banner can use it. It never touches choices or answers, and the
+review tool refuses a box whose text contains a word of the answer. The review page edits it per
+candidate (NAME ON IT…: numbers or drag a box on the picture, live preview with a sample name,
+drawn by the game's own overlay.js served at `/game/js/`); on an approved picture the manifest
+entry updates at once. dojo_2's box is set in Aaron's data (x .607 y .215 w .19 h .44, stack).
 
 Gates (each watched go red):
 ```
@@ -613,8 +625,10 @@ node tools/eventsgofalsify.mjs       # 13 mutants of events.go / the JS board, a
 node tools/eventsgame.mjs            # 58 checks, REAL touch, 844x390 + rotated 390x844, offline and online
 node tools/eventsgame.mjs --falsify  # 4 mutants (no emit, roll not saved, rotation ignored, replay rule off)
 node tools/eventartgate.mjs [--seed <dir>] [--no-flux]   # list, a REAL Flux regeneration, approve into temp
-node tools/eventartgate.mjs --falsify                    # 3 mutants (answer in manifest, no answers file, no key)
+node tools/eventartgate.mjs --falsify                    # 4 mutants (answer in manifest, no answers file, no key, box spells answer)
+node tools/overlaygate.mjs [--falsify]                   # name box: inside only, long names, lines fit, opened square shows it (3 mutants)
 ```
 Test hooks: `window.__events` (DEV), `?arena=` `?arenauid=` `?evpass=0`; ports `EVENTS_TEST_PORT`
-(9500-9502) and `EVENTART_TEST_PORT` (9510-9511).
+(9500-9502), `EVENTART_TEST_PORT` (9510-9511), `OVERLAY_TEST_PORT` (9540). Never `pkill` the review
+tool by name: Aaron's own instance runs on 8023 from `~/.ragdojo/eventart` (one was killed that way).
 

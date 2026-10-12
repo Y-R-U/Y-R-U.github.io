@@ -121,6 +121,19 @@ async function run(toolDir, { flux = true, label = '' } = {}) {
     const sync = await (await fetch(ab + '/events/sync', { method: 'POST', headers: { Authorization: 'Bearer dev:artcheck' }, body: JSON.stringify({ event: t.event }) })).json();
     ok('the arena server sees the approved art (answer file format matches)', sync.art === true, JSON.stringify(sync));
 
+    // The name box: saved on the approved picture, written into its manifest entry, never the answer.
+    const box = { x: 0.6, y: 0.2, w: 0.2, h: 0.45, rot: 2, text: '{NAME}', layout: 'stack' };
+    ok('a name box is accepted', (await api('/api/overlay', { id: pick.id, overlay: box })).status === 200);
+    const man3 = JSON.parse(readFileSync(join(OUT, 'manifest.json'), 'utf8'));
+    ok('the approved picture\'s manifest entry carries the box', JSON.stringify(man3.pictures[t.event].overlay) === JSON.stringify(box), JSON.stringify(man3.pictures[t.event]));
+    ok('the box does not change the choices', JSON.stringify(man3.pictures[t.event].choices) === JSON.stringify(entry.choices));
+    const word = t.answer.split(' ').find((w) => w.length > 3);
+    ok('a box that would write the answer is refused', (await api('/api/overlay', { id: pick.id, overlay: { ...box, text: `{NAME} ${word}` } })).status === 400);
+    ok('a box outside the picture is refused', (await api('/api/overlay', { id: pick.id, overlay: { ...box, x: 0.9, w: 0.3 } })).status === 400);
+    ok('the page can load the game\'s overlay drawing', /export function drawOverlay/.test(await (await fetch(base + '/game/js/events/overlay.js')).text()) && (await fetch(base + '/game/js/ink.js')).ok);
+    await api('/api/overlay', { id: pick.id, overlay: null });
+    ok('REMOVE takes the box off the manifest', !JSON.parse(readFileSync(join(OUT, 'manifest.json'), 'utf8')).pictures[t.event].overlay);
+
     // A second approval for the same event replaces the first; revoking clears everything.
     const other = (await api('/api/state')).j.candidates.find((c) => c.theme === theme && c.status === 'pending');
     if (other) {
@@ -141,6 +154,7 @@ const MUTANTS = [
   ['the manifest carries the answer', "man.pictures[t.event] = { img: name + '.webp',", "man.pictures[t.event] = { answer, img: name + '.webp',"],
   ['approve forgets the answers file', 'ans.answers[t.event] = answer;', ''],
   ['no access key check', 'if (key !== KEY) return', 'if (false) return'],
+  ['a name box may spell the answer', "if (words.some((w) => ov.text.toUpperCase().includes(w))) throw", "if (false) throw"],
 ];
 if (args.includes('--falsify')) {
   let red = 0;

@@ -10,6 +10,7 @@ import * as R from './reveal.js';
 import * as E from './state.js';
 import { VinesView, RevealView } from './render.js';
 import { createEventsNet, deviceId, arenaName, friendNames } from './net.js';
+import { composite } from './overlay.js';
 import { SHEET_W, GROUND_Y } from '../config.js';
 import { isRotated } from '../input.js';
 
@@ -74,7 +75,12 @@ export function mountEvents(h) {
       images.set(id, entry);
     }
     const e = images.get(id);
-    return e.ok ? e.im : null;
+    if (!e.ok) return null;
+    // A blank scroll or sign gets the player's own name, in ink (js/events/overlay.js).
+    if (!a.overlay) return e.im;
+    const name = arenaName();
+    if (e.name !== name || !e.c) { e.c = composite(e.im, a.overlay, name); e.name = name; }
+    return e.c;
   }
 
   fetch(ART('manifest.json'), { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).then((m) => {
@@ -393,7 +399,7 @@ export function mountEvents(h) {
     },
   };
   const api = {
-    open, roll, uncover, guess, sync, setTab, net,
+    open, roll, uncover, guess, sync, setTab, net, picture: imageOf,
     get tab() { return tab; }, get state() { return st(); }, get rivals() { return rivals; },
     get online() { return online; }, get manifest() { return manifest; }, vview, rview,
   };
