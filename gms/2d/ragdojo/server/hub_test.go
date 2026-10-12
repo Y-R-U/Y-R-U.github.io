@@ -81,6 +81,7 @@ type tc struct {
 	ws   *websocket.Conn
 	id   string
 	tok  string // the account token it said hello with; accept pays with it
+	mute atomic.Bool // stop answering pings (a frozen tab)
 	msgs chan map[string]any
 	bins chan []byte
 }
@@ -116,7 +117,9 @@ func (r *rig) open(q, name, tok string, resumed bool) (*tc, string) {
 			var m map[string]any
 			json.Unmarshal(b, &m)
 			if m["t"] == "p" {
-				c.send(map[string]any{"t": "q", "s": m["s"]})
+				if !c.mute.Load() {
+					c.send(map[string]any{"t": "q", "s": m["s"]})
+				}
 				continue
 			}
 			c.msgs <- m

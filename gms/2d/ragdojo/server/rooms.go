@@ -32,7 +32,7 @@ var (
 	defaultRoomSlow      = 45 * time.Second
 	// A master's socket that stays down this long is gone: the fight cannot wait for it,
 	// because nobody else is running it. Short, but longer than a reconnect usually takes.
-	defaultMigrateAfter = 1500 * time.Millisecond
+	defaultMigrateAfter = 5 * time.Second // a blip is not a hand-over; guests' stall reports are the fast path
 )
 
 func init() {
@@ -383,6 +383,10 @@ func (h *hub) roomReport(m *match, c *client, round, winner int, ko bool, place,
 	}
 	if len(m.reports) == 0 {
 		m.firstReport = h.now()
+		m.firstIn = make([]bool, len(m.seats))
+		for i, s := range m.seats {
+			m.firstIn[i] = !s.out
+		}
 	}
 	m.reports[slot] = report{winner, ko, placeKey(place, len(m.seats)), dmgKey(dmg, len(m.seats))}
 	h.checkRoomReports(m)
@@ -404,7 +408,7 @@ func (h *hub) checkRoomReports(m *match) {
 		}
 		if first == nil {
 			first = &r
-		} else if r != *first {
+		} else if m.cmp(r) != m.cmp(*first) {
 			h.disputeRoom(m)
 			return
 		}
@@ -412,11 +416,33 @@ func (h *hub) checkRoomReports(m *match) {
 	if first == nil {
 		return
 	}
-	if first.winner >= 0 && m.seats[first.winner].out {
+	if first.winner >= 0 && m.seats[first.winner].out && !m.wasIn(first.winner) {
 		h.void(m, "disagree", nil)
 		return
 	}
 	h.countRoom(m, *first)
+}
+
+func (m *match) wasIn(i int) bool { return i < len(m.firstIn) && m.firstIn[i] }
+
+// cmp: what must agree between room reports. Placings and damage are compared only for seats
+// that were still in at the first report: a seat that left before the fight was decided is
+// placed by the server's elimination order, whatever each client's view of it says.
+func (m *match) cmp(r report) report {
+	mask := func(k string) string {
+		if k == "" || m.firstIn == nil {
+			return k
+		}
+		parts := strings.Split(k, ",")
+		for i := range parts {
+			if i < len(m.firstIn) && !m.firstIn[i] {
+				parts[i] = "-"
+			}
+		}
+		return strings.Join(parts, ",")
+	}
+	r.place, r.dmg = mask(r.place), mask(r.dmg)
+	return r
 }
 
 func (h *hub) countRoom(m *match, r report) {
@@ -437,7 +463,8 @@ func (h *hub) disputeRoom(m *match) {
 	for i, s := range m.seats {
 		if !s.out {
 			in++
-			groups[m.reports[i]] = append(groups[m.reports[i]], i)
+			k := m.cmp(m.reports[i])
+			groups[k] = append(groups[k], i)
 		}
 	}
 	var best report
@@ -447,7 +474,7 @@ func (h *hub) disputeRoom(m *match) {
 			best, bestN = r, len(l)
 		}
 	}
-	if bestN >= 2 && bestN*2 > in && (best.winner < 0 || !m.seats[best.winner].out) {
+	if bestN >= 2 && bestN*2 > in && (best.winner < 0 || !m.seats[best.winner].out || m.wasIn(best.winner)) {
 		var bad []string
 		ok := true
 		for i, s := range m.seats {
@@ -455,7 +482,7 @@ func (h *hub) disputeRoom(m *match) {
 				continue
 			}
 			flagged := s.ranked && h.st.flagged(s.uid)
-			if m.reports[i] == best {
+			if m.cmp(m.reports[i]) == best {
 				ok = ok && !flagged
 			} else {
 				ok = ok && flagged
@@ -466,7 +493,7 @@ func (h *hub) disputeRoom(m *match) {
 			h.st.recordDispute(m.id, bad)
 			m.log = append(m.log, "disputed by "+strings.Join(bad, ",")+" (a record of disputes): the majority counts")
 			m.note = " disputed"
-			h.countRoom(m, best)
+			h.countRoom(m, m.reports[groups[best][0]])
 			return
 		}
 	}

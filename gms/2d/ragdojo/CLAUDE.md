@@ -428,6 +428,22 @@ Gotchas hit:
 - `wait` sent before the server finished checking the token is refused as anonymous: wait for `me`.
 - Keyframe timers must be full precision; 1 ms rounding moved the frame an attack ends on.
 
+Hostile-review hardening (F1, 2026-10-13; rules in docs/ONLINE.md "Server rules added"):
+`server/abuse_test.go` ports every R1/R2/R3 exploit inverted (each FAILS while the exploit works);
+a revert harness (57 mutants, one per fix, all red) lives in the F1 scratchpad. Gotchas:
+- **Verify every seat's token before charging anyone**, or a bad seat spends its opponent's battle.
+- **Several defences stack** (inbound bucket + name limit + lobby coalescing + skip-when-half-full):
+  one integration test cannot prove any single one. Each layer has its own test.
+- `push` bounds each socket's queue in BYTES (`queued`, shared with its writer); a full queue is
+  `disconnect` (away + resume), never an instant forfeit.
+- The pong reaper now also reaps sockets that never said hello, so `TestIdleSocketsAreReaped`
+  raises `pongLate` to prove the hello rule on its own.
+- A rival is keyed by `rid` (salted hash, salt in the DB `meta` table); `friend` comes from the
+  `friends` table (finished non-forfeit friend links), never from names the client sends.
+- LAN (`lan.sh`) binds the 192.* address only and serves just `/gms/2d/ragdojo/` (minus server/,
+  tools/, docs/) and `/lib/auth/`; `arenagate --lan` runs lan.sh itself.
+- Test-only env: `ARENA_EARLY_FF_MS` (gates), `ARENA_PER_IP`; `arenamulti` takes `ARENA_TEST_PORT`.
+
 Deploy (needs Aaron's approval; nothing has been run): 1) `server/deploy.sh` (tests, build on box,
 `/srv/apps/ragdojo-arena`, unit, health + rollback, data in `/srv/data/ragdojo-arena`); 2) merge
 `server/Caddyfile.fragment` into the games.br8t.com block, `caddy validate`, reload; 3) ship the

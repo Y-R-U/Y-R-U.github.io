@@ -120,3 +120,10 @@ Deploy (needs approval; nothing run): approve art → commit `assets/events/`; `
 rsyncs answers.json to /srv/data/ragdojo-arena/event_answers.json; unit gains ARENA_ENTITLEMENT_URL +
 ARENA_EVENT_ANSWERS); `npm run build` (copies assets/events) then `games/deploy.sh`; no Caddy change (routes sit
 under /gms/2d/ragdojo/arena/). The payment service must answer GET /api/br8t/entitlement for Pass events to lock.
+
+### F1 status (arena server hostile-review fixes, 2026-10-13)
+All 15 R1 items, R2's 5 server halves, and R3's server items are done in server/. Every exploit is
+ported inverted into `server/abuse_test.go`, and each fix has a revert mutant that turns its test
+red (57/57). Gates green: `go test -race ./...`, arenaserver, arenagate (+ `--lan` via the real
+lan.sh), arenamulti (hand-over 3.0 s), boardsgate, ghostgate, modegate. eventsgame was not stable
+while F3's client work was in progress. Deploy steps unchanged (deploy.sh / unit / Caddy fragment).

@@ -71,7 +71,7 @@ else if (mut) {
 
 const bin = process.env.ARENA_BIN || join(tmp, 'arena');
 if (!process.env.ARENA_BIN) execFileSync('go', ['build', '-o', bin, '.'], { cwd: join(ROOT, 'server'), stdio: 'inherit' });
-const PORT = 18100 + ((process.pid % 20) * 2);
+const PORT = +process.env.ARENA_TEST_PORT || 18100 + ((process.pid % 20) * 2);
 const server = spawn(bin, [], {
   env: { ...process.env, ARENA_ADDR: `127.0.0.1:${PORT}`, ARENA_DB: join(tmp, 'a.db'), ARENA_ICE_URL: 'off', ARENA_ALLOWANCE_URL: 'off',
     ARENA_DEV_AUTH: '1', ARENA_ROOM_MS: '2500', ...serverEnv },
@@ -81,7 +81,7 @@ let serverLog = '';
 server.stderr.on('data', (d) => { serverLog += d; });
 const arenaBase = `http://127.0.0.1:${PORT}/gms/2d/ragdojo/arena`;
 for (let i = 0; i < 50; i++) { try { if ((await fetch(arenaBase + '/health')).ok) break; } catch {} await sleep(100); }
-const web = await serve(game, 9400 + (process.pid % 20) * 2);
+const web = await serve(game, process.env.ARENA_TEST_PORT ? PORT + 1 : 9400 + (process.pid % 20) * 2);
 const flags = ['--disable-features=WebRtcHideLocalIpsWithMdns', '--force-webrtc-ip-handling-policy=default'];
 const all = [];
 const cleanup = () => { for (const t of all) t.close(); web.close(); server.kill('SIGKILL'); rmSync(tmp, { recursive: true, force: true }); };
@@ -196,7 +196,9 @@ async function suite(name, { mode, n, kill }) {
   if (kill) {
     const ho = await Promise.all(alive().map((c) => c.eval(`window.__net ? window.__net.m.handoverMs || 0 : 0`).catch(() => 0)));
     log(`  hand-over gap as the surviving guest saw it: ${ho.filter(Boolean).join(', ')} ms`);
-    ok(`${name}: the hand-over is quick (under 4 s, not the 10 s reconnect grace)`, ho.some(Boolean) && ho.filter(Boolean).every((g) => g < 4000), ho.join(','));
+    // A dead socket hands over after 5 s (a shorter blip is not a hand-over), or sooner when
+    // the guests report the master's snapshots stopped ({t:'stall'}).
+    ok(`${name}: the hand-over is quick (under 6.5 s, not the 10 s reconnect grace)`, ho.some(Boolean) && ho.filter(Boolean).every((g) => g < 6500), ho.join(','));
   }
   ok(`${name}: guest interpolation rarely runs dry (<5%)`, fin.every((s) => s.underrunPct < 5), fin.map((s) => s.underrunPct).join(','));
   await alive()[0].shot(join(SHOTS, `multi_${name}_result.png`));

@@ -120,3 +120,25 @@ does not send one yet, because the account layer only loads on games.br8t.com. A
 the batch to a new production endpoint (not built) that adds them to that account's arena stats
 only — never to daily battles, allowance or free-limit counts — then call `mark()`. Batched, run
 whenever convenient; re-sending a match id must be idempotent on the production side.
+
+## Server rules added after the hostile reviews (F1, 2026-10-13)
+
+Wire additions (client → server unless noted):
+
+| message | meaning |
+|---|---|
+| `{t:"stall", match, ms}` | a guest has had no master snapshot for `ms` (sent after 3 s, every 2 s while it lasts; `ms:0` = recovered). Counted when ms ≥ 2000, fresh for 3 s. A strict majority of the other seats in play = the master is away NOW: a room eliminates it (`out` why `stall`) and hands over; a 1v1 starts its away grace. |
+| `{t:"rematch", match, tok}` | a rematch pays with this fresh token; without one a ranked rematch is cancelled (`signin`). |
+| WS close code **4001** | the page hid its tab on purpose: a deliberate away. A room master hands over at once (`out` why `away`); a 1v1 seat's grace starts as usual. |
+| server → `result` | a 1v1 forfeit also carries `by` (the seat that forfeited) and `why`: `left`, `gone`, `silent`, `lagging`, or `stall` (the guest quit after ≥10 s of its stall reports: the MASTER forfeits). |
+| server → `err` / `cancel` | new codes/reasons: `signin` (a ranked seat without its own verified token, or a payment-service 4xx), `slow` (name/wait/unwait or failed joins too fast). |
+
+Rules: no pong for 8 s (two pings) = away (same path as a closed socket); no `hello` in 10 s =
+dropped; a room master migrates after 5 s of WebSocket downtime (a shorter blip is not a
+hand-over) or at once on a stall majority / 4001. At the report timeout every seat with no
+report forfeits (1v1) or is out (rooms) and the rest finish with what they agree on; each
+round also has a hard deadline (3 min duel, 5 min room). Room reports are compared only on the
+seats still in at the first report, and a winner who leaves after it does not void. A
+disagreement is a per-account dispute; an account with a record of them loses its next
+disputed match and is hidden from the boards. Forfeits before the first agreed round (rooms:
+the first 10 s) pay the stayer nothing; one pair of accounts counts at most 3 results a day.

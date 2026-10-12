@@ -33,15 +33,26 @@ if (LAN && !lanIP) { log('no 192.168.* address on this machine'); process.exit(2
 const P0 = +(process.env.ARENA_TEST_PORT || 9310);
 const PORT = LAN ? P0 + 1 : P0;
 const host = LAN ? lanIP : '127.0.0.1';
-const env = { ...process.env, ARENA_ADDR: `${LAN ? '0.0.0.0' : '127.0.0.1'}:${PORT}`, ARENA_DB: join(tmp, 'a.db'),
+const env = { ...process.env, ARENA_ADDR: `127.0.0.1:${PORT}`, ARENA_DB: join(tmp, 'a.db'),
   ARENA_ICE_URL: 'off', ARENA_ALLOWANCE_URL: 'off' };
-if (LAN) Object.assign(env, { ARENA_LAN: '1', ARENA_STATIC: SITE });
-else Object.assign(env, { ARENA_DEV_AUTH: '1' });
-const server = spawn(bin, [], { env, stdio: ['ignore', 'ignore', 'pipe'] });
+if (!LAN) Object.assign(env, { ARENA_DEV_AUTH: '1' });
+// --lan runs the real server/lan.sh (Aaron's kids' launcher): it binds this Mac's 192.* address only.
+const server = LAN
+  ? spawn(join(ROOT, 'server', 'lan.sh'), [], { env: { ...process.env, PORT: String(PORT), DB: join(tmp, 'a.db'), ARENA_BIN: bin, LAN_IP: lanIP, ANSWERS: join(tmp, 'answers.json') }, stdio: ['ignore', 'ignore', 'pipe'] })
+  : spawn(bin, [], { env, stdio: ['ignore', 'ignore', 'pipe'] });
 let serverLog = '';
 server.stderr.on('data', (d) => { serverLog += d; });
 const arenaBase = `http://${host}:${PORT}/gms/2d/ragdojo/arena`;
 for (let i = 0; i < 50; i++) { try { if ((await fetch(arenaBase + '/health')).ok) break; } catch {} await sleep(100); }
+if (LAN) {
+  const st = async (u) => { try { return (await fetch(u)).status; } catch { return 'refused'; } };
+  const base = `http://${lanIP}:${PORT}`;
+  ok('lan.sh: the game is served', await st(`${base}/gms/2d/ragdojo/index.html`) === 200);
+  ok('lan.sh: so is /lib/auth/ (the page imports it)', await st(`${base}/lib/auth/auth.js`) === 200);
+  const hidden = await Promise.all(['/index.html', '/gms/2d/ragdojo/server/hub.go', '/.git/config', '/gms/2d/ragdojo/js/', '/gms/3d/'].map((p) => st(base + p)));
+  ok('lan.sh: nothing else of the site checkout, no listings', hidden.every((x) => x === 404), hidden.join(','));
+  ok('lan.sh: bound to the 192.* address only (not 127.0.0.1)', await st(`http://127.0.0.1:${PORT}/gms/2d/ragdojo/arena/health`) === 'refused');
+}
 
 const web = LAN ? null : await serve(ROOT, P0 + 2);
 const pageBase = LAN ? `http://${lanIP}:${PORT}/gms/2d/ragdojo/index.html` : `${web.base}/index.html`;

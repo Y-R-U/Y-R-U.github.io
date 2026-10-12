@@ -458,6 +458,8 @@ func evLock(uid, ev string) *sync.Mutex { return &evLocks[hash32(uid+"|"+ev)%uin
 
 var evMinGap = 250 * time.Millisecond // tests set 0 to reach the lock behind it
 
+var evAfterLoad = func() {} // tests: widen the load-to-save window
+
 // evLimit: evMinGap between calls of one kind, per player and event.
 func (h *hub) evLimit(key string) bool {
 	evSyncMu.Lock()
@@ -1070,6 +1072,7 @@ func (h *hub) eventGuess(w http.ResponseWriter, r *http.Request) {
 		reply(w, 503, map[string]string{"error": "unavailable"})
 		return
 	}
+	evAfterLoad()
 	if len(p.battles) == 0 {
 		reply(w, 409, map[string]any{"error": "play first", "guessesLeft": guessesLeft(len(p.openCells), len(p.guesses), p.solved)})
 		return

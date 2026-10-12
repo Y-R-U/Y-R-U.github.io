@@ -25,15 +25,22 @@ import (
 // the payment service) talk to it through h.in. Same shape as Snake-eee's snakenet.
 
 const (
-	maxClients   = 600
-	maxMatches   = 300
-	maxSeats     = 8 // protocol ceiling (Last Man Standing); a duel uses two
-	maxMsg       = 32 << 10
-	sendQueue    = 1024      // frame slots; the real bound is maxQueued bytes
-	maxQueued    = 512 << 10 // bytes waiting for one socket's writer
-	tickEvery    = 250 * time.Millisecond
-	pingEvery    = 4 * time.Second
-	pongLate     = 15 * time.Second // a ping this overdue = the socket is dead or not reading
+	maxClients = 600
+	maxMatches = 300
+	maxSeats   = 8 // protocol ceiling (Last Man Standing); a duel uses two
+	maxMsg     = 32 << 10
+	sendQueue  = 1024      // frame slots; the real bound is maxQueued bytes
+	maxQueued  = 512 << 10 // bytes waiting for one socket's writer
+	tickEvery  = 250 * time.Millisecond
+	pingEvery  = 4 * time.Second
+	// No pong for pingEvery+pongLate (2 pings) = the tab is frozen or gone: the socket is closed
+	// and the seat takes the away path (1v1 grace then forfeit, room elimination / migration).
+	pongLate = pingEvery
+	// stall: a guest that has had no master snapshot for at least stallMin says so; reports
+	// fresher than stallFresh count. A majority of the other seats = the master is away now.
+	stallMin, stallFresh = 2 * time.Second, 3 * time.Second
+	// 1v1: a guest who quits after this long of reported master silence does not forfeit.
+	stallQuit    = 10 * time.Second
 	helloWithin  = 10 * time.Second
 	offerTTL     = 75 * time.Second
 	reportWindow = 15 * time.Second
@@ -155,6 +162,8 @@ type seat struct {
 	checked  bool               // its token verified as its own account (startMatch phase 1)
 	paying   bool               // its allowance claim is in flight (phase 2)
 	rtok     string             // the fresh token sent with "rematch": a rematch never reuses tok
+	stallAt  time.Time          // last "stall" report from this seat (the master is silent)
+	stallFor time.Time          // when the silence it reports began
 	out      bool               // rooms: eliminated (left, or never came back)
 	outSeq   int                // order of going out, for placements
 	rtts     map[string]float64 // rooms: this seat's measured ping to each peer id
@@ -188,7 +197,10 @@ type match struct {
 	playAt        time.Time // when play began
 	roundEnd      time.Time // hard deadline for the current round
 	agreed        int       // rounds every seat agreed on
-	note          string    // appended to the stored score (" disputed")
+	firstIn       []bool    // rooms: which seats were still in at the first report
+	ffBy          int       // 1v1 forfeit: the seat that forfeited, and why
+	ffWhy         string
+	note          string // appended to the stored score (" disputed")
 }
 
 type attachResult struct {
@@ -204,6 +216,7 @@ type event struct {
 	rtok  string
 	c     *client
 	ip    string
+	hide  bool // evLeave: the page closed its socket on purpose (4001, tab hidden)
 	data  []byte
 	bin   bool
 	fn    func()
@@ -256,6 +269,9 @@ func (h *hub) handle(e event) {
 	case evLeave:
 		if e.gen == e.c.gen {
 			h.disconnect(e.c)
+			if e.hide {
+				h.hidden(e.c)
+			}
 		}
 	case evMsg:
 		if e.c.gone || e.gen != e.c.gen {
@@ -307,6 +323,7 @@ type inMsg struct {
 	Dmg     []int              `json:"dmg"`
 	R       map[string]float64 `json:"r"`
 	Link    string             `json:"link"` // LAN: a Firebase ID token, if this device is signed in
+	Ms      float64            `json:"ms"`   // stall: how long the master has been silent
 }
 
 func (h *hub) message(c *client, raw []byte) {
@@ -398,6 +415,10 @@ func (h *hub) message(c *client, raw []byte) {
 		c.lobbyOwed = true
 	case "sig":
 		h.forwardSig(c, m)
+	case "stall":
+		if mt := h.mine(c, m.Match); mt != nil {
+			h.stall(mt, c, m.Ms)
+		}
 	}
 }
 
@@ -910,6 +931,8 @@ func (h *hub) refused(s *seat) string {
 func (h *hub) sendGo(m *match) {
 	m.reports = map[int]report{}
 	m.firstReport = time.Time{}
+	m.firstIn = nil
+	h.clearStalls(m)
 	if m.room {
 		m.roundEnd = h.now().Add(h.roomCap)
 	} else {
@@ -1021,7 +1044,8 @@ func (h *hub) disputeDuel(m *match) {
 
 // forfeit: a player left (or never came back) mid-match. In a duel the other player wins the
 // match outright and it counts. Multi-player modes will eliminate the leaver instead.
-func (h *hub) forfeit(m *match, leaver int) {
+func (h *hub) forfeit(m *match, leaver int, why string) {
+	m.ffBy, m.ffWhy = leaver, why
 	winner := -1
 	for i, s := range m.seats {
 		if i != leaver && (winner < 0 || s.wins > m.seats[winner].wins) {
@@ -1080,6 +1104,11 @@ func (h *hub) finishFF(m *match, winner int, ff bool) {
 	log.Printf("match %s: %s won %s (%s)", m.id, who, score, strings.Join(m.log, ", "))
 	for i, s := range m.seats {
 		out := map[string]any{"t": "result", "match": m.id, "winner": winner, "you": i, "score": scoreOf(m), "counted": s.ranked && !seats[i].NoStats, "forfeit": ff}
+		if ff {
+			// who forfeited and why: left | gone | silent | stall (the master went silent and
+			// the guest quit: the guest is NOT the one who forfeited) | lagging
+			out["by"], out["why"] = m.ffBy, m.ffWhy
+		}
 		if s.ranked {
 			if line, ok := h.st.mine(s.uid); ok {
 				out["stats"] = line
@@ -1191,7 +1220,16 @@ func (h *hub) leaveMatch(c *client, why string) {
 	}
 	switch m.state {
 	case mPlay:
-		h.forfeit(m, m.slotOf(c))
+		leaver := m.slotOf(c)
+		// A guest who gives up on a master that has been silent (by its reports) for stallQuit
+		// is not the one who forfeits: the frozen master is.
+		if s := m.seats[leaver]; leaver != m.master && h.stalled(s) && h.now().Sub(s.stallFor) >= stallQuit {
+			m.log = append(m.log, "quit by "+s.id+" after "+h.now().Sub(s.stallFor).Round(time.Second).String()+" of master silence")
+			h.st.recordDispute(m.id, []string{s.uid}) // a claim that decided a match: it goes on record
+			h.forfeit(m, m.master, "stall")
+			break
+		}
+		h.forfeit(m, leaver, why)
 	case mDone:
 		for _, s := range m.seats {
 			if s.c.match != m {
@@ -1242,7 +1280,7 @@ func (h *hub) tick() {
 			h.drop(c, "nohello")
 			continue
 		}
-		if now.Sub(c.pongAt) > pingEvery+h.pongLate {
+		if now.Sub(c.pongAt) > pingEvery+h.pongLate && !c.away {
 			log.Printf("client %s stopped answering pings", c.id)
 			h.disconnect(c)
 			continue
@@ -1254,22 +1292,89 @@ func (h *hub) tick() {
 	}
 }
 
+// stall: a guest reports that the master's snapshots stopped ms ago.
+func (h *hub) stall(m *match, c *client, ms float64) {
+	slot := m.slotOf(c)
+	if m.state != mPlay || slot < 0 || slot == m.master || m.seats[slot].out {
+		return
+	}
+	if ms <= 0 { // recovered
+		m.seats[slot].stallAt, m.seats[slot].stallFor = time.Time{}, time.Time{}
+		return
+	}
+	if ms < float64(stallMin.Milliseconds()) || ms > 600000 {
+		return
+	}
+	s, now := m.seats[slot], h.now()
+	if !h.stalled(s) {
+		s.stallFor = now.Add(-time.Duration(ms) * time.Millisecond)
+	}
+	s.stallAt = now
+	h.checkStall(m)
+}
+
+func (h *hub) stalled(s *seat) bool {
+	return !s.stallAt.IsZero() && h.now().Sub(s.stallAt) <= stallFresh
+}
+
+func (h *hub) clearStalls(m *match) {
+	for _, s := range m.seats {
+		s.stallAt, s.stallFor = time.Time{}, time.Time{}
+	}
+}
+
+// checkStall: when most of the other seats in play say the master is silent, it is away now —
+// whatever its socket says (a hidden tab still answers pings). A room hands over at once; a
+// 1v1 starts the master's away grace.
+func (h *hub) checkStall(m *match) {
+	if m.state != mPlay || m.master < 0 {
+		return
+	}
+	ms := m.seats[m.master]
+	if ms.out {
+		return
+	}
+	n, yes := 0, 0
+	for i, s := range m.seats {
+		if i == m.master || s.out || s.c.away {
+			continue
+		}
+		n++
+		if h.stalled(s) {
+			yes++
+		}
+	}
+	if n == 0 || yes*2 <= n {
+		return
+	}
+	log.Printf("match %s: %d of %d guests report master %s silent", m.id, yes, n, ms.id)
+	m.log = append(m.log, "master "+ms.id+" stalled")
+	if m.room {
+		h.clearStalls(m)
+		h.eliminate(m, m.master, "stall")
+		return
+	}
+	if !ms.c.away {
+		h.disconnect(ms.c)
+	}
+}
+
 // silent: a report came in and the report window ran out (or the round's hard deadline did).
-// A connected seat that still says nothing forfeits — silence never voids a match. A seat whose
-// socket is down is left to its away grace, which ends in the same forfeit.
+// A seat that still says nothing — connected or not — forfeits (a room: is out, and the rest
+// finish with what they agree on). Silence never voids a match.
 func (h *hub) silent(m *match) {
 	for i, s := range m.seats {
 		if m.state != mPlay {
 			return
 		}
-		if _, ok := m.reports[i]; ok || s.out || s.c.away {
+		if _, ok := m.reports[i]; ok || s.out {
 			continue
 		}
 		m.log = append(m.log, "silent "+s.id)
 		if m.room {
 			h.eliminate(m, i, "silent")
 		} else {
-			h.forfeit(m, i)
+			h.forfeit(m, i, "silent")
 			return
 		}
 	}
@@ -1435,6 +1540,22 @@ func (h *hub) attach(e event) (*client, string) {
 
 // disconnect: the socket is gone. Mid-match the seat is held for awayGrace with the fighter
 // idle; anywhere else the player simply leaves.
+// closeHidden: the page closes its socket with this code when its tab is hidden (a hidden tab
+// cannot run the fight). That is a deliberate away: a room master hands over at once; a 1v1
+// seat's grace has already started in disconnect.
+const closeHidden = 4001
+
+func (h *hub) hidden(c *client) {
+	m := c.match
+	if m == nil || !m.room || m.state != mPlay || !c.away {
+		return
+	}
+	if slot := m.slotOf(c); slot == m.master && !m.seats[slot].out {
+		m.log = append(m.log, "master "+c.id+" hid its tab")
+		h.eliminate(m, slot, "away")
+	}
+}
+
 func (h *hub) disconnect(c *client) {
 	if c.gone || c.away {
 		return
@@ -1526,9 +1647,11 @@ func (h *hub) serveWS(w http.ResponseWriter, r *http.Request, origins []string) 
 	go writer(ctx, conn, send, queued, cancel)
 	// One token bucket for every inbound frame; over it, frames are dropped before the hub.
 	tokens, last := float64(inBurst), time.Now()
+	var readErr error
 	for {
 		typ, data, err := conn.Read(ctx)
 		if err != nil {
+			readErr = err
 			break
 		}
 		now := time.Now()
@@ -1540,7 +1663,7 @@ func (h *hub) serveWS(w http.ResponseWriter, r *http.Request, origins []string) 
 		tokens--
 		h.in <- event{kind: evMsg, c: c, gen: gen, data: data, bin: typ == websocket.MessageBinary}
 	}
-	h.in <- event{kind: evLeave, c: c, gen: gen}
+	h.in <- event{kind: evLeave, c: c, gen: gen, hide: websocket.CloseStatus(readErr) == closeHidden}
 	conn.Close(websocket.StatusNormalClosure, "")
 }
 
