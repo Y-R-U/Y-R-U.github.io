@@ -326,7 +326,12 @@ func TestEventsRivalSelection(t *testing.T) {
 	}
 	r.sync(t, "idle", map[string]any{"event": vday, "name": "Idle"}) // no battles: never a rival
 	r.seedPlayer(t, "me", "Me", []int{3, 3})
-	_, out := call(t, "GET", r.srv.URL+prefix+"/events/rivals?event="+vday+"&friends=P13,p07", "dev:me", nil)
+	// Friends are accounts I finished a friend-link match with; names the client sends are ignored.
+	r.h.st.recordMatch("fm1", "duel", true, "2-0", []seatRow{rseat("me", "Me", true, 0), rseat("p13", "P13", false, 0)})
+	r.h.st.recordMatch("fm2", "duel", true, "2-1", []seatRow{rseat("p07", "P07", true, 0), rseat("me", "Me", false, 0)})
+	r.h.st.recordMatch("fm3", "duel", true, "0-0 ff", []seatRow{rseat("me", "Me", true, 0), rseat("p01", "P01", false, 0)})
+	r.tick(rivalTTL + time.Second) // past the rival cache
+	_, out := call(t, "GET", r.srv.URL+prefix+"/events/rivals?event="+vday+"&friends=P02,P03,P04", "dev:me", nil)
 	rv := rivalsOf(out)
 	if len(rv) != 10 || rv[0]["friend"] != true || rv[1]["friend"] != true || rv[2]["friend"] != nil {
 		t.Fatalf("selection: %v", rv)
@@ -366,25 +371,25 @@ func TestEventsCampaignCap(t *testing.T) {
 }
 
 // Agreed arena results count by themselves, for every event of their moment; a void never
-// does; a client can turn its own loss into a close loss (2), never into a win.
+// does; a client cannot change them at all (a close loss comes only from the agreed damage).
 func TestEventsArenaResultsCountServerSide(t *testing.T) {
 	r := newEvRig(t)
 	r.pass["ann"], r.pass["bob"] = true, true
 	st := r.h.st
 	st.recordMatch("m1", "duel", false, "2-1", []seatRow{rseat("ann", "Ann", true, 2), rseat("bob", "Bob", false, 1)})
 	st.recordMatch("m2", "duel", false, "2-0", []seatRow{rseat("bob", "Bob", true, 2), {UID: "anon1", Name: "x", Ranked: false}})
-	st.recordVoid("m3", "duel", false, 2, "disagree")
+	st.recordVoid("m3", "duel", false, 2, "disagree", []string{"ann", "bob"})
 	_, a := r.sync(t, "ann", map[string]any{"event": vday})
 	_, bb := r.sync(t, "bob", map[string]any{"event": vday, "b": [][]any{{"arena:m1", 3, "arena", r.now.UnixMilli()}}})
 	if a["points"].(float64) != 3 || bb["points"].(float64) != 4 {
 		t.Fatalf("arena auto-count: ann %v bob %v", a["points"], bb["points"])
 	}
 	_, bb = r.sync(t, "bob", map[string]any{"event": vday, "b": [][]any{{"arena:m1", 2, "arena", r.now.UnixMilli()}}})
-	if bb["points"].(float64) != 5 {
-		t.Fatalf("close loss claim: bob %v", bb["points"])
+	if bb["points"].(float64) != 4 {
+		t.Fatalf("a claimed close loss must change nothing: bob %v", bb["points"])
 	}
 	_, mon := r.sync(t, "bob", map[string]any{"event": "reveal-month:2026-10"})
-	if mon["points"].(float64) != 5 {
+	if mon["points"].(float64) != 4 {
 		t.Fatalf("arena results must count for arena-only events too: %v", mon["points"])
 	}
 	_, an := r.sync(t, "anon1", map[string]any{"event": vday})
@@ -442,8 +447,9 @@ func TestEventsRevealAndGuess(t *testing.T) {
 		r.tick(time.Second)
 		return call(t, "POST", r.srv.URL+prefix+"/events/guess", "dev:me", map[string]any{"event": rw, "pic": pic, "choice": choice})
 	}
-	if code, _ := guess("art", "A FLYING KICK"); code != 409 {
-		t.Fatalf("art guess on a placeholder event: %d", code)
+	// The client shows art the server has no answer for: not guessable, nothing spent.
+	if code, g := guess("art", "A FLYING KICK"); code != 200 || g["guessable"] != false || g["right"] != false || len(g["guesses"].([]any)) != 0 {
+		t.Fatalf("art guess without an answer on the server: %d %v", code, g)
 	}
 	code, g := guess("heroic", "A TEA PARTY")
 	if code != 200 || g["right"] != false || g["guessesLeft"].(float64) != 1 {
@@ -468,10 +474,11 @@ func TestEventsRevealAndGuess(t *testing.T) {
 	if strings.Contains(string(raw), "NINJA") {
 		t.Fatal("the answer leaked into a sync reply")
 	}
-	// The month picture costs 2 a square: 5 arena points (with the Pass) open 2.
+	// The month picture costs 2 a square: 5 arena points (with the Pass) open 2. The close loss
+	// (2) comes from the agreed damage; the claim in "b" is ignored.
 	r.pass["me"] = true
 	r.h.st.recordMatch("w1", "duel", false, "2-0", []seatRow{rseat("me", "Me", true, 2), rseat("x", "X", false, 0)})
-	r.h.st.recordMatch("w2", "duel", false, "0-2", []seatRow{rseat("me", "Me", false, 0), rseat("x", "X", true, 2)})
+	r.h.st.recordMatch("w2", "duel", false, "0-2", []seatRow{{UID: "me", Name: "Me", Ranked: true, OppDmg: 0.6}, rseat("x", "X", true, 2)})
 	_, m := r.sync(t, "me", map[string]any{"event": "reveal-month:2026-10", "open": []int{1, 2, 3}, "b": [][]any{{"arena:w2", 2, "arena", 0}}})
 	if fmt.Sprint(m["open"]) != "[1 2]" || m["points"].(float64) != 5 {
 		t.Fatalf("month open: %v points %v", m["open"], m["points"])

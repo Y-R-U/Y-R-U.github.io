@@ -85,8 +85,14 @@ func TestIDTokenValid(t *testing.T) {
 		t.Fatal("certs refetched inside max-age", f.fetches.Load())
 	}
 	f.now = f.now.Add(2 * time.Hour)
-	if _, e := f.v.verify(context.Background(), f.sign(t, "kid1", f.key, nil)); e != nil || f.fetches.Load() != 2 {
-		t.Fatal("certs not refreshed after max-age", e, f.fetches.Load())
+	if _, e := f.v.verify(context.Background(), f.sign(t, "kid1", f.key, nil)); e != nil {
+		t.Fatal("expired cache must still verify while it refreshes", e)
+	}
+	for i := 0; i < 100 && f.fetches.Load() != 2; i++ {
+		time.Sleep(10 * time.Millisecond)
+	}
+	if f.fetches.Load() != 2 {
+		t.Fatal("certs not refreshed after max-age", f.fetches.Load())
 	}
 }
 

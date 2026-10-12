@@ -44,9 +44,16 @@ func newRig(t *testing.T, openLobby bool) *rig {
 			w.WriteHeader(400)
 			return
 		}
-		if tok == "dev:broke" {
+		switch tok {
+		case "dev:broke":
 			w.WriteHeader(429)
 			io.WriteString(w, `{"ok":false,"allowance":{"remaining":0}}`)
+			return
+		case "dev:refused":
+			w.WriteHeader(401)
+			return
+		case "dev:billingdown":
+			w.WriteHeader(503)
 			return
 		}
 		io.WriteString(w, `{"ok":true,"allowance":{"remaining":2}}`)
@@ -62,6 +69,7 @@ func newRig(t *testing.T, openLobby bool) *rig {
 		return identity{}, io.EOF
 	}))
 	r.h.openLobby = openLobby
+	r.h.perIP = 1 << 20 // every test socket is 127.0.0.1; TestPerIPCap sets its own
 	go r.h.run()
 	r.srv = httptest.NewServer(r.h.routes(prefix, []string{"*"}))
 	t.Cleanup(r.srv.Close)
@@ -72,6 +80,7 @@ type tc struct {
 	t    *testing.T
 	ws   *websocket.Conn
 	id   string
+	tok  string // the account token it said hello with; accept pays with it
 	msgs chan map[string]any
 	bins chan []byte
 }
@@ -92,7 +101,7 @@ func (r *rig) open(q, name, tok string, resumed bool) (*tc, string) {
 	if err != nil {
 		r.t.Fatal(err)
 	}
-	c := &tc{t: r.t, ws: ws, msgs: make(chan map[string]any, 256), bins: make(chan []byte, 64)}
+	c := &tc{t: r.t, ws: ws, tok: tok, msgs: make(chan map[string]any, 256), bins: make(chan []byte, 64)}
 	go func() {
 		for {
 			typ, b, err := ws.Read(context.Background())
@@ -125,6 +134,10 @@ func (r *rig) open(q, name, tok string, resumed bool) (*tc, string) {
 	c.send(map[string]any{"t": "hello", "name": name, "tok": tok, "tz": "Australia/Sydney"})
 	c.expect("me")
 	return c, w["tok"].(string)
+}
+
+func (c *tc) accept(match string) {
+	c.send(map[string]any{"t": "accept", "match": match, "tok": c.tok})
 }
 
 func (c *tc) send(v any) {
@@ -256,10 +269,10 @@ func TestDuelBestOfThreeAgreedStats(t *testing.T) {
 		t.Fatalf("per-type board: %v", duel)
 	}
 
-	// Rematch: both ask, a new match starts straight away with a fresh coin flip.
-	a.send(map[string]any{"t": "rematch", "match": id})
+	// Rematch: both ask (each with a fresh token), a new match starts with a fresh coin flip.
+	a.send(map[string]any{"t": "rematch", "match": id, "tok": "dev:alice"})
 	b.expect("rematch")
-	b.send(map[string]any{"t": "rematch", "match": id})
+	b.send(map[string]any{"t": "rematch", "match": id, "tok": "dev:bob"})
 	g2 := a.expect("go")
 	if g2["match"] == id || num(g2["round"]) != 1 {
 		t.Fatalf("rematch should be a new match at round 1: %v", g2)
@@ -270,8 +283,8 @@ func TestDisagreementVoidsAndCountsNothing(t *testing.T) {
 	r := newRig(t, false)
 	a, b := r.dial("Alice", "dev:alice"), r.dial("Bob", "dev:bob")
 	id, _, _ := matchUp(t, a, b)
-	a.send(map[string]any{"t": "accept", "match": id})
-	b.send(map[string]any{"t": "accept", "match": id})
+	a.accept(id)
+	b.accept(id)
 	a.expect("go")
 	b.expect("go")
 	a.send(map[string]any{"t": "round", "match": id, "round": 1, "winner": 0, "ko": true})
@@ -291,13 +304,16 @@ func TestDisagreementVoidsAndCountsNothing(t *testing.T) {
 
 func TestDropIsForfeitNotVoid(t *testing.T) {
 	r := newRig(t, false)
-	r.h.post(func() { r.h.awayGrace = 400 * time.Millisecond })
+	r.h.post(func() { r.h.awayGrace = 400 * time.Millisecond; r.h.earlyFF = 0 })
 	a, b := r.dial("Alice", "dev:alice"), r.dial("Bob", "dev:bob")
 	id, _, _ := matchUp(t, a, b)
-	a.send(map[string]any{"t": "accept", "match": id})
-	b.send(map[string]any{"t": "accept", "match": id})
+	a.accept(id)
+	b.accept(id)
 	a.expect("go")
-	// Bob was winning round 1, then his socket died and he never came back.
+	b.expect("go")
+	playRound(t, []*tc{a, b}, id, 1, 1, true)
+	a.expect("go")
+	// Bob won round 1 and was winning round 2, then his socket died and he never came back.
 	b.ws.Close(websocket.StatusGoingAway, "")
 	if w := a.expect("away"); num(w["ms"]) != 400 {
 		t.Fatalf("away notice: %v", w)
@@ -320,8 +336,8 @@ func TestRageQuitIsImmediateForfeit(t *testing.T) {
 	r := newRig(t, false)
 	a, b := r.dial("Alice", "dev:alice"), r.dial("Bob", "dev:bob")
 	id, _, _ := matchUp(t, a, b)
-	a.send(map[string]any{"t": "accept", "match": id})
-	b.send(map[string]any{"t": "accept", "match": id})
+	a.accept(id)
+	b.accept(id)
 	a.expect("go")
 	b.expect("go")
 	a.send(map[string]any{"t": "leave"})
@@ -339,8 +355,8 @@ func TestReconnectInsideGraceKeepsTheMatch(t *testing.T) {
 	a := r.dial("Alice", "dev:alice")
 	b, tok := r.dialTok("Bob", "dev:bob")
 	id, _, _ := matchUp(t, a, b)
-	a.send(map[string]any{"t": "accept", "match": id})
-	b.send(map[string]any{"t": "accept", "match": id})
+	a.accept(id)
+	b.accept(id)
 	a.expect("go")
 	b.expect("go")
 	b.ws.Close(4000, "blip")
@@ -374,8 +390,8 @@ func TestAnonymousFriendLinkButNoLobbyNoBoard(t *testing.T) {
 		t.Fatal("a match with one signed-in player counts for that player")
 	}
 	id := ob["match"].(string)
-	a.send(map[string]any{"t": "accept", "match": id})
-	b.send(map[string]any{"t": "accept", "match": id})
+	a.accept(id)
+	b.accept(id)
 	a.expect("go")
 	b.expect("go")
 	for round := 1; round <= 2; round++ {
@@ -409,14 +425,24 @@ func TestTurnOnlyForMatchedAndRelayStaysInMatch(t *testing.T) {
 	x.send(map[string]any{"t": "lobby", "on": true})
 	x.none("offer", 100*time.Millisecond)
 	id, _, _ := matchUp(t, a, b)
-	_ = id
-	// Signalling and relay frames reach the peer...
+	// Signalling reaches the peer during the offer (the direct link measures the ping)...
 	a.send(map[string]any{"t": "sig", "to": b.id, "d": map[string]any{"sdp": 1}})
 	if s := b.expect("sig"); s["from"] != a.id {
 		t.Fatalf("sig: %v", s)
 	}
+	// ...relayed game traffic does not, until both have accepted.
 	frame := append([]byte{byte(len(b.id))}, b.id...)
 	frame = append(frame, 'u', 9, 9)
+	a.ws.Write(context.Background(), websocket.MessageBinary, frame)
+	select {
+	case <-b.bins:
+		t.Fatal("relay before the match was accepted")
+	case <-time.After(300 * time.Millisecond):
+	}
+	a.accept(id)
+	b.accept(id)
+	a.expect("go")
+	b.expect("go")
 	a.ws.Write(context.Background(), websocket.MessageBinary, frame)
 	select {
 	case got := <-b.bins:
@@ -525,8 +551,8 @@ func TestLanResultsKeptLinkedAndUploadable(t *testing.T) {
 	a.send(map[string]any{"t": "hello", "name": "Kid A", "tok": "lan:deviceaaa", "link": "dev:firebase-a"})
 	a.expect("me")
 	id, _, _ := matchUp(t, a, b)
-	a.send(map[string]any{"t": "accept", "match": id})
-	b.send(map[string]any{"t": "accept", "match": id})
+	a.accept(id)
+	b.accept(id)
 	a.expect("go")
 	b.expect("go")
 	playRound(t, []*tc{a, b}, id, 1, 0, true)

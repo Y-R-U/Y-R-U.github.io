@@ -8,10 +8,13 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"net/http"
 	"os"
@@ -21,6 +24,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 	"unicode/utf8"
 )
@@ -421,8 +425,8 @@ CREATE TABLE IF NOT EXISTS ev_state (uid TEXT NOT NULL, event TEXT NOT NULL, nam
   solved INTEGER NOT NULL DEFAULT 0, bonus INTEGER NOT NULL DEFAULT 0, updated INTEGER NOT NULL,
   PRIMARY KEY (uid, event));
 CREATE INDEX IF NOT EXISTS ev_state_event ON ev_state(event, updated);
--- Agreed arena results, one row per verified player (store.afterMatch). close = the player
--- claimed a loss with the opponent more than half beaten (2 points instead of 1).
+-- Agreed arena results, one row per verified player (store.afterMatch). close = a loss with the
+-- opponent more than half beaten (2 points instead of 1), from the agreed damage of the deciding round.
 CREATE TABLE IF NOT EXISTS ev_arena (match TEXT NOT NULL, uid TEXT NOT NULL, won INTEGER NOT NULL,
   close INTEGER NOT NULL DEFAULT 0, at INTEGER NOT NULL, PRIMARY KEY (match, uid));
 CREATE INDEX IF NOT EXISTS ev_arena_uid ON ev_arena(uid, at);
@@ -430,7 +434,9 @@ CREATE INDEX IF NOT EXISTS ev_arena_uid ON ev_arena(uid, at);
 
 const (
 	evGrace     = 10 * time.Minute // claims still accepted this long after a window ends
-	evSkew      = 2 * time.Minute  // a campaign fight may not be dated further ahead than this
+	evSkew      = 10 * time.Minute // a fast device clock: claims this far ahead are shifted back to now; further = refused
+	evMaxAge    = 26 * time.Hour   // ...nor further back than this
+	evSyncSlack = 10 * time.Minute // ...nor before the previous sync, less this (a sync in flight)
 	evRivalScan = 500
 	evMaxBody   = 32 << 10
 )
@@ -443,7 +449,28 @@ var (
 	evPassCache = map[string]passEntry{}
 	evSyncMu    sync.Mutex
 	evSyncLast  = map[string]time.Time{}
+	// One player's state in one event is read, changed and written under its stripe.
+	evLocks    [256]sync.Mutex
+	evNoAnswer sync.Map // events already logged as art-without-answer
 )
+
+func evLock(uid, ev string) *sync.Mutex { return &evLocks[hash32(uid+"|"+ev)%uint32(len(evLocks))] }
+
+var evMinGap = 250 * time.Millisecond // tests set 0 to reach the lock behind it
+
+// evLimit: evMinGap between calls of one kind, per player and event.
+func (h *hub) evLimit(key string) bool {
+	evSyncMu.Lock()
+	defer evSyncMu.Unlock()
+	if t := evSyncLast[key]; h.st.now().Sub(t) < evMinGap {
+		return false
+	}
+	evSyncLast[key] = h.st.now()
+	if len(evSyncLast) > 20000 {
+		evSyncLast = map[string]time.Time{}
+	}
+	return true
+}
 
 type passEntry struct {
 	ok  bool
@@ -524,8 +551,15 @@ func (h *hub) eventRoutes(mux *http.ServeMux, prefix string, origins []string) {
 			reply(w, 400, map[string]string{"error": "not a vines event"})
 			return
 		}
-		friends := strings.Split(r.URL.Query().Get("friends"), ",")
-		rv, err := h.st.evRivals(ev, uid, friends)
+		if !h.evLimit("rivals|" + uid + "|" + ev) {
+			if v, ok := h.st.rivals.get(uid+"|"+ev, -1, h.st.now()); ok {
+				reply(w, 200, map[string]any{"event": ev, "rivals": v})
+			} else {
+				reply(w, 429, map[string]string{"error": "slow down"})
+			}
+			return
+		}
+		rv, err := h.st.evRivals(ev, uid)
 		if err != nil {
 			reply(w, 503, map[string]string{"error": "unavailable"})
 			return
@@ -593,23 +627,18 @@ func (h *hub) eventSync(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	evSyncMu.Lock()
-	key := uid + "|" + body.Event
-	if t := evSyncLast[key]; h.st.now().Sub(t) < 250*time.Millisecond {
-		evSyncMu.Unlock()
+	if !h.evLimit(uid + "|" + body.Event) {
 		reply(w, 429, map[string]string{"error": "slow down"})
 		return
 	}
-	evSyncLast[key] = h.st.now()
-	if len(evSyncLast) > 20000 {
-		evSyncLast = map[string]time.Time{}
-	}
-	evSyncMu.Unlock()
 	name, err := cleanName(body.Name)
 	if err != nil {
 		name = "PLAYER"
 	}
+	mu := evLock(uid, body.Event)
+	mu.Lock()
 	out, err := h.st.evApply(uid, name, body)
+	mu.Unlock()
 	if err != nil {
 		reply(w, 503, map[string]string{"error": "unavailable"})
 		return
@@ -626,14 +655,15 @@ type evPlayer struct {
 	openCells     []int
 	solved        bool
 	bonus         int
+	updated       int64 // ms of the previous sync (0 = never)
 }
 
 func (s *store) evLoad(uid, ev string, def *evDef, win evWindow) (*evPlayer, error) {
 	p := &evPlayer{uid: uid, name: "PLAYER", openCells: []int{}, guesses: []string{}}
 	var open, guesses string
 	var solved int
-	err := s.db.QueryRow(`SELECT name, rolls, open, guesses, solved, bonus FROM ev_state WHERE uid=? AND event=?`, uid, ev).
-		Scan(&p.name, &p.rolls, &open, &guesses, &solved, &p.bonus)
+	err := s.db.QueryRow(`SELECT name, rolls, open, guesses, solved, bonus, updated FROM ev_state WHERE uid=? AND event=?`, uid, ev).
+		Scan(&p.name, &p.rolls, &open, &guesses, &solved, &p.bonus, &p.updated)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
@@ -700,8 +730,15 @@ func (s *store) evApply(uid, name string, body syncBody) (map[string]any, error)
 		return nil, err
 	}
 	if open {
-		// Battles: arena ids only confirm a close loss; campaign fights are trusted, capped.
+		// Battles: arena results count from the server's own records, never from a claim;
+		// campaign fights are trusted, but only recent ones, after the previous sync, and at
+		// most a day's cap in one request.
+		oldest := now.Add(-evMaxAge).UnixMilli()
+		if p.updated > 0 {
+			oldest = max(oldest, p.updated-evSyncSlack.Milliseconds())
+		}
 		var claims []evBattle
+		ahead := int64(0)
 		for _, raw := range body.B {
 			var row []json.RawMessage
 			if json.Unmarshal(raw, &row) != nil || len(row) < 4 {
@@ -712,21 +749,27 @@ func (s *store) evApply(uid, name string, body syncBody) (map[string]any, error)
 				json.Unmarshal(row[2], &b.Src) != nil || json.Unmarshal(row[3], &b.At) != nil || !reBattleID.MatchString(b.ID) {
 				continue
 			}
-			if b.Src == "arena" && strings.HasPrefix(b.ID, "arena:") {
-				if b.Pts == 2 {
-					s.db.Exec(`UPDATE ev_arena SET close=1 WHERE match=? AND uid=? AND won=0`, strings.TrimPrefix(b.ID, "arena:"), uid)
-				}
+			if b.Src != "campaign" || strings.HasPrefix(b.ID, "arena:") || b.Pts < 1 || b.Pts > 3 ||
+				b.At > now.Add(evSkew).UnixMilli() {
 				continue
 			}
-			if b.Src != "campaign" || strings.HasPrefix(b.ID, "arena:") || b.Pts < 1 || b.Pts > 3 || b.At > now.Add(evSkew).UnixMilli() {
-				continue
-			}
+			ahead = max(ahead, b.At-now.UnixMilli())
 			claims = append(claims, b)
 		}
+		// A device clock that runs fast: shift the whole batch back so its newest fight is
+		// "now", keeping the gaps between fights (the campaign cap wants 60 s between them).
+		kept := claims[:0]
+		for _, b := range claims {
+			if b.At -= ahead; b.At >= oldest {
+				kept = append(kept, b)
+			}
+		}
+		claims = kept
 		sort.SliceStable(claims, func(i, j int) bool { return claims[i].At < claims[j].At })
 		cur := append([]evBattle(nil), p.battles...)
+		added := 0
 		for _, c := range claims {
-			if !def.AnyBattle {
+			if !def.AnyBattle || added >= campaignCap.PerDay {
 				break
 			}
 			if containsID(cur, c.ID) {
@@ -738,6 +781,7 @@ func (s *store) evApply(uid, name string, body syncBody) (map[string]any, error)
 					return nil, err
 				}
 				cur = next
+				added++
 			}
 		}
 		if p, err = s.evLoad(uid, body.Event, def, win); err != nil {
@@ -764,7 +808,7 @@ func (s *store) evApply(uid, name string, body syncBody) (map[string]any, error)
 	out := s.evView(body.Event, def, win, p)
 	out["closed"] = !open
 	if def.Kind == "vines" {
-		rv, err := s.evRivals(body.Event, uid, body.Friends)
+		rv, err := s.evRivals(body.Event, uid)
 		if err != nil {
 			return nil, err
 		}
@@ -795,6 +839,7 @@ func (s *store) evView(ev string, def *evDef, win evWindow, p *evPlayer) map[str
 		board := makeBoard(ev)
 		pos, _ := positionAfterRolls(board, p.uid, ev, p.rolls)
 		out["rolls"], out["pos"], out["turns"] = p.rolls, pos, turnsDone(board, p.uid, ev, pts, p.rolls)
+		out["rid"] = s.rid(ev, p.uid)
 	} else {
 		out["open"], out["guesses"], out["solved"], out["bonus"] = p.openCells, p.guesses, p.solved, p.bonus
 		out["guessesLeft"] = guessesLeft(len(p.openCells), len(p.guesses), p.solved)
@@ -806,6 +851,7 @@ func (s *store) evView(ev string, def *evDef, win evWindow, p *evPlayer) map[str
 func (s *store) evHasArt(ev string) bool { _, ok := evAnswers.get(ev); return ok }
 
 type rivalOut struct {
+	Rid    string `json:"rid"` // stable per event, opaque: a salted hash, never the uid
 	Name   string `json:"name"`
 	Pos    int    `json:"pos"`
 	Turns  int    `json:"turns"` // the turn they are SHOWN at: min(theirs, yours)
@@ -815,7 +861,9 @@ type rivalOut struct {
 
 // evRivals applies THE REPLAY RULE with the caller's own stored turn count. Only a name, a
 // square and the shown turn leave the server: no uid, no batches, no roll count, no real turns.
-func (s *store) evRivals(ev, me string, friendNames []string) ([]rivalOut, error) {
+// A "friend" is an account the caller finished a friend-link match with (store.friendsOf),
+// never a display name the client sends.
+func (s *store) evRivals(ev, me string) ([]rivalOut, error) {
 	def, win, ok := parseEventID(ev)
 	if !ok || def.Kind != "vines" {
 		return []rivalOut{}, nil
@@ -828,12 +876,13 @@ func (s *store) evRivals(ev, me string, friendNames []string) ([]rivalOut, error
 	myPts := ptsOf(mine.battles)
 	myTurns := turnsDone(board, me, ev, myPts, mine.rolls)
 	myPos, _ := positionAfterRolls(board, me, ev, mine.rolls)
-	friends := map[string]bool{}
-	for _, f := range friendNames {
-		if f = strings.ToUpper(strings.TrimSpace(f)); f != "" && len(friends) < 50 {
-			friends[f] = true
-		}
+	if v, ok := s.rivals.get(me+"|"+ev, myTurns, s.now()); ok {
+		return v, nil
 	}
+	rivalSem <- struct{}{}
+	defer func() { <-rivalSem }()
+	evRivalScans.Add(1)
+	friends := s.friendsOf(me)
 	rows, err := s.db.Query(`SELECT uid FROM ev_state WHERE event=? AND uid<>? ORDER BY updated DESC LIMIT ?`, ev, me, evRivalScan)
 	if err != nil {
 		return nil, err
@@ -862,8 +911,8 @@ func (s *store) evRivals(ev, me string, friendNames []string) ([]rivalOut, error
 		}
 		shown := min(theirs, myTurns)
 		pos := positionAtTurn(board, u, ev, pts, shown)
-		c := cand{rivalOut{Name: p.name, Pos: pos, Turns: shown, Home: pos == squares}, u}
-		if friends[strings.ToUpper(p.name)] {
+		c := cand{rivalOut{Rid: s.rid(ev, u), Name: p.name, Pos: pos, Turns: shown, Home: pos == squares}, u}
+		if friends[u] {
 			c.Friend = true
 			fr = append(fr, c)
 		} else {
@@ -888,7 +937,72 @@ func (s *store) evRivals(ev, me string, friendNames []string) ([]rivalOut, error
 		}
 		out = append(out, c.rivalOut)
 	}
+	s.rivals.put(me+"|"+ev, myTurns, s.now(), out)
 	return out, nil
+}
+
+// The rival scan reads every player in the event (~1,000 queries at 500 players): one caller's
+// answer is reused for rivalTTL while their own turn count is unchanged, at most a few scans
+// run at once, and GET /events/rivals is rate limited on top (a limited caller gets the cache).
+const rivalTTL = 5 * time.Second
+
+var (
+	rivalSem     = make(chan struct{}, 4)
+	evRivalScans atomic.Int64
+)
+
+type rivalEntry struct {
+	at    time.Time
+	turns int
+	v     []rivalOut
+}
+
+type rivalMemo struct {
+	mu sync.Mutex
+	m  map[string]rivalEntry
+}
+
+func (c *rivalMemo) get(k string, turns int, now time.Time) ([]rivalOut, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	e, ok := c.m[k]
+	if !ok || (turns >= 0 && (e.turns != turns || now.Sub(e.at) > rivalTTL)) {
+		return nil, false
+	}
+	return e.v, true
+}
+
+func (c *rivalMemo) put(k string, turns int, now time.Time, v []rivalOut) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if len(c.m) > 5000 {
+		c.m = map[string]rivalEntry{}
+	}
+	c.m[k] = rivalEntry{now, turns, v}
+}
+
+// rid: a rival's id for one event — stable, opaque, unlinkable to the uid or across events.
+func (s *store) rid(ev, uid string) string {
+	sum := sha256.Sum256([]byte(s.salt() + "|" + ev + "|" + uid))
+	return hex.EncodeToString(sum[:8])
+}
+
+// salt is made once per database and kept in it, so rids survive a restart.
+func (s *store) salt() string {
+	s.saltMu.Lock()
+	defer s.saltMu.Unlock()
+	if s.saltV != "" {
+		return s.saltV
+	}
+	s.db.Exec(`CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT NOT NULL)`)
+	var v string
+	if s.db.QueryRow(`SELECT v FROM meta WHERE k='rid_salt'`).Scan(&v) != nil || v == "" {
+		v = randString(idChars, 32)
+		s.db.Exec(`INSERT OR IGNORE INTO meta(k,v) VALUES('rid_salt',?)`, v)
+		s.db.QueryRow(`SELECT v FROM meta WHERE k='rid_salt'`).Scan(&v)
+	}
+	s.saltV = v
+	return v
 }
 
 func (h *hub) eventGuess(w http.ResponseWriter, r *http.Request) {
@@ -920,15 +1034,44 @@ func (h *hub) eventGuess(w http.ResponseWriter, r *http.Request) {
 	if !art {
 		answer = placeholderAnswer
 	}
+	// Approved art in the manifest but no answer in this server's answers file: the picture
+	// cannot be checked, so it takes no guesses (the reveal still works). Logged once.
+	if body.Pic == "art" && !art {
+		if _, seen := evNoAnswer.LoadOrStore(body.Event, true); !seen {
+			log.Printf("events: %s has art but no answer in %s; guesses are off for it", body.Event, evAnswers.path)
+		}
+		p, err := h.st.evLoad(uid, body.Event, def, win)
+		if err != nil {
+			reply(w, 503, map[string]string{"error": "unavailable"})
+			return
+		}
+		out := h.st.evView(body.Event, def, win, p)
+		out["right"], out["guessable"], out["guessesLeft"] = false, false, 0
+		reply(w, 200, out)
+		return
+	}
 	// The server decides which picture is up; a client showing the other one gets told, and
 	// keeps its guess.
 	if (body.Pic == "art") != art {
 		reply(w, 409, map[string]any{"error": "picture changed", "art": art})
 		return
 	}
+	if !h.evLimit("guess|" + uid + "|" + body.Event) {
+		reply(w, 429, map[string]string{"error": "slow down"})
+		return
+	}
+	// Load, check and save under the player's lock: concurrent guesses must not all see the
+	// one guess that is left.
+	mu := evLock(uid, body.Event)
+	mu.Lock()
+	defer mu.Unlock()
 	p, err := h.st.evLoad(uid, body.Event, def, win)
 	if err != nil {
 		reply(w, 503, map[string]string{"error": "unavailable"})
+		return
+	}
+	if len(p.battles) == 0 {
+		reply(w, 409, map[string]any{"error": "play first", "guessesLeft": guessesLeft(len(p.openCells), len(p.guesses), p.solved)})
 		return
 	}
 	if guessesLeft(len(p.openCells), len(p.guesses), p.solved) <= 0 || containsStr(p.guesses, choice) {
@@ -938,7 +1081,11 @@ func (h *hub) eventGuess(w http.ResponseWriter, r *http.Request) {
 	p.guesses = append(p.guesses, choice)
 	right := choice == strings.ToUpper(answer)
 	if right {
-		p.solved, p.bonus = true, (cells-len(p.openCells))*def.GuessBonus
+		// The placeholder's answer is public (it ships in the client): solving it pays no bonus.
+		p.solved = true
+		if art {
+			p.bonus = (cells - len(p.openCells)) * def.GuessBonus
+		}
 	}
 	if err := h.st.evSave(body.Event, p); err != nil {
 		reply(w, 503, map[string]string{"error": "unavailable"})
@@ -954,7 +1101,7 @@ func (h *hub) eventGuess(w http.ResponseWriter, r *http.Request) {
 func (s *store) eventArenaResult(match string, seats []seatRow) {
 	at := s.now().UnixMilli()
 	for _, p := range seats {
-		if p.UID == "" || !p.Ranked {
+		if p.UID == "" || !p.Ranked || p.NoStats || p.NoEvent {
 			continue
 		}
 		s.db.Exec(`INSERT OR IGNORE INTO ev_arena(match,uid,won,close,at) VALUES(?,?,?,?,?)`, match, p.UID, b2i(p.Won), b2i(!p.Won && p.OppDmg > 0.5), at)

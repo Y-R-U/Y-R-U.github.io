@@ -28,7 +28,7 @@ const ice = createServer((q, r) => r.end(JSON.stringify({ iceServers: [{ urls: [
 const PORT = +(process.env.ARENA_TEST_PORT || 9320);
 await new Promise((r) => ice.listen(PORT + 1, '127.0.0.1', r));
 const server = spawn(bin, [], { env: { ...process.env, ARENA_ADDR: `127.0.0.1:${PORT}`, ARENA_DB: join(tmp, 'a.db'),
-  ARENA_ICE_URL: `http://127.0.0.1:${PORT + 1}/ice`, ARENA_ALLOWANCE_URL: 'off', ARENA_DEV_AUTH: '1' }, stdio: 'ignore' });
+  ARENA_ICE_URL: `http://127.0.0.1:${PORT + 1}/ice`, ARENA_ALLOWANCE_URL: 'off', ARENA_DEV_AUTH: '1', ARENA_EARLY_FF_MS: '0' }, stdio: 'ignore' });
 const base = `http://127.0.0.1:${PORT}/gms/2d/ragdojo/arena`;
 for (let i = 0; i < 50; i++) { try { if ((await fetch(base + '/health')).ok) break; } catch {} await sleep(100); }
 
@@ -113,7 +113,7 @@ try {
   // A mismatch is void and counts for nobody.
   for (const c of [a, b]) c.send({ t: 'leave' });
   const [o2] = await matchUp(a, b);
-  a.send({ t: 'accept', match: o2.match }); b.send({ t: 'accept', match: o2.match });
+  a.send({ t: 'accept', match: o2.match, tok: 'dev:alice' }); b.send({ t: 'accept', match: o2.match, tok: 'dev:bob' });
   await a.next('go'); await b.next('go');
   a.send({ t: 'round', match: o2.match, round: 1, winner: 0, ko: true });
   b.send({ t: 'round', match: o2.match, round: 1, winner: 1, ko: true });
@@ -124,7 +124,7 @@ try {
 
   // Rage-quit while losing: the result stands, as a forfeit.
   const [o3] = await matchUp(a, b);
-  a.send({ t: 'accept', match: o3.match }); b.send({ t: 'accept', match: o3.match });
+  a.send({ t: 'accept', match: o3.match, tok: 'dev:alice' }); b.send({ t: 'accept', match: o3.match, tok: 'dev:bob' });
   await a.next('go'); await b.next('go');
   for (const c of [a, b]) c.send({ t: 'round', match: o3.match, round: 1, winner: 0, ko: true });
   await a.next('go'); await b.next('go');

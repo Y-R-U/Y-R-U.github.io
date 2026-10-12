@@ -196,7 +196,8 @@ export async function run(root, serverDir, { label = '' } = {}) {
       await tap(c, `[data-guess="A FLYING KICK"]`);
       ok(L + 'a right guess solves it through the server', await c.waitFor(`window.__events.state.ev['${REV}']?.solved === true`, 5000));
       const ink1 = await c.eval('window.__ragdojo.save.ink');
-      ok(L + 'the guess bonus pays ink (25 covered x 2)', ink1 - ink0 === 50, `${ink0} -> ${ink1}`);
+      // The placeholder's answer ships in the client, so the server pays no bonus for it.
+      ok(L + 'the placeholder pays no guess bonus (its answer is public)', ink1 - ink0 === 0, `${ink0} -> ${ink1}`);
       ok(L + 'the picture is unlocked as a background', await c.waitFor(`document.querySelector('[data-bg]')`, 2000));
       await tap(c, `[data-bg]`);
       ok(L + 'USE IT sets the arena/menu background', await c.eval(`window.__ragdojo.save.eventPrizes.bg === '${REV}'`));

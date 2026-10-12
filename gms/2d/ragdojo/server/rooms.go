@@ -108,9 +108,14 @@ func (h *hub) roomOffer(m *match) {
 				peers = append(peers, map[string]any{"id": o.id, "name": o.name, "ranked": o.ranked, "slot": j})
 			}
 		}
-		h.send(s.c, map[string]any{"t": "offer", "room": true, "match": m.id, "type": m.typ, "friend": m.friend, "code": m.code,
-			"you": i, "host": i == 0, "peers": peers, "ice": ice, "turn": turn, "counted": m.counted(),
-			"startIn": startIn, "quorum": roomQuorum, "max": roomMax})
+		o := map[string]any{"t": "offer", "room": true, "match": m.id, "type": m.typ, "friend": m.friend, "code": m.code,
+			"you": i, "host": i == 0, "peers": peers, "counted": m.counted(),
+			"startIn": startIn, "quorum": roomQuorum, "max": roomMax}
+		// TURN credentials only once there is someone to link to: never to a room of one.
+		if len(m.seats) >= 2 {
+			o["ice"], o["turn"] = ice, turn
+		}
+		h.send(s.c, o)
 	}
 }
 
@@ -156,7 +161,9 @@ func (h *hub) startRoom(m *match) {
 			continue
 		}
 		h.send(s.c, map[string]any{"t": "cancel", "match": m.id, "why": "notready"})
-		s.c.match = nil
+		if s.c.match == m {
+			s.c.match = nil
+		}
 	}
 	m.seats = kept
 	m.startAt = time.Time{}
@@ -184,10 +191,11 @@ func (h *hub) roomBegin(m *match) {
 			kept = append(kept, s)
 			continue
 		}
-		h.send(s.c, map[string]any{"t": "err", "code": "allowance",
-			"msg": "That was today's last free arena battle. The br8t Pass makes them unlimited — or come back tomorrow."})
-		h.send(s.c, map[string]any{"t": "cancel", "match": m.id, "why": "allowance"})
-		s.c.match = nil
+		why := h.refused(s)
+		h.send(s.c, map[string]any{"t": "cancel", "match": m.id, "why": why})
+		if s.c.match == m {
+			s.c.match = nil
+		}
 	}
 	m.seats = kept
 	if len(kept) < 2 {
@@ -195,6 +203,7 @@ func (h *hub) roomBegin(m *match) {
 		return
 	}
 	m.state = mPlay
+	m.playAt = h.now()
 	m.round = 1
 	m.arena = coin(1 << 20)
 	m.master = h.bestMaster(m)
@@ -396,7 +405,7 @@ func (h *hub) checkRoomReports(m *match) {
 		if first == nil {
 			first = &r
 		} else if r != *first {
-			h.void(m, "disagree", nil)
+			h.disputeRoom(m)
 			return
 		}
 	}
@@ -407,11 +416,61 @@ func (h *hub) checkRoomReports(m *match) {
 		h.void(m, "disagree", nil)
 		return
 	}
-	if first.winner >= 0 && first.ko {
-		m.seats[first.winner].kos++
+	h.countRoom(m, *first)
+}
+
+func (h *hub) countRoom(m *match, r report) {
+	if r.winner >= 0 && r.ko {
+		m.seats[r.winner].kos++
 	}
-	m.dmg = parseDmg(first.dmg)
-	h.finishRoom(m, first.winner, parsePlace(first.place), false)
+	m.dmg = parseDmg(r.dmg)
+	h.finishRoom(m, r.winner, parsePlace(r.place), false)
+}
+
+// disputeRoom: the reports differ. The duel rule, for a room: if a strict majority (two or
+// more) agree, nobody in it has a record of disputes, and EVERY seat disagreeing with it has
+// one, the majority's report counts and the dissenters take the dispute. Otherwise a void,
+// logged against every account still in.
+func (h *hub) disputeRoom(m *match) {
+	groups := map[report][]int{}
+	in := 0
+	for i, s := range m.seats {
+		if !s.out {
+			in++
+			groups[m.reports[i]] = append(groups[m.reports[i]], i)
+		}
+	}
+	var best report
+	bestN := 0
+	for r, l := range groups {
+		if len(l) > bestN {
+			best, bestN = r, len(l)
+		}
+	}
+	if bestN >= 2 && bestN*2 > in && (best.winner < 0 || !m.seats[best.winner].out) {
+		var bad []string
+		ok := true
+		for i, s := range m.seats {
+			if s.out {
+				continue
+			}
+			flagged := s.ranked && h.st.flagged(s.uid)
+			if m.reports[i] == best {
+				ok = ok && !flagged
+			} else {
+				ok = ok && flagged
+				bad = append(bad, s.uid)
+			}
+		}
+		if ok && len(bad) > 0 {
+			h.st.recordDispute(m.id, bad)
+			m.log = append(m.log, "disputed by "+strings.Join(bad, ",")+" (a record of disputes): the majority counts")
+			m.note = " disputed"
+			h.countRoom(m, best)
+			return
+		}
+	}
+	h.void(m, "disagree", nil)
 }
 
 func placeKey(p []int, n int) string {
@@ -507,14 +566,23 @@ func (h *hub) finishRoom(m *match, winner int, place []int, ff bool) {
 	m.state = mDone
 	rows := make([]seatRow, len(m.seats))
 	names := make([]string, len(m.seats))
+	early := ff && h.earlyForfeit(m)
 	for i, s := range m.seats {
 		rows[i] = seatRow{UID: s.uid, Name: s.name, Won: i == winner, KOs: s.kos, Ranked: s.ranked, Loadout: s.c.loadout, OppDmg: oppDmg(m.dmg, i)}
+		if early {
+			rows[i].NoEvent = true
+			rows[i].NoStats = i == winner
+		}
 		names[i] = s.name
 	}
 	score := "place " + placeKey(place, len(place))
 	if ff {
 		score += " ff"
 	}
+	if early {
+		score += " early"
+	}
+	score += m.note
 	if err := h.st.recordMatch(m.id, m.typ, m.friend, score, rows); err != nil {
 		log.Printf("match %s: stats write failed: %v", m.id, err)
 	}
@@ -531,7 +599,7 @@ func (h *hub) finishRoom(m *match, winner int, place []int, ff bool) {
 			continue
 		}
 		out := map[string]any{"t": "result", "match": m.id, "mode": m.typ, "winner": winner, "you": i, "place": place,
-			"names": names, "counted": s.ranked, "forfeit": ff}
+			"names": names, "counted": s.ranked && !rows[i].NoStats, "forfeit": ff}
 		if s.ranked {
 			if line, ok := h.st.mine(s.uid); ok {
 				out["stats"] = line

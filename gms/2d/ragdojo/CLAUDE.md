@@ -667,8 +667,8 @@ tools/eventart/       Aaron's LAN review page for Flux candidates (server.mjs + 
 Server (see docs/EVENTS.md "Server contract"): agreed arena results count automatically through
 `store.afterMatch`; claims are capped/clamped/recomputed; rivals get the replay rule with the
 caller's STORED turns and leave as `{name, pos, turns, friend, home}`; the guess is checked against
-`ARENA_EVENT_ANSWERS` (default next to the DB). Known gap: arena `oppDmg` is client-claimed (worth at
-most +1 point per agreed loss) until the agreed round report carries HP (hub.go, agent C's file).
+`ARENA_EVENT_ANSWERS` (default next to the DB). Arena `oppDmg` comes only from the agreed reports
+(the old client "close loss" claim is gone, 2026-10-13 F1).
 
 **Event art review (Aaron)**: `node gms/2d/ragdojo/tools/eventart/server.mjs` from the site root,
 then open the printed `http://192.168.0.236:8023/?k=<key>` on the phone. Data lives in

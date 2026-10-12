@@ -54,6 +54,7 @@ func TestLeaderboardOrdering(t *testing.T) {
 	boardTypes["xtest"] = true
 	t.Cleanup(func() { delete(boardTypes, "xtest") })
 	st := r.h.st
+	st.pairCap = 0 // ordering only; TestPairCap covers the cap
 	day := time.Date(2026, 10, 13, 12, 0, 0, 0, time.UTC)
 	st.now = func() time.Time { return day.Add(-24 * time.Hour) }
 	// Yesterday: Cara plays a lot (but not today).

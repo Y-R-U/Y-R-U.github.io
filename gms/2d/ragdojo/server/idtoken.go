@@ -37,47 +37,96 @@ type tokenVerifier struct {
 	mu                sync.Mutex
 	keys              map[string]*rsa.PublicKey
 	expires, fetched  time.Time
+	retryAt           time.Time     // after a failed fetch, the next one waits until then
+	inflight          chan struct{} // closed when the running fetch ends; nil = none running
 }
 
 func newTokenVerifier(project string) *tokenVerifier {
 	return &tokenVerifier{project: project, certsURL: firebaseCertsURL, http: &http.Client{Timeout: 10 * time.Second}, now: time.Now}
 }
 
+// key is stale-while-revalidate: expired keys keep verifying while ONE background fetch (never
+// under the lock) replaces them; a failed fetch keeps the old keys and retries a minute later.
+// Only a caller with no usable key (first start, or a rotated kid) waits for the fetch.
 func (v *tokenVerifier) key(ctx context.Context, kid string) (*rsa.PublicKey, error) {
 	v.mu.Lock()
-	defer v.mu.Unlock()
 	now := v.now()
 	k, ok := v.keys[kid]
-	// Refresh when the cache has expired, or for an unknown kid (rotation) at most once a minute.
-	if (!ok || now.After(v.expires)) && (v.keys == nil || now.After(v.expires) || now.Sub(v.fetched) > time.Minute) {
-		if e := v.refresh(ctx, now); e != nil && v.keys == nil {
-			return nil, e
-		}
-		k, ok = v.keys[kid]
+	stale := v.keys == nil || now.After(v.expires)
+	rotated := !ok && v.keys != nil && now.Sub(v.fetched) > time.Minute
+	if (stale || rotated) && !now.Before(v.retryAt) {
+		v.startRefresh(now)
 	}
+	if ok {
+		v.mu.Unlock()
+		return k, nil
+	}
+	wait := v.inflight
+	v.mu.Unlock()
+	if wait == nil {
+		if v.keys == nil {
+			return nil, errors.New("signing keys unavailable")
+		}
+		return nil, errors.New("unknown signing key")
+	}
+	select {
+	case <-wait:
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+	v.mu.Lock()
+	k, ok = v.keys[kid]
+	none := v.keys == nil
+	v.mu.Unlock()
 	if !ok {
+		if none {
+			return nil, errors.New("signing keys unavailable")
+		}
 		return nil, errors.New("unknown signing key")
 	}
 	return k, nil
 }
 
-func (v *tokenVerifier) refresh(ctx context.Context, now time.Time) error {
-	v.fetched = now
+// startRefresh runs under v.mu; the fetch itself does not.
+func (v *tokenVerifier) startRefresh(now time.Time) {
+	if v.inflight != nil {
+		return
+	}
+	done := make(chan struct{})
+	v.inflight, v.fetched = done, now
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), v.http.Timeout+time.Second)
+		keys, maxAge, err := v.fetch(ctx)
+		cancel()
+		v.mu.Lock()
+		at := v.now()
+		if err == nil {
+			v.keys, v.expires, v.retryAt = keys, at.Add(max(maxAge, time.Minute)), time.Time{}
+		} else {
+			v.retryAt = at.Add(time.Minute)
+		}
+		v.inflight = nil
+		close(done)
+		v.mu.Unlock()
+	}()
+}
+
+func (v *tokenVerifier) fetch(ctx context.Context) (map[string]*rsa.PublicKey, time.Duration, error) {
 	req, e := http.NewRequestWithContext(ctx, "GET", v.certsURL, nil)
 	if e != nil {
-		return e
+		return nil, 0, e
 	}
 	res, e := v.http.Do(req)
 	if e != nil {
-		return errors.New("signing keys unavailable")
+		return nil, 0, errors.New("signing keys unavailable")
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return errors.New("signing keys unavailable")
+		return nil, 0, errors.New("signing keys unavailable")
 	}
 	var certs map[string]string
 	if e := json.NewDecoder(io.LimitReader(res.Body, 1<<20)).Decode(&certs); e != nil {
-		return e
+		return nil, 0, e
 	}
 	keys := map[string]*rsa.PublicKey{}
 	for kid, p := range certs {
@@ -94,7 +143,7 @@ func (v *tokenVerifier) refresh(ctx context.Context, now time.Time) error {
 		}
 	}
 	if len(keys) == 0 {
-		return errors.New("no signing keys")
+		return nil, 0, errors.New("no signing keys")
 	}
 	maxAge := time.Hour
 	for _, part := range strings.Split(res.Header.Get("Cache-Control"), ",") {
@@ -104,8 +153,7 @@ func (v *tokenVerifier) refresh(ctx context.Context, now time.Time) error {
 			}
 		}
 	}
-	v.keys, v.expires = keys, now.Add(max(maxAge, time.Minute))
-	return nil
+	return keys, maxAge, nil
 }
 
 func b64(s string, out any) error {

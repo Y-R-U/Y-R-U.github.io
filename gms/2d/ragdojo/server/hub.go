@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 	"log"
 	"math/big"
+	"net"
 	"net/http"
 	"sort"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/coder/websocket"
@@ -27,11 +29,26 @@ const (
 	maxMatches   = 300
 	maxSeats     = 8 // protocol ceiling (Last Man Standing); a duel uses two
 	maxMsg       = 32 << 10
-	sendQueue    = 512
+	sendQueue    = 1024      // frame slots; the real bound is maxQueued bytes
+	maxQueued    = 512 << 10 // bytes waiting for one socket's writer
 	tickEvery    = 250 * time.Millisecond
 	pingEvery    = 4 * time.Second
+	pongLate     = 15 * time.Second // a ping this overdue = the socket is dead or not reading
+	helloWithin  = 10 * time.Second
 	offerTTL     = 75 * time.Second
 	reportWindow = 15 * time.Second
+	// Every inbound frame, per socket (relay included: a room master sends ~30/s per guest).
+	inRate, inBurst = 400, 400
+	// name / wait / unwait: they change what every lobby client sees.
+	ctlRate, ctlBurst = 1, 6
+	joinFailsPerMin   = 5
+	defaultPerIP      = 24
+	// A round that nobody finishes still ends: past this, silence is a forfeit (or, if nobody
+	// reported at all, a void). Duel rounds are 60 s, room rounds up to 150 s + 30 s overtime.
+	duelRoundCap = 3 * time.Minute
+	roomRoundCap = 5 * time.Minute
+	// A forfeit this early (or before any round was agreed) costs the leaver, pays nobody.
+	defaultEarlyFF = 10 * time.Second
 	// A player whose socket drops mid-match keeps their seat this long, fighter standing
 	// idle. Not back in time = a forfeit loss. Never a void: rage-quitting must not erase a result.
 	defaultAwayGrace = 10 * time.Second
@@ -40,6 +57,8 @@ const (
 	maxDrawReplay    = 3
 	relayPerSec      = 300
 	relayBytesPS     = 256 << 10
+	recvPerSec       = 2 * relayPerSec // relay + signalling INTO one socket, from all its peers
+	recvBytesPS      = 2 * relayBytesPS
 )
 
 type verifier func(context.Context, string) (identity, error)
@@ -61,7 +80,11 @@ type hub struct {
 	lobbyDirt bool
 	lagging   []*client
 	// Multi-player rooms (rooms.go): countdown at roomQuorum, slower one below it.
-	roomCountdown, roomSlow, migrateAfter time.Duration
+	roomCountdown, roomSlow, migrateAfter   time.Duration
+	reportWindow, earlyFF, duelCap, roomCap time.Duration
+	helloWithin, pongLate                   time.Duration
+	perIP                                   int
+	ipN                                     map[string]int
 
 	statsMu sync.Mutex
 	live    liveStats
@@ -80,6 +103,19 @@ type client struct {
 	uid              string
 	ranked           bool // verified, non-anonymous Firebase account
 	send             chan []byte
+	queued           *atomic.Int64 // bytes in send, shared with this socket's writer
+	ip               string
+	hello            bool
+	since, pongAt    time.Time
+	authBusy         bool
+	authNext         string
+	linking          bool
+	ctlAt            time.Time
+	ctlN             float64
+	joinFails        []time.Time
+	lobbyOwed        bool
+	recvAt           time.Time
+	recvN, recvB     float64
 	gone, lagging    bool
 	waiting          string // preferred game type while in the lobby
 	lobby            bool   // wants lobby updates
@@ -116,6 +152,9 @@ type seat struct {
 	kos      int
 	rematch  bool
 	spent    *spendResult
+	checked  bool               // its token verified as its own account (startMatch phase 1)
+	paying   bool               // its allowance claim is in flight (phase 2)
+	rtok     string             // the fresh token sent with "rematch": a rematch never reuses tok
 	out      bool               // rooms: eliminated (left, or never came back)
 	outSeq   int                // order of going out, for placements
 	rtts     map[string]float64 // rooms: this seat's measured ping to each peer id
@@ -146,11 +185,16 @@ type match struct {
 	room          bool      // a 2-8 player mode: one round, host migration, eliminations
 	startAt       time.Time // rooms: when the countdown ends
 	outN          int
+	playAt        time.Time // when play began
+	roundEnd      time.Time // hard deadline for the current round
+	agreed        int       // rounds every seat agreed on
+	note          string    // appended to the stored score (" disputed")
 }
 
 type attachResult struct {
 	c   *client
 	gen int
+	why string
 }
 
 type event struct {
@@ -159,6 +203,7 @@ type event struct {
 	rid   string
 	rtok  string
 	c     *client
+	ip    string
 	data  []byte
 	bin   bool
 	fn    func()
@@ -178,6 +223,8 @@ func newHub(st *store, ice *iceSource, allow *allowance, verify verifier) *hub {
 		in: make(chan event, 2048), clients: map[string]*client{}, matches: map[string]*match{},
 		codes: map[string]*match{}, awayGrace: defaultAwayGrace, ice: ice, allow: allow, verify: verify, st: st, now: time.Now,
 		roomCountdown: defaultRoomCountdown, roomSlow: defaultRoomSlow, migrateAfter: defaultMigrateAfter,
+		reportWindow: reportWindow, earlyFF: defaultEarlyFF, duelCap: duelRoundCap, roomCap: roomRoundCap,
+		perIP: defaultPerIP, ipN: map[string]int{}, helloWithin: helloWithin, pongLate: pongLate,
 	}
 }
 
@@ -200,12 +247,12 @@ func (h *hub) post(fn func()) { h.in <- event{kind: evFn, fn: fn} }
 func (h *hub) handle(e event) {
 	switch e.kind {
 	case evJoin:
-		c := h.attach(e)
+		c, why := h.attach(e)
 		gen := 0
 		if c != nil {
 			gen = c.gen
 		}
-		e.reply <- attachResult{c, gen}
+		e.reply <- attachResult{c, gen, why}
 	case evLeave:
 		if e.gen == e.c.gen {
 			h.disconnect(e.c)
@@ -227,13 +274,15 @@ func (h *hub) handle(e event) {
 	for len(h.lagging) > 0 {
 		c := h.lagging[0]
 		h.lagging = h.lagging[1:]
-		h.drop(c, "lagging")
+		// A full queue is a dead or very slow reader: mid-match it gets the away grace (and can
+		// resume), anywhere else it is simply gone.
+		log.Printf("client %s lagging", c.id)
+		h.disconnect(c)
 	}
-	if h.lobbyDirt {
-		h.lobbyDirt = false
-		h.sendLobbies()
+	if e.kind == evTick {
+		h.flushLobbies()
+		h.publish()
 	}
-	h.publish()
 }
 
 // ---------------------------------------------------------------- messages
@@ -276,11 +325,14 @@ func (h *hub) message(c *client, raw []byte) {
 			}
 			c.pingAt = time.Time{}
 		}
+		c.pongAt = h.now()
 	case "hello":
+		c.hello = true
 		c.region = regionOf(m.TZ)
 		c.loadout = cleanLoadout(m.Loadout)
 		h.setName(c, m.Name)
-		if m.Link != "" && h.lan && h.linkAuth != nil {
+		if m.Link != "" && h.lan && h.linkAuth != nil && !c.linking {
+			c.linking = true
 			h.linkAccount(c, m.Link)
 		}
 		if m.Tok != "" {
@@ -291,17 +343,26 @@ func (h *hub) message(c *client, raw []byte) {
 	case "auth":
 		h.checkToken(c, m.Tok)
 	case "name":
+		if !h.ctl(c) {
+			return
+		}
 		h.setName(c, m.Name)
 		h.sendMe(c)
 		h.lobbyDirt = true
 	case "lobby":
 		c.lobby = m.On
 		if c.lobby {
-			h.sendLobby(c)
+			c.lobbyOwed = true
 		}
 	case "wait":
+		if !h.ctl(c) {
+			return
+		}
 		h.wait(c, m.Type)
 	case "unwait":
+		if !h.ctl(c) {
+			return
+		}
 		if c.waiting != "" {
 			c.waiting = ""
 			h.lobbyDirt = true
@@ -331,10 +392,10 @@ func (h *hub) message(c *client, raw []byte) {
 			}
 		}
 	case "rematch":
-		h.rematch(c, m.Match)
+		h.rematch(c, m.Match, m.Tok)
 	case "leave":
 		h.leaveMatch(c, "left")
-		h.sendLobby(c)
+		c.lobbyOwed = true
 	case "sig":
 		h.forwardSig(c, m)
 	}
@@ -352,16 +413,40 @@ func (h *hub) setName(c *client, raw string) {
 	c.name = n
 }
 
+// ctl: the small per-client budget for messages that change what every lobby client sees.
+func (h *hub) ctl(c *client) bool {
+	now := h.now()
+	if c.ctlAt.IsZero() {
+		c.ctlN = ctlBurst
+	} else {
+		c.ctlN = min(ctlBurst, c.ctlN+now.Sub(c.ctlAt).Seconds()*ctlRate)
+	}
+	c.ctlAt = now
+	if c.ctlN < 1 {
+		h.send(c, map[string]any{"t": "err", "code": "slow", "msg": "Slow down a moment."})
+		return false
+	}
+	c.ctlN--
+	return true
+}
+
+// checkToken: at most one verification in flight per client; a newer token waits its turn.
 func (h *hub) checkToken(c *client, tok string) {
 	if tok == "" || len(tok) > 8192 {
 		h.sendMe(c)
 		return
 	}
+	if c.authBusy {
+		c.authNext = tok
+		return
+	}
+	c.authBusy = true
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
 		defer cancel()
 		id, err := h.verify(ctx, tok)
 		h.post(func() {
+			c.authBusy = false
 			if c.gone {
 				return
 			}
@@ -373,6 +458,10 @@ func (h *hub) checkToken(c *client, tok string) {
 			}
 			h.sendMe(c)
 			h.lobbyDirt = true
+			if next := c.authNext; next != "" {
+				c.authNext = ""
+				h.checkToken(c, next)
+			}
 		})
 	}()
 }
@@ -408,17 +497,30 @@ func (h *hub) send(c *client, v any) {
 	h.push(c, append([]byte{'t'}, b...))
 }
 
+// push queues a frame for the socket's writer. The queue is bounded in BYTES: a reader that
+// falls maxQueued behind is lagging and gets disconnected (see handle).
 func (h *hub) push(c *client, frame []byte) {
 	if c.gone || c.send == nil {
+		return
+	}
+	n := int64(len(frame))
+	if c.queued.Add(n) > maxQueued {
+		c.queued.Add(-n)
+		h.lag(c)
 		return
 	}
 	select {
 	case c.send <- frame:
 	default:
-		if !c.lagging {
-			c.lagging = true
-			h.lagging = append(h.lagging, c)
-		}
+		c.queued.Add(-n)
+		h.lag(c)
+	}
+}
+
+func (h *hub) lag(c *client) {
+	if !c.lagging {
+		c.lagging = true
+		h.lagging = append(h.lagging, c)
 	}
 }
 
@@ -452,11 +554,26 @@ func (h *hub) wait(c *client, typ string) {
 	h.lobbyDirt = true
 }
 
-func (h *hub) sendLobbies() {
-	for _, c := range h.clients {
-		if c.lobby {
-			h.sendLobby(c)
+// flushLobbies runs on the tick: lobby changes are coalesced to one push per 250 ms, and a
+// client whose queue is half full skips a frame (it is owed one) instead of being dropped.
+func (h *hub) flushLobbies() {
+	if h.lobbyDirt {
+		h.lobbyDirt = false
+		for _, c := range h.clients {
+			if c.lobby {
+				c.lobbyOwed = true
+			}
 		}
+	}
+	for _, c := range h.clients {
+		if !c.lobbyOwed || c.send == nil {
+			continue
+		}
+		if c.queued.Load() > maxQueued/2 {
+			continue
+		}
+		c.lobbyOwed = false
+		h.sendLobby(c)
 	}
 }
 
@@ -528,7 +645,7 @@ func (h *hub) challenge(c *client, to string) {
 		return
 	case o == nil || o == c || o.waiting == "" || o.match != nil:
 		h.send(c, map[string]any{"t": "err", "code": "gone", "msg": "They are not waiting any more."})
-		h.sendLobby(c)
+		c.lobbyOwed = true
 		return
 	case len(h.matches) >= maxMatches:
 		h.send(c, map[string]any{"t": "err", "code": "full", "msg": "The arena is full right now. Try again in a minute."})
@@ -567,8 +684,21 @@ func (h *hub) friend(c *client, typ string) {
 }
 
 func (h *hub) joinCode(c *client, code string) {
+	now := h.now()
+	fails := c.joinFails[:0]
+	for _, t := range c.joinFails {
+		if now.Sub(t) < time.Minute {
+			fails = append(fails, t)
+		}
+	}
+	c.joinFails = fails
+	if len(fails) >= joinFailsPerMin {
+		h.send(c, map[string]any{"t": "err", "code": "slow", "msg": "Too many tries. Wait a minute, then try the link again."})
+		return
+	}
 	m := h.codes[normCode(code)]
 	if m == nil || m.state != mLobby {
+		c.joinFails = append(c.joinFails, now)
 		h.send(c, map[string]any{"t": "err", "code": "nocode", "msg": "That link has expired. Ask for a new one."})
 		return
 	}
@@ -662,37 +792,76 @@ func (h *hub) accept(c *client, id, tok string) {
 }
 
 // startMatch spends each signed-in player's free allowance (one per best of 3), then flips
-// the coin for round 1.
+// the coin for round 1. A ranked seat must pay with its own fresh token: none, one that does
+// not verify, or someone else's cancels the match ("signin"). Every token is checked BEFORE
+// anyone is charged, so a bad seat cannot spend its opponent's battle. Only an unreachable or
+// failing payment service lets play go ahead unpaid.
 func (h *hub) startMatch(m *match) {
 	m.state = mStarting
 	m.spendID = newUUID()
-	pending := 0
 	for _, s := range m.seats {
-		s.spent = nil
-		if !s.ranked || s.tok == "" {
+		s.spent, s.checked, s.paying = nil, false, false
+		if !s.ranked {
 			s.spent = &spendResult{OK: true, Remaining: -1}
 			continue
 		}
-		pending++
+		if s.tok == "" {
+			s.spent = &spendResult{Why: "signin"}
+			continue
+		}
 		s := s
-		uid, tok, id := s.uid, s.tok, m.spendID
+		uid, tok := s.uid, s.tok
 		go func() {
 			ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
 			idn, err := h.verify(ctx, tok)
 			cancel()
-			r := spendResult{OK: true, Remaining: -1}
-			if err == nil && idn.UID == uid && !idn.Anonymous {
-				r = h.allow.claimArenaBattle(tok, id)
-			}
+			ok := err == nil && idn.UID == uid && !idn.Anonymous
+			h.post(func() {
+				s.checked = true
+				if !ok {
+					s.spent = &spendResult{Why: "signin"}
+				}
+				h.maybeSpend(m)
+			})
+		}()
+	}
+	h.maybeSpend(m)
+}
+
+// maybeSpend: once every token is checked, charge the verified seats — unless a duel already
+// failed one, in which case nobody pays and maybeBegin cancels it. A room deals the failed
+// seats out and plays on.
+func (h *hub) maybeSpend(m *match) {
+	if m.state != mStarting || h.matches[m.id] != m {
+		return
+	}
+	failed := false
+	for _, s := range m.seats {
+		if s.spent == nil && !s.checked {
+			return
+		}
+		failed = failed || (s.spent != nil && !s.spent.OK)
+	}
+	for _, s := range m.seats {
+		if s.spent != nil || s.paying {
+			continue
+		}
+		if failed && !m.room {
+			s.spent = &spendResult{OK: true, Remaining: -1}
+			continue
+		}
+		s.paying = true
+		s := s
+		tok, id := s.tok, m.spendID
+		go func() {
+			r := h.allow.claimArenaBattle(tok, id)
 			h.post(func() {
 				s.spent = &r
 				h.maybeBegin(m)
 			})
 		}()
 	}
-	if pending == 0 {
-		h.maybeBegin(m)
-	}
+	h.maybeBegin(m)
 }
 
 func (h *hub) maybeBegin(m *match) {
@@ -710,13 +879,13 @@ func (h *hub) maybeBegin(m *match) {
 	}
 	for _, s := range m.seats {
 		if !s.spent.OK {
-			h.send(s.c, map[string]any{"t": "err", "code": "allowance",
-				"msg": "That was today's last free arena battle. The br8t Pass makes them unlimited — or come back tomorrow."})
-			h.cancel(m, "allowance", nil)
+			why := h.refused(s)
+			h.cancel(m, why, nil)
 			return
 		}
 	}
 	m.state = mPlay
+	m.playAt = h.now()
 	m.round = 1
 	m.master = coin(len(m.seats))
 	m.arena = coin(1 << 20)
@@ -727,9 +896,25 @@ func (h *hub) maybeBegin(m *match) {
 	h.sendGo(m)
 }
 
+// refused tells a seat why it cannot play, and returns the cancel reason.
+func (h *hub) refused(s *seat) string {
+	if s.spent.Why == "allowance" {
+		h.send(s.c, map[string]any{"t": "err", "code": "allowance",
+			"msg": "That was today's last free arena battle. The br8t Pass makes them unlimited — or come back tomorrow."})
+		return "allowance"
+	}
+	h.send(s.c, map[string]any{"t": "err", "code": "signin", "msg": "Your sign-in could not be checked. Sign in again to fight."})
+	return "signin"
+}
+
 func (h *hub) sendGo(m *match) {
 	m.reports = map[int]report{}
 	m.firstReport = time.Time{}
+	if m.room {
+		m.roundEnd = h.now().Add(h.roomCap)
+	} else {
+		m.roundEnd = h.now().Add(h.duelCap)
+	}
 	for i := range m.seats {
 		h.sendGoTo(m, i)
 	}
@@ -772,10 +957,11 @@ func (h *hub) report(m *match, c *client, round, winner int, ko bool, dmg []int)
 	first := m.reports[0]
 	for _, r := range m.reports {
 		if r != first {
-			h.void(m, "disagree", nil)
+			h.disputeDuel(m)
 			return
 		}
 	}
+	m.agreed++
 	m.log = append(m.log, "r"+itoa(m.round)+" won by "+itoa(first.winner))
 	if first.winner < 0 {
 		m.draws++
@@ -809,6 +995,30 @@ func (h *hub) report(m *match, c *client, round, winner int, ko bool, dmg []int)
 	h.sendGo(m)
 }
 
+// disputeDuel: the two reports differ. Normally a void, logged against both accounts. A player
+// with a record of disputes (store.flagged) loses a disputed match instead, to an opponent
+// without one; if both or neither have a record, it stays a void.
+func (h *hub) disputeDuel(m *match) {
+	bad := -1
+	for i, s := range m.seats {
+		if s.ranked && h.st.flagged(s.uid) {
+			if bad >= 0 {
+				bad = -1
+				break
+			}
+			bad = i
+		}
+	}
+	if bad < 0 || len(m.seats) != 2 {
+		h.void(m, "disagree", nil)
+		return
+	}
+	h.st.recordDispute(m.id, []string{m.seats[bad].uid})
+	m.log = append(m.log, "disputed by "+m.seats[bad].id+" (a record of disputes): a loss")
+	m.dmg, m.note = nil, " disputed"
+	h.finish(m, 1-bad)
+}
+
 // forfeit: a player left (or never came back) mid-match. In a duel the other player wins the
 // match outright and it counts. Multi-player modes will eliminate the leaver instead.
 func (h *hub) forfeit(m *match, leaver int) {
@@ -822,6 +1032,12 @@ func (h *hub) forfeit(m *match, leaver int) {
 	h.finishFF(m, winner, true)
 }
 
+// earlyForfeit: before any agreed round, or in the first seconds, a forfeit is a loss for
+// whoever left and nothing for whoever stayed — two accounts cannot farm wins by quitting.
+func (h *hub) earlyForfeit(m *match) bool {
+	return (!m.room && m.agreed == 0) || h.now().Sub(m.playAt) < h.earlyFF
+}
+
 func (h *hub) finish(m *match, winner int) { h.finishFF(m, winner, false) }
 
 func (h *hub) finishFF(m *match, winner int, ff bool) {
@@ -832,8 +1048,13 @@ func (h *hub) finishFF(m *match, winner int, ff bool) {
 	m.deadline = h.now().Add(rematchTTL)
 	seats := make([]seatRow, len(m.seats))
 	score := ""
+	early := ff && h.earlyForfeit(m)
 	for i, s := range m.seats {
 		seats[i] = seatRow{UID: s.uid, Name: s.name, Won: i == winner, KOs: s.kos, Ranked: s.ranked, Loadout: s.c.loadout, OppDmg: oppDmg(m.dmg, i)}
+		if early {
+			seats[i].NoEvent = true
+			seats[i].NoStats = i == winner
+		}
 		if i > 0 {
 			score += "-"
 		}
@@ -842,6 +1063,10 @@ func (h *hub) finishFF(m *match, winner int, ff bool) {
 	if ff {
 		score += " ff"
 	}
+	if early {
+		score += " early"
+	}
+	score += m.note
 	if err := h.st.recordMatch(m.id, m.typ, m.friend, score, seats); err != nil {
 		log.Printf("match %s: stats write failed: %v", m.id, err)
 	}
@@ -854,7 +1079,7 @@ func (h *hub) finishFF(m *match, winner int, ff bool) {
 	}
 	log.Printf("match %s: %s won %s (%s)", m.id, who, score, strings.Join(m.log, ", "))
 	for i, s := range m.seats {
-		out := map[string]any{"t": "result", "match": m.id, "winner": winner, "you": i, "score": scoreOf(m), "counted": s.ranked, "forfeit": ff}
+		out := map[string]any{"t": "result", "match": m.id, "winner": winner, "you": i, "score": scoreOf(m), "counted": s.ranked && !seats[i].NoStats, "forfeit": ff}
 		if s.ranked {
 			if line, ok := h.st.mine(s.uid); ok {
 				out["stats"] = line
@@ -872,12 +1097,16 @@ func scoreOf(m *match) []int {
 	return out
 }
 
-func (h *hub) rematch(c *client, id string) {
+func (h *hub) rematch(c *client, id, tok string) {
 	m := h.mine(c, id)
 	if m == nil || m.state != mDone || m.room {
 		return
 	}
-	m.seats[m.slotOf(c)].rematch = true
+	me := m.seats[m.slotOf(c)]
+	me.rematch = true
+	if len(tok) < 8192 {
+		me.rtok = tok
+	}
 	for _, s := range m.seats {
 		if s != m.seats[m.slotOf(c)] {
 			h.send(s.c, map[string]any{"t": "rematch", "match": m.id, "slot": m.slotOf(c)})
@@ -888,12 +1117,15 @@ func (h *hub) rematch(c *client, id string) {
 			return
 		}
 	}
-	// Same players, a fresh match: new id, new coin flip, one more allowance each.
+	// Same players, a fresh match: new id, new coin flip, one more allowance each, paid with
+	// the token each player sent with "rematch" (the first accept's may have expired).
 	cs := make([]*client, len(m.seats))
 	toks := make([]string, len(m.seats))
 	for i, s := range m.seats {
-		cs[i], toks[i] = s.c, s.tok
-		s.c.match = nil
+		cs[i], toks[i] = s.c, s.rtok
+		if s.c.match == m {
+			s.c.match = nil
+		}
 	}
 	h.closeMatch(m)
 	n := h.newMatch(m.typ, m.friend, cs...)
@@ -903,8 +1135,13 @@ func (h *hub) rematch(c *client, id string) {
 	h.startMatch(n)
 }
 
+// cancel and void only touch seats still in THIS match: an eliminated room seat may already
+// be in another one, and must not be detached from it.
 func (h *hub) cancel(m *match, why string, by *client) {
 	for _, s := range m.seats {
+		if s.out || s.c.match != m {
+			continue
+		}
 		if s.c != by {
 			h.send(s.c, map[string]any{"t": "cancel", "match": m.id, "why": why})
 		}
@@ -915,8 +1152,17 @@ func (h *hub) cancel(m *match, why string, by *client) {
 
 func (h *hub) void(m *match, why string, by *client) {
 	log.Printf("match %s: VOID (%s) %s", m.id, why, strings.Join(m.log, ", "))
-	h.st.recordVoid(m.id, m.typ, m.friend, len(m.seats), why)
+	var uids []string
 	for _, s := range m.seats {
+		if s.ranked && s.uid != "" && !s.out {
+			uids = append(uids, s.uid)
+		}
+	}
+	h.st.recordVoid(m.id, m.typ, m.friend, len(m.seats), why, uids)
+	for _, s := range m.seats {
+		if s.out || s.c.match != m {
+			continue
+		}
 		if s.c != by {
 			h.send(s.c, map[string]any{"t": "void", "match": m.id, "why": why})
 		}
@@ -948,6 +1194,9 @@ func (h *hub) leaveMatch(c *client, why string) {
 		h.forfeit(m, m.slotOf(c))
 	case mDone:
 		for _, s := range m.seats {
+			if s.c.match != m {
+				continue
+			}
 			if s.c != c {
 				h.send(s.c, map[string]any{"t": "left", "match": m.id})
 			}
@@ -964,8 +1213,14 @@ func (h *hub) tick() {
 	now := h.now()
 	for _, m := range h.matches {
 		switch {
-		case m.state == mPlay && !m.firstReport.IsZero() && now.Sub(m.firstReport) > reportWindow:
-			h.void(m, "timeout", nil)
+		case m.state == mPlay && !m.firstReport.IsZero() && now.Sub(m.firstReport) > h.reportWindow:
+			h.silent(m)
+		case m.state == mPlay && !m.roundEnd.IsZero() && now.After(m.roundEnd):
+			if len(m.reports) == 0 {
+				h.void(m, "timeout", nil)
+			} else {
+				h.silent(m)
+			}
 		case (m.state == mOffer || m.state == mLobby || m.state == mDone) && now.After(m.deadline):
 			if m.state == mDone {
 				h.leaveMatchAll(m)
@@ -983,6 +1238,15 @@ func (h *hub) tick() {
 			}
 			continue
 		}
+		if !c.hello && now.Sub(c.since) > h.helloWithin {
+			h.drop(c, "nohello")
+			continue
+		}
+		if now.Sub(c.pongAt) > pingEvery+h.pongLate {
+			log.Printf("client %s stopped answering pings", c.id)
+			h.disconnect(c)
+			continue
+		}
 		if now.Sub(c.lastPing) >= pingEvery {
 			c.lastPing, c.pingAt = now, now
 			h.send(c, map[string]any{"t": "p", "s": now.UnixMilli()})
@@ -990,8 +1254,32 @@ func (h *hub) tick() {
 	}
 }
 
+// silent: a report came in and the report window ran out (or the round's hard deadline did).
+// A connected seat that still says nothing forfeits — silence never voids a match. A seat whose
+// socket is down is left to its away grace, which ends in the same forfeit.
+func (h *hub) silent(m *match) {
+	for i, s := range m.seats {
+		if m.state != mPlay {
+			return
+		}
+		if _, ok := m.reports[i]; ok || s.out || s.c.away {
+			continue
+		}
+		m.log = append(m.log, "silent "+s.id)
+		if m.room {
+			h.eliminate(m, i, "silent")
+		} else {
+			h.forfeit(m, i)
+			return
+		}
+	}
+}
+
 func (h *hub) leaveMatchAll(m *match) {
 	for _, s := range m.seats {
+		if s.c.match != m {
+			continue
+		}
 		h.send(s.c, map[string]any{"t": "left", "match": m.id})
 		s.c.match = nil
 	}
@@ -1014,7 +1302,27 @@ func (h *hub) allowRelay(c *client, n int) bool {
 	return true
 }
 
-// peer: signalling and relayed traffic only ever go to someone in the same match.
+// allowRecv: the receiving side's budget, so several senders cannot pile onto one socket.
+func (h *hub) allowRecv(c *client, n int) bool {
+	now := h.now()
+	if c.recvAt.IsZero() {
+		c.recvN, c.recvB = recvPerSec, recvBytesPS
+	} else {
+		el := now.Sub(c.recvAt).Seconds()
+		c.recvN = min(recvPerSec, c.recvN+el*recvPerSec)
+		c.recvB = min(recvBytesPS, c.recvB+el*recvBytesPS)
+	}
+	c.recvAt = now
+	if c.recvN < 1 || c.recvB < float64(n) {
+		return false
+	}
+	c.recvN--
+	c.recvB -= float64(n)
+	return true
+}
+
+// peer: signalling only ever goes to someone in the same match (an offer included: the
+// players open their direct link to measure the ping before accepting).
 func (h *hub) peer(c *client, to string) *client {
 	m := c.match
 	if m == nil || (m.state == mLobby && !m.room) {
@@ -1028,11 +1336,29 @@ func (h *hub) peer(c *client, to string) *client {
 	return nil
 }
 
+// relayPeer: relayed GAME traffic needs both seats to have accepted, and neither to be out.
+func (h *hub) relayPeer(c *client, to string) *client {
+	m := c.match
+	if m == nil || m.state == mDone {
+		return nil
+	}
+	me := m.slotOf(c)
+	if me < 0 || !m.seats[me].accepted || m.seats[me].out {
+		return nil
+	}
+	for _, s := range m.seats {
+		if s.id == to && s.c != c && s.accepted && !s.out {
+			return s.c
+		}
+	}
+	return nil
+}
+
 func (h *hub) forwardSig(c *client, m inMsg) {
 	if !h.allowRelay(c, len(m.D)) {
 		return
 	}
-	if p := h.peer(c, m.To); p != nil {
+	if p := h.peer(c, m.To); p != nil && h.allowRecv(p, len(m.D)) {
 		h.send(p, map[string]any{"t": "sig", "from": c.id, "d": m.D})
 	}
 }
@@ -1042,8 +1368,8 @@ func (h *hub) relayBinary(c *client, b []byte) {
 	if len(b) < 2 || int(b[0])+1 > len(b) || !h.allowRelay(c, len(b)) {
 		return
 	}
-	p := h.peer(c, string(b[1:1+int(b[0])]))
-	if p == nil {
+	p := h.relayPeer(c, string(b[1:1+int(b[0])]))
+	if p == nil || !h.allowRecv(p, len(b)) {
 		return
 	}
 	payload := b[1+int(b[0]):]
@@ -1056,14 +1382,19 @@ func (h *hub) relayBinary(c *client, b []byte) {
 
 // ---------------------------------------------------------------- lifecycle
 
-func (h *hub) attach(e event) *client {
+func (h *hub) attach(e event) (*client, string) {
 	if old := h.clients[e.rid]; e.rid != "" && old != nil && !old.gone && old.tok != "" && old.tok == e.rtok {
 		if old.send != nil {
 			close(old.send)
 		}
-		old.send, old.away = e.c.send, false
+		old.send, old.queued, old.away, old.lagging = e.c.send, e.c.queued, false, false
 		old.gen++
-		old.budgetAt = h.now()
+		old.budgetAt, old.pongAt = h.now(), h.now()
+		if old.ip != e.ip {
+			h.ipN[old.ip]--
+			h.ipN[e.ip]++
+			old.ip = e.ip
+		}
 		h.send(old, map[string]any{"t": "welcome", "id": old.id, "tok": old.tok, "ice": stunOnly, "resumed": true, "grace": h.awayGrace.Milliseconds()})
 		h.sendMe(old)
 		if old.lastOut != nil {
@@ -1081,26 +1412,31 @@ func (h *hub) attach(e event) *client {
 				h.sendGoTo(m, slot)
 			}
 		}
-		return old
+		return old, ""
 	}
 	if len(h.clients) >= maxClients {
-		return nil
+		return nil, "server full"
+	}
+	if h.ipN[e.ip] >= h.perIP {
+		return nil, "too many connections"
 	}
 	c := e.c
 	c.id = h.newID()
 	c.tok = randString(idChars, 24)
 	c.name = "Fighter " + randString("0123456789", 4)
 	c.region = "xx"
-	c.budgetAt = h.now()
+	c.ip = e.ip
+	c.budgetAt, c.since, c.pongAt = h.now(), h.now(), h.now()
+	h.ipN[c.ip]++
 	h.clients[c.id] = c
 	h.send(c, map[string]any{"t": "welcome", "id": c.id, "tok": c.tok, "ice": stunOnly, "grace": h.awayGrace.Milliseconds()})
-	return c
+	return c, ""
 }
 
 // disconnect: the socket is gone. Mid-match the seat is held for awayGrace with the fighter
 // idle; anywhere else the player simply leaves.
 func (h *hub) disconnect(c *client) {
-	if c.gone {
+	if c.gone || c.away {
 		return
 	}
 	m := c.match
@@ -1133,6 +1469,9 @@ func (h *hub) drop(c *client, why string) {
 	}
 	c.gone = true
 	delete(h.clients, c.id)
+	if h.ipN[c.ip]--; h.ipN[c.ip] <= 0 {
+		delete(h.ipN, c.ip)
+	}
 	if c.send != nil {
 		close(c.send)
 		c.send = nil
@@ -1172,30 +1511,58 @@ func (h *hub) serveWS(w http.ResponseWriter, r *http.Request, origins []string) 
 	}
 	conn.SetReadLimit(maxMsg)
 	send := make(chan []byte, sendQueue)
+	queued := new(atomic.Int64)
 	reply := make(chan attachResult, 1)
 	q := r.URL.Query()
-	h.in <- event{kind: evJoin, c: &client{send: send}, rid: q.Get("id"), rtok: q.Get("tok"), reply: reply}
+	h.in <- event{kind: evJoin, c: &client{send: send, queued: queued}, ip: clientIP(r), rid: q.Get("id"), rtok: q.Get("tok"), reply: reply}
 	res := <-reply
 	c, gen := res.c, res.gen
 	if c == nil {
-		conn.Close(websocket.StatusTryAgainLater, "server full")
+		conn.Close(websocket.StatusTryAgainLater, res.why)
 		return
 	}
 	ctx, cancel := context.WithCancel(r.Context())
 	defer cancel()
-	go writer(ctx, conn, send, cancel)
+	go writer(ctx, conn, send, queued, cancel)
+	// One token bucket for every inbound frame; over it, frames are dropped before the hub.
+	tokens, last := float64(inBurst), time.Now()
 	for {
 		typ, data, err := conn.Read(ctx)
 		if err != nil {
 			break
 		}
+		now := time.Now()
+		tokens = min(inBurst, tokens+now.Sub(last).Seconds()*inRate)
+		last = now
+		if tokens < 1 {
+			continue
+		}
+		tokens--
 		h.in <- event{kind: evMsg, c: c, gen: gen, data: data, bin: typ == websocket.MessageBinary}
 	}
 	h.in <- event{kind: evLeave, c: c, gen: gen}
 	conn.Close(websocket.StatusNormalClosure, "")
 }
 
-func writer(ctx context.Context, conn *websocket.Conn, send chan []byte, cancel func()) {
+// clientIP: the peer address; behind Caddy (a loopback peer) the right-most X-Forwarded-For hop,
+// which is the one Caddy itself appended and the client cannot forge.
+func clientIP(r *http.Request) string {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		host = r.RemoteAddr
+	}
+	if ip := net.ParseIP(host); ip != nil && ip.IsLoopback() {
+		if v := r.Header.Values("X-Forwarded-For"); len(v) > 0 {
+			hops := strings.Split(v[len(v)-1], ",")
+			if hop := strings.TrimSpace(hops[len(hops)-1]); net.ParseIP(hop) != nil {
+				return hop
+			}
+		}
+	}
+	return host
+}
+
+func writer(ctx context.Context, conn *websocket.Conn, send chan []byte, queued *atomic.Int64, cancel func()) {
 	defer cancel()
 	for {
 		select {
@@ -1213,6 +1580,7 @@ func writer(ctx context.Context, conn *websocket.Conn, send chan []byte, cancel 
 			wctx, wcancel := context.WithTimeout(ctx, 10*time.Second)
 			err := conn.Write(wctx, typ, frame[1:])
 			wcancel()
+			queued.Add(-int64(len(frame)))
 			if err != nil {
 				return
 			}

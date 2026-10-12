@@ -14,7 +14,9 @@
 //	ARENA_OPEN_LOBBY=1  tests only: anonymous players may use the public lobby
 //	ARENA_LAN=1       home-network mode (server/lan.sh): no Firebase, no allowance, no STUN/TURN,
 //	                  players are a typed name + a per-device id ("lan:<device>" tokens), its own DB
-//	ARENA_STATIC      also serve this directory at / (lan.sh serves the site root this way)
+//	ARENA_STATIC      the site root (lan.sh): serve the game and the files its page loads from it,
+//	                  and nothing else (staticAllowed)
+//	ARENA_PER_IP      sockets per client address (default 24; behind Caddy, its X-Forwarded-For hop)
 package main
 
 import (
@@ -26,6 +28,8 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -78,31 +82,75 @@ func main() {
 	h := newHub(st, ice, newAllowance(allowURL), verify)
 	h.openLobby = lan || os.Getenv("ARENA_OPEN_LOBBY") == "1"
 	if lan {
-		h.lan, h.linkAuth = true, verifier(tv.verify)
+		// A family plays the same opponents all day: no per-pair cap on the LAN server's own stats.
+		h.lan, h.linkAuth, st.pairCap = true, verifier(tv.verify), 0
+	}
+	if n, err := strconv.Atoi(os.Getenv("ARENA_PER_IP")); err == nil && n > 0 {
+		h.perIP = n
+	}
+	// Gates only: a shorter "early forfeit" window, so a scripted match need not last 10 s.
+	if n, err := strconv.Atoi(os.Getenv("ARENA_EARLY_FF_MS")); err == nil && n >= 0 {
+		h.earlyFF = time.Duration(n) * time.Millisecond
 	}
 	go h.run()
 
 	handler := h.routes(prefix, origins)
 	if dir := os.Getenv("ARENA_STATIC"); dir != "" {
-		files := http.FileServer(http.Dir(dir))
-		api := handler
-		handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, prefix+"/") || r.URL.Path == "/internal/stats" {
-				api.ServeHTTP(w, r)
-				return
-			}
-			// The site root is a git checkout: never serve .git or any other dot-path.
-			if strings.Contains(r.URL.Path, "/.") {
-				http.NotFound(w, r)
-				return
-			}
-			w.Header().Set("Cache-Control", "no-cache")
-			files.ServeHTTP(w, r)
-		})
+		handler = staticHandler(dir, prefix, handler)
 	}
 	srv := &http.Server{Addr: addr, Handler: handler, ReadHeaderTimeout: 5 * time.Second}
 	log.Printf("ragdojo-arena on %s%s (ice %q, allowance %q)", addr, prefix, iceURL, allowURL)
 	log.Fatal(srv.ListenAndServe())
+}
+
+// The LAN server serves the site checkout, but only the game and the shared files its page
+// imports (js/cloud.js -> /lib/auth/). No server sources, no tools, no dot-paths, no listings.
+var staticAllow = []string{"/gms/2d/ragdojo/", "/lib/auth/"}
+var staticDeny = []string{"/gms/2d/ragdojo/server/", "/gms/2d/ragdojo/tools/", "/gms/2d/ragdojo/docs/", "/gms/2d/ragdojo/node_modules/"}
+
+func staticAllowed(p string) bool {
+	if strings.Contains(p, "/.") || strings.Contains(p, "..") || strings.HasSuffix(p, ".md") {
+		return false
+	}
+	for _, d := range staticDeny {
+		if strings.HasPrefix(p, d) {
+			return false
+		}
+	}
+	for _, a := range staticAllow {
+		if strings.HasPrefix(p, a) {
+			return true
+		}
+	}
+	return false
+}
+
+func staticHandler(dir, prefix string, api http.Handler) http.Handler {
+	files := http.FileServer(http.Dir(dir))
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		p := r.URL.Path
+		if strings.HasPrefix(p, prefix+"/") || p == "/internal/stats" {
+			api.ServeHTTP(w, r)
+			return
+		}
+		if p == "/" {
+			http.Redirect(w, r, "/gms/2d/ragdojo/", http.StatusFound)
+			return
+		}
+		if !staticAllowed(p) {
+			http.NotFound(w, r)
+			return
+		}
+		// A directory is served only through its index.html; never as a listing.
+		if fi, err := os.Stat(filepath.Join(dir, filepath.FromSlash(p))); err == nil && fi.IsDir() {
+			if _, err := os.Stat(filepath.Join(dir, filepath.FromSlash(p), "index.html")); err != nil {
+				http.NotFound(w, r)
+				return
+			}
+		}
+		w.Header().Set("Cache-Control", "no-cache")
+		files.ServeHTTP(w, r)
+	})
 }
 
 func devVerifier(real verifier) verifier {

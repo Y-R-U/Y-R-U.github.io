@@ -20,8 +20,9 @@ import (
 // built there: BR8T_FREE_PER_DAY=ragdojo=3, Pass unlimited, idempotent per id). The arena
 // forwards the player's own fresh Firebase ID token over loopback, so it needs no credential.
 // A best of 3 spends one use per signed-in player. Anonymous players (friend links only)
-// cannot be counted by account and are not. If the payment service does not answer, play is
-// allowed and logged: a family game should not stop because billing is down.
+// cannot be counted by account and are not. If the payment service cannot be reached or fails
+// (5xx), play is allowed and logged: a family game should not stop because billing is down.
+// Any other refusal (401/403/400) stops the match.
 type allowance struct {
 	url  string // "" = allowance off
 	game string
@@ -61,14 +62,18 @@ func (a *allowance) claimArenaBattle(token, id string) spendResult {
 		} `json:"allowance"`
 	}
 	json.NewDecoder(io.LimitReader(res.Body, 16<<10)).Decode(&out)
-	switch res.StatusCode {
-	case 200:
+	switch {
+	case res.StatusCode == 200:
 		return spendResult{OK: true, Remaining: out.Allowance.Remaining}
-	case 429:
+	case res.StatusCode == 429:
 		return spendResult{OK: false, Remaining: 0, Why: "allowance"}
+	case res.StatusCode >= 500:
+		log.Printf("allowance: payment service answered %d, allowing play", res.StatusCode)
+		return spendResult{OK: true, Remaining: -1}
 	}
-	log.Printf("allowance: payment service answered %d, allowing play", res.StatusCode)
-	return spendResult{OK: true, Remaining: -1}
+	// 400/401/403 (and any other answer): the service looked at the player and said no.
+	log.Printf("allowance: payment service refused (%d)", res.StatusCode)
+	return spendResult{OK: false, Remaining: 0, Why: "signin"}
 }
 
 func newUUID() string {

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"strings"
+	"sync"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -49,11 +50,22 @@ CREATE TABLE IF NOT EXISTS ghosts (
   id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL UNIQUE, name TEXT NOT NULL,
   snap TEXT NOT NULL, updated INTEGER NOT NULL
 );
+-- A disagreement, per account (see flagged). dispute_flags hides a flagged account from the boards.
+CREATE TABLE IF NOT EXISTS disputes (uid TEXT NOT NULL, match TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (uid, match));
+CREATE TABLE IF NOT EXISTS dispute_flags (uid TEXT PRIMARY KEY, until INTEGER NOT NULL);
+-- Counted results per pair of accounts per UTC day (a < b; "anon" = any anonymous opponent).
+CREATE TABLE IF NOT EXISTS pairs (a TEXT NOT NULL, b TEXT NOT NULL, day TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (a, b, day));
+-- Accounts that finished a friend-link match together: the only "friend" the server believes.
+CREATE TABLE IF NOT EXISTS friends (a TEXT NOT NULL, b TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (a, b));
 `
 
 type store struct {
-	db  *sql.DB
-	now func() time.Time
+	db      *sql.DB
+	now     func() time.Time
+	pairCap int        // counted results per pair of accounts per day; 0 = no cap (the LAN server)
+	rivals  *rivalMemo // events.go: recent rival lists per caller
+	saltMu  sync.Mutex
+	saltV   string
 	// afterMatch hears every agreed result once it is stored (events.go counts it for events).
 	afterMatch func(match string, seats []seatRow)
 }
@@ -67,7 +79,7 @@ func openStore(path string) (*store, error) {
 	if _, err := db.Exec(schema); err != nil {
 		return nil, err
 	}
-	return &store{db: db, now: time.Now}, nil
+	return &store{db: db, now: time.Now, pairCap: defaultPairCap, rivals: &rivalMemo{m: map[string]rivalEntry{}}}, nil
 }
 
 func (s *store) day() string { return s.now().UTC().Format("2006-01-02") }
@@ -80,7 +92,14 @@ type seatRow struct {
 	Ranked  bool
 	Loadout []int
 	OppDmg  float64 // the most-damaged opponent in the deciding round, from the agreed reports (0-1)
+	NoStats bool    // not counted for this seat (an early forfeit's stayer; set by the pair cap)
+	NoEvent bool    // no event points (an early forfeit)
 }
+
+const (
+	defaultPairCap = 3
+	flagFor        = 7 * 24 * time.Hour
+)
 
 func (s *store) recordMatch(id, typ string, friend bool, score string, seats []seatRow) error {
 	tx, err := s.db.Begin()
@@ -99,8 +118,21 @@ func (s *store) recordMatch(id, typ string, friend bool, score string, seats []s
 		id, typ, b2i(friend), len(seats), winner, score, day, now); err != nil {
 		return err
 	}
+	if err := s.capPairs(tx, day, seats); err != nil {
+		return err
+	}
+	if friend && !strings.Contains(score, " ff") {
+		for i, p := range seats {
+			for _, q := range seats[i+1:] {
+				if p.Ranked && q.Ranked && p.UID != "" && q.UID != "" && p.UID != q.UID {
+					a, b := pairOf(p.UID, q.UID)
+					tx.Exec(`INSERT OR IGNORE INTO friends(a,b,at) VALUES(?,?,?)`, a, b, now)
+				}
+			}
+		}
+	}
 	for _, p := range seats {
-		if !p.Ranked || p.UID == "" {
+		if !p.Ranked || p.UID == "" || p.NoStats {
 			continue
 		}
 		w, l := b2i(p.Won), b2i(!p.Won)
@@ -132,10 +164,140 @@ func (s *store) recordMatch(id, typ string, friend bool, score string, seats []s
 	return nil
 }
 
-func (s *store) recordVoid(id, typ string, friend bool, players int, why string) {
+func pairOf(a, b string) (string, string) {
+	if a > b {
+		return b, a
+	}
+	return a, b
+}
+
+// capPairs: the same two accounts count at most pairCap results a day against each other
+// (friend links included; all anonymous opponents share one key). A seat is counted only if
+// it has an opponent it has not hit the cap with; playing yourself never counts. Every pair
+// in a match that counted for anyone is charged one.
+func (s *store) capPairs(tx *sql.Tx, day string, seats []seatRow) error {
+	if s.pairCap <= 0 {
+		return nil
+	}
+	keys := make([]string, len(seats))
+	for i, p := range seats {
+		keys[i] = "anon"
+		if p.Ranked && p.UID != "" {
+			keys[i] = p.UID
+		}
+	}
+	n := func(i, j int) (int, error) {
+		a, b := pairOf(keys[i], keys[j])
+		var v int
+		err := tx.QueryRow(`SELECT n FROM pairs WHERE a=? AND b=? AND day=?`, a, b, day).Scan(&v)
+		if err == sql.ErrNoRows {
+			err = nil
+		}
+		return v, err
+	}
+	counted := false
+	for i, p := range seats {
+		if keys[i] == "anon" || p.NoStats {
+			continue
+		}
+		fresh := false
+		for j := range seats {
+			if j == i || keys[j] == "anon" && keys[i] == "anon" {
+				continue
+			}
+			if keys[j] == keys[i] {
+				fresh = false
+				break
+			}
+			v, err := n(i, j)
+			if err != nil {
+				return err
+			}
+			fresh = fresh || v < s.pairCap
+		}
+		if !fresh {
+			seats[i].NoStats = true
+			continue
+		}
+		counted = true
+	}
+	if !counted {
+		return nil
+	}
+	seen := map[[2]string]bool{}
+	for i := range seats {
+		for j := i + 1; j < len(seats); j++ {
+			a, b := pairOf(keys[i], keys[j])
+			if a == b || seen[[2]string{a, b}] {
+				continue
+			}
+			seen[[2]string{a, b}] = true
+			if _, err := tx.Exec(`INSERT INTO pairs(a,b,day,n) VALUES(?,?,?,1) ON CONFLICT(a,b,day) DO UPDATE SET n=n+1`, a, b, day); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// recordVoid logs a void; a disagreement ("disagree") is also a dispute for each account in it.
+func (s *store) recordVoid(id, typ string, friend bool, players int, why string, uids []string) {
 	s.db.Exec(`INSERT OR IGNORE INTO matches(id,type,friend,players,voided,why,day,at) VALUES(?,?,?,?,1,?,?,?)`,
 		id, typ, b2i(friend), players, why, s.day(), s.now().Unix())
-	_, _ = s.db.Exec(`DELETE FROM daily WHERE day < ?`, s.now().UTC().AddDate(0, 0, -40).Format("2006-01-02"))
+	if why == "disagree" {
+		s.recordDispute(id, uids)
+	}
+	old := s.now().UTC().AddDate(0, 0, -40)
+	_, _ = s.db.Exec(`DELETE FROM daily WHERE day < ?`, old.Format("2006-01-02"))
+	_, _ = s.db.Exec(`DELETE FROM pairs WHERE day < ?`, s.now().UTC().AddDate(0, 0, -2).Format("2006-01-02"))
+}
+
+func (s *store) recordDispute(match string, uids []string) {
+	for _, u := range uids {
+		if u == "" {
+			continue
+		}
+		s.db.Exec(`INSERT OR IGNORE INTO disputes(uid,match,at) VALUES(?,?,?)`, u, match, s.now().Unix())
+		if s.flagged(u) {
+			s.db.Exec(`INSERT INTO dispute_flags(uid,until) VALUES(?,?) ON CONFLICT(uid) DO UPDATE SET until=excluded.until`,
+				u, s.now().Add(flagFor).Unix())
+		}
+	}
+}
+
+// flagged: an account that disputes a lot. Three disputes in 24 h when they are at least 40%
+// of its matches in that time, or six ever at 40% of all its matches. An honest player who
+// met a liar has one dispute among many counted battles; a player who disputes every loss
+// does not. Flagged accounts lose further disputed matches and are hidden from the boards.
+func (s *store) flagged(uid string) bool {
+	if uid == "" {
+		return false
+	}
+	now := s.now()
+	var d24, dAll, b2, bAll int
+	s.db.QueryRow(`SELECT COUNT(*), COALESCE(SUM(at > ?),0) FROM disputes WHERE uid=?`, now.Add(-24*time.Hour).Unix(), uid).Scan(&dAll, &d24)
+	if d24 < 3 && dAll < 6 {
+		return false
+	}
+	s.db.QueryRow(`SELECT COALESCE(SUM(battles),0) FROM daily WHERE uid=? AND day>=?`, uid, now.UTC().AddDate(0, 0, -1).Format("2006-01-02")).Scan(&b2)
+	s.db.QueryRow(`SELECT COALESCE(battles,0) FROM players WHERE uid=?`, uid).Scan(&bAll)
+	return (d24 >= 3 && d24*100 >= 40*(d24+b2)) || (dAll >= 6 && dAll*100 >= 40*(dAll+bAll))
+}
+
+// friendsOf: the accounts uid finished a friend-link match with.
+func (s *store) friendsOf(uid string) map[string]bool {
+	out := map[string]bool{}
+	rows, err := s.db.Query(`SELECT b FROM friends WHERE a=? UNION SELECT a FROM friends WHERE b=? LIMIT 200`, uid, uid)
+	if err != nil {
+		return out
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var f string
+		rows.Scan(&f)
+		out[f] = true
+	}
+	return out
 }
 
 type statLine struct {
@@ -224,24 +386,27 @@ type boardRow struct {
 func (s *store) leaderboard(board, typ string, limit int, me string) ([]boardRow, error) {
 	var rows *sql.Rows
 	var err error
+	// Accounts with a record of disputes are left off every board.
+	hide := ` AND p.uid NOT IN (SELECT uid FROM dispute_flags WHERE until > ?)`
+	now := s.now().Unix()
 	switch {
 	case board == "today":
 		rows, err = s.db.Query(`SELECT p.uid, p.name, d.battles, d.wins, d.battles-d.wins FROM daily d JOIN players p ON p.uid=d.uid
-			WHERE d.day=? AND d.battles>0 ORDER BY d.battles DESC, d.wins DESC, p.name LIMIT ?`, s.day(), limit)
+			WHERE d.day=? AND d.battles>0`+hide+` ORDER BY d.battles DESC, d.wins DESC, p.name LIMIT ?`, s.day(), now, limit)
 	case typ != "":
 		col, ok := typeBoards[board]
 		if !ok {
 			col = "t.wins"
 		}
 		rows, err = s.db.Query(`SELECT p.uid, p.name, `+col+`, t.wins, t.losses FROM by_type t JOIN players p ON p.uid=t.uid
-			WHERE t.type=? AND t.battles>0 ORDER BY `+col+` DESC, t.wins DESC, p.name LIMIT ?`, typ, limit)
+			WHERE t.type=? AND t.battles>0`+hide+` ORDER BY `+col+` DESC, t.wins DESC, p.name LIMIT ?`, typ, now, limit)
 	default:
 		col, ok := boards[board]
 		if !ok {
 			col = "p.wins"
 		}
-		rows, err = s.db.Query(`SELECT p.uid, p.name, `+col+`, p.wins, p.losses FROM players p WHERE p.battles>0
-			ORDER BY `+col+` DESC, p.wins DESC, p.name LIMIT ?`, limit)
+		rows, err = s.db.Query(`SELECT p.uid, p.name, `+col+`, p.wins, p.losses FROM players p WHERE p.battles>0`+hide+`
+			ORDER BY `+col+` DESC, p.wins DESC, p.name LIMIT ?`, now, limit)
 	}
 	if err != nil {
 		return nil, err

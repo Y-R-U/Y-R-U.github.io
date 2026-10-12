@@ -111,12 +111,12 @@ server already has, so the only thing a client can lie about is campaign fights.
 |---|---|---|
 | `eventId` | `parseEventId` | unknown, or window not open (allow ~10 min grace after `end`) |
 | arena battle ids in `b` | its own agreed match results (`won`, `oppDmg`, `at`) | id unknown, not this uid's, result void/mismatched |
-| campaign battles `[id, pts, 'campaign', at]` | nothing — trusted, capped by `CAMPAIGN_CAP` | event is arena-only; over 10 that UTC day; under 60 s after the last counted |
+| campaign battles `[id, pts, 'campaign', at]` | nothing — trusted, capped by `CAMPAIGN_CAP` | event is arena-only; over 10 that UTC day; under 60 s after the last counted; dated over 26 h ago or more than 10 min before the previous sync; more than 10 new in one sync; over 10 min in the future (a batch up to 10 min ahead is shifted back so its newest fight is "now") |
 | `rolls` | the ordered points of the accepted battles (`counted`, play order by server time) | `rolls > sum(points)` |
 | position, turns (never sent) | `positionAfterRolls(board, uid, eventId, rolls)`, `turnsDone(...)` | — |
 | `open` squares | `cost * open.length <= points` | overspent, duplicate, out of 0..24 |
-| a guess | the answer, which only the server holds online (`PICTURES` is offline-only) | no guesses left |
-| rival list request | everyone's `{uid, name, points[], rolls}` for the event | — the server applies `rivalView` with the caller's own turns, so nobody receives a future position |
+| a guess | the answer, which only the server holds online (`PICTURES` is offline-only) | no guesses left; no counted battle in the event yet (`409 play first`) |
+| rival list request | everyone's `{uid, name, points[], rolls}` for the event | rate limited per caller (a limited caller gets its cached list, else 429) — the server applies `rivalView` with the caller's own turns, so nobody receives a future position |
 
 Endpoints (under the arena prefix, `/gms/2d/ragdojo/arena`; all but `GET /events` need the
 player's token, and Pass events also need a `br8t_pass` entitlement from the payment service
@@ -132,13 +132,22 @@ player's token, and Pass events also need a `br8t_pass` entitlement from the pay
 - **Agreed arena results count by themselves.** `store.afterMatch` (one hook in `recordMatch`)
   writes every verified seat to `ev_arena`; every event's battle list is the player's accepted
   campaign claims plus those rows in the window, through `counted()`. A void never reaches it.
-  `oppDmg` is not part of the agreed result yet (the round report carries only winner + KO), so
-  an arena loss is 1 point unless the player's own sync claims it was close (2) — the most a
-  lie buys is one point per real, agreed arena match. Wiring HP into the agreed report (hub.go)
-  would close that.
-- **Rivals** carry `{name, pos, turns (= shown), friend, home}` only — no uid, batches, rolls or
-  real turn count, so nothing in the reply can rebuild a later position. The caller's turn count
-  is the server's own, from stored battles and rolls; query parameters cannot raise it.
+  `oppDmg` IS part of the agreed result: every round report carries each fighter's damage and
+  must agree, and the deciding round's sets `close` (a 2-point loss). Arena entries in a sync's
+  `b` are ignored entirely — a client cannot claim a close loss. Early forfeits (before the first
+  agreed round or in the first 10 s) and results past the 3-a-day pair cap earn no event points.
+- **Rivals** carry `{rid, name, pos, turns (= shown), friend, home}` only — no uid, batches, rolls
+  or real turn count, so nothing in the reply can rebuild a later position. `rid` is a stable,
+  opaque per-event id (salted hash of event + uid, the salt kept in the DB); the sync reply
+  carries the caller's own `rid`. `friend` = an account the caller finished a friend-link match
+  with (server-side `friends` table); the `friends` names a client sends are ignored. One
+  caller's list is cached 5 s (while their turn count is unchanged), at most 4 scans run at once.
+  The caller's turn count is the server's own, from stored battles and rolls; query parameters
+  cannot raise it.
+- **Guesses**: one at a time per player and event (a lock around load-check-save, plus a 250 ms
+  limiter). The placeholder picture's answer is public, so solving it pays NO bonus. A client
+  showing approved art the server has no answer for gets `200 {guessable: false, guessesLeft: 0}`
+  (nothing recorded, logged once), not an endless 409.
 - **Rolls never go backwards** (`MAX` on write) and are clamped to the points banked.
 - Claims are accepted from `start` to `end + 10 min`; campaign fights may not be dated more than
   2 min ahead of the server clock. Later syncs still return the (closed) state read-only.

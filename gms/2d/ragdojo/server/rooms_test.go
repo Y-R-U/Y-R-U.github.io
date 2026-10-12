@@ -69,6 +69,7 @@ func TestRoomCountdownStartsAtFourAndFillsToEight(t *testing.T) {
 			t.Fatalf("join %d went elsewhere", i)
 		}
 		c.send(map[string]any{"t": "accept", "match": id, "tok": fmt.Sprintf("dev:q%d", i)})
+		time.Sleep(50 * time.Millisecond) // let the accept land before the next socket's wait
 		cs = append(cs, c)
 	}
 	// The 8th joined before its accept arrived, so the full room started without it... unless
@@ -261,8 +262,8 @@ func TestAgreedDamageMakesACloseLoss(t *testing.T) {
 	r := newRig(t, false)
 	a, b := r.dial("Alice", "dev:alice"), r.dial("Bob", "dev:bob")
 	id, _, _ := matchUp(t, a, b)
-	a.send(map[string]any{"t": "accept", "match": id})
-	b.send(map[string]any{"t": "accept", "match": id})
+	a.accept(id)
+	b.accept(id)
 	a.expect("go")
 	b.expect("go")
 	rep := func(round int, dmg []int, cs ...*tc) {
