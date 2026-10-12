@@ -413,3 +413,30 @@ Read `docs/MONETISATION.md` and `docs/VERIFICATION.md` before payment/release wo
 
 Do not deploy/publish or enable live payments without Aaron's approval.
 Aaron confirmed commercial-use rights for the Suno soundtrack.
+
+## Special events engine (phase 1, 2026-10-13; NOT wired into the game yet)
+
+Read `docs/EVENTS.md` (engine + server contract) after `docs/ONLINE.md` (design).
+`js/events/` is pure and node-importable — no DOM, no `Math.random`, no clock except `today()`.
+`dev/events.html` is the standalone preview (Vines & Ladders board with a walking stick man,
+fake rivals, picture-reveal grid, buttons that simulate finished battles; `?now=<ISO>` pins the
+date, `?peek=1` shows the whole picture, `?img=<url>&pic=<id>` swaps in real art).
+
+```
+node tools/eventsgate.mjs            # points, UTC windows in 5 timezones, dice + board golden vectors,
+                                     # THE REPLAY RULE (Aaron's 1,3,2 -> turn 7 example), rivals, reveal, save
+node tools/eventsgate.mjs --falsify  # 16 mutants of js/events, each must turn its own section red
+node tools/eventsshot.mjs [dir]      # the preview in Chrome: real touches, banked rolls, replay cap, 0 errors
+```
+
+- **A position is never stored.** It is `positionAt(board(eventId), uid, eventId, turns)`; the save
+  holds only `turns`, so a server can recompute any player from one integer and their battles.
+- **The replay rule is one `Math.min`** (`shownTurns`). Everything that draws or ranks rivals
+  must go through `rivalView`/`selectRivals`, never through a rival's raw `turns`.
+- **Week keys are ISO weeks** — 2027-01-01 is `2026-W53`. Use `windowOf`/`parseEventId`, never
+  build keys by hand. The gate runs the windows under five TZs because a `getDate()` slip passes
+  in UTC.
+- **Board links are 8+ squares and drift at most 3 columns.** Unconstrained long diagonals made
+  the first board an unreadable lattice; a "different row" rule is implied by the drift cap.
+- Changing `hash32`, `die`, `makeBoard` or the choice shuffle changes every board and every die
+  ever rolled — the golden vectors in the gate and `docs/EVENTS.md` are the server's contract.
