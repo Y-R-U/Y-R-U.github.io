@@ -129,6 +129,7 @@ export function mountArena(h) {
     c.on('go', (g) => startRound(g));
     c.on('result', (r) => {
       result = r; matchId = r.match; wantRematch = oppRematch = false;
+      r.eventPts = arenaBattle(r);
       setTimeout(() => { stopFight(); view = 'result'; open(); paint(); refreshAllowance(); }, fight ? 600 : 0);
     });
     c.on('rematch', () => { oppRematch = true; paint(); });
@@ -144,6 +145,17 @@ export function mountArena(h) {
     }
     c.on('closed', () => msg('Lost the connection to the arena.'));
   }
+
+  /** An agreed arena result for js/events (src 'arena'; oppDmg = the most-damaged opponent in the
+   * deciding round). The events listener writes back `award`; the server counts it on its own. */
+  function arenaBattle(r) {
+    const ens = fight?.match?.enemies || [];
+    const oppDmg = ens.length ? Math.max(...ens.map((f) => Math.max(0, Math.min(1, 1 - f.hp / (f.maxHp || 1))))) : 0;
+    const detail = { id: 'arena:' + r.match, at: Date.now(), src: 'arena', kind: r.mode || 'duel', ranked: !!r.counted, won: r.winner === r.you, oppDmg };
+    try { window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail })); } catch {}
+    return detail.award?.pts || 0;
+  }
+  const evLine = (n) => (n ? `<p class="fine evaward">+${n} event point${n === 1 ? '' : 's'}</p>` : '');
 
   function msg(text) { stopFight(); offer = null; view = 'msg'; note = esc(text); open(); paint(); }
 
@@ -287,7 +299,7 @@ export function mountArena(h) {
       html += `<h3 class="${won ? 'win' : 'lose'}">${won ? 'YOU WIN' : 'YOU LOSE'}</h3>
         <p class="vs">YOU <small>vs</small> <span class="ghosttag">GHOST</span> ${esc(R.g.name)}</p>
         <div class="rows">${[['Damage dealt', R.dealt], ['Damage taken', R.taken]].map(([k, v]) => `<div class="r"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
-        <p class="fine">Ghost fight — practice only. Not ranked, no ink, no free battle used.</p>
+        <p class="fine">Ghost fight — practice only. Not ranked, no ink, no free battle used.</p>${evLine(R.battle.award?.pts)}
         <div class="vicbtns"><button class="btn big" data-a="ghostAgain">FIGHT AGAIN</button><button class="btn" data-a="ghostList">OTHER GHOSTS</button></div>`;
     } else if (view === 'home' || view === 'msg' || view === 'joining') {
       if (view === 'msg' || view === 'joining') html += `<p class="arenanote">${view === 'joining' ? 'Joining your friend…' : note}</p>`;
@@ -335,6 +347,7 @@ export function mountArena(h) {
       if (s) html += `<div class="rows">${[['Arena wins', s.wins], ['Losses', s.losses], ['Win streak', `${s.streak} (best ${s.bestStreak})`], ['Knockouts', s.kos], ['Battles today', s.today]].map(([k, v]) => `<div class="r"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;
       else html += `<p class="fine">${lan ? '' : 'Not ranked — sign in to appear on the leaderboards.'}</p>`;
       if (allowanceLine) html += `<p class="fine">${esc(allowanceLine)}</p>`;
+      html += evLine(result.eventPts);
       html += `<div class="vicbtns"><button class="btn big" data-a="rematch"${wantRematch ? ' disabled' : ''}>${wantRematch ? 'WAITING…' : 'REMATCH'}</button><button class="btn" data-a="leave">DONE</button></div>`;
       if (oppRematch) html += `<p class="fine">They want a rematch!</p>`;
     }

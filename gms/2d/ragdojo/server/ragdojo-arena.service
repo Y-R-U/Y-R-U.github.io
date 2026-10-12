@@ -15,6 +15,8 @@ Environment=ARENA_PREFIX=/gms/2d/ragdojo/arena
 Environment=ARENA_DB=/srv/data/ragdojo-arena/arena.db
 Environment=ARENA_ICE_URL=http://127.0.0.1:8014/ice
 Environment=ARENA_ALLOWANCE_URL=http://127.0.0.1:8016/api/br8t/allowance
+Environment=ARENA_ENTITLEMENT_URL=http://127.0.0.1:8016/api/br8t/entitlement
+Environment=ARENA_EVENT_ANSWERS=/srv/data/ragdojo-arena/event_answers.json
 Environment=GOMEMLIMIT=48MiB
 # Never set ARENA_DEV_AUTH, ARENA_OPEN_LOBBY or ARENA_LAN here.
 MemoryMax=128M

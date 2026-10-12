@@ -521,7 +521,7 @@ Read `docs/MONETISATION.md` and `docs/VERIFICATION.md` before payment/release wo
 Do not deploy/publish or enable live payments without Aaron's approval.
 Aaron confirmed commercial-use rights for the Suno soundtrack.
 
-## Special events engine (phase 1, 2026-10-13; NOT wired into the game yet)
+## Special events engine (phase 1, 2026-10-13; wired into the game in phase 3 — see below)
 
 Read `docs/EVENTS.md` (engine + server contract) after `docs/ONLINE.md` (design).
 `js/events/` is pure and node-importable — no DOM, no `Math.random`, no clock except `today()`.
@@ -554,3 +554,67 @@ node tools/eventsshot.mjs [dir]      # the preview in Chrome: real touches, riva
   the first board an unreadable lattice; a "different row" rule is implied by the drift cap.
 - Changing `hash32`, `die`, `makeBoard` or the choice shuffle changes every board and every die
   ever rolled — the golden vectors in the gate and `docs/EVENTS.md` are the server's contract.
+
+## Events in the game + event art (phase 3 agent E, 2026-10-13; local only, NOT deployed)
+
+```
+js/events/ui.js       the EVENTS button + panel: tabs per running event, Vines & Ladders, picture reveal,
+                      PRIZES; listens for `ragdojo:battle`, banks into save.events, syncs with the server
+js/events/render.js   VinesView / RevealView — the preview's drawing, now shared by the game and dev/events.html
+js/events/net.js      the arena server's /events calls; same base rule as net/panel.js arenaBase
+server/events.go      Go port of hash32/die/makeBoard/windows/counted + claims, rivals, guess, arena hook
+tools/eventart/       Aaron's LAN review page for Flux candidates (server.mjs + index.html)
+```
+
+- **Battles in**: main.js `finishFight` dispatches `ragdojo:battle {src:'campaign'}` (oppDmg = the
+  most-damaged enemy); net/panel.js dispatches `{id:'arena:<match>', src:'arena'}` on an agreed
+  `result` (oppDmg from the deciding round's match) and ghosts already did. The listener records
+  it with `recordBattle` and writes `detail.award = {pts}` back onto the event object, which is how
+  the results card, the ghost card and the arena card print "+3 event points" without importing
+  the events module (main.js and panel.js load modules under different `?v=` URLs — a second
+  import would be a second module instance with its own state).
+- **The save is the run save** (`S.events`, `S.eventPrizes`), so cloud sync carries it and no new
+  key needs syncing. Only finished battles are recorded; NEW GAME keeps both; `applyCloud` merges.
+- **Offline is a full mode**: no server (or signed out) = local dice with `uid` `local:<device>`
+  and the placeholder answer checked locally. Online, the server's recomputed state wins
+  (`adopt`), keeping anything recorded while the request was out. Approved art can only be
+  guessed online (its answer is server-only).
+- **Pass events** show with 🔒, a dimmed board and a "SUPPORT / PASS" button that opens the
+  existing support panel — no modal. `hasPass` = DEV / family / `purchases.passActive`;
+  `?evpass=0` forces it off in dev. The server checks the entitlement itself.
+- **The canvas sits inside the rotated app in portrait**: `getBoundingClientRect` is the rotated
+  box, so a tap is mapped with `isRotated()` (x = clientY - top, y = right - clientX).
+- **Art paths are page-relative** (`document.baseURI`), not `import.meta.url`: the release build
+  bundles ui.js into js/main.js and a module-relative `../../assets` would point outside the game.
+  `tools/build.mjs` copies `assets/events/*.webp|jpg` + `manifest.json` into dist.
+- **Backgrounds**: a finished picture is a prize; USE IT sets `S.eventPrizes.bg` and
+  `drawEventBackdrop` paints it faintly (multiply, 30%) behind the menu demo, arena and ghost
+  fights — never the campaign.
+
+Server (see docs/EVENTS.md "Server contract"): agreed arena results count automatically through
+`store.afterMatch`; claims are capped/clamped/recomputed; rivals get the replay rule with the
+caller's STORED turns and leave as `{name, pos, turns, friend, home}`; the guess is checked against
+`ARENA_EVENT_ANSWERS` (default next to the DB). Known gap: arena `oppDmg` is client-claimed (worth at
+most +1 point per agreed loss) until the agreed round report carries HP (hub.go, agent C's file).
+
+**Event art review (Aaron)**: `node gms/2d/ragdojo/tools/eventart/server.mjs` from the site root,
+then open the printed `http://192.168.0.236:8023/?k=<key>` on the phone. Data lives in
+`~/.ragdojo/eventart/` (candidates, state, key, answers.json), seeded with the 12 phase-1 candidates;
+approving writes `assets/events/` in this repo (commit it) and the answer to answers.json (copied
+to the box by `server/deploy.sh`, read directly by `server/lan.sh`). Regenerate queues on
+mflux-queue :7867 (waits for LTX to go idle first; no lock). Nothing is approved yet.
+
+Gates (each watched go red):
+```
+cd server && go test ./...           # events_test.go: doc + ~1,300 JS golden vectors, replay rule never leaks,
+                                     # rival selection, campaign cap, arena auto-count, pass/windows, reveal + guess
+node tools/eventsvectors.mjs --check # the vectors file still matches js/events
+node tools/eventsgofalsify.mjs       # 13 mutants of events.go / the JS board, all red
+node tools/eventsgame.mjs            # 58 checks, REAL touch, 844x390 + rotated 390x844, offline and online
+node tools/eventsgame.mjs --falsify  # 4 mutants (no emit, roll not saved, rotation ignored, replay rule off)
+node tools/eventartgate.mjs [--seed <dir>] [--no-flux]   # list, a REAL Flux regeneration, approve into temp
+node tools/eventartgate.mjs --falsify                    # 3 mutants (answer in manifest, no answers file, no key)
+```
+Test hooks: `window.__events` (DEV), `?arena=` `?arenauid=` `?evpass=0`; ports `EVENTS_TEST_PORT`
+(9500-9502) and `EVENTART_TEST_PORT` (9510-9511).
+

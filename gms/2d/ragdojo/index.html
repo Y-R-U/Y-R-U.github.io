@@ -57,6 +57,7 @@
         <button class="btn hidden" id="btnDark">☾ DARK</button>
         <button class="btn" id="btnShop">SHOP <span id="inkPill" class="pill">0</span></button>
         <button class="btn hidden" id="btnArena" title="Fight other players">⚔ ARENA</button>
+        <button class="btn" id="btnEvents" title="Special events">EVENTS</button>
         <button class="btn hidden" id="btnTrophy" title="Your record book">🏆</button>
       </div>
       <div class="corner br">
@@ -179,6 +180,15 @@
       </div>
     </div>
 
+    <!-- special events (js/events/ui.js): works offline; rivals and checks need the arena server -->
+    <div id="events" class="screen panel-screen">
+      <div class="sheet evsheet">
+        <button class="icon close" id="btnEventsClose" aria-label="Close events">✕</button>
+        <div class="sheethead"><h2>EVENTS</h2><div class="tabs" id="evTabs" role="tablist"></div></div>
+        <div class="evbody" id="evBody"></div>
+      </div>
+    </div>
+
     <!-- help -->
     <div id="help" class="screen panel-screen">
       <div class="sheet">
@@ -225,6 +235,6 @@
   }, 12000);
 })();
 </script>
-<script type="module" src="js/main.js?v=20261013-ghosts"></script>
+<script type="module" src="js/main.js?v=20261013-events"></script>
 </body>
 </html>

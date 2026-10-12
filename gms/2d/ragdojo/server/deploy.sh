@@ -29,6 +29,10 @@ rsync -az --delete --include='go.mod' --include='go.sum' --include='*.go' --excl
 echo ">> build on box (1 CPU, low priority)"
 ssh "$HOST" "cd $BUILD && GOMAXPROCS=1 CGO_ENABLED=0 GOFLAGS=-mod=mod nice -n 15 $GO build -p 1 -trimpath -ldflags='-s -w' -o $BIN.new ."
 
+echo ">> event-picture answers (server-only; written by tools/eventart when Aaron approves art)"
+ANSWERS="${ANSWERS:-$HOME/.ragdojo/eventart/answers.json}"
+if [ -f "$ANSWERS" ]; then rsync -az "$ANSWERS" "$HOST:/srv/data/$APP/event_answers.json"; else echo "   none yet: every event uses the drawn placeholder"; fi
+
 echo ">> install binary + unit (previous kept as .prev)"
 rsync -az "$SERVER_DIR/$APP.service" "$HOST:/tmp/$APP.service"
 ssh "$HOST" "if [ -f $BIN ]; then cp -p $BIN $BIN.prev; fi && mv $BIN.new $BIN && \

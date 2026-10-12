@@ -73,7 +73,9 @@ async function open(w, h, label) {
   let wsSent = 0;
   c.on('Network.webSocketFrameSent', () => { wsSent++; });
   c.posts = [];
-  c.on('Network.requestWillBeSent', (p) => { if (p.request.method !== 'GET' && p.request.method !== 'OPTIONS') c.posts.push(p.request.method + ' ' + p.request.url); });
+  // A ghost fight is a campaign-class battle for the special events (js/events), so /events/sync may
+  // carry it; nothing may reach the arena's stats.
+  c.on('Network.requestWillBeSent', (p) => { if (p.request.method !== 'GET' && p.request.method !== 'OPTIONS' && !p.request.url.includes('/arena/events/')) c.posts.push(p.request.method + ' ' + p.request.url); });
   c.wsSent = () => wsSent;
   await c.goto(`${web.base}/index.html?auto=1&dpr=1&arena=${encodeURIComponent(base)}&arenauid=zed`);
   ok(`${label}: boots to the hub`, await c.waitFor('window.__state && window.__state.mode === "hub"', 20000));

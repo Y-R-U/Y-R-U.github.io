@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RAGDOJO event art</title>
+<style>
+:root { --bg: #f7f2e3; --card: #fffdf6; --ink: #20242c; --muted: #6b6658; --line: #d8cfb6; --blue: #2d5fb5; --green: #2f7d3a; --red: #b8372c; --gold: #b8860b; }
+@media (prefers-color-scheme: dark) { :root { --bg: #1f1d19; --card: #2a2722; --ink: #ece6d6; --muted: #a49c88; --line: #3d382f; --blue: #7aa5f0; --green: #6cc77a; --red: #f0857a; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.4 system-ui, -apple-system, sans-serif; padding: 12px 16px 60px; }
+h1 { font-size: 21px; margin: 4px 0; } h2 { font-size: 18px; margin: 26px 0 4px; } h3 { font-size: 15px; margin: 12px 0 6px; color: var(--muted); font-weight: 600; }
+p.lead, .muted { color: var(--muted); font-size: 14px; margin: 2px 0 8px; }
+.ev { border-top: 2px solid var(--line); margin-top: 18px; padding-top: 4px; }
+.evline { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.pill { font-size: 12px; border: 1.5px solid currentColor; border-radius: 9px; padding: 0 7px; }
+.pill.live { color: var(--green); } .pill.pass { color: #8c50c6; } .pill.ok { color: var(--green); } .pill.ph { color: var(--muted); }
+.theme { background: color-mix(in srgb, var(--card) 70%, transparent); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; margin: 8px 0; }
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 6px 0; }
+.form label { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 2px; }
+.form .wide { grid-column: 1 / -1; }
+input, select, textarea { font: inherit; font-size: 15px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--card); color: var(--ink); width: 100%; }
+textarea { min-height: 90px; font-size: 13px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.card.approved { border: 3px solid var(--green); }
+.card.rejected { opacity: .45; }
+.card.rec:not(.approved) { border: 2px dashed var(--blue); }
+.card img { width: 100%; aspect-ratio: 1024 / 640; object-fit: cover; border-radius: 6px; display: block; background: var(--line); }
+.ph-img { width: 100%; aspect-ratio: 1024 / 640; border-radius: 6px; background: var(--line); display: grid; place-items: center; color: var(--muted); font-size: 14px; text-align: center; padding: 8px; }
+.meta { display: flex; justify-content: space-between; gap: 6px; font-size: 13px; color: var(--muted); }
+.meta b { color: var(--ink); }
+.note { font-size: 13px; }
+.btns { display: flex; gap: 6px; flex-wrap: wrap; }
+button { font: inherit; font-size: 15px; min-height: 40px; padding: 6px 12px; border-radius: 9px; border: 1.5px solid var(--ink); background: var(--card); color: var(--ink); cursor: pointer; }
+button.go { background: var(--green); border-color: var(--green); color: #fff; }
+button.warn { border-color: var(--red); color: var(--red); }
+button:disabled { opacity: .45; }
+.status { font-size: 13px; font-weight: 600; }
+.status.approved { color: var(--green); } .status.failed { color: var(--red); } .status.queued, .status.generating { color: var(--blue); }
+#toast { position: fixed; left: 16px; right: 16px; bottom: 12px; padding: 10px 12px; border-radius: 10px; background: var(--ink); color: var(--bg); font-size: 14px; display: none; }
+#toast.show { display: block; }
+.prompt { display: none; } .prompt.open { display: flex; flex-direction: column; gap: 6px; }
+</style>
+</head><body>
+<h1>RAGDOJO — picture-reveal art</h1>
+<p class="lead">Pick one picture per event. Nothing reaches the game until you press <b>APPROVE</b>; until then the event uses the drawn placeholder. The answer stays on the server (never in the image or its file name). Dashed blue = recommended.</p>
+<div id="root"><p class="muted">loading…</p></div>
+<div id="toast" role="status"></div>
+<script>
+const K = new URLSearchParams(location.search).get('k') || '';
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+let S = null, openPrompt = new Set(), poll = null;
+const day = (ms) => new Date(ms).toISOString().slice(0, 10);
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 3500); }
+
+async function api(path, body) {
+  const r = await fetch(path + (path.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(K), body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || r.status);
+  return j;
+}
+async function load() {
+  try { S = await api('/api/state'); render(); }
+  catch (e) { $('#root').innerHTML = `<p class="muted">${esc(e.message)}</p>`; }
+}
+async function act(path, body, done) {
+  try { const j = await api(path, body); if (j.state) S = j.state; else await load(); render(); if (done) toast(done); }
+  catch (e) { toast(e.message); }
+}
+
+function card(c) {
+  const t = S.themes[c.theme] || {};
+  const busy = ['queued', 'generating', 'waiting for LTX to go idle'].includes(c.status);
+  const img = busy ? `<div class="ph-img">${esc(c.status)}…<br>(local Flux, about a minute)</div>`
+    : c.status === 'failed' ? `<div class="ph-img">failed: ${esc(c.error)}</div>`
+    : `<img loading="lazy" src="/img/${esc(c.file)}?k=${encodeURIComponent(K)}&t=${c.created}" alt="${esc(c.id)}">`;
+  return `<div class="card ${c.status}${c.recommended ? ' rec' : ''}" data-id="${esc(c.id)}">${img}
+    <div class="meta"><b>${esc(c.id)}</b><span>seed ${c.seed}</span><span class="status ${c.status.split(' ')[0]}">${c.status === 'approved' ? 'APPROVED ✓' : esc(c.status)}</span></div>
+    ${c.note ? `<div class="note">${esc(c.note)}</div>` : ''}
+    <div class="btns">
+      ${c.status === 'approved' ? `<button class="warn" data-a="revoke">UN-APPROVE</button>` : `<button class="go" data-a="approve"${busy || c.status === 'failed' || !t.event ? ' disabled' : ''}>APPROVE</button>`}
+      <button data-a="regen"${busy ? ' disabled' : ''}>REGENERATE</button>
+      <button data-a="edit">EDIT PROMPT</button>
+      <button class="warn" data-a="reject"${busy ? ' disabled' : ''}>${c.status === 'rejected' ? 'UN-REJECT' : 'REJECT'}</button>
+    </div>
+    <div class="prompt${openPrompt.has(c.id) ? ' open' : ''}"><textarea>${esc(c.prompt)}</textarea>
+      <div class="btns"><button data-a="savePrompt">SAVE PROMPT</button><button data-a="saveRegen">SAVE + REGENERATE</button></div></div>
+  </div>`;
+}
+
+function themeBox(name, t) {
+  const cands = S.candidates.filter((c) => c.theme === name);
+  const evOpts = ['<option value="">— not assigned —</option>', ...S.events.map((e) => `<option value="${esc(e.id)}"${e.id === t.event ? ' selected' : ''}>${esc(e.id)}${e.running ? ' (running now)' : ''}</option>`)].join('');
+  return `<div class="theme" data-theme="${esc(name)}">
+    <div class="evline"><b>${esc(name)}</b><span class="muted">${cands.length} candidate${cands.length === 1 ? '' : 's'}</span></div>
+    <div class="form">
+      <label class="wide">for event<select data-f="event">${evOpts}</select></label>
+      <label class="wide">answer (server only)<input data-f="answer" value="${esc(t.answer)}"></label>
+      ${[0, 1, 2].map((i) => `<label>decoy ${i + 1}<input data-f="decoy" value="${esc((t.decoys || [])[i] || '')}"></label>`).join('')}
+      <label class="wide"><span>&nbsp;</span><button data-a="saveTheme">SAVE ANSWER / EVENT</button></label>
+    </div>
+    <div class="grid">${cands.map(card).join('')}</div>
+  </div>`;
+}
+
+function render() {
+  const appr = new Set(S.approved);
+  const byEvent = (id) => Object.entries(S.themes).filter(([, t]) => t.event === id);
+  let h = '';
+  for (const e of S.events) {
+    const themes = byEvent(e.id);
+    h += `<section class="ev"><h2>${esc(e.title)} · ${esc(e.id)}</h2>
+      <div class="evline">${e.running ? '<span class="pill live">RUNNING NOW</span>' : `<span class="muted">starts ${day(e.start)}</span>`}
+      ${e.pass ? '<span class="pill pass">PASS</span>' : ''}${appr.has(e.id) ? '<span class="pill ok">ART APPROVED</span>' : '<span class="pill ph">placeholder until approved</span>'}</div>
+      ${themes.length ? themes.map(([n, t]) => themeBox(n, t)).join('') : '<p class="muted">No candidates for this event yet — make some below.</p>'}
+      <details><summary class="muted">+ new candidates for this event</summary>
+        <div class="form" data-new="${esc(e.id)}">
+          <label>theme name<input data-f="theme" placeholder="e.g. snowday"></label>
+          <label>answer<input data-f="answer" placeholder="A SNOWBALL FIGHT"></label>
+          ${[0, 1, 2].map((i) => `<label>decoy ${i + 1}<input data-f="decoy"></label>`).join('')}
+          <label class="wide">what to draw (the ink-on-paper style is added for you)<textarea data-f="desc" placeholder="a stick-figure snowball fight in a school yard, ..."></textarea></label>
+          <label class="wide"><span>&nbsp;</span><button data-a="newTheme">MAKE 4 CANDIDATES</button></label>
+        </div></details></section>`;
+  }
+  const loose = Object.entries(S.themes).filter(([, t]) => !S.events.some((e) => e.id === t.event));
+  if (loose.length) h += `<section class="ev"><h2>Not assigned to an upcoming event</h2>${loose.map(([n, t]) => themeBox(n, t)).join('')}</section>`;
+  h += `<p class="muted">Approved files go to <code>${esc(S.out)}</code> — commit them with the manifest; copy answers.json to the arena server (deploy step).</p>`;
+  $('#root').innerHTML = h;
+  const busy = S.candidates.some((c) => ['queued', 'generating', 'waiting for LTX to go idle'].includes(c.status));
+  clearInterval(poll);
+  if (busy) poll = setInterval(load, 4000);
+}
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-a]');
+  if (!b) return;
+  const a = b.dataset.a, cardEl = b.closest('.card'), id = cardEl?.dataset.id;
+  if (a === 'approve') act('/api/approve', { id }, 'approved — the game will use it');
+  else if (a === 'revoke') act('/api/revoke', { id }, 'back to the placeholder');
+  else if (a === 'reject') act('/api/reject', { id });
+  else if (a === 'regen') act('/api/regenerate', { id }, 'queued on local Flux');
+  else if (a === 'edit') { openPrompt.has(id) ? openPrompt.delete(id) : openPrompt.add(id); render(); }
+  else if (a === 'savePrompt' || a === 'saveRegen') {
+    const prompt = cardEl.querySelector('textarea').value;
+    act('/api/prompt', { id, prompt }, 'prompt saved').then(() => { if (a === 'saveRegen') act('/api/regenerate', { id }, 'queued on local Flux'); });
+  } else if (a === 'saveTheme') {
+    const box = b.closest('.theme');
+    act('/api/theme', { theme: box.dataset.theme, event: box.querySelector('[data-f=event]').value, answer: box.querySelector('[data-f=answer]').value,
+      decoys: [...box.querySelectorAll('[data-f=decoy]')].map((x) => x.value) }, 'saved');
+  } else if (a === 'newTheme') {
+    const f = b.closest('[data-new]');
+    act('/api/theme', { theme: f.querySelector('[data-f=theme]').value, event: f.dataset.new, answer: f.querySelector('[data-f=answer]').value,
+      decoys: [...f.querySelectorAll('[data-f=decoy]')].map((x) => x.value), desc: f.querySelector('[data-f=desc]').value, generate: 4 }, 'queued 4 on local Flux');
+  }
+});
+load();
+</script>
+</body></html>

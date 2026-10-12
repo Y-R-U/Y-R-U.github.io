@@ -77,7 +77,7 @@ still covered. A solved or fully opened picture owes `arenaBackground`; a solved
 the ink (`{ kind: 'ink', amount }`). `rewardsOwed()` lists what is unpaid; a reward is claimed by adding its id to
 `claimed`. Paying the ink and unlocking the background are the game's to wire.
 
-## The save (`ragdojo.events` — separate from the run save)
+## The save (`save.events` inside the run save, so cloud sync carries it; `save.eventPrizes` holds unlocked backgrounds)
 
 ```
 { v: 1, seenDay: 'YYYY-MM-DD',
@@ -96,8 +96,13 @@ the ink (`{ kind: 'ink', amount }`). `rewardsOwed()` lists what is unpaid; a rew
   (capped at what the merged battles bank), squares union then clamped to
   what the merged points pay for, guesses union, `solved` or, `claimed` union, `seenDay` max.
 - `prune(state, now)` drops events that ended more than 7 days ago.
+- In the game an event may also hold `uid` — whose dice these are (the server's uid once synced,
+  else the account / LAN device / `local:<device>`). Signing in mid-event can move the stick man
+  once, to where that account's dice put it.
+- NEW GAME keeps `events` and `eventPrizes`; adopting a cloud save merges this device's events
+  into it (`mergeEventsInto`, using `merge` above).
 
-## Server contract (phase 3/4, not built)
+## Server contract (built 2026-10-13: `server/events.go`)
 
 The client **claims**; the server **recomputes**. Everything below is derivable from data the
 server already has, so the only thing a client can lie about is campaign fights.
@@ -112,6 +117,32 @@ server already has, so the only thing a client can lie about is campaign fights.
 | `open` squares | `cost * open.length <= points` | overspent, duplicate, out of 0..24 |
 | a guess | the answer, which only the server holds online (`PICTURES` is offline-only) | no guesses left |
 | rival list request | everyone's `{uid, name, points[], rolls}` for the event | — the server applies `rivalView` with the caller's own turns, so nobody receives a future position |
+
+Endpoints (under the arena prefix, `/gms/2d/ragdojo/arena`; all but `GET /events` need the
+player's token, and Pass events also need a `br8t_pass` entitlement from the payment service
+— `ARENA_ENTITLEMENT_URL`, fails open like the allowance; a LAN server treats everyone as Pass):
+
+| call | does |
+|---|---|
+| `GET /events` | the running events and the server clock (also the client's probe) |
+| `POST /events/sync {event, name, b, rolls, open, friends}` | applies the claim, answers with the recomputed state: `b` (accepted, play order), `points`, `rolls`/`pos`/`turns` or `open`/`guesses`/`solved`/`bonus`/`guessesLeft`/`art`, `closed`, and `rivals` for Vines & Ladders |
+| `GET /events/rivals?event=&friends=` | the rival list on its own |
+| `POST /events/guess {event, pic, choice}` | checked against `ARENA_EVENT_ANSWERS` (art) or the placeholder's answer; `pic` must match what the server has (`409 picture changed`, the guess is kept) |
+
+- **Agreed arena results count by themselves.** `store.afterMatch` (one hook in `recordMatch`)
+  writes every verified seat to `ev_arena`; every event's battle list is the player's accepted
+  campaign claims plus those rows in the window, through `counted()`. A void never reaches it.
+  `oppDmg` is not part of the agreed result yet (the round report carries only winner + KO), so
+  an arena loss is 1 point unless the player's own sync claims it was close (2) — the most a
+  lie buys is one point per real, agreed arena match. Wiring HP into the agreed report (hub.go)
+  would close that.
+- **Rivals** carry `{name, pos, turns (= shown), friend, home}` only — no uid, batches, rolls or
+  real turn count, so nothing in the reply can rebuild a later position. The caller's turn count
+  is the server's own, from stored battles and rolls; query parameters cannot raise it.
+- **Rolls never go backwards** (`MAX` on write) and are clamped to the points banked.
+- Claims are accepted from `start` to `end + 10 min`; campaign fights may not be dated more than
+  2 min ahead of the server clock. Later syncs still return the (closed) state read-only.
+- `tools/eventsgofalsify.mjs` breaks events.go 12 ways (and the JS board once) — 13/13 red.
 
 To keep the port honest, these vectors must match on the server (they are in the gate):
 
@@ -128,7 +159,16 @@ makeBoard('vines-day:2026-10-13')
 `hash32` hashes UTF-8 bytes; uids are Firebase UIDs (ASCII). All arithmetic is uint32
 (`Math.imul` = Go's `uint32` multiply).
 
+`server/testdata/events_vectors.json` holds ~1,300 more (hashes incl. UTF-8, mulberry32 floats,
+40 rolls × 16 uid/event pairs, 60 boards, 60 players' positions/turns/rival views, 260 windows
+across year and ISO-week edges, bad ids, 30 messy `counted()` cases) written by
+`node tools/eventsvectors.mjs` from the JS engine; `--check` fails when the file is stale.
+
 ## Images
 
 Picture-reveal art is generated with local Flux (ink on notebook paper) and reviewed by Aaron
-before anything ships. Candidates live outside the repo until he approves them.
+before anything ships: `node tools/eventart/server.mjs` (see CLAUDE.md, "Event art review").
+Approving writes `assets/events/<event-id>.webp|.jpg` plus `assets/events/manifest.json`
+(`{v, pictures: {eventId: {img, jpg, w, h, choices}}}` — four choices, shuffled, no answer); the
+answer goes only to `~/.ragdojo/eventart/answers.json`, which the arena server reads. An event
+with no approved art uses the code-drawn placeholder (a flying kick, answer public).

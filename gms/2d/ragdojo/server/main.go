@@ -136,6 +136,7 @@ func (h *hub) routes(prefix string, origins []string) http.Handler {
 		reply(w, 200, map[string]any{"ok": true, "v": 1, "modes": []string{"duel"}})
 	})
 	h.boardRoutes(mux, prefix, origins)
+	h.eventRoutes(mux, prefix, origins)
 	mux.HandleFunc(prefix+"/ws", func(w http.ResponseWriter, r *http.Request) {
 		h.serveWS(w, r, origins)
 	})

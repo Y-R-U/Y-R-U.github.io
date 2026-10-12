@@ -21,7 +21,8 @@ import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
 import { Purchases, API } from './purchases.js?v=20261012-pass';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
-import { mountArena } from './net/panel.js?v=20261013-ghosts';
+import { mountArena } from './net/panel.js?v=20261013-events';
+import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261013-events';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
 let familyStorage;
@@ -101,13 +102,13 @@ const input = new Input(cvs, {
 });
 
 // ── screens ──────────────────────────────────────────────────────────────
-const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help', 'thug', 'premium', 'worlds', 'arena'];
+const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help', 'thug', 'premium', 'worlds', 'arena', 'events'];
 function show(name) {
   for (const s of SCREENS) $(s).classList.toggle('show', s === name);
   $('pauseBtn').classList.toggle('hidden', name !== null || !match || match.demo);
 }
 function overlay(name) {   // a panel on top of the hub
-  for (const s of ['shop', 'settings', 'help', 'results', 'victory', 'thug', 'premium', 'worlds', 'arena']) $(s).classList.toggle('show', s === name);
+  for (const s of ['shop', 'settings', 'help', 'results', 'victory', 'thug', 'premium', 'worlds', 'arena', 'events']) $(s).classList.toggle('show', s === name);
   $('pauseBtn').classList.toggle('hidden', !!name || mode !== 'fight');
 }
 
@@ -283,7 +284,12 @@ function finishFight(result, m) {
   }
   persist(S);
   const gained = unlockedFightTracks(reachedLevel(null), S.theme).slice(tracksBefore).map((t) => TRACK_NAME[t.id] || t.id);
-  pendingResult = { result, m, earned, bonus, rankGap, wasFinal, bully: m.bully, gained, inkWell, inkMul };
+  // Special events (js/events/ui.js) bank finished fights; the listener writes back `award`.
+  const battle = { at: Date.now(), src: 'campaign', kind: 'campaign', ranked: false, won,
+    oppDmg: Math.max(0, ...m.enemies.map((e) => Math.min(1, 1 - e.hp / e.maxHp))) };
+  try { window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail: battle })); } catch {}
+  const eventPts = battle.award?.pts || 0;
+  pendingResult = { result, m, earned, bonus, rankGap, wasFinal, bully: m.bully, gained, inkWell, inkMul, eventPts };
 
   // A bully run has a finish line too. Without this you beat the Ink Master a second time
   // and got a plain results card, then the hub handed you the same final fight for ever.
@@ -309,6 +315,7 @@ function showResults(R) {
     `<div class="r big"><span>INK EARNED</span><b>+${R.earned}</b></div>`,
     R.gained && R.gained.length
       ? `<div class="r unlock"><span>♪ NEW MUSIC</span><b>${R.gained.join(' · ')}</b></div>` : '',
+    eventRow(R.eventPts),
   ].join('');
   $('btnResult').textContent = won ? 'CONTINUE' : 'TRY AGAIN';
   // A win already continues to the hub; a loss needs its own way out of the retry loop.
@@ -318,6 +325,7 @@ function showResults(R) {
   if (won) audio.sfx.bell();
 }
 const row = (k, v) => `<div class="r"><span>${k}</span><b>${v}</b></div>`;
+const eventRow = (n) => (n ? `<div class="r evaward"><span>EVENTS</span><b>+${n} event point${n === 1 ? '' : 's'}</b></div>` : '');
 
 /**
  * The record book. Shown on a win, and reachable from the hub's trophy any time after your
@@ -337,6 +345,7 @@ function showVictory(bully, justWon = true) {
       : wasBully ? `${bullyWord()} CHAMPION`
       : CHAMP_TITLE[S.theme] || 'CHAMPION';
   $('vicBody').innerHTML = [
+    justWon ? eventRow(pendingResult?.eventPts) : '',
     `<div class="vichead">THIS RUN</div>`,
     row('Fights won', S.wins),
     row('Knockouts', S.kos),
@@ -468,6 +477,7 @@ function render() {
 
   sheetShadow(ctx, 0, 0, SHEET_W, SHEET_H);
   if (sheet) ctx.drawImage(sheet, 0, 0);
+  drawEventBackdrop(ctx, m);
   ctx.save();
   ctx.globalCompositeOperation = 'multiply';
   ctx.drawImage(m.fx.marks, 0, 0);
@@ -636,7 +646,7 @@ $('btnAgain').onclick = () => {
   resetAgainBtn();
   // Records, the music roster and the fact that you have won survive. Everything you bought
   // does not — that is the point of starting again.
-  const keep = { best: S.best, everWon: S.everWon, records: S.records };
+  const keep = { best: S.best, everWon: S.everWon, records: S.records, events: S.events, eventPrizes: S.eventPrizes };
   S = { ...DEFAULT(), ...keep, newGamePlus: (S.newGamePlus || 0) + 1 };
   persist(S); overlay(null); setMode('hub'); refreshHub();
 };
@@ -685,7 +695,7 @@ $('btnResClose').onclick = () => { click(); overlay(null); toMenu(); };
  * panel you were reading. The results card is deliberately absent: after a fight your thumb
  * is already moving, and a stray tap there should not skip past the report.
  */
-const DISMISS = { shop: 'btnShopClose', settings: 'btnSetClose', help: 'btnHelpClose', victory: 'btnVicClose', worlds: 'btnWorldsClose', arena: 'btnArenaClose' };
+const DISMISS = { shop: 'btnShopClose', settings: 'btnSetClose', help: 'btnHelpClose', victory: 'btnVicClose', worlds: 'btnWorldsClose', arena: 'btnArenaClose', events: 'btnEventsClose' };
 for (const id in DISMISS) {
   const el = $(id);
   let downOnBackdrop = false;
@@ -910,7 +920,16 @@ const arena = mountArena({
   currentMatch: () => match,
 });
 
-if (DEV) window.__ragdojo = { arena, get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
+// Special events: the EVENTS button and panel. Offline it plays locally; with the arena server
+// it syncs and shows rivals (js/events/ui.js, server/events.go).
+const eventsUI = mountEvents({
+  dev: DEV, lan: familyAccess.available && !DEMO, click, overlay, account: () => account,
+  getSave: () => S, persist: () => persist(S), openUpgrade: () => openUpgrade(),
+  hasPass: () => (DEV && qs.get('evpass') === '0' ? false : DEV || familyAccess.active || !!purchases?.passActive),
+  addInk: (n) => { S.ink += n; persist(S); refreshHub(); },
+});
+
+if (DEV) window.__ragdojo = { arena, eventsUI, get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
 if (DEV) window.__input = input;
 
 // Paid access never deletes earned progress. Park a CYBER/DEITIES run intact while signed
@@ -928,7 +947,9 @@ function parkPaid() {
 function applyCloud() {
   if (!pendingCloud) return;
   // Heal using the game's established loader; remote saves contain progress only.
+  const was = S;
   S = load(); pendingCloud = null;
+  mergeEventsInto(S, was);
   parkPaid();
   match = null; sheetLevel = -1;
   applySettings();

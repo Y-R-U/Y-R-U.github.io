@@ -25,4 +25,6 @@ echo "      http://$IP:$PORT/gms/2d/ragdojo/"
 echo
 echo "  then ⚔ ARENA. (Ctrl-C here stops it.)"
 echo
-ARENA_LAN=1 ARENA_STATIC="$SITE" ARENA_ADDR="0.0.0.0:$PORT" ARENA_DB="$DB" exec "$BIN"
+# Approved event-picture answers, from the art review tool (tools/eventart).
+ANSWERS="${ANSWERS:-$HOME/.ragdojo/eventart/answers.json}"
+ARENA_LAN=1 ARENA_STATIC="$SITE" ARENA_ADDR="0.0.0.0:$PORT" ARENA_DB="$DB" ARENA_EVENT_ANSWERS="$ANSWERS" exec "$BIN"

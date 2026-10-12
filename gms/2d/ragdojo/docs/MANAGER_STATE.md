@@ -61,3 +61,33 @@ name under it already reads GHOST · NAME), sim autoplay byKind for non-light wo
 Deploy: same as phase 1 (server/deploy.sh, Caddy fragment unchanged — new routes sit under the same
 prefix; the new `ghosts` table is created on start), then the client via games/deploy.sh.
 
+## Phase 3 (started 2026-10-13)
+- **E — events in game + image review**: EVENTS panel, battle feed, server/events.go, rewards, art review tool.
+  Owns js/events/*, server/events.go (+test), tools/event*. Touched shared files minimally (main.js, index.html,
+  panel.js hunks, store.go hook, main.go route line, build.mjs, lan.sh/deploy.sh/unit).
+
+### E status (2026-10-13)
+Done, local only, NOT deployed: EVENTS button + panel (tabs per running event with time left, FREE/PASS and
+ANY BATTLE/ARENA ONLY tags; Vines & Ladders with the walking stick man, die and server rivals; picture reveal
+with tap-to-open and the 4-choice guess; PRIZES; Pass events visible but locked with a SUPPORT / PASS button,
+no modal). Battles feed events: campaign `finishFight` emit, arena `result` emit (panel.js, oppDmg = the
+most-damaged opponent of the deciding round — this also defines it for LMS/rooms), ghosts; "+N event points"
+on the results, ghost and arena cards. Saved in the run save (`S.events`, `S.eventPrizes`) so cloud sync
+carries it; works offline. Server: `server/events.go` (Go port matching ~1,300 JS golden vectors; claims
+capped/clamped/recomputed; agreed arena results counted automatically via `store.afterMatch`; rivals with the
+replay rule on the caller's stored turns, nothing leaks; server-only answers; Pass via the payment service's
+entitlement, fail-open; LAN = everyone Pass, own DB). Rewards: the guess bonus pays ink; a finished picture
+unlocks a faint arena/menu backdrop (PRIZES / USE IT). Art review: `tools/eventart/` (LAN page, key in URL,
+approve → webp/jpg + manifest, answers to ~/.ragdojo/eventart/answers.json, regenerate through mflux-queue),
+seeded with the 12 phase-1 candidates. NOTHING APPROVED — the game shows the drawn placeholder.
+Gates: go test (events_test.go), eventsvectors --check, eventsgofalsify (13/13 red), eventsgame (58, real touch,
+landscape + rotated portrait, offline + online; --falsify 4/4 red), eventartgate (26 incl. a real Flux
+regeneration; --falsify 3/3 red); dev/events.html now draws through js/events/render.js (eventsshot green).
+Open for Aaron: pick the art (recommended heroic_2, halloween_1, dojo_2; heroic → reveal-week W43, dojo → W44,
+halloween → halloween:2026 by default — change on the page); arena `oppDmg` is client-claimed (≤ +1 point per
+agreed loss) until hub.go's round report carries HP (C's file); signing in mid-event re-seats the stick man on
+that account's dice once.
+Deploy (needs approval; nothing run): approve art → commit `assets/events/`; `server/deploy.sh` (now also
+rsyncs answers.json to /srv/data/ragdojo-arena/event_answers.json; unit gains ARENA_ENTITLEMENT_URL +
+ARENA_EVENT_ANSWERS); `npm run build` (copies assets/events) then `games/deploy.sh`; no Caddy change (routes sit
+under /gms/2d/ragdojo/arena/). The payment service must answer GET /api/br8t/entitlement for Pass events to lock.

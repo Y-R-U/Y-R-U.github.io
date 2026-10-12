@@ -54,6 +54,8 @@ CREATE TABLE IF NOT EXISTS ghosts (
 type store struct {
 	db  *sql.DB
 	now func() time.Time
+	// afterMatch hears every agreed result once it is stored (events.go counts it for events).
+	afterMatch func(match string, seats []seatRow)
 }
 
 func openStore(path string) (*store, error) {
@@ -120,7 +122,13 @@ func (s *store) recordMatch(id, typ string, friend bool, score string, seats []s
 			return err
 		}
 	}
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+	if s.afterMatch != nil {
+		s.afterMatch(id, seats)
+	}
+	return nil
 }
 
 func (s *store) recordVoid(id, typ string, friend bool, players int, why string) {
