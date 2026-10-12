@@ -203,6 +203,10 @@ func routes() http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		p := r.URL.Path
+		if p == "/internal/stats" {
+			handleInternalStats(w, r)
+			return
+		}
 		if strings.HasPrefix(p, cfg.Prefix+"/api/") || p == cfg.Prefix+"/api" {
 			p = strings.TrimPrefix(p, cfg.Prefix)
 		}
