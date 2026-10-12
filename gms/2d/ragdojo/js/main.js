@@ -18,13 +18,15 @@ import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
 import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
-import { Purchases, API } from './purchases.js?v=20261012-pass';
+import { Purchases, API } from './purchases.js?v=20261013-f2';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
 import { mountArena } from './net/panel.js?v=20261013-rooms';
 import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261013-events';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
+/** A definitive "not entitled" arrived while a paid world was in play: park it at the next hub visit, never mid-fight. */
+let parkOwed = false;
 let familyStorage;
 try { familyStorage = localStorage; } catch {}
 const familyAccess = createFamilyAccess(location.hostname, familyStorage, !DEMO);
@@ -118,7 +120,7 @@ function setMode(m) {
   input.reset();
   $('pauseBtn').classList.toggle('hidden', m !== 'fight');
   updateRotateHint();
-  if (m === 'hub') { show('hub'); startDemo(); audio.play(roleTrack(S.theme, S.completed ? 'victory' : 'menu')); }
+  if (m === 'hub') { if (parkOwed) { parkOwed = false; parkPaid(); } show('hub'); startDemo(); audio.play(roleTrack(S.theme, S.completed ? 'victory' : 'menu')); }
   else if (m === 'fight') { show(null); }
 }
 
@@ -910,7 +912,7 @@ boot().catch((err) => {
 const arena = mountArena({
   dev: DEV, lan: familyAccess.available && !DEMO, click, overlay,
   getSave: () => S, account: () => account,
-  openUpgrade: () => openUpgrade(),
+  openUpgrade: () => openUpgrade(null, 'pass'),
   startNetFight: (f) => {
     match = f.match;
     ensureSheet(f.sheetLevel);
@@ -924,12 +926,12 @@ const arena = mountArena({
 // it syncs and shows rivals (js/events/ui.js, server/events.go).
 const eventsUI = mountEvents({
   dev: DEV, lan: familyAccess.available && !DEMO, click, overlay, account: () => account,
-  getSave: () => S, persist: () => persist(S), openUpgrade: () => openUpgrade(),
+  getSave: () => S, persist: () => persist(S), openUpgrade: () => openUpgrade(null, 'pass'),
   hasPass: () => (DEV && qs.get('evpass') === '0' ? false : DEV || familyAccess.active || !!purchases?.passActive),
   addInk: (n) => { S.ink += n; persist(S); refreshHub(); },
 });
 
-if (DEV) window.__ragdojo = { arena, eventsUI, get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
+if (DEV) window.__ragdojo = { arena, eventsUI, openUpgrade, get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
 if (DEV) window.__input = input;
 
 // Paid access never deletes earned progress. Park a CYBER/DEITIES run intact while signed
@@ -958,14 +960,15 @@ function applyCloud() {
 function purchaseStatus(text) { $('purchaseStatus').textContent = text; }
 const SOON = `Supporting the developer is coming soon — thank you for looking! Until then ${PAID_NAMES} stay locked, and LIGHT and DARK are free.`;
 /** One cheap probe of the purchase API; nothing else asks it anything until this says yes. */
-let offerItems = {};
+let offerItems = {}, paymentsTest = false;
 async function probePayments() {
   if (DEMO || !ACCOUNTS) return false;
   try {
     const res = await fetch(API + 'offer', { cache: 'no-store' });
     const offer = res.ok ? await res.json() : null;
     offerItems = {};
-    for (const it of (offer?.testMode && Array.isArray(offer.items) ? offer.items : []))
+    paymentsTest = offer?.testMode === true;
+    for (const it of (Array.isArray(offer?.items) ? offer.items : []))
       if (it && typeof it.key === 'string' && typeof it.currency === 'string' && it.amount > 0) offerItems[it.key] = it;
     paymentsUp = Object.keys(offerItems).length > 0;
     return paymentsUp ? offer : false;
@@ -977,12 +980,13 @@ function money(it) {
 }
 /** Buttons follow what the server sells and what this account already has. */
 function paintOffers() {
+  upgradeContext();
   const sup = offerItems.ragdojo_supporter, mon = offerItems.br8t_pass_monthly, yr = offerItems.br8t_pass_yearly;
   const signedIn = !!account?.auth.signedIn, p = purchases;
   const passLive = !!p?.pass && !['canceled', 'incomplete_expired'].includes(p.pass.status);
   $('btnCheckout').classList.toggle('hidden', !sup);
   if (sup) {
-    $('btnCheckout').textContent = p?.supporter ? 'SUPPORTER ✓ THANK YOU' : `SUPPORT (TEST) · ${money(sup)}`;
+    $('btnCheckout').textContent = p?.supporter ? 'SUPPORTER ✓ THANK YOU' : `SUPPORT${paymentsTest ? ' (TEST)' : ''} · ${money(sup)}`;
     $('btnCheckout').disabled = !signedIn || !!p?.supporter;
     $('priceSupporter').textContent = `— ${money(sup)} once.`;
   }
@@ -990,7 +994,7 @@ function paintOffers() {
   $('btnPassYear').classList.toggle('hidden', !mon || !yr || !!p?.passActive);
   const first = mon || yr;
   if (first) {
-    $('btnPass').textContent = p?.passActive ? 'BR8T PASS ✓ ACTIVE' : `BR8T PASS (TEST) · ${money(first)}/${mon ? 'MONTH' : 'YEAR'}`;
+    $('btnPass').textContent = p?.passActive ? 'BR8T PASS ✓ ACTIVE' : `BR8T PASS${paymentsTest ? ' (TEST)' : ''} · ${money(first)}/${mon ? 'MONTH' : 'YEAR'}`;
     $('btnPass').disabled = !signedIn || !!p?.passActive || passLive;
     $('pricePass').textContent = mon && yr ? `— from ${money(mon)}/month, or ${money(yr)}/year.` : `— ${money(first)}/${mon ? 'month' : 'year'}.`;
   }
@@ -1005,20 +1009,38 @@ function ownedMessage() {
   if (p?.pass?.status === 'past_due' || p?.pass?.status === 'unpaid') return 'Your br8t Pass renewal did not go through. Use Manage subscription to update your card; earned progress is kept.';
   return 'No purchase found on this account. Sign in with the same Google or email account used at checkout.';
 }
+/** True when the server gave a definitive answer. */
 async function restorePurchase() {
-  if (!purchases) { purchaseStatus('Use the account button to sign in on games.br8t.com.'); return; }
-  if (!paymentsUp) { if (paymentsUp === false && !familyAccess.available) purchaseStatus(SOON); return; }
+  if (!purchases) { purchaseStatus('Use the account button to sign in on games.br8t.com.'); return false; }
+  if (!paymentsUp) { if (paymentsUp === false && !familyAccess.available) purchaseStatus(SOON); return false; }
   try {
     await purchases.refresh();
     purchaseStatus(ownedMessage());
     paintOffers();
     refreshHub();
-  } catch (e) { purchaseStatus(e.message); }
+    return true;
+  } catch (e) { purchaseStatus(e.message); return false; }
 }
 /** The world the player was reaching for when the upgrade opened, so family/restore can follow through. */
-let upgradeFor = null;
-function openUpgrade(forWorld = null) {
+let upgradeFor = null, upgradeWhy = null;
+/**
+ * `why === 'pass'`: opened from something only the br8t Pass unlocks (a Pass event, the online
+ * allowance), so the Pass leads and the copy says what each product actually opens.
+ */
+function upgradeContext() {
+  const pass = upgradeWhy === 'pass';
+  const sup = offerItems.ragdojo_supporter;
+  $('premiumTitle').textContent = pass ? 'BR8T PASS' : 'SUPPORT THE DEV';
+  $('premiumWhy').classList.toggle('hidden', !pass);
+  $('premiumWhy').textContent = pass ? `Pass events and unlimited online battles need the br8t Pass. Support${sup ? ` (${money(sup)})` : ''} opens CYBER + DEITIES and 10 online battles a day.` : '';
+  const [supOffer, passOffer] = ['priceSupporter', 'pricePass'].map((id) => $(id).closest('.offer'));
+  if (pass) supOffer.before(passOffer); else passOffer.before(supOffer);
+  if (pass) $('btnCheckout').before($('btnPass'), $('btnPassYear')); else $('btnPass').before($('btnCheckout'));
+}
+function openUpgrade(forWorld = null, why = null) {
   upgradeFor = forWorld;
+  upgradeWhy = why;
+  upgradeContext();
   hideNudge();
   track('upgrade_view', S);
   overlay('premium');
@@ -1040,7 +1062,7 @@ function openUpgrade(forWorld = null) {
     if (!$('premium').classList.contains('show')) return;
     if (!offer) { if (!familyAccess.available) purchaseStatus(SOON); return; }
     paintOffers();
-    if (!familyAccess.available) purchaseStatus('Test mode: no real money moves. Sign in using the account button (Google or email) before supporting, subscribing or restoring.');
+    if (!familyAccess.available) purchaseStatus(`${paymentsTest ? 'Test mode: no real money moves. ' : ''}Sign in using the account button (Google or email) before supporting, subscribing or restoring.`);
     if (account?.auth.signedIn) await restorePurchase();
   });
 }
@@ -1114,8 +1136,10 @@ if (ACCOUNTS && !DEV) {
         } else $('btnCloudRetry').textContent = 'RETRY CLOUD SYNC';
       },
     });
-    purchases = new Purchases(account.auth, fetch, owned => {
-      if (!hasPremium() && isPaid(S.theme)) { parkPaid(); toMenu(); }
+    purchases = new Purchases(account.auth, fetch, () => {
+      // Only a definitive answer gets here. Never pull a fight out from under the player.
+      parkOwed = !hasPremium() && isPaid(S.theme);
+      if (parkOwed && mode === 'hub') { parkOwed = false; parkPaid(); startDemo(); }
       refreshHub();
     });
     // Probe once; ownership checks only start if the purchase API actually answers.
@@ -1131,6 +1155,13 @@ if (ACCOUNTS && !DEV) {
       }, 2500);
     } else if (qs.get('checkout') === 'cancel') { openUpgrade(); purchaseStatus('Checkout cancelled. Your progress is unchanged.'); }
     addEventListener('focus', () => { void restorePurchase(); });
-    setInterval(() => { if (purchases.owned) void restorePurchase(); }, 120000);
+    // Owners are re-checked every 2 minutes; a failed check retries sooner (15 s, doubling).
+    let pollMs = 120000;
+    const poll = () => setTimeout(async () => {
+      const ok = (purchases.owned || purchases.unknown) ? await restorePurchase() : true;
+      pollMs = ok ? 120000 : Math.min(120000, pollMs >= 120000 ? 15000 : pollMs * 2);
+      poll();
+    }, pollMs);
+    poll();
   }).catch(() => { $('cloudStatus').textContent = 'Accounts unavailable. Play is saved on this device.'; });
 }

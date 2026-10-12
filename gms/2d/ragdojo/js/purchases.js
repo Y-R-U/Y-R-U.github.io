@@ -16,25 +16,37 @@ export class Purchases {
     if (!token || uid !== this.auth.user?.uid) throw new Error('Account changed. Try again.');
     return { uid, token };
   }
+  /**
+   * Asks the server. Only a definitive answer changes anything: signed out, or a 200 with
+   * entitlements. A failed check (offline, 5xx) throws and keeps what this account was last
+   * verified to own in this session, so a blip never takes a paid world away mid-fight.
+   * `changed(owned, true)` fires only on a definitive answer. Test and live mode count the same.
+   */
   async refresh() {
     const generation = ++this.generation;
-    this.reset(); this.changed(false);
     const uid = this.auth.user?.uid;
-    this.uid = uid;
-    if (!this.auth.signedIn) return false;
-    const token = await this.auth.getIdToken();
-    if (!token || generation !== this.generation) return false;
-    const res = await this.request(API + 'entitlement', { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
-    if (!res.ok) throw new Error('Could not check your purchases. Try Restore again when online.');
-    const data = await res.json();
-    if (generation !== this.generation || uid !== this.auth.user?.uid || !this.auth.signedIn) return false;
-    if (data.testMode !== true) return false;
-    const ents = data.entitlements || {};
-    this.supporter = ents.ragdojo_supporter === true;
-    this.passActive = ents.br8t_pass === true;
-    this.pass = data.pass && typeof data.pass === 'object' ? data.pass : null;
-    this.owned = this.supporter || this.passActive;
-    this.changed(this.owned); return this.owned;
+    if (!this.auth.signedIn || !uid) { this.uid = null; this.reset(); this.unknown = false; this.changed(false, true); return false; }
+    if (uid !== this.uid) { this.uid = uid; this.reset(); }
+    try {
+      const token = await this.auth.getIdToken();
+      if (!token) throw new Error('no token');
+      if (generation !== this.generation) return this.owned;
+      const res = await this.request(API + 'entitlement', { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      if (generation !== this.generation || uid !== this.auth.user?.uid || !this.auth.signedIn) return this.owned;
+      const ents = data.entitlements || {};
+      this.supporter = ents.ragdojo_supporter === true;
+      this.passActive = ents.br8t_pass === true;
+      this.pass = data.pass && typeof data.pass === 'object' ? data.pass : null;
+      this.owned = this.supporter || this.passActive;
+      this.testMode = data.testMode === true;
+    } catch {
+      if (generation === this.generation) this.unknown = true;
+      throw new Error('Could not check your purchases. Try Restore again when online.');
+    }
+    this.unknown = false;
+    this.changed(this.owned, true); return this.owned;
   }
   async checkout(product = 'ragdojo_supporter', analytics = {}) {
     if (!PRODUCTS.includes(product)) throw new Error('Checkout unavailable.');
@@ -44,7 +56,7 @@ export class Purchases {
     if (!res.ok) throw new Error(data.error || 'Checkout is unavailable.');
     if (uid !== this.auth.user?.uid) throw new Error('Account changed. Try again.');
     const url = new URL(data.url);
-    if (!data.testMode || url.origin !== CHECKOUT_ORIGIN) throw new Error('Checkout unavailable.');
+    if (url.origin !== CHECKOUT_ORIGIN) throw new Error('Checkout unavailable.');
     return url.href;
   }
   /** Stripe's customer portal for the account's Pass: cancel, change card, invoices. */
@@ -55,7 +67,7 @@ export class Purchases {
     if (!res.ok) throw new Error(data.error || 'Subscription management is unavailable.');
     if (uid !== this.auth.user?.uid) throw new Error('Account changed. Try again.');
     const url = new URL(data.url);
-    if (!data.testMode || url.origin !== PORTAL_ORIGIN) throw new Error('Subscription management is unavailable.');
+    if (url.origin !== PORTAL_ORIGIN) throw new Error('Subscription management is unavailable.');
     return url.href;
   }
 }
