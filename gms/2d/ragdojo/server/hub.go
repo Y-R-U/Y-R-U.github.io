@@ -60,6 +60,8 @@ type hub struct {
 	linkAuth  verifier // LAN: checks a Firebase token offered to link a device to an account
 	lobbyDirt bool
 	lagging   []*client
+	// Multi-player rooms (rooms.go): countdown at roomQuorum, slower one below it.
+	roomCountdown, roomSlow, migrateAfter time.Duration
 
 	statsMu sync.Mutex
 	live    liveStats
@@ -90,7 +92,9 @@ type client struct {
 	gen              int    // which socket is current; events from older ones are ignored
 	away             bool
 	awayUntil        time.Time
-	loadout          []int // gesture slots owned, for ghosts
+	awaySince        time.Time
+	lastOut          map[string]any // a room elimination this client has not heard yet (it was away)
+	loadout          []int          // gesture slots owned, for ghosts
 }
 
 const (
@@ -112,11 +116,16 @@ type seat struct {
 	kos      int
 	rematch  bool
 	spent    *spendResult
+	out      bool               // rooms: eliminated (left, or never came back)
+	outSeq   int                // order of going out, for placements
+	rtts     map[string]float64 // rooms: this seat's measured ping to each peer id
 }
 
 type report struct {
 	winner int
 	ko     bool
+	place  string // rooms: placements, comma-joined, part of what must agree
+	dmg    string // each fighter's damage at the end (whole percent, comma-joined): agreed too
 }
 
 type match struct {
@@ -133,6 +142,10 @@ type match struct {
 	arena         int
 	log           []string
 	spendID       string
+	dmg           []float64 // damage per seat (0-1) in the latest agreed round: the deciding one at the end
+	room          bool      // a 2-8 player mode: one round, host migration, eliminations
+	startAt       time.Time // rooms: when the countdown ends
+	outN          int
 }
 
 type attachResult struct {
@@ -164,6 +177,7 @@ func newHub(st *store, ice *iceSource, allow *allowance, verify verifier) *hub {
 	return &hub{
 		in: make(chan event, 2048), clients: map[string]*client{}, matches: map[string]*match{},
 		codes: map[string]*match{}, awayGrace: defaultAwayGrace, ice: ice, allow: allow, verify: verify, st: st, now: time.Now,
+		roomCountdown: defaultRoomCountdown, roomSlow: defaultRoomSlow, migrateAfter: defaultMigrateAfter,
 	}
 }
 
@@ -225,22 +239,25 @@ func (h *hub) handle(e event) {
 // ---------------------------------------------------------------- messages
 
 type inMsg struct {
-	T       string          `json:"t"`
-	Name    string          `json:"name"`
-	Tok     string          `json:"tok"`
-	TZ      string          `json:"tz"`
-	Type    string          `json:"type"`
-	To      string          `json:"to"`
-	Code    string          `json:"code"`
-	Match   string          `json:"match"`
-	Round   int             `json:"round"`
-	Winner  *int            `json:"winner"`
-	KO      bool            `json:"ko"`
-	On      bool            `json:"on"`
-	S       float64         `json:"s"`
-	D       json.RawMessage `json:"d"`
-	Loadout []int           `json:"loadout"`
-	Link    string          `json:"link"` // LAN: a Firebase ID token, if this device is signed in
+	T       string             `json:"t"`
+	Name    string             `json:"name"`
+	Tok     string             `json:"tok"`
+	TZ      string             `json:"tz"`
+	Type    string             `json:"type"`
+	To      string             `json:"to"`
+	Code    string             `json:"code"`
+	Match   string             `json:"match"`
+	Round   int                `json:"round"`
+	Winner  *int               `json:"winner"`
+	KO      bool               `json:"ko"`
+	On      bool               `json:"on"`
+	S       float64            `json:"s"`
+	D       json.RawMessage    `json:"d"`
+	Loadout []int              `json:"loadout"`
+	Place   []int              `json:"place"`
+	Dmg     []int              `json:"dmg"`
+	R       map[string]float64 `json:"r"`
+	Link    string             `json:"link"` // LAN: a Firebase ID token, if this device is signed in
 }
 
 func (h *hub) message(c *client, raw []byte) {
@@ -297,13 +314,21 @@ func (h *hub) message(c *client, raw []byte) {
 		h.joinCode(c, m.Code)
 	case "accept":
 		h.accept(c, m.Match, m.Tok)
+	case "start":
+		h.startEarly(c, m.Match)
+	case "rtts":
+		h.setRtts(c, m.Match, m.R)
 	case "decline":
 		if mt := h.mine(c, m.Match); mt != nil && mt.state <= mStarting {
 			h.cancel(mt, "declined", c)
 		}
 	case "round":
 		if mt := h.mine(c, m.Match); mt != nil && m.Winner != nil {
-			h.report(mt, c, m.Round, *m.Winner, m.KO)
+			if mt.room {
+				h.roomReport(mt, c, m.Round, *m.Winner, m.KO, m.Place, m.Dmg)
+			} else {
+				h.report(mt, c, m.Round, *m.Winner, m.KO, m.Dmg)
+			}
 		}
 	case "rematch":
 		h.rematch(c, m.Match)
@@ -418,6 +443,10 @@ func (h *hub) wait(c *client, typ string) {
 		return
 	}
 	h.leaveMatch(c, "left")
+	if isRoomType(typ) {
+		h.joinRoom(c, typ)
+		return
+	}
 	c.waiting = typ
 	c.lobby = true
 	h.lobbyDirt = true
@@ -530,7 +559,11 @@ func (h *hub) friend(c *client, typ string) {
 	h.codes[m.code] = m
 	m.state = mLobby
 	m.deadline = h.now().Add(30 * time.Minute)
+	m.room = isRoomType(typ)
 	h.send(c, map[string]any{"t": "friend", "match": m.id, "code": m.code, "type": typ})
+	if m.room {
+		h.roomChanged(m)
+	}
 }
 
 func (h *hub) joinCode(c *client, code string) {
@@ -542,7 +575,16 @@ func (h *hub) joinCode(c *client, code string) {
 	if m == c.match {
 		return
 	}
+	if m.room && len(m.seats) >= roomMax {
+		h.send(c, map[string]any{"t": "err", "code": "full", "msg": "That room is full."})
+		return
+	}
 	h.leaveMatch(c, "left")
+	if m.room {
+		h.seatIn(m, c)
+		h.roomChanged(m)
+		return
+	}
 	delete(h.codes, m.code)
 	h.seatIn(m, c)
 	h.offer(m)
@@ -594,6 +636,10 @@ func (m *match) slotOf(c *client) int {
 
 func (h *hub) accept(c *client, id, tok string) {
 	m := h.mine(c, id)
+	if m != nil && m.room && m.state == mLobby {
+		h.roomAccept(m, c, tok)
+		return
+	}
 	if m == nil || m.state != mOffer {
 		return
 	}
@@ -658,6 +704,10 @@ func (h *hub) maybeBegin(m *match) {
 			return
 		}
 	}
+	if m.room {
+		h.roomBegin(m)
+		return
+	}
 	for _, s := range m.seats {
 		if !s.spent.OK {
 			h.send(s.c, map[string]any{"t": "err", "code": "allowance",
@@ -688,8 +738,10 @@ func (h *hub) sendGo(m *match) {
 func (h *hub) sendGoTo(m *match, i int) {
 	score := make([]int, len(m.seats))
 	roster := make([]map[string]any, len(m.seats))
+	out := make([]bool, len(m.seats))
 	for j, s := range m.seats {
 		score[j] = s.wins
+		out[j] = s.out
 		roster[j] = map[string]any{"id": s.id, "name": s.name, "ranked": s.ranked, "away": s.c.away}
 	}
 	s := m.seats[i]
@@ -697,12 +749,12 @@ func (h *hub) sendGoTo(m *match, i int) {
 	if s.spent != nil {
 		left = s.spent.Remaining
 	}
-	h.send(s.c, map[string]any{"t": "go", "match": m.id, "round": m.round, "master": m.master,
-		"you": i, "score": score, "seats": roster, "arena": m.arena, "freeLeft": left})
+	h.send(s.c, map[string]any{"t": "go", "match": m.id, "round": m.round, "master": m.master, "mode": m.typ,
+		"you": i, "score": score, "seats": roster, "arena": m.arena, "freeLeft": left, "out": out})
 }
 
 // report: every player says who won the round. Counted only if they all agree.
-func (h *hub) report(m *match, c *client, round, winner int, ko bool) {
+func (h *hub) report(m *match, c *client, round, winner int, ko bool, dmg []int) {
 	if m.state != mPlay || round != m.round || winner < -1 || winner >= len(m.seats) {
 		return
 	}
@@ -713,7 +765,7 @@ func (h *hub) report(m *match, c *client, round, winner int, ko bool) {
 	if len(m.reports) == 0 {
 		m.firstReport = h.now()
 	}
-	m.reports[slot] = report{winner, ko}
+	m.reports[slot] = report{winner: winner, ko: ko, dmg: dmgKey(dmg, len(m.seats))}
 	if len(m.reports) < len(m.seats) {
 		return
 	}
@@ -735,6 +787,7 @@ func (h *hub) report(m *match, c *client, round, winner int, ko bool) {
 		return
 	}
 	m.draws = 0
+	m.dmg = parseDmg(first.dmg)
 	w := m.seats[first.winner]
 	w.wins++
 	if first.ko {
@@ -772,12 +825,15 @@ func (h *hub) forfeit(m *match, leaver int) {
 func (h *hub) finish(m *match, winner int) { h.finishFF(m, winner, false) }
 
 func (h *hub) finishFF(m *match, winner int, ff bool) {
+	if ff {
+		m.dmg = nil // no deciding round was agreed
+	}
 	m.state = mDone
 	m.deadline = h.now().Add(rematchTTL)
 	seats := make([]seatRow, len(m.seats))
 	score := ""
 	for i, s := range m.seats {
-		seats[i] = seatRow{UID: s.uid, Name: s.name, Won: i == winner, KOs: s.kos, Ranked: s.ranked, Loadout: s.c.loadout}
+		seats[i] = seatRow{UID: s.uid, Name: s.name, Won: i == winner, KOs: s.kos, Ranked: s.ranked, Loadout: s.c.loadout, OppDmg: oppDmg(m.dmg, i)}
 		if i > 0 {
 			score += "-"
 		}
@@ -792,7 +848,11 @@ func (h *hub) finishFF(m *match, winner int, ff bool) {
 	if h.lan {
 		h.st.recordLan(m.id, m.typ, ff, seats)
 	}
-	log.Printf("match %s: %s won %s (%s)", m.id, m.seats[winner].id, score, strings.Join(m.log, ", "))
+	who := "nobody"
+	if winner >= 0 {
+		who = m.seats[winner].id
+	}
+	log.Printf("match %s: %s won %s (%s)", m.id, who, score, strings.Join(m.log, ", "))
 	for i, s := range m.seats {
 		out := map[string]any{"t": "result", "match": m.id, "winner": winner, "you": i, "score": scoreOf(m), "counted": s.ranked, "forfeit": ff}
 		if s.ranked {
@@ -814,7 +874,7 @@ func scoreOf(m *match) []int {
 
 func (h *hub) rematch(c *client, id string) {
 	m := h.mine(c, id)
-	if m == nil || m.state != mDone {
+	if m == nil || m.state != mDone || m.room {
 		return
 	}
 	m.seats[m.slotOf(c)].rematch = true
@@ -878,6 +938,11 @@ func (h *hub) leaveMatch(c *client, why string) {
 	if m == nil {
 		return
 	}
+	if m.room {
+		h.leaveRoom(m, c, why)
+		c.match = nil
+		return
+	}
 	switch m.state {
 	case mPlay:
 		h.forfeit(m, m.slotOf(c))
@@ -909,6 +974,7 @@ func (h *hub) tick() {
 			}
 		}
 	}
+	h.tickRooms(now)
 	for _, c := range h.clients {
 		if c.away {
 			if now.After(c.awayUntil) {
@@ -951,7 +1017,7 @@ func (h *hub) allowRelay(c *client, n int) bool {
 // peer: signalling and relayed traffic only ever go to someone in the same match.
 func (h *hub) peer(c *client, to string) *client {
 	m := c.match
-	if m == nil || m.state == mLobby {
+	if m == nil || (m.state == mLobby && !m.room) {
 		return nil
 	}
 	for _, s := range m.seats {
@@ -1000,6 +1066,10 @@ func (h *hub) attach(e event) *client {
 		old.budgetAt = h.now()
 		h.send(old, map[string]any{"t": "welcome", "id": old.id, "tok": old.tok, "ice": stunOnly, "resumed": true, "grace": h.awayGrace.Milliseconds()})
 		h.sendMe(old)
+		if old.lastOut != nil {
+			h.send(old, old.lastOut)
+			old.lastOut = nil
+		}
 		if m := old.match; m != nil {
 			slot := m.slotOf(old)
 			for _, s := range m.seats {
@@ -1039,6 +1109,7 @@ func (h *hub) disconnect(c *client) {
 		return
 	}
 	c.away = true
+	c.awaySince = h.now()
 	c.awayUntil = h.now().Add(h.awayGrace)
 	if c.send != nil {
 		close(c.send)

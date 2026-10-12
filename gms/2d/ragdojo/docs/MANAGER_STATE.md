@@ -61,6 +61,30 @@ name under it already reads GHOST · NAME), sim autoplay byKind for non-light wo
 Deploy: same as phase 1 (server/deploy.sh, Caddy fragment unchanged — new routes sit under the same
 prefix; the new `ghosts` table is created on start), then the client via games/deploy.sh.
 
+
+### C status (2026-10-13)
+Done, local only, NOT deployed: Last Man Standing, Steal the Bandana, King of the Hill (2-8 players,
+rooms with a 20 s countdown at 4, joins until it ends or 8; friend rooms with a host START), master
+picked from MEASURED pings, host migration (master's socket down 1.5 s -> eliminated, best-ping seat
+rebuilds from keyframe + newest snapshot and carries on), leavers eliminated never void, agreed
+results with placings (`matches.score = "place 2,3,1"`), practice vs objective-aware bots
+(`?mode=bandana&bots=3`, PRACTICE buttons), panel modes flipped live (minimal hunks in D's panel.js:
+room view, room result, practice, out/master events, `go` resync on a resumed socket).
+Files: js/net/modes.js, js/net/objective.js, server/rooms.go (+rooms_test.go), fight.js, wire.js,
+client.js, match.js (ffa / onLand / fitAll), hub.go hooks; panel.js + arenagate (one check) + main.js /
+index.html cache-bust touched minimally.
+Agreed round reports now carry per-fighter damage; the server derives oppDmg (deciding round, most-
+damaged opponent) into seatRow.OppDmg -> ev_arena.close (one-line edits in store.go / events.go).
+Gates: go test (rooms_test.go, 10 mutants red), tools/modegate.mjs (61, --falsify 26/26 red),
+tools/modesim.mjs --check, tools/arenamulti.mjs (lms x4, bandana x4, hill x3, kill-the-master x3;
+--falsify 6/6 red). Measured: 30 snapshots/s, 0% underruns, hand-over gap ~1.7 s; balance numbers in CLAUDE.md.
+Not done / open for Aaron: the ONLINE.md line "if the master drops the match is void" for LMS is
+superseded by host migration (Aaron's later call); `oppDmg` for events in rooms still undefined;
+bandana at 8 players nearly always goes to time (first-to-20 rarely reached) — fine, or scale the target;
+public rooms of 2-3 start after 45 s (my default, not in the brief).
+Deploy: same steps as phase 1 (server/deploy.sh, unchanged Caddy fragment, games/deploy.sh); no new
+env needed (ARENA_ROOM_MS / ARENA_MIGRATE_MS are test-only overrides).
+
 ## Phase 3 (started 2026-10-13)
 - **E — events in game + image review**: EVENTS panel, battle feed, server/events.go, rewards, art review tool.
   Owns js/events/*, server/events.go (+test), tools/event*. Touched shared files minimally (main.js, index.html,

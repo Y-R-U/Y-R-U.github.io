@@ -240,7 +240,8 @@ export class NetLink {
 
 /**
  * The arena server connection. Events: welcome, me, lobby, friend, offer, accepted, go,
- * result, void, cancel, left, rematch, err, closed, link (peer, direct), rtt, data.
+ * result, void, cancel, left, rematch, err, closed, link (peer, direct), rtt, data, and for
+ * multi-player rooms: out (a seat is eliminated), master (host migration).
  */
 export class ArenaClient {
   constructor(base) {
@@ -355,18 +356,39 @@ export class ArenaClient {
   accept(match, tok) { this._raw({ t: 'accept', match, tok: tok || '' }); }
   decline(match) { this._raw({ t: 'decline', match }); this._dropLinks(); }
   rematch(match) { this._raw({ t: 'rematch', match }); }
-  report(match, round, winner, ko) { this._raw({ t: 'round', match, round, winner, ko }); }
-  leave() { this.inMatch = false; this._raw({ t: 'leave' }); this._dropLinks(); }
+  report(match, round, winner, ko, place, dmg) { this._raw({ t: 'round', match, round, winner, ko, ...(place ? { place } : {}), ...(dmg ? { dmg } : {}) }); }
+  leave() { this.inMatch = false; this._stopRoomPing(); this._raw({ t: 'leave' }); this._dropLinks(); }
+  /** Multi-player rooms: the room's host may start early (2+ players). */
+  start(match) { this._raw({ t: 'start', match }); }
+  /** Our measured round trip to every peer — the server picks the master (and any new one) from these. */
+  sendRtts(match) {
+    const r = {};
+    for (const [id, l] of this.links) if (l.rttN > 0) r[id] = Math.round(l.rtt);
+    this._raw({ t: 'rtts', match, r });
+  }
+
+  // While a room fills, keep measuring every link so the master can be picked by real ping.
+  _roomPing(match) {
+    this._stopRoomPing();
+    let n = 0;
+    this.roomT = setInterval(() => {
+      if (!this.connected) return;
+      this.pingLinks(performance.now(), 300);
+      if (++n % 5 === 0) this.sendRtts(match);
+    }, 300);
+  }
+  _stopRoomPing() { clearInterval(this.roomT); this.roomT = 0; }
 
   _onServer(m) {
     switch (m.t) {
       case 'p': this._raw({ t: 'q', s: m.s }); return;
       case 'me': this.me = m; break;
       case 'sig': { const l = this.links.get(m.from); if (l) l.onSignal(m.d); return; }
-      case 'offer': this._syncLinks(m.peers.map((p) => p.id), m.ice); break;
-      case 'go': this.inMatch = true; break;
+      case 'offer': this._syncLinks(m.peers.map((p) => p.id), m.ice); if (m.room) this._roomPing(m.match); break;
+      case 'go': this.inMatch = true; this._stopRoomPing(); break;
       case 'result': this.inMatch = false; break;
-      case 'cancel': case 'void': case 'left': this.inMatch = false; this._dropLinks(); break;
+      case 'out': if (m.you) { this.inMatch = false; this._dropLinks(); } break;
+      case 'cancel': case 'void': case 'left': this.inMatch = false; this._stopRoomPing(); this._dropLinks(); break;
     }
     this._emit(m.t, m);
   }

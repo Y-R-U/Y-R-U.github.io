@@ -2,7 +2,8 @@
 // the real ping, and the result card. Hidden unless the arena server answers its probe.
 
 import { ArenaClient } from './client.js';
-import { NetFight, loadoutOf } from './fight.js';
+import { NetFight, loadoutOf, LocalFight } from './fight.js';
+import { ordinal } from './modes.js';
 import { GhostMatch, ghostSnap, ghostSave, ghostPower, pickGhosts, ghostBattle } from './ghost.js';
 import { createBoards } from './boards.js';
 
@@ -17,9 +18,9 @@ const FRIENDS_KEY = 'ragdojo.arena.friends';
  */
 export const MODES = [
   { id: 'duel', name: '1v1 · BEST OF 3', short: '1v1', desc: 'live, against a real person', lanDesc: 'on your home network', live: true },
-  { id: 'bandana', name: 'STEAL THE BANDANA', short: 'BANDANA', desc: 'grab the golden bandana and hold it', live: false },
-  { id: 'hill', name: 'KING OF THE HILL', short: 'HILL', desc: 'hold the ledge alone', live: false },
-  { id: 'lms', name: 'LAST MAN STANDING', short: 'LMS', desc: 'up to 8 on one page', live: false },
+  { id: 'bandana', name: 'STEAL THE BANDANA', short: 'BANDANA', desc: 'grab the golden bandana and hold it · 2-8', live: true, room: true },
+  { id: 'hill', name: 'KING OF THE HILL', short: 'HILL', desc: 'hold the ledge alone · 2-8', live: true, room: true },
+  { id: 'lms', name: 'LAST MAN STANDING', short: 'LMS', desc: 'up to 8 on one page', live: true, room: true },
 ];
 const TABS = [['play', 'PLAY'], ['ghosts', 'GHOSTS'], ['boards', 'BOARDS']];
 const PAY_API = '/api/br8t/';
@@ -64,6 +65,7 @@ export function mountArena(h) {
   let base = null, client = null, view = 'home', fight = null, offer = null, matchId = null;
   let lobby = [], friend = null, result = null, note = '', allowanceLine = '', oppAccepted = false, oppRematch = false;
   let wantRematch = false, myAccepted = false, pingT = 0;
+  let room = null, roomAt = 0, roomT = 0, practice = null, practiceResult = null, lastMode = 'duel';
   let tab = 'play', ghosts = null, ghostErr = '', ghostFight = null, ghostResult = null, uploadedFor = '';
   const boards = createBoards({
     base: () => base, token,
@@ -87,7 +89,27 @@ export function mountArena(h) {
     try { return (await a.getIdToken()) || ''; } catch { return ''; }
   }
 
+  /** Practice: a room mode on this device against bots that play the objective. No server needed. */
+  function startPractice(mode, bots = 3) {
+    if (practice) practice.destroy();
+    const f = practice = new LocalFight({
+      mode, bots, save: h.getSave(),
+      onDone: (v) => {
+        if (practice !== f || h.currentMatch() !== f.match) return;
+        practice = null;
+        practiceResult = { mode, v, names: f.match.all.map((x) => (x === f.match.player ? 'YOU' : x.netName)) };
+        h.endNetFight();
+        view = 'practiceResult';
+        open();
+      },
+    });
+    h.overlay(null);
+    h.startNetFight(f);
+  }
+
   async function probe() {
+    const pm = MODES.find((m) => m.room && m.id === qs.get('mode'));
+    if (pm && !practice) startPractice(pm.id, Math.max(1, Math.min(7, +qs.get('bots') || 3)));
     for (const b of arenaBase({ dev: h.dev, lan })) {
       if (await ArenaClient.probe(b)) { base = b; break; }
     }
@@ -116,7 +138,15 @@ export function mountArena(h) {
     });
     c.on('lobby', (m) => { lobby = m.players || []; paint(); });
     c.on('friend', (m) => { friend = m; view = 'friend'; paint(); });
-    c.on('offer', (m) => {
+    c.on('offer', async (m) => {
+      if (m.room) {
+        const first = room?.match !== m.match;
+        room = m; roomAt = performance.now(); matchId = m.match; lastMode = m.type; view = 'room'; open(); paint();
+        clearInterval(roomT);
+        roomT = setInterval(() => { if (view !== 'room') { clearInterval(roomT); return; } paint(); }, 500);
+        if (first) client.accept(m.match, await token());
+        return;
+      }
       offer = m; matchId = m.match; oppAccepted = myAccepted = false; view = 'offer'; open(); paint();
       if (m.friend) rememberFriends(m.peers || []);
       // Measure the real ping now, before anyone accepts. NetFight pings once the fight runs.
@@ -126,14 +156,25 @@ export function mountArena(h) {
     c.on('accepted', () => { oppAccepted = true; paint(); });
     c.on('rtt', () => { if (view === 'offer') paint(); });
     c.on('link', () => { if (view === 'offer') paint(); });
-    c.on('go', (g) => startRound(g));
+    c.on('go', (g) => {
+      if (view === 'room') { view = 'home'; clearInterval(roomT); }
+      if (fight && fight.matchId === g.match && fight.round === g.round) fight.resync(g); else startRound(g);
+    });
+    c.on('out', (m) => {
+      if (m.you) { msg(m.why === 'left' ? 'You left the fight.' : 'You dropped out — the fight carried on without you.'); return; }
+      fight?.onOut(m.slot);
+    });
+    c.on('master', (m) => { if (fight) { fight.migrate(m.master, m.gone); fight.awayNote = ''; } });
     c.on('result', (r) => {
       result = r; matchId = r.match; wantRematch = oppRematch = false;
       r.eventPts = arenaBattle(r);
       setTimeout(() => { stopFight(); view = 'result'; open(); paint(); refreshAllowance(); }, fight ? 600 : 0);
     });
     c.on('rematch', () => { oppRematch = true; paint(); });
-    c.on('away', () => { if (fight) fight.awayNote = 'opponent disconnected — waiting for them…'; });
+    c.on('away', (m) => {
+      if (!fight) return;
+      fight.awayNote = fight.mode === 'duel' ? 'opponent disconnected — waiting for them…' : m.slot === fight.masterSlot ? 'the host dropped — handing over…' : '';
+    });
     c.on('back', () => { if (fight) fight.awayNote = ''; });
     c.on('reconnecting', (on) => { if (fight) fight.awayNote = on ? 'reconnecting…' : ''; });
     for (const ev of ['void', 'cancel', 'left']) {
@@ -311,7 +352,7 @@ export function mountArena(h) {
         if (!m.live) { html += `<div class="mode soon"><div><b>${m.name}</b><small>${m.desc}</small></div><span class="soonTag">coming soon</span></div>`; continue; }
         html += `<div class="mode"><div><b>${m.name}</b><small>${lan && m.lanDesc ? m.lanDesc : m.desc}</small></div>
           <button class="btn" data-a="find" data-mode="${m.id}"${canLobby ? '' : ' disabled'}>FIND A FIGHT</button>
-          <button class="btn" data-a="friend" data-mode="${m.id}">FRIEND LINK</button></div>`;
+          <button class="btn" data-a="friend" data-mode="${m.id}">FRIEND LINK</button>${m.room ? `<button class="btn" data-a="practice" data-mode="${m.id}">PRACTICE</button>` : ''}</div>`;
       }
       if (!canLobby) html += `<p class="fine">Sign in (the account button) to fight strangers. Friend links work without an account.</p>`;
       html += `<div class="mode"><div><b><span class="ghosttag">GHOST</span> FIGHTS</b><small>a real player's ghost, any time — never ranked</small></div>
@@ -338,6 +379,40 @@ export function mountArena(h) {
         <p class="fine">${offer.counted ? 'Counts for the leaderboards.' : 'Friendly — not ranked.'} Best of three.</p>
         <div class="vicbtns"><button class="btn big" data-a="accept"${myAccepted ? ' disabled' : ''}>${myAccepted ? 'ACCEPTED' : 'ACCEPT'}</button><button class="btn" data-a="decline">DECLINE</button></div>
         <p class="fine">${oppAccepted ? `${esc(p.name)} accepted ✓` : `waiting for ${esc(p.name)}…`}</p>`;
+    } else if (view === 'room' && room) {
+      const M = MODES.find((x) => x.id === room.type) || {};
+      const n = room.peers.length + 1;
+      const left = room.startIn >= 0 ? Math.max(0, Math.ceil((room.startIn - (performance.now() - roomAt)) / 1000)) : -1;
+      html += `<p class="vs">${esc(M.name || room.type)}</p>`;
+      if (room.friend && room.code) {
+        const url = `${location.origin}${location.pathname}?vs=${room.code}`;
+        html += `<div class="code">${esc(room.code)}</div><input id="arenaLink" readonly value="${esc(url)}">`;
+      }
+      html += `<div class="lobby room">` + [`<div class="lrow"><span class="lname" style="color:#2f6ad0">YOU</span></div>`, ...room.peers.map((p) => {
+        const l = client?.link(p.id);
+        return `<div class="lrow">${barsHTML(l?.rttN ? l.rtt : 0, l?.rttN ? `${Math.round(l.rtt)} ms` : '')}<span class="lname">${esc(p.name)}</span></div>`;
+      })].join('') + `</div>`;
+      html += `<p class="fine" id="roomState">${n} of ${room.max} · ${left >= 0 ? `starts in ${left} s${n < room.max ? ' — more can still join' : ''}`
+        : room.friend ? (room.host ? 'start when everyone is in' : 'waiting for the host to start') : `waiting for players — the countdown starts at ${room.quorum}`}</p>`;
+      html += `<div class="vicbtns">${room.friend && room.host ? `<button class="btn big" data-a="start"${n < 2 ? ' disabled' : ''}>START</button>` : ''}` +
+        `${room.friend ? `<button class="btn" data-a="copy">COPY LINK</button>` : ''}<button class="btn" data-a="stop">LEAVE</button></div>`;
+    } else if (view === 'practiceResult' || (view === 'result' && result.place)) {
+      const R = view === 'result' ? { v: { winner: result.winner, place: result.place }, names: result.names, you: result.you, mode: result.mode } : { ...practiceResult, you: 0 };
+      const p = R.v.place?.[R.you] || 0;
+      const won = R.v.winner === R.you;
+      html += `<h3 class="${won ? 'win' : 'lose'}">${won ? 'YOU WIN' : R.v.winner < 0 ? 'A DRAW' : `YOU CAME ${ordinal(p).toUpperCase()}`}</h3>`;
+      const order = (R.names || []).map((nm, i) => ({ nm: i === R.you ? 'YOU' : nm, p: R.v.place?.[i] || 99 })).sort((a, b) => a.p - b.p);
+      html += `<div class="rows">${order.map((o) => `<div class="r"><span>${ordinal(o.p)}</span><b>${esc(o.nm)}</b></div>`).join('')}</div>`;
+      if (view === 'result') {
+        if (result.forfeit) html += `<p class="fine">Everyone else left — the last one in wins.</p>`;
+        const s = result.stats;
+        if (s) html += `<div class="rows">${[['Arena wins', s.wins], ['Battles today', s.today]].map(([k, v]) => `<div class="r"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;
+        html += evLine(result.eventPts);
+        html += `<div class="vicbtns"><button class="btn big" data-a="again" data-mode="${esc(R.mode)}">PLAY AGAIN</button><button class="btn" data-a="leave">DONE</button></div>`;
+      } else {
+        html += `<p class="fine">Practice against bots — not ranked, no free battle used.</p>
+          <div class="vicbtns"><button class="btn big" data-a="practice" data-mode="${esc(R.mode)}">AGAIN</button><button class="btn" data-a="leave">DONE</button></div>`;
+      }
     } else if (view === 'result') {
       const won = result.winner === result.you;
       const sc = result.score || [];
@@ -395,8 +470,11 @@ export function mountArena(h) {
       else if (a === 'accept') { myAccepted = true; client.accept(matchId, await token()); paint(); }
       else if (a === 'decline') { client.decline(matchId); view = 'home'; paint(); }
       else if (a === 'rematch') { wantRematch = true; client.rematch(matchId); paint(); }
-      else if (a === 'leave') { client.leave(); view = 'home'; paint(); }
+      else if (a === 'leave') { client?.leave(); view = 'home'; paint(); }
       else if (a === 'upgrade') { h.openUpgrade(); }
+      else if (a === 'start') { client.start(matchId); }
+      else if (a === 'again') { view = 'home'; await find(b.dataset.mode); }
+      else if (a === 'practice') { view = 'home'; startPractice(b.dataset.mode); }
     } catch { msg('Could not reach the arena.'); }
   });
 
@@ -418,7 +496,9 @@ export function mountArena(h) {
   return {
     probe,
     /** QUIT mid-fight: leaving is a forfeit, which is the point. */
-    quit() { if (client) client.leave(); stopFight(); view = 'home'; },
+    quit() { if (client) client.leave(); stopFight(); if (practice) { practice.destroy(); practice = null; } view = 'home'; },
+    get practice() { return practice; },
+    practise: startPractice,
     get fight() { return fight; },
     get client() { return client; },
     get ghostFight() { return ghostFight; },

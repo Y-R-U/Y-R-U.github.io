@@ -79,6 +79,7 @@ type seatRow struct {
 	KOs     int
 	Ranked  bool
 	Loadout []int
+	OppDmg  float64 // the most-damaged opponent in the deciding round, from the agreed reports (0-1)
 }
 
 func (s *store) recordMatch(id, typ string, friend bool, score string, seats []seatRow) error {

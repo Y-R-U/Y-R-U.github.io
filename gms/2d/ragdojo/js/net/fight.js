@@ -21,6 +21,8 @@ import * as haptic from '../haptic.js';
 import { NPTS } from '../ragdoll.js';
 import { handText } from '../ui.js';
 import * as W from './wire.js';
+import * as Modes from './modes.js';
+import { ObjectiveBrain, objectiveFor } from './objective.js';
 
 const STEP = 1 / 120;
 const SNAP_MS = 1000 / 30;
@@ -31,6 +33,10 @@ const MAX_SELF_DELAY = 100;      // ms; the master never handicaps itself more t
 const BODY_R = 19;
 const LIGHT = MOVE_SETS.light;
 const SLOT_RANK = [3, 6, 1, 7, 2, 5, 4, 8];
+// No yellow in Steal the Bandana: the golden bandana has to be the only gold on the page.
+const SLOT_RANK_GOLDLESS = [3, 6, 4, 7, 2, 5, 8, 0];
+const READY_WAIT = 5000;         // ms the master waits for every guest before starting anyway
+const RTT_EVERY = 2000;
 const qs = new URLSearchParams(location.search);
 
 /** The gesture slots a save owns in ANY move set — online everyone fights with LIGHT's kinds. */
@@ -53,9 +59,14 @@ export function pvpSave(loadout) {
   return { theme: 'light', perks: {}, moves, settings: {}, seen: { punch: true, power: true }, carryDark: false };
 }
 
-export function arenaLevel(seed) {
+/** The gesture slots a pvpSave can use: what a keyframe carries so a new master knows everyone's moves. */
+export function loadoutOfPvp(save) {
+  return Object.keys(save?.moves || {}).map((id) => W.GESTURES.indexOf(LIGHT.find((m) => m.id === id)?.gesture)).filter((i) => i >= 0).sort((a, b) => a - b);
+}
+
+export function arenaLevel(seed, mode = 'duel') {
   return { idx: 200 + (seed % 6), tier: 0, kind: 'arena', event: null, enemies: [], reward: 0,
-    dojo: 'The Arena', title: 'best of three' };
+    dojo: 'The Arena', title: mode === 'duel' ? 'best of three' : Modes.MODES[mode].name.toLowerCase() };
 }
 
 const moveFor = (save, slot) => {
@@ -64,34 +75,36 @@ const moveFor = (save, slot) => {
 };
 
 /**
- * How a mode is won. Steal the Bandana / King of the Hill will add rules that score time
- * (holding the bandana, standing on the hill) instead of knockouts: `score` is per slot and
- * travels in every keyframe; `verdict` decides the round from what every client can see.
+ * How each mode is won lives in modes.js: `verdict` reads a quantised view that the master
+ * builds from its Match and a guest builds from the master's last snapshot, so an honest
+ * table always reports the same thing. Scores are per slot and travel in every snapshot.
  */
-export const RULES = {
-  duel: {
-    verdict: (m, timeUp) => W.verdict(m.all.map((f, i) => ({ slot: i, hp: Math.round(f.hp * 10) / 10, dead: f.dead })), timeUp),
-    update() {},
-  },
-};
+export const RULES = Object.fromEntries(Object.keys(Modes.MODES).map((k) => [k, {
+  verdict: (m, timeUp) => Modes.verdict(Modes.viewOf(m, timeUp)),
+  update: (m, dt) => Modes.update(m, dt),
+}]));
 
 export class PvpMatch extends Match {
   constructor(o) {
     super({ level: o.level, save: o.saves[o.you] });
     this.saves = o.saves;
     this.you = o.you;
+    const mode = Modes.MODES[o.mode] ? o.mode : 'duel';
     const n = o.seats.length;
     const R = ranksFor('light');
+    const ranks = mode === 'bandana' ? SLOT_RANK_GOLDLESS : SLOT_RANK;
+    const xs = mode === 'duel' ? null : Modes.spawnXs(n, o.seed || 0);
     this.all = o.seats.map((s, i) => {
       const stats = derive(this.saves[i]);
-      const x = n === 1 ? SHEET_W / 2 : 560 + (SHEET_W - 1120) * (i / (n - 1));
+      const x = xs ? xs[i] : n === 1 ? SHEET_W / 2 : 560 + (SHEET_W - 1120) * (i / (n - 1));
       const f = new Fighter({
-        isPlayer: i === o.you, name: i === o.you ? 'YOU' : s.name, rank: R[SLOT_RANK[i] % R.length],
+        isPlayer: i === o.you, name: i === o.you ? 'YOU' : s.name, rank: R[ranks[i] % R.length],
         hp: stats.maxHp * (o.hpScale || 1), dmg: 8 * stats.atkMul, speed: stats.speed, jump: stats.jump,
         scale: 1, facing: x < SHEET_W / 2 ? 1 : -1, stats,
       });
       f.place(x, GROUND_Y);
       f.slot = i;
+      f.netName = s.name;
       return f;
     });
     this.player = this.all[o.you];
@@ -100,11 +113,14 @@ export class PvpMatch extends Match {
     this.camX = SHEET_W / 2; this.camY = GROUND_Y - 200; this.camZ = 1;
     this.phase = W.PHASE.WAIT;
     this.clock = COUNTDOWN;
-    this.roundSecs = o.roundSecs || 60;
+    this.roundSecs = o.roundSecs || Modes.MODES[mode].secs;
     this.timeUp = false;
     this.verdict = null;
-    this.rules = RULES[o.mode || 'duel'];
+    this.rules = RULES[mode];
     this.scores = this.all.map(() => 0);
+    Modes.setup(this, mode);
+    this.hazards.push(new Modes.ModeLayer(this));
+    this.onLand = (a, t, def) => Modes.onLand(this, a, t, def);
   }
 
   build() { this.all = []; this.enemies = []; this.brains = []; this.player = null; }
@@ -121,7 +137,7 @@ export class PvpMatch extends Match {
       else if (now !== was) this.say(String(now), 0.9);
     } else if (this.phase === W.PHASE.FIGHT) {
       this.clock = Math.max(0, this.clock - dt);
-      this.rules.update(this, dt);
+      if (!this.over) this.rules.update(this, dt);
     }
     super.update(dt, null);
   }
@@ -129,7 +145,7 @@ export class PvpMatch extends Match {
   /** Applies one player's action on the master. Specials are checked against what they own. */
   act(slot, a) {
     const f = this.all[slot];
-    if (!f || this.phase !== W.PHASE.FIGHT || this.over) return;
+    if (!f || f.gone || this.phase !== W.PHASE.FIGHT || this.over) return;
     if (a === W.ACT.STRIKE) { if (f.strike()) sfx.whoosh(); return; }
     if (a === W.ACT.JUMP) { f.jump(); return; }
     const m = moveFor(this.saves[slot], a - W.ACT.SPECIAL);
@@ -139,13 +155,27 @@ export class PvpMatch extends Match {
     }
   }
 
+  eliminate(slot) { Modes.eliminate(this, slot); }
+
   checkEnd(dt) {
     if (this.over) { this.endT += dt; return; }
     if (this.phase !== W.PHASE.FIGHT) return;
     const timeUp = this.clock <= 0;
+    Modes.stampOuts(this);
     const v = this.rules.verdict(this, timeUp);
     if (!v) return;
-    // Freeze the outcome: nothing that lands during the slow-mo may change what both sides report.
+    if (v.overtime) {
+      this.overtime = true;
+      this.clock = this.modeDef.overtime;
+      this.say('OVERTIME!', 2);
+      sfx.ko();
+      return;
+    }
+    this.finishWith(v, timeUp);
+  }
+
+  finishWith(v, timeUp) {
+    // Freeze the outcome: nothing that lands during the slow-mo may change what everyone reports.
     for (const f of this.all) f.invuln = 1e9;
     this.over = true;
     this.phase = W.PHASE.OVER;
@@ -156,8 +186,10 @@ export class PvpMatch extends Match {
     this.slowmo = 1.4;
     sfx.ko();
     const w = this.all[v.winner];
-    const [kx] = (w ? this.all.find((f) => f !== w) || w : this.player).rag.centre();
-    this.fx.text(kx, GROUND_Y - 190, v.ko ? 'K.O.' : v.winner < 0 ? 'DRAW' : 'TIME!', { col: '#c0392b', size: 64, life: 2.2, vy: -30 });
+    const [kx] = (w ? (this.ffa ? w : this.all.find((f) => f !== w) || w) : this.player).rag.centre();
+    const word = this.ffa ? (w ? (w === this.player ? 'YOU WIN!' : `${w.netName} WINS`) : 'DRAW')
+      : v.ko ? 'K.O.' : v.winner < 0 ? 'DRAW' : 'TIME!';
+    this.fx.text(kx, GROUND_Y - 190, word, { col: '#c0392b', size: this.ffa ? 52 : 64, life: 2.2, vy: -30 });
     this.fx.shakeBy(20);
   }
 }
@@ -168,7 +200,8 @@ export class PvpMatch extends Match {
 // 30/s drawing stream; a keyframe goes out once a second on the reliable lane.
 const F_KEYS = ['x', 'y', 'vx', 'vy', 'facing', 'onGround', 'hp', 'maxHp', 'mode', 'gain', 'staggerT', 'downT',
   'getupT', 'hitFlash', 'invuln', 'blocking', 'guardBroken', 'duckDrop', 'dead', 'anim', 'animT', 'spin',
-  'comboIdx', 'comboWindow', 'combo', 'comboTimer', 'stunT', 'launchFrom', 'poseLock', 'brokeGuard', 'tailPhase'];
+  'comboIdx', 'comboWindow', 'combo', 'comboTimer', 'stunT', 'launchFrom', 'poseLock', 'brokeGuard', 'tailPhase',
+  'gone', 'out', 'respawnT'];
 // Full precision: rounding a timer by a millisecond moves the frame an attack ends on.
 const r3 = (v) => v;
 
@@ -176,6 +209,8 @@ export function matchState(m) {
   return {
     v: 1, time: r3(m.time), phase: m.phase, clock: r3(m.clock), timeUp: m.timeUp, over: m.over,
     scores: m.scores.slice(), verdict: m.verdict, endT: r3(m.endT), slowmo: r3(m.slowmo), hitstop: r3(m.fx.hitstop),
+    mode: m.modeId, overtime: !!m.overtime, outSeq: m.outSeq | 0, obj: m.obj ? { ...m.obj } : null,
+    lo: (m.saves || []).map(loadoutOfPvp),
     fighters: m.all.map((f) => {
       const o = {};
       for (const k of F_KEYS) o[k] = r3(f[k]);
@@ -193,7 +228,9 @@ export function matchState(m) {
 
 export function applyState(m, st) {
   Object.assign(m, { time: st.time, phase: st.phase, clock: st.clock, timeUp: st.timeUp, over: st.over,
-    scores: st.scores.slice(), verdict: st.verdict, endT: st.endT, slowmo: st.slowmo });
+    scores: st.scores.slice(), verdict: st.verdict, endT: st.endT, slowmo: st.slowmo,
+    overtime: !!st.overtime, outSeq: st.outSeq | 0, obj: st.obj ? { ...st.obj } : null });
+  if (Array.isArray(st.lo) && m.saves) st.lo.forEach((lo, i) => { if (Array.isArray(lo)) m.saves[i] = pvpSave(lo); });
   m.fx.hitstop = st.hitstop || 0;
   st.fighters.forEach((o, i) => {
     const f = m.all[i];
@@ -209,10 +246,24 @@ export function applyState(m, st) {
     owner: m.all[p.owner], dmg: p.dmg, kb: p.kb }), { life: p.life, rot: p.rot, spin: p.spin, bounces: p.bounces, fuse: p.fuse, netId: p.netId, ownerSlot: p.owner }));
 }
 
-/** A scripted player for the headless gates: walks in, swings, ducks, jumps, casts. */
-function botInput(me, foes, t, state) {
-  const opp = foes.filter((f) => !f.dead).sort((a, b) => Math.abs(a.x - me.x) - Math.abs(b.x - me.x))[0];
+/** A scripted player for the headless gates: walks in, swings, ducks, jumps, casts — and plays the objective. */
+function botInput(m, me, t, state) {
   const out = { moveX: 0, block: false, acts: [] };
+  if (me.dead) return out;
+  const g = objectiveFor(m, me);
+  const pool = g ? g.targets : m.all.filter((f) => f !== me && !f.dead && !f.gone);
+  const opp = pool.filter((f) => !f.dead).sort((a, b) => Math.abs(a.x - me.x) - Math.abs(b.x - me.x))[0];
+  if (g && (!opp || Math.abs(opp.x - me.x) > 150 || g.flee)) {
+    const dx = g.goX - me.x;
+    out.moveX = Math.abs(dx) < 18 ? 0 : Math.sign(dx);
+    if (t > state.next) {
+      state.next = t + 0.28 + Math.random() * 0.25;
+      const blocked = m.all.some((o) => o !== me && !o.dead && Math.sign(o.x - me.x) === out.moveX && Math.abs(o.x - me.x) < 70);
+      if (blocked || (g.loose && m.obj && m.obj.y < me.y - 110 && Math.abs(m.obj.x - me.x) < 60)) out.acts.push(W.ACT.JUMP);
+      else if (opp && Math.abs(opp.x - me.x) < 90) out.acts.push(W.ACT.STRIKE);
+    }
+    return out;
+  }
   if (!opp) return out;
   const dx = opp.x - me.x, d = Math.abs(dx);
   out.moveX = d > 66 ? Math.sign(dx) : (Math.sin(t * 1.7 + state.seed) > 0.75 ? -Math.sign(dx) : 0);
@@ -225,6 +276,35 @@ function botInput(me, foes, t, state) {
   return out;
 }
 
+/** The game canvas's aspect, so a crowd's camera can fit everyone across the screen. */
+function screenAspect() {
+  const c = typeof document !== 'undefined' && document.getElementById ? document.getElementById('game') : null;
+  return c && c.clientHeight ? c.clientWidth / c.clientHeight : 16 / 9;
+}
+
+/**
+ * Damage taken per fighter, whole percent, from the quantised HP every client sees — part of the
+ * agreed report, so the server can score how close a loss was (event points) without trusting anyone.
+ */
+export function dmgOf(mp, view) {
+  return view.map((f) => Math.max(0, Math.min(100, Math.round(100 * (1 - f.hp / (mp.all[f.slot]?.maxHp || 100))))));
+}
+
+/** The mode block that rides on every snapshot. */
+function modeBlock(mp) {
+  return { mode: Modes.MODES[mp.modeId].id, overtime: mp.overtime, obj: mp.obj };
+}
+
+function hudLines(mp, extra) {
+  const secs = Math.ceil(mp.phase === W.PHASE.FIGHT || mp.phase === W.PHASE.OVER ? mp.clock : mp.roundSecs);
+  const time = `${mp.overtime ? 'OVERTIME ' : ''}${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+  const left = mp.all.filter((f) => !f.dead && !f.gone).length;
+  const title = mp.modeId === 'lms' ? `LAST MAN STANDING  ·  ${left} of ${mp.all.length} left`
+    : mp.modeId === 'bandana' ? `STEAL THE BANDANA  ·  first to ${mp.modeDef.target}s`
+    : 'KING OF THE HILL  ·  hold it alone';
+  return { title, dojo: extra ? `${time}  ·  ${extra}` : time };
+}
+
 export class NetFight {
   /**
    * @param o {client, go, loadout, onReported(), onStall(why)}
@@ -232,6 +312,7 @@ export class NetFight {
   constructor(o) {
     this.client = o.client;
     this.go = o.go;
+    this.mode = Modes.MODES[o.go.mode] ? o.go.mode : 'duel';
     this.matchId = o.go.match;
     this.round = o.go.round;
     this.you = o.go.you;
@@ -239,21 +320,23 @@ export class NetFight {
     this.isMaster = this.you === this.masterSlot;
     this.ids = o.go.seats.map((s) => s.id);
     this.masterId = this.ids[this.masterSlot];
+    this.gone = new Set((o.go.out || []).map((v, i) => (v ? i : -1)).filter((i) => i >= 0));
     this.onReported = o.onReported || (() => {});
     this.onStall = o.onStall || (() => {});
     const loadouts = o.go.seats.map((_, i) => (i === this.you ? o.loadout : [0, 1, 2, 3, 4, 5, 6, 7]));
     this.saves = loadouts.map(pvpSave);
-    this.sheetLevel = arenaLevel(o.go.arena);
+    this.sheetLevel = arenaLevel(o.go.arena, this.mode);
     this.level = { ...this.sheetLevel };
     const dev = !!o.dev;
     this.bot = dev && qs.get('arenabot') === '1' ? { seed: Math.random() * 6, next: 0 } : null;
     this.match = new PvpMatch({
-      level: this.level, saves: this.saves, you: this.you, seats: o.go.seats,
+      level: this.level, saves: this.saves, you: this.you, seats: o.go.seats, mode: this.mode, seed: o.go.arena,
       hpScale: dev && +qs.get('arenahp') > 0 ? +qs.get('arenahp') : 1,
-      roundSecs: dev && +qs.get('arenasecs') > 0 ? +qs.get('arenasecs') : 60,
+      roundSecs: dev && +qs.get('arenasecs') > 0 ? +qs.get('arenasecs') : 0,
     });
     this.match.net = this;
     this.match.hudSave = this.saves[this.you];
+    for (const s of this.gone) this.match.eliminate(s);
     this.ready = new Set();
     this.acc = 0;
     this.reported = false;
@@ -270,11 +353,12 @@ export class NetFight {
     this.authority = true;
     this.liveRun = 0;
     this.corr = 0;
+    this.lastRtts = 0;
     this.projViews = new Map();
     this.prevHp = null;
     this.m = {
       role: this.isMaster ? 'master' : 'guest', snaps: 0, snapT0: 0, underruns: 0, frames: 0,
-      delay: 0, rtt: 0, direct: false, corrections: 0, reseeds: 0, maxErr: 0, sent: 0, shown: {}, made: {},
+      delay: 0, rtt: 0, direct: false, corrections: 0, reseeds: 0, maxErr: 0, sent: 0, shown: {}, made: {}, migrations: 0,
     };
     this._onData = (peer, bytes) => this.onData(peer, bytes);
     this.client.on('data', this._onData);
@@ -292,10 +376,12 @@ export class NetFight {
   }
 
   // ── shared ──────────────────────────────────────────────────────────────
-  peers() { return this.ids.filter((_, i) => i !== this.you); }
+  peers() { return this.ids.filter((_, i) => i !== this.you && !this.gone.has(i)); }
   rtt() {
+    // A guest only talks to the master; the master to everyone.
     let r = 0, direct = true;
-    for (const id of this.peers()) { const l = this.client.link(id); if (l) { r = Math.max(r, l.rtt); direct = direct && l.direct; } else direct = false; }
+    const ids = this.isMaster ? this.peers() : [this.masterId];
+    for (const id of ids) { const l = this.client.link(id); if (l) { r = Math.max(r, l.rtt); direct = direct && l.direct; } else direct = false; }
     this.m.rtt = Math.round(r);
     this.m.direct = direct;
     return r;
@@ -329,10 +415,11 @@ export class NetFight {
         this.match.saves[slot] = this.saves[slot];
         this.ready.add(slot);
         this.broadcast({ e: 'begin' });
-        if (this.match.phase === W.PHASE.WAIT && this.ready.size >= this.peers().length) this.match.begin();
+        if (this.match.phase === W.PHASE.WAIT && this.peers().every((id) => this.ready.has(this.ids.indexOf(id)))) this.match.begin();
       }
       return;
     }
+    if (peer !== this.masterId) return;
     if (e.e === 'begin') { this.begun = true; clearTimeout(this.readyT); }
     else if (e.e === 'fx') this.replay(e.l);
     else if (e.e === 'state') this.keyframe = e.s;
@@ -345,9 +432,73 @@ export class NetFight {
   }
 
   sendReady() {
-    if (this.dead || this.begun) return;
-    this.client.send(this.masterId, 'r', W.json({ e: 'ready', match: this.matchId, round: this.round, loadout: this.saves[this.you] ? Object.keys(this.saves[this.you].moves).map((id) => W.GESTURES.indexOf(LIGHT.find((m) => m.id === id).gesture)) : [0] }));
+    if (this.dead || this.begun || this.isMaster) return;
+    this.client.send(this.masterId, 'r', W.json({ e: 'ready', match: this.matchId, round: this.round, loadout: loadoutOfPvp(this.saves[this.you]) }));
     this.readyT = setTimeout(() => this.sendReady(), 1000);
+  }
+
+  /** A resumed socket hears this round's go again: keep the fight, catch up on master and leavers. */
+  resync(g) {
+    (g.out || []).forEach((o, i) => { if (o) this.onOut(i); });
+    if (g.master !== this.masterSlot) this.migrate(g.master);
+  }
+
+  /** The server: this seat left (or never came back). Its fighter is out for good. */
+  onOut(slot) {
+    if (slot === this.you || this.gone.has(slot)) return;
+    this.gone.add(slot);
+    if (this.isMaster) this.match.eliminate(slot);
+  }
+
+  /**
+   * The server picked a new master (the old one dropped). If it is us, rebuild the Match from
+   * the last keyframe, bring it up to the newest snapshot, and carry on as master.
+   */
+  migrate(master, goneSlot = -1) {
+    if (goneSlot >= 0 && goneSlot !== this.you) this.gone.add(goneSlot);
+    if (master === this.masterSlot || master < 0 || master >= this.ids.length) return;
+    const was = this.isMaster;
+    this.masterSlot = master;
+    this.masterId = this.ids[master];
+    this.isMaster = this.you === master;
+    this.m.role = this.isMaster ? 'master' : 'guest';
+    this.m.migrations++;
+    if (this.isMaster && !was) this.takeOver();
+    else if (!this.isMaster) {
+      // A new clock to sync to, and a new body of truth for our own fighter. The feel numbers
+      // restart too; the hand-over gap is measured on its own.
+      this.gapFrom = this.buf.length ? this.buf[this.buf.length - 1].recv : performance.now();
+      Object.assign(this.m, { snaps: 0, snapT0: 0, underruns: 0, frames: 0 });
+      this.buf = []; this.offset = null; this.late = 0; this.jitter = 0;
+      this.overSnap = null; this.overAt = 0; this.endHeard = false;
+      this.authority = true; this.liveRun = 0; this.hist = []; this.begun = true;
+      this.keyframe = null;
+      clearTimeout(this.readyT);
+    }
+  }
+
+  takeOver() {
+    const mp = this.match;
+    const B = this.buf, s = B[B.length - 1], prev = B[B.length - 2];
+    if (this.keyframe) applyState(mp, this.keyframe);
+    if (s) patchFromSnap(mp, s, prev);
+    for (const slot of this.gone) mp.eliminate(slot);
+    this.saves = mp.saves;
+    this.record();
+    this.remote = {};
+    this.ready = new Set(this.ids.map((_, i) => i));
+    this.begun = true;
+    this.acc = 0;
+    this.lastSnap = 0; this.lastKey = 0;
+    this.ownQ = []; this.ownNow = null;
+    this.projId = Math.max(0, ...mp.projectiles.map((p) => p.netId | 0));
+    // The old master may have gone while the round was already decided.
+    if (s && s.phase === W.PHASE.OVER && !mp.verdict) {
+      const v = Modes.verdict(Modes.viewOfSnap(s, this.mode)) || { winner: -1, ko: false };
+      mp.over = true; mp.verdict = v; mp.endT = END_HOLD - 0.4;
+    }
+    if (mp.phase === W.PHASE.WAIT) mp.begin();
+    this.broadcast({ e: 'state', s: matchState(mp) });
   }
 
   /** From main.js: a tap on the punch half, or a keyboard strike. */
@@ -356,7 +507,7 @@ export class NetFight {
 
   localAct(a) {
     const mp = this.match;
-    if (mp.phase !== W.PHASE.FIGHT || mp.over) return;
+    if (mp.phase !== W.PHASE.FIGHT || mp.over || mp.player.dead) return;
     if (a >= W.ACT.SPECIAL && !moveFor(this.saves[this.you], a - W.ACT.SPECIAL)) {
       mp.fx.text(mp.player.x, mp.player.y - 150, 'NOT LEARNED', { col: '#9aa0ad', size: 22 });
       return;
@@ -377,26 +528,31 @@ export class NetFight {
     if (this.dead) return;
     const now = performance.now();
     this.m.frames++;
+    const mp = this.match;
+    mp.aspect = screenAspect();
     let inp = input ? { moveX: input.moveX, block: input.block, acts: input.jump ? [W.ACT.JUMP] : [] } : { moveX: 0, block: false, acts: [] };
-    if (this.bot && this.match.phase === W.PHASE.FIGHT) {
-      inp = botInput(this.match.player, this.match.enemies, this.match.time, this.bot);
+    if (this.bot && mp.phase === W.PHASE.FIGHT) {
+      inp = botInput(mp, mp.player, mp.time, this.bot);
       inp.acts = inp.acts.map((a) => (a === W.ACT.SPECIAL ? W.ACT.SPECIAL + (Math.random() < 0.5 ? 0 : 1) : a));
     }
     if (this.isMaster) this.stepMaster(dt, now, inp);
     else this.stepGuest(dt, now, inp);
     this.client.pingLinks(now, 500);
+    if (now - this.lastRtts > RTT_EVERY && this.mode !== 'duel') { this.lastRtts = now; this.client.sendRtts(this.matchId); }
     if (now - this.lastHeard > 10000 && !this.stalled) { this.stalled = true; this.onStall('stalled'); }
-    const mp = this.match;
-    const score = this.go.score.slice();
-    mp.level.title = `ROUND ${this.round}  ·  ${score[this.you]} – ${score[(this.you + 1) % score.length]}`;
-    const secs = Math.ceil(mp.phase === W.PHASE.FIGHT || mp.phase === W.PHASE.OVER ? mp.clock : mp.roundSecs);
     const r = this.m.rtt;
-    mp.level.dojo = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}  ·  ` +
-      (this.m.direct ? `${r} ms` : `relay ${r} ms · slower connection`);
+    const net = this.peers().length ? (this.m.direct ? `${r} ms` : `relay ${r} ms · slower connection`) : '';
+    if (this.mode === 'duel') {
+      const score = this.go.score.slice();
+      mp.level.title = `ROUND ${this.round}  ·  ${score[this.you]} – ${score[(this.you + 1) % score.length]}`;
+      const secs = Math.ceil(mp.phase === W.PHASE.FIGHT || mp.phase === W.PHASE.OVER ? mp.clock : mp.roundSecs);
+      mp.level.dojo = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}  ·  ` + net;
+    } else Object.assign(mp.level, hudLines(mp, net));
   }
 
   // ── master ──────────────────────────────────────────────────────────────
   record() {
+    if (this.rec) return;
     const rec = this.rec = [];
     const fx = this.match.fx;
     for (const k of ['burst', 'shakeBy', 'stop', 'spawn', 'text', 'mark', 'scuff']) {
@@ -415,7 +571,7 @@ export class NetFight {
 
   stepMaster(dt, now, inp) {
     const mp = this.match;
-    if (mp.phase === W.PHASE.WAIT && !this.peers().length) mp.begin();
+    if (mp.phase === W.PHASE.WAIT && (!this.peers().length || now - this.t0 > READY_WAIT)) mp.begin();
     const delay = Math.min(MAX_SELF_DELAY, this.rtt() / 2);
     this.m.delay = Math.round(delay);
     // Equalise: our own input waits half a round trip, as the guest's did on the way here.
@@ -450,12 +606,12 @@ export class NetFight {
       this.lastSnap = Math.max(this.lastSnap + SNAP_MS, now - SNAP_MS);
       const seq = ++this.snapSeq & 0xffff;
       const fighters = mp.all.map((f, i) => ({
-        slot: i, f, ack: this.remote?.[i]?.seq || 0,
+        slot: i, f, ack: this.remote?.[i]?.seq || 0, score: mp.scores[i],
         cds: W.GESTURES.map((g) => { const m = LIGHT.find((x) => x.gesture === g); return m ? f.cooldown(m.id) : 0; }),
       }));
       // Wall clock, not mp.time: slow-mo and hitstop stretch game time, and the guest
       // interpolates against arrival times.
-      const b = W.snap(seq, (now - this.t0) / 1000, mp.phase, mp.clock, mp.timeUp, fighters, mp.projectiles);
+      const b = W.snap(seq, (now - this.t0) / 1000, mp.phase, mp.clock, mp.timeUp, fighters, mp.projectiles, modeBlock(mp));
       for (const id of this.peers()) this.client.send(id, 'u', b);
       this.m.sent++;
       if (window.__net === this) this.m.made[seq] = Date.now();
@@ -466,8 +622,10 @@ export class NetFight {
       this.reported = true;
       if (this.rec.length) this.flushRec();
       this.broadcast({ e: 'end' });
-      this.client.report(this.matchId, this.round, mp.verdict.winner, mp.verdict.ko);
+      this.client.report(this.matchId, this.round, mp.verdict.winner, mp.verdict.ko, mp.verdict.place,
+        dmgOf(mp, Modes.viewOf(mp, mp.timeUp).fighters));
       this.m.verdict = mp.verdict;
+      if (window.__net === this) window.__lastVerdict = { ...mp.verdict, clock: mp.clock };
       this.onReported(mp.verdict);
     }
   }
@@ -492,6 +650,7 @@ export class NetFight {
   onSnap(s) {
     const now = performance.now();
     if (!this.m.snapT0) this.m.snapT0 = now;
+    if (this.gapFrom) { this.m.handoverMs = Math.round(now - this.gapFrom); this.gapFrom = 0; }
     this.m.snaps++;
     this.begun = true;
     clearTimeout(this.readyT);
@@ -587,7 +746,10 @@ export class NetFight {
     const mp = this.match;
     const me = mp.player;
     const latest = this.buf[this.buf.length - 1];
-    if (latest) { mp.phase = latest.phase; mp.clock = latest.clock; mp.timeUp = latest.timeUp; mp.over = latest.phase === W.PHASE.OVER; }
+    if (latest) {
+      mp.phase = latest.phase; mp.clock = latest.clock; mp.timeUp = latest.timeUp; mp.over = latest.phase === W.PHASE.OVER;
+      mp.overtime = !!latest.overtime;
+    }
     this.rtt();
 
     // Stick -> master, 30/s and on every change.
@@ -627,6 +789,7 @@ export class NetFight {
     mp.time += dt;
     if (mp.announceT > 0) mp.announceT -= dt;
     if (mp.introT > 0) mp.introT -= dt;
+    for (const h of mp.hazards) h.update && h.update(dt);
     mp.fx.update(dt, GROUND_Y);
     mp.flair.update(dt);
     mp.camera(dt);
@@ -655,6 +818,8 @@ export class NetFight {
     for (const F1 of b.fighters) {
       const f = mp.all[F1.slot];
       if (!f) continue;
+      f.gone = !!F1.gone; f.out = F1.out | 0; f.respawnT = F1.respawnT || 0;
+      mp.scores[F1.slot] = F1.score || 0;
       if (f === mp.player && !this.authority) continue;
       const F0 = a.fighters.find((x) => x.slot === F1.slot) || F1;
       for (let k = 0; k < NPTS; k++) {
@@ -669,6 +834,13 @@ export class NetFight {
       f.hitFlash = F1.hitFlash; f.hp = F1.hp; f.combo = F1.combo; f.anim = F1.anim; f.animT = F1.animT;
       f.tailPhase += 0.016 * (6 + Math.abs(f.vx) * 0.02);
     }
+    if (b.obj) {
+      const o0 = a.obj || b.obj;
+      mp.obj = { ...b.obj };
+      if (b.obj.y != null && o0.y != null && o0.holder === b.obj.holder) { mp.obj.x = o0.x + (b.obj.x - o0.x) * u; mp.obj.y = o0.y + (b.obj.y - o0.y) * u; }
+      // At rest on the floor: the drawing bobs it.
+      if (mp.obj.y != null) mp.obj.vy = Math.abs(b.obj.y - o0.y) < 0.5 ? 0 : 1;
+    }
     // Projectiles: matched by id across the pair, drawn where they were at render time.
     const seen = new Set();
     for (const p1 of b.projs) {
@@ -676,6 +848,7 @@ export class NetFight {
       let v = this.projViews.get(p1.id);
       if (!v) { v = new Projectile({ type: p1.type, x: p1.x, y: p1.y, vx: 1, vy: 0 }); this.projViews.set(p1.id, v); }
       v.x = p0.x + (p1.x - p0.x) * u; v.y = p0.y + (p1.y - p0.y) * u; v.rot = p1.rot; v.fuse = p1.fuse;
+      v.netId = p1.id; v.ownerSlot = p1.owner;
       seen.add(p1.id);
     }
     for (const id of [...this.projViews.keys()]) if (!seen.has(id)) this.projViews.delete(id);
@@ -708,9 +881,11 @@ export class NetFight {
     this.endHeard = true;
     if (this.reported || !this.overSnap) return;
     this.reported = true;
-    const v = W.verdict(this.overSnap.fighters, this.overSnap.timeUp) || { winner: -1, ko: false };
+    const v = Modes.verdict(Modes.viewOfSnap(this.overSnap, this.mode)) || { winner: -1, ko: false };
+    if (v.overtime) Object.assign(v, { winner: -1, ko: false });
     this.m.verdict = v;
-    this.client.report(this.matchId, this.round, v.winner, v.ko);
+    if (window.__net === this) window.__lastVerdict = { ...v, clock: this.overSnap.clock };
+    this.client.report(this.matchId, this.round, v.winner, v.ko, v.place, dmgOf(this.match, Modes.viewOfSnap(this.overSnap, this.mode).fighters));
     if (v.winner === this.you) haptic.win(); else haptic.ko();
     this.onReported(v);
   }
@@ -718,8 +893,14 @@ export class NetFight {
   /** Extra HUD: only what the campaign HUD cannot say. */
   drawHUD(ctx, vw, vh) {
     const mp = this.match;
+    Modes.drawModeHUD(ctx, vw, vh, mp);
     if (mp.phase === W.PHASE.WAIT || (!this.isMaster && !this.begun)) {
-      handText(ctx, 'waiting for your opponent…', vw / 2, vh * 0.42, 30, '#3a4050', 'center');
+      handText(ctx, this.mode === 'duel' ? 'waiting for your opponent…' : 'waiting for everyone…', vw / 2, vh * 0.42, 30, '#3a4050', 'center');
+    }
+    if (mp.ffa && mp.player.dead && mp.phase === W.PHASE.FIGHT) {
+      const f = mp.player;
+      const t = f.respawnT > 0 ? `back in ${Math.ceil(f.respawnT)}…` : mp.modeId === 'lms' ? 'you are out — watching to the end' : '';
+      if (t) handText(ctx, t, vw / 2, vh * 0.3, 30, '#c0392b', 'center');
     }
     const n = this.awayNote || (this.stalled ? 'connection stalled…' : '');
     if (n) handText(ctx, n, vw / 2, vh * 0.5, 26, '#c0392b', 'center');
@@ -731,4 +912,122 @@ export class NetFight {
       underrunPct: this.m.frames ? +(100 * this.m.underruns / this.m.frames).toFixed(1) : 0,
       jitterMs: +(this.jitter * 1000).toFixed(1), phase: this.match.phase, authority: this.authority };
   }
+}
+
+/**
+ * A new master brings the keyframe (up to a second old) forward to the newest snapshot it
+ * holds: where everyone is, how hurt, who is down, the scores and the objective. The verlet
+ * velocity comes from the last two snapshots so a flying body keeps flying.
+ */
+export function patchFromSnap(mp, s, prev) {
+  mp.phase = s.phase; mp.clock = s.clock; mp.timeUp = s.timeUp; mp.overtime = !!s.overtime;
+  if (s.phase === W.PHASE.OVER) mp.over = true;
+  const dt = prev && s.t > prev.t ? s.t - prev.t : SNAP_MS / 1000;
+  for (const F of s.fighters) {
+    const f = mp.all[F.slot];
+    if (!f) continue;
+    const P0 = prev?.fighters.find((x) => x.slot === F.slot);
+    Object.assign(f, { x: F.x, y: F.y, vx: F.vx, vy: F.vy, hp: F.hp, dead: F.dead, facing: F.facing, onGround: F.onGround,
+      blocking: F.blocking, anim: F.anim, animT: F.animT, duckDrop: F.duckDrop, gone: !!F.gone, out: F.out | 0, respawnT: F.respawnT || 0 });
+    if (f.mode !== F.mode) {
+      f.mode = F.mode;
+      if (F.mode === 'down' || F.mode === 'dead') { f.gain = 0; f.attack = null; f.downT = F.mode === 'dead' ? 999 : 0.2; }
+      else if (F.mode === 'live') { f.gain = 1; f.poseLock = false; }
+      else if (F.mode === 'getup') f.getupT = Math.min(f.getupT || 0.2, 0.2);
+    }
+    if (!F.attacking) f.attack = null;
+    for (let k = 0; k < NPTS; k++) {
+      const x = F.pts[k * 2], y = F.pts[k * 2 + 1];
+      const vx = P0 ? (x - P0.pts[k * 2]) / dt * STEP : 0, vy = P0 ? (y - P0.pts[k * 2 + 1]) / dt * STEP : 0;
+      f.rag.x[k] = x; f.rag.y[k] = y; f.rag.px[k] = x - vx; f.rag.py[k] = y - vy;
+    }
+    mp.scores[F.slot] = F.score || 0;
+  }
+  mp.outSeq = Math.max(mp.outSeq | 0, ...s.fighters.map((F) => F.out | 0));
+  if (s.obj && mp.obj) {
+    const o = mp.obj;
+    o.holder = s.obj.holder;
+    o.x = s.obj.x;
+    if (s.obj.y != null) {
+      const p = prev?.obj;
+      o.y = s.obj.y;
+      o.vx = p && p.y != null ? (s.obj.x - p.x) / dt : 0;
+      o.vy = p && p.y != null ? (s.obj.y - p.y) / dt : 0;
+    } else Object.assign(o, { w: s.obj.w, next: s.obj.next, t: s.obj.t, contested: s.obj.contested });
+  }
+  const live = new Set(s.projs.map((p) => p.id));
+  mp.projectiles = mp.projectiles.filter((p) => live.has(p.netId & 0xff));
+  for (const p of mp.projectiles) { const q = s.projs.find((x) => x.id === (p.netId & 0xff)); if (q) { p.x = q.x; p.y = q.y; } }
+}
+
+/**
+ * Practice: the same Match a real online round runs, on this device only, against bots that
+ * play the objective. `?mode=bandana&bots=3` or the arena panel's PRACTICE.
+ */
+export class LocalFight {
+  constructor({ mode = 'lms', bots = 3, save = null, skill = 0.55, onDone = () => {} }) {
+    this.mode = Modes.MODES[mode] && mode !== 'duel' ? mode : 'lms';
+    const n = Math.max(1, Math.min(7, bots | 0)) + 1;
+    this.you = 0;
+    const seats = [{ name: 'YOU' }, ...['Biro', 'Rubber', 'Crayon', 'Staple', 'Inkpot', 'Ruler', 'Tippex'].slice(0, n - 1).map((name) => ({ name }))];
+    const loadouts = seats.map((_, i) => (i === 0 ? loadoutOf(save) : [0, 1, 2, 3, 4, 5, 6, 7]));
+    this.saves = loadouts.map(pvpSave);
+    const seed = (Math.random() * 1e6) | 0;
+    this.sheetLevel = arenaLevel(seed, this.mode);
+    this.level = { ...this.sheetLevel };
+    this.match = new PvpMatch({ level: this.level, saves: this.saves, you: 0, seats, mode: this.mode, seed });
+    this.match.net = this;
+    this.match.hudSave = this.saves[0];
+    this.brains = this.match.all.map((f, i) => (i === 0 ? null : new ObjectiveBrain(f, skill + Math.random() * 0.1,
+      LIGHT.filter((m) => loadouts[i].includes(W.GESTURES.indexOf(m.gesture))).map((m) => m.id), this.saves[i])));
+    this.onDone = onDone;
+    this.acc = 0;
+    this.match.begin();
+    if (typeof window !== 'undefined') window.__net = this;
+  }
+
+  strike() { this.act(W.ACT.STRIKE); }
+  gesture(g) { const i = W.GESTURES.indexOf(g); if (i >= 0) this.act(W.ACT.SPECIAL + i); }
+  act(a) {
+    const mp = this.match;
+    if (a >= W.ACT.SPECIAL && !moveFor(this.saves[0], a - W.ACT.SPECIAL)) {
+      mp.fx.text(mp.player.x, mp.player.y - 150, 'NOT LEARNED', { col: '#9aa0ad', size: 22 });
+      return;
+    }
+    if (a >= W.ACT.SPECIAL) haptic.gesture();
+    mp.act(0, a);
+  }
+
+  step(dt, input) {
+    const mp = this.match;
+    mp.aspect = screenAspect();
+    this.acc = Math.min(this.acc + dt, 0.1);
+    while (this.acc >= STEP) {
+      if (mp.phase === W.PHASE.FIGHT && !mp.over) {
+        if (input) { mp.player.move(input.moveX, STEP); mp.player.setBlock(input.block); }
+        this.brains.forEach((b) => b && b.update(STEP, mp));
+      }
+      mp.update(STEP);
+      this.acc -= STEP;
+    }
+    if (input && input.jump) mp.act(0, W.ACT.JUMP);
+    Object.assign(mp.level, hudLines(mp, 'practice'));
+    if (mp.over && mp.endT >= END_HOLD + 1.2 && !this.done) { this.done = true; this.onDone(mp.verdict); }
+  }
+
+  drawHUD(ctx, vw, vh) {
+    const mp = this.match;
+    Modes.drawModeHUD(ctx, vw, vh, mp);
+    if (mp.player.dead && mp.phase === W.PHASE.FIGHT) {
+      const f = mp.player;
+      const t = f.respawnT > 0 ? `back in ${Math.ceil(f.respawnT)}…` : mp.modeId === 'lms' ? 'you are out — watching to the end' : '';
+      if (t) handText(ctx, t, vw / 2, vh * 0.3, 30, '#c0392b', 'center');
+    }
+    if (mp.over && mp.verdict) {
+      const p = mp.verdict.place ? mp.verdict.place[0] : 0;
+      handText(ctx, mp.verdict.winner === 0 ? 'YOU WIN!' : p ? `you came ${Modes.ordinal(p)}` : 'draw', vw / 2, vh * 0.3, 40, '#c0392b', 'center');
+    }
+  }
+
+  destroy() { this.dead = true; if (typeof window !== 'undefined' && window.__net === this) window.__net = null; }
 }

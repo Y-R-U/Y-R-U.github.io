@@ -957,7 +957,7 @@ func (s *store) eventArenaResult(match string, seats []seatRow) {
 		if p.UID == "" || !p.Ranked {
 			continue
 		}
-		s.db.Exec(`INSERT OR IGNORE INTO ev_arena(match,uid,won,at) VALUES(?,?,?,?)`, match, p.UID, b2i(p.Won), at)
+		s.db.Exec(`INSERT OR IGNORE INTO ev_arena(match,uid,won,close,at) VALUES(?,?,?,?,?)`, match, p.UID, b2i(p.Won), b2i(!p.Won && p.OppDmg > 0.5), at)
 	}
 }
 

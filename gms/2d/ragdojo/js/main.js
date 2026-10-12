@@ -21,7 +21,7 @@ import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
 import { Purchases, API } from './purchases.js?v=20261012-pass';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
-import { mountArena } from './net/panel.js?v=20261013-events';
+import { mountArena } from './net/panel.js?v=20261013-rooms';
 import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261013-events';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;

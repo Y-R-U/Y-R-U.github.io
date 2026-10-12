@@ -77,7 +77,7 @@ try {
   await click(A, '#btnArena');
   await A.waitFor(`document.querySelector('[data-a=find]')`, 5000);
   await typeName(A, 'Kid A');
-  ok('modes listed, later ones marked coming soon', await A.eval(`document.querySelectorAll('#arenaBody .mode.soon').length >= 3`));
+  ok('every mode is playable, none "coming soon"', await A.eval(`document.querySelectorAll('#arenaBody [data-a=find]').length >= 4 && !document.querySelector('#arenaBody .mode.soon')`));
   await click(A, '[data-a=find]');
   await click(B, '#btnArena');
   await B.waitFor(`document.querySelector('[data-a=find]')`, 5000);

@@ -263,7 +263,8 @@ export class Match {
     const isPlayer = attacker === this.player && !this.demo;
     // Enemies clobbering each other is half the comedy of a gauntlet, but at full damage
     // they finish the fight for you. Keep the ragdoll, drop the damage.
-    const friendly = attacker !== this.player && target !== this.player;
+    // Free-for-all modes (online, 3+ players) have no "enemies of each other" discount.
+    const friendly = !this.ffa && attacker !== this.player && target !== this.player;
     const stats = attacker.stats;
     let dmg = def.dmg ?? 8;
     if (!isPlayer && attacker !== this.player) dmg = def.dmg ?? attacker.baseDmg;
@@ -326,6 +327,7 @@ export class Match {
       this.damageTaken += dealt;
     }
     if (target.mode === 'down' || target.dead) target.launchFrom = target.rag.centre()[0];
+    if (this.onLand) this.onLand(attacker, target, def, from, dealt);
   }
 
   /** Pop the head and tear off most of the limbs, flinging each piece with a spurt of red ink. */
@@ -522,7 +524,7 @@ export class Match {
       let best = null, bd = Infinity;
       for (const o of this.all) {
         if (o === f || o.dead) continue;
-        if (f !== this.player && o !== this.player) continue;   // enemies square up to the player
+        if (!this.ffa && f !== this.player && o !== this.player) continue;   // enemies square up to the player
         const d = Math.abs(o.x - f.x);
         if (d < bd) { bd = d; best = o; }
       }
@@ -667,7 +669,9 @@ export class Match {
       minY = Math.min(minY, y); maxY = Math.max(maxY, y);
     }
     const spanX = maxX - minX;
-    const wantH = Math.max(430, Math.min(720, spanX * 0.55 + 300));
+    let wantH = Math.max(430, Math.min(720, spanX * 0.55 + 300));
+    // Many fighters spread across the page: fit the whole spread at the screen's aspect.
+    if (this.fitAll) wantH = Math.max(wantH, Math.min(1250, (spanX + 260) / (this.aspect || 16 / 9)));
     const tx = (minX + maxX) / 2;
     // Ground sits ~78% down the view; pan up only far enough to keep a launched body in
     // frame, never so far that the floor leaves the screen.

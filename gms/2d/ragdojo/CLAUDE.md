@@ -484,6 +484,79 @@ no stats, board orders, card, internal touch-drag scroll, X + backdrop, 0 consol
 server) · `arenagate` now also checks both players' ghosts exist after a real match. All three arena
 tools take `ARENA_TEST_PORT` (and `ARENA_BIN`, a prebuilt server) so parallel agents don't collide.
 
+## Room modes + host migration (phase 2 agent C, 2026-10-13; local only, NOT deployed)
+
+Last Man Standing, Steal the Bandana and King of the Hill, 2-8 players, plus host migration.
+Practice vs bots works with no server: `?mode=bandana&bots=3` (also `lms`, `hill`; bots 1-7) or the
+PRACTICE button on each room mode in the ARENA panel.
+
+```
+js/net/modes.js      the rules: setup/update/onLand/eliminate on the master, verdict(view) everywhere,
+                     ModeLayer (hill ledge, bandana, crowd name tags — drawn via Match.hazards so
+                     main.js layers it), drawModeHUD (scoreboard down the right edge)
+js/net/objective.js  objectiveFor(m, f) + ObjectiveBrain: where a bot should be, wrapping Brain (ai.js)
+js/net/fight.js      PvpMatch (mode, seeded spawns), NetFight (rooms, onOut, migrate/takeOver,
+                     patchFromSnap), LocalFight (practice)
+server/rooms.go      gathering, countdown, master by measured ping, eliminations, migration, results
+```
+
+- **Rooms** gather in `mLobby`: the 20 s countdown starts at 4 players (45 s from 2 in a public room;
+  a friend room's host presses START instead), joins stay open until it ends or 8 are in (8 = start
+  now). Every seat links to every other seat WHILE it waits (client.js `_roomPing` pings and sends
+  `rtts`), so the master is the seat whose WORST measured ping is lowest (`bestMaster`; unmeasured
+  pairs fall back to the server estimate + 100 ms). Joining is the "yes"; the panel auto-sends
+  `accept` (it carries the token that spends the allowance); a seat with no accept is not dealt in.
+  One room = one battle = one allowance. Results: every seat still in reports winner + placings;
+  all must agree, else void. Placings are stored in `matches.score` as `place 2,3,1` (seat order).
+- **Nobody ends a room by leaving.** A leaver / a guest past the 10 s grace is `out` (eliminated,
+  their fighter `gone`, placed by when they left); the last seat in wins by forfeit. A master
+  whose socket is down for 1.5 s (`migrateAfter`) is out and `master` names the best-ping seat
+  left. That seat runs `takeOver()`: `applyState(last keyframe)` then `patchFromSnap(newest
+  snapshot)` — positions, ragdoll + verlet velocity from the last two snapshots, HP, modes,
+  scores, objective — then carries on as master. Guests reset their clock sync. 1v1 keeps the
+  phase-1 forfeit rule. A resumed socket gets its `go` again: the panel calls `fight.resync(g)`
+  instead of rebuilding the fight (rebuilding a running master's Match was a phase-1 bug).
+- **The snapshot carries a mode block** (wire.js, after the projectiles): holder, bandana x/y or
+  zone x/w/next/t, overtime, and per fighter score (1/10 s), out order, gone, respawn timer.
+  The master's `viewOf` and a guest's `viewOfSnap` quantise identically, so `verdict` agrees.
+- Free-for-all needed two Match fixes: `match.ffa` turns off the gauntlet's 25% damage between
+  two non-player fighters (on the master, guest-on-guest hits were quartered) and makes everyone
+  face their nearest fighter, not the master's. `match.fitAll` fits the camera to the spread at
+  the screen aspect (cap 1250 high), so 8 fighters wall to wall fit a phone or a tablet.
+- Bandana: knocked loose by `def.stagger >= 0.8` (the guard-break line: specials and bombs, not
+  jab/hook/kick or thrown bands), flies the way the hit went; the loser can't re-grab for 1 s.
+  The holder's own bandana turns gold (`ModeLayer.drawBack` swaps `f.rank`), so no slot gets
+  yellow in this mode. Hill: alone in the zone scores, contested scores nothing, moves every
+  20 s with a 4 s dashed warning, at least 380u away. Ties at time-up play 30 s of sudden-death
+  overtime. KOs respawn after 3 s (farthest spot from the living) with 1.5 s spawn protection.
+
+- **Agreed damage → event points.** Every round report also carries each fighter's damage taken
+  (`dmg`, whole percent from the quantised HP everyone sees; `dmgOf` in fight.js) and it is part of
+  the agreement. The server keeps the deciding round's and puts `seatRow.OppDmg` (most-damaged
+  opponent) on each seat, so `ev_arena.close` (a 2-point loss) is decided server-side, not claimed.
+
+Gates (each watched go red): `cd server && go test ./...` (rooms_test.go: countdown at 4, fill to
+8, ping master, not-ready, migration, leavers + forfeit, disagreement, guest grace, agreed damage;
+10 mutants red) · `node tools/modegate.mjs` (61 rule checks incl. wire agreement, the mid-tick
+final KO, keyframe+snapshot migration; `--falsify` 26/26 red) · `node tools/modesim.mjs --check`
+(balance) · `node tools/arenamulti.mjs` (lms x4, bandana x4, hill x3 real Chromes through the panel,
+plus kill-the-master x3: 54 checks; `--falsify` 6/6 red, each for its own reason). Under heavy CPU
+load (several agents' Chromes) one run showed a guest at 32% underruns; not reproduced in 3 reruns.
+Measured: guests 30 snapshots/s, 0% underruns at 3-4 players; hand-over gap ~1.7 s
+(1.5 s detection + rebuild). modesim, 100 runs each, equal bots: LMS 14/20/23 s at 2/4/8, no
+draws; bandana (first to 20, 100 s) 74/91/103 s, held 47-59% of the time; hill 100 s, top score
+42/24/14 s; overtime ~1%; seat win spread within noise (max skew 7%).
+
+Gotchas hit:
+- A finished room must be closed at once (results go out, `c.match = nil`): leaving an mDone room
+  sends `left` to the others, which the panel shows as "Your opponent left."
+- Snapshot-time placings: LMS placing is elimination ORDER (`f.out`), stamped by the master and sent
+  on the wire; guests could not reconstruct ties from dead flags alone.
+- The deciding LMS knockout lands mid-tick, AFTER that tick's out-numbering: unnumbered, it placed
+  LAST instead of second. `Modes.stampOuts` now also runs right before every verdict.
+- The migration test's "killed master places last" was wrong: it places by when it left, below
+  everyone standing then but above anyone already down.
+
 ## Music
 
 Fourteen Suno v5.5 instrumental tracks in `assets/audio/`, wired through `js/music.js`.

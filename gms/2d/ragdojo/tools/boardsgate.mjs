@@ -154,7 +154,7 @@ try {
   // Per arena type: flip LMS live the way agent C will (one line in MODES).
   await c.eval(`import(performance.getEntriesByType('resource').find((e) => e.name.includes('/net/panel.js')).name).then(m => { m.MODES.find(x => x.id === 'lms').live = true; })`);
   await tap(c, '#arenaBody .seg [data-b=battles]');
-  ok('a typed board offers the arena types', await c.waitFor(`document.querySelectorAll('#arenaBody .seg.sub button').length === 3`, 4000), JSON.stringify(await texts(c, '#arenaBody .seg.sub button')));
+  ok('a typed board offers the arena types', await c.waitFor(`document.querySelectorAll('#arenaBody .seg.sub button').length === 5`, 4000), JSON.stringify(await texts(c, '#arenaBody .seg.sub button')));
   await tap(c, '#arenaBody .seg.sub [data-bt=lms]');
   ok('per-type board: LMS battles', await c.waitFor(`document.querySelectorAll('#arenaBody ol.board li').length === 2`, 4000));
   const lms = await texts(c, '#arenaBody ol.board li');

@@ -58,14 +58,19 @@ export function unAct(b) {
 
 const F_BYTES = 1 + 1 + 1 + 2 + 2 + 2 + 2 + 2 + 2 + 1 + 2 + 2 + 1 + 1 + NPTS * 4 + 8;
 const P_BYTES = 1 + 1 + 1 + 2 + 2 + 2 + 1;
+// The mode block, after the projectiles: objective + per-fighter score / out / gone / respawn.
+const X_BYTES = 1 + 1 + 1 + 2 + 2 + 2 + 2 + 1;
+const XF_BYTES = 2 + 1 + 1 + 1;
+const NONE = -32768;
 
 /**
- * Master -> guests, unreliable, 30/s. fighters: [{slot, f (a Fighter), ack, cds[8]}].
- * `t` is the master's clock in seconds; the guest interpolates on it.
+ * Master -> guests, unreliable, 30/s. fighters: [{slot, f (a Fighter), ack, cds[8], score}].
+ * `t` is the master's clock in seconds; the guest interpolates on it. `x` is the mode block
+ * {mode (id), overtime, obj} — holder, bandana position or hill zone.
  */
-export function snap(seq, t, phase, clock, timeUp, fighters, projs) {
+export function snap(seq, t, phase, clock, timeUp, fighters, projs, x = null) {
   const n = fighters.length, np = Math.min(40, projs.length);
-  const b = new Uint8Array(12 + n * F_BYTES + np * P_BYTES), v = new DataView(b.buffer);
+  const b = new Uint8Array(12 + n * F_BYTES + np * P_BYTES + X_BYTES + n * XF_BYTES), v = new DataView(b.buffer);
   b[0] = KIND.SNAP;
   v.setUint16(1, seq & 0xffff);
   v.setFloat32(3, t);
@@ -104,6 +109,21 @@ export function snap(seq, t, phase, clock, timeUp, fighters, projs) {
     v.setInt16(o, i16(p.y * Q)); o += 2;
     v.setInt16(o, i16(((p.rot % 6.2832) + 6.2832) % 6.2832 * 1000)); o += 2;
     b[o++] = u8(p.fuse * 100);
+  }
+  const ob = x?.obj;
+  b[o++] = x?.mode | 0;
+  b[o++] = (x?.overtime ? 1 : 0) | (ob?.contested ? 2 : 0);
+  b[o++] = ob && ob.holder >= 0 ? ob.holder : 255;
+  v.setInt16(o, ob ? i16(ob.x * Q) : NONE); o += 2;
+  v.setInt16(o, ob && ob.y != null ? i16(ob.y * Q) : NONE); o += 2;
+  v.setUint16(o, ob?.w ? u16(ob.w) : 0); o += 2;
+  v.setInt16(o, ob && ob.next != null ? i16(ob.next * Q) : NONE); o += 2;
+  b[o++] = ob && ob.w ? u8(ob.t * 10) : 0;
+  for (const { f, score } of fighters) {
+    v.setUint16(o, u16((score || 0) * 10)); o += 2;
+    b[o++] = u8(f.out || 0);
+    b[o++] = f.gone ? 1 : 0;
+    b[o++] = u8((f.respawnT || 0) * 10);
   }
   return b;
 }
@@ -151,6 +171,25 @@ export function unSnap(b) {
     p.rot = v.getInt16(o) / 1000; o += 2;
     p.fuse = b[o++] / 100;
     s.projs.push(p);
+  }
+  if (b.length >= o + X_BYTES + n * XF_BYTES) {
+    s.mode = b[o++];
+    const fl = b[o++];
+    s.overtime = !!(fl & 1);
+    const holder = b[o++];
+    const ox = v.getInt16(o), oy = v.getInt16(o + 2), w = v.getUint16(o + 4), nx = v.getInt16(o + 6); o += 8;
+    const zt = b[o++] / 10;
+    if (ox !== NONE) {
+      s.obj = { holder: holder === 255 ? -1 : holder, x: ox / Q, contested: !!(fl & 2) };
+      if (w) Object.assign(s.obj, { w, next: nx === NONE ? null : nx / Q, t: zt });
+      else s.obj.y = oy / Q;
+    }
+    for (const F of s.fighters) {
+      F.score = v.getUint16(o) / 10; o += 2;
+      F.out = b[o++];
+      F.gone = !!(b[o++] & 1);
+      F.respawnT = b[o++] / 10;
+    }
   }
   return s;
 }
