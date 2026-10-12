@@ -25,12 +25,13 @@ const ok = (n, c, x = '') => { c ? pass++ : fail++; log(`${c ? 'PASS' : 'FAIL'} 
 
 const SITE = join(ROOT, '..', '..', '..');
 const tmp = mkdtempSync(join(tmpdir(), 'arenagate-'));
-const bin = join(tmp, 'arena');
-execFileSync('go', ['build', '-o', bin, '.'], { cwd: join(ROOT, 'server'), stdio: 'inherit' });
+const bin = process.env.ARENA_BIN || join(tmp, 'arena');
+if (!process.env.ARENA_BIN) execFileSync('go', ['build', '-o', bin, '.'], { cwd: join(ROOT, 'server'), stdio: 'inherit' });
 
 const lanIP = Object.values(networkInterfaces()).flat().find((a) => a && a.family === 'IPv4' && /^192\.168\./.test(a.address))?.address;
 if (LAN && !lanIP) { log('no 192.168.* address on this machine'); process.exit(2); }
-const PORT = LAN ? 9311 : 9310;
+const P0 = +(process.env.ARENA_TEST_PORT || 9310);
+const PORT = LAN ? P0 + 1 : P0;
 const host = LAN ? lanIP : '127.0.0.1';
 const env = { ...process.env, ARENA_ADDR: `${LAN ? '0.0.0.0' : '127.0.0.1'}:${PORT}`, ARENA_DB: join(tmp, 'a.db'),
   ARENA_ICE_URL: 'off', ARENA_ALLOWANCE_URL: 'off' };
@@ -42,7 +43,7 @@ server.stderr.on('data', (d) => { serverLog += d; });
 const arenaBase = `http://${host}:${PORT}/gms/2d/ragdojo/arena`;
 for (let i = 0; i < 50; i++) { try { if ((await fetch(arenaBase + '/health')).ok) break; } catch {} await sleep(100); }
 
-const web = LAN ? null : await serve(ROOT, 9312);
+const web = LAN ? null : await serve(ROOT, P0 + 2);
 const pageBase = LAN ? `http://${lanIP}:${PORT}/gms/2d/ragdojo/index.html` : `${web.base}/index.html`;
 const LAGMS = +(process.env.LAG || 0);
 const common = `auto=1&dpr=1&arenabot=1&arenahp=0.4&arenasecs=45${LAGMS ? `&arenalag=${LAGMS}` : ''}${LAN ? '' : `&arena=${encodeURIComponent(arenaBase)}`}`;
@@ -141,6 +142,9 @@ try {
   const lb = await (await fetch(arenaBase + '/leaderboard?board=battles')).json();
   ok('the agreed result reached the leaderboard', lb.rows?.length === 2 && lb.rows.every((r) => r.value === 1) && lb.rows.map((r) => r.name).sort().join() === 'Kid A,Kid B', JSON.stringify(lb.rows));
   ok('master swaps between rounds (server log)', /r2 master/.test(serverLog));
+  const gh = await (await fetch(arenaBase + '/ghosts')).json();
+  ok('playing a match left both players\' ghosts (real loadout snapshot)', gh.ghosts?.length === 2 && gh.ghosts.every((g) => g.snap?.v === 1 && g.snap.t) &&
+    gh.ghosts.map((g) => g.name).sort().join() === 'Kid A,Kid B', JSON.stringify(gh.ghosts));
   await tabs[0].shot(join(SHOTS, `arena_result${LAN ? '_lan' : ''}.png`));
 
   // Guest-side feel numbers.

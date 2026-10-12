@@ -21,7 +21,7 @@ import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
 import { Purchases, API } from './purchases.js?v=20261012-pass';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
-import { mountArena } from './net/panel.js?v=20261013-arena';
+import { mountArena } from './net/panel.js?v=20261013-ghosts';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
 let familyStorage;
@@ -906,7 +906,8 @@ const arena = mountArena({
     ensureSheet(f.sheetLevel);
     if (mode !== 'fight') { setMode('fight'); audio.play(roleTrack('light', 'boss')); }
   },
-  endNetFight: () => { if (match && match.net) { match = null; setMode('hub'); refreshHub(); } },
+  endNetFight: () => { if (match && (match.net || match.ghost)) { match = null; setMode('hub'); refreshHub(); } },
+  currentMatch: () => match,
 });
 
 if (DEV) window.__ragdojo = { arena, get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };

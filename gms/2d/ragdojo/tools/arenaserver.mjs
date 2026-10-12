@@ -25,10 +25,10 @@ execFileSync('go', ['build', '-o', bin, '.'], { cwd: join(ROOT, 'server'), stdio
 
 // A stand-in for snakenet's loopback /ice, so we can see who gets the TURN credential.
 const ice = createServer((q, r) => r.end(JSON.stringify({ iceServers: [{ urls: ['stun:x'] }, { urls: ['turn:x'], username: 'u', credential: 'TURNSECRET' }], turn: true, refreshSeconds: 3600 })));
-await new Promise((r) => ice.listen(9321, '127.0.0.1', r));
-const PORT = 9320;
+const PORT = +(process.env.ARENA_TEST_PORT || 9320);
+await new Promise((r) => ice.listen(PORT + 1, '127.0.0.1', r));
 const server = spawn(bin, [], { env: { ...process.env, ARENA_ADDR: `127.0.0.1:${PORT}`, ARENA_DB: join(tmp, 'a.db'),
-  ARENA_ICE_URL: 'http://127.0.0.1:9321/ice', ARENA_ALLOWANCE_URL: 'off', ARENA_DEV_AUTH: '1' }, stdio: 'ignore' });
+  ARENA_ICE_URL: `http://127.0.0.1:${PORT + 1}/ice`, ARENA_ALLOWANCE_URL: 'off', ARENA_DEV_AUTH: '1' }, stdio: 'ignore' });
 const base = `http://127.0.0.1:${PORT}/gms/2d/ragdojo/arena`;
 for (let i = 0; i < 50; i++) { try { if ((await fetch(base + '/health')).ok) break; } catch {} await sleep(100); }
 
@@ -103,8 +103,12 @@ try {
   ok('the loser\'s too', rb.stats?.losses === 1 && rb.stats?.wins === 0);
   const lb = await (await fetch(base + '/leaderboard?board=wins')).json();
   ok('leaderboard: Alice on top, no uids', lb.rows[0]?.name === 'Alice' && !JSON.stringify(lb).includes('alice'), JSON.stringify(lb.rows));
+  const up = await fetch(base + '/ghost', { method: 'POST', headers: { Authorization: 'Bearer dev:alice' },
+    body: JSON.stringify({ name: 'Alice', snap: { v: 1, t: 'light', p: { hp: 2 }, m: { power: [1, 0] } } }) });
   const ghosts = await (await fetch(base + '/ghosts')).json();
-  ok('ghost list: ranked players with their loadouts', ghosts.ghosts.length === 2 && ghosts.ghosts.every((g) => g.loadout.join() === '0,1'));
+  const own = await (await fetch(base + '/ghosts', { headers: { Authorization: 'Bearer dev:alice' } })).json();
+  ok('ghosts: an uploaded loadout is listed with its record, never to its owner', up.ok && ghosts.ghosts.length === 1 &&
+    ghosts.ghosts[0].name === 'Alice' && ghosts.ghosts[0].wins === 1 && ghosts.ghosts[0].snap.m.power.join() === '1,0' && own.ghosts.length === 0, JSON.stringify(ghosts));
 
   // A mismatch is void and counts for nobody.
   for (const c of [a, b]) c.send({ t: 'leave' });

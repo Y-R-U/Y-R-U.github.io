@@ -3,9 +3,25 @@
 
 import { ArenaClient } from './client.js';
 import { NetFight, loadoutOf } from './fight.js';
+import { GhostMatch, ghostSnap, ghostSave, ghostPower, pickGhosts, ghostBattle } from './ghost.js';
+import { createBoards } from './boards.js';
 
 const NAME_KEY = 'ragdojo.arena.name';
 const DEVICE_KEY = 'ragdojo.arena.device';
+const FRIENDS_KEY = 'ragdojo.arena.friends';
+
+/**
+ * The arena's modes, in the order the PLAY tab lists them. A mode with `live: true` gets
+ * FIND A FIGHT (waits in the lobby with its id as the game type) and FRIEND LINK; the rest
+ * show "coming soon". Flip `live` here when a mode ships. `short` labels its leaderboard tab.
+ */
+export const MODES = [
+  { id: 'duel', name: '1v1 · BEST OF 3', short: '1v1', desc: 'live, against a real person', lanDesc: 'on your home network', live: true },
+  { id: 'bandana', name: 'STEAL THE BANDANA', short: 'BANDANA', desc: 'grab the golden bandana and hold it', live: false },
+  { id: 'hill', name: 'KING OF THE HILL', short: 'HILL', desc: 'hold the ledge alone', live: false },
+  { id: 'lms', name: 'LAST MAN STANDING', short: 'LMS', desc: 'up to 8 on one page', live: false },
+];
+const TABS = [['play', 'PLAY'], ['ghosts', 'GHOSTS'], ['boards', 'BOARDS']];
 const PAY_API = '/api/br8t/';
 const qs = new URLSearchParams(location.search);
 const store = {
@@ -48,6 +64,17 @@ export function mountArena(h) {
   let base = null, client = null, view = 'home', fight = null, offer = null, matchId = null;
   let lobby = [], friend = null, result = null, note = '', allowanceLine = '', oppAccepted = false, oppRematch = false;
   let wantRematch = false, myAccepted = false, pingT = 0;
+  let tab = 'play', ghosts = null, ghostErr = '', ghostFight = null, ghostResult = null, uploadedFor = '';
+  const boards = createBoards({
+    base: () => base, token,
+    types: () => MODES.filter((m) => m.live),
+    paint: () => { if (tab === 'boards' && TABBED.has(view)) paint(); },
+  });
+  const TABBED = new Set(['home', 'msg', 'joining']);
+  const tabsEl = document.createElement('div');
+  tabsEl.className = 'tabs arenatabs';
+  tabsEl.setAttribute('role', 'tablist');
+  body?.before(tabsEl);
 
   const device = store.get(DEVICE_KEY) || (() => { const d = Math.random().toString(36).slice(2, 12); store.set(DEVICE_KEY, d); return d; })();
   let name = store.get(NAME_KEY) || '';
@@ -91,6 +118,7 @@ export function mountArena(h) {
     c.on('friend', (m) => { friend = m; view = 'friend'; paint(); });
     c.on('offer', (m) => {
       offer = m; matchId = m.match; oppAccepted = myAccepted = false; view = 'offer'; open(); paint();
+      if (m.friend) rememberFriends(m.peers || []);
       // Measure the real ping now, before anyone accepts. NetFight pings once the fight runs.
       clearInterval(pingT);
       pingT = setInterval(() => { if (view !== 'offer' || !client) { clearInterval(pingT); return; } client.pingLinks(performance.now(), 250); }, 250);
@@ -121,6 +149,7 @@ export function mountArena(h) {
 
   function startRound(g) {
     if (fight) fight.destroy();
+    void uploadGhost(g.match);
     matchId = g.match;
     fight = new NetFight({
       client, go: g, loadout: loadoutOf(h.getSave()), dev: h.dev || lan,
@@ -153,15 +182,81 @@ export function mountArena(h) {
 
   function open() { h.overlay('arena'); paint(); }
 
-  async function find() {
+  async function find(type = 'duel') {
     note = '';
     await ensure();
-    client.wait('duel');
+    client.wait(type);
     client.lobby(true);
     view = 'lobby';
     paint();
   }
-  async function makeFriend() { note = ''; await ensure(); client.friend('duel'); }
+  async function makeFriend(type = 'duel') { note = ''; await ensure(); client.friend(type); }
+
+  // ── ghosts ──────────────────────────────────────────────────────────────
+  function friends() { try { return JSON.parse(store.get(FRIENDS_KEY) || '[]'); } catch { return []; } }
+  function rememberFriends(peers) {
+    const list = [...new Set([...peers.map((p) => p.name).filter(Boolean), ...friends()])].slice(0, 30);
+    store.set(FRIENDS_KEY, JSON.stringify(list));
+  }
+
+  /** Every arena match leaves your ghost behind: your loadout and name, nothing else. */
+  async function uploadGhost(match) {
+    if (!base || uploadedFor === match) return;
+    uploadedFor = match;
+    const tok = await token();
+    if (!tok) return;
+    try {
+      await fetch(base + '/ghost', {
+        method: 'POST', cache: 'no-store',
+        headers: { Authorization: `Bearer ${tok}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: client?.me?.name || name, snap: ghostSnap(h.getSave()) }),
+      });
+    } catch { /* a missed upload just leaves the older ghost */ }
+  }
+
+  async function loadGhosts() {
+    ghostErr = ''; ghosts = null; paint();
+    try {
+      const tok = await token();
+      const r = await fetch(base + '/ghosts', { cache: 'no-store', headers: tok ? { Authorization: `Bearer ${tok}` } : {} });
+      if (!r.ok) throw new Error(r.status);
+      const all = (await r.json()).ghosts || [];
+      const mine = ghostPower(ghostSave(ghostSnap(h.getSave())));
+      ghosts = pickGhosts(all, mine, friends(), 8);
+    } catch { ghostErr = 'The ghosts are out haunting somewhere else — try again in a bit.'; }
+    if (tab === 'ghosts') paint();
+  }
+
+  function startGhost(g) {
+    ghostResult = null;
+    const m = new GhostMatch({
+      ghost: g, save: h.getSave(), seed: (Math.random() * 1e6) | 0,
+      onEnd: (result, mm) => {
+        if (ghostFight !== mm || h.currentMatch() !== mm) return;   // quit from pause: nothing to report
+        ghostFight = null;
+        ghostResult = { g, result, dealt: Math.round(mm.damageDealt), taken: Math.round(mm.damageTaken), battle: ghostBattle(result, mm) };
+        // For events marked "any battle" (js/events): src 'ghost', never ranked. Not wired yet.
+        try { window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail: ghostResult.battle })); } catch {}
+        h.endNetFight();
+        view = 'ghostResult';
+        open();
+      },
+    });
+    m.ghost = true;
+    ghostFight = m;
+    h.overlay(null);
+    h.startNetFight({ match: m, sheetLevel: m.level });
+    m.say('GHOST FIGHT', 1.8);
+  }
+
+  function ghostRows() {
+    if (ghostErr) return `<p class="fine">${esc(ghostErr)}</p>`;
+    if (!ghosts) return `<p class="fine">calling up the ghosts…</p>`;
+    if (!ghosts.length) return `<p class="fine">No ghosts yet. Every arena match leaves the player's ghost behind — play one and yours will haunt someone else.</p>`;
+    const tag = { friend: 'friend', near: 'about your level', stronger: 'stronger' };
+    return `<div class="lobby ghosts">` + ghosts.map((g, i) =>
+      `<div class="lrow"><span class="ghosttag">GHOST</span><span class="lname">${esc(g.name)}<small>${g.battles ? `${g.wins}–${g.losses}` : 'unranked'} · ${tag[g.why]}</small></span><button class="btn small" data-a="ghost" data-i="${i}">FIGHT</button></div>`).join('') + `</div>`;
+  }
   async function join(code) { note = ''; try { await ensure(); client.join(code); view = 'joining'; paint(); } catch { msg('Could not reach the arena.'); } }
 
   function linkInfo() {
@@ -171,24 +266,44 @@ export function mountArena(h) {
     return { ms: l.rtt, direct: l.direct, measured: l.rttN >= 2 };
   }
 
+  function paintTabs() {
+    const show = TABBED.has(view);
+    tabsEl.classList.toggle('hidden', !show);
+    if (show) tabsEl.innerHTML = TABS.map(([id, label]) => `<button class="tab${tab === id ? ' on' : ''}" data-tab="${id}" role="tab" aria-selected="${tab === id}">${label}</button>`).join('');
+  }
+
   function paint() {
     if (!body) return;
+    paintTabs();
     const me = client?.me;
     let html = '';
-    if (view === 'home' || view === 'msg' || view === 'joining') {
+    if (TABBED.has(view) && tab === 'ghosts') {
+      html += `<p class="fine">A ghost is an AI fighting with a real player's moves and skills. Practice only: never ranked, no ink, and it doesn't use a free battle.</p>`;
+      html += ghostRows();
+    } else if (TABBED.has(view) && tab === 'boards') {
+      html += boards.html();
+    } else if (view === 'ghostResult') {
+      const R = ghostResult, won = R.result === 'win';
+      html += `<h3 class="${won ? 'win' : 'lose'}">${won ? 'YOU WIN' : 'YOU LOSE'}</h3>
+        <p class="vs">YOU <small>vs</small> <span class="ghosttag">GHOST</span> ${esc(R.g.name)}</p>
+        <div class="rows">${[['Damage dealt', R.dealt], ['Damage taken', R.taken]].map(([k, v]) => `<div class="r"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+        <p class="fine">Ghost fight — practice only. Not ranked, no ink, no free battle used.</p>
+        <div class="vicbtns"><button class="btn big" data-a="ghostAgain">FIGHT AGAIN</button><button class="btn" data-a="ghostList">OTHER GHOSTS</button></div>`;
+    } else if (view === 'home' || view === 'msg' || view === 'joining') {
       if (view === 'msg' || view === 'joining') html += `<p class="arenanote">${view === 'joining' ? 'Joining your friend…' : note}</p>`;
       html += `<div class="toggle"><span>Your name</span><input id="arenaName" maxlength="20" value="${esc(name)}" placeholder="type a name" autocomplete="off"></div>`;
       if (view !== 'msg' && note) html += `<p class="arenanote">${note}</p>`;
       if (allowanceLine) html += `<p class="fine">${esc(allowanceLine)}</p>`;
       const canLobby = lan || !me || me.lobby;
-      html += `<div class="mode"><div><b>1v1 · BEST OF 3</b><small>${lan ? 'on your home network' : 'live, against a real person'}</small></div>
-        <button class="btn" data-a="find"${canLobby ? '' : ' disabled'}>FIND A FIGHT</button>
-        <button class="btn" data-a="friend">FRIEND LINK</button></div>`;
-      if (!canLobby) html += `<p class="fine">Sign in (the account button) to fight strangers. Friend links work without an account.</p>`;
-      for (const [t, d] of [['STEAL THE BANDANA', 'grab the golden bandana and hold it'], ['KING OF THE HILL', 'hold the ledge alone'],
-        ['LAST MAN STANDING', 'up to 8 on one page'], ['GHOSTS', 'fight a real player’s ghost — never ranked']]) {
-        html += `<div class="mode soon"><div><b>${t}</b><small>${d}</small></div><span class="soonTag">coming soon</span></div>`;
+      for (const m of MODES) {
+        if (!m.live) { html += `<div class="mode soon"><div><b>${m.name}</b><small>${m.desc}</small></div><span class="soonTag">coming soon</span></div>`; continue; }
+        html += `<div class="mode"><div><b>${m.name}</b><small>${lan && m.lanDesc ? m.lanDesc : m.desc}</small></div>
+          <button class="btn" data-a="find" data-mode="${m.id}"${canLobby ? '' : ' disabled'}>FIND A FIGHT</button>
+          <button class="btn" data-a="friend" data-mode="${m.id}">FRIEND LINK</button></div>`;
       }
+      if (!canLobby) html += `<p class="fine">Sign in (the account button) to fight strangers. Friend links work without an account.</p>`;
+      html += `<div class="mode"><div><b><span class="ghosttag">GHOST</span> FIGHTS</b><small>a real player's ghost, any time — never ranked</small></div>
+        <button class="btn" data-a="ghosts">SEE GHOSTS</button></div>`;
     } else if (view === 'lobby') {
       html += `<p class="fine">You are listed — anyone can challenge you. Or pick someone:</p>`;
       html += `<div class="lobby">` + (lobby.length ? lobby.map((p) =>
@@ -232,14 +347,34 @@ export function mountArena(h) {
     };
   }
 
+  function setTab(t) {
+    tab = t;
+    if (view === 'msg') view = 'home';
+    paint();
+    if (t === 'ghosts') loadGhosts();
+    if (t === 'boards') boards.refresh();
+  }
+  tabsEl.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-tab]');
+    if (!b) return;
+    h.click();
+    setTab(b.dataset.tab);
+  });
+
   body?.addEventListener('click', async (e) => {
+    const bb = e.target.closest('[data-b],[data-bt]');
+    if (bb && boards.click(bb)) { h.click(); return; }
     const b = e.target.closest('[data-a]');
     if (!b) return;
     h.click();
     const a = b.dataset.a;
     try {
-      if (a === 'find') await find();
-      else if (a === 'friend') await makeFriend();
+      if (a === 'ghosts') { setTab('ghosts'); return; }
+      if (a === 'ghost') { const g = ghosts?.[+b.dataset.i]; if (g) startGhost(g); return; }
+      if (a === 'ghostAgain') { startGhost(ghostResult.g); return; }
+      if (a === 'ghostList') { view = 'home'; setTab('ghosts'); return; }
+      if (a === 'find') await find(b.dataset.mode);
+      else if (a === 'friend') await makeFriend(b.dataset.mode);
       else if (a === 'challenge') { client.challenge(b.dataset.id); }
       else if (a === 'stop') { client?.unwait(); client?.leave(); client?.lobby(false); view = 'home'; paint(); }
       else if (a === 'copy') { try { await navigator.clipboard.writeText($('arenaLink').value); b.textContent = 'COPIED'; } catch { $('arenaLink').select(); } }
@@ -252,11 +387,18 @@ export function mountArena(h) {
     } catch { msg('Could not reach the arena.'); }
   });
 
-  btn?.addEventListener('click', () => { h.click(); if (view === 'msg') view = 'home'; open(); refreshAllowance(); });
+  btn?.addEventListener('click', () => {
+    h.click();
+    if (view === 'msg' || view === 'ghostResult') view = 'home';
+    open(); refreshAllowance();
+    if (tab === 'ghosts') loadGhosts();
+    if (tab === 'boards') boards.refresh();
+  });
   $('btnArenaClose')?.addEventListener('click', () => {
     h.click();
     // Closing leaves whatever you were waiting in; a fight in progress is not closed from here.
     if (client && !fight && view !== 'result') { client.unwait(); if (view !== 'home') client.leave(); client.lobby(false); view = 'home'; }
+    if (view === 'ghostResult') view = 'home';
     h.overlay(null);
   });
 
@@ -266,5 +408,9 @@ export function mountArena(h) {
     quit() { if (client) client.leave(); stopFight(); view = 'home'; },
     get fight() { return fight; },
     get client() { return client; },
+    get ghostFight() { return ghostFight; },
+    get lastGhost() { return ghostResult?.battle || null; },
+    /** Switch the panel's tab ('play' | 'ghosts' | 'boards'). */
+    tab: setTab,
   };
 }

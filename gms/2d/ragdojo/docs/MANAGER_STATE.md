@@ -47,3 +47,17 @@ Deploy steps: see CLAUDE.md "Online arena".
 - **D — ghosts + leaderboards + stats UI**: ghost fights (Brain with a real player's loadout, labelled GHOST),
   leaderboard/stats panels. Owns js/net/panel.js, ai.js, server/store.go, server/names.go, new js/net/ghost.js
   and js/net/boards.js. Exposes `openMode(id)`-style hooks; C flips its modes from "coming soon" by calling them.
+
+### D status (2026-10-13)
+Done, local only, NOT deployed: ghost fights (`js/net/ghost.js`: real loadout via `moveStats` + perks +
+record-derived skill, labelled GHOST in list/fight/HUD, offline, never ranked, no allowance; snapshot
+uploaded on every arena match via `POST /ghost`), leaderboards + your stats card (`js/net/boards.js`,
+`GET /leaderboard` extended, `GET /me`), PLAY/GHOSTS/BOARDS tabs, `MODES` table for C (`live: true`).
+Ghost results exposed as a `ragdojo:battle` event (`src: 'campaign', kind: 'ghost'`), not wired to events.
+Gates: go test (ghosts_test.go), `tools/ghostgate.mjs` (+`--falsify` 11/11 red), `tools/boardsgate.mjs`
+(45, real touch, landscape + portrait), arenagate ghost check; every existing gate re-run green.
+Not done: ghost wiring into events (phase 3), a GHOST label on the HUD's "ENEMY" bar caption (ui.js; the
+name under it already reads GHOST · NAME), sim autoplay byKind for non-light worlds (left alone on purpose).
+Deploy: same as phase 1 (server/deploy.sh, Caddy fragment unchanged — new routes sit under the same
+prefix; the new `ghosts` table is created on start), then the client via games/deploy.sh.
+

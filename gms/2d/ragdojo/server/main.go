@@ -26,7 +26,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -136,36 +135,7 @@ func (h *hub) routes(prefix string, origins []string) http.Handler {
 		cors(w, r, origins)
 		reply(w, 200, map[string]any{"ok": true, "v": 1, "modes": []string{"duel"}})
 	})
-	mux.HandleFunc("GET "+prefix+"/leaderboard", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, origins)
-		q := r.URL.Query()
-		typ := ""
-		if q.Get("type") != "" {
-			if typ = cleanType(q.Get("type")); typ == "" {
-				reply(w, 404, map[string]string{"error": "no such mode"})
-				return
-			}
-		}
-		n, _ := strconv.Atoi(q.Get("n"))
-		if n <= 0 || n > 50 {
-			n = 20
-		}
-		rows, err := h.st.leaderboard(q.Get("board"), typ, n)
-		if err != nil {
-			reply(w, 503, map[string]string{"error": "unavailable"})
-			return
-		}
-		reply(w, 200, map[string]any{"board": q.Get("board"), "type": typ, "rows": rows})
-	})
-	mux.HandleFunc("GET "+prefix+"/ghosts", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, origins)
-		rows, err := h.st.ghosts(30)
-		if err != nil {
-			reply(w, 503, map[string]string{"error": "unavailable"})
-			return
-		}
-		reply(w, 200, map[string]any{"ghosts": rows})
-	})
+	h.boardRoutes(mux, prefix, origins)
 	mux.HandleFunc(prefix+"/ws", func(w http.ResponseWriter, r *http.Request) {
 		h.serveWS(w, r, origins)
 	})

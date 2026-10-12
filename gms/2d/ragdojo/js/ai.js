@@ -1,15 +1,20 @@
 // Enemy brain. Also drives both fighters in the menu demo matches and the player's
 // opponents in bully mode. `skill` (0..1) scales reaction time, spacing and aggression.
 
-import { moveStats } from './config.js';
+import { moveStats, MOVE_SETS } from './config.js';
 
 const PREFER = ['power', 'rise', 'dash', 'flipF', 'slam', 'toss', 'flipB', 'bomb'];
+const KIND_ORDER = ['power', 'rise', 'dash', 'knives', 'flipF', 'slam', 'toss', 'gun', 'flipB', 'bomb'];
+const KIND = Object.fromEntries(Object.values(MOVE_SETS).flat().map((m) => [m.id, m.kind]));
 
 export class Brain {
-  constructor(f, skill = 0.5, moveIds = [], save = null) {
+  constructor(f, skill = 0.5, moveIds = [], save = null, opts = {}) {
     this.f = f;
     this.skill = skill;
     this.save = save;          // when set, specials use the real purchased stats
+    // byKind: any move set's ids, ranged by their kind (ghosts). Off by default so the
+    // campaign and the sim keep the behaviour their balance numbers were measured with.
+    this.byKind = !!opts.byKind;
     this.think = 0;
     this.intent = 'approach';
     this.intentT = 0;
@@ -128,13 +133,16 @@ export class Brain {
     const f = this.f;
     if (!this.moves.length) return false;
     const reach = 74 * f.scale;
-    for (const id of PREFER) {
-      if (!this.moves.includes(id)) continue;
+    const order = this.byKind
+      ? KIND_ORDER.flatMap((k) => this.moves.filter((id) => KIND[id] === k))
+      : PREFER.filter((id) => this.moves.includes(id));
+    for (const id of order) {
       if (f.cooldown(id) > 0) continue;
+      const k = this.byKind ? KIND[id] : id;
       const good =
-        id === 'toss' || id === 'bomb' ? dist > reach * 1.6 :
-        id === 'dash' || id === 'flipF' ? dist > reach * 1.1 && dist < reach * 4 :
-        id === 'flipB' ? dist < reach * 1.2 :
+        k === 'toss' || k === 'bomb' || k === 'gun' ? dist > reach * 1.6 :
+        k === 'dash' || k === 'flipF' || k === 'knives' ? dist > reach * 1.1 && dist < reach * 4 :
+        k === 'flipB' ? dist < reach * 1.2 :
         dist < reach * 1.25;
       if (!good) continue;
       if (Math.random() > 0.35 + this.skill * 0.6) continue;

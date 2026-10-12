@@ -434,6 +434,56 @@ Deploy (needs Aaron's approval; nothing has been run): 1) `server/deploy.sh` (te
 client with `games/deploy.sh`; 4) `curl https://games.br8t.com/gms/2d/ragdojo/arena/health`. The
 payment service must be deployed for the allowance to apply (it fails open without it).
 
+## Ghosts + leaderboards (phase 2 agent D, 2026-10-13; local only, NOT deployed)
+
+```
+js/net/ghost.js   ghostSnap/ghostSave (snapshot <-> clamped save), ghostPower/ghostSkill/pickGhosts,
+                  GhostMatch (a normal offline Match whose one enemy is the ghost), ghostBattle
+js/net/boards.js  the BOARDS tab: your stats card + today/battles/wins/streak/KOs/losses, per arena type
+js/net/panel.js   PLAY / GHOSTS / BOARDS tabs (built in JS above #arenaBody); MODES table
+server/ghosts.go  GET leaderboard, GET me, GET ghosts, POST ghost (+ OPTIONS preflight for dev ports)
+```
+
+- **A ghost is the uploader's real loadout.** Every arena match (`go`, once per match id) POSTs
+  `{name, snap}` to `/ghost` with the player's token; `snap` is `{v, t: theme, cd: carryDark, p: perks,
+  m: {id: [power, cd]}}` for the ACTIVE move set only — no ink, records or anything else. The server
+  re-validates it (`cleanSnap`), keeps one per player, 10 s apart, 90 days. Anonymous players leave none.
+- **The ghost fights through `moveStats(itsSave, id)`** (`Brain(f, skill, ids, save, {byKind: true})`),
+  with `derive(itsSave)` as its body (HP incl. SECOND WIND, speed, jump, `stats` for armour/crit/drain)
+  and its HEAVIER HAND on punches (`GhostMatch.land`: campaign enemies punch at a flat rate; projectile
+  hits carry `special: true` and are NOT rescaled — the gate caught that double-count). Skill comes
+  from its ranked record (`ghostSkill`). `ghostSave` clamps to what any real save could reach.
+- **`Brain` byKind is opt-in.** `PREFER` lists LIGHT ids, so a DARK/CYBER/GOD move set never threw a
+  special. Ghosts range moves by `kind`; the campaign and `sim.mjs` keep the old path, so their
+  balance numbers stand. (The sim's autoplay player in a non-light world is still special-less —
+  worth knowing before trusting a DARK sim number.)
+- **Never ranked, never counted.** The fight is a local `GhostMatch` (`match.ghost = true`; main.js's
+  `endNetFight` accepts it); nothing is sent during or after it and the server has no endpoint that
+  takes a ghost result. The result goes to `window` as a `ragdojo:battle` CustomEvent (and
+  `arena.lastGhost`) shaped for js/events: `src: 'campaign', kind: 'ghost', ranked: false`, so only
+  "any battle" events will take it, under the campaign cap. Events are NOT wired to it yet.
+- **The list** (`pickGhosts`): friends first (names from friend-link offers, `ragdojo.arena.friends`),
+  then the nearest in `ghostPower`, then up to 3 stronger; each row says why. Your own ghost is
+  excluded server-side when the request carries your token.
+- **Boards** read only agreed results. `today` = most battles today (any type); `battles|wins|losses`
+  take `&type=` (`boardTypes` in ghosts.go: duel/lms/bandana/hill; the lobby's `gameTypes` in
+  store.go is separate and is agent C's to widen); `streak|kos` are all-time. A valid token marks
+  your row `you: true`; no uid ever leaves. `/me` is the card: totals, `rank` on wins, per type, `ghost`.
+  On a 192.* page the base is the LAN server, so the boards are that server's own.
+- **Mode switch for agent C**: `MODES` at the top of panel.js — set `live: true` and the PLAY tab gets
+  FIND A FIGHT (`client.wait(id)`) + FRIEND LINK (`client.friend(id)`), and BOARDS gets a type tab.
+  `arena.tab('play'|'ghosts'|'boards')` switches tab from outside.
+
+Gates (each watched go red): `cd server && go test ./...` (`ghosts_test.go`: every board's order incl.
+per type and today, you-mark, no uids, card, ghost upload auth/clean/rate/exclude-self/age-out, no result
+endpoint, LAN identity) · `node tools/ghostgate.mjs` (29 checks: snapshot holds only the loadout,
+moveStats parity, clamp, body/brain/punch damage, dark kinds, unranked event shape) and
+`--falsify` (11 mutants incl. Brain ignoring its save, all red) · `node tools/boardsgate.mjs` (45, REAL
+touch at 844x390 and rotated 390x844: ghost list, a ghost fight sends no WS frame and no POST and changes
+no stats, board orders, card, internal touch-drag scroll, X + backdrop, 0 console errors, hidden with no
+server) · `arenagate` now also checks both players' ghosts exist after a real match. All three arena
+tools take `ARENA_TEST_PORT` (and `ARENA_BIN`, a prebuilt server) so parallel agents don't collide.
+
 ## Music
 
 Fourteen Suno v5.5 instrumental tracks in `assets/audio/`, wired through `js/music.js`.

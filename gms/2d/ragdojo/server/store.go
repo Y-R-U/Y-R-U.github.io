@@ -43,6 +43,12 @@ CREATE TABLE IF NOT EXISTS lan_results (
   PRIMARY KEY (match, device)
 );
 CREATE TABLE IF NOT EXISTS lan_links (device TEXT PRIMARY KEY, firebase_uid TEXT NOT NULL, at INTEGER NOT NULL);
+-- One ghost per player: the loadout snapshot their last arena match uploaded (ghosts.go).
+-- Fights against it run offline in the challenger's browser and are never reported back.
+CREATE TABLE IF NOT EXISTS ghosts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL UNIQUE, name TEXT NOT NULL,
+  snap TEXT NOT NULL, updated INTEGER NOT NULL
+);
 `
 
 type store struct {
@@ -142,38 +148,90 @@ func (s *store) mine(uid string) (statLine, bool) {
 	return l, err == nil
 }
 
+type typeLine struct {
+	Battles int `json:"battles"`
+	Wins    int `json:"wins"`
+	Losses  int `json:"losses"`
+}
+
+// card is the player's own stats card: totals, per arena type, and where they stand on the
+// all-time wins board (1 = top; ties share the better place).
+type card struct {
+	statLine
+	Rank  int                 `json:"rank"`
+	Types map[string]typeLine `json:"types"`
+	Ghost bool                `json:"ghost"`
+}
+
+func (s *store) card(uid string) (*card, error) {
+	c := &card{Types: map[string]typeLine{}}
+	var g int
+	s.db.QueryRow(`SELECT COUNT(*) FROM ghosts WHERE uid=?`, uid).Scan(&g)
+	c.Ghost = g > 0
+	l, ok := s.mine(uid)
+	if !ok {
+		return c, nil
+	}
+	c.statLine = l
+	if err := s.db.QueryRow(`SELECT COUNT(*)+1 FROM players WHERE battles>0 AND wins>?`, l.Wins).Scan(&c.Rank); err != nil {
+		return nil, err
+	}
+	rows, err := s.db.Query(`SELECT type,battles,wins,losses FROM by_type WHERE uid=?`, uid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var t string
+		var tl typeLine
+		if err := rows.Scan(&t, &tl.Battles, &tl.Wins, &tl.Losses); err != nil {
+			return nil, err
+		}
+		c.Types[t] = tl
+	}
+	return c, rows.Err()
+}
+
 var boards = map[string]string{
 	"wins": "p.wins", "battles": "p.battles", "streak": "p.best_streak", "kos": "p.kos", "losses": "p.losses",
 }
+
+var typeBoards = map[string]string{"wins": "t.wins", "battles": "t.battles", "losses": "t.losses"}
 
 type boardRow struct {
 	Name  string `json:"name"`
 	Value int    `json:"value"`
 	Wins  int    `json:"wins"`
 	Lost  int    `json:"losses"`
+	You   bool   `json:"you,omitempty"`
 }
 
-// leaderboard: no uids leave the server, only display names and numbers.
-func (s *store) leaderboard(board, typ string, limit int) ([]boardRow, error) {
+// leaderboard: no uids leave the server, only display names and numbers. `me` (a uid, or "")
+// only marks the caller's own row. Ties break on wins, then name, so the order is stable.
+//
+//	today                     most battles today, any arena type
+//	wins|battles|losses       all time; with a type, that arena type only
+//	streak|kos                all time, every type together
+func (s *store) leaderboard(board, typ string, limit int, me string) ([]boardRow, error) {
 	var rows *sql.Rows
 	var err error
 	switch {
 	case board == "today":
-		rows, err = s.db.Query(`SELECT p.name, d.battles, d.wins, 0 FROM daily d JOIN players p ON p.uid=d.uid
-			WHERE d.day=? ORDER BY d.battles DESC, d.wins DESC, p.name LIMIT ?`, s.day(), limit)
+		rows, err = s.db.Query(`SELECT p.uid, p.name, d.battles, d.wins, d.battles-d.wins FROM daily d JOIN players p ON p.uid=d.uid
+			WHERE d.day=? AND d.battles>0 ORDER BY d.battles DESC, d.wins DESC, p.name LIMIT ?`, s.day(), limit)
 	case typ != "":
-		col := "t.wins"
-		if board == "battles" {
-			col = "t.battles"
+		col, ok := typeBoards[board]
+		if !ok {
+			col = "t.wins"
 		}
-		rows, err = s.db.Query(`SELECT p.name, `+col+`, t.wins, t.losses FROM by_type t JOIN players p ON p.uid=t.uid
+		rows, err = s.db.Query(`SELECT p.uid, p.name, `+col+`, t.wins, t.losses FROM by_type t JOIN players p ON p.uid=t.uid
 			WHERE t.type=? AND t.battles>0 ORDER BY `+col+` DESC, t.wins DESC, p.name LIMIT ?`, typ, limit)
 	default:
 		col, ok := boards[board]
 		if !ok {
 			col = "p.wins"
 		}
-		rows, err = s.db.Query(`SELECT p.name, `+col+`, p.wins, p.losses FROM players p WHERE p.battles>0
+		rows, err = s.db.Query(`SELECT p.uid, p.name, `+col+`, p.wins, p.losses FROM players p WHERE p.battles>0
 			ORDER BY `+col+` DESC, p.wins DESC, p.name LIMIT ?`, limit)
 	}
 	if err != nil {
@@ -183,9 +241,11 @@ func (s *store) leaderboard(board, typ string, limit int) ([]boardRow, error) {
 	out := []boardRow{}
 	for rows.Next() {
 		var r boardRow
-		if err := rows.Scan(&r.Name, &r.Value, &r.Wins, &r.Lost); err != nil {
+		var uid string
+		if err := rows.Scan(&uid, &r.Name, &r.Value, &r.Wins, &r.Lost); err != nil {
 			return nil, err
 		}
+		r.You = me != "" && uid == me
 		out = append(out, r)
 	}
 	return out, rows.Err()
@@ -231,16 +291,31 @@ func cleanType(t string) string {
 var gameTypes = map[string]bool{"duel": true}
 
 type ghostRow struct {
-	Name    string `json:"name"`
-	Loadout []int  `json:"loadout"`
-	Wins    int    `json:"wins"`
-	Battles int    `json:"battles"`
+	ID      int64           `json:"id"`
+	Name    string          `json:"name"`
+	Snap    json.RawMessage `json:"snap"`
+	Wins    int             `json:"wins"`
+	Losses  int             `json:"losses"`
+	Battles int             `json:"battles"`
+	Updated int64           `json:"updated"`
 }
 
-// ghosts: recent signed-in players to fight as an AI any time. Always labelled GHOST in the
-// game and never counted in ranked stats. Names and loadouts only — no uids.
-func (s *store) ghosts(limit int) ([]ghostRow, error) {
-	rows, err := s.db.Query(`SELECT name, loadout, wins, battles FROM players WHERE battles>0 ORDER BY updated DESC LIMIT ?`, limit)
+const ghostMaxAge = 90 * 24 * time.Hour
+
+// saveGhost keeps one snapshot per player, replaced by each newer arena match.
+func (s *store) saveGhost(uid, name string, snap []byte) error {
+	_, err := s.db.Exec(`INSERT INTO ghosts(uid,name,snap,updated) VALUES(?,?,?,?)
+		ON CONFLICT(uid) DO UPDATE SET name=excluded.name, snap=excluded.snap, updated=excluded.updated`,
+		uid, name, string(snap), s.now().Unix())
+	return err
+}
+
+// ghosts: the most recent snapshots (not the caller's own), each with its owner's ranked
+// record so the client can derive a skill. Names, loadouts and numbers only — no uids.
+func (s *store) ghosts(limit int, except string) ([]ghostRow, error) {
+	rows, err := s.db.Query(`SELECT g.id, g.uid, g.name, g.snap, g.updated, COALESCE(p.wins,0), COALESCE(p.losses,0), COALESCE(p.battles,0)
+		FROM ghosts g LEFT JOIN players p ON p.uid=g.uid WHERE g.updated>? AND g.uid<>? ORDER BY g.updated DESC, g.id DESC LIMIT ?`,
+		s.now().Add(-ghostMaxAge).Unix(), except, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -248,14 +323,11 @@ func (s *store) ghosts(limit int) ([]ghostRow, error) {
 	out := []ghostRow{}
 	for rows.Next() {
 		var g ghostRow
-		var lo string
-		if err := rows.Scan(&g.Name, &lo, &g.Wins, &g.Battles); err != nil {
+		var uid, snap string
+		if err := rows.Scan(&g.ID, &uid, &g.Name, &snap, &g.Updated, &g.Wins, &g.Losses, &g.Battles); err != nil {
 			return nil, err
 		}
-		json.Unmarshal([]byte(lo), &g.Loadout)
-		if g.Loadout == nil {
-			g.Loadout = []int{0}
-		}
+		g.Snap = json.RawMessage(snap)
 		out = append(out, g)
 	}
 	return out, rows.Err()
