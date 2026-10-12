@@ -3,6 +3,10 @@
 
 const DAY = 86400000;
 
+/** Campaign fights cannot be verified by a server, so "any battle" events count at most
+ * `perDay` of them per UTC day, each at least `gapMs` after the last one counted. */
+export const CAMPAIGN_CAP = { perDay: 10, gapMs: 60000 };
+
 /**
  * kind      'vines' | 'reveal'
  * cadence   'daily' | 'weekly' | 'monthly' | 'seasonal' (from/to are UTC 'MM-DD', to exclusive)
@@ -11,11 +15,11 @@ const DAY = 86400000;
  */
 export const EVENT_DEFS = [
   { id: 'vines-day', kind: 'vines', cadence: 'daily', pass: false, anyBattle: true,
-    title: 'VINES & LADDERS', theme: 'ink', startRolls: 1 },
+    title: 'VINES & LADDERS', theme: 'ink' },
   { id: 'reveal-week', kind: 'reveal', cadence: 'weekly', pass: false, anyBattle: true,
     title: 'PICTURE REVEAL', cost: 1, guessBonus: 2 },
   { id: 'vines-month', kind: 'vines', cadence: 'monthly', pass: true, anyBattle: false,
-    title: 'SCROLLS & ROPES', theme: 'scrolls', startRolls: 1 },
+    title: 'SCROLLS & ROPES', theme: 'scrolls' },
   { id: 'reveal-month', kind: 'reveal', cadence: 'monthly', pass: true, anyBattle: false,
     title: 'MONTHLY PICTURE', cost: 2, guessBonus: 3 },
   { id: 'halloween', kind: 'reveal', cadence: 'seasonal', from: '10-24', to: '11-01', pass: true,

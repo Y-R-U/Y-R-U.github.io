@@ -2,7 +2,7 @@
 // rival selection, the reveal grid and the events save (dailies rule, merge).
 //
 //   node tools/eventsgate.mjs              run every check against js/events/
-//   node tools/eventsgate.mjs --falsify    break the engine 16 ways; each must turn its section red
+//   node tools/eventsgate.mjs --falsify    break the engine 22 ways; each must turn its section red
 //
 // EVENTS_DIR points the gate at another copy of js/events (the falsifier uses it).
 import { spawnSync } from 'node:child_process';
@@ -45,7 +45,13 @@ if (args.includes('--falsify')) {
     ['dice', 'hash.js', '0x01000193', '0x01000197'],
     ['board', 'vines.js', '|| Math.abs(col(a) - col(b)) > 3', ''],
     ['replay', 'vines.js', 'Math.min(rivalTurns, myTurns)', 'rivalTurns'],
-    ['replay', 'vines.js', 'turns >= banked', 'turns > banked'],
+    ['replay', 'vines.js', 'rolls >= rollsBanked(points)', 'rolls > rollsBanked(points)'],
+    ['replay', 'vines.js', "positionAtTurn(board, rival.uid, eventId, rival.points, t)", "positionAfterRolls(board, rival.uid, eventId, t)"],
+    ['replay', 'vines.js', "return ends.filter((e) => e <= last).length;", "return last;"],
+    ['points', 'points.js', '>= cap.perDay', '>= cap.perDay + 5'],
+    ['points', 'points.js', 'b.at - lastCamp < cap.gapMs', 'false'],
+    ['save', 'state.js', "if (battle.src === 'campaign' && !campaignAllowed(cur.b, battle, cap)) continue;", ''],
+    ['save', 'state.js', '].sort(order) };\n    if (', '] };\n    if ('],
     ['rivals', 'vines.js', '[...fr, ...rest]', '[...rest, ...fr]'],
     ['reveal', 'reveal.js', 'left(def, st, pts) < def.cost', 'left(def, st, pts) < 0'],
     ['reveal', 'reveal.js', '1 + Math.floor(st.open.length / 5)', '1 + st.open.length'],
@@ -106,6 +112,14 @@ const T = (iso) => Date.parse(iso);
   check('points', pts.pointsIn(arenaOnly, mwin, bs) === 9,
     `arena-only monthly ignores the campaign fight, got ${pts.pointsIn(arenaOnly, mwin, bs)}`);
   check('points', !pts.counts(def, win, bs[3]) && pts.counts(def, win, bs[0]), 'the window is [start, end)');
+  check('points', cal.CAMPAIGN_CAP.perDay === 10 && cal.CAMPAIGN_CAP.gapMs === 60000, 'campaign cap is 10 a UTC day, 60 s apart');
+  const camp = (i, at) => ({ id: `c${i}`, at, src: 'campaign', won: true, oppDmg: 1 });
+  const flood = Array.from({ length: 14 }, (_, i) => camp(i, win.start + i * 61e3));
+  check('points', pts.counted(def, win, flood).length === 10, `14 campaign wins a minute apart: 10 count, got ${pts.counted(def, win, flood).length}`);
+  const quick = [camp('q1', win.start), camp('q2', win.start + 30e3), camp('q3', win.start + 61e3)];
+  check('points', pts.counted(def, win, quick).map((b) => b.id).join() === 'cq1,cq3', 'a campaign fight under 60 s after the last counted one does not count');
+  const mixed = [{ id: 'z', at: win.start + 9e3, src: 'arena', won: false, oppDmg: 0 }, { id: 'y', at: win.start + 1e3, src: 'arena', won: true, oppDmg: 1 }];
+  check('points', pts.counted(def, win, mixed).map((b) => b.pts).join() === '3,1', 'counted battles come back in play order');
 }
 
 // ---------- windows (UTC, in every timezone) ----------
@@ -192,7 +206,7 @@ const T = (iso) => Date.parse(iso);
   check('board', l.to === 40 && l.link.kind === 'ladder', 'a ladder takes you up');
 }
 
-// ---------- THE REPLAY RULE (Aaron's example) ----------
+// ---------- THE REPLAY RULE (Aaron's example: a TURN is a BATTLE) ----------
 {
   const def = cal.defById('vines-day');
   const t0 = T('2026-10-13T09:00:00Z');
@@ -202,59 +216,84 @@ const T = (iso) => Date.parse(iso);
     { id: 'm2', at: t0 + 60e3, src: 'arena', won: true, oppDmg: 1 },
     { id: 'm3', at: t0 + 120e3, src: 'campaign', won: false, oppDmg: 0.8 },
   ];
-  check('replay', eq(battles.map(pts.pointsFor), [1, 3, 2]), 'the three battles are worth 1, 3, 2');
-  let banked = V.rollsBanked(def, pts.pointsIn(def, win, battles));
-  check('replay', banked === 7, `1 starting roll + 1 + 3 + 2 = 7 rolls banked, got ${banked}`);
-  let turns = 0;
-  for (let i = 0; i < 20; i++) { const r = V.takeTurn(board, 'me', EV, turns, banked); if (!r.move) break; turns = r.turns; }
-  check('replay', turns === 7, `I leave at turn 7, got ${turns}`);
-  check('replay', V.takeTurn(board, 'me', EV, 7, 7).move === null, 'no 8th turn without an 8th banked roll');
+  const mine = pts.counted(def, win, battles).map((b) => b.pts);
+  check('replay', eq(mine, [1, 3, 2]), `the three battles are worth 1, 3, 2 in play order, got ${mine}`);
+  check('replay', V.rollsBanked(mine) === 6, 'no free starting roll: 6 rolls banked');
+  check('replay', eq(V.turnEnds(mine), [1, 4, 6]), 'turn ends land after roll 1, roll 4 and roll 6');
 
-  const rivals = [{ uid: 'ann', turns: 2 }, { uid: 'bo', turns: 4 }, { uid: 'cy', turns: 3 }];
-  for (const r of rivals) {
-    const v = V.rivalView(board, EV, r, turns);
-    check('replay', v.shownTurns === r.turns && v.pos === V.positionAt(board, r.uid, EV, r.turns).pos,
-      `${r.uid} has only played ${r.turns}: shown at their own turn ${r.turns}`);
+  // Rivals whose own battle points differ from mine; each has rolled everything banked.
+  const rv = (uid, points) => ({ uid, points, rolls: V.rollsBanked(points) });
+  const ann = rv('ann', [3, 3]), bo = rv('bo', [2, 1, 3, 1]), cy = rv('cy', [1, 1, 2]);
+  let rolls = 0, ends = [];
+  const seenAt = [];
+  for (let i = 0; i < 10; i++) {
+    const r = V.takeRoll(board, 'me', EV, mine, rolls);
+    if (!r.move) break;
+    rolls = r.rolls;
+    if (r.turnEnded) ends.push(rolls);
+    const myTurns = V.turnsDone(board, 'me', EV, mine, rolls);
+    seenAt.push([ann, bo, cy].map((x) => V.rivalView(board, EV, x, myTurns).shownTurns).join(''));
   }
-  const later = [{ uid: 'ann', turns: 12 }, { uid: 'bo', turns: 30 }, { uid: 'cy', turns: 5 }];
+  check('replay', rolls === 6 && eq(ends, [1, 4, 6]), `turns end after rolls ${ends}, want 1,4,6`);
+  check('replay', eq(seenAt, ['111', '111', '111', '222', '222', '233']),
+    `rivals move only at my turn ends (ann/bo/cy shown turns per roll): ${seenAt}`);
+  check('replay', V.takeRoll(board, 'me', EV, mine, 6).move === null, 'no 7th roll without a 4th battle');
+  check('replay', V.rollsLeftInTurn(board, 'me', EV, mine, 2) === 2 && V.rollsLeftInTurn(board, 'me', EV, mine, 4) === 2 && V.rollsLeftInTurn(board, 'me', EV, mine, 6) === 0,
+    'rolls left: 2 after roll 2, the next batch (2) after roll 4, 0 once all are rolled');
+
+  // A rival's turn-k position is the end of THEIR k-th batch, with their own dice.
+  const v = V.rivalView(board, EV, bo, 3);
+  check('replay', v.shownTurns === 3 && v.pos === V.positionAfterRolls(board, 'bo', EV, 2 + 1 + 3).pos,
+    'bo at turn 3 = after his 2+1+3 rolls, not after 3 rolls');
+  const at3 = V.positionAfterRolls(board, 'bo', EV, 3).pos, at6 = V.positionAfterRolls(board, 'bo', EV, 6).pos;
+  check('replay', at3 !== at6, 'the example board must tell roll 3 from roll 6 for bo');
+
+  // Leave at turn 7 while others have at most 4; they play on; still shown at 7 until I play more.
+  const seven = [1, 3, 2, 1, 2, 3, 1];
+  const me7 = rv('me', seven);
+  const myT = V.turnsOf(board, EV, me7);
+  check('replay', myT === 7, `I leave at turn 7, got ${myT}`);
+  const early = [rv('ann', [3, 3, 1, 2]), rv('bo', [2, 1]), rv('cy', [1, 1, 2, 3])];
+  for (const r of early) {
+    const vv = V.rivalView(board, EV, r, myT);
+    check('replay', vv.shownTurns === r.points.length, `${r.uid} has only played ${r.points.length}: shown at their own last turn`);
+  }
+  const later = early.map((r) => rv(r.uid, [...r.points, 3, 1, 2, 2, 1, 3, 2, 1]));
   for (const r of later) {
-    const v = V.rivalView(board, EV, r, turns);
-    const want = Math.min(r.turns, 7);
-    check('replay', v.shownTurns === want && v.pos === V.positionAt(board, r.uid, EV, want).pos,
-      `after ${r.uid} plays to ${r.turns}, I (still at 7) see them at turn ${want}, got ${v.shownTurns}`);
+    const vv = V.rivalView(board, EV, r, myT);
+    const want = V.positionAtTurn(board, r.uid, EV, r.points, 7).pos;
+    check('replay', vv.shownTurns === 7 && vv.pos === want,
+      `${r.uid} played on to ${r.points.length} turns; I (still at 7) see them at their turn 7, got ${vv.shownTurns}`);
   }
-  const annAt12 = V.positionAt(board, 'ann', EV, 12).pos, annAt7 = V.positionAt(board, 'ann', EV, 7).pos;
-  check('replay', annAt12 !== annAt7, 'the example board must actually tell turn 7 from turn 12');
-  battles.push({ id: 'm4', at: t0 + 3600e3, src: 'arena', won: true, oppDmg: 1 });
-  banked = V.rollsBanked(def, pts.pointsIn(def, win, battles));
-  for (let k = 0; k < 3; k++) {
-    const r = V.takeTurn(board, 'me', EV, turns, banked);
-    turns = r.turns;
-    for (const rv of later) {
-      const v = V.rivalView(board, EV, rv, turns);
-      check('replay', v.shownTurns === Math.min(rv.turns, turns), `after my turn ${turns}, ${rv.uid} is shown at ${v.shownTurns}`);
-    }
-  }
-  check('replay', turns === 10, `three more turns from a win: 10, got ${turns}`);
-  const me = V.positionAt(board, 'me', EV, turns);
-  check('replay', me.pos >= 0 && me.pos <= 100, 'position stays on the board');
+  check('replay', later.some((r) => V.positionAtTurn(board, r.uid, EV, r.points, 7).pos !== V.positionAtTurn(board, r.uid, EV, r.points, 12).pos),
+    'the example must actually tell turn 7 from turn 12');
+  const me8 = { uid: 'me', points: [...seven, 3], rolls: 13 + 2 };
+  check('replay', V.turnsOf(board, EV, me8) === 7 && later.every((r) => V.rivalView(board, EV, r, 7).shownTurns === 7),
+    'two rolls into my 8th battle: nobody moves yet');
+  me8.rolls = 16;
+  const t8 = V.turnsOf(board, EV, me8);
+  check('replay', t8 === 8 && later.every((r) => V.rivalView(board, EV, r, t8).shownTurns === 8), 'my 8th turn ends: everyone moves to their turn 8');
 }
 
 // ---------- rivals ----------
 {
   const EV = 'vines-day:2026-10-13', board = V.makeBoard(EV);
-  const pool = Array.from({ length: 24 }, (_, i) => ({ uid: `r${String(i).padStart(2, '0')}`, turns: i % 4 === 3 ? 0 : 3 + (i * 7) % 20 }));
-  pool.push({ uid: 'me', turns: 9 });
+  const pool = Array.from({ length: 24 }, (_, i) => {
+    const points = i % 4 === 3 ? [] : Array.from({ length: 2 + (i * 7) % 9 }, (_, k) => 1 + ((i + k) % 3));
+    return { uid: `r${String(i).padStart(2, '0')}`, points, rolls: points.reduce((a, b) => a + b, 0) };
+  });
+  const me = { uid: 'me', points: [3, 1, 2, 3, 1], rolls: 10 };
+  pool.push(me);
   const friends = new Set(['r01', 'r10', 'r21', 'r03']);
-  const sel = V.selectRivals(board, EV, pool, { uid: 'me', turns: 9 }, { friends });
-  const mine = V.positionAt(board, 'me', EV, 9).pos;
+  const sel = V.selectRivals(board, EV, pool, me, { friends });
+  const mine = V.positionAfterRolls(board, 'me', EV, 10).pos;
   check('rivals', sel.length === 10, `10 rivals, got ${sel.length}`);
   check('rivals', sel.slice(0, 3).every((r) => r.friend) && !sel.slice(3).some((r) => r.friend),
     `friends first (r03 never played): ${sel.map((r) => r.uid)}`);
   check('rivals', !sel.some((r) => r.uid === 'me' || r.turns === 0), 'never yourself, never a player with no turns');
   const d = sel.slice(3).map((r) => Math.abs(r.pos - mine));
   check('rivals', d.every((x, i) => i === 0 || x >= d[i - 1]), `the rest sorted nearest first: ${d}`);
-  check('rivals', sel.every((r) => r.shownTurns <= 9), 'rival selection uses replay-rule positions');
+  check('rivals', sel.every((r) => r.shownTurns <= 5), 'rival selection uses replay-rule positions');
 }
 
 // ---------- reveal ----------
@@ -283,7 +322,7 @@ const T = (iso) => Date.parse(iso);
   check('reveal', g.right && g.st.solved && g.st.bonus === 20 * def.guessBonus, `bonus = 20 covered x ${def.guessBonus}, got ${g.st.bonus}`);
   check('reveal', R.guess(def, g.st, 'x', true).ok === false, 'no guessing once solved');
   const owed = R.rewardsOwed(def, g.st, pic);
-  check('reveal', eq(owed.map((r) => r.kind).sort(), ['arenaBackground', 'guessBonus']), 'a solved picture owes its bonus and its background');
+  check('reveal', eq(owed.map((r) => r.kind).sort(), ['arenaBackground', 'ink']), 'a solved picture owes its bonus and its background');
   check('reveal', R.rewardsOwed(def, { ...g.st, claimed: ['bonus', 'background'] }, pic).length === 0, 'claimed rewards are not owed again');
   let full = R.fresh();
   for (let c = 0; c < 25; c++) full = R.uncover(def, full, 25, c).st;
@@ -315,11 +354,22 @@ const T = (iso) => Date.parse(iso);
   const b = S.setEv(base, RW, { ...S.evState(base, RW), open: [10, 11, 12] });
   const m = S.merge(a, b);
   check('save', m.ev[RW].open.length === 3, `two devices spending the same 3 points: ${m.ev[RW].open.length} squares, want 3`);
-  const a2 = S.setEv(a, 'vines-day:2026-10-25', { ...S.evState(a, 'vines-day:2026-10-25'), turns: 4 });
-  const b2 = S.recordBattle(S.setEv(b, 'vines-day:2026-10-25', { ...S.evState(b, 'vines-day:2026-10-25'), turns: 2 }), { ...arena, id: 'arena:10' }, {});
+  const VD = 'vines-day:2026-10-25';
+  const a2 = S.setEv(a, VD, { ...S.evState(a, VD), rolls: 3 });
+  const early = { ...arena, id: 'arena:10', at: at - 3600e3 };
+  const b2 = S.recordBattle(S.setEv(b, VD, { ...S.evState(b, VD), rolls: 1 }), early, {});
   const m2 = S.merge(a2, b2);
-  check('save', m2.ev['vines-day:2026-10-25'].turns === 4 && S.pointsOf(S.evState(m2, 'vines-day:2026-10-25')) === 3 + 2,
-    'merge: max turns, battles unioned by id');
+  check('save', m2.ev[VD].rolls === 3 && eq(S.turnPoints(S.evState(m2, VD)), [2, 3]),
+    `merge: max rolls, battles unioned and put in play order, got ${S.turnPoints(S.evState(m2, VD))}`);
+  const tooMany = S.merge(S.setEv(a, VD, { ...S.evState(a, VD), rolls: 9 }), b);
+  check('save', tooMany.ev[VD].rolls === 3, 'merged rolls never exceed what the battles bank');
+  let c = S.fresh();
+  for (let i = 0; i < 13; i++) c = S.recordBattle(c, { id: `camp:${i}`, at: at + i * 61e3, src: 'campaign', won: false, oppDmg: 0 });
+  c = S.recordBattle(c, { id: 'camp:fast', at: at + 13 * 61e3 + 5e3, src: 'campaign', won: true, oppDmg: 1 });
+  check('save', S.evState(c, VD).b.length === 10, `the save banks 10 campaign fights a day, got ${S.evState(c, VD).b.length}`);
+  let g = S.recordBattle(S.fresh(), { id: 'camp:a', at, src: 'campaign', won: true, oppDmg: 1 });
+  g = S.recordBattle(g, { id: 'camp:b', at: at + 20e3, src: 'campaign', won: true, oppDmg: 1 });
+  check('save', S.evState(g, VD).b.length === 1, 'the save refuses a campaign fight 20 s after the last');
   check('save', S.merge({ seenDay: '2026-10-13', ev: {} }, { seenDay: '2026-10-14', ev: {} }).seenDay === '2026-10-14', 'merge keeps the later seenDay');
   const pr = S.prune(p, T('2026-11-05T00:00:00Z'));
   check('save', !pr.ev['vines-day:2026-10-25'] && pr.ev['vines-month:2026-10'], 'prune drops events ended over a week ago');

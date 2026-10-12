@@ -26,18 +26,23 @@ try {
     await sleep(120);
   };
   for (const s of ['[data-res=win]', '[data-res=loss]', '[data-res=close]']) await tap(s);
-  const banked = await cdp.eval('document.getElementById("rolls").textContent');
-  check(banked === '7', `1 + 3 + 1 + 2 = 7 rolls banked, saw ${banked}`);
-  for (let i = 0; i < 4; i++) { await tap('#roll'); await sleep(2600); }
-  const turn = await cdp.eval('document.getElementById("turn").textContent');
-  check(turn === '4', `four taps on ROLL = turn 4, saw ${turn}`);
+  const txt = (id) => cdp.eval(`document.getElementById(${JSON.stringify(id)}).textContent`);
+  check(await txt('rolls') === '3' && await txt('turn') === '1', 'a 3-point win opens turn 1 with 3 rolls');
+  const shownMax = async () => Math.max(...await cdp.eval('[...document.querySelectorAll("#rivals div")].map(d => +d.textContent.match(/turn (\\d+)\\//)[1])'));
+  for (let i = 0; i < 2; i++) { await tap('#roll'); await sleep(2600); }
+  check(await txt('turn') === '1' && await txt('rolls') === '1' && await shownMax() === 0, 'mid-turn: nobody else has moved');
+  await tap('#roll'); await sleep(2600);
+  check(await txt('turn') === '2' && await txt('rolls') === '1' && await shownMax() === 1, 'end of turn 1: rivals shown at turn 1, turn 2 has 1 roll');
+  await tap('#roll'); await sleep(2600);
+  const turn = await txt('turn'), left = await txt('rolls');
+  check(turn === '3' && left === '2' && await shownMax() === 2, `after the 1-point battle: on turn 3 with 2 rolls, others at turn 2, saw ${turn}/${left}`);
   await cdp.shot(join(out, 'ev_vines_turn4.png'));
   await tap('#others'); await tap('#others'); await sleep(300);
-  const shown = await cdp.eval('[...document.querySelectorAll("#rivals div")].map(d => +d.textContent.match(/t(\\d+)\\//)[1])');
-  check(shown.length === 10 && shown.every((t) => t <= 4), `rivals shown no further than turn 4: ${shown}`);
+  const shown = await cdp.eval('[...document.querySelectorAll("#rivals div")].map(d => +d.textContent.match(/turn (\\d+)\\//)[1])');
+  check(shown.length === 10 && shown.every((t) => t <= 2), `rivals shown no further than turn 2: ${shown}`);
   await cdp.shot(join(out, 'ev_vines_others.png'));
   await tap('[data-tab=reveal]');
-  const cells = [0, 12, 9, 16, 23, 2, 20];
+  const cells = [0, 12, 9, 16, 23, 2, 20];  // 6 points banked
   const pr = await cdp.eval('window.__ev.picRect()');
   for (const c of cells) {
     const x = pr.x + (c % 5 + 0.5) * pr.w / 5, y = pr.y + (Math.floor(c / 5) + 0.5) * pr.h / 5;

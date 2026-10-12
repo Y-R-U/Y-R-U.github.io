@@ -61,8 +61,8 @@
   </div>
   <div id="note"></div>
   <section id="vinesP">
-    <div class="row"><span class="stat">rolls <b id="rolls">0</b></span><span class="stat">turn <b id="turn">0</b></span>
-      <button class="btn big" id="roll">ROLL</button></div>
+    <div class="row"><span class="stat">turn <b id="turn">0</b> · rolls left in this turn <b id="rolls">0</b></span>
+      <button class="btn big" id="roll">ROLL</button><span class="small" id="more"></span></div>
     <div class="row small"><button class="btn small" id="others">OTHERS PLAY MORE</button>
       <button class="btn small" id="reset">RESET</button><span id="shown"></span></div>
     <div id="rivals"></div>
@@ -86,7 +86,7 @@ import * as V from '../js/events/vines.js';
 import * as R from '../js/events/reveal.js';
 import * as S from '../js/events/state.js';
 
-const KEY = 'ragdojo.eventsPreview.v1';
+const KEY = 'ragdojo.eventsPreview.v2';
 const UID = 'preview-me';
 const q = new URLSearchParams(location.search);
 const NOW = q.get('now') ? Date.parse(q.get('now')) : Date.now();
@@ -101,14 +101,17 @@ const PEEK = q.get('peek') === '1';
 const NAMES = ['INKY', 'NIB', 'SMUDGE', 'BIRO', 'DOODLE', 'ERASER', 'SCRAWL', 'QUILL', 'GRAPHITE', 'MARGIN',
   'STAPLE', 'CRAYON', 'TIPPEX', 'RULER'];
 const FRIENDS = new Set(['f-NIB', 'f-QUILL', 'f-STAPLE']);
-const freshRivals = () => NAMES.map((n, i) => ({ uid: 'f-' + n, name: n, turns: 1 + Math.floor(rnd(i * 31 + 5) * 6) }));
+const fakeBattles = (n, seed) => Array.from({ length: n }, (_, k) => 1 + Math.floor(rnd(seed + k * 13) * 3));
+const asPlayer = (uid, name, points) => ({ uid, name, points, rolls: points.reduce((a, b) => a + b, 0) });
+const freshRivals = () => NAMES.map((n, i) => asPlayer('f-' + n, n, fakeBattles(1 + Math.floor(rnd(i * 31 + 5) * 6), i * 7)));
 
 let saved = null;
 try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch {}
 let st = S.load(saved?.st);
 let rivals = saved?.rivals || freshRivals();
+let clock = saved?.clock || NOW;
 let tab = 'vines', src = 'arena', note = '';
-const persist = () => { try { localStorage.setItem(KEY, JSON.stringify({ st, rivals })); } catch {} };
+const persist = () => { try { localStorage.setItem(KEY, JSON.stringify({ st, rivals, clock })); } catch {} };
 
 const $ = (id) => document.getElementById(id);
 const cv = $('c'), g = cv.getContext('2d');
@@ -192,9 +195,10 @@ let anim = [];                      // queued segments for the walker
 let rivalAnim = [];                 // concurrent rival hops after my turn
 let walkerPos = null, walkT = 0, lastDie = null, dieSpin = 0;
 
-const myTurns = () => S.evState(st, VEV).turns;
+const meP = () => { const e = S.evState(st, VEV); return { uid: UID, points: S.turnPoints(e), rolls: e.rolls }; };
+const myTurns = () => V.turnsOf(board, VEV, meP());
 const myPts = (id) => S.pointsOf(S.evState(st, id));
-const myPos = () => V.positionAt(board, UID, VEV, myTurns()).pos;
+const myPos = () => V.positionAfterRolls(board, UID, VEV, meP().rolls).pos;
 
 function queueMove(m) {
   let prev = m.from;
@@ -206,27 +210,25 @@ function queueMove(m) {
 
 function roll() {
   if (anim.length) return;
-  const turns = myTurns(), banked = V.rollsBanked(vdef, myPts(VEV));
-  const before = V.selectRivals(board, VEV, rivals, { uid: UID, turns }, { friends: FRIENDS });
-  const r = V.takeTurn(board, UID, VEV, turns, banked);
+  const me = meP(), turns = myTurns();
+  const r = V.takeRoll(board, UID, VEV, me.points, me.rolls);
   if (!r.move) { say(myPos() === 100 ? 'you are home — square 100!' : 'no rolls banked — fight a battle'); return; }
-  st = S.setEv(st, VEV, { ...S.evState(st, VEV), turns: r.turns });
+  st = S.setEv(st, VEV, { ...S.evState(st, VEV), rolls: r.rolls });
   lastDie = r.move.roll; dieSpin = 0.45;
   queueMove(r.move);
-  rivalAnim = [];
-  for (const rv of before) {
-    if (rv.turns > turns) {
-      const from = V.positionAt(board, rv.uid, VEV, turns).pos;
-      const m = V.move(board, from, die(rv.uid, VEV, turns));
-      rivalAnim.push({ uid: rv.uid, a: centre(from), b: centre(m.to), t: -anim.reduce((s, x) => s + x.dur, 0) - 0.1 });
-    }
+  if (r.turnEnded) {
+    const wait = -anim.reduce((t, x) => t + x.dur, 0) - 0.1;
+    rivalAnim = V.selectRivals(board, VEV, rivals, meP(), { friends: FRIENDS })
+      .filter((rv) => rv.shownTurns > turns)
+      .map((rv) => ({ uid: rv.uid, a: centre(V.positionAtTurn(board, rv.uid, VEV, rv.points, turns).pos), b: centre(rv.pos), t: wait }));
   }
-  say(`rolled a ${r.move.roll}${r.move.link ? (r.move.link.kind === 'ladder' ? ' — up a ladder!' : ' — down a vine') : ''}${r.move.bounced ? ' (bounced off 100)' : ''}`);
+  say(`rolled a ${r.move.roll}${r.move.link ? (r.move.link.kind === 'ladder' ? ' — up a ladder!' : ' — down a vine') : ''}${r.move.bounced ? ' (bounced off 100)' : ''}${r.turnEnded ? ' · turn over, everyone moves' : ''}`);
   persist(); refresh();
 }
 
 function battle(res) {
-  const b = { id: `preview:${Date.now()}:${Math.random()}`, at: NOW, src, won: res === 'win', oppDmg: res === 'close' ? 0.7 : res === 'win' ? 1 : 0.3 };
+  clock += 61e3;
+  const b = { id: `preview:${clock}`, at: clock, src, won: res === 'win', oppDmg: res === 'close' ? 0.7 : res === 'win' ? 1 : 0.3 };
   st = S.recordBattle(st, b, { pass: false });
   say(`${res === 'win' ? 'WIN' : 'loss'} banked in ${Object.keys(st.ev).filter((k) => st.ev[k].b.some((x) => x[0] === b.id)).length} event(s)`);
   persist(); refresh();
@@ -245,13 +247,16 @@ function refresh() {
   $('revealP').classList.toggle('hide', tab !== 'reveal');
   document.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
   $('src').textContent = src === 'arena' ? 'ARENA' : 'CAMPAIGN';
-  const turns = myTurns(), banked = V.rollsBanked(vdef, myPts(VEV));
-  $('rolls').textContent = Math.max(0, banked - turns);
-  $('turn').textContent = turns;
-  $('roll').disabled = banked <= turns || myPos() === 100;
+  const me = meP(), turns = myTurns();
+  const rleft = V.rollsLeftInTurn(board, UID, VEV, me.points, me.rolls);
+  const waiting = Math.max(0, V.rollsBanked(me.points) - me.rolls - rleft);
+  $('rolls').textContent = rleft;
+  $('more').textContent = waiting ? `(+${waiting} banked for later turns)` : '';
+  $('turn').textContent = turns + (rleft ? 1 : 0);
+  $('roll').disabled = !rleft;
   $('shown').textContent = `others shown up to turn ${turns}`;
-  const sel = V.selectRivals(board, VEV, rivals, { uid: UID, turns }, { friends: FRIENDS });
-  $('rivals').innerHTML = sel.map((r) => `<div class="${r.friend ? 'f' : ''}">${r.friend ? '★ ' : ''}${r.name} <span class="sq">sq ${r.pos} · t${r.shownTurns}/${r.turns}</span></div>`).join('');
+  const sel = V.selectRivals(board, VEV, rivals, me, { friends: FRIENDS });
+  $('rivals').innerHTML = sel.map((r) => `<div class="${r.friend ? 'f' : ''}">${r.friend ? '★ ' : ''}${r.name} <span class="sq">sq ${r.pos} · turn ${r.shownTurns}/${r.turns}</span></div>`).join('');
   const rs = S.evState(st, REV), pts = myPts(REV);
   $('pleft').textContent = R.left(rdef, rs, pts);
   $('cost').textContent = `${rdef.cost} point a square · ${rs.open.length}/25 open`;
@@ -320,8 +325,7 @@ function frame(now) {
   drawDesk(g, W, H, sheet); g.drawImage(sheet, 0, 0);
   if (tab === 'vines') {
     g.drawImage(boardImg, 0, 0, W, H);
-    const turns = myTurns();
-    const sel = V.selectRivals(board, VEV, rivals, { uid: UID, turns }, { friends: FRIENDS });
+    const sel = V.selectRivals(board, VEV, rivals, meP(), { friends: FRIENDS });
     const ra = new Map(rivalAnim.map((r) => [r.uid, r]));
     sel.forEach((r, i) => {
       let [x, y] = centre(r.pos);
@@ -369,11 +373,11 @@ document.querySelectorAll('[data-res]').forEach((b) => b.onclick = () => battle(
 $('src').onclick = () => { src = src === 'arena' ? 'campaign' : 'arena'; refresh(); };
 $('roll').onclick = roll;
 $('others').onclick = () => {
-  rivals = rivals.map((r, i) => ({ ...r, turns: r.turns + 2 + (i % 4) }));
+  rivals = rivals.map((r, i) => asPlayer(r.uid, r.name, [...r.points, ...fakeBattles(2 + (i % 4), r.points.length * 17 + i)]));
   say(`others played on — still shown no further than your turn ${myTurns()}`);
   persist(); refresh();
 };
-$('reset').onclick = () => { st = S.fresh(); rivals = freshRivals(); anim = []; lastDie = null; say('reset'); persist(); refresh(); };
+$('reset').onclick = () => { st = S.fresh(); clock = NOW; rivals = freshRivals(); anim = []; lastDie = null; say('reset'); persist(); refresh(); };
 $('choices').onclick = (e) => {
   const b = e.target.closest('[data-choice]'); if (!b) return;
   const c = CHOICES[+b.dataset.choice];

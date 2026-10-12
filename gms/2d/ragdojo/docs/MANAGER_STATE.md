@@ -17,3 +17,10 @@ manager's scratchpad (`ragdojo-online/B/images/contact.html`), NOT in the repo, 
 Not done: in-game wiring (phase 3/4, main.js/ui.js belong to A), server endpoints, image review page.
 Open for Aaron: what `oppDmg` means for LMS / best-of-3; campaign-fight cap per day for any-battle events;
 the guess bonus currency (engine returns `guessBonus` points; game decides ink).
+
+### B rework (2026-10-13, manager's correction)
+A Vines & Ladders turn is now a BATTLE (a batch of rolls = its points), not one roll; no starting roll.
+The save stores ordered battle points + a roll count; dice are indexed by roll. Rivals move only when you
+finish a turn, to the end of THEIR k-th batch. Campaign cap 10/UTC day, 60 s apart; guess bonus = ink.
+Gate 136 checks, `--falsify` 22/22 red; eventsshot asserts nobody moves mid-turn (and goes red with the
+rule removed). Dojo images regenerated with a blank scroll.

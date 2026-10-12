@@ -48,45 +48,86 @@ export function move(board, pos, roll) {
   return { from: pos, roll, path, bounced, link, to: to ?? p };
 }
 
-/** Where `uid` stands after `turns` turns. Turns after reaching 100 are not taken. */
-export function positionAt(board, uid, eventId, turns) {
+/** Where `uid` stands after `rolls` rolls. Rolls after reaching 100 are not taken. */
+export function positionAfterRolls(board, uid, eventId, rolls) {
   let pos = 0, finishedAt = null;
-  for (let t = 0; t < turns && pos !== SQUARES; t++) {
-    pos = move(board, pos, die(uid, eventId, t)).to;
-    if (pos === SQUARES) finishedAt = t + 1;
+  for (let n = 0; n < rolls && pos !== SQUARES; n++) {
+    pos = move(board, pos, die(uid, eventId, n)).to;
+    if (pos === SQUARES) finishedAt = n + 1;
   }
   return { pos, finishedAt };
 }
 
-/** Rolls banked so far: the event's starting roll plus one per point earned in its window. */
-export const rollsBanked = (def, pts) => (def.startRolls ?? 0) + pts;
+/**
+ * A TURN IS A BATTLE. Each battle banks a batch of rolls equal to its points, in the order the
+ * battles were played; a turn is consuming one battle's batch. `points` is that ordered list.
+ * Turn k ends after roll ends[k-1]: battles worth 1, 3, 2 end their turns after rolls 1, 4, 6.
+ */
+export function turnEnds(points) {
+  let n = 0;
+  return points.map((p) => (n += p));
+}
+export const rollsBanked = (points) => points.reduce((a, b) => a + b, 0);
 
-/** Take the next turn if one is banked. Pure: returns the new turn count and the move made. */
-export function takeTurn(board, uid, eventId, turns, banked) {
-  const now = positionAt(board, uid, eventId, turns);
-  if (turns >= banked || now.pos === SQUARES) return { turns, move: null };
-  return { turns: turns + 1, move: move(board, now.pos, die(uid, eventId, turns)) };
+/** Turns finished after `rolls` rolls (reaching 100 finishes the turn it happens in). */
+export function turnsDone(board, uid, eventId, points, rolls) {
+  const ends = turnEnds(points);
+  const fin = positionAfterRolls(board, uid, eventId, rolls).finishedAt;
+  const last = fin === null ? rolls : Math.max(rolls, ends.find((e) => e >= fin) ?? rolls);
+  return ends.filter((e) => e <= last).length;
+}
+
+/** Rolls still to take in the current turn (0 between turns or once home). */
+export function rollsLeftInTurn(board, uid, eventId, points, rolls) {
+  const k = turnsDone(board, uid, eventId, points, rolls);
+  if (k >= points.length || positionAfterRolls(board, uid, eventId, rolls).pos === SQUARES) return 0;
+  return turnEnds(points)[k] - rolls;
+}
+
+/** Where a player stood at the end of their turn k. */
+export function positionAtTurn(board, uid, eventId, points, k) {
+  return positionAfterRolls(board, uid, eventId, k > 0 ? turnEnds(points)[Math.min(k, points.length) - 1] : 0);
 }
 
 /**
- * THE REPLAY RULE. Other players are shown only as far as your own turn count: when you have
- * taken N turns, a rival who has taken M is drawn where they stood after min(M, N). Leave at
- * turn 7 and come back after they have played 30 — they are still drawn at their turn 7 until
- * you take turn 8.
+ * Take one roll. Pure: returns the new roll count, the move, and whether it ended a turn —
+ * the only moment anyone else on the board may move.
+ */
+export function takeRoll(board, uid, eventId, points, rolls) {
+  const now = positionAfterRolls(board, uid, eventId, rolls);
+  if (rolls >= rollsBanked(points) || now.pos === SQUARES) return { rolls, move: null, turnEnded: false };
+  const m = move(board, now.pos, die(uid, eventId, rolls));
+  const before = turnsDone(board, uid, eventId, points, rolls);
+  const after = turnsDone(board, uid, eventId, points, rolls + 1);
+  return { rolls: rolls + 1, move: m, turnEnded: after > before, turns: after };
+}
+
+/**
+ * THE REPLAY RULE. Other players are shown only as far as your own TURN count (battles whose
+ * rolls you have finished): when you have finished N turns, a rival who has finished M is drawn
+ * where they stood at the end of their turn min(M, N) — their own batch sizes, their own dice.
+ * Nobody moves mid-turn. Leave at turn 7 and come back after they have played 30 battles —
+ * they are still drawn at their turn 7 until you finish turn 8.
  */
 export const shownTurns = (rivalTurns, myTurns) => Math.min(rivalTurns, myTurns);
 
+/** `p` = { uid, points: [ordered battle points], rolls } — a player as the server stores them. */
+export const turnsOf = (board, eventId, p) => turnsDone(board, p.uid, eventId, p.points, p.rolls);
+
 export function rivalView(board, eventId, rival, myTurns) {
-  const t = shownTurns(rival.turns, myTurns);
-  return { ...rival, shownTurns: t, ...positionAt(board, rival.uid, eventId, t) };
+  const turns = turnsOf(board, eventId, rival);
+  const t = shownTurns(turns, myTurns);
+  return { ...rival, turns, shownTurns: t, ...positionAtTurn(board, rival.uid, eventId, rival.points, t) };
 }
 
 /** ~10 rivals: friends first (nearest first), then everyone else nearest on the board. */
 export function selectRivals(board, eventId, rivals, me, { friends = new Set(), max = 10 } = {}) {
-  const mine = positionAt(board, me.uid, eventId, me.turns).pos;
+  const myTurns = turnsOf(board, eventId, me);
+  const mine = positionAfterRolls(board, me.uid, eventId, me.rolls).pos;
   const seen = rivals
-    .filter((r) => r.uid !== me.uid && r.turns > 0)
-    .map((r) => rivalView(board, eventId, r, me.turns));
+    .filter((r) => r.uid !== me.uid)
+    .map((r) => rivalView(board, eventId, r, myTurns))
+    .filter((r) => r.turns > 0);
   const near = (a, b) => Math.abs(a.pos - mine) - Math.abs(b.pos - mine) || (a.uid < b.uid ? -1 : a.uid > b.uid ? 1 : 0);
   const fr = seen.filter((r) => friends.has(r.uid)).sort(near).map((r) => ({ ...r, friend: true }));
   const rest = seen.filter((r) => !friends.has(r.uid)).sort(near);

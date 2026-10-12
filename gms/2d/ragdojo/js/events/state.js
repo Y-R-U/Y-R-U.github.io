@@ -2,10 +2,13 @@
 // strings and "already today" is `last >= today`. Only FINISHED battles are ever recorded —
 // an in-progress match never enters this state, so it never syncs.
 //
-//   { v: 1, seenDay: 'YYYY-MM-DD', ev: { [eventId]: { b: [[battleId, pts, src]], turns?, open?, ... } } }
+//   { v: 1, seenDay: 'YYYY-MM-DD', ev: { [eventId]: { b: [[battleId, pts, src, at]], rolls?, open?, ... } } }
+//
+// `b` is kept in play order (at, then id): for Vines & Ladders it IS the list of turns.
 
 import { activeEvents, parseEventId, utcDay } from './calendar.js';
 import { pointsFor, counts } from './points.js';
+import { CAMPAIGN_CAP } from './calendar.js';
 import { fresh as freshReveal, CELLS } from './reveal.js';
 
 const KEEP_ENDED = 7 * 86400000;
@@ -19,25 +22,36 @@ export function load(raw) {
 
 export function evState(state, eventId) {
   const parsed = parseEventId(eventId);
-  const base = parsed?.def.kind === 'reveal' ? freshReveal() : { turns: 0 };
+  const base = parsed?.def.kind === 'reveal' ? freshReveal() : { rolls: 0 };
   return { b: [], ...base, ...(state.ev[eventId] || {}) };
 }
 
 export const pointsOf = (ev) => ev.b.reduce((s, x) => s + x[1], 0);
+/** The ordered per-battle points — a Vines & Ladders player's turns. */
+export const turnPoints = (ev) => ev.b.map((x) => x[1]);
+const order = (a, b) => a[3] - b[3] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
+const utc = (ms) => new Date(ms).toISOString().slice(0, 10);
+
+function campaignAllowed(list, battle, cap) {
+  const camp = list.filter((x) => x[2] === 'campaign');
+  if (camp.filter((x) => utc(x[3]) === utc(battle.at)).length >= cap.perDay) return false;
+  return camp.every((x) => Math.abs(battle.at - x[3]) >= cap.gapMs);
+}
 
 /** `last >= today`, never `===`: a save from a device whose clock runs ahead is still "today". */
 export const seenToday = (state, day) => state.seenDay >= day;
 export const markSeen = (state, day) => (seenToday(state, day) ? state : { ...state, seenDay: day });
 
 /** Bank one finished battle into every running event it counts for. */
-export function recordBattle(state, battle, { pass = false } = {}) {
+export function recordBattle(state, battle, { pass = false, cap = CAMPAIGN_CAP } = {}) {
   const ev = { ...state.ev };
   const pts = pointsFor(battle);
   for (const a of activeEvents(battle.at, { pass })) {
     if (a.locked || !counts(a.def, a.win, battle)) continue;
     const cur = evState(state, a.id);
     if (cur.b.some((x) => x[0] === battle.id)) continue;
-    ev[a.id] = { ...cur, b: [...cur.b, [battle.id, pts, battle.src]] };
+    if (battle.src === 'campaign' && !campaignAllowed(cur.b, battle, cap)) continue;
+    ev[a.id] = { ...cur, b: [...cur.b, [battle.id, pts, battle.src, battle.at]].sort(order) };
   }
   return { ...state, ev };
 }
@@ -55,7 +69,8 @@ export function prune(state, now) {
 }
 
 /**
- * Two devices' saves -> one. Battles union by id, turns take the max, reveal squares union and
+ * Two devices' saves -> one. Battles union by id in play order, rolls take the max (never past
+ * what the merged battles bank — dice depend on the roll index only), reveal squares union and
  * are then clamped to what the merged points can pay for, so two devices spending the same
  * points offline cannot add up to more squares than were earned.
  */
@@ -65,8 +80,8 @@ export function merge(a, b) {
   for (const id of new Set([...Object.keys(a.ev), ...Object.keys(b.ev)])) {
     const x = evState(a, id), y = evState(b, id);
     const ids = new Set(x.b.map((r) => r[0]));
-    const m = { ...x, b: [...x.b, ...y.b.filter((r) => !ids.has(r[0]))] };
-    if ('turns' in x || 'turns' in y) m.turns = Math.max(x.turns | 0, y.turns | 0);
+    const m = { ...x, b: [...x.b, ...y.b.filter((r) => !ids.has(r[0]))].sort(order) };
+    if ('rolls' in x || 'rolls' in y) m.rolls = Math.min(pointsOf(m), Math.max(x.rolls | 0, y.rolls | 0));
     if (Array.isArray(x.open)) {
       const def = parseEventId(id)?.def;
       const cap = def ? Math.min(CELLS, Math.floor(pointsOf(m) / def.cost)) : CELLS;

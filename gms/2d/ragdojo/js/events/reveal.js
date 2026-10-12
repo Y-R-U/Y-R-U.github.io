@@ -1,5 +1,5 @@
 // Picture reveal: a 5×5 grid of paper squares over an image. Points uncover squares the
-// player chooses; guessing the picture from a short list early pays a bonus per square
+// player chooses; guessing the picture from a short list early pays ink per square
 // still covered; a revealed picture unlocks as an arena background.
 
 import { hash32, mulberry32 } from './hash.js';
@@ -39,7 +39,7 @@ export const guessesLeft = (st) => (st.solved ? 0 : 1 + Math.floor(st.open.lengt
 /** Rewards owed by a state and not yet claimed. Claim by adding their `id` to `claimed`. */
 export function rewardsOwed(def, st, pic) {
   const out = [];
-  if (st.solved && st.bonus > 0) out.push({ id: 'bonus', kind: 'guessBonus', amount: st.bonus });
+  if (st.solved && st.bonus > 0) out.push({ id: 'bonus', kind: 'ink', amount: st.bonus });
   if (complete(st)) out.push({ id: 'background', kind: 'arenaBackground', picture: pic });
   return out.filter((r) => !st.claimed.includes(r.id));
 }

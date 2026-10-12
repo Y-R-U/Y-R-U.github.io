@@ -424,15 +424,22 @@ date, `?peek=1` shows the whole picture, `?img=<url>&pic=<id>` swaps in real art
 
 ```
 node tools/eventsgate.mjs            # points, UTC windows in 5 timezones, dice + board golden vectors,
-                                     # THE REPLAY RULE (Aaron's 1,3,2 -> turn 7 example), rivals, reveal, save
-node tools/eventsgate.mjs --falsify  # 16 mutants of js/events, each must turn its own section red
-node tools/eventsshot.mjs [dir]      # the preview in Chrome: real touches, banked rolls, replay cap, 0 errors
+                                     # THE REPLAY RULE (Aaron's 1,3,2 example; a turn is a battle), rivals, reveal, save
+node tools/eventsgate.mjs --falsify  # 22 mutants of js/events, each must turn its own section red
+node tools/eventsshot.mjs [dir]      # the preview in Chrome: real touches, rivals move only at turn ends, 0 errors
 ```
 
-- **A position is never stored.** It is `positionAt(board(eventId), uid, eventId, turns)`; the save
-  holds only `turns`, so a server can recompute any player from one integer and their battles.
-- **The replay rule is one `Math.min`** (`shownTurns`). Everything that draws or ranks rivals
-  must go through `rivalView`/`selectRivals`, never through a rival's raw `turns`.
+- **A turn is a BATTLE, not a roll.** Each battle banks a batch of rolls equal to its points;
+  a turn is consuming one batch. The first build read "turn" as one roll and needed an invented
+  free starting roll to make Aaron's example add up — that was the tell. Dice are indexed by
+  ROLL, so re-ordering battles moves turn boundaries without changing any roll.
+- **A position is never stored.** The save holds the ordered battle points (`ev.b`, play order)
+  and a roll count; position and turns are recomputed, so a server can verify a player from
+  their battles and one integer.
+- **The replay rule is one `Math.min` over turns** (`shownTurns`), and a rival's turn k is the
+  end of THEIR k-th batch (`positionAtTurn`). Everything that draws or ranks rivals must go
+  through `rivalView`/`selectRivals`, never through a rival's raw rolls.
+- Campaign fights count at most 10 per UTC day, 60 s apart (`CAMPAIGN_CAP`); the guess bonus is ink.
 - **Week keys are ISO weeks** — 2027-01-01 is `2026-W53`. Use `windowOf`/`parseEventId`, never
   build keys by hand. The gate runs the windows under five TZs because a `getDate()` slip passes
   in UTC.
