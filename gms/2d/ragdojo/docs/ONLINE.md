@@ -101,3 +101,10 @@ Aaron's go-ahead (2026-10-13): build the full list in order until usage runs out
 waiting for it.
 
 Nothing in this plan deploys to the br8t box without Aaron approving the named steps.
+
+## Home network play (Aaron, 2026-10-13)
+
+Served from a `192.*` address (the family setup, like the purchase skip), the arena is fully
+playable with no internet services: it uses an arena server running on that LAN machine,
+peers connect directly on LAN candidates (no TURN), no sign-in, no daily limit, and stats stay
+in the local server's own database. A start script launches site + arena server on the LAN.
