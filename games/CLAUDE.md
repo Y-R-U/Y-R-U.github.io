@@ -73,6 +73,9 @@ to ask — an earlier design needed every menu to call `checkpoint()`, one game
 did not, and Aaron played a long session without ever seeing a nudge.
 `checkpoint()` still exists and only skips the wait.
 
+A game with busy top-right furniture can pass `pesterHoldMs` (3–14 s, default 14) to
+`mountAccount`/`syncLocalKeys` for a shorter pill; RAGDOJO uses 5000.
+
 Make `canPester` false for anything the player is actively playing, and true for
 menus and results screens. Sudoku is the deliberate exception: it has neither, so
 its rule is only "not while the digit popup is open".

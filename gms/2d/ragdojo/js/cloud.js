@@ -32,7 +32,7 @@ export function connectCloud({ canPester, adopt, status, conflict }) {
   keepMeta();
   onSave(save => { current = { revision: crypto.randomUUID(), owner: current.owner, save: structuredClone(save) }; keepMeta(); sync.changed(); });
   // The shared avatar owns sign-in only; SaveSync owns all Ragdojo save decisions.
-  mountAccount({ nudge: 'callout', canPester });
+  mountAccount({ nudge: 'callout', canPester, pesterHoldMs: 5000 });
   auth.onChange(u => {
     const uid = u && !u.anon ? u.uid : null;
     if (uid !== sync.uid) void sync.connect(uid);
