@@ -610,6 +610,27 @@ the gate starts practice through `arena.practise()` instead. A "per act" predict
 the strike buffer (a buffered swing lands in the NEXT act's window); compare the two sides' attack
 SEQUENCES (LCS) instead. Practice used `match.net` and so never paused: online-ness is `net.client`.
 
+## R4 review fixes (F4, 2026-10-13; local only, NOT deployed)
+
+Rules in docs/ONLINE.md "Server rules added". Tests: the R4 section of `server/abuse_test.go`, netfixgate
+`demote`/`stallnote`/`poll`, arenafix `roomhide` (comes back as a guest) and `stall` (socket alive = void;
+JS paused via CDP `Debugger.pause` = the master's forfeit).
+- **A stall report is a claim, not evidence.** The server times it on its own clock and only blames a 1v1
+  master it saw go quiet itself (`masterSilent`: away, or no pong for `pingEvery + pongDue`). It tells the
+  guest which (`{t:'stall', silent}`) so the HUD never promises a forfeit the server will not give.
+- **The fix for a forgeable rule is to stop trusting it, not to flag it.** The dispute share was diluted by
+  the cheater's own honest losses; `flagged()` is an absolute count now.
+- **A demoted master must stop recording.** `record()` wraps fx/sfx/say for broadcast; a master that becomes
+  a guest (`migrate` with `was`) calls `unrecord()` or its replayed fx pile up in `rec` for ever.
+- A suspended (hidden) room master steps nothing until its resumed socket's `go`: a stale Match running
+  on for a few frames could report a verdict nobody else saw.
+- **The menu demo's restart timer could replace a running online match** (main.js `onEnd` -> `setTimeout(startDemo,
+  700)` checked `mode` only when it was set). A room master whose demo ended just before `go` drew a campaign
+  sheet and stopped stepping; the room stalled. It re-checks `mode` when it fires. Found as a ~1 in 5 arenafix
+  `roomhide` flake: look at `window.__ragdojo.match === window.__net.match` before blaming the network.
+- `eventsecretgate` reads the answers from Aaron's data and prints only pass/fail; its history check uses
+  `git log --all -i -S` and excludes `assets/events/manifest.json` (the choices are public by design).
+
 ## Music
 
 Fourteen Suno v5.5 instrumental tracks in `assets/audio/`, wired through `js/music.js`.

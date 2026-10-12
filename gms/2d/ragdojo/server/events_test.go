@@ -459,11 +459,11 @@ func TestEventsRevealAndGuess(t *testing.T) {
 		t.Fatalf("repeat guess: %d", code)
 	}
 	// Aaron approves art: now the server holds a different answer, and a placeholder guess is refused.
-	os.WriteFile(evAnswers.path, []byte(`{"answers":{"`+rw+`":"A PAPER NINJA"}}`), 0o600)
+	os.WriteFile(evAnswers.path, []byte(`{"answers":{"`+rw+`":"A TEAPOT WALTZ"}}`), 0o600)
 	if code, _ := guess("heroic", placeholderAnswer); code != 409 {
 		t.Fatalf("placeholder guess after art approved: %d", code)
 	}
-	code, g = guess("art", "a paper ninja")
+	code, g = guess("art", "a teapot waltz")
 	if code != 200 || g["right"] != true || g["solved"] != true || g["bonus"].(float64) != float64((25-6)*2) {
 		t.Fatalf("right guess: %d %v", code, g)
 	}
@@ -471,7 +471,7 @@ func TestEventsRevealAndGuess(t *testing.T) {
 		t.Fatalf("guess after solving: %d", code)
 	}
 	raw, _ := json.Marshal(out)
-	if strings.Contains(string(raw), "NINJA") {
+	if strings.Contains(string(raw), "TEAPOT") {
 		t.Fatal("the answer leaked into a sync reply")
 	}
 	// The month picture costs 2 a square: 5 arena points (with the Pass) open 2. The close loss

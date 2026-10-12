@@ -127,18 +127,21 @@ Wire additions (client → server unless noted):
 
 | message | meaning |
 |---|---|
-| `{t:"stall", match, ms}` | a guest has had no master snapshot for `ms` (sent after 3 s, every 2 s while it lasts; `ms:0` = recovered). Counted when ms ≥ 2000, fresh for 3 s. A strict majority of the other seats in play = the master is away NOW: a room eliminates it (`out` why `stall`) and hands over; a 1v1 starts its away grace. |
+| `{t:"stall", match, ms}` | a guest has had no master snapshot for `ms` (sent after 3 s, every 2 s while it lasts; `ms:0` = recovered). Counted when ms ≥ 2000, fresh for 3 s; how long it lasts is timed by the SERVER from the first report (F4: a client `ms` was trusted). Rooms: a strict majority of the other seats = a new master at once (`master`, `gone: -1`); the old one is out (`out` why `stall`) only if the server also stopped hearing it, else it plays on as a guest. A 1v1 master is never disconnected by a report. The server answers a 1v1 report with `{t:"stall", match, silent}`: whether IT sees the master away or a pong over 2 s late. |
 | `{t:"rematch", match, tok}` | a rematch pays with this fresh token; without one a ranked rematch is cancelled (`signin`). |
-| WS close code **4001** | the page hid its tab on purpose: a deliberate away. A room master hands over at once (`out` why `away`); a 1v1 seat's grace starts as usual. |
-| server → `result` | a 1v1 forfeit also carries `by` (the seat that forfeited) and `why`: `left`, `gone`, `silent`, `lagging`, or `stall` (the guest quit after ≥10 s of its stall reports: the MASTER forfeits). |
+| WS close code **4001** | the page hid its tab on purpose: a deliberate away. A room master hands the role on at once (`master`, `gone: -1`) but is NOT out: its seat has the normal away grace and comes back as a guest (F4); a 1v1 seat's grace starts as usual. |
+| server → `result` | a 1v1 forfeit also carries `by` (the seat that forfeited) and `why`: `left`, `gone`, `silent`, `lagging`, or `stall` (the guest quit after ≥10 s of its stall reports AND the server saw the master go quiet: the MASTER forfeits). Same quit while the server still hears the master = `void` why `stall`, a dispute for both; a flagged guest's reports count for nothing (its quit is its forfeit). |
 | server → `err` / `cancel` | new codes/reasons: `signin` (a ranked seat without its own verified token, or a payment-service 4xx), `slow` (name/wait/unwait or failed joins too fast). |
 
 Rules: no pong for 8 s (two pings) = away (same path as a closed socket); no `hello` in 10 s =
 dropped; a room master migrates after 5 s of WebSocket downtime (a shorter blip is not a
-hand-over) or at once on a stall majority / 4001. At the report timeout every seat with no
+hand-over) or at once on a stall majority / 4001 (neither of those eliminates by itself). At the report timeout every seat with no
 report forfeits (1v1) or is out (rooms) and the rest finish with what they agree on; each
 round also has a hard deadline (3 min duel, 5 min room). Room reports are compared only on the
 seats still in at the first report, and a winner who leaves after it does not void. A
-disagreement is a per-account dispute; an account with a record of them loses its next
-disputed match and is hidden from the boards. Forfeits before the first agreed round (rooms:
-the first 10 s) pay the stayer nothing; one pair of accounts counts at most 3 results a day.
+disagreement (or an unconfirmed stall claim) is a per-account dispute; an account with 3 in 24 h
+or 6 in 7 days (an absolute count: counted battles cannot dilute it) loses its next disputed
+match, has its stall claims ignored and is hidden from the boards. Forfeits in the first 10 s of
+a match pay the stayer nothing; after that a round-1 quit or silence is a counted win (F4: it
+used to be void until a round was agreed). One pair of accounts counts at most 3 results a day.
+Per address: 64 sockets, IPv6 counted per /64.

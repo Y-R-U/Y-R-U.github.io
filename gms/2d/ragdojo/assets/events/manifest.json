@@ -5,30 +5,30 @@
    "w": 1024,
    "h": 640,
    "choices": [
-    "A CARTWHEEL",
-    "A HIGH JUMP",
-    "A BACKFLIP",
-    "A FLYING KICK"
+    "RED HEADBAND KICKS FROM RIGHT AT THREE",
+    "RED HEADBAND KICKS FROM LEFT AT TWO",
+    "RED HEADBAND KICKS FROM LEFT AT THREE",
+    "RED HEADBAND KICKS FROM RIGHT AT TWO"
    ]
   },
   "halloween:2026": {
    "w": 1024,
    "h": 640,
    "choices": [
-    "A SKELETON FIGHTER",
-    "A MUMMY BOXER",
-    "A VAMPIRE NINJA",
-    "A ZOMBIE WRESTLER"
+    "SKELETON ON THE LEFT, SIX BATS",
+    "SKELETON ON THE RIGHT, SIX BATS",
+    "SKELETON ON THE LEFT, FOUR BATS",
+    "SKELETON ON THE RIGHT, FOUR BATS"
    ]
   },
   "reveal-week:2026-W44": {
    "w": 1024,
    "h": 640,
    "choices": [
-    "A PAPER SAMURAI",
-    "A SHADOW THIEF",
-    "A KENDO MASTER",
-    "A PAPER NINJA"
+    "NINJA ON THE RIGHT, FOUR CRANES",
+    "NINJA ON THE LEFT, FOUR CRANES",
+    "NINJA ON THE LEFT, THREE CRANES",
+    "NINJA ON THE RIGHT, THREE CRANES"
    ],
    "overlay": {
     "x": 0.607,

@@ -378,8 +378,8 @@ func ptsOf(bs []evBattle) []int {
 
 const cells = 25
 
-// The code-drawn placeholder picture (a flying kick) is used until Aaron approves art for an
-// event; its answer is public anyway (js/events/reveal.js PICTURES.heroic).
+// The code-drawn placeholder picture is used until Aaron approves art for an event. Its old
+// guess (public in history) is never offered or paid: real answers live only in answers.json.
 const placeholderPic, placeholderAnswer = "heroic", "A PENCIL DUEL"
 
 func guessesLeft(open, guesses int, solved bool) int {

@@ -130,8 +130,8 @@ picture only at 25; the review tool writes `~/.ragdojo/eventart/approved/`, the 
 Halloween retitled SPOOKY WEEK; new decoys set in Aaron's tool data and republished; Pass events bank
 every battle; battles stamped on server time; merge re-caps; cloud adopt re-pays unpaid ink; Hindi
 names; panel refresh after a guess; 40 px guess buttons; rivals keyed by `rid`.
-For F1/manager: `server/events.go` `placeholderAnswer = "A FLYING KICK"` (and events_test/abuse_test)
-is the W43 picture's real answer in public source — the client no longer offers placeholder guesses,
+For F1/manager: `server/events.go` `placeholderAnswer` (and events_test/abuse_test) held the W43
+picture's real answer in public source (since replaced: F4 gave every approved picture new wording) — the client no longer offers placeholder guesses,
 so it can go. Restart Aaron's review tool on 8023 (it still runs the old code, which would write
 approved pictures into assets/events).
 Deploy additions: `server/deploy.sh` now rsyncs `~/.ragdojo/eventart/approved/*.jpg` to
@@ -158,3 +158,23 @@ Measured (t_predict, 5 runs each, attack sequences guest vs master): before 44 /
 Gates: `tools/netfixgate.mjs` (35, --falsify 21/21), `tools/arenafix.mjs` (20, --falsify 7/7; needs F1's
 4001/stall server), `tools/upsellgate.mjs`, accountgate + services.test extended. Deploy: client only —
 `npm run build` then `games/deploy.sh` (the payment fix is the urgent one; it is LIVE-affecting).
+
+### F4 status (R4 review fixes, 2026-10-13)
+Done, local only, NOT deployed. R4's four repro tests ported inverted into `server/abuse_test.go` (R4 section) plus
+tests for each rule; each fix has a revert mutant (F4 scratchpad `mutants.py`, 13/13 red).
+1. Forged stall: the silence is timed by the server from the first report; a 1v1 guest's quit after 10 s of
+   reports is the master's forfeit only if the server saw the master go quiet (away, or a pong >2 s late);
+   both sockets healthy = void `stall` + a dispute for both; a flagged guest's claims are ignored. `flagged()`
+   is now an absolute count (3 in 24 h or 6 in 7 days) so honest losses or alt-account matches cannot
+   dilute it. Rooms: a stall majority hands over; it eliminates only with the server's own evidence.
+2. A 1v1 stall report never disconnects the master (its 4001 or a pong timeout decides).
+3. Early forfeit is time-only (first 10 s); a round-1 quit/silence after that is a counted win.
+4. A hidden room master hands over but stays in; it resumes as a guest (client: `NetFight.suspend()` on hide,
+   `resync` un-suspends, `unrecord()` on demotion).
+5. Event answers: every approved picture has new wording + sibling decoys set through the review tool's API
+   (Aaron's answers.json, state.json themes and approved/ republished; manifest committed). Answer strings
+   scrubbed from the tree; `eventsecretgate` now scans server/docs/tools/CLAUDE.md and the git history and
+   checks no current choice was offered before.
+6. Owner poll settles at 2 min; art 403 is identical for "no art" and "not opened"; `/health` lists every live
+   mode; per-IP cap 64, IPv6 per /64.
+7. vpstats: RAGDOJO arena section (its own repo, committed and built, not deployed).
