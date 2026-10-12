@@ -663,6 +663,8 @@ export class Match {
   camera(dt) {
     const live = this.all.filter((f) => !f.dead);
     const pts = (live.length ? live : this.all).map((f) => f.rag.centre());
+    // Anything else the fight is about (online modes: a loose bandana, the next hill) stays in shot.
+    if (this.focusPoints) pts.push(...this.focusPoints());
     let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
     for (const [x, y] of pts) {
       minX = Math.min(minX, x); maxX = Math.max(maxX, x);

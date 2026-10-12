@@ -276,10 +276,12 @@ export class ArenaClient {
     if (this._connecting) return this._connecting;
     this.hello = hello;
     this.wantOpen = true;
-    this._connecting = new Promise((resolve, reject) => {
+    let threw = false;
+    const p = new Promise((resolve, reject) => {
       let ws;
       const q = resume ? `?id=${encodeURIComponent(resume.id)}&tok=${encodeURIComponent(resume.tok)}` : '';
-      try { ws = new WebSocket(this.base.replace(/^http/, 'ws') + '/ws' + q); } catch (e) { this._connecting = null; reject(e); return; }
+      // A synchronous throw runs before `_connecting` is assigned below: never leave it holding a dead promise.
+      try { ws = new WebSocket(this.base.replace(/^http/, 'ws') + '/ws' + q); } catch (e) { threw = true; reject(e); return; }
       ws.binaryType = 'arraybuffer';
       this.ws = ws;
       const fail = setTimeout(() => { try { ws.close(); } catch {} }, 8000);
@@ -312,17 +314,18 @@ export class ArenaClient {
         if (!welcomed) { this._connecting = null; reject(new Error('no connection')); return; }
         // Mid-match the seat is held for the grace: keep the WebRTC links (the fight may well
         // still be flowing over them) and quietly get the signalling line back.
-        if (this.wantOpen && this.inMatch && this.tok && this.grace) { this._resume(); return; }
+        if (this.wantOpen && this.inMatch && this.tok && this.grace) { if (!this.hidden) this._resume(); return; }
         this.id = null;
         this._dropLinks();
         this._emit('closed');
       };
     });
-    return this._connecting;
+    this._connecting = threw ? null : p;
+    return p;
   }
 
-  _resume() {
-    const until = performance.now() + this.grace - 500;
+  _resume(from = performance.now()) {
+    const until = from + this.grace - 500;
     const resume = { id: this.id, tok: this.tok };
     this._emit('reconnecting', true);
     const tryOnce = () => {
@@ -333,6 +336,26 @@ export class ArenaClient {
     };
     setTimeout(tryOnce, 250);
   }
+
+  /**
+   * The tab went to the background while we run the fight. Hang up now, so the server hands a
+   * room on (or starts a 1v1's reconnect grace) at once instead of waiting out the pings, and
+   * stay off the line until the tab is back.
+   */
+  hide() {
+    if (this.hidden || !this.ws || !this.inMatch) return;
+    this.hidden = true;
+    this.hiddenAt = performance.now();
+    this.ws.close(4001);
+  }
+  show() {
+    if (!this.hidden) return;
+    this.hidden = false;
+    if (!this.ws && this.wantOpen && this.inMatch && this.tok && this.grace) this._resume(this.hiddenAt);
+  }
+
+  /** A guest that has heard nothing from its master for `ms` (0 = it is flowing again). */
+  stall(match, ms) { this._raw({ t: 'stall', match, ms: Math.round(ms) }); }
 
   /** Test hook: the socket dies without a goodbye, as a network blip kills it. */
   _dropSocket() { if (this.ws) this.ws.close(4000); }
@@ -355,7 +378,7 @@ export class ArenaClient {
   join(code) { this._raw({ t: 'join', code }); }
   accept(match, tok) { this._raw({ t: 'accept', match, tok: tok || '' }); }
   decline(match) { this._raw({ t: 'decline', match }); this._dropLinks(); }
-  rematch(match) { this._raw({ t: 'rematch', match }); }
+  rematch(match, tok) { this._raw({ t: 'rematch', match, tok: tok || '' }); }
   report(match, round, winner, ko, place, dmg) { this._raw({ t: 'round', match, round, winner, ko, ...(place ? { place } : {}), ...(dmg ? { dmg } : {}) }); }
   leave() { this.inMatch = false; this._stopRoomPing(); this._raw({ t: 'leave' }); this._dropLinks(); }
   /** Multi-player rooms: the room's host may start early (2+ players). */

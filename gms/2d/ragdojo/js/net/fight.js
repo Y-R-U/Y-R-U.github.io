@@ -37,6 +37,9 @@ const SLOT_RANK = [3, 6, 1, 7, 2, 5, 4, 8];
 const SLOT_RANK_GOLDLESS = [3, 6, 4, 7, 2, 5, 8, 0];
 const READY_WAIT = 5000;         // ms the master waits for every guest before starting anyway
 const RTT_EVERY = 2000;
+const STRIKE_BUFFER = 0.15;     // s: a tap just before a swing ends still lands, on every screen
+const STALL_MS = 3000;           // no master snapshot for this long: tell the server
+const STALL_EVERY = 2000;
 const qs = new URLSearchParams(location.search);
 
 /** The gesture slots a save owns in ANY move set — online everyone fights with LIGHT's kinds. */
@@ -138,15 +141,35 @@ export class PvpMatch extends Match {
     } else if (this.phase === W.PHASE.FIGHT) {
       this.clock = Math.max(0, this.clock - dt);
       if (!this.over) this.rules.update(this, dt);
+      this.bufferedStrikes();
     }
+    // Online, hit-stop is only a picture: the sim never pauses, because a guest predicting its
+    // own swing cannot see the master's freeze coming. Screens hold the frame instead (main.js).
+    const hs = this.fx.hitstop;
+    this.fx.hitstop = 0;
     super.update(dt, null);
+    this.fx.hitstop = Math.max(this.fx.hitstop, hs - dt);
+  }
+
+  /** A tap that lands while the fighter is still busy waits up to STRIKE_BUFFER for it to free up. */
+  bufferedStrikes() {
+    if (!this.strikeQ) return;
+    for (const slot of Object.keys(this.strikeQ)) {
+      const f = this.all[slot], until = this.strikeQ[slot];
+      if (!f || f.gone || this.time > until) { delete this.strikeQ[slot]; continue; }
+      if (f.canAct && f.strike()) { sfx.whoosh(); delete this.strikeQ[slot]; }
+    }
   }
 
   /** Applies one player's action on the master. Specials are checked against what they own. */
   act(slot, a) {
     const f = this.all[slot];
     if (!f || f.gone || this.phase !== W.PHASE.FIGHT || this.over) return;
-    if (a === W.ACT.STRIKE) { if (f.strike()) sfx.whoosh(); return; }
+    if (a === W.ACT.STRIKE) {
+      if (f.strike()) sfx.whoosh();
+      else if (!f.dead) (this.strikeQ = this.strikeQ || {})[slot] = this.time + STRIKE_BUFFER;
+      return;
+    }
     if (a === W.ACT.JUMP) { f.jump(); return; }
     const m = moveFor(this.saves[slot], a - W.ACT.SPECIAL);
     if (m && f.special(m)) {
@@ -155,7 +178,8 @@ export class PvpMatch extends Match {
     }
   }
 
-  eliminate(slot) { Modes.eliminate(this, slot); }
+  /** Once the round is decided nobody can change it: a quit during the slow-mo is not an elimination. */
+  eliminate(slot) { if (!this.over) Modes.eliminate(this, slot); }
 
   checkEnd(dt) {
     if (this.over) { this.endT += dt; return; }
@@ -352,6 +376,8 @@ export class NetFight {
     this.hist = [];
     this.authority = true;
     this.liveRun = 0;
+    this.predT = 0; this.strikeAt = 0;
+    this.sentAt = new Map();
     this.corr = 0;
     this.lastRtts = 0;
     this.projViews = new Map();
@@ -494,7 +520,7 @@ export class NetFight {
     this.projId = Math.max(0, ...mp.projectiles.map((p) => p.netId | 0));
     // The old master may have gone while the round was already decided.
     if (s && s.phase === W.PHASE.OVER && !mp.verdict) {
-      const v = Modes.verdict(Modes.viewOfSnap(s, this.mode)) || { winner: -1, ko: false };
+      const v = Modes.verdict(Modes.viewOfSnap(this.overSnap || s, this.mode)) || { winner: -1, ko: false };
       mp.over = true; mp.verdict = v; mp.endT = END_HOLD - 0.4;
     }
     if (mp.phase === W.PHASE.WAIT) mp.begin();
@@ -518,7 +544,7 @@ export class NetFight {
     // Predict it: the swing starts on this screen now; the master decides what it hits.
     const me = mp.player;
     if (this.authority) return;
-    if (a === W.ACT.STRIKE) { if (me.strike()) sfx.whoosh(); }
+    if (a === W.ACT.STRIKE) { if (me.strike()) sfx.whoosh(); else this.strikeAt = this.predT + STRIKE_BUFFER; }
     else if (a === W.ACT.JUMP) me.jump();
     else { const m = moveFor(this.saves[this.you], a - W.ACT.SPECIAL); if (m && me.special(m)) sfx.whoosh(); }
   }
@@ -540,6 +566,7 @@ export class NetFight {
     this.client.pingLinks(now, 500);
     if (now - this.lastRtts > RTT_EVERY && this.mode !== 'duel') { this.lastRtts = now; this.client.sendRtts(this.matchId); }
     if (now - this.lastHeard > 10000 && !this.stalled) { this.stalled = true; this.onStall('stalled'); }
+    if (!this.isMaster) this.watchMaster(now);
     const r = this.m.rtt;
     const net = this.peers().length ? (this.m.direct ? `${r} ms` : `relay ${r} ms · slower connection`) : '';
     if (this.mode === 'duel') {
@@ -548,6 +575,25 @@ export class NetFight {
       const secs = Math.ceil(mp.phase === W.PHASE.FIGHT || mp.phase === W.PHASE.OVER ? mp.clock : mp.roundSecs);
       mp.level.dojo = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}  ·  ` + net;
     } else Object.assign(mp.level, hudLines(mp, net));
+  }
+
+  /**
+   * A guest whose master has gone quiet (tab hidden, phone locked, frozen) tells the server, which
+   * decides: hand-over in a room, the 1v1 forfeit rule. Repeated while it lasts; ms 0 when it ends.
+   */
+  watchMaster(now) {
+    const mp = this.match;
+    // Just handed over: the new master's silence counts from the hand-over.
+    const last = this.buf.length ? this.buf[this.buf.length - 1].recv : this.gapFrom || 0;
+    const running = this.begun && last && !this.reported && (mp.phase === W.PHASE.COUNT || mp.phase === W.PHASE.FIGHT);
+    const quiet = running ? now - last : 0;
+    if (quiet > STALL_MS) {
+      if (!this.stallSent || now - this.stallSent >= STALL_EVERY) { this.stallSent = now; this.m.stalls = (this.m.stalls || 0) + 1; this.client.stall(this.matchId, quiet); }
+      this.masterQuiet = quiet;
+    } else if (this.stallSent) {
+      this.stallSent = 0; this.masterQuiet = 0;
+      this.client.stall(this.matchId, 0);
+    }
   }
 
   // ── master ──────────────────────────────────────────────────────────────
@@ -670,7 +716,8 @@ export class NetFight {
     if (this.buf.length > 40) this.buf.shift();
     this.reconcile(s, now);
     this.feedback(s);
-    if (s.phase === W.PHASE.OVER) { this.overSnap = s; this.overAt = this.overAt || now; }
+    // The FIRST end-of-round snapshot is the result; later ones may show a quitter's body dropping.
+    if (s.phase === W.PHASE.OVER) { this.overSnap = this.overSnap || s; this.overAt = this.overAt || now; }
   }
 
   feedback(s) {
@@ -701,9 +748,10 @@ export class NetFight {
       if (++this.liveRun >= 2) { this.reseed(me, F); this.authority = false; this.m.reseeds++; }
       return;
     }
-    // Where were WE, on this screen, when the master was acting on the input it just
-    // reported? One round trip ago. Compare there, not now.
-    const at = now - this.rtt();
+    // The snapshot says which of our stick inputs the master had last applied (`ack`). It had
+    // been running on it for up to one input interval: compare with where WE were then.
+    const sent = this.sentAt.get(F.ack);
+    const at = sent != null ? sent + INPUT_MS / 2 : now - this.rtt();
     const h = this.histAt(at);
     if (!h) return;
     const ex = F.x - h.x, ey = F.y - h.y;
@@ -759,6 +807,8 @@ export class NetFight {
       this.lastInput = Math.max(this.lastInput + INPUT_MS, now - INPUT_MS);
       this.lastSent = send;
       this.client.send(this.masterId, 'u', W.input(++this.inputSeq, send.moveX, send.block));
+      this.sentAt.set(this.inputSeq & 0xffff, now);
+      if (this.sentAt.size > 120) this.sentAt.delete(this.sentAt.keys().next().value);
     }
     for (const a of inp.acts) this.localAct(a);
 
@@ -767,6 +817,11 @@ export class NetFight {
     if (!this.authority) {
       this.acc = Math.min(this.acc + dt, 0.1);
       while (this.acc >= STEP) {
+        this.predT += STEP;
+        if (this.strikeAt) {
+          if (!fighting || this.predT > this.strikeAt) this.strikeAt = 0;
+          else if (me.canAct && me.strike()) { sfx.whoosh(); this.strikeAt = 0; }
+        }
         if (fighting) { me.move(send.moveX, STEP); me.setBlock(send.block); }
         me.update(STEP, mp.world, null);
         this.separateMe();
@@ -902,7 +957,10 @@ export class NetFight {
       const t = f.respawnT > 0 ? `back in ${Math.ceil(f.respawnT)}…` : mp.modeId === 'lms' ? 'you are out — watching to the end' : '';
       if (t) handText(ctx, t, vw / 2, vh * 0.3, 30, '#c0392b', 'center');
     }
-    const n = this.awayNote || (this.stalled ? 'connection stalled…' : '');
+    // 10 s of our own stall reports: the server counts a QUIT as the master's forfeit, not ours.
+    const n = this.awayNote || (this.masterQuiet ? (this.mode !== 'duel' ? 'the host stopped answering — handing over…'
+      : this.masterQuiet >= 10000 + STALL_MS ? 'their game stopped answering — QUIT now counts as their forfeit' : 'their game stopped answering — waiting…')
+      : this.stalled ? 'connection stalled…' : '');
     if (n) handText(ctx, n, vw / 2, vh * 0.5, 26, '#c0392b', 'center');
   }
 
@@ -1025,7 +1083,8 @@ export class LocalFight {
     }
     if (mp.over && mp.verdict) {
       const p = mp.verdict.place ? mp.verdict.place[0] : 0;
-      handText(ctx, mp.verdict.winner === 0 ? 'YOU WIN!' : p ? `you came ${Modes.ordinal(p)}` : 'draw', vw / 2, vh * 0.3, 40, '#c0392b', 'center');
+      const v = mp.verdict;
+      handText(ctx, v.winner === 0 ? 'YOU WIN!' : v.winner < 0 && p <= 1 ? 'a draw' : p ? `you came ${Modes.ordinal(p)}` : 'a draw', vw / 2, vh * 0.3, 40, '#c0392b', 'center');
     }
   }
 

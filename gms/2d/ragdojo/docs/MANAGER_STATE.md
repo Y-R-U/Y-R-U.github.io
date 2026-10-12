@@ -143,3 +143,18 @@ ported inverted into `server/abuse_test.go`, and each fix has a revert mutant th
 red (57/57). Gates green: `go test -race ./...`, arenaserver, arenagate (+ `--lan` via the real
 lan.sh), arenamulti (hand-over 3.0 s), boardsgate, ghostgate, modegate. eventsgame was not stable
 while F3's client work was in progress. Deploy steps unchanged (deploy.sh / unit / Caddy fragment).
+
+### F2 status (online client fixes + payment kick, 2026-10-13)
+Done, local only, NOT deployed. Money: R3 H1 (re-checks kicked paying players out of CYBER/DEITIES mid-fight),
+M3 (Pass-first upsell from Pass events / the arena allowance), M6 (live mode ignored) fixed and pushed in
+73806d0c. Netcode: R2 H1 (hidden master hangs up with 4001; guests send `{t:"stall", match, ms}`; forfeit copy
+from F1's `by`/`why`), H3 (first over-snapshot; no eliminations after the end), M1 (online hit-stop is a held
+picture, 150 ms strike buffer both sides, reconcile on `F.ack`), M2 (no panel pop, X/DONE hang up, idle client
+closed), M4 (bandana + next hill in the camera fit, edge arrow), and the low items (practice pauses, `?bots=0` = 1,
+shared first on ties, hill = grounded pelvis, bandana rolls clear of the stick, no N LEFT in respawn modes,
+`_connecting` after a throwing WebSocket). Also F1's rematch `tok` and signin/slow copy.
+Measured (t_predict, 5 runs each, attack sequences guest vs master): before 44 / 37 mismatched of ~215 matched
+(0 / 140 ms); after 9 / 4 of ~280. t_rules: loose bandana off screen 12-20% -> 0%, next hill 18-46% -> <0.5%.
+Gates: `tools/netfixgate.mjs` (35, --falsify 21/21), `tools/arenafix.mjs` (20, --falsify 7/7; needs F1's
+4001/stall server), `tools/upsellgate.mjs`, accountgate + services.test extended. Deploy: client only —
+`npm run build` then `games/deploy.sh` (the payment fix is the urgent one; it is LIVE-affecting).

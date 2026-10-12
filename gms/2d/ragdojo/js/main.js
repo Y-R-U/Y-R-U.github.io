@@ -21,7 +21,7 @@ import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
 import { Purchases, API } from './purchases.js?v=20261013-f2';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
-import { mountArena } from './net/panel.js?v=20261013-rooms';
+import { mountArena } from './net/panel.js?v=20261013-f2';
 import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261013-events';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
@@ -505,7 +505,7 @@ function render() {
 }
 
 // ── loop ─────────────────────────────────────────────────────────────────
-let acc = 0;
+let acc = 0, heldStop = 0;
 function frame(t) {
   requestAnimationFrame(frame);
   const now = t / 1000;
@@ -514,10 +514,10 @@ function frame(t) {
   if (mode === 'boot') { render(); return; }
 
   input.update(dt);
-  // An online round never pauses: the other player is still there.
-  if (match && match.net) match.net.step(dt, mode === 'fight' ? input : null);
+  const paused = match && document.querySelector('.panel-screen.show') && !match.demo;
+  // An online round never pauses: the other players are still there. Practice vs bots does.
+  if (match && match.net) { if (match.net.client || !paused) match.net.step(dt, mode === 'fight' ? input : null); }
   else if (match) {
-    const paused = document.querySelector('.panel-screen.show') && !match.demo;
     if (!paused) {
       acc += dt;
       let steps = 0;
@@ -529,7 +529,11 @@ function frame(t) {
       if (mode === 'fight' && input.jump) match.player.jump();
     }
   }
-  render();
+  // Online hit-stop is a held picture (the sim runs on, see PvpMatch.update): draw the impact
+  // frame, then hold it until the stop runs out. A longer stop landing mid-hold redraws.
+  const hs = match && match.net ? match.fx.hitstop : 0;
+  if (!(hs > 0 && heldStop > 0 && hs <= heldStop)) render();
+  heldStop = hs;
   if (DEV) window.__state = match ? {
     mode, hp: match.player.hp, enemies: match.aliveEnemies.length,
     over: match.over, result: match.result, time: match.time, score: match.score,

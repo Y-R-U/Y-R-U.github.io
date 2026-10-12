@@ -94,7 +94,7 @@ export function drawHUD(ctx, vw, vh, m, save, input) {
     const totalMax = m.enemies.reduce((s, e) => s + e.maxHp, 0);
     const totalHp = m.enemies.reduce((s, e) => s + e.hp, 0);
     bar(ctx, vw - pad - 26 - bw, pad + 30, bw, bh, totalHp / totalMax, 'ENEMY',
-      live.length > 1 ? `${live.length} LEFT` : (live[0]?.name || ''), m.enemies[0].rank, 'right', 23);
+      m.modeDef?.respawn ? '' : live.length > 1 ? `${live.length} LEFT` : (live[0]?.name || ''), m.enemies[0].rank, 'right', 23);
   }
 
   ctx.save();

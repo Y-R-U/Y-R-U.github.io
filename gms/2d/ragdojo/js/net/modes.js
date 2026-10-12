@@ -26,6 +26,9 @@ export const SPAWN_INVULN = 1.5;
 export const GOLD = { key: 'gold', name: 'Gold', col: '#f0b51c', edge: '#7a5200' };
 const MIN_X = WALL_PAD + 60, MAX_X = SHEET_W - WALL_PAD - 60;
 const GRAB_R = 36;
+// A loose bandana never comes to rest by the walls: there it sits under a thumb-stick or the
+// move strip on a phone (screen-space HUD). It rolls back out to here.
+export const REST_LO = WALL_PAD + 330, REST_HI = SHEET_W - REST_LO;
 
 const q10 = (v) => Math.round(v * 10) / 10;
 
@@ -53,6 +56,7 @@ export function setup(m, modeId) {
   m.overtime = false;
   m.outSeq = 0;
   m.obj = null;
+  m.focusPoints = () => focusPoints(m);
   if (modeId === 'bandana') m.obj = { x: SHEET_W / 2, y: GROUND_Y - 560, vx: 0, vy: 0, holder: -1, grabT: 0, last: -1, lastT: 0 };
   if (modeId === 'hill') m.obj = { x: SHEET_W / 2, w: M.zoneW, next: null, t: M.every, holder: -1, contested: false };
   for (const f of m.all) { f.gone = false; f.out = 0; f.respawnT = 0; f.baseRank = f.rank; }
@@ -99,6 +103,10 @@ function bandanaStep(m, dt) {
   }
   if (b.x < MIN_X - 40) { b.x = MIN_X - 40; b.vx = Math.abs(b.vx) * 0.5; }
   if (b.x > MAX_X + 40) { b.x = MAX_X + 40; b.vx = -Math.abs(b.vx) * 0.5; }
+  if (b.y >= floor) {
+    if (b.x < REST_LO) b.vx = Math.max(b.vx, Math.min(600, (REST_LO - b.x) * 3));
+    if (b.x > REST_HI) b.vx = Math.min(b.vx, -Math.min(600, (b.x - REST_HI) * 3));
+  }
   if (b.grabT > 0) return;
   let best = null, bd = GRAB_R;
   for (const f of m.all) {
@@ -151,11 +159,14 @@ function hillStep(m, dt) {
     z.next = opts[Math.floor(Math.random() * opts.length)];
   }
   if (z.t <= 0) { z.x = z.next ?? z.x; z.next = null; z.t = M.every; m.say('THE HILL MOVED!', 1.4); }
-  const inside = m.all.filter((f) => !f.dead && !f.gone && f.mode !== 'down' && Math.abs(f.x - z.x) <= z.w / 2);
+  // Standing on it: feet on the page and the pelvis over the ledge. A hop or a lean does not hold it.
+  const inside = m.all.filter((f) => !f.dead && !f.gone && f.mode !== 'down' && onHill(f, z));
   z.contested = inside.length > 1;
   z.holder = inside.length === 1 ? inside[0].slot : -1;
   if (z.holder >= 0) m.scores[z.holder] += dt;
 }
+
+export const onHill = (f, z) => f.onGround && Math.abs(f.rag.x[P.PELVIS] - z.x) <= z.w / 2;
 
 function respawn(m, f) {
   const foes = m.all.filter((o) => o !== f && !o.dead && !o.gone);
@@ -182,6 +193,46 @@ export function eliminate(m, slot) {
   if (!f.dead) { f.hp = 0; f.dead = true; f.goDown(0, 3, true); }
   if (!f.out) f.out = ++m.outSeq;
   f.respawnT = 0;
+}
+
+/** World points the camera must keep in shot besides the fighters. */
+export function focusPoints(m) {
+  const o = m.obj;
+  if (!o) return [];
+  if (m.modeId === 'bandana' && o.holder < 0 && o.y != null) return [[o.x, Math.min(o.y, GROUND_Y - 60)]];
+  if (m.modeId === 'hill') {
+    const out = [[o.x, GROUND_Y - 40]];
+    if (o.next != null) out.push([o.next - o.w / 2, GROUND_Y - 40], [o.next + o.w / 2, GROUND_Y - 40]);
+    return out;
+  }
+  return [];
+}
+
+/**
+ * Screen space: if the camera still cannot fit the objective (wide spreads on a narrow screen),
+ * an arrow on the edge points at it. The view is computed exactly as main.js's render() does.
+ */
+export function drawEdgeArrows(ctx, vw, vh, m) {
+  const camH = m.camH || 700, scale = vh / camH, camW = vw / scale;
+  const cx = Math.max(camW / 2 - 90, Math.min(SHEET_W - camW / 2 + 90, m.camX));
+  const left = cx - camW / 2;
+  const o = m.obj;
+  const marks = m.modeId === 'bandana' ? (o && o.holder < 0 ? [o.x] : []) : m.modeId === 'hill' && o ? [o.x, ...(o.next != null ? [o.next] : [])] : [];
+  for (const x of marks) {
+    const sx = (x - left) * scale;
+    if (sx >= 0 && sx <= vw) continue;
+    const dir = sx < 0 ? -1 : 1;
+    const ax = dir < 0 ? 22 : vw - 22, ay = vh * 0.62;
+    const col = m.modeId === 'bandana' ? '#d99a00' : '#6b5a2a';
+    ctx.save();
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.moveTo(ax + dir * 14, ay); ctx.lineTo(ax - dir * 10, ay - 16); ctx.lineTo(ax - dir * 4, ay); ctx.lineTo(ax - dir * 10, ay + 16);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+    m.edgeArrows = (m.edgeArrows || 0) + 1;
+  }
 }
 
 // ── the result ──────────────────────────────────────────────────────────
@@ -225,7 +276,13 @@ export function verdict(v) {
     const key = (f) => (f.dead || f.gone ? 1e6 - (f.out || 0) : -Math.round(f.hp * 10));
     const order = [...fs].sort((a, b) => key(a) - key(b) || a.slot - b.slot);
     if (winner >= 0) order.sort((a, b) => (b.slot === winner) - (a.slot === winner));
-    return { winner, ko, place: placeOf(fs, order) };
+    const place = placeOf(fs, order);
+    // A time-up tie: the level leaders share first, nobody is listed above them.
+    if (winner < 0 && alive.length) {
+      const top = Math.max(...alive.map((f) => Math.round(f.hp * 10)));
+      for (const f of alive) if (Math.round(f.hp * 10) === top) place[f.slot] = 1;
+    }
+    return { winner, ko, place };
   }
   // Scoring modes.
   const pts = (f) => Math.round(f.score * 10);
@@ -245,7 +302,9 @@ export function verdict(v) {
   }
   if (winner === null) return null;
   if (winner >= 0) order.sort((a, b) => (b.slot === winner) - (a.slot === winner));
-  return { winner, ko: false, place: placeOf(fs, order) };
+  const place = placeOf(fs, order);
+  if (winner < 0) for (const s of leaders) place[s] = 1;
+  return { winner, ko: false, place };
 }
 
 function placeOf(fs, order) {
@@ -385,6 +444,7 @@ export class ModeLayer {
 /** Screen space: the scoreboard down the right edge, and your own status. */
 export function drawModeHUD(ctx, vw, vh, m) {
   if (!m.ffa) return;
+  drawEdgeArrows(ctx, vw, vh, m);
   const pad = Math.max(14, vw * 0.028);
   const M = m.modeDef;
   const rows = m.all.map((f, i) => ({ f, i, s: m.scores[i] || 0 }));

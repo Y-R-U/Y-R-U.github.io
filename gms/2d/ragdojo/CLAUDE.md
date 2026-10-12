@@ -573,6 +573,43 @@ Gotchas hit:
 - The migration test's "killed master places last" was wrong: it places by when it left, below
   everyone standing then but above anyone already down.
 
+## Online client fixes (F2, 2026-10-13; local only, NOT deployed)
+
+R2's netcode review and R3's payment findings, client side. `node tools/netfixgate.mjs` (node, 35 checks,
+`--falsify` 21 mutants) and `node tools/arenafix.mjs` (real Chromes + server, 20 checks, `--falsify` 7) are
+the gates; `ARENA_BIN` / `ARENA_TEST_PORT` as for the other arena tools.
+
+- **Online hit-stop is a picture, not a pause** (`PvpMatch.update`): the sim runs through it and
+  main.js holds the drawn frame until the stop runs out. A guest predicting its own swing cannot see
+  the master's freeze coming; with the sim paused a third of taps played differently on the two
+  screens. The campaign `Match` still freezes. Taps also buffer 150 ms on both sides (`strikeQ` on the
+  master, `strikeAt` in prediction), and the guest reconciles against the input the master acked
+  (`F.ack` -> `sentAt`), not "now minus ping".
+- **A hidden master hangs up** (`ArenaClient.hide()`, code 4001, no resume until visible): the server
+  hands a room over at once and starts a 1v1's grace. A master that freezes without a visibility
+  change is reported by its guests: `{t:'stall', match, ms}` after 3 s, every 2 s, `ms: 0` when it
+  ends. After 13 s quiet the guest's HUD says QUIT counts as THEIR forfeit (F1's rule, `why: 'stall'`).
+- **The slow-mo is frozen for real**: `PvpMatch.eliminate` is a no-op once `over`, guests keep the
+  FIRST end-of-round snapshot. A quitter in the slow-mo used to flip the verdict and void the room.
+- **The arena panel only opens over a fight it owns**: `msg`/`result` open it only if it was showing
+  or an online fight was running; otherwise they hang up (`closeIdle`). Every handler is bound to the
+  client it came from (`wire` ignores a closed or replaced client).
+- **The objective stays in shot**: `match.focusPoints()` (modes.js) adds a loose bandana and the
+  current + next hill to the camera fit, and `drawEdgeArrows` points at anything still off screen.
+  A loose bandana rolls out to `REST_LO`/`REST_HI` (330u from the walls) — at the walls it sat under
+  the thumb-stick.
+- Hill scores only a grounded fighter whose pelvis is over the ledge. Time-up ties share first place.
+- **Payments**: `Purchases.refresh()` changes state only on a definitive answer; a failed check keeps
+  the session's verified state (`unknown`) and announces nothing. main.js never parks or `toMenu`s
+  mid-fight: a definitive "not entitled" parks at the next hub visit (`parkOwed`). Live and test mode
+  count the same; "(TEST)" labels only in test mode. Pass events and the arena allowance open the
+  upgrade panel Pass-first (`openUpgrade(null, 'pass')`).
+
+Gotchas hit: `?mode=` practice races `?auto=1`'s START (the hub demo replaces the practice match) —
+the gate starts practice through `arena.practise()` instead. A "per act" prediction metric misreads
+the strike buffer (a buffered swing lands in the NEXT act's window); compare the two sides' attack
+SEQUENCES (LCS) instead. Practice used `match.net` and so never paused: online-ness is `net.client`.
+
 ## Music
 
 Fourteen Suno v5.5 instrumental tracks in `assets/audio/`, wired through `js/music.js`.

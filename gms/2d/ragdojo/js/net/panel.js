@@ -29,6 +29,19 @@ const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
 };
+/** The server says who forfeited and why (`by`, `why`); a guest who quit a frozen fight is not the one who forfeited. */
+function forfeitLine(r, won) {
+  const early = r.counted === false ? ' Too early to count for the boards.' : '';
+  if (won) return ({ stall: 'Their game stopped answering — that counts as their forfeit, not yours.',
+    gone: 'Your opponent dropped out and did not come back — a forfeit counts as their loss.',
+    silent: 'Your opponent\'s game stopped reporting — a forfeit counts as their loss.',
+    lagging: 'Your opponent\'s game stopped reporting — a forfeit counts as their loss.' }[r.why] || 'Your opponent left — a forfeit counts as their loss.') + early;
+  return ({ stall: 'Your game stopped answering (was it in the background?) — that counts as a forfeit.',
+    gone: 'You dropped out and did not get back in time — that counts as a forfeit.',
+    silent: 'Your game stopped reporting the result — that counts as a forfeit.',
+    lagging: 'Your game stopped reporting the result — that counts as a forfeit.' }[r.why] || 'You left the match — that counts as a forfeit.') + early;
+}
+const SIGNIN = 'Sign in (the account button) for ranked fights. Friend links still work without an account.';
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 /** Signal bars for a ping: 5 green = good, 2-3 yellow = average, 1 red = bad. */
@@ -56,6 +69,12 @@ export function arenaBase({ dev, lan }) {
   if (lan) return [location.origin + path, `${location.protocol}//${location.hostname}:8017${path}`];
   if (dev) return [`http://127.0.0.1:8017${path}`];
   return [];
+}
+
+/** `?bots=N`: 1-7 bots; 0 (or less) still means one, since a room of one is already won. Missing = 3. */
+export function practiceBots(q) {
+  const n = q == null || q === '' ? 3 : Math.floor(+q);
+  return Number.isFinite(n) ? Math.max(1, Math.min(7, n)) : 3;
 }
 
 export function mountArena(h) {
@@ -109,7 +128,7 @@ export function mountArena(h) {
 
   async function probe() {
     const pm = MODES.find((m) => m.room && m.id === qs.get('mode'));
-    if (pm && !practice) startPractice(pm.id, Math.max(1, Math.min(7, +qs.get('bots') || 3)));
+    if (pm && !practice) startPractice(pm.id, practiceBots(qs.get('bots')));
     for (const b of arenaBase({ dev: h.dev, lan })) {
       if (await ArenaClient.probe(b)) { base = b; break; }
     }
@@ -129,10 +148,14 @@ export function mountArena(h) {
     return client;
   }
 
-  function wire(c) {
+  function wire(c0) {
+    // A client we have closed (or replaced) must never touch the panel again.
+    const c = { on: (ev, fn) => c0.on(ev, (...a) => { if (c0 === client) return fn(...a); }) };
     c.on('me', (m) => { if (!name) { name = m.name; } paint(); });
     c.on('err', (m) => {
       if (m.code === 'allowance') { note = `<span class="warn">${esc(m.msg)}</span> <button class="btn small" data-a="upgrade">SUPPORT / PASS</button>`; view = 'home'; }
+      else if (m.code === 'signin') { note = `<span class="warn">${SIGNIN}</span>`; if (view !== 'result') view = 'home'; }
+      else if (m.code === 'slow') { note = `<span class="warn">${esc(m.msg || 'Slow down a moment.')}</span>`; if (view === 'joining') view = 'home'; }
       else { note = `<span class="warn">${esc(m.msg)}</span>`; if (view === 'lobby' || view === 'joining') view = 'home'; }
       paint();
     });
@@ -161,14 +184,19 @@ export function mountArena(h) {
       if (fight && fight.matchId === g.match && fight.round === g.round) fight.resync(g); else startRound(g);
     });
     c.on('out', (m) => {
-      if (m.you) { msg(m.why === 'left' ? 'You left the fight.' : 'You dropped out — the fight carried on without you.'); return; }
+      if (m.you) {
+        msg(m.why === 'left' ? 'You left the fight.' : m.why === 'away' ? 'You switched away, so the fight carried on without you.'
+          : m.why === 'stall' ? 'Your game stopped answering, so the fight carried on without you.' : 'You dropped out — the fight carried on without you.');
+        return;
+      }
       fight?.onOut(m.slot);
     });
     c.on('master', (m) => { if (fight) { fight.migrate(m.master, m.gone); fight.awayNote = ''; } });
     c.on('result', (r) => {
       result = r; matchId = r.match; wantRematch = oppRematch = false;
       r.eventPts = arenaBattle(r);
-      setTimeout(() => { stopFight(); view = 'result'; open(); paint(); refreshAllowance(); }, fight ? 600 : 0);
+      // Not watching (you quit to the campaign): keep the card for the next time the panel opens, and hang up.
+      setTimeout(() => { const had = !!fight || shown(); stopFight(); view = 'result'; if (had) open(); else closeIdle(); paint(); refreshAllowance(); }, fight ? 600 : 0);
     });
     c.on('rematch', () => { oppRematch = true; paint(); });
     c.on('away', (m) => {
@@ -179,7 +207,7 @@ export function mountArena(h) {
     c.on('reconnecting', (on) => { if (fight) fight.awayNote = on ? 'reconnecting…' : ''; });
     for (const ev of ['void', 'cancel', 'left']) {
       c.on(ev, (m) => {
-        const why = { declined: 'They declined.', timeout: 'Timed out.', allowance: 'No free battles left today.', disagree: 'The two results did not match, so this one is void.', draws: 'Too many draws — void.' }[m.why] ||
+        const why = { signin: 'Ranked fights need you signed in (the account button). Friend links still work without it.', declined: 'They declined.', timeout: 'Timed out.', allowance: 'No free battles left today.', disagree: 'The two results did not match, so this one is void.', draws: 'Too many draws — void.' }[m.why] ||
           (ev === 'left' ? 'Your opponent left.' : 'The match ended.');
         msg(why);
       });
@@ -198,7 +226,17 @@ export function mountArena(h) {
   }
   const evLine = (n) => (n ? `<p class="fine evaward">+${n} event point${n === 1 ? '' : 's'}</p>` : '');
 
-  function msg(text) { stopFight(); offer = null; view = 'msg'; note = esc(text); open(); paint(); }
+  /** The panel only comes up over what you are doing if it was already up, or an online fight was running. */
+  function msg(text) { const had = !!fight || shown(); stopFight(); offer = null; view = 'msg'; note = esc(text); if (had) open(); else closeIdle(); paint(); }
+  const shown = () => !!$('arena')?.classList.contains('show');
+  /** Nothing online going on: hang up, so no socket or peer link outlives the panel. */
+  function closeIdle() {
+    if (!client || fight || client.inMatch) return;
+    const c = client;
+    client = null;
+    c.leave();
+    c.close();
+  }
 
   function startRound(g) {
     if (fight) fight.destroy();
@@ -400,7 +438,7 @@ export function mountArena(h) {
       const R = view === 'result' ? { v: { winner: result.winner, place: result.place }, names: result.names, you: result.you, mode: result.mode } : { ...practiceResult, you: 0 };
       const p = R.v.place?.[R.you] || 0;
       const won = R.v.winner === R.you;
-      html += `<h3 class="${won ? 'win' : 'lose'}">${won ? 'YOU WIN' : R.v.winner < 0 ? 'A DRAW' : `YOU CAME ${ordinal(p).toUpperCase()}`}</h3>`;
+      html += `<h3 class="${won ? 'win' : 'lose'}">${won ? 'YOU WIN' : R.v.winner < 0 && p <= 1 ? 'A DRAW' : `YOU CAME ${ordinal(p).toUpperCase()}`}</h3>`;
       const order = (R.names || []).map((nm, i) => ({ nm: i === R.you ? 'YOU' : nm, p: R.v.place?.[i] || 99 })).sort((a, b) => a.p - b.p);
       html += `<div class="rows">${order.map((o) => `<div class="r"><span>${ordinal(o.p)}</span><b>${esc(o.nm)}</b></div>`).join('')}</div>`;
       if (view === 'result') {
@@ -417,7 +455,7 @@ export function mountArena(h) {
       const won = result.winner === result.you;
       const sc = result.score || [];
       html += `<h3 class="${won ? 'win' : 'lose'}">${won ? 'YOU WIN' : 'YOU LOSE'} ${sc[result.you] ?? 0} – ${sc[(result.you + 1) % sc.length] ?? 0}</h3>`;
-      if (result.forfeit) html += `<p class="fine">${won ? 'Your opponent left — a forfeit counts as their loss.' : 'You left the match — that counts as a forfeit.'}</p>`;
+      if (result.forfeit) html += `<p class="fine">${forfeitLine(result, won)}</p>`;
       const s = result.stats;
       if (s) html += `<div class="rows">${[['Arena wins', s.wins], ['Losses', s.losses], ['Win streak', `${s.streak} (best ${s.bestStreak})`], ['Knockouts', s.kos], ['Battles today', s.today]].map(([k, v]) => `<div class="r"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;
       else html += `<p class="fine">${lan ? '' : 'Not ranked — sign in to appear on the leaderboards.'}</p>`;
@@ -464,13 +502,13 @@ export function mountArena(h) {
       if (a === 'find') await find(b.dataset.mode);
       else if (a === 'friend') await makeFriend(b.dataset.mode);
       else if (a === 'challenge') { client.challenge(b.dataset.id); }
-      else if (a === 'stop') { client?.unwait(); client?.leave(); client?.lobby(false); view = 'home'; paint(); }
+      else if (a === 'stop') { client?.unwait(); client?.leave(); client?.lobby(false); closeIdle(); view = 'home'; paint(); }
       else if (a === 'copy') { try { await navigator.clipboard.writeText($('arenaLink').value); b.textContent = 'COPIED'; } catch { $('arenaLink').select(); } }
       else if (a === 'share') { navigator.share({ title: 'RAGDOJO', text: 'Fight me in RAGDOJO', url: $('arenaLink').value }).catch(() => {}); }
       else if (a === 'accept') { myAccepted = true; client.accept(matchId, await token()); paint(); }
-      else if (a === 'decline') { client.decline(matchId); view = 'home'; paint(); }
-      else if (a === 'rematch') { wantRematch = true; client.rematch(matchId); paint(); }
-      else if (a === 'leave') { client?.leave(); view = 'home'; paint(); }
+      else if (a === 'decline') { client.decline(matchId); closeIdle(); view = 'home'; paint(); }
+      else if (a === 'rematch') { wantRematch = true; client.rematch(matchId, await token()); paint(); }
+      else if (a === 'leave') { client?.leave(); closeIdle(); view = 'home'; paint(); }
       else if (a === 'upgrade') { h.openUpgrade(); }
       else if (a === 'start') { client.start(matchId); }
       else if (a === 'again') { view = 'home'; await find(b.dataset.mode); }
@@ -478,9 +516,15 @@ export function mountArena(h) {
     } catch { msg('Could not reach the arena.'); }
   });
 
+  // Running the fight and sent to the background: hang up so the others are not left frozen.
+  document.addEventListener('visibilitychange', () => {
+    if (!client) return;
+    if (document.hidden) { if (fight?.isMaster) client.hide(); } else client.show();
+  });
+
   btn?.addEventListener('click', () => {
     h.click();
-    if (view === 'msg' || view === 'ghostResult') view = 'home';
+    if (view === 'msg' || view === 'ghostResult' || (view === 'result' && !client)) view = 'home';
     open(); refreshAllowance();
     if (tab === 'ghosts') loadGhosts();
     if (tab === 'boards') boards.refresh();
@@ -488,8 +532,9 @@ export function mountArena(h) {
   $('btnArenaClose')?.addEventListener('click', () => {
     h.click();
     // Closing leaves whatever you were waiting in; a fight in progress is not closed from here.
-    if (client && !fight && view !== 'result') { client.unwait(); if (view !== 'home') client.leave(); client.lobby(false); view = 'home'; }
-    if (view === 'ghostResult') view = 'home';
+    // The result card too: its rematch offer goes with it.
+    if (client && !fight) { client.unwait(); client.leave(); client.lobby(false); closeIdle(); view = 'home'; }
+    if (view === 'ghostResult' || view === 'msg') view = 'home';
     h.overlay(null);
   });
 
