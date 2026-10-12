@@ -91,8 +91,10 @@ const vdef = defById('vines-day'), rdef = defById('reveal-week');
 const vwin = windowOf(vdef, NOW), rwin = windowOf(rdef, NOW);
 const VEV = eventIdOf(vdef, vwin), REV = eventIdOf(rdef, rwin);
 const board = V.makeBoard(VEV);
-const PIC = q.get('img') ? (q.get('pic') || R.pictureOf(rdef, REV)) : 'heroic';
-const CHOICES = R.choicesFor(REV, PIC);
+// No answers ship: the drawn practice picture has no choices. To try guessing on a real picture,
+// pass ?img=<url>&choices=A|B|C|D&right=<0-3> (the right one is only ever typed into the URL).
+const CHOICES = q.get('img') && q.get('choices') ? q.get('choices').split('|').slice(0, R.CHOICES) : [];
+const RIGHT = CHOICES[+q.get('right')];
 const PEEK = q.get('peek') === '1';
 
 const NAMES = ['INKY', 'NIB', 'SMUDGE', 'BIRO', 'DOODLE', 'ERASER', 'SCRAWL', 'QUILL', 'GRAPHITE', 'MARGIN',
@@ -153,7 +155,7 @@ function roll() {
 function battle(res) {
   clock += 61e3;
   const b = { id: `preview:${clock}`, at: clock, src, won: res === 'win', oppDmg: res === 'close' ? 0.7 : res === 'win' ? 1 : 0.3 };
-  st = S.recordBattle(st, b, { pass: false });
+  st = S.recordBattle(st, b);
   say(`${res === 'win' ? 'WIN' : 'loss'} banked in ${Object.keys(st.ev).filter((k) => st.ev[k].b.some((x) => x[0] === b.id)).length} event(s)`);
   persist(); refresh();
 }
@@ -184,8 +186,9 @@ function refresh() {
   const rs = S.evState(st, REV), pts = myPts(REV);
   $('pleft').textContent = R.left(rdef, rs, pts);
   $('cost').textContent = `${rdef.cost} point a square · ${rs.open.length}/25 open`;
-  $('gleft').textContent = `${R.guessesLeft(rs)} guess${R.guessesLeft(rs) === 1 ? '' : 'es'} left`;
-  $('choices').innerHTML = CHOICES.map((c, i) => `<button class="btn" data-choice="${i}" ${R.guessesLeft(rs) <= 0 || rs.guesses.includes(c) ? 'disabled' : ''}>${c}</button>`).join('');
+  const can = R.canGuess(rs, CHOICES.length > 0);
+  $('gleft').textContent = !CHOICES.length ? 'no guessing on the practice picture' : !rs.b.length ? 'fight once to guess' : `${R.guessesLeft(rs)} guess${R.guessesLeft(rs) === 1 ? '' : 'es'} left`;
+  $('choices').innerHTML = CHOICES.map((c, i) => `<button class="btn" data-choice="${i}" ${!can || rs.guesses.includes(c) ? 'disabled' : ''}>${c}</button>`).join('');
   $('rewards').textContent = rs.solved ? `solved! bonus ${rs.bonus} ink · picture unlocked as an arena background`
     : R.complete(rs) ? 'picture complete — unlocked as an arena background' : '';
 }
@@ -221,7 +224,7 @@ $('reset').onclick = () => { st = S.fresh(); clock = NOW; rivals = freshRivals()
 $('choices').onclick = (e) => {
   const b = e.target.closest('[data-choice]'); if (!b) return;
   const c = CHOICES[+b.dataset.choice];
-  const r = R.guess(rdef, S.evState(st, REV), c, c === R.PICTURES[PIC].answer);
+  const r = R.guess(rdef, S.evState(st, REV), c, c === RIGHT);
   if (!r.ok) return;
   st = S.setEv(st, REV, r.st);
   say(r.right ? `yes — ${c}!` : `not ${c.toLowerCase()}`);

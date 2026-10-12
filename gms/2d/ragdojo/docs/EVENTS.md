@@ -12,7 +12,7 @@ js/events/vines.js     board, move, positionAt, takeTurn, THE REPLAY RULE, selec
 js/events/reveal.js    5×5 grid, choices, guesses, rewards
 js/events/state.js     the events save: record, merge, prune, dailies rule
 dev/events.html        standalone preview (fake rivals, simulated battles)
-tools/eventsgate.mjs   the gate; --falsify breaks it 22 ways and expects 22 reds
+tools/eventsgate.mjs   the gate; --falsify breaks it 27 ways and expects 27 reds
 tools/eventsshot.mjs   the preview in headless Chrome with real touches
 ```
 
@@ -26,7 +26,7 @@ No module touches the DOM, `Date.now()` (except `today()`), or `Math.random`.
 | `reveal-week` | Picture reveal, 1 pt/square | ISO week, Monday 00:00Z | free | any battle |
 | `vines-month` | Scrolls & Ropes theme | calendar month UTC | Pass | arena only |
 | `reveal-month` | Picture reveal, 2 pt/square | calendar month UTC | Pass | arena only |
-| `halloween` | Picture reveal (skeleton) | Oct 24 – Nov 1 UTC | Pass | any battle |
+| `halloween` | Picture reveal, "SPOOKY WEEK" | Oct 24 – Nov 1 UTC | Pass | any battle |
 
 An **event id** is `<def id>:<window key>`: `vines-day:2026-10-13`, `reveal-week:2026-W42`,
 `vines-month:2026-10`, `halloween:2026`. `parseEventId` turns one back into its definition and
@@ -70,12 +70,18 @@ returns the counting battles **in play order** (`at`, then id) with their points
 
 ## Picture reveal
 
-25 squares. Opening one costs `cost` points from the event's total. Guessing picks from 4
-choices (`choicesFor(eventId, pic)`, a seeded shuffle — no free text): one guess to start, one
-more per five squares opened. A right guess solves the picture and pays `guessBonus` INK per square
-still covered. A solved or fully opened picture owes `arenaBackground`; a solved one also owes
-the ink (`{ kind: 'ink', amount }`). `rewardsOwed()` lists what is unpaid; a reward is claimed by adding its id to
-`claimed`. Paying the ink and unlocking the background are the game's to wire.
+25 squares. Opening one costs `cost` points from the event's total, and squares stay buyable
+after a right guess (the whole picture is only ever sent at 25 open). **No answer ships with the
+game** (2026-10-13 F3): the code-drawn practice picture has no choices and no guess bonus; real
+art takes four choices from the public manifest and only the arena server can check a guess —
+offline there is no guess bonus at all. (A salted hash was the alternative and was rejected: with
+four public choices, hashing each one finds the answer in four tries whatever the salt.)
+A guess needs real art (`canGuess(st, art)`) and at least one battle in the event: one guess to
+start, one more per five squares opened. A right guess solves the picture and pays `guessBonus`
+INK per square still covered. A solved or fully opened picture owes `arenaBackground`; a solved
+one also owes the ink (`{ kind: 'ink', amount }`). `rewardsOwed()` lists what is unpaid; a reward
+is claimed by adding its id to `claimed`. Pass events bank every battle but pay, show and sync
+only with the Pass.
 
 ## The save (`save.events` inside the run save, so cloud sync carries it; `save.eventPrizes` holds unlocked backgrounds)
 
@@ -92,7 +98,11 @@ the ink (`{ kind: 'ink', amount }`). `rewardsOwed()` lists what is unpaid; a rew
   In-progress match state never enters this save, so it never syncs.
 - `b` is kept in play order — for Vines & Ladders it IS the list of turns. `recordBattle` applies
   the campaign cap.
-- `merge(a, b)` for cloud sync: battles union by id and re-sorted into play order, `rolls` max
+- `recordBattle` banks into EVERY running event the battle counts for, Pass events included
+  (a Pass holder whose entitlement is briefly unknown loses nothing); the Pass gates display,
+  rewards and sync. Battles are stamped on the server's clock (`Date.now() + net.skew`).
+- `merge(a, b)` for cloud sync: battles union by id, re-sorted into play order and put back
+  through `counted()` (two devices' 10 campaign fights a day are still 10, 60 s apart), `rolls` max
   (capped at what the merged battles bank), squares union then clamped to
   what the merged points pay for, guesses union, `solved` or, `claimed` union, `seenDay` max.
 - `prune(state, now)` drops events that ended more than 7 days ago.
@@ -100,7 +110,8 @@ the ink (`{ kind: 'ink', amount }`). `rewardsOwed()` lists what is unpaid; a rew
   else the account / LAN device / `local:<device>`). Signing in mid-event can move the stick man
   once, to where that account's dice put it.
 - NEW GAME keeps `events` and `eventPrizes`; adopting a cloud save merges this device's events
-  into it (`mergeEventsInto`, using `merge` above).
+  into it (`mergeEventsInto` → `adoptMerge`): an ink reward stays claimed only if the adopted
+  save had claimed it too, otherwise it is paid again into that save.
 
 ## Server contract (built 2026-10-13: `server/events.go`)
 
@@ -115,7 +126,7 @@ server already has, so the only thing a client can lie about is campaign fights.
 | `rolls` | the ordered points of the accepted battles (`counted`, play order by server time) | `rolls > sum(points)` |
 | position, turns (never sent) | `positionAfterRolls(board, uid, eventId, rolls)`, `turnsDone(...)` | — |
 | `open` squares | `cost * open.length <= points` | overspent, duplicate, out of 0..24 |
-| a guess | the answer, which only the server holds online (`PICTURES` is offline-only) | no guesses left; no counted battle in the event yet (`409 play first`) |
+| a guess | the answer, which only the server holds | no guesses left; no counted battle in the event yet (`409 play first`) |
 | rival list request | everyone's `{uid, name, points[], rolls}` for the event | rate limited per caller (a limited caller gets its cached list, else 429) — the server applies `rivalView` with the caller's own turns, so nobody receives a future position |
 
 Endpoints (under the arena prefix, `/gms/2d/ragdojo/arena`; all but `GET /events` need the
@@ -127,7 +138,9 @@ player's token, and Pass events also need a `br8t_pass` entitlement from the pay
 | `GET /events` | the running events and the server clock (also the client's probe) |
 | `POST /events/sync {event, name, b, rolls, open, friends}` | applies the claim, answers with the recomputed state: `b` (accepted, play order), `points`, `rolls`/`pos`/`turns` or `open`/`guesses`/`solved`/`bonus`/`guessesLeft`/`art`, `closed`, and `rivals` for Vines & Ladders |
 | `GET /events/rivals?event=&friends=` | the rival list on its own |
-| `POST /events/guess {event, pic, choice}` | checked against `ARENA_EVENT_ANSWERS` (art) or the placeholder's answer; `pic` must match what the server has (`409 picture changed`, the guess is kept) |
+| `POST /events/guess {event, pic, choice}` | checked against `ARENA_EVENT_ANSWERS` (art) or the placeholder's answer (bonus 0; the client never offers it); `pic` must match what the server has (`409 picture changed`, the guess is kept) |
+| `GET /events/art/tile?event=&cell=` | a JPEG of that one square, cut from the server-only picture (`ARENA_EVENT_ART`), only if the CALLER's stored state has it open (else 403); `server/eventart.go` |
+| `GET /events/art/full?event=` | the whole picture, only once the caller has all 25 open (a right guess is not enough) |
 
 - **Agreed arena results count by themselves.** `store.afterMatch` (one hook in `recordMatch`)
   writes every verified seat to `ev_arena`; every event's battle list is the player's accepted
@@ -177,7 +190,10 @@ across year and ISO-week edges, bad ids, 30 messy `counted()` cases) written by
 
 Picture-reveal art is generated with local Flux (ink on notebook paper) and reviewed by Aaron
 before anything ships: `node tools/eventart/server.mjs` (see CLAUDE.md, "Event art review").
-Approving writes `assets/events/<event-id>.webp|.jpg` plus `assets/events/manifest.json`
-(`{v, pictures: {eventId: {img, jpg, w, h, choices}}}` — four choices, shuffled, no answer); the
-answer goes only to `~/.ragdojo/eventart/answers.json`, which the arena server reads. An event
-with no approved art uses the code-drawn placeholder (a flying kick, answer public).
+Approving writes the picture to `~/.ragdojo/eventart/approved/<event-id>.jpg` (server-only;
+`server/deploy.sh` copies it to `/srv/data/ragdojo-arena/event_art/`, a LAN server reads the
+folder directly) and a public `assets/events/manifest.json` entry `{w, h, choices, overlay?}` —
+four shuffled choices, no image, no answer. The answer goes only to answers.json. The panel shows
+a picture square by square from the server's tiles; with no server every event shows the
+code-drawn practice picture. `tools/eventsecretgate.mjs` fails on any answer in the bundle or
+any picture in the repo or the builds.

@@ -121,6 +121,22 @@ rsyncs answers.json to /srv/data/ragdojo-arena/event_answers.json; unit gains AR
 ARENA_EVENT_ANSWERS); `npm run build` (copies assets/events) then `games/deploy.sh`; no Caddy change (routes sit
 under /gms/2d/ragdojo/arena/). The payment service must answer GET /api/br8t/entitlement for Pass events to lock.
 
+### F3 status (events review fixes, 2026-10-13)
+Done, local only, NOT deployed. R3's H3/M1/M2/M4/L1/L4/L5/L7/L10 fixed (see CLAUDE.md "Event secrets"):
+approved art is server-only (`server/eventart.go` serves a tile per square the caller opened, the whole
+picture only at 25; the review tool writes `~/.ragdojo/eventart/approved/`, the public manifest keeps
+`{w,h,choices,overlay}`; the six committed pictures removed); no answers in the bundle (reveal.js
+`PICTURES` gone, no offline guess bonus, no guess on the practice picture, a guess needs a battle);
+Halloween retitled SPOOKY WEEK; new decoys set in Aaron's tool data and republished; Pass events bank
+every battle; battles stamped on server time; merge re-caps; cloud adopt re-pays unpaid ink; Hindi
+names; panel refresh after a guess; 40 px guess buttons; rivals keyed by `rid`.
+For F1/manager: `server/events.go` `placeholderAnswer = "A FLYING KICK"` (and events_test/abuse_test)
+is the W43 picture's real answer in public source — the client no longer offers placeholder guesses,
+so it can go. Restart Aaron's review tool on 8023 (it still runs the old code, which would write
+approved pictures into assets/events).
+Deploy additions: `server/deploy.sh` now rsyncs `~/.ragdojo/eventart/approved/*.jpg` to
+`/srv/data/ragdojo-arena/event_art/` (the server's default art dir next to event_answers.json).
+
 ### F1 status (arena server hostile-review fixes, 2026-10-13)
 All 15 R1 items, R2's 5 server halves, and R3's server items are done in server/. Every exploit is
 ported inverted into `server/abuse_test.go`, and each fix has a revert mutant that turns its test

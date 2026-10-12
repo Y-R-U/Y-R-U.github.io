@@ -6,14 +6,18 @@
  *
  *   node tools/eventart/server.mjs [--seed <dir of pngs + meta.json>]
  *
+ *   node tools/eventart/server.mjs --republish   rewrite every approved picture + manifest entry, then exit
+ *
  *   EVENTART_PORT  8023                     listens on 0.0.0.0 (the LAN)
  *   EVENTART_DATA  ~/.ragdojo/eventart      candidates, state, the access key and answers.json
- *   EVENTART_OUT   <game>/assets/events     approved images + manifest.json (what the game reads)
+ *   EVENTART_ART   $EVENTART_DATA/approved  the approved pictures (<event>.jpg) — server-only
+ *   EVENTART_OUT   <game>/assets/events     manifest.json: choices + name box, NO images (public)
  *   FLUX_URL / LTX_URL                      http://localhost:7867 / :7866
  *
- * Approving writes <event>.webp + .jpg and a manifest entry with the four shuffled choices;
- * the ANSWER goes only to $EVENTART_DATA/answers.json, which the arena server reads
- * (ARENA_EVENT_ANSWERS) and which never enters the public repo.
+ * Approving writes the full picture to $EVENTART_ART (server/deploy.sh copies it to the arena
+ * server, which hands each player only the squares they opened — server/eventart.go) and a
+ * public manifest entry with the four shuffled choices; the ANSWER goes only to answers.json.
+ * Neither the picture nor the answer ever enters the public repo.
  */
 import { createServer } from 'node:http';
 import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, renameSync, statSync, unlinkSync } from 'node:fs';
@@ -23,7 +27,6 @@ import { fileURLToPath } from 'node:url';
 import { randomBytes, randomInt } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { EVENT_DEFS, windowOf, eventIdOf } from '../../js/events/calendar.js';
-import { PICTURES } from '../../js/events/reveal.js';
 import { cleanOverlay } from '../../js/events/overlay.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -32,6 +35,7 @@ const PORT = +(process.env.EVENTART_PORT || 8023);
 const HOST = process.env.EVENTART_HOST || '0.0.0.0';
 const DATA = process.env.EVENTART_DATA || join(homedir(), '.ragdojo/eventart');
 const OUT = process.env.EVENTART_OUT || join(GAME, 'assets/events');
+const ART = process.env.EVENTART_ART || join(DATA, 'approved');
 const FLUX = process.env.FLUX_URL || 'http://localhost:7867';
 const LTX = process.env.LTX_URL || 'http://localhost:7866';
 const CAND = join(DATA, 'candidates');
@@ -46,6 +50,7 @@ const RECOMMENDED = ['heroic_2', 'halloween_1', 'dojo_2'];
 
 mkdirSync(CAND, { recursive: true });
 mkdirSync(OUT, { recursive: true });
+mkdirSync(ART, { recursive: true });
 const readJSON = (f, d) => { try { return JSON.parse(readFileSync(f, 'utf8')); } catch { return d; } };
 const writeJSON = (f, v) => { writeFileSync(f + '.tmp', JSON.stringify(v, null, 1) + '\n'); renameSync(f + '.tmp', f); };
 
@@ -87,12 +92,15 @@ function seed(dir) {
   const week = up.filter((e) => e.id.startsWith('reveal-week:'));
   const hal = up.find((e) => e.id.startsWith('halloween:'));
   const desc = (p) => p.replace(', ' + STYLE, '');
+  // Answers and decoys come with the seed (themes.json), never from the game's public code.
+  const given = readJSON(join(dir, 'themes.json'), {});
+  const theme = (name, event) => ({ event, answer: '', decoys: [], desc: '', ...given[name] });
   state = {
     v: 1,
     themes: {
-      heroic: { event: week[1]?.id || week[0]?.id || '', ...PICTURES.heroic, desc: '' },
-      halloween: { event: hal?.id || '', ...PICTURES.halloween, desc: '' },
-      dojo: { event: week[2]?.id || week[0]?.id || '', ...PICTURES.dojo, desc: '' },
+      heroic: theme('heroic', week[1]?.id || week[0]?.id || ''),
+      halloween: theme('halloween', hal?.id || ''),
+      dojo: theme('dojo', week[2]?.id || week[0]?.id || ''),
     },
     candidates: [],
   };
@@ -100,7 +108,7 @@ function seed(dir) {
     const id = basename(m.file, '.png');
     if (!existsSync(join(dir, m.file))) continue;
     copyFileSync(join(dir, m.file), join(CAND, m.file));
-    state.themes[m.theme].desc ||= desc(m.prompt);
+    (state.themes[m.theme] ||= theme(m.theme, '')).desc ||= desc(m.prompt);
     state.candidates.push({ id, theme: m.theme, file: m.file, prompt: m.prompt, seed: m.seed, status: 'pending',
       note: notes[id] || '', recommended: RECOMMENDED.includes(id), created: now });
   }
@@ -148,7 +156,7 @@ async function generate(c) {
   } catch (e) { c.status = 'failed'; c.error = String(e.message || e); save(); }
 }
 // Picks up anything left mid-generation by a restart.
-for (const c of state.candidates) if (['queued', 'generating', 'waiting for LTX to go idle'].includes(c.status)) void generate(c);
+if (!process.argv.includes('--republish')) for (const c of state.candidates) if (['queued', 'generating', 'waiting for LTX to go idle'].includes(c.status)) void generate(c);
 
 function newCandidate(theme, prompt) {
   const n = 1 + state.candidates.filter((x) => x.theme === theme).reduce((m, x) => Math.max(m, +(x.id.split('_').pop()) || 0), 0);
@@ -167,26 +175,38 @@ function shuffle(list) {
   return a;
 }
 
-function approve(c) {
-  const t = state.themes[c.theme];
-  if (!t?.event) throw new Error('pick the event this picture is for first');
+function themeOk(t) {
   const answer = String(t.answer || '').trim().toUpperCase();
   const decoys = (t.decoys || []).map((d) => String(d).trim().toUpperCase()).filter(Boolean);
   if (!answer || decoys.length < 3 || new Set([answer, ...decoys]).size < 4) throw new Error('needs an answer and three different decoys');
-  const name = slug(t.event);
-  const src = join(CAND, c.file);
-  execFileSync('cwebp', ['-quiet', '-q', '80', '-resize', '1024', '640', src, '-o', join(OUT, name + '.webp')]);
-  execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '80', '-z', '640', '1024', src, '--out', join(OUT, name + '.jpg')], { stdio: 'ignore' });
+  return { answer, decoys };
+}
+
+/** The picture to the server-only folder; the public manifest gets choices + name box only. */
+function publish(c) {
+  const t = state.themes[c.theme], ev = c.approvedFor || t.event;
+  const { answer, decoys } = themeOk(t);
+  const name = slug(ev);
+  execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '88', '-z', '640', '1024', join(CAND, c.file), '--out', join(ART, name + '.jpg')], { stdio: 'ignore' });
+  for (const old of [name + '.webp', name + '.jpg']) { try { unlinkSync(join(OUT, old)); } catch {} }
   const man = readJSON(MANIFEST, { v: 1, pictures: {} });
   man.v = 1; man.pictures ||= {};
-  man.pictures[t.event] = { img: name + '.webp', jpg: name + '.jpg', w: 1024, h: 640, choices: shuffle([answer, ...decoys.slice(0, 3)]) };
-  if (c.overlay) man.pictures[t.event].overlay = c.overlay;
+  man.pictures[ev] = { w: 1024, h: 640, choices: shuffle([answer, ...decoys.slice(0, 3)]) };
+  if (c.overlay) man.pictures[ev].overlay = c.overlay;
   writeJSON(MANIFEST, man);
   const ans = readJSON(ANSWERS, { v: 1, answers: {} });
-  ans.answers[t.event] = answer;
+  ans.answers[ev] = answer;
   writeJSON(ANSWERS, ans);
-  for (const x of state.candidates) if (x.status === 'approved' && state.themes[x.theme]?.event === t.event) x.status = 'pending';
-  c.status = 'approved'; c.approvedFor = t.event; c.approvedAt = Date.now();
+}
+
+function approve(c) {
+  const t = state.themes[c.theme];
+  if (!t?.event) throw new Error('pick the event this picture is for first');
+  themeOk(t);
+  for (const x of state.candidates) if (x.status === 'approved' && x !== c && x.approvedFor === t.event) x.status = 'pending';
+  c.approvedFor = t.event;
+  publish(c);
+  c.status = 'approved'; c.approvedAt = Date.now();
   save();
 }
 
@@ -212,8 +232,8 @@ function revoke(c) {
   const ev = c.approvedFor;
   const man = readJSON(MANIFEST, { v: 1, pictures: {} });
   const e = man.pictures?.[ev];
+  for (const f of [join(ART, slug(ev) + '.jpg'), join(OUT, slug(ev) + '.webp'), join(OUT, slug(ev) + '.jpg')]) { try { unlinkSync(f); } catch {} }
   if (e) {
-    for (const f of [e.img, e.jpg]) { try { unlinkSync(join(OUT, f)); } catch {} }
     delete man.pictures[ev];
     writeJSON(MANIFEST, man);
   }
@@ -227,7 +247,7 @@ function revoke(c) {
 // ── http ──────────────────────────────────────────────────────────────────────────────
 function view() {
   const man = readJSON(MANIFEST, { pictures: {} });
-  return { events: upcoming(), themes: state.themes, candidates: state.candidates, approved: Object.keys(man.pictures || {}), out: OUT };
+  return { events: upcoming(), themes: state.themes, candidates: state.candidates, approved: Object.keys(man.pictures || {}), out: OUT, art: ART };
 }
 
 const send = (res, code, body, type = 'application/json') => {
@@ -271,6 +291,8 @@ const server = createServer(async (req, res) => {
         if (Array.isArray(body.decoys)) t.decoys = body.decoys.slice(0, 3).map((d) => String(d).slice(0, 40).toUpperCase());
         if (typeof body.desc === 'string') t.desc = body.desc.slice(0, 1200);
         save();
+        // New decoys (or answer) for a picture already approved: its choices change at once.
+        for (const x of state.candidates) if (x.status === 'approved' && x.theme === name && (body.answer || body.decoys)) publish(x);
         if (body.generate) for (let i = 0; i < Math.min(4, +body.generate || 0); i++) newCandidate(name, `${t.desc}, ${STYLE}`);
         break;
       }
@@ -279,6 +301,11 @@ const server = createServer(async (req, res) => {
     send(res, 200, { ok: true, state: view() });
   } catch (e) { send(res, 400, { error: String(e.message || e) }); }
 });
+
+if (process.argv.includes('--republish')) {
+  for (const c of state.candidates) if (c.status === 'approved') { publish(c); console.log(`republished ${c.id} -> ${c.approvedFor}`); }
+  process.exit(0);
+}
 
 server.listen(PORT, HOST, () => {
   const ips = Object.values(networkInterfaces()).flat().filter((i) => i && i.family === 'IPv4' && !i.internal).map((i) => i.address);

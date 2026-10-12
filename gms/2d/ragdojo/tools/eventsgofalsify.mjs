@@ -25,13 +25,18 @@ const GO = [
   ['agreed arena results not counted', '\th.st.afterMatch = h.st.eventArenaResult\n', ''],
   ['the client picks which answer is checked', '\tif (body.Pic == "art") != art {', '\tif (body.Pic == "art") != art && false {'],
   ['pass events open to everyone', 'if def.Pass && !h.lan && !h.hasPass(r.Context(), uid, tok) {', 'if def.Pass && false && !h.hasPass(r.Context(), uid, tok) {'],
+  ['art routes not wired', '\th.eventArtRoutes(mux, prefix, origins)', '\t_ = 0'],
+  ['a solved picture stops opening (no way to 25)', 'if def.Kind == "reveal" && len(p.openCells) < cells {', 'if def.Kind == "reveal" && !p.solved && len(p.openCells) < cells {'],
+  ['art: a tile for any square', 'if !containsInt(open, cell) {', 'if false && !containsInt(open, cell) {', 'eventart.go'],
+  ['art: the whole picture before 25 are open', 'if len(open) < cells {', 'if len(open) < 2 {', 'eventart.go'],
+  ['art: tiles cut from the wrong square', 'col, row := c%5, c/5', 'col, row := c/5, c%5', 'eventart.go'],
 ];
 let red = 0, total = 0;
-for (const [what, from, to] of GO) {
+for (const [what, from, to, file = 'events.go'] of GO) {
   total++;
   const dir = mkdtempSync(join(tmpdir(), 'evgo-'));
   cpSync(join(ROOT, 'server'), dir, { recursive: true });
-  const f = join(dir, 'events.go'), src = readFileSync(f, 'utf8');
+  const f = join(dir, file), src = readFileSync(f, 'utf8');
   if (!src.includes(from)) { console.log(`MISSED (source moved): ${what}`); rmSync(dir, { recursive: true, force: true }); continue; }
   writeFileSync(f, src.replace(from, to));
   // A mutant that does not compile proves nothing: it would be "red" for the wrong reason.

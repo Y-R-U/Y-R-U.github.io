@@ -33,6 +33,13 @@ echo ">> event-picture answers (server-only; written by tools/eventart when Aaro
 ANSWERS="${ANSWERS:-$HOME/.ragdojo/eventart/answers.json}"
 if [ -f "$ANSWERS" ]; then rsync -az "$ANSWERS" "$HOST:/srv/data/$APP/event_answers.json"; else echo "   none yet: every event uses the drawn placeholder"; fi
 
+echo ">> approved event art (server-only: the game never ships it; eventart.go serves opened squares)"
+ART="${ART:-$HOME/.ragdojo/eventart/approved}"
+if [ -d "$ART" ]; then
+  ssh "$HOST" "install -d -m 700 /srv/data/$APP/event_art"
+  rsync -az --delete --include='*.jpg' --exclude='*' "$ART/" "$HOST:/srv/data/$APP/event_art/"
+else echo "   none yet: every event uses the drawn placeholder"; fi
+
 echo ">> install binary + unit (previous kept as .prev)"
 rsync -az "$SERVER_DIR/$APP.service" "$HOST:/tmp/$APP.service"
 ssh "$HOST" "if [ -f $BIN ]; then cp -p $BIN $BIN.prev; fi && mv $BIN.new $BIN && \

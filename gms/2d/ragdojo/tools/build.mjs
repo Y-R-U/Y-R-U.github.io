@@ -33,11 +33,10 @@ for (const edition of ['home', 'itch']) {
   for (const file of await readdir(join(root, 'assets/audio'))) {
     if (/^[a-z0-9]+\.mp3$/.test(file)) await cp(join(root, 'assets/audio', file), join(out, 'assets/audio', file));
   }
-  // Approved event art and its manifest (tools/eventart); the answers never ship.
+  // The event manifest only (choices, name box): the pictures and answers live on the arena
+  // server and never ship (tools/eventart, server/eventart.go, tools/eventsecretgate.mjs).
   await mkdir(join(out, 'assets/events'), { recursive: true });
-  for (const file of await readdir(join(root, 'assets/events')).catch(() => [])) {
-    if (/^[\w.-]+\.(webp|jpg)$|^manifest\.json$/.test(file)) await cp(join(root, 'assets/events', file), join(out, 'assets/events', file));
-  }
+  await cp(join(root, 'assets/events/manifest.json'), join(out, 'assets/events/manifest.json')).catch(() => {});
   await cp(join(root, 'privacy.html'), join(out, 'privacy.html'));
   await cp(join(root, 'terms.html'), join(out, 'terms.html'));
   const files = [];

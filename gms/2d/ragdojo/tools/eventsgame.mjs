@@ -9,10 +9,13 @@
  *   - Pass events are visible but locked for a non-Pass player, with a non-blocking note;
  *   - X in the corner, backdrop dismiss, zero console errors;
  *   - online (a real arena server): rivals come from the server and stand where THE REPLAY
- *     RULE puts them, the guess is checked by the server and pays ink, the prize background.
+ *     RULE puts them; approved art arrives as tiles of opened squares only; the guess is checked
+ *     by the server and pays ink; the panel refreshes (Solved, PRIZES) without reopening;
+ *   - no answers in the page: the practice picture offers no guess, a guess needs a battle,
+ *     guess buttons are >= 40 px tall; battles are stamped on the SERVER's clock.
  *
  *   node tools/eventsgame.mjs              (EVENTS_TEST_PORT moves its ports; default 9500-9502)
- *   node tools/eventsgame.mjs --falsify    breaks the game 4 ways in a temp copy; each must go red
+ *   node tools/eventsgame.mjs --falsify    breaks the game 9 ways in a temp copy; each must go red
  */
 import { spawn, execFileSync } from 'node:child_process';
 import { mkdtempSync, rmSync, cpSync, symlinkSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -42,11 +45,21 @@ async function touchAt(c, x, y) {
 }
 const vis = (id) => `document.getElementById('${id}').classList.contains('show')`;
 
+const slug = (id) => id.replace(/[^A-Za-z0-9-]+/g, '-');
+const NOW0 = Date.now();
+const REV0 = eventIdOf(defById('reveal-week'), windowOf(defById('reveal-week'), NOW0));
+// Test art for this week's picture: server-side only, plus the public manifest entry the page
+// would get from the repo (served through CDP Fetch, since the repo's manifest has no entry).
+const ART_MANIFEST = { v: 1, pictures: { [REV0]: { w: 1024, h: 640, choices: ['A CANOE', 'A KITE', 'A TEA PARTY', 'A SUMO MATCH'] } } };
+
 async function startArena(serverDir, port, dir) {
   const bin = join(dir, 'arena'), db = join(dir, 'a.db');
   execFileSync('go', ['build', '-o', bin, '.'], { cwd: serverDir, stdio: 'inherit' });
+  mkdirSync(join(dir, 'art'));
+  execFileSync('sips', ['-s', 'format', 'jpeg', '-z', '640', '1024', join(ROOT, '../../../assets/screenshots/ragdojo.jpg'), '--out', join(dir, 'art', slug(REV0) + '.jpg')], { stdio: 'ignore' });
+  writeFileSync(join(dir, 'answers.json'), JSON.stringify({ answers: { [REV0]: 'A KITE' } }));
   const proc = spawn(bin, [], { env: { ...process.env, ARENA_ADDR: `127.0.0.1:${port}`, ARENA_DB: db, ARENA_ICE_URL: 'off', ARENA_ALLOWANCE_URL: 'off',
-    ARENA_ENTITLEMENT_URL: 'off', ARENA_DEV_AUTH: '1', ARENA_EVENT_ANSWERS: join(dir, 'answers.json') }, stdio: 'ignore' });
+    ARENA_ENTITLEMENT_URL: 'off', ARENA_DEV_AUTH: '1', ARENA_EVENT_ANSWERS: join(dir, 'answers.json'), ARENA_EVENT_ART: join(dir, 'art') }, stdio: 'ignore' });
   const base = `http://127.0.0.1:${port}/gms/2d/ragdojo/arena`;
   for (let i = 0; i < 80; i++) { try { if ((await fetch(base + '/health')).ok) break; } catch {} await sleep(100); }
   return { proc, base };
@@ -66,6 +79,12 @@ export async function run(root, serverDir, { label = '' } = {}) {
       const c = await CDP.launch();
       tabs.push(c);
       await c.send('Network.setCacheDisabled', { cacheDisabled: true });
+      let artOn = false;
+      c.on('Fetch.requestPaused', (p) => {
+        const body = Buffer.from(JSON.stringify(artOn ? ART_MANIFEST : { v: 1, pictures: {} })).toString('base64');
+        void c.send('Fetch.fulfillRequest', { requestId: p.requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json' }], body });
+      });
+      await c.send('Fetch.enable', { patterns: [{ urlPattern: '*assets/events/manifest.json*' }] });
       await c.viewport(w, h, 1, true);
       const L = `${name}: `;
       const url = (q) => `${web.base}/index.html?dpr=1&${q}`;
@@ -131,6 +150,7 @@ export async function run(root, serverDir, { label = '' } = {}) {
       await touchAt(c, pt.x, pt.y);
       const opened = await c.eval(`JSON.stringify(window.__events.state.ev['${REV}'].open)`);
       ok(L + 'a tap on the picture opens the square under the finger', opened === `[${target}]`, opened);
+      ok(L + 'offline: the practice picture offers no guess', await c.eval(`!document.querySelector('[data-guess]') && /practice picture/.test(document.getElementById('evSide').textContent)`));
       await c.shot(join(SHOTS, `events_reveal_${name}.png`));
 
       // ── backdrop: a drag ending outside keeps it, a tap outside closes it ──
@@ -189,18 +209,52 @@ export async function run(root, serverDir, { label = '' } = {}) {
       const srv = await (await fetch(arena.base + '/events/sync', { method: 'POST', headers: { Authorization: `Bearer dev:${me}` }, body: JSON.stringify({ event: VEV }) })).json();
       ok(L + 'the server holds my 6 rolls', srv.rolls === 6, JSON.stringify(srv.rolls));
       await c.shot(join(SHOTS, `events_online_${name}.png`));
-      // The guess goes to the server; a right one pays ink and unlocks the background.
+      // Approved art: only opened squares come down, as tiles; the guess goes to the server.
+      artOn = true;
+      await c.goto(url(`auto=1&arena=${encodeURIComponent(arena.base)}&arenauid=${me}`));
+      await c.waitFor('window.__state && window.__state.mode === "hub"', 20000);
+      await tap(c, '#btnEvents');
+      await c.waitFor(vis('events'), 3000);
       await tap(c, `#evTabs [data-ev="${REV}"]`);
+      ok(L + 'the server says the art is up', await c.waitFor(`window.__events.artOn('${REV}')`, 5000));
       await c.waitFor(`document.querySelector('[data-guess]')`, 3000);
+      const heights = await c.eval(`[...document.querySelectorAll('[data-guess]')].map(b => Math.round(b.getBoundingClientRect()[${name === 'portrait' ? "'width'" : "'height'"}]))`);
+      ok(L + 'guess buttons are at least 40 px tall to the thumb', heights.length === 4 && heights.every((x) => x >= 40), JSON.stringify(heights));
+      await c.eval(`window.__events.uncover(7)`);
+      ok(L + 'an opened square arrives as a tile from the server', await c.waitFor(`window.__events.arts.get('${REV}')?.have.has(7)`, 5000));
+      await sleep(400);
+      ok(L + 'only that tile, nothing else', await c.eval(`[...window.__events.arts.get('${REV}').have].join() === '7' && !window.__events.arts.get('${REV}').full`));
+      const tileReqs = await c.eval(`performance.getEntriesByType('resource').map(e => e.name).filter(n => /events\\/art\\//.test(n))`);
+      ok(L + 'the page asked for the opened square only (no whole picture)', tileReqs.length >= 1 && tileReqs.every((u) => /tile\?.*cell=7$/.test(u)), JSON.stringify(tileReqs));
       const ink0 = await c.eval('window.__ragdojo.save.ink');
-      await tap(c, `[data-guess="A FLYING KICK"]`);
+      await tap(c, `[data-guess="A KITE"]`);
       ok(L + 'a right guess solves it through the server', await c.waitFor(`window.__events.state.ev['${REV}']?.solved === true`, 5000));
       const ink1 = await c.eval('window.__ragdojo.save.ink');
-      // The placeholder's answer ships in the client, so the server pays no bonus for it.
-      ok(L + 'the placeholder pays no guess bonus (its answer is public)', ink1 - ink0 === 0, `${ink0} -> ${ink1}`);
+      ok(L + 'the guess bonus pays ink (24 covered x 2)', ink1 - ink0 === 48, `${ink0} -> ${ink1}`);
+      ok(L + 'the panel refreshes at once: Solved line, no guess buttons, PRIZES tab', await c.waitFor(`!!document.getElementById('evSolved') && !document.querySelector('[data-guess]') && !!document.querySelector('#evTabs [data-ev="prizes"]')`, 2000));
       ok(L + 'the picture is unlocked as a background', await c.waitFor(`document.querySelector('[data-bg]')`, 2000));
       await tap(c, `[data-bg]`);
       ok(L + 'USE IT sets the arena/menu background', await c.eval(`window.__ragdojo.save.eventPrizes.bg === '${REV}'`));
+      await c.shot(join(SHOTS, `events_art_${name}.png`));
+
+      // A player with no battle in the event sees the choices, but cannot guess yet.
+      await c.eval('localStorage.clear()');
+      await c.goto(url(`auto=1&arena=${encodeURIComponent(arena.base)}&arenauid=fresh${name}`));
+      await c.waitFor('window.__state && window.__state.mode === "hub"', 20000);
+      await tap(c, '#btnEvents');
+      await c.waitFor(vis('events'), 3000);
+      await tap(c, `#evTabs [data-ev="${REV}"]`);
+      ok(L + 'no battle yet: the choices are shown disabled, "fight once"', await c.waitFor(`document.querySelectorAll('[data-guess]').length === 4 && [...document.querySelectorAll('[data-guess]')].every(b => b.disabled) && /fight once/.test(document.getElementById('evSide').textContent)`, 5000));
+
+      // A phone whose clock is a day behind: the fight is stamped on the server's clock.
+      await c.send('Page.addScriptToEvaluateOnNewDocument', { source: 'Date.now = ((n) => () => n() - 86400000)(Date.now);' });
+      await c.eval('localStorage.clear()');
+      await c.goto(url(`auto=1&arena=${encodeURIComponent(arena.base)}&arenauid=skew${name}`));
+      await c.waitFor('window.__state && window.__state.mode === "hub"', 20000);
+      await c.waitFor('window.__events.online || window.__events.net.online', 5000);
+      const awardSkew = await c.eval(`(()=>{const d={at:Date.now(),src:'campaign',won:true,oppDmg:1}; window.dispatchEvent(new CustomEvent('ragdojo:battle',{detail:d})); return d.award?.pts || 0})()`);
+      const today = await c.eval(`Object.keys(window.__events.state.ev).filter(k => k.startsWith('vines-day:')).join()`);
+      ok(L + 'a clock a day behind still fights in TODAY\'s events (server time)', today === VEV && awardSkew === 3, `${today} vs ${VEV}, award ${awardSkew}`);
       ok(L + 'zero console errors', c.errors.length === 0, c.errors.join(' | '));
       c.chrome.kill('SIGKILL');
     }
@@ -213,11 +267,17 @@ const MUTANTS = [
   ['ROLL does not persist the roll count', 'js/events/ui.js', 'setSt(E.setEv(st(), id, { ...ev, uid, rolls: r.rolls }));', 'setSt(E.setEv(st(), id, { ...ev, uid }));'],
   ['the canvas ignores the portrait rotation', 'js/events/ui.js', 'const rot = isRotated();', 'const rot = false;'],
   ['the server shows rivals at their real turn', 'server/events.go', 'shown := min(theirs, myTurns)', 'shown := min(theirs, myTurns+1000)'],
+  ['battles stamped with the device clock (M4)', 'js/events/ui.js', ': Date.now()) + net.skew;', ': Date.now());'],
+  ['the panel is not refreshed after a guess (L5)', 'js/events/ui.js', '    if (tab === id && isOpen()) paint();', '    if (tab === id && isOpen()) paintSide();'],
+  ['guess buttons are short (L10)', 'js/events/ui.js', 'line-height: 1.1; min-height: 40px; }', 'line-height: 1.1; }'],
+  ['the practice picture offers a guess (M1)', 'js/events/ui.js', 'const ask = !real ?', 'const ask = false ?'],
+  ['the server sends any tile asked for', 'server/eventart.go', 'if !containsInt(open, cell) {', 'if false && !containsInt(open, cell) {'],
 ];
 
 if (process.argv.includes('--falsify')) {
   let red = 0;
-  for (const [what, file, from, to] of MUTANTS) {
+  const only = process.argv.includes('--only') ? process.argv[process.argv.indexOf('--only') + 1] : '';
+  for (const [what, file, from, to] of MUTANTS.filter((m) => m[0].includes(only))) {
     const dir = mkdtempSync(join(tmpdir(), 'eventsmut-'));
     for (const d of ['js', 'css', 'server', 'dev']) cpSync(join(ROOT, d), join(dir, d), { recursive: true });
     for (const f of ['index.html']) cpSync(join(ROOT, f), join(dir, f));
@@ -237,8 +297,8 @@ if (process.argv.includes('--falsify')) {
     log(r.fail ? `RED   ${what} (${r.fail} failed)` : `GREEN ${what} — the gate did not notice`);
     if (r.fail) red++;
   }
-  log(`\nfalsify: ${red}/${MUTANTS.length} mutants caught`);
-  process.exit(red === MUTANTS.length ? 0 : 1);
+  log(`\nfalsify: ${red}/${MUTANTS.filter((m) => m[0].includes(only)).length} mutants caught`);
+  process.exit(red === MUTANTS.filter((m) => m[0].includes(only)).length ? 0 : 1);
 } else {
   const r = await run(ROOT, join(ROOT, 'server'));
   log(`\n${r.pass} passed, ${r.fail} failed`);

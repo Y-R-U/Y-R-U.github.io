@@ -13,7 +13,6 @@ export function deviceId() {
   return d;
 }
 export const arenaName = () => (store.get('ragdojo.arena.name') || '').trim();
-export function friendNames() { try { return JSON.parse(store.get('ragdojo.arena.friends') || '[]').slice(0, 30); } catch { return []; } }
 
 /** Same rule as net/panel.js arenaBase: games.br8t.com, a 192.* LAN host, or the dev port. */
 function bases({ dev, lan }) {
@@ -75,6 +74,18 @@ export function createEventsNet({ dev, lan, account }) {
         return { status: r.status, data };
       } catch { return { status: 0 }; }
     },
+    /** An image the server only gives this player (event art tiles, server/eventart.go). */
+    async image(path) {
+      if (!base) return null;
+      const tok = await net.token();
+      if (!tok) return null;
+      try {
+        const r = await fetch(base + path, { headers: { Authorization: `Bearer ${tok}` } });
+        return r.ok ? await createImageBitmap(await r.blob()) : null;
+      } catch { return null; }
+    },
+    tile: (event, cell) => net.image(`/events/art/tile?event=${encodeURIComponent(event)}&cell=${cell}`),
+    full: (event) => net.image(`/events/art/full?event=${encodeURIComponent(event)}`),
     sync: (body) => net.call('POST', '/events/sync', body),
     guess: (event, pic, choice) => net.call('POST', '/events/guess', { event, pic, choice }),
   };

@@ -23,7 +23,7 @@ export const EVENT_DEFS = [
   { id: 'reveal-month', kind: 'reveal', cadence: 'monthly', pass: true, anyBattle: false,
     title: 'MONTHLY PICTURE', cost: 2, guessBonus: 3 },
   { id: 'halloween', kind: 'reveal', cadence: 'seasonal', from: '10-24', to: '11-01', pass: true,
-    anyBattle: true, title: 'SKELETON WEEK', cost: 1, guessBonus: 2, image: 'halloween' },
+    anyBattle: true, title: 'SPOOKY WEEK', cost: 1, guessBonus: 2 },
 ];
 
 export const defById = (id) => EVENT_DEFS.find((d) => d.id === id) || null;

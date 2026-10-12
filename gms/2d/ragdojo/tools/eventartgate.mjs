@@ -2,11 +2,12 @@
 /**
  * Smoke gate for the event-art review tool (tools/eventart/): the list, a REAL regeneration
  * through local Flux (mflux-queue :7867, which queues behind anyone else's work), and approval
- * into a temp dir — compressed images, a manifest without the answer, the answer in the
- * server-only answers file, which the real arena server then reads.
+ * into a temp dir — the picture into the SERVER-ONLY folder (never the public one), a manifest
+ * with choices only, the answer in the server-only answers file, which the real arena server
+ * then reads and serves tiles from.
  *
  *   node tools/eventartgate.mjs [--seed <dir>] [--no-flux]   (EVENTART_TEST_PORT, default 9510)
- *   node tools/eventartgate.mjs --falsify                    3 broken copies of the tool must go red
+ *   node tools/eventartgate.mjs --falsify                    6 broken copies of the tool must go red
  */
 import { spawn, execFileSync } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync, statSync, readdirSync, cpSync, mkdirSync } from 'node:fs';
@@ -29,13 +30,16 @@ function syntheticSeed(dir) {
     meta.push({ theme, n: 1, seed: 7, file, prompt: `a ${theme} test picture, ink on paper` });
   }
   writeFileSync(join(dir, 'meta.json'), JSON.stringify(meta));
+  // Answers come with the seed, never from the game's code. Test words only.
+  writeFileSync(join(dir, 'themes.json'), JSON.stringify(Object.fromEntries(['heroic', 'halloween', 'dojo'].map((t, i) =>
+    [t, { answer: `A TESTWORD ${'ABC'[i]}${t.toUpperCase()}`, decoys: ['A KITE', 'A CANOE', 'A TEAPOT'] }]))));
 }
 
 async function run(toolDir, { flux = true, label = '' } = {}) {
   let pass = 0, fail = 0;
   const ok = (n, c, x = '') => { c ? pass++ : fail++; log(`${c ? 'PASS' : 'FAIL'}  ${label}${n}${x && !c ? '  ' + x : ''}`); };
   const tmp = mkdtempSync(join(tmpdir(), 'eventart-'));
-  const DATA = join(tmp, 'data'), OUT = join(tmp, 'out');
+  const DATA = join(tmp, 'data'), OUT = join(tmp, 'out'), ART = join(DATA, 'approved');
   const seed = seedArg || join(tmp, 'seed');
   if (!seedArg) syntheticSeed(seed);
   const proc = spawn('node', [join(toolDir, 'server.mjs'), '--seed', seed], {
@@ -59,7 +63,8 @@ async function run(toolDir, { flux = true, label = '' } = {}) {
     const n0 = st.candidates?.length || 0;
     ok('lists the seeded candidates', n0 >= 3, `${n0}`);
     ok('lists upcoming reveal events', st.events?.filter((e) => e.id.startsWith('reveal-week:')).length === 4 && st.events.some((e) => e.id.startsWith('halloween:')), JSON.stringify(st.events?.map((e) => e.id)));
-    ok('every seeded theme has an answer and three decoys', Object.values(st.themes).every((t) => t.answer && t.decoys.length === 3));
+    if (!seedArg) ok('every seeded theme has its answer and three decoys from the seed', Object.values(st.themes).every((t) => /^A TESTWORD/.test(t.answer) && t.decoys.length === 3));
+    else { for (const t of Object.keys(st.themes)) await api('/api/theme', { theme: t, answer: `A TESTWORD ${t.toUpperCase()}`, decoys: ['A KITE', 'A CANOE', 'A TEAPOT'] }); st = (await api('/api/state')).j; }
     ok('nothing is approved to begin with', st.candidates.every((c) => c.status !== 'approved') && !existsSync(join(OUT, 'manifest.json')));
     if (seedArg) ok('the recommended picks are flagged', ['heroic_2', 'halloween_1', 'dojo_2'].every((id) => st.candidates.find((c) => c.id === id)?.recommended));
 
@@ -97,17 +102,17 @@ async function run(toolDir, { flux = true, label = '' } = {}) {
     const ap = await api('/api/approve', { id: pick.id });
     ok('APPROVE succeeds', ap.status === 200, JSON.stringify(ap.j));
     const slug = t.event.replace(/[^A-Za-z0-9-]+/g, '-');
-    const webp = join(OUT, slug + '.webp'), jpg = join(OUT, slug + '.jpg');
-    ok('writes a webp and a jpg named after the event', existsSync(webp) && existsSync(jpg));
+    const jpg = join(ART, slug + '.jpg');
+    ok('writes the picture to the server-only folder, named after the event', existsSync(jpg));
+    ok('nothing but manifest.json goes to the public folder', readdirSync(OUT).join() === 'manifest.json', readdirSync(OUT).join());
     const src = statSync(join(DATA, 'candidates', pick.file)).size;
-    ok('both are much smaller than the PNG', existsSync(webp) && statSync(webp).size < src / 3 && statSync(jpg).size < src / 2, `${src} -> ${existsSync(webp) && statSync(webp).size}/${existsSync(jpg) && statSync(jpg).size}`);
-    ok('the webp is real', existsSync(webp) && readFileSync(webp).subarray(8, 12).toString() === 'WEBP');
+    ok('it is a real jpeg, much smaller than the PNG', existsSync(jpg) && readFileSync(jpg).subarray(0, 3).toString('hex') === 'ffd8ff' && statSync(jpg).size < src / 2, `${src} -> ${existsSync(jpg) && statSync(jpg).size}`);
     const man = JSON.parse(readFileSync(join(OUT, 'manifest.json'), 'utf8'));
     const entry = man.pictures?.[t.event];
     ok('the manifest lists the picture with four choices', entry?.choices?.length === 4 && entry.choices.includes(t.answer));
     const manText = readFileSync(join(OUT, 'manifest.json'), 'utf8');
-    ok('the manifest does not say which choice is right', !/answer/i.test(manText) && Object.keys(entry || {}).sort().join() === 'choices,h,img,jpg,w');
-    ok('the file names give nothing away', readdirSync(OUT).every((f) => !new RegExp(theme, 'i').test(f) && !t.answer.split(' ').some((w) => w.length > 3 && f.toUpperCase().includes(w))), readdirSync(OUT).join());
+    ok('the manifest names no image and does not say which choice is right', !/answer|webp|jpg/i.test(manText) && Object.keys(entry || {}).sort().join() === 'choices,h,w', JSON.stringify(entry));
+    ok('the file names give nothing away', readdirSync(ART).every((f) => !new RegExp(theme, 'i').test(f) && !t.answer.split(' ').some((w) => w.length > 3 && f.toUpperCase().includes(w))), readdirSync(ART).join());
     const answers = JSON.parse(readFileSync(join(DATA, 'answers.json'), 'utf8'));
     ok('the answer is in the server-only answers file', answers.answers?.[t.event] === t.answer);
 
@@ -116,10 +121,14 @@ async function run(toolDir, { flux = true, label = '' } = {}) {
     execFileSync('go', ['build', '-o', bin, '.'], { cwd: join(ROOT, 'server'), stdio: 'inherit' });
     arena = spawn(bin, [], { env: { ...process.env, ARENA_ADDR: `127.0.0.1:${P0 + 1}`, ARENA_DB: join(tmp, 'a.db'), ARENA_ICE_URL: 'off', ARENA_ALLOWANCE_URL: 'off',
       ARENA_ENTITLEMENT_URL: 'off', ARENA_DEV_AUTH: '1', ARENA_EVENT_ANSWERS: join(DATA, 'answers.json') }, stdio: 'ignore' });
+    // No ARENA_EVENT_ART: the server finds the tool's approved/ folder next to the answers (LAN).
     const ab = `http://127.0.0.1:${P0 + 1}/gms/2d/ragdojo/arena`;
     for (let i = 0; i < 80; i++) { try { if ((await fetch(ab + '/health')).ok) break; } catch {} await sleep(100); }
     const sync = await (await fetch(ab + '/events/sync', { method: 'POST', headers: { Authorization: 'Bearer dev:artcheck' }, body: JSON.stringify({ event: t.event }) })).json();
     ok('the arena server sees the approved art (answer file format matches)', sync.art === true, JSON.stringify(sync));
+    const art = (q) => fetch(`${ab}/events/art/${q}`, { headers: { Authorization: 'Bearer dev:artcheck' } }).then((r) => r.status);
+    ok('the server refuses a tile for an unopened square', await art(`tile?event=${encodeURIComponent(t.event)}&cell=0`) === 403);
+    ok('and the whole picture', await art(`full?event=${encodeURIComponent(t.event)}`) === 403);
 
     // The name box: saved on the approved picture, written into its manifest entry, never the answer.
     const box = { x: 0.6, y: 0.2, w: 0.2, h: 0.45, rot: 2, text: '{NAME}', layout: 'stack' };
@@ -144,15 +153,17 @@ async function run(toolDir, { flux = true, label = '' } = {}) {
     const appr = (await api('/api/state')).j.candidates.find((c) => c.status === 'approved');
     await api('/api/revoke', { id: appr.id });
     const man2 = JSON.parse(readFileSync(join(OUT, 'manifest.json'), 'utf8'));
-    ok('UN-APPROVE removes the files, the manifest entry and the answer', !existsSync(webp) && !man2.pictures[t.event] && !JSON.parse(readFileSync(join(DATA, 'answers.json'), 'utf8')).answers[t.event]);
+    ok('UN-APPROVE removes the files, the manifest entry and the answer', !existsSync(jpg) && !man2.pictures[t.event] && !JSON.parse(readFileSync(join(DATA, 'answers.json'), 'utf8')).answers[t.event]);
   } catch (e) { ok('no exception', false, e.stack); }
   finally { proc.kill('SIGKILL'); arena?.kill('SIGKILL'); rmSync(tmp, { recursive: true, force: true }); }
   return { pass, fail };
 }
 
 const MUTANTS = [
-  ['the manifest carries the answer', "man.pictures[t.event] = { img: name + '.webp',", "man.pictures[t.event] = { answer, img: name + '.webp',"],
-  ['approve forgets the answers file', 'ans.answers[t.event] = answer;', ''],
+  ['the manifest carries the answer', 'man.pictures[ev] = { w: 1024,', 'man.pictures[ev] = { answer, w: 1024,'],
+  ['the picture goes into the public folder', "join(ART, name + '.jpg')]", "join(OUT, name + '.jpg')]"],
+  ['the manifest names the image', 'man.pictures[ev] = { w: 1024,', "man.pictures[ev] = { img: name + '.jpg', w: 1024,"],
+  ['approve forgets the answers file', 'ans.answers[ev] = answer;', ''],
   ['no access key check', 'if (key !== KEY) return', 'if (false) return'],
   ['a name box may spell the answer', "if (words.some((w) => ov.text.toUpperCase().includes(w))) throw", "if (false) throw"],
 ];

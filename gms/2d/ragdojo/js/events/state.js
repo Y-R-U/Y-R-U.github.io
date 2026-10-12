@@ -7,7 +7,7 @@
 // `b` is kept in play order (at, then id): for Vines & Ladders it IS the list of turns.
 
 import { activeEvents, parseEventId, utcDay } from './calendar.js';
-import { pointsFor, counts } from './points.js';
+import { pointsFor, counts, counted } from './points.js';
 import { CAMPAIGN_CAP } from './calendar.js';
 import { fresh as freshReveal, CELLS } from './reveal.js';
 
@@ -42,12 +42,16 @@ function campaignAllowed(list, battle, cap) {
 export const seenToday = (state, day) => state.seenDay >= day;
 export const markSeen = (state, day) => (seenToday(state, day) ? state : { ...state, seenDay: day });
 
-/** Bank one finished battle into every running event it counts for. */
-export function recordBattle(state, battle, { pass = false, cap = CAMPAIGN_CAP } = {}) {
+/**
+ * Bank one finished battle into every running event it counts for, Pass events included: a
+ * Pass holder whose entitlement is briefly unknown must not lose the fight. The Pass gates
+ * what is shown, paid and synced, never what is banked.
+ */
+export function recordBattle(state, battle, { cap = CAMPAIGN_CAP } = {}) {
   const ev = { ...state.ev };
   const pts = pointsFor(battle);
-  for (const a of activeEvents(battle.at, { pass })) {
-    if (a.locked || !counts(a.def, a.win, battle)) continue;
+  for (const a of activeEvents(battle.at, { pass: true })) {
+    if (!counts(a.def, a.win, battle)) continue;
     const cur = evState(state, a.id);
     if (cur.b.some((x) => x[0] === battle.id)) continue;
     if (battle.src === 'campaign' && !campaignAllowed(cur.b, battle, cap)) continue;
@@ -80,7 +84,7 @@ export function merge(a, b) {
   for (const id of new Set([...Object.keys(a.ev), ...Object.keys(b.ev)])) {
     const x = evState(a, id), y = evState(b, id);
     const ids = new Set(x.b.map((r) => r[0]));
-    const m = { ...x, b: [...x.b, ...y.b.filter((r) => !ids.has(r[0]))].sort(order) };
+    const m = { ...x, b: capped(id, [...x.b, ...y.b.filter((r) => !ids.has(r[0]))].sort(order)) };
     if ('rolls' in x || 'rolls' in y) m.rolls = Math.min(pointsOf(m), Math.max(x.rolls | 0, y.rolls | 0));
     if (Array.isArray(x.open)) {
       const def = parseEventId(id)?.def;
@@ -93,6 +97,29 @@ export function merge(a, b) {
       m.claimed = [...new Set([...x.claimed, ...y.claimed])];
     }
     out.ev[id] = m;
+  }
+  return out;
+}
+
+/** The rows `counted()` keeps: two devices' 10 campaign fights a day are still 10, 60 s apart. */
+function capped(eventId, rows) {
+  const p = parseEventId(eventId);
+  if (!p) return rows;
+  const keep = new Set(counted(p.def, p.win, rows.map((r) => ({ id: r[0], at: r[3], src: r[2], won: r[1] === 3, oppDmg: r[1] === 2 ? 1 : 0 }))).map((b) => b.id));
+  return rows.filter((r) => keep.has(r[0]));
+}
+
+/**
+ * This device's events carried into a save adopted from the cloud. A reward that paid INK
+ * stays claimed only if the adopted save had claimed it too — otherwise its ink is not in
+ * that save, and the game pays it again there.
+ */
+export function adoptMerge(cloud, local) {
+  const c = load(cloud), out = merge(local, cloud);
+  for (const [id, e] of Object.entries(out.ev)) {
+    if (!Array.isArray(e.claimed)) continue;
+    const had = c.ev[id]?.claimed || [];
+    e.claimed = e.claimed.filter((r) => r !== 'bonus' || had.includes('bonus'));
   }
   return out;
 }

@@ -188,7 +188,7 @@ function render() {
   }
   const loose = Object.entries(S.themes).filter(([, t]) => !S.events.some((e) => e.id === t.event));
   if (loose.length) h += `<section class="ev"><h2>Not assigned to an upcoming event</h2>${loose.map(([n, t]) => themeBox(n, t)).join('')}</section>`;
-  h += `<p class="muted">Approved files go to <code>${esc(S.out)}</code> — commit them with the manifest; copy answers.json to the arena server (deploy step).</p>`;
+  h += `<p class="muted">Approved pictures go to <code>${esc(S.art)}</code> — never into the game's repo; <code>server/deploy.sh</code> copies them and answers.json to the arena server, which shows each player only the squares they opened. Commit only <code>${esc(S.out)}/manifest.json</code> (choices and name box).</p>`;
   $('#root').innerHTML = h;
   for (const id of openOv) { const el = document.querySelector(`.card[data-id="${CSS.escape(id)}"]`); if (el) drawPreview(el); }
   const busy = S.candidates.some((c) => ['queued', 'generating', 'waiting for LTX to go idle'].includes(c.status));

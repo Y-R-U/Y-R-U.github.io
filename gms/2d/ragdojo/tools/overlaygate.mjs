@@ -5,12 +5,16 @@
  *   - a long name stays inside the box, shrinks no smaller than 1/9 of it, then gets cut;
  *   - "lines" layout fits every line across the box;
  *   - opening the square over the box shows the name (the panel draws the composed picture);
- *   - the guess choices do not depend on the name.
+ *   - the guess choices do not depend on the name;
+ *   - a Hindi name (नमस्ते) survives intact: combining marks kept, stacked by grapheme.
+ * The art comes from a real arena server, a tile per opened square (server/eventart.go), so the
+ * gate opens the three squares under the box (8, 13, 18) and compares inside them only.
  *
  *   node tools/overlaygate.mjs            (OVERLAY_TEST_PORT, default 9540)
- *   node tools/overlaygate.mjs --falsify  3 mutants, each must go red
+ *   node tools/overlaygate.mjs --falsify  5 mutants, each must go red
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
+import { setTimeout as sleep } from 'node:timers/promises';
 import { mkdtempSync, rmSync, cpSync, symlinkSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -23,37 +27,60 @@ const OV = { x: 0.6, y: 0.2, w: 0.2, h: 0.45, rot: 0, text: '{NAME}', layout: 's
 
 function gameCopy() {
   const dir = mkdtempSync(join(tmpdir(), 'overlaygate-'));
-  for (const d of ['js', 'css', 'dev']) cpSync(join(ROOT, d), join(dir, d), { recursive: true });
+  for (const d of ['js', 'css', 'dev', 'server']) cpSync(join(ROOT, d), join(dir, d), { recursive: true });
   cpSync(join(ROOT, 'index.html'), join(dir, 'index.html'));
   mkdirSync(join(dir, 'assets/events'), { recursive: true });
+  mkdirSync(join(dir, 'art'));
   for (const a of ['audio', 'fonts']) { try { symlinkSync(join(ROOT, 'assets', a), join(dir, 'assets', a)); } catch {} }
   const ev = eventIdOf(defById('reveal-week'), windowOf(defById('reveal-week'), Date.now()));
-  execFileSync('sips', ['-s', 'format', 'png', '-z', '640', '1024', join(ROOT, '../../../assets/screenshots/ragdojo.jpg'), '--out', join(dir, 'src.png')], { stdio: 'ignore' });
-  execFileSync('cwebp', ['-quiet', '-q', '80', join(dir, 'src.png'), '-o', join(dir, 'assets/events/pic.webp')]);
+  // The raw picture sits outside the served game (as on the real site); the page reads it only
+  // through the arena server's tiles. The gate's copy at /gate/raw.jpg is for comparison.
+  execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '95', '-z', '640', '1024', join(ROOT, '../../../assets/screenshots/ragdojo.jpg'), '--out', join(dir, 'art', ev.replace(/[^A-Za-z0-9-]+/g, '-') + '.jpg')], { stdio: 'ignore' });
+  mkdirSync(join(dir, 'gate'));
+  cpSync(join(dir, 'art', ev.replace(/[^A-Za-z0-9-]+/g, '-') + '.jpg'), join(dir, 'gate/raw.jpg'));
+  writeFileSync(join(dir, 'art/answers.json'), JSON.stringify({ answers: { [ev]: 'A KITE' } }));
   writeFileSync(join(dir, 'assets/events/manifest.json'), JSON.stringify({ v: 1, pictures: { [ev]: {
-    img: 'pic.webp', jpg: 'pic.jpg', w: 1024, h: 640, choices: ['A TEA PARTY', 'A PAPER NINJA', 'A SUMO MATCH', 'A KITE'], overlay: OV } } }));
+    w: 1024, h: 640, choices: ['A TEA PARTY', 'A CANOE', 'A SUMO MATCH', 'A KITE'], overlay: OV } } }));
   return { dir, ev };
 }
+
+async function arena(dir) {
+  const bin = process.env.ARENA_BIN || join(dir, 'arena');
+  if (!process.env.ARENA_BIN) execFileSync('go', ['build', '-o', bin, '.'], { cwd: join(dir, 'server'), stdio: 'inherit' });
+  const proc = spawn(bin, [], { env: { ...process.env, ARENA_ADDR: `127.0.0.1:${P0 + 1}`, ARENA_DB: join(dir, 'a.db'), ARENA_ICE_URL: 'off', ARENA_ALLOWANCE_URL: 'off',
+    ARENA_ENTITLEMENT_URL: 'off', ARENA_DEV_AUTH: '1', ARENA_EVENT_ANSWERS: join(dir, 'art/answers.json'), ARENA_EVENT_ART: join(dir, 'art') }, stdio: 'ignore' });
+  const base = `http://127.0.0.1:${P0 + 1}/gms/2d/ragdojo/arena`;
+  for (let i = 0; i < 80; i++) { try { if ((await fetch(base + '/health')).ok) break; } catch {} await sleep(100); }
+  return { proc, base };
+}
+const BOX_CELLS = [8, 13, 18];
 
 async function run(dir, ev, label = '') {
   let pass = 0, fail = 0;
   const ok = (n, c, x = '') => { c ? pass++ : fail++; log(`${c ? 'PASS' : 'FAIL'}  ${label}${n}${x && !c ? '  ' + x : ''}`); };
   const web = await serve(dir, P0);
+  const srv = await arena(dir);
   const c = await CDP.launch();
+  let n = 0;
   try {
     await c.send('Network.setCacheDisabled', { cacheDisabled: true });
     await c.viewport(844, 390, 1, true);
+    // Each name is a fresh player: three fights (60 s apart, the campaign cap), three squares.
     const boot = async (name) => {
-      await c.goto(`${web.base}/index.html?auto=1&dpr=1&arena=http://127.0.0.1:1/x`);
-      await c.eval(`localStorage.setItem('ragdojo.arena.name', ${JSON.stringify(name)})`);
-      await c.goto(`${web.base}/index.html?auto=1&dpr=1&arena=http://127.0.0.1:1/x`);
+      const url = `${web.base}/index.html?auto=1&dpr=1&arena=${encodeURIComponent(srv.base)}&arenauid=ovl${n++}`;
+      await c.goto(url);
+      await c.eval(`localStorage.clear(); localStorage.setItem('ragdojo.arena.name', ${JSON.stringify(name)})`);
+      await c.goto(url);
       await c.waitFor('window.__state && window.__state.mode === "hub"', 20000);
       await c.eval(`document.getElementById('btnEvents').click()`);
       await c.eval(`window.__events.setTab(${JSON.stringify(ev)})`);
-      return c.waitFor(`window.__events.picture(${JSON.stringify(ev)})`, 8000);
+      for (const k of [0, 1, 2]) await c.eval(`window.dispatchEvent(new CustomEvent('ragdojo:battle',{detail:{at:Date.now()-${(3 - k) * 70e3},src:'campaign',won:false,oppDmg:0}}))`);
+      if (!await c.waitFor(`window.__events.artOn(${JSON.stringify(ev)}) && window.__events.state.ev[${JSON.stringify(ev)}]?.b.length === 3`, 8000)) return false;
+      for (const cell of BOX_CELLS) await c.eval(`window.__events.uncover(${cell})`);
+      return c.waitFor(`window.__events.arts.get(${JSON.stringify(ev)})?.have.size === 3 && window.__events.picture(${JSON.stringify(ev)})`, 8000);
     };
     ok('the approved picture loads', await boot('AARON'));
-    // Raw vs composed, counted in and out of the box (8 px margin for the pen's wobble).
+    // Served tiles vs composed, counted in and out of the box (8 px margin for the pen's wobble).
     const diff = (margin) => c.eval(`(()=>{
       const pic = window.__events.picture(${JSON.stringify(ev)}), im = new Image();
       const W = 1024, H = 640, a = document.createElement('canvas'), b = document.createElement('canvas');
@@ -62,16 +89,19 @@ async function run(dir, ev, label = '') {
       gb.drawImage(pic, 0, 0, W, H);
       const raw = [...document.images].find(() => false);
       return new Promise((res) => { im.onload = () => {
-        ga.drawImage(im, 0, 0, W, H);
+        // The tiles as served, before the name: the only difference left is the pen.
+        ga.drawImage(window.__events.arts.get(${JSON.stringify(ev)}).c, 0, 0, W, H);
         const A = ga.getImageData(0, 0, W, H).data, B = gb.getImageData(0, 0, W, H).data;
         const o = ${JSON.stringify(OV)}, x0 = o.x * W - ${margin}, x1 = (o.x + o.w) * W + ${margin}, y0 = o.y * H - ${margin}, y1 = (o.y + o.h) * H + ${margin};
         let inside = 0, outside = 0;
+        const opened = (x, y) => [${BOX_CELLS}].includes(Math.floor(y / (H / 5)) * 5 + Math.floor(x / (W / 5)));
         for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+          if (!opened(x, y)) continue;
           const i = (y * W + x) * 4, d = Math.abs(A[i] - B[i]) + Math.abs(A[i+1] - B[i+1]) + Math.abs(A[i+2] - B[i+2]);
           if (d > 30) (x >= x0 && x < x1 && y >= y0 && y < y1) ? inside++ : outside++;
         }
         res({ inside, outside });
-      }; im.src = 'assets/events/pic.webp'; });
+      }; im.src = 'gate/raw.jpg'; });
     })()`);
     const d1 = await diff(8);
     ok('the name is written inside the box', d1.inside > 800, JSON.stringify(d1));
@@ -111,17 +141,33 @@ async function run(dir, ev, label = '') {
         for (let i = 0; i < S.length; i += 4) { dc += Math.abs(S[i] - C[i]); dr += Math.abs(S[i] - R[i]); }
         res({ composed: dc / (S.length / 4), raw: dr / (S.length / 4) });
       };
-      im.src = 'assets/events/pic.webp';
+      im.src = 'gate/raw.jpg';
     })`);
     ok('the opened square shows the name (matches the composed picture, not the raw art)', shown.composed < 6 && shown.raw > shown.composed + 4, JSON.stringify(shown));
+    ok('the full picture is never in the page\'s own files', !(await c.eval(`fetch('assets/events/manifest.json').then(r=>r.text())`)).match(/jpg|webp|img/));
+
+    // A Hindi name: NFC, combining marks kept, stacked by grapheme (never a bare vowel sign).
+    const HINDI = 'नमस्ते';
+    ok('a Hindi name loads', await boot(HINDI));
+    const hi = await c.eval(`import('./js/events/overlay.js').then(({ cleanName, layoutOverlay }) => {
+      const g = document.createElement('canvas').getContext('2d');
+      const L = layoutOverlay(g, ${JSON.stringify(OV)}, ${JSON.stringify(HINDI.normalize('NFD'))}, 200, 288);
+      return { name: cleanName(${JSON.stringify(HINDI)}), items: L.items, bare: L.items.some((s) => /^\\p{M}/u.test(s)) };
+    })`);
+    ok('the Hindi name survives cleanName intact', hi.name === HINDI, JSON.stringify(hi));
+    ok('stacked by grapheme: the letters join back to the name, none starts with a mark', hi.items.join('') === HINDI && !hi.bare && hi.items.length < [...HINDI].length, JSON.stringify(hi));
+    const d3 = await diff(8);
+    ok('the Hindi name is written inside the box', d3.inside > 300 && d3.outside === 0, JSON.stringify(d3));
     ok('zero console errors', c.errors.length === 0, c.errors.join(' | '));
   } catch (e) { ok('no exception', false, e.stack); }
-  finally { c.chrome.kill('SIGKILL'); web.close(); }
+  finally { c.chrome.kill('SIGKILL'); web.close(); srv.proc.kill('SIGKILL'); }
   return { pass, fail };
 }
 
 const MUTANTS = [
-  ['the panel draws the raw art, not the composed one', 'js/events/ui.js', '    if (!a.overlay) return e.im;\n', '    return e.im;\n'],
+  ['the panel draws the raw art, not the composed one', 'js/events/ui.js', '    if (!a.overlay) return A.c;\n', '    return A.c;\n'],
+  ['names lose their combining marks', 'js/events/overlay.js', '[^\\p{L}\\p{M}\\p{N}', '[^\\p{L}\\p{N}'],
+  ['stacked by code point, not grapheme', 'js/events/overlay.js', "let letters = graphemes(text.replace(/\\s+/g, ''));", "let letters = [...text.replace(/\\s+/g, '')];"],
   ['no minimum letter size (a long name shrinks to dust)', 'js/events/overlay.js', '    if (size < min) { letters', '    if (false) { letters'],
   ['lines are not shrunk to the box width', 'js/events/overlay.js', '  for (const s of lines) size = Math.min(size, size * (w * 0.92) / Math.max(1, width(s, size)));\n', ''],
 ];

@@ -665,17 +665,17 @@ tools/eventart/       Aaron's LAN review page for Flux candidates (server.mjs + 
 - **The save is the run save** (`S.events`, `S.eventPrizes`), so cloud sync carries it and no new
   key needs syncing. Only finished battles are recorded; NEW GAME keeps both; `applyCloud` merges.
 - **Offline is a full mode**: no server (or signed out) = local dice with `uid` `local:<device>`
-  and the placeholder answer checked locally. Online, the server's recomputed state wins
-  (`adopt`), keeping anything recorded while the request was out. Approved art can only be
-  guessed online (its answer is server-only).
+  and the drawn practice picture (no guessing). Online, the server's recomputed state wins
+  (`adopt`), keeping anything recorded while the request was out. Only approved art can be
+  guessed, only online (no answer ships — see "Event secrets" below).
 - **Pass events** show with 🔒, a dimmed board and a "SUPPORT / PASS" button that opens the
   existing support panel — no modal. `hasPass` = DEV / family / `purchases.passActive`;
   `?evpass=0` forces it off in dev. The server checks the entitlement itself.
 - **The canvas sits inside the rotated app in portrait**: `getBoundingClientRect` is the rotated
   box, so a tap is mapped with `isRotated()` (x = clientY - top, y = right - clientX).
-- **Art paths are page-relative** (`document.baseURI`), not `import.meta.url`: the release build
-  bundles ui.js into js/main.js and a module-relative `../../assets` would point outside the game.
-  `tools/build.mjs` copies `assets/events/*.webp|jpg` + `manifest.json` into dist.
+- **The manifest path is page-relative** (`document.baseURI`), not `import.meta.url`: the release
+  build bundles ui.js into js/main.js and a module-relative `../../assets` would point outside the
+  game. `tools/build.mjs` copies `assets/events/manifest.json` only; pictures come from the server.
 - **Backgrounds**: a finished picture is a prize; USE IT sets `S.eventPrizes.bg` and
   `drawEventBackdrop` paints it faintly (multiply, 30%) behind the menu demo, arena and ghost
   fights — never the campaign.
@@ -688,15 +688,16 @@ caller's STORED turns and leave as `{name, pos, turns, friend, home}`; the guess
 
 **Event art review (Aaron)**: `node gms/2d/ragdojo/tools/eventart/server.mjs` from the site root,
 then open the printed `http://192.168.0.236:8023/?k=<key>` on the phone. Data lives in
-`~/.ragdojo/eventart/` (candidates, state, key, answers.json), seeded with the 12 phase-1 candidates;
-approving writes `assets/events/` in this repo (commit it) and the answer to answers.json (copied
-to the box by `server/deploy.sh`, read directly by `server/lan.sh`). Regenerate queues on
+`~/.ragdojo/eventart/` (candidates, state, key, answers.json, approved/), seeded with the 12 phase-1
+candidates; approving writes the picture to `approved/` (server-only), a choices-only entry to
+`assets/events/manifest.json` (commit that) and the answer to answers.json (`server/deploy.sh` copies
+both to the box; a LAN server reads them in place). `--republish` rewrites every approved picture. Regenerate queues on
 mflux-queue :7867 (waits for LTX to go idle first; no lock). Aaron approves live from his phone.
 
 **The player's name in the art** (`js/events/overlay.js`, Aaron's idea for the blank dojo
 scroll): a manifest entry may carry `overlay: {x, y, w, h (image fractions), rot (deg ±20), text
 ("{NAME}" = the arena name, else YOU; "\n" breaks), layout: "stack" | "lines"}`. The panel bakes it
-into the picture once per name (`composite`) in Caveat via ink.js's jitter, so the squares over the
+into the picture once per name (ui.js `imageOf`, clipped to the squares opened) in Caveat via ink.js's jitter, so the squares over the
 scroll reveal the name as they open; the backdrop prize gets it too. Stacked letters read best on a
 hanging scroll; long names shrink to 1/9 of the box, then get cut ("lines" shrinks to fit, then
 "…"). Generic: any blank sign or banner can use it. It never touches choices or answers, and the
@@ -710,13 +711,46 @@ Gates (each watched go red):
 cd server && go test ./...           # events_test.go: doc + ~1,300 JS golden vectors, replay rule never leaks,
                                      # rival selection, campaign cap, arena auto-count, pass/windows, reveal + guess
 node tools/eventsvectors.mjs --check # the vectors file still matches js/events
-node tools/eventsgofalsify.mjs       # 13 mutants of events.go / the JS board, all red
-node tools/eventsgame.mjs            # 58 checks, REAL touch, 844x390 + rotated 390x844, offline and online
-node tools/eventsgame.mjs --falsify  # 4 mutants (no emit, roll not saved, rotation ignored, replay rule off)
+node tools/eventsgofalsify.mjs       # 18 mutants of events.go, eventart.go and the JS board, all red
+node tools/eventsgame.mjs            # 76 checks, REAL touch, 844x390 + rotated 390x844, offline and online, art tiles
+node tools/eventsgame.mjs --falsify  # 9 mutants (+ device clock, no refresh after a guess, short buttons, practice guess, any tile)
 node tools/eventartgate.mjs [--seed <dir>] [--no-flux]   # list, a REAL Flux regeneration, approve into temp
-node tools/eventartgate.mjs --falsify                    # 4 mutants (answer in manifest, no answers file, no key, box spells answer)
-node tools/overlaygate.mjs [--falsify]                   # name box: inside only, long names, lines fit, opened square shows it (3 mutants)
+node tools/eventartgate.mjs --falsify                    # 6 mutants (answer/image in manifest, picture in public folder, no answers file, no key, box spells answer)
+node tools/overlaygate.mjs [--falsify]                   # name box: inside only, long names, lines fit, opened square shows it, Hindi (5 mutants)
 ```
+### Event secrets (F3 fixes, 2026-10-13; local only, NOT deployed)
+
+The pictures and their answers never reach the public site (the repo is public AND is GitHub Pages).
+- **Art is server-only.** `server/eventart.go`: `GET /events/art/tile?event=&cell=` cuts one square
+  from `ARENA_EVENT_ART/<event-id>.jpg` (default: the review tool's `approved/` next to the answers
+  on a LAN Mac, `/srv/data/ragdojo-arena/event_art/` on the box) only if the CALLER's stored state
+  has it open; `/full` only at 25 open — a right guess is not enough, so solved pictures stay
+  buyable square by square (events.go hook). The panel draws tiles into a canvas (`arts`), the
+  overlay clipped to opened squares. The public manifest is `{w, h, choices, overlay?}` only.
+  The full images were removed from assets/events (history keeps them, accepted).
+- **No answer in the bundle.** reveal.js has no `PICTURES`; the practice picture offers no guess
+  (and `server` pays it 0); `canGuess(st, art)` needs real art + one battle in the event; offline
+  there is no guess bonus (a salted hash of one of four public choices is four tries). Decoys live
+  in Aaron's tool data. Halloween is "SPOOKY WEEK" (the title used to name the answer).
+- **Banking vs the Pass**: every battle banks into every event incl. Pass ones; the Pass gates
+  display, rewards, sync and the "+N event points" line. Battles are stamped `+ net.skew` (the
+  listener converts the dispatcher's device-clock `at`). `merge` re-runs `counted()`;
+  `adoptMerge` drops a `bonus` claim the adopted cloud save never paid, so the ink is paid again.
+- Rivals are keyed by the server's `rid` (hops, ★ is server-side); names are NFC with `\p{M}` kept
+  and stacked by grapheme (`Intl.Segmenter`); guess buttons are >= 40 px.
+- **Restart Aaron's review tool** after pulling: an instance started before this change still
+  writes approved pictures into assets/events.
+
+```
+node tools/build.mjs && node tools/eventsecretgate.mjs   # no answer in dist/js/dev, no picture in assets or dist,
+                                                         # manifest has no image; --falsify 3/3; red on the pre-fix tree
+cd server && go test -run TestEventsArt ./...            # tiles only for the caller's opened squares, cut from the right
+                                                         # square; whole picture only at 25 (eventsgofalsify +5 mutants, 18/18)
+```
+eventsgate 142 (+M1/M2/L1/L7 checks, --falsify 27/27), eventsgame 76 (tiles, guess >= 40 px, Solved/PRIZES
+refresh, "fight once", a clock a day behind; --falsify 9 mutants), overlaygate 15 (Hindi; --falsify 5/5),
+eventartgate 29 (--falsify 6/6). Ports used by F3: 9900-9949.
+
 Test hooks: `window.__events` (DEV), `?arena=` `?arenauid=` `?evpass=0`; ports `EVENTS_TEST_PORT`
 (9500-9502), `EVENTART_TEST_PORT` (9510-9511), `OVERLAY_TEST_PORT` (9540). Never `pkill` the review
 tool by name: Aaron's own instance runs on 8023 from `~/.ragdojo/eventart` (one was killed that way).

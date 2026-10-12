@@ -21,10 +21,15 @@ export function cleanOverlay(o) {
   return { x, y, w, h, rot: num(o.rot ?? 0, -20, 20) ?? 0, text, layout: LAYOUTS.includes(o.layout) ? o.layout : 'stack' };
 }
 
+/** NFC, and combining marks kept: Hindi vowel signs and viramas are \p{M}, not \p{L}. */
 export function cleanName(name) {
-  const n = String(name ?? '').toUpperCase().replace(/[^\p{L}\p{N} '\-]/gu, '').replace(/\s+/g, ' ').trim();
+  const n = String(name ?? '').normalize('NFC').toUpperCase().replace(/[^\p{L}\p{M}\p{N} '\-]/gu, '').replace(/\s+/g, ' ').trim();
   return n || 'YOU';
 }
+
+const SEG = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
+/** What a reader calls letters: नमस्ते is न म स्ते, never a bare vowel sign on its own line. */
+export const graphemes = (s) => (SEG ? [...SEG.segment(s)].map((x) => x.segment) : [...s]);
 
 export const overlayText = (ov, name) => ov.text.replaceAll('{NAME}', cleanName(name)).toUpperCase();
 
@@ -35,7 +40,7 @@ export const overlayText = (ov, name) => ov.text.replaceAll('{NAME}', cleanName(
 export function layoutOverlay(g, ov, name, w, h) {
   const text = overlayText(ov, name);
   if (ov.layout === 'stack') {
-    let letters = [...text.replace(/\s+/g, '')];
+    let letters = graphemes(text.replace(/\s+/g, ''));
     const min = h / 9;
     let size = Math.min(w * 0.82, (h / Math.max(1, letters.length)) * 1.08);
     if (size < min) { letters = letters.slice(0, Math.max(1, Math.floor((h * 1.08) / min))); size = Math.min(w * 0.82, (h / letters.length) * 1.08); }
@@ -51,9 +56,9 @@ export function layoutOverlay(g, ov, name, w, h) {
     size = min;
     lines = lines.map((s) => {
       if (width(s, size) <= w * 0.92) return s;
-      let t = s;
-      while (t.length > 1 && width(t + '…', size) > w * 0.92) t = t.slice(0, -1);
-      return t + '…';
+      const gs = graphemes(s);
+      while (gs.length > 1 && width(gs.join('') + '…', size) > w * 0.92) gs.pop();
+      return gs.join('') + '…';
     });
   }
   return { kind: 'lines', items: lines, size, step: h / lines.length };

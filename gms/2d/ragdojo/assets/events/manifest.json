@@ -2,39 +2,33 @@
  "v": 1,
  "pictures": {
   "reveal-week:2026-W43": {
-   "img": "reveal-week-2026-W43.webp",
-   "jpg": "reveal-week-2026-W43.jpg",
    "w": 1024,
    "h": 640,
    "choices": [
-    "A FLYING KICK",
-    "A BIRTHDAY PARTY",
-    "A TUG OF WAR",
-    "A FOOTBALL MATCH"
+    "A CARTWHEEL",
+    "A HIGH JUMP",
+    "A BACKFLIP",
+    "A FLYING KICK"
    ]
   },
   "halloween:2026": {
-   "img": "halloween-2026.webp",
-   "jpg": "halloween-2026.jpg",
    "w": 1024,
    "h": 640,
    "choices": [
-    "A SNOWMAN",
-    "A HAUNTED SHIP",
     "A SKELETON FIGHTER",
-    "A SCARECROW"
+    "A MUMMY BOXER",
+    "A VAMPIRE NINJA",
+    "A ZOMBIE WRESTLER"
    ]
   },
   "reveal-week:2026-W44": {
-   "img": "reveal-week-2026-W44.webp",
-   "jpg": "reveal-week-2026-W44.jpg",
    "w": 1024,
    "h": 640,
    "choices": [
-    "A TEA PARTY",
-    "A SAMURAI CASTLE",
-    "A PAPER NINJA",
-    "A SUMO MATCH"
+    "A PAPER SAMURAI",
+    "A SHADOW THIEF",
+    "A KENDO MASTER",
+    "A PAPER NINJA"
    ],
    "overlay": {
     "x": 0.607,

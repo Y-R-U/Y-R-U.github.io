@@ -81,7 +81,7 @@ guessing the picture early. Completed image unlocks as an arena background (rewa
 
 ### Other event ideas
 Community boss (everyone's damage vs one weekly HP bar), weekend bracket, seasonal themes
-(Halloween skeletons, Christmas snow sheet, Easter egg hunt in arenas, origami week, comic week).
+(Halloween monsters, Christmas snow sheet, Easter egg hunt in arenas, origami week, comic week).
 
 ### Event images
 Generated with local Flux (`mflux-queue :7867`), **ink-on-paper** style to match the game.

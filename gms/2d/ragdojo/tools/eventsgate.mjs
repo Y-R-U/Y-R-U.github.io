@@ -2,7 +2,7 @@
 // rival selection, the reveal grid and the events save (dailies rule, merge).
 //
 //   node tools/eventsgate.mjs              run every check against js/events/
-//   node tools/eventsgate.mjs --falsify    break the engine 22 ways; each must turn its section red
+//   node tools/eventsgate.mjs --falsify    break the engine 27 ways; each must turn its section red
 //
 // EVENTS_DIR points the gate at another copy of js/events (the falsifier uses it).
 import { spawnSync } from 'node:child_process';
@@ -51,14 +51,19 @@ if (args.includes('--falsify')) {
     ['points', 'points.js', '>= cap.perDay', '>= cap.perDay + 5'],
     ['points', 'points.js', 'b.at - lastCamp < cap.gapMs', 'false'],
     ['save', 'state.js', "if (battle.src === 'campaign' && !campaignAllowed(cur.b, battle, cap)) continue;", ''],
-    ['save', 'state.js', '].sort(order) };\n    if (', '] };\n    if ('],
+    ['save', 'state.js', '].sort(order)) };\n    if (', ']) };\n    if ('],
+    ['save', 'state.js', 'return rows.filter((r) => keep.has(r[0]));', 'return rows;'],
+    ['save', 'state.js', "e.claimed = e.claimed.filter((r) => r !== 'bonus' || had.includes('bonus'));", ''],
+    ['reveal', 'reveal.js', "!!art && (st.b?.length || 0) > 0 && guessesLeft(st) > 0", 'guessesLeft(st) > 0'],
+    ['reveal', 'reveal.js', '(st.b?.length || 0) > 0 && ', ''],
+    ['reveal', 'reveal.js', 'if (st.open.length >= CELLS || st.open.includes(cell))', 'if (complete(st) || st.open.includes(cell))'],
     ['rivals', 'vines.js', '[...fr, ...rest]', '[...rest, ...fr]'],
     ['reveal', 'reveal.js', 'left(def, st, pts) < def.cost', 'left(def, st, pts) < 0'],
     ['reveal', 'reveal.js', '1 + Math.floor(st.open.length / 5)', '1 + st.open.length'],
     ['reveal', 'reveal.js', '(CELLS - st.open.length) * def.guessBonus', 'CELLS * def.guessBonus'],
     ['save', 'state.js', 'state.seenDay >= day', 'state.seenDay === day'],
     ['save', 'state.js', 'm.open = open.slice(0, cap);', 'm.open = open;'],
-    ['save', 'state.js', 'if (a.locked || !counts', 'if (!counts'],
+    ['save', 'state.js', 'activeEvents(battle.at, { pass: true })', 'activeEvents(battle.at, { pass: false }).filter((a) => !a.locked)'],
   ];
   let bad = 0;
   for (const [section, file, from, to] of MUTANTS) {
@@ -310,17 +315,18 @@ const T = (iso) => Date.parse(iso);
   check('reveal', R.uncover(def, st, 99, 25).why === 'cell' && R.uncover(def, st, 99, -1).why === 'cell', 'cells are 0..24');
   check('reveal', R.uncover(cal.defById('reveal-month'), R.fresh(), 1, 0).why === 'points', 'cost 2 needs 2 points');
   check('reveal', R.guessesLeft(R.fresh()) === 1 && R.guessesLeft(st) === 2, 'one guess, plus one per five squares');
-  const pic = R.pictureOf(def, 'reveal-week:2026-W42');
-  const ch = R.choicesFor('reveal-week:2026-W42', pic);
-  check('reveal', ch.length === 4 && new Set(ch).size === 4 && ch.includes(R.PICTURES[pic].answer), 'four distinct choices incl. the answer');
-  check('reveal', eq(ch, R.choicesFor('reveal-week:2026-W42', pic)), 'choices are stable for an event');
-  const slots = new Set(Array.from({ length: 40 }, (_, i) => R.choicesFor(`reveal-week:x${i}`, pic).indexOf(R.PICTURES[pic].answer)));
-  check('reveal', slots.size >= 3, 'the answer is not always in the same slot');
+  const pic = 'art';
+  check('reveal', !('PICTURES' in R) && !('choicesFor' in R) && !/answer\s*:/.test(readFileSync(join(DIR, 'reveal.js'), 'utf8')), 'no answers ship in the engine');
+  check('reveal', !R.canGuess(st, false), 'the practice picture (no art) takes no guesses');
+  check('reveal', !R.canGuess(st, true) && R.guess(def, st, 'A TEA PARTY', true).ok === false, 'no guess before a battle in the event');
+  st = { ...st, b: [['camp:1', 1, 'campaign', 0]] };
+  check('reveal', R.canGuess(st, true), 'real art + one battle: guessing opens');
   let g = R.guess(def, st, 'A TEA PARTY', false);
   check('reveal', g.ok && !g.right && R.guessesLeft(g.st) === 1 && !g.st.solved, 'a wrong guess costs a guess');
-  g = R.guess(def, g.st, R.PICTURES[pic].answer, true);
+  g = R.guess(def, g.st, 'THE ANSWER', true);
   check('reveal', g.right && g.st.solved && g.st.bonus === 20 * def.guessBonus, `bonus = 20 covered x ${def.guessBonus}, got ${g.st.bonus}`);
   check('reveal', R.guess(def, g.st, 'x', true).ok === false, 'no guessing once solved');
+  check('reveal', R.uncover(def, g.st, 25, 24).ok, 'a solved picture keeps opening: the whole art only comes at 25');
   const owed = R.rewardsOwed(def, g.st, pic);
   check('reveal', eq(owed.map((r) => r.kind).sort(), ['arenaBackground', 'ink']), 'a solved picture owes its bonus and its background');
   check('reveal', R.rewardsOwed(def, { ...g.st, claimed: ['bonus', 'background'] }, pic).length === 0, 'claimed rewards are not owed again');
@@ -338,14 +344,14 @@ const T = (iso) => Date.parse(iso);
   const at = T('2026-10-25T10:00:00Z');
   const camp = { id: 'camp:1', at, src: 'campaign', won: true, oppDmg: 1 };
   const arena = { id: 'arena:9', at: at + 1, src: 'arena', won: false, oppDmg: 0.9 };
-  let s = S.recordBattle(S.fresh(), camp, { pass: false });
-  s = S.recordBattle(s, camp, { pass: false });
-  check('save', eq(Object.keys(s.ev).sort(), ['reveal-week:2026-W43', 'vines-day:2026-10-25']), `free player, campaign win: ${Object.keys(s.ev)}`);
+  let s = S.recordBattle(S.fresh(), camp);
+  s = S.recordBattle(s, camp);
+  check('save', eq(Object.keys(s.ev).sort(), ['halloween:2026', 'reveal-week:2026-W43', 'vines-day:2026-10-25']), `campaign win banks into every any-battle event, Pass ones too: ${Object.keys(s.ev)}`);
   check('save', S.pointsOf(S.evState(s, 'vines-day:2026-10-25')) === 3, 'the same battle banks once');
-  s = S.recordBattle(s, arena, { pass: false });
-  check('save', !s.ev['vines-month:2026-10'], 'a free player banks nothing into a Pass event');
-  let p = S.recordBattle(S.fresh(), camp, { pass: true });
-  p = S.recordBattle(p, arena, { pass: true });
+  check('save', S.recordBattle(S.fresh(), camp, { pass: false }).ev['halloween:2026']?.b.length === 1,
+    'a Pass holder whose entitlement reads false for a moment still banks the fight (the Pass gates display, not banking)');
+  let p = S.recordBattle(S.fresh(), camp);
+  p = S.recordBattle(p, arena);
   check('save', S.pointsOf(S.evState(p, 'vines-month:2026-10')) === 2 && S.pointsOf(S.evState(p, 'halloween:2026')) === 5,
     'Pass: arena-only monthly takes the arena loss only; any-battle Halloween takes both');
   const RW = 'reveal-week:2026-W43';
@@ -371,6 +377,24 @@ const T = (iso) => Date.parse(iso);
   g = S.recordBattle(g, { id: 'camp:b', at: at + 20e3, src: 'campaign', won: true, oppDmg: 1 });
   check('save', S.evState(g, VD).b.length === 1, 'the save refuses a campaign fight 20 s after the last');
   check('save', S.merge({ seenDay: '2026-10-13', ev: {} }, { seenDay: '2026-10-14', ev: {} }).seenDay === '2026-10-14', 'merge keeps the later seenDay');
+  // Two devices, ten campaign fights each the same day: merged, still ten, still 60 s apart.
+  let da = S.fresh(), db = S.fresh();
+  for (let i = 0; i < 10; i++) {
+    da = S.recordBattle(da, { id: `camp:A${i}`, at: at + i * 120e3, src: 'campaign', won: true, oppDmg: 1 });
+    db = S.recordBattle(db, { id: `camp:B${i}`, at: at + i * 120e3 + 5e3, src: 'campaign', won: true, oppDmg: 1 });
+  }
+  const dm = S.evState(S.merge(da, db), VD).b;
+  check('save', dm.length === 10 && dm.every((r, i) => !i || r[3] - dm[i - 1][3] >= 60e3), `merge re-applies the campaign cap and the 60 s gap: ${dm.length} fights`);
+  check('save', S.evState(S.merge(da, S.recordBattle(db, { id: 'arena:x', at: at + 30e3, src: 'arena', won: true, oppDmg: 1 })), VD).b.some((r) => r[0] === 'arena:x'),
+    'arena battles are never capped by a merge');
+  // Adopting a cloud save: a bonus paid on this device stays claimed only if the cloud save paid it.
+  const solvedHere = S.setEv(base, RW, { ...S.evState(base, RW), solved: true, bonus: 40, claimed: ['bonus', 'background'] });
+  const cloudOld = S.setEv(base, RW, { ...S.evState(base, RW) });
+  const ad = S.adoptMerge(cloudOld, solvedHere).ev[RW];
+  check('save', !ad.claimed.includes('bonus') && ad.claimed.includes('background') && ad.solved && ad.bonus === 40,
+    `cloud adopt: the ink the cloud save never got is owed again (claimed ${ad.claimed})`);
+  const cloudPaid = S.setEv(base, RW, { ...S.evState(base, RW), solved: true, bonus: 40, claimed: ['bonus'] });
+  check('save', S.adoptMerge(cloudPaid, solvedHere).ev[RW].claimed.includes('bonus'), 'cloud adopt: a bonus the cloud save paid is not paid twice');
   const pr = S.prune(p, T('2026-11-05T00:00:00Z'));
   check('save', !pr.ev['vines-day:2026-10-25'] && pr.ev['vines-month:2026-10'], 'prune drops events ended over a week ago');
   check('save', eq(S.load(JSON.parse(JSON.stringify(p))), p), 'the save round-trips through JSON');

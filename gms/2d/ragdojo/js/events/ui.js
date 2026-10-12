@@ -9,17 +9,24 @@ import * as V from './vines.js';
 import * as R from './reveal.js';
 import * as E from './state.js';
 import { VinesView, RevealView } from './render.js';
-import { createEventsNet, deviceId, arenaName, friendNames } from './net.js';
-import { composite } from './overlay.js';
+import { createEventsNet, deviceId, arenaName } from './net.js';
+import { drawOverlay } from './overlay.js';
 import { SHEET_W, GROUND_Y } from '../config.js';
 import { isRotated } from '../input.js';
 
-const SHORT = { 'vines-day': 'VINES', 'reveal-week': 'PICTURE', 'vines-month': 'SCROLLS', 'reveal-month': 'MONTHLY', halloween: 'SKELETON' };
-/** Until Aaron approves art for an event, every picture is the code-drawn flying kick. */
-const PLACEHOLDER = 'heroic';
+const SHORT = { 'vines-day': 'VINES', 'reveal-week': 'PICTURE', 'vines-month': 'SCROLLS', 'reveal-month': 'MONTHLY', halloween: 'SPOOKY' };
 // Relative to the page (index.html sits at the game root), not this module: the release
 // build bundles this file into js/main.js, where a module-relative path would point elsewhere.
+// Only the manifest is public (choices, name box); the pictures come from the arena server a
+// square at a time (server/eventart.go). With no server every event shows the drawn picture.
 const ART = (f) => new URL('assets/events/' + f, document.baseURI).href;
+const cellRect = (c, W, H) => {
+  const col = c % R.GRID, row = Math.floor(c / R.GRID);
+  const x0 = Math.floor((col * W) / R.GRID), y0 = Math.floor((row * H) / R.GRID);
+  return [x0, y0, Math.floor(((col + 1) * W) / R.GRID) - x0, Math.floor(((row + 1) * H) / R.GRID) - y0];
+};
+/** Rivals are keyed by the server's opaque per-event id; two players may share a name. */
+const rkey = (r) => r.rid || r.name;
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const order = (a, b) => a[3] - b[3] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
 
@@ -41,9 +48,10 @@ export function mountEvents(h) {
   const g = cv.getContext('2d');
   const net = createEventsNet({ dev: h.dev, lan: h.lan, account: h.account });
   const vview = new VinesView(), rview = new RevealView();
-  const boards = new Map(), rivals = new Map(), images = new Map();
+  const boards = new Map(), rivals = new Map(), arts = new Map(), srvArt = new Map();
   let manifest = { pictures: {} };
-  let tab = null, note = '', raf = 0, last = 0, laidFor = '', online = false, syncT = null;
+  let tab = null, note = '', raf = 0, last = 0, laidFor = '', online = false;
+  const timers = new Map();
 
   // ── state: lives in the run save (S.events / S.eventPrizes), so cloud sync carries it ──
   const S = () => h.getSave();
@@ -58,46 +66,92 @@ export function mountEvents(h) {
   const pass = () => !!h.hasPass();
   const boardFor = (id) => { if (!boards.has(id)) boards.set(id, V.makeBoard(id)); return boards.get(id); };
   const art = (id) => manifest.pictures?.[id] || null;
-  const picKey = (id) => (art(id) ? 'art' : PLACEHOLDER);
-  const choicesOf = (id) => (art(id)?.choices?.length === R.CHOICES ? art(id).choices : R.choicesFor(id, PLACEHOLDER));
+  /** Real art is up only when the manifest lists it AND the server says it holds it. */
+  const artOn = (id) => !!art(id) && srvArt.get(id) === true;
+  const choicesOf = (id) => (artOn(id) && art(id).choices?.length === R.CHOICES ? art(id).choices : []);
   const uidOf = (id) => E.evState(st(), id).uid || net.localUid();
   const meOf = (id) => { const e = E.evState(st(), id); return { uid: e.uid || net.localUid(), points: E.turnPoints(e), rolls: e.rolls | 0 }; };
 
-  function imageOf(id) {
-    const a = art(id);
-    if (!a) return null;
-    if (!images.has(id)) {
-      const im = new Image();
-      const entry = { im, ok: false };
-      im.onload = () => { entry.ok = true; if (tab === id) paint(); };
-      im.onerror = () => { if (a.jpg && !im.src.endsWith(a.jpg)) im.src = ART(a.jpg); };
-      im.src = ART(a.img);
-      images.set(id, entry);
+  // ── event art: tiles for opened squares, the whole picture at 25 ──────────────────────
+  function artOf(id) {
+    if (!arts.has(id)) {
+      const a = art(id) || {}, c = document.createElement('canvas');
+      c.width = a.w || 1024; c.height = a.h || 640;
+      arts.set(id, { c, g: c.getContext('2d'), have: new Set(), busy: new Set(), full: false, triedFull: false, ver: 0 });
     }
-    const e = images.get(id);
-    if (!e.ok) return null;
-    // A blank scroll or sign gets the player's own name, in ink (js/events/overlay.js).
-    if (!a.overlay) return e.im;
-    const name = arenaName();
-    if (e.name !== name || !e.c) { e.c = composite(e.im, a.overlay, name); e.name = name; }
-    return e.c;
+    return arts.get(id);
   }
+  const redraw = (id) => { if (isOpen() && (tab === id || tab === 'prizes')) paintSide(); };
+  function fetchArt(id, open) {
+    if (!art(id) || !net.online) return;
+    const A = artOf(id);
+    if (A.full) return;
+    // Everything open: the whole picture. Nothing known (a prize whose event was pruned): ask once.
+    if (open.length >= R.CELLS || (!open.length && !A.triedFull)) {
+      if (A.busy.has('full')) return;
+      A.busy.add('full'); A.triedFull = true;
+      void net.full(id).then((bm) => {
+        A.busy.delete('full');
+        if (bm) { A.g.drawImage(bm, 0, 0, A.c.width, A.c.height); A.full = true; A.ver++; redraw(id); }
+      });
+      return;
+    }
+    for (const cell of open) {
+      if (A.have.has(cell) || A.busy.has(cell) || cell < 0 || cell >= R.CELLS) continue;
+      A.busy.add(cell);
+      void net.tile(id, cell).then((bm) => {
+        A.busy.delete(cell);
+        if (!bm) return;
+        const [x, y, w, h] = cellRect(cell, A.c.width, A.c.height);
+        A.g.drawImage(bm, x, y, w, h);
+        A.have.add(cell); A.ver++;
+      });
+    }
+  }
+
+  /** The art as far as this player has opened it, with their name written in (overlay.js). */
+  function imageOf(id) {
+    const a = art(id), A = arts.get(id);
+    if (!a || !A) return null;
+    const name = arenaName();
+    if (A.comp && A.compVer === A.ver && A.compName === name) return A.comp;
+    if (!a.overlay) return A.c;
+    const c = A.comp || document.createElement('canvas');
+    c.width = A.c.width; c.height = A.c.height;
+    const g = c.getContext('2d');
+    g.clearRect(0, 0, c.width, c.height);
+    g.drawImage(A.c, 0, 0);
+    g.save();
+    if (!A.full) { g.beginPath(); for (const cell of A.have) g.rect(...cellRect(cell, c.width, c.height)); g.clip(); }
+    drawOverlay(g, c.width, c.height, a.overlay, name);
+    g.restore();
+    A.comp = c; A.compVer = A.ver; A.compName = name;
+    return c;
+  }
+  const shownImage = (id) => (artOn(id) ? (artOf(id), imageOf(id)) : null);
+  const wholeOf = (id, ev) => (artOn(id) ? !!arts.get(id)?.full : R.complete(ev));
 
   fetch(ART('manifest.json'), { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).then((m) => {
     if (m && m.pictures && typeof m.pictures === 'object') { manifest = m; if (isOpen()) paint(); }
   }).catch(() => {});
 
   // ── battles in ─────────────────────────────────────────────────────────────────────
+  // Probed now so the first battle is already stamped on the server's clock.
+  void net.probe();
   addEventListener('ragdojo:battle', (e) => {
     const d = e.detail || {};
-    const at = Number.isFinite(+d.at) && +d.at > 0 ? +d.at : Date.now();
+    // Dispatchers stamp with this device's clock; events run on the server's (net.skew), so a
+    // phone set a day behind still fights in today's events.
+    const at = (Number.isFinite(+d.at) && +d.at > 0 ? +d.at : Date.now()) + net.skew;
     const b = { id: d.id || `camp:${deviceId()}:${at}`, at, src: d.src === 'arena' ? 'arena' : 'campaign', won: !!d.won, oppDmg: +d.oppDmg || 0 };
     const before = st();
-    const after = E.recordBattle(before, b, { pass: pass() });
+    const after = E.recordBattle(before, b);
     const hit = Object.keys(after.ev).filter((k) => after.ev[k].b.some((x) => x[0] === b.id) && !(before.ev[k]?.b || []).some((x) => x[0] === b.id));
     if (!hit.length) return;
     setSt(after);
-    d.award = { pts: pointsFor(b), events: hit.length };
+    // Banked everywhere (a lapsed Pass loses nothing); announced only where it shows.
+    const shown = hit.filter((k) => !locked(k));
+    if (shown.length) d.award = { pts: pointsFor(b), events: shown.length };
     paintButton();
     if (isOpen()) paintSide();
     for (const id of hit) void sync(id);
@@ -110,17 +164,20 @@ export function mountEvents(h) {
     if (!(await net.probe())) { online = false; return; }
     const cur = E.evState(st(), id);
     const sent = new Set(cur.b.map((x) => x[0]));
-    const r = await net.sync({ event: id, name: arenaName() || 'PLAYER', b: cur.b, rolls: cur.rolls | 0, open: cur.open || [], friends: friendNames() });
+    const r = await net.sync({ event: id, name: arenaName() || 'PLAYER', b: cur.b, rolls: cur.rolls | 0, open: cur.open || [] });
     if (r.status !== 200 || !r.data) {
       online = false;
-      if (r.status === 429) { clearTimeout(syncT); syncT = setTimeout(() => sync(id), 600); }
+      if (r.status === 0) srvArt.delete(id);
+      if (r.status === 429) later(id, 600);
       if (tab === id && isOpen()) paintSide();
       return;
     }
     online = true;
     adopt(id, r.data, sent);
   }
-  const syncSoon = (id) => { clearTimeout(syncT); syncT = setTimeout(() => sync(id), 450); };
+  // One timer per event: a retry for one event must not cancel another's.
+  const later = (id, ms) => { clearTimeout(timers.get(id)); timers.set(id, setTimeout(() => sync(id), ms)); };
+  const syncSoon = (id) => later(id, 450);
 
   /** The server's recomputed state wins; anything recorded while the request was out is kept. */
   function adopt(id, d, sent) {
@@ -132,6 +189,7 @@ export function mountEvents(h) {
     const banked = E.pointsOf(next);
     if (p.def.kind === 'vines') next.rolls = Math.min(banked, Math.max(d.rolls | 0, cur.rolls | 0));
     else {
+      if (typeof d.art === 'boolean') srvArt.set(id, d.art);
       const cap = Math.min(R.CELLS, Math.floor(banked / p.def.cost));
       const open = [...(d.open || []), ...(cur.open || []).filter((c) => !(d.open || []).includes(c))];
       next.open = open.slice(0, cap);
@@ -144,34 +202,37 @@ export function mountEvents(h) {
       const old = rivals.get(id);
       rivals.set(id, d.rivals);
       if (old && tab === id && isOpen() && laidFor.startsWith(id + '|')) {
-        const was = new Map(old.map((r) => [r.name, r.pos]));
-        vview.rivalsMove(d.rivals.filter((r) => was.has(r.name)).map((r) => ({ key: r.name, from: was.get(r.name), to: r.pos })));
+        const was = new Map(old.map((r) => [rkey(r), r.pos]));
+        vview.rivalsMove(d.rivals.filter((r) => was.has(rkey(r))).map((r) => ({ key: rkey(r), from: was.get(rkey(r)), to: r.pos })));
       }
     }
     payRewards(id);
-    if (tab === id && isOpen()) paintSide();
+    if (p.def.kind === 'reveal' && artOn(id)) fetchArt(id, Array.isArray(d.open) ? d.open : []);
+    // The whole panel, not just the side: a solved picture adds the PRIZES tab.
+    if (tab === id && isOpen()) paint();
   }
 
   // ── rewards ────────────────────────────────────────────────────────────────────────
   function payRewards(id) {
     const p = parseEventId(id);
-    if (!p || p.def.kind !== 'reveal') return;
+    if (!p || p.def.kind !== 'reveal' || locked(id)) return;
     const ev = E.evState(st(), id);
-    const owed = R.rewardsOwed(p.def, ev, picKey(id));
+    const owed = R.rewardsOwed(p.def, ev, artOn(id) ? 'art' : 'placeholder');
     if (!owed.length) return;
     for (const r of owed) {
       if (r.kind === 'ink') h.addInk(r.amount);
       if (r.kind === 'arenaBackground') {
         const pz = prizes();
-        if (!pz.bgs.some((b) => b.id === id)) pz.bgs.push({ id, title: `${p.def.title} · ${p.win.key}`, art: !!art(id) });
+        if (!pz.bgs.some((b) => b.id === id)) pz.bgs.push({ id, title: `${p.def.title} · ${p.win.key}`, art: artOn(id) });
       }
     }
     setSt(E.setEv(st(), id, { ...ev, claimed: [...ev.claimed, ...owed.map((r) => r.id)] }));
   }
+  const payAll = () => { for (const id of Object.keys(st().ev)) payRewards(id); };
 
   // ── actions ────────────────────────────────────────────────────────────────────────
   function roll() {
-    const id = tab, p = parseEventId(id);
+    const id = tab, p = id && id !== 'prizes' ? parseEventId(id) : null;
     if (!p || p.def.kind !== 'vines' || vview.busy() || locked(id)) return;
     const ev = E.evState(st(), id), uid = uidOf(id), board = boardFor(id), pts = E.turnPoints(ev);
     const r = V.takeRoll(board, uid, id, pts, ev.rolls | 0);
@@ -185,7 +246,7 @@ export function mountEvents(h) {
   }
 
   function uncover(cell) {
-    const id = tab, p = parseEventId(id);
+    const id = tab, p = id && id !== 'prizes' ? parseEventId(id) : null;
     if (!p || p.def.kind !== 'reveal' || locked(id)) return false;
     const ev = E.evState(st(), id);
     const r = R.uncover(p.def, ev, E.pointsOf(ev), cell);
@@ -197,27 +258,20 @@ export function mountEvents(h) {
     return true;
   }
 
+  /** Only the server can check a guess: no answer ships, so offline there is no guess bonus. */
   async function guess(choice) {
-    const id = tab, p = parseEventId(id);
+    const id = tab, p = id && id !== 'prizes' ? parseEventId(id) : null;
     if (!p || p.def.kind !== 'reveal' || locked(id)) return;
     const ev = E.evState(st(), id);
-    if (R.guessesLeft(ev) <= 0 || ev.guesses.includes(choice)) return;
-    if (await net.probe()) {
-      const r = await net.guess(id, picKey(id), choice);
-      if (r.status === 200 && r.data) {
-        online = true;
-        adopt(id, r.data, new Set(ev.b.map((x) => x[0])));
-        say(r.data.right ? `yes — ${choice}!` : `not ${choice.toLowerCase()}`);
-        return;
-      }
-      if (r.status === 409) { say(r.data?.error === 'picture changed' ? 'this picture was just updated — reload the game to see it' : 'no guesses left'); return; }
-    }
-    if (art(id)) { say('guessing this picture needs the arena server — try again when you are online'); return; }
-    const r = R.guess(p.def, ev, choice, choice === R.PICTURES[PLACEHOLDER].answer);
-    if (!r.ok) return;
-    setSt(E.setEv(st(), id, r.st));
-    payRewards(id);
-    say(r.right ? `yes — ${choice}!` : `not ${choice.toLowerCase()}`);
+    if (!R.canGuess(ev, artOn(id)) || ev.guesses.includes(choice)) return;
+    const r = (await net.probe()) ? await net.guess(id, 'art', choice) : { status: 0 };
+    if (r.status === 200 && r.data) {
+      online = true;
+      adopt(id, r.data, new Set(ev.b.map((x) => x[0])));
+      say(r.data.guessable === false ? 'this picture cannot be guessed right now' : r.data.right ? `yes — ${choice}!` : `not ${choice.toLowerCase()}`);
+    } else if (r.status === 409) say(r.data?.error === 'picture changed' ? 'this picture was just updated — reload the game to see it'
+      : r.data?.error === 'play first' ? 'fight once in this event first' : 'no guesses left');
+    else say('guessing needs the arena server — try again when you are online');
   }
 
   function useBackground(id) {
@@ -244,6 +298,7 @@ export function mountEvents(h) {
     if (!tab || (tab !== 'prizes' && !list.some((a) => a.id === tab))) tab = list[0]?.id || null;
     note = '';
     setSt(E.markSeen(E.prune(st(), now()), today()));
+    payAll();
     paintButton();
     h.overlay('events');
     laidFor = '';
@@ -295,17 +350,17 @@ export function mountEvents(h) {
     const lock = locked(tab);
     if (p.def.kind === 'vines') {
       const me = meOf(tab);
-      vview.draw(g, dt, t / 1000, { myPos: V.positionAfterRolls(boardFor(tab), me.uid, tab, me.rolls).pos, rivals: (rivals.get(tab) || []).map((r) => ({ ...r, key: r.name })), dim: lock });
+      vview.draw(g, dt, t / 1000, { myPos: V.positionAfterRolls(boardFor(tab), me.uid, tab, me.rolls).pos, rivals: (rivals.get(tab) || []).map((r) => ({ ...r, key: rkey(r) })), dim: lock });
     } else {
       const ev = E.evState(st(), tab);
-      rview.draw(g, { img: imageOf(tab), open: ev.open, whole: R.complete(ev), dim: lock });
+      rview.draw(g, { img: shownImage(tab), open: ev.open, whole: wholeOf(tab, ev), dim: lock });
     }
   }
 
   function drawPrizes() {
     const pz = prizes(), b = pz.bgs.find((x) => x.id === pz.bg) || pz.bgs[pz.bgs.length - 1];
     if (!b) return;
-    rview.draw(g, { img: imageOf(b.id), open: [], whole: true });
+    rview.draw(g, { img: prizeImage(b), open: [], whole: true });
   }
 
   function vinesSide(a) {
@@ -326,14 +381,18 @@ export function mountEvents(h) {
 
   function revealSide(a) {
     const id = a.id, def = a.def, ev = E.evState(st(), id), pts = E.pointsOf(ev);
-    const gl = R.guessesLeft(ev), choices = choicesOf(id);
+    const gl = R.guessesLeft(ev), choices = choicesOf(id), real = artOn(id);
     const pz = prizes(), bg = pz.bgs.find((b) => b.id === id);
-    const done = R.complete(ev);
+    const full = ev.open.length >= R.CELLS, done = real ? full : R.complete(ev);
+    const can = R.canGuess(ev, real);
+    const why = !ev.b.length ? 'fight once in this event to guess' : `${gl} guess${gl === 1 ? '' : 'es'} left · early = more ink`;
+    const ask = !real ? (done ? '' : '<p class="evsmall">A practice picture: uncover it for the prize. Guessing pays ink on the real event pictures.</p>')
+      : ev.solved || full ? '' : `<div class="evhead2">WHAT IS IT? <small>${why}</small></div>
+      <div class="evchoices">${choices.map((c) => `<button class="btn${ev.guesses.includes(c) ? ' tried' : ''}" data-guess="${esc(c)}"${!can || ev.guesses.includes(c) ? ' disabled' : ''}>${esc(c)}</button>`).join('')}</div>`;
     return `<div class="evstat"><b>${R.left(def, ev, pts)}</b> pts to spend · ${def.cost} a square · ${ev.open.length}/25 open</div>
       <div class="evnote" id="evNote">${esc(note || (done ? '' : 'tap a square to uncover it'))}</div>
-      ${done && !ev.solved ? '' : `<div class="evhead2">WHAT IS IT? <small>${ev.solved ? 'solved' : `${gl} guess${gl === 1 ? '' : 'es'} left · early = more ink`}</small></div>
-      <div class="evchoices">${choices.map((c) => `<button class="btn${ev.guesses.includes(c) ? ' tried' : ''}" data-guess="${esc(c)}"${gl <= 0 || ev.guesses.includes(c) ? ' disabled' : ''}>${esc(c)}</button>`).join('')}</div>`}
-      ${ev.solved ? `<p class="evwin">Solved! +${ev.bonus} ink</p>` : ''}
+      ${ask}
+      ${ev.solved ? `<p class="evwin" id="evSolved">Solved! +${ev.bonus} ink${real && !full ? ' · keep uncovering to see it all' : ''}</p>` : ''}
       ${bg ? `<p class="evwin">Picture unlocked as an arena background <button class="btn small" data-bg="${esc(id)}">${pz.bg === id ? 'IN USE ✓' : 'USE IT'}</button></p>` : ''}`;
   }
 
@@ -385,21 +444,29 @@ export function mountEvents(h) {
   });
   addEventListener('resize', () => { if (isOpen()) { laidFor = ''; paint(); } });
 
+  /** A finished picture: the art as far as the server lets this player see it, or the drawn one. */
+  function prizeImage(b) {
+    if (!b.art) return rview.placeholderCanvas();
+    if (!arts.get(b.id)?.full) fetchArt(b.id, E.evState(st(), b.id).open || []);
+    const A = arts.get(b.id);
+    return A && (A.full || A.have.size) ? imageOf(b.id) : null;
+  }
+
   paintButton();
   current = {
     background() {
-      const pz = prizes();
-      if (!pz.bg) return null;
-      return art(pz.bg) ? imageOf(pz.bg) : rview.placeholderCanvas();
+      const pz = prizes(), b = pz.bgs.find((x) => x.id === pz.bg);
+      return b ? prizeImage(b) : null;
     },
     mergeInto(next, prev) {
-      next.events = E.merge(prev?.events, next?.events);
+      next.events = E.adoptMerge(next?.events, prev?.events);
       const a = prev?.eventPrizes?.bgs || [], b = next?.eventPrizes?.bgs || [];
       next.eventPrizes = { bgs: [...b, ...a.filter((x) => !b.some((y) => y.id === x.id))], bg: next?.eventPrizes?.bg ?? prev?.eventPrizes?.bg ?? '' };
+      if (next === S()) payAll();
     },
   };
   const api = {
-    open, roll, uncover, guess, sync, setTab, net, picture: imageOf,
+    open, roll, uncover, guess, sync, setTab, net, picture: imageOf, artOn, arts,
     get tab() { return tab; }, get state() { return st(); }, get rivals() { return rivals; },
     get online() { return online; }, get manifest() { return manifest; }, vview, rview,
   };
@@ -454,7 +521,7 @@ function injectCSS() {
 .evriv { columns: 2; column-gap: 12px; font-size: 15px; }
 .evriv .f { color: var(--blue); } .evriv span { opacity: .7; }
 .evchoices { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 4px 0; }
-.evchoices .btn { font-size: 15px; padding: 6px 6px; line-height: 1.1; }
+.evchoices .btn { font-size: 15px; padding: 6px 6px; line-height: 1.1; min-height: 40px; }
 .evchoices .btn.tried { text-decoration: line-through; }
 .evwin { color: #2f5c39; font-size: 16px; margin: 6px 0; }
 .evlock { font-size: 16px; margin: 8px 0; }

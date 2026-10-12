@@ -458,8 +458,6 @@ func evLock(uid, ev string) *sync.Mutex { return &evLocks[hash32(uid+"|"+ev)%uin
 
 var evMinGap = 250 * time.Millisecond // tests set 0 to reach the lock behind it
 
-var evAfterLoad = func() {} // tests: widen the load-to-save window
-
 // evLimit: evMinGap between calls of one kind, per player and event.
 func (h *hub) evLimit(key string) bool {
 	evSyncMu.Lock()
@@ -572,6 +570,7 @@ func (h *hub) eventRoutes(mux *http.ServeMux, prefix string, origins []string) {
 		cors(w, r, origins)
 		h.eventGuess(w, r)
 	})
+	h.eventArtRoutes(mux, prefix, origins) // eventart.go: tiles of opened squares only
 }
 
 // evAuth: a verified (or LAN) player, a known event, and the Pass if the event wants one.
@@ -791,7 +790,7 @@ func (s *store) evApply(uid, name string, body syncBody) (map[string]any, error)
 		}
 		pts := ptsOf(p.battles)
 		p.rolls = max(p.rolls, min(body.Rolls, sumInts(pts)))
-		if def.Kind == "reveal" && !p.solved && len(p.openCells) < cells {
+		if def.Kind == "reveal" && len(p.openCells) < cells { // solved pictures keep opening: the whole art is sent only at 25
 			afford := min(cells, sumInts(pts)/def.Cost)
 			for _, c := range body.Open {
 				if len(p.openCells) >= afford {
@@ -1072,7 +1071,6 @@ func (h *hub) eventGuess(w http.ResponseWriter, r *http.Request) {
 		reply(w, 503, map[string]string{"error": "unavailable"})
 		return
 	}
-	evAfterLoad()
 	if len(p.battles) == 0 {
 		reply(w, 409, map[string]any{"error": "play first", "guessesLeft": guessesLeft(len(p.openCells), len(p.guesses), p.solved)})
 		return

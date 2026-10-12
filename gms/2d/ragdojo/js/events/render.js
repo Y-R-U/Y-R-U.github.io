@@ -166,7 +166,7 @@ export class VinesView {
   }
 }
 
-/** The 5×5 picture. `img` is approved art; without it the code-drawn placeholder (a flying kick). */
+/** The 5×5 picture. `img` is approved art (opened tiles); without it the code-drawn practice picture. */
 export class RevealView {
   constructor() {
     this.picMe = fighterOf(1.6, 77, RANKS[4]);
