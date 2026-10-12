@@ -46,8 +46,8 @@ deleted, while access is unavailable (signed out, refunded, offline); a parked r
 in DARK if you have a DARK run, else LIGHT (`parkPaid()` in main.js). Skill caps follow
 the same split: DARK's +5 levels are free; the +1 per later world needs the upgrade.
 
-**Payments are not deployed** (test-mode service built; Firebase Admin credential and the
-deployed webhook endpoint still needed). The client probes `GET /api/br8t/offer` once; if it is missing or unconfigured, CYBER and
+**Payments are not deployed** (test-mode service built; the deployed webhook endpoint is
+still needed). The client probes `GET /api/br8t/offer` once; if it is missing or unconfigured, CYBER and
 DEITIES show "support the dev · soon", the panel says support is coming soon, checkout is
 a disabled "SUPPORT · COMING SOON" button, Restore is hidden, and no entitlement request
 is ever sent (no retry/focus polling). Off games.br8t.com (GitHub Pages, LAN, itch) there
@@ -229,7 +229,8 @@ Still open:
 1. ~~Price and currency~~ (A$1.99 / A$1.49 / A$4.99, decided 2026-10-12).
 2. ~~Stripe test keys~~ (in the service's private `.env`); the **deployed webhook signing
    secret** is created when the test endpoint is registered.
-3. **Firebase Admin credential** with `firebaseauth.users.get` for revocation checks.
+3. ~~Firebase Admin credential~~ not needed: the service verifies ID tokens against Google's
+   public certs (Aaron's org forbids service-account keys); no revocation check, 1-hour tokens.
 4. ~~Business name~~ (BR8T.COM; ABN to add when one exists).
 5. ~~Tax treatment~~ (Managed Payments); purchase-record retention policy still open.
 6. itch creator account/slug and listing review; no upload yet.
