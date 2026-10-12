@@ -20,8 +20,14 @@ Aaron's brief, plus the manager's defaults where he left a choice open. Defaults
   round 3 goes to the player who lost round 2.
 - **Results**: every client reports the outcome; stats only count when reports agree. Mismatch =
   void + logged. Hacking risk is accepted over bad ping (Aaron's call).
-- **Matching**: by ping. The lobby shows a rough estimate; tapping a player opens the direct link
-  and shows the **real** ping before both accept.
+- **Matching**: by ping. Where the exact ping is not known yet, show **signal bars** (Aaron, 2026-10-13):
+  5 green = good, 2-3 yellow = average, 1 red = bad. Once a direct link exists, show the measured
+  ping in ms on the connect screen (and keep the bars beside it).
+- **A master dropping must not kill the result** (Aaron: a losing master rage-quitting is the case
+  to beat). 1v1: the leaver gets a short reconnect window (~10 s) with their fighter standing idle;
+  no return = **forfeit loss**, never void. Last Man Standing / multi-player modes: **host migration** —
+  the best-ping remaining client rebuilds the Match from the last snapshot and carries on; the
+  leaver is eliminated. Running the JS sim in node on the server is a possible later fallback.
 - Accounts: Firebase ID tokens verified credential-free (copy the approach of
   `~/cc/ionos/ragdojo-payments/idtoken.go`). Anonymous users may play friend links but don't
   appear on leaderboards **(default)**.
@@ -33,14 +39,17 @@ Aaron's brief, plus the manager's defaults where he left a choice open. Defaults
 2. **Challenge a friend by link** (like Clued rooms). Same match code as 1v1.
 3. **Last Man Standing**, up to 8. Countdown starts when 4 are waiting; joins allowed until it
    ends or 8 is reached. Master = best ping; if the master drops the match is void.
-4. **Ghost fights (default: yes)**. When nobody is waiting, fight an AI using a real player's name
-   and unlocked specials. Always labelled GHOST, never passed off as live, no ranked stats.
-5. **Steal the Bandana** (CTF variant), 2–8: one golden bandana, holding it scores seconds, a hard
-   hit knocks it loose. Later phase.
-6. Later ideas: King of the Hill, 2v2 tag, daily-rule fights (low gravity / big heads / one-hit).
+4. **Ghost fights (approved)**. Fight an AI using a real player's name and unlocked specials. The
+   arena lists players' ghosts you can challenge any time, not only when nobody is waiting. Always
+   labelled GHOST, never passed off as live, no ranked stats.
+5. **Steal the Bandana** (capture the flag), 2–8: one golden bandana, holding it scores seconds, a
+   hard hit knocks it loose. **Build now** (Aaron, 2026-10-13).
+6. **King of the Hill**, 2–8: a paper ledge/zone; time standing on it alone scores. **Build now.**
+7. Later ideas: 2v2 tag, daily-rule fights (low gravity / big heads / one-hit).
 
-**Free allowance:** 3 online battles per day free (`BR8T_FREE_PER_DAY=ragdojo=3`, already in the
-payment service), the Pass is unlimited. A best-of-3 or one Last Man Standing counts as one.
+**Free allowance:** 3 online battles per day free, **10 per day with the A$1.99 supporter unlock**,
+unlimited with the Pass (Aaron, 2026-10-13). The payment service's free-allowance API needs the
+supporter tier added. A best-of-3 or one Last Man Standing counts as one.
 Friend links count too **(default)**.
 
 ## Leaderboards (stats only)
@@ -86,6 +95,9 @@ nothing goes live unapproved.
 2. Last Man Standing, ghost fights, leaderboards UI.
 3. Event wiring in-game, picture reveal live, image review page.
 4. Vines & Ladders live.
-5. Steal the Bandana, other modes.
+5. Steal the Bandana and King of the Hill (approved for now — right after the arena works), then other modes.
+
+Aaron's go-ahead (2026-10-13): build the full list in order until usage runs out. His kids are
+waiting for it.
 
 Nothing in this plan deploys to the br8t box without Aaron approving the named steps.
