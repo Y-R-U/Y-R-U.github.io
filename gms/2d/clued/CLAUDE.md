@@ -14,3 +14,4 @@ Trivia + learning game. Manager-run: read `docs/MANAGER_STATE.md` first, then `d
 - Online saved sets: `js/net/sets.js` (`clued.sets`, synced). Host screen loads/saves; the room podium saves `st.spec.rounds` minus the `online`/`kids` opts.
 - Full screen: `fsButton()` (js/ui/toggles.js) sits in every `header()` right slot and the runner HUD. Read-aloud 🔊 is prepended to the question's `.q-prompt` by the runner, not in the HUD.
 - Home hide chips: settings `homeKids` / `homeDaily` (default true), restored in Settings › Home page.
+- Remote client logging is server-switched only: `ssh br8t 'cd /srv/apps/clued && CLUED_DATA=/srv/data/clued ./clued debuglog on|off|status|dump [--since 1h]'` (always pass CLUED_DATA; turn it OFF after testing). Server env (ntfy alert topic, CORS origins) lives in `/srv/data/clued/clued.env` — never copy the topic into the repo.
