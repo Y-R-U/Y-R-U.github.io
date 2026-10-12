@@ -377,6 +377,63 @@ the two sets use different ids (`power` vs `d_shank`) in the same `save.moves`.
 - `?autoplay=1` is a real fight with an AI player; `demo` is the menu background match. They
   are different flags.
 
+## Online arena (phase 1, 2026-10-13; local only, NOT deployed)
+
+Design: `docs/ONLINE.md`. Browser-hosted like Snake-eee: `server/` (Go, `ragdojo-arena`, planned
+`127.0.0.1:8017` behind Caddy at `/gms/2d/ragdojo/arena/*`) only introduces players, relays
+signalling and (as a fallback) game traffic, picks masters and keeps agreed stats.
+
+```
+js/net/client.js  ArenaClient (WebSocket, resume) + NetLink (WebRTC 'u'/'r' lanes, relay fallback)
+js/net/wire.js    binary input/act/snapshot (int16 at 1/8 unit), verdict()
+js/net/fight.js   PvpMatch (a Match subclass), NetFight (master/guest), RULES, keyframes
+js/net/panel.js   the ARENA panel; arenaBase() decides which server (prod / 192.* LAN / dev)
+server/           hub.go (one goroutine owns all state), store.go (SQLite), ice.go, allowance.go,
+                  idtoken.go (copied from the payment service), names.go (copied from Clued)
+```
+
+- **The master runs the real Match; guests draw it.** Guest stick (unreliable, 30/s, newest wins)
+  and taps/jumps/gestures (reliable `ACT`) go to the master; the master's OWN input is delayed by
+  RTT/2 (cap 100 ms). Snapshots 30/s carry the 11 points per fighter; every fx/sfx/`say` call the
+  master makes is recorded and replayed on guests (`record()`/`replay()`), so hits look the same.
+- **Guests interpolate opponents and predict themselves.** The buffer is sized from a decaying
+  PEAK of late arrivals, not mean jitter (mean-sized buffers ran dry 3%). Own fighter is simulated
+  locally and corrected against our position ONE RTT AGO; any non-`live` master mode hands the
+  body back to the snapshots until it is standing again (`authority`).
+- **Results**: both sides run `verdict()` on the same quantised HP/dead flags; HP freezes when the
+  round ends (`invuln = 1e9`) so the slow-mo cannot change what is reported. Disagree = void.
+  A dropped socket gets 10 s (`away`/`back`, resume token); not back = **forfeit loss, never void**.
+  QUIT mid-fight is a forfeit too (`arena.quit()` from `toMenu`).
+- **Keyframes** (`matchState`/`applyState`, 1/s on the reliable lane) rebuild a Match exactly —
+  the base for host migration. `tools/arenastate.mjs` compares rebuild vs original EVERY tick.
+- Free allowance: the server calls `claimArenaBattle` (POST `/api/br8t/allowance` on 8016 with the
+  player's own fresh token from `accept`) once per best of 3; fails open; anonymous not counted.
+  The panel shows `GET allowance` as "remaining of perDay" (silent if the API is absent).
+- **LAN** (`server/lan.sh`): a literal `192.*` page host (same test as `family-access.js`, but no
+  acceptance needed: it is a payment waiver and online LAN play involves no payment) uses the arena
+  on that machine, same origin. `ARENA_LAN=1`: typed name + per-device id, no limit, no STUN/TURN,
+  own DB, `lan_results` with `uploaded` for a later sync. Never serves dot-paths (the root is a repo).
+
+Gates (each watched go red): `cd server && go test ./...` · `node tools/arenaserver.mjs` (binary +
+two simulated clients: lobby, master rule, agreement, void, forfeit, TURN only to matched,
+internal stats) · `node tools/arenastate.mjs` · `node tools/arenagate.mjs` (two Chromes, real 1v1
+over WebRTC, feel numbers) with `--lan` (this Mac's 192.168.* address) and `LAG=140` (dev-only
+`?arenalag=` on links). Test hooks: `?arena=` `?arenauid=` `?arenabot=1` `?arenahp=` `?arenasecs=`.
+
+Gotchas hit:
+- `PvpMatch` replaces `Match.build()`, which is where `camX/camY` were set: a NaN camera draws an
+  empty page while every network number looks perfect. The gate checks the camera and screenshots.
+- Snapshot time must be the master's WALL clock, not `match.time` (slow-mo/hitstop stretch it).
+- "time since last send >= 33 ms" at 60 fps fires every THIRD frame (20/s): pace on an accumulator.
+- `wait` sent before the server finished checking the token is refused as anonymous: wait for `me`.
+- Keyframe timers must be full precision; 1 ms rounding moved the frame an attack ends on.
+
+Deploy (needs Aaron's approval; nothing has been run): 1) `server/deploy.sh` (tests, build on box,
+`/srv/apps/ragdojo-arena`, unit, health + rollback, data in `/srv/data/ragdojo-arena`); 2) merge
+`server/Caddyfile.fragment` into the games.br8t.com block, `caddy validate`, reload; 3) ship the
+client with `games/deploy.sh`; 4) `curl https://games.br8t.com/gms/2d/ragdojo/arena/health`. The
+payment service must be deployed for the allowance to apply (it fails open without it).
+
 ## Music
 
 Fourteen Suno v5.5 instrumental tracks in `assets/audio/`, wired through `js/music.js`.

@@ -24,3 +24,18 @@ The save stores ordered battle points + a roll count; dice are indexed by roll. 
 finish a turn, to the end of THEIR k-th batch. Campaign cap 10/UTC day, 60 s apart; guess bonus = ink.
 Gate 136 checks, `--falsify` 22/22 red; eventsshot asserts nobody moves mid-turn (and goes red with the
 rule removed). Dojo images regenerated with a blank scroll.
+
+### A status (2026-10-13)
+Done, local only, NOT deployed: Go `server/` (ragdojo-arena: lobby with game type, challenge, friend
+codes, offer → real ping → accept, coin-flip master / swap / round 3 to the round-2 loser, agreed-only
+results, void on disagreement, resume + 10 s away window → FORFEIT LOSS (never void), SQLite stats +
+`/leaderboard` + `/ghosts`, loopback `/internal/stats`, `/ice` from 8014 cached, allowance via
+`claimArenaBattle` → payment service, LAN mode + `lan.sh`). `js/net/` (client, wire, fight, panel).
+ARENA button on the hub, hidden unless `/health` answers. Gates: `go test ./...` (server/),
+`tools/arenaserver.mjs` (18), `tools/arenastate.mjs` (9), `tools/arenagate.mjs` (24, also `--lan` and
+`LAG=140`); all falsified. Measured: 30 snapshots/s, 52-70 ms interp buffer, 0-0.3% underruns,
+opponent shown 66 ms after the master simulated it (155 ms at 140 ms RTT).
+Not done: Steal the Bandana / KotH / LMS / ghost fights (listed "coming soon"; `RULES` + `/ghosts` are the
+hooks), host migration (keyframes are complete, `applyState` rebuilds exactly), LAN→prod upload job,
+leaderboard UI, browser-side spend (the server spends with the player's own token instead).
+Deploy steps: see CLAUDE.md "Online arena".

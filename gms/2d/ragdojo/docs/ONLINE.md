@@ -110,3 +110,13 @@ peers connect directly on LAN candidates (no TURN), no sign-in, no daily limit, 
 in the local server's own database. A start script launches site + arena server on the LAN.
 LAN results may later upload to the production stats under the player's account (Aaron: fine,
 low priority, whenever): the local DB keeps an optional uid + an uploaded flag per result.
+
+**LAN results upload (hook only, not built).** `server/lan.sh` runs the arena with `ARENA_LAN=1`.
+Every agreed LAN result is a row in that server's `lan_results` (match, device id, optional
+`firebase_uid`, name, type, won, KOs, forfeit, `uploaded`). A device becomes linked when its
+hello carries `link` = a Firebase ID token (`hub.linkAccount` → `store.linkDevice`); the LAN page
+does not send one yet, because the account layer only loads on games.br8t.com. A later job calls
+`store.uploadLanResults(n)`, which returns linked, un-uploaded rows plus a `mark` function: POST
+the batch to a new production endpoint (not built) that adds them to that account's arena stats
+only — never to daily battles, allowance or free-limit counts — then call `mark()`. Batched, run
+whenever convenient; re-sending a match id must be idempotent on the production side.

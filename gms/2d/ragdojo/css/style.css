@@ -290,3 +290,27 @@ html, body {
 #nudge span { flex: 1; }
 #nudge .btn { font-size: 16px; padding: 4px 10px; white-space: nowrap; }
 #nudge .icon { width: 32px; height: 32px; font-size: 15px; flex: none; }
+
+/* ── online arena (js/net/panel.js) ─────────────────────────────────────── */
+#arenaBody { overflow-y: auto; min-height: 0; }
+#arenaBody input { font: inherit; font-size: 18px; padding: 4px 8px; border: 2px solid var(--ink-soft);
+  border-radius: 6px; background: rgba(255,253,246,.8); color: inherit; max-width: 60%; }
+#arenaBody #arenaLink { width: 100%; max-width: none; font-size: 14px; margin: 6px 0; }
+#arenaBody .mode { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 0;
+  border-bottom: 1px dashed rgba(60,72,100,.25); }
+#arenaBody .mode > div { flex: 1 1 140px; display: flex; flex-direction: column; }
+#arenaBody .mode small { font-size: 14px; color: var(--ink-soft); }
+#arenaBody .mode.soon { opacity: .55; }
+#arenaBody .soonTag { font-size: 14px; color: var(--ink-soft); }
+#arenaBody .lrow { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
+#arenaBody .lname { flex: 1; }
+#arenaBody .code { font-size: 40px; letter-spacing: 6px; text-align: center; font-weight: 700; }
+#arenaBody .vs { font-size: 26px; text-align: center; margin: 4px 0; }
+#arenaBody .ping { display: flex; justify-content: center; align-items: flex-end; gap: 10px; font-size: 20px; }
+#arenaBody h3.win { color: #2f5c39; } #arenaBody h3.lose { color: #c0392b; }
+#arenaBody .arenanote .warn { color: #c0392b; }
+.bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 20px; }
+.bars i { width: 5px; background: rgba(60,72,100,.18); border-radius: 1px; }
+.bars.good i.on { background: #2f9e44; }
+.bars.ok i.on { background: #e0a800; }
+.bars.bad i.on { background: #c0392b; }

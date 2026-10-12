@@ -1,0 +1,7 @@
+# Merge inside the EXISTING games.br8t.com block, before its file_server fallback (like
+# snakenet's /gms/pwa/snake/net/* and br8t-payments' /api/br8t/*). Do not touch other vhosts.
+# /internal/stats is deliberately NOT routed: loopback only, for vpstats.
+handle /gms/2d/ragdojo/arena/* {
+	header Cache-Control "no-store"
+	reverse_proxy 127.0.0.1:8017
+}

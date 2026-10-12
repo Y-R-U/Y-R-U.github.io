@@ -1,0 +1,176 @@
+package main
+
+import (
+	"context"
+	"crypto"
+	"crypto/rsa"
+	"crypto/sha256"
+	"crypto/x509"
+	"encoding/base64"
+	"encoding/json"
+	"encoding/pem"
+	"errors"
+	"io"
+	"net/http"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+)
+
+// Copied from the payment service (~/cc/ionos/ragdojo-payments/idtoken.go).
+// Firebase ID tokens are verified locally with Google's public signing certificates, so the
+// service needs no Google credentials (Aaron's org forbids service-account keys). Trade-off:
+// no revocation check. A token stays valid until it expires (Firebase issues 1-hour tokens),
+// so a disabled or signed-out account keeps API access for at most that hour.
+const firebaseCertsURL = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+
+type identity struct {
+	UID       string
+	Anonymous bool
+}
+
+type tokenVerifier struct {
+	project, certsURL string
+	http              *http.Client
+	now               func() time.Time
+	mu                sync.Mutex
+	keys              map[string]*rsa.PublicKey
+	expires, fetched  time.Time
+}
+
+func newTokenVerifier(project string) *tokenVerifier {
+	return &tokenVerifier{project: project, certsURL: firebaseCertsURL, http: &http.Client{Timeout: 10 * time.Second}, now: time.Now}
+}
+
+func (v *tokenVerifier) key(ctx context.Context, kid string) (*rsa.PublicKey, error) {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	now := v.now()
+	k, ok := v.keys[kid]
+	// Refresh when the cache has expired, or for an unknown kid (rotation) at most once a minute.
+	if (!ok || now.After(v.expires)) && (v.keys == nil || now.After(v.expires) || now.Sub(v.fetched) > time.Minute) {
+		if e := v.refresh(ctx, now); e != nil && v.keys == nil {
+			return nil, e
+		}
+		k, ok = v.keys[kid]
+	}
+	if !ok {
+		return nil, errors.New("unknown signing key")
+	}
+	return k, nil
+}
+
+func (v *tokenVerifier) refresh(ctx context.Context, now time.Time) error {
+	v.fetched = now
+	req, e := http.NewRequestWithContext(ctx, "GET", v.certsURL, nil)
+	if e != nil {
+		return e
+	}
+	res, e := v.http.Do(req)
+	if e != nil {
+		return errors.New("signing keys unavailable")
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		return errors.New("signing keys unavailable")
+	}
+	var certs map[string]string
+	if e := json.NewDecoder(io.LimitReader(res.Body, 1<<20)).Decode(&certs); e != nil {
+		return e
+	}
+	keys := map[string]*rsa.PublicKey{}
+	for kid, p := range certs {
+		block, _ := pem.Decode([]byte(p))
+		if block == nil {
+			continue
+		}
+		cert, e := x509.ParseCertificate(block.Bytes)
+		if e != nil {
+			continue
+		}
+		if pk, ok := cert.PublicKey.(*rsa.PublicKey); ok {
+			keys[kid] = pk
+		}
+	}
+	if len(keys) == 0 {
+		return errors.New("no signing keys")
+	}
+	maxAge := time.Hour
+	for _, part := range strings.Split(res.Header.Get("Cache-Control"), ",") {
+		if n, ok := strings.CutPrefix(strings.TrimSpace(part), "max-age="); ok {
+			if s, e := strconv.Atoi(n); e == nil && s > 0 {
+				maxAge = time.Duration(s) * time.Second
+			}
+		}
+	}
+	v.keys, v.expires = keys, now.Add(max(maxAge, time.Minute))
+	return nil
+}
+
+func b64(s string, out any) error {
+	raw, e := base64.RawURLEncoding.DecodeString(s)
+	if e != nil {
+		return e
+	}
+	if b, ok := out.(*[]byte); ok {
+		*b = raw
+		return nil
+	}
+	return json.Unmarshal(raw, out)
+}
+
+func (v *tokenVerifier) verify(ctx context.Context, raw string) (identity, error) {
+	parts := strings.Split(raw, ".")
+	if len(parts) != 3 || len(raw) > 8192 {
+		return identity{}, errors.New("malformed token")
+	}
+	var head struct {
+		Alg, Kid string
+	}
+	if e := b64(parts[0], &head); e != nil || head.Alg != "RS256" || head.Kid == "" {
+		return identity{}, errors.New("bad token header")
+	}
+	var sig []byte
+	if e := b64(parts[2], &sig); e != nil {
+		return identity{}, errors.New("bad signature encoding")
+	}
+	k, e := v.key(ctx, head.Kid)
+	if e != nil {
+		return identity{}, e
+	}
+	sum := sha256.Sum256([]byte(parts[0] + "." + parts[1]))
+	if rsa.VerifyPKCS1v15(k, crypto.SHA256, sum[:], sig) != nil {
+		return identity{}, errors.New("bad signature")
+	}
+	var c struct {
+		Aud      string `json:"aud"`
+		Iss      string `json:"iss"`
+		Sub      string `json:"sub"`
+		Exp      int64  `json:"exp"`
+		Iat      int64  `json:"iat"`
+		AuthTime int64  `json:"auth_time"`
+		Firebase struct {
+			Provider string `json:"sign_in_provider"`
+		} `json:"firebase"`
+	}
+	if e := b64(parts[1], &c); e != nil {
+		return identity{}, errors.New("bad claims")
+	}
+	now, skew := v.now().Unix(), int64(60)
+	switch {
+	case c.Aud != v.project:
+		return identity{}, errors.New("wrong audience")
+	case c.Iss != "https://securetoken.google.com/"+v.project:
+		return identity{}, errors.New("wrong issuer")
+	case c.Exp <= now:
+		return identity{}, errors.New("expired")
+	case c.Iat <= 0 || c.Iat > now+skew || c.AuthTime <= 0 || c.AuthTime > now+skew:
+		return identity{}, errors.New("bad issue time")
+	case c.Sub == "" || len(c.Sub) > 128:
+		return identity{}, errors.New("bad subject")
+	case c.Firebase.Provider == "":
+		return identity{}, errors.New("missing sign-in provider")
+	}
+	return identity{UID: c.Sub, Anonymous: c.Firebase.Provider == "anonymous"}, nil
+}

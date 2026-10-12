@@ -21,6 +21,7 @@ import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
 import { Purchases, API } from './purchases.js?v=20261012-pass';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
+import { mountArena } from './net/panel.js?v=20261013-arena';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
 let familyStorage;
@@ -85,9 +86,10 @@ function updateRotateHint() {
 // ── input ────────────────────────────────────────────────────────────────
 const input = new Input(cvs, {
   hand: S.settings.hand,
-  onStrike: () => match && match.playerStrike(),
+  onStrike: () => match && (match.net ? match.net.strike() : match.playerStrike()),
   onGesture: (g) => {
     if (!match || match.demo) return;
+    if (match.net) { match.net.gesture(g); return; }
     const mv = MOVES().find((m) => m.gesture === g);
     if (!mv) return;
     if (!(S.moves[mv.id] || {}).owned) {
@@ -99,13 +101,13 @@ const input = new Input(cvs, {
 });
 
 // ── screens ──────────────────────────────────────────────────────────────
-const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help', 'thug', 'premium', 'worlds'];
+const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help', 'thug', 'premium', 'worlds', 'arena'];
 function show(name) {
   for (const s of SCREENS) $(s).classList.toggle('show', s === name);
   $('pauseBtn').classList.toggle('hidden', name !== null || !match || match.demo);
 }
 function overlay(name) {   // a panel on top of the hub
-  for (const s of ['shop', 'settings', 'help', 'results', 'victory', 'thug', 'premium', 'worlds']) $(s).classList.toggle('show', s === name);
+  for (const s of ['shop', 'settings', 'help', 'results', 'victory', 'thug', 'premium', 'worlds', 'arena']) $(s).classList.toggle('show', s === name);
   $('pauseBtn').classList.toggle('hidden', !!name || mode !== 'fight');
 }
 
@@ -485,7 +487,8 @@ function render() {
   ctx.restore();
   m.flair.drawScreen(ctx, vw, vh);
 
-  if (mode === 'fight') drawHUD(ctx, vw, vh, m, S, input);
+  if (mode === 'fight') drawHUD(ctx, vw, vh, m, m.hudSave || S, input);
+  if (mode === 'fight' && m.net) m.net.drawHUD(ctx, vw, vh);
   ctx.restore();
 }
 
@@ -499,7 +502,9 @@ function frame(t) {
   if (mode === 'boot') { render(); return; }
 
   input.update(dt);
-  if (match) {
+  // An online round never pauses: the other player is still there.
+  if (match && match.net) match.net.step(dt, mode === 'fight' ? input : null);
+  else if (match) {
     const paused = document.querySelector('.panel-screen.show') && !match.demo;
     if (!paused) {
       acc += dt;
@@ -611,6 +616,7 @@ $('btnQuit').onclick = () => { click(); overlay(null); toMenu(); };
 
 /** Abandon whatever is on screen and go back to the hub. Nothing is scored either way. */
 function toMenu() {
+  if (match && match.net) arena.quit();
   match = null;          // drop the fight without firing its onEnd
   pendingResult = null;
   setMode('hub');
@@ -679,7 +685,7 @@ $('btnResClose').onclick = () => { click(); overlay(null); toMenu(); };
  * panel you were reading. The results card is deliberately absent: after a fight your thumb
  * is already moving, and a stray tap there should not skip past the report.
  */
-const DISMISS = { shop: 'btnShopClose', settings: 'btnSetClose', help: 'btnHelpClose', victory: 'btnVicClose', worlds: 'btnWorldsClose' };
+const DISMISS = { shop: 'btnShopClose', settings: 'btnSetClose', help: 'btnHelpClose', victory: 'btnVicClose', worlds: 'btnWorldsClose', arena: 'btnArenaClose' };
 for (const id in DISMISS) {
   const el = $(id);
   let downOnBackdrop = false;
@@ -880,6 +886,7 @@ async function boot() {
     setMode('hub');
     refreshHub();
     track('start', S);
+    void arena.probe();
     if (DEV && qs.get('level')) startFight(Math.min(TOTAL_LEVELS - 1, +qs.get('level')));
   };
   if (DEV && (qs.get('auto') || qs.get('shot'))) setTimeout(() => $('startBtn').click(), 120);
@@ -889,7 +896,20 @@ boot().catch((err) => {
   setTimeout(() => { throw err; });
 });
 
-if (DEV) window.__ragdojo = { get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
+// The online arena. Its button stays hidden unless the arena server answers (net/panel.js).
+const arena = mountArena({
+  dev: DEV, lan: familyAccess.available && !DEMO, click, overlay,
+  getSave: () => S, account: () => account,
+  openUpgrade: () => openUpgrade(),
+  startNetFight: (f) => {
+    match = f.match;
+    ensureSheet(f.sheetLevel);
+    if (mode !== 'fight') { setMode('fight'); audio.play(roleTrack('light', 'boss')); }
+  },
+  endNetFight: () => { if (match && match.net) { match = null; setMode('hub'); refreshHub(); } },
+});
+
+if (DEV) window.__ragdojo = { arena, get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
 if (DEV) window.__input = input;
 
 // Paid access never deletes earned progress. Park a CYBER/DEITIES run intact while signed

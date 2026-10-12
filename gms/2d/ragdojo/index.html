@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20261012-pass">
+<link rel="stylesheet" href="css/style.css?v=20261013-arena">
 </head>
 <body>
 <div id="app">
@@ -56,6 +56,7 @@
       <div class="corner bl">
         <button class="btn hidden" id="btnDark">☾ DARK</button>
         <button class="btn" id="btnShop">SHOP <span id="inkPill" class="pill">0</span></button>
+        <button class="btn hidden" id="btnArena" title="Fight other players">⚔ ARENA</button>
         <button class="btn hidden" id="btnTrophy" title="Your record book">🏆</button>
       </div>
       <div class="corner br">
@@ -169,6 +170,15 @@
       </div>
     </div>
 
+    <!-- online arena (js/net/panel.js); its button only appears if the arena server answers -->
+    <div id="arena" class="screen panel-screen">
+      <div class="sheet narrow">
+        <button class="icon close" id="btnArenaClose" aria-label="Close arena">✕</button>
+        <h2>ARENA</h2>
+        <div class="rows" id="arenaBody"></div>
+      </div>
+    </div>
+
     <!-- help -->
     <div id="help" class="screen panel-screen">
       <div class="sheet">
@@ -215,6 +225,6 @@
   }, 12000);
 })();
 </script>
-<script type="module" src="js/main.js?v=20261012-pass"></script>
+<script type="module" src="js/main.js?v=20261013-arena"></script>
 </body>
 </html>
