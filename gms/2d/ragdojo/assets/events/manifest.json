@@ -39,11 +39,11 @@
    "overlay": {
     "x": 0.607,
     "y": 0.215,
-    "w": 0.19,
+    "w": 0.18,
     "h": 0.44,
     "rot": 0,
-    "text": "{NAME}",
-    "layout": "stack"
+    "text": "{NAME}\nDOJO",
+    "layout": "lines"
    }
   }
  }
