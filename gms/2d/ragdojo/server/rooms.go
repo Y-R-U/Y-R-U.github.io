@@ -229,10 +229,12 @@ func pairRTT(a, b *seat) float64 {
 }
 
 // bestMaster: the seat whose worst ping to everyone still playing is lowest.
-func (h *hub) bestMaster(m *match) int {
+func (h *hub) bestMaster(m *match) int { return h.bestMasterBut(m, -1) }
+
+func (h *hub) bestMasterBut(m *match, skip int) int {
 	best, cost := -1, math.MaxFloat64
 	for i, a := range m.seats {
-		if a.out || a.c.away {
+		if a.out || a.c.away || i == skip {
 			continue
 		}
 		worst := 0.0
@@ -352,6 +354,23 @@ func (h *hub) migrate(m *match, gone int) {
 }
 
 // tickRooms: countdowns that ran out, and masters whose socket has been down too long.
+// handOver: a new master without eliminating the old one (hidden tab, or guests' stall reports
+// the server cannot confirm). It stays in as a guest; "gone" is -1.
+func (h *hub) handOver(m *match, from int) {
+	next := h.bestMasterBut(m, from)
+	if next < 0 || next == from || m.seats[next].out || m.seats[next].c.away {
+		return
+	}
+	m.master = next
+	m.log = append(m.log, "handed over to "+m.seats[next].id)
+	log.Printf("match %s: master %s handed over to %s", m.id, m.seats[from].id, m.seats[next].id)
+	for _, s := range m.seats {
+		if !s.out {
+			h.send(s.c, map[string]any{"t": "master", "match": m.id, "round": m.round, "master": m.master, "gone": -1})
+		}
+	}
+}
+
 func (h *hub) tickRooms(now time.Time) {
 	for _, m := range h.matches {
 		if !m.room {

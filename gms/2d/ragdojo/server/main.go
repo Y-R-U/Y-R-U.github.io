@@ -16,7 +16,7 @@
 //	                  players are a typed name + a per-device id ("lan:<device>" tokens), its own DB
 //	ARENA_STATIC      the site root (lan.sh): serve the game and the files its page loads from it,
 //	                  and nothing else (staticAllowed)
-//	ARENA_PER_IP      sockets per client address (default 24; behind Caddy, its X-Forwarded-For hop)
+//	ARENA_PER_IP      sockets per client address (default 64, IPv6 per /64; behind Caddy, its X-Forwarded-For hop)
 package main
 
 import (
@@ -181,7 +181,7 @@ func (h *hub) routes(prefix string, origins []string) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET "+prefix+"/health", func(w http.ResponseWriter, r *http.Request) {
 		cors(w, r, origins)
-		reply(w, 200, map[string]any{"ok": true, "v": 1, "modes": []string{"duel"}})
+		reply(w, 200, map[string]any{"ok": true, "v": 1, "modes": liveModes()})
 	})
 	h.boardRoutes(mux, prefix, origins)
 	h.eventRoutes(mux, prefix, origins)

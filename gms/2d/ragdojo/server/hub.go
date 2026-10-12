@@ -37,10 +37,12 @@ const (
 	// and the seat takes the away path (1v1 grace then forfeit, room elimination / migration).
 	pongLate = pingEvery
 	// stall: a guest that has had no master snapshot for at least stallMin says so; reports
-	// fresher than stallFresh count. A majority of the other seats = the master is away now.
+	// fresher than stallFresh count. The silence is timed by the server from the first report.
 	stallMin, stallFresh = 2 * time.Second, 3 * time.Second
-	// 1v1: a guest who quits after this long of reported master silence does not forfeit.
+	// 1v1: a guest who quits after this long of reported silence does not forfeit, IF the server
+	// itself saw the master go quiet (away, or a pong more than pongDue late).
 	stallQuit    = 10 * time.Second
+	pongDue      = 2 * time.Second
 	helloWithin  = 10 * time.Second
 	offerTTL     = 75 * time.Second
 	reportWindow = 15 * time.Second
@@ -49,7 +51,7 @@ const (
 	// name / wait / unwait: they change what every lobby client sees.
 	ctlRate, ctlBurst = 1, 6
 	joinFailsPerMin   = 5
-	defaultPerIP      = 24
+	defaultPerIP      = 64 // IPv6 counts per /64 (ipKey): one home or phone, not one address
 	// A round that nobody finishes still ends: past this, silence is a forfeit (or, if nobody
 	// reported at all, a void). Duel rounds are 60 s, room rounds up to 150 s + 30 s overtime.
 	duelRoundCap = 3 * time.Minute
@@ -90,6 +92,7 @@ type hub struct {
 	roomCountdown, roomSlow, migrateAfter   time.Duration
 	reportWindow, earlyFF, duelCap, roomCap time.Duration
 	helloWithin, pongLate                   time.Duration
+	pingEvery, pongDue, stallQuit           time.Duration
 	perIP                                   int
 	ipN                                     map[string]int
 
@@ -238,6 +241,7 @@ func newHub(st *store, ice *iceSource, allow *allowance, verify verifier) *hub {
 		roomCountdown: defaultRoomCountdown, roomSlow: defaultRoomSlow, migrateAfter: defaultMigrateAfter,
 		reportWindow: reportWindow, earlyFF: defaultEarlyFF, duelCap: duelRoundCap, roomCap: roomRoundCap,
 		perIP: defaultPerIP, ipN: map[string]int{}, helloWithin: helloWithin, pongLate: pongLate,
+		pingEvery: pingEvery, pongDue: pongDue, stallQuit: stallQuit,
 	}
 }
 
@@ -980,7 +984,7 @@ func (h *hub) report(m *match, c *client, round, winner int, ko bool, dmg []int)
 	first := m.reports[0]
 	for _, r := range m.reports {
 		if r != first {
-			h.disputeDuel(m)
+			h.disputeDuel(m, "disagree")
 			return
 		}
 	}
@@ -1021,7 +1025,7 @@ func (h *hub) report(m *match, c *client, round, winner int, ko bool, dmg []int)
 // disputeDuel: the two reports differ. Normally a void, logged against both accounts. A player
 // with a record of disputes (store.flagged) loses a disputed match instead, to an opponent
 // without one; if both or neither have a record, it stays a void.
-func (h *hub) disputeDuel(m *match) {
+func (h *hub) disputeDuel(m *match, why string) {
 	bad := -1
 	for i, s := range m.seats {
 		if s.ranked && h.st.flagged(s.uid) {
@@ -1033,7 +1037,7 @@ func (h *hub) disputeDuel(m *match) {
 		}
 	}
 	if bad < 0 || len(m.seats) != 2 {
-		h.void(m, "disagree", nil)
+		h.void(m, why, nil)
 		return
 	}
 	h.st.recordDispute(m.id, []string{m.seats[bad].uid})
@@ -1056,10 +1060,11 @@ func (h *hub) forfeit(m *match, leaver int, why string) {
 	h.finishFF(m, winner, true)
 }
 
-// earlyForfeit: before any agreed round, or in the first seconds, a forfeit is a loss for
-// whoever left and nothing for whoever stayed — two accounts cannot farm wins by quitting.
+// earlyForfeit: in the first seconds of a match a forfeit is a loss for whoever left and nothing
+// for whoever stayed. After that a quit (or silence) in round 1 is a real win; the per-pair daily
+// cap is what stops two accounts farming it.
 func (h *hub) earlyForfeit(m *match) bool {
-	return (!m.room && m.agreed == 0) || h.now().Sub(m.playAt) < h.earlyFF
+	return h.now().Sub(m.playAt) < h.earlyFF
 }
 
 func (h *hub) finish(m *match, winner int) { h.finishFF(m, winner, false) }
@@ -1221,12 +1226,18 @@ func (h *hub) leaveMatch(c *client, why string) {
 	switch m.state {
 	case mPlay:
 		leaver := m.slotOf(c)
-		// A guest who gives up on a master that has been silent (by its reports) for stallQuit
-		// is not the one who forfeits: the frozen master is.
-		if s := m.seats[leaver]; leaver != m.master && h.stalled(s) && h.now().Sub(s.stallFor) >= stallQuit {
-			m.log = append(m.log, "quit by "+s.id+" after "+h.now().Sub(s.stallFor).Round(time.Second).String()+" of master silence")
-			h.st.recordDispute(m.id, []string{s.uid}) // a claim that decided a match: it goes on record
-			h.forfeit(m, m.master, "stall")
+		// A guest who gives up after stallQuit of reported silence (server-timed) does not forfeit
+		// if the server saw the master go quiet too. If the server still hears the master it cannot
+		// tell a broken link from a lie: a void, on record against both (disputeDuel). A flagged
+		// account's reports count for nothing.
+		if s := m.seats[leaver]; leaver != m.master && h.stalled(s) && h.now().Sub(s.stallFor) >= h.stallQuit &&
+			!(s.ranked && h.st.flagged(s.uid)) {
+			m.log = append(m.log, "quit by "+s.id+" after "+h.now().Sub(s.stallFor).Round(time.Second).String()+" of reported master silence")
+			if h.masterSilent(m) {
+				h.forfeit(m, m.master, "stall")
+			} else {
+				h.disputeDuel(m, "stall")
+			}
 			break
 		}
 		h.forfeit(m, leaver, why)
@@ -1280,12 +1291,12 @@ func (h *hub) tick() {
 			h.drop(c, "nohello")
 			continue
 		}
-		if now.Sub(c.pongAt) > pingEvery+h.pongLate && !c.away {
+		if now.Sub(c.pongAt) > h.pingEvery+h.pongLate && !c.away {
 			log.Printf("client %s stopped answering pings", c.id)
 			h.disconnect(c)
 			continue
 		}
-		if now.Sub(c.lastPing) >= pingEvery {
+		if now.Sub(c.lastPing) >= h.pingEvery {
 			c.lastPing, c.pingAt = now, now
 			h.send(c, map[string]any{"t": "p", "s": now.UnixMilli()})
 		}
@@ -1305,12 +1316,25 @@ func (h *hub) stall(m *match, c *client, ms float64) {
 	if ms < float64(stallMin.Milliseconds()) || ms > 600000 {
 		return
 	}
+	// The client's ms only has to clear stallMin: how long it lasts is the server's clock.
 	s, now := m.seats[slot], h.now()
 	if !h.stalled(s) {
-		s.stallFor = now.Add(-time.Duration(ms) * time.Millisecond)
+		s.stallFor = now
 	}
 	s.stallAt = now
+	if !m.room {
+		h.send(c, map[string]any{"t": "stall", "match": m.id, "silent": h.masterSilent(m)})
+	}
 	h.checkStall(m)
+}
+
+// masterSilent: the server itself sees the master gone (socket away) or not answering pings.
+func (h *hub) masterSilent(m *match) bool {
+	if m.master < 0 || m.master >= len(m.seats) {
+		return false
+	}
+	c := m.seats[m.master].c
+	return c.away || h.now().Sub(c.pongAt) > h.pingEvery+h.pongDue
 }
 
 func (h *hub) stalled(s *seat) bool {
@@ -1323,11 +1347,12 @@ func (h *hub) clearStalls(m *match) {
 	}
 }
 
-// checkStall: when most of the other seats in play say the master is silent, it is away now —
-// whatever its socket says (a hidden tab still answers pings). A room hands over at once; a
-// 1v1 starts the master's away grace.
+// checkStall (rooms): when most of the other seats say the master is silent, a new master takes
+// over at once. The old one is out only if the server saw it go quiet too; otherwise it plays on
+// as a guest (a forged report must not eliminate anyone). A 1v1 master is never touched here:
+// its own 4001 close or its pongs decide.
 func (h *hub) checkStall(m *match) {
-	if m.state != mPlay || m.master < 0 {
+	if m.state != mPlay || m.master < 0 || !m.room {
 		return
 	}
 	ms := m.seats[m.master]
@@ -1349,13 +1374,11 @@ func (h *hub) checkStall(m *match) {
 	}
 	log.Printf("match %s: %d of %d guests report master %s silent", m.id, yes, n, ms.id)
 	m.log = append(m.log, "master "+ms.id+" stalled")
-	if m.room {
-		h.clearStalls(m)
+	h.clearStalls(m)
+	if h.masterSilent(m) {
 		h.eliminate(m, m.master, "stall")
-		return
-	}
-	if !ms.c.away {
-		h.disconnect(ms.c)
+	} else {
+		h.handOver(m, m.master)
 	}
 }
 
@@ -1545,6 +1568,8 @@ func (h *hub) attach(e event) (*client, string) {
 // seat's grace has already started in disconnect.
 const closeHidden = 4001
 
+// A hidden room master hands the role on but stays in: the seat has the normal away grace to
+// come back, as a guest.
 func (h *hub) hidden(c *client) {
 	m := c.match
 	if m == nil || !m.room || m.state != mPlay || !c.away {
@@ -1552,7 +1577,7 @@ func (h *hub) hidden(c *client) {
 	}
 	if slot := m.slotOf(c); slot == m.master && !m.seats[slot].out {
 		m.log = append(m.log, "master "+c.id+" hid its tab")
-		h.eliminate(m, slot, "away")
+		h.handOver(m, slot)
 	}
 }
 
@@ -1635,7 +1660,7 @@ func (h *hub) serveWS(w http.ResponseWriter, r *http.Request, origins []string) 
 	queued := new(atomic.Int64)
 	reply := make(chan attachResult, 1)
 	q := r.URL.Query()
-	h.in <- event{kind: evJoin, c: &client{send: send, queued: queued}, ip: clientIP(r), rid: q.Get("id"), rtok: q.Get("tok"), reply: reply}
+	h.in <- event{kind: evJoin, c: &client{send: send, queued: queued}, ip: ipKey(clientIP(r)), rid: q.Get("id"), rtok: q.Get("tok"), reply: reply}
 	res := <-reply
 	c, gen := res.c, res.gen
 	if c == nil {
@@ -1683,6 +1708,16 @@ func clientIP(r *http.Request) string {
 		}
 	}
 	return host
+}
+
+// ipKey: what the per-address cap counts. An IPv6 client usually holds a whole /64 and can pick
+// a fresh address from it for every socket, so it counts per /64.
+func ipKey(ip string) string {
+	p := net.ParseIP(ip)
+	if p == nil || p.To4() != nil {
+		return ip
+	}
+	return p.Mask(net.CIDRMask(64, 128)).String() + "/64"
 }
 
 func writer(ctx context.Context, conn *websocket.Conn, send chan []byte, queued *atomic.Int64, cancel func()) {

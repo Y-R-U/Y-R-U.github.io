@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -80,7 +81,7 @@ type tc struct {
 	t    *testing.T
 	ws   *websocket.Conn
 	id   string
-	tok  string // the account token it said hello with; accept pays with it
+	tok  string      // the account token it said hello with; accept pays with it
 	mute atomic.Bool // stop answering pings (a frozen tab)
 	msgs chan map[string]any
 	bins chan []byte
@@ -201,6 +202,15 @@ func matchUp(t *testing.T, a, b *tc) (string, map[string]any, map[string]any) {
 		t.Fatal("offers disagree on the match")
 	}
 	return id, oa, ob
+}
+
+func TestHealthListsEveryLiveMode(t *testing.T) {
+	r := newRig(t, false)
+	h := getJSON(t, r.srv.URL+prefix+"/health")
+	got := fmt.Sprint(h["modes"])
+	if got != "[duel bandana hill lms]" {
+		t.Fatalf("/health modes: %s", got)
+	}
 }
 
 func playRound(t *testing.T, cs []*tc, id string, round, winner int, ko bool) {

@@ -181,28 +181,22 @@ func (h *hub) eventArtRoutes(mux *http.ServeMux, prefix string, origins []string
 			reply(w, 429, map[string]string{"error": "slow down"})
 			return
 		}
-		p := evArt.get(ev)
-		if p == nil {
-			reply(w, 404, map[string]string{"error": "no art"})
-			return
-		}
+		// The caller's own opened squares first: whether a picture exists (a future event's,
+		// say) is not something anyone learns before they have opened it. One answer for both.
 		open, err := h.st.openCells(uid, ev)
 		if err != nil && err.Error() != "sql: no rows in result set" {
 			reply(w, 503, map[string]string{"error": "unavailable"})
 			return
 		}
+		p := evArt.get(ev)
+		if (whole && len(open) < cells) || (!whole && !containsInt(open, cell)) || p == nil {
+			reply(w, 403, map[string]string{"error": "not open"})
+			return
+		}
 		var body []byte
 		if whole {
-			if len(open) < cells {
-				reply(w, 403, map[string]string{"error": "not all open"})
-				return
-			}
 			body = evArt.whole(p)
 		} else {
-			if !containsInt(open, cell) {
-				reply(w, 403, map[string]string{"error": "not open"})
-				return
-			}
 			body = evArt.tile(p, cell)
 		}
 		w.Header().Set("Content-Type", "image/jpeg")

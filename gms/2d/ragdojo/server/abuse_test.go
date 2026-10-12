@@ -398,6 +398,24 @@ func TestPerIPCap(t *testing.T) {
 	if _, err := readType(context.Background(), ws, "welcome"); err != nil {
 		t.Fatalf("another address (right-most hop): %v", err)
 	}
+	// IPv6 counts per /64: a client can take a fresh address from its block for every socket.
+	for i := 0; i < 3; i++ {
+		ws, _ := rawWS(t, r, xff(fmt.Sprintf("2001:db8:1:2::%x", i+1)))
+		if _, err := readType(context.Background(), ws, "welcome"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	ws, _ = rawWS(t, r, xff("2001:db8:1:2:ffff::9"))
+	if _, err := readType(context.Background(), ws, "welcome"); err == nil || !strings.Contains(err.Error(), "too many") {
+		t.Fatalf("a 4th socket from the same /64: %v", err)
+	}
+	ws, _ = rawWS(t, r, xff("2001:db8:1:3::1"))
+	if _, err := readType(context.Background(), ws, "welcome"); err != nil {
+		t.Fatalf("the next /64 is another client: %v", err)
+	}
+	if newHub(nil, nil, nil, nil).perIP < 64 {
+		t.Fatal("the default per-address cap is ~64 (a school or a carrier NAT is one address)")
+	}
 	req := httptest.NewRequest("GET", "/", nil)
 	req.RemoteAddr = "192.0.2.9:5555"
 	req.Header.Set("X-Forwarded-For", "203.0.113.7")
@@ -1102,44 +1120,46 @@ func TestFrozenTabGoesAway(t *testing.T) {
 	}
 }
 
-// H1: a hidden master's socket still answers pings; a majority of guests saying "no snapshots"
-// hands the room over at once, and a 1v1 starts the master's grace.
+// H1: a majority of guests saying "no snapshots" hands the room over at once. The old master is
+// out only if the server saw it go quiet too (R4: two guests' word alone eliminated anyone).
 func TestStallMajorityHandsOver(t *testing.T) {
 	r := newRig(t, false)
 	cs, id := startRoom3(t, r, "lms") // master = slot 1
 	cs[0].send(map[string]any{"t": "stall", "match": id, "ms": 4000})
-	cs[0].none("out", 300*time.Millisecond) // one of two guests is not a majority
+	cs[0].none("master", 300*time.Millisecond) // one of two guests is not a majority
 	cs[0].send(map[string]any{"t": "stall", "match": id, "ms": 0})
 	cs[0].send(map[string]any{"t": "stall", "match": id, "ms": 3500})
 	cs[2].send(map[string]any{"t": "stall", "match": id, "ms": 3500})
-	if o := cs[0].expect("out"); num(o["slot"]) != 1 || o["why"] != "stall" {
-		t.Fatalf("the stalled master is out: %v", o)
-	}
-	if m := cs[2].expect("master"); num(m["master"]) == 1 {
+	if m := cs[2].expect("master"); num(m["master"]) == 1 || num(m["gone"]) != -1 {
 		t.Fatalf("hand-over: %v", m)
 	}
-	// 1v1: the guest's report starts the master's away grace.
-	a, b := r.dial("Alice", "dev:alice"), r.dial("Bob", "dev:bob")
-	mid, _, _ := matchUp(t, a, b)
-	a.accept(mid)
-	b.accept(mid)
-	g := a.expect("go")
-	b.expect("go")
-	master, guest := a, b
-	if num(g["master"]) == 1 {
-		master, guest = b, a
+	if m := cs[1].expect("master"); num(m["master"]) == 1 {
+		t.Fatalf("the old master hears it is a guest now: %v", m)
 	}
-	guest.send(map[string]any{"t": "stall", "match": mid, "ms": 4000})
-	if w := guest.expect("away"); num(w["slot"]) != num(g["master"]) {
-		t.Fatalf("away: %v", w)
+	cs[0].none("out", 300*time.Millisecond) // it answers pings: still in
+
+	r2 := newRig(t, false)
+	r2.h.post(func() {
+		r2.h.pingEvery, r2.h.pongDue, r2.h.pongLate = 100*time.Millisecond, 100*time.Millisecond, time.Minute
+	})
+	cs, id = startRoom3(t, r2, "lms")
+	cs[1].mute.Store(true)
+	time.Sleep(600 * time.Millisecond)
+	cs[0].send(map[string]any{"t": "stall", "match": id, "ms": 3500})
+	cs[2].send(map[string]any{"t": "stall", "match": id, "ms": 3500})
+	if o := cs[0].expect("out"); num(o["slot"]) != 1 || o["why"] != "stall" {
+		t.Fatalf("a master the server also hears nothing from is out: %v", o)
 	}
-	_ = master
 }
 
-// H1: a 1v1 guest who quits after >10 s of reported master silence does not forfeit.
+// H1 + R4: a 1v1 guest who quits after stallQuit of reported silence does not forfeit when the
+// server saw the master go quiet too (here: its pongs stopped).
 func TestQuitAfterStallIsNotTheGuestsForfeit(t *testing.T) {
 	r := newRig(t, false)
-	r.h.post(func() { r.h.earlyFF = 0; r.h.awayGrace = time.Minute })
+	r.h.post(func() {
+		r.h.earlyFF, r.h.awayGrace, r.h.stallQuit = 0, time.Minute, 600*time.Millisecond
+		r.h.pingEvery, r.h.pongDue, r.h.pongLate = 100*time.Millisecond, 100*time.Millisecond, time.Minute
+	})
 	a, b := r.dial("Alice", "dev:alice"), r.dial("Bob", "dev:bob")
 	id, _, _ := matchUp(t, a, b)
 	a.accept(id)
@@ -1150,13 +1170,20 @@ func TestQuitAfterStallIsNotTheGuestsForfeit(t *testing.T) {
 	g = a.expect("go")
 	b.expect("go")
 	ms := num(g["master"])
-	guest := []*tc{a, b}[1-ms]
-	guest.send(map[string]any{"t": "stall", "match": id, "ms": 11000})
-	time.Sleep(100 * time.Millisecond)
+	master, guest := []*tc{a, b}[ms], []*tc{a, b}[1-ms]
+	master.mute.Store(true)
+	stallFor(guest, id, 900*time.Millisecond)
 	guest.send(map[string]any{"t": "leave"})
 	res := guest.expect("result")
 	if res["forfeit"] != true || num(res["winner"]) != 1-ms || num(res["by"]) != ms || res["why"] != "stall" {
 		t.Fatalf("the frozen master forfeits, not the guest who gave up: %v", res)
+	}
+}
+
+// stallFor sends a guest's stall report every 200 ms for d, as fight.js does every 2 s.
+func stallFor(c *tc, id string, d time.Duration) {
+	for end := time.Now().Add(d); time.Now().Before(end); time.Sleep(200 * time.Millisecond) {
+		c.send(map[string]any{"t": "stall", "match": id, "ms": 4000})
 	}
 }
 
@@ -1191,8 +1218,8 @@ func TestMigrationNotOnABlip(t *testing.T) {
 	r2 := newRig(t, false)
 	cs, _ = startRoom3(t, r2, "lms")
 	cs[1].ws.Close(closeHidden, "hidden")
-	if o := cs[0].expect("out"); num(o["slot"]) != 1 {
-		t.Fatalf("a hidden master hands over at once: %v", o)
+	if m := cs[0].expect("master"); num(m["master"]) == 1 {
+		t.Fatalf("a hidden master hands over at once: %v", m)
 	}
 }
 
@@ -1217,5 +1244,222 @@ func TestPlacingsOnlyForSeatsStillIn(t *testing.T) {
 	}
 	if res := cs[1].expect("result"); num(res["winner"]) != 0 || res["forfeit"] == true {
 		t.Fatalf("the winner leaving after the fight ended: %v", res)
+	}
+}
+
+// ---- R4 (review of the R2 fixes): forged stalls, round-1 quits, hidden room masters ----
+
+// duelRound2 plays round 1 (the master wins it) and returns the round-2 master and guest.
+func duelRound2(t *testing.T, a, b *tc) (id string, ms int, master, guest *tc) {
+	id, _, _ = matchUp(t, a, b)
+	a.accept(id)
+	b.accept(id)
+	g := a.expect("go")
+	b.expect("go")
+	playRound(t, []*tc{a, b}, id, 1, num(g["master"]), true)
+	g = a.expect("go")
+	b.expect("go")
+	ms = num(g["master"])
+	return id, ms, []*tc{a, b}[ms], []*tc{a, b}[1-ms]
+}
+
+// R4-1: a guest forged ONE stall report claiming 10 minutes of silence, quit 50 ms later, and
+// won a counted match against a healthy master. The silence is timed by the server now.
+func TestForgedStallCannotStealA1v1(t *testing.T) {
+	r := newRig(t, false)
+	r.h.post(func() { r.h.earlyFF = 0 })
+	a, b := r.dial("Alice", "dev:alice"), r.dial("Cheat", "dev:cheat")
+	id, ms, _, guest := duelRound2(t, a, b)
+	guest.send(map[string]any{"t": "stall", "match": id, "ms": 600000})
+	time.Sleep(50 * time.Millisecond)
+	guest.send(map[string]any{"t": "leave"})
+	res := guest.expect("result")
+	if num(res["winner"]) != ms || num(res["by"]) != 1-ms || res["why"] != "left" || res["counted"] != true {
+		t.Fatalf("a forged stall then a quit is the guest's own forfeit: %v", res)
+	}
+	gu, mu := []string{"alice", "cheat"}[1-ms], []string{"alice", "cheat"}[ms]
+	if l, _ := r.h.st.mine(gu); l.Losses != 1 || l.Wins != 0 {
+		t.Fatalf("guest %s: %+v", gu, l)
+	}
+	if l, _ := r.h.st.mine(mu); l.Wins != 1 {
+		t.Fatalf("master %s: %+v", mu, l)
+	}
+}
+
+// R4-1: sustained reports against a master the server still hears (both sockets healthy) are a
+// broken link or a lie: a void on record against both, never the master's forfeit. Three of them
+// flag the claimant, whose later claims count for nothing; honest wins in between do not dilute it.
+func TestStallClaimsAgainstAHealthyMasterVoidAndFlag(t *testing.T) {
+	r := newRig(t, false)
+	r.h.post(func() { r.h.earlyFF, r.h.stallQuit = 0, 500*time.Millisecond })
+	cheat := r.dial("Cheat", "dev:cheat")
+	stolen, voids, after := 0, 0, 0
+	for i := 0; i < 40 && after < 2; i++ {
+		v := r.dial("Victim", fmt.Sprintf("dev:victim%d", i))
+		id, ms, master, guest := duelRound2(t, v, cheat)
+		if guest != cheat {
+			// Cheat is master: lose honestly, which used to dilute the dispute share.
+			playRound(t, []*tc{v, cheat}, id, 2, 0, true)
+			cheat.expect("result")
+			continue
+		}
+		stallFor(cheat, id, 700*time.Millisecond)
+		cheat.send(map[string]any{"t": "leave"})
+		for {
+			m := <-master.msgs
+			if m["t"] == "void" {
+				if m["why"] != "stall" {
+					t.Fatalf("void why: %v", m)
+				}
+				voids++
+				break
+			}
+			if m["t"] == "result" {
+				if num(m["winner"]) != ms {
+					stolen++
+				}
+				if voids < 3 {
+					t.Fatalf("before the flag, an unconfirmed stall claim is a void: %v", m)
+				}
+				after++
+				break
+			}
+		}
+	}
+	if stolen != 0 {
+		t.Fatalf("%d matches stolen with stall claims", stolen)
+	}
+	if voids != 3 || after != 2 || !r.h.st.flagged("cheat") {
+		t.Fatalf("voids %d, flagged %v: three unconfirmed claims flag the claimant", voids, r.h.st.flagged("cheat"))
+	}
+	var n int
+	r.h.st.db.QueryRow(`SELECT COUNT(*) FROM disputes WHERE uid LIKE 'victim%'`).Scan(&n)
+	if n != 3 {
+		t.Fatalf("each void is on record against the master too: %d", n)
+	}
+}
+
+// R4-1: a flagged account's stall claim is ignored even against a master that really went quiet.
+func TestFlaggedGuestsStallClaimIsIgnored(t *testing.T) {
+	r := newRig(t, false)
+	r.h.post(func() {
+		r.h.earlyFF, r.h.awayGrace, r.h.stallQuit = 0, time.Minute, 500*time.Millisecond
+		r.h.pingEvery, r.h.pongDue, r.h.pongLate = 100*time.Millisecond, 100*time.Millisecond, time.Minute
+	})
+	for i := 0; i < 3; i++ {
+		r.h.st.recordDispute(fmt.Sprintf("old%d", i), []string{"cheat"})
+	}
+	a, b := r.dial("Alice", "dev:alice"), r.dial("Cheat", "dev:cheat")
+	id, ms, master, guest := duelRound2(t, a, b)
+	for guest != b { // the coin made Cheat master: finish this one and play again
+		playRound(t, []*tc{a, b}, id, 2, 0, true)
+		a.expect("result")
+		b.expect("result")
+		a.send(map[string]any{"t": "leave"})
+		b.send(map[string]any{"t": "leave"})
+		id, ms, master, guest = duelRound2(t, a, b)
+	}
+	master.mute.Store(true)
+	stallFor(guest, id, 700*time.Millisecond)
+	guest.send(map[string]any{"t": "leave"})
+	if res := guest.expect("result"); num(res["winner"]) != ms || res["why"] != "left" {
+		t.Fatalf("a flagged guest's quit is its own forfeit: %v", res)
+	}
+}
+
+// R4-1: the flag is an absolute count; counted battles cannot dilute it.
+func TestFlagNotDilutedByBattles(t *testing.T) {
+	r := newRig(t, false)
+	st := r.h.st
+	for i := 0; i < 30; i++ {
+		st.recordMatch(fmt.Sprintf("m%d", i), "duel", false, "2-0", []seatRow{{UID: "cheat", Name: "C", Won: true, Ranked: true}, {UID: fmt.Sprintf("o%d", i), Name: "O", Ranked: true}})
+	}
+	st.recordDispute("d1", []string{"cheat"})
+	st.recordDispute("d2", []string{"cheat"})
+	if st.flagged("cheat") {
+		t.Fatal("two disputes flag nobody")
+	}
+	st.recordDispute("d3", []string{"cheat"})
+	if !st.flagged("cheat") {
+		t.Fatal("three disputes in 24 h flag an account however many battles it has")
+	}
+}
+
+// R4-2: one stall frame closed a perfectly healthy 1v1 master's socket.
+func TestStallNeverKicksAHealthyDuelMaster(t *testing.T) {
+	r := newRig(t, false)
+	a, b := r.dial("Alice", "dev:alice"), r.dial("Cheat", "dev:cheat")
+	id, _, _ := matchUp(t, a, b)
+	a.accept(id)
+	b.accept(id)
+	g := a.expect("go")
+	b.expect("go")
+	ms := num(g["master"])
+	master, guest := []*tc{a, b}[ms], []*tc{a, b}[1-ms]
+	guest.send(map[string]any{"t": "stall", "match": id, "ms": 2000})
+	if s := guest.expect("stall"); s["silent"] != false {
+		t.Fatalf("the server still hears the master: %v", s)
+	}
+	guest.none("away", 600*time.Millisecond)
+	if onHub(r, func() bool { c := r.h.clients[master.id]; return c == nil || c.away }) {
+		t.Fatal("a healthy master's socket was closed by the guest's stall report")
+	}
+}
+
+// R4-3: a quit (or silence) in round 1 after the opening seconds is a counted win for the stayer.
+func TestRoundOneQuitAfterTheOpeningCounts(t *testing.T) {
+	r := newRig(t, false)
+	r.h.post(func() { r.h.earlyFF, r.h.reportWindow = 150*time.Millisecond, 300*time.Millisecond })
+	a, b := r.dial("Honest", "dev:honest"), r.dial("Rage", "dev:rage")
+	id, _, _ := matchUp(t, a, b)
+	a.accept(id)
+	b.accept(id)
+	a.expect("go")
+	b.expect("go")
+	time.Sleep(250 * time.Millisecond)
+	b.send(map[string]any{"t": "leave"})
+	if res := a.expect("result"); res["counted"] != true || num(res["winner"]) != 0 {
+		t.Fatalf("a round-1 quit after the opening: %v", res)
+	}
+	c, d := r.dial("Honest2", "dev:honest2"), r.dial("Sore", "dev:sore")
+	id, _, _ = matchUp(t, c, d)
+	c.accept(id)
+	d.accept(id)
+	c.expect("go")
+	d.expect("go")
+	time.Sleep(250 * time.Millisecond)
+	c.send(map[string]any{"t": "round", "match": id, "round": 1, "winner": 0, "ko": true})
+	if res := c.expect("result"); res["counted"] != true || num(res["winner"]) != 0 {
+		t.Fatalf("round-1 silence after the opening: %v", res)
+	}
+	if l, _ := r.h.st.mine("honest"); l.Wins != 1 {
+		t.Fatalf("honest: %+v", l)
+	}
+}
+
+// R4-4: a room master that hides its tab hands the role on but is not eliminated; it comes back
+// inside the grace as a guest and its result counts like anyone's.
+func TestHiddenRoomMasterRejoinsAsGuest(t *testing.T) {
+	r := newRig(t, false)
+	r.h.post(func() { r.h.awayGrace = 5 * time.Second })
+	cs, id := startRoom3(t, r, "lms") // master = slot 1
+	rtok := onHub(r, func() string { return r.h.clients[cs[1].id].tok })
+	cs[1].ws.Close(closeHidden, "hidden")
+	m := cs[0].expect("master")
+	nm := num(m["master"])
+	if nm == 1 || num(m["gone"]) != -1 {
+		t.Fatalf("hand-over without elimination: %v", m)
+	}
+	cs[0].none("out", 400*time.Millisecond)
+	back := r.resume(cs[1].id, rtok)
+	if g := back.expect("go"); num(g["master"]) != nm || num(g["you"]) != 1 || g["out"].([]any)[1] != false {
+		t.Fatalf("it resumes as a guest, still in: %v", g)
+	}
+	cs[0].expect("back")
+	for _, c := range []*tc{cs[0], back, cs[2]} {
+		c.send(map[string]any{"t": "round", "match": id, "round": 1, "winner": 1, "ko": true, "place": []int{2, 1, 3}})
+	}
+	if res := back.expect("result"); num(res["winner"]) != 1 || res["forfeit"] == true {
+		t.Fatalf("the returned seat finishes (and here wins) the room: %v", res)
 	}
 }

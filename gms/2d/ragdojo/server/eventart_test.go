@@ -16,7 +16,9 @@ import (
 
 // A 1000x600 picture whose 25 squares are 25 different flat colours, so a tile proves which
 // square it was cut from.
-func cellColour(c int) color.RGBA { return color.RGBA{uint8(20 + c*9), uint8(240 - c*8), uint8(c * 37 % 256), 255} }
+func cellColour(c int) color.RGBA {
+	return color.RGBA{uint8(20 + c*9), uint8(240 - c*8), uint8(c * 37 % 256), 255}
+}
 
 func writeTestArt(t *testing.T, dir, ev string) {
 	t.Helper()
@@ -54,6 +56,20 @@ func getImage(t *testing.T, url, tok string) (int, image.Image) {
 		t.Fatalf("not a jpeg: %v", err)
 	}
 	return 200, img
+}
+
+// getRaw: status and body of an art request that is not a picture.
+func getRaw(t *testing.T, url, tok string) (int, string) {
+	t.Helper()
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", "Bearer "+tok)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer res.Body.Close()
+	b, _ := io.ReadAll(res.Body)
+	return res.StatusCode, string(b)
 }
 
 func near(a, b color.Color) bool {
@@ -141,9 +157,13 @@ func TestEventsArtTilesOnlyForOpenedSquares(t *testing.T) {
 	if code != 200 || full.Bounds().Dx() != 1000 || !near(full.At(990, 590), cellColour(24)) {
 		t.Fatalf("whole picture at 25: %d", code)
 	}
-	// No art file for an event: 404, never the placeholder or another event's picture.
-	if code, _ := getImage(t, base+"tile?event=reveal-week:2026-W43&cell=0", "dev:me"); code != 404 {
-		t.Fatalf("event without art: %d", code)
+	// No art file for an event: the same 403 as an unopened square (never the placeholder or
+	// another event's picture), and a future event's art is not betrayed by a different answer.
+	noArt, noArtBody := getRaw(t, base+"tile?event=reveal-week:2026-W43&cell=0", "dev:me")
+	writeTestArt(t, dir, "reveal-week:2026-W45")
+	future, futureBody := getRaw(t, base+"tile?event=reveal-week:2026-W45&cell=0", "dev:me")
+	if noArt != 403 || future != noArt || noArtBody != futureBody {
+		t.Fatalf("no art %d %q vs future art %d %q", noArt, noArtBody, future, futureBody)
 	}
 	// Pass events need the Pass for their art too.
 	writeTestArt(t, dir, "reveal-month:2026-10")

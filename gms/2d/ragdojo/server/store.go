@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -240,11 +241,12 @@ func (s *store) capPairs(tx *sql.Tx, day string, seats []seatRow) error {
 	return nil
 }
 
-// recordVoid logs a void; a disagreement ("disagree") is also a dispute for each account in it.
+// recordVoid logs a void; a disagreement ("disagree", or "stall": an unconfirmed claim of master
+// silence) is also a dispute for each account in it.
 func (s *store) recordVoid(id, typ string, friend bool, players int, why string, uids []string) {
 	s.db.Exec(`INSERT OR IGNORE INTO matches(id,type,friend,players,voided,why,day,at) VALUES(?,?,?,?,1,?,?,?)`,
 		id, typ, b2i(friend), players, why, s.day(), s.now().Unix())
-	if why == "disagree" {
+	if why == "disagree" || why == "stall" {
 		s.recordDispute(id, uids)
 	}
 	old := s.now().UTC().AddDate(0, 0, -40)
@@ -265,23 +267,21 @@ func (s *store) recordDispute(match string, uids []string) {
 	}
 }
 
-// flagged: an account that disputes a lot. Three disputes in 24 h when they are at least 40%
-// of its matches in that time, or six ever at 40% of all its matches. An honest player who
-// met a liar has one dispute among many counted battles; a player who disputes every loss
-// does not. Flagged accounts lose further disputed matches and are hidden from the boards.
+// flagged: an account that disputes a lot: three disputes in 24 h, or six in 7 days. An absolute
+// count, on purpose: the old share-of-battles test let a cheater dilute its disputes with honest
+// losses or alt-account matches, which cost nothing to make. Every dispute row comes from a match
+// whose result was in doubt, so an honest player who meets a liar gets one, not three in a day,
+// and a flag lapses on its own as the disputes age out. Flagged accounts lose further disputed
+// matches, their stall claims count for nothing, and they are hidden from the boards.
 func (s *store) flagged(uid string) bool {
 	if uid == "" {
 		return false
 	}
 	now := s.now()
-	var d24, dAll, b2, bAll int
-	s.db.QueryRow(`SELECT COUNT(*), COALESCE(SUM(at > ?),0) FROM disputes WHERE uid=?`, now.Add(-24*time.Hour).Unix(), uid).Scan(&dAll, &d24)
-	if d24 < 3 && dAll < 6 {
-		return false
-	}
-	s.db.QueryRow(`SELECT COALESCE(SUM(battles),0) FROM daily WHERE uid=? AND day>=?`, uid, now.UTC().AddDate(0, 0, -1).Format("2006-01-02")).Scan(&b2)
-	s.db.QueryRow(`SELECT COALESCE(battles,0) FROM players WHERE uid=?`, uid).Scan(&bAll)
-	return (d24 >= 3 && d24*100 >= 40*(d24+b2)) || (dAll >= 6 && dAll*100 >= 40*(dAll+bAll))
+	var d24, d7 int
+	s.db.QueryRow(`SELECT COALESCE(SUM(at > ?),0), COUNT(*) FROM disputes WHERE uid=? AND at > ?`,
+		now.Add(-24*time.Hour).Unix(), uid, now.Add(-7*24*time.Hour).Unix()).Scan(&d24, &d7)
+	return d24 >= 3 || d7 >= 6
 }
 
 // friendsOf: the accounts uid finished a friend-link match with.
@@ -460,9 +460,20 @@ func cleanType(t string) string {
 	return ""
 }
 
-// Game types a waiting player can ask for. Only the duel ships in phase 1; the rest are
-// listed so the protocol and the lobby already carry a type.
+// Game types a waiting player can ask for: the duel here, the room modes from rooms.go's init.
 var gameTypes = map[string]bool{"duel": true}
+
+// liveModes: every type the arena plays, duel first (GET /health).
+func liveModes() []string {
+	out := []string{}
+	for t := range gameTypes {
+		if t != "duel" {
+			out = append(out, t)
+		}
+	}
+	sort.Strings(out)
+	return append([]string{"duel"}, out...)
+}
 
 type ghostRow struct {
 	ID      int64           `json:"id"`
