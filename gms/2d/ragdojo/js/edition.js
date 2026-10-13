@@ -4,3 +4,5 @@ export const DEV = EDITION === 'source' && ['localhost', '127.0.0.1'].includes(l
 export const DEMO = EDITION === 'itch';
 export const HOME = 'https://games.br8t.com/gms/2d/ragdojo/';
 export const ACCOUNTS = !DEMO && (location.hostname === 'games.br8t.com' || (['localhost', '127.0.0.1'].includes(location.hostname) && location.pathname.startsWith('/gms/2d/ragdojo/')));
+// The home copy (192.*) gets sign-in and cloud saves only: no payments, analytics or shop.
+export const SIGNIN = ACCOUNTS || (!DEMO && /^192\./.test(location.hostname));

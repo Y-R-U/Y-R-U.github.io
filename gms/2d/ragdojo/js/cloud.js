@@ -4,16 +4,19 @@ import { mountAccount, matchCompleted } from '/lib/auth/ui.js';
 import { onSave, KEY, DEFAULT } from './save.js';
 import { SaveSync } from './save-sync.js';
 
+// crypto.randomUUID needs https; the home copy is plain http.
+const newId = () => crypto.randomUUID?.() ?? [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
+
 export function connectCloud({ canPester, adopt, status, conflict }) {
   const slot = cloud.game('ragdojo');
   const metaKey = 'ragdojo.sync.v1';
   const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch { return fallback; } };
   let meta = read(metaKey, {});
-  let current = { revision: meta.revision || crypto.randomUUID(), owner: meta.owner || null, save: read(KEY, null) };
+  let current = { revision: meta.revision || newId(), owner: meta.owner || null, save: read(KEY, null) };
   const keepMeta = () => { try { localStorage.setItem(metaKey, JSON.stringify({ revision: current.revision, owner: current.owner })); } catch {} };
   const sync = new SaveSync({
     local: () => current,
-    empty: () => ({ revision: crypto.randomUUID(), owner: auth.user?.uid, save: DEFAULT() }),
+    empty: () => ({ revision: newId(), owner: auth.user?.uid, save: DEFAULT() }),
     safe: () => new Promise(resolve => {
       if (canPester()) { resolve(); return; }
       const timer = setInterval(() => { if (canPester()) { clearInterval(timer); resolve(); } }, 250);
@@ -30,7 +33,7 @@ export function connectCloud({ canPester, adopt, status, conflict }) {
     }, status, conflict,
   });
   keepMeta();
-  onSave(save => { current = { revision: crypto.randomUUID(), owner: current.owner, save: structuredClone(save) }; keepMeta(); sync.changed(); });
+  onSave(save => { current = { revision: newId(), owner: current.owner, save: structuredClone(save) }; keepMeta(); sync.changed(); });
   // The shared avatar owns sign-in only; SaveSync owns all Ragdojo save decisions.
   mountAccount({ nudge: 'callout', canPester, pesterHoldMs: 5000 });
   auth.onChange(u => {

@@ -17,7 +17,7 @@ import * as haptic from './haptic.js';
 import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
-import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
+import { DEV, DEMO, ACCOUNTS, SIGNIN, HOME } from './edition.js?v=20261013-lan';
 import { Purchases, API, ownerPollNext } from './purchases.js?v=20261013-f4';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
@@ -751,7 +751,7 @@ function openSettings() {
     `<p class="fine">Optional: starts, fight progress and upgrade conversion. No email or save contents. <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>` +
     musicList();
   $('analyticsToggle').closest('.toggle').classList.toggle('hidden', DEMO || !ACCOUNTS);
-  $('btnCloudRetry').classList.toggle('hidden', DEMO || !ACCOUNTS);
+  $('btnCloudRetry').classList.toggle('hidden', !SIGNIN);
   $('analyticsToggle').onclick = () => { analyticsChoice(!analyticsEnabled()); openSettings(); };
   // Pausing is the only place you can bail out of a fight, so the way out lives here.
   $('btnQuit').classList.toggle('hidden', mode !== 'fight');
@@ -1127,8 +1127,8 @@ $('btnCloudLocal').onclick = () => void account?.sync.choose('local');
 $('btnCloudRemote').onclick = () => void account?.sync.choose('remote');
 $('btnCloudRetry').onclick = () => { if (!account) return; if (account.sync.conflict) { openSettings(); return; } void account.sync.connect(account.auth.signedIn ? account.auth.user.uid : null); };
 
-if (ACCOUNTS && !DEV) {
-  import('./cloud.js').then(({ connectCloud }) => {
+if (SIGNIN && !DEV) {
+  import('./cloud.js?v=20261013-lan').then(({ connectCloud }) => {
     account = connectCloud({
       canPester: () => mode === 'hub' || !!document.querySelector('#results.show, #victory.show'),
       adopt: save => { pendingCloud = save; if (mode !== 'fight') { applyCloud(); refreshHub(); } },
@@ -1143,6 +1143,7 @@ if (ACCOUNTS && !DEV) {
         } else $('btnCloudRetry').textContent = 'RETRY CLOUD SYNC';
       },
     });
+    if (!ACCOUNTS) return;
     purchases = new Purchases(account.auth, fetch, () => {
       // Only a definitive answer gets here. Never pull a fight out from under the player.
       parkOwed = !hasPremium() && isPaid(S.theme);
