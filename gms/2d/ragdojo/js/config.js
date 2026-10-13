@@ -285,7 +285,7 @@ export const MOVE_SETS = {
     },
     {
       id: 'flipF', kind: 'flipF', name: 'FLIP KICK', gesture: 'circleCW', glyph: '↻',
-      hint: 'Draw a circle clockwise',
+      hint: 'Draw a circle, over the top toward your enemy',
       desc: 'Somersault forward heel-first. Big arc, big knockback.',
       cost: 520, tier: 3,
       dmg: 19, dmgStep: 7.5, cd: 5.0, cdStep: 0.46, kb: 760,
@@ -299,7 +299,7 @@ export const MOVE_SETS = {
     },
     {
       id: 'flipB', kind: 'flipB', name: 'REVERSE FLIP', gesture: 'circleCCW', glyph: '↺',
-      hint: 'Draw a circle anticlockwise',
+      hint: 'Draw a circle, over the top away from your enemy',
       desc: 'Backflip out of trouble, kicking on the way up. Your escape button.',
       cost: 800, tier: 5,
       dmg: 16, dmgStep: 6.5, cd: 4.4, cdStep: 0.42, kb: 620,
@@ -343,7 +343,7 @@ export const MOVE_SETS = {
     },
     {
       id: 'd_boots', kind: 'flipF', name: 'BOOT PARTY', gesture: 'circleCW', glyph: '↻',
-      hint: 'Draw a circle clockwise',
+      hint: 'Draw a circle, over the top toward your enemy',
       desc: 'Spin into them boots-first. Everyone in the way goes over.',
       cost: 520, tier: 3,
       dmg: 19, dmgStep: 7.5, cd: 5.0, cdStep: 0.46, kb: 760,
@@ -357,7 +357,7 @@ export const MOVE_SETS = {
     },
     {
       id: 'd_smoke', kind: 'flipB', name: 'SMOKE AND RUN', gesture: 'circleCCW', glyph: '↺',
-      hint: 'Draw a circle anticlockwise',
+      hint: 'Draw a circle, over the top away from your enemy',
       desc: 'Drop smoke and go backwards over it, boots first. Your way out.',
       cost: 800, tier: 5,
       dmg: 16, dmgStep: 6.5, cd: 4.4, cdStep: 0.42, kb: 620,
@@ -401,7 +401,7 @@ export const MOVE_SETS = {
     },
     {
       id: 'c_gyro', kind: 'flipF', name: 'GYRO KICK', gesture: 'circleCW', glyph: '↻',
-      hint: 'Draw a circle clockwise',
+      hint: 'Draw a circle, over the top toward your enemy',
       desc: 'Spin up the hip servos and somersault through them heel-first.',
       cost: 520, tier: 3,
       dmg: 19, dmgStep: 7.5, cd: 5.0, cdStep: 0.46, kb: 760,
@@ -415,7 +415,7 @@ export const MOVE_SETS = {
     },
     {
       id: 'c_thrust', kind: 'flipB', name: 'REVERSE THRUST', gesture: 'circleCCW', glyph: '↺',
-      hint: 'Draw a circle anticlockwise',
+      hint: 'Draw a circle, over the top away from your enemy',
       desc: 'Fire the back jets and flip away, kicking on the way up. Your way out.',
       cost: 800, tier: 5,
       dmg: 16, dmgStep: 6.5, cd: 4.4, cdStep: 0.42, kb: 620,
@@ -459,7 +459,7 @@ export const MOVE_SETS = {
     },
     {
       id: 'g_wheel', kind: 'flipF', name: 'FIRE WHEEL', gesture: 'circleCW', glyph: '↻',
-      hint: 'Draw a circle clockwise',
+      hint: 'Draw a circle, over the top toward your enemy',
       desc: 'Roll forward as a wheel of fire. Everyone in the way goes over.',
       cost: 520, tier: 3,
       dmg: 19, dmgStep: 7.5, cd: 5.0, cdStep: 0.46, kb: 760,
@@ -473,7 +473,7 @@ export const MOVE_SETS = {
     },
     {
       id: 'g_wings', kind: 'flipB', name: 'WINGBEAT', gesture: 'circleCCW', glyph: '↺',
-      hint: 'Draw a circle anticlockwise',
+      hint: 'Draw a circle, over the top away from your enemy',
       desc: 'One beat of the wings carries you backwards over trouble, heels first.',
       cost: 800, tier: 5,
       dmg: 16, dmgStep: 6.5, cd: 4.4, cdStep: 0.42, kb: 620,

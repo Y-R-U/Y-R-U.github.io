@@ -101,6 +101,25 @@ export function classify(pts, dur = 1) {
 }
 
 /**
+ * The gesture plus any neighbour the stroke nearly was: a straight stroke within 16° of a
+ * band edge also offers the band next door, so the caller can take the first move it knows.
+ */
+export function classifyRanked(pts, dur = 1) {
+  const g = classify(pts, dur);
+  if (!['up', 'down', 'slash', 'right'].includes(g)) return g ? [g] : [];
+  const f = features(pts);
+  const ad = Math.abs(Math.atan2(f.b.y - f.a.y, f.b.x - f.a.x) * 180 / Math.PI);
+  const vert = f.b.y < f.a.y ? 'up' : 'down';
+  const out = [g];
+  const near = (edge) => Math.abs(ad - edge) < 16;
+  if (g === vert && (near(62) || near(118))) out.push('slash');
+  if (g === 'slash' && (near(62) || near(118))) out.push(vert);
+  if (g === 'slash' && (near(26) || near(154))) out.push('right');
+  if (g === 'right' && (near(26) || near(154))) out.push('slash');
+  return out;
+}
+
+/**
  * Glyph paths in a unit box, as polylines walked by arc length so the shop can animate
  * them being drawn.
  *

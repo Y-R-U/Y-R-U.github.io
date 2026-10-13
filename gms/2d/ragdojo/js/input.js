@@ -1,7 +1,7 @@
 // Touch-first control. Left thumb is a floating stick (up = jump, down = block),
 // right thumb taps to hit and DRAWS to fire specials. Mouse and keyboard mirror it.
 
-import { classify } from './gestures.js';
+import { classifyRanked } from './gestures.js?v=20261013-mirror';
 
 const DEAD = 16;
 const MAX = 58;
@@ -30,6 +30,7 @@ export class Input {
     this.onStrike = opts.onStrike || (() => {});
     this.onGesture = opts.onGesture || (() => {});
     this.onTap = opts.onTap || (() => {});
+    this.facing = opts.facing || (() => 1);
     this.enabled = false;
     this.hand = opts.hand || 'right';
 
@@ -102,11 +103,13 @@ export class Input {
         this.block = false;
       } else if (this.draw && this.draw.id === id) {
         const dur = (performance.now() - this.draw.t0) / 1000;
-        const g = classify(this.draw.pts, dur);
+        // Strokes are read as if facing right, so a flip circled toward the enemy is FLIP KICK either way.
+        const pts = this.facing() < 0 ? this.draw.pts.map((q) => ({ x: -q.x, y: q.y })) : this.draw.pts;
+        const [g, ...alts] = classifyRanked(pts, dur);
         if (g) {
           this.lastGesture = g;
           this.lastGestureT = 0.6;
-          this.onGesture(g);
+          this.onGesture(g, alts);
         } else {
           this.onStrike();
         }

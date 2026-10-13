@@ -9,7 +9,7 @@ import { drawDesk, sheetShadow } from './paper.js';
 import { buildArena } from './arena.js';
 import { drawFighter, drawShadow } from './draw.js';
 import { Match } from './match.js';
-import { Input, isRotated, SPECIAL_KEYS } from './input.js';
+import { Input, isRotated, SPECIAL_KEYS } from './input.js?v=20261013-mirror';
 import { drawHUD, drawNameTags, handText, FONT, FONT_B } from './ui.js';
 import { load, save as persist, wipe, DEFAULT, RUN, RUN_KEYS } from './save.js';
 import * as audio from './audio.js';
@@ -89,9 +89,13 @@ function updateRotateHint() {
 // ── input ────────────────────────────────────────────────────────────────
 const input = new Input(cvs, {
   hand: S.settings.hand,
+  facing: () => match?.player?.facing ?? 1,
   onStrike: () => match && (match.net ? match.net.strike() : match.playerStrike()),
-  onGesture: (g) => {
+  onGesture: (first, alts = []) => {
     if (!match || match.demo) return;
+    // A stroke on the edge of two moves becomes the one you own. Online, any world's move counts.
+    const pool = match.net ? Object.values(MOVE_SETS).flat() : MOVES();
+    const g = [first, ...alts].find((x) => pool.some((m) => m.gesture === x && S.moves[m.id]?.owned)) || first;
     if (match.net) { match.net.gesture(g); return; }
     const mv = MOVES().find((m) => m.gesture === g);
     if (!mv) return;
