@@ -1,9 +1,9 @@
 // Local focus: a game-level setting { cc: ISO3, level: 'off'|'more'|'most'|'all', live } that makes a share of each
 // round about one country (docs/notes/LOCAL.md). Tags come from data/local/tags.json (tools/local_tags.mjs);
 // in-country geography from data/local/geo.json (js/core/localgeo.js). Pure helpers + loaders; spec.js applies it.
-import { dataUrl } from './packs.js?v=202610130524';
-import { rngFrom, shuffle } from './rng.js?v=202610130524';
-import { getSettings, setSettings } from './store.js?v=202610130524';
+import { dataUrl } from './packs.js?v=202610130607';
+import { rngFrom, shuffle } from './rng.js?v=202610130607';
+import { getSettings, setSettings } from './store.js?v=202610130607';
 
 export const LEVELS = [['off', 'Off', 0], ['more', 'More', 0.25], ['most', 'Most', 0.6], ['all', 'ALL', 1]];
 export const SHARE = Object.fromEntries(LEVELS.map(([k, , s]) => [k, s]));
@@ -108,7 +108,7 @@ export function localView(pack, cc, rng) {
 /* ---------------------------------------------------------------- a round */
 // Mixes a round to its local share. full = the normal generate() list, more = extra local candidates (local views,
 // in-country questions). Returns { list (count first, spares after), local: n in the first count, pool }.
-export function mixRound({ full, more = [], count, level, cc, seed, key = () => '' }) {
+export function mixRound({ full, more = [], count, level, cc, seed, key = () => '', rank = null }) {
   const target = targetOf(count, level);
   const seen = new Set(), keys = new Set(), local = [], normal = [];
   for (const [q, extra] of [...full.map(q => [q, false]), ...more.map(q => [q, true])]) {
@@ -120,7 +120,7 @@ export function mixRound({ full, more = [], count, level, cc, seed, key = () => 
     (loc ? local : normal).push(q);
   }
   const rng = rngFrom(`${seed}:local`);
-  const L = shuffle(rng, local), N = normal;
+  const L = rank ? rank(shuffle(rng, local)) : shuffle(rng, local), N = normal;   // rank: FRESH, unseen first
   const takeL = Math.min(target, L.length);
   const takeN = Math.min(count - takeL, N.length);
   const extraL = Math.min(L.length - takeL, count - takeL - takeN);   // a short normal pool tops up with local, never repeats

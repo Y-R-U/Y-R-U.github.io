@@ -1,28 +1,28 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=202610130524';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=202610130524';
-import { confirmPop, toast } from '../ui/popup.js?v=202610130524';
-import { sfx, confetti } from '../ui/fx.js?v=202610130524';
-import { createRunner } from '../structures/runner.js?v=202610130524';
-import { prepare, prepareFormats } from '../structures/session.js?v=202610130524';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610130524';
-import { urlsOf, preflight } from '../core/media.js?v=202610130524';
-import { randomSeed } from '../core/rng.js?v=202610130524';
-import { listFormats } from '../formats/registry.js?v=202610130524';
-import { loadFormats } from '../formats/index.js?v=202610130524';
-import { friendly } from './api.js?v=202610130524';
-import { getTransport } from './transport.js?v=202610130524';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610130524';
-import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610130524';
-import { streakOption } from '../ui/streakopt.js?v=202610130524';
-import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610130524';
-import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610130524';
-import { getFormat } from '../formats/registry.js?v=202610130524';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610130524';
-import { trackRoom } from '../core/stats.js?v=202610130524';
-import { cleanQuestion } from './sanitize.js?v=202610130524';
-import { saveSetPrompt } from './sets.js?v=202610130524';
-import { isOn, localLabel, loadNames } from '../core/local.js?v=202610130524';
+import { h, fmtNum } from '../ui/kit.js?v=202610130607';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610130607';
+import { confirmPop, toast } from '../ui/popup.js?v=202610130607';
+import { sfx, confetti } from '../ui/fx.js?v=202610130607';
+import { createRunner } from '../structures/runner.js?v=202610130607';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610130607';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610130607';
+import { urlsOf, preflight } from '../core/media.js?v=202610130607';
+import { randomSeed } from '../core/rng.js?v=202610130607';
+import { listFormats } from '../formats/registry.js?v=202610130607';
+import { loadFormats } from '../formats/index.js?v=202610130607';
+import { friendly } from './api.js?v=202610130607';
+import { getTransport } from './transport.js?v=202610130607';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610130607';
+import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610130607';
+import { streakOption } from '../ui/streakopt.js?v=202610130607';
+import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610130607';
+import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610130607';
+import { getFormat } from '../formats/registry.js?v=202610130607';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610130607';
+import { trackRoom } from '../core/stats.js?v=202610130607';
+import { cleanQuestion } from './sanitize.js?v=202610130607';
+import { saveSetPrompt } from './sets.js?v=202610130607';
+import { isOn, localLabel, loadNames } from '../core/local.js?v=202610130607';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;
@@ -49,7 +49,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   setQuery(via === 'p2p' ? 'p2p' : 'join', code);
   await ensureFormats();
   await loadNames();
-  const ctx = { st: null, game: -1, run: null, view: '', waiters: [], qcache: new Map(), live: null, asking: null, wasHost: null, timers: new Set(), ended: false };
+  const ctx = { st: null, game: -1, run: null, view: '', waiters: [], qcache: new Map(), live: null, asking: null, wasHost: null, timers: new Set(), ended: false, asked: [] };
   const every = (fn, ms) => { const id = setInterval(fn, ms); ctx.timers.add(id); return id; };
 
   const linkDot = h('div.net-link-dot', { hidden: true }, 'Reconnecting…');
@@ -226,8 +226,9 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       limitFor: () => ctx.st.limitMs || 10000,
       label: i => { const R = roundAt(ctx.st, base + i); return R ? `Round ${R.ord + 1} · ${R.pos + 1}/${R.size}` : `${base + i + 1} / ${total}`; },
       before: (i, q) => beforeQ(base + i, q, run),
-      onQuestion: i => {
+      onQuestion: (i, q) => {
         ctx.asking = base + i;
+        ctx.asked.push(q);
         syncStages(ctx.st);
         const s = ctx.st;
         if (s.q !== base + i || s.phase !== 'question' || s.you.last) setTimeout(() => { if (ctx.asking === base + i) { ctx.asking = null; run.timeUp(); } }, 60);
@@ -517,10 +518,12 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   async function playAgain(st, btn) {
     btn.disabled = true;
     const spec = { ...(st.spec || {}), seed: randomSeed() };
+    delete spec.fresh;
     const overlay = h('div.panel');
     btn.after(overlay);
     try {
-      const r = await prepare(spec, overlay);
+      // FRESH: the host's history plus everything this room has asked so far
+      const r = await prepare(spec, overlay, { fresh: true, recent: ctx.asked.filter(q => !q.hidden) });
       if (!r.questions.length) throw new Error('No questions');
       await hostAct('again', null, { spec, title: st.title, questions: fitSet(annotateTimes(r.questions, getFormat)) });
     } catch (e) {

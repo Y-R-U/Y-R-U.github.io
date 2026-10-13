@@ -1,12 +1,13 @@
 // Shared game flow: build questions from a spec, preflight media, run them, go to results.
-import { buildQuestions } from '../core/spec.js?v=202610130524';
-import { getFormat } from '../formats/registry.js?v=202610130524';
-import { urlsOf, preflight, swapFailed, questionFailed } from '../core/media.js?v=202610130524';
-import { createRunner } from './runner.js?v=202610130524';
-import { defineScreen, go, back, current } from '../ui/app.js?v=202610130524';
-import { h } from '../ui/kit.js?v=202610130524';
-import { toast } from '../ui/popup.js?v=202610130524';
-import { getSettings } from '../core/store.js?v=202610130524';
+import { buildQuestions } from '../core/spec.js?v=202610130607';
+import { getFormat } from '../formats/registry.js?v=202610130607';
+import { urlsOf, preflight, swapFailed, questionFailed } from '../core/media.js?v=202610130607';
+import { createRunner } from './runner.js?v=202610130607';
+import { defineScreen, go, back, current } from '../ui/app.js?v=202610130607';
+import { h } from '../ui/kit.js?v=202610130607';
+import { toast } from '../ui/popup.js?v=202610130607';
+import { getSettings } from '../core/store.js?v=202610130607';
+import { freshFrom } from '../core/fresh.js?v=202610130607';
 
 const TIPS = [
   'Keys 1–6 pick an answer, Enter moves on.',
@@ -26,16 +27,18 @@ export async function prepareFormats(questions) {
   }));
 }
 
-// Renders a progress screen into el. Returns { questions, spares, dropped }.
+// Renders a progress screen into el. Returns { questions, spares, dropped, fresh }.
+// fresh: prefer questions this device hasn't seen (`recent` = more to treat as just seen, e.g. a room's last game).
 // Slow or rate-limited picture hosts must not empty a round: failed questions are swapped for spares that loaded
 // (same round), and a round left under 60% gets a slower second try before anything is dropped.
-export async function prepare(spec, el, { sparesRatio = 0.8 } = {}) {
+export async function prepare(spec, el, { sparesRatio = 0.8, fresh = false, recent = [] } = {}) {
   el.innerHTML = '';
   const bar = h('div.pf-bar', {}, h('i'));
   const txt = h('div.muted', {}, 'Picking questions…');
   el.append(h('div.pf', {}, h('div.pf-ico', {}, '🔎'), h('h2', {}, 'Getting ready'), bar, txt,
     h('p.pf-tip', {}, TIPS[Math.floor(Math.random() * TIPS.length)])));
-  const { questions, spares } = await buildQuestions(spec, { sparesRatio });
+  const built = await buildQuestions(spec, { sparesRatio, fresh: fresh ? freshFrom({ recent }) : null });
+  const { questions, spares } = built;
   await prepareFormats(questions);
   const urls = urlsOf(questions);
   let result = { questions, spares, dropped: 0 };
@@ -66,7 +69,7 @@ export async function prepare(spec, el, { sparesRatio = 0.8 } = {}) {
     }
   }
   bar.firstChild.style.width = '100%';
-  return result;
+  return { ...result, fresh: built.fresh };
 }
 
 // Rounds holding fewer than 60% of the questions they asked for.
@@ -81,6 +84,7 @@ defineScreen('play', async (el, params, cur) => {
     try {
       const r = await prepare(params.spec, el, params.prepare);
       questions = r.questions; spares = r.spares;
+      if (typeof r.fresh === 'string') params.spec.fresh = r.fresh;   // link challenges rebuild this exact set
       if (r.dropped) toast(`${r.dropped} question${r.dropped === 1 ? '' : 's'} skipped (media didn't load)`);
     } catch (e) {
       console.error(e);
@@ -117,5 +121,6 @@ defineScreen('play', async (el, params, cur) => {
 }, { cls: 'scr-play' });
 
 export function playSpec(spec, opts = {}) {
-  return go('play', { spec, structure: spec.structure, ...opts });
+  // FRESH for games this device sets up; the daily stays the same for everyone
+  return go('play', { spec, structure: spec.structure, ...opts, prepare: { fresh: spec.structure !== 'daily' && !spec.daily, ...(opts.prepare || {}) } });
 }

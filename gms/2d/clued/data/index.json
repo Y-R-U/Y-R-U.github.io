@@ -1,5 +1,5 @@
 {
- "build": "202610130422",
+ "build": "202610130554",
  "themes": [
   {
    "id": "animals",
@@ -1721,7 +1721,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 1140,
+   "questions": 1142,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -1734,8 +1734,8 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 852,
-     "number": 113,
+     "mc": 853,
+     "number": 114,
      "tf": 144,
      "order": 31
     },
@@ -1829,7 +1829,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 151,
+   "questions": 153,
    "virtual": {
     "of": "general",
     "tag": "geography"
@@ -1846,8 +1846,8 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 123,
-     "number": 7,
+     "mc": 124,
+     "number": 8,
      "tf": 15,
      "order": 6
     },
@@ -1859,7 +1859,7 @@
      "mc": 20,
      "tf": 15,
      "order": 6,
-     "number": 7,
+     "number": 8,
      "type": 20
     },
     "formatsEasy": {

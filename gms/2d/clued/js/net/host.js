@@ -1,27 +1,27 @@
 // Host setup (server rooms and device rooms): a list of rounds (＋ Add round → ♥ favourite or format → themes),
 // 10 questions each by default, plus the room-wide settings (answer time, gap, private/public, auto-start).
-import { h } from '../ui/kit.js?v=202610130524';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610130524';
-import { toast } from '../ui/popup.js?v=202610130524';
-import { saveSetPrompt, pickSet, copyRounds } from './sets.js?v=202610130524';
-import { getFormat, defaultOpts } from '../formats/registry.js?v=202610130524';
-import { getSettings, getLast, read, write } from '../core/store.js?v=202610130524';
-import { makeSpec } from '../core/spec.js?v=202610130524';
-import { randomSeed } from '../core/rng.js?v=202610130524';
-import { prepare } from '../structures/session.js?v=202610130524';
-import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610130524';
-import { rooms, friendly } from './api.js?v=202610130524';
-import { rememberName, tidyName } from './ident.js?v=202610130524';
-import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610130524';
-import { timingPanel, choiceChips } from './board.js?v=202610130524';
-import { streakOption } from '../ui/streakopt.js?v=202610130524';
-import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610130524';
-import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610130524';
-import { ensureFormats } from './room.js?v=202610130524';
-import { nameField } from './join.js?v=202610130524';
-import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610130524';
-import { mySetting, saveMySetting, specLocal, resolveLocal } from '../core/local.js?v=202610130524';
-import { localChip, localLine, localTotal, localReady } from '../ui/local.js?v=202610130524';
+import { h } from '../ui/kit.js?v=202610130607';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610130607';
+import { toast } from '../ui/popup.js?v=202610130607';
+import { saveSetPrompt, pickSet, copyRounds } from './sets.js?v=202610130607';
+import { getFormat, defaultOpts } from '../formats/registry.js?v=202610130607';
+import { getSettings, getLast, read, write } from '../core/store.js?v=202610130607';
+import { makeSpec } from '../core/spec.js?v=202610130607';
+import { randomSeed } from '../core/rng.js?v=202610130607';
+import { prepare } from '../structures/session.js?v=202610130607';
+import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610130607';
+import { rooms, friendly } from './api.js?v=202610130607';
+import { rememberName, tidyName } from './ident.js?v=202610130607';
+import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610130607';
+import { timingPanel, choiceChips } from './board.js?v=202610130607';
+import { streakOption } from '../ui/streakopt.js?v=202610130607';
+import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610130607';
+import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610130607';
+import { ensureFormats } from './room.js?v=202610130607';
+import { nameField } from './join.js?v=202610130607';
+import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610130607';
+import { mySetting, saveMySetting, specLocal, resolveLocal } from '../core/local.js?v=202610130607';
+import { localChip, localLine, localTotal, localReady } from '../ui/local.js?v=202610130607';
 
 const KEY = 'clued.online';   // { rounds, kidsRounds }: the last hosted round list, per mode
 const MAX_ROUNDS = 8;
@@ -200,7 +200,7 @@ defineScreen('host', async (el, params, cur) => {
     spec.streak = S.timing.streak ? 'on' : 'off';
     const title = S.title || roomTitle(rounds);
     try {
-      const r = await prepare(spec, status);
+      const r = await prepare(spec, status, { fresh: true });
       if (cur !== current()) return;
       if (!r.questions.length) throw new Error('Not enough questions for those themes. Try more themes.');
       const questions = fitSet(annotateTimes(r.questions, getFormat));

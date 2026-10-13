@@ -1,5 +1,5 @@
 // Scoreboards and podium for rooms and challenges. All text goes in via textContent (h() kids).
-import { h, fmtNum } from '../ui/kit.js?v=202610130524';
+import { h, fmtNum } from '../ui/kit.js?v=202610130607';
 
 export const ordinal = n => {
   const s = ['th', 'st', 'nd', 'rd'], v = n % 100;

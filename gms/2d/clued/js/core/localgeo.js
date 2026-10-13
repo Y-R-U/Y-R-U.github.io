@@ -1,8 +1,8 @@
 // In-country geography for the local focus (data/local/geo.json, built + validated by tools/local_geo_build.mjs):
 // state capitals, which state a city is in, bigger/smaller, city populations, tap / name a state on the map.
 // Questions come out in existing formats (mc, tf, number, map-click), each marked data.local = cc.
-import { pick, shuffle, sample } from './rng.js?v=202610130524';
-import { givesAway } from '../formats/registry.js?v=202610130524';
+import { pick, shuffle, sample } from './rng.js?v=202610130607';
+import { givesAway } from '../formats/registry.js?v=202610130607';
 
 export const HOME_FORMATS = new Set(['mc', 'tf', 'number', 'map-click']);
 // Rounds on these packs (or "All themes", or a map round) also get in-country questions.
@@ -86,7 +86,7 @@ function candidates(cc, C, states, cname, kinds) {
   if (kinds.number) {
     const lo = Math.min(...C.cities.map(c => c.pop)), hi = Math.max(...C.cities.map(c => c.pop));
     for (const c of C.cities.slice(0, 40)) {
-      out.push({ d: cityD(c), make: () => base(`pop:${c.n}`, { format: 'number', prompt: `About how many people live in ${placeOf(C, c)}?`, answer: c.pop, answerText: big(c.pop),
+      out.push({ d: cityD(c), make: () => base(`pop:${c.n}`, { format: 'number', prompt: `In ${c.year}, about how many people lived in ${placeOf(C, c)}?`, answer: c.pop, answerText: big(c.pop),
         explain: `${c.n}: ${big(c.pop)} people (${C.kind}, ${c.year}).`, data: { min: Math.max(1000, lo / 3), max: hi * 2, log: true, unit: '' } }) });
     }
   }
@@ -106,12 +106,13 @@ function candidates(cc, C, states, cname, kinds) {
   return out;
 }
 
-// Up to `count` in-country questions for this round's format. difficulty 0 = mixed; live = rated one step easier.
+// Up to `count` in-country questions for this round's format. difficulty 0 = mixed; live = one step easier, otherwise one step harder
+// (Aaron: your own state capitals are easy, someone else's are medium/hard).
 export function homeQuestions({ rng, cc, format, count, difficulty = 0, kids = false, live = false, geo, states, cname, avoid }) {
   const C = geo?.countries?.[cc];
   if (!C || !HOME_FORMATS.has(format)) return [];
   const kinds = { mc: format === 'mc', tf: format === 'tf', number: format === 'number', map: format === 'map-click' };
-  let cands = candidates(cc, C, states?.[cc] || null, cname, kinds).map(c => ({ ...c, d: live ? Math.max(1, c.d - 1) : Math.min(3, c.d) }));
+  let cands = candidates(cc, C, states?.[cc] || null, cname, kinds).map(c => ({ ...c, d: live ? Math.max(1, c.d - 1) : Math.min(3, c.d + 1) }));
   const want = kids ? 1 : difficulty;
   if (want) {
     const bands = want === 1 ? [[1], [1, 2]] : want === 2 ? [[2], [1, 2], [1, 2, 3]] : [[3], [2, 3], [1, 2, 3]];

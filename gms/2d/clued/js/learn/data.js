@@ -1,8 +1,8 @@
 // Pack access for Learn: game packs via the shell loader, music packs (data/music/) via our own small cache.
-import { getIndex, loadPack, THEMES, dataUrl } from '../core/packs.js?v=202610130524';
-import { factText } from '../formats/registry.js?v=202610130524';
-import { getSettings } from '../core/store.js?v=202610130524';
-import { BUILD } from '../build.js?v=202610130524';
+import { getIndex, loadPack, THEMES, dataUrl } from '../core/packs.js?v=202610130607';
+import { factText } from '../formats/registry.js?v=202610130607';
+import { getSettings } from '../core/store.js?v=202610130607';
+import { BUILD } from '../build.js?v=202610130607';
 
 export const MUSIC_PACKS = ['anthems', 'instruments', 'classical-piano', 'classical-recordings', 'nursery-rhymes', 'pd-melodies',
   'kids-film-tv', 'screen-themes', 'music-artists', 'one-hit-wonders', 'hits-1960s', 'hits-1970s', 'hits-1980s', 'hits-1990s',

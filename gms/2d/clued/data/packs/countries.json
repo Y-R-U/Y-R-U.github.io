@@ -38,8 +38,10 @@
    "unit": "people",
    "higherLabel": "More people",
    "source": "World Bank, latest year",
+   "askNumber": "About how many people lived in {name} in {year}?",
    "askHigh": "Which of these countries has the most people?",
-   "askLow": "Which of these countries has the fewest people?"
+   "askLow": "Which of these countries has the fewest people?",
+   "yearField": "popYear"
   },
   "areaKm2": {
    "type": "num",
@@ -179,7 +181,8 @@
      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Islamic_Republic_of_Afghanistan.svg"
     }
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "albania",
@@ -221,7 +224,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "algeria",
@@ -264,7 +268,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "andorra",
@@ -308,7 +313,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "angola",
@@ -351,7 +357,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "antigua-and-barbuda",
@@ -397,7 +404,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "argentina",
@@ -442,7 +450,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "armenia",
@@ -489,7 +498,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "australia",
@@ -534,7 +544,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "austria",
@@ -579,7 +590,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "azerbaijan",
@@ -626,7 +638,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "bahamas",
@@ -671,7 +684,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "bahrain",
@@ -714,7 +728,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "bangladesh",
@@ -757,7 +772,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "barbados",
@@ -800,7 +816,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "belarus",
@@ -843,7 +860,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "belgium",
@@ -889,7 +907,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "belize",
@@ -932,7 +951,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "benin",
@@ -977,7 +997,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "bhutan",
@@ -1021,7 +1042,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "bolivia",
@@ -1068,7 +1090,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "bosnia-and-herzegovina",
@@ -1112,7 +1135,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "botswana",
@@ -1156,7 +1180,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "brazil",
@@ -1201,7 +1226,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "brunei",
@@ -1244,7 +1270,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "bulgaria",
@@ -1287,7 +1314,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "burkina-faso",
@@ -1332,7 +1360,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "burundi",
@@ -1377,7 +1406,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "cambodia",
@@ -1422,7 +1452,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "cameroon",
@@ -1466,7 +1497,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "canada",
@@ -1511,7 +1543,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "cape-verde",
@@ -1556,7 +1589,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "central-african-republic",
@@ -1601,7 +1635,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "chad",
@@ -1646,7 +1681,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "chile",
@@ -1691,7 +1727,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "china",
@@ -1737,7 +1774,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "colombia",
@@ -1780,7 +1818,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "comoros",
@@ -1822,7 +1861,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "democratic-republic-of-the-congo",
@@ -1868,7 +1908,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "republic-of-the-congo",
@@ -1914,7 +1955,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "costa-rica",
@@ -1956,7 +1998,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "ivory-coast",
@@ -2003,7 +2046,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "croatia",
@@ -2048,7 +2092,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "cuba",
@@ -2091,7 +2136,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "cyprus",
@@ -2139,7 +2185,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "czechia",
@@ -2186,7 +2233,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "denmark",
@@ -2232,7 +2280,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "djibouti",
@@ -2274,7 +2323,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "dominica",
@@ -2318,7 +2368,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "dominican-republic",
@@ -2361,7 +2412,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "ecuador",
@@ -2407,7 +2459,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "egypt",
@@ -2456,7 +2509,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "el-salvador",
@@ -2499,7 +2553,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "equatorial-guinea",
@@ -2543,7 +2598,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "eritrea",
@@ -2586,7 +2642,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "estonia",
@@ -2629,7 +2686,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "eswatini",
@@ -2677,7 +2735,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "ethiopia",
@@ -2723,7 +2782,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "fiji",
@@ -2765,7 +2825,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "finland",
@@ -2809,7 +2870,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "france",
@@ -2855,7 +2917,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "gabon",
@@ -2899,7 +2962,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "gambia",
@@ -2944,7 +3008,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "georgia",
@@ -2990,7 +3055,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "germany",
@@ -3035,7 +3101,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "ghana",
@@ -3078,7 +3145,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "greece",
@@ -3123,7 +3191,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "grenada",
@@ -3167,7 +3236,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "guatemala",
@@ -3211,7 +3281,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "guinea",
@@ -3254,7 +3325,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "guinea-bissau",
@@ -3297,7 +3369,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "guyana",
@@ -3340,7 +3413,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "haiti",
@@ -3382,7 +3456,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "honduras",
@@ -3425,7 +3500,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "hungary",
@@ -3468,7 +3544,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "iceland",
@@ -3512,7 +3589,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "india",
@@ -3557,7 +3635,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "indonesia",
@@ -3606,7 +3685,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "iran",
@@ -3651,7 +3731,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "iraq",
@@ -3694,7 +3775,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "ireland",
@@ -3742,7 +3824,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "israel",
@@ -3785,7 +3868,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "italy",
@@ -3830,7 +3914,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "jamaica",
@@ -3873,7 +3958,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "japan",
@@ -3917,7 +4003,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "jordan",
@@ -3962,7 +4049,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "kazakhstan",
@@ -4010,7 +4098,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "kenya",
@@ -4053,7 +4142,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "kiribati",
@@ -4097,7 +4187,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "kuwait",
@@ -4139,7 +4230,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "kyrgyzstan",
@@ -4184,7 +4276,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "laos",
@@ -4229,7 +4322,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "latvia",
@@ -4272,7 +4366,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "lebanon",
@@ -4315,7 +4410,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "lesotho",
@@ -4359,7 +4455,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "liberia",
@@ -4402,7 +4499,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "libya",
@@ -4447,7 +4545,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "liechtenstein",
@@ -4492,7 +4591,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "lithuania",
@@ -4535,7 +4635,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "luxembourg",
@@ -4578,7 +4679,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "madagascar",
@@ -4622,7 +4724,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "malawi",
@@ -4666,7 +4769,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "malaysia",
@@ -4711,7 +4815,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "maldives",
@@ -4754,7 +4859,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "mali",
@@ -4801,7 +4907,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "malta",
@@ -4844,7 +4951,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "marshall-islands",
@@ -4887,7 +4995,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "mauritania",
@@ -4930,7 +5039,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "mauritius",
@@ -4972,7 +5082,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "mexico",
@@ -5016,7 +5127,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "micronesia",
@@ -5062,7 +5174,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "moldova",
@@ -5106,7 +5219,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "monaco",
@@ -5149,7 +5263,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "mongolia",
@@ -5192,7 +5307,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "montenegro",
@@ -5235,7 +5351,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "morocco",
@@ -5280,7 +5397,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "mozambique",
@@ -5323,7 +5441,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "myanmar",
@@ -5369,7 +5488,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "namibia",
@@ -5412,7 +5532,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "nauru",
@@ -5455,7 +5576,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "nepal",
@@ -5498,7 +5620,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "netherlands",
@@ -5547,7 +5670,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "new-zealand",
@@ -5592,7 +5716,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "nicaragua",
@@ -5635,7 +5760,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "niger",
@@ -5680,7 +5806,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "nigeria",
@@ -5723,7 +5850,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "north-korea",
@@ -5767,7 +5895,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "north-macedonia",
@@ -5812,7 +5941,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "norway",
@@ -5854,7 +5984,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "oman",
@@ -5897,7 +6028,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "pakistan",
@@ -5940,7 +6072,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "palau",
@@ -5983,7 +6116,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "palestine",
@@ -6029,7 +6163,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "panama",
@@ -6076,7 +6211,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "papua-new-guinea",
@@ -6125,7 +6261,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "paraguay",
@@ -6169,7 +6306,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "peru",
@@ -6214,7 +6352,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "philippines",
@@ -6257,7 +6396,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "poland",
@@ -6303,7 +6443,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "portugal",
@@ -6346,7 +6487,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "qatar",
@@ -6389,7 +6531,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "romania",
@@ -6433,7 +6576,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "russia",
@@ -6483,7 +6627,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "rwanda",
@@ -6526,7 +6671,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "saint-kitts-and-nevis",
@@ -6572,7 +6718,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "saint-lucia",
@@ -6618,7 +6765,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "saint-vincent-and-the-grenadines",
@@ -6664,7 +6812,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "samoa",
@@ -6706,7 +6855,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "san-marino",
@@ -6750,7 +6900,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "sao-tome-and-principe",
@@ -6794,7 +6945,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "saudi-arabia",
@@ -6836,7 +6988,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "senegal",
@@ -6880,7 +7033,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "serbia",
@@ -6923,7 +7077,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "seychelles",
@@ -6965,7 +7120,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "sierra-leone",
@@ -7008,7 +7164,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "singapore",
@@ -7052,7 +7209,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "slovakia",
@@ -7096,7 +7254,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "slovenia",
@@ -7139,7 +7298,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "solomon-islands",
@@ -7182,7 +7342,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "somalia",
@@ -7224,7 +7385,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "south-africa",
@@ -7268,7 +7430,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "south-korea",
@@ -7314,7 +7477,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "south-sudan",
@@ -7358,7 +7522,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "spain",
@@ -7404,7 +7569,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "sri-lanka",
@@ -7449,7 +7615,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "sudan",
@@ -7492,7 +7659,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "suriname",
@@ -7535,7 +7703,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "sweden",
@@ -7577,7 +7746,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "switzerland",
@@ -7623,7 +7793,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "syria",
@@ -7666,7 +7837,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "tajikistan",
@@ -7710,7 +7882,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "tanzania",
@@ -7756,7 +7929,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "thailand",
@@ -7802,7 +7976,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "timor-leste",
@@ -7852,7 +8027,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "togo",
@@ -7896,7 +8072,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "tonga",
@@ -7938,7 +8115,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "trinidad-and-tobago",
@@ -7987,7 +8165,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "tunisia",
@@ -8031,7 +8210,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "turkey",
@@ -8081,7 +8261,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "turkmenistan",
@@ -8125,7 +8306,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "tuvalu",
@@ -8168,7 +8350,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "uganda",
@@ -8212,7 +8395,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "ukraine",
@@ -8254,7 +8438,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "united-arab-emirates",
@@ -8300,7 +8485,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "united-kingdom",
@@ -8350,7 +8536,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "united-states",
@@ -8399,7 +8586,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "popYear": 2025
   },
   {
    "id": "uruguay",
@@ -8442,7 +8630,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "uzbekistan",
@@ -8486,7 +8675,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "vanuatu",
@@ -8529,7 +8719,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2025
   },
   {
    "id": "vatican-city",
@@ -8578,7 +8769,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "popYear": 2024
   },
   {
    "id": "venezuela",
@@ -8621,7 +8813,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "vietnam",
@@ -8667,7 +8860,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "yemen",
@@ -8710,7 +8904,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "zambia",
@@ -8754,7 +8949,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   },
   {
    "id": "zimbabwe",
@@ -8798,7 +8994,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "popYear": 2025
   }
  ],
  "questions": [

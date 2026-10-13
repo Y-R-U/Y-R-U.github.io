@@ -202,6 +202,7 @@ const countryItems = usable.map(r => {
     media: { img: DISPUTED_FLAGS[r.iso3] ? [] : img(flagImg) },
     ...(DISPUTED_FLAGS[r.iso3] ? { flagDisputed: true, flagNote: DISPUTED_FLAGS[r.iso3].note, flagImages: DISPUTED_FLAGS[r.iso3].files.map(f => flags[f]).filter(m => m && !m.rejected) } : {}),
     difficulty,
+    popYear: r.popYear,
   };
 });
 for (const it of countryItems) if (it.clues.length < 5) note(`few clues ${it.id}: ${it.clues.length}`);
@@ -214,7 +215,7 @@ const geoSources = [
   { name: 'UN M49 regions', url: 'https://unstats.un.org/unsd/methodology/m49/' },
 ];
 const countryFactsMeta = {
-  population: { type: 'num', label: 'Population', unit: 'people', higherLabel: 'More people', source: 'World Bank, latest year', askHigh: 'Which of these countries has the most people?', askLow: 'Which of these countries has the fewest people?' },
+  population: { type: 'num', label: 'Population', unit: 'people', higherLabel: 'More people', source: 'World Bank, latest year', askNumber: 'About how many people lived in {name} in {year}?', yearField: 'popYear', askHigh: 'Which of these countries has the most people?', askLow: 'Which of these countries has the fewest people?' },
   areaKm2: { type: 'num', label: 'Area', unit: 'km²', higherLabel: 'Bigger', askHigh: 'Which of these countries is the biggest by area?', askLow: 'Which of these countries is the smallest by area?' },
   continent: { type: 'cat', label: 'Continent', ask: 'Which continent is {lname} in?', askReverse: 'Which of these countries is in {value}?', stmt: '{lname} is in {value}.' },
   drivingSide: { type: 'cat', label: 'Drives on', ask: 'On which side of the road do people drive in {lname}?', stmt: 'In {lname}, people drive on the {value}.' },

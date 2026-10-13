@@ -1,10 +1,11 @@
 // Duel: two players, one device. Portrait = top half flipped; landscape = left vs right. First right answer scores.
-import { specFor, fmtTitle } from './common.js?v=202610130524';
-import { prepare } from './session.js?v=202610130524';
-import { defineScreen, go, back } from '../ui/app.js?v=202610130524';
-import { h, choiceGrid, mediaBox, onKey } from '../ui/kit.js?v=202610130524';
-import { confirmPop } from '../ui/popup.js?v=202610130524';
-import { sfx, haptic } from '../ui/fx.js?v=202610130524';
+import { specFor, fmtTitle } from './common.js?v=202610130607';
+import { prepare } from './session.js?v=202610130607';
+import { defineScreen, go, back } from '../ui/app.js?v=202610130607';
+import { h, choiceGrid, mediaBox, onKey } from '../ui/kit.js?v=202610130607';
+import { confirmPop } from '../ui/popup.js?v=202610130607';
+import { sfx, haptic } from '../ui/fx.js?v=202610130607';
+import { recordSeen } from '../core/fresh.js?v=202610130607';
 
 const asChoice = q => {
   if (q.format === 'tf') return { ...q, options: [{ text: 'True' }, { text: 'False' }], answer: q.answer ? 0 : 1 };
@@ -15,7 +16,7 @@ const KEYS = [['1', '2', '3', '4', '5', '6'], ['7', '8', '9', '0', '-', '=']];
 
 defineScreen('duel', async (el, { spec, choice, names = ['Red', 'Teal'] }) => {
   let questions;
-  try { questions = (await prepare(spec, el)).questions.map(asChoice).filter(Boolean); } catch (e) { questions = []; }
+  try { questions = (await prepare(spec, el, { fresh: true })).questions.map(asChoice).filter(Boolean); } catch (e) { questions = []; }
   el.innerHTML = '';
   if (!questions.length) { el.append(h('div.panel.error-panel', {}, h('h2', {}, 'No duel questions'), h('button.btn.primary', { onclick: () => back() }, 'Back'))); return; }
   const score = [0, 0];
@@ -32,6 +33,8 @@ defineScreen('duel', async (el, { spec, choice, names = ['Red', 'Teal'] }) => {
 
   const flash = (p, text) => { const f = halves[p].querySelector('.dh-flash'); f.textContent = text; f.classList.remove('show'); void f.offsetWidth; f.classList.add('show'); };
 
+  let logged = 0;
+  const logSeen = () => { recordSeen(questions.slice(logged, idx + 1)); logged = Math.max(logged, idx + 1); };
   function next() {
     clearTimeout(timer);
     grids.forEach(g => g.destroy());
@@ -73,6 +76,7 @@ defineScreen('duel', async (el, { spec, choice, names = ['Red', 'Teal'] }) => {
 
   function finish() {
     offKeys();
+    logSeen();
     const players = names.map((n, i) => ({ name: n, score: score[i], correct: score[i] }));
     go('results', {
       structure: 'duel', title: `Duel · ${fmtTitle(spec.rounds[0].format)}`, spec, choice, replay: () => duelStructure.start(choice),
@@ -80,7 +84,7 @@ defineScreen('duel', async (el, { spec, choice, names = ['Red', 'Teal'] }) => {
     }, { replace: true, skipGuard: true });
   }
   next();
-  return () => { stopped = true; clearTimeout(timer); offKeys(); grids.forEach(g => g.destroy()); };
+  return () => { logSeen(); stopped = true; clearTimeout(timer); offKeys(); grids.forEach(g => g.destroy()); };
 }, { cls: 'scr-play' });
 
 const duelStructure = {

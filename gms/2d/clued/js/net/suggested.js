@@ -7,7 +7,7 @@ export const SUGGESTED = [
   { id: 'pub', name: 'Classic Pub Quiz', blurb: 'The Friday-night five: general, history, map, sport, theme tunes.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
     R('General knowledge', 'mc', ['general'], { answers: 4, source: 'mix' }),
     R('History', 'mc', ['history', 'general~history'], { answers: 4, source: 'mix' }),
-    R('Geography: name the country', 'map-click', 'all', { region: 'world', ask: 'name' }, 1),
+    R('Geography: name the country', 'map-click', 'all', { region: 'world', ask: 'name' }, 2),
     R('Sport', 'mc', ['sport'], { answers: 4, source: 'mix' }),
     R('Music & screen', 'listen', ['screen-themes', 'hits-1980s', 'hits-1990s', 'hits-2000s'], LISTEN),
   ] },
@@ -21,7 +21,7 @@ export const SUGGESTED = [
   { id: 'world', name: 'Around the World', blurb: 'Flags, capitals, the map, landmarks and money, all well-known places.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
     R('Flags', 'reveal', ['flags'], { mode: 'full', answers: 4 }, 1),
     R('Capital cities', 'mc', ['capitals'], { answers: 4, source: 'questions' }, 1),
-    R('Name the country', 'map-click', 'all', { region: 'world', ask: 'name' }, 1),
+    R('Name the country', 'map-click', 'all', { region: 'world', ask: 'name' }, 2),
     R('Landmarks', 'reveal', ['landmarks'], { mode: 'full', answers: 4 }, 1),
     R('Money & languages', 'mc', ['currencies', 'languages'], { answers: 4, source: 'mix' }, 1),
   ] },

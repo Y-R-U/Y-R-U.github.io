@@ -1,10 +1,11 @@
 // GameSpec -> questions. A spec fully describes a game; same spec + same packs = same questions.
-import { rngFrom, sample, randomSeed } from './rng.js?v=202610130524';
-import { loadIndex, loadPacks } from './packs.js?v=202610130524';
-import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610130524';
-import { isOn, loadTags, loadLocalGeo, loadNames, easeView, localView, mixRound, countryName, packHasLocal } from './local.js?v=202610130524';
-import { homeQuestions, HOME_FORMATS, HOME_PACKS } from './localgeo.js?v=202610130524';
-import { loadIndex as loadGeoIndex, geo as GEO } from '../geo/data.js?v=202610130524';
+import { rngFrom, sample, randomSeed } from './rng.js?v=202610130607';
+import { loadIndex, loadPacks } from './packs.js?v=202610130607';
+import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610130607';
+import { isOn, loadTags, loadLocalGeo, loadNames, easeView, localView, mixRound, countryName, packHasLocal } from './local.js?v=202610130607';
+import { homeQuestions, HOME_FORMATS, HOME_PACKS } from './localgeo.js?v=202610130607';
+import { loadIndex as loadGeoIndex, geo as GEO } from '../geo/data.js?v=202610130607';
+import { dupKey, freshRanker } from './fresh.js?v=202610130607';
 
 export const MAX_ALL_PACKS = 8;
 
@@ -47,12 +48,16 @@ export function resolvePackIds(fmt, packs, index, rng, opts = {}) {
 
 // Returns { questions, spares }. Each question gets .round (index) and a unique .id.
 // spec.local (js/core/local.js) mixes each round to its local share; `report` (an array) receives one row per round.
-export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(), report = null } = {}) {
+// FRESH (js/core/fresh.js): `fresh` (this device's seen history) ranks unseen questions first from a larger pool and
+// returns `fresh`, a string that, kept as spec.fresh, makes any later build of the spec pick the same questions.
+export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(), report = null, fresh = null } = {}) {
   const index = await loadIndex();
   const L = isOn(spec.local) ? spec.local : null;
   const [, localGeo] = L ? await Promise.all([loadTags(), loadLocalGeo(), loadNames(), loadGeoIndex().catch(() => null)]) : [];
   const questions = [], spares = [];
   const used = new Set(avoid), seen = new Set();
+  const F = fresh || typeof spec.fresh === 'string' ? freshRanker(fresh, fresh ? '' : spec.fresh) : null;
+  let seenPicked = 0;
   for (let i = 0; i < spec.rounds.length; i++) {
     const r = spec.rounds[i];
     const fmt = getFormat(r.format);
@@ -70,16 +75,17 @@ export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(
     if (kids) packs = packs.map(kidsView).filter(p => p.items.length + p.questions.length > 0);
     if (!packs.length && !fmt.packless) throw new Error(`No packs can play ${fmt.title}`);
     const want = r.count + Math.ceil(r.count * sparesRatio) + 1;
+    const pool = F ? want * 2 + r.count : want;
     let list = [];
     try {
-      list = fmt.generate({ rng, packs, count: want, opts, difficulty: kids ? 1 : (r.difficulty || 0), kids, avoid: used, round: i, spec }) || [];
+      list = fmt.generate({ rng, packs, count: pool, opts, difficulty: kids ? 1 : (r.difficulty || 0), kids, avoid: used, round: i, spec }) || [];
     } catch (e) {
       console.error('[clued] generate failed', r.format, e);
       throw new Error(`${fmt.title} could not make questions`);
     }
     if (L) {
       const lrng = rngFrom(`${spec.seed}:${i}:${r.format}:local`);
-      const gen = { rng: lrng, count: Math.max(want, 30), opts, difficulty: kids ? 1 : (r.difficulty || 0), kids, avoid: used, round: i, spec };
+      const gen = { rng: lrng, count: Math.max(pool, 30), opts, difficulty: kids ? 1 : (r.difficulty || 0), kids, avoid: used, round: i, spec };
       const more = [];
       if (!fmt.packless) for (const p of packs) {
         const v = localView(p, L.cc, lrng);
@@ -89,11 +95,12 @@ export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(
         more.push(...homeQuestions({ ...gen, cc: L.cc, format: fmt.id, live: L.live, geo: localGeo, states: GEO.states, cname: countryName(L.cc) }));
       }
       // drop what the game already holds (same prompt + answer) before choosing, so the share survives the dedupe below
-      const fresh = q => { const k = dupKey(q); return !k || !seen.has(k); };
-      const mixed = mixRound({ full: list.filter(fresh), more: more.filter(fresh), count: r.count, level: L.level, cc: L.cc, seed: `${spec.seed}:${i}`, key: dupKey });
+      const notDup = q => { const k = dupKey(q); return !k || !seen.has(k); };
+      if (F) { F.note([list, more]); list = F.rank(list); }
+      const mixed = mixRound({ full: list.filter(notDup), more: more.filter(notDup), count: r.count, level: L.level, cc: L.cc, seed: `${spec.seed}:${i}`, key: dupKey, rank: F?.rank });
       list = mixed.list;
       if (report) report.push({ round: i, count: r.count, target: mixed.target, pool: mixed.pool, local: 0 });
-    }
+    } else if (F) { F.note([list]); list = F.rank(list); }
     // the same question lives in several packs (96 cross-pack copies): one per game, by prompt + answer
     list = list.filter(q => {
       const k = dupKey(q);
@@ -101,6 +108,7 @@ export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(
       if (k) seen.add(k);
       return true;
     });
+    if (F) { list = list.slice(0, Math.max(want, r.count)); seenPicked += F.seenIn(list.slice(0, r.count)); }
     list.forEach(q => {
       q.format = q.format || fmt.id;
       if (kids) q.kids = true;
@@ -114,15 +122,7 @@ export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(
     spares.push(...list.slice(r.count));
     if (L && report) { const row = report[report.length - 1]; row.got = Math.min(r.count, list.length); row.local = list.slice(0, r.count).filter(q => q.loc).length; }
   }
-  return { questions, spares };
-}
-
-const flat = s => String(s ?? '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
-function dupKey(q) {
-  const p = flat(q.prompt);
-  if (!p) return '';
-  const a = q.answerText ?? (Array.isArray(q.options) && typeof q.answer === 'number' ? q.options[q.answer]?.text : q.answer);
-  return p + '|' + flat(typeof a === 'object' ? JSON.stringify(a) : a);
+  return F ? { questions, spares, fresh: F.spec, seenPicked } : { questions, spares };
 }
 
 export const roundOf = (spec, q) => spec.rounds[q.round] || spec.rounds[0];

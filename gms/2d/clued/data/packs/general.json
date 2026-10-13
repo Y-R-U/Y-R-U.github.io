@@ -12548,6 +12548,37 @@
    "topic": "geography"
   },
   {
+   "id": "gen-geo-5cb8d1",
+   "kind": "mc",
+   "prompt": "Besides its six states, which two mainland territories does Australia have?",
+   "answer": "ACT and Northern Territory",
+   "wrong": [
+    "ACT and Tasmania",
+    "Northern Territory and Queensland",
+    "Western Australia and ACT"
+   ],
+   "explain": "The Australian Capital Territory and the Northern Territory are self-governing; Jervis Bay Territory is a small third one.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-6d5ab1",
+   "kind": "number",
+   "prompt": "How many external (offshore) territories does Australia have?",
+   "answer": 7,
+   "unit": "territories",
+   "tolerance": 1,
+   "explain": "Norfolk Island, Christmas Island, Cocos (Keeling) Islands, Ashmore and Cartier, Coral Sea Islands, Heard and McDonald Islands, and the Australian Antarctic Territory.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
    "id": "gen-geo-17b739",
    "kind": "mc",
    "prompt": "Which strait separates mainland Australia from Tasmania?",

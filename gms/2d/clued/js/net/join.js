@@ -1,15 +1,16 @@
 // Online hub, join-by-name screen and host setup. Joining needs only a name.
-import { h } from '../ui/kit.js?v=202610130524';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610130524';
-import { sfx } from '../ui/fx.js?v=202610130524';
-import { toast } from '../ui/popup.js?v=202610130524';
-import { getFormat } from '../formats/registry.js?v=202610130524';
-import { rooms, friendly } from './api.js?v=202610130524';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610130524';
-import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss, myRooms, forgetRoom } from './util.js?v=202610130524';
-import { packInfo } from '../core/packs.js?v=202610130524';
-import { getTransport, hasTransport } from './transport.js?v=202610130524';
-import { signInPrompt, busyText } from './signin.js?v=202610130524';
+import { h } from '../ui/kit.js?v=202610130607';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610130607';
+import { sfx } from '../ui/fx.js?v=202610130607';
+import { toast } from '../ui/popup.js?v=202610130607';
+import { getFormat } from '../formats/registry.js?v=202610130607';
+import { rooms, friendly } from './api.js?v=202610130607';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610130607';
+import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss, myRooms, forgetRoom } from './util.js?v=202610130607';
+import { packInfo } from '../core/packs.js?v=202610130607';
+import { countryName, loadNames } from '../core/local.js?v=202610130607';
+import { getTransport, hasTransport } from './transport.js?v=202610130607';
+import { signInPrompt, busyText } from './signin.js?v=202610130607';
 
 
 export function nameField(value = '') {
@@ -27,6 +28,7 @@ function codeField(value = '') {
 }
 
 /* ---------------------------------------------------------------- hub */
+const focusOf = r => (/^[A-Z]{3}$/.test(r.local?.cc || '') ? r.local.cc : '');
 function publicCard(r, offset) {
   const fmts = (r.formats || []).map(f => getFormat(f)?.title || f).join(', ');
   const packs = (r.packs || []).map(p => (p === 'all' ? 'All themes' : packInfo(p)?.title || p)).slice(0, 4).join(', ');
@@ -44,6 +46,7 @@ function publicCard(r, offset) {
       h('span', {}, `👑 ${r.host || '?'}`),
       h('span', {}, `👥 ${r.players} waiting`),
       r.kids ? h('span.net-badge.kids', {}, '🧸 Kids') : r.difficulty ? h('span.net-badge.diff', {}, ['Mixed', 'Easy', 'Medium', 'Hard'][r.difficulty]) : null,
+      focusOf(r) ? h('span.net-badge.diff', { dataset: { badge: 'local' } }, `📍 ${countryName(focusOf(r))} focus`) : null,
       h('span', {}, `⏱ ${r.answerSec}s`))), tick };
 }
 
@@ -161,6 +164,8 @@ defineScreen('online', (el, params, cur) => {
       const d = await rooms.listPublic();
       if (stop || cur !== current()) return;
       const offset = d.now - Date.now();
+      if (d.rooms.some(focusOf)) await loadNames().catch(() => {});
+      if (stop || cur !== current()) return;
       cards = d.rooms.map(r => publicCard(r, offset));
       live.hidden = !cards.length;
       live.textContent = `🟢 ${cards.length} public game${cards.length === 1 ? '' : 's'} open`;

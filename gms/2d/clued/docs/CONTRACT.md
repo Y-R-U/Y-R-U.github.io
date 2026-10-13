@@ -170,3 +170,9 @@ or not). Runner cfg `stagesAuto`; `api.timer.full`, `api.timer.running`. Questio
 study sessions, daily calendar, last 200 games); layout in docs/notes/STATS.md. Every mode end calls
 `js/core/stats.js` (`recordGame(summarize(...))`, `trackRoom` from room.js, `recordStudy` from flashcards).
 `clued.statsTip` (not synced) rotates the home highlight.
+
+## Additive fields from LOCAL / FRESH (2026-10-13)
+- `spec.local` `{cc, level: 'more'|'most'|'all', live}`: the game's focus, set by the host; every player builds from it. Server echoes it as `pubRoom.local {cc, level}`.
+- `spec.fresh`: the compact list (≤ ~600 chars) of question picks the host's seen-history produced, so a rebuild elsewhere gets the identical set. Never set for daily / challenges / link challenges (they stay seed-only).
+- Storage `clued.seen`* `{v, h, g}`: 5-char base-36 dupKey hashes (oldest first, cap 3,000) + last-10-games new/total.
+- Pack item `popYear` + factsMeta `yearField` / `{year}` in `askNumber`.

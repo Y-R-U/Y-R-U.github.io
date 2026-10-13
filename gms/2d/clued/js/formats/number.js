@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, lcLabel, plainLabel } from './registry.js?v=202610130524';
-import { h, mediaBox } from '../ui/kit.js?v=202610130524';
-import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610130524';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, lcLabel, plainLabel } from './registry.js?v=202610130607';
+import { h, mediaBox } from '../ui/kit.js?v=202610130607';
+import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610130607';
 
 const CSS = `
 .nb{gap:12px}
@@ -35,7 +35,7 @@ const PASSIVE = /^(released|born|built|founded|discovered|first published|publis
 function askFor(meta, item, pack) {
   const l = plainLabel(meta), ll = lcLabel(l);
   const name = midName(item, pack);
-  if (meta.askNumber) return capFirst(meta.askNumber.replace(/\{name\}/g, name));
+  if (meta.askNumber && (!/\{year\}/.test(meta.askNumber) || item[meta.yearField])) return capFirst(meta.askNumber.replace(/\{name\}/g, name).replace(/\{year\}/g, item[meta.yearField]));
   if (meta.type === 'year') {
     if (/^died$/i.test(l)) return `In what year did ${name} die?`;
     if (PASSIVE.test(l)) return `In what year was ${name} ${ll}?`;

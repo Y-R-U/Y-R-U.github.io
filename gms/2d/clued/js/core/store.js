@@ -1,9 +1,9 @@
 export const KEYS = {
   settings: 'clued.settings', stats: 'clued.stats', mastery: 'clued.mastery',
   cards: 'clued.cards', last: 'clued.last', name: 'clued.name', favs: 'clued.favs',
-  sets: 'clued.sets',
+  sets: 'clued.sets', seen: 'clued.seen',
 };
-export const SYNCED = [KEYS.settings, KEYS.stats, KEYS.mastery, KEYS.cards, KEYS.favs, KEYS.sets];
+export const SYNCED = [KEYS.settings, KEYS.stats, KEYS.mastery, KEYS.cards, KEYS.favs, KEYS.sets, KEYS.seen];
 
 export const DEFAULT_SETTINGS = {
   sound: true, music: 0.5, haptics: true, timerSec: 10, streakPts: true, reducedMotion: false, kids: false, readAloud: false, bgm: false,

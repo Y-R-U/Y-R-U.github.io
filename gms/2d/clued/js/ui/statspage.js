@@ -1,13 +1,14 @@
 // The stats screen: headline tiles, breakdowns, topics, daily calendar, recent games, plain-language glossary.
-import { h, fmtNum } from './kit.js?v=202610130524';
-import { defineScreen, header, go } from './app.js?v=202610130524';
-import { getSettings } from '../core/store.js?v=202610130524';
-import { statsView, resetStats, acc, MODE_INFO, DAILY_BITS } from '../core/stats.js?v=202610130524';
-import { getIndex, THEMES } from '../core/packs.js?v=202610130524';
-import { getFormat } from '../formats/registry.js?v=202610130524';
-import { kidsProgress } from './stickers.js?v=202610130524';
-import { nameOf } from './statsline.js?v=202610130524';
-import { BUILD } from '../build.js?v=202610130524';
+import { h, fmtNum } from './kit.js?v=202610130607';
+import { defineScreen, header, go } from './app.js?v=202610130607';
+import { getSettings } from '../core/store.js?v=202610130607';
+import { statsView, resetStats, acc, MODE_INFO, DAILY_BITS } from '../core/stats.js?v=202610130607';
+import { getIndex, THEMES } from '../core/packs.js?v=202610130607';
+import { getFormat } from '../formats/registry.js?v=202610130607';
+import { kidsProgress } from './stickers.js?v=202610130607';
+import { nameOf } from './statsline.js?v=202610130607';
+import { BUILD } from '../build.js?v=202610130607';
+import { seenInfo, SEEN_MAX } from '../core/fresh.js?v=202610130607';
 
 function ensureCss() {
   if (document.getElementById('stats-css')) return;
@@ -189,6 +190,11 @@ function grownUp(el, v) {
     tile('🏆', String(v.wins), 'Online wins', v.onlineGames ? `${plural(v.podiums, 'podium')} · ${plural(v.onlineGames, 'room')}` : 'No online rooms yet'),
     tile('⏱️', v.secs ? duration(v.secs) : '–', 'Time played', v.since ? `Since ${new Date(v.since * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : 'Counts from now on'));
   el.append(h('p.muted.tiny.st-intro', {}, 'Everything you’ve played in Clued, from every mode. Synced with your account when you’re signed in.'), tiles);
+  const sn = seenInfo();
+  if (sn.count) {
+    el.append(h('p.muted.tiny.st-fresh', { dataset: { stat: 'seen' } }, `🆕 ${fmtNum(sn.count)} questions seen${sn.count >= SEEN_MAX ? ' (the latest are kept)' : ''}`
+      + (sn.asked ? ` · ${Math.round(100 * sn.fresh / sn.asked)}% of the questions in your last ${plural(sn.games, 'game')} were new to you` : '')));
+  }
   const left = h('div.st-col', {}, breakdown(v), recent(v, false));
   const right = h('div.st-col', {}, topics(v), calendar(v));
   const grid = h('div.st-grid', {}, left, right);

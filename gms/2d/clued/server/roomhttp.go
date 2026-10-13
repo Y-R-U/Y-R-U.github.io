@@ -652,19 +652,44 @@ func handleHostAction(w http.ResponseWriter, r *http.Request) {
 }
 
 type pubRoom struct {
-	Code      string   `json:"code"`
-	Title     string   `json:"title"`
-	Formats   []string `json:"formats"`
-	Packs     []string `json:"packs"`
-	Kids      bool     `json:"kids"`
-	Diff      int      `json:"difficulty"`
-	Host      string   `json:"host"`
-	Players   int      `json:"players"`
-	Phase     string   `json:"phase"`
-	Q         int      `json:"q"`
-	Total     int      `json:"total"`
-	AnswerSec int      `json:"answerSec"`
-	StartAt   int64    `json:"startAt,omitempty"`
+	Code      string    `json:"code"`
+	Title     string    `json:"title"`
+	Formats   []string  `json:"formats"`
+	Packs     []string  `json:"packs"`
+	Kids      bool      `json:"kids"`
+	Diff      int       `json:"difficulty"`
+	Host      string    `json:"host"`
+	Players   int       `json:"players"`
+	Phase     string    `json:"phase"`
+	Q         int       `json:"q"`
+	Total     int       `json:"total"`
+	AnswerSec int       `json:"answerSec"`
+	StartAt   int64     `json:"startAt,omitempty"`
+	Local     *pubLocal `json:"local,omitempty"`
+}
+
+// pubLocal is the room's local focus (spec.local, js/core/local.js) for the public list badge.
+type pubLocal struct {
+	CC    string `json:"cc"`
+	Level string `json:"level"`
+}
+
+func specLocal(spec json.RawMessage) *pubLocal {
+	var s struct {
+		Local *pubLocal `json:"local"`
+	}
+	if json.Unmarshal(spec, &s) != nil || s.Local == nil {
+		return nil
+	}
+	l := s.Local
+	if len(l.CC) != 3 || strings.Trim(l.CC, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") != "" {
+		return nil
+	}
+	switch l.Level {
+	case "more", "most", "all":
+		return &pubLocal{CC: l.CC, Level: l.Level}
+	}
+	return nil
 }
 
 var pubCache struct {
@@ -719,7 +744,8 @@ func publicList() []pubRoom {
 			}
 			f, p := specSummary(r.Spec)
 			out = append(out, pubRoom{Code: r.Code, Title: r.Title, Formats: f, Packs: p, Kids: r.Kids, Diff: r.Diff, Host: host,
-				Players: len(r.active()), Phase: r.Phase, Q: r.Q, Total: len(r.Questions), AnswerSec: r.AnswerMs / 1000, StartAt: r.StartAt})
+				Players: len(r.active()), Phase: r.Phase, Q: r.Q, Total: len(r.Questions), AnswerSec: r.AnswerMs / 1000, StartAt: r.StartAt,
+				Local: specLocal(r.Spec)})
 		}
 		r.mu.Unlock()
 	}

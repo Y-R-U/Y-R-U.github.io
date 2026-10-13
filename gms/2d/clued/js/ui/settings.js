@@ -1,16 +1,18 @@
-import { h, esc } from './kit.js?v=202610130524';
-import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610130524';
-import { defineScreen, header, back, go } from './app.js?v=202610130524';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610130524';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610130524';
-import { applyAudioSettings, sfx } from './fx.js?v=202610130524';
-import { applyKids } from './home.js?v=202610130524';
-import { loadLearn, loadNet } from './net.js?v=202610130524';
-import { BUILD } from '../build.js?v=202610130524';
-import { canSpeak, speak } from './speech.js?v=202610130524';
-import { streakOption } from './streakopt.js?v=202610130524';
-import { localChip } from './local.js?v=202610130524';
-import { mySetting, saveMySetting } from '../core/local.js?v=202610130524';
+import { h, esc } from './kit.js?v=202610130607';
+import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610130607';
+import { defineScreen, header, back, go } from './app.js?v=202610130607';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610130607';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610130607';
+import { applyAudioSettings, sfx } from './fx.js?v=202610130607';
+import { applyKids } from './home.js?v=202610130607';
+import { loadLearn, loadNet } from './net.js?v=202610130607';
+import { BUILD } from '../build.js?v=202610130607';
+import { canSpeak, speak } from './speech.js?v=202610130607';
+import { streakOption } from './streakopt.js?v=202610130607';
+import { localChip } from './local.js?v=202610130607';
+import { confirmPop, toast } from './popup.js?v=202610130607';
+import { seenInfo, resetSeen } from '../core/fresh.js?v=202610130607';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610130607';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -52,6 +54,15 @@ defineScreen('settings', el => {
   el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'Local focus'), h('div.panel.set-list', { dataset: { set: 'local' } },
     h('p.muted.tiny', { style: { margin: '0 0 10px' } }, 'More questions about one country in the games you set up (solo, party, pub quiz and the rooms you host).'),
     localChip(mySetting, next => saveMySetting(next))));
+  const seenLbl = h('span', { dataset: { seen: 'count' } });
+  const showSeen = () => { const n = seenInfo().count; seenLbl.textContent = n ? `${n.toLocaleString('en-GB')} question${n === 1 ? '' : 's'} remembered` : 'None yet'; };
+  showSeen();
+  const seenReset = h('button.btn.small', { type: 'button', dataset: { act: 'seen-reset' }, onclick: async () => {
+    if (!(await confirmPop('Forget the questions you’ve seen?', 'New games will be free to pick any question again.', 'Reset', 'Cancel', true))) return;
+    resetSeen(); showSeen(); toast('Seen questions reset');
+  } }, 'Reset');
+  el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'Questions you’ve seen'), h('div.panel.set-list', { dataset: { set: 'seen' } },
+    h('div.opt-row', {}, h('span.lbl', {}, seenLbl, h('small', {}, 'Games you set up pick questions you haven’t had yet, then the ones you saw longest ago.')), seenReset)));
   el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'Home page'), h('div.panel.set-list', {},
     toggleRow('Show the kids mode switch', 'Kids mode itself is in the list above', 'homeKids'),
     toggleRow('Show the daily challenge', null, 'homeDaily')));
