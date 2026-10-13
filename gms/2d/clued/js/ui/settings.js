@@ -1,18 +1,19 @@
-import { h, esc } from './kit.js?v=202610131422';
-import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610131422';
-import { defineScreen, header, back, go } from './app.js?v=202610131422';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610131422';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610131422';
-import { applyAudioSettings, sfx } from './fx.js?v=202610131422';
-import { applyKids } from './home.js?v=202610131422';
-import { loadLearn, loadNet } from './net.js?v=202610131422';
-import { BUILD } from '../build.js?v=202610131422';
-import { canSpeak, speak } from './speech.js?v=202610131422';
-import { streakOption } from './streakopt.js?v=202610131422';
-import { localChip } from './local.js?v=202610131422';
-import { confirmPop, toast } from './popup.js?v=202610131422';
-import { seenInfo, resetSeen } from '../core/fresh.js?v=202610131422';
-import { mySetting, saveMySetting } from '../core/local.js?v=202610131422';
+import { h, esc } from './kit.js?v=202610131439';
+import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610131439';
+import { defineScreen, header, back, go } from './app.js?v=202610131439';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610131439';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610131439';
+import { applyAudioSettings, sfx } from './fx.js?v=202610131439';
+import { applyKids } from './home.js?v=202610131439';
+import { loadLearn, loadNet } from './net.js?v=202610131439';
+import { BUILD } from '../build.js?v=202610131439';
+import { canSpeak, speak } from './speech.js?v=202610131439';
+import { streakOption } from './streakopt.js?v=202610131439';
+import { localChip } from './local.js?v=202610131439';
+import { confirmPop, toast } from './popup.js?v=202610131439';
+import { seenInfo, resetSeen } from '../core/fresh.js?v=202610131439';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610131439';
+import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610131439';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -26,6 +27,32 @@ export function applyAll(s = getSettings()) {
   document.documentElement.classList.toggle('reduced', !!s.reducedMotion);
   applyKids(s.kids);
   applyAudioSettings(s);
+}
+
+// Gift codes: the Pass is on the br8t account, so it covers every br8t game.
+function passPanel() {
+  const note = h('small', {}, 'Got a br8t Pass code? Sign in, then enter it here. The Pass covers every br8t game.');
+  const code = h('input.field', { type: 'text', placeholder: 'BR8T-XXXX-XXXX-XXXX', maxlength: 24, autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', enterkeyhint: 'go', 'aria-label': 'Pass code', style: { flex: '1', minWidth: '0', fontSize: '16px', padding: '10px 12px' } });
+  const btn = h('button.btn.small', { type: 'button', dataset: { act: 'redeem' } }, 'Use');
+  const status = h('p.muted.tiny', { style: { margin: '8px 0 0' } });
+  const use = async () => {
+    const c = code.value.trim();
+    if (!c) { status.textContent = 'Type the code first.'; return; }
+    btn.disabled = true;
+    try {
+      const until = await redeemCode(c);
+      code.value = '';
+      status.textContent = `Done! Your br8t Pass is active until ${fmtDate(until)}.`;
+      toast('br8t Pass added');
+    } catch (e) { status.textContent = e.message; }
+    btn.disabled = false;
+  };
+  btn.addEventListener('click', use);
+  code.addEventListener('keydown', e => { if (e.key === 'Enter') use(); });
+  passUntil().then(u => { if (u && status.isConnected && !status.textContent) status.textContent = `Your br8t Pass is active until ${fmtDate(u)}.`; });
+  return h('div.panel.set-list', { dataset: { set: 'pass' } },
+    h('div.opt-row', {}, h('span.lbl', {}, 'Pass code', note)),
+    h('div', { style: { display: 'flex', gap: '8px' } }, code, btn), status);
 }
 
 defineScreen('settings', el => {
@@ -65,6 +92,7 @@ defineScreen('settings', el => {
   el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'Home page'), h('div.panel.set-list', {},
     toggleRow('Show the kids mode switch', 'Kids mode itself is in the list above', 'homeKids'),
     toggleRow('Show the daily challenge', null, 'homeDaily')));
+  el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'br8t Pass'), passPanel());
   el.append(h('div.panel.set-list', { style: { marginTop: '14px' } }, h('div.opt-row', {}, h('span.lbl', {}, 'Your stats', h('small', {}, 'Games, accuracy, streaks, topics and history')),
     h('button.btn.small', { type: 'button', dataset: { act: 'stats' }, onclick: () => go('stats') }, '📊 Open'))));
   el.append(h('p.muted.tiny.center', { style: { marginTop: '18px' } }, `Clued build ${BUILD} · ${Object.values(getIndex()?.packs || {}).filter(p => !p.virtual).length} packs`));

@@ -1,8 +1,8 @@
 // Admin picture review: every pack picture with an OK / Bad verdict, saved on the server (admin only).
 // A verdict is tied to the picture's src, so a swapped or regenerated picture comes back as "to review".
-import { h } from '../ui/kit.js?v=202610131422';
-import { toast } from '../ui/popup.js?v=202610131422';
-import { API } from './api.js?v=202610131422';
+import { h } from '../ui/kit.js?v=202610131439';
+import { toast } from '../ui/popup.js?v=202610131439';
+import { API } from './api.js?v=202610131439';
 
 const root = document.getElementById('rv');
 const gate = document.getElementById('gate');

@@ -1,12 +1,12 @@
 // Structure registry. Each: { id, title, icon, blurb, start(choice), count?, timer?, difficulty?, formatFilter? }
-import quick from './quick.js?v=202610131422';
-import survival from './survival.js?v=202610131422';
-import blitz from './blitz.js?v=202610131422';
-import ladder from './ladder.js?v=202610131422';
-import daily from './daily.js?v=202610131422';
-import party from './party.js?v=202610131422';
-import duel from './duel.js?v=202610131422';
-import pubquiz from './pubquiz.js?v=202610131422';
+import quick from './quick.js?v=202610131439';
+import survival from './survival.js?v=202610131439';
+import blitz from './blitz.js?v=202610131439';
+import ladder from './ladder.js?v=202610131439';
+import daily from './daily.js?v=202610131439';
+import party from './party.js?v=202610131439';
+import duel from './duel.js?v=202610131439';
+import pubquiz from './pubquiz.js?v=202610131439';
 
 export const STRUCTURES = { quick, survival, blitz, ladder, daily, party, duel, pubquiz };
 

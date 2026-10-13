@@ -1,7 +1,7 @@
 // Stale-deploy guard. No build step means a page left open across a deploy can import new modules next to the
 // old ones it already holds; a failed or mixed lazy import used to make a tap silently do nothing.
-import { BUILD } from '../build.js?v=202610131422';
-import { h } from './kit.js?v=202610131422';
+import { BUILD } from '../build.js?v=202610131439';
+import { h } from './kit.js?v=202610131439';
 
 const G = globalThis.__cluedUpd || (globalThis.__cluedUpd = { armed: false, latest: null, reason: null });
 const ROOT = new URL('../../', import.meta.url).href;
