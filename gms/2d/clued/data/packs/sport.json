@@ -3771,6 +3771,5246 @@
     "sport"
    ],
    "topic": "rules"
+  },
+  {
+   "id": "spt-football-e46c9a",
+   "kind": "mc",
+   "prompt": "In which year did England's Premier League begin?",
+   "answer": "1992",
+   "wrong": [
+    "1888",
+    "1966",
+    "2001"
+   ],
+   "explain": "The old First Division clubs broke away to form it; the Football League itself began in 1888.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-afd77e",
+   "kind": "mc",
+   "prompt": "Which club went unbeaten through the 2003–04 Premier League season?",
+   "answer": "Arsenal",
+   "wrong": [
+    "Chelsea",
+    "Manchester United",
+    "Liverpool"
+   ],
+   "explain": "They were nicknamed 'the Invincibles': 26 wins and 12 draws.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-9337df",
+   "kind": "mc",
+   "prompt": "Which club won the 2015–16 Premier League after starting the season as 5,000–1 outsiders?",
+   "answer": "Leicester City",
+   "wrong": [
+    "Southampton",
+    "Tottenham Hotspur",
+    "West Ham United"
+   ],
+   "explain": "Claudio Ranieri managed them.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-106b0a",
+   "kind": "mc",
+   "prompt": "Which club plays its home games at Old Trafford?",
+   "answer": "Manchester United",
+   "wrong": [
+    "Manchester City",
+    "Liverpool",
+    "Leeds United"
+   ],
+   "explain": "Old Trafford is nicknamed 'the Theatre of Dreams'.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-ebd32f",
+   "kind": "mc",
+   "prompt": "Which London club plays its home games at Stamford Bridge?",
+   "answer": "Chelsea",
+   "wrong": [
+    "Fulham",
+    "Arsenal",
+    "Tottenham Hotspur"
+   ],
+   "explain": "Chelsea have played there since they were founded in 1905.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-69c2c0",
+   "kind": "mc",
+   "prompt": "Which English club is nicknamed 'the Gunners'?",
+   "answer": "Arsenal",
+   "wrong": [
+    "West Ham United",
+    "Charlton Athletic",
+    "Aston Villa"
+   ],
+   "explain": "The club was founded by workers at the Royal Arsenal in Woolwich.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-2641e9",
+   "kind": "mc",
+   "prompt": "Which Merseyside club is nicknamed 'the Toffees'?",
+   "answer": "Everton",
+   "wrong": [
+    "Liverpool",
+    "Tranmere Rovers",
+    "Southport"
+   ],
+   "explain": "The name is said to come from a toffee shop near their first ground.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-b09c50",
+   "kind": "mc",
+   "prompt": "Which club is nicknamed 'the Magpies' and plays at St James' Park?",
+   "answer": "Newcastle United",
+   "wrong": [
+    "Sunderland",
+    "Middlesbrough",
+    "Exeter City"
+   ],
+   "explain": "Newcastle play in black and white stripes.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-e404c8",
+   "kind": "mc",
+   "prompt": "Which two Glasgow clubs make up football's 'Old Firm'?",
+   "answer": "Celtic and Rangers",
+   "wrong": [
+    "Celtic and Hibernian",
+    "Rangers and Aberdeen",
+    "Hearts and Hibernian"
+   ],
+   "explain": "Hearts and Hibs are the Edinburgh rivals.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-e08ac6",
+   "kind": "mc",
+   "prompt": "Which Spanish club plays at the Santiago Bernabéu stadium?",
+   "answer": "Real Madrid",
+   "wrong": [
+    "Atlético Madrid",
+    "FC Barcelona",
+    "Sevilla"
+   ],
+   "explain": "The stadium is named after a former club president.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-1a80a8",
+   "kind": "mc",
+   "prompt": "Which stadium do Milan's two big clubs, AC Milan and Inter, share?",
+   "answer": "San Siro",
+   "wrong": [
+    "Stadio Olimpico",
+    "Allianz Stadium",
+    "Stadio Diego Armando Maradona"
+   ],
+   "explain": "Its official name is the Stadio Giuseppe Meazza.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-418c51",
+   "kind": "mc",
+   "prompt": "Which German club plays at the Allianz Arena?",
+   "answer": "Bayern Munich",
+   "wrong": [
+    "Borussia Dortmund",
+    "Schalke 04",
+    "Hamburger SV"
+   ],
+   "explain": "The stadium's outer skin can light up red, blue or white.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-d88974",
+   "kind": "mc",
+   "prompt": "Which Dutch club made 'Total Football' famous in the early 1970s?",
+   "answer": "Ajax",
+   "wrong": [
+    "PSV Eindhoven",
+    "Feyenoord",
+    "AZ Alkmaar"
+   ],
+   "explain": "Ajax won three European Cups in a row from 1971 to 1973.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-5d3b39",
+   "kind": "mc",
+   "prompt": "Which Manchester United manager won 13 Premier League titles?",
+   "answer": "Alex Ferguson",
+   "wrong": [
+    "Matt Busby",
+    "José Mourinho",
+    "Ron Atkinson"
+   ],
+   "explain": "He managed the club from 1986 to 2013.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-c233c8",
+   "kind": "mc",
+   "prompt": "Which Frenchman managed Arsenal from 1996 to 2018?",
+   "answer": "Arsène Wenger",
+   "wrong": [
+    "Gérard Houllier",
+    "Didier Deschamps",
+    "Claude Puel"
+   ],
+   "explain": "He won three Premier League titles there.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-6e8b20",
+   "kind": "mc",
+   "prompt": "As of 2024, who was the Premier League's all-time top scorer?",
+   "answer": "Alan Shearer",
+   "wrong": [
+    "Wayne Rooney",
+    "Harry Kane",
+    "Thierry Henry"
+   ],
+   "explain": "Shearer scored 260 Premier League goals for Blackburn and Newcastle.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-bed70b",
+   "kind": "mc",
+   "prompt": "Which country does Mohamed Salah play for?",
+   "answer": "Egypt",
+   "wrong": [
+    "Morocco",
+    "Senegal",
+    "Tunisia"
+   ],
+   "explain": "He joined Liverpool in 2017.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-d3640a",
+   "kind": "mc",
+   "prompt": "Which country does Son Heung-min play for?",
+   "answer": "South Korea",
+   "wrong": [
+    "Japan",
+    "China",
+    "North Korea"
+   ],
+   "explain": "He joined Tottenham Hotspur in 2015.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-b9beb8",
+   "kind": "mc",
+   "prompt": "In 2022, which country became the first African team to reach a men's World Cup semi-final?",
+   "answer": "Morocco",
+   "wrong": [
+    "Senegal",
+    "Ghana",
+    "Cameroon"
+   ],
+   "explain": "They beat Spain and Portugal on the way.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-b1ac93",
+   "kind": "mc",
+   "prompt": "Which tournament did Argentina win in 2021, beating Brazil in the final at the Maracanã?",
+   "answer": "Copa América",
+   "wrong": [
+    "Copa Libertadores",
+    "Gold Cup",
+    "Confederations Cup"
+   ],
+   "explain": "The Copa América is for national teams; the Copa Libertadores is for clubs.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-bcb07a",
+   "kind": "mc",
+   "prompt": "Which competition for Europe's top clubs used to be called the European Cup?",
+   "answer": "UEFA Champions League",
+   "wrong": [
+    "UEFA Europa League",
+    "UEFA Super Cup",
+    "Intertoto Cup"
+   ],
+   "explain": "It was renamed in 1992.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-1a3cef",
+   "kind": "mc",
+   "prompt": "As of 2024, which club had won the European Cup or Champions League the most times?",
+   "answer": "Real Madrid",
+   "wrong": [
+    "AC Milan",
+    "Bayern Munich",
+    "Liverpool"
+   ],
+   "explain": "Real Madrid won their 15th title in 2024.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-1d1891",
+   "kind": "mc",
+   "prompt": "Which English club won the 1999 Champions League final with two goals in injury time?",
+   "answer": "Manchester United",
+   "wrong": [
+    "Arsenal",
+    "Chelsea",
+    "Liverpool"
+   ],
+   "explain": "They beat Bayern Munich 2–1 in Barcelona to complete a treble.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-363855",
+   "kind": "mc",
+   "prompt": "Which club came back from 3–0 down at half-time to win the 2005 Champions League final?",
+   "answer": "Liverpool",
+   "wrong": [
+    "AC Milan",
+    "Manchester United",
+    "Chelsea"
+   ],
+   "explain": "The 'Miracle of Istanbul' ended in a penalty shoot-out win over AC Milan.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-c8b282",
+   "kind": "mc",
+   "prompt": "What is it called when one player scores three goals in a match?",
+   "answer": "A hat-trick",
+   "wrong": [
+    "A treble",
+    "A brace",
+    "A clean sheet"
+   ],
+   "explain": "Two goals is a brace.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-8211a7",
+   "kind": "mc",
+   "prompt": "In football, what is a 'clean sheet'?",
+   "answer": "Conceding no goals in a match",
+   "wrong": [
+    "Getting no yellow cards",
+    "Winning every game",
+    "Scoring with your first shot"
+   ],
+   "explain": "Goalkeepers' clean sheets are a common statistic.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-736ae7",
+   "kind": "mc",
+   "prompt": "Which Dutch great gave his name to a famous turn first seen at the 1974 World Cup?",
+   "answer": "Johan Cruyff",
+   "wrong": [
+    "Marco van Basten",
+    "Ruud Gullit",
+    "Dennis Bergkamp"
+   ],
+   "explain": "He fooled Sweden's Jan Olsson with it.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-c45fc6",
+   "kind": "mc",
+   "prompt": "As of 2024, which German held the record for most men's World Cup goals, with 16?",
+   "answer": "Miroslav Klose",
+   "wrong": [
+    "Gerd Müller",
+    "Thomas Müller",
+    "Jürgen Klinsmann"
+   ],
+   "explain": "Brazil's Ronaldo is second with 15.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-9e8c03",
+   "kind": "mc",
+   "prompt": "As of 2024, which country had won the Africa Cup of Nations the most times?",
+   "answer": "Egypt",
+   "wrong": [
+    "Cameroon",
+    "Ghana",
+    "Nigeria"
+   ],
+   "explain": "Egypt have won it seven times.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-d6d19e",
+   "kind": "mc",
+   "prompt": "Which is the oldest national football cup competition, first played in 1871–72?",
+   "answer": "The FA Cup",
+   "wrong": [
+    "The Scottish Cup",
+    "The Copa del Rey",
+    "The League Cup"
+   ],
+   "explain": "Wanderers won the first final.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-7cb922",
+   "kind": "mc",
+   "prompt": "Which country's men's football team is nicknamed 'the Socceroos'?",
+   "answer": "Australia",
+   "wrong": [
+    "New Zealand",
+    "South Africa",
+    "Canada"
+   ],
+   "explain": "New Zealand's men are the All Whites.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-7b1bf9",
+   "kind": "mc",
+   "prompt": "Which country's women's football team is nicknamed 'the Matildas'?",
+   "answer": "Australia",
+   "wrong": [
+    "New Zealand",
+    "England",
+    "Canada"
+   ],
+   "explain": "The name comes from the song 'Waltzing Matilda'.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-3fbc85",
+   "kind": "mc",
+   "prompt": "Which country's football team is nicknamed 'the Super Eagles'?",
+   "answer": "Nigeria",
+   "wrong": [
+    "Ghana",
+    "Cameroon",
+    "Senegal"
+   ],
+   "explain": "Nigeria won Olympic gold in 1996.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-be8bd8",
+   "kind": "mc",
+   "prompt": "Which country's football team is nicknamed 'the Black Stars'?",
+   "answer": "Ghana",
+   "wrong": [
+    "Nigeria",
+    "Ivory Coast",
+    "Senegal"
+   ],
+   "explain": "The black star on Ghana's flag stands for African freedom.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-2e9242",
+   "kind": "mc",
+   "prompt": "Which country's football team is nicknamed 'La Albiceleste' (the white and sky blue)?",
+   "answer": "Argentina",
+   "wrong": [
+    "Uruguay",
+    "Chile",
+    "Paraguay"
+   ],
+   "explain": "Uruguay are 'La Celeste'.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-e96c90",
+   "kind": "mc",
+   "prompt": "Which country's football team is nicknamed 'the Samurai Blue'?",
+   "answer": "Japan",
+   "wrong": [
+    "South Korea",
+    "China",
+    "Thailand"
+   ],
+   "explain": "Japan have reached every men's World Cup since 1998.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-03fb91",
+   "kind": "mc",
+   "prompt": "Which Liberian footballer won the Ballon d'Or and later became his country's president?",
+   "answer": "George Weah",
+   "wrong": [
+    "Samuel Eto'o",
+    "Didier Drogba",
+    "Roger Milla"
+   ],
+   "explain": "He was the first African to win the Ballon d'Or, in 1995.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-c743fa",
+   "kind": "mc",
+   "prompt": "In football, what colour card does a referee show as a caution?",
+   "answer": "Yellow",
+   "wrong": [
+    "Red",
+    "Green",
+    "Blue"
+   ],
+   "explain": "Two yellows in one game make a red.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-e66736",
+   "kind": "mc",
+   "prompt": "In football, what does VAR stand for?",
+   "answer": "Video assistant referee",
+   "wrong": [
+    "Verified action replay",
+    "Visual area review",
+    "Video appeal ruling"
+   ],
+   "explain": "VAR was first used at a men's World Cup in 2018.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-5d5cc6",
+   "kind": "mc",
+   "prompt": "Who scored the 'Goal of the Century', dribbling past half the England team, in 1986?",
+   "answer": "Diego Maradona",
+   "wrong": [
+    "Pelé",
+    "Lionel Messi",
+    "Michel Platini"
+   ],
+   "explain": "It came four minutes after his 'Hand of God' goal.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-f2470d",
+   "kind": "mc",
+   "prompt": "Which country beat Brazil 7–1 in the 2014 World Cup semi-final?",
+   "answer": "Germany",
+   "wrong": [
+    "Netherlands",
+    "Argentina",
+    "Spain"
+   ],
+   "explain": "The match was played in Belo Horizonte.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-7a6dcf",
+   "kind": "mc",
+   "prompt": "Which club's fans sing 'You'll Never Walk Alone' as their anthem at Anfield?",
+   "answer": "Liverpool",
+   "wrong": [
+    "Everton",
+    "Celtic",
+    "Manchester United"
+   ],
+   "explain": "Celtic fans sing it too; Gerry and the Pacemakers made it a hit in 1963.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-66bbaa",
+   "kind": "mc",
+   "prompt": "Who managed England when they won the 1966 World Cup?",
+   "answer": "Alf Ramsey",
+   "wrong": [
+    "Bobby Robson",
+    "Walter Winterbottom",
+    "Don Revie"
+   ],
+   "explain": "He was knighted in 1967.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-4e0553",
+   "kind": "mc",
+   "prompt": "As of 2024, which country had won the Women's World Cup the most times?",
+   "answer": "United States",
+   "wrong": [
+    "Germany",
+    "Norway",
+    "Japan"
+   ],
+   "explain": "The US won in 1991, 1999, 2015 and 2019.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-8b98c6",
+   "kind": "mc",
+   "prompt": "Which club is known as 'the Red Devils'?",
+   "answer": "Manchester United",
+   "wrong": [
+    "Liverpool",
+    "Arsenal",
+    "Nottingham Forest"
+   ],
+   "explain": "The club badge shows a red devil holding a trident.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-7a6a19",
+   "kind": "mc",
+   "prompt": "Which Brazilian club did Pelé play for in most of his career?",
+   "answer": "Santos",
+   "wrong": [
+    "Flamengo",
+    "Corinthians",
+    "São Paulo"
+   ],
+   "explain": "He played for Santos from 1956 to 1974, then for New York Cosmos.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-44553d",
+   "kind": "mc",
+   "prompt": "Which Argentine club is famous for its stadium La Bombonera in Buenos Aires?",
+   "answer": "Boca Juniors",
+   "wrong": [
+    "River Plate",
+    "Independiente",
+    "Racing Club"
+   ],
+   "explain": "Their derby with River Plate is called the Superclásico.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-394a78",
+   "kind": "mc",
+   "prompt": "What is the name of the derby between Real Madrid and Barcelona?",
+   "answer": "El Clásico",
+   "wrong": [
+    "The Superclásico",
+    "The Old Firm",
+    "Der Klassiker"
+   ],
+   "explain": "The Superclásico is Boca Juniors against River Plate.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-f47b46",
+   "kind": "mc",
+   "prompt": "Which Merseyside derby rivals are separated only by Stanley Park?",
+   "answer": "Liverpool and Everton",
+   "wrong": [
+    "Liverpool and Manchester United",
+    "Everton and Tranmere Rovers",
+    "Manchester City and Manchester United"
+   ],
+   "explain": "Anfield and Goodison Park stood less than a mile apart.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-019817",
+   "kind": "mc",
+   "prompt": "Which Welshman holds the record for the most goals for Wales, as of 2024?",
+   "answer": "Gareth Bale",
+   "wrong": [
+    "Ian Rush",
+    "Ryan Giggs",
+    "Aaron Ramsey"
+   ],
+   "explain": "Bale scored 41 goals for Wales and retired in 2023.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-cfbc64",
+   "kind": "mc",
+   "prompt": "Which French midfielder scored twice in the 1998 World Cup final?",
+   "answer": "Zinedine Zidane",
+   "wrong": [
+    "Thierry Henry",
+    "Emmanuel Petit",
+    "Youri Djorkaeff"
+   ],
+   "explain": "Both of his goals were headers; Emmanuel Petit added a third.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-7695a1",
+   "kind": "mc",
+   "prompt": "In 2006, which French captain was sent off in the World Cup final for a headbutt?",
+   "answer": "Zinedine Zidane",
+   "wrong": [
+    "Thierry Henry",
+    "Patrick Vieira",
+    "Franck Ribéry"
+   ],
+   "explain": "He headbutted Italy's Marco Materazzi; Italy won on penalties.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-deb23d",
+   "kind": "mc",
+   "prompt": "How many points does a team get for a win in most football leagues?",
+   "answer": "3",
+   "wrong": [
+    "2",
+    "1",
+    "4"
+   ],
+   "explain": "England switched from two points to three in 1981.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-rules-c838f3",
+   "kind": "mc",
+   "prompt": "How long is a cricket pitch between the stumps?",
+   "answer": "22 yards",
+   "wrong": [
+    "20 yards",
+    "24 yards",
+    "18 yards"
+   ],
+   "explain": "That is about 20.12 m, the length of an old measure called a chain.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-df3218",
+   "kind": "mc",
+   "prompt": "In cricket, what is it called when a batter is out without scoring?",
+   "answer": "A duck",
+   "wrong": [
+    "A goose",
+    "A maiden",
+    "A dot"
+   ],
+   "explain": "Out first ball is a golden duck.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-7d6fe4",
+   "kind": "mc",
+   "prompt": "In cricket, what is an over with no runs scored off the bat or as extras called?",
+   "answer": "A maiden",
+   "wrong": [
+    "A duck",
+    "A dead over",
+    "A dot over"
+   ],
+   "explain": "A maiden over in which a wicket falls is a wicket maiden.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-a8c616",
+   "kind": "mc",
+   "prompt": "In cricket, what does an umpire signal by raising both arms above the head?",
+   "answer": "Six runs",
+   "wrong": [
+    "Four runs",
+    "A wide",
+    "Out"
+   ],
+   "explain": "A wave of one arm across the body signals four.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e8eb2f",
+   "kind": "mc",
+   "prompt": "In cricket, what does an umpire signal by raising one finger?",
+   "answer": "Out",
+   "wrong": [
+    "A no-ball",
+    "One run",
+    "Six"
+   ],
+   "explain": "A raised finger is the most feared signal in cricket.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-records-349892",
+   "kind": "mc",
+   "prompt": "As of 2024, who had scored the most runs in men's Test cricket?",
+   "answer": "Sachin Tendulkar",
+   "wrong": [
+    "Ricky Ponting",
+    "Jacques Kallis",
+    "Joe Root"
+   ],
+   "explain": "Tendulkar made 15,921 Test runs in 200 matches.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-d35629",
+   "kind": "mc",
+   "prompt": "As of 2024, who had taken the most wickets in men's Test cricket?",
+   "answer": "Muttiah Muralitharan",
+   "wrong": [
+    "Shane Warne",
+    "James Anderson",
+    "Anil Kumble"
+   ],
+   "explain": "The Sri Lankan off-spinner took exactly 800 wickets.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-athletes-680c10",
+   "kind": "mc",
+   "prompt": "Which Australian leg-spinner bowled the 'Ball of the Century' to Mike Gatting in 1993?",
+   "answer": "Shane Warne",
+   "wrong": [
+    "Stuart MacGill",
+    "Richie Benaud",
+    "Glenn McGrath"
+   ],
+   "explain": "It was his first ball in an Ashes Test.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-records-696042",
+   "kind": "mc",
+   "prompt": "Who scored the first double century in a men's one-day international, in 2010?",
+   "answer": "Sachin Tendulkar",
+   "wrong": [
+    "Virender Sehwag",
+    "Rohit Sharma",
+    "Chris Gayle"
+   ],
+   "explain": "He made 200 not out against South Africa in Gwalior.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-rules-3492e8",
+   "kind": "mc",
+   "prompt": "Which team won the first men's Cricket World Cup, in 1975?",
+   "answer": "West Indies",
+   "wrong": [
+    "Australia",
+    "England",
+    "India"
+   ],
+   "explain": "Clive Lloyd's side also won in 1979.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-65b828",
+   "kind": "mc",
+   "prompt": "Which country won the 1983 men's Cricket World Cup in a famous upset?",
+   "answer": "India",
+   "wrong": [
+    "West Indies",
+    "Pakistan",
+    "England"
+   ],
+   "explain": "Kapil Dev's team beat the West Indies at Lord's.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-3a2fb3",
+   "kind": "mc",
+   "prompt": "Which Pakistan captain won the 1992 Cricket World Cup and later became prime minister?",
+   "answer": "Imran Khan",
+   "wrong": [
+    "Wasim Akram",
+    "Javed Miandad",
+    "Inzamam-ul-Haq"
+   ],
+   "explain": "He was prime minister from 2018 to 2022.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-d7fe31",
+   "kind": "mc",
+   "prompt": "Which country won the 1996 men's Cricket World Cup?",
+   "answer": "Sri Lanka",
+   "wrong": [
+    "Australia",
+    "India",
+    "Pakistan"
+   ],
+   "explain": "Arjuna Ranatunga's side beat Australia in Lahore.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-21bc9b",
+   "kind": "mc",
+   "prompt": "Which Indian Twenty20 cricket league began in 2008?",
+   "answer": "Indian Premier League",
+   "wrong": [
+    "Big Bash League",
+    "The Hundred",
+    "Caribbean Premier League"
+   ],
+   "explain": "It is the richest cricket league in the world.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-9f35f8",
+   "kind": "mc",
+   "prompt": "What is Australia's main domestic Twenty20 cricket competition called?",
+   "answer": "Big Bash League",
+   "wrong": [
+    "Sheffield Shield",
+    "Indian Premier League",
+    "Super Smash"
+   ],
+   "explain": "The Sheffield Shield is the first-class competition.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-8fb61a",
+   "kind": "mc",
+   "prompt": "How many overs does each side face in a standard men's one-day international?",
+   "answer": "50",
+   "wrong": [
+    "40",
+    "60",
+    "20"
+   ],
+   "explain": "Early one-day internationals were 60 overs a side.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-985c85",
+   "kind": "mc",
+   "prompt": "At which ground is the traditional Boxing Day Test played in Australia?",
+   "answer": "Melbourne Cricket Ground",
+   "wrong": [
+    "Sydney Cricket Ground",
+    "Adelaide Oval",
+    "The Gabba"
+   ],
+   "explain": "The MCG holds about 100,000 people.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-6bc2ed",
+   "kind": "mc",
+   "prompt": "Which West Indian batter scored 400 not out in a Test match in 2004?",
+   "answer": "Brian Lara",
+   "wrong": [
+    "Viv Richards",
+    "Chris Gayle",
+    "Garfield Sobers"
+   ],
+   "explain": "It is still the highest individual Test score.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-6d932c",
+   "kind": "mc",
+   "prompt": "Who was the first batter to hit six sixes in an over in first-class cricket, in 1968?",
+   "answer": "Garfield Sobers",
+   "wrong": [
+    "Viv Richards",
+    "Ravi Shastri",
+    "Herschelle Gibbs"
+   ],
+   "explain": "He did it for Nottinghamshire against Glamorgan.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-9c6576",
+   "kind": "mc",
+   "prompt": "Which New Zealand fast bowler was the first to take 400 Test wickets?",
+   "answer": "Richard Hadlee",
+   "wrong": [
+    "Chris Cairns",
+    "Daniel Vettori",
+    "Trent Boult"
+   ],
+   "explain": "He reached 400 in 1990 and was knighted the same year.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-a009c6",
+   "kind": "mc",
+   "prompt": "Which Indian captain hit the winning six in the 2011 World Cup final?",
+   "answer": "MS Dhoni",
+   "wrong": [
+    "Virat Kohli",
+    "Sachin Tendulkar",
+    "Yuvraj Singh"
+   ],
+   "explain": "India beat Sri Lanka in Mumbai.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-99cb48",
+   "kind": "mc",
+   "prompt": "In which Indian city is the Eden Gardens cricket ground?",
+   "answer": "Kolkata",
+   "wrong": [
+    "Mumbai",
+    "Chennai",
+    "Delhi"
+   ],
+   "explain": "It is one of the largest cricket grounds in the world.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-eeedb8",
+   "kind": "mc",
+   "prompt": "What colour is the ball in day-night Test cricket?",
+   "answer": "Pink",
+   "wrong": [
+    "White",
+    "Orange",
+    "Yellow"
+   ],
+   "explain": "The first day-night Test was in Adelaide in 2015.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-d98259",
+   "kind": "mc",
+   "prompt": "How many days can a Test match last?",
+   "answer": "Five",
+   "wrong": [
+    "Three",
+    "Four",
+    "Seven"
+   ],
+   "explain": "Some early Tests were 'timeless', played until finished.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e477c9",
+   "kind": "mc",
+   "prompt": "In which country did the 2018 'Sandpapergate' ball-tampering scandal involving Australia happen?",
+   "answer": "South Africa",
+   "wrong": [
+    "England",
+    "India",
+    "New Zealand"
+   ],
+   "explain": "It happened during the Cape Town Test.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-b02dae",
+   "kind": "mc",
+   "prompt": "England's 'Bodyline' tactics in 1932–33 were designed to stop which batter?",
+   "answer": "Don Bradman",
+   "wrong": [
+    "Bill Ponsford",
+    "Victor Trumper",
+    "Stan McCabe"
+   ],
+   "explain": "Bowlers aimed fast, short balls at the body.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-87dfaf",
+   "kind": "mc",
+   "prompt": "Which country won the first men's T20 World Cup, in 2007?",
+   "answer": "India",
+   "wrong": [
+    "Pakistan",
+    "Sri Lanka",
+    "Australia"
+   ],
+   "explain": "They beat Pakistan in the final in Johannesburg.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-d0a7f3",
+   "kind": "mc",
+   "prompt": "In cricket, what is a yorker?",
+   "answer": "A ball pitched at the batter's feet",
+   "wrong": [
+    "A ball that bounces twice",
+    "A slow, looping ball",
+    "A ball that hits the batter's helmet"
+   ],
+   "explain": "It is very hard to hit and often bowls batters out.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-e2a316",
+   "kind": "mc",
+   "prompt": "Which Pakistani fast bowler was nicknamed 'the Sultan of Swing'?",
+   "answer": "Wasim Akram",
+   "wrong": [
+    "Waqar Younis",
+    "Shoaib Akhtar",
+    "Imran Khan"
+   ],
+   "explain": "He was the first bowler to take 500 ODI wickets.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-656aa0",
+   "kind": "mc",
+   "prompt": "What is the name of the urn that England and Australia play for in Test cricket?",
+   "answer": "The Ashes",
+   "wrong": [
+    "The Wisden Trophy",
+    "The Border-Gavaskar Trophy",
+    "The Basin Reserve"
+   ],
+   "explain": "It began with a mock obituary of English cricket in 1882.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-42517b",
+   "kind": "mc",
+   "prompt": "Which trophy do Australia and India contest in Test series?",
+   "answer": "Border-Gavaskar Trophy",
+   "wrong": [
+    "The Ashes",
+    "Chappell-Hadlee Trophy",
+    "Frank Worrell Trophy"
+   ],
+   "explain": "It is named after Allan Border and Sunil Gavaskar.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-166d3c",
+   "kind": "mc",
+   "prompt": "In cricket, which fielding position stands right behind the stumps?",
+   "answer": "Wicketkeeper",
+   "wrong": [
+    "Slip",
+    "Gully",
+    "Silly point"
+   ],
+   "explain": "The slips stand beside the wicketkeeper.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-d6d5a7",
+   "kind": "mc",
+   "prompt": "Which country's rugby union team is called the All Blacks?",
+   "answer": "New Zealand",
+   "wrong": [
+    "Australia",
+    "South Africa",
+    "Fiji"
+   ],
+   "explain": "They are famous for their black kit and the haka.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-06f653",
+   "kind": "mc",
+   "prompt": "Which country's rugby union team is called the Springboks?",
+   "answer": "South Africa",
+   "wrong": [
+    "Australia",
+    "Argentina",
+    "Namibia"
+   ],
+   "explain": "A springbok is a kind of antelope.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ec1176",
+   "kind": "mc",
+   "prompt": "Which country's rugby union team is called the Wallabies?",
+   "answer": "Australia",
+   "wrong": [
+    "New Zealand",
+    "Fiji",
+    "Samoa"
+   ],
+   "explain": "The Australian women's team is the Wallaroos.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-770725",
+   "kind": "mc",
+   "prompt": "What is the name of the Māori challenge the All Blacks perform before matches?",
+   "answer": "The haka",
+   "wrong": [
+    "The siva tau",
+    "The sipi tau",
+    "The cibi"
+   ],
+   "explain": "Samoa perform the siva tau and Tonga the sipi tau.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-633565",
+   "kind": "mc",
+   "prompt": "What is the touring rugby side picked from England, Scotland, Wales and Ireland called?",
+   "answer": "The British & Irish Lions",
+   "wrong": [
+    "The Barbarians",
+    "The Home Nations XV",
+    "The Four Nations"
+   ],
+   "explain": "The Lions tour every four years.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-b6c074",
+   "kind": "mc",
+   "prompt": "Which trophy do England and Scotland play for in rugby union?",
+   "answer": "The Calcutta Cup",
+   "wrong": [
+    "The Triple Crown",
+    "The Bledisloe Cup",
+    "The Webb Ellis Cup"
+   ],
+   "explain": "It was made from melted-down silver rupees in 1878.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-6e8fa7",
+   "kind": "mc",
+   "prompt": "Which rugby trophy do Australia and New Zealand play for?",
+   "answer": "The Bledisloe Cup",
+   "wrong": [
+    "The Calcutta Cup",
+    "The Freedom Cup",
+    "The Tri-Nations Shield"
+   ],
+   "explain": "It was first contested in the early 1930s.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-f115b7",
+   "kind": "mc",
+   "prompt": "What does the team finishing last in the Six Nations 'win'?",
+   "answer": "The wooden spoon",
+   "wrong": [
+    "The holey bucket",
+    "The tin cup",
+    "The paper plate"
+   ],
+   "explain": "The idea of a 'wooden spoon' for last place comes from Cambridge University.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-f0af19",
+   "kind": "mc",
+   "prompt": "In the Six Nations, which prize goes to a home nation that beats the other three?",
+   "answer": "The Triple Crown",
+   "wrong": [
+    "The Grand Slam",
+    "The Calcutta Cup",
+    "The Webb Ellis Cup"
+   ],
+   "explain": "England, Ireland, Scotland and Wales compete for it; a Grand Slam means beating all five rivals.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-a656b1",
+   "kind": "mc",
+   "prompt": "Which country won the first Rugby World Cup, in 1987?",
+   "answer": "New Zealand",
+   "wrong": [
+    "Australia",
+    "France",
+    "South Africa"
+   ],
+   "explain": "They beat France in the final in Auckland.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-8d2b30",
+   "kind": "mc",
+   "prompt": "Which country won the 1995 Rugby World Cup at home, with Nelson Mandela presenting the trophy?",
+   "answer": "South Africa",
+   "wrong": [
+    "New Zealand",
+    "Australia",
+    "England"
+   ],
+   "explain": "The story is told in the film 'Invictus'.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-4a1e57",
+   "kind": "mc",
+   "prompt": "Who kicked the drop goal that won England the 2003 Rugby World Cup final?",
+   "answer": "Jonny Wilkinson",
+   "wrong": [
+    "Martin Johnson",
+    "Jason Robinson",
+    "Mike Catt"
+   ],
+   "explain": "It came in the last minute of extra time against Australia.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-733f03",
+   "kind": "mc",
+   "prompt": "In which country was the 2003 Rugby World Cup played?",
+   "answer": "Australia",
+   "wrong": [
+    "England",
+    "New Zealand",
+    "France"
+   ],
+   "explain": "The final was in Sydney.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-2e0c0c",
+   "kind": "mc",
+   "prompt": "How many points is a conversion worth in rugby union?",
+   "answer": "2",
+   "wrong": [
+    "1",
+    "3",
+    "5"
+   ],
+   "explain": "It is kicked after a try, in line with where the ball was grounded.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-a556c2",
+   "kind": "mc",
+   "prompt": "How many points is a penalty goal worth in rugby union?",
+   "answer": "3",
+   "wrong": [
+    "2",
+    "1",
+    "5"
+   ],
+   "explain": "A drop goal is also worth three points.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-fa7993",
+   "kind": "mc",
+   "prompt": "How many points is a try worth in rugby league?",
+   "answer": "4",
+   "wrong": [
+    "5",
+    "3",
+    "6"
+   ],
+   "explain": "In rugby union a try is worth five.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-9509b2",
+   "kind": "mc",
+   "prompt": "Which annual rugby league series pits Queensland against New South Wales?",
+   "answer": "State of Origin",
+   "wrong": [
+    "The Ashes",
+    "The Bledisloe Cup",
+    "The Super League"
+   ],
+   "explain": "Players line up for the state where they first played senior football.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-4177ef",
+   "kind": "mc",
+   "prompt": "What colour does Queensland wear in rugby league's State of Origin?",
+   "answer": "Maroon",
+   "wrong": [
+    "Sky blue",
+    "Green",
+    "Gold"
+   ],
+   "explain": "New South Wales are the Blues.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-02dede",
+   "kind": "mc",
+   "prompt": "At which stadium does England's rugby union team usually play home matches?",
+   "answer": "Twickenham",
+   "wrong": [
+    "Wembley",
+    "Murrayfield",
+    "Lansdowne Road"
+   ],
+   "explain": "Murrayfield is Scotland's home.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e1de08",
+   "kind": "mc",
+   "prompt": "Which country joined rugby's Five Nations in 2000 to make it the Six Nations?",
+   "answer": "Italy",
+   "wrong": [
+    "Georgia",
+    "Spain",
+    "Argentina"
+   ],
+   "explain": "Italy beat Scotland in their first match.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-184974",
+   "kind": "mc",
+   "prompt": "Which country's rugby union team is nicknamed 'the Pumas'?",
+   "answer": "Argentina",
+   "wrong": [
+    "Chile",
+    "Uruguay",
+    "Spain"
+   ],
+   "explain": "Argentina came third at the 2007 Rugby World Cup.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-485850",
+   "kind": "mc",
+   "prompt": "Which country's rugby team is nicknamed 'the Brave Blossoms'?",
+   "answer": "Japan",
+   "wrong": [
+    "South Korea",
+    "Fiji",
+    "Georgia"
+   ],
+   "explain": "The blossom is the cherry blossom on their shirts.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-5a60d4",
+   "kind": "mc",
+   "prompt": "Which team did Japan beat in the 'Brighton Miracle' at the 2015 Rugby World Cup?",
+   "answer": "South Africa",
+   "wrong": [
+    "New Zealand",
+    "Scotland",
+    "Ireland"
+   ],
+   "explain": "Japan won 34–32 with a try in the last minute.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-09535d",
+   "kind": "mc",
+   "prompt": "What is the Rugby World Cup trophy called?",
+   "answer": "The Webb Ellis Cup",
+   "wrong": [
+    "The Calcutta Cup",
+    "The Bledisloe Cup",
+    "The William Webb Shield"
+   ],
+   "explain": "It is named after the schoolboy said to have first run with the ball.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-97ca89",
+   "kind": "mc",
+   "prompt": "Which country won the Rugby World Cup in both 2007 and 2019?",
+   "answer": "South Africa",
+   "wrong": [
+    "New Zealand",
+    "England",
+    "Australia"
+   ],
+   "explain": "They also won in 1995 and 2023.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-083ca0",
+   "kind": "mc",
+   "prompt": "In rugby, what is the restart called when the ball goes over the touchline?",
+   "answer": "A line-out",
+   "wrong": [
+    "A scrum",
+    "A ruck",
+    "A maul"
+   ],
+   "explain": "Forwards line up and are lifted to catch the throw.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-fb0b99",
+   "kind": "mc",
+   "prompt": "Which rugby league competition's grand final is a highlight of the Australian sporting year?",
+   "answer": "NRL",
+   "wrong": [
+    "Super League",
+    "AFL",
+    "Super Rugby"
+   ],
+   "explain": "The National Rugby League grand final is usually held in Sydney.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-53f7fa",
+   "kind": "mc",
+   "prompt": "Which All Blacks captain lifted the Rugby World Cup in 2011 and 2015?",
+   "answer": "Richie McCaw",
+   "wrong": [
+    "Sean Fitzpatrick",
+    "Dan Carter",
+    "Kieran Read"
+   ],
+   "explain": "He played 148 Tests for New Zealand.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-8fa77c",
+   "kind": "mc",
+   "prompt": "Which Grand Slam tennis tournament is played at Roland Garros?",
+   "answer": "French Open",
+   "wrong": [
+    "US Open",
+    "Australian Open",
+    "Wimbledon"
+   ],
+   "explain": "Roland Garros was a French pilot.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ec0882",
+   "kind": "mc",
+   "prompt": "Which Grand Slam tennis tournament is played at Flushing Meadows?",
+   "answer": "US Open",
+   "wrong": [
+    "French Open",
+    "Australian Open",
+    "Wimbledon"
+   ],
+   "explain": "Flushing Meadows is in Queens, New York City.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-f4693c",
+   "kind": "mc",
+   "prompt": "In which city is the Australian Open played?",
+   "answer": "Melbourne",
+   "wrong": [
+    "Sydney",
+    "Brisbane",
+    "Adelaide"
+   ],
+   "explain": "It has been played at Melbourne Park since 1988.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-710ebd",
+   "kind": "mc",
+   "prompt": "In tennis, what is winning all four majors in one calendar year called?",
+   "answer": "A Grand Slam",
+   "wrong": [
+    "A Golden Set",
+    "A Triple Crown",
+    "A Clean Sweep"
+   ],
+   "explain": "Adding Olympic gold makes a Golden Slam.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-7a2bcf",
+   "kind": "mc",
+   "prompt": "Which Australian was the last man to win all four tennis majors in one year, in 1969?",
+   "answer": "Rod Laver",
+   "wrong": [
+    "Ken Rosewall",
+    "Roy Emerson",
+    "John Newcombe"
+   ],
+   "explain": "He had also done it in 1962, as an amateur.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-fb3a57",
+   "kind": "mc",
+   "prompt": "Which German player won the 'Golden Slam' of all four majors and Olympic gold in 1988?",
+   "answer": "Steffi Graf",
+   "wrong": [
+    "Monica Seles",
+    "Martina Navratilova",
+    "Gabriela Sabatini"
+   ],
+   "explain": "No other player has done it in a single year.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-records-2baa69",
+   "kind": "mc",
+   "prompt": "Who won a record nine Wimbledon singles titles?",
+   "answer": "Martina Navratilova",
+   "wrong": [
+    "Serena Williams",
+    "Steffi Graf",
+    "Roger Federer"
+   ],
+   "explain": "Her last singles title there came in 1990.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-399859",
+   "kind": "mc",
+   "prompt": "How many Wimbledon men's singles titles did Roger Federer win?",
+   "answer": "8",
+   "wrong": [
+    "7",
+    "6",
+    "9"
+   ],
+   "explain": "That is the men's record.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-athletes-dd463f",
+   "kind": "mc",
+   "prompt": "Which Japanese player won four Grand Slam singles titles and lit the cauldron at the Tokyo Olympics?",
+   "answer": "Naomi Osaka",
+   "wrong": [
+    "Kei Nishikori",
+    "Kimiko Date",
+    "Ai Sugiyama"
+   ],
+   "explain": "She won two US Opens and two Australian Opens.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-fc088c",
+   "kind": "mc",
+   "prompt": "Which Chinese player became Asia's first Grand Slam singles champion, at the 2011 French Open?",
+   "answer": "Li Na",
+   "wrong": [
+    "Peng Shuai",
+    "Zheng Qinwen",
+    "Zheng Jie"
+   ],
+   "explain": "She also won the 2014 Australian Open.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-f38519",
+   "kind": "mc",
+   "prompt": "Which Australian won Wimbledon in 2021 and retired as world number one in 2022?",
+   "answer": "Ashleigh Barty",
+   "wrong": [
+    "Samantha Stosur",
+    "Daria Kasatkina",
+    "Ajla Tomljanović"
+   ],
+   "explain": "She had also played professional cricket in the Big Bash.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-204e38",
+   "kind": "mc",
+   "prompt": "Which Aboriginal Australian player won seven Grand Slam singles titles?",
+   "answer": "Evonne Goolagong Cawley",
+   "wrong": [
+    "Margaret Court",
+    "Cathy Freeman",
+    "Ash Barty"
+   ],
+   "explain": "She won Wimbledon in 1971 and 1980.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-b69263",
+   "kind": "mc",
+   "prompt": "Which Scot became the first British man to win Wimbledon singles in 77 years, in 2013?",
+   "answer": "Andy Murray",
+   "wrong": [
+    "Tim Henman",
+    "Greg Rusedski",
+    "Cameron Norrie"
+   ],
+   "explain": "Fred Perry had won in 1936.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-f40ea1",
+   "kind": "mc",
+   "prompt": "Who was the first Black man to win the Wimbledon singles title, in 1975?",
+   "answer": "Arthur Ashe",
+   "wrong": [
+    "Yannick Noah",
+    "James Blake",
+    "MaliVai Washington"
+   ],
+   "explain": "The main US Open stadium is named after him.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-ec882a",
+   "kind": "mc",
+   "prompt": "What colour must players mainly wear at Wimbledon?",
+   "answer": "White",
+   "wrong": [
+    "Green",
+    "Purple",
+    "Any colour"
+   ],
+   "explain": "The all-white rule dates back to the 1800s.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-690ac7",
+   "kind": "mc",
+   "prompt": "Which fruit is traditionally eaten with cream at Wimbledon?",
+   "answer": "Strawberries",
+   "wrong": [
+    "Raspberries",
+    "Cherries",
+    "Peaches"
+   ],
+   "explain": "Fans eat around two million strawberries each year.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-bf2c12",
+   "kind": "mc",
+   "prompt": "Which team competition for men's national tennis sides began in 1900?",
+   "answer": "Davis Cup",
+   "wrong": [
+    "Hopman Cup",
+    "Laver Cup",
+    "Fed Cup"
+   ],
+   "explain": "The women's equivalent is now the Billie Jean King Cup.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-67d06f",
+   "kind": "mc",
+   "prompt": "Which Swede won five Wimbledon singles titles in a row, from 1976 to 1980?",
+   "answer": "Björn Borg",
+   "wrong": [
+    "Stefan Edberg",
+    "Mats Wilander",
+    "John McEnroe"
+   ],
+   "explain": "John McEnroe ended the run in 1981.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-8cdfb4",
+   "kind": "mc",
+   "prompt": "How many sets must a man win to take a Grand Slam singles match?",
+   "answer": "3",
+   "wrong": [
+    "2",
+    "4",
+    "5"
+   ],
+   "explain": "Men play best of five sets at the majors; women play best of three.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-85aaba",
+   "kind": "mc",
+   "prompt": "Which Australian woman won a record 24 Grand Slam singles titles?",
+   "answer": "Margaret Court",
+   "wrong": [
+    "Evonne Goolagong Cawley",
+    "Ashleigh Barty",
+    "Samantha Stosur"
+   ],
+   "explain": "A show court at Melbourne Park is named after her.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-7d601a",
+   "kind": "mc",
+   "prompt": "Which golf major is played every year at Augusta National?",
+   "answer": "The Masters",
+   "wrong": [
+    "The Open",
+    "US Open",
+    "PGA Championship"
+   ],
+   "explain": "It is held in Georgia each April.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-99776e",
+   "kind": "mc",
+   "prompt": "Which is the oldest of golf's majors, first played in 1860?",
+   "answer": "The Open Championship",
+   "wrong": [
+    "The Masters",
+    "US Open",
+    "PGA Championship"
+   ],
+   "explain": "It is often called the British Open outside the UK.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-d477d2",
+   "kind": "mc",
+   "prompt": "What do golfers call finishing a hole in three shots under par?",
+   "answer": "An albatross",
+   "wrong": [
+    "An eagle",
+    "A condor",
+    "A birdie"
+   ],
+   "explain": "Americans often call it a double eagle.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-7b3d48",
+   "kind": "mc",
+   "prompt": "What is the most clubs a golfer may carry in a round?",
+   "answer": "14",
+   "wrong": [
+    "10",
+    "12",
+    "18"
+   ],
+   "explain": "The 14-club limit was introduced in the 1930s.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-157183",
+   "kind": "mc",
+   "prompt": "In golf, what is the closely mown area around the hole called?",
+   "answer": "The green",
+   "wrong": [
+    "The fairway",
+    "The rough",
+    "The tee"
+   ],
+   "explain": "Players usually putt on the green.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-01009d",
+   "kind": "mc",
+   "prompt": "Which South African golfer is nicknamed 'the Black Knight'?",
+   "answer": "Gary Player",
+   "wrong": [
+    "Ernie Els",
+    "Retief Goosen",
+    "Bobby Locke"
+   ],
+   "explain": "He won nine majors.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-88af6c",
+   "kind": "mc",
+   "prompt": "Which Spanish golfer won five majors and inspired Europe's Ryder Cup teams?",
+   "answer": "Seve Ballesteros",
+   "wrong": [
+    "José María Olazábal",
+    "Sergio García",
+    "Jon Rahm"
+   ],
+   "explain": "He won The Open three times.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-acc39a",
+   "kind": "mc",
+   "prompt": "Which Australian golfer was nicknamed 'the Great White Shark'?",
+   "answer": "Greg Norman",
+   "wrong": [
+    "Adam Scott",
+    "Jason Day",
+    "Cameron Smith"
+   ],
+   "explain": "He was world number one for 331 weeks.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-b18042",
+   "kind": "mc",
+   "prompt": "Who won the 1997 Masters by 12 shots, aged 21?",
+   "answer": "Tiger Woods",
+   "wrong": [
+    "Phil Mickelson",
+    "Ernie Els",
+    "Vijay Singh"
+   ],
+   "explain": "He was the youngest Masters champion.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-2c517a",
+   "kind": "mc",
+   "prompt": "Which Northern Irish golfer won the 2011 US Open by eight shots?",
+   "answer": "Rory McIlroy",
+   "wrong": [
+    "Graeme McDowell",
+    "Darren Clarke",
+    "Padraig Harrington"
+   ],
+   "explain": "He was 22 at the time.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-dc9aff",
+   "kind": "mc",
+   "prompt": "What do golfers shout to warn people that a ball is heading their way?",
+   "answer": "Fore!",
+   "wrong": [
+    "Duck!",
+    "Heads!",
+    "Tee!"
+   ],
+   "explain": "It may come from 'forecaddie', a caddie sent ahead.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-c46b8d",
+   "kind": "mc",
+   "prompt": "What is a golf bunker filled with?",
+   "answer": "Sand",
+   "wrong": [
+    "Water",
+    "Gravel",
+    "Long grass"
+   ],
+   "explain": "In the US it is often called a sand trap.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-bd43c1",
+   "kind": "mc",
+   "prompt": "Who became the first Australian to win the Masters, in 2013?",
+   "answer": "Adam Scott",
+   "wrong": [
+    "Greg Norman",
+    "Jason Day",
+    "Cameron Smith"
+   ],
+   "explain": "He won in a play-off against Ángel Cabrera.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-92dca1",
+   "kind": "mc",
+   "prompt": "Which Fijian golfer won three majors and was world number one in 2004?",
+   "answer": "Vijay Singh",
+   "wrong": [
+    "Jeev Milkha Singh",
+    "K. J. Choi",
+    "Retief Goosen"
+   ],
+   "explain": "He won the Masters in 2000.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-6835ee",
+   "kind": "mc",
+   "prompt": "Which South Korean golfer became the first Asian man to win a major, in 2009?",
+   "answer": "Yang Yong-eun",
+   "wrong": [
+    "K. J. Choi",
+    "Hideki Matsuyama",
+    "Tom Kim"
+   ],
+   "explain": "He beat Tiger Woods at the PGA Championship.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-dd170c",
+   "kind": "mc",
+   "prompt": "Which Formula One team is based in Maranello, Italy?",
+   "answer": "Ferrari",
+   "wrong": [
+    "McLaren",
+    "Williams",
+    "Red Bull"
+   ],
+   "explain": "Ferrari is the oldest team still racing in F1.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-records-775690",
+   "kind": "mc",
+   "prompt": "How many Formula One world titles did Michael Schumacher win?",
+   "answer": "7",
+   "wrong": [
+    "5",
+    "6",
+    "8"
+   ],
+   "explain": "He won two with Benetton and five in a row with Ferrari.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-athletes-6a7d83",
+   "kind": "mc",
+   "prompt": "Which Brazilian F1 champion was killed in a crash at Imola in 1994?",
+   "answer": "Ayrton Senna",
+   "wrong": [
+    "Nelson Piquet",
+    "Emerson Fittipaldi",
+    "Rubens Barrichello"
+   ],
+   "explain": "He won three world titles.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-a4e1b5",
+   "kind": "mc",
+   "prompt": "Which Australian won the Formula One world championship in 1980?",
+   "answer": "Alan Jones",
+   "wrong": [
+    "Jack Brabham",
+    "Mark Webber",
+    "Daniel Ricciardo"
+   ],
+   "explain": "He drove for Williams.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-5f1652",
+   "kind": "mc",
+   "prompt": "Which Australian won the 1966 F1 world title in a car of his own make?",
+   "answer": "Jack Brabham",
+   "wrong": [
+    "Alan Jones",
+    "Mark Webber",
+    "Denny Hulme"
+   ],
+   "explain": "It was his third world title.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-5a0a85",
+   "kind": "mc",
+   "prompt": "Which Argentine won five Formula One world titles in the 1950s?",
+   "answer": "Juan Manuel Fangio",
+   "wrong": [
+    "Carlos Reutemann",
+    "José Froilán González",
+    "Ayrton Senna"
+   ],
+   "explain": "His record of five titles stood for 46 years.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-1882b6",
+   "kind": "mc",
+   "prompt": "Which Formula One race is run on the streets of a tiny principality on the French Riviera?",
+   "answer": "Monaco Grand Prix",
+   "wrong": [
+    "French Grand Prix",
+    "Italian Grand Prix",
+    "Belgian Grand Prix"
+   ],
+   "explain": "Its tight corners make overtaking very hard.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-23bf68",
+   "kind": "mc",
+   "prompt": "In which city is the Australian Formula One Grand Prix held?",
+   "answer": "Melbourne",
+   "wrong": [
+    "Adelaide",
+    "Sydney",
+    "Gold Coast"
+   ],
+   "explain": "It moved there from Adelaide in 1996.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-679c70",
+   "kind": "mc",
+   "prompt": "Which famous Australian touring-car endurance race is held at Mount Panorama?",
+   "answer": "Bathurst 1000",
+   "wrong": [
+    "Adelaide 500",
+    "Gold Coast 600",
+    "Phillip Island 500"
+   ],
+   "explain": "The track is a public road for most of the year.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-e787f1",
+   "kind": "mc",
+   "prompt": "Which Dutch driver won his first Formula One world title in 2021?",
+   "answer": "Max Verstappen",
+   "wrong": [
+    "Charles Leclerc",
+    "Lando Norris",
+    "Nyck de Vries"
+   ],
+   "explain": "He won it on the final lap of the final race in Abu Dhabi.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-7be4dc",
+   "kind": "mc",
+   "prompt": "Which British driver won the 2009 Formula One title with the Brawn team?",
+   "answer": "Jenson Button",
+   "wrong": [
+    "Lewis Hamilton",
+    "David Coulthard",
+    "Nigel Mansell"
+   ],
+   "explain": "Brawn GP raced for only one season and won both titles.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-records-953281",
+   "kind": "mc",
+   "prompt": "As of 2024, which driver had won the most Formula One races?",
+   "answer": "Lewis Hamilton",
+   "wrong": [
+    "Michael Schumacher",
+    "Max Verstappen",
+    "Sebastian Vettel"
+   ],
+   "explain": "Hamilton had 105 Grand Prix wins by the end of 2024.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-athletes-d3efe1",
+   "kind": "mc",
+   "prompt": "Which Italian motorbike racer, nicknamed 'The Doctor', won nine world titles?",
+   "answer": "Valentino Rossi",
+   "wrong": [
+    "Giacomo Agostini",
+    "Marco Simoncelli",
+    "Max Biaggi"
+   ],
+   "explain": "Seven of his titles came in the top class.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-944706",
+   "kind": "mc",
+   "prompt": "In motor racing, what does a waved yellow flag mean?",
+   "answer": "Danger ahead: slow down, no overtaking",
+   "wrong": [
+    "The race is over",
+    "Return to the pits",
+    "One lap to go"
+   ],
+   "explain": "A white flag in many series means a slow vehicle on track.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-124b80",
+   "kind": "mc",
+   "prompt": "As of 2024, how many points did a Formula One race win earn the driver?",
+   "answer": "25",
+   "wrong": [
+    "10",
+    "20",
+    "30"
+   ],
+   "explain": "The 25-point system began in 2010.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-olympics-2afef2",
+   "kind": "mc",
+   "prompt": "What are the five colours of the Olympic rings?",
+   "answer": "Blue, yellow, black, green and red",
+   "wrong": [
+    "Blue, yellow, white, green and red",
+    "Red, orange, yellow, green and blue",
+    "Blue, gold, black, green and red"
+   ],
+   "explain": "With the white background, they cover every national flag of 1913.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-cc18b9",
+   "kind": "mc",
+   "prompt": "Which Australian lit the cauldron at Sydney 2000 and then won the 400 m?",
+   "answer": "Cathy Freeman",
+   "wrong": [
+    "Sally Pearson",
+    "Raelene Boyle",
+    "Betty Cuthbert"
+   ],
+   "explain": "She ran her lap of honour carrying the Aboriginal and Australian flags.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-f24c4b",
+   "kind": "mc",
+   "prompt": "Which Australian swimmer won three gold medals at the Sydney 2000 Olympics, aged 17?",
+   "answer": "Ian Thorpe",
+   "wrong": [
+    "Grant Hackett",
+    "Kieren Perkins",
+    "Michael Klim"
+   ],
+   "explain": "He was nicknamed 'the Thorpedo' and won five Olympic golds in all.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-a0bebc",
+   "kind": "mc",
+   "prompt": "Which Australian swimmer won the 100 m freestyle at three Olympics in a row, 1956 to 1964?",
+   "answer": "Dawn Fraser",
+   "wrong": [
+    "Shane Gould",
+    "Susie O'Neill",
+    "Libby Trickett"
+   ],
+   "explain": "She was the first woman to swim 100 m in under a minute.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-201fce",
+   "kind": "mc",
+   "prompt": "Which British rower won gold medals at five Olympics in a row?",
+   "answer": "Steve Redgrave",
+   "wrong": [
+    "Matthew Pinsent",
+    "Chris Hoy",
+    "Bradley Wiggins"
+   ],
+   "explain": "His golds came from 1984 to 2000.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-c64e35",
+   "kind": "mc",
+   "prompt": "Which New Zealander won the 800 m and 1500 m at the 1964 Olympics?",
+   "answer": "Peter Snell",
+   "wrong": [
+    "John Walker",
+    "Jack Lovelock",
+    "Murray Halberg"
+   ],
+   "explain": "He had also won the 800 m in 1960.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-d668b2",
+   "kind": "mc",
+   "prompt": "Which Czech runner won the 5,000 m, 10,000 m and marathon at the 1952 Olympics?",
+   "answer": "Emil Zátopek",
+   "wrong": [
+    "Paavo Nurmi",
+    "Lasse Virén",
+    "Abebe Bikila"
+   ],
+   "explain": "It was his first ever marathon.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-facf7d",
+   "kind": "mc",
+   "prompt": "Which country's 1992 Olympic men's basketball team was called the 'Dream Team'?",
+   "answer": "United States",
+   "wrong": [
+    "Spain",
+    "Soviet Union",
+    "Lithuania"
+   ],
+   "explain": "It included Michael Jordan, Magic Johnson and Larry Bird.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-a3fdd2",
+   "kind": "mc",
+   "prompt": "Which Winter Olympic sport did Jamaica enter in 1988, inspiring the film 'Cool Runnings'?",
+   "answer": "Bobsleigh",
+   "wrong": [
+    "Luge",
+    "Ski jumping",
+    "Curling"
+   ],
+   "explain": "The team crashed in their final run and walked the sled over the line.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-d603db",
+   "kind": "mc",
+   "prompt": "In which sport did Britain's 'Eddie the Eagle' compete at the 1988 Winter Olympics?",
+   "answer": "Ski jumping",
+   "wrong": [
+    "Bobsleigh",
+    "Speed skating",
+    "Downhill skiing"
+   ],
+   "explain": "He finished last but became a folk hero.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-bd2fda",
+   "kind": "mc",
+   "prompt": "Which Australian speed skater won gold in 2002 when all his rivals crashed?",
+   "answer": "Steven Bradbury",
+   "wrong": [
+    "Torah Bright",
+    "Lydia Lassila",
+    "Dale Begg-Smith"
+   ],
+   "explain": "It was the Southern Hemisphere's first Winter Olympic gold.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-3a1ce3",
+   "kind": "mc",
+   "prompt": "At which Olympics did Tommie Smith and John Carlos raise gloved fists on the podium?",
+   "answer": "Mexico City 1968",
+   "wrong": [
+    "Rome 1960",
+    "Munich 1972",
+    "Tokyo 1964"
+   ],
+   "explain": "Australian silver medallist Peter Norman wore a protest badge in support.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-6cd06f",
+   "kind": "mc",
+   "prompt": "Which Olympics did the United States and many other countries boycott?",
+   "answer": "Moscow 1980",
+   "wrong": [
+    "Los Angeles 1984",
+    "Montreal 1976",
+    "Seoul 1988"
+   ],
+   "explain": "The Soviet bloc boycotted Los Angeles 1984 in return.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-9099a6",
+   "kind": "mc",
+   "prompt": "In which city were Israeli athletes taken hostage and killed during the 1972 Olympics?",
+   "answer": "Munich",
+   "wrong": [
+    "Mexico City",
+    "Montreal",
+    "Rome"
+   ],
+   "explain": "Eleven members of the Israeli team were killed.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-4ce451",
+   "kind": "mc",
+   "prompt": "Which winter sport combines cross-country skiing with rifle shooting?",
+   "answer": "Biathlon",
+   "wrong": [
+    "Nordic combined",
+    "Skeleton",
+    "Ski jumping"
+   ],
+   "explain": "Nordic combined mixes cross-country skiing with ski jumping.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-386003",
+   "kind": "mc",
+   "prompt": "Which Olympic sport combines fencing, swimming, riding and a run-and-shoot finale?",
+   "answer": "Modern pentathlon",
+   "wrong": [
+    "Triathlon",
+    "Decathlon",
+    "Heptathlon"
+   ],
+   "explain": "It was designed by Pierre de Coubertin.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-70a00c",
+   "kind": "mc",
+   "prompt": "In which athletics event would you see the 'Fosbury Flop'?",
+   "answer": "High jump",
+   "wrong": [
+    "Long jump",
+    "Pole vault",
+    "Triple jump"
+   ],
+   "explain": "Dick Fosbury won gold with it in 1968.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-b65ac5",
+   "kind": "mc",
+   "prompt": "As of 2024, which Norwegian cross-country skier had won the most Winter Olympic medals?",
+   "answer": "Marit Bjørgen",
+   "wrong": [
+    "Ole Einar Bjørndalen",
+    "Bjørn Dæhlie",
+    "Therese Johaug"
+   ],
+   "explain": "She won 15 medals, eight of them gold.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-cdf6ee",
+   "kind": "mc",
+   "prompt": "As of 2024, which country had won the most Winter Olympic medals overall?",
+   "answer": "Norway",
+   "wrong": [
+    "United States",
+    "Germany",
+    "Canada"
+   ],
+   "explain": "Norway has a population of only about 5.5 million.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-e7659f",
+   "kind": "mc",
+   "prompt": "As of 2024, which country had won the most Olympic gold medals in table tennis?",
+   "answer": "China",
+   "wrong": [
+    "Japan",
+    "South Korea",
+    "Sweden"
+   ],
+   "explain": "China has won the large majority of table tennis golds since 1988.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-8af2d0",
+   "kind": "mc",
+   "prompt": "What are Olympic gold medals mostly made of?",
+   "answer": "Silver",
+   "wrong": [
+    "Gold",
+    "Bronze",
+    "Copper"
+   ],
+   "explain": "They must contain at least 6 g of gold plating; the last solid gold medals were in 1912.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-a70191",
+   "kind": "mc",
+   "prompt": "Which Kenyan won the 800 m at London 2012 in a world record time?",
+   "answer": "David Rudisha",
+   "wrong": [
+    "Wilson Kipketer",
+    "Paul Tergat",
+    "Kipchoge Keino"
+   ],
+   "explain": "He ran 1:40.91, leading from the start.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-rules-634d8f",
+   "kind": "mc",
+   "prompt": "How many laps of a standard 400 m track make a 1,500 m race?",
+   "answer": "Three and three-quarters",
+   "wrong": [
+    "Three",
+    "Four",
+    "Three and a half"
+   ],
+   "explain": "The race starts 300 m from the finish line.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e9c5b2",
+   "kind": "mc",
+   "prompt": "Which running distance is nicknamed the 'metric mile'?",
+   "answer": "1,500 m",
+   "wrong": [
+    "1,000 m",
+    "1,600 m",
+    "2,000 m"
+   ],
+   "explain": "A mile is about 1,609 m.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-79c042",
+   "kind": "mc",
+   "prompt": "How long is the standard Olympic steeplechase?",
+   "answer": "3,000 m",
+   "wrong": [
+    "1,500 m",
+    "5,000 m",
+    "10,000 m"
+   ],
+   "explain": "Runners clear barriers and a water jump.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e92958",
+   "kind": "mc",
+   "prompt": "In which athletics event do athletes spin and release a heavy ball on a wire?",
+   "answer": "Hammer throw",
+   "wrong": [
+    "Shot put",
+    "Discus",
+    "Javelin"
+   ],
+   "explain": "The men's hammer weighs 7.26 kg, the same as the shot.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-fdb767",
+   "kind": "mc",
+   "prompt": "In which city did Eliud Kipchoge run a marathon in under two hours in 2019?",
+   "answer": "Vienna",
+   "wrong": [
+    "Berlin",
+    "London",
+    "Nairobi"
+   ],
+   "explain": "It was a special event with rotating pacers, so it is not an official record.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-93e31f",
+   "kind": "mc",
+   "prompt": "Which Ethiopian runner won the Olympic 10,000 m in 1996 and 2000?",
+   "answer": "Haile Gebrselassie",
+   "wrong": [
+    "Kenenisa Bekele",
+    "Abebe Bikila",
+    "Paul Tergat"
+   ],
+   "explain": "He set 27 world records.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-945732",
+   "kind": "mc",
+   "prompt": "What do relay runners pass to each other?",
+   "answer": "A baton",
+   "wrong": [
+    "A flag",
+    "A torch",
+    "A ball"
+   ],
+   "explain": "It must be passed inside a marked changeover zone.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-records-30cbd1",
+   "kind": "mc",
+   "prompt": "As of 2024, who held the men's pole vault world record?",
+   "answer": "Armand Duplantis",
+   "wrong": [
+    "Renaud Lavillenie",
+    "Sergey Bubka",
+    "Sam Kendricks"
+   ],
+   "explain": "The Swede has broken the record many times since 2020.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-athletes-207c8e",
+   "kind": "mc",
+   "prompt": "Which British athlete won heptathlon gold at the London 2012 Olympics?",
+   "answer": "Jessica Ennis",
+   "wrong": [
+    "Katarina Johnson-Thompson",
+    "Denise Lewis",
+    "Kelly Holmes"
+   ],
+   "explain": "Her gold came on 'Super Saturday'.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-b9b5f1",
+   "kind": "mc",
+   "prompt": "Which American won the 200 m and 400 m at the 1996 Olympics in golden shoes?",
+   "answer": "Michael Johnson",
+   "wrong": [
+    "Carl Lewis",
+    "Maurice Greene",
+    "Ato Boldon"
+   ],
+   "explain": "He was the first man to win both at one Games.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-records-fe7821",
+   "kind": "mc",
+   "prompt": "Which Moroccan has held the men's 1,500 m world record since 1998?",
+   "answer": "Hicham El Guerrouj",
+   "wrong": [
+    "Saïd Aouita",
+    "Noureddine Morceli",
+    "Bernard Lagat"
+   ],
+   "explain": "He ran 3:26.00 in Rome.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-rules-57b782",
+   "kind": "mc",
+   "prompt": "Over what distance do women race in the sprint hurdles?",
+   "answer": "100 m",
+   "wrong": [
+    "110 m",
+    "80 m",
+    "200 m"
+   ],
+   "explain": "Men race over 110 m.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-256173",
+   "kind": "mc",
+   "prompt": "Which Australian won the 100 m hurdles at the 2012 Olympics?",
+   "answer": "Sally Pearson",
+   "wrong": [
+    "Cathy Freeman",
+    "Jana Pittman",
+    "Melissa Breen"
+   ],
+   "explain": "She also won world titles in 2011 and 2017.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-4958e5",
+   "kind": "mc",
+   "prompt": "How many points is a free throw worth in basketball?",
+   "answer": "1",
+   "wrong": [
+    "2",
+    "3",
+    "0"
+   ],
+   "explain": "Free throws are taken from a line 15 feet from the backboard.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-0cba1c",
+   "kind": "mc",
+   "prompt": "With which NBA team did Michael Jordan win six championships?",
+   "answer": "Chicago Bulls",
+   "wrong": [
+    "Los Angeles Lakers",
+    "Boston Celtics",
+    "Washington Wizards"
+   ],
+   "explain": "He won two sets of three in a row in the 1990s.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-1b0a84",
+   "kind": "mc",
+   "prompt": "Which NBA star was killed in a helicopter crash in January 2020?",
+   "answer": "Kobe Bryant",
+   "wrong": [
+    "Shaquille O'Neal",
+    "Tim Duncan",
+    "Dwyane Wade"
+   ],
+   "explain": "He played his whole career for the Los Angeles Lakers.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-records-b08ec3",
+   "kind": "mc",
+   "prompt": "As of 2024, which team had won the most NBA championships?",
+   "answer": "Boston Celtics",
+   "wrong": [
+    "Los Angeles Lakers",
+    "Chicago Bulls",
+    "Golden State Warriors"
+   ],
+   "explain": "The Celtics won their 18th title in 2024, one more than the Lakers.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-athletes-c3e6ce",
+   "kind": "mc",
+   "prompt": "Which Chinese centre, 2.29 m tall, starred for the Houston Rockets?",
+   "answer": "Yao Ming",
+   "wrong": [
+    "Wang Zhizhi",
+    "Yi Jianlian",
+    "Zhou Qi"
+   ],
+   "explain": "He carried China's flag at the 2004 and 2008 Olympics.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-ff69cc",
+   "kind": "mc",
+   "prompt": "Which German forward led the Dallas Mavericks to the 2011 NBA title?",
+   "answer": "Dirk Nowitzki",
+   "wrong": [
+    "Dennis Schröder",
+    "Detlef Schrempf",
+    "Franz Wagner"
+   ],
+   "explain": "He spent all 21 of his NBA seasons in Dallas.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-f7f4dc",
+   "kind": "mc",
+   "prompt": "How many seconds does an NBA team have to shoot, on the shot clock?",
+   "answer": "24",
+   "wrong": [
+    "30",
+    "20",
+    "35"
+   ],
+   "explain": "The shot clock was introduced in 1954.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-712d40",
+   "kind": "mc",
+   "prompt": "Which touring basketball team is famous for its tricks and comedy?",
+   "answer": "Harlem Globetrotters",
+   "wrong": [
+    "New York Knicks",
+    "Brooklyn Nets",
+    "Washington Generals"
+   ],
+   "explain": "The Washington Generals were their usual opponents.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-records-c27218",
+   "kind": "mc",
+   "prompt": "Who scored 100 points in one NBA game, in 1962?",
+   "answer": "Wilt Chamberlain",
+   "wrong": [
+    "Kareem Abdul-Jabbar",
+    "Bill Russell",
+    "Elgin Baylor"
+   ],
+   "explain": "It is still the single-game record.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-ef234d",
+   "kind": "mc",
+   "prompt": "As of 2024, who had scored the most points in NBA history?",
+   "answer": "LeBron James",
+   "wrong": [
+    "Kareem Abdul-Jabbar",
+    "Michael Jordan",
+    "Karl Malone"
+   ],
+   "explain": "He passed Kareem Abdul-Jabbar in February 2023.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-rules-634d21",
+   "kind": "mc",
+   "prompt": "What is the NBA championship trophy called?",
+   "answer": "Larry O'Brien Trophy",
+   "wrong": [
+    "Vince Lombardi Trophy",
+    "Naismith Trophy",
+    "Commissioner's Trophy"
+   ],
+   "explain": "The Lombardi Trophy is the NFL's.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-87cdbe",
+   "kind": "mc",
+   "prompt": "Basketball's inventor, James Naismith, was born in which country?",
+   "answer": "Canada",
+   "wrong": [
+    "United States",
+    "Scotland",
+    "England"
+   ],
+   "explain": "He invented the game in Springfield, Massachusetts.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-29bc6f",
+   "kind": "mc",
+   "prompt": "In basketball, what is a 'triple-double'?",
+   "answer": "Ten or more in three stat categories in one game",
+   "wrong": [
+    "Three slam dunks in a row",
+    "Three three-pointers in a row",
+    "Winning three games by double figures"
+   ],
+   "explain": "Points, rebounds and assists are the usual three.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-4c8a4f",
+   "kind": "mc",
+   "prompt": "What is Major League Baseball's championship called?",
+   "answer": "The World Series",
+   "wrong": [
+    "The Super Bowl",
+    "The Stanley Cup",
+    "The Pennant"
+   ],
+   "explain": "It has been played since 1903.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-9d60db",
+   "kind": "mc",
+   "prompt": "Which team won the 2016 World Series, ending a 108-year wait?",
+   "answer": "Chicago Cubs",
+   "wrong": [
+    "Boston Red Sox",
+    "Cleveland Indians",
+    "New York Mets"
+   ],
+   "explain": "They had last won in 1908.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ec4f77",
+   "kind": "mc",
+   "prompt": "In baseball, what is it called when the batter hits the ball out of the park in fair territory?",
+   "answer": "A home run",
+   "wrong": [
+    "A strike",
+    "A double play",
+    "A foul"
+   ],
+   "explain": "Babe Ruth hit 714 of them.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-9d0c6d",
+   "kind": "mc",
+   "prompt": "Who broke Major League Baseball's colour line in 1947?",
+   "answer": "Jackie Robinson",
+   "wrong": [
+    "Willie Mays",
+    "Hank Aaron",
+    "Satchel Paige"
+   ],
+   "explain": "His number, 42, is retired by every MLB team.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-0fd4f3",
+   "kind": "mc",
+   "prompt": "Which baseball player was nicknamed 'the Sultan of Swat'?",
+   "answer": "Babe Ruth",
+   "wrong": [
+    "Lou Gehrig",
+    "Joe DiMaggio",
+    "Ty Cobb"
+   ],
+   "explain": "He played most famously for the New York Yankees.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-46e8d2",
+   "kind": "mc",
+   "prompt": "Which Japanese star is famous in Major League Baseball for both pitching and hitting?",
+   "answer": "Shohei Ohtani",
+   "wrong": [
+    "Ichiro Suzuki",
+    "Hideki Matsui",
+    "Yu Darvish"
+   ],
+   "explain": "He joined the Los Angeles Angels in 2018.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-00f436",
+   "kind": "mc",
+   "prompt": "Which Boston ballpark has a famous high left-field wall called the 'Green Monster'?",
+   "answer": "Fenway Park",
+   "wrong": [
+    "Wrigley Field",
+    "Yankee Stadium",
+    "Dodger Stadium"
+   ],
+   "explain": "Fenway opened in 1912.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-af737e",
+   "kind": "mc",
+   "prompt": "Which country has won the World Baseball Classic most often, as of 2024?",
+   "answer": "Japan",
+   "wrong": [
+    "United States",
+    "Dominican Republic",
+    "Cuba"
+   ],
+   "explain": "Japan won in 2006, 2009 and 2023.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-38f9e1",
+   "kind": "mc",
+   "prompt": "Which quarterback won seven Super Bowls?",
+   "answer": "Tom Brady",
+   "wrong": [
+    "Peyton Manning",
+    "Joe Montana",
+    "Patrick Mahomes"
+   ],
+   "explain": "Six came with New England and one with Tampa Bay.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-d8e224",
+   "kind": "mc",
+   "prompt": "How many points is a field goal worth in American football?",
+   "answer": "3",
+   "wrong": [
+    "2",
+    "1",
+    "6"
+   ],
+   "explain": "A touchdown is worth six.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e8c2df",
+   "kind": "mc",
+   "prompt": "What is the Super Bowl trophy called?",
+   "answer": "Vince Lombardi Trophy",
+   "wrong": [
+    "Larry O'Brien Trophy",
+    "Stanley Cup",
+    "Heisman Trophy"
+   ],
+   "explain": "Lombardi coached the Green Bay Packers to the first two Super Bowls.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-dbdbb8",
+   "kind": "mc",
+   "prompt": "In American football, how many yards must a team gain to earn a new first down?",
+   "answer": "10",
+   "wrong": [
+    "5",
+    "15",
+    "20"
+   ],
+   "explain": "They get four downs, or tries, to make it.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-b77063",
+   "kind": "mc",
+   "prompt": "Which NFL team plays at Lambeau Field?",
+   "answer": "Green Bay Packers",
+   "wrong": [
+    "Chicago Bears",
+    "Minnesota Vikings",
+    "Detroit Lions"
+   ],
+   "explain": "The Packers are owned by their fans.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-da897b",
+   "kind": "mc",
+   "prompt": "In American football, what is it called when the defence tackles a ball carrier in his own end zone?",
+   "answer": "A safety",
+   "wrong": [
+    "A sack",
+    "A touchback",
+    "An interception"
+   ],
+   "explain": "It is worth two points.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-37dc1a",
+   "kind": "mc",
+   "prompt": "In which month is the Super Bowl usually played?",
+   "answer": "February",
+   "wrong": [
+    "January",
+    "December",
+    "March"
+   ],
+   "explain": "It moved into February in 2004.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-729167",
+   "kind": "mc",
+   "prompt": "Which ice hockey player is known as 'The Great One'?",
+   "answer": "Wayne Gretzky",
+   "wrong": [
+    "Mario Lemieux",
+    "Gordie Howe",
+    "Sidney Crosby"
+   ],
+   "explain": "His number, 99, is retired across the whole NHL.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-6379d9",
+   "kind": "mc",
+   "prompt": "How long is each period in an NHL ice hockey game?",
+   "answer": "20 minutes",
+   "wrong": [
+    "15 minutes",
+    "25 minutes",
+    "30 minutes"
+   ],
+   "explain": "A game has three periods.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-0eb349",
+   "kind": "mc",
+   "prompt": "Which Canadian city's NHL team is called the Maple Leafs?",
+   "answer": "Toronto",
+   "wrong": [
+    "Montreal",
+    "Ottawa",
+    "Vancouver"
+   ],
+   "explain": "Their rivals in Montreal are the Canadiens.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-records-ce9d45",
+   "kind": "mc",
+   "prompt": "As of 2024, which team had won the most Stanley Cups?",
+   "answer": "Montreal Canadiens",
+   "wrong": [
+    "Toronto Maple Leafs",
+    "Detroit Red Wings",
+    "Boston Bruins"
+   ],
+   "explain": "They had won 24, the last in 1993.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-rules-9257b3",
+   "kind": "mc",
+   "prompt": "What is an ice hockey puck made of?",
+   "answer": "Hard rubber",
+   "wrong": [
+    "Plastic",
+    "Wood",
+    "Leather"
+   ],
+   "explain": "Pucks are frozen before games so they bounce less.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-275dd9",
+   "kind": "mc",
+   "prompt": "In ice hockey, where does a player sit after breaking the rules?",
+   "answer": "The penalty box",
+   "wrong": [
+    "The dugout",
+    "The sin room",
+    "The crease"
+   ],
+   "explain": "It is often called the sin bin.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-c032e9",
+   "kind": "mc",
+   "prompt": "In which city does the Tour de France traditionally finish?",
+   "answer": "Paris",
+   "wrong": [
+    "Lyon",
+    "Marseille",
+    "Nice"
+   ],
+   "explain": "It finished in Nice in 2024 because Paris was hosting the Olympics.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-8d7963",
+   "kind": "mc",
+   "prompt": "What colour jersey does the leader of the Giro d'Italia wear?",
+   "answer": "Pink",
+   "wrong": [
+    "Yellow",
+    "Red",
+    "Green"
+   ],
+   "explain": "The pink matches the paper of La Gazzetta dello Sport, which started the race.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-078550",
+   "kind": "mc",
+   "prompt": "In the Tour de France, what does the green jersey reward?",
+   "answer": "The points competition, usually won by a sprinter",
+   "wrong": [
+    "The best young rider",
+    "The best climber",
+    "The most aggressive rider"
+   ],
+   "explain": "The white jersey is for the best young rider.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-8f2729",
+   "kind": "mc",
+   "prompt": "Which Belgian cyclist, nicknamed 'the Cannibal', won five Tours de France?",
+   "answer": "Eddy Merckx",
+   "wrong": [
+    "Bernard Hinault",
+    "Jacques Anquetil",
+    "Miguel Induráin"
+   ],
+   "explain": "He also won the Giro d'Italia five times.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-970587",
+   "kind": "mc",
+   "prompt": "Who became the first British winner of the Tour de France, in 2012?",
+   "answer": "Bradley Wiggins",
+   "wrong": [
+    "Chris Froome",
+    "Mark Cavendish",
+    "Geraint Thomas"
+   ],
+   "explain": "Chris Froome won the next year.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-92d5ec",
+   "kind": "mc",
+   "prompt": "Which Australian won the Tour de France in 2011?",
+   "answer": "Cadel Evans",
+   "wrong": [
+    "Richie Porte",
+    "Robbie McEwen",
+    "Simon Gerrans"
+   ],
+   "explain": "He was the first Australian to win it.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-7ada98",
+   "kind": "mc",
+   "prompt": "Which American was stripped of seven Tour de France titles for doping?",
+   "answer": "Lance Armstrong",
+   "wrong": [
+    "Greg LeMond",
+    "Floyd Landis",
+    "Tyler Hamilton"
+   ],
+   "explain": "His wins from 1999 to 2005 were wiped from the record.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-records-0fc0f7",
+   "kind": "mc",
+   "prompt": "As of 2024, what was the record number of Tour de France wins by one rider?",
+   "answer": "5",
+   "wrong": [
+    "4",
+    "6",
+    "7"
+   ],
+   "explain": "Anquetil, Merckx, Hinault and Induráin each won five.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-rules-36a504",
+   "kind": "mc",
+   "prompt": "In road cycling, what is the main group of riders called?",
+   "answer": "The peloton",
+   "wrong": [
+    "The breakaway",
+    "The domestique",
+    "The gruppetto"
+   ],
+   "explain": "Riders save energy by sheltering in it.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-e41157",
+   "kind": "mc",
+   "prompt": "Which boxer became the youngest world heavyweight champion, aged 20, in 1986?",
+   "answer": "Mike Tyson",
+   "wrong": [
+    "Michael Spinks",
+    "Evander Holyfield",
+    "Lennox Lewis"
+   ],
+   "explain": "He was nicknamed 'Iron Mike'.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-7f53b7",
+   "kind": "mc",
+   "prompt": "What was Muhammad Ali's name at birth?",
+   "answer": "Cassius Clay",
+   "wrong": [
+    "Sonny Liston",
+    "Joe Louis",
+    "George Foreman"
+   ],
+   "explain": "He changed his name in 1964.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-2a48fa",
+   "kind": "mc",
+   "prompt": "In which country did the 1974 'Rumble in the Jungle' take place?",
+   "answer": "Zaire (now DR Congo)",
+   "wrong": [
+    "Philippines",
+    "Nigeria",
+    "Kenya"
+   ],
+   "explain": "Ali beat George Foreman in Kinshasa.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-92dfcf",
+   "kind": "mc",
+   "prompt": "Whom did Muhammad Ali fight in the 1975 'Thrilla in Manila'?",
+   "answer": "Joe Frazier",
+   "wrong": [
+    "George Foreman",
+    "Sonny Liston",
+    "Ken Norton"
+   ],
+   "explain": "Frazier's corner stopped the fight before the 15th round.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-b620f2",
+   "kind": "mc",
+   "prompt": "How many rounds is a men's world championship boxing fight?",
+   "answer": "12",
+   "wrong": [
+    "10",
+    "15",
+    "8"
+   ],
+   "explain": "Title fights were cut from 15 rounds in the 1980s.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-4877ff",
+   "kind": "mc",
+   "prompt": "Which Filipino boxer won world titles in eight weight divisions?",
+   "answer": "Manny Pacquiao",
+   "wrong": [
+    "Nonito Donaire",
+    "Flash Elorde",
+    "Donnie Nietes"
+   ],
+   "explain": "He also became a senator in the Philippines.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-7f6aa2",
+   "kind": "mc",
+   "prompt": "Which American boxer retired unbeaten with a 50–0 record?",
+   "answer": "Floyd Mayweather Jr.",
+   "wrong": [
+    "Rocky Marciano",
+    "Andre Ward",
+    "Sugar Ray Leonard"
+   ],
+   "explain": "Rocky Marciano retired 49–0.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-c82996",
+   "kind": "mc",
+   "prompt": "In boxing, what does KO stand for?",
+   "answer": "Knockout",
+   "wrong": [
+    "Kick off",
+    "Keep out",
+    "Knock over"
+   ],
+   "explain": "TKO means technical knockout.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-0a1391",
+   "kind": "mc",
+   "prompt": "In boxing, what is a 'southpaw'?",
+   "answer": "A left-handed boxer",
+   "wrong": [
+    "A boxer from the south",
+    "A low punch",
+    "A boxer with a long reach"
+   ],
+   "explain": "Southpaws lead with the right hand and right foot.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-c18c6c",
+   "kind": "mc",
+   "prompt": "How many points is a goal worth in Australian rules football?",
+   "answer": "6",
+   "wrong": [
+    "3",
+    "5",
+    "7"
+   ],
+   "explain": "A behind is worth one point.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ae1752",
+   "kind": "mc",
+   "prompt": "How many points is a behind worth in Australian rules football?",
+   "answer": "1",
+   "wrong": [
+    "2",
+    "3",
+    "0"
+   ],
+   "explain": "It is scored between a goal post and a behind post.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-782672",
+   "kind": "mc",
+   "prompt": "At which ground is the AFL Grand Final traditionally played?",
+   "answer": "Melbourne Cricket Ground",
+   "wrong": [
+    "Docklands Stadium",
+    "Adelaide Oval",
+    "Sydney Cricket Ground"
+   ],
+   "explain": "It moved to Brisbane and Perth during the COVID-19 years.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-7ffa09",
+   "kind": "mc",
+   "prompt": "What is the AFL's award for the best and fairest player of the season?",
+   "answer": "The Brownlow Medal",
+   "wrong": [
+    "The Norm Smith Medal",
+    "The Coleman Medal",
+    "The Dally M Medal"
+   ],
+   "explain": "The Norm Smith goes to the best player in the grand final.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-cc6add",
+   "kind": "mc",
+   "prompt": "Which AFL club is nicknamed 'the Magpies'?",
+   "answer": "Collingwood",
+   "wrong": [
+    "Carlton",
+    "Essendon",
+    "Geelong"
+   ],
+   "explain": "Collingwood play in black and white stripes.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-1bce99",
+   "kind": "mc",
+   "prompt": "Which AFL club is nicknamed 'the Cats'?",
+   "answer": "Geelong",
+   "wrong": [
+    "Richmond",
+    "Hawthorn",
+    "Fremantle"
+   ],
+   "explain": "Their home is Kardinia Park.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ffa8f5",
+   "kind": "mc",
+   "prompt": "Which AFL club is nicknamed 'the Bombers'?",
+   "answer": "Essendon",
+   "wrong": [
+    "Carlton",
+    "North Melbourne",
+    "Melbourne"
+   ],
+   "explain": "They play in red and black.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-19b1e4",
+   "kind": "mc",
+   "prompt": "Which AFL club is nicknamed 'the Tigers'?",
+   "answer": "Richmond",
+   "wrong": [
+    "Hawthorn",
+    "Carlton",
+    "St Kilda"
+   ],
+   "explain": "Richmond play in black and yellow.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-a77756",
+   "kind": "mc",
+   "prompt": "Which Perth AFL club is nicknamed 'the Eagles'?",
+   "answer": "West Coast",
+   "wrong": [
+    "Fremantle",
+    "Port Adelaide",
+    "Adelaide"
+   ],
+   "explain": "Fremantle are the Dockers.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-8fda9b",
+   "kind": "mc",
+   "prompt": "What was the VFL renamed in 1990?",
+   "answer": "AFL",
+   "wrong": [
+    "NRL",
+    "SANFL",
+    "NFL"
+   ],
+   "explain": "The Victorian Football League became the Australian Football League.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-records-fbe9a3",
+   "kind": "mc",
+   "prompt": "Who kicked a record 1,360 goals in VFL/AFL football?",
+   "answer": "Tony Lockett",
+   "wrong": [
+    "Gary Ablett Sr.",
+    "Jason Dunstall",
+    "Lance Franklin"
+   ],
+   "explain": "He played for St Kilda and Sydney.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-rules-fb1d92",
+   "kind": "mc",
+   "prompt": "What is the hybrid game played between Australia and Ireland, mixing Aussie rules and Gaelic games?",
+   "answer": "International rules football",
+   "wrong": [
+    "Compromise hurling",
+    "Celtic rules",
+    "Gaelic rugby"
+   ],
+   "explain": "It uses a round ball and an Aussie-rules-style field.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-160ee7",
+   "kind": "mc",
+   "prompt": "In Australian rules football, what is a clean catch of a kicked ball that travels at least 15 m called?",
+   "answer": "A mark",
+   "wrong": [
+    "A take",
+    "A pick",
+    "A set"
+   ],
+   "explain": "The player then gets a free kick.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e42a60",
+   "kind": "mc",
+   "prompt": "How many posts stand at each end of an Australian rules football ground?",
+   "answer": "4",
+   "wrong": [
+    "2",
+    "3",
+    "6"
+   ],
+   "explain": "Two tall goal posts and two shorter behind posts.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-2c4e5c",
+   "kind": "mc",
+   "prompt": "Which horse race is called 'the race that stops a nation'?",
+   "answer": "Melbourne Cup",
+   "wrong": [
+    "Caulfield Cup",
+    "Golden Slipper",
+    "Cox Plate"
+   ],
+   "explain": "It is run on the first Tuesday in November at Flemington.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-fe73dd",
+   "kind": "mc",
+   "prompt": "Which racehorse won the 1930 Melbourne Cup and became an Australian legend?",
+   "answer": "Phar Lap",
+   "wrong": [
+    "Makybe Diva",
+    "Black Caviar",
+    "Winx"
+   ],
+   "explain": "He was foaled in New Zealand.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-35502c",
+   "kind": "mc",
+   "prompt": "Which mare won the Melbourne Cup three years in a row, from 2003 to 2005?",
+   "answer": "Makybe Diva",
+   "wrong": [
+    "Winx",
+    "Black Caviar",
+    "Phar Lap"
+   ],
+   "explain": "No other horse has won it three times.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-79936c",
+   "kind": "mc",
+   "prompt": "Which unbeaten Australian sprinting mare won all 25 of her races?",
+   "answer": "Black Caviar",
+   "wrong": [
+    "Winx",
+    "Makybe Diva",
+    "Sunline"
+   ],
+   "explain": "She retired in 2013.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-athletes-617f56",
+   "kind": "mc",
+   "prompt": "Which horse won the Grand National three times in the 1970s?",
+   "answer": "Red Rum",
+   "wrong": [
+    "Arkle",
+    "Desert Orchid",
+    "Tiger Roll"
+   ],
+   "explain": "He won in 1973, 1974 and 1977.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-d5fd62",
+   "kind": "mc",
+   "prompt": "At which English racecourse is the Derby run?",
+   "answer": "Epsom Downs",
+   "wrong": [
+    "Ascot",
+    "Aintree",
+    "Cheltenham"
+   ],
+   "explain": "The first Derby was run in 1780.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-5c2fcf",
+   "kind": "mc",
+   "prompt": "In netball, which two positions are allowed to score goals?",
+   "answer": "Goal shooter and goal attack",
+   "wrong": [
+    "Goal attack and wing attack",
+    "Goal shooter and centre",
+    "Centre and goal keeper"
+   ],
+   "explain": "They may only shoot from inside the goal circle.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-919fb5",
+   "kind": "mc",
+   "prompt": "Which snooker player is nicknamed 'the Rocket'?",
+   "answer": "Ronnie O'Sullivan",
+   "wrong": [
+    "Stephen Hendry",
+    "Judd Trump",
+    "Steve Davis"
+   ],
+   "explain": "He made a 147 maximum in just over five minutes in 1997.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-857268",
+   "kind": "mc",
+   "prompt": "In which theatre is the World Snooker Championship held?",
+   "answer": "The Crucible, Sheffield",
+   "wrong": [
+    "The Palladium, London",
+    "Alexandra Palace, London",
+    "The Lyceum, Edinburgh"
+   ],
+   "explain": "It has been held there since 1977.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-6ba187",
+   "kind": "mc",
+   "prompt": "In which sport did Phil 'The Power' Taylor win 16 world titles?",
+   "answer": "Darts",
+   "wrong": [
+    "Snooker",
+    "Bowls",
+    "Pool"
+   ],
+   "explain": "He is often called the greatest darts player ever.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-55f050",
+   "kind": "mc",
+   "prompt": "The Boat Race is rowed every year between crews from which two universities?",
+   "answer": "Oxford and Cambridge",
+   "wrong": [
+    "Harvard and Yale",
+    "Oxford and Durham",
+    "Cambridge and Edinburgh"
+   ],
+   "explain": "It is rowed on the River Thames in London.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-3bb75c",
+   "kind": "mc",
+   "prompt": "Kabaddi, a tag-and-wrestle team game, is especially popular in which country?",
+   "answer": "India",
+   "wrong": [
+    "Brazil",
+    "Japan",
+    "Kenya"
+   ],
+   "explain": "Raiders must chant 'kabaddi' in one breath while attacking.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-1213ea",
+   "kind": "mc",
+   "prompt": "Sepak takraw, a kind of kick-volleyball, is most popular in which region?",
+   "answer": "Southeast Asia",
+   "wrong": [
+    "South America",
+    "Scandinavia",
+    "West Africa"
+   ],
+   "explain": "Players use feet, knees and heads, never their hands.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ddeffc",
+   "kind": "mc",
+   "prompt": "Which Brazilian martial art mixes fighting, acrobatics and music?",
+   "answer": "Capoeira",
+   "wrong": [
+    "Jiu-jitsu",
+    "Krav Maga",
+    "Muay Thai"
+   ],
+   "explain": "Enslaved Africans in Brazil developed it.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-8b7d74",
+   "kind": "mc",
+   "prompt": "Which Hawaiian Olympic swimmer is known as the father of modern surfing?",
+   "answer": "Duke Kahanamoku",
+   "wrong": [
+    "Kelly Slater",
+    "Eddie Aikau",
+    "Layne Beachley"
+   ],
+   "explain": "He gave surfing demonstrations in Australia in 1914–15.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-rules-2ecded",
+   "kind": "mc",
+   "prompt": "Lacrosse was first played by which people?",
+   "answer": "Indigenous peoples of North America",
+   "wrong": [
+    "Ancient Celts",
+    "Scottish Highlanders",
+    "Ancient Egyptians"
+   ],
+   "explain": "The Haudenosaunee call it 'the Creator's game'.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-09f954",
+   "kind": "mc",
+   "prompt": "Badminton is named after a country house in which English county?",
+   "answer": "Gloucestershire",
+   "wrong": [
+    "Kent",
+    "Yorkshire",
+    "Devon"
+   ],
+   "explain": "The Duke of Beaufort's Badminton House popularised the game in the 1870s.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-110b3f",
+   "kind": "mc",
+   "prompt": "Muay Thai is the national sport of which country?",
+   "answer": "Thailand",
+   "wrong": [
+    "Cambodia",
+    "Japan",
+    "Philippines"
+   ],
+   "explain": "It is called 'the art of eight limbs'.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-4291b6",
+   "kind": "mc",
+   "prompt": "In lawn bowls, what is the small white target ball called?",
+   "answer": "The jack",
+   "wrong": [
+    "The kitty-cat",
+    "The pin",
+    "The bullet"
+   ],
+   "explain": "In some places it is also called the kitty.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-6792a7",
+   "kind": "mc",
+   "prompt": "Which Japanese martial art uses bamboo swords?",
+   "answer": "Kendo",
+   "wrong": [
+    "Aikido",
+    "Karate",
+    "Judo"
+   ],
+   "explain": "Kendo means 'the way of the sword'.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-4e5c53",
+   "kind": "tf",
+   "prompt": "Golf balls have dimples to help them fly further.",
+   "answer": true,
+   "explain": "Dimples reduce drag, so a dimpled ball flies roughly twice as far as a smooth one.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-46ef52",
+   "kind": "tf",
+   "prompt": "Tennis began as a game played by hitting the ball with the palm of the hand.",
+   "answer": true,
+   "explain": "The French 'jeu de paume' means 'game of the palm'.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-0a5770",
+   "kind": "tf",
+   "prompt": "A cricket match can end in a tie.",
+   "answer": true,
+   "explain": "Only two Test matches have ever been tied, in 1960 and 1986.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-olympics-8facd5",
+   "kind": "tf",
+   "prompt": "Olympic gold medals are made of solid gold.",
+   "answer": false,
+   "explain": "They are mostly silver with gold plating; the last solid gold medals were given in 1912.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-243d45",
+   "kind": "tf",
+   "prompt": "Women first competed in the modern Olympics in 1900.",
+   "answer": true,
+   "explain": "British tennis player Charlotte Cooper became the first individual woman Olympic champion.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-rules-fb6b28",
+   "kind": "tf",
+   "prompt": "A snooker table has six pockets.",
+   "answer": true,
+   "explain": "One in each corner and one halfway along each long side.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-076716",
+   "kind": "tf",
+   "prompt": "In Australian rules football, players may throw the ball to a teammate.",
+   "answer": false,
+   "explain": "They must handball it: punching it off one hand with the other fist.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-00a210",
+   "kind": "tf",
+   "prompt": "A cricket ball is heavier than a baseball.",
+   "answer": true,
+   "explain": "A men's cricket ball weighs about 156–163 g; a baseball about 142–149 g.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-eae1fe",
+   "kind": "tf",
+   "prompt": "Basketball was first played with peach baskets as hoops.",
+   "answer": true,
+   "explain": "Someone had to fetch the ball out after every score.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-be8e78",
+   "kind": "tf",
+   "prompt": "Rugby league teams have more players on the field than rugby union teams.",
+   "answer": false,
+   "explain": "League has 13 a side; union has 15.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-263b4e",
+   "kind": "tf",
+   "prompt": "Usain Bolt never won an Olympic medal in the 200 m.",
+   "answer": false,
+   "explain": "He won the 200 m at three Olympics: 2008, 2012 and 2016.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-football-7af6c3",
+   "kind": "tf",
+   "prompt": "A men's World Cup has been held in Australia.",
+   "answer": false,
+   "explain": "Australia and New Zealand co-hosted the 2023 Women's World Cup.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-rules-59ca51",
+   "kind": "tf",
+   "prompt": "In tennis, a 'let' on a serve means the point is replayed.",
+   "answer": true,
+   "explain": "It is called when the serve clips the net and lands in.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-b96908",
+   "kind": "order",
+   "prompt": "Put these running races in order of distance, shortest first.",
+   "answer": [
+    "100 m",
+    "400 m",
+    "1,500 m",
+    "Marathon"
+   ],
+   "orderLabel": "Shortest → longest",
+   "explain": "The marathon is 42.195 km.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-football-d1392f",
+   "kind": "mc",
+   "prompt": "Which Premier League club is nicknamed 'the Citizens'?",
+   "answer": "Manchester City",
+   "wrong": [
+    "Leicester City",
+    "Bristol City",
+    "Norwich City"
+   ],
+   "explain": "Their home is the Etihad Stadium.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-1c70d7",
+   "kind": "mc",
+   "prompt": "Whose fans sing 'I'm Forever Blowing Bubbles'?",
+   "answer": "West Ham United",
+   "wrong": [
+    "Millwall",
+    "Crystal Palace",
+    "Charlton Athletic"
+   ],
+   "explain": "West Ham are nicknamed 'the Hammers'.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-e4bcd5",
+   "kind": "mc",
+   "prompt": "Which club is nicknamed 'the Saints'?",
+   "answer": "Southampton",
+   "wrong": [
+    "St Mirren",
+    "Sheffield Wednesday",
+    "Swansea City"
+   ],
+   "explain": "The club began as St Mary's Church football team in 1885.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-fe40cf",
+   "kind": "mc",
+   "prompt": "Which Welsh club played in the Premier League from 2011 to 2018?",
+   "answer": "Swansea City",
+   "wrong": [
+    "Cardiff City",
+    "Wrexham",
+    "Newport County"
+   ],
+   "explain": "Cardiff City had two single seasons in the Premier League.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-rules-84079b",
+   "kind": "mc",
+   "prompt": "In which year did England win the men's Cricket World Cup on boundary count after a tied final?",
+   "answer": "2019",
+   "wrong": [
+    "2015",
+    "2011",
+    "2023"
+   ],
+   "explain": "The final against New Zealand at Lord's was tied, and so was the super over.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-6f9a26",
+   "kind": "mc",
+   "prompt": "Who captained Australia to victory in the 2023 men's Cricket World Cup final?",
+   "answer": "Pat Cummins",
+   "wrong": [
+    "Steve Smith",
+    "Aaron Finch",
+    "David Warner"
+   ],
+   "explain": "Australia beat India in Ahmedabad for their sixth title.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
+  },
+  {
+   "id": "spt-records-23c4d6",
+   "kind": "mc",
+   "prompt": "In 2023, which Indian became the first batter to score 50 ODI centuries?",
+   "answer": "Virat Kohli",
+   "wrong": [
+    "Rohit Sharma",
+    "Sachin Tendulkar",
+    "Shubman Gill"
+   ],
+   "explain": "He passed Tendulkar's 49 in the World Cup semi-final.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-390703",
+   "kind": "mc",
+   "prompt": "Which South African hit the fastest ODI century, off 31 balls, in 2015?",
+   "answer": "AB de Villiers",
+   "wrong": [
+    "Hashim Amla",
+    "Quinton de Kock",
+    "Graeme Smith"
+   ],
+   "explain": "He did it against the West Indies in Johannesburg.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-rules-7caf45",
+   "kind": "mc",
+   "prompt": "Which country's rugby league team is nicknamed 'the Kangaroos'?",
+   "answer": "Australia",
+   "wrong": [
+    "New Zealand",
+    "England",
+    "Papua New Guinea"
+   ],
+   "explain": "New Zealand's rugby league team are the Kiwis.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-019f06",
+   "kind": "mc",
+   "prompt": "Where is the grand final of England's rugby league Super League usually played?",
+   "answer": "Old Trafford",
+   "wrong": [
+    "Wembley",
+    "Twickenham",
+    "Anfield"
+   ],
+   "explain": "The Challenge Cup final is played at Wembley.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-f495ff",
+   "kind": "mc",
+   "prompt": "In cricket, what is it called when the bowler oversteps the crease?",
+   "answer": "A no-ball",
+   "wrong": [
+    "A wide",
+    "A bye",
+    "A bouncer"
+   ],
+   "explain": "The batting side gets an extra run and, in short formats, a free hit.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-f505c6",
+   "kind": "mc",
+   "prompt": "What does NRL stand for in Australian sport?",
+   "answer": "National Rugby League",
+   "wrong": [
+    "National Rules League",
+    "New Rugby League",
+    "National Racing League"
+   ],
+   "explain": "The NRL began in 1998.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-013d2b",
+   "kind": "mc",
+   "prompt": "Which country hosted the 2023 Rugby World Cup?",
+   "answer": "France",
+   "wrong": [
+    "Japan",
+    "England",
+    "New Zealand"
+   ],
+   "explain": "South Africa beat New Zealand 12–11 in the final in Paris.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-athletes-343e0a",
+   "kind": "mc",
+   "prompt": "Which Welsh winger scored a record 58 tries for Wales?",
+   "answer": "Shane Williams",
+   "wrong": [
+    "Gareth Edwards",
+    "George North",
+    "Leigh Halfpenny"
+   ],
+   "explain": "He retired from Test rugby in 2011.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "athletes"
   }
  ],
  "sources": [

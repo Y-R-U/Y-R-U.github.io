@@ -5721,6 +5721,1735 @@
     "books"
    ],
    "topic": "fairy tales"
+  },
+  {
+   "id": "kid-world-90f18b",
+   "kind": "mc",
+   "prompt": "In which country is the famous Sydney Opera House?",
+   "answer": "Australia",
+   "wrong": [
+    "England",
+    "Canada"
+   ],
+   "explain": "Its roof looks like the sails of a boat.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-eab6e9",
+   "kind": "mc",
+   "prompt": "Which famous white building in India was built as a tomb?",
+   "answer": "Taj Mahal",
+   "wrong": [
+    "Big Ben",
+    "Eiffel Tower"
+   ],
+   "explain": "It is made of white marble.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-f97f06",
+   "kind": "mc",
+   "prompt": "In which country would you see the Leaning Tower of Pisa?",
+   "answer": "Italy",
+   "wrong": [
+    "Spain",
+    "France"
+   ],
+   "explain": "The tower started to lean while it was being built.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-5c6f31",
+   "kind": "mc",
+   "prompt": "Which country is home to the giant panda?",
+   "answer": "China",
+   "wrong": [
+    "India",
+    "Brazil"
+   ],
+   "explain": "Wild pandas live in the mountains of China.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-401645",
+   "kind": "mc",
+   "prompt": "On which continent is Kenya?",
+   "answer": "Africa",
+   "wrong": [
+    "Asia",
+    "Europe"
+   ],
+   "explain": "Lions, zebras and giraffes live in Kenya.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-2dacb9",
+   "kind": "mc",
+   "prompt": "Which is the biggest river in South America?",
+   "answer": "The Amazon",
+   "wrong": [
+    "The Nile",
+    "The Ganges"
+   ],
+   "explain": "The Amazon carries more water than any other river.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-a9de5a",
+   "kind": "mc",
+   "prompt": "What colour is the circle on Japan's flag?",
+   "answer": "Red",
+   "wrong": [
+    "Yellow",
+    "Blue"
+   ],
+   "explain": "The red circle stands for the Sun.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-e417bc",
+   "kind": "mc",
+   "prompt": "Which country's red flag has five yellow stars?",
+   "answer": "China",
+   "wrong": [
+    "Canada",
+    "Italy"
+   ],
+   "explain": "One big star and four small ones sit in the top corner.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-b85fe3",
+   "kind": "mc",
+   "prompt": "What is the capital city of France?",
+   "answer": "Paris",
+   "wrong": [
+    "Rome",
+    "London"
+   ],
+   "explain": "Paris is home to the Eiffel Tower.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-56fc43",
+   "kind": "mc",
+   "prompt": "What is the capital city of Japan?",
+   "answer": "Tokyo",
+   "wrong": [
+    "Beijing",
+    "Seoul"
+   ],
+   "explain": "Tokyo is one of the biggest cities in the world.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-c4cf6d",
+   "kind": "mc",
+   "prompt": "What is the capital city of the United Kingdom?",
+   "answer": "London",
+   "wrong": [
+    "Paris",
+    "Dublin"
+   ],
+   "explain": "The King lives at Buckingham Palace in London.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-967df7",
+   "kind": "mc",
+   "prompt": "What is the capital city of Egypt?",
+   "answer": "Cairo",
+   "wrong": [
+    "Nairobi",
+    "Rome"
+   ],
+   "explain": "The pyramids of Giza are near Cairo.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-913481",
+   "kind": "mc",
+   "prompt": "What language do most people speak in Mexico?",
+   "answer": "Spanish",
+   "wrong": [
+    "Portuguese",
+    "English"
+   ],
+   "explain": "Mexico has more Spanish speakers than any other country.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-1f5f41",
+   "kind": "mc",
+   "prompt": "Which big rock in the middle of Australia glows red at sunset?",
+   "answer": "Uluru",
+   "wrong": [
+    "Everest",
+    "Kilimanjaro"
+   ],
+   "explain": "Uluru is sacred to the Anangu people.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-2437fb",
+   "kind": "mc",
+   "prompt": "Which animal is on the flag of Wales?",
+   "answer": "A dragon",
+   "wrong": [
+    "A lion",
+    "A unicorn"
+   ],
+   "explain": "The Welsh dragon is red.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-6a1559",
+   "kind": "mc",
+   "prompt": "In which country is the city of Rio de Janeiro?",
+   "answer": "Brazil",
+   "wrong": [
+    "Spain",
+    "Mexico"
+   ],
+   "explain": "Rio has a giant statue on a mountain.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-eab95d",
+   "kind": "mc",
+   "prompt": "What do people in Japan often eat with?",
+   "answer": "Chopsticks",
+   "wrong": [
+    "Their hands only",
+    "Spoons only"
+   ],
+   "explain": "Chopsticks are two thin sticks.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-08fda7",
+   "kind": "tf",
+   "prompt": "Antarctica is covered in ice.",
+   "answer": true,
+   "explain": "Almost all of Antarctica is under thick ice.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-6ee703",
+   "kind": "tf",
+   "prompt": "Africa is a country.",
+   "answer": false,
+   "explain": "Africa is a continent with 54 countries.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-world-81ee45",
+   "kind": "tf",
+   "prompt": "The Sahara is a desert.",
+   "answer": true,
+   "explain": "It is the biggest hot desert in the world.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-ani-134b83",
+   "kind": "mc",
+   "prompt": "Which hopping animal is on Australia's coat of arms?",
+   "answer": "Kangaroo",
+   "wrong": [
+    "Koala",
+    "Wombat"
+   ],
+   "explain": "Kangaroos use their strong tails to balance.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-cbe8b3",
+   "kind": "mc",
+   "prompt": "Which animal is the largest bird in the world?",
+   "answer": "Ostrich",
+   "wrong": [
+    "Eagle",
+    "Penguin"
+   ],
+   "explain": "Ostriches cannot fly, but they run very fast.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-6f4a70",
+   "kind": "mc",
+   "prompt": "Which sea animal has a shell and walks sideways?",
+   "answer": "Crab",
+   "wrong": [
+    "Fish",
+    "Seal"
+   ],
+   "explain": "Crabs have ten legs, including two claws.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-4fb0ad",
+   "kind": "mc",
+   "prompt": "Which bird can't fly but swims very well?",
+   "answer": "Penguin",
+   "wrong": [
+    "Swan",
+    "Seagull"
+   ],
+   "explain": "Penguins use their wings like flippers.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-43ec62",
+   "kind": "mc",
+   "prompt": "Which animal is famous for being very slow and hanging in trees?",
+   "answer": "Sloth",
+   "wrong": [
+    "Monkey",
+    "Squirrel"
+   ],
+   "explain": "Sloths sleep a lot and move very slowly.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-b72487",
+   "kind": "mc",
+   "prompt": "Which animal has a pouch and eats eucalyptus leaves?",
+   "answer": "Koala",
+   "wrong": [
+    "Kangaroo",
+    "Panda"
+   ],
+   "explain": "Koalas sleep for most of the day.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-c69389",
+   "kind": "mc",
+   "prompt": "Which big grey animal has a horn on its nose?",
+   "answer": "Rhinoceros",
+   "wrong": [
+    "Hippo",
+    "Elephant"
+   ],
+   "explain": "Some rhinos have two horns.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-f3da19",
+   "kind": "mc",
+   "prompt": "Which animal is the biggest kind of ape?",
+   "answer": "Gorilla",
+   "wrong": [
+    "Chimpanzee",
+    "Monkey"
+   ],
+   "explain": "Gorillas live in the forests of Africa.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-7ed74d",
+   "kind": "mc",
+   "prompt": "Which animal can live for over 100 years?",
+   "answer": "Giant tortoise",
+   "wrong": [
+    "Mouse",
+    "Rabbit"
+   ],
+   "explain": "Some giant tortoises have lived for more than 150 years.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-5aab29",
+   "kind": "mc",
+   "prompt": "What do frogs like to eat?",
+   "answer": "Insects",
+   "wrong": [
+    "Grass",
+    "Bananas"
+   ],
+   "explain": "Frogs catch flies with their sticky tongues.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-cd8946",
+   "kind": "mc",
+   "prompt": "Which animal gives most of the milk people drink?",
+   "answer": "Cow",
+   "wrong": [
+    "Dog",
+    "Pig"
+   ],
+   "explain": "Goats and sheep give milk too.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-27119c",
+   "kind": "mc",
+   "prompt": "Which bird lays the eggs we eat most often?",
+   "answer": "Chicken",
+   "wrong": [
+    "Owl",
+    "Parrot"
+   ],
+   "explain": "A hen can lay almost an egg a day.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-ef3b5a",
+   "kind": "mc",
+   "prompt": "What is a baby elephant called?",
+   "answer": "Calf",
+   "wrong": [
+    "Cub",
+    "Kid"
+   ],
+   "explain": "A baby elephant can weigh as much as a grown-up person.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-796ee0",
+   "kind": "mc",
+   "prompt": "Which animal sleeps in a den and loves honey?",
+   "answer": "Bear",
+   "wrong": [
+    "Wolf",
+    "Fox"
+   ],
+   "explain": "Bears also eat fish, berries and nuts.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-058dd1",
+   "kind": "mc",
+   "prompt": "Which sea creature has no bones and can sting?",
+   "answer": "Jellyfish",
+   "wrong": [
+    "Dolphin",
+    "Turtle"
+   ],
+   "explain": "Jellyfish have been in the sea for millions of years.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-2a8b8c",
+   "kind": "mc",
+   "prompt": "Which dinosaur had three horns on its face?",
+   "answer": "Triceratops",
+   "wrong": [
+    "Stegosaurus",
+    "T. rex"
+   ],
+   "explain": "Its name means 'three-horned face'.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-89f9fb",
+   "kind": "mc",
+   "prompt": "Which dinosaur was a huge meat-eater with tiny arms?",
+   "answer": "T. rex",
+   "wrong": [
+    "Triceratops",
+    "Diplodocus"
+   ],
+   "explain": "Its full name is Tyrannosaurus rex.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-9d5162",
+   "kind": "mc",
+   "prompt": "Which dinosaur had big plates along its back?",
+   "answer": "Stegosaurus",
+   "wrong": [
+    "T. rex",
+    "Velociraptor"
+   ],
+   "explain": "It had spikes on its tail too.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-6a793a",
+   "kind": "tf",
+   "prompt": "Dinosaurs and people lived at the same time.",
+   "answer": false,
+   "explain": "Dinosaurs died out about 66 million years ago, long before people.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-e68566",
+   "kind": "tf",
+   "prompt": "A bat is a mammal.",
+   "answer": true,
+   "explain": "Bats feed their babies milk, like all mammals.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-320b33",
+   "kind": "tf",
+   "prompt": "Some sharks are bigger than a bus.",
+   "answer": true,
+   "explain": "Whale sharks can grow to about 18 metres long.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-space-4d4935",
+   "kind": "mc",
+   "prompt": "What is the Sun?",
+   "answer": "A star",
+   "wrong": [
+    "A planet",
+    "A moon"
+   ],
+   "explain": "It is the closest star to Earth.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "kid-space-bbc816",
+   "kind": "mc",
+   "prompt": "Who was the first person to fly into space?",
+   "answer": "Yuri Gagarin",
+   "wrong": [
+    "Neil Armstrong",
+    "Buzz Lightyear"
+   ],
+   "explain": "He flew around the Earth in 1961.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "kid-space-7043b6",
+   "kind": "mc",
+   "prompt": "What do we call the shapes the Moon seems to make each month?",
+   "answer": "Phases",
+   "wrong": [
+    "Seasons",
+    "Tides"
+   ],
+   "explain": "A full moon is a round, bright phase.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "kid-space-17779d",
+   "kind": "tf",
+   "prompt": "There is air to breathe on the Moon.",
+   "answer": false,
+   "explain": "Astronauts need space suits with air inside.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "kid-body-a0a934",
+   "kind": "mc",
+   "prompt": "How many legs do people have?",
+   "answer": "2",
+   "wrong": [
+    "4",
+    "6"
+   ],
+   "explain": "Animals with two legs are called bipeds.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-13405c",
+   "kind": "mc",
+   "prompt": "Which part of your body has your fingerprints?",
+   "answer": "Fingertips",
+   "wrong": [
+    "Toes only",
+    "Elbows"
+   ],
+   "explain": "Everyone's fingerprints are different.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-357143",
+   "kind": "mc",
+   "prompt": "What helps you breathe in air?",
+   "answer": "Lungs",
+   "wrong": [
+    "Stomach",
+    "Bones"
+   ],
+   "explain": "You have two lungs in your chest.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-beeafa",
+   "kind": "mc",
+   "prompt": "Which of these is good for your body?",
+   "answer": "Fruit and vegetables",
+   "wrong": [
+    "Only sweets",
+    "Only crisps"
+   ],
+   "explain": "Eating lots of colours keeps you healthy.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-b94ece",
+   "kind": "mc",
+   "prompt": "What is the hard white part inside your body that holds you up?",
+   "answer": "Bones",
+   "wrong": [
+    "Muscles",
+    "Skin"
+   ],
+   "explain": "A grown-up has 206 bones.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-body-f80654",
+   "kind": "tf",
+   "prompt": "Sleep helps your body grow and rest.",
+   "answer": true,
+   "explain": "Children need about 9 to 12 hours of sleep.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "kid-sci-936208",
+   "kind": "mc",
+   "prompt": "What do plants need from the Sun?",
+   "answer": "Light",
+   "wrong": [
+    "Rain",
+    "Wind"
+   ],
+   "explain": "Plants use sunlight to make their food.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-9e1007",
+   "kind": "mc",
+   "prompt": "What do caterpillars hatch from?",
+   "answer": "Eggs",
+   "wrong": [
+    "Seeds",
+    "Flowers"
+   ],
+   "explain": "Butterflies lay tiny eggs on leaves.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-0da0be",
+   "kind": "mc",
+   "prompt": "What do we call a scientist who studies dinosaurs?",
+   "answer": "Palaeontologist",
+   "wrong": [
+    "Astronaut",
+    "Chef"
+   ],
+   "explain": "They dig up fossils and study them.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-384f4c",
+   "kind": "mc",
+   "prompt": "What do you get when you mix water and soil?",
+   "answer": "Mud",
+   "wrong": [
+    "Sand",
+    "Ice"
+   ],
+   "explain": "Pigs love rolling in mud.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-0e64c3",
+   "kind": "mc",
+   "prompt": "Which of these comes from trees?",
+   "answer": "Apples",
+   "wrong": [
+    "Carrots",
+    "Potatoes"
+   ],
+   "explain": "Carrots and potatoes grow under the ground.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-985c7a",
+   "kind": "mc",
+   "prompt": "What do we call frozen water falling as soft white flakes?",
+   "answer": "Snow",
+   "wrong": [
+    "Rain",
+    "Hail"
+   ],
+   "explain": "No two snowflakes look exactly the same.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-sci-b59285",
+   "kind": "tf",
+   "prompt": "The Earth is round like a ball.",
+   "answer": true,
+   "explain": "Photos from space show the round Earth.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "kid-food-1fa95e",
+   "kind": "mc",
+   "prompt": "Which fruit is yellow and curved?",
+   "answer": "Banana",
+   "wrong": [
+    "Apple",
+    "Grape"
+   ],
+   "explain": "Bananas grow in big bunches.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "kid-food-7f272f",
+   "kind": "mc",
+   "prompt": "What are chips, or French fries, made from?",
+   "answer": "Potatoes",
+   "wrong": [
+    "Apples",
+    "Rice"
+   ],
+   "explain": "Potatoes grow under the ground.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "kid-food-9a5c85",
+   "kind": "mc",
+   "prompt": "Which fruit is used to make orange juice?",
+   "answer": "Oranges",
+   "wrong": [
+    "Lemons",
+    "Bananas"
+   ],
+   "explain": "Oranges are full of vitamin C.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "kid-food-79bf2f",
+   "kind": "mc",
+   "prompt": "What is cheese made from?",
+   "answer": "Milk",
+   "wrong": [
+    "Eggs",
+    "Flour"
+   ],
+   "explain": "There are hundreds of kinds of cheese.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "kid-food-7595d8",
+   "kind": "mc",
+   "prompt": "What is bread mainly made from?",
+   "answer": "Flour",
+   "wrong": [
+    "Sugar",
+    "Milk"
+   ],
+   "explain": "Flour is ground-up wheat.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "kid-food-adce58",
+   "kind": "mc",
+   "prompt": "Which fruit is green outside and red inside, with black seeds?",
+   "answer": "Watermelon",
+   "wrong": [
+    "Apple",
+    "Kiwi"
+   ],
+   "explain": "Watermelons are mostly water.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "kid-food-753a32",
+   "kind": "mc",
+   "prompt": "Which country did pasta like spaghetti become famous in?",
+   "answer": "Italy",
+   "wrong": [
+    "China",
+    "Mexico"
+   ],
+   "explain": "Italians eat pasta in hundreds of shapes.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "kid-sport-61da5f",
+   "kind": "mc",
+   "prompt": "In which sport do you kick a ball into a goal?",
+   "answer": "Football (soccer)",
+   "wrong": [
+    "Tennis",
+    "Golf"
+   ],
+   "explain": "Only the goalkeeper may use their hands.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "kid-sport-bb78af",
+   "kind": "mc",
+   "prompt": "In which sport do you bounce a ball and shoot it through a hoop?",
+   "answer": "Basketball",
+   "wrong": [
+    "Cricket",
+    "Swimming"
+   ],
+   "explain": "A basketball hoop is 3 metres high.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "kid-sport-a91b54",
+   "kind": "mc",
+   "prompt": "In which sport do you hit a small ball into a hole with a club?",
+   "answer": "Golf",
+   "wrong": [
+    "Hockey",
+    "Rugby"
+   ],
+   "explain": "Golfers try to use as few hits as possible.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "kid-sport-72c18c",
+   "kind": "mc",
+   "prompt": "Which sport uses a bat, a ball and wickets?",
+   "answer": "Cricket",
+   "wrong": [
+    "Tennis",
+    "Basketball"
+   ],
+   "explain": "Cricket is very popular in India, England and Australia.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "kid-sport-3a7e77",
+   "kind": "mc",
+   "prompt": "What colour medal do you get for winning at the Olympics?",
+   "answer": "Gold",
+   "wrong": [
+    "Silver",
+    "Bronze"
+   ],
+   "explain": "Second place gets silver and third gets bronze.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "kid-sport-ae5320",
+   "kind": "mc",
+   "prompt": "Which sport is played on ice with sticks and a puck?",
+   "answer": "Ice hockey",
+   "wrong": [
+    "Basketball",
+    "Netball"
+   ],
+   "explain": "Players wear skates.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "kid-sport-abe760",
+   "kind": "mc",
+   "prompt": "Which sport did Usain Bolt do?",
+   "answer": "Running",
+   "wrong": [
+    "Swimming",
+    "Football"
+   ],
+   "explain": "He was the fastest sprinter in the world.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "kid-sport-933981",
+   "kind": "mc",
+   "prompt": "What do you wear on your head to stay safe on a bike?",
+   "answer": "A helmet",
+   "wrong": [
+    "A cap",
+    "A crown"
+   ],
+   "explain": "Helmets protect your head if you fall.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "kid-pop-f356c0",
+   "kind": "mc",
+   "prompt": "What kind of animal is Peppa?",
+   "answer": "A pig",
+   "wrong": [
+    "A sheep",
+    "A rabbit"
+   ],
+   "explain": "Peppa Pig lives with Mummy, Daddy and George.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-pop-2a057f",
+   "kind": "mc",
+   "prompt": "What kind of animal is Bluey?",
+   "answer": "A dog",
+   "wrong": [
+    "A cat",
+    "A fox"
+   ],
+   "explain": "Bluey is a Blue Heeler puppy from Australia.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-pop-e2f58f",
+   "kind": "mc",
+   "prompt": "In 'Frozen', what is the name of Elsa's sister?",
+   "answer": "Anna",
+   "wrong": [
+    "Ariel",
+    "Belle"
+   ],
+   "explain": "Elsa has magic ice powers.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-pop-3af5a1",
+   "kind": "mc",
+   "prompt": "What colour is SpongeBob SquarePants?",
+   "answer": "Yellow",
+   "wrong": [
+    "Pink",
+    "Green"
+   ],
+   "explain": "SpongeBob lives in a pineapple under the sea.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-pop-cb8351",
+   "kind": "mc",
+   "prompt": "What kind of animal is Winnie-the-Pooh?",
+   "answer": "A bear",
+   "wrong": [
+    "A pig",
+    "A tiger"
+   ],
+   "explain": "Pooh's friend Piglet is a small pig.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-pop-b189e1",
+   "kind": "mc",
+   "prompt": "What kind of fish is Nemo?",
+   "answer": "A clownfish",
+   "wrong": [
+    "A goldfish",
+    "A shark"
+   ],
+   "explain": "Clownfish live among sea anemones.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-pop-712580",
+   "kind": "mc",
+   "prompt": "Which Disney mouse has big round ears and red shorts?",
+   "answer": "Mickey Mouse",
+   "wrong": [
+    "Jerry",
+    "Stuart Little"
+   ],
+   "explain": "Mickey first appeared in 1928.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-pop-f610ac",
+   "kind": "mc",
+   "prompt": "In 'Toy Story', what kind of toy is Buzz Lightyear?",
+   "answer": "A space ranger",
+   "wrong": [
+    "A cowboy",
+    "A dinosaur"
+   ],
+   "explain": "'To infinity and beyond!'",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-pop-86dfae",
+   "kind": "mc",
+   "prompt": "What kind of creature is Shrek?",
+   "answer": "An ogre",
+   "wrong": [
+    "A giant",
+    "A troll"
+   ],
+   "explain": "Shrek lives in a swamp.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-pop-bc1baa",
+   "kind": "mc",
+   "prompt": "Which film has a cowboy toy called Woody?",
+   "answer": "Toy Story",
+   "wrong": [
+    "Cars",
+    "Shrek"
+   ],
+   "explain": "Woody's best friend is Buzz Lightyear.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-mus-1ab773",
+   "kind": "mc",
+   "prompt": "Which instrument has black and white keys?",
+   "answer": "Piano",
+   "wrong": [
+    "Drum",
+    "Guitar"
+   ],
+   "explain": "A big piano has 88 keys.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "kid-mus-8e022f",
+   "kind": "mc",
+   "prompt": "Which instrument do you hit with sticks?",
+   "answer": "Drum",
+   "wrong": [
+    "Flute",
+    "Violin"
+   ],
+   "explain": "Drums keep the beat in a band.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "kid-mus-038440",
+   "kind": "mc",
+   "prompt": "Which instrument do you blow into?",
+   "answer": "Recorder",
+   "wrong": [
+    "Piano",
+    "Guitar"
+   ],
+   "explain": "Many children learn the recorder at school.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "kid-tale-2ab750",
+   "kind": "mc",
+   "prompt": "Which story has a wolf dressed as a grandma?",
+   "answer": "Little Red Riding Hood",
+   "wrong": [
+    "Cinderella",
+    "Jack and the Beanstalk"
+   ],
+   "explain": "'What big teeth you have!'",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-75c90f",
+   "kind": "mc",
+   "prompt": "Who rubbed a magic lamp and met a genie?",
+   "answer": "Aladdin",
+   "wrong": [
+    "Pinocchio",
+    "Peter Pan"
+   ],
+   "explain": "The genie granted him wishes.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-b61136",
+   "kind": "mc",
+   "prompt": "Which girl fell down a rabbit hole into Wonderland?",
+   "answer": "Alice",
+   "wrong": [
+    "Dorothy",
+    "Wendy"
+   ],
+   "explain": "She met the Mad Hatter and the Cheshire Cat.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-981f69",
+   "kind": "mc",
+   "prompt": "Which girl followed a yellow brick road to see a wizard?",
+   "answer": "Dorothy",
+   "wrong": [
+    "Alice",
+    "Goldilocks"
+   ],
+   "explain": "Her dog was called Toto.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-c0e19a",
+   "kind": "mc",
+   "prompt": "Which famous bear from Peru loves marmalade sandwiches?",
+   "answer": "Paddington",
+   "wrong": [
+    "Pooh",
+    "Baloo"
+   ],
+   "explain": "He is named after a London railway station.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-ff21c8",
+   "kind": "mc",
+   "prompt": "What did the very hungry caterpillar turn into?",
+   "answer": "A butterfly",
+   "wrong": [
+    "A bird",
+    "A bee"
+   ],
+   "explain": "Eric Carle wrote and drew the book.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-tale-dbbdb1",
+   "kind": "mc",
+   "prompt": "Which boy from the jungle was raised by wolves in 'The Jungle Book'?",
+   "answer": "Mowgli",
+   "wrong": [
+    "Tarzan",
+    "Peter Pan"
+   ],
+   "explain": "His friends were Baloo the bear and Bagheera the panther.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "books"
+   ],
+   "topic": "fairy tales"
+  },
+  {
+   "id": "kid-count-d76292",
+   "kind": "mc",
+   "prompt": "What is 4 + 4?",
+   "answer": "8",
+   "wrong": [
+    "6",
+    "9"
+   ],
+   "explain": "Double 4 is 8.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "counting"
+  },
+  {
+   "id": "kid-count-e363f9",
+   "kind": "mc",
+   "prompt": "How many legs does a cat have?",
+   "answer": "4",
+   "wrong": [
+    "2",
+    "6"
+   ],
+   "explain": "Cats walk on their toes.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "counting"
+  },
+  {
+   "id": "kid-count-1510b9",
+   "kind": "mc",
+   "prompt": "How many days are there in a year?",
+   "answer": "365",
+   "wrong": [
+    "100",
+    "500"
+   ],
+   "explain": "A leap year has 366 days.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "counting"
+  },
+  {
+   "id": "kid-shape-374f76",
+   "kind": "mc",
+   "prompt": "What shape is a slice of pizza usually?",
+   "answer": "Triangle",
+   "wrong": [
+    "Square",
+    "Circle"
+   ],
+   "explain": "A whole pizza is a circle.",
+   "difficulty": 1,
+   "tags": [
+    "kids"
+   ],
+   "topic": "shapes"
+  },
+  {
+   "id": "kid-shape-2a8f7e",
+   "kind": "mc",
+   "prompt": "What shape is a stop sign in many countries?",
+   "answer": "Octagon",
+   "wrong": [
+    "Circle",
+    "Triangle"
+   ],
+   "explain": "An octagon has eight sides.",
+   "difficulty": 1,
+   "tags": [
+    "kids"
+   ],
+   "topic": "shapes"
+  },
+  {
+   "id": "kid-ani-5e5849",
+   "kind": "mc",
+   "prompt": "Which bird is the fastest when it dives?",
+   "answer": "Peregrine falcon",
+   "wrong": [
+    "Ostrich",
+    "Penguin"
+   ],
+   "explain": "It can dive at over 300 km per hour.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-ani-c41c54",
+   "kind": "mc",
+   "prompt": "Which animal has a black mask and a stripy tail?",
+   "answer": "Raccoon",
+   "wrong": [
+    "Badger",
+    "Skunk"
+   ],
+   "explain": "Raccoons wash their food in water.",
+   "difficulty": 2,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-shape-424ebf",
+   "kind": "mc",
+   "prompt": "Which shape has four equal sides and four corners?",
+   "answer": "Square",
+   "wrong": [
+    "Triangle",
+    "Circle"
+   ],
+   "explain": "A square is a special kind of rectangle.",
+   "difficulty": 1,
+   "tags": [
+    "kids"
+   ],
+   "topic": "shapes"
+  },
+  {
+   "id": "kid-world-e920ec",
+   "kind": "mc",
+   "prompt": "What is a house made of snow blocks called?",
+   "answer": "An igloo",
+   "wrong": [
+    "A tent",
+    "A hut"
+   ],
+   "explain": "Inuit hunters built igloos for shelter.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "geography"
+   ],
+   "topic": "world"
+  },
+  {
+   "id": "kid-space-e9a7ea",
+   "kind": "mc",
+   "prompt": "Which planet looks blue from space because of its oceans?",
+   "answer": "Earth",
+   "wrong": [
+    "Mars",
+    "Jupiter"
+   ],
+   "explain": "Oceans cover about 70% of Earth.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "kid-sci-d02d8a",
+   "kind": "mc",
+   "prompt": "What is the opposite of hot?",
+   "answer": "Cold",
+   "wrong": [
+    "Wet",
+    "Big"
+   ],
+   "explain": "Ice is cold and fire is hot.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "science"
   }
  ],
  "sources": [

@@ -13,6 +13,10 @@ import GC from './c2c_src/general_c.mjs';
 import KIDS from './c2c_src/kids.mjs';
 import KB from './c2c_src/kids_b.mjs';
 import GD from './c2c_src/general_d.mjs';
+import GE from './c2c_src/general_e.mjs';
+import KC from './c2c_src/kids_c.mjs';
+import HA from './c2c_src/history_a.mjs';
+import SB from './c2c_src/sport_b.mjs';
 import { SUMMER, WINTER, WORLD_CUP, ATHLETES, QUESTIONS as SPORT_Q } from './c2c_src/sport.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -49,7 +53,7 @@ function write(id, pack) {
   console.log(`${id}: ${qs} questions${its ? `, ${its} items` : ''}`);
 }
 
-const general = [...GA, ...GB, ...GC, ...GD].map(q => toQuestion('gen', q));
+const general = [...GA, ...GB, ...GC, ...GD, ...GE].map(q => toQuestion('gen', q));
 write('general', {
   id: 'general', title: 'General knowledge', theme: 'general', icon: '💡', kids: false, version: 1,
   questions: general,
@@ -57,7 +61,7 @@ write('general', {
 });
 
 const missing = [];
-const kids = [...KIDS, ...KB].map(q => { const r = toQuestion('kid', q, { kidsTag: true }); if (!r) missing.push(q.img); return r; }).filter(Boolean);
+const kids = [...KIDS, ...KB, ...KC].map(q => { const r = toQuestion('kid', q, { kidsTag: true }); if (!r) missing.push(q.img); return r; }).filter(Boolean);
 if (missing.length) console.warn(`kids: dropped ${missing.length} picture questions with no cached image: ${missing.join(', ')}`);
 write('kids', {
   id: 'kids', title: 'Kids quiz', theme: 'kids', icon: '🧸', kids: true, version: 1,
@@ -105,9 +109,19 @@ write('sport', {
     nation: { type: 'cat', label: 'Country', ask: 'Which country did {name} represent?', askReverse: 'Which of these sports stars represented {value}?', stmt: '{name} represented {value}.' },
   },
   items,
-  questions: SPORT_Q.map(q => toQuestion('spt', q)),
+  questions: [...SPORT_Q, ...SB].map(q => toQuestion('spt', q)),
   sources: [
     { name: 'Wikipedia: List of Olympic Games host cities', url: 'https://en.wikipedia.org/wiki/List_of_Olympic_Games_host_cities' },
     { name: 'Wikipedia: List of FIFA World Cup finals', url: 'https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_finals' },
   ],
 });
+
+// Hand-written history questions live in the C2 history pack (built from Wikidata by c2_build_history.mjs, which keeps
+// them): replace every `hq-` question there with the current c2c_src/history_a.mjs set.
+const HIST = join(ROOT, 'data/packs/history.json');
+const hist = JSON.parse(readFileSync(HIST, 'utf8'));
+const hq = { questions: HA.map(q => toQuestion('hq', q)) };
+for (const q of dropGiveaways(hq)) console.warn(`  giveaway dropped history/${q.id}: ${q.prompt}`);
+hist.questions = [...hist.questions.filter(q => !q.id.startsWith('hq-')), ...hq.questions];
+writeFileSync(HIST, JSON.stringify(hist, null, 1) + '\n');
+console.log(`history: ${hq.questions.length} hand-written questions merged (${hist.questions.length} total)`);

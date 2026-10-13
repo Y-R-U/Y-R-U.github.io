@@ -1,5 +1,5 @@
 // Builds the history pack: dated events cross-checked against Wikidata dates on each article.
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, wpQids, wdEntities, claims, wdYear, writePack, slug, rng, sample } from './c2_lib.mjs';
 import { EVENTS, HAND_CHECKED } from './c2_src/history.mjs';
@@ -57,6 +57,9 @@ for (let k = 0; k < 30; k++) {
   questions.push({ id: `first-${first.id}-${second.id}`, kind: 'mc', prompt: 'Which happened first?', answer: first.name, wrong: [second.name], explain: `${first.name}: ${fmtY(first.facts.year)}. ${second.name}: ${fmtY(second.facts.year)}.`, difficulty: Math.abs(a.facts.year - b.facts.year) > 150 ? 1 : 2, refs: [`history/${first.id}`, `history/${second.id}`] });
 }
 const seen = new Set();
+// Keep the hand-written `hq-` questions that tools/c2c_build.mjs merges in (source: c2c_src/history_a.mjs).
+const HQ_FILE = join(ROOT, 'data/packs/history.json');
+if (existsSync(HQ_FILE)) questions.push(...JSON.parse(readFileSync(HQ_FILE, 'utf8')).questions.filter(q => q.id.startsWith('hq-')));
 writePack({
   id: 'history', title: 'History', theme: 'history', icon: '🏛️', kids: false, version: 1,
   factsMeta: {

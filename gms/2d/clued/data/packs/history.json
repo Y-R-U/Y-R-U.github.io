@@ -5267,6 +5267,4373 @@
     "history/darwin-publishes-on-the-origin-of-species",
     "history/the-chernobyl-disaster"
    ]
+  },
+  {
+   "id": "hq-his-790df1",
+   "kind": "mc",
+   "prompt": "Which boy pharaoh's almost untouched tomb made him the best-known Egyptian king?",
+   "answer": "Tutankhamun",
+   "wrong": [
+    "Ramesses II",
+    "Khufu",
+    "Akhenaten"
+   ],
+   "explain": "Howard Carter found the tomb in the Valley of the Kings in 1922.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b79eaa",
+   "kind": "mc",
+   "prompt": "For which pharaoh was the Great Pyramid of Giza built?",
+   "answer": "Khufu",
+   "wrong": [
+    "Khafre",
+    "Tutankhamun",
+    "Ramesses II"
+   ],
+   "explain": "It was finished around 2560 BC and is the oldest of the Seven Wonders.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-61b1c7",
+   "kind": "mc",
+   "prompt": "Which river was the lifeline of ancient Egypt?",
+   "answer": "Nile",
+   "wrong": [
+    "Tigris",
+    "Euphrates",
+    "Jordan"
+   ],
+   "explain": "Its yearly flood left rich black soil along its banks.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-cfa86f",
+   "kind": "mc",
+   "prompt": "Ancient Egyptians made a writing material from which river reed?",
+   "answer": "Papyrus",
+   "wrong": [
+    "Bamboo",
+    "Flax",
+    "Bulrush"
+   ],
+   "explain": "The word 'paper' comes from papyrus.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0fb0e5",
+   "kind": "mc",
+   "prompt": "What were the kings of ancient Egypt called?",
+   "answer": "Pharaohs",
+   "wrong": [
+    "Sultans",
+    "Shahs",
+    "Caesars"
+   ],
+   "explain": "The word first meant 'great house', the royal palace.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-c72764",
+   "kind": "mc",
+   "prompt": "Which Egyptian queen had famous relationships with Julius Caesar and Mark Antony?",
+   "answer": "Cleopatra",
+   "wrong": [
+    "Nefertiti",
+    "Hatshepsut",
+    "Boudica"
+   ],
+   "explain": "She died in 30 BC, and Egypt became a Roman province.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-71e691",
+   "kind": "mc",
+   "prompt": "Which woman ruled Egypt as pharaoh in the 1400s BC and was often shown with a false beard?",
+   "answer": "Hatshepsut",
+   "wrong": [
+    "Nefertiti",
+    "Cleopatra",
+    "Nefertari"
+   ],
+   "explain": "Her temple at Deir el-Bahari is one of Egypt's finest.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-97621e",
+   "kind": "mc",
+   "prompt": "Which pharaoh built the great rock temples at Abu Simbel?",
+   "answer": "Ramesses II",
+   "wrong": [
+    "Tutankhamun",
+    "Khufu",
+    "Akhenaten"
+   ],
+   "explain": "The temples were moved, block by block, in the 1960s to escape the Aswan Dam's lake.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-c31e06",
+   "kind": "mc",
+   "prompt": "The ruins of ancient Babylon are in which modern country?",
+   "answer": "Iraq",
+   "wrong": [
+    "Iran",
+    "Syria",
+    "Egypt"
+   ],
+   "explain": "Babylon stood on the Euphrates, south of Baghdad.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-7686b7",
+   "kind": "mc",
+   "prompt": "Which Babylonian king created one of the earliest written law codes?",
+   "answer": "Hammurabi",
+   "wrong": [
+    "Nebuchadnezzar II",
+    "Sargon of Akkad",
+    "Cyrus the Great"
+   ],
+   "explain": "His code, around 1750 BC, includes 'an eye for an eye'.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ab71fa",
+   "kind": "mc",
+   "prompt": "Which ancient people invented cuneiform, one of the first writing systems?",
+   "answer": "Sumerians",
+   "wrong": [
+    "Egyptians",
+    "Phoenicians",
+    "Greeks"
+   ],
+   "explain": "Wedge-shaped marks were pressed into wet clay in Mesopotamia over 5,000 years ago.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-eae48f",
+   "kind": "mc",
+   "prompt": "Which seafaring people created an alphabet that inspired the Greek alphabet?",
+   "answer": "Phoenicians",
+   "wrong": [
+    "Sumerians",
+    "Etruscans",
+    "Hittites"
+   ],
+   "explain": "They traded across the Mediterranean from cities like Tyre and Sidon.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ae0b79",
+   "kind": "mc",
+   "prompt": "Which Persian king founded the Achaemenid Empire and let the Jews return home from Babylon?",
+   "answer": "Cyrus the Great",
+   "wrong": [
+    "Darius I",
+    "Xerxes I",
+    "Nebuchadnezzar II"
+   ],
+   "explain": "His empire stretched from Turkey to Central Asia.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-e79c7a",
+   "kind": "mc",
+   "prompt": "The Hanging Gardens, one of the Seven Wonders, were said to be in which city?",
+   "answer": "Babylon",
+   "wrong": [
+    "Athens",
+    "Alexandria",
+    "Persepolis"
+   ],
+   "explain": "No trace of them has been found, so some doubt they existed.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-21ee1a",
+   "kind": "mc",
+   "prompt": "Which Egyptian city founded by a Greek conqueror had a famous lighthouse and library?",
+   "answer": "Alexandria",
+   "wrong": [
+    "Memphis",
+    "Thebes",
+    "Cairo"
+   ],
+   "explain": "Alexander the Great founded it in 331 BC.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-65cfee",
+   "kind": "mc",
+   "prompt": "Which ancient African kingdom, south of Egypt, conquered Egypt and ruled it as its 25th dynasty?",
+   "answer": "Kush",
+   "wrong": [
+    "Aksum",
+    "Mali",
+    "Carthage"
+   ],
+   "explain": "Kushite kings built steep pyramids at Meroë in modern Sudan.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0301ad",
+   "kind": "mc",
+   "prompt": "Which Greek city-state developed democracy around 508 BC?",
+   "answer": "Athens",
+   "wrong": [
+    "Sparta",
+    "Corinth",
+    "Thebes"
+   ],
+   "explain": "Citizens voted directly in an assembly; women and slaves could not.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-f59143",
+   "kind": "mc",
+   "prompt": "Which Greek city-state was famous for its tough military training?",
+   "answer": "Sparta",
+   "wrong": [
+    "Athens",
+    "Corinth",
+    "Delphi"
+   ],
+   "explain": "Spartan boys began training at about age seven.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-9d7151",
+   "kind": "mc",
+   "prompt": "Who was the teacher of the young Alexander the Great?",
+   "answer": "Aristotle",
+   "wrong": [
+    "Plato",
+    "Socrates",
+    "Pythagoras"
+   ],
+   "explain": "Plato taught Aristotle, and Socrates taught Plato.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-6afaa4",
+   "kind": "mc",
+   "prompt": "Which Athenian philosopher was sentenced to death by drinking hemlock?",
+   "answer": "Socrates",
+   "wrong": [
+    "Plato",
+    "Aristotle",
+    "Diogenes"
+   ],
+   "explain": "He was executed in 399 BC; he left no writings of his own.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-16f33a",
+   "kind": "mc",
+   "prompt": "At which site were the ancient Olympic Games held?",
+   "answer": "Olympia",
+   "wrong": [
+    "Athens",
+    "Sparta",
+    "Delphi"
+   ],
+   "explain": "They honoured Zeus and were held every four years.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-10234d",
+   "kind": "mc",
+   "prompt": "In legend, how did the Greeks sneak soldiers into the city of Troy?",
+   "answer": "Inside a wooden horse",
+   "wrong": [
+    "Through a tunnel",
+    "Dressed as priests",
+    "Inside wine barrels"
+   ],
+   "explain": "Hence the warning about Greeks bearing gifts.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-f2d3fd",
+   "kind": "mc",
+   "prompt": "Which ancient Greek writer is called the 'Father of History'?",
+   "answer": "Herodotus",
+   "wrong": [
+    "Thucydides",
+    "Homer",
+    "Plutarch"
+   ],
+   "explain": "He wrote about the wars between the Greeks and Persians.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b1d375",
+   "kind": "mc",
+   "prompt": "Which Athenian leader of the 400s BC had the Parthenon built?",
+   "answer": "Pericles",
+   "wrong": [
+    "Solon",
+    "Themistocles",
+    "Cleisthenes"
+   ],
+   "explain": "His time is called Athens' Golden Age.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-f148a4",
+   "kind": "mc",
+   "prompt": "Which Macedonian king was Alexander the Great's father?",
+   "answer": "Philip II",
+   "wrong": [
+    "Darius III",
+    "Leonidas",
+    "Ptolemy I"
+   ],
+   "explain": "Philip was assassinated in 336 BC, and Alexander became king at 20.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-69cd43",
+   "kind": "mc",
+   "prompt": "Which Spartan king led the 300 at the Battle of Thermopylae?",
+   "answer": "Leonidas",
+   "wrong": [
+    "Xerxes",
+    "Pericles",
+    "Philip II"
+   ],
+   "explain": "The Greeks held the pass against the Persians for three days in 480 BC.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-4c5fa1",
+   "kind": "mc",
+   "prompt": "According to legend, which twins founded Rome?",
+   "answer": "Romulus and Remus",
+   "wrong": [
+    "Castor and Pollux",
+    "Apollo and Artemis",
+    "Jacob and Esau"
+   ],
+   "explain": "A she-wolf was said to have fed them as babies.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-02b4bf",
+   "kind": "mc",
+   "prompt": "Which Carthaginian general crossed the Alps with war elephants?",
+   "answer": "Hannibal",
+   "wrong": [
+    "Hamilcar",
+    "Scipio",
+    "Spartacus"
+   ],
+   "explain": "He invaded Italy in 218 BC during the Second Punic War.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-88ccac",
+   "kind": "mc",
+   "prompt": "Which gladiator led a great slave revolt against Rome in 73 BC?",
+   "answer": "Spartacus",
+   "wrong": [
+    "Hannibal",
+    "Vercingetorix",
+    "Brutus"
+   ],
+   "explain": "His army of escaped slaves defeated several Roman forces.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-47ff75",
+   "kind": "mc",
+   "prompt": "Which Roman emperor was blamed for the Great Fire of Rome in AD 64?",
+   "answer": "Nero",
+   "wrong": [
+    "Caligula",
+    "Commodus",
+    "Tiberius"
+   ],
+   "explain": "The story that he 'fiddled while Rome burned' is a legend.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-2be5eb",
+   "kind": "mc",
+   "prompt": "What language did the ancient Romans speak?",
+   "answer": "Latin",
+   "wrong": [
+    "Greek",
+    "Italian",
+    "Etruscan"
+   ],
+   "explain": "Italian, Spanish, French, Portuguese and Romanian grew from Latin.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-1b660c",
+   "kind": "mc",
+   "prompt": "Which Roman emperor allowed Christians to worship freely in 313 AD?",
+   "answer": "Constantine the Great",
+   "wrong": [
+    "Nero",
+    "Augustus",
+    "Diocletian"
+   ],
+   "explain": "The Edict of Milan ended the persecution of Christians.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-8c235a",
+   "kind": "mc",
+   "prompt": "Which Greek city was refounded in 330 AD as Constantinople?",
+   "answer": "Byzantium",
+   "wrong": [
+    "Athens",
+    "Antioch",
+    "Ephesus"
+   ],
+   "explain": "Today the city is Istanbul.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-fcdba6",
+   "kind": "mc",
+   "prompt": "Which queen of the Iceni led a revolt against Roman rule in Britain around AD 60?",
+   "answer": "Boudica",
+   "wrong": [
+    "Cleopatra",
+    "Zenobia",
+    "Cartimandua"
+   ],
+   "explain": "Her army burned Roman London before being defeated.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-95a887",
+   "kind": "mc",
+   "prompt": "Which river did Julius Caesar cross in 49 BC, starting a civil war?",
+   "answer": "Rubicon",
+   "wrong": [
+    "Tiber",
+    "Po",
+    "Rhine"
+   ],
+   "explain": "'Crossing the Rubicon' now means passing the point of no return.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-7f0f38",
+   "kind": "mc",
+   "prompt": "Which Roman emperor ordered a wall built across northern Britain in AD 122?",
+   "answer": "Hadrian",
+   "wrong": [
+    "Claudius",
+    "Trajan",
+    "Antoninus Pius"
+   ],
+   "explain": "Antoninus Pius later built a second wall further north.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-e47835",
+   "kind": "mc",
+   "prompt": "Which Gallic chieftain surrendered to Julius Caesar after the siege of Alesia in 52 BC?",
+   "answer": "Vercingetorix",
+   "wrong": [
+    "Asterix",
+    "Boudica",
+    "Arminius"
+   ],
+   "explain": "Asterix is fiction; Vercingetorix is a French national hero.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-03ddd4",
+   "kind": "mc",
+   "prompt": "Which Chinese philosopher's sayings were collected in the Analects?",
+   "answer": "Confucius",
+   "wrong": [
+    "Laozi",
+    "Sun Tzu",
+    "Mencius"
+   ],
+   "explain": "Confucius lived around 551 to 479 BC.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-e1a158",
+   "kind": "mc",
+   "prompt": "Which Chinese general is credited with 'The Art of War'?",
+   "answer": "Sun Tzu",
+   "wrong": [
+    "Confucius",
+    "Laozi",
+    "Cao Cao"
+   ],
+   "explain": "Business leaders and sports coaches still quote it.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-f5ddde",
+   "kind": "mc",
+   "prompt": "What was the network of trade routes linking China with the Mediterranean called?",
+   "answer": "The Silk Road",
+   "wrong": [
+    "The Amber Road",
+    "The Royal Road",
+    "The Grand Trunk Road"
+   ],
+   "explain": "Silk, spices, ideas and religions all travelled along it.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-1bd0d5",
+   "kind": "mc",
+   "prompt": "Which Chinese dynasty ruled from 1368 to 1644 and built much of the Great Wall seen today?",
+   "answer": "Ming",
+   "wrong": [
+    "Qing",
+    "Tang",
+    "Han"
+   ],
+   "explain": "The Ming also built the Forbidden City.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-342173",
+   "kind": "mc",
+   "prompt": "What was China's last imperial dynasty, which ended in 1912?",
+   "answer": "Qing",
+   "wrong": [
+    "Ming",
+    "Han",
+    "Song"
+   ],
+   "explain": "The Qing were Manchus from the north-east.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-f9edb1",
+   "kind": "mc",
+   "prompt": "Who was the last emperor of China?",
+   "answer": "Puyi",
+   "wrong": [
+    "Kangxi",
+    "Qianlong",
+    "Guangxu"
+   ],
+   "explain": "He became emperor aged two and gave up the throne in 1912.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-7bb515",
+   "kind": "mc",
+   "prompt": "Who led the Communists to victory and founded the People's Republic of China?",
+   "answer": "Mao Zedong",
+   "wrong": [
+    "Chiang Kai-shek",
+    "Sun Yat-sen",
+    "Deng Xiaoping"
+   ],
+   "explain": "Mao proclaimed the People's Republic in Beijing on 1 October 1949.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-8202a9",
+   "kind": "mc",
+   "prompt": "Who became the first president of the Republic of China in 1912?",
+   "answer": "Sun Yat-sen",
+   "wrong": [
+    "Mao Zedong",
+    "Chiang Kai-shek",
+    "Yuan Shikai"
+   ],
+   "explain": "He is called the father of modern China. Yuan Shikai soon took over from him.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-9b156f",
+   "kind": "mc",
+   "prompt": "Which Mongol ruler founded China's Yuan dynasty?",
+   "answer": "Kublai Khan",
+   "wrong": [
+    "Genghis Khan",
+    "Ögedei Khan",
+    "Timur"
+   ],
+   "explain": "He was Genghis Khan's grandson; Marco Polo described his court.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-4b699d",
+   "kind": "mc",
+   "prompt": "The Terracotta Army was buried to guard the tomb of which emperor?",
+   "answer": "Qin Shi Huang",
+   "wrong": [
+    "Kublai Khan",
+    "Wu of Han",
+    "Puyi"
+   ],
+   "explain": "Farmers digging a well found it near Xi'an in 1974.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-17d906",
+   "kind": "mc",
+   "prompt": "China fought the Opium Wars in the 1800s mainly against which country?",
+   "answer": "Britain",
+   "wrong": [
+    "Japan",
+    "Russia",
+    "Portugal"
+   ],
+   "explain": "France also joined the second war.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-6797ec",
+   "kind": "mc",
+   "prompt": "Hong Kong was ruled by which country until 1997?",
+   "answer": "United Kingdom",
+   "wrong": [
+    "Portugal",
+    "France",
+    "Japan"
+   ],
+   "explain": "It was handed back to China on 1 July 1997.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-64f6f1",
+   "kind": "mc",
+   "prompt": "Macau was ruled by which country until 1999?",
+   "answer": "Portugal",
+   "wrong": [
+    "Spain",
+    "United Kingdom",
+    "Netherlands"
+   ],
+   "explain": "Portuguese traders settled there in the 1550s.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-996afa",
+   "kind": "mc",
+   "prompt": "In which year did China's Cultural Revolution begin?",
+   "answer": "1966",
+   "wrong": [
+    "1949",
+    "1958",
+    "1976"
+   ],
+   "explain": "It ended with Mao's death in 1976.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-4575db",
+   "kind": "mc",
+   "prompt": "What title did Japan's military rulers hold for about 700 years until 1868?",
+   "answer": "Shogun",
+   "wrong": [
+    "Daimyo",
+    "Samurai",
+    "Mikado"
+   ],
+   "explain": "The emperor reigned but the shogun ruled.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-8f6207",
+   "kind": "mc",
+   "prompt": "What were the warriors of old Japan called?",
+   "answer": "Samurai",
+   "wrong": [
+    "Ninja",
+    "Geisha",
+    "Sumo"
+   ],
+   "explain": "Samurai followed a code later called bushidō.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-467c96",
+   "kind": "mc",
+   "prompt": "Which Japanese city was the first to be hit by an atomic bomb, on 6 August 1945?",
+   "answer": "Hiroshima",
+   "wrong": [
+    "Nagasaki",
+    "Tokyo",
+    "Kyoto"
+   ],
+   "explain": "Nagasaki was bombed three days later.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0fbd97",
+   "kind": "mc",
+   "prompt": "Which Japanese city was hit by the second atomic bomb, on 9 August 1945?",
+   "answer": "Nagasaki",
+   "wrong": [
+    "Hiroshima",
+    "Osaka",
+    "Kobe"
+   ],
+   "explain": "Japan announced its surrender on 15 August.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-722829",
+   "kind": "mc",
+   "prompt": "Which emperor reigned in Japan during the Second World War?",
+   "answer": "Hirohito",
+   "wrong": [
+    "Meiji",
+    "Akihito",
+    "Taishō"
+   ],
+   "explain": "He reigned from 1926 to 1989.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-8e1f80",
+   "kind": "mc",
+   "prompt": "In which year did an armistice end the fighting in the Korean War?",
+   "answer": "1953",
+   "wrong": [
+    "1950",
+    "1945",
+    "1961"
+   ],
+   "explain": "No peace treaty was ever signed.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-5af601",
+   "kind": "mc",
+   "prompt": "Which Korean admiral defeated Japanese fleets with 'turtle ships' in the 1590s?",
+   "answer": "Yi Sun-sin",
+   "wrong": [
+    "Sejong the Great",
+    "Wang Geon",
+    "Gwanggaeto"
+   ],
+   "explain": "His statue stands in the centre of Seoul.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-9e5c89",
+   "kind": "mc",
+   "prompt": "Along which line of latitude was Korea divided after 1945?",
+   "answer": "The 38th parallel",
+   "wrong": [
+    "The Equator",
+    "The 17th parallel",
+    "The 49th parallel"
+   ],
+   "explain": "Vietnam was divided at the 17th parallel in 1954.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-1c8e1a",
+   "kind": "mc",
+   "prompt": "Which war did Japan win against Russia in 1905?",
+   "answer": "The Russo-Japanese War",
+   "wrong": [
+    "The Crimean War",
+    "The Boxer Rebellion",
+    "The Sino-Japanese War"
+   ],
+   "explain": "It was the first modern victory of an Asian power over a European one.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-50ba16",
+   "kind": "mc",
+   "prompt": "Which Indian emperor turned to Buddhism after a bloody war in Kalinga?",
+   "answer": "Ashoka",
+   "wrong": [
+    "Akbar",
+    "Chandragupta Maurya",
+    "Shah Jahan"
+   ],
+   "explain": "His lion capital is India's national emblem.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-e985bd",
+   "kind": "mc",
+   "prompt": "Which Mughal emperor, ruling from 1556 to 1605, was famous for religious tolerance?",
+   "answer": "Akbar",
+   "wrong": [
+    "Aurangzeb",
+    "Babur",
+    "Shah Jahan"
+   ],
+   "explain": "He held debates with Hindu, Muslim, Christian and Jain scholars.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b6a777",
+   "kind": "mc",
+   "prompt": "Who founded the Mughal Empire in India in 1526?",
+   "answer": "Babur",
+   "wrong": [
+    "Akbar",
+    "Humayun",
+    "Timur"
+   ],
+   "explain": "He won the First Battle of Panipat.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-38be8a",
+   "kind": "mc",
+   "prompt": "In which modern country was Siddhartha Gautama, the Buddha, born?",
+   "answer": "Nepal",
+   "wrong": [
+    "India",
+    "Sri Lanka",
+    "China"
+   ],
+   "explain": "Tradition places his birth at Lumbini, in southern Nepal.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0f2ea3",
+   "kind": "mc",
+   "prompt": "Gandhi's famous 1930 march to the sea protested against a British tax on what?",
+   "answer": "Salt",
+   "wrong": [
+    "Tea",
+    "Cotton",
+    "Rice"
+   ],
+   "explain": "He walked about 390 km to Dandi and made salt from seawater.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b87ded",
+   "kind": "mc",
+   "prompt": "Who was the first prime minister of independent India?",
+   "answer": "Jawaharlal Nehru",
+   "wrong": [
+    "Mahatma Gandhi",
+    "Indira Gandhi",
+    "Vallabhbhai Patel"
+   ],
+   "explain": "He served from 1947 until his death in 1964.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-54c5b3",
+   "kind": "mc",
+   "prompt": "When British India was divided in 1947, which new country was created alongside India?",
+   "answer": "Pakistan",
+   "wrong": [
+    "Bangladesh",
+    "Burma",
+    "Sri Lanka"
+   ],
+   "explain": "Partition forced about 15 million people from their homes.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-14d586",
+   "kind": "mc",
+   "prompt": "Which country, once called East Pakistan, became independent in 1971?",
+   "answer": "Bangladesh",
+   "wrong": [
+    "Sri Lanka",
+    "Nepal",
+    "Myanmar"
+   ],
+   "explain": "Sheikh Mujibur Rahman led the independence movement.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-5963ee",
+   "kind": "mc",
+   "prompt": "Who founded Pakistan and is known there as Quaid-e-Azam (Great Leader)?",
+   "answer": "Muhammad Ali Jinnah",
+   "wrong": [
+    "Liaquat Ali Khan",
+    "Allama Iqbal",
+    "Zulfikar Ali Bhutto"
+   ],
+   "explain": "He became Pakistan's first governor-general.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-506b45",
+   "kind": "mc",
+   "prompt": "Which British trading firm ruled Bengal and much of South Asia until 1858?",
+   "answer": "The East India Company",
+   "wrong": [
+    "The Hudson's Bay Company",
+    "The Royal African Company",
+    "The Virginia Company"
+   ],
+   "explain": "After the 1857 rebellion, the British Crown took direct control.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-efbda3",
+   "kind": "mc",
+   "prompt": "Who became the first woman to lead Pakistan as prime minister, in 1988?",
+   "answer": "Benazir Bhutto",
+   "wrong": [
+    "Fatima Jinnah",
+    "Malala Yousafzai",
+    "Indira Gandhi"
+   ],
+   "explain": "She was the first woman elected to lead a Muslim-majority country.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-bc0029",
+   "kind": "mc",
+   "prompt": "In which city was the Prophet Muhammad born?",
+   "answer": "Mecca",
+   "wrong": [
+    "Medina",
+    "Jerusalem",
+    "Damascus"
+   ],
+   "explain": "He was born around 570 AD.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ab1e0e",
+   "kind": "mc",
+   "prompt": "The Islamic calendar starts with the Prophet's move from Mecca to which city in 622?",
+   "answer": "Medina",
+   "wrong": [
+    "Jerusalem",
+    "Baghdad",
+    "Cairo"
+   ],
+   "explain": "The journey is called the Hijra.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-de6278",
+   "kind": "mc",
+   "prompt": "Which city was the capital of the Abbasid caliphs and home of the House of Wisdom?",
+   "answer": "Baghdad",
+   "wrong": [
+    "Damascus",
+    "Cairo",
+    "Córdoba"
+   ],
+   "explain": "Scholars there translated Greek, Persian and Indian works into Arabic.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-5a5ed2",
+   "kind": "mc",
+   "prompt": "Which Muslim leader took Jerusalem from the Crusaders in 1187?",
+   "answer": "Saladin",
+   "wrong": [
+    "Suleiman the Magnificent",
+    "Harun al-Rashid",
+    "Mehmed II"
+   ],
+   "explain": "He was born in Tikrit, in modern Iraq, to a Kurdish family.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b4cde0",
+   "kind": "mc",
+   "prompt": "Which Ottoman sultan captured Constantinople in 1453?",
+   "answer": "Mehmed II",
+   "wrong": [
+    "Suleiman the Magnificent",
+    "Osman I",
+    "Selim I"
+   ],
+   "explain": "He was only 21 and became known as Mehmed the Conqueror.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-109d48",
+   "kind": "mc",
+   "prompt": "Which Ottoman sultan, who ruled from 1520 to 1566, was called 'the Magnificent'?",
+   "answer": "Suleiman",
+   "wrong": [
+    "Mehmed II",
+    "Osman I",
+    "Selim II"
+   ],
+   "explain": "In Turkey he is called Kanuni, 'the Lawgiver'.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-a21045",
+   "kind": "mc",
+   "prompt": "Who founded the modern Republic of Turkey in 1923?",
+   "answer": "Mustafa Kemal Atatürk",
+   "wrong": [
+    "Enver Pasha",
+    "İsmet İnönü",
+    "Mehmed VI"
+   ],
+   "explain": "Atatürk means 'Father of the Turks'.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-06f60a",
+   "kind": "mc",
+   "prompt": "What name is given to the religious wars for the Holy Land that began in 1096?",
+   "answer": "The Crusades",
+   "wrong": [
+    "The Hundred Years' War",
+    "The Wars of the Roses",
+    "The Thirty Years' War"
+   ],
+   "explain": "The main crusades lasted about 200 years.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-a87afe",
+   "kind": "mc",
+   "prompt": "Muslim Moors ruled much of which peninsula for over 700 years?",
+   "answer": "The Iberian Peninsula",
+   "wrong": [
+    "The Italian Peninsula",
+    "The Balkan Peninsula",
+    "The Arabian Peninsula"
+   ],
+   "explain": "Their rule left buildings like the Alhambra and Córdoba's Great Mosque.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-73eec1",
+   "kind": "mc",
+   "prompt": "In 1492, Spain's Catholic monarchs captured which last Muslim kingdom in Spain?",
+   "answer": "Granada",
+   "wrong": [
+    "Córdoba",
+    "Seville",
+    "Toledo"
+   ],
+   "explain": "That same year they paid for Columbus's voyage.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-d8acbe",
+   "kind": "mc",
+   "prompt": "Which country was founded as a Jewish state in 1948?",
+   "answer": "Israel",
+   "wrong": [
+    "Jordan",
+    "Lebanon",
+    "Cyprus"
+   ],
+   "explain": "David Ben-Gurion declared independence on 14 May 1948.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-bdcb59",
+   "kind": "mc",
+   "prompt": "Which Egyptian president took control of the Suez Canal in 1956?",
+   "answer": "Gamal Abdel Nasser",
+   "wrong": [
+    "Anwar Sadat",
+    "Hosni Mubarak",
+    "King Farouk"
+   ],
+   "explain": "Britain, France and Israel invaded, then withdrew under US pressure.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-9dfa77",
+   "kind": "mc",
+   "prompt": "Which religious leader led Iran's 1979 revolution?",
+   "answer": "Ayatollah Khomeini",
+   "wrong": [
+    "Mohammad Reza Pahlavi",
+    "Ali Khamenei",
+    "Mohammad Mosaddegh"
+   ],
+   "explain": "The revolution ended the rule of the Shah.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-08ce1b",
+   "kind": "mc",
+   "prompt": "Which Iraqi leader invaded Kuwait in 1990?",
+   "answer": "Saddam Hussein",
+   "wrong": [
+    "Hafez al-Assad",
+    "Muammar Gaddafi",
+    "Ayatollah Khomeini"
+   ],
+   "explain": "A US-led coalition drove Iraq out in the 1991 Gulf War.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-acab45",
+   "kind": "mc",
+   "prompt": "In which country did the 'Arab Spring' protests begin, in December 2010?",
+   "answer": "Tunisia",
+   "wrong": [
+    "Egypt",
+    "Libya",
+    "Syria"
+   ],
+   "explain": "They began after a street seller, Mohamed Bouazizi, set himself on fire.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-8d8f46",
+   "kind": "mc",
+   "prompt": "Which Persian ceremonial capital was burned by Alexander the Great in 330 BC?",
+   "answer": "Persepolis",
+   "wrong": [
+    "Babylon",
+    "Susa",
+    "Nineveh"
+   ],
+   "explain": "Its ruins lie near Shiraz in Iran.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0122e1",
+   "kind": "mc",
+   "prompt": "Which king of Mali made a famous pilgrimage to Mecca in 1324, carrying great amounts of gold?",
+   "answer": "Mansa Musa",
+   "wrong": [
+    "Sundiata Keita",
+    "Askia Muhammad",
+    "Sunni Ali"
+   ],
+   "explain": "He is often called one of the richest people in history.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-6ac78e",
+   "kind": "mc",
+   "prompt": "Which king built the Zulu nation into a powerful kingdom in the early 1800s?",
+   "answer": "Shaka",
+   "wrong": [
+    "Cetshwayo",
+    "Moshoeshoe",
+    "Dingane"
+   ],
+   "explain": "He reorganised Zulu warriors with short stabbing spears.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-5ce53a",
+   "kind": "mc",
+   "prompt": "At which 1879 battle did a Zulu army defeat a British force?",
+   "answer": "Isandlwana",
+   "wrong": [
+    "Rorke's Drift",
+    "Ulundi",
+    "Majuba Hill"
+   ],
+   "explain": "The British defended Rorke's Drift the same day.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-762245",
+   "kind": "mc",
+   "prompt": "Which African country defeated an Italian invasion at the Battle of Adwa in 1896?",
+   "answer": "Ethiopia",
+   "wrong": [
+    "Somalia",
+    "Eritrea",
+    "Libya"
+   ],
+   "explain": "The victory kept Ethiopia independent during the Scramble for Africa.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-6f36e1",
+   "kind": "mc",
+   "prompt": "Which emperor ruled Ethiopia from 1930 to 1974?",
+   "answer": "Haile Selassie",
+   "wrong": [
+    "Menelik II",
+    "Tewodros II",
+    "Mengistu Haile Mariam"
+   ],
+   "explain": "Rastafarians revere him.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-610e00",
+   "kind": "mc",
+   "prompt": "Who led Ghana to independence in 1957?",
+   "answer": "Kwame Nkrumah",
+   "wrong": [
+    "Jomo Kenyatta",
+    "Julius Nyerere",
+    "Patrice Lumumba"
+   ],
+   "explain": "He became Ghana's first prime minister, then president.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-1c3e99",
+   "kind": "mc",
+   "prompt": "Who was Kenya's first president?",
+   "answer": "Jomo Kenyatta",
+   "wrong": [
+    "Daniel arap Moi",
+    "Kwame Nkrumah",
+    "Julius Nyerere"
+   ],
+   "explain": "Kenya became independent from Britain in 1963.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-e9449d",
+   "kind": "mc",
+   "prompt": "Apartheid was a system of racial segregation in which country?",
+   "answer": "South Africa",
+   "wrong": [
+    "Zimbabwe",
+    "Kenya",
+    "Nigeria"
+   ],
+   "explain": "It lasted from 1948 until the early 1990s.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b1a87d",
+   "kind": "mc",
+   "prompt": "On which island was Nelson Mandela held for 18 of his 27 years in prison?",
+   "answer": "Robben Island",
+   "wrong": [
+    "Alcatraz",
+    "Devil's Island",
+    "Saint Helena"
+   ],
+   "explain": "The prison is now a museum and World Heritage Site.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-305ac5",
+   "kind": "mc",
+   "prompt": "In which year was Nelson Mandela released from prison?",
+   "answer": "1990",
+   "wrong": [
+    "1994",
+    "1985",
+    "1976"
+   ],
+   "explain": "He walked free on 11 February 1990 and became president in 1994.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-6c9c4e",
+   "kind": "mc",
+   "prompt": "Which South African archbishop won the 1984 Nobel Peace Prize for opposing apartheid?",
+   "answer": "Desmond Tutu",
+   "wrong": [
+    "Steve Biko",
+    "Oliver Tambo",
+    "Albert Luthuli"
+   ],
+   "explain": "He later chaired the Truth and Reconciliation Commission.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-342510",
+   "kind": "mc",
+   "prompt": "In which country did a genocide kill about 800,000 people in 1994?",
+   "answer": "Rwanda",
+   "wrong": [
+    "Uganda",
+    "Kenya",
+    "Somalia"
+   ],
+   "explain": "Most of the victims were Tutsi, killed in about 100 days.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ad7014",
+   "kind": "mc",
+   "prompt": "In which city did European powers meet in 1884–85 to divide up Africa?",
+   "answer": "Berlin",
+   "wrong": [
+    "Paris",
+    "London",
+    "Brussels"
+   ],
+   "explain": "No African was invited to the conference.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-42e29e",
+   "kind": "mc",
+   "prompt": "Which European king ran the Congo Free State as his personal property?",
+   "answer": "Leopold II of Belgium",
+   "wrong": [
+    "Wilhelm II of Germany",
+    "Victor Emmanuel II of Italy",
+    "Louis-Philippe of France"
+   ],
+   "explain": "Reports of forced labour and atrocities led Belgium to take it over in 1908.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-55f922",
+   "kind": "mc",
+   "prompt": "Which European country ruled Angola and Mozambique until 1975?",
+   "answer": "Portugal",
+   "wrong": [
+    "Spain",
+    "Belgium",
+    "France"
+   ],
+   "explain": "A coup in Lisbon in 1974 led to their independence.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-d3cf69",
+   "kind": "mc",
+   "prompt": "Which ancient kingdom in today's Ethiopia and Eritrea was one of the first to adopt Christianity?",
+   "answer": "Aksum",
+   "wrong": [
+    "Kush",
+    "Mali",
+    "Songhai"
+   ],
+   "explain": "King Ezana became Christian in the 300s.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-7c3b6f",
+   "kind": "mc",
+   "prompt": "Which Basotho king founded the nation that became Lesotho?",
+   "answer": "Moshoeshoe I",
+   "wrong": [
+    "Shaka",
+    "Cetshwayo",
+    "Sobhuza II"
+   ],
+   "explain": "His mountain fortress of Thaba Bosiu was never taken.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-a024f0",
+   "kind": "mc",
+   "prompt": "Which Spanish conquistador brought down the Aztec Empire?",
+   "answer": "Hernán Cortés",
+   "wrong": [
+    "Francisco Pizarro",
+    "Vasco Núñez de Balboa",
+    "Hernando de Soto"
+   ],
+   "explain": "Tenochtitlan fell in 1521.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-c197d7",
+   "kind": "mc",
+   "prompt": "Which Spanish conquistador conquered the Inca Empire?",
+   "answer": "Francisco Pizarro",
+   "wrong": [
+    "Hernán Cortés",
+    "Vasco Núñez de Balboa",
+    "Hernando de Soto"
+   ],
+   "explain": "He captured the emperor Atahualpa in 1532.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-cb06e0",
+   "kind": "mc",
+   "prompt": "Who was the Aztec emperor when the Spanish arrived in 1519?",
+   "answer": "Moctezuma II",
+   "wrong": [
+    "Atahualpa",
+    "Cuauhtémoc",
+    "Pachacuti"
+   ],
+   "explain": "He died in 1520 while held by the Spanish.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ce3942",
+   "kind": "mc",
+   "prompt": "Which Inca emperor was captured and killed by Francisco Pizarro?",
+   "answer": "Atahualpa",
+   "wrong": [
+    "Moctezuma II",
+    "Pachacuti",
+    "Huayna Capac"
+   ],
+   "explain": "He filled a room with gold as ransom but was executed in 1533.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-74110d",
+   "kind": "mc",
+   "prompt": "Which civilisation built Chichen Itza and Tikal and used a famous calendar?",
+   "answer": "Maya",
+   "wrong": [
+    "Aztec",
+    "Inca",
+    "Olmec"
+   ],
+   "explain": "Millions of Maya people still live in Mexico and Central America.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ab7687",
+   "kind": "mc",
+   "prompt": "Which city was the capital of the Inca Empire?",
+   "answer": "Cusco",
+   "wrong": [
+    "Lima",
+    "Quito",
+    "La Paz"
+   ],
+   "explain": "Its name is often said to mean 'navel of the world'.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-200fe7",
+   "kind": "mc",
+   "prompt": "Which Venezuelan is called 'the Liberator' for freeing much of South America from Spain?",
+   "answer": "Simón Bolívar",
+   "wrong": [
+    "José de San Martín",
+    "Bernardo O'Higgins",
+    "Che Guevara"
+   ],
+   "explain": "Bolivia is named after him.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-db0ffb",
+   "kind": "mc",
+   "prompt": "Which Argentine general helped free Argentina, Chile and Peru from Spanish rule?",
+   "answer": "José de San Martín",
+   "wrong": [
+    "Simón Bolívar",
+    "Antonio José de Sucre",
+    "Juan Perón"
+   ],
+   "explain": "He led an army across the Andes in 1817.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ef1b36",
+   "kind": "mc",
+   "prompt": "Which country became independent in 1804 after the only successful large-scale slave revolt?",
+   "answer": "Haiti",
+   "wrong": [
+    "Jamaica",
+    "Cuba",
+    "Brazil"
+   ],
+   "explain": "Haiti was the first independent nation in Latin America.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-80a079",
+   "kind": "mc",
+   "prompt": "From which country did Brazil declare independence in 1822?",
+   "answer": "Portugal",
+   "wrong": [
+    "Spain",
+    "France",
+    "Netherlands"
+   ],
+   "explain": "A Portuguese prince became Brazil's first emperor, Pedro I.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-c73bba",
+   "kind": "mc",
+   "prompt": "Who led the 1959 revolution that took power in Cuba?",
+   "answer": "Fidel Castro",
+   "wrong": [
+    "Fulgencio Batista",
+    "Manuel Noriega",
+    "Hugo Chávez"
+   ],
+   "explain": "Batista, the dictator, fled on New Year's Day 1959.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0c54e6",
+   "kind": "mc",
+   "prompt": "Which Argentine-born revolutionary fought beside Fidel Castro in Cuba?",
+   "answer": "Che Guevara",
+   "wrong": [
+    "Raúl Castro",
+    "Augusto Pinochet",
+    "Juan Perón"
+   ],
+   "explain": "His portrait became one of the world's most famous images.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-248e84",
+   "kind": "mc",
+   "prompt": "Which Argentine first lady was known as Evita?",
+   "answer": "Eva Perón",
+   "wrong": [
+    "Isabel Perón",
+    "Cristina Kirchner",
+    "Frida Kahlo"
+   ],
+   "explain": "She died in 1952 aged 33.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ca022d",
+   "kind": "mc",
+   "prompt": "Which general seized power in Chile in a 1973 coup?",
+   "answer": "Augusto Pinochet",
+   "wrong": [
+    "Salvador Allende",
+    "Juan Perón",
+    "Manuel Noriega"
+   ],
+   "explain": "He ruled until 1990.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-385752",
+   "kind": "mc",
+   "prompt": "Which 1982 war was fought between Argentina and the United Kingdom?",
+   "answer": "The Falklands War",
+   "wrong": [
+    "The Gulf War",
+    "The Boer War",
+    "The Suez Crisis"
+   ],
+   "explain": "Argentina calls the islands Las Malvinas.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-637c02",
+   "kind": "mc",
+   "prompt": "Which country sold Alaska to the United States in 1867?",
+   "answer": "Russia",
+   "wrong": [
+    "Canada",
+    "Britain",
+    "Spain"
+   ],
+   "explain": "The price was 7.2 million dollars, about 2 cents an acre.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-e59bf9",
+   "kind": "mc",
+   "prompt": "In which year did the Mexican Revolution begin?",
+   "answer": "1910",
+   "wrong": [
+    "1810",
+    "1867",
+    "1929"
+   ],
+   "explain": "Mexico's war of independence had begun a century earlier, in 1810.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-57c303",
+   "kind": "mc",
+   "prompt": "Who wrote the first draft of the US Declaration of Independence?",
+   "answer": "Thomas Jefferson",
+   "wrong": [
+    "Benjamin Franklin",
+    "John Adams",
+    "George Washington"
+   ],
+   "explain": "Jefferson later became the third president.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-2d10ab",
+   "kind": "mc",
+   "prompt": "Which US president gave the Gettysburg Address in 1863?",
+   "answer": "Abraham Lincoln",
+   "wrong": [
+    "Ulysses S. Grant",
+    "Andrew Johnson",
+    "James Buchanan"
+   ],
+   "explain": "It begins 'Four score and seven years ago'.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ad4905",
+   "kind": "mc",
+   "prompt": "Which US president resigned over the Watergate scandal?",
+   "answer": "Richard Nixon",
+   "wrong": [
+    "Gerald Ford",
+    "Lyndon B. Johnson",
+    "Jimmy Carter"
+   ],
+   "explain": "He is the only US president to have resigned.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-cc850e",
+   "kind": "mc",
+   "prompt": "Who was US president during the Cuban Missile Crisis?",
+   "answer": "John F. Kennedy",
+   "wrong": [
+    "Dwight D. Eisenhower",
+    "Lyndon B. Johnson",
+    "Richard Nixon"
+   ],
+   "explain": "The 13-day stand-off with the Soviet Union came in October 1962.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-33067c",
+   "kind": "mc",
+   "prompt": "Which woman's 1955 refusal to give up her bus seat sparked the Montgomery bus boycott?",
+   "answer": "Rosa Parks",
+   "wrong": [
+    "Harriet Tubman",
+    "Coretta Scott King",
+    "Maya Angelou"
+   ],
+   "explain": "She was arrested in Montgomery, Alabama.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-808bd9",
+   "kind": "mc",
+   "prompt": "Which US president was elected four times?",
+   "answer": "Franklin D. Roosevelt",
+   "wrong": [
+    "Theodore Roosevelt",
+    "Woodrow Wilson",
+    "Harry S. Truman"
+   ],
+   "explain": "Presidents have been limited to two terms since 1951.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-09cd45",
+   "kind": "mc",
+   "prompt": "Who was the first US president to live in the White House?",
+   "answer": "John Adams",
+   "wrong": [
+    "George Washington",
+    "Thomas Jefferson",
+    "James Madison"
+   ],
+   "explain": "He moved in in 1800.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-22bc15",
+   "kind": "mc",
+   "prompt": "Which escaped slave led many others to freedom on the Underground Railroad?",
+   "answer": "Harriet Tubman",
+   "wrong": [
+    "Rosa Parks",
+    "Sojourner Truth",
+    "Phillis Wheatley"
+   ],
+   "explain": "She made about 13 trips back into the slave states.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-838671",
+   "kind": "mc",
+   "prompt": "Which Anglo-Saxon king fought off the Vikings and is called 'the Great'?",
+   "answer": "Alfred",
+   "wrong": [
+    "Æthelred",
+    "Cnut",
+    "Edward the Confessor"
+   ],
+   "explain": "Legend says he burned some cakes while hiding from the Danes.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-cf0b2f",
+   "kind": "mc",
+   "prompt": "Which Danish king ruled England, Denmark and Norway in the 1000s?",
+   "answer": "Cnut",
+   "wrong": [
+    "Harald Hardrada",
+    "Sweyn Forkbeard",
+    "Eric Bloodaxe"
+   ],
+   "explain": "The story says he showed his courtiers he could not hold back the tide.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0993d1",
+   "kind": "mc",
+   "prompt": "Which English king was killed at the Battle of Hastings in 1066?",
+   "answer": "Harold II",
+   "wrong": [
+    "William I",
+    "Edward the Confessor",
+    "Harald Hardrada"
+   ],
+   "explain": "Harald Hardrada of Norway had been killed by Harold weeks earlier at Stamford Bridge.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-9ff222",
+   "kind": "mc",
+   "prompt": "What was the great survey of England's land and property made in 1086 called?",
+   "answer": "The Domesday Book",
+   "wrong": [
+    "Magna Carta",
+    "The Anglo-Saxon Chronicle",
+    "The Bayeux Tapestry"
+   ],
+   "explain": "William the Conqueror ordered it to work out taxes.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-d7bde2",
+   "kind": "mc",
+   "prompt": "Which long embroidered cloth tells the story of the Norman conquest of England?",
+   "answer": "The Bayeux Tapestry",
+   "wrong": [
+    "The Book of Kells",
+    "The Domesday Book",
+    "The Lindisfarne Gospels"
+   ],
+   "explain": "It is about 70 m long and hangs in Bayeux, Normandy.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-2f34d1",
+   "kind": "mc",
+   "prompt": "Which English king was nicknamed 'the Lionheart'?",
+   "answer": "Richard I",
+   "wrong": [
+    "Henry II",
+    "John",
+    "Edward I"
+   ],
+   "explain": "He spent only about six months of his reign in England.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-a9e1c7",
+   "kind": "mc",
+   "prompt": "What was the long war between England and France from 1337 to 1453 called?",
+   "answer": "The Hundred Years' War",
+   "wrong": [
+    "The Seven Years' War",
+    "The Thirty Years' War",
+    "The Wars of the Roses"
+   ],
+   "explain": "It actually lasted 116 years.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-a7e559",
+   "kind": "mc",
+   "prompt": "The Wars of the Roses were fought between which two royal houses?",
+   "answer": "York and Lancaster",
+   "wrong": [
+    "Tudor and Stuart",
+    "Windsor and Hanover",
+    "Plantagenet and Valois"
+   ],
+   "explain": "The white rose stood for York and the red rose for Lancaster.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-c406e9",
+   "kind": "mc",
+   "prompt": "Which royal house began when Henry VII won the throne in 1485?",
+   "answer": "Tudor",
+   "wrong": [
+    "Stuart",
+    "Plantagenet",
+    "Windsor"
+   ],
+   "explain": "The Tudors ended with Elizabeth I in 1603.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-5e4d89",
+   "kind": "mc",
+   "prompt": "Which English queen was known as 'the Virgin Queen'?",
+   "answer": "Elizabeth I",
+   "wrong": [
+    "Mary I",
+    "Victoria",
+    "Anne"
+   ],
+   "explain": "The US state of Virginia was named after her.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-dc32c0",
+   "kind": "mc",
+   "prompt": "Which of Henry VIII's wives was the mother of Elizabeth I?",
+   "answer": "Anne Boleyn",
+   "wrong": [
+    "Catherine of Aragon",
+    "Jane Seymour",
+    "Catherine Parr"
+   ],
+   "explain": "She was executed in 1536.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-cb23ef",
+   "kind": "mc",
+   "prompt": "Which Scottish queen was executed on Elizabeth I's orders in 1587?",
+   "answer": "Mary, Queen of Scots",
+   "wrong": [
+    "Mary I of England",
+    "Lady Jane Grey",
+    "Anne Boleyn"
+   ],
+   "explain": "Her son became James I of England.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-fc10e8",
+   "kind": "mc",
+   "prompt": "Who led Parliament's army in the English Civil War and later ruled as Lord Protector?",
+   "answer": "Oliver Cromwell",
+   "wrong": [
+    "Thomas Cromwell",
+    "Charles I",
+    "Thomas Fairfax"
+   ],
+   "explain": "Thomas Cromwell was Henry VIII's minister a century earlier.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-da9b60",
+   "kind": "mc",
+   "prompt": "Who was caught guarding barrels of gunpowder under Parliament in November 1605?",
+   "answer": "Guy Fawkes",
+   "wrong": [
+    "Robert Catesby",
+    "Walter Raleigh",
+    "Francis Drake"
+   ],
+   "explain": "Bonfire Night on 5 November remembers the plot.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-8213b5",
+   "kind": "mc",
+   "prompt": "Who was the first Englishman to sail around the world, from 1577 to 1580?",
+   "answer": "Francis Drake",
+   "wrong": [
+    "Walter Raleigh",
+    "John Hawkins",
+    "James Cook"
+   ],
+   "explain": "His ship was the Golden Hind.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-4645f2",
+   "kind": "mc",
+   "prompt": "Which Scottish hero's story is told in the film 'Braveheart'?",
+   "answer": "William Wallace",
+   "wrong": [
+    "Robert the Bruce",
+    "Rob Roy",
+    "Bonnie Prince Charlie"
+   ],
+   "explain": "He won the Battle of Stirling Bridge in 1297.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-d1a856",
+   "kind": "mc",
+   "prompt": "Which Scottish king won the Battle of Bannockburn in 1314?",
+   "answer": "Robert the Bruce",
+   "wrong": [
+    "William Wallace",
+    "James IV",
+    "Malcolm III"
+   ],
+   "explain": "The victory secured Scotland's independence for centuries.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-afc2c3",
+   "kind": "mc",
+   "prompt": "Which banking family ruled Florence during the Renaissance?",
+   "answer": "The Medici",
+   "wrong": [
+    "The Borgia",
+    "The Habsburgs",
+    "The Sforza"
+   ],
+   "explain": "They paid artists such as Botticelli and Michelangelo.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-395da3",
+   "kind": "mc",
+   "prompt": "Which Florentine wrote 'The Prince', a ruthless guide to holding power?",
+   "answer": "Niccolò Machiavelli",
+   "wrong": [
+    "Dante Alighieri",
+    "Lorenzo de' Medici",
+    "Galileo Galilei"
+   ],
+   "explain": "His name gave us the word 'Machiavellian'.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ec33df",
+   "kind": "mc",
+   "prompt": "Which explorer's ships were the Niña, the Pinta and the Santa María?",
+   "answer": "Christopher Columbus",
+   "wrong": [
+    "Ferdinand Magellan",
+    "Vasco da Gama",
+    "John Cabot"
+   ],
+   "explain": "They crossed the Atlantic in 1492.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-58680c",
+   "kind": "mc",
+   "prompt": "Which 1494 treaty split newly found lands outside Europe between Spain and Portugal?",
+   "answer": "Treaty of Tordesillas",
+   "wrong": [
+    "Treaty of Utrecht",
+    "Peace of Westphalia",
+    "Treaty of Paris"
+   ],
+   "explain": "It is why Brazil speaks Portuguese.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-8eb9bb",
+   "kind": "mc",
+   "prompt": "Which Italian navigator, sailing for England, reached Newfoundland in 1497?",
+   "answer": "John Cabot",
+   "wrong": [
+    "Amerigo Vespucci",
+    "Giovanni da Verrazzano",
+    "Christopher Columbus"
+   ],
+   "explain": "His Italian name was Giovanni Caboto.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-e411d9",
+   "kind": "mc",
+   "prompt": "The Americas are named after which Italian explorer?",
+   "answer": "Amerigo Vespucci",
+   "wrong": [
+    "Christopher Columbus",
+    "John Cabot",
+    "Marco Polo"
+   ],
+   "explain": "He argued that the lands were a 'New World', not Asia.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0f9277",
+   "kind": "mc",
+   "prompt": "Which Russian tsar built a new capital on the Baltic coast from 1703?",
+   "answer": "Peter the Great",
+   "wrong": [
+    "Ivan the Terrible",
+    "Catherine the Great",
+    "Nicholas II"
+   ],
+   "explain": "Saint Petersburg was Russia's capital from 1712 to 1918.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-53f52a",
+   "kind": "mc",
+   "prompt": "Who was the last tsar of Russia?",
+   "answer": "Nicholas II",
+   "wrong": [
+    "Alexander III",
+    "Peter the Great",
+    "Alexander II"
+   ],
+   "explain": "He and his family were killed in 1918.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-442510",
+   "kind": "mc",
+   "prompt": "Which mystic gained great influence over Russia's last royal family?",
+   "answer": "Grigori Rasputin",
+   "wrong": [
+    "Leon Trotsky",
+    "Vladimir Lenin",
+    "Alexander Kerensky"
+   ],
+   "explain": "He was murdered by nobles in December 1916.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-2d778d",
+   "kind": "mc",
+   "prompt": "Who led the Bolsheviks to power in the Russian Revolution of 1917?",
+   "answer": "Vladimir Lenin",
+   "wrong": [
+    "Joseph Stalin",
+    "Leon Trotsky",
+    "Alexander Kerensky"
+   ],
+   "explain": "His body is still on display in Moscow's Red Square.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-877338",
+   "kind": "mc",
+   "prompt": "Which French queen is wrongly said to have said 'Let them eat cake'?",
+   "answer": "Marie Antoinette",
+   "wrong": [
+    "Josephine",
+    "Catherine de' Medici",
+    "Eleanor of Aquitaine"
+   ],
+   "explain": "There is no evidence she ever said it.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0a87e5",
+   "kind": "mc",
+   "prompt": "What device was used for executions during the French Revolution's Reign of Terror?",
+   "answer": "The guillotine",
+   "wrong": [
+    "The gallows",
+    "The firing squad",
+    "The electric chair"
+   ],
+   "explain": "Louis XVI and Marie Antoinette both died by it in 1793.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-f40755",
+   "kind": "mc",
+   "prompt": "To which Mediterranean island was Napoleon first exiled in 1814?",
+   "answer": "Elba",
+   "wrong": [
+    "Corsica",
+    "Sardinia",
+    "Malta"
+   ],
+   "explain": "He escaped after ten months and returned to France.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-20438c",
+   "kind": "mc",
+   "prompt": "Which Prussian statesman, the 'Iron Chancellor', united Germany in 1871?",
+   "answer": "Otto von Bismarck",
+   "wrong": [
+    "Kaiser Wilhelm II",
+    "Frederick the Great",
+    "Helmuth von Moltke"
+   ],
+   "explain": "He became the first chancellor of the German Empire.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-e9a0f7",
+   "kind": "mc",
+   "prompt": "In which city was Archduke Franz Ferdinand assassinated in June 1914?",
+   "answer": "Sarajevo",
+   "wrong": [
+    "Vienna",
+    "Belgrade",
+    "Budapest"
+   ],
+   "explain": "His killing set off the First World War.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-c93222",
+   "kind": "mc",
+   "prompt": "Which general ruled Spain as a dictator from 1939 until 1975?",
+   "answer": "Francisco Franco",
+   "wrong": [
+    "Miguel Primo de Rivera",
+    "António Salazar",
+    "Juan Carlos I"
+   ],
+   "explain": "He won the Spanish Civil War.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-f105ee",
+   "kind": "mc",
+   "prompt": "Which Fascist dictator ruled Italy from 1922?",
+   "answer": "Benito Mussolini",
+   "wrong": [
+    "Francisco Franco",
+    "Victor Emmanuel III",
+    "Giuseppe Garibaldi"
+   ],
+   "explain": "He was overthrown in 1943 and killed in 1945.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-a9347f",
+   "kind": "mc",
+   "prompt": "Which red-shirted general helped unify Italy in the 1860s?",
+   "answer": "Giuseppe Garibaldi",
+   "wrong": [
+    "Benito Mussolini",
+    "Camillo Cavour",
+    "Victor Emmanuel II"
+   ],
+   "explain": "His 'Thousand' volunteers conquered Sicily in 1860.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-91a0ba",
+   "kind": "mc",
+   "prompt": "In which city did the Easter Rising take place in 1916?",
+   "answer": "Dublin",
+   "wrong": [
+    "Belfast",
+    "Cork",
+    "Limerick"
+   ],
+   "explain": "Its leaders were executed, which turned opinion towards independence.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-11af72",
+   "kind": "mc",
+   "prompt": "Which crop failed in Ireland's Great Famine of the 1840s?",
+   "answer": "Potatoes",
+   "wrong": [
+    "Wheat",
+    "Barley",
+    "Oats"
+   ],
+   "explain": "About a million people died and a million more emigrated.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-91043a",
+   "kind": "mc",
+   "prompt": "Which city held the 1814–15 congress that redrew Europe's map after Napoleon?",
+   "answer": "Vienna",
+   "wrong": [
+    "Paris",
+    "Berlin",
+    "London"
+   ],
+   "explain": "It created a balance of power that lasted decades.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-034c49",
+   "kind": "mc",
+   "prompt": "What was the German bombing of British cities in 1940–41 called?",
+   "answer": "The Blitz",
+   "wrong": [
+    "The Somme",
+    "Operation Barbarossa",
+    "The Phoney War"
+   ],
+   "explain": "London was bombed on 57 nights in a row.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b759d1",
+   "kind": "mc",
+   "prompt": "Operation Barbarossa was Germany's 1941 invasion of which country?",
+   "answer": "Soviet Union",
+   "wrong": [
+    "Poland",
+    "France",
+    "Britain"
+   ],
+   "explain": "It was the largest invasion in history.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ba2b89",
+   "kind": "mc",
+   "prompt": "Which battle on the Volga in 1942–43 was a turning point of the Second World War?",
+   "answer": "Stalingrad",
+   "wrong": [
+    "Kursk",
+    "Leningrad",
+    "Moscow"
+   ],
+   "explain": "The German Sixth Army surrendered in February 1943.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-11b42a",
+   "kind": "mc",
+   "prompt": "Which Jewish teenager kept a diary while hiding from the Nazis in Amsterdam?",
+   "answer": "Anne Frank",
+   "wrong": [
+    "Etty Hillesum",
+    "Sophie Scholl",
+    "Irena Sendler"
+   ],
+   "explain": "She died in Bergen-Belsen in 1945; her father published the diary.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-5be69c",
+   "kind": "mc",
+   "prompt": "From which French port were Allied troops rescued by a fleet of little ships in 1940?",
+   "answer": "Dunkirk",
+   "wrong": [
+    "Calais",
+    "Le Havre",
+    "Cherbourg"
+   ],
+   "explain": "About 338,000 soldiers were brought back to Britain.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-2fe554",
+   "kind": "mc",
+   "prompt": "In which 1915 campaign did Australian and New Zealand troops land in Turkey?",
+   "answer": "Gallipoli",
+   "wrong": [
+    "The Somme",
+    "Passchendaele",
+    "Ypres"
+   ],
+   "explain": "The landing on 25 April is remembered on Anzac Day.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b211f5",
+   "kind": "mc",
+   "prompt": "What does ANZAC stand for?",
+   "answer": "Australian and New Zealand Army Corps",
+   "wrong": [
+    "Allied Navy and Zealand Air Command",
+    "Australian National Zone Army Command",
+    "Army of New Zealand and Australian Colonies"
+   ],
+   "explain": "The corps was formed in Egypt in 1914.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-629938",
+   "kind": "mc",
+   "prompt": "On which date is Anzac Day marked in Australia and New Zealand?",
+   "answer": "25 April",
+   "wrong": [
+    "11 November",
+    "26 January",
+    "6 June"
+   ],
+   "explain": "It marks the Gallipoli landing in 1915.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-03f38c",
+   "kind": "mc",
+   "prompt": "What is 11 November, marking the end of the First World War's fighting, usually called?",
+   "answer": "Armistice Day or Remembrance Day",
+   "wrong": [
+    "VE Day",
+    "D-Day",
+    "Anzac Day"
+   ],
+   "explain": "The guns fell silent at 11 a.m. on 11 November 1918.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-450685",
+   "kind": "mc",
+   "prompt": "What did VE Day on 8 May 1945 celebrate?",
+   "answer": "Victory in Europe",
+   "wrong": [
+    "Victory over Japan",
+    "Victory at El Alamein",
+    "The end of the First World War"
+   ],
+   "explain": "VJ Day, the end of the war with Japan, followed in August.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-594f08",
+   "kind": "mc",
+   "prompt": "Which flower became a symbol of remembrance for soldiers who died in the First World War?",
+   "answer": "The poppy",
+   "wrong": [
+    "The rose",
+    "The lily",
+    "The daisy"
+   ],
+   "explain": "Poppies grew on the battlefields of Flanders.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b2f4b5",
+   "kind": "mc",
+   "prompt": "In which country is El Alamein, site of key Second World War battles in 1942?",
+   "answer": "Egypt",
+   "wrong": [
+    "Libya",
+    "Tunisia",
+    "Algeria"
+   ],
+   "explain": "Montgomery's victory there turned the war in North Africa.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-bb85db",
+   "kind": "mc",
+   "prompt": "Which Pacific island battle of 1945 is remembered for a famous flag-raising photo?",
+   "answer": "Iwo Jima",
+   "wrong": [
+    "Okinawa",
+    "Guadalcanal",
+    "Midway"
+   ],
+   "explain": "Joe Rosenthal's photo won the Pulitzer Prize.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-dc317a",
+   "kind": "mc",
+   "prompt": "Which 1942 sea battle in the Pacific is often seen as the turning point against Japan?",
+   "answer": "Midway",
+   "wrong": [
+    "Pearl Harbor",
+    "Coral Sea",
+    "Leyte Gulf"
+   ],
+   "explain": "Japan lost four aircraft carriers.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-67e5ab",
+   "kind": "mc",
+   "prompt": "Which city was besieged by German forces for about 872 days in the Second World War?",
+   "answer": "Leningrad",
+   "wrong": [
+    "Moscow",
+    "Stalingrad",
+    "Warsaw"
+   ],
+   "explain": "Today the city is Saint Petersburg.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b582d7",
+   "kind": "mc",
+   "prompt": "Which organisation was founded in 1945 by 51 countries to keep world peace?",
+   "answer": "The United Nations",
+   "wrong": [
+    "NATO",
+    "The European Union",
+    "The Red Cross"
+   ],
+   "explain": "It replaced the League of Nations; its charter was signed in San Francisco.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-2bdd7c",
+   "kind": "mc",
+   "prompt": "In which city is the headquarters of the United Nations?",
+   "answer": "New York City",
+   "wrong": [
+    "Geneva",
+    "Paris",
+    "Washington, D.C."
+   ],
+   "explain": "Geneva hosts many other UN offices.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-59d97b",
+   "kind": "mc",
+   "prompt": "Which Soviet leader introduced glasnost (openness) and perestroika (restructuring)?",
+   "answer": "Mikhail Gorbachev",
+   "wrong": [
+    "Boris Yeltsin",
+    "Leonid Brezhnev",
+    "Nikita Khrushchev"
+   ],
+   "explain": "He won the Nobel Peace Prize in 1990.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-49c710",
+   "kind": "mc",
+   "prompt": "Which Soviet leader denounced Stalin in a 'secret speech' in 1956?",
+   "answer": "Nikita Khrushchev",
+   "wrong": [
+    "Leonid Brezhnev",
+    "Georgy Malenkov",
+    "Mikhail Gorbachev"
+   ],
+   "explain": "He also led the Soviet side in the Cuban Missile Crisis.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-caa13b",
+   "kind": "mc",
+   "prompt": "Which Polish trade union, led by Lech Wałęsa, challenged Communist rule in the 1980s?",
+   "answer": "Solidarity",
+   "wrong": [
+    "Comecon",
+    "Warsaw Pact",
+    "Unity"
+   ],
+   "explain": "It began at the Gdańsk shipyard in 1980.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-cca894",
+   "kind": "mc",
+   "prompt": "The 1989 'Velvet Revolution' ended Communist rule in which country?",
+   "answer": "Czechoslovakia",
+   "wrong": [
+    "Poland",
+    "Hungary",
+    "Romania"
+   ],
+   "explain": "The playwright Václav Havel became president.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-8f79b3",
+   "kind": "mc",
+   "prompt": "Which military alliance was formed in 1949 by the US, Canada and Western European countries?",
+   "answer": "NATO",
+   "wrong": [
+    "The Warsaw Pact",
+    "The European Union",
+    "The United Nations"
+   ],
+   "explain": "The Soviet-led Warsaw Pact followed in 1955.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-7cf7b3",
+   "kind": "mc",
+   "prompt": "Which 1957 treaty created the European Economic Community?",
+   "answer": "Treaty of Rome",
+   "wrong": [
+    "Maastricht Treaty",
+    "Treaty of Lisbon",
+    "Treaty of Versailles"
+   ],
+   "explain": "Six countries signed it, including France and West Germany.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-beab55",
+   "kind": "mc",
+   "prompt": "Who led Vietnam's fight for independence from France?",
+   "answer": "Ho Chi Minh",
+   "wrong": [
+    "Pol Pot",
+    "Ngo Dinh Diem",
+    "Sukarno"
+   ],
+   "explain": "Saigon was renamed after him in 1976.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0e106d",
+   "kind": "mc",
+   "prompt": "The Vietnam War ended in 1975 with the fall of which city?",
+   "answer": "Saigon",
+   "wrong": [
+    "Hanoi",
+    "Hue",
+    "Da Nang"
+   ],
+   "explain": "North Vietnamese tanks entered on 30 April 1975.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-3bf94d",
+   "kind": "mc",
+   "prompt": "Which Cambodian regime killed up to 2 million people between 1975 and 1979?",
+   "answer": "The Khmer Rouge",
+   "wrong": [
+    "The Viet Cong",
+    "The Pathet Lao",
+    "The Kuomintang"
+   ],
+   "explain": "Its leader was Pol Pot.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-d402d8",
+   "kind": "mc",
+   "prompt": "Which leader declared Indonesia's independence in 1945?",
+   "answer": "Sukarno",
+   "wrong": [
+    "Suharto",
+    "Ho Chi Minh",
+    "Tunku Abdul Rahman"
+   ],
+   "explain": "Many Indonesians use only one name.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-4e5ff7",
+   "kind": "mc",
+   "prompt": "Singapore became fully independent in 1965 after leaving which federation?",
+   "answer": "Malaysia",
+   "wrong": [
+    "Indonesia",
+    "The British West Indies",
+    "The Philippines"
+   ],
+   "explain": "Lee Kuan Yew wept on television as he announced it.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-3210a0",
+   "kind": "mc",
+   "prompt": "Who was Singapore's first prime minister?",
+   "answer": "Lee Kuan Yew",
+   "wrong": [
+    "Goh Chok Tong",
+    "Lee Hsien Loong",
+    "Tunku Abdul Rahman"
+   ],
+   "explain": "He led the country from 1959 to 1990.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-238440",
+   "kind": "mc",
+   "prompt": "The Cold War was a rivalry between the United States and which country?",
+   "answer": "Soviet Union",
+   "wrong": [
+    "China",
+    "Germany",
+    "Japan"
+   ],
+   "explain": "It lasted from about 1947 to 1991.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-528921",
+   "kind": "mc",
+   "prompt": "Who was US president when the Berlin Wall fell in 1989?",
+   "answer": "George H. W. Bush",
+   "wrong": [
+    "Ronald Reagan",
+    "Bill Clinton",
+    "Jimmy Carter"
+   ],
+   "explain": "Reagan had urged 'Tear down this wall!' in 1987.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-f7e6f3",
+   "kind": "mc",
+   "prompt": "Which Norwegian explorer sailed a balsa raft, the Kon-Tiki, across the Pacific in 1947?",
+   "answer": "Thor Heyerdahl",
+   "wrong": [
+    "Roald Amundsen",
+    "Fridtjof Nansen",
+    "Leif Erikson"
+   ],
+   "explain": "The voyage from Peru to Polynesia took 101 days.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-046d94",
+   "kind": "mc",
+   "prompt": "Which British explorer died in 1912 returning from the South Pole?",
+   "answer": "Robert Falcon Scott",
+   "wrong": [
+    "Ernest Shackleton",
+    "Edmund Hillary",
+    "David Livingstone"
+   ],
+   "explain": "His team reached the Pole weeks after Amundsen's.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-936ff1",
+   "kind": "mc",
+   "prompt": "Whose ship Endurance was crushed by Antarctic ice in 1915?",
+   "answer": "Ernest Shackleton",
+   "wrong": [
+    "Robert Falcon Scott",
+    "Roald Amundsen",
+    "Douglas Mawson"
+   ],
+   "explain": "All 28 men survived. The wreck was found in 2022.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b33e88",
+   "kind": "mc",
+   "prompt": "Which Moroccan scholar travelled about 120,000 km across Africa and Asia in the 1300s?",
+   "answer": "Ibn Battuta",
+   "wrong": [
+    "Ibn Khaldun",
+    "Marco Polo",
+    "Zheng He"
+   ],
+   "explain": "He dictated his travels in a book called the Rihla.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-1b1cc1",
+   "kind": "mc",
+   "prompt": "Which Norse explorer reached North America around the year 1000?",
+   "answer": "Leif Erikson",
+   "wrong": [
+    "Erik the Red",
+    "Harald Hardrada",
+    "Ragnar Lodbrok"
+   ],
+   "explain": "His father, Erik the Red, founded the first Norse settlement in Greenland.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-501796",
+   "kind": "mc",
+   "prompt": "Which Dutch explorer was the first European known to reach New Zealand, in 1642?",
+   "answer": "Abel Tasman",
+   "wrong": [
+    "James Cook",
+    "Willem Janszoon",
+    "Dirk Hartog"
+   ],
+   "explain": "Cook mapped New Zealand's coasts in 1769–70.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-60ef44",
+   "kind": "mc",
+   "prompt": "Which treaty did the British Crown and Māori chiefs sign in 1840?",
+   "answer": "Treaty of Waitangi",
+   "wrong": [
+    "Treaty of Paris",
+    "Treaty of Utrecht",
+    "Treaty of Nanking"
+   ],
+   "explain": "6 February, Waitangi Day, is New Zealand's national day.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-fc2e41",
+   "kind": "mc",
+   "prompt": "In which year did Australia's six colonies federate into one nation?",
+   "answer": "1901",
+   "wrong": [
+    "1788",
+    "1851",
+    "1914"
+   ],
+   "explain": "The Commonwealth of Australia came into being on 1 January 1901.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-430308",
+   "kind": "mc",
+   "prompt": "Which bushranger wore homemade iron armour at his last stand at Glenrowan in 1880?",
+   "answer": "Ned Kelly",
+   "wrong": [
+    "Ben Hall",
+    "Captain Thunderbolt",
+    "Mad Dan Morgan"
+   ],
+   "explain": "He was hanged in Melbourne later that year.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-3eae36",
+   "kind": "mc",
+   "prompt": "Which city hosted Australia's federal parliament until Canberra was ready in 1927?",
+   "answer": "Melbourne",
+   "wrong": [
+    "Sydney",
+    "Adelaide",
+    "Brisbane"
+   ],
+   "explain": "Canberra was chosen as a compromise between Sydney and Melbourne.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ae0252",
+   "kind": "mc",
+   "prompt": "Australia Day, 26 January, marks the arrival of what in 1788?",
+   "answer": "The First Fleet",
+   "wrong": [
+    "Captain Cook",
+    "The first gold rush",
+    "Federation"
+   ],
+   "explain": "Many Aboriginal Australians call it Invasion Day.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-5a4fb3",
+   "kind": "mc",
+   "prompt": "Which country elected the world's first women members of parliament, in 1907?",
+   "answer": "Finland",
+   "wrong": [
+    "New Zealand",
+    "Norway",
+    "Australia"
+   ],
+   "explain": "Nineteen women were elected to the Finnish parliament.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b413ab",
+   "kind": "mc",
+   "prompt": "Which Pacific country became independent from New Zealand in 1962?",
+   "answer": "Samoa",
+   "wrong": [
+    "Fiji",
+    "Tonga",
+    "Vanuatu"
+   ],
+   "explain": "It was the first Pacific island nation to regain independence in the 20th century.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-753bb2",
+   "kind": "mc",
+   "prompt": "Which Australian prime minister disappeared while swimming in December 1967?",
+   "answer": "Harold Holt",
+   "wrong": [
+    "Robert Menzies",
+    "John Curtin",
+    "Gough Whitlam"
+   ],
+   "explain": "His body was never found.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-4539ac",
+   "kind": "mc",
+   "prompt": "Which Australian prime minister was dismissed by the Governor-General in 1975?",
+   "answer": "Gough Whitlam",
+   "wrong": [
+    "Malcolm Fraser",
+    "Bob Hawke",
+    "Harold Holt"
+   ],
+   "explain": "It remains the only such dismissal in Australian history.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-463991",
+   "kind": "mc",
+   "prompt": "Who is Australia's longest-serving prime minister?",
+   "answer": "Robert Menzies",
+   "wrong": [
+    "John Howard",
+    "Bob Hawke",
+    "Malcolm Fraser"
+   ],
+   "explain": "He served for over 18 years in two terms, ending in 1966.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-7f386e",
+   "kind": "mc",
+   "prompt": "Who became Australia's first woman prime minister, in 2010?",
+   "answer": "Julia Gillard",
+   "wrong": [
+    "Julie Bishop",
+    "Penny Wong",
+    "Quentin Bryce"
+   ],
+   "explain": "Quentin Bryce was the first woman Governor-General.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ead734",
+   "kind": "mc",
+   "prompt": "Who was New Zealand's prime minister during the 2019 Christchurch mosque attacks?",
+   "answer": "Jacinda Ardern",
+   "wrong": [
+    "Helen Clark",
+    "John Key",
+    "Chris Hipkins"
+   ],
+   "explain": "She led the country from 2017 to 2023.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ff6f6f",
+   "kind": "mc",
+   "prompt": "Who is Britain's longest-reigning monarch?",
+   "answer": "Elizabeth II",
+   "wrong": [
+    "Victoria",
+    "George III",
+    "Henry III"
+   ],
+   "explain": "She reigned for 70 years, from 1952 to 2022.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-fafb08",
+   "kind": "mc",
+   "prompt": "Which First Fleet governor founded the colony of New South Wales at Sydney Cove?",
+   "answer": "Arthur Phillip",
+   "wrong": [
+    "Lachlan Macquarie",
+    "William Bligh",
+    "James Cook"
+   ],
+   "explain": "The fleet moved from Botany Bay to Sydney Cove within days.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-20e47d",
+   "kind": "mc",
+   "prompt": "Which governor of New South Wales was overthrown in the 1808 Rum Rebellion?",
+   "answer": "William Bligh",
+   "wrong": [
+    "Arthur Phillip",
+    "Lachlan Macquarie",
+    "John Macarthur"
+   ],
+   "explain": "Bligh had already faced the famous mutiny on the Bounty.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-6a98e4",
+   "kind": "mc",
+   "prompt": "In which Australian colony was gold found at Ballarat and Bendigo in 1851?",
+   "answer": "Victoria",
+   "wrong": [
+    "New South Wales",
+    "Queensland",
+    "Western Australia"
+   ],
+   "explain": "The gold rushes made Melbourne one of the world's richest cities.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-ebaa6e",
+   "kind": "mc",
+   "prompt": "The 1854 Eureka Stockade rebellion was led by miners in which Australian town?",
+   "answer": "Ballarat",
+   "wrong": [
+    "Bendigo",
+    "Kalgoorlie",
+    "Bathurst"
+   ],
+   "explain": "The miners' flag, the Southern Cross on blue, became a famous symbol.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0c4329",
+   "kind": "tf",
+   "prompt": "Cleopatra was of Egyptian descent.",
+   "answer": false,
+   "explain": "She came from the Ptolemies, a Macedonian Greek family that ruled Egypt.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-19f2bc",
+   "kind": "tf",
+   "prompt": "The Great Pyramid was the tallest human-made structure for over 3,800 years.",
+   "answer": true,
+   "explain": "England's Lincoln Cathedral finally passed it in about 1311.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-a23d7c",
+   "kind": "tf",
+   "prompt": "The ancient Egyptians mummified cats.",
+   "answer": true,
+   "explain": "Cats were sacred to the goddess Bastet; millions of animal mummies have been found.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-2a426c",
+   "kind": "tf",
+   "prompt": "Marie Antoinette was born in Austria.",
+   "answer": true,
+   "explain": "She was born in Vienna, a daughter of Empress Maria Theresa.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-9d08fe",
+   "kind": "tf",
+   "prompt": "The Titanic sank on its way home from New York.",
+   "answer": false,
+   "explain": "It sank on its first voyage, heading from Southampton to New York.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-69581e",
+   "kind": "tf",
+   "prompt": "Christopher Columbus set out to prove the Earth was round.",
+   "answer": false,
+   "explain": "Educated Europeans already knew it was round; he underestimated its size.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-5f4e50",
+   "kind": "tf",
+   "prompt": "Switzerland fought in the Second World War.",
+   "answer": false,
+   "explain": "Switzerland stayed neutral throughout the war.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-7b5b05",
+   "kind": "tf",
+   "prompt": "Adolf Hitler was born in Austria.",
+   "answer": true,
+   "explain": "He was born in Braunau am Inn in 1889.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-a6c096",
+   "kind": "tf",
+   "prompt": "Joseph Stalin was born in Russia.",
+   "answer": false,
+   "explain": "He was born in Gori, Georgia.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-d8cd1f",
+   "kind": "tf",
+   "prompt": "Napoleon Bonaparte was born on the island of Corsica.",
+   "answer": true,
+   "explain": "He was born in Ajaccio in 1769, a year after France took the island.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-3ab85e",
+   "kind": "tf",
+   "prompt": "The Great Fire of London started in a bakery.",
+   "answer": true,
+   "explain": "It began in Thomas Farriner's bakery on Pudding Lane in 1666.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-5c4606",
+   "kind": "tf",
+   "prompt": "Thailand was never colonised by a European power.",
+   "answer": true,
+   "explain": "Siam stayed independent as a buffer between British and French territories.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-383cbf",
+   "kind": "tf",
+   "prompt": "The Aztecs and the Incas were the same empire.",
+   "answer": false,
+   "explain": "The Aztecs were in Mexico; the Incas were in the Andes of South America.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-3c1911",
+   "kind": "tf",
+   "prompt": "The First Fleet settled at Botany Bay and stayed there.",
+   "answer": false,
+   "explain": "Governor Phillip moved the settlement to Sydney Cove, in Port Jackson.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-47b732",
+   "kind": "tf",
+   "prompt": "Australian women won the right to vote in federal elections in 1902.",
+   "answer": true,
+   "explain": "The 1902 law shut out most Aboriginal people; that was not fully fixed until 1962.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-db093c",
+   "kind": "tf",
+   "prompt": "Genghis Khan's Mongol Empire reached as far as Japan.",
+   "answer": false,
+   "explain": "Two Mongol invasions of Japan, in 1274 and 1281, failed, partly due to storms.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-d9c977",
+   "kind": "tf",
+   "prompt": "The Hundred Years' War was fought between England and Spain.",
+   "answer": false,
+   "explain": "It was fought between England and France.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-36a755",
+   "kind": "tf",
+   "prompt": "The Berlin Wall fell in the same year as the Tiananmen Square protests.",
+   "answer": true,
+   "explain": "Both happened in 1989.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-076a86",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Great Pyramid of Giza built",
+    "Traditional founding of Rome",
+    "Birth of the Prophet Muhammad",
+    "Genghis Khan proclaimed ruler of the Mongols"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "About 2560 BC · 753 BC · about 570 AD · 1206.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-95158b",
+   "kind": "order",
+   "prompt": "Put these Asian events in order, earliest first.",
+   "answer": [
+    "Mughal Empire founded",
+    "Meiji Restoration in Japan",
+    "Indian independence",
+    "Fall of Saigon"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "1526 · 1868 · 1947 · 1975.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-45d3cf",
+   "kind": "order",
+   "prompt": "Put these African events in order, earliest first.",
+   "answer": [
+    "Mansa Musa's pilgrimage to Mecca",
+    "Battle of Adwa",
+    "Ghana's independence",
+    "Nelson Mandela freed"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "1324 · 1896 · 1957 · 1990.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-9e0491",
+   "kind": "order",
+   "prompt": "Put these Latin American events in order, earliest first.",
+   "answer": [
+    "Cortés reaches Tenochtitlan",
+    "Haiti becomes independent",
+    "Mexican Revolution begins",
+    "Cuban Revolution"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "1519 · 1804 · 1910 · 1959.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-d95ec5",
+   "kind": "order",
+   "prompt": "Put these Australian and New Zealand events in order, earliest first.",
+   "answer": [
+    "Tasman reaches New Zealand",
+    "First Fleet arrives",
+    "Treaty of Waitangi",
+    "Australian Federation"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "1642 · 1788 · 1840 · 1901.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-39a99e",
+   "kind": "order",
+   "prompt": "Put these Chinese dynasties in order, earliest first.",
+   "answer": [
+    "Han",
+    "Tang",
+    "Ming",
+    "Qing"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Han 206 BC · Tang 618 · Ming 1368 · Qing 1644.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-d44d35",
+   "kind": "order",
+   "prompt": "Put these English royal houses in order, earliest first.",
+   "answer": [
+    "Plantagenet",
+    "Tudor",
+    "Stuart",
+    "Windsor"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Plantagenets from 1154, Tudors 1485, Stuarts 1603, Windsors from 1917.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-97f41c",
+   "kind": "order",
+   "prompt": "Put these Second World War events in order, earliest first.",
+   "answer": [
+    "Germany invades Poland",
+    "Attack on Pearl Harbor",
+    "D-Day landings",
+    "Atomic bomb on Hiroshima"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Sept 1939 · Dec 1941 · June 1944 · Aug 1945.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-211d58",
+   "kind": "mc",
+   "prompt": "Which ruler of Mysore, the 'Tiger of Mysore', fought the British in the 1790s?",
+   "answer": "Tipu Sultan",
+   "wrong": [
+    "Shivaji",
+    "Ranjit Singh",
+    "Akbar"
+   ],
+   "explain": "He was killed defending his capital, Srirangapatna, in 1799.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-052832",
+   "kind": "mc",
+   "prompt": "Which Maratha king was crowned in 1674 and founded an empire in western India?",
+   "answer": "Shivaji",
+   "wrong": [
+    "Tipu Sultan",
+    "Babur",
+    "Ashoka"
+   ],
+   "explain": "Mumbai's main railway station and airport are named after him.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-b0b83b",
+   "kind": "mc",
+   "prompt": "Which ruler, the 'Lion of Punjab', founded the Sikh Empire?",
+   "answer": "Ranjit Singh",
+   "wrong": [
+    "Guru Nanak",
+    "Tipu Sultan",
+    "Shivaji"
+   ],
+   "explain": "He ruled from Lahore from 1801 to 1839.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-3268d2",
+   "kind": "mc",
+   "prompt": "Which empire built Angkor Wat?",
+   "answer": "The Khmer Empire",
+   "wrong": [
+    "The Mughal Empire",
+    "The Majapahit Empire",
+    "The Ming dynasty"
+   ],
+   "explain": "Angkor was the Khmer capital, in today's Cambodia.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-e15117",
+   "kind": "mc",
+   "prompt": "Which Java-based empire ruled much of today's Indonesia in the 1300s?",
+   "answer": "Majapahit",
+   "wrong": [
+    "Srivijaya",
+    "Khmer",
+    "Ayutthaya"
+   ],
+   "explain": "Srivijaya was an earlier sea power based on Sumatra.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-922b5f",
+   "kind": "mc",
+   "prompt": "Which West African empire did Sundiata Keita found in the 1230s?",
+   "answer": "Mali",
+   "wrong": [
+    "Songhai",
+    "Ghana",
+    "Benin"
+   ],
+   "explain": "Mansa Musa later ruled it at its richest.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-c35eb2",
+   "kind": "mc",
+   "prompt": "The Kingdom of Benin, famous for its bronze sculptures, was in which modern country?",
+   "answer": "Nigeria",
+   "wrong": [
+    "Benin",
+    "Ghana",
+    "Cameroon"
+   ],
+   "explain": "British troops looted the 'Benin Bronzes' in 1897; the country called Benin is next door.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-428eed",
+   "kind": "mc",
+   "prompt": "Which Ethiopian emperor defeated the Italians at Adwa in 1896?",
+   "answer": "Menelik II",
+   "wrong": [
+    "Haile Selassie",
+    "Tewodros II",
+    "Yohannes IV"
+   ],
+   "explain": "He also founded Addis Ababa as the capital.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-0a6f39",
+   "kind": "mc",
+   "prompt": "Which former slave led the revolution that made Haiti free from France?",
+   "answer": "Toussaint Louverture",
+   "wrong": [
+    "Simón Bolívar",
+    "Jean-Jacques Dessalines",
+    "Henri Christophe"
+   ],
+   "explain": "He died in a French prison in 1803; Dessalines declared independence in 1804.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-499444",
+   "kind": "mc",
+   "prompt": "Which priest's 1810 'Cry of Dolores' started Mexico's war of independence?",
+   "answer": "Miguel Hidalgo",
+   "wrong": [
+    "Benito Juárez",
+    "Pancho Villa",
+    "Emiliano Zapata"
+   ],
+   "explain": "Mexico celebrates it every year on the night of 15 September.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-621b0b",
+   "kind": "mc",
+   "prompt": "Who became Mexico's first Indigenous president, in 1858?",
+   "answer": "Benito Juárez",
+   "wrong": [
+    "Porfirio Díaz",
+    "Miguel Hidalgo",
+    "Emiliano Zapata"
+   ],
+   "explain": "He was a Zapotec from Oaxaca.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-33de9e",
+   "kind": "mc",
+   "prompt": "Which islands did Captain Cook name the Sandwich Islands in 1778?",
+   "answer": "Hawaii",
+   "wrong": [
+    "Fiji",
+    "Tonga",
+    "New Caledonia"
+   ],
+   "explain": "He was killed there in 1779.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-9fe4c3",
+   "kind": "mc",
+   "prompt": "Who were the first people to settle New Zealand?",
+   "answer": "The Māori",
+   "wrong": [
+    "Aboriginal Australians",
+    "Dutch sailors",
+    "Spanish sailors"
+   ],
+   "explain": "Polynesian voyagers arrived in canoes around 1250 to 1300.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-e715fd",
+   "kind": "mc",
+   "prompt": "Mohenjo-daro was a great city of which ancient civilisation?",
+   "answer": "Indus Valley",
+   "wrong": [
+    "Mesopotamian",
+    "Egyptian",
+    "Minoan"
+   ],
+   "explain": "Its ruins are in Sindh, Pakistan.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "hq-his-8a0cdd",
+   "kind": "tf",
+   "prompt": "Aboriginal Australians have lived in Australia for more than 50,000 years.",
+   "answer": true,
+   "explain": "They are among the oldest continuous cultures on Earth.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
   }
  ],
  "sources": [

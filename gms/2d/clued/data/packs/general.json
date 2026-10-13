@@ -10318,16 +10318,16 @@
    "topic": "food"
   },
   {
-   "id": "gen-food-034b50",
+   "id": "gen-food-3802de",
    "kind": "mc",
-   "prompt": "Which spice gives paella and many curries a yellow colour?",
-   "answer": "Saffron or turmeric",
+   "prompt": "Which spice gives traditional Spanish paella its golden colour?",
+   "answer": "Saffron",
    "wrong": [
     "Cinnamon",
     "Nutmeg",
     "Cloves"
    ],
-   "explain": "Saffron colours paella; turmeric colours many curries.",
+   "explain": "Cheaper versions often use turmeric or food colouring instead.",
    "difficulty": 2,
    "tags": [
     "food"
@@ -10499,23 +10499,6 @@
    ],
    "explain": "Prunes are dried plums.",
    "difficulty": 1,
-   "tags": [
-    "food"
-   ],
-   "topic": "food"
-  },
-  {
-   "id": "gen-food-b41787",
-   "kind": "mc",
-   "prompt": "What is the main ingredient of the Middle Eastern dish falafel?",
-   "answer": "Chickpeas or fava beans",
-   "wrong": [
-    "Lamb",
-    "Rice",
-    "Aubergine"
-   ],
-   "explain": "Falafel are fried balls of ground chickpeas or fava beans.",
-   "difficulty": 2,
    "tags": [
     "food"
    ],
@@ -11074,23 +11057,6 @@
    "topic": "geography"
   },
   {
-   "id": "gen-geo-a6736d",
-   "kind": "mc",
-   "prompt": "Which country has the most people?",
-   "answer": "India",
-   "wrong": [
-    "China",
-    "United States",
-    "Indonesia"
-   ],
-   "explain": "India passed China in 2023, according to UN estimates.",
-   "difficulty": 2,
-   "tags": [
-    "geography"
-   ],
-   "topic": "geography"
-  },
-  {
    "id": "gen-geo-3cfe6a",
    "kind": "mc",
    "prompt": "Which canal links the Mediterranean Sea and the Red Sea?",
@@ -11543,6 +11509,6854 @@
     "science"
    ],
    "topic": "technology"
+  },
+  {
+   "id": "gen-geo-9a1d23",
+   "kind": "mc",
+   "prompt": "What is the longest river in Africa?",
+   "answer": "Nile",
+   "wrong": [
+    "Congo",
+    "Niger",
+    "Zambezi"
+   ],
+   "explain": "The Nile flows north for about 6,650 km to the Mediterranean.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-4d6184",
+   "kind": "mc",
+   "prompt": "What is the longest river in Asia?",
+   "answer": "Yangtze",
+   "wrong": [
+    "Yellow River",
+    "Mekong",
+    "Ganges"
+   ],
+   "explain": "The Yangtze runs about 6,300 km across China to Shanghai.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-1bd50c",
+   "kind": "mc",
+   "prompt": "Which river flows through Cairo?",
+   "answer": "Nile",
+   "wrong": [
+    "Euphrates",
+    "Jordan",
+    "Niger"
+   ],
+   "explain": "Cairo grew up on the banks of the Nile, just south of its delta.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-18fc31",
+   "kind": "mc",
+   "prompt": "Which river flows through Vienna, Budapest and Belgrade?",
+   "answer": "Danube",
+   "wrong": [
+    "Rhine",
+    "Elbe",
+    "Vistula"
+   ],
+   "explain": "The Danube passes through more capital cities than any other river.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-10ea1b",
+   "kind": "mc",
+   "prompt": "The holy city of Varanasi stands on which river in India?",
+   "answer": "Ganges",
+   "wrong": [
+    "Indus",
+    "Brahmaputra",
+    "Godavari"
+   ],
+   "explain": "Hindus bathe in the Ganges at Varanasi's riverside steps, the ghats.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-ed23d9",
+   "kind": "mc",
+   "prompt": "Which city is overlooked by the giant Christ the Redeemer statue?",
+   "answer": "Rio de Janeiro",
+   "wrong": [
+    "São Paulo",
+    "Buenos Aires",
+    "Lisbon"
+   ],
+   "explain": "The statue stands on Corcovado mountain above Rio, Brazil.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-0ea17a",
+   "kind": "mc",
+   "prompt": "Which is the largest country in South America by area?",
+   "answer": "Brazil",
+   "wrong": [
+    "Argentina",
+    "Peru",
+    "Colombia"
+   ],
+   "explain": "Brazil covers almost half of South America.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-d26382",
+   "kind": "mc",
+   "prompt": "Which is the largest country in Africa by area?",
+   "answer": "Algeria",
+   "wrong": [
+    "Sudan",
+    "DR Congo",
+    "Libya"
+   ],
+   "explain": "Algeria became Africa's largest country when South Sudan split from Sudan in 2011.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-e7c8a2",
+   "kind": "mc",
+   "prompt": "Which is the smallest country in Africa by area?",
+   "answer": "Seychelles",
+   "wrong": [
+    "The Gambia",
+    "Rwanda",
+    "Eswatini"
+   ],
+   "explain": "The Seychelles islands cover about 460 km²; The Gambia is the smallest on the mainland.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-995b5c",
+   "kind": "mc",
+   "prompt": "Which is the smallest continent by area?",
+   "answer": "Australia",
+   "wrong": [
+    "Europe",
+    "Antarctica",
+    "South America"
+   ],
+   "explain": "Australia is the smallest continent and the sixth-largest country.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-53dbb6",
+   "kind": "mc",
+   "prompt": "Counting its overseas territories, which country spans the most time zones?",
+   "answer": "France",
+   "wrong": [
+    "Russia",
+    "United States",
+    "China"
+   ],
+   "explain": "With territories from the Pacific to the Indian Ocean, France uses 12 time zones.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-3ac613",
+   "kind": "mc",
+   "prompt": "Mount Kilimanjaro is the highest mountain on which continent?",
+   "answer": "Africa",
+   "wrong": [
+    "Asia",
+    "South America",
+    "Europe"
+   ],
+   "explain": "Kilimanjaro, in Tanzania, rises 5,895 m.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-adb0c8",
+   "kind": "mc",
+   "prompt": "What is the highest mountain in South America?",
+   "answer": "Aconcagua",
+   "wrong": [
+    "Chimborazo",
+    "Huascarán",
+    "Cotopaxi"
+   ],
+   "explain": "Aconcagua in Argentina reaches about 6,960 m, the highest outside Asia.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-0e7f80",
+   "kind": "mc",
+   "prompt": "What is the highest mountain in North America?",
+   "answer": "Denali",
+   "wrong": [
+    "Mount Logan",
+    "Mount Whitney",
+    "Pico de Orizaba"
+   ],
+   "explain": "Denali in Alaska is about 6,190 m high; it was long called Mount McKinley.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-366b39",
+   "kind": "mc",
+   "prompt": "What is the highest mountain in the Alps?",
+   "answer": "Mont Blanc",
+   "wrong": [
+    "Matterhorn",
+    "Eiger",
+    "Jungfrau"
+   ],
+   "explain": "Mont Blanc, on the French-Italian border, is about 4,800 m high.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-76e576",
+   "kind": "mc",
+   "prompt": "Which country holds the largest share of the Amazon rainforest?",
+   "answer": "Brazil",
+   "wrong": [
+    "Peru",
+    "Colombia",
+    "Venezuela"
+   ],
+   "explain": "About 60% of the Amazon rainforest lies in Brazil.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-986d7c",
+   "kind": "mc",
+   "prompt": "Which desert covers much of Mongolia and northern China?",
+   "answer": "Gobi",
+   "wrong": [
+    "Taklamakan",
+    "Kalahari",
+    "Thar"
+   ],
+   "explain": "The Gobi is a cold desert, famous for its dinosaur fossils.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-e521bc",
+   "kind": "mc",
+   "prompt": "In which very salty lake can people float without effort?",
+   "answer": "Dead Sea",
+   "wrong": [
+    "Caspian Sea",
+    "Lake Baikal",
+    "Black Sea"
+   ],
+   "explain": "The Dead Sea is almost ten times saltier than the ocean.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-32e467",
+   "kind": "mc",
+   "prompt": "Which country, with more than 17,000 islands, is the world's largest archipelagic state?",
+   "answer": "Indonesia",
+   "wrong": [
+    "Philippines",
+    "Japan",
+    "Malaysia"
+   ],
+   "explain": "Indonesia stretches about 5,000 km from Sumatra to New Guinea.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-ff393a",
+   "kind": "mc",
+   "prompt": "Which city is nicknamed 'the Big Apple'?",
+   "answer": "New York City",
+   "wrong": [
+    "Chicago",
+    "Los Angeles",
+    "Boston"
+   ],
+   "explain": "The nickname was popularised by a 1920s sports writer and a 1970s tourism campaign.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-d5eb72",
+   "kind": "mc",
+   "prompt": "Which city is known as 'the City of Light'?",
+   "answer": "Paris",
+   "wrong": [
+    "Rome",
+    "Vienna",
+    "Venice"
+   ],
+   "explain": "Paris was an early adopter of street lighting and a centre of the Enlightenment.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-ed4189",
+   "kind": "mc",
+   "prompt": "Which city is known as 'the Eternal City'?",
+   "answer": "Rome",
+   "wrong": [
+    "Athens",
+    "Paris",
+    "Istanbul"
+   ],
+   "explain": "Ancient Roman poets already called Rome eternal.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-c0aef6",
+   "kind": "mc",
+   "prompt": "Which Japanese city was called Edo until 1868?",
+   "answer": "Tokyo",
+   "wrong": [
+    "Kyoto",
+    "Osaka",
+    "Nagoya"
+   ],
+   "explain": "Edo was renamed Tokyo, 'eastern capital', when the emperor moved there.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-6939f1",
+   "kind": "mc",
+   "prompt": "Which Vietnamese city was formerly called Saigon?",
+   "answer": "Ho Chi Minh City",
+   "wrong": [
+    "Hanoi",
+    "Da Nang",
+    "Hue"
+   ],
+   "explain": "Saigon was renamed in 1976, after the Vietnam War.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-99631b",
+   "kind": "mc",
+   "prompt": "Which Indian city was known as Bombay until 1995?",
+   "answer": "Mumbai",
+   "wrong": [
+    "Chennai",
+    "Kolkata",
+    "Delhi"
+   ],
+   "explain": "Chennai was Madras and Kolkata was Calcutta.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-6af938",
+   "kind": "mc",
+   "prompt": "Which African country was called Rhodesia before 1980?",
+   "answer": "Zimbabwe",
+   "wrong": [
+    "Zambia",
+    "Malawi",
+    "Botswana"
+   ],
+   "explain": "Zambia was Northern Rhodesia; Rhodesia became Zimbabwe in 1980.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-1eb475",
+   "kind": "mc",
+   "prompt": "Which country was known as Siam until 1939?",
+   "answer": "Thailand",
+   "wrong": [
+    "Cambodia",
+    "Myanmar",
+    "Laos"
+   ],
+   "explain": "Siam became Thailand, meaning 'land of the free'.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-481b6b",
+   "kind": "mc",
+   "prompt": "Which island country was called Ceylon until 1972?",
+   "answer": "Sri Lanka",
+   "wrong": [
+    "Madagascar",
+    "Maldives",
+    "Mauritius"
+   ],
+   "explain": "Ceylon tea kept the old name alive.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-c36814",
+   "kind": "mc",
+   "prompt": "Which country was known to the outside world as Persia until 1935?",
+   "answer": "Iran",
+   "wrong": [
+    "Iraq",
+    "Turkey",
+    "Afghanistan"
+   ],
+   "explain": "The government asked other countries to use the local name, Iran.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-d57d56",
+   "kind": "mc",
+   "prompt": "Which country was known as Burma until 1989?",
+   "answer": "Myanmar",
+   "wrong": [
+    "Thailand",
+    "Laos",
+    "Bangladesh"
+   ],
+   "explain": "Many people and some governments still use the name Burma.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-ffdfd9",
+   "kind": "mc",
+   "prompt": "Which African country was the British colony called the Gold Coast?",
+   "answer": "Ghana",
+   "wrong": [
+    "Nigeria",
+    "Senegal",
+    "Sierra Leone"
+   ],
+   "explain": "In 1957 Ghana became one of the first African colonies to gain independence.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-247c40",
+   "kind": "mc",
+   "prompt": "Which country was called Zaire from 1971 to 1997?",
+   "answer": "Democratic Republic of the Congo",
+   "wrong": [
+    "Angola",
+    "Zambia",
+    "Cameroon"
+   ],
+   "explain": "Mobutu Sese Seko renamed the country Zaire.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-48a367",
+   "kind": "mc",
+   "prompt": "Which country has the longest coastline in the world?",
+   "answer": "Canada",
+   "wrong": [
+    "Russia",
+    "Australia",
+    "Norway"
+   ],
+   "explain": "Canada's coastline, with all its islands, is over 200,000 km long.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-a90def",
+   "kind": "mc",
+   "prompt": "Which ocean lies between Africa and Australia?",
+   "answer": "Indian Ocean",
+   "wrong": [
+    "Atlantic Ocean",
+    "Pacific Ocean",
+    "Arctic Ocean"
+   ],
+   "explain": "The Indian Ocean is the third-largest ocean.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-e020a4",
+   "kind": "mc",
+   "prompt": "Which two countries share the world's longest land border?",
+   "answer": "Canada and the United States",
+   "wrong": [
+    "Russia and China",
+    "Russia and Kazakhstan",
+    "Argentina and Chile"
+   ],
+   "explain": "Their border runs for about 8,900 km, including Alaska.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-5ed36c",
+   "kind": "mc",
+   "prompt": "What is the largest island in the Mediterranean Sea?",
+   "answer": "Sicily",
+   "wrong": [
+    "Sardinia",
+    "Cyprus",
+    "Crete"
+   ],
+   "explain": "Sicily, at the toe of Italy, is home to Mount Etna.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-dcddab",
+   "kind": "mc",
+   "prompt": "In which ocean is the island of Madagascar?",
+   "answer": "Indian Ocean",
+   "wrong": [
+    "Atlantic Ocean",
+    "Pacific Ocean",
+    "Southern Ocean"
+   ],
+   "explain": "Madagascar lies off the south-east coast of Africa.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-efb609",
+   "kind": "mc",
+   "prompt": "In which city are the Kremlin and Red Square?",
+   "answer": "Moscow",
+   "wrong": [
+    "Saint Petersburg",
+    "Kyiv",
+    "Warsaw"
+   ],
+   "explain": "The Kremlin is the seat of Russia's government.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-3b5c47",
+   "kind": "mc",
+   "prompt": "In which city is the Forbidden City palace complex?",
+   "answer": "Beijing",
+   "wrong": [
+    "Shanghai",
+    "Hong Kong",
+    "Xi'an"
+   ],
+   "explain": "It was the palace of Chinese emperors from 1420 to 1912.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-1ac378",
+   "kind": "mc",
+   "prompt": "Which mountain range runs down the west side of South America?",
+   "answer": "Andes",
+   "wrong": [
+    "Rocky Mountains",
+    "Himalayas",
+    "Alps"
+   ],
+   "explain": "The Andes stretch about 7,000 km through seven countries.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-7a8935",
+   "kind": "mc",
+   "prompt": "In which mountain range is Mount Everest?",
+   "answer": "Himalayas",
+   "wrong": [
+    "Andes",
+    "Alps",
+    "Karakoram"
+   ],
+   "explain": "K2, the second-highest peak, is in the nearby Karakoram range.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-e050d6",
+   "kind": "mc",
+   "prompt": "Mount Everest lies on the border between Nepal and which country?",
+   "answer": "China",
+   "wrong": [
+    "India",
+    "Bhutan",
+    "Pakistan"
+   ],
+   "explain": "The northern side of Everest is in Tibet, an autonomous region of China.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-e790d6",
+   "kind": "mc",
+   "prompt": "In which country is the historic desert city of Timbuktu?",
+   "answer": "Mali",
+   "wrong": [
+    "Niger",
+    "Chad",
+    "Senegal"
+   ],
+   "explain": "Timbuktu was a great centre of Islamic learning in the 1400s and 1500s.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-1e91fc",
+   "kind": "mc",
+   "prompt": "Which river plunges over Victoria Falls?",
+   "answer": "Zambezi",
+   "wrong": [
+    "Limpopo",
+    "Congo",
+    "Orange"
+   ],
+   "explain": "Local people call the falls Mosi-oa-Tunya, 'the smoke that thunders'.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-798300",
+   "kind": "mc",
+   "prompt": "Lake Titicaca lies on the border of Peru and which country?",
+   "answer": "Bolivia",
+   "wrong": [
+    "Chile",
+    "Ecuador",
+    "Argentina"
+   ],
+   "explain": "At about 3,800 m, it is often called the highest navigable lake.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-f7db68",
+   "kind": "mc",
+   "prompt": "What is the largest lake in Africa?",
+   "answer": "Lake Victoria",
+   "wrong": [
+    "Lake Tanganyika",
+    "Lake Malawi",
+    "Lake Chad"
+   ],
+   "explain": "Lake Victoria is shared by Uganda, Kenya and Tanzania.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-b3148e",
+   "kind": "mc",
+   "prompt": "As of 2024, which country had the largest Muslim population?",
+   "answer": "Indonesia",
+   "wrong": [
+    "Pakistan",
+    "Egypt",
+    "Saudi Arabia"
+   ],
+   "explain": "Around 240 million Indonesians are Muslim.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-2e1b25",
+   "kind": "mc",
+   "prompt": "On which continent are the Atlas Mountains?",
+   "answer": "Africa",
+   "wrong": [
+    "Asia",
+    "Europe",
+    "South America"
+   ],
+   "explain": "The Atlas range runs through Morocco, Algeria and Tunisia.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-13d015",
+   "kind": "mc",
+   "prompt": "Which is the largest country lying entirely within Europe?",
+   "answer": "Ukraine",
+   "wrong": [
+    "France",
+    "Spain",
+    "Germany"
+   ],
+   "explain": "Russia is bigger, but most of it lies in Asia.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-1aabf4",
+   "kind": "mc",
+   "prompt": "Which European Union country has the most people?",
+   "answer": "Germany",
+   "wrong": [
+    "France",
+    "Italy",
+    "Spain"
+   ],
+   "explain": "Germany has about 84 million people.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-a28f03",
+   "kind": "mc",
+   "prompt": "Which Italian city is famous for its canals and gondolas?",
+   "answer": "Venice",
+   "wrong": [
+    "Florence",
+    "Naples",
+    "Milan"
+   ],
+   "explain": "Venice is built on more than 100 small islands in a lagoon.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-62dae8",
+   "kind": "mc",
+   "prompt": "In which country is Serengeti National Park?",
+   "answer": "Tanzania",
+   "wrong": [
+    "Kenya",
+    "Uganda",
+    "South Africa"
+   ],
+   "explain": "Its plains continue into Kenya as the Maasai Mara.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-246c8d",
+   "kind": "mc",
+   "prompt": "Which South American country's name means 'little Venice'?",
+   "answer": "Venezuela",
+   "wrong": [
+    "Colombia",
+    "Bolivia",
+    "Ecuador"
+   ],
+   "explain": "Explorers saw houses on stilts in Lake Maracaibo and thought of Venice.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-d51614",
+   "kind": "mc",
+   "prompt": "Which country is named after the Equator?",
+   "answer": "Ecuador",
+   "wrong": [
+    "Colombia",
+    "Peru",
+    "Gabon"
+   ],
+   "explain": "Ecuador is Spanish for 'equator', which crosses the country.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-ee3e9e",
+   "kind": "mc",
+   "prompt": "Which country's name comes from the Latin word for silver?",
+   "answer": "Argentina",
+   "wrong": [
+    "Chile",
+    "Uruguay",
+    "Peru"
+   ],
+   "explain": "Argentum is Latin for silver; early explorers hoped to find silver there.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-82931f",
+   "kind": "mc",
+   "prompt": "Which country is known as 'the Land of the Rising Sun'?",
+   "answer": "Japan",
+   "wrong": [
+    "China",
+    "South Korea",
+    "Thailand"
+   ],
+   "explain": "The Japanese name Nihon means 'origin of the sun'.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-d1eb63",
+   "kind": "mc",
+   "prompt": "Which Himalayan kingdom measures progress by 'Gross National Happiness'?",
+   "answer": "Bhutan",
+   "wrong": [
+    "Nepal",
+    "Lesotho",
+    "Brunei"
+   ],
+   "explain": "Bhutan's fourth king introduced the idea in the 1970s.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-07e83c",
+   "kind": "mc",
+   "prompt": "Measured from base to summit, which is the tallest mountain on Earth?",
+   "answer": "Mauna Kea",
+   "wrong": [
+    "Mount Everest",
+    "K2",
+    "Kilimanjaro"
+   ],
+   "explain": "Mauna Kea in Hawaii rises over 10,000 m from the sea floor.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-971c72",
+   "kind": "mc",
+   "prompt": "Which country has three capital cities: Pretoria, Cape Town and Bloemfontein?",
+   "answer": "South Africa",
+   "wrong": [
+    "Botswana",
+    "Namibia",
+    "Zimbabwe"
+   ],
+   "explain": "Pretoria is the seat of government, Cape Town of parliament and Bloemfontein of the courts.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-15f642",
+   "kind": "mc",
+   "prompt": "In which country is the city of Marrakesh?",
+   "answer": "Morocco",
+   "wrong": [
+    "Egypt",
+    "Tunisia",
+    "Algeria"
+   ],
+   "explain": "Marrakesh is famous for its souks and Jemaa el-Fnaa square.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-5a33dc",
+   "kind": "mc",
+   "prompt": "Which strait separates Asia from North America?",
+   "answer": "Bering Strait",
+   "wrong": [
+    "Strait of Magellan",
+    "Strait of Hormuz",
+    "Torres Strait"
+   ],
+   "explain": "Only about 82 km of water separates Russia and Alaska there.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-17b739",
+   "kind": "mc",
+   "prompt": "Which strait separates mainland Australia from Tasmania?",
+   "answer": "Bass Strait",
+   "wrong": [
+    "Torres Strait",
+    "Cook Strait",
+    "Strait of Malacca"
+   ],
+   "explain": "Bass Strait is named after the explorer George Bass.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-e9fd3f",
+   "kind": "mc",
+   "prompt": "Cook Strait separates the two main islands of which country?",
+   "answer": "New Zealand",
+   "wrong": [
+    "Japan",
+    "Fiji",
+    "Philippines"
+   ],
+   "explain": "It lies between the North Island and the South Island.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-61d925",
+   "kind": "mc",
+   "prompt": "In which ocean is the Gulf Stream?",
+   "answer": "Atlantic Ocean",
+   "wrong": [
+    "Pacific Ocean",
+    "Indian Ocean",
+    "Arctic Ocean"
+   ],
+   "explain": "This warm current keeps north-west Europe milder than its latitude suggests.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-f53ed0",
+   "kind": "mc",
+   "prompt": "Which sea is bordered by Vietnam, the Philippines and Malaysia?",
+   "answer": "South China Sea",
+   "wrong": [
+    "Java Sea",
+    "Coral Sea",
+    "Arabian Sea"
+   ],
+   "explain": "It is one of the world's busiest shipping routes.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-8c98a4",
+   "kind": "mc",
+   "prompt": "Which sea lies between Saudi Arabia and Egypt?",
+   "answer": "Red Sea",
+   "wrong": [
+    "Arabian Sea",
+    "Dead Sea",
+    "Mediterranean Sea"
+   ],
+   "explain": "The Red Sea connects to the Mediterranean through the Suez Canal.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-8d9b28",
+   "kind": "mc",
+   "prompt": "Which is the largest country in the Middle East by area?",
+   "answer": "Saudi Arabia",
+   "wrong": [
+    "Iran",
+    "Iraq",
+    "Egypt"
+   ],
+   "explain": "Saudi Arabia covers most of the Arabian Peninsula. Egypt is usually counted as North Africa.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-6b4174",
+   "kind": "mc",
+   "prompt": "The Mekong River flows into the sea in which country?",
+   "answer": "Vietnam",
+   "wrong": [
+    "Cambodia",
+    "Thailand",
+    "Laos"
+   ],
+   "explain": "The Mekong Delta is one of the world's great rice-growing areas.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-a96843",
+   "kind": "mc",
+   "prompt": "Which is the largest island in the Caribbean?",
+   "answer": "Cuba",
+   "wrong": [
+    "Jamaica",
+    "Hispaniola",
+    "Puerto Rico"
+   ],
+   "explain": "Hispaniola, shared by Haiti and the Dominican Republic, is second.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-97c4b1",
+   "kind": "mc",
+   "prompt": "On which island are Haiti and the Dominican Republic?",
+   "answer": "Hispaniola",
+   "wrong": [
+    "Cuba",
+    "Jamaica",
+    "Trinidad"
+   ],
+   "explain": "Columbus landed there in 1492.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-f4a93b",
+   "kind": "mc",
+   "prompt": "Which country is home to the Atacama Desert and Easter Island?",
+   "answer": "Chile",
+   "wrong": [
+    "Peru",
+    "Argentina",
+    "Ecuador"
+   ],
+   "explain": "Easter Island, famous for its moai statues, became part of Chile in 1888.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-d3f8aa",
+   "kind": "tf",
+   "prompt": "Australia is wider from east to west than the Moon is across.",
+   "answer": true,
+   "explain": "Australia is about 4,000 km wide; the Moon's diameter is about 3,475 km.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-d0f0e7",
+   "kind": "tf",
+   "prompt": "Russia spans 11 time zones.",
+   "answer": true,
+   "explain": "When it is morning in Kaliningrad it is evening in Kamchatka.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-7d991d",
+   "kind": "tf",
+   "prompt": "Istanbul is the capital of Turkey.",
+   "answer": false,
+   "explain": "Ankara is the capital; Istanbul is the biggest city.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-3c7a2e",
+   "kind": "tf",
+   "prompt": "Rio de Janeiro is the capital of Brazil.",
+   "answer": false,
+   "explain": "Brasília has been the capital since 1960.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-22a69f",
+   "kind": "tf",
+   "prompt": "The Sahara Desert is larger than the contiguous United States.",
+   "answer": true,
+   "explain": "The Sahara covers about 9 million km²; the lower 48 states about 8 million.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-49565a",
+   "kind": "tf",
+   "prompt": "Mount Everest is the tallest mountain measured from base to peak.",
+   "answer": false,
+   "explain": "Mauna Kea is taller from base to peak; Everest has the highest summit above sea level.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-62dae1",
+   "kind": "tf",
+   "prompt": "Canada has more lakes than any other country.",
+   "answer": true,
+   "explain": "Canada has hundreds of thousands of lakes, a legacy of the Ice Age glaciers.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-food-f60aab",
+   "kind": "mc",
+   "prompt": "Tofu is made from the milk of which beans?",
+   "answer": "Soya beans",
+   "wrong": [
+    "Kidney beans",
+    "Chickpeas",
+    "Mung beans"
+   ],
+   "explain": "Soya milk is curdled and pressed into blocks, much like cheese.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-569ef1",
+   "kind": "mc",
+   "prompt": "Couscous is made from semolina, which comes from which grain?",
+   "answer": "Wheat",
+   "wrong": [
+    "Rice",
+    "Maize",
+    "Oats"
+   ],
+   "explain": "Couscous is a staple across North Africa.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-c9a305",
+   "kind": "mc",
+   "prompt": "Italian polenta is made from which grain?",
+   "answer": "Maize",
+   "wrong": [
+    "Rice",
+    "Wheat",
+    "Barley"
+   ],
+   "explain": "Polenta is cornmeal porridge, served soft or set and grilled.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-6390ac",
+   "kind": "mc",
+   "prompt": "Parmigiano-Reggiano cheese comes from which country?",
+   "answer": "Italy",
+   "wrong": [
+    "France",
+    "Switzerland",
+    "Spain"
+   ],
+   "explain": "Parmesan wheels are aged for at least 12 months.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-ccd3d7",
+   "kind": "mc",
+   "prompt": "Camembert and Brie are cheeses from which country?",
+   "answer": "France",
+   "wrong": [
+    "Belgium",
+    "Switzerland",
+    "Netherlands"
+   ],
+   "explain": "Camembert comes from Normandy.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-acb86c",
+   "kind": "mc",
+   "prompt": "Gouda and Edam are cheeses from which country?",
+   "answer": "Netherlands",
+   "wrong": [
+    "Belgium",
+    "Denmark",
+    "Germany"
+   ],
+   "explain": "Both are named after Dutch towns.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-cd2864",
+   "kind": "mc",
+   "prompt": "Manchego cheese comes from which country?",
+   "answer": "Spain",
+   "wrong": [
+    "Italy",
+    "Portugal",
+    "Mexico"
+   ],
+   "explain": "Manchego is made from sheep's milk in La Mancha.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-869e43",
+   "kind": "mc",
+   "prompt": "What kind of fruit is a Granny Smith?",
+   "answer": "Apple",
+   "wrong": [
+    "Pear",
+    "Plum",
+    "Grape"
+   ],
+   "explain": "It is named after Maria Ann Smith, who grew it near Sydney in the 1860s.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-8efcd2",
+   "kind": "mc",
+   "prompt": "Which spiky Southeast Asian fruit is famous for its strong smell?",
+   "answer": "Durian",
+   "wrong": [
+    "Jackfruit",
+    "Mango",
+    "Rambutan"
+   ],
+   "explain": "Durian is banned on some public transport in Singapore.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-9ef5a7",
+   "kind": "mc",
+   "prompt": "Tequila is made from which plant?",
+   "answer": "Agave",
+   "wrong": [
+    "Sugar cane",
+    "Cactus pear",
+    "Maize"
+   ],
+   "explain": "Tequila is distilled from blue agave in Mexico.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-ce8315",
+   "kind": "mc",
+   "prompt": "Rum is made from which crop?",
+   "answer": "Sugar cane",
+   "wrong": [
+    "Potatoes",
+    "Barley",
+    "Grapes"
+   ],
+   "explain": "Rum is distilled from molasses or sugar-cane juice.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-802b55",
+   "kind": "mc",
+   "prompt": "Japanese sake is brewed from which grain?",
+   "answer": "Rice",
+   "wrong": [
+    "Barley",
+    "Wheat",
+    "Sorghum"
+   ],
+   "explain": "Sake is sometimes called rice wine, though it is brewed like beer.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-f88474",
+   "kind": "mc",
+   "prompt": "Which country has been the world's biggest coffee producer since the 1800s?",
+   "answer": "Brazil",
+   "wrong": [
+    "Colombia",
+    "Vietnam",
+    "Ethiopia"
+   ],
+   "explain": "Brazil grows about a third of the world's coffee.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-5e6d78",
+   "kind": "mc",
+   "prompt": "The arabica coffee plant is native to the highlands of which country?",
+   "answer": "Ethiopia",
+   "wrong": [
+    "Brazil",
+    "Colombia",
+    "India"
+   ],
+   "explain": "Legend says a goatherd called Kaldi noticed his goats lively after eating coffee berries.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-fc1b51",
+   "kind": "mc",
+   "prompt": "In which country did tea drinking begin?",
+   "answer": "China",
+   "wrong": [
+    "India",
+    "Japan",
+    "Sri Lanka"
+   ],
+   "explain": "Tea was drunk in China thousands of years ago.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-4d4b9a",
+   "kind": "mc",
+   "prompt": "Which country produces the most cocoa beans?",
+   "answer": "Ivory Coast",
+   "wrong": [
+    "Ghana",
+    "Brazil",
+    "Indonesia"
+   ],
+   "explain": "Côte d'Ivoire has grown about 40% of the world's cocoa for decades.",
+   "difficulty": 3,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-504384",
+   "kind": "mc",
+   "prompt": "Which spice is the most expensive by weight?",
+   "answer": "Saffron",
+   "wrong": [
+    "Vanilla",
+    "Cardamom",
+    "Cinnamon"
+   ],
+   "explain": "Saffron threads are hand-picked from crocus flowers.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-f602b9",
+   "kind": "mc",
+   "prompt": "Which part of a tree gives us cinnamon?",
+   "answer": "The bark",
+   "wrong": [
+    "The seeds",
+    "The roots",
+    "The flowers"
+   ],
+   "explain": "Strips of inner bark curl into quills as they dry.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-ffa630",
+   "kind": "mc",
+   "prompt": "Which spice is made from dried flower buds?",
+   "answer": "Cloves",
+   "wrong": [
+    "Nutmeg",
+    "Black pepper",
+    "Cumin"
+   ],
+   "explain": "Cloves come from a tree native to Indonesia's Maluku Islands.",
+   "difficulty": 3,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-22539d",
+   "kind": "mc",
+   "prompt": "Black pepper is native to which country?",
+   "answer": "India",
+   "wrong": [
+    "Mexico",
+    "Brazil",
+    "Spain"
+   ],
+   "explain": "Pepper vines grow wild in the Western Ghats of south-west India.",
+   "difficulty": 3,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-809faf",
+   "kind": "mc",
+   "prompt": "Chilli peppers originally came from which part of the world?",
+   "answer": "The Americas",
+   "wrong": [
+    "South Asia",
+    "Africa",
+    "Europe"
+   ],
+   "explain": "Chillies reached Asia only after Columbus, in the 1500s.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-b8a9a5",
+   "kind": "mc",
+   "prompt": "In which mountains were potatoes first farmed?",
+   "answer": "The Andes",
+   "wrong": [
+    "The Alps",
+    "The Himalayas",
+    "The Rockies"
+   ],
+   "explain": "People in what is now Peru and Bolivia farmed potatoes thousands of years ago.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-ce85ce",
+   "kind": "mc",
+   "prompt": "What does the Italian cooking term 'al dente' mean?",
+   "answer": "To the tooth",
+   "wrong": [
+    "Very soft",
+    "With garlic",
+    "In the oven"
+   ],
+   "explain": "Al dente pasta is cooked until still slightly firm to bite.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-28bdbf",
+   "kind": "mc",
+   "prompt": "Which nuts are used in classic Genovese pesto?",
+   "answer": "Pine nuts",
+   "wrong": [
+    "Walnuts",
+    "Almonds",
+    "Cashews"
+   ],
+   "explain": "Basil, pine nuts, garlic, Parmesan and olive oil.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-b8107b",
+   "kind": "mc",
+   "prompt": "Profiteroles and éclairs are made with which pastry?",
+   "answer": "Choux pastry",
+   "wrong": [
+    "Puff pastry",
+    "Filo pastry",
+    "Shortcrust pastry"
+   ],
+   "explain": "Choux puffs up with steam, leaving a hollow to fill.",
+   "difficulty": 3,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-a1fd0d",
+   "kind": "mc",
+   "prompt": "Which sweet pastry is made with layers of filo, nuts and syrup?",
+   "answer": "Baklava",
+   "wrong": [
+    "Pavlova",
+    "Tiramisu",
+    "Crème brûlée"
+   ],
+   "explain": "Baklava is loved from Turkey and Greece to the Middle East.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-cb007f",
+   "kind": "mc",
+   "prompt": "The pavlova dessert is named after a ballerina from which country?",
+   "answer": "Russia",
+   "wrong": [
+    "France",
+    "Italy",
+    "Austria"
+   ],
+   "explain": "Anna Pavlova toured in the 1920s; Australia and New Zealand both claim the dessert.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-9ad7bf",
+   "kind": "mc",
+   "prompt": "Which Italian dessert's name means 'pick me up'?",
+   "answer": "Tiramisu",
+   "wrong": [
+    "Panna cotta",
+    "Cannoli",
+    "Zabaglione"
+   ],
+   "explain": "Coffee-soaked biscuits are layered with mascarpone cream.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-3d510e",
+   "kind": "mc",
+   "prompt": "Which herb is the main ingredient of the Lebanese salad tabbouleh?",
+   "answer": "Parsley",
+   "wrong": [
+    "Coriander",
+    "Basil",
+    "Dill"
+   ],
+   "explain": "Tabbouleh is mostly chopped parsley with bulgur wheat, tomato and lemon.",
+   "difficulty": 3,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-4b4192",
+   "kind": "mc",
+   "prompt": "Paneer is a fresh cheese from which part of the world?",
+   "answer": "South Asia",
+   "wrong": [
+    "South America",
+    "Scandinavia",
+    "West Africa"
+   ],
+   "explain": "Paneer stars in Indian dishes such as palak paneer.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-0839d3",
+   "kind": "mc",
+   "prompt": "Cider is made from which fruit?",
+   "answer": "Apples",
+   "wrong": [
+    "Pears",
+    "Grapes",
+    "Cherries"
+   ],
+   "explain": "Perry is the same kind of drink made from pears.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-b16657",
+   "kind": "mc",
+   "prompt": "Jollof rice is a famous dish from which region?",
+   "answer": "West Africa",
+   "wrong": [
+    "East Asia",
+    "South America",
+    "Scandinavia"
+   ],
+   "explain": "Nigeria and Ghana have a friendly rivalry over whose jollof is best.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-989f07",
+   "kind": "mc",
+   "prompt": "Biltong, a dried and cured meat, comes from which country?",
+   "answer": "South Africa",
+   "wrong": [
+    "Australia",
+    "Argentina",
+    "Mongolia"
+   ],
+   "explain": "Biltong is spiced with coriander and air-dried.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-ff4f68",
+   "kind": "mc",
+   "prompt": "Dim sum is most closely linked with which Chinese cuisine?",
+   "answer": "Cantonese",
+   "wrong": [
+    "Sichuan",
+    "Hunan",
+    "Shandong"
+   ],
+   "explain": "Dim sum is eaten with tea in Guangzhou and Hong Kong.",
+   "difficulty": 3,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-fb2539",
+   "kind": "mc",
+   "prompt": "Nori, used to wrap sushi rolls, is made from what?",
+   "answer": "Seaweed",
+   "wrong": [
+    "Rice paper",
+    "Soya bean",
+    "Fish skin"
+   ],
+   "explain": "Sheets of nori are pressed and dried like paper.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-e640a1",
+   "kind": "mc",
+   "prompt": "Which drink is made by fermenting grapes?",
+   "answer": "Wine",
+   "wrong": [
+    "Beer",
+    "Whisky",
+    "Cider"
+   ],
+   "explain": "Beer is brewed from grain and cider from apples.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-5a92c7",
+   "kind": "mc",
+   "prompt": "Which grain is used to make single malt Scotch whisky?",
+   "answer": "Barley",
+   "wrong": [
+    "Rice",
+    "Maize",
+    "Oats"
+   ],
+   "explain": "Single malt Scotch is made from malted barley only.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-2f40de",
+   "kind": "mc",
+   "prompt": "Which Mexican sauce is made with chilli and chocolate?",
+   "answer": "Mole",
+   "wrong": [
+    "Salsa verde",
+    "Guacamole",
+    "Pico de gallo"
+   ],
+   "explain": "Mole poblano can contain more than 20 ingredients.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-3d609f",
+   "kind": "mc",
+   "prompt": "Which Japanese dish is battered, deep-fried seafood or vegetables?",
+   "answer": "Tempura",
+   "wrong": [
+    "Sashimi",
+    "Udon",
+    "Miso"
+   ],
+   "explain": "Portuguese missionaries are thought to have brought the idea to Japan.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-e53d83",
+   "kind": "tf",
+   "prompt": "Botanically, bananas are berries.",
+   "answer": true,
+   "explain": "A berry grows from a single flower with one ovary; bananas qualify.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-c5e3e7",
+   "kind": "tf",
+   "prompt": "Botanically, strawberries are berries.",
+   "answer": false,
+   "explain": "Strawberries are 'accessory fruits'; the seeds outside are the true fruits.",
+   "difficulty": 3,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-669ac4",
+   "kind": "tf",
+   "prompt": "Cashew nuts grow attached to a fruit called the cashew apple.",
+   "answer": true,
+   "explain": "Each nut hangs below a fleshy, pear-shaped 'apple'.",
+   "difficulty": 3,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-124f60",
+   "kind": "tf",
+   "prompt": "The first farmed carrots were mostly purple or yellow, not orange.",
+   "answer": true,
+   "explain": "Orange carrots became common in the Netherlands in the 1600s.",
+   "difficulty": 3,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-sci-2f4e03",
+   "kind": "mc",
+   "prompt": "Which force keeps the planets in orbit around the Sun?",
+   "answer": "Gravity",
+   "wrong": [
+    "Magnetism",
+    "Friction",
+    "Electricity"
+   ],
+   "explain": "Newton showed that the same force makes apples fall.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-3c2d07",
+   "kind": "mc",
+   "prompt": "What is the centre of an atom called?",
+   "answer": "The nucleus",
+   "wrong": [
+    "The electron",
+    "The shell",
+    "The ion"
+   ],
+   "explain": "The nucleus holds the protons and neutrons.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-11ad74",
+   "kind": "mc",
+   "prompt": "Which particle in an atom has no electric charge?",
+   "answer": "Neutron",
+   "wrong": [
+    "Proton",
+    "Electron",
+    "Ion"
+   ],
+   "explain": "James Chadwick discovered the neutron in 1932.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-b70171",
+   "kind": "mc",
+   "prompt": "What is the scientific study of earthquakes called?",
+   "answer": "Seismology",
+   "wrong": [
+    "Meteorology",
+    "Volcanology",
+    "Astronomy"
+   ],
+   "explain": "Seismologists record earthquake waves with seismographs.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-5f11f8",
+   "kind": "mc",
+   "prompt": "What is the scientific study of weather called?",
+   "answer": "Meteorology",
+   "wrong": [
+    "Astronomy",
+    "Ecology",
+    "Geology"
+   ],
+   "explain": "The word comes from the Greek for 'things high in the air'.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-f43966",
+   "kind": "mc",
+   "prompt": "What is the scientific study of stars and planets called?",
+   "answer": "Astronomy",
+   "wrong": [
+    "Astrology",
+    "Geology",
+    "Meteorology"
+   ],
+   "explain": "Astrology claims the stars shape our lives; it is not a science.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-ca8217",
+   "kind": "mc",
+   "prompt": "What is the study of fossils called?",
+   "answer": "Palaeontology",
+   "wrong": [
+    "Archaeology",
+    "Zoology",
+    "Entomology"
+   ],
+   "explain": "Archaeology studies human remains and objects; palaeontology studies ancient life.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-59661c",
+   "kind": "mc",
+   "prompt": "Which husband-and-wife team discovered radium and polonium?",
+   "answer": "Marie and Pierre Curie",
+   "wrong": [
+    "Ernest and Mary Rutherford",
+    "Niels and Margrethe Bohr",
+    "Max and Marie Planck"
+   ],
+   "explain": "Polonium was named after Marie's homeland, Poland.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-dd29e7",
+   "kind": "mc",
+   "prompt": "Which Italian scientist saw four moons of Jupiter through his telescope in 1610?",
+   "answer": "Galileo Galilei",
+   "wrong": [
+    "Nicolaus Copernicus",
+    "Johannes Kepler",
+    "Isaac Newton"
+   ],
+   "explain": "Io, Europa, Ganymede and Callisto are still called the Galilean moons.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-20ef3b",
+   "kind": "mc",
+   "prompt": "Which Polish astronomer argued that the Earth goes around the Sun?",
+   "answer": "Nicolaus Copernicus",
+   "wrong": [
+    "Galileo Galilei",
+    "Johannes Kepler",
+    "Tycho Brahe"
+   ],
+   "explain": "His book was published in 1543, the year he died.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-235812",
+   "kind": "mc",
+   "prompt": "Which Arab scholar, born around 965, is called the father of optics?",
+   "answer": "Ibn al-Haytham",
+   "wrong": [
+    "Al-Khwarizmi",
+    "Ibn Sina",
+    "Ibn Rushd"
+   ],
+   "explain": "His Book of Optics showed that we see because light enters the eye.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-fb75d8",
+   "kind": "mc",
+   "prompt": "The word 'algorithm' comes from the name of which Persian mathematician?",
+   "answer": "Al-Khwarizmi",
+   "wrong": [
+    "Omar Khayyam",
+    "Ibn Sina",
+    "Al-Biruni"
+   ],
+   "explain": "His book on equations also gave us the word 'algebra'.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-681396",
+   "kind": "mc",
+   "prompt": "Mathematicians in which country first treated zero as a number in its own right?",
+   "answer": "India",
+   "wrong": [
+    "Greece",
+    "Egypt",
+    "Italy"
+   ],
+   "explain": "Brahmagupta set out rules for zero in 628 AD. The Maya also had a zero symbol.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-04cf0b",
+   "kind": "mc",
+   "prompt": "Which astronomer worked out the three laws of planetary motion?",
+   "answer": "Johannes Kepler",
+   "wrong": [
+    "Nicolaus Copernicus",
+    "Galileo Galilei",
+    "Edmond Halley"
+   ],
+   "explain": "Kepler showed that planets move in ellipses, not circles.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-ccd63a",
+   "kind": "mc",
+   "prompt": "Which New Zealand-born scientist discovered the atomic nucleus in 1911?",
+   "answer": "Ernest Rutherford",
+   "wrong": [
+    "Niels Bohr",
+    "J. J. Thomson",
+    "James Chadwick"
+   ],
+   "explain": "Rutherford appears on New Zealand's $100 note.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-7cb72f",
+   "kind": "mc",
+   "prompt": "Which Indian physicist won the 1930 Nobel Prize for his work on the scattering of light?",
+   "answer": "C. V. Raman",
+   "wrong": [
+    "Homi Bhabha",
+    "Satyendra Nath Bose",
+    "Jagadish Chandra Bose"
+   ],
+   "explain": "He was the first Asian to win a Nobel Prize in a science.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-fadb71",
+   "kind": "mc",
+   "prompt": "A substance with a pH below 7 is called…",
+   "answer": "An acid",
+   "wrong": [
+    "An alkali",
+    "A salt",
+    "A metal"
+   ],
+   "explain": "Lemon juice and vinegar are acids; soap is alkaline.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-f7d1e9",
+   "kind": "mc",
+   "prompt": "What colour does blue litmus paper turn in an acid?",
+   "answer": "Red",
+   "wrong": [
+    "Green",
+    "Yellow",
+    "Purple"
+   ],
+   "explain": "Red litmus turns blue in an alkali.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-5a4e01",
+   "kind": "mc",
+   "prompt": "What is the second most common gas in Earth's atmosphere?",
+   "answer": "Oxygen",
+   "wrong": [
+    "Carbon dioxide",
+    "Argon",
+    "Hydrogen"
+   ],
+   "explain": "Air is about 78% nitrogen and 21% oxygen.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-5defaf",
+   "kind": "mc",
+   "prompt": "What does a Geiger counter detect?",
+   "answer": "Radiation",
+   "wrong": [
+    "Earthquakes",
+    "Wind speed",
+    "Humidity"
+   ],
+   "explain": "It clicks each time an ionising particle passes through it.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-ef60d9",
+   "kind": "mc",
+   "prompt": "What does the Richter scale measure?",
+   "answer": "Earthquakes",
+   "wrong": [
+    "Wind speed",
+    "Rainfall",
+    "Temperature"
+   ],
+   "explain": "It was devised by Charles Richter in 1935.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-d95659",
+   "kind": "mc",
+   "prompt": "What does the Mohs scale measure?",
+   "answer": "The hardness of minerals",
+   "wrong": [
+    "Earthquake strength",
+    "Wind speed",
+    "Acidity"
+   ],
+   "explain": "It runs from talc (1) to diamond (10).",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-0f5fee",
+   "kind": "mc",
+   "prompt": "What does the Beaufort scale measure?",
+   "answer": "Wind speed",
+   "wrong": [
+    "Earthquake strength",
+    "Temperature",
+    "Rainfall"
+   ],
+   "explain": "Force 0 is calm and force 12 is a hurricane.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-95f5d0",
+   "kind": "mc",
+   "prompt": "Which metal is the best conductor of electricity?",
+   "answer": "Silver",
+   "wrong": [
+    "Copper",
+    "Gold",
+    "Aluminium"
+   ],
+   "explain": "Copper is used in wires because it is nearly as good and much cheaper.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-cfc17f",
+   "kind": "mc",
+   "prompt": "Bronze is an alloy of tin and which metal?",
+   "answer": "Copper",
+   "wrong": [
+    "Iron",
+    "Zinc",
+    "Lead"
+   ],
+   "explain": "Bronze gave its name to the Bronze Age.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-d7adf3",
+   "kind": "mc",
+   "prompt": "Brass is an alloy of copper and which metal?",
+   "answer": "Zinc",
+   "wrong": [
+    "Tin",
+    "Iron",
+    "Nickel"
+   ],
+   "explain": "Brass is used for many musical instruments.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-18955b",
+   "kind": "mc",
+   "prompt": "Steel is made mainly from which metal?",
+   "answer": "Iron",
+   "wrong": [
+    "Aluminium",
+    "Copper",
+    "Zinc"
+   ],
+   "explain": "Steel is iron with a little carbon added.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-31161f",
+   "kind": "mc",
+   "prompt": "Which gas is known as laughing gas?",
+   "answer": "Nitrous oxide",
+   "wrong": [
+    "Carbon monoxide",
+    "Methane",
+    "Ammonia"
+   ],
+   "explain": "Dentists and midwives use it as a mild anaesthetic.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-901c1d",
+   "kind": "mc",
+   "prompt": "What is it called when a solid turns straight into a gas?",
+   "answer": "Sublimation",
+   "wrong": [
+    "Evaporation",
+    "Condensation",
+    "Melting"
+   ],
+   "explain": "Dry ice sublimes at room temperature.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-b9a753",
+   "kind": "mc",
+   "prompt": "In E = mc², what does the c stand for?",
+   "answer": "The speed of light",
+   "wrong": [
+    "Carbon",
+    "Electric charge",
+    "Heat"
+   ],
+   "explain": "Because c² is huge, a little mass holds a vast amount of energy.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-ccbc37",
+   "kind": "mc",
+   "prompt": "Which French scientist developed the first rabies vaccine in 1885?",
+   "answer": "Louis Pasteur",
+   "wrong": [
+    "Robert Koch",
+    "Edward Jenner",
+    "Joseph Lister"
+   ],
+   "explain": "He also invented pasteurisation, which makes milk safer to drink.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-fa995e",
+   "kind": "mc",
+   "prompt": "Which Austrian-born physicist is famous for a thought experiment about a cat in a box?",
+   "answer": "Erwin Schrödinger",
+   "wrong": [
+    "Werner Heisenberg",
+    "Max Planck",
+    "Wolfgang Pauli"
+   ],
+   "explain": "The cat is both alive and dead until someone looks, to mock a quantum idea.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-c069a2",
+   "kind": "tf",
+   "prompt": "Glass is made mainly from sand.",
+   "answer": true,
+   "explain": "Silica sand is melted with soda ash and limestone.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-8af9f2",
+   "kind": "tf",
+   "prompt": "Water expands when it freezes.",
+   "answer": true,
+   "explain": "That is why ice floats and frozen pipes burst.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-05127d",
+   "kind": "tf",
+   "prompt": "Rubber conducts electricity well.",
+   "answer": false,
+   "explain": "Rubber is an insulator, so it is used to cover wires.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-space-a08710",
+   "kind": "mc",
+   "prompt": "Which is the only planet in our Solar System not named after a god?",
+   "answer": "Earth",
+   "wrong": [
+    "Mars",
+    "Venus",
+    "Mercury"
+   ],
+   "explain": "Its name comes from old English and Germanic words for ground.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-264d8d",
+   "kind": "mc",
+   "prompt": "As of 2024, which planet had the most known moons?",
+   "answer": "Saturn",
+   "wrong": [
+    "Jupiter",
+    "Uranus",
+    "Neptune"
+   ],
+   "explain": "Saturn retook the lead from Jupiter in 2023, with 146 confirmed moons.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-711baa",
+   "kind": "mc",
+   "prompt": "Which planet is called Earth's twin because of its similar size?",
+   "answer": "Venus",
+   "wrong": [
+    "Mars",
+    "Mercury",
+    "Neptune"
+   ],
+   "explain": "Venus is almost Earth's size but has a crushing, scorching atmosphere.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-31ca26",
+   "kind": "mc",
+   "prompt": "Who was the second person to walk on the Moon?",
+   "answer": "Buzz Aldrin",
+   "wrong": [
+    "Michael Collins",
+    "Yuri Gagarin",
+    "John Glenn"
+   ],
+   "explain": "Aldrin followed Neil Armstrong down the ladder in July 1969.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-dc0760",
+   "kind": "mc",
+   "prompt": "Which Apollo 11 astronaut stayed in lunar orbit while the others landed?",
+   "answer": "Michael Collins",
+   "wrong": [
+    "Buzz Aldrin",
+    "Jim Lovell",
+    "Alan Shepard"
+   ],
+   "explain": "Collins flew the command module Columbia.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-0df221",
+   "kind": "mc",
+   "prompt": "What was the name of the Soviet dog that became the first animal to orbit Earth?",
+   "answer": "Laika",
+   "wrong": [
+    "Belka",
+    "Strelka",
+    "Ham"
+   ],
+   "explain": "Laika flew on Sputnik 2 in November 1957.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-d35a10",
+   "kind": "mc",
+   "prompt": "In 2019, which country made the first landing on the far side of the Moon?",
+   "answer": "China",
+   "wrong": [
+    "United States",
+    "Russia",
+    "India"
+   ],
+   "explain": "China's Chang'e 4 lander touched down in January 2019.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-034dff",
+   "kind": "mc",
+   "prompt": "In 2023, which country made the first landing near the Moon's south pole?",
+   "answer": "India",
+   "wrong": [
+    "China",
+    "Japan",
+    "United States"
+   ],
+   "explain": "Chandrayaan-3 touched down in August 2023.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-4ec81e",
+   "kind": "mc",
+   "prompt": "Which country's Hope probe went into orbit around Mars in 2021?",
+   "answer": "United Arab Emirates",
+   "wrong": [
+    "India",
+    "Japan",
+    "Saudi Arabia"
+   ],
+   "explain": "It was the Arab world's first interplanetary mission.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-420965",
+   "kind": "mc",
+   "prompt": "What is the boundary around a black hole beyond which nothing can escape called?",
+   "answer": "Event horizon",
+   "wrong": [
+    "Singularity",
+    "Corona",
+    "Nebula"
+   ],
+   "explain": "Not even light can get back out once past it.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-6e9fcf",
+   "kind": "mc",
+   "prompt": "What is the name of the theory that the universe began from a hot, dense state and expanded?",
+   "answer": "The Big Bang",
+   "wrong": [
+    "Steady State",
+    "Big Crunch",
+    "String theory"
+   ],
+   "explain": "It happened about 13.8 billion years ago.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-c05ca8",
+   "kind": "mc",
+   "prompt": "Which planet takes only about 88 Earth days to orbit the Sun?",
+   "answer": "Mercury",
+   "wrong": [
+    "Venus",
+    "Mars",
+    "Neptune"
+   ],
+   "explain": "Being closest to the Sun, it has the shortest year.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-f34537",
+   "kind": "mc",
+   "prompt": "What are Saturn's rings mainly made of?",
+   "answer": "Ice and rock",
+   "wrong": [
+    "Gas",
+    "Molten metal",
+    "Sand"
+   ],
+   "explain": "The pieces range from dust-sized to as big as houses.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-8146ab",
+   "kind": "mc",
+   "prompt": "Which orbiting laboratory has had people living aboard since November 2000?",
+   "answer": "International Space Station",
+   "wrong": [
+    "Mir",
+    "Skylab",
+    "Tiangong"
+   ],
+   "explain": "The US, Russia, Europe, Japan and Canada built it together.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-d01b29",
+   "kind": "mc",
+   "prompt": "What do we call a pattern of stars named after a figure, like Orion?",
+   "answer": "A constellation",
+   "wrong": [
+    "A galaxy",
+    "A nebula",
+    "A comet"
+   ],
+   "explain": "Astronomers recognise 88 constellations.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-559893",
+   "kind": "mc",
+   "prompt": "Since 2006, Pluto has been classed as what?",
+   "answer": "A dwarf planet",
+   "wrong": [
+    "An asteroid",
+    "A moon",
+    "A comet"
+   ],
+   "explain": "It was demoted because it has not cleared its orbit of other objects.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-f206c4",
+   "kind": "mc",
+   "prompt": "Which star pattern appears on the flags of Australia, New Zealand and Brazil?",
+   "answer": "The Southern Cross",
+   "wrong": [
+    "Orion",
+    "The Plough",
+    "Cassiopeia"
+   ],
+   "explain": "The Southern Cross (Crux) is the smallest constellation.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-a25dab",
+   "kind": "mc",
+   "prompt": "What is a supernova?",
+   "answer": "An exploding star",
+   "wrong": [
+    "A newborn planet",
+    "A very bright comet",
+    "A cluster of galaxies"
+   ],
+   "explain": "A supernova can briefly outshine a whole galaxy.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-a591ed",
+   "kind": "mc",
+   "prompt": "Roughly how long does the Moon take to orbit the Earth?",
+   "answer": "About a month",
+   "wrong": [
+    "About a week",
+    "About a year",
+    "About a day"
+   ],
+   "explain": "The word 'month' comes from 'moon'.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-a95e28",
+   "kind": "mc",
+   "prompt": "Which planet was found in 1846 after mathematicians predicted where it should be?",
+   "answer": "Neptune",
+   "wrong": [
+    "Uranus",
+    "Pluto",
+    "Saturn"
+   ],
+   "explain": "Its pull was disturbing the orbit of Uranus.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-ad8cce",
+   "kind": "mc",
+   "prompt": "Which planet did William Herschel discover in 1781?",
+   "answer": "Uranus",
+   "wrong": [
+    "Neptune",
+    "Saturn",
+    "Pluto"
+   ],
+   "explain": "It was the first planet found with a telescope.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-a3b4b4",
+   "kind": "tf",
+   "prompt": "There is no gravity on the International Space Station.",
+   "answer": false,
+   "explain": "Gravity there is about 90% of Earth's; astronauts float because they are always falling around Earth.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-body-9ae342",
+   "kind": "mc",
+   "prompt": "Which small organ stores bile?",
+   "answer": "Gallbladder",
+   "wrong": [
+    "Liver",
+    "Pancreas",
+    "Spleen"
+   ],
+   "explain": "The liver makes bile; the gallbladder stores it.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-1241a6",
+   "kind": "mc",
+   "prompt": "What is the largest internal organ in the human body?",
+   "answer": "Liver",
+   "wrong": [
+    "Brain",
+    "Lungs",
+    "Heart"
+   ],
+   "explain": "The liver weighs about 1.5 kg in an adult.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-7ff9f2",
+   "kind": "mc",
+   "prompt": "Which muscle is at the front of the upper arm?",
+   "answer": "Biceps",
+   "wrong": [
+    "Triceps",
+    "Deltoid",
+    "Quadriceps"
+   ],
+   "explain": "The triceps is at the back.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-421d24",
+   "kind": "mc",
+   "prompt": "What is the medical name for the windpipe?",
+   "answer": "Trachea",
+   "wrong": [
+    "Oesophagus",
+    "Larynx",
+    "Bronchus"
+   ],
+   "explain": "The trachea carries air from the throat to the lungs.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-6080e9",
+   "kind": "mc",
+   "prompt": "Which part of the brain controls balance and coordination?",
+   "answer": "Cerebellum",
+   "wrong": [
+    "Cerebrum",
+    "Brainstem",
+    "Hypothalamus"
+   ],
+   "explain": "Its name means 'little brain'; it sits at the back of the skull.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-329b87",
+   "kind": "mc",
+   "prompt": "What is the medical name for the shoulder blade?",
+   "answer": "Scapula",
+   "wrong": [
+    "Clavicle",
+    "Sternum",
+    "Patella"
+   ],
+   "explain": "The clavicle is the collarbone.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-9d8937",
+   "kind": "mc",
+   "prompt": "What is the medical name for the breastbone?",
+   "answer": "Sternum",
+   "wrong": [
+    "Scapula",
+    "Clavicle",
+    "Tibia"
+   ],
+   "explain": "Most ribs attach to the sternum through cartilage.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-c4919d",
+   "kind": "mc",
+   "prompt": "What is the common name for the larynx?",
+   "answer": "Voice box",
+   "wrong": [
+    "Windpipe",
+    "Tonsils",
+    "Gullet"
+   ],
+   "explain": "The vocal cords inside it vibrate to make sound.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-0a9686",
+   "kind": "mc",
+   "prompt": "Hepatitis is an inflammation of which organ?",
+   "answer": "Liver",
+   "wrong": [
+    "Kidneys",
+    "Lungs",
+    "Heart"
+   ],
+   "explain": "'Hepar' is Greek for liver.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-935fdb",
+   "kind": "mc",
+   "prompt": "Which vitamin is most linked with healthy eyes and night vision?",
+   "answer": "Vitamin A",
+   "wrong": [
+    "Vitamin C",
+    "Vitamin D",
+    "Vitamin K"
+   ],
+   "explain": "Carrots contain beta-carotene, which the body turns into vitamin A.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-c56946",
+   "kind": "mc",
+   "prompt": "A lack of iron in the diet can cause which condition?",
+   "answer": "Anaemia",
+   "wrong": [
+    "Scurvy",
+    "Rickets",
+    "Gout"
+   ],
+   "explain": "Iron is needed to make haemoglobin.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-1256c9",
+   "kind": "mc",
+   "prompt": "Rickets, which softens children's bones, is caused by a lack of which vitamin?",
+   "answer": "Vitamin D",
+   "wrong": [
+    "Vitamin C",
+    "Vitamin B12",
+    "Vitamin K"
+   ],
+   "explain": "Vitamin D helps the body absorb calcium.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-327949",
+   "kind": "mc",
+   "prompt": "A cardiologist specialises in which organ?",
+   "answer": "Heart",
+   "wrong": [
+    "Brain",
+    "Skin",
+    "Kidneys"
+   ],
+   "explain": "'Kardia' is Greek for heart.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-77d37f",
+   "kind": "mc",
+   "prompt": "A dermatologist treats problems with which organ?",
+   "answer": "Skin",
+   "wrong": [
+    "Eyes",
+    "Bones",
+    "Heart"
+   ],
+   "explain": "'Derma' is Greek for skin.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-f007d7",
+   "kind": "mc",
+   "prompt": "Which ancient Greek doctor gave his name to the oath doctors once swore?",
+   "answer": "Hippocrates",
+   "wrong": [
+    "Galen",
+    "Aristotle",
+    "Archimedes"
+   ],
+   "explain": "He is often called the father of medicine.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-c9ad5c",
+   "kind": "mc",
+   "prompt": "Who described how the heart pumps blood around the body, in 1628?",
+   "answer": "William Harvey",
+   "wrong": [
+    "Galen",
+    "Andreas Vesalius",
+    "Edward Jenner"
+   ],
+   "explain": "Harvey was an English doctor to King James I and Charles I.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-20f921",
+   "kind": "tf",
+   "prompt": "Blood in your veins is blue.",
+   "answer": false,
+   "explain": "Blood is always red; veins only look blue through the skin.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-bddc1e",
+   "kind": "tf",
+   "prompt": "Identical twins have different fingerprints.",
+   "answer": true,
+   "explain": "Fingerprints form in the womb and are shaped by tiny differences in pressure.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-3d4bd0",
+   "kind": "tf",
+   "prompt": "A human heart beats about 100,000 times a day.",
+   "answer": true,
+   "explain": "At 70 beats a minute that is about 100,800 beats.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-bb35a1",
+   "kind": "tf",
+   "prompt": "Hair and nails keep growing after death.",
+   "answer": false,
+   "explain": "The skin dries and shrinks, which makes them look longer.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-tech-7b3501",
+   "kind": "tf",
+   "prompt": "Wi-Fi is short for 'wireless fidelity'.",
+   "answer": false,
+   "explain": "Wi-Fi is a brand name invented by a marketing firm; it never stood for anything.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-9635ce",
+   "kind": "mc",
+   "prompt": "What does PDF stand for?",
+   "answer": "Portable Document Format",
+   "wrong": [
+    "Printed Data File",
+    "Public Document File",
+    "Personal Digital Form"
+   ],
+   "explain": "Adobe introduced PDF in 1993.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-a125c9",
+   "kind": "mc",
+   "prompt": "In computing, what does AI stand for?",
+   "answer": "Artificial intelligence",
+   "wrong": [
+    "Automatic input",
+    "Advanced internet",
+    "Analogue interface"
+   ],
+   "explain": "The term was coined for a 1956 conference at Dartmouth College.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-f61f3e",
+   "kind": "mc",
+   "prompt": "What does SIM stand for in 'SIM card'?",
+   "answer": "Subscriber Identity Module",
+   "wrong": [
+    "Secure Internet Memory",
+    "Signal Input Module",
+    "System Identity Memory"
+   ],
+   "explain": "The card identifies your phone account to the network.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-9a0ad6",
+   "kind": "mc",
+   "prompt": "The word 'radar' is short for…",
+   "answer": "Radio detection and ranging",
+   "wrong": [
+    "Rapid data relay",
+    "Radio direction alert",
+    "Range and direction recorder"
+   ],
+   "explain": "Radar bounces radio waves off objects to find them.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-eb2e8f",
+   "kind": "mc",
+   "prompt": "What does 'scuba' stand for?",
+   "answer": "Self-contained underwater breathing apparatus",
+   "wrong": [
+    "Sub-surface compressed underwater breathing aid",
+    "Safe controlled underwater buoyancy apparatus",
+    "Submarine crew underwater breathing apparatus"
+   ],
+   "explain": "Jacques Cousteau co-invented the Aqua-Lung in 1943.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-6c30d9",
+   "kind": "mc",
+   "prompt": "Which company develops the Android phone operating system?",
+   "answer": "Google",
+   "wrong": [
+    "Apple",
+    "Microsoft",
+    "Samsung"
+   ],
+   "explain": "Google bought Android Inc. in 2005.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-2a2da2",
+   "kind": "mc",
+   "prompt": "Which company makes the PlayStation games consoles?",
+   "answer": "Sony",
+   "wrong": [
+    "Nintendo",
+    "Sega",
+    "Microsoft"
+   ],
+   "explain": "The first PlayStation came out in Japan in 1994.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-4cc83d",
+   "kind": "mc",
+   "prompt": "Which company makes the Xbox games consoles?",
+   "answer": "Microsoft",
+   "wrong": [
+    "Sony",
+    "Nintendo",
+    "Sega"
+   ],
+   "explain": "The first Xbox was released in 2001.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-40967c",
+   "kind": "mc",
+   "prompt": "Nokia, once the world's biggest maker of mobile phones, comes from which country?",
+   "answer": "Finland",
+   "wrong": [
+    "Sweden",
+    "Denmark",
+    "Norway"
+   ],
+   "explain": "Nokia began in 1865 as a paper mill.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-d3fb3f",
+   "kind": "mc",
+   "prompt": "In which country was IKEA founded?",
+   "answer": "Sweden",
+   "wrong": [
+    "Denmark",
+    "Norway",
+    "Finland"
+   ],
+   "explain": "Ingvar Kamprad founded it in 1943, aged 17.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-2561dd",
+   "kind": "mc",
+   "prompt": "Which country do Toyota, Honda and Nissan cars come from?",
+   "answer": "Japan",
+   "wrong": [
+    "South Korea",
+    "China",
+    "Germany"
+   ],
+   "explain": "Toyota began as a maker of weaving looms.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-d2f2fc",
+   "kind": "mc",
+   "prompt": "From which country do Ferrari and Lamborghini cars come?",
+   "answer": "Italy",
+   "wrong": [
+    "Germany",
+    "France",
+    "Spain"
+   ],
+   "explain": "Lamborghini was a tractor maker before it built sports cars.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-91b78e",
+   "kind": "mc",
+   "prompt": "Which German car maker builds the 911 sports car?",
+   "answer": "Porsche",
+   "wrong": [
+    "BMW",
+    "Audi",
+    "Mercedes-Benz"
+   ],
+   "explain": "The 911 has been made since 1964.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-7b16d2",
+   "kind": "mc",
+   "prompt": "In which country was gunpowder invented?",
+   "answer": "China",
+   "wrong": [
+    "India",
+    "Persia",
+    "Greece"
+   ],
+   "explain": "Chinese alchemists discovered it in the 800s while seeking an elixir of life.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-1342b7",
+   "kind": "mc",
+   "prompt": "The wheel is generally thought to have been invented in which region, about 5,500 years ago?",
+   "answer": "Mesopotamia",
+   "wrong": [
+    "Ancient Egypt",
+    "China",
+    "Ancient Greece"
+   ],
+   "explain": "The first wheels were potter's wheels; wheels for carts followed.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-51929c",
+   "kind": "mc",
+   "prompt": "Which navigation tool was first invented in China?",
+   "answer": "The magnetic compass",
+   "wrong": [
+    "The sextant",
+    "The astrolabe",
+    "The telescope"
+   ],
+   "explain": "Early Chinese compasses were spoons of lodestone that pointed south.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-edd6c4",
+   "kind": "mc",
+   "prompt": "Which company did Jeff Bezos found in 1994?",
+   "answer": "Amazon",
+   "wrong": [
+    "eBay",
+    "Google",
+    "PayPal"
+   ],
+   "explain": "Amazon started out selling books.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-864d99",
+   "kind": "mc",
+   "prompt": "At which research centre did Tim Berners-Lee invent the World Wide Web?",
+   "answer": "CERN",
+   "wrong": [
+    "NASA",
+    "MIT",
+    "Bell Labs"
+   ],
+   "explain": "CERN, near Geneva, is Europe's particle physics laboratory.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-861172",
+   "kind": "mc",
+   "prompt": "Which 1972 Atari game was one of the first video game hits?",
+   "answer": "Pong",
+   "wrong": [
+    "Pac-Man",
+    "Space Invaders",
+    "Tetris"
+   ],
+   "explain": "Pong was a simple electronic version of table tennis.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-6995e0",
+   "kind": "mc",
+   "prompt": "Which Japanese company created Super Mario?",
+   "answer": "Nintendo",
+   "wrong": [
+    "Sega",
+    "Sony",
+    "Capcom"
+   ],
+   "explain": "Mario first appeared in Donkey Kong in 1981.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-314d56",
+   "kind": "mc",
+   "prompt": "Which company launched the Walkman portable cassette player in 1979?",
+   "answer": "Sony",
+   "wrong": [
+    "Panasonic",
+    "Philips",
+    "Toshiba"
+   ],
+   "explain": "Hundreds of millions of Walkmans were sold.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-4fdcc8",
+   "kind": "mc",
+   "prompt": "Which Dutch company introduced the compact cassette tape in 1963?",
+   "answer": "Philips",
+   "wrong": [
+    "Sony",
+    "Grundig",
+    "Bang & Olufsen"
+   ],
+   "explain": "Philips also co-developed the CD with Sony.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-f532cd",
+   "kind": "mc",
+   "prompt": "QR codes were invented in which country?",
+   "answer": "Japan",
+   "wrong": [
+    "South Korea",
+    "China",
+    "United States"
+   ],
+   "explain": "A Denso Wave engineer created them in 1994 to track car parts.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-3d7686",
+   "kind": "mc",
+   "prompt": "Which car company made the Model T?",
+   "answer": "Ford",
+   "wrong": [
+    "General Motors",
+    "Chrysler",
+    "Cadillac"
+   ],
+   "explain": "Launched in 1908; Ford's moving assembly line from 1913 made it cheap.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-e5e7d9",
+   "kind": "mc",
+   "prompt": "Which country opened the first high-speed 'bullet train' line in 1964?",
+   "answer": "Japan",
+   "wrong": [
+    "France",
+    "Germany",
+    "China"
+   ],
+   "explain": "The Shinkansen opened between Tokyo and Osaka before the Tokyo Olympics.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-61675c",
+   "kind": "mc",
+   "prompt": "What did the first text message, sent in 1992, say?",
+   "answer": "Merry Christmas",
+   "wrong": [
+    "Hello world",
+    "Can you hear me?",
+    "Happy New Year"
+   ],
+   "explain": "Engineer Neil Papworth sent it from a computer to a phone.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-tech-55f126",
+   "kind": "mc",
+   "prompt": "In web addresses, what does 'http' stand for?",
+   "answer": "Hypertext Transfer Protocol",
+   "wrong": [
+    "High Tech Text Program",
+    "Hyperlink Text Transfer Process",
+    "Home Terminal Transfer Protocol"
+   ],
+   "explain": "The 's' in https means secure.",
+   "difficulty": 3,
+   "tags": [
+    "science"
+   ],
+   "topic": "technology"
+  },
+  {
+   "id": "gen-art-880080",
+   "kind": "mc",
+   "prompt": "In which city is the Louvre museum, home of the Mona Lisa?",
+   "answer": "Paris",
+   "wrong": [
+    "Rome",
+    "Florence",
+    "Madrid"
+   ],
+   "explain": "The Louvre was a royal palace before it became a museum in 1793.",
+   "difficulty": 1,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-b49207",
+   "kind": "mc",
+   "prompt": "In which city is the Prado, Spain's national art museum?",
+   "answer": "Madrid",
+   "wrong": [
+    "Barcelona",
+    "Seville",
+    "Valencia"
+   ],
+   "explain": "It holds great works by Velázquez and Goya.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-a44588",
+   "kind": "mc",
+   "prompt": "In which city is the Uffizi Gallery, home of 'The Birth of Venus'?",
+   "answer": "Florence",
+   "wrong": [
+    "Venice",
+    "Rome",
+    "Milan"
+   ],
+   "explain": "Florence was the heart of the Italian Renaissance.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-3b3a1f",
+   "kind": "mc",
+   "prompt": "In which city is the Hermitage Museum?",
+   "answer": "Saint Petersburg",
+   "wrong": [
+    "Moscow",
+    "Vienna",
+    "Berlin"
+   ],
+   "explain": "It fills the Winter Palace of the Russian tsars.",
+   "difficulty": 3,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-ded2c8",
+   "kind": "mc",
+   "prompt": "Which Mexican artist is famous for her self-portraits, often with flowers in her hair?",
+   "answer": "Frida Kahlo",
+   "wrong": [
+    "Georgia O'Keeffe",
+    "Tamara de Lempicka",
+    "Mary Cassatt"
+   ],
+   "explain": "Her Blue House in Mexico City is now a museum.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-fe949c",
+   "kind": "mc",
+   "prompt": "Which Mexican painter, husband of Frida Kahlo, was famous for huge murals?",
+   "answer": "Diego Rivera",
+   "wrong": [
+    "José Clemente Orozco",
+    "Rufino Tamayo",
+    "David Alfaro Siqueiros"
+   ],
+   "explain": "His murals tell the history of Mexico's people.",
+   "difficulty": 3,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-d7e952",
+   "kind": "mc",
+   "prompt": "Which art movement did Salvador Dalí and René Magritte belong to?",
+   "answer": "Surrealism",
+   "wrong": [
+    "Cubism",
+    "Impressionism",
+    "Pop art"
+   ],
+   "explain": "Surrealists painted dreamlike scenes from the unconscious mind.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-55a331",
+   "kind": "mc",
+   "prompt": "Which Austrian painter created 'The Kiss', covered in gold leaf?",
+   "answer": "Gustav Klimt",
+   "wrong": [
+    "Egon Schiele",
+    "Oskar Kokoschka",
+    "Paul Klee"
+   ],
+   "explain": "It was painted in Vienna around 1908.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-ab79a4",
+   "kind": "mc",
+   "prompt": "Which Dutch artist painted 'Sunflowers'?",
+   "answer": "Vincent van Gogh",
+   "wrong": [
+    "Rembrandt",
+    "Piet Mondrian",
+    "Johannes Vermeer"
+   ],
+   "explain": "He painted several versions in Arles, France, in 1888 and 1889.",
+   "difficulty": 1,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-41599c",
+   "kind": "mc",
+   "prompt": "Which British street artist hides his identity and shredded one of his own paintings at auction?",
+   "answer": "Banksy",
+   "wrong": [
+    "Damien Hirst",
+    "David Hockney",
+    "Tracey Emin"
+   ],
+   "explain": "'Girl with Balloon' half-shredded itself in 2018.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-4b1232",
+   "kind": "mc",
+   "prompt": "Which Dutch painter is famous for grids of black lines and primary colours?",
+   "answer": "Piet Mondrian",
+   "wrong": [
+    "Vincent van Gogh",
+    "M. C. Escher",
+    "Rembrandt"
+   ],
+   "explain": "His style influenced fashion, posters and buildings.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-015d80",
+   "kind": "mc",
+   "prompt": "Which Dutch artist drew impossible staircases and hands drawing each other?",
+   "answer": "M. C. Escher",
+   "wrong": [
+    "Piet Mondrian",
+    "Hieronymus Bosch",
+    "René Magritte"
+   ],
+   "explain": "Escher loved tessellations and optical illusions.",
+   "difficulty": 3,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-802f39",
+   "kind": "mc",
+   "prompt": "The Taj Mahal is built mainly from which material?",
+   "answer": "White marble",
+   "wrong": [
+    "Red sandstone",
+    "Granite",
+    "Limestone"
+   ],
+   "explain": "The marble changes colour with the light during the day.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-d73942",
+   "kind": "mc",
+   "prompt": "Which architect designed the Guggenheim Museum in Bilbao?",
+   "answer": "Frank Gehry",
+   "wrong": [
+    "Zaha Hadid",
+    "Norman Foster",
+    "Renzo Piano"
+   ],
+   "explain": "Its curving titanium walls opened in 1997.",
+   "difficulty": 3,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-6a85d4",
+   "kind": "mc",
+   "prompt": "Which Iraqi-British architect designed the London Aquatics Centre and Baku's Heydar Aliyev Centre?",
+   "answer": "Zaha Hadid",
+   "wrong": [
+    "Frank Gehry",
+    "Tadao Ando",
+    "I. M. Pei"
+   ],
+   "explain": "In 2004 she became the first woman to win the Pritzker Prize.",
+   "difficulty": 3,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-3a7246",
+   "kind": "mc",
+   "prompt": "Which architect designed the glass pyramid at the Louvre?",
+   "answer": "I. M. Pei",
+   "wrong": [
+    "Frank Gehry",
+    "Le Corbusier",
+    "Renzo Piano"
+   ],
+   "explain": "Pei was born in China and worked mostly in the United States.",
+   "difficulty": 3,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-07eb02",
+   "kind": "mc",
+   "prompt": "Which Japanese art is the folding of paper into shapes?",
+   "answer": "Origami",
+   "wrong": [
+    "Ikebana",
+    "Bonsai",
+    "Kintsugi"
+   ],
+   "explain": "Ikebana is flower arranging; kintsugi mends pottery with gold.",
+   "difficulty": 1,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-107306",
+   "kind": "mc",
+   "prompt": "Which Japanese art repairs broken pottery with gold?",
+   "answer": "Kintsugi",
+   "wrong": [
+    "Origami",
+    "Ikebana",
+    "Haiku"
+   ],
+   "explain": "The cracks are celebrated rather than hidden.",
+   "difficulty": 3,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-a947b1",
+   "kind": "tf",
+   "prompt": "The Mona Lisa is painted on a wooden panel, not canvas.",
+   "answer": true,
+   "explain": "Leonardo painted it on a panel of poplar wood.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-d1f0a6",
+   "kind": "tf",
+   "prompt": "Michelangelo painted the Sistine Chapel ceiling lying on his back.",
+   "answer": false,
+   "explain": "He stood on scaffolding and painted overhead, bending backwards.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-mus-5418ba",
+   "kind": "mc",
+   "prompt": "Which Polish composer, famous for piano music, was born in 1810?",
+   "answer": "Frédéric Chopin",
+   "wrong": [
+    "Franz Liszt",
+    "Robert Schumann",
+    "Johannes Brahms"
+   ],
+   "explain": "Chopin's heart was buried in Warsaw.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-4a9b6c",
+   "kind": "mc",
+   "prompt": "Which Austrian composer wrote 'The Blue Danube' waltz?",
+   "answer": "Johann Strauss II",
+   "wrong": [
+    "Joseph Haydn",
+    "Franz Schubert",
+    "Gustav Mahler"
+   ],
+   "explain": "He was known as the Waltz King.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-0828ef",
+   "kind": "mc",
+   "prompt": "Which Italian composer wrote the operas 'La Traviata' and 'Aida'?",
+   "answer": "Giuseppe Verdi",
+   "wrong": [
+    "Giacomo Puccini",
+    "Gioachino Rossini",
+    "Vincenzo Bellini"
+   ],
+   "explain": "'Aida' is set in ancient Egypt.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-2f1311",
+   "kind": "mc",
+   "prompt": "Which Italian composer wrote the operas 'Madama Butterfly' and 'La Bohème'?",
+   "answer": "Giacomo Puccini",
+   "wrong": [
+    "Giuseppe Verdi",
+    "Gioachino Rossini",
+    "Antonio Vivaldi"
+   ],
+   "explain": "'Madama Butterfly' is set in Nagasaki, Japan.",
+   "difficulty": 3,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-c4d98b",
+   "kind": "mc",
+   "prompt": "Which composer wrote 'The Planets' suite?",
+   "answer": "Gustav Holst",
+   "wrong": [
+    "Edward Elgar",
+    "Ralph Vaughan Williams",
+    "Benjamin Britten"
+   ],
+   "explain": "It has a movement for each planet known then, except Earth.",
+   "difficulty": 3,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-86cac2",
+   "kind": "mc",
+   "prompt": "Which Norwegian composer wrote 'In the Hall of the Mountain King'?",
+   "answer": "Edvard Grieg",
+   "wrong": [
+    "Jean Sibelius",
+    "Carl Nielsen",
+    "Edvard Munch"
+   ],
+   "explain": "It comes from the music for Ibsen's play 'Peer Gynt'.",
+   "difficulty": 3,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-9a5000",
+   "kind": "mc",
+   "prompt": "Which composer wrote the 'Messiah', with its 'Hallelujah' chorus?",
+   "answer": "George Frideric Handel",
+   "wrong": [
+    "Johann Sebastian Bach",
+    "Joseph Haydn",
+    "Henry Purcell"
+   ],
+   "explain": "It was first performed in Dublin in 1742.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-d88f9d",
+   "kind": "mc",
+   "prompt": "The sitar is a stringed instrument from which country?",
+   "answer": "India",
+   "wrong": [
+    "Japan",
+    "Turkey",
+    "Indonesia"
+   ],
+   "explain": "Ravi Shankar made the sitar famous around the world.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-8198e2",
+   "kind": "mc",
+   "prompt": "The didgeridoo is a wind instrument from which country?",
+   "answer": "Australia",
+   "wrong": [
+    "New Zealand",
+    "Papua New Guinea",
+    "South Africa"
+   ],
+   "explain": "Aboriginal people of northern Australia have played it for centuries.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-0bad6e",
+   "kind": "mc",
+   "prompt": "Which music style was born in Jamaica in the late 1960s?",
+   "answer": "Reggae",
+   "wrong": [
+    "Salsa",
+    "Calypso",
+    "Samba"
+   ],
+   "explain": "Bob Marley took reggae around the world.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-24c62a",
+   "kind": "mc",
+   "prompt": "Samba is a music and dance style from which country?",
+   "answer": "Brazil",
+   "wrong": [
+    "Argentina",
+    "Cuba",
+    "Spain"
+   ],
+   "explain": "It is the heartbeat of the Rio de Janeiro carnival.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-e5088c",
+   "kind": "mc",
+   "prompt": "The tango dance began in Buenos Aires and which other city?",
+   "answer": "Montevideo",
+   "wrong": [
+    "Havana",
+    "Madrid",
+    "Lima"
+   ],
+   "explain": "It grew up along the Río de la Plata in the late 1800s.",
+   "difficulty": 3,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-c4e6cf",
+   "kind": "mc",
+   "prompt": "Flamenco music and dance come from which country?",
+   "answer": "Spain",
+   "wrong": [
+    "Portugal",
+    "Mexico",
+    "Italy"
+   ],
+   "explain": "Flamenco grew up in Andalusia in southern Spain.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-d548fb",
+   "kind": "mc",
+   "prompt": "K-pop comes from which country?",
+   "answer": "South Korea",
+   "wrong": [
+    "Japan",
+    "China",
+    "Thailand"
+   ],
+   "explain": "Groups like BTS and Blackpink made it a global hit.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-23a535",
+   "kind": "mc",
+   "prompt": "Which band had hits with 'Dancing Queen' and 'Waterloo'?",
+   "answer": "ABBA",
+   "wrong": [
+    "Roxette",
+    "Boney M.",
+    "The Bee Gees"
+   ],
+   "explain": "ABBA won Eurovision for Sweden with 'Waterloo' in 1974.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-60366b",
+   "kind": "mc",
+   "prompt": "Which Jamaican singer recorded 'No Woman, No Cry' and 'One Love'?",
+   "answer": "Bob Marley",
+   "wrong": [
+    "Jimmy Cliff",
+    "Peter Tosh",
+    "Desmond Dekker"
+   ],
+   "explain": "Bob Marley and the Wailers made reggae world-famous.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-764aec",
+   "kind": "mc",
+   "prompt": "Which Irish band sang 'With or Without You' and 'One'?",
+   "answer": "U2",
+   "wrong": [
+    "The Cranberries",
+    "Coldplay",
+    "Simple Minds"
+   ],
+   "explain": "U2 formed in Dublin in 1976.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-5ed79e",
+   "kind": "mc",
+   "prompt": "Which band were John, Paul, George and Ringo?",
+   "answer": "The Beatles",
+   "wrong": [
+    "The Rolling Stones",
+    "The Who",
+    "The Kinks"
+   ],
+   "explain": "John Lennon, Paul McCartney, George Harrison and Ringo Starr.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-3149d0",
+   "kind": "mc",
+   "prompt": "Which Colombian singer had hits with 'Hips Don't Lie' and 'Whenever, Wherever'?",
+   "answer": "Shakira",
+   "wrong": [
+    "Jennifer Lopez",
+    "Gloria Estefan",
+    "Selena"
+   ],
+   "explain": "Shakira sang the 2010 World Cup song 'Waka Waka'.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-2e2c60",
+   "kind": "mc",
+   "prompt": "Which annual song contest began in 1956 and is watched across Europe and beyond?",
+   "answer": "Eurovision",
+   "wrong": [
+    "Sanremo",
+    "The Brit Awards",
+    "The Grammys"
+   ],
+   "explain": "Australia has competed since 2015.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-926d0d",
+   "kind": "mc",
+   "prompt": "What does 'piano' mean as a musical instruction?",
+   "answer": "Play softly",
+   "wrong": [
+    "Play loudly",
+    "Play faster",
+    "Play slowly"
+   ],
+   "explain": "The instrument's full name, pianoforte, means 'soft-loud'.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-9df2d6",
+   "kind": "mc",
+   "prompt": "How many musicians play in a trio?",
+   "answer": "Three",
+   "wrong": [
+    "Two",
+    "Four",
+    "Five"
+   ],
+   "explain": "A duet is two, a quartet four and a quintet five.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-327563",
+   "kind": "mc",
+   "prompt": "Which South African singer was known as 'Mama Africa'?",
+   "answer": "Miriam Makeba",
+   "wrong": [
+    "Brenda Fassie",
+    "Yvonne Chaka Chaka",
+    "Angélique Kidjo"
+   ],
+   "explain": "Her hit 'Pata Pata' was a worldwide success in 1967.",
+   "difficulty": 3,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-f561bc",
+   "kind": "tf",
+   "prompt": "Mozart and Beethoven were both born in Austria.",
+   "answer": false,
+   "explain": "Mozart was born in Salzburg, now in Austria; Beethoven in Bonn, Germany.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-bef948",
+   "kind": "tf",
+   "prompt": "A violin is played with a bow strung with horsehair.",
+   "answer": true,
+   "explain": "Rosin on the hair helps it grip the strings.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-lit-ed0917",
+   "kind": "mc",
+   "prompt": "Who wrote 'Hamlet', 'Macbeth' and 'Othello'?",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Christopher Marlowe",
+    "Ben Jonson",
+    "John Milton"
+   ],
+   "explain": "Shakespeare wrote about 39 plays.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-9ced66",
+   "kind": "mc",
+   "prompt": "In which Italian city is 'Romeo and Juliet' set?",
+   "answer": "Verona",
+   "wrong": [
+    "Venice",
+    "Florence",
+    "Rome"
+   ],
+   "explain": "Tourists visit 'Juliet's balcony' in Verona.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-45d274",
+   "kind": "mc",
+   "prompt": "Which Shakespeare play features three witches and a Scottish king?",
+   "answer": "Macbeth",
+   "wrong": [
+    "King Lear",
+    "Hamlet",
+    "Othello"
+   ],
+   "explain": "Actors often call it 'the Scottish play' to avoid bad luck.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-c5e09c",
+   "kind": "mc",
+   "prompt": "In which play does a character ask 'To be, or not to be'?",
+   "answer": "Hamlet",
+   "wrong": [
+    "Macbeth",
+    "King Lear",
+    "Julius Caesar"
+   ],
+   "explain": "Prince Hamlet speaks the famous soliloquy.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-a1db83",
+   "kind": "mc",
+   "prompt": "Which Brazilian author wrote 'The Alchemist'?",
+   "answer": "Paulo Coelho",
+   "wrong": [
+    "Jorge Amado",
+    "Machado de Assis",
+    "Clarice Lispector"
+   ],
+   "explain": "It has been translated into more than 80 languages.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-4fc165",
+   "kind": "mc",
+   "prompt": "Which Japanese court lady wrote 'The Tale of Genji', often called the first novel?",
+   "answer": "Murasaki Shikibu",
+   "wrong": [
+    "Sei Shōnagon",
+    "Ono no Komachi",
+    "Higuchi Ichiyō"
+   ],
+   "explain": "It was written in the early 1000s.",
+   "difficulty": 3,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-f566cd",
+   "kind": "mc",
+   "prompt": "Which Japanese author wrote 'Norwegian Wood' and 'Kafka on the Shore'?",
+   "answer": "Haruki Murakami",
+   "wrong": [
+    "Yukio Mishima",
+    "Kazuo Ishiguro",
+    "Kenzaburō Ōe"
+   ],
+   "explain": "Both novels are set mostly in Japan.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-b58e9c",
+   "kind": "mc",
+   "prompt": "Which Persian poet wrote 'The Rubaiyat'?",
+   "answer": "Omar Khayyam",
+   "wrong": [
+    "Rumi",
+    "Hafez",
+    "Ferdowsi"
+   ],
+   "explain": "He was also a mathematician and astronomer.",
+   "difficulty": 3,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-10b325",
+   "kind": "mc",
+   "prompt": "Which collection of tales is told by Scheherazade to a king, night after night?",
+   "answer": "One Thousand and One Nights",
+   "wrong": [
+    "The Canterbury Tales",
+    "Aesop's Fables",
+    "Grimm's Fairy Tales"
+   ],
+   "explain": "Aladdin and Sinbad are among its best-known stories.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-a5ece4",
+   "kind": "mc",
+   "prompt": "Which Danish writer wrote 'The Little Mermaid' and 'The Ugly Duckling'?",
+   "answer": "Hans Christian Andersen",
+   "wrong": [
+    "The Brothers Grimm",
+    "Charles Perrault",
+    "Aesop"
+   ],
+   "explain": "A statue of the Little Mermaid sits in Copenhagen harbour.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-3afb5b",
+   "kind": "mc",
+   "prompt": "Which German brothers collected 'Hansel and Gretel' and 'Snow White'?",
+   "answer": "The Brothers Grimm",
+   "wrong": [
+    "The Brothers Karamazov",
+    "The Lumière brothers",
+    "The Wright brothers"
+   ],
+   "explain": "Jacob and Wilhelm Grimm published their first collection in 1812.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-c92ae9",
+   "kind": "mc",
+   "prompt": "Which ancient Greek storyteller is credited with 'The Tortoise and the Hare'?",
+   "answer": "Aesop",
+   "wrong": [
+    "Homer",
+    "Plato",
+    "Sophocles"
+   ],
+   "explain": "Aesop's fables end with a moral.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-761350",
+   "kind": "mc",
+   "prompt": "Who wrote 'The Tale of Peter Rabbit'?",
+   "answer": "Beatrix Potter",
+   "wrong": [
+    "A. A. Milne",
+    "Enid Blyton",
+    "Kenneth Grahame"
+   ],
+   "explain": "She illustrated her own books.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-f12460",
+   "kind": "mc",
+   "prompt": "Which George Orwell book features the pigs Napoleon and Snowball?",
+   "answer": "Animal Farm",
+   "wrong": [
+    "Watership Down",
+    "Charlotte's Web",
+    "The Wind in the Willows"
+   ],
+   "explain": "'All animals are equal, but some animals are more equal than others.'",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-b05f08",
+   "kind": "mc",
+   "prompt": "Which Agatha Christie detective is Belgian?",
+   "answer": "Hercule Poirot",
+   "wrong": [
+    "Miss Marple",
+    "Sherlock Holmes",
+    "Inspector Morse"
+   ],
+   "explain": "Poirot is proud of his 'little grey cells' and his moustache.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-e8f8f5",
+   "kind": "mc",
+   "prompt": "What is the name of Sherlock Holmes's friend and narrator?",
+   "answer": "Dr John Watson",
+   "wrong": [
+    "Inspector Lestrade",
+    "Mycroft Holmes",
+    "Professor Moriarty"
+   ],
+   "explain": "Watson was an army doctor.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-739fb6",
+   "kind": "mc",
+   "prompt": "What was the name of Don Quixote's loyal squire?",
+   "answer": "Sancho Panza",
+   "wrong": [
+    "Rocinante",
+    "Dulcinea",
+    "Lazarillo"
+   ],
+   "explain": "Rocinante is Don Quixote's horse.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-b2d057",
+   "kind": "mc",
+   "prompt": "Which Indian epic tells of Prince Rama rescuing his wife Sita?",
+   "answer": "Ramayana",
+   "wrong": [
+    "Mahabharata",
+    "Bhagavad Gita",
+    "Rigveda"
+   ],
+   "explain": "Diwali celebrates Rama's return home.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-e83d08",
+   "kind": "mc",
+   "prompt": "Which ancient epic poem from Mesopotamia is one of the oldest surviving stories?",
+   "answer": "Epic of Gilgamesh",
+   "wrong": [
+    "The Iliad",
+    "Beowulf",
+    "The Aeneid"
+   ],
+   "explain": "It was written on clay tablets about 4,000 years ago.",
+   "difficulty": 3,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-fe9306",
+   "kind": "mc",
+   "prompt": "Which Homer poem tells of the war at Troy?",
+   "answer": "The Iliad",
+   "wrong": [
+    "The Odyssey",
+    "The Aeneid",
+    "Beowulf"
+   ],
+   "explain": "The Odyssey follows Odysseus's ten-year journey home afterwards.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-0fe483",
+   "kind": "mc",
+   "prompt": "In Greek myth, which hero killed the snake-haired Medusa?",
+   "answer": "Perseus",
+   "wrong": [
+    "Hercules",
+    "Theseus",
+    "Achilles"
+   ],
+   "explain": "Perseus used a polished shield as a mirror.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-4041cc",
+   "kind": "mc",
+   "prompt": "In Greek myth, which hero killed the Minotaur in the labyrinth?",
+   "answer": "Theseus",
+   "wrong": [
+    "Perseus",
+    "Jason",
+    "Hercules"
+   ],
+   "explain": "Ariadne gave him a ball of thread to find his way out.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-f47678",
+   "kind": "mc",
+   "prompt": "In Greek myth, who opened a jar that released the world's troubles?",
+   "answer": "Pandora",
+   "wrong": [
+    "Persephone",
+    "Athena",
+    "Medusa"
+   ],
+   "explain": "Only hope was left inside.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-4accf8",
+   "kind": "mc",
+   "prompt": "Who is the Roman god of war?",
+   "answer": "Mars",
+   "wrong": [
+    "Jupiter",
+    "Neptune",
+    "Mercury"
+   ],
+   "explain": "His Greek equivalent is Ares.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-5092dd",
+   "kind": "mc",
+   "prompt": "Who is the Greek god of the sea?",
+   "answer": "Poseidon",
+   "wrong": [
+    "Zeus",
+    "Hades",
+    "Apollo"
+   ],
+   "explain": "The Romans called him Neptune.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-6f76c6",
+   "kind": "mc",
+   "prompt": "Who is the Greek goddess of wisdom, after whom Athens is named?",
+   "answer": "Athena",
+   "wrong": [
+    "Aphrodite",
+    "Hera",
+    "Artemis"
+   ],
+   "explain": "The Parthenon was her temple.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-f72906",
+   "kind": "mc",
+   "prompt": "In Norse myth, who is the chief of the gods?",
+   "answer": "Odin",
+   "wrong": [
+    "Thor",
+    "Loki",
+    "Freyr"
+   ],
+   "explain": "Wednesday is named after Odin (Woden).",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-e3c914",
+   "kind": "mc",
+   "prompt": "In Egyptian myth, who is the god of the dead with green skin?",
+   "answer": "Osiris",
+   "wrong": [
+    "Ra",
+    "Anubis",
+    "Horus"
+   ],
+   "explain": "Anubis, with the jackal head, guards the tombs.",
+   "difficulty": 3,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-ba5112",
+   "kind": "tf",
+   "prompt": "J. K. Rowling wrote 'The Hunger Games'.",
+   "answer": false,
+   "explain": "'The Hunger Games' was written by Suzanne Collins.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lang-0cfe8e",
+   "kind": "mc",
+   "prompt": "'Arigato' means 'thank you' in which language?",
+   "answer": "Japanese",
+   "wrong": [
+    "Korean",
+    "Chinese",
+    "Thai"
+   ],
+   "explain": "Arigatō gozaimasu is the polite form.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-833ea4",
+   "kind": "mc",
+   "prompt": "'Ciao' is a greeting in which language?",
+   "answer": "Italian",
+   "wrong": [
+    "Spanish",
+    "Portuguese",
+    "French"
+   ],
+   "explain": "Ciao means both hello and goodbye.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-2ac13c",
+   "kind": "mc",
+   "prompt": "'Hola' means 'hello' in which language?",
+   "answer": "Spanish",
+   "wrong": [
+    "Italian",
+    "Portuguese",
+    "French"
+   ],
+   "explain": "The h is silent.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-c884a4",
+   "kind": "mc",
+   "prompt": "'Jambo' is a greeting in which East African language?",
+   "answer": "Swahili",
+   "wrong": [
+    "Amharic",
+    "Zulu",
+    "Yoruba"
+   ],
+   "explain": "Swahili is widely spoken in Kenya and Tanzania.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-1efb3b",
+   "kind": "mc",
+   "prompt": "'Namaste' is a respectful greeting from which country?",
+   "answer": "India",
+   "wrong": [
+    "Thailand",
+    "Japan",
+    "Indonesia"
+   ],
+   "explain": "It is said with the palms pressed together.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-babefc",
+   "kind": "mc",
+   "prompt": "'Kia ora' is a greeting in which language?",
+   "answer": "Māori",
+   "wrong": [
+    "Hawaiian",
+    "Samoan",
+    "Fijian"
+   ],
+   "explain": "It means 'be well' and is heard across New Zealand.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-93db57",
+   "kind": "mc",
+   "prompt": "'Salaam' or 'as-salamu alaykum', meaning 'peace be upon you', is a greeting in which language?",
+   "answer": "Arabic",
+   "wrong": [
+    "Hindi",
+    "Turkish",
+    "Hebrew"
+   ],
+   "explain": "Hebrew has a similar greeting, shalom.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-e0186f",
+   "kind": "mc",
+   "prompt": "'Obrigado' means 'thank you' in which language?",
+   "answer": "Portuguese",
+   "wrong": [
+    "Spanish",
+    "Italian",
+    "Romanian"
+   ],
+   "explain": "Men say obrigado; women usually say obrigada.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-4b06b2",
+   "kind": "mc",
+   "prompt": "'Spasibo' means 'thank you' in which language?",
+   "answer": "Russian",
+   "wrong": [
+    "Polish",
+    "Czech",
+    "Greek"
+   ],
+   "explain": "It is written спасибо in Cyrillic.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-0cd90c",
+   "kind": "mc",
+   "prompt": "What does the Latin phrase 'et cetera' mean?",
+   "answer": "And the rest",
+   "wrong": [
+    "For example",
+    "That is",
+    "Against"
+   ],
+   "explain": "It is shortened to etc.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-f2664b",
+   "kind": "mc",
+   "prompt": "What does the Latin abbreviation 'i.e.' stand for?",
+   "answer": "Id est (that is)",
+   "wrong": [
+    "In example",
+    "Ipso effecto",
+    "Item extra"
+   ],
+   "explain": "Use i.e. to explain and e.g. to give examples.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-05148d",
+   "kind": "mc",
+   "prompt": "What does 'bon appétit' mean?",
+   "answer": "Enjoy your meal",
+   "wrong": [
+    "Good morning",
+    "Good luck",
+    "Cheers"
+   ],
+   "explain": "It is French for 'good appetite'.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-22dcae",
+   "kind": "mc",
+   "prompt": "What does the German word 'Kindergarten' literally mean?",
+   "answer": "Children's garden",
+   "wrong": [
+    "Little school",
+    "Play house",
+    "Toy room"
+   ],
+   "explain": "Friedrich Fröbel opened the first one in 1840.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-587f0c",
+   "kind": "mc",
+   "prompt": "What does the Swahili phrase 'hakuna matata' mean?",
+   "answer": "No worries",
+   "wrong": [
+    "Good morning",
+    "Welcome home",
+    "Let's go"
+   ],
+   "explain": "The Lion King made it famous.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-bdb4de",
+   "kind": "mc",
+   "prompt": "After the Norman Conquest of 1066, English borrowed thousands of words from which language?",
+   "answer": "French",
+   "wrong": [
+    "Latin",
+    "German",
+    "Danish"
+   ],
+   "explain": "Words like beef, court and government came from Norman French.",
+   "difficulty": 3,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-72b8fe",
+   "kind": "mc",
+   "prompt": "What is the official language of Brazil's neighbour Argentina?",
+   "answer": "Spanish",
+   "wrong": [
+    "Portuguese",
+    "Italian",
+    "English"
+   ],
+   "explain": "Brazil is the only Portuguese-speaking country in South America.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-33d85f",
+   "kind": "mc",
+   "prompt": "How many official languages does South Africa have?",
+   "answer": "12",
+   "wrong": [
+    "2",
+    "5",
+    "9"
+   ],
+   "explain": "South African Sign Language became the 12th in 2023.",
+   "difficulty": 3,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-f4ea76",
+   "kind": "mc",
+   "prompt": "Which word means a fear of enclosed spaces?",
+   "answer": "Claustrophobia",
+   "wrong": [
+    "Agoraphobia",
+    "Arachnophobia",
+    "Acrophobia"
+   ],
+   "explain": "Agoraphobia is fear of open or crowded places.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-d48f95",
+   "kind": "tf",
+   "prompt": "Spanish uses an upside-down question mark at the start of questions.",
+   "answer": true,
+   "explain": "¿Cómo estás? means 'How are you?'",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-42acc4",
+   "kind": "tf",
+   "prompt": "Mandarin Chinese is a tonal language.",
+   "answer": true,
+   "explain": "The same syllable can mean different things depending on its pitch.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-ani-cafcfd",
+   "kind": "mc",
+   "prompt": "Which bird is the national symbol of New Zealand?",
+   "answer": "Kiwi",
+   "wrong": [
+    "Emu",
+    "Kookaburra",
+    "Albatross"
+   ],
+   "explain": "New Zealanders are often called Kiwis.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-98fad7",
+   "kind": "mc",
+   "prompt": "Which big flightless bird appears on Australia's coat of arms with the kangaroo?",
+   "answer": "Emu",
+   "wrong": [
+    "Ostrich",
+    "Cassowary",
+    "Kiwi"
+   ],
+   "explain": "The emu is the world's second-tallest bird, after the ostrich.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-ba30b4",
+   "kind": "mc",
+   "prompt": "Which bird is famous for its laughing call in Australia?",
+   "answer": "Kookaburra",
+   "wrong": [
+    "Cockatoo",
+    "Lyrebird",
+    "Galah"
+   ],
+   "explain": "Kookaburras are giant kingfishers.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-df6c20",
+   "kind": "mc",
+   "prompt": "On which island do lemurs live in the wild?",
+   "answer": "Madagascar",
+   "wrong": [
+    "Borneo",
+    "Sri Lanka",
+    "New Guinea"
+   ],
+   "explain": "Lemurs are found nowhere else in the wild.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-60bf68",
+   "kind": "mc",
+   "prompt": "Orangutans live in the wild on Borneo and which other island?",
+   "answer": "Sumatra",
+   "wrong": [
+    "Java",
+    "Madagascar",
+    "New Guinea"
+   ],
+   "explain": "Their name means 'person of the forest' in Malay.",
+   "difficulty": 3,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-7294b4",
+   "kind": "mc",
+   "prompt": "In which country do giant pandas live in the wild?",
+   "answer": "China",
+   "wrong": [
+    "Nepal",
+    "Japan",
+    "Vietnam"
+   ],
+   "explain": "They live in mountain forests in Sichuan, Shaanxi and Gansu.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-3cc7e7",
+   "kind": "mc",
+   "prompt": "Which large lizard lives only on a few Indonesian islands?",
+   "answer": "Komodo dragon",
+   "wrong": [
+    "Gila monster",
+    "Green iguana",
+    "Frilled lizard"
+   ],
+   "explain": "Komodo dragons can grow up to 3 m long.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-c145cf",
+   "kind": "mc",
+   "prompt": "Which animal's name means 'river horse' in ancient Greek?",
+   "answer": "Hippopotamus",
+   "wrong": [
+    "Rhinoceros",
+    "Walrus",
+    "Manatee"
+   ],
+   "explain": "Hippos spend the day in water and graze on land at night.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-7dbe4b",
+   "kind": "mc",
+   "prompt": "What is the national animal of Scotland?",
+   "answer": "Unicorn",
+   "wrong": [
+    "Red deer",
+    "Golden eagle",
+    "Highland cow"
+   ],
+   "explain": "The unicorn appears on the royal coat of arms used in Scotland.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-dd4ccf",
+   "kind": "mc",
+   "prompt": "What is the only continent with no native ants?",
+   "answer": "Antarctica",
+   "wrong": [
+    "Australia",
+    "Europe",
+    "South America"
+   ],
+   "explain": "Ants live everywhere else, from deserts to rainforests.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-decffa",
+   "kind": "mc",
+   "prompt": "What is a group of flamingos called?",
+   "answer": "A flamboyance",
+   "wrong": [
+    "A parade",
+    "A blush",
+    "A colony of pinks"
+   ],
+   "explain": "Flamingos often stand on one leg.",
+   "difficulty": 3,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-224a4a",
+   "kind": "mc",
+   "prompt": "What is a female horse called?",
+   "answer": "Mare",
+   "wrong": [
+    "Filly",
+    "Ewe",
+    "Doe"
+   ],
+   "explain": "A filly is a young female horse.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-285c85",
+   "kind": "mc",
+   "prompt": "How many legs does a crab have, including its claws?",
+   "answer": "Ten",
+   "wrong": [
+    "Eight",
+    "Six",
+    "Twelve"
+   ],
+   "explain": "Crabs are decapods, meaning 'ten-footed'.",
+   "difficulty": 3,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-626a7f",
+   "kind": "mc",
+   "prompt": "Which bird is the national bird of India?",
+   "answer": "Peacock (Indian peafowl)",
+   "wrong": [
+    "Flamingo",
+    "Bald eagle",
+    "Hornbill"
+   ],
+   "explain": "Only the male, the peacock, has the long fan of tail feathers.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-4306d1",
+   "kind": "mc",
+   "prompt": "Which animal is the symbol of the conservation charity WWF?",
+   "answer": "Giant panda",
+   "wrong": [
+    "Tiger",
+    "Polar bear",
+    "Elephant"
+   ],
+   "explain": "The logo was inspired by Chi Chi, a panda at London Zoo, in 1961.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-cb0b7c",
+   "kind": "tf",
+   "prompt": "A group of crows is called a murder.",
+   "answer": true,
+   "explain": "Many animal group names come from medieval hunting books.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-33bdc0",
+   "kind": "tf",
+   "prompt": "Kangaroos can easily walk backwards.",
+   "answer": false,
+   "explain": "Their big tail and feet make it very hard.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-31b31d",
+   "kind": "tf",
+   "prompt": "An ostrich's eye is bigger than its brain.",
+   "answer": true,
+   "explain": "Each eye is about 5 cm across.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-59ef89",
+   "kind": "tf",
+   "prompt": "Octopuses have blue blood.",
+   "answer": true,
+   "explain": "Their blood uses copper, not iron, to carry oxygen.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-weather-34552d",
+   "kind": "mc",
+   "prompt": "Which wind blows from the Sahara and can carry dust as far as Europe?",
+   "answer": "Sirocco",
+   "wrong": [
+    "Mistral",
+    "Chinook",
+    "Monsoon"
+   ],
+   "explain": "The Mistral is a cold wind in southern France.",
+   "difficulty": 3,
+   "tags": [
+    "nature"
+   ],
+   "topic": "weather"
+  },
+  {
+   "id": "gen-weather-11e544",
+   "kind": "mc",
+   "prompt": "What name is given to the seasonal winds that bring heavy summer rain to South Asia?",
+   "answer": "Monsoon",
+   "wrong": [
+    "Typhoon",
+    "Sirocco",
+    "Trade winds"
+   ],
+   "explain": "India gets most of its rain from the monsoon, June to September.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "weather"
+  },
+  {
+   "id": "gen-weather-453f47",
+   "kind": "mc",
+   "prompt": "What is a tropical storm called in the Indian Ocean and around Australia?",
+   "answer": "Cyclone",
+   "wrong": [
+    "Typhoon",
+    "Tornado",
+    "Blizzard"
+   ],
+   "explain": "The same storm is a hurricane in the Atlantic and a typhoon in the north-west Pacific.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "weather"
+  },
+  {
+   "id": "gen-weather-0baf8e",
+   "kind": "mc",
+   "prompt": "What is the name for a periodic warming of the Pacific Ocean near South America?",
+   "answer": "El Niño",
+   "wrong": [
+    "La Niña",
+    "Gulf Stream",
+    "Monsoon"
+   ],
+   "explain": "Spanish for 'the boy'; La Niña is the cooling phase.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "weather"
+  },
+  {
+   "id": "gen-weather-dc5c90",
+   "kind": "mc",
+   "prompt": "In which country is the town of Mawsynram, one of the wettest places on Earth?",
+   "answer": "India",
+   "wrong": [
+    "Bangladesh",
+    "Colombia",
+    "Indonesia"
+   ],
+   "explain": "It is in Meghalaya state, near Cherrapunji.",
+   "difficulty": 3,
+   "tags": [
+    "nature"
+   ],
+   "topic": "weather"
+  },
+  {
+   "id": "gen-nat-2a1674",
+   "kind": "mc",
+   "prompt": "Which is the world's largest rainforest?",
+   "answer": "Amazon",
+   "wrong": [
+    "Congo",
+    "Daintree",
+    "Borneo"
+   ],
+   "explain": "The Congo Basin holds the second-largest rainforest.",
+   "difficulty": 1,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-f57d8f",
+   "kind": "mc",
+   "prompt": "Which tree's spring blossom is celebrated at Japan's hanami picnics?",
+   "answer": "Cherry",
+   "wrong": [
+    "Lotus",
+    "Chrysanthemum",
+    "Magnolia"
+   ],
+   "explain": "Sakura season moves north through Japan from March to May.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-f698ab",
+   "kind": "mc",
+   "prompt": "Which flower is sacred in India and grows out of muddy water?",
+   "answer": "Lotus",
+   "wrong": [
+    "Rose",
+    "Jasmine",
+    "Marigold"
+   ],
+   "explain": "The lotus is India's national flower.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-d678d9",
+   "kind": "mc",
+   "prompt": "Which giant African tree stores water in its swollen trunk?",
+   "answer": "Baobab",
+   "wrong": [
+    "Acacia",
+    "Mahogany",
+    "Ebony"
+   ],
+   "explain": "Some baobabs are over 1,000 years old.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-1df619",
+   "kind": "mc",
+   "prompt": "Which Californian trees are the largest trees on Earth by volume?",
+   "answer": "Giant sequoias",
+   "wrong": [
+    "Coast redwoods",
+    "Baobabs",
+    "Douglas firs"
+   ],
+   "explain": "The General Sherman tree is the largest by volume.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-nat-1a04f2",
+   "kind": "tf",
+   "prompt": "Some bamboo can grow almost a metre in a single day.",
+   "answer": true,
+   "explain": "Certain species are among the fastest-growing plants on Earth.",
+   "difficulty": 2,
+   "tags": [
+    "nature"
+   ],
+   "topic": "nature"
+  },
+  {
+   "id": "gen-pop-f8faf5",
+   "kind": "mc",
+   "prompt": "Which film features a shark terrorising the beach town of Amity Island?",
+   "answer": "Jaws",
+   "wrong": [
+    "Deep Blue Sea",
+    "The Meg",
+    "Orca"
+   ],
+   "explain": "Steven Spielberg directed it in 1975.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-c8d120",
+   "kind": "mc",
+   "prompt": "In which film does a boy befriend an alien who wants to 'phone home'?",
+   "answer": "E.T. the Extra-Terrestrial",
+   "wrong": [
+    "Close Encounters of the Third Kind",
+    "Gremlins",
+    "The Goonies"
+   ],
+   "explain": "Spielberg's E.T. came out in 1982.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-0ee845",
+   "kind": "mc",
+   "prompt": "In 'The Lion King', what is the name of Simba's father?",
+   "answer": "Mufasa",
+   "wrong": [
+    "Scar",
+    "Rafiki",
+    "Zazu"
+   ],
+   "explain": "Scar is his wicked brother.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-e291b2",
+   "kind": "mc",
+   "prompt": "In 'Toy Story', what is the name of the cowboy?",
+   "answer": "Woody",
+   "wrong": [
+    "Buzz",
+    "Jessie",
+    "Hamm"
+   ],
+   "explain": "Tom Hanks voices Woody.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-d5ae90",
+   "kind": "mc",
+   "prompt": "In 'Frozen', what is the name of the snowman?",
+   "answer": "Olaf",
+   "wrong": [
+    "Sven",
+    "Kristoff",
+    "Hans"
+   ],
+   "explain": "Sven is the reindeer.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-4761ea",
+   "kind": "mc",
+   "prompt": "What kind of animal is Dumbo?",
+   "answer": "Elephant",
+   "wrong": [
+    "Mouse",
+    "Deer",
+    "Rabbit"
+   ],
+   "explain": "Dumbo flies using his huge ears.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-db3480",
+   "kind": "mc",
+   "prompt": "What kind of animal is Bambi?",
+   "answer": "Deer",
+   "wrong": [
+    "Rabbit",
+    "Fox",
+    "Skunk"
+   ],
+   "explain": "Thumper is his rabbit friend.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-2be0ef",
+   "kind": "mc",
+   "prompt": "Which Japanese studio made 'Spirited Away' and 'My Neighbour Totoro'?",
+   "answer": "Studio Ghibli",
+   "wrong": [
+    "Toei Animation",
+    "Sunrise",
+    "Pixar"
+   ],
+   "explain": "Spirited Away won the Oscar for Best Animated Feature in 2003.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-ae0312",
+   "kind": "mc",
+   "prompt": "Who directed the animated films 'Spirited Away' and 'Princess Mononoke'?",
+   "answer": "Hayao Miyazaki",
+   "wrong": [
+    "Akira Kurosawa",
+    "Isao Takahata",
+    "Makoto Shinkai"
+   ],
+   "explain": "He co-founded Studio Ghibli in 1985.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-c82338",
+   "kind": "mc",
+   "prompt": "Which South Korean film became the first non-English film to win Best Picture, in 2020?",
+   "answer": "Parasite",
+   "wrong": [
+    "Oldboy",
+    "Train to Busan",
+    "Minari"
+   ],
+   "explain": "Bong Joon-ho directed it.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-639b01",
+   "kind": "mc",
+   "prompt": "Which Indian city is the centre of the Hindi film industry known as Bollywood?",
+   "answer": "Mumbai",
+   "wrong": [
+    "Delhi",
+    "Kolkata",
+    "Chennai"
+   ],
+   "explain": "The name blends Bombay and Hollywood.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-5f3da9",
+   "kind": "mc",
+   "prompt": "Which Nigerian film industry is one of the world's biggest by number of films?",
+   "answer": "Nollywood",
+   "wrong": [
+    "Bollywood",
+    "Tollywood",
+    "Kollywood"
+   ],
+   "explain": "Nollywood is based mainly in Lagos.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-e70461",
+   "kind": "mc",
+   "prompt": "Which Japanese director made 'Seven Samurai'?",
+   "answer": "Akira Kurosawa",
+   "wrong": [
+    "Hayao Miyazaki",
+    "Yasujirō Ozu",
+    "Takeshi Kitano"
+   ],
+   "explain": "It inspired the Western 'The Magnificent Seven'.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-e725be",
+   "kind": "mc",
+   "prompt": "Which wizard is the headmaster of Hogwarts in most of the Harry Potter books?",
+   "answer": "Albus Dumbledore",
+   "wrong": [
+    "Severus Snape",
+    "Minerva McGonagall",
+    "Rubeus Hagrid"
+   ],
+   "explain": "Snape briefly takes over in the last book.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-dfa5be",
+   "kind": "mc",
+   "prompt": "What is the name of Harry Potter's owl?",
+   "answer": "Hedwig",
+   "wrong": [
+    "Errol",
+    "Pigwidgeon",
+    "Fawkes"
+   ],
+   "explain": "Fawkes is Dumbledore's phoenix.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-ca2112",
+   "kind": "mc",
+   "prompt": "In 'Star Wars', which Wookiee is Han Solo's co-pilot?",
+   "answer": "Chewbacca",
+   "wrong": [
+    "Yoda",
+    "Jabba",
+    "R2-D2"
+   ],
+   "explain": "They fly the Millennium Falcon.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-ddf0a2",
+   "kind": "mc",
+   "prompt": "In 'Star Wars', what is the name of Han Solo's ship?",
+   "answer": "Millennium Falcon",
+   "wrong": [
+    "X-wing",
+    "Death Star",
+    "Star Destroyer"
+   ],
+   "explain": "It made the Kessel Run in less than twelve parsecs.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-25781e",
+   "kind": "mc",
+   "prompt": "In 'The Wizard of Oz', what does the Tin Man want from the Wizard?",
+   "answer": "A heart",
+   "wrong": [
+    "A brain",
+    "Courage",
+    "A way home"
+   ],
+   "explain": "The Scarecrow wants a brain and the Lion wants courage.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-167dc4",
+   "kind": "mc",
+   "prompt": "In 'Jurassic Park', on which fictional island is the park?",
+   "answer": "Isla Nublar",
+   "wrong": [
+    "Skull Island",
+    "Isla Sorna",
+    "Amity Island"
+   ],
+   "explain": "Isla Nublar is set off Costa Rica.",
+   "difficulty": 3,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-cfead3",
+   "kind": "mc",
+   "prompt": "Which superhero is the alter ego of Bruce Wayne?",
+   "answer": "Batman",
+   "wrong": [
+    "Superman",
+    "Iron Man",
+    "Green Lantern"
+   ],
+   "explain": "Bruce Wayne lives in Wayne Manor in Gotham City.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-1e380a",
+   "kind": "mc",
+   "prompt": "Which superhero is the alter ego of Tony Stark?",
+   "answer": "Iron Man",
+   "wrong": [
+    "Captain America",
+    "Batman",
+    "Thor"
+   ],
+   "explain": "Robert Downey Jr. played him from 2008.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-81d8e2",
+   "kind": "mc",
+   "prompt": "Which superhero is the alter ego of Clark Kent?",
+   "answer": "Superman",
+   "wrong": [
+    "Batman",
+    "The Flash",
+    "Captain Marvel"
+   ],
+   "explain": "Clark works as a reporter at the Daily Planet.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-f7025f",
+   "kind": "mc",
+   "prompt": "Which African country is the hidden kingdom in 'Black Panther'?",
+   "answer": "Wakanda",
+   "wrong": [
+    "Zamunda",
+    "Genovia",
+    "Latveria"
+   ],
+   "explain": "Wakanda is fictional; Zamunda is from 'Coming to America'.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-227824",
+   "kind": "mc",
+   "prompt": "What colour are the Smurfs?",
+   "answer": "Blue",
+   "wrong": [
+    "Green",
+    "Red",
+    "Yellow"
+   ],
+   "explain": "The Smurfs were created by Belgian artist Peyo in 1958.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-82a6a5",
+   "kind": "mc",
+   "prompt": "Tintin and the Smurfs both come from comics in which country?",
+   "answer": "Belgium",
+   "wrong": [
+    "France",
+    "Netherlands",
+    "Switzerland"
+   ],
+   "explain": "Hergé created Tintin in 1929.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-780ee6",
+   "kind": "mc",
+   "prompt": "From which country does the Moomin family of cartoon trolls come?",
+   "answer": "Finland",
+   "wrong": [
+    "Norway",
+    "Sweden",
+    "Denmark"
+   ],
+   "explain": "Tove Jansson, a Swedish-speaking Finn, created them.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-de3452",
+   "kind": "mc",
+   "prompt": "Which Japanese cartoon cat with no mouth has a red bow?",
+   "answer": "Hello Kitty",
+   "wrong": [
+    "Doraemon",
+    "Totoro",
+    "Pikachu"
+   ],
+   "explain": "Sanrio launched Hello Kitty in 1974.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-05934a",
+   "kind": "mc",
+   "prompt": "Which yellow Electric-type Pokémon is the mascot of the series?",
+   "answer": "Pikachu",
+   "wrong": [
+    "Psyduck",
+    "Jigglypuff",
+    "Meowth"
+   ],
+   "explain": "Pikachu is an Electric-type mouse Pokémon.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-301fd9",
+   "kind": "mc",
+   "prompt": "In 'The Simpsons', where does Homer work?",
+   "answer": "A nuclear power plant",
+   "wrong": [
+    "A doughnut shop",
+    "A bowling alley",
+    "A school"
+   ],
+   "explain": "He is the safety inspector at Springfield Nuclear Power Plant.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-0ede4e",
+   "kind": "mc",
+   "prompt": "Which TV series follows the Stark and Lannister families in Westeros?",
+   "answer": "Game of Thrones",
+   "wrong": [
+    "The Witcher",
+    "The Lord of the Rings",
+    "Vikings"
+   ],
+   "explain": "It is based on George R. R. Martin's novels.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-9827d4",
+   "kind": "mc",
+   "prompt": "In 'The Lord of the Rings', which hobbit carries the One Ring to Mordor?",
+   "answer": "Frodo Baggins",
+   "wrong": [
+    "Bilbo Baggins",
+    "Samwise Gamgee",
+    "Peregrin Took"
+   ],
+   "explain": "Sam goes with him all the way.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-82f0ad",
+   "kind": "mc",
+   "prompt": "Which actor played Jack in 'Titanic' (1997)?",
+   "answer": "Leonardo DiCaprio",
+   "wrong": [
+    "Brad Pitt",
+    "Matt Damon",
+    "Johnny Depp"
+   ],
+   "explain": "Kate Winslet played Rose.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-5f0ea1",
+   "kind": "mc",
+   "prompt": "Which Australian actor played Wolverine in the X-Men films?",
+   "answer": "Hugh Jackman",
+   "wrong": [
+    "Russell Crowe",
+    "Chris Hemsworth",
+    "Mel Gibson"
+   ],
+   "explain": "He first played Wolverine in 'X-Men' (2000).",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-edef11",
+   "kind": "mc",
+   "prompt": "Which actor played Crocodile Dundee?",
+   "answer": "Paul Hogan",
+   "wrong": [
+    "Mel Gibson",
+    "Hugh Jackman",
+    "Eric Bana"
+   ],
+   "explain": "'That's not a knife. That's a knife.'",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-de3584",
+   "kind": "mc",
+   "prompt": "Which martial-arts star from Hong Kong starred in 'Enter the Dragon'?",
+   "answer": "Bruce Lee",
+   "wrong": [
+    "Jackie Chan",
+    "Jet Li",
+    "Chow Yun-fat"
+   ],
+   "explain": "Bruce Lee died in 1973, a month before the film's release.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-463350",
+   "kind": "mc",
+   "prompt": "Which Indian actor is known as 'the King of Bollywood'?",
+   "answer": "Shah Rukh Khan",
+   "wrong": [
+    "Amitabh Bachchan",
+    "Aamir Khan",
+    "Salman Khan"
+   ],
+   "explain": "Amitabh Bachchan is often called 'the Shahenshah' (emperor).",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-fd1b4c",
+   "kind": "mc",
+   "prompt": "Which board game uses the words 'Go' and 'Jail' and has properties to buy?",
+   "answer": "Monopoly",
+   "wrong": [
+    "Cluedo",
+    "Risk",
+    "Scrabble"
+   ],
+   "explain": "Its ideas came from 'The Landlord's Game', patented by Lizzie Magie in 1904.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-54b86f",
+   "kind": "mc",
+   "prompt": "In 'Cluedo' (or 'Clue'), what are players trying to solve?",
+   "answer": "A murder",
+   "wrong": [
+    "A bank robbery",
+    "A missing jewel",
+    "A kidnapping"
+   ],
+   "explain": "Who did it, with what weapon, and in which room?",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-bf5fd5",
+   "kind": "mc",
+   "prompt": "In which game do you score points by making words with letter tiles?",
+   "answer": "Scrabble",
+   "wrong": [
+    "Monopoly",
+    "Boggle",
+    "Dominoes"
+   ],
+   "explain": "Each tile has a value; Q and Z are worth 10.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-bb55d2",
+   "kind": "mc",
+   "prompt": "The ancient board game Go comes from which country?",
+   "answer": "China",
+   "wrong": [
+    "Japan",
+    "Korea",
+    "India"
+   ],
+   "explain": "Go is over 2,500 years old.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-e58611",
+   "kind": "mc",
+   "prompt": "Chess is believed to have begun in which country, around the 500s AD?",
+   "answer": "India",
+   "wrong": [
+    "China",
+    "Persia",
+    "Egypt"
+   ],
+   "explain": "The Indian game chaturanga spread to Persia and then Europe.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-436d0d",
+   "kind": "mc",
+   "prompt": "Which video game has players build with blocks in a world of creepers?",
+   "answer": "Minecraft",
+   "wrong": [
+    "Roblox",
+    "Fortnite",
+    "Terraria"
+   ],
+   "explain": "As of 2024 it was the best-selling video game of all time.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-8f26c9",
+   "kind": "mc",
+   "prompt": "In 'Doctor Who', which race of robot-like aliens shouts 'Exterminate!'?",
+   "answer": "Daleks",
+   "wrong": [
+    "Cybermen",
+    "Sontarans",
+    "Weeping Angels"
+   ],
+   "explain": "The Daleks first appeared in 1963.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-b0117c",
+   "kind": "tf",
+   "prompt": "Mickey Mouse's original name was going to be Mortimer.",
+   "answer": true,
+   "explain": "Walt Disney's wife Lillian is said to have suggested Mickey instead.",
+   "difficulty": 3,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-5071e6",
+   "kind": "tf",
+   "prompt": "Shrek is an ogre.",
+   "answer": true,
+   "explain": "Shrek is based on a 1990 picture book by William Steig.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-math-1e96e2",
+   "kind": "mc",
+   "prompt": "How many years are there in a century?",
+   "answer": "100",
+   "wrong": [
+    "10",
+    "50",
+    "1000"
+   ],
+   "explain": "A millennium is 1,000 years.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-d3d27d",
+   "kind": "mc",
+   "prompt": "How many years are in a decade?",
+   "answer": "10",
+   "wrong": [
+    "5",
+    "12",
+    "100"
+   ],
+   "explain": "From the Latin decem, ten.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-cea511",
+   "kind": "mc",
+   "prompt": "How many years are celebrated by a golden wedding anniversary?",
+   "answer": "50",
+   "wrong": [
+    "25",
+    "40",
+    "60"
+   ],
+   "explain": "Silver is 25 years and diamond is 60.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-89361d",
+   "kind": "mc",
+   "prompt": "How many sides does a heptagon have?",
+   "answer": "7",
+   "wrong": [
+    "6",
+    "8",
+    "9"
+   ],
+   "explain": "The UK 50p and 20p coins are seven-sided.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-b970be",
+   "kind": "mc",
+   "prompt": "What do you call the distance around the edge of a circle?",
+   "answer": "Circumference",
+   "wrong": [
+    "Diameter",
+    "Radius",
+    "Area"
+   ],
+   "explain": "It equals π times the diameter.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-ee9668",
+   "kind": "mc",
+   "prompt": "How many is a 'baker's dozen'?",
+   "answer": "13",
+   "wrong": [
+    "12",
+    "10",
+    "14"
+   ],
+   "explain": "Bakers added an extra loaf to avoid being fined for short weight.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-faf624",
+   "kind": "mc",
+   "prompt": "What is the Roman numeral for 100?",
+   "answer": "C",
+   "wrong": [
+    "L",
+    "M",
+    "D"
+   ],
+   "explain": "From the Latin centum.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-6e1a79",
+   "kind": "mc",
+   "prompt": "What is the Roman numeral for 1,000?",
+   "answer": "M",
+   "wrong": [
+    "C",
+    "D",
+    "X"
+   ],
+   "explain": "From the Latin mille.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-bf0226",
+   "kind": "mc",
+   "prompt": "How many centimetres are in a metre?",
+   "answer": "100",
+   "wrong": [
+    "10",
+    "1000",
+    "12"
+   ],
+   "explain": "Centi- means one-hundredth.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-d37b76",
+   "kind": "mc",
+   "prompt": "What is 12 × 12?",
+   "answer": "144",
+   "wrong": [
+    "124",
+    "132",
+    "156"
+   ],
+   "explain": "A dozen dozens is a gross.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-77a7f0",
+   "kind": "number",
+   "prompt": "How many hours are in a week?",
+   "answer": 168,
+   "unit": "hours",
+   "tolerance": 0,
+   "explain": "7 days × 24 hours.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-his-6da90f",
+   "kind": "mc",
+   "prompt": "Who was the first woman to win a Nobel Prize?",
+   "answer": "Marie Curie",
+   "wrong": [
+    "Mother Teresa",
+    "Florence Nightingale",
+    "Dorothy Hodgkin"
+   ],
+   "explain": "She shared the 1903 physics prize.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-539a46",
+   "kind": "mc",
+   "prompt": "Which country was the first to give women the vote in national elections, in 1893?",
+   "answer": "New Zealand",
+   "wrong": [
+    "Australia",
+    "Finland",
+    "United Kingdom"
+   ],
+   "explain": "Kate Sheppard led the campaign; she is on New Zealand's $10 note.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-ef118e",
+   "kind": "mc",
+   "prompt": "Who was the world's first woman prime minister, elected in 1960?",
+   "answer": "Sirimavo Bandaranaike",
+   "wrong": [
+    "Indira Gandhi",
+    "Golda Meir",
+    "Margaret Thatcher"
+   ],
+   "explain": "She led Ceylon, now Sri Lanka.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-4586ae",
+   "kind": "mc",
+   "prompt": "Who became India's first woman prime minister, in 1966?",
+   "answer": "Indira Gandhi",
+   "wrong": [
+    "Sonia Gandhi",
+    "Pratibha Patil",
+    "Sarojini Naidu"
+   ],
+   "explain": "She was the daughter of Jawaharlal Nehru.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-653fb1",
+   "kind": "mc",
+   "prompt": "Who became Africa's first elected woman head of state, in Liberia in 2006?",
+   "answer": "Ellen Johnson Sirleaf",
+   "wrong": [
+    "Joyce Banda",
+    "Winnie Mandela",
+    "Wangari Maathai"
+   ],
+   "explain": "She shared the Nobel Peace Prize in 2011.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-c35aff",
+   "kind": "mc",
+   "prompt": "Which young Pakistani campaigner for girls' education won the 2014 Nobel Peace Prize?",
+   "answer": "Malala Yousafzai",
+   "wrong": [
+    "Benazir Bhutto",
+    "Greta Thunberg",
+    "Nadia Murad"
+   ],
+   "explain": "At 17, she is the youngest Nobel laureate.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-823387",
+   "kind": "mc",
+   "prompt": "Which Kenyan environmentalist was the first African woman to win the Nobel Peace Prize?",
+   "answer": "Wangari Maathai",
+   "wrong": [
+    "Ellen Johnson Sirleaf",
+    "Leymah Gbowee",
+    "Miriam Makeba"
+   ],
+   "explain": "Her Green Belt Movement planted tens of millions of trees.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
   }
  ],
  "sources": [

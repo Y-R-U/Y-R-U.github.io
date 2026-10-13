@@ -1,5 +1,5 @@
 {
- "build": "202610110327",
+ "build": "202610130422",
  "themes": [
   {
    "id": "animals",
@@ -1721,7 +1721,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 729,
+   "questions": 1140,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -1734,12 +1734,12 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 476,
-     "number": 112,
-     "tf": 110,
+     "mc": 852,
+     "number": 113,
+     "tf": 144,
      "order": 31
     },
-    "easy": 249,
+    "easy": 420,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -1773,7 +1773,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 258,
+   "questions": 374,
    "virtual": {
     "of": "general",
     "tag": "science"
@@ -1790,12 +1790,12 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 155,
-     "number": 61,
-     "tf": 34,
+     "mc": 261,
+     "number": 62,
+     "tf": 43,
      "order": 8
     },
-    "easy": 76,
+    "easy": 121,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -1808,14 +1808,14 @@
     },
     "formatsEasy": {
      "mc": 20,
-     "tf": 8,
+     "tf": 12,
      "order": 5,
      "number": 20,
      "type": 20
     },
     "formatsKids": {
      "mc": 20,
-     "tf": 8,
+     "tf": 12,
      "order": 0,
      "number": 20,
      "type": 20
@@ -1829,7 +1829,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 74,
+   "questions": 151,
    "virtual": {
     "of": "general",
     "tag": "geography"
@@ -1846,35 +1846,35 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 53,
+     "mc": 123,
      "number": 7,
-     "tf": 8,
+     "tf": 15,
      "order": 6
     },
-    "easy": 19,
+    "easy": 49,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 8,
+     "tf": 15,
      "order": 6,
      "number": 7,
      "type": 20
     },
     "formatsEasy": {
-     "mc": 14,
-     "tf": 2,
+     "mc": 20,
+     "tf": 4,
      "order": 2,
      "number": 1,
-     "type": 14
+     "type": 20
     },
     "formatsKids": {
-     "mc": 14,
-     "tf": 2,
+     "mc": 20,
+     "tf": 4,
      "order": 2,
      "number": 1,
-     "type": 14
+     "type": 20
     }
    }
   },
@@ -1885,7 +1885,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 82,
+   "questions": 89,
    "virtual": {
     "of": "general",
     "tag": "history"
@@ -1903,7 +1903,7 @@
     "quotes": 0,
     "qkinds": {
      "number": 19,
-     "mc": 48,
+     "mc": 55,
      "tf": 9,
      "order": 6
     },
@@ -1941,7 +1941,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 33,
+   "questions": 53,
    "virtual": {
     "of": "general",
     "tag": "art"
@@ -1958,27 +1958,27 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 25,
-     "tf": 8
+     "mc": 43,
+     "tf": 10
     },
-    "easy": 10,
+    "easy": 13,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 8,
+     "tf": 10,
      "type": 20
     },
     "formatsEasy": {
-     "mc": 5,
+     "mc": 8,
      "tf": 5,
-     "type": 5
+     "type": 8
     },
     "formatsKids": {
-     "mc": 5,
+     "mc": 8,
      "tf": 5,
-     "type": 5
+     "type": 8
     }
    }
   },
@@ -1989,7 +1989,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 37,
+   "questions": 62,
    "virtual": {
     "of": "general",
     "tag": "music"
@@ -2006,35 +2006,35 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 18,
+     "mc": 41,
      "number": 7,
-     "tf": 7,
+     "tf": 9,
      "order": 5
     },
-    "easy": 15,
+    "easy": 27,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
-     "mc": 18,
-     "tf": 7,
+     "mc": 20,
+     "tf": 9,
      "order": 5,
      "number": 7,
-     "type": 18
+     "type": 20
     },
     "formatsEasy": {
-     "mc": 8,
+     "mc": 20,
      "tf": 4,
      "order": 1,
      "number": 2,
-     "type": 8
+     "type": 20
     },
     "formatsKids": {
-     "mc": 8,
+     "mc": 20,
      "tf": 4,
      "order": 1,
      "number": 2,
-     "type": 8
+     "type": 20
     }
    }
   },
@@ -2045,7 +2045,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 82,
+   "questions": 131,
    "virtual": {
     "of": "general",
     "tag": "books"
@@ -2062,29 +2062,29 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 68,
+     "mc": 114,
      "number": 6,
-     "tf": 8
+     "tf": 11
     },
-    "easy": 26,
+    "easy": 54,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 8,
+     "tf": 11,
      "number": 6,
      "type": 20
     },
     "formatsEasy": {
      "mc": 20,
-     "tf": 3,
+     "tf": 5,
      "number": 1,
      "type": 20
     },
     "formatsKids": {
      "mc": 20,
-     "tf": 3,
+     "tf": 5,
      "number": 1,
      "type": 20
     }
@@ -2097,7 +2097,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 43,
+   "questions": 62,
    "virtual": {
     "of": "general",
     "tag": "animals"
@@ -2114,35 +2114,35 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 20,
+     "mc": 35,
      "number": 5,
-     "tf": 12,
+     "tf": 16,
      "order": 6
     },
-    "easy": 17,
+    "easy": 23,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 12,
+     "tf": 16,
      "order": 6,
      "number": 5,
-     "type": 18
+     "type": 20
     },
     "formatsEasy": {
-     "mc": 9,
+     "mc": 15,
      "tf": 5,
      "order": 3,
      "number": 3,
-     "type": 7
+     "type": 13
     },
     "formatsKids": {
-     "mc": 9,
+     "mc": 15,
      "tf": 5,
      "order": 3,
      "number": 0,
-     "type": 7
+     "type": 13
     }
    }
   },
@@ -2153,7 +2153,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 39,
+   "questions": 50,
    "virtual": {
     "of": "general",
     "tag": "nature"
@@ -2170,27 +2170,27 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 28,
-     "tf": 11
+     "mc": 38,
+     "tf": 12
     },
-    "easy": 14,
+    "easy": 15,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 11,
+     "tf": 12,
      "type": 20
     },
     "formatsEasy": {
-     "mc": 9,
+     "mc": 10,
      "tf": 5,
-     "type": 9
+     "type": 10
     },
     "formatsKids": {
-     "mc": 9,
+     "mc": 10,
      "tf": 5,
-     "type": 9
+     "type": 10
     }
    }
   },
@@ -2201,7 +2201,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 50,
+   "questions": 95,
    "virtual": {
     "of": "general",
     "tag": "screen"
@@ -2218,31 +2218,31 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 35,
+     "mc": 78,
      "number": 7,
-     "tf": 8
+     "tf": 10
     },
-    "easy": 26,
+    "easy": 58,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 8,
+     "tf": 10,
      "number": 7,
      "type": 20
     },
     "formatsEasy": {
      "mc": 20,
-     "tf": 2,
+     "tf": 3,
      "number": 4,
-     "type": 19
+     "type": 20
     },
     "formatsKids": {
      "mc": 20,
-     "tf": 2,
+     "tf": 3,
      "number": 4,
-     "type": 19
+     "type": 20
     }
    }
   },
@@ -2253,7 +2253,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 31,
+   "questions": 73,
    "virtual": {
     "of": "general",
     "tag": "food"
@@ -2270,27 +2270,27 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 26,
-     "tf": 5
+     "mc": 64,
+     "tf": 9
     },
-    "easy": 15,
+    "easy": 29,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 5,
+     "tf": 9,
      "type": 20
     },
     "formatsEasy": {
-     "mc": 13,
+     "mc": 20,
      "tf": 2,
-     "type": 13
+     "type": 20
     },
     "formatsKids": {
-     "mc": 13,
+     "mc": 20,
      "tf": 2,
-     "type": 13
+     "type": 20
     }
    }
   },
@@ -2301,7 +2301,7 @@
    "icon": "🏛️",
    "kids": false,
    "items": 112,
-   "questions": 248,
+   "questions": 510,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -2318,11 +2318,12 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 139,
+     "mc": 374,
      "number": 69,
-     "order": 40
+     "order": 48,
+     "tf": 19
     },
-    "easy": 54,
+    "easy": 119,
     "kidsItems": 0,
     "multi": [
      "era"
@@ -2675,7 +2676,7 @@
    "icon": "🧸",
    "kids": true,
    "items": 0,
-   "questions": 326,
+   "questions": 430,
    "caps": {
     "img": 25,
     "audio": 0,
@@ -2688,10 +2689,10 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 296,
-     "tf": 30
+     "mc": 391,
+     "tf": 39
     },
-    "easy": 286,
+    "easy": 372,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -4075,7 +4076,7 @@
    "icon": "⚽",
    "kids": false,
    "items": 120,
-   "questions": 155,
+   "questions": 467,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -4096,11 +4097,11 @@
     "quotes": 0,
     "qkinds": {
      "number": 56,
-     "mc": 84,
-     "order": 7,
-     "tf": 8
+     "mc": 382,
+     "order": 8,
+     "tf": 21
     },
-    "easy": 60,
+    "easy": 164,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
@@ -4113,7 +4114,7 @@
      "mc": 20,
      "tf": 20,
      "match": 20,
-     "order": 7,
+     "order": 8,
      "odd": 20,
      "sort": 19,
      "number": 20,
@@ -4125,7 +4126,7 @@
      "mc": 20,
      "tf": 20,
      "match": 20,
-     "order": 1,
+     "order": 2,
      "odd": 20,
      "sort": 1,
      "number": 12,
@@ -4137,7 +4138,7 @@
      "mc": 20,
      "tf": 20,
      "match": 0,
-     "order": 1,
+     "order": 2,
      "odd": 20,
      "sort": 20,
      "number": 12,
