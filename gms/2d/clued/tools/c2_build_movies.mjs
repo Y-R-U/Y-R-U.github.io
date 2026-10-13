@@ -148,7 +148,7 @@ function questions() {
   return qs;
 }
 
-writePack({
+const pack = {
   id: 'movies', title: 'Movies', theme: 'screen', icon: '🎬', kids: false, version: 1,
   notice: 'Box office figures are worldwide grosses, not adjusted for inflation, as listed on Wikipedia in October 2026; they include re-releases where listed.',
   factsMeta: {
@@ -168,6 +168,9 @@ writePack({
     { name: 'Wikidata (directors, release dates)', url: 'https://www.wikidata.org' },
     { name: 'Wikiquote (quotes)', url: 'https://en.wikiquote.org' },
   ],
-});
+};
+// lane SCREEN: the hand-listed films of c2_src/films_more.mjs + country/stars/franchise/bestPicture (tools/c2_screen_movies.mjs)
+await (await import('./c2_screen_movies.mjs')).extendMovies(pack, note);
+writePack(pack);
 writeFileSync(join(ROOT, 'tools/c2_reports/movies.txt'), report.join('\n') + '\n');
 console.log(report.join('\n'));

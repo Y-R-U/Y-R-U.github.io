@@ -121,7 +121,10 @@ for (const [id, title, theme, icon, text, factsMeta] of packs) {
   const items = rows.filter(r => r.qid).map(r => toItem(r, id));
   const ids = new Set();
   for (const it of items) { if (ids.has(it.id)) throw new Error('dup id ' + it.id); ids.add(it.id); }
-  writePack({ id, title, theme, icon, kids: false, version: 1, imgPrompt: 'Which of these is {name}?', nameImgPrompt: 'Who is this?', tfImgPrompt: 'This is {name}.', factsMeta, items, questions: questions(items, id), sources: src });
+  const pack = { id, title, theme, icon, kids: false, version: 1, imgPrompt: 'Which of these is {name}?', nameImgPrompt: 'Who is this?', tfImgPrompt: 'This is {name}.', factsMeta, items, questions: questions(items, id), sources: src };
+  // lane SCREEN: c2_src/actors_more.mjs (tools/c2_screen_actors.mjs)
+  if (id === 'actors') await (await import('./c2_screen_actors.mjs')).extendActors(pack, note);
+  writePack(pack);
 }
 (await import('./c2_gender.mjs')).run();
 writeFileSync(join(ROOT, 'tools/c2_reports/people.txt'), report.join('\n') + '\n');

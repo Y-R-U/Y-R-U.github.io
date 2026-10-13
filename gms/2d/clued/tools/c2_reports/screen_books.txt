@@ -1,0 +1,10 @@
+old book country not confirmed Gulliver's Travels: mine IRL, book GBR, author -
+DROPPED The Last of the Mohicans: year: mine 1826, Wikidata 1824
+DROPPED Where Is the Green Sheep?: not on Wikidata
+DROPPED Dear Zoo: author: mine Rod Campbell, Wikidata -
+DROPPED The Magic Faraway Tree: year: mine 1943, Wikidata -, lead -, infobox 1939
+DROPPED The Help: not on Wikidata
+few clues The Railway Children: 4
+few clues Love in the Time of Cholera: 4
+few clues Northern Lights: 4
+books: 90 old + 189 new (5 of 194 candidates dropped)

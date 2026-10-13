@@ -1,13 +1,21 @@
-movies/star-wars: dropped clue leaking "new": It was later retitled Episode IV – A New Hope.
-movies/the-empire-strikes-back: dropped clue leaking "star": It is the second Star Wars film.
-movies/raiders-of-the-lost-ark: dropped clue leaking "ark": Nazis race to find the Ark of the Covenant.
-movies/the-lion-king: dropped clue leaking "king": Simba must become king of the Pride Lands.
-movies/toy-story: dropped clue leaking "toy": A cowboy doll is jealous of a new space ranger toy.
-movies/star-wars-episode-i-the-phantom-menace: dropped clue leaking "star": It is the first of the Star Wars prequels.
-movies/the-lord-of-the-rings-the-two-towers: dropped clue leaking "two": Gollum guides two hobbits towards Mordor.
-movies/the-lord-of-the-rings-the-two-towers: dropped clue leaking "ring": It is the second part of a fantasy trilogy about a ring.
-movies/the-lord-of-the-rings-the-return-of-the-king: dropped clue leaking "king": Aragorn becomes king.
-movies/the-lord-of-the-rings-the-return-of-the-king: dropped clue leaking "ring": The One Ring is finally thrown into Mount Doom.
-movies/star-wars-the-force-awakens: dropped clue leaking "star": It is the seventh main Star Wars film.
-movies/star-wars-the-last-jedi: dropped clue leaking "star": It is the eighth main Star Wars film.
-movies/avatar-fire-and-ash: dropped clue leaking "ash": It introduces a fierce Na'vi clan known as the Ash People.
+movies/oliver: dropped clue leaking "oliv": It stars Ron Moody and Oliver Reed.
+movies/mad-max-2: dropped clue leaking "mad": It is part of the Mad Max franchise.
+movies/good-will-hunting: dropped clue leaking "will": It stars Robin Williams and Matt Damon.
+movies/the-castle: dropped clue leaking "cast": Its cast also includes Stephen Curry.
+movies/toy-story-2: dropped clue leaking "toy": It is part of the Toy Story franchise.
+movies/cast-away: dropped clue leaking "cast": Its cast also includes Nick Searcy.
+movies/star-wars-episode-ii-attack-of-the-clones: dropped clue leaking "star": It stars Ewan McGregor and Natalie Portman.
+movies/star-wars-episode-ii-attack-of-the-clones: dropped clue leaking "star": It is part of the Star Wars franchise.
+movies/the-bourne-identity: only 4 clean clues -> no ladder
+movies/howl-s-moving-castle: dropped clue leaking "cast": Its cast also includes Akihiro Miwa.
+movies/star-wars-episode-iii-revenge-of-the-sith: dropped clue leaking "star": It stars Ewan McGregor and Natalie Portman.
+movies/star-wars-episode-iii-revenge-of-the-sith: dropped clue leaking "star": It is part of the Star Wars franchise.
+movies/borat: dropped clue leaking "amer": A Kazakh TV reporter travels across America.
+movies/borat: only 4 clean clues -> no ladder
+movies/the-king-s-speech: dropped clue leaking "king": It comes from the United Kingdom.
+movies/mad-max-fury-road: dropped clue leaking "mad": It is part of the Mad Max franchise.
+movies/a-star-is-born: dropped clue leaking "star": It stars Bradley Cooper and Lady Gaga.
+movies/toy-story-4: dropped clue leaking "toy": It is part of the Toy Story franchise.
+movies/star-wars-the-rise-of-skywalker: dropped clue leaking "star": It stars Carrie Fisher and Mark Hamill.
+movies/star-wars-the-rise-of-skywalker: dropped clue leaking "star": It is part of the Star Wars franchise.
+movies/turning-red: dropped clue leaking "red": A 13-year-old girl in Toronto becomes a giant red panda when she gets emotional.

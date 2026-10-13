@@ -89,7 +89,7 @@ function questions() {
 const qs = questions();
 for (const it of items.filter(i => leaks(i.summary, [i.name], STOPS))) note(`summary mentions its own title (plot question dropped): ${it.name}`);
 
-writePack({
+const pack = {
   id: 'books', title: 'Famous books', theme: 'books', icon: '📚', kids: false, version: 1, leakExempt: ['adventures'],
   factsMeta: {
     author: { type: 'cat', label: 'Author', ask: 'Who wrote {name}?', askReverse: 'Which of these books was written by {value}?', stmt: '{name} was written by {value}.' },
@@ -105,6 +105,9 @@ writePack({
     { name: 'Project Gutenberg (public-domain first lines)', url: 'https://www.gutenberg.org' },
     { name: 'Wikipedia articles on each book (clues, summaries written in our own words)', url: 'https://en.wikipedia.org' },
   ],
-});
+};
+// lane SCREEN: c2_src/books_more.mjs books + country for every book (tools/c2_screen_books.mjs)
+await (await import('./c2_screen_books.mjs')).extendBooks(pack, note);
+writePack(pack);
 writeFileSync(join(ROOT, 'tools/c2_reports/books.txt'), report.join('\n') + '\n');
 console.log(report.join('\n'));

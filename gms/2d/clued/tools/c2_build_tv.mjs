@@ -55,7 +55,7 @@ for (const it of items) {
   const wy = sample(rr, [-6, -4, -2, 2, 4, 6].map(k => it.facts.year + k).filter(y => y <= 2025), 3).map(String);
   questions.push({ id: `year-${it.id}`, kind: 'mc', prompt: `In which year was ${it.name} first shown?`, answer: String(it.facts.year), wrong: wy, explain: it.blurb, difficulty: 3, refs: [`tv/${it.id}`] });
 }
-writePack({
+const pack = {
   id: 'tv', title: 'TV shows', theme: 'screen', icon: '📺', kids: false, version: 1, quotePrompt: 'Which TV show is this line from?',
   factsMeta: {
     year: { type: 'year', label: 'First shown', matchPrompt: 'Match each show to the year it was first shown', askNumber: 'In what year was {name} first shown?', higherLabel: 'Newer', askHigh: 'Which of these shows started most recently?', askLow: 'Which of these shows started first?' },
@@ -65,6 +65,9 @@ writePack({
   },
   items, questions: [...questions, ...parseQuestions(TV_QS, 'tvq')],
   sources: [{ name: 'Wikidata (start dates)', url: 'https://www.wikidata.org' }, { name: 'Wikipedia articles for each show', url: 'https://en.wikipedia.org' }, { name: 'Wikiquote (catchphrases)', url: 'https://en.wikiquote.org' }],
-});
+};
+// lane SCREEN: c2_src/tv_more.mjs shows + network/stars (tools/c2_screen_tv.mjs)
+await (await import('./c2_screen_tv.mjs')).extendTv(pack, note);
+writePack(pack);
 writeFileSync(join(ROOT, 'tools/c2_reports/tv.txt'), report.join('\n') + '\n');
 console.log(report.join('\n'));

@@ -1,1 +1,47 @@
-
+tv/prisoner-cell-block-h: only 4 clean clues -> no ladder
+tv/skippy-the-bush-kangaroo: only 4 clean clues -> no ladder
+tv/play-school: only 4 clean clues -> no ladder
+tv/bananas-in-pyjamas: only 4 clean clues -> no ladder
+tv/hi-5: only 4 clean clues -> no ladder
+tv/packed-to-the-rafters: only 4 clean clues -> no ladder
+tv/a-country-practice: only 4 clean clues -> no ladder
+tv/hey-hey-it-s-saturday: only 4 clean clues -> no ladder
+tv/masterchef-australia: dropped clue leaking "austra": It was made in Australia.
+tv/masterchef-australia: only 4 clean clues -> no ladder
+tv/mr-squiggle: only 4 clean clues -> no ladder
+tv/heartbreak-high: only 3 clean clues -> no ladder
+tv/the-brokenwood-mysteries: only 4 clean clues -> no ladder
+tv/emmerdale: only 4 clean clues -> no ladder
+tv/one-foot-in-the-grave: dropped clue leaking "one": It was first shown on BBC One.
+tv/steptoe-and-son: dropped clue leaking "son": A rag-and-bone man and his ambitious son in West London.
+tv/steptoe-and-son: only 4 clean clues -> no ladder
+tv/match-of-the-day: only 4 clean clues -> no ladder
+tv/planet-earth: only 4 clean clues -> no ladder
+tv/fireman-sam: dropped clue leaking "fire": A firefighter rescues people from trouble caused by naughty Norman Price.
+tv/fireman-sam: only 4 clean clues -> no ladder
+tv/shaun-the-sheep: only 4 clean clues -> no ladder
+tv/in-the-night-garden: only 4 clean clues -> no ladder
+tv/killing-eve: dropped clue leaking "kill": An MI6 officer and a killer become obsessed with each other.
+tv/sex-education: dropped clue leaking "sex": Gillian Anderson plays a sex therapist mother.
+tv/doc-martin: dropped clue leaking "mart": It starred Martin Clunes and Caroline Catz.
+tv/doc-martin: only 4 clean clues -> no ladder
+tv/the-two-ronnies: dropped clue leaking "ronn": It starred Ronnie Barker and Ronnie Corbett.
+tv/the-two-ronnies: only 4 clean clues -> no ladder
+tv/roseanne: dropped clue leaking "rosea": It starred Roseanne Barr and John Goodman.
+tv/star-trek-the-next-generation: dropped clue leaking "star": It starred Patrick Stewart and Jonathan Frakes.
+tv/star-trek-the-next-generation: only 3 clean clues -> no ladder
+tv/south-park: dropped clue leaking "park": It starred Trey Parker and Matt Stone.
+tv/arthur: only 4 clean clues -> no ladder
+tv/saturday-night-live: only 3 clean clues -> no ladder
+tv/degrassi-junior-high: only 4 clean clues -> no ladder
+tv/doraemon: only 4 clean clues -> no ladder
+tv/takeshi-s-castle: dropped clue leaking "take": It starred Takeshi Kitano.
+tv/takeshi-s-castle: only 3 clean clues -> no ladder
+tv/monkey: only 4 clean clues -> no ladder
+tv/crash-landing-on-you: dropped clue leaking "land": A paragliding accident lands her in North Korea, where she falls for an army officer.
+tv/call-my-agent: dropped clue leaking "agen": Life in a Paris talent agency.
+tv/ramayan: dropped clue leaking "rama": An adaptation of the epic about Prince Rama.
+tv/ramayan: only 4 clean clues -> no ladder
+tv/masha-and-the-bear: only 3 clean clues -> no ladder
+tv/big-brother-netherlands: dropped clue leaking "netherla": It was made in the Netherlands.
+tv/big-brother-netherlands: only 3 clean clues -> no ladder

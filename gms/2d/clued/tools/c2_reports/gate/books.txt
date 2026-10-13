@@ -1,1 +1,18 @@
-books/the-diary-of-a-young-girl: dropped clue leaking "anne": It was written by Anne Frank.
+books/ethan-frome: dropped clue leaking "from": It comes from the United States.
+books/ethan-frome: dropped clue leaking "from": It opens: “I had the story, bit by bit, from various people, and, as generally happens in such cases, each time it was a different story.”
+books/the-island-of-doctor-moreau: dropped clue leaking "isla": A scientist on a remote Pacific island turns animals into human-like beings.
+books/sons-and-lovers: dropped clue leaking "love": A miner's son is torn between his possessive mother and the women he loves.
+books/the-railway-children: only 4 clean clues -> no ladder
+books/perfume: dropped clue leaking "perf": A man born with no body odour but a perfect sense of smell kills to capture scent.
+books/perfume: only 4 clean clues -> no ladder
+books/love-in-the-time-of-cholera: only 4 clean clues -> no ladder
+books/seven-little-australians: dropped clue leaking "australi": It comes from Australia.
+books/storm-boy: dropped clue leaking "boy": A boy raises three orphaned pelicans.
+books/the-boy-in-the-striped-pyjamas: dropped clue leaking "boy": The son of a Nazi commandant befriends a boy behind a fence.
+books/goodnight-mister-tom: dropped clue leaking "mist": A mistreated London evacuee finds a home with an old man in the countryside.
+books/northern-lights: only 4 clean clues -> no ladder
+books/the-twits: dropped clue leaking "twit": Mr Twit's beard is full of old food.
+books/five-on-a-treasure-island: dropped clue leaking "isla": Four children and a dog explore a shipwreck and an island castle.
+books/gangsta-granny: dropped clue leaking "gran": Its grandmother smells of cabbage.
+books/gangsta-granny: dropped clue leaking "gran": A boy discovers his boring gran was once an international jewel thief.
+books/gangsta-granny: only 4 clean clues -> no ladder

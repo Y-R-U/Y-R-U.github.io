@@ -1,0 +1,75 @@
+network not agreed: Skippy the Bush Kangaroo (infobox TCN Channel 9)
+network not agreed: Play School (infobox ABC Television (Australian TV network))
+network not agreed: Bananas in Pyjamas (infobox ABC TV (Australian TV channel))
+network not agreed: Hi-5 (infobox Nine Network)
+DROPPED Round the Twist: start year: mine 1989, infobox 1990
+network not agreed: Summer Heights High (infobox ABC TV (Australian TV channel))
+network not agreed: Wentworth (infobox SoHo (Australian TV channel))
+DROPPED The Block: start year: mine 2003, Wikidata -
+network not agreed: Rake (infobox -)
+DROPPED The Flying Doctors: start year: mine 1986, Wikidata 1993
+network not agreed: The Brokenwood Mysteries (infobox Prime (New Zealand), Acorn TV)
+DROPPED The Bill: start year: mine 1984, Wikidata 1983
+DROPPED Porridge: start year: mine 1974, Wikidata 1973
+network not agreed: Absolutely Fabulous (infobox -)
+DROPPED Little Britain: start year: mine 2003, Wikidata -
+network not agreed: Poirot (infobox ITV (TV network))
+DROPPED Open All Hours: start year: mine 1973, infobox 1976
+network not agreed: Steptoe and Son (infobox BBC)
+DROPPED Top of the Pops: start year: mine 1964, Wikidata -
+network not agreed: Planet Earth (infobox -)
+DROPPED Bob the Builder: start year: mine 1999, Wikidata 1997,1998
+network not agreed: Shaun the Sheep (infobox CBBC, Kika (TV channel), Netflix, BBC iPlayer)
+DROPPED The Wombles: start year: mine 1973, Wikidata -
+network not agreed: Danger Mouse (infobox ITV (TV network))
+DROPPED Rainbow: not found
+DROPPED Hey Duggee: start year: mine 2014, infobox 2015
+DROPPED Love Island: country: mine United Kingdom, Wikidata -, Wikipedia GBR
+network not agreed: Brooklyn Nine-Nine (infobox Fox Broadcasting Company)
+network not agreed: The Bear (infobox FX on Hulu)
+DROPPED Little House on the Prairie: start year: mine 1974, Wikidata -
+network not agreed: Star Trek: The Next Generation (infobox Broadcast syndication)
+network not agreed: Arthur (infobox PBS Kids, CBC Kids)
+DROPPED Dora the Explorer: start year: mine 2000, Wikidata -
+DROPPED Phineas and Ferb: country: mine United States, Wikidata -, Wikipedia USA
+DROPPED Wheel of Fortune: start year: mine 1975, Wikidata 1983
+DROPPED Sailor Moon: start year: mine 1992, Wikidata 1991
+DROPPED Naruto: start year: mine 2002, Wikidata 1999
+network not agreed: Doraemon (infobox All-Nippon News Network)
+DROPPED Astro Boy: start year: mine 1963, infobox 1964
+DROPPED Attack on Titan: start year: mine 2013, Wikidata 2009
+network not agreed: Takeshi's Castle (infobox Japan News Network)
+network not agreed: Monkey (infobox -)
+DROPPED Borgen: start year: mine 2010, Wikidata -
+DROPPED Skam: start year: mine 2015, Wikidata -
+network not agreed: El Chavo del Ocho (infobox -)
+network not agreed: Ramayan (infobox DD National)
+network not agreed: Masha and the Bear (infobox -)
+network not agreed: Fauda (infobox Yes Oh)
+network not agreed: Big Brother (Netherlands) (infobox RTL 7)
+few clues Prisoner: Cell Block H: 4
+few clues Skippy the Bush Kangaroo: 4
+few clues Play School: 4
+few clues Bananas in Pyjamas: 4
+few clues Hi-5: 4
+few clues Packed to the Rafters: 4
+few clues A Country Practice: 4
+few clues Hey Hey It's Saturday: 4
+few clues Mr Squiggle: 4
+few clues Heartbreak High: 3
+few clues The Brokenwood Mysteries: 4
+few clues Emmerdale: 4
+few clues Match of the Day: 4
+few clues Planet Earth: 4
+few clues Shaun the Sheep: 4
+few clues In the Night Garden: 4
+few clues Star Trek: The Next Generation: 4
+few clues Arthur: 4
+few clues Saturday Night Live: 3
+few clues Degrassi Junior High: 4
+few clues Doraemon: 4
+few clues Takeshi's Castle: 4
+few clues Monkey: 4
+few clues Masha and the Bear: 3
+few clues Big Brother (Netherlands): 4
+tv: 53 old + 214 new (23 of 237 candidates dropped)

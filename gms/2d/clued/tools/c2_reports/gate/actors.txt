@@ -1,1 +1,1 @@
-
+actors/richard-burton: dropped clue leaking "rich": He was a famous Welsh actor with a rich, deep voice.

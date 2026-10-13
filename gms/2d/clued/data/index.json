@@ -1,5 +1,5 @@
 {
- "build": "202610130733",
+ "build": "202610130819",
  "themes": [
   {
    "id": "animals",
@@ -203,14 +203,14 @@
    "theme": "screen",
    "icon": "🎭",
    "kids": false,
-   "items": 84,
-   "questions": 168,
+   "items": 336,
+   "questions": 672,
    "caps": {
-    "img": 83,
+    "img": 334,
     "audio": 0,
-    "itemImg": 83,
+    "itemImg": 334,
     "itemAudio": 0,
-    "clues": 84,
+    "clues": 336,
     "facts": {
      "born": "year",
      "died": "year",
@@ -218,20 +218,20 @@
      "era": "cat",
      "films": "text"
     },
-    "groups": 10,
+    "groups": 13,
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 168
+     "mc": 672
     },
-    "easy": 40,
+    "easy": 60,
     "kidsItems": 0,
     "multi": [
      "nationality"
     ],
     "catBins": {
-     "era": 8
+     "era": 10
     },
     "formats": {
      "mc": 20,
@@ -245,7 +245,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 11,
+     "blitz60": 20,
      "type": 20,
      "chain": 20
     },
@@ -255,13 +255,13 @@
      "match": 20,
      "ladder": 20,
      "hilo": 20,
-     "order": 0,
+     "order": 20,
      "odd": 20,
-     "sort": 16,
+     "sort": 20,
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 11,
+     "blitz60": 20,
      "type": 20,
      "chain": 20
     },
@@ -276,8 +276,8 @@
      "sort": 20,
      "reveal": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 2,
+     "connect": 20,
+     "blitz60": 3,
      "type": 20,
      "chain": 17
     }
@@ -646,37 +646,39 @@
    "theme": "books",
    "icon": "📚",
    "kids": false,
-   "items": 90,
-   "questions": 309,
+   "items": 279,
+   "questions": 825,
    "caps": {
     "img": 0,
     "audio": 0,
     "itemImg": 0,
     "itemAudio": 0,
-    "clues": 90,
+    "clues": 274,
     "facts": {
      "author": "cat",
      "year": "year",
      "genre": "cat",
      "century": "cat",
-     "kids": "bool"
+     "kids": "bool",
+     "country": "cat"
     },
-    "groups": 22,
+    "groups": 25,
     "lookalikes": 0,
     "fakes": 8,
-    "quotes": 43,
+    "quotes": 65,
     "qkinds": {
-     "mc": 304,
+     "mc": 820,
      "tf": 5
     },
-    "easy": 104,
-    "kidsItems": 27,
+    "easy": 180,
+    "kidsItems": 55,
     "multi": [
      "genre"
     ],
     "catBins": {
-     "author": 1,
-     "century": 3
+     "author": 7,
+     "century": 3,
+     "country": 9
     },
     "formats": {
      "mc": 20,
@@ -690,7 +692,7 @@
      "fake": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 8,
+     "blitz60": 20,
      "type": 20,
      "quote": 20,
      "pickall": 20
@@ -706,10 +708,10 @@
      "sort": 20,
      "fake": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 8,
+     "connect": 20,
+     "blitz60": 20,
      "type": 20,
-     "quote": 14,
+     "quote": 15,
      "pickall": 20
     },
     "formatsKids": {
@@ -723,10 +725,10 @@
      "sort": 20,
      "fake": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 5,
+     "connect": 20,
+     "blitz60": 12,
      "type": 20,
-     "quote": 14,
+     "quote": 15,
      "pickall": 0
     }
    }
@@ -3213,15 +3215,15 @@
    "theme": "screen",
    "icon": "🎬",
    "kids": false,
-   "items": 77,
-   "questions": 330,
+   "items": 570,
+   "questions": 2371,
    "notice": "Box office figures are worldwide grosses, not adjusted for inflation, as listed on Wikipedia in October 2026; they include re-releases where listed.",
    "caps": {
     "img": 0,
     "audio": 0,
     "itemImg": 0,
     "itemAudio": 0,
-    "clues": 77,
+    "clues": 568,
     "facts": {
      "year": "year",
      "boxOfficeUSD": "num",
@@ -3229,20 +3231,26 @@
      "director": "text",
      "topOfYear": "bool",
      "decadeRank": "num",
-     "kids": "bool"
+     "kids": "bool",
+     "country": "cat",
+     "stars": "text",
+     "franchise": "cat",
+     "bestPicture": "bool"
     },
-    "groups": 6,
+    "groups": 10,
     "lookalikes": 0,
     "fakes": 10,
     "quotes": 45,
     "qkinds": {
-     "mc": 330
+     "mc": 2371
     },
-    "easy": 74,
-    "kidsItems": 16,
+    "easy": 230,
+    "kidsItems": 78,
     "multi": [],
     "catBins": {
-     "decade": 6
+     "decade": 10,
+     "country": 11,
+     "franchise": 8
     },
     "formats": {
      "mc": 20,
@@ -3256,10 +3264,10 @@
      "fake": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 8,
+     "blitz60": 20,
      "type": 20,
      "quote": 20,
-     "pickall": 18
+     "pickall": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -3267,16 +3275,16 @@
      "match": 20,
      "ladder": 20,
      "hilo": 20,
-     "order": 0,
+     "order": 20,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 8,
+     "blitz60": 20,
      "type": 20,
      "quote": 20,
-     "pickall": 18
+     "pickall": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -3290,7 +3298,7 @@
      "fake": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 4,
+     "blitz60": 15,
      "type": 20,
      "quote": 20,
      "pickall": 0
@@ -4339,35 +4347,37 @@
    "theme": "screen",
    "icon": "📺",
    "kids": false,
-   "items": 53,
-   "questions": 167,
+   "items": 267,
+   "questions": 1006,
    "caps": {
     "img": 0,
     "audio": 0,
     "itemImg": 0,
     "itemAudio": 0,
-    "clues": 53,
+    "clues": 236,
     "facts": {
      "year": "year",
      "country": "cat",
      "decade": "cat",
-     "kids": "bool"
+     "kids": "bool",
+     "network": "text",
+     "stars": "text"
     },
     "groups": 8,
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 17,
     "qkinds": {
-     "mc": 157,
+     "mc": 996,
      "tf": 9,
      "number": 1
     },
-    "easy": 60,
-    "kidsItems": 12,
+    "easy": 122,
+    "kidsItems": 24,
     "multi": [],
     "catBins": {
-     "country": 2,
-     "decade": 6
+     "country": 7,
+     "decade": 8
     },
     "formats": {
      "mc": 20,
@@ -4380,39 +4390,39 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 9,
+     "blitz60": 14,
      "type": 20,
      "quote": 17,
-     "pickall": 6
+     "pickall": 20
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 20,
      "match": 20,
-     "ladder": 17,
+     "ladder": 20,
      "hilo": 20,
      "order": 0,
      "odd": 20,
      "sort": 20,
-     "number": 18,
+     "number": 20,
      "connect": 20,
-     "blitz60": 9,
+     "blitz60": 14,
      "type": 20,
      "quote": 5,
-     "pickall": 6
+     "pickall": 20
     },
     "formatsKids": {
      "mc": 20,
      "tf": 20,
      "match": 0,
-     "ladder": 17,
+     "ladder": 20,
      "hilo": 20,
      "order": 20,
      "odd": 20,
      "sort": 20,
-     "number": 18,
+     "number": 20,
      "connect": 20,
-     "blitz60": 4,
+     "blitz60": 11,
      "type": 20,
      "quote": 5,
      "pickall": 0
