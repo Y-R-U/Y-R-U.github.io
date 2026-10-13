@@ -205,3 +205,14 @@ Aaron: the Sets popup gets two tabs, Suggested and My sets. Picking a suggestion
 - 2026-10-13 RECORDS DONE: 523 records / 713 q (18 groups with sub-types, 23 range bands, 150 "As of 2025" stamps; records changed in 2025–26 dropped; rec_verify checks holder + value against the cited pages). Engine edits: mc (q.ordered bands), type (typeable:false), number, blitz60, registry, order. Manager fixes: planets pick-all got 2 more decoys (tiles ≥ 2n); per-question explain `e` in rec_src `more`. Added a "Records & Extremes" suggested set (mc easy / number / hilo / order / mc hard, 20 s answers).
   LESSON: copying release-tree files back over the shared tree clobbered RECORDS' newer edits in files whose only release diff was ?v (the agent re-applied them). Next time stage with `git update-index --cacheinfo` for EVERY file, never cp over the shared tree.
   Open: re-add records changed in 2025–26 with "as of 2026" stamps (marathon, World Cup goals, highest-grossing film…) once verified.
+
+## STATE @ 2026-10-13 (evening): committed, pushed, deployed (BUILD 202610130907, commit 5544e063)
+Shipped today: suggested sets, local focus (10 countries in-country), +1,090 famous questions, music 1,699 hits, FRESH seen-history, Pick all, difficulty blend, movies/TV/actors/books ×3–7, World records (523) + a Records & Extremes set. No agents running; the tree is clean.
+Open / follow-ups:
+- Pick all: a partly-right reveal says "Nope" → add a "Partly right" state in the runner.
+- p2p_e2e "early reveal after host refresh" intermittent (also on older HEAD).
+- Records: re-add those changed in 2025–26 with "as of 2026" stamps once verified.
+- LOCAL wave 2: music by country (item.charts / item.artistCountry exist), screen by country (facts.country exists).
+- 382 new films without movie-moment art; landscape result card covers bottom rows (ladder/chain/pickall 8-tile).
+- Packs that can't honour Hard: birds, mammals, screen-themes, music-artists, pd-melodies.
+- Two-country focus idea for mixed groups (AU + UK).
