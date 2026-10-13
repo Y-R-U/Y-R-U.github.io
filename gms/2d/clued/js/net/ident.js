@@ -1,5 +1,5 @@
 // Who is playing: the remembered name, plus the optional br8t account (name prefill + ID token for the server).
-import { getName, setName } from '../core/store.js?v=202610111253';
+import { getName, setName } from '../core/store.js?v=202610130349';
 
 let authP = null;
 

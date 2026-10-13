@@ -1,7 +1,7 @@
-import { h } from './kit.js?v=202610111253';
-import { getSettings, setSettings } from '../core/store.js?v=202610111253';
+import { h } from './kit.js?v=202610130349';
+import { getSettings, setSettings } from '../core/store.js?v=202610130349';
 
-const root = document.documentElement;
+const root = globalThis.document?.documentElement || {};
 const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
 export const canFullscreen = () => !!(root.requestFullscreen || root.webkitRequestFullscreen);
 
@@ -12,7 +12,7 @@ export function toggleFullscreen() {
 
 let bgmMod = null;
 export async function bgm() {
-  if (!bgmMod) bgmMod = await import('../audio/bgm.js?v=202610111253').catch(() => null);
+  if (!bgmMod) bgmMod = await import('../audio/bgm.js?v=202610130349').catch(() => null);
   return bgmMod;
 }
 

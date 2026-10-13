@@ -1,15 +1,15 @@
 // Round lists shared by the pub quiz builder and the online host setup: round cards (edit/remove/reorder),
 // the "add a round" picker (♥ favourites first, then formats) and the round editor screen ('pqround').
-import { defineScreen, go, back, header } from '../ui/app.js?v=202610111253';
-import { h } from '../ui/kit.js?v=202610111253';
-import { popup, toast } from '../ui/popup.js?v=202610111253';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610111253';
-import { getIndex } from '../core/packs.js?v=202610111253';
-import { supportedPackIds } from '../core/spec.js?v=202610111253';
-import { getSettings, getFavs } from '../core/store.js?v=202610111253';
-import { cleanFav, favKey, favLabel } from '../ui/favmodel.js?v=202610111253';
-import { optionsPanel } from '../ui/setup.js?v=202610111253';
-import { sfx } from '../ui/fx.js?v=202610111253';
+import { defineScreen, go, back, header } from '../ui/app.js?v=202610130349';
+import { h } from '../ui/kit.js?v=202610130349';
+import { popup, toast } from '../ui/popup.js?v=202610130349';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610130349';
+import { getIndex } from '../core/packs.js?v=202610130349';
+import { supportedPackIds } from '../core/spec.js?v=202610130349';
+import { getSettings, getFavs } from '../core/store.js?v=202610130349';
+import { cleanFav, favKey, favLabel } from '../ui/favmodel.js?v=202610130349';
+import { optionsPanel } from '../ui/setup.js?v=202610130349';
+import { sfx } from '../ui/fx.js?v=202610130349';
 
 const CSS = `
 .round-card.rc { grid-template-columns: 44px minmax(0, 1fr) auto; cursor: pointer; }
@@ -41,6 +41,11 @@ const CSS = `
 .set-load b { display: block; font-size: 16px; overflow-wrap: anywhere; }
 .set-load small { display: block; font-size: 12.5px; color: var(--ink-2); overflow-wrap: anywhere; }
 .set-row .icon-btn { width: 44px; height: 44px; }
+.set-row.no-del { grid-template-columns: minmax(0, 1fr); }
+.set-load small.set-blurb { color: var(--ink); font-weight: 700; margin: 1px 0 2px; }
+.set-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+.set-tab { min-height: 44px; padding: 8px 6px; border: var(--line) solid var(--ink); border-radius: 12px; background: var(--card, #fff); font: inherit; font-weight: 800; color: var(--ink-2); }
+.set-tab[aria-selected=true] { background: var(--sun, #ffd23f); color: var(--ink); box-shadow: var(--shadow-sm); }
 body.kids-on .round-card.rc { padding: 14px; }
 body.kids-on .rc-acts { grid-template-columns: repeat(2, 52px); gap: 8px; }
 body.kids-on .rc-acts .icon-btn { width: 52px; height: 52px; font-size: 22px; }

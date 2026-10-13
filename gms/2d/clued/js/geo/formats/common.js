@@ -1,7 +1,7 @@
 // Shared bits for the map formats: geo index (loaded before any format generates), layout, views, flags.
-import { loadIndex, geo, countryIds, regionMembers, isPlayable } from '../data.js?v=202610111253';
-import { REGIONS, STATE_VIEWS, CONTINENTS } from '../regions.js?v=202610111253';
-import { createMap } from '../map.js?v=202610111253';
+import { loadIndex, geo, countryIds, regionMembers, isPlayable } from '../data.js?v=202610130349';
+import { REGIONS, STATE_VIEWS, CONTINENTS } from '../regions.js?v=202610130349';
+import { createMap } from '../map.js?v=202610130349';
 
 await loadIndex();   // ~75 KB; generate() is synchronous and needs it
 
@@ -48,8 +48,19 @@ export function bboxUnion(list) {
   return [Math.min(...b.map(x => x[0])), Math.min(...b.map(x => x[1])), Math.max(...b.map(x => x[2])), Math.max(...b.map(x => x[3]))];
 }
 
-// Country difficulty for the requested level; 0 = mixed.
-export function byLevel(ids, difficulty, getD = id => geo.countries[id]?.d || 2, min = 6) {
+// Fame, not size: geo `d` alone made Chad and Mauritania "easy" and Spain "medium". FAMOUS = the countries pack's
+// difficulty-1 list (plus Greenland); a famous but tiny country stays medium. Kids get only KIDS_EASY.
+export const FAMOUS = new Set('ARG AUS AUT BEL BRA CAN CHL CHN CUB DNK EGY FIN FRA DEU GRC ISL IND IRL ITA JAM JPN KEN MEX NLD NZL NGA NOR PER POL PRT RUS ZAF KOR ESP SWE CHE THA TUR GBR USA GRL'.split(' '));
+export const KIDS_EASY = new Set('USA CAN MEX BRA ARG GRL GBR FRA ITA ESP RUS CHN IND JPN AUS EGY ZAF'.split(' '));
+export function countryLevel(id) {
+  const d = geo.countries[id]?.d || 2;
+  if (FAMOUS.has(id)) return d === 3 ? 2 : 1;
+  return d === 1 ? 2 : d;
+}
+
+// Country difficulty for the requested level; 0 = mixed. Kids: the KIDS_EASY countries when the view has enough.
+export function byLevel(ids, difficulty, getD = countryLevel, min = 6, kids = false) {
+  if (kids) { const l = ids.filter(id => KIDS_EASY.has(id)); if (l.length >= Math.min(min, 5)) return l; difficulty = 1; }
   if (!difficulty) return ids;
   const bands = difficulty === 1 ? [[1], [1, 2]] : difficulty === 2 ? [[1, 2], [1, 2, 3]] : [[3, 2], [1, 2, 3]];
   for (const b of bands) { const l = ids.filter(id => b.includes(getD(id))); if (l.length >= min) return l; }

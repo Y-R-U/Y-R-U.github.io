@@ -1,10 +1,10 @@
-import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610111253';
-import { loadCities, geo as G } from '../data.js?v=202610111253';
-import { haversineKm } from '../proj.js?v=202610111253';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610130349';
+import { loadCities, geo as G } from '../data.js?v=202610130349';
+import { haversineKm } from '../proj.js?v=202610130349';
 import {
   geo, countryIds, regionMembers, REGIONS, STATE_VIEWS, createMap, frame, message, isKids, cname, regionForCountry,
   REGION_CHOICES, REGION_LABELS, refFor, supportsGeo, byLevel,
-} from './common.js?v=202610111253';
+} from './common.js?v=202610130349';
 
 await loadCities();
 
@@ -76,7 +76,7 @@ export default register({
     const kids = !!(opts.kids || kidsArg), level = kids ? 1 : difficulty || 0;
     const region = REGIONS[opts.region] ? opts.region : 'world';
     const members = region === 'world' ? countryIds() : regionMembers(region);
-    const isos = byLevel(members.filter(iso => (G.cities.c[iso] || []).length >= 4), level, undefined, 6);
+    const isos = byLevel(members.filter(iso => (G.cities.c[iso] || []).length >= 4), level, undefined, 6, kids);
     const states = Object.entries(geo.states).filter(([iso]) => members.includes(iso))
       .flatMap(([iso, S]) => Object.keys(S.s).filter(sid => (G.cities.s[sid] || []).length >= 4).map(sid => [iso, sid]));
     const scope = opts.scope || 'countries';

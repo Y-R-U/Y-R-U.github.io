@@ -1,7 +1,7 @@
-import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610111253';
-import { geo, countryIds, isPlayable, REGIONS, createMap, frame, message, button, isKids, cname, theName, byLevel, refFor, supportsGeo, bboxUnion, plural } from './common.js?v=202610111253';
-import { makeProjection, projectedBox, haversineKm } from '../proj.js?v=202610111253';
-import { regionFor } from '../regions.js?v=202610111253';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610130349';
+import { geo, countryIds, isPlayable, REGIONS, createMap, frame, message, button, isKids, cname, theName, byLevel, refFor, supportsGeo, bboxUnion, plural } from './common.js?v=202610130349';
+import { makeProjection, projectedBox, haversineKm } from '../proj.js?v=202610130349';
+import { regionFor } from '../regions.js?v=202610130349';
 
 // Borders that surprise people, explained on the reveal.
 const NOTES = {
@@ -152,7 +152,7 @@ export function poolFor(kind, level) {
   else if (kind === 'count') p = ids.filter(id => countable(id) && nbOf(id).length <= COUNT_MAX[level]);
   else if (kind === 'tap1') return (pools[key] = ids.filter(id => kidsOK(id) && geo.countries[id].d <= 2));
   else { const max = level === 1 ? 6 : level === 2 ? 9 : 15; p = ids.filter(id => { const n = nbOf(id).length; return n >= 2 && n <= max && (level >= 3 || id !== 'FRA'); }); }
-  return (pools[key] = byLevel(p, level, undefined, kind === 'tap1' ? 4 : 10));
+  return (pools[key] = byLevel(p, level, id => geo.countries[id]?.d || 2, kind === 'tap1' ? 4 : 10));
 }
 
 export default register({

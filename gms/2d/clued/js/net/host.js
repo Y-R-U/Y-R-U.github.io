@@ -1,25 +1,25 @@
 // Host setup (server rooms and device rooms): a list of rounds (＋ Add round → ♥ favourite or format → themes),
 // 10 questions each by default, plus the room-wide settings (answer time, gap, private/public, auto-start).
-import { h } from '../ui/kit.js?v=202610111253';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610111253';
-import { toast } from '../ui/popup.js?v=202610111253';
-import { getSets, saveSetPrompt, pickSet, copyRounds } from './sets.js?v=202610111253';
-import { getFormat, defaultOpts } from '../formats/registry.js?v=202610111253';
-import { getSettings, getLast, read, write } from '../core/store.js?v=202610111253';
-import { makeSpec } from '../core/spec.js?v=202610111253';
-import { randomSeed } from '../core/rng.js?v=202610111253';
-import { prepare } from '../structures/session.js?v=202610111253';
-import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610111253';
-import { rooms, friendly } from './api.js?v=202610111253';
-import { rememberName, tidyName } from './ident.js?v=202610111253';
-import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610111253';
-import { timingPanel, choiceChips } from './board.js?v=202610111253';
-import { streakOption } from '../ui/streakopt.js?v=202610111253';
-import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610111253';
-import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610111253';
-import { ensureFormats } from './room.js?v=202610111253';
-import { nameField } from './join.js?v=202610111253';
-import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610111253';
+import { h } from '../ui/kit.js?v=202610130349';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610130349';
+import { toast } from '../ui/popup.js?v=202610130349';
+import { saveSetPrompt, pickSet, copyRounds } from './sets.js?v=202610130349';
+import { getFormat, defaultOpts } from '../formats/registry.js?v=202610130349';
+import { getSettings, getLast, read, write } from '../core/store.js?v=202610130349';
+import { makeSpec } from '../core/spec.js?v=202610130349';
+import { randomSeed } from '../core/rng.js?v=202610130349';
+import { prepare } from '../structures/session.js?v=202610130349';
+import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610130349';
+import { rooms, friendly } from './api.js?v=202610130349';
+import { rememberName, tidyName } from './ident.js?v=202610130349';
+import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610130349';
+import { timingPanel, choiceChips } from './board.js?v=202610130349';
+import { streakOption } from '../ui/streakopt.js?v=202610130349';
+import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610130349';
+import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610130349';
+import { ensureFormats } from './room.js?v=202610130349';
+import { nameField } from './join.js?v=202610130349';
+import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610130349';
 
 const KEY = 'clued.online';   // { rounds, kidsRounds }: the last hosted round list, per mode
 const MAX_ROUNDS = 8;
@@ -92,9 +92,8 @@ defineScreen('host', async (el, params, cur) => {
   const setBar = h('div.set-bar');
   body.append(h('div', {}, h('div.rounds-head', {}, h('h3.sec-title', {}, 'Rounds'), sum), setBar, list));
   function drawSetBar() {
-    const n = getSets(kids).length;
     setBar.replaceChildren(
-      n ? h('button.btn.small', { type: 'button', dataset: { act: 'sets-load' }, onclick: async () => {
+      h('button.btn.small', { type: 'button', dataset: { act: 'sets-load' }, onclick: async () => {
         const set = await pickSet(kids);
         if (set) {
           S.rounds = copyRounds(set.rounds).filter(r => getFormat(r.format));
@@ -105,7 +104,7 @@ defineScreen('host', async (el, params, cur) => {
           toast(`Loaded “${set.name}”`);
           go('host', { ...params, seeded: true }, { replace: true });   // re-render so the timing panel shows the set's times
         } else drawSetBar();
-      } }, `📂 Saved sets (${n})`) : null,
+      } }, '📂 Sets'),
       h('button.btn.small', { type: 'button', dataset: { act: 'sets-save' }, onclick: async () => {
         const nm = await saveSetPrompt({ kids, rounds: S.rounds, timing: S.timing, name: S.setName || '' });
         if (!nm) return;

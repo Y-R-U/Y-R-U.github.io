@@ -1,8 +1,8 @@
-import { register, collect, pick } from '../../formats/registry.js?v=202610111253';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610130349';
 import {
   geo, countryIds, regionMembers, REGIONS, STATE_VIEWS, createMap, frame, message, revealCard, isKids, cname, byLevel,
-  stateDifficulty, REGION_CHOICES, REGION_LABELS, STATE_CHOICES, STATE_LABELS, refFor, supportsGeo, theName,
-} from './common.js?v=202610111253';
+  stateDifficulty, REGION_CHOICES, REGION_LABELS, STATE_CHOICES, STATE_LABELS, refFor, supportsGeo, theName, regionForCountry, isPlayable,
+} from './common.js?v=202610130349';
 
 const EASY_STATES = ['USA', 'CAN', 'AUS', 'BRA', 'IND', 'GBR', 'DEU', 'ITA', 'ESP', 'FRA', 'MEX', 'CHN', 'JPN'];
 
@@ -26,6 +26,7 @@ export default register({
   options: [
     { key: 'region', label: 'Map', type: 'choice', values: [...REGION_CHOICES, 'states'], labels: [...REGION_LABELS, 'States & provinces'], default: 'world' },
     { key: 'country', label: 'States of', type: 'choice', values: STATE_CHOICES, labels: STATE_LABELS, default: 'any' },
+    { key: 'ask', label: 'Question', type: 'choice', values: ['tap', 'name'], labels: ['Tap the country', 'Name the highlighted one'], default: 'tap', showIf: o => o.region !== 'states' },
   ],
   supports: supportsGeo, packless: true,
   generate({ rng, packs = [], count, opts = {}, difficulty = 0, avoid, kids: kidsArg }) {
@@ -37,7 +38,10 @@ export default register({
     }
     const region = REGIONS[opts.region] ? opts.region : 'world';
     const members = region === 'world' ? countryIds() : regionMembers(region);
-    const pool = byLevel(members, level, undefined, Math.min(8, count));
+    if (opts.ask === 'name') return collect(count, () => nameQuestion(rng, byLevel(members, level, undefined, 8, kids), region, level, kids, packs), avoid);
+    // Greenland is a territory, never "a country", but "Tap Greenland" is one of the best-known shapes there is
+    if (region === 'world') members.push('GRL');
+    const pool = byLevel(members, level, undefined, Math.min(8, count), kids);
     return collect(count, () => {
       const iso = pick(rng, pool);
       return {
@@ -47,6 +51,7 @@ export default register({
     }, avoid);
   },
   render(el, q, api) {
+    if (q.data?.mode === 'name') return renderName(el, q, api);
     const kids = isKids(q, api);
     const easy = kids || q.data.level === 1;
     const ui = frame(el, { prompt: q.prompt });
@@ -54,6 +59,7 @@ export default register({
     let done = false;
     const map = createMap(ui.mapEl, {
       region: q.data.region, target: q.data.kind === 'state' ? 'states' : 'countries',
+      ...(q.answer === 'GRL' && q.data.region === 'world' ? { playable: id => id === 'GRL' || isPlayable(id) } : {}),
       style: easy && q.data.kind === 'country' ? 'continents' : 'plain', bigTargets: easy, dots: !easy, portraitZoom: !easy,
       onTap(hit) {
         if (done) return;
@@ -93,3 +99,58 @@ export default register({
 });
 
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+// "Which country is highlighted?": wrong answers come from the same pool, same continent first.
+function nameQuestion(rng, pool, region, level, kids, packs) {
+  if (pool.length < 4) return null;
+  const iso = pick(rng, pool), cont = geo.countries[iso].c;
+  const others = pool.filter(x => x !== iso);
+  const near = shuffle(rng, others.filter(x => geo.countries[x].c === cont));
+  const wrong = [...near, ...shuffle(rng, others.filter(x => !near.includes(x)))].slice(0, kids ? 2 : 3);
+  const opts = shuffle(rng, [iso, ...wrong]);
+  return {
+    format: 'map-click', id: `map-click:name:${iso}`, prompt: 'Which country is highlighted?',
+    options: opts.map(id => ({ text: cname(id) })), answer: opts.indexOf(iso), answerText: cname(iso),
+    refs: refFor(packs, iso), data: { region: region === 'world' ? regionForCountry(iso) : region, kind: 'country', mode: 'name', iso, name: cname(iso), level, kids },
+  };
+}
+
+function renderName(el, q, api) {
+  const kids = isKids(q, api);
+  const iso = q.data.iso;
+  const ui = frame(el, { prompt: q.prompt });
+  let done = false;
+  const map = createMap(ui.mapEl, { region: q.data.region, target: 'none', interactive: false, dotFor: [iso], bigTargets: true, padding: 6, portraitZoom: false });
+  map.ready.then(() => { if (!done) map.setState(iso, 'target pulse'); });
+  const grid = document.createElement('div');
+  grid.className = 'gmq-big' + (q.options.length === 3 ? ' n3' : '');
+  const btns = q.options.map((o, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.style.background = '#fff6dc';
+    b.textContent = o.text ?? '';
+    b.addEventListener('click', () => finish(i));
+    grid.append(b);
+    return b;
+  });
+  ui.foot.append(grid);
+  function finish(i) {
+    if (done) return;
+    done = true;
+    const correct = i === q.answer;
+    btns.forEach((b, k) => { b.disabled = true; if (k === q.answer) b.classList.add('ok'); else if (k === i) b.classList.add('bad'); });
+    map.ready.then(() => { map.setState(iso, 'target'); map.label(iso, q.answerText); });
+    message(ui.foot, correct ? (kids ? `Yes! It's ${q.answerText}! 🎉` : `Correct, ${q.answerText}.`) : `It's ${q.answerText}.`, correct);
+    ui.foot.append(revealCard(iso, kids));
+    if (i != null) api.answer({ correct, given: i });
+  }
+  return {
+    map, destroy: () => map.destroy(),
+    timeout() { finish(null); },
+    choose(x) { finish(x === 'correct' ? q.answer : (q.answer + 1) % q.options.length); },
+    eliminate(k = 2) {
+      const wrong = btns.map((b, i) => i).filter(i => i !== q.answer && !btns[i].disabled);
+      for (const i of shuffle(Math.random, wrong).slice(0, Math.min(k, wrong.length - 1))) { btns[i].disabled = true; btns[i].classList.add('bad'); }
+    },
+  };
+}

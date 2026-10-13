@@ -1,7 +1,7 @@
 // Apple connectivity probe, only while remote debug logging is on (docs/notes/APPLEPROXY.md "Reading the probe").
 // Runs at the start of a music round and logs, tag `probe`, what this device can and can't reach.
-import { dlog, debugOn } from '../core/debuglog.js?v=202610111253';
-import { proxyUrl } from './applenet.js?v=202610111253';
+import { dlog, debugOn } from '../core/debuglog.js?v=202610130349';
+import { proxyUrl } from './applenet.js?v=202610130349';
 
 const G = globalThis;
 const LOOKUP = 'https://itunes.apple.com/lookup?id=1444065075';

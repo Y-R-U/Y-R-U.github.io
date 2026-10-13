@@ -1,8 +1,8 @@
-import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610111253';
-import { geo, countryIds, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, CONTINENTS, loadFlags } from './common.js?v=202610111253';
-import { loadCities, geo as G } from '../data.js?v=202610111253';
-import { CONTINENT_FILL } from '../style.js?v=202610111253';
-import { LAT, LON, STEP, CODES as BAND_CODES } from '../bands.js?v=202610111253';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610130349';
+import { geo, countryIds, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, CONTINENTS, loadFlags } from './common.js?v=202610130349';
+import { loadCities, geo as G } from '../data.js?v=202610130349';
+import { CONTINENT_FILL } from '../style.js?v=202610130349';
+import { LAT, LON, STEP, CODES as BAND_CODES } from '../bands.js?v=202610130349';
 
 await loadCities();
 
@@ -86,7 +86,7 @@ export default register({
     const n = kids ? 3 : +opts.answers === 3 ? 3 : 6;
     const what = opts.what || (kids ? 'countries' : 'mix');
     const showMap = kids || opts.map !== 'no';
-    const countries = byLevel(countryIds().filter(plainCountry), level, undefined, 12);
+    const countries = byLevel(countryIds().filter(plainCountry), level, undefined, 12, kids);
     const maxFame = level === 1 ? 1 : level ? 2 : 3;
     const cities = cityPool().filter(c => c.fame <= maxFame);
     const buttons = c => (n === 6 ? CODES.slice() : shuffle(rng, [c, ...shuffle(rng, CODES.filter(x => x !== c)).slice(0, n - 1)]));
