@@ -267,8 +267,11 @@ html, body {
 .corner.tr, #pauseBtn { right: calc(max(10px, env(safe-area-inset-right)) + var(--br8t-account-space, 0px)); }
 /* The shared account button sits over the HP labels, and nobody needs it mid-fight. */
 body.fighting #br8t-account { visibility: hidden; }
+/* Panels keep both sides clear of it so its corner never covers a close X (symmetric, so they stay centred). */
+.panel-screen.show { padding-inline: calc(max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) + var(--br8t-account-space, 0px)); }
 /* Rotated portrait puts the screen's top-right corner at the app's top-left. */
 @media (orientation: portrait) and (max-width: 860px) {
+  .panel-screen.show { padding-inline: calc(max(10px, env(safe-area-inset-top)) + var(--br8t-account-space, 0px)); }
   .corner.tr, #pauseBtn { right: max(10px, env(safe-area-inset-right)); }
   .corner.tl { left: calc(max(10px, env(safe-area-inset-left)) + var(--br8t-account-space, 0px)); }
 }
