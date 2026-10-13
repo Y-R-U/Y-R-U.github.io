@@ -1,15 +1,16 @@
 // Round lists shared by the pub quiz builder and the online host setup: round cards (edit/remove/reorder),
 // the "add a round" picker (♥ favourites first, then formats) and the round editor screen ('pqround').
-import { defineScreen, go, back, header } from '../ui/app.js?v=202610130349';
-import { h } from '../ui/kit.js?v=202610130349';
-import { popup, toast } from '../ui/popup.js?v=202610130349';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610130349';
-import { getIndex } from '../core/packs.js?v=202610130349';
-import { supportedPackIds } from '../core/spec.js?v=202610130349';
-import { getSettings, getFavs } from '../core/store.js?v=202610130349';
-import { cleanFav, favKey, favLabel } from '../ui/favmodel.js?v=202610130349';
-import { optionsPanel } from '../ui/setup.js?v=202610130349';
-import { sfx } from '../ui/fx.js?v=202610130349';
+import { defineScreen, go, back, header } from '../ui/app.js?v=202610130524';
+import { h } from '../ui/kit.js?v=202610130524';
+import { popup, toast } from '../ui/popup.js?v=202610130524';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610130524';
+import { getIndex } from '../core/packs.js?v=202610130524';
+import { supportedPackIds } from '../core/spec.js?v=202610130524';
+import { getSettings, getFavs } from '../core/store.js?v=202610130524';
+import { cleanFav, favKey, favLabel } from '../ui/favmodel.js?v=202610130524';
+import { optionsPanel } from '../ui/setup.js?v=202610130524';
+import { sfx } from '../ui/fx.js?v=202610130524';
+import { mySetting } from '../core/local.js?v=202610130524';
 
 const CSS = `
 .round-card.rc { grid-template-columns: 44px minmax(0, 1fr) auto; cursor: pointer; }
@@ -146,7 +147,7 @@ export function moveItem(list, i, dir) {
   return true;
 }
 
-// Round lists by id: { get() -> rounds (mutable), save(), count (default questions), max, kids? }
+// Round lists by id: { get() -> rounds (mutable), save(), count (default questions), max, kids?, local?() -> focus setting }
 // Function declarations so pubquiz.js can register during an import cycle (setup → structures → pubquiz → here).
 export function registerRoundList(id, def) { lists()[id] = def; }
 function lists() { return (lists.m ||= {}); }
@@ -186,7 +187,7 @@ defineScreen('pqround', (el, { idx = -1, format, list = 'pub', title: draftTitle
   const body = h('div', { style: { marginTop: '12px' } });
   el.append(body);
   const same = cur && cur.format === fmt.id;
-  const panel = optionsPanel(body, fmt, { kids, showTimer: false,
+  const panel = optionsPanel(body, fmt, { kids, showTimer: false, local: L.local || mySetting,
     last: same ? { packs: cur.packs, count: cur.count, opts: cur.opts, difficulty: cur.difficulty } : { count: cur?.count || L.count || 10 } });
   el.append(h('div.start-bar', {}, h('button.btn.go.big.wide', {
     type: 'button', dataset: { act: 'save-round' }, onclick: () => {

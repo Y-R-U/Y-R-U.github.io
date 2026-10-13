@@ -1,16 +1,18 @@
 // Format grid + per-game setup (themes, count, options, difficulty, timer).
-import { h } from './kit.js?v=202610130349';
-import { defineScreen, go, header } from './app.js?v=202610130349';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610130349';
-import { getIndex } from '../core/packs.js?v=202610130349';
-import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610130349';
-import { getSettings, setSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610130349';
-import { streakOption } from './streakopt.js?v=202610130349';
-import { themePicker } from './picker.js?v=202610130349';
-import { STRUCTURES } from '../structures/index.js?v=202610130349';
-import { sfx } from './fx.js?v=202610130349';
-import { favControls } from './favs.js?v=202610130349';
-import { favKey } from './favmodel.js?v=202610130349';
+import { h } from './kit.js?v=202610130524';
+import { defineScreen, go, header } from './app.js?v=202610130524';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610130524';
+import { getIndex } from '../core/packs.js?v=202610130524';
+import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610130524';
+import { getSettings, setSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610130524';
+import { streakOption } from './streakopt.js?v=202610130524';
+import { themePicker } from './picker.js?v=202610130524';
+import { STRUCTURES } from '../structures/index.js?v=202610130524';
+import { sfx } from './fx.js?v=202610130524';
+import { favControls } from './favs.js?v=202610130524';
+import { favKey } from './favmodel.js?v=202610130524';
+import { mySetting, saveMySetting, isOn } from '../core/local.js?v=202610130524';
+import { localChip, localLine } from './local.js?v=202610130524';
 
 export const DIFFS = [[0, 'Mixed'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']];
 
@@ -59,13 +61,15 @@ function switchEl(checked, onChange, label) {
 }
 
 // Builds the option panel for one format, with favourite picks (quick picks above, ♥ save control below).
-export function optionsPanel(host, fmt, { structure = 'quick', last = null, showCount = true, showTimer = true, showDifficulty = true, kids = false, favs = true } = {}) {
+// local: () => the local focus setting for the picker's 📍 counts; onChange(value) after any change.
+export function optionsPanel(host, fmt, { structure = 'quick', last = null, showCount = true, showTimer = true, showDifficulty = true, kids = false, favs = true, local = null, onChange = null } = {}) {
   const s = getSettings();
   const index = getIndex();
   let v, picker;
   const wrap = h('div.opt-wrap');
   let fav = null;
-  const changed = () => fav && fav.refresh();
+  let ready = false;
+  const changed = () => { fav && fav.refresh(); if (ready && onChange) onChange(); };
 
   function build(last) {
     wrap.replaceChildren();
@@ -78,7 +82,7 @@ export function optionsPanel(host, fmt, { structure = 'quick', last = null, show
     };
     picker = fmt.packless
       ? (wrap.append(h('div.panel.picker', {}, h('div.theme-sum', {}, h('span.ts-ico', {}, '🗺️'), h('span.ts-txt', {}, h('b', {}, 'Built-in world map'), h('small', {}, 'Natural Earth borders, no theme to pick'))))), { value: () => 'all' })
-      : themePicker(wrap, { fmt, selected: v.packs, kids, onChange: p => { v.packs = p; changed(); } });
+      : themePicker(wrap, { fmt, selected: v.packs, kids, local, onChange: p => { v.packs = p; changed(); } });
     const panel = h('div.panel', { style: { marginTop: '14px' } });
     if (showCount) {
       const custom = h('input.field.custom-n', { type: 'number', min: 3, max: 50, value: v.count, inputmode: 'numeric', 'aria-label': 'Custom count', hidden: [5, 10, 20].includes(v.count) });
@@ -151,6 +155,7 @@ export function optionsPanel(host, fmt, { structure = 'quick', last = null, show
     });
     host.append(fav.quick, wrap, fav.save);
   } else host.append(wrap);
+  ready = true;
   return {
     value: () => ({ format: fmt.id, packs: picker.value(), count: v.count, opts: { ...v.opts }, difficulty: kids ? 1 : v.difficulty, timer: v.timer, kids }),
     save: () => setLast(kids ? `${fmt.id}:kids` : fmt.id, { packs: picker.value(), count: v.count, opts: v.opts, difficulty: v.difficulty, timer: v.timer }),
@@ -166,11 +171,23 @@ defineScreen('setup', (el, { structure = 'quick', format = 'mc' }) => {
   el.append(h('div.setup-head', {}, h('span.fh-ico', {}, structure === 'ladder' ? '🪜' : fmt.icon),
     h('div', {}, h('h2', {}, structure === 'ladder' ? 'The Ladder' : fmt.title), h('p', {}, structure === 'ladder' ? '15 questions, easy to fiendish. 50:50, skip and hint once each.' : (st.blurb || fmt.blurb)))));
   const body = h('div');
-  el.append(body);
+  const loc = h('div.loc-bar');
+  el.append(loc, body);
+  let line = null;
+  const drawLoc = () => {
+    const l = mySetting();
+    const v = panel.value();
+    const next = isOn(l) && st.count !== false && !fmt.hidden ? localLine({ ...v, count: v.count }, l, { kids, count: v.count }) : null;
+    if (line) line.remove();
+    line = next;
+    if (line) loc.append(line);
+  };
   const panel = optionsPanel(body, fmt, {
-    structure, kids, last: getLast(kids ? `${fmt.id}:kids` : fmt.id),
+    structure, kids, last: getLast(kids ? `${fmt.id}:kids` : fmt.id), local: mySetting, onChange: () => drawLoc(),
     showCount: st.count !== false, showTimer: st.timer !== false, showDifficulty: st.difficulty !== false,
   });
+  loc.append(localChip(mySetting, next => saveMySetting(next), drawLoc));
+  drawLoc();
   const start = h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'start' } }, structure === 'quick' ? "Let's go!" : `Start ${st.title}`);
   start.addEventListener('click', () => {
     sfx('button');

@@ -1,10 +1,11 @@
 // Saved sets: named online round lists (+ answer time, gap, streak), per mode, synced with the br8t account.
-import { h } from '../ui/kit.js?v=202610130349';
-import { popup, confirmPop, toast } from '../ui/popup.js?v=202610130349';
-import { read, write, KEYS } from '../core/store.js?v=202610130349';
-import { getFormat } from '../formats/registry.js?v=202610130349';
-import { roundThemes } from '../structures/rounds.js?v=202610130349';
-import { getSuggested } from './suggested.js?v=202610130349';
+import { h } from '../ui/kit.js?v=202610130524';
+import { popup, confirmPop, toast } from '../ui/popup.js?v=202610130524';
+import { read, write, KEYS } from '../core/store.js?v=202610130524';
+import { getFormat } from '../formats/registry.js?v=202610130524';
+import { roundThemes } from '../structures/rounds.js?v=202610130524';
+import { getSuggested } from './suggested.js?v=202610130524';
+import { isOn, localLabel } from '../core/local.js?v=202610130524';
 
 export const MAX_SETS = 20;
 const total = rounds => rounds.reduce((n, r) => n + (r.count || 0), 0);
@@ -15,12 +16,12 @@ const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
 export const copyRounds = rounds => JSON.parse(JSON.stringify(rounds));
 
 // Same name in the same mode overwrites. Returns 'saved' | 'updated' | 'full'.
-export function saveSet(name, { kids, rounds, timing }) {
+export function saveSet(name, { kids, rounds, timing, local }) {
   const all = allSets();
   const list = all.filter(x => !(!!x.kids === kids && sameName(x.name, name)));
   const had = list.length < all.length;
   if (!had && getSets(kids).length >= MAX_SETS) return 'full';
-  list.push({ name, kids, rounds: copyRounds(rounds), timing: { ...(timing || {}) }, at: Date.now() });
+  list.push({ name, kids, rounds: copyRounds(rounds), timing: { ...(timing || {}) }, ...(local !== undefined ? { local } : {}), at: Date.now() });
   writeSets(list);
   return had ? 'updated' : 'saved';
 }
@@ -34,16 +35,16 @@ export async function askSetName(rounds, name = '') {
 }
 
 // Name prompt + save + toast. Resolves the saved name or null.
-export async function saveSetPrompt({ kids, rounds, timing, name = '' }) {
+export async function saveSetPrompt({ kids, rounds, timing, name = '', local }) {
   const nm = await askSetName(rounds, name);
   if (!nm) return null;
-  const res = saveSet(nm, { kids, rounds, timing });
+  const res = saveSet(nm, { kids, rounds, timing, local });
   if (res === 'full') { toast(`You can keep ${MAX_SETS} sets: delete one first`); return null; }
   toast(res === 'updated' ? `Updated “${nm}”` : `Saved “${nm}”`);
   return nm;
 }
 
-const roundsLine = set => `${set.rounds.length} round${set.rounds.length === 1 ? '' : 's'} · ${total(set.rounds)} questions${set.timing?.answerSec ? ` · ${set.timing.answerSec} s answers` : ''}`;
+const roundsLine = set => `${set.rounds.length} round${set.rounds.length === 1 ? '' : 's'} · ${total(set.rounds)} questions${set.timing?.answerSec ? ` · ${set.timing.answerSec} s answers` : ''}${isOn(set.local) ? ` · ${localLabel(set.local)}` : ''}`;
 const themesLine = (set, kids) => set.rounds.map(r => `${getFormat(r.format)?.icon || '❓'} ${r.title || roundThemes(r, kids)}`).join(' · ');
 
 // Popup with two tabs: Suggested (read-only, js/net/suggested.js) and My sets (tap to load, ✕ to delete).

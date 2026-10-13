@@ -1,27 +1,28 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=202610130349';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=202610130349';
-import { confirmPop, toast } from '../ui/popup.js?v=202610130349';
-import { sfx, confetti } from '../ui/fx.js?v=202610130349';
-import { createRunner } from '../structures/runner.js?v=202610130349';
-import { prepare, prepareFormats } from '../structures/session.js?v=202610130349';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610130349';
-import { urlsOf, preflight } from '../core/media.js?v=202610130349';
-import { randomSeed } from '../core/rng.js?v=202610130349';
-import { listFormats } from '../formats/registry.js?v=202610130349';
-import { loadFormats } from '../formats/index.js?v=202610130349';
-import { friendly } from './api.js?v=202610130349';
-import { getTransport } from './transport.js?v=202610130349';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610130349';
-import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610130349';
-import { streakOption } from '../ui/streakopt.js?v=202610130349';
-import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610130349';
-import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610130349';
-import { getFormat } from '../formats/registry.js?v=202610130349';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610130349';
-import { trackRoom } from '../core/stats.js?v=202610130349';
-import { cleanQuestion } from './sanitize.js?v=202610130349';
-import { saveSetPrompt } from './sets.js?v=202610130349';
+import { h, fmtNum } from '../ui/kit.js?v=202610130524';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610130524';
+import { confirmPop, toast } from '../ui/popup.js?v=202610130524';
+import { sfx, confetti } from '../ui/fx.js?v=202610130524';
+import { createRunner } from '../structures/runner.js?v=202610130524';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610130524';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610130524';
+import { urlsOf, preflight } from '../core/media.js?v=202610130524';
+import { randomSeed } from '../core/rng.js?v=202610130524';
+import { listFormats } from '../formats/registry.js?v=202610130524';
+import { loadFormats } from '../formats/index.js?v=202610130524';
+import { friendly } from './api.js?v=202610130524';
+import { getTransport } from './transport.js?v=202610130524';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610130524';
+import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610130524';
+import { streakOption } from '../ui/streakopt.js?v=202610130524';
+import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610130524';
+import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610130524';
+import { getFormat } from '../formats/registry.js?v=202610130524';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610130524';
+import { trackRoom } from '../core/stats.js?v=202610130524';
+import { cleanQuestion } from './sanitize.js?v=202610130524';
+import { saveSetPrompt } from './sets.js?v=202610130524';
+import { isOn, localLabel, loadNames } from '../core/local.js?v=202610130524';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;
@@ -47,6 +48,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   ensureStyles();
   setQuery(via === 'p2p' ? 'p2p' : 'join', code);
   await ensureFormats();
+  await loadNames();
   const ctx = { st: null, game: -1, run: null, view: '', waiters: [], qcache: new Map(), live: null, asking: null, wasHost: null, timers: new Set(), ended: false };
   const every = (fn, ms) => { const id = setInterval(fn, ms); ctx.timers.add(id); return id; };
 
@@ -152,7 +154,8 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       h('span.net-badge', {}, `${st.total} question${st.total === 1 ? '' : 's'}`),
       h('span.net-badge.diff', {}, st.p2p ? '📡 Device room' : st.public ? '🌍 Public' : '🔒 Private'),
       st.kids ? h('span.net-badge.kids', {}, '🧸 Kids game') : null,
-      !st.kids && st.difficulty ? h('span.net-badge.diff', {}, DIFF[st.difficulty] || '') : null].filter(Boolean));
+      !st.kids && st.difficulty ? h('span.net-badge.diff', {}, DIFF[st.difficulty] || '') : null,
+      isOn(st.spec?.local) ? h('span.net-badge.diff', { dataset: { badge: 'local' } }, localLabel(st.spec.local)) : null].filter(Boolean));
     r.count.textContent = `${st.players.length} player${st.players.length === 1 ? '' : 's'}`;
     r.players.replaceChildren(...st.players.map(p => h('span.net-player', { class: `${p.id === st.you.id ? 'me' : ''} ${p.online ? '' : 'off'}`, dataset: { id: p.id } },
       p.host ? h('span.crown', { title: 'Host' }, '👑') : null,
@@ -498,7 +501,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       return { format: r.format, packs: r.packs, count: r.count, opts, difficulty: r.difficulty || 0, ...(r.title ? { title: r.title } : {}) };
     });
     const title = /^\d+-round quiz$/.test(st.title || '') ? '' : st.title || '';
-    return { kids: !!st.kids, rounds, timing: { answerSec: st.answerSec, gapSec: st.gapSec, streak: st.spec.streak === 'on' }, name: title };
+    return { kids: !!st.kids, rounds, timing: { answerSec: st.answerSec, gapSec: st.gapSec, streak: st.spec.streak === 'on' }, name: title, local: isOn(st.spec.local) ? st.spec.local : null };
   }
 
   function showEndedLobby(st) {

@@ -1,8 +1,8 @@
-import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610130349';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610130524';
 import {
   geo, countryIds, regionMembers, REGIONS, STATE_VIEWS, createMap, frame, message, revealCard, isKids, cname, byLevel,
   stateDifficulty, REGION_CHOICES, REGION_LABELS, STATE_CHOICES, STATE_LABELS, refFor, supportsGeo, theName, regionForCountry, isPlayable,
-} from './common.js?v=202610130349';
+} from './common.js?v=202610130524';
 
 const EASY_STATES = ['USA', 'CAN', 'AUS', 'BRA', 'IND', 'GBR', 'DEU', 'ITA', 'ESP', 'FRA', 'MEX', 'CHN', 'JPN'];
 
@@ -141,7 +141,7 @@ function renderName(el, q, api) {
     btns.forEach((b, k) => { b.disabled = true; if (k === q.answer) b.classList.add('ok'); else if (k === i) b.classList.add('bad'); });
     map.ready.then(() => { map.setState(iso, 'target'); map.label(iso, q.answerText); });
     message(ui.foot, correct ? (kids ? `Yes! It's ${q.answerText}! 🎉` : `Correct, ${q.answerText}.`) : `It's ${q.answerText}.`, correct);
-    ui.foot.append(revealCard(iso, kids));
+    if (q.data.kind !== 'state') ui.foot.append(revealCard(iso, kids));   // local focus: "Which state is highlighted?" (js/core/localgeo.js)
     if (i != null) api.answer({ correct, given: i });
   }
   return {

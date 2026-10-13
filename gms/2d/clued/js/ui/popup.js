@@ -1,4 +1,4 @@
-import { h } from './kit.js?v=202610130349';
+import { h } from './kit.js?v=202610130524';
 
 let layer = null;
 const ensure = () => layer || (layer = document.getElementById('popups') || document.body.appendChild(h('div', { id: 'popups' })));

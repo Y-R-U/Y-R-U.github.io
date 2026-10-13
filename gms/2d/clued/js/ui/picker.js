@@ -1,8 +1,9 @@
 // Theme picker: "All" by default, or a Theme -> packs tree with multi-select. Packs that can't play this format are
 // hidden (and themes left empty); one quiet line at the bottom lists them, grouped by reason, for the curious.
-import { h } from './kit.js?v=202610130349';
-import { getIndex } from '../core/packs.js?v=202610130349';
-import { supportsPack, NOT_ENOUGH } from '../formats/registry.js?v=202610130349';
+import { h } from './kit.js?v=202610130524';
+import { getIndex } from '../core/packs.js?v=202610130524';
+import { supportsPack, NOT_ENOUGH } from '../formats/registry.js?v=202610130524';
+import { packLocalCount, isOn } from './local.js?v=202610130524';
 
 const shortWhy = (w, kids) => (w === NOT_ENOUGH ? (kids ? 'Not enough easy questions for this game yet' : 'Too few questions for this game yet') : w);
 
@@ -21,7 +22,8 @@ export function hiddenPacks(index, why, kids) {
   return [...groups].map(([reason, packs]) => ({ reason, packs })).sort((a, b) => b.packs.length - a.packs.length);
 }
 
-export function themePicker(host, { fmt, selected = 'all', kids = false, onChange = () => {} } = {}) {
+// local: () => the local focus setting; when it's on, each pack shows how many local questions it has (📍 N).
+export function themePicker(host, { fmt, selected = 'all', kids = false, local = null, onChange = () => {} } = {}) {
   const index = getIndex();
   let sel = selected === 'all' || !Array.isArray(selected) ? 'all' : new Set(selected);
   const why = id => {
@@ -98,7 +100,10 @@ export function themePicker(host, { fmt, selected = 'all', kids = false, onChang
           pt.checked ? s.add(id) : s.delete(id);
           set(s);
         });
-        list.append(h('label.pk', {}, pt, h('span', {}, info.icon || '•'), h('span.pk-name', {}, info.title)));
+        const lc = h('span.pk-loc', { dataset: { pack: id } });
+        list.append(h('label.pk', {}, pt, h('span', {}, info.icon || '•'), h('span.pk-name', {}, info.title), lc));
+        const l = local?.();
+        if (fmt && isOn(l)) packLocalCount(fmt, id, l, { kids }).then(n => { lc.textContent = n ? `📍 ${n >= 60 ? '60+' : n}` : ''; lc.dataset.n = String(n); });
       }
       box.append(list);
       tree.append(box);

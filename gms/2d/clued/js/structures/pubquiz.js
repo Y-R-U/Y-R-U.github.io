@@ -1,19 +1,21 @@
 // Pub quiz: 4–8 rounds of different formats/themes, one double-points joker per player, builder or "surprise me".
-import { playSpec } from './session.js?v=202610130349';
-import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610130349';
-import { handoff } from './handoff.js?v=202610130349';
-import { playersEditor } from './party.js?v=202610130349';
-import { defineScreen, go, header } from '../ui/app.js?v=202610130349';
-import { h, esc, fmtNum } from '../ui/kit.js?v=202610130349';
-import { toast } from '../ui/popup.js?v=202610130349';
-import { getFormat, defaultOpts } from '../formats/registry.js?v=202610130349';
-import { getIndex } from '../core/packs.js?v=202610130349';
-import { getSettings, setSettings, read, write, getFavs } from '../core/store.js?v=202610130349';
-import { streakOption } from '../ui/streakopt.js?v=202610130349';
-import { cleanFav, favKey } from '../ui/favmodel.js?v=202610130349';
-import { roundTitle, usable, roundCard, moveItem, registerRoundList, addRound } from './rounds.js?v=202610130349';
-import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610130349';
-import { sfx } from '../ui/fx.js?v=202610130349';
+import { playSpec } from './session.js?v=202610130524';
+import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610130524';
+import { mySetting, saveMySetting, specLocal } from '../core/local.js?v=202610130524';
+import { localChip, localLine, localTotal } from '../ui/local.js?v=202610130524';
+import { handoff } from './handoff.js?v=202610130524';
+import { playersEditor } from './party.js?v=202610130524';
+import { defineScreen, go, header } from '../ui/app.js?v=202610130524';
+import { h, esc, fmtNum } from '../ui/kit.js?v=202610130524';
+import { toast } from '../ui/popup.js?v=202610130524';
+import { getFormat, defaultOpts } from '../formats/registry.js?v=202610130524';
+import { getIndex } from '../core/packs.js?v=202610130524';
+import { getSettings, setSettings, read, write, getFavs } from '../core/store.js?v=202610130524';
+import { streakOption } from '../ui/streakopt.js?v=202610130524';
+import { cleanFav, favKey } from '../ui/favmodel.js?v=202610130524';
+import { roundTitle, usable, roundCard, moveItem, registerRoundList, addRound } from './rounds.js?v=202610130524';
+import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610130524';
+import { sfx } from '../ui/fx.js?v=202610130524';
 
 const KEY = 'clued.pubquiz';
 const MAX_ROUNDS = 8;
@@ -25,7 +27,7 @@ function state() {
   return S;
 }
 const save = () => write(KEY, { rounds: S.rounds, players: S.players });
-registerRoundList('pub', { get: () => state().rounds, save: () => { state(); save(); }, count: 6 });
+registerRoundList('pub', { get: () => state().rounds, save: () => { state(); save(); }, count: 6, local: mySetting });
 
 // The first round of each format uses one of the player's saved favourites for it, if any (packs, options, difficulty).
 // A round's own preset options (Picture round = pictures) win, and the final keeps its difficulty.
@@ -96,7 +98,9 @@ defineScreen('pubquiz', el => {
     h('button.btn', { type: 'button', dataset: { act: 'kids-preset' }, onclick: () => { s.rounds = surprise(randomSeed(), true); s.jokers = {}; save(); draw(); } }, '🧸 Kids quiz'));
   const list = h('div.rounds');
   const playersBox = h('div.panel');
-  el.append(top, h('div.sec-title', {}, 'Rounds'), list, h('div.sec-title', {}, 'Players or teams'), playersBox);
+  const locSum = h('p.rounds-sum', { dataset: { loc: 'total' } });
+  const locBar = h('div.loc-bar', {}, localChip(mySetting, next => saveMySetting(next), () => draw()), locSum);
+  el.append(top, h('div.sec-title', {}, 'Rounds'), locBar, list, h('div.sec-title', {}, 'Players or teams'), playersBox);
   const ed = playersEditor(playersBox, s.players, { min: 1, max: 8, kidsToggle: false });
   playersBox.addEventListener('input', () => { s.players = ed.players(); save(); drawJokers(); });
   playersBox.addEventListener('click', () => setTimeout(() => { s.players = ed.players(); save(); draw(); }, 0));
@@ -115,9 +119,12 @@ defineScreen('pubquiz', el => {
   }
   function draw() {
     list.innerHTML = '';
+    const loc = mySetting(), mult = Math.max(1, s.players.length);
+    localTotal(locSum, s.rounds, loc, { kids, mult });
     s.rounds.forEach((r, i) => {
       list.append(roundCard(r, {
-        i, n: s.rounds.length, extra: h('div.jokers', { dataset: { r: String(i) } }),
+        i, n: s.rounds.length, extra: h('div', {}, localLine(r, loc, { kids, count: (r.count || 6) * mult,
+          onKeep: () => { r.localOk = true; save(); draw(); }, onChange: () => go('pqround', { idx: i, format: r.format, list: 'pub' }) }), h('div.jokers', { dataset: { r: String(i) } })),
         onEdit: () => go('pqround', { idx: i, format: r.format, list: 'pub' }),
         onRemove: () => { s.rounds.splice(i, 1); s.jokers = {}; save(); draw(); },
         onMove: dir => { if (moveItem(s.rounds, i, dir)) { s.jokers = {}; save(); draw(); } },
@@ -144,7 +151,7 @@ defineScreen('pubquiz', el => {
 
 function startQuiz(rounds, players, jokers, kids) {
   const n = players.length;
-  const spec = makeSpec('pubquiz', rounds.map(r => ({ format: r.format, packs: r.packs, count: r.count * n, opts: r.opts, difficulty: r.difficulty })), randomSeed(), { kids });
+  const spec = makeSpec('pubquiz', rounds.map(r => ({ format: r.format, packs: r.packs, count: r.count * n, opts: r.opts, difficulty: r.difficulty })), randomSeed(), { kids, local: specLocal(mySetting()) });
   const pos = [];
   playSpec(spec, {
     title: 'Pub quiz', players, replay: () => startQuiz(rounds, players, jokers, kids),

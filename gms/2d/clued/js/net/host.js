@@ -1,25 +1,27 @@
 // Host setup (server rooms and device rooms): a list of rounds (＋ Add round → ♥ favourite or format → themes),
 // 10 questions each by default, plus the room-wide settings (answer time, gap, private/public, auto-start).
-import { h } from '../ui/kit.js?v=202610130349';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610130349';
-import { toast } from '../ui/popup.js?v=202610130349';
-import { saveSetPrompt, pickSet, copyRounds } from './sets.js?v=202610130349';
-import { getFormat, defaultOpts } from '../formats/registry.js?v=202610130349';
-import { getSettings, getLast, read, write } from '../core/store.js?v=202610130349';
-import { makeSpec } from '../core/spec.js?v=202610130349';
-import { randomSeed } from '../core/rng.js?v=202610130349';
-import { prepare } from '../structures/session.js?v=202610130349';
-import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610130349';
-import { rooms, friendly } from './api.js?v=202610130349';
-import { rememberName, tidyName } from './ident.js?v=202610130349';
-import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610130349';
-import { timingPanel, choiceChips } from './board.js?v=202610130349';
-import { streakOption } from '../ui/streakopt.js?v=202610130349';
-import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610130349';
-import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610130349';
-import { ensureFormats } from './room.js?v=202610130349';
-import { nameField } from './join.js?v=202610130349';
-import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610130349';
+import { h } from '../ui/kit.js?v=202610130524';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610130524';
+import { toast } from '../ui/popup.js?v=202610130524';
+import { saveSetPrompt, pickSet, copyRounds } from './sets.js?v=202610130524';
+import { getFormat, defaultOpts } from '../formats/registry.js?v=202610130524';
+import { getSettings, getLast, read, write } from '../core/store.js?v=202610130524';
+import { makeSpec } from '../core/spec.js?v=202610130524';
+import { randomSeed } from '../core/rng.js?v=202610130524';
+import { prepare } from '../structures/session.js?v=202610130524';
+import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610130524';
+import { rooms, friendly } from './api.js?v=202610130524';
+import { rememberName, tidyName } from './ident.js?v=202610130524';
+import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610130524';
+import { timingPanel, choiceChips } from './board.js?v=202610130524';
+import { streakOption } from '../ui/streakopt.js?v=202610130524';
+import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610130524';
+import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610130524';
+import { ensureFormats } from './room.js?v=202610130524';
+import { nameField } from './join.js?v=202610130524';
+import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610130524';
+import { mySetting, saveMySetting, specLocal, resolveLocal } from '../core/local.js?v=202610130524';
+import { localChip, localLine, localTotal, localReady } from '../ui/local.js?v=202610130524';
 
 const KEY = 'clued.online';   // { rounds, kidsRounds }: the last hosted round list, per mode
 const MAX_ROUNDS = 8;
@@ -34,7 +36,7 @@ function hostState() {
   HS = { kids, rounds: Array.isArray(list) ? list.filter(r => r && typeof r.format === 'string') : [], name: '',
     // New rooms default to streaks "just for show": the quicker correct answer always scores more (TIMING.md);
     // the host's last choice is remembered.
-    timing: { answerSec: kids ? 20 : 10, gapSec: 5, streak: saved.streak === true }, vis: { public: false, startIn: 120 } };
+    timing: { answerSec: kids ? 20 : 10, gapSec: 5, streak: saved.streak === true }, vis: { public: false, startIn: 120 }, local: null };
   return HS;
 }
 function saveHost() {
@@ -42,7 +44,7 @@ function saveHost() {
   saved[HS.kids ? 'kidsRounds' : 'rounds'] = HS.rounds;
   write(KEY, saved);
 }
-registerRoundList('online', { get: () => hostState().rounds, save: saveHost, count: COUNT });
+registerRoundList('online', { get: () => hostState().rounds, save: saveHost, count: COUNT, local: () => hostState().local });
 
 function defaultRound(kids, format = 'mc') {
   const fmt = getFormat(format) || getFormat('mc') || usable(kids)[0];
@@ -65,7 +67,9 @@ defineScreen('host', async (el, params, cur) => {
   const { format, spec: given, title: givenTitle, via = 'server' } = params;
   ensureStyles();
   await ensureFormats();
+  await localReady;
   const S = hostState();
+  if (!S.local) S.local = mySetting();
   const kids = S.kids;
   if (!params.seeded) {
     params.seeded = true;   // params live on the back stack: seed once, not on every return from the round editor
@@ -88,9 +92,12 @@ defineScreen('host', async (el, params, cur) => {
   body.append(statusNote, h('div.panel.net-form', {}, h('label', {}, 'Your name'), name));
 
   const sum = h('p.rounds-sum');
+  const locSum = h('span.loc-sum', { dataset: { loc: 'total' } });
   const list = h('div.rounds', { dataset: { list: 'online' } });
   const setBar = h('div.set-bar');
-  body.append(h('div', {}, h('div.rounds-head', {}, h('h3.sec-title', {}, 'Rounds'), sum), setBar, list));
+  // the room's local focus is the host's choice; editing it here also becomes the host's own setting
+  const locChip = localChip(() => S.local, next => { S.local = saveMySetting(next); }, () => draw());
+  body.append(h('div', {}, h('div.rounds-head', {}, h('h3.sec-title', {}, 'Rounds'), sum), setBar, h('div.loc-bar', {}, locChip), list));
   function drawSetBar() {
     setBar.replaceChildren(
       h('button.btn.small', { type: 'button', dataset: { act: 'sets-load' }, onclick: async () => {
@@ -99,6 +106,7 @@ defineScreen('host', async (el, params, cur) => {
           S.rounds = copyRounds(set.rounds).filter(r => getFormat(r.format));
           if (!S.rounds.length) S.rounds.push(defaultRound(kids));
           Object.assign(S.timing, set.timing || {});
+          if (set.local !== undefined) S.local = resolveLocal(set.local || { level: 'off' });
           S.setName = set.name;
           saveHost();
           toast(`Loaded “${set.name}”`);
@@ -106,19 +114,24 @@ defineScreen('host', async (el, params, cur) => {
         } else drawSetBar();
       } }, '📂 Sets'),
       h('button.btn.small', { type: 'button', dataset: { act: 'sets-save' }, onclick: async () => {
-        const nm = await saveSetPrompt({ kids, rounds: S.rounds, timing: S.timing, name: S.setName || '' });
+        const nm = await saveSetPrompt({ kids, rounds: S.rounds, timing: S.timing, name: S.setName || '', local: specLocal(S.local) || null });
         if (!nm) return;
         S.setName = nm;
         drawSetBar();
       } }, '💾 Save set'),
-      S.setName ? h('span.set-name', {}, S.setName) : null);
+      ...(S.setName ? [h('span.set-name', {}, S.setName)] : []));
   }
   drawSetBar();
   function draw() {
     const n = S.rounds.length;
     sum.textContent = `${n} round${n === 1 ? '' : 's'} · ${total(S.rounds)} questions${total(S.rounds) > MAX_QUESTIONS ? ` (max ${MAX_QUESTIONS}: the biggest rounds get trimmed)` : ''}`;
+    sum.append(locSum);
+    localTotal(locSum, S.rounds, S.local, { kids, prefix: ' · ' });
+    locChip.redraw();
     list.replaceChildren(...S.rounds.map((r, i) => roundCard(r, {
-      i, n,
+      i, n, extra: localLine(r, S.local, { kids, count: r.count || COUNT,
+        onKeep: () => { r.localOk = true; saveHost(); draw(); },
+        onChange: () => go('pqround', { idx: i, format: r.format, list: 'online' }) }),
       onEdit: () => go('pqround', { idx: i, format: r.format, list: 'online' }),
       onRemove: n > 1 ? () => { S.rounds.splice(i, 1); saveHost(); draw(); } : null,
       onMove: dir => { if (moveItem(S.rounds, i, dir)) { saveHost(); draw(); } },
@@ -183,7 +196,7 @@ defineScreen('host', async (el, params, cur) => {
     const spec = makeSpec('online', rounds.map(r => ({
       format: r.format, packs: r.packs, count: r.count || COUNT, difficulty: kids ? 1 : (r.difficulty || 0),
       opts: { ...(r.opts || {}), online: true, ...(kids ? { kids: true } : {}) }, ...(r.title ? { title: r.title } : {}),
-    })), randomSeed(), { kids });
+    })), randomSeed(), { kids, local: specLocal(S.local) });
     spec.streak = S.timing.streak ? 'on' : 'off';
     const title = S.title || roomTitle(rounds);
     try {

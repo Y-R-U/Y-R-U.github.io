@@ -1,14 +1,16 @@
-import { h, esc } from './kit.js?v=202610130349';
-import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610130349';
-import { defineScreen, header, back, go } from './app.js?v=202610130349';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610130349';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610130349';
-import { applyAudioSettings, sfx } from './fx.js?v=202610130349';
-import { applyKids } from './home.js?v=202610130349';
-import { loadLearn, loadNet } from './net.js?v=202610130349';
-import { BUILD } from '../build.js?v=202610130349';
-import { canSpeak, speak } from './speech.js?v=202610130349';
-import { streakOption } from './streakopt.js?v=202610130349';
+import { h, esc } from './kit.js?v=202610130524';
+import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610130524';
+import { defineScreen, header, back, go } from './app.js?v=202610130524';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610130524';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610130524';
+import { applyAudioSettings, sfx } from './fx.js?v=202610130524';
+import { applyKids } from './home.js?v=202610130524';
+import { loadLearn, loadNet } from './net.js?v=202610130524';
+import { BUILD } from '../build.js?v=202610130524';
+import { canSpeak, speak } from './speech.js?v=202610130524';
+import { streakOption } from './streakopt.js?v=202610130524';
+import { localChip } from './local.js?v=202610130524';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610130524';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -47,6 +49,9 @@ defineScreen('settings', el => {
     canFullscreen() ? h('div.opt-row', {}, h('span.lbl', {}, 'Full screen'), h('button.btn.small', { type: 'button', onclick: () => toggleFullscreen() }, 'Toggle')) : null,
     toggleRow('Kids mode', 'Easy picture questions, no timer, stickers', 'kids', applyAll),
   ));
+  el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'Local focus'), h('div.panel.set-list', { dataset: { set: 'local' } },
+    h('p.muted.tiny', { style: { margin: '0 0 10px' } }, 'More questions about one country in the games you set up (solo, party, pub quiz and the rooms you host).'),
+    localChip(mySetting, next => saveMySetting(next))));
   el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'Home page'), h('div.panel.set-list', {},
     toggleRow('Show the kids mode switch', 'Kids mode itself is in the list above', 'homeKids'),
     toggleRow('Show the daily challenge', null, 'homeDaily')));
