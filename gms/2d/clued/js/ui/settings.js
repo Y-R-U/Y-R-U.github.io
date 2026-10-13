@@ -1,18 +1,18 @@
-import { h, esc } from './kit.js?v=202610130907';
-import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610130907';
-import { defineScreen, header, back, go } from './app.js?v=202610130907';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610130907';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610130907';
-import { applyAudioSettings, sfx } from './fx.js?v=202610130907';
-import { applyKids } from './home.js?v=202610130907';
-import { loadLearn, loadNet } from './net.js?v=202610130907';
-import { BUILD } from '../build.js?v=202610130907';
-import { canSpeak, speak } from './speech.js?v=202610130907';
-import { streakOption } from './streakopt.js?v=202610130907';
-import { localChip } from './local.js?v=202610130907';
-import { confirmPop, toast } from './popup.js?v=202610130907';
-import { seenInfo, resetSeen } from '../core/fresh.js?v=202610130907';
-import { mySetting, saveMySetting } from '../core/local.js?v=202610130907';
+import { h, esc } from './kit.js?v=202610131128';
+import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610131128';
+import { defineScreen, header, back, go } from './app.js?v=202610131128';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610131128';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610131128';
+import { applyAudioSettings, sfx } from './fx.js?v=202610131128';
+import { applyKids } from './home.js?v=202610131128';
+import { loadLearn, loadNet } from './net.js?v=202610131128';
+import { BUILD } from '../build.js?v=202610131128';
+import { canSpeak, speak } from './speech.js?v=202610131128';
+import { streakOption } from './streakopt.js?v=202610131128';
+import { localChip } from './local.js?v=202610131128';
+import { confirmPop, toast } from './popup.js?v=202610131128';
+import { seenInfo, resetSeen } from '../core/fresh.js?v=202610131128';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610131128';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -40,7 +40,6 @@ defineScreen('settings', el => {
     secs.append(c);
   }
   el.append(h('div.panel.set-list', {},
-    toggleRow('Background music', 'Soft classical, pauses for questions with sound', 'bgm', n => setBgm(n.bgm !== false)),
     toggleRow('Sound effects', null, 'sound', applyAll),
     h('div.opt-row', {}, h('span.lbl', {}, 'Music volume'), h('div', { style: { width: '50%' } }, vol)),
     toggleRow('Haptics', 'Buzz on right and wrong answers', 'haptics'),

@@ -1,28 +1,27 @@
-import { BUILD } from './build.js?v=202610130907';
-import './core/debuglog.js?v=202610130907';   // remote debug log (server-switched, docs/notes/DEBUGLOG.md)
-import { loadFormats } from './formats/index.js?v=202610130907';
-import { getFormat, listFormats, register } from './formats/registry.js?v=202610130907';
-import { loadIndex, loadPack, loadPacks, getIndex } from './core/packs.js?v=202610130907';
-import { buildQuestions, makeSpec } from './core/spec.js?v=202610130907';
-import { preflight, urlsOf, swapFailed } from './core/media.js?v=202610130907';
-import * as store from './core/store.js?v=202610130907';
-import { mountApp, defineScreen, go, back, reset, header, current, canPester } from './ui/app.js?v=202610130907';
-import { h } from './ui/kit.js?v=202610130907';
-import { popup, toast, confirmPop } from './ui/popup.js?v=202610130907';
-import { sfx, haptic, confetti } from './ui/fx.js?v=202610130907';
-import { shareText } from './ui/share.js?v=202610130907';
-import { loadNet } from './ui/net.js?v=202610130907';
-import { watchVersion, checkVersion, updateState } from './ui/update.js?v=202610130907';
-import { applyAll } from './ui/settings.js?v=202610130907';
-import { armBgm } from './ui/toggles.js?v=202610130907';
-import { setMatchCompleted } from './ui/results.js?v=202610130907';
-import './ui/home.js?v=202610130907';
-import './ui/setup.js?v=202610130907';
-import './ui/statspage.js?v=202610130907';
-import { createRunner } from './structures/runner.js?v=202610130907';
-import { prepare, playSpec } from './structures/session.js?v=202610130907';
-import { STRUCTURES } from './structures/index.js?v=202610130907';
-import { handoff } from './structures/handoff.js?v=202610130907';
+import { BUILD } from './build.js?v=202610131128';
+import './core/debuglog.js?v=202610131128';   // remote debug log (server-switched, docs/notes/DEBUGLOG.md)
+import { loadFormats } from './formats/index.js?v=202610131128';
+import { getFormat, listFormats, register } from './formats/registry.js?v=202610131128';
+import { loadIndex, loadPack, loadPacks, getIndex } from './core/packs.js?v=202610131128';
+import { buildQuestions, makeSpec } from './core/spec.js?v=202610131128';
+import { preflight, urlsOf, swapFailed } from './core/media.js?v=202610131128';
+import * as store from './core/store.js?v=202610131128';
+import { mountApp, defineScreen, go, back, reset, header, current, canPester } from './ui/app.js?v=202610131128';
+import { h } from './ui/kit.js?v=202610131128';
+import { popup, toast, confirmPop } from './ui/popup.js?v=202610131128';
+import { sfx, haptic, confetti } from './ui/fx.js?v=202610131128';
+import { shareText } from './ui/share.js?v=202610131128';
+import { loadNet } from './ui/net.js?v=202610131128';
+import { watchVersion, checkVersion, updateState } from './ui/update.js?v=202610131128';
+import { applyAll } from './ui/settings.js?v=202610131128';
+import { setMatchCompleted } from './ui/results.js?v=202610131128';
+import './ui/home.js?v=202610131128';
+import './ui/setup.js?v=202610131128';
+import './ui/statspage.js?v=202610131128';
+import { createRunner } from './structures/runner.js?v=202610131128';
+import { prepare, playSpec } from './structures/session.js?v=202610131128';
+import { STRUCTURES } from './structures/index.js?v=202610131128';
+import { handoff } from './structures/handoff.js?v=202610131128';
 
 const params = new URLSearchParams(location.search);
 const TEST = params.has('test') || params.has('noauth');
@@ -91,7 +90,6 @@ function hooks() {
 
 async function boot() {
   applyAll();
-  armBgm();
   const [fr] = await Promise.all([loadFormats(), loadIndex()]);
   if (fr.failed.length) console.warn('[clued] formats failed to load:', fr.failed.join(', '));
   mountApp(document.getElementById('app'));

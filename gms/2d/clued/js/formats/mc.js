@@ -1,8 +1,8 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
   spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk, givesAway,
-} from './registry.js?v=202610130907';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610130907';
+} from './registry.js?v=202610131128';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610131128';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 

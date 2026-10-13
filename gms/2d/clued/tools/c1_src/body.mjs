@@ -63,7 +63,7 @@ const PACK = {
     { n: 'Gallbladder', wp: 'Gallbladder', f: f(OR, DIG, { count: 1 }), d: 3, allowSvg: true,
       b: 'A small pouch under the liver that stores bile to help digest fat.',
       c: ['Stones can form inside it.', 'It squeezes bile into the gut after fatty meals.', 'It sits under the liver.', 'People can live without it.', 'It stores bile.'] },
-    { n: 'Thyroid', alt: ['thyroid gland'], wp: 'Thyroid', f: f(OR, END, { count: 1 }), d: 3, allowSvg: true,
+    { n: 'Thyroid', alt: ['thyroid gland'], wp: 'Thyroid', f: f(OR, END, { count: 1 }), d: 3, allowSvg: true, noAutoImg: true, files: ['Glands - Normal thyroid -- Smart-Servier.png'],
       b: 'A butterfly-shaped gland in the neck that controls how fast the body uses energy.',
       c: ['It needs iodine to work.', 'It controls metabolism.', 'A swelling of it is called a goitre.', 'It is shaped like a butterfly.', 'It is a gland in your neck.'] },
     { n: 'Tongue', wp: 'Tongue', f: f(MU, DIG, { count: 1 }), d: 1, allowSvg: true,

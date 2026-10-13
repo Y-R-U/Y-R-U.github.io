@@ -598,12 +598,12 @@
    "media": {
     "img": [
      {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Thyroid_dummy.jpg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Glands_-_Normal_thyroid_--_Smart-Servier.png/500px-Glands_-_Normal_thyroid_--_Smart-Servier.png",
       "w": 500,
-      "h": 379,
-      "credit": "CFCF",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Thyroid_dummy.jpg"
+      "h": 453,
+      "credit": "Servier Medical Art",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Glands_-_Normal_thyroid_--_Smart-Servier.png"
      }
     ]
    },

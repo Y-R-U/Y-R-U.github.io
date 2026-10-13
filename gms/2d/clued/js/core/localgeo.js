@@ -1,8 +1,8 @@
 // In-country geography for the local focus (data/local/geo.json, built + validated by tools/local_geo_build.mjs):
 // state capitals, which state a city is in, bigger/smaller, city populations, tap / name a state on the map.
 // Questions come out in existing formats (mc, tf, number, map-click), each marked data.local = cc.
-import { pick, shuffle, sample } from './rng.js?v=202610130907';
-import { givesAway } from '../formats/registry.js?v=202610130907';
+import { pick, shuffle, sample } from './rng.js?v=202610131128';
+import { givesAway } from '../formats/registry.js?v=202610131128';
 
 export const HOME_FORMATS = new Set(['mc', 'tf', 'number', 'map-click']);
 // Rounds on these packs (or "All themes", or a map round) also get in-country questions.

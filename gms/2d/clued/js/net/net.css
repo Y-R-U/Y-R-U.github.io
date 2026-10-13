@@ -42,6 +42,8 @@
 .net-count { font-family: var(--font-display); font-size: 20px; margin: 4px 2px 0; }
 .net-setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .net-actions { display: flex; flex-direction: column; gap: 10px; }
+/* shown while a room's formats and data load, so a slow join isn't a blank page */
+.net-loading { padding-top: 30vh; }
 .net-wait { text-align: center; color: var(--ink-2); font-weight: 800; padding: 6px; }
 .net-wait .dots::after { content: ''; animation: net-dots 1.4s steps(4) infinite; }
 @keyframes net-dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
