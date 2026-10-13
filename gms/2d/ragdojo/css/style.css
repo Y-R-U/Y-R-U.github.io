@@ -193,6 +193,9 @@ html, body {
 #vicFine b { color: var(--ink); }
 .toggle { display: flex; justify-content: space-between; align-items: center; padding: 5px 0;
   border-bottom: 1px dashed rgba(32,36,44,.25); }
+.toggle.code { gap: 8px; }
+#giftCode { flex: 1; min-width: 0; font-family: var(--font); font-size: 15px; padding: 3px 6px; letter-spacing: 1px;
+  border: 2px solid var(--ink); background: transparent; color: var(--ink); }
 
 .rows .r.unlock { color: #b8860b; border-bottom: none; }
 .rows .r.lockedrow { opacity: .45; }

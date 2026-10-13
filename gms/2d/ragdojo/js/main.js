@@ -18,7 +18,7 @@ import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
 import { DEV, DEMO, ACCOUNTS, SIGNIN, HOME } from './edition.js?v=20261013-lan';
-import { Purchases, API, ownerPollNext } from './purchases.js?v=20261013-f4';
+import { Purchases, API, ownerPollNext } from './purchases.js?v=20261014-gift';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
 import { mountArena } from './net/panel.js?v=20261013-f4';
@@ -751,12 +751,14 @@ function openSettings() {
     // Only once GOD is open, where winning tears the losers apart. No spoilers before then.
     (S.simulantWon ? T('Blood & gore (DEITIES)', S.settings.gore !== false, 'gore') : '') +
     `<div class="toggle"><span>Stick side</span><button class="buy" data-fn="hand">${S.settings.hand === 'right' ? 'LEFT STICK' : 'RIGHT STICK'}</button></div>` +
+    (ACCOUNTS && !DEMO ? `<div class="toggle code"><span>Pass code</span><input id="giftCode" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="BR8T-XXXX-XXXX-XXXX" maxlength="24"><button class="buy" id="btnRedeem">USE</button></div><p class="fine" id="giftStatus">Got a br8t Pass code from a friend? Sign in, then enter it here.</p>` : '') +
     `<div class="toggle"><span>Share anonymous play statistics</span><button class="buy" id="analyticsToggle">${analyticsEnabled() ? 'ON' : 'OFF'}</button></div>` +
     `<p class="fine">Optional: starts, fight progress and upgrade conversion. No email or save contents. <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>` +
     musicList();
   $('analyticsToggle').closest('.toggle').classList.toggle('hidden', DEMO || !ACCOUNTS);
   $('btnCloudRetry').classList.toggle('hidden', !SIGNIN);
   $('analyticsToggle').onclick = () => { analyticsChoice(!analyticsEnabled()); openSettings(); };
+  if ($('btnRedeem')) $('btnRedeem').onclick = redeemCode;
   // Pausing is the only place you can bail out of a fight, so the way out lives here.
   $('btnQuit').classList.toggle('hidden', mode !== 'fight');
   rows.querySelectorAll('button[data-fn]').forEach((b) => {
@@ -995,6 +997,7 @@ function paintOffers() {
   const sup = offerItems.ragdojo_supporter, mon = offerItems.br8t_pass_monthly, yr = offerItems.br8t_pass_yearly;
   const signedIn = !!account?.auth.signedIn, p = purchases;
   const passLive = !!p?.pass && !['canceled', 'incomplete_expired'].includes(p.pass.status);
+  const manageable = passLive && p.pass.manage !== false;
   $('btnCheckout').classList.toggle('hidden', !sup);
   if (sup) {
     $('btnCheckout').textContent = p?.supporter ? 'SUPPORTER ✓ THANK YOU' : `SUPPORT${paymentsTest ? ' (TEST)' : ''} · ${money(sup)}`;
@@ -1010,15 +1013,30 @@ function paintOffers() {
     $('pricePass').textContent = mon && yr ? `— from ${money(mon)}/month, or ${money(yr)}/year.` : `— ${money(first)}/${mon ? 'month' : 'year'}.`;
   }
   if (yr) { $('btnPassYear').textContent = `OR ${money(yr)}/YEAR`; $('btnPassYear').disabled = !signedIn || passLive; }
-  $('btnManage').classList.toggle('hidden', !signedIn || !passLive);
+  $('btnManage').classList.toggle('hidden', !signedIn || !manageable);
   $('btnRestore').classList.remove('hidden');
 }
 function ownedMessage() {
   const p = purchases, endTs = p?.pass?.cancelAt || p?.pass?.periodEnd, end = endTs ? new Date(endTs * 1000).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  if (p?.passActive && p.pass?.status === 'gift') return `Your gift br8t Pass is active until ${end} — enjoy! ${PAID_NAMES} open as you earn them; earned progress is kept.`;
   if (p?.passActive) return `Your br8t Pass is active${(p.pass?.cancelAtPeriodEnd || p.pass?.cancelAt) && end ? ` until ${end} (cancelled, no more charges)` : ''} — thank you! ${PAID_NAMES} open as you earn them; earned progress is kept.`;
   if (p?.supporter) return `Thank you — your support is restored. ${PAID_NAMES} open as you earn them; earned progress is kept.`;
   if (p?.pass?.status === 'past_due' || p?.pass?.status === 'unpaid') return 'Your br8t Pass renewal did not go through. Use Manage subscription to update your card; earned progress is kept.';
   return 'No purchase found on this account. Sign in with the same Google or email account used at checkout.';
+}
+async function redeemCode() {
+  const code = $('giftCode').value.trim(), say = (t) => { $('giftStatus').textContent = t; };
+  if (!code) { say('Type the code first.'); return; }
+  if (!purchases || !account?.auth.signedIn) { say('Sign in with the account button first, so the Pass goes on your account.'); return; }
+  $('btnRedeem').disabled = true;
+  try {
+    const until = await purchases.redeem(code);
+    $('giftCode').value = '';
+    say(`Done! Your br8t Pass is active until ${new Date(until * 1000).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}.`);
+    paintOffers();
+    refreshHub();
+  } catch (e) { say(e.message); }
+  $('btnRedeem').disabled = false;
 }
 /** True when the server gave a definitive answer. */
 async function restorePurchase() {

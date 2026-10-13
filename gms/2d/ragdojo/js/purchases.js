@@ -64,6 +64,16 @@ export class Purchases {
     if (url.origin !== CHECKOUT_ORIGIN) throw new Error('Checkout unavailable.');
     return url.href;
   }
+  /** A gift code (made on the server, single use) adds a year or so of the br8t Pass to this account. */
+  async redeem(code) {
+    const { uid, token } = await this.token();
+    const res = await this.request(API + 'redeem', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Codes are unavailable right now. Try again later.');
+    if (uid !== this.auth.user?.uid) throw new Error('Account changed. Try again.');
+    await this.refresh().catch(() => {});
+    return data.until;
+  }
   /** Stripe's customer portal for the account's Pass: cancel, change card, invoices. */
   async portal() {
     const { uid, token } = await this.token();
