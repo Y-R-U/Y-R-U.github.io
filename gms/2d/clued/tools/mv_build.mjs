@@ -14,7 +14,7 @@ const DEFS = {
     head: {
       title: 'Movie Moments', theme: 'screen', icon: '🎬',
       notice: 'Original illustrations of famous film scenes, not real stills.',
-      nameImgPrompt: 'Which movie is this scene from?', imgPrompt: 'Which scene is from {name}?',
+      nameImgPrompt: 'What movie is this?', imgPrompt: 'Which picture shows {name}?',
       factsMeta: {
         year: { type: 'year', label: 'Released', askHigh: 'Which of these films came out most recently?', askLow: 'Which of these films came out first?', askNumber: 'In what year did {name} come out?' },
         decade: { type: 'cat', label: 'Decade', ask: 'In which decade did {name} come out?', askReverse: 'Which of these films came out in the {value}?', stmt: '{name} came out in the {value}.' },
@@ -29,7 +29,7 @@ const DEFS = {
     head: {
       title: 'Book Moments', theme: 'books', icon: '📖',
       notice: 'Original illustrations of scenes from famous books.',
-      nameImgPrompt: 'Which book is this scene from?', imgPrompt: 'Which scene is from {name}?',
+      nameImgPrompt: 'What book is this?', imgPrompt: 'Which picture shows {name}?',
       factsMeta: {
         author: { type: 'cat', label: 'Author', ask: 'Who wrote {name}?', askReverse: 'Which of these books is by {value}?', stmt: '{name} was written by {value}.' },
         year: { type: 'year', label: 'Published', askHigh: 'Which of these books came out most recently?', askLow: 'Which of these books came out first?', askNumber: 'In what year was {name} first published?' },

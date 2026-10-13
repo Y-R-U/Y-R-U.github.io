@@ -1,5 +1,5 @@
-import { playSpec } from './session.js?v=202610131128';
-import { specFor, fmtTitle } from './common.js?v=202610131128';
+import { playSpec } from './session.js?v=202610131422';
+import { specFor, fmtTitle } from './common.js?v=202610131422';
 
 const blitz = {
   id: 'blitz', title: 'Blitz', icon: '⚡', blurb: 'As many as you can in 60 seconds.', count: false, timer: false,

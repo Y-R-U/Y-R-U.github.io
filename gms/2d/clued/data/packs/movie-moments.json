@@ -4,8 +4,8 @@
  "theme": "screen",
  "icon": "🎬",
  "notice": "Original illustrations of famous film scenes, not real stills.",
- "nameImgPrompt": "Which movie is this scene from?",
- "imgPrompt": "Which scene is from {name}?",
+ "nameImgPrompt": "What movie is this?",
+ "imgPrompt": "Which picture shows {name}?",
  "factsMeta": {
   "year": {
    "type": "year",
@@ -112,26 +112,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "The giant ape atop the Empire State Building"
-     },
-     {
-      "src": "media/moments/e3add7a945b4.webp",
-      "w": 640,
-      "h": 427,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "The great wall on Skull Island"
-     },
-     {
-      "src": "media/moments/74865c7188d7.webp",
-      "w": 640,
-      "h": 427,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Beauty in the beast's hand"
      }
     ]
    },
@@ -245,16 +225,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "A nose that grows with every lie"
-     },
-     {
-      "src": "media/moments/ff3127ffc8c8.webp",
-      "w": 640,
-      "h": 427,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Escaping the giant whale"
      },
      {
       "src": "media/moments/354bbabbc193.webp",
@@ -416,43 +386,6 @@
     ]
    },
    "difficulty": 2
-  },
-  {
-   "id": "citizen-kane",
-   "name": "Citizen Kane",
-   "alt": [],
-   "facts": {
-    "year": 1941,
-    "decade": "1940s",
-    "director": "Orson Welles",
-    "kids": false
-   },
-   "blurb": "A reporter tries to decode the dying word of newspaper tycoon Charles Foster Kane.",
-   "media": {
-    "img": [
-     {
-      "src": "media/moments/daf95d70f2eb.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The sled thrown into the furnace"
-     },
-     {
-      "src": "media/moments/97aebc933a99.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The dropped snow globe"
-     }
-    ]
-   },
-   "difficulty": 3
   },
   {
    "id": "its-a-wonderful-life",
@@ -620,16 +553,6 @@
    "media": {
     "img": [
      {
-      "src": "media/moments/0f7fd1d9de04.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Spying on the neighbours across the courtyard"
-     },
-     {
       "src": "media/moments/79b571ded0c9.webp",
       "w": 640,
       "h": 432,
@@ -752,43 +675,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
       "caption": "A walk on the sea floor"
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
-   "id": "north-by-northwest",
-   "name": "North by Northwest",
-   "alt": [],
-   "facts": {
-    "year": 1959,
-    "decade": "1950s",
-    "director": "Alfred Hitchcock",
-    "kids": false
-   },
-   "blurb": "An advertising man mistaken for a spy is chased across America.",
-   "media": {
-    "img": [
-     {
-      "src": "media/moments/9201eb38aa5d.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Chased by the crop-duster"
-     },
-     {
-      "src": "media/moments/bacc24b2917f.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Waiting at the lonely crossroads"
      }
     ]
    },
@@ -1129,16 +1015,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "The hills are alive"
-     },
-     {
-      "src": "media/moments/180c59e4f70e.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Seven children in curtain play clothes"
      }
     ]
    },
@@ -1209,16 +1085,6 @@
    "blurb": "A mysterious black monolith guides human evolution, from apes to a voyage to Jupiter.",
    "media": {
     "img": [
-     {
-      "src": "media/moments/b11f5851cfb2.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "The unblinking red eye of the ship's computer"
-     },
      {
       "src": "media/moments/3858f89a538d.webp",
       "w": 640,
@@ -1292,16 +1158,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "The magical flying car"
-     },
-     {
-      "src": "media/moments/c320ba91e76e.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Vulgaria, where children are banned"
      }
     ]
    },
@@ -1356,45 +1212,6 @@
     ]
    },
    "difficulty": 1
-  },
-  {
-   "id": "the-godfather",
-   "name": "The Godfather",
-   "alt": [
-    "Godfather"
-   ],
-   "facts": {
-    "year": 1972,
-    "decade": "1970s",
-    "director": "Francis Ford Coppola",
-    "kids": false
-   },
-   "blurb": "The aging head of a Mafia family hands control of his empire to his reluctant youngest son.",
-   "media": {
-    "img": [
-     {
-      "src": "media/moments/2a4e752f01a2.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Hearing requests on his daughter's wedding day"
-     },
-     {
-      "src": "media/moments/1a558b5a34b8.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The puppet master's strings"
-     }
-    ]
-   },
-   "difficulty": 2
   },
   {
    "id": "jaws",
@@ -1592,16 +1409,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "Night fever on the light-up dance floor"
-     },
-     {
-      "src": "media/moments/7348a89a9d3e.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The Verrazzano bridge at night"
      }
     ]
    },
@@ -1629,16 +1436,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "Greased Lightnin' races in the drain"
-     },
-     {
-      "src": "media/moments/b90195e2ca73.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "You're the one that I want, at the carnival"
      }
     ]
    },
@@ -1834,16 +1631,6 @@
       "caption": "Flying across the moon on a bicycle"
      },
      {
-      "src": "media/moments/ec76c895257c.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "A trail of sweets to lure a visitor"
-     },
-     {
       "src": "media/moments/881751580f9b.webp",
       "w": 640,
       "h": 432,
@@ -1967,16 +1754,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "The machine war of the future"
-     },
-     {
-      "src": "media/moments/bf65b4b7a50d.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Arriving from the future in a ball of lightning"
      }
     ]
    },
@@ -2264,16 +2041,6 @@
    "media": {
     "img": [
      {
-      "src": "media/moments/28a1358c3a61.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Playing the giant floor piano"
-     },
-     {
       "src": "media/moments/d7facd9df51b.webp",
       "w": 640,
       "h": 432,
@@ -2285,44 +2052,7 @@
      }
     ]
    },
-   "difficulty": 2
-  },
-  {
-   "id": "die-hard",
-   "name": "Die Hard",
-   "alt": [],
-   "facts": {
-    "year": 1988,
-    "decade": "1980s",
-    "director": "John McTiernan",
-    "kids": false
-   },
-   "blurb": "A New York cop takes on terrorists who seize a Los Angeles skyscraper on Christmas Eve.",
-   "media": {
-    "img": [
-     {
-      "src": "media/moments/c590d62f6df3.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Christmas Eve at Nakatomi Plaza"
-     },
-     {
-      "src": "media/moments/ba0840de44aa.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "The rooftop leap with the fire hose"
-     }
-    ]
-   },
-   "difficulty": 2
+   "difficulty": 3
   },
   {
    "id": "the-little-mermaid",
@@ -2557,16 +2287,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "Left home alone at Christmas"
-     },
-     {
-      "src": "media/moments/123daac7ad22.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The family racing for the plane to Paris"
      }
     ]
    },
@@ -2622,16 +2342,6 @@
    "blurb": "An artificial man with scissors for hands is taken in by a pastel suburban town.",
    "media": {
     "img": [
-     {
-      "src": "media/moments/c7f188082c47.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Topiary art in pastel suburbia"
-     },
      {
       "src": "media/moments/63504076c993.webp",
       "w": 640,
@@ -2725,16 +2435,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "The magic lamp in the Cave of Wonders"
-     },
-     {
-      "src": "media/moments/f24959823d2a.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "The Cave of Wonders"
      }
     ]
    },
@@ -2803,16 +2503,6 @@
    "media": {
     "img": [
      {
-      "src": "media/moments/e1dc0df002d9.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Dancing with the vacuum cleaner"
-     },
-     {
       "src": "media/moments/128b8621cbc9.webp",
       "w": 640,
       "h": 432,
@@ -2824,7 +2514,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 3
   },
   {
    "id": "groundhog-day",
@@ -3085,16 +2775,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "The toys come alive when nobody's looking"
-     },
-     {
-      "src": "media/moments/db3e38720cc6.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Falling with style"
      }
     ]
    },
@@ -3270,16 +2950,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "Chasing the tornado (with a flying cow)"
-     },
-     {
-      "src": "media/moments/418d054f9c57.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Dorothy's sensors fly into the twister"
      }
     ]
    },
@@ -3455,16 +3125,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "Drillers to the asteroid"
-     },
-     {
-      "src": "media/moments/1169b3d742ad.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The walk to the launch pad"
      }
     ]
    },
@@ -3656,26 +3316,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "A volleyball for a friend"
-     },
-     {
-      "src": "media/moments/acfd1a33611a.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Adrift on the raft"
-     },
-     {
-      "src": "media/moments/5ccd4f33fffa.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The parcel he never opened"
      }
     ]
    },
@@ -3695,16 +3335,6 @@
    "media": {
     "img": [
      {
-      "src": "media/moments/bf53b91fceaa.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "The great chicken escape by plane"
-     },
-     {
       "src": "media/moments/cb9e400d8bf3.webp",
       "w": 640,
       "h": 432,
@@ -3716,7 +3346,7 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 2
   },
   {
    "id": "shrek",
@@ -3740,16 +3370,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "Crossing the bridge to the dragon's castle"
-     },
-     {
-      "src": "media/moments/7cafbf3e3115.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "A swamp invaded by fairy-tale creatures"
      },
      {
       "src": "media/moments/19be8679c1d5.webp",
@@ -4285,16 +3905,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "A rat's view of Paris"
-     },
-     {
-      "src": "media/moments/f44666b149ad.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "The dish that won the critic"
      }
     ]
    },
@@ -4325,16 +3935,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "Cleaning up an abandoned Earth"
-     },
-     {
-      "src": "media/moments/2c2063d48e3b.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Dancing in space"
      }
     ]
    },
@@ -4438,16 +4038,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "A house carried away by balloons"
-     },
-     {
-      "src": "media/moments/7f41d8dabe05.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Paradise Falls"
      }
     ]
    },
@@ -4551,16 +4141,6 @@
    "media": {
     "img": [
      {
-      "src": "media/moments/b9e01e73ad68.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "I see the light: the floating lanterns"
-     },
-     {
       "src": "media/moments/7facad3ec14d.webp",
       "w": 640,
       "h": 432,
@@ -4572,7 +4152,7 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 2
   },
   {
    "id": "how-to-train-your-dragon",
@@ -4670,16 +4250,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "The red-haired archer of the highlands"
-     },
-     {
-      "src": "media/moments/6ded42e05e1e.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Follow the wisps"
      }
     ]
    },
@@ -4709,16 +4279,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "The girl on fire in the arena"
-     },
-     {
-      "src": "media/moments/7f3f8ae215fa.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The Cornucopia"
      }
     ]
    },
@@ -4793,16 +4353,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "Lost in orbit"
-     },
-     {
-      "src": "media/moments/2cbc5959b681.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Back on solid ground"
      }
     ]
    },
@@ -4896,16 +4446,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "The pink hotel"
-     },
-     {
-      "src": "media/moments/3e78db40ad21.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Mendl's pastries"
      }
     ]
    },
@@ -4946,43 +4486,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "Into the sandstorm"
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
-   "id": "inside-out",
-   "name": "Inside Out",
-   "alt": [],
-   "facts": {
-    "year": 2015,
-    "decade": "2010s",
-    "director": "Pete Docter",
-    "kids": true
-   },
-   "blurb": "Five emotions guide a girl's mind as her family moves.",
-   "media": {
-    "img": [
-     {
-      "src": "media/moments/2dd0ad6d55cc.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "Headquarters and the memory orbs"
-     },
-     {
-      "src": "media/moments/9f5ce02d7833.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "The personality islands"
      }
     ]
    },
@@ -5088,16 +4591,6 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "Sailing beyond the reef"
-     },
-     {
-      "src": "media/moments/19c7aee2713a.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "The heart of Te Fiti"
      },
      {
       "src": "media/moments/96a2c6e0f013.webp",
@@ -5291,33 +4784,6 @@
     ]
    },
    "difficulty": 1
-  },
-  {
-   "id": "luca",
-   "name": "Luca",
-   "alt": [],
-   "facts": {
-    "year": 2021,
-    "decade": "2020s",
-    "director": "Enrico Casarosa",
-    "kids": true
-   },
-   "blurb": "A young sea monster spends a summer on the Italian Riviera.",
-   "media": {
-    "img": [
-     {
-      "src": "media/moments/cdf7f6c4c6ff.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "Silenzio, Bruno!"
-     }
-    ]
-   },
-   "difficulty": 2
   },
   {
    "id": "turning-red",

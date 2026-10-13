@@ -1,18 +1,18 @@
-import { h, esc } from './kit.js?v=202610131128';
-import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610131128';
-import { defineScreen, header, back, go } from './app.js?v=202610131128';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610131128';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610131128';
-import { applyAudioSettings, sfx } from './fx.js?v=202610131128';
-import { applyKids } from './home.js?v=202610131128';
-import { loadLearn, loadNet } from './net.js?v=202610131128';
-import { BUILD } from '../build.js?v=202610131128';
-import { canSpeak, speak } from './speech.js?v=202610131128';
-import { streakOption } from './streakopt.js?v=202610131128';
-import { localChip } from './local.js?v=202610131128';
-import { confirmPop, toast } from './popup.js?v=202610131128';
-import { seenInfo, resetSeen } from '../core/fresh.js?v=202610131128';
-import { mySetting, saveMySetting } from '../core/local.js?v=202610131128';
+import { h, esc } from './kit.js?v=202610131422';
+import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610131422';
+import { defineScreen, header, back, go } from './app.js?v=202610131422';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610131422';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610131422';
+import { applyAudioSettings, sfx } from './fx.js?v=202610131422';
+import { applyKids } from './home.js?v=202610131422';
+import { loadLearn, loadNet } from './net.js?v=202610131422';
+import { BUILD } from '../build.js?v=202610131422';
+import { canSpeak, speak } from './speech.js?v=202610131422';
+import { streakOption } from './streakopt.js?v=202610131422';
+import { localChip } from './local.js?v=202610131422';
+import { confirmPop, toast } from './popup.js?v=202610131422';
+import { seenInfo, resetSeen } from '../core/fresh.js?v=202610131422';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610131422';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();

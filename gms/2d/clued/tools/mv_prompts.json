@@ -50,12 +50,16 @@
     {
      "p": "a huge ancient wooden wall with an enormous gate on a misty jungle island, tiny explorers in 1930s clothes watching from the beach, a steamship anchored offshore",
      "d": 2,
-     "cap": "The great wall on Skull Island"
+     "cap": "The great wall on Skull Island",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor — Maybe if it had a skull in it?"
     },
     {
      "p": "a giant hairy hand gently holding a tiny woman in a flowing white dress, seen from a distance against a jungle at night",
      "d": 3,
-     "cap": "Beauty in the beast's hand"
+     "cap": "Beauty in the beast's hand",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: wrong"
     }
    ]
   },
@@ -125,7 +129,9 @@
     {
      "p": "a gigantic whale bursting out of a stormy sea, mouth wide open, chasing a tiny wooden raft",
      "d": 2,
-     "cap": "Escaping the giant whale"
+     "cap": "Escaping the giant whale",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor — Doesn't look like a whale, shark teeth?"
     },
     {
      "p": "a small green cricket insect wearing a tiny top hat and holding a folded umbrella, standing on a windowsill under one bright wishing star, an Italian village at night",
@@ -230,12 +236,16 @@
     {
      "p": "a child's wooden sled with plain red runners burning in a furnace among crates and antiques in a vast cluttered mansion basement",
      "d": 3,
-     "cap": "The sled thrown into the furnace"
+     "cap": "The sled thrown into the furnace",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "a snow globe with a tiny cottage falling from an open hand, about to shatter on the floor, dark gothic bedroom",
      "d": 3,
-     "cap": "The dropped snow globe"
+     "cap": "The dropped snow globe",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: wrong — Not dropped"
     }
    ]
   },
@@ -345,7 +355,9 @@
     {
      "p": "view from a dark apartment across a Greenwich Village courtyard at night into many lit windows of neighbours, a camera with a long telephoto lens on the sill, a leg in a plaster cast",
      "d": 3,
-     "cap": "Spying on the neighbours across the courtyard"
+     "cap": "Spying on the neighbours across the courtyard",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: text"
     },
     {
      "p": "a man in a wheelchair with a leg in a plaster cast, silhouetted at an open window holding binoculars, hot summer evening",
@@ -457,12 +469,16 @@
     {
      "p": "a man in a grey suit running across a flat empty field of farmland as a yellow crop-duster biplane swoops low behind him, dusty roadside, bright sky",
      "d": 2,
-     "cap": "Chased by the crop-duster"
+     "cap": "Chased by the crop-duster",
+     "drop": true,
+     "dropWhy": "Aaron: do not use this movie"
     },
     {
      "p": "a man in a grey suit waiting alone by a dusty empty highway crossroads in flat Midwest farmland, a plain unmarked bus driving away",
      "d": 3,
-     "cap": "Waiting at the lonely crossroads"
+     "cap": "Waiting at the lonely crossroads",
+     "drop": true,
+     "dropWhy": "Aaron: do not use this movie"
     }
    ]
   },
@@ -675,7 +691,9 @@
     {
      "p": "seven children in matching outfits made from old green curtains, standing on steps in height order in an Austrian villa garden",
      "d": 2,
-     "cap": "Seven children in curtain play clothes"
+     "cap": "Seven children in curtain play clothes",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor — Do not use this image"
     },
     {
      "p": "a gazebo of glass panes in a garden at night, rain on the glass",
@@ -728,7 +746,9 @@
     {
      "p": "a single red glowing circular camera eye lens set in a sleek white panel, cold spaceship interior",
      "d": 2,
-     "cap": "The unblinking red eye of the ship's computer"
+     "cap": "The unblinking red eye of the ship's computer",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: text — Could be big brother"
     },
     {
      "p": "a tall smooth black rectangular monolith standing in a rocky prehistoric desert at dawn, apes gathered around it",
@@ -781,7 +801,9 @@
     {
      "p": "a fairy-tale Bavarian castle on a hill where the streets are empty of children, a sinister figure with a net lurking",
      "d": 3,
-     "cap": "Vulgaria, where children are banned"
+     "cap": "Vulgaria, where children are banned",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: text"
     }
    ]
   },
@@ -828,18 +850,23 @@
     {
      "p": "a dim wood-panelled study with shuttered blinds, a man in a black tuxedo with a red rose seen from behind in a leather armchair, stroking a grey cat, a wedding party outside",
      "d": 2,
-     "cap": "Hearing requests on his daughter's wedding day"
+     "cap": "Hearing requests on his daughter's wedding day",
+     "drop": true,
+     "dropWhy": "Aaron: do not use this movie"
     },
     {
      "p": "a puppeteer's hand holding marionette strings over a black background",
      "d": 3,
-     "cap": "The puppet master's strings"
+     "cap": "The puppet master's strings",
+     "drop": true,
+     "dropWhy": "Aaron: do not use this movie"
     },
     {
      "p": "a sunlit Sicilian village square with an orange tree, an old stone church and a 1940s car",
      "d": 3,
      "cap": "Sicily, the old country",
-     "drop": true
+     "drop": true,
+     "dropWhy": "Aaron: do not use this movie"
     }
    ]
   },
@@ -960,7 +987,9 @@
     {
      "p": "a long suspension bridge glowing at night over a river, 1970s Brooklyn",
      "d": 3,
-     "cap": "The Verrazzano bridge at night"
+     "cap": "The Verrazzano bridge at night",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: wrong"
     }
    ]
   },
@@ -981,7 +1010,9 @@
     {
      "p": "a 1950s high school fair at sunset with a ferris wheel and carnival rides, a couple in black leather dancing",
      "d": 2,
-     "cap": "You're the one that I want, at the carnival"
+     "cap": "You're the one that I want, at the carnival",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -1105,7 +1136,9 @@
     {
      "p": "a trail of colourful round sweets leading through a dark suburban back garden into a misty forest at night",
      "d": 2,
-     "cap": "A trail of sweets to lure a visitor"
+     "cap": "A trail of sweets to lure a visitor",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "a homemade communicator built from a speak-and-spell toy, a saw blade and an umbrella, on a forest hilltop at night",
@@ -1182,7 +1215,9 @@
     {
      "p": "a crackling sphere of blue lightning in a dark city alley at night, rubbish swirling",
      "d": 3,
-     "cap": "Arriving from the future in a ball of lightning"
+     "cap": "Arriving from the future in a ball of lightning",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: wrong"
     }
    ]
   },
@@ -1360,7 +1395,9 @@
     {
      "p": "two adults in suits dancing on a giant walk-on floor piano keyboard in a huge toy store",
      "d": 2,
-     "cap": "Playing the giant floor piano"
+     "cap": "Playing the giant floor piano",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "an old fortune-teller arcade machine with a mechanical turbaned mystic figure in a glass booth at a night carnival, no sign, no lettering",
@@ -1381,12 +1418,16 @@
     {
      "p": "a modern skyscraper at night with fire and an explosion on one high floor, Christmas lights, a barefoot man in a vest crawling through an air duct",
      "d": 2,
-     "cap": "Christmas Eve at Nakatomi Plaza"
+     "cap": "Christmas Eve at Nakatomi Plaza",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "a man in a white vest leaping from a skyscraper rooftop with a fire hose tied around his waist as a fireball erupts behind",
      "d": 2,
-     "cap": "The rooftop leap with the fire hose"
+     "cap": "The rooftop leap with the fire hose",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -1528,7 +1569,9 @@
     {
      "p": "a crowded airport terminal with a family running with suitcases, Christmas 1990",
      "d": 3,
-     "cap": "The family racing for the plane to Paris"
+     "cap": "The family racing for the plane to Paris",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -1565,7 +1608,9 @@
     {
      "p": "pastel-coloured suburban houses with elaborate topiary hedges cut into dinosaurs and animals, a dark gothic castle on a hill above",
      "d": 2,
-     "cap": "Topiary art in pastel suburbia"
+     "cap": "Topiary art in pastel suburbia",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "snow-like flakes of ice falling as a pale figure carves an ice angel with blades for fingers, a girl dancing below",
@@ -1622,7 +1667,9 @@
     {
      "p": "a giant tiger-head shaped cave entrance rising out of night desert sand dunes with glowing eyes",
      "d": 2,
-     "cap": "The Cave of Wonders"
+     "cap": "The Cave of Wonders",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -1671,7 +1718,9 @@
     {
      "p": "a nanny in a flowery dress and pearls seen from behind hoovering a living room while dancing with the vacuum cleaner",
      "d": 2,
-     "cap": "Dancing with the vacuum cleaner"
+     "cap": "Dancing with the vacuum cleaner",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -1840,7 +1889,9 @@
     {
      "p": "a toy spaceman with wings leaping off a bedpost, falling with style, viewed from below",
      "d": 2,
-     "cap": "Falling with style"
+     "cap": "Falling with style",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: wrong"
     },
     {
      "p": "a claw crane arcade machine full of three-eyed green alien toys looking up at the claw",
@@ -1951,7 +2002,9 @@
     {
      "p": "hundreds of small sensor balls being sucked up into a spinning tornado funnel",
      "d": 3,
-     "cap": "Dorothy's sensors fly into the twister"
+     "cap": "Dorothy's sensors fly into the twister",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -2074,7 +2127,9 @@
     {
      "p": "a crew of drillers in orange spacesuits walking in slow motion toward a launch pad",
      "d": 3,
-     "cap": "The walk to the launch pad"
+     "cap": "The walk to the launch pad",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -2190,12 +2245,16 @@
     {
      "p": "a bearded man on a tiny makeshift raft alone in a vast ocean, a giant whale surfacing beside him",
      "d": 2,
-     "cap": "Adrift on the raft"
+     "cap": "Adrift on the raft",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: wrong"
     },
     {
      "p": "an unopened brown parcel with wings drawn on it on a cave shelf beside a fire",
      "d": 3,
-     "cap": "The parcel he never opened"
+     "cap": "The parcel he never opened",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -2211,7 +2270,9 @@
     {
      "p": "a flock of plasticine-style chickens flying a homemade wooden aeroplane out of a barbed-wire chicken farm at night",
      "d": 1,
-     "cap": "The great chicken escape by plane"
+     "cap": "The great chicken escape by plane",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "a chicken farm with rows of wooden huts behind barbed-wire fences like a prison camp, searchlights",
@@ -2237,7 +2298,9 @@
     {
      "p": "a mossy wooden outhouse and a stump house in a misty green swamp, fairy-tale creatures arriving",
      "d": 2,
-     "cap": "A swamp invaded by fairy-tale creatures"
+     "cap": "A swamp invaded by fairy-tale creatures",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: wrong"
     },
     {
      "p": "a frightened little gingerbread man with gumdrop buttons on a baking tray in a gloomy castle kitchen",
@@ -2584,7 +2647,9 @@
     {
      "p": "a plate of layered sliced vegetables in a ratatouille spiral, a stern food critic's pen dropping",
      "d": 2,
-     "cap": "The dish that won the critic"
+     "cap": "The dish that won the critic",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -2608,7 +2673,9 @@
     {
      "p": "a sleek white egg-shaped flying robot dancing in space with a little rusty robot using a fire extinguisher",
      "d": 2,
-     "cap": "Dancing in space"
+     "cap": "Dancing in space",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: wrong"
     }
    ]
   },
@@ -2673,7 +2740,9 @@
     {
      "p": "a house perched beside a towering waterfall on a South American mesa",
      "d": 2,
-     "cap": "Paradise Falls"
+     "cap": "Paradise Falls",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "a golden retriever wearing a collar device, a squirrel in the jungle",
@@ -2742,7 +2811,9 @@
     {
      "p": "a young woman with extremely long golden hair seen from behind in a small boat with a young man, thousands of glowing floating lanterns rising over a lake at night",
      "d": 1,
-     "cap": "I see the light: the floating lanterns"
+     "cap": "I see the light: the floating lanterns",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "an isolated stone tower in a secret valley, a very long golden braid hanging from the window",
@@ -2810,7 +2881,9 @@
     {
      "p": "glowing blue will-o'-the-wisps in a misty Scottish forest",
      "d": 2,
-     "cap": "Follow the wisps"
+     "cap": "Follow the wisps",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -2833,7 +2906,9 @@
     {
      "p": "a golden horn-shaped structure full of weapons and supplies in a forest clearing",
      "d": 3,
-     "cap": "The Cornucopia"
+     "cap": "The Cornucopia",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: wrong"
     }
    ]
   },
@@ -2880,7 +2955,9 @@
     {
      "p": "a space capsule splashing down in a lake, a woman crawling onto the shore",
      "d": 3,
-     "cap": "Back on solid ground"
+     "cap": "Back on solid ground",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -2952,7 +3029,9 @@
     {
      "p": "a pastel pink box of pastries with blue ribbon",
      "d": 3,
-     "cap": "Mendl's pastries"
+     "cap": "Mendl's pastries",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -2992,12 +3071,16 @@
     {
      "p": "shelves of glowing coloured memory orbs inside a mind headquarters, a control console",
      "d": 1,
-     "cap": "Headquarters and the memory orbs"
+     "cap": "Headquarters and the memory orbs",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "islands floating in a mind: hockey island, family island, goofball island",
      "d": 2,
-     "cap": "The personality islands"
+     "cap": "The personality islands",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     }
    ]
   },
@@ -3064,7 +3147,9 @@
     {
      "p": "a small glowing green spiral stone in an open palm on a beach",
      "d": 2,
-     "cap": "The heart of Te Fiti"
+     "cap": "The heart of Te Fiti",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "a giant tattooed demigod with a magic fishhook, pulling up an island",
@@ -3195,7 +3280,9 @@
     {
      "p": "two boys riding a rickety homemade scooter down a hill into the Italian Riviera sea, town of colourful houses",
      "d": 2,
-     "cap": "Silenzio, Bruno!"
+     "cap": "Silenzio, Bruno!",
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-14: poor"
     },
     {
      "p": "a boy with green fish scales on his cheeks and arms peeking out of the sea at sunset, gazing at a plain unbranded vintage motor scooter parked on a jetty, Italian Riviera village behind",

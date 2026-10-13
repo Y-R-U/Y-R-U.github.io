@@ -1,5 +1,5 @@
 // Flashcard faces: what a card's front shows for any item, without ever giving the answer away. Pure (tools/cards_test.mjs).
-import { factText } from '../formats/registry.js?v=202610131128';
+import { factText } from '../formats/registry.js?v=202610131422';
 
 export const MIN_LEAK = 4;   // names shorter than this are too common as substrings to police
 export const BLANK = '____';
@@ -38,7 +38,7 @@ const NOUN = { books: 'book', movies: 'film', tv: 'TV show', history: 'event', s
   currencies: 'currency', capitals: 'capital city', elements: 'element', inventions: 'invention', countries: 'country',
   flags: 'country', landmarks: 'landmark', paintings: 'painting', dishes: 'dish', gems: 'gemstone', space: 'space object',
   dinosaurs: 'dinosaur', 'movie-moments': 'film' };
-const IMG_ASK = { flags: "Which country's flag is this?", countries: "Which country's flag is this?", 'movie-moments': 'Which film is this scene from?',
+const IMG_ASK = { flags: "Which country's flag is this?", countries: "Which country's flag is this?", 'movie-moments': 'What movie is this?',
   paintings: 'Which painting is this?', landmarks: 'Which landmark is this?', body: 'Which part of the body is this?', dishes: 'Which dish is this?' };
 const AUDIO_ASK = { 'music-artists': 'Who is the artist?', 'nursery-rhymes': 'Which nursery rhyme is this?', 'screen-themes': 'Which film or show is this from?',
   'kids-film-tv': 'Which film or show is this from?', 'classical-piano': 'Name this piece', 'classical-recordings': 'Name this piece',
