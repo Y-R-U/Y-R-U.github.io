@@ -1,0 +1,204 @@
+// Admin picture review: every pack picture with an OK / Bad verdict, saved on the server (admin only).
+// A verdict is tied to the picture's src, so a swapped or regenerated picture comes back as "to review".
+import { h } from '../ui/kit.js?v=202610131128';
+import { toast } from '../ui/popup.js?v=202610131128';
+import { API } from './api.js?v=202610131128';
+
+const root = document.getElementById('rv');
+const gate = document.getElementById('gate');
+const PAGE = 60;
+const REASONS = [['text', 'Words in it'], ['wrong', 'Wrong thing'], ['giveaway', 'Gives answer away'], ['poor', 'Poor / ugly'], ['broken', 'Won’t load']];
+let auth = null;
+const pics = [];
+const reviews = new Map();
+const view = { pack: 'all', show: 'todo', shown: PAGE };
+
+async function call(method, path, body) {
+  const tok = auth ? await Promise.race([auth.getIdToken().catch(() => null), new Promise(r => setTimeout(() => r(null), 5000))]) : null;
+  const res = await fetch(API + path, {
+    method, cache: 'no-store',
+    headers: { ...(tok ? { Authorization: `Bearer ${tok}` } : {}), ...(body ? { 'Content-Type': 'application/json' } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { const e = new Error(data.error || `HTTP ${res.status}`); e.status = res.status; throw e; }
+  return data;
+}
+
+function signInPanel(msg) {
+  gate.replaceChildren(h('p', {}, msg), h('button.btn.primary', { type: 'button', onclick: async () => {
+    try { await auth.signInGoogle(); start(); } catch (e) { toast(e.message || 'Sign-in failed'); }
+  } }, 'Sign in with Google'));
+}
+
+async function loadPics() {
+  const index = await (await fetch(`data/index.json?r=${Date.now()}`, { cache: 'no-store' })).json();
+  const ids = Object.keys(index.packs).filter(id => index.packs[id].caps?.img > 0).sort();
+  const packs = await Promise.all(ids.map(id => fetch(`data/${index.packs[id].path}`, { cache: 'no-cache' }).then(r => r.json()).catch(() => null)));
+  packs.forEach((p, n) => {
+    if (!p) return;
+    const seen = new Set(), seenSrc = new Set();
+    (function walk(o, owner) {
+      if (Array.isArray(o)) { o.forEach(x => walk(x, owner)); return; }
+      if (!o || typeof o !== 'object') return;
+      const me = o.id && (o.name || o.q || o.prompt) ? o : owner;
+      const imgs = o.media?.img || (Array.isArray(o.img) ? o.img : null);
+      (imgs || []).forEach((m, i) => {
+        const src = typeof m === 'string' ? m : m?.src;
+        if (!src || seenSrc.has(src)) return;
+        seenSrc.add(src);
+        let ref = `${ids[n]}/${me?.id || 'pack'}/${i}`;
+        while (seen.has(ref)) ref += '+';
+        seen.add(ref);
+        pics.push({ ref, src, pack: ids[n], packTitle: p.title || ids[n], name: me?.name || me?.q || me?.prompt || '', ai: !/^https?:/.test(src), caption: m?.caption || '', page: m?.page || '' });
+      });
+      for (const [k, v] of Object.entries(o)) if (k !== 'media' && v && typeof v === 'object') walk(v, me);
+    })([p.items, p.questions], null);
+  });
+}
+
+// the stored verdict only counts while it is for the same picture
+const verdictOf = p => { const r = reviews.get(p.ref); return r && r.src === p.src ? r : null; };
+
+async function save(items) {
+  try { await call('POST', '/admin/imgreview', { items }); } catch (e) { toast(`Not saved: ${e.message}`); throw e; }
+}
+
+function setVerdict(p, verdict, reason = '', note = '') {
+  const before = reviews.get(p.ref);
+  if (verdict) reviews.set(p.ref, { ref: p.ref, src: p.src, verdict, reason, note }); else reviews.delete(p.ref);
+  summary();
+  return save([{ ref: p.ref, src: p.src, verdict, reason, note }]).catch(() => {
+    if (before) reviews.set(p.ref, before); else reviews.delete(p.ref);
+    summary(); render();
+  });
+}
+
+const sumEl = h('div.rv-sum');
+function summary() {
+  const inPack = view.pack === 'all' ? pics : view.pack === 'ai' ? pics.filter(p => p.ai) : pics.filter(p => p.pack === view.pack);
+  let ok = 0, bad = 0;
+  for (const p of inPack) { const v = verdictOf(p)?.verdict; if (v === 'ok') ok++; else if (v === 'bad') bad++; }
+  sumEl.replaceChildren(
+    h('span', {}, h('b', {}, String(inPack.length)), ' pictures'),
+    h('span', {}, h('b', {}, String(inPack.length - ok - bad)), ' to review'),
+    h('span', {}, h('b', {}, String(ok)), ' OK'),
+    h('span', {}, h('b', {}, String(bad)), ' bad'));
+}
+
+function filtered() {
+  return pics.filter(p => {
+    if (view.pack === 'ai' ? !p.ai : view.pack !== 'all' && p.pack !== view.pack) return false;
+    const v = verdictOf(p)?.verdict;
+    return view.show === 'all' || (view.show === 'todo' ? !v : v === view.show);
+  });
+}
+
+function card(p) {
+  const el = h('div.rv-card');
+  const img = h('img', { src: p.src, alt: p.name, loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' });
+  const pic = h('a.rv-pic', { href: p.src, target: '_blank', rel: 'noopener' }, img, p.ai ? h('span.ai', {}, 'AI') : null);
+  img.addEventListener('error', () => pic.classList.add('broken'));
+  const yes = h('button.y', { type: 'button' }, '✓ OK');
+  const no = h('button.n', { type: 'button' }, '✗ Bad');
+  const why = h('div.rv-why');
+  const note = h('input', { type: 'text', placeholder: 'Note (optional): what’s wrong, what to show instead', maxlength: 400 });
+  const paint = () => {
+    const v = verdictOf(p);
+    el.classList.toggle('ok', v?.verdict === 'ok');
+    el.classList.toggle('bad', v?.verdict === 'bad');
+    yes.classList.toggle('on', v?.verdict === 'ok');
+    no.classList.toggle('on', v?.verdict === 'bad');
+    why.hidden = v?.verdict !== 'bad';
+    for (const b of why.querySelectorAll('button')) b.classList.toggle('on', b.dataset.r === v?.reason);
+    if (document.activeElement !== note) note.value = v?.note || '';
+  };
+  yes.addEventListener('click', () => { setVerdict(p, verdictOf(p)?.verdict === 'ok' ? '' : 'ok').then(paint); paint(); });
+  no.addEventListener('click', () => {
+    const v = verdictOf(p);
+    setVerdict(p, v?.verdict === 'bad' ? '' : 'bad', v?.reason || (pic.classList.contains('broken') ? 'broken' : 'text'), v?.note || '').then(paint);
+    paint();
+  });
+  for (const [r, label] of REASONS) {
+    why.append(h('button', { type: 'button', dataset: { r }, onclick: () => { setVerdict(p, 'bad', r, note.value).then(paint); paint(); } }, label));
+  }
+  note.addEventListener('change', () => { const v = verdictOf(p); setVerdict(p, 'bad', v?.reason || 'text', note.value).then(paint); paint(); });
+  why.append(note);
+  el.append(pic, h('div.rv-meta', {}, h('b', {}, p.name || '(no name)'), h('small', {}, p.caption ? `${p.packTitle} · ${p.caption}` : p.packTitle)),
+    h('div.rv-acts', {}, yes, no), why);
+  paint();
+  return el;
+}
+
+const grid = h('div.rv-grid');
+const more = h('div.rv-more');
+let confirmAll = 0;
+function render() {
+  const list = filtered();
+  const page = list.slice(0, view.shown);
+  grid.replaceChildren(...page.map(card));
+  if (!list.length) grid.append(h('p.muted', {}, view.show === 'todo' ? 'Nothing left to review here.' : 'No pictures match.'));
+  const todo = page.filter(p => !verdictOf(p));
+  const allOk = h('button.btn.go', { type: 'button' }, `Mark the ${todo.length} unmarked above OK`);
+  allOk.hidden = !todo.length;
+  allOk.addEventListener('click', async () => {
+    if (Date.now() - confirmAll > 4000) { confirmAll = Date.now(); allOk.textContent = `Tap again to mark ${todo.length} OK`; return; }
+    confirmAll = 0;
+    allOk.disabled = true;
+    try {
+      await save(todo.map(p => ({ ref: p.ref, src: p.src, verdict: 'ok' })));
+      todo.forEach(p => reviews.set(p.ref, { ref: p.ref, src: p.src, verdict: 'ok' }));
+      summary(); render();
+    } catch { allOk.disabled = false; }
+  });
+  const next = h('button.btn', { type: 'button', onclick: () => { view.shown += PAGE; render(); } }, `Show more (${list.length - page.length} left)`);
+  next.hidden = list.length <= page.length;
+  more.replaceChildren(allOk, next);
+}
+
+function controls() {
+  const counts = new Map();
+  for (const p of pics) counts.set(p.pack, (counts.get(p.pack) || 0) + 1);
+  const titles = new Map(pics.map(p => [p.pack, p.packTitle]));
+  const sel = h('select', { id: 'rv-pack', 'aria-label': 'Pack' },
+    h('option', { value: 'all' }, `All packs (${pics.length})`),
+    h('option', { value: 'ai' }, `AI pictures only (${pics.filter(p => p.ai).length})`),
+    ...[...counts].map(([id, n]) => h('option', { value: id }, `${titles.get(id)} (${n})`)));
+  sel.value = view.pack;
+  sel.addEventListener('change', () => { view.pack = sel.value; view.shown = PAGE; summary(); render(); });
+  const seg = h('div.rv-seg', { role: 'group', 'aria-label': 'Show' });
+  for (const [k, label] of [['todo', 'To review'], ['bad', 'Bad'], ['ok', 'OK'], ['all', 'All']]) {
+    const b = h('button', { type: 'button', class: view.show === k ? 'on' : '' }, label);
+    b.addEventListener('click', () => { view.show = k; view.shown = PAGE; seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); render(); });
+    seg.append(b);
+  }
+  return h('div.rv-bar', {}, sel, seg);
+}
+
+async function start() {
+  let got;
+  try { got = await call('GET', '/admin/imgreview'); } catch (e) {
+    if (e.status === 401) signInPanel('Sign in with your admin Google account.');
+    else if (e.status === 403) signInPanel(`${auth?.user?.email || 'This account'} is not a Clued admin.`);
+    else gate.replaceChildren(h('p', {}, `Couldn’t load: ${e.message}`));
+    return;
+  }
+  for (const r of got.reviews || []) reviews.set(r.ref, r);
+  gate.replaceChildren(h('p.muted', {}, 'Loading the packs…'));
+  if (!pics.length) await loadPics();
+  gate.remove();
+  root.append(sumEl, controls(), grid, more);
+  summary(); render();
+}
+
+(async () => {
+  try {
+    const m = await import('/lib/auth/auth.js');
+    auth = { ...m.auth, signInGoogle: m.signInGoogle, getIdToken: () => m.auth.getIdToken(), get user() { return m.auth.user; } };
+    await Promise.race([m.auth.ready(), new Promise(r => setTimeout(r, 5000))]);
+  } catch (e) {
+    gate.replaceChildren(h('p', {}, 'The br8t account layer didn’t load, so admin sign-in isn’t available here.'));
+    return;
+  }
+  await start();
+})();

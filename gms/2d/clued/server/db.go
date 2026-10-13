@@ -92,6 +92,17 @@ CREATE TABLE IF NOT EXISTS debug_logs (
 CREATE INDEX IF NOT EXISTS idx_debug_ts ON debug_logs(ts);
 CREATE INDEX IF NOT EXISTS idx_debug_device ON debug_logs(device, id);
 
+-- Admin picture review: one row per reviewed picture (pack/item/index), verdict ok or bad.
+CREATE TABLE IF NOT EXISTS img_review (
+  ref     TEXT PRIMARY KEY,
+  src     TEXT NOT NULL DEFAULT '',
+  verdict TEXT NOT NULL,
+  reason  TEXT NOT NULL DEFAULT '',
+  note    TEXT NOT NULL DEFAULT '',
+  at      INTEGER NOT NULL,
+  by      TEXT NOT NULL DEFAULT ''
+);
+
 CREATE INDEX IF NOT EXISTS idx_scores_board ON challenge_scores(challenge_id, score DESC, ms ASC, id ASC);
 CREATE INDEX IF NOT EXISTS idx_challenges_touched ON challenges(touched);
 `

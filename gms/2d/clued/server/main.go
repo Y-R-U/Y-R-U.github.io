@@ -190,6 +190,8 @@ func routes() http.Handler {
 	api.HandleFunc("GET /api/status", handleStatus)
 	api.HandleFunc("POST /api/debuglog", handleDebugLog)
 	api.HandleFunc("GET /api/admin/debuglog", requireAdmin(handleAdminDebugGet))
+	api.HandleFunc("GET /api/admin/imgreview", requireAdmin(handleImgReviewGet))
+	api.HandleFunc("POST /api/admin/imgreview", requireAdmin(handleImgReviewSet))
 	api.HandleFunc("POST /api/admin/debuglog", requireAdmin(handleAdminDebugSet))
 	registerAppleProxy(api)
 	api.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
