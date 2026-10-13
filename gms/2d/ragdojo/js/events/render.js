@@ -104,19 +104,50 @@ export class VinesView {
   /** Seconds of walking still queued. */
   queued() { return this.anim.reduce((t, x) => t + x.dur - (x.t || 0), 0); }
 
+  // Steps hold squares, not pixels, so a re-layout mid-walk (a phone toolbar resize) keeps the walk.
   walk(m) {
-    let prev = m.from;
-    for (const s of m.path) { this.anim.push({ kind: 'walk', a: this.centre(prev), b: this.centre(s), dur: 0.26 }); prev = s; }
-    if (m.link) this.anim.push(m.link.kind === 'ladder'
-      ? { kind: 'climb', a: this.centre(m.link.from), b: this.centre(m.link.to), dur: 0.55 + Math.abs(m.link.to - m.link.from) * 0.012 }
-      : { kind: 'slide', pts: this.vinePts(m.link.from, m.link.to, this.board.vines.findIndex((v) => v[0] === m.link.from) * 1.7), dur: 0.9 });
+    if (m.path.length) this.anim.push({ kind: 'walk', sq: [m.from, ...m.path], dur: 0.3 + m.path.length * 0.24 });
+    if (m.link) {
+      this.anim.push({ kind: 'wait', at: m.link.from, dur: 0.2 });
+      this.anim.push(m.link.kind === 'ladder'
+        ? { kind: 'climb', a: m.link.from, b: m.link.to, dur: 0.7 + Math.abs(m.link.to - m.link.from) * 0.014 }
+        : { kind: 'slide', a: m.link.from, b: m.link.to, vine: this.board.vines.findIndex((v) => v[0] === m.link.from), dur: 1.1 });
+    }
     this.lastDie = m.roll; this.dieSpin = 0.45;
+  }
+
+  /** Where the walker is `u` (0–1) through step `s`. */
+  stepAt(s, u) {
+    const lerp = (p, q, t) => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t];
+    const ease = u * u * (3 - 2 * u);
+    if (s.kind === 'walk') {
+      const f = ease * (s.sq.length - 1), i = Math.min(s.sq.length - 2, Math.floor(f));
+      return lerp(this.centre(s.sq[i]), this.centre(s.sq[i + 1]), f - i);
+    }
+    if (s.kind === 'wait') return this.centre(s.at);
+    if (s.kind === 'climb') return lerp(this.centre(s.a), this.centre(s.b), ease);
+    const pts = this.vinePts(s.a, s.b, s.vine * 1.7), f = u * u * (pts.length - 1), i = Math.min(pts.length - 2, Math.floor(f));
+    return lerp(pts[i], pts[i + 1], f - i);
+  }
+
+  /** A red arrow bobbing over the resting walker, so you can find yourself on a busy board. */
+  drawArrow(g, x, y, now) {
+    const cs = this.L.cs, a = Math.min(1, this.idleT / 0.25);
+    if (a <= 0) return;
+    const tip = y - cs * 0.8 - Math.abs(Math.sin(now * 4.2)) * cs * 0.35, w = cs * 0.36, hh = cs * 0.36, tail = cs * 0.5;
+    const pts = [[x, tip], [x - w, tip - hh], [x - w * 0.42, tip - hh], [x - w * 0.42, tip - hh - tail],
+      [x + w * 0.42, tip - hh - tail], [x + w * 0.42, tip - hh], [x + w, tip - hh], [x, tip]];
+    g.save(); g.globalAlpha = a;
+    g.beginPath(); pts.forEach(([px, py], i) => (i ? g.lineTo(px, py) : g.moveTo(px, py))); g.closePath();
+    g.fillStyle = '#c8463f'; g.fill();
+    g.strokeStyle = INK; g.lineWidth = 2; g.lineJoin = 'round'; g.stroke();
+    g.restore();
   }
 
   /** Rivals hop from `from` to `to` once the walker is done. `key` identifies a rival. */
   rivalsMove(list) {
     const wait = -this.queued() - 0.1;
-    this.rivalAnim = list.filter((r) => r.from !== r.to).map((r) => ({ key: r.key, a: this.centre(r.from), b: this.centre(r.to), t: wait }));
+    this.rivalAnim = list.filter((r) => r.from !== r.to).map((r) => ({ key: r.key, a: r.from, b: r.to, t: wait }));
   }
 
   /** `rivals`: [{ key, name, pos, friend }]; `myPos`: where the walker rests. */
@@ -127,7 +158,10 @@ export class VinesView {
     rivals.forEach((r, i) => {
       let [x, y] = this.centre(r.pos);
       const a = ra.get(r.key);
-      if (a) { const t = Math.max(0, Math.min(1, a.t / 0.5)); x = a.a[0] + (a.b[0] - a.a[0]) * t; y = a.a[1] + (a.b[1] - a.a[1]) * t - Math.sin(t * Math.PI) * L.cs * 0.3; }
+      if (a) {
+        const t = Math.max(0, Math.min(1, a.t / 0.5)), [ax, ay] = this.centre(a.a), [bx, by] = this.centre(a.b);
+        x = ax + (bx - ax) * t; y = ay + (by - ay) * t - Math.sin(t * Math.PI) * L.cs * 0.3;
+      }
       const ang = i * 2.399, off = L.cs * 0.26;
       x += Math.cos(ang) * off; y += Math.sin(ang) * off * 0.7;
       const col = RIVAL_COL[i % RIVAL_COL.length];
@@ -144,11 +178,14 @@ export class VinesView {
     const me = this.me;
     if (this.anim.length) {
       const s = this.anim[0]; s.t = (s.t || 0) + dt; const u = Math.min(1, s.t / s.dur);
-      if (s.kind === 'walk') { x = s.a[0] + (s.b[0] - s.a[0]) * u; y = s.a[1] + (s.b[1] - s.a[1]) * u - Math.sin(u * Math.PI) * L.cs * 0.12; pose = 'walk'; poseT = this.walkT; me.facing = s.b[0] >= s.a[0] ? 1 : -1; }
-      else if (s.kind === 'climb') { x = s.a[0] + (s.b[0] - s.a[0]) * u; y = s.a[1] + (s.b[1] - s.a[1]) * u; pose = 'walk'; poseT = this.walkT * 1.6; }
-      else { const k = Math.min(s.pts.length - 1, Math.floor(u * (s.pts.length - 1))); [x, y] = s.pts[k]; pose = 'hurt'; }
+      const was = this.walkerAt;
+      [x, y] = this.stepAt(s, u);
+      if (s.kind === 'walk') { pose = 'walk'; poseT = this.walkT; if (was && Math.abs(x - was[0]) > 0.05) me.facing = x > was[0] ? 1 : -1; }
+      else if (s.kind === 'climb') { pose = 'walk'; poseT = this.walkT * 1.6; }
+      else if (s.kind === 'slide') pose = 'hurt';
       if (u >= 1) this.anim.shift();
-    } else [x, y] = this.centre(myPos);
+      this.idleT = 0;
+    } else { [x, y] = this.centre(myPos); this.idleT = (this.idleT || 0) + dt; }
     this.walkerAt = [x, y];
     const k = L.cs / 115;
     const p = pose === 'walk' ? sample('walk', poseT) : (POSE[pose] || POSE.guard);
@@ -156,6 +193,7 @@ export class VinesView {
     g.save(); g.translate(x, y + L.cs * 0.02); g.scale(k, k);
     drawFighter(g, me, now);
     g.restore();
+    if (!this.anim.length) this.drawArrow(g, x, y, now);
     if (this.lastDie) {
       this.dieSpin = Math.max(0, this.dieSpin - dt);
       const s = L.cs * 0.8, dx = L.bx - L.cs * 0.95, dy = L.by + L.cs * 0.2;

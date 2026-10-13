@@ -8,7 +8,7 @@ import { activeEvents, parseEventId, pointsFor, today } from './index.js';
 import * as V from './vines.js';
 import * as R from './reveal.js';
 import * as E from './state.js';
-import { VinesView, RevealView } from './render.js';
+import { VinesView, RevealView } from './render.js?v=20261014-vines';
 import { createEventsNet, deviceId, arenaName } from './net.js';
 import { drawOverlay } from './overlay.js';
 import { SHEET_W, GROUND_Y } from '../config.js';
@@ -331,7 +331,8 @@ export function mountEvents(h) {
     cv.style.width = w + 'px'; cv.style.height = hgt + 'px';
     const area = { x: 0, y: 0, w, h: hgt };
     const p = tab && tab !== 'prizes' ? parseEventId(tab) : null;
-    if (p?.def.kind === 'vines') { vview.anim = []; vview.rivalAnim = []; vview.layout(area, boardFor(tab), dpr); }
+    // A resize keeps a walk in progress; only a different board drops it.
+    if (p?.def.kind === 'vines') { if (vview.tab !== tab) { vview.anim = []; vview.rivalAnim = []; vview.tab = tab; } vview.layout(area, boardFor(tab), dpr); }
     rview.layout(area);
     laidFor = `${tab}|${w}|${hgt}|${dpr}`;
   }
