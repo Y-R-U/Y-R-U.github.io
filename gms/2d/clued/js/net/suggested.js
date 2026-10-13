@@ -39,6 +39,13 @@ export const SUGGESTED = [
     R('The human body', 'mc', ['body', 'elements'], { answers: 4, source: 'mix' }),
     R('Animal calls', 'listen', ['birds', 'mammals'], { clip: 10, art: 'off', ask: 'auto', answers: 4 }),
   ] },
+  { id: 'records', name: 'Records & Extremes', blurb: 'Fastest, tallest, deepest, hottest: guess, compare and rank world records.', timing: { answerSec: 20, gapSec: 5 }, rounds: [
+    R('World records', 'mc', ['records'], { answers: 4, source: 'mix' }, 1),
+    R('Closest guess', 'number', ['records'], {}, 2),
+    R('Higher or lower', 'hilo', ['records'], {}, 2),
+    R('Put them in order', 'order', ['records'], {}),
+    R('Record breakers', 'mc', ['records'], { answers: 4, source: 'mix' }, 3),
+  ] },
   { id: 'quick', name: 'Quick Quiz', blurb: 'Three short rounds for a ten-minute game.', timing: { answerSec: 10, gapSec: 5 }, rounds: [
     R('General knowledge', 'mc', ['general'], { answers: 4, source: 'mix' }),
     R('Flags', 'reveal', ['flags'], { mode: 'full', answers: 4 }, 1),

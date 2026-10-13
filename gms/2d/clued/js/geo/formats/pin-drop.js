@@ -1,7 +1,7 @@
-import { register, collect, pick } from '../../formats/registry.js?v=202610130751';
-import { loadCities, geo as G } from '../data.js?v=202610130751';
-import { haversineKm } from '../proj.js?v=202610130751';
-import { geo, countryIds, regionMembers, REGIONS, createMap, frame, message, button, isKids, cname, REGION_CHOICES, REGION_LABELS, supportsGeo, fmtKm } from './common.js?v=202610130751';
+import { register, collect, pick } from '../../formats/registry.js?v=202610130907';
+import { loadCities, geo as G } from '../data.js?v=202610130907';
+import { haversineKm } from '../proj.js?v=202610130907';
+import { geo, countryIds, regionMembers, REGIONS, createMap, frame, message, button, isKids, cname, REGION_CHOICES, REGION_LABELS, supportsGeo, fmtKm } from './common.js?v=202610130907';
 
 await loadCities();
 

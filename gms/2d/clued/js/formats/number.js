@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, lcLabel, plainLabel } from './registry.js?v=202610130751';
-import { h, mediaBox } from '../ui/kit.js?v=202610130751';
-import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610130751';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, lcLabel, plainLabel } from './registry.js?v=202610130907';
+import { h, mediaBox } from '../ui/kit.js?v=202610130907';
+import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610130907';
 
 const CSS = `
 .nb{gap:12px}
@@ -120,8 +120,8 @@ function fromQuestion(rng, pack, difficulty) {
   const span = q.min != null && q.max != null ? { min: q.min, max: q.max } : year ? { min: Math.floor((v - 200) / 50) * 50, max: Math.min(2026, Math.ceil((v + 120) / 50) * 50) } : v > 0 ? { min: v / 10, max: v * 10 } : { min: v - 100, max: v + 100 };
   return {
     format: 'number', id: `number:${pack.id}/q:${q.id}`, prompt: q.prompt, media: q.media && Object.keys(q.media).length ? q.media : undefined,
-    answer: v, answerText: pretty(v, year ? '' : q.unit || '', year), explain: q.explain, refs: [`${pack.id}/q:${q.id}`], pack: pack.id,
-    data: { ...span, year, log: !year && span.min > 0 && span.max / span.min > 30, unit: year ? '' : q.unit || '', tolerance: q.tolerance ?? null, level: difficulty },
+    answer: v, answerText: q.answerText || pretty(v, year ? '' : q.unit || '', year), explain: q.explain, refs: [`${pack.id}/q:${q.id}`], pack: pack.id,
+    data: { ...span, year, log: !year && span.min > 0 && span.max / span.min > 30, unit: year ? '' : q.unit || '', tolerance: q.tolerance ?? null, level: difficulty, ...(q.answerText ? { exact: q.answerText } : {}) },
   };
 }
 
@@ -199,7 +199,7 @@ export default register({
       const pos = v => `${(toPos(v) / STEPS) * 100}%`;
       const sc = h('div.nb-scale', {}, h('div.bar'),
         h('div.mk.g', { style: { left: pos(value) } }, h('span', {}, 'You'), h('i')),
-        h('div.mk.t', { style: { left: pos(q.answer) } }, h('i'), h('span', {}, pretty(q.answer, d.unit, d.year))));
+        h('div.mk.t', { style: { left: pos(q.answer) } }, h('i'), h('span', {}, d.exact || pretty(q.answer, d.unit, d.year))));
       slider.replaceWith(sc);
     }
     const onKey = e => {

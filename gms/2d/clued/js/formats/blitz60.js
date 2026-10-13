@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, collect, pick, factText, isIucn, lcLabel, factHeading } from './registry.js?v=202610130751';
-import { h, typeBox } from '../ui/kit.js?v=202610130751';
-import { fuzzyMatch, distance, answersFor } from '../core/fuzzy.js?v=202610130751';
-import { norm, injectCSS, baseCSS, ownClock, once } from './fkit.js?v=202610130751';
+import { register, poolItems, pickPack, collect, pick, factText, isIucn, lcLabel, factHeading } from './registry.js?v=202610130907';
+import { h, typeBox } from '../ui/kit.js?v=202610130907';
+import { fuzzyMatch, distance, answersFor } from '../core/fuzzy.js?v=202610130907';
+import { norm, injectCSS, baseCSS, ownClock, once } from './fkit.js?v=202610130907';
 
 const CSS = `
 .bz{gap:10px}
@@ -34,7 +34,7 @@ function categories(pack) {
   const items = (pack.items || []).filter(it => SHORT(it.name));
   const out = [];
   const title = pack.title || pack.id;
-  if (items.length >= 6) out.push({ label: title, test: () => true, key: '*' });
+  if (items.length >= 6 && pack.blitzAll !== false) out.push({ label: title, test: () => true, key: '*' });
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
     if (m.hard || isIucn(m)) continue;
     if (m.type === 'cat') {

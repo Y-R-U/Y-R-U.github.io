@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, fill, collect, pick, factAllowed, givesAway } from './registry.js?v=202610130751';
-import { h, layout, typeBox } from '../ui/kit.js?v=202610130751';
-import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610130751';
-import { norm, injectCSS, once, hasImg } from './fkit.js?v=202610130751';
+import { register, poolItems, pickPack, byDifficulty, imageOf, fill, collect, pick, factAllowed, givesAway } from './registry.js?v=202610130907';
+import { h, layout, typeBox } from '../ui/kit.js?v=202610130907';
+import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610130907';
+import { norm, injectCSS, once, hasImg } from './fkit.js?v=202610130907';
 
 const CSS = `
 .ty-pat{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-family:var(--font-display);font-size:22px;letter-spacing:4px;color:var(--ink-2)}
@@ -56,7 +56,7 @@ function sources(pack, gate) {
     if (!m.ask || (m.type !== 'cat' && m.type !== 'text') || m.exclusive === false || !factAllowed(m, gate) || !typeableFact(key, m, items)) continue;
     if (items.filter(it => typeof it.facts?.[key] === 'string' && SHORT(it.facts[key])).length >= 4) out.push([`fact:${key}`, 1.5]);
   }
-  if ((pack.questions || []).some(q => (q.kind || 'mc') === 'mc' && SHORT(q.answer) && !CONTEXT.test(q.prompt))) out.push(['q', 1.5]);
+  if ((pack.questions || []).some(q => (q.kind || 'mc') === 'mc' && q.typeable !== false && SHORT(q.answer) && !CONTEXT.test(q.prompt))) out.push(['q', 1.5]);
   return out;
 }
 
@@ -66,7 +66,7 @@ function make(rng, pack, kind, difficulty) {
   const all = poolItems([pack]);
   const base = { format: 'type', pack: pack.id };
   if (kind === 'q') {
-    const qs = byDifficulty((pack.questions || []).filter(q => (q.kind || 'mc') === 'mc' && SHORT(q.answer) && !CONTEXT.test(q.prompt) && !givesAway(q.answer, q.prompt, q.wrong)), difficulty, 1);
+    const qs = byDifficulty((pack.questions || []).filter(q => (q.kind || 'mc') === 'mc' && q.typeable !== false && SHORT(q.answer) && !CONTEXT.test(q.prompt) && !givesAway(q.answer, q.prompt, q.wrong)), difficulty, 1);
     if (!qs.length) return null;
     const q = pick(rng, qs);
     return { ...base, id: `type:${pack.id}/q:${q.id}`, prompt: q.prompt, media: q.media && Object.keys(q.media).length ? q.media : undefined,

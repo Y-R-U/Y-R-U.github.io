@@ -1,5 +1,5 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610130751';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610130907';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -110,8 +110,8 @@ export function nested(a, b) {
 }
 
 // Wording for comparing a number fact, from factsMeta.higherLabel: { hi, lo, sup, ask(b) } or null (use higher/lower).
-const OPP = { bigger: 'smaller', longer: 'shorter', heavier: 'lighter', taller: 'shorter', wider: 'narrower', harder: 'softer', denser: 'less dense' };
-const SUP = { bigger: 'biggest', longer: 'longest', heavier: 'heaviest', taller: 'tallest', wider: 'widest', harder: 'hardest', denser: 'densest' };
+const OPP = { bigger: 'smaller', longer: 'shorter', heavier: 'lighter', taller: 'shorter', wider: 'narrower', harder: 'softer', denser: 'less dense', deeper: 'shallower', faster: 'slower' };
+const SUP = { bigger: 'biggest', longer: 'longest', heavier: 'heaviest', taller: 'tallest', wider: 'widest', harder: 'hardest', denser: 'densest', deeper: 'deepest', faster: 'fastest' };
 export function comparison(meta) {
   if (!meta || meta.type !== 'num') return null;
   if (/\bago\b/i.test(meta.unit || '')) {

@@ -1,5 +1,5 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested, nameArgs, catStmt, boolStmt, givesAway } from './registry.js?v=202610130751';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610130751';
+import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested, nameArgs, catStmt, boolStmt, givesAway } from './registry.js?v=202610130907';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610130907';
 
 function sources(pack, gate) {
   const out = [];

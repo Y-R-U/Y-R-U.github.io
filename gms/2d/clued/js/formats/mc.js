@@ -1,8 +1,8 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
   spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk, givesAway,
-} from './registry.js?v=202610130751';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610130751';
+} from './registry.js?v=202610130907';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610130907';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
@@ -39,7 +39,10 @@ function fromQuestion(rng, pack, n, difficulty) {
   if (!qs.length) return null;
   const q = pick(rng, qs);
   const wrong = sample(rng, q.wrong, Math.min(n - 1, q.wrong.length));
-  const { options, answer } = placeAnswer(rng, q.answer, wrong);
+  // ordered: range bands ("Under 10 h", "10–50 h", …) stay in their natural order
+  const { options, answer } = Array.isArray(q.ordered)
+    ? (o => ({ options: o, answer: o.indexOf(q.answer) }))(q.ordered.filter(t => t === q.answer || wrong.includes(t)))
+    : placeAnswer(rng, q.answer, wrong);
   const notes = q.wrongNotes && wrong.filter(w => q.wrongNotes[w]).map(w => [String(w), q.wrongNotes[w]]);
   return {
     format: 'mc', id: `mc:${pack.id}/q:${q.id}`, prompt: q.prompt, media: q.media && Object.keys(q.media).length ? q.media : undefined,

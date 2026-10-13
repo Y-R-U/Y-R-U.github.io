@@ -1,5 +1,5 @@
 {
- "build": "202610130819",
+ "build": "202610130902",
  "themes": [
   {
    "id": "animals",
@@ -159,7 +159,8 @@
    "title": "General knowledge",
    "icon": "💡",
    "packs": [
-    "general"
+    "general",
+    "records"
    ]
   },
   {
@@ -184,6 +185,7 @@
     "kids",
     "landmarks",
     "mammals",
+    "records",
     "reptiles",
     "sea",
     "sharks",
@@ -3605,6 +3607,79 @@
      "blitz60": 1,
      "type": 16,
      "quote": 18
+    }
+   }
+  },
+  "records": {
+   "path": "packs/records.json",
+   "title": "World records",
+   "theme": "general",
+   "icon": "🏆",
+   "kids": true,
+   "items": 523,
+   "questions": 713,
+   "notice": "Records change: anything marked \"as of 2025\" was checked against the official list for 2025.",
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {
+     "holder": "cat",
+     "country": "cat",
+     "heightM": "num",
+     "lengthKm": "num",
+     "areaKm2": "num",
+     "depthM": "num",
+     "speedKmh": "num",
+     "diameterKm": "num"
+    },
+    "groups": 18,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 648,
+     "number": 59,
+     "pickall": 6
+    },
+    "easy": 119,
+    "kidsItems": 59,
+    "multi": [
+     "holder",
+     "country"
+    ],
+    "catBins": {},
+    "formats": {
+     "mc": 20,
+     "tf": 0,
+     "hilo": 20,
+     "order": 20,
+     "number": 20,
+     "blitz60": 0,
+     "type": 20,
+     "pickall": 6
+    },
+    "formatsEasy": {
+     "mc": 20,
+     "tf": 0,
+     "hilo": 20,
+     "order": 20,
+     "number": 20,
+     "blitz60": 0,
+     "type": 20,
+     "pickall": 6
+    },
+    "formatsKids": {
+     "mc": 20,
+     "tf": 0,
+     "hilo": 20,
+     "order": 10,
+     "number": 10,
+     "blitz60": 0,
+     "type": 20,
+     "pickall": 1
     }
    }
   },

@@ -39,7 +39,7 @@ async function flow(orient) {
   ok(await tabOn() === 'suggested', `${orient}: popup opens on Suggested`);
   ok(await b.eval(`document.querySelector('.pop .set-tab[data-tab=mine]')?.textContent`) === 'My sets (0)', `${orient}: My sets (0) tab`);
   const n = await count('.pop .set-row.no-del');
-  ok(n === 6, `${orient}: 6 suggestions listed (${n})`);
+  ok(n === 7, `${orient}: 7 suggestions listed (${n})`);
   ok(await count('.pop [data-act=set-delete]') === 0, `${orient}: suggestions have no ✕`);
   const pub = await rowText('Classic Pub Quiz', 'suggested');
   ok(pub.includes('5 rounds · 50 questions') && pub.includes('Friday-night'), `${orient}: pub quiz row: rounds line + blurb`);

@@ -1,13 +1,13 @@
-import { h } from './kit.js?v=202610130751';
-import { defineScreen, go } from './app.js?v=202610130751';
-import { getSettings, setSettings, dailyDone, todayUTC } from '../core/store.js?v=202610130751';
-import { kidsProgress } from './stickers.js?v=202610130751';
-import { sfx } from './fx.js?v=202610130751';
-import { toast } from './popup.js?v=202610130751';
-import { loadNet } from './net.js?v=202610130751';
-import { toolButtons } from './toggles.js?v=202610130751';
-import { statsLine } from './statsline.js?v=202610130751';
-import { BUILD } from '../build.js?v=202610130751';
+import { h } from './kit.js?v=202610130907';
+import { defineScreen, go } from './app.js?v=202610130907';
+import { getSettings, setSettings, dailyDone, todayUTC } from '../core/store.js?v=202610130907';
+import { kidsProgress } from './stickers.js?v=202610130907';
+import { sfx } from './fx.js?v=202610130907';
+import { toast } from './popup.js?v=202610130907';
+import { loadNet } from './net.js?v=202610130907';
+import { toolButtons } from './toggles.js?v=202610130907';
+import { statsLine } from './statsline.js?v=202610130907';
+import { BUILD } from '../build.js?v=202610130907';
 
 export const logo = (sm = false) => h('div.logo', { class: sm ? 'sm' : '', 'aria-label': 'Clued' },
   h('span.lens', {}, '?'), ...'lued'.split('').map(c => h('span.l', {}, c)));
