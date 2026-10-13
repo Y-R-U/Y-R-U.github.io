@@ -262,6 +262,13 @@ html, body {
 
 /* Leave room for the shared account button. */
 .corner.tr, #pauseBtn { right: calc(max(10px, env(safe-area-inset-right)) + var(--br8t-account-space, 0px)); }
+/* The shared account button sits over the HP labels, and nobody needs it mid-fight. */
+body.fighting #br8t-account { visibility: hidden; }
+/* Rotated portrait puts the screen's top-right corner at the app's top-left. */
+@media (orientation: portrait) and (max-width: 860px) {
+  .corner.tr, #pauseBtn { right: max(10px, env(safe-area-inset-right)); }
+  .corner.tl { left: calc(max(10px, env(safe-area-inset-left)) + var(--br8t-account-space, 0px)); }
+}
 #premium p { margin: 8px 0; }
 #premium .rows { font-size: 19px; }
 #premium .offer { margin: 6px 0; padding: 6px 10px; border: 1.5px dashed var(--ink-soft); border-radius: 10px 7px 11px 6px; text-align: left; font-size: .9em; }

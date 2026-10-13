@@ -119,6 +119,7 @@ function setMode(m) {
   input.enabled = (m === 'fight');
   input.reset();
   $('pauseBtn').classList.toggle('hidden', m !== 'fight');
+  document.body.classList.toggle('fighting', m === 'fight');
   updateRotateHint();
   if (m === 'hub') { if (parkOwed) { parkOwed = false; parkPaid(); } show('hub'); startDemo(); audio.play(roleTrack(S.theme, S.completed ? 'victory' : 'menu')); }
   else if (m === 'fight') { show(null); }
