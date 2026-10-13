@@ -1,9 +1,9 @@
 // The home screen's stats highlight (a different real stat each visit, tap for the stats page) and the play clock.
-import { h } from './kit.js?v=202610130607';
-import { go, onScreen } from './app.js?v=202610130607';
-import { statsView, highlights, markPlay } from '../core/stats.js?v=202610130607';
-import { getIndex, THEMES } from '../core/packs.js?v=202610130607';
-import { getFormat } from '../formats/registry.js?v=202610130607';
+import { h } from './kit.js?v=202610130751';
+import { go, onScreen } from './app.js?v=202610130751';
+import { statsView, highlights, markPlay } from '../core/stats.js?v=202610130751';
+import { getIndex, THEMES } from '../core/packs.js?v=202610130751';
+import { getFormat } from '../formats/registry.js?v=202610130751';
 
 const PLAY_SCREENS = new Set(['play', 'duel', 'challenge', 'linkchallenge', 'l-review']);
 onScreen(name => { if (PLAY_SCREENS.has(name)) markPlay(); });

@@ -97,3 +97,5 @@ The resolver is rate-limited to one call per 3.3 s (a cold run of all lists take
 - **A**: before media preflight, call `fmt.prepare?.(questions)` for formats that have it (listen refreshes stale Apple previews there).
 - **A/S (runner)**: when the runner draws the shared Show-more/vote button, set `api.moreButton = true` so listen hides its own. For online rooms please pass `online: true` (or `spec.online`) to `generate()` so Grow-the-clip "Online only" switches on; until then hosts can pick "On".
 - **A**: SFX names you use are all implemented; kids variants switch automatically from `body.kids-on`.
+
+- 2026-10-13: decade hits, one-hit wonders and artists grown from year-end charts by the MUSIC lane — see docs/notes/MUSIC.md.

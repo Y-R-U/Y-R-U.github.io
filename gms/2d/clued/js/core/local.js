@@ -1,9 +1,9 @@
 // Local focus: a game-level setting { cc: ISO3, level: 'off'|'more'|'most'|'all', live } that makes a share of each
 // round about one country (docs/notes/LOCAL.md). Tags come from data/local/tags.json (tools/local_tags.mjs);
 // in-country geography from data/local/geo.json (js/core/localgeo.js). Pure helpers + loaders; spec.js applies it.
-import { dataUrl } from './packs.js?v=202610130607';
-import { rngFrom, shuffle } from './rng.js?v=202610130607';
-import { getSettings, setSettings } from './store.js?v=202610130607';
+import { dataUrl } from './packs.js?v=202610130751';
+import { rngFrom, shuffle } from './rng.js?v=202610130751';
+import { getSettings, setSettings } from './store.js?v=202610130751';
 
 export const LEVELS = [['off', 'Off', 0], ['more', 'More', 0.25], ['most', 'Most', 0.6], ['all', 'ALL', 1]];
 export const SHARE = Object.fromEntries(LEVELS.map(([k, , s]) => [k, s]));
@@ -73,7 +73,7 @@ const refLocal = (ref, cc) => {
   return i > 0 && tagsOf(s.slice(0, i), s.slice(i + 1)).includes(cc);
 };
 // Formats about every ref (learn/mastery.js ALL_REFS + odd/chain): local when at least half the refs are.
-const ALL_REFS = new Set(['order', 'hilo', 'match', 'sort', 'connect', 'odd', 'chain']);
+const ALL_REFS = new Set(['order', 'hilo', 'match', 'sort', 'connect', 'odd', 'chain', 'pickall']);
 export function isLocalQ(q, cc) {
   if (!q || !cc) return false;
   if (q.data?.local) return q.data.local === cc;

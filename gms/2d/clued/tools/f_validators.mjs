@@ -205,5 +205,22 @@ function revealCheck(q, { itemOf, ok }, tag) {
   for (const r of q.refs.slice(1)) ok(itemOf(r)?.name !== t.name, `reveal :: distractor differs (${tag})`);
 }
 
-export const VALIDATORS = { match: matchCheck, ladder: ladderCheck, order: orderCheck, sort: sortCheck, number: numberCheck, connect: connectCheck,
+// pickall: the right tiles are exactly the options whose fact equals the asked value (or the list's answers).
+function pickallCheck(q, { byId, itemOf, ok }, tag) {
+  const A = new Set(q.answer), texts = q.options.map(o => o.text);
+  ok(A.size >= 2 && A.size <= 4 && q.options.length >= 2 * A.size && q.data.need === A.size, `pickall :: 2–4 right, tiles ≥ 2n (${tag}) ${q.id}`);
+  if (q.data.from === 'rule') {
+    q.refs.map(itemOf).forEach(it => {
+      const v = it?.facts?.[q.data.key];
+      const right = q.data.value === true ? v === true : String(v) === String(q.data.value);
+      ok(it && right === A.has(texts.indexOf(it.name)), `pickall :: tile matches its fact (${tag}) ${q.id} ${it?.name}`);
+    });
+  } else {
+    const [pid, qid] = q.refs[0].split('/q:');
+    const src = byId.get(pid)?.questions?.find(x => x.id === qid);
+    ok(src && texts.every((t, i) => (A.has(i) ? src.answer : src.wrong).includes(t)), `pickall :: list sides (${tag}) ${q.id}`);
+  }
+}
+
+export const VALIDATORS = { pickall: pickallCheck, match: matchCheck, ladder: ladderCheck, order: orderCheck, sort: sortCheck, number: numberCheck, connect: connectCheck,
   blitz60: blitzCheck, type: typeCheck, chain: chainCheck, silhouette: silCheck, reveal: revealCheck, odd: oddCheck, fake: fakeCheck, hilo: hiloCheck, lookalike: lookCheck, quote: quoteCheck };

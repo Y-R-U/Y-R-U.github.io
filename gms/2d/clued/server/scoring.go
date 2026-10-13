@@ -15,13 +15,13 @@ const maxBase = 500
 // Formats whose score depends on more than right/wrong; the client's points are used (clamped).
 var partialFormats = map[string]bool{
 	"ladder": true, "pin-drop": true, "number": true, "blitz60": true, "match": true,
-	"connect": true, "sort": true, "neighbours": true, "order": true, "chain": true,
+	"connect": true, "sort": true, "neighbours": true, "order": true, "chain": true, "pickall": true,
 }
 
 // Long-form formats get a longer default limit in rooms.
 var longFormats = map[string]int{
 	"connect": 120000, "blitz60": 60000, "match": 60000, "ladder": 60000, "sort": 45000,
-	"neighbours": 45000, "order": 40000, "chain": 60000, "pin-drop": 30000, "type": 30000,
+	"neighbours": 45000, "order": 40000, "chain": 60000, "pin-drop": 30000, "type": 30000, "pickall": 30000,
 }
 
 const defaultLimit = 20000
@@ -102,8 +102,12 @@ func parseMeta(raw json.RawMessage) qMeta {
 }
 
 // verifyCorrect overrides the client's claim only where the server can check:
-// mc (given = option index) and tf (given = bool).
+// mc (given = option index), tf (given = bool) and pickall (given = picked option indices).
 func verifyCorrect(m qMeta, given json.RawMessage, claimed bool) bool {
+	if m.Format == "pickall" {
+		_, ok := pickallScore(m.Answer, given)
+		return ok
+	}
 	if m.Format != "mc" && m.Format != "tf" || len(m.Answer) == 0 || len(given) == 0 {
 		return claimed
 	}
@@ -210,4 +214,42 @@ func answerMs(serverMs int, client *float64, limitMs int) int {
 		}
 	}
 	return max(0, min(ms, limitMs))
+}
+
+// pickallScore mirrors js/formats/pickall_score.js: right picks / right answers; more picks than right answers
+// score 0, so picking every tile never pays. ok = exactly the right set. Unparseable input scores 0.
+func pickallScore(answer, given json.RawMessage) (frac float64, ok bool) {
+	var a, g []float64
+	if json.Unmarshal(answer, &a) != nil || len(a) == 0 {
+		return 0, false
+	}
+	json.Unmarshal(given, &g)
+	right := map[int]bool{}
+	for _, x := range a {
+		right[int(x)] = true
+	}
+	picked := map[int]bool{}
+	for _, x := range g {
+		if x == math.Trunc(x) {
+			picked[int(x)] = true
+		}
+	}
+	hits := 0
+	for i := range picked {
+		if right[i] {
+			hits++
+		}
+	}
+	wrong := len(picked) - hits
+	if len(picked) > len(right) {
+		return 0, false
+	}
+	frac = math.Min(1, float64(hits)/float64(len(right)))
+	return frac, hits == len(right) && wrong == 0
+}
+
+// pickallCap: the most a pick-all answer may score before streaks, whatever points the client sent.
+func pickallCap(answer, given json.RawMessage) int {
+	frac, _ := pickallScore(answer, given)
+	return int(math.Round(maxBase * frac))
 }

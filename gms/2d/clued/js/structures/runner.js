@@ -1,17 +1,17 @@
 // The question runner: plays a list of questions with HUD, timer, reveal and scoring.
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
-import { getFormat } from '../formats/registry.js?v=202610130607';
-import { createTimer } from '../core/timer.js?v=202610130607';
-import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610130607';
-import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610130607';
-import { getSettings } from '../core/store.js?v=202610130607';
-import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610130607';
-import { popup, confirmPop } from '../ui/popup.js?v=202610130607';
-import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610130607';
-import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610130607';
-import { dlog, debugCheck } from '../core/debuglog.js?v=202610130607';
-import { fsButton } from '../ui/toggles.js?v=202610130607';
-import { recordSeen } from '../core/fresh.js?v=202610130607';
+import { getFormat } from '../formats/registry.js?v=202610130751';
+import { createTimer } from '../core/timer.js?v=202610130751';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610130751';
+import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610130751';
+import { getSettings } from '../core/store.js?v=202610130751';
+import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610130751';
+import { popup, confirmPop } from '../ui/popup.js?v=202610130751';
+import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610130751';
+import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610130751';
+import { dlog, debugCheck } from '../core/debuglog.js?v=202610130751';
+import { fsButton } from '../ui/toggles.js?v=202610130751';
+import { recordSeen } from '../core/fresh.js?v=202610130751';
 
 const KIND_RIGHT = ['Brilliant!', 'You got it!', 'Super!', 'Yes!', 'Amazing!'];
 const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];

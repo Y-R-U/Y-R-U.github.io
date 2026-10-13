@@ -1,16 +1,17 @@
 // GameSpec -> questions. A spec fully describes a game; same spec + same packs = same questions.
-import { rngFrom, sample, randomSeed } from './rng.js?v=202610130607';
-import { loadIndex, loadPacks } from './packs.js?v=202610130607';
-import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610130607';
-import { isOn, loadTags, loadLocalGeo, loadNames, easeView, localView, mixRound, countryName, packHasLocal } from './local.js?v=202610130607';
-import { homeQuestions, HOME_FORMATS, HOME_PACKS } from './localgeo.js?v=202610130607';
-import { loadIndex as loadGeoIndex, geo as GEO } from '../geo/data.js?v=202610130607';
-import { dupKey, freshRanker } from './fresh.js?v=202610130607';
+import { rngFrom, sample, shuffle, randomSeed } from './rng.js?v=202610130751';
+import { loadIndex, loadPacks } from './packs.js?v=202610130751';
+import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610130751';
+import { isOn, loadTags, loadLocalGeo, loadNames, easeView, localView, mixRound, countryName, packHasLocal, isLocalQ, targetOf } from './local.js?v=202610130751';
+import { homeQuestions, HOME_FORMATS, HOME_PACKS } from './localgeo.js?v=202610130751';
+import { loadIndex as loadGeoIndex, geo as GEO } from '../geo/data.js?v=202610130751';
+import { dupKey, freshRanker } from './fresh.js?v=202610130751';
+import { BLEND, blendCounts, blendOn, levelMap, levelOf, loadGeoLevels, pickBlend } from './diffmix.js?v=202610130751';
 
 export const MAX_ALL_PACKS = 8;
 
 export function makeSpec(structure, rounds, seed = randomSeed(), extra = {}) {
-  return { v: 1, structure, rounds: rounds.map(r => ({ packs: 'all', count: 10, opts: {}, difficulty: 0, ...r })), seed: String(seed), ...extra };
+  return { v: 1, structure, rounds: rounds.map(r => ({ packs: 'all', count: 10, opts: {}, difficulty: 0, ...r })), seed: String(seed), ...(structure === 'daily' ? {} : { blend: 1 }), ...extra };
 }
 
 // Kids mode: kids packs first; other packs only if not marked kidsSafe:false (their items get filtered to difficulty 1).
@@ -23,7 +24,7 @@ export function supportedPackIds(fmt, index, { kids = false } = {}) {
 // Map formats bring their own geo data (packless); the geography packs only add flags, landmarks and mastery refs.
 export const formatAvailable = (fmt, index, opts) => !!fmt?.packless || supportedPackIds(fmt, index, opts).length > 0;
 
-export const kidsOk = (x, pack) => x.facts?.kids === true || x.kids === true || (x.difficulty || 2) <= 1 || (pack.kids && !(x.difficulty > 1));
+export const kidsOk = (x, pack) => x.kids !== false && x.facts?.kids !== false && (x.facts?.kids === true || x.kids === true || (x.difficulty || 2) <= 1 || (pack.kids && !(x.difficulty > 1)));
 
 // A shallow copy of the pack holding only child-friendly items/questions, so every format respects kids mode for free.
 export function kidsView(pack) {
@@ -77,30 +78,35 @@ export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(
     const want = r.count + Math.ceil(r.count * sparesRatio) + 1;
     const pool = F ? want * 2 + r.count : want;
     let list = [];
-    try {
-      list = fmt.generate({ rng, packs, count: pool, opts, difficulty: kids ? 1 : (r.difficulty || 0), kids, avoid: used, round: i, spec }) || [];
-    } catch (e) {
-      console.error('[clued] generate failed', r.format, e);
-      throw new Error(`${fmt.title} could not make questions`);
+    if (blendOn(spec, r, kids)) {
+      list = await blendRound({ spec, r, i, fmt, packs, opts, pool, want, used, seen, F, L, localGeo });
+      if (L && report) report.push({ round: i, count: r.count, target: list.localTarget, pool: list.localPool, local: 0 });
+    } else {
+      try {
+        list = fmt.generate({ rng, packs, count: pool, opts, difficulty: kids ? 1 : (r.difficulty || 0), kids, avoid: used, round: i, spec }) || [];
+      } catch (e) {
+        console.error('[clued] generate failed', r.format, e);
+        throw new Error(`${fmt.title} could not make questions`);
+      }
+      if (L) {
+        const lrng = rngFrom(`${spec.seed}:${i}:${r.format}:local`);
+        const gen = { rng: lrng, count: Math.max(pool, 30), opts, difficulty: kids ? 1 : (r.difficulty || 0), kids, avoid: used, round: i, spec };
+        const more = [];
+        if (!fmt.packless) for (const p of packs) {
+          const v = localView(p, L.cc, lrng);
+          if (v) try { more.push(...(fmt.generate({ ...gen, packs: [v] }) || [])); } catch (e) { /* a tiny local view can't feed this format */ }
+        }
+        if (HOME_FORMATS.has(fmt.id) && (fmt.packless || !Array.isArray(r.packs) || !r.packs.length || r.packs.some(id => HOME_PACKS.has(id)))) {
+          more.push(...homeQuestions({ ...gen, cc: L.cc, format: fmt.id, live: L.live, geo: localGeo, states: GEO.states, cname: countryName(L.cc) }));
+        }
+        // drop what the game already holds (same prompt + answer) before choosing, so the share survives the dedupe below
+        const notDup = q => { const k = dupKey(q); return !k || !seen.has(k); };
+        if (F) { F.note([list, more]); list = F.rank(list); }
+        const mixed = mixRound({ full: list.filter(notDup), more: more.filter(notDup), count: r.count, level: L.level, cc: L.cc, seed: `${spec.seed}:${i}`, key: dupKey, rank: F?.rank });
+        list = mixed.list;
+        if (report) report.push({ round: i, count: r.count, target: mixed.target, pool: mixed.pool, local: 0 });
+      } else if (F) { F.note([list]); list = F.rank(list); }
     }
-    if (L) {
-      const lrng = rngFrom(`${spec.seed}:${i}:${r.format}:local`);
-      const gen = { rng: lrng, count: Math.max(pool, 30), opts, difficulty: kids ? 1 : (r.difficulty || 0), kids, avoid: used, round: i, spec };
-      const more = [];
-      if (!fmt.packless) for (const p of packs) {
-        const v = localView(p, L.cc, lrng);
-        if (v) try { more.push(...(fmt.generate({ ...gen, packs: [v] }) || [])); } catch (e) { /* a tiny local view can't feed this format */ }
-      }
-      if (HOME_FORMATS.has(fmt.id) && (fmt.packless || !Array.isArray(r.packs) || !r.packs.length || r.packs.some(id => HOME_PACKS.has(id)))) {
-        more.push(...homeQuestions({ ...gen, cc: L.cc, format: fmt.id, live: L.live, geo: localGeo, states: GEO.states, cname: countryName(L.cc) }));
-      }
-      // drop what the game already holds (same prompt + answer) before choosing, so the share survives the dedupe below
-      const notDup = q => { const k = dupKey(q); return !k || !seen.has(k); };
-      if (F) { F.note([list, more]); list = F.rank(list); }
-      const mixed = mixRound({ full: list.filter(notDup), more: more.filter(notDup), count: r.count, level: L.level, cc: L.cc, seed: `${spec.seed}:${i}`, key: dupKey, rank: F?.rank });
-      list = mixed.list;
-      if (report) report.push({ round: i, count: r.count, target: mixed.target, pool: mixed.pool, local: 0 });
-    } else if (F) { F.note([list]); list = F.rank(list); }
     // the same question lives in several packs (96 cross-pack copies): one per game, by prompt + answer
     list = list.filter(q => {
       const k = dupKey(q);
@@ -123,6 +129,67 @@ export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(
     if (L && report) { const row = report[report.length - 1]; row.got = Math.min(r.count, list.length); row.local = list.slice(0, r.count).filter(q => q.loc).length; }
   }
   return F ? { questions, spares, fresh: F.spec, seenPicked } : { questions, spares };
+}
+
+// DIFFMIX: generate each level (1–3) on its own stream, rate every question by its real level, then fill the round's
+// blend (js/core/diffmix.js). LOCAL and FRESH compose: local share split across levels, unseen first within a level.
+async function blendRound({ spec, r, i, fmt, packs, opts, pool, want, used, seen, F, L, localGeo }) {
+  const d = r.difficulty, av = new Set(used);
+  const ctx = { levels: levelMap(packs), packless: !!fmt.packless, geoL: fmt.packless ? await loadGeoLevels() : null };
+  const per = BLEND[d].map(w => Math.ceil(pool * w / 10) + 2);
+  const tag = (out, lv) => { for (const q of out) { q.lv = levelOf(q, lv, ctx); av.add(q.id); } return out; };
+  const lists = [], mores = [];
+  let fails = 0;
+  const gen = (lv, n, k = '') => fmt.generate({ rng: rngFrom(`${spec.seed}:${i}:${r.format}:L${lv}${k}`), packs, count: n, opts, difficulty: lv, kids: false, avoid: av, round: i, spec }) || [];
+  for (const lv of [1, 2, 3]) {
+    try { lists.push(tag(gen(lv, per[lv - 1]), lv)); } catch (e) { fails++; console.error('[clued] generate failed', r.format, lv, e); lists.push([]); }
+  }
+  if (fails === 3) throw new Error(`${fmt.title} could not make questions`);
+  // a level whose band is diluted (a hard map band is 1/3 hard) gets one bigger second pass
+  const quotas = blendCounts(r.count, d);
+  for (const lv of [1, 2, 3]) {
+    const need = Math.ceil(quotas[lv - 1] * 1.4);
+    if (need && lists.flat().filter(q => q.lv === lv).length < need) {
+      try { lists.push(tag(gen(lv, per[lv - 1] * 3, '+'), lv)); } catch (e) { /* the first pass already failed or was enough */ }
+    }
+  }
+  if (L) {
+    for (const lv of [1, 2, 3]) {
+      const lrng = rngFrom(`${spec.seed}:${i}:${r.format}:local:L${lv}`);
+      const gen = { rng: lrng, count: Math.max(per[lv - 1], 10), opts, difficulty: lv, kids: false, avoid: av, round: i, spec };
+      const more = [];
+      if (!fmt.packless) for (const p of packs) {
+        const v = localView(p, L.cc, lrng);
+        if (v) try { more.push(...tag(fmt.generate({ ...gen, packs: [v] }) || [], lv)); } catch (e) { /* a tiny local view can't feed this format */ }
+      }
+      if (HOME_FORMATS.has(fmt.id) && (fmt.packless || !Array.isArray(r.packs) || !r.packs.length || r.packs.some(id => HOME_PACKS.has(id)))) {
+        more.push(...tag(homeQuestions({ ...gen, cc: L.cc, format: fmt.id, live: L.live, geo: localGeo, states: GEO.states, cname: countryName(L.cc) }), lv));
+      }
+      mores.push(more);
+    }
+  }
+  if (F) F.note([...lists, ...mores]);
+  const ids = new Set(), keys = new Set(), cands = [];
+  const isLoc = L ? q => isLocalQ(q, L.cc) : () => false;
+  for (const [q, extra] of [...lists.flat().map(q => [q, false]), ...mores.flat().map(q => [q, true])]) {
+    const k = dupKey(q), loc = isLoc(q);
+    if (ids.has(q.id) || (k && (keys.has(k) || seen.has(k))) || (extra && !loc)) continue;
+    ids.add(q.id); if (k) keys.add(k);
+    cands.push({ q, lv: q.lv, loc });
+  }
+  // unseen first within each level; local ones shuffled first (packs arrive one after another), as mixRound does
+  const lrng = rngFrom(`${spec.seed}:${i}:local`);
+  const order = [];
+  for (const lv of [1, 2, 3]) for (const loc of [false, true]) {
+    let b = cands.filter(c => c.lv === lv && c.loc === loc).map(c => c.q);
+    if (loc) b = shuffle(lrng, b);
+    if (F) b = F.rank(b);
+    order.push(...b.map(q => ({ q, lv, loc, seen: !!F?.seenIn([q]) })));
+  }
+  const target = L ? targetOf(r.count, L.level) : 0;
+  const { head, tail } = pickBlend({ cands: order, count: r.count, difficulty: d, localTarget: target, seed: `${spec.seed}:${i}:${r.format}` });
+  if (L) head.forEach(c => { if (c.loc) c.q.loc = 1; });
+  return Object.assign([...head, ...tail].slice(0, Math.max(want, r.count)).map(c => c.q), { localTarget: target, localPool: order.filter(c => c.loc).length });
 }
 
 export const roundOf = (spec, q) => spec.rounds[q.round] || spec.rounds[0];

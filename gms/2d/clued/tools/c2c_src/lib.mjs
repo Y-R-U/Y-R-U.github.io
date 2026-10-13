@@ -3,6 +3,8 @@ export const M = (t, d, p, a, w, e, x = {}) => ({ kind: 'mc', t, d, p, a, w, e, 
 export const T = (t, d, p, a, e, x = {}) => ({ kind: 'tf', t, d, p, a, e, ...x });
 export const N = (t, d, p, a, unit, tol, e, x = {}) => ({ kind: 'number', t, d, p, a, unit, tol, e, ...x });
 export const O = (t, d, p, a, label, e, x = {}) => ({ kind: 'order', t, d, p, a, label, e, ...x });
+// pick all: a = every right option, w = decoys; p holds {n} (js/formats/pickall.js)
+export const P = (t, d, p, a, w, e, x = {}) => ({ kind: 'pickall', t, d, p, a, w, e, ...x });
 
 // topic key -> [theme id (CONTRACT THEMES), topic label]
 export const TOPICS = {

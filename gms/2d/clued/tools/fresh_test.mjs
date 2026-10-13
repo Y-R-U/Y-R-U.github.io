@@ -89,6 +89,7 @@ const geo = [{ format: 'map-click', packs: 'all', count: 10, opts: { region: 'wo
 const order = [];
 for (let g = 0; g < 6; g++) {
   const s = roomSpec(geo, `geo-${g}`);
+  delete s.blend;   // pure Easy keeps the 38-country pool exhausted (DIFFMIX's blend widens it)
   const r = await buildQuestions(s, { sparesRatio: 0.8, fresh: F.freshFrom() });
   ok(r.questions.length === 10, `geo game ${g}: full round (${r.questions.length})`);
   if (g === 4) {

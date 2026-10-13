@@ -1,6 +1,7 @@
 // Device-hosted room logic: a port of server/rooms.go + scoring.go so the host's tab can be the room
 // server. Pure (no DOM, no network), so tools/p2p_test.mjs runs it in node. State shape = the server's.
-import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610130607';
+import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610130751';
+import { pickScore, pickallCap } from '../formats/pickall_score.js?v=202610130751';
 export { stageMultiplier, withStreak };
 
 export const MAX_PLAYERS = 8;
@@ -35,8 +36,8 @@ const MAX_TSCALE = 6, MAX_SCALED_MS = 180000;
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const ANSWER_CHOICES = [3, 5, 10, 15, 20, 30], GAP_CHOICES = [3, 5, 10];
 
-export const PARTIAL = new Set(['ladder', 'pin-drop', 'number', 'blitz60', 'match', 'connect', 'sort', 'neighbours', 'order', 'chain']);
-export const LONG = { connect: 120000, blitz60: 60000, match: 60000, ladder: 60000, sort: 45000, neighbours: 45000, order: 40000, chain: 60000, 'pin-drop': 30000, type: 30000 };
+export const PARTIAL = new Set(['ladder', 'pin-drop', 'number', 'blitz60', 'match', 'connect', 'sort', 'neighbours', 'order', 'chain', 'pickall']);
+export const LONG = { connect: 120000, blitz60: 60000, match: 60000, ladder: 60000, sort: 45000, neighbours: 45000, order: 40000, chain: 60000, pickall: 30000, 'pin-drop': 30000, type: 30000 };
 
 const rnd = (alpha, n, rand) => Array.from({ length: n }, () => alpha[Math.floor(rand() * alpha.length)]).join('');
 export const newCode = (rand = Math.random) => rnd(CODE_ALPHABET, 5, rand);
@@ -58,6 +59,7 @@ export function basePoints(format, correct, clientPoints, ms, limitMs, timed, mu
 
 // mc (index) and tf (bool) are re-checked; everything else trusts the client's claim.
 export function verifyCorrect(q, given, claimed) {
+  if (q?.format === 'pickall' && Array.isArray(q.answer)) return pickScore(given, q.answer).correct;
   if (!q || (q.format !== 'mc' && q.format !== 'tf') || q.answer == null || given == null) return !!claimed;
   const a = q.answer, g = given;
   if (typeof a === 'string' && typeof g === 'string') return a.trim().toLowerCase() === g.trim().toLowerCase();
@@ -304,7 +306,8 @@ export class P2PRoom {
     const correct = verifyCorrect(q, a.given, a.correct);
     const n = stagesOf(q);
     const stage = n ? this.stage : 0;
-    const speed = basePoints(q?.format, correct, typeof a.points === 'number' ? a.points : undefined, ms, limit, !this.kids);
+    let speed = basePoints(q?.format, correct, typeof a.points === 'number' ? a.points : undefined, ms, limit, !this.kids);
+    if (q?.format === 'pickall') speed = Math.min(speed, pickallCap(q.answer, a.given, MAX_BASE));
     let raw = speed, lf = null;
     if (q?.format === 'listen' && !n && correct && !this.kids) {
       lf = listenFactors(q, a.replays);

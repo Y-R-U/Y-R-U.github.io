@@ -1,18 +1,19 @@
 // Format grid + per-game setup (themes, count, options, difficulty, timer).
-import { h } from './kit.js?v=202610130607';
-import { defineScreen, go, header } from './app.js?v=202610130607';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610130607';
-import { getIndex } from '../core/packs.js?v=202610130607';
-import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610130607';
-import { getSettings, setSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610130607';
-import { streakOption } from './streakopt.js?v=202610130607';
-import { themePicker } from './picker.js?v=202610130607';
-import { STRUCTURES } from '../structures/index.js?v=202610130607';
-import { sfx } from './fx.js?v=202610130607';
-import { favControls } from './favs.js?v=202610130607';
-import { favKey } from './favmodel.js?v=202610130607';
-import { mySetting, saveMySetting, isOn } from '../core/local.js?v=202610130607';
-import { localChip, localLine } from './local.js?v=202610130607';
+import { h } from './kit.js?v=202610130751';
+import { defineScreen, go, header } from './app.js?v=202610130751';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610130751';
+import { getIndex } from '../core/packs.js?v=202610130751';
+import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610130751';
+import { getSettings, setSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610130751';
+import { streakOption } from './streakopt.js?v=202610130751';
+import { themePicker } from './picker.js?v=202610130751';
+import { STRUCTURES } from '../structures/index.js?v=202610130751';
+import { sfx } from './fx.js?v=202610130751';
+import { favControls } from './favs.js?v=202610130751';
+import { favKey } from './favmodel.js?v=202610130751';
+import { mySetting, saveMySetting, isOn } from '../core/local.js?v=202610130751';
+import { localChip, localLine } from './local.js?v=202610130751';
+import { BLEND_NOTE } from '../core/diffmix.js?v=202610130751';
 
 export const DIFFS = [[0, 'Mixed'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']];
 
@@ -113,15 +114,18 @@ export function optionsPanel(host, fmt, { structure = 'quick', last = null, show
     }
     syncShow();
     if (showDifficulty && !kids) {
+      const note = h('small.muted.tiny.diff-note', { dataset: { d: String(v.difficulty) } }, `ⓘ ${BLEND_NOTE[v.difficulty] || BLEND_NOTE[0]}`);
       panel.append(h('div.opt', { dataset: { opt: 'difficulty' } }, h('div.opt-label', {}, 'Difficulty'), chipRow(DIFFS.map(d => d[0]), DIFFS.map(d => d[1]), v.difficulty, x => {
         v.difficulty = x;
+        note.textContent = `ⓘ ${BLEND_NOTE[x] || BLEND_NOTE[0]}`;
+        note.dataset.d = String(x);
         const ans = (fmt.options || []).find(o => o.key === 'answers');
         if (ans && x === 1 && ans.values.includes(3) && v.opts.answers > 3) {
           v.opts.answers = 3;
           panel.querySelectorAll('.opt').forEach(o => { if (o.firstChild.textContent === ans.label) o.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.v === '3')); });
         }
         changed();
-      })));
+      }), note));
     }
     if (showTimer) {
       const times = kids ? [0, 20, 30] : ANSWER_TIMES;

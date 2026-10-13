@@ -1,6 +1,6 @@
 // Every format module the shell loads. Lanes append a path to MODULES (relative to this file) and say so in notes.
 // Loaded with allSettled so one broken format can't stop the game booting.
-import { BUILD } from '../build.js?v=202610130607';
+import { BUILD } from '../build.js?v=202610130751';
 
 export const MODULES = [
   './mc.js',
@@ -29,6 +29,7 @@ export const MODULES = [
   './chain.js',
   './lookalike.js',
   './quote.js',
+  './pickall.js',
 ];
 
 export async function loadFormats() {

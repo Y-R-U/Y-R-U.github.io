@@ -15,6 +15,7 @@ import KB from './c2c_src/kids_b.mjs';
 import GD from './c2c_src/general_d.mjs';
 import GE from './c2c_src/general_e.mjs';
 import KC from './c2c_src/kids_c.mjs';
+import PA, { KIDS as PAK } from './c2c_src/pickall_a.mjs';
 import HA from './c2c_src/history_a.mjs';
 import SB from './c2c_src/sport_b.mjs';
 import { SUMMER, WINTER, WORLD_CUP, ATHLETES, QUESTIONS as SPORT_Q } from './c2c_src/sport.mjs';
@@ -31,7 +32,7 @@ function toQuestion(prefix, q, { kidsTag = false } = {}) {
     id: `${prefix}-${q.t}-${hash(q.p + '|' + JSON.stringify(q.a) + '|' + (q.img || ''))}`,
     kind: q.kind, prompt: q.p, answer: q.a,
   };
-  if (q.kind === 'mc') out.wrong = q.w;
+  if (q.kind === 'mc' || q.kind === 'pickall') out.wrong = q.w;
   if (q.kind === 'number') { out.unit = q.unit; out.tolerance = q.tol; }
   if (q.kind === 'order') out.orderLabel = q.label;
   out.explain = q.e;
@@ -53,7 +54,7 @@ function write(id, pack) {
   console.log(`${id}: ${qs} questions${its ? `, ${its} items` : ''}`);
 }
 
-const general = [...GA, ...GB, ...GC, ...GD, ...GE].map(q => toQuestion('gen', q));
+const general = [...GA, ...GB, ...GC, ...GD, ...GE, ...PA].map(q => toQuestion('gen', q));
 write('general', {
   id: 'general', title: 'General knowledge', theme: 'general', icon: '💡', kids: false, version: 1,
   questions: general,
@@ -61,7 +62,7 @@ write('general', {
 });
 
 const missing = [];
-const kids = [...KIDS, ...KB, ...KC].map(q => { const r = toQuestion('kid', q, { kidsTag: true }); if (!r) missing.push(q.img); return r; }).filter(Boolean);
+const kids = [...KIDS, ...KB, ...KC, ...PAK].map(q => { const r = toQuestion('kid', q, { kidsTag: true }); if (!r) missing.push(q.img); return r; }).filter(Boolean);
 if (missing.length) console.warn(`kids: dropped ${missing.length} picture questions with no cached image: ${missing.join(', ')}`);
 write('kids', {
   id: 'kids', title: 'Kids quiz', theme: 'kids', icon: '🧸', kids: true, version: 1,

@@ -18,12 +18,12 @@ export const SUGGESTED = [
     R('Theme tunes', 'listen', ['screen-themes'], LISTEN),
     R('Artists', 'mc', ['music-artists', 'general~music'], { answers: 4, source: 'mix' }),
   ] },
-  { id: 'world', name: 'Around the World', blurb: 'Flags, capitals, the map, landmarks and money, all well-known places.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
+  { id: 'world', name: 'Around the World', blurb: 'Flags, capitals, the map, landmarks and a pick-all round, all well-known places.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
     R('Flags', 'reveal', ['flags'], { mode: 'full', answers: 4 }, 1),
     R('Capital cities', 'mc', ['capitals'], { answers: 4, source: 'questions' }, 1),
     R('Name the country', 'map-click', 'all', { region: 'world', ask: 'name' }, 2),
     R('Landmarks', 'reveal', ['landmarks'], { mode: 'full', answers: 4 }, 1),
-    R('Money & languages', 'mc', ['currencies', 'languages'], { answers: 4, source: 'mix' }, 1),
+    R('Pick all the right ones', 'pickall', ['countries', 'capitals', 'landmarks', 'general~geography'], { tiles: 6 }, 1),
   ] },
   { id: 'screen', name: 'Movie & TV Night', blurb: 'Guess the film from a scene, theme tunes, actors, quotes and telly.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
     R('Movie moments', 'reveal', ['movie-moments'], { mode: 'full', answers: 4 }),

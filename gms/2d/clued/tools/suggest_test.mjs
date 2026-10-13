@@ -106,6 +106,7 @@ for (const kids of [false, true]) {
   for (const [fid, opts] of [['map-click', { region: 'world', ask: kids ? 'tap' : 'name' }], ['flag-map', { region: 'world' }], ['continent', { what: 'countries', answers: 3, map: 'yes' }]]) {
     if (!kids && fid !== 'map-click') continue;
     const spec = makeSpec('online', [{ format: fid, packs: 'all', count: 10, difficulty: 1, opts: { ...opts, online: true, ...(kids ? { kids: true } : {}) } }], 'pools', { kids });
+    delete spec.blend;   // the pool itself; an adult Easy round blends in some medium/hard (DIFFMIX)
     const { questions } = await buildQuestions(spec, { sparesRatio: 0.8 });
     const pool = new Set([...(kids ? kidsPool : adult), ...(fid === 'map-click' && opts.ask === 'tap' ? ['GRL'] : [])]);
     const isoOf = q => q.data?.iso || (typeof q.answer === 'string' ? q.answer : null);

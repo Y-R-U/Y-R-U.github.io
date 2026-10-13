@@ -1,18 +1,18 @@
-import { h, esc } from './kit.js?v=202610130607';
-import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610130607';
-import { defineScreen, header, back, go } from './app.js?v=202610130607';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610130607';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610130607';
-import { applyAudioSettings, sfx } from './fx.js?v=202610130607';
-import { applyKids } from './home.js?v=202610130607';
-import { loadLearn, loadNet } from './net.js?v=202610130607';
-import { BUILD } from '../build.js?v=202610130607';
-import { canSpeak, speak } from './speech.js?v=202610130607';
-import { streakOption } from './streakopt.js?v=202610130607';
-import { localChip } from './local.js?v=202610130607';
-import { confirmPop, toast } from './popup.js?v=202610130607';
-import { seenInfo, resetSeen } from '../core/fresh.js?v=202610130607';
-import { mySetting, saveMySetting } from '../core/local.js?v=202610130607';
+import { h, esc } from './kit.js?v=202610130751';
+import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610130751';
+import { defineScreen, header, back, go } from './app.js?v=202610130751';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610130751';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610130751';
+import { applyAudioSettings, sfx } from './fx.js?v=202610130751';
+import { applyKids } from './home.js?v=202610130751';
+import { loadLearn, loadNet } from './net.js?v=202610130751';
+import { BUILD } from '../build.js?v=202610130751';
+import { canSpeak, speak } from './speech.js?v=202610130751';
+import { streakOption } from './streakopt.js?v=202610130751';
+import { localChip } from './local.js?v=202610130751';
+import { confirmPop, toast } from './popup.js?v=202610130751';
+import { seenInfo, resetSeen } from '../core/fresh.js?v=202610130751';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610130751';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();

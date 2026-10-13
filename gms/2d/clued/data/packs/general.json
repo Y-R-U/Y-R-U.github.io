@@ -12548,16 +12548,16 @@
    "topic": "geography"
   },
   {
-   "id": "gen-geo-5cb8d1",
+   "id": "gen-geo-d05d00",
    "kind": "mc",
-   "prompt": "Besides its six states, which two mainland territories does Australia have?",
+   "prompt": "Besides its six states, which two self-governing territories does Australia have?",
    "answer": "ACT and Northern Territory",
    "wrong": [
     "ACT and Tasmania",
     "Northern Territory and Queensland",
     "Western Australia and ACT"
    ],
-   "explain": "The Australian Capital Territory and the Northern Territory are self-governing; Jervis Bay Territory is a small third one.",
+   "explain": "Only the ACT and the Northern Territory govern themselves; the third mainland territory, Jervis Bay, is run by the federal government.",
    "difficulty": 2,
    "tags": [
     "geography"
@@ -18388,6 +18388,2092 @@
     "history"
    ],
    "topic": "history"
+  },
+  {
+   "id": "gen-geo-8786cb",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are external territories of Australia?",
+   "answer": [
+    "Norfolk Island",
+    "Christmas Island",
+    "Cocos (Keeling) Islands",
+    "Coral Sea Islands",
+    "Ashmore and Cartier Islands",
+    "Heard Island and McDonald Islands"
+   ],
+   "wrong": [
+    "Lord Howe Island",
+    "Kangaroo Island",
+    "Rottnest Island",
+    "K'gari (Fraser Island)",
+    "Phillip Island",
+    "Macquarie Island",
+    "Thursday Island",
+    "Magnetic Island"
+   ],
+   "explain": "Australia has seven external territories (the seventh is the Australian Antarctic Territory). Lord Howe and Macquarie belong to NSW and Tasmania.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-ba6b8c",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are Australia’s mainland territories?",
+   "answer": [
+    "Australian Capital Territory",
+    "Northern Territory",
+    "Jervis Bay Territory"
+   ],
+   "wrong": [
+    "Australian Antarctic Territory",
+    "Coral Sea Islands Territory",
+    "Norfolk Island",
+    "Christmas Island",
+    "Tasmania",
+    "Queensland"
+   ],
+   "explain": "The three mainland territories are the ACT, the Northern Territory and Jervis Bay (separate from the ACT since 1989). Only the ACT and NT govern themselves.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-e54d39",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are Australian states?",
+   "answer": [
+    "New South Wales",
+    "Victoria",
+    "Queensland",
+    "Western Australia",
+    "South Australia",
+    "Tasmania"
+   ],
+   "wrong": [
+    "Northern Territory",
+    "Australian Capital Territory",
+    "Jervis Bay Territory",
+    "Norfolk Island",
+    "New England",
+    "Gippsland"
+   ],
+   "explain": "Australia has six states. The Northern Territory, the ACT and Jervis Bay are territories; New England and Gippsland are regions.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-64ee18",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are Australian state capitals?",
+   "answer": [
+    "Sydney",
+    "Melbourne",
+    "Brisbane",
+    "Perth",
+    "Adelaide",
+    "Hobart"
+   ],
+   "wrong": [
+    "Canberra",
+    "Darwin",
+    "Gold Coast",
+    "Newcastle",
+    "Cairns",
+    "Alice Springs",
+    "Geelong"
+   ],
+   "explain": "The six state capitals. Canberra (ACT) and Darwin (Northern Territory) are territory capitals.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-cd526d",
+   "kind": "pickall",
+   "prompt": "Which {n} of these countries are in the G7?",
+   "answer": [
+    "United States",
+    "United Kingdom",
+    "Canada",
+    "France",
+    "Germany",
+    "Italy",
+    "Japan"
+   ],
+   "wrong": [
+    "China",
+    "Russia",
+    "Australia",
+    "Spain",
+    "India",
+    "Brazil",
+    "South Korea"
+   ],
+   "explain": "The G7: Canada, France, Germany, Italy, Japan, the UK and the US. Russia was suspended from the G8 in 2014.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-374c95",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are among the Great Lakes of North America?",
+   "answer": [
+    "Lake Superior",
+    "Lake Michigan",
+    "Lake Huron",
+    "Lake Erie",
+    "Lake Ontario"
+   ],
+   "wrong": [
+    "Great Salt Lake",
+    "Lake Winnipeg",
+    "Great Bear Lake",
+    "Lake Tahoe",
+    "Lake Champlain",
+    "Lake of the Woods"
+   ],
+   "explain": "The five Great Lakes are Superior, Michigan, Huron, Erie and Ontario.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-a32393",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are Scandinavian countries?",
+   "answer": [
+    "Denmark",
+    "Norway",
+    "Sweden"
+   ],
+   "wrong": [
+    "Netherlands",
+    "Estonia",
+    "Poland",
+    "Germany",
+    "Belgium",
+    "Lithuania"
+   ],
+   "explain": "Scandinavia is Denmark, Norway and Sweden. Finland and Iceland are Nordic (some include them), so they are left out here.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-01a6a6",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are Nordic countries?",
+   "answer": [
+    "Denmark",
+    "Finland",
+    "Iceland",
+    "Norway",
+    "Sweden"
+   ],
+   "wrong": [
+    "Estonia",
+    "Netherlands",
+    "Germany",
+    "Poland",
+    "Ireland",
+    "Latvia",
+    "Lithuania"
+   ],
+   "explain": "The five Nordic countries are Denmark, Finland, Iceland, Norway and Sweden.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-f0d743",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are countries of the United Kingdom?",
+   "answer": [
+    "England",
+    "Scotland",
+    "Wales",
+    "Northern Ireland"
+   ],
+   "wrong": [
+    "Republic of Ireland",
+    "Isle of Man",
+    "Jersey",
+    "Guernsey",
+    "Gibraltar"
+   ],
+   "explain": "The UK is England, Scotland, Wales and Northern Ireland. The Isle of Man, Jersey and Guernsey are Crown dependencies.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-5cbc50",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are Canada’s Atlantic provinces?",
+   "answer": [
+    "New Brunswick",
+    "Nova Scotia",
+    "Prince Edward Island",
+    "Newfoundland and Labrador"
+   ],
+   "wrong": [
+    "Ontario",
+    "Manitoba",
+    "Saskatchewan",
+    "Alberta",
+    "British Columbia"
+   ],
+   "explain": "The four Atlantic provinces are New Brunswick, Nova Scotia, Prince Edward Island, and Newfoundland and Labrador.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-9b4084",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are Canada’s Prairie Provinces?",
+   "answer": [
+    "Alberta",
+    "Saskatchewan",
+    "Manitoba"
+   ],
+   "wrong": [
+    "Ontario",
+    "British Columbia",
+    "Nova Scotia",
+    "New Brunswick",
+    "Prince Edward Island",
+    "Quebec"
+   ],
+   "explain": "The Prairie Provinces are Alberta, Saskatchewan and Manitoba.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-80a23f",
+   "kind": "pickall",
+   "prompt": "Which {n} of these countries use the euro?",
+   "answer": [
+    "France",
+    "Germany",
+    "Italy",
+    "Spain",
+    "Ireland",
+    "Netherlands",
+    "Greece",
+    "Croatia"
+   ],
+   "wrong": [
+    "United Kingdom",
+    "Sweden",
+    "Denmark",
+    "Poland",
+    "Switzerland",
+    "Norway",
+    "Czechia",
+    "Hungary"
+   ],
+   "explain": "All eight are in the eurozone (Croatia joined in 2023). The UK, Sweden, Denmark, Poland, Czechia and Hungary keep their own money.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-2144a7",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are permanent members of the UN Security Council?",
+   "answer": [
+    "China",
+    "France",
+    "Russia",
+    "United Kingdom",
+    "United States"
+   ],
+   "wrong": [
+    "Germany",
+    "Japan",
+    "India",
+    "Brazil",
+    "Canada",
+    "Italy"
+   ],
+   "explain": "The five permanent members are China, France, Russia, the United Kingdom and the United States.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-c71f51",
+   "kind": "pickall",
+   "prompt": "Which {n} of these countries are island nations?",
+   "answer": [
+    "Japan",
+    "Iceland",
+    "Madagascar",
+    "New Zealand",
+    "Sri Lanka",
+    "Jamaica"
+   ],
+   "wrong": [
+    "Norway",
+    "Chile",
+    "Portugal",
+    "Thailand",
+    "Peru",
+    "Mexico"
+   ],
+   "explain": "Japan, Iceland, Madagascar, New Zealand, Sri Lanka and Jamaica are made up of islands and have no land borders.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-d052d5",
+   "kind": "pickall",
+   "prompt": "Which {n} of these countries are doubly landlocked?",
+   "answer": [
+    "Liechtenstein",
+    "Uzbekistan"
+   ],
+   "wrong": [
+    "Switzerland",
+    "Austria",
+    "Bolivia",
+    "Paraguay",
+    "Mongolia",
+    "Nepal"
+   ],
+   "explain": "Only Liechtenstein and Uzbekistan are surrounded entirely by other landlocked countries.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-0138c6",
+   "kind": "pickall",
+   "prompt": "Which {n} of these cities are national capitals?",
+   "answer": [
+    "Canberra",
+    "Ottawa",
+    "Brasília",
+    "Wellington",
+    "Ankara",
+    "Nairobi"
+   ],
+   "wrong": [
+    "Sydney",
+    "Toronto",
+    "Rio de Janeiro",
+    "Auckland",
+    "Istanbul",
+    "Lagos",
+    "Zurich",
+    "New York City"
+   ],
+   "explain": "Canberra, Ottawa, Brasília, Wellington, Ankara and Nairobi are capitals; the decoys are bigger or better-known cities.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-d27acc",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are names of the world’s five oceans?",
+   "answer": [
+    "Pacific",
+    "Atlantic",
+    "Indian",
+    "Arctic",
+    "Southern"
+   ],
+   "wrong": [
+    "Mediterranean",
+    "Caribbean",
+    "Arabian",
+    "Tasman",
+    "Bering",
+    "Caspian",
+    "Coral"
+   ],
+   "explain": "The five oceans: Pacific, Atlantic, Indian, Southern and Arctic. The others are seas (the Caspian is a lake).",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-f873fd",
+   "kind": "pickall",
+   "prompt": "Which {n} of these rivers flow into the Mediterranean Sea?",
+   "answer": [
+    "Nile",
+    "Rhône",
+    "Ebro"
+   ],
+   "wrong": [
+    "Danube",
+    "Rhine",
+    "Thames",
+    "Volga",
+    "Seine",
+    "Loire"
+   ],
+   "explain": "The Nile, Rhône and Ebro reach the Mediterranean. The Danube ends in the Black Sea and the Volga in the Caspian.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-5d3327",
+   "kind": "pickall",
+   "prompt": "Which {n} of these countries does the Danube flow through?",
+   "answer": [
+    "Germany",
+    "Austria",
+    "Slovakia",
+    "Hungary",
+    "Croatia",
+    "Serbia",
+    "Romania",
+    "Bulgaria",
+    "Ukraine"
+   ],
+   "wrong": [
+    "Czechia",
+    "Poland",
+    "Switzerland",
+    "Slovenia",
+    "Italy",
+    "Greece"
+   ],
+   "explain": "The Danube runs from Germany through Austria, Slovakia, Hungary, Croatia, Serbia, Romania, Bulgaria and Ukraine (and touches Moldova).",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-fdd976",
+   "kind": "pickall",
+   "prompt": "Which {n} of these countries does the Equator pass through?",
+   "answer": [
+    "Ecuador",
+    "Colombia",
+    "Brazil",
+    "Gabon",
+    "Uganda",
+    "Kenya",
+    "Somalia",
+    "Indonesia"
+   ],
+   "wrong": [
+    "Nigeria",
+    "Ethiopia",
+    "Malaysia",
+    "Sri Lanka",
+    "Thailand",
+    "Tanzania"
+   ],
+   "explain": "The Equator crosses Ecuador, Colombia, Brazil, Gabon, both Congos, Uganda, Kenya, Somalia, Indonesia and others. Tanzania lies just south.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-6a538c",
+   "kind": "pickall",
+   "prompt": "Which {n} of these countries have a coast on the Caspian Sea?",
+   "answer": [
+    "Russia",
+    "Kazakhstan",
+    "Turkmenistan",
+    "Iran",
+    "Azerbaijan"
+   ],
+   "wrong": [
+    "Georgia",
+    "Armenia",
+    "Uzbekistan",
+    "Turkey",
+    "Iraq",
+    "Afghanistan"
+   ],
+   "explain": "Five countries ring the Caspian: Russia, Kazakhstan, Turkmenistan, Iran and Azerbaijan.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-b959f5",
+   "kind": "pickall",
+   "prompt": "Which {n} of these US states share a border with Canada?",
+   "answer": [
+    "Alaska",
+    "Washington",
+    "Idaho",
+    "Montana",
+    "North Dakota",
+    "Minnesota",
+    "Vermont",
+    "Maine"
+   ],
+   "wrong": [
+    "Oregon",
+    "Wyoming",
+    "South Dakota",
+    "Iowa",
+    "Nevada",
+    "Colorado"
+   ],
+   "explain": "Thirteen US states border Canada, among them Alaska, Washington, Idaho, Montana, North Dakota, Minnesota, Vermont and Maine.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-0d3f8b",
+   "kind": "pickall",
+   "prompt": "Which {n} of these New Zealand cities are on the South Island?",
+   "answer": [
+    "Christchurch",
+    "Dunedin",
+    "Queenstown",
+    "Nelson",
+    "Invercargill"
+   ],
+   "wrong": [
+    "Auckland",
+    "Wellington",
+    "Hamilton",
+    "Rotorua",
+    "Napier",
+    "Tauranga"
+   ],
+   "explain": "Christchurch, Dunedin, Queenstown, Nelson and Invercargill are on the South Island; Wellington is at the foot of the North Island.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-5f79b1",
+   "kind": "pickall",
+   "prompt": "Which {n} of these cities are in Scotland?",
+   "answer": [
+    "Edinburgh",
+    "Glasgow",
+    "Aberdeen",
+    "Dundee",
+    "Inverness",
+    "Stirling"
+   ],
+   "wrong": [
+    "Cardiff",
+    "Belfast",
+    "Newcastle upon Tyne",
+    "Leeds",
+    "Manchester",
+    "Swansea"
+   ],
+   "explain": "Edinburgh, Glasgow, Aberdeen, Dundee, Inverness and Stirling are Scottish cities.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-ea7c89",
+   "kind": "pickall",
+   "prompt": "Which {n} of these English counties border Wales?",
+   "answer": [
+    "Cheshire",
+    "Shropshire",
+    "Herefordshire",
+    "Gloucestershire"
+   ],
+   "wrong": [
+    "Devon",
+    "Cumbria",
+    "Kent",
+    "Norfolk",
+    "Lancashire",
+    "Northumberland"
+   ],
+   "explain": "Wales has a land border with Cheshire, Shropshire, Herefordshire and Gloucestershire.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-b2d4d2",
+   "kind": "pickall",
+   "prompt": "Which {n} of these countries lie entirely in the Southern Hemisphere?",
+   "answer": [
+    "Australia",
+    "New Zealand",
+    "Argentina",
+    "Chile",
+    "South Africa",
+    "Madagascar"
+   ],
+   "wrong": [
+    "Mexico",
+    "Japan",
+    "Egypt",
+    "Spain",
+    "India",
+    "Canada"
+   ],
+   "explain": "Australia, New Zealand, Argentina, Chile, South Africa and Madagascar are wholly south of the Equator.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-his-1001a2",
+   "kind": "pickall",
+   "prompt": "Which {n} of these countries founded the European Economic Community in 1957?",
+   "answer": [
+    "Belgium",
+    "France",
+    "West Germany",
+    "Italy",
+    "Luxembourg",
+    "Netherlands"
+   ],
+   "wrong": [
+    "United Kingdom",
+    "Spain",
+    "Denmark",
+    "Ireland",
+    "Portugal",
+    "Greece",
+    "Austria"
+   ],
+   "explain": "The Treaty of Rome (1957) was signed by Belgium, France, West Germany, Italy, Luxembourg and the Netherlands.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-9fb433",
+   "kind": "pickall",
+   "prompt": "Which {n} of these were the main Axis powers of World War II?",
+   "answer": [
+    "Germany",
+    "Italy",
+    "Japan"
+   ],
+   "wrong": [
+    "United Kingdom",
+    "United States",
+    "Soviet Union",
+    "China",
+    "France",
+    "Canada"
+   ],
+   "explain": "Germany, Italy and Japan were the main Axis powers; the others fought with the Allies.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-2d2f2d",
+   "kind": "pickall",
+   "prompt": "Which {n} of these were wives of Henry VIII?",
+   "answer": [
+    "Catherine of Aragon",
+    "Anne Boleyn",
+    "Jane Seymour",
+    "Anne of Cleves",
+    "Catherine Howard",
+    "Catherine Parr"
+   ],
+   "wrong": [
+    "Mary Boleyn",
+    "Elizabeth Woodville",
+    "Elizabeth of York",
+    "Margaret Beaufort",
+    "Lady Jane Grey"
+   ],
+   "explain": "Henry VIII married six times: Catherine of Aragon, Anne Boleyn, Jane Seymour, Anne of Cleves, Catherine Howard and Catherine Parr.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-78cf1c",
+   "kind": "pickall",
+   "prompt": "Which {n} of these were presidents of the United States?",
+   "answer": [
+    "Thomas Jefferson",
+    "Abraham Lincoln",
+    "Theodore Roosevelt",
+    "Woodrow Wilson",
+    "Dwight D. Eisenhower",
+    "John F. Kennedy"
+   ],
+   "wrong": [
+    "Benjamin Franklin",
+    "Alexander Hamilton",
+    "Paul Revere",
+    "Robert E. Lee",
+    "Al Gore",
+    "Patrick Henry"
+   ],
+   "explain": "Franklin, Hamilton, Revere and Patrick Henry were founding-era figures, Lee a Confederate general and Al Gore a vice president.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-ad0dab",
+   "kind": "pickall",
+   "prompt": "Which {n} of these people walked on the Moon?",
+   "answer": [
+    "Neil Armstrong",
+    "Buzz Aldrin",
+    "Alan Shepard",
+    "Pete Conrad",
+    "Gene Cernan",
+    "John Young"
+   ],
+   "wrong": [
+    "Michael Collins",
+    "Yuri Gagarin",
+    "John Glenn",
+    "Valentina Tereshkova",
+    "Jim Lovell",
+    "Sally Ride"
+   ],
+   "explain": "Twelve men walked on the Moon (1969–72). Michael Collins and Jim Lovell flew there but never landed.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-64a99d",
+   "kind": "pickall",
+   "prompt": "Which {n} of these were Roman emperors?",
+   "answer": [
+    "Augustus",
+    "Nero",
+    "Caligula",
+    "Hadrian",
+    "Trajan",
+    "Marcus Aurelius"
+   ],
+   "wrong": [
+    "Julius Caesar",
+    "Cicero",
+    "Pompey",
+    "Hannibal",
+    "Spartacus",
+    "Mark Antony"
+   ],
+   "explain": "Julius Caesar was dictator but never emperor; his heir Augustus was the first emperor.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-5f0bbf",
+   "kind": "pickall",
+   "prompt": "Which {n} of these were Ancient Greek philosophers?",
+   "answer": [
+    "Socrates",
+    "Plato",
+    "Aristotle",
+    "Pythagoras",
+    "Diogenes",
+    "Epicurus"
+   ],
+   "wrong": [
+    "Cicero",
+    "Seneca",
+    "Confucius",
+    "Machiavelli",
+    "Descartes",
+    "Kant"
+   ],
+   "explain": "Cicero and Seneca were Roman, Confucius Chinese, Machiavelli Italian, Descartes French and Kant German.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-sci-916b3b",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are noble gases?",
+   "answer": [
+    "Helium",
+    "Neon",
+    "Argon",
+    "Krypton",
+    "Xenon",
+    "Radon"
+   ],
+   "wrong": [
+    "Hydrogen",
+    "Nitrogen",
+    "Oxygen",
+    "Chlorine",
+    "Fluorine",
+    "Carbon"
+   ],
+   "explain": "The noble gases (group 18): helium, neon, argon, krypton, xenon and radon.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-b63eb0",
+   "kind": "pickall",
+   "prompt": "Which {n} of these elements are metals?",
+   "answer": [
+    "Iron",
+    "Copper",
+    "Gold",
+    "Sodium",
+    "Aluminium",
+    "Mercury"
+   ],
+   "wrong": [
+    "Carbon",
+    "Oxygen",
+    "Sulfur",
+    "Neon",
+    "Nitrogen",
+    "Iodine"
+   ],
+   "explain": "Mercury is a metal that is liquid at room temperature; sodium is a soft metal. The decoys are non-metals.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-bc5e70",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are greenhouse gases?",
+   "answer": [
+    "Carbon dioxide",
+    "Methane",
+    "Water vapour",
+    "Nitrous oxide",
+    "Ozone"
+   ],
+   "wrong": [
+    "Nitrogen",
+    "Oxygen",
+    "Argon",
+    "Helium",
+    "Neon",
+    "Hydrogen"
+   ],
+   "explain": "Nitrogen, oxygen and argon make up 99% of the air but do not trap heat.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-b93256",
+   "kind": "pickall",
+   "prompt": "Which {n} of these vitamins are fat-soluble?",
+   "answer": [
+    "Vitamin A",
+    "Vitamin D",
+    "Vitamin E",
+    "Vitamin K"
+   ],
+   "wrong": [
+    "Vitamin C",
+    "Vitamin B12",
+    "Vitamin B6",
+    "Vitamin B1",
+    "Vitamin B9"
+   ],
+   "explain": "A, D, E and K dissolve in fat; vitamin C and the B vitamins dissolve in water.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-sci-bb1ba6",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are among the seven colours of a rainbow?",
+   "answer": [
+    "Red",
+    "Orange",
+    "Yellow",
+    "Green",
+    "Blue",
+    "Indigo",
+    "Violet"
+   ],
+   "wrong": [
+    "Pink",
+    "Brown",
+    "Black",
+    "White",
+    "Grey",
+    "Gold"
+   ],
+   "explain": "Red, orange, yellow, green, blue, indigo, violet: \"Richard Of York Gave Battle In Vain\".",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-art-e1f253",
+   "kind": "pickall",
+   "prompt": "In traditional painting, which {n} of these are the primary colours?",
+   "answer": [
+    "Red",
+    "Yellow",
+    "Blue"
+   ],
+   "wrong": [
+    "Green",
+    "Orange",
+    "Purple",
+    "Pink",
+    "Brown"
+   ],
+   "explain": "Painters traditionally mix everything from red, yellow and blue. For light (screens) the primaries are red, green and blue.",
+   "difficulty": 1,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-sci-17ea3e",
+   "kind": "pickall",
+   "prompt": "For light, as on a screen, which {n} of these are the primary colours?",
+   "answer": [
+    "Red",
+    "Green",
+    "Blue"
+   ],
+   "wrong": [
+    "Yellow",
+    "Orange",
+    "Purple",
+    "Pink",
+    "Brown"
+   ],
+   "explain": "Screens mix every colour from red, green and blue light (RGB).",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "science"
+  },
+  {
+   "id": "gen-space-1f67f8",
+   "kind": "pickall",
+   "prompt": "Which {n} of these planets have rings?",
+   "answer": [
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune"
+   ],
+   "wrong": [
+    "Mercury",
+    "Venus",
+    "Earth",
+    "Mars"
+   ],
+   "explain": "All four giant planets have rings; Saturn’s are just the brightest.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-b9b6c2",
+   "kind": "pickall",
+   "prompt": "Which {n} of these planets are closer to the Sun than Earth?",
+   "answer": [
+    "Mercury",
+    "Venus"
+   ],
+   "wrong": [
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune"
+   ],
+   "explain": "Only Mercury and Venus orbit inside Earth’s orbit.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-71c453",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are moons of Jupiter?",
+   "answer": [
+    "Io",
+    "Europa",
+    "Ganymede",
+    "Callisto"
+   ],
+   "wrong": [
+    "Titan",
+    "Enceladus",
+    "Triton",
+    "Phobos",
+    "Charon",
+    "Deimos"
+   ],
+   "explain": "Io, Europa, Ganymede and Callisto are Jupiter’s Galilean moons. Titan and Enceladus orbit Saturn.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-space-08f1ef",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are dwarf planets?",
+   "answer": [
+    "Pluto",
+    "Ceres",
+    "Eris",
+    "Haumea",
+    "Makemake"
+   ],
+   "wrong": [
+    "Charon",
+    "Titan",
+    "Io",
+    "Europa",
+    "Ganymede",
+    "Phobos"
+   ],
+   "explain": "The IAU recognises five dwarf planets: Pluto, Ceres, Eris, Haumea and Makemake. The decoys are moons.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "gen-body-29aabd",
+   "kind": "pickall",
+   "prompt": "Which {n} of these bones are in the human arm?",
+   "answer": [
+    "Humerus",
+    "Radius",
+    "Ulna"
+   ],
+   "wrong": [
+    "Femur",
+    "Tibia",
+    "Fibula",
+    "Patella",
+    "Sternum"
+   ],
+   "explain": "The humerus is the upper-arm bone; the radius and ulna are in the forearm. The femur, tibia and fibula are leg bones.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-body-48d8ac",
+   "kind": "pickall",
+   "prompt": "Which {n} of these bones are in the human leg?",
+   "answer": [
+    "Femur",
+    "Tibia",
+    "Fibula"
+   ],
+   "wrong": [
+    "Humerus",
+    "Radius",
+    "Ulna",
+    "Sternum",
+    "Scapula",
+    "Mandible"
+   ],
+   "explain": "The femur (thigh), tibia and fibula (lower leg) are leg bones.",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "body"
+  },
+  {
+   "id": "gen-math-29d2d0",
+   "kind": "pickall",
+   "prompt": "Which {n} of these numbers are prime?",
+   "answer": [
+    "2",
+    "3",
+    "5",
+    "7",
+    "11",
+    "13",
+    "17",
+    "19",
+    "23",
+    "29"
+   ],
+   "wrong": [
+    "1",
+    "9",
+    "15",
+    "21",
+    "25",
+    "27",
+    "33",
+    "49",
+    "51"
+   ],
+   "explain": "A prime has exactly two factors: 1 and itself. 1 is not prime; 51 = 3 × 17.",
+   "difficulty": 1,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-math-042c65",
+   "kind": "pickall",
+   "prompt": "Which {n} of these numbers are perfect squares?",
+   "answer": [
+    "16",
+    "25",
+    "36",
+    "49",
+    "64",
+    "81",
+    "144"
+   ],
+   "wrong": [
+    "24",
+    "32",
+    "50",
+    "72",
+    "90",
+    "120",
+    "125"
+   ],
+   "explain": "A perfect square is a whole number times itself, like 12 × 12 = 144. 125 is a cube (5 × 5 × 5).",
+   "difficulty": 2,
+   "tags": [
+    "science"
+   ],
+   "topic": "maths"
+  },
+  {
+   "id": "gen-ani-2edebc",
+   "kind": "pickall",
+   "prompt": "Which {n} of these animals are mammals?",
+   "answer": [
+    "Dolphin",
+    "Bat",
+    "Whale",
+    "Platypus",
+    "Kangaroo"
+   ],
+   "wrong": [
+    "Shark",
+    "Penguin",
+    "Crocodile",
+    "Frog",
+    "Salmon",
+    "Ostrich"
+   ],
+   "explain": "Dolphins, bats, whales, platypuses and kangaroos are mammals; the platypus even lays eggs.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-8bb098",
+   "kind": "pickall",
+   "prompt": "Which {n} of these animals are marsupials?",
+   "answer": [
+    "Kangaroo",
+    "Koala",
+    "Wombat",
+    "Tasmanian devil",
+    "Opossum"
+   ],
+   "wrong": [
+    "Platypus",
+    "Echidna",
+    "Sloth",
+    "Raccoon",
+    "Red panda",
+    "Meerkat"
+   ],
+   "explain": "Marsupials carry their young in a pouch. The platypus and echidna are monotremes: mammals that lay eggs.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-2a9f13",
+   "kind": "pickall",
+   "prompt": "Which {n} of these animals lay eggs?",
+   "answer": [
+    "Platypus",
+    "Echidna",
+    "Chicken",
+    "Crocodile",
+    "Turtle"
+   ],
+   "wrong": [
+    "Dolphin",
+    "Bat",
+    "Kangaroo",
+    "Whale",
+    "Koala",
+    "Horse"
+   ],
+   "explain": "The platypus and echidna are the only mammals that lay eggs.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-5fe427",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are reptiles?",
+   "answer": [
+    "Crocodile",
+    "Tortoise",
+    "Iguana",
+    "Chameleon",
+    "Komodo dragon"
+   ],
+   "wrong": [
+    "Frog",
+    "Salamander",
+    "Newt",
+    "Axolotl",
+    "Toad"
+   ],
+   "explain": "Frogs, toads, newts, salamanders and axolotls are amphibians, not reptiles.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-7e85fd",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are insects?",
+   "answer": [
+    "Ant",
+    "Bee",
+    "Butterfly",
+    "Beetle",
+    "Grasshopper"
+   ],
+   "wrong": [
+    "Spider",
+    "Scorpion",
+    "Centipede",
+    "Tick",
+    "Woodlouse",
+    "Crab"
+   ],
+   "explain": "Insects have six legs. Spiders, scorpions and ticks are arachnids; a woodlouse is a crustacean.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-d509ac",
+   "kind": "pickall",
+   "prompt": "Which {n} of these animals are native to Australia?",
+   "answer": [
+    "Kangaroo",
+    "Koala",
+    "Wombat",
+    "Platypus",
+    "Kookaburra",
+    "Emu",
+    "Echidna"
+   ],
+   "wrong": [
+    "Rabbit",
+    "Cane toad",
+    "Red fox",
+    "Camel",
+    "Kiwi",
+    "Lemur"
+   ],
+   "explain": "Rabbits, cane toads, foxes and camels were brought to Australia. Kiwis live in New Zealand, lemurs in Madagascar.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-6d84a6",
+   "kind": "pickall",
+   "prompt": "Which {n} of these animals live wild in Africa?",
+   "answer": [
+    "Lion",
+    "Giraffe",
+    "Zebra",
+    "Hippopotamus",
+    "Gorilla",
+    "Cheetah"
+   ],
+   "wrong": [
+    "Kangaroo",
+    "Giant panda",
+    "Polar bear",
+    "Koala",
+    "Sloth",
+    "Jaguar"
+   ],
+   "explain": "Kangaroos and koalas live in Australia, pandas in China, polar bears in the Arctic, sloths and jaguars in the Americas.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-food-c033af",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are citrus fruits?",
+   "answer": [
+    "Lemon",
+    "Lime",
+    "Orange",
+    "Grapefruit",
+    "Mandarin"
+   ],
+   "wrong": [
+    "Apple",
+    "Banana",
+    "Mango",
+    "Kiwifruit",
+    "Pineapple",
+    "Pear"
+   ],
+   "explain": "Lemons, limes, oranges, grapefruit and mandarins are all citrus fruits.",
+   "difficulty": 1,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-697d9e",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are types of pasta?",
+   "answer": [
+    "Penne",
+    "Fusilli",
+    "Farfalle",
+    "Rigatoni",
+    "Tagliatelle"
+   ],
+   "wrong": [
+    "Risotto",
+    "Polenta",
+    "Paella",
+    "Focaccia",
+    "Bruschetta",
+    "Ciabatta"
+   ],
+   "explain": "Risotto is a rice dish, polenta is cornmeal, paella is Spanish rice, and focaccia and ciabatta are breads.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-11bec3",
+   "kind": "pickall",
+   "prompt": "Which {n} of these cheeses come from Italy?",
+   "answer": [
+    "Parmesan",
+    "Mozzarella",
+    "Gorgonzola",
+    "Ricotta",
+    "Pecorino"
+   ],
+   "wrong": [
+    "Brie",
+    "Camembert",
+    "Cheddar",
+    "Gouda",
+    "Feta",
+    "Roquefort"
+   ],
+   "explain": "Brie, Camembert and Roquefort are French, Cheddar English, Gouda Dutch and Feta Greek.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-food-f004d9",
+   "kind": "pickall",
+   "prompt": "Which {n} of these cheeses come from France?",
+   "answer": [
+    "Brie",
+    "Camembert",
+    "Roquefort",
+    "Comté",
+    "Reblochon"
+   ],
+   "wrong": [
+    "Cheddar",
+    "Gouda",
+    "Edam",
+    "Manchego",
+    "Feta",
+    "Mozzarella"
+   ],
+   "explain": "Cheddar is English, Gouda and Edam Dutch, Manchego Spanish, Feta Greek and Mozzarella Italian.",
+   "difficulty": 2,
+   "tags": [
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "gen-lit-13e4f8",
+   "kind": "pickall",
+   "prompt": "Which {n} of these plays did William Shakespeare write?",
+   "answer": [
+    "Hamlet",
+    "Macbeth",
+    "Othello",
+    "King Lear",
+    "The Tempest",
+    "Twelfth Night"
+   ],
+   "wrong": [
+    "Doctor Faustus",
+    "The Duchess of Malfi",
+    "Volpone",
+    "The Alchemist",
+    "Tamburlaine",
+    "The Spanish Tragedy"
+   ],
+   "explain": "Doctor Faustus and Tamburlaine are Marlowe’s, Volpone and The Alchemist Jonson’s, The Duchess of Malfi Webster’s, The Spanish Tragedy Kyd’s.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-933ef4",
+   "kind": "pickall",
+   "prompt": "Which {n} of these novels did Jane Austen write?",
+   "answer": [
+    "Pride and Prejudice",
+    "Emma",
+    "Persuasion",
+    "Sense and Sensibility",
+    "Mansfield Park",
+    "Northanger Abbey"
+   ],
+   "wrong": [
+    "Jane Eyre",
+    "Wuthering Heights",
+    "Middlemarch",
+    "Great Expectations",
+    "Little Women",
+    "Vanity Fair"
+   ],
+   "explain": "Jane Eyre is by Charlotte Brontë, Wuthering Heights by Emily Brontë, Middlemarch by George Eliot.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-art-b5ce32",
+   "kind": "pickall",
+   "prompt": "Which {n} of these painters were Impressionists?",
+   "answer": [
+    "Claude Monet",
+    "Edgar Degas",
+    "Pierre-Auguste Renoir",
+    "Camille Pissarro",
+    "Alfred Sisley",
+    "Berthe Morisot"
+   ],
+   "wrong": [
+    "Pablo Picasso",
+    "Salvador Dalí",
+    "Rembrandt",
+    "Michelangelo",
+    "Andy Warhol",
+    "Frida Kahlo"
+   ],
+   "explain": "Monet, Degas, Renoir, Pissarro, Sisley and Morisot all showed at the Impressionist exhibitions in Paris.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-pop-b7e883",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are names of Teenage Mutant Ninja Turtles?",
+   "answer": [
+    "Leonardo",
+    "Michelangelo",
+    "Donatello",
+    "Raphael"
+   ],
+   "wrong": [
+    "Botticelli",
+    "Caravaggio",
+    "Titian",
+    "Rembrandt",
+    "Picasso",
+    "Vermeer"
+   ],
+   "explain": "The four turtles are named after Renaissance artists: Leonardo, Michelangelo, Donatello and Raphael.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-5171a4",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are Hogwarts houses?",
+   "answer": [
+    "Gryffindor",
+    "Hufflepuff",
+    "Ravenclaw",
+    "Slytherin"
+   ],
+   "wrong": [
+    "Durmstrang",
+    "Beauxbatons",
+    "Hogsmeade",
+    "Azkaban",
+    "Ilvermorny",
+    "Diagon Alley"
+   ],
+   "explain": "Durmstrang, Beauxbatons and Ilvermorny are other wizarding schools; Hogsmeade is a village and Azkaban a prison.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-e687d7",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are members of the Simpson family?",
+   "answer": [
+    "Homer",
+    "Marge",
+    "Bart",
+    "Lisa",
+    "Maggie"
+   ],
+   "wrong": [
+    "Ned",
+    "Milhouse",
+    "Krusty",
+    "Moe",
+    "Apu",
+    "Barney"
+   ],
+   "explain": "Homer and Marge have three children: Bart, Lisa and Maggie.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-71d3de",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are main characters in Friends?",
+   "answer": [
+    "Rachel Green",
+    "Monica Geller",
+    "Phoebe Buffay",
+    "Joey Tribbiani",
+    "Chandler Bing",
+    "Ross Geller"
+   ],
+   "wrong": [
+    "Sheldon Cooper",
+    "Elaine Benes",
+    "Ted Mosby",
+    "Leslie Knope",
+    "Jim Halpert",
+    "Carrie Bradshaw"
+   ],
+   "explain": "The decoys are from The Big Bang Theory, Seinfeld, How I Met Your Mother, Parks and Recreation, The Office and Sex and the City.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-0db1a6",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are the ghosts in Pac-Man?",
+   "answer": [
+    "Blinky",
+    "Pinky",
+    "Inky",
+    "Clyde"
+   ],
+   "wrong": [
+    "Bowser",
+    "Yoshi",
+    "Wario",
+    "Luigi",
+    "Toad",
+    "Kirby"
+   ],
+   "explain": "Blinky (red), Pinky (pink), Inky (cyan) and Clyde (orange) chase Pac-Man.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-mus-8a341c",
+   "kind": "pickall",
+   "prompt": "Which {n} of these were members of the Beatles?",
+   "answer": [
+    "John Lennon",
+    "Paul McCartney",
+    "George Harrison",
+    "Ringo Starr"
+   ],
+   "wrong": [
+    "Mick Jagger",
+    "Keith Richards",
+    "Roger Daltrey",
+    "Freddie Mercury",
+    "Elton John",
+    "David Bowie"
+   ],
+   "explain": "The Beatles were John, Paul, George and Ringo.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-50b67d",
+   "kind": "pickall",
+   "prompt": "Which {n} of these were members of Queen?",
+   "answer": [
+    "Freddie Mercury",
+    "Brian May",
+    "Roger Taylor",
+    "John Deacon"
+   ],
+   "wrong": [
+    "Mick Jagger",
+    "Robert Plant",
+    "Roger Daltrey",
+    "Jimmy Page",
+    "David Bowie",
+    "Ozzy Osbourne"
+   ],
+   "explain": "Queen: Freddie Mercury, Brian May, Roger Taylor and John Deacon. Bowie sang with them on \"Under Pressure\" but was never a member.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-d69222",
+   "kind": "pickall",
+   "prompt": "Which {n} of these were members of ABBA?",
+   "answer": [
+    "Agnetha Fältskog",
+    "Björn Ulvaeus",
+    "Benny Andersson",
+    "Anni-Frid Lyngstad"
+   ],
+   "wrong": [
+    "Marie Fredriksson",
+    "Per Gessle",
+    "Robyn",
+    "Zara Larsson",
+    "Neneh Cherry"
+   ],
+   "explain": "ABBA is named from their initials: Agnetha, Björn, Benny and Anni-Frid. Fredriksson and Gessle were Roxette.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-5bf968",
+   "kind": "pickall",
+   "prompt": "Which {n} of these played in the Rolling Stones?",
+   "answer": [
+    "Mick Jagger",
+    "Keith Richards",
+    "Charlie Watts",
+    "Ronnie Wood",
+    "Bill Wyman",
+    "Brian Jones"
+   ],
+   "wrong": [
+    "John Lennon",
+    "Pete Townshend",
+    "Roger Daltrey",
+    "Jimmy Page",
+    "Eric Clapton",
+    "Ray Davies"
+   ],
+   "explain": "Townshend and Daltrey were in the Who, Page in Led Zeppelin, Davies in the Kinks; Clapton was never a Stone.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-5d8f42",
+   "kind": "pickall",
+   "prompt": "Which {n} of these were Spice Girls?",
+   "answer": [
+    "Geri Halliwell",
+    "Victoria Beckham",
+    "Emma Bunton",
+    "Melanie Brown",
+    "Melanie Chisholm"
+   ],
+   "wrong": [
+    "Kylie Minogue",
+    "Nicole Scherzinger",
+    "Sarah Harding",
+    "Kimberley Walsh",
+    "Cheryl Cole"
+   ],
+   "explain": "The Spice Girls: Geri (Ginger), Victoria (Posh), Emma (Baby), Mel B (Scary) and Mel C (Sporty).",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-79ab14",
+   "kind": "pickall",
+   "prompt": "Which {n} of these instruments belong to the string family?",
+   "answer": [
+    "Violin",
+    "Viola",
+    "Cello",
+    "Double bass"
+   ],
+   "wrong": [
+    "Flute",
+    "Clarinet",
+    "Trumpet",
+    "Oboe",
+    "Trombone",
+    "Timpani"
+   ],
+   "explain": "The orchestra’s string section is violins, violas, cellos and double basses.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-84b08e",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are woodwind instruments?",
+   "answer": [
+    "Flute",
+    "Clarinet",
+    "Oboe",
+    "Bassoon",
+    "Saxophone",
+    "Piccolo"
+   ],
+   "wrong": [
+    "Trumpet",
+    "Trombone",
+    "French horn",
+    "Tuba",
+    "Cornet",
+    "Violin"
+   ],
+   "explain": "Flutes and saxophones are often metal but count as woodwind: the sound comes from air across an edge or a reed.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-lang-0783e9",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are national languages of Switzerland?",
+   "answer": [
+    "German",
+    "French",
+    "Italian",
+    "Romansh"
+   ],
+   "wrong": [
+    "English",
+    "Dutch",
+    "Spanish",
+    "Portuguese",
+    "Swedish"
+   ],
+   "explain": "Switzerland has four national languages: German, French, Italian and Romansh.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-lang-8fbf1f",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are official languages of the United Nations?",
+   "answer": [
+    "Arabic",
+    "Chinese",
+    "English",
+    "French",
+    "Russian",
+    "Spanish"
+   ],
+   "wrong": [
+    "German",
+    "Japanese",
+    "Portuguese",
+    "Hindi",
+    "Italian",
+    "Swahili"
+   ],
+   "explain": "The UN has six official languages: Arabic, Chinese, English, French, Russian and Spanish.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "language"
+  },
+  {
+   "id": "gen-sport-afa0d7",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are Grand Slam tennis tournaments?",
+   "answer": [
+    "Wimbledon",
+    "US Open",
+    "French Open",
+    "Australian Open"
+   ],
+   "wrong": [
+    "Indian Wells",
+    "Davis Cup",
+    "Miami Open",
+    "Queen's Club Championships",
+    "ATP Finals",
+    "Italian Open"
+   ],
+   "explain": "The four Grand Slams: the Australian Open, the French Open, Wimbledon and the US Open.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "gen-sport-fc21e7",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are men’s major championships in golf?",
+   "answer": [
+    "The Masters",
+    "PGA Championship",
+    "US Open",
+    "The Open Championship"
+   ],
+   "wrong": [
+    "Ryder Cup",
+    "Players Championship",
+    "FedEx Cup",
+    "Presidents Cup",
+    "Solheim Cup"
+   ],
+   "explain": "The four men’s majors: the Masters, the PGA Championship, the US Open and the Open Championship.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "gen-sport-e921c2",
+   "kind": "pickall",
+   "prompt": "Which {n} of these sports make up a triathlon?",
+   "answer": [
+    "Swimming",
+    "Cycling",
+    "Running"
+   ],
+   "wrong": [
+    "Rowing",
+    "Kayaking",
+    "Horse riding",
+    "Fencing",
+    "Shooting",
+    "Archery"
+   ],
+   "explain": "A triathlon is a swim, then a bike ride, then a run.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "sport"
+  },
+  {
+   "id": "gen-sport-580ed7",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are colours of the Olympic rings?",
+   "answer": [
+    "Blue",
+    "Yellow",
+    "Black",
+    "Green",
+    "Red"
+   ],
+   "wrong": [
+    "Orange",
+    "Purple",
+    "Pink",
+    "Brown",
+    "Grey"
+   ],
+   "explain": "The five rings are blue, yellow, black, green and red on a white background.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "sport"
   }
  ],
  "sources": [

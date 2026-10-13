@@ -1,17 +1,17 @@
 // Learn tab entry (lane L). The shell calls openLearn(el, ctx) to render the 'learn' screen.
-import { h } from '../ui/kit.js?v=202610130607';
-import { defineScreen, header, go } from '../ui/app.js?v=202610130607';
-import { sfx } from '../ui/fx.js?v=202610130607';
-import { install, ensureCss } from './hook.js?v=202610130607';
-import { badgeCount, getCards } from './model.js?v=202610130607';
-import { getIndex } from '../core/packs.js?v=202610130607';
-import { kidsOn } from './data.js?v=202610130607';
-import { kidsProgress } from '../ui/stickers.js?v=202610130607';
-import { WIDE } from './ui.js?v=202610130607';
-import { BUILD } from '../build.js?v=202610130607';
-import { lazyImport } from '../ui/update.js?v=202610130607';
+import { h } from '../ui/kit.js?v=202610130751';
+import { defineScreen, header, go } from '../ui/app.js?v=202610130751';
+import { sfx } from '../ui/fx.js?v=202610130751';
+import { install, ensureCss } from './hook.js?v=202610130751';
+import { badgeCount, getCards } from './model.js?v=202610130751';
+import { getIndex } from '../core/packs.js?v=202610130751';
+import { kidsOn } from './data.js?v=202610130751';
+import { kidsProgress } from '../ui/stickers.js?v=202610130751';
+import { WIDE } from './ui.js?v=202610130751';
+import { BUILD } from '../build.js?v=202610130751';
+import { lazyImport } from '../ui/update.js?v=202610130751';
 
-export { install, feed } from './hook.js?v=202610130607';
+export { install, feed } from './hook.js?v=202610130751';
 
 const lazy = file => () => lazyImport(new URL(`./${file}.js?v=${BUILD}`, import.meta.url).href);
 const SCREENS = {

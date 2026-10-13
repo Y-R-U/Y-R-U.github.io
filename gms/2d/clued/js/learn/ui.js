@@ -1,10 +1,10 @@
 // Shared Learn widgets: progress ring, credits popup, sound button, read-aloud button, notice banner.
-import { h, esc } from '../ui/kit.js?v=202610130607';
-import { popup } from '../ui/popup.js?v=202610130607';
-import { speak, canSpeak, stopSpeaking } from '../ui/speech.js?v=202610130607';
-import { BUILD } from '../build.js?v=202610130607';
-import { lazyImport } from '../ui/update.js?v=202610130607';
-import { kidsOn } from './data.js?v=202610130607';
+import { h, esc } from '../ui/kit.js?v=202610130751';
+import { popup } from '../ui/popup.js?v=202610130751';
+import { speak, canSpeak, stopSpeaking } from '../ui/speech.js?v=202610130751';
+import { BUILD } from '../build.js?v=202610130751';
+import { lazyImport } from '../ui/update.js?v=202610130751';
+import { kidsOn } from './data.js?v=202610130751';
 
 export function ring(pct, { size = 44, label = true } = {}) {
   const r = 16, c = 2 * Math.PI * r, p = Math.max(0, Math.min(100, pct || 0));

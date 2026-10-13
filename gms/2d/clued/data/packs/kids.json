@@ -7450,6 +7450,352 @@
     "science"
    ],
    "topic": "science"
+  },
+  {
+   "id": "kid-colour-3b2e61",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are colours of the rainbow?",
+   "answer": [
+    "Red",
+    "Orange",
+    "Yellow",
+    "Green",
+    "Blue",
+    "Purple"
+   ],
+   "wrong": [
+    "Pink",
+    "Brown",
+    "Black",
+    "White",
+    "Grey"
+   ],
+   "explain": "A rainbow goes red, orange, yellow, green, blue, indigo and violet (purple).",
+   "difficulty": 1,
+   "tags": [
+    "kids"
+   ],
+   "topic": "colours"
+  },
+  {
+   "id": "kid-ani-af384e",
+   "kind": "pickall",
+   "prompt": "Which {n} of these animals can fly?",
+   "answer": [
+    "Eagle",
+    "Bat",
+    "Owl",
+    "Parrot",
+    "Bee",
+    "Butterfly"
+   ],
+   "wrong": [
+    "Penguin",
+    "Ostrich",
+    "Dog",
+    "Cat",
+    "Elephant",
+    "Horse"
+   ],
+   "explain": "Penguins and ostriches are birds, but they can’t fly.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-food-6331df",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are fruits?",
+   "answer": [
+    "Apple",
+    "Banana",
+    "Strawberry",
+    "Grapes",
+    "Pear",
+    "Cherry"
+   ],
+   "wrong": [
+    "Carrot",
+    "Potato",
+    "Broccoli",
+    "Onion",
+    "Lettuce",
+    "Cabbage"
+   ],
+   "explain": "Apples, bananas, strawberries, grapes, pears and cherries are fruits; the others are vegetables.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "kid-food-a1157b",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are vegetables?",
+   "answer": [
+    "Carrot",
+    "Broccoli",
+    "Potato",
+    "Lettuce",
+    "Cabbage",
+    "Onion"
+   ],
+   "wrong": [
+    "Apple",
+    "Banana",
+    "Orange",
+    "Strawberry",
+    "Grapes",
+    "Cherry"
+   ],
+   "explain": "Carrots, broccoli, potatoes, lettuce, cabbage and onions are vegetables; the others are fruits.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "food"
+   ],
+   "topic": "food"
+  },
+  {
+   "id": "kid-ani-94f8d9",
+   "kind": "pickall",
+   "prompt": "Which {n} of these animals live in the sea?",
+   "answer": [
+    "Whale",
+    "Octopus",
+    "Shark",
+    "Starfish",
+    "Jellyfish",
+    "Dolphin"
+   ],
+   "wrong": [
+    "Lion",
+    "Elephant",
+    "Giraffe",
+    "Horse",
+    "Cow",
+    "Monkey"
+   ],
+   "explain": "Whales, octopuses, sharks, starfish, jellyfish and dolphins all live in the sea.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-count-23c21b",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are days of the week?",
+   "answer": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+   ],
+   "wrong": [
+    "January",
+    "March",
+    "Summer",
+    "Winter",
+    "Morning",
+    "Birthday"
+   ],
+   "explain": "The seven days: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday and Sunday.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "counting"
+  },
+  {
+   "id": "kid-count-9a53c6",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are seasons?",
+   "answer": [
+    "Spring",
+    "Summer",
+    "Autumn",
+    "Winter"
+   ],
+   "wrong": [
+    "Monday",
+    "Friday",
+    "January",
+    "July",
+    "Morning",
+    "Night"
+   ],
+   "explain": "The four seasons are spring, summer, autumn and winter.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "counting"
+  },
+  {
+   "id": "kid-ani-615869",
+   "kind": "pickall",
+   "prompt": "Which {n} of these animals hatch from eggs?",
+   "answer": [
+    "Chicken",
+    "Duck",
+    "Turtle",
+    "Frog",
+    "Crocodile"
+   ],
+   "wrong": [
+    "Dog",
+    "Cat",
+    "Cow",
+    "Horse",
+    "Pig",
+    "Rabbit"
+   ],
+   "explain": "Dogs, cats, cows, horses, pigs and rabbits are born as babies, not from eggs.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-space-6f833d",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are planets?",
+   "answer": [
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Venus",
+    "Earth",
+    "Neptune"
+   ],
+   "wrong": [
+    "Sun",
+    "Moon",
+    "Comet"
+   ],
+   "explain": "The Sun is a star and the Moon goes round the Earth.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "science"
+   ],
+   "topic": "space"
+  },
+  {
+   "id": "kid-ani-74754b",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are baby animals?",
+   "answer": [
+    "Puppy",
+    "Kitten",
+    "Calf",
+    "Lamb",
+    "Foal",
+    "Chick"
+   ],
+   "wrong": [
+    "Cow",
+    "Horse",
+    "Sheep",
+    "Dog",
+    "Cat",
+    "Hen"
+   ],
+   "explain": "A puppy is a baby dog, a kitten a baby cat, a calf a baby cow, a lamb a baby sheep, a foal a baby horse.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "kid-shape-a2f45f",
+   "kind": "pickall",
+   "prompt": "Which {n} of these shapes have four sides?",
+   "answer": [
+    "Square",
+    "Rectangle"
+   ],
+   "wrong": [
+    "Triangle",
+    "Circle",
+    "Pentagon",
+    "Hexagon",
+    "Oval"
+   ],
+   "explain": "Squares and rectangles have four sides. A triangle has three, a pentagon five and a hexagon six.",
+   "difficulty": 1,
+   "tags": [
+    "kids"
+   ],
+   "topic": "shapes"
+  },
+  {
+   "id": "kid-pop-3b8dbd",
+   "kind": "pickall",
+   "prompt": "Which {n} of these are Teletubbies?",
+   "answer": [
+    "Tinky Winky",
+    "Dipsy",
+    "Laa-Laa",
+    "Po"
+   ],
+   "wrong": [
+    "Peppa",
+    "Bluey",
+    "Iggle Piggle",
+    "Upsy Daisy",
+    "Makka Pakka",
+    "Noddy"
+   ],
+   "explain": "The four Teletubbies are Tinky Winky, Dipsy, Laa-Laa and Po.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "kid-ani-3af2fb",
+   "kind": "pickall",
+   "prompt": "Which {n} of these animals have stripes?",
+   "answer": [
+    "Zebra",
+    "Tiger",
+    "Bee",
+    "Skunk"
+   ],
+   "wrong": [
+    "Elephant",
+    "Polar bear",
+    "Hippo",
+    "Flamingo",
+    "Sheep"
+   ],
+   "explain": "Zebras, tigers, bees and skunks all have stripes.",
+   "difficulty": 1,
+   "tags": [
+    "kids",
+    "animals"
+   ],
+   "topic": "animals"
   }
  ],
  "sources": [

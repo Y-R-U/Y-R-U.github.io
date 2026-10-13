@@ -4,7 +4,7 @@ export const ALLOWED_LICENSE = /^(CC0( 1\.0)?|Public domain|PD|PDM(-owner)?|CC B
 // Apple previews are streamed at play time, never stored (DESIGN.md media policy); allowed for audio only.
 const APPLE_PREVIEW = /^Apple Music preview/;
 const FACT_TYPES = ['bool', 'num', 'cat', 'year', 'date', 'text'];
-const Q_KINDS = ['mc', 'tf', 'number', 'order'];
+const Q_KINDS = ['mc', 'tf', 'number', 'order', 'pickall'];
 const STOP = new Set(['the', 'and', 'of', 'a', 'an', 'de', 'la', 'le', 'el', 'du', 'von', 'van', 'der', 'den', 'des', 'di', 'da', 'in', 'on', 'or', 'to', 'for', 'with', 'from']);
 
 const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -131,6 +131,13 @@ export function validatePack(pack, fileId) {
       if (q.tolerance != null && typeof q.tolerance !== 'number') errors.push(`${W}: tolerance must be numeric`);
     }
     if (q.kind === 'order' && (!Array.isArray(q.answer) || q.answer.length < 3)) errors.push(`${W}: order answer must be an array of 3+`);
+    if (q.kind === 'pickall') {
+      const a = Array.isArray(q.answer) ? q.answer : [], w = Array.isArray(q.wrong) ? q.wrong : [];
+      if (a.length < 2 || w.length < 3) errors.push(`${W}: pickall needs answer[] of 2+ and wrong[] of 3+`);
+      if (!String(q.prompt || '').includes('{n}')) errors.push(`${W}: pickall prompt needs {n}`);
+      const all = [...a, ...w].map(x => norm(String(x)));
+      if (new Set(all).size !== all.length) errors.push(`${W}: pickall options repeat`);
+    }
     if (q.difficulty != null && ![1, 2, 3].includes(q.difficulty)) errors.push(`${W}: difficulty must be 1-3`);
     if (!q.explain) warnings.push(`${W}: no explain`);
     checkMedia(q.media, W, errors, warnings);

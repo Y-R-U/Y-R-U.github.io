@@ -1,28 +1,28 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=202610130607';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=202610130607';
-import { confirmPop, toast } from '../ui/popup.js?v=202610130607';
-import { sfx, confetti } from '../ui/fx.js?v=202610130607';
-import { createRunner } from '../structures/runner.js?v=202610130607';
-import { prepare, prepareFormats } from '../structures/session.js?v=202610130607';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610130607';
-import { urlsOf, preflight } from '../core/media.js?v=202610130607';
-import { randomSeed } from '../core/rng.js?v=202610130607';
-import { listFormats } from '../formats/registry.js?v=202610130607';
-import { loadFormats } from '../formats/index.js?v=202610130607';
-import { friendly } from './api.js?v=202610130607';
-import { getTransport } from './transport.js?v=202610130607';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610130607';
-import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610130607';
-import { streakOption } from '../ui/streakopt.js?v=202610130607';
-import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610130607';
-import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610130607';
-import { getFormat } from '../formats/registry.js?v=202610130607';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610130607';
-import { trackRoom } from '../core/stats.js?v=202610130607';
-import { cleanQuestion } from './sanitize.js?v=202610130607';
-import { saveSetPrompt } from './sets.js?v=202610130607';
-import { isOn, localLabel, loadNames } from '../core/local.js?v=202610130607';
+import { h, fmtNum } from '../ui/kit.js?v=202610130751';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610130751';
+import { confirmPop, toast } from '../ui/popup.js?v=202610130751';
+import { sfx, confetti } from '../ui/fx.js?v=202610130751';
+import { createRunner } from '../structures/runner.js?v=202610130751';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610130751';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610130751';
+import { urlsOf, preflight } from '../core/media.js?v=202610130751';
+import { randomSeed } from '../core/rng.js?v=202610130751';
+import { listFormats } from '../formats/registry.js?v=202610130751';
+import { loadFormats } from '../formats/index.js?v=202610130751';
+import { friendly } from './api.js?v=202610130751';
+import { getTransport } from './transport.js?v=202610130751';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610130751';
+import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610130751';
+import { streakOption } from '../ui/streakopt.js?v=202610130751';
+import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610130751';
+import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610130751';
+import { getFormat } from '../formats/registry.js?v=202610130751';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610130751';
+import { trackRoom } from '../core/stats.js?v=202610130751';
+import { cleanQuestion } from './sanitize.js?v=202610130751';
+import { saveSetPrompt } from './sets.js?v=202610130751';
+import { isOn, localLabel, loadNames } from '../core/local.js?v=202610130751';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;
@@ -76,7 +76,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     if (cur !== current()) return;
     ctx.st = st;
     trackRoom(st, code, via);
-    window.__cluedRoom = { code, st, view: ctx.view, link: sub?.mode };
+    window.__cluedRoom = { code, st, view: ctx.view, link: sub?.mode, q: () => ctx.run?.current() || null };
     if (ctx.wasHost === false && st.you.host) { toast('You’re the host now'); sfx('join'); }
     ctx.wasHost = st.you.host;
     if (st.game !== ctx.game) { stopRunner(); ctx.game = st.game; ctx.qcache.clear(); }

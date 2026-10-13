@@ -1,6 +1,6 @@
 // Questions from rooms, challenges and P2P hosts are someone else's JSON: clean them before any format renders them.
 export const FORMATS = new Set(['blitz60', 'chain', 'city-pick', 'connect', 'continent', 'fake', 'flag-map', 'hilo', 'ladder', 'listen',
-  'lookalike', 'map-click', 'match', 'mc', 'neighbours', 'number', 'odd', 'order', 'pin-drop', 'quote', 'reveal', 'silhouette', 'sort',
+  'lookalike', 'map-click', 'match', 'mc', 'neighbours', 'number', 'odd', 'order', 'pickall', 'pin-drop', 'quote', 'reveal', 'silhouette', 'sort',
   'tf', 'type', 'water-click']);
 const KINDS = new Set(['mc', 'tf', 'number', 'order', 'quote']);
 const URL_KEYS = new Set(['src', 'url', 'page', 'art', 'href', 'img', 'image', 'poster', 'thumb', 'previewUrl', 'trackViewUrl']);

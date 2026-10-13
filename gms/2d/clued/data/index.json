@@ -1,5 +1,5 @@
 {
- "build": "202610130657",
+ "build": "202610130733",
  "themes": [
   {
    "id": "animals",
@@ -510,7 +510,8 @@
      "connect": 20,
      "blitz60": 11,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 2
     },
     "formatsEasy": {
      "mc": 20,
@@ -528,7 +529,8 @@
      "connect": 20,
      "blitz60": 11,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 2
     },
     "formatsKids": {
      "mc": 20,
@@ -546,7 +548,8 @@
      "connect": 20,
      "blitz60": 7,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 2
     }
    }
   },
@@ -689,7 +692,8 @@
      "connect": 20,
      "blitz60": 8,
      "type": 20,
-     "quote": 20
+     "quote": 20,
+     "pickall": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -705,7 +709,8 @@
      "connect": 0,
      "blitz60": 8,
      "type": 20,
-     "quote": 14
+     "quote": 14,
+     "pickall": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -721,7 +726,8 @@
      "connect": 0,
      "blitz60": 5,
      "type": 20,
-     "quote": 14
+     "quote": 14,
+     "pickall": 0
     }
    }
   },
@@ -765,7 +771,8 @@
      "sort": 20,
      "connect": 20,
      "blitz60": 7,
-     "type": 20
+     "type": 20,
+     "pickall": 10
     },
     "formatsEasy": {
      "mc": 20,
@@ -775,7 +782,8 @@
      "sort": 20,
      "connect": 20,
      "blitz60": 7,
-     "type": 20
+     "type": 20,
+     "pickall": 10
     },
     "formatsKids": {
      "mc": 20,
@@ -785,7 +793,8 @@
      "sort": 20,
      "connect": 20,
      "blitz60": 3,
-     "type": 20
+     "type": 20,
+     "pickall": 0
     }
    }
   },
@@ -932,7 +941,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 10,
-     "type": 20
+     "type": 20,
+     "pickall": 14
     },
     "formatsEasy": {
      "mc": 20,
@@ -949,7 +959,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 10,
-     "type": 20
+     "type": 20,
+     "pickall": 14
     },
     "formatsKids": {
      "mc": 20,
@@ -966,7 +977,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 5,
-     "type": 20
+     "type": 20,
+     "pickall": 0
     }
    }
   },
@@ -1095,7 +1107,8 @@
      "connect": 20,
      "blitz60": 11,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 4
     },
     "formatsEasy": {
      "mc": 20,
@@ -1112,7 +1125,8 @@
      "connect": 20,
      "blitz60": 11,
      "type": 20,
-     "lookalike": 12
+     "lookalike": 12,
+     "pickall": 4
     },
     "formatsKids": {
      "mc": 20,
@@ -1129,7 +1143,8 @@
      "connect": 20,
      "blitz60": 5,
      "type": 20,
-     "lookalike": 7
+     "lookalike": 7,
+     "pickall": 4
     }
    }
   },
@@ -1262,7 +1277,8 @@
      "connect": 20,
      "blitz60": 17,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 14
     },
     "formatsEasy": {
      "mc": 20,
@@ -1279,7 +1295,8 @@
      "connect": 20,
      "blitz60": 17,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 14
     },
     "formatsKids": {
      "mc": 20,
@@ -1296,7 +1313,8 @@
      "connect": 20,
      "blitz60": 7,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 4
     }
    }
   },
@@ -1357,7 +1375,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 14,
-     "type": 20
+     "type": 20,
+     "pickall": 14
     },
     "formatsEasy": {
      "mc": 20,
@@ -1373,7 +1392,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 14,
-     "type": 20
+     "type": 20,
+     "pickall": 14
     },
     "formatsKids": {
      "mc": 20,
@@ -1389,7 +1409,8 @@
      "number": 20,
      "connect": 0,
      "blitz60": 4,
-     "type": 20
+     "type": 20,
+     "pickall": 0
     }
    }
   },
@@ -1721,7 +1742,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 1142,
+   "questions": 1222,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -1737,9 +1758,10 @@
      "mc": 853,
      "number": 114,
      "tf": 144,
-     "order": 31
+     "order": 31,
+     "pickall": 80
     },
-    "easy": 420,
+    "easy": 458,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -1748,21 +1770,24 @@
      "tf": 20,
      "order": 20,
      "number": 20,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 20,
      "order": 8,
      "number": 20,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     },
     "formatsKids": {
      "mc": 20,
      "tf": 20,
      "order": 8,
      "number": 20,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     }
    }
   },
@@ -1773,7 +1798,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 374,
+   "questions": 388,
    "virtual": {
     "of": "general",
     "tag": "science"
@@ -1793,9 +1818,10 @@
      "mc": 261,
      "number": 62,
      "tf": 43,
-     "order": 8
+     "order": 8,
+     "pickall": 14
     },
-    "easy": 121,
+    "easy": 127,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -1804,21 +1830,24 @@
      "tf": 20,
      "order": 8,
      "number": 20,
-     "type": 20
+     "type": 20,
+     "pickall": 14
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 12,
      "order": 5,
      "number": 20,
-     "type": 20
+     "type": 20,
+     "pickall": 14
     },
     "formatsKids": {
      "mc": 20,
      "tf": 12,
      "order": 0,
      "number": 20,
-     "type": 20
+     "type": 20,
+     "pickall": 6
     }
    }
   },
@@ -1829,7 +1858,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 153,
+   "questions": 179,
    "virtual": {
     "of": "general",
     "tag": "geography"
@@ -1849,9 +1878,10 @@
      "mc": 124,
      "number": 8,
      "tf": 15,
-     "order": 6
+     "order": 6,
+     "pickall": 26
     },
-    "easy": 49,
+    "easy": 60,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -1860,21 +1890,24 @@
      "tf": 15,
      "order": 6,
      "number": 8,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 4,
      "order": 2,
      "number": 1,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     },
     "formatsKids": {
      "mc": 20,
      "tf": 4,
      "order": 2,
      "number": 1,
-     "type": 20
+     "type": 20,
+     "pickall": 11
     }
    }
   },
@@ -1885,7 +1918,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 89,
+   "questions": 96,
    "virtual": {
     "of": "general",
     "tag": "history"
@@ -1905,9 +1938,10 @@
      "number": 19,
      "mc": 55,
      "tf": 9,
-     "order": 6
+     "order": 6,
+     "pickall": 7
     },
-    "easy": 31,
+    "easy": 34,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -1916,21 +1950,24 @@
      "tf": 9,
      "order": 6,
      "number": 19,
-     "type": 20
+     "type": 20,
+     "pickall": 7
     },
     "formatsEasy": {
      "mc": 19,
      "tf": 3,
      "order": 2,
      "number": 7,
-     "type": 17
+     "type": 17,
+     "pickall": 7
     },
     "formatsKids": {
      "mc": 19,
      "tf": 3,
      "order": 2,
      "number": 7,
-     "type": 17
+     "type": 17,
+     "pickall": 3
     }
    }
   },
@@ -1941,7 +1978,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 53,
+   "questions": 55,
    "virtual": {
     "of": "general",
     "tag": "art"
@@ -1959,26 +1996,30 @@
     "quotes": 0,
     "qkinds": {
      "mc": 43,
-     "tf": 10
+     "tf": 10,
+     "pickall": 2
     },
-    "easy": 13,
+    "easy": 14,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
      "tf": 10,
-     "type": 20
+     "type": 20,
+     "pickall": 2
     },
     "formatsEasy": {
      "mc": 8,
      "tf": 5,
-     "type": 8
+     "type": 8,
+     "pickall": 2
     },
     "formatsKids": {
      "mc": 8,
      "tf": 5,
-     "type": 8
+     "type": 8,
+     "pickall": 1
     }
    }
   },
@@ -1989,7 +2030,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 62,
+   "questions": 69,
    "virtual": {
     "of": "general",
     "tag": "music"
@@ -2009,9 +2050,10 @@
      "mc": 41,
      "number": 7,
      "tf": 9,
-     "order": 5
+     "order": 5,
+     "pickall": 7
     },
-    "easy": 27,
+    "easy": 30,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -2020,21 +2062,24 @@
      "tf": 9,
      "order": 5,
      "number": 7,
-     "type": 20
+     "type": 20,
+     "pickall": 7
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 4,
      "order": 1,
      "number": 2,
-     "type": 20
+     "type": 20,
+     "pickall": 7
     },
     "formatsKids": {
      "mc": 20,
      "tf": 4,
      "order": 1,
      "number": 2,
-     "type": 20
+     "type": 20,
+     "pickall": 3
     }
    }
   },
@@ -2045,7 +2090,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 131,
+   "questions": 135,
    "virtual": {
     "of": "general",
     "tag": "books"
@@ -2064,9 +2109,10 @@
     "qkinds": {
      "mc": 114,
      "number": 6,
-     "tf": 11
+     "tf": 11,
+     "pickall": 4
     },
-    "easy": 54,
+    "easy": 56,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -2074,19 +2120,22 @@
      "mc": 20,
      "tf": 11,
      "number": 6,
-     "type": 20
+     "type": 20,
+     "pickall": 4
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 5,
      "number": 1,
-     "type": 20
+     "type": 20,
+     "pickall": 4
     },
     "formatsKids": {
      "mc": 20,
      "tf": 5,
      "number": 1,
-     "type": 20
+     "type": 20,
+     "pickall": 2
     }
    }
   },
@@ -2097,7 +2146,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 62,
+   "questions": 69,
    "virtual": {
     "of": "general",
     "tag": "animals"
@@ -2117,9 +2166,10 @@
      "mc": 35,
      "number": 5,
      "tf": 16,
-     "order": 6
+     "order": 6,
+     "pickall": 7
     },
-    "easy": 23,
+    "easy": 28,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -2128,21 +2178,24 @@
      "tf": 16,
      "order": 6,
      "number": 5,
-     "type": 20
+     "type": 20,
+     "pickall": 7
     },
     "formatsEasy": {
      "mc": 15,
      "tf": 5,
      "order": 3,
      "number": 3,
-     "type": 13
+     "type": 13,
+     "pickall": 7
     },
     "formatsKids": {
      "mc": 15,
      "tf": 5,
      "order": 3,
      "number": 0,
-     "type": 13
+     "type": 13,
+     "pickall": 5
     }
    }
   },
@@ -2201,7 +2254,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 95,
+   "questions": 100,
    "virtual": {
     "of": "general",
     "tag": "screen"
@@ -2220,9 +2273,10 @@
     "qkinds": {
      "mc": 78,
      "number": 7,
-     "tf": 10
+     "tf": 10,
+     "pickall": 5
     },
-    "easy": 58,
+    "easy": 61,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
@@ -2230,19 +2284,22 @@
      "mc": 20,
      "tf": 10,
      "number": 7,
-     "type": 20
+     "type": 20,
+     "pickall": 5
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 3,
      "number": 4,
-     "type": 20
+     "type": 20,
+     "pickall": 5
     },
     "formatsKids": {
      "mc": 20,
      "tf": 3,
      "number": 4,
-     "type": 20
+     "type": 20,
+     "pickall": 3
     }
    }
   },
@@ -2253,7 +2310,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 73,
+   "questions": 77,
    "virtual": {
     "of": "general",
     "tag": "food"
@@ -2271,26 +2328,30 @@
     "quotes": 0,
     "qkinds": {
      "mc": 64,
-     "tf": 9
+     "tf": 9,
+     "pickall": 4
     },
-    "easy": 29,
+    "easy": 30,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
      "tf": 9,
-     "type": 20
+     "type": 20,
+     "pickall": 4
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 2,
-     "type": 20
+     "type": 20,
+     "pickall": 4
     },
     "formatsKids": {
      "mc": 20,
      "tf": 2,
-     "type": 20
+     "type": 20,
+     "pickall": 1
     }
    }
   },
@@ -2423,7 +2484,8 @@
      "connect": 20,
      "blitz60": 4,
      "type": 20,
-     "lookalike": 13
+     "lookalike": 13,
+     "pickall": 8
     },
     "formatsEasy": {
      "mc": 20,
@@ -2440,7 +2502,8 @@
      "connect": 20,
      "blitz60": 4,
      "type": 20,
-     "lookalike": 4
+     "lookalike": 4,
+     "pickall": 8
     },
     "formatsKids": {
      "mc": 20,
@@ -2457,7 +2520,8 @@
      "connect": 20,
      "blitz60": 2,
      "type": 20,
-     "lookalike": 1
+     "lookalike": 1,
+     "pickall": 4
     }
    }
   },
@@ -2676,7 +2740,7 @@
    "icon": "🧸",
    "kids": true,
    "items": 0,
-   "questions": 430,
+   "questions": 443,
    "caps": {
     "img": 25,
     "audio": 0,
@@ -2690,26 +2754,30 @@
     "quotes": 0,
     "qkinds": {
      "mc": 391,
-     "tf": 39
+     "tf": 39,
+     "pickall": 13
     },
-    "easy": 372,
+    "easy": 385,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
      "tf": 20,
-     "type": 20
+     "type": 20,
+     "pickall": 13
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 20,
-     "type": 20
+     "type": 20,
+     "pickall": 13
     },
     "formatsKids": {
      "mc": 20,
      "tf": 20,
-     "type": 20
+     "type": 20,
+     "pickall": 13
     }
    }
   },
@@ -2762,7 +2830,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 15,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -2777,7 +2846,8 @@
      "number": 10,
      "connect": 20,
      "blitz60": 15,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -2792,7 +2862,8 @@
      "number": 10,
      "connect": 20,
      "blitz60": 5,
-     "type": 20
+     "type": 20,
+     "pickall": 8
     }
    }
   },
@@ -2844,7 +2915,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 8,
-     "type": 20
+     "type": 20,
+     "pickall": 12
     },
     "formatsEasy": {
      "mc": 20,
@@ -2858,7 +2930,8 @@
      "number": 15,
      "connect": 20,
      "blitz60": 8,
-     "type": 20
+     "type": 20,
+     "pickall": 12
     },
     "formatsKids": {
      "mc": 20,
@@ -2872,7 +2945,8 @@
      "number": 15,
      "connect": 0,
      "blitz60": 3,
-     "type": 20
+     "type": 20,
+     "pickall": 0
     }
    }
   },
@@ -3013,7 +3087,8 @@
      "connect": 20,
      "blitz60": 10,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 4
     },
     "formatsEasy": {
      "mc": 20,
@@ -3031,7 +3106,8 @@
      "connect": 20,
      "blitz60": 10,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 4
     },
     "formatsKids": {
      "mc": 20,
@@ -3049,7 +3125,8 @@
      "connect": 20,
      "blitz60": 8,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 4
     }
    }
   },
@@ -3125,7 +3202,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 9,
+     "blitz60": 5,
      "type": 20
     }
    }
@@ -3181,7 +3258,8 @@
      "connect": 20,
      "blitz60": 8,
      "type": 20,
-     "quote": 20
+     "quote": 20,
+     "pickall": 18
     },
     "formatsEasy": {
      "mc": 20,
@@ -3197,7 +3275,8 @@
      "connect": 20,
      "blitz60": 8,
      "type": 20,
-     "quote": 20
+     "quote": 20,
+     "pickall": 18
     },
     "formatsKids": {
      "mc": 20,
@@ -3213,7 +3292,8 @@
      "connect": 20,
      "blitz60": 4,
      "type": 20,
-     "quote": 20
+     "quote": 20,
+     "pickall": 0
     }
    }
   },
@@ -3344,7 +3424,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 4,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -3359,7 +3440,8 @@
      "number": 14,
      "connect": 20,
      "blitz60": 4,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -3374,7 +3456,8 @@
      "number": 14,
      "connect": 0,
      "blitz60": 1,
-     "type": 20
+     "type": 20,
+     "pickall": 0
     }
    }
   },
@@ -3574,7 +3657,8 @@
      "connect": 20,
      "blitz60": 7,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 4
     },
     "formatsEasy": {
      "mc": 20,
@@ -3592,7 +3676,8 @@
      "connect": 20,
      "blitz60": 7,
      "type": 20,
-     "lookalike": 13
+     "lookalike": 13,
+     "pickall": 4
     },
     "formatsKids": {
      "mc": 20,
@@ -3610,7 +3695,8 @@
      "connect": 0,
      "blitz60": 6,
      "type": 20,
-     "lookalike": 7
+     "lookalike": 7,
+     "pickall": 4
     }
    }
   },
@@ -3665,7 +3751,8 @@
      "connect": 20,
      "blitz60": 5,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 12
     },
     "formatsEasy": {
      "mc": 20,
@@ -3682,7 +3769,8 @@
      "connect": 20,
      "blitz60": 5,
      "type": 20,
-     "lookalike": 13
+     "lookalike": 13,
+     "pickall": 12
     },
     "formatsKids": {
      "mc": 20,
@@ -3699,7 +3787,8 @@
      "connect": 0,
      "blitz60": 4,
      "type": 20,
-     "lookalike": 10
+     "lookalike": 10,
+     "pickall": 8
     }
    }
   },
@@ -3846,7 +3935,8 @@
      "connect": 20,
      "blitz60": 10,
      "type": 20,
-     "lookalike": 20
+     "lookalike": 20,
+     "pickall": 2
     },
     "formatsEasy": {
      "mc": 20,
@@ -3863,7 +3953,8 @@
      "connect": 20,
      "blitz60": 10,
      "type": 20,
-     "lookalike": 15
+     "lookalike": 15,
+     "pickall": 2
     },
     "formatsKids": {
      "mc": 20,
@@ -3880,7 +3971,8 @@
      "connect": 20,
      "blitz60": 5,
      "type": 20,
-     "lookalike": 8
+     "lookalike": 8,
+     "pickall": 0
     }
    }
   },
@@ -3939,7 +4031,8 @@
      "connect": 20,
      "blitz60": 5,
      "type": 20,
-     "lookalike": 17
+     "lookalike": 17,
+     "pickall": 8
     },
     "formatsEasy": {
      "mc": 20,
@@ -3956,7 +4049,8 @@
      "connect": 20,
      "blitz60": 5,
      "type": 20,
-     "lookalike": 4
+     "lookalike": 4,
+     "pickall": 8
     },
     "formatsKids": {
      "mc": 20,
@@ -3973,7 +4067,8 @@
      "connect": 0,
      "blitz60": 2,
      "type": 20,
-     "lookalike": 2
+     "lookalike": 2,
+     "pickall": 2
     }
    }
   },
@@ -4120,7 +4215,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 4,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -4132,7 +4228,8 @@
      "number": 12,
      "connect": 0,
      "blitz60": 4,
-     "type": 20
+     "type": 20,
+     "pickall": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -4144,7 +4241,8 @@
      "number": 12,
      "connect": 0,
      "blitz60": 2,
-     "type": 20
+     "type": 20,
+     "pickall": 0
     }
    }
   },
@@ -4196,7 +4294,8 @@
      "number": 20,
      "blitz60": 7,
      "type": 20,
-     "lookalike": 15
+     "lookalike": 15,
+     "pickall": 2
     },
     "formatsEasy": {
      "mc": 20,
@@ -4212,7 +4311,8 @@
      "number": 16,
      "blitz60": 7,
      "type": 20,
-     "lookalike": 6
+     "lookalike": 6,
+     "pickall": 2
     },
     "formatsKids": {
      "mc": 20,
@@ -4228,7 +4328,8 @@
      "number": 16,
      "blitz60": 2,
      "type": 20,
-     "lookalike": 0
+     "lookalike": 0,
+     "pickall": 2
     }
    }
   },
@@ -4281,7 +4382,8 @@
      "connect": 20,
      "blitz60": 9,
      "type": 20,
-     "quote": 17
+     "quote": 17,
+     "pickall": 6
     },
     "formatsEasy": {
      "mc": 20,
@@ -4296,7 +4398,8 @@
      "connect": 20,
      "blitz60": 9,
      "type": 20,
-     "quote": 5
+     "quote": 5,
+     "pickall": 6
     },
     "formatsKids": {
      "mc": 20,
@@ -4311,7 +4414,8 @@
      "connect": 20,
      "blitz60": 4,
      "type": 20,
-     "quote": 5
+     "quote": 5,
+     "pickall": 0
     }
    }
   },

@@ -176,3 +176,24 @@ study sessions, daily calendar, last 200 games); layout in docs/notes/STATS.md. 
 - `spec.fresh`: the compact list (≤ ~600 chars) of question picks the host's seen-history produced, so a rebuild elsewhere gets the identical set. Never set for daily / challenges / link challenges (they stay seed-only).
 - Storage `clued.seen`* `{v, h, g}`: 5-char base-36 dupKey hashes (oldest first, cap 3,000) + last-10-games new/total.
 - Pack item `popYear` + factsMeta `yearField` / `{year}` in `askNumber`.
+
+## Additive fields from DIFFMIX (2026-10-13)
+- `spec.blend: 1`: Easy/Medium/Hard rounds are a blend (per 10: 6/3/1, 2/6/2, 1/3/6; `js/core/diffmix.js`). Set by
+  makeSpec on every spec except the daily; a spec without it builds pure levels as before (old links replay unchanged).
+  Never blended: kids, the Ladder, the daily, Mixed.
+- Question `lv` (1–3): the question's real level, set on blended rounds and in-country questions.
+- `kidsOk` rejects items/questions with `kids: false` or `facts.kids: false` at any difficulty.
+
+
+## Additive fields from PICKALL (2026-10-13)
+- Format `pickall` (js/formats/pickall.js, rules in pickall_rules.js, scoring in pickall_score.js). Question:
+  `{ format: 'pickall', options: [{ text, img? }], answer: [sorted option indices, 2–4], answerText: 'A · B · C',
+  data: { need, layout: 'text'|'images', from: 'q'|'rule', rule?, key?, value? } }`. Adult 6–8 tiles, kids 4–5 with
+  2 right; tiles ≥ 2 × right. Option `tiles` (6/7/8, kids hidden). Never put a `src` key in `data` (preflight reads it as media).
+- Pack question kind `pickall` (c1_schema): `answer` = EVERY right option on the list, `wrong` = decoys (3+), prompt holds
+  `{n}` ("Which {n} of these …?"), filled with two/three/four. Built from tools/c2c_src/pickall_a.mjs (P constructor in lib.mjs).
+- Scoring: (right picks − wrong picks) / right answers, floored at 0; more picks than right answers = 0. All right = normal
+  speed points; otherwise `partial` with points = round(speed base × fraction). Rooms: `pickall` is in server partialFormats
+  (longFormats 30 s); the server re-checks `correct` from `given` and caps points at round(500 × fraction) (pickallCap,
+  mirrored in js/net/p2p_room.js). Not hidden until the reveal (partial formats ship their answer).
+- `window.__cluedRoom.q()` (test hook): the room runner's current question.

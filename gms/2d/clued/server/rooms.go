@@ -530,6 +530,9 @@ func (r *Room) answer(p *Player, in answerIn) (*Answer, string) {
 	}
 	correct := verifyCorrect(m, in.Given, in.Correct)
 	base := basePoints(m.Format, correct, in.Points, ms, m.LimitMs, !r.Kids)
+	if m.Format == "pickall" {
+		base = min(base, pickallCap(m.Answer, in.Given))
+	}
 	if correct {
 		p.Streak++
 		p.Correct++

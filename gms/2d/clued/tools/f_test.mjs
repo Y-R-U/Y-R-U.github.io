@@ -13,7 +13,7 @@ const VERBOSE = args.includes('--verbose');
 const ONLY = (args.find(a => !a.startsWith('--')) || '').split(',').filter(Boolean);
 
 export const F_FORMATS = ['match', 'ladder', 'hilo', 'order', 'odd', 'sort', 'fake', 'reveal', 'silhouette', 'number', 'connect',
-  'blitz60', 'type', 'chain', 'lookalike', 'quote'];
+  'blitz60', 'type', 'chain', 'lookalike', 'quote', 'pickall'];
 
 let fails = 0, passes = 0;
 const failMsgs = new Map();
