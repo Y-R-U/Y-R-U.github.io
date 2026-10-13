@@ -22,7 +22,7 @@ import { Purchases, API, ownerPollNext } from './purchases.js?v=20261014-gift';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
 import { mountArena } from './net/panel.js?v=20261013-f4';
-import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261014-vines';
+import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261014-walk';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
 /** A definitive "not entitled" arrived while a paid world was in play: park it at the next hub visit, never mid-fight. */

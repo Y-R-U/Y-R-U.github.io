@@ -8,7 +8,7 @@ import { activeEvents, parseEventId, pointsFor, today } from './index.js';
 import * as V from './vines.js';
 import * as R from './reveal.js';
 import * as E from './state.js';
-import { VinesView, RevealView } from './render.js?v=20261014-vines';
+import { VinesView, RevealView } from './render.js?v=20261014-walk';
 import { createEventsNet, deviceId, arenaName } from './net.js';
 import { drawOverlay } from './overlay.js';
 import { SHEET_W, GROUND_Y } from '../config.js';

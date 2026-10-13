@@ -188,7 +188,7 @@ export class VinesView {
     } else { [x, y] = this.centre(myPos); this.idleT = (this.idleT || 0) + dt; }
     this.walkerAt = [x, y];
     const k = L.cs / 115;
-    const p = pose === 'walk' ? sample('walk', poseT) : (POSE[pose] || POSE.guard);
+    const p = pose === 'walk' ? sample('walk', poseT).p : (POSE[pose] || POSE.guard);
     me.rag.place(0, 0, fk(p, me.facing, 1));
     g.save(); g.translate(x, y + L.cs * 0.02); g.scale(k, k);
     drawFighter(g, me, now);
