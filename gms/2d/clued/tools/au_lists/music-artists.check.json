@@ -1,266 +1,526 @@
 {
  "dropped": [
-  "NO MATCH  Green Day — Good Riddance (Time of Your Life)"
+  "NO MATCH  Green Day — Good Riddance (Time of Your Life)",
+  "EXPLICIT preview left out  Drake — God's Plan",
+  "EXPLICIT preview left out  Sabrina Carpenter — Espresso",
+  "EXPLICIT preview left out  Maroon 5 — Payphone ; Sugar",
+  "EXPLICIT preview left out  Lil Nas X — Montero (Call Me by Your Name) ; Thats What I Want",
+  "EXPLICIT preview left out  Fergie — Glamorous ; London Bridge",
+  "EXPLICIT preview left out  Gwen Stefani — Hollaback Girl",
+  "EXPLICIT preview left out  OutKast — Hey Ya! ; Roses"
  ],
  "offby": [],
  "items": [
   {
-   "id": "the-beatles"
+   "id": "the-beatles",
+   "d": 1
   },
   {
-   "id": "elvis-presley"
+   "id": "elvis-presley",
+   "d": 1
   },
   {
-   "id": "the-rolling-stones"
+   "id": "the-rolling-stones",
+   "d": 1
   },
   {
-   "id": "the-beach-boys"
+   "id": "the-beach-boys",
+   "d": 2
   },
   {
-   "id": "bob-dylan"
+   "id": "bob-dylan",
+   "d": 2
   },
   {
-   "id": "aretha-franklin"
+   "id": "aretha-franklin",
+   "d": 2
   },
   {
-   "id": "marvin-gaye"
+   "id": "marvin-gaye",
+   "d": 2
   },
   {
-   "id": "ray-charles"
+   "id": "ray-charles",
+   "d": 2
   },
   {
-   "id": "chuck-berry"
+   "id": "chuck-berry",
+   "d": 2
   },
   {
-   "id": "frank-sinatra"
+   "id": "frank-sinatra",
+   "d": 1
   },
   {
-   "id": "johnny-cash"
+   "id": "johnny-cash",
+   "d": 2
   },
   {
-   "id": "the-supremes"
+   "id": "the-supremes",
+   "d": 2
   },
   {
-   "id": "simon-and-garfunkel"
+   "id": "simon-and-garfunkel",
+   "d": 2
   },
   {
-   "id": "stevie-wonder"
+   "id": "stevie-wonder",
+   "d": 2
   },
   {
-   "id": "led-zeppelin"
+   "id": "led-zeppelin",
+   "d": 2
   },
   {
-   "id": "david-bowie"
+   "id": "david-bowie",
+   "d": 1
   },
   {
-   "id": "elton-john"
+   "id": "elton-john",
+   "d": 1
   },
   {
-   "id": "queen"
+   "id": "queen",
+   "d": 1
   },
   {
-   "id": "abba"
+   "id": "abba",
+   "d": 1
   },
   {
-   "id": "bee-gees"
+   "id": "bee-gees",
+   "d": 2
   },
   {
-   "id": "fleetwood-mac"
+   "id": "fleetwood-mac",
+   "d": 2
   },
   {
-   "id": "pink-floyd"
+   "id": "pink-floyd",
+   "d": 2
   },
   {
-   "id": "eagles"
+   "id": "eagles",
+   "d": 2
   },
   {
-   "id": "bob-marley-and-the-wailers"
+   "id": "bob-marley-and-the-wailers",
+   "d": 2
   },
   {
-   "id": "dolly-parton"
+   "id": "dolly-parton",
+   "d": 1
   },
   {
-   "id": "bruce-springsteen"
+   "id": "bruce-springsteen",
+   "d": 2
   },
   {
-   "id": "billy-joel"
+   "id": "billy-joel",
+   "d": 2
   },
   {
-   "id": "ac-dc"
+   "id": "ac-dc",
+   "d": 2
   },
   {
-   "id": "donna-summer"
+   "id": "donna-summer",
+   "d": 2
   },
   {
-   "id": "michael-jackson"
+   "id": "michael-jackson",
+   "d": 1
   },
   {
-   "id": "madonna"
+   "id": "madonna",
+   "d": 1
   },
   {
-   "id": "prince"
+   "id": "prince",
+   "d": 2
   },
   {
-   "id": "whitney-houston"
+   "id": "whitney-houston",
+   "d": 1
   },
   {
-   "id": "tina-turner"
+   "id": "tina-turner",
+   "d": 2
   },
   {
-   "id": "phil-collins"
+   "id": "phil-collins",
+   "d": 2
   },
   {
-   "id": "george-michael"
+   "id": "george-michael",
+   "d": 2
   },
   {
-   "id": "u2"
+   "id": "u2",
+   "d": 2
   },
   {
-   "id": "the-police"
+   "id": "the-police",
+   "d": 2
   },
   {
-   "id": "bon-jovi"
+   "id": "bon-jovi",
+   "d": 2
   },
   {
-   "id": "guns-n-roses"
+   "id": "guns-n-roses",
+   "d": 2
   },
   {
-   "id": "cyndi-lauper"
+   "id": "cyndi-lauper",
+   "d": 2
   },
   {
-   "id": "lionel-richie"
+   "id": "lionel-richie",
+   "d": 2
   },
   {
-   "id": "dire-straits"
+   "id": "dire-straits",
+   "d": 2
   },
   {
-   "id": "kylie-minogue"
+   "id": "kylie-minogue",
+   "d": 2
   },
   {
-   "id": "metallica"
+   "id": "metallica",
+   "d": 2
   },
   {
-   "id": "mariah-carey"
+   "id": "mariah-carey",
+   "d": 2
   },
   {
-   "id": "celine-dion"
+   "id": "celine-dion",
+   "d": 2
   },
   {
-   "id": "nirvana"
+   "id": "nirvana",
+   "d": 2
   },
   {
-   "id": "oasis"
+   "id": "oasis",
+   "d": 1
   },
   {
-   "id": "red-hot-chili-peppers"
+   "id": "red-hot-chili-peppers",
+   "d": 2
   },
   {
-   "id": "spice-girls"
+   "id": "spice-girls",
+   "d": 2
   },
   {
-   "id": "britney-spears"
+   "id": "britney-spears",
+   "d": 1
   },
   {
-   "id": "backstreet-boys"
+   "id": "backstreet-boys",
+   "d": 2
   },
   {
-   "id": "radiohead"
+   "id": "radiohead",
+   "d": 2
   },
   {
-   "id": "green-day"
+   "id": "green-day",
+   "d": 2
   },
   {
-   "id": "shakira"
+   "id": "shakira",
+   "d": 2
   },
   {
-   "id": "eminem"
+   "id": "eminem",
+   "d": 2,
+   "explicit": true
   },
   {
-   "id": "destinys-child"
+   "id": "destinys-child",
+   "d": 2
   },
   {
-   "id": "coldplay"
+   "id": "coldplay",
+   "d": 1
   },
   {
-   "id": "beyonce"
+   "id": "beyonce",
+   "d": 1
   },
   {
-   "id": "alicia-keys"
+   "id": "alicia-keys",
+   "d": 2
   },
   {
-   "id": "linkin-park"
+   "id": "linkin-park",
+   "d": 2
   },
   {
-   "id": "usher"
+   "id": "usher",
+   "d": 2
   },
   {
-   "id": "the-killers"
+   "id": "the-killers",
+   "d": 2
   },
   {
-   "id": "amy-winehouse"
+   "id": "amy-winehouse",
+   "d": 2
   },
   {
-   "id": "arctic-monkeys"
+   "id": "arctic-monkeys",
+   "d": 2
   },
   {
-   "id": "daft-punk"
+   "id": "daft-punk",
+   "d": 2
   },
   {
-   "id": "rihanna"
+   "id": "rihanna",
+   "d": 1
   },
   {
-   "id": "lady-gaga"
+   "id": "lady-gaga",
+   "d": 1
   },
   {
-   "id": "katy-perry"
+   "id": "katy-perry",
+   "d": 2
   },
   {
-   "id": "taylor-swift"
+   "id": "taylor-swift",
+   "d": 1
   },
   {
-   "id": "bruno-mars"
+   "id": "bruno-mars",
+   "d": 2
   },
   {
-   "id": "adele"
+   "id": "adele",
+   "d": 1
   },
   {
-   "id": "ed-sheeran"
+   "id": "ed-sheeran",
+   "d": 1
   },
   {
-   "id": "justin-bieber"
+   "id": "justin-bieber",
+   "d": 2
   },
   {
-   "id": "drake"
+   "id": "drake",
+   "d": 2
   },
   {
-   "id": "imagine-dragons"
+   "id": "imagine-dragons",
+   "d": 2
   },
   {
-   "id": "ariana-grande"
+   "id": "ariana-grande",
+   "d": 2,
+   "explicit": true
   },
   {
-   "id": "the-weeknd"
+   "id": "the-weeknd",
+   "d": 2
   },
   {
-   "id": "billie-eilish"
+   "id": "billie-eilish",
+   "d": 2
   },
   {
-   "id": "dua-lipa"
+   "id": "dua-lipa",
+   "d": 2
   },
   {
-   "id": "harry-styles"
+   "id": "harry-styles",
+   "d": 2
   },
   {
-   "id": "bts"
+   "id": "bts",
+   "d": 2
   },
   {
-   "id": "olivia-rodrigo"
+   "id": "olivia-rodrigo",
+   "d": 2,
+   "explicit": true
   },
   {
-   "id": "sabrina-carpenter"
+   "id": "sabrina-carpenter",
+   "d": 2
   },
   {
-   "id": "kendrick-lamar"
+   "id": "kendrick-lamar",
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "the-black-eyed-peas",
+   "d": 1
+  },
+  {
+   "id": "maroon-5",
+   "d": 1
+  },
+  {
+   "id": "flo-rida",
+   "d": 1
+  },
+  {
+   "id": "justin-timberlake",
+   "d": 1
+  },
+  {
+   "id": "post-malone",
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "shaggy",
+   "d": 1
+  },
+  {
+   "id": "miley-cyrus",
+   "d": 2
+  },
+  {
+   "id": "rod-stewart",
+   "d": 1
+  },
+  {
+   "id": "the-chainsmokers",
+   "d": 2
+  },
+  {
+   "id": "pitbull",
+   "d": 2
+  },
+  {
+   "id": "the-pussycat-dolls",
+   "d": 2
+  },
+  {
+   "id": "the-bangles",
+   "d": 2
+  },
+  {
+   "id": "christina-aguilera",
+   "d": 2
+  },
+  {
+   "id": "jason-derulo",
+   "d": 2
+  },
+  {
+   "id": "blondie",
+   "d": 1
+  },
+  {
+   "id": "jennifer-lopez",
+   "d": 2
+  },
+  {
+   "id": "cher",
+   "d": 1
+  },
+  {
+   "id": "50-cent",
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "calvin-harris",
+   "d": 2
+  },
+  {
+   "id": "chris-brown",
+   "d": 2
+  },
+  {
+   "id": "lil-nas-x",
+   "d": 2
+  },
+  {
+   "id": "fergie",
+   "d": 2
+  },
+  {
+   "id": "sia",
+   "d": 2
+  },
+  {
+   "id": "david-guetta",
+   "d": 2
+  },
+  {
+   "id": "roxette",
+   "d": 1
+  },
+  {
+   "id": "shawn-mendes",
+   "d": 2
+  },
+  {
+   "id": "onerepublic",
+   "d": 1
+  },
+  {
+   "id": "enrique-iglesias",
+   "d": 2
+  },
+  {
+   "id": "gwen-stefani",
+   "d": 2
+  },
+  {
+   "id": "savage-garden",
+   "d": 2
+  },
+  {
+   "id": "will-smith",
+   "d": 2
+  },
+  {
+   "id": "shania-twain",
+   "d": 1
+  },
+  {
+   "id": "ace-of-base",
+   "d": 1
+  },
+  {
+   "id": "jay-z",
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "meghan-trainor",
+   "d": 2
+  },
+  {
+   "id": "wham",
+   "d": 1
+  },
+  {
+   "id": "outkast",
+   "d": 2
+  },
+  {
+   "id": "nickelback",
+   "d": 2
+  },
+  {
+   "id": "toni-braxton",
+   "d": 1
+  },
+  {
+   "id": "benson-boone",
+   "d": 2
   }
  ]
 }

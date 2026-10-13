@@ -14,6 +14,7 @@ const warn = (m) => { warns++; console.log('warn ' + m); };
 const FREE = /^(PD|Public domain|CC0|CC0 1\.0|PDM|PDM-owner|Public Domain Mark.*|CC BY(-SA)? \d\.\d( [a-z]{2,})?)$/i;
 const APPLE_LIC = 'Apple Music preview (streamed, not stored)';
 const THEMES = ['music'];
+const DATA_FACTS = ['charts', 'artistCountry', 'artistCountries'];
 
 export function checkPack(p, file) {
   const errs = [];
@@ -53,6 +54,17 @@ export function checkPack(p, file) {
     if (f.year != null && !(Number.isInteger(f.year) && f.year >= 1500 && f.year <= 2026)) w(`bad year ${f.year}`);
     if (f.decade != null && f.year != null && f.decade !== `${Math.floor(f.year / 10) * 10}s`) w(`decade ${f.decade} does not match year ${f.year}`);
     for (const k of Object.keys(f)) if (!p.factsMeta?.[k]) w(`fact "${k}" missing from factsMeta`);
+    // item-level data (not facts, so no format words a question from them): year-end chart positions, artist country
+    for (const k of DATA_FACTS) if (f[k] != null) w(`${k} belongs on the item, not in facts`);
+    const d = it;
+    if (d.charts != null) {
+      const ks = Object.keys(d.charts);
+      if (!ks.length || ks.some((c) => !['us', 'uk', 'au'].includes(c) || !Number.isInteger(d.charts[c]) || d.charts[c] < 1 || d.charts[c] > 101)) w(`bad charts ${JSON.stringify(d.charts)}`);
+    }
+    if (d.artistCountry != null && !/^[A-Z]{3}$/.test(d.artistCountry)) w(`bad artistCountry ${d.artistCountry}`);
+    if (d.artistCountries != null && (!Array.isArray(d.artistCountries) || d.artistCountries[0] !== d.artistCountry || d.artistCountries.some((c) => !/^[A-Z]{3}$/.test(c)))) w('bad artistCountries');
+    // kids mode sees only difficulty 1, so an explicit or kids:false song must never be 1
+    if ((it.explicit || it.kids === false) && it.difficulty < 2) w('explicit / not-for-kids item at difficulty 1');
     if (it.lyrics && !audio.every((a) => a.type === 'piano' && /^(PD|Public domain)$/i.test(a.license))) w('lyrics allowed only on public-domain songs');
   }
   return errs;
@@ -88,6 +100,17 @@ async function main() {
         if (codes.has(i.iso3)) fail(`anthems: duplicate iso3 ${i.iso3}`);
         codes.add(i.iso3);
       }
+    }
+    if (/^hits-\d{4}s$/.test(p.id)) {
+      const y0 = +p.id.slice(5, 9), years = Math.min(10, 2026 - y0);
+      const charted = p.items.filter((i) => i.charts).length;
+      if (p.items.length < years * 18) fail(`${p.id}: only ${p.items.length} songs (want ~25 a year)`);
+      if (charted < p.items.length * 0.95) fail(`${p.id}: only ${charted}/${p.items.length} songs carry year-end chart data`);
+      if (p.items.filter((i) => i.artistCountry).length < p.items.length * 0.9) fail(`${p.id}: artistCountry on under 90% of songs`);
+      const byD = [1, 2, 3].map((d) => p.items.filter((i) => i.difficulty === d).length);
+      if (byD[0] < 25 || byD[1] < 25) fail(`${p.id}: difficulty split ${byD.join('/')} too thin`);
+      const kidsN = p.items.filter((i) => i.difficulty === 1).length;
+      console.log(`ok   ${p.id}: ${p.items.length} songs, d1/d2/d3 ${byD.join('/')}, ${p.items.filter((i) => i.explicit).length} explicit, kids pool ${kidsN}`);
     }
     const easy = p.items.filter((i) => i.difficulty === 1).length;
     if (easy < 15) warn(`${p.id}: only ${easy} difficulty-1 items (target 15)`);

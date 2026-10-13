@@ -90,3 +90,44 @@ BTS | South Korea | 2010s | Dynamite ; Butter
 Olivia Rodrigo | US | 2020s | drivers license ; good 4 u
 Sabrina Carpenter | US | 2020s | Espresso ; Please Please Please
 Kendrick Lamar | US | 2010s | HUMBLE. ; Not Like Us
+# added by tools/au_artists.mjs from the year-end charts (origin from Wikidata)
+The Black Eyed Peas | US | 2000s | I Gotta Feeling ; Where Is the Love? ; Boom Boom Pow | d=1
+Maroon 5 | US | 2000s | Moves like Jagger ; Payphone ; Sugar | d=1
+Flo Rida | US | 2000s | Low ; Right Round ; Wild Ones | d=1
+Justin Timberlake | US | 2000s | Can't Stop the Feeling! ; Mirrors ; What Goes Around... Comes Around | d=1
+Post Malone | US | 2010s | I Had Some Help ; Rockstar ; Wow | d=1
+Shaggy | Jamaica | 1990s | It Wasn't Me ; Angel ; Boombastic | d=1
+Miley Cyrus | US | 2000s | Flowers ; Wrecking Ball ; We Can't Stop
+Rod Stewart | UK | 1970s | Maggie May ; You're in My Heart (The Final Acclaim) ; Rhythm of My Heart | d=1
+The Chainsmokers | US | 2010s | Closer ; Don't Let Me Down ; Paris
+Pitbull | US | 2000s | Give Me Everything ; Timber ; I Know You Want Me (Calle Ocho)
+The Pussycat Dolls | US | 2000s | Don't Cha ; Buttons ; Stickwitu
+The Bangles | US | 1980s | Walk Like An Egyptian ; Eternal Flame ; Manic Monday
+Christina Aguilera | US | 1990s | Genie in a Bottle ; Beautiful ; Ain't No Other Man
+Jason Derulo | US | 2000s | Want to Want Me ; In My Head ; Ridin' Solo
+Blondie | US | 1970s | Heart of Glass ; Call Me ; The Tide Is High | d=1
+Jennifer Lopez | US | 1990s | On the Floor ; All I Have ; If You Had My Love
+Cher | US | 1960s | Believe ; If I Could Turn Back Time ; The Shoop Shoop Song (It's in His Kiss) | d=1
+50 Cent | US | 2000s | In da Club ; Candy Shop ; 21 Questions
+Calvin Harris | UK | 2000s | This Is What You Came For ; Summer ; I Need Your Love
+Chris Brown | US | 2000s | Forever ; With You ; Run It!
+Lil Nas X | US | 2010s | Old Town Road ; Montero (Call Me by Your Name) ; Thats What I Want
+Fergie | US | 2000s | Big Girls Don't Cry ; Glamorous ; London Bridge
+Sia | Australia | 2010s | Cheap Thrills ; Chandelier ; Elastic Heart
+David Guetta | France | 2000s | Titanium ; Turn Me On ; Without You
+Roxette | Sweden | 1980s | It Must Have Been Love ; Joyride ; The Look | d=1
+Shawn Mendes | Canada | 2010s | There's Nothing Holdin' Me Back ; Stitches ; Treat You Better
+OneRepublic | US | 2000s | Counting Stars ; I Ain't Worried ; Stop and Stare | d=1
+Enrique Iglesias | Spain | 1990s | Hero ; I Like It ; Tonight (I'm Lovin' You)
+Gwen Stefani | US | 2000s | The Sweet Escape ; Hollaback Girl ; Rich Girl
+Savage Garden | Australia | 1990s | Truly Madly Deeply ; I Want You ; I Knew I Loved You
+Will Smith | US | 1990s | Switch ; Men in Black ; Wild Wild West
+Shania Twain | Canada | 1990s | That Don't Impress Me Much ; You're Still the One ; Man! I Feel Like a Woman! | d=1
+Ace of Base | Sweden | 1990s | The Sign ; All That She Wants ; Don't Turn Around | d=1
+Jay-Z | US | 1990s | Empire State of Mind ; '03 Bonnie & Clyde ; Run This Town
+Meghan Trainor | US | 2010s | All About That Bass ; Made You Look ; No
+Wham! | UK | 1980s | Wake Me Up Before You Go-Go ; Last Christmas ; Freedom | d=1
+OutKast | US | 1990s | Hey Ya! ; Ms. Jackson ; Roses
+Nickelback | Canada | 2000s | How You Remind Me ; Rockstar ; Someday
+Toni Braxton | US | 1990s | Breathe Again ; Un-Break My Heart ; You're Makin' Me High | d=1
+Benson Boone | US | 2020s | Beautiful Things ; Slow It Down ; Mystical Magical

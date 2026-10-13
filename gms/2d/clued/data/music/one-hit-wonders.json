@@ -54,7 +54,13 @@
     "decade": "1960s",
     "act": "Male solo artist"
    },
-   "blurb": "\"Spirit in the Sky\" by Norman Greenbaum, released in 1969.",
+   "charts": {
+    "us": 22,
+    "uk": 4,
+    "au": 4
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Spirit in the Sky\" by Norman Greenbaum, released in 1969. Year-end charts: the US #22, the UK #4, Australia #4.",
    "media": {
     "audio": [
      {
@@ -84,7 +90,11 @@
     "decade": "1960s",
     "act": "Group or duo"
    },
-   "blurb": "\"In the Year 2525\" by Zager & Evans, released in 1969.",
+   "charts": {
+    "us": 26
+   },
+   "artistCountry": "USA",
+   "blurb": "\"In the Year 2525\" by Zager & Evans, released in 1969. Year-end charts: the US #26.",
    "media": {
     "audio": [
      {
@@ -102,6 +112,45 @@
      }
     ]
    },
+   "difficulty": 3
+  },
+  {
+   "id": "love-grows-where-my-rosemary-goes-edison-lighthouse",
+   "name": "Love Grows (Where My Rosemary Goes)",
+   "alt": [
+    "Love Grows"
+   ],
+   "group": "1970s",
+   "facts": {
+    "artist": "Edison Lighthouse",
+    "year": 1970,
+    "decade": "1970s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 40,
+    "uk": 11,
+    "au": 12
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Love Grows (Where My Rosemary Goes)\" by Edison Lighthouse, released in 1970. Year-end charts: the US #40, the UK #11, Australia #12.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/6c/7b/5d/6c7b5d5d-8488-28b1-575b-9528d86204ca/mzaf_13881764212611963136.plus.aac.p.m4a",
+      "credit": "Edison Lighthouse: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/love-grows-where-my-rosemary-goes-new-stereo-version/587462321?i=587462754&uo=4",
+      "apple": {
+       "trackId": 587462754,
+       "url": "https://music.apple.com/us/album/love-grows-where-my-rosemary-goes-new-stereo-version/587462321?i=587462754&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/43/8d/92/438d92fc-94f3-7049-9c5c-afeab6cfdd0f/The_Power_Of_Love.jpg/300x300bb.jpg",
+       "term": "Edison Lighthouse Love Grows"
+      },
+      "dur": 30
+     }
+    ]
+   },
    "difficulty": 2
   },
   {
@@ -114,7 +163,12 @@
     "decade": "1970s",
     "act": "Group or duo"
    },
-   "blurb": "\"Popcorn\" by Hot Butter, released in 1972.",
+   "charts": {
+    "us": 28,
+    "au": 3
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Popcorn\" by Hot Butter, released in 1972. Year-end charts: the US #28, Australia #3.",
    "media": {
     "audio": [
      {
@@ -137,6 +191,9 @@
   {
    "id": "brandy-youre-a-fine-girl-looking-glass",
    "name": "Brandy (You're a Fine Girl)",
+   "alt": [
+    "Brandy"
+   ],
    "group": "1970s",
    "facts": {
     "artist": "Looking Glass",
@@ -144,7 +201,11 @@
     "decade": "1970s",
     "act": "Group or duo"
    },
-   "blurb": "\"Brandy (You're a Fine Girl)\" by Looking Glass, released in 1972.",
+   "charts": {
+    "us": 12
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Brandy (You're a Fine Girl)\" by Looking Glass, released in 1972. Year-end charts: the US #12.",
    "media": {
     "audio": [
      {
@@ -174,7 +235,13 @@
     "decade": "1970s",
     "act": "Male solo artist"
    },
-   "blurb": "\"Kung Fu Fighting\" by Carl Douglas, released in 1974.",
+   "charts": {
+    "us": 15,
+    "uk": 8,
+    "au": 22
+   },
+   "artistCountry": "JAM",
+   "blurb": "\"Kung Fu Fighting\" by Carl Douglas, released in 1974. Year-end charts: the US #15, the UK #8, Australia #22.",
    "media": {
     "audio": [
      {
@@ -204,7 +271,12 @@
     "decade": "1970s",
     "act": "Group or duo"
    },
-   "blurb": "\"Play That Funky Music\" by Wild Cherry, released in 1976.",
+   "charts": {
+    "us": 5,
+    "uk": 47
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Play That Funky Music\" by Wild Cherry, released in 1976. Year-end charts: the US #5, the UK #47.",
    "media": {
     "audio": [
      {
@@ -222,7 +294,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "video-killed-the-radio-star-the-buggles",
@@ -234,7 +306,12 @@
     "decade": "1970s",
     "act": "Group or duo"
    },
-   "blurb": "\"Video Killed the Radio Star\" by The Buggles, released in 1979.",
+   "charts": {
+    "uk": 17,
+    "au": 18
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Video Killed the Radio Star\" by The Buggles, released in 1979. Year-end charts: the UK #17, Australia #18.",
    "media": {
     "audio": [
      {
@@ -264,6 +341,7 @@
     "decade": "1970s",
     "act": "Group or duo"
    },
+   "artistCountry": "USA",
    "blurb": "\"Rapper's Delight\" by The Sugarhill Gang, released in 1979.",
    "media": {
     "audio": [
@@ -291,9 +369,16 @@
    "facts": {
     "artist": "M",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
-   "blurb": "\"Pop Muzik\" by M, released in 1979.",
+   "charts": {
+    "us": 40,
+    "uk": 12,
+    "au": 10
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Pop Muzik\" by M, released in 1979. Year-end charts: the US #40, the UK #12, Australia #10.",
    "media": {
     "audio": [
      {
@@ -314,6 +399,77 @@
    "difficulty": 2
   },
   {
+   "id": "funkytown-lipps-inc",
+   "name": "Funkytown",
+   "group": "1970s",
+   "facts": {
+    "artist": "Lipps Inc.",
+    "year": 1979,
+    "decade": "1970s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 8,
+    "uk": 26,
+    "au": 9
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Funkytown\" by Lipps Inc., released in 1979. Year-end charts: the US #8, the UK #26, Australia #9.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/73/6b/19/736b196c-9851-2860-457e-51b1e228558a/mzaf_8722409030863972870.plus.aac.p.m4a",
+      "credit": "Lipps Inc.: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/funkytown-long-version/1443828321?i=1443828328&uo=4",
+      "apple": {
+       "trackId": 1443828328,
+       "url": "https://music.apple.com/us/album/funkytown-long-version/1443828321?i=1443828328&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/8c/af/f28cafdd-e76e-5cef-42f9-80670b65f1ab/00044006305622.rgb.jpg/300x300bb.jpg",
+       "term": "Lipps, Inc. Funkytown"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "my-sharona-the-knack",
+   "name": "My Sharona",
+   "group": "1970s",
+   "facts": {
+    "artist": "The Knack",
+    "year": 1979,
+    "decade": "1970s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 1,
+    "au": 11
+   },
+   "artistCountry": "USA",
+   "blurb": "\"My Sharona\" by The Knack, released in 1979. Year-end charts: the US #1, Australia #11.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/bf/7e/72/bf7e7202-35f4-e081-4219-f802450dd60a/mzaf_15190309208679198585.plus.aac.p.m4a",
+      "credit": "The Knack: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/my-sharona/716268020?i=716268684&uo=4",
+      "apple": {
+       "trackId": 716268684,
+       "url": "https://music.apple.com/us/album/my-sharona/716268020?i=716268684&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d2/8c/a9/d28ca97f-f577-4bee-fb12-716570d076da/05099922669056.rgb.jpg/300x300bb.jpg",
+       "term": "The Knack My Sharona"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
    "id": "turning-japanese-the-vapors",
    "name": "Turning Japanese",
    "group": "1980s",
@@ -323,7 +479,12 @@
     "decade": "1980s",
     "act": "Group or duo"
    },
-   "blurb": "\"Turning Japanese\" by The Vapors, released in 1980.",
+   "charts": {
+    "uk": 42,
+    "au": 2
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Turning Japanese\" by The Vapors, released in 1980. Year-end charts: the UK #42, Australia #2.",
    "media": {
     "audio": [
      {
@@ -344,36 +505,6 @@
    "difficulty": 2
   },
   {
-   "id": "funkytown-lipps-inc",
-   "name": "Funkytown",
-   "group": "1970s",
-   "facts": {
-    "artist": "Lipps Inc.",
-    "year": 1979,
-    "decade": "1970s",
-    "act": "Group or duo"
-   },
-   "blurb": "\"Funkytown\" by Lipps Inc., released in 1979.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/73/6b/19/736b196c-9851-2860-457e-51b1e228558a/mzaf_8722409030863972870.plus.aac.p.m4a",
-      "credit": "Lipps Inc.: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/funkytown-long-version/1443828321?i=1443828328&uo=4",
-      "apple": {
-       "trackId": 1443828328,
-       "url": "https://music.apple.com/us/album/funkytown-long-version/1443828321?i=1443828328&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/8c/af/f28cafdd-e76e-5cef-42f9-80670b65f1ab/00044006305622.rgb.jpg/300x300bb.jpg",
-       "term": "Lipps, Inc. Funkytown"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "mickey-toni-basil",
    "name": "Mickey",
    "group": "1980s",
@@ -383,7 +514,13 @@
     "decade": "1980s",
     "act": "Female solo artist"
    },
-   "blurb": "\"Mickey\" by Toni Basil, released in 1981.",
+   "charts": {
+    "us": 36,
+    "uk": 13,
+    "au": 6
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Mickey\" by Toni Basil, released in 1981. Year-end charts: the US #36, the UK #13, Australia #6.",
    "media": {
     "audio": [
      {
@@ -409,11 +546,15 @@
    "group": "1980s",
    "facts": {
     "artist": "Men Without Hats",
-    "year": 1982,
+    "year": 1981,
     "decade": "1980s",
     "act": "Group or duo"
    },
-   "blurb": "\"The Safety Dance\" by Men Without Hats, released in 1982.",
+   "charts": {
+    "us": 35
+   },
+   "artistCountry": "CAN",
+   "blurb": "\"The Safety Dance\" by Men Without Hats, released in 1981. Year-end charts: the US #35.",
    "media": {
     "audio": [
      {
@@ -434,35 +575,6 @@
    "difficulty": 2
   },
   {
-   "id": "99-luftballons-nena",
-   "name": "99 Luftballons",
-   "group": "1980s",
-   "facts": {
-    "artist": "Nena",
-    "year": 1983,
-    "decade": "1980s"
-   },
-   "blurb": "\"99 Luftballons\" by Nena, released in 1983.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a7/6e/fb/a76efb31-b380-673f-886d-a31b8f763815/mzaf_1652288231289913225.plus.aac.p.m4a",
-      "credit": "Nena: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/99-luftballons/1446013584?i=1446013598&uo=4",
-      "apple": {
-       "trackId": 1446013598,
-       "url": "https://music.apple.com/us/album/99-luftballons/1446013584?i=1446013598&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/58/b3/df/58b3df70-d2e0-80e9-3f98-87d63fb9f02e/0859381162407.jpg/300x300bb.jpg",
-       "term": "Nena 99 Luftballons"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "come-on-eileen-dexys-midnight-runners",
    "name": "Come On Eileen",
    "group": "1980s",
@@ -472,7 +584,13 @@
     "decade": "1980s",
     "act": "Group or duo"
    },
-   "blurb": "\"Come On Eileen\" by Dexys Midnight Runners, released in 1982.",
+   "charts": {
+    "us": 13,
+    "uk": 1,
+    "au": 12
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Come On Eileen\" by Dexys Midnight Runners, released in 1982. Year-end charts: the US #13, the UK #1, Australia #12.",
    "media": {
     "audio": [
      {
@@ -493,6 +611,110 @@
    "difficulty": 1
   },
   {
+   "id": "99-luftballons-nena",
+   "name": "99 Luftballons",
+   "group": "1980s",
+   "facts": {
+    "artist": "Nena",
+    "year": 1983,
+    "decade": "1980s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 28,
+    "au": 18
+   },
+   "artistCountry": "DEU",
+   "blurb": "\"99 Luftballons\" by Nena, released in 1983. Year-end charts: the US #28, Australia #18.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a7/6e/fb/a76efb31-b380-673f-886d-a31b8f763815/mzaf_1652288231289913225.plus.aac.p.m4a",
+      "credit": "Nena: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/99-luftballons/1446013584?i=1446013598&uo=4",
+      "apple": {
+       "trackId": 1446013598,
+       "url": "https://music.apple.com/us/album/99-luftballons/1446013584?i=1446013598&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/58/b3/df/58b3df70-d2e0-80e9-3f98-87d63fb9f02e/0859381162407.jpg/300x300bb.jpg",
+       "term": "Nena 99 Luftballons"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "we-are-the-world-usa-for-africa",
+   "name": "We Are the World",
+   "group": "1980s",
+   "facts": {
+    "artist": "USA for Africa",
+    "year": 1985,
+    "decade": "1980s"
+   },
+   "charts": {
+    "us": 20,
+    "uk": 35,
+    "au": 1
+   },
+   "blurb": "\"We Are the World\" by USA for Africa, released in 1985. Year-end charts: the US #20, the UK #35, Australia #1.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6d/06/2f/6d062f45-9075-b108-ae07-abc8468a800a/mzaf_14078627042936418856.plus.aac.p.m4a",
+      "credit": "USA for Africa: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/we-are-the-world/41737866?i=41737859&uo=4",
+      "apple": {
+       "trackId": 41737859,
+       "url": "https://music.apple.com/us/album/we-are-the-world/41737866?i=41737859&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/y2005/m01/d20/h14/s05.bkornbke.jpg/300x300bb.jpg",
+       "term": "U.S.A. for Africa We Are the World"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "take-my-breath-away-berlin",
+   "name": "Take My Breath Away",
+   "group": "1980s",
+   "facts": {
+    "artist": "Berlin",
+    "year": 1986,
+    "decade": "1980s"
+   },
+   "charts": {
+    "us": 27,
+    "uk": 9,
+    "au": 6
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Take My Breath Away\" by Berlin, released in 1986. Year-end charts: the US #27, the UK #9, Australia #6.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fb/74/fb/fb74fb0b-83f3-186a-4833-e0ebdb86cf10/mzaf_6965137412837280913.plus.aac.p.m4a",
+      "credit": "Berlin: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/take-my-breath-away-love-theme-from-top-gun/387193895?i=387194076&uo=4",
+      "apple": {
+       "trackId": 387194076,
+       "url": "https://music.apple.com/us/album/take-my-breath-away-love-theme-from-top-gun/387193895?i=387194076&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/81/2f/27/812f27f8-4c88-7b16-8a54-5113fa169781/dj.jvcruggi.jpg/300x300bb.jpg",
+       "term": "Berlin Take My Breath Away"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
    "id": "dont-worry-be-happy-bobby-mcferrin",
    "name": "Don't Worry, Be Happy",
    "group": "1980s",
@@ -502,7 +724,13 @@
     "decade": "1980s",
     "act": "Male solo artist"
    },
-   "blurb": "\"Don't Worry, Be Happy\" by Bobby McFerrin, released in 1988.",
+   "charts": {
+    "us": 37,
+    "uk": 43,
+    "au": 14
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Don't Worry, Be Happy\" by Bobby McFerrin, released in 1988. Year-end charts: the US #37, the UK #43, Australia #14.",
    "media": {
     "audio": [
      {
@@ -532,7 +760,13 @@
     "decade": "1990s",
     "act": "Group or duo"
    },
-   "blurb": "\"Groove Is in the Heart\" by Deee-Lite, released in 1990.",
+   "charts": {
+    "us": 91,
+    "uk": 26,
+    "au": 38
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Groove Is in the Heart\" by Deee-Lite, released in 1990. Year-end charts: the US #91, the UK #26, Australia #38.",
    "media": {
     "audio": [
      {
@@ -553,6 +787,78 @@
    "difficulty": 2
   },
   {
+   "id": "nothing-compares-2-u-sinead-oconnor",
+   "name": "Nothing Compares 2 U",
+   "group": "1990s",
+   "facts": {
+    "artist": "Sinéad O'Connor",
+    "year": 1990,
+    "decade": "1990s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 3,
+    "uk": 2,
+    "au": 1
+   },
+   "artistCountry": "IRL",
+   "blurb": "\"Nothing Compares 2 U\" by Sinéad O'Connor, released in 1990. Year-end charts: the US #3, the UK #2, Australia #1.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/ea/d0/1fead06e-6edf-4415-61a9-f1a2cd7bd4aa/mzaf_8555394426401719010.plus.aac.p.m4a",
+      "credit": "Sinéad O'Connor: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/nothing-compares-2-u/1629185300?i=1629185307&uo=4",
+      "apple": {
+       "trackId": 1629185307,
+       "url": "https://music.apple.com/us/album/nothing-compares-2-u/1629185300?i=1629185307&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/19/3f/fa193fc7-f9cf-c84e-c7ef-77b2fceb3a3e/5054526647565.png/300x300bb.jpg",
+       "term": "Sinéad O'Connor Nothing Compares 2 U"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "black-velvet-alannah-myles",
+   "name": "Black Velvet",
+   "group": "1990s",
+   "facts": {
+    "artist": "Alannah Myles",
+    "year": 1990,
+    "decade": "1990s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 18,
+    "uk": 18,
+    "au": 13
+   },
+   "artistCountry": "CAN",
+   "blurb": "\"Black Velvet\" by Alannah Myles, released in 1990. Year-end charts: the US #18, the UK #18, Australia #13.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/b9/9e/ecb99e49-c661-d370-027b-b08c68be990d/mzaf_15413575699994555090.plus.aac.p.m4a",
+      "credit": "Alannah Myles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/black-velvet/1837530989?i=1837530994&uo=4",
+      "apple": {
+       "trackId": 1837530994,
+       "url": "https://music.apple.com/us/album/black-velvet/1837530989?i=1837530994&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/af/ac/b1/afacb116-c6e9-ae05-a3e5-efdd6ded7094/199538722796.jpg/300x300bb.jpg",
+       "term": "Alannah Myles Black Velvet"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
    "id": "im-too-sexy-right-said-fred",
    "name": "I'm Too Sexy",
    "group": "1990s",
@@ -562,7 +868,13 @@
     "decade": "1990s",
     "act": "Group or duo"
    },
-   "blurb": "\"I'm Too Sexy\" by Right Said Fred, released in 1991.",
+   "charts": {
+    "us": 13,
+    "uk": 4,
+    "au": 13
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"I'm Too Sexy\" by Right Said Fred, released in 1991. Year-end charts: the US #13, the UK #4, Australia #13.",
    "media": {
     "audio": [
      {
@@ -580,7 +892,224 @@
      }
     ]
    },
+   "difficulty": 2,
+   "kids": false
+  },
+  {
+   "id": "achy-breaky-heart-billy-ray-cyrus",
+   "name": "Achy Breaky Heart",
+   "group": "1990s",
+   "facts": {
+    "artist": "Billy Ray Cyrus",
+    "year": 1992,
+    "decade": "1990s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 15,
+    "uk": 21,
+    "au": 1
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Achy Breaky Heart\" by Billy Ray Cyrus, released in 1992. Year-end charts: the US #15, the UK #21, Australia #1.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6a/0a/10/6a0a1012-86f5-c100-d443-31f95dba24bb/mzaf_12266939131850217262.plus.aac.p.m4a",
+      "credit": "Billy Ray Cyrus: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/achy-breaky-heart/1440756021?i=1440756026&uo=4",
+      "apple": {
+       "trackId": 1440756026,
+       "url": "https://music.apple.com/us/album/achy-breaky-heart/1440756021?i=1440756026&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/cd/e3/f5/cde3f5a9-2fa5-6ece-c31d-8bbb4e0e2d37/06UMGIM23363.rgb.jpg/300x300bb.jpg",
+       "term": "Billy Ray Cyrus Achy Breaky Heart"
+      },
+      "dur": 30
+     }
+    ]
+   },
    "difficulty": 2
+  },
+  {
+   "id": "whats-up-4-non-blondes",
+   "name": "What's Up?",
+   "group": "1990s",
+   "facts": {
+    "artist": "4 Non Blondes",
+    "year": 1992,
+    "decade": "1990s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 50,
+    "uk": 21,
+    "au": 7
+   },
+   "artistCountry": "USA",
+   "blurb": "\"What's Up?\" by 4 Non Blondes, released in 1992. Year-end charts: the US #50, the UK #21, Australia #7.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0d/5e/61/0d5e612a-78a7-388a-79b8-c0c0cbb87a59/mzaf_16167981556861077252.plus.aac.p.m4a",
+      "credit": "4 Non Blondes: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/whats-up/1440902342?i=1440902348&uo=4",
+      "apple": {
+       "trackId": 1440902348,
+       "url": "https://music.apple.com/us/album/whats-up/1440902342?i=1440902348&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d2/aa/44/d2aa4418-7e74-7e6d-4247-9b9c1cba9e64/06UMGIM01654.rgb.jpg/300x300bb.jpg",
+       "term": "4 Non Blondes What's Up?"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "informer-snow",
+   "name": "Informer",
+   "group": "1990s",
+   "facts": {
+    "artist": "Snow",
+    "year": 1993,
+    "decade": "1990s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 10,
+    "uk": 17,
+    "au": 6
+   },
+   "artistCountry": "CAN",
+   "blurb": "\"Informer\" by Snow, released in 1993. Year-end charts: the US #10, the UK #17, Australia #6.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/66/7c/c1/667cc1b6-34c6-b24f-b44f-edf1c9163460/mzaf_11199462887859469789.plus.aac.p.m4a",
+      "credit": "Snow: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/informer/179495520?i=179495871&uo=4",
+      "apple": {
+       "trackId": 179495871,
+       "url": "https://music.apple.com/us/album/informer/179495520?i=179495871&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/7d/c4/bf/mzi.egufmkoj.jpg/300x300bb.jpg",
+       "term": "Snow Informer"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mmm-mmm-mmm-mmm-crash-test-dummies",
+   "name": "Mmm Mmm Mmm Mmm",
+   "group": "1990s",
+   "facts": {
+    "artist": "Crash Test Dummies",
+    "year": 1993,
+    "decade": "1990s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 35,
+    "uk": 48,
+    "au": 14
+   },
+   "artistCountry": "CAN",
+   "blurb": "\"Mmm Mmm Mmm Mmm\" by Crash Test Dummies, released in 1993. Year-end charts: the US #35, the UK #48, Australia #14.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/91/05/9d/91059dac-d46f-a14a-1608-868e9c1310f5/mzaf_8831457129779330483.plus.aac.p.m4a",
+      "credit": "Crash Test Dummies: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/mmm-mmm-mmm-mmm/309226405?i=309226521&uo=4",
+      "apple": {
+       "trackId": 309226521,
+       "url": "https://music.apple.com/us/album/mmm-mmm-mmm-mmm/309226405?i=309226521&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/84/5e/7f/845e7f4a-35ca-6afa-2db1-4b2091060fc9/888880411853.jpg/300x300bb.jpg",
+       "term": "Crash Test Dummies Mmm Mmm Mmm Mmm"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "baby-i-love-your-way-big-mountain",
+   "name": "Baby, I Love Your Way",
+   "group": "1990s",
+   "facts": {
+    "artist": "Big Mountain",
+    "year": 1994,
+    "decade": "1990s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 21,
+    "uk": 30,
+    "au": 19
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Baby, I Love Your Way\" by Big Mountain, released in 1994. Year-end charts: the US #21, the UK #30, Australia #19.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d1/6c/4e/d16c4eb2-f313-35d9-4871-25989e998177/mzaf_8981258244251762770.plus.aac.p.m4a",
+      "credit": "Big Mountain: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/baby-i-love-your-way/847366075?i=847366090&uo=4",
+      "apple": {
+       "trackId": 847366090,
+       "url": "https://music.apple.com/us/album/baby-i-love-your-way/847366075?i=847366090&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/e5/4c/a6/e54ca6c7-c578-e11d-f9a7-c9acd49bc1de/075992456326.jpg/300x300bb.jpg",
+       "term": "Big Mountain Baby, I Love Your Way"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "here-comes-the-hotstepper-ini-kamoze",
+   "name": "Here Comes the Hotstepper",
+   "group": "1990s",
+   "facts": {
+    "artist": "Ini Kamoze",
+    "year": 1994,
+    "decade": "1990s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 24,
+    "uk": 24,
+    "au": 22
+   },
+   "artistCountry": "JAM",
+   "blurb": "\"Here Comes the Hotstepper\" by Ini Kamoze, released in 1994. Year-end charts: the US #24, the UK #24, Australia #22.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/3f/6d/1f/3f6d1f9d-b4fe-e527-f0e8-3a8580f3cb5f/mzaf_15457813979023307456.plus.aac.p.m4a",
+      "credit": "Ini Kamoze: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/here-comes-the-hotstepper/163357357?i=163357374&uo=4",
+      "apple": {
+       "trackId": 163357374,
+       "url": "https://music.apple.com/us/album/here-comes-the-hotstepper/163357357?i=163357374&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/ea/c6/0f/mzi.mxjrwiwd.jpg/300x300bb.jpg",
+       "term": "Ini Kamoze Here Comes the Hotstepper"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 3
   },
   {
    "id": "how-bizarre-omc",
@@ -591,7 +1120,11 @@
     "year": 1995,
     "decade": "1990s"
    },
-   "blurb": "\"How Bizarre\" by OMC, released in 1995.",
+   "charts": {
+    "uk": 37
+   },
+   "artistCountry": "NZL",
+   "blurb": "\"How Bizarre\" by OMC, released in 1995. Year-end charts: the UK #37.",
    "media": {
     "audio": [
      {
@@ -612,6 +1145,114 @@
    "difficulty": 2
   },
   {
+   "id": "total-eclipse-of-the-heart-nicki-french",
+   "name": "Total Eclipse of the Heart",
+   "group": "1990s",
+   "facts": {
+    "artist": "Nicki French",
+    "year": 1995,
+    "decade": "1990s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 19,
+    "uk": 48,
+    "au": 17
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Total Eclipse of the Heart\" by Nicki French, released in 1995. Year-end charts: the US #19, the UK #48, Australia #17.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d4/54/fd/d454fd22-f581-76dd-ab23-dac86043fd5b/mzaf_5831050377255186724.plus.aac.p.m4a",
+      "credit": "Nicki French: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/total-eclipse-of-the-heart-alternative-7-inch/1375799818?i=1375800199&uo=4",
+      "apple": {
+       "trackId": 1375800199,
+       "url": "https://music.apple.com/us/album/total-eclipse-of-the-heart-alternative-7-inch/1375799818?i=1375800199&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/00/ed/70/00ed7013-c8d7-ce2d-0463-cfa590e79211/5037300834481.jpg/300x300bb.jpg",
+       "term": "Nicki French Total Eclipse of the Heart"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "macarena-los-del-rio",
+   "name": "Macarena",
+   "group": "1990s",
+   "facts": {
+    "artist": "Los del Río",
+    "year": 1996,
+    "decade": "1990s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 1,
+    "uk": 22,
+    "au": 1
+   },
+   "artistCountry": "ESP",
+   "blurb": "\"Macarena\" by Los del Río, released in 1996. Year-end charts: the US #1, the UK #22, Australia #1.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview71/v4/31/5d/90/315d900b-8aa5-ca0e-7ad5-ce914848704a/mzaf_5935500227984817909.plus.aac.p.m4a",
+      "credit": "Los del Río: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/macarena/716374900?i=716380073&uo=4",
+      "apple": {
+       "trackId": 716380073,
+       "url": "https://music.apple.com/us/album/macarena/716374900?i=716380073&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/d9/cd/37/d9cd3736-ce1d-f118-c02d-cb7b04893785/05099962637053.jpg/300x300bb.jpg",
+       "term": "Los del Río Macarena"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "i-love-you-always-forever-donna-lewis",
+   "name": "I Love You Always Forever",
+   "group": "1990s",
+   "facts": {
+    "artist": "Donna Lewis",
+    "year": 1996,
+    "decade": "1990s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 8,
+    "uk": 36,
+    "au": 13
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"I Love You Always Forever\" by Donna Lewis, released in 1996. Year-end charts: the US #8, the UK #36, Australia #13.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4c/d8/23/4cd823af-1f46-ee24-ccef-12b29fdc0a68/mzaf_7093239451571714634.plus.aac.p.m4a",
+      "credit": "Donna Lewis: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-love-you-always-forever/281708862?i=281708889&uo=4",
+      "apple": {
+       "trackId": 281708889,
+       "url": "https://music.apple.com/us/album/i-love-you-always-forever/281708862?i=281708889&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/79/1b/ae/791bae6a-09aa-28f9-e819-7a1c2813b576/mzi.uchcimod.jpg/300x300bb.jpg",
+       "term": "Donna Lewis I Love You Always Forever"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
    "id": "tubthumping-chumbawamba",
    "name": "Tubthumping",
    "group": "1990s",
@@ -621,7 +1262,13 @@
     "decade": "1990s",
     "act": "Group or duo"
    },
-   "blurb": "\"Tubthumping\" by Chumbawamba, released in 1997.",
+   "charts": {
+    "us": 35,
+    "uk": 9,
+    "au": 3
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Tubthumping\" by Chumbawamba, released in 1997. Year-end charts: the US #35, the UK #9, Australia #3.",
    "media": {
     "audio": [
      {
@@ -651,7 +1298,12 @@
     "decade": "1990s",
     "act": "Group or duo"
    },
-   "blurb": "\"Steal My Sunshine\" by Len, released in 1999.",
+   "charts": {
+    "us": 78,
+    "au": 44
+   },
+   "artistCountry": "CAN",
+   "blurb": "\"Steal My Sunshine\" by Len, released in 1999. Year-end charts: the US #78, Australia #44.",
    "media": {
     "audio": [
      {
@@ -669,11 +1321,14 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 3
   },
   {
    "id": "mambo-no-5-a-little-bit-of-lou-bega",
    "name": "Mambo No. 5 (A Little Bit Of...)",
+   "alt": [
+    "Mambo No. 5"
+   ],
    "group": "1990s",
    "facts": {
     "artist": "Lou Bega",
@@ -681,7 +1336,13 @@
     "decade": "1990s",
     "act": "Male solo artist"
    },
-   "blurb": "\"Mambo No. 5 (A Little Bit Of...)\" by Lou Bega, released in 1999.",
+   "charts": {
+    "us": 42,
+    "uk": 4,
+    "au": 1
+   },
+   "artistCountry": "DEU",
+   "blurb": "\"Mambo No. 5 (A Little Bit Of...)\" by Lou Bega, released in 1999. Year-end charts: the US #42, the UK #4, Australia #1.",
    "media": {
     "audio": [
      {
@@ -699,11 +1360,14 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "blue-da-ba-dee-eiffel-65",
    "name": "Blue (Da Ba Dee)",
+   "alt": [
+    "Blue"
+   ],
    "group": "1990s",
    "facts": {
     "artist": "Eiffel 65",
@@ -711,7 +1375,13 @@
     "decade": "1990s",
     "act": "Group or duo"
    },
-   "blurb": "\"Blue (Da Ba Dee)\" by Eiffel 65, released in 1999.",
+   "charts": {
+    "us": 49,
+    "uk": 2,
+    "au": 3
+   },
+   "artistCountry": "ITA",
+   "blurb": "\"Blue (Da Ba Dee)\" by Eiffel 65, released in 1999. Year-end charts: the US #49, the UK #2, Australia #3.",
    "media": {
     "audio": [
      {
@@ -729,7 +1399,42 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
+  },
+  {
+   "id": "kiss-me-sixpence-none-the-richer",
+   "name": "Kiss Me",
+   "group": "1990s",
+   "facts": {
+    "artist": "Sixpence None the Richer",
+    "year": 1999,
+    "decade": "1990s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 6,
+    "au": 19
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Kiss Me\" by Sixpence None the Richer, released in 1999. Year-end charts: the US #6, Australia #19.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/2a/c0/51/2ac051bd-effb-9027-7618-b0405427f8e9/mzaf_6301246934613938414.plus.aac.p.m4a",
+      "credit": "Sixpence None the Richer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/kiss-me-japanese-version/1492267471?i=1492267728&uo=4",
+      "apple": {
+       "trackId": 1492267728,
+       "url": "https://music.apple.com/us/album/kiss-me-japanese-version/1492267471?i=1492267728&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/3c/c5/b1/3cc5b1fc-828b-984a-ca75-76c139be37f6/080688702861.png/300x300bb.jpg",
+       "term": "Sixpence None the Richer Kiss Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
   },
   {
    "id": "who-let-the-dogs-out-baha-men",
@@ -741,7 +1446,12 @@
     "decade": "2000s",
     "act": "Group or duo"
    },
-   "blurb": "\"Who Let the Dogs Out\" by Baha Men, released in 2000.",
+   "charts": {
+    "uk": 4,
+    "au": 22
+   },
+   "artistCountry": "BHS",
+   "blurb": "\"Who Let the Dogs Out\" by Baha Men, released in 2000. Year-end charts: the UK #4, Australia #22.",
    "media": {
     "audio": [
      {
@@ -764,6 +1474,9 @@
   {
    "id": "the-ketchup-song-asereje-las-ketchup",
    "name": "The Ketchup Song (Aserejé)",
+   "alt": [
+    "The Ketchup Song"
+   ],
    "group": "2000s",
    "facts": {
     "artist": "Las Ketchup",
@@ -771,7 +1484,12 @@
     "decade": "2000s",
     "act": "Group or duo"
    },
-   "blurb": "\"The Ketchup Song (Aserejé)\" by Las Ketchup, released in 2002.",
+   "charts": {
+    "uk": 8,
+    "au": 3
+   },
+   "artistCountry": "ESP",
+   "blurb": "\"The Ketchup Song (Aserejé)\" by Las Ketchup, released in 2002. Year-end charts: the UK #8, Australia #3.",
    "media": {
     "audio": [
      {
@@ -789,7 +1507,42 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
+  },
+  {
+   "id": "a-thousand-miles-vanessa-carlton",
+   "name": "A Thousand Miles",
+   "group": "2000s",
+   "facts": {
+    "artist": "Vanessa Carlton",
+    "year": 2002,
+    "decade": "2000s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 6,
+    "au": 6
+   },
+   "artistCountry": "USA",
+   "blurb": "\"A Thousand Miles\" by Vanessa Carlton, released in 2002. Year-end charts: the US #6, Australia #6.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/63/38/40/633840d8-8ee4-dc75-96e5-acd71162cb8e/mzaf_9113523502409433892.plus.aac.p.m4a",
+      "credit": "Vanessa Carlton: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/a-thousand-miles/1440865939?i=1440865959&uo=4",
+      "apple": {
+       "trackId": 1440865959,
+       "url": "https://music.apple.com/us/album/a-thousand-miles/1440865939?i=1440865959&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ca/a3/28/caa328ee-6aab-34cb-5ddd-30092599dfbd/06UMGIM22940.rgb.jpg/300x300bb.jpg",
+       "term": "Vanessa Carlton A Thousand Miles"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
   },
   {
    "id": "stacys-mom-fountains-of-wayne",
@@ -801,6 +1554,7 @@
     "decade": "2000s",
     "act": "Group or duo"
    },
+   "artistCountry": "USA",
    "blurb": "\"Stacy's Mom\" by Fountains of Wayne, released in 2003.",
    "media": {
     "audio": [
@@ -822,6 +1576,42 @@
    "difficulty": 2
   },
   {
+   "id": "i-dont-wanna-know-mario-winans",
+   "name": "I Don't Wanna Know",
+   "group": "2000s",
+   "facts": {
+    "artist": "Mario Winans",
+    "year": 2004,
+    "decade": "2000s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 7,
+    "uk": 11,
+    "au": 16
+   },
+   "artistCountry": "USA",
+   "blurb": "\"I Don't Wanna Know\" by Mario Winans, released in 2004. Year-end charts: the US #7, the UK #11, Australia #16.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/64/9e/c5/649ec5cd-b94f-fdd4-18e4-da701fc7f19d/mzaf_4372512102184954796.plus.aac.p.m4a",
+      "credit": "Mario Winans: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-dont-wanna-know-feat-enya-and-p-diddy/1738587079?i=1738587096&uo=4",
+      "apple": {
+       "trackId": 1738587096,
+       "url": "https://music.apple.com/us/album/i-dont-wanna-know-feat-enya-and-p-diddy/1738587079?i=1738587096&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ef/7c/46/ef7c46d9-0f87-215e-fad7-364f437f62a8/075678388361.jpg/300x300bb.jpg",
+       "term": "Mario Winans I Don't Wanna Know"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
    "id": "bad-day-daniel-powter",
    "name": "Bad Day",
    "group": "2000s",
@@ -831,7 +1621,13 @@
     "decade": "2000s",
     "act": "Male solo artist"
    },
-   "blurb": "\"Bad Day\" by Daniel Powter, released in 2005.",
+   "charts": {
+    "us": 1,
+    "uk": 11,
+    "au": 18
+   },
+   "artistCountry": "CAN",
+   "blurb": "\"Bad Day\" by Daniel Powter, released in 2005. Year-end charts: the US #1, the UK #11, Australia #18.",
    "media": {
     "audio": [
      {
@@ -857,11 +1653,17 @@
    "group": "2000s",
    "facts": {
     "artist": "Gnarls Barkley",
-    "year": 2006,
+    "year": 2005,
     "decade": "2000s",
     "act": "Group or duo"
    },
-   "blurb": "\"Crazy\" by Gnarls Barkley, released in 2006.",
+   "charts": {
+    "us": 7,
+    "uk": 1,
+    "au": 16
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Crazy\" by Gnarls Barkley, released in 2005. Year-end charts: the US #7, the UK #1, Australia #16.",
    "media": {
     "audio": [
      {
@@ -882,6 +1684,78 @@
    "difficulty": 2
   },
   {
+   "id": "hey-there-delilah-plain-white-ts",
+   "name": "Hey There Delilah",
+   "group": "2000s",
+   "facts": {
+    "artist": "Plain White T's",
+    "year": 2005,
+    "decade": "2000s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 7,
+    "uk": 14,
+    "au": 21
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Hey There Delilah\" by Plain White T's, released in 2005. Year-end charts: the US #7, the UK #14, Australia #21.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f6/82/42/f6824288-2d1e-7a1f-ed84-6b435cbfea74/mzaf_3615908399069987941.plus.aac.p.m4a",
+      "credit": "Plain White T's: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hey-there-delilah/1442825106?i=1442825350&uo=4",
+      "apple": {
+       "trackId": 1442825350,
+       "url": "https://music.apple.com/us/album/hey-there-delilah/1442825106?i=1442825350&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a8/a4/23/a8a423e8-643b-79d0-81e4-00b3ca683b8c/00050087104436.rgb.jpg/300x300bb.jpg",
+       "term": "Plain White T's Hey There Delilah"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "american-boy-estelle",
+   "name": "American Boy",
+   "group": "2000s",
+   "facts": {
+    "artist": "Estelle",
+    "year": 2008,
+    "decade": "2000s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 39,
+    "uk": 6,
+    "au": 27
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"American Boy\" by Estelle, released in 2008. Year-end charts: the US #39, the UK #6, Australia #27.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2c/6d/cf/2c6dcf66-dda6-3f72-ab4e-7d001335ee66/mzaf_3555846837795543038.plus.aac.p.m4a",
+      "credit": "Estelle: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/gb/album/american-boy-no-rap-version/1159316039?i=1159316573&uo=4",
+      "apple": {
+       "trackId": 1159316573,
+       "url": "https://music.apple.com/gb/album/american-boy-no-rap-version/1159316039?i=1159316573&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/83/03/25/8303252a-ee97-b8ac-ab21-2961af18e162/190295912048.jpg/300x300bb.jpg",
+       "term": "Estelle American Boy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
    "id": "somebody-that-i-used-to-know-gotye",
    "name": "Somebody That I Used to Know",
    "group": "2010s",
@@ -890,7 +1764,17 @@
     "year": 2011,
     "decade": "2010s"
    },
-   "blurb": "\"Somebody That I Used to Know\" by Gotye, released in 2011.",
+   "charts": {
+    "us": 1,
+    "uk": 1,
+    "au": 2
+   },
+   "artistCountry": "BEL",
+   "artistCountries": [
+    "BEL",
+    "AUS"
+   ],
+   "blurb": "\"Somebody That I Used to Know\" by Gotye, released in 2011. Year-end charts: the US #1, the UK #1, Australia #2.",
    "media": {
     "audio": [
      {
@@ -908,7 +1792,42 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
+  },
+  {
+   "id": "pumped-up-kicks-foster-the-people",
+   "name": "Pumped Up Kicks",
+   "group": "2010s",
+   "facts": {
+    "artist": "Foster the People",
+    "year": 2010,
+    "decade": "2010s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 13,
+    "au": 23
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Pumped Up Kicks\" by Foster the People, released in 2010. Year-end charts: the US #13, Australia #23.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/06/5b/df/065bdfe1-4d16-53c9-f24d-f1ad16983f92/mzaf_15283020811004936626.plus.aac.p.m4a",
+      "credit": "Foster the People: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/pumped-up-kicks/435761204?i=435761212&uo=4",
+      "apple": {
+       "trackId": 435761212,
+       "url": "https://music.apple.com/us/album/pumped-up-kicks/435761204?i=435761212&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ba/07/5b/ba075b3c-f0c4-b519-59f3-7ae74d43246b/dj.lajxsvkg.jpg/300x300bb.jpg",
+       "term": "Foster the People Pumped Up Kicks"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
   },
   {
    "id": "gangnam-style-psy",
@@ -920,7 +1839,13 @@
     "decade": "2010s",
     "act": "Male solo artist"
    },
-   "blurb": "\"Gangnam Style\" by PSY, released in 2012.",
+   "charts": {
+    "us": 47,
+    "uk": 6,
+    "au": 2
+   },
+   "artistCountry": "KOR",
+   "blurb": "\"Gangnam Style\" by PSY, released in 2012. Year-end charts: the US #47, the UK #6, Australia #2.",
    "media": {
     "audio": [
      {
@@ -938,7 +1863,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "harlem-shake-baauer",
@@ -950,7 +1875,13 @@
     "decade": "2010s",
     "act": "Male solo artist"
    },
-   "blurb": "\"Harlem Shake\" by Baauer, released in 2012.",
+   "charts": {
+    "us": 4,
+    "uk": 72,
+    "au": 61
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Harlem Shake\" by Baauer, released in 2012. Year-end charts: the US #4, the UK #72, Australia #61.",
    "media": {
     "audio": [
      {
@@ -971,6 +1902,78 @@
    "difficulty": 2
   },
   {
+   "id": "i-love-it-icona-pop",
+   "name": "I Love It",
+   "group": "2010s",
+   "facts": {
+    "artist": "Icona Pop",
+    "year": 2012,
+    "decade": "2010s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 28,
+    "uk": 19,
+    "au": 41
+   },
+   "artistCountry": "SWE",
+   "blurb": "\"I Love It\" by Icona Pop, released in 2012. Year-end charts: the US #28, the UK #19, Australia #41.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/20/1f/87/201f87d6-1e1d-7348-b508-84e67e1537ae/mzaf_10059328106564887521.plus.aac.p.m4a",
+      "credit": "Icona Pop: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-love-it-feat-charli-xcx-i-dont-care-2022-re-edit/1626267339?i=1626267340&uo=4",
+      "apple": {
+       "trackId": 1626267340,
+       "url": "https://music.apple.com/us/album/i-love-it-feat-charli-xcx-i-dont-care-2022-re-edit/1626267339?i=1626267340&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/6a/ca/da/6acadad8-808e-3a4b-0ed9-2646985baf6e/603497837281.jpg/300x300bb.jpg",
+       "term": "Icona Pop I Love It"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ho-hey-the-lumineers",
+   "name": "Ho Hey",
+   "group": "2010s",
+   "facts": {
+    "artist": "The Lumineers",
+    "year": 2012,
+    "decade": "2010s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 12,
+    "uk": 21,
+    "au": 21
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Ho Hey\" by The Lumineers, released in 2012. Year-end charts: the US #12, the UK #21, Australia #21.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/33/0b/1e/330b1e56-9db5-a341-546e-f00dc2ec36e5/mzaf_4304570900509942884.plus.aac.p.m4a",
+      "credit": "The Lumineers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ho-hey/1754031514?i=1754031516&uo=4",
+      "apple": {
+       "trackId": 1754031516,
+       "url": "https://music.apple.com/us/album/ho-hey/1754031514?i=1754031516&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/83/20/a9/8320a945-11ac-e7cd-29e7-d80782698f55/18515.jpg/300x300bb.jpg",
+       "term": "The Lumineers Ho Hey"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
    "id": "rude-magic",
    "name": "Rude",
    "group": "2010s",
@@ -980,7 +1983,13 @@
     "decade": "2010s",
     "act": "Group or duo"
    },
-   "blurb": "\"Rude\" by MAGIC!, released in 2013.",
+   "charts": {
+    "us": 7,
+    "uk": 12,
+    "au": 40
+   },
+   "artistCountry": "CAN",
+   "blurb": "\"Rude\" by MAGIC!, released in 2013. Year-end charts: the US #7, the UK #12, Australia #40.",
    "media": {
     "audio": [
      {
@@ -1001,8 +2010,85 @@
    "difficulty": 2
   },
   {
+   "id": "the-fox-what-does-the-fox-say-ylvis",
+   "name": "The Fox (What Does the Fox Say?)",
+   "alt": [
+    "The Fox"
+   ],
+   "group": "2010s",
+   "facts": {
+    "artist": "Ylvis",
+    "year": 2013,
+    "decade": "2010s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 73,
+    "au": 99
+   },
+   "artistCountry": "NOR",
+   "blurb": "\"The Fox (What Does the Fox Say?)\" by Ylvis, released in 2013. Year-end charts: the US #73, Australia #99.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/04/87/b0/0487b014-3052-819a-546d-55533910586a/mzaf_14292809388004102845.plus.aac.p.m4a",
+      "credit": "Ylvis: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-fox-what-does-the-fox-say/690233609?i=690233856&uo=4",
+      "apple": {
+       "trackId": 690233856,
+       "url": "https://music.apple.com/us/album/the-fox-what-does-the-fox-say/690233609?i=690233856&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/32/f5/b4/32f5b44a-6713-dfd4-e561-e40679bff318/825646409051.jpg/300x300bb.jpg",
+       "term": "Ylvis The Fox"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "let-her-go-passenger",
+   "name": "Let Her Go",
+   "group": "2010s",
+   "facts": {
+    "artist": "Passenger",
+    "year": 2012,
+    "decade": "2010s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 19,
+    "uk": 4,
+    "au": 3
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Let Her Go\" by Passenger, released in 2012. Year-end charts: the US #19, the UK #4, Australia #3.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/26/90/0f/26900f61-d88a-a558-6f4d-b0dec8ba5262/mzaf_6952636564970959693.plus.aac.p.m4a",
+      "credit": "Passenger: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/let-her-go/1623014082?i=1623014090&uo=4",
+      "apple": {
+       "trackId": 1623014090,
+       "url": "https://music.apple.com/us/album/let-her-go/1623014082?i=1623014090&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/9b/7e/28/9b7e2896-e049-1663-6791-e0111690ffc1/067003051361.png/300x300bb.jpg",
+       "term": "Passenger Let Her Go"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
    "id": "cheerleader-felix-jaehn-remix-omi",
    "name": "Cheerleader (Felix Jaehn Remix)",
+   "alt": [
+    "Cheerleader"
+   ],
    "group": "2010s",
    "facts": {
     "artist": "OMI",
@@ -1010,7 +2096,13 @@
     "decade": "2010s",
     "act": "Male solo artist"
    },
-   "blurb": "\"Cheerleader (Felix Jaehn Remix)\" by OMI, released in 2014.",
+   "charts": {
+    "us": 11,
+    "uk": 2,
+    "au": 2
+   },
+   "artistCountry": "JAM",
+   "blurb": "\"Cheerleader (Felix Jaehn Remix)\" by OMI, released in 2014. Year-end charts: the US #11, the UK #2, Australia #2.",
    "media": {
     "audio": [
      {
@@ -1031,28 +2123,142 @@
    "difficulty": 2
   },
   {
-   "id": "the-fox-what-does-the-fox-say-ylvis",
-   "name": "The Fox (What Does the Fox Say?)",
+   "id": "say-something-a-great-big-world-and-christina-aguilera",
+   "name": "Say Something",
    "group": "2010s",
    "facts": {
-    "artist": "Ylvis",
+    "artist": "A Great Big World and Christina Aguilera",
     "year": 2013,
-    "decade": "2010s",
-    "act": "Group or duo"
+    "decade": "2010s"
    },
-   "blurb": "\"The Fox (What Does the Fox Say?)\" by Ylvis, released in 2013.",
+   "charts": {
+    "us": 17,
+    "uk": 39,
+    "au": 13
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Say Something\" by A Great Big World and Christina Aguilera, released in 2013. Year-end charts: the US #17, the UK #39, Australia #13.",
    "media": {
     "audio": [
      {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/04/87/b0/0487b014-3052-819a-546d-55533910586a/mzaf_14292809388004102845.plus.aac.p.m4a",
-      "credit": "Ylvis: 30-second preview courtesy of Apple Music",
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e8/88/cb/e888cbf6-d4ad-5544-1d33-2f405b2d897c/mzaf_15664802248030574328.plus.aac.p.m4a",
+      "credit": "A Great Big World and Christina Aguilera: 30-second preview courtesy of Apple Music",
       "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/the-fox-what-does-the-fox-say/690233609?i=690233856&uo=4",
+      "page": "https://music.apple.com/us/album/say-something/1435641904?i=1435642123&uo=4",
       "apple": {
-       "trackId": 690233856,
-       "url": "https://music.apple.com/us/album/the-fox-what-does-the-fox-say/690233609?i=690233856&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/32/f5/b4/32f5b44a-6713-dfd4-e561-e40679bff318/825646409051.jpg/300x300bb.jpg",
-       "term": "Ylvis The Fox"
+       "trackId": 1435642123,
+       "url": "https://music.apple.com/us/album/say-something/1435641904?i=1435642123&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/87/a6/d7/87a6d729-7719-cbcc-9e47-4ef2a6062ba4/886444319638.jpg/300x300bb.jpg",
+       "term": "A Great Big World & Christina Aguilera Say Something"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cake-by-the-ocean-dnce",
+   "name": "Cake by the Ocean",
+   "group": "2010s",
+   "facts": {
+    "artist": "DNCE",
+    "year": 2015,
+    "decade": "2010s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 18,
+    "uk": 23,
+    "au": 35
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Cake by the Ocean\" by DNCE, released in 2015. Year-end charts: the US #18, the UK #23, Australia #35.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/aa/62/65/aa626560-8dde-3aee-7c66-c19b74c206ab/mzaf_11691676274114841013.plus.aac.p.m4a",
+      "credit": "DNCE: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cake-by-the-ocean/1440867688?i=1440867865&uo=4",
+      "apple": {
+       "trackId": 1440867865,
+       "url": "https://music.apple.com/us/album/cake-by-the-ocean/1440867688?i=1440867865&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/46/dd/0d/46dd0d29-7dbf-7e3a-0f76-1595e18c4b73/16UMGIM68265.rgb.jpg/300x300bb.jpg",
+       "term": "DNCE Cake By the Ocean"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2,
+   "explicit": true,
+   "kids": false
+  },
+  {
+   "id": "despacito-luis-fonsi-and-daddy-yankee",
+   "name": "Despacito",
+   "group": "2010s",
+   "facts": {
+    "artist": "Luis Fonsi and Daddy Yankee",
+    "year": 2017,
+    "decade": "2010s"
+   },
+   "charts": {
+    "us": 2,
+    "uk": 2,
+    "au": 2
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Despacito\" by Luis Fonsi and Daddy Yankee, released in 2017. Year-end charts: the US #2, the UK #2, Australia #2.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/01/55/6f/01556f75-ea92-0267-c6d4-09ee6fd8ff26/mzaf_15962911936959580358.plus.aac.p.m4a",
+      "credit": "Luis Fonsi and Daddy Yankee: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/despacito-versi%C3%B3n-urbana-sky/1445011791?i=1445011795&uo=4",
+      "apple": {
+       "trackId": 1445011795,
+       "url": "https://music.apple.com/us/album/despacito-versi%C3%B3n-urbana-sky/1445011791?i=1445011795&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/11/d6/58/11d658ed-2ee0-31bb-da65-3377b879f7fe/00602557543537.rgb.jpg/300x300bb.jpg",
+       "term": "Luis Fonsi & Daddy Yankee Despacito"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "heat-waves-glass-animals",
+   "name": "Heat Waves",
+   "group": "2020s",
+   "facts": {
+    "artist": "Glass Animals",
+    "year": 2021,
+    "decade": "2020s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 1,
+    "uk": 7,
+    "au": 1
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Heat Waves\" by Glass Animals, released in 2021. Year-end charts: the US #1, the UK #7, Australia #1.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1e/b3/bc/1eb3bcb9-ffd4-ac25-5b00-786952329728/mzaf_590015609930999065.plus.aac.p.m4a",
+      "credit": "Glass Animals: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/heat-waves-with-iann-dior/1686518532?i=1686519894&uo=4",
+      "apple": {
+       "trackId": 1686519894,
+       "url": "https://music.apple.com/us/album/heat-waves-with-iann-dior/1686518532?i=1686519894&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/50/b1/42/50b142aa-5462-d3a8-2d36-e3c0df02ac3c/22UMGIM84423.rgb.jpg/300x300bb.jpg",
+       "term": "Glass Animals & iann dior Heat Waves"
       },
       "dur": 30
      }
@@ -1064,13 +2270,17 @@
  "questions": [],
  "sources": [
   {
-   "name": "Acts with a single US Billboard Hot 100 top-40 hit (or UK top-40, where noted); curated by Clued",
-   "url": "https://en.wikipedia.org/wiki/One-hit_wonder"
+   "name": "Acts with a single US Billboard Hot 100 top-40 hit, or a single UK top-40 hit (Wikipedia one-hit-wonder lists); each song also made a year-end chart",
+   "url": "https://en.wikipedia.org/wiki/List_of_one-hit_wonders_in_the_United_States"
+  },
+  {
+   "name": "One-hit wonders on the UK singles chart",
+   "url": "https://en.wikipedia.org/wiki/List_of_one-hit_wonders_on_the_UK_singles_chart"
   },
   {
    "name": "Apple iTunes Search API (previews, artwork, links)",
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-07"
+ "built": "2026-10-13"
 }

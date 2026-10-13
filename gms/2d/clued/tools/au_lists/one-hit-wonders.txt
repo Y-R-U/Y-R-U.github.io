@@ -1,38 +1,69 @@
 @id one-hit-wonders
 @title One-hit wonders
 @icon 🌠
-@sources [{"name":"Acts with a single US Billboard Hot 100 top-40 hit (or UK top-40, where noted); curated by Clued","url":"https://en.wikipedia.org/wiki/One-hit_wonder"}]
-1969 | Norman Greenbaum | Spirit in the Sky | d=1
-1969 | Zager & Evans | In the Year 2525
-1972 | Hot Butter | Popcorn | tm=^popcorn; note=keepyear 1972 single; Apple has compilations only
-1972 | Looking Glass | Brandy (You're a Fine Girl)
-1974 | Carl Douglas | Kung Fu Fighting | d=1
-1976 | Wild Cherry | Play That Funky Music
-1979 | The Buggles | Video Killed the Radio Star | d=1
-1979 | The Sugarhill Gang | Rapper's Delight
-1979 | M | Pop Muzik | am=^m$
-1980 | The Vapors | Turning Japanese
-1979 | Lipps Inc. | Funkytown | am=lipps
-1981 | Toni Basil | Mickey | d=1; tm=^mickey$
-1982 | Men Without Hats | The Safety Dance
-1983 | Nena | 99 Luftballons | tm=99 luftballons|99 red balloons
-1982 | Dexys Midnight Runners | Come On Eileen | d=1
-1988 | Bobby McFerrin | Don't Worry, Be Happy | d=1
-1990 | Deee-Lite | Groove Is in the Heart
-1991 | Right Said Fred | I'm Too Sexy
-1995 | OMC | How Bizarre
-1997 | Chumbawamba | Tubthumping | d=1
-1999 | Len | Steal My Sunshine
-1999 | Lou Bega | Mambo No. 5 (A Little Bit Of...) | tm=mambo no
-1999 | Eiffel 65 | Blue (Da Ba Dee) | tm=blue
-2000 | Baha Men | Who Let the Dogs Out | d=1
-2002 | Las Ketchup | The Ketchup Song (Aserejé) | tm=ketchup|asereje
-2003 | Fountains of Wayne | Stacy's Mom
-2005 | Daniel Powter | Bad Day
-2006 | Gnarls Barkley | Crazy
-2011 | Gotye | Somebody That I Used to Know | am=gotye
-2012 | PSY | Gangnam Style | tm=gangnam
-2012 | Baauer | Harlem Shake
-2013 | MAGIC! | Rude
-2014 | OMI | Cheerleader (Felix Jaehn Remix) | tm=cheerleader; extras=1
-2013 | Ylvis | The Fox (What Does the Fox Say?) | tm=the fox
+@sources [{"name":"Acts with a single US Billboard Hot 100 top-40 hit, or a single UK top-40 hit (Wikipedia one-hit-wonder lists); each song also made a year-end chart","url":"https://en.wikipedia.org/wiki/List_of_one-hit_wonders_in_the_United_States"},{"name":"One-hit wonders on the UK singles chart","url":"https://en.wikipedia.org/wiki/List_of_one-hit_wonders_on_the_UK_singles_chart"}]
+# chart column: best year-end position us/uk/au, pv = monthly Wikipedia views, from = artist country (see tools/au_pick.mjs)
+1969 | Norman Greenbaum | Spirit in the Sky | us=22 uk=4 au=4 pv=11961 from=USA | d=1
+1969 | Zager & Evans | In the Year 2525 | us=26 uk=- au=- pv=5561 from=USA
+1970 | Edison Lighthouse | Love Grows (Where My Rosemary Goes) | us=40 uk=11 au=12 pv=4768 from=GBR
+1972 | Hot Butter | Popcorn | us=28 uk=- au=3 pv=9386 from=USA | tm=^popcorn; note=keepyear 1972 single; Apple has compilations only
+1972 | Looking Glass | Brandy (You're a Fine Girl) | us=12 uk=- au=- pv=8316 from=USA
+1974 | Carl Douglas | Kung Fu Fighting | us=15 uk=8 au=22 pv=10671 from=JAM | d=1
+1976 | Wild Cherry | Play That Funky Music | us=5 uk=47 au=- pv=12563 from=USA
+1979 | The Buggles | Video Killed the Radio Star | us=- uk=17 au=18 pv=38023 from=GBR | d=1
+1979 | The Sugarhill Gang | Rapper's Delight | us=- uk=- au=- pv=0 from=USA
+1979 | M | Pop Muzik | us=40 uk=12 au=10 pv=7477 from=GBR | am=^m$
+1979 | Lipps Inc. | Funkytown | us=8 uk=26 au=9 pv=20652 from=USA | am=lipps
+1979 | The Knack | My Sharona | us=1 uk=- au=11 pv=16186 from=USA
+1980 | The Vapors | Turning Japanese | us=- uk=42 au=2 pv=6424 from=GBR
+1981 | Toni Basil | Mickey | us=36 uk=13 au=6 pv=13781 from=USA | d=1; tm=^mickey$
+1982 | Men Without Hats | The Safety Dance | us=35 uk=- au=- pv=11008 from=CAN
+1982 | Dexys Midnight Runners | Come On Eileen | us=13 uk=1 au=12 pv=18260 from=GBR | d=1
+1983 | Nena | 99 Luftballons | us=28 uk=- au=18 pv=28466 from=DEU | tm=99 luftballons | 99 red balloons
+1985 | USA for Africa | We Are the World | us=20 uk=35 au=1 pv=77338
+1986 | Berlin | Take My Breath Away | us=27 uk=9 au=6 pv=13895 from=USA
+1988 | Bobby McFerrin | Don't Worry, Be Happy | us=37 uk=43 au=14 pv=11397 from=USA | d=1
+1990 | Deee-Lite | Groove Is in the Heart | us=91 uk=26 au=38 pv=12275 from=USA
+1990 | Sinéad O'Connor | Nothing Compares 2 U | us=3 uk=2 au=1 pv=18307 from=IRL
+1990 | Alannah Myles | Black Velvet | us=18 uk=18 au=13 pv=14927 from=CAN
+1991 | Right Said Fred | I'm Too Sexy | us=13 uk=4 au=13 pv=12865 from=GBR
+1992 | Billy Ray Cyrus | Achy Breaky Heart | us=15 uk=21 au=1 pv=7652 from=USA
+1993 | 4 Non Blondes | What's Up? | us=50 uk=21 au=7 pv=38962 from=USA
+1993 | Snow | Informer | us=10 uk=17 au=6 pv=8916 from=CAN
+1994 | Crash Test Dummies | Mmm Mmm Mmm Mmm | us=35 uk=48 au=14 pv=21785 from=CAN
+1994 | Big Mountain | Baby, I Love Your Way | us=21 uk=30 au=19 pv=7413 from=USA
+1994 | Ini Kamoze | Here Comes the Hotstepper | us=24 uk=24 au=22 pv=5398 from=JAM
+1995 | OMC | How Bizarre | us=- uk=37 au=- pv=8393 from=NZL
+1995 | Nicki French | Total Eclipse of the Heart | us=19 uk=48 au=17 pv=43971 from=GBR
+1996 | Los del Río | Macarena | us=1 uk=22 au=1 pv=25310 from=ESP
+1996 | Donna Lewis | I Love You Always Forever | us=8 uk=36 au=13 pv=5562 from=GBR
+1997 | Chumbawamba | Tubthumping | us=35 uk=9 au=3 pv=15097 from=GBR | d=1
+1999 | Len | Steal My Sunshine | us=78 uk=- au=44 pv=12309 from=CAN
+1999 | Lou Bega | Mambo No. 5 (A Little Bit Of...) | us=42 uk=4 au=1 pv=17339 from=DEU | tm=mambo no
+1999 | Eiffel 65 | Blue (Da Ba Dee) | us=49 uk=2 au=3 pv=18073 from=ITA | tm=blue
+1999 | Sixpence None the Richer | Kiss Me | us=6 uk=- au=19 pv=18605 from=USA
+2000 | Baha Men | Who Let the Dogs Out | us=- uk=4 au=22 pv=13242 from=BHS | d=1
+2001 | Crazy Town | Butterfly | us=29 uk=38 au=12 pv=11483 from=USA
+2002 | Las Ketchup | The Ketchup Song (Aserejé) | us=- uk=8 au=3 pv=15579 from=ESP | tm=ketchup | asereje
+2002 | Vanessa Carlton | A Thousand Miles | us=6 uk=- au=6 pv=20635 from=USA
+2003 | Fountains of Wayne | Stacy's Mom | us=- uk=- au=- pv=0 from=USA
+2004 | Mario Winans | I Don't Wanna Know | us=7 uk=11 au=16 pv=3226 from=USA
+2005 | Daniel Powter | Bad Day | us=1 uk=11 au=18 pv=7306 from=CAN
+2006 | Gnarls Barkley | Crazy | us=7 uk=1 au=16 pv=9711 from=USA
+2007 | Plain White T's | Hey There Delilah | us=7 uk=14 au=21 pv=14070 from=USA
+2008 | Estelle | American Boy | us=39 uk=6 au=27 pv=6828 from=GBR
+2011 | Gotye | Somebody That I Used to Know | us=1 uk=1 au=2 pv=28850 from=BEL/AUS | am=gotye
+2011 | Foster the People | Pumped Up Kicks | us=13 uk=- au=23 pv=24425 from=USA
+2012 | PSY | Gangnam Style | us=47 uk=6 au=2 pv=37026 from=KOR | tm=gangnam
+2012 | Baauer | Harlem Shake | us=4 uk=72 au=61 pv=3881 from=USA
+2012 | Icona Pop | I Love It | us=28 uk=19 au=41 pv=11749 from=SWE
+2012 | The Lumineers | Ho Hey | us=12 uk=21 au=21 pv=4085 from=USA
+2013 | MAGIC! | Rude | us=7 uk=12 au=40 pv=5506 from=CAN
+2013 | Ylvis | The Fox (What Does the Fox Say?) | us=73 uk=- au=99 pv=17127 from=NOR | tm=the fox
+2013 | Passenger | Let Her Go | us=19 uk=4 au=3 pv=6527 from=GBR
+2014 | OMI | Cheerleader (Felix Jaehn Remix) | us=11 uk=2 au=2 pv=5701 from=JAM | tm=cheerleader; extras=1
+2014 | A Great Big World and Christina Aguilera | Say Something | us=17 uk=39 au=13 pv=5851 from=USA
+2016 | DNCE | Cake by the Ocean | us=18 uk=23 au=35 pv=10451 from=USA
+2017 | Luis Fonsi and Daddy Yankee | Despacito | us=2 uk=2 au=2 pv=19934 from=USA
+2021 | Glass Animals | Heat Waves | us=1 uk=7 au=1 pv=6368 from=GBR
+2022 | Gayle | ABCDEFU | us=17 uk=17 au=12 pv=3685 from=USA

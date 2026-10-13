@@ -1,52 +1,171 @@
 @id hits-2020s
 @title Hits of the 2020s
 @icon 🔥
-@sources [{"name":"Billboard Year-End Hot 100 singles (2020–2025)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2020"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
-2019 | Dua Lipa | Don't Start Now | d=1
-2019 | Post Malone | Circles
-2019 | Harry Styles | Watermelon Sugar | d=1
-2019 | Harry Styles | Adore You
-2020 | BTS | Dynamite | d=1
-2020 | Dua Lipa | Levitating | d=1
-2020 | The Weeknd | Save Your Tears
-2020 | 24kGoldn | Mood | am=24kgoldn
-2020 | Jawsh 685 & Jason Derulo | Savage Love (Laxed - Siren Beat) | am=jawsh|derulo; tm=savage love
-2020 | Glass Animals | Heat Waves
-2021 | Olivia Rodrigo | drivers license | d=1; alt=Drivers License
-2021 | Olivia Rodrigo | good 4 u | alt=Good 4 U
-2021 | The Kid LAROI & Justin Bieber | STAY | am=laroi; d=1
-2021 | Lil Nas X | MONTERO (Call Me By Your Name) | tm=montero
-2021 | Justin Bieber | Peaches
-2021 | Doja Cat | Kiss Me More
-2021 | Silk Sonic | Leave the Door Open | am=silk sonic|bruno
-2021 | Adele | Easy on Me | d=1
-2021 | Ed Sheeran | Bad Habits | d=1
-2021 | Ed Sheeran | Shivers | d=1
-2022 | Harry Styles | As It Was | d=1
-2022 | Jack Harlow | First Class
-2022 | Taylor Swift | Anti-Hero | d=1
-2022 | Lizzo | About Damn Time
-2022 | SZA | Kill Bill | d=1
-2022 | Rema & Selena Gomez | Calm Down | am=rema
-2022 | Sam Smith & Kim Petras | Unholy | am=sam smith; d=1
-2022 | Metro Boomin, The Weeknd & 21 Savage | Creepin' | am=metro boomin
-2023 | Miley Cyrus | Flowers | d=1
-2023 | Morgan Wallen | Last Night
-2023 | Olivia Rodrigo | vampire
-2023 | Teddy Swims | Lose Control
-2023 | Jack Harlow | Lovin On Me
-2024 | Shaboozey | A Bar Song (Tipsy) | tm=bar song
-2024 | Benson Boone | Beautiful Things
-2024 | Post Malone & Morgan Wallen | I Had Some Help | am=post malone
-2024 | Sabrina Carpenter | Espresso | d=1
-2024 | Sabrina Carpenter | Please Please Please
-2024 | Kendrick Lamar | Not Like Us
-2024 | Hozier | Too Sweet
-2024 | Billie Eilish | BIRDS OF A FEATHER | d=1
-2024 | Beyoncé | TEXAS HOLD 'EM | tm=texas hold
-2024 | Lady Gaga & Bruno Mars | Die With A Smile | am=gaga; d=1
-2024 | ROSÉ & Bruno Mars | APT. | am=ros; d=1
-2024 | Chappell Roan | Good Luck, Babe!
-2025 | Alex Warren | Ordinary
-2025 | Lady Gaga | Abracadabra
-2025 | Sabrina Carpenter | Manchild
+@sources [{"name":"Billboard Year-End Hot 100 singles (2020s)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2020"},{"name":"UK year-end best-selling singles (Music Week / Official Charts Company)","url":"https://www.officialcharts.com/charts/end-of-year-singles-chart/"},{"name":"ARIA year-end singles chart","url":"https://www.aria.com.au/charts/2020/singles-chart"},{"name":"Wikipedia pageviews (lasting fame) and Wikidata (artist country)","url":"https://www.wikidata.org/"}]
+# chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
+2019 | Dua Lipa | Don't Start Now | us=4 uk=6 au=3 pv=4976 from=GBR/ALB/XKX | d=1
+2019 | Harry Styles | Watermelon Sugar | us=20 uk=10 au=6 pv=7319 from=GBR | d=1
+2019 | Harry Styles | Adore You | us=6 uk=16 au=11 pv=2836 from=GBR
+2019 | Post Malone | Circles | us=2 uk=50 au=7 pv=3983 from=USA
+2020 | Dua Lipa | Levitating | us=1 uk=6 au=5 pv=9162 from=GBR/ALB/XKX | d=1
+2020 | Glass Animals | Heat Waves | us=1 uk=7 au=1 pv=6368 from=GBR
+2020 | The Weeknd | Save Your Tears | us=2 uk=4 au=8 pv=7272 from=CAN
+2020 | 24kGoldn | Mood | us=4 uk=20 au=15 pv=3066 from=USA | am=24kgoldn
+2020 | Jawsh 685 & Jason Derulo | Savage Love (Laxed - Siren Beat) | us=35 uk=11 au=12 pv=3313 from=NZL | am=jawsh
+2020 | BTS | Dynamite | us=38 uk=- au=79 pv=8630 from=KOR | d=1
+2020 | Doja Cat | Say So | us=11 uk=13 au=10 pv=4884 from=USA
+2020 | Cardi B | WAP | us=24 uk=23 au=19 pv=18836 from=USA
+2020 | Roddy Ricch | The Box | us=3 uk=12 au=14 pv=3379 from=USA
+2020 | DaBaby | Rockstar | us=5 uk=7 au=5 pv=1704 from=USA
+2020 | Saint Jhn | Roses | us=19 uk=3 au=2 pv=1581 from=USA
+2020 | Lewis Capaldi | Before You Go | us=21 uk=4 au=8 pv=2247 from=GBR
+2020 | Justin Bieber | Intentions | us=17 uk=30 au=9 pv=1883 from=CAN
+2020 | Billie Eilish | Everything I Wanted | us=18 uk=29 au=38 pv=3444 from=USA
+2020 | Powfu | Death Bed | us=43 uk=21 au=20 pv=3187 from=CAN
+2020 | Future | Life Is Good | us=7 uk=22 au=39 pv=1495 from=USA
+2020 | Lady Gaga and Ariana Grande | Rain on Me | us=48 uk=17 au=35 pv=5946 from=USA
+2020 | Arizona Zervas | Roxanne | us=16 uk=31 au=29 pv=1302 from=USA
+2020 | Megan Thee Stallion | Savage | us=15 uk=36 au=40 pv=2425 from=USA
+2020 | Dua Lipa | Break My Heart | us=33 uk=43 au=31 pv=4098 from=GBR/ALB/XKX
+2020 | Drake | Toosie Slide | us=32 uk=25 au=37 pv=1981 from=CAN/USA
+2020 | Eminem | Godzilla | us=62 uk=27 au=33 pv=3694 from=USA
+2020 | Tate McRae | You Broke Me First | us=37 uk=56 au=27 pv=3243 from=CAN
+2020 | Lil Mosey | Blueberry Faygo | us=27 uk=39 au=43 pv=1803 from=USA
+2020 | Chris Brown and Young Thug | Go Crazy | us=19 uk=62 au=46 pv=1765 from=USA
+2020 | Joel Corry and MNEK | Head & Heart | us=- uk=5 au=20 pv=1037 from=GBR
+2020 | Jack Harlow | Whats Poppin | us=13 uk=96 au=25 pv=1482 from=USA
+2021 | Olivia Rodrigo | drivers license | us=8 uk=3 au=3 pv=10422 from=USA | d=1; alt=Drivers License
+2021 | The Kid LAROI & Justin Bieber | STAY | us=3 uk=7 au=2 pv=9138 from=AUS | am=laroi; d=1
+2021 | Olivia Rodrigo | good 4 u | us=5 uk=2 au=6 pv=7330 from=USA | alt=Good 4 U
+2021 | Ed Sheeran | Bad Habits | us=13 uk=1 au=5 pv=4125 from=GBR | d=1
+2021 | Lil Nas X | MONTERO (Call Me By Your Name) | us=9 uk=5 au=11 pv=3698 from=USA | tm=montero
+2021 | Ed Sheeran | Shivers | us=5 uk=5 au=6 pv=2419 from=GBR | d=1
+2021 | Adele | Easy on Me | us=4 uk=12 au=17 pv=4804 from=GBR | d=1
+2021 | Doja Cat | Kiss Me More | us=6 uk=14 au=9 pv=3839 from=USA
+2021 | Justin Bieber | Peaches | us=10 uk=23 au=14 pv=3712 from=CAN
+2021 | Silk Sonic | Leave the Door Open | us=7 uk=- au=40 pv=5330 from=USA | am=silk sonic
+2021 | Elton John and Dua Lipa | Cold Heart | us=10 uk=13 au=4 pv=7215 from=GBR
+2021 | Olivia Rodrigo | Deja Vu | us=13 uk=32 au=26 pv=6769 from=USA
+2021 | The Kid Laroi | Without You | us=17 uk=19 au=4 pv=1508 from=AUS
+2021 | Lil Nas X and Jack Harlow | Industry Baby | us=16 uk=45 au=16 pv=4053 from=USA
+2021 | Masked Wolf | Astronaut in the Ocean | us=20 uk=41 au=12 pv=2191 from=AUS
+2021 | Olivia Rodrigo | Traitor | us=38 uk=42 au=42 pv=2545 from=USA
+2021 | Riton and Nightcrawlers | Friday | us=- uk=13 au=19 pv=2458 from=GBR
+2021 | Lil Tjay and 6lack | Calling My Phone | us=33 uk=48 au=38 pv=557 from=USA
+2021 | Doja Cat | Streets | us=67 uk=50 au=34 pv=1720 from=USA
+2021 | ATB, Topic and A7S | Your Love (9PM) | us=- uk=29 au=35 pv=2665 from=DEU
+2021 | Ariana Grande | Positions | us=14 uk=- au=55 pv=3133 from=USA
+2021 | Cardi B | Up | us=26 uk=- au=46 pv=3013 from=USA
+2021 | Russ Millions and Tion Wayne | Body | us=- uk=10 au=25 pv=512 from=GBR
+2021 | Nathan Evans, 220 Kid and Billen Ted | Wellerman (Sea Shanty) | us=- uk=11 au=- pv=17246 from=GBR
+2021 | Doja Cat | Need to Know | us=18 uk=- au=57 pv=1592 from=USA
+2021 | Brenda Lee | Rockin' Around the Christmas Tree | us=59 uk=67 au=- pv=16314 from=USA
+2021 | Billie Eilish | Happier Than Ever | us=94 uk=68 au=32 pv=2902 from=USA
+2022 | Harry Styles | As It Was | us=2 uk=1 au=1 pv=10628 from=GBR | d=1
+2022 | Taylor Swift | Anti-Hero | us=4 uk=4 au=4 pv=8225 from=USA | d=1
+2022 | SZA | Kill Bill | us=3 uk=7 au=3 pv=4384 from=USA | d=1; kids=0
+2022 | Rema & Selena Gomez | Calm Down | us=6 uk=6 au=12 pv=6831 from=NGA | am=rema
+2022 | Lizzo | About Damn Time | us=12 uk=19 au=10 pv=3031 from=USA
+2022 | Sam Smith & Kim Petras | Unholy | us=11 uk=31 au=19 pv=7019 from=GBR | am=sam smith; d=1; kids=0
+2022 | Metro Boomin, The Weeknd & 21 Savage | Creepin' | us=5 uk=23 au=16 pv=2983 from=USA | am=metro boomin
+2022 | Jack Harlow | First Class | us=6 uk=28 au=8 pv=1707 from=USA
+2022 | Kate Bush | Running Up That Hill (A Deal with God) | us=23 uk=6 au=11 pv=35792 from=GBR
+2022 | David Guetta and Bebe Rexha | I'm Good (Blue) | us=10 uk=13 au=23 pv=6094 from=FRA
+2022 | Gayle | ABCDEFU | us=17 uk=17 au=12 pv=3685 from=USA
+2022 | Carolina Gaitán, Mauro Castillo, Adassa, Rhenzy Feliz, Diane Guerrero, Stephanie Beatriz and the Encanto cast | We Don't Talk About Bruno | us=24 uk=11 au=38 pv=7448 from=COL
+2022 | OneRepublic | I Ain't Worried | us=37 uk=20 au=9 pv=3260 from=USA
+2022 | Justin Bieber | Ghost | us=8 uk=62 au=13 pv=5238 from=CAN
+2022 | Imagine Dragons and JID | Enemy | us=15 uk=60 au=22 pv=3588 from=USA
+2022 | Harry Styles | Late Night Talking | us=25 uk=32 au=37 pv=1855 from=GBR
+2022 | Luude | Down Under | us=- uk=23 au=28 pv=26508 from=AUS
+2022 | Steve Lacy | Bad Habit | us=28 uk=58 au=24 pv=3064 from=USA
+2022 | Zach Bryan | Something in the Orange | us=13 uk=92 au=7 pv=2834 from=USA
+2022 | Chris Brown | Under the Influence | us=17 uk=45 au=52 pv=2533 from=USA
+2022 | Future | Wait for U | us=11 uk=48 au=55 pv=1817 from=USA
+2022 | Latto | Big Energy | us=7 uk=- au=20 pv=2691 from=USA
+2022 | Lost Frequencies and Calum Scott | Where Are You Now | us=- uk=8 au=7 pv=1299 from=BEL
+2022 | Beyoncé | Cuff It | us=29 uk=43 au=74 pv=4020 from=USA
+2022 | Beyoncé | Break My Soul | us=38 uk=38 au=76 pv=4391 from=USA
+2022 | Lil Nas X | Thats What I Want | us=14 uk=- au=23 pv=1403 from=USA
+2022 | Camila Cabello | Bam Bam | us=66 uk=34 au=46 pv=1864 from=CUB/MEX/USA
+2023 | Miley Cyrus | Flowers | us=2 uk=1 au=1 pv=13771 from=USA | d=1
+2023 | Teddy Swims | Lose Control | us=1 uk=4 au=5 pv=11967 from=USA
+2023 | Olivia Rodrigo | vampire | us=30 uk=14 au=26 pv=7140 from=USA
+2023 | Jack Harlow | Lovin On Me | us=5 uk=28 au=17 pv=2310 from=USA
+2023 | Morgan Wallen | Last Night | us=1 uk=- au=2 pv=2740 from=USA
+2023 | Noah Kahan | Stick Season | us=11 uk=1 au=4 pv=6300 from=USA
+2023 | Taylor Swift | Cruel Summer | us=12 uk=11 au=8 pv=10725 from=USA
+2023 | The Weeknd and Ariana Grande | Die for You | us=7 uk=17 au=6 pv=4047 from=CAN
+2023 | PinkPantheress and Ice Spice | Boy's a Liar Pt. 2 | us=20 uk=8 au=5 pv=2681 from=GBR
+2023 | Tate McRae | Greedy | us=13 uk=18 au=16 pv=4980 from=CAN
+2023 | Raye | Escapism | us=48 uk=3 au=10 pv=5564 from=GBR
+2023 | Doja Cat | Paint the Town Red | us=21 uk=26 au=14 pv=4954 from=USA
+2023 | Zach Bryan | I Remember Everything | us=9 uk=39 au=11 pv=2434 from=USA
+2023 | Dua Lipa | Dance the Night | us=35 uk=19 au=27 pv=4293 from=GBR/ALB/XKX
+2023 | Luke Combs | Fast Car | us=8 uk=- au=13 pv=18176 from=USA
+2023 | Stephen Sanchez | Until I Found You | us=50 uk=39 au=17 pv=8490 from=USA
+2023 | David Kushner | Daylight | us=62 uk=16 au=19 pv=3078 from=USA
+2023 | Billie Eilish | What Was I Made For? | us=46 uk=45 au=62 pv=8947 from=USA
+2023 | SZA | Snooze | us=9 uk=92 au=43 pv=5559 from=USA
+2023 | Meghan Trainor | Made You Look | us=53 uk=36 au=38 pv=2116 from=USA
+2023 | Coi Leray | Players | us=33 uk=54 au=31 pv=1317 from=USA
+2023 | Taylor Swift | Karma | us=27 uk=99 au=39 pv=4061 from=USA
+2023 | Jvke | Golden Hour | us=41 uk=71 au=57 pv=3939 from=USA
+2023 | Dave & Central Cee | Sprinter | us=- uk=2 au=15 pv=0 from=NLD | nm=apple
+2023 | Casso | Prada | us=- uk=13 au=19 pv=0 | nm=apple
+2023 | Ed Sheeran | Eyes Closed | us=64 uk=31 au=73 pv=1444 from=GBR
+2023 | Morgan Wallen | Thinkin' Bout Me | us=19 uk=- au=45 pv=556 from=USA
+2024 | Lady Gaga & Bruno Mars | Die With A Smile | us=1 uk=10 au=5 pv=38880 from=USA | am=gaga; d=1
+2024 | ROSÉ & Bruno Mars | APT. | us=9 uk=5 au=3 pv=28472 from=NZL/KOR | am=ros; d=1
+2024 | Sabrina Carpenter | Espresso | us=7 uk=3 au=3 pv=18950 from=USA | d=1
+2024 | Benson Boone | Beautiful Things | us=3 uk=2 au=1 pv=12562 from=USA
+2024 | Shaboozey | A Bar Song (Tipsy) | us=2 uk=6 au=2 pv=11405 from=USA | tm=bar song
+2024 | Billie Eilish | BIRDS OF A FEATHER | us=5 uk=7 au=6 pv=13651 from=USA | d=1
+2024 | Chappell Roan | Good Luck, Babe! | us=18 uk=8 au=13 pv=13871 from=USA
+2024 | Hozier | Too Sweet | us=10 uk=5 au=8 pv=5502 from=IRL
+2024 | Sabrina Carpenter | Please Please Please | us=16 uk=10 au=14 pv=10736 from=USA
+2024 | Post Malone & Morgan Wallen | I Had Some Help | us=4 uk=15 au=7 pv=5624 from=USA | am=post malone
+2024 | Kendrick Lamar | Not Like Us | us=6 uk=43 au=23 pv=34677 from=USA
+2024 | Beyoncé | TEXAS HOLD 'EM | us=32 uk=14 au=35 pv=5977 from=USA | tm=texas hold
+2024 | Gracie Abrams | That's So True | us=14 uk=6 au=4 pv=6728 from=USA
+2024 | Djo | End of Beginning | us=47 uk=23 au=22 pv=42852 from=USA
+2024 | Taylor Swift | Fortnight | us=22 uk=19 au=20 pv=9707 from=USA
+2024 | Sabrina Carpenter | Taste | us=19 uk=19 au=23 pv=7093 from=USA
+2024 | Tommy Richman | Million Dollar Baby | us=8 uk=29 au=10 pv=3468 from=USA
+2024 | Dasha | Austin | us=27 uk=9 au=12 pv=2633 from=USA
+2024 | Ariana Grande | We Can't Be Friends (Wait for Your Love) | us=26 uk=24 au=26 pv=9060 from=USA
+2024 | Gigi Perez | Sailor Song | us=36 uk=18 au=21 pv=6654 from=USA
+2024 | Myles Smith | Stargazing | us=29 uk=12 au=27 pv=3835 from=GBR
+2024 | Billie Eilish | Wildflower | us=26 uk=56 au=33 pv=16003 from=USA
+2024 | Eminem | Houdini | us=39 uk=26 au=32 pv=5613 from=USA
+2024 | Tyla | Water | us=24 uk=46 au=38 pv=7110 from=ZAF
+2024 | Artemas | I Like the Way You Kiss Me | us=63 uk=17 au=21 pv=3920 from=GBR
+2024 | Taylor Swift | I Can Do It with a Broken Heart | us=35 uk=38 au=49 pv=5156 from=USA
+2024 | Sabrina Carpenter | Feather | us=25 uk=69 au=46 pv=8608 from=USA
+2025 | Alex Warren | Ordinary | us=7 uk=1 au=1 pv=30635 from=USA
+2025 | Sabrina Carpenter | Manchild | us=38 uk=24 au=38 pv=22866 from=USA
+2025 | Lady Gaga | Abracadabra | us=56 uk=46 au=63 pv=23578 from=USA
+2025 | Huntrix | Golden | us=25 uk=4 au=2 pv=76983
+2025 | Chappell Roan | Pink Pony Club | us=10 uk=3 au=20 pv=37882 from=USA
+2025 | Lola Young | Messy | us=28 uk=2 au=8 pv=13905 from=GBR
+2025 | Ravyn Lenae | Love Me Not | us=30 uk=8 au=11 pv=6960 from=USA
+2025 | Sombr | Back to Friends | us=44 uk=15 au=12 pv=15422 from=USA
+2025 | Sombr | Undressed | us=42 uk=16 au=14 pv=8215 from=USA
+2025 | Kendrick Lamar and SZA | Luther | us=2 uk=80 au=13 pv=19268 from=USA
+2025 | Tate McRae | Sports Car | us=46 uk=22 au=22 pv=7066 from=CAN
+2025 | Saja Boys | Soda Pop | us=61 uk=36 au=28 pv=22606 from=USA
+2025 | The Weeknd and Playboi Carti | Timeless | us=16 uk=66 au=31 pv=6633 from=CAN
+2025 | Saja Boys | Your Idol | us=54 uk=44 au=36 pv=12852 from=USA
+2025 | Drake | Nokia | us=24 uk=75 au=35 pv=4792 from=CAN/USA
+2025 | Teddy Swims | Bad Dreams | us=74 uk=20 au=26 pv=2271 from=USA
+2025 | Doechii | Anxiety | us=39 uk=70 au=64 pv=15538 from=USA
+2025 | Justin Bieber | Daisies | us=60 uk=79 au=34 pv=11782 from=CAN
+2025 | Leon Thomas | Mutt | us=22 uk=100 au=57 pv=7319 from=USA
+2025 | Kendrick Lamar | TV Off | us=15 uk=- au=60 pv=5760 from=USA
+2025 | Benson Boone | Mystical Magical | us=47 uk=61 au=80 pv=9105 from=USA
+2025 | Chrystal | The Days | us=- uk=12 au=10 pv=0 from=GBR | nm=apple
+2025 | Huntrix | How It's Done | us=68 uk=67 au=46 pv=4258
+2025 | Olivia Dean | Man I Need | us=- uk=9 au=15 pv=0 from=GBR | nm=apple
+2025 | Sabrina Carpenter | Bed Chem | us=45 uk=58 au=82 pv=4051 from=USA
+2025 | Morgan Wallen | I'm the Problem | us=13 uk=- au=66 pv=1597 from=USA
+2025 | The Marías | No One Noticed | us=32 uk=- au=61 pv=2878 from=USA

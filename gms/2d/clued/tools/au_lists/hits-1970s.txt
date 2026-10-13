@@ -1,62 +1,275 @@
 @id hits-1970s
 @title Hits of the 1970s
 @icon 🕺
-@sources [{"name":"Billboard Year-End Hot 100 singles (1970–1979)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1970"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
-1970 | Simon & Garfunkel | Bridge Over Troubled Water | d=1
-1970 | Carpenters | (They Long to Be) Close to You | alt=Close to You
-1970 | The Guess Who | American Woman
-1970 | Edwin Starr | War
-1970 | The Jackson 5 | ABC | d=1
-1970 | The Beatles | Let It Be | d=1
-1971 | Three Dog Night | Joy to the World
-1971 | Rod Stewart | Maggie May
-1971 | Carole King | It's Too Late
-1971 | Bee Gees | How Can You Mend a Broken Heart
-1971 | The Rolling Stones | Brown Sugar
-1971 | John Lennon | Imagine | d=1
-1971 | Don McLean | American Pie | d=1
-1972 | Gilbert O'Sullivan | Alone Again (Naturally)
-1972 | Bill Withers | Lean on Me | d=1
-1971 | Al Green | Let's Stay Together
-1971 | Nilsson | Without You | am=nilsson
-1972 | Elton John | Crocodile Rock
-1972 | Carly Simon | You're So Vain
-1973 | Tony Orlando & Dawn | Tie a Yellow Ribbon Round the Ole Oak Tree | am=dawn
-1973 | Roberta Flack | Killing Me Softly with His Song
-1973 | Marvin Gaye | Let's Get It On
-1973 | Jim Croce | Bad, Bad Leroy Brown
-1974 | ABBA | Waterloo | d=1
-1974 | Carl Douglas | Kung Fu Fighting | d=1
-1973 | Redbone | Come and Get Your Love
-1973 | Barbra Streisand | The Way We Were
-1975 | Captain & Tennille | Love Will Keep Us Together | am=captain
-1975 | Glen Campbell | Rhinestone Cowboy
-1975 | Bee Gees | Jive Talkin'
-1975 | David Bowie | Fame
-1975 | Eagles | One of These Nights
-1974 | Labelle | Lady Marmalade
-1975 | Queen | Bohemian Rhapsody | d=1
-1976 | Wings | Silly Love Songs
-1976 | Elton John & Kiki Dee | Don't Go Breaking My Heart | am=elton
-1976 | Wild Cherry | Play That Funky Music
-1976 | ABBA | Dancing Queen | d=1
-1976 | Stevie Wonder | Sir Duke
-1976 | Eagles | Hotel California | d=1
-1976 | Rod Stewart | Tonight's the Night (Gonna Be Alright) | tm=tonight.?s the night
-1977 | Andy Gibb | I Just Want to Be Your Everything
-1977 | The Emotions | Best of My Love
-1977 | Fleetwood Mac | Go Your Own Way | d=1
-1977 | Bee Gees | Stayin' Alive | d=1
-1978 | Andy Gibb | Shadow Dancing
-1977 | Bee Gees | Night Fever | d=1
-1978 | Chic | Le Freak | d=1
-1978 | John Travolta & Olivia Newton-John | You're the One That I Want | am=travolta; d=1
-1978 | Frankie Valli | Grease
-1978 | Gloria Gaynor | I Will Survive | d=1
-1978 | Village People | Y.M.C.A. | d=1; alt=YMCA
-1979 | The Knack | My Sharona
-1979 | Donna Summer | Hot Stuff
-1979 | Anita Ward | Ring My Bell
-1978 | Blondie | Heart of Glass
-1979 | Michael Jackson | Don't Stop 'Til You Get Enough
-1979 | Pink Floyd | Another Brick in the Wall, Pt. 2 | tm=another brick in the wall.*2
+@sources [{"name":"Billboard Year-End Hot 100 singles (1970s)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1970"},{"name":"UK year-end best-selling singles (Music Week / Official Charts Company)","url":"https://en.wikipedia.org/wiki/1970_in_British_music"},{"name":"Kent Music Report / ARIA year-end top 25 singles (Australia)","url":"https://en.wikipedia.org/wiki/List_of_top_25_singles_for_1970_in_Australia"},{"name":"Wikipedia pageviews (lasting fame) and Wikidata (artist country)","url":"https://www.wikidata.org/"}]
+# chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
+1970 | Simon & Garfunkel | Bridge Over Troubled Water | us=1 uk=5 au=5 pv=15945 from=USA | d=1
+1970 | The Beatles | Let It Be | us=9 uk=46 au=1 pv=21856 from=GBR | d=1
+1970 | Carpenters | (They Long to Be) Close to You | us=2 uk=49 au=2 pv=9111 from=USA | alt=Close to You
+1970 | The Guess Who | American Woman | us=3 uk=- au=- pv=10141 from=CAN
+1970 | Edwin Starr | War | us=5 uk=- au=- pv=7078 from=USA
+1970 | The Jackson 5 | ABC | us=15 uk=- au=- pv=7734 from=USA | d=1
+1970 | Norman Greenbaum | Spirit in the Sky | us=22 uk=4 au=4 pv=11961 from=USA
+1970 | Freda Payne | Band of Gold | us=10 uk=3 au=15 pv=3204 from=USA
+1970 | Edison Lighthouse | Love Grows (Where My Rosemary Goes) | us=40 uk=11 au=12 pv=4768 from=GBR
+1970 | Mungo Jerry | In the Summertime | us=53 uk=1 au=16 pv=6441 from=GBR
+1970 | Elvis Presley | The Wonder of You | us=72 uk=2 au=15 pv=2872 from=USA
+1970 | Ray Stevens | Everything Is Beautiful | us=12 uk=44 au=21 pv=1622 from=USA
+1970 | Free | All Right Now | us=27 uk=7 au=- pv=7421 from=GBR
+1970 | Shocking Blue | Venus | us=33 uk=- au=19 pv=13427 from=NLD
+1970 | Creedence Clearwater Revival | Up Around the Bend | us=73 uk=36 au=8 pv=2160 from=USA
+1970 | Beach Boys | Cottonfields | us=- uk=20 au=13 pv=3936 from=USA
+1970 | The Jackson 5 | I Want You Back | us=28 uk=35 au=- pv=15080 from=USA
+1970 | The Kinks | Lola | us=52 uk=13 au=- pv=15742 from=GBR
+1970 | Three Dog Night | Mama Told Me (Not to Come) | us=11 uk=33 au=- pv=5803 from=USA
+1970 | Dave Edmunds | I Hear You Knocking | us=81 uk=29 au=20 pv=2703 from=GBR
+1970 | Eric Burdon & War | Spill the Wine | us=20 uk=- au=18 pv=3475 from=GBR
+1970 | Creedence Clearwater Revival | Lookin' out My Back Door | us=36 uk=- au=6 pv=3202 from=USA
+1970 | Melanie | Lay Down (Candles in the Rain) | us=23 uk=- au=22 pv=2110 from=USA
+1970 | Rolf Harris | Two Little Boys | us=- uk=25 au=24 pv=1950 from=AUS/GBR
+1970 | Diana Ross | Ain't No Mountain High Enough | us=6 uk=- au=- pv=16621 from=USA
+1970 | Clarence Carter | Patches | us=35 uk=26 au=- pv=1960 from=USA
+1970 | Andy Williams | Can't Help Falling In Love | us=- uk=14 au=- pv=23496 from=USA
+1971 | Don McLean | American Pie | us=3 uk=11 au=4 pv=51171 from=USA | d=1
+1971 | Nilsson | Without You | us=4 uk=4 au=2 pv=15514 from=USA | am=nilsson
+1971 | Rod Stewart | Maggie May | us=2 uk=2 au=13 pv=8699 from=GBR
+1971 | The Rolling Stones | Brown Sugar | us=16 uk=19 au=- pv=8990 from=GBR
+1971 | Three Dog Night | Joy to the World | us=1 uk=- au=- pv=7909 from=USA
+1971 | John Lennon | Imagine | us=- uk=- au=19 pv=15800 from=GBR | d=1
+1971 | Carole King | It's Too Late | us=3 uk=- au=- pv=4431 from=USA
+1971 | Bee Gees | How Can You Mend a Broken Heart | us=5 uk=- au=- pv=4825 from=GBR/AUS
+1971 | Al Green | Let's Stay Together | us=11 uk=- au=- pv=5091 from=USA
+1971 | George Harrison | My Sweet Lord | us=31 uk=1 au=2 pv=16109 from=GBR
+1971 | Tony Orlando and Dawn | Knock Three Times | us=10 uk=4 au=7 pv=2584 from=USA
+1971 | Lynn Anderson | Rose Garden | us=41 uk=15 au=9 pv=4233 from=USA
+1971 | Janis Joplin | Me and Bobby McGee | us=11 uk=- au=17 pv=13544 from=USA
+1971 | Paul McCartney | Another Day | us=60 uk=25 au=21 pv=3938 from=GBR
+1971 | James Taylor | You've Got a Friend | us=17 uk=32 au=- pv=9567 from=USA/GBR
+1971 | The Mixtures | The Pushbike Song | us=- uk=6 au=3 pv=736 from=AUS
+1971 | Judy Collins | Amazing Grace | us=80 uk=12 au=- pv=32592 from=USA
+1971 | T. Rex | Hot Love | us=- uk=5 au=25 pv=1646 from=GBR
+1971 | Tom Jones | She's a Lady | us=25 uk=- au=22 pv=2979 from=GBR
+1971 | Benny Hill | Ernie (The Fastest Milkman in the West) | us=- uk=23 au=17 pv=2114 from=GBR
+1971 | Helen Reddy | I Don't Know How to Love Him | us=50 uk=- au=6 pv=3361 from=AUS/USA
+1971 | John Denver | Take Me Home, Country Roads | us=8 uk=- au=- pv=35072 from=USA
+1971 | Olivia Newton-John | Banks of the Ohio | us=- uk=50 au=8 pv=1789 from=GBR/AUS
+1971 | Zoot | Eleanor Rigby | us=- uk=- au=10 pv=19362 from=AUS
+1971 | Ringo Starr | It Don't Come Easy | us=43 uk=42 au=- pv=5151 from=GBR
+1971 | Tony Christie | I Did What I Did for Maria | us=- uk=28 au=18 pv=726 from=GBR
+1971 | T-Rex | Get It On | us=- uk=10 au=- pv=7537 from=GBR
+1972 | Carly Simon | You're So Vain | us=9 uk=31 au=3 pv=19673 from=USA
+1972 | Gilbert O'Sullivan | Alone Again (Naturally) | us=2 uk=- au=13 pv=7913 from=IRL
+1972 | Elton John | Crocodile Rock | us=7 uk=- au=5 pv=4850 from=GBR
+1972 | Bill Withers | Lean on Me | us=7 uk=- au=- pv=8395 from=USA | d=1
+1972 | The Pipes and Drums and the Military Band of the Royal Scots Dragoon Guards | Amazing Grace | us=- uk=1 au=10 pv=32592
+1972 | Roberta Flack | The First Time Ever I Saw Your Face | us=1 uk=- au=8 pv=11322 from=USA
+1972 | Donny Osmond | Puppy Love | us=67 uk=3 au=1 pv=1876 from=USA
+1972 | Dr. Hook & the Medicine Show | Sylvia's Mother | us=64 uk=20 au=15 pv=3939 from=USA
+1972 | Melanie | Brand New Key | us=9 uk=- au=11 pv=7113 from=USA
+1972 | Michael Jackson | Ben | us=20 uk=- au=12 pv=10611 from=USA
+1972 | Hot Butter | Popcorn | us=28 uk=- au=3 pv=9386 from=USA
+1972 | America | A Horse with No Name | us=27 uk=- au=22 pv=19012 from=GBR
+1972 | Chuck Berry | My Ding-a-Ling | us=15 uk=18 au=- pv=6669 from=USA
+1972 | Sammy Davis Jr. | The Candy Man | us=5 uk=- au=24 pv=5399 from=USA
+1972 | The Hollies | Long Cool Woman in a Black Dress | us=24 uk=- au=16 pv=8576 from=GBR
+1972 | Wayne Newton | Daddy Don't You Walk So Fast | us=10 uk=- au=7 pv=851 from=USA
+1972 | Little Jimmy Osmond | Long Haired Lover from Liverpool | us=- uk=12 au=14 pv=910 from=USA
+1972 | Mac Davis | Baby, Don't Get Hooked on Me | us=8 uk=- au=25 pv=837 from=USA
+1972 | The New Seekers | I'd Like to Teach the World to Sing (In Perfect Harmony) | us=93 uk=5 au=- pv=10187 from=GBR
+1972 | Robert John | The Lion Sleeps Tonight | us=21 uk=- au=- pv=28690 from=USA/GBR
+1972 | Alice Cooper | School's Out | us=75 uk=13 au=- pv=5180 from=USA
+1972 | Colleen Hewett | Day By Day | us=- uk=- au=21 pv=18736 from=AUS
+1972 | Don McLean | Vincent | us=94 uk=16 au=- pv=9374 from=USA
+1972 | Looking Glass | Brandy (You're a Fine Girl) | us=12 uk=- au=- pv=8316 from=USA
+1972 | Gary Glitter | Rock and Roll (Parts 1 & 2) | us=- uk=7 au=- pv=5689 from=GBR
+1972 | Gilbert O'Sullivan | Clair | us=72 uk=17 au=- pv=2339 from=IRL
+1972 | Neil Young | Heart of Gold | us=17 uk=- au=- pv=5012 from=CAN/USA
+1973 | Tony Orlando & Dawn | Tie a Yellow Ribbon Round the Ole Oak Tree | us=1 uk=1 au=1 pv=8997 from=USA | am=dawn
+1973 | Roberta Flack | Killing Me Softly with His Song | us=3 uk=- au=17 pv=30925 from=USA
+1973 | Redbone | Come and Get Your Love | us=4 uk=- au=- pv=12816 from=USA
+1973 | Barbra Streisand | The Way We Were | us=1 uk=- au=- pv=7218 from=USA
+1973 | Jim Croce | Bad, Bad Leroy Brown | us=2 uk=- au=- pv=5209 from=USA
+1973 | Marvin Gaye | Let's Get It On | us=4 uk=- au=- pv=2641 from=USA
+1973 | Sweet | The Ballroom Blitz | us=17 uk=17 au=9 pv=8717 from=GBR
+1973 | Bobby 'Boris' Pickett | Monster Mash | us=38 uk=21 au=21 pv=13368 from=USA
+1973 | Helen Reddy | Delta Dawn | us=14 uk=- au=6 pv=8022 from=AUS/USA
+1973 | Paul McCartney & Wings | My Love | us=5 uk=- au=24 pv=4048 from=GBR
+1973 | Perry Como | And I Love You So | us=- uk=14 au=9 pv=2376 from=USA
+1973 | The Carpenters | Top of the World | us=39 uk=- au=14 pv=4571 from=USA
+1973 | David Essex | Rock On | us=17 uk=33 au=- pv=3671 from=GBR
+1973 | Suzi Quatro | Can the Can | us=- uk=29 au=7 pv=1543 from=USA
+1973 | Maureen McGovern | The Morning After | us=28 uk=- au=16 pv=2027 from=USA
+1973 | 10cc | Rubber Bullets | us=- uk=20 au=22 pv=1518 from=GBR
+1973 | David Bowie | Sorrow | us=- uk=36 au=16 pv=1749 from=GBR
+1973 | Gary Glitter | I Love You Love Me Love | us=- uk=8 au=19 pv=486 from=GBR
+1973 | Alvin Stardust | My Coo Ca Choo | us=- uk=44 au=1 pv=716 from=GBR
+1973 | Vicki Lawrence | The Night the Lights Went Out in Georgia | us=11 uk=- au=- pv=15270 from=USA
+1973 | Slade | Cum On Feel the Noize | us=- uk=5 au=- pv=10171 from=GBR | kids=0
+1973 | Barry Blue | Dancin' (on a Saturday Night) | us=- uk=23 au=23 pv=387 from=GBR
+1973 | The Rolling Stones | Angie | us=85 uk=- au=19 pv=5190 from=GBR
+1973 | Tony Orlando and Dawn | Say, Has Anybody Seen My Sweet Gypsy Rose | us=34 uk=- au=25 pv=586 from=USA
+1973 | The Carpenters | Yesterday Once More | us=70 uk=28 au=- pv=3167 from=USA
+1973 | Shirley Bassey | Never Never Never (Grande Grande Grande) | us=- uk=46 au=2 pv=294 from=GBR
+1973 | Gilbert O'Sullivan | Get Down | us=67 uk=16 au=- pv=1090 from=IRL
+1974 | Carl Douglas | Kung Fu Fighting | us=15 uk=8 au=22 pv=10671 from=JAM | d=1
+1974 | ABBA | Waterloo | us=49 uk=16 au=- pv=10360 from=SWE | d=1
+1974 | Labelle | Lady Marmalade | us=23 uk=- au=- pv=23581 from=USA | kids=0
+1974 | Terry Jacks | Seasons in the Sun | us=2 uk=2 au=5 pv=13255 from=CAN
+1974 | George McCrae | Rock Your Baby | us=38 uk=5 au=20 pv=4004 from=USA
+1974 | Ray Stevens | The Streak | us=8 uk=24 au=17 pv=2057 from=USA
+1974 | The Three Degrees | When Will I See You Again | us=75 uk=4 au=21 pv=3306 from=USA
+1974 | Paper Lace | Billy Don't Be a Hero | us=- uk=3 au=2 pv=2782 from=GBR
+1974 | John Denver | Annie's Song | us=25 uk=15 au=- pv=7016 from=USA
+1974 | The Stylistics | You Make Me Feel Brand New | us=14 uk=18 au=- pv=2630 from=USA
+1974 | The Hollies | The Air That I Breathe | us=50 uk=14 au=- pv=10141 from=GBR
+1974 | The Rubettes | Sugar Baby Love | us=- uk=10 au=21 pv=2125 from=GBR
+1974 | Suzi Quatro | Devil Gate Drive | us=- uk=11 au=13 pv=1254 from=USA
+1974 | Paul Anka | (You're) Having My Baby | us=28 uk=- au=15 pv=2500 from=CAN/USA
+1974 | Paper Lace | The Night Chicago Died | us=47 uk=- au=4 pv=3467 from=GBR
+1974 | Ringo Starr | You're Sixteen | us=31 uk=28 au=- pv=4638 from=GBR
+1974 | Charlie Rich | The Most Beautiful Girl | us=23 uk=19 au=- pv=1779 from=USA
+1974 | Paul McCartney and Wings | Band on the Run | us=22 uk=50 au=- pv=6332 from=GBR
+1974 | Grand Funk Railroad | The Loco-Motion | us=6 uk=- au=- pv=12490 from=USA
+1974 | Barry White | You're the First, the Last, My Everything | us=49 uk=32 au=- pv=2949 from=USA
+1974 | Queen | Killer Queen | us=78 uk=29 au=- pv=7860 from=GBR
+1974 | Elton John | Bennie and the Jets | us=9 uk=- au=- pv=8678 from=GBR
+1974 | Elton John | Goodbye Yellow Brick Road | us=72 uk=- au=25 pv=4658 from=GBR
+1974 | Ken Boothe | Everything I Own | us=- uk=9 au=- pv=6013 from=JAM
+1974 | Love Unlimited Orchestra | Love's Theme | us=3 uk=- au=- pv=3457 from=USA
+1974 | The Jackson 5 | Dancing Machine | us=5 uk=- au=- pv=3557 from=USA
+1974 | Charles Aznavour | She | us=- uk=7 au=- pv=3898 from=FRA/ARM
+1975 | Queen | Bohemian Rhapsody | us=18 uk=22 au=2 pv=58759 from=GBR | d=1
+1975 | Captain & Tennille | Love Will Keep Us Together | us=1 uk=- au=6 pv=7051 from=USA | am=captain
+1975 | Glen Campbell | Rhinestone Cowboy | us=2 uk=31 au=- pv=7501 from=USA
+1975 | David Bowie | Fame | us=8 uk=- au=- pv=8217 from=GBR
+1975 | Eagles | One of These Nights | us=10 uk=- au=- pv=4093 from=USA
+1975 | Bee Gees | Jive Talkin' | us=12 uk=- au=- pv=2948 from=GBR/AUS
+1975 | The Carpenters | Please Mr. Postman | us=33 uk=28 au=7 pv=7310 from=USA
+1975 | Sweet | Fox on the Run | us=76 uk=37 au=1 pv=4603 from=GBR
+1975 | ABBA | Mamma Mia | us=- uk=21 au=3 pv=6871 from=SWE
+1975 | Minnie Riperton | Lovin' You | us=14 uk=24 au=- pv=9123 from=USA
+1975 | 10cc | I'm Not in Love | us=43 uk=11 au=- pv=18048 from=GBR
+1975 | Bay City Rollers | Bye Bye Baby | us=- uk=1 au=12 pv=2320 from=GBR
+1975 | Rod Stewart | Sailing | us=- uk=2 au=24 pv=3718 from=GBR
+1975 | Freddy Fender | Before the Next Teardrop Falls | us=4 uk=- au=9 pv=1877 from=USA
+1975 | Van McCoy & the Soul City Symphony | The Hustle | us=22 uk=16 au=- pv=3774
+1975 | Roger Whittaker | The Last Farewell | us=- uk=8 au=17 pv=1830 from=GBR
+1975 | Pilot | January | us=- uk=18 au=2 pv=979 from=GBR
+1975 | Hot Chocolate | You Sexy Thing | us=22 uk=41 au=- pv=5671 from=GBR
+1975 | ABBA | SOS | us=- uk=48 au=16 pv=3761 from=SWE
+1975 | Gladys Knight & the Pips | The Way We Were/Try to Remember | us=54 uk=25 au=- pv=7218 from=USA
+1975 | David Essex | Hold Me Close | us=- uk=7 au=25 pv=503 from=GBR
+1975 | Billy Swan | I Can Help | us=44 uk=- au=20 pv=1814 from=USA
+1975 | Gloria Gaynor | Never Can Say Goodbye | us=72 uk=- au=25 pv=7410 from=USA
+1975 | The Drifters | There Goes My First Love | us=- uk=14 au=- pv=14795 from=USA
+1975 | KC and the Sunshine Band | That's the Way (I Like It) | us=45 uk=49 au=- pv=4974 from=USA
+1975 | Morris Albert | Feelings | us=46 uk=42 au=- pv=3278 from=BRA
+1975 | George Baker Selection | Paloma Blanca | us=- uk=- au=11 pv=7706 from=NLD
+1976 | Elton John & Kiki Dee | Don't Go Breaking My Heart | us=2 uk=2 au=5 pv=14155 from=GBR | am=elton
+1976 | ABBA | Dancing Queen | us=12 uk=4 au=3 pv=16379 from=SWE | d=1
+1976 | Wings | Silly Love Songs | us=1 uk=23 au=- pv=6215 from=GBR
+1976 | Rod Stewart | Tonight's the Night (Gonna Be Alright) | us=1 uk=- au=11 pv=3049 from=GBR | tm=tonight.?s the night
+1976 | Wild Cherry | Play That Funky Music | us=5 uk=47 au=- pv=12563 from=USA
+1976 | Eagles | Hotel California | us=19 uk=- au=- pv=43100 from=USA | d=1
+1976 | Stevie Wonder | Sir Duke | us=18 uk=- au=- pv=4589 from=USA/GHA
+1976 | The Four Seasons | December, 1963 (Oh, What a Night) | us=4 uk=10 au=22 pv=10802 from=USA
+1976 | Chicago | If You Leave Me Now | us=48 uk=6 au=10 pv=7246 from=USA
+1976 | C. W. McCall | Convoy | us=57 uk=24 au=10 pv=6437 from=USA
+1976 | ABBA | Fernando | us=- uk=7 au=1 pv=10646 from=SWE
+1976 | Pussycat | Mississippi | us=- uk=3 au=13 pv=2163 from=NLD
+1976 | Leo Sayer | You Make Me Feel Like Dancing | us=13 uk=20 au=- pv=4394 from=GBR
+1976 | Lord David Dundas | Jeans On | us=73 uk=31 au=20 pv=1661 from=GBR
+1976 | The Manhattans | Kiss and Say Goodbye | us=6 uk=25 au=- pv=2122 from=USA
+1976 | Billy Ocean | Love Really Hurts Without You | us=- uk=27 au=19 pv=2155 from=TTO/GBR
+1976 | Bryan Ferry | Let's Stick Together | us=- uk=43 au=9 pv=2250 from=GBR
+1976 | The Miracles | Love Machine | us=7 uk=41 au=- pv=1694 from=USA
+1976 | Sherbet | Howzat! | us=- uk=33 au=4 pv=766 from=AUS
+1976 | Dorothy Moore | Misty Blue | us=19 uk=36 au=- pv=1552 from=USA
+1976 | Dr. Hook | A Little Bit More | us=46 uk=5 au=- pv=1229 from=USA
+1976 | Tina Charles | Dance Little Lady Dance | us=- uk=38 au=14 pv=773 from=GBR
+1976 | Wings | Let 'Em In | us=67 uk=29 au=- pv=4915 from=GBR
+1976 | Paul Simon | 50 Ways to Leave Your Lover | us=8 uk=- au=- pv=6501 from=USA
+1976 | Candi Staton | Young Hearts Run Free | us=90 uk=15 au=- pv=4936 from=USA
+1976 | Starland Vocal Band | Afternoon Delight | us=12 uk=- au=- pv=6330 from=USA | kids=0
+1976 | Brotherhood of Man | Save Your Kisses for Me | us=- uk=1 au=- pv=3488 from=GBR
+1977 | Bee Gees | Stayin' Alive | us=4 uk=33 au=4 pv=15251 from=GBR/AUS | d=1
+1977 | Bee Gees | Night Fever | us=2 uk=7 au=- pv=4185 from=GBR/AUS | d=1
+1977 | Andy Gibb | I Just Want to Be Your Everything | us=2 uk=- au=3 pv=2418 from=GBR
+1977 | The Emotions | Best of My Love | us=3 uk=40 au=- pv=3306 from=USA
+1977 | Fleetwood Mac | Go Your Own Way | us=94 uk=- au=- pv=12625 from=GBR | d=1
+1977 | Bee Gees | How Deep Is Your Love | us=6 uk=19 au=17 pv=11493 from=GBR/AUS
+1977 | Leo Sayer | When I Need You | us=24 uk=4 au=15 pv=2776 from=GBR
+1977 | David Soul | Don't Give Up on Us | us=29 uk=2 au=11 pv=2042 from=USA/GBR
+1977 | Julie Covington | Don't Cry for Me Argentina | us=- uk=3 au=1 pv=14331 from=GBR
+1977 | Wings | Mull of Kintyre | us=- uk=1 au=2 pv=12436 from=GBR
+1977 | Rod Stewart | You're in My Heart (The Final Acclaim) | us=37 uk=25 au=23 pv=1800 from=GBR
+1977 | Donna Summer | I Feel Love | us=- uk=7 au=17 pv=10463 from=USA
+1977 | Kenny Rogers | Lucille | us=43 uk=20 au=25 pv=1769 from=USA
+1977 | Thelma Houston | Don't Leave Me This Way | us=7 uk=- au=21 pv=9228 from=USA
+1977 | Barbra Streisand | Evergreen (Love Theme from A Star Is Born) | us=4 uk=18 au=- pv=3490 from=USA
+1977 | La Belle Epoque | Black Is Black | us=- uk=13 au=5 pv=2563 from=FRA
+1977 | Mary MacGregor | Torn Between Two Lovers | us=10 uk=- au=7 pv=1898 from=USA
+1977 | Boney M | Ma Baker | us=- uk=15 au=24 pv=4240 from=DEU
+1977 | Joe Tex | Ain't Gonna Bump No More (With No Big Fat Woman) | us=86 uk=32 au=22 pv=594 from=USA
+1977 | Smokie | Living Next Door to Alice | us=- uk=- au=5 pv=9747 from=GBR
+1977 | Boz Scaggs | Lido Shuffle | us=74 uk=- au=12 pv=3453 from=USA
+1977 | Alice Cooper | You and Me | us=48 uk=- au=13 pv=1025 from=USA
+1977 | Elvis Presley | Way Down | us=64 uk=8 au=- pv=1674 from=USA
+1977 | Baccara | Yes Sir, I Can Boogie | us=- uk=12 au=- pv=8807 from=ESP
+1977 | Jimmy Buffett | Margaritaville | us=14 uk=- au=- pv=6899 from=USA
+1977 | Rita Coolidge | (Your Love Has Lifted Me) Higher and Higher | us=8 uk=- au=- pv=4370 from=USA
+1977 | ABBA | Knowing Me, Knowing You | us=97 uk=6 au=- pv=3259 from=SWE
+1978 | Blondie | Heart of Glass | us=18 uk=2 au=3 pv=12112 from=USA
+1978 | Gloria Gaynor | I Will Survive | us=6 uk=6 au=25 pv=16319 from=USA | d=1
+1978 | John Travolta & Olivia Newton-John | You're the One That I Want | us=13 uk=2 au=1 pv=6149 from=USA | am=travolta; d=1
+1978 | Frankie Valli | Grease | us=11 uk=29 au=18 pv=6271 from=USA
+1978 | Village People | Y.M.C.A. | us=8 uk=26 au=- pv=35319 from=USA | d=1; alt=YMCA
+1978 | Chic | Le Freak | us=3 uk=- au=8 pv=5742 from=USA | d=1
+1978 | Andy Gibb | Shadow Dancing | us=1 uk=- au=- pv=2145 from=GBR
+1978 | Rod Stewart | Da Ya Think I'm Sexy? | us=4 uk=18 au=7 pv=8125 from=GBR
+1978 | Gerry Rafferty | Baker Street | us=26 uk=17 au=10 pv=14619 from=GBR
+1978 | Commodores | Three Times a Lady | us=10 uk=4 au=8 pv=2936 from=USA
+1978 | Boney M | Rivers of Babylon | us=- uk=1 au=3 pv=12123 from=DEU
+1978 | Kate Bush | Wuthering Heights | us=- uk=12 au=11 pv=22627 from=GBR
+1978 | Boney M | Rasputin | us=- uk=14 au=25 pv=30273 from=DEU
+1978 | Donna Summer | MacArthur Park | us=12 uk=45 au=- pv=33694 from=USA
+1978 | Bonnie Tyler | It's a Heartache | us=24 uk=- au=7 pv=8907 from=GBR
+1978 | Samantha Sang | Emotion | us=14 uk=- au=13 pv=4520 from=AUS
+1978 | The Jacksons | Blame It on the Boogie | us=- uk=37 au=24 pv=10400 from=USA
+1978 | ABBA | Take a Chance on Me | us=32 uk=9 au=- pv=4116 from=SWE
+1978 | A Taste of Honey | Boogie Oogie Oogie | us=9 uk=27 au=- pv=3182 from=USA
+1978 | Eruption | I Can't Stand the Rain | us=95 uk=42 au=15 pv=4840 from=GBR
+1978 | Dan Hill | Sometimes When We Touch | us=33 uk=- au=22 pv=3295 from=CAN
+1978 | John Paul Young | Love Is in the Air | us=46 uk=- au=23 pv=4966 from=AUS
+1978 | Olivia Newton-John | Hopelessly Devoted to You | us=35 uk=36 au=- pv=4471 from=GBR/AUS
+1978 | John Travolta & Olivia Newton-John | Summer Nights | us=69 uk=3 au=- pv=2881 from=USA
+1978 | Scott Fitzgerald and Yvonne Keeley | If I Had Words | us=- uk=41 au=24 pv=2031 from=GBR
+1978 | Johnny Mathis & Deniece Williams | Too Much, Too Little, Too Late | us=28 uk=34 au=- pv=1284 from=USA
+1978 | Player | Baby Come Back | us=7 uk=- au=- pv=7926 from=USA
+1979 | The Knack | My Sharona | us=1 uk=- au=11 pv=16186 from=USA
+1979 | Michael Jackson | Don't Stop 'Til You Get Enough | us=91 uk=23 au=12 pv=20166 from=USA
+1979 | Donna Summer | Hot Stuff | us=7 uk=- au=17 pv=5639 from=USA | kids=0
+1979 | Anita Ward | Ring My Bell | us=9 uk=20 au=- pv=6904 from=USA
+1979 | Pink Floyd | Another Brick in the Wall, Pt. 2 | us=- uk=- au=- pv=0 from=GBR | tm=another brick in the wall.*2
+1979 | M | Pop Muzik | us=40 uk=12 au=10 pv=7477 from=GBR
+1979 | Amii Stewart | Knock on Wood | us=22 uk=38 au=9 pv=4826 from=USA
+1979 | Cliff Richard | We Don't Talk Anymore | us=45 uk=3 au=24 pv=3179 from=GBR
+1979 | The Boomtown Rats | I Don't Like Mondays | us=- uk=4 au=6 pv=16320 from=IRL
+1979 | The Buggles | Video Killed the Radio Star | us=- uk=17 au=18 pv=38023 from=GBR
+1979 | Gary Numan | Cars | us=12 uk=18 au=- pv=6134 from=GBR
+1979 | Suzi Quatro & Chris Norman | Stumblin' In | us=23 uk=- au=16 pv=8868 from=USA
+1979 | Art Garfunkel | Bright Eyes | us=- uk=1 au=20 pv=3571 from=USA
+1979 | Bee Gees | Tragedy | us=16 uk=15 au=- pv=4863 from=GBR/AUS
+1979 | Dr. Hook | When You're in Love with a Beautiful Woman | us=13 uk=5 au=- pv=2487 from=USA
+1979 | Kiss | I Was Made for Lovin' You | us=74 uk=- au=2 pv=13767 from=USA
+1979 | Peaches & Herb | Reunited | us=5 uk=27 au=- pv=1566 from=USA
+1979 | Patrick Hernandez | Born to Be Alive | us=70 uk=- au=5 pv=9066 from=FRA
+1979 | Racey | Some Girls | us=- uk=21 au=4 pv=732 from=GBR
+1979 | The Jacksons | Shake Your Body (Down to the Ground) | us=25 uk=44 au=- pv=5081 from=USA
+1979 | Lene Lovich | Lucky Number | us=- uk=29 au=21 pv=1229 from=USA
+1979 | Earth, Wind & Fire & The Emotions | Boogie Wonderland | us=57 uk=22 au=- pv=4597 from=USA
+1979 | Village People | In the Navy | us=48 uk=49 au=- pv=7631 from=USA
+1979 | The Doobie Brothers | What a Fool Believes | us=19 uk=- au=- pv=11957 from=USA
+1979 | Commodores | Still | us=23 uk=48 au=- pv=1061 from=USA
+1979 | The Police | Message in a Bottle | us=- uk=11 au=- pv=6464 from=GBR
+1979 | ABBA | Chiquitita | us=- uk=16 au=- pv=5798 from=SWE

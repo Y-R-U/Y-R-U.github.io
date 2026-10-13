@@ -1,66 +1,277 @@
 @id hits-1980s
 @title Hits of the 1980s
 @icon 📼
-@sources [{"name":"Billboard Year-End Hot 100 singles (1980–1989)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1980"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
-1980 | Blondie | Call Me
-1980 | Queen | Another One Bites the Dust | d=1
-1979 | Queen | Crazy Little Thing Called Love
-1980 | Olivia Newton-John | Magic
-1979 | Michael Jackson | Rock with You
-1980 | Lipps Inc. | Funkytown | am=lipps
-1980 | AC/DC | Back in Black
-1981 | Kim Carnes | Bette Davis Eyes
-1981 | Diana Ross & Lionel Richie | Endless Love | am=diana ross
-1980 | Kenny Rogers | Lady
-1981 | Rick Springfield | Jessie's Girl
-1980 | Kool & The Gang | Celebration | d=1
-1980 | Dolly Parton | 9 to 5 | alt=Nine to Five
-1981 | Journey | Don't Stop Believin' | d=1
-1981 | Soft Cell | Tainted Love
-1981 | The Human League | Don't You Want Me
-1981 | Olivia Newton-John | Physical
-1982 | Survivor | Eye of the Tiger | d=1
-1981 | Joan Jett & The Blackhearts | I Love Rock 'n' Roll | am=joan jett
-1982 | Paul McCartney & Stevie Wonder | Ebony and Ivory | am=mccartney
-1982 | John Cougar | Jack & Diane | am=mellencamp|cougar
-1982 | Dexys Midnight Runners | Come On Eileen
-1982 | Toto | Africa | d=1
-1983 | The Police | Every Breath You Take | d=1
-1982 | Michael Jackson | Billie Jean | d=1
-1983 | Irene Cara | Flashdance... What a Feeling | tm=flashdance
-1982 | Michael Jackson | Beat It | note=keepyear on Thriller (Nov 1982), single 1983
-1983 | Bonnie Tyler | Total Eclipse of the Heart | d=1
-1983 | Eurythmics | Sweet Dreams (Are Made of This)
-1983 | Culture Club | Karma Chameleon
-1983 | Cyndi Lauper | Girls Just Want to Have Fun | d=1
-1984 | Prince | When Doves Cry
-1984 | Tina Turner | What's Love Got to Do with It
-1983 | Van Halen | Jump
-1984 | Kenny Loggins | Footloose
-1984 | Ray Parker Jr. | Ghostbusters | d=1
-1984 | Madonna | Like a Virgin | d=1
-1984 | Wham! | Wake Me Up Before You Go-Go
-1984 | George Michael | Careless Whisper | am=george michael|wham
-1984 | Foreigner | I Want to Know What Love Is
-1984 | Band Aid | Do They Know It's Christmas?
-1985 | USA for Africa | We Are the World
-1985 | Tears for Fears | Everybody Wants to Rule the World
-1985 | Dire Straits | Money for Nothing
-1985 | Dionne Warwick | That's What Friends Are For | am=dionne
-1986 | Bon Jovi | Livin' on a Prayer | d=1
-1986 | Berlin | Take My Breath Away
-1986 | The Bangles | Walk Like an Egyptian
-1986 | Madonna | Papa Don't Preach
-1987 | U2 | With or Without You
-1987 | Whitney Houston | I Wanna Dance with Somebody (Who Loves Me) | d=1; alt=I Wanna Dance with Somebody
-1987 | Rick Astley | Never Gonna Give You Up | d=1
-1987 | George Michael | Faith
-1987 | Guns N' Roses | Sweet Child o' Mine | d=1
-1987 | INXS | Need You Tonight
-1988 | Bobby McFerrin | Don't Worry, Be Happy | d=1
-1987 | Michael Jackson | Man in the Mirror
-1988 | Paula Abdul | Straight Up
-1989 | Madonna | Like a Prayer
-1989 | Phil Collins | Another Day in Paradise
-1988 | Bette Midler | Wind Beneath My Wings
-1989 | Black Box | Ride on Time
+@sources [{"name":"Billboard Year-End Hot 100 singles (1980s)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1980"},{"name":"UK year-end best-selling singles (Music Week / Official Charts Company)","url":"https://en.wikipedia.org/wiki/1980_in_British_music"},{"name":"Kent Music Report / ARIA year-end top 25 singles (Australia)","url":"https://en.wikipedia.org/wiki/List_of_top_25_singles_for_1980_in_Australia"},{"name":"Wikipedia pageviews (lasting fame) and Wikidata (artist country)","url":"https://www.wikidata.org/"}]
+# chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
+1979 | Queen | Crazy Little Thing Called Love | us=6 uk=25 au=3 pv=9213 from=GBR
+1979 | Michael Jackson | Rock with You | us=4 uk=- au=- pv=12372 from=USA
+1980 | Lipps Inc. | Funkytown | us=8 uk=26 au=9 pv=20652 from=USA | am=lipps
+1980 | Blondie | Call Me | us=1 uk=48 au=19 pv=11231 from=USA
+1980 | Dolly Parton | 9 to 5 | us=9 uk=- au=- pv=18223 from=USA | alt=Nine to Five
+1980 | Kool & The Gang | Celebration | us=6 uk=- au=- pv=6889 from=USA | d=1
+1980 | Kenny Rogers | Lady | us=3 uk=- au=- pv=4125 from=USA
+1980 | Olivia Newton-John | Magic | us=3 uk=- au=- pv=2852 from=GBR/AUS
+1980 | Queen | Another One Bites the Dust | us=65 uk=- au=- pv=19347 from=GBR | d=1
+1980 | AC/DC | Back in Black | us=- uk=- au=- pv=0 from=AUS
+1980 | Diana Ross | Upside Down | us=18 uk=22 au=15 pv=14257 from=USA
+1980 | John Lennon | (Just Like) Starting Over | us=4 uk=10 au=18 pv=3729 from=GBR
+1980 | Barbra Streisand | Woman in Love | us=35 uk=2 au=21 pv=5715 from=USA
+1980 | Pink Floyd | Another Brick in the Wall, Part II | us=2 uk=- au=4 pv=16700 from=GBR
+1980 | The Pretenders | Brass in Pocket | us=41 uk=35 au=5 pv=4163 from=GBR
+1980 | Blondie | The Tide Is High | us=17 uk=6 au=- pv=9947 from=USA
+1980 | ABBA | The Winner Takes It All | us=23 uk=18 au=- pv=17060 from=SWE
+1980 | Paul McCartney | Coming Up | us=7 uk=- au=22 pv=7943 from=GBR
+1980 | Leo Sayer | More Than I Can Say | us=52 uk=49 au=8 pv=2470 from=GBR
+1980 | KC and the Sunshine Band | Please Don't Go | us=19 uk=- au=10 pv=4894 from=USA
+1980 | David Bowie | Ashes to Ashes | us=- uk=14 au=25 pv=6845 from=GBR
+1980 | The Spinners | Working My Way Back to You/Forgive Me, Girl | us=14 uk=11 au=- pv=3151 from=USA
+1980 | The Vapors | Turning Japanese | us=- uk=42 au=2 pv=6424 from=GBR
+1980 | Kenny Rogers | Coward of the County | us=34 uk=9 au=- pv=2842 from=USA
+1980 | Don McLean | Crying | us=40 uk=17 au=- pv=4177 from=USA
+1980 | The Police | Don't Stand So Close to Me | us=71 uk=1 au=- pv=6658 from=GBR
+1980 | Irene Cara | Fame | us=66 uk=2 au=- pv=4344 from=USA
+1980 | Rupert Holmes | Escape (The Piña Colada Song) | us=11 uk=- au=- pv=16364 from=GBR/USA
+1980 | Rocky Burnette | Tired of Toein' the Line | us=48 uk=- au=11 pv=1076 from=USA
+1981 | Soft Cell | Tainted Love | us=11 uk=2 au=3 pv=21076 from=GBR
+1981 | Diana Ross & Lionel Richie | Endless Love | us=2 uk=48 au=8 pv=7619 from=USA | am=diana ross
+1981 | Kim Carnes | Bette Davis Eyes | us=1 uk=- au=6 pv=16998 from=USA
+1981 | The Human League | Don't You Want Me | us=6 uk=1 au=- pv=11264 from=GBR
+1981 | Joan Jett & The Blackhearts | I Love Rock 'n' Roll | us=3 uk=- au=7 pv=11461 from=USA | am=joan jett
+1981 | Rick Springfield | Jessie's Girl | us=5 uk=- au=15 pv=7723 from=AUS/USA
+1981 | Olivia Newton-John | Physical | us=1 uk=- au=- pv=7212 from=GBR/AUS | kids=0
+1981 | Journey | Don't Stop Believin' | us=73 uk=- au=- pv=27211 from=USA | d=1
+1981 | Kim Wilde | Kids in America | us=91 uk=23 au=10 pv=7647 from=GBR
+1981 | Roxy Music | Jealous Guy | us=- uk=22 au=4 pv=6485 from=GBR
+1981 | Phil Collins | In the Air Tonight | us=- uk=38 au=23 pv=27541 from=GBR
+1981 | REO Speedwagon | Keep on Loving You | us=10 uk=- au=20 pv=5270 from=USA
+1981 | Shakin' Stevens | This Ole House | us=- uk=5 au=11 pv=1918 from=GBR
+1981 | Men at Work | Who Can It Be Now? | us=30 uk=- au=9 pv=4501 from=AUS
+1981 | Stars on 45 | Stars on 45 Medley | us=24 uk=- au=2 pv=2217 from=NLD
+1981 | John Lennon | Woman | us=21 uk=17 au=- pv=3653 from=GBR
+1981 | Smokey Robinson | Being with You | us=13 uk=14 au=- pv=944 from=USA
+1981 | Adam and the Ants | Antmusic | us=- uk=30 au=3 pv=1152 from=GBR
+1981 | Shakin' Stevens | You Drive Me Crazy | us=- uk=11 au=19 pv=756 from=GBR
+1981 | Dr Hook | Girls Can Get It | us=- uk=- au=17 pv=29740 from=USA
+1981 | Earth, Wind & Fire | Let's Groove | us=33 uk=50 au=- pv=4375 from=USA
+1981 | Royal Philharmonic Orchestra | Hooked On Classics | us=56 uk=27 au=- pv=2497 from=GBR
+1981 | Blondie | Rapture | us=15 uk=- au=- pv=9760 from=USA
+1981 | Grover Washington, Jr. & Bill Withers | Just the Two of Us | us=18 uk=- au=- pv=10475 from=USA
+1981 | The Tweets | The Birdie Song (Birdie Dance) | us=- uk=10 au=- pv=6384 from=CHE
+1981 | Sheena Easton | Nine to Five (Morning Train) | us=- uk=- au=7 pv=5452 from=GBR
+1981 | Ultravox | Vienna | us=- uk=6 au=- pv=4851 from=GBR
+1982 | Michael Jackson | Billie Jean | us=2 uk=8 au=4 pv=57316 from=USA | d=1
+1982 | Survivor | Eye of the Tiger | us=2 uk=3 au=1 pv=24224 from=USA | d=1
+1982 | Dexys Midnight Runners | Come On Eileen | us=13 uk=1 au=12 pv=18260 from=GBR
+1982 | Michael Jackson | Beat It | us=5 uk=39 au=9 pv=44261 from=USA | note=keepyear on Thriller (Nov 1982), single 1983
+1982 | Paul McCartney & Stevie Wonder | Ebony and Ivory | us=4 uk=9 au=20 pv=6503 from=GBR | am=mccartney
+1982 | Toto | Africa | us=24 uk=41 au=25 pv=21475 from=USA | d=1
+1982 | John Cougar | Jack & Diane | us=7 uk=- au=- pv=7453 from=USA | am=mellencamp
+1982 | Men at Work | Down Under | us=4 uk=7 au=24 pv=26508 from=AUS
+1982 | Chicago | Hard to Say I'm Sorry | us=10 uk=27 au=10 pv=15198 from=USA
+1982 | Toni Basil | Mickey | us=36 uk=13 au=6 pv=13781 from=USA
+1982 | The J. Geils Band | Centerfold | us=5 uk=30 au=4 pv=5506 from=USA
+1982 | Culture Club | Do You Really Want to Hurt Me | us=11 uk=5 au=22 pv=4995 from=GBR
+1982 | Steve Miller Band | Abracadabra | us=9 uk=28 au=13 pv=6444 from=USA
+1982 | Charlene | I've Never Been to Me | us=38 uk=48 au=11 pv=4397 from=USA
+1982 | Dionne Warwick | Heartbreaker | us=80 uk=18 au=18 pv=3281 from=USA
+1982 | John Cougar | Hurts So Good | us=8 uk=- au=16 pv=3020 from=USA
+1982 | Foreigner | Waiting for a Girl Like You | us=19 uk=- au=21 pv=4621 from=USA
+1982 | Bertie Higgins | Key Largo | us=17 uk=- au=5 pv=1755 from=USA
+1982 | Laura Branigan | Gloria | us=56 uk=- au=3 pv=7809 from=USA
+1982 | Duran Duran | Hungry Like the Wolf | us=17 uk=39 au=- pv=6273 from=GBR
+1982 | Tight Fit | The Lion Sleeps Tonight | us=- uk=4 au=- pv=28690 from=GBR
+1982 | Rod Stewart | Young Turks | us=48 uk=- au=23 pv=5220 from=GBR
+1982 | The Go-Go's | Our Lips Are Sealed | us=63 uk=- au=17 pv=7034 from=USA
+1982 | Lindsey Buckingham | Trouble | us=45 uk=- au=8 pv=1964 from=USA
+1982 | Renée and Renato | Save Your Love | us=- uk=23 au=7 pv=673 from=GBR/ITA
+1982 | The Stranglers | Golden Brown | us=- uk=11 au=- pv=28767 from=GBR
+1982 | A Flock of Seagulls | I Ran (So Far Away) | us=67 uk=- au=15 pv=7205 from=GBR
+1983 | Bonnie Tyler | Total Eclipse of the Heart | us=6 uk=5 au=6 pv=43971 from=GBR | d=1
+1983 | The Police | Every Breath You Take | us=1 uk=16 au=10 pv=21211 from=GBR | d=1
+1983 | Culture Club | Karma Chameleon | us=10 uk=1 au=8 pv=13883 from=GBR
+1983 | Irene Cara | Flashdance... What a Feeling | us=3 uk=27 au=2 pv=7101 from=USA | tm=flashdance
+1983 | Cyndi Lauper | Girls Just Want to Have Fun | us=15 uk=32 au=9 pv=20354 from=USA | d=1
+1983 | Eurythmics | Sweet Dreams (Are Made of This) | us=10 uk=11 au=- pv=21836 from=GBR
+1983 | Van Halen | Jump | us=6 uk=- au=- pv=10138 from=USA
+1983 | David Bowie | Let's Dance | us=18 uk=4 au=24 pv=7378 from=GBR
+1983 | Lionel Richie | All Night Long (All Night) | us=12 uk=10 au=23 pv=6568 from=USA
+1983 | Phil Collins | You Can't Hurry Love | us=37 uk=12 au=21 pv=8090 from=GBR
+1983 | Eddy Grant | Electric Avenue | us=22 uk=37 au=20 pv=6389 from=GUY/GBR
+1983 | Prince | 1999 | us=41 uk=30 au=16 pv=6713 from=USA
+1983 | Paul McCartney and Michael Jackson | Say, Say, Say | us=3 uk=22 au=- pv=13968 from=GBR
+1983 | KC and the Sunshine Band | Give It Up | us=75 uk=19 au=17 pv=4589 from=USA
+1983 | Joe Cocker and Jennifer Warnes | Up Where We Belong | us=27 uk=- au=5 pv=9135 from=GBR
+1983 | Elton John | I'm Still Standing | us=74 uk=49 au=19 pv=11638 from=GBR
+1983 | Billy Joel | Uptown Girl | us=39 uk=2 au=- pv=10219 from=USA
+1983 | Thompson Twins | Hold Me Now | us=23 uk=32 au=- pv=4450 from=GBR
+1983 | Kajagoogoo | Too Shy | us=50 uk=13 au=- pv=3999 from=GBR
+1983 | Spandau Ballet | True | us=92 uk=6 au=- pv=10704 from=GBR
+1983 | UB40 | Red Red Wine | us=- uk=3 au=- pv=10953 from=GBR
+1983 | New Order | Blue Monday | us=- uk=18 au=- pv=19505 from=GBR
+1983 | The Human League | (Keep Feeling) Fascination | us=33 uk=43 au=- pv=2530 from=GBR
+1983 | Duran Duran | Is There Something I Should Know? | us=55 uk=17 au=- pv=2058 from=GBR
+1983 | The Flying Pickets | Only You | us=- uk=9 au=- pv=10756 from=GBR
+1983 | Michael Sembello | Maniac | us=9 uk=- au=- pv=9296 from=USA
+1983 | Daryl Hall & John Oates | Maneater | us=7 uk=- au=- pv=7485 from=USA
+1984 | George Michael | Careless Whisper | us=1 uk=5 au=4 pv=24969 from=GBR | am=george michael
+1984 | Foreigner | I Want to Know What Love Is | us=4 uk=11 au=5 pv=16897 from=USA
+1984 | Wham! | Wake Me Up Before You Go-Go | us=3 uk=11 au=5 pv=8713 from=GBR
+1984 | Ray Parker Jr. | Ghostbusters | us=9 uk=9 au=3 pv=9448 from=USA | d=1
+1984 | Prince | When Doves Cry | us=1 uk=28 au=14 pv=11023 from=USA
+1984 | Madonna | Like a Virgin | us=2 uk=18 au=25 pv=10819 from=USA | d=1; kids=0
+1984 | Tina Turner | What's Love Got to Do with It | us=2 uk=20 au=22 pv=9089 from=USA/CHE
+1984 | Band Aid | Do They Know It's Christmas? | us=- uk=1 au=19 pv=38000
+1984 | Kenny Loggins | Footloose | us=4 uk=- au=7 pv=5872 from=USA
+1984 | Lionel Richie | Hello | us=7 uk=7 au=8 pv=5971 from=USA
+1984 | Stevie Wonder | I Just Called to Say I Love You | us=25 uk=2 au=6 pv=8303 from=USA/GHA
+1984 | Bruce Springsteen | Dancing in the Dark | us=14 uk=29 au=1 pv=11711 from=USA
+1984 | Phil Collins | Against All Odds (Take a Look at Me Now) | us=5 uk=19 au=21 pv=11981 from=GBR
+1984 | Frankie Goes to Hollywood | Relax | us=- uk=3 au=16 pv=10571 from=GBR | kids=0
+1984 | Nena | 99 Luftballons | us=28 uk=- au=18 pv=28466 from=DEU
+1984 | Chaka Khan | I Feel for You | us=5 uk=12 au=- pv=6658 from=USA
+1984 | Cyndi Lauper | Time After Time | us=17 uk=25 au=- pv=15775 from=USA
+1984 | Kenny Rogers and Dolly Parton | Islands in the Stream | us=56 uk=- au=10 pv=28322 from=USA
+1984 | Frankie Goes to Hollywood | Two Tribes | us=- uk=4 au=20 pv=3823 from=GBR
+1984 | Laura Branigan | Self Control | us=20 uk=30 au=- pv=8154 from=USA
+1984 | Duran Duran | The Reflex | us=16 uk=17 au=- pv=3499 from=GBR
+1984 | Jim Diamond | I Should Have Known Better | us=- uk=21 au=9 pv=2433 from=GBR
+1984 | Michael Jackson | Thriller | us=78 uk=- au=17 pv=40873 from=USA
+1984 | Dan Hartman | I Can Dream About You | us=29 uk=- au=24 pv=5102 from=USA
+1984 | Matthew Wilder | Break My Stride | us=27 uk=44 au=- pv=7681 from=USA
+1984 | Deniece Williams | Let's Hear It for the Boy | us=13 uk=47 au=- pv=4530 from=USA
+1984 | Wham! | Last Christmas | us=- uk=6 au=- pv=38804 from=GBR
+1985 | USA for Africa | We Are the World | us=20 uk=35 au=1 pv=77338
+1985 | Dire Straits | Money for Nothing | us=8 uk=38 au=7 pv=26560 from=GBR
+1985 | Tears for Fears | Everybody Wants to Rule the World | us=7 uk=24 au=- pv=42306 from=GBR
+1985 | Dionne Warwick | That's What Friends Are For | us=1 uk=- au=12 pv=9550 from=USA | am=dionne
+1985 | a-ha | Take On Me | us=10 uk=9 au=12 pv=23500 from=NOR
+1985 | Madonna | Crazy for You | us=9 uk=16 au=3 pv=6747 from=USA
+1985 | Tears for Fears | Shout | us=21 uk=50 au=14 pv=7793 from=GBR
+1985 | Starship | We Built This City | us=14 uk=- au=11 pv=16247 from=USA
+1985 | David Bowie and Mick Jagger | Dancing in the Street | us=- uk=6 au=11 pv=10082 from=GBR
+1985 | Jennifer Rush | The Power of Love | us=- uk=1 au=23 pv=13770 from=USA
+1985 | UB40 and Chrissie Hynde | I Got You Babe | us=- uk=15 au=8 pv=9498 from=GBR
+1985 | Dead or Alive | You Spin Me Round (Like a Record) | us=- uk=19 au=13 pv=14018 from=GBR
+1985 | Philip Bailey and Phil Collins | Easy Lover | us=12 uk=12 au=- pv=9001 from=USA
+1985 | Tina Turner | We Don't Need Another Hero (Thunderdome) | us=57 uk=43 au=20 pv=3733 from=USA/CHE
+1985 | Huey Lewis and the News | The Power of Love | us=15 uk=- au=24 pv=8454 from=USA
+1985 | Feargal Sharkey | A Good Heart | us=- uk=8 au=8 pv=2202 from=GBR
+1985 | Murray Head | One Night in Bangkok | us=54 uk=- au=15 pv=18260 from=GBR
+1985 | Whitney Houston | Saving All My Love for You | us=23 uk=17 au=- pv=4527 from=USA
+1985 | Glenn Frey | The Heat Is On | us=19 uk=- au=22 pv=4181 from=USA
+1985 | Mental As Anything | Live It Up | us=- uk=31 au=4 pv=1976 from=AUS
+1985 | Harold Faltermeyer | Axel F | us=61 uk=13 au=- pv=11433 from=DEU
+1985 | Kool & the Gang | Cherish | us=17 uk=23 au=- pv=2169 from=USA
+1985 | Duran Duran | A View to a Kill | us=35 uk=34 au=- pv=5491 from=GBR
+1985 | Stevie Wonder | Part-Time Lover | us=22 uk=37 au=- pv=3260 from=USA/GHA
+1985 | The Pointer Sisters | Neutron Dance | us=38 uk=- au=17 pv=2086 from=USA
+1985 | Commodores | Nightshift | us=40 uk=41 au=- pv=6524 from=USA
+1985 | Katrina and the Waves | Walking on Sunshine | us=75 uk=- au=21 pv=8619 from=GBR
+1986 | The Bangles | Walk Like an Egyptian | us=1 uk=23 au=7 pv=14541 from=USA
+1986 | Berlin | Take My Breath Away | us=27 uk=9 au=6 pv=13895 from=USA
+1986 | Madonna | Papa Don't Preach | us=29 uk=8 au=9 pv=9098 from=USA | kids=0
+1986 | Bon Jovi | Livin' on a Prayer | us=10 uk=41 au=17 pv=14130 from=USA | d=1
+1986 | Billy Ocean | When the Going Gets Tough, the Tough Get Going | us=31 uk=7 au=2 pv=4604 from=TTO/GBR
+1986 | Kim Wilde | You Keep Me Hangin' On | us=34 uk=34 au=6 pv=9351 from=GBR
+1986 | The Bangles | Manic Monday | us=48 uk=37 au=16 pv=12941 from=USA
+1986 | Samantha Fox | Touch Me (I Want Your Body) | us=44 uk=30 au=3 pv=2210 from=GBR
+1986 | Europe | The Final Countdown | us=- uk=16 au=10 pv=20777 from=SWE
+1986 | The Communards | Don't Leave Me This Way | us=- uk=1 au=17 pv=9228 from=GBR
+1986 | Robert Palmer | Addicted to Love | us=10 uk=- au=10 pv=8079 from=GBR/USA
+1986 | Chris de Burgh | The Lady in Red | us=21 uk=6 au=- pv=8684 from=ARG/IRL/GBR
+1986 | Diana Ross | Chain Reaction | us=- uk=5 au=1 pv=2834 from=USA
+1986 | Bananarama | Venus | us=38 uk=- au=4 pv=13427 from=GBR
+1986 | Falco | Rock Me Amadeus | us=28 uk=13 au=- pv=9935 from=AUT
+1986 | Whitney Houston | How Will I Know | us=6 uk=- au=22 pv=5413 from=USA
+1986 | Peter Gabriel | Sledgehammer | us=23 uk=28 au=- pv=10744 from=GBR
+1986 | Cliff Richard & The Young Ones | Living Doll | us=- uk=4 au=7 pv=1684 from=GBR
+1986 | Prince and The Revolution | Kiss | us=19 uk=- au=25 pv=7400 from=USA
+1986 | Patti LaBelle and Michael McDonald | On My Own | us=4 uk=22 au=- pv=3170 from=USA
+1986 | Peter Cetera | Glory of Love | us=14 uk=26 au=- pv=4971 from=USA
+1986 | Paul Simon | You Can Call Me Al | us=- uk=40 au=21 pv=12448 from=USA
+1986 | Simply Red | Holding Back the Years | us=22 uk=33 au=- pv=9022 from=GBR
+1986 | Huey Lewis and the News | Stuck with You | us=21 uk=- au=13 pv=1992 from=USA
+1986 | Cutting Crew | (I Just) Died In Your Arms | us=32 uk=44 au=- pv=13097 from=GBR
+1986 | Nu Shooz | I Can't Wait | us=26 uk=38 au=- pv=3396 from=USA
+1986 | Lionel Richie | Dancing on the Ceiling | us=39 uk=- au=15 pv=1859 from=USA
+1987 | Rick Astley | Never Gonna Give You Up | us=4 uk=1 au=8 pv=20456 from=GBR | d=1
+1987 | Whitney Houston | I Wanna Dance with Somebody (Who Loves Me) | us=4 uk=3 au=11 pv=13870 from=USA | d=1; alt=I Wanna Dance with Somebody
+1987 | George Michael | Faith | us=1 uk=29 au=19 pv=7513 from=GBR
+1987 | U2 | With or Without You | us=15 uk=45 au=- pv=8898 from=IRL
+1987 | Guns N' Roses | Sweet Child o' Mine | us=5 uk=- au=- pv=16135 from=USA | d=1
+1987 | Michael Jackson | Man in the Mirror | us=21 uk=- au=- pv=20563 from=USA
+1987 | INXS | Need You Tonight | us=2 uk=- au=- pv=5057 from=AUS
+1987 | Starship | Nothing's Gonna Stop Us Now | us=5 uk=2 au=12 pv=20691 from=USA
+1987 | Los Lobos | La Bamba | us=11 uk=18 au=2 pv=19521 from=USA
+1987 | Tiffany | I Think We're Alone Now | us=18 uk=5 au=32 pv=24405 from=USA
+1987 | George Harrison | Got My Mind Set on You | us=3 uk=15 au=17 pv=9565 from=GBR
+1987 | Aretha Franklin and George Michael | I Knew You Were Waiting (For Me) | us=36 uk=11 au=20 pv=5836 from=USA
+1987 | Pet Shop Boys | Always on My Mind | us=80 uk=14 au=35 pv=21948 from=GBR
+1987 | Glenn Medeiros | Nothing's Gonna Change My Love for You | us=85 uk=6 au=36 pv=11449 from=USA
+1987 | Bill Medley and Jennifer Warnes | (I've Had) The Time of My Life | us=27 uk=- au=1 pv=12330 from=USA
+1987 | Heart | Alone | us=2 uk=34 au=- pv=6441 from=USA
+1987 | Mel and Kim | Respectable | us=- uk=6 au=5 pv=1222 from=GBR
+1987 | The Firm | Star Trekkin' | us=- uk=9 au=24 pv=2457 from=GBR
+1987 | Michael Jackson | Bad | us=59 uk=- au=22 pv=21529 from=USA
+1987 | Madonna | La Isla Bonita | us=58 uk=17 au=- pv=13612 from=USA
+1987 | Michael Jackson | I Just Can't Stop Loving You | us=45 uk=30 au=- pv=10623 from=USA
+1987 | Club Nouveau | Lean on Me | us=29 uk=41 au=- pv=8395 from=USA
+1987 | Atlantic Starr | Always | us=14 uk=25 au=- pv=1648 from=USA
+1987 | Angry Anderson | Suddenly | us=- uk=16 au=13 pv=899 from=AUS
+1987 | Madonna | Who's That Girl | us=42 uk=20 au=- pv=3552 from=USA
+1987 | Terence Trent D'Arby | Wishing Well | us=12 uk=46 au=- pv=2495 from=USA
+1987 | Rick Astley | Whenever You Need Somebody | us=- uk=26 au=12 pv=855 from=GBR
+1988 | Bobby McFerrin | Don't Worry, Be Happy | us=37 uk=43 au=14 pv=11397 from=USA | d=1
+1988 | Bette Midler | Wind Beneath My Wings | us=7 uk=- au=11 pv=7665 from=USA
+1988 | Paula Abdul | Straight Up | us=4 uk=31 au=- pv=5058 from=USA
+1988 | Belinda Carlisle | Heaven Is a Place on Earth | us=7 uk=17 au=11 pv=10488 from=USA
+1988 | Phil Collins | A Groovy Kind of Love | us=29 uk=7 au=20 pv=5481 from=GBR
+1988 | Billy Ocean | Get Outta My Dreams, Get into My Car | us=15 uk=27 au=4 pv=2798 from=TTO/GBR
+1988 | Kylie Minogue | I Should Be So Lucky | us=- uk=3 au=5 pv=4495 from=AUS/GBR
+1988 | Taylor Dayne | Tell It to My Heart | us=53 uk=23 au=43 pv=4186 from=USA
+1988 | The Beach Boys | Kokomo | us=42 uk=- au=9 pv=17968 from=USA
+1988 | Cheap Trick | The Flame | us=14 uk=- au=3 pv=3637 from=USA
+1988 | Terence Trent D'Arby | Sign Your Name | us=58 uk=32 au=27 pv=2314 from=USA
+1988 | Womack & Womack | Teardrops | us=- uk=10 au=12 pv=3009 from=USA
+1988 | Kylie Minogue & Jason Donovan | Especially for You | us=- uk=4 au=17 pv=2791 from=AUS/GBR
+1988 | Robert Palmer | Simply Irresistible | us=23 uk=- au=2 pv=2890 from=GBR/USA
+1988 | Kylie Minogue | The Loco-Motion | us=49 uk=11 au=- pv=12490 from=AUS/GBR
+1988 | Salt-n-Pepa | Push It | us=- uk=15 au=29 pv=5036 from=USA
+1988 | Fairground Attraction | Perfect | us=- uk=13 au=6 pv=1550 from=GBR
+1988 | Enya | Orinoco Flow | us=- uk=18 au=43 pv=9939 from=IRL
+1988 | Milli Vanilli | Girl You Know It's True | us=8 uk=40 au=- pv=3847 from=DEU
+1988 | U2 | Desire | us=56 uk=45 au=28 pv=1486 from=IRL
+1988 | Eric Carmen | Hungry Eyes | us=25 uk=- au=39 pv=6516 from=USA
+1988 | Kylie Minogue | Got to Be Certain | us=- uk=21 au=18 pv=1083 from=AUS/GBR
+1988 | Tiffany | Could've Been | us=8 uk=- au=38 pv=1432 from=USA
+1988 | Breathe | Hands to Heaven | us=9 uk=44 au=- pv=1709 from=GBR
+1988 | Sabrina | Boys (Summertime Love) | us=- uk=35 au=41 pv=4364 from=ITA
+1988 | Wet Wet Wet | With a Little Help from My Friends | us=- uk=9 au=- pv=15650 from=GBR
+1988 | Cheap Trick | Don't Be Cruel | us=70 uk=- au=13 pv=3460 from=USA
+1989 | Madonna | Like a Prayer | us=25 uk=11 au=1 pv=23430 from=USA
+1989 | Black Box | Ride on Time | us=- uk=1 au=14 pv=5324 from=ITA
+1989 | Phil Collins | Another Day in Paradise | us=7 uk=46 au=- pv=19557 from=GBR
+1989 | Technotronic | Pump Up the Jam | us=13 uk=8 au=27 pv=21449 from=BEL
+1989 | The Bangles | Eternal Flame | us=32 uk=3 au=4 pv=12898 from=USA
+1989 | Richard Marx | Right Here Waiting | us=11 uk=30 au=14 pv=7492 from=USA
+1989 | Mike + The Mechanics | The Living Years | us=31 uk=18 au=10 pv=6460 from=GBR
+1989 | Milli Vanilli | Girl I'm Gonna Miss You | us=16 uk=15 au=9 pv=1950 from=DEU
+1989 | Linda Ronstadt | Don't Know Much | us=20 uk=23 au=12 pv=3740 from=USA
+1989 | The B-52's | Love Shack | us=47 uk=23 au=10 pv=9413 from=USA
+1989 | Cher | If I Could Turn Back Time | us=35 uk=43 au=5 pv=10154 from=USA
+1989 | Simply Red | If You Don't Know Me by Now | us=24 uk=38 au=13 pv=6867 from=GBR
+1989 | New Kids on the Block | You Got It (The Right Stuff) | us=52 uk=17 au=8 pv=2039 from=USA
+1989 | Fine Young Cannibals | She Drives Me Crazy | us=18 uk=- au=6 pv=6062 from=GBR
+1989 | Roxette | The Look | us=17 uk=- au=2 pv=3950 from=SWE
+1989 | Billy Joel | We Didn't Start the Fire | us=35 uk=- au=37 pv=24760 from=USA
+1989 | Lisa Stansfield | All Around the World | us=21 uk=12 au=- pv=4094 from=GBR
+1989 | Alice Cooper | Poison | us=91 uk=40 au=18 pv=7180 from=USA
+1989 | Soul II Soul | Back to Life (However Do You Want Me) | us=42 uk=5 au=- pv=6009 from=GBR
+1989 | Jive Bunny and the Mastermixers | Swing the Mood | us=97 uk=2 au=16 pv=1078 from=GBR
+1989 | Kaoma | Lambada | us=- uk=34 au=24 pv=8034 from=FRA/BRA
+1989 | Martika | Toy Soldiers | us=29 uk=- au=30 pv=7927 from=USA
+1989 | Roy Orbison | You Got It | us=- uk=33 au=23 pv=6686 from=USA
+1989 | Tina Turner | The Best | us=- uk=41 au=33 pv=10772 from=USA/CHE
+1989 | Debbie Gibson | Lost in Your Eyes | us=13 uk=- au=27 pv=2170 from=USA
+1989 | Bad English | When I See You Smile | us=34 uk=- au=21 pv=2332 from=USA
+1989 | Prince | Batdance | us=44 uk=- au=19 pv=2625 from=USA

@@ -1,49 +1,49 @@
 {
- "dropped": [],
+ "dropped": [
+  "YEAR 2000 vs apple 1998  Sonique — It Feels So Good  [It Feels so Good]",
+  "YEAR 2000 vs apple 2017  Bob the Builder — Can We Fix It?  [Can We Fix It? Yes We Can! (Opening Theme) - Single]",
+  "YEAR 2001 vs apple 1999  Crazy Town — Butterfly  [The Gift of Game]",
+  "NO MATCH  2001 Bob the Builder — Mambo No. 5",
+  "NO MATCH  2003 Dixie Chicks — Landslide",
+  "NO MATCH  2004 Eric Prydz — Call on Me",
+  "NO MATCH  2005 Green Day — Boulevard of Broken Dreams",
+  "YEAR 2005 vs apple 2000  Crazy Frog — Axel F  [Axel F - EP]",
+  "NO MATCH  2009 Lady Gaga — Paparazzi"
+ ],
  "offby": [
-  "2006 apple 2005 (earliest original 2005)  Gnarls Barkley — Crazy  [St. Elsewhere]",
-  "2006 apple 2005 (earliest original 2005)  Snow Patrol — Chasing Cars  [Eyes Open (Bonus Track Version)]"
+  "2000 apple 1999 (earliest original 1999)  Sisqó — Thong Song  [Unleash the Dragon]",
+  "2000 apple 1999 (earliest original 1999)  Bomfunk MCs — Freestyler  [In Stereo]",
+  "2000 apple 1999 (earliest original 1999)  Melanie C — Never Be the Same Again  [Northern Star]",
+  "2001 apple 2001 (earliest original 1999)  City High — What Would You Do?  [City High (Expanded Edition)]",
+  "2002 apple 2002 (earliest original 2000)  Las Ketchup — The Ketchup Song (Aserejé)  [Aserejé (The Ketchup Song) - Single]",
+  "2001 apple 2001 (earliest original 1968)  Elvis vs JXL — A Little Less Conversation  [A Little Less Conversation: Elvis vs JXL - Single]",
+  "2003 apple 2003 (earliest original 2001)  Kevin Lyttle — Turn Me On  [Turn Me On - Single]",
+  "2004 apple 2004 (earliest original 2001)  Destiny's Child — Lose My Breath  [Destiny Fulfilled]",
+  "2004 apple 2004 (earliest original 2000)  DJ Casper — Cha Cha Slide  [Cha Cha Slide - Single]",
+  "2004 apple 2004 (earliest original 1990)  Ciara — 1, 2 Step  [1,2 Step]",
+  "2006 apple 2005 (earliest original -)  Panic! at the Disco — I Write Sins Not Tragedies  [Rock Classics: The Collection]",
+  "2007 apple 2006 (earliest original 2005)  Nickelback — Rockstar  [The Best of Nickelback, Vol. 1]"
  ],
  "items": [
-  {
-   "id": "breathe-faith-hill",
-   "appleYear": 1999,
-   "album": "Breathe",
-   "appleArtist": "Faith Hill",
-   "appleTitle": "Breathe",
-   "year": 1999
-  },
   {
    "id": "maria-maria-santana",
    "appleYear": 1999,
    "album": "Knuffelrock 14",
    "appleArtist": "Santana",
    "appleTitle": "Maria Maria (feat. The Product G&B)",
-   "year": 1999
+   "store": "US",
+   "year": 1999,
+   "d": 1
   },
   {
-   "id": "say-my-name-destinys-child",
-   "appleYear": 2000,
-   "album": "Say My Name - EP",
-   "appleArtist": "Destiny's Child",
-   "appleTitle": "Say My Name (feat. Kobe Bryant)",
-   "year": 2000
-  },
-  {
-   "id": "oops-i-did-it-again-britney-spears",
-   "appleYear": 2000,
-   "album": "Oops!... I Did It Again (25th Anniversary Edition)",
-   "appleArtist": "Britney Spears",
-   "appleTitle": "Oops!...I Did It Again",
-   "year": 2000
-  },
-  {
-   "id": "bye-bye-bye-nsync",
-   "appleYear": 2000,
-   "album": "No Strings Attached",
-   "appleArtist": "*NSYNC",
-   "appleTitle": "Bye Bye Bye",
-   "year": 2000
+   "id": "breathe-faith-hill",
+   "appleYear": 1999,
+   "album": "Breathe",
+   "appleArtist": "Faith Hill",
+   "appleTitle": "Breathe",
+   "store": "US",
+   "year": 1999,
+   "d": 2
   },
   {
    "id": "music-madonna",
@@ -51,15 +51,29 @@
    "album": "Music",
    "appleArtist": "Madonna",
    "appleTitle": "Music",
-   "year": 2000
+   "store": "US",
+   "year": 2000,
+   "d": 1
   },
   {
-   "id": "its-my-life-bon-jovi",
+   "id": "oops-i-did-it-again-britney-spears",
    "appleYear": 2000,
-   "album": "Crush",
-   "appleArtist": "Bon Jovi",
-   "appleTitle": "It's My Life",
-   "year": 2000
+   "album": "Oops!... I Did It Again (25th Anniversary Edition)",
+   "appleArtist": "Britney Spears",
+   "appleTitle": "Oops!...I Did It Again",
+   "store": "US",
+   "year": 2000,
+   "d": 1
+  },
+  {
+   "id": "say-my-name-destinys-child",
+   "appleYear": 2000,
+   "album": "Say My Name - EP",
+   "appleArtist": "Destiny's Child",
+   "appleTitle": "Say My Name (feat. Kobe Bryant)",
+   "store": "US",
+   "year": 2000,
+   "d": 1
   },
   {
    "id": "who-let-the-dogs-out-baha-men",
@@ -67,7 +81,19 @@
    "album": "Who Let the Dogs Out",
    "appleArtist": "Baha Men",
    "appleTitle": "Who Let the Dogs Out",
-   "year": 2000
+   "store": "US",
+   "year": 2000,
+   "d": 1
+  },
+  {
+   "id": "bye-bye-bye-nsync",
+   "appleYear": 2000,
+   "album": "No Strings Attached",
+   "appleArtist": "*NSYNC",
+   "appleTitle": "Bye Bye Bye",
+   "store": "US",
+   "year": 2000,
+   "d": 1
   },
   {
    "id": "hanging-by-a-moment-lifehouse",
@@ -75,23 +101,19 @@
    "album": "No Name Face",
    "appleArtist": "Lifehouse",
    "appleTitle": "Hanging By a Moment",
-   "year": 2000
+   "store": "US",
+   "year": 2000,
+   "d": 2
   },
   {
-   "id": "fallin-alicia-keys",
-   "appleYear": 2001,
-   "album": "Songs In A Minor",
-   "appleArtist": "Alicia Keys",
-   "appleTitle": "Fallin'",
-   "year": 2001
-  },
-  {
-   "id": "lady-marmalade-christina-aguilera-lil-kim-mya-and-p-nk",
-   "appleYear": 2001,
-   "album": "Music From Baz Luhrmann's Film Moulin Rouge (Original Motion Picture Soundtrack)",
-   "appleArtist": "Christina Aguilera, Lil' Kim, Mýa & P!nk",
-   "appleTitle": "Lady Marmalade",
-   "year": 2001
+   "id": "its-my-life-bon-jovi",
+   "appleYear": 2000,
+   "album": "Crush",
+   "appleArtist": "Bon Jovi",
+   "appleTitle": "It's My Life",
+   "store": "US",
+   "year": 2000,
+   "d": 1
   },
   {
    "id": "independent-women-pt-1-destinys-child",
@@ -99,15 +121,196 @@
    "album": "Survivor (International Edition)",
    "appleArtist": "Destiny's Child",
    "appleTitle": "Independent Women, Pt. 1",
-   "year": 2000
+   "store": "US",
+   "year": 2000,
+   "d": 2
   },
   {
-   "id": "cant-get-you-out-of-my-head-kylie-minogue",
+   "id": "thong-song-sisqo",
+   "appleYear": 1999,
+   "album": "Unleash the Dragon",
+   "appleArtist": "Sisqó",
+   "appleTitle": "Thong Song (Edited Version)",
+   "store": "US",
+   "year": 2000,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "cant-fight-the-moonlight-leann-rimes",
+   "appleYear": 2000,
+   "album": "I Need You",
+   "appleArtist": "LeAnn Rimes",
+   "appleTitle": "Can't Fight the Moonlight",
+   "store": "US",
+   "year": 2000,
+   "d": 1
+  },
+  {
+   "id": "teenage-dirtbag-wheatus",
+   "appleYear": 2000,
+   "album": "Wheatus",
+   "appleArtist": "Wheatus",
+   "appleTitle": "Teenage Dirtbag",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2000,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "stan-eminem",
+   "appleYear": 2000,
+   "album": "The Marshall Mathers LP",
+   "appleArtist": "Eminem",
+   "appleTitle": "Stan (feat. Dido)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2000,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "independent-women-part-i-destinys-child",
+   "appleYear": 2000,
+   "album": "Charlie's Angels - Music From the Motion Picture",
+   "appleArtist": "Destiny's Child",
+   "appleTitle": "Independent Women, Pt. I",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "groovejet-if-this-aint-love-spiller",
+   "appleYear": 2000,
+   "album": "Groovejet (If This Ain't Love) [feat. Sophie Ellis-Bextor] - EP",
+   "appleArtist": "Spiller",
+   "appleTitle": "Groovejet (If This Ain't Love) [feat. Sophie Ellis-Bextor]",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "freestyler-bomfunk-mcs",
+   "appleYear": 1999,
+   "album": "In Stereo",
+   "appleArtist": "Bomfunk MC's",
+   "appleTitle": "Freestyler",
+   "store": "US",
+   "year": 2000,
+   "d": 1
+  },
+  {
+   "id": "rock-dj-robbie-williams",
+   "appleYear": 2000,
+   "album": "Sing When You're Winning",
+   "appleArtist": "Robbie Williams",
+   "appleTitle": "Rock DJ",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "american-pie-madonna",
+   "appleYear": 2000,
+   "album": "American Pie - Single",
+   "appleArtist": "Madonna",
+   "appleTitle": "American Pie",
+   "store": "US",
+   "year": 2000,
+   "d": 1
+  },
+  {
+   "id": "kryptonite-3-doors-down",
+   "appleYear": 2000,
+   "album": "The Better Life",
+   "appleArtist": "3 Doors Down",
+   "appleTitle": "Kryptonite",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "jumpin-jumpin-destinys-child",
+   "appleYear": 2000,
+   "album": "Jumpin', Jumpin' - EP",
+   "appleArtist": "Destiny's Child",
+   "appleTitle": "Jumpin', Jumpin'",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "fill-me-in-craig-david",
+   "appleYear": 2000,
+   "album": "Born to Do It",
+   "appleArtist": "Craig David",
+   "appleTitle": "Fill Me In",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "pure-shores-all-saints",
+   "appleYear": 2000,
+   "album": "Saints & Sinners (25th Anniversary Edition)",
+   "appleArtist": "All Saints",
+   "appleTitle": "Pure Shores",
+   "store": "US",
+   "year": 2000,
+   "d": 1
+  },
+  {
+   "id": "7-days-craig-david",
+   "appleYear": 2000,
+   "album": "Born to Do It",
+   "appleArtist": "Craig David",
+   "appleTitle": "7 Days",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "never-be-the-same-again-melanie-c",
+   "appleYear": 1999,
+   "album": "Northern Star",
+   "appleArtist": "Melanie C",
+   "appleTitle": "Never Be the Same Again",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "the-real-slim-shady-eminem",
+   "appleYear": 2000,
+   "album": "The Marshall Mathers LP",
+   "appleArtist": "Eminem",
+   "appleTitle": "The Real Slim Shady",
+   "store": "US",
+   "year": 2000,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "with-arms-wide-open-creed",
+   "appleYear": 2000,
+   "album": "Greatest Hits",
+   "appleArtist": "Creed",
+   "appleTitle": "With Arms Wide Open",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "lady-marmalade-christina-aguilera-lil-kim-mya-and-p-nk",
    "appleYear": 2001,
-   "album": "Fever (Deluxe Edition)",
-   "appleArtist": "Kylie Minogue",
-   "appleTitle": "Can't Get You Out of My Head",
-   "year": 2001
+   "album": "Music From Baz Luhrmann's Film Moulin Rouge (Original Motion Picture Soundtrack)",
+   "appleArtist": "Christina Aguilera, Lil' Kim, Mýa & P!nk",
+   "appleTitle": "Lady Marmalade",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2001,
+   "d": 2
   },
   {
    "id": "how-you-remind-me-nickelback",
@@ -115,15 +318,244 @@
    "album": "Silver Side Up",
    "appleArtist": "Nickelback",
    "appleTitle": "How You Remind Me",
-   "year": 2001
+   "store": "US",
+   "year": 2001,
+   "d": 1
   },
   {
-   "id": "hot-in-herre-nelly",
-   "appleYear": 2002,
-   "album": "Nellyville",
+   "id": "cant-get-you-out-of-my-head-kylie-minogue",
+   "appleYear": 2001,
+   "album": "Fever (Deluxe Edition)",
+   "appleArtist": "Kylie Minogue",
+   "appleTitle": "Can't Get You Out of My Head",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "fallin-alicia-keys",
+   "appleYear": 2001,
+   "album": "Songs In A Minor",
+   "appleArtist": "Alicia Keys",
+   "appleTitle": "Fallin'",
+   "store": "US",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "it-wasnt-me-shaggy",
+   "appleYear": 2000,
+   "album": "Hot Shot",
+   "appleArtist": "Shaggy",
+   "appleTitle": "It Wasn't Me (feat. Ricardo Ducent)",
+   "store": "US",
+   "year": 2000,
+   "d": 1
+  },
+  {
+   "id": "angel-shaggy",
+   "appleYear": 2001,
+   "album": "Angel - EP",
+   "appleArtist": "Shaggy",
+   "appleTitle": "Angel (Instrumental)",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "hero-enrique-iglesias",
+   "appleYear": 2001,
+   "album": "Escape",
+   "appleArtist": "Enrique Iglesias",
+   "appleTitle": "Hero",
+   "store": "US",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "ms-jackson-outkast",
+   "appleYear": 2000,
+   "album": "Ms. Jackson / Sole Sunday",
+   "appleArtist": "Outkast",
+   "appleTitle": "Ms. Jackson (Instrumental)",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "let-me-blow-ya-mind-eve",
+   "appleYear": 2001,
+   "album": "Scorpion",
+   "appleArtist": "Eve",
+   "appleTitle": "Let Me Blow Ya Mind (feat. Gwen Stefani & Stevie J.)",
+   "store": "US",
+   "year": 2001,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "im-like-a-bird-nelly-furtado",
+   "appleYear": 2000,
+   "album": "Whoa, Nelly!",
+   "appleArtist": "Nelly Furtado",
+   "appleTitle": "I'm Like a Bird",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "what-would-you-do-city-high",
+   "appleYear": 2001,
+   "album": "City High (Expanded Edition)",
+   "appleArtist": "City High",
+   "appleTitle": "What Would You Do? (Instrumental)",
+   "store": "US",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "smooth-criminal-alien-ant-farm",
+   "appleYear": 2001,
+   "album": "Smooth Criminal - Single",
+   "appleArtist": "Alien Ant Farm",
+   "appleTitle": "Smooth Criminal",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "follow-me-uncle-kracker",
+   "appleYear": 2000,
+   "album": "Double Wide",
+   "appleArtist": "Uncle Kracker",
+   "appleTitle": "Follow Me",
+   "store": "US",
+   "year": 2000,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "survivor-destinys-child",
+   "appleYear": 2001,
+   "album": "Survivor (International Edition)",
+   "appleArtist": "Destiny's Child",
+   "appleTitle": "Survivor",
+   "store": "US",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "because-i-got-high-afroman",
+   "appleYear": 2001,
+   "album": "The Good Times",
+   "appleArtist": "Afroman",
+   "appleTitle": "Because I Got High",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2001,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "drops-of-jupiter-tell-me-train",
+   "appleYear": 2001,
+   "album": "Drops of Jupiter",
+   "appleArtist": "Train",
+   "appleTitle": "Drops of Jupiter (Tell Me)",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "hey-baby-uhh-ahh-dj-otzi",
+   "appleYear": 2001,
+   "album": "Hey Baby - Reloaded - Single",
+   "appleArtist": "DJ Ötzi",
+   "appleTitle": "Hey Baby - Reloaded",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "whole-again-atomic-kitten",
+   "appleYear": 2000,
+   "album": "Right Now",
+   "appleArtist": "Atomic Kitten",
+   "appleTitle": "Whole Again",
+   "store": "US",
+   "year": 2000,
+   "d": 2
+  },
+  {
+   "id": "its-raining-men-geri-halliwell",
+   "appleYear": 2001,
+   "album": "It's Raining Men - Single",
+   "appleArtist": "Geri Halliwell",
+   "appleTitle": "It's Raining Men",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "uptown-girl-westlife",
+   "appleYear": 2001,
+   "album": "Coast to Coast (Expanded Edition)",
+   "appleArtist": "Westlife",
+   "appleTitle": "Uptown Girl (Radio Edit)",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "dont-stop-movin-s-club-7",
+   "appleYear": 2001,
+   "album": "Sunshine",
+   "appleArtist": "S Club",
+   "appleTitle": "Don't Stop Movin'",
+   "store": "US",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "clint-eastwood-gorillaz",
+   "appleYear": 2001,
+   "album": "G Sides",
+   "appleArtist": "Gorillaz",
+   "appleTitle": "Clint Eastwood (Phi Life Cypher Version)",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "rollin-limp-bizkit",
+   "appleYear": 2001,
+   "album": "The Fast And The Furious (Original Motion Picture Soundtrack)",
+   "appleArtist": "Limp Bizkit",
+   "appleTitle": "Rollin' (Urban Assault Vehicle) [feat. Redman, Method Man & DMX]",
+   "store": "US",
+   "year": 2001,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "all-for-you-janet",
+   "appleYear": 2001,
+   "album": "All For You",
+   "appleArtist": "Janet Jackson",
+   "appleTitle": "All For You",
+   "store": "US",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "ride-wit-me-nelly",
+   "appleYear": 2000,
+   "album": "(Hot S**t) Country Grammar - EP",
    "appleArtist": "Nelly",
-   "appleTitle": "Hot in Herre",
-   "year": 2002
+   "appleTitle": "Ride Wit Me",
+   "store": "US",
+   "year": 2000,
+   "d": 2
   },
   {
    "id": "dilemma-nelly-and-kelly-rowland",
@@ -131,31 +563,11 @@
    "album": "Nellyville",
    "appleArtist": "Nelly",
    "appleTitle": "Dilemma (feat. Kelly Rowland)",
-   "year": 2002
-  },
-  {
-   "id": "a-thousand-miles-vanessa-carlton",
-   "appleYear": 2002,
-   "album": "Be Not Nobody",
-   "appleArtist": "Vanessa Carlton",
-   "appleTitle": "A Thousand Miles",
-   "year": 2002
-  },
-  {
-   "id": "complicated-avril-lavigne",
-   "appleYear": 2002,
-   "album": "Let Go",
-   "appleArtist": "Avril Lavigne",
-   "appleTitle": "Complicated",
-   "year": 2002
-  },
-  {
-   "id": "lose-yourself-eminem",
-   "appleYear": 2002,
-   "album": "8 Mile (Music from and Inspired By the Motion Picture)",
-   "appleArtist": "Eminem",
-   "appleTitle": "Lose Yourself",
-   "year": 2002
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2002,
+   "d": 2,
+   "explicit": true
   },
   {
    "id": "without-me-eminem",
@@ -163,47 +575,55 @@
    "album": "The Eminem Show",
    "appleArtist": "Eminem",
    "appleTitle": "Without Me",
-   "year": 2002
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2002,
+   "d": 2,
+   "explicit": true
   },
   {
-   "id": "in-da-club-50-cent",
-   "appleYear": 2003,
-   "album": "Get Rich or Die Tryin' (Bonus Track Version)",
-   "appleArtist": "50 Cent",
-   "appleTitle": "In da Club",
-   "year": 2003
+   "id": "lose-yourself-eminem",
+   "appleYear": 2002,
+   "album": "8 Mile (Music from and Inspired By the Motion Picture)",
+   "appleArtist": "Eminem",
+   "appleTitle": "Lose Yourself",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2002,
+   "d": 2,
+   "explicit": true
   },
   {
-   "id": "crazy-in-love-beyonce",
-   "appleYear": 2003,
-   "album": "Dangerously in Love",
-   "appleArtist": "Beyoncé",
-   "appleTitle": "Crazy in Love (feat. JAŸ-Z)",
-   "year": 2003
+   "id": "complicated-avril-lavigne",
+   "appleYear": 2002,
+   "album": "Let Go",
+   "appleArtist": "Avril Lavigne",
+   "appleTitle": "Complicated",
+   "store": "US",
+   "year": 2002,
+   "d": 1
   },
   {
-   "id": "hey-ya-outkast",
-   "appleYear": 2003,
-   "album": "Speakerboxxx/The Love Below",
-   "appleArtist": "Outkast",
-   "appleTitle": "Hey Ya!",
-   "year": 2003
+   "id": "hot-in-herre-nelly",
+   "appleYear": 2002,
+   "album": "Nellyville",
+   "appleArtist": "Nelly",
+   "appleTitle": "Hot in Herre",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2002,
+   "d": 2,
+   "explicit": true
   },
   {
-   "id": "where-is-the-love-the-black-eyed-peas",
-   "appleYear": 2003,
-   "album": "Elephunk",
-   "appleArtist": "Black Eyed Peas",
-   "appleTitle": "Where Is The Love?",
-   "year": 2003
-  },
-  {
-   "id": "bring-me-to-life-evanescence",
-   "appleYear": 2003,
-   "album": "Fallen",
-   "appleArtist": "Evanescence",
-   "appleTitle": "Bring Me to Life",
-   "year": 2003
+   "id": "a-thousand-miles-vanessa-carlton",
+   "appleYear": 2002,
+   "album": "Be Not Nobody",
+   "appleArtist": "Vanessa Carlton",
+   "appleTitle": "A Thousand Miles",
+   "store": "US",
+   "year": 2002,
+   "d": 1
   },
   {
    "id": "get-busy-sean-paul",
@@ -211,7 +631,9 @@
    "album": "Dutty Rock (20th Anniversary)",
    "appleArtist": "Sean Paul",
    "appleTitle": "Get Busy",
-   "year": 2002
+   "store": "US",
+   "year": 2002,
+   "d": 2
   },
   {
    "id": "clocks-coldplay",
@@ -219,31 +641,245 @@
    "album": "A Rush of Blood to the Head",
    "appleArtist": "Coldplay",
    "appleTitle": "Clocks",
-   "year": 2002
+   "store": "US",
+   "year": 2002,
+   "d": 3
   },
   {
-   "id": "yeah-usher",
-   "appleYear": 2004,
-   "album": "Confessions (Expanded Edition)",
+   "id": "whenever-wherever-shakira",
+   "appleYear": 2001,
+   "album": "Laundry Service",
+   "appleArtist": "Shakira",
+   "appleTitle": "Whenever, Wherever",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "heaven-dj-sammy",
+   "appleYear": 2001,
+   "album": "Heaven",
+   "appleArtist": "DJ Sammy & Yanou featuring Do",
+   "appleTitle": "Heaven",
+   "store": "US",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "get-the-party-started-pink",
+   "appleYear": 2001,
+   "album": "M!ssundaztood (Expanded Edition)",
+   "appleArtist": "P!nk",
+   "appleTitle": "Get the Party Started",
+   "store": "US",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "the-ketchup-song-asereje-las-ketchup",
+   "appleYear": 2002,
+   "album": "Aserejé (The Ketchup Song) - Single",
+   "appleArtist": "Las Ketchup",
+   "appleTitle": "The Ketchup Song (Aserejé) [Chiringuito Club Single Edit]",
+   "store": "US",
+   "year": 2002,
+   "d": 1
+  },
+  {
+   "id": "a-little-less-conversation-elvis-vs-jxl",
+   "appleYear": 2001,
+   "album": "A Little Less Conversation: Elvis vs JXL - Single",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "A Little Less Conversation",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "the-tide-is-high-get-the-feeling-atomic-kitten",
+   "appleYear": 2002,
+   "album": "Ladies Night - Single",
+   "appleArtist": "Atomic Kitten",
+   "appleTitle": "The Tide Is High (Get the Feeling)",
+   "store": "US",
+   "year": 2002,
+   "d": 2
+  },
+  {
+   "id": "the-logical-song-scooter",
+   "appleYear": 2001,
+   "album": "The Logical Song - EP",
+   "appleArtist": "Scooter",
+   "appleTitle": "The Logical Song",
+   "store": "GB",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "kiss-kiss-holly-valance",
+   "appleYear": 2002,
+   "album": "Footprints",
+   "appleArtist": "Holly Valance",
+   "appleTitle": "Kiss Kiss",
+   "store": "US",
+   "year": 2002,
+   "d": 2
+  },
+  {
+   "id": "underneath-your-clothes-shakira",
+   "appleYear": 2001,
+   "album": "Laundry Service",
+   "appleArtist": "Shakira",
+   "appleTitle": "Underneath Your Clothes",
+   "store": "US",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "in-the-end-linkin-park",
+   "appleYear": 2000,
+   "album": "Hybrid Theory (Deluxe Edition)",
+   "appleArtist": "LINKIN PARK",
+   "appleTitle": "In the End",
+   "store": "US",
+   "year": 2000,
+   "d": 1
+  },
+  {
+   "id": "unchained-melody-gareth-gates",
+   "appleYear": 2002,
+   "album": "What My Heart Wants To Say",
+   "appleArtist": "Gareth Gates",
+   "appleTitle": "Unchained Melody",
+   "store": "US",
+   "year": 2002,
+   "d": 1
+  },
+  {
+   "id": "if-tomorrow-never-comes-ronan-keating",
+   "appleYear": 2002,
+   "album": "Destination",
+   "appleArtist": "Ronan Keating",
+   "appleTitle": "If Tomorrow Never Comes",
+   "store": "US",
+   "year": 2002,
+   "d": 2
+  },
+  {
+   "id": "wherever-you-will-go-the-calling",
+   "appleYear": 2001,
+   "album": "Camino Palmero",
+   "appleArtist": "The Calling",
+   "appleTitle": "Wherever You Will Go",
+   "store": "US",
+   "year": 2001,
+   "d": 1
+  },
+  {
+   "id": "foolish-ashanti",
+   "appleYear": 2002,
+   "album": "Ashanti",
+   "appleArtist": "Ashanti",
+   "appleTitle": "Foolish",
+   "store": "US",
+   "year": 2002,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "escape-enrique-iglesias",
+   "appleYear": 2001,
+   "album": "Escape",
+   "appleArtist": "Enrique Iglesias",
+   "appleTitle": "Escape",
+   "store": "US",
+   "year": 2001,
+   "d": 3
+  },
+  {
+   "id": "dirrty-christina-aguilera",
+   "appleYear": 2002,
+   "album": "Totally Hip Hop",
+   "appleArtist": "Christina Aguilera",
+   "appleTitle": "Dirrty (feat. Redman)",
+   "store": "US",
+   "year": 2002,
+   "d": 2
+  },
+  {
+   "id": "whats-luv-fat-joe",
+   "appleYear": 2002,
+   "album": "What's Luv? (feat. Ashanti) - Single",
+   "appleArtist": "Fat Joe",
+   "appleTitle": "What's Luv? (feat. Ashanti)",
+   "store": "US",
+   "year": 2002,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "u-got-it-bad-usher",
+   "appleYear": 2001,
+   "album": "8701",
    "appleArtist": "USHER",
-   "appleTitle": "Yeah! (feat. Lil Jon & Ludacris)",
-   "year": 2004
+   "appleTitle": "U Got It Bad",
+   "store": "US",
+   "year": 2001,
+   "d": 2
   },
   {
-   "id": "burn-usher",
-   "appleYear": 2004,
-   "album": "Confessions (20th Anniversary Edition)",
-   "appleArtist": "USHER",
-   "appleTitle": "Burn",
-   "year": 2004
-  },
-  {
-   "id": "if-i-aint-got-you-alicia-keys",
+   "id": "bring-me-to-life-evanescence",
    "appleYear": 2003,
-   "album": "The Diary of Alicia Keys",
-   "appleArtist": "Alicia Keys",
-   "appleTitle": "If I Ain't Got You",
-   "year": 2003
+   "album": "Fallen",
+   "appleArtist": "Evanescence",
+   "appleTitle": "Bring Me to Life",
+   "store": "US",
+   "year": 2003,
+   "d": 1
+  },
+  {
+   "id": "in-da-club-50-cent",
+   "appleYear": 2003,
+   "album": "Get Rich or Die Tryin' (Bonus Track Version)",
+   "appleArtist": "50 Cent",
+   "appleTitle": "In da Club",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2003,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "where-is-the-love-the-black-eyed-peas",
+   "appleYear": 2003,
+   "album": "Elephunk",
+   "appleArtist": "Black Eyed Peas",
+   "appleTitle": "Where Is The Love?",
+   "store": "US",
+   "year": 2003,
+   "d": 1
+  },
+  {
+   "id": "hey-ya-outkast",
+   "appleYear": 2003,
+   "album": "Speakerboxxx/The Love Below",
+   "appleArtist": "Outkast",
+   "appleTitle": "Hey Ya!",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2003,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "crazy-in-love-beyonce",
+   "appleYear": 2003,
+   "album": "Dangerously in Love",
+   "appleArtist": "Beyoncé",
+   "appleTitle": "Crazy in Love (feat. JAŸ-Z)",
+   "store": "US",
+   "year": 2003,
+   "d": 1
   },
   {
    "id": "toxic-britney-spears",
@@ -251,55 +887,217 @@
    "album": "In the Zone",
    "appleArtist": "Britney Spears",
    "appleTitle": "Toxic",
-   "year": 2003
+   "store": "US",
+   "year": 2003,
+   "d": 1
   },
   {
-   "id": "since-u-been-gone-kelly-clarkson",
-   "appleYear": 2004,
-   "album": "Breakaway",
-   "appleArtist": "Kelly Clarkson",
-   "appleTitle": "Since U Been Gone",
-   "year": 2004
+   "id": "if-i-aint-got-you-alicia-keys",
+   "appleYear": 2003,
+   "album": "The Diary of Alicia Keys",
+   "appleArtist": "Alicia Keys",
+   "appleTitle": "If I Ain't Got You",
+   "store": "US",
+   "year": 2003,
+   "d": 2
   },
   {
-   "id": "we-belong-together-mariah-carey",
-   "appleYear": 2005,
-   "album": "The Emancipation Of Mimi",
-   "appleArtist": "Mariah Carey",
-   "appleTitle": "We Belong Together",
-   "year": 2005
+   "id": "ignition-r-kelly",
+   "appleYear": 2003,
+   "album": "Chocolate Factory",
+   "appleArtist": "R. Kelly",
+   "appleTitle": "Ignition",
+   "store": "US",
+   "year": 2003,
+   "d": 2
   },
   {
-   "id": "hollaback-girl-gwen-stefani",
-   "appleYear": 2004,
-   "album": "Hollaback Girl - Single",
-   "appleArtist": "Gwen Stefani",
-   "appleTitle": "Hollaback Girl",
-   "year": 2004
+   "id": "beautiful-christina-aguilera",
+   "appleYear": 2003,
+   "album": "Beautiful (The Voice Performance) - Single",
+   "appleArtist": "Christina Aguilera & Beverly McClellan",
+   "appleTitle": "Beautiful (The Voice Performance)",
+   "store": "US",
+   "year": 2003,
+   "d": 2
   },
   {
-   "id": "gold-digger-kanye-west",
-   "appleYear": 2005,
-   "album": "Late Registration",
-   "appleArtist": "Kanye West",
-   "appleTitle": "Gold Digger (feat. Jamie Foxx)",
-   "year": 2005
+   "id": "all-i-have-jennifer-lopez",
+   "appleYear": 2002,
+   "album": "This Is Me...Then",
+   "appleArtist": "Jennifer Lopez",
+   "appleTitle": "All I Have (feat. LL Cool J)",
+   "store": "US",
+   "year": 2002,
+   "d": 2
   },
   {
-   "id": "feel-good-inc-gorillaz",
-   "appleYear": 2005,
-   "album": "Demon Days",
-   "appleArtist": "Gorillaz & De La Soul",
-   "appleTitle": "Feel Good Inc. (feat. David Jolicoeur, Kelvin Mercer & Vincent Mason)",
-   "year": 2005
+   "id": "all-the-things-she-said-t-a-t-u",
+   "appleYear": 2002,
+   "album": "200 KM/H In the Wrong Lane",
+   "appleArtist": "t.A.T.u.",
+   "appleTitle": "All the Things She Said",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2002,
+   "d": 2,
+   "explicit": true
   },
   {
-   "id": "bad-day-daniel-powter",
-   "appleYear": 2005,
-   "album": "Daniel Powter",
-   "appleArtist": "Daniel Powter",
-   "appleTitle": "Bad Day",
-   "year": 2005
+   "id": "turn-me-on-kevin-lyttle",
+   "appleYear": 2003,
+   "album": "Turn Me On - Single",
+   "appleArtist": "Kevin Lyttle",
+   "appleTitle": "Turn Me On",
+   "store": "US",
+   "year": 2003,
+   "d": 2
+  },
+  {
+   "id": "i-know-what-you-want-busta-rhymes-and-mariah-carey",
+   "appleYear": 2002,
+   "album": "It Ain't Safe No More...",
+   "appleArtist": "Busta Rhymes & Mariah Carey",
+   "appleTitle": "I Know What You Want (feat. Flipmode Squad)",
+   "store": "US",
+   "year": 2002,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "cry-me-a-river-justin-timberlake",
+   "appleYear": 2002,
+   "album": "Justified",
+   "appleArtist": "Justin Timberlake",
+   "appleTitle": "Cry Me a River",
+   "store": "US",
+   "year": 2002,
+   "d": 2
+  },
+  {
+   "id": "03-bonnie-and-clyde-jay-z",
+   "appleYear": 2003,
+   "album": "Blueprint 2.1",
+   "appleArtist": "JAŸ-Z",
+   "appleTitle": "03' Bonnie & Clyde (feat. Beyoncé Knowles)",
+   "store": "US",
+   "year": 2003,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "white-flag-dido",
+   "appleYear": 2003,
+   "album": "Life for Rent",
+   "appleArtist": "Dido",
+   "appleTitle": "White Flag",
+   "store": "US",
+   "year": 2003,
+   "d": 2
+  },
+  {
+   "id": "here-without-you-3-doors-down",
+   "appleYear": 2002,
+   "album": "Away from the Sun",
+   "appleArtist": "3 Doors Down",
+   "appleTitle": "Here Without You",
+   "store": "US",
+   "year": 2002,
+   "d": 2
+  },
+  {
+   "id": "numb-linkin-park",
+   "appleYear": 2003,
+   "album": "Meteora (Deluxe Edition)",
+   "appleArtist": "LINKIN PARK",
+   "appleTitle": "Numb",
+   "store": "US",
+   "year": 2003,
+   "d": 2
+  },
+  {
+   "id": "shut-up-the-black-eyed-peas",
+   "appleYear": 2003,
+   "album": "RnB Fridays, Vol. 3",
+   "appleArtist": "Black Eyed Peas",
+   "appleTitle": "Shut Up",
+   "store": "AU",
+   "year": 2003,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "baby-boy-beyonce",
+   "appleYear": 2003,
+   "album": "Dangerously in Love",
+   "appleArtist": "Beyoncé",
+   "appleTitle": "Baby Boy (feat. Sean Paul)",
+   "store": "US",
+   "year": 2003,
+   "d": 2
+  },
+  {
+   "id": "superstar-jamelia",
+   "appleYear": 2003,
+   "album": "Thank You",
+   "appleArtist": "Jamelia",
+   "appleTitle": "Superstar",
+   "store": "US",
+   "year": 2003,
+   "d": 2
+  },
+  {
+   "id": "p-i-m-p-50-cent",
+   "appleYear": 2003,
+   "album": "Get Rich or Die Tryin' (Bonus Track Version)",
+   "appleArtist": "50 Cent",
+   "appleTitle": "P.I.M.P.",
+   "store": "US",
+   "year": 2003,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "shake-ya-tailfeather-nelly-p-diddy-and-murphy-lee",
+   "appleYear": 2003,
+   "album": "Murphy's Law",
+   "appleArtist": "Murphy Lee, Nelly & P. Diddy",
+   "appleTitle": "Shake Ya Tailfeather",
+   "store": "US",
+   "year": 2003,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "stole-kelly-rowland",
+   "appleYear": 2002,
+   "album": "Simply Deep",
+   "appleArtist": "Kelly Rowland",
+   "appleTitle": "Stole",
+   "store": "US",
+   "year": 2002,
+   "d": 2
+  },
+  {
+   "id": "someday-nickelback",
+   "appleYear": 2003,
+   "album": "2003",
+   "appleArtist": "Nickelback",
+   "appleTitle": "Someday",
+   "store": "US",
+   "year": 2003,
+   "d": 2
+  },
+  {
+   "id": "21-questions-50-cent",
+   "appleYear": 2003,
+   "album": "Get Rich or Die Tryin' (Bonus Track Version)",
+   "appleArtist": "50 Cent",
+   "appleTitle": "21 Questions (feat. Nate Dogg)",
+   "store": "US",
+   "year": 2003,
+   "d": 2,
+   "explicit": true
   },
   {
    "id": "youre-beautiful-james-blunt",
@@ -307,7 +1105,526 @@
    "album": "Back To Bedlam",
    "appleArtist": "James Blunt",
    "appleTitle": "You're Beautiful",
-   "year": 2004
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2004,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "yeah-usher",
+   "appleYear": 2004,
+   "album": "Confessions (Expanded Edition)",
+   "appleArtist": "USHER",
+   "appleTitle": "Yeah! (feat. Lil Jon & Ludacris)",
+   "store": "US",
+   "year": 2004,
+   "d": 1
+  },
+  {
+   "id": "hollaback-girl-gwen-stefani",
+   "appleYear": 2004,
+   "album": "Hollaback Girl - Single",
+   "appleArtist": "Gwen Stefani",
+   "appleTitle": "Hollaback Girl",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2004,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "burn-usher",
+   "appleYear": 2004,
+   "album": "Confessions (20th Anniversary Edition)",
+   "appleArtist": "USHER",
+   "appleTitle": "Burn",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "since-u-been-gone-kelly-clarkson",
+   "appleYear": 2004,
+   "album": "Breakaway",
+   "appleArtist": "Kelly Clarkson",
+   "appleTitle": "Since U Been Gone",
+   "store": "US",
+   "year": 2004,
+   "d": 1
+  },
+  {
+   "id": "milkshake-kelis",
+   "appleYear": 2003,
+   "album": "Milkshake (Instrumental) - Single",
+   "appleArtist": "Kelis",
+   "appleTitle": "Milkshake (Instrumental)",
+   "store": "US",
+   "year": 2003,
+   "d": 1
+  },
+  {
+   "id": "i-dont-wanna-know-mario-winans",
+   "appleYear": 2004,
+   "album": "Hurt No More",
+   "appleArtist": "Mario Winans",
+   "appleTitle": "I Don't Wanna Know (feat. Enya and P. Diddy)",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "leave-get-out-jojo",
+   "appleYear": 2004,
+   "album": "JoJo",
+   "appleArtist": "JoJo",
+   "appleTitle": "Leave (Get Out)",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "over-and-over-nelly",
+   "appleYear": 2004,
+   "album": "Suit",
+   "appleArtist": "Nelly",
+   "appleTitle": "Over and Over (feat. Tim McGraw)",
+   "store": "US",
+   "year": 2004,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "this-love-maroon-5",
+   "appleYear": 2002,
+   "album": "Songs About Jane: 10th Anniversary Edition",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "This Love",
+   "store": "US",
+   "year": 2002,
+   "d": 1
+  },
+  {
+   "id": "my-band-d12",
+   "appleYear": 2004,
+   "album": "D12 World",
+   "appleArtist": "D12",
+   "appleTitle": "My Band",
+   "store": "US",
+   "year": 2004,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "my-immortal-evanescence",
+   "appleYear": 2003,
+   "album": "Fallen",
+   "appleArtist": "Evanescence",
+   "appleTitle": "My Immortal",
+   "store": "US",
+   "year": 2003,
+   "d": 1
+  },
+  {
+   "id": "left-outside-alone-anastacia",
+   "appleYear": 2004,
+   "album": "Anastacia",
+   "appleArtist": "Anastacia",
+   "appleTitle": "Left Outside Alone",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "lose-my-breath-destinys-child",
+   "appleYear": 2004,
+   "album": "Destiny Fulfilled",
+   "appleArtist": "Destiny's Child",
+   "appleTitle": "Lose My Breath",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "my-place-nelly",
+   "appleYear": 2004,
+   "album": "Suit",
+   "appleArtist": "Nelly",
+   "appleTitle": "My Place (feat. Jaheim)",
+   "store": "US",
+   "year": 2004,
+   "d": 3,
+   "explicit": true
+  },
+  {
+   "id": "she-will-be-loved-maroon-5",
+   "appleYear": 2002,
+   "album": "Songs About Jane",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "She Will Be Loved",
+   "store": "US",
+   "year": 2002,
+   "d": 2
+  },
+  {
+   "id": "tipsy-j-kwon",
+   "appleYear": 2001,
+   "album": "Tipsy - EP",
+   "appleArtist": "J-Kwon",
+   "appleTitle": "Tipsy (Instrumental)",
+   "store": "US",
+   "year": 2001,
+   "d": 2
+  },
+  {
+   "id": "drop-it-like-its-hot-snoop-dogg",
+   "appleYear": 2004,
+   "album": "R&G (Rhythm & Gangsta) - The Masterpiece",
+   "appleArtist": "Snoop Dogg",
+   "appleTitle": "Drop It Like It's Hot (feat. Pharrell Williams)",
+   "store": "US",
+   "year": 2004,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "just-lose-it-eminem",
+   "appleYear": 2004,
+   "album": "Encore (Deluxe Version)",
+   "appleArtist": "Eminem",
+   "appleTitle": "Just Lose It",
+   "store": "US",
+   "year": 2004,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "slow-jamz-twista",
+   "appleYear": 2003,
+   "album": "The College Dropout",
+   "appleArtist": "Twista, Kanye West & Jamie Foxx",
+   "appleTitle": "Slow Jamz",
+   "store": "US",
+   "year": 2003,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "these-words-natasha-bedingfield",
+   "appleYear": 2004,
+   "album": "Unwritten",
+   "appleArtist": "Natasha Bedingfield",
+   "appleTitle": "These Words",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "everytime-britney-spears",
+   "appleYear": 2004,
+   "album": "Everytime - EP",
+   "appleArtist": "Britney Spears",
+   "appleTitle": "Everytime (Dr. Octavo's Translucent Mixshow Edit)",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "somebody-to-love-boogie-pimps",
+   "appleYear": 2004,
+   "album": "Somebody to Love",
+   "appleArtist": "Boogie Pimps",
+   "appleTitle": "Somebody to Love (Radio Edit)",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "goodies-ciara",
+   "appleYear": 2004,
+   "album": "Goodies",
+   "appleArtist": "Ciara",
+   "appleTitle": "Goodies (feat. Petey Pablo)",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "cha-cha-slide-dj-casper",
+   "appleYear": 2004,
+   "album": "Cha Cha Slide - Single",
+   "appleArtist": "Robot Kids Electric, Mr. C & DJ Casper",
+   "appleTitle": "Cha Cha Slide",
+   "store": "US",
+   "year": 2004,
+   "d": 1
+  },
+  {
+   "id": "dip-it-low-christina-milian",
+   "appleYear": 2004,
+   "album": "It's About Time",
+   "appleArtist": "Christina Milian",
+   "appleTitle": "Dip It Low (feat. Fabolous)",
+   "store": "US",
+   "year": 2004,
+   "d": 3
+  },
+  {
+   "id": "bad-day-daniel-powter",
+   "appleYear": 2005,
+   "album": "Daniel Powter",
+   "appleArtist": "Daniel Powter",
+   "appleTitle": "Bad Day",
+   "store": "US",
+   "year": 2005,
+   "d": 1
+  },
+  {
+   "id": "we-belong-together-mariah-carey",
+   "appleYear": 2005,
+   "album": "The Emancipation Of Mimi",
+   "appleArtist": "Mariah Carey",
+   "appleTitle": "We Belong Together",
+   "store": "US",
+   "year": 2005,
+   "d": 1
+  },
+  {
+   "id": "feel-good-inc-gorillaz",
+   "appleYear": 2005,
+   "album": "Demon Days",
+   "appleArtist": "Gorillaz & De La Soul",
+   "appleTitle": "Feel Good Inc. (feat. David Jolicoeur, Kelvin Mercer & Vincent Mason)",
+   "store": "US",
+   "year": 2005,
+   "d": 1
+  },
+  {
+   "id": "gold-digger-kanye-west",
+   "appleYear": 2005,
+   "album": "Late Registration",
+   "appleArtist": "Kanye West",
+   "appleTitle": "Gold Digger (feat. Jamie Foxx)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2005,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "dont-cha-the-pussycat-dolls",
+   "appleYear": 2005,
+   "album": "Don't Cha - Single",
+   "appleArtist": "The Pussycat Dolls",
+   "appleTitle": "Don't Cha (Radio Edit)",
+   "store": "US",
+   "year": 2005,
+   "d": 1
+  },
+  {
+   "id": "let-me-love-you-mario",
+   "appleYear": 2004,
+   "album": "Turning Point",
+   "appleArtist": "Mario",
+   "appleTitle": "Let Me Love You",
+   "store": "US",
+   "year": 2004,
+   "d": 1
+  },
+  {
+   "id": "lonely-akon",
+   "appleYear": 2005,
+   "album": "Lonely - Single",
+   "appleArtist": "Akon",
+   "appleTitle": "Lonely (Disney Edit)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2005,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "dont-phunk-with-my-heart-the-black-eyed-peas",
+   "appleYear": 2005,
+   "album": "Monkey Business",
+   "appleArtist": "Black Eyed Peas",
+   "appleTitle": "Don't Phunk With My Heart",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "candy-shop-50-cent",
+   "appleYear": 2005,
+   "album": "The Massacre",
+   "appleArtist": "50 Cent",
+   "appleTitle": "Candy Shop (feat. Olivia)",
+   "store": "US",
+   "year": 2005,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "1-2-step-ciara",
+   "appleYear": 2004,
+   "album": "1,2 Step",
+   "appleArtist": "Ciara",
+   "appleTitle": "1, 2 Step (feat. Missy Elliott)",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "pon-de-replay-rihanna",
+   "appleYear": 2005,
+   "album": "Music of the Sun",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Pon de Replay",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "switch-will-smith",
+   "appleYear": 2005,
+   "album": "Lost and Found",
+   "appleArtist": "Will Smith",
+   "appleTitle": "Switch",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "my-humps-the-black-eyed-peas",
+   "appleYear": 2005,
+   "album": "Monkey Business",
+   "appleArtist": "Black Eyed Peas",
+   "appleTitle": "My Humps",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "run-it-chris-brown",
+   "appleYear": 2005,
+   "album": "Chris Brown (Expanded Edition)",
+   "appleArtist": "Chris Brown",
+   "appleTitle": "Run It! (feat. Juelz Santana)",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "rich-girl-gwen-stefani",
+   "appleYear": 2004,
+   "album": "Love. Angel. Music. Baby (Deluxe Version)",
+   "appleArtist": "Gwen Stefani",
+   "appleTitle": "Rich Girl (feat. Eve)",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "hung-up-madonna",
+   "appleYear": 2005,
+   "album": "Confessions on a Dance Floor",
+   "appleArtist": "Madonna",
+   "appleTitle": "Hung Up",
+   "store": "US",
+   "year": 2005,
+   "d": 1
+  },
+  {
+   "id": "stickwitu-pussycat-dolls",
+   "appleYear": 2005,
+   "album": "PCD",
+   "appleArtist": "The Pussycat Dolls",
+   "appleTitle": "Stickwitu",
+   "store": "US",
+   "year": 2005,
+   "d": 3
+  },
+  {
+   "id": "lose-control-missy-elliott",
+   "appleYear": 2005,
+   "album": "The Cookbook",
+   "appleArtist": "Missy Elliott",
+   "appleTitle": "Lose Control (feat. Ciara & Fat Man Scoop)",
+   "store": "US",
+   "year": 2005,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "get-right-jennifer-lopez",
+   "appleYear": 2005,
+   "album": "Rebirth",
+   "appleArtist": "Jennifer Lopez",
+   "appleTitle": "Get Right",
+   "store": "US",
+   "year": 2005,
+   "d": 3
+  },
+  {
+   "id": "wake-me-up-when-september-ends-green-day",
+   "appleYear": 2004,
+   "album": "American Idiot (Deluxe Edition)",
+   "appleArtist": "Green Day",
+   "appleTitle": "Wake Me Up When September Ends",
+   "store": "US",
+   "year": 2004,
+   "d": 2
+  },
+  {
+   "id": "lonely-no-more-rob-thomas",
+   "appleYear": 2005,
+   "album": "Something To Be",
+   "appleArtist": "Rob Thomas",
+   "appleTitle": "Lonely No More",
+   "store": "US",
+   "year": 2005,
+   "d": 3
+  },
+  {
+   "id": "obsession-no-es-amor-frankie-j",
+   "appleYear": 2005,
+   "album": "The One",
+   "appleArtist": "Frankie J",
+   "appleTitle": "Obsession (No Es Amor) [feat. Baby Bash]",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "hate-it-or-love-it-the-game",
+   "appleYear": 2005,
+   "album": "The Documentary (Edited Version)",
+   "appleArtist": "The Game",
+   "appleTitle": "Hate It or Love It (feat. 50 Cent)",
+   "store": "US",
+   "year": 2005,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "because-of-you-kelly-clarkson",
+   "appleYear": 2005,
+   "album": "Dance Vault Mixes: Because of You",
+   "appleArtist": "Kelly Clarkson",
+   "appleTitle": "Because of You (Jason Nevins Club with Intro Breakdown)",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "you-raise-me-up-westlife",
+   "appleYear": 2005,
+   "album": "Face to Face",
+   "appleArtist": "Westlife",
+   "appleTitle": "You Raise Me Up",
+   "store": "US",
+   "year": 2005,
+   "d": 1
   },
   {
    "id": "hips-dont-lie-shakira",
@@ -315,7 +1632,9 @@
    "album": "Oral Fixation, Vol. 2 (Expanded Edition)",
    "appleArtist": "Shakira",
    "appleTitle": "Hips Don't Lie (featuring Wyclef Jean) [En Español]",
-   "year": 2006
+   "store": "US",
+   "year": 2006,
+   "d": 1
   },
   {
    "id": "crazy-gnarls-barkley",
@@ -323,7 +1642,9 @@
    "album": "St. Elsewhere",
    "appleArtist": "Gnarls Barkley",
    "appleTitle": "Crazy",
-   "year": 2006
+   "store": "US",
+   "year": 2005,
+   "d": 1
   },
   {
    "id": "sexyback-justin-timberlake",
@@ -331,7 +1652,11 @@
    "album": "FutureSex/LoveSounds (Deluxe Edition)",
    "appleArtist": "Justin Timberlake",
    "appleTitle": "SexyBack (feat. Timbaland)",
-   "year": 2006
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2006,
+   "d": 2,
+   "explicit": true
   },
   {
    "id": "promiscuous-nelly-furtado",
@@ -339,15 +1664,10 @@
    "album": "Loose (Expanded Edition)",
    "appleArtist": "Nelly Furtado",
    "appleTitle": "Promiscuous (feat. Timbaland)",
-   "year": 2006
-  },
-  {
-   "id": "chasing-cars-snow-patrol",
-   "appleYear": 2005,
-   "album": "Eyes Open (Bonus Track Version)",
-   "appleArtist": "Snow Patrol",
-   "appleTitle": "Chasing Cars",
-   "year": 2006
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2006,
+   "d": 2
   },
   {
    "id": "irreplaceable-beyonce",
@@ -355,7 +1675,234 @@
    "album": "B'Day Deluxe Edition",
    "appleArtist": "Beyoncé",
    "appleTitle": "Irreplaceable",
-   "year": 2006
+   "store": "US",
+   "year": 2006,
+   "d": 1
+  },
+  {
+   "id": "chasing-cars-snow-patrol",
+   "appleYear": 2005,
+   "album": "Eyes Open (Bonus Track Version)",
+   "appleArtist": "Snow Patrol",
+   "appleTitle": "Chasing Cars",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "how-to-save-a-life-the-fray",
+   "appleYear": 2005,
+   "album": "How to Save a Life",
+   "appleArtist": "The Fray",
+   "appleTitle": "How to Save a Life (New Version)",
+   "store": "US",
+   "year": 2005,
+   "d": 1
+  },
+  {
+   "id": "sos-rihanna",
+   "appleYear": 2006,
+   "album": "A Girl Like Me (Bonus Track Version)",
+   "appleArtist": "Rihanna",
+   "appleTitle": "SOS",
+   "store": "US",
+   "year": 2006,
+   "d": 2
+  },
+  {
+   "id": "smack-that-akon",
+   "appleYear": 2006,
+   "album": "Konvicted",
+   "appleArtist": "Akon featuring Eminem",
+   "appleTitle": "Smack That (feat. Eminem)",
+   "store": "US",
+   "year": 2006,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "unfaithful-rihanna",
+   "appleYear": 2006,
+   "album": "A Girl Like Me (Bonus Track Version)",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Unfaithful",
+   "store": "US",
+   "year": 2006,
+   "d": 2
+  },
+  {
+   "id": "so-sick-ne-yo",
+   "appleYear": 2006,
+   "album": "In My Own Words (Deluxe Edition)",
+   "appleArtist": "Ne-Yo",
+   "appleTitle": "So Sick (Instrumental)",
+   "store": "US",
+   "year": 2006,
+   "d": 2
+  },
+  {
+   "id": "buttons-pussycat-dolls",
+   "appleYear": 2005,
+   "album": "PCD",
+   "appleArtist": "The Pussycat Dolls",
+   "appleTitle": "Buttons",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "aint-no-other-man-christina-aguilera",
+   "appleYear": 2006,
+   "album": "Back to Basics",
+   "appleArtist": "Christina Aguilera",
+   "appleTitle": "Ain't No Other Man",
+   "store": "US",
+   "year": 2006,
+   "d": 3
+  },
+  {
+   "id": "dani-california-red-hot-chili-peppers",
+   "appleYear": 2006,
+   "album": "Stadium Arcadium",
+   "appleArtist": "Red Hot Chili Peppers",
+   "appleTitle": "Dani California",
+   "store": "US",
+   "year": 2006,
+   "d": 2
+  },
+  {
+   "id": "my-love-justin-timberlake",
+   "appleYear": 2006,
+   "album": "FutureSex/LoveSounds (Deluxe Edition)",
+   "appleArtist": "Justin Timberlake",
+   "appleTitle": "My Love (feat. T.I.)",
+   "store": "US",
+   "year": 2006,
+   "d": 3
+  },
+  {
+   "id": "me-and-u-cassie",
+   "appleYear": 2006,
+   "album": "Cassie",
+   "appleArtist": "Cassie",
+   "appleTitle": "Me & U",
+   "store": "US",
+   "year": 2006,
+   "d": 2
+  },
+  {
+   "id": "lips-of-an-angel-hinder",
+   "appleYear": 2005,
+   "album": "Extreme Behavior",
+   "appleArtist": "Hinder",
+   "appleTitle": "Lips of an Angel",
+   "store": "US",
+   "year": 2005,
+   "d": 1
+  },
+  {
+   "id": "everytime-we-touch-cascada",
+   "appleYear": 2005,
+   "album": "Everytime We Touch - Single",
+   "appleArtist": "Cascada",
+   "appleTitle": "Everytime We Touch (Radio Edit)",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "welcome-to-the-black-parade-my-chemical-romance",
+   "appleYear": 2006,
+   "album": "The Black Parade",
+   "appleArtist": "My Chemical Romance",
+   "appleTitle": "Welcome to the Black Parade",
+   "store": "US",
+   "year": 2006,
+   "d": 2
+  },
+  {
+   "id": "temperature-sean-paul",
+   "appleYear": 2005,
+   "album": "The Trinity (Bonus Version)",
+   "appleArtist": "Sean Paul",
+   "appleTitle": "Temperature",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "ridin-chamillionaire",
+   "appleYear": 2005,
+   "album": "The Sound of Revenge",
+   "appleArtist": "Chamillionaire",
+   "appleTitle": "Ridin' (feat. Krayzie Bone)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2005,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "pump-it-the-black-eyed-peas",
+   "appleYear": 2005,
+   "album": "iTunes Originals: The Black Eyed Peas",
+   "appleArtist": "Black Eyed Peas",
+   "appleTitle": "Pump It (iTunes Originals Version)",
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "london-bridge-fergie",
+   "appleYear": 2006,
+   "album": "The Dutchess",
+   "appleArtist": "Fergie",
+   "appleTitle": "London Bridge",
+   "store": "US",
+   "year": 2006,
+   "d": 3,
+   "explicit": true
+  },
+  {
+   "id": "fergalicious-fergie",
+   "appleYear": 2006,
+   "album": "The Dutchess",
+   "appleArtist": "Fergie",
+   "appleTitle": "Fergalicious (feat. will.i.am)",
+   "store": "US",
+   "year": 2006,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "beep-pussycat-dolls",
+   "appleYear": 2005,
+   "album": "PCD",
+   "appleArtist": "The Pussycat Dolls",
+   "appleTitle": "Beep (feat. will.i.am)",
+   "store": "US",
+   "year": 2005,
+   "d": 3
+  },
+  {
+   "id": "i-write-sins-not-tragedies-panic-at-the-disco",
+   "appleYear": 2005,
+   "album": "Rock Classics: The Collection",
+   "appleArtist": "Panic! At the Disco",
+   "appleTitle": "I Write Sins Not Tragedies (Edit)",
+   "store": "GB",
+   "year": 2006,
+   "d": 2
+  },
+  {
+   "id": "i-wish-i-was-a-punk-rocker-sandi-thom",
+   "appleYear": 2005,
+   "album": "I Wish I Was a Punk Rocker (with Flowers in My Hair) - Single",
+   "appleArtist": "Sandi Thom",
+   "appleTitle": "I Wish I Was a Punk Rocker (with Flowers in My Hair)",
+   "store": "US",
+   "year": 2005,
+   "d": 1
   },
   {
    "id": "umbrella-rihanna",
@@ -363,39 +1910,9 @@
    "album": "Good Girl Gone Bad: Reloaded",
    "appleArtist": "Rihanna",
    "appleTitle": "Umbrella (feat. JAŸ-Z)",
-   "year": 2007
-  },
-  {
-   "id": "girlfriend-avril-lavigne",
-   "appleYear": 2007,
-   "album": "Girlfriend EP",
-   "appleArtist": "Avril Lavigne",
-   "appleTitle": "Girlfriend (Radio Edit)",
-   "year": 2007
-  },
-  {
-   "id": "stronger-kanye-west",
-   "appleYear": 2007,
-   "album": "Graduation",
-   "appleArtist": "Kanye West",
-   "appleTitle": "Stronger",
-   "year": 2007
-  },
-  {
-   "id": "apologize-timbaland",
-   "appleYear": 2007,
-   "album": "Shock Value",
-   "appleArtist": "Timbaland",
-   "appleTitle": "Apologize (feat. OneRepublic)",
-   "year": 2007
-  },
-  {
-   "id": "bleeding-love-leona-lewis",
-   "appleYear": 2007,
-   "album": "Spirit (The Deluxe Edition)",
-   "appleArtist": "Leona Lewis",
-   "appleTitle": "Bleeding Love",
-   "year": 2007
+   "store": "US",
+   "year": 2007,
+   "d": 1
   },
   {
    "id": "low-flo-rida",
@@ -403,39 +1920,268 @@
    "album": "Mail On Sunday",
    "appleArtist": "Flo Rida",
    "appleTitle": "Low (feat. T-Pain)",
-   "year": 2007
+   "store": "US",
+   "year": 2007,
+   "d": 1
   },
   {
-   "id": "i-kissed-a-girl-katy-perry",
-   "appleYear": 2008,
-   "album": "One of the Boys",
-   "appleArtist": "Katy Perry",
-   "appleTitle": "I Kissed a Girl",
-   "year": 2008
+   "id": "bleeding-love-leona-lewis",
+   "appleYear": 2007,
+   "album": "Spirit (The Deluxe Edition)",
+   "appleArtist": "Leona Lewis",
+   "appleTitle": "Bleeding Love",
+   "store": "US",
+   "year": 2007,
+   "d": 1
   },
   {
-   "id": "viva-la-vida-coldplay",
-   "appleYear": 2008,
-   "album": "Viva La Vida or Death and All His Friends",
-   "appleArtist": "Coldplay",
-   "appleTitle": "Viva La Vida",
-   "year": 2008
+   "id": "girlfriend-avril-lavigne",
+   "appleYear": 2007,
+   "album": "Girlfriend EP",
+   "appleArtist": "Avril Lavigne",
+   "appleTitle": "Girlfriend (Radio Edit)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2007,
+   "d": 2,
+   "explicit": true
   },
   {
-   "id": "single-ladies-put-a-ring-on-it-beyonce",
-   "appleYear": 2008,
-   "album": "I AM...SASHA FIERCE",
-   "appleArtist": "Beyoncé",
-   "appleTitle": "Single Ladies (Put a Ring on It)",
-   "year": 2008
+   "id": "stronger-kanye-west",
+   "appleYear": 2007,
+   "album": "Graduation",
+   "appleArtist": "Kanye West",
+   "appleTitle": "Stronger",
+   "store": "US",
+   "year": 2007,
+   "d": 2,
+   "explicit": true
   },
   {
-   "id": "love-story-taylor-swift",
-   "appleYear": 2008,
-   "album": "Fearless",
-   "appleArtist": "Taylor Swift",
-   "appleTitle": "Love Story",
-   "year": 2008
+   "id": "apologize-timbaland",
+   "appleYear": 2007,
+   "album": "Shock Value",
+   "appleArtist": "Timbaland",
+   "appleTitle": "Apologize (feat. OneRepublic)",
+   "store": "US",
+   "year": 2007,
+   "d": 1
+  },
+  {
+   "id": "hey-there-delilah-plain-white-ts",
+   "appleYear": 2005,
+   "album": "Every Second Counts",
+   "appleArtist": "Plain White T's",
+   "appleTitle": "Hey There Delilah",
+   "store": "US",
+   "year": 2005,
+   "d": 1
+  },
+  {
+   "id": "big-girls-dont-cry-fergie",
+   "appleYear": 2007,
+   "album": "NOW That's What I Call #1's",
+   "appleArtist": "Fergie",
+   "appleTitle": "Big Girls Don't Cry (Personal)",
+   "store": "US",
+   "year": 2007,
+   "d": 1
+  },
+  {
+   "id": "the-sweet-escape-gwen-stefani",
+   "appleYear": 2006,
+   "album": "The Sweet Escape",
+   "appleArtist": "Gwen Stefani",
+   "appleTitle": "The Sweet Escape (feat. Akon)",
+   "store": "US",
+   "year": 2006,
+   "d": 2
+  },
+  {
+   "id": "the-way-i-are-timbaland",
+   "appleYear": 2007,
+   "album": "Shock Value",
+   "appleArtist": "Timbaland",
+   "appleTitle": "The Way I Are (feat. Keri Hilson & D.O.E.)",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "beautiful-girls-sean-kingston",
+   "appleYear": 2007,
+   "album": "Sean Kingston",
+   "appleArtist": "Sean Kingston",
+   "appleTitle": "Beautiful Girls",
+   "store": "US",
+   "year": 2007,
+   "d": 1
+  },
+  {
+   "id": "say-it-right-nelly-furtado",
+   "appleYear": 2006,
+   "album": "Loose",
+   "appleArtist": "Nelly Furtado",
+   "appleTitle": "Say It Right",
+   "store": "US",
+   "year": 2006,
+   "d": 1
+  },
+  {
+   "id": "glamorous-fergie",
+   "appleYear": 2006,
+   "album": "The Dutchess",
+   "appleArtist": "Fergie",
+   "appleTitle": "Glamorous (feat. Ludacris)",
+   "store": "US",
+   "year": 2006,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "what-goes-around-comes-around-justin-timberlake",
+   "appleYear": 2007,
+   "album": "What Goes Around...Comes Around - Single",
+   "appleArtist": "Justin Timberlake",
+   "appleTitle": "What Goes Around...Comes Around (Instrumental)",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "crank-that-soulja-boy-soulja-boy-tell-em",
+   "appleYear": 2007,
+   "album": "souljaboytellem.com",
+   "appleArtist": "Soulja Boy Tell 'Em",
+   "appleTitle": "Crank That (Soulja Boy) [Clean]",
+   "store": "US",
+   "year": 2007,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "this-aint-a-scene-its-an-arms-race-fall-out-boy",
+   "appleYear": 2007,
+   "album": "Infinity On High",
+   "appleArtist": "Fall Out Boy",
+   "appleTitle": "This Ain't A Scene, It's An Arms Race",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "i-wanna-love-you-akon",
+   "appleYear": 2006,
+   "album": "Konvicted",
+   "appleArtist": "Akon featuring Snoop Dogg",
+   "appleTitle": "I Wanna Love You (feat. Snoop Dogg)",
+   "store": "US",
+   "year": 2006,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "give-it-to-me-timbaland",
+   "appleYear": 2007,
+   "album": "Shock Value",
+   "appleArtist": "Timbaland",
+   "appleTitle": "Give It to Me (feat. Justin Timberlake & Nelly Furtado)",
+   "store": "US",
+   "year": 2007,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "no-one-alicia-keys",
+   "appleYear": 2007,
+   "album": "As I Am (Expanded Edition)",
+   "appleArtist": "Alicia Keys",
+   "appleTitle": "No One",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "cupids-chokehold-gym-class-heroes",
+   "appleYear": 2006,
+   "album": "As Cruel As School Children",
+   "appleArtist": "Gym Class Heroes",
+   "appleTitle": "Cupid's Chokehold (Featuring Patrick Stump)",
+   "store": "US",
+   "year": 2006,
+   "d": 2
+  },
+  {
+   "id": "dont-matter-akon",
+   "appleYear": 2006,
+   "album": "Konvicted",
+   "appleArtist": "Akon",
+   "appleTitle": "Don't Matter",
+   "store": "US",
+   "year": 2006,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "beautiful-liar-beyonce-and-shakira",
+   "appleYear": 2007,
+   "album": "Beautiful Liar - EP",
+   "appleArtist": "Beyoncé & Shakira",
+   "appleTitle": "Beautiful Liar",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "makes-me-wonder-maroon-5",
+   "appleYear": 2007,
+   "album": "Kids Driving Pac",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "Makes Me Wonder",
+   "store": "GB",
+   "year": 2007,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "what-ive-done-linkin-park",
+   "appleYear": 2007,
+   "album": "Minutes to Midnight (Deluxe Edition)",
+   "appleArtist": "LINKIN PARK",
+   "appleTitle": "What I've Done",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "rockstar-nickelback",
+   "appleYear": 2006,
+   "album": "The Best of Nickelback, Vol. 1",
+   "appleArtist": "Nickelback",
+   "appleTitle": "Rockstar",
+   "store": "US",
+   "year": 2007,
+   "d": 1
+  },
+  {
+   "id": "thnks-fr-th-mmrs-fall-out-boy",
+   "appleYear": 2007,
+   "album": "Infinity On High",
+   "appleArtist": "Fall Out Boy",
+   "appleTitle": "Thnks Fr Th Mmrs",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "bubbly-colbie-caillat",
+   "appleYear": 2007,
+   "album": "Coco",
+   "appleArtist": "Colbie Caillat",
+   "appleTitle": "Bubbly",
+   "store": "US",
+   "year": 2007,
+   "d": 3
   },
   {
    "id": "poker-face-lady-gaga",
@@ -443,7 +2189,9 @@
    "album": "Pop Princesses 2011",
    "appleArtist": "Lady Gaga",
    "appleTitle": "Poker Face",
-   "year": 2008
+   "store": "GB",
+   "year": 2008,
+   "d": 1
   },
   {
    "id": "just-dance-lady-gaga",
@@ -451,39 +2199,50 @@
    "album": "The Fame",
    "appleArtist": "Lady Gaga",
    "appleTitle": "Just Dance (feat. Colby O'Donis)",
-   "year": 2008
+   "store": "US",
+   "year": 2008,
+   "d": 1
   },
   {
-   "id": "i-gotta-feeling-the-black-eyed-peas",
-   "appleYear": 2009,
-   "album": "THE E.N.D. (THE ENERGY NEVER DIES)",
-   "appleArtist": "Black Eyed Peas",
-   "appleTitle": "I Gotta Feeling",
-   "year": 2009
+   "id": "i-kissed-a-girl-katy-perry",
+   "appleYear": 2008,
+   "album": "One of the Boys",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "I Kissed a Girl",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2008,
+   "d": 2
   },
   {
-   "id": "boom-boom-pow-the-black-eyed-peas",
-   "appleYear": 2009,
-   "album": "The Beginning & The Best of The E.N.D.",
-   "appleArtist": "Black Eyed Peas",
-   "appleTitle": "Boom Boom Pow",
-   "year": 2009
+   "id": "single-ladies-put-a-ring-on-it-beyonce",
+   "appleYear": 2008,
+   "album": "I AM...SASHA FIERCE",
+   "appleArtist": "Beyoncé",
+   "appleTitle": "Single Ladies (Put a Ring on It)",
+   "store": "US",
+   "year": 2008,
+   "d": 1
   },
   {
-   "id": "party-in-the-u-s-a-miley-cyrus",
-   "appleYear": 2009,
-   "album": "Party In the U.S.A. - Single",
-   "appleArtist": "Miley Cyrus",
-   "appleTitle": "Party In the U.S.A.",
-   "year": 2009
+   "id": "love-story-taylor-swift",
+   "appleYear": 2008,
+   "album": "Fearless",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "Love Story",
+   "store": "US",
+   "year": 2008,
+   "d": 1
   },
   {
-   "id": "empire-state-of-mind-jay-z-and-alicia-keys",
-   "appleYear": 2009,
-   "album": "The Blueprint 3",
-   "appleArtist": "JAŸ-Z",
-   "appleTitle": "Empire State Of Mind (feat. Alicia Keys)",
-   "year": 2009
+   "id": "viva-la-vida-coldplay",
+   "appleYear": 2008,
+   "album": "Viva La Vida or Death and All His Friends",
+   "appleArtist": "Coldplay",
+   "appleTitle": "Viva La Vida",
+   "store": "US",
+   "year": 2008,
+   "d": 1
   },
   {
    "id": "use-somebody-kings-of-leon",
@@ -491,7 +2250,476 @@
    "album": "Only By the Night",
    "appleArtist": "Kings of Leon",
    "appleTitle": "Use Somebody",
-   "year": 2008
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "no-air-jordin-sparks-and-chris-brown",
+   "appleYear": 2007,
+   "album": "Jordin Sparks (Deluxe Version)",
+   "appleArtist": "Jordin Sparks & Chris Brown",
+   "appleTitle": "No Air",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "4-minutes-madonna",
+   "appleYear": 2008,
+   "album": "Celebration (Deluxe Version)",
+   "appleArtist": "Madonna",
+   "appleTitle": "4 Minutes (feat. Justin Timberlake & Timbaland)",
+   "store": "US",
+   "year": 2008,
+   "d": 1
+  },
+  {
+   "id": "dont-stop-the-music-rihanna",
+   "appleYear": 2007,
+   "album": "Good Girl Gone Bad: Reloaded",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Don't Stop The Music",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "disturbia-rihanna",
+   "appleYear": 2008,
+   "album": "Good Girl Gone Bad: Reloaded",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Disturbia",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "hot-n-cold-katy-perry",
+   "appleYear": 2008,
+   "album": "One of the Boys",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "Hot n Cold",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "im-yours-jason-mraz",
+   "appleYear": 2008,
+   "album": "We Sing. We Dance. We Steal Things",
+   "appleArtist": "Jason Mraz",
+   "appleTitle": "I'm Yours",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "take-a-bow-rihanna",
+   "appleYear": 2008,
+   "album": "Good Girl Gone Bad: Reloaded",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Take a Bow",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "american-boy-estelle",
+   "appleYear": 2008,
+   "album": "R&B - The Collection",
+   "appleArtist": "Estelle",
+   "appleTitle": "American Boy (No Rap Version)",
+   "store": "GB",
+   "year": 2008,
+   "d": 1
+  },
+  {
+   "id": "closer-ne-yo",
+   "appleYear": 2008,
+   "album": "Year of the Gentleman (Deluxe Edition)",
+   "appleArtist": "Ne-Yo",
+   "appleTitle": "Closer",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "forever-chris-brown",
+   "appleYear": 2007,
+   "album": "Forever - EP",
+   "appleArtist": "Chris Brown",
+   "appleTitle": "Forever (Main Version)",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "with-you-chris-brown",
+   "appleYear": 2007,
+   "album": "Exclusive (Expanded Edition)",
+   "appleArtist": "Chris Brown",
+   "appleTitle": "With You",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "live-your-life-t-i",
+   "appleYear": 2008,
+   "album": "Paper Trail",
+   "appleArtist": "T.I.",
+   "appleTitle": "Live Your Life (feat. Rihanna)",
+   "store": "US",
+   "year": 2008,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "love-song-sara-bareilles",
+   "appleYear": 2007,
+   "album": "Little Voice",
+   "appleArtist": "Sara Bareilles",
+   "appleTitle": "Love Song",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "shake-it-metro-station",
+   "appleYear": 2007,
+   "album": "Metro Station",
+   "appleArtist": "Metro Station",
+   "appleTitle": "Shake It",
+   "store": "US",
+   "year": 2007,
+   "d": 2
+  },
+  {
+   "id": "all-summer-long-kid-rock",
+   "appleYear": 2007,
+   "album": "Rock N Roll Jesus",
+   "appleArtist": "Kid Rock",
+   "appleTitle": "All Summer Long",
+   "store": "US",
+   "year": 2007,
+   "d": 1
+  },
+  {
+   "id": "womanizer-britney-spears",
+   "appleYear": 2008,
+   "album": "Circus (Deluxe Version)",
+   "appleArtist": "Britney Spears",
+   "appleTitle": "Womanizer",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "love-in-this-club-usher",
+   "appleYear": 2008,
+   "album": "Here I Stand",
+   "appleArtist": "USHER",
+   "appleTitle": "Love In This Club (feat. Young Jeezy)",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "when-i-grow-up-pussycat-dolls",
+   "appleYear": 2008,
+   "album": "Doll Domination",
+   "appleArtist": "The Pussycat Dolls",
+   "appleTitle": "When I Grow Up",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "so-what-pink",
+   "appleYear": 2008,
+   "album": "Funhouse (Deluxe Version)",
+   "appleArtist": "P!nk",
+   "appleTitle": "So What",
+   "store": "US",
+   "year": 2008,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "stop-and-stare-onerepublic",
+   "appleYear": 2007,
+   "album": "Dreaming Out Loud (Deluxe Edition)",
+   "appleArtist": "OneRepublic",
+   "appleTitle": "Stop And Stare",
+   "store": "US",
+   "year": 2007,
+   "d": 3
+  },
+  {
+   "id": "i-gotta-feeling-the-black-eyed-peas",
+   "appleYear": 2009,
+   "album": "THE E.N.D. (THE ENERGY NEVER DIES)",
+   "appleArtist": "Black Eyed Peas",
+   "appleTitle": "I Gotta Feeling",
+   "store": "US",
+   "year": 2009,
+   "d": 1
+  },
+  {
+   "id": "boom-boom-pow-the-black-eyed-peas",
+   "appleYear": 2009,
+   "album": "The Beginning & The Best of The E.N.D.",
+   "appleArtist": "Black Eyed Peas",
+   "appleTitle": "Boom Boom Pow",
+   "store": "US",
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "empire-state-of-mind-jay-z-and-alicia-keys",
+   "appleYear": 2009,
+   "album": "The Blueprint 3",
+   "appleArtist": "JAŸ-Z",
+   "appleTitle": "Empire State Of Mind (feat. Alicia Keys)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2009,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "party-in-the-u-s-a-miley-cyrus",
+   "appleYear": 2009,
+   "album": "Party In the U.S.A. - Single",
+   "appleArtist": "Miley Cyrus",
+   "appleTitle": "Party In the U.S.A.",
+   "store": "US",
+   "year": 2009,
+   "d": 1
+  },
+  {
+   "id": "right-round-flo-rida",
+   "appleYear": 2009,
+   "album": "R.O.O.T.S. (Deluxe Version)",
+   "appleArtist": "Flo Rida",
+   "appleTitle": "Right Round (feat. Ke$ha)",
+   "store": "US",
+   "year": 2009,
+   "d": 1
+  },
+  {
+   "id": "fireflies-owl-city",
+   "appleYear": 2009,
+   "album": "Ocean Eyes",
+   "appleArtist": "Owl City",
+   "appleTitle": "Fireflies",
+   "store": "US",
+   "year": 2009,
+   "d": 1
+  },
+  {
+   "id": "bad-romance-lady-gaga",
+   "appleYear": 2009,
+   "album": "The Fame Monster (Deluxe Edition)",
+   "appleArtist": "Lady Gaga",
+   "appleTitle": "Bad Romance",
+   "store": "US",
+   "year": 2009,
+   "d": 1
+  },
+  {
+   "id": "halo-beyonce",
+   "appleYear": 2008,
+   "album": "I AM...SASHA FIERCE",
+   "appleArtist": "Beyoncé",
+   "appleTitle": "Halo",
+   "store": "US",
+   "year": 2008,
+   "d": 1
+  },
+  {
+   "id": "replay-iyaz",
+   "appleYear": 2009,
+   "album": "Replay - Single",
+   "appleArtist": "Iyaz",
+   "appleTitle": "Replay",
+   "store": "US",
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "meet-me-halfway-the-black-eyed-peas",
+   "appleYear": 2009,
+   "album": "THE E.N.D. (THE ENERGY NEVER DIES)",
+   "appleArtist": "Black Eyed Peas",
+   "appleTitle": "Meet Me Halfway",
+   "store": "US",
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "break-your-heart-taio-cruz",
+   "appleYear": 2009,
+   "album": "Rokstarr (Bonus Track Version)",
+   "appleArtist": "Taio Cruz",
+   "appleTitle": "Break Your Heart (feat. Ludacris)",
+   "store": "US",
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "i-know-you-want-me-calle-ocho-pitbull",
+   "appleYear": 2009,
+   "album": "Pitbull Starring In: Rebelution (Deluxe Version)",
+   "appleArtist": "Pitbull",
+   "appleTitle": "I Know You Want Me (Calle Ocho)",
+   "store": "US",
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "sexy-bitch-david-guetta",
+   "appleYear": 2009,
+   "album": "One Love (Club Version)",
+   "appleArtist": "David Guetta",
+   "appleTitle": "Sexy Bitch (feat. Akon) [Extended]",
+   "store": "GB",
+   "kidsFloor": 1,
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "the-climb-miley-cyrus",
+   "appleYear": 2009,
+   "album": "Hannah Montana: The Movie (Original Motion Picture Soundtrack)",
+   "appleArtist": "Miley Cyrus",
+   "appleTitle": "The Climb",
+   "store": "US",
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "bulletproof-la-roux",
+   "appleYear": 2009,
+   "album": "La Roux (Bonus Track Version)",
+   "appleArtist": "La Roux",
+   "appleTitle": "Bulletproof",
+   "store": "US",
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "dead-and-gone-t-i",
+   "appleYear": 2008,
+   "album": "Paper Trail (Deluxe Version)",
+   "appleArtist": "T.I.",
+   "appleTitle": "Dead and Gone (feat. Justin Timberlake)",
+   "store": "US",
+   "year": 2008,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "you-belong-with-me-taylor-swift",
+   "appleYear": 2008,
+   "album": "Fearless",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "You Belong With Me",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "down-jay-sean",
+   "appleYear": 2009,
+   "album": "Down (feat. Lil Wayne) - EP",
+   "appleArtist": "Jay Sean",
+   "appleTitle": "Down",
+   "store": "US",
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "my-life-would-suck-without-you-kelly-clarkson",
+   "appleYear": 2009,
+   "album": "My Life Would Suck Without You - Single",
+   "appleArtist": "Kelly Clarkson",
+   "appleTitle": "My Life Would Suck Without You",
+   "store": "US",
+   "year": 2009,
+   "d": 3
+  },
+  {
+   "id": "day-n-nite-kid-cudi",
+   "appleYear": 2008,
+   "album": "Man On the Moon: The End of Day",
+   "appleArtist": "Kid Cudi",
+   "appleTitle": "Day 'n' Nite",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "gives-you-hell-the-all-american-rejects",
+   "appleYear": 2008,
+   "album": "When the World Comes Down (Bonus Track Version)",
+   "appleArtist": "The All-American Rejects",
+   "appleTitle": "Gives You Hell",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "sweet-dreams-beyonce",
+   "appleYear": 2008,
+   "album": "I AM...SASHA FIERCE",
+   "appleArtist": "Beyoncé",
+   "appleTitle": "Sweet Dreams",
+   "store": "US",
+   "year": 2008,
+   "d": 3
+  },
+  {
+   "id": "whatcha-say-jason-derulo",
+   "appleYear": 2009,
+   "album": "Jason Derulo",
+   "appleArtist": "Jason Derulo",
+   "appleTitle": "Whatcha Say",
+   "store": "US",
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "you-found-me-the-fray",
+   "appleYear": 2008,
+   "album": "The Fray",
+   "appleArtist": "The Fray",
+   "appleTitle": "You Found Me",
+   "store": "US",
+   "year": 2008,
+   "d": 2
+  },
+  {
+   "id": "run-this-town-jay-z",
+   "appleYear": 2009,
+   "album": "The Blueprint 3",
+   "appleArtist": "JAŸ-Z",
+   "appleTitle": "Run This Town (feat. Rihanna & Kanye West)",
+   "store": "US",
+   "year": 2009,
+   "d": 3,
+   "explicit": true
+  },
+  {
+   "id": "breakeven-the-script",
+   "appleYear": 2008,
+   "album": "The Script",
+   "appleArtist": "The Script",
+   "appleTitle": "Breakeven",
+   "store": "US",
+   "year": 2008,
+   "d": 3
   }
  ]
 }

@@ -1,65 +1,276 @@
 @id hits-2000s
 @title Hits of the 2000s
 @icon 📱
-@sources [{"name":"Billboard Year-End Hot 100 singles (2000–2009)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2000"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
-1999 | Faith Hill | Breathe
-1999 | Santana | Maria Maria | am=santana
-2000 | Destiny's Child | Say My Name
-2000 | Britney Spears | Oops!...I Did It Again | d=1; tm=oops
-2000 | *NSYNC | Bye Bye Bye | am=sync
-2000 | Madonna | Music
-2000 | Bon Jovi | It's My Life | d=1
-2000 | Baha Men | Who Let the Dogs Out | d=1
-2000 | Lifehouse | Hanging by a Moment
-2001 | Alicia Keys | Fallin'
-2001 | Christina Aguilera, Lil' Kim, Mýa & P!nk | Lady Marmalade | am=aguilera|lil.? kim
-2000 | Destiny's Child | Independent Women, Pt. 1 | tm=independent women
-2001 | Kylie Minogue | Can't Get You Out of My Head | d=1
-2001 | Nickelback | How You Remind Me
-2002 | Nelly | Hot in Herre
-2002 | Nelly & Kelly Rowland | Dilemma | am=nelly
-2002 | Vanessa Carlton | A Thousand Miles
-2002 | Avril Lavigne | Complicated
-2002 | Eminem | Lose Yourself | d=1
-2002 | Eminem | Without Me
-2003 | 50 Cent | In da Club | d=1
-2003 | Beyoncé | Crazy in Love | d=1
-2003 | Outkast | Hey Ya! | d=1
-2003 | The Black Eyed Peas | Where Is the Love?
-2003 | Evanescence | Bring Me to Life
-2002 | Sean Paul | Get Busy
-2002 | Coldplay | Clocks | am=coldplay
-2004 | Usher | Yeah! | d=1; am=usher
-2004 | Usher | Burn
-2003 | Alicia Keys | If I Ain't Got You
-2003 | Britney Spears | Toxic | d=1
-2004 | Kelly Clarkson | Since U Been Gone | d=1
-2005 | Mariah Carey | We Belong Together
-2004 | Gwen Stefani | Hollaback Girl
-2005 | Kanye West | Gold Digger
-2005 | Gorillaz | Feel Good Inc.
-2005 | Daniel Powter | Bad Day | d=1
-2004 | James Blunt | You're Beautiful
-2006 | Shakira | Hips Don't Lie | d=1
-2006 | Gnarls Barkley | Crazy | d=1
-2006 | Justin Timberlake | SexyBack
-2006 | Nelly Furtado | Promiscuous
-2006 | Snow Patrol | Chasing Cars
-2006 | Beyoncé | Irreplaceable
-2007 | Rihanna | Umbrella | d=1
-2007 | Avril Lavigne | Girlfriend
-2007 | Kanye West | Stronger
-2007 | Timbaland | Apologize | am=timbaland|onerepublic
-2007 | Leona Lewis | Bleeding Love
-2007 | Flo Rida | Low
-2008 | Katy Perry | I Kissed a Girl
-2008 | Coldplay | Viva la Vida | d=1
-2008 | Beyoncé | Single Ladies (Put a Ring on It) | tm=single ladies; alt=Single Ladies
-2008 | Taylor Swift | Love Story
-2008 | Lady Gaga | Poker Face | d=1
-2008 | Lady Gaga | Just Dance
-2009 | The Black Eyed Peas | I Gotta Feeling | d=1
-2009 | The Black Eyed Peas | Boom Boom Pow
-2009 | Miley Cyrus | Party in the U.S.A.
-2009 | Jay-Z & Alicia Keys | Empire State of Mind | am=ja.?.?-z|jay; q=empire state of mind
-2008 | Kings of Leon | Use Somebody
+@sources [{"name":"Billboard Year-End Hot 100 singles (2000s)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2000"},{"name":"UK year-end best-selling singles (Music Week / Official Charts Company)","url":"https://www.officialcharts.com/charts/end-of-year-singles-chart/"},{"name":"ARIA year-end singles chart","url":"https://www.aria.com.au/charts/2000/singles-chart"},{"name":"Wikipedia pageviews (lasting fame) and Wikidata (artist country)","url":"https://www.wikidata.org/"}]
+# chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
+1999 | Santana | Maria Maria | us=3 uk=- au=- pv=6377 from=USA | am=santana
+1999 | Faith Hill | Breathe | us=1 uk=- au=- pv=2326 from=USA
+2000 | Madonna | Music | us=17 uk=24 au=4 pv=6732 from=USA
+2000 | Britney Spears | Oops!...I Did It Again | us=55 uk=15 au=35 pv=10354 from=USA | d=1; tm=oops
+2000 | Destiny's Child | Say My Name | us=6 uk=- au=5 pv=7770 from=USA
+2000 | Baha Men | Who Let the Dogs Out | us=- uk=4 au=22 pv=13242 from=BHS | d=1
+2000 | *NSYNC | Bye Bye Bye | us=21 uk=- au=7 pv=12018 from=USA | am=sync
+2000 | Lifehouse | Hanging by a Moment | us=1 uk=- au=5 pv=3369 from=USA
+2000 | Bon Jovi | It's My Life | us=- uk=- au=24 pv=0 from=USA | d=1
+2000 | Destiny's Child | Independent Women, Pt. 1 | us=- uk=- au=- pv=0 from=USA | tm=independent women
+2000 | Sisqó | Thong Song | us=14 uk=29 au=23 pv=8013 from=USA
+2000 | LeAnn Rimes | Can't Fight the Moonlight | us=56 uk=12 au=1 pv=5902 from=USA
+2000 | Wheatus | Teenage Dirtbag | us=- uk=9 au=2 pv=25098 from=USA
+2000 | Eminem | Stan | us=- uk=6 au=6 pv=21558 from=USA
+2000 | Destiny's Child | Independent Women Part I | us=10 uk=25 au=57 pv=3354 from=USA
+2000 | Spiller | Groovejet (If This Ain't Love) | us=- uk=8 au=9 pv=4560 from=ITA
+2000 | Bomfunk MCs | Freestyler | us=- uk=23 au=3 pv=6873 from=FIN
+2000 | Sonique | It Feels So Good | us=34 uk=3 au=84 pv=4402 from=GBR
+2000 | Bob the Builder | Can We Fix It? | us=- uk=1 au=9 pv=1760 from=GBR
+2000 | Robbie Williams | Rock DJ | us=- uk=5 au=21 pv=3430 from=GBR
+2000 | Madonna | American Pie | us=- uk=19 au=66 pv=51171 from=USA
+2000 | 3 Doors Down | Kryptonite | us=15 uk=- au=41 pv=11668 from=USA
+2000 | Destiny's Child | Jumpin', Jumpin' | us=13 uk=- au=17 pv=3325 from=USA
+2000 | Craig David | Fill Me In | us=37 uk=10 au=68 pv=1334 from=GBR
+2000 | All Saints | Pure Shores | us=- uk=2 au=43 pv=5213 from=GBR
+2000 | Craig David | 7 Days | us=52 uk=17 au=58 pv=2062 from=GBR
+2000 | Melanie C | Never Be the Same Again | us=- uk=18 au=14 pv=2368 from=GBR
+2000 | Eminem | The Real Slim Shady | us=51 uk=14 au=- pv=10137 from=USA
+2000 | Creed | With Arms Wide Open | us=36 uk=- au=20 pv=4544 from=USA
+2001 | Christina Aguilera, Lil' Kim, Mýa & P!nk | Lady Marmalade | us=24 uk=14 au=13 pv=23581 from=USA | am=aguilera; kids=0
+2001 | Nickelback | How You Remind Me | us=1 uk=12 au=18 pv=8337 from=CAN
+2001 | Kylie Minogue | Can't Get You Out of My Head | us=45 uk=3 au=3 pv=14636 from=AUS/GBR | d=1
+2001 | Alicia Keys | Fallin' | us=2 uk=- au=52 pv=4527 from=USA
+2001 | Shaggy | It Wasn't Me | us=12 uk=1 au=2 pv=12451 from=JAM
+2001 | Shaggy | Angel | us=17 uk=8 au=4 pv=6543 from=JAM
+2001 | Enrique Iglesias | Hero | us=22 uk=3 au=18 pv=4712 from=ESP
+2001 | Crazy Town | Butterfly | us=29 uk=38 au=12 pv=11483 from=USA
+2001 | Outkast | Ms. Jackson | us=25 uk=43 au=17 pv=9972 from=USA
+2001 | Eve | Let Me Blow Ya Mind | us=7 uk=45 au=24 pv=3874 from=USA
+2001 | Nelly Furtado | I'm Like a Bird | us=43 uk=31 au=7 pv=4848 from=CAN/PRT
+2001 | City High | What Would You Do? | us=22 uk=18 au=29 pv=2694 from=USA
+2001 | Alien Ant Farm | Smooth Criminal | us=- uk=32 au=8 pv=37425 from=USA
+2001 | Uncle Kracker | Follow Me | us=19 uk=28 au=49 pv=3426 from=USA
+2001 | Destiny's Child | Survivor | us=23 uk=35 au=55 pv=5372 from=USA
+2001 | Afroman | Because I Got High | us=- uk=10 au=14 pv=7992 from=USA
+2001 | Train | Drops of Jupiter (Tell Me) | us=4 uk=- au=23 pv=9010 from=USA
+2001 | DJ Ötzi | Hey Baby (Uhh, Ahh) | us=- uk=5 au=14 pv=6185 from=AUT
+2001 | Bob the Builder | Mambo No. 5 | us=- uk=17 au=26 pv=17339 from=GBR
+2001 | Atomic Kitten | Whole Again | us=- uk=4 au=10 pv=3812 from=GBR
+2001 | Geri Halliwell | It's Raining Men | us=- uk=13 au=34 pv=14553 from=GBR
+2001 | Westlife | Uptown Girl | us=- uk=6 au=44 pv=10219 from=IRL
+2001 | S Club 7 | Don't Stop Movin | us=- uk=7 au=16 pv=1393 from=GBR
+2001 | Gorillaz | Clint Eastwood | us=- uk=12 au=74 pv=19252 from=GBR
+2001 | Limp Bizkit | Rollin' | us=- uk=27 au=45 pv=9180 from=USA
+2001 | Janet | All for You | us=3 uk=- au=56 pv=3749 from=USA
+2001 | Nelly | Ride wit Me | us=18 uk=- au=40 pv=3314 from=USA
+2002 | Nelly & Kelly Rowland | Dilemma | us=4 uk=4 au=4 pv=7629 from=USA | am=nelly
+2002 | Eminem | Without Me | us=21 uk=10 au=1 pv=9266 from=USA
+2002 | Eminem | Lose Yourself | us=28 uk=25 au=2 pv=17321 from=USA | d=1
+2002 | Avril Lavigne | Complicated | us=11 uk=36 au=9 pv=8811 from=CAN/FRA
+2002 | Nelly | Hot in Herre | us=3 uk=27 au=17 pv=5344 from=USA
+2002 | Vanessa Carlton | A Thousand Miles | us=6 uk=- au=6 pv=20635 from=USA
+2002 | Sean Paul | Get Busy | us=3 uk=- au=45 pv=4386 from=JAM
+2002 | Coldplay | Clocks | us=81 uk=- au=- pv=6156 from=GBR | am=coldplay
+2002 | Shakira | Whenever, Wherever | us=28 uk=7 au=2 pv=7377 from=COL/ESP
+2002 | DJ Sammy | Heaven | us=31 uk=19 au=22 pv=9971 from=ESP
+2002 | Pink | Get the Party Started | us=24 uk=21 au=35 pv=7462 from=USA
+2002 | Las Ketchup | The Ketchup Song (Aserejé) | us=- uk=8 au=3 pv=15579 from=ESP
+2002 | Elvis vs JXL | A Little Less Conversation | us=- uk=5 au=5 pv=6672 from=USA
+2002 | Atomic Kitten | The Tide Is High (Get the Feeling) | us=- uk=13 au=16 pv=9947 from=GBR
+2002 | Scooter | The Logical Song | us=- uk=15 au=20 pv=11681 from=DEU
+2002 | Holly Valance | Kiss Kiss | us=- uk=14 au=10 pv=4263 from=AUS
+2002 | Shakira | Underneath Your Clothes | us=66 uk=41 au=11 pv=2736 from=COL/ESP
+2002 | Linkin Park | In the End | us=7 uk=- au=46 pv=11619 from=USA
+2002 | Gareth Gates | Unchained Melody | us=- uk=2 au=72 pv=26723 from=GBR
+2002 | Ronan Keating | If Tomorrow Never Comes | us=- uk=11 au=19 pv=3017 from=IRL
+2002 | The Calling | Wherever You Will Go | us=5 uk=- au=45 pv=7113 from=USA
+2002 | Ashanti | Foolish | us=2 uk=- au=32 pv=2733 from=USA
+2002 | Enrique Iglesias | Escape | us=57 uk=46 au=44 pv=2447 from=ESP
+2002 | Christina Aguilera | Dirrty | us=- uk=30 au=27 pv=4054 from=USA
+2002 | Fat Joe | What's Luv? | us=8 uk=- au=49 pv=3776 from=USA
+2002 | Usher | U Got It Bad | us=9 uk=- au=38 pv=2019 from=USA
+2003 | Evanescence | Bring Me to Life | us=10 uk=11 au=6 pv=24339 from=USA
+2003 | 50 Cent | In da Club | us=1 uk=13 au=5 pv=12015 from=USA | d=1
+2003 | The Black Eyed Peas | Where Is the Love? | us=26 uk=1 au=3 pv=10598 from=USA
+2003 | Outkast | Hey Ya! | us=8 uk=25 au=15 pv=15650 from=USA | d=1
+2003 | Beyoncé | Crazy in Love | us=4 uk=15 au=28 pv=9699 from=USA | d=1
+2003 | Britney Spears | Toxic | us=48 uk=9 au=38 pv=16066 from=USA | d=1
+2003 | Alicia Keys | If I Ain't Got You | us=3 uk=- au=- pv=4444 from=USA
+2003 | R. Kelly | Ignition | us=2 uk=3 au=10 pv=2981 from=USA
+2003 | Christina Aguilera | Beautiful | us=16 uk=23 au=24 pv=7565 from=USA
+2003 | Jennifer Lopez | All I Have | us=15 uk=29 au=11 pv=2161 from=USA
+2003 | t.A.T.u. | All the Things She Said | us=- uk=6 au=14 pv=31099 from=RUS
+2003 | Kevin Lyttle | Turn Me On | us=27 uk=14 au=29 pv=2181 from=VCT
+2003 | Busta Rhymes and Mariah Carey | I Know What You Want | us=17 uk=38 au=31 pv=3420 from=USA
+2003 | Justin Timberlake | Cry Me a River | us=30 uk=28 au=54 pv=7983 from=USA
+2003 | Jay-Z | '03 Bonnie & Clyde | us=37 uk=50 au=16 pv=4000 from=USA
+2003 | Dido | White Flag | us=36 uk=12 au=78 pv=6946 from=GBR
+2003 | 3 Doors Down | Here Without You | us=15 uk=- au=18 pv=6591 from=USA
+2003 | Linkin Park | Numb | us=33 uk=- au=30 pv=10218 from=USA
+2003 | The Black Eyed Peas | Shut Up | us=- uk=20 au=9 pv=2090 from=USA
+2003 | Dixie Chicks | Landslide | us=35 uk=- au=42 pv=18843 from=USA
+2003 | Beyoncé | Baby Boy | us=12 uk=- au=30 pv=3273 from=USA
+2003 | Jamelia | Superstar | us=- uk=26 au=6 pv=1776 from=GBR
+2003 | 50 Cent | P.I.M.P. | us=21 uk=- au=33 pv=4719 from=USA
+2003 | Nelly, P. Diddy and Murphy Lee | Shake Ya Tailfeather | us=13 uk=- au=21 pv=1831 from=USA
+2003 | Kelly Rowland | Stole | us=- uk=30 au=12 pv=1602 from=USA
+2003 | Nickelback | Someday | us=17 uk=- au=23 pv=1457 from=CAN
+2003 | 50 Cent | 21 Questions | us=14 uk=- au=44 pv=3124 from=USA
+2004 | James Blunt | You're Beautiful | us=4 uk=4 au=11 pv=8375 from=GBR
+2004 | Usher | Yeah! | us=1 uk=5 au=28 pv=16122 from=USA | d=1; am=usher
+2004 | Gwen Stefani | Hollaback Girl | us=2 uk=47 au=21 pv=8971 from=USA
+2004 | Usher | Burn | us=2 uk=27 au=31 pv=2673 from=USA
+2004 | Kelly Clarkson | Since U Been Gone | us=4 uk=30 au=- pv=9711 from=USA | d=1
+2004 | Kelis | Milkshake | us=41 uk=14 au=4 pv=11291 from=USA
+2004 | Mario Winans | I Don't Wanna Know | us=7 uk=11 au=16 pv=3226 from=USA
+2004 | JoJo | Leave (Get Out) | us=40 uk=36 au=23 pv=4868 from=USA
+2004 | Nelly | Over and Over | us=48 uk=25 au=5 pv=1790 from=USA
+2004 | Maroon 5 | This Love | us=4 uk=39 au=60 pv=5608 from=USA
+2004 | D12 | My Band | us=59 uk=16 au=11 pv=2436 from=USA
+2004 | Evanescence | My Immortal | us=19 uk=- au=7 pv=8217 from=USA
+2004 | Anastacia | Left Outside Alone | us=- uk=7 au=2 pv=3172 from=USA
+2004 | Eric Prydz | Call on Me | us=- uk=4 au=46 pv=18485 from=SWE
+2004 | Destiny's Child | Lose My Breath | us=58 uk=15 au=43 pv=2563 from=USA
+2004 | Nelly | My Place | us=30 uk=26 au=40 pv=699 from=USA
+2004 | Maroon 5 | She Will Be Loved | us=35 uk=- au=13 pv=7007 from=USA
+2004 | J-Kwon | Tipsy | us=11 uk=- au=35 pv=3396 from=USA
+2004 | Snoop Dogg | Drop It Like It's Hot | us=23 uk=- au=36 pv=4865 from=USA
+2004 | Eminem | Just Lose It | us=98 uk=23 au=36 pv=4092 from=USA
+2004 | Twista | Slow Jamz | us=16 uk=47 au=- pv=5089 from=USA
+2004 | Natasha Bedingfield | These Words | us=80 uk=17 au=49 pv=2190 from=GBR/NZL
+2004 | Britney Spears | Everytime | us=83 uk=18 au=72 pv=6458 from=USA
+2004 | Boogie Pimps | Somebody to Love | us=- uk=31 au=53 pv=6550 from=DEU
+2004 | Ciara | Goodies | us=9 uk=59 au=- pv=2652 from=USA/BEN
+2004 | DJ Casper | Cha Cha Slide | us=- uk=3 au=- pv=11191 from=USA
+2004 | Christina Milian | Dip It Low | us=23 uk=37 au=- pv=1342 from=USA
+2005 | Daniel Powter | Bad Day | us=1 uk=11 au=18 pv=7306 from=CAN | d=1
+2005 | Mariah Carey | We Belong Together | us=1 uk=20 au=17 pv=8516 from=USA
+2005 | Gorillaz | Feel Good Inc. | us=37 uk=14 au=9 pv=16962 from=GBR
+2005 | Kanye West | Gold Digger | us=6 uk=35 au=33 pv=8011 from=USA
+2005 | The Pussycat Dolls | Don't Cha | us=9 uk=5 au=2 pv=9361 from=USA
+2005 | Mario | Let Me Love You | us=3 uk=18 au=7 pv=6827 from=USA
+2005 | Akon | Lonely | us=44 uk=7 au=3 pv=5344 from=USA/SEN
+2005 | The Black Eyed Peas | Don't Phunk with My Heart | us=13 uk=24 au=10 pv=2535 from=USA
+2005 | 50 Cent | Candy Shop | us=8 uk=29 au=24 pv=4780 from=USA | kids=0
+2005 | Ciara | 1, 2 Step | us=5 uk=44 au=13 pv=2836 from=USA/BEN
+2005 | Rihanna | Pon de Replay | us=18 uk=33 au=39 pv=6923 from=BRB
+2005 | Will Smith | Switch | us=28 uk=15 au=6 pv=850 from=USA
+2005 | The Black Eyed Peas | My Humps | us=32 uk=32 au=36 pv=4579 from=USA
+2005 | Chris Brown | Run It! | us=16 uk=59 au=20 pv=3073 from=USA
+2005 | Gwen Stefani | Rich Girl | us=31 uk=48 au=26 pv=4821 from=USA
+2005 | Green Day | Boulevard of Broken Dreams | us=7 uk=88 au=31 pv=10069 from=USA
+2005 | Madonna | Hung Up | us=91 uk=8 au=38 pv=16163 from=USA
+2005 | Pussycat Dolls | Stickwitu | us=40 uk=28 au=29 pv=2408 from=USA
+2005 | Missy Elliott | Lose Control | us=14 uk=61 au=41 pv=2945 from=USA
+2005 | Jennifer Lopez | Get Right | us=82 uk=23 au=29 pv=1991 from=USA
+2005 | Green Day | Wake Me Up When September Ends | us=46 uk=53 au=87 pv=12350 from=USA
+2005 | Crazy Frog | Axel F | us=- uk=3 au=4 pv=0 | nm=apple
+2005 | Rob Thomas | Lonely No More | us=22 uk=- au=23 pv=1664 from=USA
+2005 | Frankie J | Obsession (No Es Amor) | us=33 uk=- au=32 pv=3850 from=USA
+2005 | The Game | Hate It or Love It | us=24 uk=49 au=95 pv=4008 from=USA
+2005 | Kelly Clarkson | Because of You | us=39 uk=83 au=58 pv=5088 from=USA
+2005 | Westlife | You Raise Me Up | us=- uk=9 au=14 pv=0 from=IRL | nm=apple
+2006 | Shakira | Hips Don't Lie | us=5 uk=3 au=3 pv=16461 from=COL/ESP | d=1
+2006 | Gnarls Barkley | Crazy | us=7 uk=1 au=16 pv=9711 from=USA | d=1
+2006 | Justin Timberlake | SexyBack | us=9 uk=10 au=4 pv=7507 from=USA
+2006 | Nelly Furtado | Promiscuous | us=3 uk=38 au=10 pv=7005 from=CAN/PRT | kids=0
+2006 | Beyoncé | Irreplaceable | us=1 uk=29 au=23 pv=6881 from=USA
+2006 | Snow Patrol | Chasing Cars | us=29 uk=14 au=- pv=9493 from=GBR
+2006 | The Fray | How to Save a Life | us=24 uk=11 au=18 pv=13301 from=USA
+2006 | Rihanna | SOS | us=19 uk=9 au=13 pv=4501 from=BRB
+2006 | Akon | Smack That | us=15 uk=27 au=26 pv=5099 from=USA/SEN
+2006 | Rihanna | Unfaithful | us=28 uk=23 au=19 pv=2935 from=BRB
+2006 | Ne-Yo | So Sick | us=17 uk=32 au=28 pv=3517 from=USA
+2006 | Pussycat Dolls | Buttons | us=15 uk=57 au=17 pv=5609 from=USA
+2006 | Christina Aguilera | Ain't No Other Man | us=32 uk=33 au=34 pv=2726 from=USA
+2006 | Red Hot Chili Peppers | Dani California | us=23 uk=43 au=54 pv=5438 from=USA
+2006 | Justin Timberlake | My Love | us=26 uk=55 au=35 pv=3371 from=USA
+2006 | Cassie | Me & U | us=14 uk=50 au=62 pv=4115 from=USA
+2006 | Hinder | Lips of an Angel | us=30 uk=- au=5 pv=5923 from=USA
+2006 | Cascada | Everytime We Touch | us=31 uk=15 au=- pv=8296 from=DEU
+2006 | My Chemical Romance | Welcome To The Black Parade | us=59 uk=26 au=71 pv=11242 from=USA
+2006 | Sean Paul | Temperature | us=2 uk=- au=30 pv=3456 from=JAM
+2006 | Chamillionaire | Ridin' | us=8 uk=41 au=- pv=4865 from=USA
+2006 | The Black Eyed Peas | Pump It | us=89 uk=34 au=31 pv=5012 from=USA
+2006 | Fergie | London Bridge | us=22 uk=- au=27 pv=3237 from=USA
+2006 | Fergie | Fergalicious | us=19 uk=- au=38 pv=4421 from=USA
+2006 | Pussycat Dolls | Beep | us=84 uk=31 au=24 pv=1755 from=USA
+2006 | Panic! at the Disco | I Write Sins Not Tragedies | us=20 uk=- au=50 pv=6729 from=USA
+2006 | Sandi Thom | I Wish I Was a Punk Rocker | us=- uk=5 au=1 pv=0 from=GBR | nm=apple
+2007 | Rihanna | Umbrella | us=2 uk=2 au=3 pv=12900 from=BRB | d=1
+2007 | Flo Rida | Low | us=1 uk=11 au=1 pv=13462 from=USA
+2007 | Leona Lewis | Bleeding Love | us=2 uk=1 au=4 pv=6934 from=GBR
+2007 | Avril Lavigne | Girlfriend | us=12 uk=20 au=2 pv=8493 from=CAN/FRA
+2007 | Kanye West | Stronger | us=27 uk=19 au=19 pv=7772 from=USA
+2007 | Timbaland | Apologize | us=- uk=16 au=6 pv=0 from=USA | am=timbaland
+2007 | Plain White T's | Hey There Delilah | us=7 uk=14 au=21 pv=14070 from=USA
+2007 | Fergie | Big Girls Don't Cry | us=4 uk=21 au=1 pv=5281 from=USA
+2007 | Gwen Stefani | The Sweet Escape | us=3 uk=13 au=9 pv=4821 from=USA
+2007 | Timbaland | The Way I Are | us=18 uk=7 au=11 pv=4792 from=USA
+2007 | Sean Kingston | Beautiful Girls | us=31 uk=15 au=10 pv=4889 from=USA
+2007 | Nelly Furtado | Say It Right | us=9 uk=29 au=25 pv=5067 from=CAN/PRT
+2007 | Fergie | Glamorous | us=10 uk=33 au=13 pv=2134 from=USA
+2007 | Justin Timberlake | What Goes Around... Comes Around | us=22 uk=28 au=31 pv=6195 from=USA
+2007 | Soulja Boy Tell 'Em | Crank That (Soulja Boy) | us=20 uk=56 au=23 pv=10838 from=USA
+2007 | Fall Out Boy | This Ain't a Scene, It's an Arms Race | us=32 uk=35 au=14 pv=2968 from=USA
+2007 | Akon | I Wanna Love You | us=8 uk=36 au=43 pv=2959 from=USA/SEN
+2007 | Timbaland | Give It to Me | us=21 uk=22 au=55 pv=4189 from=USA
+2007 | Alicia Keys | No One | us=3 uk=49 au=47 pv=3876 from=USA
+2007 | Gym Class Heroes | Cupid's Chokehold | us=23 uk=27 au=72 pv=5901 from=USA
+2007 | Akon | Don't Matter | us=11 uk=40 au=62 pv=2316 from=USA/SEN
+2007 | Beyoncé and Shakira | Beautiful Liar | us=62 uk=12 au=51 pv=3823 from=USA
+2007 | Maroon 5 | Makes Me Wonder | us=13 uk=53 au=45 pv=1939 from=USA
+2007 | Linkin Park | What I've Done | us=38 uk=63 au=39 pv=7312 from=USA
+2007 | Nickelback | Rockstar | us=36 uk=5 au=- pv=5618 from=CAN
+2007 | Fall Out Boy | Thnks fr th Mmrs | us=37 uk=- au=16 pv=4796 from=USA
+2007 | Colbie Caillat | Bubbly | us=21 uk=- au=24 pv=2178 from=USA
+2008 | Lady Gaga | Poker Face | us=2 uk=1 au=11 pv=14042 from=USA | d=1
+2008 | Lady Gaga | Just Dance | us=3 uk=3 au=7 pv=11666 from=USA
+2008 | Katy Perry | I Kissed a Girl | us=14 uk=4 au=6 pv=10007 from=USA | kids=0
+2008 | Beyoncé | Single Ladies (Put a Ring on It) | us=8 uk=34 au=14 pv=40630 from=USA | tm=single ladies; alt=Single Ladies
+2008 | Taylor Swift | Love Story | us=5 uk=29 au=3 pv=13786 from=USA
+2008 | Coldplay | Viva la Vida | us=13 uk=25 au=33 pv=22538 from=GBR | d=1
+2008 | Kings of Leon | Use Somebody | us=14 uk=13 au=30 pv=4958 from=USA
+2008 | Jordin Sparks and Chris Brown | No Air | us=6 uk=21 au=8 pv=4265 from=USA
+2008 | Madonna | 4 Minutes | us=23 uk=9 au=15 pv=6259 from=USA
+2008 | Rihanna | Don't Stop the Music | us=17 uk=24 au=12 pv=7905 from=BRB
+2008 | Rihanna | Disturbia | us=16 uk=18 au=22 pv=6870 from=BRB
+2008 | Katy Perry | Hot n Cold | us=25 uk=23 au=16 pv=6324 from=USA
+2008 | Jason Mraz | I'm Yours | us=7 uk=40 au=9 pv=4316 from=USA
+2008 | Rihanna | Take a Bow | us=12 uk=20 au=25 pv=3565 from=BRB
+2008 | Estelle | American Boy | us=39 uk=6 au=27 pv=6828 from=GBR
+2008 | Ne-Yo | Closer | us=20 uk=15 au=28 pv=2560 from=USA
+2008 | Chris Brown | Forever | us=10 uk=46 au=20 pv=3317 from=USA
+2008 | Chris Brown | With You | us=9 uk=39 au=31 pv=2492 from=USA
+2008 | T.I. | Live Your Life | us=18 uk=38 au=45 pv=4662 from=USA
+2008 | Sara Bareilles | Love Song | us=7 uk=55 au=37 pv=4069 from=USA
+2008 | Metro Station | Shake It | us=32 uk=55 au=11 pv=3221 from=USA
+2008 | Kid Rock | All Summer Long | us=85 uk=19 au=10 pv=6569 from=USA
+2008 | Britney Spears | Womanizer | us=39 uk=33 au=40 pv=5380 from=USA
+2008 | Usher | Love in This Club | us=8 uk=32 au=51 pv=1985 from=USA
+2008 | Pussycat Dolls | When I Grow Up | us=49 uk=45 au=13 pv=2246 from=USA
+2008 | Pink | So What | us=24 uk=14 au=- pv=4539 from=USA
+2008 | OneRepublic | Stop and Stare | us=33 uk=40 au=59 pv=1236 from=USA
+2009 | The Black Eyed Peas | I Gotta Feeling | us=4 uk=2 au=1 pv=9877 from=USA | d=1
+2009 | The Black Eyed Peas | Boom Boom Pow | us=1 uk=7 au=4 pv=4393 from=USA
+2009 | Jay-Z & Alicia Keys | Empire State of Mind | us=21 uk=13 au=19 pv=16003 from=USA | am=ja.?.?-z
+2009 | Miley Cyrus | Party in the U.S.A. | us=29 uk=- au=37 pv=13635 from=USA
+2009 | Flo Rida | Right Round | us=6 uk=22 au=5 pv=6185 from=USA
+2009 | Owl City | Fireflies | us=30 uk=6 au=6 pv=8943 from=USA
+2009 | Lady Gaga | Bad Romance | us=8 uk=17 au=26 pv=13066 from=USA
+2009 | Beyoncé | Halo | us=24 uk=25 au=7 pv=7693 from=USA
+2009 | Iyaz | Replay | us=25 uk=18 au=15 pv=5872 from=USA
+2009 | The Black Eyed Peas | Meet Me Halfway | us=58 uk=10 au=8 pv=4631 from=USA
+2009 | Lady Gaga | Paparazzi | us=53 uk=21 au=12 pv=7273 from=USA
+2009 | Taio Cruz | Break Your Heart | us=10 uk=37 au=31 pv=2057 from=GBR
+2009 | Pitbull | I Know You Want Me (Calle Ocho) | us=17 uk=59 au=21 pv=4008 from=USA
+2009 | David Guetta | Sexy Bitch | us=26 uk=- au=2 pv=16118 from=FRA
+2009 | Miley Cyrus | The Climb | us=21 uk=84 au=16 pv=6563 from=USA
+2009 | La Roux | Bulletproof | us=42 uk=24 au=47 pv=4494 from=GBR
+2009 | T.I. | Dead and Gone | us=12 uk=47 au=36 pv=1636 from=USA
+2009 | Taylor Swift | You Belong with Me | us=11 uk=- au=17 pv=7581 from=USA
+2009 | Jay Sean | Down | us=20 uk=64 au=34 pv=4247 from=GBR
+2009 | Kelly Clarkson | My Life Would Suck Without You | us=23 uk=46 au=40 pv=2534 from=USA
+2009 | Kid Cudi | Day 'n' Nite | us=28 uk=33 au=84 pv=7074 from=USA
+2009 | The All-American Rejects | Gives You Hell | us=10 uk=- au=19 pv=2957 from=USA
+2009 | Beyoncé | Sweet Dreams | us=66 uk=39 au=23 pv=2604 from=USA
+2009 | Jason Derulo | Whatcha Say | us=34 uk=70 au=43 pv=5732 from=USA
+2009 | The Fray | You Found Me | us=13 uk=- au=13 pv=2101 from=USA
+2009 | Jay-Z | Run This Town | us=31 uk=60 au=60 pv=3421 from=USA
+2009 | The Script | Breakeven | us=27 uk=- au=24 pv=2453 from=IRL

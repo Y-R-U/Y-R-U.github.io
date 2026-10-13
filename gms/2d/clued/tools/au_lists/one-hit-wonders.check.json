@@ -1,15 +1,19 @@
 {
- "dropped": [],
+ "dropped": [
+  "YEAR 2001 vs apple 1999  Crazy Town — Butterfly  [The Gift of Game]",
+  "NO MATCH  2022 Gayle — ABCDEFU"
+ ],
  "offby": [
   "1972 apple 1989 (earliest original 2000)  Hot Butter — Popcorn  [That '70s Show (Music Inspired By The TV Series)]",
   "1972 apple 1972 (earliest original 1900)  Looking Glass — Brandy (You're a Fine Girl)  [Looking Glass]",
   "1979 apple 1979 (earliest original 1974)  The Buggles — Video Killed the Radio Star  [The Age of Plastic]",
   "1979 apple 1980 (earliest original 1980)  The Sugarhill Gang — Rapper's Delight  [Disco]",
   "1981 apple 1982 (earliest original 1982)  Toni Basil — Mickey  [Mickey - Single]",
-  "1982 apple 1981 (earliest original 1981)  Men Without Hats — The Safety Dance  [Rhythm of Youth (Expanded Edition)]",
   "1982 apple 1982 (earliest original 1974)  Dexys Midnight Runners — Come On Eileen  [Too Rye Ay]",
-  "2002 apple 2002 (earliest original 1995)  Las Ketchup — The Ketchup Song (Aserejé)  [Aserejé (The Ketchup Song) - Single]",
-  "2006 apple 2005 (earliest original 2005)  Gnarls Barkley — Crazy  [St. Elsewhere]"
+  "1990 apple 1989 (earliest original 1989)  Alannah Myles — Black Velvet  [Alannah Myles]",
+  "1996 apple 1996 (earliest original 1993)  Los del Río — Macarena  [NOW That's What I Call the 90's]",
+  "1999 apple 2000 (earliest original 1997)  Sixpence None the Richer — Kiss Me  [The Best of Sixpence None the Richer]",
+  "2002 apple 2002 (earliest original 2000)  Las Ketchup — The Ketchup Song (Aserejé)  [Aserejé (The Ketchup Song) - Single]"
  ],
  "items": [
   {
@@ -18,7 +22,9 @@
    "album": "Spirit In the Sky (Deluxe Edition)",
    "appleArtist": "Norman Greenbaum",
    "appleTitle": "Spirit In the Sky",
-   "year": 1969
+   "store": "US",
+   "year": 1969,
+   "d": 1
   },
   {
    "id": "in-the-year-2525-zager-and-evans",
@@ -26,7 +32,19 @@
    "album": "In the Year 2525 (Exordium Terminus)",
    "appleArtist": "Zager & Evans",
    "appleTitle": "In the Year 2525 (Exordium & Terminus)",
-   "year": 1969
+   "store": "US",
+   "year": 1969,
+   "d": 3
+  },
+  {
+   "id": "love-grows-where-my-rosemary-goes-edison-lighthouse",
+   "appleYear": 1970,
+   "album": "The Power of Love",
+   "appleArtist": "Edison Lighthouse",
+   "appleTitle": "Love Grows (Where My Rosemary Goes) [New Stereo Version]",
+   "store": "US",
+   "year": 1970,
+   "d": 2
   },
   {
    "id": "popcorn-hot-butter",
@@ -34,7 +52,9 @@
    "album": "That '70s Show (Music Inspired By The TV Series)",
    "appleArtist": "Hot Buttered Popcorn",
    "appleTitle": "Popcorn",
-   "year": 1972
+   "store": "US",
+   "year": 1972,
+   "d": 2
   },
   {
    "id": "brandy-youre-a-fine-girl-looking-glass",
@@ -42,7 +62,9 @@
    "album": "Looking Glass",
    "appleArtist": "Looking Glass",
    "appleTitle": "Brandy (You're A Fine Girl)",
-   "year": 1972
+   "store": "US",
+   "year": 1972,
+   "d": 2
   },
   {
    "id": "kung-fu-fighting-carl-douglas",
@@ -50,7 +72,9 @@
    "album": "The Soul of the Kung Fu Fighter",
    "appleArtist": "Carl Douglas",
    "appleTitle": "Kung Fu Fighting",
-   "year": 1974
+   "store": "US",
+   "year": 1974,
+   "d": 1
   },
   {
    "id": "play-that-funky-music-wild-cherry",
@@ -58,7 +82,9 @@
    "album": "Wild Cherry",
    "appleArtist": "Wild Cherry",
    "appleTitle": "Play That Funky Music",
-   "year": 1976
+   "store": "US",
+   "year": 1976,
+   "d": 1
   },
   {
    "id": "video-killed-the-radio-star-the-buggles",
@@ -66,7 +92,9 @@
    "album": "The Age of Plastic",
    "appleArtist": "The Buggles",
    "appleTitle": "Video Killed the Radio Star",
-   "year": 1979
+   "store": "US",
+   "year": 1979,
+   "d": 1
   },
   {
    "id": "rappers-delight-the-sugarhill-gang",
@@ -74,7 +102,9 @@
    "album": "Disco",
    "appleArtist": "The Sugarhill Gang",
    "appleTitle": "Rapper's Delight (Single Version)",
-   "year": 1979
+   "store": "US",
+   "year": 1979,
+   "d": 2
   },
   {
    "id": "pop-muzik-m",
@@ -82,15 +112,9 @@
    "album": "New York, London, Paris, Munich",
    "appleArtist": "M",
    "appleTitle": "Pop Muzik (Nik Launay '79 12\")",
-   "year": 1979
-  },
-  {
-   "id": "turning-japanese-the-vapors",
-   "appleYear": 1980,
-   "album": "New Clear Days",
-   "appleArtist": "The Vapors",
-   "appleTitle": "Turning Japanese (Non Stop Edit)",
-   "year": 1980
+   "store": "US",
+   "year": 1979,
+   "d": 2
   },
   {
    "id": "funkytown-lipps-inc",
@@ -98,7 +122,29 @@
    "album": "Funkytown",
    "appleArtist": "Lipps, Inc.",
    "appleTitle": "Funkytown (Long Version)",
-   "year": 1979
+   "store": "US",
+   "year": 1979,
+   "d": 1
+  },
+  {
+   "id": "my-sharona-the-knack",
+   "appleYear": 1979,
+   "album": "Get the Knack",
+   "appleArtist": "The Knack",
+   "appleTitle": "My Sharona",
+   "store": "US",
+   "year": 1979,
+   "d": 1
+  },
+  {
+   "id": "turning-japanese-the-vapors",
+   "appleYear": 1980,
+   "album": "New Clear Days",
+   "appleArtist": "The Vapors",
+   "appleTitle": "Turning Japanese (Non Stop Edit)",
+   "store": "US",
+   "year": 1980,
+   "d": 2
   },
   {
    "id": "mickey-toni-basil",
@@ -106,7 +152,9 @@
    "album": "Mickey - Single",
    "appleArtist": "Toni Basil",
    "appleTitle": "Mickey",
-   "year": 1981
+   "store": "GB",
+   "year": 1981,
+   "d": 1
   },
   {
    "id": "the-safety-dance-men-without-hats",
@@ -114,15 +162,9 @@
    "album": "Rhythm of Youth (Expanded Edition)",
    "appleArtist": "Men Without Hats",
    "appleTitle": "The Safety Dance (Short Version)",
-   "year": 1982
-  },
-  {
-   "id": "99-luftballons-nena",
-   "appleYear": 1983,
-   "album": "99 Luftballons",
-   "appleArtist": "Nena",
-   "appleTitle": "99 Luftballons",
-   "year": 1983
+   "store": "US",
+   "year": 1981,
+   "d": 2
   },
   {
    "id": "come-on-eileen-dexys-midnight-runners",
@@ -130,7 +172,39 @@
    "album": "Too Rye Ay",
    "appleArtist": "Dexys Midnight Runners",
    "appleTitle": "Come On Eileen",
-   "year": 1982
+   "store": "US",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "99-luftballons-nena",
+   "appleYear": 1983,
+   "album": "99 Luftballons",
+   "appleArtist": "Nena",
+   "appleTitle": "99 Luftballons",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "we-are-the-world-usa-for-africa",
+   "appleYear": 1985,
+   "album": "We Are the World - Single",
+   "appleArtist": "U.S.A. for Africa",
+   "appleTitle": "We Are the World",
+   "store": "US",
+   "year": 1985,
+   "d": 1
+  },
+  {
+   "id": "take-my-breath-away-berlin",
+   "appleYear": 1986,
+   "album": "Top Gun (Original Motion Picture Soundtrack) [Special Expanded Edition]",
+   "appleArtist": "Berlin",
+   "appleTitle": "Take My Breath Away (Love Theme from \"Top Gun\")",
+   "store": "US",
+   "year": 1986,
+   "d": 1
   },
   {
    "id": "dont-worry-be-happy-bobby-mcferrin",
@@ -138,7 +212,9 @@
    "album": "Simple Pleasures",
    "appleArtist": "Bobby McFerrin",
    "appleTitle": "Don't Worry, Be Happy",
-   "year": 1988
+   "store": "US",
+   "year": 1988,
+   "d": 1
   },
   {
    "id": "groove-is-in-the-heart-deee-lite",
@@ -146,7 +222,29 @@
    "album": "World Clique",
    "appleArtist": "Deee-Lite",
    "appleTitle": "Groove Is In the Heart",
-   "year": 1990
+   "store": "US",
+   "year": 1990,
+   "d": 2
+  },
+  {
+   "id": "nothing-compares-2-u-sinead-oconnor",
+   "appleYear": 1990,
+   "album": "I Do Not Want What I Haven't Got",
+   "appleArtist": "Sinéad O'Connor",
+   "appleTitle": "Nothing Compares 2 U",
+   "store": "US",
+   "year": 1990,
+   "d": 1
+  },
+  {
+   "id": "black-velvet-alannah-myles",
+   "appleYear": 1989,
+   "album": "Alannah Myles",
+   "appleArtist": "Alannah Myles",
+   "appleTitle": "Black Velvet",
+   "store": "US",
+   "year": 1990,
+   "d": 2
   },
   {
    "id": "im-too-sexy-right-said-fred",
@@ -154,7 +252,70 @@
    "album": "Up",
    "appleArtist": "Right Said Fred",
    "appleTitle": "I'm Too Sexy",
-   "year": 1991
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 1991,
+   "d": 2
+  },
+  {
+   "id": "achy-breaky-heart-billy-ray-cyrus",
+   "appleYear": 1992,
+   "album": "Some Gave All",
+   "appleArtist": "Billy Ray Cyrus",
+   "appleTitle": "Achy Breaky Heart",
+   "store": "US",
+   "year": 1992,
+   "d": 2
+  },
+  {
+   "id": "whats-up-4-non-blondes",
+   "appleYear": 1992,
+   "album": "Bigger, Better, Faster, More!",
+   "appleArtist": "4 Non Blondes",
+   "appleTitle": "What's Up?",
+   "store": "US",
+   "year": 1992,
+   "d": 1
+  },
+  {
+   "id": "informer-snow",
+   "appleYear": 1993,
+   "album": "Rhino Hi-Five: Rap, Vol. 1 - EP",
+   "appleArtist": "Snow",
+   "appleTitle": "Informer",
+   "store": "US",
+   "year": 1993,
+   "d": 2
+  },
+  {
+   "id": "mmm-mmm-mmm-mmm-crash-test-dummies",
+   "appleYear": 1993,
+   "album": "God Shuffled His Feet",
+   "appleArtist": "Crash Test Dummies",
+   "appleTitle": "Mmm Mmm Mmm Mmm",
+   "store": "US",
+   "year": 1993,
+   "d": 1
+  },
+  {
+   "id": "baby-i-love-your-way-big-mountain",
+   "appleYear": 1994,
+   "album": "Unity",
+   "appleArtist": "Big Mountain",
+   "appleTitle": "Baby, I Love Your Way",
+   "store": "US",
+   "year": 1994,
+   "d": 2
+  },
+  {
+   "id": "here-comes-the-hotstepper-ini-kamoze",
+   "appleYear": 1994,
+   "album": "Here Comes the Hot Stepper - Single",
+   "appleArtist": "Ini Kamoze",
+   "appleTitle": "Here Comes the Hotstepper",
+   "store": "US",
+   "year": 1994,
+   "d": 3
   },
   {
    "id": "how-bizarre-omc",
@@ -162,7 +323,39 @@
    "album": "How Bizarre (Deluxe Version)",
    "appleArtist": "OMC",
    "appleTitle": "How Bizarre",
-   "year": 1995
+   "store": "US",
+   "year": 1995,
+   "d": 2
+  },
+  {
+   "id": "total-eclipse-of-the-heart-nicki-french",
+   "appleYear": 1995,
+   "album": "Total Eclipse of the Heart",
+   "appleArtist": "Nicki French",
+   "appleTitle": "Total Eclipse of the Heart (Alternative 7 Inch)",
+   "store": "US",
+   "year": 1995,
+   "d": 1
+  },
+  {
+   "id": "macarena-los-del-rio",
+   "appleYear": 1996,
+   "album": "NOW That's What I Call the 90's",
+   "appleArtist": "Los del Río",
+   "appleTitle": "Macarena",
+   "store": "US",
+   "year": 1996,
+   "d": 1
+  },
+  {
+   "id": "i-love-you-always-forever-donna-lewis",
+   "appleYear": 1996,
+   "album": "Now In a Minute",
+   "appleArtist": "Donna Lewis",
+   "appleTitle": "I Love You Always Forever",
+   "store": "US",
+   "year": 1996,
+   "d": 2
   },
   {
    "id": "tubthumping-chumbawamba",
@@ -170,7 +363,9 @@
    "album": "Tubthumper",
    "appleArtist": "Chumbawamba",
    "appleTitle": "Tubthumping",
-   "year": 1997
+   "store": "US",
+   "year": 1997,
+   "d": 1
   },
   {
    "id": "steal-my-sunshine-len",
@@ -178,7 +373,9 @@
    "album": "Steal My Sunshine - Single",
    "appleArtist": "LEN",
    "appleTitle": "Steal My Sunshine",
-   "year": 1999
+   "store": "US",
+   "year": 1999,
+   "d": 3
   },
   {
    "id": "mambo-no-5-a-little-bit-of-lou-bega",
@@ -186,7 +383,9 @@
    "album": "A Little Bit of Mambo",
    "appleArtist": "Lou Bega",
    "appleTitle": "Mambo No. 5 (a Little Bit of...)",
-   "year": 1999
+   "store": "US",
+   "year": 1999,
+   "d": 1
   },
   {
    "id": "blue-da-ba-dee-eiffel-65",
@@ -194,7 +393,19 @@
    "album": "Blue - Single",
    "appleArtist": "Mat1ne, PED1NE & Eiffel 65",
    "appleTitle": "Blue",
-   "year": 1999
+   "store": "US",
+   "year": 1999,
+   "d": 1
+  },
+  {
+   "id": "kiss-me-sixpence-none-the-richer",
+   "appleYear": 2000,
+   "album": "The Best of Sixpence None the Richer",
+   "appleArtist": "Sixpence None the Richer",
+   "appleTitle": "Kiss Me (Japanese Version)",
+   "store": "US",
+   "year": 1999,
+   "d": 1
   },
   {
    "id": "who-let-the-dogs-out-baha-men",
@@ -202,7 +413,9 @@
    "album": "Who Let the Dogs Out",
    "appleArtist": "Baha Men",
    "appleTitle": "Who Let the Dogs Out",
-   "year": 2000
+   "store": "US",
+   "year": 2000,
+   "d": 1
   },
   {
    "id": "the-ketchup-song-asereje-las-ketchup",
@@ -210,7 +423,19 @@
    "album": "Aserejé (The Ketchup Song) - Single",
    "appleArtist": "Las Ketchup",
    "appleTitle": "The Ketchup Song (Aserejé) [Chiringuito Club Single Edit]",
-   "year": 2002
+   "store": "US",
+   "year": 2002,
+   "d": 1
+  },
+  {
+   "id": "a-thousand-miles-vanessa-carlton",
+   "appleYear": 2002,
+   "album": "Be Not Nobody",
+   "appleArtist": "Vanessa Carlton",
+   "appleTitle": "A Thousand Miles",
+   "store": "US",
+   "year": 2002,
+   "d": 1
   },
   {
    "id": "stacys-mom-fountains-of-wayne",
@@ -218,7 +443,19 @@
    "album": "Welcome Interstate Managers",
    "appleArtist": "Fountains Of Wayne",
    "appleTitle": "Stacy's Mom",
-   "year": 2003
+   "store": "US",
+   "year": 2003,
+   "d": 2
+  },
+  {
+   "id": "i-dont-wanna-know-mario-winans",
+   "appleYear": 2004,
+   "album": "Hurt No More",
+   "appleArtist": "Mario Winans",
+   "appleTitle": "I Don't Wanna Know (feat. Enya and P. Diddy)",
+   "store": "US",
+   "year": 2004,
+   "d": 2
   },
   {
    "id": "bad-day-daniel-powter",
@@ -226,7 +463,9 @@
    "album": "Daniel Powter",
    "appleArtist": "Daniel Powter",
    "appleTitle": "Bad Day",
-   "year": 2005
+   "store": "US",
+   "year": 2005,
+   "d": 2
   },
   {
    "id": "crazy-gnarls-barkley",
@@ -234,7 +473,29 @@
    "album": "St. Elsewhere",
    "appleArtist": "Gnarls Barkley",
    "appleTitle": "Crazy",
-   "year": 2006
+   "store": "US",
+   "year": 2005,
+   "d": 2
+  },
+  {
+   "id": "hey-there-delilah-plain-white-ts",
+   "appleYear": 2005,
+   "album": "Every Second Counts",
+   "appleArtist": "Plain White T's",
+   "appleTitle": "Hey There Delilah",
+   "store": "US",
+   "year": 2005,
+   "d": 1
+  },
+  {
+   "id": "american-boy-estelle",
+   "appleYear": 2008,
+   "album": "R&B - The Collection",
+   "appleArtist": "Estelle",
+   "appleTitle": "American Boy (No Rap Version)",
+   "store": "GB",
+   "year": 2008,
+   "d": 2
   },
   {
    "id": "somebody-that-i-used-to-know-gotye",
@@ -242,7 +503,19 @@
    "album": "Making Mirrors",
    "appleArtist": "Gotye",
    "appleTitle": "Somebody That I Used to Know (feat. Kimbra)",
-   "year": 2011
+   "store": "US",
+   "year": 2011,
+   "d": 1
+  },
+  {
+   "id": "pumped-up-kicks-foster-the-people",
+   "appleYear": 2010,
+   "album": "Torches",
+   "appleArtist": "Foster the People",
+   "appleTitle": "Pumped Up Kicks",
+   "store": "US",
+   "year": 2010,
+   "d": 1
   },
   {
    "id": "gangnam-style-psy",
@@ -250,7 +523,9 @@
    "album": "Gangnam Style - Single",
    "appleArtist": "PSY",
    "appleTitle": "Gangnam Style",
-   "year": 2012
+   "store": "US",
+   "year": 2012,
+   "d": 1
   },
   {
    "id": "harlem-shake-baauer",
@@ -258,7 +533,29 @@
    "album": "Harlem Shake - Single",
    "appleArtist": "Baauer",
    "appleTitle": "Harlem Shake",
-   "year": 2012
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "i-love-it-icona-pop",
+   "appleYear": 2012,
+   "album": "I Love It (feat. Charli XCX) [I Don’t Care 2022 Re-Edit] - Single",
+   "appleArtist": "Icona Pop",
+   "appleTitle": "I Love It (feat. Charli XCX) [I Don’t Care 2022 Re-Edit]",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "ho-hey-the-lumineers",
+   "appleYear": 2012,
+   "album": "Ho Hey - Single",
+   "appleArtist": "The Lumineers",
+   "appleTitle": "Ho Hey",
+   "store": "US",
+   "year": 2012,
+   "d": 2
   },
   {
    "id": "rude-magic",
@@ -266,15 +563,9 @@
    "album": "Don't Kill the Magic",
    "appleArtist": "MAGIC!",
    "appleTitle": "Rude",
-   "year": 2013
-  },
-  {
-   "id": "cheerleader-felix-jaehn-remix-omi",
-   "appleYear": 2014,
-   "album": "Verano 2016",
-   "appleArtist": "Omi",
-   "appleTitle": "Cheerleader",
-   "year": 2014
+   "store": "US",
+   "year": 2013,
+   "d": 2
   },
   {
    "id": "the-fox-what-does-the-fox-say-ylvis",
@@ -282,7 +573,70 @@
    "album": "The Fox (What Does the Fox Say?) - Single",
    "appleArtist": "Ylvis",
    "appleTitle": "The Fox (What Does the Fox Say?)",
-   "year": 2013
+   "store": "US",
+   "year": 2013,
+   "d": 3
+  },
+  {
+   "id": "let-her-go-passenger",
+   "appleYear": 2012,
+   "album": "All the Little Lights",
+   "appleArtist": "Passenger",
+   "appleTitle": "Let Her Go",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "cheerleader-felix-jaehn-remix-omi",
+   "appleYear": 2014,
+   "album": "Verano 2016",
+   "appleArtist": "Omi",
+   "appleTitle": "Cheerleader",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "say-something-a-great-big-world-and-christina-aguilera",
+   "appleYear": 2013,
+   "album": "Say Something - Single",
+   "appleArtist": "A Great Big World & Christina Aguilera",
+   "appleTitle": "Say Something",
+   "store": "US",
+   "year": 2013,
+   "d": 2
+  },
+  {
+   "id": "cake-by-the-ocean-dnce",
+   "appleYear": 2015,
+   "album": "DNCE",
+   "appleArtist": "DNCE",
+   "appleTitle": "Cake By the Ocean",
+   "store": "US",
+   "year": 2015,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "despacito-luis-fonsi-and-daddy-yankee",
+   "appleYear": 2017,
+   "album": "Despacito (Versión Urbana/Sky) - Single",
+   "appleArtist": "Luis Fonsi & Daddy Yankee",
+   "appleTitle": "Despacito (Versión Urbana/Sky)",
+   "store": "US",
+   "year": 2017,
+   "d": 1
+  },
+  {
+   "id": "heat-waves-glass-animals",
+   "appleYear": 2021,
+   "album": "Dreamland (Real Life Edition)",
+   "appleArtist": "Glass Animals & iann dior",
+   "appleTitle": "Heat Waves (with iann dior)",
+   "store": "US",
+   "year": 2021,
+   "d": 2
   }
  ]
 }

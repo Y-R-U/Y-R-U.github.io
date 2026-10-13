@@ -1,60 +1,278 @@
 @id hits-1960s
 @title Hits of the 1960s
 @icon 🎙️
-@sources [{"name":"Billboard Year-End Hot 100 singles (1960–1969)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1960"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
+@sources [{"name":"Billboard Year-End Hot 100 singles (1960s)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1960"},{"name":"UK year-end best-selling singles (Music Week / Official Charts Company)","url":"https://en.wikipedia.org/wiki/1960_in_British_music"},{"name":"Kent Music Report / ARIA year-end top 25 singles (Australia)","url":"https://en.wikipedia.org/wiki/List_of_top_25_singles_for_1960_in_Australia"},{"name":"Wikipedia pageviews (lasting fame) and Wikidata (artist country)","url":"https://www.wikidata.org/"}]
 # YEAR = original release year (verified against Apple's release dates by au_resolve)
-1959 | Percy Faith | Theme from "A Summer Place" | q=percy faith summer place; tm=summer place
-1959 | Jim Reeves | He'll Have to Go
-1960 | The Everly Brothers | Cathy's Clown
-1960 | Elvis Presley | It's Now or Never | d=1
-1960 | Chubby Checker | The Twist | d=1
-1961 | Ben E. King | Stand by Me | d=1
-1961 | Patsy Cline | Crazy | d=1
-1961 | Del Shannon | Runaway
-1961 | Dion | Runaround Sue
-1962 | Ray Charles | I Can't Stop Loving You
-1962 | The Four Seasons | Sherry
-1962 | The Four Seasons | Big Girls Don't Cry
-1962 | Little Eva | The Loco-Motion
-1963 | The Beach Boys | Surfin' U.S.A.
-1963 | The Chiffons | He's So Fine
-1963 | The Kingsmen | Louie Louie
-1963 | The Ronettes | Be My Baby | d=1
-1963 | The Beatles | She Loves You | d=1
-1963 | The Beatles | I Want to Hold Your Hand | d=1
-1964 | Louis Armstrong | Hello, Dolly!
-1964 | Roy Orbison | Oh, Pretty Woman | d=1; alt=Pretty Woman
-1964 | The Beach Boys | I Get Around
-1964 | The Supremes | Where Did Our Love Go
-1964 | The Animals | The House of the Rising Sun | d=1
-1964 | The Beatles | Can't Buy Me Love
-1964 | The Temptations | My Girl | d=1
-1965 | The Rolling Stones | (I Can't Get No) Satisfaction | d=1; alt=Satisfaction
-1965 | Four Tops | I Can't Help Myself (Sugar Pie Honey Bunch)
-1965 | The Byrds | Mr. Tambourine Man
-1965 | The Beatles | Help!
-1964 | The Righteous Brothers | You've Lost That Lovin' Feelin'
-1965 | The Mamas & The Papas | California Dreamin' | d=1
-1966 | The Beach Boys | Good Vibrations | d=1
-1966 | Four Tops | Reach Out I'll Be There
-1966 | The Rolling Stones | Paint It Black
-1966 | Nancy Sinatra | These Boots Are Made for Walkin'
-1966 | The Monkees | I'm a Believer
-1967 | Aretha Franklin | Respect | d=1
-1967 | The Box Tops | The Letter
-1967 | The Turtles | Happy Together
-1967 | The Doors | Light My Fire
-1967 | Bobbie Gentry | Ode to Billie Joe
-1967 | Procol Harum | A Whiter Shade of Pale
-1967 | Van Morrison | Brown Eyed Girl | d=1
-1968 | The Beatles | Hey Jude | d=1
-1968 | Otis Redding | (Sittin' On) The Dock of the Bay | alt=Dock of the Bay
-1968 | Simon & Garfunkel | Mrs. Robinson | d=1
-1968 | Marvin Gaye | I Heard It Through the Grapevine
-1968 | Steppenwolf | Born to Be Wild
-1969 | The Archies | Sugar, Sugar
-1969 | The 5th Dimension | Aquarius / Let the Sunshine In | tm=aquarius
-1969 | The Rolling Stones | Honky Tonk Women
-1969 | Zager & Evans | In the Year 2525
-1969 | David Bowie | Space Oddity | d=1
-1969 | B.J. Thomas | Raindrops Keep Fallin' on My Head
+# chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
+1959 | Jim Reeves | He'll Have to Go | us=2 uk=- au=3 pv=1442 from=USA
+1959 | Percy Faith | Theme from "A Summer Place" | us=1 uk=- au=- pv=5931 from=CAN/USA | q=percy faith summer place; tm=summer place
+1960 | Elvis Presley | It's Now or Never | us=7 uk=- au=1 pv=4519 from=USA | d=1
+1960 | The Everly Brothers | Cathy's Clown | us=3 uk=- au=25 pv=1886 from=USA
+1960 | Chubby Checker | The Twist | us=9 uk=- au=- pv=5443 from=USA | d=1
+1960 | The Drifters | Save the Last Dance for Me | us=26 uk=- au=7 pv=5545 from=USA
+1960 | Johnny Preston | Running Bear | us=4 uk=- au=19 pv=2105 from=USA
+1960 | Connie Francis | Everybody's Somebody's Fool | us=11 uk=- au=12 pv=1011 from=USA
+1960 | The Ventures | Walk, Don't Run | us=25 uk=- au=16 pv=1819 from=USA
+1960 | Elvis Presley | Stuck on You | us=9 uk=- au=22 pv=1047 from=USA
+1960 | Jack Scott | What in the World's Come Over You | us=14 uk=- au=23 pv=246 from=USA
+1960 | Johnny and the Hurricanes | Beatnik Fly | us=90 uk=- au=17 pv=6077 from=USA
+1960 | Elvis Presley | Are You Lonesome Tonight? | us=96 uk=- au=4 pv=2890 from=USA
+1960 | Johnny Horton | North to Alaska | us=- uk=- au=11 pv=4867 from=USA
+1960 | Marty Robbins | El Paso | us=15 uk=- au=- pv=5194 from=USA
+1960 | Brian Hyland | Itsy Bitsy Teenie Weenie Yellow Polkadot Bikini | us=19 uk=- au=- pv=6038 from=USA
+1960 | Duane Eddy | Peter Gunn | us=- uk=- au=15 pv=4466 from=USA
+1960 | Rolf Harris | Tie Me Kangaroo Down Sport | us=- uk=- au=8 pv=3151 from=AUS/GBR
+1960 | Bobby Darin | Beyond the Sea | us=32 uk=- au=- pv=7360 from=USA
+1960 | Jimmie Rodgers | Just a Closer Walk with Thee | us=- uk=- au=6 pv=2037 from=USA
+1960 | Jimmy Jones | Handy Man | us=8 uk=- au=- pv=1918 from=USA
+1960 | Brenda Lee | I'm Sorry | us=6 uk=- au=- pv=1664 from=USA
+1960 | Roy Orbison | Only the Lonely | us=20 uk=- au=- pv=2784 from=USA
+1960 | Mark Dinning | Teen Angel | us=5 uk=- au=- pv=1156 from=USA
+1960 | The Everly Brothers | Let It Be Me | us=30 uk=- au=- pv=3130 from=USA
+1960 | Lonnie Donegan | My Old Man's a Dustman | us=- uk=- au=10 pv=1127 from=GBR
+1960 | Dion and the Belmonts | Where or When | us=21 uk=- au=- pv=1728 from=USA
+1960 | Paul Anka | Puppy Love | us=23 uk=- au=- pv=1876 from=CAN/USA
+1960 | The Hollywood Argyles | Alley Oop | us=16 uk=- au=- pv=1326 from=USA
+1961 | Del Shannon | Runaway | us=5 uk=- au=2 pv=5578 from=USA
+1961 | Ben E. King | Stand by Me | us=63 uk=- au=- pv=19967 from=USA | d=1
+1961 | Dion | Runaround Sue | us=46 uk=- au=- pv=4413 from=USA
+1961 | Patsy Cline | Crazy | us=- uk=- au=- pv=0 from=USA | d=1
+1961 | Roy Orbison | Crying | us=4 uk=- au=10 pv=4177 from=USA
+1961 | The Highwaymen | Michael | us=3 uk=- au=17 pv=3216 from=USA
+1961 | Ray Charles | Hit the Road Jack | us=19 uk=- au=24 pv=8529 from=USA
+1961 | Bobby Vee | Take Good Care of My Baby | us=12 uk=- au=18 pv=1609 from=USA
+1961 | Ricky Nelson | Hello Mary Lou | us=49 uk=- au=4 pv=2178 from=USA
+1961 | The String-A-Longs | Wheels | us=8 uk=- au=16 pv=371 from=USA
+1961 | Sue Thompson | Sad Movies (Make Me Cry) | us=20 uk=- au=21 pv=536 from=USA
+1961 | Elvis Presley | Surrender | us=51 uk=- au=14 pv=957 from=USA
+1961 | The Shirelles | Will You Love Me Tomorrow | us=16 uk=- au=- pv=8770 from=USA
+1961 | Elvis Presley | (Marie's the Name) His Latest Flame | us=71 uk=- au=19 pv=1318 from=USA
+1961 | Patsy Cline | I Fall to Pieces | us=2 uk=- au=- pv=1895 from=USA
+1961 | Bert Kaempfert | Wonderland by Night | us=72 uk=- au=8 pv=619 from=DEU
+1961 | Bob Moore | Mexico | us=55 uk=- au=13 pv=151 from=USA
+1961 | Elvis Presley | Wooden Heart | us=- uk=- au=3 pv=1632 from=USA
+1961 | The Shirelles | Dedicated to the One I Love | us=14 uk=- au=- pv=2701 from=USA
+1961 | Ferrante and Teicher | Theme from Exodus | us=- uk=- au=9 pv=1871 from=USA
+1961 | Eddie Hodges | I'm Gonna Knock on Your Door | us=92 uk=- au=1 pv=835 from=USA
+1961 | Joe Dowell | Wooden Heart | us=10 uk=- au=- pv=1632 from=USA
+1961 | Bobby Lewis | Tossin' and Turnin' | us=1 uk=- au=- pv=969 from=USA
+1961 | Ferrante & Teicher | Exodus | us=17 uk=- au=- pv=1871 from=USA
+1961 | Bobby Vee | Rubber Ball | us=89 uk=- au=12 pv=694 from=USA
+1961 | Charlie Drake | My Boomerang Won't Come Back | us=- uk=- au=5 pv=678 from=GBR
+1961 | Roy Orbison | Running Scared | us=13 uk=- au=- pv=913 from=USA
+1962 | Ray Charles | I Can't Stop Loving You | us=2 uk=- au=7 pv=4075 from=USA
+1962 | Little Eva | The Loco-Motion | us=7 uk=- au=- pv=12490 from=USA
+1962 | The Four Seasons | Big Girls Don't Cry | us=- uk=- au=15 pv=2495 from=USA
+1962 | The Four Seasons | Sherry | us=55 uk=- au=- pv=2585 from=USA
+1962 | Acker Bilk | Stranger on the Shore | us=1 uk=- au=8 pv=2533 from=GBR
+1962 | Elvis Presley | Can't Help Falling in Love | us=57 uk=- au=2 pv=23496 from=USA
+1962 | Dion | The Wanderer | us=12 uk=- au=21 pv=5046 from=USA
+1962 | Bobby Vinton | Roses Are Red (My Love) | us=4 uk=- au=4 pv=799 from=USA
+1962 | Kenny Ball | Midnight in Moscow | us=21 uk=- au=12 pv=1702 from=GBR
+1962 | Claude King | Wolverton Mountain | us=16 uk=- au=11 pv=1103 from=USA
+1962 | Elvis Presley | Good Luck Charm | us=20 uk=- au=3 pv=819 from=USA
+1962 | Tommy Roe | Sheila | us=22 uk=- au=15 pv=794 from=USA
+1962 | Nat King Cole | Ramblin' Rose | us=28 uk=- au=18 pv=695 from=USA
+1962 | Bobby Darin | Multiplication | us=- uk=- au=5 pv=9959 from=USA
+1962 | Bent Fabric | Alley Cat | us=37 uk=- au=16 pv=750 from=DNK
+1962 | Bruce Channel | Hey! Baby | us=11 uk=- au=- pv=6185 from=USA
+1962 | Shelley Fabares | Johnny Angel | us=6 uk=- au=- pv=3836 from=USA
+1962 | Lucky Starr | I've Been Everywhere | us=- uk=- au=14 pv=5524 from=AUS
+1962 | The Tornados | Telstar | us=- uk=- au=9 pv=4241 from=GBR
+1962 | Neil Sedaka | Breaking Up Is Hard to Do | us=15 uk=- au=- pv=3935 from=USA
+1962 | The Shirelles | Soldier Boy | us=10 uk=- au=- pv=2259 from=USA
+1962 | Brian Hyland | Sealed with a Kiss | us=29 uk=- au=- pv=4654 from=USA
+1962 | Gene Chandler | Duke of Earl | us=13 uk=- au=- pv=2216 from=USA
+1962 | Freddy Cannon | Palisades Park | us=14 uk=- au=- pv=2248 from=USA
+1962 | Cliff Richard | Do You Want to Dance | us=- uk=- au=24 pv=3509 from=GBR
+1962 | David Rose | The Stripper | us=5 uk=- au=- pv=1425 from=USA
+1962 | Dee Dee Sharp | Mashed Potato Time | us=3 uk=- au=- pv=1056 from=USA
+1963 | The Beatles | I Want to Hold Your Hand | us=1 uk=- au=1 pv=11565 from=GBR | d=1
+1963 | The Beatles | She Loves You | us=2 uk=- au=2 pv=8273 from=GBR | d=1
+1963 | The Beach Boys | Surfin' U.S.A. | us=1 uk=- au=- pv=4670 from=USA
+1963 | The Ronettes | Be My Baby | us=35 uk=- au=- pv=13426 from=USA | d=1
+1963 | The Chiffons | He's So Fine | us=4 uk=- au=- pv=2115 from=USA
+1963 | The Kingsmen | Louie Louie | us=99 uk=- au=- pv=14030 from=USA
+1963 | Kyu Sakamoto | Sukiyaki | us=10 uk=- au=19 pv=12023 from=JPN
+1963 | Little Peggy March | I Will Follow Him | us=20 uk=- au=8 pv=4256 from=USA
+1963 | The Surfaris | Wipe Out | us=14 uk=- au=23 pv=4183 from=USA
+1963 | Paul & Paula | Hey Paula | us=6 uk=- au=6 pv=1110 from=USA
+1963 | The Chantays | Pipeline | us=21 uk=- au=5 pv=1495 from=USA
+1963 | Jan and Dean | Surf City | us=22 uk=- au=22 pv=1945 from=USA
+1963 | Roy Orbison | In Dreams | us=49 uk=- au=14 pv=4007 from=USA
+1963 | Jimmy Gilmer and the Fireballs | Sugar Shack | us=40 uk=- au=7 pv=926 from=USA
+1963 | Gerry & the Pacemakers | You'll Never Walk Alone | us=- uk=- au=16 pv=22054 from=GBR
+1963 | Peter, Paul and Mary | Puff, the Magic Dragon | us=12 uk=- au=- pv=15140 from=USA
+1963 | Peter, Paul and Mary | Blowin' in the Wind | us=13 uk=- au=- pv=12706 from=USA
+1963 | Skeeter Davis | The End of the World | us=2 uk=- au=- pv=6330 from=USA
+1963 | Helen Shapiro | No Trespassing | us=- uk=- au=20 pv=12160 from=GBR
+1963 | Ned Miller | From a Jack to a King | us=63 uk=- au=4 pv=749 from=USA
+1963 | Bobby Vinton | Blue Velvet | us=5 uk=- au=- pv=4430 from=USA
+1963 | The Cascades | Rhythm of the Rain | us=3 uk=- au=- pv=2987 from=USA
+1963 | Roy Orbison | Blue Bayou | us=- uk=- au=21 pv=6034 from=USA
+1963 | Lesley Gore | It's My Party | us=23 uk=- au=- pv=5773 from=USA
+1963 | Little Stevie Wonder | Fingertips – Part 2 | us=7 uk=- au=- pv=2401 from=USA/GHA
+1963 | Elvis Presley | Return to Sender | us=- uk=- au=9 pv=2393 from=USA
+1963 | The Angels | My Boyfriend's Back | us=9 uk=- au=- pv=2331 from=USA
+1964 | Roy Orbison | Oh, Pretty Woman | us=4 uk=- au=10 pv=9261 from=USA | d=1; alt=Pretty Woman
+1964 | The Animals | The House of the Rising Sun | us=38 uk=- au=17 pv=51838 from=GBR | d=1
+1964 | The Beatles | Can't Buy Me Love | us=52 uk=- au=3 pv=5721 from=GBR
+1964 | The Righteous Brothers | You've Lost That Lovin' Feelin' | us=5 uk=- au=- pv=8901 from=USA
+1964 | The Temptations | My Girl | us=10 uk=- au=- pv=9401 from=USA | d=1
+1964 | The Beach Boys | I Get Around | us=5 uk=- au=- pv=4084 from=USA
+1964 | Louis Armstrong | Hello, Dolly! | us=3 uk=- au=- pv=2992 from=USA
+1964 | The Supremes | Where Did Our Love Go | us=10 uk=- au=- pv=2555 from=USA
+1964 | The Beatles | A Hard Day's Night | us=13 uk=- au=4 pv=6297 from=GBR
+1964 | Manfred Mann | Do Wah Diddy Diddy | us=15 uk=- au=19 pv=4666 from=GBR
+1964 | Mary Wells | My Guy | us=7 uk=- au=12 pv=2258 from=USA
+1964 | Peter and Gordon | A World Without Love | us=30 uk=- au=20 pv=3835 from=GBR
+1964 | The Honeycombs | Have I the Right? | us=31 uk=- au=8 pv=1472 from=GBR
+1964 | The Dave Clark Five | Glad All Over | us=23 uk=- au=22 pv=1923 from=GBR
+1964 | Millie Small | My Boy Lollipop | us=46 uk=- au=16 pv=3191 from=JAM
+1964 | The Beatles | I Saw Her Standing There | us=95 uk=- au=1 pv=8533 from=GBR
+1964 | The Beatles | Love Me Do | us=14 uk=- au=- pv=11836 from=GBR
+1964 | J. Frank Wilson and the Cavaliers | Last Kiss | us=9 uk=- au=- pv=9148 from=USA
+1964 | The Beatles | I Feel Fine | us=- uk=- au=2 pv=5787 from=GBR
+1964 | Martha and the Vandellas | Dancing in the Street | us=17 uk=- au=- pv=10082 from=USA
+1964 | The Beatles | Roll Over Beethoven | us=- uk=- au=11 pv=5256 from=GBR
+1964 | The Beatles | Please Please Me | us=16 uk=- au=- pv=6241 from=GBR
+1964 | Sounds Incorporated | William Tell Overture | us=- uk=- au=25 pv=9151 from=GBR
+1964 | The Drifters | Under the Boardwalk | us=20 uk=- au=- pv=5981 from=USA
+1964 | Dean Martin | Everybody Loves Somebody | us=6 uk=- au=- pv=3127 from=USA
+1964 | The Beatles | I Should Have Known Better | us=- uk=- au=6 pv=2433 from=GBR
+1964 | Elvis Presley | Viva Las Vegas | us=- uk=- au=15 pv=2672 from=USA
+1965 | The Rolling Stones | (I Can't Get No) Satisfaction | us=3 uk=- au=14 pv=14940 from=GBR | d=1; alt=Satisfaction
+1965 | The Beatles | Help! | us=7 uk=- au=3 pv=8133 from=GBR
+1965 | The Mamas & The Papas | California Dreamin' | us=1 uk=- au=- pv=23895 from=USA | d=1
+1965 | Four Tops | I Can't Help Myself (Sugar Pie Honey Bunch) | us=2 uk=- au=- pv=3084 from=USA
+1965 | The Byrds | Mr. Tambourine Man | us=25 uk=- au=- pv=8745 from=USA
+1965 | Petula Clark | Downtown | us=6 uk=- au=19 pv=9605 from=GBR
+1965 | Sonny & Cher | I Got You Babe | us=16 uk=- au=22 pv=9498 from=USA
+1965 | The Beatles | Ticket to Ride | us=31 uk=- au=10 pv=7973 from=GBR
+1965 | Elvis Presley | Crying in the Chapel | us=9 uk=- au=5 pv=1565 from=USA
+1965 | The Seekers | I'll Never Find Another You | us=23 uk=- au=6 pv=1901 from=AUS
+1965 | Herman's Hermits | Mrs. Brown, You've Got a Lovely Daughter | us=19 uk=- au=9 pv=1714 from=GBR
+1965 | Normie Rowe | Que Sera, Sera | us=- uk=- au=1 pv=26445 from=AUS
+1965 | Billy Thorpe and the Aztecs | Over the Rainbow | us=- uk=- au=23 pv=31026 from=AUS
+1965 | The Righteous Brothers | Unchained Melody | us=21 uk=- au=- pv=26723 from=USA
+1965 | The Beatles | Yesterday | us=- uk=- au=15 pv=14069 from=GBR
+1965 | Sam the Sham and the Pharaohs | Wooly Bully | us=1 uk=- au=- pv=5434 from=USA
+1965 | Rolling Stones | Under the Boardwalk | us=- uk=- au=8 pv=5981 from=GBR
+1965 | Horst Jankowski | A Walk in the Black Forest | us=47 uk=- au=20 pv=795 from=DEU
+1965 | The Beatles | Rock and Roll Music | us=- uk=- au=4 pv=3181 from=GBR
+1965 | Roger Miller | King of the Road | us=12 uk=- au=- pv=4354 from=USA
+1965 | The Beach Boys | Help Me, Rhonda | us=11 uk=- au=- pv=3142 from=USA
+1965 | The McCoys | Hang On Sloopy | us=30 uk=- au=- pv=7283 from=USA
+1965 | We Five | You Were on My Mind | us=4 uk=- au=- pv=2163 from=USA
+1965 | Barry McGuire | Eve of Destruction | us=29 uk=- au=- pv=6723 from=USA
+1965 | The Seekers | The Carnival is Over | us=- uk=- au=2 pv=1545 from=AUS
+1965 | The Supremes | Stop! In the Name of Love | us=20 uk=- au=- pv=3067 from=USA
+1965 | Rolling Stones | Get Off Of My Cloud | us=- uk=- au=25 pv=3178 from=GBR
+1966 | Nancy Sinatra | These Boots Are Made for Walkin' | us=6 uk=- au=1 pv=12385 from=USA
+1966 | The Monkees | I'm a Believer | us=5 uk=- au=10 pv=15017 from=USA
+1966 | The Rolling Stones | Paint It Black | us=34 uk=- au=12 pv=19913 from=GBR
+1966 | The Beach Boys | Good Vibrations | us=- uk=- au=13 pv=14535 from=USA | d=1
+1966 | Four Tops | Reach Out I'll Be There | us=5 uk=- au=- pv=3718 from=USA
+1966 | Frank Sinatra | Strangers in the Night | us=8 uk=- au=11 pv=5202 from=USA/ITA
+1966 | The Beatles | We Can Work It Out | us=49 uk=- au=2 pv=8428 from=GBR
+1966 | The Troggs | Wild Thing | us=40 uk=- au=20 pv=9230 from=GBR
+1966 | Peter and Gordon | Lady Godiva | us=- uk=- au=6 pv=47675 from=GBR
+1966 | The Beatles | Yellow Submarine | us=90 uk=- au=3 pv=18016 from=GBR
+1966 | Ray Conniff Singers | Somewhere My Love | us=64 uk=- au=5 pv=2103 from=USA
+1966 | The Easybeats | Friday on My Mind | us=66 uk=- au=10 pv=2435 from=AUS
+1966 | The New Vaudeville Band | Winchester Cathedral | us=- uk=- au=9 pv=11514 from=GBR
+1966 | The Beatles | Nowhere Man | us=84 uk=- au=15 pv=5412 from=GBR
+1966 | The Supremes | You Can't Hurry Love | us=13 uk=- au=- pv=8090 from=USA
+1966 | The Monkees | Last Train to Clarksville | us=4 uk=- au=- pv=5214 from=USA
+1966 | ? and the Mysterians | 96 Tears | us=2 uk=- au=- pv=4482 from=USA
+1966 | Bobby Hebb | Sunny | us=14 uk=- au=- pv=7505 from=USA
+1966 | Jimmy Ruffin | What Becomes of the Brokenhearted | us=3 uk=- au=- pv=4505 from=USA
+1966 | The Overlanders | Michelle | us=- uk=- au=22 pv=6091 from=GBR
+1966 | The Mindbenders | A Groovy Kind of Love | us=20 uk=- au=- pv=5481 from=GBR
+1966 | The Rolling Stones | As Tears Go By | us=- uk=- au=23 pv=5934 from=GBR
+1966 | Barry Sadler | The Ballad of the Green Berets | us=10 uk=- au=- pv=3178 from=USA
+1966 | The Association | Cherish | us=7 uk=- au=- pv=2342 from=USA
+1966 | Dusty Springfield | You Don't Have to Say You Love Me | us=21 uk=- au=- pv=3923 from=GBR
+1966 | Johnny Young and Kompany | Let It Be Me | us=- uk=- au=18 pv=3130 from=AUS
+1966 | Herman's Hermits | No Milk Today | us=- uk=- au=16 pv=2651 from=GBR
+1967 | Procol Harum | A Whiter Shade of Pale | us=38 uk=- au=9 pv=21683 from=GBR
+1967 | The Box Tops | The Letter | us=2 uk=- au=24 pv=5907 from=USA
+1967 | Bobbie Gentry | Ode to Billie Joe | us=3 uk=- au=- pv=10492 from=USA
+1967 | The Turtles | Happy Together | us=8 uk=- au=- pv=12375 from=USA
+1967 | The Doors | Light My Fire | us=6 uk=- au=- pv=9295 from=USA
+1967 | Aretha Franklin | Respect | us=13 uk=- au=- pv=8395 from=USA | d=1
+1967 | Van Morrison | Brown Eyed Girl | us=35 uk=- au=- pv=9463 from=GBR | d=1
+1967 | Frank & Nancy Sinatra | Somethin' Stupid | us=7 uk=- au=6 pv=8233 from=USA/ITA
+1967 | The Beatles | All You Need Is Love | us=30 uk=- au=8 pv=13632 from=GBR
+1967 | The Rolling Stones | Ruby Tuesday | us=24 uk=- au=17 pv=7374 from=GBR
+1967 | The Beatles | Penny Lane | us=55 uk=- au=5 pv=12580 from=GBR
+1967 | Scott McKenzie | San Francisco (Be Sure to Wear Flowers in Your Hair) | us=48 uk=- au=13 pv=6891 from=USA
+1967 | The 5th Dimension | Up, Up and Away | us=47 uk=- au=12 pv=4067 from=USA
+1967 | Engelbert Humperdinck | Release Me | us=31 uk=- au=20 pv=2433 from=GBR
+1967 | The Seekers | Georgy Girl | us=57 uk=- au=7 pv=3497 from=AUS
+1967 | Petula Clark | This Is My Song | us=52 uk=- au=2 pv=1723 from=GBR
+1967 | Tommy James and the Shondells | I Think We're Alone Now | us=12 uk=- au=- pv=24405 from=USA
+1967 | Vikki Carr | It Must Be Him | us=25 uk=- au=11 pv=599 from=USA/MEX
+1967 | Frankie Valli | Can't Take My Eyes Off You | us=10 uk=- au=- pv=18106 from=USA
+1967 | The Monkees | Daydream Believer | us=94 uk=- au=21 pv=10248 from=USA
+1967 | Tom Jones | Green, Green Grass of Home | us=97 uk=- au=4 pv=5239 from=GBR
+1967 | The Royal Guardsmen | Snoopy Vs. The Red Baron | us=84 uk=- au=3 pv=2731 from=USA
+1967 | The Mamas & the Papas | Dedicated to the One I Love | us=62 uk=- au=25 pv=2701 from=USA
+1967 | Buffalo Springfield | For What It's Worth | us=27 uk=- au=- pv=16359 from=USA/CAN
+1967 | Lulu | To Sir With Love | us=1 uk=- au=- pv=3317 from=GBR
+1967 | Small Faces | Itchycoo Park | us=- uk=- au=15 pv=4511 from=GBR
+1967 | The Association | Windy | us=4 uk=- au=- pv=2415 from=USA
+1968 | The Beatles | Hey Jude | us=1 uk=- au=1 pv=31830 from=GBR | d=1
+1968 | Otis Redding | (Sittin' On) The Dock of the Bay | us=4 uk=- au=- pv=13140 from=USA | alt=Dock of the Bay
+1968 | Simon & Garfunkel | Mrs. Robinson | us=9 uk=- au=- pv=13068 from=USA | d=1
+1968 | Steppenwolf | Born to Be Wild | us=31 uk=- au=- pv=8340 from=USA
+1968 | Marvin Gaye | I Heard It Through the Grapevine | us=88 uk=- au=- pv=15620 from=USA
+1968 | Paul Mauriat | Love is Blue | us=2 uk=- au=3 pv=4832 from=FRA
+1968 | Bobby Goldsboro | Honey | us=3 uk=- au=4 pv=3515 from=USA
+1968 | Merrilee Rush | Angel of the Morning | us=28 uk=- au=12 pv=13511 from=USA
+1968 | Richard Harris | MacArthur Park | us=51 uk=- au=9 pv=33694 from=IRL
+1968 | Jeannie C. Riley | Harper Valley PTA | us=11 uk=- au=13 pv=5590 from=USA
+1968 | Herb Alpert | This Guy's in Love with You | us=7 uk=- au=11 pv=3863 from=USA
+1968 | Hugo Montenegro | The Good, the Bad and the Ugly | us=8 uk=- au=23 pv=3166 from=USA
+1968 | Gary Puckett & The Union Gap | Young Girl | us=15 uk=- au=20 pv=2875 from=USA
+1968 | John Fred & His Playboy Band | Judy in Disguise (With Glasses) | us=25 uk=- au=14 pv=1894 from=USA
+1968 | The Beatles | Lady Madonna | us=60 uk=- au=16 pv=7665 from=GBR
+1968 | The Supremes | Love Child | us=27 uk=- au=19 pv=1530 from=USA
+1968 | Tom Jones | Delilah | us=66 uk=- au=17 pv=5599 from=GBR
+1968 | Cream | White Room | us=81 uk=- au=13 pv=5975 from=GBR
+1968 | Mama Cass | Dream a Little Dream of Me | us=- uk=- au=18 pv=15155 from=USA
+1968 | Mary Hopkin | Those Were the Days | us=30 uk=- au=6 pv=0 from=GBR
+1968 | The Beatles | Hello, Goodbye | us=- uk=- au=10 pv=8546 from=GBR
+1968 | Cream | Sunshine of Your Love | us=6 uk=- au=- pv=6837 from=GBR
+1968 | Tommy James and the Shondells | Mony Mony | us=13 uk=- au=- pv=7268 from=USA
+1968 | The Irish Rovers | The Unicorn | us=76 uk=- au=5 pv=1583 from=CAN
+1968 | Johnny Nash | Hold Me Tight | us=37 uk=- au=22 pv=365 from=USA
+1968 | Classics IV | Spooky | us=26 uk=- au=- pv=5095 from=USA
+1968 | O. C. Smith | Little Green Apples | us=12 uk=- au=- pv=2419 from=USA
+1969 | The Rolling Stones | Honky Tonk Women | us=4 uk=- au=2 pv=7168 from=GBR
+1969 | The Archies | Sugar, Sugar | us=1 uk=- au=- pv=14651 from=USA
+1969 | B.J. Thomas | Raindrops Keep Fallin' on My Head | us=4 uk=- au=- pv=11904 from=USA
+1969 | The 5th Dimension | Aquarius / Let the Sunshine In | us=2 uk=- au=- pv=10374 from=USA | tm=aquarius
+1969 | Zager & Evans | In the Year 2525 | us=26 uk=- au=- pv=5561 from=USA
+1969 | David Bowie | Space Oddity | us=- uk=- au=- pv=0 from=GBR | d=1
+1969 | Elvis Presley | Suspicious Minds | us=18 uk=- au=5 pv=11005 from=USA
+1969 | The Beatles | Get Back | us=25 uk=- au=8 pv=13639 from=GBR
+1969 | The Foundations | Build Me Up Buttercup | us=9 uk=- au=22 pv=8141 from=GBR
+1969 | The Cowsills | Hair | us=13 uk=- au=9 pv=2050 from=USA
+1969 | Elvis Presley | In the Ghetto | us=35 uk=- au=11 pv=5492 from=USA
+1969 | Tommy Roe | Dizzy | us=6 uk=- au=24 pv=2401 from=USA
+1969 | The Beatles | Something | us=83 uk=- au=1 pv=16966 from=GBR
+1969 | The Beatles | Ob-La-Di, Ob-La-Da | us=- uk=- au=3 pv=13547 from=GBR
+1969 | Neil Diamond | Sweet Caroline | us=22 uk=- au=- pv=29634 from=USA
+1969 | Creedence Clearwater Revival | Proud Mary | us=19 uk=- au=- pv=20040 from=USA
+1969 | Tommy James and the Shondells | Crimson and Clover | us=10 uk=- au=- pv=8396 from=USA
+1969 | The Beatles | The Ballad of John and Yoko | us=- uk=- au=14 pv=8848 from=GBR
+1969 | Three Dog Night | One | us=11 uk=- au=- pv=5974 from=USA
+1969 | Peter Sarstedt | Where Do You Go To (My Lovely) | us=- uk=- au=10 pv=4343 from=GBR
+1969 | Sly and the Family Stone | Everyday People | us=5 uk=- au=- pv=3338 from=USA
+1969 | Bee Gees | I Started a Joke | us=- uk=- au=16 pv=5152 from=GBR/AUS
+1969 | Creedence Clearwater Revival | Bad Moon Rising | us=24 uk=- au=- pv=7018 from=USA
+1969 | Tommy James and the Shondells | Crystal Blue Persuasion | us=12 uk=- au=- pv=3392 from=USA
+1969 | Elvis Presley | If I Can Dream | us=- uk=- au=21 pv=4899 from=USA
+1969 | Tom Jones | I'll Never Fall in Love Again | us=8 uk=- au=- pv=2581 from=GBR
+1969 | Canned Heat | Going Up the Country | us=- uk=- au=25 pv=5495 from=USA

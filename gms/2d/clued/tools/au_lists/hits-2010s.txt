@@ -1,60 +1,277 @@
 @id hits-2010s
 @title Hits of the 2010s
 @icon 🎧
-@sources [{"name":"Billboard Year-End Hot 100 singles (2010–2019)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2010"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
-2009 | Kesha | TiK ToK | tm=tik ?tok
-2009 | Train | Hey, Soul Sister
-2010 | Katy Perry | California Gurls
-2010 | Eminem | Love the Way You Lie | am=eminem
-2010 | Bruno Mars | Just the Way You Are | d=1
-2010 | Bruno Mars | Grenade
-2010 | Katy Perry | Firework | d=1
-2010 | Adele | Rolling in the Deep | d=1
-2011 | Adele | Someone Like You | d=1
-2011 | LMFAO | Party Rock Anthem
-2011 | Maroon 5 | Moves Like Jagger
-2011 | Pitbull | Give Me Everything | am=pitbull
-2011 | Gotye | Somebody That I Used to Know | am=gotye
-2011 | Carly Rae Jepsen | Call Me Maybe | d=1
-2011 | fun. | We Are Young | am=^fun
-2011 | Rihanna | We Found Love | am=rihanna
-2012 | Maroon 5 | Payphone
-2012 | PSY | Gangnam Style | d=1; tm=gangnam
-2012 | Macklemore & Ryan Lewis | Thrift Shop | am=macklemore
-2012 | Imagine Dragons | Radioactive
-2013 | Robin Thicke | Blurred Lines | am=thicke
-2013 | Daft Punk | Get Lucky | d=1; am=daft punk
-2013 | Lorde | Royals
-2013 | Miley Cyrus | Wrecking Ball
-2013 | Katy Perry | Roar
-2013 | Pharrell Williams | Happy | d=1; tm=^happy
-2013 | John Legend | All of Me
-2013 | Idina Menzel | Let It Go | d=1; am=idina
-2014 | Sam Smith | Stay with Me
-2014 | Taylor Swift | Shake It Off | d=1
-2014 | Mark Ronson | Uptown Funk | d=1; am=ronson; tm=uptown funk
-2014 | Ed Sheeran | Thinking Out Loud
-2015 | Wiz Khalifa | See You Again | am=wiz khalifa
-2015 | Adele | Hello | d=1
-2014 | Walk the Moon | Shut Up and Dance
-2015 | Justin Bieber | Love Yourself
-2015 | Justin Bieber | Sorry
-2016 | Drake | One Dance | am=drake
-2016 | Rihanna | Work | am=rihanna
-2016 | Justin Timberlake | CAN'T STOP THE FEELING! | tm=can.?t stop the feeling
-2016 | The Chainsmokers | Closer | am=chainsmokers
-2016 | Sia | Cheap Thrills | am=^sia
-2017 | Ed Sheeran | Shape of You | d=1
-2017 | Luis Fonsi & Daddy Yankee | Despacito | d=1; am=fonsi
-2017 | Kendrick Lamar | HUMBLE.
-2017 | Imagine Dragons | Believer
-2017 | Ed Sheeran | Perfect
-2017 | Camila Cabello | Havana | am=camila
-2018 | Drake | God's Plan
-2018 | Lady Gaga & Bradley Cooper | Shallow | am=gaga
-2018 | Post Malone & Swae Lee | Sunflower (Spider-Man: Into the Spider-Verse) | am=post malone; tm=sunflower
-2018 | Lil Nas X | Old Town Road | d=1; am=lil nas
-2019 | Billie Eilish | bad guy | d=1; alt=Bad Guy
-2019 | Shawn Mendes & Camila Cabello | Señorita | am=mendes
-2018 | Lewis Capaldi | Someone You Loved
-2019 | The Weeknd | Blinding Lights | d=1
+@sources [{"name":"Billboard Year-End Hot 100 singles (2010s)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2010"},{"name":"UK year-end best-selling singles (Music Week / Official Charts Company)","url":"https://www.officialcharts.com/charts/end-of-year-singles-chart/"},{"name":"ARIA year-end singles chart","url":"https://www.aria.com.au/charts/2010/singles-chart"},{"name":"Wikipedia pageviews (lasting fame) and Wikidata (artist country)","url":"https://www.wikidata.org/"}]
+# chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
+2009 | Train | Hey, Soul Sister | us=3 uk=84 au=4 pv=8950 from=USA
+2009 | Kesha | TiK ToK | us=1 uk=45 au=- pv=16670 from=USA | tm=tik ?tok
+2010 | Eminem | Love the Way You Lie | us=7 uk=1 au=1 pv=10063 from=USA | am=eminem
+2010 | Adele | Rolling in the Deep | us=1 uk=9 au=5 pv=10261 from=GBR | d=1
+2010 | Katy Perry | California Gurls | us=4 uk=8 au=5 pv=10155 from=USA
+2010 | Bruno Mars | Just the Way You Are | us=15 uk=3 au=8 pv=9317 from=USA | d=1
+2010 | Katy Perry | Firework | us=3 uk=19 au=24 pv=8013 from=USA | d=1
+2010 | Bruno Mars | Grenade | us=6 uk=7 au=21 pv=4577 from=USA
+2010 | Usher | OMG | us=5 uk=5 au=2 pv=2695 from=USA
+2010 | Taio Cruz | Dynamite | us=9 uk=17 au=3 pv=5047 from=GBR
+2010 | Lady Gaga | Telephone | us=16 uk=15 au=20 pv=8181 from=USA
+2010 | Rihanna | Only Girl (In the World) | us=40 uk=4 au=7 pv=5907 from=BRB
+2010 | Katy Perry | Teenage Dream | us=17 uk=32 au=9 pv=5641 from=USA
+2010 | Rihanna | Rude Boy | us=15 uk=14 au=33 pv=4357 from=BRB
+2010 | Travie McCoy | Billionaire | us=23 uk=23 au=30 pv=3162 from=USA
+2010 | Jason Derulo | In My Head | us=14 uk=40 au=13 pv=1964 from=USA
+2010 | Eminem | Not Afraid | us=24 uk=34 au=22 pv=3547 from=USA
+2010 | Justin Bieber | Baby | us=44 uk=47 au=35 pv=28381 from=CAN
+2010 | Flo Rida | Club Can't Handle Me | us=40 uk=20 au=18 pv=2743 from=USA
+2010 | Usher | DJ Got Us Fallin' in Love | us=22 uk=56 au=10 pv=4222 from=USA
+2010 | Mike Posner | Cooler Than Me | us=19 uk=33 au=21 pv=1997 from=USA
+2010 | Enrique Iglesias | I Like It | us=12 uk=51 au=14 pv=2181 from=ESP
+2010 | The Black Eyed Peas | The Time (Dirty Bit) | us=37 uk=26 au=28 pv=2241 from=USA
+2010 | Far East Movement | Like a G6 | us=37 uk=63 au=27 pv=9819 from=USA
+2010 | B.o.B | Airplanes | us=6 uk=- au=11 pv=5921 from=USA
+2010 | Jason Derulo | Ridin' Solo | us=34 uk=22 au=38 pv=1785 from=USA
+2010 | Chris Brown | Yeah 3x | us=49 uk=28 au=30 pv=2832 from=USA
+2010 | Lady Gaga | Alejandro | us=33 uk=46 au=50 pv=7373 from=USA
+2010 | Nelly | Just a Dream | us=35 uk=68 au=16 pv=3552 from=USA
+2011 | Gotye | Somebody That I Used to Know | us=1 uk=1 au=2 pv=28850 from=BEL/AUS | am=gotye
+2011 | Carly Rae Jepsen | Call Me Maybe | us=2 uk=2 au=1 pv=18117 from=CAN | d=1
+2011 | LMFAO | Party Rock Anthem | us=2 uk=3 au=1 pv=16239 from=USA
+2011 | fun. | We Are Young | us=3 uk=3 au=12 pv=14561 from=USA | am=^fun
+2011 | Maroon 5 | Moves Like Jagger | us=9 uk=2 au=3 pv=8273 from=USA
+2011 | Rihanna | We Found Love | us=8 uk=5 au=12 pv=8775 from=BRB | am=rihanna
+2011 | Pitbull | Give Me Everything | us=5 uk=6 au=7 pv=5009 from=USA | am=pitbull
+2011 | Adele | Someone Like You | us=24 uk=1 au=4 pv=7441 from=GBR | d=1
+2011 | Jennifer Lopez | On the Floor | us=11 uk=10 au=10 pv=10217 from=USA
+2011 | LMFAO | Sexy and I Know It | us=13 uk=30 au=6 pv=23131 from=USA
+2011 | Lady Gaga | Born This Way | us=18 uk=14 au=8 pv=9416 from=USA
+2011 | Rihanna | S&M | us=12 uk=12 au=11 pv=7307 from=BRB
+2011 | David Guetta | Titanium | us=24 uk=4 au=18 pv=11796 from=FRA
+2011 | One Direction | What Makes You Beautiful | us=10 uk=20 au=17 pv=9884 from=GBR
+2011 | Nicki Minaj | Super Bass | us=8 uk=30 au=17 pv=5353 from=TTO
+2011 | Bruno Mars | The Lazy Song | us=26 uk=15 au=14 pv=4221 from=USA
+2011 | Katy Perry | Last Friday Night (T.G.I.F.) | us=14 uk=45 au=31 pv=7005 from=USA
+2011 | Flo Rida | Good Feeling | us=16 uk=47 au=20 pv=4339 from=USA
+2011 | The Black Eyed Peas | Just Can't Get Enough | us=10 uk=42 au=22 pv=2245 from=USA
+2011 | Adele | Set Fire to the Rain | us=12 uk=29 au=49 pv=4607 from=GBR
+2011 | Christina Perri | Jar of Hearts | us=55 uk=11 au=16 pv=3143 from=USA
+2011 | Foster the People | Pumped Up Kicks | us=13 uk=- au=23 pv=24425 from=USA
+2011 | Lady Gaga | The Edge of Glory | us=29 uk=27 au=39 pv=3513 from=USA
+2011 | Ed Sheeran | The A Team | us=75 uk=8 au=24 pv=5519 from=GBR
+2011 | Jessie J | Price Tag | us=93 uk=4 au=9 pv=3942 from=GBR
+2011 | Katy Perry | E.T. | us=4 uk=- au=15 pv=5457 from=USA
+2011 | Jessie J | Domino | us=46 uk=8 au=53 pv=2849 from=GBR
+2012 | Macklemore & Ryan Lewis | Thrift Shop | us=1 uk=7 au=9 pv=7137 from=USA | am=macklemore
+2012 | PSY | Gangnam Style | us=47 uk=6 au=2 pv=37026 from=KOR | d=1; tm=gangnam
+2012 | Maroon 5 | Payphone | us=4 uk=9 au=11 pv=4890 from=USA
+2012 | Imagine Dragons | Radioactive | us=3 uk=30 au=20 pv=9046 from=USA
+2012 | Nicki Minaj | Starships | us=9 uk=7 au=6 pv=5841 from=TTO
+2012 | Flo Rida | Wild Ones | us=11 uk=10 au=5 pv=2930 from=USA
+2012 | Flo Rida | Whistle | us=17 uk=15 au=4 pv=2833 from=USA
+2012 | Swedish House Mafia | Don't You Worry Child | us=26 uk=13 au=10 pv=4859 from=SWE
+2012 | Rihanna | Diamonds | us=27 uk=11 au=32 pv=11181 from=BRB
+2012 | Taylor Swift | I Knew You Were Trouble | us=16 uk=17 au=27 pv=5508 from=USA
+2012 | The Lumineers | Ho Hey | us=12 uk=21 au=21 pv=4085 from=USA
+2012 | Will.i.am | Scream & Shout | us=23 uk=18 au=27 pv=5826 from=USA
+2012 | Bruno Mars | Locked Out of Heaven | us=11 uk=33 au=28 pv=5827 from=USA
+2012 | Icona Pop | I Love It | us=28 uk=19 au=41 pv=11749 from=SWE
+2012 | Taylor Swift | We Are Never Ever Getting Back Together | us=33 uk=26 au=19 pv=6532 from=USA
+2012 | Rihanna | Where Have You Been | us=21 uk=32 au=53 pv=4888 from=BRB
+2012 | Fun | Some Nights | us=14 uk=77 au=15 pv=4225 from=USA
+2012 | Maroon 5 | One More Night | us=18 uk=72 au=18 pv=2930 from=USA
+2012 | Train | Drive By | us=19 uk=23 au=56 pv=1769 from=USA
+2012 | Katy Perry | Wide Awake | us=15 uk=68 au=35 pv=3719 from=USA
+2012 | Owl City and Carly Rae Jepsen | Good Time | us=38 uk=69 au=16 pv=3670 from=USA
+2012 | The Script | Hall of Fame | us=85 uk=21 au=20 pv=3829 from=IRL
+2012 | David Guetta | Turn Me On | us=35 uk=35 au=44 pv=1746 from=FRA
+2012 | Katy Perry | Part of Me | us=31 uk=55 au=45 pv=3426 from=USA
+2012 | Kelly Clarkson | Stronger (What Doesn't Kill You) | us=7 uk=36 au=99 pv=4699 from=USA
+2012 | Calvin Harris | Sweet Nothing | us=44 uk=48 au=55 pv=2334 from=GBR
+2012 | Drake | Take Care | us=23 uk=67 au=66 pv=3059 from=CAN/USA
+2013 | Robin Thicke | Blurred Lines | us=2 uk=1 au=2 pv=19108 from=USA | am=thicke; kids=0
+2013 | Pharrell Williams | Happy | us=1 uk=1 au=1 pv=15106 from=USA | d=1; tm=^happy
+2013 | Daft Punk | Get Lucky | us=14 uk=2 au=7 pv=12027 from=FRA | d=1; am=daft punk
+2013 | John Legend | All of Me | us=3 uk=3 au=11 pv=6633 from=USA
+2013 | Katy Perry | Roar | us=10 uk=6 au=1 pv=6631 from=USA
+2013 | Idina Menzel | Let It Go | us=21 uk=13 au=25 pv=9777 from=USA | d=1; am=idina
+2013 | Miley Cyrus | Wrecking Ball | us=18 uk=41 au=22 pv=10602 from=USA
+2013 | Lorde | Royals | us=15 uk=44 au=- pv=7259 from=NZL/HRV
+2013 | Avicii | Wake Me Up | us=19 uk=3 au=4 pv=13215 from=SWE
+2013 | OneRepublic | Counting Stars | us=5 uk=9 au=8 pv=6901 from=USA
+2013 | Macklemore & Ryan Lewis | Can't Hold Us | us=5 uk=13 au=9 pv=7108 from=USA
+2013 | Passenger | Let Her Go | us=19 uk=4 au=3 pv=6527 from=GBR
+2013 | Bastille | Pompeii | us=12 uk=11 au=15 pv=8185 from=GBR
+2013 | Bruno Mars | When I Was Your Man | us=8 uk=16 au=17 pv=4449 from=USA
+2013 | Rihanna | Stay | us=13 uk=22 au=11 pv=5027 from=BRB
+2013 | Pitbull | Timber | us=11 uk=9 au=31 pv=5172 from=USA
+2013 | Magic! | Rude | us=7 uk=12 au=40 pv=5506 from=CAN
+2013 | Justin Timberlake | Mirrors | us=6 uk=10 au=47 pv=6159 from=USA
+2013 | Eminem | The Monster | us=16 uk=26 au=24 pv=6895 from=USA
+2013 | Jason Derulo | Talk Dirty | us=6 uk=25 au=13 pv=2242 from=USA
+2013 | Miley Cyrus | We Can't Stop | us=17 uk=28 au=30 pv=4456 from=USA
+2013 | Lana Del Rey and Cédric Gervais | Summertime Sadness | us=45 uk=23 au=26 pv=7525 from=USA
+2013 | Ellie Goulding | Burn | us=39 uk=15 au=34 pv=2228 from=GBR
+2013 | Pink | Just Give Me a Reason | us=7 uk=8 au=- pv=6272 from=USA
+2013 | Avicii | Hey Brother | us=60 uk=33 au=28 pv=5850 from=SWE
+2013 | Vance Joy | Riptide | us=71 uk=42 au=12 pv=5719 from=AUS
+2013 | Naughty Boy | La La La | us=82 uk=5 au=40 pv=4836 from=GBR
+2014 | Mark Ronson | Uptown Funk | us=1 uk=1 au=1 pv=17802 from=GBR/USA | d=1; am=ronson; tm=uptown funk
+2014 | Ed Sheeran | Thinking Out Loud | us=2 uk=5 au=7 pv=5842 from=GBR
+2014 | Taylor Swift | Shake It Off | us=13 uk=14 au=3 pv=10493 from=USA | d=1
+2014 | Sam Smith | Stay with Me | us=10 uk=7 au=8 pv=5618 from=GBR
+2014 | Walk the Moon | Shut Up and Dance | us=6 uk=94 au=8 pv=9928 from=USA
+2014 | Hozier | Take Me to Church | us=14 uk=3 au=4 pv=13150 from=IRL
+2014 | Meghan Trainor | All About That Bass | us=8 uk=8 au=2 pv=8087 from=USA
+2014 | Iggy Azalea | Fancy | us=4 uk=31 au=12 pv=6190 from=AUS
+2014 | Sia | Chandelier | us=25 uk=32 au=6 pv=10293 from=AUS
+2014 | Ariana Grande | Problem | us=9 uk=23 au=18 pv=4948 from=USA
+2014 | Clean Bandit | Rather Be | us=41 uk=2 au=14 pv=5595 from=GBR
+2014 | A Great Big World and Christina Aguilera | Say Something | us=17 uk=39 au=13 pv=5851 from=USA
+2014 | Nico & Vinz | Am I Wrong | us=14 uk=21 au=16 pv=2485 from=NOR
+2014 | Jessie J, Ariana Grande and Nicki Minaj | Bang Bang | us=27 uk=25 au=30 pv=7542 from=GBR
+2014 | Taylor Swift | Blank Space | us=7 uk=64 au=28 pv=10631 from=USA
+2014 | Calvin Harris | Summer | us=33 uk=19 au=45 pv=3095 from=GBR
+2014 | Katy Perry | Dark Horse | us=2 uk=20 au=- pv=6955 from=USA
+2014 | Sam Smith | I'm Not the Only One | us=26 uk=24 au=56 pv=2567 from=GBR
+2014 | Ed Sheeran | Sing | us=56 uk=11 au=33 pv=1716 from=GBR
+2014 | George Ezra | Budapest | us=89 uk=10 au=19 pv=2745 from=GBR
+2014 | Ed Sheeran | Don't | us=52 uk=27 au=42 pv=2933 from=GBR
+2014 | Coldplay | A Sky Full of Stars | us=51 uk=40 au=54 pv=6626 from=GBR
+2014 | Mr Probz | Waves | us=95 uk=4 au=21 pv=1768 from=NLD
+2014 | Iggy Azalea | Black Widow | us=26 uk=47 au=70 pv=2415 from=AUS
+2014 | Ella Henderson | Ghost | us=93 uk=6 au=31 pv=1317 from=GBR
+2014 | Ariana Grande | Break Free | us=37 uk=86 au=39 pv=5604 from=USA
+2014 | DJ Snake and Lil Jon | Turn Down for What | us=15 uk=- au=49 pv=5739 from=FRA/DZA
+2015 | Adele | Hello | us=7 uk=6 au=5 pv=27139 from=GBR | d=1
+2015 | Wiz Khalifa | See You Again | us=3 uk=5 au=3 pv=18868 from=USA | am=wiz khalifa
+2015 | Justin Bieber | Love Yourself | us=1 uk=8 au=10 pv=9269 from=CAN
+2015 | Justin Bieber | Sorry | us=2 uk=10 au=16 pv=11298 from=CAN
+2015 | OMI | Cheerleader | us=11 uk=2 au=2 pv=5701 from=JAM
+2015 | Ellie Goulding | Love Me Like You Do | us=13 uk=4 au=7 pv=7958 from=GBR
+2015 | Major Lazer and DJ Snake | Lean On | us=16 uk=7 au=6 pv=7068 from=USA
+2015 | Maroon 5 | Sugar | us=5 uk=13 au=13 pv=5411 from=USA
+2015 | The Weeknd | Can't Feel My Face | us=12 uk=21 au=12 pv=5600 from=CAN
+2015 | Justin Bieber | What Do You Mean? | us=31 uk=9 au=9 pv=5813 from=CAN
+2015 | The Weeknd | The Hills | us=10 uk=25 au=20 pv=4237 from=CAN
+2015 | Rihanna, Kanye West and Paul McCartney | FourFiveSeconds | us=42 uk=18 au=10 pv=6217 from=BRB
+2015 | Jason Derulo | Want to Want Me | us=17 uk=16 au=24 pv=1595 from=USA
+2015 | Shawn Mendes | Stitches | us=23 uk=11 au=43 pv=3047 from=CAN
+2015 | Sia | Elastic Heart | us=52 uk=32 au=14 pv=4642 from=AUS
+2015 | Drake | Hotline Bling | us=24 uk=40 au=43 pv=6111 from=CAN/USA
+2015 | Ed Sheeran | Photograph | us=34 uk=29 au=33 pv=3479 from=GBR
+2015 | Taylor Swift | Bad Blood | us=15 uk=- au=18 pv=11444 from=USA
+2015 | Fetty Wap | Trap Queen | us=4 uk=23 au=96 pv=6472 from=USA
+2015 | The Weeknd | Earned It | us=9 uk=26 au=80 pv=2939 from=CAN
+2015 | Jack Ü | Where Are Ü Now | us=19 uk=15 au=- pv=4714 from=USA
+2015 | Rachel Platten | Fight Song | us=20 uk=- au=21 pv=5259 from=USA
+2015 | James Bay | Let It Go | us=44 uk=41 au=35 pv=1099 from=GBR
+2015 | Charlie Puth | Marvin Gaye | us=75 uk=34 au=38 pv=3612 from=USA
+2015 | Calvin Harris and Disciples | How Deep Is Your Love | us=100 uk=20 au=29 pv=3633 from=GBR
+2015 | Taylor Swift | Style | us=29 uk=- au=31 pv=5826 from=USA
+2015 | James Bay | Hold Back the River | us=- uk=8 au=19 pv=1103 from=GBR
+2016 | Drake | One Dance | us=3 uk=1 au=2 pv=7079 from=CAN/USA | am=drake
+2016 | The Chainsmokers | Closer | us=7 uk=7 au=1 pv=8788 from=USA | am=chainsmokers
+2016 | Sia | Cheap Thrills | us=11 uk=3 au=8 pv=6680 from=AUS | am=^sia
+2016 | Justin Timberlake | CAN'T STOP THE FEELING! | us=9 uk=10 au=7 pv=7825 from=USA | tm=can.?t stop the feeling
+2016 | Rihanna | Work | us=4 uk=9 au=40 pv=6296 from=BRB | am=rihanna
+2016 | Lukas Graham | 7 Years | us=12 uk=2 au=3 pv=6893 from=DNK
+2016 | Mike Posner | I Took a Pill in Ibiza | us=15 uk=4 au=16 pv=10755 from=USA
+2016 | Calvin Harris | This Is What You Came For | us=17 uk=5 au=6 pv=6952 from=GBR
+2016 | The Chainsmokers | Don't Let Me Down | us=8 uk=17 au=5 pv=4432 from=USA
+2016 | Twenty One Pilots | Stressed Out | us=5 uk=31 au=9 pv=5661 from=USA
+2016 | Fifth Harmony | Work from Home | us=16 uk=15 au=15 pv=4597 from=USA
+2016 | DNCE | Cake by the Ocean | us=18 uk=23 au=35 pv=10451 from=USA
+2016 | Major Lazer | Cold Water | us=25 uk=14 au=11 pv=2973 from=USA
+2016 | James Arthur | Say You Won't Let Go | us=11 uk=19 au=22 pv=2569 from=GBR
+2016 | The Weeknd | Starboy | us=20 uk=34 au=23 pv=6478 from=CAN
+2016 | DJ Snake | Let Me Love You | us=46 uk=25 au=19 pv=5117 from=FRA/DZA
+2016 | Twenty One Pilots | Heathens | us=21 uk=38 au=27 pv=4142 from=USA
+2016 | Desiigner | Panda | us=6 uk=36 au=38 pv=2844 from=USA
+2016 | Clean Bandit | Rockabye | us=44 uk=23 au=30 pv=4458 from=GBR
+2016 | Shawn Mendes | Treat You Better | us=28 uk=27 au=29 pv=2167 from=CAN
+2016 | Drake | Too Good | us=29 uk=18 au=34 pv=1327 from=CAN/USA
+2016 | Zayn | Pillowtalk | us=22 uk=24 au=32 pv=1007 from=GBR
+2016 | Gnash | I Hate U, I Love U | us=38 uk=32 au=13 pv=1223 from=USA
+2016 | Ariana Grande | Side to Side | us=43 uk=49 au=37 pv=3871 from=USA
+2016 | Adele | Send My Love (To Your New Lover) | us=26 uk=53 au=45 pv=2378 from=GBR
+2016 | Bruno Mars | 24K Magic | us=16 uk=68 au=59 pv=5700 from=USA
+2016 | The Chainsmokers | Roses | us=27 uk=62 au=33 pv=2040 from=USA
+2017 | Luis Fonsi & Daddy Yankee | Despacito | us=2 uk=2 au=2 pv=19934 from=USA | d=1; am=fonsi
+2017 | Ed Sheeran | Shape of You | us=1 uk=1 au=1 pv=12574 from=GBR | d=1
+2017 | Ed Sheeran | Perfect | us=2 uk=6 au=3 pv=10604 from=GBR
+2017 | Camila Cabello | Havana | us=4 uk=17 au=19 pv=7143 from=CUB/MEX/USA | am=camila
+2017 | Kendrick Lamar | HUMBLE. | us=4 uk=47 au=8 pv=4045 from=USA
+2017 | Imagine Dragons | Believer | us=9 uk=97 au=72 pv=8001 from=USA
+2017 | The Chainsmokers and Coldplay | Something Just Like This | us=5 uk=9 au=5 pv=5125 from=USA
+2017 | DJ Khaled | I'm the One | us=12 uk=12 au=13 pv=3305 from=USA
+2017 | French Montana | Unforgettable | us=15 uk=4 au=21 pv=3610 from=MAR/USA
+2017 | Post Malone | Rockstar | us=5 uk=22 au=12 pv=3318 from=USA
+2017 | Dua Lipa | New Rules | us=16 uk=11 au=22 pv=4561 from=GBR/ALB/XKX
+2017 | Ed Sheeran | Castle on the Hill | us=40 uk=3 au=3 pv=3916 from=GBR
+2017 | Shawn Mendes | There's Nothing Holdin' Me Back | us=23 uk=16 au=10 pv=2609 from=CAN
+2017 | Bruno Mars | That's What I Like | us=3 uk=36 au=25 pv=4393 from=USA
+2017 | DJ Khaled | Wild Thoughts | us=18 uk=13 au=29 pv=2835 from=USA
+2017 | Portugal. The Man | Feel It Still | us=33 uk=10 au=35 pv=5343 from=USA
+2017 | Charlie Puth | Attention | us=22 uk=26 au=24 pv=3562 from=USA
+2017 | Kygo and Selena Gomez | It Ain't Me | us=27 uk=25 au=20 pv=2891 from=NOR
+2017 | Zedd and Alessia Cara | Stay | us=17 uk=37 au=14 pv=1984 from=RUS/DEU
+2017 | Liam Payne | Strip That Down | us=36 uk=20 au=11 pv=1535 from=GBR
+2017 | Zayn and Taylor Swift | I Don't Wanna Live Forever | us=26 uk=52 au=17 pv=4291 from=GBR
+2017 | Julia Michaels | Issues | us=29 uk=35 au=15 pv=1713 from=USA
+2017 | Niall Horan | Slow Hands | us=32 uk=45 au=12 pv=1490 from=IRL
+2017 | Post Malone | Congratulations | us=10 uk=62 au=36 pv=2289 from=USA
+2017 | The Chainsmokers | Paris | us=42 uk=32 au=31 pv=1892 from=USA
+2017 | Future | Mask Off | us=14 uk=43 au=64 pv=3484 from=USA
+2017 | Imagine Dragons | Thunder | us=22 uk=100 au=6 pv=4392 from=USA
+2018 | Lil Nas X | Old Town Road | us=1 uk=2 au=1 pv=14798 from=USA | d=1; am=lil nas
+2018 | Lewis Capaldi | Someone You Loved | us=10 uk=1 au=5 pv=10953 from=GBR
+2018 | Drake | God's Plan | us=1 uk=2 au=2 pv=5329 from=CAN/USA
+2018 | Post Malone & Swae Lee | Sunflower (Spider-Man: Into the Spider-Verse) | us=2 uk=15 au=4 pv=7632 from=USA | am=post malone; tm=sunflower
+2018 | Lady Gaga & Bradley Cooper | Shallow | us=19 uk=20 au=9 pv=12321 from=USA | am=gaga
+2018 | Maroon 5 | Girls Like You | us=10 uk=26 au=8 pv=7218 from=USA
+2018 | Drake | In My Feelings | us=9 uk=15 au=16 pv=3788 from=CAN/USA
+2018 | Drake | Nice for What | us=11 uk=7 au=22 pv=3048 from=CAN/USA
+2018 | Cardi B, Bad Bunny and J Balvin | I Like It | us=7 uk=23 au=36 pv=9585 from=USA
+2018 | Benny Blanco, Halsey and Khalid | Eastside | us=17 uk=19 au=10 pv=3698 from=USA
+2018 | Ariana Grande | No Tears Left to Cry | us=20 uk=9 au=26 pv=4679 from=USA
+2018 | Halsey | Without Me | us=3 uk=40 au=18 pv=5289 from=USA
+2018 | Zedd, Maren Morris and Grey | The Middle | us=8 uk=35 au=15 pv=4435 from=RUS/DEU
+2018 | Post Malone | Psycho | us=6 uk=22 au=7 pv=1384 from=USA
+2018 | Ariana Grande | Thank U, Next | us=12 uk=30 au=34 pv=8359 from=USA
+2018 | Bebe Rexha | Meant to Be | us=3 uk=47 au=5 pv=2571 from=USA
+2018 | Marshmello and Bastille | Happier | us=6 uk=37 au=21 pv=3882 from=USA
+2018 | Panic! at the Disco | High Hopes | us=11 uk=31 au=32 pv=5474 from=USA
+2018 | Post Malone | Better Now | us=13 uk=21 au=11 pv=1354 from=USA
+2018 | 5 Seconds of Summer | Youngblood | us=33 uk=28 au=1 pv=2697 from=AUS
+2018 | XXXTentacion | Sad! | us=17 uk=46 au=21 pv=5576 from=USA
+2018 | Marshmello and Anne-Marie | Friends | us=26 uk=13 au=27 pv=2051 from=USA
+2018 | Calvin Harris and Dua Lipa | One Kiss | us=68 uk=1 au=20 pv=3294 from=GBR
+2018 | Juice Wrld | Lucid Dreams | us=12 uk=53 au=38 pv=5526 from=USA
+2018 | Kendrick Lamar and SZA | All the Stars | us=47 uk=38 au=17 pv=5131 from=USA
+2018 | Travis Scott | Sicko Mode | us=9 uk=75 au=25 pv=6718 from=USA
+2018 | Khalid and Normani | Love Lies | us=19 uk=52 au=13 pv=1216 from=USA
+2019 | The Weeknd | Blinding Lights | us=1 uk=1 au=1 pv=22204 from=CAN | d=1
+2019 | Billie Eilish | bad guy | us=4 uk=4 au=3 pv=10731 from=USA | d=1; alt=Bad Guy
+2019 | Shawn Mendes & Camila Cabello | Señorita | us=15 uk=10 au=- pv=6535 from=CAN | am=mendes
+2019 | Tones and I | Dance Monkey | us=14 uk=2 au=2 pv=10988 from=AUS
+2019 | Ariana Grande | 7 Rings | us=7 uk=16 au=10 pv=7081 from=USA
+2019 | Ed Sheeran and Justin Bieber | I Don't Care | us=16 uk=3 au=6 pv=3939 from=GBR
+2019 | Ava Max | Sweet but Psycho | us=23 uk=6 au=15 pv=4897 from=USA
+2019 | Maroon 5 | Memories | us=8 uk=28 au=21 pv=6855 from=USA
+2019 | Jonas Brothers | Sucker | us=10 uk=29 au=13 pv=3617 from=USA
+2019 | Post Malone | Wow | us=5 uk=17 au=7 pv=1183 from=USA
+2019 | Sam Smith and Normani | Dancing with a Stranger | us=14 uk=22 au=19 pv=1879 from=GBR
+2019 | Khalid | Talk | us=8 uk=43 au=17 pv=1097 from=USA
+2019 | Ed Sheeran | Beautiful People | us=50 uk=21 au=14 pv=1268 from=GBR
+2019 | Ariana Grande | Break Up with Your Girlfriend, I'm Bored | us=36 uk=33 au=44 pv=3919 from=USA
+2019 | Billie Eilish | Bury a Friend | us=73 uk=36 au=26 pv=2923 from=USA
+2019 | Lizzo | Truth Hurts | us=13 uk=93 au=31 pv=2931 from=USA
+2019 | Chris Brown | No Guidance | us=21 uk=67 au=53 pv=1980 from=USA
+2019 | Lizzo | Good as Hell | us=31 uk=68 au=48 pv=2168 from=USA
+2019 | Taylor Swift | Me! | us=43 uk=71 au=68 pv=7213 from=USA
+2019 | Post Malone | Goodbyes | us=30 uk=79 au=35 pv=1181 from=USA
+2019 | Billie Eilish | When the Party's Over | us=67 uk=74 au=29 pv=3194 from=USA
+2019 | Shawn Mendes | If I Can't Have You | us=29 uk=83 au=37 pv=1012 from=CAN
+2019 | Meduza | Piece of Your Heart | us=- uk=11 au=16 pv=0 from=ITA | nm=apple
+2019 | Lil Tecca | Ransom | us=28 uk=53 au=85 pv=1786 from=USA
+2019 | Dominic Fike | 3 Nights | us=- uk=24 au=11 pv=0 from=USA | nm=apple
+2019 | Taylor Swift | You Need to Calm Down | us=39 uk=- au=61 pv=4962 from=USA
+2019 | Meek Mill | Going Bad | us=18 uk=81 au=69 pv=819 from=USA

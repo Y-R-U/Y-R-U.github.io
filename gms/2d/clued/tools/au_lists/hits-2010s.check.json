@@ -1,32 +1,41 @@
 {
- "dropped": [],
+ "dropped": [
+  "NO MATCH  2017 Zayn and Taylor Swift — I Don't Wanna Live Forever",
+  "NO MATCH  2018 Marshmello and Anne-Marie — Friends",
+  "NO MATCH  2018 Khalid and Normani — Love Lies",
+  "SAME TITLE  2010 Enrique Iglesias — I Like It (kept the Cardi B, Bad Bunny and J Balvin song)",
+  "SAME TITLE  2015 James Bay — Let It Go (kept the Idina Menzel song)",
+  "SAME TITLE  2017 Zedd and Alessia Cara — Stay (kept the Rihanna song)"
+ ],
  "offby": [
-  "2011 apple 2010 (earliest original 2010)  Maroon 5 — Moves Like Jagger  [Hands All Over (Deluxe Edition)]"
+  "2010 apple 2009 (earliest original 2009)  Lady Gaga — Telephone  [The Fame Monster (Deluxe Edition)]",
+  "2010 apple 2009 (earliest original 2009)  Rihanna — Rude Boy  [Rated R]",
+  "2010 apple 2009 (earliest original 2009)  Mike Posner — Cooler Than Me  [Cooler Than Me - EP]",
+  "2010 apple 2009 (earliest original 2009)  Lady Gaga — Alejandro  [The Fame Monster (Deluxe Edition)]",
+  "2018 apple 2019 (earliest original 2019)  XXXTentacion — Sad!  [? (Deluxe)]",
+  "2019 apple 2019 (earliest original 2016)  Lizzo — Good as Hell  [Cuz I Love You (Super Deluxe)]",
+  "2019 apple 2019 (earliest original 1990)  MEDUZA — Piece Of Your Heart  [Piece Of Your Heart - Single]"
  ],
  "items": [
-  {
-   "id": "tik-tok-kesha",
-   "appleYear": 2009,
-   "album": "Animal (Expanded Edition)",
-   "appleArtist": "Kesha",
-   "appleTitle": "TiK ToK",
-   "year": 2009
-  },
   {
    "id": "hey-soul-sister-train",
    "appleYear": 2009,
    "album": "Save Me, San Francisco (Golden Gate Edition)",
    "appleArtist": "Train",
    "appleTitle": "Hey, Soul Sister",
-   "year": 2009
+   "store": "US",
+   "year": 2009,
+   "d": 1
   },
   {
-   "id": "california-gurls-katy-perry",
-   "appleYear": 2010,
-   "album": "Teenage Dream (Deluxe Edition)",
-   "appleArtist": "Katy Perry",
-   "appleTitle": "California Gurls (feat. Snoop Dogg)",
-   "year": 2010
+   "id": "tik-tok-kesha",
+   "appleYear": 2009,
+   "album": "Animal (Expanded Edition)",
+   "appleArtist": "Kesha",
+   "appleTitle": "TiK ToK",
+   "store": "US",
+   "year": 2009,
+   "d": 1
   },
   {
    "id": "love-the-way-you-lie-eminem",
@@ -34,31 +43,11 @@
    "album": "Recovery",
    "appleArtist": "Eminem",
    "appleTitle": "Love the Way You Lie (feat. Rihanna)",
-   "year": 2010
-  },
-  {
-   "id": "just-the-way-you-are-bruno-mars",
-   "appleYear": 2010,
-   "album": "Doo-Wops & Hooligans",
-   "appleArtist": "Bruno Mars",
-   "appleTitle": "Just the Way You Are",
-   "year": 2010
-  },
-  {
-   "id": "grenade-bruno-mars",
-   "appleYear": 2010,
-   "album": "Doo-Wops & Hooligans",
-   "appleArtist": "Bruno Mars",
-   "appleTitle": "Grenade",
-   "year": 2010
-  },
-  {
-   "id": "firework-katy-perry",
-   "appleYear": 2010,
-   "album": "Teenage Dream",
-   "appleArtist": "Katy Perry",
-   "appleTitle": "Firework",
-   "year": 2010
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2010,
+   "d": 2,
+   "explicit": true
   },
   {
    "id": "rolling-in-the-deep-adele",
@@ -66,39 +55,253 @@
    "album": "21",
    "appleArtist": "Adele",
    "appleTitle": "Rolling in the Deep",
-   "year": 2010
+   "store": "US",
+   "year": 2010,
+   "d": 1
   },
   {
-   "id": "someone-like-you-adele",
-   "appleYear": 2011,
-   "album": "21",
-   "appleArtist": "Adele",
-   "appleTitle": "Someone Like You",
-   "year": 2011
-  },
-  {
-   "id": "party-rock-anthem-lmfao",
-   "appleYear": 2011,
-   "album": "Sorry for Party Rocking (Deluxe Version)",
-   "appleArtist": "LMFAO",
-   "appleTitle": "Party Rock Anthem (feat. Lauren Bennett & GoonRock)",
-   "year": 2011
-  },
-  {
-   "id": "moves-like-jagger-maroon-5",
+   "id": "california-gurls-katy-perry",
    "appleYear": 2010,
-   "album": "Hands All Over (Deluxe Edition)",
-   "appleArtist": "Maroon 5",
-   "appleTitle": "Moves Like Jagger (feat. Christina Aguilera)",
-   "year": 2011
+   "album": "Teenage Dream (Deluxe Edition)",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "California Gurls (feat. Snoop Dogg)",
+   "store": "US",
+   "year": 2010,
+   "d": 1
   },
   {
-   "id": "give-me-everything-pitbull",
-   "appleYear": 2011,
-   "album": "Planet Pit (Deluxe Version)",
-   "appleArtist": "Pitbull",
-   "appleTitle": "Give Me Everything (feat. Ne-Yo, Afrojack & Nayer)",
-   "year": 2011
+   "id": "just-the-way-you-are-bruno-mars",
+   "appleYear": 2010,
+   "album": "Doo-Wops & Hooligans",
+   "appleArtist": "Bruno Mars",
+   "appleTitle": "Just the Way You Are",
+   "store": "US",
+   "year": 2010,
+   "d": 1
+  },
+  {
+   "id": "firework-katy-perry",
+   "appleYear": 2010,
+   "album": "Teenage Dream",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "Firework",
+   "store": "US",
+   "year": 2010,
+   "d": 1
+  },
+  {
+   "id": "grenade-bruno-mars",
+   "appleYear": 2010,
+   "album": "Doo-Wops & Hooligans",
+   "appleArtist": "Bruno Mars",
+   "appleTitle": "Grenade",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "omg-usher",
+   "appleYear": 2010,
+   "album": "Raymond v Raymond (Expanded Edition)",
+   "appleArtist": "USHER",
+   "appleTitle": "Omg (feat. will.i.am)",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "dynamite-taio-cruz",
+   "appleYear": 2010,
+   "album": "iTunes Session",
+   "appleArtist": "Taio Cruz",
+   "appleTitle": "Dynamite (iTunes Session)",
+   "store": "US",
+   "year": 2010,
+   "d": 1
+  },
+  {
+   "id": "telephone-lady-gaga",
+   "appleYear": 2009,
+   "album": "The Fame Monster (Deluxe Edition)",
+   "appleArtist": "Lady Gaga",
+   "appleTitle": "Telephone (feat. Beyoncé)",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "only-girl-in-the-world-rihanna",
+   "appleYear": 2010,
+   "album": "Loud (Deluxe)",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Only Girl (In the World)",
+   "store": "US",
+   "year": 2010,
+   "d": 1
+  },
+  {
+   "id": "teenage-dream-katy-perry",
+   "appleYear": 2010,
+   "album": "Teenage Dream",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "Teenage Dream",
+   "store": "US",
+   "year": 2010,
+   "d": 1
+  },
+  {
+   "id": "rude-boy-rihanna",
+   "appleYear": 2009,
+   "album": "Rated R",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Rude Boy",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "billionaire-travie-mccoy",
+   "appleYear": 2010,
+   "album": "Lazarus (Deluxe Version)",
+   "appleArtist": "Travie McCoy",
+   "appleTitle": "Billionaire (feat. Bruno Mars)",
+   "store": "US",
+   "year": 2010,
+   "d": 3,
+   "explicit": true
+  },
+  {
+   "id": "in-my-head-jason-derulo",
+   "appleYear": 2010,
+   "album": "Jason Derulo (Special Edition) - EP",
+   "appleArtist": "Jason Derulo",
+   "appleTitle": "In My Head (feat. Nicki Minaj)",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "not-afraid-eminem",
+   "appleYear": 2010,
+   "album": "Recovery",
+   "appleArtist": "Eminem",
+   "appleTitle": "Not Afraid",
+   "store": "US",
+   "year": 2010,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "baby-justin-bieber",
+   "appleYear": 2010,
+   "album": "My World 2.0 (Bonus Track Version)",
+   "appleArtist": "Justin Bieber",
+   "appleTitle": "Baby (feat. Ludacris)",
+   "store": "US",
+   "year": 2010,
+   "d": 1
+  },
+  {
+   "id": "club-cant-handle-me-flo-rida",
+   "appleYear": 2010,
+   "album": "Club Can't Handle Me - Single",
+   "appleArtist": "Flo Rida",
+   "appleTitle": "Club Can't Handle Me (feat. David Guetta) [From \"Step Up 3D\"]",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "dj-got-us-fallin-in-love-usher",
+   "appleYear": 2010,
+   "album": "Raymond v Raymond (Expanded Edition)",
+   "appleArtist": "USHER",
+   "appleTitle": "DJ Got Us Fallin' in Love (feat. Pitbull)",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "cooler-than-me-mike-posner",
+   "appleYear": 2009,
+   "album": "Cooler Than Me - EP",
+   "appleArtist": "Mike Posner",
+   "appleTitle": "Cooler Than Me (feat. Big Sean)",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "the-time-dirty-bit-the-black-eyed-peas",
+   "appleYear": 2010,
+   "album": "The Beginning",
+   "appleArtist": "Black Eyed Peas",
+   "appleTitle": "The Time (Dirty Bit)",
+   "store": "US",
+   "year": 2010,
+   "d": 3
+  },
+  {
+   "id": "like-a-g6-far-east-movement",
+   "appleYear": 2010,
+   "album": "Free Wired",
+   "appleArtist": "Far East Movement, The Cataracs & DEV",
+   "appleTitle": "Like a G6",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "airplanes-b-o-b",
+   "appleYear": 2010,
+   "album": "B.o.B Presents: The Adventures of Bobby Ray (Deluxe Version)",
+   "appleArtist": "B.o.B feat. Hayley Williams",
+   "appleTitle": "Airplanes (feat. Hayley Williams)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2010,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "ridin-solo-jason-derulo",
+   "appleYear": 2010,
+   "album": "Jason Derulo",
+   "appleArtist": "Jason Derulo",
+   "appleTitle": "Ridin' Solo",
+   "store": "US",
+   "year": 2010,
+   "d": 3
+  },
+  {
+   "id": "yeah-3x-chris-brown",
+   "appleYear": 2010,
+   "album": "Most Wanted",
+   "appleArtist": "Chris Brown",
+   "appleTitle": "Yeah 3X",
+   "store": "GB",
+   "year": 2010,
+   "d": 3
+  },
+  {
+   "id": "alejandro-lady-gaga",
+   "appleYear": 2009,
+   "album": "The Fame Monster (Deluxe Edition)",
+   "appleArtist": "Lady Gaga",
+   "appleTitle": "Alejandro",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "just-a-dream-nelly",
+   "appleYear": 2010,
+   "album": "Just a Dream - Single",
+   "appleArtist": "Nelly",
+   "appleTitle": "Just a Dream",
+   "store": "US",
+   "year": 2010,
+   "d": 2
   },
   {
    "id": "somebody-that-i-used-to-know-gotye",
@@ -106,7 +309,9 @@
    "album": "Making Mirrors",
    "appleArtist": "Gotye",
    "appleTitle": "Somebody That I Used to Know (feat. Kimbra)",
-   "year": 2011
+   "store": "US",
+   "year": 2011,
+   "d": 1
   },
   {
    "id": "call-me-maybe-carly-rae-jepsen",
@@ -114,7 +319,19 @@
    "album": "Kiss (Deluxe Version)",
    "appleArtist": "Carly Rae Jepsen",
    "appleTitle": "Call Me Maybe",
-   "year": 2011
+   "store": "US",
+   "year": 2011,
+   "d": 1
+  },
+  {
+   "id": "party-rock-anthem-lmfao",
+   "appleYear": 2011,
+   "album": "Sorry for Party Rocking (Deluxe Version)",
+   "appleArtist": "LMFAO",
+   "appleTitle": "Party Rock Anthem (feat. Lauren Bennett & GoonRock)",
+   "store": "US",
+   "year": 2011,
+   "d": 1
   },
   {
    "id": "we-are-young-fun",
@@ -122,7 +339,19 @@
    "album": "Some Nights",
    "appleArtist": "Fun.",
    "appleTitle": "We Are Young (feat. Janelle Monáe)",
-   "year": 2011
+   "store": "US",
+   "year": 2011,
+   "d": 1
+  },
+  {
+   "id": "moves-like-jagger-maroon-5",
+   "appleYear": 2010,
+   "album": "Hands All Over (Deluxe Edition)",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "Moves Like Jagger (feat. Christina Aguilera)",
+   "store": "US",
+   "year": 2010,
+   "d": 1
   },
   {
    "id": "we-found-love-rihanna",
@@ -130,23 +359,222 @@
    "album": "Talk That Talk",
    "appleArtist": "Rihanna",
    "appleTitle": "We Found Love (feat. Calvin Harris)",
-   "year": 2011
+   "store": "US",
+   "year": 2011,
+   "d": 1
   },
   {
-   "id": "payphone-maroon-5",
-   "appleYear": 2012,
-   "album": "Overexposed (Deluxe Version)",
-   "appleArtist": "Maroon 5",
-   "appleTitle": "Payphone (feat. Wiz Khalifa)",
-   "year": 2012
+   "id": "give-me-everything-pitbull",
+   "appleYear": 2011,
+   "album": "Planet Pit (Deluxe Version)",
+   "appleArtist": "Pitbull",
+   "appleTitle": "Give Me Everything (feat. Ne-Yo, Afrojack & Nayer)",
+   "store": "US",
+   "year": 2011,
+   "d": 1
   },
   {
-   "id": "gangnam-style-psy",
-   "appleYear": 2012,
-   "album": "Gangnam Style - Single",
-   "appleArtist": "PSY",
-   "appleTitle": "Gangnam Style",
-   "year": 2012
+   "id": "someone-like-you-adele",
+   "appleYear": 2011,
+   "album": "21",
+   "appleArtist": "Adele",
+   "appleTitle": "Someone Like You",
+   "store": "US",
+   "year": 2011,
+   "d": 1
+  },
+  {
+   "id": "on-the-floor-jennifer-lopez",
+   "appleYear": 2011,
+   "album": "LOVE? (Deluxe Edition)",
+   "appleArtist": "Jennifer Lopez",
+   "appleTitle": "On the Floor (feat. Pitbull)",
+   "store": "US",
+   "year": 2011,
+   "d": 1
+  },
+  {
+   "id": "sexy-and-i-know-it-lmfao",
+   "appleYear": 2011,
+   "album": "Sorry for Party Rocking (Deluxe Version)",
+   "appleArtist": "LMFAO",
+   "appleTitle": "Sexy and I Know It",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2011,
+   "d": 2
+  },
+  {
+   "id": "born-this-way-lady-gaga",
+   "appleYear": 2011,
+   "album": "Born This Way (Special Edition)",
+   "appleArtist": "Lady Gaga",
+   "appleTitle": "Born This Way",
+   "store": "US",
+   "year": 2011,
+   "d": 1
+  },
+  {
+   "id": "s-and-m-rihanna",
+   "appleYear": 2011,
+   "album": "S&M - EP",
+   "appleArtist": "Rihanna",
+   "appleTitle": "S&M (Dave Aude Club)",
+   "store": "GB",
+   "year": 2011,
+   "d": 2
+  },
+  {
+   "id": "titanium-david-guetta",
+   "appleYear": 2011,
+   "album": "Nothing But the Beat",
+   "appleArtist": "David Guetta",
+   "appleTitle": "Titanium (feat. Sia)",
+   "store": "US",
+   "year": 2011,
+   "d": 1
+  },
+  {
+   "id": "what-makes-you-beautiful-one-direction",
+   "appleYear": 2011,
+   "album": "Up All Night (Deluxe Version)",
+   "appleArtist": "One Direction",
+   "appleTitle": "What Makes You Beautiful",
+   "store": "US",
+   "year": 2011,
+   "d": 1
+  },
+  {
+   "id": "super-bass-nicki-minaj",
+   "appleYear": 2010,
+   "album": "Pink Friday (Deluxe Edition)",
+   "appleArtist": "Nicki Minaj",
+   "appleTitle": "Super Bass",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2010,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "the-lazy-song-bruno-mars",
+   "appleYear": 2010,
+   "album": "Doo-Wops & Hooligans (Deluxe)",
+   "appleArtist": "Bruno Mars",
+   "appleTitle": "The Lazy Song",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "last-friday-night-t-g-i-f-katy-perry",
+   "appleYear": 2011,
+   "album": "Teenage Dream: The Complete Confection",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "Last Friday Night (T.G.I.F.)",
+   "store": "US",
+   "year": 2011,
+   "d": 2
+  },
+  {
+   "id": "good-feeling-flo-rida",
+   "appleYear": 2011,
+   "album": "Wild Ones",
+   "appleArtist": "Flo Rida",
+   "appleTitle": "Good Feeling",
+   "store": "US",
+   "year": 2011,
+   "d": 2
+  },
+  {
+   "id": "just-cant-get-enough-the-black-eyed-peas",
+   "appleYear": 2010,
+   "album": "The Beginning (Deluxe)",
+   "appleArtist": "Black Eyed Peas",
+   "appleTitle": "Just Can't Get Enough",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "set-fire-to-the-rain-adele",
+   "appleYear": 2011,
+   "album": "21",
+   "appleArtist": "Adele",
+   "appleTitle": "Set Fire to the Rain",
+   "store": "US",
+   "year": 2011,
+   "d": 2
+  },
+  {
+   "id": "jar-of-hearts-christina-perri",
+   "appleYear": 2010,
+   "album": "Lovestrong.",
+   "appleArtist": "Christina Perri",
+   "appleTitle": "Jar of Hearts",
+   "store": "US",
+   "year": 2010,
+   "d": 2
+  },
+  {
+   "id": "pumped-up-kicks-foster-the-people",
+   "appleYear": 2010,
+   "album": "Torches",
+   "appleArtist": "Foster the People",
+   "appleTitle": "Pumped Up Kicks",
+   "store": "US",
+   "year": 2010,
+   "d": 1
+  },
+  {
+   "id": "the-edge-of-glory-lady-gaga",
+   "appleYear": 2011,
+   "album": "Born This Way (Special Edition)",
+   "appleArtist": "Lady Gaga",
+   "appleTitle": "The Edge of Glory",
+   "store": "US",
+   "year": 2011,
+   "d": 3
+  },
+  {
+   "id": "the-a-team-ed-sheeran",
+   "appleYear": 2010,
+   "album": "+ (Deluxe Version)",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "The A Team",
+   "store": "US",
+   "year": 2010,
+   "d": 1
+  },
+  {
+   "id": "price-tag-jessie-j",
+   "appleYear": 2011,
+   "album": "Who You Are",
+   "appleArtist": "Jessie J",
+   "appleTitle": "Price Tag (feat. B.o.B)",
+   "store": "US",
+   "year": 2011,
+   "d": 2
+  },
+  {
+   "id": "e-t-katy-perry",
+   "appleYear": 2011,
+   "album": "Teenage Dream: The Complete Confection",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "E.T. (feat. Kanye West)",
+   "store": "US",
+   "year": 2011,
+   "d": 1
+  },
+  {
+   "id": "domino-jessie-j",
+   "appleYear": 2011,
+   "album": "Who You Are (Platinum Edition)",
+   "appleArtist": "Jessie J",
+   "appleTitle": "Domino",
+   "store": "US",
+   "year": 2011,
+   "d": 2
   },
   {
    "id": "thrift-shop-macklemore-and-ryan-lewis",
@@ -154,7 +582,33 @@
    "album": "The Heist",
    "appleArtist": "Macklemore & Ryan Lewis",
    "appleTitle": "Thrift Shop (feat. Wanz)",
-   "year": 2012
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2012,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "gangnam-style-psy",
+   "appleYear": 2012,
+   "album": "Gangnam Style - Single",
+   "appleArtist": "PSY",
+   "appleTitle": "Gangnam Style",
+   "store": "US",
+   "year": 2012,
+   "d": 1
+  },
+  {
+   "id": "payphone-maroon-5",
+   "appleYear": 2012,
+   "album": "Overexposed (Deluxe Version)",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "Payphone (feat. Wiz Khalifa)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2012,
+   "d": 2,
+   "explicit": true
   },
   {
    "id": "radioactive-imagine-dragons",
@@ -162,7 +616,245 @@
    "album": "Night Visions",
    "appleArtist": "Imagine Dragons",
    "appleTitle": "Radioactive",
-   "year": 2012
+   "store": "US",
+   "year": 2012,
+   "d": 1
+  },
+  {
+   "id": "starships-nicki-minaj",
+   "appleYear": 2012,
+   "album": "Pink Friday ... Roman Reloaded (Deluxe Edition)",
+   "appleArtist": "Nicki Minaj",
+   "appleTitle": "Starships",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2012,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "wild-ones-flo-rida",
+   "appleYear": 2011,
+   "album": "Wild Ones",
+   "appleArtist": "Flo Rida",
+   "appleTitle": "Wild Ones (feat. Sia)",
+   "store": "US",
+   "year": 2011,
+   "d": 2
+  },
+  {
+   "id": "whistle-flo-rida",
+   "appleYear": 2012,
+   "album": "Wild Ones",
+   "appleArtist": "Flo Rida",
+   "appleTitle": "Whistle",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "dont-you-worry-child-swedish-house-mafia",
+   "appleYear": 2012,
+   "album": "Don't You Worry Child (feat. John Martin) - EP",
+   "appleArtist": "Swedish House Mafia",
+   "appleTitle": "Don't You Worry Child (feat. John Martin)",
+   "store": "US",
+   "year": 2012,
+   "d": 1
+  },
+  {
+   "id": "diamonds-rihanna",
+   "appleYear": 2012,
+   "album": "Diamonds - Single",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Diamonds",
+   "store": "US",
+   "year": 2012,
+   "d": 1
+  },
+  {
+   "id": "i-knew-you-were-trouble-taylor-swift",
+   "appleYear": 2012,
+   "album": "Red",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "I Knew You Were Trouble",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "ho-hey-the-lumineers",
+   "appleYear": 2012,
+   "album": "Ho Hey - Single",
+   "appleArtist": "The Lumineers",
+   "appleTitle": "Ho Hey",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "scream-and-shout-will-i-am",
+   "appleYear": 2012,
+   "album": "#Willpower",
+   "appleArtist": "will.i.am",
+   "appleTitle": "Scream & Shout (feat. Britney Spears)",
+   "store": "US",
+   "year": 2012,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "locked-out-of-heaven-bruno-mars",
+   "appleYear": 2012,
+   "album": "Unorthodox Jukebox",
+   "appleArtist": "Bruno Mars",
+   "appleTitle": "Locked Out of Heaven",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "i-love-it-icona-pop",
+   "appleYear": 2012,
+   "album": "I Love It (feat. Charli XCX) [I Don’t Care 2022 Re-Edit] - Single",
+   "appleArtist": "Icona Pop",
+   "appleTitle": "I Love It (feat. Charli XCX) [I Don’t Care 2022 Re-Edit]",
+   "store": "US",
+   "year": 2012,
+   "d": 1
+  },
+  {
+   "id": "we-are-never-ever-getting-back-together-taylor-swift",
+   "appleYear": 2012,
+   "album": "Red",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "We Are Never Ever Getting Back Together",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "where-have-you-been-rihanna",
+   "appleYear": 2011,
+   "album": "Talk That Talk (Deluxe Edition)",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Where Have You Been",
+   "store": "US",
+   "year": 2011,
+   "d": 2
+  },
+  {
+   "id": "some-nights-fun",
+   "appleYear": 2012,
+   "album": "Some Nights",
+   "appleArtist": "Fun.",
+   "appleTitle": "Some Nights",
+   "store": "US",
+   "year": 2012,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "one-more-night-maroon-5",
+   "appleYear": 2012,
+   "album": "Overexposed (Deluxe Version)",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "One More Night",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "drive-by-train",
+   "appleYear": 2012,
+   "album": "California 37",
+   "appleArtist": "Train",
+   "appleTitle": "Drive By",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "wide-awake-katy-perry",
+   "appleYear": 2012,
+   "album": "Teenage Dream: The Complete Confection",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "Wide Awake",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "good-time-owl-city-and-carly-rae-jepsen",
+   "appleYear": 2012,
+   "album": "Good Time - Single",
+   "appleArtist": "Owl City & Carly Rae Jepsen",
+   "appleTitle": "Good Time",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "hall-of-fame-the-script",
+   "appleYear": 2012,
+   "album": "#3 (Deluxe Version)",
+   "appleArtist": "The Script",
+   "appleTitle": "Hall of Fame (feat. will.i.am)",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "turn-me-on-david-guetta",
+   "appleYear": 2011,
+   "album": "Pink Friday ... Roman Reloaded (Deluxe Edition)",
+   "appleArtist": "David Guetta",
+   "appleTitle": "Turn Me On (feat. Nicki Minaj)",
+   "store": "US",
+   "year": 2011,
+   "d": 3
+  },
+  {
+   "id": "part-of-me-katy-perry",
+   "appleYear": 2012,
+   "album": "Teenage Dream: The Complete Confection",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "Part of Me",
+   "store": "US",
+   "year": 2012,
+   "d": 3
+  },
+  {
+   "id": "stronger-what-doesnt-kill-you-kelly-clarkson",
+   "appleYear": 2011,
+   "album": "Stronger",
+   "appleArtist": "Kelly Clarkson",
+   "appleTitle": "Stronger (What Doesn't Kill You)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2011,
+   "d": 2
+  },
+  {
+   "id": "sweet-nothing-calvin-harris",
+   "appleYear": 2012,
+   "album": "18 Months",
+   "appleArtist": "Calvin Harris",
+   "appleTitle": "Sweet Nothing (feat. Florence Welch)",
+   "store": "US",
+   "year": 2012,
+   "d": 3
+  },
+  {
+   "id": "take-care-drake",
+   "appleYear": 2011,
+   "album": "Take Care (Deluxe Version)",
+   "appleArtist": "Drake",
+   "appleTitle": "Take Care (feat. Rihanna)",
+   "store": "US",
+   "year": 2011,
+   "d": 3,
+   "explicit": true
   },
   {
    "id": "blurred-lines-robin-thicke",
@@ -170,39 +862,10 @@
    "album": "Blurred Lines (Deluxe Version)",
    "appleArtist": "Robin Thicke",
    "appleTitle": "Blurred Lines (feat. T.I. & Pharrell)",
-   "year": 2013
-  },
-  {
-   "id": "get-lucky-daft-punk",
-   "appleYear": 2013,
-   "album": "Random Access Memories",
-   "appleArtist": "Daft Punk, Pharrell Williams & Nile Rodgers",
-   "appleTitle": "Get Lucky",
-   "year": 2013
-  },
-  {
-   "id": "royals-lorde",
-   "appleYear": 2013,
-   "album": "The Love Club EP",
-   "appleArtist": "Lorde",
-   "appleTitle": "Royals",
-   "year": 2013
-  },
-  {
-   "id": "wrecking-ball-miley-cyrus",
-   "appleYear": 2013,
-   "album": "Bangerz (Deluxe Version)",
-   "appleArtist": "Miley Cyrus",
-   "appleTitle": "Wrecking Ball",
-   "year": 2013
-  },
-  {
-   "id": "roar-katy-perry",
-   "appleYear": 2013,
-   "album": "PRISM (Deluxe Version)",
-   "appleArtist": "Katy Perry",
-   "appleTitle": "Roar",
-   "year": 2013
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2013,
+   "d": 2
   },
   {
    "id": "happy-pharrell-williams",
@@ -210,7 +873,19 @@
    "album": "G I R L",
    "appleArtist": "Pharrell Williams",
    "appleTitle": "Happy (From \"Despicable Me 2\")",
-   "year": 2013
+   "store": "US",
+   "year": 2013,
+   "d": 1
+  },
+  {
+   "id": "get-lucky-daft-punk",
+   "appleYear": 2013,
+   "album": "Random Access Memories",
+   "appleArtist": "Daft Punk, Pharrell Williams & Nile Rodgers",
+   "appleTitle": "Get Lucky",
+   "store": "US",
+   "year": 2013,
+   "d": 1
   },
   {
    "id": "all-of-me-john-legend",
@@ -218,7 +893,19 @@
    "album": "Love in the Future (Expanded Edition)",
    "appleArtist": "John Legend",
    "appleTitle": "All of Me",
-   "year": 2013
+   "store": "US",
+   "year": 2013,
+   "d": 1
+  },
+  {
+   "id": "roar-katy-perry",
+   "appleYear": 2013,
+   "album": "PRISM (Deluxe Version)",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "Roar",
+   "store": "US",
+   "year": 2013,
+   "d": 1
   },
   {
    "id": "let-it-go-idina-menzel",
@@ -226,23 +913,221 @@
    "album": "Frozen (Original Motion Picture Soundtrack)",
    "appleArtist": "Idina Menzel",
    "appleTitle": "Let It Go",
-   "year": 2013
+   "store": "US",
+   "year": 2013,
+   "d": 1
   },
   {
-   "id": "stay-with-me-sam-smith",
-   "appleYear": 2014,
-   "album": "In the Lonely Hour",
-   "appleArtist": "Sam Smith",
-   "appleTitle": "Stay With Me",
-   "year": 2014
+   "id": "wrecking-ball-miley-cyrus",
+   "appleYear": 2013,
+   "album": "Bangerz (Deluxe Version)",
+   "appleArtist": "Miley Cyrus",
+   "appleTitle": "Wrecking Ball",
+   "store": "US",
+   "year": 2013,
+   "d": 1
   },
   {
-   "id": "shake-it-off-taylor-swift",
-   "appleYear": 2014,
-   "album": "1989 (Deluxe Edition)",
-   "appleArtist": "Taylor Swift",
-   "appleTitle": "Shake It Off",
-   "year": 2014
+   "id": "royals-lorde",
+   "appleYear": 2013,
+   "album": "The Love Club EP",
+   "appleArtist": "Lorde",
+   "appleTitle": "Royals",
+   "store": "US",
+   "year": 2013,
+   "d": 2
+  },
+  {
+   "id": "wake-me-up-avicii",
+   "appleYear": 2013,
+   "album": "True",
+   "appleArtist": "Avicii",
+   "appleTitle": "Wake Me Up",
+   "store": "US",
+   "year": 2013,
+   "d": 1
+  },
+  {
+   "id": "counting-stars-onerepublic",
+   "appleYear": 2013,
+   "album": "Native (Deluxe)",
+   "appleArtist": "OneRepublic",
+   "appleTitle": "Counting Stars",
+   "store": "US",
+   "year": 2013,
+   "d": 1
+  },
+  {
+   "id": "cant-hold-us-macklemore-and-ryan-lewis",
+   "appleYear": 2011,
+   "album": "The Heist",
+   "appleArtist": "Macklemore & Ryan Lewis",
+   "appleTitle": "Can't Hold Us (feat. Ray Dalton)",
+   "store": "US",
+   "year": 2011,
+   "d": 1
+  },
+  {
+   "id": "let-her-go-passenger",
+   "appleYear": 2012,
+   "album": "All the Little Lights",
+   "appleArtist": "Passenger",
+   "appleTitle": "Let Her Go",
+   "store": "US",
+   "year": 2012,
+   "d": 1
+  },
+  {
+   "id": "pompeii-bastille",
+   "appleYear": 2013,
+   "album": "Bad Blood (Bonus Track Version)",
+   "appleArtist": "Bastille",
+   "appleTitle": "Pompeii",
+   "store": "US",
+   "year": 2013,
+   "d": 2
+  },
+  {
+   "id": "when-i-was-your-man-bruno-mars",
+   "appleYear": 2012,
+   "album": "Unorthodox Jukebox",
+   "appleArtist": "Bruno Mars",
+   "appleTitle": "When I Was Your Man",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "stay-rihanna",
+   "appleYear": 2012,
+   "album": "Unapologetic (Deluxe Version)",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Stay (feat. Mikky Ekko)",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "timber-pitbull",
+   "appleYear": 2013,
+   "album": "Global Warming: Meltdown (Deluxe Version)",
+   "appleArtist": "Pitbull & Kesha",
+   "appleTitle": "Timber",
+   "store": "US",
+   "year": 2013,
+   "d": 1
+  },
+  {
+   "id": "rude-magic",
+   "appleYear": 2013,
+   "album": "Don't Kill the Magic",
+   "appleArtist": "MAGIC!",
+   "appleTitle": "Rude",
+   "store": "US",
+   "year": 2013,
+   "d": 1
+  },
+  {
+   "id": "mirrors-justin-timberlake",
+   "appleYear": 2013,
+   "album": "The 20/20 Experience (Deluxe Version)",
+   "appleArtist": "Justin Timberlake",
+   "appleTitle": "Mirrors",
+   "store": "US",
+   "year": 2013,
+   "d": 1
+  },
+  {
+   "id": "the-monster-eminem",
+   "appleYear": 2013,
+   "album": "The Marshall Mathers LP2",
+   "appleArtist": "Eminem",
+   "appleTitle": "The Monster (feat. Rihanna)",
+   "store": "US",
+   "year": 2013,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "talk-dirty-jason-derulo",
+   "appleYear": 2013,
+   "album": "Talk Dirty",
+   "appleArtist": "Jason Derulo",
+   "appleTitle": "Talk Dirty (feat. 2 Chainz)",
+   "store": "US",
+   "year": 2013,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "we-cant-stop-miley-cyrus",
+   "appleYear": 2013,
+   "album": "Bangerz (Deluxe Version)",
+   "appleArtist": "Miley Cyrus",
+   "appleTitle": "We Can't Stop",
+   "store": "US",
+   "year": 2013,
+   "d": 2
+  },
+  {
+   "id": "summertime-sadness-lana-del-rey-and-cedric-gervais",
+   "appleYear": 2012,
+   "album": "Born to Die",
+   "appleArtist": "Lana Del Rey",
+   "appleTitle": "Summertime Sadness",
+   "store": "US",
+   "year": 2012,
+   "d": 2
+  },
+  {
+   "id": "burn-ellie-goulding",
+   "appleYear": 2013,
+   "album": "Halcyon Days",
+   "appleArtist": "Ellie Goulding",
+   "appleTitle": "Burn",
+   "store": "US",
+   "year": 2013,
+   "d": 2
+  },
+  {
+   "id": "just-give-me-a-reason-pink",
+   "appleYear": 2012,
+   "album": "The Truth About Love",
+   "appleArtist": "P!nk",
+   "appleTitle": "Just Give Me a Reason (feat. Nate Ruess)",
+   "store": "US",
+   "year": 2012,
+   "d": 1
+  },
+  {
+   "id": "hey-brother-avicii",
+   "appleYear": 2013,
+   "album": "True",
+   "appleArtist": "Avicii",
+   "appleTitle": "Hey Brother",
+   "store": "US",
+   "year": 2013,
+   "d": 2
+  },
+  {
+   "id": "riptide-vance-joy",
+   "appleYear": 2013,
+   "album": "Dream Your Life Away (Special Edition)",
+   "appleArtist": "Vance Joy",
+   "appleTitle": "Riptide",
+   "store": "US",
+   "year": 2013,
+   "d": 2
+  },
+  {
+   "id": "la-la-la-naughty-boy",
+   "appleYear": 2013,
+   "album": "Hotel Cabana (Deluxe Version)",
+   "appleArtist": "Naughty Boy",
+   "appleTitle": "La La La (feat. Sam Smith)",
+   "store": "US",
+   "year": 2013,
+   "d": 1
   },
   {
    "id": "uptown-funk-mark-ronson",
@@ -250,7 +1135,9 @@
    "album": "Uptown Special",
    "appleArtist": "Mark Ronson",
    "appleTitle": "Uptown Funk (feat. Bruno Mars)",
-   "year": 2014
+   "store": "US",
+   "year": 2014,
+   "d": 1
   },
   {
    "id": "thinking-out-loud-ed-sheeran",
@@ -258,23 +1145,29 @@
    "album": "x (Wembley Edition)",
    "appleArtist": "Ed Sheeran",
    "appleTitle": "Thinking Out Loud",
-   "year": 2014
+   "store": "US",
+   "year": 2014,
+   "d": 1
   },
   {
-   "id": "see-you-again-wiz-khalifa",
-   "appleYear": 2015,
-   "album": "Furious 7 (Original Motion Picture Soundtrack)",
-   "appleArtist": "Wiz Khalifa",
-   "appleTitle": "See You Again (feat. Charlie Puth)",
-   "year": 2015
+   "id": "shake-it-off-taylor-swift",
+   "appleYear": 2014,
+   "album": "1989 (Deluxe Edition)",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "Shake It Off",
+   "store": "US",
+   "year": 2014,
+   "d": 1
   },
   {
-   "id": "hello-adele",
-   "appleYear": 2015,
-   "album": "25",
-   "appleArtist": "Adele",
-   "appleTitle": "Hello",
-   "year": 2015
+   "id": "stay-with-me-sam-smith",
+   "appleYear": 2014,
+   "album": "In the Lonely Hour",
+   "appleArtist": "Sam Smith",
+   "appleTitle": "Stay With Me",
+   "store": "US",
+   "year": 2014,
+   "d": 1
   },
   {
    "id": "shut-up-and-dance-walk-the-moon",
@@ -282,7 +1175,252 @@
    "album": "TALKING IS HARD (Expanded Edition)",
    "appleArtist": "WALK THE MOON",
    "appleTitle": "Shut Up and Dance",
-   "year": 2014
+   "store": "US",
+   "year": 2014,
+   "d": 1
+  },
+  {
+   "id": "take-me-to-church-hozier",
+   "appleYear": 2013,
+   "album": "Hozier (Expanded Edition)",
+   "appleArtist": "Hozier",
+   "appleTitle": "Take Me to Church",
+   "store": "US",
+   "year": 2013,
+   "d": 1
+  },
+  {
+   "id": "all-about-that-bass-meghan-trainor",
+   "appleYear": 2014,
+   "album": "Radio Disney Music Awards",
+   "appleArtist": "Meghan Trainor",
+   "appleTitle": "All About That Bass",
+   "store": "US",
+   "year": 2014,
+   "d": 1
+  },
+  {
+   "id": "fancy-iggy-azalea",
+   "appleYear": 2014,
+   "album": "The New Classic (Deluxe Version)",
+   "appleArtist": "Iggy Azalea",
+   "appleTitle": "Fancy (feat. Charli XCX)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2014,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "chandelier-sia",
+   "appleYear": 2014,
+   "album": "1000 Forms of Fear",
+   "appleArtist": "Sia",
+   "appleTitle": "Chandelier",
+   "store": "US",
+   "year": 2014,
+   "d": 1
+  },
+  {
+   "id": "problem-ariana-grande",
+   "appleYear": 2014,
+   "album": "My Everything (Bonus Tracks Edition)",
+   "appleArtist": "Ariana Grande",
+   "appleTitle": "Problem (feat. Iggy Azalea)",
+   "store": "US",
+   "year": 2014,
+   "d": 1
+  },
+  {
+   "id": "rather-be-clean-bandit",
+   "appleYear": 2014,
+   "album": "I Cry When I Laugh",
+   "appleArtist": "Clean Bandit",
+   "appleTitle": "Rather Be (feat. Jess Glynne)",
+   "store": "US",
+   "year": 2014,
+   "d": 1
+  },
+  {
+   "id": "say-something-a-great-big-world-and-christina-aguilera",
+   "appleYear": 2013,
+   "album": "Say Something - Single",
+   "appleArtist": "A Great Big World & Christina Aguilera",
+   "appleTitle": "Say Something",
+   "store": "US",
+   "year": 2013,
+   "d": 2
+  },
+  {
+   "id": "am-i-wrong-nico-and-vinz",
+   "appleYear": 2014,
+   "album": "Am I Wrong - Single",
+   "appleArtist": "Nico & Vinz",
+   "appleTitle": "Am I Wrong",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "bang-bang-jessie-j-ariana-grande-and-nicki-minaj",
+   "appleYear": 2014,
+   "album": "My Everything (Tenth Anniversary Edition)",
+   "appleArtist": "Jessie J, Ariana Grande & Nicki Minaj",
+   "appleTitle": "Bang Bang",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "blank-space-taylor-swift",
+   "appleYear": 2014,
+   "album": "1989 (Deluxe Edition)",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "Blank Space",
+   "store": "US",
+   "year": 2014,
+   "d": 1
+  },
+  {
+   "id": "summer-calvin-harris",
+   "appleYear": 2014,
+   "album": "Motion",
+   "appleArtist": "Calvin Harris",
+   "appleTitle": "Summer",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "dark-horse-katy-perry",
+   "appleYear": 2013,
+   "album": "PRISM (Deluxe Version)",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "Dark Horse (feat. Juicy J)",
+   "store": "US",
+   "year": 2013,
+   "d": 1
+  },
+  {
+   "id": "im-not-the-only-one-sam-smith",
+   "appleYear": 2014,
+   "album": "In the Lonely Hour",
+   "appleArtist": "Sam Smith",
+   "appleTitle": "I'm Not the Only One",
+   "store": "US",
+   "year": 2014,
+   "d": 3
+  },
+  {
+   "id": "sing-ed-sheeran",
+   "appleYear": 2014,
+   "album": "x (Wembley Edition)",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Sing",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "budapest-george-ezra",
+   "appleYear": 2014,
+   "album": "Wanted On Voyage",
+   "appleArtist": "George Ezra",
+   "appleTitle": "Budapest",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "dont-ed-sheeran",
+   "appleYear": 2014,
+   "album": "x (Wembley Edition)",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Don't",
+   "store": "US",
+   "year": 2014,
+   "d": 3
+  },
+  {
+   "id": "a-sky-full-of-stars-coldplay",
+   "appleYear": 2014,
+   "album": "Ghost Stories",
+   "appleArtist": "Coldplay",
+   "appleTitle": "A Sky Full of Stars",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "waves-mr-probz",
+   "appleYear": 2013,
+   "album": "Waves - Single",
+   "appleArtist": "Mr. Probz",
+   "appleTitle": "Waves",
+   "store": "US",
+   "year": 2013,
+   "d": 2
+  },
+  {
+   "id": "black-widow-iggy-azalea",
+   "appleYear": 2014,
+   "album": "The New Classic (Deluxe Version)",
+   "appleArtist": "Iggy Azalea",
+   "appleTitle": "Black Widow (feat. Rita Ora)",
+   "store": "US",
+   "year": 2014,
+   "d": 3,
+   "explicit": true
+  },
+  {
+   "id": "ghost-ella-henderson",
+   "appleYear": 2014,
+   "album": "Chapter One (Deluxe)",
+   "appleArtist": "Ella Henderson",
+   "appleTitle": "Ghost",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "break-free-ariana-grande",
+   "appleYear": 2014,
+   "album": "My Everything (Bonus Tracks Edition)",
+   "appleArtist": "Ariana Grande",
+   "appleTitle": "Break Free (feat. Zedd)",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "turn-down-for-what-dj-snake-and-lil-jon",
+   "appleYear": 2013,
+   "album": "Turn Down for What - Single",
+   "appleArtist": "DJ Snake & Lil Jon",
+   "appleTitle": "Turn Down for What",
+   "store": "US",
+   "year": 2013,
+   "d": 2
+  },
+  {
+   "id": "hello-adele",
+   "appleYear": 2015,
+   "album": "25",
+   "appleArtist": "Adele",
+   "appleTitle": "Hello",
+   "store": "US",
+   "year": 2015,
+   "d": 1
+  },
+  {
+   "id": "see-you-again-wiz-khalifa",
+   "appleYear": 2015,
+   "album": "Furious 7 (Original Motion Picture Soundtrack)",
+   "appleArtist": "Wiz Khalifa",
+   "appleTitle": "See You Again (feat. Charlie Puth)",
+   "store": "US",
+   "year": 2015,
+   "d": 1
   },
   {
    "id": "love-yourself-justin-bieber",
@@ -290,7 +1428,9 @@
    "album": "Purpose (Deluxe)",
    "appleArtist": "Justin Bieber",
    "appleTitle": "Love Yourself",
-   "year": 2015
+   "store": "US",
+   "year": 2015,
+   "d": 1
   },
   {
    "id": "sorry-justin-bieber",
@@ -298,7 +1438,234 @@
    "album": "Purpose (Deluxe)",
    "appleArtist": "Justin Bieber",
    "appleTitle": "Sorry",
-   "year": 2015
+   "store": "US",
+   "year": 2015,
+   "d": 1
+  },
+  {
+   "id": "cheerleader-omi",
+   "appleYear": 2014,
+   "album": "Verano 2016",
+   "appleArtist": "Omi",
+   "appleTitle": "Cheerleader",
+   "store": "US",
+   "year": 2014,
+   "d": 1
+  },
+  {
+   "id": "love-me-like-you-do-ellie-goulding",
+   "appleYear": 2015,
+   "album": "Delirium (Deluxe)",
+   "appleArtist": "Ellie Goulding",
+   "appleTitle": "Love Me Like You Do (From \"Fifty Shades of Grey\")",
+   "store": "US",
+   "year": 2015,
+   "d": 1
+  },
+  {
+   "id": "lean-on-major-lazer-and-dj-snake",
+   "appleYear": 2015,
+   "album": "Peace Is The Mission",
+   "appleArtist": "Major Lazer & DJ Snake",
+   "appleTitle": "Lean On (feat. MØ)",
+   "store": "US",
+   "year": 2015,
+   "d": 1
+  },
+  {
+   "id": "sugar-maroon-5",
+   "appleYear": 2014,
+   "album": "V (Deluxe)",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "Sugar",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2014,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "cant-feel-my-face-the-weeknd",
+   "appleYear": 2015,
+   "album": "Beauty Behind the Madness",
+   "appleArtist": "The Weeknd",
+   "appleTitle": "Can't Feel My Face",
+   "store": "US",
+   "year": 2015,
+   "d": 2
+  },
+  {
+   "id": "what-do-you-mean-justin-bieber",
+   "appleYear": 2015,
+   "album": "Purpose (Deluxe)",
+   "appleArtist": "Justin Bieber",
+   "appleTitle": "What Do You Mean?",
+   "store": "US",
+   "year": 2015,
+   "d": 1
+  },
+  {
+   "id": "the-hills-the-weeknd",
+   "appleYear": 2015,
+   "album": "Beauty Behind the Madness",
+   "appleArtist": "The Weeknd",
+   "appleTitle": "The Hills",
+   "store": "US",
+   "year": 2015,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "fourfiveseconds-rihanna-kanye-west-and-paul-mccartney",
+   "appleYear": 2015,
+   "album": "FourFiveSeconds - Single",
+   "appleArtist": "Rihanna and Kanye West and Paul McCartney",
+   "appleTitle": "FourFiveSeconds",
+   "store": "US",
+   "year": 2015,
+   "d": 1
+  },
+  {
+   "id": "want-to-want-me-jason-derulo",
+   "appleYear": 2015,
+   "album": "Everything Is 4",
+   "appleArtist": "Jason Derulo",
+   "appleTitle": "Want to Want Me",
+   "store": "US",
+   "year": 2015,
+   "d": 2
+  },
+  {
+   "id": "stitches-shawn-mendes",
+   "appleYear": 2015,
+   "album": "Handwritten (Revisited)",
+   "appleArtist": "Shawn Mendes",
+   "appleTitle": "Stitches",
+   "store": "US",
+   "year": 2015,
+   "d": 2
+  },
+  {
+   "id": "elastic-heart-sia",
+   "appleYear": 2014,
+   "album": "1000 Forms of Fear",
+   "appleArtist": "Sia",
+   "appleTitle": "Elastic Heart",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "hotline-bling-drake",
+   "appleYear": 2015,
+   "album": "Views",
+   "appleArtist": "Drake",
+   "appleTitle": "Hotline Bling",
+   "store": "US",
+   "year": 2015,
+   "d": 2
+  },
+  {
+   "id": "photograph-ed-sheeran",
+   "appleYear": 2014,
+   "album": "x (Wembley Edition)",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Photograph",
+   "store": "US",
+   "year": 2014,
+   "d": 3
+  },
+  {
+   "id": "bad-blood-taylor-swift",
+   "appleYear": 2015,
+   "album": "Bad Blood (feat. Kendrick Lamar) - Single",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "Bad Blood (feat. Kendrick Lamar)",
+   "store": "US",
+   "year": 2015,
+   "d": 1
+  },
+  {
+   "id": "trap-queen-fetty-wap",
+   "appleYear": 2014,
+   "album": "Fetty Wap",
+   "appleArtist": "Fetty Wap",
+   "appleTitle": "Trap Queen",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2014,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "earned-it-the-weeknd",
+   "appleYear": 2014,
+   "album": "Fifty Shades of Grey (Original Motion Picture Soundtrack)",
+   "appleArtist": "The Weeknd",
+   "appleTitle": "Earned It",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "where-are-u-now-jack-u",
+   "appleYear": 2015,
+   "album": "Skrillex and Diplo present Jack Ü",
+   "appleArtist": "Jack Ü, Skrillex & Diplo",
+   "appleTitle": "Where Are Ü Now (with Justin Bieber) [feat. Justin Bieber]",
+   "store": "US",
+   "year": 2015,
+   "d": 2
+  },
+  {
+   "id": "fight-song-rachel-platten",
+   "appleYear": 2015,
+   "album": "Wildfire",
+   "appleArtist": "Rachel Platten",
+   "appleTitle": "Fight Song",
+   "store": "US",
+   "year": 2015,
+   "d": 2
+  },
+  {
+   "id": "marvin-gaye-charlie-puth",
+   "appleYear": 2015,
+   "album": "Nine Track Mind",
+   "appleArtist": "Charlie Puth",
+   "appleTitle": "Marvin Gaye (feat. Meghan Trainor)",
+   "store": "US",
+   "year": 2015,
+   "d": 2
+  },
+  {
+   "id": "how-deep-is-your-love-calvin-harris-and-disciples",
+   "appleYear": 2015,
+   "album": "How Deep Is Your Love - Single",
+   "appleArtist": "Calvin Harris, Disciples",
+   "appleTitle": "How Deep Is Your Love",
+   "store": "US",
+   "year": 2015,
+   "d": 2
+  },
+  {
+   "id": "style-taylor-swift",
+   "appleYear": 2014,
+   "album": "1989 (Deluxe Edition)",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "Style",
+   "store": "US",
+   "year": 2014,
+   "d": 2
+  },
+  {
+   "id": "hold-back-the-river-james-bay",
+   "appleYear": 2015,
+   "album": "Chaos And The Calm 10 Years",
+   "appleArtist": "James Bay",
+   "appleTitle": "Hold Back The River (Original Session)",
+   "store": "US",
+   "year": 2015,
+   "d": 2
   },
   {
    "id": "one-dance-drake",
@@ -306,23 +1673,9 @@
    "album": "Views",
    "appleArtist": "Drake",
    "appleTitle": "One Dance (feat. Wizkid & Kyla)",
-   "year": 2016
-  },
-  {
-   "id": "work-rihanna",
-   "appleYear": 2016,
-   "album": "ANTI",
-   "appleArtist": "Rihanna",
-   "appleTitle": "Work (feat. Drake)",
-   "year": 2016
-  },
-  {
-   "id": "cant-stop-the-feeling-justin-timberlake",
-   "appleYear": 2016,
-   "album": "TROLLS (Original Motion Picture Soundtrack)",
-   "appleArtist": "Justin Timberlake",
-   "appleTitle": "CAN'T STOP THE FEELING!",
-   "year": 2016
+   "store": "US",
+   "year": 2016,
+   "d": 1
   },
   {
    "id": "closer-the-chainsmokers",
@@ -330,7 +1683,9 @@
    "album": "Collage - EP",
    "appleArtist": "The Chainsmokers",
    "appleTitle": "Closer (feat. Halsey)",
-   "year": 2016
+   "store": "US",
+   "year": 2016,
+   "d": 1
   },
   {
    "id": "cheap-thrills-sia",
@@ -338,15 +1693,261 @@
    "album": "Cheap Thrills (feat. Sean Paul) - Single",
    "appleArtist": "Sia",
    "appleTitle": "Cheap Thrills (feat. Sean Paul)",
-   "year": 2016
+   "store": "US",
+   "year": 2016,
+   "d": 1
   },
   {
-   "id": "shape-of-you-ed-sheeran",
-   "appleYear": 2017,
-   "album": "÷ (Deluxe)",
-   "appleArtist": "Ed Sheeran",
-   "appleTitle": "Shape of You",
-   "year": 2017
+   "id": "cant-stop-the-feeling-justin-timberlake",
+   "appleYear": 2016,
+   "album": "TROLLS (Original Motion Picture Soundtrack)",
+   "appleArtist": "Justin Timberlake",
+   "appleTitle": "CAN'T STOP THE FEELING!",
+   "store": "US",
+   "year": 2016,
+   "d": 1
+  },
+  {
+   "id": "work-rihanna",
+   "appleYear": 2016,
+   "album": "ANTI",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Work (feat. Drake)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2016,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "7-years-lukas-graham",
+   "appleYear": 2015,
+   "album": "Lukas Graham",
+   "appleArtist": "Lukas Graham",
+   "appleTitle": "7 Years",
+   "store": "US",
+   "year": 2015,
+   "d": 1
+  },
+  {
+   "id": "i-took-a-pill-in-ibiza-mike-posner",
+   "appleYear": 2015,
+   "album": "At Night, Alone.",
+   "appleArtist": "Mike Posner",
+   "appleTitle": "I Took a Pill In Ibiza",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2015,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "this-is-what-you-came-for-calvin-harris",
+   "appleYear": 2016,
+   "album": "This Is What You Came For - Single",
+   "appleArtist": "Calvin Harris & Rihanna",
+   "appleTitle": "This Is What You Came For",
+   "store": "US",
+   "year": 2016,
+   "d": 1
+  },
+  {
+   "id": "dont-let-me-down-the-chainsmokers",
+   "appleYear": 2016,
+   "album": "Collage - EP",
+   "appleArtist": "The Chainsmokers",
+   "appleTitle": "Don't Let Me Down (feat. Daya)",
+   "store": "US",
+   "year": 2016,
+   "d": 2
+  },
+  {
+   "id": "stressed-out-twenty-one-pilots",
+   "appleYear": 2015,
+   "album": "Blurryface",
+   "appleArtist": "twenty one pilots",
+   "appleTitle": "Stressed Out",
+   "store": "US",
+   "year": 2015,
+   "d": 1
+  },
+  {
+   "id": "work-from-home-fifth-harmony",
+   "appleYear": 2016,
+   "album": "7/27 (Deluxe)",
+   "appleArtist": "Fifth Harmony",
+   "appleTitle": "Work from Home (feat. Ty Dolla $ign)",
+   "store": "US",
+   "year": 2016,
+   "d": 2
+  },
+  {
+   "id": "cake-by-the-ocean-dnce",
+   "appleYear": 2015,
+   "album": "DNCE",
+   "appleArtist": "DNCE",
+   "appleTitle": "Cake By the Ocean",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2015,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "cold-water-major-lazer",
+   "appleYear": 2016,
+   "album": "Cold Water (feat. Justin Bieber & MØ) - Single",
+   "appleArtist": "Major Lazer",
+   "appleTitle": "Cold Water (feat. Justin Bieber & MØ)",
+   "store": "US",
+   "year": 2016,
+   "d": 2
+  },
+  {
+   "id": "say-you-wont-let-go-james-arthur",
+   "appleYear": 2016,
+   "album": "Back from the Edge (Deluxe Edition)",
+   "appleArtist": "James Arthur",
+   "appleTitle": "Say You Won't Let Go",
+   "store": "US",
+   "year": 2016,
+   "d": 2
+  },
+  {
+   "id": "starboy-the-weeknd",
+   "appleYear": 2016,
+   "album": "Starboy",
+   "appleArtist": "The Weeknd",
+   "appleTitle": "Starboy (feat. Daft Punk)",
+   "store": "US",
+   "year": 2016,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "let-me-love-you-dj-snake",
+   "appleYear": 2016,
+   "album": "Encore",
+   "appleArtist": "DJ Snake",
+   "appleTitle": "Let Me Love You (feat. Justin Bieber)",
+   "store": "US",
+   "year": 2016,
+   "d": 2
+  },
+  {
+   "id": "heathens-twenty-one-pilots",
+   "appleYear": 2016,
+   "album": "Suicide Squad: The Album",
+   "appleArtist": "twenty one pilots",
+   "appleTitle": "Heathens",
+   "store": "US",
+   "year": 2016,
+   "d": 2
+  },
+  {
+   "id": "panda-desiigner",
+   "appleYear": 2016,
+   "album": "Panda - Single",
+   "appleArtist": "Desiigner",
+   "appleTitle": "Panda",
+   "store": "US",
+   "year": 2016,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "rockabye-clean-bandit",
+   "appleYear": 2016,
+   "album": "Speak Your Mind (Deluxe)",
+   "appleArtist": "Clean Bandit",
+   "appleTitle": "Rockabye (feat. Sean Paul & Anne-Marie)",
+   "store": "US",
+   "year": 2016,
+   "d": 2
+  },
+  {
+   "id": "treat-you-better-shawn-mendes",
+   "appleYear": 2016,
+   "album": "Illuminate",
+   "appleArtist": "Shawn Mendes",
+   "appleTitle": "Treat You Better",
+   "store": "US",
+   "year": 2016,
+   "d": 3
+  },
+  {
+   "id": "too-good-drake",
+   "appleYear": 2016,
+   "album": "Views",
+   "appleArtist": "Drake",
+   "appleTitle": "Too Good (feat. Rihanna)",
+   "store": "US",
+   "year": 2016,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "pillowtalk-zayn",
+   "appleYear": 2016,
+   "album": "Mind Of Mine (Deluxe Edition)",
+   "appleArtist": "ZAYN",
+   "appleTitle": "PILLOWTALK",
+   "store": "US",
+   "year": 2016,
+   "d": 3,
+   "explicit": true
+  },
+  {
+   "id": "i-hate-u-i-love-u-gnash",
+   "appleYear": 2016,
+   "album": "us",
+   "appleArtist": "gnash",
+   "appleTitle": "i hate u, i love u (feat. Olivia O'Brien)",
+   "store": "US",
+   "year": 2016,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "side-to-side-ariana-grande",
+   "appleYear": 2016,
+   "album": "Dangerous Woman",
+   "appleArtist": "Ariana Grande",
+   "appleTitle": "Side To Side (feat. Nicki Minaj)",
+   "store": "US",
+   "year": 2016,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "send-my-love-to-your-new-lover-adele",
+   "appleYear": 2015,
+   "album": "25",
+   "appleArtist": "Adele",
+   "appleTitle": "Send My Love (To Your New Lover)",
+   "store": "US",
+   "year": 2015,
+   "d": 3
+  },
+  {
+   "id": "24k-magic-bruno-mars",
+   "appleYear": 2016,
+   "album": "24K Magic",
+   "appleArtist": "Bruno Mars",
+   "appleTitle": "24K Magic",
+   "store": "US",
+   "year": 2016,
+   "d": 2
+  },
+  {
+   "id": "roses-the-chainsmokers",
+   "appleYear": 2015,
+   "album": "Bouquet - EP",
+   "appleArtist": "The Chainsmokers",
+   "appleTitle": "Roses (feat. ROZES)",
+   "store": "US",
+   "year": 2015,
+   "d": 3
   },
   {
    "id": "despacito-luis-fonsi-and-daddy-yankee",
@@ -354,23 +1955,19 @@
    "album": "Despacito (Versión Urbana/Sky) - Single",
    "appleArtist": "Luis Fonsi & Daddy Yankee",
    "appleTitle": "Despacito (Versión Urbana/Sky)",
-   "year": 2017
+   "store": "US",
+   "year": 2017,
+   "d": 1
   },
   {
-   "id": "humble-kendrick-lamar",
+   "id": "shape-of-you-ed-sheeran",
    "appleYear": 2017,
-   "album": "DAMN.",
-   "appleArtist": "Kendrick Lamar",
-   "appleTitle": "HUMBLE.",
-   "year": 2017
-  },
-  {
-   "id": "believer-imagine-dragons",
-   "appleYear": 2017,
-   "album": "Evolve",
-   "appleArtist": "Imagine Dragons",
-   "appleTitle": "Believer",
-   "year": 2017
+   "album": "÷ (Deluxe)",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Shape of You",
+   "store": "US",
+   "year": 2017,
+   "d": 1
   },
   {
    "id": "perfect-ed-sheeran",
@@ -378,7 +1975,9 @@
    "album": "÷ (Deluxe)",
    "appleArtist": "Ed Sheeran",
    "appleTitle": "Perfect",
-   "year": 2017
+   "store": "US",
+   "year": 2017,
+   "d": 1
   },
   {
    "id": "havana-camila-cabello",
@@ -386,31 +1985,227 @@
    "album": "Camila",
    "appleArtist": "Camila Cabello",
    "appleTitle": "Havana (feat. Young Thug)",
-   "year": 2017
+   "store": "US",
+   "year": 2017,
+   "d": 1
   },
   {
-   "id": "gods-plan-drake",
-   "appleYear": 2018,
-   "album": "Scorpion",
-   "appleArtist": "Drake",
-   "appleTitle": "God's Plan",
-   "year": 2018
+   "id": "humble-kendrick-lamar",
+   "appleYear": 2017,
+   "album": "DAMN.",
+   "appleArtist": "Kendrick Lamar",
+   "appleTitle": "HUMBLE.",
+   "store": "US",
+   "year": 2017,
+   "d": 2,
+   "explicit": true
   },
   {
-   "id": "shallow-lady-gaga-and-bradley-cooper",
-   "appleYear": 2018,
-   "album": "A Star Is Born Soundtrack",
-   "appleArtist": "Lady Gaga & Bradley Cooper",
-   "appleTitle": "Shallow",
-   "year": 2018
+   "id": "believer-imagine-dragons",
+   "appleYear": 2017,
+   "album": "Evolve",
+   "appleArtist": "Imagine Dragons",
+   "appleTitle": "Believer",
+   "store": "US",
+   "year": 2017,
+   "d": 1
   },
   {
-   "id": "sunflower-spider-man-into-the-spider-verse-post-malone-and-s",
-   "appleYear": 2018,
-   "album": "Spider-Man: Into the Spider-Verse (Soundtrack From & Inspired by the Motion Picture)",
-   "appleArtist": "Post Malone & Swae Lee",
-   "appleTitle": "Sunflower (Spider-Man: Into the Spider-Verse)",
-   "year": 2018
+   "id": "something-just-like-this-the-chainsmokers-and-coldplay",
+   "appleYear": 2017,
+   "album": "Memories...Do Not Open",
+   "appleArtist": "The Chainsmokers & Coldplay",
+   "appleTitle": "Something Just Like This",
+   "store": "US",
+   "year": 2017,
+   "d": 1
+  },
+  {
+   "id": "im-the-one-dj-khaled",
+   "appleYear": 2017,
+   "album": "Grateful",
+   "appleArtist": "DJ Khaled",
+   "appleTitle": "I'm the One (feat. Justin Bieber, Quavo, Chance the Rapper & Lil Wayne)",
+   "store": "US",
+   "year": 2017,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "unforgettable-french-montana",
+   "appleYear": 2017,
+   "album": "Jungle Rules",
+   "appleArtist": "French Montana",
+   "appleTitle": "Unforgettable (feat. Swae Lee)",
+   "store": "US",
+   "year": 2017,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "rockstar-post-malone",
+   "appleYear": 2017,
+   "album": "beerbongs & bentleys",
+   "appleArtist": "Post Malone",
+   "appleTitle": "rockstar (feat. 21 Savage)",
+   "store": "US",
+   "year": 2017,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "new-rules-dua-lipa",
+   "appleYear": 2017,
+   "album": "Dua Lipa (Deluxe)",
+   "appleArtist": "Dua Lipa",
+   "appleTitle": "New Rules",
+   "store": "US",
+   "year": 2017,
+   "d": 2
+  },
+  {
+   "id": "castle-on-the-hill-ed-sheeran",
+   "appleYear": 2017,
+   "album": "÷ (Deluxe)",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Castle on the Hill",
+   "store": "US",
+   "year": 2017,
+   "d": 2
+  },
+  {
+   "id": "theres-nothing-holdin-me-back-shawn-mendes",
+   "appleYear": 2016,
+   "album": "Illuminate (Deluxe)",
+   "appleArtist": "Shawn Mendes",
+   "appleTitle": "There's Nothing Holdin' Me Back",
+   "store": "US",
+   "year": 2016,
+   "d": 2
+  },
+  {
+   "id": "thats-what-i-like-bruno-mars",
+   "appleYear": 2016,
+   "album": "24K Magic",
+   "appleArtist": "Bruno Mars",
+   "appleTitle": "That's What I Like",
+   "store": "US",
+   "year": 2016,
+   "d": 2
+  },
+  {
+   "id": "wild-thoughts-dj-khaled",
+   "appleYear": 2017,
+   "album": "Grateful",
+   "appleArtist": "DJ Khaled",
+   "appleTitle": "Wild Thoughts (feat. Rihanna & Bryson Tiller)",
+   "store": "US",
+   "year": 2017,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "feel-it-still-portugal-the-man",
+   "appleYear": 2017,
+   "album": "Woodstock",
+   "appleArtist": "Portugal. The Man",
+   "appleTitle": "Feel It Still",
+   "store": "US",
+   "year": 2017,
+   "d": 1
+  },
+  {
+   "id": "attention-charlie-puth",
+   "appleYear": 2017,
+   "album": "Voicenotes",
+   "appleArtist": "Charlie Puth",
+   "appleTitle": "Attention",
+   "store": "US",
+   "year": 2017,
+   "d": 2
+  },
+  {
+   "id": "it-aint-me-kygo-and-selena-gomez",
+   "appleYear": 2017,
+   "album": "It Ain't Me - Single",
+   "appleArtist": "Kygo & Selena Gomez",
+   "appleTitle": "It Ain't Me",
+   "store": "US",
+   "year": 2017,
+   "d": 2
+  },
+  {
+   "id": "strip-that-down-liam-payne",
+   "appleYear": 2017,
+   "album": "Strip That Down (feat. Quavo) - Single",
+   "appleArtist": "Liam Payne",
+   "appleTitle": "Strip That Down (feat. Quavo)",
+   "store": "US",
+   "year": 2017,
+   "d": 2
+  },
+  {
+   "id": "issues-julia-michaels",
+   "appleYear": 2017,
+   "album": "Nervous System",
+   "appleArtist": "Julia Michaels",
+   "appleTitle": "Issues",
+   "store": "US",
+   "year": 2017,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "slow-hands-niall-horan",
+   "appleYear": 2017,
+   "album": "Slow Hands - Single",
+   "appleArtist": "Niall Horan",
+   "appleTitle": "Slow Hands",
+   "store": "US",
+   "year": 2017,
+   "d": 2
+  },
+  {
+   "id": "congratulations-post-malone",
+   "appleYear": 2016,
+   "album": "Stoney",
+   "appleArtist": "Post Malone",
+   "appleTitle": "Congratulations (feat. Quavo)",
+   "store": "US",
+   "year": 2016,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "paris-the-chainsmokers",
+   "appleYear": 2017,
+   "album": "Memories...Do Not Open",
+   "appleArtist": "The Chainsmokers",
+   "appleTitle": "Paris",
+   "store": "US",
+   "year": 2017,
+   "d": 3
+  },
+  {
+   "id": "mask-off-future",
+   "appleYear": 2017,
+   "album": "FUTURE",
+   "appleArtist": "Future",
+   "appleTitle": "Mask Off",
+   "store": "US",
+   "year": 2017,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "thunder-imagine-dragons",
+   "appleYear": 2017,
+   "album": "Evolve",
+   "appleArtist": "Imagine Dragons",
+   "appleTitle": "Thunder",
+   "store": "US",
+   "year": 2017,
+   "d": 2
   },
   {
    "id": "old-town-road-lil-nas-x",
@@ -418,23 +2213,9 @@
    "album": "7",
    "appleArtist": "Lil Nas X",
    "appleTitle": "Old Town Road",
-   "year": 2018
-  },
-  {
-   "id": "bad-guy-billie-eilish",
-   "appleYear": 2019,
-   "album": "WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?",
-   "appleArtist": "Billie Eilish",
-   "appleTitle": "bad guy",
-   "year": 2019
-  },
-  {
-   "id": "senorita-shawn-mendes-and-camila-cabello",
-   "appleYear": 2019,
-   "album": "Señorita - Single",
-   "appleArtist": "Shawn Mendes & Camila Cabello",
-   "appleTitle": "Señorita",
-   "year": 2019
+   "store": "US",
+   "year": 2018,
+   "d": 1
   },
   {
    "id": "someone-you-loved-lewis-capaldi",
@@ -442,7 +2223,256 @@
    "album": "Divinely Uninspired To A Hellish Extent",
    "appleArtist": "Lewis Capaldi",
    "appleTitle": "Someone You Loved",
-   "year": 2018
+   "store": "US",
+   "year": 2018,
+   "d": 1
+  },
+  {
+   "id": "gods-plan-drake",
+   "appleYear": 2018,
+   "album": "Scorpion",
+   "appleArtist": "Drake",
+   "appleTitle": "God's Plan",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2018,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "sunflower-spider-man-into-the-spider-verse-post-malone-and-s",
+   "appleYear": 2018,
+   "album": "Spider-Man: Into the Spider-Verse (Soundtrack From & Inspired by the Motion Picture)",
+   "appleArtist": "Post Malone & Swae Lee",
+   "appleTitle": "Sunflower (Spider-Man: Into the Spider-Verse)",
+   "store": "US",
+   "year": 2018,
+   "d": 1
+  },
+  {
+   "id": "shallow-lady-gaga-and-bradley-cooper",
+   "appleYear": 2018,
+   "album": "A Star Is Born Soundtrack",
+   "appleArtist": "Lady Gaga & Bradley Cooper",
+   "appleTitle": "Shallow",
+   "store": "US",
+   "year": 2018,
+   "d": 1
+  },
+  {
+   "id": "girls-like-you-maroon-5",
+   "appleYear": 2018,
+   "album": "Girls Like You (feat. Cardi B) - Single",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "Girls Like You (feat. Cardi B)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2018,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "in-my-feelings-drake",
+   "appleYear": 2018,
+   "album": "Scorpion",
+   "appleArtist": "Drake",
+   "appleTitle": "In My Feelings",
+   "store": "US",
+   "year": 2018,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "nice-for-what-drake",
+   "appleYear": 2018,
+   "album": "Scorpion",
+   "appleArtist": "Drake",
+   "appleTitle": "Nice For What",
+   "store": "US",
+   "year": 2018,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "i-like-it-cardi-b-bad-bunny-and-j-balvin",
+   "appleYear": 2018,
+   "album": "Invasion of Privacy",
+   "appleArtist": "Cardi B, Bad Bunny & J Balvin",
+   "appleTitle": "I Like It",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2018,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "eastside-benny-blanco-halsey-and-khalid",
+   "appleYear": 2018,
+   "album": "FRIENDS KEEP SECRETS",
+   "appleArtist": "benny blanco, Halsey & Khalid",
+   "appleTitle": "Eastside",
+   "store": "US",
+   "year": 2018,
+   "d": 2
+  },
+  {
+   "id": "no-tears-left-to-cry-ariana-grande",
+   "appleYear": 2018,
+   "album": "Sweetener",
+   "appleArtist": "Ariana Grande",
+   "appleTitle": "no tears left to cry",
+   "store": "US",
+   "year": 2018,
+   "d": 2
+  },
+  {
+   "id": "without-me-halsey",
+   "appleYear": 2018,
+   "album": "Manic",
+   "appleArtist": "Halsey",
+   "appleTitle": "Without Me",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2018,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "the-middle-zedd-maren-morris-and-grey",
+   "appleYear": 2018,
+   "album": "The Middle - Single",
+   "appleArtist": "Zedd, Maren Morris & Grey",
+   "appleTitle": "The Middle",
+   "store": "US",
+   "year": 2018,
+   "d": 2
+  },
+  {
+   "id": "psycho-post-malone",
+   "appleYear": 2018,
+   "album": "beerbongs & bentleys",
+   "appleArtist": "Post Malone",
+   "appleTitle": "Psycho (feat. Ty Dolla $ign)",
+   "store": "US",
+   "year": 2018,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "thank-u-next-ariana-grande",
+   "appleYear": 2018,
+   "album": "thank u, next",
+   "appleArtist": "Ariana Grande",
+   "appleTitle": "thank u, next",
+   "store": "US",
+   "year": 2018,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "meant-to-be-bebe-rexha",
+   "appleYear": 2017,
+   "album": "All Your Fault, Pt. 2 - EP",
+   "appleArtist": "Bebe Rexha & Florida Georgia Line",
+   "appleTitle": "Meant to Be",
+   "store": "US",
+   "year": 2017,
+   "d": 2
+  },
+  {
+   "id": "happier-marshmello-and-bastille",
+   "appleYear": 2018,
+   "album": "Happier - Single",
+   "appleArtist": "Marshmello & Bastille",
+   "appleTitle": "Happier",
+   "store": "US",
+   "year": 2018,
+   "d": 2
+  },
+  {
+   "id": "high-hopes-panic-at-the-disco",
+   "appleYear": 2018,
+   "album": "Pray for the Wicked",
+   "appleArtist": "Panic! At the Disco",
+   "appleTitle": "High Hopes",
+   "store": "US",
+   "year": 2018,
+   "d": 2
+  },
+  {
+   "id": "better-now-post-malone",
+   "appleYear": 2018,
+   "album": "beerbongs & bentleys",
+   "appleArtist": "Post Malone",
+   "appleTitle": "Better Now",
+   "store": "US",
+   "year": 2018,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "youngblood-5-seconds-of-summer",
+   "appleYear": 2018,
+   "album": "Youngblood",
+   "appleArtist": "5 Seconds of Summer",
+   "appleTitle": "Youngblood",
+   "store": "US",
+   "year": 2018,
+   "d": 2
+  },
+  {
+   "id": "sad-xxxtentacion",
+   "appleYear": 2019,
+   "album": "? (Deluxe)",
+   "appleArtist": "XXXTENTACION",
+   "appleTitle": "SAD! (Instrumental)",
+   "store": "US",
+   "year": 2018,
+   "d": 2
+  },
+  {
+   "id": "one-kiss-calvin-harris-and-dua-lipa",
+   "appleYear": 2018,
+   "album": "One Kiss - Single",
+   "appleArtist": "Calvin Harris, Dua Lipa",
+   "appleTitle": "One Kiss",
+   "store": "US",
+   "year": 2018,
+   "d": 2
+  },
+  {
+   "id": "lucid-dreams-juice-wrld",
+   "appleYear": 2017,
+   "album": "Lucid Dreams - Single",
+   "appleArtist": "Juice WRLD",
+   "appleTitle": "Lucid Dreams",
+   "store": "US",
+   "year": 2017,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "all-the-stars-kendrick-lamar-and-sza",
+   "appleYear": 2018,
+   "album": "Black Panther: The Album",
+   "appleArtist": "Kendrick Lamar, SZA",
+   "appleTitle": "All The Stars",
+   "store": "US",
+   "year": 2018,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "sicko-mode-travis-scott",
+   "appleYear": 2018,
+   "album": "ASTROWORLD",
+   "appleArtist": "Travis Scott",
+   "appleTitle": "SICKO MODE",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2018,
+   "d": 2,
+   "explicit": true
   },
   {
    "id": "blinding-lights-the-weeknd",
@@ -450,7 +2480,277 @@
    "album": "After Hours (Deluxe)",
    "appleArtist": "The Weeknd",
    "appleTitle": "Blinding Lights",
-   "year": 2019
+   "store": "US",
+   "year": 2019,
+   "d": 1
+  },
+  {
+   "id": "bad-guy-billie-eilish",
+   "appleYear": 2019,
+   "album": "WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?",
+   "appleArtist": "Billie Eilish",
+   "appleTitle": "bad guy",
+   "store": "US",
+   "year": 2019,
+   "d": 1
+  },
+  {
+   "id": "senorita-shawn-mendes-and-camila-cabello",
+   "appleYear": 2019,
+   "album": "Señorita - Single",
+   "appleArtist": "Shawn Mendes & Camila Cabello",
+   "appleTitle": "Señorita",
+   "store": "US",
+   "year": 2019,
+   "d": 1
+  },
+  {
+   "id": "dance-monkey-tones-and-i",
+   "appleYear": 2019,
+   "album": "The Kids Are Coming - EP",
+   "appleArtist": "Tones And I",
+   "appleTitle": "Dance Monkey",
+   "store": "US",
+   "year": 2019,
+   "d": 1
+  },
+  {
+   "id": "7-rings-ariana-grande",
+   "appleYear": 2019,
+   "album": "thank u, next",
+   "appleArtist": "Ariana Grande",
+   "appleTitle": "7 rings",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2019,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "i-dont-care-ed-sheeran-and-justin-bieber",
+   "appleYear": 2019,
+   "album": "No.6 Collaborations Project",
+   "appleArtist": "Ed Sheeran & Justin Bieber",
+   "appleTitle": "I Don't Care",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "sweet-but-psycho-ava-max",
+   "appleYear": 2018,
+   "album": "Heaven & Hell",
+   "appleArtist": "Ava Max",
+   "appleTitle": "Sweet but Psycho",
+   "store": "US",
+   "year": 2018,
+   "d": 1
+  },
+  {
+   "id": "memories-maroon-5",
+   "appleYear": 2019,
+   "album": "JORDI (Deluxe Edition)",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "Memories",
+   "store": "US",
+   "year": 2019,
+   "d": 1
+  },
+  {
+   "id": "sucker-jonas-brothers",
+   "appleYear": 2019,
+   "album": "Happiness Begins",
+   "appleArtist": "Jonas Brothers",
+   "appleTitle": "Sucker",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "wow-post-malone",
+   "appleYear": 2019,
+   "album": "Wow. (Instrumental) - Single",
+   "appleArtist": "Post Malone",
+   "appleTitle": "Wow. (Instrumental)",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "dancing-with-a-stranger-sam-smith-and-normani",
+   "appleYear": 2019,
+   "album": "Love Goes",
+   "appleArtist": "Sam Smith & Normani",
+   "appleTitle": "Dancing With A Stranger (Bonus Track)",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "talk-khalid",
+   "appleYear": 2019,
+   "album": "Free Spirit",
+   "appleArtist": "Khalid",
+   "appleTitle": "Talk (feat. Disclosure)",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "beautiful-people-ed-sheeran",
+   "appleYear": 2019,
+   "album": "No.6 Collaborations Project",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Beautiful People (feat. Khalid)",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "break-up-with-your-girlfriend-im-bored-ariana-grande",
+   "appleYear": 2019,
+   "album": "thank u, next",
+   "appleArtist": "Ariana Grande",
+   "appleTitle": "break up with your girlfriend, i'm bored",
+   "store": "US",
+   "year": 2019,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "bury-a-friend-billie-eilish",
+   "appleYear": 2019,
+   "album": "WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?",
+   "appleArtist": "Billie Eilish",
+   "appleTitle": "bury a friend",
+   "store": "US",
+   "year": 2019,
+   "d": 3
+  },
+  {
+   "id": "truth-hurts-lizzo",
+   "appleYear": 2017,
+   "album": "Cuz I Love You (Super Deluxe)",
+   "appleArtist": "Lizzo",
+   "appleTitle": "Truth Hurts",
+   "store": "US",
+   "year": 2017,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "no-guidance-chris-brown",
+   "appleYear": 2019,
+   "album": "Indigo",
+   "appleArtist": "Chris Brown",
+   "appleTitle": "No Guidance (feat. Drake)",
+   "store": "US",
+   "year": 2019,
+   "d": 3,
+   "explicit": true
+  },
+  {
+   "id": "good-as-hell-lizzo",
+   "appleYear": 2019,
+   "album": "Cuz I Love You (Super Deluxe)",
+   "appleArtist": "Lizzo",
+   "appleTitle": "Good as Hell (feat. Ariana Grande)",
+   "store": "US",
+   "year": 2019,
+   "d": 3
+  },
+  {
+   "id": "me-taylor-swift",
+   "appleYear": 2019,
+   "album": "Lover",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "ME! (feat. Brendon Urie of Panic! At The Disco)",
+   "store": "US",
+   "year": 2019,
+   "d": 3
+  },
+  {
+   "id": "goodbyes-post-malone",
+   "appleYear": 2019,
+   "album": "Hollywood's Bleeding",
+   "appleArtist": "Post Malone",
+   "appleTitle": "Goodbyes (feat. Young Thug)",
+   "store": "US",
+   "year": 2019,
+   "d": 3,
+   "explicit": true
+  },
+  {
+   "id": "when-the-partys-over-billie-eilish",
+   "appleYear": 2018,
+   "album": "WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?",
+   "appleArtist": "Billie Eilish",
+   "appleTitle": "when the party's over",
+   "store": "US",
+   "year": 2018,
+   "d": 3
+  },
+  {
+   "id": "if-i-cant-have-you-shawn-mendes",
+   "appleYear": 2019,
+   "album": "Shawn Mendes (Deluxe)",
+   "appleArtist": "Shawn Mendes",
+   "appleTitle": "If I Can't Have You",
+   "store": "US",
+   "year": 2019,
+   "d": 3
+  },
+  {
+   "id": "piece-of-your-heart-meduza",
+   "appleYear": 2019,
+   "album": "Piece Of Your Heart - Single",
+   "appleArtist": "MEDUZA & Goodboys",
+   "appleTitle": "Piece Of Your Heart",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "ransom-lil-tecca",
+   "appleYear": 2019,
+   "album": "Ransom - Single",
+   "appleArtist": "Lil Tecca",
+   "appleTitle": "Ransom",
+   "store": "US",
+   "year": 2019,
+   "d": 3,
+   "explicit": true
+  },
+  {
+   "id": "3-nights-dominic-fike",
+   "appleYear": 2018,
+   "album": "Don't Forget About Me, Demos - EP",
+   "appleArtist": "Dominic Fike",
+   "appleTitle": "3 Nights",
+   "store": "US",
+   "year": 2018,
+   "d": 2
+  },
+  {
+   "id": "you-need-to-calm-down-taylor-swift",
+   "appleYear": 2019,
+   "album": "Lover",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "You Need To Calm Down",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "going-bad-meek-mill",
+   "appleYear": 2018,
+   "album": "Championships",
+   "appleArtist": "Meek Mill",
+   "appleTitle": "Going Bad (feat. Drake)",
+   "store": "US",
+   "year": 2018,
+   "d": 2,
+   "explicit": true
   }
  ]
 }

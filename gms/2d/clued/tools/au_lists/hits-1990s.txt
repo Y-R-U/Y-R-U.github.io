@@ -1,60 +1,275 @@
 @id hits-1990s
 @title Hits of the 1990s
 @icon 💿
-@sources [{"name":"Billboard Year-End Hot 100 singles (1990–1999)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1990"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
-1990 | Wilson Phillips | Hold On
-1990 | Sinéad O'Connor | Nothing Compares 2 U | d=1
-1990 | Madonna | Vogue
-1990 | Mariah Carey | Vision of Love
-1990 | MC Hammer | U Can't Touch This | d=1; am=hammer
-1990 | Vanilla Ice | Ice Ice Baby | d=1
-1990 | Deee-Lite | Groove Is in the Heart
-1991 | Bryan Adams | (Everything I Do) I Do It for You
-1991 | Nirvana | Smells Like Teen Spirit | d=1
-1991 | R.E.M. | Losing My Religion | d=1
-1991 | Michael Jackson | Black or White
-1990 | C+C Music Factory | Gonna Make You Sweat (Everybody Dance Now) | am=c\+c|music factory; tm=gonna make you sweat
-1992 | Boyz II Men | End of the Road
-1992 | Sir Mix-a-Lot | Baby Got Back
-1992 | Kris Kross | Jump
-1992 | Whitney Houston | I Will Always Love You | d=1
-1992 | Billy Ray Cyrus | Achy Breaky Heart
-1991 | Red Hot Chili Peppers | Under the Bridge
-1993 | Haddaway | What Is Love | d=1
-1993 | UB40 | (I Can't Help) Falling in Love with You
-1993 | Meat Loaf | I'd Do Anything for Love (But I Won't Do That)
-1993 | Tag Team | Whoomp! (There It Is) | note=keepyear single released 1993; Apple only has a 1998 compilation
-1993 | Ace of Base | The Sign
-1994 | All-4-One | I Swear
-1994 | Boyz II Men | I'll Make Love to You
-1994 | Wet Wet Wet | Love Is All Around
-1994 | Lisa Loeb | Stay (I Missed You)
-1995 | Coolio | Gangsta's Paradise | d=1
-1995 | TLC | Waterfalls
-1994 | Seal | Kiss from a Rose
-1995 | Mariah Carey & Boyz II Men | One Sweet Day | am=mariah
-1995 | Oasis | Wonderwall | d=1
-1995 | Alanis Morissette | Ironic
-1996 | Celine Dion | Because You Loved Me
-1996 | Fugees | Killing Me Softly with His Song
-1996 | Spice Girls | Wannabe | d=1
-1996 | Blackstreet | No Diggity
-1996 | Toni Braxton | Un-Break My Heart
-1997 | Puff Daddy | I'll Be Missing You | am=puff daddy|diddy
-1997 | Hanson | MMMBop
-1997 | Aqua | Barbie Girl | d=1
-1997 | The Verve | Bitter Sweet Symphony
-1997 | Chumbawamba | Tubthumping
-1997 | Celine Dion | My Heart Will Go On | d=1
-1997 | Savage Garden | Truly Madly Deeply
-1998 | Cher | Believe | d=1
-1998 | Britney Spears | ...Baby One More Time | d=1; tm=baby one more time; alt=Baby One More Time
-1998 | Goo Goo Dolls | Iris
-1999 | TLC | No Scrubs
-1999 | Santana | Smooth | am=santana
-1999 | Ricky Martin | Livin' la Vida Loca
-1999 | Christina Aguilera | Genie in a Bottle
-1999 | Backstreet Boys | I Want It That Way | d=1
-1999 | Smash Mouth | All Star
-1999 | Lou Bega | Mambo No. 5 (A Little Bit Of...) | tm=mambo no
-1999 | Eiffel 65 | Blue (Da Ba Dee) | tm=blue
+@sources [{"name":"Billboard Year-End Hot 100 singles (1990s)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1990"},{"name":"UK year-end best-selling singles (Music Week / Official Charts Company)","url":"https://en.wikipedia.org/wiki/1990_in_British_music"},{"name":"ARIA year-end singles chart","url":"https://www.aria.com.au/charts/1990/singles-chart"},{"name":"Wikipedia pageviews (lasting fame) and Wikidata (artist country)","url":"https://www.wikidata.org/"}]
+# chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
+1990 | Sinéad O'Connor | Nothing Compares 2 U | us=3 uk=2 au=1 pv=18307 from=IRL | d=1
+1990 | Madonna | Vogue | us=5 uk=8 au=3 pv=12782 from=USA
+1990 | Vanilla Ice | Ice Ice Baby | us=45 uk=4 au=22 pv=15683 from=USA | d=1
+1990 | MC Hammer | U Can't Touch This | us=55 uk=15 au=2 pv=13988 from=USA | d=1; am=hammer
+1990 | Wilson Phillips | Hold On | us=1 uk=- au=11 pv=6550 from=USA
+1990 | C+C Music Factory | Gonna Make You Sweat (Everybody Dance Now) | us=3 uk=- au=26 pv=7895 from=USA | am=c\+c
+1990 | Deee-Lite | Groove Is in the Heart | us=91 uk=26 au=38 pv=12275 from=USA
+1990 | Mariah Carey | Vision of Love | us=6 uk=- au=- pv=4341 from=USA
+1990 | Roxette | It Must Have Been Love | us=2 uk=14 au=4 pv=10884 from=SWE
+1990 | Alannah Myles | Black Velvet | us=18 uk=18 au=13 pv=14927 from=CAN
+1990 | Michael Bolton | How Am I Supposed to Live Without You | us=12 uk=28 au=7 pv=5857 from=USA
+1990 | Paula Abdul | Opposites Attract | us=14 uk=25 au=6 pv=4391 from=USA
+1990 | Londonbeat | I've Been Thinking About You | us=31 uk=29 au=8 pv=3007 from=GBR
+1990 | Heart | All I Wanna Do Is Make Love to You | us=16 uk=- au=5 pv=4551 from=USA
+1990 | Snap! | The Power | us=26 uk=10 au=- pv=6766 from=DEU
+1990 | EMF | Unbelievable | us=6 uk=30 au=- pv=6464 from=GBR
+1990 | Jon Bon Jovi | Blaze of Glory | us=10 uk=- au=20 pv=3650 from=USA
+1990 | Elton John | Sacrifice | us=- uk=3 au=47 pv=5330 from=GBR
+1990 | Madonna | Justify My Love | us=21 uk=43 au=- pv=8401 from=USA
+1990 | DNA | Tom's Diner | us=53 uk=32 au=- pv=18004 from=GBR
+1990 | Billy Idol | Cradle of Love | us=9 uk=- au=48 pv=2433 from=GBR
+1990 | Luciano Pavarotti | Nessun Dorma | us=- uk=11 au=- pv=29147 from=ITA
+1990 | Craig McLachlan & Check 1–2 | Mona | us=- uk=22 au=15 pv=890 from=AUS
+1990 | Aerosmith | Janie's Got a Gun | us=61 uk=- au=19 pv=6141 from=USA
+1990 | Maxi Priest | Close to You | us=17 uk=- au=36 pv=1699 from=GBR
+1990 | Black Box | Fantasy | us=- uk=47 au=17 pv=2773 from=ITA
+1990 | En Vogue | Hold On | us=8 uk=45 au=- pv=1542 from=USA
+1991 | Bryan Adams | (Everything I Do) I Do It for You | us=1 uk=1 au=1 pv=15261 from=CAN/GBR
+1991 | Michael Jackson | Black or White | us=14 uk=13 au=34 pv=25281 from=USA
+1991 | Red Hot Chili Peppers | Under the Bridge | us=8 uk=- au=9 pv=14691 from=USA
+1991 | Nirvana | Smells Like Teen Spirit | us=32 uk=- au=46 pv=31384 from=USA | d=1
+1991 | R.E.M. | Losing My Religion | us=33 uk=- au=- pv=14738 from=USA | d=1
+1991 | Right Said Fred | I'm Too Sexy | us=13 uk=4 au=13 pv=12865 from=GBR
+1991 | Extreme | More Than Words | us=7 uk=16 au=7 pv=11944 from=USA
+1991 | Color Me Badd | I Wanna Sex You Up | us=2 uk=10 au=21 pv=3494 from=USA
+1991 | Scorpions | Wind of Change | us=39 uk=21 au=43 pv=20316 from=DEU
+1991 | Amy Grant | Baby Baby | us=10 uk=25 au=31 pv=2956 from=USA
+1991 | Roxette | Joyride | us=23 uk=47 au=9 pv=1762 from=SWE
+1991 | Cher | The Shoop Shoop Song (It's in His Kiss) | us=- uk=3 au=10 pv=7140 from=USA
+1991 | The Simpsons | Do the Bartman | us=- uk=5 au=11 pv=5580 from=USA
+1991 | Rod Stewart | Rhythm of My Heart | us=50 uk=34 au=18 pv=1904 from=GBR
+1991 | Paula Abdul | Rush Rush | us=4 uk=- au=19 pv=2732 from=USA
+1991 | Enigma | Sadness (Part I) | us=- uk=37 au=23 pv=9378 from=DEU
+1991 | 2 Unlimited | Get Ready for This | us=- uk=11 au=28 pv=3250 from=NLD
+1991 | Heavy D & the Boyz | Now That We Found Love | us=67 uk=24 au=47 pv=2537 from=USA
+1991 | Seal | Crazy | us=75 uk=38 au=46 pv=5379 from=GBR
+1991 | The KLF | Justified and Ancient | us=86 uk=27 au=39 pv=3579 from=GBR
+1991 | Divinyls | I Touch Myself | us=52 uk=- au=15 pv=6553 from=AUS
+1991 | Guns N' Roses | You Could Be Mine | us=- uk=50 au=5 pv=3749 from=USA
+1991 | Vic Reeves & the Wonder Stuff | Dizzy | us=- uk=8 au=49 pv=2401 from=GBR
+1991 | Salt-N-Pepa | Let's Talk About Sex | us=- uk=14 au=48 pv=2940 from=USA
+1991 | P.M. Dawn | Set Adrift on Memory Bliss | us=44 uk=35 au=- pv=4161 from=USA
+1991 | Stevie B | Because I Love You (The Postman Song) | us=12 uk=- au=49 pv=1505 from=USA
+1991 | Color Me Badd | All 4 Love | us=9 uk=45 au=- pv=981 from=USA
+1992 | Whitney Houston | I Will Always Love You | us=1 uk=1 au=2 pv=54834 from=USA | d=1
+1992 | Boyz II Men | End of the Road | us=1 uk=6 au=3 pv=5698 from=USA
+1992 | Billy Ray Cyrus | Achy Breaky Heart | us=15 uk=21 au=1 pv=7652 from=USA
+1992 | Kris Kross | Jump | us=3 uk=25 au=12 pv=4972 from=USA
+1992 | Sir Mix-a-Lot | Baby Got Back | us=2 uk=- au=32 pv=9721 from=USA | kids=0
+1992 | Snap! | Rhythm Is a Dancer | us=25 uk=2 au=15 pv=8272 from=DEU
+1992 | Mr. Big | To Be with You | us=12 uk=31 au=4 pv=4352 from=USA
+1992 | KWS | Please Don't Go | us=47 uk=5 au=7 pv=4894 from=GBR
+1992 | Shakespears Sister | Stay | us=45 uk=4 au=21 pv=5112 from=GBR
+1992 | Richard Marx | Hazard | us=56 uk=14 au=10 pv=3732 from=USA
+1992 | Guns N' Roses | November Rain | us=17 uk=- au=2 pv=14769 from=USA
+1992 | Mariah Carey | I'll Be There | us=16 uk=40 au=37 pv=2057 from=USA
+1992 | Madonna | This Used to Be My Playground | us=21 uk=42 au=45 pv=3390 from=USA
+1992 | Vanessa Williams | Save the Best for Last | us=4 uk=- au=11 pv=4469 from=USA
+1992 | Tom Cochrane | Life Is a Highway | us=18 uk=- au=27 pv=16403 from=CAN
+1992 | Charles & Eddie | Would I Lie to You? | us=90 uk=3 au=30 pv=4510 from=USA
+1992 | Guns N' Roses | Knockin' On Heaven's Door | us=- uk=34 au=35 pv=25603 from=USA
+1992 | Jon Secada | Just Another Day | us=10 uk=19 au=- pv=3110 from=CUB/USA
+1992 | Shanice | I Love Your Smile | us=11 uk=24 au=- pv=4042 from=USA
+1992 | Sophie B. Hawkins | Damn I Wish I Was Your Lover | us=34 uk=- au=18 pv=3091 from=USA
+1992 | Patty Smyth and Don Henley | Sometimes Love Just Ain't Enough | us=22 uk=- au=23 pv=2006 from=USA
+1992 | Arrested Development | People Everyday | us=67 uk=23 au=48 pv=1342 from=USA
+1992 | Eric Clapton | Tears in Heaven | us=6 uk=- au=- pv=26759 from=GBR/USA
+1992 | Jimmy Nail | Ain't No Doubt | us=- uk=8 au=33 pv=1219 from=GBR
+1992 | Luther Vandross and Janet Jackson | The Best Things in Life Are Free | us=41 uk=17 au=- pv=2018 from=USA
+1992 | CeCe Peniston | Finally | us=20 uk=48 au=- pv=3065 from=USA
+1992 | George Michael | Too Funky | us=58 uk=- au=19 pv=2926 from=GBR
+1993 | Ace of Base | The Sign | us=1 uk=11 au=5 pv=6981 from=SWE
+1993 | Meat Loaf | I'd Do Anything for Love (But I Won't Do That) | us=36 uk=1 au=1 pv=15672 from=USA
+1993 | Haddaway | What Is Love | us=82 uk=8 au=- pv=18106 from=TTO/DEU | d=1
+1993 | UB40 | (I Can't Help) Falling in Love with You | us=- uk=2 au=- pv=23496 from=GBR
+1993 | Tag Team | Whoomp! (There It Is) | us=2 uk=- au=- pv=4711 from=USA | note=keepyear single released 1993; Apple only has a 1998 compilation
+1993 | Ace of Base | All That She Wants | us=9 uk=3 au=9 pv=7698 from=SWE
+1993 | Snow | Informer | us=10 uk=17 au=6 pv=8916 from=CAN
+1993 | 4 Non Blondes | What's Up? | us=50 uk=21 au=7 pv=38962 from=USA
+1993 | Bryan Adams | Please Forgive Me | us=27 uk=15 au=8 pv=2297 from=CAN/GBR
+1993 | Janet Jackson | That's the Way Love Goes | us=4 uk=43 au=17 pv=4091 from=USA
+1993 | Spin Doctors | Two Princes | us=28 uk=25 au=27 pv=6276 from=USA
+1993 | UB40 | Can't Help Falling in Love | us=3 uk=- au=5 pv=23496 from=GBR
+1993 | Billy Joel | The River of Dreams | us=26 uk=27 au=13 pv=2768 from=USA
+1993 | Inner Circle | Sweat (A La La La La Long) | us=77 uk=19 au=4 pv=3643 from=JAM
+1993 | Culture Beat | Mr. Vain | us=76 uk=9 au=16 pv=3731 from=DEU
+1993 | Gabrielle | Dreams | us=75 uk=5 au=20 pv=2030 from=GBR
+1993 | DJ Jazzy Jeff & The Fresh Prince | Boom! Shake the Room | us=75 uk=16 au=18 pv=1308 from=USA
+1993 | Silk | Freak Me | us=5 uk=- au=15 pv=1764 from=USA | kids=0
+1993 | 2 Unlimited | No Limit | us=- uk=4 au=30 pv=3169 from=NLD
+1993 | Ugly Kid Joe | Cat's in the Cradle | us=61 uk=- au=8 pv=12241 from=USA
+1993 | Soul Asylum | Runaway Train | us=22 uk=- au=45 pv=10318 from=USA
+1993 | Peabo Bryson and Regina Belle | A Whole New World | us=18 uk=- au=50 pv=9134 from=USA
+1993 | SWV | Right Here (Human Nature) | us=29 uk=34 au=- pv=3780 from=USA
+1993 | Lenny Kravitz | Are You Gonna Go My Way | us=- uk=47 au=11 pv=2761 from=USA
+1993 | Shai | If I Ever Fall in Love | us=7 uk=- au=41 pv=1656 from=USA
+1993 | Shaggy | Oh Carolina | us=- uk=7 au=34 pv=1127 from=JAM
+1993 | Michael Jackson | Give In to Me | us=- uk=50 au=32 pv=6006 from=USA
+1994 | Seal | Kiss from a Rose | us=4 uk=39 au=3 pv=18695 from=GBR
+1994 | All-4-One | I Swear | us=2 uk=5 au=2 pv=3180 from=USA
+1994 | Boyz II Men | I'll Make Love to You | us=3 uk=43 au=7 pv=3059 from=USA
+1994 | Lisa Loeb | Stay (I Missed You) | us=6 uk=40 au=35 pv=5791 from=USA
+1994 | Wet Wet Wet | Love Is All Around | us=- uk=1 au=1 pv=9737 from=GBR
+1994 | Mariah Carey | Without You | us=16 uk=6 au=16 pv=15514 from=USA
+1994 | Bon Jovi | Always | us=17 uk=7 au=3 pv=6546 from=USA
+1994 | Real McCoy | Another Night | us=6 uk=31 au=5 pv=2834 from=DEU
+1994 | Bryan Adams, Rod Stewart and Sting | All for Love | us=8 uk=37 au=10 pv=4757 from=CAN/GBR
+1994 | Big Mountain | Baby, I Love Your Way | us=21 uk=30 au=19 pv=7413 from=USA
+1994 | Crash Test Dummies | Mmm Mmm Mmm Mmm | us=35 uk=48 au=14 pv=21785 from=CAN
+1994 | Ini Kamoze | Here Comes the Hotstepper | us=24 uk=24 au=22 pv=5398 from=JAM
+1994 | Toni Braxton | Breathe Again | us=7 uk=33 au=20 pv=1718 from=USA
+1994 | Warren G and Nate Dogg | Regulate | us=22 uk=35 au=47 pv=7224 from=USA
+1994 | Bruce Springsteen | Streets of Philadelphia | us=54 uk=22 au=39 pv=7823 from=USA
+1994 | Luther Vandross & Mariah Carey | Endless Love | us=56 uk=44 au=27 pv=7619 from=USA
+1994 | Rednex | Cotton Eye Joe | us=93 uk=16 au=34 pv=7786 from=SWE
+1994 | East 17 | Stay Another Day | us=- uk=3 au=28 pv=4188 from=GBR
+1994 | Elton John | Can You Feel the Love Tonight | us=18 uk=- au=28 pv=8081 from=GBR
+1994 | Celine Dion | Think Twice | us=- uk=5 au=11 pv=1950 from=CAN
+1994 | Reel 2 Real | I Like to Move It | us=- uk=15 au=40 pv=8982 from=USA
+1994 | Prince | The Most Beautiful Girl in the World | us=19 uk=24 au=- pv=4366 from=USA
+1994 | Youssou N'Dour and Neneh Cherry | 7 Seconds | us=- uk=16 au=29 pv=4768 from=SEN
+1994 | D:Ream | Things Can Only Get Better | us=- uk=9 au=32 pv=3816 from=GBR
+1994 | Enigma | Return to Innocence | us=33 uk=28 au=- pv=7965 from=DEU
+1994 | Corona | The Rhythm of the Night | us=54 uk=13 au=- pv=9924 from=ITA
+1994 | Salt-n-Pepa | Shoop | us=29 uk=- au=15 pv=2425 from=USA
+1995 | Coolio | Gangsta's Paradise | us=1 uk=2 au=1 pv=27250 from=USA | d=1; kids=0
+1995 | Oasis | Wonderwall | us=56 uk=10 au=19 pv=22883 from=GBR | d=1
+1995 | TLC | Waterfalls | us=2 uk=29 au=- pv=11379 from=USA
+1995 | Alanis Morissette | Ironic | us=13 uk=- au=25 pv=7960 from=CAN/USA
+1995 | Mariah Carey & Boyz II Men | One Sweet Day | us=2 uk=- au=32 pv=5963 from=USA | am=mariah
+1995 | Michael Jackson | You Are Not Alone | us=21 uk=8 au=10 pv=16133 from=USA
+1995 | Everything but the Girl | Missing | us=12 uk=9 au=7 pv=6229 from=GBR
+1995 | Nicki French | Total Eclipse of the Heart | us=19 uk=48 au=17 pv=43971 from=GBR
+1995 | Shaggy | Boombastic | us=18 uk=15 au=16 pv=6186 from=JAM
+1995 | Mariah Carey | Fantasy | us=7 uk=37 au=18 pv=9255 from=USA
+1995 | Take That | Back for Good | us=62 uk=4 au=9 pv=5790 from=GBR
+1995 | N-Trance | Stayin' Alive | us=- uk=34 au=2 pv=15251 from=GBR
+1995 | Diana King | Shy Guy | us=43 uk=25 au=25 pv=1526 from=JAM
+1995 | Boyzone | Father and Son | us=- uk=13 au=28 pv=9118 from=IRL
+1995 | Bryan Adams | Have You Ever Really Loved a Woman? | us=16 uk=- au=6 pv=3755 from=CAN/GBR
+1995 | The Rembrandts | I'll Be There for You | us=- uk=22 au=24 pv=9374 from=USA
+1995 | Peter Andre | Mysterious Girl | us=- uk=9 au=23 pv=3739 from=GBR
+1995 | U2 | Hold Me, Thrill Me, Kiss Me, Kill Me | us=81 uk=19 au=29 pv=2870 from=IRL
+1995 | The Outhere Brothers | Boom Boom Boom | us=- uk=11 au=13 pv=1536 from=USA
+1995 | Scatman John | Scatman (Ski Ba Bop Ba Dop Bop) | us=- uk=30 au=38 pv=10248 from=USA
+1995 | Jann Arden | Insensitive | us=22 uk=- au=12 pv=1176 from=CAN
+1995 | Robson & Jerome | Unchained Melody | us=- uk=1 au=- pv=26723 from=GBR
+1995 | N-Trance | Set You Free | us=- uk=17 au=39 pv=2299 from=GBR
+1995 | Michael Jackson and Janet Jackson | Scream | us=56 uk=- au=47 pv=15639 from=USA
+1995 | Luniz | I Got 5 on It | us=36 uk=47 au=- pv=5907 from=USA
+1995 | Michael Jackson | Earth Song | us=- uk=6 au=- pv=17524 from=USA
+1995 | Sheryl Crow | Strong Enough | us=30 uk=- au=26 pv=1192 from=USA
+1996 | Spice Girls | Wannabe | us=10 uk=2 au=5 pv=12313 from=GBR | d=1
+1996 | Celine Dion | Because You Loved Me | us=3 uk=27 au=3 pv=5545 from=CAN
+1996 | Fugees | Killing Me Softly with His Song | us=- uk=1 au=2 pv=30925 from=USA
+1996 | Toni Braxton | Un-Break My Heart | us=4 uk=13 au=- pv=6836 from=USA
+1996 | Blackstreet | No Diggity | us=23 uk=- au=63 pv=7103 from=USA
+1996 | Los del Río | Macarena | us=1 uk=22 au=1 pv=25310 from=ESP
+1996 | Mark Morrison | Return of the Mack | us=8 uk=5 au=8 pv=14634 from=GBR
+1996 | Donna Lewis | I Love You Always Forever | us=8 uk=36 au=13 pv=5562 from=GBR
+1996 | Celine Dion | It's All Coming Back to Me Now | us=18 uk=35 au=42 pv=15016 from=CAN
+1996 | Spice Girls | 2 Become 1 | us=35 uk=10 au=32 pv=5894 from=GBR
+1996 | Spice Girls | Say You'll Be There | us=28 uk=4 au=45 pv=4025 from=GBR
+1996 | The Tony Rich Project | Nobody Knows | us=4 uk=29 au=33 pv=2186 from=USA
+1996 | Gina G | Ooh Aah... Just a Little Bit | us=41 uk=6 au=23 pv=2492 from=AUS
+1996 | No Mercy | Where Do You Go | us=26 uk=18 au=26 pv=2454 from=DEU
+1996 | Deep Blue Something | Breakfast at Tiffany's | us=39 uk=17 au=38 pv=6586 from=USA
+1996 | Robert Miles | Children | us=65 uk=8 au=32 pv=10646 from=ITA
+1996 | George Michael | Fastlove | us=62 uk=21 au=20 pv=3533 from=GBR
+1996 | Joan Osborne | One of Us | us=30 uk=- au=6 pv=8815 from=USA
+1996 | The Prodigy | Breathe | us=- uk=14 au=9 pv=4424 from=GBR
+1996 | Tracy Chapman | Give Me One Reason | us=6 uk=- au=15 pv=3551 from=USA
+1996 | 3T | Anything | us=43 uk=20 au=31 pv=928 from=USA
+1996 | Toni Braxton | You're Makin' Me High | us=9 uk=- au=10 pv=2126 from=USA
+1996 | La Bouche | Be My Lover | us=23 uk=- au=18 pv=5598 from=DEU
+1996 | Warren G | What's Love Got to Do with It | us=- uk=45 au=9 pv=9089 from=USA
+1996 | Savage Garden | I Want You | us=22 uk=- au=12 pv=3088 from=AUS
+1996 | Bone Thugs-n-Harmony | Tha Crossroads | us=7 uk=- au=39 pv=4782 from=USA
+1996 | Babylon Zoo | Spaceman | us=- uk=3 au=30 pv=2322 from=GBR
+1997 | Puff Daddy | I'll Be Missing You | us=3 uk=3 au=4 pv=13131 from=USA | am=puff daddy
+1997 | Celine Dion | My Heart Will Go On | us=13 uk=2 au=14 pv=20140 from=CAN | d=1
+1997 | Hanson | MMMBop | us=12 uk=11 au=5 pv=10533 from=USA
+1997 | Savage Garden | Truly Madly Deeply | us=4 uk=10 au=7 pv=6248 from=AUS
+1997 | Chumbawamba | Tubthumping | us=35 uk=9 au=3 pv=15097 from=GBR
+1997 | Aqua | Barbie Girl | us=94 uk=2 au=2 pv=14967 from=DNK | d=1
+1997 | The Verve | Bitter Sweet Symphony | us=79 uk=43 au=62 pv=27578 from=GBR
+1997 | En Vogue | Don't Let Go (Love) | us=7 uk=29 au=18 pv=3501 from=USA
+1997 | Janet | Together Again | us=6 uk=32 au=27 pv=4599 from=USA
+1997 | All Saints | Never Ever | us=42 uk=13 au=5 pv=3464 from=GBR
+1997 | Backstreet Boys | Everybody (Backstreet's Back) | us=22 uk=38 au=26 pv=10751 from=USA
+1997 | No Doubt | Don't Speak | us=- uk=7 au=8 pv=12258 from=USA
+1997 | LeAnn Rimes | How Do I Live | us=5 uk=6 au=- pv=9478 from=USA
+1997 | R. Kelly | I Believe I Can Fly | us=6 uk=14 au=- pv=7825 from=USA
+1997 | Will Smith | Men in Black | us=- uk=6 au=6 pv=4407 from=USA
+1997 | Usher | You Make Me Wanna... | us=14 uk=42 au=47 pv=2168 from=USA
+1997 | Meredith Brooks | Bitch | us=15 uk=- au=16 pv=7512 from=USA
+1997 | Az Yet | Hard to Say I'm Sorry | us=19 uk=- au=31 pv=15198 from=USA
+1997 | White Town | Your Woman | us=65 uk=41 au=35 pv=8413 from=IND/GBR
+1997 | Spice Girls | Spice Up Your Life | us=81 uk=10 au=36 pv=3502 from=GBR
+1997 | Jewel | You Were Meant for Me | us=2 uk=- au=25 pv=3352 from=USA
+1997 | Aqua | Doctor Jones | us=- uk=15 au=14 pv=2311 from=DNK
+1997 | Backstreet Boys | As Long as You Love Me | us=- uk=25 au=28 pv=5258 from=USA
+1997 | Savage Garden | To the Moon and Back | us=- uk=30 au=17 pv=3001 from=AUS
+1997 | Third Eye Blind | Semi-Charmed Life | us=17 uk=- au=59 pv=10597 from=USA
+1997 | The Notorious B.I.G. | Mo Money Mo Problems | us=20 uk=- au=51 pv=6647 from=USA
+1997 | Natalie Imbruglia | Torn | us=- uk=8 au=37 pv=1749 from=AUS/GBR
+1998 | Britney Spears | ...Baby One More Time | us=5 uk=1 au=2 pv=27332 from=USA | d=1; tm=baby one more time; alt=Baby One More Time
+1998 | Cher | Believe | us=1 uk=1 au=6 pv=15413 from=USA | d=1
+1998 | Goo Goo Dolls | Iris | us=94 uk=- au=3 pv=32803 from=USA
+1998 | Aerosmith | I Don't Want to Miss a Thing | us=23 uk=17 au=4 pv=18106 from=USA
+1998 | Brandy and Monica | The Boy Is Mine | us=2 uk=18 au=17 pv=9278 from=USA
+1998 | Madonna | Frozen | us=32 uk=22 au=44 pv=9767 from=USA
+1998 | Shania Twain | You're Still the One | us=3 uk=- au=9 pv=9574 from=CAN
+1998 | Run–D.M.C. vs. Jason Nevins | It's Like That | us=- uk=3 au=2 pv=2787 from=USA
+1998 | The Offspring | Pretty Fly (For a White Guy) | us=- uk=30 au=5 pv=10827 from=USA
+1998 | K-Ci & JoJo | All My Life | us=7 uk=- au=12 pv=5063 from=USA
+1998 | Stardust | Music Sounds Better with You | us=- uk=11 au=36 pv=12755
+1998 | Jennifer Paige | Crush | us=21 uk=- au=7 pv=3963 from=USA
+1998 | B*Witched | C'est la Vie | us=- uk=5 au=26 pv=3686 from=IRL
+1998 | Spice Girls | Viva Forever | us=- uk=13 au=23 pv=4231 from=GBR
+1998 | All Saints | Under the Bridge | us=- uk=27 au=45 pv=14691 from=GBR
+1998 | Spice Girls | Goodbye | us=- uk=8 au=45 pv=3354 from=GBR
+1998 | Boyzone | No Matter What | us=- uk=4 au=53 pv=3664 from=IRL
+1998 | Eagle-Eye Cherry | Save Tonight | us=22 uk=39 au=- pv=4368 from=SWE/USA
+1998 | Marcy Playground | Sex and Candy | us=28 uk=- au=59 pv=12810 from=USA
+1998 | Will Smith | Gettin' Jiggy wit It | us=14 uk=- au=52 pv=4506 from=USA
+1998 | Lighthouse Family | High | us=- uk=35 au=11 pv=1757 from=GBR
+1998 | Pras Michel | Ghetto Supastar (That Is What You Are) | us=70 uk=9 au=- pv=6831 from=USA
+1998 | Faith Hill | This Kiss | us=25 uk=- au=39 pv=3338 from=USA
+1998 | Shania Twain | From This Moment On | us=57 uk=- au=10 pv=2962 from=CAN
+1998 | Backstreet Boys | All I Have to Give | us=25 uk=- au=32 pv=1720 from=USA
+1998 | Five | When the Lights Go Out | us=38 uk=- au=25 pv=1513 from=GBR
+1998 | B*Witched | Rollercoaster | us=- uk=21 au=21 pv=569 from=IRL
+1999 | TLC | No Scrubs | us=2 uk=16 au=12 pv=10192 from=USA
+1999 | Ricky Martin | Livin' la Vida Loca | us=10 uk=6 au=21 pv=12626 from=USA/ESP
+1999 | Christina Aguilera | Genie in a Bottle | us=7 uk=13 au=10 pv=9011 from=USA
+1999 | Lou Bega | Mambo No. 5 (A Little Bit Of...) | us=42 uk=4 au=1 pv=17339 from=DEU | tm=mambo no
+1999 | Eiffel 65 | Blue (Da Ba Dee) | us=49 uk=2 au=3 pv=18073 from=ITA | tm=blue
+1999 | Backstreet Boys | I Want It That Way | us=15 uk=35 au=25 pv=16188 from=USA | d=1
+1999 | Smash Mouth | All Star | us=17 uk=- au=31 pv=12887 from=USA
+1999 | Santana | Smooth | us=2 uk=- au=11 pv=48 from=USA | am=santana
+1999 | Shania Twain | That Don't Impress Me Much | us=32 uk=7 au=8 pv=4015 from=CAN
+1999 | Macy Gray | I Try | us=26 uk=20 au=18 pv=4028 from=USA
+1999 | Sixpence None the Richer | Kiss Me | us=6 uk=- au=19 pv=18605 from=USA
+1999 | Pearl Jam | Last Kiss | us=23 uk=- au=4 pv=9148 from=USA
+1999 | Ronan Keating | When You Say Nothing at All | us=- uk=18 au=15 pv=11884 from=IRL
+1999 | Will Smith | Wild Wild West | us=33 uk=32 au=49 pv=3648 from=USA
+1999 | Lenny Kravitz | Fly Away | us=29 uk=50 au=52 pv=4405 from=USA
+1999 | Jennifer Lopez | If You Had My Love | us=12 uk=- au=16 pv=3798 from=USA
+1999 | Vengaboys | Boom, Boom, Boom, Boom!! | us=- uk=15 au=24 pv=5518 from=NLD
+1999 | Britney Spears | Sometimes | us=86 uk=34 au=22 pv=3915 from=USA
+1999 | Savage Garden | I Knew I Loved You | us=7 uk=- au=27 pv=2730 from=AUS
+1999 | S Club 7 | Bring It All Back | us=- uk=11 au=14 pv=1366 from=GBR
+1999 | Madonna | Beautiful Stranger | us=- uk=23 au=34 pv=5171 from=USA
+1999 | Madison Avenue | Don't Call Me Baby | us=- uk=31 au=7 pv=2049 from=AUS
+1999 | Vengaboys | We Like to Party! (The Vengabus) | us=- uk=29 au=17 pv=2643 from=NLD
+1999 | Shania Twain | Man! I Feel Like a Woman! | us=77 uk=47 au=44 pv=6093 from=CAN
+1999 | Ann Lee | 2 Times | us=- uk=21 au=20 pv=1546 from=GBR
+1999 | Lonestar | Amazed | us=8 uk=- au=49 pv=2987 from=USA
+1999 | Monica | Angel of Mine | us=3 uk=- au=57 pv=2843 from=USA

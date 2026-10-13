@@ -1,45 +1,62 @@
 {
- "dropped": [],
+ "dropped": [
+  "NO MATCH  1980 Pink Floyd — Another Brick in the Wall, Part II",
+  "NO MATCH  1981 Stars on 45 — Stars on 45 Medley",
+  "YEAR 1981 vs apple 2013  Dr Hook — Girls Can Get It  [Rising + Players In the Dark]",
+  "YEAR 1981 vs apple 1983  The Tweets — The Birdie Song (Birdie Dance)  [The Tweets (Extended Edition)]",
+  "NO MATCH  1981 Sheena Easton — Nine to Five (Morning Train)",
+  "YEAR 1982 vs apple 1985  Renée and Renato — Save Your Love  [Save Your Love]",
+  "YEAR 1984 vs apple 2005  Jim Diamond — I Should Have Known Better  [Blue Shoes]",
+  "NO MATCH  1987 Terence Trent D'Arby — Wishing Well",
+  "NO MATCH  1988 Terence Trent D'Arby — Sign Your Name",
+  "YEAR 1989 vs apple 2000  Jive Bunny and the Mastermixers — Swing the Mood  [Jive Bunny And The Mastermixers The Biggest Party On The Planet]",
+  "SAME TITLE  1985 Huey Lewis and the News — The Power of Love (kept the Jennifer Rush song)"
+ ],
  "offby": [
   "1980 apple 1980 (earliest original 1969)  Kool & The Gang — Celebration  [Celebrate!]",
-  "1982 apple 1982 (earliest original 1974)  Dexys Midnight Runners — Come On Eileen  [Too Rye Ay]",
+  "1980 apple 1980 (earliest original 1976)  Leo Sayer — More Than I Can Say  [Play Soft Rock]",
+  "1980 apple 1979 (earliest original 1979)  KC and the Sunshine Band — Please Don't Go  [Do You Wanna Go Party]",
+  "1980 apple 1979 (earliest original 1979)  The Spinners — Working My Way Back to You/Forgive Me, Girl  [Smooth & Sweet: The Spinners]",
+  "1980 apple 1979 (earliest original 1979)  Kenny Rogers — Coward of the County  [Kenny]",
+  "1980 apple 1980 (earliest original 1972)  Don McLean — Crying  [Favorites & Rarities]",
+  "1980 apple 1979 (earliest original 1979)  Rupert Holmes — Escape (The Piña Colada Song)  [Partners In Crime]",
+  "1980 apple 1979 (earliest original 1979)  Rocky Burnette — Tired of Toein' the Line  [Tired of Toein' the Line - Single]",
+  "1981 apple 1981 (earliest original 1973)  Earth, Wind & Fire — Let's Groove  [Raise!]",
   "1982 apple 1982 (earliest original 1966)  Michael Jackson — Billie Jean  [Thriller]",
+  "1982 apple 1982 (earliest original 1974)  Dexys Midnight Runners — Come On Eileen  [Too Rye Ay]",
+  "1982 apple 1982 (earliest original 1977)  Charlene — I've Never Been to Me  [25 Best Hits of the 80's]",
+  "1981 apple 1981 (earliest original 1978)  Foreigner — Waiting for a Girl Like You  [40]",
+  "1981 apple 1981 (earliest original 1961)  Rod Stewart — Young Turks  [Tonight I'm Yours (Bonus Track Version)]",
+  "1982 apple 1983 (earliest original 1983)  The Stranglers — Golden Brown  [La folie]",
+  "1983 apple 1982 (earliest original -)  Joe Cocker and Jennifer Warnes — Up Where We Belong  [20th Century Masters - The Millennium Collection: The Best of Joe Cocker]",
+  "1983 apple 1983 (earliest original 1981)  Duran Duran — Is There Something I Should Know?  [Duran Duran]",
+  "1983 apple 1984 (earliest original 1984)  The Flying Pickets — Only You  [Lost Boys]",
   "1984 apple 1984 (earliest original 1977)  Foreigner — I Want to Know What Love Is  [Agent Provocateur]",
   "1985 apple 1985 (earliest original 1978)  Dire Straits — Money for Nothing  [Brothers in Arms (40th Anniversary)]",
-  "1985 apple 1985 (earliest original 1972)  Dionne Warwick — That's What Friends Are For  [Friends]"
+  "1985 apple 1985 (earliest original 1972)  Dionne Warwick — That's What Friends Are For  [Friends]",
+  "1985 apple 1985 (earliest original 1983)  Dead or Alive — You Spin Me Round (Like a Record)  [Stranger Things: Soundtrack from the Netflix Series, Season 4]",
+  "1985 apple 1985 (earliest original 1983)  Katrina and the Waves — Walking on Sunshine  [Katrina and the Waves]",
+  "1986 apple 1986 (earliest original 1981)  Kim Wilde — You Keep Me Hangin' On  [Another Step]",
+  "1986 apple 1986 (earliest original 1984)  Nu Shooz — I Can't Wait  [Poolside]",
+  "1987 apple 1987 (earliest original 1970)  Michael Jackson — I Just Can't Stop Loving You  [Bad]",
+  "1988 apple 1987 (earliest original 1986)  Salt-n-Pepa — Push It  [20 #1's: Party Hits]",
+  "1987 apple 1987 (earliest original 1980)  Eric Carmen — Hungry Eyes  [Dirty Dancing (Original Motion Picture Soundtrack)]",
+  "1987 apple 1987 (earliest original 1985)  Sabrina — Boys (Summertime Love)  [Boys (Summertime Love) - Single]",
+  "1988 apple 1987 (earliest original -)  Wet Wet Wet — With a Little Help from My Friends  [End of Part One - Their Greatest Hits]",
+  "1989 apple 1989 (earliest original 1984)  The B-52's — Love Shack  [Time Capsule]",
+  "1989 apple 1989 (earliest original 1985)  Simply Red — If You Don't Know Me by Now  [A New Flame (Expanded Version)]",
+  "1989 apple 1989 (earliest original 1966)  Billy Joel — We Didn't Start the Fire  [Storm Front]"
  ],
  "items": [
-  {
-   "id": "call-me-blondie",
-   "appleYear": 1980,
-   "album": "Call Me - EP",
-   "appleArtist": "Blondie",
-   "appleTitle": "Call Me",
-   "year": 1980
-  },
-  {
-   "id": "another-one-bites-the-dust-queen",
-   "appleYear": 1980,
-   "album": "The Game (Deluxe Edition)",
-   "appleArtist": "Queen",
-   "appleTitle": "Another One Bites The Dust",
-   "year": 1980
-  },
   {
    "id": "crazy-little-thing-called-love-queen",
    "appleYear": 1979,
    "album": "The Game (Deluxe Edition)",
    "appleArtist": "Queen",
    "appleTitle": "Crazy Little Thing Called Love",
-   "year": 1979
-  },
-  {
-   "id": "magic-olivia-newton-john",
-   "appleYear": 1980,
-   "album": "Xanadu (From the Original Motion Picture Soundtrack)",
-   "appleArtist": "Olivia Newton-John",
-   "appleTitle": "Magic",
-   "year": 1980
+   "store": "US",
+   "year": 1979,
+   "d": 1
   },
   {
    "id": "rock-with-you-michael-jackson",
@@ -47,7 +64,9 @@
    "album": "Off the Wall",
    "appleArtist": "Michael Jackson",
    "appleTitle": "Rock with You (Single Version)",
-   "year": 1979
+   "store": "US",
+   "year": 1979,
+   "d": 1
   },
   {
    "id": "funkytown-lipps-inc",
@@ -55,55 +74,19 @@
    "album": "Body By Jake: Sweating Disco Dance Party (BPM 108-128)",
    "appleArtist": "Lipps, Inc.",
    "appleTitle": "Funkytown (Sweating Disco Dance Party)",
-   "year": 1980
+   "store": "US",
+   "year": 1980,
+   "d": 1
   },
   {
-   "id": "back-in-black-ac-dc",
+   "id": "call-me-blondie",
    "appleYear": 1980,
-   "album": "Back In Black",
-   "appleArtist": "AC/DC",
-   "appleTitle": "Back In Black",
-   "year": 1980
-  },
-  {
-   "id": "bette-davis-eyes-kim-carnes",
-   "appleYear": 1981,
-   "album": "Mistaken Identity",
-   "appleArtist": "Kim Carnes",
-   "appleTitle": "Bette Davis Eyes",
-   "year": 1981
-  },
-  {
-   "id": "endless-love-diana-ross-and-lionel-richie",
-   "appleYear": 1981,
-   "album": "To Love Again (Expanded Edition)",
-   "appleArtist": "Lionel Richie & Diana Ross",
-   "appleTitle": "Endless Love (From \"The Endless Love\" Soundtrack)",
-   "year": 1981
-  },
-  {
-   "id": "lady-kenny-rogers",
-   "appleYear": 1980,
-   "album": "Throwback Tunes: 1980",
-   "appleArtist": "Kenny Rogers",
-   "appleTitle": "Lady",
-   "year": 1980
-  },
-  {
-   "id": "jessies-girl-rick-springfield",
-   "appleYear": 1981,
-   "album": "Working Class Dog",
-   "appleArtist": "Rick Springfield",
-   "appleTitle": "Jessie's Girl",
-   "year": 1981
-  },
-  {
-   "id": "celebration-kool-and-the-gang",
-   "appleYear": 1980,
-   "album": "Celebrate!",
-   "appleArtist": "Kool & The Gang",
-   "appleTitle": "Celebration (Single Version)",
-   "year": 1980
+   "album": "Call Me - EP",
+   "appleArtist": "Blondie",
+   "appleTitle": "Call Me",
+   "store": "US",
+   "year": 1980,
+   "d": 1
   },
   {
    "id": "9-to-5-dolly-parton",
@@ -111,15 +94,239 @@
    "album": "9 to 5 and Odd Jobs",
    "appleArtist": "Dolly Parton",
    "appleTitle": "9 to 5",
-   "year": 1980
+   "store": "US",
+   "year": 1980,
+   "d": 1
   },
   {
-   "id": "dont-stop-believin-journey",
-   "appleYear": 1981,
-   "album": "Escape (2022 Remaster)",
-   "appleArtist": "Journey",
-   "appleTitle": "Don't Stop Believin'  (2022 Remaster)",
-   "year": 1981
+   "id": "celebration-kool-and-the-gang",
+   "appleYear": 1980,
+   "album": "Celebrate!",
+   "appleArtist": "Kool & The Gang",
+   "appleTitle": "Celebration (Single Version)",
+   "store": "US",
+   "year": 1980,
+   "d": 1
+  },
+  {
+   "id": "lady-kenny-rogers",
+   "appleYear": 1980,
+   "album": "Throwback Tunes: 1980",
+   "appleArtist": "Kenny Rogers",
+   "appleTitle": "Lady",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "magic-olivia-newton-john",
+   "appleYear": 1980,
+   "album": "Xanadu (From the Original Motion Picture Soundtrack)",
+   "appleArtist": "Olivia Newton-John",
+   "appleTitle": "Magic",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "another-one-bites-the-dust-queen",
+   "appleYear": 1980,
+   "album": "The Game (Deluxe Edition)",
+   "appleArtist": "Queen",
+   "appleTitle": "Another One Bites The Dust",
+   "store": "US",
+   "year": 1980,
+   "d": 1
+  },
+  {
+   "id": "back-in-black-ac-dc",
+   "appleYear": 1980,
+   "album": "Back In Black",
+   "appleArtist": "AC/DC",
+   "appleTitle": "Back In Black",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "upside-down-diana-ross",
+   "appleYear": 1980,
+   "album": "Diana (Deluxe Edition)",
+   "appleArtist": "Diana Ross",
+   "appleTitle": "Upside Down",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "just-like-starting-over-john-lennon",
+   "appleYear": 1980,
+   "album": "Double Fantasy",
+   "appleArtist": "John Lennon",
+   "appleTitle": "(Just Like) Starting Over",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "woman-in-love-barbra-streisand",
+   "appleYear": 1980,
+   "album": "Guilty",
+   "appleArtist": "Barbra Streisand",
+   "appleTitle": "Woman In Love",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "brass-in-pocket-the-pretenders",
+   "appleYear": 1980,
+   "album": "The Singles",
+   "appleArtist": "Pretenders",
+   "appleTitle": "Brass in Pocket (2018 Remaster)",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "the-tide-is-high-blondie",
+   "appleYear": 1980,
+   "album": "The Tide Is High - Single",
+   "appleArtist": "Blondie",
+   "appleTitle": "The Tide Is High",
+   "store": "US",
+   "year": 1980,
+   "d": 1
+  },
+  {
+   "id": "the-winner-takes-it-all-abba",
+   "appleYear": 1980,
+   "album": "Super Trouper (Bonus Track Version)",
+   "appleArtist": "ABBA",
+   "appleTitle": "The Winner Takes It All",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "coming-up-paul-mccartney",
+   "appleYear": 1980,
+   "album": "Pure McCartney",
+   "appleArtist": "Paul McCartney",
+   "appleTitle": "Coming Up",
+   "store": "US",
+   "year": 1980,
+   "d": 1
+  },
+  {
+   "id": "more-than-i-can-say-leo-sayer",
+   "appleYear": 1980,
+   "album": "Play Soft Rock",
+   "appleArtist": "Leo Sayer",
+   "appleTitle": "More Than I Can Say",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "please-dont-go-kc-and-the-sunshine-band",
+   "appleYear": 1979,
+   "album": "Do You Wanna Go Party",
+   "appleArtist": "KC and the Sunshine Band",
+   "appleTitle": "Please Don't Go",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "ashes-to-ashes-david-bowie",
+   "appleYear": 1980,
+   "album": "Leto (Original Motion Picture Soundtrack)",
+   "appleArtist": "David Bowie",
+   "appleTitle": "Ashes To Ashes",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "working-my-way-back-to-you-forgive-me-girl-the-spinners",
+   "appleYear": 1979,
+   "album": "Smooth & Sweet: The Spinners",
+   "appleArtist": "The Spinners",
+   "appleTitle": "Working My Way Back to You / Forgive Me, Girl",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "turning-japanese-the-vapors",
+   "appleYear": 1980,
+   "album": "New Clear Days",
+   "appleArtist": "The Vapors",
+   "appleTitle": "Turning Japanese (Non Stop Edit)",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "coward-of-the-county-kenny-rogers",
+   "appleYear": 1979,
+   "album": "Kenny",
+   "appleArtist": "Kenny Rogers",
+   "appleTitle": "Coward of the County",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "crying-don-mclean",
+   "appleYear": 1980,
+   "album": "Favorites & Rarities",
+   "appleArtist": "Don Mclean",
+   "appleTitle": "Crying In the Chapel",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "dont-stand-so-close-to-me-the-police",
+   "appleYear": 1980,
+   "album": "iTunes Originals: Sting",
+   "appleArtist": "The Police",
+   "appleTitle": "Don't Stand So Close to Me",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "fame-irene-cara",
+   "appleYear": 1980,
+   "album": "Fame (Original Motion Picture Soundtrack)",
+   "appleArtist": "Irene Cara",
+   "appleTitle": "Fame",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "escape-the-pina-colada-song-rupert-holmes",
+   "appleYear": 1979,
+   "album": "Partners In Crime",
+   "appleArtist": "Rupert Holmes",
+   "appleTitle": "Escape (The Pina Colada Song)",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "tired-of-toein-the-line-rocky-burnette",
+   "appleYear": 1979,
+   "album": "Tired of Toein' the Line - Single",
+   "appleArtist": "Rocky Burnette",
+   "appleTitle": "Tired of Toein' the Line",
+   "store": "US",
+   "year": 1980,
+   "d": 2
   },
   {
    "id": "tainted-love-soft-cell",
@@ -127,7 +334,29 @@
    "album": "Tainted Love / Where Did Our Love Go - Single",
    "appleArtist": "Soft Cell",
    "appleTitle": "Tainted Love",
-   "year": 1981
+   "store": "US",
+   "year": 1981,
+   "d": 1
+  },
+  {
+   "id": "endless-love-diana-ross-and-lionel-richie",
+   "appleYear": 1981,
+   "album": "To Love Again (Expanded Edition)",
+   "appleArtist": "Lionel Richie & Diana Ross",
+   "appleTitle": "Endless Love (From \"The Endless Love\" Soundtrack)",
+   "store": "US",
+   "year": 1981,
+   "d": 1
+  },
+  {
+   "id": "bette-davis-eyes-kim-carnes",
+   "appleYear": 1981,
+   "album": "Mistaken Identity",
+   "appleArtist": "Kim Carnes",
+   "appleTitle": "Bette Davis Eyes",
+   "store": "US",
+   "year": 1981,
+   "d": 1
   },
   {
    "id": "dont-you-want-me-the-human-league",
@@ -135,23 +364,9 @@
    "album": "Dare",
    "appleArtist": "The Human League",
    "appleTitle": "Don't You Want Me",
-   "year": 1981
-  },
-  {
-   "id": "physical-olivia-newton-john",
-   "appleYear": 1981,
-   "album": "Physical (Deluxe Edition) [Remastered 2021]",
-   "appleArtist": "Olivia Newton-John",
-   "appleTitle": "Physical (Remastered 2021)",
-   "year": 1981
-  },
-  {
-   "id": "eye-of-the-tiger-survivor",
-   "appleYear": 1982,
-   "album": "Eye of the Tiger (Remastered)",
-   "appleArtist": "Survivor",
-   "appleTitle": "Eye of the Tiger",
-   "year": 1982
+   "store": "US",
+   "year": 1981,
+   "d": 1
   },
   {
    "id": "i-love-rock-n-roll-joan-jett-and-the-blackhearts",
@@ -159,47 +374,190 @@
    "album": "I Love Rock 'N' Roll (Expanded Edition)",
    "appleArtist": "Joan Jett & The Blackhearts",
    "appleTitle": "I Love Rock 'N Roll",
-   "year": 1981
+   "store": "US",
+   "year": 1981,
+   "d": 1
   },
   {
-   "id": "ebony-and-ivory-paul-mccartney-and-stevie-wonder",
-   "appleYear": 1982,
-   "album": "All the Best!",
-   "appleArtist": "Paul McCartney & Stevie Wonder",
-   "appleTitle": "Ebony and Ivory",
-   "year": 1982
+   "id": "jessies-girl-rick-springfield",
+   "appleYear": 1981,
+   "album": "Working Class Dog",
+   "appleArtist": "Rick Springfield",
+   "appleTitle": "Jessie's Girl",
+   "store": "US",
+   "year": 1981,
+   "d": 1
   },
   {
-   "id": "jack-and-diane-john-cougar",
-   "appleYear": 1982,
-   "album": "NOW That's What I Call Rock Anthems",
-   "appleArtist": "John Mellencamp",
-   "appleTitle": "Jack & Diane",
-   "year": 1982
+   "id": "physical-olivia-newton-john",
+   "appleYear": 1981,
+   "album": "Physical (Deluxe Edition) [Remastered 2021]",
+   "appleArtist": "Olivia Newton-John",
+   "appleTitle": "Physical (Remastered 2021)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 1981,
+   "d": 2
   },
   {
-   "id": "come-on-eileen-dexys-midnight-runners",
-   "appleYear": 1982,
-   "album": "Too Rye Ay",
-   "appleArtist": "Dexys Midnight Runners",
-   "appleTitle": "Come On Eileen",
-   "year": 1982
+   "id": "dont-stop-believin-journey",
+   "appleYear": 1981,
+   "album": "Time3",
+   "appleArtist": "Journey",
+   "appleTitle": "Don't Stop Believin'",
+   "store": "US",
+   "year": 1981,
+   "d": 1
   },
   {
-   "id": "africa-toto",
-   "appleYear": 1982,
-   "album": "Toto IV",
-   "appleArtist": "Toto",
-   "appleTitle": "Africa",
-   "year": 1982
+   "id": "kids-in-america-kim-wilde",
+   "appleYear": 1981,
+   "album": "Kim Wilde",
+   "appleArtist": "Kim Wilde",
+   "appleTitle": "Kids In America",
+   "store": "US",
+   "year": 1981,
+   "d": 1
   },
   {
-   "id": "every-breath-you-take-the-police",
-   "appleYear": 1983,
-   "album": "Synchronicity (Remastered 2003)",
-   "appleArtist": "The Police",
-   "appleTitle": "Every Breath You Take (Remastered 2003)",
-   "year": 1983
+   "id": "jealous-guy-roxy-music",
+   "appleYear": 1981,
+   "album": "The Best of Roxy Music",
+   "appleArtist": "Roxy Music",
+   "appleTitle": "Jealous Guy",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "in-the-air-tonight-phil-collins",
+   "appleYear": 1981,
+   "album": "Face Value (Deluxe Edition)",
+   "appleArtist": "Phil Collins",
+   "appleTitle": "In the Air Tonight",
+   "store": "US",
+   "year": 1981,
+   "d": 1
+  },
+  {
+   "id": "keep-on-loving-you-reo-speedwagon",
+   "appleYear": 1980,
+   "album": "Hi Infidelity (30th Anniversary Edition)",
+   "appleArtist": "REO Speedwagon",
+   "appleTitle": "Keep On Loving You",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "this-ole-house-shakin-stevens",
+   "appleYear": 1981,
+   "album": "Singled Out",
+   "appleArtist": "Shakin' Stevens",
+   "appleTitle": "This Ole House",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "who-can-it-be-now-men-at-work",
+   "appleYear": 1981,
+   "album": "Business As Usual",
+   "appleArtist": "Men At Work",
+   "appleTitle": "Who Can It Be Now?",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "woman-john-lennon",
+   "appleYear": 1980,
+   "album": "Double Fantasy",
+   "appleArtist": "John Lennon",
+   "appleTitle": "Woman (Remastered 2010)",
+   "store": "US",
+   "year": 1980,
+   "d": 2
+  },
+  {
+   "id": "being-with-you-smokey-robinson",
+   "appleYear": 1981,
+   "album": "Being With You",
+   "appleArtist": "Smokey Robinson",
+   "appleTitle": "Being With You",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "antmusic-adam-and-the-ants",
+   "appleYear": 1981,
+   "album": "The Essential 80s Rock",
+   "appleArtist": "Adam & The Ants",
+   "appleTitle": "Antmusic",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "you-drive-me-crazy-shakin-stevens",
+   "appleYear": 1981,
+   "album": "Singled Out",
+   "appleArtist": "Shakin' Stevens",
+   "appleTitle": "You Drive Me Crazy",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "lets-groove-earth-wind-and-fire",
+   "appleYear": 1981,
+   "album": "Raise!",
+   "appleArtist": "Earth, Wind & Fire",
+   "appleTitle": "Let's Groove",
+   "store": "US",
+   "year": 1981,
+   "d": 3
+  },
+  {
+   "id": "hooked-on-classics-royal-philharmonic-orchestra",
+   "appleYear": 1981,
+   "album": "Hooked On Music",
+   "appleArtist": "Louis Clark & Royal Philharmonic Orchestra",
+   "appleTitle": "Hooked On Classics (Parts 1 & 2)",
+   "store": "US",
+   "year": 1981,
+   "d": 3
+  },
+  {
+   "id": "rapture-blondie",
+   "appleYear": 1981,
+   "album": "The Best of Blondie",
+   "appleArtist": "Blondie",
+   "appleTitle": "Rapture",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "just-the-two-of-us-grover-washington-jr-and-bill-withers",
+   "appleYear": 1981,
+   "album": "The Best Of Bill Withers: Lean On Me",
+   "appleArtist": "Grover Washington, Jr. with Bill Withers",
+   "appleTitle": "Just the Two of Us",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "vienna-ultravox",
+   "appleYear": 1980,
+   "album": "Vienna [Deluxe Edition: 40th Anniversary",
+   "appleArtist": "Ultravox",
+   "appleTitle": "Vienna",
+   "store": "US",
+   "year": 1980,
+   "d": 2
   },
   {
    "id": "billie-jean-michael-jackson",
@@ -207,15 +565,29 @@
    "album": "Thriller",
    "appleArtist": "Michael Jackson",
    "appleTitle": "Billie Jean",
-   "year": 1982
+   "store": "US",
+   "year": 1982,
+   "d": 1
   },
   {
-   "id": "flashdance-what-a-feeling-irene-cara",
-   "appleYear": 1983,
-   "album": "What a Feeling - EP",
-   "appleArtist": "Irene Cara",
-   "appleTitle": "Flashdance...What a Feeling",
-   "year": 1983
+   "id": "eye-of-the-tiger-survivor",
+   "appleYear": 1982,
+   "album": "Rocky IV (Original Motion Picture Soundtrack)",
+   "appleArtist": "Survivor",
+   "appleTitle": "Eye of the Tiger",
+   "store": "US",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "come-on-eileen-dexys-midnight-runners",
+   "appleYear": 1982,
+   "album": "Too Rye Ay",
+   "appleArtist": "Dexys Midnight Runners",
+   "appleTitle": "Come On Eileen",
+   "store": "US",
+   "year": 1982,
+   "d": 1
   },
   {
    "id": "beat-it-michael-jackson",
@@ -223,7 +595,229 @@
    "album": "Thriller",
    "appleArtist": "Michael Jackson",
    "appleTitle": "Beat It",
-   "year": 1982
+   "store": "US",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "ebony-and-ivory-paul-mccartney-and-stevie-wonder",
+   "appleYear": 1982,
+   "album": "All the Best!",
+   "appleArtist": "Paul McCartney & Stevie Wonder",
+   "appleTitle": "Ebony and Ivory",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "africa-toto",
+   "appleYear": 1982,
+   "album": "Toto IV",
+   "appleArtist": "Toto",
+   "appleTitle": "Africa",
+   "store": "US",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "jack-and-diane-john-cougar",
+   "appleYear": 1982,
+   "album": "NOW That's What I Call Rock Anthems",
+   "appleArtist": "John Mellencamp",
+   "appleTitle": "Jack & Diane",
+   "store": "GB",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "down-under-men-at-work",
+   "appleYear": 1982,
+   "album": "The Works",
+   "appleArtist": "Men At Work",
+   "appleTitle": "Down Under",
+   "store": "US",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "hard-to-say-im-sorry-chicago",
+   "appleYear": 1982,
+   "album": "Chicago 16 (Expanded)",
+   "appleArtist": "Chicago",
+   "appleTitle": "Hard to Say I'm Sorry (Single Edit Version)",
+   "store": "US",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "mickey-toni-basil",
+   "appleYear": 1982,
+   "album": "Mickey (Spanish Version) - Single",
+   "appleArtist": "Toni Basil",
+   "appleTitle": "Mickey (Spanish Version)",
+   "store": "US",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "centerfold-the-j-geils-band",
+   "appleYear": 1981,
+   "album": "Freeze Frame",
+   "appleArtist": "The J. Geils Band",
+   "appleTitle": "Centerfold",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "do-you-really-want-to-hurt-me-culture-club",
+   "appleYear": 1982,
+   "album": "Kissing to Be Clever",
+   "appleArtist": "Culture Club",
+   "appleTitle": "Do You Really Want to Hurt Me",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "abracadabra-steve-miller-band",
+   "appleYear": 1982,
+   "album": "Welcome to the Vault",
+   "appleArtist": "Steve Miller Band",
+   "appleTitle": "Abracadabra",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "ive-never-been-to-me-charlene",
+   "appleYear": 1982,
+   "album": "25 Best Hits of the 80's",
+   "appleArtist": "Charlene",
+   "appleTitle": "I've Never Been to Me",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "heartbreaker-dionne-warwick",
+   "appleYear": 1982,
+   "album": "Heartbreaker",
+   "appleArtist": "Dionne Warwick",
+   "appleTitle": "Heartbreaker",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "hurts-so-good-john-cougar",
+   "appleYear": 1982,
+   "album": "The Best That I Could Do: 1978-1988",
+   "appleArtist": "John Cougar",
+   "appleTitle": "Hurts So Good",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "waiting-for-a-girl-like-you-foreigner",
+   "appleYear": 1981,
+   "album": "40",
+   "appleArtist": "Foreigner",
+   "appleTitle": "Waiting for a Girl Like You (Radio Edit)",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "key-largo-bertie-higgins",
+   "appleYear": 1982,
+   "album": "Just Another Day in Paradise",
+   "appleArtist": "Bertie Higgins",
+   "appleTitle": "Key Largo",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "gloria-laura-branigan",
+   "appleYear": 1982,
+   "album": "Branigan",
+   "appleArtist": "Laura Branigan",
+   "appleTitle": "Gloria (Single Version)",
+   "store": "US",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "hungry-like-the-wolf-duran-duran",
+   "appleYear": 1982,
+   "album": "Rio (Collectors Edition)",
+   "appleArtist": "Duran Duran",
+   "appleTitle": "Hungry Like the Wolf",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "the-lion-sleeps-tonight-tight-fit",
+   "appleYear": 1982,
+   "album": "The Best Year of My Life: 1982",
+   "appleArtist": "Tight Fit",
+   "appleTitle": "The Lion Sleeps Tonight",
+   "store": "GB",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "young-turks-rod-stewart",
+   "appleYear": 1981,
+   "album": "Tonight I'm Yours (Bonus Track Version)",
+   "appleArtist": "Rod Stewart",
+   "appleTitle": "Young Turks",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "our-lips-are-sealed-the-go-gos",
+   "appleYear": 1981,
+   "album": "Beauty and the Beat",
+   "appleArtist": "The Go-Go's",
+   "appleTitle": "Our Lips Are Sealed",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "trouble-lindsey-buckingham",
+   "appleYear": 1981,
+   "album": "Law and Order",
+   "appleArtist": "Lindsey Buckingham",
+   "appleTitle": "Trouble",
+   "store": "US",
+   "year": 1981,
+   "d": 2
+  },
+  {
+   "id": "golden-brown-the-stranglers",
+   "appleYear": 1983,
+   "album": "La folie",
+   "appleArtist": "The Stranglers",
+   "appleTitle": "Golden Brown",
+   "store": "US",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "i-ran-so-far-away-a-flock-of-seagulls",
+   "appleYear": 1982,
+   "album": "A Flock of Seagulls (Deluxe)",
+   "appleArtist": "A Flock of Seagulls",
+   "appleTitle": "I Ran (So Far Away) [Single Edit]",
+   "store": "US",
+   "year": 1982,
+   "d": 2
   },
   {
    "id": "total-eclipse-of-the-heart-bonnie-tyler",
@@ -231,15 +825,19 @@
    "album": "Faster Than the Speed of Night",
    "appleArtist": "Bonnie Tyler",
    "appleTitle": "Total Eclipse of the Heart",
-   "year": 1983
+   "store": "US",
+   "year": 1983,
+   "d": 1
   },
   {
-   "id": "sweet-dreams-are-made-of-this-eurythmics",
+   "id": "every-breath-you-take-the-police",
    "appleYear": 1983,
-   "album": "Sweet Dreams (Are Made of This)",
-   "appleArtist": "Eurythmics",
-   "appleTitle": "Sweet Dreams (Are Made of This)",
-   "year": 1983
+   "album": "Synchronicity (Remastered 2003)",
+   "appleArtist": "The Police",
+   "appleTitle": "Every Breath You Take (Remastered 2003)",
+   "store": "US",
+   "year": 1983,
+   "d": 1
   },
   {
    "id": "karma-chameleon-culture-club",
@@ -247,7 +845,19 @@
    "album": "Colour By Numbers",
    "appleArtist": "Culture Club",
    "appleTitle": "Karma Chameleon",
-   "year": 1983
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "flashdance-what-a-feeling-irene-cara",
+   "appleYear": 1983,
+   "album": "What a Feeling - EP",
+   "appleArtist": "Irene Cara",
+   "appleTitle": "Flashdance...What a Feeling",
+   "store": "US",
+   "year": 1983,
+   "d": 1
   },
   {
    "id": "girls-just-want-to-have-fun-cyndi-lauper",
@@ -255,23 +865,19 @@
    "album": "She's So Unusual",
    "appleArtist": "Cyndi Lauper",
    "appleTitle": "Girls Just Want to Have Fun",
-   "year": 1983
+   "store": "US",
+   "year": 1983,
+   "d": 1
   },
   {
-   "id": "when-doves-cry-prince",
-   "appleYear": 1984,
-   "album": "Purple Rain",
-   "appleArtist": "Prince & The Revolution",
-   "appleTitle": "When Doves Cry",
-   "year": 1984
-  },
-  {
-   "id": "whats-love-got-to-do-with-it-tina-turner",
-   "appleYear": 1984,
-   "album": "Love Songs",
-   "appleArtist": "Tina Turner",
-   "appleTitle": "What's Love Got to Do with It",
-   "year": 1984
+   "id": "sweet-dreams-are-made-of-this-eurythmics",
+   "appleYear": 1983,
+   "album": "Sweet Dreams (Are Made of This)",
+   "appleArtist": "Eurythmics",
+   "appleTitle": "Sweet Dreams (Are Made of This)",
+   "store": "US",
+   "year": 1983,
+   "d": 1
   },
   {
    "id": "jump-van-halen",
@@ -279,39 +885,209 @@
    "album": "1984",
    "appleArtist": "Van Halen",
    "appleTitle": "Jump",
-   "year": 1983
+   "store": "US",
+   "year": 1983,
+   "d": 1
   },
   {
-   "id": "footloose-kenny-loggins",
-   "appleYear": 1984,
-   "album": "Footloose (Original Motion Picture Soundtrack)",
-   "appleArtist": "Kenny Loggins",
-   "appleTitle": "Footloose",
-   "year": 1984
+   "id": "lets-dance-david-bowie",
+   "appleYear": 1983,
+   "album": "Let's Dance - Single",
+   "appleArtist": "David Bowie",
+   "appleTitle": "Let's Dance (Single Version)",
+   "store": "US",
+   "year": 1983,
+   "d": 1
   },
   {
-   "id": "ghostbusters-ray-parker-jr",
-   "appleYear": 1984,
-   "album": "Ghostbusters (Original Motion Picture Soundtrack)",
-   "appleArtist": "Ray Parker Jr.",
-   "appleTitle": "Ghostbusters",
-   "year": 1984
+   "id": "all-night-long-all-night-lionel-richie",
+   "appleYear": 1983,
+   "album": "Can't Slow Down",
+   "appleArtist": "Lionel Richie",
+   "appleTitle": "All Night Long (All Night)",
+   "store": "US",
+   "year": 1983,
+   "d": 2
   },
   {
-   "id": "like-a-virgin-madonna",
-   "appleYear": 1984,
-   "album": "Like a Virgin",
-   "appleArtist": "Madonna",
-   "appleTitle": "Like a Virgin",
-   "year": 1984
+   "id": "you-cant-hurry-love-phil-collins",
+   "appleYear": 1982,
+   "album": "Hello, I Must Be Going! (Deluxe Edition)",
+   "appleArtist": "Phil Collins",
+   "appleTitle": "You Can't Hurry Love",
+   "store": "US",
+   "year": 1982,
+   "d": 2
   },
   {
-   "id": "wake-me-up-before-you-go-go-wham",
+   "id": "electric-avenue-eddy-grant",
+   "appleYear": 1982,
+   "album": "Killer on the Rampage",
+   "appleArtist": "Eddy Grant",
+   "appleTitle": "Electric Avenue",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "1999-prince",
+   "appleYear": 1982,
+   "album": "1999 (2019 Remaster)",
+   "appleArtist": "Prince",
+   "appleTitle": "1999",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "say-say-say-paul-mccartney-and-michael-jackson",
+   "appleYear": 1983,
+   "album": "All the Best!",
+   "appleArtist": "Paul McCartney & Michael Jackson",
+   "appleTitle": "Say Say Say",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "give-it-up-kc-and-the-sunshine-band",
+   "appleYear": 1982,
+   "album": "All In a Night's Work (Expanded Version)",
+   "appleArtist": "KC and the Sunshine Band",
+   "appleTitle": "Give It Up",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "up-where-we-belong-joe-cocker-and-jennifer-warnes",
+   "appleYear": 1982,
+   "album": "20th Century Masters - The Millennium Collection: The Best of Joe Cocker",
+   "appleArtist": "Joe Cocker & Jennifer Warnes",
+   "appleTitle": "Up Where We Belong (From \"An Officer and a Gentleman\")",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "im-still-standing-elton-john",
+   "appleYear": 1983,
+   "album": "Too Low For Zero (Bonus Track Version)",
+   "appleArtist": "Elton John",
+   "appleTitle": "I'm Still Standing",
+   "store": "US",
+   "year": 1983,
+   "d": 2
+  },
+  {
+   "id": "uptown-girl-billy-joel",
+   "appleYear": 1983,
+   "album": "An Innocent Man",
+   "appleArtist": "Billy Joel",
+   "appleTitle": "Uptown Girl",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "hold-me-now-thompson-twins",
+   "appleYear": 1983,
+   "album": "Arista Heritage Series: Thompson Twins",
+   "appleArtist": "Thompson Twins",
+   "appleTitle": "Hold Me Now",
+   "store": "US",
+   "year": 1983,
+   "d": 3
+  },
+  {
+   "id": "too-shy-kajagoogoo",
+   "appleYear": 1982,
+   "album": "Too Shy - EP",
+   "appleArtist": "Kajagoogoo",
+   "appleTitle": "Too Shy (Extended Version)",
+   "store": "US",
+   "year": 1982,
+   "d": 2
+  },
+  {
+   "id": "true-spandau-ballet",
+   "appleYear": 1983,
+   "album": "True - EP",
+   "appleArtist": "Spandau Ballet",
+   "appleTitle": "True",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "red-red-wine-ub40",
+   "appleYear": 1983,
+   "album": "Labour of Love",
+   "appleArtist": "UB40",
+   "appleTitle": "Red Red Wine (12'' Version)",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "blue-monday-new-order",
+   "appleYear": 1983,
+   "album": "Substance (2023 Expanded Reissue)",
+   "appleArtist": "New Order",
+   "appleTitle": "Blue Monday (2023 Digital Master)",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "keep-feeling-fascination-the-human-league",
+   "appleYear": 1983,
+   "album": "Fascination! - EP",
+   "appleArtist": "The Human League",
+   "appleTitle": "(Keep Feeling) Fascination (Extended Version)",
+   "store": "US",
+   "year": 1983,
+   "d": 3
+  },
+  {
+   "id": "is-there-something-i-should-know-duran-duran",
+   "appleYear": 1983,
+   "album": "Duran Duran",
+   "appleArtist": "Duran Duran",
+   "appleTitle": "Is There Something I Should Know?",
+   "store": "US",
+   "year": 1983,
+   "d": 2
+  },
+  {
+   "id": "only-you-the-flying-pickets",
    "appleYear": 1984,
-   "album": "Make It Big",
-   "appleArtist": "Wham!",
-   "appleTitle": "Wake Me Up Before You Go-Go",
-   "year": 1984
+   "album": "Lost Boys",
+   "appleArtist": "The Flying Pickets",
+   "appleTitle": "Only You",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "maniac-michael-sembello",
+   "appleYear": 1983,
+   "album": "Flashdance (Original Soundtrack from the Motion Picture)",
+   "appleArtist": "Michael Sembello",
+   "appleTitle": "Maniac",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "maneater-daryl-hall-and-john-oates",
+   "appleYear": 1982,
+   "album": "H2O",
+   "appleArtist": "Daryl Hall & John Oates",
+   "appleTitle": "Maneater",
+   "store": "US",
+   "year": 1982,
+   "d": 1
   },
   {
    "id": "careless-whisper-george-michael",
@@ -319,7 +1095,9 @@
    "album": "Ladies & Gentlemen",
    "appleArtist": "George Michael",
    "appleTitle": "Careless Whisper",
-   "year": 1984
+   "store": "US",
+   "year": 1984,
+   "d": 1
   },
   {
    "id": "i-want-to-know-what-love-is-foreigner",
@@ -327,15 +1105,251 @@
    "album": "Agent Provocateur",
    "appleArtist": "Foreigner",
    "appleTitle": "I Want to Know What Love Is",
-   "year": 1984
+   "store": "US",
+   "year": 1984,
+   "d": 1
+  },
+  {
+   "id": "wake-me-up-before-you-go-go-wham",
+   "appleYear": 1984,
+   "album": "Make It Big",
+   "appleArtist": "Wham!",
+   "appleTitle": "Wake Me Up Before You Go-Go",
+   "store": "US",
+   "year": 1984,
+   "d": 1
+  },
+  {
+   "id": "ghostbusters-ray-parker-jr",
+   "appleYear": 1984,
+   "album": "Ghostbusters (Original Motion Picture Soundtrack)",
+   "appleArtist": "Ray Parker Jr.",
+   "appleTitle": "Ghostbusters",
+   "store": "US",
+   "year": 1984,
+   "d": 1
+  },
+  {
+   "id": "when-doves-cry-prince",
+   "appleYear": 1984,
+   "album": "Purple Rain",
+   "appleArtist": "Prince & The Revolution",
+   "appleTitle": "When Doves Cry",
+   "store": "US",
+   "year": 1984,
+   "d": 1
+  },
+  {
+   "id": "like-a-virgin-madonna",
+   "appleYear": 1984,
+   "album": "Like a Virgin",
+   "appleArtist": "Madonna",
+   "appleTitle": "Like a Virgin",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "whats-love-got-to-do-with-it-tina-turner",
+   "appleYear": 1984,
+   "album": "Love Songs",
+   "appleArtist": "Tina Turner",
+   "appleTitle": "What's Love Got to Do with It",
+   "store": "US",
+   "year": 1984,
+   "d": 1
   },
   {
    "id": "do-they-know-its-christmas-band-aid",
    "appleYear": 1984,
-   "album": "Do They Know It's Christmas? (2004 Version) - Single",
+   "album": "Do They Know Its Christmas? - Single",
    "appleArtist": "Band Aid",
-   "appleTitle": "Do They Know It's Christmas? (Original 1984 Version)",
-   "year": 1984
+   "appleTitle": "Do They Know It's Christmas?",
+   "store": "GB",
+   "year": 1984,
+   "d": 1
+  },
+  {
+   "id": "footloose-kenny-loggins",
+   "appleYear": 1984,
+   "album": "Footloose (Original Motion Picture Soundtrack)",
+   "appleArtist": "Kenny Loggins",
+   "appleTitle": "Footloose",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "hello-lionel-richie",
+   "appleYear": 1983,
+   "album": "Can't Slow Down",
+   "appleArtist": "Lionel Richie",
+   "appleTitle": "Hello",
+   "store": "US",
+   "year": 1983,
+   "d": 2
+  },
+  {
+   "id": "i-just-called-to-say-i-love-you-stevie-wonder",
+   "appleYear": 1984,
+   "album": "The Woman in Red (Original Motion Picture Soundtrack)",
+   "appleArtist": "Stevie Wonder",
+   "appleTitle": "I Just Called To Say I Love You",
+   "store": "US",
+   "year": 1984,
+   "d": 1
+  },
+  {
+   "id": "dancing-in-the-dark-bruce-springsteen",
+   "appleYear": 1984,
+   "album": "Born In the U.S.A.",
+   "appleArtist": "Bruce Springsteen",
+   "appleTitle": "Dancing In the Dark",
+   "store": "US",
+   "year": 1984,
+   "d": 1
+  },
+  {
+   "id": "against-all-odds-take-a-look-at-me-now-phil-collins",
+   "appleYear": 1984,
+   "album": "Against All Odds (Original Motion Picture Soundtrack)",
+   "appleArtist": "Phil Collins",
+   "appleTitle": "Against All Odds (Take a Look At Me Now)",
+   "store": "US",
+   "year": 1984,
+   "d": 1
+  },
+  {
+   "id": "relax-frankie-goes-to-hollywood",
+   "appleYear": 1984,
+   "album": "Maximum Joy",
+   "appleArtist": "Frankie Goes to Hollywood",
+   "appleTitle": "Relax (Club 69 Future Anthem Pt. 1)",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "99-luftballons-nena",
+   "appleYear": 1983,
+   "album": "99 Luftballons",
+   "appleArtist": "Nena",
+   "appleTitle": "99 Luftballons",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "i-feel-for-you-chaka-khan",
+   "appleYear": 1984,
+   "album": "I Feel for You",
+   "appleArtist": "Chaka Khan",
+   "appleTitle": "I Feel for You",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "time-after-time-cyndi-lauper",
+   "appleYear": 1984,
+   "album": "She's So Unusual: A 30th Anniversary Celebration (Deluxe Edition)",
+   "appleArtist": "Cyndi Lauper",
+   "appleTitle": "Time After Time",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "islands-in-the-stream-kenny-rogers-and-dolly-parton",
+   "appleYear": 1983,
+   "album": "Dolly",
+   "appleArtist": "Dolly Parton & Kenny Rogers",
+   "appleTitle": "Islands in the Stream",
+   "store": "US",
+   "year": 1983,
+   "d": 1
+  },
+  {
+   "id": "two-tribes-frankie-goes-to-hollywood",
+   "appleYear": 1984,
+   "album": "Welcome to the Pleasuredome",
+   "appleArtist": "Frankie Goes to Hollywood",
+   "appleTitle": "Two Tribes",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "self-control-laura-branigan",
+   "appleYear": 1984,
+   "album": "Self Control",
+   "appleArtist": "Laura Branigan",
+   "appleTitle": "Self Control",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "the-reflex-duran-duran",
+   "appleYear": 1983,
+   "album": "Seven and the Ragged Tiger",
+   "appleArtist": "Duran Duran",
+   "appleTitle": "The Reflex",
+   "store": "US",
+   "year": 1983,
+   "d": 2
+  },
+  {
+   "id": "thriller-michael-jackson",
+   "appleYear": 1982,
+   "album": "Thriller",
+   "appleArtist": "Michael Jackson",
+   "appleTitle": "Thriller",
+   "store": "US",
+   "year": 1982,
+   "d": 1
+  },
+  {
+   "id": "i-can-dream-about-you-dan-hartman",
+   "appleYear": 1984,
+   "album": "Streets of Fire",
+   "appleArtist": "Dan Hartman",
+   "appleTitle": "I Can Dream About You",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "break-my-stride-matthew-wilder",
+   "appleYear": 1983,
+   "album": "I Don't Speak the Language",
+   "appleArtist": "Matthew Wilder",
+   "appleTitle": "Break My Stride",
+   "store": "US",
+   "year": 1983,
+   "d": 2
+  },
+  {
+   "id": "lets-hear-it-for-the-boy-deniece-williams",
+   "appleYear": 1984,
+   "album": "Footloose (Original Motion Picture Soundtrack)",
+   "appleArtist": "Deniece Williams",
+   "appleTitle": "Let's Hear It for the Boy",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "last-christmas-wham",
+   "appleYear": 1984,
+   "album": "Last Christmas - Single",
+   "appleArtist": "Wham!",
+   "appleTitle": "Last Christmas (Single Version)",
+   "store": "US",
+   "year": 1984,
+   "d": 1
   },
   {
    "id": "we-are-the-world-usa-for-africa",
@@ -343,15 +1357,9 @@
    "album": "We Are the World - Single",
    "appleArtist": "U.S.A. for Africa",
    "appleTitle": "We Are the World",
-   "year": 1985
-  },
-  {
-   "id": "everybody-wants-to-rule-the-world-tears-for-fears",
-   "appleYear": 1985,
-   "album": "Songs from the Big Chair",
-   "appleArtist": "Tears for Fears",
-   "appleTitle": "Everybody Wants to Rule the World",
-   "year": 1985
+   "store": "US",
+   "year": 1985,
+   "d": 1
   },
   {
    "id": "money-for-nothing-dire-straits",
@@ -359,7 +1367,19 @@
    "album": "Brothers in Arms (40th Anniversary)",
    "appleArtist": "Dire Straits",
    "appleTitle": "Money for Nothing",
-   "year": 1985
+   "store": "US",
+   "year": 1985,
+   "d": 1
+  },
+  {
+   "id": "everybody-wants-to-rule-the-world-tears-for-fears",
+   "appleYear": 1985,
+   "album": "Songs from the Big Chair",
+   "appleArtist": "Tears for Fears",
+   "appleTitle": "Everybody Wants to Rule the World",
+   "store": "US",
+   "year": 1985,
+   "d": 1
   },
   {
    "id": "thats-what-friends-are-for-dionne-warwick",
@@ -367,23 +1387,229 @@
    "album": "Friends",
    "appleArtist": "Dionne Warwick",
    "appleTitle": "That's What Friends Are For (With Elton John, Gladys Knight & Stevie Wonder)",
-   "year": 1985
+   "store": "US",
+   "year": 1985,
+   "d": 1
   },
   {
-   "id": "livin-on-a-prayer-bon-jovi",
-   "appleYear": 1986,
-   "album": "Slippery When Wet",
-   "appleArtist": "Bon Jovi",
-   "appleTitle": "Livin' On a Prayer",
-   "year": 1986
+   "id": "take-on-me-a-ha",
+   "appleYear": 1985,
+   "album": "Hunting High and Low (Deluxe Edition)",
+   "appleArtist": "a-ha",
+   "appleTitle": "Take On Me",
+   "store": "US",
+   "year": 1985,
+   "d": 1
   },
   {
-   "id": "take-my-breath-away-berlin",
-   "appleYear": 1986,
-   "album": "Top Gun (Original Motion Picture Soundtrack) [Special Expanded Edition]",
-   "appleArtist": "Berlin",
-   "appleTitle": "Take My Breath Away (Love Theme from \"Top Gun\")",
-   "year": 1986
+   "id": "crazy-for-you-madonna",
+   "appleYear": 1985,
+   "album": "Something to Remember",
+   "appleArtist": "Madonna",
+   "appleTitle": "Crazy for You",
+   "store": "US",
+   "year": 1985,
+   "d": 1
+  },
+  {
+   "id": "shout-tears-for-fears",
+   "appleYear": 1985,
+   "album": "Songs from the Big Chair (Deluxe)",
+   "appleArtist": "Tears for Fears",
+   "appleTitle": "Shout (U.S. Single Edit)",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "we-built-this-city-starship",
+   "appleYear": 1985,
+   "album": "Knee Deep in the Hoopla",
+   "appleArtist": "Starship",
+   "appleTitle": "We Built This City",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "dancing-in-the-street-david-bowie-and-mick-jagger",
+   "appleYear": 1985,
+   "album": "Dancing In the Street - EP",
+   "appleArtist": "David Bowie & Mick Jagger",
+   "appleTitle": "Dancing In the Street",
+   "store": "US",
+   "year": 1985,
+   "d": 1
+  },
+  {
+   "id": "the-power-of-love-jennifer-rush",
+   "appleYear": 1985,
+   "album": "Jennifer Rush: Best of 1983-2010",
+   "appleArtist": "Jennifer Rush",
+   "appleTitle": "The Power of Love (Radio Edit)",
+   "store": "US",
+   "year": 1985,
+   "d": 1
+  },
+  {
+   "id": "i-got-you-babe-ub40-and-chrissie-hynde",
+   "appleYear": 1985,
+   "album": "The Singles",
+   "appleArtist": "Chrissie Hynde & UB40",
+   "appleTitle": "I Got You Babe",
+   "store": "US",
+   "year": 1985,
+   "d": 1
+  },
+  {
+   "id": "you-spin-me-round-like-a-record-dead-or-alive",
+   "appleYear": 1985,
+   "album": "Stranger Things: Soundtrack from the Netflix Series, Season 4",
+   "appleArtist": "Dead or Alive",
+   "appleTitle": "You Spin Me Round (Like a Record)",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "easy-lover-philip-bailey-and-phil-collins",
+   "appleYear": 1984,
+   "album": "Chinese Wall (Bonus Track)",
+   "appleArtist": "Philip Bailey & Phil Collins",
+   "appleTitle": "Easy Lover",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "we-dont-need-another-hero-thunderdome-tina-turner",
+   "appleYear": 1985,
+   "album": "Private Dancer (40th Anniversary Edition)",
+   "appleArtist": "Tina Turner",
+   "appleTitle": "We Don't Need Another Hero (Thunderdome)",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "a-good-heart-feargal-sharkey",
+   "appleYear": 1985,
+   "album": "Feargal Sharkey",
+   "appleArtist": "Feargal Sharkey",
+   "appleTitle": "A Good Heart",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "one-night-in-bangkok-murray-head",
+   "appleYear": 1984,
+   "album": "One Night in Bangkok (Radio Edit / From “Chess” / Remastered 2016) - Single",
+   "appleArtist": "Murray Head",
+   "appleTitle": "One Night in Bangkok (Radio Edit / From “Chess” / Remastered 2016)",
+   "store": "US",
+   "year": 1984,
+   "d": 1
+  },
+  {
+   "id": "saving-all-my-love-for-you-whitney-houston",
+   "appleYear": 1985,
+   "album": "Whitney Houston",
+   "appleArtist": "Whitney Houston",
+   "appleTitle": "Saving All My Love for You",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "the-heat-is-on-glenn-frey",
+   "appleYear": 1984,
+   "album": "Beverly Hills Cop (Music From the Motion Picture Soundtrack)",
+   "appleArtist": "Glenn Frey",
+   "appleTitle": "The Heat Is On",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "live-it-up-mental-as-anything",
+   "appleYear": 1985,
+   "album": "Fundamental as Anything",
+   "appleArtist": "Mental As Anything",
+   "appleTitle": "Live It Up (From \"Crocodile Dundee\")",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "axel-f-harold-faltermeyer",
+   "appleYear": 1984,
+   "album": "Harold F",
+   "appleArtist": "Harold Faltermeyer",
+   "appleTitle": "Axel F",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "cherish-kool-and-the-gang",
+   "appleYear": 1984,
+   "album": "Emergency",
+   "appleArtist": "Kool & The Gang",
+   "appleTitle": "Cherish",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "a-view-to-a-kill-duran-duran",
+   "appleYear": 1985,
+   "album": "The Singles 81-85",
+   "appleArtist": "Duran Duran",
+   "appleTitle": "A View to a Kill (That Fatal Kiss)",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "part-time-lover-stevie-wonder",
+   "appleYear": 1985,
+   "album": "In Square Circle",
+   "appleArtist": "Stevie Wonder",
+   "appleTitle": "Part-Time Lover",
+   "store": "US",
+   "year": 1985,
+   "d": 3
+  },
+  {
+   "id": "neutron-dance-the-pointer-sisters",
+   "appleYear": 1984,
+   "album": "Beverly Hills Cop (Music From the Motion Picture Soundtrack)",
+   "appleArtist": "The Pointer Sisters",
+   "appleTitle": "Neutron Dance",
+   "store": "US",
+   "year": 1984,
+   "d": 2
+  },
+  {
+   "id": "nightshift-commodores",
+   "appleYear": 1985,
+   "album": "Nightshift",
+   "appleArtist": "The Commodores",
+   "appleTitle": "Nightshift",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "walking-on-sunshine-katrina-and-the-waves",
+   "appleYear": 1985,
+   "album": "Katrina and the Waves",
+   "appleArtist": "Katrina and the Waves",
+   "appleTitle": "Walking On Sunshine",
+   "store": "US",
+   "year": 1985,
+   "d": 2
   },
   {
    "id": "walk-like-an-egyptian-the-bangles",
@@ -391,7 +1617,19 @@
    "album": "Different Light (Expanded Edition)",
    "appleArtist": "The Bangles",
    "appleTitle": "Walk Like an Egyptian",
-   "year": 1986
+   "store": "US",
+   "year": 1986,
+   "d": 1
+  },
+  {
+   "id": "take-my-breath-away-berlin",
+   "appleYear": 1986,
+   "album": "Top Gun (Original Motion Picture Soundtrack) [Special Expanded Edition]",
+   "appleArtist": "Berlin",
+   "appleTitle": "Take My Breath Away (Love Theme from \"Top Gun\")",
+   "store": "US",
+   "year": 1986,
+   "d": 1
   },
   {
    "id": "papa-dont-preach-madonna",
@@ -399,23 +1637,250 @@
    "album": "True Blue",
    "appleArtist": "Madonna",
    "appleTitle": "Papa Don't Preach",
-   "year": 1986
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 1986,
+   "d": 2
   },
   {
-   "id": "with-or-without-you-u2",
-   "appleYear": 1987,
-   "album": "U218 Singles (Deluxe Edition)",
-   "appleArtist": "U2",
-   "appleTitle": "With or Without You",
-   "year": 1987
+   "id": "livin-on-a-prayer-bon-jovi",
+   "appleYear": 1986,
+   "album": "Slippery When Wet",
+   "appleArtist": "Bon Jovi",
+   "appleTitle": "Livin' On a Prayer",
+   "store": "US",
+   "year": 1986,
+   "d": 1
   },
   {
-   "id": "i-wanna-dance-with-somebody-who-loves-me-whitney-houston",
-   "appleYear": 1987,
-   "album": "Whitney",
+   "id": "when-the-going-gets-tough-the-tough-get-going-billy-ocean",
+   "appleYear": 1986,
+   "album": "Love Zone (Expanded Edition)",
+   "appleArtist": "Billy Ocean",
+   "appleTitle": "When the Going Gets Tough, The Tough Get Going",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "you-keep-me-hangin-on-kim-wilde",
+   "appleYear": 1986,
+   "album": "Another Step",
+   "appleArtist": "Kim Wilde",
+   "appleTitle": "You Keep Me Hangin On",
+   "store": "US",
+   "year": 1986,
+   "d": 1
+  },
+  {
+   "id": "manic-monday-the-bangles",
+   "appleYear": 1986,
+   "album": "Different Light",
+   "appleArtist": "The Bangles",
+   "appleTitle": "Manic Monday",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "touch-me-i-want-your-body-samantha-fox",
+   "appleYear": 1986,
+   "album": "Touch Me",
+   "appleArtist": "Samantha Fox",
+   "appleTitle": "Touch Me (I Want Your Body) [Extended Version]",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "the-final-countdown-europe",
+   "appleYear": 1986,
+   "album": "The Final Countdown (Expanded Edition)",
+   "appleArtist": "Europe",
+   "appleTitle": "The Final Countdown",
+   "store": "US",
+   "year": 1986,
+   "d": 1
+  },
+  {
+   "id": "dont-leave-me-this-way-the-communards",
+   "appleYear": 1986,
+   "album": "Communards",
+   "appleArtist": "The Communards",
+   "appleTitle": "Don't Leave Me This Way (with Sarah Jane Morris) [feat. Sarah Jane Morris]",
+   "store": "US",
+   "year": 1986,
+   "d": 1
+  },
+  {
+   "id": "addicted-to-love-robert-palmer",
+   "appleYear": 1985,
+   "album": "Riptide",
+   "appleArtist": "Robert Palmer",
+   "appleTitle": "Addicted to Love",
+   "store": "US",
+   "year": 1985,
+   "d": 1
+  },
+  {
+   "id": "the-lady-in-red-chris-de-burgh",
+   "appleYear": 1986,
+   "album": "The Love Songs",
+   "appleArtist": "Chris de Burgh",
+   "appleTitle": "The Lady in Red",
+   "store": "US",
+   "year": 1986,
+   "d": 1
+  },
+  {
+   "id": "chain-reaction-diana-ross",
+   "appleYear": 1985,
+   "album": "Eaten Alive (Expanded Edition)",
+   "appleArtist": "Diana Ross",
+   "appleTitle": "Chain Reaction",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "venus-bananarama",
+   "appleYear": 1986,
+   "album": "True Confessions (Collector's Edition)",
+   "appleArtist": "Bananarama",
+   "appleTitle": "Venus",
+   "store": "US",
+   "year": 1986,
+   "d": 1
+  },
+  {
+   "id": "rock-me-amadeus-falco",
+   "appleYear": 1986,
+   "album": "Rock Me Amadeus (30th Anniversary) - EP",
+   "appleArtist": "Falco",
+   "appleTitle": "Rock Me Amadeus (12\" American Edit)",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "how-will-i-know-whitney-houston",
+   "appleYear": 1985,
+   "album": "Whitney Houston",
    "appleArtist": "Whitney Houston",
-   "appleTitle": "I Wanna Dance with Somebody (Who Loves Me)",
-   "year": 1987
+   "appleTitle": "How Will I Know",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "sledgehammer-peter-gabriel",
+   "appleYear": 1986,
+   "album": "So (Special Edition)",
+   "appleArtist": "Peter Gabriel",
+   "appleTitle": "Sledgehammer",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "living-doll-cliff-richard-and-the-young-ones",
+   "appleYear": 1986,
+   "album": "Living Doll - Single",
+   "appleArtist": "Cliff Richard & The Young Ones",
+   "appleTitle": "Living Doll (feat. Hank Marvin)",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "kiss-prince-and-the-revolution",
+   "appleYear": 1986,
+   "album": "Kiss - Single",
+   "appleArtist": "Prince & The Revolution",
+   "appleTitle": "Kiss (Extended Version)",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "on-my-own-patti-labelle-and-michael-mcdonald",
+   "appleYear": 1986,
+   "album": "Winner in You",
+   "appleArtist": "Patti LaBelle & Michael McDonald",
+   "appleTitle": "On My Own",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "glory-of-love-peter-cetera",
+   "appleYear": 1986,
+   "album": "Solitude / Solitaire",
+   "appleArtist": "Peter Cetera",
+   "appleTitle": "Glory of Love (Theme from \"the Karate Kid, Pt. II\")",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "you-can-call-me-al-paul-simon",
+   "appleYear": 1986,
+   "album": "Graceland",
+   "appleArtist": "Paul Simon",
+   "appleTitle": "You Can Call Me Al",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "holding-back-the-years-simply-red",
+   "appleYear": 1985,
+   "album": "Picture Book (Expanded Version)",
+   "appleArtist": "Simply Red",
+   "appleTitle": "Holding Back the Years",
+   "store": "US",
+   "year": 1985,
+   "d": 2
+  },
+  {
+   "id": "stuck-with-you-huey-lewis-and-the-news",
+   "appleYear": 1986,
+   "album": "Fore!",
+   "appleArtist": "Huey Lewis & The News",
+   "appleTitle": "Stuck With You",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "i-just-died-in-your-arms-cutting-crew",
+   "appleYear": 1986,
+   "album": "Broadcast",
+   "appleArtist": "Cutting Crew",
+   "appleTitle": "(I Just) Died in Your Arms",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "i-cant-wait-nu-shooz",
+   "appleYear": 1986,
+   "album": "Poolside",
+   "appleArtist": "Nu Shooz",
+   "appleTitle": "I Can't Wait",
+   "store": "US",
+   "year": 1986,
+   "d": 3
+  },
+  {
+   "id": "dancing-on-the-ceiling-lionel-richie",
+   "appleYear": 1986,
+   "album": "Dancing On the Ceiling",
+   "appleArtist": "Lionel Richie",
+   "appleTitle": "Dancing On the Ceiling",
+   "store": "US",
+   "year": 1986,
+   "d": 2
   },
   {
    "id": "never-gonna-give-you-up-rick-astley",
@@ -423,7 +1888,19 @@
    "album": "Whenever You Need Somebody",
    "appleArtist": "Rick Astley",
    "appleTitle": "Never Gonna Give You Up",
-   "year": 1987
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "i-wanna-dance-with-somebody-who-loves-me-whitney-houston",
+   "appleYear": 1987,
+   "album": "Whitney",
+   "appleArtist": "Whitney Houston",
+   "appleTitle": "I Wanna Dance with Somebody (Who Loves Me)",
+   "store": "US",
+   "year": 1987,
+   "d": 1
   },
   {
    "id": "faith-george-michael",
@@ -431,7 +1908,19 @@
    "album": "Twenty Five",
    "appleArtist": "George Michael",
    "appleTitle": "Faith",
-   "year": 1987
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "with-or-without-you-u2",
+   "appleYear": 1987,
+   "album": "U218 Singles (Deluxe Edition)",
+   "appleArtist": "U2",
+   "appleTitle": "With or Without You",
+   "store": "US",
+   "year": 1987,
+   "d": 2
   },
   {
    "id": "sweet-child-o-mine-guns-n-roses",
@@ -439,7 +1928,19 @@
    "album": "Appetite For Destruction",
    "appleArtist": "Guns N' Roses",
    "appleTitle": "Sweet Child O' Mine",
-   "year": 1987
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "man-in-the-mirror-michael-jackson",
+   "appleYear": 1987,
+   "album": "Number Ones",
+   "appleArtist": "Michael Jackson",
+   "appleTitle": "Man In the Mirror (2003 Edit)",
+   "store": "US",
+   "year": 1987,
+   "d": 1
   },
   {
    "id": "need-you-tonight-inxs",
@@ -447,7 +1948,199 @@
    "album": "Kick (30th Deluxe Edition)",
    "appleArtist": "INXS",
    "appleTitle": "Need You Tonight",
-   "year": 1987
+   "store": "US",
+   "year": 1987,
+   "d": 2
+  },
+  {
+   "id": "nothings-gonna-stop-us-now-starship",
+   "appleYear": 1987,
+   "album": "No Protection",
+   "appleArtist": "Starship",
+   "appleTitle": "Nothing's Gonna Stop Us Now",
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "la-bamba-los-lobos",
+   "appleYear": 1987,
+   "album": "La Bamba (Original Motion Picture Soundtrack)",
+   "appleArtist": "Los Lobos",
+   "appleTitle": "La Bamba",
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "i-think-were-alone-now-tiffany",
+   "appleYear": 1987,
+   "album": "Tiffany",
+   "appleArtist": "Tiffany",
+   "appleTitle": "I Think We're Alone Now",
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "got-my-mind-set-on-you-george-harrison",
+   "appleYear": 1987,
+   "album": "Cloud Nine",
+   "appleArtist": "George Harrison",
+   "appleTitle": "Got My Mind Set on You (Extended Version)",
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "i-knew-you-were-waiting-for-me-aretha-franklin-and-george-mi",
+   "appleYear": 1986,
+   "album": "Aretha (Expanded Edition)",
+   "appleArtist": "George Michael & Aretha Franklin",
+   "appleTitle": "I Knew You Were Waiting (For Me)",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "always-on-my-mind-pet-shop-boys",
+   "appleYear": 1987,
+   "album": "Furthermore - EP",
+   "appleArtist": "Pet Shop Boys",
+   "appleTitle": "Always on my mind (New version)",
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "nothings-gonna-change-my-love-for-you-glenn-medeiros",
+   "appleYear": 1987,
+   "album": "Nothing's Gonna Change My Love for You",
+   "appleArtist": "Glenn Medeiros",
+   "appleTitle": "Nothing's Gonna Change My Love for You",
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "ive-had-the-time-of-my-life-bill-medley-and-jennifer-warnes",
+   "appleYear": 1987,
+   "album": "Dirty Dancing (Original Motion Picture Soundtrack)",
+   "appleArtist": "Bill Medley & Jennifer Warnes",
+   "appleTitle": "(I've Had) The Time of My Life",
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "alone-heart",
+   "appleYear": 1987,
+   "album": "Bad Animals",
+   "appleArtist": "Heart",
+   "appleTitle": "Alone",
+   "store": "US",
+   "year": 1987,
+   "d": 2
+  },
+  {
+   "id": "respectable-mel-and-kim",
+   "appleYear": 1987,
+   "album": "Bite Size - EP",
+   "appleArtist": "Mel & Kim",
+   "appleTitle": "Respectable",
+   "store": "US",
+   "year": 1987,
+   "d": 2
+  },
+  {
+   "id": "star-trekkin-the-firm",
+   "appleYear": 1987,
+   "album": "Star Trekkin' - Single",
+   "appleArtist": "The Firm",
+   "appleTitle": "Star Trekkin'",
+   "store": "US",
+   "year": 1987,
+   "d": 2
+  },
+  {
+   "id": "bad-michael-jackson",
+   "appleYear": 1987,
+   "album": "Bad",
+   "appleArtist": "Michael Jackson",
+   "appleTitle": "Bad",
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "la-isla-bonita-madonna",
+   "appleYear": 1986,
+   "album": "True Blue",
+   "appleArtist": "Madonna",
+   "appleTitle": "La Isla Bonita",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "i-just-cant-stop-loving-you-michael-jackson",
+   "appleYear": 1987,
+   "album": "Bad",
+   "appleArtist": "Michael Jackson",
+   "appleTitle": "I Just Can't Stop Loving You (feat. Siedah Garrett)",
+   "store": "US",
+   "year": 1987,
+   "d": 2
+  },
+  {
+   "id": "lean-on-me-club-nouveau",
+   "appleYear": 1986,
+   "album": "Life, Love & Pain",
+   "appleArtist": "Club Nouveau",
+   "appleTitle": "Lean on Me",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "always-atlantic-starr",
+   "appleYear": 1986,
+   "album": "All In The Name Of Love",
+   "appleArtist": "Atlantic Starr",
+   "appleTitle": "Always",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "suddenly-angry-anderson",
+   "appleYear": 1986,
+   "album": "Suddenly - Single",
+   "appleArtist": "Angry Anderson",
+   "appleTitle": "Suddenly",
+   "store": "US",
+   "year": 1986,
+   "d": 2
+  },
+  {
+   "id": "whos-that-girl-madonna",
+   "appleYear": 1987,
+   "album": "Who's That Girl (Soundtrack from the Motion Picture)",
+   "appleArtist": "Madonna",
+   "appleTitle": "Who's That Girl",
+   "store": "US",
+   "year": 1987,
+   "d": 2
+  },
+  {
+   "id": "whenever-you-need-somebody-rick-astley",
+   "appleYear": 1987,
+   "album": "Whenever You Need Somebody",
+   "appleArtist": "Rick Astley",
+   "appleTitle": "Whenever You Need Somebody",
+   "store": "US",
+   "year": 1987,
+   "d": 2
   },
   {
    "id": "dont-worry-be-happy-bobby-mcferrin",
@@ -455,39 +2148,9 @@
    "album": "Simple Pleasures",
    "appleArtist": "Bobby McFerrin",
    "appleTitle": "Don't Worry, Be Happy",
-   "year": 1988
-  },
-  {
-   "id": "man-in-the-mirror-michael-jackson",
-   "appleYear": 1987,
-   "album": "Bad 25th Anniversary",
-   "appleArtist": "Michael Jackson",
-   "appleTitle": "Man in the Mirror (2012 Remaster)",
-   "year": 1987
-  },
-  {
-   "id": "straight-up-paula-abdul",
-   "appleYear": 1988,
-   "album": "Forever Your Girl",
-   "appleArtist": "Paula Abdul",
-   "appleTitle": "Straight Up",
-   "year": 1988
-  },
-  {
-   "id": "like-a-prayer-madonna",
-   "appleYear": 1989,
-   "album": "Like a Prayer",
-   "appleArtist": "Madonna",
-   "appleTitle": "Like a Prayer",
-   "year": 1989
-  },
-  {
-   "id": "another-day-in-paradise-phil-collins",
-   "appleYear": 1989,
-   "album": "...But Seriously (Remastered)",
-   "appleArtist": "Phil Collins",
-   "appleTitle": "Another Day in Paradise (2016 Remastered)",
-   "year": 1989
+   "store": "US",
+   "year": 1988,
+   "d": 1
   },
   {
    "id": "wind-beneath-my-wings-bette-midler",
@@ -495,7 +2158,259 @@
    "album": "Jackpot - The Best Bette",
    "appleArtist": "Bette Midler",
    "appleTitle": "Wind Beneath My Wings",
-   "year": 1988
+   "store": "US",
+   "year": 1988,
+   "d": 1
+  },
+  {
+   "id": "straight-up-paula-abdul",
+   "appleYear": 1988,
+   "album": "Forever Your Girl",
+   "appleArtist": "Paula Abdul",
+   "appleTitle": "Straight Up",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "heaven-is-a-place-on-earth-belinda-carlisle",
+   "appleYear": 1987,
+   "album": "Heaven On Earth",
+   "appleArtist": "Belinda Carlisle",
+   "appleTitle": "Heaven is a Place on Earth",
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "a-groovy-kind-of-love-phil-collins",
+   "appleYear": 1988,
+   "album": "The Singles (Deluxe Edition)",
+   "appleArtist": "Phil Collins",
+   "appleTitle": "A Groovy Kind of Love",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "get-outta-my-dreams-get-into-my-car-billy-ocean",
+   "appleYear": 1988,
+   "album": "Tear Down These Walls",
+   "appleArtist": "Billy Ocean",
+   "appleTitle": "Get Outta My Dreams, Get into My Car",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "i-should-be-so-lucky-kylie-minogue",
+   "appleYear": 1987,
+   "album": "I Should Be so Lucky",
+   "appleArtist": "Kylie Minogue",
+   "appleTitle": "I Should Be so Lucky",
+   "store": "US",
+   "year": 1987,
+   "d": 2
+  },
+  {
+   "id": "tell-it-to-my-heart-taylor-dayne",
+   "appleYear": 1988,
+   "album": "Tell It to My Heart (Expanded Edition)",
+   "appleArtist": "Taylor Dayne",
+   "appleTitle": "Tell It to My Heart",
+   "store": "US",
+   "year": 1988,
+   "d": 3
+  },
+  {
+   "id": "kokomo-the-beach-boys",
+   "appleYear": 1988,
+   "album": "Made In California (1962–2012)",
+   "appleArtist": "The Beach Boys",
+   "appleTitle": "Kokomo",
+   "store": "US",
+   "year": 1988,
+   "d": 1
+  },
+  {
+   "id": "the-flame-cheap-trick",
+   "appleYear": 1988,
+   "album": "Lap of Luxury",
+   "appleArtist": "Cheap Trick",
+   "appleTitle": "The Flame",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "teardrops-womack-and-womack",
+   "appleYear": 1988,
+   "album": "Conscience",
+   "appleArtist": "Womack & Womack",
+   "appleTitle": "Teardrops",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "especially-for-you-kylie-minogue-and-jason-donovan",
+   "appleYear": 1988,
+   "album": "Especially for You",
+   "appleArtist": "Kylie Minogue & Jason Donovan",
+   "appleTitle": "Especially for You (Extended Version)",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "simply-irresistible-robert-palmer",
+   "appleYear": 1988,
+   "album": "Heavy Nova",
+   "appleArtist": "Robert Palmer",
+   "appleTitle": "Simply Irresistible",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "the-loco-motion-kylie-minogue",
+   "appleYear": 1988,
+   "album": "Kylie",
+   "appleArtist": "Kylie Minogue",
+   "appleTitle": "The Loco-Motion",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "push-it-salt-n-pepa",
+   "appleYear": 1987,
+   "album": "20 #1's: Party Hits",
+   "appleArtist": "Salt-N-Pepa",
+   "appleTitle": "Push It (Single Version)",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "perfect-fairground-attraction",
+   "appleYear": 1988,
+   "album": "The First of a Million Kisses",
+   "appleArtist": "Fairground Attraction",
+   "appleTitle": "Perfect",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "orinoco-flow-enya",
+   "appleYear": 1988,
+   "album": "Watermark",
+   "appleArtist": "Enya",
+   "appleTitle": "Orinoco Flow",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "girl-you-know-its-true-milli-vanilli",
+   "appleYear": 1988,
+   "album": "All or Nothing",
+   "appleArtist": "Milli Vanilli",
+   "appleTitle": "Girl You Know It's True",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "desire-u2",
+   "appleYear": 1988,
+   "album": "Rattle and Hum",
+   "appleArtist": "U2",
+   "appleTitle": "Desire",
+   "store": "US",
+   "year": 1988,
+   "d": 3
+  },
+  {
+   "id": "hungry-eyes-eric-carmen",
+   "appleYear": 1987,
+   "album": "Dirty Dancing (Original Motion Picture Soundtrack)",
+   "appleArtist": "Eric Carmen",
+   "appleTitle": "Hungry Eyes",
+   "store": "US",
+   "year": 1987,
+   "d": 2
+  },
+  {
+   "id": "got-to-be-certain-kylie-minogue",
+   "appleYear": 1988,
+   "album": "Kylie",
+   "appleArtist": "Kylie Minogue",
+   "appleTitle": "Got to Be Certain",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "couldve-been-tiffany",
+   "appleYear": 1987,
+   "album": "Tiffany",
+   "appleArtist": "Tiffany",
+   "appleTitle": "Could've Been",
+   "store": "US",
+   "year": 1987,
+   "d": 2
+  },
+  {
+   "id": "hands-to-heaven-breathe",
+   "appleYear": 1988,
+   "album": "All That Jazz",
+   "appleArtist": "Breathe",
+   "appleTitle": "Hands to Heaven",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "boys-summertime-love-sabrina",
+   "appleYear": 1987,
+   "album": "Boys (Summertime Love) - Single",
+   "appleArtist": "Sabrina",
+   "appleTitle": "Boys (Summertime Love) [Extended Version]",
+   "store": "US",
+   "year": 1987,
+   "d": 3
+  },
+  {
+   "id": "with-a-little-help-from-my-friends-wet-wet-wet",
+   "appleYear": 1987,
+   "album": "End of Part One - Their Greatest Hits",
+   "appleArtist": "Wet Wet Wet",
+   "appleTitle": "With a Little Help from My Friends",
+   "store": "US",
+   "year": 1988,
+   "d": 1
+  },
+  {
+   "id": "dont-be-cruel-cheap-trick",
+   "appleYear": 1988,
+   "album": "Lap of Luxury",
+   "appleArtist": "Cheap Trick",
+   "appleTitle": "Don't Be Cruel",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "like-a-prayer-madonna",
+   "appleYear": 1989,
+   "album": "Like a Prayer",
+   "appleArtist": "Madonna",
+   "appleTitle": "Like a Prayer",
+   "store": "US",
+   "year": 1989,
+   "d": 1
   },
   {
    "id": "ride-on-time-black-box",
@@ -503,7 +2418,249 @@
    "album": "Dreamland",
    "appleArtist": "Black Box",
    "appleTitle": "Ride On Time",
-   "year": 1989
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "another-day-in-paradise-phil-collins",
+   "appleYear": 1989,
+   "album": "The Singles (Deluxe Edition)",
+   "appleArtist": "Phil Collins",
+   "appleTitle": "Another Day In Paradise",
+   "store": "US",
+   "year": 1989,
+   "d": 1
+  },
+  {
+   "id": "pump-up-the-jam-technotronic",
+   "appleYear": 1989,
+   "album": "Pump Up the Jam",
+   "appleArtist": "Technotronic",
+   "appleTitle": "Pump Up the Jam",
+   "store": "US",
+   "year": 1989,
+   "d": 1
+  },
+  {
+   "id": "eternal-flame-the-bangles",
+   "appleYear": 1989,
+   "album": "Super Hits",
+   "appleArtist": "The Bangles",
+   "appleTitle": "Eternal Flame",
+   "store": "US",
+   "year": 1989,
+   "d": 1
+  },
+  {
+   "id": "right-here-waiting-richard-marx",
+   "appleYear": 1989,
+   "album": "Repeat Offender",
+   "appleArtist": "Richard Marx",
+   "appleTitle": "Right Here Waiting",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "the-living-years-mike-the-mechanics",
+   "appleYear": 1988,
+   "album": "R-Kive",
+   "appleArtist": "Mike + The Mechanics",
+   "appleTitle": "The Living Years",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "girl-im-gonna-miss-you-milli-vanilli",
+   "appleYear": 1989,
+   "album": "NOW That's What I Call Music! 16",
+   "appleArtist": "Milli Vanilli",
+   "appleTitle": "Girl I'm Gonna Miss You",
+   "store": "GB",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "dont-know-much-linda-ronstadt",
+   "appleYear": 1989,
+   "album": "Cry Like a Rainstorm, Howl Like the Wind",
+   "appleArtist": "Linda Ronstadt",
+   "appleTitle": "Don't Know Much (with Aaron Neville)",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "love-shack-the-b-52s",
+   "appleYear": 1989,
+   "album": "Time Capsule",
+   "appleArtist": "The B-52's",
+   "appleTitle": "Love Shack",
+   "store": "US",
+   "year": 1989,
+   "d": 1
+  },
+  {
+   "id": "if-i-could-turn-back-time-cher",
+   "appleYear": 1989,
+   "album": "Heart of Stone",
+   "appleArtist": "Cher",
+   "appleTitle": "If I Could Turn Back Time",
+   "store": "US",
+   "year": 1989,
+   "d": 1
+  },
+  {
+   "id": "if-you-dont-know-me-by-now-simply-red",
+   "appleYear": 1989,
+   "album": "A New Flame (Expanded Version)",
+   "appleArtist": "Simply Red",
+   "appleTitle": "If You Don't Know Me By Now",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "you-got-it-the-right-stuff-new-kids-on-the-block",
+   "appleYear": 1988,
+   "album": "Hangin' Tough (30th Anniversary Edition)",
+   "appleArtist": "New Kids On the Block",
+   "appleTitle": "You Got It (The Right Stuff) [7\" Version]",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "she-drives-me-crazy-fine-young-cannibals",
+   "appleYear": 1989,
+   "album": "The Raw & the Cooked",
+   "appleArtist": "Fine Young Cannibals",
+   "appleTitle": "She Drives Me Crazy",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "the-look-roxette",
+   "appleYear": 1988,
+   "album": "Look Sharp! 30th Anniversary Edition",
+   "appleArtist": "Roxette",
+   "appleTitle": "The Look",
+   "store": "US",
+   "year": 1988,
+   "d": 2
+  },
+  {
+   "id": "we-didnt-start-the-fire-billy-joel",
+   "appleYear": 1989,
+   "album": "Storm Front",
+   "appleArtist": "Billy Joel",
+   "appleTitle": "We Didn't Start the Fire",
+   "store": "US",
+   "year": 1989,
+   "d": 1
+  },
+  {
+   "id": "all-around-the-world-lisa-stansfield",
+   "appleYear": 1989,
+   "album": "Affection (Deluxe)",
+   "appleArtist": "Lisa Stansfield",
+   "appleTitle": "All Around the World",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "poison-alice-cooper",
+   "appleYear": 1989,
+   "album": "Alice Cooper Classicks",
+   "appleArtist": "Alice Cooper",
+   "appleTitle": "Poison",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "back-to-life-however-do-you-want-me-soul-ii-soul",
+   "appleYear": 1989,
+   "album": "Keep On Movin'",
+   "appleArtist": "Soul II Soul",
+   "appleTitle": "Back to Life",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "lambada-kaoma",
+   "appleYear": 1989,
+   "album": "Lambada (Version 1989) - Single",
+   "appleArtist": "Kaoma",
+   "appleTitle": "Lambada (Version 1989)",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "toy-soldiers-martika",
+   "appleYear": 1989,
+   "album": "Toy Soldiers - The Best of Martika",
+   "appleArtist": "Martika",
+   "appleTitle": "Toy Soldiers (Japanese Version)",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "you-got-it-roy-orbison",
+   "appleYear": 1989,
+   "album": "Mystery Girl (Deluxe)",
+   "appleArtist": "Roy Orbison",
+   "appleTitle": "You Got It",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "the-best-tina-turner",
+   "appleYear": 1989,
+   "album": "Foreign Affair",
+   "appleArtist": "Tina Turner",
+   "appleTitle": "The Best",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "lost-in-your-eyes-debbie-gibson",
+   "appleYear": 1989,
+   "album": "Lost In Your Eyes",
+   "appleArtist": "Debbie Gibson",
+   "appleTitle": "Lost In Your Eyes",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "when-i-see-you-smile-bad-english",
+   "appleYear": 1989,
+   "album": "Bad English",
+   "appleArtist": "Bad English",
+   "appleTitle": "When I See You Smile",
+   "store": "US",
+   "year": 1989,
+   "d": 3
+  },
+  {
+   "id": "batdance-prince",
+   "appleYear": 1989,
+   "album": "Batman",
+   "appleArtist": "Prince",
+   "appleTitle": "Batdance",
+   "store": "US",
+   "year": 1989,
+   "d": 2
   }
  ]
 }

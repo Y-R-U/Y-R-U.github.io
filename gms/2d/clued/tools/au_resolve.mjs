@@ -2,7 +2,9 @@
 // Resolve curated song lists (tools/au_lists/*.txt) to iTunes previews and write data/music/<id>.json.
 //   node tools/au_resolve.mjs [listName ...] [--refresh] [--report]
 // List line formats (# comments, blank lines ignored; header lines "@key value"):
-//   songs:   YEAR | Artist | Title [| q=search terms; am=artist regex; tm=title regex; d=1..3; alt=a/b; note=...]
+//   songs:   YEAR | Artist | Title [| us=1 uk=4 au=12 pv=8100 from=USA] [| q=search terms; am=artist regex; tm=title regex; d=1..3; alt=a/b; kids=0; nm=apple; note=...]
+//            The optional chart column (tools/au_pick.mjs writes it) holds best year-end positions, monthly Wikipedia
+//            views and the artist's country; it sets facts.charts / facts.artistCountry and the difficulty (unless d=).
 //   artists: Artist | origin | decade | Song A ; Song B [| d=1..3; alt=a/b; am=artist regex]
 // Every match is verified: artist + title fuzzy match, karaoke/cover/live/remix rejected, earliest release chosen,
 // and the curated year compared with Apple's earliest release (|diff| > 1 is reported and the item dropped
@@ -49,6 +51,7 @@ const pickFields = (t) => ({
   trackId: t.trackId, artistName: t.artistName, trackName: t.trackName, collectionName: t.collectionName,
   previewUrl: t.previewUrl, artworkUrl100: t.artworkUrl100, trackViewUrl: t.trackViewUrl,
   releaseDate: t.releaseDate, trackTimeMillis: t.trackTimeMillis, kind: t.kind, collectionArtistName: t.collectionArtistName,
+  trackExplicitness: t.trackExplicitness,
 });
 
 export const norm = (s) => String(s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase()
@@ -63,7 +66,7 @@ export function dice(a, b) {
   for (const [g, n] of A) inter += Math.min(n, B.get(g) || 0);
   return (2 * inter) / (a.length - 1 + b.length - 1);
 }
-const BAD = /karaoke|tribute|made famous|in the style of|originally performed|cover version|instrumental version|re-?recorded|taylor.?s version|sped up|slowed|lullaby|8-bit|music box|backing track|workout|remake|piano version|acoustic|demo\b|edit by|live at|live from|\blive\b|remix|\bmix\)|re-?record|rendition|as made popular|from the motion picture.*cover|a cappella|orchestral version|orchestral album|new studio recording|\bmix\b|symphonic|string quartet/i;
+const BAD = /karaoke|tribute|made famous|in the style of|originally performed|cover version|instrumental version|re-?recorded|taylor.?s version|sped up|slowed|lullaby|8-bit|music box|backing track|workout|remake|piano version|acoustic|demo\b|edit by|live at|live from|\blive\b|remix|\bmix\)|re-?record|rendition|as made popular|from the motion picture.*cover|a cappella|orchestral version|orchestral album|new studio recording|\bmix\b|symphonic|string quartet|re-?imagined|\bredux\b|unplugged|\bstripped\b|\bcover\b|originally by|christmas version|\b(19|20)\d\d version\b|\bversion 20\d\d\b|nightcore|\b8d\b|lo-?fi version|tiktok version|\bspanglish\b/i;
 const BAD_ARTIST = /karaoke|tribute|the hit crew|starlite|party band|cover band|ameritz|vitamin string|piano tribute|lullaby|countdown singers|sound-alike|chart hits|the original hits|top hits|hit masters|orchestra of the|kidz bop|studio allstars|soundtrack wonder band/i;
 const theRm = (s) => s.replace(/^the /, '');
 
@@ -93,7 +96,8 @@ export function best(results, want, year) {
   // prefer an exact year, then an original album, then the earliest
   const near = year ? ok.filter((x) => Math.abs(x.year - year) <= 1) : ok;
   const pool = near.length ? near : ok;
-  pool.sort((a, b) => (year ? Math.abs(a.year - year) - Math.abs(b.year - year) : 0) || b.exact - a.exact || comp(a) - comp(b) || a.year - b.year);
+  const rem = (x) => (/remaster/i.test(x.t.trackName + ' ' + x.t.collectionName) ? 1 : 0);
+  pool.sort((a, b) => (year ? Math.abs(a.year - year) - Math.abs(b.year - year) : 0) || b.exact - a.exact || comp(a) - comp(b) || rem(a) - rem(b) || a.year - b.year);
   const r = pool[0];
   r.near = near.length > 0;
   r.originals = ok.filter((x) => !comp(x)).map((x) => x.year).sort()[0];
@@ -133,12 +137,25 @@ const audioObj = (t, artist, title) => ({
   dur: 30,
 });
 
+// Apple spells some acts differently
+const ALIAS = { Pink: 'P!nk', Huntrix: 'HUNTR/X', 'Little Stevie Wonder': 'Stevie Wonder' };
 async function resolveSong(want, year) {
-  const terms = want.q || `${want.artist} ${stripExtras(want.title)}`;
+  if (ALIAS[want.artist] && !want.am) want = { ...want, am: '^' + ALIAS[want.artist].replace(/[.*+?^${}()|[\]\\/!]/g, '\\$&') + '|^' + want.artist };
+  const terms = want.q || `${ALIAS[want.artist] || want.artist} ${stripExtras(want.title)}`;
   let res = await itunes({ term: terms });
   let b = best(res, want, year);
   if (!b && !want.q) { res = await itunes({ term: stripExtras(want.title), attribute: 'songTerm' }); b = best(res, want, year); }
-  if (!b || (year && !b.near)) { const r2 = await itunes({ term: terms, country: 'GB' }); const b2 = best(r2, want, year); if (b2 && (!b || b2.near)) b = b2; }
+  if (b) b.cc = 'US';
+  if (!b || (year && !b.near)) { const r2 = await itunes({ term: terms, country: 'GB' }); const b2 = best(r2, want, year); if (b2 && (!b || b2.near)) { b = b2; b.cc = 'GB'; } }
+  // Australian-only hits (Kent/ARIA charts) are often missing from the US and UK stores
+  if (want.au && (!b || (year && !b.near))) { const r3 = await itunes({ term: terms, country: 'AU' }); const b3 = best(r3, want, year); if (b3 && (!b || b3.near)) { b = b3; b.cc = 'AU'; } }
+  // duet credits ("Elton John and Dua Lipa") rarely match as a search term: search the first act, and accept a track
+  // whose artist starts with it
+  const first = String(want.artist).split(/\s(?:&|and|x|vs\.?)\s|,\s/i)[0];
+  if (!b && !want.q && !want.am && first !== want.artist) {
+    const w2 = { ...want, am: '^' + first.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') };
+    for (const cc of ['US', 'GB']) { const r = await itunes({ term: `${first} ${stripExtras(want.title)}`, country: cc }); const b4 = best(r, w2, year); if (b4) { b = b4; b.cc = cc; break; } }
+  }
   return b;
 }
 
@@ -146,32 +163,125 @@ async function resolveSong(want, year) {
 const ACTS = JSON.parse(fs.readFileSync(path.join(LISTS, 'acts.json'), 'utf8'));
 const actOf = (artist, title) => { const k = `${artist} — ${title}`; return k in ACTS.songs ? ACTS.songs[k] : ACTS.artists[artist]; };
 
+// chart column: "us=1 uk=- au=12 pv=8100 from=GBR/AUS"
+export function parseChart(s) {
+  const out = { charts: {}, pv: 0, from: [] };
+  for (const m of String(s || '').matchAll(/(\w+)=(\S+)/g)) {
+    if (['us', 'uk', 'au'].includes(m[1]) && /^\d+$/.test(m[2])) out.charts[m[1]] = +m[2];
+    else if (m[1] === 'pv') out.pv = +m[2] || 0;
+    else if (m[1] === 'from') out.from = m[2].split('/').filter((c) => /^[A-Z]{3}$/.test(c));
+  }
+  return out;
+}
+const isChartCol = (s) => /^(us|uk|au|pv|from)=/.test(String(s || '').trim());
+// year-end top 10 anywhere = 1, top 40 = 2, else 3; lasting fame (pageviews ranked within the pack; no article = middle)
+// moves it a step: top 15 % easier, a top-10 hit in the bottom 45 % or a #21-40 hit in the bottom 30 % harder
+export function fameDifficulty(charts, pv, pvRank) {
+  const best = Math.min(...Object.values(charts), 999);
+  let d = best <= 10 ? 1 : best <= 40 ? 2 : 3;
+  if (pvRank >= 0.85) d = Math.max(1, d - 1);
+  else if (pvRank < 0.45 && d === 1) d = 2;
+  else if (pvRank < 0.3 && d === 2 && best > 20) d = 3;
+  return d;
+}
+// kids mode only ever sees difficulty-1 items (js/core/spec.js kidsOk), so explicit or edgy songs never go below 2
+export const EDGY = /\bsex|f\*+k|fuck|sh\*t|\bshit|bitch|\bwhore|\bhoe\b|\bnaked|\bbooty|\bdrunk|cocaine|\bweed\b|\bp\.?i\.?m\.?p\b|talk dirty|\bkill(ing)? (you|him|her)|\bwap\b/i;
+const COUNTRY_NAME = { US: 'the US', UK: 'the UK', AU: 'Australia' };
+const chartLine = (c) => Object.entries(c).map(([k, v]) => `${COUNTRY_NAME[k.toUpperCase()]} #${v}`).join(', ');
+
+// pairs: [{ id: trackId, cc: store }] -> Map(trackId -> explicit?). A 'cleaned' track is a radio edit of an explicit song:
+// fine for adults, still not a kids' song.
+async function explicitness(pairs) {
+  const by = {};
+  for (const p of pairs) (by[p.cc || 'US'] ||= []).push(p.id);
+  const out = new Map();
+  for (const [cc, list] of Object.entries(by)) {
+    for (let i = 0; i < list.length; i += 150) {
+      const ids = list.slice(i, i + 150).join(',');
+      const key = `lookup:${cc}:${ids}`;
+      if (!cache[key]) {
+        await sleep(Math.max(0, lastCall + 3300 - Date.now())); lastCall = Date.now();
+        const r = await fetch(`https://itunes.apple.com/lookup?id=${ids}&country=${cc}&entity=song`);
+        const j = await r.json();
+        cache[key] = (j.results || []).map((t) => ({ trackId: t.trackId, e: t.trackExplicitness, c: t.collectionExplicitness }));
+        saveCache();
+      }
+      for (const t of cache[key]) out.set(t.trackId, t.e === 'explicit' || t.e === 'cleaned');
+    }
+  }
+  return out;
+}
+
 async function buildSongs(head, rows, report) {
   const items = [], dropped = [], offby = [];
-  for (const [y, artist, title, optStr] of rows) {
-    const o = parseOpts(optStr), year = +y;
-    const want = { title, artist, q: o.q, am: o.am, tm: o.tm, allowExtras: o.extras === '1' };
-    const b = await resolveSong(want, year);
-    if (!b) { dropped.push(`NO MATCH  ${year} ${artist} — ${title}`); continue; }
-    if (!b.near && head.kind !== 'themes' && !(o.note || '').startsWith('keepyear')) {
-      dropped.push(`YEAR ${year} vs apple ${b.year}  ${artist} — ${title}  [${b.t.collectionName}]`);
+  const pvs = rows.map((r) => (isChartCol(r[3]) ? parseChart(r[3]).pv : 0)).filter((x) => x > 0).sort((a, b) => a - b);
+  const pvRank = (v) => (v > 0 && pvs.length ? pvs.filter((x) => x <= v).length / pvs.length : 0.5);
+  for (const row of rows) {
+    const [y, artist0, title0] = row;
+    const chartCol = isChartCol(row[3]) ? row[3] : '';
+    const o = parseOpts(chartCol ? row[4] : row[3]), chartYear = +y;
+    let year = chartYear;
+    const ch = chartCol ? parseChart(chartCol) : null;
+    const want = { title: title0, artist: artist0, q: o.q, am: o.am, tm: o.tm, allowExtras: o.extras === '1', au: !!ch?.charts.au && !ch.charts.us };
+    const b = await resolveSong(want, chartYear);
+    if (!b) { dropped.push(`NO MATCH  ${year} ${artist0} — ${title0}`); continue; }
+    const keep = (o.note || '').startsWith('keepyear');
+    // an album track that charted as a single 2-3 years later: the original album's year, within the same decade
+    if (ch && !b.near && !keep && b.year < chartYear && b.year >= chartYear - 3 && decade(b.year) === decade(chartYear) && !COMPILATION.test(b.t.collectionName)) { b.near = true; year = b.year; }
+    if (!b.near && head.kind !== 'themes' && !keep) {
+      dropped.push(`YEAR ${year} vs apple ${b.year}  ${artist0} — ${title0}  [${b.t.collectionName}]`);
       continue;
     }
+    // a year-end chart counts a December single in the next year: an original (non-compilation) album a year
+    // earlier is the release year
+    if (ch && !keep && b.near && b.year === chartYear - 1 && decade(b.year) === decade(chartYear) && !COMPILATION.test(b.t.collectionName)) year = b.year;
+    const fromApple = o.nm === 'apple';
+    const title = fromApple ? stripExtras(b.t.trackName).trim() : title0;
+    const artist = fromApple ? b.t.artistName.replace(/\s*[,&]\s.*$|\s+(feat\.?|featuring|ft\.?|with)\s.*$/i, '').trim() : artist0;
     if (head.kind !== 'themes' && (b.year !== year || (b.originals && b.originals < year - 1))) offby.push(`${year} apple ${b.year} (earliest original ${b.originals ?? '-'})  ${artist} — ${title}  [${b.t.collectionName}]`);
     const theme = head.kind === 'themes';
     const id = slug(theme ? o.film : `${title} ${artist}`);
     if (!id || items.some((i) => i.id === id)) continue;
+    const facts = theme ? { composer: o.composer || artist, year, decade: decade(year), track: title, type: o.type || 'film' }
+      : { artist, year, decade: decade(year), ...(actOf(artist, title) ? { act: actOf(artist, title) } : {}) };
+    // item-level data, not facts: no format may word a question from them (the shared schema also rejects objects
+    // in facts); LOCAL reads them for "charted in" / "made in" rounds
+    const data = {};
+    if (ch && Object.keys(ch.charts).length) data.charts = ch.charts;
+    if (ch?.from.length) { data.artistCountry = ch.from[0]; if (ch.from.length > 1) data.artistCountries = ch.from; }
+    const short = stripExtras(title).trim();
+    const alt = o.alt ? o.alt.split('/') : (!theme && short !== title && short.length >= 3 ? [short] : undefined);
+    const tail = ch && Object.keys(ch.charts).length ? ` Year-end charts: ${chartLine(ch.charts)}.` : '';
     items.push({
-      id, name: theme ? o.film : title, alt: o.alt ? o.alt.split('/') : undefined,
+      id, name: theme ? o.film : title, alt,
       group: theme ? (o.type || 'film') : decade(year),
-      facts: theme ? { composer: o.composer || artist, year, decade: decade(year), track: title, type: o.type || 'film' }
-        : { artist, year, decade: decade(year), ...(actOf(artist, title) ? { act: actOf(artist, title) } : {}) },
-      blurb: o.blurb || (theme ? `"${title}" from ${o.film} (${year}), by ${o.composer || artist}.` : `"${title}" by ${artist}, released in ${year}.`),
+      facts, ...data,
+      blurb: o.blurb || (theme ? `"${title}" from ${o.film} (${year}), by ${o.composer || artist}.` : `"${title}" by ${artist}, released in ${year}.${tail}`),
       media: { audio: [audioObj(b.t, artist)] },
-      difficulty: +(o.d || head.difficulty || 2),
-      _check: { appleYear: b.year, album: b.t.collectionName, appleArtist: b.t.artistName, appleTitle: b.t.trackName },
+      difficulty: +(o.d || (ch && Object.keys(ch.charts).length ? fameDifficulty(ch.charts, ch.pv, pvRank(ch.pv)) : 0) || head.difficulty || 2),
+      _cc: b.cc, _pv: ch?.pv || 0, _noKids: o.kids === '0' || EDGY.test(title),
+      _check: { appleYear: b.year, album: b.t.collectionName, appleArtist: b.t.artistName, appleTitle: b.t.trackName, store: b.cc },
     });
     if (report) console.log(`ok  ${year} (apple ${b.year})  ${artist} — ${title}  →  ${b.t.artistName} — ${b.t.trackName} [${b.t.collectionName}]`);
+  }
+  // two songs with one title in a pack (covers, "I Like It") can't be told apart in a "name this song" question:
+  // keep the better-known one
+  const bestRank = (it) => Math.min(...Object.values(it.charts || {}), 999);
+  for (const it of [...items]) {
+    if (!items.includes(it)) continue;
+    const twin = items.find((x) => x !== it && norm(x.name) === norm(it.name));
+    if (!twin) continue;
+    const lose = ((twin._pv || 0) - (it._pv || 0) || it.facts.year - twin.facts.year || it.difficulty - twin.difficulty) > 0 ? it : twin;   // a shared article (a cover) keeps the original
+    items.splice(items.indexOf(lose), 1);
+    dropped.push(`SAME TITLE  ${lose.facts.year} ${lose.facts.artist} — ${lose.name} (kept the ${(lose === it ? twin : it).facts.artist} song)`);
+  }
+  // explicit (Apple) or edgy titles never reach kids mode
+  const ex = await explicitness(items.filter((it) => it.media.audio[0].apple).map((it) => ({ id: it.media.audio[0].apple.trackId, cc: it._cc })));
+  for (const it of items) {
+    if (ex.get(it.media.audio[0].apple.trackId)) it.explicit = true;
+    if ((it.explicit || it._noKids) && it.difficulty < 2) { it._check.kidsFloor = it.difficulty; it.difficulty = 2; }
+    if (it._noKids) it.kids = false;
+    if (it.explicit) it.kids = false;
   }
   return { items, dropped, offby };
 }
@@ -186,17 +296,28 @@ async function buildArtists(head, rows, report) {
       if (!b) { dropped.push(`NO MATCH  ${artist} — ${title}`); continue; }
       const a = audioObj(b.t, artist);
       a.title = title;
+      a._cc = b.cc;
       audio.push(a); titles.push(title);
       if (report) console.log(`ok  ${artist} — ${title}  →  ${b.t.artistName} — ${b.t.trackName} [${b.t.collectionName}, ${b.year}]`);
     }
     if (!audio.length) continue;
+    // explicit previews go when the act has a clean one; an all-explicit act never reaches kids mode
+    const ex = await explicitness(audio.map((a) => ({ id: a.apple.trackId, cc: a._cc })));
+    const clean = audio.filter((a) => !ex.get(a.apple.trackId));
+    const keepAudio = (clean.length ? clean : audio).map(({ _cc, ...a }) => a);
+    const dropT = new Set(audio.filter((a) => !keepAudio.some((k) => k.apple.trackId === a.apple.trackId)).map((a) => a.title));
+    if (dropT.size) dropped.push(`EXPLICIT preview left out  ${artist} — ${[...dropT].join(' ; ')}`);
+    titles.splice(0, titles.length, ...titles.filter((t) => !dropT.has(t)));
+    audio.splice(0, audio.length, ...keepAudio);
+    const allExplicit = !clean.length;
     items.push({
       id: slug(artist), name: artist, alt: o.alt ? o.alt.split('/') : undefined,
       group: dec,
       facts: { origin, decade: dec, songs: titles.join(' · ') },
       blurb: `${artist} (${origin}), breakthrough in the ${dec}. Known for ${titles.map((t) => `"${t}"`).join(' and ')}.`,
       media: { audio },
-      difficulty: +(o.d || 2),
+      difficulty: allExplicit ? Math.max(2, +(o.d || 2)) : +(o.d || 2),
+      ...(allExplicit ? { explicit: true, kids: false } : {}),
     });
   }
   return { items, dropped };
@@ -240,12 +361,12 @@ async function main() {
     const pack = {
       id: head.id, title: head.title, theme: 'music', icon: head.icon || '🎵', kids: head.kids === 'true', version: 1, ask: head.ask || undefined,
       notice: '30-second previews stream from Apple Music.',
-      factsMeta, items: items.map(({ _check, ...it }) => it), questions: [],
+      factsMeta, items: items.map(({ _check, _cc, _pv, _noKids, ...it }) => it), questions: [],
       sources: JSON.parse(head.sources || '[]').concat([{ name: 'Apple iTunes Search API (previews, artwork, links)', url: 'https://performance-partners.apple.com/search-api' }]),
       built: new Date().toISOString().slice(0, 10),
     };
     fs.writeFileSync(path.join(OUT, head.id + '.json'), JSON.stringify(pack, null, 1));
-    fs.writeFileSync(path.join(ROOT, 'tools/au_lists', head.id + '.check.json'), JSON.stringify({ dropped, offby, items: items.map((i) => ({ id: i.id, ...i._check, year: i.facts?.year })) }, null, 1));
+    fs.writeFileSync(path.join(ROOT, 'tools/au_lists', head.id + '.check.json'), JSON.stringify({ dropped, offby, items: items.map((i) => ({ id: i.id, ...i._check, year: i.facts?.year, d: i.difficulty, ...(i.explicit ? { explicit: true } : {}) })) }, null, 1));
     console.log(`  wrote ${items.length} items (${dropped.length} dropped)`);
   }
 }

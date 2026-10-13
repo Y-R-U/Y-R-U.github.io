@@ -18,7 +18,7 @@ const args = process.argv.slice(2);
 const arg = (k, d) => (args.includes(k) ? args[args.indexOf(k) + 1] : d);
 const SEEDS = +arg('--seeds', 4), LIST = args.includes('--list'), JSON_OUT = arg('--json', null);
 
-const STOP = new Set(('the and of a an de la le el du von van der den des di da in on or to for with from this that these which what who ' +
+const STOP = new Set(('the and of a an de la le el du von van der den des di da in on or to for with from this that these which what who think ' +
   'is are was were it its his her their one two three four five common great little big small new old true false yes no ' +
   'spider snake shark bird bee dog cat tree flower mushroom fish frog lizard turtle tortoise whale dolphin ant beetle ' +
   'butterfly moth fly wasp fungus plant animal sea jellyfish song film movie book story tale part day night man woman ' +
@@ -130,6 +130,15 @@ for (const id of realIds) {
   const corpus = new Map();
   for (const [fid, q, ans] of qs) { const k = fid + (q.id || '').split(':').slice(0, 2).join(':'); if (!corpus.has(k)) corpus.set(k, new Set()); corpus.get(k).add(ans); }
   for (const [fid, q, ans] of qs) {
+    if (fid === 'pickall') {
+      // every right tile against the prompt and hint, the decoys being the "others"
+      const rs = new Set(q.answer), decoys = q.options.filter((o, i) => !rs.has(i)).map(o => o.text);
+      for (const r of q.answer.map(i => q.options[i].text)) {
+        const w = leak(r, q.prompt, ctx, decoys);
+        if (w) { found.generated.push({ pack: id, fmt: fid, where: 'prompt', answer: r, token: w, text: q.prompt, id: q.id }); break; }
+      }
+      continue;
+    }
     const picks = Array.isArray(q.options) && q.options.some(o => o.img);
     const others = Array.isArray(q.options) ? q.options.map(o => o.text).filter(t => t && t !== ans)
       : fid === 'type' ? [...corpus.get(fid + (q.id || '').split(':').slice(0, 2).join(':')) || []].filter(t => t !== ans) : [];

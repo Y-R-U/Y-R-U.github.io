@@ -1,38 +1,79 @@
 {
- "dropped": [],
+ "dropped": [
+  "YEAR 1960 vs apple 1990  Rolf Harris — Tie Me Kangaroo Down Sport  [Ideal]",
+  "YEAR 1960 vs apple 2004  Jimmie Rodgers — Just a Closer Walk with Thee  [Classic Jimmie]",
+  "YEAR 1961 vs apple 1954  Ferrante and Teicher — Theme from Exodus  [Great Motion Picture Themes]",
+  "YEAR 1961 vs apple 1997  Eddie Hodges — I'm Gonna Knock on Your Door  [Hit Singles - EP]",
+  "YEAR 1962 vs apple 1989  Lucky Starr — I've Been Everywhere  [Seven]",
+  "NO MATCH  1962 Cliff Richard — Do You Want to Dance",
+  "NO MATCH  1963 Little Stevie Wonder — Fingertips – Part 2",
+  "YEAR 1964 vs apple 2015  J. Frank Wilson and the Cavaliers — Last Kiss  [Last Kiss - Single]",
+  "NO MATCH  1964 Sounds Incorporated — William Tell Overture",
+  "YEAR 1965 vs apple 1968  Herman's Hermits — Mrs. Brown, You've Got a Lovely Daughter  [Mrs. Brown, You've Got a Lovely Daughter (Music from the Original Soundtrack)]",
+  "YEAR 1965 vs apple 1990  Normie Rowe — Que Sera, Sera  [Normie Rowe a Go Go]",
+  "YEAR 1965 vs apple 2002  Billy Thorpe and the Aztecs — Over the Rainbow  [Long Way to the Top]",
+  "YEAR 1966 vs apple 1900  Ray Conniff Singers — Somewhere My Love  [NOW That's What I Call Jukebox Classics - True Love Ways]",
+  "YEAR 1966 vs apple 2001  The Overlanders — Michelle  [All You Need Is Covers: The Songs of the Beatles]",
+  "YEAR 1966 vs apple 1964  The Mindbenders — A Groovy Kind of Love  [20th Century Masters - The Millennium Collection: Wayne Fontana & The Mindbenders]",
+  "NO MATCH  1967 Vikki Carr — It Must Be Him",
+  "YEAR 1969 vs apple 1988  The Cowsills — Hair  [The Best of the Cowsills]",
+  "YEAR 1969 vs apple 1967  Tom Jones — I'll Never Fall in Love Again  [The Best of Tom Jones Country Hits 20th Century Masters the Millennium Collection]",
+  "SAME TITLE  1966 Johnny Young and Kompany — Let It Be Me (kept the The Everly Brothers song)",
+  "SAME TITLE  1961 Joe Dowell — Wooden Heart (kept the Elvis Presley song)",
+  "SAME TITLE  1967 The Mamas & the Papas — Dedicated to the One I Love (kept the The Shirelles song)",
+  "SAME TITLE  1965 Rolling Stones — Under the Boardwalk (kept the The Drifters song)"
+ ],
  "offby": [
   "1959 apple 1960 (earliest original 1955)  Percy Faith — Theme from \"A Summer Place\"  [Percy Faith's Greatest Hits]",
   "1960 apple 1960 (earliest original 1958)  The Everly Brothers — Cathy's Clown  [A Date With The Everly Brothers]",
-  "1964 apple 1964 (earliest original 1962)  Louis Armstrong — Hello, Dolly!  [Hello, Dolly! (Remastered)]",
+  "1960 apple 1959 (earliest original 1956)  Marty Robbins — El Paso  [Gunfighter Ballads and Trail Songs]",
+  "1960 apple 1959 (earliest original 1959)  Duane Eddy — Peter Gunn  [Especially for You]",
+  "1960 apple 1959 (earliest original 1959)  Mark Dinning — Teen Angel  [The Lovin' Touch]",
+  "1960 apple 1959 (earliest original 1959)  The Everly Brothers — Let It Be Me  [The Fabulous Style of the Everly Brothers]",
+  "1960 apple 1961 (earliest original 1961)  Lonnie Donegan — My Old Man's a Dustman  [King of Skiffle]",
+  "1960 apple 1959 (earliest original 1959)  Dion and the Belmonts — Where or When  [Presenting Dion and The Belmonts]",
+  "1960 apple 1959 (earliest original 1959)  Paul Anka — Puppy Love  [Paul Anka: Written in Love]",
+  "1961 apple 1962 (earliest original 1962)  Sue Thompson — Sad Movies (Make Me Cry)  [Greatest Hits]",
+  "1961 apple 1961 (earliest original 1954)  Ferrante & Teicher — Exodus  [Exodus (Mono Version) - EP]",
+  "1962 apple 1962 (earliest original 1959)  Bruce Channel — Hey! Baby  [La fabuleuse époque des groupes, Vol. 1 (2021 Remastered Version)]",
+  "1962 apple 1962 (earliest original 1960)  Neil Sedaka — Breaking Up Is Hard to Do  [Neil Sedaka Sings Greatest Hits (Remastered)]",
+  "1962 apple 1962 (earliest original 1960)  Freddy Cannon — Palisades Park  [Palisades Park - Single]",
+  "1963 apple 1962 (earliest original 1991)  Ned Miller — From a Jack to a King  [Country Classics]",
+  "1964 apple 1964 (earliest original 1962)  Louis Armstrong — Hello, Dolly!  [Oh Didn't He Ramble]",
+  "1965 apple 1965 (earliest original 1953)  Elvis Presley — Crying in the Chapel  [How Great Thou Art]",
+  "1965 apple 1965 (earliest original 1955)  The Righteous Brothers — Unchained Melody  [Just Once In My Life]",
+  "1965 apple 1966 (earliest original 1966)  We Five — You Were on My Mind  [You Were On My Mind]",
   "1966 apple 1967 (earliest original 1967)  Four Tops — Reach Out I'll Be There  [Reach Out]",
+  "1966 apple 1967 (earliest original 1964)  Peter and Gordon — Lady Godiva  [British Entertainers and Eccentrics]",
+  "1966 apple 1966 (earliest original 1964)  ? and the Mysterians — 96 Tears  [96 Tears]",
   "1968 apple 1968 (earliest original 1964)  Otis Redding — (Sittin' On) The Dock of the Bay  [The Dock of the Bay]",
+  "1968 apple 1969 (earliest original 1969)  Merrilee Rush — Angel of the Morning  [Dial A Hit]",
+  "1968 apple 1968 (earliest original 1900)  Hugo Montenegro — The Good, the Bad and the Ugly  [Music from \"The Good, the Bad and the Ugly\" & \"A Fistful of Dollars\" & \"For a Few Dollars More\"]",
+  "1968 apple 1969 (earliest original 1969)  Mary Hopkin — Those Were the Days  [Post Card]",
+  "1969 apple 1969 (earliest original 1966)  The Rolling Stones — Honky Tonk Women  [Hot Rocks 1964-1971]",
   "1969 apple 1969 (earliest original 1963)  The Archies — Sugar, Sugar  [Sugar, Sugar - Single]",
-  "1969 apple 1969 (earliest original 1966)  The Rolling Stones — Honky Tonk Women  [Hot Rocks 1964-1971]"
+  "1969 apple 1970 (earliest original 2001)  Tommy Roe — Dizzy  [Tommy Roe: Greatest Hits]"
  ],
  "items": [
-  {
-   "id": "theme-from-a-summer-place-percy-faith",
-   "appleYear": 1960,
-   "album": "Percy Faith's Greatest Hits",
-   "appleArtist": "Percy Faith",
-   "appleTitle": "Theme from \"A Summer Place\" (Single Version)",
-   "year": 1959
-  },
   {
    "id": "hell-have-to-go-jim-reeves",
    "appleYear": 1959,
    "album": "He'll Have To Go (Expanded Edition)",
    "appleArtist": "Jim Reeves",
    "appleTitle": "He'll Have to Go",
-   "year": 1959
+   "store": "US",
+   "year": 1959,
+   "d": 2
   },
   {
-   "id": "cathys-clown-the-everly-brothers",
+   "id": "theme-from-a-summer-place-percy-faith",
    "appleYear": 1960,
-   "album": "A Date With The Everly Brothers",
-   "appleArtist": "The Everly Brothers",
-   "appleTitle": "Cathy's Clown",
-   "year": 1960
+   "album": "Percy Faith's Greatest Hits",
+   "appleArtist": "Percy Faith",
+   "appleTitle": "Theme from \"A Summer Place\" (Single Version)",
+   "store": "US",
+   "year": 1959,
+   "d": 1
   },
   {
    "id": "its-now-or-never-elvis-presley",
@@ -40,7 +81,19 @@
    "album": "Elvis' Golden Records, Vol. 3",
    "appleArtist": "Elvis Presley",
    "appleTitle": "It's Now or Never",
-   "year": 1960
+   "store": "US",
+   "year": 1960,
+   "d": 1
+  },
+  {
+   "id": "cathys-clown-the-everly-brothers",
+   "appleYear": 1960,
+   "album": "A Date With The Everly Brothers",
+   "appleArtist": "The Everly Brothers",
+   "appleTitle": "Cathy's Clown",
+   "store": "US",
+   "year": 1960,
+   "d": 2
   },
   {
    "id": "the-twist-chubby-checker",
@@ -48,23 +101,229 @@
    "album": "The Twist - Single",
    "appleArtist": "Chubby Checker",
    "appleTitle": "The Twist",
-   "year": 1960
+   "store": "US",
+   "year": 1960,
+   "d": 1
   },
   {
-   "id": "stand-by-me-ben-e-king",
-   "appleYear": 1961,
-   "album": "Rhino Hi-Five: Ben E. King - EP",
-   "appleArtist": "Ben E. King",
-   "appleTitle": "Stand By Me",
-   "year": 1961
+   "id": "save-the-last-dance-for-me-the-drifters",
+   "appleYear": 1960,
+   "album": "Save the Last Dance for Me",
+   "appleArtist": "The Drifters",
+   "appleTitle": "Save the Last Dance for Me",
+   "store": "US",
+   "year": 1960,
+   "d": 1
   },
   {
-   "id": "crazy-patsy-cline",
+   "id": "running-bear-johnny-preston",
+   "appleYear": 1960,
+   "album": "Making Believe",
+   "appleArtist": "Johnny Preston",
+   "appleTitle": "Running Bear",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "everybodys-somebodys-fool-connie-francis",
+   "appleYear": 1960,
+   "album": "Her Greatest Hits & Finest Performances",
+   "appleArtist": "Connie Francis",
+   "appleTitle": "Everybody's Somebody's Fool",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "walk-dont-run-the-ventures",
+   "appleYear": 1960,
+   "album": "Walk Don't Run",
+   "appleArtist": "The Ventures",
+   "appleTitle": "Walk, Don't Run",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "stuck-on-you-elvis-presley",
+   "appleYear": 1960,
+   "album": "Elvis' Golden Records, Vol. 3",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "Stuck On You",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "what-in-the-worlds-come-over-you-jack-scott",
+   "appleYear": 1960,
+   "album": "Jack Scott - His Very Best - EP",
+   "appleArtist": "Jack Scott",
+   "appleTitle": "What In the World's Come Over You",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "beatnik-fly-johnny-and-the-hurricanes",
+   "appleYear": 1960,
+   "album": "The Big Sound of Johnny and the Hurricanes",
+   "appleArtist": "Johnny & The Hurricanes",
+   "appleTitle": "Beatnik Fly",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "are-you-lonesome-tonight-elvis-presley",
+   "appleYear": 1960,
+   "album": "Elvis' Golden Records, Vol. 3",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "Are You Lonesome Tonight?",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "north-to-alaska-johnny-horton",
+   "appleYear": 1960,
+   "album": "Les 100 plus grands titres Country",
+   "appleArtist": "Johnny Horton",
+   "appleTitle": "North to Alaska",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "el-paso-marty-robbins",
+   "appleYear": 1959,
+   "album": "Gunfighter Ballads and Trail Songs",
+   "appleArtist": "Marty Robbins",
+   "appleTitle": "El Paso",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "itsy-bitsy-teenie-weenie-yellow-polkadot-bikini-brian-hyland",
+   "appleYear": 1960,
+   "album": "Brian Hyland: Greatest Hits",
+   "appleArtist": "Brian Hyland",
+   "appleTitle": "Itsy Bitsy Teenie Weenie Yellow Polka Dot Bikini (Single)",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "peter-gunn-duane-eddy",
+   "appleYear": 1959,
+   "album": "Especially for You",
+   "appleArtist": "Duane Eddy",
+   "appleTitle": "Peter Gunn",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "beyond-the-sea-bobby-darin",
+   "appleYear": 1960,
+   "album": "Rhino Hi-Five: Bobby Darin - EP",
+   "appleArtist": "Bobby Darin",
+   "appleTitle": "Beyond the Sea",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "handy-man-jimmy-jones",
+   "appleYear": 1960,
+   "album": "Good Timin'",
+   "appleArtist": "Jimmy Jones",
+   "appleTitle": "Handy Man",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "im-sorry-brenda-lee",
+   "appleYear": 1960,
+   "album": "Brenda Lee",
+   "appleArtist": "Brenda Lee",
+   "appleTitle": "I'm Sorry",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "only-the-lonely-roy-orbison",
+   "appleYear": 1960,
+   "album": "Lonely and Blue",
+   "appleArtist": "Roy Orbison",
+   "appleTitle": "Only the Lonely",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "teen-angel-mark-dinning",
+   "appleYear": 1959,
+   "album": "The Lovin' Touch",
+   "appleArtist": "Mark Dinning",
+   "appleTitle": "Teen Angel",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "let-it-be-me-the-everly-brothers",
+   "appleYear": 1959,
+   "album": "The Fabulous Style of the Everly Brothers",
+   "appleArtist": "The Everly Brothers",
+   "appleTitle": "Let It Be Me",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "my-old-mans-a-dustman-lonnie-donegan",
    "appleYear": 1961,
-   "album": "Showcase (feat. The Jordanaires)",
-   "appleArtist": "Patsy Cline",
-   "appleTitle": "Crazy (feat. The Jordanaires)",
-   "year": 1961
+   "album": "King of Skiffle",
+   "appleArtist": "Lonnie Donegan",
+   "appleTitle": "My Old Man's a Dustman",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "where-or-when-dion-and-the-belmonts",
+   "appleYear": 1959,
+   "album": "Presenting Dion and The Belmonts",
+   "appleArtist": "Dion & The Belmonts",
+   "appleTitle": "Where Or When",
+   "store": "US",
+   "year": 1960,
+   "d": 3
+  },
+  {
+   "id": "puppy-love-paul-anka",
+   "appleYear": 1959,
+   "album": "Paul Anka: Written in Love",
+   "appleArtist": "Paul Anka",
+   "appleTitle": "Puppy Love",
+   "store": "US",
+   "year": 1960,
+   "d": 3
+  },
+  {
+   "id": "alley-oop-the-hollywood-argyles",
+   "appleYear": 1960,
+   "album": "Alley Oop - Single",
+   "appleArtist": "The Hollywood Argyles",
+   "appleTitle": "Alley Oop",
+   "store": "US",
+   "year": 1960,
+   "d": 2
   },
   {
    "id": "runaway-del-shannon",
@@ -72,7 +331,19 @@
    "album": "Runaway",
    "appleArtist": "Del Shannon",
    "appleTitle": "Runaway",
-   "year": 1961
+   "store": "US",
+   "year": 1961,
+   "d": 1
+  },
+  {
+   "id": "stand-by-me-ben-e-king",
+   "appleYear": 1961,
+   "album": "Rhino Hi-Five: Ben E. King - EP",
+   "appleArtist": "Ben E. King",
+   "appleTitle": "Stand By Me",
+   "store": "US",
+   "year": 1961,
+   "d": 1
   },
   {
    "id": "runaround-sue-dion",
@@ -80,7 +351,219 @@
    "album": "Runaround Sue",
    "appleArtist": "Dion",
    "appleTitle": "Runaround Sue",
-   "year": 1961
+   "store": "US",
+   "year": 1961,
+   "d": 3
+  },
+  {
+   "id": "crazy-patsy-cline",
+   "appleYear": 1961,
+   "album": "Showcase (feat. The Jordanaires)",
+   "appleArtist": "Patsy Cline",
+   "appleTitle": "Crazy (feat. The Jordanaires)",
+   "store": "US",
+   "year": 1961,
+   "d": 1
+  },
+  {
+   "id": "crying-roy-orbison",
+   "appleYear": 1961,
+   "album": "Crying",
+   "appleArtist": "Roy Orbison",
+   "appleTitle": "Crying",
+   "store": "US",
+   "year": 1961,
+   "d": 1
+  },
+  {
+   "id": "michael-the-highwaymen",
+   "appleYear": 1961,
+   "album": "Michael (Remastered) - Single",
+   "appleArtist": "The Highwaymen",
+   "appleTitle": "Michael",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "hit-the-road-jack-ray-charles",
+   "appleYear": 1961,
+   "album": "True Genius",
+   "appleArtist": "Ray Charles",
+   "appleTitle": "Hit the Road Jack",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "take-good-care-of-my-baby-bobby-vee",
+   "appleYear": 1960,
+   "album": "Take Good Care of My Baby",
+   "appleArtist": "Bobby Vee",
+   "appleTitle": "Take Good Care of My Baby",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "hello-mary-lou-ricky-nelson",
+   "appleYear": 1961,
+   "album": "Legacy",
+   "appleArtist": "Ricky Nelson",
+   "appleTitle": "Hello Mary Lou",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "wheels-the-string-a-longs",
+   "appleYear": 1961,
+   "album": "Pick a Hit",
+   "appleArtist": "The String-A-Longs",
+   "appleTitle": "Wheels",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "sad-movies-make-me-cry-sue-thompson",
+   "appleYear": 1962,
+   "album": "Greatest Hits",
+   "appleArtist": "Sue Thompson",
+   "appleTitle": "Sad Movies (Make Me Cry)",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "surrender-elvis-presley",
+   "appleYear": 1961,
+   "album": "Elvis Songs Love",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "Surrender",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "will-you-love-me-tomorrow-the-shirelles",
+   "appleYear": 1960,
+   "album": "Filth (Music From the Original Motion Picture)",
+   "appleArtist": "The Shirelles",
+   "appleTitle": "Will You Love Me Tomorrow",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "maries-the-name-his-latest-flame-elvis-presley",
+   "appleYear": 1961,
+   "album": "Elvis' Golden Records, Vol. 3",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "(Marie's the Name Of) His Latest Flame",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "i-fall-to-pieces-patsy-cline",
+   "appleYear": 1961,
+   "album": "Showcase (feat. The Jordanaires)",
+   "appleArtist": "Patsy Cline",
+   "appleTitle": "I Fall To Pieces (feat. The Jordanaires)",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "wonderland-by-night-bert-kaempfert",
+   "appleYear": 1960,
+   "album": "Wonderland By Night (Decca Album)",
+   "appleArtist": "Bert Kaempfert",
+   "appleTitle": "Wonderland By Night (Wunderland bei Nacht)",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "mexico-bob-moore",
+   "appleYear": 1961,
+   "album": "Mexico / Hot Spot (Mono Version) - Single",
+   "appleArtist": "Bob Moore And His Orchestra",
+   "appleTitle": "Mexico",
+   "store": "GB",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "wooden-heart-elvis-presley",
+   "appleYear": 1960,
+   "album": "G.I. Blues (Original Soundtrack)",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "Wooden Heart",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "dedicated-to-the-one-i-love-the-shirelles",
+   "appleYear": 1961,
+   "album": "Dedicated To The One I Love - Single",
+   "appleArtist": "The Shirelles",
+   "appleTitle": "Dedicated To The One I Love",
+   "store": "GB",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "tossin-and-turnin-bobby-lewis",
+   "appleYear": 1961,
+   "album": "Tossin' and Turnin'",
+   "appleArtist": "Bobby Lewis",
+   "appleTitle": "Tossin' and Turnin'",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "exodus-ferrante-and-teicher",
+   "appleYear": 1961,
+   "album": "Exodus (Mono Version) - EP",
+   "appleArtist": "Ferrante & Teicher",
+   "appleTitle": "Exodus",
+   "store": "GB",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "rubber-ball-bobby-vee",
+   "appleYear": 1960,
+   "album": "The Legendary Masters Series: Bobby Vee",
+   "appleArtist": "Bobby Vee",
+   "appleTitle": "Rubber Ball",
+   "store": "US",
+   "year": 1960,
+   "d": 2
+  },
+  {
+   "id": "my-boomerang-wont-come-back-charlie-drake",
+   "appleYear": 1961,
+   "album": "My Boomerang Won’t Come Back - Single",
+   "appleArtist": "Charlie Drake",
+   "appleTitle": "My Boomerang Won’t Come Back",
+   "store": "GB",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "running-scared-roy-orbison",
+   "appleYear": 1961,
+   "album": "The Soul of Rock And Roll",
+   "appleArtist": "Roy Orbison",
+   "appleTitle": "Running Scared",
+   "store": "US",
+   "year": 1961,
+   "d": 2
   },
   {
    "id": "i-cant-stop-loving-you-ray-charles",
@@ -88,23 +571,9 @@
    "album": "Jazz On the Afternoon",
    "appleArtist": "Ray Charles",
    "appleTitle": "I Can't Stop Loving You",
-   "year": 1962
-  },
-  {
-   "id": "sherry-the-four-seasons",
-   "appleYear": 1962,
-   "album": "Jersey Beat: The Music of Frankie Valli & The Four Seasons (Remastered)",
-   "appleArtist": "Frankie Valli & The Four Seasons",
-   "appleTitle": "Sherry",
-   "year": 1962
-  },
-  {
-   "id": "big-girls-dont-cry-the-four-seasons",
-   "appleYear": 1962,
-   "album": "Jersey Boys (Original Broadway Cast Recording)",
-   "appleArtist": "The Four Seasons",
-   "appleTitle": "Big Girls Don't Cry",
-   "year": 1962
+   "store": "US",
+   "year": 1962,
+   "d": 2
   },
   {
    "id": "the-loco-motion-little-eva",
@@ -112,47 +581,239 @@
    "album": "Dick Van Dyke's Dance Party",
    "appleArtist": "Little Eva",
    "appleTitle": "The Loco-Motion",
-   "year": 1962
+   "store": "US",
+   "year": 1962,
+   "d": 1
   },
   {
-   "id": "surfin-u-s-a-the-beach-boys",
-   "appleYear": 1963,
-   "album": "10 Great Songs (Remastered)",
-   "appleArtist": "The Beach Boys",
-   "appleTitle": "Surfin' U.S.A.",
-   "year": 1963
+   "id": "big-girls-dont-cry-the-four-seasons",
+   "appleYear": 1962,
+   "album": "Jersey Boys (Original Broadway Cast Recording)",
+   "appleArtist": "The Four Seasons",
+   "appleTitle": "Big Girls Don't Cry",
+   "store": "US",
+   "year": 1962,
+   "d": 2
   },
   {
-   "id": "hes-so-fine-the-chiffons",
-   "appleYear": 1963,
-   "album": "Absolutely the Best!",
-   "appleArtist": "The Chiffons",
-   "appleTitle": "He's So Fine",
-   "year": 1963
+   "id": "sherry-the-four-seasons",
+   "appleYear": 1962,
+   "album": "Jersey Beat: The Music of Frankie Valli & The Four Seasons (Remastered)",
+   "appleArtist": "Frankie Valli & The Four Seasons",
+   "appleTitle": "Sherry",
+   "store": "US",
+   "year": 1962,
+   "d": 3
   },
   {
-   "id": "louie-louie-the-kingsmen",
-   "appleYear": 1963,
-   "album": "The Best of the Kingsmen",
-   "appleArtist": "The Kingsmen",
-   "appleTitle": "Louie Louie",
-   "year": 1963
+   "id": "stranger-on-the-shore-acker-bilk",
+   "appleYear": 1961,
+   "album": "Some of the Best",
+   "appleArtist": "Acker Bilk",
+   "appleTitle": "Stranger on the Shore",
+   "store": "US",
+   "year": 1961,
+   "d": 2
   },
   {
-   "id": "be-my-baby-the-ronettes",
-   "appleYear": 1963,
-   "album": "Presenting the Fabulous Ronettes Featuring Veronica",
-   "appleArtist": "The Ronettes",
-   "appleTitle": "Be My Baby",
-   "year": 1963
+   "id": "cant-help-falling-in-love-elvis-presley",
+   "appleYear": 1961,
+   "album": "Blue Hawaii (Original Soundtrack)",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "Can't Help Falling In Love",
+   "store": "US",
+   "year": 1961,
+   "d": 1
   },
   {
-   "id": "she-loves-you-the-beatles",
-   "appleYear": 1963,
-   "album": "Past Masters, Vols. 1 & 2",
-   "appleArtist": "The Beatles",
-   "appleTitle": "She Loves You",
-   "year": 1963
+   "id": "the-wanderer-dion",
+   "appleYear": 1961,
+   "album": "Runaround Sue",
+   "appleArtist": "Dion",
+   "appleTitle": "The Wanderer",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "roses-are-red-my-love-bobby-vinton",
+   "appleYear": 1962,
+   "album": "16 Most Requested",
+   "appleArtist": "Bobby Vinton",
+   "appleTitle": "Roses Are Red (My Love)",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "midnight-in-moscow-kenny-ball",
+   "appleYear": 1961,
+   "album": "Midnight In Moscow - EP",
+   "appleArtist": "Kenny Ball",
+   "appleTitle": "Midnight in Moscow",
+   "store": "US",
+   "year": 1961,
+   "d": 2
+  },
+  {
+   "id": "wolverton-mountain-claude-king",
+   "appleYear": 1962,
+   "album": "Chip 'N' Dale's Place",
+   "appleArtist": "Claude King",
+   "appleTitle": "Wolverton Mountain",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "good-luck-charm-elvis-presley",
+   "appleYear": 1962,
+   "album": "Elvis' Golden Records, Vol. 3",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "Good Luck Charm",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "sheila-tommy-roe",
+   "appleYear": 1962,
+   "album": "Sheila",
+   "appleArtist": "Tommy Roe",
+   "appleTitle": "Sheila",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "ramblin-rose-nat-king-cole",
+   "appleYear": 1962,
+   "album": "Ramblin' Rose",
+   "appleArtist": "Nat \"King\" Cole",
+   "appleTitle": "Ramblin' Rose",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "multiplication-bobby-darin",
+   "appleYear": 1961,
+   "album": "Twist With Bobby Darin",
+   "appleArtist": "Bobby Darin",
+   "appleTitle": "Multiplication",
+   "store": "US",
+   "year": 1961,
+   "d": 1
+  },
+  {
+   "id": "alley-cat-bent-fabric",
+   "appleYear": 1962,
+   "album": "Alley Cat",
+   "appleArtist": "Bent Fabric",
+   "appleTitle": "Alley Cat",
+   "store": "GB",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "hey-baby-bruce-channel",
+   "appleYear": 1962,
+   "album": "La fabuleuse époque des groupes, Vol. 1 (2021 Remastered Version)",
+   "appleArtist": "Bruce Channel",
+   "appleTitle": "Hey Baby (2021 Remastered Version)",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "johnny-angel-shelley-fabares",
+   "appleYear": 1962,
+   "album": "Teen-Age Triangle",
+   "appleArtist": "Shelley Fabares",
+   "appleTitle": "Johnny Angel (Single Version)",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "telstar-the-tornados",
+   "appleYear": 1962,
+   "album": "The Original Telstar: The Sounds of the Tornadoes",
+   "appleArtist": "The Tornados",
+   "appleTitle": "Telstar (Alternate Take)",
+   "store": "US",
+   "year": 1962,
+   "d": 1
+  },
+  {
+   "id": "breaking-up-is-hard-to-do-neil-sedaka",
+   "appleYear": 1962,
+   "album": "Neil Sedaka Sings Greatest Hits (Remastered)",
+   "appleArtist": "NEIL SEDAKA",
+   "appleTitle": "Breaking Up Is Hard to Do",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "soldier-boy-the-shirelles",
+   "appleYear": 1962,
+   "album": "P.S. I Love You",
+   "appleArtist": "The Shirelles",
+   "appleTitle": "Soldier Boy",
+   "store": "GB",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "sealed-with-a-kiss-brian-hyland",
+   "appleYear": 1962,
+   "album": "Chronology",
+   "appleArtist": "Brian Hyland",
+   "appleTitle": "Sealed with a Kiss",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "duke-of-earl-gene-chandler",
+   "appleYear": 1962,
+   "album": "The Duke of Earl",
+   "appleArtist": "Gene Chandler",
+   "appleTitle": "Duke of Earl",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "palisades-park-freddy-cannon",
+   "appleYear": 1962,
+   "album": "Palisades Park - Single",
+   "appleArtist": "Freddy Cannon",
+   "appleTitle": "Palisades Park",
+   "store": "GB",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "the-stripper-david-rose",
+   "appleYear": 1962,
+   "album": "Tease! The Beat of Burlesque",
+   "appleArtist": "David Rose",
+   "appleTitle": "The Stripper",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "mashed-potato-time-dee-dee-sharp",
+   "appleYear": 1962,
+   "album": "It's Mashed Potato Time / Do the Bird",
+   "appleArtist": "Dee Dee Sharp",
+   "appleTitle": "Mashed Potato Time",
+   "store": "US",
+   "year": 1962,
+   "d": 2
   },
   {
    "id": "i-want-to-hold-your-hand-the-beatles",
@@ -160,15 +821,259 @@
    "album": "The Beatles 1962-1966 (The Red Album)",
    "appleArtist": "The Beatles",
    "appleTitle": "I Want to Hold Your Hand",
-   "year": 1963
+   "store": "US",
+   "year": 1963,
+   "d": 1
   },
   {
-   "id": "hello-dolly-louis-armstrong",
-   "appleYear": 1964,
-   "album": "Hello, Dolly! (Remastered)",
-   "appleArtist": "Louis Armstrong",
-   "appleTitle": "Hello, Dolly!",
-   "year": 1964
+   "id": "she-loves-you-the-beatles",
+   "appleYear": 1963,
+   "album": "Past Masters, Vols. 1 & 2",
+   "appleArtist": "The Beatles",
+   "appleTitle": "She Loves You",
+   "store": "US",
+   "year": 1963,
+   "d": 1
+  },
+  {
+   "id": "surfin-u-s-a-the-beach-boys",
+   "appleYear": 1963,
+   "album": "Surfin' USA (Mono & Stereo)",
+   "appleArtist": "The Beach Boys",
+   "appleTitle": "Surfin' U.S.A. (Mono)",
+   "store": "US",
+   "year": 1963,
+   "d": 1
+  },
+  {
+   "id": "be-my-baby-the-ronettes",
+   "appleYear": 1963,
+   "album": "Presenting the Fabulous Ronettes Featuring Veronica",
+   "appleArtist": "The Ronettes",
+   "appleTitle": "Be My Baby",
+   "store": "US",
+   "year": 1963,
+   "d": 1
+  },
+  {
+   "id": "hes-so-fine-the-chiffons",
+   "appleYear": 1963,
+   "album": "Absolutely the Best!",
+   "appleArtist": "The Chiffons",
+   "appleTitle": "He's So Fine",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "louie-louie-the-kingsmen",
+   "appleYear": 1963,
+   "album": "The Best of the Kingsmen",
+   "appleArtist": "The Kingsmen",
+   "appleTitle": "Louie Louie",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "sukiyaki-kyu-sakamoto",
+   "appleYear": 1961,
+   "album": "Sukiyaki (Ueo O Muite Aru Kou) [English Promo Version, 1962]  [Remastered] - Single",
+   "appleArtist": "Kyu Sakamoto",
+   "appleTitle": "Sukiyaki (Ueo O Muite Aru Kou) [English Promo Version, 1962]  [Remastered] [English Promo Version, 1962]",
+   "store": "US",
+   "year": 1961,
+   "d": 1
+  },
+  {
+   "id": "i-will-follow-him-little-peggy-march",
+   "appleYear": 1963,
+   "album": "I Will Follow Him (Remastered) - Single",
+   "appleArtist": "Little Peggy March",
+   "appleTitle": "I Will Follow Him (Remastered)",
+   "store": "US",
+   "year": 1963,
+   "d": 1
+  },
+  {
+   "id": "wipe-out-the-surfaris",
+   "appleYear": 1963,
+   "album": "Wipe Out",
+   "appleArtist": "The Surfaris",
+   "appleTitle": "Wipe Out (Hit Version)",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "hey-paula-paul-and-paula",
+   "appleYear": 1963,
+   "album": "Hey Paula - Single",
+   "appleArtist": "Paul & Paula",
+   "appleTitle": "Hey Paula",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "pipeline-the-chantays",
+   "appleYear": 1963,
+   "album": "Pipeline",
+   "appleArtist": "The Chantays",
+   "appleTitle": "Pipeline",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "surf-city-jan-and-dean",
+   "appleYear": 1963,
+   "album": "Surf City (And Other Swingin' Cities)",
+   "appleArtist": "Jan & Dean",
+   "appleTitle": "Surf City",
+   "store": "US",
+   "year": 1963,
+   "d": 3
+  },
+  {
+   "id": "in-dreams-roy-orbison",
+   "appleYear": 1963,
+   "album": "In Dreams",
+   "appleArtist": "Roy Orbison",
+   "appleTitle": "In Dreams",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "sugar-shack-jimmy-gilmer-and-the-fireballs",
+   "appleYear": 1963,
+   "album": "Clovis Classics: The Definitive Collection",
+   "appleArtist": "Jimmy Gilmer & The Fireballs",
+   "appleTitle": "Sugar Shack",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "youll-never-walk-alone-gerry-and-the-pacemakers",
+   "appleYear": 1963,
+   "album": "You'll Never Walk Alone: All the Best",
+   "appleArtist": "Gerry & The Pacemakers",
+   "appleTitle": "You'll Never Walk Alone",
+   "store": "US",
+   "year": 1963,
+   "d": 1
+  },
+  {
+   "id": "puff-the-magic-dragon-peter-paul-and-mary",
+   "appleYear": 1963,
+   "album": "Moving",
+   "appleArtist": "Peter, Paul & Mary",
+   "appleTitle": "Puff, the Magic Dragon",
+   "store": "US",
+   "year": 1963,
+   "d": 1
+  },
+  {
+   "id": "blowin-in-the-wind-peter-paul-and-mary",
+   "appleYear": 1963,
+   "album": "In the Wind",
+   "appleArtist": "Peter, Paul & Mary",
+   "appleTitle": "Blowin' In the Wind",
+   "store": "US",
+   "year": 1963,
+   "d": 1
+  },
+  {
+   "id": "the-end-of-the-world-skeeter-davis",
+   "appleYear": 1962,
+   "album": "Daltry Calhoun (Motion Picture Soundtrack)",
+   "appleArtist": "Skeeter Davis",
+   "appleTitle": "The End of the World",
+   "store": "US",
+   "year": 1962,
+   "d": 1
+  },
+  {
+   "id": "no-trespassing-helen-shapiro",
+   "appleYear": 1963,
+   "album": "Helen In Nashville",
+   "appleArtist": "Helen Shapiro",
+   "appleTitle": "No Trespassing",
+   "store": "GB",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "from-a-jack-to-a-king-ned-miller",
+   "appleYear": 1962,
+   "album": "Country Classics",
+   "appleArtist": "Ned Miller",
+   "appleTitle": "From A Jack To A King",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "blue-velvet-bobby-vinton",
+   "appleYear": 1963,
+   "album": "16 Most Requested",
+   "appleArtist": "Bobby Vinton",
+   "appleTitle": "Blue Velvet",
+   "store": "US",
+   "year": 1963,
+   "d": 1
+  },
+  {
+   "id": "rhythm-of-the-rain-the-cascades",
+   "appleYear": 1963,
+   "album": "Ten Songs for You",
+   "appleArtist": "The Cascades",
+   "appleTitle": "Rhythm of the Rain",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "blue-bayou-roy-orbison",
+   "appleYear": 1963,
+   "album": "In Dreams",
+   "appleArtist": "Roy Orbison",
+   "appleTitle": "Blue Bayou",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "its-my-party-lesley-gore",
+   "appleYear": 1963,
+   "album": "I'll Cry If I Want To",
+   "appleArtist": "Lesley Gore",
+   "appleTitle": "It's My Party",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "return-to-sender-elvis-presley",
+   "appleYear": 1962,
+   "album": "Girls! Girls! Girls! (Original Soundtrack)",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "Return to Sender (From, \"Girls! Girls! Girls!\")",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "my-boyfriends-back-the-angels",
+   "appleYear": 1963,
+   "album": "My Boyfriend's Back",
+   "appleArtist": "The Angels",
+   "appleTitle": "My Boyfriend's Back (Single Version)",
+   "store": "US",
+   "year": 1963,
+   "d": 2
   },
   {
    "id": "oh-pretty-woman-roy-orbison",
@@ -176,23 +1081,9 @@
    "album": "Oh! Pretty Woman",
    "appleArtist": "Roy Orbison",
    "appleTitle": "Oh, Pretty Woman",
-   "year": 1964
-  },
-  {
-   "id": "i-get-around-the-beach-boys",
-   "appleYear": 1964,
-   "album": "All Summer Long",
-   "appleArtist": "The Beach Boys",
-   "appleTitle": "I Get Around",
-   "year": 1964
-  },
-  {
-   "id": "where-did-our-love-go-the-supremes",
-   "appleYear": 1964,
-   "album": "Where Did Our Love Go",
-   "appleArtist": "The Supremes",
-   "appleTitle": "Where Did Our Love Go",
-   "year": 1964
+   "store": "US",
+   "year": 1964,
+   "d": 1
   },
   {
    "id": "the-house-of-the-rising-sun-the-animals",
@@ -200,7 +1091,9 @@
    "album": "The Animals (Bonus Track)",
    "appleArtist": "The Animals",
    "appleTitle": "House of the Rising Sun",
-   "year": 1964
+   "store": "US",
+   "year": 1964,
+   "d": 1
   },
   {
    "id": "cant-buy-me-love-the-beatles",
@@ -208,47 +1101,9 @@
    "album": "A Hard Day's Night",
    "appleArtist": "The Beatles",
    "appleTitle": "Can't Buy Me Love",
-   "year": 1964
-  },
-  {
-   "id": "my-girl-the-temptations",
-   "appleYear": 1964,
-   "album": "The Temptations Sing Smokey",
-   "appleArtist": "The Temptations",
-   "appleTitle": "My Girl",
-   "year": 1964
-  },
-  {
-   "id": "i-cant-get-no-satisfaction-the-rolling-stones",
-   "appleYear": 1965,
-   "album": "Out of Our Heads",
-   "appleArtist": "The Rolling Stones",
-   "appleTitle": "(I Can't Get No) Satisfaction",
-   "year": 1965
-  },
-  {
-   "id": "i-cant-help-myself-sugar-pie-honey-bunch-four-tops",
-   "appleYear": 1965,
-   "album": "Second Album",
-   "appleArtist": "Four Tops",
-   "appleTitle": "I Can't Help Myself (Sugar Pie, Honey Bunch)",
-   "year": 1965
-  },
-  {
-   "id": "mr-tambourine-man-the-byrds",
-   "appleYear": 1965,
-   "album": "Mr. Tambourine Man (Reissue Edition with Bonus Tracks)",
-   "appleArtist": "The Byrds",
-   "appleTitle": "Mr. Tambourine Man",
-   "year": 1965
-  },
-  {
-   "id": "help-the-beatles",
-   "appleYear": 1965,
-   "album": "Help!",
-   "appleArtist": "The Beatles",
-   "appleTitle": "Help!",
-   "year": 1965
+   "store": "US",
+   "year": 1964,
+   "d": 1
   },
   {
    "id": "youve-lost-that-lovin-feelin-the-righteous-brothers",
@@ -256,7 +1111,239 @@
    "album": "The Essential Phil Spector",
    "appleArtist": "The Righteous Brothers",
    "appleTitle": "You've Lost That Lovin' Feelin' (Single Version)",
-   "year": 1964
+   "store": "US",
+   "year": 1964,
+   "d": 1
+  },
+  {
+   "id": "my-girl-the-temptations",
+   "appleYear": 1964,
+   "album": "The Temptations Sing Smokey",
+   "appleArtist": "The Temptations",
+   "appleTitle": "My Girl",
+   "store": "US",
+   "year": 1964,
+   "d": 1
+  },
+  {
+   "id": "i-get-around-the-beach-boys",
+   "appleYear": 1964,
+   "album": "All Summer Long",
+   "appleArtist": "The Beach Boys",
+   "appleTitle": "I Get Around",
+   "store": "US",
+   "year": 1964,
+   "d": 1
+  },
+  {
+   "id": "hello-dolly-louis-armstrong",
+   "appleYear": 1964,
+   "album": "Oh Didn't He Ramble",
+   "appleArtist": "Louis Armstrong",
+   "appleTitle": "Hello, Dolly!",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "where-did-our-love-go-the-supremes",
+   "appleYear": 1964,
+   "album": "Where Did Our Love Go",
+   "appleArtist": "The Supremes",
+   "appleTitle": "Where Did Our Love Go",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "a-hard-days-night-the-beatles",
+   "appleYear": 1964,
+   "album": "A Hard Day's Night",
+   "appleArtist": "The Beatles",
+   "appleTitle": "A Hard Day's Night",
+   "store": "US",
+   "year": 1964,
+   "d": 1
+  },
+  {
+   "id": "do-wah-diddy-diddy-manfred-mann",
+   "appleYear": 1964,
+   "album": "Groovin' with Manfred Mann - EP",
+   "appleArtist": "Manfred Mann",
+   "appleTitle": "Do Wah Diddy Diddy",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "my-guy-mary-wells",
+   "appleYear": 1964,
+   "album": "Mary Wells Sings My Guy",
+   "appleArtist": "Mary Wells",
+   "appleTitle": "My Guy",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "a-world-without-love-peter-and-gordon",
+   "appleYear": 1964,
+   "album": "Play Soft Rock",
+   "appleArtist": "Peter & Gordon",
+   "appleTitle": "A World Without Love",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "have-i-the-right-the-honeycombs",
+   "appleYear": 1964,
+   "album": "The Honeycombs (Expanded)",
+   "appleArtist": "The Honeycombs",
+   "appleTitle": "Have I the Right",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "glad-all-over-the-dave-clark-five",
+   "appleYear": 1964,
+   "album": "The History of the Dave Clark Five, Pt. 1",
+   "appleArtist": "The Dave Clark Five",
+   "appleTitle": "Glad All Over",
+   "store": "US",
+   "year": 1964,
+   "d": 3
+  },
+  {
+   "id": "my-boy-lollipop-millie-small",
+   "appleYear": 1964,
+   "album": "My Boy Lollipop: The Best of Millie Small",
+   "appleArtist": "Millie Small",
+   "appleTitle": "My Boy Lollipop",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "i-saw-her-standing-there-the-beatles",
+   "appleYear": 1963,
+   "album": "Please Please Me",
+   "appleArtist": "The Beatles",
+   "appleTitle": "I Saw Her Standing There",
+   "store": "US",
+   "year": 1963,
+   "d": 1
+  },
+  {
+   "id": "love-me-do-the-beatles",
+   "appleYear": 1962,
+   "album": "Please Please Me",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Love Me Do",
+   "store": "US",
+   "year": 1962,
+   "d": 2
+  },
+  {
+   "id": "i-feel-fine-the-beatles",
+   "appleYear": 1964,
+   "album": "The Beatles 1962-1966 (The Red Album)",
+   "appleArtist": "The Beatles",
+   "appleTitle": "I Feel Fine",
+   "store": "US",
+   "year": 1964,
+   "d": 1
+  },
+  {
+   "id": "dancing-in-the-street-martha-and-the-vandellas",
+   "appleYear": 1964,
+   "album": "Dancing In the Street",
+   "appleArtist": "Martha Reeves & The Vandellas",
+   "appleTitle": "Dancing In the Street",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "roll-over-beethoven-the-beatles",
+   "appleYear": 1963,
+   "album": "With The Beatles",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Roll Over Beethoven",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "please-please-me-the-beatles",
+   "appleYear": 1963,
+   "album": "Please Please Me",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Please Please Me",
+   "store": "US",
+   "year": 1963,
+   "d": 2
+  },
+  {
+   "id": "under-the-boardwalk-the-drifters",
+   "appleYear": 1964,
+   "album": "Under the Boardwalk",
+   "appleArtist": "The Drifters",
+   "appleTitle": "Under the Boardwalk",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "everybody-loves-somebody-dean-martin",
+   "appleYear": 1964,
+   "album": "Everybody Loves Somebody",
+   "appleArtist": "Dean Martin",
+   "appleTitle": "Everybody Loves Somebody",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "i-should-have-known-better-the-beatles",
+   "appleYear": 1964,
+   "album": "A Hard Day's Night",
+   "appleArtist": "The Beatles",
+   "appleTitle": "I Should Have Known Better",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "viva-las-vegas-elvis-presley",
+   "appleYear": 1964,
+   "album": "2nd to None",
+   "appleArtist": "Elvis Presley & The Jordanaires",
+   "appleTitle": "Viva Las Vegas",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "i-cant-get-no-satisfaction-the-rolling-stones",
+   "appleYear": 1965,
+   "album": "Out of Our Heads",
+   "appleArtist": "The Rolling Stones",
+   "appleTitle": "(I Can't Get No) Satisfaction",
+   "store": "US",
+   "year": 1965,
+   "d": 1
+  },
+  {
+   "id": "help-the-beatles",
+   "appleYear": 1965,
+   "album": "Help!",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Help!",
+   "store": "US",
+   "year": 1965,
+   "d": 1
   },
   {
    "id": "california-dreamin-the-mamas-and-the-papas",
@@ -264,31 +1351,209 @@
    "album": "31 - A Rob Zombie Film (Original Motion Picture Soundtrack)",
    "appleArtist": "The Mamas & The Papas",
    "appleTitle": "California Dreamin' (Single Version)",
-   "year": 1965
+   "store": "US",
+   "year": 1965,
+   "d": 1
   },
   {
-   "id": "good-vibrations-the-beach-boys",
-   "appleYear": 1966,
-   "album": "Smiley Smile (Mono & Stereo)",
-   "appleArtist": "The Beach Boys",
-   "appleTitle": "Good Vibrations",
-   "year": 1966
-  },
-  {
-   "id": "reach-out-ill-be-there-four-tops",
-   "appleYear": 1967,
-   "album": "Reach Out",
+   "id": "i-cant-help-myself-sugar-pie-honey-bunch-four-tops",
+   "appleYear": 1965,
+   "album": "Second Album",
    "appleArtist": "Four Tops",
-   "appleTitle": "Reach Out, I'll Be There",
-   "year": 1966
+   "appleTitle": "I Can't Help Myself (Sugar Pie, Honey Bunch)",
+   "store": "US",
+   "year": 1965,
+   "d": 2
   },
   {
-   "id": "paint-it-black-the-rolling-stones",
+   "id": "mr-tambourine-man-the-byrds",
+   "appleYear": 1965,
+   "album": "Mr. Tambourine Man (Reissue Edition with Bonus Tracks)",
+   "appleArtist": "The Byrds",
+   "appleTitle": "Mr. Tambourine Man",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "downtown-petula-clark",
+   "appleYear": 1964,
+   "album": "Lost In You",
+   "appleArtist": "Petula Clark",
+   "appleTitle": "Downtown",
+   "store": "US",
+   "year": 1964,
+   "d": 1
+  },
+  {
+   "id": "i-got-you-babe-sonny-and-cher",
+   "appleYear": 1965,
+   "album": "Look At Us (Mono Version)",
+   "appleArtist": "Sonny & Cher",
+   "appleTitle": "I Got You Babe (Mono Version)",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "ticket-to-ride-the-beatles",
+   "appleYear": 1965,
+   "album": "Help!",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Ticket to Ride",
+   "store": "US",
+   "year": 1965,
+   "d": 1
+  },
+  {
+   "id": "crying-in-the-chapel-elvis-presley",
+   "appleYear": 1965,
+   "album": "How Great Thou Art",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "Crying in the Chapel",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "ill-never-find-another-you-the-seekers",
+   "appleYear": 1964,
+   "album": "The Seekers",
+   "appleArtist": "The Seekers",
+   "appleTitle": "I'll Never Find Another You",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "unchained-melody-the-righteous-brothers",
+   "appleYear": 1965,
+   "album": "Just Once In My Life",
+   "appleArtist": "The Righteous Brothers",
+   "appleTitle": "Unchained Melody",
+   "store": "US",
+   "year": 1965,
+   "d": 1
+  },
+  {
+   "id": "yesterday-the-beatles",
+   "appleYear": 1965,
+   "album": "Help!",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Yesterday",
+   "store": "US",
+   "year": 1965,
+   "d": 1
+  },
+  {
+   "id": "wooly-bully-sam-the-sham-and-the-pharaohs",
+   "appleYear": 1965,
+   "album": "All-Star Sports Jams",
+   "appleArtist": "Sam the Sham & The Pharaohs & The Pharaohs",
+   "appleTitle": "Wooly Bully",
+   "store": "US",
+   "year": 1965,
+   "d": 1
+  },
+  {
+   "id": "a-walk-in-the-black-forest-horst-jankowski",
+   "appleYear": 1965,
+   "album": "Jerusalem",
+   "appleArtist": "Horst Jankowski",
+   "appleTitle": "A Walk in the Black Forest",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "rock-and-roll-music-the-beatles",
+   "appleYear": 1964,
+   "album": "Beatles For Sale",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Rock and Roll Music",
+   "store": "US",
+   "year": 1964,
+   "d": 2
+  },
+  {
+   "id": "king-of-the-road-roger-miller",
+   "appleYear": 1965,
+   "album": "King Of The Road: The Genius Of Roger Miller",
+   "appleArtist": "Roger Miller",
+   "appleTitle": "King Of The Road",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "help-me-rhonda-the-beach-boys",
+   "appleYear": 1965,
+   "album": "The Beach Boys Today!",
+   "appleArtist": "The Beach Boys",
+   "appleTitle": "Help Me, Rhonda",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "hang-on-sloopy-the-mccoys",
+   "appleYear": 1965,
+   "album": "Hang On Sloopy",
+   "appleArtist": "The McCoys",
+   "appleTitle": "Hang On Sloopy",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "you-were-on-my-mind-we-five",
    "appleYear": 1966,
-   "album": "Aftermath (US Version)",
+   "album": "You Were On My Mind",
+   "appleArtist": "We Five",
+   "appleTitle": "You Were On My Mind",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "eve-of-destruction-barry-mcguire",
+   "appleYear": 1965,
+   "album": "Eve of Destruction",
+   "appleArtist": "Barry McGuire",
+   "appleTitle": "Eve of Destruction",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "the-carnival-is-over-the-seekers",
+   "appleYear": 1965,
+   "album": "The Seekers",
+   "appleArtist": "The Seekers",
+   "appleTitle": "The Carnival Is Over",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "stop-in-the-name-of-love-the-supremes",
+   "appleYear": 1965,
+   "album": "Motown: The Complete No. 1's",
+   "appleArtist": "The Supremes",
+   "appleTitle": "Stop! In the Name of Love",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "get-off-of-my-cloud-rolling-stones",
+   "appleYear": 1965,
+   "album": "December's Children (And Everybody's)",
    "appleArtist": "The Rolling Stones",
-   "appleTitle": "Paint It, Black",
-   "year": 1966
+   "appleTitle": "Get Off of My Cloud",
+   "store": "US",
+   "year": 1965,
+   "d": 2
   },
   {
    "id": "these-boots-are-made-for-walkin-nancy-sinatra",
@@ -296,7 +1561,9 @@
    "album": "Boots (Bonus Tracks Edition)",
    "appleArtist": "Nancy Sinatra",
    "appleTitle": "These Boots Are Made for Walkin'",
-   "year": 1966
+   "store": "US",
+   "year": 1966,
+   "d": 1
   },
   {
    "id": "im-a-believer-the-monkees",
@@ -304,15 +1571,229 @@
    "album": "More of the Monkees (Deluxe Edition)",
    "appleArtist": "The Monkees",
    "appleTitle": "I'm a Believer",
-   "year": 1966
+   "store": "US",
+   "year": 1966,
+   "d": 1
   },
   {
-   "id": "respect-aretha-franklin",
+   "id": "paint-it-black-the-rolling-stones",
+   "appleYear": 1966,
+   "album": "Aftermath (US Version)",
+   "appleArtist": "The Rolling Stones",
+   "appleTitle": "Paint It, Black",
+   "store": "US",
+   "year": 1966,
+   "d": 1
+  },
+  {
+   "id": "good-vibrations-the-beach-boys",
+   "appleYear": 1966,
+   "album": "Smiley Smile (Mono & Stereo)",
+   "appleArtist": "The Beach Boys",
+   "appleTitle": "Good Vibrations",
+   "store": "US",
+   "year": 1966,
+   "d": 1
+  },
+  {
+   "id": "reach-out-ill-be-there-four-tops",
    "appleYear": 1967,
-   "album": "I Never Loved a Man the Way I Love You",
-   "appleArtist": "Aretha Franklin",
-   "appleTitle": "Respect",
-   "year": 1967
+   "album": "Reach Out",
+   "appleArtist": "Four Tops",
+   "appleTitle": "Reach Out, I'll Be There",
+   "store": "US",
+   "year": 1966,
+   "d": 2
+  },
+  {
+   "id": "strangers-in-the-night-frank-sinatra",
+   "appleYear": 1966,
+   "album": "Strangers In the Night (Expanded Edition)",
+   "appleArtist": "Frank Sinatra",
+   "appleTitle": "Strangers In the Night",
+   "store": "US",
+   "year": 1966,
+   "d": 1
+  },
+  {
+   "id": "we-can-work-it-out-the-beatles",
+   "appleYear": 1965,
+   "album": "The Beatles 1962-1966 (The Red Album)",
+   "appleArtist": "The Beatles",
+   "appleTitle": "We Can Work It Out",
+   "store": "US",
+   "year": 1965,
+   "d": 1
+  },
+  {
+   "id": "wild-thing-the-troggs",
+   "appleYear": 1966,
+   "album": "From Nowhere",
+   "appleArtist": "The Troggs",
+   "appleTitle": "Wild Thing",
+   "store": "US",
+   "year": 1966,
+   "d": 2
+  },
+  {
+   "id": "lady-godiva-peter-and-gordon",
+   "appleYear": 1967,
+   "album": "British Entertainers and Eccentrics",
+   "appleArtist": "Peter & Gordon",
+   "appleTitle": "Lady Godiva",
+   "store": "US",
+   "year": 1966,
+   "d": 1
+  },
+  {
+   "id": "yellow-submarine-the-beatles",
+   "appleYear": 1966,
+   "album": "Yellow Submarine",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Yellow Submarine",
+   "store": "US",
+   "year": 1966,
+   "d": 1
+  },
+  {
+   "id": "friday-on-my-mind-the-easybeats",
+   "appleYear": 1966,
+   "album": "Friday on My Mind",
+   "appleArtist": "The Easybeats",
+   "appleTitle": "Friday On My Mind",
+   "store": "US",
+   "year": 1966,
+   "d": 2
+  },
+  {
+   "id": "winchester-cathedral-the-new-vaudeville-band",
+   "appleYear": 1966,
+   "album": "British Invasion Greatest Hits",
+   "appleArtist": "New Vaudeville Band",
+   "appleTitle": "Winchester Cathedral",
+   "store": "US",
+   "year": 1966,
+   "d": 1
+  },
+  {
+   "id": "nowhere-man-the-beatles",
+   "appleYear": 1965,
+   "album": "Rubber Soul",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Nowhere Man",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "you-cant-hurry-love-the-supremes",
+   "appleYear": 1966,
+   "album": "The Supremes A' Go-Go",
+   "appleArtist": "The Supremes",
+   "appleTitle": "You Can't Hurry Love",
+   "store": "US",
+   "year": 1966,
+   "d": 2
+  },
+  {
+   "id": "last-train-to-clarksville-the-monkees",
+   "appleYear": 1966,
+   "album": "The Monkees",
+   "appleArtist": "The Monkees",
+   "appleTitle": "Last Train to Clarksville",
+   "store": "US",
+   "year": 1966,
+   "d": 1
+  },
+  {
+   "id": "96-tears-and-the-mysterians",
+   "appleYear": 1966,
+   "album": "96 Tears",
+   "appleArtist": "? and The Mysterians",
+   "appleTitle": "96 Tears",
+   "store": "US",
+   "year": 1966,
+   "d": 1
+  },
+  {
+   "id": "sunny-bobby-hebb",
+   "appleYear": 1966,
+   "album": "Sunny",
+   "appleArtist": "Bobby Hebb",
+   "appleTitle": "Sunny",
+   "store": "US",
+   "year": 1966,
+   "d": 2
+  },
+  {
+   "id": "what-becomes-of-the-brokenhearted-jimmy-ruffin",
+   "appleYear": 1966,
+   "album": "Jimmy Ruffin Sings Top Ten",
+   "appleArtist": "Jimmy Ruffin",
+   "appleTitle": "What Becomes of the Brokenhearted",
+   "store": "US",
+   "year": 1966,
+   "d": 1
+  },
+  {
+   "id": "as-tears-go-by-the-rolling-stones",
+   "appleYear": 1965,
+   "album": "December's Children (And Everybody's)",
+   "appleArtist": "The Rolling Stones",
+   "appleTitle": "As Tears Go By",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "the-ballad-of-the-green-berets-barry-sadler",
+   "appleYear": 1966,
+   "album": "Ballads of the Green Berets",
+   "appleArtist": "SSgt. Barry Sadler",
+   "appleTitle": "The Ballad of the Green Berets",
+   "store": "US",
+   "year": 1966,
+   "d": 2
+  },
+  {
+   "id": "cherish-the-association",
+   "appleYear": 1966,
+   "album": "Rhino Hi-Five: The Association - EP",
+   "appleArtist": "The Association",
+   "appleTitle": "Cherish",
+   "store": "US",
+   "year": 1966,
+   "d": 2
+  },
+  {
+   "id": "you-dont-have-to-say-you-love-me-dusty-springfield",
+   "appleYear": 1965,
+   "album": "You Don't Have to Say You Love Me",
+   "appleArtist": "Dusty Springfield",
+   "appleTitle": "You Don't Have to Say You Love Me (Single)",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "no-milk-today-hermans-hermits",
+   "appleYear": 1966,
+   "album": "Retrospective (2004 Remaster)",
+   "appleArtist": "Herman's Hermits",
+   "appleTitle": "No Milk Today",
+   "store": "US",
+   "year": 1966,
+   "d": 2
+  },
+  {
+   "id": "a-whiter-shade-of-pale-procol-harum",
+   "appleYear": 1967,
+   "album": "The Big Chill (Original Motion Picture Soundtrack) [15th Anniversary]",
+   "appleArtist": "Procol Harum",
+   "appleTitle": "A Whiter Shade of Pale",
+   "store": "US",
+   "year": 1967,
+   "d": 1
   },
   {
    "id": "the-letter-the-box-tops",
@@ -320,23 +1801,9 @@
    "album": "The Letter / Neon Rainbow",
    "appleArtist": "The Box Tops",
    "appleTitle": "The Letter",
-   "year": 1967
-  },
-  {
-   "id": "happy-together-the-turtles",
-   "appleYear": 1967,
-   "album": "Happy Together",
-   "appleArtist": "The Turtles",
-   "appleTitle": "Happy Together",
-   "year": 1967
-  },
-  {
-   "id": "light-my-fire-the-doors",
-   "appleYear": 1967,
-   "album": "The Doors (50th Anniversary Deluxe Edition)",
-   "appleArtist": "The Doors",
-   "appleTitle": "Light My Fire",
-   "year": 1967
+   "store": "US",
+   "year": 1967,
+   "d": 1
   },
   {
    "id": "ode-to-billie-joe-bobbie-gentry",
@@ -344,15 +1811,39 @@
    "album": "Ode to Billie Joe",
    "appleArtist": "Bobbie Gentry",
    "appleTitle": "Ode to Billie Joe",
-   "year": 1967
+   "store": "US",
+   "year": 1967,
+   "d": 1
   },
   {
-   "id": "a-whiter-shade-of-pale-procol-harum",
+   "id": "happy-together-the-turtles",
    "appleYear": 1967,
-   "album": "A Whiter Shade of Pale (Original Single Version) [2007 Remaster] - Single",
-   "appleArtist": "Procol Harum",
-   "appleTitle": "A Whiter Shade of Pale (Original Single Version (2007 Remaster))",
-   "year": 1967
+   "album": "Happy Together",
+   "appleArtist": "The Turtles",
+   "appleTitle": "Happy Together",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "light-my-fire-the-doors",
+   "appleYear": 1967,
+   "album": "The Doors (50th Anniversary Deluxe Edition)",
+   "appleArtist": "The Doors",
+   "appleTitle": "Light My Fire",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "respect-aretha-franklin",
+   "appleYear": 1967,
+   "album": "I Never Loved a Man the Way I Love You",
+   "appleArtist": "Aretha Franklin",
+   "appleTitle": "Respect",
+   "store": "US",
+   "year": 1967,
+   "d": 1
   },
   {
    "id": "brown-eyed-girl-van-morrison",
@@ -360,7 +1851,189 @@
    "album": "Blowin' Your Mind!",
    "appleArtist": "Van Morrison",
    "appleTitle": "Brown Eyed Girl",
-   "year": 1967
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "somethin-stupid-frank-and-nancy-sinatra",
+   "appleYear": 1967,
+   "album": "The World We Knew",
+   "appleArtist": "Frank Sinatra & Nancy Sinatra",
+   "appleTitle": "Somethin' Stupid",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "all-you-need-is-love-the-beatles",
+   "appleYear": 1967,
+   "album": "Magical Mystery Tour",
+   "appleArtist": "The Beatles",
+   "appleTitle": "All You Need Is Love",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "ruby-tuesday-the-rolling-stones",
+   "appleYear": 1967,
+   "album": "Between the Buttons",
+   "appleArtist": "The Rolling Stones",
+   "appleTitle": "Ruby Tuesday",
+   "store": "US",
+   "year": 1967,
+   "d": 2
+  },
+  {
+   "id": "penny-lane-the-beatles",
+   "appleYear": 1967,
+   "album": "Magical Mystery Tour",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Penny Lane",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "san-francisco-be-sure-to-wear-flowers-in-your-hair-scott-mck",
+   "appleYear": 1967,
+   "album": "The Voice of Scott McKenzie (Expanded Edition)",
+   "appleArtist": "Scott McKenzie",
+   "appleTitle": "San Francisco (Be Sure to Wear Some Flowers In Your Hair)",
+   "store": "US",
+   "year": 1967,
+   "d": 2
+  },
+  {
+   "id": "up-up-and-away-the-5th-dimension",
+   "appleYear": 1967,
+   "album": "Up, Up and Away",
+   "appleArtist": "The 5th Dimension",
+   "appleTitle": "Up-Up and Away",
+   "store": "US",
+   "year": 1967,
+   "d": 2
+  },
+  {
+   "id": "release-me-engelbert-humperdinck",
+   "appleYear": 1967,
+   "album": "Release Me",
+   "appleArtist": "Engelbert Humperdinck",
+   "appleTitle": "Release Me",
+   "store": "US",
+   "year": 1967,
+   "d": 2
+  },
+  {
+   "id": "georgy-girl-the-seekers",
+   "appleYear": 1967,
+   "album": "The Best of the Seekers",
+   "appleArtist": "The Seekers",
+   "appleTitle": "Georgy Girl",
+   "store": "US",
+   "year": 1967,
+   "d": 2
+  },
+  {
+   "id": "this-is-my-song-petula-clark",
+   "appleYear": 1967,
+   "album": "Platinum & Gold Collection",
+   "appleArtist": "Petula Clark",
+   "appleTitle": "This Is My Song",
+   "store": "US",
+   "year": 1967,
+   "d": 2
+  },
+  {
+   "id": "i-think-were-alone-now-tommy-james-and-the-shondells",
+   "appleYear": 1967,
+   "album": "I Think We're Alone Now",
+   "appleArtist": "Tommy James & The Shondells",
+   "appleTitle": "I Think We're Alone Now",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "cant-take-my-eyes-off-you-frankie-valli",
+   "appleYear": 1967,
+   "album": "Frankie Valli Solo",
+   "appleArtist": "Frankie Valli",
+   "appleTitle": "Can't Take My Eyes Off You",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "daydream-believer-the-monkees",
+   "appleYear": 1967,
+   "album": "The Birds, The Bees & The Monkees (Deluxe Edition)",
+   "appleArtist": "The Monkees",
+   "appleTitle": "Daydream Believer",
+   "store": "US",
+   "year": 1967,
+   "d": 2
+  },
+  {
+   "id": "green-green-grass-of-home-tom-jones",
+   "appleYear": 1967,
+   "album": "Green, Green Grass of Home",
+   "appleArtist": "Tom Jones",
+   "appleTitle": "Green Green Grass of Home",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "snoopy-vs-the-red-baron-the-royal-guardsmen",
+   "appleYear": 1966,
+   "album": "Snoopy and His Friends the Royal Guardsmen",
+   "appleArtist": "The Royal Guardsmen",
+   "appleTitle": "Snoopy vs. The Red Baron",
+   "store": "US",
+   "year": 1966,
+   "d": 2
+  },
+  {
+   "id": "for-what-its-worth-buffalo-springfield",
+   "appleYear": 1967,
+   "album": "What's That Sound? The Complete Album Collection (Remastered)",
+   "appleArtist": "Buffalo Springfield",
+   "appleTitle": "For What It's Worth (Remastered)",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "to-sir-with-love-lulu",
+   "appleYear": 1967,
+   "album": "To Sir With Love",
+   "appleArtist": "Lulu",
+   "appleTitle": "To Sir With Love",
+   "store": "US",
+   "year": 1967,
+   "d": 2
+  },
+  {
+   "id": "itchycoo-park-small-faces",
+   "appleYear": 1967,
+   "album": "The Small Faces",
+   "appleArtist": "Small Faces",
+   "appleTitle": "Itchycoo Park",
+   "store": "US",
+   "year": 1967,
+   "d": 2
+  },
+  {
+   "id": "windy-the-association",
+   "appleYear": 1967,
+   "album": "Insight Out (Mono)",
+   "appleArtist": "The Association",
+   "appleTitle": "Windy",
+   "store": "US",
+   "year": 1967,
+   "d": 2
   },
   {
    "id": "hey-jude-the-beatles",
@@ -368,7 +2041,9 @@
    "album": "The Beatles 1967-1970 (The Blue Album)",
    "appleArtist": "The Beatles",
    "appleTitle": "Hey Jude",
-   "year": 1968
+   "store": "US",
+   "year": 1968,
+   "d": 1
   },
   {
    "id": "sittin-on-the-dock-of-the-bay-otis-redding",
@@ -376,7 +2051,9 @@
    "album": "The Dock of the Bay",
    "appleArtist": "Otis Redding",
    "appleTitle": "(Sittin' On) The Dock of the Bay",
-   "year": 1968
+   "store": "US",
+   "year": 1968,
+   "d": 1
   },
   {
    "id": "mrs-robinson-simon-and-garfunkel",
@@ -384,15 +2061,9 @@
    "album": "Bookends",
    "appleArtist": "Simon & Garfunkel",
    "appleTitle": "Mrs. Robinson",
-   "year": 1968
-  },
-  {
-   "id": "i-heard-it-through-the-grapevine-marvin-gaye",
-   "appleYear": 1968,
-   "album": "Every Great Motown Hit of Marvin Gaye",
-   "appleArtist": "Marvin Gaye",
-   "appleTitle": "I Heard It Through the Grapevine",
-   "year": 1968
+   "store": "US",
+   "year": 1968,
+   "d": 1
   },
   {
    "id": "born-to-be-wild-steppenwolf",
@@ -400,23 +2071,239 @@
    "album": "Steppenwolf",
    "appleArtist": "Steppenwolf",
    "appleTitle": "Born to Be Wild",
-   "year": 1968
+   "store": "US",
+   "year": 1968,
+   "d": 2
   },
   {
-   "id": "sugar-sugar-the-archies",
-   "appleYear": 1969,
-   "album": "Sugar, Sugar - Single",
-   "appleArtist": "The Archies",
-   "appleTitle": "Sugar, Sugar",
-   "year": 1969
+   "id": "i-heard-it-through-the-grapevine-marvin-gaye",
+   "appleYear": 1968,
+   "album": "Every Great Motown Hit of Marvin Gaye",
+   "appleArtist": "Marvin Gaye",
+   "appleTitle": "I Heard It Through the Grapevine",
+   "store": "US",
+   "year": 1968,
+   "d": 2
   },
   {
-   "id": "aquarius-let-the-sunshine-in-the-5th-dimension",
+   "id": "love-is-blue-paul-mauriat",
+   "appleYear": 1968,
+   "album": "Love Is Blue",
+   "appleArtist": "Paul Mauriat",
+   "appleTitle": "Love Is Blue",
+   "store": "US",
+   "year": 1968,
+   "d": 1
+  },
+  {
+   "id": "honey-bobby-goldsboro",
+   "appleYear": 1968,
+   "album": "Honey",
+   "appleArtist": "Bobby Goldsboro",
+   "appleTitle": "Honey",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "angel-of-the-morning-merrilee-rush",
    "appleYear": 1969,
-   "album": "The Age of Aquarius (2000 Remaster)",
-   "appleArtist": "The 5th Dimension",
-   "appleTitle": "Aquarius/Let the Sunshine In",
-   "year": 1969
+   "album": "Dial A Hit",
+   "appleArtist": "MERRILEE RUSH & THE TURNABOUTS",
+   "appleTitle": "Angel of The Morning",
+   "store": "US",
+   "year": 1968,
+   "d": 1
+  },
+  {
+   "id": "macarthur-park-richard-harris",
+   "appleYear": 1968,
+   "album": "A Tramp Shining",
+   "appleArtist": "Richard Harris",
+   "appleTitle": "MacArthur Park",
+   "store": "US",
+   "year": 1968,
+   "d": 1
+  },
+  {
+   "id": "harper-valley-pta-jeannie-c-riley",
+   "appleYear": 1968,
+   "album": "Harper Valley P.T.A. (The Plantation Recordings 1968-70)",
+   "appleArtist": "Jeannie C. Riley",
+   "appleTitle": "Harper Valley P.T.A.",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "this-guys-in-love-with-you-herb-alpert",
+   "appleYear": 1968,
+   "album": "Herb Alpert Is...",
+   "appleArtist": "Herb Alpert",
+   "appleTitle": "This Guy's In Love With You",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "the-good-the-bad-and-the-ugly-hugo-montenegro",
+   "appleYear": 1968,
+   "album": "Music from \"The Good, the Bad and the Ugly\" & \"A Fistful of Dollars\" & \"For a Few Dollars More\"",
+   "appleArtist": "Hugo Montenegro and His Orchestra",
+   "appleTitle": "The Good, the Bad and the Ugly",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "young-girl-gary-puckett-and-the-union-gap",
+   "appleYear": 1968,
+   "album": "Gary Puckett & The Union Gap Featuring \"Young Girl\"",
+   "appleArtist": "Gary Puckett & The Union Gap",
+   "appleTitle": "Young Girl",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "judy-in-disguise-with-glasses-john-fred-and-his-playboy-band",
+   "appleYear": 1965,
+   "album": "Agnes English",
+   "appleArtist": "John Fred & His Playboy Band",
+   "appleTitle": "Judy in Disguise (with Glasses)",
+   "store": "US",
+   "year": 1965,
+   "d": 2
+  },
+  {
+   "id": "lady-madonna-the-beatles",
+   "appleYear": 1968,
+   "album": "The Beatles 1967-1970 (The Blue Album)",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Lady Madonna",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "love-child-the-supremes",
+   "appleYear": 1968,
+   "album": "Love Child",
+   "appleArtist": "Diana Ross & The Supremes",
+   "appleTitle": "Love Child",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "delilah-tom-jones",
+   "appleYear": 1968,
+   "album": "Delilah",
+   "appleArtist": "Tom Jones",
+   "appleTitle": "Delilah",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "white-room-cream",
+   "appleYear": 1968,
+   "album": "Wheels of Fire",
+   "appleArtist": "Cream",
+   "appleTitle": "White Room",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "dream-a-little-dream-of-me-mama-cass",
+   "appleYear": 1968,
+   "album": "NOW That's What I Call Jukebox Classics - True Love Ways",
+   "appleArtist": "Mama Cass",
+   "appleTitle": "Dream a Little Dream of Me (Edit)",
+   "store": "GB",
+   "year": 1968,
+   "d": 1
+  },
+  {
+   "id": "those-were-the-days-mary-hopkin",
+   "appleYear": 1969,
+   "album": "Post Card",
+   "appleArtist": "Mary Hopkin",
+   "appleTitle": "Those Were the Days (2010 - Remaster)",
+   "store": "US",
+   "year": 1968,
+   "d": 1
+  },
+  {
+   "id": "hello-goodbye-the-beatles",
+   "appleYear": 1967,
+   "album": "Magical Mystery Tour",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Hello, Goodbye",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "sunshine-of-your-love-cream",
+   "appleYear": 1967,
+   "album": "Disraeli Gears",
+   "appleArtist": "Cream",
+   "appleTitle": "Sunshine of Your Love",
+   "store": "US",
+   "year": 1967,
+   "d": 1
+  },
+  {
+   "id": "mony-mony-tommy-james-and-the-shondells",
+   "appleYear": 1968,
+   "album": "Mony Mony",
+   "appleArtist": "Tommy James & The Shondells",
+   "appleTitle": "Mony Mony",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "the-unicorn-the-irish-rovers",
+   "appleYear": 1967,
+   "album": "The Unicorn",
+   "appleArtist": "The Irish Rovers",
+   "appleTitle": "The Unicorn",
+   "store": "US",
+   "year": 1967,
+   "d": 2
+  },
+  {
+   "id": "hold-me-tight-johnny-nash",
+   "appleYear": 1968,
+   "album": "The Reggae Collection",
+   "appleArtist": "Johnny Nash",
+   "appleTitle": "Hold Me Tight",
+   "store": "US",
+   "year": 1968,
+   "d": 3
+  },
+  {
+   "id": "spooky-classics-iv",
+   "appleYear": 1968,
+   "album": "Spooky",
+   "appleArtist": "Classics IV",
+   "appleTitle": "Spooky",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "little-green-apples-o-c-smith",
+   "appleYear": 1968,
+   "album": "Hickory Holler Revisted",
+   "appleArtist": "O.C. Smith",
+   "appleTitle": "Little Green Apples",
+   "store": "US",
+   "year": 1968,
+   "d": 2
   },
   {
    "id": "honky-tonk-women-the-rolling-stones",
@@ -424,23 +2311,19 @@
    "album": "Hot Rocks 1964-1971",
    "appleArtist": "The Rolling Stones",
    "appleTitle": "Honky Tonk Women",
-   "year": 1969
+   "store": "US",
+   "year": 1969,
+   "d": 1
   },
   {
-   "id": "in-the-year-2525-zager-and-evans",
+   "id": "sugar-sugar-the-archies",
    "appleYear": 1969,
-   "album": "In the Year 2525 (Exordium Terminus)",
-   "appleArtist": "Zager & Evans",
-   "appleTitle": "In the Year 2525 (Exordium & Terminus)",
-   "year": 1969
-  },
-  {
-   "id": "space-oddity-david-bowie",
-   "appleYear": 1969,
-   "album": "Laughing with Liza",
-   "appleArtist": "David Bowie",
-   "appleTitle": "Space Oddity (Love You Til Tuesday version)",
-   "year": 1969
+   "album": "Sugar, Sugar - Single",
+   "appleArtist": "The Archies",
+   "appleTitle": "Sugar, Sugar",
+   "store": "US",
+   "year": 1969,
+   "d": 1
   },
   {
    "id": "raindrops-keep-fallin-on-my-head-b-j-thomas",
@@ -448,7 +2331,229 @@
    "album": "Clerks II (Music From The Motion Picture)",
    "appleArtist": "B.J. Thomas",
    "appleTitle": "Raindrops Keep Fallin’ On My Head",
-   "year": 1969
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "aquarius-let-the-sunshine-in-the-5th-dimension",
+   "appleYear": 1969,
+   "album": "The Age of Aquarius (2000 Remaster)",
+   "appleArtist": "The 5th Dimension",
+   "appleTitle": "Aquarius/Let the Sunshine In",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "in-the-year-2525-zager-and-evans",
+   "appleYear": 1969,
+   "album": "In the Year 2525 (Exordium Terminus)",
+   "appleArtist": "Zager & Evans",
+   "appleTitle": "In the Year 2525 (Exordium & Terminus)",
+   "store": "US",
+   "year": 1969,
+   "d": 2
+  },
+  {
+   "id": "space-oddity-david-bowie",
+   "appleYear": 1969,
+   "album": "Laughing with Liza",
+   "appleArtist": "David Bowie",
+   "appleTitle": "Space Oddity (Love You Til Tuesday version)",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "suspicious-minds-elvis-presley",
+   "appleYear": 1969,
+   "album": "From Elvis In Memphis",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "Suspicious Minds",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "get-back-the-beatles",
+   "appleYear": 1969,
+   "album": "Let It Be",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Get Back",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "build-me-up-buttercup-the-foundations",
+   "appleYear": 1968,
+   "album": "The Foundations",
+   "appleArtist": "The Foundations",
+   "appleTitle": "Build Me Up Buttercup (Mono)",
+   "store": "US",
+   "year": 1968,
+   "d": 1
+  },
+  {
+   "id": "in-the-ghetto-elvis-presley",
+   "appleYear": 1969,
+   "album": "From Elvis In Memphis",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "In the Ghetto",
+   "store": "US",
+   "year": 1969,
+   "d": 2
+  },
+  {
+   "id": "dizzy-tommy-roe",
+   "appleYear": 1970,
+   "album": "Tommy Roe: Greatest Hits",
+   "appleArtist": "Tommy Roe",
+   "appleTitle": "Dizzy",
+   "store": "US",
+   "year": 1969,
+   "d": 2
+  },
+  {
+   "id": "something-the-beatles",
+   "appleYear": 1969,
+   "album": "1",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Something",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "ob-la-di-ob-la-da-the-beatles",
+   "appleYear": 1968,
+   "album": "The Beatles (The White Album)",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Ob-La-Di, Ob-La-Da",
+   "store": "US",
+   "year": 1968,
+   "d": 1
+  },
+  {
+   "id": "sweet-caroline-neil-diamond",
+   "appleYear": 1969,
+   "album": "Sweet Caroline",
+   "appleArtist": "Neil Diamond",
+   "appleTitle": "Sweet Caroline",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "proud-mary-creedence-clearwater-revival",
+   "appleYear": 1969,
+   "album": "Bayou Country",
+   "appleArtist": "Creedence Clearwater Revival",
+   "appleTitle": "Proud Mary",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "crimson-and-clover-tommy-james-and-the-shondells",
+   "appleYear": 1968,
+   "album": "Crimson & Clover",
+   "appleArtist": "Tommy James & The Shondells",
+   "appleTitle": "Crimson and Clover",
+   "store": "US",
+   "year": 1968,
+   "d": 1
+  },
+  {
+   "id": "the-ballad-of-john-and-yoko-the-beatles",
+   "appleYear": 1969,
+   "album": "The Beatles 1967-1970 (The Blue Album)",
+   "appleArtist": "The Beatles",
+   "appleTitle": "The Ballad of John and Yoko",
+   "store": "US",
+   "year": 1969,
+   "d": 2
+  },
+  {
+   "id": "one-three-dog-night",
+   "appleYear": 1969,
+   "album": "The Best of 3 Dog Night",
+   "appleArtist": "Three Dog Night",
+   "appleTitle": "One",
+   "store": "US",
+   "year": 1969,
+   "d": 2
+  },
+  {
+   "id": "where-do-you-go-to-my-lovely-peter-sarstedt",
+   "appleYear": 1969,
+   "album": "Where Do You Go to (My Lovely)",
+   "appleArtist": "Peter Sarstedt",
+   "appleTitle": "Where Do You Go to (My Lovely)",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "everyday-people-sly-and-the-family-stone",
+   "appleYear": 1968,
+   "album": "Stand! (Deluxe Edition)",
+   "appleArtist": "Sly & The Family Stone",
+   "appleTitle": "Everyday People",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "i-started-a-joke-bee-gees",
+   "appleYear": 1968,
+   "album": "Idea",
+   "appleArtist": "Bee Gees",
+   "appleTitle": "I Started a Joke",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "bad-moon-rising-creedence-clearwater-revival",
+   "appleYear": 1969,
+   "album": "Green River",
+   "appleArtist": "Creedence Clearwater Revival",
+   "appleTitle": "Bad Moon Rising",
+   "store": "US",
+   "year": 1969,
+   "d": 2
+  },
+  {
+   "id": "crystal-blue-persuasion-tommy-james-and-the-shondells",
+   "appleYear": 1969,
+   "album": "Crystal Blue Persuasion / I'm Alive [Digital 45]",
+   "appleArtist": "Tommy James & The Shondells",
+   "appleTitle": "Crystal Blue Persuasion",
+   "store": "US",
+   "year": 1969,
+   "d": 2
+  },
+  {
+   "id": "if-i-can-dream-elvis-presley",
+   "appleYear": 1968,
+   "album": "2nd to None",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "If I Can Dream",
+   "store": "US",
+   "year": 1968,
+   "d": 2
+  },
+  {
+   "id": "going-up-the-country-canned-heat",
+   "appleYear": 1968,
+   "album": "Living the Blues",
+   "appleArtist": "Canned Heat",
+   "appleTitle": "Goin' Up the Country",
+   "store": "US",
+   "year": 1968,
+   "d": 2
   }
  ]
 }
