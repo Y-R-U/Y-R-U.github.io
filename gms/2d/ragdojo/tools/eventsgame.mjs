@@ -23,7 +23,7 @@
  *   - a save still holding the retired SCROLLS & ROPES / MONTHLY PICTURE loads clean.
  *
  *   node tools/eventsgame.mjs              (EVENTS_TEST_PORT moves its ports; default 9500-9502)
- *   node tools/eventsgame.mjs --falsify    breaks the game 9 ways in a temp copy; each must go red
+ *   node tools/eventsgame.mjs --falsify    breaks the game 18 ways in a temp copy; each must go red
  */
 import { spawn, execFileSync } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -247,6 +247,8 @@ export async function run(root, serverDir, { label = '' } = {}) {
       await sleep(400);
       ok(L + 'only that tile, nothing else', await c.eval(`[...window.__events.arts.get('${REV}').have].join() === '7' && !window.__events.arts.get('${REV}').full`));
       const tileReqs = await c.eval(`performance.getEntriesByType('resource').map(e => e.name).filter(n => /events\\/art\\//.test(n))`);
+      const peek = await fetch(arena.base + `/events/art/tile?event=${encodeURIComponent(REV)}&cell=8`, { headers: { Authorization: `Bearer dev:${me}` } });
+      ok(L + 'the server refuses a tile for a square this player has not opened', peek.status === 403, `${peek.status}`);
       ok(L + 'the page asked for the opened square only (no whole picture)', tileReqs.length >= 1 && tileReqs.every((u) => /tile\?.*cell=7$/.test(u)), JSON.stringify(tileReqs));
       const ink0 = await c.eval('window.__ragdojo.save.ink');
       await tap(c, `[data-guess="A KITE"]`);
@@ -438,7 +440,7 @@ const MUTANTS = [
   ['the story chapter never opens', 'js/events/ui.js', 'if (to >= end) sv.pending = true;', ''],
   ['the client ignores the paid cap', 'js/events/ui.js', 'E.recordBattle(before, b, { cap: capFor(paid()) })', 'E.recordBattle(before, b)'],
   ['the server never counts anyone as paid', 'server/events.go', 'Paid: pass || out.Entitlements["ragdojo_supporter"]', 'Paid: false'],
-  ['old events are not dropped from a save', 'js/events/state.js', "if (parseEventId(id) && e && typeof e === 'object') ev[id] = e;", "if (e && typeof e === 'object') ev[id] = e;"],
+  ['the retired SCROLLS & ROPES is back', 'js/events/calendar.js', "  { id: 'tower', kind: 'tower',", "  { id: 'vines-month', kind: 'vines', cadence: 'monthly', pass: true, anyBattle: false, title: 'SCROLLS & ROPES' },\n  { id: 'tower', kind: 'tower',"],
   ['THE TOWER is open without the Pass', 'js/events/calendar.js', "{ id: 'tower', kind: 'tower', cadence: 'weekly', pass: true,", "{ id: 'tower', kind: 'tower', cadence: 'weekly', pass: false,"],
 ];
 

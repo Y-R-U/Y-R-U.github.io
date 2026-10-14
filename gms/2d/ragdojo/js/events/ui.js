@@ -199,7 +199,7 @@ export function mountEvents(h) {
       setSt(E.setEv(s, id, { ...cur, uid: d.uid || cur.uid, t: TW.towerCounted(p.win, [...srvT, ...extraT]) }));
       if (Array.isArray(d.rivals)) rivals.set(id, d.rivals);
       payRewards(id);
-      if (tab === id && isOpen()) paint();
+      if (isOpen() && tab === id) paint();
       return;
     }
     const srv = Array.isArray(d.b) ? d.b : [];
