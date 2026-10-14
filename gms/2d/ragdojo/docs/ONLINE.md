@@ -46,6 +46,13 @@ Aaron's brief, plus the manager's defaults where he left a choice open. Defaults
    hard hit knocks it loose. **Build now** (Aaron, 2026-10-13).
 6. **King of the Hill**, 2–8: a paper ledge/zone; time standing on it alone scores. **Build now.**
 7. Later ideas: 2v2 tag, daily-rule fights (low gravity / big heads / one-hit).
+8. **QUICK FIGHT** (Aaron, 2026-10-14), on every mode: always a match within ~10 s. Others pressing it on
+   the same mode in that window join; empty seats (to 2 for 1v1, 4 for rooms) go to **ghost players** —
+   AI fighters with a personality (BRICK, ZIPPY, RUMBLE, INKSLINGER, SNEAK, RANDOM) whose names end in
+   "*" ("*unfilled slots are filled by ghost players"). Sign-in and allowance as FIND A FIGHT; never ranked;
+   event points as an arena battle with 2+ people, as a campaign battle when alone. Wire: `{t:"quick", type,
+   tok}`; server → `offer` with `quick`/`list`, `go` with `quick`/`ghosts`, or `quickgo` (alone: played on
+   the device). Details in CLAUDE.md "Quick fight".
 
 **Free allowance:** 3 online battles per day free, **10 per day with the A$1.99 supporter unlock**,
 unlimited with the Pass (Aaron, 2026-10-13). The payment service's free-allowance API needs the

@@ -21,8 +21,8 @@ import { DEV, DEMO, ACCOUNTS, SIGNIN, HOME } from './edition.js?v=20261013-lan';
 import { Purchases, API, ownerPollNext } from './purchases.js?v=20261014-gift';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
-import { mountArena } from './net/panel.js?v=20261013-f4';
-import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261014-walk';
+import { mountArena } from './net/panel.js?v=20261014-qf';
+import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261014-ev';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
 /** A definitive "not entitled" arrived while a paid world was in play: park it at the next hub visit, never mid-fight. */
@@ -941,7 +941,12 @@ const eventsUI = mountEvents({
   dev: DEV, lan: familyAccess.available && !DEMO, click, overlay, account: () => account,
   getSave: () => S, persist: () => persist(S), openUpgrade: () => openUpgrade(null, 'pass'),
   hasPass: () => (DEV && qs.get('evpass') === '0' ? false : DEV || familyAccess.active || !!purchases?.passActive),
+  paid: () => (DEV && qs.has('evpaid') ? qs.get('evpaid') === '1' : DEV && qs.get('evpass') === '0' ? false : hasPremium()),
   addInk: (n) => { S.ink += n; persist(S); refreshHub(); },
+  // THE TOWER's fights (js/events/towerfight.js): a local Match, ended by the events panel.
+  startFight: (m) => { match = m; ensureSheet(m.level); setMode('fight'); audio.play(m.level.kind === 'champion' ? roleTrack(S.theme, 'boss') : fightTrack({ kind: 'fight', idx: 0 })); },
+  endFight: () => { if (match && match.tower) { match = null; setMode('hub'); refreshHub(); } },
+  currentMatch: () => match,
 });
 
 if (DEV) window.__ragdojo = { arena, eventsUI, openUpgrade, get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };

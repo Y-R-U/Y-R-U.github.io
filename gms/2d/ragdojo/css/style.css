@@ -332,6 +332,9 @@ body.fighting #br8t-account { visibility: hidden; }
 #arena .arenatabs { justify-content: center; margin: 0 0 6px; }
 #arenaBody .btn.small { font-size: 17px; padding: 4px 13px; }
 #arenaBody .lname small { display: block; font-size: 13px; color: var(--ink-soft); line-height: 1.1; }
+#arenaBody .quickclock { text-align: center; font-size: 22px; margin: 0 0 4px; color: var(--blue); font-variant-numeric: tabular-nums; }
+#arenaBody .quicklist .lrow { border-bottom: 1px dashed rgba(32,36,44,.18); }
+#arenaBody .quicknote { text-align: center; margin: 8px 0 0; }
 .ghosttag { display: inline-block; font-size: 12px; letter-spacing: 1.2px; padding: 0 6px; margin-right: 4px;
   border: 1.5px dashed #6b5ca8; color: #6b5ca8; border-radius: 7px 5px 8px 4px; vertical-align: middle; line-height: 1.5; }
 #arenaBody .seg { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 6px 0 2px; }

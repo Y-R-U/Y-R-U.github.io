@@ -631,6 +631,50 @@ JS paused via CDP `Debugger.pause` = the master's forfeit).
 - `eventsecretgate` reads the answers from Aaron's data and prints only pass/fail; its history check uses
   `git log --all -i -S` and excludes `assets/events/manifest.json` (the choices are public by design).
 
+## Quick fight + ghost players (lane QF, 2026-10-14; local only, NOT deployed)
+
+FIND A FIGHT finds nobody while the game is new, so every mode also has QUICK FIGHT: always a match.
+
+```
+server/quick.go    quick windows, ghost planning/reveal, quickStrength, quickLocal (+ quick_test.go)
+js/net/quick.js    STYLES (personalities for Brain), styleAt (RANDOM's schedule), GhostBrain, ghostSeats
+js/ai.js           Brain opts.style + decideStyled; no style = the old path, byte for byte
+js/net/objective.js  ObjectiveBrain(…, opts) passes the style on; lurk() is SNEAK
+```
+
+- **The window.** `{t:"quick", type, tok}` (the token rides along: a window that fills starts at once, before
+  any separate accept). First press opens a 10 s window per mode (`ARENA_QUICK_MS` in tests); later presses on
+  that mode join it; 2 humans fill a 1v1, 8 a room. At the deadline: 2 / 4 fighters, all humans up to 8.
+  Updates are `offer` frames with `quick: true` and a `list` (you first, then join order).
+- **Ghosts are picked by the server** (personality, name + "*", seed; skill and loadout at the start from the
+  people's ranked records via ghost.js's formula and their loadout size, ±a little) so every browser and any
+  new master agree. One is revealed per tick across the last 3 s, all of them 2 ticks before the start. A
+  person joining late takes a ghost's seat: unshown ones go first, then the last-revealed.
+- **One person** gets `quickgo` and plays it on the device (`LocalFight` with `ghosts`; a 1v1 is a local best
+  of 3). **Two or more**: a normal room (`go` with `quick` + `ghosts`; ghost seats come after the people's);
+  the master runs the ghosts' brains in `stepMaster`, guests draw them from snapshots, `takeOver` needs nothing
+  extra (brains hold the fighters, RANDOM's style is `styleAt(seed, match.time)`). The last person in a room
+  with ghosts fights on (no forfeit win). Two people in a 1v1 window = a plain best of 3.
+- **Never ranked.** `store.recordQuick`: a `matches` row tagged "quick", afterMatch for events, NO players /
+  by_type / daily rows, pair cap on its own `<day>/quick` counter. Results carry `quick`, `names`, `place` and
+  `hwin` (the best-placed PERSON: ghost seats are ignored for events). A ghost-only fight emits
+  `ragdojo:battle {src:'campaign', kind:'quick'}` like a campaign fight.
+- **Names.** A ghost's name ends in "*" everywhere (lists, HUD, tags, results); typed names cannot contain "*"
+  (names.go). `Modes.shortName` keeps the star when a name is cut. The UI never says "bot".
+- **Personalities** (STYLES): BRICK blocks then counters, ZIPPY hovers ~1.8 reaches and backs off after a hit,
+  RUMBLE presses through instead of retreating, INKSLINGER hovers ~3.3 reaches and throws ranged specials
+  first, SNEAK waits where the nearest body is farthest, fights whoever comes close, goes for the hurt and
+  camps the next hill. Measured in `quickgate` (seeded, vs a plain bot): every style wins 20-80% of 1v1s.
+
+Gotchas: a falsifier mutant that only removed `client.leave()` from CANCEL survived — `closeIdle()` leaves too;
+the gate's metrics only measure footwork while both fighters stand (knockback flight read as "keeps distance");
+ghost reveals at tick granularity clumped until the reveal span ended two ticks early.
+
+Gates (each watched go red): `cd server && go test -race ./...` (quick_test.go) · `node tools/quickgate.mjs`
+(35: personality, sneak, random, fair, netfight incl. hand-over, local best of 3, names, plain-Brain-equals-HEAD;
+`--falsify` 17 JS + 15 Go mutants) · `node tools/quickbrowser.mjs` (real touch: solo landscape, rotated portrait
+ghost 1v1, two Chromes + 2 ghosts over WebRTC, offline; `--falsify` 9). Ports 9600-9649 (`ARENA_TEST_PORT`).
+
 ## Music
 
 Fourteen Suno v5.5 instrumental tracks in `assets/audio/`, wired through `js/music.js`.
@@ -813,3 +857,36 @@ Test hooks: `window.__events` (DEV), `?arena=` `?arenauid=` `?evpass=0`; ports `
 (9500-9502), `EVENTART_TEST_PORT` (9510-9511), `OVERLAY_TEST_PORT` (9540). Never `pkill` the review
 tool by name: Aaron's own instance runs on 8023 from `~/.ragdojo/eventart` (one was killed that way).
 
+
+## THE TOWER, STORY and the paid campaign cap (lane EV, 2026-10-14; local only, NOT deployed)
+
+Rules and server contract: `docs/EVENTS.md` ("THE TOWER", "STORY", "Campaign cap", "Entitlements").
+SCROLLS & ROPES (`vines-month`) and MONTHLY PICTURE (`reveal-month`) are gone; their ids no longer parse,
+`load()` drops them from saves, the server 404s them and deletes their rows on start.
+
+```
+js/events/tower.js       towerCounted / towerOf / rewardsOwed / selectRivals — the floor is always recomputed
+js/events/towerfight.js  TowerMatch + towerLevel: the floor's opponent, scaled to the player's own body and kit
+js/events/story.js       the three stories (text), storyIndex(month), progress(points) -> chapter/circle
+js/events/storyart.js    18 chapter pictures + the tower prize, drawn with ink.js and real ragdoll fighters
+js/events/render.js      TowerView (pyramid, climber, rivals) and StoryView (winding circles, picture page)
+```
+
+- **Paid = supporter or Pass** (`hasPremium()` in main.js; `?evpaid=0|1` in dev). Paid players' campaign
+  fights have no daily cap, only 15 s between them (`PAID_CAP`). Server: `evEnt{Pass, Paid, Known}` from
+  the payment service; an outage keeps Pass events open but the FREE cap, and loses nothing (watermark +
+  the client keeps refused rows while `cap.known === false`). Stored claims re-count with the lenient cap.
+- **Tower fights go through main.js hooks** `startFight(m)` / `endFight()` / `currentMatch()` (like the
+  ghost fights' `startNetFight`), with `match.tower` set; quitting from pause records nothing. The result is
+  also dispatched as a campaign `ragdojo:battle` (`id: 'tower:…'`), so the other events bank it.
+- Tower balance lives in `tools/eventtower.mjs`, not in config.js: the opponent is relative to the player,
+  so the same table holds for a white belt and a maxed save. Re-run `--check` after touching Brain/Match.
+- **Module identity**: every changed js/events import carries `?v=20261014-ev` from every importer, so
+  the URLs agree and each module loads once.
+
+```
+node tools/eventsgate.mjs [--falsify]   # 183 checks; 43/43 mutants (paid cap, tower, story, retired ids, locked)
+node tools/eventtower.mjs --check       # floor 1 >= 85%, floor 12 20-90% for 4 saves; --falsify 2/2; --climb
+node tools/eventsgofalsify.mjs          # 36/36 (paid cap, outage, supporter, tower floor/TOP/gap/back-dating, story)
+node tools/eventsgame.mjs [--falsify]   # 134 checks, real touch, landscape + rotated portrait; 18/18 mutants (EVENTS_TEST_PORT)
+```

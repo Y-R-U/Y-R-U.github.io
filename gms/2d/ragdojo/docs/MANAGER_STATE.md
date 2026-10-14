@@ -178,3 +178,54 @@ tests for each rule; each fix has a revert mutant (F4 scratchpad `mutants.py`, 1
 6. Owner poll settles at 2 min; art 403 is identical for "no art" and "not opened"; `/health` lists every live
    mode; per-IP cap 64, IPv6 per /64.
 7. vpstats: RAGDOJO arena section (its own repo, committed and built, not deployed).
+
+### QF status (QUICK FIGHT + ghost players, 2026-10-14)
+Done, local only, NOT deployed. Every arena mode (1v1 included) has QUICK FIGHT beside FIND A FIGHT and FRIEND
+LINK; the PRACTICE button is gone (the `?mode=..&bots=` hook stays). QUICK FIGHT opens a waiting view inside the
+sheet (mode, 10 s countdown, who has joined with you first, CANCEL, footnote "*unfilled slots are filled by ghost
+players"). Server (`server/quick.go`): one quick window per mode, joiners inside it share it; at the deadline the
+match is 2 (duel) / 4 (rooms) fighters, all humans up to 8, the rest ghosts. The server picks each ghost
+(personality, name + "*", seed, skill, loadout) and reveals them one per tick across the last 3 s; a late human
+drops unshown ghosts first, then the last-revealed one. 1 human: `quickgo`, played on the device (LocalFight; 1v1
+is a best of 3). 2+ humans: a normal online room with ghost seats after the people's (the master runs their
+brains; a new master takes them over from the keyframe); two humans in a 1v1 window = a plain best of 3.
+Personalities on the existing Brain (style params): BRICK, ZIPPY, RUMBLE, INKSLINGER, SNEAK (lurks, picks off the
+hurt, camps the next hill), RANDOM (~40%, a realistic name, style changes every 12-25 s, a pure function of seed +
+clock). Sign-in + allowance as FIND A FIGHT (the token rides on `{t:"quick"}`); never ranked (`recordQuick`:
+`matches` row tagged "quick", no players/by_type/daily rows, a separate pair-cap counter); events: 2+ humans via
+`store.afterMatch` with people ranked among themselves (`hwin`), 1 human via `ragdojo:battle` `{src:'campaign',
+kind:'quick'}`. Typed names can no longer contain `*` (names.go).
+Gates: `go test -race ./...` (quick_test.go, 11 tests), `tools/quickgate.mjs` (35 checks; `--falsify` 32/32 red:
+17 JS + 15 Go mutants), `tools/quickbrowser.mjs` (60 checks, REAL touch, landscape + rotated portrait, two Chromes
+over WebRTC, offline; `--falsify` 9/9 red); arenaserver 18, arenagate 25, arenamulti, boardsgate 45, arenafix 26,
+modegate 61, netfixgate 45, ghostgate 29, panelgate 18, portraitgate, modesim --check green; `npm run build` ok.
+Shared hunks left for the manager: main.js (panel import `?v=20261014-qf`), index.html (`main.js?v=20261014-qf`),
+css/style.css (3 rules after `#arenaBody .lname small`), this section, CLAUDE.md "Quick fight" section, ONLINE.md.
+Deploy: `server/deploy.sh` (no new env, route or table; `ARENA_QUICK_MS` is test-only), then the client build.
+Open for Aaron: ghost name style (named ones show as "Brick*", "Zippy*"…; RANDOM uses a typed-looking name);
+SNEAK is the weakest style in a 4-way LMS (avg place 3.4 of 4 vs 2.8 plain) — fine or tune.
+
+### EV status (THE TOWER, STORY, paid campaign cap, 2026-10-14)
+Done, local only, NOT deployed; committed + pushed (84d32388, 3710b75c, 667835e9). SCROLLS & ROPES and MONTHLY
+PICTURE are gone (client defs, server defs, docs, tests; `load()` drops them from saves, the server 404s their ids and
+deletes their rows on start). New Pass events: **THE TOWER** (`tower`, ISO week): 12-floor ink pyramid, FIGHT FLOOR N
+runs a real local fight (`TowerMatch`, main.js `startFight`/`endFight` hooks), win up / loss down / never below 1,
+winning floor 12 = TOP (600 ink + "TOP OF THE TOWER" backdrop prize, once a week), then defend; opponent scaled to
+the player's own body and kit (tools/eventtower.mjs: floor 1 100%, top 27-77% across a fresh/early/mid/maxed save,
+14-22 fights to the TOP); server stores the W/L list (`ev_tower`), recomputes the floor, 8 s gap, 120 a day, the
+campaign-claim time rules; tower rivals (floor, tops) from the sync. **STORY** (`story`, month, any battle): three
+original stories (THE STOLEN BANDANA / THE GREAT SPILL / THE DRAWING DRAGON) by month, 6 chapters of 12-16 circles,
+a point = a circle, the last circle opens the chapter's code-drawn picture + paragraph, NEXT CHAPTER, re-readable,
+finishing = 500 ink + the last picture as a backdrop. **Paid cap**: supporter or Pass = no daily limit, 15 s gap,
+client and server agree (golden vectors); payment outage = free cap but nothing lost. Solo quick fights (`quick:`)
+are accepted as campaign claims.
+Gates: `go test -race ./...` green (115 s); eventsgate 183 (--falsify 43/43), eventsvectors --check, eventsgofalsify
+36/36, eventsgame 134 (--falsify 18/18; 3 stale mutants fixed), eventtower --check (+--falsify 2/2), eventsecretgate
+9, eventsshot, accountgate, services.test 28, panelgate 18, portraitgate, bootgate, `npm run build` ok.
+Shared hunks left for the manager: js/main.js (`events/ui.js?v=20261014-ev`; mountEvents gains `paid`, `startFight`,
+`endFight`, `currentMatch` — 6 lines), CLAUDE.md (new section "THE TOWER, STORY and the paid campaign cap"), this
+section. index.html needs `main.js?v=` bumped (QF's `-qf` bump covers it if it lands after my main.js hunk).
+Deploy: `server/deploy.sh` as before — no new env/route; `ev_tower` is created on start; the payment service must
+return `entitlements.ragdojo_supporter` / `br8t_pass` on GET /api/br8t/entitlement (it does) for the paid cap.
+Open for Aaron: TOP reward (600 ink + backdrop) and story reward (500 ink + backdrop) amounts; tower opponent
+difficulty (a fresh save tops out ~27%, a mid one ~77%); quitting a tower fight from pause records nothing.
