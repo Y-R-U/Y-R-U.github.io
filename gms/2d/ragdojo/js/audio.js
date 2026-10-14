@@ -4,16 +4,28 @@
 let ctx = null, master = null, sfxGain = null, musGain = null, noiseBuf = null;
 let enabledSfx = true, enabledMusic = true;
 let curTrack = null, curEl = null, curGain = null;
+let needKick = false, hiddenTrack = false;
 const cache = new Map();
+const MUSIC_VOL = 0.62;
+/**
+ * iOS: HTMLMediaElement.volume is read-only (always 1), so fades did nothing. There the music is
+ * routed through Web Audio — but only where audioSession can say 'playback', or the silent
+ * switch would mute music that plays today. Desktop and Android keep element volume.
+ */
+const volumeLocked = (() => { try { const a = new Audio(); a.volume = 0.5; return a.volume !== 0.5; } catch { return false; } })();
+const routeMusic = () => volumeLocked && !!ctx && typeof navigator !== 'undefined' && !!navigator.audioSession;
 
 export function init() {
   if (ctx) return ctx;
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return null;
+  // iPhone mutes Web Audio under the silent switch unless the session is media playback.
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch { /* older Safari */ }
   ctx = new AC();
   master = ctx.createGain(); master.gain.value = 0.9; master.connect(ctx.destination);
   sfxGain = ctx.createGain(); sfxGain.gain.value = 0.85; sfxGain.connect(master);
-  musGain = ctx.createGain(); musGain.gain.value = 0.55; musGain.connect(master);
+  // Only routed (iOS) music passes through here; 1.1 x master 0.9 keeps it as loud as element volume.
+  musGain = ctx.createGain(); musGain.gain.value = 1.1; musGain.connect(master);
   const n = ctx.sampleRate * 2;
   noiseBuf = ctx.createBuffer(1, n, ctx.sampleRate);
   const d = noiseBuf.getChannelData(0);
@@ -21,7 +33,29 @@ export function init() {
   return ctx;
 }
 
-export function resume() { if (ctx && ctx.state === 'suspended') ctx.resume(); }
+// iOS parks the context as 'interrupted' after a call or the lock screen, not 'suspended'.
+export function resume() {
+  if (ctx && (ctx.state === 'suspended' || ctx.state === 'interrupted')) ctx.resume().catch(() => { /* needs a gesture */ });
+}
+/** The page went to the background: no music in a pocket. Fading tracks too, since rAF fades stall there. */
+export function suspend() {
+  hiddenTrack = !!(curEl && !curEl.paused);
+  for (const a of cache.values()) if (!a.paused) { try { a.pause(); } catch { /* ignore */ } }
+}
+export function wake() {
+  resume();
+  if (hiddenTrack && enabledMusic && curEl) { setVol(curEl, MUSIC_VOL); start(curEl); }
+  hiddenTrack = false;
+}
+/** Every user gesture: a context or a track the browser held back gets another go. */
+export function kick() {
+  resume();
+  if (needKick && curEl && enabledMusic && !document.hidden) { needKick = false; start(curEl); }
+}
+function start(a) {
+  const p = a.play();
+  if (p && p.catch) p.catch((e) => { if (a === curEl && e && e.name === 'NotAllowedError') needKick = true; });
+}
 export function setSfx(on) { enabledSfx = on; }
 export function setMusic(on) {
   enabledMusic = on;
@@ -112,11 +146,22 @@ function el(src) {
   a.src = src;
   a.loop = true;
   a.preload = 'auto';
-  a.volume = 0;
   a.addEventListener('error', () => { /* missing track: stay silent */ });
+  if (routeMusic()) {
+    try {
+      const g = ctx.createGain();
+      g.gain.value = 0;
+      ctx.createMediaElementSource(a).connect(g);
+      g.connect(musGain);
+      a._gain = g;
+    } catch { /* stays on element volume */ }
+  }
+  setVol(a, 0);
   cache.set(src, a);
   return a;
 }
+const setVol = (a, v) => { if (a._gain) a._gain.gain.value = v; else a.volume = v; };
+const getVol = (a) => (a._gain ? a._gain.gain.value : a.volume);
 
 export function play(id, force = false) {
   if (!enabledMusic) { curTrack = id; return; }
@@ -128,18 +173,19 @@ export function play(id, force = false) {
   const prev = curEl;
   curEl = next;
   next.currentTime = next.currentTime || 0;
-  const p = next.play();
-  if (p && p.catch) p.catch(() => { /* autoplay blocked until first tap */ });
-  fade(next, 0.62, 0.7);
+  needKick = false;
+  // Blocked until a gesture (iOS plays a new element only from one): kick() retries on the next tap.
+  if (!document.hidden) start(next); else hiddenTrack = true;
+  fade(next, MUSIC_VOL, 0.7);
   if (prev && prev !== next) fade(prev, 0, 0.5, true);
 }
 
 function fade(a, to, secs, stopAfter = false) {
-  const from = a.volume;
+  const from = getVol(a);
   const t0 = performance.now();
   const step = () => {
     const u = Math.min(1, (performance.now() - t0) / (secs * 1000));
-    try { a.volume = Math.max(0, Math.min(1, from + (to - from) * u)); } catch { /* detached */ }
+    try { setVol(a, Math.max(0, Math.min(1, from + (to - from) * u))); } catch { /* detached */ }
     if (u < 1) requestAnimationFrame(step);
     else if (stopAfter) { try { a.pause(); } catch { /* ignore */ } }
   };
@@ -152,4 +198,4 @@ export function current() { return curTrack; }
 export function stopMusic() {
   if (curEl) { fade(curEl, 0, 0.35, true); curEl = null; }
 }
-export function duck(on) { if (musGain) musGain.gain.value = on ? 0.18 : 0.55; }
+export function duck(on) { if (musGain) musGain.gain.value = on ? 0.36 : 1.1; }

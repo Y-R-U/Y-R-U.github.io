@@ -1,8 +1,8 @@
 // Screen-space HUD. Drawn after the world, in unscaled pixels.
 
 import { stroke, line, rect, circle, hatch, splat, INK } from './ink.js';
-import { glyphPoints, glyphStart } from './gestures.js';
-import { SPECIAL_KEYS, hasKeyboard } from './input.js';
+import { glyphPoints, glyphStart } from './gestures.js?v=20261013-mirror';
+import { SPECIAL_KEYS, hasKeyboard } from './input.js?v=20261015-gf';
 import { activeMoves, moveStats } from './config.js';
 import { P as RIG } from './ragdoll.js';
 

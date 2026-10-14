@@ -57,8 +57,9 @@ export class Purchases {
     if (!PRODUCTS.includes(product)) throw new Error('Checkout unavailable.');
     const { uid, token } = await this.token();
     const res = await this.request(API + 'checkout', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ product, game: 'ragdojo', ...analytics }) });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Checkout is unavailable.');
+    // A proxy's HTML error page is not JSON; its parse error is not a message for a player.
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || typeof data.url !== 'string') throw new Error(data.error || 'Checkout is unavailable.');
     if (uid !== this.auth.user?.uid) throw new Error('Account changed. Try again.');
     const url = new URL(data.url);
     if (url.origin !== CHECKOUT_ORIGIN) throw new Error('Checkout unavailable.');
@@ -78,8 +79,8 @@ export class Purchases {
   async portal() {
     const { uid, token } = await this.token();
     const res = await this.request(API + 'portal', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ game: 'ragdojo' }) });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Subscription management is unavailable.');
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || typeof data.url !== 'string') throw new Error(data.error || 'Subscription management is unavailable.');
     if (uid !== this.auth.user?.uid) throw new Error('Account changed. Try again.');
     const url = new URL(data.url);
     if (url.origin !== PORTAL_ORIGIN) throw new Error('Subscription management is unavailable.');

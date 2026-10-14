@@ -65,6 +65,8 @@ export class SaveSync {
       const remote = await this.io.read(uid);
       if (generation !== this.generation) return;
       if ((remote?.revision || null) !== this.remoteRevision) {
+        // choose('local') writes against this revision; holding the stale one failed its CAS for ever.
+        this.remoteRevision = remote?.revision || null;
         this.conflict = { local: this.io.local(), remote }; this.ready = false;
         this.io.status('Another device has progress. Choose a save.'); this.io.conflict(this.conflict); return;
       }

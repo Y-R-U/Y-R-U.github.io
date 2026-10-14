@@ -5,7 +5,7 @@ import {
   PERKS, moveMaxLv, moveBuyCost, movePowerCost, moveCdCost, perkCost, perkMax, perkLocked,
   moveStats, playerRankAt, ranksFor, activeMoves, RANK_WORD,
 } from './config.js';
-import { glyphPoints, glyphStart } from './gestures.js';
+import { glyphPoints, glyphStart } from './gestures.js?v=20261013-mirror';
 import { stroke } from './ink.js';
 import { sfx } from './audio.js';
 import * as haptic from './haptic.js';

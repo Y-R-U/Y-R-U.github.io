@@ -51,6 +51,8 @@ export class Input {
     el.addEventListener('contextmenu', (e) => e.preventDefault());
     window.addEventListener('keydown', (e) => this.key(e, true));
     window.addEventListener('keyup', (e) => this.key(e, false));
+    // A key released while another window had focus never sends its keyup: the fighter walked on.
+    window.addEventListener('blur', () => { this.keys = {}; });
   }
 
   /** Which half of the screen a point is in, honouring the handedness setting. */
@@ -135,7 +137,10 @@ export class Input {
   }
 
   key(e, down) {
-    const k = e.key.toLowerCase();
+    // Typing in a field (arena name, Pass code) is not fighting: spaces must reach the input.
+    const k = (e.key || '').toLowerCase();
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) { if (!down) this.keys[k] = false; return; }
     this.keys[k] = down;
     if (down && k === ' ') e.preventDefault();
     if (!this.enabled) return;

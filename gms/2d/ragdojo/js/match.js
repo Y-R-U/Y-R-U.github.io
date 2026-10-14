@@ -13,7 +13,7 @@ import {
   playerRankAt, derive, moveStats, activeMoves, ranksFor, STRIKE_WORD,
 } from './config.js';
 import { sfx } from './audio.js';
-import { hasKeyboard } from './input.js';
+import { hasKeyboard } from './input.js?v=20261015-gf';
 import * as haptic from './haptic.js';
 
 /**

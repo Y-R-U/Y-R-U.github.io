@@ -212,6 +212,9 @@ html, body {
 
 /* QUIT sits directly above ERASE ALL PROGRESS — keep them from touching. */
 #btnQuit { margin-bottom: 8px; }
+/* Kept well away from everything else in the panel, and armed by a first tap (main.js). */
+#btnWipe { margin-top: 26px; }
+#btnWipe.armed { background: var(--red); color: #fff; }
 
 #pauseBtn { position: absolute; top: max(10px, env(safe-area-inset-top));
   left: 50%; transform: translateX(-50%); }
@@ -234,7 +237,8 @@ html, body {
  */
 @media (orientation: portrait) and (max-width: 860px) {
   #app {
-    width: 100vh; height: 100vw;
+    /* dvh: 100vh is the toolbar-less height, so the rotated game ran under the browser's URL bar. */
+    width: 100vh; width: 100dvh; height: 100vw; height: 100dvw;
     transform: translateX(100vw) rotate(90deg);
     transform-origin: 0 0;
   }

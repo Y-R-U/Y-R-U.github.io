@@ -1,4 +1,4 @@
-import { ACCOUNTS, DEMO } from './edition.js';
+import { ACCOUNTS, DEMO } from './edition.js?v=20261013-lan';
 const PREF = 'ragdojo.analytics';
 let enabled = false;
 try { enabled = localStorage.getItem(PREF) === 'yes'; } catch {}

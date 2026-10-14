@@ -2,7 +2,7 @@ import { auth } from '/lib/auth/auth.js';
 import { cloud } from '/lib/auth/cloud.js';
 import { mountAccount, matchCompleted } from '/lib/auth/ui.js';
 import { onSave, KEY, DEFAULT } from './save.js';
-import { SaveSync } from './save-sync.js';
+import { SaveSync } from './save-sync.js?v=20261015-gf';
 
 // crypto.randomUUID needs https; the home copy is plain http.
 const newId = () => crypto.randomUUID?.() ?? [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
