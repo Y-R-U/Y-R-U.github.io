@@ -9,7 +9,7 @@ import { POSE, fk, sample } from '../poses.js';
 import { drawFighter, drawShadow } from '../draw.js';
 import { RANKS } from '../config.js';
 import { CELLS, GRID } from './reveal.js';
-import { FLOORS } from './tower.js?v=20261014-ev';
+import { FLOORS } from './tower.js?v=20261015-evf';
 
 const FONT = '"Patrick Hand", cursive';
 const RIVAL_COL = ['#2d5fb5', '#c8463f', '#3d6b3a', '#8c50c6', '#d08a1e', '#8a5a33', '#1d8a8a'];

@@ -107,7 +107,8 @@ for (let i = 0; i < 30; i++) {
   let at = w.start - 3600000;
   for (let k = 0; k < int(0, i === 29 ? 260 : 60); k++) {
     at += [int(1000, 7000), int(8000, 9000), int(8000, 60000), int(60000, 3600000)][int(0, 3)];
-    rows.push([`tower:${int(0, 400)}`, r() < 0.55 ? 1 : 0, at]);
+    // an admin drop now and then (won = -floors): no gap, no fight
+    rows.push(r() < 0.04 ? [`tower:drop:${k}`, -int(1, 5), at] : [`tower:${int(0, 400)}`, r() < 0.55 ? 1 : 0, at]);
   }
   const out = TW.towerCounted(w, rows);
   towerCases.push({ start: w.start, end: w.end, rows, out, ...TW.towerOf(out) });

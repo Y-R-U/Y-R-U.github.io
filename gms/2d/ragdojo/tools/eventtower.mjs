@@ -6,23 +6,27 @@
  * for all four.
  *
  *   node tools/eventtower.mjs [--runs=40] [--floors=1,6,12]
- *   node tools/eventtower.mjs --check     # the gate: floor 1 >= 85%, floor 12 between 20% and 90%,
- *                                         # floors fall from 1 to 12, no timeouts or non-finite fights
+ *   node tools/eventtower.mjs --check     # the gate: floor 1 >= 85% for every save; mid + maxed: floor 2 >= 85%,
+ *                                         # floors 10-11 together 20-75%, the top 10-65%; no timeouts or non-finite fights
+ *   node tools/eventtower.mjs --mins      # also the shortest fight per cell (TOWER_CAP.gapMs comes from it)
  *   node tools/eventtower.mjs --climb     # a whole week's climb: fights needed to reach the TOP
- *   node tools/eventtower.mjs --falsify   # the check against a tower 3x too hard and one 6x too soft: both must fail
+ *   node tools/eventtower.mjs --falsify   # x3 too hard, x0.16 too soft, the old easy curve: all must fail
  */
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 if (process.argv.includes('--falsify')) {
   let red = 0;
-  for (const m of ['3', '0.16']) {
-    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), '--check', '--runs=16'], { env: { ...process.env, TOWER_M: m }, encoding: 'utf8' });
+  // x3 too hard, x0.16 too soft, and the pre-2026-10-15 curve (Aaron climbed all 12 without a loss).
+  const runs = [['difficulty x3', { TOWER_M: '3' }], ['difficulty x0.16', { TOWER_M: '0.16' }],
+    ['the old easy curve', { TOWER_KNOBS: '{"hp1":2.2,"hpP":0.75,"dmg1":1.7,"dmgP":0.75,"gx":0.41,"m":1}' }]];
+  for (const [what, env] of runs) {
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), '--check', '--runs=16', '--saves=fresh,mid,maxed'], { env: { ...process.env, ...env }, encoding: 'utf8' });
     const ok = r.status !== 0 && /FAIL/.test(r.stdout);
     if (ok) red++;
-    console.log(`${ok ? 'RED  ' : 'GREEN'} difficulty x${m}`);
+    console.log(`${ok ? 'RED  ' : 'GREEN'} ${what}`);
   }
-  console.log(`falsify: ${red}/2`);
-  process.exit(red === 2 ? 0 : 1);
+  console.log(`falsify: ${red}/${runs.length}`);
+  process.exit(red === runs.length ? 0 : 1);
 }
 const noopCtx = new Proxy({}, {
   get: (t, k) => (k === 'canvas' ? { width: 0, height: 0 } : k === 'createLinearGradient' || k === 'createRadialGradient' ? () => ({ addColorStop() {} }) : () => {}),
@@ -33,7 +37,8 @@ globalThis.window = globalThis;
 globalThis.requestAnimationFrame = (fn) => setTimeout(() => fn(Date.now()), 0);
 
 const { TowerMatch, KNOBS } = await import('../js/events/towerfight.js');
-if (process.env.TOWER_M) KNOBS.m = +process.env.TOWER_M;
+if (process.env.TOWER_M) KNOBS.m *= +process.env.TOWER_M;
+if (process.env.TOWER_KNOBS) Object.assign(KNOBS, JSON.parse(process.env.TOWER_KNOBS)); // tuning: '{"hp1":4}'
 const { FLOORS, nextFloor } = await import('../js/events/tower.js');
 const { MOVES } = await import('../js/config.js');
 const { DEFAULT } = await import('../js/save.js');
@@ -65,29 +70,42 @@ function fight(floor, save) {
   return { r: m.over ? m.result : 'timeout', t, finite };
 }
 
+if (args.saves) for (const k of Object.keys(SAVES)) if (!String(args.saves).split(',').includes(k)) delete SAVES[k];
 const floors = args.floors ? String(args.floors).split(',').map(Number) : Array.from({ length: FLOORS }, (_, i) => i + 1);
 let bad = 0;
-const rate = {};
+const rate = {}, shortest = { t: Infinity };
 if (!args.climb) {
   console.log(`floor  ${Object.keys(SAVES).map((k) => k.padStart(8)).join('')}   (win %, ${RUNS} fights each; mean seconds)`);
   for (const f of floors) {
     const row = [];
     for (const [k, s] of Object.entries(SAVES)) {
-      let w = 0, secs = 0, to = 0, nan = 0;
-      for (let i = 0; i < RUNS; i++) { const x = fight(f, s); if (x.r === 'win') w++; if (x.r === 'timeout') to++; if (!x.finite) nan++; secs += x.t; }
+      let w = 0, secs = 0, to = 0, nan = 0, mn = Infinity;
+      for (let i = 0; i < RUNS; i++) {
+        const x = fight(f, s); if (x.r === 'win') w++; if (x.r === 'timeout') to++; if (!x.finite) nan++; secs += x.t;
+        if (x.r !== 'timeout') mn = Math.min(mn, x.t);
+        if (x.r !== 'timeout' && x.t < shortest.t) Object.assign(shortest, { t: x.t, f, k });
+      }
       (rate[k] ||= {})[f] = w / RUNS;
       row.push(`${String(Math.round((100 * w) / RUNS)).padStart(5)}%${to ? 't' + to : '  '}`);
       if (args.check && (to > RUNS * 0.1 || nan)) { bad++; console.log(`FAIL floor ${f} ${k}: ${to} timeouts, ${nan} non-finite`); }
       if (!row.secs) row.secs = [];
-      row.secs.push(Math.round(secs / RUNS));
+      row.secs.push(args.mins ? `${Math.round(secs / RUNS)}(${mn.toFixed(1)})` : Math.round(secs / RUNS));
     }
     console.log(`${String(f).padStart(5)}  ${row.join('')}   ${row.secs.join('/')} s`);
   }
+  console.log(`shortest fight: ${shortest.t.toFixed(2)} s (floor ${shortest.f}, ${shortest.k}); TOWER_CAP.gapMs must stay under it + the ~2.1 s end delay`);
   if (args.check) {
+    const pc = (x) => `${Math.round(x * 100)}%`;
     for (const [k, r] of Object.entries(rate)) {
-      if (r[1] < 0.85) { bad++; console.log(`FAIL ${k}: floor 1 is ${Math.round(r[1] * 100)}% (want >= 85%)`); }
-      if (r[FLOORS] < 0.2 || r[FLOORS] > 0.9) { bad++; console.log(`FAIL ${k}: the top is ${Math.round(r[FLOORS] * 100)}% (want 20-90%)`); }
+      if (r[1] < 0.85) { bad++; console.log(`FAIL ${k}: floor 1 is ${pc(r[1])} (want >= 85%)`); }
+      if (r[FLOORS] > 0.9) { bad++; console.log(`FAIL ${k}: the top is ${pc(r[FLOORS])} (want <= 90%)`); }
       if (r[FLOORS] >= r[1]) { bad++; console.log(`FAIL ${k}: the top is no harder than floor 1`); }
+      if (k !== 'mid' && k !== 'maxed') continue;
+      // Aaron, 2026-10-15: floors 1-2 ~90%+, a steady fall to ~50-60% on 10-11 and ~40% at the top.
+      if (r[2] < 0.85) { bad++; console.log(`FAIL ${k}: floor 2 is ${pc(r[2])} (want >= 85%)`); }
+      const late = (r[10] + r[11]) / 2; // the pair: one floor of 30 fights is too noisy alone
+      if (!(late >= 0.2 && late <= 0.75)) { bad++; console.log(`FAIL ${k}: floors 10-11 are ${pc(late)} (want 20-75%)`); }
+      if (r[FLOORS] < 0.1 || r[FLOORS] > 0.65) { bad++; console.log(`FAIL ${k}: the top is ${pc(r[FLOORS])} (want 10-65%)`); }
     }
     console.log(bad ? `\n${bad} check(s) failed` : '\nPASS  tower balance');
     process.exit(bad ? 1 : 0);

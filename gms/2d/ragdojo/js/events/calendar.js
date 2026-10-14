@@ -8,7 +8,9 @@ const DAY = 86400000;
  * paid (supporter or br8t Pass) have no daily limit, only the anti-spam gap. */
 export const CAMPAIGN_CAP = { perDay: 10, gapMs: 60000 };
 export const PAID_CAP = { perDay: Infinity, gapMs: 15000 };
-export const capFor = (paid) => (paid ? PAID_CAP : CAMPAIGN_CAP);
+/** `unknown`: signed in but the entitlement is not answered yet — bank like a paid player; the
+ * server, which asks the payment service itself, trims what a free player may not keep. */
+export const capFor = (paid, unknown = false) => (paid || unknown ? PAID_CAP : CAMPAIGN_CAP);
 
 /**
  * kind      'vines' | 'reveal' | 'tower' (W/L floors, no points) | 'story' (points walk a track)

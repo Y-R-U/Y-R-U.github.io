@@ -4,8 +4,9 @@
 // server can check it from the same list (server/events.go towerOf).
 
 export const FLOORS = 12;
-/** A tower fight takes longer than this, and nobody fights the tower all day long. */
-export const TOWER_CAP = { gapMs: 8000, perDay: 120 };
+/** Rows are stamped when a fight STARTS, so two are at least a fight, the ~2.1-2.3 s end delay and a
+ * tap apart; the shortest fight measured (eventtower --mins) is 1.6 s. Nobody fights all day. */
+export const TOWER_CAP = { gapMs: 3000, perDay: 120 };
 export const TOP_INK = 600;
 
 const byTime = (a, b) => a[2] - b[2] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
@@ -13,14 +14,17 @@ const utc = (ms) => new Date(ms).toISOString().slice(0, 10);
 
 /**
  * Rows `[id, won (1|0), at]` -> the ones that count, in play order: inside the window, one per
- * id, at least `gapMs` after the last one kept, at most `perDay` a UTC day.
+ * id, at least `gapMs` after the last one kept, at most `perDay` a UTC day. `won < 0` is no fight
+ * but an admin drop of -won floors (server tower-drop): it takes no gap and counts toward nothing.
  */
 export function towerCounted(win, rows, cap = TOWER_CAP) {
   const seen = new Set(), perDay = new Map(), out = [];
   let last = -Infinity;
   for (const r of [...rows].sort(byTime)) {
     const [id, won, at] = r;
-    if (seen.has(id) || !(at >= win.start && at < win.end) || at - last < cap.gapMs) continue;
+    if (seen.has(id) || !(at >= win.start && at < win.end)) continue;
+    if (won < 0) { seen.add(id); out.push([id, Math.trunc(won), at]); continue; }
+    if (at - last < cap.gapMs) continue;
     const d = utc(at);
     if ((perDay.get(d) || 0) >= cap.perDay) continue;
     perDay.set(d, (perDay.get(d) || 0) + 1);
@@ -34,6 +38,7 @@ export function towerCounted(win, rows, cap = TOWER_CAP) {
 export function towerOf(rows) {
   let floor = 1, tops = 0, best = 1, wins = 0;
   for (const r of rows) {
+    if (r[1] < 0) { floor = Math.max(1, floor + r[1]); continue; }
     if (r[1]) {
       wins++;
       if (floor === FLOORS) tops++;
@@ -41,7 +46,7 @@ export function towerOf(rows) {
     } else floor = Math.max(1, floor - 1);
     best = Math.max(best, floor);
   }
-  return { floor, tops, best, fights: rows.length, wins };
+  return { floor, tops, best, fights: rows.filter((r) => r[1] >= 0).length, wins };
 }
 
 /** What a win or a loss on `floor` does. */

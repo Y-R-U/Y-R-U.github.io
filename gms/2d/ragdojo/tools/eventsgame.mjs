@@ -23,7 +23,7 @@
  *   - a save still holding the retired SCROLLS & ROPES / MONTHLY PICTURE loads clean.
  *
  *   node tools/eventsgame.mjs              (EVENTS_TEST_PORT moves its ports; default 9500-9502)
- *   node tools/eventsgame.mjs --falsify    breaks the game 18 ways in a temp copy; each must go red
+ *   node tools/eventsgame.mjs --falsify    breaks the game 22 ways in a temp copy; each must go red
  */
 import { spawn, execFileSync } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -268,7 +268,8 @@ export async function run(root, serverDir, { label = '' } = {}) {
       await tap(c, '#btnEvents');
       await c.waitFor(vis('events'), 3000);
       await tap(c, `#evTabs [data-ev="${REV}"]`);
-      ok(L + 'no battle yet: the choices are shown disabled, "fight once"', await c.waitFor(`document.querySelectorAll('[data-guess]').length === 4 && [...document.querySelectorAll('[data-guess]')].every(b => b.disabled) && /fight once/.test(document.getElementById('evSide').textContent)`, 5000));
+      ok(L + 'no battle yet: the choices are shown disabled, "fight once"', await c.waitFor(`document.querySelectorAll('[data-guess]').length === 4 && [...document.querySelectorAll('[data-guess]')].every(b => b.disabled) && /fight once/.test(document.getElementById('evSide').textContent)`, 5000),
+        await c.eval(`JSON.stringify({ n: document.querySelectorAll('[data-guess]').length, dis: [...document.querySelectorAll('[data-guess]')].map(b => b.disabled), side: document.getElementById('evSide').textContent.slice(0, 300), ev: window.__events.state.ev['${REV}'] })`));
 
       await towerAndStory(c, L, name, url, arena, ok);
 
@@ -336,6 +337,30 @@ async function towerAndStory(c, L, name, url, arena, ok) {
   ok(L + 'a loss drops a floor (2 -> 1)', f.floor === 2 && await floorNow() === 1 && /down to floor 1/.test(f.note), f.note);
   f = await fight(false);
   ok(L + 'a loss on floor 1 stays on floor 1', f.floor === 1 && await floorNow() === 1 && /still on floor 1/.test(f.note), f.note);
+  // Quitting a losing tower fight from pause is a loss (and the pause panel says so), and so is a reload.
+  const upOne = (k) => c.eval(`(() => { window.__clock.v += 20000; window.__ragdojo.save.events.ev['${TW}'].t.push(['tower:up${k}', 1, Date.now()]); window.__clock.v += 20000; })()`);
+  await upOne(1);
+  await tap(c, `#evTabs [data-ev="${TW}"]`);
+  await tap(c, '#evFight');
+  await c.waitFor(`window.__state && window.__state.mode === "fight" && window.__ragdojo.match?.tower === 2`, 5000);
+  await tap(c, '#btnPause');
+  await c.waitFor(vis('settings'), 3000);
+  const qn = await c.eval(`(() => { const n = document.getElementById('evQuitNote'); return n && n.offsetParent ? n.textContent : ''; })()`);
+  ok(L + 'the pause panel says quitting a tower fight counts as a loss', /counts as a loss/.test(qn), qn);
+  await tap(c, '#btnQuit');
+  await c.waitFor(`window.__state.mode === 'hub'`, 5000);
+  await sleep(200);
+  ok(L + 'QUIT from a tower fight on floor 2: a loss, back to floor 1', await floorNow() === 1 && await c.eval(`!window.__events.state.ev['${TW}'].pend && window.__events.state.ev['${TW}'].t.at(-1)[1] === 0`), await c.eval(`JSON.stringify(window.__events.state.ev['${TW}'])`));
+  ok(L + 'the note is gone outside a tower fight', await c.eval(`!document.getElementById('evQuitNote')?.offsetParent`));
+  await tap(c, '#btnEvents');
+  await c.waitFor(vis('events'), 3000);
+  await upOne(2);
+  await tap(c, `#evTabs [data-ev="${TW}"]`);
+  await tap(c, '#evFight');
+  await c.waitFor(`window.__state && window.__state.mode === "fight" && window.__ragdojo.match?.tower === 2`, 5000);
+  await openEvents(c, url(`auto=1&${off}`));
+  await c.eval('window.__clock.v += 200000');
+  ok(L + 'a reload in the middle of a tower fight on floor 2: a loss, floor 1', await floorNow() === 1 && await c.eval(`!window.__events.state.ev['${TW}'].pend`), await c.eval(`JSON.stringify(window.__events.state.ev['${TW}'])`));
   await c.eval('window.__clock.v += 20000');
   // Straight to floor 12: eleven wins (stamped an hour back, a minute apart).
   await c.eval(`(() => { const S = window.__ragdojo.save, e = S.events.ev['${TW}']; const t0 = Date.now() - 7200e3;
@@ -391,7 +416,7 @@ async function towerAndStory(c, L, name, url, arena, ok) {
     await sleep(400);
     const srv = await (await fetch(arena.base + '/events/sync', { method: 'POST', headers: { Authorization: `Bearer dev:${who}cap${name}` }, body: JSON.stringify({ event: V0 }) })).json();
     const after = await c.eval(`window.__events.state.ev['${V0}'].b.length`);
-    ok(L + `${who}: 14 campaign fights ${gap / 1000} s apart -> client ${want}, server ${want}, and they agree`, local === want && srv.b.length === want && after === want && srv.cap.paid === (who === 'paid'),
+    ok(L + `${who}: 14 campaign fights ${gap / 1000} s apart -> client ${want}, server ${want}, and they agree`, local === want && srv.b.length === want && after === want && (!srv.cap.checked || srv.cap.paid === (who === 'paid')),
       `client ${local} (after sync ${after}), server ${srv.b.length}, cap ${JSON.stringify(srv.cap)}`);
     await tap(c, '#btnEvents');
     await c.waitFor(vis('events'), 3000);
@@ -408,6 +433,10 @@ async function towerAndStory(c, L, name, url, arena, ok) {
   await openEvents(c, url(`auto=1&arena=${encodeURIComponent(arena.base)}&arenauid=climber${name}`));
   await tap(c, `#evTabs [data-ev="${TW}"]`);
   ok(L + 'online: the rival is listed on floor 4', await c.waitFor(`[...document.querySelectorAll('#evSide .evriv > div')].some(d => d.textContent.includes('${rname}') && /fl 4/.test(d.textContent))`, 6000));
+  // The raw save, not __events.state (load() would strip the fields on the way out).
+  const rawST = `window.__ragdojo.save.events.ev['${ST}']`;
+  const afterSync = await c.eval(`(async () => { await new Promise((r) => setTimeout(r, 600)); await window.__events.sync('${ST}'); return JSON.stringify(${rawST} || null); })()`);
+  ok(L + 'an online STORY sync writes no picture fields into the save', /"b":/.test(afterSync) && !/"open"|"bonus"|"guesses"/.test(afterSync), afterSync);
   ok(L + 'and drawn on the tower', await c.waitFor(`(window.__events.rivals.get('${TW}') || []).some(r => r.name === '${rname}' && r.floor === 4 && !('uid' in r))`, 2000));
   await c.shot(join(SHOTS, `events_tower_online_${name}.png`));
 
@@ -421,6 +450,20 @@ async function towerAndStory(c, L, name, url, arena, ok) {
   await c.eval(`window.__events.setTab('${TW}'); window.__events.fightTower()`);
   ok(L + 'a locked tower cannot be fought (no fight starts)', await c.eval(`window.__state.mode === 'hub' && !window.__ragdojo.match?.tower`));
   await c.shot(join(SHOTS, `events_tower_locked_${name}.png`));
+
+  // ── a tower fight that ends after Monday 00:00 UTC counts for the week it started in ──
+  await c.eval('localStorage.clear()');
+  await openEvents(c, url(`auto=1&${off}`));
+  const end = windowOf(defById('tower'), await c.eval('Date.now()')).end;
+  await c.eval(`window.__clock.v = ${end} - 10000 - (Date.now() - window.__clock.v)`);
+  await c.eval(`window.__events.open('${TW}')`);
+  await tap(c, '#evFight');
+  await c.waitFor(`window.__state && window.__state.mode === "fight" && !!window.__ragdojo.match?.tower`, 5000);
+  await c.eval('window.__clock.v += 40000');
+  await c.eval(`window.__ragdojo.match.enemies.forEach(e => e.hurt(99999, {from:[0,0], kb:900, stagger:1}))`);
+  await c.waitFor(vis('events') + ` && window.__state.mode === 'hub'`, 15000);
+  const edge = await c.eval(`document.getElementById('evNote')?.textContent || ''`);
+  ok(L + 'a tower win across Monday 00:00 counts for the week it started (not "too quick")', await c.eval(`(window.__events.state.ev['${TW}']?.t || []).length === 1`) && /WON on floor 1 — up to floor 2/.test(edge), edge);
 }
 
 const MUTANTS = [
@@ -438,7 +481,11 @@ const MUTANTS = [
   ['a tower fight is not a campaign battle', 'js/events/ui.js', "try { window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail })); } catch {}", ''],
   ['the TOP pays nothing', 'js/events/ui.js', "!['reveal', 'tower', 'story'].includes(p.def.kind)", "!['reveal', 'story'].includes(p.def.kind)"],
   ['the story chapter never opens', 'js/events/ui.js', 'if (to >= end) sv.pending = true;', ''],
-  ['the client ignores the paid cap', 'js/events/ui.js', 'E.recordBattle(before, b, { cap: capFor(paid()) })', 'E.recordBattle(before, b)'],
+  ['the client ignores the paid cap', 'js/events/ui.js', 'E.recordBattle(before, b, { cap: capNow() })', 'E.recordBattle(before, b)'],
+  ['quitting a tower fight saves the floor (M3)', 'js/events/ui.js', "setSt(E.setEv(st(), id, { ...E.evState(st(), id), pend: [bid, at] }));", ''],
+  ['no quit note in the pause panel (M3)', 'js/events/ui.js', '    quitNote(true);\n', ''],
+  ['a tower result stamped when it ends (L1)', 'js/events/ui.js', '[bid, won ? 1 : 0, late ? end : at]', '[bid, won ? 1 : 0, end]'],
+  ['STORY adopted as a picture (H2)', 'js/events/ui.js', "else if (p.def.kind === 'reveal') {", 'else {'],
   ['the server never counts anyone as paid', 'server/events.go', 'Paid: pass || out.Entitlements["ragdojo_supporter"]', 'Paid: false'],
   ['the retired SCROLLS & ROPES is back', 'js/events/calendar.js', "  { id: 'tower', kind: 'tower',", "  { id: 'vines-month', kind: 'vines', cadence: 'monthly', pass: true, anyBattle: false, title: 'SCROLLS & ROPES' },\n  { id: 'tower', kind: 'tower',"],
   ['THE TOWER is open without the Pass', 'js/events/calendar.js', "{ id: 'tower', kind: 'tower', cadence: 'weekly', pass: true,", "{ id: 'tower', kind: 'tower', cadence: 'weekly', pass: false,"],

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"net/http"
 	"net/http/httptest"
@@ -215,10 +216,21 @@ func TestEventsTowerAndStoryVectors(t *testing.T) {
 	if v.TowerCap.GapMs != towerGapMs || v.TowerCap.PerDay != towerPerDay || v.PaidCap.GapMs != paidCap.GapMs || !reflect.DeepEqual(v.StoryCircles, storyCircles) {
 		t.Fatalf("constants differ from js/events: %+v %+v %v", v.TowerCap, v.PaidCap, v.StoryCircles)
 	}
-	if len(v.Tower) < 20 || len(v.Story) < 30 {
+	drops := 0
+	for _, c := range v.Tower {
+		for _, x := range c.Out {
+			if x[1].(float64) < 0 {
+				drops++
+			}
+		}
+	}
+	if len(v.Tower) < 20 || len(v.Story) < 30 || drops < 3 {
 		t.Fatalf("vector file is too thin: %d tower, %d story", len(v.Tower), len(v.Story))
 	}
-	row := func(x [3]any) towerRow { return towerRow{x[0].(string), x[1].(float64) == 1, int64(x[2].(float64))} }
+	row := func(x [3]any) towerRow {
+		w := int(x[1].(float64))
+		return towerRow{x[0].(string), w == 1, int64(x[2].(float64)), max(0, -w)}
+	}
 	for i, c := range v.Tower {
 		var in []towerRow
 		for _, x := range c.Rows {
@@ -640,7 +652,7 @@ func TestEventsTower(t *testing.T) {
 	for i := 0; i < 11; i++ { // eleven wins: floor 12
 		add(fmt.Sprintf("w%d", i), 1, 40*time.Second)
 	}
-	add("spam", 1, 3*time.Second)  // 3 s after the last one: not a fight
+	add("spam", 1, 2*time.Second)  // 2 s after the last one: not a fight
 	add("top", 1, 40*time.Second)  // a win ON floor 12: the TOP
 	add("drop", 0, 40*time.Second) // defending: down to 11
 	_, out := r.sync(t, "me", map[string]any{"event": tw, "name": "Me", "t": append(rows,
@@ -750,5 +762,187 @@ func TestEventsEntitlementCheck(t *testing.T) {
 	}
 	if got := entitlementCheck("http://127.0.0.1:1/x")(context.Background(), "x"); got != (evEnt{Pass: true}) {
 		t.Errorf("payment service unreachable: %+v", got)
+	}
+}
+
+// ── EVF review fixes (2026-10-15) ─────────────────────────────────────────────────────
+
+// H1: a free claim may not push a stored one out of the free count — both would bank, because
+// stored claims re-count with the paid cap. Each claim dated just before the earliest stored one
+// used to do exactly that (30 claims in 8 minutes = 30 points); two devices' interleaved fights too.
+func TestEventsFreeCapHoldsOnTheServer(t *testing.T) {
+	r := newEvRig(t)
+	start := r.now.Add(-10 * time.Second)
+	var out map[string]any
+	for k := 0; k < 30; k++ {
+		_, out = r.sync(t, "free", map[string]any{"event": vday, "b": [][]any{camp(fmt.Sprintf("x%d", k), 1, start.Add(-time.Duration(k)*16*time.Second))}})
+	}
+	if pts := out["points"].(float64); pts > 8 {
+		t.Fatalf("back-stepping claims: %v points in 8 minutes (60 s apart: at most 8)", pts)
+	}
+	gapsOK := func(out map[string]any) bool {
+		last := int64(math.MinInt64 / 2)
+		for _, x := range out["b"].([]any) {
+			at := int64(x.([]any)[3].(float64))
+			if at-last < campaignCap.GapMs {
+				return false
+			}
+			last = at
+		}
+		return true
+	}
+	if !gapsOK(out) {
+		t.Fatalf("stored fights closer than 60 s: %v", out["b"])
+	}
+	// Two devices, each honest, 61 s apart on their own, 30 s apart from each other.
+	base := r.now.Add(-3 * time.Hour)
+	var a, b [][]any
+	for i := 0; i < 12; i++ {
+		a = append(a, camp(fmt.Sprintf("a%d", i), 3, base.Add(time.Duration(i)*61*time.Second)))
+		b = append(b, camp(fmt.Sprintf("b%d", i), 3, base.Add(time.Duration(i)*61*time.Second+30*time.Second)))
+	}
+	r.sync(t, "two", map[string]any{"event": vday, "b": a[:5]})
+	r.sync(t, "two", map[string]any{"event": vday, "b": b})
+	_, two := r.sync(t, "two", map[string]any{"event": vday, "b": a})
+	if n := len(two["b"].([]any)); n > 10 || two["points"].(float64) > 30 || !gapsOK(two) {
+		t.Fatalf("two devices: %d fights, %v points (free cap: 10 a day, 60 s apart)", n, two["points"])
+	}
+}
+
+// M2: a paid player's month can pass 400 fights; a sync must still go through, and `since` tells
+// the client how far back the next one needs to send.
+func TestEventsPaidSyncManyRows(t *testing.T) {
+	r := newEvRig(t)
+	r.pass["p"] = true
+	var b [][]any
+	for i := 0; i < 401; i++ {
+		b = append(b, camp(fmt.Sprintf("p%d", i), 1, r.now.Add(-time.Duration(401-i)*20*time.Second)))
+	}
+	code, out := r.sync(t, "p", map[string]any{"event": "story:2026-10", "b": b})
+	if code != 200 || out["points"].(float64) != 200 {
+		t.Fatalf("401 rows: HTTP %d, %v points (want 200: at most 200 new a sync)", code, out["points"])
+	}
+	if s, ok := out["since"].(float64); !ok || int64(s) != r.now.Add(-evSyncSlack).UnixMilli() {
+		t.Fatalf("since %v, want the next sync's oldest claim %d", out["since"], r.now.Add(-evSyncSlack).UnixMilli())
+	}
+	// Only the 30 inside the previous sync's slack are still claimable.
+	_, again := r.sync(t, "p", map[string]any{"event": "story:2026-10", "b": b})
+	if p := again["points"].(float64); p <= 200 || p > 230 {
+		t.Fatalf("second sync: %v points (want 200 + the fights within %v of the first)", p, evSyncSlack)
+	}
+}
+
+// L3: a free event's sync asks the payment service nothing while every claim fits the free cap.
+func TestEventsEntitlementOnlyWhenNeeded(t *testing.T) {
+	r := newEvRig(t)
+	calls := 0
+	inner := evEntCheck
+	evEntCheck = func(ctx context.Context, tok string) evEnt { calls++; return inner(ctx, tok) }
+	base := r.now.Add(-5 * time.Minute)
+	_, out := r.sync(t, "f", map[string]any{"event": vday, "b": [][]any{camp("a", 3, base), camp("b", 3, base.Add(2*time.Minute))}})
+	if calls != 0 || out["points"].(float64) != 6 || out["cap"].(map[string]any)["checked"] != false {
+		t.Fatalf("free claims within the cap: %d entitlement calls, %v points", calls, out["points"])
+	}
+	r.paid["f"] = true
+	_, out = r.sync(t, "f", map[string]any{"event": vday, "b": [][]any{camp("c", 3, base.Add(2*time.Minute+20*time.Second))}})
+	if calls != 1 || out["points"].(float64) != 9 || out["cap"].(map[string]any)["paid"] != true {
+		t.Fatalf("a claim past the free cap: %d calls, %v points (a supporter: counts)", calls, out["points"])
+	}
+}
+
+// L3: a fight refused in an outage stays claimable for a player then known to be paid — and the
+// hold never lets anyone else back-date before their previous sync.
+func TestEventsOutageHoldOnlyForPaid(t *testing.T) {
+	r := newEvRig(t)
+	t0 := r.now
+	r.sync(t, "free", map[string]any{"event": vday, "b": [][]any{camp("first", 1, t0.Add(-time.Minute))}})
+	r.tick(5 * time.Hour)
+	r.unknown["free"] = true
+	evPassCache = map[string]passEntry{}
+	// 30 s apart: the second fits only a paid cap, so it is refused "because of the outage".
+	r.sync(t, "free", map[string]any{"event": vday, "b": [][]any{camp("x", 1, t0.Add(time.Minute)), camp("y", 1, t0.Add(time.Minute+30*time.Second))}})
+	r.unknown["free"] = false
+	evPassCache = map[string]passEntry{}
+	r.tick(time.Minute)
+	_, out := r.sync(t, "free", map[string]any{"event": vday, "b": [][]any{camp("old", 3, t0.Add(time.Hour))}})
+	if out["points"].(float64) != 2 {
+		t.Fatalf("a free player back-dated 4 h past the previous sync through an outage hold: %v points (want 2)", out["points"])
+	}
+}
+
+// Manager, 2026-10-15: `ragdojo-arena tower-drop <uid> <n>` drops a player's floor for the week.
+// It is one stored row that both sides recompute through; no fight, nothing for the other events,
+// and the player's own save cannot climb back past it.
+func TestEventsTowerDrop(t *testing.T) {
+	r := newEvRig(t)
+	const tw = "tower:2026-W42"
+	r.pass["me"], r.pass["bob"] = true, true
+	var rows [][]any
+	for i := 0; i < 12; i++ {
+		rows = append(rows, []any{fmt.Sprintf("tower:w%d", i), 1, r.now.Add(time.Duration(i-30) * time.Minute).UnixMilli()})
+	}
+	_, out := r.sync(t, "me", map[string]any{"event": tw, "name": "Me", "t": rows})
+	r.sync(t, "bob", map[string]any{"event": tw, "name": "Bob", "t": rows[:3]})
+	if out["floor"].(float64) != 12 || out["tops"].(float64) != 1 {
+		t.Fatalf("setup: floor %v tops %v", out["floor"], out["tops"])
+	}
+	var buf strings.Builder
+	if err := r.h.st.towerAdminRun([]string{"tower-list"}, &buf); err != nil || !strings.Contains(buf.String(), "   12    1   12     12   12  me  Me") {
+		t.Fatalf("tower-list: %v\n%s", err, buf.String())
+	}
+	if strings.Index(buf.String(), " me ") > strings.Index(buf.String(), " bob ") {
+		t.Fatalf("tower-list is not highest floor first:\n%s", buf.String())
+	}
+	for _, bad := range [][]string{{"tower-drop", "me"}, {"tower-drop", "me", "0"}, {"tower-drop", "me", "13"}, {"tower-drop", "nobody", "2"}, {"tower-drop", "me", "2", "story:2026-10"}} {
+		if r.h.st.towerAdminRun(bad, io.Discard) == nil {
+			t.Fatalf("%v accepted", bad)
+		}
+	}
+	buf.Reset()
+	if err := r.h.st.towerAdminRun([]string{"tower-drop", "me", "4"}, &buf); err != nil || !strings.Contains(buf.String(), "floor 12 -> 8") {
+		t.Fatalf("tower-drop: %v %s", err, buf.String())
+	}
+	r.tick(time.Second)
+	// The save still holds the 12 wins and no drop row; it may also try to forge one back up.
+	_, out = r.sync(t, "me", map[string]any{"event": tw, "name": "Me", "t": append(rows, []any{"tower:drop:9", 3, r.now.UnixMilli()}, []any{"tower:up", -1, r.now.UnixMilli() - 5000})})
+	if out["floor"].(float64) != 8 || out["fights"].(float64) != 12 || out["wins"].(float64) != 12 || out["tops"].(float64) != 1 {
+		t.Fatalf("after the drop: floor %v fights %v wins %v tops %v", out["floor"], out["fights"], out["wins"], out["tops"])
+	}
+	var drop []any
+	for _, x := range out["t"].([]any) {
+		if x.([]any)[1].(float64) < 0 {
+			drop = x.([]any)
+		}
+	}
+	if drop == nil || drop[1].(float64) != -4 || !strings.HasPrefix(drop[0].(string), "tower:drop:") {
+		t.Fatalf("the drop row does not reach the client: %v", out["t"])
+	}
+	// The next fight counts from floor 8, and a drop is not a battle anywhere else.
+	r.tick(time.Minute)
+	_, out = r.sync(t, "me", map[string]any{"event": tw, "name": "Me", "t": [][]any{{"tower:n1", 1, r.now.Add(-30 * time.Second).UnixMilli()}}})
+	if out["floor"].(float64) != 9 {
+		t.Fatalf("a win after the drop: floor %v (want 9)", out["floor"])
+	}
+	_, v := r.sync(t, "me", map[string]any{"event": vday, "b": [][]any{{"tower:drop:1", 1, "campaign", r.now.Add(-time.Minute).UnixMilli()}}})
+	if v["points"].(float64) != 1 { // only what the client claims; the server never makes one up
+		t.Fatalf("vines: %v", v["points"])
+	}
+	var n int
+	r.h.st.db.QueryRow(`SELECT COUNT(*) FROM ev_claims WHERE uid='me'`).Scan(&n)
+	if n != 1 {
+		t.Fatalf("the drop created %d claims", n)
+	}
+}
+
+// L1: a tower fight is stamped when it starts, so one that ends after Monday 00:00 still counts
+// for the week it started in while that week takes claims (evGrace).
+func TestEventsTowerWeekEdge(t *testing.T) {
+	r := newEvRig(t)
+	r.pass["me"] = true
+	r.now = time.Date(2026, 10, 19, 0, 0, 30, 0, time.UTC) // Monday, W43
+	started := time.Date(2026, 10, 18, 23, 59, 50, 0, time.UTC).UnixMilli()
+	_, out := r.sync(t, "me", map[string]any{"event": "tower:2026-W42", "t": [][]any{{"tower:edge", 1, started}}})
+	if out["closed"] != false || out["floor"].(float64) != 2 {
+		t.Fatalf("week edge: closed %v floor %v", out["closed"], out["floor"])
 	}
 }

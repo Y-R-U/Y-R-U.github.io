@@ -2,7 +2,7 @@
 // rival selection, the reveal grid and the events save (dailies rule, merge).
 //
 //   node tools/eventsgate.mjs              run every check against js/events/
-//   node tools/eventsgate.mjs --falsify    break the engine 43 ways; each must turn its section red
+//   node tools/eventsgate.mjs --falsify    break the engine 48 ways; each must turn its section red
 //
 // EVENTS_DIR points the gate at another copy of js/events (the falsifier uses it).
 import { spawnSync } from 'node:child_process';
@@ -56,7 +56,7 @@ if (args.includes('--falsify')) {
     ['save', 'state.js', "e.claimed = e.claimed.filter((r) => !INK_CLAIMS.includes(r) || had.includes(r));", ''],
     ['paid', 'calendar.js', 'export const PAID_CAP = { perDay: Infinity, gapMs: 15000 };', 'export const PAID_CAP = { perDay: 10, gapMs: 15000 };'],
     ['paid', 'calendar.js', 'export const PAID_CAP = { perDay: Infinity, gapMs: 15000 };', 'export const PAID_CAP = { perDay: Infinity, gapMs: 0 };'],
-    ['paid', 'calendar.js', '(paid ? PAID_CAP : CAMPAIGN_CAP)', '(CAMPAIGN_CAP)'],
+    ['paid', 'calendar.js', '(paid || unknown ? PAID_CAP : CAMPAIGN_CAP)', '(CAMPAIGN_CAP)'],
     ['paid', 'state.js', 'out = merge(local, cloud, { cap });', 'out = merge(local, cloud);'],
     ['tower', 'tower.js', '      else floor++;', '      floor++;'],
     ['tower', 'tower.js', 'else floor = Math.max(1, floor - 1);', 'else floor = floor - 1;'],
@@ -68,7 +68,7 @@ if (args.includes('--falsify')) {
     ['story', 'story.js', 'left >= story.chapters[ch].circles', 'left > story.chapters[ch].circles'],
     ['story', 'story.js', '(((y * 12 + (m - 1)) % STORIES.length)', '((0 % STORIES.length)'],
     ['story', 'state.js', 'm.read = Math.max(x.read | 0, y.read | 0);', 'm.read = x.read | 0;'],
-    ['retired', 'state.js', "if (parseEventId(id) && e && typeof e === 'object') ev[id] = e;", "if (e && typeof e === 'object') ev[id] = e;"],
+    ['retired', 'state.js', "if (!kind || !e || typeof e !== 'object') continue;", "if (!e || typeof e !== 'object') continue;"],
     ['windows', 'calendar.js', "{ id: 'tower', kind: 'tower', cadence: 'weekly', pass: true,", "{ id: 'tower', kind: 'tower', cadence: 'weekly', pass: false,"],
     ['reveal', 'reveal.js', "!!art && (st.b?.length || 0) > 0 && guessesLeft(st) > 0", 'guessesLeft(st) > 0'],
     ['reveal', 'reveal.js', '(st.b?.length || 0) > 0 && ', ''],
@@ -80,6 +80,11 @@ if (args.includes('--falsify')) {
     ['save', 'state.js', 'state.seenDay >= day', 'state.seenDay === day'],
     ['save', 'state.js', 'm.open = open.slice(0, cap);', 'm.open = open;'],
     ['save', 'state.js', 'activeEvents(battle.at, { pass: true })', 'activeEvents(battle.at, { pass: false }).filter((a) => !a.locked)'],
+    ['evf', 'state.js', "if ((kind === 'story' || kind === 'tower') && REVEAL_ONLY.some((k) => k in e)) {", 'if (false) {'],
+    ['evf', 'calendar.js', '(paid || unknown ? PAID_CAP', '(paid ? PAID_CAP'],
+    ['evf', 'state.js', 'return keep.slice(-max);', 'return rows;'],
+    ['evf', 'tower.js', 'if (won < 0) { seen.add(id); out.push([id, Math.trunc(won), at]); continue; }', ''],
+    ['evf', 'tower.js', 'if (r[1] < 0) { floor = Math.max(1, floor + r[1]); continue; }', ''],
   ];
   let bad = 0;
   for (const [section, file, from, to] of MUTANTS) {
@@ -453,7 +458,7 @@ const T = (iso) => Date.parse(iso);
   const top = tw.towerOf(R1([...Array(12).fill(1), 1, 0]));
   check('tower', top.tops === 2 && top.floor === 11 && top.best === 12, `winning ON floor 12 is a TOP (defend it: stay); a loss drops to 11, got ${JSON.stringify(top)}`);
   check('tower', tw.nextFloor(12, true) === 12 && tw.nextFloor(1, false) === 1 && tw.nextFloor(5, false) === 4, 'nextFloor clamps to 1..12');
-  check('tower', tw.towerCounted(win, R1([1, 1, 1], 3e3)).length === 1, 'tower fights closer than the gap do not count');
+  check('tower', tw.towerCounted(win, R1([1, 1, 1], 1e3)).length === 1, 'tower fights closer than the gap do not count');
   check('tower', tw.towerCounted(win, [['tower:a', 1, win.start - 1], ['tower:b', 1, win.end]]).length === 0, 'outside the week does not count');
   check('tower', tw.towerCounted(win, [['tower:a', 1, win.start + 9e5], ['tower:a', 0, win.start + 9e6]]).length === 1, 'one result per fight id');
   check('tower', eq(tw.rewardsOwed({ t: top ? R1([...Array(12).fill(1)]) : [], claimed: [] }).map((r) => r.id), ['top', 'topbg']), 'the TOP owes ink and its prize');
@@ -506,6 +511,55 @@ const T = (iso) => Date.parse(iso);
   check('retired', Object.keys(S.merge(old, S.fresh()).ev).join() === 'vines-day:2026-10-13' && Object.keys(S.adoptMerge(old, old).ev).length === 1, 'merge and adopt drop them too');
   let r = S.recordBattle(old, { id: 'camp:r', at: T('2026-10-13T10:00:00Z'), src: 'campaign', won: true, oppDmg: 1 });
   check('retired', !Object.keys(r.ev).some((k) => /month/.test(k)), 'banking a fight into an old save never touches them');
+}
+
+// ---------- EVF review fixes (2026-10-15) ----------
+{
+  const tw = await imp('tower.js');
+  const SID = 'story:2026-10', at = T('2026-10-14T10:00:00Z');
+  // H2: an old adopt() wrote picture fields (open/guesses/solved/bonus, NaN) onto STORY states;
+  // merging such a save with one that never had them threw on `y.open.filter`.
+  let local = S.recordBattle(S.fresh(), { id: 'camp:a:1', at, src: 'campaign', won: true, oppDmg: 1 });
+  local = { ...local, ev: { ...local.ev, [SID]: { ...local.ev[SID], open: [], guesses: [], solved: false, bonus: NaN } } };
+  const TID = 'tower:2026-W42';
+  local.ev[TID] = { t: [['tower:x', 1, T('2026-10-14T09:00:00Z')]], claimed: [], open: [], bonus: NaN };
+  const clean = S.load(local);
+  check('evf', !['open', 'guesses', 'solved', 'bonus'].some((k) => k in clean.ev[SID] || k in clean.ev[TID]) && clean.ev[SID].b.length === 1 && clean.ev[TID].t.length === 1,
+    'load() strips picture fields from STORY and TOWER states, keeping their fights');
+  let threw = '';
+  let m1, m2;
+  try { m1 = S.adoptMerge(S.fresh(), local, { cap: cal.PAID_CAP }); m2 = S.merge(local, S.fresh()); S.merge(S.fresh(), local); } catch (e) { threw = e.message; }
+  check('evf', !threw, `merging a polluted STORY save throws: ${threw}`);
+  check('evf', !threw && !('open' in m1.ev[SID]) && !('open' in m2.ev[SID]) && S.pointsOf(m1.ev[SID]) === 3, 'and the merged STORY is a plain story state');
+  const RID = 'reveal-week:2026-W42';
+  const rv = S.merge({ v: 1, ev: { [RID]: { b: [['camp:r', 3, 'campaign', at]], open: [4] } } }, { v: 1, ev: { [RID]: { b: [['camp:q', 3, 'campaign', at + 70e3]] } } });
+  check('evf', eq(rv.ev[RID].open, [4]) && eq(rv.ev[RID].guesses, []), 'a picture state missing its fields on one side merges');
+  // M1: signed in, entitlement not answered yet: bank like a paid player (the server trims).
+  check('evf', cal.capFor(false, true) === cal.PAID_CAP && cal.capFor(false) === cal.CAMPAIGN_CAP && cal.capFor(true, false) === cal.PAID_CAP, 'capFor(paid, unknown)');
+  let u = S.fresh();
+  for (let i = 0; i < 14; i++) u = S.recordBattle(u, { id: 'camp:d:' + i, at: at + i * 61e3, src: 'campaign', won: true, oppDmg: 1 }, { cap: cal.capFor(false, true) });
+  check('evf', S.evState(u, SID).b.length === 14, `14 fights while the entitlement is unknown: all banked, got ${S.evState(u, SID).b.length}`);
+  // M2: a sync sends only what the server still takes, never more than 400 rows.
+  const many = Array.from({ length: 900 }, (_, i) => [`camp:m${i}`, 1, 'campaign', at + i * 16e3]);
+  const sent = S.syncRows(many, at + 300 * 16e3);
+  check('evf', sent.length === 400 && sent.every((r) => r[3] >= at + 300 * 16e3) && sent[399][0] === 'camp:m899', `syncRows: ${sent.length} rows, newest last`);
+  check('evf', S.syncRows(many, at + 800 * 16e3).length === 100 && S.syncRows([['tower:a', 1, 5], ['tower:b', 0, 9]], 6).length === 1, 'syncRows: only rows at or after `since` (b rows and tower rows)');
+  // tower-drop: an admin row [id, -n, at] drops n floors; it is no fight and takes no gap.
+  const win = cal.windowOf(cal.defById('tower'), T('2026-10-14T12:00:00Z'));
+  const up = Array.from({ length: 12 }, (_, i) => [`tower:w${i}`, 1, win.start + 3600e3 + i * 60e3]);
+  const drop = ['tower:drop:1', -4, win.start + 3600e3 + 11 * 60e3 + 1000];
+  const ct = tw.towerCounted(win, [...up, drop]);
+  check('evf', ct.length === 13 && ct.some((r) => r[0] === drop[0] && r[1] === -4), 'a drop row is kept even 1 s after a fight');
+  const d = tw.towerOf(ct);
+  check('evf', d.floor === 8 && d.fights === 12 && d.wins === 12 && d.tops === 1 && d.best === 12, `a drop of 4 from the TOP: ${JSON.stringify(d)}`);
+  check('evf', tw.towerOf(tw.towerCounted(win, [...ct, ['tower:n', 1, win.start + 3600e3 + 13 * 60e3]])).floor === 9, 'the next win climbs from the dropped floor');
+  const mine = S.recordTower(S.fresh(), TID, up[0]);
+  let both = S.fresh();
+  for (const r of up) both = S.recordTower(both, TID, r);
+  const srv = S.setEv(both, TID, { ...S.evState(both, TID), t: tw.towerCounted(win, [...S.evState(both, TID).t, drop]) });
+  check('evf', tw.towerOf(S.evState(S.merge(both, srv), TID).t).floor === 8 && tw.towerOf(S.evState(S.adoptMerge(srv, both), TID).t).floor === 8 && !!mine,
+    'merging a save without the drop never climbs back past it');
+  check('evf', tw.TOWER_CAP.gapMs === 3000, 'tower rows are stamped at the start: 3 s apart (shortest fight + end delay)');
 }
 
 console.log(`${passes} passed, ${fails} failed`);

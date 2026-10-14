@@ -6,21 +6,35 @@
 //
 // `b` is kept in play order (at, then id): for Vines & Ladders it IS the list of turns.
 
-import { activeEvents, parseEventId, utcDay } from './calendar.js?v=20261014-ev';
-import { pointsFor, counts, counted } from './points.js?v=20261014-ev';
-import { CAMPAIGN_CAP } from './calendar.js?v=20261014-ev';
+import { activeEvents, parseEventId, utcDay } from './calendar.js?v=20261015-evf';
+import { pointsFor, counts, counted } from './points.js?v=20261015-evf';
+import { CAMPAIGN_CAP } from './calendar.js?v=20261015-evf';
 import { fresh as freshReveal, CELLS } from './reveal.js';
-import { towerCounted } from './tower.js?v=20261014-ev';
+import { towerCounted } from './tower.js?v=20261015-evf';
 
 const KEEP_ENDED = 7 * 86400000;
 
 export const fresh = () => ({ v: 1, seenDay: '', ev: {} });
 
-/** Events whose definition is gone (the old Pass events SCROLLS & ROPES, MONTHLY PICTURE) are dropped. */
+const REVEAL_ONLY = ['open', 'guesses', 'solved', 'bonus'];
+
+/**
+ * Events whose definition is gone (the old Pass events SCROLLS & ROPES, MONTHLY PICTURE) are dropped,
+ * and so are picture fields on a STORY or TOWER state (an old adopt() wrote them there, with NaN).
+ */
 export function load(raw) {
   const s = raw && typeof raw === 'object' ? raw : {};
   const ev = {};
-  if (s.ev && typeof s.ev === 'object') for (const [id, e] of Object.entries(s.ev)) if (parseEventId(id) && e && typeof e === 'object') ev[id] = e;
+  if (s.ev && typeof s.ev === 'object') {
+    for (const [id, e] of Object.entries(s.ev)) {
+      const kind = parseEventId(id)?.def.kind;
+      if (!kind || !e || typeof e !== 'object') continue;
+      if ((kind === 'story' || kind === 'tower') && REVEAL_ONLY.some((k) => k in e)) {
+        ev[id] = { ...e };
+        for (const k of REVEAL_ONLY) delete ev[id][k];
+      } else ev[id] = e;
+    }
+  }
   return { v: 1, seenDay: typeof s.seenDay === 'string' ? s.seenDay : '', ev };
 }
 
@@ -69,6 +83,15 @@ export function recordBattle(state, battle, { cap = CAMPAIGN_CAP } = {}) {
 
 export const setEv = (state, eventId, ev) => ({ ...state, ev: { ...state.ev, [eventId]: ev } });
 
+/**
+ * The rows a sync sends: the server takes nothing older than `since` (its previous sync less a
+ * slack, or a day back), so a long month of fights is never sent whole. Newest `max` at most.
+ */
+export function syncRows(rows, since, max = 400) {
+  const keep = rows.filter((r) => r[r.length === 3 ? 2 : 3] >= since);
+  return keep.slice(-max);
+}
+
 /** One finished tower fight, `[id, won, at]`, into THE TOWER's ordered W/L list. */
 export function recordTower(state, eventId, row) {
   const p = parseEventId(eventId);
@@ -102,22 +125,23 @@ export function merge(a, b, { cap = CAMPAIGN_CAP } = {}) {
     const ids = new Set(x.b.map((r) => r[0]));
     const m = { ...x, b: capped(id, [...x.b, ...y.b.filter((r) => !ids.has(r[0]))].sort(order), cap) };
     if ('rolls' in x || 'rolls' in y) m.rolls = Math.min(pointsOf(m), Math.max(x.rolls | 0, y.rolls | 0));
-    if (Array.isArray(x.open)) {
-      const def = parseEventId(id)?.def;
-      const cap = def ? Math.min(CELLS, Math.floor(pointsOf(m) / def.cost)) : CELLS;
-      const open = [...x.open, ...y.open.filter((c) => !x.open.includes(c))];
+    if (parseEventId(id).def.kind === 'reveal') {
+      const def = parseEventId(id).def, arr = (v) => (Array.isArray(v) ? v : []);
+      const cap = Math.min(CELLS, Math.floor(pointsOf(m) / def.cost));
+      const xo = arr(x.open), xg = arr(x.guesses);
+      const open = [...xo, ...arr(y.open).filter((c) => !xo.includes(c))];
       m.open = open.slice(0, cap);
-      m.guesses = [...x.guesses, ...y.guesses.filter((g) => !x.guesses.includes(g))];
-      m.solved = x.solved || y.solved;
+      m.guesses = [...xg, ...arr(y.guesses).filter((g) => !xg.includes(g))];
+      m.solved = !!(x.solved || y.solved);
       m.bonus = Math.max(x.bonus | 0, y.bonus | 0);
-      m.claimed = [...new Set([...x.claimed, ...y.claimed])];
+      m.claimed = [...new Set([...arr(x.claimed), ...arr(y.claimed)])];
     }
     if (Array.isArray(x.t)) {
       const tids = new Set(x.t.map((r) => r[0]));
       m.t = towerCounted(parseEventId(id).win, [...x.t, ...y.t.filter((r) => !tids.has(r[0]))]);
     }
     if ('seen' in x || 'seen' in y) { m.seen = Math.max(x.seen | 0, y.seen | 0); m.read = Math.max(x.read | 0, y.read | 0); }
-    if (!Array.isArray(x.open) && (x.claimed || y.claimed)) m.claimed = [...new Set([...(x.claimed || []), ...(y.claimed || [])])];
+    if (!('open' in m) && (x.claimed || y.claimed)) m.claimed = [...new Set([...(x.claimed || []), ...(y.claimed || [])])];
     out.ev[id] = m;
   }
   return out;

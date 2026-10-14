@@ -57,7 +57,9 @@ battles **in play order** (`at`, then id) with their points. The panel says "cam
 (10 a day)" or "campaign fights count — unlimited, thanks for supporting". Ghost fights, tower
 fights and (later) `kind: 'quick'` ghost-only quick fights all arrive as `src: 'campaign'` and
 follow exactly these rules. In the game `paid` = `hasPremium()` (DEV / family / supporter / Pass;
-dev hooks `?evpaid=0|1`). A merge on cloud adopt re-counts with `PAID_CAP` — a not-yet-known
+dev hooks `?evpaid=0|1`). **Signed in but not answered yet** (loading, offline, a failed check:
+main.js `paidKnown()` false) banks with `capFor(paid, unknown)` = `PAID_CAP`; the server, which
+asks the payment service itself, trims what a free player may not keep. A merge on cloud adopt re-counts with `PAID_CAP` — a not-yet-known
 entitlement must never trim fights already banked; online the server's cap is the authority.
 
 THE TOWER takes no battle points at all (`counts()` is false for `kind: 'tower'`).
@@ -70,22 +72,43 @@ THE TOWER takes no battle points at all (`counts()` is false for `kind: 'tower'`
   **TOP**; after it you keep defending (win: stay, loss: back to 11).
 - **The floor is never stored.** A player is the ordered list `t: [[id, won 1|0, at], ...]`;
   `towerOf(t)` = `{floor, tops, best, fights, wins}`. `towerCounted(win, rows)` keeps rows in the
-  week, one per id, play order, **8 s** apart (`TOWER_CAP.gapMs`: shorter than any real fight plus
-  its result screen) and at most **120 a UTC day**.
+  week, one per id, play order, **3 s** apart and at most **120 a UTC day**. A row is stamped
+  when the fight STARTS, so two real rows are at least a fight + the 2.1-2.3 s end delay + a tap
+  apart; the shortest fight measured (`eventtower --mins`, after the retune) is 1.6 s, a maxed save's
+  floor-1 KO, so 3 s never refuses a real fight. (The old 8 s did: refused fast floor-1 wins.)
+- **Admin drop** (`ragdojo-arena tower-drop <uid> <n> [tower:YYYY-Www]`, `tower-list` to find the
+  uid): one stored row `[tower:drop:<ms>, -n, at]`. It is no fight (no gap, no daily count, not in
+  `fights`/`wins`, never a battle anywhere else); `towerOf` takes the floor down n (never below 1).
+  The server only ever writes it; a client claiming `won` other than 0/1 is ignored, and because
+  the floor is recomputed from the merged rows, a save without the row cannot climb back past it.
 - **The opponent** (`towerLevel(floor, save)` in towerfight.js) is scaled to the player's own
   body and kit (`towerPower`: punch × crit × specials owned/upgraded, and HP × second wind ÷
-  armour) with a `(off·tough)^0.41` difficulty term, so the climb is the same climb for a white
-  belt and a maxed player. Floors climb in HP, damage, skill (0.26 → 0.82), speed and moves;
+  armour) with a `1.3·(off·tough)^0.3` difficulty term (was `(off·tough)^0.41`, under which a maxed
+  save fell far behind a mid one), so the climb is much the same climb for a mid and a maxed player
+  (white belts and early saves now find the upper floors much harder — measured below). Floors climb in HP, damage, skill (0.26 → 0.82), speed and moves;
   floors 5 and 9 are a pair; hazards from floor 7 (wind, coffee, eraser, pencil, rain); floor
-  12 is a boss (`kind: 'champion'`, boss music). `node tools/eventtower.mjs` (autoplay player,
-  skill 0.62) measured floor 1 100% for every save, floor 12 32% (fresh) / 63% (early) /
-  83% (mid) / 53% (maxed), and 14-22 fights to reach the TOP; `--check` is the gate.
+  12 is a boss (`kind: 'champion'`, boss music). 2026-10-15 retune (Aaron climbed all 12 without a
+  loss): HP `×(1 + 4.5·u^0.3)`, damage `×(1 + 2.4·u^0.25)` (u = 0 on floor 1, 1 on 12; was
+  2.2·u^0.75 and 1.7·u^0.75). `node tools/eventtower.mjs` (autoplay player, skill 0.62, 40 fights
+  a cell), mid / maxed: floors 1-4 100%, 5 100/95, 6 100/100, 7 95/88, 8 83/65, 9 78/73, 10 75/45,
+  11 58/55, 12 28/43; mean fight 4 s on floor 1, 9-10 s on floor 2, 10-14 s at the top; 20 (mid) /
+  58 (maxed) fights to the TOP. Fresh and early saves: floor 1 100%, then 88-98% to floor 4, and
+  they rarely pass floors 7-9 (fresh 0% from floor 9). Before: mid 100% through floor 10, 95% on 11,
+  maxed 60-73% on 9-12, fresh 35% at the top.
+  `--check` is the gate (floor 1 >= 85% everywhere; mid + maxed: floor 2 >= 85%, floors 10-11
+  together 20-75%, the top 10-65%); `--falsify` 3/3 (x3, x0.16, the old curve).
 - **The TOP pays once per week**: `TOP_INK` = 600 ink and a PRIZES backdrop (`towerPicture()`:
   the pyramid with you and a flag on top). Tower fights earn no ink of their own.
 - **A tower fight is a campaign fight for every other event**: its result is dispatched as
   `ragdojo:battle {id: 'tower:<device>:<at>', src: 'campaign', kind: 'tower'}`, so Vines,
   the picture, STORY and Halloween bank it under the campaign cap.
-- Quitting a tower fight from pause records nothing (same as the campaign).
+- **Quitting is a loss.** FIGHT books the fight as a provisional loss (`pend: [id, at]` on the
+  event state); the result replaces it. Quit from pause, a reload, or a crash mid-fight: the next
+  look (`settleTower`, on QUIT, open, sync and mount) turns it into that loss. The pause panel says
+  so (`#evQuitNote`, injected under QUIT), and so does the FIGHT line.
+- **A fight across Monday 00:00 UTC** counts in the week it started (stamped at its start) while
+  that week still takes claims (10 min grace); one that ends later than that counts in the new
+  week, stamped at its end, and the note says so.
 - **Rivals**: the server's `{rid, name, floor, tops?, friend?}` — friends first, then nearest
   floor, more TOPs first on a tie, then uid; 10 at most; players with no fight are not shown.
   They are drawn as initials on their floors. (No replay rule: a floor is not a future.)
@@ -190,8 +213,8 @@ server already has, so the only thing a client can lie about is campaign fights.
 |---|---|---|
 | `eventId` | `parseEventId` | unknown, or window not open (allow ~10 min grace after `end`) |
 | arena battle ids in `b` | its own agreed match results (`won`, `oppDmg`, `at`) | id unknown, not this uid's, result void/mismatched |
-| campaign battles `[id, pts, 'campaign', at]` (ids `camp:`, `ghost:`, `tower:`, `quick:`) | nothing — trusted, capped by `CAMPAIGN_CAP`, or `PAID_CAP` when the payment service says supporter or Pass | event is arena-only; over the day's cap (free: 10); under the gap after the last counted (free 60 s, paid 15 s); dated over 26 h ago or more than 10 min before the previous sync; more than 10 new in one sync (paid: 200); over 10 min in the future (a batch up to 10 min ahead is shifted back so its newest fight is "now") |
-| tower fights `t: [[id, won, at]]` | nothing — trusted like a campaign claim | id not `tower:…`; `won` not 0/1; the same time rules as campaign claims; under 8 s after the last counted; over 120 that UTC day; more than 60 new in one sync |
+| campaign battles `[id, pts, 'campaign', at]` (ids `camp:`, `ghost:`, `tower:`, `quick:`) | nothing — trusted, capped by `CAMPAIGN_CAP`, or `PAID_CAP` when the payment service says supporter or Pass | event is arena-only; over the day's cap (free: 10); under the gap after the last counted (free 60 s, paid 15 s); **it would push an already-counted fight out of the count** (`admits`: stored claims re-count with the paid cap, so a displaced one would still bank); dated over 26 h ago or more than 10 min before the previous sync; more than 10 new in one sync (paid: 200); over 10 min in the future (a batch up to 10 min ahead is shifted back so its newest fight is "now") |
+| tower fights `t: [[id, won, at]]` | nothing — trusted like a campaign claim | id not `tower:…`; `won` not 0/1; the same time rules as campaign claims; under 3 s after the last counted; over 120 that UTC day; more than 60 new in one sync |
 | `rolls` | the ordered points of the accepted battles (`counted`, play order by server time) | `rolls > sum(points)` |
 | position, turns (never sent) | `positionAfterRolls(board, uid, eventId, rolls)`, `turnsDone(...)` | — |
 | floor, TOPs (never accepted) | `towerOf` over the stored, counted tower rows | — |
@@ -206,12 +229,18 @@ player's token, and Pass events also need a `br8t_pass` entitlement from the pay
 
 **Entitlements** (`entitlementCheck` → `evEnt{Pass, Paid, Known}`, cached per uid: a positive
 answer 5 min, a negative 1 min so a purchase shows up soon, an outage 30 s). `Paid` = `br8t_pass`
-or `ragdojo_supporter`. **An outage** (no answer, 5xx, junk) is `Known: false`: Pass events stay
-open (fail-open, as before) but **the campaign cap stays the free one** — an outage never grants
-unlimited fights. It never loses them either: a claim refused only for that reason keeps the
-"before the previous sync" watermark just before it (`p.mark`), the reply carries
-`cap: {paid, known, perDay, gapMs}`, and with `known: false` a client that believes it is paid
-keeps its refused campaign rows and claims them again on the next sync. Stored claims are always
+or `ragdojo_supporter`. **It is asked only when it matters**: Pass events (evAuth), or a free-event
+sync with a claim the free cap refuses (more than 10, or closer than 60 s). Otherwise the reply's
+`cap.checked` is false and the free cap held everything. **An outage** (no answer, 5xx, junk) is
+`Known: false`: Pass events stay open (fail-open, as before) but **the campaign cap stays the free
+one** — an outage never grants unlimited fights. It never loses them either: the earliest claim
+refused only for that reason is kept in `ev_hold`, and a later sync by a player THEN known to be
+paid may claim back to it (never past 26 h); for anyone else the hold widens nothing. The reply
+carries `cap: {paid, known, checked, perDay, gapMs}`; with `known: false` a client that believes it
+is paid (or does not know) keeps its refused campaign rows and claims them again.
+**`since`**: every sync reply says the oldest claim the next sync can take (previous sync less
+10 min, or the hold). The client sends only rows at or after it (less a minute), newest 400 at most
+(`syncRows`); the server takes up to 1,000 rows / 96 KB a sync and weighs at most 260 new claims. Stored claims are always
 re-counted with the lenient `PAID_CAP` (they already passed the cap they were claimed under), so a
 lapsed entitlement keeps what was banked and only stops new fights past the free cap.
 
@@ -247,7 +276,9 @@ lapsed entitlement keeps what was banked and only stops new fights past the free
 - **Rolls never go backwards** (`MAX` on write) and are clamped to the points banked.
 - Claims are accepted from `start` to `end + 10 min`; campaign fights may not be dated more than
   2 min ahead of the server clock. Later syncs still return the (closed) state read-only.
-- `tools/eventsgofalsify.mjs` breaks events.go/eventart.go 35 ways (and the JS board once) — 36/36 red
+- `tools/eventsgofalsify.mjs` breaks events.go/eventart.go 41 ways (and the JS board once) — 42/42 red
+  (2026-10-15 EVF: displacing claims, the 400-row limit, entitlement on every sync, the outage hold for
+  anyone, the tower drop ignored or claimable by a client)
   (2026-10-14: paid cap, outage, supporter, tower floor/TOP/gap/back-dating/no points/rivals,
   story circles and rotation, retired ids, Pass gating, quick-fight ids added; four stale mutants repaired).
 

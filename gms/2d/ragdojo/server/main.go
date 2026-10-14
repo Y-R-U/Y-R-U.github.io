@@ -47,6 +47,12 @@ var defaultOrigins = []string{
 }
 
 func main() {
+	if ok, err := towerAdmin(os.Args[1:], os.Stdout); ok { // events.go: tower-list, tower-drop
+		if err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
 	addr := env("ARENA_ADDR", "127.0.0.1:8017")
 	prefix := strings.TrimRight(env("ARENA_PREFIX", "/gms/2d/ragdojo/arena"), "/")
 	origins := defaultOrigins

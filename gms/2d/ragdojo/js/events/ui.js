@@ -4,19 +4,19 @@
 // banked into `save.events` — the run save, so cloud sync carries it. Works with no server;
 // with one, the server's recomputed state wins (server/events.go).
 
-import { activeEvents, parseEventId, pointsFor, today, capFor, PAID_CAP } from './index.js?v=20261014-ev';
+import { activeEvents, parseEventId, eventIdOf, windowOf, pointsFor, today, capFor, PAID_CAP } from './index.js?v=20261015-evf';
 import * as V from './vines.js';
 import * as R from './reveal.js';
-import * as E from './state.js?v=20261014-ev';
-import * as TW from './tower.js?v=20261014-ev';
-import * as SY from './story.js?v=20261014-ev';
-import { VinesView, RevealView, TowerView, StoryView } from './render.js?v=20261014-ev';
-import { storyPicture, towerPicture } from './storyart.js?v=20261014-ev';
-import { TowerMatch } from './towerfight.js?v=20261014-ev';
+import * as E from './state.js?v=20261015-evf';
+import * as TW from './tower.js?v=20261015-evf';
+import * as SY from './story.js?v=20261015-evf';
+import { VinesView, RevealView, TowerView, StoryView } from './render.js?v=20261015-evf';
+import { storyPicture, towerPicture } from './storyart.js?v=20261015-evf';
+import { TowerMatch } from './towerfight.js?v=20261015-evf';
 import { createEventsNet, deviceId, arenaName } from './net.js';
 import { drawOverlay } from './overlay.js';
 import { SHEET_W, GROUND_Y } from '../config.js';
-import { isRotated } from '../input.js';
+import { isRotated } from '../input.js?v=20261015-gf';
 
 const SHORT = { 'vines-day': 'VINES', 'reveal-week': 'PICTURE', tower: 'TOWER', story: 'STORY', halloween: 'SPOOKY' };
 // Relative to the page (index.html sits at the game root), not this module: the release
@@ -72,6 +72,11 @@ export function mountEvents(h) {
   const pass = () => !!h.hasPass();
   /** Supporter or Pass: campaign fights have no daily limit in "any battle" events. */
   const paid = () => !!(h.paid ? h.paid() : h.hasPass());
+  /** Signed in, but the entitlement has not been answered yet (loading, offline, a failed check). */
+  const entUnknown = () => { const u = h.account?.()?.auth?.user; return !!u && !u.anon && !!h.paidKnown && !h.paidKnown(); };
+  const capNow = () => capFor(paid(), entUnknown());
+  /** Per event: the oldest claim the server still takes (its `since`); before any answer, a day back. */
+  const since = new Map();
   const boardFor = (id) => { if (!boards.has(id)) boards.set(id, V.makeBoard(id)); return boards.get(id); };
   const art = (id) => manifest.pictures?.[id] || null;
   /** Real art is up only when the manifest lists it AND the server says it holds it. */
@@ -153,7 +158,7 @@ export function mountEvents(h) {
     const at = (Number.isFinite(+d.at) && +d.at > 0 ? +d.at : Date.now()) + net.skew;
     const b = { id: d.id || `camp:${deviceId()}:${at}`, at, src: d.src === 'arena' ? 'arena' : 'campaign', won: !!d.won, oppDmg: +d.oppDmg || 0 };
     const before = st();
-    const after = E.recordBattle(before, b, { cap: capFor(paid()) });
+    const after = E.recordBattle(before, b, { cap: capNow() });
     const hit = Object.keys(after.ev).filter((k) => after.ev[k].b.some((x) => x[0] === b.id) && !(before.ev[k]?.b || []).some((x) => x[0] === b.id));
     if (!hit.length) return;
     setSt(after);
@@ -170,11 +175,15 @@ export function mountEvents(h) {
     const p = parseEventId(id);
     if (!p || (p.def.pass && !pass())) return;
     if (!(await net.probe())) { online = false; return; }
-    const cur = E.evState(st(), id);
     const tower = p.def.kind === 'tower';
-    const sent = new Set((tower ? cur.t : cur.b).map((x) => x[0]));
-    const r = await net.sync(tower ? { event: id, name: arenaName() || 'PLAYER', t: cur.t }
-      : { event: id, name: arenaName() || 'PLAYER', b: cur.b, rolls: cur.rolls | 0, open: cur.open || [] });
+    if (tower) settleTower(id);
+    const cur = E.evState(st(), id);
+    const from = since.get(id) ?? now() - 26 * 3600e3;
+    const cut = from - 60e3;
+    const rows = E.syncRows(tower ? cur.t.filter((x) => x[1] >= 0) : cur.b, cut);
+    const sent = new Set(rows.map((x) => x[0]));
+    const r = await net.sync(tower ? { event: id, name: arenaName() || 'PLAYER', t: rows }
+      : { event: id, name: arenaName() || 'PLAYER', b: rows, rolls: cur.rolls | 0, open: cur.open || [] });
     if (r.status !== 200 || !r.data) {
       online = false;
       if (r.status === 0) srvArt.delete(id);
@@ -183,19 +192,23 @@ export function mountEvents(h) {
       return;
     }
     online = true;
-    adopt(id, r.data, sent);
+    if (Number.isFinite(r.data.since)) since.set(id, r.data.since);
+    adopt(id, r.data, sent, cut);
   }
   // One timer per event: a retry for one event must not cancel another's.
   const later = (id, ms) => { clearTimeout(timers.get(id)); timers.set(id, setTimeout(() => sync(id), ms)); };
   const syncSoon = (id) => later(id, 450);
 
-  /** The server's recomputed state wins; anything recorded while the request was out is kept. */
-  function adopt(id, d, sent) {
+  /**
+   * The server's recomputed state wins; anything recorded while the request was out is kept. Rows
+   * older than `cut` were not sent: the server no longer takes them, so its list stands for them.
+   */
+  function adopt(id, d, sent, cut = -Infinity) {
     const p = parseEventId(id);
     const s = st(), cur = E.evState(s, id);
     if (p.def.kind === 'tower') {
       const srvT = Array.isArray(d.t) ? d.t : [];
-      const extraT = cur.t.filter((x) => !sent.has(x[0]) && !srvT.some((y) => y[0] === x[0]));
+      const extraT = cur.t.filter((x) => !sent.has(x[0]) && x[1] >= 0 && x[2] >= cut && !srvT.some((y) => y[0] === x[0]));
       setSt(E.setEv(s, id, { ...cur, uid: d.uid || cur.uid, t: TW.towerCounted(p.win, [...srvT, ...extraT]) }));
       if (Array.isArray(d.rivals)) rivals.set(id, d.rivals);
       payRewards(id);
@@ -205,12 +218,12 @@ export function mountEvents(h) {
     const srv = Array.isArray(d.b) ? d.b : [];
     // The payment service did not answer the server, so it applied the free cap: a paid player
     // keeps the fights it refused and claims them again later (server/events.go evApply).
-    const held = d.cap && d.cap.known === false && paid();
-    const extra = cur.b.filter((x) => (held ? x[2] === 'campaign' : !sent.has(x[0])) && !srv.some((y) => y[0] === x[0]));
+    const held = d.cap && d.cap.known === false && (paid() || entUnknown());
+    const extra = cur.b.filter((x) => (held ? x[2] === 'campaign' : !sent.has(x[0]) && x[3] >= cut) && !srv.some((y) => y[0] === x[0]));
     const next = { ...cur, uid: d.uid || cur.uid, b: [...srv, ...extra].sort(order) };
     const banked = E.pointsOf(next);
     if (p.def.kind === 'vines') next.rolls = Math.min(banked, Math.max(d.rolls | 0, cur.rolls | 0));
-    else {
+    else if (p.def.kind === 'reveal') {
       if (typeof d.art === 'boolean') srvArt.set(id, d.art);
       const cap = Math.min(R.CELLS, Math.floor(banked / p.def.cost));
       const open = [...(d.open || []), ...(cur.open || []).filter((c) => !(d.open || []).includes(c))];
@@ -301,34 +314,76 @@ export function mountEvents(h) {
   }
 
   // ── THE TOWER: a fight on your floor, through the game's own fight machinery ──────────
+  // A started fight is a provisional loss (`pend`, stamped at the start) until its result
+  // replaces it: quitting, reloading or crashing out of a losing fight never saves the floor.
   let towerFight = null;
+  const quitNote = (on) => {
+    let n = $('evQuitNote');
+    const q = $('btnQuit');
+    if (!n && on && q) {
+      n = document.createElement('p');
+      n.id = 'evQuitNote'; n.className = 'fine';
+      n.textContent = 'Quitting a tower fight counts as a loss.';
+      q.after(n);
+    }
+    n?.classList.toggle('hidden', !on);
+  };
+  /** A pending tower fight that is no longer being fought becomes the loss it was booked as. */
+  function settleTower(id) {
+    const ev = E.evState(st(), id);
+    if (!Array.isArray(ev.pend)) return false;
+    if (towerFight && towerFight.bid === ev.pend[0]) {
+      if (h.currentMatch?.() === towerFight) return false;
+      towerFight = null;
+      quitNote(false);
+    }
+    const { pend, ...rest } = ev;
+    setSt(E.recordTower(E.setEv(st(), id, rest), id, [pend[0], 0, pend[1]]));
+    return true;
+  }
+  const settleAll = () => {
+    for (const id of Object.keys(st().ev)) if (parseEventId(id)?.def.kind === 'tower' && settleTower(id)) void sync(id);
+  };
+  $('btnQuit')?.addEventListener('click', () => setTimeout(settleAll, 0));
+
   function fightTower() {
     const id = tab, p = id && id !== 'prizes' ? parseEventId(id) : null;
     if (!p || p.def.kind !== 'tower' || locked(id) || !h.startFight) return;
+    settleTower(id);
     const before = TW.towerOf(E.evState(st(), id).t).floor;
+    const at = now(), bid = `tower:${deviceId()}:${at}`;
+    setSt(E.setEv(st(), id, { ...E.evState(st(), id), pend: [bid, at] }));
     const m = new TowerMatch({
       floor: before, save: h.getSave(),
       onEnd: (result, mm) => {
-        if (towerFight !== mm || h.currentMatch() !== mm) return;   // quit from pause: no result
+        if (towerFight !== mm || h.currentMatch() !== mm) return;   // quit: settleTower books the loss
         towerFight = null;
-        const won = result === 'win', dev = Date.now(), at = dev + net.skew, bid = `tower:${deviceId()}:${at}`;
-        const was = E.evState(st(), id);
-        setSt(E.recordTower(st(), id, [bid, won ? 1 : 0, at]));
-        const now = E.evState(st(), id), counted = now.t.some((r) => r[0] === bid), t = TW.towerOf(now.t);
+        quitNote(false);
+        const won = result === 'win', dev = Date.now(), end = dev + net.skew;
+        // The week it started in, while that week still takes claims (the server's 10 min grace); else this week.
+        const late = end >= p.win.end + 9 * 60e3, tid = late ? eventIdOf(p.def, windowOf(p.def, end)) : id;
+        const was = E.evState(st(), tid), from = TW.towerOf(was.t).floor;
+        const { pend, ...rest } = E.evState(st(), id);
+        setSt(E.recordTower(E.setEv(st(), id, rest), tid, [bid, won ? 1 : 0, late ? end : at]));
+        const cur = E.evState(st(), tid), counted = cur.t.some((r) => r[0] === bid), t = TW.towerOf(cur.t);
         // A tower fight is a campaign fight for every other event (campaign rules).
         const detail = { id: bid, at: dev, src: 'campaign', kind: 'tower', ranked: false, won, oppDmg: Math.max(0, ...mm.enemies.map((e) => Math.min(1, 1 - e.hp / e.maxHp))) };
         try { window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail })); } catch {}
         h.endFight();
-        open(id);
+        open(tid);
         const award = detail.award?.pts ? ` · +${detail.award.pts} event points` : '';
+        const moved = `${t.floor > from ? 'up to' : t.floor < from ? 'down to' : 'still on'} floor ${t.floor}`;
         if (!counted) say(`too quick after the last one — that fight did not count${award}`);
+        else if (late) say(`${won ? 'WON' : 'lost'} — a new week began during the fight, so it counts in this week's tower: ${moved}${award}`);
         else if (won && before === TW.FLOORS) say(`you defended the TOP!${TW.towerOf(was.t).tops ? '' : ' The tower is yours.'}${award}`);
-        else say(`${won ? 'WON' : 'lost'} on floor ${before} — ${t.floor > before ? 'up to' : t.floor < before ? 'down to' : 'still on'} floor ${t.floor}${award}`);
-        if (counted) tview.climb(before, t.floor);
-        void sync(id);
+        else say(`${won ? 'WON' : 'lost'} on floor ${before} — ${moved}${award}`);
+        if (counted) tview.climb(from, t.floor);
+        void sync(tid);
       },
     });
+    m.bid = bid;
     towerFight = m;
+    quitNote(true);
     h.overlay(null);
     h.startFight(m);
     m.say(before === TW.FLOORS ? 'THE TOP' : `FLOOR ${before}`, 1.8);
@@ -394,6 +449,7 @@ export function mountEvents(h) {
     if (!tab || (tab !== 'prizes' && !list.some((a) => a.id === tab))) tab = list[0]?.id || null;
     note = '';
     setSt(E.markSeen(E.prune(st(), now()), today()));
+    settleAll();
     payAll();
     if (parseEventId(tab || '')?.def.kind === 'story') storyEnter(tab);
     paintButton();
@@ -499,7 +555,7 @@ export function mountEvents(h) {
     const top = t.floor === TW.FLOORS;
     return `<div class="evstat">floor <b>${t.floor}</b>/${TW.FLOORS} · best <b>${t.best}</b> · ${t.wins}–${t.fights - t.wins}${t.tops ? ` · TOP <b>×${t.tops}</b>` : ''}</div>
       <div class="evrollrow"><button class="btn big" id="evFight"${h.startFight ? '' : ' disabled'}>${top ? (t.tops ? 'DEFEND THE TOP' : 'FIGHT THE TOP') : `FIGHT FLOOR ${t.floor}`}</button>
-      <span class="evsmall">${top ? `win it: ${t.tops ? 'stay on top' : `+${TW.TOP_INK} ink and a prize`}` : 'win: up a floor · lose: down one'}</span></div>
+      <span class="evsmall">${top ? `win it: ${t.tops ? 'stay on top' : `+${TW.TOP_INK} ink and a prize`}` : 'win: up a floor · lose: down one'} · quitting is a loss</span></div>
       <div class="evnote" id="evNote">${esc(note)}</div>
       <div class="evhead2">RIVALS <small>their floor now</small></div>
       ${rv.length ? `<div class="evriv">${rv.map((r) => `<div class="${r.friend ? 'f' : ''}">${r.friend ? '★ ' : ''}${esc(r.name)} <span>fl ${r.floor}${r.tops ? ' ★' + r.tops : ''}</span></div>`).join('')}</div>`
@@ -608,6 +664,7 @@ export function mountEvents(h) {
     return A && (A.full || A.have.size) ? imageOf(b.id) : null;
   }
 
+  settleAll();   // a reload mid-fight: that fight was lost
   paintButton();
   current = {
     background() {

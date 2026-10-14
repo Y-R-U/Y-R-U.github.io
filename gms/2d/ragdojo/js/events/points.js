@@ -1,6 +1,6 @@
 // Points per battle (ONLINE.md): 1 = loss, 2 = loss with the opponent damaged > 50%, 3 = win.
 
-import { CAMPAIGN_CAP } from './calendar.js?v=20261014-ev';
+import { CAMPAIGN_CAP } from './calendar.js?v=20261015-evf';
 
 /**
  * A battle as the client records it and later claims it:
