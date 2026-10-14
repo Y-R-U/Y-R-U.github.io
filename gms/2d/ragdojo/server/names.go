@@ -47,6 +47,19 @@ func normCode(s string) string {
 	return s
 }
 
+// isStar: "*" and everything drawn like one. Ghost names end in "*"; a person's never may.
+// Mirrored in js/net/panel.js STARS.
+func isStar(r rune) bool {
+	switch {
+	case r == '*', r == 0x066D, r == 0x2042, r == 0x204E, r == 0x2051, r == 0x2055, r == 0x2217,
+		r == 0x2743, r == 0xA673, r == 0xFE61, r == 0xFF0A, r == 0x0359, r == 0x20F0, r == 0x22C6:
+		return true
+	case r >= 0x2722 && r <= 0x273D, r >= 0x2749 && r <= 0x274B, r >= 0x1F7AF && r <= 0x1F7BF:
+		return true
+	}
+	return false
+}
+
 var errBadName = errors.New("name not allowed")
 var errEmptyName = errors.New("name required")
 
@@ -64,7 +77,7 @@ func cleanName(s string) (string, error) {
 			space = true
 			continue
 		case unicode.IsControl(r), unicode.Is(unicode.Cf, r), unicode.Is(unicode.Co, r),
-			unicode.Is(unicode.Cs, r), r == '<', r == '>', r == '*', r == utf8.RuneError:
+			unicode.Is(unicode.Cs, r), r == '<', r == '>', isStar(r), r == utf8.RuneError:
 			continue
 		}
 		if space && b.Len() > 0 {

@@ -162,18 +162,30 @@ func (h *hub) quickChanged(m *match) {
 		h.closeMatch(m)
 		return
 	}
+	h.quickPlan(m, false)
+	h.quickOffer(m) // the client links to its peers only on an offer: the one who fills it too
 	if len(m.seats) >= quickCap(m.typ) {
 		h.quickStart(m)
-		return
 	}
-	h.quickPlan(m, false)
-	h.quickOffer(m)
 }
 
-// quickPlan: exactly as many ghosts as the humans leave seats for. Surplus ones go, unshown
-// ones first, then the LAST one shown (a person took its seat). New ones are revealed at a
-// random moment in the last quickReveal of the window (or at once, when `now`).
+// quickPlan: exactly as many ghosts as the humans leave seats for. A ghost named like a person
+// who joined goes at once. Other surplus ones go unshown first; shown ones stay in the list
+// while the window is open (people come and go) and only at the start (`now`) does the LAST
+// one shown step out for a person who took its seat. New ones are revealed at a random moment
+// in the last quickReveal of the window (or at once, when `now`).
 func (h *hub) quickPlan(m *match, now bool) {
+	names := map[string]bool{}
+	for _, s := range m.seats {
+		names[strings.ToLower(s.name)] = true
+	}
+	kept := m.ghosts[:0]
+	for _, g := range m.ghosts {
+		if !names[strings.ToLower(strings.TrimSuffix(g.Name, "*"))] {
+			kept = append(kept, g)
+		}
+	}
+	m.ghosts = kept
 	need := max(0, quickTarget(m.typ)-len(m.seats))
 	for len(m.ghosts) > need {
 		drop := -1
@@ -181,6 +193,9 @@ func (h *hub) quickPlan(m *match, now bool) {
 			if g.shownN == 0 {
 				drop = i
 			}
+		}
+		if drop < 0 && !now {
+			break
 		}
 		if drop < 0 {
 			for i, g := range m.ghosts {
@@ -314,9 +329,6 @@ func (h *hub) quickStart(m *match) {
 	}
 	h.quickPlan(m, true)
 	h.quickStrength(m)
-	if m.typ == "duel" && len(kept) == 2 {
-		m.room, m.ghosts = false, nil // two people: a normal best of 3, never ranked
-	}
 	h.lobbyDirt = true
 	h.startMatch(m)
 }

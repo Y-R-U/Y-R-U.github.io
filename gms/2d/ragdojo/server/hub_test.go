@@ -56,6 +56,8 @@ func newRig(t *testing.T, openLobby bool) *rig {
 		case "dev:billingdown":
 			w.WriteHeader(503)
 			return
+		case "dev:slow": // a slow payment service: the match sits in mStarting a while
+			time.Sleep(600 * time.Millisecond)
 		}
 		io.WriteString(w, `{"ok":true,"allowance":{"remaining":2}}`)
 	}))

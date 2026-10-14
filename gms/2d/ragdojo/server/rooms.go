@@ -207,6 +207,11 @@ func (h *hub) roomBegin(m *match) {
 			h.quickLocal(m, kept[0])
 			return
 		}
+		if m.typ == "duel" && len(kept) == 2 { // two people: a normal best of 3, never ranked
+			m.room, m.ghosts = false, nil
+			h.duelBegin(m)
+			return
+		}
 	}
 	if len(kept) < 2 {
 		h.cancel(m, "allowance", nil)
@@ -630,8 +635,18 @@ func (h *hub) finishRoom(m *match, winner int, place []int, ff bool) {
 	early := ff && h.earlyForfeit(m)
 	// A quick fight ranks its people among themselves: ghost seats are not in the ranking.
 	hw := winner
+	// One person left with the ghosts: their report alone would decide it (a friend who walks
+	// out hands them the win), so it earns nobody event points.
+	lone := false
 	if m.quick {
 		hw = humanWinner(place, len(m.seats))
+		in := 0
+		for _, s := range m.seats {
+			if !s.out {
+				in++
+			}
+		}
+		lone = in < 2
 	}
 	for i, s := range m.seats {
 		rows[i] = seatRow{UID: s.uid, Name: s.name, Won: i == hw, KOs: s.kos, Ranked: s.ranked, Loadout: s.c.loadout, OppDmg: oppDmg(m.dmg, i)}
@@ -642,6 +657,7 @@ func (h *hub) finishRoom(m *match, winner int, place []int, ff bool) {
 			rows[i].NoEvent = true
 			rows[i].NoStats = i == winner
 		}
+		rows[i].NoEvent = rows[i].NoEvent || lone
 		names[i] = s.name
 	}
 	for j, g := range m.ghosts {

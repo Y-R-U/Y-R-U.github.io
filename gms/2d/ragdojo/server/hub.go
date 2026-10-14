@@ -420,7 +420,11 @@ func (h *hub) message(c *client, raw []byte) {
 		h.setRtts(c, m.Match, m.R)
 	case "decline":
 		if mt := h.mine(c, m.Match); mt != nil && mt.state <= mStarting {
-			h.cancel(mt, "declined", c)
+			if mt.room || mt.quick { // one joiner saying no never ends it for the others
+				h.leaveMatch(c, "declined")
+			} else {
+				h.cancel(mt, "declined", c)
+			}
 		}
 	case "round":
 		if mt := h.mine(c, m.Match); mt != nil && m.Winner != nil {
@@ -927,6 +931,10 @@ func (h *hub) maybeBegin(m *match) {
 			return
 		}
 	}
+	h.duelBegin(m)
+}
+
+func (h *hub) duelBegin(m *match) {
 	m.state = mPlay
 	m.playAt = h.now()
 	m.round = 1

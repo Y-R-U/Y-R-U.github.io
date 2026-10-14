@@ -395,3 +395,207 @@ func contains(l []string, s string) bool {
 	}
 	return false
 }
+
+// peersBeforeGo: every peer this client was offered before its "go" (the client links only to those).
+func peersBeforeGo(t *testing.T, c *tc) (map[string]bool, map[string]any) {
+	t.Helper()
+	seen := map[string]bool{}
+	to := time.After(8 * time.Second)
+	for {
+		select {
+		case m := <-c.msgs:
+			if m["t"] == "offer" {
+				for _, p := range m["peers"].([]any) {
+					seen[p.(map[string]any)["id"].(string)] = true
+				}
+			}
+			if m["t"] == "go" {
+				return seen, m
+			}
+			if m["t"] == "cancel" || m["t"] == "quickgo" {
+				t.Fatalf("waiting for go: %v", m)
+			}
+		case <-to:
+			t.Fatal("no go")
+		}
+	}
+}
+
+func TestQuickDuelPeopleAreOfferedEachOtherBeforeGo(t *testing.T) {
+	r := quickRig(t, 10*time.Second)
+	a, b := r.dial("Ann", "dev:ann"), r.dial("Bob", "dev:bob")
+	pressQuick(a, "duel")
+	a.expect("offer")
+	pressQuick(b, "duel")
+	pa, _ := peersBeforeGo(t, a)
+	pb, _ := peersBeforeGo(t, b)
+	if !pa[b.id] || !pb[a.id] {
+		t.Fatalf("a full 1v1 window offers each the other before go (no offer, no link): a %v b %v", pa, pb)
+	}
+}
+
+func TestQuickJoinerWhoFillsTheRoomIsLinkedToEveryone(t *testing.T) {
+	r := quickRig(t, 10*time.Second)
+	cs := []*tc{}
+	for i := 0; i < roomMax; i++ {
+		c := r.dial(fmt.Sprintf("P%d", i), fmt.Sprintf("dev:p%d", i))
+		cs = append(cs, c)
+		pressQuick(c, "lms")
+		if i < roomMax-1 {
+			c.expect("offer")
+		}
+	}
+	last := cs[roomMax-1]
+	pl, g := peersBeforeGo(t, last)
+	p0, _ := peersBeforeGo(t, cs[0])
+	if len(pl) != roomMax-1 || !p0[last.id] || len(g["seats"].([]any)) != roomMax {
+		t.Fatalf("the eighth joiner is offered all seven, and they it: %d peers, first knows it %v", len(pl), p0[last.id])
+	}
+}
+
+func TestQuickDeclineIsOnePersonLeaving(t *testing.T) {
+	r := quickRig(t, 1500*time.Millisecond)
+	a, b, x := r.dial("Ann", "dev:ann"), r.dial("Bob", "dev:bob"), r.dial("Griefer", "dev:grief")
+	pressQuick(a, "lms")
+	a.expect("offer")
+	pressQuick(b, "lms")
+	b.expect("offer")
+	pressQuick(x, "lms")
+	o := x.expect("offer")
+	x.send(map[string]any{"t": "decline", "match": o["match"]})
+	pa, g := peersBeforeGo(t, a)
+	b.expect("go")
+	if len(g["seats"].([]any)) != 2 || g["match"] != o["match"] || !pa[b.id] {
+		t.Fatalf("one decline never cancels the window for the others: %v", g)
+	}
+	x.none("go", 200*time.Millisecond)
+
+	// FIND A FIGHT rooms too.
+	cs, id := roomOf(t, r, "bandana", 3)
+	cs[2].send(map[string]any{"t": "decline", "match": id})
+	if l := lastOffer(cs[0]); len(l["peers"].([]any)) != 1 || l["match"] != id {
+		t.Fatalf("the room carries on without the decliner: %v", l)
+	}
+	cs[0].none("cancel", 200*time.Millisecond)
+}
+
+func TestQuickDuelLeaverWhileStartingLeavesTheOtherAGhost(t *testing.T) {
+	r := quickRig(t, 10*time.Second)
+	a, b := r.dial("Ann", "dev:ann"), r.dial("Slow", "dev:slow")
+	pressQuick(a, "duel")
+	o := a.expect("offer")
+	pressQuick(b, "duel")
+	b.send(map[string]any{"t": "decline", "match": o["match"]}) // still paying: mStarting
+	for {
+		m := <-a.msgs
+		if m["t"] == "cancel" || m["t"] == "go" {
+			t.Fatalf("Ann is not cancelled (nor sent to an empty duel): %v", m)
+		}
+		if m["t"] == "quickgo" {
+			if gs := m["ghosts"].([]any); len(gs) != 1 || m["mode"] != "duel" {
+				t.Fatalf("a ghost takes the empty seat: %v", m)
+			}
+			return
+		}
+	}
+}
+
+func TestQuickLonePersonEarnsNoEventPoints(t *testing.T) {
+	r := quickRig(t, 500*time.Millisecond)
+	a, b := r.dial("Ann", "dev:ann"), r.dial("Bob", "dev:bob")
+	after := make(chan []seatRow, 2)
+	ready := make(chan bool)
+	r.h.post(func() { r.h.st.afterMatch = func(_ string, s []seatRow) { after <- s }; close(ready) })
+	<-ready
+	pressQuick(a, "lms")
+	a.expect("offer")
+	pressQuick(b, "lms")
+	g := a.expect("go")
+	b.expect("go")
+	b.send(map[string]any{"t": "leave"}) // a friend walks out ...
+	a.expect("out")
+	a.send(map[string]any{"t": "round", "match": g["match"], "round": 1, "winner": 0, "ko": true, "place": []int{1, 4, 3, 2}, "dmg": []int{10, 100, 100, 100}})
+	if res := a.expect("result"); num(res["hwin"]) != 0 {
+		t.Fatalf("%v", res)
+	}
+	select {
+	case rows := <-after:
+		for _, s := range rows {
+			if !s.NoEvent {
+				t.Fatalf("... and Ann's lone report would decide their event points: %+v", rows)
+			}
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("no afterMatch")
+	}
+}
+
+func TestQuickGhostNeverSharesAJoinersName(t *testing.T) {
+	r := quickRig(t, 4*time.Second)
+	a := r.dial("Ann", "dev:ann")
+	pressQuick(a, "lms")
+	var ghost string
+	for ghost == "" {
+		for _, n := range listNames(a.expect("offer")) {
+			if strings.HasSuffix(n, "*") {
+				ghost = strings.TrimSuffix(n, "*")
+			}
+		}
+	}
+	c := r.dial(ghost, "dev:cat")
+	pressQuick(c, "lms")
+	l := listNames(c.expect("offer"))
+	for _, n := range l {
+		if strings.EqualFold(n, ghost+"*") {
+			t.Fatalf("%q joined next to its ghost twin: %v", ghost, l)
+		}
+	}
+	if l[0] != ghost {
+		t.Fatalf("the person keeps the name: %v", l)
+	}
+}
+
+func TestQuickShownGhostsStayWhilePeopleComeAndGo(t *testing.T) {
+	r := quickRig(t, 3*time.Second)
+	r.h.post(func() { r.h.quickReveal = r.h.quickWindow })
+	a, b := r.dial("Ann", "dev:ann"), r.dial("Bob", "dev:bob")
+	pressQuick(a, "lms")
+	var shown []string
+	for len(shown) < 3 {
+		shown = shown[:0]
+		for _, n := range listNames(a.expect("offer")) {
+			if strings.HasSuffix(n, "*") {
+				shown = append(shown, n)
+			}
+		}
+	}
+	for i := 0; i < 3; i++ {
+		pressQuick(b, "lms")
+		b.expect("offer")
+		b.send(map[string]any{"t": "leave"})
+	}
+	offers, g := offersUntil(t, a, "quickgo")
+	for _, o := range offers {
+		l := listNames(o)
+		for _, n := range shown {
+			if !contains(l, n) {
+				t.Fatalf("a shown ghost flickered out while Bob came and went: %v, then %v", shown, l)
+			}
+		}
+	}
+	got := []string{}
+	for _, x := range g["ghosts"].([]any) {
+		got = append(got, x.(map[string]any)["name"].(string))
+	}
+	if fmt.Sprint(got) != fmt.Sprint(shown) {
+		t.Fatalf("the ghosts who were shown are the ones who fight: %v vs %v", shown, got)
+	}
+}
+
+func TestQuickStarLookalikesNeverPassAsAGhost(t *testing.T) {
+	for _, s := range []string{"Maddy*", "Maddy＊", "Maddy∗", "Maddy⁎", "Maddy✱", "Maddy✻", "Maddy⁂", "Maddy⁑", "Maddy٭", "Maddy꙳", "Maddy﹡", "Maddy❋", "Maddy⋆", "Maddy🞯", "Mad*dy", "Maddy⃰"} {
+		if n, err := cleanName(s); err != nil || n != "Maddy" {
+			t.Fatalf("%q -> %q (%v): a person's name never ends like a ghost's", s, n, err)
+		}
+	}
+}

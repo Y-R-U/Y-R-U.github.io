@@ -9,9 +9,11 @@
  *   portrait 390x844 rotated: the same taps land; a ghost 1v1 is a best of 3
  *   duo      two Chromes press QUICK FIGHT on one mode: they see each other, two ghosts fill the
  *            room, the master runs them over WebRTC, both reach the same never-ranked result
+ *   duel2    two Chromes press 1v1 QUICK FIGHT: the full window links them, both fight the same
+ *            best of 3 (snapshots reach the guest) and reach the same result; a typed "✱" is dropped
  *   offline  the arena goes away: QUICK FIGHT is disabled and says why
  *
- *   node tools/quickbrowser.mjs [--only=solo|portrait|duo|offline]
+ *   node tools/quickbrowser.mjs [--only=solo|portrait|duo|duel2|offline]
  *   node tools/quickbrowser.mjs --falsify     each suite against a copy broken the way it checks
  *
  * Ports 9600-9649 (ARENA_TEST_PORT moves them). The game is served from a temp copy.
@@ -40,6 +42,8 @@ if (args.falsify) {
     ['portrait', 'js/net/fight.js', "    if (w >= 0 || this.draws >= 3) {", "    if (true) {", 'a ghost 1v1 ends after one round'],
     ['duo', 'js/net/fight.js', '          if (this.brains[i]) { this.brains[i].update(STEP, mp); return; }\n', '', 'nobody runs the ghosts online'],
     ['duo', 'js/net/panel.js', "html += `<p class=\"fine\">Quick fight — not ranked.", "html += `<p class=\"fine\">Ranked.", 'the card does not say not ranked'],
+    ['duel2', 'server/quick.go', '\th.quickPlan(m, false)\n\th.quickOffer(m)', '\tif len(m.seats) >= quickCap(m.typ) {\n\t\th.quickStart(m)\n\t\treturn\n\t}\n\th.quickPlan(m, false)\n\th.quickOffer(m)', 'a full 1v1 window starts with no offer (nobody links)'],
+    ['duel2', 'js/net/panel.js', "name = nm.value.replace(STARS, '')", "name = nm.value", 'a typed star look-alike stays in the name'],
     ['offline', 'js/net/panel.js', 'const canQuick = canLobby && !arenaDown;', 'const canQuick = canLobby;', 'QUICK FIGHT stays on with the arena gone'],
   ];
   let bad = 0;
@@ -63,21 +67,23 @@ for (const d of ['js', 'css']) cpSync(join(ROOT, d), join(game, d), { recursive:
 for (const f of ['index.html', 'privacy.html', 'terms.html']) if (existsSync(join(ROOT, f))) cpSync(join(ROOT, f), join(game, f));
 symlinkSync(join(ROOT, 'assets'), join(game, 'assets'));
 const mut = process.env.MUTATE ? JSON.parse(process.env.MUTATE) : null;
-if (mut) {
-  const p = join(game, mut[0]);
+function mutate(dir, file) {
+  const p = join(dir, file);
   const src = readFileSync(p, 'utf8');
   if (!src.includes(mut[1])) { log(`STALE mutant: ${mut[1].slice(0, 70)}`); process.exit(3); }
   writeFileSync(p, src.replace(mut[1], mut[2]));
 }
+if (mut && !mut[0].startsWith('server/')) mutate(game, mut[0]);
 
 // The arena binary: from server/ as it stands, or (another lane mid-edit) with HEAD's events files.
-let bin = process.env.ARENA_BIN;
+let bin = mut?.[0].startsWith('server/') ? '' : process.env.ARENA_BIN;
 if (!bin) {
   const src = join(tmp, 'server');
   cpSync(join(ROOT, 'server'), src, { recursive: true });
   if (spawnSync('go', ['vet', '.'], { cwd: src }).status !== 0) {
-    for (const f of ['events.go', 'eventart.go']) { try { writeFileSync(join(src, f), execSync(`git show HEAD:gms/2d/ragdojo/server/${f}`, { cwd: ROOT })); } catch {} }
+    for (const f of ['main.go', 'events.go', 'eventart.go']) { try { writeFileSync(join(src, f), execSync(`git show HEAD:gms/2d/ragdojo/server/${f}`, { cwd: ROOT })); } catch {} }
   }
+  if (mut?.[0].startsWith('server/')) mutate(src, mut[0].slice(7));
   bin = join(tmp, 'arena');
   execFileSync('go', ['build', '-o', bin, '.'], { cwd: src, stdio: 'inherit' });
 }
@@ -295,7 +301,42 @@ async function offline() {
   c.close();
 }
 
-const SUITES = { solo, portrait, duo, offline };
+// ── duel2 ────────────────────────────────────────────────────────────
+async function duel2() {
+  log('\n── duel2: two people press 1v1 QUICK FIGHT');
+  const extra = '&arenabot=1&arenasecs=20';
+  const A = await open(860, 400, 'duelA', 'duel A', extra), B = await open(860, 400, 'duelB', 'duel B', extra);
+  for (const [c, n] of [[A, 'Duel A\u2731'], [B, 'Duel B']]) {
+    await tap(c, '#btnArena');
+    await c.waitFor(`document.querySelector('[data-a=quick]')`, 5000);
+    await c.eval(`(()=>{const i=document.getElementById('arenaName'); i.value=${JSON.stringify(n)}; i.dispatchEvent(new Event('change'))})()`);
+  }
+  ok('duel2: a typed star look-alike is dropped from the name', await A.eval(`document.getElementById('arenaName').value`) === 'Duel A', await A.eval(`document.getElementById('arenaName').value`));
+  await tap(A, '#arenaBody [data-a=quick][data-mode=duel]');
+  await A.waitFor(`document.getElementById('quickClock')`, 4000);
+  await sleep(600);
+  await tap(B, '#arenaBody [data-a=quick][data-mode=duel]');
+  for (const c of [A, B]) await c.eval(`(()=>{const cl=window.__ragdojo.arena.client; window.__heard=[]; for (const t of ['result','void','cancel','out','quickgo']) cl.on(t, (m)=>window.__heard.push(m));})()`);
+  const started = await Promise.all([A, B].map((c) => c.waitFor(`window.__net && window.__net.match && window.__net.match.phase >= 1`, 15000)));
+  ok('duel2: the fight starts on both screens, online (not two ghost fights)', started.every(Boolean) && await A.eval(`!window.__ragdojo.arena.quickFight`));
+  await sleep(5000);
+  const st = await Promise.all([A, B].map((c) => c.eval(`(()=>{const cl=window.__ragdojo.arena.client, n=window.__net; return {master:n.isMaster, links:[...cl.links.keys()], me:cl.me&&cl.me.id, snaps:n.m.snaps, names:n.match.all.map(f=>f.netName)}})()`)));
+  ok('duel2: each is linked to the other', st[0].links.length === 1 && st[1].links.length === 1 && st[0].links[0] === st[1].me && st[1].links[0] === st[0].me, JSON.stringify(st.map((s) => [s.me, s.links])));
+  ok('duel2: exactly one master', st.filter((s) => s.master).length === 1);
+  const g = st.find((s) => !s.master);
+  ok('duel2: the guest receives the master\'s snapshots', g && g.snaps > 10, JSON.stringify(g && g.snaps));
+  ok('duel2: two people, no ghost, no star', st.every((s) => s.names.length === 2 && s.names.every((n) => !/\*$/.test(n))) && st[1].names.includes('Duel A'), JSON.stringify(st.map((s) => s.names)));
+  const done = await Promise.all([A, B].map((c) => c.waitFor(`(window.__heard||[]).some(m=>m.t==='result'||m.t==='void'||m.t==='cancel')`, 150000, 500)));
+  ok('duel2: both reach the end', done.every(Boolean));
+  const res = await Promise.all([A, B].map((c) => c.eval(`window.__heard.find(m=>m.t==='result'||m.t==='void'||m.t==='cancel')`)));
+  ok('duel2: the same agreed best-of-3 result, quick, never counted', res.every((r) => r && r.t === 'result' && r.quick && r.counted === false && !r.stats) && res[0].winner === res[1].winner && JSON.stringify(res[0].score) === JSON.stringify(res[1].score) && Math.max(...res[0].score) === 2,
+    JSON.stringify(res.map((r) => r && { t: r.t, w: r.winner, s: r.score, q: r.quick, c: r.counted, why: r.why })));
+  const errs = [A, B].flatMap((c) => c.errors);
+  ok('duel2: zero console errors', errs.length === 0, errs.slice(0, 3).join(' / '));
+  A.close(); B.close();
+}
+
+const SUITES = { solo, portrait, duo, duel2, offline };
 try {
   for (const [k, fn] of Object.entries(SUITES)) if (!args.only || args.only === k) await fn();
 } catch (e) {

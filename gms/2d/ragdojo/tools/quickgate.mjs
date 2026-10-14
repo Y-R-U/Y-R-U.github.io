@@ -52,14 +52,21 @@ if (args.includes('--falsify')) {
     ['ghost reveal', 'quick.go', '\t\t\t\th.quickOffer(m)\n\t\t\t\tbreak', '\t\t\t\tbreak'],
     ['ghost replacement', 'quick.go', '\tfor len(m.ghosts) > need {', '\tfor false && len(m.ghosts) > need {'],
     ['seat filling', 'quick.go', '\treturn 4\n}', '\treturn 3\n}'],
-    ['seat filling (duel)', 'quick.go', '\tif m.typ == "duel" && len(kept) == 2 {', '\tif false {'],
+    ['seat filling (duel)', 'rooms.go', '\t\tif m.typ == "duel" && len(kept) == 2 {', '\t\tif false {'],
     ['never ranked (stats)', 'rooms.go', '\t\th.st.recordQuick(m.id, m.typ, score, rows)', '\t\th.st.recordMatch(m.id, m.typ, m.friend, score, rows)'],
     ['never ranked (duel stats)', 'hub.go', '\t\th.st.recordQuick(m.id, m.typ, score, seats)', '\t\th.st.recordMatch(m.id, m.typ, m.friend, score, seats)'],
     ['never ranked (counted)', 'rooms.go', '"counted": s.ranked && !rows[i].NoStats && !m.quick', '"counted": s.ranked && !rows[i].NoStats'],
     ['allowance spent', 'quick.go', '\th.lobbyDirt = true\n\th.startMatch(m)', '\th.lobbyDirt = true\n\tm.state = mStarting\n\tfor _, s := range m.seats {\n\t\ts.spent = &spendResult{OK: true, Remaining: -1}\n\t}\n\th.maybeBegin(m)'],
     ['allowance needs sign-in', 'quick.go', '\tif !c.ranked && !h.openLobby {\n\t\th.send(c, map[string]any{"t": "err", "code": "signin", "msg": "Sign in for a quick fight.', '\tif false {\n\t\th.send(c, map[string]any{"t": "err", "code": "signin", "msg": "Sign in for a quick fight.'],
     ['* naming', 'quick.go', 'Name: name + "*"', 'Name: name'],
-    ['* only for ghosts', 'names.go', "r == '<', r == '>', r == '*',", "r == '<', r == '>',"],
+    ['* only for ghosts', 'names.go', "r == '<', r == '>', isStar(r),", "r == '<', r == '>',"],
+    ['no * look-alikes', 'names.go', "\tcase r >= 0x2722 && r <= 0x273D,", "\tcase false,"],
+    ['the filling joiner is offered its peers', 'quick.go', '\th.quickPlan(m, false)\n\th.quickOffer(m)', '\tif len(m.seats) >= quickCap(m.typ) {\n\t\th.quickStart(m)\n\t\treturn\n\t}\n\th.quickPlan(m, false)\n\th.quickOffer(m)'],
+    ['decline is one person leaving', 'hub.go', '\t\t\tif mt.room || mt.quick {', '\t\t\tif false {'],
+    ['a 1v1 stays a room while starting', 'quick.go', '\th.quickStrength(m)\n\th.lobbyDirt = true', '\th.quickStrength(m)\n\tif m.typ == "duel" && len(kept) == 2 {\n\t\tm.room, m.ghosts = false, nil\n\t}\n\th.lobbyDirt = true'],
+    ['a lone person earns no event points', 'rooms.go', '\t\tlone = in < 2', '\t\tlone = false'],
+    ['no ghost twin of a joiner', 'quick.go', 'if !names[strings.ToLower(strings.TrimSuffix(g.Name, "*"))] {', 'if true {'],
+    ['shown ghosts stay', 'quick.go', '\t\tif drop < 0 && !now {\n\t\t\tbreak\n\t\t}\n', ''],
     ['people ranked among themselves', 'rooms.go', '\t\thw = humanWinner(place, len(m.seats))\n', ''],
     ['last person fights on', 'rooms.go', 'case len(left) == 1 && len(m.ghosts) == 0:', 'case len(left) == 1:'],
     ['no duplicate personality', 'quick.go', '\t\tif p.id != "random" && taken[p.id] {\n\t\t\tcontinue\n\t\t}\n', ''],
@@ -84,7 +91,7 @@ if (args.includes('--falsify')) {
   cpSync(join(GAME, 'server'), goSrc, { recursive: true });
   // Another lane may be mid-edit in server/: if the tree does not build, test against HEAD's files of theirs.
   if (spawnSync('go', ['vet', '.'], { cwd: goSrc }).status !== 0) {
-    for (const f of ['events.go', 'events_test.go', 'eventart.go', 'eventart_test.go', 'abuse_test.go']) {
+    for (const f of ['main.go', 'events.go', 'events_test.go', 'eventart.go', 'eventart_test.go', 'abuse_test.go']) {
       try { writeFileSync(join(goSrc, f), execSync(`git show HEAD:gms/2d/ragdojo/server/${f}`, { cwd: GAME })); } catch {}
     }
     console.log('(server/ does not build as it stands; Go mutants run against HEAD\'s events files)');

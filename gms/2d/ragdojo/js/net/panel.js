@@ -44,6 +44,8 @@ function forfeitLine(r, won) {
 }
 const SIGNIN = 'Sign in (the account button) for ranked and quick fights. Friend links still work without an account.';
 const QUICK_NOTE = '*unfilled slots are filled by ghost players';
+/** "*" and its look-alikes: only ghost names carry one (server/names.go isStar). */
+const STARS = /[*\u066D\u2042\u204E\u2051\u2055\u2217\u22C6\u2743\uA673\uFE61\uFF0A\u0359\u20F0\u2722-\u273D\u2749-\u274B\u{1F7AF}-\u{1F7BF}]/gu;
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 /** Signal bars for a ping: 5 green = good, 2-3 yellow = average, 1 red = bad. */
@@ -101,7 +103,7 @@ export function mountArena(h) {
   body?.before(tabsEl);
 
   const device = store.get(DEVICE_KEY) || (() => { const d = Math.random().toString(36).slice(2, 12); store.set(DEVICE_KEY, d); return d; })();
-  let name = store.get(NAME_KEY) || '';
+  let name = (store.get(NAME_KEY) || '').replace(STARS, '');
 
   async function token() {
     if (lan) return 'lan:' + device;
@@ -549,7 +551,8 @@ export function mountArena(h) {
     body.innerHTML = html;
     const nm = $('arenaName');
     if (nm) nm.onchange = () => {
-      name = nm.value.trim().slice(0, 20);
+      name = nm.value.replace(STARS, '').trim().slice(0, 20);
+      nm.value = name;
       store.set(NAME_KEY, name);
       if (client?.connected) client.setName(name);
     };
