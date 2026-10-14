@@ -1,5 +1,6 @@
 // Event boards drawn in ink: the Vines & Ladders board with its walking stick man, rivals and
-// die, and the picture-reveal grid. Used by the game's EVENTS panel and by dev/events.html.
+// die, the picture-reveal grid, THE TOWER and the STORY track. Used by the game's EVENTS panel
+// and by dev/events.html.
 // Everything is drawn in CSS pixels inside an `area` rect of whatever canvas it is given.
 
 import { stroke, line, circle, rect, hatch, splat, INK } from '../ink.js';
@@ -8,6 +9,7 @@ import { POSE, fk, sample } from '../poses.js';
 import { drawFighter, drawShadow } from '../draw.js';
 import { RANKS } from '../config.js';
 import { CELLS, GRID } from './reveal.js';
+import { FLOORS } from './tower.js?v=20261014-ev';
 
 const FONT = '"Patrick Hand", cursive';
 const RIVAL_COL = ['#2d5fb5', '#c8463f', '#3d6b3a', '#8c50c6', '#d08a1e', '#8a5a33', '#1d8a8a'];
@@ -259,5 +261,165 @@ export class RevealView {
     }
     g.textAlign = 'start'; g.textBaseline = 'alphabetic';
     if (dim) { g.save(); g.fillStyle = 'rgba(247,242,227,0.55)'; g.fillRect(p.x - 4, p.y - 4, p.w + 8, p.h + 8); g.restore(); }
+  }
+}
+
+/**
+ * THE TOWER: twelve floors as a pyramid, floor 1 the wide base. `climb(from, to)` animates the
+ * stick man between floors after a fight; rivals sit on their floors as initials.
+ */
+export class TowerView {
+  constructor() { this.me = fighterOf(1, 5, RANKS[0]); this.anim = null; this.img = null; this.L = null; this.t = 0; }
+
+  layout(area, dpr) {
+    const top = 34, fh = Math.max(10, Math.floor((area.h - top - 8) / FLOORS)), base = area.y + area.h - 6;
+    const wMax = Math.min(area.w - 16, fh * 22), wMin = Math.max(fh * 3.2, wMax * 0.2);
+    this.L = { ...area, fh, base, wMax, wMin, cx: area.x + area.w / 2 };
+    this.img = this.bake(dpr);
+  }
+
+  /** The band of floor `f` (1-based): its left x, top y, width. */
+  band(f) {
+    const { fh, base, wMax, wMin, cx } = this.L, u = (f - 1) / (FLOORS - 1), w = wMax - (wMax - wMin) * u;
+    return { x: cx - w / 2, y: base - f * fh, w, h: fh };
+  }
+
+  bake(dpr) {
+    const L = this.L, c = document.createElement('canvas');
+    c.width = Math.ceil((L.x + L.w) * dpr); c.height = Math.ceil((L.y + L.h) * dpr);
+    const b = c.getContext('2d'); b.scale(dpr, dpr);
+    b.save(); b.globalCompositeOperation = 'multiply';
+    line(b, L.x + 4, L.base, L.x + L.w - 4, L.base, { w: 2.6, seed: 700 });
+    for (let f = 1; f <= FLOORS; f++) {
+      const r = this.band(f);
+      if (f % 2) { b.fillStyle = 'rgba(160,150,120,0.10)'; b.fillRect(r.x, r.y, r.w, r.h); }
+      rect(b, r.x, r.y, r.w, r.h, { w: f === FLOORS ? 2.6 : 1.8, seed: 710 + f, wob: 0.6 });
+      b.font = `${Math.round(Math.min(18, r.h * 0.6))}px ${FONT}`; b.fillStyle = 'rgba(32,36,44,0.6)'; b.textBaseline = 'middle';
+      b.fillText(String(f), r.x + 5, r.y + r.h / 2 + 1);
+      b.strokeStyle = 'rgba(32,36,44,0.4)'; b.lineWidth = 1.2;
+      for (let k = 1; k < Math.floor(r.w / (r.h * 2.6)); k++) if ((k + f) % 3 === 0) b.strokeRect(Math.round(r.x + k * r.h * 2.6) + 0.5, Math.round(r.y + r.h * 0.3) + 0.5, Math.round(r.h * 0.42), Math.round(r.h * 0.4));
+    }
+    b.textBaseline = 'alphabetic';
+    const r1 = this.band(1);
+    rect(b, L.cx - r1.h * 0.32, r1.y + r1.h * 0.2, r1.h * 0.64, r1.h * 0.8, { w: 1.6, seed: 760 });
+    const t = this.band(FLOORS), px = t.x + t.w * 0.86;
+    stroke(b, [[px, t.y], [px, t.y - 30]], { w: 2, seed: 770 });
+    stroke(b, [[px, t.y - 30], [px + 22, t.y - 24], [px, t.y - 17]], { w: 2, col: '#c8463f', seed: 771 });
+    b.restore();
+    return c;
+  }
+
+  /** Where the climber stands on floor `f`. */
+  spot(f) { const r = this.band(f); return [r.x + r.w * (f === FLOORS ? 0.42 : 0.3), r.y + r.h - 2]; }
+
+  climb(from, to) { if (from !== to) this.anim = { from, to, t: 0, dur: 0.5 + Math.abs(to - from) * 0.35 }; }
+  busy() { return !!this.anim; }
+
+  /** `floor` where the climber rests; `rivals`: [{ key, name, floor, friend }]; `tops`: TOPs won. */
+  draw(g, dt, now, { floor, rivals = [], tops = 0, dim = false }) {
+    const L = this.L;
+    g.drawImage(this.img, 0, 0, L.x + L.w, L.y + L.h);
+    const perFloor = new Map();
+    rivals.forEach((r, i) => {
+      const f = Math.max(1, Math.min(FLOORS, r.floor | 0)), k = perFloor.get(f) || 0; perFloor.set(f, k + 1);
+      const b = this.band(f), rr = Math.min(b.h * 0.36, 11), x = b.x + b.w - rr - 4 - k * (rr * 2.2), y = b.y + b.h / 2;
+      if (x < b.x + b.w * 0.5) return;
+      const col = RIVAL_COL[i % RIVAL_COL.length];
+      g.save(); g.fillStyle = 'rgba(255,253,244,0.9)'; g.beginPath(); g.arc(x, y, rr, 0, 6.283); g.fill(); g.restore();
+      circle(g, x, y, rr, { w: r.friend ? 2.2 : 1.4, col, seed: i * 13, passes: 1 });
+      g.font = `${Math.round(rr * 1.4)}px ${FONT}`; g.fillStyle = col; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText((r.name || '?')[0], x, y + 1); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
+    });
+    let [x, y] = this.spot(floor), pose = 'guard', poseT = 0;
+    if (this.anim) {
+      const a = this.anim; a.t += dt; const u = Math.min(1, a.t / a.dur), e = u * u * (3 - 2 * u);
+      const [x0, y0] = this.spot(a.from), [x1, y1] = this.spot(a.to);
+      x = x0 + (x1 - x0) * e; y = y0 + (y1 - y0) * e - Math.sin(e * Math.PI) * L.fh * 0.4;
+      pose = a.to > a.from ? 'walk' : 'hurt'; poseT = a.t;
+      if (u >= 1) this.anim = null;
+    } else if (floor === FLOORS && tops > 0) pose = 'victory';
+    const k = Math.max(L.fh * 2.2, 26) / 140;
+    const p = pose === 'walk' ? sample('walk', poseT).p : pose === 'victory' ? sample('victory', now).p : (POSE[pose] || POSE.guard);
+    this.me.rag.place(0, 0, fk(p, 1, 1));
+    g.save(); g.translate(x, y - 58 * k); g.scale(k, k); drawFighter(g, this.me, now); g.restore();
+    if (tops > 0) {
+      const t = this.band(FLOORS);
+      g.font = `${Math.round(Math.min(20, L.fh * 0.9))}px ${FONT}`; g.fillStyle = '#c8463f'; g.textAlign = 'right'; g.textBaseline = 'middle';
+      g.fillText(`TOP ×${tops}`, t.x - 8, t.y + t.h / 2); g.textAlign = 'start'; g.textBaseline = 'alphabetic';
+    }
+    if (dim) { g.save(); g.fillStyle = 'rgba(247,242,227,0.62)'; g.fillRect(L.x, L.y, L.w, L.h); g.restore(); }
+  }
+}
+
+/**
+ * STORY: one chapter's track of circles, winding up the stage, with the walker; or a chapter's
+ * picture. `walkTo(circle)` queues steps; the circle index is the walker's resting place.
+ */
+export class StoryView {
+  constructor() { this.me = fighterOf(1, 9, RANKS[0]); this.L = null; this.pts = []; this.steps = []; this.walkT = 0; this.at = 0; }
+
+  layout(area, n) {
+    this.L = area; this.n = n;
+    const pad = Math.max(22, Math.min(area.w, area.h) * 0.09), swings = 2.5, N = 400;
+    const path = Array.from({ length: N + 1 }, (_, i) => {
+      const t = i / N;
+      return [area.x + area.w / 2 + Math.sin(t * Math.PI * swings - Math.PI / 2) * (area.w / 2 - pad * 1.3), area.y + area.h - pad - t * (area.h - pad * 2)];
+    });
+    const len = [0];
+    for (let i = 1; i <= N; i++) len.push(len[i - 1] + Math.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1]));
+    const total = len[N];
+    this.pts = Array.from({ length: n + 1 }, (_, k) => {
+      const d = (k / n) * total; let i = 1; while (i < N && len[i] < d) i++;
+      const u = (d - len[i - 1]) / Math.max(1e-6, len[i] - len[i - 1]);
+      return [path[i - 1][0] + (path[i][0] - path[i - 1][0]) * u, path[i - 1][1] + (path[i][1] - path[i - 1][1]) * u];
+    });
+    this.r = Math.max(6, Math.min(16, (total / n) * 0.3, pad * 0.6));
+  }
+
+  /** Walk from the resting circle to `to` (0 = start, n = the chapter's end). */
+  walkTo(to) { const from = this.steps.length ? this.steps[this.steps.length - 1].b : this.at; for (let c = from; c < to; c++) this.steps.push({ a: c, b: c + 1, t: 0 }); }
+  busy() { return this.steps.length > 0; }
+
+  drawTrack(g, dt, now, { walked, dim = false, title = '' }) {
+    const { pts, r } = this, L = this.L;
+    for (let k = 0; k < pts.length - 1; k++) {
+      const [x0, y0] = pts[k], [x1, y1] = pts[k + 1], d = Math.hypot(x1 - x0, y1 - y0), ux = (x1 - x0) / d, uy = (y1 - y0) / d;
+      line(g, x0 + ux * r, y0 + uy * r, x1 - ux * r, y1 - uy * r, { w: 1.6, passes: 1, seed: 800 + k, a: 0.5, wob: 0.6 });
+    }
+    pts.forEach(([x, y], k) => {
+      if (k === pts.length - 1) {
+        g.save(); g.fillStyle = 'rgba(255,253,244,0.95)'; g.fillRect(x - r * 1.4, y - r * 1.1, r * 2.8, r * 2.2); g.restore();
+        rect(g, x - r * 1.4, y - r * 1.1, r * 2.8, r * 2.2, { w: 2.4, seed: 870, col: '#c8463f' });
+        g.font = `${Math.round(r * 1.3)}px ${FONT}`; g.fillStyle = '#c8463f'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('?', x, y + 1);
+      } else {
+        const done = k > 0 && k <= walked;
+        if (done) { g.save(); g.globalAlpha = 0.28; g.fillStyle = INK; g.beginPath(); g.arc(x, y, r * 0.8, 0, 6.283); g.fill(); g.restore(); }
+        circle(g, x, y, r, { w: k === 0 ? 2.4 : 1.8, seed: 900 + k, passes: 1, col: k === 0 ? '#2d5fb5' : INK });
+        if (k > 0 && r >= 9) { g.font = `${Math.round(r * 0.9)}px ${FONT}`; g.fillStyle = 'rgba(32,36,44,0.6)'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(k), x, y + 1); }
+      }
+    });
+    g.textAlign = 'start'; g.textBaseline = 'alphabetic';
+    if (title) { g.font = `${Math.round(Math.max(14, r * 1.2))}px ${FONT}`; g.fillStyle = 'rgba(32,36,44,0.75)'; g.fillText(title, L.x + 8, L.y + 20); }
+    this.walkT += dt;
+    let x, y, pose = 'guard', face = 1;
+    if (this.steps.length) {
+      const s = this.steps[0]; s.t += dt; const u = Math.min(1, s.t / 0.32);
+      const [x0, y0] = pts[s.a], [x1, y1] = pts[s.b];
+      x = x0 + (x1 - x0) * u; y = y0 + (y1 - y0) * u - Math.sin(u * Math.PI) * r * 0.8; pose = 'walk'; face = x1 >= x0 ? 1 : -1;
+      if (u >= 1) { this.steps.shift(); this.at = s.b; }
+    } else [x, y] = pts[Math.min(this.at, pts.length - 1)];
+    const k = (r * 4.2) / 140;
+    const p = pose === 'walk' ? sample('walk', this.walkT).p : POSE.guard;
+    this.me.rag.place(0, 0, fk(p, face, 1));
+    g.save(); g.translate(x, y - r * 0.2 - 58 * k); g.scale(k, k); drawFighter(g, this.me, now); g.restore();
+    if (dim) { g.save(); g.fillStyle = 'rgba(247,242,227,0.62)'; g.fillRect(L.x, L.y, L.w, L.h); g.restore(); }
+  }
+
+  /** A chapter's picture, fitted and framed. */
+  drawPage(g, img, { dim = false } = {}) {
+    const L = this.L, w = Math.min(L.w - 12, (L.h - 12) * 1.6), h = w / 1.6, x = L.x + (L.w - w) / 2, y = L.y + (L.h - h) / 2;
+    g.drawImage(img, x, y, w, h);
+    rect(g, x - 3, y - 3, w + 6, h + 6, { w: 2.6, seed: 990 });
+    if (dim) { g.save(); g.fillStyle = 'rgba(247,242,227,0.62)'; g.fillRect(L.x, L.y, L.w, L.h); g.restore(); }
   }
 }

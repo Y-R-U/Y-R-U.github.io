@@ -1,20 +1,24 @@
-// The EVENTS panel: every running event with its time left, Vines & Ladders and the picture
-// reveal, rivals from the server, and the prizes. Battles arrive as `ragdojo:battle` window
+// The EVENTS panel: every running event with its time left, Vines & Ladders, the picture
+// reveal, THE TOWER, the STORY, rivals from the server, and the prizes. Battles arrive as `ragdojo:battle` window
 // events (campaign fights from main.js, ghost and arena results from net/panel.js) and are
 // banked into `save.events` — the run save, so cloud sync carries it. Works with no server;
 // with one, the server's recomputed state wins (server/events.go).
 
-import { activeEvents, parseEventId, pointsFor, today } from './index.js';
+import { activeEvents, parseEventId, pointsFor, today, capFor, PAID_CAP } from './index.js?v=20261014-ev';
 import * as V from './vines.js';
 import * as R from './reveal.js';
-import * as E from './state.js';
-import { VinesView, RevealView } from './render.js?v=20261014-walk';
+import * as E from './state.js?v=20261014-ev';
+import * as TW from './tower.js?v=20261014-ev';
+import * as SY from './story.js?v=20261014-ev';
+import { VinesView, RevealView, TowerView, StoryView } from './render.js?v=20261014-ev';
+import { storyPicture, towerPicture } from './storyart.js?v=20261014-ev';
+import { TowerMatch } from './towerfight.js?v=20261014-ev';
 import { createEventsNet, deviceId, arenaName } from './net.js';
 import { drawOverlay } from './overlay.js';
 import { SHEET_W, GROUND_Y } from '../config.js';
 import { isRotated } from '../input.js';
 
-const SHORT = { 'vines-day': 'VINES', 'reveal-week': 'PICTURE', 'vines-month': 'SCROLLS', 'reveal-month': 'MONTHLY', halloween: 'SPOOKY' };
+const SHORT = { 'vines-day': 'VINES', 'reveal-week': 'PICTURE', tower: 'TOWER', story: 'STORY', halloween: 'SPOOKY' };
 // Relative to the page (index.html sits at the game root), not this module: the release
 // build bundles this file into js/main.js, where a module-relative path would point elsewhere.
 // Only the manifest is public (choices, name box); the pictures come from the arena server a
@@ -47,7 +51,9 @@ export function mountEvents(h) {
   const stage = $('evStage'), cv = $('evCanvas'), side = $('evSide');
   const g = cv.getContext('2d');
   const net = createEventsNet({ dev: h.dev, lan: h.lan, account: h.account });
-  const vview = new VinesView(), rview = new RevealView();
+  const vview = new VinesView(), rview = new RevealView(), tview = new TowerView(), sview = new StoryView();
+  /** The STORY tab: the chapter on show, track or picture page, and a page waiting to open. */
+  let sv = { id: '', mode: 'track', ch: 0, reread: false, pending: false };
   const boards = new Map(), rivals = new Map(), arts = new Map(), srvArt = new Map();
   let manifest = { pictures: {} };
   let tab = null, note = '', raf = 0, last = 0, laidFor = '', online = false;
@@ -64,6 +70,8 @@ export function mountEvents(h) {
   }
   const now = () => Date.now() + net.skew;
   const pass = () => !!h.hasPass();
+  /** Supporter or Pass: campaign fights have no daily limit in "any battle" events. */
+  const paid = () => !!(h.paid ? h.paid() : h.hasPass());
   const boardFor = (id) => { if (!boards.has(id)) boards.set(id, V.makeBoard(id)); return boards.get(id); };
   const art = (id) => manifest.pictures?.[id] || null;
   /** Real art is up only when the manifest lists it AND the server says it holds it. */
@@ -145,7 +153,7 @@ export function mountEvents(h) {
     const at = (Number.isFinite(+d.at) && +d.at > 0 ? +d.at : Date.now()) + net.skew;
     const b = { id: d.id || `camp:${deviceId()}:${at}`, at, src: d.src === 'arena' ? 'arena' : 'campaign', won: !!d.won, oppDmg: +d.oppDmg || 0 };
     const before = st();
-    const after = E.recordBattle(before, b);
+    const after = E.recordBattle(before, b, { cap: capFor(paid()) });
     const hit = Object.keys(after.ev).filter((k) => after.ev[k].b.some((x) => x[0] === b.id) && !(before.ev[k]?.b || []).some((x) => x[0] === b.id));
     if (!hit.length) return;
     setSt(after);
@@ -163,8 +171,10 @@ export function mountEvents(h) {
     if (!p || (p.def.pass && !pass())) return;
     if (!(await net.probe())) { online = false; return; }
     const cur = E.evState(st(), id);
-    const sent = new Set(cur.b.map((x) => x[0]));
-    const r = await net.sync({ event: id, name: arenaName() || 'PLAYER', b: cur.b, rolls: cur.rolls | 0, open: cur.open || [] });
+    const tower = p.def.kind === 'tower';
+    const sent = new Set((tower ? cur.t : cur.b).map((x) => x[0]));
+    const r = await net.sync(tower ? { event: id, name: arenaName() || 'PLAYER', t: cur.t }
+      : { event: id, name: arenaName() || 'PLAYER', b: cur.b, rolls: cur.rolls | 0, open: cur.open || [] });
     if (r.status !== 200 || !r.data) {
       online = false;
       if (r.status === 0) srvArt.delete(id);
@@ -183,8 +193,20 @@ export function mountEvents(h) {
   function adopt(id, d, sent) {
     const p = parseEventId(id);
     const s = st(), cur = E.evState(s, id);
+    if (p.def.kind === 'tower') {
+      const srvT = Array.isArray(d.t) ? d.t : [];
+      const extraT = cur.t.filter((x) => !sent.has(x[0]) && !srvT.some((y) => y[0] === x[0]));
+      setSt(E.setEv(s, id, { ...cur, uid: d.uid || cur.uid, t: TW.towerCounted(p.win, [...srvT, ...extraT]) }));
+      if (Array.isArray(d.rivals)) rivals.set(id, d.rivals);
+      payRewards(id);
+      if (tab === id && isOpen()) paint();
+      return;
+    }
     const srv = Array.isArray(d.b) ? d.b : [];
-    const extra = cur.b.filter((x) => !sent.has(x[0]) && !srv.some((y) => y[0] === x[0]));
+    // The payment service did not answer the server, so it applied the free cap: a paid player
+    // keeps the fights it refused and claims them again later (server/events.go evApply).
+    const held = d.cap && d.cap.known === false && paid();
+    const extra = cur.b.filter((x) => (held ? x[2] === 'campaign' : !sent.has(x[0])) && !srv.some((y) => y[0] === x[0]));
     const next = { ...cur, uid: d.uid || cur.uid, b: [...srv, ...extra].sort(order) };
     const banked = E.pointsOf(next);
     if (p.def.kind === 'vines') next.rolls = Math.min(banked, Math.max(d.rolls | 0, cur.rolls | 0));
@@ -198,7 +220,7 @@ export function mountEvents(h) {
       next.bonus = Math.max(d.bonus | 0, cur.bonus | 0);
     }
     setSt(E.setEv(s, id, next));
-    if (Array.isArray(d.rivals)) {
+    if (Array.isArray(d.rivals) && p.def.kind === 'vines') {
       const old = rivals.get(id);
       rivals.set(id, d.rivals);
       if (old && tab === id && isOpen() && laidFor.startsWith(id + '|')) {
@@ -207,6 +229,7 @@ export function mountEvents(h) {
       }
     }
     payRewards(id);
+    if (p.def.kind === 'story' && tab === id && sv.id === id && sv.mode === 'track') storyWalk(id);
     if (p.def.kind === 'reveal' && artOn(id)) fetchArt(id, Array.isArray(d.open) ? d.open : []);
     // The whole panel, not just the side: a solved picture adds the PRIZES tab.
     if (tab === id && isOpen()) paint();
@@ -215,15 +238,18 @@ export function mountEvents(h) {
   // ── rewards ────────────────────────────────────────────────────────────────────────
   function payRewards(id) {
     const p = parseEventId(id);
-    if (!p || p.def.kind !== 'reveal' || locked(id)) return;
+    if (!p || locked(id) || !['reveal', 'tower', 'story'].includes(p.def.kind)) return;
     const ev = E.evState(st(), id);
-    const owed = R.rewardsOwed(p.def, ev, artOn(id) ? 'art' : 'placeholder');
+    const kind = p.def.kind;
+    const owed = kind === 'tower' ? TW.rewardsOwed(ev) : kind === 'story' ? SY.rewardsOwed(SY.storyOf(p.win.key), E.pointsOf(ev), ev.claimed)
+      : R.rewardsOwed(p.def, ev, artOn(id) ? 'art' : 'placeholder');
     if (!owed.length) return;
     for (const r of owed) {
       if (r.kind === 'ink') h.addInk(r.amount);
       if (r.kind === 'arenaBackground') {
         const pz = prizes();
-        if (!pz.bgs.some((b) => b.id === id)) pz.bgs.push({ id, title: `${p.def.title} · ${p.win.key}`, art: artOn(id) });
+        const title = kind === 'story' ? `${SY.storyOf(p.win.key).title} · ${p.win.key}` : kind === 'tower' ? `TOP OF THE TOWER · ${p.win.key}` : `${p.def.title} · ${p.win.key}`;
+        if (!pz.bgs.some((b) => b.id === id)) pz.bgs.push({ id, title, art: kind === 'reveal' && artOn(id), kind, story: kind === 'story' ? SY.storyIndex(p.win.key) : undefined });
       }
     }
     setSt(E.setEv(st(), id, { ...ev, claimed: [...ev.claimed, ...owed.map((r) => r.id)] }));
@@ -274,6 +300,76 @@ export function mountEvents(h) {
     else say('guessing needs the arena server — try again when you are online');
   }
 
+  // ── THE TOWER: a fight on your floor, through the game's own fight machinery ──────────
+  let towerFight = null;
+  function fightTower() {
+    const id = tab, p = id && id !== 'prizes' ? parseEventId(id) : null;
+    if (!p || p.def.kind !== 'tower' || locked(id) || !h.startFight) return;
+    const before = TW.towerOf(E.evState(st(), id).t).floor;
+    const m = new TowerMatch({
+      floor: before, save: h.getSave(),
+      onEnd: (result, mm) => {
+        if (towerFight !== mm || h.currentMatch() !== mm) return;   // quit from pause: no result
+        towerFight = null;
+        const won = result === 'win', dev = Date.now(), at = dev + net.skew, bid = `tower:${deviceId()}:${at}`;
+        const was = E.evState(st(), id);
+        setSt(E.recordTower(st(), id, [bid, won ? 1 : 0, at]));
+        const now = E.evState(st(), id), counted = now.t.some((r) => r[0] === bid), t = TW.towerOf(now.t);
+        // A tower fight is a campaign fight for every other event (campaign rules).
+        const detail = { id: bid, at: dev, src: 'campaign', kind: 'tower', ranked: false, won, oppDmg: Math.max(0, ...mm.enemies.map((e) => Math.min(1, 1 - e.hp / e.maxHp))) };
+        try { window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail })); } catch {}
+        h.endFight();
+        open(id);
+        const award = detail.award?.pts ? ` · +${detail.award.pts} event points` : '';
+        if (!counted) say(`too quick after the last one — that fight did not count${award}`);
+        else if (won && before === TW.FLOORS) say(`you defended the TOP!${TW.towerOf(was.t).tops ? '' : ' The tower is yours.'}${award}`);
+        else say(`${won ? 'WON' : 'lost'} on floor ${before} — ${t.floor > before ? 'up to' : t.floor < before ? 'down to' : 'still on'} floor ${t.floor}${award}`);
+        if (counted) tview.climb(before, t.floor);
+        void sync(id);
+      },
+    });
+    towerFight = m;
+    h.overlay(null);
+    h.startFight(m);
+    m.say(before === TW.FLOORS ? 'THE TOP' : `FLOOR ${before}`, 1.8);
+  }
+
+  // ── STORY: walk the circles, open the chapter at the end of each track ────────────────
+  const storyFor = (id) => SY.storyOf(parseEventId(id).win.key);
+  const chStart = (story, ch) => story.chapters.slice(0, ch).reduce((a, c) => a + c.circles, 0);
+  /** Enter the STORY tab: show the page owed, or the track, and walk any new circles. */
+  function storyEnter(id) {
+    if (sv.id !== id) sv = { id, mode: 'track', ch: 0, reread: false, pending: false };
+    const ev = E.evState(st(), id), story = storyFor(id), read = Math.min(ev.read | 0, 6);
+    sv.reread = false;
+    if (read >= story.chapters.length) { sv.mode = 'page'; sv.ch = story.chapters.length - 1; return; }
+    const seen = Math.min(ev.seen | 0, chStart(story, read + 1));
+    if (seen >= chStart(story, read + 1)) { sv.mode = 'page'; sv.ch = read; sv.pending = false; return; }
+    if (sv.mode !== 'track' || sv.ch !== read || !sview.busy()) { sv.mode = 'track'; sv.ch = read; sview.steps = []; sview.at = seen - chStart(story, read); }
+    storyWalk(id);
+  }
+  function storyWalk(id) {
+    if (locked(id)) return;
+    const ev = E.evState(st(), id), story = storyFor(id), pts = E.pointsOf(ev), end = chStart(story, sv.ch + 1);
+    const seen = Math.max(ev.seen | 0, chStart(story, sv.ch) + sview.at);
+    const to = Math.min(pts, end);
+    if (to <= seen) return;
+    sview.walkTo(to - chStart(story, sv.ch));
+    setSt(E.setEv(st(), id, { ...ev, seen: to }));
+    if (to >= end) sv.pending = true;
+  }
+  function storyContinue() {
+    const id = sv.id, ev = E.evState(st(), id), story = storyFor(id);
+    if (sv.reread) { sv.reread = false; storyEnter(id); paint(); return; }
+    setSt(E.setEv(st(), id, { ...ev, read: Math.max(ev.read | 0, sv.ch + 1) }));
+    if (sv.ch + 1 >= story.chapters.length) { payRewards(id); paint(); return; }
+    sv = { ...sv, mode: 'track', ch: sv.ch + 1, pending: false };
+    sview.steps = []; sview.at = 0; laidFor = '';
+    storyWalk(id);
+    paint();
+  }
+  function storyRead(ch) { sv = { ...sv, mode: 'page', ch, reread: true }; paint(); }
+
   function useBackground(id) {
     const pz = prizes();
     pz.bg = pz.bg === id ? '' : id;
@@ -299,6 +395,7 @@ export function mountEvents(h) {
     note = '';
     setSt(E.markSeen(E.prune(st(), now()), today()));
     payAll();
+    if (parseEventId(tab || '')?.def.kind === 'story') storyEnter(tab);
     paintButton();
     h.overlay('events');
     laidFor = '';
@@ -309,7 +406,12 @@ export function mountEvents(h) {
     raf = requestAnimationFrame(frame);
   }
 
-  function setTab(id) { tab = id; note = ''; laidFor = ''; paint(); if (id !== 'prizes') void sync(id); }
+  function setTab(id) {
+    tab = id; note = ''; laidFor = '';
+    if (parseEventId(id)?.def.kind === 'story') storyEnter(id);
+    paint();
+    if (id !== 'prizes') void sync(id);
+  }
 
   function paint() { paintTabs(); layout(); paintSide(); }
 
@@ -333,6 +435,8 @@ export function mountEvents(h) {
     const p = tab && tab !== 'prizes' ? parseEventId(tab) : null;
     // A resize keeps a walk in progress; only a different board drops it.
     if (p?.def.kind === 'vines') { if (vview.tab !== tab) { vview.anim = []; vview.rivalAnim = []; vview.tab = tab; } vview.layout(area, boardFor(tab), dpr); }
+    if (p?.def.kind === 'tower') tview.layout(area, dpr);
+    if (p?.def.kind === 'story') sview.layout(area, storyFor(tab).chapters[Math.min(5, sv.ch)].circles);
     rview.layout(area);
     laidFor = `${tab}|${w}|${hgt}|${dpr}`;
   }
@@ -352,6 +456,16 @@ export function mountEvents(h) {
     if (p.def.kind === 'vines') {
       const me = meOf(tab);
       vview.draw(g, dt, t / 1000, { myPos: V.positionAfterRolls(boardFor(tab), me.uid, tab, me.rolls).pos, rivals: (rivals.get(tab) || []).map((r) => ({ ...r, key: rkey(r) })), dim: lock });
+    } else if (p.def.kind === 'tower') {
+      const tw = TW.towerOf(E.evState(st(), tab).t);
+      tview.draw(g, dt, t / 1000, { floor: tw.floor, tops: tw.tops, rivals: (rivals.get(tab) || []).map((r) => ({ ...r, key: rkey(r) })), dim: lock });
+    } else if (p.def.kind === 'story') {
+      if (sv.mode === 'page') sview.drawPage(g, storyPicture(SY.storyIndex(p.win.key), sv.ch), { dim: lock });
+      else {
+        const story = storyFor(tab), c = story.chapters[sv.ch];
+        sview.drawTrack(g, dt, t / 1000, { walked: sview.at, dim: lock, title: `${sv.ch + 1}. ${c.title}` });
+        if (sv.pending && !sview.busy()) { sv.pending = false; sv.mode = 'page'; paintSide(); }
+      }
     } else {
       const ev = E.evState(st(), tab);
       rview.draw(g, { img: shownImage(tab), open: ev.open, whole: wholeOf(tab, ev), dim: lock });
@@ -378,6 +492,39 @@ export function mountEvents(h) {
       <div class="evhead2">RIVALS <small>shown up to your turn ${turns}</small></div>
       ${rv.length ? `<div class="evriv">${rv.map((r) => `<div class="${r.friend ? 'f' : ''}">${r.friend ? '★ ' : ''}${esc(r.name)} <span>sq ${r.pos}</span></div>`).join('')}</div>`
         : `<p class="evsmall">${online ? 'Nobody else has played this one yet.' : 'Rivals show up here when you are online and signed in.'}</p>`}`;
+  }
+
+  function towerSide(a) {
+    const id = a.id, ev = E.evState(st(), id), t = TW.towerOf(ev.t), rv = rivals.get(id) || [];
+    const top = t.floor === TW.FLOORS;
+    return `<div class="evstat">floor <b>${t.floor}</b>/${TW.FLOORS} · best <b>${t.best}</b> · ${t.wins}–${t.fights - t.wins}${t.tops ? ` · TOP <b>×${t.tops}</b>` : ''}</div>
+      <div class="evrollrow"><button class="btn big" id="evFight"${h.startFight ? '' : ' disabled'}>${top ? (t.tops ? 'DEFEND THE TOP' : 'FIGHT THE TOP') : `FIGHT FLOOR ${t.floor}`}</button>
+      <span class="evsmall">${top ? `win it: ${t.tops ? 'stay on top' : `+${TW.TOP_INK} ink and a prize`}` : 'win: up a floor · lose: down one'}</span></div>
+      <div class="evnote" id="evNote">${esc(note)}</div>
+      <div class="evhead2">RIVALS <small>their floor now</small></div>
+      ${rv.length ? `<div class="evriv">${rv.map((r) => `<div class="${r.friend ? 'f' : ''}">${r.friend ? '★ ' : ''}${esc(r.name)} <span>fl ${r.floor}${r.tops ? ' ★' + r.tops : ''}</span></div>`).join('')}</div>`
+        : `<p class="evsmall">${online ? 'Nobody else is climbing this week yet.' : 'Rivals show up here when you are online and signed in.'}</p>`}`;
+  }
+
+  function storySide(a) {
+    const id = a.id, ev = E.evState(st(), id), story = storyFor(id), pts = E.pointsOf(ev);
+    const read = Math.min(ev.read | 0, story.chapters.length), c = story.chapters[sv.ch];
+    const pills = story.chapters.map((x, i) => `<button class="btn small evch${i === sv.ch ? ' on' : ''}" data-ch="${i}"${i < read ? '' : ' disabled'}>${i + 1}</button>`).join('');
+    const done = read >= story.chapters.length;
+    const head = `<div class="evstat">${esc(story.title)}</div><div class="evchs">${pills}</div>`;
+    if (sv.mode === 'page') {
+      const last = sv.ch === story.chapters.length - 1;
+      const btn = sv.reread ? 'BACK' : last ? (done ? '' : 'THE END') : 'NEXT CHAPTER';
+      return head + `<div class="evhead2">CHAPTER ${sv.ch + 1} <small>${esc(c.title)}</small></div>
+        ${btn ? `<div class="evrollrow"><button class="btn" id="evNext">${btn}</button></div>` : ''}
+        ${done && last ? `<p class="evwin">The end! +${SY.STORY_INK} ink, and this picture is a backdrop in PRIZES.</p>` : ''}
+        <p class="evstory">${esc(c.text)}</p><div class="evnote" id="evNote">${esc(note)}</div>`;
+    }
+    const at = sview.at, n = c.circles, left = Math.max(0, chStart(story, sv.ch + 1) - Math.max(pts, chStart(story, sv.ch) + at));
+    return head + `<div class="evhead2">CHAPTER ${sv.ch + 1} <small>${esc(c.title)}</small></div>
+      <div class="evstat">circle <b>${Math.min(at, n)}</b>/${n} · <b>${pts}</b> pts</div>
+      <p class="evsmall">${left ? `${left} more point${left === 1 ? '' : 's'} to open this chapter` : 'walking…'} · every event point is one circle</p>
+      <div class="evnote" id="evNote">${esc(note)}</div>`;
   }
 
   function revealSide(a) {
@@ -410,14 +557,17 @@ export function mountEvents(h) {
     if (!a) { side.innerHTML = '<p class="evsmall">No events are running right now.</p>'; return; }
     const head = `<div class="evtitle">${esc(a.def.title)}</div>
       <div class="evtags"><span class="evtag ${a.def.pass ? 'pass' : 'free'}">${a.def.pass ? 'PASS' : 'FREE'}</span>
-      <span class="evtag any">${a.def.anyBattle ? 'ANY BATTLE' : 'ARENA ONLY'}</span><span class="evsmall">${fmtLeft(a.win.end - now())}</span></div>`;
+      <span class="evtag any">${a.def.kind === 'tower' ? 'TOWER FIGHTS' : a.def.anyBattle ? 'ANY BATTLE' : 'ARENA ONLY'}</span><span class="evsmall">${fmtLeft(a.win.end - now())}</span></div>`;
     if (a.locked) {
       side.innerHTML = head + `<p class="evlock">A br8t Pass event. Battles count here for Pass holders — the free events count for everyone.</p>
         <button class="btn small" id="evPass">SUPPORT / PASS</button>`;
       return;
     }
-    const how = `<p class="evsmall evhow">win 3 · close loss 2 · loss 1${a.def.anyBattle ? ' · campaign fights count (10 a day)' : ' · arena battles only'}</p>`;
-    side.innerHTML = head + (a.def.kind === 'vines' ? vinesSide(a) : revealSide(a)) + how;
+    const camp = paid() ? ' · campaign fights count — unlimited, thanks for supporting' : ' · campaign fights count (10 a day)';
+    const how = a.def.kind === 'tower' ? '<p class="evsmall evhow">tower fights also count as campaign fights in the other events</p>'
+      : `<p class="evsmall evhow">win 3 · close loss 2 · loss 1${a.def.anyBattle ? camp : ' · arena battles only'}</p>`;
+    const body = { vines: vinesSide, tower: towerSide, story: storySide }[a.def.kind] || revealSide;
+    side.innerHTML = head + body(a) + how;
   }
 
   // ── input ──────────────────────────────────────────────────────────────────────────
@@ -429,6 +579,9 @@ export function mountEvents(h) {
     if (!t || t.disabled) return;
     h.click();
     if (t.id === 'evRoll') roll();
+    else if (t.id === 'evFight') fightTower();
+    else if (t.id === 'evNext') storyContinue();
+    else if (t.dataset.ch !== undefined) storyRead(+t.dataset.ch);
     else if (t.id === 'evPass') h.openUpgrade();
     else if (t.dataset.guess !== undefined) void guess(t.dataset.guess);
     else if (t.dataset.bg !== undefined) useBackground(t.dataset.bg);
@@ -447,6 +600,8 @@ export function mountEvents(h) {
 
   /** A finished picture: the art as far as the server lets this player see it, or the drawn one. */
   function prizeImage(b) {
+    if (b.kind === 'tower') return towerPicture();
+    if (b.kind === 'story') return storyPicture(b.story | 0, 5);
     if (!b.art) return rview.placeholderCanvas();
     if (!arts.get(b.id)?.full) fetchArt(b.id, E.evState(st(), b.id).open || []);
     const A = arts.get(b.id);
@@ -460,14 +615,15 @@ export function mountEvents(h) {
       return b ? prizeImage(b) : null;
     },
     mergeInto(next, prev) {
-      next.events = E.adoptMerge(next?.events, prev?.events);
+      next.events = E.adoptMerge(next?.events, prev?.events, { cap: PAID_CAP });
       const a = prev?.eventPrizes?.bgs || [], b = next?.eventPrizes?.bgs || [];
       next.eventPrizes = { bgs: [...b, ...a.filter((x) => !b.some((y) => y.id === x.id))], bg: next?.eventPrizes?.bg ?? prev?.eventPrizes?.bg ?? '' };
       if (next === S()) payAll();
     },
   };
   const api = {
-    open, roll, uncover, guess, sync, setTab, net, picture: imageOf, artOn, arts,
+    open, roll, uncover, guess, sync, setTab, net, picture: imageOf, artOn, arts, fightTower, storyContinue, storyRead, tview, sview,
+    get story() { return sv; },
     get tab() { return tab; }, get state() { return st(); }, get rivals() { return rivals; },
     get online() { return online; }, get manifest() { return manifest; }, vview, rview,
   };
@@ -527,6 +683,10 @@ function injectCSS() {
 .evwin { color: #2f5c39; font-size: 16px; margin: 6px 0; }
 .evlock { font-size: 16px; margin: 8px 0; }
 .evhow { margin-top: 8px; }
+.evstory { font-size: 17px; line-height: 1.3; margin: 4px 0 8px; }
+.evchs { display: flex; gap: 4px; flex-wrap: wrap; margin: 2px 0 4px; }
+#events .btn.small.evch { min-width: 34px; min-height: 34px; padding: 2px 8px; }
+#events .btn.small.evch.on { background: var(--blue); color: #fff; }
 .evprize { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px dashed rgba(32,36,44,.25); }
 #events .btn.small { font-size: 15px; padding: 4px 12px; }
 .rows .r.evaward, .fine.evaward { color: #8c50c6; border-bottom: none; }
@@ -538,6 +698,7 @@ function injectCSS() {
   .evnote { font-size: 14px; min-height: 17px; }
   .evchoices .btn { font-size: 13px; padding: 4px 5px; }
   #evTabs .tab { font-size: 15px; padding: 2px 8px; }
+  .evstory { font-size: 15px; }
 }
 @media (orientation: portrait) and (max-width: 860px) {
   #events .sheet.evsheet { width: 97vh; height: calc(100vw - 24px); max-height: calc(100vw - 24px); padding: 8px 12px 10px; }

@@ -13,11 +13,20 @@
  *     by the server and pays ink; the panel refreshes (Solved, PRIZES) without reopening;
  *   - no answers in the page: the practice picture offers no guess, a guess needs a battle,
  *     guess buttons are >= 40 px tall; battles are stamped on the SERVER's clock.
+ *   - THE TOWER: a real tap on FIGHT FLOOR N starts a real fight; a win climbs, a loss drops,
+ *     never below 1, winning floor 12 is the TOP (ink + prize); a tower fight also banks as a
+ *     campaign fight elsewhere; tower rivals and floors come from the server;
+ *   - STORY: points walk the circles; the last circle opens the chapter's picture and text;
+ *     NEXT CHAPTER and re-reading by real taps;
+ *   - the campaign cap: paid (supporter / Pass) = no daily limit, 15 s apart, free = 10 a day,
+ *     with the panel copy to match, and the server agreeing with the client both ways;
+ *   - a save still holding the retired SCROLLS & ROPES / MONTHLY PICTURE loads clean.
  *
  *   node tools/eventsgame.mjs              (EVENTS_TEST_PORT moves its ports; default 9500-9502)
  *   node tools/eventsgame.mjs --falsify    breaks the game 9 ways in a temp copy; each must go red
  */
 import { spawn, execFileSync } from 'node:child_process';
+import { createServer } from 'node:http';
 import { mkdtempSync, rmSync, cpSync, symlinkSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -26,6 +35,7 @@ import { CDP, ROOT, serve } from './cdp.mjs';
 import { die } from '../js/events/hash.js';
 import { activeEvents, defById, windowOf, eventIdOf } from '../js/events/calendar.js';
 import * as V from '../js/events/vines.js';
+import { storyOf } from '../js/events/story.js';
 
 const SHOTS = process.env.SHOTS || join(ROOT, 'shots');
 const P0 = +(process.env.EVENTS_TEST_PORT || 9500);
@@ -52,6 +62,17 @@ const REV0 = eventIdOf(defById('reveal-week'), windowOf(defById('reveal-week'), 
 // would get from the repo (served through CDP Fetch, since the repo's manifest has no entry).
 const ART_MANIFEST = { v: 1, pictures: { [REV0]: { w: 1024, h: 640, choices: ['A CANOE', 'A KITE', 'A TEA PARTY', 'A SUMO MATCH'] } } };
 
+/** A stand-in payment service: every dev account holds the Pass, except ids with "free" in them. */
+function entitlementStub(port) {
+  const srv = createServer((req, res) => {
+    const tok = String(req.headers.authorization || '');
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ entitlements: /free/.test(tok) ? {} : { br8t_pass: true } }));
+  });
+  srv.listen(port, '127.0.0.1');
+  return srv;
+}
+
 async function startArena(serverDir, port, dir) {
   const bin = join(dir, 'arena'), db = join(dir, 'a.db');
   execFileSync('go', ['build', '-o', bin, '.'], { cwd: serverDir, stdio: 'inherit' });
@@ -59,7 +80,7 @@ async function startArena(serverDir, port, dir) {
   execFileSync('sips', ['-s', 'format', 'jpeg', '-z', '640', '1024', join(ROOT, '../../../assets/screenshots/ragdojo.jpg'), '--out', join(dir, 'art', slug(REV0) + '.jpg')], { stdio: 'ignore' });
   writeFileSync(join(dir, 'answers.json'), JSON.stringify({ answers: { [REV0]: 'A KITE' } }));
   const proc = spawn(bin, [], { env: { ...process.env, ARENA_ADDR: `127.0.0.1:${port}`, ARENA_DB: db, ARENA_ICE_URL: 'off', ARENA_ALLOWANCE_URL: 'off',
-    ARENA_ENTITLEMENT_URL: 'off', ARENA_DEV_AUTH: '1', ARENA_EVENT_ANSWERS: join(dir, 'answers.json'), ARENA_EVENT_ART: join(dir, 'art') }, stdio: 'ignore' });
+    ARENA_ENTITLEMENT_URL: `http://127.0.0.1:${port + 1}/ent`, ARENA_DEV_AUTH: '1', ARENA_EVENT_ANSWERS: join(dir, 'answers.json'), ARENA_EVENT_ART: join(dir, 'art') }, stdio: 'ignore' });
   const base = `http://127.0.0.1:${port}/gms/2d/ragdojo/arena`;
   for (let i = 0; i < 80; i++) { try { if ((await fetch(base + '/health')).ok) break; } catch {} await sleep(100); }
   return { proc, base };
@@ -71,9 +92,10 @@ export async function run(root, serverDir, { label = '' } = {}) {
   const ok = (n, c, x = '') => { c ? pass++ : fail++; log(`${c ? 'PASS' : 'FAIL'}  ${label}${n}${x && !c ? '  ' + x : ''}`); };
   const tmp = mkdtempSync(join(tmpdir(), 'eventsgame-'));
   const web = await serve(root, P0);
+  const ent = entitlementStub(P0 + 2);
   const arena = await startArena(serverDir, P0 + 1, tmp);
   const tabs = [];
-  const done = () => { for (const t of tabs) { try { t.chrome.kill('SIGKILL'); } catch {} } web.close(); arena.proc.kill('SIGKILL'); rmSync(tmp, { recursive: true, force: true }); };
+  const done = () => { for (const t of tabs) { try { t.chrome.kill('SIGKILL'); } catch {} } web.close(); ent.close(); arena.proc.kill('SIGKILL'); rmSync(tmp, { recursive: true, force: true }); };
   try {
     for (const [w, h, name] of [[844, 390, 'landscape'], [390, 844, 'portrait']]) {
       const c = await CDP.launch();
@@ -246,6 +268,8 @@ export async function run(root, serverDir, { label = '' } = {}) {
       await tap(c, `#evTabs [data-ev="${REV}"]`);
       ok(L + 'no battle yet: the choices are shown disabled, "fight once"', await c.waitFor(`document.querySelectorAll('[data-guess]').length === 4 && [...document.querySelectorAll('[data-guess]')].every(b => b.disabled) && /fight once/.test(document.getElementById('evSide').textContent)`, 5000));
 
+      await towerAndStory(c, L, name, url, arena, ok);
+
       // A phone whose clock is a day behind: the fight is stamped on the server's clock.
       await c.send('Page.addScriptToEvaluateOnNewDocument', { source: 'Date.now = ((n) => () => n() - 86400000)(Date.now);' });
       await c.eval('localStorage.clear()');
@@ -262,6 +286,141 @@ export async function run(root, serverDir, { label = '' } = {}) {
   return { pass, fail };
 }
 
+const evTab = (prefix) => `[...document.querySelectorAll('#evTabs [data-ev]')].map(b => b.dataset.ev).find(i => i.startsWith('${prefix}'))`;
+const sideText = `document.getElementById('evSide').textContent`;
+
+async function openEvents(c, u) {
+  await c.goto(u);
+  await c.waitFor('window.__state && window.__state.mode === "hub"', 20000);
+  await c.eval(`(() => { const o = { v: 0 }; window.__clock = o; const n = Date.now; Date.now = () => n() + o.v; })()`);
+  await tap(c, '#btnEvents');
+  await c.waitFor(vis('events'), 3000);
+}
+
+/** THE TOWER, the STORY, the paid cap, a retired-event save. */
+async function towerAndStory(c, L, name, url, arena, ok) {
+  const off = 'arena=http://127.0.0.1:1/x';
+  // A save from before: the retired Pass events are still in it.
+  await c.eval(`(() => { localStorage.clear(); localStorage.setItem('ragdojo.save.v2', JSON.stringify({ events: { v: 1, seenDay: '', ev: {
+    'vines-month:2026-10': { b: [['arena:1', 3, 'arena', 1]], rolls: 2 }, 'reveal-month:2026-10': { b: [], open: [1, 2] } } } })) })()`);
+  const errs0 = c.errors.length;
+  await openEvents(c, url(`auto=1&${off}`));
+  ok(L + 'a save holding SCROLLS & ROPES / MONTHLY PICTURE loads, and they are gone', await c.eval(`!Object.keys(window.__ragdojo.save.events.ev).some(k => /month/.test(k)) && ![...document.querySelectorAll('#evTabs [data-ev]')].some(b => /month/.test(b.dataset.ev))`) && c.errors.length === errs0);
+  const TW = await c.eval(evTab('tower:')), ST = await c.eval(evTab('story:'));
+  ok(L + 'THE TOWER and STORY tabs are listed', !!TW && !!ST, `${TW} ${ST}`);
+
+  // ── THE TOWER: real fights from the panel ──
+  const fight = async (win) => {
+    await c.eval('window.__clock.v += 20000');
+    await tap(c, `#evTabs [data-ev="${TW}"]`);
+    const label = await c.eval(`document.getElementById('evFight')?.textContent || ''`);
+    if (!(await tap(c, '#evFight'))) return { label, started: false };
+    const started = await c.waitFor(`window.__state && window.__state.mode === "fight" && !!window.__ragdojo.match?.tower`, 5000);
+    const floor = await c.eval('window.__ragdojo.match?.tower');
+    await c.eval(win ? `window.__ragdojo.match.enemies.forEach(e => e.hurt(99999, {from:[0,0], kb:900, stagger:1}))`
+      : `window.__ragdojo.match.player.hurt(99999, {from:[0,0], kb:900, stagger:1})`);
+    await c.waitFor(vis('events') + ` && window.__state.mode === 'hub'`, 15000);
+    await c.frames(4);
+    return { label, started, floor, note: await c.eval(`document.getElementById('evNote')?.textContent || ''`) };
+  };
+  const floorNow = () => c.eval(`(() => { const t = window.__events.state.ev['${TW}']?.t || []; let f = 1; for (const r of t) f = r[1] ? Math.min(12, f + 1) : Math.max(1, f - 1); return f; })()`);
+  const VEV = await c.eval(evTab('vines-day:'));
+  const vb0 = await c.eval(`window.__events.state.ev['${VEV}']?.b.length || 0`);
+  let f = await fight(true);
+  ok(L + 'a real tap on FIGHT FLOOR 1 starts a real fight on floor 1', f.started && f.floor === 1 && /FLOOR 1/.test(f.label), JSON.stringify(f));
+  ok(L + 'a win climbs to floor 2, and the panel says so', await floorNow() === 2 && /WON on floor 1 — up to floor 2/.test(f.note), f.note);
+  ok(L + 'the tower fight also banked as a campaign fight (Vines & Ladders +3)', await c.eval(`window.__events.state.ev['${VEV}']?.b.length || 0`) === vb0 + 1 && /\+3 event points/.test(f.note), f.note);
+  f = await fight(false);
+  ok(L + 'a loss drops a floor (2 -> 1)', f.floor === 2 && await floorNow() === 1 && /down to floor 1/.test(f.note), f.note);
+  f = await fight(false);
+  ok(L + 'a loss on floor 1 stays on floor 1', f.floor === 1 && await floorNow() === 1 && /still on floor 1/.test(f.note), f.note);
+  await c.eval('window.__clock.v += 20000');
+  // Straight to floor 12: eleven wins (stamped an hour back, a minute apart).
+  await c.eval(`(() => { const S = window.__ragdojo.save, e = S.events.ev['${TW}']; const t0 = Date.now() - 7200e3;
+    e.t = [...e.t.map((r, i) => [r[0], r[1], t0 - 600e3 + i * 60e3]), ...Array.from({ length: 11 }, (_, i) => ['tower:seed' + i, 1, t0 + i * 60e3])]; })()`);
+  const ink0 = await c.eval('window.__ragdojo.save.ink');
+  f = await fight(true);
+  ok(L + 'floor 12 shows FIGHT THE TOP; winning it is the TOP', /THE TOP/.test(f.label) && f.floor === 12 && await floorNow() === 12 && /tower is yours/.test(f.note), `${f.label} / ${f.note}`);
+  ok(L + 'the TOP pays 600 ink and a prize backdrop', await c.eval('window.__ragdojo.save.ink') - ink0 === 600 && await c.eval(`window.__ragdojo.save.eventPrizes.bgs.some(b => b.id === '${TW}' && b.kind === 'tower')`));
+  f = await fight(true);
+  ok(L + 'defending the TOP pays nothing twice', await c.eval('window.__ragdojo.save.ink') - ink0 === 600 && /defended the TOP/.test(f.note), f.note);
+  await sleep(1500);
+  await c.shot(join(SHOTS, `events_tower_${name}.png`));
+
+  // ── STORY: points walk the circles; the chapter opens at the last one ──
+  await tap(c, `#evTabs [data-ev="${ST}"]`);
+  const st = storyOf(ST.slice(6)), first = st.chapters[0].circles;
+  const pts = await c.eval(`window.__events.state.ev['${ST}'] ? window.__events.state.ev['${ST}'].b.reduce((a, x) => a + x[1], 0) : 0`);
+  ok(L + 'STORY: the tower fights walked it too (any battle)', pts >= 3, `${pts}`);
+  // Exactly to the end of chapter 1: campaign fights a minute apart.
+  const need = first - pts;
+  await c.eval(`(() => { let n = ${need}; const t0 = Date.now() - 3600e3; for (let i = 0; n > 0; i++) { const w = n >= 3; window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail: { at: t0 + i * 70e3, src: 'campaign', won: w, oppDmg: n === 2 ? 1 : 0 } })); n -= w ? 3 : n === 2 ? 2 : 1; } })()`);
+  const pts1 = await c.eval(`window.__events.state.ev['${ST}'].b.reduce((a, x) => a + x[1], 0)`);
+  ok(L + `STORY: ${first} points banked = chapter 1's ${first} circles`, pts1 === first, `${pts1}`);
+  await c.eval(`window.__events.setTab('${ST}')`);
+  ok(L + 'the walker walks the circles, then chapter 1 opens: picture + its text', await c.waitFor(`window.__events.story.mode === 'page' && window.__events.story.ch === 0`, 12000)
+    && await c.eval(`${sideText}.includes(${JSON.stringify(st.chapters[0].text.slice(0, 40))}) && /NEXT CHAPTER/.test(${sideText})`));
+  await c.shot(join(SHOTS, `events_story_page_${name}.png`));
+  await tap(c, '#evNext');
+  ok(L + 'NEXT CHAPTER (real tap): chapter 2\'s track, at its first circle', await c.waitFor(`window.__events.story.mode === 'track' && window.__events.story.ch === 1 && window.__events.sview.at === 0`, 3000)
+    && await c.eval(`/CHAPTER 2/.test(${sideText}) && /circle/.test(${sideText})`));
+  await c.eval(`window.__clock.v += 20000; window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail: { at: Date.now(), src: 'campaign', won: true, oppDmg: 1 } }))`);
+  await c.eval(`window.__events.setTab('${ST}')`);
+  ok(L + 'a win walks 3 circles into chapter 2', await c.waitFor(`window.__events.sview.at === 3 && !window.__events.sview.busy()`, 6000), await c.eval('window.__events.sview.at'));
+  await c.shot(join(SHOTS, `events_story_track_${name}.png`));
+  await tap(c, '[data-ch="0"]');
+  ok(L + 'an opened chapter is re-readable (tap 1): picture, text, BACK', await c.waitFor(`window.__events.story.mode === 'page' && window.__events.story.ch === 0 && window.__events.story.reread`, 2000)
+    && await c.eval(`/BACK/.test(document.getElementById('evNext')?.textContent || '')`));
+  ok(L + 'chapter 3 is not open yet', await c.eval(`document.querySelector('[data-ch="2"]').disabled`));
+  await tap(c, '#evNext');
+  ok(L + 'BACK returns to the chapter 2 track', await c.waitFor(`window.__events.story.mode === 'track' && window.__events.story.ch === 1`, 2000));
+
+  // ── the campaign cap, paid vs free, client and server agreeing ──
+  ok(L + 'paid copy: "unlimited, thanks for supporting"', await c.eval(`/unlimited, thanks for supporting/.test(${sideText})`));
+  for (const [who, q, gap, want] of [['paid', '', 20e3, 14], ['free', '&evpaid=0', 70e3, 10]]) {
+    // Fought before the panel is opened (an open panel syncs, and nothing older than a sync is taken).
+    await c.eval('localStorage.clear()');
+    await c.goto(url(`auto=1&arena=${encodeURIComponent(arena.base)}&arenauid=${who}cap${name}${q}`));
+    await c.waitFor('window.__state && window.__state.mode === "hub" && window.__events.net.online', 20000);
+    const V0 = eventIdOf(defById('vines-day'), windowOf(defById('vines-day'), await c.eval('Date.now()')));
+    await c.eval(`(() => { const t0 = Date.now() - 14 * ${gap}; for (let i = 0; i < 14; i++) window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail: { at: t0 + i * ${gap}, src: 'campaign', won: false, oppDmg: 0 } })); })()`);
+    const local = await c.eval(`window.__events.state.ev['${V0}'].b.length`);
+    for (let i = 0; i < 6; i++) { await sleep(700); await c.eval(`window.__events.sync('${V0}')`); if (await c.eval('window.__events.online')) break; }
+    await sleep(400);
+    const srv = await (await fetch(arena.base + '/events/sync', { method: 'POST', headers: { Authorization: `Bearer dev:${who}cap${name}` }, body: JSON.stringify({ event: V0 }) })).json();
+    const after = await c.eval(`window.__events.state.ev['${V0}'].b.length`);
+    ok(L + `${who}: 14 campaign fights ${gap / 1000} s apart -> client ${want}, server ${want}, and they agree`, local === want && srv.b.length === want && after === want && srv.cap.paid === (who === 'paid'),
+      `client ${local} (after sync ${after}), server ${srv.b.length}, cap ${JSON.stringify(srv.cap)}`);
+    await tap(c, '#btnEvents');
+    await c.waitFor(vis('events'), 3000);
+    await tap(c, `#evTabs [data-ev="${V0}"]`);
+    if (who === 'free') ok(L + 'free copy: "campaign fights count (10 a day)"', await c.eval(`/campaign fights count \\(10 a day\\)/.test(${sideText})`), await c.eval(sideText));
+  }
+
+  // ── tower rivals come from the server, on their floors ──
+  const now = Date.now(), rname = `Tower${name}`;
+  const tr = await fetch(arena.base + '/events/sync', { method: 'POST', headers: { Authorization: `Bearer dev:tw${name}` },
+    body: JSON.stringify({ event: TW, name: rname, t: [1, 1, 1].map((w, i) => [`tower:r${i}`, w, now - 600e3 + i * 60e3]) }) });
+  ok(L + 'seed a tower rival through the real API (3 wins: floor 4)', tr.ok && (await tr.json()).floor === 4);
+  await c.eval('localStorage.clear()');
+  await openEvents(c, url(`auto=1&arena=${encodeURIComponent(arena.base)}&arenauid=climber${name}`));
+  await tap(c, `#evTabs [data-ev="${TW}"]`);
+  ok(L + 'online: the rival is listed on floor 4', await c.waitFor(`[...document.querySelectorAll('#evSide .evriv > div')].some(d => d.textContent.includes('${rname}') && /fl 4/.test(d.textContent))`, 6000));
+  ok(L + 'and drawn on the tower', await c.waitFor(`(window.__events.rivals.get('${TW}') || []).some(r => r.name === '${rname}' && r.floor === 4 && !('uid' in r))`, 2000));
+  await c.shot(join(SHOTS, `events_tower_online_${name}.png`));
+
+  // ── locked for a player without the Pass ──
+  await c.eval('localStorage.clear()');
+  await openEvents(c, url(`auto=1&${off}&evpass=0`));
+  for (const id of [TW, ST]) {
+    await tap(c, `#evTabs [data-ev="${id}"]`);
+    ok(L + `${id.split(':')[0]} without the Pass: locked tab, SUPPORT / PASS, no FIGHT or NEXT`, await c.eval(`document.querySelector('#evTabs [data-ev="${id}"]').textContent.includes('🔒') && !!document.getElementById('evPass') && !document.getElementById('evFight') && !document.getElementById('evNext')`));
+  }
+  await c.eval(`window.__events.setTab('${TW}'); window.__events.fightTower()`);
+  ok(L + 'a locked tower cannot be fought (no fight starts)', await c.eval(`window.__state.mode === 'hub' && !window.__ragdojo.match?.tower`));
+  await c.shot(join(SHOTS, `events_tower_locked_${name}.png`));
+}
+
 const MUTANTS = [
   ['no emit at the end of a campaign fight', 'js/main.js', "try { window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail: battle })); } catch {}", ''],
   ['ROLL does not persist the roll count', 'js/events/ui.js', 'setSt(E.setEv(st(), id, { ...ev, uid, rolls: r.rolls }));', 'setSt(E.setEv(st(), id, { ...ev, uid }));'],
@@ -271,7 +430,16 @@ const MUTANTS = [
   ['the panel is not refreshed after a guess (L5)', 'js/events/ui.js', '    if (tab === id && isOpen()) paint();', '    if (tab === id && isOpen()) paintSide();'],
   ['guess buttons are short (L10)', 'js/events/ui.js', 'line-height: 1.1; min-height: 40px; }', 'line-height: 1.1; }'],
   ['the practice picture offers a guess (M1)', 'js/events/ui.js', 'const ask = !real ?', 'const ask = false ?'],
-  ['the server sends any tile asked for', 'server/eventart.go', 'if !containsInt(open, cell) {', 'if false && !containsInt(open, cell) {'],
+  ['the server sends any tile asked for', 'server/eventart.go', '(!whole && !containsInt(open, cell))', '(!whole && false)'],
+  ['a tower loss climbs too', 'js/events/tower.js', '} else floor = Math.max(1, floor - 1);', '} else floor = Math.min(FLOORS, floor + 1);'],
+  ['tower fights start on floor 1 always', 'js/events/ui.js', 'floor: before, save: h.getSave(),', 'floor: 1, save: h.getSave(),'],
+  ['a tower fight is not a campaign battle', 'js/events/ui.js', "try { window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail })); } catch {}", ''],
+  ['the TOP pays nothing', 'js/events/ui.js', "!['reveal', 'tower', 'story'].includes(p.def.kind)", "!['reveal', 'story'].includes(p.def.kind)"],
+  ['the story chapter never opens', 'js/events/ui.js', 'if (to >= end) sv.pending = true;', ''],
+  ['the client ignores the paid cap', 'js/events/ui.js', 'E.recordBattle(before, b, { cap: capFor(paid()) })', 'E.recordBattle(before, b)'],
+  ['the server never counts anyone as paid', 'server/events.go', 'Paid: pass || out.Entitlements["ragdojo_supporter"]', 'Paid: false'],
+  ['old events are not dropped from a save', 'js/events/state.js', "if (parseEventId(id) && e && typeof e === 'object') ev[id] = e;", "if (e && typeof e === 'object') ev[id] = e;"],
+  ['THE TOWER is open without the Pass', 'js/events/calendar.js', "{ id: 'tower', kind: 'tower', cadence: 'weekly', pass: true,", "{ id: 'tower', kind: 'tower', cadence: 'weekly', pass: false,"],
 ];
 
 if (process.argv.includes('--falsify')) {

@@ -4,11 +4,14 @@
 const DAY = 86400000;
 
 /** Campaign fights cannot be verified by a server, so "any battle" events count at most
- * `perDay` of them per UTC day, each at least `gapMs` after the last one counted. */
+ * `perDay` of them per UTC day, each at least `gapMs` after the last one counted. Players who
+ * paid (supporter or br8t Pass) have no daily limit, only the anti-spam gap. */
 export const CAMPAIGN_CAP = { perDay: 10, gapMs: 60000 };
+export const PAID_CAP = { perDay: Infinity, gapMs: 15000 };
+export const capFor = (paid) => (paid ? PAID_CAP : CAMPAIGN_CAP);
 
 /**
- * kind      'vines' | 'reveal'
+ * kind      'vines' | 'reveal' | 'tower' (W/L floors, no points) | 'story' (points walk a track)
  * cadence   'daily' | 'weekly' | 'monthly' | 'seasonal' (from/to are UTC 'MM-DD', to exclusive)
  * pass      true = Pass holders only
  * anyBattle true = campaign fights count too; false = arena battles only
@@ -18,10 +21,8 @@ export const EVENT_DEFS = [
     title: 'VINES & LADDERS', theme: 'ink' },
   { id: 'reveal-week', kind: 'reveal', cadence: 'weekly', pass: false, anyBattle: true,
     title: 'PICTURE REVEAL', cost: 1, guessBonus: 2 },
-  { id: 'vines-month', kind: 'vines', cadence: 'monthly', pass: true, anyBattle: false,
-    title: 'SCROLLS & ROPES', theme: 'scrolls' },
-  { id: 'reveal-month', kind: 'reveal', cadence: 'monthly', pass: true, anyBattle: false,
-    title: 'MONTHLY PICTURE', cost: 2, guessBonus: 3 },
+  { id: 'tower', kind: 'tower', cadence: 'weekly', pass: true, anyBattle: false, title: 'THE TOWER' },
+  { id: 'story', kind: 'story', cadence: 'monthly', pass: true, anyBattle: true, title: 'STORY' },
   { id: 'halloween', kind: 'reveal', cadence: 'seasonal', from: '10-24', to: '11-01', pass: true,
     anyBattle: true, title: 'SPOOKY WEEK', cost: 1, guessBonus: 2 },
 ];

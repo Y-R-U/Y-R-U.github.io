@@ -7,6 +7,7 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"crypto/sha256"
 	"database/sql"
@@ -70,15 +71,29 @@ type evDef struct {
 var evDefs = []evDef{
 	{ID: "vines-day", Kind: "vines", Cadence: "daily", AnyBattle: true},
 	{ID: "reveal-week", Kind: "reveal", Cadence: "weekly", AnyBattle: true, Cost: 1, GuessBonus: 2},
-	{ID: "vines-month", Kind: "vines", Cadence: "monthly", Pass: true},
-	{ID: "reveal-month", Kind: "reveal", Cadence: "monthly", Pass: true, Cost: 2, GuessBonus: 3},
+	{ID: "tower", Kind: "tower", Cadence: "weekly", Pass: true},
+	{ID: "story", Kind: "story", Cadence: "monthly", Pass: true, AnyBattle: true},
 	{ID: "halloween", Kind: "reveal", Cadence: "seasonal", From: "10-24", To: "11-01", Pass: true, AnyBattle: true, Cost: 1, GuessBonus: 2},
 }
 
-var campaignCap = struct {
+// evCap: campaign fights per UTC day (0 = no daily limit) and the gap between counted ones.
+// Mirror of CAMPAIGN_CAP / PAID_CAP in js/events/calendar.js.
+type evCap struct {
 	PerDay int
 	GapMs  int64
-}{10, 60000}
+}
+
+var (
+	campaignCap = evCap{10, 60000}
+	paidCap     = evCap{0, 15000}
+)
+
+func capFor(paid bool) evCap {
+	if paid {
+		return paidCap
+	}
+	return campaignCap
+}
 
 const dayMs = int64(86400000)
 
@@ -331,13 +346,14 @@ type evBattle struct {
 	Pts int
 }
 
+// THE TOWER keeps its own W/L list (ev_tower) and takes no points.
 func battleCounts(def *evDef, w evWindow, b evBattle) bool {
-	return b.At >= w.Start && b.At < w.End && (def.AnyBattle || b.Src == "arena")
+	return def.Kind != "tower" && b.At >= w.Start && b.At < w.End && (def.AnyBattle || b.Src == "arena")
 }
 
 // counted: the battles that count for one window, in play order, duplicates once, the
 // campaign cap applied — exactly js/events/points.js counted().
-func counted(def *evDef, w evWindow, battles []evBattle) []evBattle {
+func counted(def *evDef, w evWindow, battles []evBattle, cap evCap) []evBattle {
 	in := append([]evBattle(nil), battles...)
 	sort.SliceStable(in, func(i, j int) bool {
 		if in[i].At != in[j].At {
@@ -354,7 +370,7 @@ func counted(def *evDef, w evWindow, battles []evBattle) []evBattle {
 		}
 		if b.Src == "campaign" {
 			day := utcDayOf(b.At)
-			if perDay[day] >= campaignCap.PerDay || b.At-last < campaignCap.GapMs {
+			if (cap.PerDay > 0 && perDay[day] >= cap.PerDay) || b.At-last < cap.GapMs {
 				continue
 			}
 			perDay[day]++
@@ -441,9 +457,10 @@ const (
 	evMaxBody   = 32 << 10
 )
 
-// Overridable by tests. Pass = a br8t Pass entitlement, asked of the payment service.
+// Overridable by tests. The payment service's entitlements: Pass events need br8t_pass; paid
+// (br8t_pass or ragdojo_supporter) lifts the campaign cap's daily limit.
 var (
-	evPassCheck func(ctx context.Context, tok string) bool
+	evEntCheck  func(ctx context.Context, tok string) evEnt
 	evAnswers   = &answerBook{}
 	evPassMu    sync.Mutex
 	evPassCache = map[string]passEntry{}
@@ -474,49 +491,65 @@ func (h *hub) evLimit(key string) bool {
 	return true
 }
 
+// evEnt: what the payment service said. Known=false is an outage (no answer, 5xx): Pass events
+// then stay open (fail-open, same rule as the allowance), but the campaign cap stays the FREE
+// one — an outage never grants unlimited fights (and evApply keeps the refused ones claimable).
+type evEnt struct{ Pass, Paid, Known bool }
+
 type passEntry struct {
-	ok  bool
+	e   evEnt
 	exp time.Time
 }
 
-func entitlementPass(url string) func(ctx context.Context, tok string) bool {
+func entitlementCheck(url string) func(ctx context.Context, tok string) evEnt {
 	client := &http.Client{Timeout: 4 * time.Second}
-	return func(ctx context.Context, tok string) bool {
+	unknown := evEnt{Pass: true}
+	return func(ctx context.Context, tok string) evEnt {
 		if url == "" {
-			return true
+			return evEnt{true, true, true}
 		}
 		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 		if err != nil {
-			return true
+			return unknown
 		}
 		req.Header.Set("Authorization", "Bearer "+tok)
 		res, err := client.Do(req)
 		if err != nil {
-			return true // billing down: a family game keeps going (same rule as the allowance)
+			return unknown
 		}
 		defer res.Body.Close()
 		if res.StatusCode != 200 {
-			return res.StatusCode >= 500
+			if res.StatusCode >= 500 {
+				return unknown
+			}
+			return evEnt{Known: true}
 		}
 		var out struct {
 			Entitlements map[string]bool `json:"entitlements"`
 		}
-		json.NewDecoder(io.LimitReader(res.Body, 16<<10)).Decode(&out)
-		return out.Entitlements["br8t_pass"]
+		if json.NewDecoder(io.LimitReader(res.Body, 16<<10)).Decode(&out) != nil {
+			return unknown
+		}
+		pass := out.Entitlements["br8t_pass"]
+		return evEnt{Pass: pass, Paid: pass || out.Entitlements["ragdojo_supporter"], Known: true}
 	}
 }
 
 // eventRoutes wires the events API onto the arena's mux (one line in routes()).
 func (h *hub) eventRoutes(mux *http.ServeMux, prefix string, origins []string) {
-	if _, err := h.st.db.Exec(evSchema); err != nil {
+	if _, err := h.st.db.Exec(evSchema + towerSchema); err != nil {
 		panic(err)
 	}
-	if evPassCheck == nil {
+	if evEntCheck == nil {
 		url := env("ARENA_ENTITLEMENT_URL", "http://127.0.0.1:8016/api/br8t/entitlement")
 		if url == "off" {
 			url = ""
 		}
-		evPassCheck = entitlementPass(url)
+		evEntCheck = entitlementCheck(url)
+	}
+	// The Pass events SCROLLS & ROPES and MONTHLY PICTURE were replaced by THE TOWER and STORY.
+	for _, t := range []string{"ev_claims", "ev_state"} {
+		h.st.db.Exec(`DELETE FROM ` + t + ` WHERE event LIKE 'vines-month:%' OR event LIKE 'reveal-month:%'`)
 	}
 	if evAnswers.path == "" {
 		evAnswers.path = env("ARENA_EVENT_ANSWERS", filepath.Join(filepath.Dir(env("ARENA_DB", "arena.db")), "event_answers.json"))
@@ -549,6 +582,19 @@ func (h *hub) eventRoutes(mux *http.ServeMux, prefix string, origins []string) {
 		}
 		ev := r.URL.Query().Get("event")
 		def, _, _ := parseEventID(ev)
+		if def.Kind == "tower" {
+			if !h.evLimit("rivals|" + uid + "|" + ev) {
+				reply(w, 429, map[string]string{"error": "slow down"})
+				return
+			}
+			rv, err := h.st.towerRivals(ev, uid)
+			if err != nil {
+				reply(w, 503, map[string]string{"error": "unavailable"})
+				return
+			}
+			reply(w, 200, map[string]any{"event": ev, "rivals": rv})
+			return
+		}
 		if def.Kind != "vines" {
 			reply(w, 400, map[string]string{"error": "not a vines event"})
 			return
@@ -588,28 +634,40 @@ func (h *hub) evAuth(w http.ResponseWriter, r *http.Request, ev string) (uid, to
 		reply(w, 404, map[string]string{"error": "no such event"})
 		return "", "", false
 	}
-	if def.Pass && !h.lan && !h.hasPass(r.Context(), uid, tok) {
+	if def.Pass && !h.lan && !h.ent(r.Context(), uid, tok).Pass {
 		reply(w, 403, map[string]string{"error": "pass"})
 		return "", "", false
 	}
 	return uid, tok, true
 }
 
-func (h *hub) hasPass(ctx context.Context, uid, tok string) bool {
+// ent: the caller's entitlements, cached (see ttl below). A LAN
+// server treats everyone as a Pass holder, so as paid too.
+func (h *hub) ent(ctx context.Context, uid, tok string) evEnt {
+	if h.lan {
+		return evEnt{true, true, true}
+	}
 	evPassMu.Lock()
 	if e, ok := evPassCache[uid]; ok && h.st.now().Before(e.exp) {
 		evPassMu.Unlock()
-		return e.ok
+		return e.e
 	}
 	evPassMu.Unlock()
-	ok := evPassCheck(ctx, tok)
+	e := evEntCheck(ctx, tok)
+	// A purchase must show up soon: only a positive answer is kept the full 5 minutes.
+	ttl := 5 * time.Minute
+	if !e.Known {
+		ttl = 30 * time.Second
+	} else if !e.Pass || !e.Paid {
+		ttl = time.Minute
+	}
 	evPassMu.Lock()
-	evPassCache[uid] = passEntry{ok, h.st.now().Add(5 * time.Minute)}
+	evPassCache[uid] = passEntry{e, h.st.now().Add(ttl)}
 	evPassMu.Unlock()
-	return ok
+	return e
 }
 
-var reBattleID = regexp.MustCompile(`^(camp|ghost|arena):[A-Za-z0-9:_.\-]{1,80}$`)
+var reBattleID = regexp.MustCompile(`^(camp|ghost|tower|arena):[A-Za-z0-9:_.\-]{1,80}$`)
 
 type syncBody struct {
 	Event   string            `json:"event"`
@@ -618,18 +676,20 @@ type syncBody struct {
 	Rolls   int               `json:"rolls"`
 	Open    []int             `json:"open"`
 	Friends []string          `json:"friends"`
+	T       []json.RawMessage `json:"t"` // THE TOWER: [id, won 1|0, at] per fight
 }
 
 func (h *hub) eventSync(w http.ResponseWriter, r *http.Request) {
 	var body syncBody
-	if err := json.NewDecoder(io.LimitReader(r.Body, evMaxBody)).Decode(&body); err != nil || len(body.B) > 400 || len(body.Open) > cells {
+	if err := json.NewDecoder(io.LimitReader(r.Body, evMaxBody)).Decode(&body); err != nil || len(body.B) > 400 || len(body.T) > 400 || len(body.Open) > cells {
 		reply(w, 400, map[string]string{"error": "bad body"})
 		return
 	}
-	uid, _, ok := h.evAuth(w, r, body.Event)
+	uid, tok, ok := h.evAuth(w, r, body.Event)
 	if !ok {
 		return
 	}
+	ent := h.ent(r.Context(), uid, tok)
 	if !h.evLimit(uid + "|" + body.Event) {
 		reply(w, 429, map[string]string{"error": "slow down"})
 		return
@@ -640,7 +700,7 @@ func (h *hub) eventSync(w http.ResponseWriter, r *http.Request) {
 	}
 	mu := evLock(uid, body.Event)
 	mu.Lock()
-	out, err := h.st.evApply(uid, name, body)
+	out, err := h.st.evApply(uid, name, body, ent)
 	mu.Unlock()
 	if err != nil {
 		reply(w, 503, map[string]string{"error": "unavailable"})
@@ -659,6 +719,8 @@ type evPlayer struct {
 	solved        bool
 	bonus         int
 	updated       int64 // ms of the previous sync (0 = never)
+	mark          int64 // evSave writes this as `updated` instead of now, when set (see evApply)
+	tower         []towerRow
 }
 
 func (s *store) evLoad(uid, ev string, def *evDef, win evWindow) (*evPlayer, error) {
@@ -691,7 +753,9 @@ func (s *store) evLoad(uid, ev string, def *evDef, win evWindow) (*evPlayer, err
 	if err != nil {
 		return nil, err
 	}
-	p.battles = counted(def, win, append(all, arena...))
+	// Stored claims already passed the cap they were claimed under; re-counted with the lenient
+	// (paid) one, so a lapsed or unknown entitlement never trims fights that were accepted.
+	p.battles = counted(def, win, append(all, arena...), paidCap)
 	p.rolls = min(p.rolls, sumInts(ptsOf(p.battles)))
 	return p, nil
 }
@@ -723,23 +787,35 @@ func arenaPts(won, close bool) int {
 	return 1
 }
 
+// claimWindow: the oldest a claimed fight may be — evMaxAge back, and never before the
+// previous sync less evSyncSlack.
+func (s *store) claimWindow(p *evPlayer) (oldest int64) {
+	oldest = s.now().Add(-evMaxAge).UnixMilli()
+	if p.updated > 0 {
+		oldest = max(oldest, p.updated-evSyncSlack.Milliseconds())
+	}
+	return
+}
+
 // evApply takes a client's claim, keeps what checks out, and answers with the recomputed state.
-func (s *store) evApply(uid, name string, body syncBody) (map[string]any, error) {
+func (s *store) evApply(uid, name string, body syncBody, ent evEnt) (map[string]any, error) {
 	def, win, _ := parseEventID(body.Event)
+	if def.Kind == "tower" {
+		return s.towerApply(uid, name, body, def, win)
+	}
 	now := s.now()
 	open := now.UnixMilli() < win.End+evGrace.Milliseconds() && now.UnixMilli() >= win.Start
 	p, err := s.evLoad(uid, body.Event, def, win)
 	if err != nil {
 		return nil, err
 	}
+	paid := ent.Known && ent.Paid
+	cap := capFor(paid)
 	if open {
 		// Battles: arena results count from the server's own records, never from a claim;
 		// campaign fights are trusted, but only recent ones, after the previous sync, and at
 		// most a day's cap in one request.
-		oldest := now.Add(-evMaxAge).UnixMilli()
-		if p.updated > 0 {
-			oldest = max(oldest, p.updated-evSyncSlack.Milliseconds())
-		}
+		oldest := s.claimWindow(p)
 		var claims []evBattle
 		ahead := int64(0)
 		for _, raw := range body.B {
@@ -770,25 +846,36 @@ func (s *store) evApply(uid, name string, body syncBody) (map[string]any, error)
 		claims = kept
 		sort.SliceStable(claims, func(i, j int) bool { return claims[i].At < claims[j].At })
 		cur := append([]evBattle(nil), p.battles...)
-		added := 0
+		added, maxNew := 0, campaignCap.PerDay
+		if paid {
+			maxNew = 200
+		}
+		refused := int64(0) // the earliest claim refused only because the entitlement was unknown
 		for _, c := range claims {
-			if !def.AnyBattle || added >= campaignCap.PerDay {
+			if !def.AnyBattle || added >= maxNew {
 				break
 			}
 			if containsID(cur, c.ID) {
 				continue
 			}
-			next := counted(def, win, append(append([]evBattle(nil), cur...), c))
+			next := counted(def, win, append(append([]evBattle(nil), cur...), c), cap)
 			if containsID(next, c.ID) {
 				if _, err := s.db.Exec(`INSERT OR IGNORE INTO ev_claims(uid,event,id,pts,at) VALUES(?,?,?,?,?)`, uid, body.Event, c.ID, c.Pts, c.At); err != nil {
 					return nil, err
 				}
 				cur = next
 				added++
+			} else if !ent.Known && refused == 0 && containsID(counted(def, win, append(append([]evBattle(nil), cur...), c), paidCap), c.ID) {
+				refused = c.At
 			}
 		}
 		if p, err = s.evLoad(uid, body.Event, def, win); err != nil {
 			return nil, err
+		}
+		// Refused only because the payment service did not answer: keep it claimable later
+		// (the "before the previous sync" rule then starts just before it).
+		if refused > 0 {
+			p.mark = min(now.UnixMilli(), refused-1+evSyncSlack.Milliseconds())
 		}
 		pts := ptsOf(p.battles)
 		p.rolls = max(p.rolls, min(body.Rolls, sumInts(pts)))
@@ -810,6 +897,7 @@ func (s *store) evApply(uid, name string, body syncBody) (map[string]any, error)
 	}
 	out := s.evView(body.Event, def, win, p)
 	out["closed"] = !open
+	out["cap"] = map[string]any{"paid": paid, "known": ent.Known, "perDay": cap.PerDay, "gapMs": cap.GapMs}
 	if def.Kind == "vines" {
 		rv, err := s.evRivals(body.Event, uid)
 		if err != nil {
@@ -826,7 +914,7 @@ func (s *store) evSave(ev string, p *evPlayer) error {
 	_, err := s.db.Exec(`INSERT INTO ev_state(uid,event,name,rolls,open,guesses,solved,bonus,updated) VALUES(?,?,?,?,?,?,?,?,?)
 		ON CONFLICT(uid,event) DO UPDATE SET name=excluded.name, rolls=MAX(rolls, excluded.rolls), open=excluded.open,
 		guesses=excluded.guesses, solved=excluded.solved, bonus=excluded.bonus, updated=excluded.updated`,
-		p.uid, ev, p.name, p.rolls, string(open), string(guesses), b2i(p.solved), p.bonus, s.now().UnixMilli())
+		p.uid, ev, p.name, p.rolls, string(open), string(guesses), b2i(p.solved), p.bonus, cmp.Or(p.mark, s.now().UnixMilli()))
 	return err
 }
 
@@ -843,6 +931,11 @@ func (s *store) evView(ev string, def *evDef, win evWindow, p *evPlayer) map[str
 		pos, _ := positionAfterRolls(board, p.uid, ev, p.rolls)
 		out["rolls"], out["pos"], out["turns"] = p.rolls, pos, turnsDone(board, p.uid, ev, pts, p.rolls)
 		out["rid"] = s.rid(ev, p.uid)
+	} else if def.Kind == "story" {
+		key := ev[strings.IndexByte(ev, ':')+1:]
+		st := storyIndex(key)
+		ch, circle, done := storyProgress(st, sumInts(pts))
+		out["story"], out["chapter"], out["circle"], out["done"] = st, ch, circle, done
 	} else {
 		out["open"], out["guesses"], out["solved"], out["bonus"] = p.openCells, p.guesses, p.solved, p.bonus
 		out["guessesLeft"] = guessesLeft(len(p.openCells), len(p.guesses), p.solved)
@@ -1135,4 +1228,311 @@ func containsStr(l []string, v string) bool {
 		}
 	}
 	return false
+}
+
+// ── THE TOWER (js/events/tower.js) ─────────────────────────────────────────────────────
+// A player is their ordered W/L list; the floor is recomputed from it every time.
+
+const (
+	towerFloors = 12
+	towerGapMs  = int64(8000)
+	towerPerDay = 120
+	towerMaxNew = 60
+)
+
+type towerRow struct {
+	ID  string
+	Won bool
+	At  int64
+}
+
+// towerCounted: in the window, one per id, play order, towerGapMs apart, towerPerDay a UTC day.
+func towerCounted(w evWindow, rows []towerRow) []towerRow {
+	in := append([]towerRow(nil), rows...)
+	sort.SliceStable(in, func(i, j int) bool {
+		if in[i].At != in[j].At {
+			return in[i].At < in[j].At
+		}
+		return in[i].ID < in[j].ID
+	})
+	seen, perDay := map[string]bool{}, map[string]int{}
+	last := int64(math.MinInt64 / 2)
+	var out []towerRow
+	for _, r := range in {
+		day := utcDayOf(r.At)
+		if seen[r.ID] || r.At < w.Start || r.At >= w.End || r.At-last < towerGapMs || perDay[day] >= towerPerDay {
+			continue
+		}
+		perDay[day]++
+		seen[r.ID], last = true, r.At
+		out = append(out, r)
+	}
+	return out
+}
+
+type towerState struct{ Floor, Tops, Best, Fights, Wins int }
+
+func towerOf(rows []towerRow) towerState {
+	t := towerState{Floor: 1, Best: 1}
+	for _, r := range rows {
+		if r.Won {
+			t.Wins++
+			if t.Floor == towerFloors {
+				t.Tops++
+			} else {
+				t.Floor++
+			}
+		} else {
+			t.Floor = max(1, t.Floor-1)
+		}
+		t.Best = max(t.Best, t.Floor)
+	}
+	t.Fights = len(rows)
+	return t
+}
+
+const towerSchema = `CREATE TABLE IF NOT EXISTS ev_tower (uid TEXT NOT NULL, event TEXT NOT NULL, id TEXT NOT NULL,
+  won INTEGER NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (uid, event, id));`
+
+var reTowerID = regexp.MustCompile(`^tower:[A-Za-z0-9:_.\-]{1,80}$`)
+
+func (s *store) towerLoad(uid, ev string, win evWindow) (*evPlayer, error) {
+	p := &evPlayer{uid: uid, name: "PLAYER"}
+	err := s.db.QueryRow(`SELECT name, updated FROM ev_state WHERE uid=? AND event=?`, uid, ev).Scan(&p.name, &p.updated)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+	rows, err := s.db.Query(`SELECT id, won, at FROM ev_tower WHERE uid=? AND event=?`, uid, ev)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var all []towerRow
+	for rows.Next() {
+		var r towerRow
+		var won int
+		rows.Scan(&r.ID, &won, &r.At)
+		r.Won = won == 1
+		all = append(all, r)
+	}
+	p.tower = towerCounted(win, all)
+	return p, rows.Err()
+}
+
+// towerApply: claimed fights are checked like campaign claims (ids, age, the previous sync,
+// a fast clock shifted back), then the gap and daily limit; the floor is never accepted.
+func (s *store) towerApply(uid, name string, body syncBody, def *evDef, win evWindow) (map[string]any, error) {
+	now := s.now()
+	open := now.UnixMilli() < win.End+evGrace.Milliseconds() && now.UnixMilli() >= win.Start
+	p, err := s.towerLoad(uid, body.Event, win)
+	if err != nil {
+		return nil, err
+	}
+	if open {
+		oldest := s.claimWindow(p)
+		var claims []towerRow
+		ahead := int64(0)
+		for _, raw := range body.T {
+			var row []json.RawMessage
+			if json.Unmarshal(raw, &row) != nil || len(row) < 3 {
+				continue
+			}
+			var r towerRow
+			var won int
+			if json.Unmarshal(row[0], &r.ID) != nil || json.Unmarshal(row[1], &won) != nil || json.Unmarshal(row[2], &r.At) != nil ||
+				!reTowerID.MatchString(r.ID) || (won != 0 && won != 1) || r.At > now.Add(evSkew).UnixMilli() {
+				continue
+			}
+			r.Won = won == 1
+			ahead = max(ahead, r.At-now.UnixMilli())
+			claims = append(claims, r)
+		}
+		sort.SliceStable(claims, func(i, j int) bool { return claims[i].At < claims[j].At })
+		cur := append([]towerRow(nil), p.tower...)
+		added := 0
+		for _, c := range claims {
+			if c.At -= ahead; c.At < oldest || added >= towerMaxNew || containsTower(cur, c.ID) {
+				continue
+			}
+			next := towerCounted(win, append(append([]towerRow(nil), cur...), c))
+			if !containsTower(next, c.ID) {
+				continue
+			}
+			if _, err := s.db.Exec(`INSERT OR IGNORE INTO ev_tower(uid,event,id,won,at) VALUES(?,?,?,?,?)`, uid, body.Event, c.ID, b2i(c.Won), c.At); err != nil {
+				return nil, err
+			}
+			cur = next
+			added++
+		}
+		if p, err = s.towerLoad(uid, body.Event, win); err != nil {
+			return nil, err
+		}
+		p.name = name
+		p.openCells, p.guesses = []int{}, []string{}
+		if err := s.evSave(body.Event, p); err != nil {
+			return nil, err
+		}
+	}
+	out := s.towerView(body.Event, win, p)
+	out["closed"] = !open
+	rv, err := s.towerRivals(body.Event, uid)
+	if err != nil {
+		return nil, err
+	}
+	out["rivals"] = rv
+	return out, nil
+}
+
+func containsTower(l []towerRow, id string) bool {
+	for _, r := range l {
+		if r.ID == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *store) towerView(ev string, win evWindow, p *evPlayer) map[string]any {
+	t := make([][]any, len(p.tower))
+	for i, r := range p.tower {
+		t[i] = []any{r.ID, b2i(r.Won), r.At}
+	}
+	st := towerOf(p.tower)
+	return map[string]any{"event": ev, "uid": p.uid, "t": t, "floor": st.Floor, "tops": st.Tops, "best": st.Best,
+		"fights": st.Fights, "wins": st.Wins, "start": win.Start, "end": win.End, "rid": s.rid(ev, p.uid)}
+}
+
+type towerRivalOut struct {
+	Rid    string `json:"rid"`
+	Name   string `json:"name"`
+	Floor  int    `json:"floor"`
+	Tops   int    `json:"tops,omitempty"`
+	Friend bool   `json:"friend,omitempty"`
+}
+
+var towerMemo = struct {
+	sync.Mutex
+	m map[string]towerMemoEntry
+}{m: map[string]towerMemoEntry{}}
+
+type towerMemoEntry struct {
+	at     time.Time
+	fights int
+	v      []towerRivalOut
+}
+
+// towerRivals: friends first, then the nearest floors (more tops first), ties by uid; 10 at
+// most. Only a name, a floor and the tops leave the server.
+func (s *store) towerRivals(ev, me string) ([]towerRivalOut, error) {
+	_, win, ok := parseEventID(ev)
+	if !ok {
+		return []towerRivalOut{}, nil
+	}
+	mine, err := s.towerLoad(me, ev, win)
+	if err != nil {
+		return nil, err
+	}
+	my := towerOf(mine.tower)
+	key := me + "|" + ev
+	towerMemo.Lock()
+	if e, ok := towerMemo.m[key]; ok && e.fights == my.Fights && s.now().Sub(e.at) <= rivalTTL {
+		towerMemo.Unlock()
+		return e.v, nil
+	}
+	towerMemo.Unlock()
+	rivalSem <- struct{}{}
+	defer func() { <-rivalSem }()
+	evRivalScans.Add(1)
+	friends := s.friendsOf(me)
+	rows, err := s.db.Query(`SELECT uid FROM ev_state WHERE event=? AND uid<>? ORDER BY updated DESC LIMIT ?`, ev, me, evRivalScan)
+	if err != nil {
+		return nil, err
+	}
+	var uids []string
+	for rows.Next() {
+		var u string
+		rows.Scan(&u)
+		uids = append(uids, u)
+	}
+	rows.Close()
+	type cand struct {
+		towerRivalOut
+		uid string
+	}
+	var fr, rest []cand
+	for _, u := range uids {
+		p, err := s.towerLoad(u, ev, win)
+		if err != nil {
+			return nil, err
+		}
+		if len(p.tower) == 0 {
+			continue
+		}
+		t := towerOf(p.tower)
+		c := cand{towerRivalOut{Rid: s.rid(ev, u), Name: p.name, Floor: t.Floor, Tops: t.Tops}, u}
+		if friends[u] {
+			c.Friend = true
+			fr = append(fr, c)
+		} else {
+			rest = append(rest, c)
+		}
+	}
+	near := func(l []cand) {
+		sort.SliceStable(l, func(i, j int) bool {
+			di, dj := iabs(l[i].Floor-my.Floor), iabs(l[j].Floor-my.Floor)
+			if di != dj {
+				return di < dj
+			}
+			if l[i].Tops != l[j].Tops {
+				return l[i].Tops > l[j].Tops
+			}
+			return l[i].uid < l[j].uid
+		})
+	}
+	near(fr)
+	near(rest)
+	out := []towerRivalOut{}
+	for _, c := range append(fr, rest...) {
+		if len(out) >= 10 {
+			break
+		}
+		out = append(out, c.towerRivalOut)
+	}
+	towerMemo.Lock()
+	if len(towerMemo.m) > 5000 {
+		towerMemo.m = map[string]towerMemoEntry{}
+	}
+	towerMemo.m[key] = towerMemoEntry{s.now(), my.Fights, out}
+	towerMemo.Unlock()
+	return out, nil
+}
+
+// ── STORY (js/events/story.js) ─────────────────────────────────────────────────────────
+// Points walk the circles; only the circle counts are needed here (the text is client-side).
+
+var storyCircles = [][]int{
+	{13, 14, 14, 15, 15, 16}, // THE STOLEN BANDANA
+	{12, 13, 14, 14, 15, 16}, // THE GREAT SPILL
+	{12, 13, 14, 15, 15, 16}, // THE DRAWING DRAGON
+}
+
+func storyIndex(key string) int {
+	y, _ := strconv.Atoi(key[:4])
+	m, _ := strconv.Atoi(key[5:7])
+	n := len(storyCircles)
+	return ((y*12+m-1)%n + n) % n
+}
+
+// storyProgress: the chapter being walked (6 = finished) and the circle reached in it.
+func storyProgress(story, points int) (chapter, circle int, done bool) {
+	left := max(0, points)
+	ch := storyCircles[story]
+	for chapter < len(ch) && left >= ch[chapter] {
+		left -= ch[chapter]
+		chapter++
+	}
+	if chapter >= len(ch) {
+		return chapter, 0, true
+	}
+	return chapter, left, false
 }

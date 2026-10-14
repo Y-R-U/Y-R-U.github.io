@@ -1,6 +1,6 @@
 // Points per battle (ONLINE.md): 1 = loss, 2 = loss with the opponent damaged > 50%, 3 = win.
 
-import { CAMPAIGN_CAP } from './calendar.js';
+import { CAMPAIGN_CAP } from './calendar.js?v=20261014-ev';
 
 /**
  * A battle as the client records it and later claims it:
@@ -14,14 +14,15 @@ export function pointsFor(b) {
   return b.oppDmg > 0.5 ? 2 : 1;
 }
 
+/** THE TOWER keeps its own W/L list (tower.js) and takes no points. */
 export const counts = (def, win, b) =>
-  b.at >= win.start && b.at < win.end && (def.anyBattle || b.src === 'arena');
+  def.kind !== 'tower' && b.at >= win.start && b.at < win.end && (def.anyBattle || b.src === 'arena');
 
 const byTime = (a, b) => a.at - b.at || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 
 /**
  * The battles that count for one event window, in the order they were played, with their
- * points. Duplicate ids count once; campaign fights obey CAMPAIGN_CAP. This ordered list IS a
+ * points. Duplicate ids count once; campaign fights obey `cap` (CAMPAIGN_CAP, or PAID_CAP). This ordered list IS a
  * player's Vines & Ladders turns — each entry is one turn's batch of rolls.
  */
 export function counted(def, win, battles, cap = CAMPAIGN_CAP) {

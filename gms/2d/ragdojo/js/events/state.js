@@ -6,23 +6,29 @@
 //
 // `b` is kept in play order (at, then id): for Vines & Ladders it IS the list of turns.
 
-import { activeEvents, parseEventId, utcDay } from './calendar.js';
-import { pointsFor, counts, counted } from './points.js';
-import { CAMPAIGN_CAP } from './calendar.js';
+import { activeEvents, parseEventId, utcDay } from './calendar.js?v=20261014-ev';
+import { pointsFor, counts, counted } from './points.js?v=20261014-ev';
+import { CAMPAIGN_CAP } from './calendar.js?v=20261014-ev';
 import { fresh as freshReveal, CELLS } from './reveal.js';
+import { towerCounted } from './tower.js?v=20261014-ev';
 
 const KEEP_ENDED = 7 * 86400000;
 
 export const fresh = () => ({ v: 1, seenDay: '', ev: {} });
 
+/** Events whose definition is gone (the old Pass events SCROLLS & ROPES, MONTHLY PICTURE) are dropped. */
 export function load(raw) {
   const s = raw && typeof raw === 'object' ? raw : {};
-  return { v: 1, seenDay: typeof s.seenDay === 'string' ? s.seenDay : '', ev: s.ev && typeof s.ev === 'object' ? s.ev : {} };
+  const ev = {};
+  if (s.ev && typeof s.ev === 'object') for (const [id, e] of Object.entries(s.ev)) if (parseEventId(id) && e && typeof e === 'object') ev[id] = e;
+  return { v: 1, seenDay: typeof s.seenDay === 'string' ? s.seenDay : '', ev };
 }
 
+const BASE = { reveal: freshReveal, vines: () => ({ rolls: 0 }), tower: () => ({ t: [], claimed: [] }), story: () => ({ seen: 0, read: 0, claimed: [] }) };
+
 export function evState(state, eventId) {
-  const parsed = parseEventId(eventId);
-  const base = parsed?.def.kind === 'reveal' ? freshReveal() : { rolls: 0 };
+  const kind = parseEventId(eventId)?.def.kind;
+  const base = (BASE[kind] || BASE.vines)();
   return { b: [], ...base, ...(state.ev[eventId] || {}) };
 }
 
@@ -48,6 +54,7 @@ export const markSeen = (state, day) => (seenToday(state, day) ? state : { ...st
  * what is shown, paid and synced, never what is banked.
  */
 export function recordBattle(state, battle, { cap = CAMPAIGN_CAP } = {}) {
+  state = load(state);
   const ev = { ...state.ev };
   const pts = pointsFor(battle);
   for (const a of activeEvents(battle.at, { pass: true })) {
@@ -61,6 +68,15 @@ export function recordBattle(state, battle, { cap = CAMPAIGN_CAP } = {}) {
 }
 
 export const setEv = (state, eventId, ev) => ({ ...state, ev: { ...state.ev, [eventId]: ev } });
+
+/** One finished tower fight, `[id, won, at]`, into THE TOWER's ordered W/L list. */
+export function recordTower(state, eventId, row) {
+  const p = parseEventId(eventId);
+  if (!p || p.def.kind !== 'tower') return state;
+  const cur = evState(state, eventId);
+  if (cur.t.some((r) => r[0] === row[0])) return state;
+  return setEv(state, eventId, { ...cur, t: towerCounted(p.win, [...cur.t, row]) });
+}
 
 /** Drop events that ended more than a week before `now`. */
 export function prune(state, now) {
@@ -78,13 +94,13 @@ export function prune(state, now) {
  * are then clamped to what the merged points can pay for, so two devices spending the same
  * points offline cannot add up to more squares than were earned.
  */
-export function merge(a, b) {
+export function merge(a, b, { cap = CAMPAIGN_CAP } = {}) {
   a = load(a); b = load(b);
   const out = { v: 1, seenDay: a.seenDay >= b.seenDay ? a.seenDay : b.seenDay, ev: {} };
   for (const id of new Set([...Object.keys(a.ev), ...Object.keys(b.ev)])) {
     const x = evState(a, id), y = evState(b, id);
     const ids = new Set(x.b.map((r) => r[0]));
-    const m = { ...x, b: capped(id, [...x.b, ...y.b.filter((r) => !ids.has(r[0]))].sort(order)) };
+    const m = { ...x, b: capped(id, [...x.b, ...y.b.filter((r) => !ids.has(r[0]))].sort(order), cap) };
     if ('rolls' in x || 'rolls' in y) m.rolls = Math.min(pointsOf(m), Math.max(x.rolls | 0, y.rolls | 0));
     if (Array.isArray(x.open)) {
       const def = parseEventId(id)?.def;
@@ -96,30 +112,41 @@ export function merge(a, b) {
       m.bonus = Math.max(x.bonus | 0, y.bonus | 0);
       m.claimed = [...new Set([...x.claimed, ...y.claimed])];
     }
+    if (Array.isArray(x.t)) {
+      const tids = new Set(x.t.map((r) => r[0]));
+      m.t = towerCounted(parseEventId(id).win, [...x.t, ...y.t.filter((r) => !tids.has(r[0]))]);
+    }
+    if ('seen' in x || 'seen' in y) { m.seen = Math.max(x.seen | 0, y.seen | 0); m.read = Math.max(x.read | 0, y.read | 0); }
+    if (!Array.isArray(x.open) && (x.claimed || y.claimed)) m.claimed = [...new Set([...(x.claimed || []), ...(y.claimed || [])])];
     out.ev[id] = m;
   }
   return out;
 }
 
 /** The rows `counted()` keeps: two devices' 10 campaign fights a day are still 10, 60 s apart. */
-function capped(eventId, rows) {
+function capped(eventId, rows, cap) {
   const p = parseEventId(eventId);
   if (!p) return rows;
-  const keep = new Set(counted(p.def, p.win, rows.map((r) => ({ id: r[0], at: r[3], src: r[2], won: r[1] === 3, oppDmg: r[1] === 2 ? 1 : 0 }))).map((b) => b.id));
+  const keep = new Set(counted(p.def, p.win, rows.map((r) => ({ id: r[0], at: r[3], src: r[2], won: r[1] === 3, oppDmg: r[1] === 2 ? 1 : 0 })), cap).map((b) => b.id));
   return rows.filter((r) => keep.has(r[0]));
 }
+
+/** The claims that paid ink: the reveal's guess bonus, the tower's TOP, the story's end. */
+const INK_CLAIMS = ['bonus', 'top', 'end'];
 
 /**
  * This device's events carried into a save adopted from the cloud. A reward that paid INK
  * stays claimed only if the adopted save had claimed it too — otherwise its ink is not in
- * that save, and the game pays it again there.
+ * that save, and the game pays it again there. `cap` is the campaign cap re-applied to the
+ * union (the game passes PAID_CAP: a not-yet-known entitlement must never trim fights already
+ * banked; the server's cap is the authority online).
  */
-export function adoptMerge(cloud, local) {
-  const c = load(cloud), out = merge(local, cloud);
+export function adoptMerge(cloud, local, { cap = CAMPAIGN_CAP } = {}) {
+  const c = load(cloud), out = merge(local, cloud, { cap });
   for (const [id, e] of Object.entries(out.ev)) {
     if (!Array.isArray(e.claimed)) continue;
     const had = c.ev[id]?.claimed || [];
-    e.claimed = e.claimed.filter((r) => r !== 'bonus' || had.includes('bonus'));
+    e.claimed = e.claimed.filter((r) => !INK_CLAIMS.includes(r) || had.includes(r));
   }
   return out;
 }

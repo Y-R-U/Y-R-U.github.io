@@ -166,8 +166,8 @@ func TestEventsArtTilesOnlyForOpenedSquares(t *testing.T) {
 		t.Fatalf("no art %d %q vs future art %d %q", noArt, noArtBody, future, futureBody)
 	}
 	// Pass events need the Pass for their art too.
-	writeTestArt(t, dir, "reveal-month:2026-10")
-	if code, _ := getImage(t, base+"tile?event=reveal-month:2026-10&cell=0", "dev:me"); code != 403 {
+	writeTestArt(t, dir, "halloween:2026")
+	if code, _ := getImage(t, base+"tile?event=halloween:2026&cell=0", "dev:me"); code != 403 {
 		t.Fatalf("pass art without a pass: %d", code)
 	}
 }
