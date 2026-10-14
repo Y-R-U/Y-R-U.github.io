@@ -683,7 +683,11 @@ func TestEventsTower(t *testing.T) {
 			t.Fatalf("tower rival reply leaks %q: %s", leak, raw)
 		}
 	}
-	// A tower fight is a campaign fight for the other events too.
+	// A tower fight (and a solo quick fight, net/panel.js) is a campaign fight for the other events too.
+	_, qf := r.sync(t, "bob", map[string]any{"event": vday, "name": "Bob", "b": [][]any{{"quick:m1", 3, "campaign", r.now.Add(-2 * time.Minute).UnixMilli()}}})
+	if qf["points"].(float64) != 3 {
+		t.Fatalf("a quick fight did not count as a campaign battle: %v", qf["points"])
+	}
 	_, v := r.sync(t, "ann", map[string]any{"event": vday, "b": [][]any{{"tower:a1", 3, "campaign", r.now.Add(-time.Minute).UnixMilli()}}})
 	if v["points"].(float64) != 3 {
 		t.Fatalf("a tower fight did not count as a campaign battle: %v", v["points"])

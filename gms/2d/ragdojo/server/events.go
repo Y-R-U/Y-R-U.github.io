@@ -667,7 +667,8 @@ func (h *hub) ent(ctx context.Context, uid, tok string) evEnt {
 	return e
 }
 
-var reBattleID = regexp.MustCompile(`^(camp|ghost|tower|arena):[A-Za-z0-9:_.\-]{1,80}$`)
+// Campaign-class claims: campaign, ghost, tower and solo quick fights (`quick:<match>`, net/panel.js).
+var reBattleID = regexp.MustCompile(`^(camp|ghost|tower|quick|arena):[A-Za-z0-9:_.\-]{1,80}$`)
 
 type syncBody struct {
 	Event   string            `json:"event"`

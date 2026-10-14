@@ -190,7 +190,7 @@ server already has, so the only thing a client can lie about is campaign fights.
 |---|---|---|
 | `eventId` | `parseEventId` | unknown, or window not open (allow ~10 min grace after `end`) |
 | arena battle ids in `b` | its own agreed match results (`won`, `oppDmg`, `at`) | id unknown, not this uid's, result void/mismatched |
-| campaign battles `[id, pts, 'campaign', at]` (ids `camp:`, `ghost:`, `tower:`) | nothing — trusted, capped by `CAMPAIGN_CAP`, or `PAID_CAP` when the payment service says supporter or Pass | event is arena-only; over the day's cap (free: 10); under the gap after the last counted (free 60 s, paid 15 s); dated over 26 h ago or more than 10 min before the previous sync; more than 10 new in one sync (paid: 200); over 10 min in the future (a batch up to 10 min ahead is shifted back so its newest fight is "now") |
+| campaign battles `[id, pts, 'campaign', at]` (ids `camp:`, `ghost:`, `tower:`, `quick:`) | nothing — trusted, capped by `CAMPAIGN_CAP`, or `PAID_CAP` when the payment service says supporter or Pass | event is arena-only; over the day's cap (free: 10); under the gap after the last counted (free 60 s, paid 15 s); dated over 26 h ago or more than 10 min before the previous sync; more than 10 new in one sync (paid: 200); over 10 min in the future (a batch up to 10 min ahead is shifted back so its newest fight is "now") |
 | tower fights `t: [[id, won, at]]` | nothing — trusted like a campaign claim | id not `tower:…`; `won` not 0/1; the same time rules as campaign claims; under 8 s after the last counted; over 120 that UTC day; more than 60 new in one sync |
 | `rolls` | the ordered points of the accepted battles (`counted`, play order by server time) | `rolls > sum(points)` |
 | position, turns (never sent) | `positionAfterRolls(board, uid, eventId, rolls)`, `turnsDone(...)` | — |
@@ -247,9 +247,9 @@ lapsed entitlement keeps what was banked and only stops new fights past the free
 - **Rolls never go backwards** (`MAX` on write) and are clamped to the points banked.
 - Claims are accepted from `start` to `end + 10 min`; campaign fights may not be dated more than
   2 min ahead of the server clock. Later syncs still return the (closed) state read-only.
-- `tools/eventsgofalsify.mjs` breaks events.go/eventart.go 34 ways (and the JS board once) — 35/35 red
+- `tools/eventsgofalsify.mjs` breaks events.go/eventart.go 35 ways (and the JS board once) — 36/36 red
   (2026-10-14: paid cap, outage, supporter, tower floor/TOP/gap/back-dating/no points/rivals,
-  story circles and rotation, retired ids, Pass gating added; four stale mutants repaired).
+  story circles and rotation, retired ids, Pass gating, quick-fight ids added; four stale mutants repaired).
 
 To keep the port honest, these vectors must match on the server (they are in the gate):
 

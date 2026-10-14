@@ -46,6 +46,7 @@ const GO = [
   ['story: a circle short', 'for chapter < len(ch) && left >= ch[chapter] {', 'for chapter < len(ch) && left > ch[chapter] {'],
   ['story: one story for every month', 'return ((y*12+m-1)%n + n) % n', 'return ((y*0+m*0)%n + n) % n'],
   ['retired events still answer', '{ID: "tower", Kind: "tower", Cadence: "weekly", Pass: true},', '{ID: "tower", Kind: "tower", Cadence: "weekly", Pass: true},\n\t{ID: "vines-month", Kind: "vines", Cadence: "monthly", Pass: true},'],
+  ['solo quick fights refused as claims', '(camp|ghost|tower|quick|arena)', '(camp|ghost|tower|arena)'],
   ['tower/story open without the Pass', '{ID: "story", Kind: "story", Cadence: "monthly", Pass: true, AnyBattle: true},', '{ID: "story", Kind: "story", Cadence: "monthly", AnyBattle: true},'],
 ];
 let red = 0, total = 0;
