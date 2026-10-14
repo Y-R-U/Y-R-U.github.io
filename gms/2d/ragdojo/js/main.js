@@ -5,24 +5,24 @@ import {
   playerRankAt, moveStats, derive, levelsFor, ranksFor, activeMoves, RANK_WORD,
   WORLDS, worldOf, BULLY_WIN_FLAG, MOVE_SETS,
 } from './config.js';
-import { drawDesk, sheetShadow } from './paper.js';
+import { drawDesk } from './paper.js';
 import { buildArena } from './arena.js';
 import { drawFighter, drawShadow } from './draw.js';
 import { Match } from './match.js';
-import { Input, isRotated, SPECIAL_KEYS } from './input.js?v=20261013-mirror';
+import { Input, isRotated, SPECIAL_KEYS } from './input.js?v=20261015-gf';
 import { drawHUD, drawNameTags, handText, FONT, FONT_B } from './ui.js';
-import { load, save as persist, wipe, DEFAULT, RUN, RUN_KEYS } from './save.js';
+import { load, save as persist, wipe, DEFAULT, RUN, RUN_KEYS, KEY } from './save.js';
 import * as audio from './audio.js';
 import * as haptic from './haptic.js';
-import { buildShop } from './shop.js';
+import { buildShop, stopShopTicker } from './shop.js?v=20261015-gf';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
 import { DEV, DEMO, ACCOUNTS, SIGNIN, HOME } from './edition.js?v=20261013-lan';
-import { Purchases, API, ownerPollNext } from './purchases.js?v=20261014-gift';
+import { Purchases, API, ownerPollNext } from './purchases.js?v=20261015-gf';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
-import { mountArena } from './net/panel.js?v=20261014-qf';
-import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261014-ev';
+import { mountArena } from './net/panel.js?v=20261015-qff';
+import { mountEvents, mergeEventsInto, drawEventBackdrop } from './events/ui.js?v=20261015-evf';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
 /** A definitive "not entitled" arrived while a paid world was in play: park it at the next hub visit, never mid-fight. */
@@ -37,6 +37,8 @@ const isPaid = (id) => PAID_WORLDS.includes(id);
 const PAID_NAMES = 'CYBER and DEITIES';
 // null until probed: the purchase API is not live yet, and asking it repeatedly is just noise.
 let paymentsUp = null;
+/** A definitive entitlement answer exists. Until then a paid run is never parked: a paying player is just unverified yet. */
+let entKnown = DEV || DEMO || !ACCOUNTS;
 
 const cvs = document.getElementById('game');
 const ctx = cvs.getContext('2d', { alpha: false });
@@ -61,16 +63,21 @@ let pendingResult = null;
 audio.registerTracks(MUSIC);
 
 // ── canvas ───────────────────────────────────────────────────────────────
+const MAX_PIXELS = 3.5e6;
 function resize() {
   dpr = Math.min(2, window.devicePixelRatio || 1);
   if (qs.get('dpr')) dpr = +qs.get('dpr');
   vw = cvs.clientWidth; vh = cvs.clientHeight;
+  // Big tablets at dpr 2 are 5-6 MP of canvas for a pencil drawing; cap the backing store.
+  dpr = Math.min(dpr, Math.sqrt(MAX_PIXELS / Math.max(1, vw * vh)));
   cvs.width = Math.round(vw * dpr);
   cvs.height = Math.round(vh * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  deskCache = null;
 }
-window.addEventListener('resize', () => { resize(); updateRotateHint(); });
-window.addEventListener('orientationchange', () => setTimeout(() => { resize(); updateRotateHint(); }, 120));
+// render() too: resizing clears the canvas, and the hub behind a panel is not repainted every frame.
+window.addEventListener('resize', () => { resize(); updateRotateHint(); render(); });
+window.addEventListener('orientationchange', () => setTimeout(() => { resize(); updateRotateHint(); render(); }, 120));
 
 let rotateHintT = null;
 /** Nudge, not a wall: shows briefly in portrait and gets out of the way. */
@@ -111,10 +118,12 @@ const input = new Input(cvs, {
 const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help', 'thug', 'premium', 'worlds', 'arena', 'events'];
 function show(name) {
   for (const s of SCREENS) $(s).classList.toggle('show', s === name);
+  if (name !== 'shop') stopShopTicker();
   $('pauseBtn').classList.toggle('hidden', name !== null || !match || match.demo);
 }
 function overlay(name) {   // a panel on top of the hub
   for (const s of ['shop', 'settings', 'help', 'results', 'victory', 'thug', 'premium', 'worlds', 'arena', 'events']) $(s).classList.toggle('show', s === name);
+  if (name !== 'shop') stopShopTicker();
   $('pauseBtn').classList.toggle('hidden', !!name || mode !== 'fight');
 }
 
@@ -125,7 +134,7 @@ function setMode(m) {
   $('pauseBtn').classList.toggle('hidden', m !== 'fight');
   document.body.classList.toggle('fighting', m === 'fight');
   updateRotateHint();
-  if (m === 'hub') { if (parkOwed) { parkOwed = false; parkPaid(); } show('hub'); startDemo(); audio.play(roleTrack(S.theme, S.completed ? 'victory' : 'menu')); }
+  if (m === 'hub') { if (parkOwed) { parkOwed = false; parkPaid(); } else unparkPaid(); show('hub'); startDemo(); audio.play(roleTrack(S.theme, S.completed ? 'victory' : 'menu')); }
   else if (m === 'fight') { show(null); }
 }
 
@@ -393,7 +402,7 @@ function showVictory(bully, justWon = true) {
     canBelt ? '<b>White Belt</b> — back to the dojo in daylight, fight 1, as a white belt.' +
       ' Every skill, move and drop of ink comes with you.' : '',
     `<b>Keep Playing</b> — close this and carry on where you are (${at}).`,
-    '<b>New Game</b> — wipe this run. Only the all-time records above are kept.',
+    '<b>New Game</b> — back to LIGHT fight 1 with no ink, skills, moves or worlds. Kept: the all-time records above, your soundtrack, events and settings.',
   ].filter(Boolean).map((t) => `<span>${t}</span>`).join('');
   overlay('victory');
   if (justWon) { audio.play(roleTrack(S.theme, 'victory')); audio.sfx.bell(); }
@@ -465,9 +474,28 @@ function refreshHub() {
 }
 
 // ── render ───────────────────────────────────────────────────────────────
+/** The desk never changes and the sheet's blurred shadow only moves with the camera: bake both once per resize. */
+let deskCache = null;
+const SHADOW_PAD = 80, SHADOW_RES = 0.25;
+function bakeDesk() {
+  const desk = document.createElement('canvas');
+  desk.width = Math.max(1, Math.round(vw * dpr)); desk.height = Math.max(1, Math.round(vh * dpr));
+  const d = desk.getContext('2d');
+  d.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawDesk(d, vw, vh, sheet);
+  const shadow = document.createElement('canvas');
+  shadow.width = Math.ceil((SHEET_W + SHADOW_PAD * 2) * SHADOW_RES); shadow.height = Math.ceil((SHEET_H + SHADOW_PAD * 2) * SHADOW_RES);
+  // paper.js sheetShadow, in sheet units: shadowBlur/offset ignore the transform, so scale them by hand.
+  const g = shadow.getContext('2d'), k = SHADOW_RES;
+  g.shadowColor = 'rgba(0,0,0,0.55)'; g.shadowBlur = 30 * k; g.shadowOffsetY = 13 * k;
+  g.fillStyle = '#000';
+  g.fillRect((SHADOW_PAD + 6) * k, (SHADOW_PAD + 6) * k, (SHEET_W - 12) * k, (SHEET_H - 12) * k);
+  deskCache = { desk, shadow };
+}
 function render() {
   ctx.save();
-  drawDesk(ctx, vw, vh, sheet);
+  if (!deskCache) bakeDesk();
+  ctx.drawImage(deskCache.desk, 0, 0, vw, vh);
   if (!match) { ctx.restore(); return; }
 
   const m = match;
@@ -484,7 +512,7 @@ function render() {
   ctx.scale(scale, scale);
   ctx.translate(-(cx - camW / 2), -cy);
 
-  sheetShadow(ctx, 0, 0, SHEET_W, SHEET_H);
+  ctx.drawImage(deskCache.shadow, -SHADOW_PAD, -SHADOW_PAD, SHEET_W + SHADOW_PAD * 2, SHEET_H + SHADOW_PAD * 2);
   if (sheet) ctx.drawImage(sheet, 0, 0);
   drawEventBackdrop(ctx, m);
   ctx.save();
@@ -539,7 +567,9 @@ function frame(t) {
   // Online hit-stop is a held picture (the sim runs on, see PvpMatch.update): draw the impact
   // frame, then hold it until the stop runs out. A longer stop landing mid-hold redraws.
   const hs = match && match.net ? match.fx.hitstop : 0;
-  if (!(hs > 0 && heldStop > 0 && hs <= heldStop)) render();
+  // The hub's demo fight behind a blurred panel is not worth repainting every frame.
+  const still = mode === 'hub' && match?.demo && document.querySelector('.panel-screen.show');
+  if (!still && !(hs > 0 && heldStop > 0 && hs <= heldStop)) render();
   heldStop = hs;
   if (DEV) window.__state = match ? {
     mode, hp: match.player.hp, enemies: match.aliveEnemies.length,
@@ -651,7 +681,7 @@ $('btnAgain').onclick = () => {
   // Two-step instead of a modal: the first press asks, the second one does it.
   if (Date.now() > armAgain) {
     armAgain = Date.now() + 6000;
-    $('btnAgain').textContent = 'SURE? WIPES THIS RUN';
+    $('btnAgain').textContent = 'SURE? WIPES INK + WORLDS';
     $('btnAgain').classList.add('danger');
     setTimeout(() => { if (Date.now() > armAgain - 200) resetAgainBtn(); }, 6000);
     return;
@@ -659,10 +689,19 @@ $('btnAgain').onclick = () => {
   resetAgainBtn();
   // Records, the music roster and the fact that you have won survive. Everything you bought
   // does not — that is the point of starting again.
-  const keep = { best: S.best, everWon: S.everWon, records: S.records, events: S.events, eventPrizes: S.eventPrizes };
-  S = { ...DEFAULT(), ...keep, newGamePlus: (S.newGamePlus || 0) + 1 };
-  persist(S); overlay(null); setMode('hub'); refreshHub();
+  resetSave({ best: S.best, everWon: S.everWon, records: S.records, events: S.events, eventPrizes: S.eventPrizes, newGamePlus: (S.newGamePlus || 0) + 1 });
 };
+/**
+ * NEW GAME and ERASE both land here. Settings and the muted tracks are preferences, not
+ * progress, and the page has to follow the new save: a DARK page with a LIGHT save stayed dark.
+ */
+function resetSave(keep = {}) {
+  S = { ...DEFAULT(), ...keep, settings: { ...DEFAULT().settings, ...S.settings }, musicOff: { ...(S.musicOff || {}) } };
+  persist(S);
+  sheetLevel = -1;
+  applySettings();
+  overlay(null); setMode('hub'); refreshHub();
+}
 let armBelt = 0;
 $('btnWhiteBelt').onclick = () => {
   click();
@@ -715,11 +754,18 @@ for (const id in DISMISS) {
   el.addEventListener('pointerdown', (e) => { downOnBackdrop = e.target === el; });
   el.addEventListener('click', (e) => { if (downOnBackdrop && e.target === el) $(DISMISS[id]).click(); });
 }
+// iPhone Safari and iframes without allow=fullscreen cannot; a rejected request used to reach the boot-failure box.
+const canFull = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+for (const id of ['btnFull', 'btnFullBoot']) $(id).classList.toggle('hidden', !canFull);
 $('btnFull').onclick = $('btnFullBoot').onclick = () => {
   click();
   const d = document.documentElement;
-  if (!document.fullscreenElement) (d.requestFullscreen || d.webkitRequestFullscreen || (() => {})).call(d);
-  else (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document);
+  try {
+    const p = !(document.fullscreenElement || document.webkitFullscreenElement)
+      ? (d.requestFullscreen || d.webkitRequestFullscreen || (() => {})).call(d)
+      : (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document);
+    p?.catch?.(() => {});
+  } catch {}
 };
 $('btnMusic').onclick = () => {
   S.settings.music = !S.settings.music;
@@ -727,12 +773,27 @@ $('btnMusic').onclick = () => {
   persist(S); refreshHub();
   click();
 };
+// Two-step like NEW GAME, and never offered in the fight's pause panel next to QUIT.
+let armWipe = 0;
 $('btnWipe').onclick = () => {
+  click();
+  if (mode === 'fight') return;
+  if (Date.now() > armWipe) {
+    armWipe = Date.now() + 6000;
+    $('btnWipe').textContent = account?.auth.signedIn ? 'SURE? ALSO ERASES THE CLOUD SAVE' : 'SURE? ERASES EVERYTHING';
+    $('btnWipe').classList.add('armed');
+    setTimeout(() => { if (Date.now() > armWipe - 200) resetWipeBtn(); }, 6000);
+    return;
+  }
+  resetWipeBtn();
   wipe();
-  S = DEFAULT();
-  persist(S);
-  overlay(null); setMode('hub'); refreshHub();
+  resetSave();
 };
+function resetWipeBtn() {
+  armWipe = 0;
+  $('btnWipe').textContent = 'ERASE ALL PROGRESS';
+  $('btnWipe').classList.remove('armed');
+}
 
 function openShop() {
   buildShop($('shopList'), $('shopInk'), S, () => { persist(S); refreshHub(); }, hasPremium());
@@ -761,6 +822,8 @@ function openSettings() {
   if ($('btnRedeem')) $('btnRedeem').onclick = redeemCode;
   // Pausing is the only place you can bail out of a fight, so the way out lives here.
   $('btnQuit').classList.toggle('hidden', mode !== 'fight');
+  $('btnWipe').classList.toggle('hidden', mode === 'fight');
+  resetWipeBtn();
   rows.querySelectorAll('button[data-fn]').forEach((b) => {
     b.onclick = () => {
       const f = b.dataset.fn;
@@ -942,6 +1005,7 @@ const eventsUI = mountEvents({
   getSave: () => S, persist: () => persist(S), openUpgrade: () => openUpgrade(null, 'pass'),
   hasPass: () => (DEV && qs.get('evpass') === '0' ? false : DEV || familyAccess.active || !!purchases?.passActive),
   paid: () => (DEV && qs.has('evpaid') ? qs.get('evpaid') === '1' : DEV && qs.get('evpass') === '0' ? false : hasPremium()),
+  paidKnown: () => entKnown || paymentsUp === false,
   addInk: (n) => { S.ink += n; persist(S); refreshHub(); },
   // THE TOWER's fights (js/events/towerfight.js): a local Match, ended by the events panel.
   startFight: (m) => { match = m; ensureSheet(m.level); setMode('fight'); audio.play(m.level.kind === 'champion' ? roleTrack(S.theme, 'boss') : fightTrack({ kind: 'fight', idx: 0 })); },
@@ -952,17 +1016,33 @@ const eventsUI = mountEvents({
 if (DEV) window.__ragdojo = { arena, eventsUI, openUpgrade, get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
 if (DEV) window.__input = input;
 
-// Paid access never deletes earned progress. Park a CYBER/DEITIES run intact while signed
-// out, refunded or offline; restoring ownership resumes it from the WORLDS list. DARK is free.
-function parkPaid() {
-  if (!isPaid(S.theme) || hasPremium()) return;
+// Paid access never deletes earned progress. Park a CYBER/DEITIES run intact once the answer
+// is a definitive "not entitled" (signed out, refunded, lapsed) — never while it is merely
+// unknown (still loading, offline, payments down). A later yes walks it back in. DARK is free.
+function swapRun(to) {
   S.stash[S.theme] = Object.fromEntries(RUN_KEYS.map(k => [k, S[k]]));
-  const back = S.darkUnlocked && S.stash.dark ? 'dark' : 'light';
-  const run = S.stash[back] || RUN();
+  const run = S.stash[to] || RUN();
   for (const k of RUN_KEYS) S[k] = run[k];
-  S.theme = back;
+  S.theme = to;
   sheetLevel = -1;
   applyTheme();
+}
+function parkPaid() {
+  if (!isPaid(S.theme) || hasPremium() || !entKnown) return;
+  const from = S.theme, back = S.darkUnlocked && S.stash.dark ? 'dark' : 'light';
+  swapRun(back);
+  S.parkedFrom = from; S.parkedTo = back;
+  persist(S);
+}
+/** True when it moved you. Only from where parking left you; never mid-fight. */
+function unparkPaid() {
+  const from = S.parkedFrom;
+  if (!from || mode === 'fight' || !hasPremium() || !worldOpen(from)) return false;
+  const here = S.theme === S.parkedTo;
+  S.parkedFrom = S.parkedTo = null;
+  if (here) swapRun(from);
+  persist(S);
+  return here;
 }
 function applyCloud() {
   if (!pendingCloud) return;
@@ -977,10 +1057,16 @@ function applyCloud() {
 }
 function purchaseStatus(text) { $('purchaseStatus').textContent = text; }
 const SOON = `Supporting the developer is coming soon — thank you for looking! Until then ${PAID_NAMES} stay locked, and LIGHT and DARK are free.`;
-/** One cheap probe of the purchase API; nothing else asks it anything until this says yes. */
-let offerItems = {}, paymentsTest = false;
-async function probePayments() {
+const DOWN = `Supporting the developer is temporarily unavailable — try again in a little while. Earned progress is kept, and LIGHT and DARK are free.`;
+/** Once this device has seen the purchase API answer, an outage is an outage, not "coming soon". */
+const PAY_SEEN = 'ragdojo.payseen.v1';
+const soon = () => { try { return localStorage.getItem(PAY_SEEN) ? DOWN : SOON; } catch { return SOON; } };
+/** A cheap probe of the purchase API; nothing else asks it anything until this says yes. A failure is retried, at most every 20 s unless asked. */
+let offerItems = {}, paymentsTest = false, probedAt = 0;
+async function probePayments(force = true) {
   if (DEMO || !ACCOUNTS) return false;
+  if (!force && paymentsUp === false && Date.now() - probedAt < 20000) return false;
+  probedAt = Date.now();
   try {
     const res = await fetch(API + 'offer', { cache: 'no-store' });
     const offer = res.ok ? await res.json() : null;
@@ -989,6 +1075,7 @@ async function probePayments() {
     for (const it of (Array.isArray(offer?.items) ? offer.items : []))
       if (it && typeof it.key === 'string' && typeof it.currency === 'string' && it.amount > 0) offerItems[it.key] = it;
     paymentsUp = Object.keys(offerItems).length > 0;
+    if (paymentsUp) try { localStorage.setItem(PAY_SEEN, '1'); } catch {}
     return paymentsUp ? offer : false;
   } catch { paymentsUp = false; return false; }
 }
@@ -1046,7 +1133,8 @@ async function redeemCode() {
 /** True when the server gave a definitive answer. */
 async function restorePurchase() {
   if (!purchases) { purchaseStatus('Use the account button to sign in on games.br8t.com.'); return false; }
-  if (!paymentsUp) { if (paymentsUp === false && !familyAccess.available) purchaseStatus(SOON); return false; }
+  if (paymentsUp === false) await probePayments(false);
+  if (!paymentsUp) { if (paymentsUp === false && !familyAccess.available) purchaseStatus(soon()); return false; }
   try {
     await purchases.refresh();
     purchaseStatus(ownedMessage());
@@ -1094,7 +1182,7 @@ function openUpgrade(forWorld = null, why = null) {
   if (DEMO || !ACCOUNTS) return;
   void probePayments().then(async offer => {
     if (!$('premium').classList.contains('show')) return;
-    if (!offer) { if (!familyAccess.available) purchaseStatus(SOON); return; }
+    if (!offer) { if (!familyAccess.available) purchaseStatus(soon()); return; }
     paintOffers();
     if (!familyAccess.available) purchaseStatus(`${paymentsTest ? 'Test mode: no real money moves. ' : ''}Sign in using the account button (Google or email) before supporting, subscribing or restoring.`);
     if (account?.auth.signedIn) await restorePurchase();
@@ -1104,7 +1192,7 @@ $('btnUpgrade').onclick = () => { click(); openUpgrade(); };
 $('btnPremiumClose').onclick = () => { click(); overlay(null); };
 $('btnFamilySkip').onclick = () => {
   if (!familyAccess.grant()) return;
-  click(); refreshHub();
+  click(); unparkPaid(); refreshHub();
   if (upgradeFor && worldOpen(upgradeFor)) { overlay(null); setTheme(upgradeFor); }
   else {
     $('btnFamilySkip').disabled = true;
@@ -1150,12 +1238,28 @@ function maybeNudge() {
 function hideNudge() { clearTimeout(nudgeT); $('nudge').classList.add('hidden'); }
 $('btnNudge').onclick = () => { click(); openUpgrade(); };
 $('btnNudgeClose').onclick = () => { click(); hideNudge(); };
+// Backgrounded: the music stops (an HTMLAudio track otherwise plays on in a pocket) and a
+// campaign fight pauses itself. Online rounds cannot pause; the other players are still there.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    audio.suspend?.();
+    if (mode === 'fight' && match && !match.net && !match.demo && !document.querySelector('.panel-screen.show')) openSettings();
+  } else audio.wake?.();
+});
+// Every user gesture gives a held-back AudioContext (iOS 'interrupted') or a blocked track another go.
+for (const ev of ['pointerup', 'touchend', 'keydown']) addEventListener(ev, () => audio.kick?.(), { capture: true, passive: true });
+// Another tab saved newer progress: adopt it at the next safe moment rather than overwrite it.
+addEventListener('storage', (e) => {
+  if (e.key !== KEY || e.newValue == null) return;
+  pendingCloud = true;
+  if (mode !== 'fight') { applyCloud(); refreshHub(); }
+});
 $('btnCloudLocal').onclick = () => void account?.sync.choose('local');
 $('btnCloudRemote').onclick = () => void account?.sync.choose('remote');
 $('btnCloudRetry').onclick = () => { if (!account) return; if (account.sync.conflict) { openSettings(); return; } void account.sync.connect(account.auth.signedIn ? account.auth.user.uid : null); };
 
 if (SIGNIN && !DEV) {
-  import('./cloud.js?v=20261013-lan').then(({ connectCloud }) => {
+  import('./cloud.js?v=20261015-gf').then(({ connectCloud }) => {
     account = connectCloud({
       canPester: () => mode === 'hub' || !!document.querySelector('#results.show, #victory.show'),
       adopt: save => { pendingCloud = save; if (mode !== 'fight') { applyCloud(); refreshHub(); } },
@@ -1173,8 +1277,10 @@ if (SIGNIN && !DEV) {
     if (!ACCOUNTS) return;
     purchases = new Purchases(account.auth, fetch, () => {
       // Only a definitive answer gets here. Never pull a fight out from under the player.
+      entKnown = true;
       parkOwed = !hasPremium() && isPaid(S.theme);
       if (parkOwed && mode === 'hub') { parkOwed = false; parkPaid(); startDemo(); }
+      else if (unparkPaid() && mode === 'hub') startDemo();
       refreshHub();
     });
     // Probe once; ownership checks only start if the purchase API actually answers.
@@ -1189,11 +1295,18 @@ if (SIGNIN && !DEV) {
         void restorePurchase();
       }, 2500);
     } else if (qs.get('checkout') === 'cancel') { openUpgrade(); purchaseStatus('Checkout cancelled. Your progress is unchanged.'); }
+    // Handled once: a reload or a shared link must not reopen the upgrade.
+    if (qs.has('checkout')) {
+      const u = new URL(location.href);
+      u.searchParams.delete('checkout');
+      try { history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch {}
+    }
     addEventListener('focus', () => { void restorePurchase(); });
     // Owners are re-checked every 2 minutes; a failed check retries sooner (ownerPollNext).
     let pollMs = 120000, failing = false;
     const poll = () => setTimeout(async () => {
-      const ok = (purchases.owned || purchases.unknown) ? await restorePurchase() : true;
+      // A purchase API that failed its probe is probed again here, not written off for the session.
+      const ok = (purchases.owned || purchases.unknown || paymentsUp === false) ? await restorePurchase() : true;
       pollMs = ownerPollNext(pollMs, ok, failing);
       failing = !ok;
       poll();

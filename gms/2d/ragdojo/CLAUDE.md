@@ -649,18 +649,23 @@ js/net/objective.js  ObjectiveBrain(…, opts) passes the style on; lurk() is SN
 - **Ghosts are picked by the server** (personality, name + "*", seed; skill and loadout at the start from the
   people's ranked records via ghost.js's formula and their loadout size, ±a little) so every browser and any
   new master agree. One is revealed per tick across the last 3 s, all of them 2 ticks before the start. A
-  person joining late takes a ghost's seat: unshown ones go first, then the last-revealed.
+  person joining late takes a ghost's seat: unshown ones go at once; shown ones stay listed while people come
+  and go, and only at the start does the last-revealed step out. A ghost named like a joiner goes at once.
+  Every change (the filling join too) is an `offer` before any `go`: the client links only on an offer.
+  `decline` in a room or quick window is that person leaving, never a cancel for everyone.
 - **One person** gets `quickgo` and plays it on the device (`LocalFight` with `ghosts`; a 1v1 is a local best
   of 3). **Two or more**: a normal room (`go` with `quick` + `ghosts`; ghost seats come after the people's);
   the master runs the ghosts' brains in `stepMaster`, guests draw them from snapshots, `takeOver` needs nothing
   extra (brains hold the fighters, RANDOM's style is `styleAt(seed, match.time)`). The last person in a room
-  with ghosts fights on (no forfeit win). Two people in a 1v1 window = a plain best of 3.
+  with ghosts fights on (no forfeit win) but earns nobody event points (their report alone decides it). Two
+  people in a 1v1 window = a plain best of 3, switched over in roomBegin: one leaving or refused while the
+  allowance is checked leaves the other a ghost 1v1, not a cancel.
 - **Never ranked.** `store.recordQuick`: a `matches` row tagged "quick", afterMatch for events, NO players /
   by_type / daily rows, pair cap on its own `<day>/quick` counter. Results carry `quick`, `names`, `place` and
   `hwin` (the best-placed PERSON: ghost seats are ignored for events). A ghost-only fight emits
   `ragdojo:battle {src:'campaign', kind:'quick'}` like a campaign fight.
 - **Names.** A ghost's name ends in "*" everywhere (lists, HUD, tags, results); typed names cannot contain "*"
-  (names.go). `Modes.shortName` keeps the star when a name is cut. The UI never says "bot".
+  or a look-alike (names.go isStar, panel.js STARS). `Modes.shortName` keeps the star when a name is cut. The UI never says "bot".
 - **Personalities** (STYLES): BRICK blocks then counters, ZIPPY hovers ~1.8 reaches and backs off after a hit,
   RUMBLE presses through instead of retreating, INKSLINGER hovers ~3.3 reaches and throws ranged specials
   first, SNEAK waits where the nearest body is farthest, fights whoever comes close, goes for the hurt and
@@ -672,8 +677,21 @@ ghost reveals at tick granularity clumped until the reveal span ended two ticks 
 
 Gates (each watched go red): `cd server && go test -race ./...` (quick_test.go) · `node tools/quickgate.mjs`
 (35: personality, sneak, random, fair, netfight incl. hand-over, local best of 3, names, plain-Brain-equals-HEAD;
-`--falsify` 17 JS + 15 Go mutants) · `node tools/quickbrowser.mjs` (real touch: solo landscape, rotated portrait
-ghost 1v1, two Chromes + 2 ghosts over WebRTC, offline; `--falsify` 9). Ports 9600-9649 (`ARENA_TEST_PORT`).
+`--falsify` 17 JS + 22 Go mutants) · `node tools/quickbrowser.mjs` (real touch: solo landscape, rotated portrait
+ghost 1v1, two Chromes + 2 ghosts over WebRTC, two Chromes in a 1v1 (duel2), offline; `--falsify` 11, server
+mutants too). Ports 9600-9649 (`ARENA_TEST_PORT`).
+
+## Reset, save-sync and backgrounding (2026-10-15)
+- NEW GAME and ERASE both go through `resetSave(keep)` (keeps settings + musicOff, re-applies theme/settings).
+  ERASE is a two-tap arm and hidden mid-fight. `tools/resetgate.mjs` (44, `--falsify`) covers both, the
+  keep-local cloud conflict (`save-sync.js` updates `remoteRevision` on conflict), parking, fullscreen and keys.
+- Paid worlds park only on a DEFINITIVE not-entitled answer (`entKnown`), recording `parkedFrom`/`parkedTo` in the
+  save; `unparkPaid()` walks back when entitlement confirms (never mid-fight). A failed payments probe re-probes
+  (≤ once / 20 s); once payments have answered on this device (`ragdojo.payseen.v1`) an outage reads
+  "temporarily unavailable", not "coming soon".
+- `visibilitychange`: hide pauses music and a campaign fight; show resumes the AudioContext (incl. iOS
+  'interrupted'). iOS: `navigator.audioSession.type='playback'`, music routed through `musGain` where element
+  volume is read-only. Canvas backing store capped at 3.5 MP.
 
 ## Music
 
@@ -874,14 +892,19 @@ js/events/render.js      TowerView (pyramid, climber, rivals) and StoryView (win
 
 - **Paid = supporter or Pass** (`hasPremium()` in main.js; `?evpaid=0|1` in dev). Paid players' campaign
   fights have no daily cap, only 15 s between them (`PAID_CAP`). Server: `evEnt{Pass, Paid, Known}` from
-  the payment service; an outage keeps Pass events open but the FREE cap, and loses nothing (watermark +
-  the client keeps refused rows while `cap.known === false`). Stored claims re-count with the lenient cap.
+  the payment service; an outage keeps Pass events open but the FREE cap, and loses nothing (refused-in-outage claims sit in
+  `ev_hold`, honoured only for a player later known paid, never past 26 h). A new claim is admitted only if it
+  pushes no counted fight out (`admits()`); stored claims re-count with the lenient cap. While signed in with the
+  entitlement not yet known (`paidKnown` hook), the client banks under `PAID_CAP` and lets the server trim.
+  Syncs send only rows since the server's `since` (≤ 400); server limit 1000 rows.
 - **Tower fights go through main.js hooks** `startFight(m)` / `endFight()` / `currentMatch()` (like the
-  ghost fights' `startNetFight`), with `match.tower` set; quitting from pause records nothing. The result is
+  ghost fights' `startNetFight`), with `match.tower` set. FIGHT books a provisional loss (`pend`), so quitting or reloading counts as a loss;
+  rows are stamped at the fight's start, 3 s minimum gap, 120 a day. Admin: `ragdojo-arena tower-list` /
+  `tower-drop <uid> <n>` (a `won = -n` row; never a fight). Ship the client before dropping anyone. The result is
   also dispatched as a campaign `ragdojo:battle` (`id: 'tower:…'`), so the other events bank it.
 - Tower balance lives in `tools/eventtower.mjs`, not in config.js: the opponent is relative to the player,
   so the same table holds for a white belt and a maxed save. Re-run `--check` after touching Brain/Match.
-- **Module identity**: every changed js/events import carries `?v=20261014-ev` from every importer, so
+- **Module identity**: every changed js/events import carries `?v=20261015-evf` from every importer, so
   the URLs agree and each module loads once.
 
 ```
