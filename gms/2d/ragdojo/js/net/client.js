@@ -241,7 +241,8 @@ export class NetLink {
 /**
  * The arena server connection. Events: welcome, me, lobby, friend, offer, accepted, go,
  * result, void, cancel, left, rematch, err, closed, link (peer, direct), rtt, data, and for
- * multi-player rooms: out (a seat is eliminated), master (host migration).
+ * multi-player rooms: out (a seat is eliminated), master (host migration); quickgo (a quick
+ * fight against ghosts only, run on this device).
  */
 export class ArenaClient {
   constructor(base) {
@@ -372,6 +373,8 @@ export class ArenaClient {
   auth(tok) { this._raw({ t: 'auth', tok }); }
   lobby(on) { this._raw({ t: 'lobby', on }); }
   wait(type = 'duel') { this._raw({ t: 'wait', type }); }
+  /** QUICK FIGHT: join (or open) this mode's quick window. Pressing it is the yes, so it pays. */
+  quick(type, tok) { this._raw({ t: 'quick', type, tok: tok || '' }); }
   unwait() { this._raw({ t: 'unwait' }); }
   challenge(to) { this._raw({ t: 'challenge', to }); }
   friend(type = 'duel') { this._raw({ t: 'friend', type }); }
@@ -409,6 +412,7 @@ export class ArenaClient {
       case 'sig': { const l = this.links.get(m.from); if (l) l.onSignal(m.d); return; }
       case 'offer': this._syncLinks(m.peers.map((p) => p.id), m.ice); if (m.room) this._roomPing(m.match); break;
       case 'go': this.inMatch = true; this._stopRoomPing(); break;
+      case 'quickgo': this._stopRoomPing(); this._dropLinks(); break;   // just you and ghosts: played here
       case 'result': this.inMatch = false; break;
       case 'out': if (m.you) { this.inMatch = false; this._dropLinks(); } break;
       case 'cancel': case 'void': case 'left': this.inMatch = false; this._stopRoomPing(); this._dropLinks(); break;

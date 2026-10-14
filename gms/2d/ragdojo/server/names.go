@@ -4,6 +4,7 @@ package main
 import (
 	"crypto/rand"
 	"errors"
+	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -63,7 +64,7 @@ func cleanName(s string) (string, error) {
 			space = true
 			continue
 		case unicode.IsControl(r), unicode.Is(unicode.Cf, r), unicode.Is(unicode.Co, r),
-			unicode.Is(unicode.Cs, r), r == '<', r == '>', r == utf8.RuneError:
+			unicode.Is(unicode.Cs, r), r == '<', r == '>', r == '*', r == utf8.RuneError:
 			continue
 		}
 		if space && b.Len() > 0 {
@@ -83,6 +84,24 @@ func cleanName(s string) (string, error) {
 		return "", errBadName
 	}
 	return out, nil
+}
+
+// The names quick-fight ghosts of the RANDOM personality go by: what people actually type, or
+// the "Fighter 1234" everyone starts as. A ghost's name always ends in "*", which typed names
+// cannot (cleanName drops it), so no person can pass as one or be taken for one.
+var ghostNames = []string{"Maddy", "jaxon", "Tomo", "lil kev", "Priya", "ZacAttack", "Noodle", "Ollie B", "inkboi",
+	"Mia", "Kiran", "Hamish", "sasha.k", "Big Dave", "Leo", "Ruby", "Fin", "Ayaan", "Charlie", "toby123", "Ella",
+	"Mateo", "Hugo", "Isla", "Arlo", "Zara", "Jun", "Nikhil", "Tane", "Sione", "Ava", "Lachie", "Bodhi", "Matilda",
+	"Rangi", "Aroha", "Wei", "Yuki", "Dev", "NinjaNat", "SkyeK", "max power", "Theo", "Lily", "Kai", "Pip",
+	"Harry P", "Sami", "Rosie", "Jas", "Benji", "Coco", "dino dan", "Ivy", "Eli", "Nora", "Ravi", "Luca", "Mo",
+	"Ezra", "stickman99", "Penny", "Oscar", "Juno", "Aiden", "Grace", "Wren", "Ted"}
+
+// ghostName: one of those, or a default "Fighter NNNN" about one time in five.
+func ghostName(r interface{ Intn(int) int }) string {
+	if r.Intn(5) == 0 {
+		return "Fighter " + strconv.Itoa(1000+r.Intn(9000))
+	}
+	return ghostNames[r.Intn(len(ghostNames))]
 }
 
 // Substring matches: no innocent English word contains these.

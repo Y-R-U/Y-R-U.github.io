@@ -1,11 +1,22 @@
 // Enemy brain. Also drives both fighters in the menu demo matches and the player's
 // opponents in bully mode. `skill` (0..1) scales reaction time, spacing and aggression.
 
-import { moveStats, MOVE_SETS } from './config.js';
+import { moveStats, MOVE_SETS, SHEET_W, WALL_PAD } from './config.js';
 
 const PREFER = ['power', 'rise', 'dash', 'flipF', 'slam', 'toss', 'flipB', 'bomb'];
 const KIND_ORDER = ['power', 'rise', 'dash', 'knives', 'flipF', 'slam', 'toss', 'gun', 'flipB', 'bomb'];
 const KIND = Object.fromEntries(Object.values(MOVE_SETS).flat().map((m) => [m.id, m.kind]));
+const RANGED = ['toss', 'bomb', 'gun', 'knives'];
+
+/**
+ * A fighting style for Brain (quick-fight ghost personalities, js/net/quick.js). Every field is
+ * a nudge on the plain Brain: react/block scale how it answers an incoming swing, keep is a
+ * distance (in reaches) it likes to hover at, runAfter how long it backs off after a hit, aggro
+ * its appetite for swinging, special for specials, think its reaction time. Without a style,
+ * Brain runs exactly as it always has (the campaign and sim balance depend on that).
+ */
+export const PLAIN_STYLE = { react: 1, block: 1, counter: false, keep: 0, runAfter: 0, aggro: 1, retreat: 1,
+  special: 1, ranged: false, think: 1, chain: false };
 
 export class Brain {
   constructor(f, skill = 0.5, moveIds = [], save = null, opts = {}) {
@@ -23,6 +34,14 @@ export class Brain {
     this.moves = moveIds;
     this.jumpCd = 0;
     this.hesitate = 0.34 - skill * 0.28;
+    this.style = null;
+    if (opts.style) this.setStyle(opts.style);
+  }
+
+  setStyle(style) {
+    this.style = { ...PLAIN_STYLE, ...style };
+    this.goIn = 0;
+    this.counterT = 0;
   }
 
   /** @param world {minX,maxX,groundY} @param ctxInfo {targets, projectiles, hazards} */
@@ -32,6 +51,7 @@ export class Brain {
     this.jumpCd -= dt;
     this.think -= dt;
     this.intentT -= dt;
+    if (this.style) { this.counterT -= dt; this.goIn -= dt; }
 
     const t = this.pickTarget(info.targets);
     if (!t) { f.move(0, dt); return; }
@@ -58,11 +78,17 @@ export class Brain {
 
     if (this.think <= 0) {
       this.think = this.hesitate * (0.6 + Math.random() * 0.8);
-      this.decide(t, dist, info);
+      if (this.style) { this.think *= this.style.think; this.decideStyled(t, dist); }
+      else this.decide(t, dist, info);
     }
 
     const reach = 74 * f.scale;
-    if (this.intent === 'approach') {
+    if (this.intent === 'hover') {
+      // Hold a distance: close in if too far, back off if too near, otherwise shuffle in place.
+      const want = reach * this.style.keep;
+      this.dir = dist > want * 1.2 ? dir : dist < want * 0.8 && !this.cornered() ? -dir : 0;
+      this.wantBlock = false;
+    } else if (this.intent === 'approach') {
       this.dir = dist > reach * 0.9 ? dir : 0;
       this.wantBlock = false;
     } else if (this.intent === 'retreat') {
@@ -92,6 +118,62 @@ export class Brain {
       if (d < bd) { bd = d; best = t; }
     }
     return best;
+  }
+
+  /** Backed against a wall: retreating gets nowhere. */
+  cornered() {
+    const f = this.f;
+    return f.x < WALL_PAD + 140 || f.x > SHEET_W - WALL_PAD - 140;
+  }
+
+  /** decide() with a style. Same shape: answer a swing, then by distance swing / close in / hold off. */
+  decideStyled(t, dist) {
+    const f = this.f, st = this.style;
+    const reach = 74 * f.scale;
+    const s = this.skill;
+    const r = Math.random();
+
+    if (t.attack && dist < reach * 1.5 && r < (0.25 + s * 0.6) * st.react) {
+      const block = r < (0.1 + s * 0.35) * st.block;
+      this.intent = block ? 'block' : st.retreat >= 1 || Math.random() < st.retreat ? 'retreat' : 'approach';
+      if (block && st.counter) this.counterT = 0.6;
+      return;
+    }
+    // Their swing is over and we blocked it: hit back at once.
+    if (st.counter && this.counterT > 0 && !t.attack && dist < reach * 1.3 && f.canAct) {
+      this.counterT = 0;
+      if (!this.trySpecial(dist)) f.strike();
+      this.intent = 'approach';
+      return;
+    }
+    if (f.hp < f.maxHp * 0.28 && r < (0.16 + s * 0.2) * st.retreat) { this.intent = 'retreat'; return; }
+
+    // A hit-and-run or ranged style hovers at its distance and only sometimes goes in.
+    if (st.keep && this.goIn <= 0) {
+      if (f.canAct && dist > reach * 1.4 && r < (0.2 + s * 0.4) * st.special) this.trySpecial(dist);
+      this.intent = 'hover';
+      if (dist < reach * 1.1 && this.cornered()) this.goIn = 0.6;
+      else if (Math.random() < (st.ranged ? 0.06 : 0.22) * st.aggro * (0.6 + s)) this.goIn = 1.2;
+      return;
+    }
+    if (dist < reach) {
+      if (f.canAct) {
+        const sp = this.trySpecial(dist);
+        if (!sp && r < (0.55 + s * 0.4) * st.aggro) {
+          f.strike();
+          if (st.chain) this.think = Math.min(this.think, 0.12);
+          if (st.runAfter) { this.goIn = 0; this.intent = 'retreat'; this.think = st.runAfter; return; }
+        }
+      }
+      this.intent = r < 0.25 * st.retreat ? 'retreat' : 'approach';
+    } else if (dist < reach * 3.2) {
+      if (f.canAct && r < (0.14 + s * 0.34) * st.special) this.trySpecial(dist);
+      this.intent = r < (0.72 + s * 0.2) * Math.min(1.3, st.aggro) ? 'approach' : st.block > 1.5 ? 'block' : 'circle';
+      this.circleDir = Math.random() < 0.5 ? -1 : 1;
+    } else {
+      if (f.canAct && r < (0.10 + s * 0.22) * st.special) this.trySpecial(dist);
+      this.intent = 'approach';
+    }
   }
 
   decide(t, dist, info) {
@@ -133,9 +215,10 @@ export class Brain {
     const f = this.f;
     if (!this.moves.length) return false;
     const reach = 74 * f.scale;
-    const order = this.byKind
+    let order = this.byKind
       ? KIND_ORDER.flatMap((k) => this.moves.filter((id) => KIND[id] === k))
       : PREFER.filter((id) => this.moves.includes(id));
+    if (this.style?.ranged) order = [...order.filter((id) => RANGED.includes(KIND[id])), ...order.filter((id) => !RANGED.includes(KIND[id]))];
     for (const id of order) {
       if (f.cooldown(id) > 0) continue;
       const k = this.byKind ? KIND[id] : id;
@@ -145,7 +228,7 @@ export class Brain {
         k === 'flipB' ? dist < reach * 1.2 :
         dist < reach * 1.25;
       if (!good) continue;
-      if (Math.random() > 0.35 + this.skill * 0.6) continue;
+      if (Math.random() > Math.min(0.97, (0.35 + this.skill * 0.6) * (this.style ? this.style.special : 1))) continue;
       if (this.save) {
         const m = moveStats(this.save, id);
         return m ? f.special(m) : false;

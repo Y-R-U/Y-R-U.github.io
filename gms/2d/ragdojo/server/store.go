@@ -165,6 +165,28 @@ func (s *store) recordMatch(id, typ string, friend bool, score string, seats []s
 	return nil
 }
 
+// recordQuick: a QUICK FIGHT with two or more people. Never ranked: logged in `matches` (score
+// tagged "quick") and handed to afterMatch for event points, but no player, by_type or daily
+// row — the boards and stats never see it. The per-pair cap still applies (a separate daily
+// counter from ranked play), so two accounts cannot farm event points off each other.
+func (s *store) recordQuick(id, typ, score string, seats []seatRow) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return
+	}
+	defer tx.Rollback()
+	if _, err := tx.Exec(`INSERT OR IGNORE INTO matches(id,type,friend,players,winner_uid,score,day,at) VALUES(?,?,0,?,'',?,?,?)`,
+		id, typ, len(seats), score+" quick", s.day(), s.now().Unix()); err != nil {
+		return
+	}
+	if err := s.capPairs(tx, s.day()+"/quick", seats); err != nil || tx.Commit() != nil {
+		return
+	}
+	if s.afterMatch != nil {
+		s.afterMatch(id, seats)
+	}
+}
+
 func pairOf(a, b string) (string, string) {
 	if a > b {
 		return b, a

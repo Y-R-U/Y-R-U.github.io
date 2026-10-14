@@ -32,6 +32,13 @@ export const REST_LO = WALL_PAD + 330, REST_HI = SHEET_W - REST_LO;
 
 const q10 = (v) => Math.round(v * 10) / 10;
 
+/** Shorten a name for a tight spot without losing a quick-fight ghost's trailing "*". */
+export function shortName(s, n) {
+  s = String(s ?? '');
+  if (s.length <= n) return s;
+  return s.endsWith('*') ? s.slice(0, n - 1) + '*' : s.slice(0, n);
+}
+
 /** Even spacing across the page; which slot stands where is shuffled by the match seed. */
 export function spawnXs(n, seed = 0) {
   if (n <= 2) {
@@ -428,14 +435,14 @@ export class ModeLayer {
       if (f === m.player && !f.dead) continue;
       const hx = f.dead ? f.rag.centre()[0] : f.rag.x[P.HEAD];
       const hy = f.dead ? GROUND_Y - 70 : f.rag.y[P.HEAD] - 34 * f.scale;
-      let text = f === m.player ? 'YOU' : (f.netName || f.name);
+      let text = f === m.player ? 'YOU' : shortName(f.netName || f.name, 14);
       if (f.gone) text += ' · left';
       else if (f.dead && f.respawnT > 0) text += ` · back in ${Math.ceil(f.respawnT)}`;
       else if (f.dead && f.out) text += ' · out';
       ctx.font = `700 ${f.dead ? 20 : 22}px ${FONT}`;
       ctx.fillStyle = f === m.player ? '#2f6ad0' : f.dead ? '#8a8f9a' : '#a8322c';
       ctx.globalAlpha = f.dead ? 0.8 : 0.95;
-      ctx.fillText(text.length > 18 ? text.slice(0, 17) + '…' : text, hx, hy);
+      ctx.fillText(text, hx, hy);
     }
     ctx.restore();
   }
@@ -461,7 +468,7 @@ export function drawModeHUD(ctx, vw, vh, m) {
   for (const r of shown) {
     const me = r.f === m.player;
     const col = me ? '#2f6ad0' : r.f.dead ? '#9aa0ad' : '#3a4050';
-    const name = me ? 'YOU' : (r.f.netName || r.f.name).slice(0, 9);
+    const name = me ? 'YOU' : shortName(r.f.netName || r.f.name, 9);
     const held = m.obj && m.obj.holder === r.i;
     const val = scoring ? `${Math.floor(r.s)}s` : r.f.dead ? (r.f.gone ? 'left' : 'out') : `${Math.round(100 * r.f.hp / r.f.maxHp)}%`;
     handText(ctx, val, x1, y, rh * 0.86, col, 'right');

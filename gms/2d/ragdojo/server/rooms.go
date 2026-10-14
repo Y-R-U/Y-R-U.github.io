@@ -53,7 +53,7 @@ func isRoomType(t string) bool { return t == "lms" || t == "bandana" || t == "hi
 func (h *hub) joinRoom(c *client, typ string) {
 	var best *match
 	for _, m := range h.matches {
-		if m.room && !m.friend && m.typ == typ && m.state == mLobby && len(m.seats) < roomMax &&
+		if m.room && !m.friend && !m.quick && m.typ == typ && m.state == mLobby && len(m.seats) < roomMax &&
 			(best == nil || len(m.seats) > len(best.seats) || (len(m.seats) == len(best.seats) && m.id < best.id)) {
 			best = m
 		}
@@ -131,7 +131,7 @@ func (h *hub) roomAccept(m *match, c *client, tok string) {
 
 func (h *hub) startEarly(c *client, id string) {
 	m := h.mine(c, id)
-	if m == nil || !m.room || m.state != mLobby || m.seats[0].c != c || len(m.seats) < 2 {
+	if m == nil || !m.room || m.quick || m.state != mLobby || m.seats[0].c != c || len(m.seats) < 2 {
 		return
 	}
 	h.startRoom(m)
@@ -198,6 +198,16 @@ func (h *hub) roomBegin(m *match) {
 		}
 	}
 	m.seats = kept
+	if m.quick && len(kept) > 0 {
+		if len(m.ghosts) < quickTarget(m.typ)-len(kept) { // someone was dealt out: a ghost takes the seat
+			h.quickPlan(m, true)
+			h.quickStrength(m)
+		}
+		if len(kept) == 1 {
+			h.quickLocal(m, kept[0])
+			return
+		}
+	}
 	if len(kept) < 2 {
 		h.cancel(m, "allowance", nil)
 		return
@@ -289,7 +299,9 @@ func (h *hub) leaveRoom(m *match, c *client, why string) {
 		m.seats = append(m.seats[:slot], m.seats[slot+1:]...)
 		if len(m.seats) == 0 {
 			h.closeMatch(m)
-		} else if m.state == mStarting && len(m.seats) < 2 {
+		} else if m.quick && m.state == mLobby {
+			h.quickChanged(m)
+		} else if m.state == mStarting && len(m.seats) < 2 && !m.quick {
 			h.cancel(m, "left", nil)
 		} else if m.state == mLobby {
 			h.roomChanged(m)
@@ -332,7 +344,7 @@ func (h *hub) eliminate(m *match, slot int, why string) {
 	case len(left) == 0:
 		h.void(m, "empty", nil)
 		return
-	case len(left) == 1:
+	case len(left) == 1 && len(m.ghosts) == 0: // with ghosts in, the last person fights on
 		h.finishRoom(m, left[0], nil, true)
 		return
 	}
@@ -390,7 +402,7 @@ func (h *hub) tickRooms(now time.Time) {
 }
 
 func (h *hub) roomReport(m *match, c *client, round, winner int, ko bool, place, dmg []int) {
-	if m.state != mPlay || round != m.round || winner < -1 || winner >= len(m.seats) {
+	if m.state != mPlay || round != m.round || winner < -1 || winner >= m.fighters() {
 		return
 	}
 	slot := m.slotOf(c)
@@ -407,7 +419,7 @@ func (h *hub) roomReport(m *match, c *client, round, winner int, ko bool, place,
 			m.firstIn[i] = !s.out
 		}
 	}
-	m.reports[slot] = report{winner, ko, placeKey(place, len(m.seats)), dmgKey(dmg, len(m.seats))}
+	m.reports[slot] = report{winner, ko, placeKey(place, m.fighters()), dmgKey(dmg, m.fighters())}
 	h.checkRoomReports(m)
 }
 
@@ -435,7 +447,7 @@ func (h *hub) checkRoomReports(m *match) {
 	if first == nil {
 		return
 	}
-	if first.winner >= 0 && m.seats[first.winner].out && !m.wasIn(first.winner) {
+	if first.winner >= 0 && first.winner < len(m.seats) && m.seats[first.winner].out && !m.wasIn(first.winner) {
 		h.void(m, "disagree", nil)
 		return
 	}
@@ -465,7 +477,7 @@ func (m *match) cmp(r report) report {
 }
 
 func (h *hub) countRoom(m *match, r report) {
-	if r.winner >= 0 && r.ko {
+	if r.winner >= 0 && r.winner < len(m.seats) && r.ko {
 		m.seats[r.winner].kos++
 	}
 	m.dmg = parseDmg(r.dmg)
@@ -493,7 +505,7 @@ func (h *hub) disputeRoom(m *match) {
 			best, bestN = r, len(l)
 		}
 	}
-	if bestN >= 2 && bestN*2 > in && (best.winner < 0 || !m.seats[best.winner].out || m.wasIn(best.winner)) {
+	if bestN >= 2 && bestN*2 > in && (best.winner < 0 || best.winner >= len(m.seats) || !m.seats[best.winner].out || m.wasIn(best.winner)) {
 		var bad []string
 		ok := true
 		for i, s := range m.seats {
@@ -596,9 +608,12 @@ func serverPlace(m *match, winner int) []int {
 		}
 		return sa.outSeq > sb.outSeq
 	})
-	place := make([]int, len(m.seats))
+	place := make([]int, m.fighters())
 	for rank, i := range idx {
 		place[i] = rank + 1
+	}
+	for g := len(m.seats); g < len(place); g++ {
+		place[g] = g + 1
 	}
 	return place
 }
@@ -606,20 +621,31 @@ func serverPlace(m *match, winner int) []int {
 // finishRoom records one room: the winner (or nobody, a draw) and everyone's placing. The
 // room closes at once; "again" is a fresh wait.
 func (h *hub) finishRoom(m *match, winner int, place []int, ff bool) {
-	if len(place) != len(m.seats) {
+	if len(place) != m.fighters() {
 		place = serverPlace(m, winner)
 	}
 	m.state = mDone
 	rows := make([]seatRow, len(m.seats))
-	names := make([]string, len(m.seats))
+	names := make([]string, m.fighters())
 	early := ff && h.earlyForfeit(m)
+	// A quick fight ranks its people among themselves: ghost seats are not in the ranking.
+	hw := winner
+	if m.quick {
+		hw = humanWinner(place, len(m.seats))
+	}
 	for i, s := range m.seats {
-		rows[i] = seatRow{UID: s.uid, Name: s.name, Won: i == winner, KOs: s.kos, Ranked: s.ranked, Loadout: s.c.loadout, OppDmg: oppDmg(m.dmg, i)}
+		rows[i] = seatRow{UID: s.uid, Name: s.name, Won: i == hw, KOs: s.kos, Ranked: s.ranked, Loadout: s.c.loadout, OppDmg: oppDmg(m.dmg, i)}
+		if m.quick {
+			rows[i].OppDmg = humanOppDmg(m.dmg, i, len(m.seats))
+		}
 		if early {
 			rows[i].NoEvent = true
 			rows[i].NoStats = i == winner
 		}
 		names[i] = s.name
+	}
+	for j, g := range m.ghosts {
+		names[len(m.seats)+j] = g.Name
 	}
 	score := "place " + placeKey(place, len(place))
 	if ff {
@@ -629,15 +655,19 @@ func (h *hub) finishRoom(m *match, winner int, place []int, ff bool) {
 		score += " early"
 	}
 	score += m.note
-	if err := h.st.recordMatch(m.id, m.typ, m.friend, score, rows); err != nil {
-		log.Printf("match %s: stats write failed: %v", m.id, err)
-	}
-	if h.lan {
-		h.st.recordLan(m.id, m.typ, ff, rows)
+	if m.quick {
+		h.st.recordQuick(m.id, m.typ, score, rows)
+	} else {
+		if err := h.st.recordMatch(m.id, m.typ, m.friend, score, rows); err != nil {
+			log.Printf("match %s: stats write failed: %v", m.id, err)
+		}
+		if h.lan {
+			h.st.recordLan(m.id, m.typ, ff, rows)
+		}
 	}
 	who := "nobody"
 	if winner >= 0 {
-		who = m.seats[winner].id
+		who = names[winner]
 	}
 	log.Printf("match %s (%s): %s won, %s (%s)", m.id, m.typ, who, score, strings.Join(m.log, ", "))
 	for i, s := range m.seats {
@@ -645,8 +675,11 @@ func (h *hub) finishRoom(m *match, winner int, place []int, ff bool) {
 			continue
 		}
 		out := map[string]any{"t": "result", "match": m.id, "mode": m.typ, "winner": winner, "you": i, "place": place,
-			"names": names, "counted": s.ranked && !rows[i].NoStats, "forfeit": ff}
-		if s.ranked {
+			"names": names, "counted": s.ranked && !rows[i].NoStats && !m.quick, "forfeit": ff}
+		if m.quick {
+			out["quick"], out["hwin"] = true, hw
+		}
+		if s.ranked && !m.quick {
 			if line, ok := h.st.mine(s.uid); ok {
 				out["stats"] = line
 			}

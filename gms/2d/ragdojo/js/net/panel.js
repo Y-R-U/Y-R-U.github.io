@@ -13,8 +13,9 @@ const FRIENDS_KEY = 'ragdojo.arena.friends';
 
 /**
  * The arena's modes, in the order the PLAY tab lists them. A mode with `live: true` gets
- * FIND A FIGHT (waits in the lobby with its id as the game type) and FRIEND LINK; the rest
- * show "coming soon". Flip `live` here when a mode ships. `short` labels its leaderboard tab.
+ * FIND A FIGHT (waits in the lobby with its id as the game type), FRIEND LINK and QUICK FIGHT
+ * (always a match: unfilled seats go to ghost players); the rest show "coming soon". Flip
+ * `live` here when a mode ships. `short` labels its leaderboard tab.
  */
 export const MODES = [
   { id: 'duel', name: '1v1 · BEST OF 3', short: '1v1', desc: 'live, against a real person', lanDesc: 'on your home network', live: true },
@@ -41,7 +42,8 @@ function forfeitLine(r, won) {
     silent: 'Your game stopped reporting the result — that counts as a forfeit.',
     lagging: 'Your game stopped reporting the result — that counts as a forfeit.' }[r.why] || 'You left the match — that counts as a forfeit.') + early;
 }
-const SIGNIN = 'Sign in (the account button) for ranked fights. Friend links still work without an account.';
+const SIGNIN = 'Sign in (the account button) for ranked and quick fights. Friend links still work without an account.';
+const QUICK_NOTE = '*unfilled slots are filled by ghost players';
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 /** Signal bars for a ping: 5 green = good, 2-3 yellow = average, 1 red = bad. */
@@ -86,6 +88,7 @@ export function mountArena(h) {
   let wantRematch = false, myAccepted = false, pingT = 0;
   let room = null, roomAt = 0, roomT = 0, practice = null, practiceResult = null, lastMode = 'duel';
   let tab = 'play', ghosts = null, ghostErr = '', ghostFight = null, ghostResult = null, uploadedFor = '';
+  let quickRoom = null, quickAt = 0, quickT = 0, quickMode = 'duel', quickFight = null, quickResult = null, arenaDown = false;
   const boards = createBoards({
     base: () => base, token,
     types: () => MODES.filter((m) => m.live),
@@ -126,6 +129,46 @@ export function mountArena(h) {
     h.startNetFight(f);
   }
 
+  /**
+   * A quick fight nobody else joined: the server picked the ghosts (`quickgo`); the whole fight
+   * runs on this device, like practice, and nothing is reported back. For the special events it
+   * counts as a campaign-class battle (`src: 'campaign', kind: 'quick'`).
+   */
+  function startQuickLocal(q) {
+    if (quickFight) quickFight.destroy();
+    if (q.freeLeft >= 0) allowanceLine = `${q.freeLeft} free battle${q.freeLeft === 1 ? '' : 's'} left today`;
+    const f = quickFight = new LocalFight({
+      mode: q.mode, ghosts: q.ghosts, seed: q.arena | 0, save: h.getSave(),
+      onRound: (lf) => { if (quickFight === lf) h.startNetFight(lf); },
+      onDone: (v) => {
+        if (quickFight !== f || h.currentMatch() !== f.match) return;
+        quickFight = null;
+        const ens = f.match.all.slice(1);
+        const battle = { id: 'quick:' + q.match, at: Date.now(), src: 'campaign', kind: 'quick', ranked: false, won: v.winner === 0,
+          oppDmg: ens.length ? Math.max(...ens.map((x) => Math.max(0, Math.min(1, 1 - x.hp / (x.maxHp || 1))))) : 0 };
+        try { window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail: battle })); } catch {}
+        quickResult = { mode: q.mode, v, score: v.score, names: f.match.all.map((x) => (x === f.match.player ? 'YOU' : x.netName)), battle };
+        h.endNetFight();
+        view = 'quickResult';
+        open();
+      },
+    });
+    view = 'home';
+    h.overlay(null);
+    h.startNetFight(f);
+    closeIdle();
+  }
+
+  async function quick(type = 'duel') {
+    note = '';
+    quickMode = type;
+    quickRoom = null;
+    view = 'quick';
+    paint();
+    try { await ensure(); } catch { arenaDown = true; msg('Could not reach the arena.'); return; }
+    client.quick(type, await token());
+  }
+
   async function probe() {
     const pm = MODES.find((m) => m.room && m.id === qs.get('mode'));
     if (pm && !practice) startPractice(pm.id, practiceBots(qs.get('bots')));
@@ -155,13 +198,21 @@ export function mountArena(h) {
     c.on('err', (m) => {
       if (m.code === 'allowance') { note = `<span class="warn">${esc(m.msg)}</span> <button class="btn small" data-a="upgrade">SUPPORT / PASS</button>`; view = 'home'; }
       else if (m.code === 'signin') { note = `<span class="warn">${SIGNIN}</span>`; if (view !== 'result') view = 'home'; }
-      else if (m.code === 'slow') { note = `<span class="warn">${esc(m.msg || 'Slow down a moment.')}</span>`; if (view === 'joining') view = 'home'; }
-      else { note = `<span class="warn">${esc(m.msg)}</span>`; if (view === 'lobby' || view === 'joining') view = 'home'; }
+      else if (m.code === 'slow') { note = `<span class="warn">${esc(m.msg || 'Slow down a moment.')}</span>`; if (view === 'joining' || view === 'quick') view = 'home'; }
+      else { note = `<span class="warn">${esc(m.msg)}</span>`; if (view === 'lobby' || view === 'joining' || view === 'quick') view = 'home'; }
       paint();
     });
     c.on('lobby', (m) => { lobby = m.players || []; paint(); });
     c.on('friend', (m) => { friend = m; view = 'friend'; paint(); });
     c.on('offer', async (m) => {
+      if (m.quick) {
+        quickRoom = m; quickAt = performance.now(); matchId = m.match; quickMode = lastMode = m.type;
+        if (view !== 'quick') open();
+        view = 'quick'; paint();
+        clearInterval(quickT);
+        quickT = setInterval(() => { if (view !== 'quick') { clearInterval(quickT); return; } paintQuickClock(); }, 250);
+        return;
+      }
       if (m.room) {
         const first = room?.match !== m.match;
         room = m; roomAt = performance.now(); matchId = m.match; lastMode = m.type; view = 'room'; open(); paint();
@@ -179,8 +230,10 @@ export function mountArena(h) {
     c.on('accepted', () => { oppAccepted = true; paint(); });
     c.on('rtt', () => { if (view === 'offer') paint(); });
     c.on('link', () => { if (view === 'offer') paint(); });
+    c.on('quickgo', (q) => { clearInterval(quickT); quickRoom = null; startQuickLocal(q); });
     c.on('go', (g) => {
       if (view === 'room') { view = 'home'; clearInterval(roomT); }
+      if (view === 'quick') { view = 'home'; clearInterval(quickT); }
       if (fight && fight.matchId === g.match && fight.round === g.round) fight.resync(g); else startRound(g);
     });
     c.on('out', (m) => {
@@ -213,15 +266,17 @@ export function mountArena(h) {
         msg(why);
       });
     }
-    c.on('closed', () => msg('Lost the connection to the arena.'));
+    c.on('closed', () => { if (!fight) arenaDown = true; msg('Lost the connection to the arena.'); });
   }
 
   /** An agreed arena result for js/events (src 'arena'; oppDmg = the most-damaged opponent in the
    * deciding round). The events listener writes back `award`; the server counts it on its own. */
   function arenaBattle(r) {
-    const ens = fight?.match?.enemies || [];
+    // A quick fight ranks its people among themselves: ghost seats count for neither the win nor oppDmg.
+    const ens = (fight?.match?.enemies || []).filter((f) => !r.quick || f.slot < (fight.humans ?? Infinity));
     const oppDmg = ens.length ? Math.max(...ens.map((f) => Math.max(0, Math.min(1, 1 - f.hp / (f.maxHp || 1))))) : 0;
-    const detail = { id: 'arena:' + r.match, at: Date.now(), src: 'arena', kind: r.mode || 'duel', ranked: !!r.counted, won: r.winner === r.you, oppDmg };
+    const won = r.quick ? r.hwin === r.you : r.winner === r.you;
+    const detail = { id: 'arena:' + r.match, at: Date.now(), src: 'arena', kind: r.mode || 'duel', ranked: !!r.counted, won, oppDmg, ...(r.quick ? { quick: true } : {}) };
     try { window.dispatchEvent(new CustomEvent('ragdojo:battle', { detail })); } catch {}
     return detail.award?.pts || 0;
   }
@@ -387,13 +442,17 @@ export function mountArena(h) {
       if (view !== 'msg' && note) html += `<p class="arenanote">${note}</p>`;
       if (allowanceLine) html += `<p class="fine">${esc(allowanceLine)}</p>`;
       const canLobby = lan || !me || me.lobby;
+      const canQuick = canLobby && !arenaDown;
       for (const m of MODES) {
         if (!m.live) { html += `<div class="mode soon"><div><b>${m.name}</b><small>${m.desc}</small></div><span class="soonTag">coming soon</span></div>`; continue; }
         html += `<div class="mode"><div><b>${m.name}</b><small>${lan && m.lanDesc ? m.lanDesc : m.desc}</small></div>
           <button class="btn" data-a="find" data-mode="${m.id}"${canLobby ? '' : ' disabled'}>FIND A FIGHT</button>
-          <button class="btn" data-a="friend" data-mode="${m.id}">FRIEND LINK</button>${m.room ? `<button class="btn" data-a="practice" data-mode="${m.id}">PRACTICE</button>` : ''}</div>`;
+          <button class="btn" data-a="friend" data-mode="${m.id}">FRIEND LINK</button>
+          <button class="btn quickbtn" data-a="quick" data-mode="${m.id}"${canQuick ? '' : ' disabled'}>QUICK FIGHT</button></div>`;
       }
-      if (!canLobby) html += `<p class="fine">Sign in (the account button) to fight strangers. Friend links work without an account.</p>`;
+      if (arenaDown) html += `<p class="fine">The arena is offline right now, so QUICK FIGHT is off. It comes back by itself.</p>`;
+      else if (!canLobby) html += `<p class="fine">Sign in (the account button) to fight strangers or start a quick fight. Friend links work without an account.</p>`;
+      else html += `<p class="fine">QUICK FIGHT always finds a match in about 10 s: ${QUICK_NOTE.slice(1)}. Never ranked.</p>`;
       html += `<div class="mode"><div><b><span class="ghosttag">GHOST</span> FIGHTS</b><small>a real player's ghost, any time — never ranked</small></div>
         <button class="btn" data-a="ghosts">SEE GHOSTS</button></div>`;
     } else if (view === 'lobby') {
@@ -435,6 +494,28 @@ export function mountArena(h) {
         : room.friend ? (room.host ? 'start when everyone is in' : 'waiting for the host to start') : `waiting for players — the countdown starts at ${room.quorum}`}</p>`;
       html += `<div class="vicbtns">${room.friend && room.host ? `<button class="btn big" data-a="start"${n < 2 ? ' disabled' : ''}>START</button>` : ''}` +
         `${room.friend ? `<button class="btn" data-a="copy">COPY LINK</button>` : ''}<button class="btn" data-a="stop">LEAVE</button></div>`;
+    } else if (view === 'quick') {
+      const M = MODES.find((x) => x.id === quickMode) || {};
+      const list = quickRoom?.list || [{ name: name || 'you', you: true }];
+      html += `<p class="vs">${esc(M.name || quickMode)}</p>
+        <p class="quickclock" id="quickClock">${quickClock()}</p>
+        <div class="lobby room quicklist">${list.map((e) => `<div class="lrow"><span class="lname"${e.you ? ' style="color:#2f6ad0"' : ''}>${e.you ? 'YOU' : esc(e.name)}${e.you && e.name ? ` <small>${esc(e.name)}</small>` : ''}</span></div>`).join('')}</div>
+        <div class="vicbtns"><button class="btn" data-a="stop">CANCEL</button></div>
+        <p class="fine quicknote">${QUICK_NOTE}</p>`;
+    } else if (view === 'quickResult' || (view === 'result' && result.quick)) {
+      const L = view === 'quickResult';
+      const R = L ? { ...quickResult, you: 0 } : { v: { winner: result.winner, place: result.place }, names: result.names, you: result.you, mode: result.mode, score: result.mode === 'duel' ? result.score : null };
+      const p = R.v.place?.[R.you] || 0;
+      const won = R.v.winner === R.you;
+      const sc = R.score && R.mode === 'duel' ? ` ${R.score[R.you] ?? 0} – ${R.score[1 - R.you] ?? 0}` : '';
+      html += `<h3 class="${won ? 'win' : 'lose'}">${won ? 'YOU WIN' : R.v.winner < 0 && p <= 1 ? 'A DRAW' : R.mode === 'duel' ? 'YOU LOSE' : `YOU CAME ${ordinal(p).toUpperCase()}`}${sc}</h3>`;
+      const order = (R.names || []).map((nm, i) => ({ nm: i === R.you ? 'YOU' : nm, p: R.v.place?.[i] || 99 })).sort((a, b) => a.p - b.p);
+      html += `<div class="rows">${order.map((o) => `<div class="r"><span>${ordinal(o.p)}</span><b>${esc(o.nm)}</b></div>`).join('')}</div>`;
+      if (!L && result.forfeit) html += `<p class="fine">${result.mode === 'duel' ? forfeitLine(result, won) : 'Everyone else left — the last one in wins.'}</p>`;
+      html += `<p class="fine">Quick fight — not ranked.${R.names?.some((n) => /\*$/.test(n)) ? ` ${QUICK_NOTE}` : ''}</p>`;
+      if (allowanceLine) html += `<p class="fine">${esc(allowanceLine)}</p>`;
+      html += evLine(L ? R.battle?.award?.pts : result.eventPts);
+      html += `<div class="vicbtns"><button class="btn big" data-a="quick" data-mode="${esc(R.mode)}">AGAIN</button><button class="btn" data-a="leave">DONE</button></div>`;
     } else if (view === 'practiceResult' || (view === 'result' && result.place)) {
       const R = view === 'result' ? { v: { winner: result.winner, place: result.place }, names: result.names, you: result.you, mode: result.mode } : { ...practiceResult, you: 0 };
       const p = R.v.place?.[R.you] || 0;
@@ -474,6 +555,14 @@ export function mountArena(h) {
     };
   }
 
+  function quickClock() {
+    if (!quickRoom) return 'looking for a fight…';
+    const left = Math.ceil((quickRoom.startIn - (performance.now() - quickAt)) / 1000);
+    return left > 0 ? `starts in ${left} s` : 'starting…';
+  }
+  /** The countdown ticks on its own: repainting the whole view under a thumb would eat a CANCEL tap. */
+  function paintQuickClock() { const e = $('quickClock'); if (e) e.textContent = quickClock(); }
+
   function setTab(t) {
     tab = t;
     if (view === 'msg') view = 'home';
@@ -503,7 +592,7 @@ export function mountArena(h) {
       if (a === 'find') await find(b.dataset.mode);
       else if (a === 'friend') await makeFriend(b.dataset.mode);
       else if (a === 'challenge') { client.challenge(b.dataset.id); }
-      else if (a === 'stop') { client?.unwait(); client?.leave(); client?.lobby(false); closeIdle(); view = 'home'; paint(); }
+      else if (a === 'stop') { client?.unwait(); client?.leave(); client?.lobby(false); closeIdle(); clearInterval(quickT); quickRoom = null; view = 'home'; paint(); }
       else if (a === 'copy') { try { await navigator.clipboard.writeText($('arenaLink').value); b.textContent = 'COPIED'; } catch { $('arenaLink').select(); } }
       else if (a === 'share') { navigator.share({ title: 'RAGDOJO', text: 'Fight me in RAGDOJO', url: $('arenaLink').value }).catch(() => {}); }
       else if (a === 'accept') { myAccepted = true; client.accept(matchId, await token()); paint(); }
@@ -513,6 +602,7 @@ export function mountArena(h) {
       else if (a === 'upgrade') { h.openUpgrade(); }
       else if (a === 'start') { client.start(matchId); }
       else if (a === 'again') { view = 'home'; await find(b.dataset.mode); }
+      else if (a === 'quick') { await quick(b.dataset.mode); }
       else if (a === 'practice') { view = 'home'; startPractice(b.dataset.mode); }
     } catch { msg('Could not reach the arena.'); }
   });
@@ -526,8 +616,9 @@ export function mountArena(h) {
 
   btn?.addEventListener('click', () => {
     h.click();
-    if (view === 'msg' || view === 'ghostResult' || (view === 'result' && !client)) view = 'home';
+    if (view === 'msg' || view === 'ghostResult' || view === 'quickResult' || (view === 'result' && !client)) view = 'home';
     open(); refreshAllowance();
+    if (base && arenaDown) ArenaClient.probe(base).then((up) => { if (up && arenaDown) { arenaDown = false; paint(); } });
     if (tab === 'ghosts') loadGhosts();
     if (tab === 'boards') boards.refresh();
   });
@@ -535,16 +626,20 @@ export function mountArena(h) {
     h.click();
     // Closing leaves whatever you were waiting in; a fight in progress is not closed from here.
     // The result card too: its rematch offer goes with it.
-    if (client && !fight) { client.unwait(); client.leave(); client.lobby(false); closeIdle(); view = 'home'; }
-    if (view === 'ghostResult' || view === 'msg') view = 'home';
+    if (client && !fight) { client.unwait(); client.leave(); client.lobby(false); closeIdle(); clearInterval(quickT); quickRoom = null; view = 'home'; }
+    if (view === 'ghostResult' || view === 'quickResult' || view === 'msg') view = 'home';
     h.overlay(null);
   });
 
   return {
     probe,
     /** QUIT mid-fight: leaving is a forfeit, which is the point. */
-    quit() { if (client) client.leave(); stopFight(); if (practice) { practice.destroy(); practice = null; } view = 'home'; },
+    quit() { if (client) client.leave(); stopFight(); if (practice) { practice.destroy(); practice = null; } if (quickFight) { quickFight.destroy(); quickFight = null; } view = 'home'; },
     get practice() { return practice; },
+    get quickFight() { return quickFight; },
+    get quickResult() { return quickResult; },
+    /** Gates: start a quick fight on a mode as the QUICK FIGHT button does. */
+    quick,
     practise: startPractice,
     get fight() { return fight; },
     get client() { return client; },

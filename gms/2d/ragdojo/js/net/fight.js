@@ -23,6 +23,7 @@ import { handText } from '../ui.js';
 import * as W from './wire.js';
 import * as Modes from './modes.js';
 import { ObjectiveBrain, objectiveFor } from './objective.js';
+import { GhostBrain, ghostSeats } from './quick.js';
 
 const STEP = 1 / 120;
 const SNAP_MS = 1000 / 30;
@@ -342,24 +343,28 @@ export class NetFight {
     this.you = o.go.you;
     this.masterSlot = o.go.master;
     this.isMaster = this.you === this.masterSlot;
-    this.ids = o.go.seats.map((s) => s.id);
+    // Quick fights: ghost seats come after the people's. Whoever is master runs their brains.
+    this.humans = o.go.seats.length;
+    const seats = [...o.go.seats, ...ghostSeats(o.go.ghosts)];
+    this.ids = seats.map((s) => s.id);
     this.masterId = this.ids[this.masterSlot];
     this.gone = new Set((o.go.out || []).map((v, i) => (v ? i : -1)).filter((i) => i >= 0));
     this.onReported = o.onReported || (() => {});
     this.onStall = o.onStall || (() => {});
-    const loadouts = o.go.seats.map((_, i) => (i === this.you ? o.loadout : [0, 1, 2, 3, 4, 5, 6, 7]));
+    const loadouts = seats.map((s, i) => (i === this.you ? o.loadout : s.ghost ? s.ghost.lo || [0] : [0, 1, 2, 3, 4, 5, 6, 7]));
     this.saves = loadouts.map(pvpSave);
     this.sheetLevel = arenaLevel(o.go.arena, this.mode);
     this.level = { ...this.sheetLevel };
     const dev = !!o.dev;
     this.bot = dev && qs.get('arenabot') === '1' ? { seed: Math.random() * 6, next: 0 } : null;
     this.match = new PvpMatch({
-      level: this.level, saves: this.saves, you: this.you, seats: o.go.seats, mode: this.mode, seed: o.go.arena,
+      level: this.level, saves: this.saves, you: this.you, seats, mode: this.mode, seed: o.go.arena,
       hpScale: dev && +qs.get('arenahp') > 0 ? +qs.get('arenahp') : 1,
       roundSecs: dev && +qs.get('arenasecs') > 0 ? +qs.get('arenasecs') : 0,
     });
     this.match.net = this;
     this.match.hudSave = this.saves[this.you];
+    this.brains = seats.map((s, i) => (s.ghost ? new GhostBrain(this.match.all[i], s.ghost, this.saves[i]) : null));
     for (const s of this.gone) this.match.eliminate(s);
     this.ready = new Set();
     this.acc = 0;
@@ -402,7 +407,7 @@ export class NetFight {
   }
 
   // ── shared ──────────────────────────────────────────────────────────────
-  peers() { return this.ids.filter((_, i) => i !== this.you && !this.gone.has(i)); }
+  peers() { return this.ids.filter((_, i) => i < this.humans && i !== this.you && !this.gone.has(i)); }
   rtt() {
     // A guest only talks to the master; the master to everyone.
     let r = 0, direct = true;
@@ -657,6 +662,7 @@ export class NetFight {
     while (this.acc >= STEP) {
       if (mp.phase === W.PHASE.FIGHT && !mp.over) {
         mp.all.forEach((f, i) => {
+          if (this.brains[i]) { this.brains[i].update(STEP, mp); return; }
           // A player we have not heard from for half a second stands idle (dropped, tab hidden).
           const r = this.remote?.[i];
           const s = i === this.you ? own : (r && now - r.at < 500 ? r : { moveX: 0, block: false });
@@ -1048,29 +1054,45 @@ export function patchFromSnap(mp, s, prev) {
 }
 
 /**
- * Practice: the same Match a real online round runs, on this device only, against bots that
- * play the objective. `?mode=bandana&bots=3` or the arena panel's PRACTICE.
+ * A fight on this device only: the same Match a real online round runs. Practice (the dev hook
+ * `?mode=bandana&bots=3`) against bots that play the objective, or a QUICK FIGHT nobody else
+ * joined: `ghosts` from the server, with their personalities, and for 1v1 a best of 3.
  */
 export class LocalFight {
-  constructor({ mode = 'lms', bots = 3, save = null, skill = 0.55, onDone = () => {} }) {
-    this.mode = Modes.MODES[mode] && mode !== 'duel' ? mode : 'lms';
-    const n = Math.max(1, Math.min(7, bots | 0)) + 1;
+  constructor({ mode = 'lms', bots = 3, save = null, skill = 0.55, onDone = () => {}, ghosts = null, seed = null, onRound = () => {} }) {
+    this.quick = Array.isArray(ghosts) && ghosts.length > 0;
+    this.mode = Modes.MODES[mode] && (mode !== 'duel' || this.quick) ? mode : 'lms';
     this.you = 0;
-    const seats = [{ name: 'YOU' }, ...['Biro', 'Rubber', 'Crayon', 'Staple', 'Inkpot', 'Ruler', 'Tippex'].slice(0, n - 1).map((name) => ({ name }))];
-    const loadouts = seats.map((_, i) => (i === 0 ? loadoutOf(save) : [0, 1, 2, 3, 4, 5, 6, 7]));
+    this.seats = this.quick ? [{ name: 'YOU' }, ...ghostSeats(ghosts)]
+      : [{ name: 'YOU' }, ...['Biro', 'Rubber', 'Crayon', 'Staple', 'Inkpot', 'Ruler', 'Tippex'].slice(0, Math.max(1, Math.min(7, bots | 0))).map((name) => ({ name }))];
+    const loadouts = this.seats.map((st, i) => (i === 0 ? loadoutOf(save) : st.ghost ? st.ghost.lo || [0] : [0, 1, 2, 3, 4, 5, 6, 7]));
     this.saves = loadouts.map(pvpSave);
-    const seed = (Math.random() * 1e6) | 0;
-    this.sheetLevel = arenaLevel(seed, this.mode);
+    this.skill = skill;
+    this.seed = seed == null ? (Math.random() * 1e6) | 0 : seed | 0;
+    this.onDone = onDone;
+    this.onRound = onRound;
+    this.round = 1;
+    this.score = this.seats.map(() => 0);
+    this.draws = 0;
+    this.newRound();
+    if (typeof window !== 'undefined') window.__net = this;
+  }
+
+  newRound() {
+    this.sheetLevel = arenaLevel(this.seed, this.mode);
     this.level = { ...this.sheetLevel };
-    this.match = new PvpMatch({ level: this.level, saves: this.saves, you: 0, seats, mode: this.mode, seed });
+    this.match = new PvpMatch({ level: this.level, saves: this.saves, you: 0, seats: this.seats, mode: this.mode, seed: this.seed + this.round - 1 });
     this.match.net = this;
     this.match.hudSave = this.saves[0];
-    this.brains = this.match.all.map((f, i) => (i === 0 ? null : new ObjectiveBrain(f, skill + Math.random() * 0.1,
-      LIGHT.filter((m) => loadouts[i].includes(W.GESTURES.indexOf(m.gesture))).map((m) => m.id), this.saves[i])));
-    this.onDone = onDone;
+    this.brains = this.match.all.map((f, i) => {
+      if (i === 0) return null;
+      const st = this.seats[i];
+      if (st.ghost) return new GhostBrain(f, st.ghost, this.saves[i]);
+      return new ObjectiveBrain(f, this.skill + Math.random() * 0.1,
+        LIGHT.filter((m) => this.saves[i].moves[m.id]).map((m) => m.id), this.saves[i]);
+    });
     this.acc = 0;
     this.match.begin();
-    if (typeof window !== 'undefined') window.__net = this;
   }
 
   strike() { this.act(W.ACT.STRIKE); }
@@ -1098,22 +1120,43 @@ export class LocalFight {
       this.acc -= STEP;
     }
     if (input && input.jump) mp.act(0, W.ACT.JUMP);
-    Object.assign(mp.level, hudLines(mp, 'practice'));
-    if (mp.over && mp.endT >= END_HOLD + 1.2 && !this.done) { this.done = true; this.onDone(mp.verdict); }
+    if (this.mode === 'duel') {
+      mp.level.title = `ROUND ${this.round}  ·  ${this.score[0]} – ${this.score[1]}`;
+      const secs = Math.ceil(mp.phase === W.PHASE.FIGHT || mp.phase === W.PHASE.OVER ? mp.clock : mp.roundSecs);
+      mp.level.dojo = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}  ·  quick fight`;
+    } else Object.assign(mp.level, hudLines(mp, this.quick ? 'quick fight' : 'practice'));
+    if (mp.over && mp.endT >= END_HOLD + 1.2 && !this.done) this.roundOver(mp.verdict);
+  }
+
+  /** A room mode ends with its one round; a 1v1 plays to two round wins (three draws: a draw). */
+  roundOver(v) {
+    if (this.mode !== 'duel') { this.done = true; this.onDone(v); return; }
+    if (v.winner >= 0) this.score[v.winner]++; else this.draws++;
+    const w = this.score.findIndex((n) => n >= 2);
+    if (w >= 0 || this.draws >= 3) {
+      this.done = true;
+      this.onDone({ winner: w, ko: !!v.ko, score: this.score.slice(), place: w < 0 ? [1, 1] : [w === 0 ? 1 : 2, w === 1 ? 1 : 2] });
+      return;
+    }
+    this.round++;
+    this.newRound();
+    this.onRound(this);
   }
 
   drawHUD(ctx, vw, vh) {
     const mp = this.match;
     Modes.drawModeHUD(ctx, vw, vh, mp);
-    if (mp.player.dead && mp.phase === W.PHASE.FIGHT) {
+    if (mp.player.dead && mp.phase === W.PHASE.FIGHT && mp.ffa) {
       const f = mp.player;
       const t = f.respawnT > 0 ? `back in ${Math.ceil(f.respawnT)}…` : mp.modeId === 'lms' ? 'you are out — watching to the end' : '';
       if (t) handText(ctx, t, vw / 2, vh * 0.3, 30, '#c0392b', 'center');
     }
     if (mp.over && mp.verdict) {
-      const p = mp.verdict.place ? mp.verdict.place[0] : 0;
       const v = mp.verdict;
-      handText(ctx, v.winner === 0 ? 'YOU WIN!' : v.winner < 0 && p <= 1 ? 'a draw' : p ? `you came ${Modes.ordinal(p)}` : 'a draw', vw / 2, vh * 0.3, 40, '#c0392b', 'center');
+      const p = v.place ? v.place[0] : 0;
+      const t = this.mode === 'duel' ? (v.winner === 0 ? 'round won' : v.winner < 0 ? 'a draw' : 'round lost')
+        : v.winner === 0 ? 'YOU WIN!' : v.winner < 0 && p <= 1 ? 'a draw' : p ? `you came ${Modes.ordinal(p)}` : 'a draw';
+      handText(ctx, t, vw / 2, vh * 0.3, 40, '#c0392b', 'center');
     }
   }
 

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"log"
 	"math/big"
+	mrand "math/rand"
 	"net"
 	"net/http"
 	"sort"
@@ -93,6 +94,7 @@ type hub struct {
 	reportWindow, earlyFF, duelCap, roomCap time.Duration
 	helloWithin, pongLate                   time.Duration
 	pingEvery, pongDue, stallQuit           time.Duration
+	quickWindow, quickReveal                time.Duration // quick.go
 	perIP                                   int
 	ipN                                     map[string]int
 
@@ -170,6 +172,7 @@ type seat struct {
 	out      bool               // rooms: eliminated (left, or never came back)
 	outSeq   int                // order of going out, for placements
 	rtts     map[string]float64 // rooms: this seat's measured ping to each peer id
+	joinAt   time.Time
 }
 
 type report struct {
@@ -204,7 +207,16 @@ type match struct {
 	ffBy          int       // 1v1 forfeit: the seat that forfeited, and why
 	ffWhy         string
 	note          string // appended to the stored score (" disputed")
+	// quick.go: a QUICK FIGHT window/match. Ghost seats come after the people's, slot-wise.
+	quick    bool
+	ghosts   []*ghostSeat
+	quickEnd time.Time
+	shownN   int
+	rng      *mrand.Rand
 }
+
+// fighters: every slot in the fight, ghost seats included.
+func (m *match) fighters() int { return len(m.seats) + len(m.ghosts) }
 
 type attachResult struct {
 	c   *client
@@ -242,6 +254,7 @@ func newHub(st *store, ice *iceSource, allow *allowance, verify verifier) *hub {
 		reportWindow: reportWindow, earlyFF: defaultEarlyFF, duelCap: duelRoundCap, roomCap: roomRoundCap,
 		perIP: defaultPerIP, ipN: map[string]int{}, helloWithin: helloWithin, pongLate: pongLate,
 		pingEvery: pingEvery, pongDue: pongDue, stallQuit: stallQuit,
+		quickWindow: defaultQuickWindow, quickReveal: defaultQuickReveal,
 	}
 }
 
@@ -380,6 +393,11 @@ func (h *hub) message(c *client, raw []byte) {
 			return
 		}
 		h.wait(c, m.Type)
+	case "quick":
+		if !h.ctl(c) {
+			return
+		}
+		h.quick(c, m.Type, m.Tok)
 	case "unwait":
 		if !h.ctl(c) {
 			return
@@ -658,7 +676,7 @@ func (h *hub) newMatch(typ string, friend bool, cs ...*client) *match {
 func (h *hub) seatIn(m *match, c *client) {
 	c.waiting = ""
 	c.match = m
-	m.seats = append(m.seats, &seat{c: c, id: c.id, name: c.name, uid: c.uid, ranked: c.ranked})
+	m.seats = append(m.seats, &seat{c: c, id: c.id, name: c.name, uid: c.uid, ranked: c.ranked, joinAt: h.now()})
 	h.lobbyDirt = true
 }
 
@@ -961,8 +979,12 @@ func (h *hub) sendGoTo(m *match, i int) {
 	if s.spent != nil {
 		left = s.spent.Remaining
 	}
-	h.send(s.c, map[string]any{"t": "go", "match": m.id, "round": m.round, "master": m.master, "mode": m.typ,
-		"you": i, "score": score, "seats": roster, "arena": m.arena, "freeLeft": left, "out": out})
+	g := map[string]any{"t": "go", "match": m.id, "round": m.round, "master": m.master, "mode": m.typ,
+		"you": i, "score": score, "seats": roster, "arena": m.arena, "freeLeft": left, "out": out}
+	if m.quick {
+		g["quick"], g["ghosts"] = true, m.ghosts
+	}
+	h.send(s.c, g)
 }
 
 // report: every player says who won the round. Counted only if they all agree.
@@ -1096,11 +1118,15 @@ func (h *hub) finishFF(m *match, winner int, ff bool) {
 		score += " early"
 	}
 	score += m.note
-	if err := h.st.recordMatch(m.id, m.typ, m.friend, score, seats); err != nil {
-		log.Printf("match %s: stats write failed: %v", m.id, err)
-	}
-	if h.lan {
-		h.st.recordLan(m.id, m.typ, ff, seats)
+	if m.quick {
+		h.st.recordQuick(m.id, m.typ, score, seats)
+	} else {
+		if err := h.st.recordMatch(m.id, m.typ, m.friend, score, seats); err != nil {
+			log.Printf("match %s: stats write failed: %v", m.id, err)
+		}
+		if h.lan {
+			h.st.recordLan(m.id, m.typ, ff, seats)
+		}
 	}
 	who := "nobody"
 	if winner >= 0 {
@@ -1108,18 +1134,37 @@ func (h *hub) finishFF(m *match, winner int, ff bool) {
 	}
 	log.Printf("match %s: %s won %s (%s)", m.id, who, score, strings.Join(m.log, ", "))
 	for i, s := range m.seats {
-		out := map[string]any{"t": "result", "match": m.id, "winner": winner, "you": i, "score": scoreOf(m), "counted": s.ranked && !seats[i].NoStats, "forfeit": ff}
+		out := map[string]any{"t": "result", "match": m.id, "winner": winner, "you": i, "score": scoreOf(m), "counted": s.ranked && !seats[i].NoStats && !m.quick, "forfeit": ff}
+		if m.quick {
+			// Never ranked: no stats line. The card lists placings like a room's.
+			place, names := make([]int, len(m.seats)), make([]string, len(m.seats))
+			for j, o := range m.seats {
+				names[j], place[j] = o.name, 2
+				if j == winner {
+					place[j] = 1
+				}
+			}
+			out["quick"], out["mode"], out["names"], out["place"], out["hwin"] = true, m.typ, names, place, winner
+		}
 		if ff {
 			// who forfeited and why: left | gone | silent | stall (the master went silent and
 			// the guest quit: the guest is NOT the one who forfeited) | lagging
 			out["by"], out["why"] = m.ffBy, m.ffWhy
 		}
-		if s.ranked {
+		if s.ranked && !m.quick {
 			if line, ok := h.st.mine(s.uid); ok {
 				out["stats"] = line
 			}
 		}
 		h.send(s.c, out)
+	}
+	if m.quick { // no rematch: AGAIN is a fresh quick fight
+		for _, s := range m.seats {
+			if s.c.match == m {
+				s.c.match = nil
+			}
+		}
+		h.closeMatch(m)
 	}
 }
 
@@ -1133,7 +1178,7 @@ func scoreOf(m *match) []int {
 
 func (h *hub) rematch(c *client, id, tok string) {
 	m := h.mine(c, id)
-	if m == nil || m.state != mDone || m.room {
+	if m == nil || m.state != mDone || m.room || m.quick {
 		return
 	}
 	me := m.seats[m.slotOf(c)]
@@ -1279,6 +1324,7 @@ func (h *hub) tick() {
 		}
 	}
 	h.tickRooms(now)
+	h.tickQuick(now)
 	for _, c := range h.clients {
 		if c.away {
 			if now.After(c.awayUntil) {
