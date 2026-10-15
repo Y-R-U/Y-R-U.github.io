@@ -135,6 +135,9 @@ dialog { background: var(--panel); color: var(--text); border: 1px solid var(--l
   width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 60px); }
 dialog::backdrop { background: rgba(0,0,0,.6); }
 #dlgForm { padding: 18px; }
+/* footer buttons stay put while long dialogs (help, track info) scroll */
+#dlgForm > .actions:last-child { position: sticky; bottom: 0; background: var(--panel); border-top: 1px solid var(--line);
+  margin: 12px -18px -18px; padding: 12px 18px 18px; border-radius: 0 0 14px 14px; }
 #dlgForm h2 { margin: 0 0 12px; font-size: 17px; }
 .helpdoc h4 { margin: 14px 0 6px; font-size: 13px; color: var(--accent2); }
 .helpdoc code, .helpdoc pre { background: var(--bg); border-radius: 6px; font-size: 12px; }

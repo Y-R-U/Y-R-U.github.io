@@ -689,24 +689,43 @@ function initPlayer() {
 const SECURE = window.isSecureContext;
 let SW_REG = null;
 
-async function cacheCollection(kind, id, quiet) {
+const KBPS = { 320: 320, v0: 245, 192: 192, 128: 128, 96: 96, '64m': 64 };
+// ask which MP3 quality to keep offline; resolves to a preset key or null
+async function askOfflineQuality(kind, id) {
+  const m = await api(`offline/${kind}/${id}`);
+  const presets = S.config?.mp3_presets || { 192: '192 kbps' };
+  const secs = m.tracks.reduce((a, t) => a + (t.audio ? t.duration || 120 : 0), 0);
+  const cur = S.offline[`${kind}:${id}`]?.q || ls.get('offline-q', '128');
+  return new Promise(res => {
+    dialog(`<h2>Keep “${esc(m.name)}” offline</h2>
+      <p class="note">${m.tracks.filter(t => t.audio).length} tracks · ${fmtT(secs)}. Smaller files save phone storage; 192 kbps is what streams.</p>
+      <div class="field"><label>MP3 quality</label><select name="q">${Object.entries(presets).sort((a, b) => KBPS[a[0]] - KBPS[b[0]]).map(([k, v]) =>
+        `<option value="${k}" ${k === cur ? 'selected' : ''}>${esc(v)} — ~${fmtB(secs * KBPS[k] * 125)}</option>`).join('')}</select></div>
+      <div class="actions"><button class="btn" value="cancel">Cancel</button><button class="btn primary" value="ok">Save offline</button></div>`,
+      (f) => { ls.set('offline-q', f.q.value); res(f.q.value); });
+    $('#dlg').addEventListener('close', () => res(null), { once: true });
+  });
+}
+async function cacheCollection(kind, id, quiet, q) {
   const m = await api(`offline/${kind}/${id}`);
   const key = `${kind}:${id}`;
+  q = q || (await IDB.get('collections', key))?.q || '192';
   const have = new Set(await IDB.keys('audio'));
   let got = 0, bytes = 0;
   for (const t of m.tracks) {
     if (!t.audio) continue;
     const cur = have.has(t.id) ? await IDB.get('audio', t.id) : null;
-    if (cur && cur.etag === t.audio_etag) continue;
-    if (!quiet) toast(`Downloading ${++got}… ${t.title}`, 60000);
-    const r = await xfetch('api/tracks/' + t.id + '/play.mp3');
+    if (cur && cur.etag === t.audio_etag && (cur.q || '192') === q) { bytes += cur.blob.size; continue; }
+    if (!quiet) toast(`Downloading ${++got}… ${t.title}`, 60000); else got++;
+    // 192 = the streaming copy as-is; anything else is encoded (and cached) server-side
+    const r = await xfetch('api/tracks/' + t.id + (q === '192' ? '/play.mp3' : '/export?preset=' + encodeURIComponent(q)));
     if (!r.ok) continue;
     const blob = await r.blob(); bytes += blob.size;
-    await IDB.put('audio', t.id, { etag: t.audio_etag, blob, title: t.title });
+    await IDB.put('audio', t.id, { etag: t.audio_etag, q, blob, title: t.title });
   }
   // keep the track metadata browsable offline
   await api(kind === 'project' ? 'projects/' + id : 'playlists/' + id).catch(() => {});
-  await IDB.put('collections', key, { kind, id, name: m.name, tracks: m.tracks.map(t => t.id), bytes: m.bytes, synced: Date.now() / 1000 });
+  await IDB.put('collections', key, { kind, id, q, name: m.name, tracks: m.tracks.map(t => t.id), bytes, synced: Date.now() / 1000 });
   await pruneAudio();
   if (!quiet) toast(got ? `${m.name}: ${got} new/updated track${got > 1 ? 's' : ''} saved offline` : `${m.name} is up to date`);
   return got;
@@ -778,7 +797,7 @@ async function viewOffline() {
     <section class="card">
       <h3>Saved for offline</h3>
       ${cols.length ? cols.map(c => `<div class="off-row"><div class="meta"><b>${esc(c.name)}</b>
-          <div class="note">${c.kind} · ${c.tracks.length} tracks · ${fmtB(c.bytes)} · synced ${ago(c.synced)}</div></div>
+          <div class="note">${c.kind} · ${c.tracks.length} tracks · ${fmtB(c.bytes)} · ${esc(c.q === 'v0' ? 'V0' : (c.q || '192') + (c.q === '64m' ? '' : ' kbps'))} · synced ${ago(c.synced)}</div></div>
           <a class="btn small" href="#/${c.kind}/${c.id}">Open</a>
           <button class="btn small" data-act="offline" data-kind="${c.kind}" data-id="${c.id}">Update</button>
           <button class="btn small danger" data-act="off-remove" data-key="${c.key}">Remove</button></div>`).join('')
@@ -876,7 +895,7 @@ document.addEventListener('click', async (e) => {
     case 'track-menu': return trackMenu(b, t);
     case 'offline': {
       b.disabled = true;
-      try { await cacheCollection(b.dataset.kind, b.dataset.id); } catch (err) { toast(err.message); }
+      try { const q = await askOfflineQuality(b.dataset.kind, b.dataset.id); if (q) await cacheCollection(b.dataset.kind, b.dataset.id, false, q); } catch (err) { toast(err.message); }
       b.disabled = false; await loadSide(); if (S.view.kind === 'offline') viewOffline(); else { b.textContent = '⤓ Update offline'; $$('.tracks').forEach(markCached); }
       return;
     }
