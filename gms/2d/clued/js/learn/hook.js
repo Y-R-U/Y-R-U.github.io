@@ -1,8 +1,8 @@
 // Tiny boot hook (no heavy imports): feeds finished games into mastery/flashcards and badges the Learn tile.
-import { onScreen } from '../ui/app.js?v=202610161040';
-import { getIndex } from '../core/packs.js?v=202610161040';
-import { recordGame, badgeCount } from './model.js?v=202610161040';
-import { BUILD } from '../build.js?v=202610161040';
+import { onScreen } from '../ui/app.js?v=202610161047';
+import { getIndex } from '../core/packs.js?v=202610161047';
+import { recordGame, badgeCount } from './model.js?v=202610161047';
+import { BUILD } from '../build.js?v=202610161047';
 
 let installed = false;
 const seen = new WeakSet();

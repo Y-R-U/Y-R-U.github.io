@@ -36,6 +36,13 @@ export const SUGGESTED = [
     R('Famous lines', 'quote', ['movies', 'tv'], { answers: 4 }),
     R('TV', 'mc', ['tv', 'general~screen'], { answers: 4, source: 'mix' }),
   ] },
+  { id: 'books', name: 'Books & Authors', blurb: 'Who wrote it and when, opening lines, publication order and a pick-all.', timing: { answerSec: 20, gapSec: 5 }, rounds: [
+    TRIO('Hat-trick: author, year', ['books']),
+    R('Books and authors', 'mc', ['books', 'general~books'], { answers: 4, source: 'mix' }),
+    R('Opening lines', 'quote', ['books'], { answers: 4 }),
+    R('In order of publication', 'order', ['books'], {}),
+    R('Pick all by the author', 'pickall', ['books'], { tiles: 6 }),
+  ] },
   { id: 'science', name: 'Science & Nature', blurb: 'Science trivia, space, animal pictures, the body and animal calls.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
     R('Science', 'mc', ['general~science'], { answers: 4, source: 'mix' }),
     R('Space', 'mc', ['space'], { answers: 4, source: 'mix' }),

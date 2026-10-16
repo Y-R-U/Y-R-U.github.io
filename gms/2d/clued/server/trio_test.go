@@ -78,10 +78,62 @@ func TestTrioRoomScore(t *testing.T) {
 		t.Fatalf("1 of 3 must score about a third and not count as correct: %+v %s", a, e)
 	}
 	b, e := r.answer(honest, answerIn{Q: 0, Given: json.RawMessage(`[1,2,0]`), Correct: false, Points: &ms, Ms: &ms})
-	if e != "" || !b.Correct || b.Points < 450 {
-		t.Fatalf("a hat-trick is correct with speed points, whatever the client claimed: %+v %s", b, e)
+	if e != "" || !b.Correct || b.Points < 550 || b.Hat != hatTrickBonus {
+		t.Fatalf("a hat-trick is correct with speed points + the bonus, whatever the client claimed: %+v %s", b, e)
 	}
 	if cheat.Streak != 0 || honest.Streak != 1 {
 		t.Fatalf("only the hat-trick counts for the streak: %d %d", cheat.Streak, honest.Streak)
+	}
+}
+
+// Picks never locked in are scored at the deadline (minimum speed points); nothing picked scores nothing.
+func TestTrioDrafts(t *testing.T) {
+	q := json.RawMessage(`{"format":"trio","answer":[1,2,0]}`)
+	pq := json.RawMessage(`{"format":"pickall","answer":[0,2]}`)
+	mq := json.RawMessage(`{"format":"mc","answer":1}`)
+	r := &Room{Phase: "question", Q: 0, QStart: nowMs(), QDeadline: nowMs() + 30000, meta: []qMeta{parseMeta(q), parseMeta(pq), parseMeta(mq)}}
+	for i := range r.meta {
+		r.meta[i].LimitMs = 30000
+	}
+	mk := func(id string) *Player { return &Player{ID: id, Answers: map[int]*Answer{}, LastSeen: nowMs()} }
+	a, b, c, d := mk("a"), mk("b"), mk("c"), mk("d")
+	r.Players = []*Player{a, b, c, d}
+	if e := r.draft(a, answerIn{Q: 0, Given: json.RawMessage(`[0,0,0]`)}); e != "" {
+		t.Fatal(e)
+	}
+	r.draft(a, answerIn{Q: 0, Given: json.RawMessage(`[1,2,0]`)}) // newest wins
+	r.draft(b, answerIn{Q: 0, Given: json.RawMessage(`[1,0,3]`)})
+	ms := 0.0
+	if _, e := r.answer(c, answerIn{Q: 0, Given: json.RawMessage(`[1,0,0]`), Ms: &ms}); e != "" {
+		t.Fatal(e)
+	}
+	if e := r.draft(c, answerIn{Q: 0, Given: json.RawMessage(`[1,2,0]`)}); e != "already_answered" {
+		t.Fatalf("a draft after the answer: %q", e)
+	}
+	if e := r.draft(d, answerIn{Q: 1, Given: json.RawMessage(`[1]`)}); e != "not_open" {
+		t.Fatalf("a draft for another question: %q", e)
+	}
+	r.reveal()
+	if x := a.Answers[0]; x == nil || !x.Correct || x.Points != 100+hatTrickBonus || x.Ms != 30000 || a.Streak != 1 {
+		t.Fatalf("an unlocked hat-trick scores minimum speed + bonus: %+v", x)
+	}
+	if x := b.Answers[0]; x == nil || x.Correct || x.Points != 33 {
+		t.Fatalf("an unlocked 1 of 3 scores a third of minimum speed: %+v", x)
+	}
+	if c.Answers[0].Points < 300 || d.Answers[0] != nil {
+		t.Fatal("a locked answer keeps its own score; no picks, no answer")
+	}
+	// pick-all drafts work the same way; an mc question takes no drafts
+	r.Q, r.Phase = 1, "question"
+	if e := r.draft(d, answerIn{Q: 1, Given: json.RawMessage(`[2]`)}); e != "" {
+		t.Fatal(e)
+	}
+	r.reveal()
+	if x := d.Answers[1]; x == nil || x.Correct || x.Points != 50 {
+		t.Fatalf("an unlocked pick-all 1 of 2 scores 50: %+v", x)
+	}
+	r.Q, r.Phase = 2, "question"
+	if e := r.draft(d, answerIn{Q: 2, Given: json.RawMessage(`1`)}); e != "not_draftable" {
+		t.Fatalf("mc draft: %q", e)
 	}
 }

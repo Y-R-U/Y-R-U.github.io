@@ -504,6 +504,14 @@ func handleAnswer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	withPlayer(w, r.PathValue("code"), in.Key, func(room *Room, p *Player) {
+		if in.Draft {
+			if code := room.draft(p, in.answerIn); code != "" {
+				writeErr(w, 409, code, strings.ReplaceAll(code, "_", " "))
+				return
+			}
+			writeJSON(w, 200, map[string]any{"ok": true, "draft": true})
+			return
+		}
 		a, code := room.answer(p, in.answerIn)
 		if a == nil {
 			writeErr(w, 409, code, strings.ReplaceAll(code, "_", " "))

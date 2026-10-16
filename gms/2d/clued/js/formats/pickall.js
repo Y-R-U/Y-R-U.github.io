@@ -1,12 +1,12 @@
 // Pick all: "Which 3 of these are …?" — 6–8 tiles (kids 4–5), 2–4 right. Sources: hand-written list questions
 // (pack questions of kind 'pickall': answer = every right option, wrong = decoys, prompt holds {n}) and item facts
 // (js/formats/pickall_rules.js). Partial credit: see pickScore.
-import { register, poolItems, byDifficulty, imageOf, collect, pick, shuffle, sample, fill, givesAway, weightedPick } from './registry.js?v=202610161040';
-import { h, imgEl, onKey } from '../ui/kit.js?v=202610161040';
-import { injectCSS, baseCSS, once, hasImg, norm, uniqueByName } from './fkit.js?v=202610161040';
-import { basePoints } from '../core/scoring.js?v=202610161040';
-import { rulesFor } from './pickall_rules.js?v=202610161040';
-import { pickScore } from './pickall_score.js?v=202610161040';
+import { register, poolItems, byDifficulty, imageOf, collect, pick, shuffle, sample, fill, givesAway, weightedPick } from './registry.js?v=202610161047';
+import { h, imgEl, onKey } from '../ui/kit.js?v=202610161047';
+import { injectCSS, baseCSS, once, hasImg, norm, uniqueByName } from './fkit.js?v=202610161047';
+import { basePoints } from '../core/scoring.js?v=202610161047';
+import { rulesFor } from './pickall_rules.js?v=202610161047';
+import { pickScore } from './pickall_score.js?v=202610161047';
 
 export { pickScore };
 
@@ -240,6 +240,7 @@ function render(el, q, api) {
     }
     tiles[i].setAttribute('aria-pressed', String(sel.has(i)));
     api.sfx?.('tap');
+    api.draft?.([...sel].sort((a, b) => a - b));
     draw();
     clearTimeout(autoT);
     if (api.kids && sel.size === need) autoT = setTimeout(() => finish(), 450);
@@ -260,15 +261,20 @@ function render(el, q, api) {
     mark();
     const s = pickScore([...sel], q.answer);
     top.classList.remove('warn');
-    top.textContent = timeout ? `${s.hits} of ${right.size} picked in time` : s.correct ? `All ${right.size} right!` : `${s.hits} of ${right.size} right${s.wrong ? ` · ${s.wrong} wrong` : ''}`;
-    if (timeout) return;
+    top.textContent = s.correct ? `All ${right.size} right!` : `${s.hits} of ${right.size} right${s.wrong ? ` · ${s.wrong} wrong` : ''}`;
+    // a timeout scores what was picked as if locked at the deadline (minimum speed points)
     const given = [...sel].sort((a, b) => a - b);
-    if (s.correct) { answer({ correct: true, given }); return; }
-    let rem = 0, full = 0;
-    try { rem = api.timer.remaining(); full = api.timer.full || api.timer.limit || 0; } catch (e) {}
-    const base = basePoints({ timed: !!api.timed && rem > 0 && full > 0, remaining: rem, limit: full });
-    const points = Math.round(base * s.frac);
-    answer({ correct: false, partial: points > 0, points, given, detail: { hits: s.hits, wrong: s.wrong, of: right.size } });
+    let res;
+    if (s.correct) res = { correct: true, given };
+    else {
+      let rem = 0, full = 0;
+      try { rem = timeout ? 0 : api.timer.remaining(); full = api.timer.full || api.timer.limit || 0; } catch (e) {}
+      const base = basePoints({ timed: !!api.timed && full > 0 && (timeout || rem > 0), remaining: rem, limit: full });
+      const points = Math.round(base * s.frac);
+      res = { correct: false, partial: points > 0, points, given, detail: { hits: s.hits, wrong: s.wrong, of: right.size } };
+    }
+    if (timeout) return res;
+    answer(res);
   }
   const offKey = onKey(e => {
     if (done) return;
@@ -278,7 +284,7 @@ function render(el, q, api) {
   });
   return {
     destroy() { offKey(); clearTimeout(autoT); clearTimeout(warnT); },
-    timeout() { finish(true); },
+    timeoutAnswer() { return finish(true) || null; },
     eliminate(k = 1) {
       const wrong = tiles.map((b, i) => i).filter(i => !right.has(i) && !tiles[i].disabled && !sel.has(i));
       const m = Math.min(k, Math.max(1, Math.floor(wrong.length / 2)));

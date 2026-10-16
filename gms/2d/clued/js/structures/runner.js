@@ -1,17 +1,17 @@
 // The question runner: plays a list of questions with HUD, timer, reveal and scoring.
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
-import { getFormat } from '../formats/registry.js?v=202610161040';
-import { createTimer } from '../core/timer.js?v=202610161040';
-import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610161040';
-import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610161040';
-import { getSettings } from '../core/store.js?v=202610161040';
-import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610161040';
-import { popup, confirmPop } from '../ui/popup.js?v=202610161040';
-import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610161040';
-import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610161040';
-import { dlog, debugCheck } from '../core/debuglog.js?v=202610161040';
-import { fsButton } from '../ui/toggles.js?v=202610161040';
-import { recordSeen } from '../core/fresh.js?v=202610161040';
+import { getFormat } from '../formats/registry.js?v=202610161047';
+import { createTimer } from '../core/timer.js?v=202610161047';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610161047';
+import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610161047';
+import { getSettings } from '../core/store.js?v=202610161047';
+import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610161047';
+import { popup, confirmPop } from '../ui/popup.js?v=202610161047';
+import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610161047';
+import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610161047';
+import { dlog, debugCheck } from '../core/debuglog.js?v=202610161047';
+import { fsButton } from '../ui/toggles.js?v=202610161047';
+import { recordSeen } from '../core/fresh.js?v=202610161047';
 
 const KIND_RIGHT = ['Brilliant!', 'You got it!', 'Super!', 'Yes!', 'Amazing!'];
 const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];
@@ -24,7 +24,7 @@ function stageStyles() {
   const st = document.createElement('style');
   st.id = 'runner-stage-css';
   st.textContent = '.more-btn{margin-left:auto;min-height:38px}.more-btn[hidden]{display:none}.more-btn.locked{background:#e9e4f5}' +
-    '.reveal.partial .rv-card{background:#fff3d1}.reveal.partial .rv-mark{background:var(--sun);color:var(--ink);font-size:17px;letter-spacing:-.04em}.reveal.partial .rv-mark.wide{font-size:14px}.reveal.partial .rv-head .pts{color:#b07800}' +
+    '.rv-head .pts.hat{font-size:17px;color:#b07800;white-space:nowrap}.reveal.partial .rv-card{background:#fff3d1}.reveal.partial .rv-mark{background:var(--sun);color:var(--ink);font-size:17px;letter-spacing:-.04em}.reveal.partial .rv-mark.wide{font-size:14px}.reveal.partial .rv-head .pts{color:#b07800}' +
     '.ring{position:relative}.ring-plus{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-weight:900;font-size:13px;color:var(--good,#1fbf6a);' +
     'animation:ringplus 1.2s ease-out forwards;pointer-events:none;white-space:nowrap}@keyframes ringplus{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-18px)}}';
   document.head.append(st);
@@ -163,6 +163,8 @@ export function createRunner(host, cfg = {}) {
     onStage(cb) { sg.subs.add(cb); return () => sg.subs.delete(cb); },
     requestMore() { requestMore(); },
     reveal(html) { extraReveal.push(html); },
+    // multi-pick formats report their current picks so rooms can score them at the deadline
+    draft(given) { if (answerResolve) try { cfg.onDraft && cfg.onDraft(state.i, given); } catch (e) {} },
   };
   let extraReveal = [];
 
@@ -230,9 +232,11 @@ export function createRunner(host, cfg = {}) {
       onTimeoutFn = () => {
         R('timeout', { pending: !!answerResolve });
         if (!answerResolve) return;
-        try { ctrl?.timeout && ctrl.timeout(); } catch (e) {}
+        // multi-pick formats (trio, pickall) hand back what was picked, scored as if locked at the deadline
+        let auto = null;
+        try { auto = ctrl?.timeoutAnswer ? ctrl.timeoutAnswer() : (ctrl?.timeout && ctrl.timeout(), null); } catch (e) {}
         const r = answerResolve; answerResolve = null;
-        resolve(record(q, { correct: false, given: null, detail: 'timeout' }, { remaining: 0, limit, timedNow: true, ms: limit, timeout: true }));
+        resolve(record(q, auto ? { ...auto, auto: true } : { correct: false, given: null, detail: 'timeout' }, { remaining: 0, limit, timedNow: true, ms: limit, timeout: true }));
         void r;
       };
       skipFn = () => {
@@ -348,6 +352,9 @@ export function createRunner(host, cfg = {}) {
       points = (cfg.noStreak ? base : withStreak(base, streak)) * (cfg.multiplier ? cfg.multiplier(state.i, q, state) : 1);
     } else if (res.partial && res.points) points = res.points;
     if (sg.n) points = Math.round(points * stageMultiplier(sg.stage, sg.n));
+    // a flat bonus after the streak (trio's hat-trick)
+    const hat = correct && res.hat > 0 && !kids ? Math.min(200, Math.round(res.hat)) : 0;
+    points += hat;
     R('answer', { correct, ms: Math.round(t.ms), timeout: !!t.timeout, skipped: !!t.skipped });
     const rec = {
       i: state.i, qid: q.id, format: q.format, round: q.round, correct, points, given: res.given ?? null,
@@ -355,6 +362,7 @@ export function createRunner(host, cfg = {}) {
       ...(sg.n ? { stage: sg.stage, stages: sg.n } : {}),
       ...(!correct && res.partial && points > 0 ? { partial: true } : {}),
       ...(typeof res.title === 'string' && res.title ? { title: res.title.slice(0, 40) } : {}),
+      ...(hat ? { hat } : {}), ...(res.auto ? { auto: true } : {}),
     };
     lockStages();
     if (!t.skipped) state.answered++;
@@ -459,13 +467,14 @@ export function createRunner(host, cfg = {}) {
     const pending = !!rec.pending;
     // partly right (points for some of it) gets its own state instead of "Nope"; a format may name the result
     const part = !good && !pending && !!rec.partial && rec.points > 0;
-    const title = pending ? 'Locked in' : rec.skipped ? 'Skipped' : rec.timeout ? (kids ? 'Out of time!' : "Time's up") : rec.title || (good ? pick(kids ? KIND_RIGHT : RIGHT) : part ? 'Partly right' : pick(kids ? KIND_WRONG : WRONG));
-    const pts = good || part ? (kids ? '<span class="star-pop">⭐</span>' : `<span class="pts">+${fmtNum(rec.points)}</span>`) : '';
+    const up = kids ? 'Out of time!' : "Time's up";
+    const title = pending ? 'Locked in' : rec.skipped ? 'Skipped' : rec.timeout ? (rec.auto && (good || rec.points > 0) && rec.title ? `${up} · ${rec.title}` : up) : rec.title || (good ? pick(kids ? KIND_RIGHT : RIGHT) : part ? 'Partly right' : pick(kids ? KIND_WRONG : WRONG));
+    const pts = good || part ? (kids ? '<span class="star-pop">⭐</span>' : `<span class="pts">+${fmtNum(rec.points - (rec.hat || 0))}</span>${rec.hat ? `<span class="pts hat">+${fmtNum(rec.hat)} hat-trick</span>` : ''}`) : '';
     // Tall boards (format flag revealInline) get a one-line result under the board with Next beside it; answerOnBoard
     // formats already mark the right answer on the board, so the long "Answer:" line is left out.
     const fmt = getFormat(q.format) || {};
     const inline = !!fmt.revealInline;
-    const ans = good || pending || q.hidden || (fmt.answerOnBoard && !rec.skipped && !rec.timeout) ? '' : `<div class="rv-answer">${kids ? 'The answer is' : 'Answer:'} <b>${esc(answerLine(q))}</b></div>`;
+    const ans = good || pending || q.hidden || (fmt.answerOnBoard && !rec.skipped && (!rec.timeout || rec.auto)) ? '' : `<div class="rv-answer">${kids ? 'The answer is' : 'Answer:'} <b>${esc(answerLine(q))}</b></div>`;
     const credits = creditsOf(q);
     reveal.innerHTML = '';
     reveal.className = `reveal ${pending ? 'pending' : good ? 'good' : part ? 'partial' : 'bad'}${inline ? ' inline' : ''}`;

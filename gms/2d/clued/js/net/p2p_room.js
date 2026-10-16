@@ -1,8 +1,8 @@
 // Device-hosted room logic: a port of server/rooms.go + scoring.go so the host's tab can be the room
 // server. Pure (no DOM, no network), so tools/p2p_test.mjs runs it in node. State shape = the server's.
-import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610161040';
-import { pickScore, pickallCap } from '../formats/pickall_score.js?v=202610161040';
-import { trioScore } from '../formats/trio_score.js?v=202610161040';
+import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610161047';
+import { pickScore } from '../formats/pickall_score.js?v=202610161047';
+import { trioScore } from '../formats/trio_score.js?v=202610161047';
 export { stageMultiplier, withStreak };
 
 export const MAX_PLAYERS = 8;
@@ -41,6 +41,10 @@ export const PARTIAL = new Set(['ladder', 'pin-drop', 'number', 'blitz60', 'matc
 export const LONG = { connect: 120000, blitz60: 60000, match: 60000, ladder: 60000, sort: 45000, neighbours: 45000, order: 40000, chain: 60000, pickall: 30000, 'pin-drop': 30000, type: 30000 };
 // formats that ask several things at once get a fixed amount on top of the host's answer time (scoring.go extraFormats)
 export const EXTRA = { trio: 10000 };
+// Hat-trick: a flat bonus for every row right, after the streak bonus (scoring.go hatTrickBonus)
+export const HAT_BONUS = 100;
+// multi-pick formats: current picks are kept as a draft and scored at the deadline when never locked (scoring.go draftFormats)
+export const DRAFT = new Set(['trio', 'pickall']);
 
 const rnd = (alpha, n, rand) => Array.from({ length: n }, () => alpha[Math.floor(rand() * alpha.length)]).join('');
 export const newCode = (rand = Math.random) => rnd(CODE_ALPHABET, 5, rand);
@@ -113,6 +117,7 @@ function lastOf(a, n) {
   if (a.stage) l.stage = a.stage;
   if (n) l.stages = n;
   if (a.streak) l.streak = a.streak;
+  if (a.hat) l.hat = a.hat;
   if (a.clipMul) Object.assign(l, { clipMul: a.clipMul, artMul: a.artMul, clip: a.clip, ...(a.replays ? { replays: a.replays } : {}) });
   return l;
 }
@@ -237,6 +242,15 @@ export class P2PRoom {
   }
 
   reveal() {
+    // unlocked multi-pick answers count as locked at the deadline (minimum speed points)
+    const q = this.questions[this.q];
+    if (DRAFT.has(q?.format)) {
+      for (const p of this.players) {
+        const d = p.drafts?.[this.q];
+        if (d !== undefined && !p.gone && p.joinedQ <= this.q && !p.answers[this.q]) this.record(p, { q: this.q, given: d }, this.limitFor(q));
+      }
+    }
+    for (const p of this.players) p.drafts = null;
     this.phase = 'reveal';
     this.revealAt = this.now() + this.revealMs;
     for (const p of this.players) if (!p.gone && p.joinedQ <= this.q && !p.answers[this.q]) p.streak = 0;
@@ -307,13 +321,35 @@ export class P2PRoom {
     if (now < this.qStart - 500) return err('not_open');
     if (now > this.qDeadline + GRACE_MS) return err('too_late');
     const q = this.questions[this.q], limit = this.limitFor(q);
-    const ms = answerMs(now - this.qStart, a.ms, limit);
+    const rec = this.record(p, a, answerMs(now - this.qStart, a.ms, limit));
+    p.seen = now;
+    if (this.allAnswered(now)) this.reveal(); else this.changed();
+    return { answer: rec };
+  }
+
+  // Current picks for a multi-pick question (rooms.go draft); reveal() scores them if no answer came.
+  draft(p, a) {
+    const now = this.now();
+    if (this.phase !== 'question' || a.q !== this.q || now < this.qStart - 500) return err('not_open');
+    if (!DRAFT.has(this.questions[this.q]?.format)) return err('not_draftable');
+    if (p.joinedQ > this.q) return err('late_join');
+    if (p.answers[this.q]) return err('already_answered');
+    if (now > this.qDeadline + GRACE_MS) return err('too_late');
+    if (JSON.stringify(a.given ?? null).length > 512) return err('too_big');
+    p.drafts = { [this.q]: a.given ?? null };
+    p.seen = now;
+    return {};
+  }
+
+  // Scores one answer at answer time ms and books it; the caller checks the phase and timing.
+  record(p, a, ms) {
+    const q = this.questions[this.q], limit = this.limitFor(q);
     const correct = verifyCorrect(q, a.given, a.correct);
     const n = stagesOf(q);
     const stage = n ? this.stage : 0;
     let speed = basePoints(q?.format, correct, typeof a.points === 'number' ? a.points : undefined, ms, limit, !this.kids);
-    if (q?.format === 'pickall') speed = Math.min(speed, pickallCap(q.answer, a.given, MAX_BASE));
-    // trio: the room's own speed points × the share of rows right (the client's points are never used)
+    // pickall / trio: the room's own speed points × the share right (the client's points are never used)
+    if (q?.format === 'pickall') speed = Math.round(basePoints('mc', true, undefined, ms, limit, !this.kids) * pickScore(a.given, q.answer).frac);
     if (q?.format === 'trio') speed = Math.round(basePoints('mc', true, undefined, ms, limit, !this.kids) * trioScore(a.given, q.answer).frac);
     let raw = speed, lf = null;
     if (q?.format === 'listen' && !n && correct && !this.kids) {
@@ -323,14 +359,14 @@ export class P2PRoom {
     const base = Math.round(raw * stageMultiplier(stage, n));
     if (correct) { p.streak++; p.correct++; p.best = Math.max(p.best, p.streak); } else p.streak = 0;
     const pts = correct && !this.noStreak ? withStreak(base, p.streak) : base;
+    const hat = q?.format === 'trio' && correct ? HAT_BONUS : 0;
     const given = JSON.stringify(a.given ?? null).length > 2048 ? null : a.given;
-    const rec = { given, correct, points: pts, ms, stage, speed, bonus: pts - base, streak: correct ? p.streak : 0,
-      ...(lf ? { clipMul: lf.clipMul, artMul: lf.artMul, replays: lf.reps, clip: lf.clip } : {}) };
+    const rec = { given, correct, points: pts + hat, ms, stage, speed, bonus: pts - base, streak: correct ? p.streak : 0,
+      ...(hat ? { hat } : {}), ...(lf ? { clipMul: lf.clipMul, artMul: lf.artMul, replays: lf.reps, clip: lf.clip } : {}) };
     p.answers[this.q] = rec;
-    p.score += pts;
-    p.seen = now;
-    if (this.allAnswered(now)) this.reveal(); else this.changed();
-    return { answer: rec };
+    p.score += pts + hat;
+    this.changed();
+    return rec;
   }
 
   remove(p, kicked = false) {

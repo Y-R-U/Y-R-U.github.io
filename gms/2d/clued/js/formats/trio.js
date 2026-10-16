@@ -2,15 +2,19 @@
 // year from a clip, country / capital / continent from a flag; with no picture or clip the name is shown and the other
 // rows asked). Tap one per row, lock in; each right row is a share of the points (js/formats/trio_score.js).
 // Packs opt in through TRIO (or pack.trio, same shape): the rows, the facts behind them and the media to show.
-import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick } from './registry.js?v=202610161040';
-import { h, mediaBox, onKey } from '../ui/kit.js?v=202610161040';
-import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610161040';
-import { basePoints } from '../core/scoring.js?v=202610161040';
-import { preflight, urlsOf } from '../core/media.js?v=202610161040';
-import { confetti } from '../ui/fx.js?v=202610161040';
-import { trioScore, trioCap } from './trio_score.js?v=202610161040';
+import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick } from './registry.js?v=202610161047';
+import { h, mediaBox, onKey } from '../ui/kit.js?v=202610161047';
+import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610161047';
+import { basePoints } from '../core/scoring.js?v=202610161047';
+import { preflight, urlsOf } from '../core/media.js?v=202610161047';
+import { confetti } from '../ui/fx.js?v=202610161047';
+import { trioScore, trioCap } from './trio_score.js?v=202610161047';
+import { yearOptions, MAX_YEAR } from './years.js?v=202610161047';
+import { isCredit, leadOf } from './cocredit.js?v=202610161047';
 
 export { trioScore, trioCap };
+// every row right: a flat bonus on top, after the streak (the server and P2P host award the same)
+export const HAT_BONUS = 100;
 
 /* Row kinds: 'name' (the item; only when a picture or clip stands in for it), 'fact' (facts[key]; split = how a value
    breaks into people, so co-credits never repeat across options; first = one billed name; fromOptions = the values of
@@ -44,10 +48,8 @@ export const TRIO = {
 };
 const confOf = pack => pack?.trio || TRIO[pack?.id] || null;
 
-export const YEAR_GAP = { 0: 3, 1: 5, 2: 3, 3: 2 };   // min years between year options, by difficulty
 const NEAR = [8, 15];                                 // fact distractors: from an item within this many years
 const NAME_NEAR = [5, 10, 15, 25, Infinity];
-const MIN_YEAR = -3000, MAX_YEAR = 2026;
 const CLIP_LEN = 10;
 
 const SPLITS = {
@@ -67,6 +69,7 @@ const peopleText = ps => (ps.length <= 2 ? ps.join(' & ') : `${ps[0]} & others`)
 // What an option shows: artists as credited ("Simon & Garfunkel"), people lists shortened, a single picked name as is.
 function textOf(it, row, ids) {
   if (row.first) return ids[0];
+  if (row.split === 'people' && isCredit(row.key)) return leadOf(ids);
   if (row.split === 'people') return peopleText(ids);
   return rawOf(it, row.key);
 }
@@ -76,21 +79,10 @@ export const yearText = y => (y < 0 ? `${-y} BC` : String(y));
 const hasClip = it => !!it?.media?.audio?.some(a => a.src);
 const hasMedia = (it, conf) => (conf.media === 'audio' ? hasClip(it) : conf.media === 'img' ? hasImg(it) : false);
 
-// Four exact years, consecutive ones at least `gap` apart, the right one at a random place, in order.
-export function yearOptions(rng, y, gap, lo = MIN_YEAR, hi = MAX_YEAR) {
-  const step = () => gap + Math.floor(rng() * (gap >= 5 ? 3 : 2));
-  for (const k of shuffle(rng, [0, 1, 2, 3])) {
-    const all = [y];
-    for (let i = 0; i < k; i++) all.unshift(all[0] - step());
-    while (all.length < 4) all.push(all[all.length - 1] + step());
-    if (all[0] >= lo && all[3] <= hi) return { years: all, answer: k };
-  }
-  return null;
-}
-// Inside the pack's own years first (a 1980s pack never offers 1993), narrowing the gap down to 2 before going wider.
-function yearRow(rng, y, gap, lo, hi) {
-  for (let g = gap; g >= 2; g--) for (let k = 0; k < 6; k++) { const r = yearOptions(rng, y, g, lo, hi); if (r) return r; }
-  return yearOptions(rng, y, gap, lo - 15, Math.min(hi + 5, MAX_YEAR)) || yearOptions(rng, y, gap, MIN_YEAR, MAX_YEAR);
+// Inside the pack's own years first (a 1980s pack never offers 1993); the level's spacing always holds (years.js).
+function yearRow(rng, y, level, lo, hi) {
+  for (let k = 0; k < 6; k++) { const r = yearOptions(rng, y, 4, { level, lo, hi }); if (r) return r; }
+  return yearOptions(rng, y, 4, { level }) || yearOptions(rng, y, 4, { level, hi: Math.max(y + 30, MAX_YEAR) });
 }
 
 function pickImage(rng, item, difficulty) {
@@ -160,7 +152,7 @@ function make(rng, pack, conf, difficulty) {
       rows.push({ row, options: opts.map(c => c.item.name), answer: opts.indexOf(t) });
     } else if (row.kind === 'year') {
       const ys = all.map(c => yearOf(c.item, row.key)).filter(v => v != null);
-      const yo = yearRow(rng, yearOf(t.item, row.key), YEAR_GAP[difficulty] ?? 3, Math.min(...ys), Math.min(Math.max(...ys), MAX_YEAR));
+      const yo = yearRow(rng, yearOf(t.item, row.key), difficulty || 2, Math.min(...ys), Math.min(Math.max(...ys), MAX_YEAR));
       if (!yo) return null;
       rows.push({ row, options: yo.years.map(yearText), answer: yo.answer });
     } else {
@@ -207,6 +199,7 @@ function makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame,
   const right = row.first ? ids.filter(x => !taken.has(norm(x))).slice(0, 1) : ids;
   if (!right.length) return null;
   const rightText = row.first ? right[0] : textOf(t.item, row, right);
+  // a shared credit names its best-known person only (cocredit.js); the others stay banned as wrong options
   if (!rightText) return null;
   let wrong = [];
   if (row.fromOptions) {
@@ -243,7 +236,7 @@ function makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame,
 }
 
 const packId = info => info.id || String(info.path || '').replace(/^.*\//, '').replace(/\.json$/, '');
-const audioMod = () => import('./trio_audio.js?v=202610161040');
+const audioMod = () => import('./trio_audio.js?v=202610161047');
 
 export default register({
   id: 'trio', title: 'Hat-trick', icon: '🎩', blurb: 'Three questions in one: name it, who, when', tags: ['slow'], noKids: true,
@@ -283,7 +276,7 @@ const CSS = `
 .tr-row{display:flex;flex-direction:column;gap:4px}
 .tr-lbl{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
 .tr-lbl .tk{font-size:14px;letter-spacing:0}
-.tr-lbl .tk.ok{color:var(--good)}.tr-lbl .tk.bad{color:var(--bad)}
+.tr-lbl .tk.ok{color:var(--good)}.tr-lbl .tk.bad{color:var(--bad)}.tr-lbl .tk.none{color:var(--ink-2)}
 .tr-opts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .tr-opts.year{grid-template-columns:repeat(4,1fr)}
 .tr-chip{position:relative;min-height:40px;padding:4px 8px;border:2px solid var(--ink);border-radius:12px;background:#fff;box-shadow:0 2px 0 var(--ink);font:inherit;font-weight:800;font-size:14px;line-height:1.12;color:var(--ink);text-align:center;cursor:pointer;overflow-wrap:anywhere;hyphens:auto}
@@ -366,6 +359,7 @@ function render(el, q, api) {
     const next = sel.findIndex(x => x < 0);
     cur = next < 0 ? ri : next;
     api.sfx?.('tap');
+    api.draft?.(sel.slice());
     draw();
   }
   const right = Array.isArray(q.answer) ? q.answer : [];
@@ -376,8 +370,9 @@ function render(el, q, api) {
         b.disabled = true; b.removeAttribute('aria-pressed');
         b.classList.add(i === a ? (sel[ri] === i ? 'ok' : 'miss') : sel[ri] === i ? 'bad' : 'dim');
       });
-      ticks[ri].textContent = sel[ri] === a ? '✓' : '✗';
-      ticks[ri].className = `tk ${sel[ri] === a ? 'ok' : 'bad'}`;
+      // a row left unpicked is shown, never marked wrong
+      ticks[ri].textContent = sel[ri] === a ? '✓' : sel[ri] < 0 ? '–' : '✗';
+      ticks[ri].className = `tk ${sel[ri] === a ? 'ok' : sel[ri] < 0 ? 'none' : 'bad'}`;
     });
   }
   function finish(timeout) {
@@ -388,19 +383,22 @@ function render(el, q, api) {
     const s = trioScore(sel, right);
     const hat = s.correct && n === 3;
     top.classList.toggle('hat', hat);
-    top.textContent = timeout ? `Time's up · answers shown` : hat ? 'Hat-trick! 🎩' : `${s.hits} of ${n} right`;
-    if (timeout) return;
+    top.textContent = hat ? 'Hat-trick! 🎩' : `${s.hits} of ${n} right`;
+    // a timeout scores what was picked as if locked at the deadline (minimum speed points)
     const given = sel.slice();
+    let res;
     if (s.correct) {
       if (hat) try { confetti({ count: 90, duration: 2000 }); } catch (e) {}
-      answer({ correct: true, given, title: hat ? 'Hat-trick! 🎩' : `All ${n} right!`, detail: { hits: s.hits, of: n } });
-      return;
+      res = { correct: true, given, hat: HAT_BONUS, title: hat ? 'Hat-trick! 🎩' : `All ${n} right!`, detail: { hits: s.hits, of: n } };
+    } else {
+      let rem = 0, full = 0;
+      try { rem = timeout ? 0 : api.timer.remaining(); full = api.timer.full || api.timer.limit || 0; } catch (e) {}
+      const base = basePoints({ timed: !!api.timed && full > 0 && (timeout || rem > 0), remaining: rem, limit: full });
+      const points = Math.round(base * s.frac);
+      res = { correct: false, partial: points > 0, points, given, title: s.hits ? `${s.hits} of ${n} right` : undefined, detail: { hits: s.hits, of: n } };
     }
-    let rem = 0, full = 0;
-    try { rem = api.timer.remaining(); full = api.timer.full || api.timer.limit || 0; } catch (e) {}
-    const base = basePoints({ timed: !!api.timed && rem > 0 && full > 0, remaining: rem, limit: full });
-    const points = Math.round(base * s.frac);
-    answer({ correct: false, partial: points > 0, points, given, title: s.hits ? `${s.hits} of ${n} right` : undefined, detail: { hits: s.hits, of: n } });
+    if (timeout) return res;
+    answer(res);
   }
   const offKey = onKey(e => {
     if (done) return;
@@ -410,7 +408,7 @@ function render(el, q, api) {
   });
   return {
     destroy() { dead = true; offKey(); au?.destroy(); },
-    timeout() { finish(true); },
+    timeoutAnswer() { return finish(true) || null; },
     choose(x) {
       const want = Array.isArray(x) ? x : rows.map((r, ri) => (x === 'correct' ? right[ri] : (right[ri] + 1) % r.options.length));
       want.forEach((i, ri) => { if (ri < n && sel[ri] !== i) tap(ri, i); });

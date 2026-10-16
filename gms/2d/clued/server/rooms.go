@@ -43,25 +43,27 @@ type Answer struct {
 	ClipMul float64         `json:"cm,omitempty"` // listen: clip-length and artwork multipliers, replays counted
 	ArtMul  float64         `json:"am,omitempty"`
 	Replays int             `json:"rp,omitempty"`
+	Hat     int             `json:"ht,omitempty"` // trio: the hat-trick bonus included in Points
 }
 
 type Player struct {
-	ID         string          `json:"id"`
-	Name       string          `json:"name"`
-	Key        string          `json:"key"`
-	UID        string          `json:"uid,omitempty"`
-	Score      int             `json:"score"`
-	Correct    int             `json:"correct"`
-	Streak     int             `json:"streak"`
-	BestStreak int             `json:"best"`
-	JoinedQ    int             `json:"joinedQ"`
-	Order      int             `json:"order"`
-	Answers    map[int]*Answer `json:"answers"`
-	Gone       bool            `json:"gone,omitempty"`
-	Kicked     bool            `json:"kicked,omitempty"`
-	LastSeen   int64           `json:"seen"`
-	Ready      int             `json:"ready,omitempty"`    // highest question index + 1 this client has loaded
-	ReadyCap   bool            `json:"readyCap,omitempty"` // the client reports readiness, so openings may wait for it
+	ID         string                  `json:"id"`
+	Name       string                  `json:"name"`
+	Key        string                  `json:"key"`
+	UID        string                  `json:"uid,omitempty"`
+	Score      int                     `json:"score"`
+	Correct    int                     `json:"correct"`
+	Streak     int                     `json:"streak"`
+	BestStreak int                     `json:"best"`
+	JoinedQ    int                     `json:"joinedQ"`
+	Order      int                     `json:"order"`
+	Answers    map[int]*Answer         `json:"answers"`
+	Gone       bool                    `json:"gone,omitempty"`
+	Kicked     bool                    `json:"kicked,omitempty"`
+	LastSeen   int64                   `json:"seen"`
+	Ready      int                     `json:"ready,omitempty"`    // highest question index + 1 this client has loaded
+	ReadyCap   bool                    `json:"readyCap,omitempty"` // the client reports readiness, so openings may wait for it
+	Drafts     map[int]json.RawMessage `json:"drafts,omitempty"`   // multi-pick formats: the current picks, scored at the deadline if never locked
 	conns      int
 }
 
@@ -450,12 +452,21 @@ func (r *Room) ready(p *Player, q int) {
 }
 
 func (r *Room) reveal() {
+	// unlocked multi-pick answers count as locked at the deadline (minimum speed points)
+	if r.Q >= 0 && r.Q < len(r.meta) && draftFormats[r.meta[r.Q].Format] {
+		for _, p := range r.Players {
+			if d, ok := p.Drafts[r.Q]; ok && !p.Gone && p.JoinedQ <= r.Q && p.Answers[r.Q] == nil {
+				r.record(p, answerIn{Q: r.Q, Given: d}, r.meta[r.Q].LimitMs)
+			}
+		}
+	}
 	r.Phase = "reveal"
 	r.RevealAt = nowMs() + int64(r.RevealMs)
 	for _, p := range r.Players {
 		if !p.Gone && p.JoinedQ <= r.Q && p.Answers[r.Q] == nil {
 			p.Streak = 0
 		}
+		clear(p.Drafts)
 	}
 	r.changed()
 }
@@ -510,6 +521,7 @@ type answerIn struct {
 	Points  *float64        `json:"points"`
 	Ms      *float64        `json:"ms"`
 	Replays *int            `json:"replays"` // listen: replays used (client-reported, clamped to the question's allowance)
+	Draft   bool            `json:"draft"`   // multi-pick formats: current picks, not a locked answer
 }
 
 func (r *Room) answer(p *Player, in answerIn) (*Answer, string) {
@@ -527,14 +539,53 @@ func (r *Room) answer(p *Player, in answerIn) (*Answer, string) {
 		return nil, "too_late"
 	}
 	m := r.meta[r.Q]
-	ms := answerMs(int(now-r.QStart), in.Ms, m.LimitMs)
+	a := r.record(p, in, answerMs(int(now-r.QStart), in.Ms, m.LimitMs))
+	p.LastSeen = now
+	if r.allAnswered(now) {
+		r.reveal()
+	}
+	return a, ""
+}
+
+// Formats whose picks can be scored at the deadline when the player never locked in (draftFormats).
+var draftFormats = map[string]bool{"trio": true, "pickall": true}
+
+// draft keeps a player's current picks for a multi-pick question; reveal() scores them if no answer came.
+func (r *Room) draft(p *Player, in answerIn) string {
+	now := nowMs()
+	switch {
+	case r.Phase != "question" || in.Q != r.Q || now < r.QStart-500:
+		return "not_open"
+	case !draftFormats[r.meta[r.Q].Format]:
+		return "not_draftable"
+	case p.JoinedQ > r.Q:
+		return "late_join"
+	case p.Answers[r.Q] != nil:
+		return "already_answered"
+	case now > r.QDeadline+graceMs:
+		return "too_late"
+	case len(in.Given) > 512:
+		return "too_big"
+	}
+	if p.Drafts == nil {
+		p.Drafts = map[int]json.RawMessage{}
+	}
+	clear(p.Drafts)
+	p.Drafts[r.Q] = in.Given
+	p.LastSeen = now
+	return ""
+}
+
+// record scores one answer at answer time ms and books it; the caller checks the phase and timing.
+func (r *Room) record(p *Player, in answerIn, ms int) *Answer {
+	m := r.meta[r.Q]
 	if len(in.Given) > 2048 {
 		in.Given = nil
 	}
 	correct := verifyCorrect(m, in.Given, in.Correct)
 	base := basePoints(m.Format, correct, in.Points, ms, m.LimitMs, !r.Kids)
 	if m.Format == "pickall" {
-		base = min(base, pickallCap(m.Answer, in.Given))
+		base = pickallPoints(m.Answer, in.Given, ms, m.LimitMs, !r.Kids)
 	}
 	if m.Format == "trio" {
 		base = trioPoints(m.Answer, in.Given, ms, m.LimitMs, !r.Kids)
@@ -559,16 +610,16 @@ func (r *Room) answer(p *Player, in answerIn) (*Answer, string) {
 	if correct && !r.NoStreak {
 		pts = withStreak(base, p.Streak)
 	}
-	a := &Answer{Given: in.Given, Correct: correct, Points: pts, Ms: ms, Stage: stage, Speed: speed, Bonus: pts - base,
-		ClipMul: clipMul, ArtMul: artMul, Replays: reps}
-	p.Answers[r.Q] = a
-	p.Score += pts
-	p.LastSeen = now
-	r.changed()
-	if r.allAnswered(now) {
-		r.reveal()
+	hat := 0
+	if m.Format == "trio" && correct {
+		hat = hatTrickBonus
 	}
-	return a, ""
+	a := &Answer{Given: in.Given, Correct: correct, Points: pts + hat, Ms: ms, Stage: stage, Speed: speed, Bonus: pts - base,
+		ClipMul: clipMul, ArtMul: artMul, Replays: reps, Hat: hat}
+	p.Answers[r.Q] = a
+	p.Score += pts + hat
+	r.changed()
+	return a
 }
 
 func (r *Room) transferHost(now int64, preferOnline bool) {
@@ -839,10 +890,11 @@ type pubLast struct {
 	ArtMul  float64 `json:"artMul,omitempty"`
 	Clip    float64 `json:"clip,omitempty"`
 	Replays int     `json:"replays,omitempty"`
+	Hat     int     `json:"hat,omitempty"` // trio: hat-trick bonus included in Points
 }
 
 func (r *Room) lastOf(a *Answer, p *Player) *pubLast {
-	l := &pubLast{Correct: a.Correct, Points: a.Points, Ms: a.Ms, Speed: a.Speed, Bonus: a.Bonus, Stage: a.Stage}
+	l := &pubLast{Correct: a.Correct, Points: a.Points, Ms: a.Ms, Speed: a.Speed, Bonus: a.Bonus, Stage: a.Stage, Hat: a.Hat}
 	if r.Q >= 0 && r.Q < len(r.meta) && r.meta[r.Q].Stages >= 2 {
 		l.Stages = r.meta[r.Q].Stages
 	}

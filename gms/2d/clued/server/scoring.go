@@ -284,6 +284,15 @@ func trioScore(answer, given json.RawMessage) (frac float64, ok bool) {
 	return float64(hits) / float64(len(a)), hits == len(a) && len(g) == len(a)
 }
 
+// The flat bonus for getting every row of a Hat-trick right, after the streak bonus (js/net/p2p_room.js HAT_BONUS).
+const hatTrickBonus = 100
+
+// pickallPoints: the room's own speed points × the share of right picks (pickall_score.js); client points are not used.
+func pickallPoints(answer, given json.RawMessage, ms, limitMs int, timed bool) int {
+	frac, _ := pickallScore(answer, given)
+	return int(math.Round(float64(basePoints("mc", true, nil, ms, limitMs, timed)) * frac))
+}
+
 // trioPoints: the room's own speed points × the share of rows right; the client's points are never used.
 func trioPoints(answer, given json.RawMessage, ms, limitMs int, timed bool) int {
 	frac, _ := trioScore(answer, given)

@@ -1,8 +1,10 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
   spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk, givesAway,
-} from './registry.js?v=202610161040';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610161040';
+} from './registry.js?v=202610161047';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610161047';
+import { yearOptions, plainYear } from './years.js?v=202610161047';
+import { isCredit, leadOf, people } from './cocredit.js?v=202610161047';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
@@ -31,7 +33,7 @@ function sources(pack, n, src, gate = {}) {
   return out;
 }
 
-function fromQuestion(rng, pack, n, difficulty) {
+function fromQuestion(rng, pack, n, difficulty, kids = false) {
   // kids-bank questions carry only 2 wrong answers: a 4-answer game falls back to 3 rather than finding nothing
   const mcs = (pack.questions || []).filter(q => (q.kind || 'mc') === 'mc' && !givesAway(q.answer, q.prompt, q.wrong));
   const full = mcs.filter(q => (q.wrong || []).length >= n - 1);
@@ -40,10 +42,13 @@ function fromQuestion(rng, pack, n, difficulty) {
   const q = pick(rng, qs);
   const wrong = sample(rng, q.wrong, Math.min(n - 1, q.wrong.length));
   // ordered: range bands ("Under 10 h", "10–50 h", …) stay in their natural order
-  const { options, answer } = Array.isArray(q.ordered)
+  // a year answer with year decoys: the decoys are re-spaced by level (years.js), in order
+  const y = !Array.isArray(q.ordered) && /\b(year|when)\b/i.test(q.prompt) && plainYear(q.answer);
+  const yo = y && q.wrong.every(w => plainYear(w) != null) ? yearOptions(rng, y, wrong.length + 1, { level: difficulty || 2, kids }) : null;
+  const { options, answer } = yo ? { options: yo.years.map(String), answer: yo.answer } : Array.isArray(q.ordered)
     ? (o => ({ options: o, answer: o.indexOf(q.answer) }))(q.ordered.filter(t => t === q.answer || wrong.includes(t)))
     : placeAnswer(rng, q.answer, wrong);
-  const notes = q.wrongNotes && wrong.filter(w => q.wrongNotes[w]).map(w => [String(w), q.wrongNotes[w]]);
+  const notes = !yo && q.wrongNotes && wrong.filter(w => q.wrongNotes[w]).map(w => [String(w), q.wrongNotes[w]]);
   return {
     format: 'mc', id: `mc:${pack.id}/q:${q.id}`, prompt: q.prompt, media: q.media && Object.keys(q.media).length ? q.media : undefined,
     options: options.map(t => ({ text: String(t) })), answer, answerText: String(q.answer),
@@ -79,10 +84,14 @@ function fromItems(rng, pack, kind, n, difficulty) {
   const pool = all.filter(c => fv(c.item) != null);
   if (type === 'cat' || type === 'rev') {
     const t = pick(rng, byDifficulty(pool, difficulty, n, c => c.item.difficulty || 2));
-    const vals = [].concat(fv(t.item)).map(String);
+    // shared credits (two directors): only the best-known one is asked or offered, and no co-credit is ever a wrong option
+    const credit = isCredit(key), tPeople = new Set(people(fv(t.item)).map(s => s.toLowerCase()));
+    const cv = it => (credit ? [leadOf(fv(it))] : [].concat(fv(it)).map(String));
+    const sharesCredit = it => credit && people(fv(it)).some(p => tPeople.has(p.toLowerCase()));
+    const vals = cv(t.item);
     const value = pick(rng, vals);
     if (type === 'cat') {
-      const others = shuffle(rng, [...new Set(pool.flatMap(c => [].concat(fv(c.item)).map(String)))].filter(v => !vals.includes(v) && !vals.some(x => nested(x, v))));
+      const others = shuffle(rng, [...new Set(pool.filter(c => !sharesCredit(c.item)).flatMap(c => cv(c.item)))].filter(v => !vals.includes(v) && !vals.some(x => nested(x, v))));
       if (others.length < n - 1) return null;
       const prompt = fill(catAsk(meta), { name: t.item.name, lname: t.item.lname, label: meta.label, value });
       if (givesAway(value, prompt, others.slice(0, n - 1))) return null;
@@ -94,7 +103,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
         explain: t.item.blurb, refs: [t.ref], hint: `It starts with “${value.charAt(0)}”`,
       };
     }
-    const wrong = distractors(rng, t, pool, n - 1, { reject: it => [].concat(fv(it)).map(String).includes(value) });
+    const wrong = distractors(rng, t, pool, n - 1, { reject: it => (credit ? people(fv(it)).some(p => p.toLowerCase() === value.toLowerCase()) : [].concat(fv(it)).map(String).includes(value)) });
     if (!wrong) return null;
     const prompt = fill(meta.askReverse, { name: t.item.name, lname: t.item.lname, label: meta.label, value });
     if (givesAway(t.item.name, prompt, wrong.map(c => c.item.name))) return null;
@@ -174,7 +183,7 @@ export default register({
     return collect(count, () => {
       const { p, s } = pickPack(rng, usable, x => Math.sqrt((x.p.items || []).length + (x.p.questions || []).length + 1));
       const [kind] = pickWeighted(rng, s);
-      const q = kind === 'q' ? fromQuestion(rng, p, n, difficulty) : fromItems(rng, p, kind, n, difficulty);
+      const q = kind === 'q' ? fromQuestion(rng, p, n, difficulty, kids) : fromItems(rng, p, kind, n, difficulty);
       if (q) q.pack = p.id;
       return q;
     }, avoid);

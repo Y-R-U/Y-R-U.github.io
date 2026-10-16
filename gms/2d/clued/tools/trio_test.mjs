@@ -24,6 +24,8 @@ const { rngFrom } = await imp('js/core/rng.js');
 const reg = await imp('js/formats/registry.js');
 const T = await imp('js/formats/trio.js');
 const { trioScore, trioCap } = await imp('js/formats/trio_score.js');
+const Y = await imp('js/formats/years.js');
+const CC = await imp('js/formats/cocredit.js');
 const P2P = await imp('js/net/p2p_room.js');
 const { cleanQuestion } = await imp('js/net/sanitize.js');
 const fmt = T.default;
@@ -55,8 +57,32 @@ ok(trioCap([2, 0, 3], [2, 0, 1]) === 333 && trioCap([2, 0, 3], [2, 0, 3]) === 50
   const ra = room.answer(a, { q: 0, given: [1, 0, 3], correct: true, points: 500, ms: 0 }).answer;
   const rb = room.answer(b, { q: 0, given: [1, 2, 0], correct: false, points: 0, ms: 0 }).answer;
   ok(!ra.correct && ra.points === 167, `P2P: 1 of 3 claimed as 500 scores 167 (${ra.points})`);
-  ok(rb.correct && rb.points === 500, `P2P: hat-trick at once scores 500 (${rb.points})`);
+  ok(rb.correct && rb.points === 600 && rb.hat === 100, `P2P: hat-trick at once scores 500 + 100 bonus (${rb.points})`);
   ok(a.streak === 0 && b.streak === 1, 'P2P: only a hat-trick keeps the streak');
+  // drafts: picks never locked in are scored at the deadline with minimum speed points; nothing picked scores nothing
+  room.reveal(); room.advance();
+  now = room.qStart;
+  const c = room.addPlayer('Cy').player;
+  ok(!room.draft(a, { q: 1, given: [1, 2, 3] }).error && !room.draft(a, { q: 1, given: [1, 2, 0] }).error, 'P2P: drafts accepted, newest wins');
+  ok(!room.draft(b, { q: 1, given: [1, 0, 3] }).error, 'P2P: a partial draft');
+  ok(room.draft(c, { q: 0, given: [1, 2, 0] }).error === 'not_open', 'P2P: a draft for another question is refused');
+  now = room.qDeadline + 10000;
+  room.reveal();
+  const da = a.answers[1], db = b.answers[1];
+  ok(da?.correct && da.points === 100 + 100 && da.ms === room.limitFor(q), `P2P: an unlocked hat-trick scores minimum speed + bonus (${JSON.stringify(da)})`);
+  ok(db && !db.correct && db.points === 33, `P2P: an unlocked 1 of 3 scores a third of minimum speed (${JSON.stringify(db)})`);
+  ok(!c.answers[1], 'P2P: no picks, no answer');
+}
+{
+  const pq = { format: 'pickall', answer: [0, 2], options: [...'abcdef'].map(text => ({ text })), data: { need: 2 } };
+  let now = 1e6;
+  const room = new P2P.P2PRoom({ questions: [pq], answerSec: 15, now: () => now });
+  const a = room.addPlayer('Ann').player, b = room.addPlayer('Bob').player;
+  room.start(); now = room.qStart;
+  ok(room.answer(a, { q: 0, given: [0, 1], correct: true, points: 500, ms: 0 }).answer.points === 250, 'P2P pick-all: half right claimed as 500 scores 250');
+  room.draft(b, { q: 0, given: [2] });
+  now = room.qDeadline + 5000; room.reveal();
+  ok(b.answers[0]?.points === 50 && !b.answers[0].correct, `P2P pick-all: an unlocked 1 of 2 scores 50 (${JSON.stringify(b.answers[0])})`);
 }
 
 // sanitize
@@ -115,10 +141,10 @@ function validate(q, pack, d, tag) {
       const gaps = ys.slice(1).map((v, i) => v - ys[i]);
       const span = pack.items.map(it => it.facts[rc.key]);
       const roomy = Math.max(...span) - Math.min(...span) >= 30;
-      const want = roomy ? T.YEAR_GAP[d] ?? 3 : 2;
+      const [want, most] = Y.stepsFor(d || 2);
       ok(gaps.every(g => g >= want), `years ascending, ≥ ${want} apart (${gaps}) ${tag} ${q.id}`);
-      if (!roomy && Math.max(...span) - Math.min(...span) >= 9) ok(ys[0] >= Math.min(...span) && ys[3] <= Math.max(...span), `a decade pack's years stay inside it (${ys}) ${tag} ${q.id}`);
-      ok(gaps.every(g => g <= (T.YEAR_GAP[d] ?? 3) + 2), `years not spread wider than the rule ${tag} ${q.id}`);
+      if (!roomy && Math.max(...span) - Math.min(...span) >= 3 * most) ok(ys[0] >= Math.min(...span) && ys[3] <= Math.max(...span), `a decade pack's years stay inside it (${ys}) ${tag} ${q.id}`);
+      ok(gaps.every(g => g <= most), `years not spread wider than the rule (${gaps}) ${tag} ${q.id}`);
     } else {
       const sp = rc.split ? SPLIT[rc.split] : null;
       const ids = v => (v == null ? [] : rc.split ? String(v).split(sp).map(s => s.trim()) : rc.key === 'continent' ? String(v).split(',') : [String(v)]).map(norm);
@@ -128,6 +154,8 @@ function validate(q, pack, d, tag) {
       const has = (it, o) => (asCredited ? norm(it.facts[rc.key]) === norm(o) : ids(it.facts[rc.key]).includes(keyOf(o)));
       const rightIds = asCredited ? [norm(right)] : rc.split === 'people' && !rc.first ? right.replace(/ & others$/, '').split(' & ').map(norm) : [norm(right)];
       ok(asCredited ? norm(t.facts[rc.key]) === norm(right) : rightIds.every(x => tIds.includes(x)), `${r.label} answer is the item's (${right}) ${tag} ${q.id}`);
+      // shared credits: the best-known person alone, and every option one person
+      if (CC.isCredit(rc.key) && !rc.first) ok(right === CC.leadOf(t.facts[rc.key]) && r.options.every(o => !/ & /.test(o)), `${r.label} names the best-known co-credit only (${right}) ${tag} ${q.id}`);
       const credits = new Set(c.rows.filter(x => x.kind === 'fact' && x.split).flatMap(x => (x.split ? String(t.facts[x.key] ?? '').split(SPLIT[x.split]) : [])).map(norm).filter(Boolean));
       r.options.forEach((o, i) => {
         if (i === a) return;
@@ -198,19 +226,63 @@ ok(L('countries').filter(q => q.data.layout === 'pic').every(q => q.rows[0].labe
   const qs = fmt.generate({ rng: rngFrom('nc'), packs: [hp], count: 15, difficulty: 0 });
   ok(qs.length >= 10 && qs.every(q => q.data.layout === 'text' && !q.data.a && q.rows.map(r => r.label).join() === 'Artist,Year'), 'songs without clips: Artist / Year');
 }
-// year spacing by difficulty
+// year spacing by level (years.js): hard 1–2, medium/any 2–3, easy 4–6, kids 10–12; also the mc year questions
 {
   const r = rngFrom('years');
-  for (const [d, g] of [[1, 5], [2, 3], [3, 2]]) for (let i = 0; i < 200; i++) {
+  for (const [d, lo, hi, kids] of [[1, 4, 6], [2, 2, 3], [0, 2, 3], [3, 1, 2], [2, 10, 12, true]]) for (let i = 0; i < 200; i++) {
     const y = 1950 + Math.floor(r() * 60);
-    const o = T.yearOptions(r, y, T.YEAR_GAP[d]);
+    const o = Y.yearOptions(r, y, 4, { level: d, kids });
     const gaps = o.years.slice(1).map((v, j) => v - o.years[j]);
-    ok(o.years[o.answer] === y && gaps.every(x => x >= g), `year options level ${d}: ≥ ${g} apart`);
+    ok(o.years[o.answer] === y && gaps.every(x => x >= lo && x <= hi), `year options level ${d}${kids ? ' kids' : ''}: ${lo}–${hi} apart (${gaps})`);
   }
-  const pos = new Set(); for (let i = 0; i < 60; i++) pos.add(T.yearOptions(r, 1990, 3).answer);
+  const pos = new Set(); for (let i = 0; i < 60; i++) pos.add(Y.yearOptions(r, 1990, 4).answer);
   ok(pos.size === 4, 'the right year lands in every position');
+  ok(Y.yearOptions(r, 2025, 4, { level: 1 }).years.every(v => v <= 2026), 'never a year after 2026');
+  // pack mc questions with a year answer ("In which year was Jaws released?")
+  const mcF = reg.getFormat('mc') || (await imp('js/formats/mc.js')).default;
+  const made = {};
+  for (const id of ['movies', 'history', 'books']) {
+    const pack = loadPack(id);
+    for (const [d, kids] of [[0], [1], [2], [3], [1, true]]) {
+      const qs = mcF.generate({ rng: rngFrom(`mcy:${id}:${d}`), packs: [{ ...pack, items: [] }], count: 80, opts: { answers: 4, source: 'questions' }, difficulty: d, kids });
+      const yq = qs.filter(q => /\b(year|when)\b/i.test(q.prompt) && q.options.every(o => /^\d{3,4}$/.test(o.text)));
+      made[id] = (made[id] || 0) + yq.length;
+      const [lo, hi] = Y.stepsFor(d || 2, !!kids);
+      for (const q of yq) {
+        const ys = q.options.map(o => +o.text), gaps = ys.slice(1).map((v, j) => v - ys[j]);
+        ok(gaps.every(g => g >= lo && g <= hi) && q.options[q.answer].text === q.answerText, `mc year question ${id}/${d}${kids ? ' kids' : ''}: ${lo}–${hi} apart (${ys}) ${q.id}`);
+        const src = pack.questions.find(x => `mc:${id}/q:${x.id}` === q.id);
+        ok(src && String(src.answer) === q.answerText, `mc year answer unchanged ${q.id}`);
+      }
+    }
+  }
+  ok(Object.values(made).every(n => n >= 20), `mc year questions checked ${JSON.stringify(made)}`);
 }
-
+// co-credits in the regular mc questions: "Who directed Aladdin?" offers Ron Clements, never John Musker as a wrong option
+{
+  const mcF = reg.getFormat('mc') || (await imp('js/formats/mc.js')).default;
+  let seen = 0;
+  for (const id of ['movie-moments', 'books', 'inventions']) {
+    if (!index.packs[id]) continue;
+    const pack = loadPack(id);
+    const qs = mcF.generate({ rng: rngFrom('cc' + id), packs: [{ ...pack, questions: [] }], count: 400, opts: { answers: 4, source: 'facts' }, difficulty: 0 });
+    for (const q of qs.filter(q => /^mc:cat:(director|author|inventor):/.test(q.id))) {
+      const key = q.id.split(':')[2], t = pack.items.find(it => `${id}/${it.id}` === q.refs[0]);
+      const ps = CC.people(t.facts[key]).map(norm);
+      if (ps.length > 1) seen++;
+      ok(q.answerText === CC.leadOf(t.facts[key]), `mc ${key}: the answer is the best-known credit (${q.answerText}) ${q.id}`);
+      ok(q.options.every((o, i) => i === q.answer || !ps.includes(norm(o.text))), `mc ${key}: no co-credit as a wrong option ${q.id}`);
+      ok(q.options.every(o => CC.people(o.text).length === 1 || /^the /i.test(o.text)), `mc ${key}: one person per option (${q.options.map(o => o.text)}) ${q.id}`);
+    }
+    for (const q of qs.filter(q => /^mc:rev:(director|author):/.test(q.id))) {
+      const key = q.id.split(':')[2], who = norm(q.prompt.replace(/^.*by (.+)\?$/, '$1'));
+      const hits = q.options.filter(o => CC.people(pack.items.find(it => it.name === o.text)?.facts[key]).map(norm).includes(who));
+      ok(hits.length === 1 && hits[0].text === q.answerText, `mc rev ${key}: exactly one option credits ${who} ${q.id}`);
+    }
+  }
+  ok(seen >= 5, `mc co-credit questions checked (${seen})`);
+  ok(CC.leadOf('Ron Clements, John Musker') === 'Ron Clements' && CC.leadOf('Clyde Geronimi, Wilfred Jackson, Hamilton Luske') === 'Clyde Geronimi' && CC.leadOf('Jane Austen') === 'Jane Austen', 'leadOf picks the most-credited, ties to the first listed');
+}
 // falsify: the validator must catch broken questions
 {
   const pack = loadPack('movie-moments');

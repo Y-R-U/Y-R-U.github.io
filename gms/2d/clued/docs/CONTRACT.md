@@ -210,3 +210,12 @@ study sessions, daily calendar, last 200 games); layout in docs/notes/STATS.md. 
   `noKids` (supportsPack says 'Not in kids mode').
 - Runner: `api.answer({ title })` names the result on the reveal card; a partial answer with points shows "Partly right"
   (class `reveal.partial`, ½ mark, points) instead of a wrong card. `rec.partial`, `rec.title`.
+- (2026-10-16, round 2) Hat-trick bonus: every row right = +100 after the streak (`res.hat` → `rec.hat`; server `hatTrickBonus`
+  / `Answer.Hat` / `last.hat`, P2P `HAT_BONUS`). Multi-pick timeouts: formats expose `ctrl.timeoutAnswer()`; the runner
+  records it as `{ timeout, auto }` at minimum speed points. Rooms: `api.draft(given)` → `cfg.onDraft` → `POST /answer
+  {draft: true}` (trio, pickall: `draftFormats` / P2P `DRAFT`); the server/host scores an unlocked draft at reveal with
+  ms = limit. Pick-all room points are now server-computed too (speed × share, `pickallPoints`).
+- Year options (js/formats/years.js): gaps by level, hard 1–2, medium/any 2–3, easy 4–6, kids 10–12; used by trio rows
+  and mc pack questions whose answer and decoys are years (prompt mentions year/when).
+- Co-credits (js/formats/cocredit.js + generated cocredit_data.js from tools/trio_cocredit.mjs): director/author/inventor
+  facts name the best-known person only (most credits, ties to first listed), in trio and mc cat/rev questions.

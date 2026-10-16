@@ -1,5 +1,5 @@
 // Scoreboards and podium for rooms and challenges. All text goes in via textContent (h() kids).
-import { h, fmtNum } from '../ui/kit.js?v=202610161040';
+import { h, fmtNum } from '../ui/kit.js?v=202610161047';
 
 export const ordinal = n => {
   const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
@@ -20,6 +20,7 @@ export function pointsBreakdown(last, { streakBonus = true } = {}) {
   if (last.replays) parts.push(`−${Math.round((1 - 0.85 ** last.replays) * 100)}% ${last.replays} replay${last.replays === 1 ? '' : 's'}`);
   if (last.stages > 1 && last.stage) parts.push(`×${(1 - 0.6 * Math.min(last.stage, last.stages - 1) / (last.stages - 1)).toFixed(2).replace(/0$/, '')} at step ${last.stage + 1}/${last.stages}`);
   if (streakBonus && last.bonus > 0) parts.push(`+${fmtNum(last.bonus)} streak${last.streak > 1 ? ` (${last.streak} in a row)` : ''}`);
+  if (last.hat > 0) parts.push(`+${fmtNum(last.hat)} hat-trick`);
   return parts.join(' · ');
 }
 

@@ -82,6 +82,23 @@ async function solo() {
     await b.click('.reveal.show .next');
   }
   await b.waitFor('document.body.dataset.screen === "results"', 15000);
+  // timeout: the picks so far count as locked at the deadline (minimum speed points); missed tiles shown, none wrong
+  await b.eval(`window.__clued.start({ structure: 'quick', format: 'pickall', packs: ['general', 'countries', 'birds'], count: 1, timer: 3, opts: { tiles: 6 } }); true`);
+  await b.waitFor(`window.__clued.state().run?.answers === 0 && document.querySelectorAll('.stage .pa-tile').length`, 20000);
+  {
+    await sleep(500);
+    const Q = await qOf(b);
+    await tap(b, Q.answer[0]);
+    ok((await tiles(b))[Q.answer[0]].on, 'timeout: the pick registered before time ran out');
+    await b.waitFor('document.querySelector(".reveal.show")', 20000);
+    await sleep(500);
+    const rec = await lastRec(b), t = await tiles(b);
+    ok(rec.timeout && rec.auto && !rec.correct && rec.points === Math.round(100 / Q.need), `timeout: 1 of ${Q.need} picked scores ${Math.round(100 / Q.need)}`, JSON.stringify(rec));
+    ok(!t.some(x => /\bbad\b/.test(x.cls)) && t.filter(x => /\bmiss\b/.test(x.cls)).length === Q.need - 1, 'timeout: missed tiles shown, none marked wrong');
+    await b.shot(`${OUT}/${MODE}-timeout.png`);
+    await b.click('.reveal.show .next');
+    await b.waitFor('document.body.dataset.screen === "results"', 15000);
+  }
   // kids: 4–5 tiles, 2 right, pictures where the pack has them, read aloud, auto lock-in at 2 picks
   await boot(true);
   await b.eval(`window.__clued.start({ structure: 'quick', format: 'pickall', packs: ['birds', 'sea', 'kids'], count: 3, timer: 0, kids: true }); true`);

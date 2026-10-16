@@ -1,12 +1,12 @@
 // Device-hosted rooms: the host's tab runs P2PRoom and serves players over WebRTC data channels.
 // Signalling goes through the free PeerJS cloud broker (0.peerjs.com); no server of ours is involved.
 // Implements the transport interface in transport.js, so room.js / join.js work unchanged. docs/notes/P2P.md.
-import { P2PRoom, newCode, MAX_PLAYERS } from './p2p_room.js?v=202610161040';
-import { registerTransport, fallback } from './transport.js?v=202610161040';
-import { bootParam, rooms } from './api.js?v=202610161040';
-import { saveSeat } from './util.js?v=202610161040';
-import { lobbyNote, hostBackWarning } from './p2p_ui.js?v=202610161040';
-import { spendGame } from './pass.js?v=202610161040';
+import { P2PRoom, newCode, MAX_PLAYERS } from './p2p_room.js?v=202610161047';
+import { registerTransport, fallback } from './transport.js?v=202610161047';
+import { bootParam, rooms } from './api.js?v=202610161047';
+import { saveSeat } from './util.js?v=202610161047';
+import { lobbyNote, hostBackWarning } from './p2p_ui.js?v=202610161047';
+import { spendGame } from './pass.js?v=202610161047';
 
 export const PEER_PREFIX = 'clued-p2p-';
 const ICE = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }];
@@ -31,7 +31,7 @@ const fromRes = e => new P2PError(e?.error || 'error', MSG[e?.error] || e?.messa
   e?.error === 'bad_key' ? 403 : e?.error === 'kicked' ? 410 : e?.error === 'room_not_found' || e?.error === 'not_yet' ? 404 : CONFLICT.has(e?.error) ? 409 : 400);
 
 let PeerP = null;
-const loadPeer = () => PeerP || (PeerP = import('../vendor/peerjs.js?v=202610161040').then(m => m.Peer));
+const loadPeer = () => PeerP || (PeerP = import('../vendor/peerjs.js?v=202610161047').then(m => m.Peer));
 
 // ?peerhost=host:port[:path] points at a self-run PeerJS server (testing / future self-hosting).
 function peerOptions() {
@@ -201,6 +201,7 @@ function dispatch(H, op, a, conn) {
     case 'sub': bind(H, conn, p); return { state: r.stateFor(p) };
     case 'q': return r.question(p, a.i);
     case 'answer': {
+      if (a.draft) { const d = r.draft(p, a); return d.error ? d : { ok: true, draft: true }; }
       const res = r.answer(p, a);
       if (res.error) return res;
       return { ok: true, correct: res.answer.correct, points: res.answer.points, ms: res.answer.ms, score: p.score, streak: p.streak, state: r.stateFor(p) };
@@ -456,8 +457,8 @@ stats.transport = p2pTransport;   // test hook (tools/p2p_e2e.mjs)
 
 // Server refused (busy / paused): host the same prepared game from this device.
 fallback.host = async opts => {
-  const { go } = await import('../ui/app.js?v=202610161040');
-  const { toast } = await import('../ui/popup.js?v=202610161040');
+  const { go } = await import('../ui/app.js?v=202610161047');
+  const { toast } = await import('../ui/popup.js?v=202610161047');
   try {
     const res = await p2pTransport.create(opts);
     saveSeat(res.code, { key: res.playerKey, id: res.playerId, via: 'p2p' });
