@@ -277,14 +277,6 @@
       "credit": "JonRichfield",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Sparassidae_Palystes_castaneus_mature_female_9923s.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7497532/medium.jpeg",
-      "w": 500,
-      "h": 376,
-      "credit": "Matt Muir",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/7497532"
      }
     ]
    },
@@ -680,14 +672,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/589997318/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/589997318"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/407859897/medium.jpg",
       "w": 500,
       "h": 355,
@@ -752,14 +736,6 @@
       "credit": "Olei",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Pholcus.phalangioides.6908.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Smeringopus_natalensis_301141651_542639013.jpg/500px-Smeringopus_natalensis_301141651_542639013.jpg",
-      "w": 500,
-      "h": 424,
-      "credit": "Peter Webb",
-      "license": "CC BY 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Smeringopus_natalensis_301141651_542639013.jpg"
      }
     ]
    },
@@ -1089,14 +1065,6 @@
       "credit": "Jefferson Ferreira",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/304800566"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/269675936/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "anguspritchard",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/269675936"
      }
     ]
    },
@@ -1558,14 +1526,6 @@
       "credit": "Michael J. Papay",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/555702674"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/211209217/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Brian Mork",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/211209217"
      }
     ]
    },
@@ -2424,28 +2384,12 @@
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Phidippus_audax_male.jpg/500px-Phidippus_audax_male.jpg",
-      "w": 500,
-      "h": 381,
-      "credit": "Opoterser",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Phidippus_audax_male.jpg"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/PlatycryptusUndatusFemale.jpg/500px-PlatycryptusUndatusFemale.jpg",
       "w": 500,
       "h": 328,
       "credit": "Kevincollins123",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:PlatycryptusUndatusFemale.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/378835762/medium.jpg",
-      "w": 500,
-      "h": 332,
-      "credit": "Thomas Shahan",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/378835762"
      }
     ]
    },

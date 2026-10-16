@@ -133,7 +133,16 @@ function validate(q, pack, d, tag) {
       ok(right === t.name, `name row answer is the item ${tag} ${q.id}`);
       ok(media !== 'text', `name row only with a picture or clip ${tag} ${q.id}`);
       ok(optItems.every(Boolean), `name options are pack items ${tag} ${q.id}`);
-      if (c.era) ok(optItems.every(it => Math.abs(it.facts[c.era] - y) <= 25) || optItems.length < 4, `name options from a near era ${tag} ${q.id}`);
+      // within 25 years (or the pack's widest band) unless the pack has too few items that close: then the nearest
+      if (c.era) {
+        const bound = Math.max(25, (c.near || [0]).at(-1)), close = pack.items.filter(it => it.facts[c.era] != null && Math.abs(it.facts[c.era] - y) <= bound).length;
+        // an option from further away only when every closer unused item was ruled out: a look-alike / same-series
+        // item past the level's cap, or a name that hints at a chosen one
+        const near = it => it.facts[c.era] != null && Math.abs(it.facts[c.era] - y) <= bound;
+        const blocked = it => optItems.some(o => reg.looksAlike(o, it) || reg.givesAway(o.name, it.name) || reg.givesAway(it.name, o.name) || (o.facts.franchise && o.facts.franchise === it.facts.franchise));
+        const spare = pack.items.filter(it => near(it) && !optItems.includes(it) && !blocked(it));
+        ok(close < 4 || optItems.every(near) || !spare.length, `name options from a near era (${optItems.map(it => it.facts[c.era])} vs ${spare.map(it => it.name).slice(0, 3)}) ${tag} ${q.id}`);
+      }
       if (c.spread) ok(new Set(optItems.map(it => it.facts[c.spread])).size === 4, `name options differ on ${c.spread} ${tag} ${q.id}`);
     } else if (r.kind === 'year') {
       const ys = r.options.map(Number);
@@ -163,13 +172,13 @@ function validate(q, pack, d, tag) {
         const src = pack.items.filter(it => it !== t && has(it, o));
         ok(src.length > 0, `${r.label} wrong option comes from a pack item (${o}) ${tag} ${q.id}`);
         ok(!(asCredited ? ids(o) : norm(o).split(' & ')).some(x => credits.has(norm(x)) || tIds.includes(norm(x))), `${r.label} wrong option is never credited on the item (${o}) ${tag} ${q.id}`);
-        if (c.era) ok(src.some(it => Math.abs(it.facts[c.era] - y) <= 15), `${r.label} wrong option is from the same era (${o}) ${tag} ${q.id}`);
+        if (c.era) ok(src.some(it => Math.abs(it.facts[c.era] - y) <= (c.near || T.NEAR).at(-1)), `${r.label} wrong option is from the same era (${o}) ${tag} ${q.id}`);
         if (nameRow >= 0 && rc.split) ok(!optItems.filter(it => it !== t).some(it => has(it, o)), `${r.label} never pairs with another name option ${tag} ${q.id}`);
         if (c.spread && nameRow >= 0) ok(src.some(it => optItems.filter(it => it !== t).some(x => x.facts[c.spread] === it.facts[c.spread])), `${r.label} follows the name row's ${c.spread}s ${tag} ${q.id}`);
       });
       if (c.era && !rc.fromOptions) {
         // giveaway: every option is someone with work from the item's era, so no option stands alone
-        const era = r.options.filter(o => pack.items.some(it => Math.abs(it.facts[c.era] - y) <= 15 && has(it, o)));
+        const era = r.options.filter(o => pack.items.some(it => Math.abs(it.facts[c.era] - y) <= (c.near || T.NEAR).at(-1) && has(it, o)));
         ok(era.length === 4, `${r.label}: all four options from the item's era ${tag} ${q.id}`);
       }
     }
@@ -211,6 +220,16 @@ ok(L('movies').every(q => q.data.layout === 'text' && q.rows[0].label === 'Direc
 ok(L('hits-1980s').every(q => q.data.layout === 'audio' && q.data.len === 10 && q.rows.map(r => r.label).join() === 'Song,Artist,Year'), 'hits: clip + Song / Artist / Year');
 ok(L('books').every(q => q.data.layout === 'text' && q.rows.map(r => r.label).join() === 'Author,Year'), 'books: title shown, Author / Year');
 ok(L('countries').filter(q => q.data.layout === 'pic').every(q => q.rows[0].label === 'Country' && q.media.img[0].src.includes('Flag')), 'countries: the flag + Country / Capital / Continent');
+ok(L('inventions').every(q => q.data.layout === 'pic' && q.rows.map(r => r.label).join() === 'Invention,Inventor,Year'), 'inventions: picture + Invention / Inventor / Year');
+ok(L('paintings').every(q => q.data.layout === 'pic' && q.rows.map(r => r.label).join() === 'Painting,Artist,Year'), 'paintings: picture + Painting / Artist / Year');
+ok(L('landmarks').every(q => q.data.layout === 'pic' && /^Landmark,Country(,Continent)?$/.test(q.rows.map(r => r.label).join())), 'landmarks: picture + Landmark / Country / Continent');
+{
+  const inv = loadPack('inventions');
+  inv.items.forEach(it => { delete it.media; });
+  const qs = fmt.generate({ rng: rngFrom('inv-text'), packs: [inv], count: 20, difficulty: 0 });
+  ok(qs.length >= 12 && qs.every(q => q.data.layout === 'text' && /^Inventor,Year(,Country)?$/.test(q.rows.map(r => r.label).join())) && qs.some(q => q.rows.length === 3), 'inventions without pictures: Inventor / Year (/ Country)');
+  qs.forEach(q => validate(q, inv, 0, 'inventions-text'));
+}
 // a pack whose items gain pictures switches to the picture variant by itself (books → Book / Author / Year)
 {
   const bk = loadPack('books');

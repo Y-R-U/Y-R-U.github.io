@@ -43,12 +43,13 @@ export const SUGGESTED = [
     R('In order of publication', 'order', ['books'], {}),
     R('Pick all by the author', 'pickall', ['books'], { tiles: 6 }),
   ] },
-  { id: 'science', name: 'Science & Nature', blurb: 'Science trivia, space, animal pictures, the body and animal calls.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
+  { id: 'science', name: 'Science & Nature', blurb: 'Science trivia, space, animal pictures, the body, animal calls, inventions.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
     R('Science', 'mc', ['general~science'], { answers: 4, source: 'mix' }),
     R('Space', 'mc', ['space'], { answers: 4, source: 'mix' }),
     R('Animal pictures', 'reveal', ['mammals', 'birds', 'sea'], { mode: 'full', answers: 4 }),
     R('The human body', 'mc', ['body', 'elements'], { answers: 4, source: 'mix' }),
     R('Animal calls', 'listen', ['birds', 'mammals'], { clip: 10, art: 'off', ask: 'auto', answers: 4 }),
+    TRIO('Hat-trick: invention, inventor, year', ['inventions']),
   ] },
   { id: 'records', name: 'Records & Extremes', blurb: 'Fastest, tallest, deepest, hottest: guess, compare and rank world records.', timing: { answerSec: 20, gapSec: 5 }, rounds: [
     R('World records', 'mc', ['records'], { answers: 4, source: 'mix' }, 1),

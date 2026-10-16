@@ -2,15 +2,15 @@
 // year from a clip, country / capital / continent from a flag; with no picture or clip the name is shown and the other
 // rows asked). Tap one per row, lock in; each right row is a share of the points (js/formats/trio_score.js).
 // Packs opt in through TRIO (or pack.trio, same shape): the rows, the facts behind them and the media to show.
-import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick, looksAlike } from './registry.js?v=202610161231';
-import { h, mediaBox, onKey } from '../ui/kit.js?v=202610161231';
-import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610161231';
-import { basePoints } from '../core/scoring.js?v=202610161231';
-import { preflight, urlsOf } from '../core/media.js?v=202610161231';
-import { confetti } from '../ui/fx.js?v=202610161231';
-import { trioScore, trioCap } from './trio_score.js?v=202610161231';
-import { yearOptions, MAX_YEAR } from './years.js?v=202610161231';
-import { isCredit, leadOf } from './cocredit.js?v=202610161231';
+import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick, looksAlike } from './registry.js?v=202610161246';
+import { h, mediaBox, onKey } from '../ui/kit.js?v=202610161246';
+import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610161246';
+import { basePoints } from '../core/scoring.js?v=202610161246';
+import { preflight, urlsOf } from '../core/media.js?v=202610161246';
+import { confetti } from '../ui/fx.js?v=202610161246';
+import { trioScore, trioCap } from './trio_score.js?v=202610161246';
+import { yearOptions, MAX_YEAR } from './years.js?v=202610161246';
+import { isCredit, leadOf } from './cocredit.js?v=202610161246';
 
 export { trioScore, trioCap };
 // every row right: a flat bonus on top, after the streak (the server and P2P host award the same)
@@ -42,13 +42,31 @@ const COUNTRY = { media: 'img', spread: 'continent', rows: [
   { kind: 'fact', key: 'capital', label: 'Capital', noun: 'the capital', optional: true },
   { kind: 'fact', key: 'continent', fromOptions: true, label: 'Continent', noun: 'the continent', optional: true },
 ] };
+// Inventions span 2,000 years and paintings 500, so their people come from wider era bands (near).
+const INVENTION = { era: 'year', media: 'img', near: [15, 40, 80], rows: [
+  { kind: 'name', label: 'Invention', noun: 'the invention' },
+  { kind: 'fact', key: 'inventor', split: 'people', label: 'Inventor', noun: 'the inventor' },
+  { kind: 'year', key: 'year', label: 'Year', noun: 'the year' },
+  { kind: 'fact', key: 'country', label: 'Country', noun: 'the country', optional: true },
+] };
+const PAINTING = { era: 'year', media: 'img', near: [15, 30, 60], rows: [
+  { kind: 'name', label: 'Painting', noun: 'the painting' },
+  { kind: 'fact', key: 'artist', label: 'Artist', noun: 'the artist' },
+  { kind: 'year', key: 'year', label: 'Year', noun: 'the year' },
+] };
+const LANDMARK = { media: 'img', spread: 'continent', rows: [
+  { kind: 'name', label: 'Landmark', noun: 'the landmark' },
+  { kind: 'fact', key: 'country', label: 'Country', noun: 'the country' },
+  { kind: 'fact', key: 'continent', fromOptions: true, label: 'Continent', noun: 'the continent', optional: true },
+] };
 export const TRIO = {
+  inventions: INVENTION, paintings: PAINTING, landmarks: LANDMARK,
   'movie-moments': FILM, movies: FILM, books: BOOK, 'book-moments': BOOK, countries: COUNTRY, 'one-hit-wonders': SONG,
   ...Object.fromEntries(['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'].map(d => [`hits-${d}`, SONG])),
 };
 const confOf = pack => pack?.trio || TRIO[pack?.id] || null;
 
-const NEAR = [8, 15];                                 // fact distractors: from an item within this many years
+export const NEAR = [8, 15];                          // fact distractors: from an item within this many years (conf.near)
 const NAME_NEAR = [5, 10, 15, 25, Infinity];
 const CLIP_LEN = 10;
 
@@ -148,7 +166,8 @@ function make(rng, pack, conf, difficulty) {
       }
     };
     if (cap === undefined) take(byFame(shuffle(rng, all.filter(c => alike(t, c) && dist(c) <= 25))).slice(0, 3));
-    for (const band of NAME_NEAR) {
+    // sparse packs (inventions, paintings) widen through their own bands before giving up on the era
+    for (const band of [...NAME_NEAR.filter(isFinite), ...(conf.near || []).filter(b => b > 25), Infinity]) {
       take(byFame(shuffle(rng, all.filter(c => dist(c) <= band))));
       if (optionItems.length >= 4) break;
     }
@@ -167,7 +186,8 @@ function make(rng, pack, conf, difficulty) {
       if (!yo) return null;
       rows.push({ row, options: yo.years.map(yearText), answer: yo.answer });
     } else {
-      const fact = makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame, spreadRow, spreadOf });
+      if (row.optional && rows.length >= 3) continue;   // three rows at most: optional extras only fill a gap
+      const fact = makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame, spreadRow, spreadOf, near: conf.near || NEAR });
       if (!fact) { if (row.optional) continue; return null; }
       rows.push(fact);
     }
@@ -205,7 +225,7 @@ function make(rng, pack, conf, difficulty) {
   return q;
 }
 
-function makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame, spreadRow, spreadOf }) {
+function makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame, spreadRow, spreadOf, near }) {
   const ids = idsOf(t.item, row);
   const right = row.first ? ids.filter(x => !taken.has(norm(x))).slice(0, 1) : ids;
   if (!right.length) return null;
@@ -224,7 +244,7 @@ function makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame,
     const used = new Set(right.map(norm));
     const usedSpread = new Set(spreadRow ? spreadOf(t).map(norm) : []);
     const wantSpread = spreadRow && others.length >= 3 ? others.map(c => norm(spreadOf(c)[0])) : null;
-    for (const band of NEAR) {
+    for (const band of near) {
       for (const c of byFame(shuffle(rng, all.filter(c => c.item !== t.item && !others.includes(c) && dist(c) <= band)))) {
         if (wrong.length >= 3) break;
         const cid = idsOf(c.item, row);
@@ -247,7 +267,7 @@ function makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame,
 }
 
 const packId = info => info.id || String(info.path || '').replace(/^.*\//, '').replace(/\.json$/, '');
-const audioMod = () => import('./trio_audio.js?v=202610161231');
+const audioMod = () => import('./trio_audio.js?v=202610161246');
 
 export default register({
   id: 'trio', title: 'Hat-trick', icon: '🎩', blurb: 'Three questions in one: name it, who, when', tags: ['slow'], noKids: true,

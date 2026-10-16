@@ -1,9 +1,9 @@
 // Local focus: a game-level setting { cc: ISO3, level: 'off'|'more'|'most'|'all', live } that makes a share of each
 // round about one country (docs/notes/LOCAL.md). Tags come from data/local/tags.json (tools/local_tags.mjs);
 // in-country geography from data/local/geo.json (js/core/localgeo.js). Pure helpers + loaders; spec.js applies it.
-import { dataUrl } from './packs.js?v=202610161231';
-import { rngFrom, shuffle } from './rng.js?v=202610161231';
-import { getSettings, setSettings } from './store.js?v=202610161231';
+import { dataUrl } from './packs.js?v=202610161246';
+import { rngFrom, shuffle } from './rng.js?v=202610161246';
+import { getSettings, setSettings } from './store.js?v=202610161246';
 
 export const LEVELS = [['off', 'Off', 0], ['more', 'More', 0.25], ['most', 'Most', 0.6], ['all', 'ALL', 1]];
 export const SHARE = Object.fromEntries(LEVELS.map(([k, , s]) => [k, s]));

@@ -94,5 +94,38 @@
   "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Petite_sir%C3%A8ne_de_Copenhague_%28conforme_%C3%A0_la_loi_danoise%29.JPG/500px-Petite_sir%C3%A8ne_de_Copenhague_%28conforme_%C3%A0_la_loi_danoise%29.JPG",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Salar_de_Uyuni_-_panoramio_%2810%29.jpg/500px-Salar_de_Uyuni_-_panoramio_%2810%29.jpg",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Ngorongo_1.jpg/500px-Ngorongo_1.jpg"
+ ],
+ "dishes": [
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Fish_and_chips.jpg/500px-Fish_and_chips.jpg",
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/D%C3%B6ner_Kebab%2C_Berlin%2C_2010_%2801%29.jpg/500px-D%C3%B6ner_Kebab%2C_Berlin%2C_2010_%2801%29.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/d/d1/Une_femme_d%27Alger_en_d%C3%A9shabill%C3%A9_portant_un_tajine_-_XVII_si%C3%A8cle.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/b/b3/Nasi_Goreng_Ikan_Asin.jpg",
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Triple_White_Kimchi_05.jpg/500px-Triple_White_Kimchi_05.jpg",
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Food_at_WIkimanian_2017_02.jpg/500px-Food_at_WIkimanian_2017_02.jpg",
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Argentinean_asado.jpg/500px-Argentinean_asado.jpg",
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Fydzhin_cross-section.jpg/500px-Fydzhin_cross-section.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/9/9d/A_Northern_Nigeria_snacks_called_meat_pie_20.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/1/10/Vegemiteontoast_large.jpg"
+ ],
+ "spiders": [
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/7497532/medium.jpeg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/589997318/medium.jpg",
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Smeringopus_natalensis_301141651_542639013.jpg/500px-Smeringopus_natalensis_301141651_542639013.jpg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/269675936/medium.jpg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/211209217/medium.jpg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/378835762/medium.jpg",
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Phidippus_audax_male.jpg/500px-Phidippus_audax_male.jpg"
+ ],
+ "sea": [
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg/500px-Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/7690110/medium.jpg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/19460647/medium.jpeg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/401108419/medium.jpeg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/368390714/medium.jpeg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/220525356/medium.jpeg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/403671903/medium.jpg"
+ ],
+ "mushrooms": [
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/3089906/medium.JPG"
  ]
 }

@@ -77,6 +77,9 @@ for (const [r, kids] of bad) ok((await roundProblems(r, kids)).length > 0, `vali
   ok(mtv.rounds.length === 5 && mtv.rounds[0].format === 'trio' && !mtv.rounds.some(r => r.format === 'reveal' && r.packs.includes('movie-moments')), 'Movie & TV Night: the hat-trick replaces the movie-moments picture round');
   const music = SUGGESTED.find(s => s.id === 'music'), world = SUGGESTED.find(s => s.id === 'world');
   ok(music.rounds.some(r => r.format === 'trio') && world.rounds.some(r => r.format === 'trio'), 'music + world sets carry a hat-trick round');
+  const sci = SUGGESTED.find(s => s.id === 'science'), pub = SUGGESTED.find(s => s.id === 'pub');
+  ok(sci.rounds.some(r => r.format === 'trio' && r.packs.includes('inventions')) && pub.rounds.length === 5, 'Science & Nature carries the inventions hat-trick; the pub quiz stays at 5 rounds');
+  ok(world.rounds.filter(r => ['reveal', 'trio'].includes(r.format) && r.packs.includes('landmarks')).length === 1, 'Around the World: landmark pictures in one round only');
   const bk = SUGGESTED.find(s => s.id === 'books');
   ok(bk && bk.rounds.length === 5 && bk.rounds[0].format === 'trio' && bk.rounds.every(r => Array.isArray(r.packs) && r.packs.includes('books')) && new Set(bk.rounds.map(r => r.format)).size === 5, 'Books & Authors: 5 rounds, all on books, a hat-trick first, five different kinds');
 }

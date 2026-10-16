@@ -99,14 +99,6 @@
       "credit": "Postverk Føroya - Philatelic Office",
       "license": "Public domain",
       "page": "https://commons.wikimedia.org/wiki/File:Faroe_stamp_402_blue_whale_(Balaenoptera_musculus)_crop.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg/500px-Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg",
-      "w": 500,
-      "h": 346,
-      "credit": "NOAA Photo Library",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg"
      }
     ]
    },
@@ -272,14 +264,6 @@
       "credit": "Gabriel Barathieu",
       "license": "CC BY-SA 2.0",
       "page": "https://commons.wikimedia.org/wiki/File:Mother_and_baby_sperm_whale.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7690110/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "harum.koh",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/7690110"
      }
     ]
    },
@@ -748,14 +732,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19460647/medium.jpeg",
-      "w": 500,
-      "h": 331,
-      "credit": "Mike Bowie",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/19460647"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/374620739/medium.jpg",
       "w": 482,
@@ -1353,14 +1329,6 @@
       "credit": "Tom Field",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/237114360"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/401108419/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/401108419"
      }
     ]
    },
@@ -1742,14 +1710,6 @@
       "credit": "Jennie Pistevos",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/148776236"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368390714/medium.jpeg",
-      "w": 500,
-      "h": 402,
-      "credit": "Belinda Forbes",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/368390714"
      }
     ]
    },
@@ -1864,14 +1824,6 @@
       "credit": "Diego Delso",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Botete_negro_(Arothron_meleagris),_Cabo_Pulmo,_Baja_California,_M%C3%A9xico,_2024-12-19,_DD_54.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/220525356/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Alberto Alcalá",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/220525356"
      }
     ]
    },
@@ -2822,14 +2774,6 @@
       "credit": "David Starr Jordan and Barton Warren Evermann",
       "license": "Public domain",
       "page": "https://commons.wikimedia.org/wiki/File:Sailfin_flyingfish.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/403671903/medium.jpg",
-      "w": 500,
-      "h": 309,
-      "credit": "Steve Taylor",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/403671903"
      }
     ]
    },

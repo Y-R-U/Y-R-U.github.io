@@ -833,14 +833,6 @@
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Fish_and_chips.jpg/500px-Fish_and_chips.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Andrew Dunn",
-      "license": "CC BY-SA 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Fish_and_chips.jpg"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Fish_and_chips_blackpool.jpg/500px-Fish_and_chips_blackpool.jpg",
       "w": 500,
       "h": 331,
@@ -1409,14 +1401,6 @@
       "credit": "Usien",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Zwei_Doener_Kebab.JPG"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/D%C3%B6ner_Kebab%2C_Berlin%2C_2010_%2801%29.jpg/500px-D%C3%B6ner_Kebab%2C_Berlin%2C_2010_%2801%29.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "AleGranholm",
-      "license": "CC BY 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:D%C3%B6ner_Kebab,_Berlin,_2010_(01).jpg"
      }
     ]
    },
@@ -1533,14 +1517,6 @@
       "credit": "Bawdeep2010",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Tajine_marocain.jpg"
-     },
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Une_femme_d%27Alger_en_d%C3%A9shabill%C3%A9_portant_un_tajine_-_XVII_si%C3%A8cle.jpg",
-      "w": 500,
-      "h": 771,
-      "credit": "BNF",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Une_femme_d%27Alger_en_d%C3%A9shabill%C3%A9_portant_un_tajine_-_XVII_si%C3%A8cle.jpg"
      }
     ]
    },
@@ -1995,14 +1971,6 @@
    "media": {
     "img": [
      {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Nasi_Goreng_Ikan_Asin.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Rizka Budiati from Leicester, United Kingdom",
-      "license": "CC BY 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Nasi_Goreng_Ikan_Asin.jpg"
-     },
-     {
       "src": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Nasi_goreng.jpg",
       "w": 500,
       "h": 375,
@@ -2262,14 +2230,6 @@
       "credit": "Nagyman, a flickr user",
       "license": "CC BY-SA 2.0",
       "page": "https://commons.wikimedia.org/wiki/File:Gimchi.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Triple_White_Kimchi_05.jpg/500px-Triple_White_Kimchi_05.jpg",
-      "w": 500,
-      "h": 315,
-      "credit": "korea.net",
-      "license": "CC BY-SA 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Triple_White_Kimchi_05.jpg"
      }
     ]
    },
@@ -2517,12 +2477,20 @@
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Food_at_WIkimanian_2017_02.jpg/500px-Food_at_WIkimanian_2017_02.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Poutine-Restaurant.jpg/500px-Poutine-Restaurant.jpg",
       "w": 500,
-      "h": 281,
-      "credit": "Camelia.boban",
+      "h": 375,
+      "credit": "Holger B",
       "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Food_at_WIkimanian_2017_02.jpg"
+      "page": "https://commons.wikimedia.org/wiki/File:Poutine-Restaurant.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e3/LaBanquise.jpg/500px-LaBanquise.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Andy Liang",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:LaBanquise.jpg"
      }
     ]
    },
@@ -2634,12 +2602,20 @@
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Argentinean_asado.jpg/500px-Argentinean_asado.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/Asado_a_la_estaca_en_General_Pico%2C_Argentina_2007.jpg/500px-Asado_a_la_estaca_en_General_Pico%2C_Argentina_2007.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Wikimedia Commons",
-      "license": "CC BY-SA 2.5",
-      "page": "https://commons.wikimedia.org/wiki/File:Argentinean_asado.jpg"
+      "credit": "Mauryfrapi",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Asado_a_la_estaca_en_General_Pico,_Argentina_2007.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Small_Family_Asado.jpg/500px-Small_Family_Asado.jpg",
+      "w": 500,
+      "h": 349,
+      "credit": "Rldca",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Small_Family_Asado.jpg"
      }
     ]
    },
@@ -2671,20 +2647,12 @@
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Fydzhin_cross-section.jpg/500px-Fydzhin_cross-section.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Aussie_meat_pie_%28cropped%29.jpg/500px-Aussie_meat_pie_%28cropped%29.jpg",
       "w": 500,
-      "h": 366,
-      "credit": "Georgian Recipes at Georgia About",
-      "license": "CC BY 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Fydzhin_cross-section.jpg"
-     },
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9d/A_Northern_Nigeria_snacks_called_meat_pie_20.jpg",
-      "w": 500,
-      "h": 553,
-      "credit": "Hajjare",
+      "h": 343,
+      "credit": "Finbar.concaig",
       "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:A_Northern_Nigeria_snacks_called_meat_pie_20.jpg"
+      "page": "https://commons.wikimedia.org/wiki/File:Aussie_meat_pie_(cropped).jpg"
      }
     ]
    },
@@ -2815,12 +2783,20 @@
    "media": {
     "img": [
      {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/1/10/Vegemiteontoast_large.jpg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Vegemite_on_toast.jpg",
       "w": 500,
-      "h": 566,
+      "h": 353,
       "credit": "Tristanb",
       "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Vegemiteontoast_large.jpg"
+      "page": "https://commons.wikimedia.org/wiki/File:Vegemite_on_toast.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Vegemite_on_toast_and_a_cup_of_coffee.jpg/500px-Vegemite_on_toast_and_a_cup_of_coffee.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "s2art",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vegemite_on_toast_and_a_cup_of_coffee.jpg"
      }
     ]
    },
