@@ -136,6 +136,13 @@ function showSettings() {
            { label: "Cancel", cls: "ghost", fn: showSettings }]) },
       { label: "Done", fn: () => buildMenu() },
     ]);
+  // The shared br8t bug/idea panel; it reads "Sign in…" for guests.
+  const box = $("modal-root").lastChild;
+  import("/lib/feedback/feedback.js").then(m => {
+    const row = box && box.isConnected && box.querySelector(".row");
+    if (!row) return;
+    row.insertBefore(m.feedbackButton({ game: "racketeer", className: "btn ghost", label: "✉️ Report a bug / suggest an idea", signedOutLabel: "✉️ Sign in to send feedback", accent: "#3ecf6d" }), row.querySelector(".btn.danger"));
+  }).catch(() => {});
 }
 
 function showHelp() {

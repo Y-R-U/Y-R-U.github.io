@@ -565,6 +565,9 @@ class UISys {
       row('Vibration', seg('vibration', [true, false], ['On', 'Off'])),
       row('Sound', seg('sound', [true, false], ['On', 'Off'])),
     );
+    // The shared br8t bug/idea panel; guests see "Sign in".
+    import('/lib/feedback/feedback.js').then(m => wrap.append(row('Bug or idea?',
+      m.feedbackButton({ game: 'sundayleague', label: 'Send', signedOutLabel: 'Sign in', accent: '#7ee081' })))).catch(() => {});
     this.popup({
       title: '⚙ Settings', node: wrap,
       buttons: [{ label: 'Done', cls: 'ghost', cb: onClose }],

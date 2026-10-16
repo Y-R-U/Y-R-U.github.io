@@ -1065,6 +1065,15 @@ function setupAccountCloud() {
   import('./cloud.mjs')
     .then((mod) => { accountCloud = mod; })
     .catch(() => { /* play on locally */ });
+  // The shared br8t bug/idea row in Settings; guests see "Sign in".
+  import('/lib/feedback/feedback.js').then((m) => {
+    const list = settingsModal?.querySelector('.settings-list');
+    if (!list || list.querySelector('[data-br8t-feedback]')) return;
+    const part = (tag, text) => Object.assign(document.createElement(tag), { textContent: text });
+    list.insertBefore(m.feedbackButton({ game: 'outpace', className: 'setting-row', accent: '#6ea8ff',
+      paint: (btn, on) => btn.replaceChildren(part('span', 'Bug or idea?'), part('strong', on ? 'Send' : 'Sign in')) }),
+    document.getElementById('reset-open-button'));
+  }).catch(() => {});
 }
 
 function notifyRunCompleted() {

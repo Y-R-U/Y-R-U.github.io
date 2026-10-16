@@ -11,6 +11,7 @@ class Game {
         this.collision = new CollisionSystem();
         this.particles = new ParticleSystem();
         this.audio = new Audio();
+        GameSettings.apply(this.audio);
         this.ai = new AI(this.collision);
 
         this.state = 'menu'; // menu, playing, dead, won
@@ -85,6 +86,13 @@ class Game {
             this.audio.playClick();
             this._showScreen('stats-screen');
             this._renderStats();
+        });
+
+        document.getElementById('settings-btn')?.addEventListener('click', () => {
+            this.audio.init();
+            this.audio.playClick();
+            this._showScreen('settings-screen');
+            GameSettings.render(this);
         });
 
         // Back buttons

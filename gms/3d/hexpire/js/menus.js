@@ -230,6 +230,16 @@ export function openOptions(inGame) {
   }
   buttons.push({ label: 'Done', primary: true });
   const card = showModal({ title: '⚙️ Options', body, buttons });
+  // The shared br8t bug/idea panel; guests see "Sign in".
+  import('/lib/feedback/feedback.js').then(m => {
+    const mb = card.isConnected && card.querySelector('.m-body');
+    if (!mb) return;
+    const row = document.createElement('div');
+    row.className = 'opt-row';
+    row.append(Object.assign(document.createElement('span'), { textContent: '🐞 Bug or idea?' }),
+      m.feedbackButton({ game: 'hexpire', label: 'Send', signedOutLabel: 'Sign in', accent: '#f0a52c' }));
+    mb.append(row);
+  }).catch(() => {});
   card.querySelectorAll('.toggle').forEach(t => {
     t.onclick = () => {
       const k = t.dataset.k;

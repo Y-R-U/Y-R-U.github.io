@@ -36,6 +36,9 @@ importmap, no CDN), no build step.
   match scoring, and the in-memory (never persisted) live-match tracker
 - `js/cloud.js` — br8t account glue (`syncLocalKeys`), imported dynamically
   by `main.js` and allowed to fail
+- `js/settings.js` — the title screen's ⚙️ Settings popup (sound, volume, auto-fire,
+  full screen, br8t account, the shared `/lib/feedback/` bug/idea row; account and
+  feedback are skipped under `?test`/`?auto`/`?shot`)
 - `js/particles.js`, `js/audio.js`, `js/input.js`, `js/utils.js`
 
 ## Saves + the br8t account
@@ -45,7 +48,7 @@ Two localStorage keys, both safe to move between devices:
 | Key | Holds |
 |---|---|
 | `f5mr.career.v1` | per-mode (duel/skirmish/royale/frenzy) played, wins, best placement, kills, deaths, best kills, longest survival, best score; overall totals incl. best kill streak and time in the field; `killedBy` / `killed` personality tallies (nemesis / favourite prey); callsigns used and felled |
-| `f5mr.settings.v1` | callsign, mute, last mode picked, `autoFire`, `daily` {date, best, plays} |
+| `f5mr.settings.v1` | callsign, mute, `volume` (0–1), last mode picked, `autoFire`, `daily` {date, best, plays} |
 
 Device-only (never synced): `f5mr.quality.v1` {level} — the adaptive-quality
 tier chosen on the first touch match (see below).

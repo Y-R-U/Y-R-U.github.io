@@ -16,7 +16,7 @@ for (const edition of ['home', 'itch']) {
   await build({
     entryPoints: { 'js/main': join(root, 'js/main.js') }, outdir: out, splitting: true, chunkNames: 'js/chunks/[name]-[hash]',
     bundle: true, minify: true, sourcemap: false, format: 'esm', target: ['es2022'],
-    external: ['/lib/auth/*'], define: { __RAGDOJO_EDITION__: JSON.stringify(edition) },
+    external: ['/lib/auth/*', '/lib/feedback/*'], define: { __RAGDOJO_EDITION__: JSON.stringify(edition) },
     plugins: edition === 'itch' ? [{ name: 'no-itch-accounts', setup(b) {
       b.onResolve({ filter: /^\.\/cloud\.js$/ }, () => ({ path: 'no-account', namespace: 'demo' }));
       b.onLoad({ filter: /.*/, namespace: 'demo' }, () => ({ contents: 'export function connectCloud() { throw new Error("Accounts live on games.br8t.com"); }', loader: 'js' }));

@@ -199,6 +199,12 @@ export class Menu {
         el('p', { class: 'hint' }, 'Steering joystick goes on this side; fire buttons on the other. Settings and career stats are saved on this device — sign in from the avatar to carry them between devices.'),
       )],
     });
+    // The shared br8t bug/idea panel; guests see "Sign in".
+    const fbRow = el('div', { class: 'setting' }, el('label', {}, 'Bug or idea?'));
+    this.settingsScreen.querySelector('.panel')?.insertBefore(fbRow, this.settingsScreen.querySelector('.panel .hint'));
+    import('/lib/feedback/feedback.js')
+      .then((m) => fbRow.append(m.feedbackButton({ game: 'crazyspace', className: 'btn small', label: 'Send feedback', signedOutLabel: 'Sign in to send feedback', accent: '#39c0ed' })))
+      .catch(() => fbRow.remove());
 
     // ---------------- career ----------------
     this.careerBody = el('div', { class: 'panel' });

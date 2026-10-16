@@ -125,6 +125,21 @@ const UI = (() => {
     function showSettings() {
         if (screens['settings-screen']) screens['settings-screen'].classList.add('active');
         settingsOpen = true;
+        addFeedbackRow();
+    }
+    // The shared br8t bug/idea panel; guests see "Sign in".
+    let feedbackAdded = false;
+    function addFeedbackRow() {
+        const close = document.getElementById('settings-close');
+        if (feedbackAdded || !close) return;
+        feedbackAdded = true;
+        import('/lib/feedback/feedback.js').then(m => {
+            const row = document.createElement('div');
+            row.className = 'setting-row';
+            row.append(Object.assign(document.createElement('span'), { textContent: 'Bug or idea?' }),
+                m.feedbackButton({ game: 'paperant', className: 'toggle-btn', label: 'SEND', signedOutLabel: 'SIGN IN', accent: '#e8d36a' }));
+            close.before(row);
+        }).catch(() => { feedbackAdded = false; });
     }
     function hideSettings() {
         if (screens['settings-screen']) screens['settings-screen'].classList.remove('active');

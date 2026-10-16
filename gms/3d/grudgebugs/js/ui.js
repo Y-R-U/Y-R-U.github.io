@@ -207,6 +207,16 @@ export function optionsModal() {
     ${optRow('Battery saver (less shadow)', 'lite')}
     <p style="font-size:12px;color:#7e9a6c;text-align:center">battery saver applies to the next battle</p>`,
     [{ label: 'Done', gold: true }]);
+  // The shared br8t bug/idea panel; guests see "Sign in".
+  const box = root.querySelector('.modal');
+  import('/lib/feedback/feedback.js').then(m => {
+    if (!box.isConnected) return;
+    const row = document.createElement('div');
+    row.className = 'opt-row';
+    row.append(Object.assign(document.createElement('label'), { textContent: 'Bug or idea?' }),
+      m.feedbackButton({ game: 'grudgebugs', label: 'Send', signedOutLabel: 'Sign in', accent: '#8fd14f' }));
+    box.querySelector('p')?.before(row);
+  }).catch(() => {});
   for (const t of root.querySelectorAll('.toggle')) {
     t.addEventListener('click', () => {
       const p = save.load();

@@ -131,4 +131,4 @@
   .cp-grade b { font-size: 44px; }
 }
 
-.hf-title .ti-fs { position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); z-index: 3; }
+.hf-title .ti-fs { position: absolute; top: max(12px, env(safe-area-inset-top)); right: calc(max(14px, env(safe-area-inset-right)) + var(--br8t-account-space, 0px)); z-index: 3; }

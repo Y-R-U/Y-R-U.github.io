@@ -45,6 +45,11 @@ async function start() {
     if (mod?.ui) { try { ui = mod.ui; ui.mount(document.getElementById('ui-root')); } catch (e) { console.warn('ui.mount failed', e); ui = null; } }
   }
   if (!ui && !flags.shot) pad = createDevpad(document.body);
+  // br8t sign-in (title + Settings only) and the feedback row; kept out of automated runs.
+  if (ui && !flags.auto && !Q.has('test') && !Q.has('nocloud')) {
+    window.__hfAccounts = true;
+    tryImport('./account.js').then(m => m?.mountBr8tAccount().catch(e => console.warn('br8t account unavailable', e)));
+  }
 
   // Player + crowd (robots optional until the robots agent ships)
   const robots = flags.norobots ? null : await tryImport('./actors/robots.js');

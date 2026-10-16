@@ -48,3 +48,9 @@ clear of a human's head in its forward cone, `SPAWN_HUMAN_SIDE` elsewhere,
 `SPAWN_BOT_GAP` from bot heads; the new head stays clear of every body and
 faces away from the nearest human. Up to `SPAWN_TRIES` samples, else the
 roomiest. Before: ~3% of spawns landed in reach of the player's head.
+
+## Settings screen (2026-10-16)
+Menu ⚙️ Settings → `#settings-screen`, built by `js/settings.js` (`GameSettings`):
+sound on/off + volume (device-only key `snakeio_settings`, applied to `Audio` at boot),
+full screen, br8t account row and the shared `/lib/feedback/` bug/idea row (both
+skipped under `?test`/`?soak`). `sw.js` is v11 with `js/settings.js` in ASSETS.

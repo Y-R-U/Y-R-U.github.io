@@ -335,7 +335,7 @@ html, body {
 }
 
 /* ========== UPGRADES SCREEN ========== */
-#upgrades-screen, #skins-screen, #stats-screen, #rooms-screen {
+#upgrades-screen, #skins-screen, #stats-screen, #rooms-screen, #settings-screen {
     background: var(--bg);
     padding: 20px;
     padding-top: calc(20px + var(--safe-top));
@@ -1113,3 +1113,18 @@ body.in-room #death-screen, body.in-room #win-screen {
 @media (max-width: 599px) {
     #rival-toast { top: calc(248px + var(--br8t-account-space, 0px) + var(--safe-top)); }
 }
+
+/* ========== SETTINGS SCREEN ========== */
+#settings-list { width: 100%; max-width: 400px; }
+.set-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--bg-card); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+}
+.set-label { font-weight: 700; font-size: 15px; min-width: 0; }
+.set-label small { display: block; font-weight: 400; font-size: 12px; color: var(--text-mid); margin-top: 2px; overflow-wrap: anywhere; }
+.set-btn {
+    flex: 0 0 auto; min-width: 72px; padding: 8px 14px; border-radius: 8px; cursor: pointer; white-space: nowrap;
+    background: var(--primary); color: #fff; border: 0; font-weight: 700; font-size: 14px;
+}
+.set-btn.off { background: var(--bg-card-hover); color: var(--text-mid); }
+.set-range { width: 50%; accent-color: var(--primary); }

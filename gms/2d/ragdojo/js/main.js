@@ -813,6 +813,7 @@ function openSettings() {
     (S.simulantWon ? T('Blood & gore (DEITIES)', S.settings.gore !== false, 'gore') : '') +
     `<div class="toggle"><span>Stick side</span><button class="buy" data-fn="hand">${S.settings.hand === 'right' ? 'LEFT STICK' : 'RIGHT STICK'}</button></div>` +
     (ACCOUNTS && !DEMO ? `<div class="toggle code"><span>Pass code</span><input id="giftCode" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="BR8T-XXXX-XXXX-XXXX" maxlength="24"><button class="buy" id="btnRedeem">USE</button></div><p class="fine" id="giftStatus">Got a br8t Pass code from a friend? Sign in, then enter it here.</p>` : '') +
+    (ACCOUNTS && !DEMO ? `<div class="toggle" id="fbRow"><span>Bug or idea?</span></div><p class="fine" id="fbNote"></p>` : '') +
     `<div class="toggle"><span>Share anonymous play statistics</span><button class="buy" id="analyticsToggle">${analyticsEnabled() ? 'ON' : 'OFF'}</button></div>` +
     `<p class="fine">Optional: starts, fight progress and upgrade conversion. No email or save contents. <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>` +
     musicList();
@@ -820,6 +821,11 @@ function openSettings() {
   $('btnCloudRetry').classList.toggle('hidden', !SIGNIN);
   $('analyticsToggle').onclick = () => { analyticsChoice(!analyticsEnabled()); openSettings(); };
   if ($('btnRedeem')) $('btnRedeem').onclick = redeemCode;
+  // The shared br8t feedback panel; signed-out players see SIGN IN instead.
+  if ($('fbRow')) import('/lib/feedback/feedback.js').then((m) => {
+    const row = $('fbRow');
+    if (row && !row.querySelector('button')) row.append(m.feedbackButton({ game: 'ragdojo', className: 'buy', label: 'SEND', signedOutLabel: 'SIGN IN', note: $('fbNote'), accent: '#3d7fd6' }));
+  }).catch(() => {});
   // Pausing is the only place you can bail out of a fight, so the way out lives here.
   $('btnQuit').classList.toggle('hidden', mode !== 'fight');
   $('btnWipe').classList.toggle('hidden', mode === 'fight');

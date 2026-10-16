@@ -51,6 +51,18 @@ class PanelManager {
       document.getElementById('musicRow').hidden = !this.audio.availableTracks.length;
     });
 
+    // The shared br8t bug/idea panel; guests see "Sign in".
+    import('/lib/feedback/feedback.js').then(m => {
+      const row = document.createElement('div');
+      row.className = 'setting-row';
+      const label = document.createElement('div');
+      label.className = 'setting-label';
+      label.textContent = 'Bug or idea?';
+      row.append(label, m.feedbackButton({ game: 'sudoku', label: 'Send', signedOutLabel: 'Sign in', accent: '#4a90e2' }));
+      const rows = document.querySelectorAll('#settingsOverlay .setting-row');
+      rows[rows.length - 1]?.after(row);
+    }).catch(() => {});
+
     document.getElementById('helpBtn').addEventListener('click', () => {
       this.closeSettings();
       setTimeout(() => this.openHelp(), 200);

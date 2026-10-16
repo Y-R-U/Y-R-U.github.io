@@ -52,6 +52,10 @@ echo ">> shared auth layer → /lib/auth/"
 ssh "$HOST" "install -d '$SITE/lib'"
 rsync -az --delete "$REPO/lib/auth/" "$HOST:$SITE/lib/auth/"
 
+# Bug/idea panel used from the games' Settings, plus its admin page (API: br8t-payments).
+echo ">> shared feedback panel → /lib/feedback/"
+rsync -az --delete "$REPO/lib/feedback/" "$HOST:$SITE/lib/feedback/"
+
 # The 3D games import three from ../../lib/three/<ver>/ (= /gms/lib/three/). Missing it hangs them on boot.
 echo ">> shared three.js → /gms/lib/three/"
 ssh "$HOST" "install -d '$SITE/gms/lib/three'"

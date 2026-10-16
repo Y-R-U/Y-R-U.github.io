@@ -9,6 +9,9 @@ export const AudioFX = {
   master: null,
   noiseBuf: null,
   muted: loadSettings().muted,
+  volume: Number.isFinite(+loadSettings().volume) ? +loadSettings().volume : 1,
+
+  level() { return this.muted ? 0 : 0.5 * this.volume; },
 
   init() {
     if (this.ctx) return;
@@ -22,7 +25,7 @@ export const AudioFX = {
       else this.resume();
     });
     this.master = this.ctx.createGain();
-    this.master.gain.value = this.muted ? 0 : 0.5;
+    this.master.gain.value = this.level();
     this.master.connect(this.ctx.destination);
 
     const len = this.ctx.sampleRate;
@@ -43,7 +46,13 @@ export const AudioFX = {
   setMuted(m) {
     this.muted = m;
     saveSettings({ muted: m });
-    if (this.master) this.master.gain.value = m ? 0 : 0.5;
+    if (this.master) this.master.gain.value = this.level();
+  },
+
+  setVolume(v) {
+    this.volume = Math.max(0, Math.min(1, v));
+    saveSettings({ volume: this.volume });
+    if (this.master) this.master.gain.value = this.level();
   },
 
   env(gainNode, peak, dur, t0) {

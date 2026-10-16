@@ -1114,6 +1114,20 @@ export function showSettings(from) {
   scroll.appendChild(el('div', 'section-head', 'CONTROL REFERENCE'));
   scroll.appendChild(controlReference());
 
+  // The shared br8t bug/idea panel; guests see SIGN IN.
+  const fb = el('div', 'item');
+  const fl = el('div', 'item-l');
+  fl.appendChild(el('b', null, 'BUG OR IDEA?'));
+  const fs = el('small', null, 'Report a bug or suggest an idea.');
+  fl.appendChild(fs);
+  fb.appendChild(fl);
+  const fr = el('div', 'item-r');
+  fb.appendChild(fr);
+  scroll.appendChild(fb);
+  import('/lib/feedback/feedback.js')
+    .then((m) => fr.appendChild(m.feedbackButton({ game: 'ironhail', className: 'buy', label: 'SEND', signedOutLabel: 'SIGN IN', note: fs, accent: '#d8823c' })))
+    .catch(() => fb.remove());
+
   const wipe = el('div', 'item');
   const wl = el('div', 'item-l');
   wl.appendChild(el('b', null, 'RESET PROGRESS'));

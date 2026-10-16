@@ -41,6 +41,17 @@ function toggle(on, onFlip) {
   return el;
 }
 
+// The shared br8t bug/idea panel; signed-out players get "Sign in" instead.
+function feedbackRow() {
+  const sub = h('span', { class: 'row-sub', text: 'report a bug or suggest an idea' });
+  const ctl = h('div', { class: 'row-ctl' });
+  const r = h('div', { class: 'row' }, h('div', {}, h('span', { class: 'row-lab', text: 'Feedback' }), sub), ctl);
+  import('/lib/feedback/feedback.js')
+    .then((m) => ctl.append(m.feedbackButton({ game: 'silt', className: 'gb gb--ghost', label: 'Send', signedOutLabel: 'Sign in', note: sub, accent: '#e0a24a' })))
+    .catch(() => r.remove());
+  return r;
+}
+
 export function createSettings(deps) {
   const sheet = createSheet('SETTINGS', 'sound · look · feel', deps.onClose);
   let built = false;
@@ -104,6 +115,7 @@ export function createSettings(deps) {
           set('haptics', v);
           if (v) navigator.vibrate(8);
         })) : null,
+      feedbackRow(),
       h('div', { class: 'row row--note', style: { justifyContent: 'center' } },
         h('span', { class: 'row-sub', style: { marginTop: '0', textAlign: 'center' },
           text: 'SILT — a falling-sand puzzle. Best scores live on this device.' })),

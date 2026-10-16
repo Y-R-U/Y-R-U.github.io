@@ -47,6 +47,8 @@ export function settingsPanel(body, data, ctx) {
     </section>
   </div>`;
 
+  if (window.__hfAccounts) accountSection(body.querySelector('.hf-settings section'));
+
   const commit = () => ctx.applySettings({ ...s });
   body.querySelectorAll('.st-seg button').forEach(b => onTap(b, () => {
     const k = b.parentElement.dataset.k;
@@ -97,6 +99,41 @@ export function settingsPanel(body, data, ctx) {
       ctx.bus.emit('save:import', { text: st.impText, cb: r => { if (r.ok) ctx.toast?.('Save imported · restarting', 'good'); else { st.imp = r; ctx.rerender(); } } });
     }
   }));
+}
+
+// br8t account + the shared bug/idea row (main.js sets __hfAccounts when the account layer mounts).
+function accountSection(sec) {
+  if (!sec) return;
+  const row = (ic, label) => {
+    const r = document.createElement('div');
+    r.className = 'st-row';
+    r.innerHTML = `<span class="st-ic">${icon(ic)}</span><div class="st-l"><b></b><small></small></div>`;
+    r.querySelector('b').textContent = label;
+    return r;
+  };
+  const lab = document.createElement('span');
+  lab.className = 'hf-label';
+  lab.textContent = 'Account';
+  const acct = row('user', 'br8t account');
+  const ab = document.createElement('button');
+  ab.className = 'hf-btn hf-live st-acct';
+  ab.textContent = 'Account';
+  ab.addEventListener('click', () => document.getElementById('br8t-account')?.shadowRoot?.querySelector('.fab')?.click());
+  acct.append(ab);
+  const fb = row('talk', 'Bug or idea?');
+  sec.append(lab, acct, fb);
+  import('/lib/auth/auth.js').then(m => m.auth.ready().then(() => {
+    const paint = u => {
+      const inn = u && !u.anon;
+      acct.querySelector('small').textContent = inn ? `Signed in as ${u.name || u.email || 'you'}` : 'Playing as guest';
+      ab.textContent = inn ? 'Account' : 'Sign in';
+    };
+    paint(m.auth.user);
+    m.auth.onChange(u => { if (acct.isConnected) paint(u); });
+  })).catch(() => acct.remove());
+  import('/lib/feedback/feedback.js')
+    .then(m => fb.append(m.feedbackButton({ game: 'heirframe', className: 'hf-btn hf-live', label: 'Send', signedOutLabel: 'Sign in', note: fb.querySelector('small'), accent: '#e8c45a' })))
+    .catch(() => fb.remove());
 }
 
 export function pausePanel(body, data, ctx) {

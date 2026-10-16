@@ -513,3 +513,7 @@
   .wh-stat { padding: 3px 7px; }
   .wi-grid .wi-empty { padding: 16px 10px; }
 }
+
+/* br8t account row: the avatar sits top-right while Settings is open, so the close button moves left of it */
+.st-acct { flex: none; }
+.hf-panel[data-panel="settings"] .pn-x { margin-right: var(--br8t-account-space, 0px); }

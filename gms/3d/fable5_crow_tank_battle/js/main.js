@@ -99,6 +99,13 @@ ui.initUI({
   onCareer: () => ui.openCareerPanel(loadCareer(), modeFor(state.tankCount).id),
 });
 
+document.getElementById('btn-settings').addEventListener('click', () => {
+  import('./settings.js').then((m) => m.openSettings({ AudioFX, ui, aim, saveSettings, loadSettings, noCloud: NO_CLOUD }));
+});
+document.getElementById('btn-settings-close').addEventListener('click', () => {
+  document.getElementById('settings-popup').classList.add('hidden');
+});
+
 ui.setPlayerNameUI(state.playerName);
 ui.selectModePill(state.tankCount);
 ui.updateMuteBtn(AudioFX.muted);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snakeio-v10';
+const CACHE_NAME = 'snakeio-v11';
 const NET_TIMEOUT_MS = 3000;
 const ASSETS = [
     './',
@@ -21,6 +21,7 @@ const ASSETS = [
     './js/upgrades.js',
     './js/renderer.js',
     './js/audio.js',
+    './js/settings.js',
     './js/main.js',
     './js/cloud.js',
     './manifest.json',
