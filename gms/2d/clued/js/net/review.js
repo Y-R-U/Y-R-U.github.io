@@ -3,9 +3,9 @@
 // New AI pictures wait in data/candidates/*.json (refs "<pack>:new/<key>", never loaded by the game) until
 // tools/img_promote.mjs moves the OK ones into the live pack; an OK candidate verdict then carries over to the live copy.
 // A picture can also carry a drawn circle around the target (mark, 0–1 image coordinates); tools/img_marks.mjs puts those in the packs.
-import { h, markRect } from '../ui/kit.js?v=202610161358';
-import { toast } from '../ui/popup.js?v=202610161358';
-import { API } from './api.js?v=202610161358';
+import { h, markRect } from '../ui/kit.js?v=202610161407';
+import { toast } from '../ui/popup.js?v=202610161407';
+import { API } from './api.js?v=202610161407';
 
 const root = document.getElementById('rv');
 const gate = document.getElementById('gate');
@@ -87,7 +87,8 @@ function carryCandidates() {
 // the stored verdict only counts while it is for the same picture
 const verdictOf = p => {
   const r = reviews.get(p.ref);
-  if (r) return r.src === p.src ? r : null;
+  // the server used to clip src at 600 chars, so a clipped row still matches its picture
+  if (r) return r.src === p.src || (r.src.length >= 600 && p.src.startsWith(r.src)) ? r : null;
   const c = p.ai && !p.cand && carried.get(`${p.pack}|${fileName(p.src)}`);
   return c ? { ...c, ref: p.ref, src: p.src } : null;
 };

@@ -1,23 +1,23 @@
 // Serverless link challenges: the URL hash carries the GameSpec (with its seed), BUILD and a chain of
 // up to 8 { name, score }. The receiver regenerates the identical set locally, plays it, and gets a
 // reply link with their score appended. No server, no caps; works on Pages.
-import { playUrl } from './share.js?v=202610161358';
-import { h, fmtNum } from '../ui/kit.js?v=202610161358';
-import { defineScreen, header, current, reset } from '../ui/app.js?v=202610161358';
-import { toast } from '../ui/popup.js?v=202610161358';
-import { sfx, confetti } from '../ui/fx.js?v=202610161358';
-import { BUILD } from '../build.js?v=202610161358';
-import { getSettings } from '../core/store.js?v=202610161358';
-import { hashString } from '../core/rng.js?v=202610161358';
-import { createRunner } from '../structures/runner.js?v=202610161358';
-import { replayCfg, replayScore } from '../structures/index.js?v=202610161358';
-import { prepare } from '../structures/session.js?v=202610161358';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610161358';
-import { openShare, shareOrCopy } from './share.js?v=202610161358';
-import { ordinal, detailOf, comparison } from './board.js?v=202610161358';
-import { ensureStyles } from './util.js?v=202610161358';
-import { ensureFormats } from './room.js?v=202610161358';
-import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610161358';
+import { playUrl } from './share.js?v=202610161407';
+import { h, fmtNum } from '../ui/kit.js?v=202610161407';
+import { defineScreen, header, current, reset } from '../ui/app.js?v=202610161407';
+import { toast } from '../ui/popup.js?v=202610161407';
+import { sfx, confetti } from '../ui/fx.js?v=202610161407';
+import { BUILD } from '../build.js?v=202610161407';
+import { getSettings } from '../core/store.js?v=202610161407';
+import { hashString } from '../core/rng.js?v=202610161407';
+import { createRunner } from '../structures/runner.js?v=202610161407';
+import { replayCfg, replayScore } from '../structures/index.js?v=202610161407';
+import { prepare } from '../structures/session.js?v=202610161407';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610161407';
+import { openShare, shareOrCopy } from './share.js?v=202610161407';
+import { ordinal, detailOf, comparison } from './board.js?v=202610161407';
+import { ensureStyles } from './util.js?v=202610161407';
+import { ensureFormats } from './room.js?v=202610161407';
+import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610161407';
 
 const MAX_CHAIN = 8;
 const b64u = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');

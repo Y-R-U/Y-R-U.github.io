@@ -104,7 +104,7 @@ func handleImgReviewSet(w http.ResponseWriter, r *http.Request) {
 			}
 			_, err = tx.Exec(`INSERT INTO img_review(ref, src, verdict, reason, note, mark, at, by) VALUES(?,?,?,?,?,?,?,?)
 				ON CONFLICT(ref) DO UPDATE SET src=excluded.src, verdict=excluded.verdict, reason=excluded.reason, note=excluded.note, mark=excluded.mark, at=excluded.at, by=excluded.by`,
-				ref, cut(v.Src, 600), v.Verdict, cut(v.Reason, 40), cut(v.Note, 400), mark, now, by)
+				ref, cut(v.Src, 4000), v.Verdict, cut(v.Reason, 40), cut(v.Note, 400), mark, now, by)
 		case "":
 			_, err = tx.Exec(`DELETE FROM img_review WHERE ref = ?`, ref)
 		default:

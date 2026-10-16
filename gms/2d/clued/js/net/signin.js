@@ -1,9 +1,9 @@
 // Protection-level sign-in asks. Never a blocking modal: an inline panel with a button that opens
 // the br8t account panel (or Google sign-in when the panel isn't mounted).
-import { h } from '../ui/kit.js?v=202610161358';
-import { toast } from '../ui/popup.js?v=202610161358';
-import { go } from '../ui/app.js?v=202610161358';
-import { allowanceText, resetTime } from './pass.js?v=202610161358';
+import { h } from '../ui/kit.js?v=202610161407';
+import { toast } from '../ui/popup.js?v=202610161407';
+import { go } from '../ui/app.js?v=202610161407';
+import { allowanceText, resetTime } from './pass.js?v=202610161407';
 
 let authMod = null;
 const loadAuth = () => authMod || (authMod = import('/lib/auth/auth.js').catch(() => null));

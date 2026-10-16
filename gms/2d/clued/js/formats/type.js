@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, fill, collect, pick, factAllowed, givesAway } from './registry.js?v=202610161358';
-import { h, layout, typeBox } from '../ui/kit.js?v=202610161358';
-import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610161358';
-import { norm, injectCSS, once, hasImg } from './fkit.js?v=202610161358';
+import { register, poolItems, pickPack, byDifficulty, imageOf, fill, collect, pick, factAllowed, givesAway } from './registry.js?v=202610161407';
+import { h, layout, typeBox } from '../ui/kit.js?v=202610161407';
+import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610161407';
+import { norm, injectCSS, once, hasImg } from './fkit.js?v=202610161407';
 
 const CSS = `
 .ty-pat{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-family:var(--font-display);font-size:22px;letter-spacing:4px;color:var(--ink-2)}

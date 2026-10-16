@@ -1,6 +1,6 @@
-import { register, collect, pick } from '../../formats/registry.js?v=202610161358';
-import { loadMarine } from '../data.js?v=202610161358';
-import { REGIONS, createMap, frame, message, isKids, REGION_CHOICES, REGION_LABELS, supportsGeo } from './common.js?v=202610161358';
+import { register, collect, pick } from '../../formats/registry.js?v=202610161407';
+import { loadMarine } from '../data.js?v=202610161407';
+import { REGIONS, createMap, frame, message, isKids, REGION_CHOICES, REGION_LABELS, supportsGeo } from './common.js?v=202610161407';
 
 const { info: M } = await loadMarine();
 

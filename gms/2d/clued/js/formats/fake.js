@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, placeAnswer, collect, pick, sample } from './registry.js?v=202610161358';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610161358';
-import { uniqueByName, norm, packNoun } from './fkit.js?v=202610161358';
+import { register, poolItems, pickPack, byDifficulty, placeAnswer, collect, pick, sample } from './registry.js?v=202610161407';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610161407';
+import { uniqueByName, norm, packNoun } from './fkit.js?v=202610161407';
 
 function fakesOf(pack) {
   const real = new Set((pack.items || []).flatMap(it => [it.name, ...(it.alt || [])]).map(norm));
