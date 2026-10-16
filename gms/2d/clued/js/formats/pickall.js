@@ -1,12 +1,12 @@
 // Pick all: "Which 3 of these are …?" — 6–8 tiles (kids 4–5), 2–4 right. Sources: hand-written list questions
 // (pack questions of kind 'pickall': answer = every right option, wrong = decoys, prompt holds {n}) and item facts
 // (js/formats/pickall_rules.js). Partial credit: see pickScore.
-import { register, poolItems, byDifficulty, imageOf, collect, pick, shuffle, sample, fill, givesAway, weightedPick } from './registry.js?v=202610131439';
-import { h, imgEl, onKey } from '../ui/kit.js?v=202610131439';
-import { injectCSS, baseCSS, once, hasImg, norm, uniqueByName } from './fkit.js?v=202610131439';
-import { basePoints } from '../core/scoring.js?v=202610131439';
-import { rulesFor } from './pickall_rules.js?v=202610131439';
-import { pickScore } from './pickall_score.js?v=202610131439';
+import { register, poolItems, byDifficulty, imageOf, collect, pick, shuffle, sample, fill, givesAway, weightedPick } from './registry.js?v=202610161020';
+import { h, imgEl, onKey } from '../ui/kit.js?v=202610161020';
+import { injectCSS, baseCSS, once, hasImg, norm, uniqueByName } from './fkit.js?v=202610161020';
+import { basePoints } from '../core/scoring.js?v=202610161020';
+import { rulesFor } from './pickall_rules.js?v=202610161020';
+import { pickScore } from './pickall_score.js?v=202610161020';
 
 export { pickScore };
 
@@ -268,7 +268,6 @@ function render(el, q, api) {
     try { rem = api.timer.remaining(); full = api.timer.full || api.timer.limit || 0; } catch (e) {}
     const base = basePoints({ timed: !!api.timed && rem > 0 && full > 0, remaining: rem, limit: full });
     const points = Math.round(base * s.frac);
-    if (points > 0) api.reveal(`<b>+${points}</b> pts for a partly right answer`);
     answer({ correct: false, partial: points > 0, points, given, detail: { hits: s.hits, wrong: s.wrong, of: right.size } });
   }
   const offKey = onKey(e => {

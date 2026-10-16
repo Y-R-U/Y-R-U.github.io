@@ -39,6 +39,26 @@
   .rv-why button { font: 800 12px var(--font); padding: 4px 9px; border-radius: 99px; border: 2px solid var(--ink-3); background: var(--card); color: var(--ink-2); cursor: pointer; }
   .rv-why button.on { border-color: var(--bad); background: var(--bad); color: #fff; }
   .rv-why input { width: 100%; font: 700 13px var(--font); padding: 6px 8px; border: 2px solid var(--ink-3); border-radius: 8px; color: var(--ink); background: var(--card); }
+  .rv-card.marked .rv-pic { box-shadow: inset 0 0 0 3px #ffe14d; }
+  .rv-card.drawing { grid-column: 1 / -1; }
+  .rv-card.drawing .rv-pic { aspect-ratio: auto; height: min(70vh, 640px); cursor: crosshair; touch-action: none; }
+  .rv-ring { position: absolute; z-index: 1; box-sizing: border-box; border: 4px solid #ffe14d; border-radius: 50%; pointer-events: none;
+    box-shadow: 0 0 0 2px rgba(20, 16, 50, .85), inset 0 0 0 2px rgba(20, 16, 50, .85); }
+  .rv-circ { padding-top: 0; }
+  .rv-circ button { font-size: 13px; padding: 6px; }
+  .rv-circ button.on { background: #ffe14d; }
+  .rv-lay { font: 800 14px var(--font); padding: 8px 12px; border: 3px solid var(--ink); border-radius: 12px; background: var(--card); color: var(--ink); cursor: pointer; }
+  .rv-grid.compact { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .rv-grid.compact .rv-card { border-radius: 12px; }
+  .rv-grid.compact .rv-meta { padding: 6px 8px 0; font-size: 14px; line-height: 1.25; }
+  .rv-grid.compact .rv-meta small { font-size: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .rv-grid.compact .rv-acts { gap: 6px; padding: 6px 8px 8px; flex-wrap: wrap; }
+  .rv-grid.compact .rv-acts button { min-height: 44px; min-width: 0; padding: 6px 4px; font-size: 15px; }
+  .rv-grid.compact .rv-circ { padding-top: 0; }
+  .rv-grid.compact .rv-circ button { font-size: 12px; }
+  .rv-grid.compact .rv-why { padding: 0 8px 8px; }
+  .rv-grid.compact .rv-why button { min-height: 36px; font-size: 12px; padding: 4px 8px; }
+  .rv-grid.compact .rv-card.drawing .rv-meta { font-size: inherit; }
   .rv-more { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
   .muted { color: var(--ink-2); }
   :focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }

@@ -108,6 +108,8 @@ type Room struct {
 	dirty     bool
 	qDirty    bool // questions changed since the last flush (create / play again)
 	dead      bool
+	spending  bool            // an auto-start is waiting on the host's allowance
+	limit     json.RawMessage // the host's allowance after an auto-start was refused
 }
 
 type sub struct {
@@ -198,6 +200,7 @@ func (r *Room) limitFor(m qMeta) int {
 	if m.TScale > 1 {
 		ms = max(ms, min(int(math.Round(float64(ms)*m.TScale)), maxScaledMs))
 	}
+	ms += extraFormats[m.Format]
 	if long, ok := longFormats[m.Format]; ok && long > ms {
 		ms = long
 	}
@@ -341,7 +344,7 @@ func (r *Room) addPlayer(name, uid string) (*Player, string) {
 }
 
 func (r *Room) start() {
-	r.StartAt = 0
+	r.StartAt, r.limit = 0, nil
 	r.advance()
 }
 
@@ -533,6 +536,9 @@ func (r *Room) answer(p *Player, in answerIn) (*Answer, string) {
 	if m.Format == "pickall" {
 		base = min(base, pickallCap(m.Answer, in.Given))
 	}
+	if m.Format == "trio" {
+		base = trioPoints(m.Answer, in.Given, ms, m.LimitMs, !r.Kids)
+	}
 	if correct {
 		p.Streak++
 		p.Correct++
@@ -656,7 +662,7 @@ func (r *Room) tick(now int64) bool {
 		return true
 	}
 	if r.Public && r.Phase == "lobby" && r.StartAt > 0 && now >= r.StartAt && len(r.active()) > 0 {
-		r.start()
+		r.autoStart()
 	}
 	switch r.Phase {
 	case "question":
@@ -870,17 +876,18 @@ type pubPlayer struct {
 }
 
 type pubYou struct {
-	ID      string   `json:"id"`
-	Name    string   `json:"name"`
-	Host    bool     `json:"host"`
-	JoinedQ int      `json:"joinedQ"`
-	Kicked  bool     `json:"kicked,omitempty"`
-	Gone    bool     `json:"gone,omitempty"`
-	Owner   bool     `json:"owner,omitempty"` // created the room: may end it even when someone else hosts
-	Last    *pubLast `json:"last,omitempty"`
-	Rank    int      `json:"rank"`
-	Voted   bool     `json:"voted,omitempty"`
-	Stage   int      `json:"stage,omitempty"` // stage you answered at
+	ID      string          `json:"id"`
+	Name    string          `json:"name"`
+	Host    bool            `json:"host"`
+	JoinedQ int             `json:"joinedQ"`
+	Kicked  bool            `json:"kicked,omitempty"`
+	Gone    bool            `json:"gone,omitempty"`
+	Owner   bool            `json:"owner,omitempty"` // created the room: may end it even when someone else hosts
+	Last    *pubLast        `json:"last,omitempty"`
+	Rank    int             `json:"rank"`
+	Voted   bool            `json:"voted,omitempty"`
+	Stage   int             `json:"stage,omitempty"` // stage you answered at
+	Limit   json.RawMessage `json:"limit,omitempty"` // host only: the allowance that stopped the auto-start
 }
 
 type pubState struct {
@@ -990,6 +997,9 @@ func (r *Room) stateFor(viewer *Player) pubState {
 	if viewer != nil {
 		y := &pubYou{ID: viewer.ID, Name: viewer.Name, Host: viewer.ID == r.HostID, JoinedQ: viewer.JoinedQ,
 			Kicked: viewer.Kicked, Gone: viewer.Gone, Owner: r.Owner != "" && viewer.ID == r.Owner}
+		if y.Host && r.Phase == "lobby" {
+			y.Limit = r.limit
+		}
 		if r.Q >= 0 {
 			if a := viewer.Answers[r.Q]; a != nil {
 				y.Last = r.lastOf(a, viewer)

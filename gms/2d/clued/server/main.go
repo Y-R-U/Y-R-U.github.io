@@ -105,6 +105,7 @@ func loadConfig() {
 			cfg.Origins[o] = true
 		}
 	}
+	loadAllowanceConfig()
 }
 
 func main() {

@@ -108,7 +108,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    72.8,
+    7.3,
+    13.3
+   ]
   },
   {
    "id": "ruby",
@@ -157,7 +162,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    31.5,
+    24.1,
+    19.4
+   ]
   },
   {
    "id": "sapphire",
@@ -198,7 +208,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    28.7,
+    12.7,
+    -30
+   ]
   },
   {
    "id": "emerald",
@@ -239,7 +254,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    52.6,
+    -16.2,
+    7.6
+   ]
   },
   {
    "id": "amethyst",
@@ -288,7 +308,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    39,
+    18.7,
+    -13
+   ]
   },
   {
    "id": "topaz",
@@ -330,7 +355,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    50.8,
+    7.6,
+    17.8
+   ]
   },
   {
    "id": "opal",
@@ -375,7 +405,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    41.6,
+    -0.5,
+    -4.8
+   ]
   },
   {
    "id": "pearl",
@@ -412,7 +447,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    70,
+    4.6,
+    10
+   ]
   },
   {
    "id": "jade",
@@ -463,7 +503,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    64.5,
+    -8.6,
+    12.1
+   ]
   },
   {
    "id": "turquoise",
@@ -509,7 +554,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    50.1,
+    -12.2,
+    9.2
+   ]
   },
   {
    "id": "garnet",
@@ -556,7 +606,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    34.5,
+    18.3,
+    20.1
+   ]
   },
   {
    "id": "aquamarine",
@@ -604,7 +659,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    55.9,
+    -5.6,
+    -5.3
+   ]
   },
   {
    "id": "peridot",
@@ -652,7 +712,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    54.8,
+    -13.3,
+    35.7
+   ]
   },
   {
    "id": "citrine",
@@ -699,7 +764,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    51.9,
+    3.8,
+    28.1
+   ]
   },
   {
    "id": "lapis-lazuli",
@@ -748,7 +818,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    40.9,
+    12.9,
+    -36.2
+   ]
   },
   {
    "id": "moonstone",
@@ -792,7 +867,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    45.5,
+    4.9,
+    17
+   ]
   },
   {
    "id": "tanzanite",
@@ -831,7 +911,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    45.2,
+    11.2,
+    -17.6
+   ]
   },
   {
    "id": "tigers-eye",
@@ -873,7 +958,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    43.2,
+    7.8,
+    31.2
+   ]
   },
   {
    "id": "malachite",
@@ -920,7 +1010,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    47.3,
+    -16.8,
+    2.6
+   ]
   },
   {
    "id": "obsidian",
@@ -963,7 +1058,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    58.1,
+    -0.5,
+    3.8
+   ]
   },
   {
    "id": "quartz",
@@ -1007,7 +1107,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    49.4,
+    0.5,
+    -1.6
+   ]
   },
   {
    "id": "rose-quartz",
@@ -1053,7 +1158,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    57.5,
+    22,
+    8.6
+   ]
   },
   {
    "id": "amber",
@@ -1096,7 +1206,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    55.1,
+    22.4,
+    41.8
+   ]
   },
   {
    "id": "pyrite",
@@ -1138,7 +1253,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    58.8,
+    -1.5,
+    10.5
+   ]
   },
   {
    "id": "gold",
@@ -1178,7 +1298,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    62.5,
+    6.4,
+    17.7
+   ]
   },
   {
    "id": "hematite",
@@ -1224,7 +1349,12 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "look": [
+    41.7,
+    2,
+    5.6
+   ]
   },
   {
    "id": "fluorite",
@@ -1264,7 +1394,12 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "look": [
+    69,
+    0.2,
+    10.9
+   ]
   },
   {
    "id": "calcite",
@@ -1306,7 +1441,12 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "look": [
+    57,
+    2.3,
+    13.4
+   ]
   },
   {
    "id": "gypsum",
@@ -1345,7 +1485,12 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "look": [
+    47.8,
+    0.1,
+    9.5
+   ]
   },
   {
    "id": "talc",
@@ -1388,7 +1533,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    66.9,
+    1,
+    2.9
+   ]
   },
   {
    "id": "halite",
@@ -1432,7 +1582,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    68.7,
+    1,
+    0.9
+   ]
   }
  ],
  "questions": [

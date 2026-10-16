@@ -15,7 +15,7 @@ const maxBase = 500
 // Formats whose score depends on more than right/wrong; the client's points are used (clamped).
 var partialFormats = map[string]bool{
 	"ladder": true, "pin-drop": true, "number": true, "blitz60": true, "match": true,
-	"connect": true, "sort": true, "neighbours": true, "order": true, "chain": true, "pickall": true,
+	"connect": true, "sort": true, "neighbours": true, "order": true, "chain": true, "pickall": true, "trio": true,
 }
 
 // Long-form formats get a longer default limit in rooms.
@@ -25,6 +25,9 @@ var longFormats = map[string]int{
 }
 
 const defaultLimit = 20000
+
+// Formats that ask several things at once get a fixed amount on top of the answer time (js/net/p2p_room.js EXTRA).
+var extraFormats = map[string]int{"trio": 10000}
 
 type qMeta struct {
 	Format  string
@@ -106,6 +109,10 @@ func parseMeta(raw json.RawMessage) qMeta {
 func verifyCorrect(m qMeta, given json.RawMessage, claimed bool) bool {
 	if m.Format == "pickall" {
 		_, ok := pickallScore(m.Answer, given)
+		return ok
+	}
+	if m.Format == "trio" {
+		_, ok := trioScore(m.Answer, given)
 		return ok
 	}
 	if m.Format != "mc" && m.Format != "tf" || len(m.Answer) == 0 || len(given) == 0 {
@@ -252,4 +259,33 @@ func pickallScore(answer, given json.RawMessage) (frac float64, ok bool) {
 func pickallCap(answer, given json.RawMessage) int {
 	frac, _ := pickallScore(answer, given)
 	return int(math.Round(maxBase * frac))
+}
+
+// trioScore mirrors js/formats/trio_score.js: the share of rows whose pick (given[i]) is the right index (answer[i]).
+// ok = every row right. Unparseable input scores 0.
+func trioScore(answer, given json.RawMessage) (frac float64, ok bool) {
+	var a []float64
+	if json.Unmarshal(answer, &a) != nil || len(a) == 0 {
+		return 0, false
+	}
+	var g []any
+	json.Unmarshal(given, &g)
+	if len(g) > len(a) {
+		return 0, false
+	}
+	hits := 0
+	for i, x := range a {
+		if i < len(g) {
+			if v, isNum := g[i].(float64); isNum && v == math.Trunc(v) && v == x {
+				hits++
+			}
+		}
+	}
+	return float64(hits) / float64(len(a)), hits == len(a) && len(g) == len(a)
+}
+
+// trioPoints: the room's own speed points × the share of rows right; the client's points are never used.
+func trioPoints(answer, given json.RawMessage, ms, limitMs int, timed bool) int {
+	frac, _ := trioScore(answer, given)
+	return int(math.Round(float64(basePoints("mc", true, nil, ms, limitMs, timed)) * frac))
 }

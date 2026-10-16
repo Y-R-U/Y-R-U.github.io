@@ -1,0 +1,84 @@
+#!/usr/bin/env node
+// Moves reviewed candidate pictures (data/candidates/*.json, refs "<pack>:new/<scene key>") into the live packs.
+//   OK  → the scene loses `cand`, its file moves media/cand/<pack>/ → the live media folder, the pack is rebuilt (mv_build).
+//   Bad → the scene gets drop: true + dropWhy "Aaron review <date>: <reason> — <note>" in the prompts file (never regenerated
+//         the same way) and its candidate file is deleted.
+//   No verdict, or a verdict for a different src → left as a candidate.
+// Input: the verdicts export, either
+//   ssh br8t "sqlite3 -json /srv/data/clued/clued.db \"SELECT ref, src, verdict, reason, note, mark FROM img_review\"" > v.json
+//   or the admin GET /api/admin/imgreview body ({ reviews: [...] }).
+// Usage: node tools/img_promote.mjs v.json [--apply] [--no-index]   (dry run without --apply)
+// --apply also runs mv_build (live + candidates), build_index, local_tags and leak_scan unless --no-index.
+import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { PACKS, sceneRel, candRef, momentFile } from './mv_paths.mjs';
+
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const args = process.argv.slice(2);
+const file = args.find(a => !a.startsWith('--'));
+const APPLY = args.includes('--apply');
+if (!file) { console.log('usage: node tools/img_promote.mjs <verdicts.json> [--apply] [--no-index]'); process.exit(2); }
+const raw = JSON.parse(fs.readFileSync(file, 'utf8') || '[]');
+const rows = new Map((Array.isArray(raw) ? raw : raw.reviews || []).map(r => [r.ref, r]));
+const day = new Date().toISOString().slice(0, 10);
+const run = (...a) => execFileSync('node', a, { cwd: ROOT, stdio: 'inherit' });
+
+let livePacks = [], candPacks = [];
+for (const [packId, def] of Object.entries(PACKS)) {
+  const pf = path.join(ROOT, def.prompts);
+  if (!fs.existsSync(pf)) continue;
+  const cfg = JSON.parse(fs.readFileSync(pf, 'utf8'));
+  const sum = { ok: [], bad: {}, todo: 0, stale: [], missing: 0 };
+  const moves = [];
+  for (const f of cfg.films) f.scenes.forEach((sc, i) => {
+    if (!sc.cand || sc.drop) return;
+    const key = `${f.id}-${i + 1}`, from = path.join(ROOT, sceneRel(packId, key, sc));
+    if (!fs.existsSync(from)) { sum.missing++; return; }
+    const r = rows.get(candRef(packId, key));
+    if (!r || !r.verdict) { sum.todo++; return; }
+    if (r.src && path.basename(r.src.split('?')[0]) !== momentFile(key)) { sum.stale.push(key); return; }
+    if (r.verdict === 'ok') {
+      sum.ok.push(`${f.name} (${key})`);
+      moves.push(() => {
+        delete sc.cand;
+        const to = path.join(ROOT, sceneRel(packId, key, sc));
+        fs.mkdirSync(path.dirname(to), { recursive: true });
+        fs.renameSync(from, to);
+      });
+    } else if (r.verdict === 'bad') {
+      const why = `Aaron review ${day}: ${r.reason || 'bad'}${r.note ? ` — ${r.note}` : ''}`;
+      (sum.bad[r.reason || 'bad'] ||= []).push(`${f.name} (${key})${r.note ? `: ${r.note}` : ''}`);
+      moves.push(() => {
+        delete sc.cand;
+        sc.drop = true;
+        sc.dropWhy = why;
+        fs.unlinkSync(from);
+      });
+    }
+  });
+  const nBad = Object.values(sum.bad).reduce((s, l) => s + l.length, 0);
+  if (!sum.ok.length && !nBad && !sum.todo && !sum.stale.length && !sum.missing) continue;
+  console.log(`\n${packId}: ${sum.ok.length} OK → live, ${nBad} bad → dropped, ${sum.todo} still to review` +
+    (sum.stale.length ? `, ${sum.stale.length} verdicts for an older picture (left as candidates)` : '') +
+    (sum.missing ? `, ${sum.missing} candidate scenes without a file yet` : ''));
+  for (const n of sum.ok) console.log('  ok ', n);
+  for (const [why, l] of Object.entries(sum.bad)) for (const n of l) console.log(`  bad[${why}]`, n);
+  for (const k of sum.stale) console.log('  stale', k);
+  if (APPLY && moves.length) {
+    moves.forEach(m => m());
+    fs.writeFileSync(pf, JSON.stringify(cfg, null, 1));
+    if (sum.ok.length) livePacks.push(packId);
+    candPacks.push(packId);
+  }
+}
+
+if (!APPLY) { console.log('\nDry run. Rerun with --apply to move the files and rebuild.'); process.exit(0); }
+for (const id of livePacks) run('tools/mv_build.mjs', id);
+for (const id of candPacks) run('tools/mv_build.mjs', id, '--candidates');
+if (livePacks.length && !args.includes('--no-index')) {
+  run('tools/build_index.mjs');
+  run('tools/local_tags.mjs');
+  run('tools/leak_scan.mjs');
+}
+console.log(livePacks.length ? `\nLive packs rebuilt: ${livePacks.join(', ')}. Ship media/<pack folder> + data/ (static rsync).` : '\nNo live pack changed.');

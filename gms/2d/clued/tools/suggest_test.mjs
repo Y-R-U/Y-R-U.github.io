@@ -72,12 +72,21 @@ const bad = [
 ];
 for (const [r, kids] of bad) ok((await roundProblems(r, kids)).length > 0, `validator rejects ${JSON.stringify(r)}${kids ? ' (kids)' : ''}`);
 
+{
+  const mtv = SUGGESTED.find(s => s.id === 'screen');
+  ok(mtv.rounds.length === 5 && mtv.rounds[0].format === 'trio' && !mtv.rounds.some(r => r.format === 'reveal' && r.packs.includes('movie-moments')), 'Movie & TV Night: the hat-trick replaces the movie-moments picture round');
+  const music = SUGGESTED.find(s => s.id === 'music'), world = SUGGESTED.find(s => s.id === 'world');
+  ok(music.rounds.some(r => r.format === 'trio') && world.rounds.some(r => r.format === 'trio'), 'music + world sets carry a hat-trick round');
+}
 for (const [list, kids] of [[SUGGESTED, false], [SUGGESTED_KIDS, true]]) {
   const ids = new Set();
   for (const s of list) {
     ok(s.id && !ids.has(s.id), `${s.name}: unique id`); ids.add(s.id);
     ok(s.name && s.blurb && s.blurb.length <= 80, `${s.name}: name + one-line blurb`);
     ok(s.rounds.length >= 3 && s.rounds.length <= 8, `${s.name}: 3–8 rounds`);
+    // a picture pack feeds one round per set, so the same pictures never come back in a later round
+    const pics = s.rounds.flatMap(r => (Array.isArray(r.packs) ? r.packs : []).filter(id => id === 'movie-moments'));
+    ok(pics.length <= 1, `${s.name}: movie moments in one round at most`);
     ok([3, 5, 10, 15, 20, 30].includes(s.timing?.answerSec) && [3, 5, 10, 0].includes(s.timing?.gapSec), `${s.name}: timing values`);
     let n = 0;
     for (const r of s.rounds) {

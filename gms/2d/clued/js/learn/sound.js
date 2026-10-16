@@ -1,8 +1,8 @@
 // Sound lab: browse every playable sound (animal calls, anthems, instruments, piano pieces, recordings, previews).
-import { h, esc } from '../ui/kit.js?v=202610131439';
-import { header, go } from '../ui/app.js?v=202610131439';
-import { packList, getPack, loadMusic, kidsOn, kidsItems, thumb, norm, hasAudio, factRows } from './data.js?v=202610131439';
-import { soundBtn, creditBtn, emptyState, stopAudio } from './ui.js?v=202610131439';
+import { h, esc } from '../ui/kit.js?v=202610161020';
+import { header, go } from '../ui/app.js?v=202610161020';
+import { packList, getPack, loadMusic, kidsOn, kidsItems, thumb, norm, hasAudio, factRows } from './data.js?v=202610161020';
+import { soundBtn, creditBtn, emptyState, stopAudio } from './ui.js?v=202610161020';
 
 const GROUPS = [
   { id: 'animals', title: 'Animal calls', icon: '🐦', kids: true, game: true },

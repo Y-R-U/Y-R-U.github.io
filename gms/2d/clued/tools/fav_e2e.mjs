@@ -21,7 +21,7 @@ async function boot(settings = {}, clear = true) {
   await b.goto(URL); await b.waitFor('window.__cluedReady'); await b.sleep(300);
 }
 async function toListenSetup() {
-  await b.click('[data-mode=quick]'); await b.click('[data-format=listen]');
+  await b.click('[data-mode=solo]'); await b.click('[data-mode=quick]'); await b.click('[data-format=listen]');
   await b.waitFor(`document.body.dataset.screen === 'setup'`);
   await b.sleep(250);
 }
@@ -88,7 +88,7 @@ try {
 
   // pub quiz round builder
   await b.goto(URL); await b.waitFor('window.__cluedReady'); await b.sleep(300);
-  await b.click('[data-mode=pubquiz]');
+  await b.click('[data-mode=together]'); await b.click('[data-mode=pubquiz]');
   await b.click('[data-act=add-round]');
   await b.click('.pop .tile[data-format=listen]');
   await b.waitFor(`document.body.dataset.screen === 'pqround'`);

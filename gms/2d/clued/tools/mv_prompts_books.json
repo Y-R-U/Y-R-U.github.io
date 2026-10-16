@@ -19,12 +19,14 @@
     {
      "p": "a gigantic white sperm whale smashing a small wooden whaling rowboat in a stormy sea, harpoons flying, a three-masted whaling ship behind",
      "d": 1,
-     "cap": "The white whale strikes"
+     "cap": "The white whale strikes",
+     "cand": true
     },
     {
      "p": "a peg-legged sea captain seen from behind on the deck of a 19th-century whaling ship, staring out at a stormy sea",
      "d": 3,
-     "cap": "The obsessed captain on deck"
+     "cap": "The obsessed captain on deck",
+     "cand": true
     }
    ]
   },
@@ -40,22 +42,25 @@
     {
      "p": "an old parchment treasure map with a red X, a compass and a cutlass on a wooden table, a tropical island seen through a cabin window",
      "d": 1,
-     "cap": "X marks the spot"
+     "cap": "X marks the spot",
+     "cand": true
     },
     {
      "p": "a one-legged pirate with a crutch and a green parrot on his shoulder seen from behind on a ship deck",
      "d": 1,
-     "cap": "The one-legged cook and his parrot"
+     "cap": "The one-legged cook and his parrot",
+     "cand": true
     },
     {
      "p": "a boy hiding inside a big wooden apple barrel on a ship at night, listening",
      "d": 3,
-     "cap": "Overheard from the apple barrel"
+     "cap": "Overheard from the apple barrel",
+     "cand": true
     }
    ]
   },
   {
-   "id": "alice-in-wonderland",
+   "id": "alice-s-adventures-in-wonderland",
    "name": "Alice's Adventures in Wonderland",
    "alt": [
     "Alice in Wonderland",
@@ -69,17 +74,20 @@
     {
      "p": "a white rabbit in a waistcoat checking a pocket watch, hurrying towards a rabbit hole under a tree, a girl in a blue dress following",
      "d": 1,
-     "cap": "Late! Following the white rabbit"
+     "cap": "Late! Following the white rabbit",
+     "cand": true
     },
     {
      "p": "a chaotic outdoor tea party at a long table with a hare, a man in an enormous top hat and a sleepy dormouse in a teapot",
      "d": 1,
-     "cap": "The mad tea party"
+     "cap": "The mad tea party",
+     "cand": true
     },
     {
      "p": "playing cards with arms and legs painting white roses red in a royal garden",
      "d": 2,
-     "cap": "Painting the roses red"
+     "cap": "Painting the roses red",
+     "cand": true
     }
    ]
   },
@@ -95,12 +103,14 @@
     {
      "p": "a single bare human footprint in wet sand on a deserted island beach, a castaway in goatskin clothes with a parasol seen from behind staring at it",
      "d": 2,
-     "cap": "A footprint in the sand"
+     "cap": "A footprint in the sand",
+     "cand": true
     },
     {
      "p": "a castaway in a goatskin hat with a homemade umbrella and a parrot beside a hut and stockade on a tropical island",
      "d": 2,
-     "cap": "The castaway's island home"
+     "cap": "The castaway's island home",
+     "cand": true
     }
    ]
   },
@@ -118,12 +128,14 @@
     {
      "p": "a gothic laboratory in a stone tower during a thunderstorm, lightning striking a rod above a sheet-covered figure on a table, crackling electrical apparatus",
      "d": 1,
-     "cap": "A creature brought to life"
+     "cap": "A creature brought to life",
+     "cand": true
     },
     {
      "p": "a lone figure crossing a vast frozen Arctic ice field on a dog sled at twilight, a ship trapped in ice",
      "d": 3,
-     "cap": "The chase across the Arctic ice"
+     "cap": "The chase across the Arctic ice",
+     "cand": true
     }
    ]
   },
@@ -139,12 +151,14 @@
     {
      "p": "a jagged gothic castle on a crag in the Carpathian mountains under a full moon, bats flying, a horse-drawn coach on the winding road",
      "d": 1,
-     "cap": "The count's castle in Transylvania"
+     "cap": "The count's castle in Transylvania",
+     "cand": true
     },
     {
      "p": "a ship drifting into Whitby harbour in a storm, a huge black dog leaping ashore, ruined abbey on the cliff",
      "d": 3,
-     "cap": "The ghost ship arrives at Whitby"
+     "cap": "The ghost ship arrives at Whitby",
+     "cand": true
     }
    ]
   },
@@ -162,17 +176,20 @@
     {
      "p": "a huge red-gold dragon sleeping on a vast hoard of gold coins and treasure inside a mountain hall, a tiny figure peeking in",
      "d": 1,
-     "cap": "The dragon on his hoard"
+     "cap": "The dragon on his hoard",
+     "cand": true
     },
     {
      "p": "a crowd of hooded dwarves and a tall wizard with a staff arriving at a round green door in a hillside at dusk",
      "d": 2,
-     "cap": "An unexpected party"
+     "cap": "An unexpected party",
+     "cand": true
     },
     {
      "p": "dwarves floating down a river in wooden barrels away from an elven forest stronghold",
      "d": 2,
-     "cap": "Barrels out of bond"
+     "cap": "Barrels out of bond",
+     "cand": true
     }
    ]
   },
@@ -190,12 +207,14 @@
     {
      "p": "a Victorian gentleman in a top hat checking his pocket watch while riding an elephant through an Indian jungle, his valet beside him",
      "d": 2,
-     "cap": "Racing the clock by elephant"
+     "cap": "Racing the clock by elephant",
+     "cand": true
     },
     {
      "p": "a Victorian gentleman in a top hat and his valet on a paddle steamer deck, a big globe beside them, ocean and steam",
      "d": 3,
-     "cap": "A wager against the calendar"
+     "cap": "A wager against the calendar",
+     "cand": true
     }
    ]
   },
@@ -211,12 +230,14 @@
     {
      "p": "a Regency-era country ballroom with dancers in empire-waist gowns and tailcoats in rows, candle chandeliers",
      "d": 2,
-     "cap": "The Meryton assembly ball"
+     "cap": "The Meryton assembly ball",
+     "cand": true
     },
     {
      "p": "a grand English country house across a lake in a landscaped park, a young woman in a Regency bonnet seen from behind gazing at it",
      "d": 3,
-     "cap": "First sight of Pemberley"
+     "cap": "First sight of Pemberley",
+     "cand": true
     }
    ]
   },
@@ -232,12 +253,14 @@
     {
      "p": "a gothic English manor house on fire at night, flames from the battlements, a figure on the roof",
      "d": 3,
-     "cap": "Thornfield Hall burns"
+     "cap": "Thornfield Hall burns",
+     "cand": true
     },
     {
      "p": "a young governess in a plain grey dress seen from behind walking up to a gloomy manor house on the moors",
      "d": 3,
-     "cap": "The new governess arrives"
+     "cap": "The new governess arrives",
+     "cand": true
     }
    ]
   },
@@ -253,12 +276,14 @@
     {
      "p": "a lonely stone farmhouse on bleak windswept Yorkshire moors, twisted trees bent by wind, stormy sky",
      "d": 2,
-     "cap": "The windswept farmhouse on the moors"
+     "cap": "The windswept farmhouse on the moors",
+     "cand": true
     },
     {
      "p": "a ghostly pale hand tapping at a frosted window at night in a storm",
      "d": 3,
-     "cap": "Let me in!"
+     "cap": "Let me in!",
+     "cand": true
     }
    ]
   },
@@ -274,12 +299,14 @@
     {
      "p": "an elderly woman in a yellowed wedding dress seen from behind in a dark room with stopped clocks and a rotting wedding cake covered in cobwebs",
      "d": 2,
-     "cap": "The jilted bride and her wedding cake"
+     "cap": "The jilted bride and her wedding cake",
+     "cand": true
     },
     {
      "p": "a convict in leg irons on misty Kent marshes at dusk beside a churchyard, a boy running",
      "d": 3,
-     "cap": "The convict on the marshes"
+     "cap": "The convict on the marshes",
+     "cand": true
     }
    ]
   },
@@ -295,12 +322,14 @@
     {
      "p": "a miserly old man in a nightcap in a Victorian bedroom recoiling from a glowing ghost wrapped in heavy chains and cash boxes",
      "d": 1,
-     "cap": "Visited by a ghost in chains"
+     "cap": "Visited by a ghost in chains",
+     "cand": true
     },
     {
      "p": "a poor Victorian family around a small Christmas goose, a little boy with a wooden crutch by the fire",
      "d": 2,
-     "cap": "Christmas dinner with the Cratchits"
+     "cap": "Christmas dinner with the Cratchits",
+     "cand": true
     }
    ]
   },
@@ -316,17 +345,19 @@
     {
      "p": "a thin orphan boy in rags holding up an empty bowl to a large stern man at a cauldron in a Victorian workhouse dining hall",
      "d": 1,
-     "cap": "Please, sir, I want some more"
+     "cap": "Please, sir, I want some more",
+     "cand": true
     },
     {
      "p": "boys picking a gentleman's pocket on a crowded Victorian London street",
      "d": 2,
-     "cap": "Learning to pick pockets"
+     "cap": "Learning to pick pockets",
+     "cand": true
     }
    ]
   },
   {
-   "id": "charlottes-web",
+   "id": "charlotte-s-web",
    "name": "Charlotte's Web",
    "alt": [
     "Charlottes Web"
@@ -339,12 +370,14 @@
     {
      "p": "a small pink pig in a barn doorway looking up at a large dewy spider web with a friendly grey spider, morning sun",
      "d": 1,
-     "cap": "A pig and his spider friend"
+     "cap": "A pig and his spider friend",
+     "cand": true
     },
     {
      "p": "a pig at a country fair with a prize ribbon, a ferris wheel behind",
      "d": 3,
-     "cap": "Wilbur at the county fair"
+     "cap": "Wilbur at the county fair",
+     "cand": true
     }
    ]
   },
@@ -363,17 +396,20 @@
     {
      "p": "the open doors of an old wardrobe full of fur coats revealing a snowy forest with a glowing lamppost",
      "d": 1,
-     "cap": "Through the wardrobe to Narnia"
+     "cap": "Through the wardrobe to Narnia",
+     "cand": true
     },
     {
      "p": "a faun with an umbrella and parcels walking past a lamppost in a snowy forest",
      "d": 2,
-     "cap": "Meeting a faun by the lamppost"
+     "cap": "Meeting a faun by the lamppost",
+     "cand": true
     },
     {
      "p": "a great golden lion beside a cracked stone table at dawn",
      "d": 3,
-     "cap": "The Stone Table"
+     "cap": "The Stone Table",
+     "cand": true
     }
    ]
   },
@@ -389,12 +425,14 @@
     {
      "p": "a fat green caterpillar eating holes through an apple, pears, plums, strawberries and oranges in a row",
      "d": 1,
-     "cap": "Munching through the fruit"
+     "cap": "Munching through the fruit",
+     "cand": true
     },
     {
      "p": "a colourful butterfly emerging from a cocoon on a twig",
      "d": 2,
-     "cap": "A beautiful butterfly"
+     "cap": "A beautiful butterfly",
+     "cand": true
     }
    ]
   },
@@ -410,12 +448,14 @@
     {
      "p": "a gigantic peach flying over the ocean lifted by a flock of seagulls tied with silk threads, a boy on top",
      "d": 1,
-     "cap": "Carried across the ocean by seagulls"
+     "cap": "Carried across the ocean by seagulls",
+     "cand": true
     },
     {
      "p": "a giant peach rolling down a hill through a village",
      "d": 3,
-     "cap": "The peach rolls away"
+     "cap": "The peach rolls away",
+     "cand": true
     }
    ]
   },
@@ -434,12 +474,14 @@
     {
      "p": "an enormous kindly old human giant with huge ears and a waistcoat, crouching outside a little English village house at night, blowing a glowing golden dream through a long thin trumpet into a girl's open bedroom window, moonlight",
      "d": 1,
-     "cap": "Blowing dreams into a window"
+     "cap": "Blowing dreams into a window",
+     "cand": true
     },
     {
      "p": "shelves of glass jars each holding a glowing swirling dream in a giant's cave",
      "d": 2,
-     "cap": "The jars of dreams"
+     "cap": "The jars of dreams",
+     "cand": true
     }
    ]
   },
@@ -457,12 +499,14 @@
     {
      "p": "a fox family in an underground burrow tunnel beneath three farms, the farmers digging furiously above",
      "d": 1,
-     "cap": "Tunnelling under the farmers"
+     "cap": "Tunnelling under the farmers",
+     "cand": true
     },
     {
      "p": "three farmers, one fat, one short, one thin, with shotguns waiting at a fox hole at night",
      "d": 2,
-     "cap": "Boggis, Bunce and Bean"
+     "cap": "Boggis, Bunce and Bean",
+     "cand": true
     }
    ]
   },
@@ -478,12 +522,14 @@
     {
      "p": "an old iron key and a hidden wooden door in an ivy-covered brick wall, a robin perched nearby",
      "d": 1,
-     "cap": "The hidden door in the wall"
+     "cap": "The hidden door in the wall",
+     "cand": true
     },
     {
      "p": "a blooming walled garden with roses, a girl and a boy in a wheelchair",
      "d": 3,
-     "cap": "The garden comes alive"
+     "cap": "The garden comes alive",
+     "cand": true
     }
    ]
   },
@@ -499,12 +545,14 @@
     {
      "p": "a black horse with a white star on its forehead pulling a hansom cab through a foggy Victorian London street of gas lamps, blank shopfronts without signs",
      "d": 2,
-     "cap": "A black horse pulling a London cab"
+     "cap": "A black horse pulling a London cab",
+     "cand": true
     },
     {
      "p": "a black foal with a white star galloping in a green English meadow beside its mother",
      "d": 2,
-     "cap": "Growing up in the meadow"
+     "cap": "Growing up in the meadow",
+     "cand": true
     }
    ]
   },
@@ -522,17 +570,19 @@
     {
      "p": "a toad in goggles recklessly driving an old open-topped motor car down a country lane, chickens scattering",
      "d": 1,
-     "cap": "Poop-poop! Toad's motor car"
+     "cap": "Poop-poop! Toad's motor car",
+     "cand": true
     },
     {
      "p": "a mole and a water rat in a little rowing boat with a picnic basket on a willow-lined river",
      "d": 2,
-     "cap": "Messing about in boats"
+     "cap": "Messing about in boats",
+     "cand": true
     }
    ]
   },
   {
-   "id": "gullivers-travels",
+   "id": "gulliver-s-travels",
    "name": "Gulliver's Travels",
    "alt": [
     "Gullivers Travels"
@@ -545,12 +595,14 @@
     {
      "p": "a giant man tied down on a beach by hundreds of ropes and pegs, swarms of tiny people climbing on him",
      "d": 1,
-     "cap": "Tied down by tiny people in Lilliput"
+     "cap": "Tied down by tiny people in Lilliput",
+     "cand": true
     },
     {
      "p": "a man the size of a doll standing on a giant's dining table",
      "d": 2,
-     "cap": "Tiny among the giants"
+     "cap": "Tiny among the giants",
+     "cand": true
     }
    ]
   },
@@ -566,7 +618,8 @@
     {
      "p": "a thin knight in old armour on a bony horse charging with a lance at Spanish windmills, a short squire on a donkey behind",
      "d": 1,
-     "cap": "Tilting at windmills"
+     "cap": "Tilting at windmills",
+     "cand": true
     }
    ]
   },
@@ -582,12 +635,14 @@
     {
      "p": "an old fisherman in a small wooden skiff with a giant marlin skeleton lashed alongside, sharks circling, Cuban coast at dawn",
      "d": 2,
-     "cap": "Bringing home the marlin's skeleton"
+     "cap": "Bringing home the marlin's skeleton",
+     "cand": true
     },
     {
      "p": "an old fisherman in a small skiff holding a fishing line taut, a huge marlin leaping",
      "d": 2,
-     "cap": "The battle with the marlin"
+     "cap": "The battle with the marlin",
+     "cand": true
     }
    ]
   },
@@ -603,12 +658,14 @@
     {
      "p": "a large pink conch shell held up by a boy in a torn school uniform on a tropical beach, other boys gathered",
      "d": 2,
-     "cap": "Whoever holds the conch may speak"
+     "cap": "Whoever holds the conch may speak",
+     "cand": true
     },
     {
      "p": "a pair of spectacles focusing sunlight to light a signal fire on a mountain top on an island",
      "d": 3,
-     "cap": "Fire from the spectacles"
+     "cap": "Fire from the spectacles",
+     "cand": true
     }
    ]
   },
@@ -626,12 +683,14 @@
     {
      "p": "a man in a white suit seen from behind at the end of a wooden dock at night, reaching toward a small green light across a bay",
      "d": 2,
-     "cap": "The green light across the bay"
+     "cap": "The green light across the bay",
+     "cand": true
     },
     {
      "p": "a lavish 1920s mansion party with flappers dancing, champagne towers and fireworks",
      "d": 2,
-     "cap": "One of Gatsby's parties"
+     "cap": "One of Gatsby's parties",
+     "cand": true
     }
    ]
   },
@@ -647,12 +706,14 @@
     {
      "p": "the knothole of an old oak tree holding small gifts: two carved soap dolls, chewing gum and a pocket watch, a quiet Southern street",
      "d": 3,
-     "cap": "Gifts in the knothole"
+     "cap": "Gifts in the knothole",
+     "cand": true
     },
     {
      "p": "a lawyer in a 1930s suit seen from behind addressing a packed small-town Alabama courtroom",
      "d": 3,
-     "cap": "The trial in Maycomb"
+     "cap": "The trial in Maycomb",
+     "cand": true
     }
    ]
   },
@@ -670,12 +731,14 @@
     {
      "p": "giant stern watching eyes on a huge poster above a grey dystopian city street, telescreens, people in blue overalls",
      "d": 2,
-     "cap": "Big Brother is watching"
+     "cap": "Big Brother is watching",
+     "cand": true
     },
     {
      "p": "a man seen from behind writing in a diary in an alcove hidden from a telescreen in a shabby flat",
      "d": 3,
-     "cap": "The forbidden diary"
+     "cap": "The forbidden diary",
+     "cand": true
     }
    ]
   },
@@ -691,12 +754,14 @@
     {
      "p": "pigs walking on their hind legs out of an English farmhouse, other farm animals watching in shock",
      "d": 1,
-     "cap": "Four legs good, two legs better"
+     "cap": "Four legs good, two legs better",
+     "cand": true
     },
     {
      "p": "farm animals building a windmill on an English farm",
      "d": 2,
-     "cap": "Building the windmill"
+     "cap": "Building the windmill",
+     "cand": true
     }
    ]
   },
@@ -712,7 +777,8 @@
     {
      "p": "firemen with flamethrowers burning a pile of books in a street at night, pages swirling in the flames",
      "d": 2,
-     "cap": "Firemen who burn books"
+     "cap": "Firemen who burn books",
+     "cand": true
     }
    ]
   },
@@ -730,12 +796,14 @@
     {
      "p": "giant three-legged Martian fighting machines striding over a Victorian English town firing heat rays, people fleeing",
      "d": 1,
-     "cap": "Martian tripods attack"
+     "cap": "Martian tripods attack",
+     "cand": true
     },
     {
      "p": "a huge metal cylinder half-buried in a smoking crater on an English common at dawn, crowds watching",
      "d": 3,
-     "cap": "The cylinder on Horsell Common"
+     "cap": "The cylinder on Horsell Common",
+     "cand": true
     }
    ]
   },
@@ -751,7 +819,8 @@
     {
      "p": "an ornate brass and wood Victorian time machine with a velvet seat and spinning dials glowing in a gentleman's study",
      "d": 1,
-     "cap": "The Time Traveller's machine"
+     "cap": "The Time Traveller's machine",
+     "cand": true
     }
    ]
   },
@@ -761,13 +830,14 @@
    "alt": [],
    "author": "Louisa May Alcott",
    "year": 1868,
-   "kids": false,
+   "kids": true,
    "blurb": "Four March sisters grow up in Civil War-era Massachusetts.",
    "scenes": [
     {
      "p": "four sisters in 1860s dresses gathered by the fireside at Christmas in a cosy New England parlour",
      "d": 2,
-     "cap": "The four March sisters at Christmas"
+     "cap": "The four March sisters at Christmas",
+     "cand": true
     }
    ]
   },
@@ -783,12 +853,14 @@
     {
      "p": "a little girl with goats on a flowery Swiss alpine meadow beside a wooden hut, snowy peaks",
      "d": 1,
-     "cap": "Heidi and the goats in the Alps"
+     "cap": "Heidi and the goats in the Alps",
+     "cand": true
     },
     {
      "p": "a girl lying in a hay loft looking out a round window at the stars over the Alps",
      "d": 3,
-     "cap": "A bed in the hayloft"
+     "cap": "A bed in the hayloft",
+     "cand": true
     }
    ]
   },
@@ -806,17 +878,19 @@
     {
      "p": "a little boy with a long scarf standing on a tiny planet with three small volcanoes and a single rose under a glass dome, stars",
      "d": 1,
-     "cap": "The prince on his tiny planet"
+     "cap": "The prince on his tiny planet",
+     "cand": true
     },
     {
      "p": "a small boy and a fox in the desert beside a crashed biplane",
      "d": 2,
-     "cap": "Taming the fox in the desert"
+     "cap": "Taming the fox in the desert",
+     "cand": true
     }
    ]
   },
   {
-   "id": "peter-rabbit",
+   "id": "the-tale-of-peter-rabbit",
    "name": "The Tale of Peter Rabbit",
    "alt": [
     "Peter Rabbit"
@@ -829,7 +903,8 @@
     {
      "p": "a little rabbit in a blue jacket squeezing under a garden gate in an English vegetable garden, cabbages, a farmer with a rake in the distance",
      "d": 1,
-     "cap": "Into Mr McGregor's garden"
+     "cap": "Into Mr McGregor's garden",
+     "cand": true
     }
    ]
   },
@@ -845,30 +920,33 @@
     {
      "p": "a huge glowing spectral hound with fiery eyes leaping across a misty moor at night, granite tors",
      "d": 2,
-     "cap": "The hound on the moor"
+     "cap": "The hound on the moor",
+     "cand": true
     },
     {
      "p": "a detective in a deerstalker cap with a pipe seen from behind looking across foggy Dartmoor",
      "d": 2,
-     "cap": "A detective on Dartmoor"
+     "cap": "A detective on Dartmoor",
+     "cand": true
     }
    ]
   },
   {
-   "id": "journey-to-the-centre-of-the-earth",
-   "name": "Journey to the Centre of the Earth",
+   "id": "journey-to-the-center-of-the-earth",
+   "name": "Journey to the Center of the Earth",
    "alt": [
-    "Journey to the Center of the Earth"
+    "Journey to the Centre of the Earth"
    ],
    "author": "Jules Verne",
    "year": 1864,
-   "kids": false,
+   "kids": true,
    "blurb": "A professor descends through an Icelandic volcano to an underground world.",
    "scenes": [
     {
      "p": "explorers on a raft crossing a vast underground sea in a huge glowing cavern with giant mushrooms and sea monsters",
      "d": 2,
-     "cap": "The underground sea"
+     "cap": "The underground sea",
+     "cand": true
     }
    ]
   },
@@ -880,13 +958,14 @@
    ],
    "author": "Jack London",
    "year": 1903,
-   "kids": false,
+   "kids": true,
    "blurb": "A pet dog is stolen and becomes a sled dog in the Yukon gold rush.",
    "scenes": [
     {
      "p": "a big shaggy dog leading a dog sled team through the snowy Yukon wilderness, northern lights",
      "d": 2,
-     "cap": "A sled dog in the Yukon"
+     "cap": "A sled dog in the Yukon",
+     "cand": true
     }
    ]
   },
@@ -905,12 +984,14 @@
     {
      "p": "young revolutionaries on a barricade of furniture across a narrow Paris street waving a red flag, smoke",
      "d": 2,
-     "cap": "On the barricade"
+     "cap": "On the barricade",
+     "cand": true
     },
     {
      "p": "a pair of silver candlesticks on a bishop's table by candlelight",
      "d": 3,
-     "cap": "The bishop's silver candlesticks"
+     "cap": "The bishop's silver candlesticks",
+     "cand": true
     }
    ]
   },
@@ -929,7 +1010,8 @@
     {
      "p": "a hunched bell-ringer swinging on a huge bronze bell in a gothic cathedral tower, gargoyles and Paris rooftops",
      "d": 1,
-     "cap": "The bell-ringer of the cathedral"
+     "cap": "The bell-ringer of the cathedral",
+     "cand": true
     }
    ]
   },
@@ -945,12 +1027,14 @@
     {
      "p": "a man escaping a grim island fortress prison by being thrown into the sea in a weighted sack at night",
      "d": 2,
-     "cap": "Escape from the Château d'If"
+     "cap": "Escape from the Château d'If",
+     "cand": true
     },
     {
      "p": "a cave full of treasure chests on a rocky Mediterranean island",
      "d": 3,
-     "cap": "The treasure of Monte Cristo"
+     "cap": "The treasure of Monte Cristo",
+     "cand": true
     }
    ]
   },
@@ -966,7 +1050,8 @@
     {
      "p": "four swordsmen in plumed hats and blue tabards crossing rapiers in the air, 17th-century Paris",
      "d": 1,
-     "cap": "All for one and one for all"
+     "cap": "All for one and one for all",
+     "cand": true
     }
    ]
   },
@@ -982,12 +1067,13 @@
     {
      "p": "a red-haired orphan girl with two braids and a straw hat seen from behind with a carpet bag, a white farmhouse with green gables on Prince Edward Island",
      "d": 2,
-     "cap": "Arriving at the farmhouse with green gables"
+     "cap": "Arriving at the farmhouse with green gables",
+     "cand": true
     }
    ]
   },
   {
-   "id": "hitchhikers-guide",
+   "id": "the-hitchhiker-s-guide-to-the-galaxy",
    "name": "The Hitchhiker's Guide to the Galaxy",
    "alt": [
     "Hitchhikers Guide to the Galaxy",
@@ -1001,12 +1087,14 @@
     {
      "p": "a sperm whale and a bowl of petunias falling through the sky over an alien planet",
      "d": 2,
-     "cap": "A whale and a bowl of petunias"
+     "cap": "A whale and a bowl of petunias",
+     "cand": true
     },
     {
      "p": "a man in a dressing gown seen from behind lying in front of a bulldozer outside a cottage, giant yellow spaceships above",
      "d": 3,
-     "cap": "Bypass day"
+     "cap": "Bypass day",
+     "cand": true
     }
    ]
   },
@@ -1022,7 +1110,2197 @@
     {
      "p": "a band of wild rabbits crossing rolling green English downs at sunset, a lone beech tree on the hill",
      "d": 2,
-     "cap": "The rabbits' journey to the down"
+     "cap": "The rabbits' journey to the down",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "peter-pan",
+   "name": "Peter Pan",
+   "alt": [
+    "Peter and Wendy"
+   ],
+   "author": "J. M. Barrie",
+   "year": 1911,
+   "kids": true,
+   "blurb": "The boy who will not grow up flies Wendy and her brothers to Neverland, home of the Lost Boys, fairies and Captain Hook.",
+   "scenes": [
+    {
+     "p": "three children in nightclothes flying hand in hand over moonlit London rooftops past a big clock tower, a tiny glowing fairy leading them",
+     "d": 2,
+     "cap": "Second star to the right",
+     "cand": true
+    },
+    {
+     "p": "a pirate captain with an iron hook for a hand on the deck of a pirate ship at night, a crocodile circling in the water below",
+     "d": 2,
+     "cap": "The captain and the crocodile",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-wonderful-wizard-of-oz",
+   "name": "The Wonderful Wizard of Oz",
+   "alt": [
+    "The Wizard of Oz"
+   ],
+   "author": "L. Frank Baum",
+   "year": 1900,
+   "kids": true,
+   "blurb": "A cyclone carries Dorothy from Kansas to a magical land, where she seeks a great ruler's help with a Scarecrow, a Tin Woodman and a Cowardly Lion.",
+   "scenes": [
+    {
+     "p": "a little farm girl in a blue gingham dress with a small dog walking a yellow brick road with a straw scarecrow, a tin woodman with an axe and a lion, a glittering green city ahead",
+     "d": 2,
+     "cap": "The road to the Emerald City",
+     "cand": true
+    },
+    {
+     "p": "a small wooden farmhouse spinning high up inside a tornado over flat grey prairie",
+     "d": 2,
+     "cap": "Carried away by the cyclone",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-jungle-book",
+   "name": "The Jungle Book",
+   "alt": [],
+   "author": "Rudyard Kipling",
+   "year": 1894,
+   "kids": true,
+   "blurb": "Stories of Indian forest animals, led by the tale of Mowgli, a boy raised by wolves and taught by Baloo the bear and Bagheera the panther.",
+   "scenes": [
+    {
+     "p": "a small boy in a loincloth floating down a jungle river lying on the belly of a big lazy brown bear",
+     "d": 2,
+     "cap": "Floating with Baloo",
+     "cand": true
+    },
+    {
+     "p": "a boy raised by wolves sitting with a wolf pack on a moonlit council rock in the Indian jungle, a black panther watching",
+     "d": 2,
+     "cap": "The wolf pack council",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "winnie-the-pooh",
+   "name": "Winnie-the-Pooh",
+   "alt": [
+    "Winnie the Pooh"
+   ],
+   "author": "A. A. Milne",
+   "year": 1926,
+   "kids": true,
+   "blurb": "Gentle stories of a honey-loving bear and his friends Piglet, Eeyore, Owl, Rabbit and Christopher Robin in the Hundred Acre Wood.",
+   "scenes": [
+    {
+     "p": "a small honey-loving teddy bear floating up toward a tree beehive holding a blue balloon, angry bees buzzing around him",
+     "d": 2,
+     "cap": "Floating up to the honey",
+     "cand": true
+    },
+    {
+     "p": "a teddy bear, a small piglet and a boy dropping sticks off the side of a little wooden bridge into a stream",
+     "d": 2,
+     "cap": "Poohsticks",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-lord-of-the-rings",
+   "name": "The Lord of the Rings",
+   "alt": [],
+   "author": "J. R. R. Tolkien",
+   "year": 1954,
+   "kids": false,
+   "blurb": "The hobbit Frodo and the Fellowship set out to destroy the One Ring in the fires of Mount Doom before the Dark Lord Sauron can reclaim it.",
+   "scenes": [
+    {
+     "p": "a plain gold ring glowing on a stone ledge, a dark volcanic mountain erupting far away under a red sky",
+     "d": 2,
+     "cap": "The One Ring",
+     "cand": true
+    },
+    {
+     "p": "nine walkers on a mountain path in the snow: a wizard with a staff, an elf archer, a dwarf with an axe, men and four small hobbits",
+     "d": 2,
+     "cap": "The fellowship sets out",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-cat-in-the-hat",
+   "name": "The Cat in the Hat",
+   "alt": [],
+   "author": "Dr. Seuss",
+   "year": 1957,
+   "kids": true,
+   "blurb": "On a rainy day, a mischievous cat in a tall hat turns two children's house upside down while their mother is out.",
+   "scenes": [
+    {
+     "p": "two children watching from a window on a rainy day while a goldfish in a bowl balances on top of an umbrella held up by a mischievous figure, toppling books and a cake",
+     "d": 2,
+     "cap": "A rainy day turned upside down",
+     "cand": true
+    },
+    {
+     "p": "a big red kite flying through a house, knocking over furniture, a goldfish in a bowl looking alarmed",
+     "d": 2,
+     "cap": "Kites in the house",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "harry-potter-and-the-philosopher-s-stone",
+   "name": "Harry Potter and the Philosopher's Stone",
+   "alt": [
+    "Harry Potter and the Sorcerer's Stone"
+   ],
+   "author": "J. K. Rowling",
+   "year": 1997,
+   "kids": true,
+   "blurb": "On his eleventh birthday an orphan learns he is a wizard and goes to Hogwarts, where he uncovers a plot to steal an object that grants eternal life.",
+   "scenes": [
+    {
+     "p": "a cupboard under the stairs with a small camp bed and spiders, hundreds of sealed letters pouring through the letterbox of a suburban house",
+     "d": 2,
+     "cap": "Letters from no one",
+     "cand": true
+    },
+    {
+     "p": "a giant three-headed dog guarding a trapdoor in a stone castle corridor, a harp playing",
+     "d": 2,
+     "cap": "The three-headed dog",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "matilda",
+   "name": "Matilda",
+   "alt": [],
+   "author": "Roald Dahl",
+   "year": 1988,
+   "kids": true,
+   "blurb": "A brilliant girl with awful parents and a tyrannical headmistress discovers she has special powers and helps her kind teacher, Miss Honey.",
+   "scenes": [
+    {
+     "p": "a little girl sitting on a stack of library books making a glass of water tip over with her mind on a classroom desk",
+     "d": 2,
+     "cap": "The power of her mind",
+     "cand": true
+    },
+    {
+     "p": "a huge stern headmistress throwing a girl by her pigtails over a school fence like a hammer thrower",
+     "d": 2,
+     "cap": "The hammer throw",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "charlie-and-the-chocolate-factory",
+   "name": "Charlie and the Chocolate Factory",
+   "alt": [],
+   "author": "Roald Dahl",
+   "year": 1964,
+   "kids": true,
+   "blurb": "A poor boy finds a golden ticket and joins four badly behaved children on a tour of Willy Wonka's magical sweet works.",
+   "scenes": [
+    {
+     "p": "a boy finding a shining golden ticket inside the wrapper of a chocolate bar in a snowy street",
+     "d": 2,
+     "cap": "The golden ticket",
+     "cand": true
+    },
+    {
+     "p": "a giant room with a chocolate river and waterfall, candy trees and lollipop flowers, a glass elevator",
+     "d": 2,
+     "cap": "The chocolate room",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "where-the-wild-things-are",
+   "name": "Where the Wild Things Are",
+   "alt": [],
+   "author": "Maurice Sendak",
+   "year": 1963,
+   "kids": true,
+   "blurb": "Sent to bed without supper, Max sails to an island of monsters, becomes their king, then sails home to find his supper waiting.",
+   "scenes": [
+    {
+     "p": "a small boy in a white wolf suit with a crown standing on the back of a big hairy horned monster in a moonlit forest, other monsters dancing",
+     "d": 2,
+     "cap": "The wild rumpus",
+     "cand": true
+    },
+    {
+     "p": "a boy's bedroom where trees grow out of the floor and walls until it becomes a forest",
+     "d": 2,
+     "cap": "The room becomes a forest",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-gruffalo",
+   "name": "The Gruffalo",
+   "alt": [],
+   "author": "Julia Donaldson",
+   "year": 1999,
+   "kids": true,
+   "blurb": "A small mouse walking through the woods invents a fearsome monster to scare off hungry animals, then meets the monster for real.",
+   "scenes": [
+    {
+     "p": "a little brown mouse walking along a path through a deep dark wood, a fox, an owl in a tree and a snake watching it",
+     "d": 2,
+     "cap": "A mouse in the deep dark wood",
+     "cand": true
+    },
+    {
+     "p": "a little mouse eating a nut at the edge of a dark wood at night",
+     "d": 2,
+     "cap": "The mouse and the nut",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "mary-poppins",
+   "name": "Mary Poppins",
+   "alt": [],
+   "author": "P. L. Travers",
+   "year": 1934,
+   "kids": true,
+   "blurb": "A strict but magical nanny blows in on the east wind to look after the Banks children of Cherry Tree Lane.",
+   "scenes": [
+    {
+     "p": "a nanny with an umbrella and a carpet bag floating down from the sky onto a neat London street in an east wind",
+     "d": 2,
+     "cap": "Arriving on the east wind",
+     "cand": true
+    },
+    {
+     "p": "children and a nanny floating near the ceiling having tea with an old man laughing",
+     "d": 2,
+     "cap": "Tea on the ceiling",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "a-bear-called-paddington",
+   "name": "A Bear Called Paddington",
+   "alt": [
+    "Paddington"
+   ],
+   "author": "Michael Bond",
+   "year": 1958,
+   "kids": true,
+   "blurb": "A polite, marmalade-loving visitor from Peru is found at a London station by the Brown family, who take him home and name him after it.",
+   "scenes": [
+    {
+     "p": "a small brown bear sitting on a suitcase at a busy railway station, a label around its neck",
+     "d": 2,
+     "cap": "Found at the station",
+     "cand": true
+    },
+    {
+     "p": "a marmalade sandwich under a battered red hat",
+     "d": 2,
+     "cap": "Marmalade under the hat",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-tiger-who-came-to-tea",
+   "name": "The Tiger Who Came to Tea",
+   "alt": [],
+   "author": "Judith Kerr",
+   "year": 1968,
+   "kids": true,
+   "blurb": "A hungry striped big cat turns up at Sophie's house in the afternoon and eats and drinks absolutely everything.",
+   "scenes": [
+    {
+     "p": "a big friendly tiger sitting at a kitchen table in a 1960s house drinking from the teapot, a little girl and her mother watching",
+     "d": 2,
+     "cap": "A tiger at the tea table",
+     "cand": true
+    },
+    {
+     "p": "a family eating at a cafe at night after the tiger ate all their food",
+     "d": 2,
+     "cap": "Supper out",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-adventures-of-tom-sawyer",
+   "name": "The Adventures of Tom Sawyer",
+   "alt": [
+    "Tom Sawyer"
+   ],
+   "author": "Mark Twain",
+   "year": 1876,
+   "kids": true,
+   "blurb": "A mischievous boy in a Mississippi river town plays tricks, fakes his own death and witnesses a murder in a graveyard with his friend Huck.",
+   "scenes": [
+    {
+     "p": "a barefoot boy in a straw hat watching other boys whitewash a long wooden fence on a sunny Missouri street",
+     "d": 2,
+     "cap": "Whitewashing the fence",
+     "cand": true
+    },
+    {
+     "p": "a boy and a girl lost in a dark cave holding a candle",
+     "d": 2,
+     "cap": "Lost in the cave",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-adventures-of-sherlock-holmes",
+   "name": "The Adventures of Sherlock Holmes",
+   "alt": [],
+   "author": "Arthur Conan Doyle",
+   "year": 1892,
+   "kids": false,
+   "blurb": "Twelve short cases for the detective of Baker Street and his friend Dr Watson, including the woman who outwitted him and a league of red-haired men.",
+   "scenes": [
+    {
+     "p": "a man in a deerstalker cap and Inverness cape holding a magnifying glass and a pipe on a foggy gaslit Victorian London street, a hansom cab",
+     "d": 2,
+     "cap": "The detective in the fog",
+     "cand": true
+    },
+    {
+     "p": "a cosy Victorian sitting room with a violin, chemistry equipment, and a pipe by the fire",
+     "d": 2,
+     "cap": "Two-twenty-one B",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-railway-children",
+   "name": "The Railway Children",
+   "alt": [],
+   "author": "E. Nesbit",
+   "year": 1906,
+   "kids": true,
+   "blurb": "Roberta, Peter and Phyllis move to the countryside when their father is taken away, and make friends with the trains and the people on them.",
+   "scenes": [
+    {
+     "p": "three Edwardian children waving red petticoats at a steam train on a railway line to stop it before a landslide",
+     "d": 2,
+     "cap": "Waving the red petticoats",
+     "cand": true
+    },
+    {
+     "p": "three children sitting on a fence by a railway line waving to a passing steam train",
+     "d": 2,
+     "cap": "Waving to the old gentleman",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-adventures-of-pinocchio",
+   "name": "The Adventures of Pinocchio",
+   "alt": [
+    "Pinocchio"
+   ],
+   "author": "Carlo Collodi",
+   "year": 1883,
+   "kids": true,
+   "blurb": "An old woodcarver's puppet comes to life, runs into trouble with a fox, a cat and a talking cricket, and must learn to be good.",
+   "scenes": [
+    {
+     "p": "a wooden puppet boy whose nose grows long like a branch with a bird's nest on it, a fairy watching",
+     "d": 2,
+     "cap": "The growing nose",
+     "cand": true
+    },
+    {
+     "p": "an old woodcarver in his workshop carving a wooden puppet boy",
+     "d": 2,
+     "cap": "Carving the puppet",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "pippi-longstocking",
+   "name": "Pippi Longstocking",
+   "alt": [],
+   "author": "Astrid Lindgren",
+   "year": 1945,
+   "kids": true,
+   "blurb": "A red-pigtailed, super-strong girl lives without grown-ups in a ramshackle house and has wild adventures with her neighbours.",
+   "scenes": [
+    {
+     "p": "a red-haired girl with stiff sticking-out plaits lifting a spotted horse above her head on a house veranda",
+     "d": 2,
+     "cap": "The strongest girl in the world",
+     "cand": true
+    },
+    {
+     "p": "a girl with red plaits and mismatched stockings with a monkey on her shoulder",
+     "d": 2,
+     "cap": "Pippi and her monkey",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "possum-magic",
+   "name": "Possum Magic",
+   "alt": [],
+   "author": "Mem Fox",
+   "year": 1983,
+   "kids": true,
+   "blurb": "Grandma Poss makes Hush invisible to keep her safe, then they travel to Australian cities eating local food to make her seen again.",
+   "scenes": [
+    {
+     "p": "a grandmother possum and an invisible little possum eating lamingtons and pavlova in Australian towns",
+     "d": 2,
+     "cap": "Making Hush visible",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "harry-potter-and-the-prisoner-of-azkaban",
+   "name": "Harry Potter and the Prisoner of Azkaban",
+   "alt": [
+    "Prisoner of Azkaban"
+   ],
+   "author": "J. K. Rowling",
+   "year": 1999,
+   "kids": true,
+   "blurb": "In his third year, Harry learns that the escaped wizard Sirius Black is said to be after him, and soul-sucking Dementors guard the school.",
+   "scenes": [
+    {
+     "p": "a huge shaggy black dog in a graveyard at night, a boy with glasses and a wand",
+     "d": 2,
+     "cap": "The grim",
+     "cand": true
+    },
+    {
+     "p": "a hippogriff flying over a misty Scottish lake with a boy on its back",
+     "d": 2,
+     "cap": "Riding the hippogriff",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "harry-potter-and-the-deathly-hallows",
+   "name": "Harry Potter and the Deathly Hallows",
+   "alt": [
+    "Deathly Hallows"
+   ],
+   "author": "J. K. Rowling",
+   "year": 2007,
+   "kids": true,
+   "blurb": "Harry, Ron and Hermione leave school to hunt down Voldemort's Horcruxes, ending in a great battle at Hogwarts.",
+   "scenes": [
+    {
+     "p": "a white dragon bursting up through a marble bank hall with three young riders on its back",
+     "d": 2,
+     "cap": "Escaping the bank",
+     "cand": true
+    },
+    {
+     "p": "a cracked stone castle at night under attack, lights in the sky",
+     "d": 2,
+     "cap": "The battle for the castle",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "room-on-the-broom",
+   "name": "Room on the Broom",
+   "alt": [],
+   "author": "Julia Donaldson",
+   "year": 2001,
+   "kids": true,
+   "blurb": "A witch keeps dropping her things and picking up new animal friends on her broomstick, and they save her from a hungry dragon.",
+   "scenes": [
+    {
+     "p": "a friendly witch flying on a broomstick crowded with a cat, a dog, a green bird and a frog, over a moonlit countryside",
+     "d": 2,
+     "cap": "Room on the broom",
+     "cand": true
+    },
+    {
+     "p": "a witch and her animals in a magic cauldron",
+     "d": 2,
+     "cap": "The cauldron",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-snowman",
+   "name": "The Snowman",
+   "alt": [],
+   "author": "Raymond Briggs",
+   "year": 1978,
+   "kids": true,
+   "blurb": "A wordless picture book in which a boy's snowy creation comes alive at night and flies him to the North Pole.",
+   "scenes": [
+    {
+     "p": "a boy in pyjamas flying hand in hand with a snowman over snowy countryside and the sea at night",
+     "d": 2,
+     "cap": "Walking in the air",
+     "cand": true
+    },
+    {
+     "p": "a boy building a big snowman with a scarf and a hat in a snowy garden",
+     "d": 2,
+     "cap": "Building the snowman",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "we-re-going-on-a-bear-hunt",
+   "name": "We're Going on a Bear Hunt",
+   "alt": [],
+   "author": "Michael Rosen",
+   "year": 1989,
+   "kids": true,
+   "blurb": "A family sets off across long grass, a river, mud, a forest and a snowstorm to find a bear, and then runs all the way home.",
+   "scenes": [
+    {
+     "p": "a family of four children and a father wading through long swishy grass under a big sky, a dog following",
+     "d": 2,
+     "cap": "Long wavy grass",
+     "cand": true
+    },
+    {
+     "p": "a family running in a line away from a bear across a beach and a river",
+     "d": 2,
+     "cap": "Running from the bear",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-witches",
+   "name": "The Witches",
+   "alt": [],
+   "author": "Roald Dahl",
+   "year": 1983,
+   "kids": true,
+   "blurb": "A boy and his Norwegian grandmother discover a hotel convention of child-hating women plotting to turn children into mice.",
+   "scenes": [
+    {
+     "p": "a hotel conference room full of ladies taking off their wigs and gloves to reveal bald heads and claws, a little mouse hiding",
+     "d": 2,
+     "cap": "The witches' convention",
+     "cand": true
+    },
+    {
+     "p": "a small boy turned into a mouse peeking out of a knitted handbag",
+     "d": 2,
+     "cap": "A boy turned into a mouse",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-twits",
+   "name": "The Twits",
+   "alt": [],
+   "author": "Roald Dahl",
+   "year": 1980,
+   "kids": true,
+   "blurb": "A disgusting husband and wife play cruel jokes on each other, until the monkeys they keep get their revenge.",
+   "scenes": [
+    {
+     "p": "an ugly bearded man with bits of food in his beard and his wife glaring at each other at a dinner table, a plate of wormy spaghetti",
+     "d": 2,
+     "cap": "Wormy spaghetti",
+     "cand": true
+    },
+    {
+     "p": "birds stuck with glue to the branches of a big dead tree",
+     "d": 2,
+     "cap": "The glue tree",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "george-s-marvellous-medicine",
+   "name": "George's Marvellous Medicine",
+   "alt": [],
+   "author": "Roald Dahl",
+   "year": 1981,
+   "kids": true,
+   "blurb": "A boy mixes a magic medicine from things around the house for his horrible grandma, and she grows enormously.",
+   "scenes": [
+    {
+     "p": "a boy stirring a huge steaming pot of bubbling multicoloured medicine in a farmhouse kitchen",
+     "d": 2,
+     "cap": "Mixing the marvellous medicine",
+     "cand": true
+    },
+    {
+     "p": "a grandmother growing so tall that her head bursts through the roof of a farmhouse",
+     "d": 2,
+     "cap": "Grandma grows through the roof",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "green-eggs-and-ham",
+   "name": "Green Eggs and Ham",
+   "alt": [],
+   "author": "Dr. Seuss",
+   "year": 1960,
+   "kids": true,
+   "blurb": "A persistent character keeps offering an odd-coloured breakfast in every place imaginable until his grumpy friend finally tries it.",
+   "scenes": [
+    {
+     "p": "a plate of fried eggs with bright green yolks and a slice of green ham, a fork",
+     "d": 2,
+     "cap": "Green eggs and ham",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "how-the-grinch-stole-christmas",
+   "name": "How the Grinch Stole Christmas!",
+   "alt": [
+    "The Grinch"
+   ],
+   "author": "Dr. Seuss",
+   "year": 1957,
+   "kids": true,
+   "blurb": "A grouch who hates the festive season steals all the presents from Whoville, but the Whos celebrate anyway.",
+   "scenes": [
+    {
+     "p": "a sleigh piled high with stolen Christmas presents and trees teetering on a snowy mountain peak above a little town, a small dog with an antler tied to its head pulling it",
+     "d": 2,
+     "cap": "Up the mountain with the stolen Christmas",
+     "cand": true
+    },
+    {
+     "p": "a little snowy town with houses where people are singing in a circle holding hands",
+     "d": 2,
+     "cap": "They sang without presents",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-lorax",
+   "name": "The Lorax",
+   "alt": [],
+   "author": "Dr. Seuss",
+   "year": 1971,
+   "kids": true,
+   "blurb": "A creature who speaks for the trees warns a greedy businessman not to chop down every last Truffula Tree.",
+   "scenes": [
+    {
+     "p": "a landscape of colourful fluffy truffula-like trees on candy-striped trunks being chopped down, stumps and a factory with smoke",
+     "d": 2,
+     "cap": "The last of the tufted trees",
+     "cand": true
+    },
+    {
+     "p": "a single seed in a child's hand in a grey polluted wasteland",
+     "d": 2,
+     "cap": "Unless",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "goodnight-moon",
+   "name": "Goodnight Moon",
+   "alt": [],
+   "author": "Margaret Wise Brown",
+   "year": 1947,
+   "kids": true,
+   "blurb": "A young rabbit in bed says goodnight to each thing in the room as the night grows darker.",
+   "scenes": [
+    {
+     "p": "a great green room at bedtime with a fireplace, a red balloon, a telephone, a moon in the window, a small bunny in bed",
+     "d": 2,
+     "cap": "Goodnight room",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "a-tale-of-two-cities",
+   "name": "A Tale of Two Cities",
+   "alt": [],
+   "author": "Charles Dickens",
+   "year": 1859,
+   "kids": false,
+   "blurb": "Families in London and Paris are swept up in the French Revolution, and the cynical Sydney Carton makes the ultimate sacrifice.",
+   "scenes": [
+    {
+     "p": "a revolutionary crowd in Paris in 1789 storming a fortress, a guillotine in a square, women knitting",
+     "d": 2,
+     "cap": "The revolution",
+     "cand": true
+    },
+    {
+     "p": "a man climbing to the guillotine in Paris",
+     "d": 2,
+     "cap": "A far, far better thing",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-picture-of-dorian-gray",
+   "name": "The Picture of Dorian Gray",
+   "alt": [],
+   "author": "Oscar Wilde",
+   "year": 1890,
+   "kids": false,
+   "blurb": "A beautiful young man stays youthful while his portrait records every sin he commits, growing ever more hideous.",
+   "scenes": [
+    {
+     "p": "a portrait of a handsome young man in a gilded frame in an attic, aging and turning hideous while the real man stays young",
+     "d": 2,
+     "cap": "The portrait in the attic",
+     "cand": true
+    },
+    {
+     "p": "a Victorian gentleman with a knife in front of a portrait under a cloth",
+     "d": 2,
+     "cap": "The cloth is lifted",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "adventures-of-huckleberry-finn",
+   "name": "Adventures of Huckleberry Finn",
+   "alt": [
+    "Huckleberry Finn",
+    "Huck Finn"
+   ],
+   "author": "Mark Twain",
+   "year": 1884,
+   "kids": false,
+   "blurb": "Huck fakes his death to escape his father and rafts down the Mississippi with Jim, a man escaping slavery.",
+   "scenes": [
+    {
+     "p": "a boy and a man on a small wooden log raft floating down the wide Mississippi River at sunset, a paddle steamer in the distance",
+     "d": 2,
+     "cap": "Rafting down the Mississippi",
+     "cand": true
+    },
+    {
+     "p": "a boy in a straw hat fishing on a riverbank",
+     "d": 2,
+     "cap": "Fishing on the bank",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "war-and-peace",
+   "name": "War and Peace",
+   "alt": [],
+   "author": "Leo Tolstoy",
+   "year": 1869,
+   "kids": false,
+   "blurb": "Several aristocratic Russian families live, love and fight through the Napoleonic Wars, including the 1812 invasion of Russia.",
+   "scenes": [
+    {
+     "p": "a French imperial army on horseback in the snow with Moscow burning in the distance, 1812",
+     "d": 2,
+     "cap": "Moscow burns",
+     "cand": true
+    },
+    {
+     "p": "a grand ballroom in Saint Petersburg, 1805, a young woman at her first ball",
+     "d": 2,
+     "cap": "The first ball",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "emma",
+   "name": "Emma",
+   "alt": [],
+   "author": "Jane Austen",
+   "year": 1815,
+   "kids": false,
+   "blurb": "A clever, wealthy young woman meddles in her neighbours' love lives in the village of Highbury and misreads her own heart.",
+   "scenes": [
+    {
+     "p": "a young woman in a Regency dress at a picnic on Box Hill",
+     "d": 2,
+     "cap": "The picnic at Box Hill",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-metamorphosis",
+   "name": "The Metamorphosis",
+   "alt": [
+    "Metamorphosis"
+   ],
+   "author": "Franz Kafka",
+   "year": 1915,
+   "kids": false,
+   "blurb": "Salesman Gregor Samsa wakes to find he has turned into a huge insect, and his family slowly comes to see him as a burden.",
+   "scenes": [
+    {
+     "p": "a giant brown beetle-like insect lying on its back on a bed in a small early 20th century bedroom, a travelling salesman's sample case, the family at the door horrified",
+     "d": 2,
+     "cap": "He woke up as a giant insect",
+     "cand": true
+    },
+    {
+     "p": "an apple stuck in the back of a giant insect",
+     "d": 2,
+     "cap": "The apple",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "twenty-thousand-leagues-under-the-seas",
+   "name": "Twenty Thousand Leagues Under the Seas",
+   "alt": [
+    "20,000 Leagues Under the Sea",
+    "Twenty Thousand Leagues Under the Sea"
+   ],
+   "author": "Jules Verne",
+   "year": 1870,
+   "kids": true,
+   "blurb": "Professor Aronnax is captured by the mysterious Captain Nemo and tours the world's oceans aboard the submarine Nautilus.",
+   "scenes": [
+    {
+     "p": "a submarine shaped like a narwhal in the depths with a giant squid wrapping it in tentacles, a porthole",
+     "d": 2,
+     "cap": "The giant squid attacks",
+     "cand": true
+    },
+    {
+     "p": "divers in old brass diving suits walking on the seabed in an underwater forest",
+     "d": 2,
+     "cap": "The underwater forest",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "strange-case-of-dr-jekyll-and-mr-hyde",
+   "name": "Strange Case of Dr Jekyll and Mr Hyde",
+   "alt": [
+    "Dr Jekyll and Mr Hyde",
+    "Jekyll and Hyde"
+   ],
+   "author": "Robert Louis Stevenson",
+   "year": 1886,
+   "kids": false,
+   "blurb": "A London lawyer investigates the link between his respectable friend, a doctor, and a brutal man who seems to have a hold over him.",
+   "scenes": [
+    {
+     "p": "a Victorian gentleman in a laboratory drinking a smoking potion, his shadow on the wall becoming a hunched brute",
+     "d": 2,
+     "cap": "The potion",
+     "cand": true
+    },
+    {
+     "p": "a hunched figure running through a foggy London alley at night",
+     "d": 2,
+     "cap": "Hyde in the fog",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "sense-and-sensibility",
+   "name": "Sense and Sensibility",
+   "alt": [],
+   "author": "Jane Austen",
+   "year": 1811,
+   "kids": false,
+   "blurb": "Sensible Elinor and passionate Marianne Dashwood face heartbreak and money worries after their father's death.",
+   "scenes": [
+    {
+     "p": "two sisters in Regency dresses, one rescued by a man on a horse in the rain",
+     "d": 2,
+     "cap": "Rescued in the rain",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-hunger-games",
+   "name": "The Hunger Games",
+   "alt": [],
+   "author": "Suzanne Collins",
+   "year": 2008,
+   "kids": false,
+   "blurb": "In the nation of Panem, Katniss Everdeen takes her sister's place in a televised fight to the death between teenagers.",
+   "scenes": [
+    {
+     "p": "a young woman with a bow and arrow in a forest, a burning dress, a mockingjay pin",
+     "d": 2,
+     "cap": "The girl on fire",
+     "cand": true
+    },
+    {
+     "p": "a golden horn-shaped structure in a field with weapons around it, tributes running",
+     "d": 2,
+     "cap": "The Cornucopia",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-da-vinci-code",
+   "name": "The Da Vinci Code",
+   "alt": [],
+   "author": "Dan Brown",
+   "year": 2003,
+   "kids": false,
+   "blurb": "Symbologist Robert Langdon and cryptologist Sophie Neveu follow clues in famous artworks after a murder in the Louvre.",
+   "scenes": [
+    {
+     "p": "a body in the Louvre art museum on the floor lit by moonlight, a glass pyramid outside",
+     "d": 2,
+     "cap": "The body in the Louvre",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "life-of-pi",
+   "name": "Life of Pi",
+   "alt": [],
+   "author": "Yann Martel",
+   "year": 2001,
+   "kids": false,
+   "blurb": "After a shipwreck, a teenage boy from India drifts across the Pacific in a small boat with a Bengal tiger called Richard Parker.",
+   "scenes": [
+    {
+     "p": "a boy in a lifeboat on a vast calm ocean with a Bengal tiger, the sea glowing with jellyfish at night",
+     "d": 2,
+     "cap": "A boy and a tiger in a lifeboat",
+     "cand": true
+    },
+    {
+     "p": "a floating island of meerkats in the middle of the ocean",
+     "d": 2,
+     "cap": "The meerkat island",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "rebecca",
+   "name": "Rebecca",
+   "alt": [],
+   "author": "Daphne du Maurier",
+   "year": 1938,
+   "kids": false,
+   "blurb": "A shy young bride arrives at the grand estate of Manderley and lives in the shadow of her husband's glamorous dead first wife.",
+   "scenes": [
+    {
+     "p": "a grand ruined English mansion on the coast at night, moonlight, overgrown drive",
+     "d": 2,
+     "cap": "Last night I dreamt I went to Manderley",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "murder-on-the-orient-express",
+   "name": "Murder on the Orient Express",
+   "alt": [],
+   "author": "Agatha Christie",
+   "year": 1934,
+   "kids": false,
+   "blurb": "Hercule Poirot investigates a passenger's killing on a snowbound luxury train, where every suspect seems to have an alibi.",
+   "scenes": [
+    {
+     "p": "a luxury steam train stuck in a snowdrift in the mountains at night, passengers looking out of lit windows",
+     "d": 2,
+     "cap": "Stuck in the snow",
+     "cand": true
+    },
+    {
+     "p": "a man with a magnificent moustache examining a compartment",
+     "d": 2,
+     "cap": "The detective",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "and-then-there-were-none",
+   "name": "And Then There Were None",
+   "alt": [],
+   "author": "Agatha Christie",
+   "year": 1939,
+   "kids": false,
+   "blurb": "Ten strangers lured to an island are killed one by one, following the verses of a nursery rhyme.",
+   "scenes": [
+    {
+     "p": "ten little china soldier figurines on a dining table in a lonely house on a rocky island, a storm at sea",
+     "d": 2,
+     "cap": "Ten little soldiers on the island",
+     "cand": true
+    },
+    {
+     "p": "a house on a rocky island with no boat coming",
+     "d": 2,
+     "cap": "Stranded on the island",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "dune",
+   "name": "Dune",
+   "alt": [],
+   "author": "Frank Herbert",
+   "year": 1965,
+   "kids": false,
+   "blurb": "Young Paul Atreides moves with his family to the desert planet Arrakis, the only source of the precious spice, and becomes a leader of its people.",
+   "scenes": [
+    {
+     "p": "a giant sandworm rising out of the desert dunes, a lone figure in a desert stillsuit standing on top of a dune",
+     "d": 2,
+     "cap": "The sandworm rises",
+     "cand": true
+    },
+    {
+     "p": "two moons rising over a vast desert",
+     "d": 2,
+     "cap": "Arrakis",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "white-fang",
+   "name": "White Fang",
+   "alt": [],
+   "author": "Jack London",
+   "year": 1906,
+   "kids": true,
+   "blurb": "A wolf-dog born in the frozen Yukon is cruelly treated as a fighting animal until a kind man tames him.",
+   "scenes": [
+    {
+     "p": "a wolf-dog in the snowy Yukon wilderness during the Klondike gold rush, a sled team",
+     "d": 2,
+     "cap": "The wolf-dog",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-invisible-man",
+   "name": "The Invisible Man",
+   "alt": [],
+   "author": "H. G. Wells",
+   "year": 1897,
+   "kids": false,
+   "blurb": "A scientist who has made himself unseeable arrives at a country inn wrapped in bandages and slowly turns to violence.",
+   "scenes": [
+    {
+     "p": "a man wrapped head to toe in bandages with dark goggles and a hat in an English village inn, his empty sleeve",
+     "d": 2,
+     "cap": "The bandaged stranger",
+     "cand": true
+    },
+    {
+     "p": "an empty suit of clothes walking down a village street",
+     "d": 2,
+     "cap": "The empty clothes",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "through-the-looking-glass",
+   "name": "Through the Looking-Glass",
+   "alt": [
+    "Through the Looking Glass"
+   ],
+   "author": "Lewis Carroll",
+   "year": 1871,
+   "kids": true,
+   "blurb": "A girl climbs through a mirror into a back-to-front world shaped like a chessboard, meeting Tweedledum and Tweedledee and Humpty Dumpty.",
+   "scenes": [
+    {
+     "p": "a girl climbing through a mantel mirror into a reversed room, a chess game of red and white pieces come to life",
+     "d": 2,
+     "cap": "Through the mirror",
+     "cand": true
+    },
+    {
+     "p": "a giant chessboard landscape of fields and hedges with a girl and a queen",
+     "d": 2,
+     "cap": "The chessboard country",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-velveteen-rabbit",
+   "name": "The Velveteen Rabbit",
+   "alt": [],
+   "author": "Margery Williams",
+   "year": 1922,
+   "kids": true,
+   "blurb": "A child's stuffed toy learns from an old rocking horse that being loved for a long time makes you real.",
+   "scenes": [
+    {
+     "p": "a worn, shabby velveteen toy rabbit in the arms of a sleeping boy",
+     "d": 2,
+     "cap": "Becoming real",
+     "cand": true
+    },
+    {
+     "p": "a toy rabbit in a garden with real rabbits",
+     "d": 2,
+     "cap": "Real rabbits",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-phantom-of-the-opera",
+   "name": "The Phantom of the Opera",
+   "alt": [],
+   "author": "Gaston Leroux",
+   "year": 1910,
+   "kids": false,
+   "blurb": "A masked, disfigured genius haunting a Paris theatre tutors and becomes obsessed with the young singer Christine Daaé.",
+   "scenes": [
+    {
+     "p": "a masked figure in a cape rowing a boat through candlelit underground canals beneath an opera house",
+     "d": 2,
+     "cap": "Beneath the opera house",
+     "cand": true
+    },
+    {
+     "p": "a huge crystal chandelier crashing down in a grand theatre",
+     "d": 2,
+     "cap": "The chandelier falls",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-neverending-story",
+   "name": "The Neverending Story",
+   "alt": [],
+   "author": "Michael Ende",
+   "year": 1979,
+   "kids": true,
+   "blurb": "A lonely boy hides in a school attic with a stolen book and finds himself part of its story, the only one who can save a dying fantasy world.",
+   "scenes": [
+    {
+     "p": "a boy flying on the back of a giant white luck dragon with a dog-like face over a fantasy land",
+     "d": 2,
+     "cap": "Riding the luck dragon",
+     "cand": true
+    },
+    {
+     "p": "a boy reading a book in a school attic, candles",
+     "d": 2,
+     "cap": "Reading in the attic",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-alchemist",
+   "name": "The Alchemist",
+   "alt": [],
+   "author": "Paulo Coelho",
+   "year": 1988,
+   "kids": false,
+   "blurb": "A young Spanish shepherd follows a recurring dream across the desert to the pyramids and learns to follow his heart.",
+   "scenes": [
+    {
+     "p": "a young shepherd seen from behind walking across the desert toward the pyramids of Egypt, sheep behind",
+     "d": 2,
+     "cap": "Following his dream",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-thorn-birds",
+   "name": "The Thorn Birds",
+   "alt": [],
+   "author": "Colleen McCullough",
+   "year": 1977,
+   "kids": false,
+   "blurb": "Meggie Cleary grows up on a vast New South Wales sheep station and falls in love with the ambitious priest Ralph de Bricassart.",
+   "scenes": [
+    {
+     "p": "a sheep station homestead on the Australian outback, a priest on horseback",
+     "d": 2,
+     "cap": "Drogheda",
+     "cand": true
+    },
+    {
+     "p": "a bird impaling itself on a thorn tree at dawn",
+     "d": 2,
+     "cap": "The thorn bird",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "picnic-at-hanging-rock",
+   "name": "Picnic at Hanging Rock",
+   "alt": [],
+   "author": "Joan Lindsay",
+   "year": 1967,
+   "kids": false,
+   "blurb": "On a summer outing in Victoria in 1900, three schoolgirls and a teacher climb a volcanic rock and disappear.",
+   "scenes": [
+    {
+     "p": "schoolgirls in white Victorian dresses on a picnic below towering volcanic rocks in the Australian bush",
+     "d": 2,
+     "cap": "The picnic",
+     "cand": true
+    },
+    {
+     "p": "girls in white climbing up into a crack in a rock",
+     "d": 2,
+     "cap": "Climbing the rock",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "storm-boy",
+   "name": "Storm Boy",
+   "alt": [],
+   "author": "Colin Thiele",
+   "year": 1963,
+   "kids": true,
+   "blurb": "A boy living a lonely life with his father on a wild South Australian coast raises a pelican called Mr Percival.",
+   "scenes": [
+    {
+     "p": "a boy on a lonely beach of the Coorong in South Australia with a pelican, dunes",
+     "d": 2,
+     "cap": "A boy and his pelican",
+     "cand": true
+    },
+    {
+     "p": "a pelican pulling a rope out to a ship in a storm",
+     "d": 2,
+     "cap": "The pelican in the storm",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-magic-pudding",
+   "name": "The Magic Pudding",
+   "alt": [],
+   "author": "Norman Lindsay",
+   "year": 1918,
+   "kids": true,
+   "blurb": "A koala, a sailor and a penguin own a bad-tempered pudding that never runs out, and must defend it from greedy pudding thieves.",
+   "scenes": [
+    {
+     "p": "a koala, a penguin and a sailor at a campfire with a cranky walking pudding in a basin with arms and legs",
+     "d": 2,
+     "cap": "The pudding that never runs out",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-boy-in-the-striped-pyjamas",
+   "name": "The Boy in the Striped Pyjamas",
+   "alt": [],
+   "author": "John Boyne",
+   "year": 2006,
+   "kids": false,
+   "blurb": "The son of a Nazi camp commandant makes friends with a Jewish boy on the other side of the camp's wire fence.",
+   "scenes": [
+    {
+     "p": "two boys sitting on either side of a barbed wire fence, one in striped pyjamas, a chessboard between them",
+     "d": 2,
+     "cap": "Friends on either side of the fence",
+     "cand": true
+    },
+    {
+     "p": "a big house beside a camp",
+     "d": 2,
+     "cap": "Out-With",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "goodnight-mister-tom",
+   "name": "Goodnight Mister Tom",
+   "alt": [],
+   "author": "Michelle Magorian",
+   "year": 1981,
+   "kids": true,
+   "blurb": "William, a frightened evacuee from London, is taken in by a gruff old widower in a village during the Second World War.",
+   "scenes": [
+    {
+     "p": "a grumpy old man and a small evacuee boy with a gas mask box at a country village gate in 1939",
+     "d": 2,
+     "cap": "The evacuee",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-borrowers",
+   "name": "The Borrowers",
+   "alt": [],
+   "author": "Mary Norton",
+   "year": 1952,
+   "kids": true,
+   "blurb": "A family of tiny people lives secretly beneath the floor of an old house, borrowing small things from the humans above.",
+   "scenes": [
+    {
+     "p": "tiny people living under the floorboards of a house using thimbles, matchboxes, cotton reels and stamps as furniture",
+     "d": 2,
+     "cap": "The Borrowers",
+     "cand": true
+    },
+    {
+     "p": "a tiny girl climbing a curtain with a hatpin",
+     "d": 2,
+     "cap": "Borrowing",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "northern-lights",
+   "name": "Northern Lights",
+   "alt": [
+    "The Golden Compass"
+   ],
+   "author": "Philip Pullman",
+   "year": 1995,
+   "kids": true,
+   "blurb": "In a world where people's souls walk beside them as animals, a girl from Oxford travels to the Arctic to save stolen children.",
+   "scenes": [
+    {
+     "p": "a girl riding a huge armoured polar bear across the snowy Arctic under the northern lights",
+     "d": 2,
+     "cap": "Riding the armoured bear",
+     "cand": true
+    },
+    {
+     "p": "a golden compass with symbols",
+     "d": 2,
+     "cap": "The alethiometer",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "danny-the-champion-of-the-world",
+   "name": "Danny, the Champion of the World",
+   "alt": [],
+   "author": "Roald Dahl",
+   "year": 1975,
+   "kids": true,
+   "blurb": "Danny lives in a caravan with his loving father, and together they plot to poach all the pheasants of a nasty landowner.",
+   "scenes": [
+    {
+     "p": "a boy and his father in a gypsy caravan by a filling station at night, pheasants",
+     "d": 2,
+     "cap": "The caravan",
+     "cand": true
+    },
+    {
+     "p": "pheasants falling asleep in trees in a wood at night after eating raisins",
+     "d": 2,
+     "cap": "Sleeping pheasants",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "five-on-a-treasure-island",
+   "name": "Five on a Treasure Island",
+   "alt": [
+    "The Famous Five"
+   ],
+   "author": "Enid Blyton",
+   "year": 1942,
+   "kids": true,
+   "blurb": "Julian, Dick, Anne, their cousin George and her dog Timmy find a shipwreck and gold on an island.",
+   "scenes": [
+    {
+     "p": "four children and a dog rowing a small boat to a little island with a ruined castle",
+     "d": 2,
+     "cap": "Kirrin Island",
+     "cand": true
+    },
+    {
+     "p": "children in a dungeon with a dog, gold ingots",
+     "d": 2,
+     "cap": "Treasure in the dungeon",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "gangsta-granny",
+   "name": "Gangsta Granny",
+   "alt": [],
+   "author": "David Walliams",
+   "year": 2011,
+   "kids": true,
+   "blurb": "A boy who dreads Friday nights at his granny's learns she claims to be a jewel thief, and they plan to steal the Crown Jewels.",
+   "scenes": [
+    {
+     "p": "a granny and her grandson in a mobility scooter trying to steal the crown jewels from the Tower of London",
+     "d": 2,
+     "cap": "The heist",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "jaws",
+   "name": "Jaws",
+   "alt": [],
+   "author": "Peter Benchley",
+   "year": 1974,
+   "kids": false,
+   "blurb": "A great white shark attacks swimmers at a beach resort on Long Island, and a police chief, a scientist and a fisherman hunt it.",
+   "scenes": [
+    {
+     "p": "a huge great white shark rising from the deep toward a lone swimmer at night",
+     "d": 2,
+     "cap": "The shark",
+     "cand": true
+    },
+    {
+     "p": "a small fishing boat chased by a giant shark",
+     "d": 2,
+     "cap": "A bigger boat",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-shining",
+   "name": "The Shining",
+   "alt": [],
+   "author": "Stephen King",
+   "year": 1977,
+   "kids": false,
+   "blurb": "A struggling writer becomes caretaker of a remote hotel for the winter, and its evil spirits work on him while his psychic son watches.",
+   "scenes": [
+    {
+     "p": "a grand isolated mountain hotel snowed in during winter, a hedge maze in front",
+     "d": 2,
+     "cap": "The snowbound hotel",
+     "cand": true
+    },
+    {
+     "p": "a little boy riding a tricycle down a long hotel corridor with patterned carpet",
+     "d": 2,
+     "cap": "The tricycle",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "it",
+   "name": "It",
+   "alt": [],
+   "author": "Stephen King",
+   "year": 1986,
+   "kids": false,
+   "blurb": "A group of friends in Derry, Maine, fight an evil creature that preys on children, and return as adults to finish it off.",
+   "scenes": [
+    {
+     "p": "a small boy in a yellow raincoat chasing a paper boat to a storm drain in the rain, a red balloon floating from the drain",
+     "d": 2,
+     "cap": "The paper boat and the storm drain",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "jurassic-park",
+   "name": "Jurassic Park",
+   "alt": [],
+   "author": "Michael Crichton",
+   "year": 1990,
+   "kids": false,
+   "blurb": "A billionaire clones dinosaurs for an island theme park, and the animals break loose during a preview visit.",
+   "scenes": [
+    {
+     "p": "a tyrannosaurus breaking out of an electric fence in the rain at night, a jeep",
+     "d": 2,
+     "cap": "The T. rex breaks out",
+     "cand": true
+    },
+    {
+     "p": "a mosquito trapped in amber",
+     "d": 2,
+     "cap": "Dinosaur DNA",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-lightning-thief",
+   "name": "The Lightning Thief",
+   "alt": [],
+   "author": "Rick Riordan",
+   "year": 2005,
+   "kids": true,
+   "blurb": "A boy with dyslexia and ADHD learns he is the son of Poseidon and must recover Zeus's stolen weapon.",
+   "scenes": [
+    {
+     "p": "a boy holding a glowing bronze sword facing a minotaur on a hill by a pine tree",
+     "d": 2,
+     "cap": "The minotaur on Half-Blood Hill",
+     "cand": true
+    },
+    {
+     "p": "a boy rising out of the sea surrounded by water",
+     "d": 2,
+     "cap": "Son of the sea god",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "holes",
+   "name": "Holes",
+   "alt": [],
+   "author": "Louis Sachar",
+   "year": 1998,
+   "kids": true,
+   "blurb": "Stanley Yelnats is sent to a juvenile camp where boys dig holes in a dry lake bed, and discovers what the warden is looking for.",
+   "scenes": [
+    {
+     "p": "boys in orange jumpsuits digging holes in a dry lake bed in the Texas desert, hundreds of holes",
+     "d": 2,
+     "cap": "Digging holes",
+     "cand": true
+    },
+    {
+     "p": "a pair of famous sneakers falling from the sky",
+     "d": 2,
+     "cap": "The falling sneakers",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "stuart-little",
+   "name": "Stuart Little",
+   "alt": [],
+   "author": "E. B. White",
+   "year": 1945,
+   "kids": true,
+   "blurb": "A small mouse born to a New York family has adventures, including a sailing race, before setting off to find a lost bird friend.",
+   "scenes": [
+    {
+     "p": "a tiny mouse in a little sailor suit sailing a toy sailboat across a boat pond in Central Park",
+     "d": 2,
+     "cap": "The boat race in Central Park",
+     "cand": true
+    },
+    {
+     "p": "a mouse driving a tiny car",
+     "d": 2,
+     "cap": "The tiny car",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-giving-tree",
+   "name": "The Giving Tree",
+   "alt": [],
+   "author": "Shel Silverstein",
+   "year": 1964,
+   "kids": true,
+   "blurb": "A tree loves a boy and gives him its apples, branches and trunk as he grows old.",
+   "scenes": [
+    {
+     "p": "an old man sitting on the stump of a tree",
+     "d": 2,
+     "cap": "The stump",
+     "cand": true
+    },
+    {
+     "p": "a boy swinging from the branches of a big apple tree",
+     "d": 2,
+     "cap": "The tree and the boy",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-polar-express",
+   "name": "The Polar Express",
+   "alt": [],
+   "author": "Chris Van Allsburg",
+   "year": 1985,
+   "kids": true,
+   "blurb": "On Christmas Eve, a boy boards a train to the North Pole and is given the first gift of Christmas by Santa.",
+   "scenes": [
+    {
+     "p": "a boy in pyjamas boarding a steam train in the snow outside his house at night",
+     "d": 2,
+     "cap": "All aboard",
+     "cand": true
+    },
+    {
+     "p": "a steam train arriving at a Christmas village at the North Pole full of elves",
+     "d": 2,
+     "cap": "The North Pole",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "a-wrinkle-in-time",
+   "name": "A Wrinkle in Time",
+   "alt": [],
+   "author": "Madeleine L'Engle",
+   "year": 1962,
+   "kids": true,
+   "blurb": "Meg Murry, her brother and a friend travel across the universe with three strange women to free her father from an evil power.",
+   "scenes": [
+    {
+     "p": "three children and three strange old ladies traveling across a galaxy through a tesseract",
+     "d": 2,
+     "cap": "Tesseract",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-martian",
+   "name": "The Martian",
+   "alt": [],
+   "author": "Andy Weir",
+   "year": 2011,
+   "kids": false,
+   "blurb": "An astronaut stranded alone on Mars uses science and humour to survive until he can be rescued.",
+   "scenes": [
+    {
+     "p": "an astronaut alone on the red surface of Mars growing potatoes in a habitat dome",
+     "d": 2,
+     "cap": "Growing potatoes on Mars",
+     "cand": true
+    },
+    {
+     "p": "an astronaut in a rover driving across Mars",
+     "d": 2,
+     "cap": "Driving across Mars",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "ready-player-one",
+   "name": "Ready Player One",
+   "alt": [],
+   "author": "Ernest Cline",
+   "year": 2011,
+   "kids": false,
+   "blurb": "In a grim future, teenage gamer Wade Watts hunts for a hidden prize in a vast virtual world.",
+   "scenes": [
+    {
+     "p": "a stacked trailer park of mobile homes piled high on scaffolding, a teenager with VR goggles",
+     "d": 2,
+     "cap": "The stacks",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "twilight",
+   "name": "Twilight",
+   "alt": [],
+   "author": "Stephenie Meyer",
+   "year": 2005,
+   "kids": false,
+   "blurb": "Bella Swan moves to a small rainy town and falls for the mysterious Edward Cullen, who turns out to be a vampire.",
+   "scenes": [
+    {
+     "p": "a pale young man whose skin sparkles like diamonds in sunlight in a misty forest clearing, a girl watching",
+     "d": 2,
+     "cap": "Sparkling in the sun",
+     "cand": true
+    },
+    {
+     "p": "a family playing baseball in a thunderstorm",
+     "d": 2,
+     "cap": "Baseball in the storm",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-fault-in-our-stars",
+   "name": "The Fault in Our Stars",
+   "alt": [],
+   "author": "John Green",
+   "year": 2012,
+   "kids": false,
+   "blurb": "Hazel and Augustus meet at a cancer support group, fall in love and travel to Amsterdam to meet their favourite author.",
+   "scenes": [
+    {
+     "p": "two teenagers on a canal bench in Amsterdam, a cigarette",
+     "d": 2,
+     "cap": "Amsterdam",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "anna-karenina",
+   "name": "Anna Karenina",
+   "alt": [],
+   "author": "Leo Tolstoy",
+   "year": 1878,
+   "kids": false,
+   "blurb": "A married Russian aristocrat begins a passionate affair with Count Vronsky, while the landowner Levin searches for meaning in country life.",
+   "scenes": [
+    {
+     "p": "a woman in a fur hat and black dress on a snowy Russian railway platform in a cloud of steam, a train arriving",
+     "d": 2,
+     "cap": "Meeting at the station",
+     "cand": true
+    },
+    {
+     "p": "a horse race in the countryside",
+     "d": 2,
+     "cap": "The race",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "crime-and-punishment",
+   "name": "Crime and Punishment",
+   "alt": [],
+   "author": "Fyodor Dostoevsky",
+   "year": 1866,
+   "kids": false,
+   "blurb": "A desperate former student in Saint Petersburg kills a pawnbroker to prove a theory, then is tormented by guilt and a shrewd investigator.",
+   "scenes": [
+    {
+     "p": "a young man in a ragged coat climbing a dark narrow staircase in a St Petersburg tenement holding an axe under his coat",
+     "d": 2,
+     "cap": "The axe under the coat",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "brave-new-world",
+   "name": "Brave New World",
+   "alt": [],
+   "author": "Aldous Huxley",
+   "year": 1932,
+   "kids": false,
+   "blurb": "In a future World State, people are bred in hatcheries and kept happy with conditioning and drugs, until an outsider challenges it all.",
+   "scenes": [
+    {
+     "p": "rows of babies in glass bottles on a conveyor in a futuristic hatchery",
+     "d": 2,
+     "cap": "The hatchery",
+     "cand": true
+    },
+    {
+     "p": "a man alone in a lighthouse",
+     "d": 2,
+     "cap": "The savage",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "of-mice-and-men",
+   "name": "Of Mice and Men",
+   "alt": [],
+   "author": "John Steinbeck",
+   "year": 1937,
+   "kids": false,
+   "blurb": "Two drifting ranch hands, quick George and strong, gentle Lennie, share a dream of their own farm during the Great Depression.",
+   "scenes": [
+    {
+     "p": "two migrant workers in the shade by a pool beside the Salinas River, one tall and big holding a dead mouse",
+     "d": 2,
+     "cap": "Living off the fat of the land",
+     "cand": true
+    },
+    {
+     "p": "a puppy in a barn",
+     "d": 2,
+     "cap": "The puppy",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-grapes-of-wrath",
+   "name": "The Grapes of Wrath",
+   "alt": [],
+   "author": "John Steinbeck",
+   "year": 1939,
+   "kids": false,
+   "blurb": "The Joad family loses its Oklahoma farm in the Dust Bowl and heads west to California, only to find poverty and exploitation.",
+   "scenes": [
+    {
+     "p": "an old jalopy truck piled high with furniture and a family driving across the Dust Bowl toward California",
+     "d": 2,
+     "cap": "The road to California",
+     "cand": true
+    },
+    {
+     "p": "a migrant camp",
+     "d": 2,
+     "cap": "The camp",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "gone-with-the-wind",
+   "name": "Gone with the Wind",
+   "alt": [],
+   "author": "Margaret Mitchell",
+   "year": 1936,
+   "kids": false,
+   "blurb": "Strong-willed Scarlett O'Hara struggles to survive and keep her plantation through the American Civil War and Reconstruction.",
+   "scenes": [
+    {
+     "p": "a woman in a green dress silhouetted on a hill under a huge tree at sunset, a burning city in the distance",
+     "d": 2,
+     "cap": "Tomorrow is another day",
+     "cand": true
+    },
+    {
+     "p": "a dress made from green velvet curtains",
+     "d": 2,
+     "cap": "The curtain dress",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-handmaid-s-tale",
+   "name": "The Handmaid's Tale",
+   "alt": [],
+   "author": "Margaret Atwood",
+   "year": 1985,
+   "kids": false,
+   "blurb": "In the theocracy of Gilead, Offred is one of a class of women forced to bear children for powerful couples.",
+   "scenes": [
+    {
+     "p": "a line of women in long red cloaks and white winged bonnets walking down a quiet street, faces hidden",
+     "d": 2,
+     "cap": "The handmaids",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "slaughterhouse-five",
+   "name": "Slaughterhouse-Five",
+   "alt": [],
+   "author": "Kurt Vonnegut",
+   "year": 1969,
+   "kids": false,
+   "blurb": "Billy Pilgrim, an American prisoner of war who survives the bombing of Dresden, comes unstuck in time.",
+   "scenes": [
+    {
+     "p": "a firebombed German city of ruins, a prisoner of war emerging from an underground meat locker",
+     "d": 2,
+     "cap": "Dresden",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "heart-of-darkness",
+   "name": "Heart of Darkness",
+   "alt": [],
+   "author": "Joseph Conrad",
+   "year": 1899,
+   "kids": false,
+   "blurb": "Sailor Charles Marlow travels up the Congo River to find Kurtz, an ivory trader who has gone far beyond the bounds of civilisation.",
+   "scenes": [
+    {
+     "p": "a small steamboat heading up a dark jungle river in Africa",
+     "d": 2,
+     "cap": "Up the river",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "kidnapped",
+   "name": "Kidnapped",
+   "alt": [],
+   "author": "Robert Louis Stevenson",
+   "year": 1886,
+   "kids": false,
+   "blurb": "Cheated of his inheritance by his uncle, David Balfour is seized and put on a ship, then escapes across the Scottish Highlands with the Jacobite Alan Breck.",
+   "scenes": [
+    {
+     "p": "a young man and a Highlander on the run across the heather of the Scottish Highlands",
+     "d": 2,
+     "cap": "On the run in the Highlands",
+     "cand": true
+    },
+    {
+     "p": "a ship wrecked on a rock",
+     "d": 2,
+     "cap": "Shipwrecked",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "david-copperfield",
+   "name": "David Copperfield",
+   "alt": [],
+   "author": "Charles Dickens",
+   "year": 1850,
+   "kids": false,
+   "blurb": "A mistreated boy grows up to be a successful writer, meeting the hopeful Mr Micawber and the scheming Uriah Heep along the way.",
+   "scenes": [
+    {
+     "p": "a boy working in a London bottle-washing warehouse",
+     "d": 2,
+     "cap": "The bottle warehouse",
+     "cand": true
+    },
+    {
+     "p": "an upturned boat converted into a house on the beach at Yarmouth",
+     "d": 2,
+     "cap": "The boat house",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-catcher-in-the-rye",
+   "name": "The Catcher in the Rye",
+   "alt": [],
+   "author": "J. D. Salinger",
+   "year": 1951,
+   "kids": false,
+   "blurb": "After being expelled from his school, teenager Holden Caulfield spends a few aimless, lonely days in New York City.",
+   "scenes": [
+    {
+     "p": "a teenager in a red hunting hat watching his little sister ride a carousel in Central Park in the rain",
+     "d": 2,
+     "cap": "The carousel",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-day-of-the-triffids",
+   "name": "The Day of the Triffids",
+   "alt": [],
+   "author": "John Wyndham",
+   "year": 1951,
+   "kids": false,
+   "blurb": "After a strange meteor shower blinds most of the world, a few survivors struggle against walking, poisonous plants.",
+   "scenes": [
+    {
+     "p": "giant carnivorous walking plants with stingers roaming the empty streets of London",
+     "d": 2,
+     "cap": "The triffids",
+     "cand": true
+    },
+    {
+     "p": "a green meteor shower in the sky",
+     "d": 2,
+     "cap": "The meteor shower",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-princess-bride",
+   "name": "The Princess Bride",
+   "alt": [],
+   "author": "William Goldman",
+   "year": 1973,
+   "kids": false,
+   "blurb": "Westley, a farm boy turned pirate, fights a giant, a swordsman and a prince to rescue his true love Buttercup.",
+   "scenes": [
+    {
+     "p": "a sword fight on the edge of high cliffs, a masked man in black",
+     "d": 2,
+     "cap": "The duel on the cliffs",
+     "cand": true
+    },
+    {
+     "p": "a giant eel in the sea",
+     "d": 2,
+     "cap": "The shrieking eels",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-outsiders",
+   "name": "The Outsiders",
+   "alt": [],
+   "author": "S. E. Hinton",
+   "year": 1967,
+   "kids": false,
+   "blurb": "Ponyboy, a member of a poor gang called the Greasers, is caught up in violence with the rich Socs in 1960s Oklahoma.",
+   "scenes": [
+    {
+     "p": "greasers with slicked hair and leather jackets watching a sunset from a vacant lot",
+     "d": 2,
+     "cap": "Stay gold",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-road",
+   "name": "The Road",
+   "alt": [],
+   "author": "Cormac McCarthy",
+   "year": 2006,
+   "kids": false,
+   "blurb": "After an unnamed disaster, a father and his young son walk through a burned America towards the coast, carrying the fire.",
+   "scenes": [
+    {
+     "p": "a father and son pushing a shopping cart along a grey ash-covered road through a burned-out wasteland",
+     "d": 2,
+     "cap": "Carrying the fire",
+     "cand": true
+    },
+    {
+     "p": "a bunker of food",
+     "d": 2,
+     "cap": "The bunker",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "ender-s-game",
+   "name": "Ender's Game",
+   "alt": [],
+   "author": "Orson Scott Card",
+   "year": 1985,
+   "kids": false,
+   "blurb": "Brilliant child Andrew Wiggin is sent to a space military academy to train for war against an alien race.",
+   "scenes": [
+    {
+     "p": "children in a zero-gravity battle room in space",
+     "d": 2,
+     "cap": "The battle room",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-colour-of-magic",
+   "name": "The Colour of Magic",
+   "alt": [
+    "The Color of Magic"
+   ],
+   "author": "Terry Pratchett",
+   "year": 1983,
+   "kids": false,
+   "blurb": "The cowardly wizard Rincewind becomes a guide to the Discworld's first tourist and his luggage with legs.",
+   "scenes": [
+    {
+     "p": "a flat world resting on the backs of four elephants standing on a giant turtle swimming through space",
+     "d": 2,
+     "cap": "The world on the turtle",
+     "cand": true
+    },
+    {
+     "p": "a wooden chest with hundreds of little legs following a tourist",
+     "d": 2,
+     "cap": "The Luggage",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-secret-river",
+   "name": "The Secret River",
+   "alt": [],
+   "author": "Kate Grenville",
+   "year": 2005,
+   "kids": false,
+   "blurb": "A London boatman transported to New South Wales claims land beside the Hawkesbury, leading to conflict with its Aboriginal owners.",
+   "scenes": [
+    {
+     "p": "a convict family's rough hut on the banks of the Hawkesbury River in colonial New South Wales, sandstone cliffs",
+     "d": 2,
+     "cap": "On the Hawkesbury",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "cloudstreet",
+   "name": "Cloudstreet",
+   "alt": [],
+   "author": "Tim Winton",
+   "year": 1991,
+   "kids": false,
+   "blurb": "Two struggling families, the Pickles and the Lambs, share a rambling house in Perth from the 1940s to the 1960s.",
+   "scenes": [
+    {
+     "p": "a big rambling old house in Perth shared by two families",
+     "d": 2,
+     "cap": "The house on Cloud Street",
+     "cand": true
     }
    ]
   }

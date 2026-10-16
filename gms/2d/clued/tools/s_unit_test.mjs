@@ -39,7 +39,7 @@ eq(pointsBreakdown({ correct: true, points: 515, ms: 5895, speed: 343, bonus: 17
 eq(pointsBreakdown({ correct: true, points: 446, ms: 2000, speed: 420, clipMul: 1.25, artMul: 1, clip: 5, replays: 1 }), '420 speed (2.0 s) · ×1.25 5 s clip · −15% 1 replay', 'listen: clip factor and replays');
 eq(pointsBreakdown({ correct: true, points: 357, ms: 3000, speed: 420, stage: 1, stages: 5 }), '420 speed (3.0 s) · ×0.85 at step 2/5', 'progressive step multiplier');
 eq([pointsBreakdown({ correct: false, points: 0, ms: 4000 }), pointsBreakdown({ correct: true, points: 400, ms: 1000 })], ['', ''], 'nothing for a wrong answer or an old server');
-eq([rowNote({ correct: true, ms: 4114, bonus: 39 }), rowNote({ correct: true, ms: 4114, bonus: 39 }, { streakBonus: false }), rowNote({ correct: false, ms: 1 }), rowNote(null)], ['4.1 s · +39 streak', '4.1 s', '✗', ''], 'scoreboard row notes');
+eq([rowNote({ correct: true, ms: 4114, bonus: 39 }), rowNote({ correct: true, ms: 4114, bonus: 39 }, { streakBonus: false }), rowNote({ correct: false, ms: 1 }), rowNote({ correct: false, points: 167, ms: 2300 }), rowNote(null)], ['4.1 s · +39 streak', '4.1 s', '✗', '◐ 2.3 s · partly right', ''], 'scoreboard row notes');
 const { answerMs, listenFactors } = await import('../js/net/p2p_room.js');
 eq([answerMs(4000, 3950, 15000), answerMs(4000, 950, 15000), answerMs(4000, 4400, 15000), answerMs(4000, undefined, 15000), answerMs(20000, 19000, 15000)], [3950, 2500, 4000, 4000, 15000], 'answerMs: client time within [receive − 1.5 s, receive + 0.3 s], clamped to the limit');
 eq(listenFactors({ data: { len: 5, art: 'blur', replays: 2 } }, 7), { clipMul: 1.25, artMul: 0.85, reps: 2, clip: 5 }, 'listenFactors clamps replays to the allowance');

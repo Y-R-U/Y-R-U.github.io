@@ -1,27 +1,28 @@
 // Host setup (server rooms and device rooms): a list of rounds (＋ Add round → ♥ favourite or format → themes),
 // 10 questions each by default, plus the room-wide settings (answer time, gap, private/public, auto-start).
-import { h } from '../ui/kit.js?v=202610131439';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610131439';
-import { toast } from '../ui/popup.js?v=202610131439';
-import { saveSetPrompt, pickSet, copyRounds } from './sets.js?v=202610131439';
-import { getFormat, defaultOpts } from '../formats/registry.js?v=202610131439';
-import { getSettings, getLast, read, write } from '../core/store.js?v=202610131439';
-import { makeSpec } from '../core/spec.js?v=202610131439';
-import { randomSeed } from '../core/rng.js?v=202610131439';
-import { prepare } from '../structures/session.js?v=202610131439';
-import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610131439';
-import { rooms, friendly } from './api.js?v=202610131439';
-import { rememberName, tidyName } from './ident.js?v=202610131439';
-import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610131439';
-import { timingPanel, choiceChips } from './board.js?v=202610131439';
-import { streakOption } from '../ui/streakopt.js?v=202610131439';
-import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610131439';
-import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610131439';
-import { ensureFormats } from './room.js?v=202610131439';
-import { nameField } from './join.js?v=202610131439';
-import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610131439';
-import { mySetting, saveMySetting, specLocal, resolveLocal } from '../core/local.js?v=202610131439';
-import { localChip, localLine, localTotal, localReady } from '../ui/local.js?v=202610131439';
+import { h } from '../ui/kit.js?v=202610161020';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610161020';
+import { toast } from '../ui/popup.js?v=202610161020';
+import { saveSetPrompt, pickSet, copyRounds } from './sets.js?v=202610161020';
+import { getFormat, defaultOpts } from '../formats/registry.js?v=202610161020';
+import { getSettings, getLast, read, write } from '../core/store.js?v=202610161020';
+import { makeSpec } from '../core/spec.js?v=202610161020';
+import { randomSeed } from '../core/rng.js?v=202610161020';
+import { prepare } from '../structures/session.js?v=202610161020';
+import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610161020';
+import { rooms, friendly } from './api.js?v=202610161020';
+import { rememberName, tidyName } from './ident.js?v=202610161020';
+import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610161020';
+import { timingPanel, choiceChips } from './board.js?v=202610161020';
+import { streakOption } from '../ui/streakopt.js?v=202610161020';
+import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610161020';
+import { signInPrompt, isSignedIn, pausedText, busyText, allowanceNote, noGamesPanel } from './signin.js?v=202610161020';
+import { allowanceState, outOfGames } from './pass.js?v=202610161020';
+import { ensureFormats } from './room.js?v=202610161020';
+import { nameField } from './join.js?v=202610161020';
+import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610161020';
+import { mySetting, saveMySetting, specLocal, resolveLocal } from '../core/local.js?v=202610161020';
+import { localChip, localLine, localTotal, localReady } from '../ui/local.js?v=202610161020';
 
 const KEY = 'clued.online';   // { rounds, kidsRounds }: the last hosted round list, per mode
 const MAX_ROUNDS = 8;
@@ -156,10 +157,25 @@ defineScreen('host', async (el, params, cur) => {
   if (kids) body.append(h('p.net-note', {}, '🧸 Kids game: easy questions, a gentle timer and stars instead of points.'));
   const btn = h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'create' } }, 'Create room');
   const status = h('div');
-  body.append(err, btn, status, h('p.net-note', {}, TRUST_HINT));
+  const allow = h('div', { dataset: { box: 'allowance' } });
+  body.append(allow, err, btn, status, h('p.net-note', {}, TRUST_HINT));
   const T = getTransport(device ? 'p2p' : 'server');
+  const statusP = device ? null : rooms.status();
+  // Online games spend the host's daily allowance (3 free + any bonus; unlimited with a br8t Pass).
+  const limited = (statusP || rooms.status()).then(s => !!s.allowance).catch(() => false);
+  async function showAllowance() {
+    if (!(await limited)) return null;
+    if (!(await isSignedIn())) {
+      if (cur === current()) allow.replaceChildren(h('p.net-note', { dataset: { allowance: 'signin' } }, '🔐 Hosting online games needs a free br8t sign-in: free games every day, unlimited with a br8t Pass.'));
+      return null;
+    }
+    const a = await allowanceState();
+    if (cur === current()) allow.replaceChildren(...(a ? [outOfGames(a) ? noGamesPanel(a) : allowanceNote(a)] : []));
+    return a;
+  }
+  showAllowance();
   if (device) statusNote.append(h('p.net-note', {}, '📡 No server: this device runs the room for up to 8 players. Keep this tab open and on screen while you play.'));
-  else rooms.status().then(s => {
+  else statusP.then(s => {
     if (s.level >= 3) statusNote.append(h('p.net-note', {}, pausedText));
     else if (s.level >= 1) isSignedIn().then(ok => { if (!ok) statusNote.append(h('p.net-note', {}, '🔐 Hosting needs a free br8t sign-in right now; you’ll be asked when you create the room.')); });
   }).catch(() => {});
@@ -194,6 +210,10 @@ defineScreen('host', async (el, params, cur) => {
     if (!n) { err.textContent = 'Type your name first.'; name.focus(); return; }
     err.textContent = '';
     btn.disabled = true;
+    if (await limited) {
+      if (!(await isSignedIn()) && !(await signInPrompt(status, 'start'))) { btn.disabled = false; return; }
+      if (outOfGames(await showAllowance())) { btn.disabled = false; allow.scrollIntoView?.({ block: 'center' }); return; }
+    }
     const rounds = S.rounds.filter(r => getFormat(r.format));
     // formats may tune for rooms (lane AU) via opts.online; round titles ride along for the round cards
     const spec = makeSpec('online', rounds.map(r => ({

@@ -1,17 +1,17 @@
 // The question runner: plays a list of questions with HUD, timer, reveal and scoring.
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
-import { getFormat } from '../formats/registry.js?v=202610131439';
-import { createTimer } from '../core/timer.js?v=202610131439';
-import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610131439';
-import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610131439';
-import { getSettings } from '../core/store.js?v=202610131439';
-import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610131439';
-import { popup, confirmPop } from '../ui/popup.js?v=202610131439';
-import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610131439';
-import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610131439';
-import { dlog, debugCheck } from '../core/debuglog.js?v=202610131439';
-import { fsButton } from '../ui/toggles.js?v=202610131439';
-import { recordSeen } from '../core/fresh.js?v=202610131439';
+import { getFormat } from '../formats/registry.js?v=202610161020';
+import { createTimer } from '../core/timer.js?v=202610161020';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610161020';
+import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610161020';
+import { getSettings } from '../core/store.js?v=202610161020';
+import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610161020';
+import { popup, confirmPop } from '../ui/popup.js?v=202610161020';
+import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610161020';
+import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610161020';
+import { dlog, debugCheck } from '../core/debuglog.js?v=202610161020';
+import { fsButton } from '../ui/toggles.js?v=202610161020';
+import { recordSeen } from '../core/fresh.js?v=202610161020';
 
 const KIND_RIGHT = ['Brilliant!', 'You got it!', 'Super!', 'Yes!', 'Amazing!'];
 const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];
@@ -24,6 +24,7 @@ function stageStyles() {
   const st = document.createElement('style');
   st.id = 'runner-stage-css';
   st.textContent = '.more-btn{margin-left:auto;min-height:38px}.more-btn[hidden]{display:none}.more-btn.locked{background:#e9e4f5}' +
+    '.reveal.partial .rv-card{background:#fff3d1}.reveal.partial .rv-mark{background:var(--sun);color:var(--ink);font-size:17px;letter-spacing:-.04em}.reveal.partial .rv-mark.wide{font-size:14px}.reveal.partial .rv-head .pts{color:#b07800}' +
     '.ring{position:relative}.ring-plus{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-weight:900;font-size:13px;color:var(--good,#1fbf6a);' +
     'animation:ringplus 1.2s ease-out forwards;pointer-events:none;white-space:nowrap}@keyframes ringplus{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-18px)}}';
   document.head.append(st);
@@ -215,6 +216,8 @@ export function createRunner(host, cfg = {}) {
         try { k = typeof fmt.timeScale === 'function' ? fmt.timeScale(q) : fmt.timeScale; } catch (e) {}
         if (k > 1 && isFinite(k)) limit = Math.round(limit * k);
       }
+      // formats that ask several things at once (trio) add a fixed amount instead
+      if (!ext && !cfg.limitFor && api.mode !== 'online' && fmt.timeAdd > 0) limit += Math.min(60000, fmt.timeAdd);
       resetStages(q, limit);
       if (sg.n && !ext && !cfg.limitFor) limit = progressiveLimit(limit);
       api.timed = useTimer;
@@ -350,6 +353,8 @@ export function createRunner(host, cfg = {}) {
       i: state.i, qid: q.id, format: q.format, round: q.round, correct, points, given: res.given ?? null,
       detail: res.detail, ms: Math.round(t.ms), streak, player: pi, timeout: !!t.timeout, skipped: !!t.skipped,
       ...(sg.n ? { stage: sg.stage, stages: sg.n } : {}),
+      ...(!correct && res.partial && points > 0 ? { partial: true } : {}),
+      ...(typeof res.title === 'string' && res.title ? { title: res.title.slice(0, 40) } : {}),
     };
     lockStages();
     if (!t.skipped) state.answered++;
@@ -452,8 +457,10 @@ export function createRunner(host, cfg = {}) {
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const good = rec.correct;
     const pending = !!rec.pending;
-    const title = pending ? 'Locked in' : rec.skipped ? 'Skipped' : rec.timeout ? (kids ? 'Out of time!' : "Time's up") : good ? pick(kids ? KIND_RIGHT : RIGHT) : pick(kids ? KIND_WRONG : WRONG);
-    const pts = good ? (kids ? '<span class="star-pop">⭐</span>' : `<span class="pts">+${fmtNum(rec.points)}</span>`) : '';
+    // partly right (points for some of it) gets its own state instead of "Nope"; a format may name the result
+    const part = !good && !pending && !!rec.partial && rec.points > 0;
+    const title = pending ? 'Locked in' : rec.skipped ? 'Skipped' : rec.timeout ? (kids ? 'Out of time!' : "Time's up") : rec.title || (good ? pick(kids ? KIND_RIGHT : RIGHT) : part ? 'Partly right' : pick(kids ? KIND_WRONG : WRONG));
+    const pts = good || part ? (kids ? '<span class="star-pop">⭐</span>' : `<span class="pts">+${fmtNum(rec.points)}</span>`) : '';
     // Tall boards (format flag revealInline) get a one-line result under the board with Next beside it; answerOnBoard
     // formats already mark the right answer on the board, so the long "Answer:" line is left out.
     const fmt = getFormat(q.format) || {};
@@ -461,8 +468,10 @@ export function createRunner(host, cfg = {}) {
     const ans = good || pending || q.hidden || (fmt.answerOnBoard && !rec.skipped && !rec.timeout) ? '' : `<div class="rv-answer">${kids ? 'The answer is' : 'Answer:'} <b>${esc(answerLine(q))}</b></div>`;
     const credits = creditsOf(q);
     reveal.innerHTML = '';
-    reveal.className = `reveal ${pending ? 'pending' : good ? 'good' : 'bad'}${inline ? ' inline' : ''}`;
-    const head = h('div.rv-head', { html: `<span class="rv-mark">${pending ? '…' : good ? '✓' : rec.skipped ? '⤼' : kids ? '♥' : '✗'}</span><span class="rv-title">${esc(title)}</span>${pts}` });
+    reveal.className = `reveal ${pending ? 'pending' : good ? 'good' : part ? 'partial' : 'bad'}${inline ? ' inline' : ''}`;
+    // the partial badge is the share right ("2/3") when the format says so
+    const frac = part && Number.isInteger(rec.detail?.hits) && Number.isInteger(rec.detail?.of) && rec.detail.of > 0 ? `${rec.detail.hits}/${rec.detail.of}` : '½';
+    const head = h('div.rv-head', { html: `<span class="rv-mark${part && frac.length > 3 ? ' wide' : ''}">${pending ? '…' : good ? '✓' : part ? esc(frac) : rec.skipped ? '⤼' : kids ? '♥' : '✗'}</span><span class="rv-title">${esc(title)}</span>${pts}` });
     const card = h('div.rv-card', {},
       h('div.rv-q', {}, q.prompt || ''),
       head,

@@ -1890,11 +1890,6 @@
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-05T00:10:43.575Z"
  },
- "alice-in-wonderland-1": {
-  "seed": 69852,
-  "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-05T00:12:01.254Z"
- },
  "robinson-crusoe-1": {
   "seed": 39179,
   "model": "flux2-klein-9b-mlx-4bit",
@@ -1950,11 +1945,6 @@
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-05T00:28:26.481Z"
  },
- "charlottes-web-1": {
-  "seed": 49749,
-  "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-05T00:29:44.173Z"
- },
  "the-lion-the-witch-and-the-wardrobe-1": {
   "seed": 26360,
   "model": "flux2-klein-9b-mlx-4bit",
@@ -1996,11 +1986,6 @@
   "seed": 26753,
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-05T00:39:55.788Z"
- },
- "gullivers-travels-1": {
-  "seed": 72128,
-  "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-05T00:41:16.081Z"
  },
  "don-quixote-1": {
   "seed": 31786,
@@ -2067,11 +2052,6 @@
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-05T00:58:09.124Z"
  },
- "peter-rabbit-1": {
-  "seed": 41070,
-  "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-05T00:59:26.843Z"
- },
  "the-hound-of-the-baskervilles-1": {
   "seed": 25691,
   "model": "flux2-klein-9b-mlx-4bit",
@@ -2112,11 +2092,6 @@
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-05T01:09:43.704Z"
  },
- "hitchhikers-guide-1": {
-  "seed": 56690,
-  "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-05T01:11:03.899Z"
- },
  "watership-down-1": {
   "seed": 56843,
   "model": "flux2-klein-9b-mlx-4bit",
@@ -2131,11 +2106,6 @@
   "seed": 25549,
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-05T01:14:52.029Z"
- },
- "alice-in-wonderland-2": {
-  "seed": 2709,
-  "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-05T01:16:07.275Z"
  },
  "robinson-crusoe-2": {
   "seed": 76798,
@@ -2192,11 +2162,6 @@
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-05T01:30:22.531Z"
  },
- "charlottes-web-2": {
-  "seed": 26892,
-  "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-05T01:32:05.633Z"
- },
  "the-lion-the-witch-and-the-wardrobe-2": {
   "seed": 49217,
   "model": "flux2-klein-9b-mlx-4bit",
@@ -2216,5 +2181,355 @@
   "seed": 2663,
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-05T01:37:42.168Z"
+ },
+ "the-empire-strikes-back-1": {
+  "seed": 41025,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:22:07.234Z"
+ },
+ "alice-s-adventures-in-wonderland-1": {
+  "seed": 69852,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:12:01.254Z"
+ },
+ "alice-s-adventures-in-wonderland-2": {
+  "seed": 2709,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:16:07.275Z"
+ },
+ "charlotte-s-web-1": {
+  "seed": 49749,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:29:44.173Z"
+ },
+ "charlotte-s-web-2": {
+  "seed": 26892,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:32:05.633Z"
+ },
+ "gulliver-s-travels-1": {
+  "seed": 72128,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:41:16.081Z"
+ },
+ "the-tale-of-peter-rabbit-1": {
+  "seed": 41070,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:59:26.843Z"
+ },
+ "the-hitchhiker-s-guide-to-the-galaxy-1": {
+  "seed": 56690,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:11:03.899Z"
+ },
+ "avengers-endgame-1": {
+  "seed": 12062,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:22:49.838Z"
+ },
+ "star-wars-the-force-awakens-1": {
+  "seed": 77772,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:23:42.439Z"
+ },
+ "avengers-infinity-war-1": {
+  "seed": 13484,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:24:42.597Z"
+ },
+ "spider-man-no-way-home-1": {
+  "seed": 25889,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:25:27.724Z"
+ },
+ "the-avengers-1": {
+  "seed": 5578,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:26:25.438Z"
+ },
+ "barbie-1": {
+  "seed": 26020,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:27:23.182Z"
+ },
+ "the-lord-of-the-rings-the-return-of-the-king-1": {
+  "seed": 21419,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:28:08.284Z"
+ },
+ "shrek-2-1": {
+  "seed": 8621,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:28:50.923Z"
+ },
+ "toy-story-3-1": {
+  "seed": 19937,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:29:36.020Z"
+ },
+ "star-wars-episode-i-the-phantom-menace-1": {
+  "seed": 45195,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:30:28.653Z"
+ },
+ "avatar-the-way-of-water-1": {
+  "seed": 40074,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:31:23.822Z"
+ },
+ "frozen-ii-1": {
+  "seed": 84994,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:32:11.494Z"
+ },
+ "pirates-of-the-caribbean-dead-man-s-chest-1": {
+  "seed": 83941,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:33:09.123Z"
+ },
+ "indiana-jones-and-the-last-crusade-1": {
+  "seed": 6704,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:34:01.818Z"
+ },
+ "the-dark-knight-1": {
+  "seed": 969,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:35:01.987Z"
+ },
+ "return-of-the-jedi-1": {
+  "seed": 45052,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:36:12.182Z"
+ },
+ "toy-story-4-1": {
+  "seed": 59476,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:37:14.826Z"
+ },
+ "skyfall-1": {
+  "seed": 78449,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:38:12.473Z"
+ },
+ "harry-potter-and-the-chamber-of-secrets-1": {
+  "seed": 31925,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:39:10.190Z"
+ },
+ "harry-potter-and-the-prisoner-of-azkaban-1": {
+  "seed": 80944,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:40:15.397Z"
+ },
+ "the-incredibles-1": {
+  "seed": 4367,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:41:28.183Z"
+ },
+ "the-lord-of-the-rings-the-two-towers-1": {
+  "seed": 69542,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:42:25.874Z"
+ },
+ "jurassic-world-1": {
+  "seed": 33244,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:43:23.563Z"
+ },
+ "crocodile-dundee-1": {
+  "seed": 69119,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:44:18.702Z"
+ },
+ "spider-man-1": {
+  "seed": 80543,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:45:21.408Z"
+ },
+ "iron-man-1": {
+  "seed": 44248,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:46:16.549Z"
+ },
+ "guardians-of-the-galaxy-1": {
+  "seed": 54610,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:47:11.678Z"
+ },
+ "harry-potter-and-the-deathly-hallows-part-2-1": {
+  "seed": 36602,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:48:09.328Z"
+ },
+ "star-wars-the-last-jedi-1": {
+  "seed": 45051,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:49:14.475Z"
+ },
+ "harry-potter-and-the-goblet-of-fire-1": {
+  "seed": 82853,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:50:14.709Z"
+ },
+ "terminator-2-judgment-day-1": {
+  "seed": 31623,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:51:27.403Z"
+ },
+ "furious-7-1": {
+  "seed": 7792,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:52:30.071Z"
+ },
+ "black-panther-1": {
+  "seed": 44527,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:53:27.780Z"
+ },
+ "the-bridge-on-the-river-kwai-1": {
+  "seed": 86958,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:54:27.941Z"
+ },
+ "west-side-story-1": {
+  "seed": 48092,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:55:25.654Z"
+ },
+ "one-flew-over-the-cuckoo-s-nest-1": {
+  "seed": 10153,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:56:20.813Z"
+ },
+ "platoon-1": {
+  "seed": 59910,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:57:15.958Z"
+ },
+ "dances-with-wolves-1": {
+  "seed": 5221,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:58:11.094Z"
+ },
+ "the-silence-of-the-lambs-1": {
+  "seed": 80416,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:59:03.833Z"
+ },
+ "schindler-s-list-1": {
+  "seed": 49582,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T09:59:51.466Z"
+ },
+ "braveheart-1": {
+  "seed": 41293,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:00:44.130Z"
+ },
+ "the-empire-strikes-back-2": {
+  "seed": 18168,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:01:31.756Z"
+ },
+ "avengers-endgame-2": {
+  "seed": 64443,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:02:26.885Z"
+ },
+ "star-wars-the-force-awakens-2": {
+  "seed": 10629,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:03:19.515Z"
+ },
+ "avengers-infinity-war-2": {
+  "seed": 36341,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:04:12.144Z"
+ },
+ "spider-man-no-way-home-2": {
+  "seed": 3032,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:05:02.290Z"
+ },
+ "the-avengers-2": {
+  "seed": 57959,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:05:57.453Z"
+ },
+ "barbie-2": {
+  "seed": 48877,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:06:47.599Z"
+ },
+ "the-lord-of-the-rings-the-return-of-the-king-2": {
+  "seed": 59038,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:07:42.731Z"
+ },
+ "shrek-2-2": {
+  "seed": 75764,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:08:40.380Z"
+ },
+ "toy-story-3-2": {
+  "seed": 87080,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:09:43.059Z"
+ },
+ "star-wars-episode-i-the-phantom-menace-2": {
+  "seed": 82814,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:10:43.208Z"
+ },
+ "avatar-the-way-of-water-2": {
+  "seed": 2455,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:11:38.357Z"
+ },
+ "frozen-ii-2": {
+  "seed": 47375,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:12:28.473Z"
+ },
+ "pirates-of-the-caribbean-dead-man-s-chest-2": {
+  "seed": 61084,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:13:26.108Z"
+ },
+ "indiana-jones-and-the-last-crusade-2": {
+  "seed": 29561,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:14:21.252Z"
+ },
+ "the-dark-knight-2": {
+  "seed": 68112,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:15:13.924Z"
+ },
+ "return-of-the-jedi-2": {
+  "seed": 67909,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:16:11.555Z"
+ },
+ "toy-story-4-2": {
+  "seed": 82333,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:17:21.742Z"
+ },
+ "skyfall-2": {
+  "seed": 55592,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:18:21.887Z"
+ },
+ "harry-potter-and-the-chamber-of-secrets-2": {
+  "seed": 9068,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:19:24.541Z"
+ },
+ "harry-potter-and-the-prisoner-of-azkaban-2": {
+  "seed": 13801,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-16T10:20:32.226Z"
  }
 }

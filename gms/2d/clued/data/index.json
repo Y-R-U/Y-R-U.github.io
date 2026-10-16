@@ -1,5 +1,5 @@
 {
- "build": "202610131422",
+ "build": "202610160931",
  "themes": [
   {
    "id": "animals",
@@ -697,7 +697,8 @@
      "blitz60": 20,
      "type": 20,
      "quote": 20,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -714,7 +715,8 @@
      "blitz60": 20,
      "type": 20,
      "quote": 15,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -731,7 +733,8 @@
      "blitz60": 12,
      "type": 20,
      "quote": 15,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -946,7 +949,8 @@
      "connect": 20,
      "blitz60": 10,
      "type": 20,
-     "pickall": 14
+     "pickall": 14,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -964,7 +968,8 @@
      "connect": 20,
      "blitz60": 10,
      "type": 20,
-     "pickall": 14
+     "pickall": 14,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -982,7 +987,8 @@
      "connect": 20,
      "blitz60": 5,
      "type": 20,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -3179,7 +3185,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 11,
-     "type": 20
+     "type": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -3193,7 +3200,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 11,
-     "type": 20
+     "type": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -3207,7 +3215,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 5,
-     "type": 20
+     "type": 20,
+     "trio": 0
     }
    }
   },
@@ -3269,7 +3278,8 @@
      "blitz60": 20,
      "type": 20,
      "quote": 20,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -3286,7 +3296,8 @@
      "blitz60": 20,
      "type": 20,
      "quote": 20,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -3303,7 +3314,8 @@
      "blitz60": 15,
      "type": 20,
      "quote": 20,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -4822,7 +4834,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 8,
-     "pickall": 18
+     "pickall": 18,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -4836,7 +4849,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 8,
-     "pickall": 18
+     "pickall": 18,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -4850,7 +4864,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 6,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -4900,7 +4915,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 5,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -4914,7 +4930,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 5,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -4928,7 +4945,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 4,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -4978,7 +4996,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 7,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -4992,7 +5011,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 7,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -5006,7 +5026,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 6,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -5056,7 +5077,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 5,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -5070,7 +5092,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 5,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -5084,7 +5107,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 4,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -5134,7 +5158,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 8,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -5148,7 +5173,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 8,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -5162,7 +5188,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 5,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -5212,7 +5239,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 14,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -5226,7 +5254,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 14,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -5240,7 +5269,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 6,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -5290,7 +5320,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 7,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -5304,7 +5335,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 7,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -5318,7 +5350,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 4,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -5609,7 +5642,8 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 9
+     "blitz60": 9,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -5622,7 +5656,8 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 9
+     "blitz60": 9,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -5635,7 +5670,8 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 4
+     "blitz60": 4,
+     "trio": 0
     }
    }
   },

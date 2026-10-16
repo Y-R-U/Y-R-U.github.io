@@ -1,0 +1,549 @@
+{
+ "id": "classic-posters-candidates",
+ "title": "Classic posters: pilot",
+ "candidate": true,
+ "pilot": true,
+ "notice": "Public-domain posters and covers from Wikimedia Commons with all text hidden. Pilot only, not in the game.",
+ "items": [
+  {
+   "id": "the-wizard-of-oz",
+   "name": "The Wizard of Oz",
+   "kind": "film",
+   "facts": {
+    "year": 1939,
+    "by": "Victor Fleming"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/5c82425952b6.jpg",
+      "w": 602,
+      "h": 900,
+      "credit": "MGM",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Wizard_of_oz_movie_poster.jpg",
+      "caption": "Poster, text hidden",
+      "key": "film-the-wizard-of-oz",
+      "ref": "classic-posters:new/film-the-wizard-of-oz",
+      "textBoxes": 27,
+      "textArea": 0.284,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "snow-white-and-the-seven-dwarfs",
+   "name": "Snow White and the Seven Dwarfs",
+   "kind": "film",
+   "facts": {
+    "year": 1937,
+    "by": "David Hand"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/88c10caa246d.jpg",
+      "w": 590,
+      "h": 900,
+      "credit": "Gustaf Tenggren",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Snow_White_and_the_Seven_Dwarfs_(Style_B)_poster.jpg",
+      "caption": "Poster, text hidden",
+      "key": "film-snow-white-and-the-seven-dwarfs",
+      "ref": "classic-posters:new/film-snow-white-and-the-seven-dwarfs",
+      "textBoxes": 10,
+      "textArea": 0.197,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "king-kong",
+   "name": "King Kong",
+   "kind": "film",
+   "facts": {
+    "year": 1933,
+    "by": "Merian C. Cooper and Ernest B. Schoedsack"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/b7759e3f2ab5.jpg",
+      "w": 438,
+      "h": 900,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kingkongposter.jpg",
+      "caption": "Poster, text hidden",
+      "key": "film-king-kong",
+      "ref": "classic-posters:new/film-king-kong",
+      "textBoxes": 1,
+      "textArea": 0.221,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "casablanca",
+   "name": "Casablanca",
+   "kind": "film",
+   "facts": {
+    "year": 1942,
+    "by": "Michael Curtiz"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/63982823887a.jpg",
+      "w": 580,
+      "h": 859,
+      "credit": "Bill Gold",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:CasablancaPoster-Gold.jpg",
+      "caption": "Poster, text hidden",
+      "key": "film-casablanca",
+      "ref": "classic-posters:new/film-casablanca",
+      "textBoxes": 7,
+      "textArea": 0.418,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "singin-in-the-rain",
+   "name": "Singin' in the Rain",
+   "kind": "film",
+   "facts": {
+    "year": 1952,
+    "by": "Gene Kelly and Stanley Donen"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/9d6703a2a373.jpg",
+      "w": 594,
+      "h": 900,
+      "credit": "\"Copyright 1952 Loew's Incorporated\"",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Singin%27_in_the_Rain_(1952_poster).jpg",
+      "caption": "Poster, text hidden",
+      "key": "film-singin-in-the-rain",
+      "ref": "classic-posters:new/film-singin-in-the-rain",
+      "textBoxes": 19,
+      "textArea": 0.332,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "peter-pan",
+   "name": "Peter Pan",
+   "kind": "film",
+   "facts": {
+    "year": 1953,
+    "by": "Hamilton Luske and Clyde Geronimi and Wilfred Jackson"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/5e5adf615b18.jpg",
+      "w": 606,
+      "h": 900,
+      "credit": "Illustrator unknown. \"Copyright 1952 RKO Radio Pictures Inc.\"",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Peter_Pan_(1953_poster).jpg",
+      "caption": "Poster, text hidden",
+      "key": "film-peter-pan",
+      "ref": "classic-posters:new/film-peter-pan",
+      "textBoxes": 14,
+      "textArea": 0.266,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "rear-window",
+   "name": "Rear Window",
+   "kind": "film",
+   "facts": {
+    "year": 1954,
+    "by": "Alfred Hitchcock"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/c46c9a1038f8.jpg",
+      "w": 602,
+      "h": 900,
+      "credit": "Copyrighted by Paramount International. Artists(s) not known.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Rear_Window_film_poster.jpg",
+      "caption": "Poster, text hidden",
+      "key": "film-rear-window",
+      "ref": "classic-posters:new/film-rear-window",
+      "textBoxes": 11,
+      "textArea": 0.202,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "psycho",
+   "name": "Psycho",
+   "kind": "film",
+   "facts": {
+    "year": 1960,
+    "by": "Alfred Hitchcock"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/f4b868824fc0.jpg",
+      "w": 608,
+      "h": 900,
+      "credit": "Designed by Macario G\u00f3mez Quibus. \"\u00a9 Shamley Productions, Inc.\"",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Psycho_(1960)_theatrical_poster_(retouched).jpg",
+      "caption": "Poster, text hidden",
+      "key": "film-psycho",
+      "ref": "classic-posters:new/film-psycho",
+      "textBoxes": 35,
+      "textArea": 0.276,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "jaws",
+   "name": "Jaws",
+   "kind": "film",
+   "facts": {
+    "year": 1975,
+    "by": "Steven Spielberg"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/af05d1b7bdb4.jpg",
+      "w": 599,
+      "h": 900,
+      "credit": "Roger Kastel",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jaws_movie_poster.jpg",
+      "caption": "Poster, text hidden",
+      "key": "film-jaws",
+      "ref": "classic-posters:new/film-jaws",
+      "textBoxes": 19,
+      "textArea": 0.204,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "vertigo",
+   "name": "Vertigo",
+   "kind": "film",
+   "facts": {
+    "year": 1958,
+    "by": "Alfred Hitchcock"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/92637081ffab.jpg",
+      "w": 581,
+      "h": 900,
+      "credit": "Saul Bass / Adam Cuerden",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Vertigomovie_restoration.jpg",
+      "caption": "Poster, text hidden",
+      "key": "film-vertigo",
+      "ref": "classic-posters:new/film-vertigo",
+      "textBoxes": 13,
+      "textArea": 0.167,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "the-jungle-book",
+   "name": "The Jungle Book",
+   "kind": "book",
+   "facts": {
+    "year": 1894,
+    "by": "Rudyard Kipling"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/4f61e121c421.jpg",
+      "w": 455,
+      "h": 597,
+      "credit": "Illustrated by John Lockwood Kipling",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:JunglebookCover.jpg",
+      "caption": "Cover, text hidden",
+      "key": "book-the-jungle-book",
+      "ref": "classic-posters:new/book-the-jungle-book",
+      "textBoxes": 5,
+      "textArea": 0.024,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "the-wind-in-the-willows",
+   "name": "The Wind in the Willows",
+   "kind": "book",
+   "facts": {
+    "year": 1908,
+    "by": "Kenneth Grahame"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/8f14ef7f3902.jpg",
+      "w": 576,
+      "h": 900,
+      "credit": "W. Graham Robertson/Kenneth Grahame",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Wind_in_the_Willows_cover.jpg",
+      "caption": "Cover, text hidden",
+      "key": "book-the-wind-in-the-willows",
+      "ref": "classic-posters:new/book-the-wind-in-the-willows",
+      "textBoxes": 2,
+      "textArea": 0.064,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "the-secret-garden",
+   "name": "The Secret Garden",
+   "kind": "book",
+   "facts": {
+    "year": 1911,
+    "by": "Frances Hodgson Burnett"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/d89644ba676f.jpg",
+      "w": 630,
+      "h": 900,
+      "credit": "Maria Louise Kirk",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Houghton_AC85_B9345_911s_-_Secret_Garden,_1911_-_cover.jpg",
+      "caption": "Cover, text hidden",
+      "key": "book-the-secret-garden",
+      "ref": "classic-posters:new/book-the-secret-garden",
+      "textBoxes": 3,
+      "textArea": 0.032,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "black-beauty",
+   "name": "Black Beauty",
+   "kind": "book",
+   "facts": {
+    "year": 1877,
+    "by": "Anna Sewell"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/ab0ff4aab195.jpg",
+      "w": 508,
+      "h": 840,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:BlackBeautyCoverFirstEd1877.jpeg",
+      "caption": "Cover, text hidden",
+      "key": "book-black-beauty",
+      "ref": "classic-posters:new/book-black-beauty",
+      "textBoxes": 2,
+      "textArea": 0.064,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "the-hound-of-the-baskervilles",
+   "name": "The Hound of the Baskervilles",
+   "kind": "book",
+   "facts": {
+    "year": 1902,
+    "by": "Arthur Conan Doyle"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/f59fbe23450a.jpg",
+      "w": 571,
+      "h": 900,
+      "credit": "Alfred Garth Jones",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Cover_(Hound_of_Baskervilles,_1902).jpg",
+      "caption": "Cover, text hidden",
+      "key": "book-the-hound-of-the-baskervilles",
+      "ref": "classic-posters:new/book-the-hound-of-the-baskervilles",
+      "textBoxes": 6,
+      "textArea": 0.22,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "the-great-gatsby",
+   "name": "The Great Gatsby",
+   "kind": "book",
+   "facts": {
+    "year": 1925,
+    "by": "F. Scott Fitzgerald"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/ec964fc00a15.jpg",
+      "w": 635,
+      "h": 900,
+      "credit": "Original cover illustration by Francis Cugat (1893\u20131981) and published by Charles Scribner's Sons. Digital restoration and enhancement by User:Flask.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Great_Gatsby_Cover_1925_Retouched.jpg",
+      "caption": "Cover, text hidden",
+      "key": "book-the-great-gatsby",
+      "ref": "classic-posters:new/book-the-great-gatsby",
+      "textBoxes": 3,
+      "textArea": 0.164,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "the-war-of-the-worlds",
+   "name": "The War of the Worlds",
+   "kind": "book",
+   "facts": {
+    "year": 1898,
+    "by": "H. G. Wells"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/f1bdc002a3e2.jpg",
+      "w": 381,
+      "h": 560,
+      "credit": "H. G. Wells",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_War_of_the_Worlds_first_edition.jpg",
+      "caption": "Cover, text hidden",
+      "key": "book-the-war-of-the-worlds",
+      "ref": "classic-posters:new/book-the-war-of-the-worlds",
+      "textBoxes": 3,
+      "textArea": 0.125,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "the-invisible-man",
+   "name": "The Invisible Man",
+   "kind": "book",
+   "facts": {
+    "year": 1897,
+    "by": "H. G. Wells"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/bc533de0f3ba.jpg",
+      "w": 323,
+      "h": 513,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Wells_-_The_Invisible_Man_-_Pearson_cover_1897.jpg",
+      "caption": "Cover, text hidden",
+      "key": "book-the-invisible-man",
+      "ref": "classic-posters:new/book-the-invisible-man",
+      "textBoxes": 2,
+      "textArea": 0.048,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "the-tale-of-peter-rabbit",
+   "name": "The Tale of Peter Rabbit",
+   "kind": "book",
+   "facts": {
+    "year": 1902,
+    "by": "Beatrix Potter"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/d9d98d45c425.jpg",
+      "w": 623,
+      "h": 877,
+      "credit": "Beatrix Potter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Peter_Rabbit_first_edition_1902a.jpg",
+      "caption": "Cover, text hidden",
+      "key": "book-the-tale-of-peter-rabbit",
+      "ref": "classic-posters:new/book-the-tale-of-peter-rabbit",
+      "textBoxes": 5,
+      "textArea": 0.141,
+      "ocrLeft": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "dracula",
+   "name": "Dracula",
+   "kind": "book",
+   "facts": {
+    "year": 1897,
+    "by": "Bram Stoker"
+   },
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/classic-posters/3cf919928fc0.jpg",
+      "w": 646,
+      "h": 900,
+      "credit": "British Library Board",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Dracula-First-Edition-1897.jpg",
+      "caption": "Cover, text hidden",
+      "key": "book-dracula",
+      "ref": "classic-posters:new/book-dracula",
+      "textBoxes": 2,
+      "textArea": 0.194,
+      "ocrLeft": []
+     }
+    ]
+   }
+  }
+ ]
+}

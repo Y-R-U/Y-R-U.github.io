@@ -56,7 +56,7 @@ async function expectResults(name) {
 const scenarios = {
   async quick() {
     await fresh();
-    await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
+    await b.click('[data-mode=solo]'); await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
     await b.click('button.chip[data-v="5"]');
     await b.click('[data-act=start]');
     await b.waitFor(vis('.choice'), 20000);
@@ -69,7 +69,7 @@ const scenarios = {
   },
   async picker() {
     await fresh();
-    await b.click('[data-mode=quick]'); await b.click('[data-format=tf]');
+    await b.click('[data-mode=solo]'); await b.click('[data-mode=quick]'); await b.click('[data-format=tf]');
     await b.click('.picker .btn.small');
     await b.click('.th-exp');
     await b.shot(`${OUT}/${MODE}-picker.png`);
@@ -84,7 +84,7 @@ const scenarios = {
   async kids() {
     await fresh({ kids: true });
     await b.shot(`${OUT}/${MODE}-kids-home.png`);
-    await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
+    await b.click('[data-mode=solo]'); await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
     await b.shot(`${OUT}/${MODE}-kids-setup.png`);
     await b.click('button.chip[data-v="5"]');
     await b.click('[data-act=start]');
@@ -97,7 +97,7 @@ const scenarios = {
   },
   async survival() {
     await fresh();
-    await b.click('[data-mode=survival]'); await b.click('[data-format=mc]');
+    await b.click('[data-mode=solo]'); await b.click('[data-mode=survival]'); await b.click('[data-format=mc]');
     await b.click('[data-act=start]');
     await b.waitFor(vis('.choice'), 20000);
     await b.eval('window.__clued.answer("wrong")'); await b.sleep(300);
@@ -108,7 +108,7 @@ const scenarios = {
   },
   async blitz() {
     await fresh();
-    await b.click('[data-mode=blitz]'); await b.click('[data-format=tf]');
+    await b.click('[data-mode=solo]'); await b.click('[data-mode=blitz]'); await b.click('[data-format=tf]');
     await b.click('[data-act=start]');
     await b.waitFor(vis('.choice'), 20000);
     await b.shot(`${OUT}/${MODE}-blitz-q.png`);
@@ -121,7 +121,7 @@ const scenarios = {
   },
   async ladder() {
     await fresh();
-    await b.click('[data-mode=ladder]');
+    await b.click('[data-mode=solo]'); await b.click('[data-mode=ladder]');
     await b.click('[data-act=start]');
     await b.waitFor(vis('.choice'), 20000);
     await b.sleep(600);
@@ -164,7 +164,7 @@ const scenarios = {
   },
   async party() {
     await fresh();
-    await b.click('[data-mode=party]');
+    await b.click('[data-mode=together]'); await b.click('[data-mode=party]');
     await b.click('.player-row .kid-btn', { index: 1 });
     await b.shot(`${OUT}/${MODE}-party-setup.png`);
     await b.click('[data-act=next]');
@@ -178,7 +178,7 @@ const scenarios = {
   },
   async pubquiz() {
     await fresh();
-    await b.click('[data-mode=pubquiz]');
+    await b.click('[data-mode=together]'); await b.click('[data-mode=pubquiz]');
     await b.click('[data-act=surprise]');
     await b.click('.joker');
     await b.shot(`${OUT}/${MODE}-pub-builder.png`);
@@ -192,7 +192,7 @@ const scenarios = {
   },
   async duel() {
     await fresh();
-    await b.click('[data-mode=duel]'); await b.click('[data-format=mc]');
+    await b.click('[data-mode=together]'); await b.click('[data-mode=duel]'); await b.click('[data-format=mc]');
     await b.click('button.chip[data-v="5"]');
     await b.click('[data-act=start]');
     await b.waitFor(vis('.duel .choice'), 20000);

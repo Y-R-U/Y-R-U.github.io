@@ -1,8 +1,8 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
   spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk, givesAway,
-} from './registry.js?v=202610131439';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610131439';
+} from './registry.js?v=202610161020';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610161020';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
@@ -61,7 +61,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
   if (type === 'imgName' || type === 'nameImg') {
     const pool = all.filter(c => hasImg(c.item));
     const t = pick(rng, byDifficulty(pool, difficulty, n, c => c.item.difficulty || 2));
-    const wrong = distractors(rng, t, pool, n - 1);
+    const wrong = distractors(rng, t, pool, n - 1, { lv: difficulty });
     if (!wrong) return null;
     const right = t;
     const { options, answer } = placeAnswer(rng, right, wrong);

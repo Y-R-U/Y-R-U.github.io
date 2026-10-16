@@ -38,10 +38,38 @@ export function mediaBox(media, { alt = '' } = {}) {
   const fig = h('figure.q-media');
   if (img) {
     fig.style.setProperty('--fill', `url("${img.src.replace(/"/g, '%22')}")`);
-    fig.append(imgEl(img, { alt }));
+    const el = imgEl(img, { alt });
+    fig.append(el);
+    if (markOk(img.mark)) ringOver(fig, el, img);
   }
   if (audio) fig.append(audioButton(audio));
   return fig;
+}
+
+// A reviewer's ellipse (0–1 image coordinates) marking what the question is about.
+export const markOk = m => !!m && ['cx', 'cy', 'rx', 'ry'].every(k => Number.isFinite(m[k])) && m.cx >= 0 && m.cx <= 1 && m.cy >= 0 && m.cy <= 1 && m.rx > 0 && m.ry > 0 && m.rx <= 1 && m.ry <= 1;
+
+// Where the mark sits in a box showing the picture with object-fit: contain.
+export function markRect(mark, boxW, boxH, natW, natH, min = 0) {
+  if (!(boxW > 0 && boxH > 0 && natW > 0 && natH > 0)) return null;
+  const s = Math.min(boxW / natW, boxH / natH), w = natW * s, ht = natH * s;
+  const cx = (boxW - w) / 2 + mark.cx * w, cy = (boxH - ht) / 2 + mark.cy * ht;
+  const width = Math.max(min, 2 * mark.rx * w), height = Math.max(min, 2 * mark.ry * ht);
+  return { left: cx - width / 2, top: cy - height / 2, width, height };
+}
+
+function ringOver(fig, img, m) {
+  const ring = h('span.q-mark', { 'aria-hidden': 'true' });
+  fig.append(ring);
+  const place = () => {
+    const r = markRect(m.mark, fig.clientWidth, fig.clientHeight, img.naturalWidth || m.w, img.naturalHeight || m.h, 24);
+    ring.hidden = !r || img.classList.contains('broken');
+    if (r) Object.assign(ring.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
+  };
+  img.addEventListener('load', place);
+  img.addEventListener('error', place);
+  if (typeof ResizeObserver === 'function') new ResizeObserver(place).observe(fig);
+  requestAnimationFrame(place);
 }
 
 export function audioButton(a) {

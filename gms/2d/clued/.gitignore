@@ -9,4 +9,5 @@ server/clued
 *.db
 .DS_Store
 media/song-pictures/
-media/book-moments/
+media/cand/
+tools/pd_cache/

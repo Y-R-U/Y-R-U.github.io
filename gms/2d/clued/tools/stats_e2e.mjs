@@ -67,7 +67,7 @@ try {
   ok(second && first && second !== first, `highlight rotates per visit (${first} → ${second})`);
 
   // quick game, real clicks
-  await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
+  await b.click('[data-mode=solo]'); await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
   await b.click('button.chip[data-v="5"]');
   await b.click('[data-act=start]');
   await b.waitFor(vis('.choice'), 25000);

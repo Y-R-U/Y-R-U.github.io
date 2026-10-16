@@ -2,6 +2,8 @@
 // screen, and Save set turns an edited copy into the player's own set. tools/suggest_test.mjs checks every round builds.
 const R = (title, format, packs, opts = {}, difficulty = 0) => ({ title, format, packs, count: 10, opts, difficulty });
 const LISTEN = { clip: 10, art: 'off', ask: 'auto', answers: 4 };
+// Hat-trick rounds are three questions each, so they run five long
+const TRIO = (title, packs, difficulty = 0) => ({ ...R(title, 'trio', packs, {}, difficulty), count: 5 });
 
 export const SUGGESTED = [
   { id: 'pub', name: 'Classic Pub Quiz', blurb: 'The Friday-night five: general, history, map, sport, theme tunes.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
@@ -11,22 +13,24 @@ export const SUGGESTED = [
     R('Sport', 'mc', ['sport'], { answers: 4, source: 'mix' }),
     R('Music & screen', 'listen', ['screen-themes', 'hits-1980s', 'hits-1990s', 'hits-2000s'], LISTEN),
   ] },
-  { id: 'music', name: 'Music Night', blurb: 'Clips from six decades, one-hit wonders and theme tunes.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
+  { id: 'music', name: 'Music Night', blurb: 'Clips from six decades, one-hit wonders, theme tunes and a song hat-trick.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
     R('Classic hits: 60s to 80s', 'listen', ['hits-1960s', 'hits-1970s', 'hits-1980s'], LISTEN),
     R('Modern hits: 90s to now', 'listen', ['hits-1990s', 'hits-2000s', 'hits-2010s', 'hits-2020s'], LISTEN),
     R('One-hit wonders', 'listen', ['one-hit-wonders'], LISTEN),
     R('Theme tunes', 'listen', ['screen-themes'], LISTEN),
     R('Artists', 'mc', ['music-artists', 'general~music'], { answers: 4, source: 'mix' }),
+    TRIO('Hat-trick: song, artist, year', ['hits-1970s', 'hits-1980s', 'hits-1990s', 'hits-2000s']),
   ] },
-  { id: 'world', name: 'Around the World', blurb: 'Flags, capitals, the map, landmarks and a pick-all round, all well-known places.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
+  { id: 'world', name: 'Around the World', blurb: 'Flags, capitals, the map, landmarks, pick-all and a flag hat-trick.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
     R('Flags', 'reveal', ['flags'], { mode: 'full', answers: 4 }, 1),
     R('Capital cities', 'mc', ['capitals'], { answers: 4, source: 'questions' }, 1),
     R('Name the country', 'map-click', 'all', { region: 'world', ask: 'name' }, 2),
     R('Landmarks', 'reveal', ['landmarks'], { mode: 'full', answers: 4 }, 1),
     R('Pick all the right ones', 'pickall', ['countries', 'capitals', 'landmarks', 'general~geography'], { tiles: 6 }, 1),
+    TRIO('Hat-trick: flag, capital, continent', ['countries'], 1),
   ] },
-  { id: 'screen', name: 'Movie & TV Night', blurb: 'Guess the film from a scene, theme tunes, actors, quotes and telly.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
-    R('Movie moments', 'reveal', ['movie-moments'], { mode: 'full', answers: 4 }),
+  { id: 'screen', name: 'Movie & TV Night', blurb: 'Film scenes as a hat-trick, theme tunes, actors, quotes and telly.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
+    TRIO('Hat-trick: film, director, year', ['movie-moments']),
     R('Theme tunes', 'listen', ['screen-themes'], LISTEN),
     R('Actors', 'reveal', ['actors'], { mode: 'full', answers: 4 }),
     R('Famous lines', 'quote', ['movies', 'tv'], { answers: 4 }),

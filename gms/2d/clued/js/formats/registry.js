@@ -1,5 +1,5 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610131439';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610161020';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -25,6 +25,7 @@ export function supportsPack(fmt, info, { kids = false } = {}) {
   if (!fmt || !info) return 'Not available';
   let r;
   try { r = fmt.supports(info); } catch (e) { r = false; }
+  if (kids && fmt.noKids) return 'Not in kids mode';
   if (r !== true) return typeof r === 'string' && r ? r : 'Not enough data for this format';
   const counts = kids ? info.caps?.formatsKids : info.caps?.formats;
   if (fmt.packless || !counts || !(fmt.id in counts)) return true;
@@ -265,27 +266,50 @@ export function pickPack(rng, packs, weight = p => Math.sqrt((p.items || []).len
 
 // n distractor items for target from pool (both {item}). Prefers lookalikes, then the same group.
 // keyFn(item) gives the text that must be unique among options; reject(item) excludes ones that would also be right.
-export function distractors(rng, target, pool, n, { keyFn = it => it.name, reject = () => false } = {}) {
+// Two items look alike: a curated lookalike, or picture colour signatures (item.look, CIELAB from
+// tools/img_look.py) close together.
+const LOOK_NEAR = 20;
+export function looksAlike(a, b) {
+  if ((a.lookalikes || []).includes(b.id) || (b.lookalikes || []).includes(a.id)) return true;
+  if (!a.look || !b.look) return false;
+  return Math.hypot(a.look[0] - b.look[0], a.look[1] - b.look[1], a.look[2] - b.look[2]) < LOOK_NEAR;
+}
+// Look-alike pairs allowed among the options by question level (Aaron 2026-10-16): easy none, medium one pair,
+// hard as many as the pack has (look-alikes are offered first).
+const ALIKE_CAP = { 1: 0, 2: 1 };
+
+export function distractors(rng, target, pool, n, { keyFn = it => it.name, reject = () => false, lv = 0 } = {}) {
   const seen = new Set([norm(keyFn(target.item))]);
   const out = [];
-  const take = list => {
+  const cap = ALIKE_CAP[lv];
+  let pairs = 0;
+  const pairsWith = c => [target, ...out].filter(o => looksAlike(o.item, c.item)).length;
+  const take = (list, capped = cap !== undefined) => {
     for (const c of shuffle(rng, list)) {
       if (out.length >= n) return;
       if (c.item === target.item || reject(c.item)) continue;
       const k = norm(keyFn(c.item));
       if (!k || seen.has(k)) continue;
-      seen.add(k); out.push(c);
+      const p = capped ? pairsWith(c) : 0;
+      if (capped && pairs + p > cap) continue;
+      seen.add(k); out.push(c); pairs += p;
     }
   };
   const look = new Set(target.item.lookalikes || []);
+  const near = c => c.pack === target.pack && looksAlike(target.item, c.item);
   // people: a "Who is this?" photo of a woman with three men offered gives it away, so same gender first
   const g = target.item.gender;
   for (const same of g ? [c => c.item.gender === g, () => true] : [() => true]) {
-    take(pool.filter(c => c.pack === target.pack && look.has(c.item.id) && same(c)));
+    if (cap === undefined) {
+      take(pool.filter(c => c.pack === target.pack && look.has(c.item.id) && same(c)));
+      take(pool.filter(c => near(c) && same(c)));
+    }
     if (target.item.group) take(pool.filter(c => c.pack === target.pack && c.item.group === target.item.group && same(c)));
     take(pool.filter(c => c.pack === target.pack && same(c)));
     if (out.length < n && !target.item.group) take(pool.filter(same));
   }
+  // a small pack can't always keep look-alikes apart: fill up rather than drop the question
+  if (out.length < n && cap !== undefined) take(pool.filter(c => c.pack === target.pack), false);
   return out.length >= n ? out : null;
 }
 

@@ -39,7 +39,7 @@ await b.eval(`localStorage.clear(); localStorage.setItem('clued.settings', JSON.
 await b.goto(URL); await b.waitFor('window.__cluedReady'); await b.sleep(300);
 
 // 1. Quick game, Movies only, picked in the theme picker
-await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
+await b.click('[data-mode=solo]'); await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
 await b.click('.theme-sum button'); await b.sleep(200);
 if (await b.eval(`document.querySelector('input.tick[aria-label="All themes"]')?.checked`)) await b.click('input.tick[aria-label="All themes"]');
 await b.click('.th[data-theme=screen] .th-exp'); await b.sleep(200);

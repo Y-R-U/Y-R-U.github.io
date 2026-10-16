@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Builds C1 packs: tools/c1_src/<id>.mjs (hand-checked content) + iNaturalist/Wikidata/Commons media → data/packs/<id>.json
 // Usage: node tools/c1_build.mjs [packId…]   (no args = every source)
-import { readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
@@ -10,6 +10,9 @@ import {
 } from './c1_lib.mjs';
 import { validatePack, leakStems, findLeak } from './c1_schema.mjs';
 import { dropGiveaways } from './q_giveaway.mjs';
+import { applyMarks } from './img_marks.mjs';
+// picture colour signatures from tools/img_look.py (look-alike options by level)
+const LOOKS = (() => { try { return JSON.parse(readFileSync(new URL('./img_look.json', import.meta.url), 'utf8')); } catch (e) { return {}; } })();
 
 const SRC = join(TOOLS, 'c1_src');
 const MIRROR = readJSON(join(ROOT, 'media/mirror.json'), {});
@@ -288,6 +291,9 @@ async function buildPack(id) {
   for (const w2 of warnings.slice(0, 15)) console.warn(`  schema-warn: ${w2}`);
   if (errors.length) { for (const e of errors) console.error('  ERROR', e); throw new Error(`${id}: ${errors.length} schema errors; not written`); }
   for (const q of dropGiveaways(pack)) console.warn(`  giveaway dropped ${id}/${q.id}: ${q.prompt}`);
+  applyMarks(id, pack);
+  const look = LOOKS[id];
+  if (look) for (const it of pack.items) if (look[it.id]) it.look = look[it.id];
   writeJSON(join(ROOT, 'data/packs', id + '.json'), pack);
   const nImg = items.filter(i => i.media?.img?.length).length, nAud = items.filter(i => i.media?.audio).length;
   console.log(`${id}: ${items.length} items (${nImg} with images, ${nAud} with audio), ${pack.questions?.length || 0} questions, ${warn.length} warnings`);

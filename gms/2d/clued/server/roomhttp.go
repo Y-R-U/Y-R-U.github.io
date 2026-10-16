@@ -171,6 +171,7 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	p, _ := room.addPlayer(name, uid)
 	room.Owner = p.ID
+	holdToken(room.Code, p.ID, r)
 	writeJSON(w, 200, map[string]any{"code": room.Code, "hostKey": p.Key, "playerKey": p.Key, "playerId": p.ID,
 		"room": room.stateFor(p)})
 }
@@ -550,8 +551,14 @@ func handleHostAction(w http.ResponseWriter, r *http.Request) {
 	if in.Key == "" {
 		in.Key = in.HostKey
 	}
+	if room := getRoom(normCode(r.PathValue("code"))); room != nil && (action == "start" || action == "next") && !gateStart(w, r, room, in.Key) {
+		return
+	}
 	withPlayer(w, r.PathValue("code"), in.Key, func(room *Room, p *Player) {
 		host := p.ID == room.HostID && !p.Gone
+		if host {
+			holdToken(room.Code, p.ID, r)
+		}
 		owner := room.Owner != "" && p.ID == room.Owner // the creator can end it after leaving or handing over
 		if !host && !(action == "end" && owner) {
 			writeErr(w, 403, "not_host", "only the host can do that")

@@ -197,3 +197,16 @@ study sessions, daily calendar, last 200 games); layout in docs/notes/STATS.md. 
   (longFormats 30 s); the server re-checks `correct` from `given` and caps points at round(500 × fraction) (pickallCap,
   mirrored in js/net/p2p_room.js). Not hidden until the reveal (partial formats ship their answer).
 - `window.__cluedRoom.q()` (test hook): the room runner's current question.
+
+## Additive fields from TRIO (Hat-trick, 2026-10-16)
+- Format `trio` (js/formats/trio.js, scoring trio_score.js, clip player trio_audio.js). Question: `{ format: 'trio', prompt,
+  media?, rows: [{ label, kind: 'name'|'fact'|'year', options: [4 strings] }] (2–3), answer: [right index per row],
+  answerText: 'A · B · C', data: { layout: 'pic'|'audio'|'text', a?, start?, len?, meta? } }`. Packs opt in through
+  `TRIO` in trio.js or a pack-level `trio` object of the same shape (rows from facts, `era`, `media`, `spread`).
+- Scoring: each right row = 1/rows of the speed points; all right = correct (streaks, "Hat-trick!"), else `partial`.
+  Rooms: in partialFormats; the server and the P2P host ignore the client's points and score `trioPoints` (their own speed
+  points × rows right / rows); `verifyCorrect` re-checks. Not hidden until the reveal.
+- Format fields: `timeAdd` (ms added to the answer time; rooms mirror it with server `extraFormats` / P2P `EXTRA`),
+  `noKids` (supportsPack says 'Not in kids mode').
+- Runner: `api.answer({ title })` names the result on the reveal card; a partial answer with points shows "Partly right"
+  (class `reveal.partial`, ½ mark, points) instead of a wrong card. `rec.partial`, `rec.title`.

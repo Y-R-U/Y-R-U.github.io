@@ -1,11 +1,12 @@
 // Device-hosted rooms: the host's tab runs P2PRoom and serves players over WebRTC data channels.
 // Signalling goes through the free PeerJS cloud broker (0.peerjs.com); no server of ours is involved.
 // Implements the transport interface in transport.js, so room.js / join.js work unchanged. docs/notes/P2P.md.
-import { P2PRoom, newCode, MAX_PLAYERS } from './p2p_room.js?v=202610131439';
-import { registerTransport, fallback } from './transport.js?v=202610131439';
-import { bootParam } from './api.js?v=202610131439';
-import { saveSeat } from './util.js?v=202610131439';
-import { lobbyNote, hostBackWarning } from './p2p_ui.js?v=202610131439';
+import { P2PRoom, newCode, MAX_PLAYERS } from './p2p_room.js?v=202610161020';
+import { registerTransport, fallback } from './transport.js?v=202610161020';
+import { bootParam, rooms } from './api.js?v=202610161020';
+import { saveSeat } from './util.js?v=202610161020';
+import { lobbyNote, hostBackWarning } from './p2p_ui.js?v=202610161020';
+import { spendGame } from './pass.js?v=202610161020';
 
 export const PEER_PREFIX = 'clued-p2p-';
 const ICE = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }];
@@ -30,7 +31,7 @@ const fromRes = e => new P2PError(e?.error || 'error', MSG[e?.error] || e?.messa
   e?.error === 'bad_key' ? 403 : e?.error === 'kicked' ? 410 : e?.error === 'room_not_found' || e?.error === 'not_yet' ? 404 : CONFLICT.has(e?.error) ? 409 : 400);
 
 let PeerP = null;
-const loadPeer = () => PeerP || (PeerP = import('../vendor/peerjs.js?v=202610131439').then(m => m.Peer));
+const loadPeer = () => PeerP || (PeerP = import('../vendor/peerjs.js?v=202610161020').then(m => m.Peer));
 
 // ?peerhost=host:port[:path] points at a self-run PeerJS server (testing / future self-hosting).
 function peerOptions() {
@@ -222,6 +223,22 @@ function dispatch(H, op, a, conn) {
 }
 
 const isHosting = code => hosting && hosting.code === code;
+
+// No server here, so the hosting device spends the host's daily online game itself, once per game (a retry
+// reuses the id). Payments unreachable (or Pages, which has none) = the game starts anyway.
+const gameIds = new Map();
+const uuid = () => crypto.randomUUID?.() || '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
+// One switch for every mode: device rooms count only once the Clued server has the limit on.
+let gateP = null;
+const gateOn = () => gateP || (gateP = rooms.status().then(s => !!s.allowance).catch(() => { gateP = null; return false; }));
+async function spendForStart(H) {
+  if (!(await gateOn())) return;
+  const k = `${H.code}:${H.room.game}`;
+  if (!gameIds.has(k)) gameIds.set(k, uuid());
+  const r = await spendGame(gameIds.get(k));
+  if (r.status === 'denied') throw Object.assign(new P2PError('no_games_left', 'No online games left today.', 429), { allowance: r.allowance });
+  if (r.status === 'signin') throw new P2PError('signin_required', 'Sign in with your br8t account to start online games.', 403);
+}
 function local(op, a) {
   const out = dispatch(hosting, op, a, null);
   if (out && out.error) throw fromRes(out);
@@ -419,7 +436,11 @@ export const p2pTransport = {
   async answer(code, key, a) { return isHosting(code) ? local('answer', { key, ...a }) : call(code, 'answer', { key, ...a }); },
   async vote(code, key, q) { return isHosting(code) ? local('vote', { key, q }) : call(code, 'vote', { key, q }); },
   async ready(code, key, q) { return isHosting(code) ? local('ready', { key, q }) : call(code, 'ready', { key, q }); },
-  async host(code, key, action, extra = {}) { return isHosting(code) ? local('host', { key, action, extra }) : call(code, 'host', { key, action, extra }, action === 'again' ? 20000 : REQ_MS); },
+  async host(code, key, action, extra = {}) {
+    if (!isHosting(code)) return call(code, 'host', { key, action, extra }, action === 'again' ? 20000 : REQ_MS);
+    if ((action === 'start' || action === 'next') && hosting.room.phase === 'lobby') await spendForStart(hosting);
+    return local('host', { key, action, extra });
+  },
   async leave(code, key) {
     if (isHosting(code)) { local('leave', { key }); try { sessionStorage.removeItem(HOST_SNAP(code)); } catch (e) {} return; }
     try { await call(code, 'leave', { key }, 3000); } finally { try { client?.peer.destroy(); } catch (e) {} client = null; }
@@ -435,8 +456,8 @@ stats.transport = p2pTransport;   // test hook (tools/p2p_e2e.mjs)
 
 // Server refused (busy / paused): host the same prepared game from this device.
 fallback.host = async opts => {
-  const { go } = await import('../ui/app.js?v=202610131439');
-  const { toast } = await import('../ui/popup.js?v=202610131439');
+  const { go } = await import('../ui/app.js?v=202610161020');
+  const { toast } = await import('../ui/popup.js?v=202610161020');
   try {
     const res = await p2pTransport.create(opts);
     saveSeat(res.code, { key: res.playerKey, id: res.playerId, via: 'p2p' });

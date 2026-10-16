@@ -76,6 +76,7 @@ async function solo() {
     else ok(!rec.correct && (frac > 0 ? rec.points > 0 && rec.points <= Math.round(500 * frac) : rec.points === 0), `q${r} partial = base × ${frac.toFixed(2)}`, JSON.stringify(rec));
     ok(Q.answer.every(i => /\b(ok|miss)\b/.test(t[i].cls)) && W.every(i => /\b(bad|dim)\b/.test(t[i].cls)), `q${r} reveal marks right / wrong / missed`);
     if (r === 1) ok(t.some(x => /\bmiss\b/.test(x.cls)) && t.some(x => /\bbad\b/.test(x.cls)), 'q1 shows a missed and a wrong tile');
+    if (r === 1) { const m = await b.eval(`[document.querySelector('.reveal.show .rv-mark')?.textContent, document.querySelector('.reveal.show').className, document.querySelectorAll('.reveal.show .rv-extra').length]`); ok(m[0] === `${hits}/${Q.need}` && /partial/.test(m[1]) && m[2] === 0, `q1 partial card shows ${hits}/${Q.need}, no extra points line`, JSON.stringify(m)); }
     ok(await noHScroll(b), `q${r} no horizontal scroll`);
     if (r === 1) await b.shot(`${OUT}/${MODE}-reveal.png`);
     await b.click('.reveal.show .next');

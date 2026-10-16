@@ -1,5 +1,5 @@
 // Scoreboards and podium for rooms and challenges. All text goes in via textContent (h() kids).
-import { h, fmtNum } from '../ui/kit.js?v=202610131439';
+import { h, fmtNum } from '../ui/kit.js?v=202610161020';
 
 export const ordinal = n => {
   const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
@@ -26,7 +26,8 @@ export function pointsBreakdown(last, { streakBonus = true } = {}) {
 // Short per-row note on a scoreboard: answer time, plus the streak bonus when it added points.
 export function rowNote(last, { streakBonus = true } = {}) {
   if (!last) return '';
-  if (!last.correct) return '✗';
+  // partly right (pick-all, hat-trick, boards): points without a full answer
+  if (!last.correct) return last.points > 0 ? `◐ ${secs(last.ms)} · partly right` : '✗';
   return [secs(last.ms), streakBonus && last.bonus > 0 ? `+${fmtNum(last.bonus)} streak` : ''].filter(Boolean).join(' · ');
 }
 

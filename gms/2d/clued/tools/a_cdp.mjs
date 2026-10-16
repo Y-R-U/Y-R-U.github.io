@@ -9,8 +9,10 @@ export async function open({ port: portArg = 9401, url, width = 384, height = 85
   let id = 0;
   const pending = new Map();
   const logs = [];
+  const handlers = new Map();
   ws.onmessage = ev => {
     const m = JSON.parse(ev.data);
+    if (m.method && handlers.has(m.method)) handlers.get(m.method)(m.params);
     if (m.id && pending.has(m.id)) { const { r, j } = pending.get(m.id); pending.delete(m.id); m.error ? j(new Error(m.error.message)) : r(m.result); }
     else if (m.method === 'Runtime.consoleAPICalled') logs.push(`[${m.params.type}] ` + m.params.args.map(a => a.value ?? a.description ?? '').join(' '));
     else if (m.method === 'Runtime.exceptionThrown') logs.push('[exception] ' + (m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text));
@@ -23,6 +25,7 @@ export async function open({ port: portArg = 9401, url, width = 384, height = 85
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const api = {
     send, logs, sleep,
+    on(method, fn) { handlers.set(method, fn); },
     async viewport(w, h, d = dpr, mob = mobile) {
       await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: d, mobile: mob });
       await send('Emulation.setTouchEmulationEnabled', { enabled: mob });

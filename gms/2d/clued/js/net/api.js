@@ -1,5 +1,5 @@
 // Clued server client: base URL, JSON requests, server clock, live room subscription (SSE → long-poll fallback).
-import { idToken } from './ident.js?v=202610131439';
+import { idToken } from './ident.js?v=202610161020';
 
 const DEFAULT_API = location.hostname === 'games.br8t.com' ? '/gms/2d/clued/api' : 'https://games.br8t.com/gms/2d/clued/api';
 
@@ -50,6 +50,7 @@ const FRIENDLY = {
   not_host: 'Only the host can do that.',
   challenge_not_found: 'This challenge has expired or the link is wrong.',
   busy: 'Clued is busy right now. Please try again soon.',
+  no_games_left: 'No online games left today.',
 };
 export const friendly = e => FRIENDLY[e?.code] || e?.message || 'Something went wrong.';
 
@@ -72,7 +73,7 @@ export async function req(method, path, body, { timeout = 12000, auth = false } 
   }
   let data = null;
   try { data = await res.json(); } catch (e) {}
-  if (!res.ok) throw new ApiError(res.status, data?.code, data?.error);
+  if (!res.ok) throw Object.assign(new ApiError(res.status, data?.code, data?.error), data?.allowance ? { allowance: data.allowance } : {});
   return data;
 }
 
@@ -95,6 +96,7 @@ export async function syncClock(samples = 5) {
 }
 
 /* ------------------------------------------------------------- rooms */
+const HOST_AUTH = new Set(['start', 'settings', 'again']);
 export const rooms = {
   create: (body) => req('POST', '/rooms', body, { auth: true, timeout: 20000 }),
   status: () => req('GET', '/status', undefined, { timeout: 6000 }),
@@ -109,7 +111,8 @@ export const rooms = {
   mine: list => req('POST', '/rooms/mine', { rooms: list }, { timeout: 8000 }),
   vote: (code, key, q) => req('POST', `/rooms/${code}/vote`, { key, q }),
   ready: (code, key, q) => req('POST', `/rooms/${code}/ready`, { key, q }),
-  host: (code, key, action, extra = {}) => req('POST', `/rooms/${code}/${action}`, { key, ...extra }, { timeout: action === 'again' ? 20000 : 12000 }),
+  // start spends the host's allowance; settings/again keep the server's copy of the token fresh for a public auto-start
+  host: (code, key, action, extra = {}) => req('POST', `/rooms/${code}/${action}`, { key, ...extra }, { timeout: action === 'again' ? 20000 : 12000, auth: HOST_AUTH.has(action) }),
 };
 
 export const challenges = {

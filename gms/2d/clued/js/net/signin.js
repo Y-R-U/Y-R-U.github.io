@@ -1,7 +1,9 @@
 // Protection-level sign-in asks. Never a blocking modal: an inline panel with a button that opens
 // the br8t account panel (or Google sign-in when the panel isn't mounted).
-import { h } from '../ui/kit.js?v=202610131439';
-import { toast } from '../ui/popup.js?v=202610131439';
+import { h } from '../ui/kit.js?v=202610161020';
+import { toast } from '../ui/popup.js?v=202610161020';
+import { go } from '../ui/app.js?v=202610161020';
+import { allowanceText, resetTime } from './pass.js?v=202610161020';
 
 let authMod = null;
 const loadAuth = () => authMod || (authMod = import('/lib/auth/auth.js').catch(() => null));
@@ -23,6 +25,7 @@ const WHY = {
   host: 'To keep Clued friendly while it’s busy, hosting needs a free br8t account for now. Joining stays open to everyone.',
   join: 'This room needs a free br8t account to join right now. It only takes a moment.',
   challenge: 'Creating challenges needs a free br8t account for now.',
+  start: 'Online games run on the host’s free br8t account: free games every day, unlimited with a br8t Pass. Joining stays free for everyone.',
 };
 
 // Renders into box; resolves once the player is signed in (polls, since the panel is in a shadow root).
@@ -39,3 +42,17 @@ export function signInPrompt(box, kind = 'host') {
 
 export const pausedText = 'New games are paused for a little while. Please try again later.';
 export const busyText = 'Clued is busy right now. Please try again soon.';
+
+// The host's daily online games: one quiet line, or (none left) an inline panel. Never a modal.
+export function allowanceNote(a) {
+  return h('p.net-note', { dataset: { allowance: a.unlimited ? 'pass' : String(a.remaining) } }, `${a.unlimited ? '⭐' : '🎟️'} ${allowanceText(a)}`);
+}
+
+export function noGamesPanel(a) {
+  const at = resetTime(a);
+  return h('div.panel.stack.net-signin', { dataset: { panel: 'no-games' } },
+    h('b', {}, '🎟️ No online games left today'),
+    h('p.muted', { style: { margin: 0 } }, `You’ve used today’s ${a?.perDay || ''} online games${at ? `. More at ${at} your time` : ''}.`.replace('  ', ' ')),
+    h('p.muted', { style: { margin: 0 } }, 'A br8t Pass (monthly or yearly) makes online play unlimited, in Clued and every br8t game. Players who join your games always play free, so a friend with a Pass can host.'),
+    h('button.btn.wide', { type: 'button', dataset: { act: 'pass-code' }, onclick: () => go('settings', { focus: 'pass' }) }, 'Got a Pass code?'));
+}

@@ -5,19 +5,16 @@ import fs from 'fs';
 import path from 'path';
 import { execFileSync } from 'child_process';
 import os from 'os';
-import { momentFile } from './mv_paths.mjs';
+import { PACKS, sceneRel } from './mv_paths.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const args = process.argv.slice(2);
 const arg = (k, d) => { const i = args.indexOf('--' + k); return i >= 0 ? args[i + 1] : d; };
-const PACKS = {
-  'movie-moments': { prompts: 'tools/mv_prompts.json', media: 'media/moments' },
-  'book-moments': { prompts: 'tools/mv_prompts_books.json', media: 'media/book-moments' },
-  'song-pictures': { prompts: 'tools/mv_prompts_songs.json', media: 'media/song-pictures' },
-};
-const pack = PACKS[arg('pack', 'movie-moments')];
+const packId = arg('pack', 'movie-moments');
+const pack = PACKS[packId];
 let cfg = JSON.parse(fs.readFileSync(path.join(ROOT, pack.prompts), 'utf8'));
 const MEDIA = path.join(ROOT, pack.media);
+const fileOf = (key, sc) => path.join(ROOT, sceneRel(packId, key, sc));
 const STATE = path.join(ROOT, 'tools', 'mv_state.json');
 const RAW = process.env.MV_RAW || path.join(os.homedir(), '.cache', 'clued-mv');
 const Q = 'http://localhost:7867', LTX = 'http://localhost:7866';
@@ -35,7 +32,8 @@ if (arg('reject')) {
     const s = state[key] || (state[key] = { attempt: 0 });
     s.attempt = (s.attempt || 0) + 1;
     s.rejected = (s.rejected || 0) + 1;
-    try { fs.unlinkSync(path.join(MEDIA, momentFile(key))); } catch {}
+    const [, id, n] = key.match(/^(.*)-(\d+)$/);
+    try { fs.unlinkSync(fileOf(key, cfg.films.find(f => f.id === id)?.scenes[n - 1])); } catch {}
     console.log('rejected', key, '-> attempt', s.attempt);
   }
   save();
@@ -59,7 +57,7 @@ function scan() {
     if (only && !only.has(f.id)) continue;
     f.scenes.forEach((sc, i) => {
       const key = `${f.id}-${i + 1}`;
-      if (sc.drop || failed.has(key) || fs.existsSync(path.join(MEDIA, momentFile(key)))) return;
+      if (sc.drop || failed.has(key) || fs.existsSync(fileOf(key, sc))) return;
       todo.push({ key, sc, i });
     });
   }
@@ -80,10 +78,10 @@ async function submit({ key, sc }) {
     width: cfg.width, height: cfg.height, num_inference_steps: cfg.steps, guidance: 1.0, seed, num_images: 1,
   };
   const r = await (await fetch(Q + '/api/generate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })).json();
-  return { key, seed, job: r.job_id };
+  return { key, sc, seed, job: r.job_id };
 }
 
-async function finish({ key, seed, job }) {
+async function finish({ key, sc, seed, job }) {
   for (;;) {
     const j = await getJ(`${Q}/api/jobs/${job}`);
     if (j.status === 'done') break;
@@ -92,7 +90,8 @@ async function finish({ key, seed, job }) {
   }
   const raw = path.join(RAW, `${key}.png`);
   fs.writeFileSync(raw, Buffer.from(await (await fetch(`${Q}/api/jobs/${job}/file/0`)).arrayBuffer()));
-  const out = path.join(MEDIA, momentFile(key));
+  const out = fileOf(key, sc);
+  fs.mkdirSync(path.dirname(out), { recursive: true });
   execFileSync('cwebp', ['-quiet', '-q', '82', '-resize', '640', '0', raw, '-o', out]);
   state = load();
   state[key] = { ...(state[key] || {}), seed, model: cfg.model, at: new Date().toISOString() };

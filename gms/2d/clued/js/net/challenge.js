@@ -1,21 +1,22 @@
 // Challenge links: "beat my score on this exact set". Create from a results screen, play via ?c=ID.
-import { h, fmtNum } from '../ui/kit.js?v=202610131439';
-import { defineScreen, header, current, reset } from '../ui/app.js?v=202610131439';
-import { popup, toast } from '../ui/popup.js?v=202610131439';
-import { sfx, confetti } from '../ui/fx.js?v=202610131439';
-import { getSettings } from '../core/store.js?v=202610131439';
-import { createRunner } from '../structures/runner.js?v=202610131439';
-import { replayCfg, replayScore } from '../structures/index.js?v=202610131439';
-import { challenges, friendly } from './api.js?v=202610131439';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610131439';
-import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610131439';
-import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610131439';
-import { ensureStyles, setQuery } from './util.js?v=202610131439';
-import { ensureFormats } from './room.js?v=202610131439';
-import { openSignIn } from './signin.js?v=202610131439';
-import { linkChallengeShare } from './linkchallenge.js?v=202610131439';
-import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610131439';
-import { cleanQuestions } from './sanitize.js?v=202610131439';
+import { h, fmtNum } from '../ui/kit.js?v=202610161020';
+import { defineScreen, header, current, reset, go } from '../ui/app.js?v=202610161020';
+import { popup, toast } from '../ui/popup.js?v=202610161020';
+import { sfx, confetti } from '../ui/fx.js?v=202610161020';
+import { getSettings } from '../core/store.js?v=202610161020';
+import { createRunner } from '../structures/runner.js?v=202610161020';
+import { replayCfg, replayScore } from '../structures/index.js?v=202610161020';
+import { challenges, friendly } from './api.js?v=202610161020';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610161020';
+import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610161020';
+import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610161020';
+import { ensureStyles, setQuery } from './util.js?v=202610161020';
+import { ensureFormats } from './room.js?v=202610161020';
+import { openSignIn } from './signin.js?v=202610161020';
+import { resetTime } from './pass.js?v=202610161020';
+import { linkChallengeShare } from './linkchallenge.js?v=202610161020';
+import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610161020';
+import { cleanQuestions } from './sanitize.js?v=202610161020';
 
 const MAX_SET = 500 * 1024;
 
@@ -52,6 +53,16 @@ export async function createChallenge(out) {
     return { id: res.id, url };
   } catch (e) {
     // The server path is refused (sign-in level, daily cap, paused): the serverless link always works.
+    if (e.code === 'no_games_left') {
+      const at = resetTime(e.allowance);
+      const pick = await popup({ title: 'No online games left today',
+        body: h('div.stack', {}, h('p', {}, `Leaderboard challenges use one of your daily online games${at ? `; more at ${at} your time` : ''}. A br8t Pass (monthly or yearly) makes them unlimited.`),
+          h('p.muted', {}, 'A link challenge still works: no leaderboard, no server.')),
+        actions: [{ label: 'Got a Pass code?', value: 'pass' }, { label: 'Send a link challenge', value: 'link', primary: true }] });
+      if (pick === 'pass') go('settings', { focus: 'pass' });
+      if (pick === 'link') return linkChallengeShare(out, name);
+      return null;
+    }
     const signin = e.code === 'signin_required';
     const pick = await popup({
       title: signin ? 'Sign in for a leaderboard' : 'Leaderboard challenges are busy',

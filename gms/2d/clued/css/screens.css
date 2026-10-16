@@ -42,7 +42,9 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
 .daily-card .d-badge { grid-row: span 2; font-size: 40px; background: var(--sun); border: var(--line) solid var(--ink); border-radius: 16px; width: 64px; height: 64px; display: grid; place-items: center; transform: rotate(6deg); box-shadow: var(--shadow-sm); }
 .daily-card:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
 
-.play-btn { margin: 14px 0 6px; }
+.home-grid { display: grid; gap: 14px; }
+.tiles.hubs .tile { min-height: 132px; }
+.tiles.hubs .t-ico { font-size: 40px; }
 .hideable { position: relative; }
 .hide-chip {
   position: absolute; top: -9px; right: -7px; z-index: 2; width: 30px; height: 30px; padding: 0; display: grid; place-items: center;
@@ -51,8 +53,6 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
 .hide-chip:hover { color: var(--ink); }
 .hide-chip:active { transform: translateY(1px); box-shadow: none; }
 .hide-chip svg { display: block; }
-.play-btn .btn { width: 100%; min-height: 76px; font-size: 32px; border-radius: 26px; }
-.play-btn .btn .wobble { display: inline-block; animation: wob 2.6s ease-in-out infinite; }
 @keyframes wob { 0%, 80%, 100% { transform: rotate(0); } 85% { transform: rotate(-10deg) scale(1.1); } 92% { transform: rotate(8deg); } }
 
 .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -211,7 +211,6 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
   .tiles { grid-template-columns: repeat(4, 1fr); }
   .screen > * { max-width: 820px; }
   .home-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; align-items: start; }
-  .play-btn .btn { min-height: 64px; font-size: 28px; }
   .tile { min-height: 84px; }
   /* phone landscape: the whole home on one screen, 8 compact tiles in two rows */
   .scr-home .home-top { padding-top: 4px; padding-bottom: 2px; }
@@ -228,13 +227,14 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
   .scr-home .tile .t-ico { font-size: 24px; }
   .scr-home .tile .t-title { font-size: 17px; margin-top: 2px; }
   .scr-home .tile .t-blurb { display: none; }
+  .scr-home .tiles.hubs { grid-template-columns: repeat(2, 1fr); }
+  .scr-home .tiles.hubs .tile { min-height: 0; padding: 8px 12px; }
+  .scr-home .tiles.hubs .t-ico { font-size: 26px; }
   .scr-home .daily-card { padding: 10px 14px; }
   .scr-home .daily-card h2 { font-size: 22px; }
   .scr-home .daily-card p { font-size: 14px; }
   .scr-home .daily-card .d-badge { width: 52px; height: 52px; font-size: 32px; }
   .scr-home .daily-card .d-badge.cal i { font-size: 24px; }
-  .scr-home .play-btn { margin: 8px 0 0; }
-  .scr-home .play-btn .btn { min-height: 52px; font-size: 26px; }
 }
 .res-score[data-stars]::after { content: ' ⭐'; -webkit-text-stroke: 0; text-shadow: none; }
 .daily-card .d-badge.cal { display: flex; flex-direction: column; overflow: hidden; background: var(--card); place-items: stretch; }
@@ -248,3 +248,4 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
 .hid-g b { display: block; color: var(--ink-2); font-size: 12px; }
 .home-move { display: block; margin: 0 0 12px; padding: 8px 14px; border: 2px dashed var(--grape); border-radius: var(--r-sm); color: var(--grape); font-weight: 800; font-size: 14px; text-decoration: none; text-align: center; background: var(--card); }
 .tile .t-live { position: absolute; top: 10px; right: 10px; padding: 3px 8px; border: 2px solid var(--ink); border-radius: 999px; background: var(--card); font: 800 11px/1 var(--font-body, sans-serif); }
+.home-grid > .hubs:only-child { grid-column: 1 / -1; }

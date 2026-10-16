@@ -1,19 +1,19 @@
-import { h, esc } from './kit.js?v=202610131439';
-import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610131439';
-import { defineScreen, header, back, go } from './app.js?v=202610131439';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610131439';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610131439';
-import { applyAudioSettings, sfx } from './fx.js?v=202610131439';
-import { applyKids } from './home.js?v=202610131439';
-import { loadLearn, loadNet } from './net.js?v=202610131439';
-import { BUILD } from '../build.js?v=202610131439';
-import { canSpeak, speak } from './speech.js?v=202610131439';
-import { streakOption } from './streakopt.js?v=202610131439';
-import { localChip } from './local.js?v=202610131439';
-import { confirmPop, toast } from './popup.js?v=202610131439';
-import { seenInfo, resetSeen } from '../core/fresh.js?v=202610131439';
-import { mySetting, saveMySetting } from '../core/local.js?v=202610131439';
-import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610131439';
+import { h, esc } from './kit.js?v=202610161020';
+import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610161020';
+import { defineScreen, header, back, go } from './app.js?v=202610161020';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610161020';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610161020';
+import { applyAudioSettings, sfx } from './fx.js?v=202610161020';
+import { applyKids } from './home.js?v=202610161020';
+import { loadLearn, loadNet } from './net.js?v=202610161020';
+import { BUILD } from '../build.js?v=202610161020';
+import { canSpeak, speak } from './speech.js?v=202610161020';
+import { streakOption } from './streakopt.js?v=202610161020';
+import { localChip } from './local.js?v=202610161020';
+import { confirmPop, toast } from './popup.js?v=202610161020';
+import { seenInfo, resetSeen } from '../core/fresh.js?v=202610161020';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610161020';
+import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610161020';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -55,7 +55,7 @@ function passPanel() {
     h('div', { style: { display: 'flex', gap: '8px' } }, code, btn), status);
 }
 
-defineScreen('settings', el => {
+defineScreen('settings', (el, params = {}) => {
   const s = getSettings();
   el.append(header('Settings'));
   const vol = h('input', { type: 'range', min: 0, max: 1, step: 0.05, value: s.music, 'aria-label': 'Music volume' });
@@ -93,6 +93,7 @@ defineScreen('settings', el => {
     toggleRow('Show the kids mode switch', 'Kids mode itself is in the list above', 'homeKids'),
     toggleRow('Show the daily challenge', null, 'homeDaily')));
   el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'br8t Pass'), passPanel());
+  if (params.focus === 'pass') setTimeout(() => el.querySelector('[data-set=pass]')?.scrollIntoView({ block: 'center' }), 60);
   el.append(h('div.panel.set-list', { style: { marginTop: '14px' } }, h('div.opt-row', {}, h('span.lbl', {}, 'Your stats', h('small', {}, 'Games, accuracy, streaks, topics and history')),
     h('button.btn.small', { type: 'button', dataset: { act: 'stats' }, onclick: () => go('stats') }, '📊 Open'))));
   el.append(h('p.muted.tiny.center', { style: { marginTop: '18px' } }, `Clued build ${BUILD} · ${Object.values(getIndex()?.packs || {}).filter(p => !p.virtual).length} packs`));

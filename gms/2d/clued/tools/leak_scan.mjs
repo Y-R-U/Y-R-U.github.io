@@ -139,6 +139,19 @@ for (const id of realIds) {
       }
       continue;
     }
+    if (fid === 'trio') {
+      // every row's answer against the prompt, the picture/clip file name and every other row's options
+      const media = [...mediaUrls(q.media)].filter(u => u && isLocal(u)).map(urlText);
+      outer: for (const [ri, r] of q.rows.entries()) {
+        const a = r.options[q.answer[ri]], wrong = r.options.filter((_, i) => i !== q.answer[ri]);
+        const texts = [['prompt', q.prompt], ...media.map(t => ['media', t]), ...q.rows.filter((_, j) => j !== ri).flatMap(o => o.options.map(t => ['row', t]))];
+        for (const [where, t] of texts) {
+          const w = leak(a, t, ctx, wrong);
+          if (w) { found.generated.push({ pack: id, fmt: fid, where, answer: a, token: w, text: String(t).slice(0, 160), id: q.id }); break outer; }
+        }
+      }
+      continue;
+    }
     const picks = Array.isArray(q.options) && q.options.some(o => o.img);
     const others = Array.isArray(q.options) ? q.options.map(o => o.text).filter(t => t && t !== ans)
       : fid === 'type' ? [...corpus.get(fid + (q.id || '').split(':').slice(0, 2).join(':')) || []].filter(t => t !== ans) : [];

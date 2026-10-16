@@ -111,6 +111,7 @@ CREATE INDEX IF NOT EXISTS idx_challenges_touched ON challenges(touched);
 var migrations = []string{
 	`ALTER TABLE challenge_scores ADD COLUMN detail TEXT NOT NULL DEFAULT ''`, // per-question [correct, stage, ms]
 	`ALTER TABLE rooms ADD COLUMN questions BLOB`,                             // written once per game, not with every state flush
+	`ALTER TABLE img_review ADD COLUMN mark TEXT NOT NULL DEFAULT ''`,         // JSON {cx,cy,rx,ry} in 0–1 image coordinates
 }
 
 func openDB(path string) {

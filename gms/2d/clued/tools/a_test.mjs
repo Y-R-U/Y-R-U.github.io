@@ -191,5 +191,21 @@ ok(registry.fill('The {lname} is {aValue}.', { name: 'Tiger', value: 'Mammal' })
   ok(!registry.factAllowed({ label: 'Conservation status (IUCN)' }, { kids: true }) && registry.factAllowed({ label: 'Conservation status (IUCN)' }, { difficulty: 3 }), 'IUCN only at Hard, never kids');
 }
 
+// online-game allowance helpers (js/net/pass.js)
+{
+  const pass = await imp('js/net/pass.js');
+  const free = { perDay: 5, promoPerDay: 2, promoUntil: '2026-12-31', remaining: 2, unlimited: false, resetsAt: 1791936000 };
+  ok(pass.allowanceText(free) === 'Online games today: 2 of 5 left (3 free + 2 bonus until 31 Dec)', `promo line: ${pass.allowanceText(free)}`);
+  ok(pass.allowanceText({ perDay: 3, promoPerDay: 0, promoUntil: '', remaining: 1 }) === 'Online games today: 1 of 3 left', 'no promo line');
+  ok(pass.allowanceText({ perDay: -1, remaining: -1, unlimited: true, promoPerDay: 2 }) === 'Unlimited online games with your br8t Pass', 'pass line');
+  ok(pass.allowanceText({ perDay: 5, promoPerDay: 2, promoUntil: '2026-12-31', remaining: -3 }).startsWith('Online games today: 0 of 5'), 'never negative');
+  ok(pass.outOfGames({ ...free, remaining: 0 }) && !pass.outOfGames(free) && !pass.outOfGames({ unlimited: true, remaining: -1 }) && !pass.outOfGames(null), 'outOfGames');
+  ok(pass.resetTime(free, { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', hour12: false }) === '00:00' && pass.resetTime({}) === '', 'reset time');
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async u => ({ ok: true, json: async () => ({ ok: /health$/.test(u) }) });
+  ok((await pass.spendGame('11111111-1111-4111-8111-111111111111')).status === 'signin', 'signed out where payments is live: sign in');
+  globalThis.fetch = realFetch;
+}
+
 console.log(`a_test: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

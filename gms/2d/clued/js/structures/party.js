@@ -1,11 +1,11 @@
 // Pass and play: 2–8 named players take turns on one device. Each player can be in kids mode.
-import { playSpec } from './session.js?v=202610131439';
-import { specFor, fmtTitle } from './common.js?v=202610131439';
-import { handoff } from './handoff.js?v=202610131439';
-import { defineScreen, go, header } from '../ui/app.js?v=202610131439';
-import { h, esc, fmtNum } from '../ui/kit.js?v=202610131439';
-import { read, write, getSettings } from '../core/store.js?v=202610131439';
-import { toast } from '../ui/popup.js?v=202610131439';
+import { playSpec } from './session.js?v=202610161020';
+import { specFor, fmtTitle } from './common.js?v=202610161020';
+import { handoff } from './handoff.js?v=202610161020';
+import { defineScreen, go, header } from '../ui/app.js?v=202610161020';
+import { h, esc, fmtNum } from '../ui/kit.js?v=202610161020';
+import { read, write, getSettings } from '../core/store.js?v=202610161020';
+import { toast } from '../ui/popup.js?v=202610161020';
 
 const KEY = 'clued.party';
 export function getPlayers() {

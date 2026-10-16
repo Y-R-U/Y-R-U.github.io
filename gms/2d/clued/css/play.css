@@ -73,6 +73,8 @@ body.kids-on .speak-q { width: 44px; height: 44px; font-size: 20px; }
 /* absolute, so a shrinking box (the reveal) scales the whole picture down instead of clipping it */
 .q-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
 .q-media img.broken { opacity: 0; }
+.q-mark { position: absolute; z-index: 1; box-sizing: border-box; border: 4px solid #ffe14d; border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 0 2px rgba(20, 16, 50, .85), inset 0 0 0 2px rgba(20, 16, 50, .85), 0 0 10px 2px rgba(20, 16, 50, .5); }
 /* a long-press or right-click menu would show the picture's file name */
 .play img, .l-card img, .l-quiz-img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; pointer-events: none; }
 .audio-btn { position: relative; width: 96px; height: 96px; border-radius: 50%; border: var(--line) solid var(--ink); background: var(--sun); font-size: 36px; box-shadow: var(--shadow); }

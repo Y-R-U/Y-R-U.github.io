@@ -1,7 +1,7 @@
 // Questions from rooms, challenges and P2P hosts are someone else's JSON: clean them before any format renders them.
 export const FORMATS = new Set(['blitz60', 'chain', 'city-pick', 'connect', 'continent', 'fake', 'flag-map', 'hilo', 'ladder', 'listen',
   'lookalike', 'map-click', 'match', 'mc', 'neighbours', 'number', 'odd', 'order', 'pickall', 'pin-drop', 'quote', 'reveal', 'silhouette', 'sort',
-  'tf', 'type', 'water-click']);
+  'tf', 'trio', 'type', 'water-click']);
 const KINDS = new Set(['mc', 'tf', 'number', 'order', 'quote']);
 const URL_KEYS = new Set(['src', 'url', 'page', 'art', 'href', 'img', 'image', 'poster', 'thumb', 'previewUrl', 'trackViewUrl']);
 const BAD_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
@@ -48,6 +48,15 @@ export function cleanQuestion(raw) {
     if (q.data?.kind != null && !(typeof q.data.kind === 'string' && /^[a-z0-9-]{1,24}$/.test(q.data.kind))) delete q.data.kind;
     if ('options' in q && !Array.isArray(q.options)) return null;
     if (q.options) q.options = q.options.filter(o => typeof o === 'string' || typeof o === 'number' || (o && typeof o === 'object' && !Array.isArray(o)));
+    // trio: 2–3 rows of 2–6 text options, one answer index per row
+    if (q.format === 'trio') {
+      const rows = Array.isArray(q.rows) ? q.rows.filter(r => r && typeof r === 'object' && !Array.isArray(r) && Array.isArray(r.options)).slice(0, 3)
+        .map(r => ({ label: typeof r.label === 'string' ? r.label.slice(0, 40) : '', kind: typeof r.kind === 'string' ? r.kind.slice(0, 12) : '',
+          options: r.options.filter(o => typeof o === 'string' || typeof o === 'number').map(String).slice(0, 6) })) : [];
+      if (rows.length < 2 || rows.some(r => r.options.length < 2)) return null;
+      q.rows = rows;
+      if ('answer' in q && !(Array.isArray(q.answer) && q.answer.length === rows.length && q.answer.every((a, i) => Number.isInteger(a) && a >= 0 && a < rows[i].options.length))) return null;
+    }
     return q;
   } catch (e) { return null; }
 }

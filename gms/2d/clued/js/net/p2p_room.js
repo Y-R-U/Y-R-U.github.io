@@ -1,7 +1,8 @@
 // Device-hosted room logic: a port of server/rooms.go + scoring.go so the host's tab can be the room
 // server. Pure (no DOM, no network), so tools/p2p_test.mjs runs it in node. State shape = the server's.
-import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610131439';
-import { pickScore, pickallCap } from '../formats/pickall_score.js?v=202610131439';
+import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610161020';
+import { pickScore, pickallCap } from '../formats/pickall_score.js?v=202610161020';
+import { trioScore } from '../formats/trio_score.js?v=202610161020';
 export { stageMultiplier, withStreak };
 
 export const MAX_PLAYERS = 8;
@@ -36,8 +37,10 @@ const MAX_TSCALE = 6, MAX_SCALED_MS = 180000;
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const ANSWER_CHOICES = [3, 5, 10, 15, 20, 30], GAP_CHOICES = [3, 5, 10];
 
-export const PARTIAL = new Set(['ladder', 'pin-drop', 'number', 'blitz60', 'match', 'connect', 'sort', 'neighbours', 'order', 'chain', 'pickall']);
+export const PARTIAL = new Set(['ladder', 'pin-drop', 'number', 'blitz60', 'match', 'connect', 'sort', 'neighbours', 'order', 'chain', 'pickall', 'trio']);
 export const LONG = { connect: 120000, blitz60: 60000, match: 60000, ladder: 60000, sort: 45000, neighbours: 45000, order: 40000, chain: 60000, pickall: 30000, 'pin-drop': 30000, type: 30000 };
+// formats that ask several things at once get a fixed amount on top of the host's answer time (scoring.go extraFormats)
+export const EXTRA = { trio: 10000 };
 
 const rnd = (alpha, n, rand) => Array.from({ length: n }, () => alpha[Math.floor(rand() * alpha.length)]).join('');
 export const newCode = (rand = Math.random) => rnd(CODE_ALPHABET, 5, rand);
@@ -60,6 +63,7 @@ export function basePoints(format, correct, clientPoints, ms, limitMs, timed, mu
 // mc (index) and tf (bool) are re-checked; everything else trusts the client's claim.
 export function verifyCorrect(q, given, claimed) {
   if (q?.format === 'pickall' && Array.isArray(q.answer)) return pickScore(given, q.answer).correct;
+  if (q?.format === 'trio' && Array.isArray(q.answer)) return trioScore(given, q.answer).correct;
   if (!q || (q.format !== 'mc' && q.format !== 'tf') || q.answer == null || given == null) return !!claimed;
   const a = q.answer, g = given;
   if (typeof a === 'string' && typeof g === 'string') return a.trim().toLowerCase() === g.trim().toLowerCase();
@@ -144,6 +148,7 @@ export class P2PRoom {
     let ms = this.answerMs > 0 ? this.answerMs : DEFAULT_ANSWER;
     const ts = Number(q?.tscale);
     if (ts > 1) ms = Math.max(ms, Math.min(Math.round(ms * Math.min(ts, MAX_TSCALE)), MAX_SCALED_MS));
+    ms += EXTRA[q?.format] || 0;
     const long = LONG[q?.format];
     if (long && long > ms) ms = long;
     const n = stagesOf(q);
@@ -308,6 +313,8 @@ export class P2PRoom {
     const stage = n ? this.stage : 0;
     let speed = basePoints(q?.format, correct, typeof a.points === 'number' ? a.points : undefined, ms, limit, !this.kids);
     if (q?.format === 'pickall') speed = Math.min(speed, pickallCap(q.answer, a.given, MAX_BASE));
+    // trio: the room's own speed points × the share of rows right (the client's points are never used)
+    if (q?.format === 'trio') speed = Math.round(basePoints('mc', true, undefined, ms, limit, !this.kids) * trioScore(a.given, q.answer).frac);
     let raw = speed, lf = null;
     if (q?.format === 'listen' && !n && correct && !this.kids) {
       lf = listenFactors(q, a.replays);

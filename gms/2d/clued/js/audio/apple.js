@@ -1,6 +1,6 @@
 // iTunes Search API: lookup by trackId (CORS, JSONP fallback), stale-preview refresh, reveal badge.
-import { dlog, modLoaded } from '../core/debuglog.js?v=202610131439';
-import { net, appleSrc, proxyUrl } from './applenet.js?v=202610131439';
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610161020';
+import { net, appleSrc, proxyUrl } from './applenet.js?v=202610161020';
 const MOD_ID = modLoaded('apple', import.meta.url);
 
 const LOOKUP = 'https://itunes.apple.com/lookup';

@@ -33,7 +33,7 @@ await b.goto(URL); await b.waitFor('window.__cluedReady');
 await b.eval(`localStorage.clear(); localStorage.setItem('clued.settings', JSON.stringify({ timerSec: 0, bgm: false })); true`);
 await b.goto(URL); await b.waitFor('window.__cluedReady'); await b.sleep(300);
 
-await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
+await b.click('[data-mode=solo]'); await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
 await b.click('button.chip[data-v="10"]');
 await b.click('[data-act=start]');
 await b.waitFor(vis('.choice'), 20000);

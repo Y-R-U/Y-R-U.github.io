@@ -208,6 +208,7 @@ const scenarios = {
       await go(BACK, 'home');
       await go('.tile[data-mode="online"]', 'online', 8000);
       await go(BACK, 'home');
+      await go('[data-mode="solo"]', 'solo');
       await go('[data-mode="quick"]', 'formats');
       await go('[data-format="mc"]', 'setup');
       await go('button.chip[data-v="5"]', 'setup');
@@ -216,6 +217,7 @@ const scenarios = {
       await go('.hud .quit', '!!document.querySelector("#popups .pop")');
       await go('#popups .pop .btn.danger', 'setup');
       await go(BACK, 'formats');
+      await go(BACK, 'solo');
       await go(BACK, 'home');
     }
     check(`stress: ${ROUNDS} rounds, ${taps} real taps, every tap navigated`, dead === 0, log.slice(0, 5).join(' | '));

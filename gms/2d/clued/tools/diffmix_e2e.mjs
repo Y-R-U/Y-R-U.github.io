@@ -14,7 +14,7 @@ const note = () => b.eval(`document.querySelector('.diff-note')?.textContent || 
 await b.goto(URL); await b.waitFor('window.__cluedReady');
 await b.eval(`localStorage.clear(); localStorage.setItem('clued.settings', JSON.stringify({ timerSec: 0, bgm: false })); true`);
 await b.goto(URL); await b.waitFor('window.__cluedReady'); await b.sleep(300);
-await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
+await b.click('[data-mode=solo]'); await b.click('[data-mode=quick]'); await b.click('[data-format=mc]');
 await b.waitFor(vis('.diff-note'));
 ok(/Any level/.test(await note()), `Mixed: "${await note()}"`);
 const pick = async v => { await b.click(`[data-opt=difficulty] button.chip[data-v="${v}"]`); await b.sleep(150); };

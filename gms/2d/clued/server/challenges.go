@@ -136,6 +136,17 @@ func handleCreateChallenge(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, 400, "bad_score", "score out of range")
 		return
 	}
+	if allowanceCfg.On && !isAdmin(id) {
+		if uid == "" {
+			writeGate(w, 403, "signin_required", "sign in with your br8t account to create challenges", level())
+			return
+		}
+		tok, _ := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer ")
+		if res, a := spendAllowance(tok, gameID("challenge", uid, string(in.Spec), in.Score, in.Ms, total)); res == spendDenied {
+			writeNoGames(w, a)
+			return
+		}
+	}
 	qs, _ := json.Marshal(in.Questions)
 	now := nowMs()
 	cid := newChallengeID()
