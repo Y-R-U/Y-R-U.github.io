@@ -1,19 +1,19 @@
-import { h, esc } from './kit.js?v=202610161246';
-import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610161246';
-import { defineScreen, header, back, go } from './app.js?v=202610161246';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610161246';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610161246';
-import { applyAudioSettings, sfx } from './fx.js?v=202610161246';
-import { applyKids } from './home.js?v=202610161246';
-import { loadLearn, loadNet } from './net.js?v=202610161246';
-import { BUILD } from '../build.js?v=202610161246';
-import { canSpeak, speak } from './speech.js?v=202610161246';
-import { streakOption } from './streakopt.js?v=202610161246';
-import { localChip } from './local.js?v=202610161246';
-import { confirmPop, toast } from './popup.js?v=202610161246';
-import { seenInfo, resetSeen } from '../core/fresh.js?v=202610161246';
-import { mySetting, saveMySetting } from '../core/local.js?v=202610161246';
-import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610161246';
+import { h, esc } from './kit.js?v=202610161358';
+import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610161358';
+import { defineScreen, header, back, go } from './app.js?v=202610161358';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610161358';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610161358';
+import { applyAudioSettings, sfx } from './fx.js?v=202610161358';
+import { applyKids } from './home.js?v=202610161358';
+import { loadLearn, loadNet } from './net.js?v=202610161358';
+import { BUILD } from '../build.js?v=202610161358';
+import { canSpeak, speak } from './speech.js?v=202610161358';
+import { streakOption } from './streakopt.js?v=202610161358';
+import { localChip } from './local.js?v=202610161358';
+import { confirmPop, toast } from './popup.js?v=202610161358';
+import { seenInfo, resetSeen } from '../core/fresh.js?v=202610161358';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610161358';
+import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610161358';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -55,6 +55,16 @@ function passPanel() {
     h('div', { style: { display: 'flex', gap: '8px' } }, code, btn), status);
 }
 
+// Bug reports and ideas, through the shared br8t feedback panel (signed-in accounts only).
+function feedbackPanel() {
+  const note = h('small', {}, 'Goes straight to the developer.');
+  const slot = h('span');
+  import('/lib/feedback/feedback.js')
+    .then(m => slot.replaceWith(m.feedbackButton({ game: 'clued', build: BUILD, accent: '#7b61ff', className: 'btn small', label: '✉️ Write', signedOutLabel: 'Sign in', note })))
+    .catch(() => { note.textContent = 'Feedback isn’t available right now.'; });
+  return h('div.panel.set-list', { dataset: { set: 'feedback' } }, h('div.opt-row', {}, h('span.lbl', {}, 'Report a bug or suggest an idea', note), slot));
+}
+
 defineScreen('settings', (el, params = {}) => {
   const s = getSettings();
   el.append(header('Settings'));
@@ -93,6 +103,7 @@ defineScreen('settings', (el, params = {}) => {
     toggleRow('Show the kids mode switch', 'Kids mode itself is in the list above', 'homeKids'),
     toggleRow('Show the daily challenge', null, 'homeDaily')));
   el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'br8t Pass'), passPanel());
+  el.append(h('h3.sec-title', { style: { marginTop: '18px' } }, 'Feedback'), feedbackPanel());
   if (params.focus === 'pass') setTimeout(() => el.querySelector('[data-set=pass]')?.scrollIntoView({ block: 'center' }), 60);
   el.append(h('div.panel.set-list', { style: { marginTop: '14px' } }, h('div.opt-row', {}, h('span.lbl', {}, 'Your stats', h('small', {}, 'Games, accuracy, streaks, topics and history')),
     h('button.btn.small', { type: 'button', dataset: { act: 'stats' }, onclick: () => go('stats') }, '📊 Open'))));

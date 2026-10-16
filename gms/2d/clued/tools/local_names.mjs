@@ -37,6 +37,10 @@ export const DEMONYMS = {
 export const NATIONALITY_EXTRA = {
   'English': 'GBR', 'Venetian': 'ITA', 'Genoese': 'ITA', 'Irish-born British': 'GBR', 'Frankish': 'FRA', 'Roman': 'ITA', 'Macedonian': 'GRC',
   'Mughal': 'IND', 'Hong Kong': 'HKG', 'German-born': 'DEU', 'Scottish-born': 'GBR', 'US': 'USA', 'UK': 'GBR', 'Tibet': 'CHN',
+  // lane LEADERS (leaders pack nationalities)
+  'Babylonian': 'IRQ', 'Athenian': 'GRC', 'Spartan': 'GRC', 'Carthaginian': 'TUN', 'Byzantine': 'TUR', 'Malian': 'MLI', 'Wallachian': 'ROU',
+  'Khmer': 'KHM', 'Prussian': 'DEU', 'Angolan': 'AGO', 'Haitian': 'HTI', 'Zulu': 'ZAF', 'Basotho': 'LSO', 'Malagasy': 'MDG', 'Hawaiian': 'USA',
+  'Lakota': 'USA', 'Tanzanian': 'TZA', 'Liberian': 'LBR', 'Congolese': 'COD',
 };
 // words.origin (a language) → the country it is tied to; Arabic, Latin, Old Norse, Inuit… stay untagged
 export const LANG_ORIGIN = {

@@ -1,5 +1,5 @@
 {
- "build": "202610161250",
+ "build": "202610161359",
  "themes": [
   {
    "id": "animals",
@@ -3055,36 +3055,41 @@
    "theme": "people",
    "icon": "👑",
    "kids": false,
-   "items": 34,
-   "questions": 61,
+   "items": 258,
+   "questions": 463,
    "caps": {
-    "img": 32,
+    "img": 245,
     "audio": 0,
-    "itemImg": 32,
+    "itemImg": 245,
     "itemAudio": 0,
-    "clues": 31,
+    "clues": 255,
     "facts": {
      "born": "year",
      "died": "year",
      "nationality": "cat",
      "era": "cat",
-     "field": "cat"
+     "field": "cat",
+     "country": "cat",
+     "role": "cat",
+     "start": "year"
     },
     "groups": 1,
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 61
+     "mc": 463
     },
-    "easy": 32,
+    "easy": 80,
     "kidsItems": 0,
     "multi": [
      "nationality"
     ],
     "catBins": {
-     "era": 4,
-     "field": 1
+     "era": 5,
+     "field": 1,
+     "country": 13,
+     "role": 3
     },
     "formats": {
      "mc": 20,
@@ -3098,38 +3103,41 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 5,
-     "type": 20
+     "blitz60": 20,
+     "type": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 20,
      "match": 20,
-     "ladder": 16,
+     "ladder": 20,
      "hilo": 20,
      "order": 20,
      "odd": 20,
-     "sort": 5,
-     "reveal": 16,
+     "sort": 20,
+     "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 5,
-     "type": 20
+     "blitz60": 20,
+     "type": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
      "tf": 20,
      "match": 20,
-     "ladder": 16,
+     "ladder": 20,
      "hilo": 20,
      "order": 20,
      "odd": 20,
      "sort": 20,
-     "reveal": 16,
+     "reveal": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 1,
-     "type": 20
+     "connect": 20,
+     "blitz60": 7,
+     "type": 20,
+     "trio": 0
     }
    }
   },

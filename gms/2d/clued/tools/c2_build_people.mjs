@@ -124,6 +124,8 @@ for (const [id, title, theme, icon, text, factsMeta] of packs) {
   const pack = { id, title, theme, icon, kids: false, version: 1, imgPrompt: 'Which of these is {name}?', nameImgPrompt: 'Who is this?', tfImgPrompt: 'This is {name}.', factsMeta, items, questions: questions(items, id), sources: src };
   // lane SCREEN: c2_src/actors_more.mjs (tools/c2_screen_actors.mjs)
   if (id === 'actors') await (await import('./c2_screen_actors.mjs')).extendActors(pack, note);
+  // lane LEADERS: c2_src/leaders_more.mjs + country/role/came-to-power facts (tools/c2_leaders_add.mjs)
+  if (id === 'leaders') await (await import('./c2_leaders_add.mjs')).extendLeaders(pack, note);
   writePack(pack);
 }
 (await import('./c2_gender.mjs')).run();
