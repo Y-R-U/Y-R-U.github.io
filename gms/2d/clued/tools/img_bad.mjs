@@ -11,6 +11,15 @@ const SIDE = join(HERE, 'img_bad.json');
 const SKIP = new Set(['movie-moments', 'book-moments', 'tv-moments']);
 
 export const badList = () => (existsSync(SIDE) ? JSON.parse(readFileSync(SIDE, 'utf8')) : {});
+// Replacement pictures for items that lost theirs (tools/img_add.json: pack -> id -> [media]), added when missing.
+export function addImages(id, pack) {
+  const add = existsSync(join(HERE, 'img_add.json')) ? JSON.parse(readFileSync(join(HERE, 'img_add.json'), 'utf8'))[id] || {} : {};
+  for (const it of pack.items || []) for (const m of add[it.id] || []) {
+    const img = (it.media ||= {}).img ||= [];
+    if (!img.some(x => x.src === m.src)) img.push(m);
+  }
+}
+
 export function dropBad(id, pack, list = badList()) {
   const bad = new Set(list[id] || []);
   let n = 0;

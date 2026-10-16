@@ -108,7 +108,7 @@ export default {
     { n: 'Angelshark', alt: ['angel shark'], sci: 'Squatina squatina', g: 'angel shark', f: f(1.5, B, CO), d: 2,
       b: 'A flat shark that buries itself in sand and ambushes fish. It is critically endangered in Europe.',
       c: ['The Canary Islands are one of its last strongholds.', 'It is critically endangered.', 'It buries itself in sand to ambush fish.', 'It is flat like a ray.', 'Its fins spread out like wings.'] },
-    { n: 'Silky shark', sci: 'Carcharhinus falciformis', g: 'requiem shark', f: f(2.5, D, OO), d: 3,
+    { n: 'Silky shark', sci: 'Carcharhinus falciformis', noAutoImg: true, files: ['Carcharhinus falciformis off Cuba.jpg', 'Silky Shark.jpg'], g: 'requiem shark', f: f(2.5, D, OO), d: 3,
       b: 'A slender ocean shark with smooth, satiny skin. It often gathers around floating objects at sea.',
       c: ['It often follows schools of tuna.', 'It gathers under floating logs and buoys.', 'It is one of the most common ocean sharks.', 'It is slim with a rounded snout.', 'Its skin feels smooth, like a soft fabric.'] },
     { n: 'Leopard shark', sci: 'Triakis semifasciata', g: 'houndshark', f: f(1.5, H, CO), d: 2,

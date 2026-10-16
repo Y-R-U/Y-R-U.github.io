@@ -831,7 +831,13 @@
       "h": 378,
       "credit": "Tim.Reckmann",
       "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Dubai_skyline_2015_(crop).jpg"
+      "page": "https://commons.wikimedia.org/wiki/File:Dubai_skyline_2015_(crop).jpg",
+      "mark": {
+       "cx": 0.7718,
+       "cy": 0.3845,
+       "rx": 0.0958,
+       "ry": 0.3845
+      }
      }
     ]
    },
@@ -1721,12 +1727,12 @@
    "media": {
     "img": [
      {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Petite_sir%C3%A8ne_de_Copenhague_%28conforme_%C3%A0_la_loi_danoise%29.JPG/500px-Petite_sir%C3%A8ne_de_Copenhague_%28conforme_%C3%A0_la_loi_danoise%29.JPG",
+      "src": "https://thumb.wikimedia.org/wikipedia/en/thumb/7/7a/Copenhagen_-_the_little_mermaid_statue_-_2013.jpg/500px-Copenhagen_-_the_little_mermaid_statue_-_2013.jpg",
       "w": 500,
-      "h": 429,
-      "credit": "Benoît Prieur",
-      "license": "CC0",
-      "page": "https://commons.wikimedia.org/wiki/File:Petite_sir%C3%A8ne_de_Copenhague_(conforme_%C3%A0_la_loi_danoise).JPG"
+      "h": 749,
+      "credit": "Avda-berlin",
+      "license": "CC BY-SA 3.0",
+      "page": "https://en.wikipedia.org/wiki/File:Copenhagen_-_the_little_mermaid_statue_-_2013.jpg"
      }
     ]
    },
@@ -2583,12 +2589,20 @@
    "media": {
     "img": [
      {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Salar_de_Uyuni_-_panoramio_%2810%29.jpg/500px-Salar_de_Uyuni_-_panoramio_%2810%29.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Reflection_on_the_Salar_de_Uyuni%2C_bolivia.jpg/500px-Reflection_on_the_Salar_de_Uyuni%2C_bolivia.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Pavel Špindler",
-      "license": "CC BY 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Salar_de_Uyuni_-_panoramio_(10).jpg"
+      "credit": "Christopher Crouzet",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Reflection_on_the_Salar_de_Uyuni,_bolivia.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Salar_de_Uyuni_2013.jpg/500px-Salar_de_Uyuni_2013.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Kuroiniisan",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Salar_de_Uyuni_2013.jpg"
      }
     ]
    },
@@ -4060,12 +4074,20 @@
    "media": {
     "img": [
      {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Ngorongo_1.jpg/500px-Ngorongo_1.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Ngorongoro-1001-2.jpg/500px-Ngorongoro-1001-2.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Grahampurse",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ngorongoro-1001-2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Ngorongoro_Crater_%2874%29_%2813962020680%29.jpg/500px-Ngorongoro_Crater_%2874%29_%2813962020680%29.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Jantjeerkamp at Dutch Wikipedia",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Ngorongo_1.jpg"
+      "credit": "xorge",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ngorongoro_Crater_(74)_(13962020680).jpg"
      }
     ]
    },

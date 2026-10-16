@@ -1607,7 +1607,18 @@
     "The answer has 2 words (5, 5 letters).",
     "Its first letter is S."
    ],
-   "media": {},
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Carcharhinus_falciformis_off_Cuba.jpg/500px-Carcharhinus_falciformis_off_Cuba.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Alex Chernikh",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Carcharhinus_falciformis_off_Cuba.jpg"
+     }
+    ]
+   },
    "difficulty": 3
   },
   {

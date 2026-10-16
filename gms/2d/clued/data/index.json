@@ -1,5 +1,5 @@
 {
- "build": "202610161207",
+ "build": "202610161231",
  "themes": [
   {
    "id": "animals",
@@ -1748,9 +1748,9 @@
    "items": 31,
    "questions": 12,
    "caps": {
-    "img": 30,
+    "img": 31,
     "audio": 0,
-    "itemImg": 30,
+    "itemImg": 31,
     "itemAudio": 0,
     "clues": 31,
     "facts": {
@@ -1802,7 +1802,7 @@
      "odd": 9,
      "sort": 20,
      "fake": 20,
-     "reveal": 12,
+     "reveal": 13,
      "number": 13,
      "connect": 0,
      "blitz60": 4,
@@ -1819,7 +1819,7 @@
      "odd": 20,
      "sort": 2,
      "fake": 20,
-     "reveal": 12,
+     "reveal": 13,
      "number": 13,
      "connect": 0,
      "blitz60": 2,
@@ -2665,7 +2665,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 2,
-     "type": 20
+     "type": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -2681,7 +2682,8 @@
      "number": 20,
      "connect": 0,
      "blitz60": 2,
-     "type": 20
+     "type": 20,
+     "trio": 16
     },
     "formatsKids": {
      "mc": 20,
@@ -2697,7 +2699,8 @@
      "number": 20,
      "connect": 0,
      "blitz60": 2,
-     "type": 20
+     "type": 20,
+     "trio": 0
     }
    }
   },
@@ -2924,7 +2927,8 @@
      "connect": 20,
      "blitz60": 15,
      "type": 20,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -2940,7 +2944,8 @@
      "connect": 20,
      "blitz60": 15,
      "type": 20,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 19
     },
     "formatsKids": {
      "mc": 20,
@@ -2956,7 +2961,8 @@
      "connect": 20,
      "blitz60": 5,
      "type": 20,
-     "pickall": 8
+     "pickall": 8,
+     "trio": 0
     }
    }
   },
@@ -3530,7 +3536,8 @@
      "connect": 20,
      "blitz60": 4,
      "type": 20,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -3546,7 +3553,8 @@
      "connect": 20,
      "blitz60": 4,
      "type": 20,
-     "pickall": 20
+     "pickall": 20,
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -3562,7 +3570,8 @@
      "connect": 0,
      "blitz60": 1,
      "type": 20,
-     "pickall": 0
+     "pickall": 0,
+     "trio": 0
     }
    }
   },
@@ -3979,9 +3988,9 @@
    "items": 34,
    "questions": 14,
    "caps": {
-    "img": 32,
+    "img": 33,
     "audio": 0,
-    "itemImg": 32,
+    "itemImg": 33,
     "itemAudio": 0,
     "clues": 34,
     "facts": {

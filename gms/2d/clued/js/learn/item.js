@@ -1,11 +1,11 @@
 // Field guide detail card: photo carousel, blurb, facts, lookalikes, sound, read-aloud, credits.
-import { h } from '../ui/kit.js?v=202610161208';
-import { header, go } from '../ui/app.js?v=202610161208';
-import { toast } from '../ui/popup.js?v=202610161208';
-import { sfx } from '../ui/fx.js?v=202610161208';
-import { itemByRef, factRows, kidsOn, refOf } from './data.js?v=202610161208';
-import { getCards, addCards, removeCard, itemLevel } from './model.js?v=202610161208';
-import { notice, soundBtn, sayBtn, say, creditBtn, emptyState, stopAudio, put } from './ui.js?v=202610161208';
+import { h } from '../ui/kit.js?v=202610161231';
+import { header, go } from '../ui/app.js?v=202610161231';
+import { toast } from '../ui/popup.js?v=202610161231';
+import { sfx } from '../ui/fx.js?v=202610161231';
+import { itemByRef, factRows, kidsOn, refOf } from './data.js?v=202610161231';
+import { getCards, addCards, removeCard, itemLevel } from './model.js?v=202610161231';
+import { notice, soundBtn, sayBtn, say, creditBtn, emptyState, stopAudio, put } from './ui.js?v=202610161231';
 
 const LV = ['Not seen yet', 'Seen', 'Learning', 'Learned ★'];
 

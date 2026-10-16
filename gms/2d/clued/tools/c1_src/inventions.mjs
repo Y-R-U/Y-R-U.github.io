@@ -151,7 +151,7 @@ export default {
     { n: 'Laser', f: f(1960, 'Theodore Maiman', US), d: 2,
       b: 'Theodore Maiman built the first working laser in 1960 using a ruby crystal.',
       c: ['The first one used a ruby crystal.', 'Its name is short for "light amplification by stimulated emission of radiation".', 'It reads barcodes at checkouts.', 'It makes a very narrow beam.', 'It is a beam of focused light.'] },
-    { n: 'Kevlar', ln: 'Kevlar', f: f(1965, 'Stephanie Kwolek', US), d: 3,
+    { n: 'Kevlar', ln: 'Kevlar', noAutoImg: true, files: ['Aramid fiber2.jpg'], f: f(1965, 'Stephanie Kwolek', US), d: 3,
       b: 'Chemist Stephanie Kwolek invented Kevlar in 1965. It is five times stronger than steel for its weight.',
       c: ['It is five times stronger than steel by weight.', 'It was invented by a woman chemist at DuPont.', 'It is used in racing tyres.', 'It is used in bulletproof vests.', 'Its name starts with a K.'] },
     { n: 'Mobile phone', alt: ['cell phone', 'cellphone'], f: f(1973, 'Martin Cooper', US), d: 1,

@@ -6,6 +6,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { leakStems, findLeak, ALLOWED_LICENSE } from './c1_schema.mjs';
 import { dropGiveaways } from './q_giveaway.mjs';
+import { dropBad, addImages } from './img_bad.mjs';
+import { applyMarks } from './img_marks.mjs';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const PACKS = join(ROOT, 'data/packs');
@@ -168,6 +170,10 @@ function tidyPack(pack) {
 export function writePack(pack) {
   if (!pack.noun && PACK_NOUNS[pack.id]) pack.noun = PACK_NOUNS[pack.id];
   tidyPack(pack);
+  // Aaron's review verdicts: Bad pictures stay out, circled targets stay circled
+  dropBad(pack.id, pack);
+  addImages(pack.id, pack);
+  applyMarks(pack.id, pack);
   for (const q of dropGiveaways(pack)) console.warn(`  giveaway dropped ${pack.id}/${q.id}: ${q.prompt}`);
   const before = gateLog.length;
   gatePack(pack);
