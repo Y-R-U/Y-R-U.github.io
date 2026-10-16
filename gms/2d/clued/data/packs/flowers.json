@@ -199,14 +199,6 @@
       "credit": "Dina L",
       "license": "CC0 1.0",
       "page": "https://commons.wikimedia.org/wiki/File:%D7%A6%D7%91%D7%A2%D7%95%D7%A0%D7%99%D7%9D.JPG"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/275165315/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Igor Balashov",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/275165315"
      }
     ]
    },
@@ -256,14 +248,6 @@
       "credit": "André Karwath aka Aka",
       "license": "CC BY-SA 2.5",
       "page": "https://commons.wikimedia.org/wiki/File:Bellis_perennis_white_(aka).jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Bellis_perennis_-_Museo_Tazzetti_Herbarium_96-2024.tif/lossy-page1-500px-Bellis_perennis_-_Museo_Tazzetti_Herbarium_96-2024.tif.jpg",
-      "w": 500,
-      "h": 607,
-      "credit": "Epgrande",
-      "license": "CC BY 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Bellis_perennis_-_Museo_Tazzetti_Herbarium_96-2024.tif"
      }
     ]
    },
@@ -603,14 +587,6 @@
       "credit": "Kieran Roy Powell",
       "license": "CC BY 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Papaver_rhoeas_Lincolnshire_2026.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114734771/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Eleftherios Katsillis",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/114734771"
      }
     ]
    },
@@ -1043,14 +1019,6 @@
       "credit": "草花写真館",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:W_carnation4051.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/52411785/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Jason Grant",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/52411785"
      }
     ]
    },
@@ -1201,14 +1169,6 @@
       "credit": "Meneerke bloem",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Paeonia_officinalis_01.JPG"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/275394133/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Ljaž",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/275394133"
      }
     ]
    },
@@ -1257,14 +1217,6 @@
       "credit": "Tony Rebelo",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/31091656"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/439784619/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Claude Kolwelter",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/439784619"
      }
     ]
    },
@@ -1311,14 +1263,6 @@
       "credit": "Salicyna",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Convallaria_majalis_2016-11-08_4871.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42995958/medium.jpeg",
-      "w": 500,
-      "h": 382,
-      "credit": "Vladimir",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/42995958"
      }
     ]
    },
@@ -1424,14 +1368,6 @@
       "credit": "Patrick Hacker",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/248589470"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54579998/medium.jpeg",
-      "w": 500,
-      "h": 335,
-      "credit": "Douglas Goldman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/54579998"
      }
     ]
    },
@@ -1547,14 +1483,6 @@
       "credit": "AnRo0002",
       "license": "CC0 1.0",
       "page": "https://commons.wikimedia.org/wiki/File:20130407Viola_odorata1.jpg"
-     },
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Viola_odorata1.jpg",
-      "w": 500,
-      "h": 632,
-      "credit": "Carl Axel Magnus Lindman",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Viola_odorata1.jpg"
      }
     ]
    },
@@ -1596,22 +1524,6 @@
       "credit": "Wikimedia Commons",
       "license": "Public domain",
       "page": "https://commons.wikimedia.org/wiki/File:Illustration_Ranunculus_acris0.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102792039/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Daniel Cahen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/102792039"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/178823211/medium.jpg",
-      "w": 500,
-      "h": 335,
-      "credit": "Douglas Goldman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/178823211"
      }
     ]
    },
@@ -1924,14 +1836,6 @@
       "credit": "Cas Liber",
       "license": "Public domain",
       "page": "https://commons.wikimedia.org/wiki/File:Banksia_serrata_Henry_Hd_email.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Banksia_serrata_regrowth_Booti_Booti.jpg/330px-Banksia_serrata_regrowth_Booti_Booti.jpg",
-      "w": 330,
-      "h": 440,
-      "credit": "Casliber",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Banksia_serrata_regrowth_Booti_Booti.jpg"
      },
      {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Proteaceae_-_Banksia_serrata.JPG/330px-Proteaceae_-_Banksia_serrata.JPG",
@@ -2265,14 +2169,6 @@
       "credit": "Dmitry Makeev",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Unidentified_Gerbera.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15793969/medium.jpg",
-      "w": 500,
-      "h": 339,
-      "credit": "Wynand Uys",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/15793969"
      }
     ]
    },
@@ -2425,14 +2321,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Starr_030418-0058_Bougainvillea_spectabilis.jpg"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Bugambilia_IIE.jpg/500px-Bugambilia_IIE.jpg",
-      "w": 500,
-      "h": 360,
-      "credit": "Claudio.molina.salinas",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Bugambilia_IIE.jpg"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Bougainvillea_closeup.jpg/500px-Bougainvillea_closeup.jpg",
       "w": 500,
       "h": 333,
@@ -2488,14 +2376,6 @@
       "credit": "harum.koh",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/3190034"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/307161003/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/307161003"
      }
     ]
    },
@@ -2544,14 +2424,6 @@
       "credit": "Plantman",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Hyacinth_flower.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/258425794/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "florawhite",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/258425794"
      }
     ]
    },

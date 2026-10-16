@@ -80,14 +80,6 @@
       "credit": "Avispa marina.jpg: Guido Gautsch, Toyota, Japan derivative work: Mithril (talk)",
       "license": "CC BY-SA 2.0",
       "page": "https://commons.wikimedia.org/wiki/File:Avispa_marina_cropped.png"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/157640089/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Kai Squires",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/157640089"
      }
     ]
    },
@@ -133,14 +125,6 @@
       "credit": "Lisa-ann Gershwin",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/148301255"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/148301257/medium.jpg",
-      "w": 500,
-      "h": 362,
-      "credit": "GondwanaGirl 04:29, 6 January 2009 (UTC)",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/148301257"
      }
     ]
    },
@@ -245,14 +229,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/660769247/medium.jpg",
-      "w": 334,
-      "h": 500,
-      "credit": "tunicatedreamz",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/660769247"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/463115994/medium.jpeg",
       "w": 500,
@@ -565,14 +541,6 @@
       "credit": "Bachware",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Turritopsis_dohrnii_(cropped).jpg"
-     },
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/7/74/Turritopsis_dohrnii.jpg",
-      "w": 500,
-      "h": 320,
-      "credit": "Bachware",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Turritopsis_dohrnii.jpg"
      }
     ]
    },
@@ -1151,14 +1119,6 @@
       "credit": "Photo by and (C)2007 Derek Ramsey (Ram-Man)",
       "license": "CC BY-SA 2.5",
       "page": "https://commons.wikimedia.org/wiki/File:Red_Lionfish_Pterois_volitans_Left_Side_2460px.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70521568/medium.png",
-      "w": 500,
-      "h": 362,
-      "credit": "Jens Petersen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/70521568"
      }
     ]
    },
@@ -1207,14 +1167,6 @@
       "credit": "desertnaturalist",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/40594012"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60648752/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Kai Squires",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/60648752"
      }
     ]
    },

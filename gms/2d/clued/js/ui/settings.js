@@ -1,19 +1,19 @@
-import { h, esc } from './kit.js?v=202610161139';
-import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610161139';
-import { defineScreen, header, back, go } from './app.js?v=202610161139';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610161139';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610161139';
-import { applyAudioSettings, sfx } from './fx.js?v=202610161139';
-import { applyKids } from './home.js?v=202610161139';
-import { loadLearn, loadNet } from './net.js?v=202610161139';
-import { BUILD } from '../build.js?v=202610161139';
-import { canSpeak, speak } from './speech.js?v=202610161139';
-import { streakOption } from './streakopt.js?v=202610161139';
-import { localChip } from './local.js?v=202610161139';
-import { confirmPop, toast } from './popup.js?v=202610161139';
-import { seenInfo, resetSeen } from '../core/fresh.js?v=202610161139';
-import { mySetting, saveMySetting } from '../core/local.js?v=202610161139';
-import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610161139';
+import { h, esc } from './kit.js?v=202610161208';
+import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610161208';
+import { defineScreen, header, back, go } from './app.js?v=202610161208';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610161208';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610161208';
+import { applyAudioSettings, sfx } from './fx.js?v=202610161208';
+import { applyKids } from './home.js?v=202610161208';
+import { loadLearn, loadNet } from './net.js?v=202610161208';
+import { BUILD } from '../build.js?v=202610161208';
+import { canSpeak, speak } from './speech.js?v=202610161208';
+import { streakOption } from './streakopt.js?v=202610161208';
+import { localChip } from './local.js?v=202610161208';
+import { confirmPop, toast } from './popup.js?v=202610161208';
+import { seenInfo, resetSeen } from '../core/fresh.js?v=202610161208';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610161208';
+import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610161208';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();

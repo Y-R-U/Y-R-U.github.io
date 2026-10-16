@@ -392,14 +392,6 @@
       "credit": "Sandra Keller",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/204425017"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/432986602/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "Sidonio Paes",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/432986602"
      }
     ]
    },
@@ -565,22 +557,6 @@
       "credit": "Kris Mikael Krister",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/86555463"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/253901905/medium.jpeg",
-      "w": 500,
-      "h": 379,
-      "credit": "ecovore",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/253901905"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31652382/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "coenobita",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/31652382"
      }
     ]
    },
@@ -803,14 +779,6 @@
       "credit": "alicia penney",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/242252421"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/44945731/medium.jpeg",
-      "w": 500,
-      "h": 246,
-      "credit": "Lawrence Troup",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/44945731"
      }
     ]
    },
@@ -852,22 +820,6 @@
       "credit": "Hemming1952",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/62876037"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62876039/medium.jpg",
-      "w": 500,
-      "h": 334,
-      "credit": "Julian Idrobo",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/62876039"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/446406287/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Julien Savoie",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/446406287"
      }
     ]
    },
@@ -997,14 +949,6 @@
       "credit": "Lawrence Hylton",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/553150641"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/109559903/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Lek Khauv",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/109559903"
      }
     ]
    },
@@ -1513,14 +1457,6 @@
       "page": "https://www.inaturalist.org/photos/86554426"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/190530813/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Uwe Schneehagen",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/190530813"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102351331/medium.jpeg",
       "w": 500,
       "h": 335,
@@ -1581,14 +1517,6 @@
       "credit": "Georgina Jones",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/441886621"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/236884888/medium.jpg",
-      "w": 500,
-      "h": 335,
-      "credit": "Georgina Jones",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/236884888"
      }
     ]
    },
@@ -1679,18 +1607,7 @@
     "The answer has 2 words (5, 5 letters).",
     "Its first letter is S."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/428589176/medium.jpg",
-      "w": 500,
-      "h": 334,
-      "credit": "Rafael Rosa",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/428589176"
-     }
-    ]
-   },
+   "media": {},
    "difficulty": 3
   },
   {
@@ -1736,14 +1653,6 @@
       "credit": "Brian Gratwicke",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/22868665"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/51346720/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "dmoders",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/51346720"
      }
     ]
    },
@@ -1831,14 +1740,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/340689858/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "GayleIsTired",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/340689858"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30422274/medium.jpg",
       "w": 500,

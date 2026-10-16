@@ -1,16 +1,16 @@
 // Round lists shared by the pub quiz builder and the online host setup: round cards (edit/remove/reorder),
 // the "add a round" picker (♥ favourites first, then formats) and the round editor screen ('pqround').
-import { defineScreen, go, back, header } from '../ui/app.js?v=202610161139';
-import { h } from '../ui/kit.js?v=202610161139';
-import { popup, toast } from '../ui/popup.js?v=202610161139';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610161139';
-import { getIndex } from '../core/packs.js?v=202610161139';
-import { supportedPackIds } from '../core/spec.js?v=202610161139';
-import { getSettings, getFavs } from '../core/store.js?v=202610161139';
-import { cleanFav, favKey, favLabel } from '../ui/favmodel.js?v=202610161139';
-import { optionsPanel } from '../ui/setup.js?v=202610161139';
-import { sfx } from '../ui/fx.js?v=202610161139';
-import { mySetting } from '../core/local.js?v=202610161139';
+import { defineScreen, go, back, header } from '../ui/app.js?v=202610161208';
+import { h } from '../ui/kit.js?v=202610161208';
+import { popup, toast } from '../ui/popup.js?v=202610161208';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610161208';
+import { getIndex } from '../core/packs.js?v=202610161208';
+import { supportedPackIds } from '../core/spec.js?v=202610161208';
+import { getSettings, getFavs } from '../core/store.js?v=202610161208';
+import { cleanFav, favKey, favLabel } from '../ui/favmodel.js?v=202610161208';
+import { optionsPanel } from '../ui/setup.js?v=202610161208';
+import { sfx } from '../ui/fx.js?v=202610161208';
+import { mySetting } from '../core/local.js?v=202610161208';
 
 const CSS = `
 .round-card.rc { grid-template-columns: 44px minmax(0, 1fr) auto; cursor: pointer; }

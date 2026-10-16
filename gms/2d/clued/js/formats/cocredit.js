@@ -1,6 +1,6 @@
 // Shared credits ("Ron Clements, John Musker"): a question names only the best-known person (most credits across the
 // packs, ties to the first listed); the other co-credits never turn up as wrong options. Data: tools/trio_cocredit.mjs.
-import FAME from './cocredit_data.js?v=202610161139';
+import FAME from './cocredit_data.js?v=202610161208';
 
 export const CREDIT_KEYS = new Set(['director', 'author', 'inventor']);
 const SPLIT = /\s*,\s*|\s+and\s+|\s*&\s*/i;

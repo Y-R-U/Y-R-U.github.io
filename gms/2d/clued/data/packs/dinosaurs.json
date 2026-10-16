@@ -135,22 +135,6 @@
       "credit": "Nobu Tamura",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Tyrannosaurus_rex_Reconstruction_by_Nobu_Tamura.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Baby_T-rex_0496.JPG/500px-Baby_T-rex_0496.JPG",
-      "w": 500,
-      "h": 318,
-      "credit": "Conty",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Baby_T-rex_0496.JPG"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Embri%C3%A3o_e_ovo_de_Tiranossauro_rex_MN_01.jpg/330px-Embri%C3%A3o_e_ovo_de_Tiranossauro_rex_MN_01.jpg",
-      "w": 330,
-      "h": 694,
-      "credit": "Dornicke",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Embri%C3%A3o_e_ovo_de_Tiranossauro_rex_MN_01.jpg"
      }
     ]
    },
@@ -326,14 +310,6 @@
       "credit": "Eduard Solà Vázquez",
       "license": "CC BY 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Velociraptor_skeleton_white_background.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Velociraptor_skull_cr%C3%A2ne_2.png/500px-Velociraptor_skull_cr%C3%A2ne_2.png",
-      "w": 500,
-      "h": 375,
-      "credit": "Zil-fr & Poke2001",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Velociraptor_skull_cr%C3%A2ne_2.png"
      }
     ]
    },
@@ -608,22 +584,6 @@
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Spinosaurus_new_skull.jpg/330px-Spinosaurus_new_skull.jpg",
-      "w": 330,
-      "h": 495,
-      "credit": "Mike Bowler from Canada",
-      "license": "CC BY 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Spinosaurus_new_skull.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Spinosaurus_skull_steveoc.jpg/500px-Spinosaurus_skull_steveoc.jpg",
-      "w": 500,
-      "h": 281,
-      "credit": "Steveoc 86",
-      "license": "CC BY 2.5",
-      "page": "https://commons.wikimedia.org/wiki/File:Spinosaurus_skull_steveoc.jpg"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Spinosaurus_Model_%282%29.png/500px-Spinosaurus_Model_%282%29.png",
       "w": 500,
       "h": 329,
@@ -850,14 +810,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Iguanodon_new_NT.jpg"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Iguanodon_bernissartensis_skull.JPG/500px-Iguanodon_bernissartensis_skull.JPG",
-      "w": 500,
-      "h": 375,
-      "credit": "LadyofHats",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Iguanodon_bernissartensis_skull.JPG"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Iguanodon_Dinopark.jpg/500px-Iguanodon_Dinopark.jpg",
       "w": 500,
       "h": 375,
@@ -913,14 +865,6 @@
       "credit": "Nobu Tamura (http://spinops.blogspot.com)",
       "license": "CC BY 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Dracorex_BW.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Pachycephalosaurus_ontogeny_skulls_-_Museum_of_the_Rockies_-_2013-07-08.jpg/500px-Pachycephalosaurus_ontogeny_skulls_-_Museum_of_the_Rockies_-_2013-07-08.jpg",
-      "w": 500,
-      "h": 441,
-      "credit": "Tim Evanson",
-      "license": "CC BY-SA 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Pachycephalosaurus_ontogeny_skulls_-_Museum_of_the_Rockies_-_2013-07-08.jpg"
      }
     ]
    },
@@ -955,14 +899,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Berlin_Archaeopteryx.jpg/500px-Berlin_Archaeopteryx.jpg",
-      "w": 500,
-      "h": 597,
-      "credit": "Emily Willoughby (emily.a.willoughby@gmail.com)",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Berlin_Archaeopteryx.jpg"
-     },
      {
       "src": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Archaeopteryx_NT.jpg",
       "w": 500,
@@ -1025,14 +961,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Giganotos_Db.jpg"
      },
      {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/0/06/Giganotosaurus_skull.jpg",
-      "w": 500,
-      "h": 360,
-      "credit": "No machine-readable author provided. Barracuda1983 assumed (based on copyright claims).",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Giganotosaurus_skull.jpg"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Giganotosaurus_at_Fernbank.jpg/500px-Giganotosaurus_at_Fernbank.jpg",
       "w": 500,
       "h": 245,
@@ -1091,14 +1019,6 @@
       "credit": "AStrangerintheAlps",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Carnotaurus_Skull.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Carnotaurus_skin.jpg/500px-Carnotaurus_skin.jpg",
-      "w": 500,
-      "h": 336,
-      "credit": "Published by Rafael Delcourt.",
-      "license": "CC BY 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Carnotaurus_skin.jpg"
      }
     ]
    },
@@ -1199,14 +1119,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Compsognathus_TD.png"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Compsognathus_longipes_01.JPG/500px-Compsognathus_longipes_01.JPG",
-      "w": 500,
-      "h": 604,
-      "credit": "H. Zell",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Compsognathus_longipes_01.JPG"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/Compsognathus.jpg/500px-Compsognathus.jpg",
       "w": 500,
       "h": 176,
@@ -1257,14 +1169,6 @@
       "credit": "Nobu Tamura (http://spinops.blogspot.com)",
       "license": "CC BY 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Argentinosaurus_BW.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Museo_de_La_Plata_-_Argentinosaurus_%28f%C3%A9mur%29.jpg/330px-Museo_de_La_Plata_-_Argentinosaurus_%28f%C3%A9mur%29.jpg",
-      "w": 330,
-      "h": 493,
-      "credit": "Beatrice Murch from Buenos Aires, Argentina",
-      "license": "CC BY 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Museo_de_La_Plata_-_Argentinosaurus_(f%C3%A9mur).jpg"
      },
      {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Argentinosaurus_skeleton%2C_PLoS_ONE.png/500px-Argentinosaurus_skeleton%2C_PLoS_ONE.png",
@@ -1322,14 +1226,6 @@
       "credit": "Original uploader was Firsfron at en.wikipedia",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Gallimimus_1_NHM3.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Gallimimus_bullatus.002_-_Natural_History_Museum_of_London_%28white_background%29.JPG/500px-Gallimimus_bullatus.002_-_Natural_History_Museum_of_London_%28white_background%29.JPG",
-      "w": 500,
-      "h": 373,
-      "credit": "Drow male",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Gallimimus_bullatus.002_-_Natural_History_Museum_of_London_(white_background).JPG"
      }
     ]
    },
@@ -1364,14 +1260,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Oviraptor_holotype.jpg/500px-Oviraptor_holotype.jpg",
-      "w": 500,
-      "h": 444,
-      "credit": "Internet Archive Book Images",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Oviraptor_holotype.jpg"
-     },
      {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Oviraptor_Restoration.png/500px-Oviraptor_Restoration.png",
       "w": 500,
@@ -1413,14 +1301,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Therizinosaurus_arms.jpg/500px-Therizinosaurus_arms.jpg",
-      "w": 500,
-      "h": 462,
-      "credit": "Yuya Tamai from Gifu, Japan",
-      "license": "CC BY 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Therizinosaurus_arms.jpg"
-     },
      {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Therizinosaurus_Restoration.png/500px-Therizinosaurus_Restoration.png",
       "w": 500,
@@ -1651,14 +1531,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Baryonyx_walkeri_restoration.jpg"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Baryonix_skull_43553.JPG/500px-Baryonix_skull_43553.JPG",
-      "w": 500,
-      "h": 334,
-      "credit": "Ghedoghedo",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Baryonix_skull_43553.JPG"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Baryonyx_walkeri_mount_NMNS.jpg/500px-Baryonyx_walkeri_mount_NMNS.jpg",
       "w": 500,
       "h": 219,
@@ -1714,14 +1586,6 @@
       "credit": "Michiel Petrified Forest from Petrified Forest, USA",
       "license": "Public domain",
       "page": "https://commons.wikimedia.org/wiki/File:Coelophysis_size_flipped.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Raptor_Skeleton_%2836492878135%29.jpg/500px-Raptor_Skeleton_%2836492878135%29.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Gary Todd from Xinzheng, China",
-      "license": "CC0 1.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Raptor_Skeleton_(36492878135).jpg"
      }
     ]
    },
@@ -1929,14 +1793,6 @@
       "credit": "Artwork: T. Tischler, Australian Age of Dinosaurs Museum of Natural History (edited by …",
       "license": "CC BY 2.5",
       "page": "https://commons.wikimedia.org/wiki/File:Australovenator_wintonensis.png"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Banjo_Australovenator.jpg/500px-Banjo_Australovenator.jpg",
-      "w": 500,
-      "h": 406,
-      "credit": "Talisen",
-      "license": "CC BY 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Banjo_Australovenator.jpg"
      }
     ]
    },
@@ -2302,14 +2158,6 @@
       "credit": "Ballista at English Wikipedia",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Ichthyosaurus_breviceps_2.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Ichthyosaurus_anningae_trio_NT_small.jpg/500px-Ichthyosaurus_anningae_trio_NT_small.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Nobu Tamura email:nobu.tamura@yahoo.com http://spinops.blogspot.com/",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Ichthyosaurus_anningae_trio_NT_small.jpg"
      }
     ]
    },
@@ -2414,22 +2262,6 @@
       "credit": "Karen Carr",
       "license": "CC BY 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:VMNH_megalodon.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Carcharocles_megalodon_%28Agassz%2C_1837%29_1.jpg/500px-Carcharocles_megalodon_%28Agassz%2C_1837%29_1.jpg",
-      "w": 500,
-      "h": 511,
-      "credit": "Géry PARENT",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Carcharocles_megalodon_(Agassz,_1837)_1.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Carcharodon_megalodon_P1060082.jpg/330px-Carcharodon_megalodon_P1060082.jpg",
-      "w": 330,
-      "h": 440,
-      "credit": "Gunnar Ries Amphibol",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Carcharodon_megalodon_P1060082.jpg"
      }
     ]
    },
@@ -2750,26 +2582,7 @@
     "The answer is one word of 9 letters.",
     "Its first letter is T."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Titanoboa_NT.jpg/500px-Titanoboa_NT.jpg",
-      "w": 500,
-      "h": 303,
-      "credit": "Nobu Tamura email:nobu.tamura@yahoo.com www.palaeocritti.com",
-      "license": "CC BY 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Titanoboa_NT.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Titanoboa_paratype_precloacal_vertebra_UF-IGM_2_edited_with_scale_bar.jpg/500px-Titanoboa_paratype_precloacal_vertebra_UF-IGM_2_edited_with_scale_bar.jpg",
-      "w": 500,
-      "h": 508,
-      "credit": "Gretarsson",
-      "license": "CC BY 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Titanoboa_paratype_precloacal_vertebra_UF-IGM_2_edited_with_scale_bar.jpg"
-     }
-    ]
-   },
+   "media": {},
    "difficulty": 2
   },
   {
@@ -2801,22 +2614,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Dunkleosteus_terrelli_%28fossil_fish%29_%28Cleveland_Shale_Member%2C_Ohio_Shale%2C_Upper_Devonian%3B_Rocky_River_Valley%2C_Cleveland%2C_Ohio%2C_USA%29_16_%2833289195654%29.jpg/500px-Dunkleosteus_terrelli_%28fossil_fish%29_%28Cleveland_Shale_Member%2C_Ohio_Shale%2C_Upper_Devonian%3B_Rocky_River_Valley%2C_Cleveland%2C_Ohio%2C_USA%29_16_%2833289195654%29.jpg",
-      "w": 500,
-      "h": 390,
-      "credit": "James St. John",
-      "license": "CC BY 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Dunkleosteus_terrelli_(fossil_fish)_(Cleveland_Shale_Member,_Ohio_Shale,_Upper_Devonian;_Rocky_River_Valley,_Cleveland,_Ohio,_USA)_16_(33289195654).jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/Dunkleosteus_marsaisi_marocco.JPG/330px-Dunkleosteus_marsaisi_marocco.JPG",
-      "w": 330,
-      "h": 440,
-      "credit": "Ghedoghedo",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Dunkleosteus_marsaisi_marocco.JPG"
-     },
      {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Dunkleosteus_terrelli_2024_reconstruction.jpg/500px-Dunkleosteus_terrelli_2024_reconstruction.jpg",
       "w": 500,

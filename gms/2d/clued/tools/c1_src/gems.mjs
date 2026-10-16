@@ -44,7 +44,7 @@ export default {
     { n: 'Opal', f: f(G, 'Multicoloured', 6, 'October'), d: 1,
       b: 'A gemstone that flashes rainbow colours. Australia produces almost all the world\'s precious opal.',
       c: ['It contains water.', 'Coober Pedy residents live underground to mine it.', 'Its flashes of colour are called "play of colour".', 'Australia mines almost all of the world\'s supply.', 'It flashes all the colours of the rainbow.'] },
-    { n: 'Pearl', f: f(O, 'Colourless or white', 3, 'June'), d: 1,
+    { n: 'Pearl', noAutoImg: true, files: ['Pearls.jpg', 'White pearl necklace.jpg'], f: f(O, 'Colourless or white', 3, 'June'), d: 1,
       b: 'A shiny gem made inside the shell of an oyster or mussel. It is the only gem made by a living animal.',
       c: ['Most sold today are farmed.', 'It dissolves in vinegar.', 'Layers of nacre build it up.', 'It forms inside an oyster.', 'It is a shiny white gem from the sea.'] },
     { n: 'Jade', alt: ['jadeite', 'nephrite'], f: f(G, 'Green', 6.5), d: 1, look: ['Emerald', 'Malachite'],

@@ -3,9 +3,9 @@
 // New AI pictures wait in data/candidates/*.json (refs "<pack>:new/<key>", never loaded by the game) until
 // tools/img_promote.mjs moves the OK ones into the live pack; an OK candidate verdict then carries over to the live copy.
 // A picture can also carry a drawn circle around the target (mark, 0–1 image coordinates); tools/img_marks.mjs puts those in the packs.
-import { h, markRect } from '../ui/kit.js?v=202610161139';
-import { toast } from '../ui/popup.js?v=202610161139';
-import { API } from './api.js?v=202610161139';
+import { h, markRect } from '../ui/kit.js?v=202610161208';
+import { toast } from '../ui/popup.js?v=202610161208';
+import { API } from './api.js?v=202610161208';
 
 const root = document.getElementById('rv');
 const gate = document.getElementById('gate');
@@ -268,6 +268,8 @@ async function markOk(list, btn) {
     } catch (e) { failed.push({ part, err: e.message }); }
   }
   summary(); render();
+  // the "to review" list has refilled with the next page: start it from the top
+  if (done) window.scrollTo({ top: 0, behavior: 'smooth' });
   const box = more.querySelector('.rv-fails');
   if (!failed.length || !box) { if (done) toast(`Marked ${done} OK`); return; }
   const n = failed.reduce((s, f) => s + f.part.length, 0);

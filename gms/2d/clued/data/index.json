@@ -1,5 +1,5 @@
 {
- "build": "202610161134",
+ "build": "202610161207",
  "themes": [
   {
    "id": "animals",
@@ -689,7 +689,7 @@
      "blitz60": 4,
      "type": 20,
      "quote": 0,
-     "trio": 17
+     "trio": 18
     },
     "formatsEasy": {
      "mc": 20,
@@ -1154,9 +1154,9 @@
    "items": 51,
    "questions": 12,
    "caps": {
-    "img": 49,
+    "img": 48,
     "audio": 0,
-    "itemImg": 49,
+    "itemImg": 48,
     "itemAudio": 0,
     "clues": 51,
     "facts": {
@@ -1748,9 +1748,9 @@
    "items": 31,
    "questions": 12,
    "caps": {
-    "img": 31,
+    "img": 30,
     "audio": 0,
-    "itemImg": 31,
+    "itemImg": 30,
     "itemAudio": 0,
     "clues": 31,
     "facts": {
@@ -1802,7 +1802,7 @@
      "odd": 9,
      "sort": 20,
      "fake": 20,
-     "reveal": 13,
+     "reveal": 12,
      "number": 13,
      "connect": 0,
      "blitz60": 4,
@@ -1819,7 +1819,7 @@
      "odd": 20,
      "sort": 2,
      "fake": 20,
-     "reveal": 13,
+     "reveal": 12,
      "number": 13,
      "connect": 0,
      "blitz60": 2,
@@ -3979,9 +3979,9 @@
    "items": 34,
    "questions": 14,
    "caps": {
-    "img": 33,
+    "img": 32,
     "audio": 0,
-    "itemImg": 33,
+    "itemImg": 32,
     "itemAudio": 0,
     "clues": 34,
     "facts": {
