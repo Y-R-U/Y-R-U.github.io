@@ -1,6 +1,6 @@
 // Sound, haptics and confetti. Sound goes through AU's js/audio/sfx.js when it loads; tiny beeps until then.
-import { BUILD } from '../build.js?v=202610161047';
-import { getSettings } from '../core/store.js?v=202610161047';
+import { BUILD } from '../build.js?v=202610161056';
+import { getSettings } from '../core/store.js?v=202610161056';
 
 let sfxMod = null;
 import(`../audio/sfx.js?v=${BUILD}`).then(m => {

@@ -1,17 +1,17 @@
 // Local focus UI: the compact "📍 Japan focus · Most" chip + its editor popup, the per-round local line (with the
 // Keep / Change warning when a round can't reach its share), the rounds total, and the picker's per-pack counts.
-import { h } from './kit.js?v=202610161047';
-import { popup } from './popup.js?v=202610161047';
+import { h } from './kit.js?v=202610161056';
+import { popup } from './popup.js?v=202610161056';
 import {
   LEVELS, SHARE, isOn, specLocal, localLabel, levelLabel, countryName, countryList, detectCountry, loadPlaces, loadNames, loadTags, loadLocalGeo,
   hasHomeGeo, packHasLocal, easeView, localView, isLocalQ, targetOf,
-} from '../core/local.js?v=202610161047';
-import { buildQuestions, makeSpec, kidsView } from '../core/spec.js?v=202610161047';
-import { loadPack } from '../core/packs.js?v=202610161047';
-import { rngFrom } from '../core/rng.js?v=202610161047';
-import { defaultOpts } from '../formats/registry.js?v=202610161047';
-import { homeQuestions, HOME_FORMATS, HOME_PACKS } from '../core/localgeo.js?v=202610161047';
-import { loadIndex as loadGeoIndex, geo as GEO } from '../geo/data.js?v=202610161047';
+} from '../core/local.js?v=202610161056';
+import { buildQuestions, makeSpec, kidsView } from '../core/spec.js?v=202610161056';
+import { loadPack } from '../core/packs.js?v=202610161056';
+import { rngFrom } from '../core/rng.js?v=202610161056';
+import { defaultOpts } from '../formats/registry.js?v=202610161056';
+import { homeQuestions, HOME_FORMATS, HOME_PACKS } from '../core/localgeo.js?v=202610161056';
+import { loadIndex as loadGeoIndex, geo as GEO } from '../geo/data.js?v=202610161056';
 
 export const localReady = Promise.all([loadPlaces(), loadNames(), loadTags(), loadLocalGeo()]).catch(() => null);
 

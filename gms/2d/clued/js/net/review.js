@@ -3,9 +3,9 @@
 // New AI pictures wait in data/candidates/*.json (refs "<pack>:new/<key>", never loaded by the game) until
 // tools/img_promote.mjs moves the OK ones into the live pack; an OK candidate verdict then carries over to the live copy.
 // A picture can also carry a drawn circle around the target (mark, 0–1 image coordinates); tools/img_marks.mjs puts those in the packs.
-import { h, markRect } from '../ui/kit.js?v=202610161047';
-import { toast } from '../ui/popup.js?v=202610161047';
-import { API } from './api.js?v=202610161047';
+import { h, markRect } from '../ui/kit.js?v=202610161056';
+import { toast } from '../ui/popup.js?v=202610161056';
+import { API } from './api.js?v=202610161056';
 
 const root = document.getElementById('rv');
 const gate = document.getElementById('gate');
@@ -118,6 +118,7 @@ function summary() {
     h('span', {}, h('b', {}, String(ok)), ' OK'),
     h('span', {}, h('b', {}, String(bad)), ' bad'),
     h('span', {}, h('b', {}, String(marked)), ' circled'));
+  refreshRest?.();
 }
 
 function filtered() {
@@ -226,29 +227,66 @@ function card(p) {
 
 const grid = h('div.rv-grid');
 const more = h('div.rv-more');
-let confirmAll = 0;
+// "Mark the rest OK": every listed picture (this pack, this filter, the pages shown) that has no verdict yet.
+// Two taps (no modal), saved in batches with a progress count; failed batches are listed and can be retried.
+const BATCH = 50;
+let refreshRest = null;
+function restOk(page) {
+  const todo = () => page.filter(p => !verdictOf(p));
+  const btn = h('button.btn.go.rv-rest', { type: 'button' });
+  let armed = 0, timer = null;
+  refreshRest = () => {
+    if (btn.disabled) return;
+    const n = todo().length;
+    btn.hidden = !n;
+    btn.textContent = armed ? `Tap again to mark ${n} as OK` : `✓ Mark the rest OK (${n})`;
+  };
+  btn.addEventListener('click', async () => {
+    if (!armed) {
+      armed = 1; refreshRest();
+      timer = setTimeout(() => { armed = 0; refreshRest(); }, 4000);
+      return;
+    }
+    clearTimeout(timer);
+    btn.disabled = true;
+    await markOk(todo(), btn);
+  });
+  refreshRest();
+  return btn;
+}
+
+async function markOk(list, btn) {
+  const failed = [];
+  let done = 0;
+  for (let i = 0; i < list.length; i += BATCH) {
+    const part = list.slice(i, i + BATCH);
+    btn.textContent = `Saving… ${done} of ${list.length}`;
+    try {
+      await call('POST', '/admin/imgreview', { items: part.map(p => ({ ref: p.ref, src: p.src, verdict: 'ok' })) });
+      part.forEach(p => reviews.set(p.ref, { ref: p.ref, src: p.src, verdict: 'ok' }));
+      done += part.length;
+    } catch (e) { failed.push({ part, err: e.message }); }
+  }
+  summary(); render();
+  const box = more.querySelector('.rv-fails');
+  if (!failed.length || !box) { if (done) toast(`Marked ${done} OK`); return; }
+  const n = failed.reduce((s, f) => s + f.part.length, 0);
+  const retry = h('button.btn', { type: 'button' }, `Retry ${n}`);
+  retry.addEventListener('click', () => { retry.disabled = true; markOk(failed.flatMap(f => f.part.filter(p => !verdictOf(p))), retry); });
+  box.replaceChildren(h('p.rv-err', {}, `${done} saved, ${n} not saved (${failed[0].err}): `,
+    ...failed.flatMap(f => f.part).slice(0, 12).map(p => h('span', {}, `${p.name || p.ref}; `)), n > 12 ? `and ${n - 12} more. ` : ''), retry);
+}
+
 function render() {
   const list = filtered();
   const page = list.slice(0, view.shown);
   grid.classList.toggle('compact', view.compact);
   grid.replaceChildren(...page.map(card));
   if (!list.length) grid.append(h('p.muted', {}, view.show === 'todo' ? 'Nothing left to review here.' : 'No pictures match.'));
-  const todo = page.filter(p => !verdictOf(p));
-  const allOk = h('button.btn.go', { type: 'button' }, `Mark the ${todo.length} unmarked above OK`);
-  allOk.hidden = !todo.length;
-  allOk.addEventListener('click', async () => {
-    if (Date.now() - confirmAll > 4000) { confirmAll = Date.now(); allOk.textContent = `Tap again to mark ${todo.length} OK`; return; }
-    confirmAll = 0;
-    allOk.disabled = true;
-    try {
-      await save(todo.map(p => ({ ref: p.ref, src: p.src, verdict: 'ok' })));
-      todo.forEach(p => reviews.set(p.ref, { ref: p.ref, src: p.src, verdict: 'ok' }));
-      summary(); render();
-    } catch { allOk.disabled = false; }
-  });
+  more.replaceChildren(restOk(page), h('div.rv-fails'));
   const next = h('button.btn', { type: 'button', onclick: () => { view.shown += PAGE; render(); } }, `Show more (${list.length - page.length} left)`);
   next.hidden = list.length <= page.length;
-  more.replaceChildren(allOk, next);
+  more.append(next);
 }
 
 function controls() {

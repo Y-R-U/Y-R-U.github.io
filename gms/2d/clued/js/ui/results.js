@@ -1,12 +1,12 @@
-import { h, fmtNum, countUp } from './kit.js?v=202610161047';
-import { defineScreen, go, reset } from './app.js?v=202610161047';
-import { getSettings } from '../core/store.js?v=202610161047';
-import { recordGame, summarize, playSecs, MODE_INFO } from '../core/stats.js?v=202610161047';
-import { getFormat } from '../formats/registry.js?v=202610161047';
-import { confetti, sfx, haptic, reducedMotion } from './fx.js?v=202610161047';
-import { addStars, kidsProgress } from './stickers.js?v=202610161047';
-import { shareText } from './share.js?v=202610161047';
-import { loadNet } from './net.js?v=202610161047';
+import { h, fmtNum, countUp } from './kit.js?v=202610161056';
+import { defineScreen, go, reset } from './app.js?v=202610161056';
+import { getSettings } from '../core/store.js?v=202610161056';
+import { recordGame, summarize, playSecs, MODE_INFO } from '../core/stats.js?v=202610161056';
+import { getFormat } from '../formats/registry.js?v=202610161056';
+import { confetti, sfx, haptic, reducedMotion } from './fx.js?v=202610161056';
+import { addStars, kidsProgress } from './stickers.js?v=202610161056';
+import { shareText } from './share.js?v=202610161056';
+import { loadNet } from './net.js?v=202610161056';
 
 let matchDone = () => {};
 export const setMatchCompleted = fn => { matchDone = fn; };

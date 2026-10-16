@@ -25,6 +25,7 @@ ok(!/candidates|media\/cand\//.test(gameIndex), 'data/index.json names no candid
 const b = await open({ port: 9406, width: 384, height: 854, mobile: true });
 const reviews = new Map();
 const posts = [];
+let failPosts = 0;
 // a live movie-moments picture whose candidate twin was approved earlier (same hashed file name)
 const LIVE_KEY = 'titanic-1', liveFile = momentFile(LIVE_KEY);
 reviews.set(`movie-moments:new/${LIVE_KEY}`, { ref: `movie-moments:new/${LIVE_KEY}`, src: `media/cand/movie-moments/${liveFile}`, verdict: 'ok' });
@@ -36,6 +37,10 @@ b.on('Fetch.requestPaused', async ({ requestId, request }) => {
     responseHeaders: [{ name: 'Content-Type', value: type }, { name: 'Cache-Control', value: 'no-store' }] }).catch(() => {});
   if (request.url.includes('/lib/auth/auth.js')) return reply(AUTH, 'text/javascript');
   if (request.url.includes('/fakeapi/admin/imgreview')) {
+    if (request.method === 'POST' && failPosts > 0) {
+      failPosts--;
+      return b.send('Fetch.fulfillRequest', { requestId, responseCode: 500, body: b64(JSON.stringify({ error: 'boom' })), responseHeaders: [{ name: 'Content-Type', value: 'application/json' }] }).catch(() => {});
+    }
     if (request.method === 'POST') {
       const items = JSON.parse(request.postData || '{}').items || [];
       posts.push(items);
@@ -73,6 +78,39 @@ const p2 = posts.flat().pop();
 ok(p2 && p2.ref.includes(':new/') && p2.verdict === 'bad' && p2.reason === 'poor', `Bad saved with a reason: ${JSON.stringify(p2)}`);
 const keys = (await b.eval(`[...document.querySelectorAll('.rv-card img')].map(i => i.getAttribute('src'))`));
 ok(keys.every(s => s.startsWith('media/cand/')), 'the candidate set shows only candidate pictures');
+
+// "Mark the rest OK" on the second candidate set: only unmarked pictures of this pack and filter, two taps, batched
+const second = idx.candidates[1];
+if (second) {
+  await b.eval(`(() => { const s = document.querySelector('#rv-pack'); s.value = '${second.pack}:new'; s.dispatchEvent(new Event('change')); return true; })()`);
+  await b.sleep(300);
+  await b.eval(`document.querySelectorAll('.rv-card')[0].querySelector('.rv-acts .n').click(); true`);
+  await b.sleep(400);
+  const badRef = posts.flat().pop().ref;
+  const listed = await b.eval(`document.querySelectorAll('.rv-card').length`);
+  const restLabel = await b.eval(`document.querySelector('.rv-rest').textContent`);
+  ok(restLabel === `✓ Mark the rest OK (${listed - 1})`, `button counts the unmarked listed pictures: ${restLabel} (${listed} listed)`);
+  const before = posts.length;
+  await b.eval(`document.querySelector('.rv-rest').click(); true`);
+  await b.sleep(200);
+  ok(posts.length === before && /^Tap again to mark \d+ as OK$/.test(await b.eval(`document.querySelector('.rv-rest').textContent`)), 'first tap only asks to confirm');
+  await b.sleep(4300);
+  ok((await b.eval(`document.querySelector('.rv-rest').textContent`)).startsWith('✓ Mark the rest'), 'the confirm resets after 4 s');
+  failPosts = 1;
+  await b.eval(`(() => { const x = document.querySelector('.rv-rest'); x.click(); x.click(); return true; })()`);
+  await b.waitFor(`!!document.querySelector('.rv-err')`, 10000);
+  const err = await b.eval(`document.querySelector('.rv-err').textContent`);
+  const saved1 = posts.slice(before).flat();
+  ok(/not saved/.test(err) && saved1.length === listed - 1 - 50 || (listed - 1 <= 50 && saved1.length === 0), `a failed batch is reported inline: ${err.slice(0, 80)}`);
+  ok(saved1.every(p => p.verdict === 'ok' && p.ref.startsWith(`${second.pack}:new/`) && p.ref !== badRef), 'only this pack, never the Bad one');
+  await b.eval(`[...document.querySelectorAll('.rv-fails button')].pop().click(); true`);
+  await b.waitFor(`!document.querySelector('.rv-err')`, 10000);
+  const saved = posts.slice(before).flat();
+  ok(saved.length === listed - 1 && new Set(saved.map(p => p.ref)).size === listed - 1, `retry saves the rest: ${saved.length} OK in ${posts.length - before} posts`);
+  ok(reviews.get(badRef)?.verdict === 'bad', 'the Bad verdict is untouched');
+  ok(posts.slice(before).every(p => p.length <= 50), 'saved in batches of at most 50');
+  await b.shot(`${OUT}/cand-rest-ok.png`);
+}
 
 // carry-over: the live titanic-1 picture counts as OK because its candidate was approved
 await b.eval(`(() => { const s = document.querySelector('#rv-pack'); s.value = 'movie-moments'; s.dispatchEvent(new Event('change')); return true; })()`);
