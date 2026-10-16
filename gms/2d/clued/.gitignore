@@ -11,3 +11,4 @@ server/clued
 media/song-pictures/
 media/cand/
 tools/pd_cache/
+tools/.cache/

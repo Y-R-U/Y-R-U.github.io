@@ -67,6 +67,7 @@
    "lookalikes": [
     "cork-oak"
    ],
+   "form": "round",
    "blurb": "A big, long-lived tree that grows acorns. One oak can be home to hundreds of kinds of insects.",
    "clues": [
     "Family: Fagaceae.",
@@ -110,7 +111,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    50.8,
+    -8.8,
+    25.5
+   ]
   },
   {
    "id": "silver-birch",
@@ -126,6 +132,7 @@
     "conifer": false,
     "heightM": 25
    },
+   "form": "round",
    "blurb": "A slender tree with white, papery bark and drooping twigs. It is one of the first trees to grow on bare land.",
    "clues": [
     "Family: Betulaceae.",
@@ -169,7 +176,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    57.3,
+    -13.3,
+    29.4
+   ]
   },
   {
    "id": "european-beech",
@@ -187,6 +199,7 @@
     "conifer": false,
     "heightM": 35
    },
+   "form": "round",
    "blurb": "A tall tree with smooth grey bark. Its dense leaves make beech woods dark and shady.",
    "clues": [
     "Family: Fagaceae.",
@@ -229,7 +242,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    49.3,
+    -8.6,
+    26.8
+   ]
   },
   {
    "id": "horse-chestnut",
@@ -245,6 +263,7 @@
     "conifer": false,
     "heightM": 30
    },
+   "form": "round",
    "blurb": "A big tree with leaves like an open hand and spiky cases holding shiny brown seeds called conkers.",
    "clues": [
     "Family: Sapindaceae.",
@@ -287,7 +306,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    42.2,
+    -11.7,
+    20.7
+   ]
   },
   {
    "id": "sugar-maple",
@@ -306,6 +330,7 @@
    "lookalikes": [
     "japanese-maple"
    ],
+   "form": "autumn",
    "blurb": "A North American tree whose sap is boiled down to make maple syrup. Its leaves turn brilliant colours in autumn.",
    "clues": [
     "Family: Sapindaceae.",
@@ -349,7 +374,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    48.3,
+    -30.2,
+    31.1
+   ]
   },
   {
    "id": "japanese-maple",
@@ -366,6 +396,7 @@
    "lookalikes": [
     "sugar-maple"
    ],
+   "form": "autumn",
    "blurb": "A small, graceful tree with finely cut leaves that turn fiery red in autumn. It is popular in gardens.",
    "clues": [
     "Family: Sapindaceae.",
@@ -408,7 +439,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    52.8,
+    -11.2,
+    30.7
+   ]
   },
   {
    "id": "weeping-willow",
@@ -424,6 +460,7 @@
     "conifer": false,
     "heightM": 15
    },
+   "form": "weeping",
    "blurb": "A tree with long, drooping branches that often grows by rivers and lakes.",
    "clues": [
     "Family: Salicaceae.",
@@ -466,7 +503,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    50.2,
+    -6.3,
+    24.6
+   ]
   },
   {
    "id": "scots-pine",
@@ -482,6 +524,7 @@
    "lookalikes": [
     "norway-spruce"
    ],
+   "form": "pine",
    "blurb": "A pine with orange-red bark near the top and blue-green needles in pairs. It is often called Scotland's national tree.",
    "clues": [
     "Family: Pinaceae.",
@@ -523,7 +566,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    44.1,
+    -5.6,
+    14.4
+   ]
   },
   {
    "id": "norway-spruce",
@@ -544,6 +592,7 @@
    "lookalikes": [
     "scots-pine"
    ],
+   "form": "spire",
    "blurb": "A tall, cone-shaped conifer. It is the traditional Christmas tree in Europe.",
    "clues": [
     "Family: Pinaceae.",
@@ -586,7 +635,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    30.4,
+    -5,
+    17.4
+   ]
   },
   {
    "id": "coast-redwood",
@@ -606,6 +660,7 @@
    "lookalikes": [
     "giant-sequoia"
    ],
+   "form": "spire",
    "blurb": "The tallest tree in the world. The tallest one, named Hyperion, is over 115 metres tall.",
    "clues": [
     "Family: Cupressaceae.",
@@ -649,7 +704,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    41.6,
+    -4.9,
+    12.9
+   ]
   },
   {
    "id": "giant-sequoia",
@@ -669,6 +729,7 @@
    "lookalikes": [
     "coast-redwood"
    ],
+   "form": "spire",
    "blurb": "The biggest tree in the world by volume. The largest, General Sherman, is over 2,000 years old.",
    "clues": [
     "Family: Cupressaceae.",
@@ -712,7 +773,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    41.4,
+    -2.9,
+    15
+   ]
   },
   {
    "id": "douglas-fir",
@@ -725,6 +791,7 @@
     "conifer": true,
     "heightM": 70
    },
+   "form": "spire",
    "blurb": "A huge conifer of western North America and a very important timber tree. Its cones have three-pointed bracts.",
    "clues": [
     "Family: Pinaceae.",
@@ -767,7 +834,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    48.3,
+    -3.8,
+    13.3
+   ]
   },
   {
    "id": "monkey-puzzle-tree",
@@ -784,6 +856,7 @@
     "conifer": true,
     "heightM": 30
    },
+   "form": "spiky",
    "blurb": "A strange conifer from Chile covered in sharp, scale-like leaves. It is said that even a monkey would find it puzzling to climb.",
    "clues": [
     "Family: Araucariaceae.",
@@ -827,7 +900,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    44.1,
+    -2.6,
+    4.2
+   ]
   },
   {
    "id": "ginkgo",
@@ -844,6 +922,7 @@
     "conifer": false,
     "heightM": 25
    },
+   "form": "round",
    "blurb": "A \"living fossil\" tree with fan-shaped leaves. Six survived the Hiroshima atomic bomb.",
    "clues": [
     "Some survived the Hiroshima atomic bomb.",
@@ -885,7 +964,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    47.3,
+    -6.5,
+    13.7
+   ]
   },
   {
    "id": "african-baobab",
@@ -905,6 +989,7 @@
    "lookalikes": [
     "boab"
    ],
+   "form": "bottle",
    "blurb": "A huge, thick-trunked African tree that stores water in its trunk. It is called the \"upside-down tree\".",
    "clues": [
     "Family: Malvaceae.",
@@ -947,7 +1032,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    50.5,
+    5.5,
+    11.9
+   ]
   },
   {
    "id": "boab",
@@ -966,6 +1056,7 @@
    "lookalikes": [
     "african-baobab"
    ],
+   "form": "bottle",
    "blurb": "Australia's only baobab, found in the Kimberley. One hollow boab was used as a prison.",
    "clues": [
     "Family: Malvaceae.",
@@ -1007,7 +1098,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    51.1,
+    0.1,
+    2.3
+   ]
   },
   {
    "id": "mountain-ash",
@@ -1024,6 +1120,7 @@
     "conifer": false,
     "heightM": 85
    },
+   "form": "gum",
    "blurb": "The tallest flowering plant in the world, a giant eucalypt of Victoria and Tasmania.",
    "clues": [
     "Family: Myrtaceae.",
@@ -1065,7 +1162,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    52.7,
+    -2,
+    0
+   ]
   },
   {
    "id": "river-red-gum",
@@ -1081,6 +1183,7 @@
     "conifer": false,
     "heightM": 30
    },
+   "form": "gum",
    "blurb": "A big, spreading gum tree that grows along rivers across Australia. It can drop heavy branches without warning.",
    "clues": [
     "Family: Myrtaceae.",
@@ -1122,7 +1225,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    44.2,
+    0.2,
+    11.7
+   ]
   },
   {
    "id": "tasmanian-blue-gum",
@@ -1140,6 +1248,7 @@
     "conifer": false,
     "heightM": 45
    },
+   "form": "gum",
    "blurb": "A fast-growing eucalypt with blue-grey young leaves. Its oil is used in cough sweets and inhalers.",
    "clues": [
     "Family: Myrtaceae.",
@@ -1180,7 +1289,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    41.5,
+    -2.5,
+    8.7
+   ]
   },
   {
    "id": "snow-gum",
@@ -1193,6 +1307,7 @@
     "conifer": false,
     "heightM": 10
    },
+   "form": "gum",
    "blurb": "A twisted, colourful gum tree that grows high in the Australian Alps, where it survives snow and freezing winds.",
    "clues": [
     "Family: Myrtaceae.",
@@ -1235,7 +1350,12 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "look": [
+    48,
+    -2.4,
+    6.4
+   ]
   },
   {
    "id": "moreton-bay-fig",
@@ -1252,6 +1372,7 @@
    "lookalikes": [
     "banyan"
    ],
+   "form": "fig",
    "blurb": "A huge fig tree of eastern Australia with buttress roots. It often starts life growing on another tree.",
    "clues": [
     "Family: Moraceae.",
@@ -1294,7 +1415,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    34.8,
+    -1.7,
+    21.8
+   ]
   },
   {
    "id": "wollemi-pine",
@@ -1308,6 +1434,7 @@
     "conifer": true,
     "heightM": 35
    },
+   "form": "spire",
    "blurb": "A \"dinosaur tree\" known only from fossils until 1994, when a few were found in a hidden gorge near Sydney.",
    "clues": [
     "Family: Araucariaceae.",
@@ -1351,7 +1478,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    45.9,
+    -11.5,
+    16
+   ]
   },
   {
    "id": "jacaranda",
@@ -1364,6 +1496,7 @@
     "conifer": false,
     "heightM": 15
    },
+   "form": "blossom",
    "blurb": "A tree covered in purple-blue flowers in late spring. In Australia, students say it blooms at exam time.",
    "clues": [
     "Family: Bignoniaceae.",
@@ -1406,7 +1539,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    48.3,
+    -0.2,
+    -3.3
+   ]
   },
   {
    "id": "coconut-palm",
@@ -1425,6 +1563,7 @@
    "lookalikes": [
     "date-palm"
    ],
+   "form": "palm",
    "blurb": "A tall tropical palm that grows coconuts. Coconuts can float across oceans to new beaches.",
    "clues": [
     "Family: Arecaceae.",
@@ -1467,7 +1606,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    59.2,
+    -0.1,
+    6.4
+   ]
   },
   {
    "id": "date-palm",
@@ -1483,6 +1627,7 @@
    "lookalikes": [
     "coconut-palm"
    ],
+   "form": "palm",
    "blurb": "A desert palm that has been grown for its sweet fruit for thousands of years.",
    "clues": [
     "Family: Arecaceae.",
@@ -1526,7 +1671,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    41.2,
+    6.4,
+    15.1
+   ]
   },
   {
    "id": "banyan",
@@ -1545,6 +1695,7 @@
    "lookalikes": [
     "moreton-bay-fig"
    ],
+   "form": "fig",
    "blurb": "A fig tree that drops roots from its branches, which become new trunks. One banyan can cover a whole field.",
    "clues": [
     "Family: Moraceae.",
@@ -1588,7 +1739,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    37.3,
+    -1.4,
+    6.6
+   ]
   },
   {
    "id": "olive-tree",
@@ -1604,6 +1760,7 @@
     "conifer": false,
     "heightM": 10
    },
+   "form": "gnarled",
    "blurb": "A twisted, silvery-leaved tree of the Mediterranean. Its fruit is pressed to make oil.",
    "clues": [
     "Family: Oleaceae.",
@@ -1647,7 +1804,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    45.8,
+    -6.1,
+    5.3
+   ]
   },
   {
    "id": "japanese-cherry",
@@ -1665,6 +1827,7 @@
     "conifer": false,
     "heightM": 10
    },
+   "form": "blossom",
    "blurb": "A tree famous for clouds of pink and white blossom in spring. In Japan, people hold picnics under it.",
    "clues": [
     "Family: Rosaceae.",
@@ -1704,7 +1867,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    56.6,
+    -7.8,
+    23.9
+   ]
   },
   {
    "id": "apple-tree",
@@ -1720,6 +1888,7 @@
     "conifer": false,
     "heightM": 6
    },
+   "form": "blossom",
    "blurb": "A fruit tree first grown in Central Asia. There are thousands of kinds of apple.",
    "clues": [
     "Family: Rosaceae.",
@@ -1763,7 +1932,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    60.5,
+    7.9,
+    36.7
+   ]
   },
   {
    "id": "golden-wattle",
@@ -1779,6 +1953,7 @@
     "conifer": false,
     "heightM": 6
    },
+   "form": "blossom",
    "blurb": "A small tree covered in fluffy golden flowers. It is Australia's national flower.",
    "clues": [
     "Family: Fabaceae.",
@@ -1821,7 +1996,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    41.9,
+    -2.3,
+    16.2
+   ]
   },
   {
    "id": "norfolk-island-pine",
@@ -1838,6 +2018,7 @@
    "lookalikes": [
     "monkey-puzzle-tree"
    ],
+   "form": "spire",
    "blurb": "A tall, symmetrical conifer from Norfolk Island that lines many beaches in Australia.",
    "clues": [
     "Family: Araucariaceae.",
@@ -1881,7 +2062,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    47.5,
+    -3.1,
+    0.5
+   ]
   },
   {
    "id": "kauri",
@@ -1897,6 +2083,7 @@
     "conifer": true,
     "heightM": 40
    },
+   "form": "pine",
    "blurb": "A giant New Zealand conifer. The biggest, Tāne Mahuta, is thought to be well over 1,000 years old.",
    "clues": [
     "Family: Araucariaceae.",
@@ -1938,7 +2125,12 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "look": [
+    42.5,
+    -2.8,
+    3.4
+   ]
   },
   {
    "id": "rowan",
@@ -1955,6 +2147,7 @@
     "conifer": false,
     "heightM": 12
    },
+   "form": "round",
    "blurb": "A small tree with clusters of bright red berries in autumn. Folklore says it protects against witches.",
    "clues": [
     "Family: Rosaceae.",
@@ -1996,7 +2189,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    47.8,
+    24.4,
+    34.5
+   ]
   },
   {
    "id": "english-yew",
@@ -2014,6 +2212,7 @@
     "conifer": true,
     "heightM": 15
    },
+   "form": "round",
    "blurb": "A dark, long-lived evergreen often found in churchyards. Almost every part of it is poisonous.",
    "clues": [
     "Family: Taxaceae.",
@@ -2057,7 +2256,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    39.7,
+    -0.5,
+    11
+   ]
   },
   {
    "id": "holly",
@@ -2073,6 +2277,7 @@
     "conifer": false,
     "heightM": 10
    },
+   "form": "round",
    "blurb": "An evergreen with shiny, spiky leaves and red berries. It is used as a Christmas decoration.",
    "clues": [
     "Family: Aquifoliaceae.",
@@ -2116,7 +2321,12 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "look": [
+    45.3,
+    -9,
+    16
+   ]
   },
   {
    "id": "london-plane",
@@ -2133,6 +2343,7 @@
     "conifer": false,
     "heightM": 30
    },
+   "form": "round",
    "blurb": "A tough city tree with patchy, flaking bark. It lines the streets of London and many other cities.",
    "clues": [
     "Family: Platanaceae.",
@@ -2176,7 +2387,12 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "look": [
+    52.7,
+    -9.6,
+    22.8
+   ]
   },
   {
    "id": "cedar-of-lebanon",
@@ -2192,6 +2408,7 @@
     "conifer": true,
     "heightM": 35
    },
+   "form": "pine",
    "blurb": "A majestic conifer with flat, spreading layers of branches. It appears on the flag of Lebanon.",
    "clues": [
     "Family: Pinaceae.",
@@ -2235,7 +2452,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    41.3,
+    -2.9,
+    10.1
+   ]
   },
   {
    "id": "great-basin-bristlecone-pine",
@@ -2251,6 +2473,7 @@
     "conifer": true,
     "heightM": 10
    },
+   "form": "pine",
    "blurb": "A twisted pine of the American West. One called Methuselah is over 4,800 years old.",
    "clues": [
     "Family: Pinaceae.",
@@ -2294,7 +2517,12 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "look": [
+    38,
+    1.7,
+    4
+   ]
   },
   {
    "id": "dragons-blood-tree",
@@ -2310,6 +2538,7 @@
     "conifer": false,
     "heightM": 10
    },
+   "form": "umbrella",
    "blurb": "An umbrella-shaped tree from the island of Socotra. Its red resin was used as dye and medicine.",
    "clues": [
     "Family: Asparagaceae.",
@@ -2351,7 +2580,12 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "look": [
+    47.7,
+    -1.2,
+    8.8
+   ]
   },
   {
    "id": "joshua-tree",
@@ -2365,6 +2599,7 @@
     "conifer": false,
     "heightM": 10
    },
+   "form": "spiky",
    "blurb": "A spiky desert tree of the Mojave Desert. Mormon settlers named it after Joshua from the Bible.",
    "clues": [
     "Family: Asparagaceae.",
@@ -2408,7 +2643,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    49.7,
+    0.5,
+    3.1
+   ]
   },
   {
    "id": "cork-oak",
@@ -2424,6 +2664,7 @@
    "lookalikes": [
     "english-oak"
    ],
+   "form": "round",
    "blurb": "An evergreen oak whose thick bark is peeled off every nine years or so to make wine corks.",
    "clues": [
     "Family: Fagaceae.",
@@ -2466,7 +2707,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    40.6,
+    -3.2,
+    16.4
+   ]
   },
   {
    "id": "southern-magnolia",
@@ -2482,6 +2728,7 @@
     "conifer": false,
     "heightM": 25
    },
+   "form": "round",
    "blurb": "An evergreen tree of the south-eastern USA with huge, scented white flowers and glossy leaves.",
    "clues": [
     "It is the state flower of Mississippi.",
@@ -2521,7 +2768,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    62.5,
+    -8.9,
+    20.5
+   ]
   },
   {
    "id": "rubber-tree",
@@ -2537,6 +2789,7 @@
     "conifer": false,
     "heightM": 30
    },
+   "form": "round",
    "blurb": "A tree from the Amazon whose milky sap, called latex, is made into natural rubber.",
    "clues": [
     "Family: Euphorbiaceae.",
@@ -2579,7 +2832,12 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "look": [
+    57.2,
+    -12.8,
+    22
+   ]
   }
  ],
  "questions": [

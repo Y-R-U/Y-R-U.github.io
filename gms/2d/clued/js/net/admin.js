@@ -1,8 +1,8 @@
 // Clued admin page: stats, live rooms, protection level, alerts. The server checks the
 // Firebase ID token's email against CLUED_ADMINS; this page only renders what it's given.
-import { h, fmtNum } from '../ui/kit.js?v=202610161020';
-import { toast } from '../ui/popup.js?v=202610161020';
-import { API } from './api.js?v=202610161020';
+import { h, fmtNum } from '../ui/kit.js?v=202610161040';
+import { toast } from '../ui/popup.js?v=202610161040';
+import { API } from './api.js?v=202610161040';
 
 const root = document.getElementById('adm');
 const gate = document.getElementById('gate');

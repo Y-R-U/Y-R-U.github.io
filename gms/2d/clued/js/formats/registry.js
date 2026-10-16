@@ -1,5 +1,5 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610161020';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610161040';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -271,12 +271,15 @@ export function pickPack(rng, packs, weight = p => Math.sqrt((p.items || []).len
 const LOOK_NEAR = 20;
 export function looksAlike(a, b) {
   if ((a.lookalikes || []).includes(b.id) || (b.lookalikes || []).includes(a.id)) return true;
-  if (!a.look || !b.look) return false;
-  return Math.hypot(a.look[0] - b.look[0], a.look[1] - b.look[1], a.look[2] - b.look[2]) < LOOK_NEAR;
+  // a curated overall shape (trees: spire, palm, gum…) decides first: different shapes never look alike
+  if (a.form && b.form && a.form !== b.form) return false;
+  if (!a.look || !b.look) return !!(a.form && a.form === b.form);
+  return Math.hypot(a.look[0] - b.look[0], a.look[1] - b.look[1], a.look[2] - b.look[2]) < (a.form ? LOOK_NEAR * 1.5 : LOOK_NEAR);
 }
 // Look-alike pairs allowed among the options by question level (Aaron 2026-10-16): easy none, medium one pair,
 // hard as many as the pack has (look-alikes are offered first).
 const ALIKE_CAP = { 1: 0, 2: 1 };
+const kept = (a, b) => (a.apart || []).includes(b.id) || (b.apart || []).includes(a.id);
 
 export function distractors(rng, target, pool, n, { keyFn = it => it.name, reject = () => false, lv = 0 } = {}) {
   const seen = new Set([norm(keyFn(target.item))]);
@@ -287,7 +290,7 @@ export function distractors(rng, target, pool, n, { keyFn = it => it.name, rejec
   const take = (list, capped = cap !== undefined) => {
     for (const c of shuffle(rng, list)) {
       if (out.length >= n) return;
-      if (c.item === target.item || reject(c.item)) continue;
+      if (c.item === target.item || reject(c.item) || [target, ...out].some(o => kept(o.item, c.item))) continue;
       const k = norm(keyFn(c.item));
       if (!k || seen.has(k)) continue;
       const p = capped ? pairsWith(c) : 0;

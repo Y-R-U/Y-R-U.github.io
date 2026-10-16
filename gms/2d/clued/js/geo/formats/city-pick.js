@@ -1,10 +1,10 @@
-import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610161020';
-import { loadCities, geo as G } from '../data.js?v=202610161020';
-import { haversineKm } from '../proj.js?v=202610161020';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610161040';
+import { loadCities, geo as G } from '../data.js?v=202610161040';
+import { haversineKm } from '../proj.js?v=202610161040';
 import {
   geo, countryIds, regionMembers, REGIONS, STATE_VIEWS, createMap, frame, message, isKids, cname, regionForCountry,
   REGION_CHOICES, REGION_LABELS, refFor, supportsGeo, byLevel,
-} from './common.js?v=202610161020';
+} from './common.js?v=202610161040';
 
 await loadCities();
 

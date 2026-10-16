@@ -196,6 +196,9 @@ async function buildPack(id) {
     }
     if (Object.keys(facts).length) item.facts = facts;
     if (it.look?.length) item.lookalikes = it.look.map(l => nameToId.get(l.toLowerCase()) || l);
+    // pictures too alike to tell apart at any level: never offered in the same question
+    if (it.form) item.form = it.form;
+    if (it.apart?.length) item.apart = it.apart.map(l => nameToId.get(l.toLowerCase()) || l);
     if (it.b) item.blurb = it.b;
     const diffs = {};
     for (const [k, t] of Object.entries(DIFFS[id] || {})) { const [a, b] = k.split('|'); if (a === iid) diffs[b] = t; else if (b === iid) diffs[a] = t; }

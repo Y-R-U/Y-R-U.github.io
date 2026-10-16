@@ -2,13 +2,13 @@
 // year from a clip, country / capital / continent from a flag; with no picture or clip the name is shown and the other
 // rows asked). Tap one per row, lock in; each right row is a share of the points (js/formats/trio_score.js).
 // Packs opt in through TRIO (or pack.trio, same shape): the rows, the facts behind them and the media to show.
-import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick } from './registry.js?v=202610161020';
-import { h, mediaBox, onKey } from '../ui/kit.js?v=202610161020';
-import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610161020';
-import { basePoints } from '../core/scoring.js?v=202610161020';
-import { preflight, urlsOf } from '../core/media.js?v=202610161020';
-import { confetti } from '../ui/fx.js?v=202610161020';
-import { trioScore, trioCap } from './trio_score.js?v=202610161020';
+import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick } from './registry.js?v=202610161040';
+import { h, mediaBox, onKey } from '../ui/kit.js?v=202610161040';
+import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610161040';
+import { basePoints } from '../core/scoring.js?v=202610161040';
+import { preflight, urlsOf } from '../core/media.js?v=202610161040';
+import { confetti } from '../ui/fx.js?v=202610161040';
+import { trioScore, trioCap } from './trio_score.js?v=202610161040';
 
 export { trioScore, trioCap };
 
@@ -243,7 +243,7 @@ function makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame,
 }
 
 const packId = info => info.id || String(info.path || '').replace(/^.*\//, '').replace(/\.json$/, '');
-const audioMod = () => import('./trio_audio.js?v=202610161020');
+const audioMod = () => import('./trio_audio.js?v=202610161040');
 
 export default register({
   id: 'trio', title: 'Hat-trick', icon: '🎩', blurb: 'Three questions in one: name it, who, when', tags: ['slow'], noKids: true,
