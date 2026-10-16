@@ -1,12 +1,12 @@
 // Pick all: "Which 3 of these are …?" — 6–8 tiles (kids 4–5), 2–4 right. Sources: hand-written list questions
 // (pack questions of kind 'pickall': answer = every right option, wrong = decoys, prompt holds {n}) and item facts
 // (js/formats/pickall_rules.js). Partial credit: see pickScore.
-import { register, poolItems, byDifficulty, imageOf, collect, pick, shuffle, sample, fill, givesAway, weightedPick } from './registry.js?v=202610161056';
-import { h, imgEl, onKey } from '../ui/kit.js?v=202610161056';
-import { injectCSS, baseCSS, once, hasImg, norm, uniqueByName } from './fkit.js?v=202610161056';
-import { basePoints } from '../core/scoring.js?v=202610161056';
-import { rulesFor } from './pickall_rules.js?v=202610161056';
-import { pickScore } from './pickall_score.js?v=202610161056';
+import { register, poolItems, byDifficulty, imageOf, collect, pick, shuffle, sample, fill, givesAway, weightedPick } from './registry.js?v=202610161139';
+import { h, imgEl, onKey } from '../ui/kit.js?v=202610161139';
+import { injectCSS, baseCSS, once, hasImg, norm, uniqueByName } from './fkit.js?v=202610161139';
+import { basePoints } from '../core/scoring.js?v=202610161139';
+import { rulesFor } from './pickall_rules.js?v=202610161139';
+import { pickScore } from './pickall_score.js?v=202610161139';
 
 export { pickScore };
 

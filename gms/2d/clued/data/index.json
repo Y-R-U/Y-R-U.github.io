@@ -1,5 +1,5 @@
 {
- "build": "202610160931",
+ "build": "202610161134",
  "themes": [
   {
    "id": "animals",
@@ -90,6 +90,7 @@
    "title": "Books & words",
    "icon": "📚",
    "packs": [
+    "book-moments",
     "books",
     "general~books",
     "quotes",
@@ -639,6 +640,88 @@
      "blitz60": 2,
      "type": 20,
      "lookalike": 2
+    }
+   }
+  },
+  "book-moments": {
+   "path": "packs/book-moments.json",
+   "title": "Book Moments",
+   "theme": "books",
+   "icon": "📖",
+   "kids": false,
+   "items": 37,
+   "questions": 0,
+   "notice": "Original illustrations of scenes from famous books.",
+   "caps": {
+    "img": 37,
+    "audio": 0,
+    "itemImg": 37,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {
+     "author": "cat",
+     "year": "year",
+     "century": "cat",
+     "kids": "bool"
+    },
+    "groups": 0,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 28,
+    "kidsItems": 11,
+    "multi": [],
+    "catBins": {
+     "century": 2
+    },
+    "formats": {
+     "mc": 20,
+     "tf": 20,
+     "match": 20,
+     "hilo": 20,
+     "order": 20,
+     "odd": 20,
+     "sort": 20,
+     "reveal": 20,
+     "number": 20,
+     "connect": 0,
+     "blitz60": 4,
+     "type": 20,
+     "quote": 0,
+     "trio": 17
+    },
+    "formatsEasy": {
+     "mc": 20,
+     "tf": 20,
+     "match": 20,
+     "hilo": 20,
+     "order": 20,
+     "odd": 20,
+     "sort": 20,
+     "reveal": 20,
+     "number": 20,
+     "connect": 0,
+     "blitz60": 4,
+     "type": 20,
+     "quote": 0,
+     "trio": 13
+    },
+    "formatsKids": {
+     "mc": 20,
+     "tf": 20,
+     "match": 20,
+     "hilo": 20,
+     "order": 20,
+     "odd": 20,
+     "sort": 20,
+     "reveal": 11,
+     "number": 11,
+     "connect": 0,
+     "blitz60": 2,
+     "type": 20,
+     "quote": 0,
+     "trio": 0
     }
    }
   },
@@ -3146,13 +3229,13 @@
    "theme": "screen",
    "icon": "🎬",
    "kids": false,
-   "items": 132,
+   "items": 165,
    "questions": 0,
    "notice": "Original illustrations of famous film scenes, not real stills.",
    "caps": {
-    "img": 132,
+    "img": 165,
     "audio": 0,
-    "itemImg": 132,
+    "itemImg": 165,
     "itemAudio": 0,
     "clues": 0,
     "facts": {
@@ -3166,12 +3249,12 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 79,
-    "kidsItems": 59,
+    "easy": 88,
+    "kidsItems": 61,
     "multi": [],
     "catBins": {
      "decade": 10,
-     "director": 3
+     "director": 5
     },
     "formats": {
      "mc": 20,

@@ -192,10 +192,11 @@ for (const id of Object.keys(conf)) {
     const gen = s => fmt.generate({ rng: rngFrom(`trio:${id}:${d}:${s}`), packs: [pack], count: 40, difficulty: d });
     const a = gen(1);
     ok(JSON.stringify(a) === JSON.stringify(gen(1)), `${id}/${d} deterministic`);
-    ok(a.length >= (d === 0 ? 30 : 10), `${id}/${d} makes enough (${a.length})`);
+    const small = pack.items.length < 60;   // book-moments: 37 pictured books so far
+    ok(a.length >= (small ? 12 : d === 0 ? 30 : 10), `${id}/${d} makes enough (${a.length})`);
     counts[id][d] = a.length;
     for (const q of [...a, ...gen(2)]) { validate(q, pack, d, `${id}/${d}`); total++; }
-    if (d) {
+    if (d && !small) {
       const lv = a.map(q => pack.items.find(it => `${id}/${it.id}` === q.refs[0])?.difficulty || 2);
       const avail = pack.items.filter(it => (it.difficulty || 2) === d).length;
       ok(lv.filter(x => x === d).length >= Math.min(a.length, avail) * 0.5, `${id}/${d} mostly level-${d} items (${lv.filter(x => x === d).length}/${a.length})`);
@@ -282,6 +283,37 @@ ok(L('countries').filter(q => q.data.layout === 'pic').every(q => q.rows[0].labe
   }
   ok(seen >= 5, `mc co-credit questions checked (${seen})`);
   ok(CC.leadOf('Ron Clements, John Musker') === 'Ron Clements' && CC.leadOf('Clyde Geronimi, Wilfred Jackson, Hamilton Luske') === 'Clyde Geronimi' && CC.leadOf('Jane Austen') === 'Jane Austen', 'leadOf picks the most-credited, ties to the first listed');
+}
+// sequels / look-alikes in the name row (registry looksAlike, as mc): easy none, medium and any one pair at most,
+// hard offers the target's own series first (Harry Potter, the MCU…)
+{
+  const pairsOf = (items) => { let n = 0; for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) if (reg.looksAlike(items[i], items[j]) || (items[i].facts?.franchise && items[i].facts.franchise === items[j].facts?.franchise)) n++; return n; };
+  const most = {};
+  for (const id of ['movie-moments', 'book-moments', 'books']) {
+    if (!index.packs[id]) continue;
+    const pack = loadPack(id);
+    // books (no pictures) has no name row; give it pictures so the rule is checked on a pack with long series
+    if (id === 'books') pack.items.forEach((it, i) => { it.media = { img: [{ src: `media/x/${i}.webp`, w: 640, h: 427 }] }; });
+    for (const d of [0, 1, 2, 3]) {
+      const qs = fmt.generate({ rng: rngFrom(`series:${id}:${d}`), packs: [pack], count: 120, difficulty: d });
+      let max = 0;
+      for (const q of qs) {
+        const items = q.rows[0].options.map(n => pack.items.find(it => it.name === n));
+        const p = pairsOf(items);
+        max = Math.max(max, p);
+        if (d === 1) ok(p === 0, `easy: no two name options from one series or look-alike (${q.rows[0].options}) ${q.id}`);
+        if (d === 2 || d === 0) ok(p <= 1, `medium/any: at most one same-series pair (${q.rows[0].options}) ${q.id}`);
+      }
+      most[`${id}/${d}`] = max;
+    }
+  }
+  ok(Math.max(most['books/3'] || 0, most['movie-moments/3'] || 0) >= 3, `hard: several from one series appear (${JSON.stringify(most)})`);
+  // movies (text variant) has no name row, so it is untouched; a hard Harry Potter question can offer the series
+  const bk = loadPack('books');
+  bk.items.forEach((it, i) => { it.media = { img: [{ src: `media/x/${i}.webp`, w: 640, h: 427 }] }; if (/harry potter/i.test(it.name)) it.difficulty = 3; });
+  const hp = fmt.generate({ rng: rngFrom('hp'), packs: [{ ...bk, items: bk.items.filter(it => /harry potter/i.test(it.name) || (it.difficulty || 2) === 3) }], count: 60, difficulty: 3 })
+    .filter(q => /harry potter/i.test(q.answerText));
+  ok(hp.some(q => q.rows[0].options.filter(o => /harry potter/i.test(o)).length >= 3), `hard Harry Potter: 3+ of the series offered (${hp.map(q => q.rows[0].options.filter(o => /harry potter/i.test(o)).length)})`);
 }
 // falsify: the validator must catch broken questions
 {

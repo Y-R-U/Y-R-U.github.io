@@ -1,0 +1,15 @@
+{
+ "birds": [
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/111948592/medium.jpg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/411315483/medium.jpeg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/507313802/medium.jpg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/186367047/medium.jpeg",
+  "https://inaturalist-open-data.s3.amazonaws.com/photos/337531825/medium.jpg"
+ ],
+ "space": [
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Venus_from_Mariner_10.jpg/500px-Venus_from_Mariner_10.jpg",
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/The_Sun_in_white_light.jpg/500px-The_Sun_in_white_light.jpg",
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/Voyager_spacecraft_model.png/500px-Voyager_spacecraft_model.png",
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Apollo_13_passing_Moon.jpg/500px-Apollo_13_passing_Moon.jpg"
+ ]
+}

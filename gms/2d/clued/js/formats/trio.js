@@ -2,15 +2,15 @@
 // year from a clip, country / capital / continent from a flag; with no picture or clip the name is shown and the other
 // rows asked). Tap one per row, lock in; each right row is a share of the points (js/formats/trio_score.js).
 // Packs opt in through TRIO (or pack.trio, same shape): the rows, the facts behind them and the media to show.
-import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick } from './registry.js?v=202610161056';
-import { h, mediaBox, onKey } from '../ui/kit.js?v=202610161056';
-import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610161056';
-import { basePoints } from '../core/scoring.js?v=202610161056';
-import { preflight, urlsOf } from '../core/media.js?v=202610161056';
-import { confetti } from '../ui/fx.js?v=202610161056';
-import { trioScore, trioCap } from './trio_score.js?v=202610161056';
-import { yearOptions, MAX_YEAR } from './years.js?v=202610161056';
-import { isCredit, leadOf } from './cocredit.js?v=202610161056';
+import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick, looksAlike } from './registry.js?v=202610161139';
+import { h, mediaBox, onKey } from '../ui/kit.js?v=202610161139';
+import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610161139';
+import { basePoints } from '../core/scoring.js?v=202610161139';
+import { preflight, urlsOf } from '../core/media.js?v=202610161139';
+import { confetti } from '../ui/fx.js?v=202610161139';
+import { trioScore, trioCap } from './trio_score.js?v=202610161139';
+import { yearOptions, MAX_YEAR } from './years.js?v=202610161139';
+import { isCredit, leadOf } from './cocredit.js?v=202610161139';
 
 export { trioScore, trioCap };
 // every row right: a flat bonus on top, after the streak (the server and P2P host award the same)
@@ -127,18 +127,29 @@ function make(rng, pack, conf, difficulty) {
   const optionItems = [t];
 
   if (rowsConf.some(r => r.kind === 'name')) {
-    const fr = t.item.facts?.franchise;
+    // sequels and look-alikes (registry looksAlike: one series, or pictures close in colour) by level, as mc does:
+    // easy none among the options, medium (and any) one pair, hard offers the target's own series first
+    const cap = { 1: 0, 2: 1, 0: 1 }[difficulty];
+    const alike = (a, b) => looksAlike(a.item, b.item) || (!!a.item.facts?.franchise && a.item.facts.franchise === b.item.facts?.franchise);
+    const pairsWith = c => optionItems.filter(o => alike(o, c)).length;
+    // names that hint at each other ("Toy Story 2") may only meet as an allowed same-series pair
+    const clash = (a, b) => norm(a.item.name) === norm(b.item.name) || ((givesAway(a.item.name, b.item.name) || givesAway(b.item.name, a.item.name)) && !alike(a, b));
     const seenSpread = new Set(spreadOf(t).map(norm));
-    const ok = c => c.item !== t.item && norm(c.item.name) !== norm(t.item.name) && !givesAway(t.item.name, c.item.name) && !givesAway(c.item.name, t.item.name)
-      && !(fr && c.item.facts?.franchise === fr) && (!spreadRow || spreadOf(c).length === 1);
-    for (const band of NAME_NEAR) {
-      for (const c of byFame(shuffle(rng, all.filter(c => ok(c) && dist(c) <= band)))) {
-        if (optionItems.length >= 4) break;
-        if (optionItems.some(p => norm(p.item.name) === norm(c.item.name) || givesAway(p.item.name, c.item.name) || givesAway(c.item.name, p.item.name))) continue;
+    let pairs = 0;
+    const take = (list, capped = cap !== undefined) => {
+      for (const c of list) {
+        if (optionItems.length >= 4) return;
+        if (c.item === t.item || (spreadRow && spreadOf(c).length !== 1) || optionItems.some(o => o.item === c.item || clash(o, c))) continue;
+        const p = capped ? pairsWith(c) : 0;
+        if (capped && pairs + p > cap) continue;
         if (spreadRow && seenSpread.has(norm(spreadOf(c)[0]))) continue;
         if (spreadRow) seenSpread.add(norm(spreadOf(c)[0]));
-        optionItems.push(c);
+        optionItems.push(c); pairs += p;
       }
+    };
+    if (cap === undefined) take(byFame(shuffle(rng, all.filter(c => alike(t, c) && dist(c) <= 25))).slice(0, 3));
+    for (const band of NAME_NEAR) {
+      take(byFame(shuffle(rng, all.filter(c => dist(c) <= band))));
       if (optionItems.length >= 4) break;
     }
     if (optionItems.length < 4) return null;
@@ -236,7 +247,7 @@ function makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame,
 }
 
 const packId = info => info.id || String(info.path || '').replace(/^.*\//, '').replace(/\.json$/, '');
-const audioMod = () => import('./trio_audio.js?v=202610161056');
+const audioMod = () => import('./trio_audio.js?v=202610161139');
 
 export default register({
   id: 'trio', title: 'Hat-trick', icon: '🎩', blurb: 'Three questions in one: name it, who, when', tags: ['slow'], noKids: true,

@@ -20,13 +20,15 @@
      "p": "a gigantic white sperm whale smashing a small wooden whaling rowboat in a stormy sea, harpoons flying, a three-masted whaling ship behind",
      "d": 1,
      "cap": "The white whale strikes",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a peg-legged sea captain seen from behind on the deck of a 19th-century whaling ship, staring out at a stormy sea",
      "d": 3,
      "cap": "The obsessed captain on deck",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank 1 vs 1 for scene 1)"
     }
    ]
   },
@@ -43,19 +45,23 @@
      "p": "an old parchment treasure map with a red X, a compass and a cutlass on a wooden table, a tropical island seen through a cabin window",
      "d": 1,
      "cap": "X marks the spot",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a one-legged pirate with a crutch and a green parrot on his shoulder seen from behind on a ship deck",
      "d": 1,
      "cap": "The one-legged cook and his parrot",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank 1 vs 1 for scene 1)"
     },
     {
      "p": "a boy hiding inside a big wooden apple barrel on a ship at night, listening",
      "d": 3,
      "cap": "Overheard from the apple barrel",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -75,19 +81,23 @@
      "p": "a white rabbit in a waistcoat checking a pocket watch, hurrying towards a rabbit hole under a tree, a girl in a blue dress following",
      "d": 1,
      "cap": "Late! Following the white rabbit",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a chaotic outdoor tea party at a long table with a hare, a man in an enormous top hat and a sleepy dormouse in a teapot",
      "d": 1,
      "cap": "The mad tea party",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 1)"
     },
     {
      "p": "playing cards with arms and legs painting white roses red in a royal garden",
      "d": 2,
      "cap": "Painting the roses red",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -104,13 +114,15 @@
      "p": "a single bare human footprint in wet sand on a deserted island beach, a castaway in goatskin clothes with a parasol seen from behind staring at it",
      "d": 2,
      "cap": "A footprint in the sand",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 2)"
     },
     {
      "p": "a castaway in a goatskin hat with a homemade umbrella and a parrot beside a hut and stockade on a tropical island",
-     "d": 2,
+     "d": 1,
      "cap": "The castaway's island home",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -129,13 +141,15 @@
      "p": "a gothic laboratory in a stone tower during a thunderstorm, lightning striking a rod above a sheet-covered figure on a table, crackling electrical apparatus",
      "d": 1,
      "cap": "A creature brought to life",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a lone figure crossing a vast frozen Arctic ice field on a dog sled at twilight, a ship trapped in ice",
      "d": 3,
      "cap": "The chase across the Arctic ice",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 1)"
     }
    ]
   },
@@ -152,13 +166,15 @@
      "p": "a jagged gothic castle on a crag in the Carpathian mountains under a full moon, bats flying, a horse-drawn coach on the winding road",
      "d": 1,
      "cap": "The count's castle in Transylvania",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a ship drifting into Whitby harbour in a storm, a huge black dog leaping ashore, ruined abbey on the cliff",
      "d": 3,
      "cap": "The ghost ship arrives at Whitby",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 1)"
     }
    ]
   },
@@ -177,19 +193,23 @@
      "p": "a huge red-gold dragon sleeping on a vast hoard of gold coins and treasure inside a mountain hall, a tiny figure peeking in",
      "d": 1,
      "cap": "The dragon on his hoard",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank 2 vs 1 for scene 2)"
     },
     {
      "p": "a crowd of hooded dwarves and a tall wizard with a staff arriving at a round green door in a hillside at dusk",
-     "d": 2,
+     "d": 1,
      "cap": "An unexpected party",
-     "cand": true
+     "picked": true
     },
     {
      "p": "dwarves floating down a river in wooden barrels away from an elven forest stronghold",
      "d": 2,
      "cap": "Barrels out of bond",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -206,15 +226,17 @@
    "scenes": [
     {
      "p": "a Victorian gentleman in a top hat checking his pocket watch while riding an elephant through an Indian jungle, his valet beside him",
-     "d": 2,
+     "d": 3,
      "cap": "Racing the clock by elephant",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a Victorian gentleman in a top hat and his valet on a paddle steamer deck, a big globe beside them, ocean and steam",
      "d": 3,
      "cap": "A wager against the calendar",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -229,15 +251,17 @@
    "scenes": [
     {
      "p": "a Regency-era country ballroom with dancers in empire-waist gowns and tailcoats in rows, candle chandeliers",
-     "d": 2,
+     "d": 1,
      "cap": "The Meryton assembly ball",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a grand English country house across a lake in a landscaped park, a young woman in a Regency bonnet seen from behind gazing at it",
      "d": 3,
      "cap": "First sight of Pemberley",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank 2 vs 1 for scene 1)"
     }
    ]
   },
@@ -254,13 +278,15 @@
      "p": "a gothic English manor house on fire at night, flames from the battlements, a figure on the roof",
      "d": 3,
      "cap": "Thornfield Hall burns",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 2 for scene 2)"
     },
     {
      "p": "a young governess in a plain grey dress seen from behind walking up to a gloomy manor house on the moors",
-     "d": 3,
+     "d": 2,
      "cap": "The new governess arrives",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -275,15 +301,17 @@
    "scenes": [
     {
      "p": "a lonely stone farmhouse on bleak windswept Yorkshire moors, twisted trees bent by wind, stormy sky",
-     "d": 2,
+     "d": 1,
      "cap": "The windswept farmhouse on the moors",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a ghostly pale hand tapping at a frosted window at night in a storm",
      "d": 3,
      "cap": "Let me in!",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 1)"
     }
    ]
   },
@@ -298,15 +326,17 @@
    "scenes": [
     {
      "p": "an elderly woman in a yellowed wedding dress seen from behind in a dark room with stopped clocks and a rotting wedding cake covered in cobwebs",
-     "d": 2,
+     "d": 3,
      "cap": "The jilted bride and her wedding cake",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a convict in leg irons on misty Kent marshes at dusk beside a churchyard, a boy running",
      "d": 3,
      "cap": "The convict on the marshes",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -323,13 +353,15 @@
      "p": "a miserly old man in a nightcap in a Victorian bedroom recoiling from a glowing ghost wrapped in heavy chains and cash boxes",
      "d": 1,
      "cap": "Visited by a ghost in chains",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 2)"
     },
     {
      "p": "a poor Victorian family around a small Christmas goose, a little boy with a wooden crutch by the fire",
-     "d": 2,
+     "d": 1,
      "cap": "Christmas dinner with the Cratchits",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -346,13 +378,15 @@
      "p": "a thin orphan boy in rags holding up an empty bowl to a large stern man at a cauldron in a Victorian workhouse dining hall",
      "d": 1,
      "cap": "Please, sir, I want some more",
-     "cand": true
+     "picked": true
     },
     {
      "p": "boys picking a gentleman's pocket on a crowded Victorian London street",
      "d": 2,
      "cap": "Learning to pick pockets",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 1)"
     }
    ]
   },
@@ -369,15 +403,17 @@
    "scenes": [
     {
      "p": "a small pink pig in a barn doorway looking up at a large dewy spider web with a friendly grey spider, morning sun",
-     "d": 1,
+     "d": 3,
      "cap": "A pig and his spider friend",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a pig at a country fair with a prize ribbon, a ferris wheel behind",
      "d": 3,
      "cap": "Wilbur at the county fair",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -426,13 +462,15 @@
      "p": "a fat green caterpillar eating holes through an apple, pears, plums, strawberries and oranges in a row",
      "d": 1,
      "cap": "Munching through the fruit",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a colourful butterfly emerging from a cocoon on a twig",
      "d": 2,
      "cap": "A beautiful butterfly",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 1)"
     }
    ]
   },
@@ -449,13 +487,15 @@
      "p": "a gigantic peach flying over the ocean lifted by a flock of seagulls tied with silk threads, a boy on top",
      "d": 1,
      "cap": "Carried across the ocean by seagulls",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 2 for scene 2)"
     },
     {
      "p": "a giant peach rolling down a hill through a village",
-     "d": 3,
+     "d": 2,
      "cap": "The peach rolls away",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -523,13 +563,15 @@
      "p": "an old iron key and a hidden wooden door in an ivy-covered brick wall, a robin perched nearby",
      "d": 1,
      "cap": "The hidden door in the wall",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a blooming walled garden with roses, a girl and a boy in a wheelchair",
      "d": 3,
      "cap": "The garden comes alive",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -619,7 +661,7 @@
      "p": "a thin knight in old armour on a bony horse charging with a lance at Spanish windmills, a short squire on a donkey behind",
      "d": 1,
      "cap": "Tilting at windmills",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -634,15 +676,17 @@
    "scenes": [
     {
      "p": "an old fisherman in a small wooden skiff with a giant marlin skeleton lashed alongside, sharks circling, Cuban coast at dawn",
-     "d": 2,
+     "d": 1,
      "cap": "Bringing home the marlin's skeleton",
-     "cand": true
+     "picked": true
     },
     {
      "p": "an old fisherman in a small skiff holding a fishing line taut, a huge marlin leaping",
      "d": 2,
      "cap": "The battle with the marlin",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -682,15 +726,17 @@
    "scenes": [
     {
      "p": "a man in a white suit seen from behind at the end of a wooden dock at night, reaching toward a small green light across a bay",
-     "d": 2,
+     "d": 1,
      "cap": "The green light across the bay",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a lavish 1920s mansion party with flappers dancing, champagne towers and fireworks",
      "d": 2,
      "cap": "One of Gatsby's parties",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -755,13 +801,15 @@
      "p": "pigs walking on their hind legs out of an English farmhouse, other farm animals watching in shock",
      "d": 1,
      "cap": "Four legs good, two legs better",
-     "cand": true
+     "picked": true
     },
     {
      "p": "farm animals building a windmill on an English farm",
      "d": 2,
      "cap": "Building the windmill",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -776,9 +824,9 @@
    "scenes": [
     {
      "p": "firemen with flamethrowers burning a pile of books in a street at night, pages swirling in the flames",
-     "d": 2,
+     "d": 1,
      "cap": "Firemen who burn books",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -797,13 +845,15 @@
      "p": "giant three-legged Martian fighting machines striding over a Victorian English town firing heat rays, people fleeing",
      "d": 1,
      "cap": "Martian tripods attack",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a huge metal cylinder half-buried in a smoking crater on an English common at dawn, crowds watching",
      "d": 3,
      "cap": "The cylinder on Horsell Common",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -820,7 +870,7 @@
      "p": "an ornate brass and wood Victorian time machine with a velvet seat and spinning dials glowing in a gentleman's study",
      "d": 1,
      "cap": "The Time Traveller's machine",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -835,9 +885,9 @@
    "scenes": [
     {
      "p": "four sisters in 1860s dresses gathered by the fireside at Christmas in a cosy New England parlour",
-     "d": 2,
+     "d": 1,
      "cap": "The four March sisters at Christmas",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -854,13 +904,15 @@
      "p": "a little girl with goats on a flowery Swiss alpine meadow beside a wooden hut, snowy peaks",
      "d": 1,
      "cap": "Heidi and the goats in the Alps",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a girl lying in a hay loft looking out a round window at the stars over the Alps",
      "d": 3,
      "cap": "A bed in the hayloft",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -879,13 +931,15 @@
      "p": "a little boy with a long scarf standing on a tiny planet with three small volcanoes and a single rose under a glass dome, stars",
      "d": 1,
      "cap": "The prince on his tiny planet",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a small boy and a fox in the desert beside a crashed biplane",
      "d": 2,
      "cap": "Taming the fox in the desert",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -902,9 +956,9 @@
    "scenes": [
     {
      "p": "a little rabbit in a blue jacket squeezing under a garden gate in an English vegetable garden, cabbages, a farmer with a rake in the distance",
-     "d": 1,
+     "d": 3,
      "cap": "Into Mr McGregor's garden",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -919,15 +973,17 @@
    "scenes": [
     {
      "p": "a huge glowing spectral hound with fiery eyes leaping across a misty moor at night, granite tors",
-     "d": 2,
+     "d": 1,
      "cap": "The hound on the moor",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a detective in a deerstalker cap with a pipe seen from behind looking across foggy Dartmoor",
      "d": 2,
      "cap": "A detective on Dartmoor",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -944,9 +1000,9 @@
    "scenes": [
     {
      "p": "explorers on a raft crossing a vast underground sea in a huge glowing cavern with giant mushrooms and sea monsters",
-     "d": 2,
+     "d": 3,
      "cap": "The underground sea",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -965,7 +1021,7 @@
      "p": "a big shaggy dog leading a dog sled team through the snowy Yukon wilderness, northern lights",
      "d": 2,
      "cap": "A sled dog in the Yukon",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -983,15 +1039,17 @@
    "scenes": [
     {
      "p": "young revolutionaries on a barricade of furniture across a narrow Paris street waving a red flag, smoke",
-     "d": 2,
+     "d": 1,
      "cap": "On the barricade",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a pair of silver candlesticks on a bishop's table by candlelight",
      "d": 3,
      "cap": "The bishop's silver candlesticks",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -1009,9 +1067,9 @@
    "scenes": [
     {
      "p": "a hunched bell-ringer swinging on a huge bronze bell in a gothic cathedral tower, gargoyles and Paris rooftops",
-     "d": 1,
+     "d": 3,
      "cap": "The bell-ringer of the cathedral",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -1026,15 +1084,17 @@
    "scenes": [
     {
      "p": "a man escaping a grim island fortress prison by being thrown into the sea in a weighted sack at night",
-     "d": 2,
+     "d": 1,
      "cap": "Escape from the Château d'If",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a cave full of treasure chests on a rocky Mediterranean island",
      "d": 3,
      "cap": "The treasure of Monte Cristo",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG 2026-10-16: not generated; another candidate was already named by the blind check"
     }
    ]
   },
@@ -1051,7 +1111,9 @@
      "p": "four swordsmen in plumed hats and blue tabards crossing rapiers in the air, 17th-century Paris",
      "d": 1,
      "cap": "All for one and one for all",
-     "cand": true
+     "picked": true,
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-16: poor — There are 4 instead of 3?"
     }
    ]
   },
@@ -1066,9 +1128,9 @@
    "scenes": [
     {
      "p": "a red-haired orphan girl with two braids and a straw hat seen from behind with a carpet bag, a white farmhouse with green gables on Prince Edward Island",
-     "d": 2,
+     "d": 1,
      "cap": "Arriving at the farmhouse with green gables",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -1109,9 +1171,9 @@
    "scenes": [
     {
      "p": "a band of wild rabbits crossing rolling green English downs at sunset, a lone beech tree on the hill",
-     "d": 2,
+     "d": 1,
      "cap": "The rabbits' journey to the down",
-     "cand": true
+     "picked": true
     }
    ]
   },

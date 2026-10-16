@@ -1,10 +1,10 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
   spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk, givesAway,
-} from './registry.js?v=202610161056';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610161056';
-import { yearOptions, plainYear } from './years.js?v=202610161056';
-import { isCredit, leadOf, people } from './cocredit.js?v=202610161056';
+} from './registry.js?v=202610161139';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610161139';
+import { yearOptions, plainYear } from './years.js?v=202610161139';
+import { isCredit, leadOf, people } from './cocredit.js?v=202610161139';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
@@ -103,7 +103,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
         explain: t.item.blurb, refs: [t.ref], hint: `It starts with “${value.charAt(0)}”`,
       };
     }
-    const wrong = distractors(rng, t, pool, n - 1, { reject: it => (credit ? people(fv(it)).some(p => p.toLowerCase() === value.toLowerCase()) : [].concat(fv(it)).map(String).includes(value)) });
+    const wrong = distractors(rng, t, pool, n - 1, { reject: it => (credit ? people(fv(it)).some(p => p.toLowerCase() === value.toLowerCase()) : [].concat(fv(it)).map(String).includes(value)), lv: difficulty });
     if (!wrong) return null;
     const prompt = fill(meta.askReverse, { name: t.item.name, lname: t.item.lname, label: meta.label, value });
     if (givesAway(t.item.name, prompt, wrong.map(c => c.item.name))) return null;

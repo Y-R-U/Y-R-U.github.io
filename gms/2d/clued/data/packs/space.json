@@ -110,14 +110,6 @@
       "credit": "Burkhard Mücke",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Our_Sun_at_a_distance_of_150_Mio._km.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/The_Sun_in_white_light.jpg/500px-The_Sun_in_white_light.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Matúš Motlo",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:The_Sun_in_white_light.jpg"
      }
     ]
    },
@@ -215,14 +207,6 @@
       "credit": "NASA/JPL-Caltech",
       "license": "Public domain",
       "page": "https://commons.wikimedia.org/wiki/File:PIA23791-Venus-RealAndEnhancedContrastViews-20200608_(cropped).jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Venus_from_Mariner_10.jpg/500px-Venus_from_Mariner_10.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "NASA/JPL-Caltech",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Venus_from_Mariner_10.jpg"
      }
     ]
    },
@@ -458,7 +442,7 @@
    "difficulty": 1,
    "look": [
     79.5,
-    -5.0,
+    -5,
     -7.9
    ]
   },
@@ -595,7 +579,7 @@
    "look": [
     47.3,
     1.7,
-    3.0
+    3
    ]
   },
   {
@@ -842,9 +826,9 @@
    },
    "difficulty": 2,
    "look": [
-    45.0,
-    0.0,
-    0.0
+    45,
+    0,
+    0
    ]
   },
   {
@@ -976,8 +960,8 @@
    "difficulty": 3,
    "look": [
     61.1,
-    0.0,
-    0.0
+    0,
+    0
    ]
   },
   {
@@ -1114,7 +1098,7 @@
    },
    "difficulty": 3,
    "look": [
-    40.0,
+    40,
     0.2,
     -7.1
    ]
@@ -1155,7 +1139,7 @@
    "difficulty": 2,
    "look": [
     2.2,
-    0.0,
+    0,
     -1.8
    ]
   },
@@ -1303,7 +1287,7 @@
    "look": [
     24.8,
     4.2,
-    -2.0
+    -2
    ]
   },
   {
@@ -1509,8 +1493,8 @@
    },
    "difficulty": 1,
    "look": [
-    42.0,
-    2.0,
+    42,
+    2,
     -6.4
    ]
   },
@@ -1698,7 +1682,7 @@
    "look": [
     25.5,
     17.5,
-    -22.0
+    -22
    ]
   },
   {
@@ -1837,7 +1821,7 @@
    "look": [
     51.4,
     -0.3,
-    8.0
+    8
    ]
   },
   {
@@ -1882,7 +1866,7 @@
    },
    "difficulty": 1,
    "look": [
-    50.0,
+    50,
     3.8,
     -3.1
    ]
@@ -1916,20 +1900,12 @@
       "credit": "NASA",
       "license": "Public domain",
       "page": "https://commons.wikimedia.org/wiki/File:Apollo_13_Prime_Crew.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Apollo_13_passing_Moon.jpg/500px-Apollo_13_passing_Moon.jpg",
-      "w": 500,
-      "h": 519,
-      "credit": "James Lovell, John Swigert, Fred Haise",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Apollo_13_passing_Moon.jpg"
      }
     ]
    },
    "difficulty": 2,
    "look": [
-    38.0,
+    38,
     1.9,
     1.9
    ]
@@ -1966,21 +1942,13 @@
       "credit": "NASA/JPL",
       "license": "Public domain",
       "page": "https://commons.wikimedia.org/wiki/File:Voyager_spacecraft.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/Voyager_spacecraft_model.png/500px-Voyager_spacecraft_model.png",
-      "w": 500,
-      "h": 363,
-      "credit": "National Aeronautics and Space Administration (NASA)",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Voyager_spacecraft_model.png"
      }
     ]
    },
    "difficulty": 2,
    "look": [
     31.4,
-    4.0,
+    4,
     -6.4
    ]
   },
@@ -2031,7 +1999,7 @@
    },
    "difficulty": 1,
    "look": [
-    46.0,
+    46,
     3.2,
     7.1
    ]
@@ -2174,7 +2142,7 @@
    "difficulty": 1,
    "look": [
     64.7,
-    4.0,
+    4,
     4.9
    ]
   },

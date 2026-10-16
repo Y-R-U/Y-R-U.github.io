@@ -46,5 +46,22 @@ for (const id of ['gems', 'space', 'trees']) {
   ok(avg(stats[3]) > avg(stats[2]) && avg(stats[2]) >= avg(stats[1]), `${id}: hard offers more look-alikes than medium, medium ≥ easy`);
   ok(together === 0, `${id}: "apart" items never share a question (${together})`);
 }
+// films of one franchise / books of one series: easy never two together, medium one pair at most, hard offers them
+const { SERIES } = await import(js('formats/series_data.js'));
+for (const id of ['movies', 'books', 'movie-moments']) {
+  const pack = JSON.parse(await readFile(join(ROOT, `data/packs/${id}.json`), 'utf8'));
+  const pool = pack.items.map(item => ({ item, pack: pack.id, ref: `${pack.id}/${item.id}` }));
+  const inSeries = pool.filter(c => SERIES[c.item.id]);
+  const same = opts => { let p = 0; for (let i = 0; i < opts.length; i++) for (let j = i + 1; j < opts.length; j++) if (SERIES[opts[i].item.id] && SERIES[opts[i].item.id] === SERIES[opts[j].item.id]) p++; return p; };
+  const st = { 1: [], 2: [], 3: [] };
+  for (const lv of [1, 2, 3]) for (const t of inSeries) for (let k = 0; k < 10; k++) {
+    const w = distractors(rng, t, pool, 3, { lv });
+    if (w) st[lv].push(same([t, ...w]));
+  }
+  console.log(`${id}: same-series pairs per question (${inSeries.length} series items)  easy ${avg(st[1]).toFixed(2)}  medium ${avg(st[2]).toFixed(2)}  hard ${avg(st[3]).toFixed(2)}`);
+  ok(st[1].every(p => p === 0), `${id} easy: never two from one series`);
+  ok(st[2].every(p => p <= 1), `${id} medium: at most one same-series pair`);
+  ok(avg(st[3]) > avg(st[2]), `${id} hard: same-series options offered more than medium`);
+}
 console.log(`look_test: ${checks - fails} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

@@ -4961,6 +4961,919 @@
     ]
    },
    "difficulty": 1
+  },
+  {
+   "id": "the-empire-strikes-back",
+   "name": "The Empire Strikes Back",
+   "alt": [
+    "Star Wars: The Empire Strikes Back",
+    "Empire Strikes Back"
+   ],
+   "facts": {
+    "year": 1980,
+    "decade": "1980s",
+    "director": "Irvin Kershner",
+    "kids": true
+   },
+   "blurb": "It is the second Star Wars film.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/1754c0fa9aac.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Frozen in carbonite"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "star-wars-the-force-awakens",
+   "name": "Star Wars: The Force Awakens",
+   "alt": [
+    "The Force Awakens"
+   ],
+   "facts": {
+    "year": 2015,
+    "decade": "2010s",
+    "director": "J. J. Abrams",
+    "kids": false
+   },
+   "blurb": "It is the seventh main Star Wars film.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/e990c47fef53.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Duel in the snowy forest"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "avengers-infinity-war",
+   "name": "Avengers: Infinity War",
+   "alt": [
+    "Infinity War"
+   ],
+   "facts": {
+    "year": 2018,
+    "decade": "2010s",
+    "director": "Anthony Russo and Joe Russo",
+    "kids": false
+   },
+   "blurb": "Nearly every Marvel hero teams up against Thanos.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/3fa0ae508328.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The gauntlet with all six stones"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "spider-man-no-way-home",
+   "name": "Spider-Man: No Way Home",
+   "alt": [
+    "No Way Home"
+   ],
+   "facts": {
+    "year": 2021,
+    "decade": "2020s",
+    "director": "Jon Watts",
+    "kids": false
+   },
+   "blurb": "Tom Holland's Peter Parker faces the multiverse.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/32aaf36a593d.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The mirror dimension folds the city"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-avengers",
+   "name": "The Avengers",
+   "alt": [],
+   "facts": {
+    "year": 2012,
+    "decade": "2010s",
+    "director": "Joss Whedon",
+    "kids": false
+   },
+   "blurb": "Iron Man, Captain America, Thor and Hulk team up.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/ce4730f88a94.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Assembled at last"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "barbie",
+   "name": "Barbie",
+   "alt": [],
+   "facts": {
+    "year": 2023,
+    "decade": "2020s",
+    "director": "Greta Gerwig",
+    "kids": false
+   },
+   "blurb": "Margot Robbie plays a famous fashion doll.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/bbcc5a451c58.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Welcome to Barbie Land"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-lord-of-the-rings-the-return-of-the-king",
+   "name": "The Lord of the Rings: The Return of the King",
+   "alt": [
+    "The Return of the King"
+   ],
+   "facts": {
+    "year": 2003,
+    "decade": "2000s",
+    "director": "Peter Jackson",
+    "kids": false
+   },
+   "blurb": "The One Ring is finally thrown into Mount Doom.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/d46426d93e85.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The last climb up Mount Doom"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "shrek-2",
+   "name": "Shrek 2",
+   "alt": [],
+   "facts": {
+    "year": 2004,
+    "decade": "2000s",
+    "director": "Andrew Adamson and Kelly Asbury and Conrad Vernon",
+    "kids": true
+   },
+   "blurb": "An ogre and Princess Fiona go to meet her parents.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/bee598292219.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "A giant gingerbread man storms the castle"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "toy-story-3",
+   "name": "Toy Story 3",
+   "alt": [],
+   "facts": {
+    "year": 2010,
+    "decade": "2010s",
+    "director": "Lee Unkrich",
+    "kids": true
+   },
+   "blurb": "Woody, Buzz and friends face being thrown away.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/bc609737a9c0.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Holding hands at the incinerator"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "star-wars-episode-i-the-phantom-menace",
+   "name": "Star Wars: Episode I – The Phantom Menace",
+   "alt": [
+    "Episode I – The Phantom Menace",
+    "Phantom Menace"
+   ],
+   "facts": {
+    "year": 1999,
+    "decade": "1990s",
+    "director": "George Lucas",
+    "kids": true
+   },
+   "blurb": "It is the first of the Star Wars prequels.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/755d4ca5a565.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The duel of the fates"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pirates-of-the-caribbean-dead-man-s-chest",
+   "name": "Pirates of the Caribbean: Dead Man's Chest",
+   "alt": [
+    "Dead Man's Chest"
+   ],
+   "facts": {
+    "year": 2006,
+    "decade": "2000s",
+    "director": "Gore Verbinski",
+    "kids": false
+   },
+   "blurb": "Captain Jack Sparrow owes a debt to Davy Jones.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/71a9ab02a4e0.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The Kraken attacks"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "indiana-jones-and-the-last-crusade",
+   "name": "Indiana Jones and the Last Crusade",
+   "alt": [],
+   "facts": {
+    "year": 1989,
+    "decade": "1980s",
+    "director": "Steven Spielberg",
+    "kids": false
+   },
+   "blurb": "It is the third film about the whip-cracking archaeologist.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/d27ed4b3df39.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The leap of faith"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "return-of-the-jedi",
+   "name": "Return of the Jedi",
+   "alt": [],
+   "facts": {
+    "year": 1983,
+    "decade": "1980s",
+    "director": "Richard Marquand",
+    "kids": true
+   },
+   "blurb": "It is the third Star Wars film.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/f238274d0d60.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Walking the plank over the sand pit"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "toy-story-4",
+   "name": "Toy Story 4",
+   "alt": [],
+   "facts": {
+    "year": 2019,
+    "decade": "2010s",
+    "director": "Josh Cooley",
+    "kids": true
+   },
+   "blurb": "Woody looks after a plaything made from a plastic fork while searching for Bo Peep.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/b224c875278c.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "A spork who thinks he is trash"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "harry-potter-and-the-chamber-of-secrets",
+   "name": "Harry Potter and the Chamber of Secrets",
+   "alt": [],
+   "facts": {
+    "year": 2002,
+    "decade": "2000s",
+    "director": "Chris Columbus",
+    "kids": true
+   },
+   "blurb": "In his second year, the boy wizard investigates attacks on pupils at his school.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/cec38d5d05d6.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The basilisk in the Chamber of Secrets"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "harry-potter-and-the-prisoner-of-azkaban",
+   "name": "Harry Potter and the Prisoner of Azkaban",
+   "alt": [],
+   "facts": {
+    "year": 2004,
+    "decade": "2000s",
+    "director": "Alfonso Cuarón",
+    "kids": true
+   },
+   "blurb": "The boy wizard learns of an escaped convict said to be hunting him.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/27957515e8de.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The purple triple-decker bus"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-incredibles",
+   "name": "The Incredibles",
+   "alt": [],
+   "facts": {
+    "year": 2004,
+    "decade": "2000s",
+    "director": "Brad Bird",
+    "kids": true
+   },
+   "blurb": "A family of undercover superheroes comes out of retirement.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/94d79cd300a4.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A super family in matching suits"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-lord-of-the-rings-the-two-towers",
+   "name": "The Lord of the Rings: The Two Towers",
+   "alt": [
+    "The Two Towers"
+   ],
+   "facts": {
+    "year": 2002,
+    "decade": "2000s",
+    "director": "Peter Jackson",
+    "kids": false
+   },
+   "blurb": "It is the second part of a fantasy trilogy about a ring.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/c208364a17da.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The siege of Helm's Deep"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jurassic-world",
+   "name": "Jurassic World",
+   "alt": [],
+   "facts": {
+    "year": 2015,
+    "decade": "2010s",
+    "director": "Colin Trevorrow",
+    "kids": false
+   },
+   "blurb": "It is set 22 years after the first park film.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/8cee5bc27cc8.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Training the raptors"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spider-man",
+   "name": "Spider-Man",
+   "alt": [],
+   "facts": {
+    "year": 2002,
+    "decade": "2000s",
+    "director": "Sam Raimi",
+    "kids": false
+   },
+   "blurb": "A teenager bitten by a lab-altered arachnid gains powers and fights the Green Goblin.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/7f9f0a3d897e.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The upside-down kiss in the rain"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "iron-man",
+   "name": "Iron Man",
+   "alt": [],
+   "facts": {
+    "year": 2008,
+    "decade": "2000s",
+    "director": "Jon Favreau",
+    "kids": false
+   },
+   "blurb": "An arms dealer builds a powered suit of armour to escape captivity.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/c98e5de6a2b5.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The first flight of the suit"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "guardians-of-the-galaxy",
+   "name": "Guardians of the Galaxy",
+   "alt": [],
+   "facts": {
+    "year": 2014,
+    "decade": "2010s",
+    "director": "James Gunn",
+    "kids": false
+   },
+   "blurb": "A thief, a talking raccoon and a tree creature team up in space.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/dcea94cb0121.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The dancing baby tree"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "star-wars-the-last-jedi",
+   "name": "Star Wars: The Last Jedi",
+   "alt": [
+    "The Last Jedi"
+   ],
+   "facts": {
+    "year": 2017,
+    "decade": "2010s",
+    "director": "Rian Johnson",
+    "kids": false
+   },
+   "blurb": "It is the eighth main Star Wars film.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/0fe7c648c865.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Red trails on the salt planet"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "harry-potter-and-the-goblet-of-fire",
+   "name": "Harry Potter and the Goblet of Fire",
+   "alt": [],
+   "facts": {
+    "year": 2005,
+    "decade": "2000s",
+    "director": "Mike Newell",
+    "kids": false
+   },
+   "blurb": "It is the fourth film about the boy wizard.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/c3179ad87763.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Outflying the dragon"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "terminator-2-judgment-day",
+   "name": "Terminator 2: Judgment Day",
+   "alt": [
+    "Judgment Day"
+   ],
+   "facts": {
+    "year": 1991,
+    "decade": "1990s",
+    "director": "James Cameron",
+    "kids": false
+   },
+   "blurb": "Arnold Schwarzenegger plays a reprogrammed Terminator.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/83c887f1f3a8.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The liquid metal man"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "furious-7",
+   "name": "Furious 7",
+   "alt": [],
+   "facts": {
+    "year": 2015,
+    "decade": "2010s",
+    "director": "James Wan",
+    "kids": false
+   },
+   "blurb": "Dom Toretto's crew are hunted by a vengeful assassin.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/71fde2c4a237.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Jumping between the towers"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-bridge-on-the-river-kwai",
+   "name": "The Bridge on the River Kwai",
+   "alt": [],
+   "facts": {
+    "year": 1957,
+    "decade": "1950s",
+    "director": "David Lean",
+    "kids": false
+   },
+   "blurb": "British prisoners of war are forced to build a railway crossing in Burma.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/2fc59127a638.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The bridge built by prisoners"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "west-side-story",
+   "name": "West Side Story",
+   "alt": [],
+   "facts": {
+    "year": 1961,
+    "decade": "1960s",
+    "director": "Robert Wise and Jerome Robbins",
+    "kids": false
+   },
+   "blurb": "Rival New York street gangs and a forbidden love, retold from Romeo and Juliet.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/9717babdbdb6.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Tonight, on the fire escape"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "platoon",
+   "name": "Platoon",
+   "alt": [],
+   "facts": {
+    "year": 1986,
+    "decade": "1980s",
+    "director": "Oliver Stone",
+    "kids": false
+   },
+   "blurb": "A young soldier is caught between two sergeants in Vietnam.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/0bf3f43994d8.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Into the jungle"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dances-with-wolves",
+   "name": "Dances with Wolves",
+   "alt": [],
+   "facts": {
+    "year": 1990,
+    "decade": "1990s",
+    "director": "Kevin Costner",
+    "kids": false
+   },
+   "blurb": "A Union soldier posted to the frontier befriends a Lakota tribe.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/ddfda59920bb.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The buffalo hunt"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-silence-of-the-lambs",
+   "name": "The Silence of the Lambs",
+   "alt": [],
+   "facts": {
+    "year": 1991,
+    "decade": "1990s",
+    "director": "Jonathan Demme",
+    "kids": false
+   },
+   "blurb": "An FBI trainee seeks help from a cannibal psychiatrist to catch a serial killer.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/be94310faccb.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The death's-head moth"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "schindler-s-list",
+   "name": "Schindler's List",
+   "alt": [],
+   "facts": {
+    "year": 1993,
+    "decade": "1990s",
+    "director": "Steven Spielberg",
+    "kids": false
+   },
+   "blurb": "A German businessman saves more than a thousand Jewish workers during the Holocaust.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/9a6573bf00bb.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The girl in the red coat"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "braveheart",
+   "name": "Braveheart",
+   "alt": [],
+   "facts": {
+    "year": 1995,
+    "decade": "1990s",
+    "director": "Mel Gibson",
+    "kids": false
+   },
+   "blurb": "William Wallace leads the Scots against the English king.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/95f5ff31f79d.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "They may take our lives..."
+     }
+    ]
+   },
+   "difficulty": 1
   }
  ],
  "sources": [

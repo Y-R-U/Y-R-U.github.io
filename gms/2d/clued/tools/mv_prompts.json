@@ -3416,13 +3416,15 @@
      "p": "giant four-legged armoured walker war machines striding across a snowy white plain on an ice planet, small grey snowspeeder aircraft swooping low between their legs, soldiers in snow trenches",
      "d": 2,
      "cap": "The walkers attack on the ice planet",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 2)"
     },
     {
      "p": "a man frozen inside a slab of dark grey metal, only his raised hands and face in relief, standing upright in a steam-filled industrial chamber lit orange, figures in silhouette around it",
-     "d": 2,
+     "d": 3,
      "cap": "Frozen in carbonite",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -3441,13 +3443,17 @@
      "p": "dozens of glowing orange sparkling circular portals opening across a ruined smoking battlefield at dusk, armies of costumed heroes and flying warriors pouring out of them",
      "d": 2,
      "cap": "Portals open: the final battle",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 2 for scene 2)"
     },
     {
      "p": "a red and gold armoured metal hand in a gauntlet set with six glowing coloured gems, fingers about to snap, sparks and lightning on a ruined battlefield",
      "d": 2,
      "cap": "The last snap",
-     "cand": true
+     "picked": true,
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-16: poor — Try again, 3 fingers 1 thumb"
     }
    ]
   },
@@ -3466,13 +3472,15 @@
      "p": "the colossal wreck of a crashed triangular grey star destroyer half buried in golden desert dunes, a lone scavenger on a small hover speeder in the foreground at sunset",
      "d": 2,
      "cap": "Scavenging the fallen star destroyer",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 2)"
     },
     {
      "p": "two figures duelling with glowing light swords in a snowy pine forest at night, one red crackling cross-guard blade and one blue blade, the ground splitting behind them",
-     "d": 2,
+     "d": 3,
      "cap": "Duel in the snowy forest",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -3491,13 +3499,15 @@
      "p": "people slowly dissolving into drifting dust and ash in a misty alien forest, survivors kneeling in shock",
      "d": 2,
      "cap": "Half of all life turns to dust",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 2)"
     },
     {
      "p": "a golden metal gauntlet set with six glowing coloured gems raised in a huge purple fist against a burning sky",
-     "d": 2,
+     "d": 1,
      "cap": "The gauntlet with all six stones",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -3516,13 +3526,15 @@
      "p": "three masked web-slinging heroes in red and blue suits seen from behind standing on scaffolding wrapped around the Statue of Liberty at night, the city skyline glowing",
      "d": 2,
      "cap": "Three web-slingers at the Statue of Liberty",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 3 for scene 2)"
     },
     {
      "p": "a city street folding and twisting like a kaleidoscope, buildings spiralling into geometric mirrored shards, a masked hero in red and blue falling through it",
      "d": 2,
      "cap": "The mirror dimension folds the city",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -3539,13 +3551,15 @@
      "p": "a huge glowing hole torn in the sky above a New York skyscraper, an alien army and giant flying armoured whale-like creatures pouring out between the towers, smoke and broken glass",
      "d": 2,
      "cap": "The battle of New York",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 2)"
     },
     {
      "p": "a team of six costumed heroes standing in a circle back to back in a wrecked city street, a man in a red and gold armour suit, a star-spangled shield, a hammer and a bow",
-     "d": 2,
+     "d": 1,
      "cap": "Assembled at last",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -3560,15 +3574,17 @@
    "scenes": [
     {
      "p": "a bright pink plastic dream house with no outside walls on a perfect pink and pastel toy beach town, a pink convertible car parked outside, perfect plastic waves",
-     "d": 2,
+     "d": 3,
      "cap": "Welcome to Barbie Land",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a woman in a pink gingham dress seen from behind driving a pink convertible out of a toy pastel world onto a real grey Los Angeles highway",
      "d": 2,
      "cap": "Leaving Barbie Land for the real world",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -3587,13 +3603,15 @@
      "p": "a chain of beacon bonfires blazing one after another on the tops of snowy mountain peaks at dusk, stretching into the distance",
      "d": 2,
      "cap": "The beacons are lit",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 2 for scene 2)"
     },
     {
      "p": "two small hooded travellers climbing the ash slopes of a fiery erupting volcano under a red sky, a dark tower with a flaming eye far away",
      "d": 2,
      "cap": "The last climb up Mount Doom",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -3608,15 +3626,17 @@
    "scenes": [
     {
      "p": "a giant gingerbread man as tall as a castle stomping across a moat toward a fairy-tale castle, tiny guards fleeing, a fairy-tale kingdom of rolling hills",
-     "d": 2,
+     "d": 3,
      "cap": "A giant gingerbread man storms the castle",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a fairy-tale kingdom on a hill with a glittering Hollywood-style palace, a royal carriage pulled by horses arriving down a palm-lined road crowded with cheering subjects",
      "d": 2,
      "cap": "Arriving in Far Far Away",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -3631,15 +3651,17 @@
    "scenes": [
     {
      "p": "a group of toys holding hands on a sliding heap of rubbish above the fiery glowing pit of a garbage incinerator: a cowboy rag doll, a toy spaceman, a cowgirl doll, a toy horse, a piggy bank and a dinosaur",
-     "d": 2,
+     "d": 1,
      "cap": "Holding hands at the incinerator",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a giant mechanical claw reaching down from above toward a pile of toys in a dark garbage dump, the toys looking up",
      "d": 2,
      "cap": "Saved by the claw",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank 1 vs 1 for scene 1)"
     }
    ]
   },
@@ -3659,13 +3681,15 @@
      "p": "a podrace: small rocket racing pods towed by pairs of huge jet engines on cables tearing through a desert canyon past a giant rock arch, dust trails",
      "d": 2,
      "cap": "The podrace",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 2 for scene 2)"
     },
     {
      "p": "a horned figure in black robes seen from behind wielding a double-ended red light staff, facing two figures with blue and green light swords in a huge industrial reactor shaft",
      "d": 2,
      "cap": "The duel of the fates",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -3682,15 +3706,19 @@
    "scenes": [
     {
      "p": "tall blue-skinned people riding sleek long-finned sea creatures through clear turquoise reef water, a giant gentle whale-like creature below them, a sea village of woven huts on stilts",
-     "d": 2,
+     "d": 3,
      "cap": "Riding the reef of the sea clans",
-     "cand": true
+     "picked": true,
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-16: poor"
     },
     {
      "p": "a huge gentle whale-like sea creature with patterned skin breaching beside a small boy swimming in sunlit open ocean",
      "d": 2,
      "cap": "The great spirit-brother of the sea",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -3705,15 +3733,19 @@
    "scenes": [
     {
      "p": "a young woman in a white dress clinging to a translucent galloping horse made of water as it charges over dark stormy sea waves crashing against black rocks",
-     "d": 2,
+     "d": 3,
      "cap": "Taming the water horse",
-     "cand": true
+     "picked": true,
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-16: poor"
     },
     {
      "p": "an enchanted autumn forest of red and gold trees surrounded by a wall of thick swirling mist, four giant stone monoliths in a clearing",
      "d": 2,
      "cap": "The enchanted forest in the mist",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -3730,15 +3762,17 @@
    "scenes": [
     {
      "p": "the giant tentacles of a sea monster rising from the ocean to wrap around and crush a tall wooden sailing ship, sailors flying, stormy sky",
-     "d": 2,
+     "d": 3,
      "cap": "The Kraken attacks",
-     "cand": true
+     "picked": true
     },
     {
      "p": "three swordsmen duelling on top of a giant rolling wooden water mill wheel as it crashes through a tropical jungle",
      "d": 2,
      "cap": "Sword fight on the rolling wheel",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -3755,13 +3789,15 @@
      "p": "an adventurer in a fedora and leather jacket seen from behind stepping off a cliff edge onto an invisible stone bridge over a deep chasm in a cave temple",
      "d": 2,
      "cap": "The leap of faith",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a candlelit cave chamber filled with dozens of ornate jewelled golden goblets and one plain wooden cup, an ancient knight in chain mail standing guard",
      "d": 2,
      "cap": "Choose wisely: the Holy Grail",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 2 for scene 1)"
     }
    ]
   },
@@ -3776,15 +3812,19 @@
    "scenes": [
     {
      "p": "an enormous articulated truck flipping end over end on a dark wet city street at night, sparks flying, a dark motorcycle with huge wheels speeding away",
-     "d": 2,
+     "d": 3,
      "cap": "The truck flips",
-     "cand": true
+     "picked": true,
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-16: poor"
     },
     {
      "p": "a hospital building exploding behind a lone figure in a nurse uniform seen from behind walking away down the street, purple and green tones",
      "d": 2,
      "cap": "Leaving the exploding hospital",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -3801,13 +3841,15 @@
      "p": "two soldiers on small hover speeder bikes racing at high speed between giant redwood trees in a green forest, blurred trunks",
      "d": 2,
      "cap": "Speeder-bike chase through the forest",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 2)"
     },
     {
      "p": "a huge sail barge hovering above a gaping pit in the desert sand with a ring of teeth and tentacles at the bottom, a prisoner on a plank",
-     "d": 2,
+     "d": 3,
      "cap": "Walking the plank over the sand pit",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -3822,15 +3864,17 @@
    "scenes": [
     {
      "p": "a homemade toy made from a white plastic spork with mismatched googly eyes, pipe-cleaner arms and popsicle-stick feet standing on a school desk, crayons around it",
-     "d": 2,
+     "d": 3,
      "cap": "A spork who thinks he is trash",
-     "cand": true
+     "picked": true
     },
     {
      "p": "an old dusty antiques shop at night, a vintage doll in a pram watched over by stiff ventriloquist dummies, toys peering around a shelf",
      "d": 2,
      "cap": "The antiques shop at night",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -3845,15 +3889,19 @@
    "scenes": [
     {
      "p": "a lonely stone manor house in the Scottish highlands burning at night, a helicopter overhead, a figure running across the misty moor",
-     "d": 2,
+     "d": 3,
      "cap": "The old family house burns",
-     "cand": true
+     "picked": true,
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-16: poor"
     },
     {
      "p": "a man in a suit seen from behind leaping into the back of a moving train carriage with a digger arm ripping it open, a viaduct over a gorge",
      "d": 2,
      "cap": "The fight on top of the train",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -3870,13 +3918,15 @@
      "p": "a flying turquoise 1960s car soaring high above a red steam train crossing a stone viaduct in green Scottish highlands, two boys in it",
      "d": 2,
      "cap": "The flying car chases the Hogwarts Express",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 2 for scene 2)"
     },
     {
      "p": "a giant serpent rearing up in a flooded stone chamber of carved snake heads, a boy holding a silver sword, a red bird circling",
      "d": 2,
      "cap": "The basilisk in the Chamber of Secrets",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -3891,15 +3941,17 @@
    "scenes": [
     {
      "p": "a tall purple triple-decker bus squeezing itself thin between two London double-decker buses on a wet street at night",
-     "d": 2,
+     "d": 3,
      "cap": "The purple triple-decker bus",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a boy riding a hippogriff, half eagle half horse, gliding low over a misty Scottish lake, wingtip touching the water",
      "d": 2,
      "cap": "Flying on the hippogriff",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -3914,15 +3966,17 @@
    "scenes": [
     {
      "p": "a family of five superheroes in matching red suits with black eye masks seen from behind standing together in a wrecked city street, a mother stretching her arm, a boy running, a giant black robot behind",
-     "d": 2,
+     "d": 1,
      "cap": "A super family in matching suits",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a giant black spherical robot with long clawed legs rampaging through a city, firing a red laser, people fleeing",
      "d": 2,
      "cap": "The giant robot attacks the city",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 1)"
     }
    ]
   },
@@ -3941,13 +3995,15 @@
      "p": "a vast army of armoured warriors with ladders attacking a stone fortress built into a mountain gorge in pouring rain at night, lightning, torches",
      "d": 2,
      "cap": "The siege of Helm's Deep",
-     "cand": true
+     "picked": true
     },
     {
      "p": "giant walking tree creatures marching across a ring of broken walls as a dam bursts and floods around a tall black stone tower",
      "d": 2,
      "cap": "The trees flood Isengard",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 2 for scene 1)"
     }
    ]
   },
@@ -3964,13 +4020,15 @@
      "p": "a gigantic sea reptile leaping out of a huge lagoon to snatch a shark dangling from a crane, a crowded grandstand of tourists getting splashed",
      "d": 2,
      "cap": "Feeding time at the lagoon",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 2 for scene 2)"
     },
     {
      "p": "a man seen from behind holding out his hand to calm four velociraptors in a pen, catwalks above",
      "d": 2,
      "cap": "Training the raptors",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -3987,13 +4045,17 @@
      "p": "an outback bushman in a slouch hat with crocodile teeth on the band and a sleeveless leather vest seen from behind, holding up a huge hunting knife toward a mugger with a small flick knife in a night-time New York street",
      "d": 2,
      "cap": "That's not a knife",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 2)"
     },
     {
      "p": "a man in a leather vest and slouch hat wrestling a crocodile in a billabong in the Australian outback, red rocks and gum trees",
-     "d": 2,
+     "d": 1,
      "cap": "Wrestling a crocodile",
-     "cand": true
+     "picked": true,
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-16: poor — I like it, but it's a2 headed croc"
     }
    ]
   },
@@ -4008,15 +4070,17 @@
    "scenes": [
     {
      "p": "a masked hero in a red and blue web-patterned suit hanging upside down in pouring rain in a dark alley at night, a woman pulling his mask halfway down to kiss him",
-     "d": 2,
+     "d": 1,
      "cap": "The upside-down kiss in the rain",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a masked hero in red and blue swinging on a web line between New York skyscrapers, a villain on a green glider throwing a glowing bomb",
      "d": 2,
      "cap": "The glider attack over the city",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 1)"
     }
    ]
   },
@@ -4033,13 +4097,15 @@
      "p": "a crude bulky suit of iron armour built from scrap metal, rivets and pipes, with a glowing circle on its chest, smashing out of a dark desert cave workshop in flames",
      "d": 2,
      "cap": "Built in a cave from a box of scraps",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 2)"
     },
     {
      "p": "a man in a sleek red and gold metal flying suit soaring over clouds at night, jet boots glowing, ice forming on the armour",
-     "d": 2,
+     "d": 1,
      "cap": "The first flight of the suit",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -4054,15 +4120,17 @@
    "scenes": [
     {
      "p": "a little potted tree sapling with a tiny face dancing happily beside an old cassette player with foam headphones",
-     "d": 2,
+     "d": 3,
      "cap": "The dancing baby tree",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a masked space outlaw in a red leather coat with rocket boots seen from behind dancing through the ruins of an alien temple, a cassette walkman on his belt",
      "d": 2,
      "cap": "Dancing through the ruins",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -4077,15 +4145,19 @@
    "scenes": [
     {
      "p": "a pale white dragon bursting up through the glass dome of a vast marble bank hall and flying over London, three riders clinging to its back",
-     "d": 2,
+     "d": 3,
      "cap": "Escaping the bank on a dragon",
-     "cand": true
+     "picked": true,
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-16: poor"
     },
     {
      "p": "a great stone castle under a glowing shimmering magical dome at night, streaks of red and green light striking it from an army on the hills",
      "d": 2,
      "cap": "The battle of Hogwarts",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -4102,15 +4174,17 @@
    "scenes": [
     {
      "p": "small ski speeder craft skimming over a white salt-crusted planet, kicking up bright red trails of crystal dust, giant walker machines in the distance",
-     "d": 2,
+     "d": 3,
      "cap": "Red trails on the salt planet",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a lone hooded old man on a grassy cliff top of a remote rocky island in a grey sea, ancient stone beehive huts, a young woman holding out a light sword hilt",
      "d": 2,
      "cap": "Handing back the lightsaber on the island",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -4125,15 +4199,17 @@
    "scenes": [
     {
      "p": "a boy on a broomstick swerving around the slate roofs and towers of a castle, chased by a huge black spiky dragon breathing fire",
-     "d": 2,
+     "d": 3,
      "cap": "Outflying the dragon",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a giant hedge maze at night, a glowing blue trophy cup on a stone plinth at the centre, mist creeping between the walls",
      "d": 2,
      "cap": "The cup at the heart of the maze",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -4152,13 +4228,15 @@
      "p": "a boy on a small dirt bike racing down a dry concrete flood channel in Los Angeles as a huge tow truck crashes down into the channel behind him",
      "d": 2,
      "cap": "Chased down the storm drain",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 2 for scene 2)"
     },
     {
      "p": "a figure made of liquid shiny chrome metal rising out of a black-and-white chequered floor, reflecting the room",
      "d": 2,
      "cap": "The liquid metal man",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -4173,15 +4251,17 @@
    "scenes": [
     {
      "p": "a red sports car flying through the air between the top floors of two glass skyscrapers in Abu Dhabi, shattering glass, desert city below",
-     "d": 2,
+     "d": 3,
      "cap": "Jumping between the towers",
-     "cand": true
+     "picked": true
     },
     {
      "p": "cars with parachutes dropping out of the back of a cargo plane high above a mountain road",
      "d": 2,
      "cap": "Cars skydiving from a plane",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -4196,15 +4276,19 @@
    "scenes": [
     {
      "p": "a hidden futuristic African city of gleaming towers with thatched rooftops and maglev trains, set in a green valley ringed by misty waterfalls",
-     "d": 2,
+     "d": 3,
      "cap": "The hidden city of Wakanda",
-     "cand": true
+     "picked": true,
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-16: poor"
     },
     {
      "p": "two warriors fighting in ritual combat in a pool at the foot of a huge waterfall cliff, crowds watching from the rock ledges",
      "d": 2,
      "cap": "Ritual combat at the waterfall",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -4219,15 +4303,17 @@
    "scenes": [
     {
      "p": "a large wooden trestle railway bridge over a jungle river in Burma, ragged soldiers in shorts marching beside it",
-     "d": 2,
+     "d": 1,
      "cap": "The bridge built by prisoners",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a wooden railway bridge exploding as a steam train crosses it, the train plunging into the jungle river below",
      "d": 2,
      "cap": "The bridge is blown",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 1 for scene 1)"
     }
    ]
   },
@@ -4242,15 +4328,17 @@
    "scenes": [
     {
      "p": "a girl in a white dress on a fire escape balcony of a New York tenement at night, a young man climbing up to her, washing lines",
-     "d": 2,
+     "d": 3,
      "cap": "Tonight, on the fire escape",
-     "cand": true
+     "picked": true
     },
     {
      "p": "rival 1950s street gangs dancing and snapping their fingers in a New York playground among tenements, jeans and sneakers, high kicks",
      "d": 2,
      "cap": "The gangs dance in the street",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -4265,15 +4353,19 @@
    "scenes": [
     {
      "p": "a huge man seen from behind lifting a heavy marble hydrotherapy water fountain and throwing it through a barred hospital window at dawn, glass flying",
-     "d": 2,
+     "d": 3,
      "cap": "Breaking out through the window",
-     "cand": true
+     "picked": true,
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-16: poor"
     },
     {
      "p": "a group of hospital patients on a stolen fishing boat at sea laughing, an old harbour",
      "d": 2,
      "cap": "The fishing trip",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -4290,13 +4382,15 @@
      "p": "a soldier seen from behind falling to his knees with both arms raised to the sky in a jungle clearing, a helicopter flying away above",
      "d": 2,
      "cap": "The fall of Sergeant Elias",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank 3 vs 1 for scene 2)"
     },
     {
      "p": "soldiers wading through a misty Vietnam jungle at dawn, helicopters overhead",
-     "d": 2,
+     "d": 1,
      "cap": "Into the jungle",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -4313,13 +4407,15 @@
      "p": "a lone cavalry officer and a grey wolf facing each other on the vast golden prairie at sunset, a small fort behind",
      "d": 2,
      "cap": "Two Socks the wolf",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs 3 for scene 2)"
     },
     {
      "p": "a great buffalo herd thundering across the plains with Native American hunters on horseback riding among them",
      "d": 2,
      "cap": "The buffalo hunt",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -4336,13 +4432,15 @@
      "p": "a man in a white straitjacket and a grilled face mask strapped upright to a hand truck in a grey hangar, seen at a distance",
      "d": 2,
      "cap": "The masked prisoner on the hand truck",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 2)"
     },
     {
      "p": "a large moth with a skull-like pattern on its back resting on a dark surface, close up",
-     "d": 2,
+     "d": 3,
      "cap": "The death's-head moth",
-     "cand": true
+     "picked": true
     }
    ]
   },
@@ -4357,15 +4455,17 @@
    "scenes": [
     {
      "p": "a black and white ghetto street crowded with people and soldiers, one small girl in a red coat the only colour in the whole picture",
-     "d": 2,
+     "d": 3,
      "cap": "The girl in the red coat",
-     "cand": true
+     "picked": true
     },
     {
      "p": "black and white factory floor with workers making enamel pots and pans, a man in a coat watching",
      "d": 2,
      "cap": "The factory that saved lives",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank - vs - for scene 1)"
     }
    ]
   },
@@ -4380,15 +4480,17 @@
    "scenes": [
     {
      "p": "a horde of Scottish warriors in kilts with blue-painted faces charging with swords across a green highland battlefield",
-     "d": 2,
+     "d": 1,
      "cap": "They may take our lives...",
-     "cand": true
+     "picked": true
     },
     {
      "p": "a long line of Scottish warriors in kilts on a hill facing armoured English cavalry across a misty field",
      "d": 2,
      "cap": "Before the battle of Stirling",
-     "cand": true
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG pick 2026-10-16: the other candidate was kept (blind rank 1 vs 1 for scene 1)"
     }
    ]
   },

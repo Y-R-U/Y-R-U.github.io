@@ -1,5 +1,6 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610161056';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610161139';
+import { SERIES } from './series_data.js?v=202610161139';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -271,6 +272,8 @@ export function pickPack(rng, packs, weight = p => Math.sqrt((p.items || []).len
 const LOOK_NEAR = 20;
 export function looksAlike(a, b) {
   if ((a.lookalikes || []).includes(b.id) || (b.lookalikes || []).includes(a.id)) return true;
+  // films of one franchise, books of one series (Aaron 2026-10-16: easy never offers two from one series)
+  if (SERIES[a.id] && SERIES[a.id] === SERIES[b.id]) return true;
   // a curated overall shape (trees: spire, palm, gum…) decides first: different shapes never look alike
   if (a.form && b.form && a.form !== b.form) return false;
   if (!a.look || !b.look) return !!(a.form && a.form === b.form);

@@ -11,6 +11,7 @@ import {
 import { validatePack, leakStems, findLeak } from './c1_schema.mjs';
 import { dropGiveaways } from './q_giveaway.mjs';
 import { applyMarks } from './img_marks.mjs';
+import { dropBad } from './img_bad.mjs';
 // picture colour signatures from tools/img_look.py (look-alike options by level)
 const LOOKS = (() => { try { return JSON.parse(readFileSync(new URL('./img_look.json', import.meta.url), 'utf8')); } catch (e) { return {}; } })();
 
@@ -294,6 +295,7 @@ async function buildPack(id) {
   for (const w2 of warnings.slice(0, 15)) console.warn(`  schema-warn: ${w2}`);
   if (errors.length) { for (const e of errors) console.error('  ERROR', e); throw new Error(`${id}: ${errors.length} schema errors; not written`); }
   for (const q of dropGiveaways(pack)) console.warn(`  giveaway dropped ${id}/${q.id}: ${q.prompt}`);
+  dropBad(id, pack);
   applyMarks(id, pack);
   const look = LOOKS[id];
   if (look) for (const it of pack.items) if (look[it.id]) it.look = look[it.id];
