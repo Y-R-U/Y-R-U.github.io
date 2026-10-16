@@ -61,6 +61,27 @@ export const cloud = syncLocalKeys({
   canPester,
 });
 
+// Aaron: the avatar shows on the title, the results screens and Settings, never
+// during a match (it sat on top of the standings). Same approach as HEIRFRAME.
+const open = (id) => { const e = document.getElementById(id); return !!e && !e.classList.contains("hidden"); };
+const avatarShown = () => state.phase === "title" || state.phase === "over"
+  || open("gameover-popup") || open("victory-popup") || open("settings-popup");
+
+{
+  const host = document.getElementById("br8t-account");
+  const root = document.documentElement;
+  let last = null;
+  const sync = () => {
+    const on = avatarShown();
+    if (on === last) return;
+    last = on;
+    if (host) host.style.display = on ? "" : "none";
+    root.style.setProperty("--br8t-account-space", on ? "52px" : "0px");
+  };
+  sync();
+  setInterval(sync, 250);
+}
+
 /**
  * Called once from the results screen — never mid-match. Counts matches towards
  * the sign-in nudge.

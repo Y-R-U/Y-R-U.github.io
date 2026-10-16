@@ -64,8 +64,11 @@ memory-only. `matchCompleted()` fires once per match from `bankMatch()` in
 `main.js`, as the defeat/victory screen goes up. Read `/games/CLAUDE.md` before
 touching any of this.
 
-The account avatar sits top-right, so `#leaderboard` is offset by
-`var(--br8t-account-space, 0px)`.
+The account avatar sits top-right and (Aaron's call) shows only on the title,
+the results screens (defeat/victory popups, phase `over`) and Settings; `cloud.js`
+hides it during a match (countdown, playing, spectating with the popup dismissed)
+and sets `--br8t-account-space` to 0px then, like HEIRFRAME. `#leaderboard`'s `top`
+adds that var, so on results screens the standings drop below the avatar (on short landscape screens they step left of it instead, clear of the kill feed).
 
 `?test` skips the account layer entirely (hermetic automated runs); so do
 `?auto` and `?shot`. Career stats **are** still recorded under `?auto`, so a

@@ -198,14 +198,13 @@ body.playing { cursor: none; }
 
 /* ---------- Leaderboard ---------- */
 
-/* The br8t account avatar floats in the top-right corner and publishes its
-   footprint as --br8t-account-space (/lib/auth/ui.js). Shift the standings
-   panel out from under it; the 0px fallback means this is a no-op when the
-   account layer isn't loaded. */
+/* The br8t account avatar (top-right) only shows between matches; js/cloud.js
+   sets --br8t-account-space to 0px during play. On the results screens the
+   standings drop below the avatar rather than sliding left into the HUD. */
 #leaderboard {
   position: fixed;
-  top: max(12px, env(safe-area-inset-top));
-  right: calc(14px + var(--br8t-account-space, 0px));
+  top: calc(max(12px, env(safe-area-inset-top)) + var(--br8t-account-space, 0px));
+  right: 14px;
   z-index: 20;
   min-width: 215px;
   max-width: 250px;
@@ -1162,6 +1161,8 @@ body.spectating #btn-mute { bottom: max(100px, calc(env(safe-area-inset-bottom) 
   .game-title br { display: none; }
   .game-title .subtitle { margin-left: 10px; }
   .tagline { display: none; }
+  /* no height to drop into here (the kill feed rises from below): step left of the avatar */
+  #leaderboard { top: max(12px, env(safe-area-inset-top)); right: calc(14px + var(--br8t-account-space, 0px)); }
   #title-name-row { margin: 6px 0 6px; font-size: 11px; }
   #title-name { font-size: 15px; }
   #career-strip { margin-bottom: 8px; padding: 5px 12px; }
