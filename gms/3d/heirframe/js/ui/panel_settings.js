@@ -125,7 +125,8 @@ function accountSection(sec) {
   import('/lib/auth/auth.js').then(m => m.auth.ready().then(() => {
     const paint = u => {
       const inn = u && !u.anon;
-      acct.querySelector('small').textContent = inn ? `Signed in as ${u.name || u.email || 'you'}` : 'Playing as guest';
+      const cs = inn && window.__hfCloud?.status;
+      acct.querySelector('small').textContent = inn ? `Signed in as ${u.name || u.email || 'you'}${cs ? ' · ' + cs : ''}` : 'Playing as guest';
       ab.textContent = inn ? 'Account' : 'Sign in';
     };
     paint(m.auth.user);
