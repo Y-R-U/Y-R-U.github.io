@@ -40,7 +40,8 @@ export const NATIONALITY_EXTRA = {
   // lane LEADERS (leaders pack nationalities)
   'Babylonian': 'IRQ', 'Athenian': 'GRC', 'Spartan': 'GRC', 'Carthaginian': 'TUN', 'Byzantine': 'TUR', 'Malian': 'MLI', 'Wallachian': 'ROU',
   'Khmer': 'KHM', 'Prussian': 'DEU', 'Angolan': 'AGO', 'Haitian': 'HTI', 'Zulu': 'ZAF', 'Basotho': 'LSO', 'Malagasy': 'MDG', 'Hawaiian': 'USA',
-  'Lakota': 'USA', 'Tanzanian': 'TZA', 'Liberian': 'LBR', 'Congolese': 'COD',
+  'Lakota': 'USA', 'Tanzanian': 'TZA', 'Liberian': 'LBR', 'Congolese': 'COD', 'Libyan': 'LBY',
+  'Cambodian': 'KHM', 'Ugandan': 'UGA', 'North Korean': 'PRK',
 };
 // words.origin (a language) → the country it is tied to; Arabic, Latin, Old Norse, Inuit… stay untagged
 export const LANG_ORIGIN = {

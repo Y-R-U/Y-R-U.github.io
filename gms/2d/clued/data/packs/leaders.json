@@ -1012,7 +1012,8 @@
     ]
    },
    "difficulty": 2,
-   "gender": "m"
+   "gender": "m",
+   "kids": false
   },
   {
    "id": "charles-de-gaulle",
@@ -1604,7 +1605,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -1785,7 +1786,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -2087,7 +2088,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -2203,7 +2204,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -2238,7 +2239,7 @@
      }
     ]
    },
-   "difficulty": 3,
+   "difficulty": 2,
    "gender": "f"
   },
   {
@@ -2384,7 +2385,7 @@
      }
     ]
    },
-   "difficulty": 3,
+   "difficulty": 2,
    "gender": "m"
   },
   {
@@ -2451,7 +2452,7 @@
    "media": {
     "img": []
    },
-   "difficulty": 2,
+   "difficulty": 1,
    "gender": "m"
   },
   {
@@ -2733,7 +2734,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 1,
    "gender": "f"
   },
   {
@@ -2973,7 +2974,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 1,
    "gender": "m"
   },
   {
@@ -3087,7 +3088,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 1,
    "gender": "m"
   },
   {
@@ -3127,7 +3128,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 1,
    "gender": "m"
   },
   {
@@ -3208,7 +3209,7 @@
      }
     ]
    },
-   "difficulty": 3,
+   "difficulty": 2,
    "gender": "m"
   },
   {
@@ -3341,7 +3342,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -3379,7 +3380,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -3419,7 +3420,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -3460,7 +3461,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -4155,7 +4156,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -5533,7 +5534,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -5729,7 +5730,7 @@
      }
     ]
    },
-   "difficulty": 3,
+   "difficulty": 2,
    "gender": "m"
   },
   {
@@ -7456,7 +7457,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -7576,7 +7577,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -7616,7 +7617,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -7657,7 +7658,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -7696,7 +7697,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -7737,7 +7738,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -7941,7 +7942,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -7980,7 +7981,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -8134,7 +8135,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -8255,7 +8256,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -8295,7 +8296,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -8374,7 +8375,7 @@
      }
     ]
    },
-   "difficulty": 1,
+   "difficulty": 2,
    "gender": "m"
   },
   {
@@ -8414,7 +8415,7 @@
      }
     ]
    },
-   "difficulty": 1,
+   "difficulty": 2,
    "gender": "m"
   },
   {
@@ -8573,6 +8574,7 @@
     ]
    },
    "difficulty": 1,
+   "kids": false,
    "gender": "m"
   },
   {
@@ -8612,6 +8614,7 @@
     ]
    },
    "difficulty": 1,
+   "kids": false,
    "gender": "m"
   },
   {
@@ -8648,7 +8651,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -8723,7 +8726,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -8762,7 +8765,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -8926,7 +8929,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -9048,7 +9051,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -9087,7 +9090,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "gender": "m"
   },
   {
@@ -10099,7 +10102,412 @@
      }
     ]
    },
-   "difficulty": 3,
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "adolf-hitler",
+   "name": "Adolf Hitler",
+   "alt": [
+    "Hitler"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1889,
+    "died": 1945,
+    "nationality": "German",
+    "era": "1800s",
+    "field": "leadership",
+    "country": "Germany",
+    "start": 1933
+   },
+   "blurb": "Adolf Hitler (1889–1945): The dictator of Nazi Germany who started the Second World War in Europe.",
+   "clues": [
+    "He was born in Austria.",
+    "He wrote Mein Kampf while in prison.",
+    "He became Chancellor of Germany in 1933.",
+    "The Holocaust was carried out under his rule.",
+    "He killed himself in Berlin in April 1945.",
+    "Born in 1889.",
+    "Nationality: German.",
+    "He was the dictator of Nazi Germany who started the Second World War in Europe."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Adolf_Hitler_cropped_restored_3x4.jpg/330px-Adolf_Hitler_cropped_restored_3x4.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Unknown authorUnknown author",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Adolf_Hitler_cropped_restored_3x4.jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "kids": false,
+   "gender": "m"
+  },
+  {
+   "id": "benito-mussolini",
+   "name": "Benito Mussolini",
+   "alt": [
+    "Mussolini"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1883,
+    "died": 1945,
+    "nationality": "Italian",
+    "era": "1800s",
+    "field": "leadership",
+    "country": "Italy",
+    "start": 1922
+   },
+   "blurb": "Benito Mussolini (1883–1945): The fascist dictator of Italy.",
+   "clues": [
+    "He worked as a journalist before politics.",
+    "He led the March on Rome in 1922.",
+    "He allied Italy with Nazi Germany in the Second World War.",
+    "He was shot by Italian partisans in 1945.",
+    "Born in 1883.",
+    "Nationality: Italian.",
+    "He was the fascist dictator of Italy."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Mussolini_mezzobusto.jpg/330px-Mussolini_mezzobusto.jpg",
+      "w": 330,
+      "h": 447,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mussolini_mezzobusto.jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "kids": false,
+   "gender": "m"
+  },
+  {
+   "id": "francisco-franco",
+   "name": "Francisco Franco",
+   "alt": [
+    "Franco",
+    "General Franco"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1892,
+    "died": 1975,
+    "nationality": "Spanish",
+    "era": "1800s",
+    "field": "leadership",
+    "country": "Spain"
+   },
+   "blurb": "Francisco Franco (1892–1975): The dictator of Spain from 1939 to 1975.",
+   "clues": [
+    "He led the Nationalist side in the Spanish Civil War.",
+    "He kept Spain out of the Second World War.",
+    "He ruled until his death in 1975.",
+    "Born in 1892.",
+    "Nationality: Spanish.",
+    "He was the dictator of Spain from 1939 to 1975."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/RETRATO_DEL_GRAL._FRANCISCO_FRANCO_BAHAMONDE_%28adjusted_levels%29.jpg/330px-RETRATO_DEL_GRAL._FRANCISCO_FRANCO_BAHAMONDE_%28adjusted_levels%29.jpg",
+      "w": 330,
+      "h": 451,
+      "credit": "Unknown authorUnknown author",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:RETRATO_DEL_GRAL._FRANCISCO_FRANCO_BAHAMONDE_(adjusted_levels).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "kids": false,
+   "gender": "m"
+  },
+  {
+   "id": "pol-pot",
+   "name": "Pol Pot",
+   "alt": [],
+   "group": "leadership",
+   "facts": {
+    "born": 1925,
+    "died": 1998,
+    "nationality": "Cambodian",
+    "era": "1900s or later",
+    "field": "leadership"
+   },
+   "blurb": "Pol Pot (1925–1998): The leader of Cambodia from 1975 to 1979.",
+   "clues": [
+    "He led the communist Khmer Rouge movement.",
+    "His regime forced people out of the cities to work on collective farms.",
+    "Up to two million Cambodians died under his rule.",
+    "He died in 1998 without facing trial.",
+    "Born in 1925.",
+    "Nationality: Cambodian.",
+    "He was the leader of Cambodia from 1975 to 1979."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Pol_Pot_in_1978.png/330px-Pol_Pot_in_1978.png",
+      "w": 330,
+      "h": 472,
+      "credit": "Editura Politică",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pol_Pot_in_1978.png"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "kids": false,
+   "gender": "m"
+  },
+  {
+   "id": "idi-amin",
+   "name": "Idi Amin",
+   "alt": [
+    "Amin"
+   ],
+   "group": "leadership",
+   "facts": {
+    "died": 2003,
+    "nationality": "Ugandan",
+    "field": "leadership",
+    "country": "Uganda",
+    "role": "President",
+    "start": 1971
+   },
+   "blurb": "Idi Amin (died 2003): The military dictator of Uganda in the 1970s.",
+   "clues": [
+    "He was a heavyweight boxing champion of Uganda.",
+    "He seized power in a military coup in 1971.",
+    "He expelled Uganda's Asian community in 1972.",
+    "He was overthrown in 1979 and lived in exile in Saudi Arabia.",
+    "Nationality: Ugandan.",
+    "He was the military dictator of Uganda in the 1970s."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Idi_Amin_at_UN_%28United_Nations%2C_New_York%29_gtfy.00132_%28cropped%29.jpg/330px-Idi_Amin_at_UN_%28United_Nations%2C_New_York%29_gtfy.00132_%28cropped%29.jpg",
+      "w": 330,
+      "h": 437,
+      "credit": "Bernard Gotfryd",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Idi_Amin_at_UN_(United_Nations,_New_York)_gtfy.00132_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "kids": false,
+   "gender": "m"
+  },
+  {
+   "id": "saddam-hussein",
+   "name": "Saddam Hussein",
+   "alt": [
+    "Saddam"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1937,
+    "died": 2006,
+    "nationality": "Iraqi",
+    "era": "1900s or later",
+    "field": "leadership"
+   },
+   "blurb": "Saddam Hussein (1937–2006): The president of Iraq from 1979 to 2003.",
+   "clues": [
+    "He led his country in a long war against Iran in the 1980s.",
+    "He invaded Kuwait in 1990.",
+    "He was captured by US troops in 2003.",
+    "He was executed in 2006.",
+    "Born in 1937.",
+    "Nationality: Iraqi.",
+    "He was the president of Iraq from 1979 to 2003."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Saddam_Hussein_at_trial%2C_July_2004.JPEG/330px-Saddam_Hussein_at_trial%2C_July_2004.JPEG",
+      "w": 330,
+      "h": 506,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Saddam_Hussein_at_trial,_July_2004.JPEG"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "kids": false,
+   "gender": "m"
+  },
+  {
+   "id": "muammar-gaddafi",
+   "name": "Muammar Gaddafi",
+   "alt": [
+    "Gaddafi",
+    "Qaddafi",
+    "Muammar al-Gaddafi"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1942,
+    "died": 2011,
+    "nationality": "Libyan",
+    "era": "1900s or later",
+    "field": "leadership",
+    "country": "Libya",
+    "start": 1969
+   },
+   "blurb": "Muammar Gaddafi (1942–2011): The ruler of Libya from 1969 to 2011.",
+   "clues": [
+    "He seized power in a coup in 1969 at the age of 27.",
+    "He set out his ideas in the Green Book.",
+    "He ruled his country for 42 years.",
+    "He was killed during the civil war in 2011.",
+    "Born in 1942.",
+    "Nationality: Libyan.",
+    "He was the ruler of Libya from 1969 to 2011."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Muammar_al-Gaddafi_in_2010_%28cropped%29.jpg/330px-Muammar_al-Gaddafi_in_2010_%28cropped%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Hamza Turkia, © European Union, 2010",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Muammar_al-Gaddafi_in_2010_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "kids": false,
+   "gender": "m"
+  },
+  {
+   "id": "kim-il-sung",
+   "name": "Kim Il Sung",
+   "alt": [
+    "Kim Il-sung"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1912,
+    "died": 1994,
+    "nationality": "North Korean",
+    "era": "1900s or later",
+    "field": "leadership",
+    "country": "North Korea",
+    "start": 1948
+   },
+   "blurb": "Kim Il Sung (1912–1994): The founder and first leader of North Korea.",
+   "clues": [
+    "He fought against Japanese rule in Manchuria.",
+    "He started the Korean War in 1950.",
+    "His son and grandson have led the country since his death.",
+    "Born in 1912.",
+    "Nationality: North Korean.",
+    "He was the founder and first leader of North Korea."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Kim_Il-sung_in_1950.jpg/330px-Kim_Il-sung_in_1950.jpg",
+      "w": 330,
+      "h": 446,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kim_Il-sung_in_1950.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "kids": false,
+   "gender": "m"
+  },
+  {
+   "id": "augusto-pinochet",
+   "name": "Augusto Pinochet",
+   "alt": [
+    "Pinochet"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1915,
+    "died": 2006,
+    "nationality": "Chilean",
+    "era": "1900s or later",
+    "field": "leadership",
+    "country": "Chile",
+    "start": 1973
+   },
+   "blurb": "Augusto Pinochet (1915–2006): The military ruler of Chile from 1973 to 1990.",
+   "clues": [
+    "He led the 1973 military coup.",
+    "Thousands of opponents were killed or disappeared under his rule.",
+    "He lost a 1988 referendum on staying in power.",
+    "He was arrested in London in 1998.",
+    "Born in 1915.",
+    "Nationality: Chilean.",
+    "He was the military ruler of Chile from 1973 to 1990."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Augusto_Pinochet_foto_oficial_%28cropped%29%282%29.jpg/330px-Augusto_Pinochet_foto_oficial_%28cropped%29%282%29.jpg",
+      "w": 330,
+      "h": 479,
+      "credit": "Ministerio de Relaciones Exteriores de Chile",
+      "license": "CC BY 2.0 cl",
+      "page": "https://commons.wikimedia.org/wiki/File:Augusto_Pinochet_foto_oficial_(cropped)(2).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "kids": false,
+   "gender": "m"
+  },
+  {
+   "id": "nicolae-ceausescu",
+   "name": "Nicolae Ceaușescu",
+   "alt": [
+    "Ceausescu",
+    "Nicolae Ceausescu"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1918,
+    "died": 1989,
+    "nationality": "Romanian",
+    "era": "1900s or later",
+    "field": "leadership",
+    "country": "Romania",
+    "start": 1965
+   },
+   "blurb": "Nicolae Ceaușescu (1918–1989): The communist leader of Romania from 1965 to 1989.",
+   "clues": [
+    "He built the huge Palace of the Parliament in Bucharest.",
+    "His secret police, the Securitate, watched the population.",
+    "He was overthrown in the 1989 revolution.",
+    "He and his wife were executed on Christmas Day 1989.",
+    "Born in 1918.",
+    "Nationality: Romanian.",
+    "He was the communist leader of Romania from 1965 to 1989."
+   ],
+   "media": {
+    "img": []
+   },
+   "difficulty": 2,
+   "kids": false,
    "gender": "m"
   }
  ],
@@ -10742,7 +11150,8 @@
    "difficulty": 2,
    "refs": [
     "leaders/mao-zedong"
-   ]
+   ],
+   "kids": false
   },
   {
    "id": "born-mao-zedong",
@@ -10758,7 +11167,8 @@
    "difficulty": 3,
    "refs": [
     "leaders/mao-zedong"
-   ]
+   ],
+   "kids": false
   },
   {
    "id": "who-charles-de-gaulle",
@@ -11086,9 +11496,9 @@
    "prompt": "Who is this? He is often regarded as the most powerful pharaoh of the New Kingdom.",
    "answer": "Ramesses II",
    "wrong": [
-    "Oda Nobunaga",
-    "François Mitterrand",
-    "Richard Seddon"
+    "Frederick the Great",
+    "Cyril Ramaphosa",
+    "Cyrus the Great"
    ],
    "explain": "Ramesses II: Often regarded as the most powerful pharaoh of the New Kingdom.",
    "difficulty": 2,
@@ -11102,9 +11512,9 @@
    "prompt": "Who is this? He was a boy pharaoh of ancient Egypt.",
    "answer": "Tutankhamun",
    "wrong": [
-    "John Adams",
-    "Haile Selassie",
-    "Václav Havel"
+    "John Howard",
+    "Pachacuti",
+    "Neville Chamberlain"
    ],
    "explain": "Tutankhamun: A boy pharaoh of ancient Egypt.",
    "difficulty": 2,
@@ -11134,9 +11544,9 @@
    "prompt": "Who is this? He was a pharaoh who made the sun disc Aten the centre of Egyptian worship.",
    "answer": "Akhenaten",
    "wrong": [
-    "Justin Trudeau",
-    "Mikhail Gorbachev",
-    "Suleiman the Magnificent"
+    "Augusto Pinochet",
+    "David Lloyd George",
+    "Oliver Cromwell"
    ],
    "explain": "Akhenaten: A pharaoh who made the sun disc Aten the centre of Egyptian worship.",
    "difficulty": 3,
@@ -11150,9 +11560,9 @@
    "prompt": "Who is this? He was the pharaoh who built the Great Pyramid of Giza.",
    "answer": "Khufu",
    "wrong": [
-    "John Adams",
-    "Robert the Bruce",
-    "Charles I"
+    "Cyril Ramaphosa",
+    "John A. Macdonald",
+    "Oliver Cromwell"
    ],
    "explain": "Khufu: The pharaoh who built the Great Pyramid of Giza.",
    "difficulty": 3,
@@ -11166,12 +11576,12 @@
    "prompt": "Who is this? He founded the Achaemenid Persian Empire.",
    "answer": "Cyrus the Great",
    "wrong": [
-    "Sitting Bull",
-    "Winston Churchill",
-    "Attila"
+    "George H. W. Bush",
+    "Philip II of Spain",
+    "Maximilien Robespierre"
    ],
    "explain": "Cyrus the Great (died 530 BC): Founded the Achaemenid Persian Empire.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/cyrus-the-great"
    ]
@@ -11182,9 +11592,9 @@
    "prompt": "Who is this? He was the third king of the Achaemenid Persian Empire.",
    "answer": "Darius the Great",
    "wrong": [
-    "Lee Kuan Yew",
-    "Kwame Nkrumah",
-    "Sejong the Great"
+    "George III",
+    "Kamehameha I",
+    "Boris Yeltsin"
    ],
    "explain": "Darius the Great (died 486 BC): The third king of the Achaemenid Persian Empire.",
    "difficulty": 3,
@@ -11198,9 +11608,9 @@
    "prompt": "Who is this? He was a Persian king who invaded Greece.",
    "answer": "Xerxes I",
    "wrong": [
-    "Timur",
-    "François Mitterrand",
-    "Lee Kuan Yew"
+    "Benito Juárez",
+    "Barack Obama",
+    "Kim Il Sung"
    ],
    "explain": "Xerxes I (518 BC–465 BC): A Persian king who invaded Greece.",
    "difficulty": 3,
@@ -11214,9 +11624,9 @@
    "prompt": "Who is this? He was a king of Babylon famous for his code of laws.",
    "answer": "Hammurabi",
    "wrong": [
-    "Scott Morrison",
-    "David Lange",
-    "Babur"
+    "Qin Shi Huang",
+    "John Key",
+    "Tutankhamun"
    ],
    "explain": "Hammurabi: A king of Babylon famous for his code of laws.",
    "difficulty": 3,
@@ -11230,9 +11640,9 @@
    "prompt": "Who is this? He was the longest-reigning king of the Neo-Babylonian Empire.",
    "answer": "Nebuchadnezzar II",
    "wrong": [
-    "Hadrian",
-    "Pachacuti",
-    "Edward VII"
+    "Sun Yat-sen",
+    "Timur",
+    "Ashoka"
    ],
    "explain": "Nebuchadnezzar II: The longest-reigning king of the Neo-Babylonian Empire.",
    "difficulty": 3,
@@ -11246,12 +11656,12 @@
    "prompt": "Who is this? He was an emperor of the Maurya dynasty.",
    "answer": "Ashoka",
    "wrong": [
-    "Attila",
-    "Harun al-Rashid",
-    "Tipu Sultan"
+    "Sukarno",
+    "Pericles",
+    "George III"
    ],
    "explain": "Ashoka (died 232 BC): An emperor of the Maurya dynasty.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/ashoka"
    ]
@@ -11262,9 +11672,9 @@
    "prompt": "Who is this? He was the leading statesman of Athens in its golden age.",
    "answer": "Pericles",
    "wrong": [
-    "Kublai Khan",
-    "Wilfrid Laurier",
-    "Alfred Deakin"
+    "Maximilien Robespierre",
+    "Sejong the Great",
+    "John Howard"
    ],
    "explain": "Pericles (died 429 BC): The leading statesman of Athens in its golden age.",
    "difficulty": 3,
@@ -11278,9 +11688,9 @@
    "prompt": "Who is this? He was a warrior king of Sparta.",
    "answer": "Leonidas I",
    "wrong": [
-    "Puyi",
-    "George VI",
-    "William Gladstone"
+    "Boris Yeltsin",
+    "Gordon Brown",
+    "Toyotomi Hideyoshi"
    ],
    "explain": "Leonidas I (died 480 BC): A warrior king of Sparta.",
    "difficulty": 3,
@@ -11294,9 +11704,9 @@
    "prompt": "Who is this? He was the father of Alexander the Great.",
    "answer": "Philip II of Macedon",
    "wrong": [
-    "Jomo Kenyatta",
-    "Sitting Bull",
-    "Winston Churchill"
+    "Edward VIII",
+    "Mikhail Gorbachev",
+    "Ho Chi Minh"
    ],
    "explain": "Philip II of Macedon (died 336 BC): The father of Alexander the Great.",
    "difficulty": 3,
@@ -11310,9 +11720,9 @@
    "prompt": "Who is this? He was a Carthaginian general who fought Rome.",
    "answer": "Hannibal",
    "wrong": [
-    "Moshoeshoe I",
-    "Kangxi Emperor",
-    "Ronald Reagan"
+    "Alexander the Great",
+    "Joe Biden",
+    "Wilfrid Laurier"
    ],
    "explain": "Hannibal: A Carthaginian general who fought Rome.",
    "difficulty": 2,
@@ -11326,9 +11736,9 @@
    "prompt": "Who is this? He was the last emperor of the Julio-Claudian dynasty.",
    "answer": "Nero",
    "wrong": [
-    "Mansa Musa",
-    "Frederick the Great",
-    "Jacques Chirac"
+    "Mustafa Kemal Atatürk",
+    "Woodrow Wilson",
+    "Mehmed II"
    ],
    "explain": "Nero (37–68): The last emperor of the Julio-Claudian dynasty.",
    "difficulty": 2,
@@ -11344,7 +11754,7 @@
    "wrong": [
     "67",
     "7",
-    "27"
+    "47"
    ],
    "explain": "Nero (37–68): The last emperor of the Julio-Claudian dynasty.",
    "difficulty": 3,
@@ -11358,9 +11768,9 @@
    "prompt": "Who is this? He was the third Roman emperor.",
    "answer": "Caligula",
    "wrong": [
-    "Harold Macmillan",
-    "Nebuchadnezzar II",
-    "Neville Chamberlain"
+    "Wilfrid Laurier",
+    "Jimmy Carter",
+    "Clement Attlee"
    ],
    "explain": "Caligula (12–41): The third Roman emperor.",
    "difficulty": 2,
@@ -11374,9 +11784,9 @@
    "prompt": "In which year was Caligula born?",
    "answer": "12",
    "wrong": [
-    "-18",
-    "2",
-    "-8"
+    "22",
+    "32",
+    "2"
    ],
    "explain": "Caligula (12–41): The third Roman emperor.",
    "difficulty": 3,
@@ -11390,9 +11800,9 @@
    "prompt": "Who is this? He was the last of the Five Good Emperors of Rome.",
    "answer": "Marcus Aurelius",
    "wrong": [
-    "Charles III",
-    "Otto von Bismarck",
-    "Vladimir Lenin"
+    "Atahualpa",
+    "William Pitt the Younger",
+    "Mehmed II"
    ],
    "explain": "Marcus Aurelius (121–180): The last of the Five Good Emperors of Rome.",
    "difficulty": 2,
@@ -11406,9 +11816,9 @@
    "prompt": "In which year was Marcus Aurelius born?",
    "answer": "121",
    "wrong": [
-    "111",
-    "101",
-    "91"
+    "131",
+    "91",
+    "101"
    ],
    "explain": "Marcus Aurelius (121–180): The last of the Five Good Emperors of Rome.",
    "difficulty": 3,
@@ -11422,12 +11832,12 @@
    "prompt": "Who is this? He was a Roman emperor counted among the Five Good Emperors.",
    "answer": "Trajan",
    "wrong": [
-    "Anthony Albanese",
-    "Menelik II",
-    "Ulysses S. Grant"
+    "Kevin Rudd",
+    "Billy Hughes",
+    "Mikhail Gorbachev"
    ],
    "explain": "Trajan (53–117): A Roman emperor counted among the Five Good Emperors.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/trajan"
    ]
@@ -11439,8 +11849,8 @@
    "answer": "53",
    "wrong": [
     "23",
-    "73",
-    "33"
+    "63",
+    "83"
    ],
    "explain": "Trajan (53–117): A Roman emperor counted among the Five Good Emperors.",
    "difficulty": 3,
@@ -11454,9 +11864,9 @@
    "prompt": "Who is this? He was the Roman emperor who built a wall across northern Britain.",
    "answer": "Hadrian",
    "wrong": [
-    "Oliver Cromwell",
-    "David Cameron",
-    "Hannibal"
+    "Edward I",
+    "Charles III",
+    "Theodore Roosevelt"
    ],
    "explain": "Hadrian (76–138): The Roman emperor who built a wall across northern Britain.",
    "difficulty": 3,
@@ -11470,9 +11880,9 @@
    "prompt": "In which year was Hadrian born?",
    "answer": "76",
    "wrong": [
+    "46",
     "66",
-    "96",
-    "46"
+    "106"
    ],
    "explain": "Hadrian (76–138): The Roman emperor who built a wall across northern Britain.",
    "difficulty": 3,
@@ -11486,9 +11896,9 @@
    "prompt": "Who is this? He was the first Roman emperor to become a Christian.",
    "answer": "Constantine the Great",
    "wrong": [
-    "Emperor Meiji",
-    "Charles V",
-    "Nelson Mandela"
+    "Bob Hawke",
+    "Brian Boru",
+    "Rishi Sunak"
    ],
    "explain": "Constantine the Great (died 337): The first Roman emperor to become a Christian.",
    "difficulty": 2,
@@ -11502,12 +11912,12 @@
    "prompt": "Who is this? He was a Byzantine emperor who won back Italy and North Africa.",
    "answer": "Justinian I",
    "wrong": [
-    "John Curtin",
-    "Jimmy Carter",
-    "David Lange"
+    "Scott Morrison",
+    "Lee Kuan Yew",
+    "Harold Macmillan"
    ],
    "explain": "Justinian I (died 565): A Byzantine emperor who won back Italy and North Africa.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/justinian-i"
    ]
@@ -11523,7 +11933,7 @@
     "Margaret Thatcher"
    ],
    "explain": "Boudica (died 61): A queen of the Iceni who led a revolt against Roman rule in Britain.",
-   "difficulty": 3,
+   "difficulty": 2,
    "refs": [
     "leaders/boudica"
    ]
@@ -11534,9 +11944,9 @@
    "prompt": "Who is this? He was the ruler of the Huns.",
    "answer": "Attila",
    "wrong": [
-    "Simón Bolívar",
-    "Woodrow Wilson",
-    "Malcolm Fraser"
+    "Charles de Gaulle",
+    "Gough Whitlam",
+    "Constantine the Great"
    ],
    "explain": "Attila (died 453): The ruler of the Huns.",
    "difficulty": 2,
@@ -11550,9 +11960,9 @@
    "prompt": "Who is this? He was one of the longest-reigning rulers of ancient China.",
    "answer": "Emperor Wu of Han",
    "wrong": [
-    "Toyotomi Hideyoshi",
-    "Charles de Gaulle",
-    "David Cameron"
+    "Ben Chifley",
+    "Lee Kuan Yew",
+    "Julius Caesar"
    ],
    "explain": "Emperor Wu of Han (died 87 BC): One of the longest-reigning rulers of ancient China.",
    "difficulty": 3,
@@ -11566,9 +11976,9 @@
    "prompt": "Who is this? He was a king of Wessex who fought off the Vikings.",
    "answer": "Alfred the Great",
    "wrong": [
-    "Henry V",
-    "Aurangzeb",
-    "Peter the Great"
+    "Kublai Khan",
+    "Toussaint Louverture",
+    "Malcolm Fraser"
    ],
    "explain": "Alfred the Great (849–899): A king of Wessex who fought off the Vikings.",
    "difficulty": 2,
@@ -11582,9 +11992,9 @@
    "prompt": "In which year was Alfred the Great born?",
    "answer": "849",
    "wrong": [
-    "829",
-    "839",
-    "869"
+    "879",
+    "819",
+    "829"
    ],
    "explain": "Alfred the Great (849–899): A king of Wessex who fought off the Vikings.",
    "difficulty": 3,
@@ -11598,12 +12008,12 @@
    "prompt": "Who is this? He was a Viking king who ruled a North Sea empire.",
    "answer": "Cnut",
    "wrong": [
-    "George VI",
-    "Frederick the Great",
-    "Moctezuma II"
+    "George Washington",
+    "Emperor Wu of Han",
+    "Scott Morrison"
    ],
    "explain": "Cnut (died 1035): A Viking king who ruled a North Sea empire.",
-   "difficulty": 3,
+   "difficulty": 2,
    "refs": [
     "leaders/cnut"
    ]
@@ -11614,9 +12024,9 @@
    "prompt": "Who is this? He was the last crowned Anglo-Saxon king of England.",
    "answer": "Harold Godwinson",
    "wrong": [
-    "Chris Watson",
-    "John Curtin",
-    "Jomo Kenyatta"
+    "Patrice Lumumba",
+    "Trajan",
+    "Augusto Pinochet"
    ],
    "explain": "Harold Godwinson (died 1066): The last crowned Anglo-Saxon king of England.",
    "difficulty": 2,
@@ -11630,12 +12040,12 @@
    "prompt": "Who is this? He was the first Norman king of England.",
    "answer": "William the Conqueror",
    "wrong": [
-    "Oda Nobunaga",
-    "Lech Wałęsa",
-    "Éamon de Valera"
+    "Wilfrid Laurier",
+    "Kim Il Sung",
+    "John Gorton"
    ],
    "explain": "William the Conqueror (died 1087): The first Norman king of England.",
-   "difficulty": 2,
+   "difficulty": 1,
    "refs": [
     "leaders/william-the-conqueror"
    ]
@@ -11646,9 +12056,9 @@
    "prompt": "Who is this? He was a crusader king of England.",
    "answer": "Richard I",
    "wrong": [
-    "Edmund Barton",
-    "Jomo Kenyatta",
-    "William Gladstone"
+    "Sitting Bull",
+    "Cyrus the Great",
+    "Shinzo Abe"
    ],
    "explain": "Richard I (1157–1199): A crusader king of England.",
    "difficulty": 2,
@@ -11662,9 +12072,9 @@
    "prompt": "In which year was Richard I born?",
    "answer": "1157",
    "wrong": [
-    "1187",
-    "1127",
-    "1177"
+    "1177",
+    "1147",
+    "1137"
    ],
    "explain": "Richard I (1157–1199): A crusader king of England.",
    "difficulty": 3,
@@ -11678,9 +12088,9 @@
    "prompt": "Who is this? He was the English king who fought William Wallace.",
    "answer": "Edward I",
    "wrong": [
-    "Emmanuel Macron",
-    "Joe Biden",
-    "Yongle Emperor"
+    "Shinzo Abe",
+    "Henry Parkes",
+    "George III"
    ],
    "explain": "Edward I (1239–1307): The English king who fought William Wallace.",
    "difficulty": 3,
@@ -11694,9 +12104,9 @@
    "prompt": "In which year was Edward I born?",
    "answer": "1239",
    "wrong": [
-    "1219",
-    "1259",
-    "1209"
+    "1269",
+    "1209",
+    "1219"
    ],
    "explain": "Edward I (1239–1307): The English king who fought William Wallace.",
    "difficulty": 3,
@@ -11710,9 +12120,9 @@
    "prompt": "Who is this? He was an English king who conquered much of northern France.",
    "answer": "Henry V",
    "wrong": [
-    "Rishi Sunak",
-    "Woodrow Wilson",
-    "Julius Nyerere"
+    "Deng Xiaoping",
+    "Kevin Rudd",
+    "Charles II"
    ],
    "explain": "Henry V (1386–1422): An English king who conquered much of northern France.",
    "difficulty": 2,
@@ -11726,9 +12136,9 @@
    "prompt": "In which year was Henry V born?",
    "answer": "1386",
    "wrong": [
+    "1356",
     "1396",
-    "1376",
-    "1366"
+    "1416"
    ],
    "explain": "Henry V (1386–1422): An English king who conquered much of northern France.",
    "difficulty": 3,
@@ -11742,9 +12152,9 @@
    "prompt": "Who is this? He was the last Plantagenet king of England.",
    "answer": "Richard III",
    "wrong": [
-    "Shaka",
-    "Helmut Kohl",
-    "Wilhelm II"
+    "Sun Yat-sen",
+    "Donald Trump",
+    "Darius the Great"
    ],
    "explain": "Richard III (1452–1485): The last Plantagenet king of England.",
    "difficulty": 2,
@@ -11758,9 +12168,9 @@
    "prompt": "In which year was Richard III born?",
    "answer": "1452",
    "wrong": [
-    "1442",
     "1472",
-    "1482"
+    "1482",
+    "1432"
    ],
    "explain": "Richard III (1452–1485): The last Plantagenet king of England.",
    "difficulty": 3,
@@ -11774,9 +12184,9 @@
    "prompt": "Who is this? He was the first Tudor king of England.",
    "answer": "Henry VII",
    "wrong": [
-    "Otto von Bismarck",
-    "George H. W. Bush",
-    "Edward I"
+    "Louis XIV",
+    "George W. Bush",
+    "Akbar"
    ],
    "explain": "Henry VII (1457–1509): The first Tudor king of England.",
    "difficulty": 2,
@@ -11790,9 +12200,9 @@
    "prompt": "In which year was Henry VII born?",
    "answer": "1457",
    "wrong": [
+    "1447",
     "1477",
-    "1467",
-    "1437"
+    "1487"
    ],
    "explain": "Henry VII (1457–1509): The first Tudor king of England.",
    "difficulty": 3,
@@ -11806,9 +12216,9 @@
    "prompt": "Who is this? She was a Tudor queen who tried to restore Catholicism in England.",
    "answer": "Mary I",
    "wrong": [
-    "Margaret Thatcher",
-    "Ranavalona I",
-    "Empress Dowager Cixi"
+    "Maria Theresa",
+    "Queen Anne",
+    "Elizabeth II"
    ],
    "explain": "Mary I (1516–1558): A Tudor queen who tried to restore Catholicism in England.",
    "difficulty": 2,
@@ -11822,8 +12232,8 @@
    "prompt": "In which year was Mary I born?",
    "answer": "1516",
    "wrong": [
+    "1536",
     "1486",
-    "1506",
     "1496"
    ],
    "explain": "Mary I (1516–1558): A Tudor queen who tried to restore Catholicism in England.",
@@ -11843,7 +12253,7 @@
     "Catherine the Great"
    ],
    "explain": "Mary, Queen of Scots (1542–1587): Executed on the orders of her cousin Elizabeth I.",
-   "difficulty": 2,
+   "difficulty": 1,
    "refs": [
     "leaders/mary-queen-of-scots"
    ]
@@ -11854,9 +12264,9 @@
    "prompt": "In which year was Mary, Queen of Scots born?",
    "answer": "1542",
    "wrong": [
-    "1532",
+    "1572",
     "1522",
-    "1552"
+    "1512"
    ],
    "explain": "Mary, Queen of Scots (1542–1587): Executed on the orders of her cousin Elizabeth I.",
    "difficulty": 3,
@@ -11870,9 +12280,9 @@
    "prompt": "Who is this? He was the first monarch to rule both England and Scotland.",
    "answer": "James VI and I",
    "wrong": [
-    "Henry VII",
-    "John Curtin",
-    "Yongle Emperor"
+    "Moshoeshoe I",
+    "Franz Joseph I",
+    "Harold Godwinson"
    ],
    "explain": "James VI and I (1566–1625): The first monarch to rule both England and Scotland.",
    "difficulty": 2,
@@ -11886,9 +12296,9 @@
    "prompt": "In which year was James VI and I born?",
    "answer": "1566",
    "wrong": [
-    "1596",
-    "1546",
-    "1586"
+    "1576",
+    "1586",
+    "1556"
    ],
    "explain": "James VI and I (1566–1625): The first monarch to rule both England and Scotland.",
    "difficulty": 3,
@@ -11902,9 +12312,9 @@
    "prompt": "Who is this? He was the king executed in 1649.",
    "answer": "Charles I",
    "wrong": [
-    "Chiang Kai-shek",
-    "Pericles",
-    "Gordon Brown"
+    "Harold Godwinson",
+    "Tony Blair",
+    "Franz Joseph I"
    ],
    "explain": "Charles I (1600–1649): The king executed in 1649.",
    "difficulty": 2,
@@ -11918,9 +12328,9 @@
    "prompt": "In which year was Charles I born?",
    "answer": "1600",
    "wrong": [
-    "1570",
+    "1590",
     "1580",
-    "1610"
+    "1570"
    ],
    "explain": "Charles I (1600–1649): The king executed in 1649.",
    "difficulty": 3,
@@ -11934,9 +12344,9 @@
    "prompt": "Who is this? He ruled as Lord Protector of England, Scotland and Ireland.",
    "answer": "Oliver Cromwell",
    "wrong": [
-    "Robert Peel",
-    "Aurangzeb",
-    "Ramesses II"
+    "Éamon de Valera",
+    "Constantine the Great",
+    "Harold Godwinson"
    ],
    "explain": "Oliver Cromwell (1599–1658): Ruled as Lord Protector of England, Scotland and Ireland.",
    "difficulty": 2,
@@ -11950,8 +12360,8 @@
    "prompt": "In which year was Oliver Cromwell born?",
    "answer": "1599",
    "wrong": [
-    "1629",
     "1619",
+    "1609",
     "1589"
    ],
    "explain": "Oliver Cromwell (1599–1658): Ruled as Lord Protector of England, Scotland and Ireland.",
@@ -11966,9 +12376,9 @@
    "prompt": "Who is this? He became king when the monarchy was restored in 1660.",
    "answer": "Charles II",
    "wrong": [
-    "George VI",
-    "Cetshwayo",
-    "Éamon de Valera"
+    "Jacques Chirac",
+    "Robert Walpole",
+    "Nicolae Ceaușescu"
    ],
    "explain": "Charles II (1630–1685): Became king when the monarchy was restored in 1660.",
    "difficulty": 2,
@@ -11983,7 +12393,7 @@
    "answer": "1630",
    "wrong": [
     "1650",
-    "1600",
+    "1610",
     "1660"
    ],
    "explain": "Charles II (1630–1685): Became king when the monarchy was restored in 1660.",
@@ -11998,9 +12408,9 @@
    "prompt": "Who is this? She was the last Stuart monarch.",
    "answer": "Queen Anne",
    "wrong": [
-    "Empress Dowager Cixi",
-    "Golda Meir",
-    "Maria Theresa"
+    "Liliʻuokalani",
+    "Boudica",
+    "Elizabeth I"
    ],
    "explain": "Queen Anne (1665–1714): The last Stuart monarch.",
    "difficulty": 2,
@@ -12014,9 +12424,9 @@
    "prompt": "In which year was Queen Anne born?",
    "answer": "1665",
    "wrong": [
-    "1695",
-    "1675",
-    "1635"
+    "1645",
+    "1635",
+    "1655"
    ],
    "explain": "Queen Anne (1665–1714): The last Stuart monarch.",
    "difficulty": 3,
@@ -12030,12 +12440,12 @@
    "prompt": "Who is this? He was the British monarch who lost the American colonies.",
    "answer": "George III",
    "wrong": [
-    "Toussaint Louverture",
-    "Shinzo Abe",
-    "Ben Chifley"
+    "Lyndon B. Johnson",
+    "Frederick Barbarossa",
+    "Moshoeshoe I"
    ],
    "explain": "George III (1738–1820): The British monarch who lost the American colonies.",
-   "difficulty": 2,
+   "difficulty": 1,
    "refs": [
     "leaders/george-iii"
    ]
@@ -12046,9 +12456,9 @@
    "prompt": "In which year was George III born?",
    "answer": "1738",
    "wrong": [
-    "1728",
     "1768",
-    "1758"
+    "1758",
+    "1728"
    ],
    "explain": "George III (1738–1820): The British monarch who lost the American colonies.",
    "difficulty": 3,
@@ -12062,9 +12472,9 @@
    "prompt": "Who is this? He was the British king who reigned from 1901 to 1910.",
    "answer": "Edward VII",
    "wrong": [
-    "Hannibal",
-    "Andrew Jackson",
-    "John Curtin"
+    "Pedro II",
+    "Josip Broz Tito",
+    "Malcolm Fraser"
    ],
    "explain": "Edward VII (1841–1910): The British king who reigned from 1901 to 1910.",
    "difficulty": 2,
@@ -12078,9 +12488,9 @@
    "prompt": "In which year was Edward VII born?",
    "answer": "1841",
    "wrong": [
-    "1871",
+    "1851",
     "1821",
-    "1831"
+    "1861"
    ],
    "explain": "Edward VII (1841–1910): The British king who reigned from 1901 to 1910.",
    "difficulty": 3,
@@ -12094,9 +12504,9 @@
    "prompt": "Who is this? He was the grandfather of Elizabeth II.",
    "answer": "George V",
    "wrong": [
-    "Charles de Gaulle",
-    "Billy Hughes",
-    "Kwame Nkrumah"
+    "Kublai Khan",
+    "Robert Walpole",
+    "Woodrow Wilson"
    ],
    "explain": "George V (1865–1936): The grandfather of Elizabeth II.",
    "difficulty": 2,
@@ -12110,8 +12520,8 @@
    "prompt": "In which year was George V born?",
    "answer": "1865",
    "wrong": [
-    "1835",
-    "1845",
+    "1875",
+    "1855",
     "1885"
    ],
    "explain": "George V (1865–1936): The grandfather of Elizabeth II.",
@@ -12126,12 +12536,12 @@
    "prompt": "Who is this? He gave up the throne in 1936.",
    "answer": "Edward VIII",
    "wrong": [
-    "Mikhail Gorbachev",
-    "Benjamin Disraeli",
-    "Alfred the Great"
+    "Tony Blair",
+    "John Adams",
+    "Cyrus the Great"
    ],
    "explain": "Edward VIII (1894–1972): Gave up the throne in 1936.",
-   "difficulty": 2,
+   "difficulty": 1,
    "refs": [
     "leaders/edward-viii"
    ]
@@ -12143,8 +12553,8 @@
    "answer": "1894",
    "wrong": [
     "1884",
-    "1874",
-    "1914"
+    "1914",
+    "1924"
    ],
    "explain": "Edward VIII (1894–1972): Gave up the throne in 1936.",
    "difficulty": 3,
@@ -12158,12 +12568,12 @@
    "prompt": "Who is this? He was the father of Elizabeth II.",
    "answer": "George VI",
    "wrong": [
-    "Jawaharlal Nehru",
-    "Sejong the Great",
-    "George H. W. Bush"
+    "Philip II of Spain",
+    "Mao Zedong",
+    "Ho Chi Minh"
    ],
    "explain": "George VI (1895–1952): The father of Elizabeth II.",
-   "difficulty": 2,
+   "difficulty": 1,
    "refs": [
     "leaders/george-vi"
    ]
@@ -12174,9 +12584,9 @@
    "prompt": "In which year was George VI born?",
    "answer": "1895",
    "wrong": [
-    "1875",
-    "1915",
-    "1865"
+    "1925",
+    "1905",
+    "1875"
    ],
    "explain": "George VI (1895–1952): The father of Elizabeth II.",
    "difficulty": 3,
@@ -12190,9 +12600,9 @@
    "prompt": "Who is this? He became the British monarch in 2022 at the age of 73.",
    "answer": "Charles III",
    "wrong": [
-    "Václav Havel",
-    "Robert Menzies",
-    "Neville Chamberlain"
+    "Sun Yat-sen",
+    "Akhenaten",
+    "Narendra Modi"
    ],
    "explain": "Charles III (1948): Became the British monarch in 2022 at the age of 73.",
    "difficulty": 1,
@@ -12206,8 +12616,8 @@
    "prompt": "In which year was Charles III born?",
    "answer": "1948",
    "wrong": [
-    "1958",
-    "1968",
+    "1928",
+    "1978",
     "1938"
    ],
    "explain": "Charles III (1948): Became the British monarch in 2022 at the age of 73.",
@@ -12222,12 +12632,12 @@
    "prompt": "Who is this? He was a king who fought for Scotland's independence from England.",
    "answer": "Robert the Bruce",
    "wrong": [
-    "Tutankhamun",
-    "Henry V",
-    "John F. Kennedy"
+    "Wilhelm II",
+    "Xerxes I",
+    "Mackenzie King"
    ],
    "explain": "Robert the Bruce (1274–1329): A king who fought for Scotland's independence from England.",
-   "difficulty": 3,
+   "difficulty": 2,
    "refs": [
     "leaders/robert-the-bruce"
    ]
@@ -12240,7 +12650,7 @@
    "wrong": [
     "1304",
     "1284",
-    "1294"
+    "1244"
    ],
    "explain": "Robert the Bruce (1274–1329): A king who fought for Scotland's independence from England.",
    "difficulty": 3,
@@ -12254,9 +12664,9 @@
    "prompt": "Who is this? He was a king of Scotland in the 11th century.",
    "answer": "Macbeth",
    "wrong": [
-    "Hirohito",
-    "Gough Whitlam",
-    "Pierre Trudeau"
+    "Lee Kuan Yew",
+    "Vladimir Lenin",
+    "Akhenaten"
    ],
    "explain": "Macbeth (died 1057): A king of Scotland in the 11th century.",
    "difficulty": 3,
@@ -12270,9 +12680,9 @@
    "prompt": "Who is this? He was a High King of Ireland.",
    "answer": "Brian Boru",
    "wrong": [
-    "Josip Broz Tito",
-    "Joe Biden",
-    "Konrad Adenauer"
+    "Lee Kuan Yew",
+    "George W. Bush",
+    "Henry VII"
    ],
    "explain": "Brian Boru (died 1014): A High King of Ireland.",
    "difficulty": 3,
@@ -12286,9 +12696,9 @@
    "prompt": "Who is this? He was a sultan who founded the Ayyubid dynasty.",
    "answer": "Saladin",
    "wrong": [
-    "Éamon de Valera",
-    "Peter the Great",
-    "Genghis Khan"
+    "Toussaint Louverture",
+    "Cetshwayo",
+    "Richard III"
    ],
    "explain": "Saladin (died 1193): A sultan who founded the Ayyubid dynasty.",
    "difficulty": 2,
@@ -12302,12 +12712,12 @@
    "prompt": "Who is this? He founded the Yuan dynasty in China.",
    "answer": "Kublai Khan",
    "wrong": [
-    "Narendra Modi",
-    "Alfred the Great",
-    "Richard Nixon"
+    "Qianlong Emperor",
+    "Jayavarman VII",
+    "Kangxi Emperor"
    ],
    "explain": "Kublai Khan (1215–1294): Founded the Yuan dynasty in China.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/kublai-khan"
    ]
@@ -12318,9 +12728,9 @@
    "prompt": "In which year was Kublai Khan born?",
    "answer": "1215",
    "wrong": [
-    "1245",
-    "1195",
-    "1225"
+    "1205",
+    "1225",
+    "1245"
    ],
    "explain": "Kublai Khan (1215–1294): Founded the Yuan dynasty in China.",
    "difficulty": 3,
@@ -12334,12 +12744,12 @@
    "prompt": "Who is this? He was a Turco-Mongol conqueror of Central Asia.",
    "answer": "Timur",
    "wrong": [
-    "Lula da Silva",
-    "Charles de Gaulle",
-    "Mikhail Gorbachev"
+    "Mikhail Gorbachev",
+    "Moctezuma II",
+    "Toussaint Louverture"
    ],
    "explain": "Timur (died 1405): A Turco-Mongol conqueror of Central Asia.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/timur"
    ]
@@ -12350,12 +12760,12 @@
    "prompt": "Who is this? He was an Ottoman sultan who ended the Byzantine Empire.",
    "answer": "Mehmed II",
    "wrong": [
-    "Juan Perón",
-    "Paul Keating",
-    "Akhenaten"
+    "John Howard",
+    "Cyril Ramaphosa",
+    "Tony Abbott"
    ],
    "explain": "Mehmed II (1432–1481): An Ottoman sultan who ended the Byzantine Empire.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/mehmed-ii"
    ]
@@ -12366,9 +12776,9 @@
    "prompt": "In which year was Mehmed II born?",
    "answer": "1432",
    "wrong": [
-    "1442",
+    "1422",
     "1412",
-    "1452"
+    "1402"
    ],
    "explain": "Mehmed II (1432–1481): An Ottoman sultan who ended the Byzantine Empire.",
    "difficulty": 3,
@@ -12382,12 +12792,12 @@
    "prompt": "Who is this? He ruled the Ottoman Empire at the height of its power.",
    "answer": "Suleiman the Magnificent",
    "wrong": [
-    "Franz Joseph I",
-    "John Curtin",
-    "F. W. de Klerk"
+    "Nikita Khrushchev",
+    "Malcolm Turnbull",
+    "Maximilien Robespierre"
    ],
    "explain": "Suleiman the Magnificent (1494–1566): Ruled the Ottoman Empire at the height of its power.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/suleiman-the-magnificent"
    ]
@@ -12398,9 +12808,9 @@
    "prompt": "In which year was Suleiman the Magnificent born?",
    "answer": "1494",
    "wrong": [
-    "1464",
     "1514",
-    "1484"
+    "1464",
+    "1474"
    ],
    "explain": "Suleiman the Magnificent (1494–1566): Ruled the Ottoman Empire at the height of its power.",
    "difficulty": 3,
@@ -12414,9 +12824,9 @@
    "prompt": "Who is this? He founded the Ottoman Empire.",
    "answer": "Osman I",
    "wrong": [
-    "Sejong the Great",
-    "Nebuchadnezzar II",
-    "Benito Juárez"
+    "Konrad Adenauer",
+    "Mikhail Gorbachev",
+    "Pol Pot"
    ],
    "explain": "Osman I: Founded the Ottoman Empire.",
    "difficulty": 3,
@@ -12430,9 +12840,9 @@
    "prompt": "Who is this? He was a king of the Mali Empire often called the richest person who ever lived.",
    "answer": "Mansa Musa",
    "wrong": [
-    "Volodymyr Zelenskyy",
-    "John Curtin",
-    "Joseph Lyons"
+    "Ben Chifley",
+    "Kangxi Emperor",
+    "Edward VII"
    ],
    "explain": "Mansa Musa (died 1337): A king of the Mali Empire often called the richest person who ever lived.",
    "difficulty": 3,
@@ -12446,9 +12856,9 @@
    "prompt": "Who is this? He founded the Mali Empire.",
    "answer": "Sundiata Keita",
    "wrong": [
-    "George III",
-    "William the Conqueror",
-    "Simón Bolívar"
+    "Kamehameha I",
+    "John Major",
+    "Joseph Lyons"
    ],
    "explain": "Sundiata Keita (died 1255): Founded the Mali Empire.",
    "difficulty": 3,
@@ -12462,9 +12872,9 @@
    "prompt": "Who is this? She was the only woman to rule China as emperor in her own name.",
    "answer": "Wu Zetian",
    "wrong": [
-    "Nzinga",
-    "Cleopatra",
-    "Catherine the Great"
+    "Liliʻuokalani",
+    "Queen Anne",
+    "Angela Merkel"
    ],
    "explain": "Wu Zetian (624–705): The only woman to rule China as emperor in her own name.",
    "difficulty": 3,
@@ -12478,7 +12888,7 @@
    "prompt": "In which year was Wu Zetian born?",
    "answer": "624",
    "wrong": [
-    "604",
+    "594",
     "644",
     "654"
    ],
@@ -12494,9 +12904,9 @@
    "prompt": "Who is this? He was the third ruler of the Ming dynasty.",
    "answer": "Yongle Emperor",
    "wrong": [
-    "Anwar Sadat",
-    "Shivaji",
-    "Tony Abbott"
+    "Richard I",
+    "Qin Shi Huang",
+    "Napoleon Bonaparte"
    ],
    "explain": "Yongle Emperor (1360–1424): The third ruler of the Ming dynasty.",
    "difficulty": 3,
@@ -12510,9 +12920,9 @@
    "prompt": "In which year was Yongle Emperor born?",
    "answer": "1360",
    "wrong": [
-    "1350",
-    "1340",
-    "1370"
+    "1390",
+    "1370",
+    "1330"
    ],
    "explain": "Yongle Emperor (1360–1424): The third ruler of the Ming dynasty.",
    "difficulty": 3,
@@ -12526,9 +12936,9 @@
    "prompt": "Who is this? He was a Qing ruler of China.",
    "answer": "Kangxi Emperor",
    "wrong": [
-    "Benito Juárez",
-    "Aurangzeb",
-    "Genghis Khan"
+    "Gamal Abdel Nasser",
+    "Trajan",
+    "Muammar Gaddafi"
    ],
    "explain": "Kangxi Emperor (1654–1722): A Qing ruler of China.",
    "difficulty": 3,
@@ -12542,9 +12952,9 @@
    "prompt": "In which year was Kangxi Emperor born?",
    "answer": "1654",
    "wrong": [
-    "1684",
-    "1634",
-    "1644"
+    "1644",
+    "1664",
+    "1624"
    ],
    "explain": "Kangxi Emperor (1654–1722): A Qing ruler of China.",
    "difficulty": 3,
@@ -12558,9 +12968,9 @@
    "prompt": "Who is this? He was a Qing ruler whose reign saw China at its largest.",
    "answer": "Qianlong Emperor",
    "wrong": [
-    "Kamehameha I",
-    "Barack Obama",
-    "Cetshwayo"
+    "Yongle Emperor",
+    "Darius the Great",
+    "Khufu"
    ],
    "explain": "Qianlong Emperor (1711–1799): A Qing ruler whose reign saw China at its largest.",
    "difficulty": 3,
@@ -12574,9 +12984,9 @@
    "prompt": "In which year was Qianlong Emperor born?",
    "answer": "1711",
    "wrong": [
-    "1681",
-    "1721",
-    "1691"
+    "1691",
+    "1731",
+    "1721"
    ],
    "explain": "Qianlong Emperor (1711–1799): A Qing ruler whose reign saw China at its largest.",
    "difficulty": 3,
@@ -12606,9 +13016,9 @@
    "prompt": "In which year was Empress Dowager Cixi born?",
    "answer": "1835",
    "wrong": [
-    "1815",
+    "1865",
     "1845",
-    "1825"
+    "1805"
    ],
    "explain": "Empress Dowager Cixi (1835–1908): The power behind the Qing throne in its last decades.",
    "difficulty": 3,
@@ -12622,9 +13032,9 @@
    "prompt": "Who is this? He was the last emperor of China.",
    "answer": "Puyi",
    "wrong": [
-    "Mehmed II",
-    "Václav Havel",
-    "Tony Blair"
+    "Richard Seddon",
+    "Mackenzie King",
+    "Edward VIII"
    ],
    "explain": "Puyi (1906–1967): The last emperor of China.",
    "difficulty": 3,
@@ -12638,9 +13048,9 @@
    "prompt": "In which year was Puyi born?",
    "answer": "1906",
    "wrong": [
-    "1876",
-    "1936",
-    "1886"
+    "1886",
+    "1896",
+    "1916"
    ],
    "explain": "Puyi (1906–1967): The last emperor of China.",
    "difficulty": 3,
@@ -12654,9 +13064,9 @@
    "prompt": "Who is this? He created the Korean alphabet, Hangul.",
    "answer": "Sejong the Great",
    "wrong": [
-    "Éamon de Valera",
-    "Ulysses S. Grant",
-    "John Howard"
+    "Darius the Great",
+    "Bill Clinton",
+    "Nelson Mandela"
    ],
    "explain": "Sejong the Great (1397–1450): Created the Korean alphabet, Hangul.",
    "difficulty": 3,
@@ -12671,8 +13081,8 @@
    "answer": "1397",
    "wrong": [
     "1377",
-    "1417",
-    "1427"
+    "1427",
+    "1367"
    ],
    "explain": "Sejong the Great (1397–1450): Created the Korean alphabet, Hangul.",
    "difficulty": 3,
@@ -12686,9 +13096,9 @@
    "prompt": "Who is this? He was a prince of Wallachia known for his cruelty to enemies.",
    "answer": "Vlad the Impaler",
    "wrong": [
-    "Charles I",
-    "Charles II",
-    "Gough Whitlam"
+    "Shaka",
+    "Tokugawa Ieyasu",
+    "Kublai Khan"
    ],
    "explain": "Vlad the Impaler (died 1476): A prince of Wallachia known for his cruelty to enemies.",
    "difficulty": 2,
@@ -12702,9 +13112,9 @@
    "prompt": "Who is this? He was the first ruler crowned Tsar of all Russia.",
    "answer": "Ivan the Terrible",
    "wrong": [
-    "Qianlong Emperor",
-    "Richard I",
-    "Franklin D. Roosevelt"
+    "Dwight D. Eisenhower",
+    "Thomas Jefferson",
+    "Genghis Khan"
    ],
    "explain": "Ivan the Terrible (1530–1584): The first ruler crowned Tsar of all Russia.",
    "difficulty": 2,
@@ -12718,9 +13128,9 @@
    "prompt": "In which year was Ivan the Terrible born?",
    "answer": "1530",
    "wrong": [
+    "1520",
     "1510",
-    "1560",
-    "1500"
+    "1540"
    ],
    "explain": "Ivan the Terrible (1530–1584): The first ruler crowned Tsar of all Russia.",
    "difficulty": 3,
@@ -12734,8 +13144,8 @@
    "prompt": "Who is this? He turned the Inca kingdom into an empire.",
    "answer": "Pachacuti",
    "wrong": [
-    "Edmund Barton",
-    "Charles I",
+    "Richard III",
+    "Adolf Hitler",
     "Julius Caesar"
    ],
    "explain": "Pachacuti: Turned the Inca kingdom into an empire.",
@@ -12750,9 +13160,9 @@
    "prompt": "Who is this? He was the Aztec emperor when the Spanish arrived.",
    "answer": "Moctezuma II",
    "wrong": [
-    "Andrew Jackson",
-    "Louis XVI",
-    "Deng Xiaoping"
+    "Willy Brandt",
+    "Maximilien Robespierre",
+    "Sejong the Great"
    ],
    "explain": "Moctezuma II (died 1520): The Aztec emperor when the Spanish arrived.",
    "difficulty": 3,
@@ -12766,9 +13176,9 @@
    "prompt": "Who is this? He was the last Inca emperor before the Spanish conquest.",
    "answer": "Atahualpa",
    "wrong": [
-    "Jomo Kenyatta",
-    "Pericles",
-    "Donald Trump"
+    "Kwame Nkrumah",
+    "Helmut Kohl",
+    "Andrew Jackson"
    ],
    "explain": "Atahualpa (died 1533): The last Inca emperor before the Spanish conquest.",
    "difficulty": 3,
@@ -12782,9 +13192,9 @@
    "prompt": "Who is this? He was one of the greatest kings of the Khmer Empire.",
    "answer": "Jayavarman VII",
    "wrong": [
-    "Tony Blair",
-    "Attila",
-    "Mackenzie King"
+    "William the Conqueror",
+    "Lyndon B. Johnson",
+    "John Gorton"
    ],
    "explain": "Jayavarman VII (died 1218): One of the greatest kings of the Khmer Empire.",
    "difficulty": 3,
@@ -12798,9 +13208,9 @@
    "prompt": "Who is this? He was the fifth Abbasid caliph.",
    "answer": "Harun al-Rashid",
    "wrong": [
-    "Shinzo Abe",
-    "Julius Caesar",
-    "Peter the Great"
+    "Willy Brandt",
+    "Harold Wilson",
+    "William Gladstone"
    ],
    "explain": "Harun al-Rashid (died 809): The fifth Abbasid caliph.",
    "difficulty": 3,
@@ -12814,9 +13224,9 @@
    "prompt": "Who is this? He was a Holy Roman Emperor.",
    "answer": "Frederick Barbarossa",
    "wrong": [
-    "Moshoeshoe I",
-    "Tony Blair",
-    "Harry S. Truman"
+    "Tipu Sultan",
+    "Toussaint Louverture",
+    "Suleiman the Magnificent"
    ],
    "explain": "Frederick Barbarossa (1122–1190): A Holy Roman Emperor.",
    "difficulty": 3,
@@ -12830,9 +13240,9 @@
    "prompt": "In which year was Frederick Barbarossa born?",
    "answer": "1122",
    "wrong": [
-    "1142",
     "1132",
-    "1112"
+    "1092",
+    "1102"
    ],
    "explain": "Frederick Barbarossa (1122–1190): A Holy Roman Emperor.",
    "difficulty": 3,
@@ -12846,12 +13256,12 @@
    "prompt": "Who is this? He was the most powerful Habsburg ruler of the 1500s.",
    "answer": "Charles V",
    "wrong": [
-    "Lyndon B. Johnson",
-    "Tipu Sultan",
-    "Ben Chifley"
+    "Pierre Trudeau",
+    "Harold Holt",
+    "Lester B. Pearson"
    ],
    "explain": "Charles V (1500–1558): The most powerful Habsburg ruler of the 1500s.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/charles-v"
    ]
@@ -12862,9 +13272,9 @@
    "prompt": "In which year was Charles V born?",
    "answer": "1500",
    "wrong": [
-    "1480",
-    "1520",
-    "1530"
+    "1530",
+    "1510",
+    "1490"
    ],
    "explain": "Charles V (1500–1558): The most powerful Habsburg ruler of the 1500s.",
    "difficulty": 3,
@@ -12878,9 +13288,9 @@
    "prompt": "Who is this? He was the monarch who sent the Spanish Armada against England.",
    "answer": "Philip II of Spain",
    "wrong": [
-    "Nikita Khrushchev",
-    "Theodore Roosevelt",
-    "Qin Shi Huang"
+    "Xi Jinping",
+    "Wilhelm II",
+    "Louis XIV"
    ],
    "explain": "Philip II of Spain (1527–1598): The monarch who sent the Spanish Armada against England.",
    "difficulty": 2,
@@ -12894,9 +13304,9 @@
    "prompt": "In which year was Philip II of Spain born?",
    "answer": "1527",
    "wrong": [
-    "1517",
-    "1497",
-    "1557"
+    "1547",
+    "1507",
+    "1517"
    ],
    "explain": "Philip II of Spain (1527–1598): The monarch who sent the Spanish Armada against England.",
    "difficulty": 3,
@@ -12926,9 +13336,9 @@
    "prompt": "In which year was Isabella I of Castile born?",
    "answer": "1451",
    "wrong": [
+    "1481",
     "1471",
-    "1441",
-    "1481"
+    "1421"
    ],
    "explain": "Isabella I of Castile (1451–1504): A Spanish monarch who paid for the first voyage of Columbus.",
    "difficulty": 3,
@@ -12942,9 +13352,9 @@
    "prompt": "Who is this? He was the French king guillotined during the Revolution.",
    "answer": "Louis XVI",
    "wrong": [
-    "Augustus",
-    "Keir Starmer",
-    "Ulysses S. Grant"
+    "Menelik II",
+    "Duke of Wellington",
+    "Bob Hawke"
    ],
    "explain": "Louis XVI (1754–1793): The French king guillotined during the Revolution.",
    "difficulty": 2,
@@ -12958,9 +13368,9 @@
    "prompt": "In which year was Louis XVI born?",
    "answer": "1754",
    "wrong": [
-    "1724",
-    "1764",
-    "1774"
+    "1784",
+    "1774",
+    "1744"
    ],
    "explain": "Louis XVI (1754–1793): The French king guillotined during the Revolution.",
    "difficulty": 3,
@@ -12974,9 +13384,9 @@
    "prompt": "Who is this? He was a king of Prussia.",
    "answer": "Frederick the Great",
    "wrong": [
-    "Tutankhamun",
-    "Pedro II",
-    "Patrice Lumumba"
+    "Atahualpa",
+    "Hadrian",
+    "Alfred the Great"
    ],
    "explain": "Frederick the Great (1712–1786): A king of Prussia.",
    "difficulty": 3,
@@ -12990,9 +13400,9 @@
    "prompt": "In which year was Frederick the Great born?",
    "answer": "1712",
    "wrong": [
-    "1722",
-    "1702",
-    "1692"
+    "1682",
+    "1732",
+    "1702"
    ],
    "explain": "Frederick the Great (1712–1786): A king of Prussia.",
    "difficulty": 3,
@@ -13022,8 +13432,8 @@
    "prompt": "In which year was Maria Theresa born?",
    "answer": "1717",
    "wrong": [
-    "1737",
     "1707",
+    "1737",
     "1687"
    ],
    "explain": "Maria Theresa (1717–1780): The only woman to rule the Habsburg lands in her own right.",
@@ -13038,9 +13448,9 @@
    "prompt": "Who is this? He was a Swedish king in the Thirty Years' War.",
    "answer": "Gustavus Adolphus",
    "wrong": [
-    "Billy Hughes",
-    "Louis XVI",
-    "Emmanuel Macron"
+    "Narendra Modi",
+    "Julius Nyerere",
+    "Nelson Mandela"
    ],
    "explain": "Gustavus Adolphus (1594–1632): A Swedish king in the Thirty Years' War.",
    "difficulty": 3,
@@ -13054,9 +13464,9 @@
    "prompt": "In which year was Gustavus Adolphus born?",
    "answer": "1594",
    "wrong": [
-    "1624",
+    "1564",
     "1574",
-    "1564"
+    "1604"
    ],
    "explain": "Gustavus Adolphus (1594–1632): A Swedish king in the Thirty Years' War.",
    "difficulty": 3,
@@ -13070,9 +13480,9 @@
    "prompt": "Who is this? He built the Taj Mahal as a tomb for his wife.",
    "answer": "Shah Jahan",
    "wrong": [
-    "Qin Shi Huang",
-    "Saladin",
-    "Giuseppe Garibaldi"
+    "George H. W. Bush",
+    "George V",
+    "Edward VIII"
    ],
    "explain": "Shah Jahan (1592–1666): Built the Taj Mahal as a tomb for his wife.",
    "difficulty": 3,
@@ -13086,9 +13496,9 @@
    "prompt": "In which year was Shah Jahan born?",
    "answer": "1592",
    "wrong": [
-    "1582",
-    "1602",
-    "1562"
+    "1612",
+    "1572",
+    "1622"
    ],
    "explain": "Shah Jahan (1592–1666): Built the Taj Mahal as a tomb for his wife.",
    "difficulty": 3,
@@ -13103,8 +13513,8 @@
    "answer": "Aurangzeb",
    "wrong": [
     "Emperor Wu of Han",
-    "Sejong the Great",
-    "Cyrus the Great"
+    "Richard Nixon",
+    "Henry VII"
    ],
    "explain": "Aurangzeb (1618–1707): The last of the great Mughal emperors.",
    "difficulty": 3,
@@ -13118,9 +13528,9 @@
    "prompt": "In which year was Aurangzeb born?",
    "answer": "1618",
    "wrong": [
-    "1648",
+    "1608",
     "1588",
-    "1598"
+    "1638"
    ],
    "explain": "Aurangzeb (1618–1707): The last of the great Mughal emperors.",
    "difficulty": 3,
@@ -13134,9 +13544,9 @@
    "prompt": "Who is this? He founded the Mughal Empire in India.",
    "answer": "Babur",
    "wrong": [
-    "Duke of Wellington",
-    "Sun Yat-sen",
-    "Hadrian"
+    "Akhenaten",
+    "Ronald Reagan",
+    "Nicholas II"
    ],
    "explain": "Babur (1483–1530): Founded the Mughal Empire in India.",
    "difficulty": 3,
@@ -13150,9 +13560,9 @@
    "prompt": "In which year was Babur born?",
    "answer": "1483",
    "wrong": [
-    "1453",
-    "1493",
-    "1513"
+    "1513",
+    "1473",
+    "1503"
    ],
    "explain": "Babur (1483–1530): Founded the Mughal Empire in India.",
    "difficulty": 3,
@@ -13166,9 +13576,9 @@
    "prompt": "Who is this? He founded the shogunate that ruled Japan until 1868.",
    "answer": "Tokugawa Ieyasu",
    "wrong": [
-    "Chiang Kai-shek",
-    "Puyi",
-    "Oliver Cromwell"
+    "Charlemagne",
+    "Jawaharlal Nehru",
+    "Mansa Musa"
    ],
    "explain": "Tokugawa Ieyasu (1543–1616): Founded the shogunate that ruled Japan until 1868.",
    "difficulty": 3,
@@ -13182,9 +13592,9 @@
    "prompt": "In which year was Tokugawa Ieyasu born?",
    "answer": "1543",
    "wrong": [
-    "1553",
-    "1523",
-    "1533"
+    "1533",
+    "1513",
+    "1553"
    ],
    "explain": "Tokugawa Ieyasu (1543–1616): Founded the shogunate that ruled Japan until 1868.",
    "difficulty": 3,
@@ -13198,9 +13608,9 @@
    "prompt": "Who is this? He was a warlord who began the unification of Japan.",
    "answer": "Oda Nobunaga",
    "wrong": [
-    "Andrew Fisher",
-    "Peter the Great",
-    "Neville Chamberlain"
+    "Lester B. Pearson",
+    "Henry V",
+    "Gustavus Adolphus"
    ],
    "explain": "Oda Nobunaga (1534–1582): A warlord who began the unification of Japan.",
    "difficulty": 3,
@@ -13215,7 +13625,7 @@
    "answer": "1534",
    "wrong": [
     "1554",
-    "1504",
+    "1544",
     "1564"
    ],
    "explain": "Oda Nobunaga (1534–1582): A warlord who began the unification of Japan.",
@@ -13230,9 +13640,9 @@
    "prompt": "Who is this? He completed the unification of Japan begun by Oda Nobunaga.",
    "answer": "Toyotomi Hideyoshi",
    "wrong": [
-    "Lech Wałęsa",
-    "Václav Havel",
-    "Emperor Meiji"
+    "Marcus Aurelius",
+    "Nicolae Ceaușescu",
+    "Benjamin Disraeli"
    ],
    "explain": "Toyotomi Hideyoshi (1537–1598): Completed the unification of Japan begun by Oda Nobunaga.",
    "difficulty": 3,
@@ -13246,9 +13656,9 @@
    "prompt": "In which year was Toyotomi Hideyoshi born?",
    "answer": "1537",
    "wrong": [
+    "1527",
     "1547",
-    "1567",
-    "1507"
+    "1557"
    ],
    "explain": "Toyotomi Hideyoshi (1537–1598): Completed the unification of Japan begun by Oda Nobunaga.",
    "difficulty": 3,
@@ -13278,9 +13688,9 @@
    "prompt": "Who is this? He was a Maratha king who fought the Mughals.",
    "answer": "Shivaji",
    "wrong": [
-    "Napoleon III",
-    "Kwame Nkrumah",
-    "William Pitt the Younger"
+    "Pol Pot",
+    "Augusto Pinochet",
+    "Salvador Allende"
    ],
    "explain": "Shivaji (died 1680): A Maratha king who fought the Mughals.",
    "difficulty": 3,
@@ -13294,9 +13704,9 @@
    "prompt": "Who is this? He was a ruler of Mysore killed fighting the British in 1799.",
    "answer": "Tipu Sultan",
    "wrong": [
-    "Charles II",
-    "Chiang Kai-shek",
-    "William Gladstone"
+    "Charlemagne",
+    "Mustafa Kemal Atatürk",
+    "Salvador Allende"
    ],
    "explain": "Tipu Sultan (1751–1799): A ruler of Mysore killed fighting the British in 1799.",
    "difficulty": 3,
@@ -13310,9 +13720,9 @@
    "prompt": "In which year was Tipu Sultan born?",
    "answer": "1751",
    "wrong": [
-    "1771",
-    "1721",
-    "1731"
+    "1741",
+    "1761",
+    "1771"
    ],
    "explain": "Tipu Sultan (1751–1799): A ruler of Mysore killed fighting the British in 1799.",
    "difficulty": 3,
@@ -13326,9 +13736,9 @@
    "prompt": "Who is this? He founded the Sikh Empire.",
    "answer": "Ranjit Singh",
    "wrong": [
-    "John Adams",
-    "Napoleon III",
-    "Kangxi Emperor"
+    "Emperor Wu of Han",
+    "Konrad Adenauer",
+    "Nebuchadnezzar II"
    ],
    "explain": "Ranjit Singh (1780–1839): Founded the Sikh Empire.",
    "difficulty": 3,
@@ -13342,9 +13752,9 @@
    "prompt": "In which year was Ranjit Singh born?",
    "answer": "1780",
    "wrong": [
-    "1800",
-    "1770",
-    "1810"
+    "1810",
+    "1790",
+    "1750"
    ],
    "explain": "Ranjit Singh (1780–1839): Founded the Sikh Empire.",
    "difficulty": 3,
@@ -13358,9 +13768,9 @@
    "prompt": "Who is this? He was the main author of the Declaration of Independence.",
    "answer": "Thomas Jefferson",
    "wrong": [
-    "David Cameron",
-    "Oda Nobunaga",
-    "James VI and I"
+    "Malcolm Fraser",
+    "Akbar",
+    "Harold Godwinson"
    ],
    "explain": "Thomas Jefferson (1743–1826): The main author of the Declaration of Independence.",
    "difficulty": 1,
@@ -13374,7 +13784,7 @@
    "prompt": "In which year was Thomas Jefferson born?",
    "answer": "1743",
    "wrong": [
-    "1763",
+    "1723",
     "1753",
     "1773"
    ],
@@ -13390,9 +13800,9 @@
    "prompt": "Who is this? He was the second US president.",
    "answer": "John Adams",
    "wrong": [
-    "Pericles",
-    "Patrice Lumumba",
-    "George H. W. Bush"
+    "Darius the Great",
+    "Harold Godwinson",
+    "Harold Wilson"
    ],
    "explain": "John Adams (1735–1826): The second US president.",
    "difficulty": 2,
@@ -13406,9 +13816,9 @@
    "prompt": "In which year was John Adams born?",
    "answer": "1735",
    "wrong": [
+    "1725",
     "1715",
-    "1755",
-    "1725"
+    "1745"
    ],
    "explain": "John Adams (1735–1826): The second US president.",
    "difficulty": 3,
@@ -13422,9 +13832,9 @@
    "prompt": "Who is this? He was the seventh US president.",
    "answer": "Andrew Jackson",
    "wrong": [
-    "Mehmed II",
-    "Scott Morrison",
-    "George W. Bush"
+    "Franklin D. Roosevelt",
+    "Charles III",
+    "Moshoeshoe I"
    ],
    "explain": "Andrew Jackson (1767–1845): The seventh US president.",
    "difficulty": 2,
@@ -13438,9 +13848,9 @@
    "prompt": "In which year was Andrew Jackson born?",
    "answer": "1767",
    "wrong": [
-    "1787",
-    "1747",
-    "1777"
+    "1757",
+    "1737",
+    "1797"
    ],
    "explain": "Andrew Jackson (1767–1845): The seventh US president.",
    "difficulty": 3,
@@ -13454,9 +13864,9 @@
    "prompt": "Who is this? He was the Union general who became the 18th US president.",
    "answer": "Ulysses S. Grant",
    "wrong": [
-    "Darius the Great",
-    "Mao Zedong",
-    "Simón Bolívar"
+    "Harold Wilson",
+    "Moctezuma II",
+    "Ben Chifley"
    ],
    "explain": "Ulysses S. Grant (1822–1885): The Union general who became the 18th US president.",
    "difficulty": 2,
@@ -13470,9 +13880,9 @@
    "prompt": "In which year was Ulysses S. Grant born?",
    "answer": "1822",
    "wrong": [
+    "1842",
     "1792",
-    "1802",
-    "1852"
+    "1802"
    ],
    "explain": "Ulysses S. Grant (1822–1885): The Union general who became the 18th US president.",
    "difficulty": 3,
@@ -13486,9 +13896,9 @@
    "prompt": "Who is this? He was the leader of the Haitian Revolution.",
    "answer": "Toussaint Louverture",
    "wrong": [
-    "Sun Yat-sen",
-    "Fidel Castro",
-    "Qianlong Emperor"
+    "Lyndon B. Johnson",
+    "Mackenzie King",
+    "Harold Godwinson"
    ],
    "explain": "Toussaint Louverture (died 1803): The leader of the Haitian Revolution.",
    "difficulty": 3,
@@ -13502,9 +13912,9 @@
    "prompt": "Who is this? He was a leader of the Reign of Terror in the French Revolution.",
    "answer": "Maximilien Robespierre",
    "wrong": [
-    "Charles II",
-    "Emperor Wu of Han",
-    "William Gladstone"
+    "Patrice Lumumba",
+    "George VI",
+    "Henry Parkes"
    ],
    "explain": "Maximilien Robespierre (1758–1794): A leader of the Reign of Terror in the French Revolution.",
    "difficulty": 2,
@@ -13518,9 +13928,9 @@
    "prompt": "In which year was Maximilien Robespierre born?",
    "answer": "1758",
    "wrong": [
-    "1738",
-    "1768",
-    "1728"
+    "1728",
+    "1778",
+    "1768"
    ],
    "explain": "Maximilien Robespierre (1758–1794): A leader of the Reign of Terror in the French Revolution.",
    "difficulty": 3,
@@ -13534,9 +13944,9 @@
    "prompt": "Who is this? He was the last emperor of the French.",
    "answer": "Napoleon III",
    "wrong": [
-    "Emperor Wu of Han",
-    "Mehmed II",
-    "Xerxes I"
+    "Sitting Bull",
+    "George H. W. Bush",
+    "Philip II of Macedon"
    ],
    "explain": "Napoleon III (1808–1873): The last emperor of the French.",
    "difficulty": 2,
@@ -13550,9 +13960,9 @@
    "prompt": "In which year was Napoleon III born?",
    "answer": "1808",
    "wrong": [
-    "1788",
+    "1818",
     "1778",
-    "1838"
+    "1788"
    ],
    "explain": "Napoleon III (1808–1873): The last emperor of the French.",
    "difficulty": 3,
@@ -13566,9 +13976,9 @@
    "prompt": "Who is this? He was the last Russian emperor, killed with his family in 1918.",
    "answer": "Nicholas II",
    "wrong": [
-    "Kevin Rudd",
-    "Cyril Ramaphosa",
-    "Tokugawa Ieyasu"
+    "Robert the Bruce",
+    "Charles III",
+    "Sundiata Keita"
    ],
    "explain": "Nicholas II (1868–1918): The last Russian emperor, killed with his family in 1918.",
    "difficulty": 2,
@@ -13584,7 +13994,7 @@
    "wrong": [
     "1878",
     "1888",
-    "1848"
+    "1898"
    ],
    "explain": "Nicholas II (1868–1918): The last Russian emperor, killed with his family in 1918.",
    "difficulty": 3,
@@ -13598,9 +14008,9 @@
    "prompt": "Who is this? He was the last German emperor.",
    "answer": "Wilhelm II",
    "wrong": [
-    "Nebuchadnezzar II",
-    "Vladimir Putin",
-    "Ramesses II"
+    "Konrad Adenauer",
+    "Ranjit Singh",
+    "Deng Xiaoping"
    ],
    "explain": "Wilhelm II (1859–1941): The last German emperor.",
    "difficulty": 2,
@@ -13614,8 +14024,8 @@
    "prompt": "In which year was Wilhelm II born?",
    "answer": "1859",
    "wrong": [
+    "1849",
     "1869",
-    "1829",
     "1879"
    ],
    "explain": "Wilhelm II (1859–1941): The last German emperor.",
@@ -13630,9 +14040,9 @@
    "prompt": "Who is this? He was the emperor of Austria-Hungary who reigned for 68 years.",
    "answer": "Franz Joseph I",
    "wrong": [
-    "Wilhelm II",
-    "Deng Xiaoping",
-    "Kangxi Emperor"
+    "Leonidas I",
+    "Babur",
+    "Harry S. Truman"
    ],
    "explain": "Franz Joseph I (1830–1916): The emperor of Austria-Hungary who reigned for 68 years.",
    "difficulty": 3,
@@ -13646,9 +14056,9 @@
    "prompt": "In which year was Franz Joseph I born?",
    "answer": "1830",
    "wrong": [
-    "1800",
+    "1820",
     "1860",
-    "1820"
+    "1850"
    ],
    "explain": "Franz Joseph I (1830–1916): The emperor of Austria-Hungary who reigned for 68 years.",
    "difficulty": 3,
@@ -13662,9 +14072,9 @@
    "prompt": "Who is this? He was the second and last emperor of Brazil.",
    "answer": "Pedro II",
    "wrong": [
-    "Gustavus Adolphus",
-    "Benjamin Disraeli",
-    "Ivan the Terrible"
+    "Louis XVI",
+    "Constantine the Great",
+    "Salvador Allende"
    ],
    "explain": "Pedro II (1825–1891): The second and last emperor of Brazil.",
    "difficulty": 3,
@@ -13678,9 +14088,9 @@
    "prompt": "In which year was Pedro II born?",
    "answer": "1825",
    "wrong": [
-    "1805",
-    "1815",
-    "1855"
+    "1835",
+    "1845",
+    "1805"
    ],
    "explain": "Pedro II (1825–1891): The second and last emperor of Brazil.",
    "difficulty": 3,
@@ -13694,9 +14104,9 @@
    "prompt": "Who is this? He was the first Indigenous president of Mexico.",
    "answer": "Benito Juárez",
    "wrong": [
-    "Sejong the Great",
-    "Woodrow Wilson",
-    "Deng Xiaoping"
+    "Oda Nobunaga",
+    "Kangxi Emperor",
+    "Anthony Albanese"
    ],
    "explain": "Benito Juárez (1806–1872): The first Indigenous president of Mexico.",
    "difficulty": 3,
@@ -13710,9 +14120,9 @@
    "prompt": "In which year was Benito Juárez born?",
    "answer": "1806",
    "wrong": [
-    "1816",
     "1786",
-    "1836"
+    "1816",
+    "1796"
    ],
    "explain": "Benito Juárez (1806–1872): The first Indigenous president of Mexico.",
    "difficulty": 3,
@@ -13726,9 +14136,9 @@
    "prompt": "Who is this? He was an emperor of Ethiopia.",
    "answer": "Menelik II",
    "wrong": [
-    "Jawaharlal Nehru",
-    "José de San Martín",
-    "Rajiv Gandhi"
+    "Charles de Gaulle",
+    "Genghis Khan",
+    "Harry S. Truman"
    ],
    "explain": "Menelik II (1844–1913): An emperor of Ethiopia.",
    "difficulty": 3,
@@ -13742,9 +14152,9 @@
    "prompt": "In which year was Menelik II born?",
    "answer": "1844",
    "wrong": [
+    "1824",
     "1864",
-    "1854",
-    "1874"
+    "1814"
    ],
    "explain": "Menelik II (1844–1913): An emperor of Ethiopia.",
    "difficulty": 3,
@@ -13758,9 +14168,9 @@
    "prompt": "Who is this? He was a king who built a powerful southern African kingdom.",
    "answer": "Shaka",
    "wrong": [
-    "Richard I",
-    "John Howard",
-    "Gough Whitlam"
+    "Anwar Sadat",
+    "Malcolm Fraser",
+    "Paul Keating"
    ],
    "explain": "Shaka (died 1828): A king who built a powerful southern African kingdom.",
    "difficulty": 3,
@@ -13774,9 +14184,9 @@
    "prompt": "Who is this? He was the Zulu king during the Anglo-Zulu War.",
    "answer": "Cetshwayo",
    "wrong": [
-    "John F. Kennedy",
-    "Abraham Lincoln",
-    "Macbeth"
+    "Bill Clinton",
+    "David Lloyd George",
+    "Kublai Khan"
    ],
    "explain": "Cetshwayo (died 1884): The Zulu king during the Anglo-Zulu War.",
    "difficulty": 3,
@@ -13790,9 +14200,9 @@
    "prompt": "Who is this? He founded the nation of Lesotho.",
    "answer": "Moshoeshoe I",
    "wrong": [
-    "Louis XVI",
-    "Shaka",
-    "Pedro II"
+    "John Major",
+    "Václav Havel",
+    "George VI"
    ],
    "explain": "Moshoeshoe I (died 1870): Founded the nation of Lesotho.",
    "difficulty": 3,
@@ -13822,9 +14232,9 @@
    "prompt": "Who is this? He founded the Kingdom of Hawaii.",
    "answer": "Kamehameha I",
    "wrong": [
-    "Ranjit Singh",
-    "Mao Zedong",
-    "Vladimir Putin"
+    "Deng Xiaoping",
+    "Frederick Barbarossa",
+    "Charles II"
    ],
    "explain": "Kamehameha I (died 1819): Founded the Kingdom of Hawaii.",
    "difficulty": 3,
@@ -13855,8 +14265,8 @@
    "answer": "1838",
    "wrong": [
     "1868",
-    "1848",
-    "1808"
+    "1808",
+    "1828"
    ],
    "explain": "Liliʻuokalani (1838–1917): The last monarch of the Kingdom of Hawaii.",
    "difficulty": 3,
@@ -13870,12 +14280,12 @@
    "prompt": "Who is this? He was a general who helped unify Italy.",
    "answer": "Giuseppe Garibaldi",
    "wrong": [
-    "Qin Shi Huang",
-    "Anthony Albanese",
-    "Jimmy Carter"
+    "Nicolae Ceaușescu",
+    "Jawaharlal Nehru",
+    "Lester B. Pearson"
    ],
    "explain": "Giuseppe Garibaldi (1807–1882): A general who helped unify Italy.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/giuseppe-garibaldi"
    ]
@@ -13886,8 +14296,8 @@
    "prompt": "In which year was Giuseppe Garibaldi born?",
    "answer": "1807",
    "wrong": [
-    "1777",
     "1827",
+    "1777",
     "1787"
    ],
    "explain": "Giuseppe Garibaldi (1807–1882): A general who helped unify Italy.",
@@ -13902,9 +14312,9 @@
    "prompt": "Who is this? He was a South American liberator.",
    "answer": "José de San Martín",
    "wrong": [
-    "John Adams",
-    "Vlad the Impaler",
-    "Malcolm Fraser"
+    "Lula da Silva",
+    "Trajan",
+    "Shah Jahan"
    ],
    "explain": "José de San Martín (1778–1850): A South American liberator.",
    "difficulty": 3,
@@ -13918,8 +14328,8 @@
    "prompt": "In which year was José de San Martín born?",
    "answer": "1778",
    "wrong": [
-    "1768",
-    "1748",
+    "1808",
+    "1758",
     "1798"
    ],
    "explain": "José de San Martín (1778–1850): A South American liberator.",
@@ -13934,9 +14344,9 @@
    "prompt": "Who is this? He was a Hunkpapa Lakota leader.",
    "answer": "Sitting Bull",
    "wrong": [
-    "Oliver Cromwell",
     "Emmanuel Macron",
-    "William Pitt the Younger"
+    "Cetshwayo",
+    "Scott Morrison"
    ],
    "explain": "Sitting Bull (died 1890): A Hunkpapa Lakota leader.",
    "difficulty": 3,
@@ -13950,9 +14360,9 @@
    "prompt": "Who is this? He is regarded as Britain's first prime minister.",
    "answer": "Robert Walpole",
    "wrong": [
-    "John Adams",
-    "Boris Johnson",
-    "Nero"
+    "Moctezuma II",
+    "Constantine the Great",
+    "Sukarno"
    ],
    "explain": "Robert Walpole (1676–1745): Regarded as Britain's first prime minister.",
    "difficulty": 3,
@@ -13966,9 +14376,9 @@
    "prompt": "In which year was Robert Walpole born?",
    "answer": "1676",
    "wrong": [
-    "1666",
     "1656",
-    "1646"
+    "1686",
+    "1696"
    ],
    "explain": "Robert Walpole (1676–1745): Regarded as Britain's first prime minister.",
    "difficulty": 3,
@@ -13982,9 +14392,9 @@
    "prompt": "Who is this? He was a British prime minister during the wars against Revolutionary France.",
    "answer": "William Pitt the Younger",
    "wrong": [
-    "Ranjit Singh",
-    "Henry VIII",
-    "Edward VIII"
+    "Pericles",
+    "Mehmed II",
+    "Neville Chamberlain"
    ],
    "explain": "William Pitt the Younger (1759–1806): A British prime minister during the wars against Revolutionary France.",
    "difficulty": 3,
@@ -13999,8 +14409,8 @@
    "answer": "1759",
    "wrong": [
     "1769",
-    "1729",
-    "1739"
+    "1739",
+    "1729"
    ],
    "explain": "William Pitt the Younger (1759–1806): A British prime minister during the wars against Revolutionary France.",
    "difficulty": 3,
@@ -14014,12 +14424,12 @@
    "prompt": "Who is this? He defeated Napoleon at the Battle of Waterloo.",
    "answer": "Duke of Wellington",
    "wrong": [
-    "Kangxi Emperor",
-    "Jomo Kenyatta",
-    "John A. Macdonald"
+    "Muammar Gaddafi",
+    "Vlad the Impaler",
+    "Harun al-Rashid"
    ],
    "explain": "Duke of Wellington (1769–1852): Defeated Napoleon at the Battle of Waterloo.",
-   "difficulty": 3,
+   "difficulty": 2,
    "refs": [
     "leaders/duke-of-wellington"
    ]
@@ -14030,9 +14440,9 @@
    "prompt": "In which year was Duke of Wellington born?",
    "answer": "1769",
    "wrong": [
+    "1759",
     "1789",
-    "1799",
-    "1739"
+    "1799"
    ],
    "explain": "Duke of Wellington (1769–1852): Defeated Napoleon at the Battle of Waterloo.",
    "difficulty": 3,
@@ -14046,9 +14456,9 @@
    "prompt": "Who is this? He was a prime minister who founded the modern Conservative Party.",
    "answer": "Robert Peel",
    "wrong": [
-    "Charles de Gaulle",
-    "John Adams",
-    "Alfred the Great"
+    "John Howard",
+    "Caligula",
+    "Charles I"
    ],
    "explain": "Robert Peel (1788–1850): A prime minister who founded the modern Conservative Party.",
    "difficulty": 3,
@@ -14062,9 +14472,9 @@
    "prompt": "In which year was Robert Peel born?",
    "answer": "1788",
    "wrong": [
-    "1768",
-    "1758",
-    "1798"
+    "1778",
+    "1818",
+    "1758"
    ],
    "explain": "Robert Peel (1788–1850): A prime minister who founded the modern Conservative Party.",
    "difficulty": 3,
@@ -14078,9 +14488,9 @@
    "prompt": "Who is this? He was a Conservative prime minister and a favourite of Queen Victoria.",
    "answer": "Benjamin Disraeli",
    "wrong": [
-    "Harun al-Rashid",
-    "Caligula",
-    "Edward I"
+    "Michael Joseph Savage",
+    "Lech Wałęsa",
+    "Henry VII"
    ],
    "explain": "Benjamin Disraeli (1804–1881): A Conservative prime minister and a favourite of Queen Victoria.",
    "difficulty": 3,
@@ -14094,9 +14504,9 @@
    "prompt": "In which year was Benjamin Disraeli born?",
    "answer": "1804",
    "wrong": [
-    "1794",
-    "1784",
-    "1774"
+    "1824",
+    "1774",
+    "1794"
    ],
    "explain": "Benjamin Disraeli (1804–1881): A Conservative prime minister and a favourite of Queen Victoria.",
    "difficulty": 3,
@@ -14110,9 +14520,9 @@
    "prompt": "Who is this? He was the Liberal rival of Benjamin Disraeli.",
    "answer": "William Gladstone",
    "wrong": [
-    "Franz Joseph I",
-    "John F. Kennedy",
-    "Darius the Great"
+    "Joseph Lyons",
+    "Henry VIII",
+    "Salvador Allende"
    ],
    "explain": "William Gladstone (1809–1898): The Liberal rival of Benjamin Disraeli.",
    "difficulty": 3,
@@ -14126,9 +14536,9 @@
    "prompt": "In which year was William Gladstone born?",
    "answer": "1809",
    "wrong": [
+    "1839",
     "1829",
-    "1799",
-    "1839"
+    "1789"
    ],
    "explain": "William Gladstone (1809–1898): The Liberal rival of Benjamin Disraeli.",
    "difficulty": 3,
@@ -14142,9 +14552,9 @@
    "prompt": "Who is this? He was the last Liberal prime minister of Britain.",
    "answer": "David Lloyd George",
    "wrong": [
-    "Maximilien Robespierre",
-    "Boris Johnson",
-    "Joe Biden"
+    "Charles V",
+    "Napoleon Bonaparte",
+    "Lech Wałęsa"
    ],
    "explain": "David Lloyd George (1863–1945): The last Liberal prime minister of Britain.",
    "difficulty": 3,
@@ -14158,9 +14568,9 @@
    "prompt": "In which year was David Lloyd George born?",
    "answer": "1863",
    "wrong": [
-    "1883",
-    "1843",
-    "1833"
+    "1873",
+    "1833",
+    "1843"
    ],
    "explain": "David Lloyd George (1863–1945): The last Liberal prime minister of Britain.",
    "difficulty": 3,
@@ -14174,9 +14584,9 @@
    "prompt": "Who is this? He was the prime minister before Winston Churchill.",
    "answer": "Neville Chamberlain",
    "wrong": [
-    "Saladin",
-    "Joe Biden",
-    "Robert Walpole"
+    "Jimmy Carter",
+    "Justin Trudeau",
+    "Cetshwayo"
    ],
    "explain": "Neville Chamberlain (1869–1940): The prime minister before Winston Churchill.",
    "difficulty": 2,
@@ -14190,9 +14600,9 @@
    "prompt": "In which year was Neville Chamberlain born?",
    "answer": "1869",
    "wrong": [
-    "1849",
+    "1879",
     "1839",
-    "1859"
+    "1899"
    ],
    "explain": "Neville Chamberlain (1869–1940): The prime minister before Winston Churchill.",
    "difficulty": 3,
@@ -14206,9 +14616,9 @@
    "prompt": "Who is this? He was a Labour prime minister after the Second World War.",
    "answer": "Clement Attlee",
    "wrong": [
-    "Justinian I",
-    "Josip Broz Tito",
-    "John Curtin"
+    "Frederick Barbarossa",
+    "Gustavus Adolphus",
+    "Lula da Silva"
    ],
    "explain": "Clement Attlee (1883–1967): A Labour prime minister after the Second World War.",
    "difficulty": 3,
@@ -14222,9 +14632,9 @@
    "prompt": "In which year was Clement Attlee born?",
    "answer": "1883",
    "wrong": [
-    "1893",
+    "1873",
     "1863",
-    "1873"
+    "1893"
    ],
    "explain": "Clement Attlee (1883–1967): A Labour prime minister after the Second World War.",
    "difficulty": 3,
@@ -14238,9 +14648,9 @@
    "prompt": "Who is this? He was a Conservative prime minister nicknamed Supermac.",
    "answer": "Harold Macmillan",
    "wrong": [
-    "Constantine the Great",
-    "Rajiv Gandhi",
-    "Keir Starmer"
+    "George Washington",
+    "Shah Jahan",
+    "Abraham Lincoln"
    ],
    "explain": "Harold Macmillan (1894–1986): A Conservative prime minister nicknamed Supermac.",
    "difficulty": 3,
@@ -14254,9 +14664,9 @@
    "prompt": "In which year was Harold Macmillan born?",
    "answer": "1894",
    "wrong": [
-    "1884",
+    "1914",
     "1924",
-    "1864"
+    "1874"
    ],
    "explain": "Harold Macmillan (1894–1986): A Conservative prime minister nicknamed Supermac.",
    "difficulty": 3,
@@ -14270,9 +14680,9 @@
    "prompt": "Who is this? He was a Labour prime minister in the 1960s and 1970s.",
    "answer": "Harold Wilson",
    "wrong": [
-    "Napoleon III",
-    "Philip II of Macedon",
-    "John Major"
+    "Henry Parkes",
+    "Richard Seddon",
+    "Constantine the Great"
    ],
    "explain": "Harold Wilson (1916–1995): A Labour prime minister in the 1960s and 1970s.",
    "difficulty": 2,
@@ -14286,9 +14696,9 @@
    "prompt": "In which year was Harold Wilson born?",
    "answer": "1916",
    "wrong": [
+    "1926",
     "1906",
-    "1946",
-    "1896"
+    "1946"
    ],
    "explain": "Harold Wilson (1916–1995): A Labour prime minister in the 1960s and 1970s.",
    "difficulty": 3,
@@ -14302,9 +14712,9 @@
    "prompt": "Who is this? He followed Margaret Thatcher as prime minister.",
    "answer": "John Major",
    "wrong": [
-    "Constantine the Great",
-    "Pericles",
-    "Attila"
+    "Leonidas I",
+    "Kwame Nkrumah",
+    "Mackenzie King"
    ],
    "explain": "John Major (1943): Followed Margaret Thatcher as prime minister.",
    "difficulty": 2,
@@ -14318,9 +14728,9 @@
    "prompt": "In which year was John Major born?",
    "answer": "1943",
    "wrong": [
-    "1923",
     "1913",
-    "1933"
+    "1963",
+    "1923"
    ],
    "explain": "John Major (1943): Followed Margaret Thatcher as prime minister.",
    "difficulty": 3,
@@ -14334,9 +14744,9 @@
    "prompt": "Who is this? He was the Labour prime minister from 1997 to 2007.",
    "answer": "Tony Blair",
    "wrong": [
-    "Gustavus Adolphus",
-    "Sejong the Great",
-    "Éamon de Valera"
+    "Philip II of Spain",
+    "François Mitterrand",
+    "Lee Kuan Yew"
    ],
    "explain": "Tony Blair (1953): The Labour prime minister from 1997 to 2007.",
    "difficulty": 2,
@@ -14350,9 +14760,9 @@
    "prompt": "In which year was Tony Blair born?",
    "answer": "1953",
    "wrong": [
-    "1923",
+    "1933",
     "1963",
-    "1983"
+    "1973"
    ],
    "explain": "Tony Blair (1953): The Labour prime minister from 1997 to 2007.",
    "difficulty": 3,
@@ -14366,9 +14776,9 @@
    "prompt": "Who is this? He was the Labour prime minister after Tony Blair.",
    "answer": "Gordon Brown",
    "wrong": [
-    "Jimmy Carter",
-    "Sitting Bull",
-    "Bill Clinton"
+    "Winston Churchill",
+    "Robert Menzies",
+    "Rajiv Gandhi"
    ],
    "explain": "Gordon Brown (1951): The Labour prime minister after Tony Blair.",
    "difficulty": 2,
@@ -14382,9 +14792,9 @@
    "prompt": "In which year was Gordon Brown born?",
    "answer": "1951",
    "wrong": [
-    "1981",
-    "1931",
-    "1961"
+    "1941",
+    "1971",
+    "1981"
    ],
    "explain": "Gordon Brown (1951): The Labour prime minister after Tony Blair.",
    "difficulty": 3,
@@ -14398,9 +14808,9 @@
    "prompt": "Who is this? He was the Conservative prime minister from 2010 to 2016.",
    "answer": "David Cameron",
    "wrong": [
-    "Hadrian",
-    "Joe Biden",
-    "Vladimir Lenin"
+    "Jomo Kenyatta",
+    "Attila",
+    "Nebuchadnezzar II"
    ],
    "explain": "David Cameron (1966): The Conservative prime minister from 2010 to 2016.",
    "difficulty": 2,
@@ -14414,9 +14824,9 @@
    "prompt": "In which year was David Cameron born?",
    "answer": "1966",
    "wrong": [
-    "1936",
-    "1946",
-    "1996"
+    "1976",
+    "1996",
+    "1936"
    ],
    "explain": "David Cameron (1966): The Conservative prime minister from 2010 to 2016.",
    "difficulty": 3,
@@ -14446,9 +14856,9 @@
    "prompt": "In which year was Theresa May born?",
    "answer": "1956",
    "wrong": [
-    "1926",
-    "1976",
-    "1936"
+    "1936",
+    "1946",
+    "1926"
    ],
    "explain": "Theresa May (1956): Britain's second female prime minister.",
    "difficulty": 3,
@@ -14462,9 +14872,9 @@
    "prompt": "Who is this? He was the prime minister who took Britain out of the European Union.",
    "answer": "Boris Johnson",
    "wrong": [
-    "Hadrian",
-    "Napoleon III",
-    "John Gorton"
+    "Hammurabi",
+    "Hannibal",
+    "Moshoeshoe I"
    ],
    "explain": "Boris Johnson (1964): The prime minister who took Britain out of the European Union.",
    "difficulty": 2,
@@ -14478,9 +14888,9 @@
    "prompt": "In which year was Boris Johnson born?",
    "answer": "1964",
    "wrong": [
+    "1934",
     "1994",
-    "1954",
-    "1934"
+    "1944"
    ],
    "explain": "Boris Johnson (1964): The prime minister who took Britain out of the European Union.",
    "difficulty": 3,
@@ -14510,9 +14920,9 @@
    "prompt": "In which year was Liz Truss born?",
    "answer": "1975",
    "wrong": [
-    "1985",
     "1995",
-    "2005"
+    "1985",
+    "1965"
    ],
    "explain": "Liz Truss (1975): The shortest-serving British prime minister.",
    "difficulty": 3,
@@ -14526,9 +14936,9 @@
    "prompt": "Who is this? He was the Conservative prime minister from 2022 to 2024.",
    "answer": "Rishi Sunak",
    "wrong": [
-    "Charles de Gaulle",
-    "Alfred the Great",
-    "Suleiman the Magnificent"
+    "Napoleon Bonaparte",
+    "Benjamin Disraeli",
+    "George III"
    ],
    "explain": "Rishi Sunak (1980): The Conservative prime minister from 2022 to 2024.",
    "difficulty": 2,
@@ -14542,9 +14952,9 @@
    "prompt": "In which year was Rishi Sunak born?",
    "answer": "1980",
    "wrong": [
-    "1990",
-    "2000",
-    "2010"
+    "1970",
+    "1960",
+    "1950"
    ],
    "explain": "Rishi Sunak (1980): The Conservative prime minister from 2022 to 2024.",
    "difficulty": 3,
@@ -14558,9 +14968,9 @@
    "prompt": "Who is this? He became prime minister after Labour's big win in 2024.",
    "answer": "Keir Starmer",
    "wrong": [
-    "Boris Johnson",
-    "Gustavus Adolphus",
-    "Benjamin Disraeli"
+    "Sitting Bull",
+    "Lester B. Pearson",
+    "F. W. de Klerk"
    ],
    "explain": "Keir Starmer (1962): Became prime minister after Labour's big win in 2024.",
    "difficulty": 1,
@@ -14574,9 +14984,9 @@
    "prompt": "In which year was Keir Starmer born?",
    "answer": "1962",
    "wrong": [
-    "1992",
+    "1982",
     "1942",
-    "1952"
+    "1992"
    ],
    "explain": "Keir Starmer (1962): Became prime minister after Labour's big win in 2024.",
    "difficulty": 3,
@@ -14590,9 +15000,9 @@
    "prompt": "Who is this? He was the US president who proposed the League of Nations.",
    "answer": "Woodrow Wilson",
    "wrong": [
-    "Napoleon Bonaparte",
-    "Louis XVI",
-    "Robert Menzies"
+    "Emperor Meiji",
+    "Wilhelm II",
+    "Otto von Bismarck"
    ],
    "explain": "Woodrow Wilson (1856–1924): The US president who proposed the League of Nations.",
    "difficulty": 2,
@@ -14606,9 +15016,9 @@
    "prompt": "In which year was Woodrow Wilson born?",
    "answer": "1856",
    "wrong": [
-    "1846",
+    "1876",
     "1836",
-    "1886"
+    "1826"
    ],
    "explain": "Woodrow Wilson (1856–1924): The US president who proposed the League of Nations.",
    "difficulty": 3,
@@ -14622,9 +15032,9 @@
    "prompt": "Who is this? He was the 33rd US president.",
    "answer": "Harry S. Truman",
    "wrong": [
-    "Anthony Albanese",
-    "Tutankhamun",
-    "Philip II of Spain"
+    "William Gladstone",
+    "George H. W. Bush",
+    "Billy Hughes"
    ],
    "explain": "Harry S. Truman (1884–1972): The 33rd US president.",
    "difficulty": 1,
@@ -14638,9 +15048,9 @@
    "prompt": "In which year was Harry S. Truman born?",
    "answer": "1884",
    "wrong": [
-    "1854",
     "1914",
-    "1874"
+    "1904",
+    "1854"
    ],
    "explain": "Harry S. Truman (1884–1972): The 33rd US president.",
    "difficulty": 3,
@@ -14654,9 +15064,9 @@
    "prompt": "Who is this? He was the 34th US president.",
    "answer": "Dwight D. Eisenhower",
    "wrong": [
-    "Deng Xiaoping",
-    "Robert Walpole",
-    "Ranjit Singh"
+    "Mackenzie King",
+    "Joseph Stalin",
+    "Tutankhamun"
    ],
    "explain": "Dwight D. Eisenhower (1890–1969): The 34th US president.",
    "difficulty": 1,
@@ -14670,9 +15080,9 @@
    "prompt": "In which year was Dwight D. Eisenhower born?",
    "answer": "1890",
    "wrong": [
-    "1910",
+    "1920",
     "1880",
-    "1920"
+    "1860"
    ],
    "explain": "Dwight D. Eisenhower (1890–1969): The 34th US president.",
    "difficulty": 3,
@@ -14686,9 +15096,9 @@
    "prompt": "Who is this? He was the 36th US president, from Texas.",
    "answer": "Lyndon B. Johnson",
    "wrong": [
-    "Thomas Jefferson",
-    "Wilfrid Laurier",
-    "Charles de Gaulle"
+    "Paul Keating",
+    "Richard Seddon",
+    "Muammar Gaddafi"
    ],
    "explain": "Lyndon B. Johnson (1908–1973): The 36th US president, from Texas.",
    "difficulty": 1,
@@ -14702,9 +15112,9 @@
    "prompt": "In which year was Lyndon B. Johnson born?",
    "answer": "1908",
    "wrong": [
-    "1938",
-    "1888",
-    "1928"
+    "1928",
+    "1898",
+    "1918"
    ],
    "explain": "Lyndon B. Johnson (1908–1973): The 36th US president, from Texas.",
    "difficulty": 3,
@@ -14718,9 +15128,9 @@
    "prompt": "Who is this? He was the only US president to resign.",
    "answer": "Richard Nixon",
    "wrong": [
-    "Hammurabi",
-    "Constantine the Great",
-    "Billy Hughes"
+    "Bill Clinton",
+    "Mansa Musa",
+    "Toussaint Louverture"
    ],
    "explain": "Richard Nixon (1913–1994): The only US president to resign.",
    "difficulty": 1,
@@ -14750,9 +15160,9 @@
    "prompt": "Who is this? He was the 39th US president and lived to 100.",
    "answer": "Jimmy Carter",
    "wrong": [
-    "George III",
-    "Macbeth",
-    "Henry VIII"
+    "Malcolm Fraser",
+    "Khufu",
+    "Harold Wilson"
    ],
    "explain": "Jimmy Carter (1924–2024): The 39th US president and lived to 100.",
    "difficulty": 1,
@@ -14766,9 +15176,9 @@
    "prompt": "In which year was Jimmy Carter born?",
    "answer": "1924",
    "wrong": [
-    "1914",
+    "1954",
     "1894",
-    "1944"
+    "1934"
    ],
    "explain": "Jimmy Carter (1924–2024): The 39th US president and lived to 100.",
    "difficulty": 3,
@@ -14782,9 +15192,9 @@
    "prompt": "Who is this? He was the 40th US president.",
    "answer": "Ronald Reagan",
    "wrong": [
-    "Boris Yeltsin",
-    "Toyotomi Hideyoshi",
-    "Vladimir Lenin"
+    "F. W. de Klerk",
+    "Lula da Silva",
+    "Ranjit Singh"
    ],
    "explain": "Ronald Reagan (1911–2004): The 40th US president.",
    "difficulty": 1,
@@ -14800,7 +15210,7 @@
    "wrong": [
     "1921",
     "1941",
-    "1891"
+    "1881"
    ],
    "explain": "Ronald Reagan (1911–2004): The 40th US president.",
    "difficulty": 3,
@@ -14814,9 +15224,9 @@
    "prompt": "Who is this? He was the 41st US president, father of the 43rd.",
    "answer": "George H. W. Bush",
    "wrong": [
-    "Bob Hawke",
-    "Josip Broz Tito",
-    "Pachacuti"
+    "Hannibal",
+    "Attila",
+    "Edward VIII"
    ],
    "explain": "George H. W. Bush (1924–2018): The 41st US president, father of the 43rd.",
    "difficulty": 1,
@@ -14830,9 +15240,9 @@
    "prompt": "In which year was George H. W. Bush born?",
    "answer": "1924",
    "wrong": [
-    "1934",
+    "1904",
     "1914",
-    "1904"
+    "1934"
    ],
    "explain": "George H. W. Bush (1924–2018): The 41st US president, father of the 43rd.",
    "difficulty": 3,
@@ -14846,9 +15256,9 @@
    "prompt": "Who is this? He was the 43rd US president, son of the 41st.",
    "answer": "George W. Bush",
    "wrong": [
-    "Neville Chamberlain",
-    "Genghis Khan",
-    "Rajiv Gandhi"
+    "Trajan",
+    "Harold Wilson",
+    "Paul Keating"
    ],
    "explain": "George W. Bush (1946): The 43rd US president, son of the 41st.",
    "difficulty": 1,
@@ -14862,9 +15272,9 @@
    "prompt": "In which year was George W. Bush born?",
    "answer": "1946",
    "wrong": [
-    "1956",
-    "1926",
-    "1966"
+    "1966",
+    "1916",
+    "1926"
    ],
    "explain": "George W. Bush (1946): The 43rd US president, son of the 41st.",
    "difficulty": 3,
@@ -14878,9 +15288,9 @@
    "prompt": "Who is this? He was the 42nd US president.",
    "answer": "Bill Clinton",
    "wrong": [
-    "Alfred Deakin",
-    "David Ben-Gurion",
-    "Wilfrid Laurier"
+    "Charles III",
+    "Benjamin Disraeli",
+    "Pierre Trudeau"
    ],
    "explain": "Bill Clinton (1946): The 42nd US president.",
    "difficulty": 1,
@@ -14894,9 +15304,9 @@
    "prompt": "In which year was Bill Clinton born?",
    "answer": "1946",
    "wrong": [
-    "1966",
-    "1956",
-    "1916"
+    "1936",
+    "1926",
+    "1966"
    ],
    "explain": "Bill Clinton (1946): The 42nd US president.",
    "difficulty": 3,
@@ -14910,9 +15320,9 @@
    "prompt": "Who is this? He is the 45th and 47th US president.",
    "answer": "Donald Trump",
    "wrong": [
-    "Helmut Kohl",
-    "William Pitt the Younger",
-    "Edward VIII"
+    "David Lloyd George",
+    "Napoleon III",
+    "Haile Selassie"
    ],
    "explain": "Donald Trump (1946): The 45th and 47th US president.",
    "difficulty": 1,
@@ -14926,9 +15336,9 @@
    "prompt": "In which year was Donald Trump born?",
    "answer": "1946",
    "wrong": [
-    "1976",
     "1936",
-    "1966"
+    "1966",
+    "1956"
    ],
    "explain": "Donald Trump (1946): The 45th and 47th US president.",
    "difficulty": 3,
@@ -14942,9 +15352,9 @@
    "prompt": "Who is this? He was the 46th US president.",
    "answer": "Joe Biden",
    "wrong": [
-    "Pierre Trudeau",
-    "José de San Martín",
-    "Babur"
+    "Louis XVI",
+    "Robert Menzies",
+    "Edward VIII"
    ],
    "explain": "Joe Biden (1942): The 46th US president.",
    "difficulty": 1,
@@ -14958,9 +15368,9 @@
    "prompt": "In which year was Joe Biden born?",
    "answer": "1942",
    "wrong": [
-    "1922",
-    "1912",
-    "1952"
+    "1972",
+    "1952",
+    "1932"
    ],
    "explain": "Joe Biden (1942): The 46th US president.",
    "difficulty": 3,
@@ -14974,9 +15384,9 @@
    "prompt": "Who is this? He was Canada's first prime minister.",
    "answer": "John A. Macdonald",
    "wrong": [
-    "Xerxes I",
-    "Jawaharlal Nehru",
-    "Andrew Jackson"
+    "Constantine the Great",
+    "Richard Seddon",
+    "John Key"
    ],
    "explain": "John A. Macdonald (1815–1891): Canada's first prime minister.",
    "difficulty": 3,
@@ -14990,9 +15400,9 @@
    "prompt": "In which year was John A. Macdonald born?",
    "answer": "1815",
    "wrong": [
-    "1795",
-    "1785",
-    "1835"
+    "1835",
+    "1825",
+    "1805"
    ],
    "explain": "John A. Macdonald (1815–1891): Canada's first prime minister.",
    "difficulty": 3,
@@ -15006,9 +15416,9 @@
    "prompt": "Who is this? He was Canada's prime minister from 1896 to 1911.",
    "answer": "Wilfrid Laurier",
    "wrong": [
-    "Lech Wałęsa",
-    "Sejong the Great",
-    "Akbar"
+    "Billy Hughes",
+    "Malcolm Fraser",
+    "Jawaharlal Nehru"
    ],
    "explain": "Wilfrid Laurier (1841–1919): Canada's prime minister from 1896 to 1911.",
    "difficulty": 3,
@@ -15022,8 +15432,8 @@
    "prompt": "In which year was Wilfrid Laurier born?",
    "answer": "1841",
    "wrong": [
-    "1821",
     "1871",
+    "1811",
     "1851"
    ],
    "explain": "Wilfrid Laurier (1841–1919): Canada's prime minister from 1896 to 1911.",
@@ -15038,9 +15448,9 @@
    "prompt": "Who is this? He was Canada's longest-serving prime minister.",
    "answer": "Mackenzie King",
    "wrong": [
-    "Franz Joseph I",
-    "James VI and I",
-    "Neville Chamberlain"
+    "Gamal Abdel Nasser",
+    "Robert Walpole",
+    "Barack Obama"
    ],
    "explain": "Mackenzie King (1874–1950): Canada's longest-serving prime minister.",
    "difficulty": 3,
@@ -15054,9 +15464,9 @@
    "prompt": "In which year was Mackenzie King born?",
    "answer": "1874",
    "wrong": [
-    "1894",
-    "1864",
-    "1844"
+    "1884",
+    "1904",
+    "1894"
    ],
    "explain": "Mackenzie King (1874–1950): Canada's longest-serving prime minister.",
    "difficulty": 3,
@@ -15070,9 +15480,9 @@
    "prompt": "Who is this? He was Canada's prime minister in the 1960s.",
    "answer": "Lester B. Pearson",
    "wrong": [
-    "Joe Biden",
-    "Hammurabi",
-    "Franz Joseph I"
+    "Thomas Jefferson",
+    "Volodymyr Zelenskyy",
+    "Mustafa Kemal Atatürk"
    ],
    "explain": "Lester B. Pearson (1897–1972): Canada's prime minister in the 1960s.",
    "difficulty": 3,
@@ -15086,9 +15496,9 @@
    "prompt": "In which year was Lester B. Pearson born?",
    "answer": "1897",
    "wrong": [
-    "1907",
-    "1917",
-    "1867"
+    "1877",
+    "1927",
+    "1907"
    ],
    "explain": "Lester B. Pearson (1897–1972): Canada's prime minister in the 1960s.",
    "difficulty": 3,
@@ -15102,9 +15512,9 @@
    "prompt": "Who is this? He was Canada's prime minister for most of the 1970s.",
    "answer": "Pierre Trudeau",
    "wrong": [
-    "Fidel Castro",
-    "Edward VIII",
-    "John Howard"
+    "Toyotomi Hideyoshi",
+    "Oliver Cromwell",
+    "Mao Zedong"
    ],
    "explain": "Pierre Trudeau (1919–2000): Canada's prime minister for most of the 1970s.",
    "difficulty": 3,
@@ -15118,9 +15528,9 @@
    "prompt": "In which year was Pierre Trudeau born?",
    "answer": "1919",
    "wrong": [
-    "1899",
-    "1889",
-    "1909"
+    "1909",
+    "1949",
+    "1939"
    ],
    "explain": "Pierre Trudeau (1919–2000): Canada's prime minister for most of the 1970s.",
    "difficulty": 3,
@@ -15134,9 +15544,9 @@
    "prompt": "Who is this? He was Canada's prime minister from 2015 to 2025.",
    "answer": "Justin Trudeau",
    "wrong": [
-    "Ashoka",
-    "Genghis Khan",
-    "Shaka"
+    "Boris Yeltsin",
+    "Ranjit Singh",
+    "Richard Seddon"
    ],
    "explain": "Justin Trudeau (1971): Canada's prime minister from 2015 to 2025.",
    "difficulty": 1,
@@ -15151,8 +15561,8 @@
    "answer": "1971",
    "wrong": [
     "1981",
-    "2001",
-    "1991"
+    "1941",
+    "1951"
    ],
    "explain": "Justin Trudeau (1971): Canada's prime minister from 2015 to 2025.",
    "difficulty": 3,
@@ -15166,9 +15576,9 @@
    "prompt": "Who is this? He is New Zealand's longest-serving prime minister.",
    "answer": "Richard Seddon",
    "wrong": [
-    "Xi Jinping",
-    "Genghis Khan",
-    "Chiang Kai-shek"
+    "Francisco Franco",
+    "Wilfrid Laurier",
+    "Henry VIII"
    ],
    "explain": "Richard Seddon (1845–1906): New Zealand's longest-serving prime minister.",
    "difficulty": 3,
@@ -15182,9 +15592,9 @@
    "prompt": "In which year was Richard Seddon born?",
    "answer": "1845",
    "wrong": [
+    "1835",
     "1815",
-    "1865",
-    "1875"
+    "1855"
    ],
    "explain": "Richard Seddon (1845–1906): New Zealand's longest-serving prime minister.",
    "difficulty": 3,
@@ -15198,9 +15608,9 @@
    "prompt": "Who is this? He was New Zealand's first Labour prime minister.",
    "answer": "Michael Joseph Savage",
    "wrong": [
-    "Emperor Meiji",
-    "Attila",
-    "Nikita Khrushchev"
+    "John F. Kennedy",
+    "Shaka",
+    "Akbar"
    ],
    "explain": "Michael Joseph Savage (1872–1940): New Zealand's first Labour prime minister.",
    "difficulty": 3,
@@ -15214,9 +15624,9 @@
    "prompt": "In which year was Michael Joseph Savage born?",
    "answer": "1872",
    "wrong": [
+    "1882",
     "1852",
-    "1842",
-    "1892"
+    "1902"
    ],
    "explain": "Michael Joseph Savage (1872–1940): New Zealand's first Labour prime minister.",
    "difficulty": 3,
@@ -15230,9 +15640,9 @@
    "prompt": "Who is this? He was a Labour prime minister in the 1980s.",
    "answer": "David Lange",
    "wrong": [
-    "Joseph Lyons",
-    "Edward VII",
-    "Nebuchadnezzar II"
+    "Akbar",
+    "Clement Attlee",
+    "Ho Chi Minh"
    ],
    "explain": "David Lange (1942–2005): A Labour prime minister in the 1980s.",
    "difficulty": 3,
@@ -15247,8 +15657,8 @@
    "answer": "1942",
    "wrong": [
     "1912",
-    "1972",
-    "1962"
+    "1922",
+    "1972"
    ],
    "explain": "David Lange (1942–2005): A Labour prime minister in the 1980s.",
    "difficulty": 3,
@@ -15278,9 +15688,9 @@
    "prompt": "In which year was Helen Clark born?",
    "answer": "1950",
    "wrong": [
+    "1940",
     "1980",
-    "1930",
-    "1920"
+    "1930"
    ],
    "explain": "Helen Clark (1950): The Labour prime minister from 1999 to 2008.",
    "difficulty": 3,
@@ -15294,9 +15704,9 @@
    "prompt": "Who is this? He was a National Party prime minister from 2008 to 2016.",
    "answer": "John Key",
    "wrong": [
-    "Justinian I",
-    "Shah Jahan",
-    "Edward VIII"
+    "Xi Jinping",
+    "Chiang Kai-shek",
+    "Charles II"
    ],
    "explain": "John Key (1961): A National Party prime minister from 2008 to 2016.",
    "difficulty": 3,
@@ -15310,9 +15720,9 @@
    "prompt": "In which year was John Key born?",
    "answer": "1961",
    "wrong": [
-    "1951",
-    "1941",
-    "1931"
+    "1991",
+    "1981",
+    "1951"
    ],
    "explain": "John Key (1961): A National Party prime minister from 2008 to 2016.",
    "difficulty": 3,
@@ -15326,9 +15736,9 @@
    "prompt": "Who is this? She was New Zealand's youngest prime minister in 150 years.",
    "answer": "Jacinda Ardern",
    "wrong": [
-    "Boudica",
-    "Elizabeth I",
-    "Maria Theresa"
+    "Liliʻuokalani",
+    "Theresa May",
+    "Elizabeth I"
    ],
    "explain": "Jacinda Ardern (1980): New Zealand's youngest prime minister in 150 years.",
    "difficulty": 2,
@@ -15342,9 +15752,9 @@
    "prompt": "In which year was Jacinda Ardern born?",
    "answer": "1980",
    "wrong": [
-    "2010",
-    "1970",
-    "1960"
+    "2000",
+    "1950",
+    "1970"
    ],
    "explain": "Jacinda Ardern (1980): New Zealand's youngest prime minister in 150 years.",
    "difficulty": 3,
@@ -15358,9 +15768,9 @@
    "prompt": "Who is this? He was India's first prime minister.",
    "answer": "Jawaharlal Nehru",
    "wrong": [
-    "Nikita Khrushchev",
-    "Harry S. Truman",
-    "William Gladstone"
+    "Edward VII",
+    "Vladimir Putin",
+    "Justinian I"
    ],
    "explain": "Jawaharlal Nehru (1889–1964): India's first prime minister.",
    "difficulty": 2,
@@ -15390,12 +15800,12 @@
    "prompt": "Who is this? He was India's youngest prime minister.",
    "answer": "Rajiv Gandhi",
    "wrong": [
-    "George Washington",
-    "Henry VII",
-    "Saladin"
+    "Constantine the Great",
+    "Atahualpa",
+    "Frederick the Great"
    ],
    "explain": "Rajiv Gandhi (1944–1991): India's youngest prime minister.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/rajiv-gandhi"
    ]
@@ -15406,9 +15816,9 @@
    "prompt": "In which year was Rajiv Gandhi born?",
    "answer": "1944",
    "wrong": [
-    "1914",
-    "1974",
-    "1924"
+    "1954",
+    "1964",
+    "1914"
    ],
    "explain": "Rajiv Gandhi (1944–1991): India's youngest prime minister.",
    "difficulty": 3,
@@ -15422,9 +15832,9 @@
    "prompt": "Who is this? He is India's prime minister.",
    "answer": "Narendra Modi",
    "wrong": [
-    "Alfred Deakin",
     "Lester B. Pearson",
-    "Joe Biden"
+    "Salvador Allende",
+    "Timur"
    ],
    "explain": "Narendra Modi (1950): India's prime minister.",
    "difficulty": 1,
@@ -15438,8 +15848,8 @@
    "prompt": "In which year was Narendra Modi born?",
    "answer": "1950",
    "wrong": [
-    "1980",
     "1920",
+    "1960",
     "1930"
    ],
    "explain": "Narendra Modi (1950): India's prime minister.",
@@ -15454,9 +15864,9 @@
    "prompt": "Who is this? He founded the Republic of Turkey and was its first president.",
    "answer": "Mustafa Kemal Atatürk",
    "wrong": [
-    "Shinzo Abe",
-    "Keir Starmer",
-    "Benito Juárez"
+    "Josip Broz Tito",
+    "Mikhail Gorbachev",
+    "Xerxes I"
    ],
    "explain": "Mustafa Kemal Atatürk (1881–1938): Founded the Republic of Turkey and was its first president.",
    "difficulty": 2,
@@ -15470,9 +15880,9 @@
    "prompt": "In which year was Mustafa Kemal Atatürk born?",
    "answer": "1881",
    "wrong": [
-    "1861",
     "1851",
-    "1901"
+    "1901",
+    "1861"
    ],
    "explain": "Mustafa Kemal Atatürk (1881–1938): Founded the Republic of Turkey and was its first president.",
    "difficulty": 3,
@@ -15486,12 +15896,12 @@
    "prompt": "Who is this? He was Egypt's second president.",
    "answer": "Gamal Abdel Nasser",
    "wrong": [
-    "Edward VII",
-    "Akbar",
-    "Pericles"
+    "Billy Hughes",
+    "Woodrow Wilson",
+    "Saddam Hussein"
    ],
    "explain": "Gamal Abdel Nasser (1918–1970): Egypt's second president.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/gamal-abdel-nasser"
    ]
@@ -15502,9 +15912,9 @@
    "prompt": "In which year was Gamal Abdel Nasser born?",
    "answer": "1918",
    "wrong": [
-    "1948",
-    "1908",
-    "1898"
+    "1938",
+    "1898",
+    "1908"
    ],
    "explain": "Gamal Abdel Nasser (1918–1970): Egypt's second president.",
    "difficulty": 3,
@@ -15518,12 +15928,12 @@
    "prompt": "Who is this? He was an Egyptian president assassinated in 1981.",
    "answer": "Anwar Sadat",
    "wrong": [
-    "Otto von Bismarck",
-    "John Adams",
-    "Philip II of Spain"
+    "Tony Abbott",
+    "Muammar Gaddafi",
+    "Paul Keating"
    ],
    "explain": "Anwar Sadat (1918–1981): An Egyptian president assassinated in 1981.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/anwar-sadat"
    ]
@@ -15534,9 +15944,9 @@
    "prompt": "In which year was Anwar Sadat born?",
    "answer": "1918",
    "wrong": [
-    "1898",
-    "1948",
-    "1928"
+    "1928",
+    "1908",
+    "1948"
    ],
    "explain": "Anwar Sadat (1918–1981): An Egyptian president assassinated in 1981.",
    "difficulty": 3,
@@ -15550,12 +15960,12 @@
    "prompt": "Who is this? He was Israel's first prime minister.",
    "answer": "David Ben-Gurion",
    "wrong": [
-    "Robert the Bruce",
-    "Otto von Bismarck",
-    "Tutankhamun"
+    "Justinian I",
+    "Willy Brandt",
+    "Narendra Modi"
    ],
    "explain": "David Ben-Gurion (1886–1973): Israel's first prime minister.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/david-ben-gurion"
    ]
@@ -15567,8 +15977,8 @@
    "answer": "1886",
    "wrong": [
     "1876",
-    "1856",
-    "1916"
+    "1896",
+    "1866"
    ],
    "explain": "David Ben-Gurion (1886–1973): Israel's first prime minister.",
    "difficulty": 3,
@@ -15582,12 +15992,12 @@
    "prompt": "Who is this? He was Singapore's first prime minister.",
    "answer": "Lee Kuan Yew",
    "wrong": [
-    "Henry VII",
-    "Scott Morrison",
-    "Malcolm Fraser"
+    "Khufu",
+    "Wilfrid Laurier",
+    "Idi Amin"
    ],
    "explain": "Lee Kuan Yew (1923–2015): Singapore's first prime minister.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/lee-kuan-yew"
    ]
@@ -15598,9 +16008,9 @@
    "prompt": "In which year was Lee Kuan Yew born?",
    "answer": "1923",
    "wrong": [
-    "1933",
     "1953",
-    "1943"
+    "1933",
+    "1913"
    ],
    "explain": "Lee Kuan Yew (1923–2015): Singapore's first prime minister.",
    "difficulty": 3,
@@ -15614,12 +16024,12 @@
    "prompt": "Who is this? He was Indonesia's first president.",
    "answer": "Sukarno",
    "wrong": [
-    "Alfred the Great",
-    "David Ben-Gurion",
-    "Brian Boru"
+    "Cyril Ramaphosa",
+    "Akbar",
+    "Darius the Great"
    ],
    "explain": "Sukarno (1901–1970): Indonesia's first president.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/sukarno"
    ]
@@ -15631,8 +16041,8 @@
    "answer": "1901",
    "wrong": [
     "1891",
-    "1881",
-    "1921"
+    "1921",
+    "1881"
    ],
    "explain": "Sukarno (1901–1970): Indonesia's first president.",
    "difficulty": 3,
@@ -15646,9 +16056,9 @@
    "prompt": "Who is this? He was the communist leader of North Vietnam.",
    "answer": "Ho Chi Minh",
    "wrong": [
-    "Narendra Modi",
-    "Juan Perón",
-    "Henry VIII"
+    "Frederick Barbarossa",
+    "Lee Kuan Yew",
+    "Edmund Barton"
    ],
    "explain": "Ho Chi Minh (1890–1969): The communist leader of North Vietnam.",
    "difficulty": 2,
@@ -15662,8 +16072,8 @@
    "prompt": "In which year was Ho Chi Minh born?",
    "answer": "1890",
    "wrong": [
-    "1910",
-    "1870",
+    "1880",
+    "1900",
     "1920"
    ],
    "explain": "Ho Chi Minh (1890–1969): The communist leader of North Vietnam.",
@@ -15678,9 +16088,9 @@
    "prompt": "Who is this? He was the communist leader of Cuba.",
    "answer": "Fidel Castro",
    "wrong": [
-    "Woodrow Wilson",
-    "Julius Caesar",
-    "Brian Boru"
+    "Emperor Wu of Han",
+    "Ulysses S. Grant",
+    "Akhenaten"
    ],
    "explain": "Fidel Castro (1926–2016): The communist leader of Cuba.",
    "difficulty": 1,
@@ -15694,8 +16104,8 @@
    "prompt": "In which year was Fidel Castro born?",
    "answer": "1926",
    "wrong": [
+    "1946",
     "1956",
-    "1936",
     "1906"
    ],
    "explain": "Fidel Castro (1926–2016): The communist leader of Cuba.",
@@ -15710,9 +16120,9 @@
    "prompt": "Who is this? He was an Argentine president who founded a political movement named after him.",
    "answer": "Juan Perón",
    "wrong": [
-    "Ivan the Terrible",
-    "Boris Yeltsin",
-    "John A. Macdonald"
+    "Alfred the Great",
+    "Ashoka",
+    "Nicholas II"
    ],
    "explain": "Juan Perón (1895–1974): An Argentine president who founded a political movement named after him.",
    "difficulty": 3,
@@ -15726,9 +16136,9 @@
    "prompt": "In which year was Juan Perón born?",
    "answer": "1895",
    "wrong": [
-    "1925",
-    "1885",
-    "1915"
+    "1875",
+    "1915",
+    "1925"
    ],
    "explain": "Juan Perón (1895–1974): An Argentine president who founded a political movement named after him.",
    "difficulty": 3,
@@ -15742,9 +16152,9 @@
    "prompt": "Who is this? He was a Chilean president.",
    "answer": "Salvador Allende",
    "wrong": [
-    "George W. Bush",
-    "Mustafa Kemal Atatürk",
-    "Mahatma Gandhi"
+    "Michael Joseph Savage",
+    "Louis XVI",
+    "Saddam Hussein"
    ],
    "explain": "Salvador Allende (1908–1973): A Chilean president.",
    "difficulty": 3,
@@ -15758,7 +16168,7 @@
    "prompt": "In which year was Salvador Allende born?",
    "answer": "1908",
    "wrong": [
-    "1878",
+    "1938",
     "1928",
     "1918"
    ],
@@ -15774,12 +16184,12 @@
    "prompt": "Who is this? He is a president of Brazil.",
    "answer": "Lula da Silva",
    "wrong": [
-    "Genghis Khan",
-    "Thomas Jefferson",
-    "Woodrow Wilson"
+    "George H. W. Bush",
+    "Donald Trump",
+    "Richard Nixon"
    ],
    "explain": "Lula da Silva (1945): A president of Brazil.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/lula-da-silva"
    ]
@@ -15790,8 +16200,8 @@
    "prompt": "In which year was Lula da Silva born?",
    "answer": "1945",
    "wrong": [
+    "1935",
     "1915",
-    "1925",
     "1975"
    ],
    "explain": "Lula da Silva (1945): A president of Brazil.",
@@ -15806,12 +16216,12 @@
    "prompt": "Who is this? He was Ghana's first prime minister and president.",
    "answer": "Kwame Nkrumah",
    "wrong": [
-    "Saladin",
-    "Xi Jinping",
-    "George VI"
+    "Hirohito",
+    "Cnut",
+    "Vladimir Putin"
    ],
    "explain": "Kwame Nkrumah (1909–1972): Ghana's first prime minister and president.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/kwame-nkrumah"
    ]
@@ -15822,9 +16232,9 @@
    "prompt": "In which year was Kwame Nkrumah born?",
    "answer": "1909",
    "wrong": [
-    "1929",
-    "1879",
-    "1939"
+    "1939",
+    "1889",
+    "1929"
    ],
    "explain": "Kwame Nkrumah (1909–1972): Ghana's first prime minister and president.",
    "difficulty": 3,
@@ -15838,9 +16248,9 @@
    "prompt": "Who is this? He was the first president of his East African country.",
    "answer": "Jomo Kenyatta",
    "wrong": [
-    "Harold Holt",
-    "Robert Walpole",
-    "George III"
+    "Moctezuma II",
+    "Ranjit Singh",
+    "Alexander the Great"
    ],
    "explain": "Jomo Kenyatta (died 1978): The first president of his East African country.",
    "difficulty": 3,
@@ -15854,9 +16264,9 @@
    "prompt": "Who is this? He was the first president of Tanzania.",
    "answer": "Julius Nyerere",
    "wrong": [
-    "Xi Jinping",
-    "Juan Perón",
-    "Cyrus the Great"
+    "Xerxes I",
+    "Woodrow Wilson",
+    "Nero"
    ],
    "explain": "Julius Nyerere (1922–1999): The first president of Tanzania.",
    "difficulty": 3,
@@ -15870,9 +16280,9 @@
    "prompt": "In which year was Julius Nyerere born?",
    "answer": "1922",
    "wrong": [
-    "1892",
-    "1932",
-    "1902"
+    "1902",
+    "1952",
+    "1892"
    ],
    "explain": "Julius Nyerere (1922–1999): The first president of Tanzania.",
    "difficulty": 3,
@@ -15886,9 +16296,9 @@
    "prompt": "Who is this? She was Africa's first elected female head of state.",
    "answer": "Ellen Johnson Sirleaf",
    "wrong": [
+    "Indira Gandhi",
     "Maria Theresa",
-    "Wu Zetian",
-    "Golda Meir"
+    "Ranavalona I"
    ],
    "explain": "Ellen Johnson Sirleaf (1938): Africa's first elected female head of state.",
    "difficulty": 3,
@@ -15903,8 +16313,8 @@
    "answer": "1938",
    "wrong": [
     "1918",
-    "1928",
-    "1908"
+    "1908",
+    "1958"
    ],
    "explain": "Ellen Johnson Sirleaf (1938): Africa's first elected female head of state.",
    "difficulty": 3,
@@ -15918,12 +16328,12 @@
    "prompt": "Who is this? He was the first prime minister of the Congo.",
    "answer": "Patrice Lumumba",
    "wrong": [
-    "George W. Bush",
-    "Moshoeshoe I",
-    "Giuseppe Garibaldi"
+    "Éamon de Valera",
+    "Philip II of Macedon",
+    "Richard Seddon"
    ],
    "explain": "Patrice Lumumba (1925–1961): The first prime minister of the Congo.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/patrice-lumumba"
    ]
@@ -15935,8 +16345,8 @@
    "answer": "1925",
    "wrong": [
     "1935",
-    "1895",
-    "1955"
+    "1955",
+    "1905"
    ],
    "explain": "Patrice Lumumba (1925–1961): The first prime minister of the Congo.",
    "difficulty": 3,
@@ -15950,9 +16360,9 @@
    "prompt": "Who is this? He was the last white president of South Africa.",
    "answer": "F. W. de Klerk",
    "wrong": [
-    "Oliver Cromwell",
-    "Robert Peel",
-    "Joseph Stalin"
+    "Nebuchadnezzar II",
+    "Billy Hughes",
+    "Lula da Silva"
    ],
    "explain": "F. W. de Klerk (1936–2021): The last white president of South Africa.",
    "difficulty": 3,
@@ -15966,9 +16376,9 @@
    "prompt": "In which year was F. W. de Klerk born?",
    "answer": "1936",
    "wrong": [
-    "1906",
     "1926",
-    "1956"
+    "1916",
+    "1906"
    ],
    "explain": "F. W. de Klerk (1936–2021): The last white president of South Africa.",
    "difficulty": 3,
@@ -15982,9 +16392,9 @@
    "prompt": "Who is this? He became South Africa's president in 2018.",
    "answer": "Cyril Ramaphosa",
    "wrong": [
-    "Sun Yat-sen",
-    "Hirohito",
-    "Ben Chifley"
+    "Scott Morrison",
+    "Dwight D. Eisenhower",
+    "Winston Churchill"
    ],
    "explain": "Cyril Ramaphosa (1952): Became South Africa's president in 2018.",
    "difficulty": 3,
@@ -15998,9 +16408,9 @@
    "prompt": "In which year was Cyril Ramaphosa born?",
    "answer": "1952",
    "wrong": [
-    "1982",
-    "1932",
-    "1972"
+    "1972",
+    "1962",
+    "1942"
    ],
    "explain": "Cyril Ramaphosa (1952): Became South Africa's president in 2018.",
    "difficulty": 3,
@@ -16014,12 +16424,12 @@
    "prompt": "Who is this? He was the leader of Yugoslavia.",
    "answer": "Josip Broz Tito",
    "wrong": [
-    "Shinzo Abe",
-    "Tipu Sultan",
-    "Julius Nyerere"
+    "Robert Walpole",
+    "Puyi",
+    "Salvador Allende"
    ],
    "explain": "Josip Broz Tito (1892–1980): The leader of Yugoslavia.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/josip-broz-tito"
    ]
@@ -16030,9 +16440,9 @@
    "prompt": "In which year was Josip Broz Tito born?",
    "answer": "1892",
    "wrong": [
-    "1902",
+    "1912",
     "1882",
-    "1922"
+    "1862"
    ],
    "explain": "Josip Broz Tito (1892–1980): The leader of Yugoslavia.",
    "difficulty": 3,
@@ -16046,12 +16456,12 @@
    "prompt": "Who is this? He was the first president of Poland elected by popular vote.",
    "answer": "Lech Wałęsa",
    "wrong": [
-    "Frederick Barbarossa",
-    "Rajiv Gandhi",
-    "Fidel Castro"
+    "Akbar",
+    "Trajan",
+    "François Mitterrand"
    ],
    "explain": "Lech Wałęsa (1943): The first president of Poland elected by popular vote.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/lech-wa-esa"
    ]
@@ -16062,9 +16472,9 @@
    "prompt": "In which year was Lech Wałęsa born?",
    "answer": "1943",
    "wrong": [
-    "1963",
-    "1933",
-    "1973"
+    "1913",
+    "1973",
+    "1953"
    ],
    "explain": "Lech Wałęsa (1943): The first president of Poland elected by popular vote.",
    "difficulty": 3,
@@ -16078,9 +16488,9 @@
    "prompt": "Who is this? He was the last president of Czechoslovakia and the first of the Czech Republic.",
    "answer": "Václav Havel",
    "wrong": [
-    "Gough Whitlam",
-    "Woodrow Wilson",
-    "Oda Nobunaga"
+    "Brian Boru",
+    "Juan Perón",
+    "Darius the Great"
    ],
    "explain": "Václav Havel (1936–2011): The last president of Czechoslovakia and the first of the Czech Republic.",
    "difficulty": 3,
@@ -16094,9 +16504,9 @@
    "prompt": "In which year was Václav Havel born?",
    "answer": "1936",
    "wrong": [
-    "1926",
-    "1966",
-    "1906"
+    "1906",
+    "1946",
+    "1926"
    ],
    "explain": "Václav Havel (1936–2011): The last president of Czechoslovakia and the first of the Czech Republic.",
    "difficulty": 3,
@@ -16110,12 +16520,12 @@
    "prompt": "Who is this? He became Ukraine's president in 2019.",
    "answer": "Volodymyr Zelenskyy",
    "wrong": [
-    "Wilhelm II",
-    "Cyril Ramaphosa",
-    "Kublai Khan"
+    "Robert the Bruce",
+    "Shivaji",
+    "Charles I"
    ],
    "explain": "Volodymyr Zelenskyy (1978): Became Ukraine's president in 2019.",
-   "difficulty": 1,
+   "difficulty": 2,
    "refs": [
     "leaders/volodymyr-zelenskyy"
    ]
@@ -16126,9 +16536,9 @@
    "prompt": "In which year was Volodymyr Zelenskyy born?",
    "answer": "1978",
    "wrong": [
-    "2008",
-    "1968",
-    "1998"
+    "1948",
+    "1988",
+    "1958"
    ],
    "explain": "Volodymyr Zelenskyy (1978): Became Ukraine's president in 2019.",
    "difficulty": 3,
@@ -16142,12 +16552,12 @@
    "prompt": "Who is this? He was the last leader of the Soviet Union.",
    "answer": "Mikhail Gorbachev",
    "wrong": [
-    "Yongle Emperor",
-    "Harold Macmillan",
-    "Richard III"
+    "José de San Martín",
+    "Oda Nobunaga",
+    "Maximilien Robespierre"
    ],
    "explain": "Mikhail Gorbachev (1931–2022): The last leader of the Soviet Union.",
-   "difficulty": 1,
+   "difficulty": 2,
    "refs": [
     "leaders/mikhail-gorbachev"
    ]
@@ -16159,8 +16569,8 @@
    "answer": "1931",
    "wrong": [
     "1911",
-    "1951",
-    "1901"
+    "1941",
+    "1961"
    ],
    "explain": "Mikhail Gorbachev (1931–2022): The last leader of the Soviet Union.",
    "difficulty": 3,
@@ -16174,9 +16584,9 @@
    "prompt": "Who is this? He was the first president of Russia.",
    "answer": "Boris Yeltsin",
    "wrong": [
-    "Robert Walpole",
-    "Konrad Adenauer",
-    "Julius Caesar"
+    "Robert Peel",
+    "Gamal Abdel Nasser",
+    "Richard Nixon"
    ],
    "explain": "Boris Yeltsin (1931–2007): The first president of Russia.",
    "difficulty": 2,
@@ -16190,7 +16600,7 @@
    "prompt": "In which year was Boris Yeltsin born?",
    "answer": "1931",
    "wrong": [
-    "1911",
+    "1941",
     "1951",
     "1961"
    ],
@@ -16206,9 +16616,9 @@
    "prompt": "Who is this? He has led Russia since 1999.",
    "answer": "Vladimir Putin",
    "wrong": [
-    "Rajiv Gandhi",
-    "Hammurabi",
-    "Richard Nixon"
+    "Ramesses II",
+    "John Key",
+    "Emperor Meiji"
    ],
    "explain": "Vladimir Putin (1952): Has led Russia since 1999.",
    "difficulty": 1,
@@ -16223,8 +16633,8 @@
    "answer": "1952",
    "wrong": [
     "1942",
-    "1962",
-    "1922"
+    "1982",
+    "1932"
    ],
    "explain": "Vladimir Putin (1952): Has led Russia since 1999.",
    "difficulty": 3,
@@ -16238,9 +16648,9 @@
    "prompt": "Who is this? He was the Soviet leader after Stalin.",
    "answer": "Nikita Khrushchev",
    "wrong": [
-    "William Pitt the Younger",
-    "Thomas Jefferson",
-    "Kublai Khan"
+    "Kevin Rudd",
+    "Richard Nixon",
+    "Éamon de Valera"
    ],
    "explain": "Nikita Khrushchev (1894–1971): The Soviet leader after Stalin.",
    "difficulty": 2,
@@ -16254,9 +16664,9 @@
    "prompt": "In which year was Nikita Khrushchev born?",
    "answer": "1894",
    "wrong": [
+    "1924",
     "1884",
-    "1904",
-    "1924"
+    "1904"
    ],
    "explain": "Nikita Khrushchev (1894–1971): The Soviet leader after Stalin.",
    "difficulty": 3,
@@ -16270,15 +16680,16 @@
    "prompt": "Who is this? He founded the Soviet state.",
    "answer": "Vladimir Lenin",
    "wrong": [
-    "Rishi Sunak",
+    "Benito Mussolini",
     "Emperor Wu of Han",
-    "Hirohito"
+    "Trajan"
    ],
    "explain": "Vladimir Lenin (1870–1924): Founded the Soviet state.",
    "difficulty": 1,
    "refs": [
     "leaders/vladimir-lenin"
-   ]
+   ],
+   "kids": false
   },
   {
    "id": "born-vladimir-lenin",
@@ -16286,15 +16697,16 @@
    "prompt": "In which year was Vladimir Lenin born?",
    "answer": "1870",
    "wrong": [
-    "1850",
     "1890",
-    "1860"
+    "1860",
+    "1840"
    ],
    "explain": "Vladimir Lenin (1870–1924): Founded the Soviet state.",
    "difficulty": 3,
    "refs": [
     "leaders/vladimir-lenin"
-   ]
+   ],
+   "kids": false
   },
   {
    "id": "who-joseph-stalin",
@@ -16302,15 +16714,16 @@
    "prompt": "Who is this? He was the Soviet dictator from the 1920s until 1953.",
    "answer": "Joseph Stalin",
    "wrong": [
-    "Sun Yat-sen",
-    "Gordon Brown",
-    "Ho Chi Minh"
+    "Narendra Modi",
+    "Joseph Lyons",
+    "Ben Chifley"
    ],
    "explain": "Joseph Stalin (1878–1953): The Soviet dictator from the 1920s until 1953.",
    "difficulty": 1,
    "refs": [
     "leaders/joseph-stalin"
-   ]
+   ],
+   "kids": false
   },
   {
    "id": "born-joseph-stalin",
@@ -16318,15 +16731,16 @@
    "prompt": "In which year was Joseph Stalin born?",
    "answer": "1878",
    "wrong": [
-    "1848",
     "1888",
-    "1908"
+    "1868",
+    "1848"
    ],
    "explain": "Joseph Stalin (1878–1953): The Soviet dictator from the 1920s until 1953.",
    "difficulty": 3,
    "refs": [
     "leaders/joseph-stalin"
-   ]
+   ],
+   "kids": false
   },
   {
    "id": "who-deng-xiaoping",
@@ -16334,12 +16748,12 @@
    "prompt": "Who is this? He was China's paramount leader after Mao.",
    "answer": "Deng Xiaoping",
    "wrong": [
-    "Saladin",
-    "David Ben-Gurion",
-    "Caligula"
+    "Michael Joseph Savage",
+    "Philip II of Macedon",
+    "Henry Parkes"
    ],
    "explain": "Deng Xiaoping (1904–1997): China's paramount leader after Mao.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/deng-xiaoping"
    ]
@@ -16350,8 +16764,8 @@
    "prompt": "In which year was Deng Xiaoping born?",
    "answer": "1904",
    "wrong": [
-    "1914",
     "1874",
+    "1894",
     "1934"
    ],
    "explain": "Deng Xiaoping (1904–1997): China's paramount leader after Mao.",
@@ -16366,9 +16780,9 @@
    "prompt": "Who is this? He has been China's leader since 2012.",
    "answer": "Xi Jinping",
    "wrong": [
-    "Ramesses II",
-    "Scott Morrison",
-    "Charles de Gaulle"
+    "Gordon Brown",
+    "Macbeth",
+    "John Major"
    ],
    "explain": "Xi Jinping (1953): Has been China's leader since 2012.",
    "difficulty": 1,
@@ -16382,8 +16796,8 @@
    "prompt": "In which year was Xi Jinping born?",
    "answer": "1953",
    "wrong": [
+    "1973",
     "1983",
-    "1923",
     "1933"
    ],
    "explain": "Xi Jinping (1953): Has been China's leader since 2012.",
@@ -16398,12 +16812,12 @@
    "prompt": "Who is this? He was the first president of the Republic of China.",
    "answer": "Sun Yat-sen",
    "wrong": [
-    "Babur",
-    "Konrad Adenauer",
-    "Willy Brandt"
+    "Pierre Trudeau",
+    "Ben Chifley",
+    "Cyril Ramaphosa"
    ],
    "explain": "Sun Yat-sen (1866–1925): The first president of the Republic of China.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/sun-yat-sen"
    ]
@@ -16414,9 +16828,9 @@
    "prompt": "In which year was Sun Yat-sen born?",
    "answer": "1866",
    "wrong": [
-    "1886",
+    "1856",
     "1896",
-    "1876"
+    "1846"
    ],
    "explain": "Sun Yat-sen (1866–1925): The first president of the Republic of China.",
    "difficulty": 3,
@@ -16430,12 +16844,12 @@
    "prompt": "Who is this? He was the leader of the Republic of China.",
    "answer": "Chiang Kai-shek",
    "wrong": [
-    "Clement Attlee",
-    "Charles de Gaulle",
-    "Caligula"
+    "Josip Broz Tito",
+    "David Cameron",
+    "Idi Amin"
    ],
    "explain": "Chiang Kai-shek (1887–1975): The leader of the Republic of China.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/chiang-kai-shek"
    ]
@@ -16446,9 +16860,9 @@
    "prompt": "In which year was Chiang Kai-shek born?",
    "answer": "1887",
    "wrong": [
-    "1917",
     "1857",
-    "1877"
+    "1917",
+    "1907"
    ],
    "explain": "Chiang Kai-shek (1887–1975): The leader of the Republic of China.",
    "difficulty": 3,
@@ -16462,9 +16876,9 @@
    "prompt": "Who is this? He was Japan's longest-reigning emperor.",
    "answer": "Hirohito",
    "wrong": [
-    "Kevin Rudd",
-    "Toyotomi Hideyoshi",
-    "Edward VII"
+    "Maximilien Robespierre",
+    "Harold Holt",
+    "William the Conqueror"
    ],
    "explain": "Hirohito (1901–1989): Japan's longest-reigning emperor.",
    "difficulty": 2,
@@ -16479,8 +16893,8 @@
    "answer": "1901",
    "wrong": [
     "1891",
-    "1911",
-    "1921"
+    "1921",
+    "1881"
    ],
    "explain": "Hirohito (1901–1989): Japan's longest-reigning emperor.",
    "difficulty": 3,
@@ -16494,9 +16908,9 @@
    "prompt": "Who is this? He was the ruler in whose name Japan modernised after 1868.",
    "answer": "Emperor Meiji",
    "wrong": [
-    "Harry S. Truman",
-    "Akbar",
-    "Napoleon Bonaparte"
+    "Aurangzeb",
+    "Ranjit Singh",
+    "Osman I"
    ],
    "explain": "Emperor Meiji (1852–1912): The ruler in whose name Japan modernised after 1868.",
    "difficulty": 3,
@@ -16510,8 +16924,8 @@
    "prompt": "In which year was Emperor Meiji born?",
    "answer": "1852",
    "wrong": [
-    "1862",
-    "1832",
+    "1872",
+    "1882",
     "1842"
    ],
    "explain": "Emperor Meiji (1852–1912): The ruler in whose name Japan modernised after 1868.",
@@ -16526,9 +16940,9 @@
    "prompt": "Who is this? He was a Japanese prime minister.",
    "answer": "Shinzo Abe",
    "wrong": [
-    "Xi Jinping",
-    "Vladimir Lenin",
-    "Charles V"
+    "Ben Chifley",
+    "Henry V",
+    "Billy Hughes"
    ],
    "explain": "Shinzo Abe (1954–2022): A Japanese prime minister.",
    "difficulty": 2,
@@ -16542,9 +16956,9 @@
    "prompt": "In which year was Shinzo Abe born?",
    "answer": "1954",
    "wrong": [
-    "1944",
-    "1974",
-    "1964"
+    "1934",
+    "1924",
+    "1944"
    ],
    "explain": "Shinzo Abe (1954–2022): A Japanese prime minister.",
    "difficulty": 3,
@@ -16558,12 +16972,12 @@
    "prompt": "Who is this? He was West Germany's first chancellor.",
    "answer": "Konrad Adenauer",
    "wrong": [
-    "Éamon de Valera",
-    "Toussaint Louverture",
-    "Pedro II"
+    "Edmund Barton",
+    "Jimmy Carter",
+    "Juan Perón"
    ],
    "explain": "Konrad Adenauer (1876–1967): West Germany's first chancellor.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/konrad-adenauer"
    ]
@@ -16574,9 +16988,9 @@
    "prompt": "In which year was Konrad Adenauer born?",
    "answer": "1876",
    "wrong": [
-    "1866",
+    "1906",
     "1886",
-    "1856"
+    "1866"
    ],
    "explain": "Konrad Adenauer (1876–1967): West Germany's first chancellor.",
    "difficulty": 3,
@@ -16590,9 +17004,9 @@
    "prompt": "Who is this? He was a West German chancellor.",
    "answer": "Willy Brandt",
    "wrong": [
-    "Bob Hawke",
-    "Benjamin Disraeli",
-    "Shinzo Abe"
+    "Pericles",
+    "Andrew Fisher",
+    "Mao Zedong"
    ],
    "explain": "Willy Brandt (1913–1992): A West German chancellor.",
    "difficulty": 3,
@@ -16606,9 +17020,9 @@
    "prompt": "In which year was Willy Brandt born?",
    "answer": "1913",
    "wrong": [
+    "1923",
     "1943",
-    "1903",
-    "1933"
+    "1903"
    ],
    "explain": "Willy Brandt (1913–1992): A West German chancellor.",
    "difficulty": 3,
@@ -16622,9 +17036,9 @@
    "prompt": "Who is this? He was the first chancellor of reunited Germany.",
    "answer": "Helmut Kohl",
    "wrong": [
-    "Dwight D. Eisenhower",
-    "Shah Jahan",
-    "Mehmed II"
+    "Ulysses S. Grant",
+    "Fidel Castro",
+    "Mao Zedong"
    ],
    "explain": "Helmut Kohl (1930–2017): The first chancellor of reunited Germany.",
    "difficulty": 3,
@@ -16638,9 +17052,9 @@
    "prompt": "In which year was Helmut Kohl born?",
    "answer": "1930",
    "wrong": [
-    "1950",
     "1940",
-    "1960"
+    "1960",
+    "1920"
    ],
    "explain": "Helmut Kohl (1930–2017): The first chancellor of reunited Germany.",
    "difficulty": 3,
@@ -16654,12 +17068,12 @@
    "prompt": "Who is this? He was a French president.",
    "answer": "François Mitterrand",
    "wrong": [
-    "Kwame Nkrumah",
-    "Ramesses II",
-    "Boris Johnson"
+    "Narendra Modi",
+    "Jayavarman VII",
+    "Michael Joseph Savage"
    ],
    "explain": "François Mitterrand (1916–1996): A French president.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/francois-mitterrand"
    ]
@@ -16670,9 +17084,9 @@
    "prompt": "In which year was François Mitterrand born?",
    "answer": "1916",
    "wrong": [
-    "1906",
-    "1926",
-    "1896"
+    "1946",
+    "1886",
+    "1936"
    ],
    "explain": "François Mitterrand (1916–1996): A French president.",
    "difficulty": 3,
@@ -16686,12 +17100,12 @@
    "prompt": "Who is this? He was a French president from 1995 to 2007.",
    "answer": "Jacques Chirac",
    "wrong": [
-    "Justin Trudeau",
-    "Neville Chamberlain",
-    "Tony Abbott"
+    "Atahualpa",
+    "Louis XIV",
+    "Adolf Hitler"
    ],
    "explain": "Jacques Chirac (1932–2019): A French president from 1995 to 2007.",
-   "difficulty": 2,
+   "difficulty": 3,
    "refs": [
     "leaders/jacques-chirac"
    ]
@@ -16702,9 +17116,9 @@
    "prompt": "In which year was Jacques Chirac born?",
    "answer": "1932",
    "wrong": [
-    "1952",
-    "1922",
-    "1942"
+    "1942",
+    "1902",
+    "1922"
    ],
    "explain": "Jacques Chirac (1932–2019): A French president from 1995 to 2007.",
    "difficulty": 3,
@@ -16718,9 +17132,9 @@
    "prompt": "Who is this? He became president of France in 2017.",
    "answer": "Emmanuel Macron",
    "wrong": [
-    "Anwar Sadat",
-    "Bob Hawke",
-    "Cetshwayo"
+    "William Pitt the Younger",
+    "Mustafa Kemal Atatürk",
+    "Tony Abbott"
    ],
    "explain": "Emmanuel Macron (1977): Became president of France in 2017.",
    "difficulty": 1,
@@ -16735,8 +17149,8 @@
    "answer": "1977",
    "wrong": [
     "2007",
-    "1947",
-    "1987"
+    "1987",
+    "1957"
    ],
    "explain": "Emmanuel Macron (1977): Became president of France in 2017.",
    "difficulty": 3,
@@ -16750,9 +17164,9 @@
    "prompt": "Who is this? He was Irish taoiseach and then president.",
    "answer": "Éamon de Valera",
    "wrong": [
-    "Nikita Khrushchev",
-    "Attila",
-    "Neville Chamberlain"
+    "Richard I",
+    "Vladimir Putin",
+    "Clement Attlee"
    ],
    "explain": "Éamon de Valera (1882–1975): Irish taoiseach and then president.",
    "difficulty": 3,
@@ -16766,9 +17180,9 @@
    "prompt": "In which year was Éamon de Valera born?",
    "answer": "1882",
    "wrong": [
-    "1852",
     "1862",
-    "1872"
+    "1902",
+    "1852"
    ],
    "explain": "Éamon de Valera (1882–1975): Irish taoiseach and then president.",
    "difficulty": 3,
@@ -16782,9 +17196,9 @@
    "prompt": "Who is this? He is called the Father of Federation.",
    "answer": "Henry Parkes",
    "wrong": [
-    "Rajiv Gandhi",
-    "Oliver Cromwell",
-    "Jacques Chirac"
+    "Vladimir Putin",
+    "Mikhail Gorbachev",
+    "Osman I"
    ],
    "explain": "Henry Parkes (1815–1896): Called the Father of Federation.",
    "difficulty": 3,
@@ -16814,9 +17228,9 @@
    "prompt": "Who is this? He was Australia's first prime minister.",
    "answer": "Edmund Barton",
    "wrong": [
-    "José de San Martín",
-    "Constantine the Great",
-    "Pachacuti"
+    "Hammurabi",
+    "Vladimir Putin",
+    "Mao Zedong"
    ],
    "explain": "Edmund Barton (1849–1920): Australia's first prime minister.",
    "difficulty": 3,
@@ -16830,9 +17244,9 @@
    "prompt": "In which year was Edmund Barton born?",
    "answer": "1849",
    "wrong": [
-    "1819",
-    "1859",
-    "1839"
+    "1829",
+    "1869",
+    "1879"
    ],
    "explain": "Edmund Barton (1849–1920): Australia's first prime minister.",
    "difficulty": 3,
@@ -16846,9 +17260,9 @@
    "prompt": "Who is this? He was Australia's second prime minister.",
    "answer": "Alfred Deakin",
    "wrong": [
-    "Salvador Allende",
-    "Sitting Bull",
-    "Benito Juárez"
+    "Konrad Adenauer",
+    "Ramesses II",
+    "David Lange"
    ],
    "explain": "Alfred Deakin (1856–1919): Australia's second prime minister.",
    "difficulty": 3,
@@ -16862,9 +17276,9 @@
    "prompt": "In which year was Alfred Deakin born?",
    "answer": "1856",
    "wrong": [
-    "1886",
-    "1826",
-    "1836"
+    "1846",
+    "1866",
+    "1826"
    ],
    "explain": "Alfred Deakin (1856–1919): Australia's second prime minister.",
    "difficulty": 3,
@@ -16878,9 +17292,9 @@
    "prompt": "Who is this? He was Australia's first Labor prime minister.",
    "answer": "Chris Watson",
    "wrong": [
-    "Alfred Deakin",
-    "Justinian I",
-    "Aurangzeb"
+    "Bob Hawke",
+    "Josip Broz Tito",
+    "Nero"
    ],
    "explain": "Chris Watson (1867–1941): Australia's first Labor prime minister.",
    "difficulty": 3,
@@ -16895,7 +17309,7 @@
    "answer": "1867",
    "wrong": [
     "1847",
-    "1887",
+    "1877",
     "1897"
    ],
    "explain": "Chris Watson (1867–1941): Australia's first Labor prime minister.",
@@ -16910,9 +17324,9 @@
    "prompt": "Who is this? He was a Labor prime minister three times.",
    "answer": "Andrew Fisher",
    "wrong": [
-    "George III",
-    "Aurangzeb",
-    "Ivan the Terrible"
+    "Jayavarman VII",
+    "George W. Bush",
+    "Hannibal"
    ],
    "explain": "Andrew Fisher (1862–1928): A Labor prime minister three times.",
    "difficulty": 3,
@@ -16926,9 +17340,9 @@
    "prompt": "In which year was Andrew Fisher born?",
    "answer": "1862",
    "wrong": [
-    "1882",
+    "1832",
     "1892",
-    "1852"
+    "1842"
    ],
    "explain": "Andrew Fisher (1862–1928): A Labor prime minister three times.",
    "difficulty": 3,
@@ -16942,9 +17356,9 @@
    "prompt": "Who is this? He was Australia's prime minister during most of the First World War.",
    "answer": "Billy Hughes",
    "wrong": [
-    "Frederick Barbarossa",
-    "Menelik II",
-    "Pierre Trudeau"
+    "Suleiman the Magnificent",
+    "Maximilien Robespierre",
+    "Winston Churchill"
    ],
    "explain": "Billy Hughes (1862–1952): Australia's prime minister during most of the First World War.",
    "difficulty": 3,
@@ -16958,9 +17372,9 @@
    "prompt": "In which year was Billy Hughes born?",
    "answer": "1862",
    "wrong": [
+    "1842",
     "1892",
-    "1882",
-    "1832"
+    "1872"
    ],
    "explain": "Billy Hughes (1862–1952): Australia's prime minister during most of the First World War.",
    "difficulty": 3,
@@ -16974,9 +17388,9 @@
    "prompt": "Who is this? He was the only Tasmanian to become prime minister of Australia.",
    "answer": "Joseph Lyons",
    "wrong": [
-    "Richard I",
-    "Thomas Jefferson",
-    "Caligula"
+    "Henry VIII",
+    "Philip II of Spain",
+    "Jomo Kenyatta"
    ],
    "explain": "Joseph Lyons (1879–1939): The only Tasmanian to become prime minister of Australia.",
    "difficulty": 3,
@@ -16990,9 +17404,9 @@
    "prompt": "In which year was Joseph Lyons born?",
    "answer": "1879",
    "wrong": [
-    "1899",
     "1869",
-    "1909"
+    "1899",
+    "1889"
    ],
    "explain": "Joseph Lyons (1879–1939): The only Tasmanian to become prime minister of Australia.",
    "difficulty": 3,
@@ -17006,9 +17420,9 @@
    "prompt": "Who is this? He was Australia's longest-serving prime minister.",
    "answer": "Robert Menzies",
    "wrong": [
-    "Alfred the Great",
-    "Josip Broz Tito",
-    "Shah Jahan"
+    "Nebuchadnezzar II",
+    "Darius the Great",
+    "Louis XIV"
    ],
    "explain": "Robert Menzies (1894–1978): Australia's longest-serving prime minister.",
    "difficulty": 3,
@@ -17022,9 +17436,9 @@
    "prompt": "In which year was Robert Menzies born?",
    "answer": "1894",
    "wrong": [
-    "1904",
+    "1874",
     "1924",
-    "1884"
+    "1864"
    ],
    "explain": "Robert Menzies (1894–1978): Australia's longest-serving prime minister.",
    "difficulty": 3,
@@ -17038,9 +17452,9 @@
    "prompt": "Who is this? He was Australia's prime minister for most of the Second World War.",
    "answer": "John Curtin",
    "wrong": [
-    "Barack Obama",
-    "Edward I",
-    "Andrew Fisher"
+    "William the Conqueror",
+    "George III",
+    "Adolf Hitler"
    ],
    "explain": "John Curtin (1885–1945): Australia's prime minister for most of the Second World War.",
    "difficulty": 3,
@@ -17055,8 +17469,8 @@
    "answer": "1885",
    "wrong": [
     "1915",
-    "1855",
-    "1895"
+    "1895",
+    "1865"
    ],
    "explain": "John Curtin (1885–1945): Australia's prime minister for most of the Second World War.",
    "difficulty": 3,
@@ -17070,9 +17484,9 @@
    "prompt": "Who is this? He was the Labor prime minister after John Curtin.",
    "answer": "Ben Chifley",
    "wrong": [
-    "Franz Joseph I",
-    "Mehmed II",
-    "Richard I"
+    "Jacques Chirac",
+    "Hirohito",
+    "Konrad Adenauer"
    ],
    "explain": "Ben Chifley (1885–1951): The Labor prime minister after John Curtin.",
    "difficulty": 3,
@@ -17086,9 +17500,9 @@
    "prompt": "In which year was Ben Chifley born?",
    "answer": "1885",
    "wrong": [
-    "1895",
     "1905",
-    "1915"
+    "1895",
+    "1855"
    ],
    "explain": "Ben Chifley (1885–1951): The Labor prime minister after John Curtin.",
    "difficulty": 3,
@@ -17102,9 +17516,9 @@
    "prompt": "Who is this? He was the Australian prime minister who vanished in the sea.",
    "answer": "Harold Holt",
    "wrong": [
-    "Mao Zedong",
-    "Wilhelm II",
-    "Ronald Reagan"
+    "Muammar Gaddafi",
+    "Constantine the Great",
+    "Jayavarman VII"
    ],
    "explain": "Harold Holt (1908–1967): The Australian prime minister who vanished in the sea.",
    "difficulty": 3,
@@ -17118,9 +17532,9 @@
    "prompt": "In which year was Harold Holt born?",
    "answer": "1908",
    "wrong": [
-    "1938",
+    "1898",
     "1928",
-    "1888"
+    "1878"
    ],
    "explain": "Harold Holt (1908–1967): The Australian prime minister who vanished in the sea.",
    "difficulty": 3,
@@ -17134,9 +17548,9 @@
    "prompt": "Who is this? He was the Liberal prime minister after Harold Holt.",
    "answer": "John Gorton",
    "wrong": [
-    "Harold Macmillan",
-    "Joseph Stalin",
-    "Harold Godwinson"
+    "Benito Juárez",
+    "John Key",
+    "Benjamin Disraeli"
    ],
    "explain": "John Gorton (1911–2002): The Liberal prime minister after Harold Holt.",
    "difficulty": 3,
@@ -17150,9 +17564,9 @@
    "prompt": "In which year was John Gorton born?",
    "answer": "1911",
    "wrong": [
-    "1891",
     "1881",
-    "1921"
+    "1921",
+    "1891"
    ],
    "explain": "John Gorton (1911–2002): The Liberal prime minister after Harold Holt.",
    "difficulty": 3,
@@ -17166,9 +17580,9 @@
    "prompt": "Who is this? He was the only prime minister dismissed by a governor-general.",
    "answer": "Gough Whitlam",
    "wrong": [
-    "Sitting Bull",
-    "Lee Kuan Yew",
-    "Henry VIII"
+    "Charles I",
+    "Duke of Wellington",
+    "Tony Abbott"
    ],
    "explain": "Gough Whitlam (1916–2014): The only prime minister dismissed by a governor-general.",
    "difficulty": 3,
@@ -17182,8 +17596,8 @@
    "prompt": "In which year was Gough Whitlam born?",
    "answer": "1916",
    "wrong": [
-    "1926",
     "1886",
+    "1906",
     "1896"
    ],
    "explain": "Gough Whitlam (1916–2014): The only prime minister dismissed by a governor-general.",
@@ -17198,9 +17612,9 @@
    "prompt": "Who is this? He was a Liberal prime minister from 1975 to 1983.",
    "answer": "Malcolm Fraser",
    "wrong": [
-    "Frederick Barbarossa",
-    "Chris Watson",
-    "Henry VIII"
+    "Duke of Wellington",
+    "Éamon de Valera",
+    "Sun Yat-sen"
    ],
    "explain": "Malcolm Fraser (1930–2015): A Liberal prime minister from 1975 to 1983.",
    "difficulty": 3,
@@ -17214,9 +17628,9 @@
    "prompt": "In which year was Malcolm Fraser born?",
    "answer": "1930",
    "wrong": [
-    "1920",
     "1900",
-    "1960"
+    "1950",
+    "1920"
    ],
    "explain": "Malcolm Fraser (1930–2015): A Liberal prime minister from 1975 to 1983.",
    "difficulty": 3,
@@ -17230,9 +17644,9 @@
    "prompt": "Who is this? He was the longest-serving Labor prime minister of Australia.",
    "answer": "Bob Hawke",
    "wrong": [
-    "Aurangzeb",
-    "Richard Seddon",
-    "Mackenzie King"
+    "George V",
+    "Charles III",
+    "Pierre Trudeau"
    ],
    "explain": "Bob Hawke (1929–2019): The longest-serving Labor prime minister of Australia.",
    "difficulty": 3,
@@ -17246,9 +17660,9 @@
    "prompt": "In which year was Bob Hawke born?",
    "answer": "1929",
    "wrong": [
-    "1959",
-    "1939",
-    "1919"
+    "1949",
+    "1919",
+    "1909"
    ],
    "explain": "Bob Hawke (1929–2019): The longest-serving Labor prime minister of Australia.",
    "difficulty": 3,
@@ -17262,9 +17676,9 @@
    "prompt": "Who is this? He was the Labor prime minister from 1991 to 1996.",
    "answer": "Paul Keating",
    "wrong": [
-    "Edward VII",
-    "Caligula",
-    "John A. Macdonald"
+    "Pol Pot",
+    "David Ben-Gurion",
+    "Idi Amin"
    ],
    "explain": "Paul Keating (1944): The Labor prime minister from 1991 to 1996.",
    "difficulty": 3,
@@ -17278,9 +17692,9 @@
    "prompt": "In which year was Paul Keating born?",
    "answer": "1944",
    "wrong": [
-    "1974",
-    "1924",
-    "1964"
+    "1914",
+    "1934",
+    "1954"
    ],
    "explain": "Paul Keating (1944): The Labor prime minister from 1991 to 1996.",
    "difficulty": 3,
@@ -17294,9 +17708,9 @@
    "prompt": "Who is this? He was Australia's second-longest-serving prime minister.",
    "answer": "John Howard",
    "wrong": [
-    "Akhenaten",
-    "Charlemagne",
-    "John Major"
+    "Henry VIII",
+    "Nicholas II",
+    "Brian Boru"
    ],
    "explain": "John Howard (1939): Australia's second-longest-serving prime minister.",
    "difficulty": 3,
@@ -17310,9 +17724,9 @@
    "prompt": "In which year was John Howard born?",
    "answer": "1939",
    "wrong": [
-    "1949",
     "1909",
-    "1969"
+    "1929",
+    "1949"
    ],
    "explain": "John Howard (1939): Australia's second-longest-serving prime minister.",
    "difficulty": 3,
@@ -17326,9 +17740,9 @@
    "prompt": "Who is this? He later became Australia's ambassador to the United States.",
    "answer": "Kevin Rudd",
    "wrong": [
-    "Joseph Lyons",
-    "Bill Clinton",
-    "Kamehameha I"
+    "Shaka",
+    "Henry VIII",
+    "Tony Blair"
    ],
    "explain": "Kevin Rudd (1957): Later became Australia's ambassador to the United States.",
    "difficulty": 3,
@@ -17342,9 +17756,9 @@
    "prompt": "In which year was Kevin Rudd born?",
    "answer": "1957",
    "wrong": [
-    "1977",
-    "1967",
-    "1937"
+    "1947",
+    "1937",
+    "1977"
    ],
    "explain": "Kevin Rudd (1957): Later became Australia's ambassador to the United States.",
    "difficulty": 3,
@@ -17358,9 +17772,9 @@
    "prompt": "Who is this? She was Australia's first female prime minister.",
    "answer": "Julia Gillard",
    "wrong": [
-    "Empress Dowager Cixi",
-    "Elizabeth II",
-    "Elizabeth I"
+    "Cleopatra",
+    "Ellen Johnson Sirleaf",
+    "Catherine the Great"
    ],
    "explain": "Julia Gillard (1961): Australia's first female prime minister.",
    "difficulty": 3,
@@ -17374,9 +17788,9 @@
    "prompt": "In which year was Julia Gillard born?",
    "answer": "1961",
    "wrong": [
-    "1951",
-    "1931",
-    "1991"
+    "1971",
+    "1991",
+    "1941"
    ],
    "explain": "Julia Gillard (1961): Australia's first female prime minister.",
    "difficulty": 3,
@@ -17390,9 +17804,9 @@
    "prompt": "Who is this? He was a Liberal prime minister from 2013 to 2015.",
    "answer": "Tony Abbott",
    "wrong": [
-    "Caligula",
-    "Edward I",
-    "John Major"
+    "Louis XVI",
+    "Justinian I",
+    "Joseph Stalin"
    ],
    "explain": "Tony Abbott (1957): A Liberal prime minister from 2013 to 2015.",
    "difficulty": 3,
@@ -17406,8 +17820,8 @@
    "prompt": "In which year was Tony Abbott born?",
    "answer": "1957",
    "wrong": [
-    "1987",
     "1937",
+    "1927",
     "1977"
    ],
    "explain": "Tony Abbott (1957): A Liberal prime minister from 2013 to 2015.",
@@ -17422,9 +17836,9 @@
    "prompt": "Who is this? He was a Liberal prime minister from 2015 to 2018.",
    "answer": "Malcolm Turnbull",
    "wrong": [
-    "Henry VIII",
-    "Jomo Kenyatta",
-    "Khufu"
+    "Louis XVI",
+    "John Adams",
+    "Tutankhamun"
    ],
    "explain": "Malcolm Turnbull (1954): A Liberal prime minister from 2015 to 2018.",
    "difficulty": 3,
@@ -17438,9 +17852,9 @@
    "prompt": "In which year was Malcolm Turnbull born?",
    "answer": "1954",
    "wrong": [
-    "1964",
-    "1984",
-    "1944"
+    "1974",
+    "1944",
+    "1934"
    ],
    "explain": "Malcolm Turnbull (1954): A Liberal prime minister from 2015 to 2018.",
    "difficulty": 3,
@@ -17454,9 +17868,9 @@
    "prompt": "Who is this? He was the Liberal prime minister during the COVID-19 pandemic.",
    "answer": "Scott Morrison",
    "wrong": [
-    "Richard III",
-    "Helmut Kohl",
-    "Henry Parkes"
+    "Charlemagne",
+    "William Pitt the Younger",
+    "Saladin"
    ],
    "explain": "Scott Morrison (1968): The Liberal prime minister during the COVID-19 pandemic.",
    "difficulty": 3,
@@ -17470,9 +17884,9 @@
    "prompt": "In which year was Scott Morrison born?",
    "answer": "1968",
    "wrong": [
-    "1988",
     "1998",
-    "1938"
+    "1938",
+    "1988"
    ],
    "explain": "Scott Morrison (1968): The Liberal prime minister during the COVID-19 pandemic.",
    "difficulty": 3,
@@ -17486,12 +17900,12 @@
    "prompt": "Who is this? He became the Labor prime minister in 2022.",
    "answer": "Anthony Albanese",
    "wrong": [
-    "Harold Macmillan",
-    "Leonidas I",
-    "Edward VII"
+    "Duke of Wellington",
+    "Xerxes I",
+    "Henry VIII"
    ],
    "explain": "Anthony Albanese (1963): Became the Labor prime minister in 2022.",
-   "difficulty": 3,
+   "difficulty": 2,
    "refs": [
     "leaders/anthony-albanese"
    ]
@@ -17502,15 +17916,338 @@
    "prompt": "In which year was Anthony Albanese born?",
    "answer": "1963",
    "wrong": [
-    "1953",
-    "1973",
-    "1993"
+    "1933",
+    "1993",
+    "1943"
    ],
    "explain": "Anthony Albanese (1963): Became the Labor prime minister in 2022.",
    "difficulty": 3,
    "refs": [
     "leaders/anthony-albanese"
    ]
+  },
+  {
+   "id": "who-adolf-hitler",
+   "kind": "mc",
+   "prompt": "Who is this? He was the dictator of Nazi Germany who started the Second World War in Europe.",
+   "answer": "Adolf Hitler",
+   "wrong": [
+    "Tony Blair",
+    "Aurangzeb",
+    "John F. Kennedy"
+   ],
+   "explain": "Adolf Hitler (1889–1945): The dictator of Nazi Germany who started the Second World War in Europe.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/adolf-hitler"
+   ],
+   "kids": false
+  },
+  {
+   "id": "born-adolf-hitler",
+   "kind": "mc",
+   "prompt": "In which year was Adolf Hitler born?",
+   "answer": "1889",
+   "wrong": [
+    "1879",
+    "1899",
+    "1909"
+   ],
+   "explain": "Adolf Hitler (1889–1945): The dictator of Nazi Germany who started the Second World War in Europe.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/adolf-hitler"
+   ],
+   "kids": false
+  },
+  {
+   "id": "who-benito-mussolini",
+   "kind": "mc",
+   "prompt": "Who is this? He was the fascist dictator of Italy.",
+   "answer": "Benito Mussolini",
+   "wrong": [
+    "Haile Selassie",
+    "Yongle Emperor",
+    "Henry VIII"
+   ],
+   "explain": "Benito Mussolini (1883–1945): The fascist dictator of Italy.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/benito-mussolini"
+   ],
+   "kids": false
+  },
+  {
+   "id": "born-benito-mussolini",
+   "kind": "mc",
+   "prompt": "In which year was Benito Mussolini born?",
+   "answer": "1883",
+   "wrong": [
+    "1873",
+    "1903",
+    "1893"
+   ],
+   "explain": "Benito Mussolini (1883–1945): The fascist dictator of Italy.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/benito-mussolini"
+   ],
+   "kids": false
+  },
+  {
+   "id": "who-francisco-franco",
+   "kind": "mc",
+   "prompt": "Who is this? He was the dictator of Spain from 1939 to 1975.",
+   "answer": "Francisco Franco",
+   "wrong": [
+    "Harold Macmillan",
+    "Cyril Ramaphosa",
+    "Franklin D. Roosevelt"
+   ],
+   "explain": "Francisco Franco (1892–1975): The dictator of Spain from 1939 to 1975.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/francisco-franco"
+   ],
+   "kids": false
+  },
+  {
+   "id": "born-francisco-franco",
+   "kind": "mc",
+   "prompt": "In which year was Francisco Franco born?",
+   "answer": "1892",
+   "wrong": [
+    "1882",
+    "1912",
+    "1902"
+   ],
+   "explain": "Francisco Franco (1892–1975): The dictator of Spain from 1939 to 1975.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/francisco-franco"
+   ],
+   "kids": false
+  },
+  {
+   "id": "who-pol-pot",
+   "kind": "mc",
+   "prompt": "Who is this? He was the leader of Cambodia from 1975 to 1979.",
+   "answer": "Pol Pot",
+   "wrong": [
+    "Puyi",
+    "William Pitt the Younger",
+    "Charles I"
+   ],
+   "explain": "Pol Pot (1925–1998): The leader of Cambodia from 1975 to 1979.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/pol-pot"
+   ],
+   "kids": false
+  },
+  {
+   "id": "born-pol-pot",
+   "kind": "mc",
+   "prompt": "In which year was Pol Pot born?",
+   "answer": "1925",
+   "wrong": [
+    "1955",
+    "1895",
+    "1945"
+   ],
+   "explain": "Pol Pot (1925–1998): The leader of Cambodia from 1975 to 1979.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/pol-pot"
+   ],
+   "kids": false
+  },
+  {
+   "id": "who-idi-amin",
+   "kind": "mc",
+   "prompt": "Who is this? He was the military dictator of Uganda in the 1970s.",
+   "answer": "Idi Amin",
+   "wrong": [
+    "Franklin D. Roosevelt",
+    "Nelson Mandela",
+    "Deng Xiaoping"
+   ],
+   "explain": "Idi Amin (died 2003): The military dictator of Uganda in the 1970s.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/idi-amin"
+   ],
+   "kids": false
+  },
+  {
+   "id": "who-saddam-hussein",
+   "kind": "mc",
+   "prompt": "Who is this? He was the president of Iraq from 1979 to 2003.",
+   "answer": "Saddam Hussein",
+   "wrong": [
+    "Sitting Bull",
+    "Jimmy Carter",
+    "Kamehameha I"
+   ],
+   "explain": "Saddam Hussein (1937–2006): The president of Iraq from 1979 to 2003.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/saddam-hussein"
+   ],
+   "kids": false
+  },
+  {
+   "id": "born-saddam-hussein",
+   "kind": "mc",
+   "prompt": "In which year was Saddam Hussein born?",
+   "answer": "1937",
+   "wrong": [
+    "1957",
+    "1927",
+    "1967"
+   ],
+   "explain": "Saddam Hussein (1937–2006): The president of Iraq from 1979 to 2003.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/saddam-hussein"
+   ],
+   "kids": false
+  },
+  {
+   "id": "who-muammar-gaddafi",
+   "kind": "mc",
+   "prompt": "Who is this? He was the ruler of Libya from 1969 to 2011.",
+   "answer": "Muammar Gaddafi",
+   "wrong": [
+    "Ben Chifley",
+    "Charles de Gaulle",
+    "Pedro II"
+   ],
+   "explain": "Muammar Gaddafi (1942–2011): The ruler of Libya from 1969 to 2011.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/muammar-gaddafi"
+   ],
+   "kids": false
+  },
+  {
+   "id": "born-muammar-gaddafi",
+   "kind": "mc",
+   "prompt": "In which year was Muammar Gaddafi born?",
+   "answer": "1942",
+   "wrong": [
+    "1912",
+    "1962",
+    "1932"
+   ],
+   "explain": "Muammar Gaddafi (1942–2011): The ruler of Libya from 1969 to 2011.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/muammar-gaddafi"
+   ],
+   "kids": false
+  },
+  {
+   "id": "who-kim-il-sung",
+   "kind": "mc",
+   "prompt": "Who is this? He was the founder and first leader of North Korea.",
+   "answer": "Kim Il Sung",
+   "wrong": [
+    "John Curtin",
+    "Kublai Khan",
+    "Helmut Kohl"
+   ],
+   "explain": "Kim Il Sung (1912–1994): The founder and first leader of North Korea.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/kim-il-sung"
+   ],
+   "kids": false
+  },
+  {
+   "id": "born-kim-il-sung",
+   "kind": "mc",
+   "prompt": "In which year was Kim Il Sung born?",
+   "answer": "1912",
+   "wrong": [
+    "1922",
+    "1932",
+    "1902"
+   ],
+   "explain": "Kim Il Sung (1912–1994): The founder and first leader of North Korea.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/kim-il-sung"
+   ],
+   "kids": false
+  },
+  {
+   "id": "who-augusto-pinochet",
+   "kind": "mc",
+   "prompt": "Who is this? He was the military ruler of Chile from 1973 to 1990.",
+   "answer": "Augusto Pinochet",
+   "wrong": [
+    "Éamon de Valera",
+    "Shah Jahan",
+    "Theodore Roosevelt"
+   ],
+   "explain": "Augusto Pinochet (1915–2006): The military ruler of Chile from 1973 to 1990.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/augusto-pinochet"
+   ],
+   "kids": false
+  },
+  {
+   "id": "born-augusto-pinochet",
+   "kind": "mc",
+   "prompt": "In which year was Augusto Pinochet born?",
+   "answer": "1915",
+   "wrong": [
+    "1905",
+    "1895",
+    "1935"
+   ],
+   "explain": "Augusto Pinochet (1915–2006): The military ruler of Chile from 1973 to 1990.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/augusto-pinochet"
+   ],
+   "kids": false
+  },
+  {
+   "id": "who-nicolae-ceausescu",
+   "kind": "mc",
+   "prompt": "Who is this? He was the communist leader of Romania from 1965 to 1989.",
+   "answer": "Nicolae Ceaușescu",
+   "wrong": [
+    "Marcus Aurelius",
+    "Scott Morrison",
+    "Akbar"
+   ],
+   "explain": "Nicolae Ceaușescu (1918–1989): The communist leader of Romania from 1965 to 1989.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/nicolae-ceausescu"
+   ],
+   "kids": false
+  },
+  {
+   "id": "born-nicolae-ceausescu",
+   "kind": "mc",
+   "prompt": "In which year was Nicolae Ceaușescu born?",
+   "answer": "1918",
+   "wrong": [
+    "1888",
+    "1938",
+    "1948"
+   ],
+   "explain": "Nicolae Ceaușescu (1918–1989): The communist leader of Romania from 1965 to 1989.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/nicolae-ceausescu"
+   ],
+   "kids": false
   }
  ],
  "sources": [

@@ -230,6 +230,16 @@ Tony Abbott|Tony Abbott|1957|Australian|Australia|PM|2013|He was born in London;
 Malcolm Turnbull|Malcolm Turnbull|1954|Australian|Australia|PM|2015|He was the lawyer who won the Spycatcher case;He led the campaign for an Australian republic in 1999;He was a merchant banker;He was a Liberal prime minister from 2015 to 2018|Turnbull
 Scott Morrison|Scott Morrison|1968|Australian|Australia|PM|2018|He was managing director of Tourism Australia;He held up a lump of coal in Parliament;He secretly took on extra ministries;He was the Liberal prime minister during the COVID-19 pandemic|ScoMo
 Anthony Albanese|Anthony Albanese|1963|Australian|Australia|PM|2022|He grew up in public housing in Sydney;He has represented the seat of Grayndler since 1996;He won a second term in 2025;He became the Labor prime minister in 2022|Albo
+Adolf Hitler|Adolf Hitler|1889|German|Germany||1933|He was born in Austria;He wrote Mein Kampf while in prison;He became Chancellor of Germany in 1933;The Holocaust was carried out under his rule;He killed himself in Berlin in April 1945;He was the dictator of Nazi Germany who started the Second World War in Europe|Hitler
+Benito Mussolini|Benito Mussolini|1883|Italian|Italy||1922|He worked as a journalist before politics;He led the March on Rome in 1922;He allied Italy with Nazi Germany in the Second World War;He was shot by Italian partisans in 1945;He was the fascist dictator of Italy|Mussolini
+Francisco Franco|Francisco Franco|1892|Spanish|Spain|||He led the Nationalist side in the Spanish Civil War;He kept Spain out of the Second World War;He ruled until his death in 1975;He was the dictator of Spain from 1939 to 1975|Franco;General Franco
+Pol Pot|Pol Pot|1925|Cambodian||||He led the communist Khmer Rouge movement;His regime forced people out of the cities to work on collective farms;Up to two million Cambodians died under his rule;He died in 1998 without facing trial;He was the leader of Cambodia from 1975 to 1979
+Idi Amin|Idi Amin||Ugandan|Uganda|P|1971|He was a heavyweight boxing champion of Uganda;He seized power in a military coup in 1971;He expelled Uganda's Asian community in 1972;He was overthrown in 1979 and lived in exile in Saudi Arabia;He was the military dictator of Uganda in the 1970s|Amin
+Saddam Hussein|Saddam Hussein|1937|Iraqi||||He led his country in a long war against Iran in the 1980s;He invaded Kuwait in 1990;He was captured by US troops in 2003;He was executed in 2006;He was the president of Iraq from 1979 to 2003|Saddam
+Muammar Gaddafi|Muammar Gaddafi|1942|Libyan|Libya||1969|He seized power in a coup in 1969 at the age of 27;He set out his ideas in the Green Book;He ruled his country for 42 years;He was killed during the civil war in 2011;He was the ruler of Libya from 1969 to 2011|Gaddafi;Qaddafi;Muammar al-Gaddafi
+Kim Il Sung|Kim Il Sung|1912|North Korean|North Korea||1948|He fought against Japanese rule in Manchuria;He started the Korean War in 1950;His son and grandson have led the country since his death;He was the founder and first leader of North Korea|Kim Il-sung
+Augusto Pinochet|Augusto Pinochet|1915|Chilean|Chile||1973|He led the 1973 military coup;Thousands of opponents were killed or disappeared under his rule;He lost a 1988 referendum on staying in power;He was arrested in London in 1998;He was the military ruler of Chile from 1973 to 1990|Pinochet
+Nicolae Ceaușescu|Nicolae Ceaușescu|1918|Romanian|Romania||1965|He built the huge Palace of the Parliament in Bucharest;His secret police, the Securitate, watched the population;He was overthrown in the 1989 revolution;He and his wife were executed on Christmas Day 1989;He was the communist leader of Romania from 1965 to 1989|Ceausescu;Nicolae Ceausescu
 `;
 
 // Added facts for the 34 original leaders (c2_src/people.mjs LEADERS): country|role|came to power, same rules.
@@ -260,4 +270,21 @@ export const LEADERS_IMG = {
   // Nebuchadnezzar cameo drawing), or the only free one has the name carved on it (Sejong statue)
   'attila': '', 'william-the-conqueror': '', 'macbeth': '', 'pachacuti': '', 'nzinga': '', 'shivaji': '', 'frederick-barbarossa': '', 'saladin': '',
   'nebuchadnezzar-ii': '', 'sejong-the-great': '',
+  // round 2: plain portraits only (the free Ceaușescu pictures are propaganda stamps and posters)
+  'pol-pot': 'Pol Pot in 1978.png', 'nicolae-ceausescu': '',
+};
+
+// Never in kids play (item and its questions get kids: false). Aaron 2026-10-17: history included, not hidden, no
+// separate "dictators" category, neutral factual clues.
+export const LEADERS_KIDS_OFF = new Set(['adolf-hitler', 'benito-mussolini', 'francisco-franco', 'pol-pot', 'idi-amin', 'saddam-hussein', 'muammar-gaddafi', 'kim-il-sung', 'augusto-pinochet', 'nicolae-ceausescu', 'joseph-stalin', 'vladimir-lenin', 'mao-zedong']);
+
+// Levels set by hand after the fame pass (Aaron 2026-10-17: leaders an English-speaking player doesn't know are hard;
+// the blend still shows a hard item now and then in a medium round). id -> 1|2|3
+export const LEADERS_LEVEL = {
+  // world-famous but little known to an Australian / UK / US player: hard (the blend still shows them now and then in medium)
+  'sun-yat-sen': 3, 'chiang-kai-shek': 3, 'kublai-khan': 3, 'timur': 3, 'patrice-lumumba': 3, 'rajiv-gandhi': 3, 'cyrus-the-great': 3,
+  'mehmed-ii': 3, 'puyi': 3, 'shivaji': 3, 'lee-kuan-yew': 3, 'deng-xiaoping': 3, 'josip-broz-tito': 3, 'suleiman-the-magnificent': 3,
+  'aurangzeb': 3, 'lula-da-silva': 3, 'charles-v': 3, 'mansa-musa': 3,
+  // pageviews lifted by TV dramas: medium, not easy
+  'edward-vii': 2, 'george-v': 2, 'james-vi-and-i': 2, 'ulysses-s-grant': 2,
 };

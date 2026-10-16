@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { ROOT, PACKS, fetchJSON, wpQids, wdEntities, claims, wdYear, commonsImages, writePack, slug, leaks, rng, sample } from './c2_lib.mjs';
 import { sitelinkCounts, wpLeads, wpInfobox, QID_ISO, demonymIsos } from './c2_screen_lib.mjs';
 import { valueIsos } from './local_tags.mjs';
-import { LEADERS_MORE, LEADERS_FACTS, LEADERS_IMG } from './c2_src/leaders_more.mjs';
+import { LEADERS_MORE, LEADERS_FACTS, LEADERS_IMG, LEADERS_KIDS_OFF, LEADERS_LEVEL } from './c2_src/leaders_more.mjs';
 import { LEADERS } from './c2_src/people.mjs';
 
 const OLD_IDS = new Set(LEADERS.trim().split('\n').map(l => slug(l.split('|')[1])));
@@ -35,7 +35,8 @@ export function stripLeaders(pack) {
   const gone = new Set(pack.items.filter(it => !OLD_IDS.has(it.id)).map(it => it.id));
   pack.items = pack.items.filter(it => !gone.has(it.id));
   pack.questions = pack.questions.filter(q => !(q.refs || []).some(r => gone.has(r.split('/')[1])));
-  for (const it of pack.items) for (const k of Object.keys(LEADER_META)) delete it.facts[k];
+  for (const it of pack.items) { for (const k of Object.keys(LEADER_META)) delete it.facts[k]; delete it.kids; }
+  for (const q of pack.questions) delete q.kids;
   return pack;
 }
 
@@ -69,8 +70,10 @@ async function fame(all) {
   const sl = await sitelinkCounts(all.map(x => x.qid));
   for (const x of all) { x.sl = sl[x.qid] || 0; x.pv = x.wpTitle ? await pageviews(x.wpTitle) : 0; }
   const pct = key => { const s = all.map(x => x[key]).sort((a, b) => a - b); return v => s.filter(y => y < v).length / Math.max(1, s.length - 1); };
-  const ps = pct('sl'), pp = pct('pv');
-  for (const x of all) x.score = (ps(x.sl) + pp(x.pv)) / 2;
+  // English pageviews only: sitelinks rate world-famous leaders (Sun Yat-sen, Sukarno) as easy for players who
+  // don't know them (Aaron 2026-10-17); sitelinks stay in the report
+  const pp = pct('pv');
+  for (const x of all) x.score = pp(x.pv);
 }
 // top ~quarter easy, the next third medium; the 34 hand-rated originals keep their levels (agreement in the report)
 const T1 = 0.8, T2 = 0.45;
@@ -154,7 +157,10 @@ export async function extendLeaders(pack, note = console.log) {
   let agree = 0;
   for (const o of oldRows) { const d = levelOf(o.score); if (d === o.old.difficulty) agree++; else note(`fame level differs (kept hand level) ${o.name}: hand ${o.old.difficulty}, fame ${d} (score ${o.score.toFixed(2)}, ${o.sl} sitelinks, ${o.pv} views)`); }
   note(`fame levels agree with ${agree}/${oldRows.length} hand-rated originals (T1 ${T1}, T2 ${T2})`);
-  for (const r of ok) r.d = levelOf(r.score);
+  for (const r of ok) {
+    r.d = levelOf(r.score);
+    if (LEADERS_LEVEL[r.id] && LEADERS_LEVEL[r.id] !== r.d) { note(`level by hand ${r.name}: fame ${r.d} -> ${LEADERS_LEVEL[r.id]}`); r.d = LEADERS_LEVEL[r.id]; }
+  }
   // facts for the originals
   for (const it of pack.items) {
     const f = LEADERS_FACTS[it.id];
@@ -168,6 +174,9 @@ export async function extendLeaders(pack, note = console.log) {
   pack.items.push(...added);
   note(`leaders: ${pack.items.length - added.length} old + ${added.length} new (${rows.length - added.length} of ${rows.length} candidates dropped)`);
   for (const it of added) questions(pack, it);
+  // never in kids play: the item and every question about it
+  for (const it of pack.items) if (LEADERS_KIDS_OFF.has(it.id)) it.kids = false;
+  for (const q of pack.questions) if ((q.refs || []).some(r => LEADERS_KIDS_OFF.has(String(r).split('/')[1]))) q.kids = false;
   for (const r of ok) note(`fame ${r.name}: d${r.d} score ${r.score.toFixed(2)} (${r.sl} sitelinks, ${r.pv} views)`);
   return pack;
 }

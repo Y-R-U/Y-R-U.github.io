@@ -1,7 +1,7 @@
 // Explore map for lane L: tap (or search) a country -> onPick(iso3, props). Political colours, names on tap.
-import { createMap } from './map.js?v=202610161407';
-import { loadIndex, geo } from './data.js?v=202610161407';
-import { STATE_VIEWS } from './regions.js?v=202610161407';
+import { createMap } from './map.js?v=202610161426';
+import { loadIndex, geo } from './data.js?v=202610161426';
+import { STATE_VIEWS } from './regions.js?v=202610161426';
 
 export function createExplore(el, { region = 'world', onPick = () => {}, set = 'all', search = true, style = 'political', label = true } = {}) {
   el.innerHTML = '';

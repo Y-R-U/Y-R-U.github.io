@@ -1,5 +1,5 @@
 {
- "build": "202610161359",
+ "build": "202610161426",
  "themes": [
   {
    "id": "animals",
@@ -3055,14 +3055,14 @@
    "theme": "people",
    "icon": "👑",
    "kids": false,
-   "items": 258,
-   "questions": 463,
+   "items": 268,
+   "questions": 482,
    "caps": {
-    "img": 245,
+    "img": 254,
     "audio": 0,
-    "itemImg": 245,
+    "itemImg": 254,
     "itemAudio": 0,
-    "clues": 255,
+    "clues": 265,
     "facts": {
      "born": "year",
      "died": "year",
@@ -3078,9 +3078,9 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {
-     "mc": 463
+     "mc": 482
     },
-    "easy": 80,
+    "easy": 94,
     "kidsItems": 0,
     "multi": [
      "nationality"
@@ -3135,7 +3135,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 7,
+     "blitz60": 9,
      "type": 20,
      "trio": 0
     }

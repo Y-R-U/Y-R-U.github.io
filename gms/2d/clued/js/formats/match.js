@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, factAllowed, factPhrase } from './registry.js?v=202610161407';
-import { h, imgEl } from '../ui/kit.js?v=202610161407';
-import { norm, injectCSS, baseCSS, once, fmtFact, uniqueByName, hasImg } from './fkit.js?v=202610161407';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, factAllowed, factPhrase } from './registry.js?v=202610161426';
+import { h, imgEl } from '../ui/kit.js?v=202610161426';
+import { norm, injectCSS, baseCSS, once, fmtFact, uniqueByName, hasImg } from './fkit.js?v=202610161426';
 
 const CSS = `
 .mt-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;align-items:start}

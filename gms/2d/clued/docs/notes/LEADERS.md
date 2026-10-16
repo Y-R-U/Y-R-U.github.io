@@ -17,3 +17,14 @@ calls the same `extendLeaders()`, so a full rebuild gives the same pack. Afterwa
 - Local tags: nationality demonyms added to `NATIONALITY_EXTRA` in tools/local_names.mjs (Zulu, Malian, Hawaiian …).
 - Pictures: Wikidata P18 unless overridden; checked by eye for names in the image (captions, coin legends, stamps).
   11 leaders have no picture. All new pictures go through Aaron's review page.
+
+## Round 2 (2026-10-17)
+- Fame is English Wikipedia pageviews only (sitelinks inflated leaders an English-speaking player doesn't know), then
+  `LEADERS_LEVEL` hand levels (Sun Yat-sen, Chiang, Kublai, Timur … → hard; TV-boosted Edward VII / George V → medium).
+  "Mostly hard, occasionally medium" comes from DIFFMIX's blend (Medium round 2/6/2, Easy 6/3/1), no new mechanism.
+- Local: "I live here" = `easeView` (js/core/local.js, applied in spec.js buildQuestions when `L.live`) one level easier;
+  a chosen region (live false) gets its local share via `localView` + `pickBlend`, with no easing, so its hard
+  leaders still come up in Easy rounds, rated hard.
+- Added Hitler, Mussolini, Franco, Pol Pot, Idi Amin, Saddam Hussein, Gaddafi, Kim Il Sung, Pinochet, Ceaușescu: neutral
+  factual clues, plain portraits (none for Ceaușescu), no separate category. `LEADERS_KIDS_OFF` (those plus Stalin,
+  Lenin, Mao) → `kids: false` on the item and its questions, so kidsOk (js/core/spec.js) keeps them out of kids play.
