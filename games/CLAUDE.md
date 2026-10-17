@@ -134,7 +134,9 @@ Aaron was explicit about this. Hexpire's `hexpire.resume` is the clearest case.
 - **Caching bit us twice.** Caddy sent no `Cache-Control` at all, so Chrome
   heuristically cached `auth.js` and Aaron kept retesting old code after every
   deploy. Both vhosts now send `no-cache` for js/css/html and a week for images.
-  Keep it that way.
+  Keep it that way. The `@code` matcher must include `*/` too (added 2026-10-18):
+  without it directory URLs like `/gms/2d/clued/` (how every game is opened) got
+  no Cache-Control and phones kept stale HTML.
 - **The `apiKey` in `lib/auth/config.js` is not a secret — don't "fix" it.**
   GitHub's scanner flags it as a leaked Google API key (it did on 2026-08-02,
   commit e5c1e261). A Firebase Web API key is a public project identifier that
