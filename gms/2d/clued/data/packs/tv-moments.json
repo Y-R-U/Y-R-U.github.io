@@ -262,6 +262,16 @@
    "media": {
     "img": [
      {
+      "src": "media/tv-moments/8a95ac3b4a48.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The prison fence"
+     },
+     {
       "src": "media/tv-moments/15c6324c2688.webp",
       "w": 640,
       "h": 432,
@@ -273,7 +283,7 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 1
   },
   {
    "id": "wednesday",
@@ -328,6 +338,16 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "Red jumpsuits in the mint"
+     },
+     {
+      "src": "media/tv-moments/8b5806a436fc.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Raining money"
      }
     ]
    },
@@ -356,6 +376,16 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "Red light, green light"
+     },
+     {
+      "src": "media/tv-moments/925a4dd51f03.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The pastel staircase"
      }
     ]
    },
@@ -440,6 +470,16 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "Crash on the island"
+     },
+     {
+      "src": "media/tv-moments/4438daf84794.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The hatch"
      }
     ]
    },
@@ -496,6 +536,16 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
       "caption": "The truth is out there"
+     },
+     {
+      "src": "media/tv-moments/fbd7c63e4e77.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The basement office"
      }
     ]
    },
@@ -608,6 +658,16 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
       "caption": "Foot-powered car"
+     },
+     {
+      "src": "media/tv-moments/9c764588cc28.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Dino crane"
      }
     ]
    },

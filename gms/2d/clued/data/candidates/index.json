@@ -1,28 +1,3 @@
 {
- "candidates": [
-  {
-   "pack": "movie-moments",
-   "kind": "more",
-   "title": "Movie moments: second pictures",
-   "path": "candidates/movie-moments-more.json",
-   "pictures": 80,
-   "titles": 80
-  },
-  {
-   "pack": "book-moments",
-   "kind": "more",
-   "title": "Book moments: second pictures",
-   "path": "candidates/book-moments-more.json",
-   "pictures": 79,
-   "titles": 78
-  },
-  {
-   "pack": "tv-moments",
-   "kind": "more",
-   "title": "TV moments: second pictures",
-   "path": "candidates/tv-moments-more.json",
-   "pictures": 22,
-   "titles": 22
-  }
- ]
+ "candidates": []
 }

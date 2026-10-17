@@ -1,11 +1,11 @@
 // Field guide: theme → pack browser and the filterable photo grid.
-import { h } from '../ui/kit.js?v=202610170857';
-import { header, go } from '../ui/app.js?v=202610170857';
-import { getIndex } from '../core/packs.js?v=202610170857';
-import { themeTree, getPack, itemsFor, refOf, thumb, catValues, norm, kidsOn, hasAudio, factRows } from './data.js?v=202610170857';
-import { packPct, getMastery, getCards, itemLevel } from './model.js?v=202610170857';
-import { ring, notice, emptyState } from './ui.js?v=202610170857';
-import { factText } from '../formats/registry.js?v=202610170857';
+import { h } from '../ui/kit.js?v=202610171109';
+import { header, go } from '../ui/app.js?v=202610171109';
+import { getIndex } from '../core/packs.js?v=202610171109';
+import { themeTree, getPack, itemsFor, refOf, thumb, catValues, norm, kidsOn, hasAudio, factRows } from './data.js?v=202610171109';
+import { packPct, getMastery, getCards, itemLevel } from './model.js?v=202610171109';
+import { ring, notice, emptyState } from './ui.js?v=202610171109';
+import { factText } from '../formats/registry.js?v=202610171109';
 
 export function guideHome(el) {
   const kids = kidsOn();

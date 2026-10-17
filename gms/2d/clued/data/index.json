@@ -1,5 +1,5 @@
 {
- "build": "202610170843",
+ "build": "202610171108",
  "themes": [
   {
    "id": "animals",
@@ -670,8 +670,8 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 62,
-    "kidsItems": 22,
+    "easy": 67,
+    "kidsItems": 26,
     "multi": [],
     "catBins": {
      "author": 3,
@@ -3265,7 +3265,7 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 101,
+    "easy": 105,
     "kidsItems": 61,
     "multi": [],
     "catBins": {
@@ -4557,7 +4557,7 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 19,
+    "easy": 20,
     "kidsItems": 1,
     "multi": [],
     "catBins": {
@@ -4587,8 +4587,8 @@
      "order": 0,
      "odd": 20,
      "sort": 20,
-     "reveal": 19,
-     "number": 19,
+     "reveal": 20,
+     "number": 20,
      "connect": 20,
      "blitz60": 12,
      "type": 20
