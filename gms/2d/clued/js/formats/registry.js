@@ -1,6 +1,6 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610171317';
-import { SERIES } from './series_data.js?v=202610171317';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610171327';
+import { SERIES } from './series_data.js?v=202610171327';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -304,6 +304,8 @@ export function distractors(rng, target, pool, n, { keyFn = it => it.name, rejec
     for (const c of shuffle(rng, list)) {
       if (out.length >= n) return;
       if (c.item === target.item || reject(c.item) || [target, ...out].some(o => kept(o.item, c.item))) continue;
+      // at most two titles of one film franchise / book series among the options, whatever the level
+      if (SERIES[c.item.id] && [target, ...out].filter(o => SERIES[o.item.id] === SERIES[c.item.id]).length >= 2) continue;
       const k = norm(keyFn(c.item));
       if (!k || seen.has(k)) continue;
       const p = capped ? pairsWith(c) : 0;

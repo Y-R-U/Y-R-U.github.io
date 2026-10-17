@@ -1,12 +1,12 @@
 // GameSpec -> questions. A spec fully describes a game; same spec + same packs = same questions.
-import { rngFrom, sample, shuffle, randomSeed } from './rng.js?v=202610171317';
-import { loadIndex, loadPacks } from './packs.js?v=202610171317';
-import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610171317';
-import { isOn, loadTags, loadLocalGeo, loadNames, easeView, localView, mixRound, countryName, packHasLocal, isLocalQ, targetOf } from './local.js?v=202610171317';
-import { homeQuestions, HOME_FORMATS, HOME_PACKS } from './localgeo.js?v=202610171317';
-import { loadIndex as loadGeoIndex, geo as GEO } from '../geo/data.js?v=202610171317';
-import { dupKey, freshRanker } from './fresh.js?v=202610171317';
-import { BLEND, blendCounts, blendOn, levelMap, levelOf, loadGeoLevels, pickBlend } from './diffmix.js?v=202610171317';
+import { rngFrom, sample, shuffle, randomSeed } from './rng.js?v=202610171327';
+import { loadIndex, loadPacks } from './packs.js?v=202610171327';
+import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610171327';
+import { isOn, loadTags, loadLocalGeo, loadNames, easeView, localView, mixRound, countryName, packHasLocal, isLocalQ, targetOf } from './local.js?v=202610171327';
+import { homeQuestions, HOME_FORMATS, HOME_PACKS } from './localgeo.js?v=202610171327';
+import { loadIndex as loadGeoIndex, geo as GEO } from '../geo/data.js?v=202610171327';
+import { dupKey, freshRanker } from './fresh.js?v=202610171327';
+import { BLEND, blendCounts, blendOn, levelMap, levelOf, loadGeoLevels, pickBlend } from './diffmix.js?v=202610171327';
 
 export const MAX_ALL_PACKS = 8;
 
