@@ -1,5 +1,5 @@
 // Procedural UI sounds. play(name, opts) — names: correct wrong tick timerLow reveal streak fanfare button join
-import { getCtx, buses, reverbIR, setVolume, setSfxVolume, mute, applySettings, unlock, installUnlock } from './ctx.js?v=202610171142';
+import { getCtx, buses, reverbIR, setVolume, setSfxVolume, mute, applySettings, unlock, installUnlock } from './ctx.js?v=202610171247';
 
 export { setVolume, setSfxVolume, mute, applySettings, unlock, installUnlock };
 
@@ -8,7 +8,7 @@ let out = null, wet = null, noiseBuf = null;
 function bus() {
   const c = getCtx();
   if (!c) return null;
-  if (!out) {
+  if (!out || out.context !== c) {
     out = c.createGain(); out.gain.value = 0.9;
     out.connect(buses().sfx);
     const rv = c.createConvolver(); rv.buffer = reverbIR();

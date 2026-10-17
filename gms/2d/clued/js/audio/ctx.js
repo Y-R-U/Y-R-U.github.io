@@ -1,5 +1,5 @@
 // Shared AudioContext, buses and the mobile unlock. sfx, piano and clips all route through here.
-import { dlog, modLoaded } from '../core/debuglog.js?v=202610171142';
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610171247';
 const MOD_ID = modLoaded('ctx', import.meta.url);
 let ctx = null, master = null, sfxBus = null, musicBus = null, comp = null;
 const state = { volume: 0.8, sfx: 1, music: 1, muted: false };
@@ -101,6 +101,18 @@ function silentKeepAlive() {
 const streamEls = new Set();
 export const trackAudioEl = (el) => { streamEls.add(el); return el; };
 
+// iOS Safari can bring a context back from a hidden tab "running" but silent until the page reloads, so after a
+// hide the next gesture swaps in a fresh context. AudioBuffers carry over; consumers rebuild nodes via getCtx().
+const IOS = /iP(hone|ad|od)|Macintosh.*Mobile/.test(globalThis.navigator?.userAgent || '') || (globalThis.navigator?.maxTouchPoints > 1 && /Macintosh/.test(globalThis.navigator?.userAgent || ''));
+let stale = false;
+function rebuild(why) {
+  const old = ctx;
+  dlog('ctx', 'rebuild', { why, ac: old?.__id, state: old?.state });
+  ctx = null; ir = null;
+  try { old?.close?.().catch?.(() => {}); } catch {}
+  return getCtx();
+}
+
 // call once at boot; resumes on the first real gesture (and again after iOS interruptions)
 let installed = false;
 export function installUnlock(target = globalThis.document) {
@@ -110,6 +122,7 @@ export function installUnlock(target = globalThis.document) {
   // so these stay installed for the page's lifetime: every tap re-wakes a sleeping context.
   const wake = () => {
     if (!ctx) return unlock();
+    if (stale) return (stale = false, rebuild('back'), unlock());
     try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
     if (keepAlive && keepAlive.paused) { dlog('ctx', 'keepAlive.replay'); keepAlive.play()?.catch?.(() => {}); }
     if (ctx.state !== 'running') unlock();
@@ -118,6 +131,7 @@ export function installUnlock(target = globalThis.document) {
   // Hidden: nothing keeps playing in the background (Web Audio clips, piano, sfx and the streamed Apple preview).
   const away = () => {
     if (target.visibilityState !== 'hidden') return;
+    if (ctx && IOS) stale = true;
     if (ctx && ctx.state === 'running') { dlog('ctx', 'suspend', { why: 'hidden' }); ctx.suspend().catch(() => {}); }
     for (const el of target.querySelectorAll?.('audio[data-clued="1"]') || []) if (!el.paused) { el.pause(); el.__hidPaused = true; }
     for (const el of streamEls) if (!el.paused) { el.pause(); el.__hidPaused = true; }
