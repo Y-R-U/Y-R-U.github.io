@@ -9,17 +9,14 @@
 1970 | The Guess Who | American Woman | us=3 uk=- au=- pv=10141 from=CAN
 1970 | Edwin Starr | War | us=5 uk=- au=- pv=7078 from=USA
 1970 | The Jackson 5 | ABC | us=15 uk=- au=- pv=7734 from=USA | d=1
-1970 | Norman Greenbaum | Spirit in the Sky | us=22 uk=4 au=4 pv=11961 from=USA
 1970 | Freda Payne | Band of Gold | us=10 uk=3 au=15 pv=3204 from=USA
 1970 | Edison Lighthouse | Love Grows (Where My Rosemary Goes) | us=40 uk=11 au=12 pv=4768 from=GBR
 1970 | Mungo Jerry | In the Summertime | us=53 uk=1 au=16 pv=6441 from=GBR
 1970 | Elvis Presley | The Wonder of You | us=72 uk=2 au=15 pv=2872 from=USA
 1970 | Ray Stevens | Everything Is Beautiful | us=12 uk=44 au=21 pv=1622 from=USA
 1970 | Free | All Right Now | us=27 uk=7 au=- pv=7421 from=GBR
-1970 | Shocking Blue | Venus | us=33 uk=- au=19 pv=13427 from=NLD
 1970 | Creedence Clearwater Revival | Up Around the Bend | us=73 uk=36 au=8 pv=2160 from=USA
 1970 | Beach Boys | Cottonfields | us=- uk=20 au=13 pv=3936 from=USA
-1970 | The Jackson 5 | I Want You Back | us=28 uk=35 au=- pv=15080 from=USA
 1970 | The Kinks | Lola | us=52 uk=13 au=- pv=15742 from=GBR
 1970 | Three Dog Night | Mama Told Me (Not to Come) | us=11 uk=33 au=- pv=5803 from=USA
 1970 | Dave Edmunds | I Hear You Knocking | us=81 uk=29 au=20 pv=2703 from=GBR
@@ -273,3 +270,11 @@
 1979 | Commodores | Still | us=23 uk=48 au=- pv=1061 from=USA
 1979 | The Police | Message in a Bottle | us=- uk=11 au=- pv=6464 from=GBR
 1979 | ABBA | Chiquitita | us=- uk=16 au=- pv=5798 from=SWE
+
+1980 | KC and the Sunshine Band | Please Don't Go | us=19 uk=- au=10 pv=4894 from=USA | note=first released 1979, moved from hits-1980s
+1980 | Kenny Rogers | Coward of the County | us=34 uk=9 au=- pv=2842 from=USA | note=first released 1979, moved from hits-1980s
+1980 | Rupert Holmes | Escape (The Piña Colada Song) | us=11 uk=- au=- pv=16364 from=GBR/USA | note=first released 1979, moved from hits-1980s
+1982 | Charlene | I've Never Been to Me | us=38 uk=48 au=11 pv=4397 from=USA | note=first released 1976, moved from hits-1980s
+
+1979 | Queen | Crazy Little Thing Called Love | us=6 uk=25 au=3 pv=9213 from=GBR | note=released 1979, moved from hits-1980s
+1979 | Michael Jackson | Rock with You | us=4 uk=- au=- pv=12372 from=USA | note=released 1979, moved from hits-1980s

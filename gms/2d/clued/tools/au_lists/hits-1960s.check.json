@@ -26,8 +26,6 @@
  "offby": [
   "1959 apple 1960 (earliest original 1955)  Percy Faith — Theme from \"A Summer Place\"  [Percy Faith's Greatest Hits]",
   "1960 apple 1960 (earliest original 1958)  The Everly Brothers — Cathy's Clown  [A Date With The Everly Brothers]",
-  "1960 apple 1959 (earliest original 1956)  Marty Robbins — El Paso  [Gunfighter Ballads and Trail Songs]",
-  "1960 apple 1959 (earliest original 1959)  Duane Eddy — Peter Gunn  [Especially for You]",
   "1960 apple 1959 (earliest original 1959)  Mark Dinning — Teen Angel  [The Lovin' Touch]",
   "1960 apple 1959 (earliest original 1959)  The Everly Brothers — Let It Be Me  [The Fabulous Style of the Everly Brothers]",
   "1960 apple 1961 (earliest original 1961)  Lonnie Donegan — My Old Man's a Dustman  [King of Skiffle]",
@@ -117,12 +115,14 @@
   },
   {
    "id": "running-bear-johnny-preston",
+   "chartYear": 1960,
+   "firstYear": 1959,
    "appleYear": 1960,
    "album": "Making Believe",
    "appleArtist": "Johnny Preston",
    "appleTitle": "Running Bear",
    "store": "US",
-   "year": 1960,
+   "year": 1959,
    "d": 2
   },
   {
@@ -157,12 +157,14 @@
   },
   {
    "id": "what-in-the-worlds-come-over-you-jack-scott",
+   "chartYear": 1960,
+   "firstYear": 1959,
    "appleYear": 1960,
    "album": "Jack Scott - His Very Best - EP",
    "appleArtist": "Jack Scott",
    "appleTitle": "What In the World's Come Over You",
    "store": "US",
-   "year": 1960,
+   "year": 1959,
    "d": 2
   },
   {
@@ -197,12 +199,14 @@
   },
   {
    "id": "el-paso-marty-robbins",
+   "chartYear": 1960,
+   "firstYear": 1959,
    "appleYear": 1959,
    "album": "Gunfighter Ballads and Trail Songs",
    "appleArtist": "Marty Robbins",
    "appleTitle": "El Paso",
    "store": "US",
-   "year": 1960,
+   "year": 1959,
    "d": 2
   },
   {
@@ -217,32 +221,38 @@
   },
   {
    "id": "peter-gunn-duane-eddy",
+   "chartYear": 1960,
+   "firstYear": 1959,
    "appleYear": 1959,
    "album": "Especially for You",
    "appleArtist": "Duane Eddy",
    "appleTitle": "Peter Gunn",
    "store": "US",
-   "year": 1960,
+   "year": 1959,
    "d": 2
   },
   {
    "id": "beyond-the-sea-bobby-darin",
+   "chartYear": 1960,
+   "firstYear": 1959,
    "appleYear": 1960,
    "album": "Rhino Hi-Five: Bobby Darin - EP",
    "appleArtist": "Bobby Darin",
    "appleTitle": "Beyond the Sea",
    "store": "US",
-   "year": 1960,
+   "year": 1959,
    "d": 2
   },
   {
    "id": "handy-man-jimmy-jones",
+   "chartYear": 1960,
+   "firstYear": 1959,
    "appleYear": 1960,
    "album": "Good Timin'",
    "appleArtist": "Jimmy Jones",
    "appleTitle": "Handy Man",
    "store": "US",
-   "year": 1960,
+   "year": 1959,
    "d": 2
   },
   {
@@ -417,12 +427,14 @@
   },
   {
    "id": "wheels-the-string-a-longs",
+   "chartYear": 1961,
+   "firstYear": 1960,
    "appleYear": 1961,
    "album": "Pick a Hit",
    "appleArtist": "The String-A-Longs",
    "appleTitle": "Wheels",
    "store": "US",
-   "year": 1961,
+   "year": 1960,
    "d": 2
   },
   {
@@ -907,12 +919,14 @@
   },
   {
    "id": "hey-paula-paul-and-paula",
+   "chartYear": 1963,
+   "firstYear": 1962,
    "appleYear": 1963,
    "album": "Hey Paula - Single",
    "appleArtist": "Paul & Paula",
    "appleTitle": "Hey Paula",
    "store": "US",
-   "year": 1963,
+   "year": 1962,
    "d": 2
   },
   {
@@ -1027,12 +1041,14 @@
   },
   {
    "id": "rhythm-of-the-rain-the-cascades",
+   "chartYear": 1963,
+   "firstYear": 1962,
    "appleYear": 1963,
    "album": "Ten Songs for You",
    "appleArtist": "The Cascades",
    "appleTitle": "Rhythm of the Rain",
    "store": "US",
-   "year": 1963,
+   "year": 1962,
    "d": 2
   },
   {
@@ -1133,7 +1149,7 @@
    "appleTitle": "I Get Around",
    "store": "US",
    "year": 1964,
-   "d": 1
+   "d": 2
   },
   {
    "id": "hello-dolly-louis-armstrong",
@@ -1207,12 +1223,14 @@
   },
   {
    "id": "glad-all-over-the-dave-clark-five",
+   "chartYear": 1964,
+   "firstYear": 1963,
    "appleYear": 1964,
    "album": "The History of the Dave Clark Five, Pt. 1",
    "appleArtist": "The Dave Clark Five",
    "appleTitle": "Glad All Over",
    "store": "US",
-   "year": 1964,
+   "year": 1963,
    "d": 3
   },
   {
@@ -2554,6 +2572,54 @@
    "store": "US",
    "year": 1968,
    "d": 2
+  },
+  {
+   "id": "spirit-in-the-sky-norman-greenbaum",
+   "chartYear": 1970,
+   "firstYear": 1969,
+   "appleYear": 1969,
+   "album": "Spirit In the Sky (Deluxe Edition)",
+   "appleArtist": "Norman Greenbaum",
+   "appleTitle": "Spirit In the Sky",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "venus-shocking-blue",
+   "chartYear": 1970,
+   "firstYear": 1969,
+   "appleYear": 1969,
+   "album": "At Home",
+   "appleArtist": "Shocking Blue",
+   "appleTitle": "Venus",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "i-want-you-back-the-jackson-5",
+   "chartYear": 1970,
+   "firstYear": 1969,
+   "appleYear": 1969,
+   "album": "Diana Ross Presents the Jackson 5",
+   "appleArtist": "Jackson 5",
+   "appleTitle": "I Want You Back",
+   "store": "US",
+   "year": 1969,
+   "d": 1
+  },
+  {
+   "id": "a-little-less-conversation-elvis-vs-jxl",
+   "chartYear": 2002,
+   "firstYear": 1968,
+   "appleYear": 2001,
+   "album": "A Little Less Conversation: Elvis vs JXL - Single",
+   "appleArtist": "Elvis Presley",
+   "appleTitle": "A Little Less Conversation",
+   "store": "US",
+   "year": 1968,
+   "d": 1
   }
  ]
 }

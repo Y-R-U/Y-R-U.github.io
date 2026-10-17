@@ -22,10 +22,7 @@
   "SAME TITLE  1972 The Pipes and Drums and the Military Band of the Royal Scots Dragoon Guards — Amazing Grace (kept the Judy Collins song)"
  ],
  "offby": [
-  "1970 apple 1969 (earliest original 1969)  Norman Greenbaum — Spirit in the Sky  [Spirit In the Sky (Deluxe Edition)]",
-  "1970 apple 1969 (earliest original 1969)  Shocking Blue — Venus  [At Home]",
   "1970 apple 1969 (earliest original 1969)  Beach Boys — Cottonfields  [20/20]",
-  "1970 apple 1969 (earliest original 1969)  The Jackson 5 — I Want You Back  [Diana Ross Presents the Jackson 5]",
   "1970 apple 1970 (earliest original 1967)  Diana Ross — Ain't No Mountain High Enough  [Diana Ross (1970)]",
   "1970 apple 1970 (earliest original 1968)  Clarence Carter — Patches  [Patches]",
   "1971 apple 1971 (earliest original 1969)  Lynn Anderson — Rose Garden  [Lynn Anderson]",
@@ -124,16 +121,6 @@
    "d": 1
   },
   {
-   "id": "spirit-in-the-sky-norman-greenbaum",
-   "appleYear": 1969,
-   "album": "Spirit In the Sky (Deluxe Edition)",
-   "appleArtist": "Norman Greenbaum",
-   "appleTitle": "Spirit In the Sky",
-   "store": "US",
-   "year": 1970,
-   "d": 1
-  },
-  {
    "id": "band-of-gold-freda-payne",
    "appleYear": 1970,
    "album": "The UK's No. 1's",
@@ -194,16 +181,6 @@
    "d": 1
   },
   {
-   "id": "venus-shocking-blue",
-   "appleYear": 1969,
-   "album": "At Home",
-   "appleArtist": "Shocking Blue",
-   "appleTitle": "Venus",
-   "store": "US",
-   "year": 1970,
-   "d": 2
-  },
-  {
    "id": "up-around-the-bend-creedence-clearwater-revival",
    "appleYear": 1970,
    "album": "Cosmo's Factory",
@@ -222,16 +199,6 @@
    "store": "US",
    "year": 1970,
    "d": 2
-  },
-  {
-   "id": "i-want-you-back-the-jackson-5",
-   "appleYear": 1969,
-   "album": "Diana Ross Presents the Jackson 5",
-   "appleArtist": "Jackson 5",
-   "appleTitle": "I Want You Back",
-   "store": "US",
-   "year": 1970,
-   "d": 1
   },
   {
    "id": "lola-the-kinks",
@@ -955,12 +922,14 @@
   },
   {
    "id": "the-night-the-lights-went-out-in-georgia-vicki-lawrence",
+   "chartYear": 1973,
+   "firstYear": 1972,
    "appleYear": 1973,
    "album": "The Night the Lights Went Out In Georgia (Deluxe Edition)",
    "appleArtist": "Vicki Lawrence",
    "appleTitle": "The Night the Lights Went Out In Georgia",
    "store": "US",
-   "year": 1973,
+   "year": 1972,
    "d": 1
   },
   {
@@ -1857,12 +1826,14 @@
   },
   {
    "id": "go-your-own-way-fleetwood-mac",
+   "chartYear": 1977,
+   "firstYear": 1976,
    "appleYear": 1977,
    "album": "Rumours (Super Deluxe Edition)",
    "appleArtist": "Fleetwood Mac",
    "appleTitle": "Go Your Own Way (Sessions, Roughs & Outtakes)",
    "store": "US",
-   "year": 1977,
+   "year": 1976,
    "d": 1
   },
   {
@@ -2566,6 +2537,74 @@
    "store": "US",
    "year": 1979,
    "d": 2
+  },
+  {
+   "id": "please-dont-go-kc-and-the-sunshine-band",
+   "chartYear": 1980,
+   "firstYear": 1979,
+   "appleYear": 1979,
+   "album": "Do You Wanna Go Party",
+   "appleArtist": "KC and the Sunshine Band",
+   "appleTitle": "Please Don't Go",
+   "store": "US",
+   "year": 1979,
+   "d": 1
+  },
+  {
+   "id": "coward-of-the-county-kenny-rogers",
+   "chartYear": 1980,
+   "firstYear": 1979,
+   "appleYear": 1979,
+   "album": "Kenny",
+   "appleArtist": "Kenny Rogers",
+   "appleTitle": "Coward of the County",
+   "store": "US",
+   "year": 1979,
+   "d": 2
+  },
+  {
+   "id": "escape-the-pina-colada-song-rupert-holmes",
+   "chartYear": 1980,
+   "firstYear": 1979,
+   "appleYear": 1979,
+   "album": "Partners In Crime",
+   "appleArtist": "Rupert Holmes",
+   "appleTitle": "Escape (The Pina Colada Song)",
+   "store": "US",
+   "year": 1979,
+   "d": 1
+  },
+  {
+   "id": "ive-never-been-to-me-charlene",
+   "chartYear": 1982,
+   "firstYear": 1976,
+   "appleYear": 1982,
+   "album": "25 Best Hits of the 80's",
+   "appleArtist": "Charlene",
+   "appleTitle": "I've Never Been to Me",
+   "store": "US",
+   "year": 1976,
+   "d": 2
+  },
+  {
+   "id": "crazy-little-thing-called-love-queen",
+   "appleYear": 1979,
+   "album": "The Game (Deluxe Edition)",
+   "appleArtist": "Queen",
+   "appleTitle": "Crazy Little Thing Called Love",
+   "store": "US",
+   "year": 1979,
+   "d": 1
+  },
+  {
+   "id": "rock-with-you-michael-jackson",
+   "appleYear": 1979,
+   "album": "Off the Wall",
+   "appleArtist": "Michael Jackson",
+   "appleTitle": "Rock with You (Single Version)",
+   "store": "US",
+   "year": 1979,
+   "d": 1
   }
  ]
 }

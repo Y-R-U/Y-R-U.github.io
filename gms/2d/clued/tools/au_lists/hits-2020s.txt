@@ -3,10 +3,6 @@
 @icon 🔥
 @sources [{"name":"Billboard Year-End Hot 100 singles (2020s)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2020"},{"name":"UK year-end best-selling singles (Music Week / Official Charts Company)","url":"https://www.officialcharts.com/charts/end-of-year-singles-chart/"},{"name":"ARIA year-end singles chart","url":"https://www.aria.com.au/charts/2020/singles-chart"},{"name":"Wikipedia pageviews (lasting fame) and Wikidata (artist country)","url":"https://www.wikidata.org/"}]
 # chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
-2019 | Dua Lipa | Don't Start Now | us=4 uk=6 au=3 pv=4976 from=GBR/ALB/XKX | d=1
-2019 | Harry Styles | Watermelon Sugar | us=20 uk=10 au=6 pv=7319 from=GBR | d=1
-2019 | Harry Styles | Adore You | us=6 uk=16 au=11 pv=2836 from=GBR
-2019 | Post Malone | Circles | us=2 uk=50 au=7 pv=3983 from=USA
 2020 | Dua Lipa | Levitating | us=1 uk=6 au=5 pv=9162 from=GBR/ALB/XKX | d=1
 2020 | Glass Animals | Heat Waves | us=1 uk=7 au=1 pv=6368 from=GBR
 2020 | The Weeknd | Save Your Tears | us=2 uk=4 au=8 pv=7272 from=CAN
@@ -18,13 +14,10 @@
 2020 | Roddy Ricch | The Box | us=3 uk=12 au=14 pv=3379 from=USA
 2020 | DaBaby | Rockstar | us=5 uk=7 au=5 pv=1704 from=USA
 2020 | Saint Jhn | Roses | us=19 uk=3 au=2 pv=1581 from=USA
-2020 | Lewis Capaldi | Before You Go | us=21 uk=4 au=8 pv=2247 from=GBR
 2020 | Justin Bieber | Intentions | us=17 uk=30 au=9 pv=1883 from=CAN
-2020 | Billie Eilish | Everything I Wanted | us=18 uk=29 au=38 pv=3444 from=USA
 2020 | Powfu | Death Bed | us=43 uk=21 au=20 pv=3187 from=CAN
 2020 | Future | Life Is Good | us=7 uk=22 au=39 pv=1495 from=USA
 2020 | Lady Gaga and Ariana Grande | Rain on Me | us=48 uk=17 au=35 pv=5946 from=USA
-2020 | Arizona Zervas | Roxanne | us=16 uk=31 au=29 pv=1302 from=USA
 2020 | Megan Thee Stallion | Savage | us=15 uk=36 au=40 pv=2425 from=USA
 2020 | Dua Lipa | Break My Heart | us=33 uk=43 au=31 pv=4098 from=GBR/ALB/XKX
 2020 | Drake | Toosie Slide | us=32 uk=25 au=37 pv=1981 from=CAN/USA
@@ -69,7 +62,6 @@
 2022 | Sam Smith & Kim Petras | Unholy | us=11 uk=31 au=19 pv=7019 from=GBR | am=sam smith; d=1; kids=0
 2022 | Metro Boomin, The Weeknd & 21 Savage | Creepin' | us=5 uk=23 au=16 pv=2983 from=USA | am=metro boomin
 2022 | Jack Harlow | First Class | us=6 uk=28 au=8 pv=1707 from=USA
-2022 | Kate Bush | Running Up That Hill (A Deal with God) | us=23 uk=6 au=11 pv=35792 from=GBR
 2022 | David Guetta and Bebe Rexha | I'm Good (Blue) | us=10 uk=13 au=23 pv=6094 from=FRA
 2022 | Gayle | ABCDEFU | us=17 uk=17 au=12 pv=3685 from=USA
 2022 | Carolina Gaitán, Mauro Castillo, Adassa, Rhenzy Feliz, Diane Guerrero, Stephanie Beatriz and the Encanto cast | We Don't Talk About Bruno | us=24 uk=11 au=38 pv=7448 from=COL

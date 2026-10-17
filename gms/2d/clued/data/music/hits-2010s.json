@@ -45,77 +45,6 @@
  },
  "items": [
   {
-   "id": "hey-soul-sister-train",
-   "name": "Hey, Soul Sister",
-   "group": "2000s",
-   "facts": {
-    "artist": "Train",
-    "year": 2009,
-    "decade": "2000s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "us": 3,
-    "uk": 84,
-    "au": 4
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Hey, Soul Sister\" by Train, released in 2009. Year-end charts: the US #3, the UK #84, Australia #4.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/22/b2/3b/22b23b2d-db40-0fa1-b714-140aff15ecbe/mzaf_699506205855316636.plus.aac.p.m4a",
-      "credit": "Train: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/hey-soul-sister/425320463?i=425320500&uo=4",
-      "apple": {
-       "trackId": 425320500,
-       "url": "https://music.apple.com/us/album/hey-soul-sister/425320463?i=425320500&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/fa/e8/28/fae8283a-ad10-a642-1d41-a4b3402da4ba/884977817027.jpg/300x300bb.jpg",
-       "term": "Train Hey, Soul Sister"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
-   "id": "tik-tok-kesha",
-   "name": "TiK ToK",
-   "group": "2000s",
-   "facts": {
-    "artist": "Kesha",
-    "year": 2009,
-    "decade": "2000s",
-    "act": "Female solo artist"
-   },
-   "charts": {
-    "us": 1,
-    "uk": 45
-   },
-   "artistCountry": "USA",
-   "blurb": "\"TiK ToK\" by Kesha, released in 2009. Year-end charts: the US #1, the UK #45.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ca/c4/5d/cac45d18-3920-16ab-33b9-5b85cc5e394b/mzaf_18125601085374059686.plus.aac.p.m4a",
-      "credit": "Kesha: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/tik-tok/381237317?i=381237322&uo=4",
-      "apple": {
-       "trackId": 381237322,
-       "url": "https://music.apple.com/us/album/tik-tok/381237317?i=381237322&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/92/d2/a7/92d2a780-3aa9-8b58-b753-62e4175dd2ec/884977451856.jpg/300x300bb.jpg",
-       "term": "Kesha TiK ToK"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
    "id": "love-the-way-you-lie-eminem",
    "name": "Love the Way You Lie",
    "group": "2010s",
@@ -588,42 +517,6 @@
    "difficulty": 3,
    "explicit": true,
    "kids": false
-  },
-  {
-   "id": "in-my-head-jason-derulo",
-   "name": "In My Head",
-   "group": "2010s",
-   "facts": {
-    "artist": "Jason Derulo",
-    "year": 2010,
-    "decade": "2010s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 14,
-    "uk": 40,
-    "au": 13
-   },
-   "artistCountry": "USA",
-   "blurb": "\"In My Head\" by Jason Derulo, released in 2010. Year-end charts: the US #14, the UK #40, Australia #13.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d3/0a/9a/d30a9a07-e2dd-78ee-cecd-a44ca50bf032/mzaf_14167067778678001690.plus.aac.p.m4a",
-      "credit": "Jason Derulo: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/in-my-head-feat-nicki-minaj/446308124?i=446308126&uo=4",
-      "apple": {
-       "trackId": 446308126,
-       "url": "https://music.apple.com/us/album/in-my-head-feat-nicki-minaj/446308124?i=446308126&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e5/02/e0/e502e027-a708-e341-2e82-a6eec28f3b46/mzi.emrxzqxr.jpg/300x300bb.jpg",
-       "term": "Jason Derulo In My Head"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
   },
   {
    "id": "not-afraid-eminem",
@@ -1897,7 +1790,7 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 2
   },
   {
    "id": "the-a-team-ed-sheeran",
@@ -4451,7 +4344,7 @@
    "group": "2010s",
    "facts": {
     "artist": "Nico & Vinz",
-    "year": 2014,
+    "year": 2013,
     "decade": "2010s"
    },
    "charts": {
@@ -4460,7 +4353,7 @@
     "au": 16
    },
    "artistCountry": "NOR",
-   "blurb": "\"Am I Wrong\" by Nico & Vinz, released in 2014. Year-end charts: the US #14, the UK #21, Australia #16.",
+   "blurb": "\"Am I Wrong\" by Nico & Vinz, released in 2013; year-end charts 2014: the US #14, the UK #21, Australia #16.",
    "media": {
     "audio": [
      {
@@ -4699,7 +4592,7 @@
    "group": "2010s",
    "facts": {
     "artist": "George Ezra",
-    "year": 2014,
+    "year": 2013,
     "decade": "2010s",
     "act": "Male solo artist"
    },
@@ -4709,7 +4602,7 @@
     "au": 19
    },
    "artistCountry": "GBR",
-   "blurb": "\"Budapest\" by George Ezra, released in 2014. Year-end charts: the US #89, the UK #10, Australia #19.",
+   "blurb": "\"Budapest\" by George Ezra, released in 2013; year-end charts 2014–2015: the US #89, the UK #10, Australia #19.",
    "media": {
     "audio": [
      {
@@ -5497,7 +5390,7 @@
    "group": "2010s",
    "facts": {
     "artist": "Sia",
-    "year": 2014,
+    "year": 2013,
     "decade": "2010s",
     "act": "Female solo artist"
    },
@@ -5507,7 +5400,7 @@
     "au": 14
    },
    "artistCountry": "AUS",
-   "blurb": "\"Elastic Heart\" by Sia, released in 2014. Year-end charts: the US #52, the UK #32, Australia #14.",
+   "blurb": "\"Elastic Heart\" by Sia, released in 2013; year-end charts 2015: the US #52, the UK #32, Australia #14.",
    "media": {
     "audio": [
      {
@@ -5894,7 +5787,7 @@
    "group": "2010s",
    "facts": {
     "artist": "James Bay",
-    "year": 2015,
+    "year": 2014,
     "decade": "2010s",
     "act": "Male solo artist"
    },
@@ -5903,7 +5796,7 @@
     "au": 19
    },
    "artistCountry": "GBR",
-   "blurb": "\"Hold Back the River\" by James Bay, released in 2015. Year-end charts: the UK #8, Australia #19.",
+   "blurb": "\"Hold Back the River\" by James Bay, released in 2014; year-end charts 2015: the UK #8, Australia #19.",
    "media": {
     "audio": [
      {
@@ -6005,7 +5898,7 @@
    "group": "2010s",
    "facts": {
     "artist": "Sia",
-    "year": 2016,
+    "year": 2015,
     "decade": "2010s",
     "act": "Female solo artist"
    },
@@ -6015,7 +5908,7 @@
     "au": 8
    },
    "artistCountry": "AUS",
-   "blurb": "\"Cheap Thrills\" by Sia, released in 2016. Year-end charts: the US #11, the UK #3, Australia #8.",
+   "blurb": "\"Cheap Thrills\" by Sia, released in 2015; year-end charts 2016: the US #11, the UK #3, Australia #8.",
    "media": {
     "audio": [
      {
@@ -6557,7 +6450,7 @@
    "group": "2010s",
    "facts": {
     "artist": "Desiigner",
-    "year": 2016,
+    "year": 2015,
     "decade": "2010s",
     "act": "Male solo artist"
    },
@@ -6567,7 +6460,7 @@
     "au": 38
    },
    "artistCountry": "USA",
-   "blurb": "\"Panda\" by Desiigner, released in 2016. Year-end charts: the US #6, the UK #36, Australia #38.",
+   "blurb": "\"Panda\" by Desiigner, released in 2015; year-end charts 2016: the US #6, the UK #36, Australia #38.",
    "media": {
     "audio": [
      {
@@ -8273,7 +8166,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "without-me-halsey",
@@ -9125,7 +9018,7 @@
    "group": "2010s",
    "facts": {
     "artist": "Post Malone",
-    "year": 2019,
+    "year": 2018,
     "decade": "2010s",
     "act": "Male solo artist"
    },
@@ -9135,7 +9028,7 @@
     "au": 7
    },
    "artistCountry": "USA",
-   "blurb": "\"Wow\" by Post Malone, released in 2019. Year-end charts: the US #5, the UK #17, Australia #7.",
+   "blurb": "\"Wow\" by Post Malone, released in 2018; year-end charts 2019: the US #5, the UK #17, Australia #7.",
    "media": {
     "audio": [
      {
@@ -9418,7 +9311,7 @@
    "group": "2010s",
    "facts": {
     "artist": "Lizzo",
-    "year": 2019,
+    "year": 2016,
     "decade": "2010s",
     "act": "Female solo artist"
    },
@@ -9428,7 +9321,7 @@
     "au": 48
    },
    "artistCountry": "USA",
-   "blurb": "\"Good as Hell\" by Lizzo, released in 2019. Year-end charts: the US #31, the UK #68, Australia #48.",
+   "blurb": "\"Good as Hell\" by Lizzo, released in 2016; year-end charts 2019–2020: the US #31, the UK #68, Australia #48.",
    "media": {
     "audio": [
      {
@@ -9773,6 +9666,265 @@
    "difficulty": 2,
    "explicit": true,
    "kids": false
+  },
+  {
+   "id": "before-you-go-lewis-capaldi",
+   "name": "Before You Go",
+   "group": "2010s",
+   "facts": {
+    "artist": "Lewis Capaldi",
+    "year": 2019,
+    "decade": "2010s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 21,
+    "uk": 4,
+    "au": 8
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Before You Go\" by Lewis Capaldi, released in 2019; year-end charts 2020–2021: the US #21, the UK #4, Australia #8.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/27/43/38/2743383c-f0a0-2e97-cbd0-2ff6bf0d382d/mzaf_13019359257674877387.plus.aac.p.m4a",
+      "credit": "Lewis Capaldi: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/before-you-go-orchestral/1527103351?i=1527103352&uo=4",
+      "apple": {
+       "trackId": 1527103352,
+       "url": "https://music.apple.com/us/album/before-you-go-orchestral/1527103351?i=1527103352&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/5e/b5/aa5eb5a7-c276-f993-e26c-0b67cb6f6fc1/20UMGIM65379.rgb.jpg/300x300bb.jpg",
+       "term": "Lewis Capaldi Before You Go"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "everything-i-wanted-billie-eilish",
+   "name": "Everything I Wanted",
+   "group": "2010s",
+   "facts": {
+    "artist": "Billie Eilish",
+    "year": 2019,
+    "decade": "2010s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 18,
+    "uk": 29,
+    "au": 38
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Everything I Wanted\" by Billie Eilish, released in 2019; year-end charts 2020: the US #18, the UK #29, Australia #38.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/23/f3/6b/23f36bc0-9edc-8d55-df7f-7b806310d4b4/mzaf_15718469078111904528.plus.aac.p.m4a",
+      "credit": "Billie Eilish: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/everything-i-wanted/1487502456?i=1487502476&uo=4",
+      "apple": {
+       "trackId": 1487502476,
+       "url": "https://music.apple.com/us/album/everything-i-wanted/1487502456?i=1487502476&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/c5/6c/b1/c56cb16a-52c3-33b5-5189-6c65028001fb/19UM1IM00404.rgb.jpg/300x300bb.jpg",
+       "term": "Billie Eilish everything i wanted"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "roxanne-arizona-zervas",
+   "name": "Roxanne",
+   "group": "2010s",
+   "facts": {
+    "artist": "Arizona Zervas",
+    "year": 2019,
+    "decade": "2010s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 16,
+    "uk": 31,
+    "au": 29
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Roxanne\" by Arizona Zervas, released in 2019; year-end charts 2020: the US #16, the UK #31, Australia #29.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/0e/d8/57/0ed85735-222d-f853-339a-674db1deab59/mzaf_13516983249408034524.plus.aac.p.m4a",
+      "credit": "Arizona Zervas: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/roxanne/1496062760?i=1496062761&uo=4",
+      "apple": {
+       "trackId": 1496062761,
+       "url": "https://music.apple.com/us/album/roxanne/1496062760?i=1496062761&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/9c/19/1b/9c191bbf-15e1-ffd6-c36d-2e480a1a156e/886448153238.jpg/300x300bb.jpg",
+       "term": "Arizona Zervas ROXANNE"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2,
+   "explicit": true,
+   "kids": false
+  },
+  {
+   "id": "dont-start-now-dua-lipa",
+   "name": "Don't Start Now",
+   "group": "2010s",
+   "facts": {
+    "artist": "Dua Lipa",
+    "year": 2019,
+    "decade": "2010s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 4,
+    "uk": 6,
+    "au": 3
+   },
+   "artistCountry": "GBR",
+   "artistCountries": [
+    "GBR",
+    "ALB",
+    "XKX"
+   ],
+   "blurb": "\"Don't Start Now\" by Dua Lipa, released in 2019. Year-end charts: the US #4, the UK #6, Australia #3.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/24/3d/34/243d3413-a0fc-b229-f54a-1715ebd3a9ca/mzaf_11578996572221800393.plus.aac.p.m4a",
+      "credit": "Dua Lipa: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dont-start-now/1484636581?i=1484636829&uo=4",
+      "apple": {
+       "trackId": 1484636829,
+       "url": "https://music.apple.com/us/album/dont-start-now/1484636581?i=1484636829&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/41/ee/66/41ee66fa-f8dd-7e82-155a-3a1b360dc562/190295322175.jpg/300x300bb.jpg",
+       "term": "Dua Lipa Don't Start Now"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "watermelon-sugar-harry-styles",
+   "name": "Watermelon Sugar",
+   "group": "2010s",
+   "facts": {
+    "artist": "Harry Styles",
+    "year": 2019,
+    "decade": "2010s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 20,
+    "uk": 10,
+    "au": 6
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Watermelon Sugar\" by Harry Styles, released in 2019. Year-end charts: the US #20, the UK #10, Australia #6.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/25/54/81/255481c0-1ef2-c1bc-f3b3-ea2b1419c1f1/mzaf_5289557126888202047.plus.aac.p.m4a",
+      "credit": "Harry Styles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/watermelon-sugar/1485802965?i=1485802967&uo=4",
+      "apple": {
+       "trackId": 1485802967,
+       "url": "https://music.apple.com/us/album/watermelon-sugar/1485802965?i=1485802967&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/300x300bb.jpg",
+       "term": "Harry Styles Watermelon Sugar"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "adore-you-harry-styles",
+   "name": "Adore You",
+   "group": "2010s",
+   "facts": {
+    "artist": "Harry Styles",
+    "year": 2019,
+    "decade": "2010s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 6,
+    "uk": 16,
+    "au": 11
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Adore You\" by Harry Styles, released in 2019. Year-end charts: the US #6, the UK #16, Australia #11.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/75/41/de/7541ded7-1699-85a7-0723-65f913ecc8a8/mzaf_8413154903682037570.plus.aac.p.m4a",
+      "credit": "Harry Styles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/adore-you/1485802965?i=1485802970&uo=4",
+      "apple": {
+       "trackId": 1485802970,
+       "url": "https://music.apple.com/us/album/adore-you/1485802965?i=1485802970&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/300x300bb.jpg",
+       "term": "Harry Styles Adore You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "circles-post-malone",
+   "name": "Circles",
+   "group": "2010s",
+   "facts": {
+    "artist": "Post Malone",
+    "year": 2019,
+    "decade": "2010s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 2,
+    "uk": 50,
+    "au": 7
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Circles\" by Post Malone, released in 2019. Year-end charts: the US #2, the UK #50, Australia #7.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f9/b1/aa/f9b1aaed-3e24-227f-153d-99969f8b8464/mzaf_6272498007975402144.plus.aac.p.m4a",
+      "credit": "Post Malone: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/circles/1477880265?i=1477880561&uo=4",
+      "apple": {
+       "trackId": 1477880561,
+       "url": "https://music.apple.com/us/album/circles/1477880265?i=1477880561&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7b/1b/1b/7b1b1b0b-7ce2-b223-f9e0-8e36abe51877/19UMGIM78325.rgb.jpg/300x300bb.jpg",
+       "term": "Post Malone Circles"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
   }
  ],
  "questions": [],
@@ -9798,5 +9950,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-13"
+ "built": "2026-10-17"
 }

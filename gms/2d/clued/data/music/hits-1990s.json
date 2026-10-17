@@ -332,78 +332,6 @@
    "difficulty": 2
   },
   {
-   "id": "it-must-have-been-love-roxette",
-   "name": "It Must Have Been Love",
-   "group": "1990s",
-   "facts": {
-    "artist": "Roxette",
-    "year": 1990,
-    "decade": "1990s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "us": 2,
-    "uk": 14,
-    "au": 4
-   },
-   "artistCountry": "SWE",
-   "blurb": "\"It Must Have Been Love\" by Roxette, released in 1990. Year-end charts: the US #2, the UK #14, Australia #4.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/10/39/d7/1039d79f-931d-f74f-05ee-42232346157f/mzaf_15605068770237194498.plus.aac.p.m4a",
-      "credit": "Roxette: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/it-must-have-been-love-l-a-version-1992/976541442?i=976541449&uo=4",
-      "apple": {
-       "trackId": 976541449,
-       "url": "https://music.apple.com/us/album/it-must-have-been-love-l-a-version-1992/976541442?i=976541449&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/18/72/e3/1872e3d5-20d4-dcf1-c3af-a87a553b296c/825646124688.jpg/300x300bb.jpg",
-       "term": "Roxette It Must Have Been Love"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
-   "id": "black-velvet-alannah-myles",
-   "name": "Black Velvet",
-   "group": "1990s",
-   "facts": {
-    "artist": "Alannah Myles",
-    "year": 1990,
-    "decade": "1990s",
-    "act": "Female solo artist"
-   },
-   "charts": {
-    "us": 18,
-    "uk": 18,
-    "au": 13
-   },
-   "artistCountry": "CAN",
-   "blurb": "\"Black Velvet\" by Alannah Myles, released in 1990. Year-end charts: the US #18, the UK #18, Australia #13.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/b9/9e/ecb99e49-c661-d370-027b-b08c68be990d/mzaf_15413575699994555090.plus.aac.p.m4a",
-      "credit": "Alannah Myles: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/black-velvet/1837530989?i=1837530994&uo=4",
-      "apple": {
-       "trackId": 1837530994,
-       "url": "https://music.apple.com/us/album/black-velvet/1837530989?i=1837530994&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/af/ac/b1/afacb116-c6e9-ae05-a3e5-efdd6ded7094/199538722796.jpg/300x300bb.jpg",
-       "term": "Alannah Myles Black Velvet"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "how-am-i-supposed-to-live-without-you-michael-bolton",
    "name": "How Am I Supposed to Live Without You",
    "group": "1990s",
@@ -616,41 +544,6 @@
    "difficulty": 2
   },
   {
-   "id": "sacrifice-elton-john",
-   "name": "Sacrifice",
-   "group": "1990s",
-   "facts": {
-    "artist": "Elton John",
-    "year": 1990,
-    "decade": "1990s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "uk": 3,
-    "au": 47
-   },
-   "artistCountry": "GBR",
-   "blurb": "\"Sacrifice\" by Elton John, released in 1990. Year-end charts: the UK #3, Australia #47.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d5/58/f1/d558f18e-b2f6-b8f5-9a4f-3a56736fedeb/mzaf_4413104975256182874.plus.aac.p.m4a",
-      "credit": "Elton John: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/sacrifice/1452863377?i=1452865752&uo=4",
-      "apple": {
-       "trackId": 1452865752,
-       "url": "https://music.apple.com/us/album/sacrifice/1452863377?i=1452865752&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/f1/2a/0a/f12a0a94-5c3f-82d7-4faf-38873cbf77fe/06UMGIM01420.rgb.jpg/300x300bb.jpg",
-       "term": "Elton John Sacrifice"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
    "id": "justify-my-love-madonna",
    "name": "Justify My Love",
    "group": "1990s",
@@ -747,41 +640,6 @@
        "url": "https://music.apple.com/us/album/mona/349899416?i=349899417&uo=4",
        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/93/b9/d2/mzi.yjghxrhs.jpg/300x300bb.jpg",
        "term": "Craig McLachlan & Check 1-2 Mona"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
-   "id": "janies-got-a-gun-aerosmith",
-   "name": "Janie's Got a Gun",
-   "group": "1990s",
-   "facts": {
-    "artist": "Aerosmith",
-    "year": 1990,
-    "decade": "1990s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "us": 61,
-    "au": 19
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Janie's Got a Gun\" by Aerosmith, released in 1990. Year-end charts: the US #61, Australia #19.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8e/7a/7b/8e7a7b4b-792a-8e32-025d-6cf97b8bd16e/mzaf_15564791630200989525.plus.aac.p.m4a",
-      "credit": "Aerosmith: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/janies-got-a-gun/1660109451?i=1660110046&uo=4",
-      "apple": {
-       "trackId": 1660110046,
-       "url": "https://music.apple.com/us/album/janies-got-a-gun/1660109451?i=1660110046&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/ac/26/c0/ac26c0ad-13c6-c965-0298-eae523313a3c/22UM1IM35689.rgb.jpg/300x300bb.jpg",
-       "term": "Aerosmith Janie's Got a Gun"
       },
       "dur": 30
      }
@@ -1445,7 +1303,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Seal",
-    "year": 1991,
+    "year": 1990,
     "decade": "1990s",
     "act": "Male solo artist"
    },
@@ -1455,7 +1313,7 @@
     "au": 46
    },
    "artistCountry": "GBR",
-   "blurb": "\"Crazy\" by Seal, released in 1991. Year-end charts: the US #75, the UK #38, Australia #46.",
+   "blurb": "\"Crazy\" by Seal, released in 1990; year-end charts 1991: the US #75, the UK #38, Australia #46.",
    "media": {
     "audio": [
      {
@@ -1695,7 +1553,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Stevie B",
-    "year": 1991,
+    "year": 1990,
     "decade": "1990s",
     "act": "Male solo artist"
    },
@@ -1704,7 +1562,7 @@
     "au": 49
    },
    "artistCountry": "USA",
-   "blurb": "\"Because I Love You (The Postman Song)\" by Stevie B, released in 1991. Year-end charts: the US #12, Australia #49.",
+   "blurb": "\"Because I Love You (The Postman Song)\" by Stevie B, released in 1990; year-end charts 1991: the US #12, Australia #49.",
    "media": {
     "audio": [
      {
@@ -2767,7 +2625,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Haddaway",
-    "year": 1993,
+    "year": 1992,
     "decade": "1990s",
     "act": "Male solo artist"
    },
@@ -2780,7 +2638,7 @@
     "TTO",
     "DEU"
    ],
-   "blurb": "\"What Is Love\" by Haddaway, released in 1993. Year-end charts: the US #82, the UK #8.",
+   "blurb": "\"What Is Love\" by Haddaway, released in 1992; year-end charts 1993–1994: the US #82, the UK #8.",
    "media": {
     "audio": [
      {
@@ -2880,7 +2738,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Ace of Base",
-    "year": 1993,
+    "year": 1992,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -2890,7 +2748,7 @@
     "au": 9
    },
    "artistCountry": "SWE",
-   "blurb": "\"All That She Wants\" by Ace of Base, released in 1993. Year-end charts: the US #9, the UK #3, Australia #9.",
+   "blurb": "\"All That She Wants\" by Ace of Base, released in 1992; year-end charts 1993–1994: the US #9, the UK #3, Australia #9.",
    "media": {
     "audio": [
      {
@@ -2916,7 +2774,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Snow",
-    "year": 1993,
+    "year": 1992,
     "decade": "1990s",
     "act": "Male solo artist"
    },
@@ -2926,7 +2784,7 @@
     "au": 6
    },
    "artistCountry": "CAN",
-   "blurb": "\"Informer\" by Snow, released in 1993. Year-end charts: the US #10, the UK #17, Australia #6.",
+   "blurb": "\"Informer\" by Snow, released in 1992; year-end charts 1993: the US #10, the UK #17, Australia #6.",
    "media": {
     "audio": [
      {
@@ -4355,7 +4213,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Reel 2 Real",
-    "year": 1994,
+    "year": 1993,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -4364,7 +4222,7 @@
     "au": 40
    },
    "artistCountry": "USA",
-   "blurb": "\"I Like to Move It\" by Reel 2 Real, released in 1994. Year-end charts: the UK #15, Australia #40.",
+   "blurb": "\"I Like to Move It\" by Reel 2 Real, released in 1993; year-end charts 1994: the UK #15, Australia #40.",
    "media": {
     "audio": [
      {
@@ -5249,7 +5107,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Scatman John",
-    "year": 1995,
+    "year": 1994,
     "decade": "1990s",
     "act": "Male solo artist"
    },
@@ -5258,7 +5116,7 @@
     "au": 38
    },
    "artistCountry": "USA",
-   "blurb": "\"Scatman (Ski Ba Bop Ba Dop Bop)\" by Scatman John, released in 1995. Year-end charts: the UK #30, Australia #38.",
+   "blurb": "\"Scatman (Ski Ba Bop Ba Dop Bop)\" by Scatman John, released in 1994; year-end charts 1995: the UK #30, Australia #38.",
    "media": {
     "audio": [
      {
@@ -5352,7 +5210,7 @@
    "group": "1990s",
    "facts": {
     "artist": "N-Trance",
-    "year": 1995,
+    "year": 1994,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -5361,7 +5219,7 @@
     "au": 39
    },
    "artistCountry": "GBR",
-   "blurb": "\"Set You Free\" by N-Trance, released in 1995. Year-end charts: the UK #17, Australia #39.",
+   "blurb": "\"Set You Free\" by N-Trance, released in 1994; year-end charts 1995: the UK #17, Australia #39.",
    "media": {
     "audio": [
      {
@@ -5527,7 +5385,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Celine Dion",
-    "year": 1996,
+    "year": 1995,
     "decade": "1990s",
     "act": "Female solo artist"
    },
@@ -5537,7 +5395,7 @@
     "au": 3
    },
    "artistCountry": "CAN",
-   "blurb": "\"Because You Loved Me\" by Celine Dion, released in 1996. Year-end charts: the US #3, the UK #27, Australia #3.",
+   "blurb": "\"Because You Loved Me\" by Celine Dion, released in 1995; year-end charts 1996: the US #3, the UK #27, Australia #3.",
    "media": {
     "audio": [
      {
@@ -5670,7 +5528,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Los del Río",
-    "year": 1996,
+    "year": 1993,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -5680,7 +5538,7 @@
     "au": 1
    },
    "artistCountry": "ESP",
-   "blurb": "\"Macarena\" by Los del Río, released in 1996. Year-end charts: the US #1, the UK #22, Australia #1.",
+   "blurb": "\"Macarena\" by Los del Río, released in 1993; year-end charts 1996–1997: the US #1, the UK #22, Australia #1.",
    "media": {
     "audio": [
      {
@@ -6030,7 +5888,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Robert Miles",
-    "year": 1996,
+    "year": 1995,
     "decade": "1990s",
     "act": "Male solo artist"
    },
@@ -6040,7 +5898,7 @@
     "au": 32
    },
    "artistCountry": "ITA",
-   "blurb": "\"Children\" by Robert Miles, released in 1996. Year-end charts: the US #65, the UK #8, Australia #32.",
+   "blurb": "\"Children\" by Robert Miles, released in 1995; year-end charts 1996: the US #65, the UK #8, Australia #32.",
    "media": {
     "audio": [
      {
@@ -6278,7 +6136,7 @@
    "group": "1990s",
    "facts": {
     "artist": "La Bouche",
-    "year": 1995,
+    "year": 1994,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -6287,7 +6145,7 @@
     "au": 18
    },
    "artistCountry": "DEU",
-   "blurb": "\"Be My Lover\" by La Bouche, released in 1995. Year-end charts: the US #23, Australia #18.",
+   "blurb": "\"Be My Lover\" by La Bouche, released in 1994; year-end charts 1996: the US #23, Australia #18.",
    "media": {
     "audio": [
      {
@@ -6893,7 +6751,7 @@
    "group": "1990s",
    "facts": {
     "artist": "R. Kelly",
-    "year": 1997,
+    "year": 1996,
     "decade": "1990s",
     "act": "Male solo artist"
    },
@@ -6902,7 +6760,7 @@
     "uk": 14
    },
    "artistCountry": "USA",
-   "blurb": "\"I Believe I Can Fly\" by R. Kelly, released in 1997. Year-end charts: the US #6, the UK #14.",
+   "blurb": "\"I Believe I Can Fly\" by R. Kelly, released in 1996; year-end charts 1997: the US #6, the UK #14.",
    "media": {
     "audio": [
      {
@@ -7250,7 +7108,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Savage Garden",
-    "year": 1997,
+    "year": 1996,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -7259,7 +7117,7 @@
     "au": 17
    },
    "artistCountry": "AUS",
-   "blurb": "\"To the Moon and Back\" by Savage Garden, released in 1997. Year-end charts: the UK #30, Australia #17.",
+   "blurb": "\"To the Moon and Back\" by Savage Garden, released in 1996; year-end charts 1997–1998: the UK #30, Australia #17.",
    "media": {
     "audio": [
      {
@@ -7639,40 +7497,6 @@
     ]
    },
    "difficulty": 1
-  },
-  {
-   "id": "its-like-that-run-d-m-c-vs-jason-nevins",
-   "name": "It's Like That",
-   "group": "1990s",
-   "facts": {
-    "artist": "Run–D.M.C. vs. Jason Nevins",
-    "year": 1997,
-    "decade": "1990s"
-   },
-   "charts": {
-    "uk": 3,
-    "au": 2
-   },
-   "artistCountry": "USA",
-   "blurb": "\"It's Like That\" by Run–D.M.C. vs. Jason Nevins, released in 1997. Year-end charts: the UK #3, Australia #2.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e8/d3/fe/e8d3fe4e-0dca-cb8f-7053-440a829a4ee5/mzaf_3142322185420814435.plus.aac.p.m4a",
-      "credit": "Run–D.M.C. vs. Jason Nevins: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/gb/album/its-like-that/312637584?i=312637994&uo=4",
-      "apple": {
-       "trackId": 312637994,
-       "url": "https://music.apple.com/gb/album/its-like-that/312637584?i=312637994&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/b5/24/73/mzi.fsjrworz.jpg/300x300bb.jpg",
-       "term": "RUN-DMC vs. Jason Nevins It's Like That"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
   },
   {
    "id": "pretty-fly-for-a-white-guy-the-offspring",
@@ -8071,7 +7895,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Lighthouse Family",
-    "year": 1998,
+    "year": 1997,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -8080,7 +7904,7 @@
     "au": 11
    },
    "artistCountry": "GBR",
-   "blurb": "\"High\" by Lighthouse Family, released in 1998. Year-end charts: the UK #35, Australia #11.",
+   "blurb": "\"High\" by Lighthouse Family, released in 1997; year-end charts 1998: the UK #35, Australia #11.",
    "media": {
     "audio": [
      {
@@ -8475,7 +8299,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Eiffel 65",
-    "year": 1999,
+    "year": 1998,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -8485,7 +8309,7 @@
     "au": 3
    },
    "artistCountry": "ITA",
-   "blurb": "\"Blue (Da Ba Dee)\" by Eiffel 65, released in 1999. Year-end charts: the US #49, the UK #2, Australia #3.",
+   "blurb": "\"Blue (Da Ba Dee)\" by Eiffel 65, released in 1998; year-end charts 1999–2000: the US #49, the UK #2, Australia #3.",
    "media": {
     "audio": [
      {
@@ -9114,7 +8938,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Vengaboys",
-    "year": 1999,
+    "year": 1998,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -9123,7 +8947,7 @@
     "au": 17
    },
    "artistCountry": "NLD",
-   "blurb": "\"We Like to Party! (The Vengabus)\" by Vengaboys, released in 1999. Year-end charts: the UK #29, Australia #17.",
+   "blurb": "\"We Like to Party! (The Vengabus)\" by Vengaboys, released in 1998; year-end charts 1999: the UK #29, Australia #17.",
    "media": {
     "audio": [
      {
@@ -9283,6 +9107,74 @@
     ]
    },
    "difficulty": 2
+  },
+  {
+   "id": "never-be-the-same-again-melanie-c",
+   "name": "Never Be the Same Again",
+   "group": "1990s",
+   "facts": {
+    "artist": "Melanie C",
+    "year": 1999,
+    "decade": "1990s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "uk": 18,
+    "au": 14
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Never Be the Same Again\" by Melanie C, released in 1999; year-end charts 2000: the UK #18, Australia #14.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0e/85/e2/0e85e2aa-6ea1-bc5c-04fb-264276f2f82a/mzaf_13827864060930008810.plus.aac.p.m4a",
+      "credit": "Melanie C: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/never-be-the-same-again/724545802?i=724546269&uo=4",
+      "apple": {
+       "trackId": 724546269,
+       "url": "https://music.apple.com/us/album/never-be-the-same-again/724545802?i=724546269&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a7/29/6d/a7296db0-4792-31b9-1abc-394441db12e5/13ULAIM49428.rgb.jpg/300x300bb.jpg",
+       "term": "Melanie C Never Be the Same Again"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "maria-maria-santana",
+   "name": "Maria Maria",
+   "group": "1990s",
+   "facts": {
+    "artist": "Santana",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "charts": {
+    "us": 3
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Maria Maria\" by Santana, released in 1999. Year-end charts: the US #3.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/33/a0/f8/33a0f89e-4d1e-44a3-5b29-07629f62e22a/mzaf_10671385530310908346.plus.aac.p.m4a",
+      "credit": "Santana: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/maria-maria-feat-the-product-g-b/1726954467?i=1726954846&uo=4",
+      "apple": {
+       "trackId": 1726954846,
+       "url": "https://music.apple.com/us/album/maria-maria-feat-the-product-g-b/1726954467?i=1726954846&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/20/31/8f/20318f92-bfc3-452e-1d1f-95a86366afc3/196871785426.jpg/300x300bb.jpg",
+       "term": "Santana Maria Maria"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
   }
  ],
  "questions": [],
@@ -9308,5 +9200,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-13"
+ "built": "2026-10-17"
 }

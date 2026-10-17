@@ -1129,15 +1129,15 @@
    "media": {
     "audio": [
      {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6d/cd/11/6dcd1170-d3a7-2fd7-87a3-55377251a463/mzaf_5578227239503922898.plus.aac.p.m4a",
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c0/72/17/c07217c9-c2ff-8f96-abc9-5a6c42464d69/mzaf_5036872155813968561.plus.aac.p.m4a",
       "credit": "Bob Marley & The Wailers: 30-second preview courtesy of Apple Music",
       "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/no-woman-no-cry/447628136?i=447628159&uo=4",
+      "page": "https://music.apple.com/us/album/no-woman-no-cry/1440861483?i=1440861526&uo=4",
       "apple": {
-       "trackId": 447628159,
-       "url": "https://music.apple.com/us/album/no-woman-no-cry/447628136?i=447628159&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/05/65/87/mzi.ojueazhq.jpg/300x300bb.jpg",
-       "term": "Ángeles & Bob Marley No Woman No Cry"
+       "trackId": 1440861526,
+       "url": "https://music.apple.com/us/album/no-woman-no-cry/1440861483?i=1440861526&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/b9/ec/9f/b9ec9f4a-c4f1-5136-7587-86826e28d67b/06UMGIM34964.rgb.jpg/300x300bb.jpg",
+       "term": "Bob Marley & The Wailers No Woman, No Cry"
       },
       "dur": 30,
       "title": "No Woman, No Cry"
@@ -2049,15 +2049,15 @@
       "title": "Sultans of Swing"
      },
      {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/3a/0a/fe/3a0afe4f-6a40-2bfc-06b4-c7d876923384/mzaf_11343011571794572089.plus.aac.p.m4a",
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/53/76/3e/53763eca-4074-40f4-6371-65887f979361/mzaf_7155839044380445720.plus.aac.p.m4a",
       "credit": "Dire Straits: 30-second preview courtesy of Apple Music",
       "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/money-for-nothing/602192125?i=602192564&uo=4",
+      "page": "https://music.apple.com/us/album/money-for-nothing/1813832408?i=1813832413&uo=4",
       "apple": {
-       "trackId": 602192564,
-       "url": "https://music.apple.com/us/album/money-for-nothing/602192125?i=602192564&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music2/v4/21/84/c6/2184c667-7c8d-4644-a816-b3bceb5d6ba2/DireStraits.jpg/300x300bb.jpg",
-       "term": "Dire Strats Money For Nothing"
+       "trackId": 1813832413,
+       "url": "https://music.apple.com/us/album/money-for-nothing/1813832408?i=1813832413&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/af/15/bf/af15bf49-3d46-1bf2-99a7-faad001a8c02/603497812400.jpg/300x300bb.jpg",
+       "term": "Dire Straits Money for Nothing"
       },
       "dur": 30,
       "title": "Money for Nothing"
@@ -6303,5 +6303,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-13"
+ "built": "2026-10-17"
 }

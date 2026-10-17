@@ -45,76 +45,6 @@
  },
  "items": [
   {
-   "id": "crazy-little-thing-called-love-queen",
-   "name": "Crazy Little Thing Called Love",
-   "group": "1970s",
-   "facts": {
-    "artist": "Queen",
-    "year": 1979,
-    "decade": "1970s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "us": 6,
-    "uk": 25,
-    "au": 3
-   },
-   "artistCountry": "GBR",
-   "blurb": "\"Crazy Little Thing Called Love\" by Queen, released in 1979. Year-end charts: the US #6, the UK #25, Australia #3.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/04/f0/78/04f078ae-9d1b-2f8a-b173-8b54b0288058/mzaf_9972199097319129995.plus.aac.p.m4a",
-      "credit": "Queen: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/crazy-little-thing-called-love/6781076388?i=6781076401&uo=4",
-      "apple": {
-       "trackId": 6781076401,
-       "url": "https://music.apple.com/us/album/crazy-little-thing-called-love/6781076388?i=6781076401&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/08/ee/da/08eeda1f-d44d-aec1-ec9d-0c5b9f8c8536/602527717524.jpg/300x300bb.jpg",
-       "term": "Queen Crazy Little Thing Called Love"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
-   "id": "rock-with-you-michael-jackson",
-   "name": "Rock with You",
-   "group": "1970s",
-   "facts": {
-    "artist": "Michael Jackson",
-    "year": 1979,
-    "decade": "1970s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 4
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Rock with You\" by Michael Jackson, released in 1979. Year-end charts: the US #4.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ba/c3/12/bac31216-bfc5-68dd-1f86-955777ba5c77/mzaf_5177525496066876810.plus.aac.p.m4a",
-      "credit": "Michael Jackson: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/rock-with-you-single-version/186166282?i=186166358&uo=4",
-      "apple": {
-       "trackId": 186166358,
-       "url": "https://music.apple.com/us/album/rock-with-you-single-version/186166282?i=186166358&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/fe/a3/0cfea324-57c1-d530-5248-9bb591bbd7bf/074643574525.jpg/300x300bb.jpg",
-       "term": "Michael Jackson Rock with You"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
    "id": "funkytown-lipps-inc",
    "name": "Funkytown",
    "group": "1980s",
@@ -683,40 +613,6 @@
    "difficulty": 2
   },
   {
-   "id": "please-dont-go-kc-and-the-sunshine-band",
-   "name": "Please Don't Go",
-   "group": "1980s",
-   "facts": {
-    "artist": "KC and the Sunshine Band",
-    "year": 1980,
-    "decade": "1980s"
-   },
-   "charts": {
-    "us": 19,
-    "au": 10
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Please Don't Go\" by KC and the Sunshine Band, released in 1980. Year-end charts: the US #19, Australia #10.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8f/1c/72/8f1c728e-f749-5ad2-ed95-34442530e74a/mzaf_7348861842360863739.plus.aac.p.m4a",
-      "credit": "KC and the Sunshine Band: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/please-dont-go/27496656?i=27496664&uo=4",
-      "apple": {
-       "trackId": 27496664,
-       "url": "https://music.apple.com/us/album/please-dont-go/27496656?i=27496664&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/y2004/m10/d21/h13/s06.uxenjjhu.jpg/300x300bb.jpg",
-       "term": "KC and the Sunshine Band Please Don't Go"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "ashes-to-ashes-david-bowie",
    "name": "Ashes to Ashes",
    "group": "1980s",
@@ -822,41 +718,6 @@
    "difficulty": 2
   },
   {
-   "id": "coward-of-the-county-kenny-rogers",
-   "name": "Coward of the County",
-   "group": "1980s",
-   "facts": {
-    "artist": "Kenny Rogers",
-    "year": 1980,
-    "decade": "1980s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 34,
-    "uk": 9
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Coward of the County\" by Kenny Rogers, released in 1980. Year-end charts: the US #34, the UK #9.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7d/8c/37/7d8c37b0-a19a-a229-763e-7f83b069b497/mzaf_15034017920978618737.plus.aac.p.m4a",
-      "credit": "Kenny Rogers: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/coward-of-the-county/1443292623?i=1443293079&uo=4",
-      "apple": {
-       "trackId": 1443293079,
-       "url": "https://music.apple.com/us/album/coward-of-the-county/1443292623?i=1443293079&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/47/0a/99/470a9938-2d07-d4bb-768d-83b1f5be3e87/14UMGIM37189.rgb.jpg/300x300bb.jpg",
-       "term": "Kenny Rogers Coward of the County"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "crying-don-mclean",
    "name": "Crying",
    "group": "1980s",
@@ -954,47 +815,6 @@
        "url": "https://music.apple.com/us/album/fame/1454593959?i=1454593961&uo=4",
        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/28/b3/5b/28b35b08-0799-053c-b72a-3de17840fc38/794043166228.jpg/300x300bb.jpg",
        "term": "Irene Cara Fame"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
-   "id": "escape-the-pina-colada-song-rupert-holmes",
-   "name": "Escape (The Piña Colada Song)",
-   "alt": [
-    "Escape"
-   ],
-   "group": "1980s",
-   "facts": {
-    "artist": "Rupert Holmes",
-    "year": 1980,
-    "decade": "1980s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 11
-   },
-   "artistCountry": "GBR",
-   "artistCountries": [
-    "GBR",
-    "USA"
-   ],
-   "blurb": "\"Escape (The Piña Colada Song)\" by Rupert Holmes, released in 1980. Year-end charts: the US #11.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/47/63/e5/4763e510-a446-d285-2e90-b743ceae62b2/mzaf_4218584407198042659.plus.aac.p.m4a",
-      "credit": "Rupert Holmes: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/escape-the-pina-colada-song/1443846037?i=1443846163&uo=4",
-      "apple": {
-       "trackId": 1443846163,
-       "url": "https://music.apple.com/us/album/escape-the-pina-colada-song/1443846037?i=1443846163&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/3f/d7/3d/3fd73db9-d2dc-9769-8419-67ab5ae4a1f7/06UMGIM03861.rgb.jpg/300x300bb.jpg",
-       "term": "Rupert Holmes Escape"
       },
       "dur": 30
      }
@@ -2312,42 +2132,6 @@
    "difficulty": 2
   },
   {
-   "id": "ive-never-been-to-me-charlene",
-   "name": "I've Never Been to Me",
-   "group": "1980s",
-   "facts": {
-    "artist": "Charlene",
-    "year": 1982,
-    "decade": "1980s",
-    "act": "Female solo artist"
-   },
-   "charts": {
-    "us": 38,
-    "uk": 48,
-    "au": 11
-   },
-   "artistCountry": "USA",
-   "blurb": "\"I've Never Been to Me\" by Charlene, released in 1982. Year-end charts: the US #38, the UK #48, Australia #11.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/4e/04/46/4e0446a4-99cb-346d-da4d-42e0bd0dba79/mzaf_16349177011590582276.plus.aac.p.m4a",
-      "credit": "Charlene: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/ive-never-been-to-me/1171164885?i=1171166443&uo=4",
-      "apple": {
-       "trackId": 1171166443,
-       "url": "https://music.apple.com/us/album/ive-never-been-to-me/1171164885?i=1171166443&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music71/v4/c2/09/cf/c209cff6-448b-63af-9581-24730c32605d/191018391683.jpg/300x300bb.jpg",
-       "term": "Charlene I've Never Been to Me"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "heartbreaker-dionne-warwick",
    "name": "Heartbreaker",
    "group": "1980s",
@@ -2459,7 +2243,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Bertie Higgins",
-    "year": 1982,
+    "year": 1981,
     "decade": "1980s",
     "act": "Male solo artist"
    },
@@ -2468,7 +2252,7 @@
     "au": 5
    },
    "artistCountry": "USA",
-   "blurb": "\"Key Largo\" by Bertie Higgins, released in 1982. Year-end charts: the US #17, Australia #5.",
+   "blurb": "\"Key Largo\" by Bertie Higgins, released in 1981; year-end charts 1982: the US #17, Australia #5.",
    "media": {
     "audio": [
      {
@@ -2703,7 +2487,7 @@
    "group": "1980s",
    "facts": {
     "artist": "The Stranglers",
-    "year": 1982,
+    "year": 1981,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -2711,7 +2495,7 @@
     "uk": 11
    },
    "artistCountry": "GBR",
-   "blurb": "\"Golden Brown\" by The Stranglers, released in 1982. Year-end charts: the UK #11.",
+   "blurb": "\"Golden Brown\" by The Stranglers, released in 1981; year-end charts 1982: the UK #11.",
    "media": {
     "audio": [
      {
@@ -3283,7 +3067,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Joe Cocker and Jennifer Warnes",
-    "year": 1983,
+    "year": 1982,
     "decade": "1980s"
    },
    "charts": {
@@ -3291,7 +3075,7 @@
     "au": 5
    },
    "artistCountry": "GBR",
-   "blurb": "\"Up Where We Belong\" by Joe Cocker and Jennifer Warnes, released in 1983. Year-end charts: the US #27, Australia #5.",
+   "blurb": "\"Up Where We Belong\" by Joe Cocker and Jennifer Warnes, released in 1982; year-end charts 1983: the US #27, Australia #5.",
    "media": {
     "audio": [
      {
@@ -4877,7 +4661,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Tears for Fears",
-    "year": 1985,
+    "year": 1984,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -4887,7 +4671,7 @@
     "au": 14
    },
    "artistCountry": "GBR",
-   "blurb": "\"Shout\" by Tears for Fears, released in 1985. Year-end charts: the US #21, the UK #50, Australia #14.",
+   "blurb": "\"Shout\" by Tears for Fears, released in 1984; year-end charts 1985: the US #21, the UK #50, Australia #14.",
    "media": {
     "audio": [
      {
@@ -5054,7 +4838,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Dead or Alive",
-    "year": 1985,
+    "year": 1984,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -5063,7 +4847,7 @@
     "au": 13
    },
    "artistCountry": "GBR",
-   "blurb": "\"You Spin Me Round (Like a Record)\" by Dead or Alive, released in 1985. Year-end charts: the UK #19, Australia #13.",
+   "blurb": "\"You Spin Me Round (Like a Record)\" by Dead or Alive, released in 1984; year-end charts 1985: the UK #19, Australia #13.",
    "media": {
     "audio": [
      {
@@ -5228,7 +5012,7 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 2
   },
   {
    "id": "saving-all-my-love-for-you-whitney-houston",
@@ -5484,7 +5268,7 @@
    "group": "1980s",
    "facts": {
     "artist": "The Pointer Sisters",
-    "year": 1984,
+    "year": 1983,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -5493,7 +5277,7 @@
     "au": 17
    },
    "artistCountry": "USA",
-   "blurb": "\"Neutron Dance\" by The Pointer Sisters, released in 1984. Year-end charts: the US #38, Australia #17.",
+   "blurb": "\"Neutron Dance\" by The Pointer Sisters, released in 1983; year-end charts 1985: the US #38, Australia #17.",
    "media": {
     "audio": [
      {
@@ -5732,7 +5516,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Billy Ocean",
-    "year": 1986,
+    "year": 1985,
     "decade": "1980s",
     "act": "Male solo artist"
    },
@@ -5746,7 +5530,7 @@
     "TTO",
     "GBR"
    ],
-   "blurb": "\"When the Going Gets Tough, the Tough Get Going\" by Billy Ocean, released in 1986. Year-end charts: the US #31, the UK #7, Australia #2.",
+   "blurb": "\"When the Going Gets Tough, the Tough Get Going\" by Billy Ocean, released in 1985; year-end charts 1986: the US #31, the UK #7, Australia #2.",
    "media": {
     "audio": [
      {
@@ -6102,7 +5886,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Falco",
-    "year": 1986,
+    "year": 1985,
     "decade": "1980s",
     "act": "Male solo artist"
    },
@@ -6111,7 +5895,7 @@
     "uk": 13
    },
    "artistCountry": "AUT",
-   "blurb": "\"Rock Me Amadeus\" by Falco, released in 1986. Year-end charts: the US #28, the UK #13.",
+   "blurb": "\"Rock Me Amadeus\" by Falco, released in 1985; year-end charts 1986: the US #28, the UK #13.",
    "media": {
     "audio": [
      {
@@ -6204,18 +5988,18 @@
   {
    "id": "living-doll-cliff-richard-and-the-young-ones",
    "name": "Living Doll",
-   "group": "1980s",
+   "group": "1950s",
    "facts": {
     "artist": "Cliff Richard & The Young Ones",
-    "year": 1986,
-    "decade": "1980s"
+    "year": 1959,
+    "decade": "1950s"
    },
    "charts": {
     "uk": 4,
     "au": 7
    },
    "artistCountry": "GBR",
-   "blurb": "\"Living Doll\" by Cliff Richard & The Young Ones, released in 1986. Year-end charts: the UK #4, Australia #7.",
+   "blurb": "\"Living Doll\" was first released by Cliff Richard in 1959; he re-recorded it with The Young Ones for charity in 1986. Year-end charts 1986: the UK #4, Australia #7.",
    "media": {
     "audio": [
      {
@@ -8276,7 +8060,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Breathe",
-    "year": 1988,
+    "year": 1987,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -8285,7 +8069,7 @@
     "uk": 44
    },
    "artistCountry": "GBR",
-   "blurb": "\"Hands to Heaven\" by Breathe, released in 1988. Year-end charts: the US #9, the UK #44.",
+   "blurb": "\"Hands to Heaven\" by Breathe, released in 1987; year-end charts 1988: the US #9, the UK #44.",
    "media": {
     "audio": [
      {
@@ -9347,6 +9131,221 @@
     ]
    },
    "difficulty": 2
+  },
+  {
+   "id": "it-must-have-been-love-roxette",
+   "name": "It Must Have Been Love",
+   "group": "1980s",
+   "facts": {
+    "artist": "Roxette",
+    "year": 1987,
+    "decade": "1980s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 2,
+    "uk": 14,
+    "au": 4
+   },
+   "artistCountry": "SWE",
+   "blurb": "\"It Must Have Been Love\" by Roxette, released in 1987; year-end charts 1990: the US #2, the UK #14, Australia #4.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/10/39/d7/1039d79f-931d-f74f-05ee-42232346157f/mzaf_15605068770237194498.plus.aac.p.m4a",
+      "credit": "Roxette: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/it-must-have-been-love-l-a-version-1992/976541442?i=976541449&uo=4",
+      "apple": {
+       "trackId": 976541449,
+       "url": "https://music.apple.com/us/album/it-must-have-been-love-l-a-version-1992/976541442?i=976541449&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/18/72/e3/1872e3d5-20d4-dcf1-c3af-a87a553b296c/825646124688.jpg/300x300bb.jpg",
+       "term": "Roxette It Must Have Been Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "black-velvet-alannah-myles",
+   "name": "Black Velvet",
+   "group": "1980s",
+   "facts": {
+    "artist": "Alannah Myles",
+    "year": 1989,
+    "decade": "1980s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 18,
+    "uk": 18,
+    "au": 13
+   },
+   "artistCountry": "CAN",
+   "blurb": "\"Black Velvet\" by Alannah Myles, released in 1989; year-end charts 1990: the US #18, the UK #18, Australia #13.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/b9/9e/ecb99e49-c661-d370-027b-b08c68be990d/mzaf_15413575699994555090.plus.aac.p.m4a",
+      "credit": "Alannah Myles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/black-velvet/1837530989?i=1837530994&uo=4",
+      "apple": {
+       "trackId": 1837530994,
+       "url": "https://music.apple.com/us/album/black-velvet/1837530989?i=1837530994&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/af/ac/b1/afacb116-c6e9-ae05-a3e5-efdd6ded7094/199538722796.jpg/300x300bb.jpg",
+       "term": "Alannah Myles Black Velvet"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sacrifice-elton-john",
+   "name": "Sacrifice",
+   "group": "1980s",
+   "facts": {
+    "artist": "Elton John",
+    "year": 1989,
+    "decade": "1980s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "uk": 3,
+    "au": 47
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Sacrifice\" by Elton John, released in 1989; year-end charts 1990: the UK #3, Australia #47.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d5/58/f1/d558f18e-b2f6-b8f5-9a4f-3a56736fedeb/mzaf_4413104975256182874.plus.aac.p.m4a",
+      "credit": "Elton John: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sacrifice/1452863377?i=1452865752&uo=4",
+      "apple": {
+       "trackId": 1452865752,
+       "url": "https://music.apple.com/us/album/sacrifice/1452863377?i=1452865752&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/f1/2a/0a/f12a0a94-5c3f-82d7-4faf-38873cbf77fe/06UMGIM01420.rgb.jpg/300x300bb.jpg",
+       "term": "Elton John Sacrifice"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "janies-got-a-gun-aerosmith",
+   "name": "Janie's Got a Gun",
+   "group": "1980s",
+   "facts": {
+    "artist": "Aerosmith",
+    "year": 1989,
+    "decade": "1980s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 61,
+    "au": 19
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Janie's Got a Gun\" by Aerosmith, released in 1989; year-end charts 1990: the US #61, Australia #19.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8e/7a/7b/8e7a7b4b-792a-8e32-025d-6cf97b8bd16e/mzaf_15564791630200989525.plus.aac.p.m4a",
+      "credit": "Aerosmith: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/janies-got-a-gun/1660109451?i=1660110046&uo=4",
+      "apple": {
+       "trackId": 1660110046,
+       "url": "https://music.apple.com/us/album/janies-got-a-gun/1660109451?i=1660110046&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/ac/26/c0/ac26c0ad-13c6-c965-0298-eae523313a3c/22UM1IM35689.rgb.jpg/300x300bb.jpg",
+       "term": "Aerosmith Janie's Got a Gun"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "its-like-that-run-d-m-c-vs-jason-nevins",
+   "name": "It's Like That",
+   "group": "1980s",
+   "facts": {
+    "artist": "Run–D.M.C. vs. Jason Nevins",
+    "year": 1983,
+    "decade": "1980s"
+   },
+   "charts": {
+    "uk": 3,
+    "au": 2
+   },
+   "artistCountry": "USA",
+   "blurb": "\"It's Like That\" was first released by Run–D.M.C. in 1983; Jason Nevins's remix made it a hit again in 1997–98. Year-end charts 1998: the UK #3, Australia #2.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e8/d3/fe/e8d3fe4e-0dca-cb8f-7053-440a829a4ee5/mzaf_3142322185420814435.plus.aac.p.m4a",
+      "credit": "Run–D.M.C. vs. Jason Nevins: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/gb/album/its-like-that/312637584?i=312637994&uo=4",
+      "apple": {
+       "trackId": 312637994,
+       "url": "https://music.apple.com/gb/album/its-like-that/312637584?i=312637994&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/b5/24/73/mzi.fsjrworz.jpg/300x300bb.jpg",
+       "term": "RUN-DMC vs. Jason Nevins It's Like That"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "running-up-that-hill-a-deal-with-god-kate-bush",
+   "name": "Running Up That Hill (A Deal with God)",
+   "alt": [
+    "Running Up That Hill"
+   ],
+   "group": "1980s",
+   "facts": {
+    "artist": "Kate Bush",
+    "year": 1985,
+    "decade": "1980s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 23,
+    "uk": 6,
+    "au": 11
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Running Up That Hill (A Deal with God)\" by Kate Bush, released in 1985; year-end charts 2022: the US #23, the UK #6, Australia #11.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/60/a8/fb/60a8fb49-fcf6-42ac-b9d4-6dfbfd517a54/mzaf_13233345866871199423.plus.aac.p.m4a",
+      "credit": "Kate Bush: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/running-up-that-hill-a-deal-with-god/1623616562?i=1623617264&uo=4",
+      "apple": {
+       "trackId": 1623617264,
+       "url": "https://music.apple.com/us/album/running-up-that-hill-a-deal-with-god/1623616562?i=1623617264&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/fa/aa/2e/faaa2e7b-f344-df5e-681e-5adb4fa91255/196589171115.jpg/300x300bb.jpg",
+       "term": "Kate Bush Running Up That Hill"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
   }
  ],
  "questions": [],
@@ -9372,5 +9371,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-13"
+ "built": "2026-10-17"
 }

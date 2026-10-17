@@ -16,53 +16,10 @@
   "YEAR 2025 vs apple 2020  Chappell Roan — Pink Pony Club  [Pink Pony Club - Single]"
  ],
  "offby": [
-  "2020 apple 2019 (earliest original 2019)  Billie Eilish — Everything I Wanted  [everything i wanted - Single]",
-  "2020 apple 2019 (earliest original 2019)  Arizona Zervas — Roxanne  [ROXANNE - Single]",
-  "2022 apple 2022 (earliest original 1985)  Kate Bush — Running Up That Hill (A Deal with God)  [Stranger Things: Soundtrack from the Netflix Series, Season 4]",
   "2024 apple 2025 (earliest original 2025)  Gigi Perez — Sailor Song  [Sailor Song - Single]",
   "2024 apple 2024 (earliest original 2021)  The Marías — No One Noticed  [Submarine]"
  ],
  "items": [
-  {
-   "id": "dont-start-now-dua-lipa",
-   "appleYear": 2019,
-   "album": "Don't Start Now - Single",
-   "appleArtist": "Dua Lipa",
-   "appleTitle": "Don't Start Now",
-   "store": "US",
-   "year": 2019,
-   "d": 1
-  },
-  {
-   "id": "watermelon-sugar-harry-styles",
-   "appleYear": 2019,
-   "album": "Fine Line",
-   "appleArtist": "Harry Styles",
-   "appleTitle": "Watermelon Sugar",
-   "store": "US",
-   "year": 2019,
-   "d": 1
-  },
-  {
-   "id": "adore-you-harry-styles",
-   "appleYear": 2019,
-   "album": "Fine Line",
-   "appleArtist": "Harry Styles",
-   "appleTitle": "Adore You",
-   "store": "US",
-   "year": 2019,
-   "d": 2
-  },
-  {
-   "id": "circles-post-malone",
-   "appleYear": 2019,
-   "album": "Hollywood's Bleeding",
-   "appleArtist": "Post Malone",
-   "appleTitle": "Circles",
-   "store": "US",
-   "year": 2019,
-   "d": 2
-  },
   {
    "id": "levitating-dua-lipa",
    "appleYear": 2020,
@@ -75,6 +32,8 @@
   },
   {
    "id": "heat-waves-glass-animals",
+   "chartYear": 2020,
+   "firstYear": 2020,
    "appleYear": 2020,
    "album": "Dreamland",
    "appleArtist": "Glass Animals",
@@ -163,31 +122,11 @@
    "explicit": true
   },
   {
-   "id": "before-you-go-lewis-capaldi",
-   "appleYear": 2020,
-   "album": "Before You Go (Orchestral) - Single",
-   "appleArtist": "Lewis Capaldi",
-   "appleTitle": "Before You Go (Orchestral)",
-   "store": "US",
-   "year": 2020,
-   "d": 2
-  },
-  {
    "id": "intentions-justin-bieber",
    "appleYear": 2020,
    "album": "Changes",
    "appleArtist": "Justin Bieber",
    "appleTitle": "Intentions (feat. Quavo)",
-   "store": "US",
-   "year": 2020,
-   "d": 2
-  },
-  {
-   "id": "everything-i-wanted-billie-eilish",
-   "appleYear": 2019,
-   "album": "everything i wanted - Single",
-   "appleArtist": "Billie Eilish",
-   "appleTitle": "everything i wanted",
    "store": "US",
    "year": 2020,
    "d": 2
@@ -222,17 +161,6 @@
    "store": "US",
    "year": 2020,
    "d": 2
-  },
-  {
-   "id": "roxanne-arizona-zervas",
-   "appleYear": 2019,
-   "album": "ROXANNE - Single",
-   "appleArtist": "Arizona Zervas",
-   "appleTitle": "ROXANNE",
-   "store": "US",
-   "year": 2020,
-   "d": 2,
-   "explicit": true
   },
   {
    "id": "savage-megan-thee-stallion",
@@ -642,16 +570,6 @@
    "explicit": true
   },
   {
-   "id": "running-up-that-hill-a-deal-with-god-kate-bush",
-   "appleYear": 2022,
-   "album": "Stranger Things: Soundtrack from the Netflix Series, Season 4",
-   "appleArtist": "Kate Bush",
-   "appleTitle": "Running Up That Hill (A Deal with God)",
-   "store": "US",
-   "year": 2022,
-   "d": 1
-  },
-  {
    "id": "im-good-blue-david-guetta-and-bebe-rexha",
    "appleYear": 2022,
    "album": "I'm Good (Blue) - Single",
@@ -731,7 +649,7 @@
    "appleTitle": "Bad Habit",
    "store": "US",
    "year": 2022,
-   "d": 2,
+   "d": 3,
    "explicit": true
   },
   {
@@ -957,12 +875,14 @@
   },
   {
    "id": "until-i-found-you-stephen-sanchez",
+   "chartYear": 2023,
+   "firstYear": 2021,
    "appleYear": 2022,
    "album": "Until I Found You (Em Beihold Version) - Single",
    "appleArtist": "Stephen Sanchez & Em Beihold",
    "appleTitle": "Until I Found You (Em Beihold Version)",
    "store": "US",
-   "year": 2022,
+   "year": 2021,
    "d": 2
   },
   {
@@ -999,22 +919,26 @@
   },
   {
    "id": "made-you-look-meghan-trainor",
+   "chartYear": 2023,
+   "firstYear": 2022,
    "appleYear": 2023,
    "album": "Made You Look (feat. Kim Petras) - Single",
    "appleArtist": "Meghan Trainor",
    "appleTitle": "Made You Look (feat. Kim Petras)",
    "store": "US",
-   "year": 2023,
+   "year": 2022,
    "d": 3
   },
   {
    "id": "players-coi-leray",
+   "chartYear": 2023,
+   "firstYear": 2022,
    "appleYear": 2023,
    "album": "Players - EP",
    "appleArtist": "Coi Leray",
    "appleTitle": "Players",
    "store": "US",
-   "year": 2023,
+   "year": 2022,
    "d": 3,
    "explicit": true
   },
@@ -1031,12 +955,14 @@
   },
   {
    "id": "golden-hour-jvke",
+   "chartYear": 2023,
+   "firstYear": 2022,
    "appleYear": 2023,
    "album": "golden hour (Acapella Version) - Single",
    "appleArtist": "JVKE",
    "appleTitle": "golden hour (Acapella Version)",
    "store": "US",
-   "year": 2023,
+   "year": 2022,
    "d": 3
   },
   {
@@ -1253,12 +1179,14 @@
   },
   {
    "id": "austin-dasha",
+   "chartYear": 2024,
+   "firstYear": 2023,
    "appleYear": 2024,
    "album": "Austin (Boots Stop Workin') - Single",
    "appleArtist": "Dasha",
    "appleTitle": "Austin (Boots Stop Workin')",
    "store": "US",
-   "year": 2024,
+   "year": 2023,
    "d": 2,
    "explicit": true
   },

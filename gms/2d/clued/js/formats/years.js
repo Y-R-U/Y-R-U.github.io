@@ -1,6 +1,6 @@
 // Years offered as answer options: how far apart they sit by level (Aaron 2026-10-16). Hard may use neighbouring
 // years, medium (and "any") 2–3 apart, easy 4–6, kids 10+. The right year lands anywhere in the row, which is in order.
-import { shuffle } from './registry.js?v=202610170710';
+import { shuffle } from './registry.js?v=202610170717';
 
 export const YEAR_STEPS = { 1: [4, 6], 2: [2, 3], 3: [1, 2], kids: [10, 12] };
 export const MAX_YEAR = 2026;

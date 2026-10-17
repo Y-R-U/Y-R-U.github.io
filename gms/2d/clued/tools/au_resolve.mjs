@@ -162,6 +162,10 @@ async function resolveSong(want, year) {
 // act of the credited lead artist (tools/au_lists/acts.json); songs{} can override one "Artist — Title" (null = leave out)
 const ACTS = JSON.parse(fs.readFileSync(path.join(LISTS, 'acts.json'), 'utf8'));
 const actOf = (artist, title) => { const k = `${artist} — ${title}`; return k in ACTS.songs ? ACTS.songs[k] : ACTS.artists[artist]; };
+// first release by the same act (tools/music_firstyear.mjs): a year-end chart year can be a re-release or re-chart
+// (Bohemian Rhapsody 1992), so "Artist — Title" -> { year, charted } replaces it; covers by another act keep their own year
+const FIRST = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'tools/music_firstyear.json'), 'utf8')).songs || {}; } catch { return {}; } })();
+export const firstYearOf = (artist, title) => FIRST[`${artist} — ${title}`] || null;
 
 // chart column: "us=1 uk=- au=12 pv=8100 from=GBR/AUS"
 export function parseChart(s) {
@@ -235,10 +239,12 @@ async function buildSongs(head, rows, report) {
     // a year-end chart counts a December single in the next year: an original (non-compilation) album a year
     // earlier is the release year
     if (ch && !keep && b.near && b.year === chartYear - 1 && decade(b.year) === decade(chartYear) && !COMPILATION.test(b.t.collectionName)) year = b.year;
+    const first = head.kind !== 'themes' && !keep ? firstYearOf(artist0, title0) : null;
+    if (first) year = first.year;
     const fromApple = o.nm === 'apple';
     const title = fromApple ? stripExtras(b.t.trackName).trim() : title0;
     const artist = fromApple ? b.t.artistName.replace(/\s*[,&]\s.*$|\s+(feat\.?|featuring|ft\.?|with)\s.*$/i, '').trim() : artist0;
-    if (head.kind !== 'themes' && (b.year !== year || (b.originals && b.originals < year - 1))) offby.push(`${year} apple ${b.year} (earliest original ${b.originals ?? '-'})  ${artist} — ${title}  [${b.t.collectionName}]`);
+    if (head.kind !== 'themes' && !first && (b.year !== year || (b.originals && b.originals < year - 1))) offby.push(`${year} apple ${b.year} (earliest original ${b.originals ?? '-'})  ${artist} — ${title}  [${b.t.collectionName}]`);
     const theme = head.kind === 'themes';
     const id = slug(theme ? o.film : `${title} ${artist}`);
     if (!id || items.some((i) => i.id === id)) continue;
@@ -251,16 +257,18 @@ async function buildSongs(head, rows, report) {
     if (ch?.from.length) { data.artistCountry = ch.from[0]; if (ch.from.length > 1) data.artistCountries = ch.from; }
     const short = stripExtras(title).trim();
     const alt = o.alt ? o.alt.split('/') : (!theme && short !== title && short.length >= 3 ? [short] : undefined);
-    const tail = ch && Object.keys(ch.charts).length ? ` Year-end charts: ${chartLine(ch.charts)}.` : '';
+    const hasCharts = ch && Object.keys(ch.charts).length;
+    // first.blurb (a hand sentence) words a re-recording or remix credited to a team-up ("Elvis vs JXL") truthfully
+    const tail = !hasCharts ? '' : first?.blurb ? ` Year-end charts ${first.charted || chartYear}: ${chartLine(ch.charts)}.` : first ? `; year-end charts ${first.charted || chartYear}: ${chartLine(ch.charts)}.` : ` Year-end charts: ${chartLine(ch.charts)}.`;
     items.push({
       id, name: theme ? o.film : title, alt,
       group: theme ? (o.type || 'film') : decade(year),
       facts, ...data,
-      blurb: o.blurb || (theme ? `"${title}" from ${o.film} (${year}), by ${o.composer || artist}.` : `"${title}" by ${artist}, released in ${year}.${tail}`),
+      blurb: o.blurb || (theme ? `"${title}" from ${o.film} (${year}), by ${o.composer || artist}.` : (first?.blurb ? first.blurb + tail : `"${title}" by ${artist}, released in ${year}${first && hasCharts ? '' : '.'}${tail}`)),
       media: { audio: [audioObj(b.t, artist)] },
       difficulty: +(o.d || (ch && Object.keys(ch.charts).length ? fameDifficulty(ch.charts, ch.pv, pvRank(ch.pv)) : 0) || head.difficulty || 2),
       _cc: b.cc, _pv: ch?.pv || 0, _noKids: o.kids === '0' || EDGY.test(title),
-      _check: { appleYear: b.year, album: b.t.collectionName, appleArtist: b.t.artistName, appleTitle: b.t.trackName, store: b.cc },
+      _check: { ...(first ? { chartYear, firstYear: first.year } : {}), appleYear: b.year, album: b.t.collectionName, appleArtist: b.t.artistName, appleTitle: b.t.trackName, store: b.cc },
     });
     if (report) console.log(`ok  ${year} (apple ${b.year})  ${artist} — ${title}  →  ${b.t.artistName} — ${b.t.trackName} [${b.t.collectionName}]`);
   }

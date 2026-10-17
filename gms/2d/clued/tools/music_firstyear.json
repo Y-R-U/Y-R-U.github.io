@@ -1,0 +1,467 @@
+{
+ "about": "First-release year by the same act (tools/music_firstyear.mjs --write adds agreed corrections and never removes one). au_resolve.mjs sets facts.year, decade, group and the blurb from it; blurb = a hand first sentence; \"hand\": true = never rewritten by the audit.",
+ "songs": {
+  "Ace of Base — All That She Wants": {
+   "year": 1992,
+   "was": 1993,
+   "charted": "1993–1994",
+   "why": "Wikidata Q695648 1992; MusicBrainz 1992 (1/25 recordings)"
+  },
+  "Aerosmith — Janie's Got a Gun": {
+   "year": 1989,
+   "was": 1990,
+   "charted": "1990",
+   "why": "Wikidata Q625461 1989; MusicBrainz 1989 (3/40 recordings)"
+  },
+  "Alannah Myles — Black Velvet": {
+   "year": 1989,
+   "was": 1990,
+   "charted": "1990",
+   "why": "Wikidata Q880611 1989; MusicBrainz 1989 (1/17 recordings)"
+  },
+  "Arizona Zervas — Roxanne": {
+   "year": 2019,
+   "was": 2020,
+   "charted": "2020",
+   "why": "Wikidata Q74753254 2019; MusicBrainz 2019 (2/6 recordings)"
+  },
+  "Bertie Higgins — Key Largo": {
+   "year": 1981,
+   "was": 1982,
+   "charted": "1982",
+   "why": "Wikidata Q6398058 1981; MusicBrainz 1981 (1/11 recordings)"
+  },
+  "Billie Eilish — Everything I Wanted": {
+   "year": 2019,
+   "was": 2020,
+   "charted": "2020",
+   "why": "Wikidata Q74459564 2019; MusicBrainz 2019 (1/2 recordings)"
+  },
+  "Billy Ocean — When the Going Gets Tough, the Tough Get Going": {
+   "year": 1985,
+   "was": 1986,
+   "charted": "1986",
+   "why": "Wikidata Q2687802 1985; MusicBrainz 1985 (1/25 recordings)"
+  },
+  "Bobby Darin — Beyond the Sea": {
+   "year": 1959,
+   "was": 1960,
+   "charted": "1960",
+   "why": "Wikidata Q2551568 1959; MusicBrainz 1959 (1/92 recordings)"
+  },
+  "Breathe — Hands to Heaven": {
+   "year": 1987,
+   "was": 1988,
+   "charted": "1988",
+   "why": "Wikidata Q5647623 1987; MusicBrainz 1987 (2/42 recordings)"
+  },
+  "Celine Dion — Because You Loved Me": {
+   "year": 1995,
+   "was": 1996,
+   "charted": "1996",
+   "why": "Wikidata Q2732222 1995; MusicBrainz 1995 (1/14 recordings)"
+  },
+  "Charlene — I've Never Been to Me": {
+   "year": 1976,
+   "was": 1982,
+   "charted": "1982",
+   "why": "Wikidata Q5967364 1976; MusicBrainz 1976 (1/62 recordings)"
+  },
+  "Christina Aguilera — Beautiful": {
+   "year": 2002,
+   "was": 2003,
+   "charted": "2003",
+   "why": "Wikidata Q813449 2002; MusicBrainz 2002 (3/14 recordings)"
+  },
+  "Cliff Richard & The Young Ones — Living Doll": {
+   "year": 1959,
+   "was": 1986,
+   "charted": "1986",
+   "why": "Wikidata Q611319 1959; MusicBrainz 1959 (1/88 recordings)",
+   "blurb": "\"Living Doll\" was first released by Cliff Richard in 1959; he re-recorded it with The Young Ones for charity in 1986.",
+   "hand": true
+  },
+  "Coi Leray — Players": {
+   "year": 2022,
+   "was": 2023,
+   "charted": "2023",
+   "why": "Wikidata Q116312137 2022; MusicBrainz 2022 (1/4 recordings)"
+  },
+  "Dasha — Austin": {
+   "year": 2023,
+   "was": 2024,
+   "charted": "2024–2025",
+   "why": "Wikidata Q125371893 2023; MusicBrainz 2023 (2/8 recordings)"
+  },
+  "Dead or Alive — You Spin Me Round (Like a Record)": {
+   "year": 1984,
+   "was": 1985,
+   "charted": "1985",
+   "why": "Wikidata Q1194567 1984; MusicBrainz 1984 (1/55 recordings)"
+  },
+  "Desiigner — Panda": {
+   "year": 2015,
+   "was": 2016,
+   "charted": "2016",
+   "why": "Wikidata Q23936885 2015; MusicBrainz 2015 (1/16 recordings)"
+  },
+  "Duane Eddy — Peter Gunn": {
+   "year": 1959,
+   "was": 1960,
+   "charted": "1960",
+   "why": "Wikidata Q16966903 1959; MusicBrainz 1959 (3/52 recordings)"
+  },
+  "Eiffel 65 — Blue (Da Ba Dee)": {
+   "year": 1998,
+   "was": 1999,
+   "charted": "1999–2000",
+   "why": "Wikidata Q696600 1998; MusicBrainz 1998 (1/22 recordings)"
+  },
+  "Elton John — Sacrifice": {
+   "year": 1989,
+   "was": 1990,
+   "charted": "1990",
+   "why": "Wikidata Q2338119 1989; MusicBrainz 1989 (1/14 recordings)"
+  },
+  "Elvis vs JXL — A Little Less Conversation": {
+   "year": 1968,
+   "was": 2001,
+   "charted": "2002",
+   "why": "Wikidata Q2627030 1968; MusicBrainz 1968 (1/32 recordings)",
+   "blurb": "\"A Little Less Conversation\" was first released by Elvis Presley in 1968; the JXL remix made it a hit again in 2002.",
+   "hand": true
+  },
+  "Falco — Rock Me Amadeus": {
+   "year": 1985,
+   "was": 1986,
+   "charted": "1986",
+   "why": "Wikidata Q600718 1985; MusicBrainz 1985 (1/11 recordings)"
+  },
+  "Fleetwood Mac — Go Your Own Way": {
+   "year": 1976,
+   "was": 1977,
+   "charted": "1977",
+   "why": "Wikidata Q2387143 1976; MusicBrainz 1976 (1/45 recordings)"
+  },
+  "George Ezra — Budapest": {
+   "year": 2013,
+   "was": 2014,
+   "charted": "2014–2015",
+   "why": "Wikidata Q16467392 2013; MusicBrainz 2013 (1/3 recordings)"
+  },
+  "Glass Animals — Heat Waves": {
+   "year": 2020,
+   "was": 2021,
+   "charted": "2021–2024",
+   "why": "Wikidata Q104540815 2020; MusicBrainz 2020 (2/9 recordings)"
+  },
+  "Gym Class Heroes — Cupid's Chokehold": {
+   "year": 2005,
+   "was": 2006,
+   "charted": "2007",
+   "why": "Wikidata Q2551530 2005; MusicBrainz 2005 (1/5 recordings)"
+  },
+  "Haddaway — What Is Love": {
+   "year": 1992,
+   "was": 1993,
+   "charted": "1993–1994",
+   "why": "Wikidata Q550158 1992; MusicBrainz 1992 (2/70 recordings)"
+  },
+  "Jack Scott — What in the World's Come Over You": {
+   "year": 1959,
+   "was": 1960,
+   "charted": "1960",
+   "why": "Wikidata Q62586636 1959; MusicBrainz 1959 (1/40 recordings)"
+  },
+  "James Bay — Hold Back the River": {
+   "year": 2014,
+   "was": 2015,
+   "charted": "2015",
+   "why": "Wikidata Q18663654 2014; MusicBrainz 2014 (1/6 recordings)"
+  },
+  "Jason Derulo — In My Head": {
+   "year": 2009,
+   "was": 2010,
+   "charted": "2010",
+   "why": "Wikidata Q1660651 2009; MusicBrainz 2009 (1/11 recordings)"
+  },
+  "Jay-Z — '03 Bonnie & Clyde": {
+   "year": 2002,
+   "was": 2003,
+   "charted": "2003",
+   "why": "Wikidata Q149404 2002; MusicBrainz 2002 (4/8 recordings)"
+  },
+  "Jimmy Jones — Handy Man": {
+   "year": 1959,
+   "was": 1960,
+   "charted": "1960",
+   "why": "Wikidata Q11973896 1959; MusicBrainz 1959 (1/67 recordings)"
+  },
+  "Joe Cocker and Jennifer Warnes — Up Where We Belong": {
+   "year": 1982,
+   "was": 1983,
+   "charted": "1983",
+   "why": "Wikidata Q2064725 1982; MusicBrainz 1982 (1/22 recordings)"
+  },
+  "Johnny Preston — Running Bear": {
+   "year": 1959,
+   "was": 1960,
+   "charted": "1960",
+   "why": "Wikidata Q1630775 1959; MusicBrainz 1959 (1/87 recordings)"
+  },
+  "Jvke — Golden Hour": {
+   "year": 2022,
+   "was": 2023,
+   "charted": "2023",
+   "why": "Wikidata Q117811287 2022; MusicBrainz 2022 (4/8 recordings)"
+  },
+  "Kate Bush — Running Up That Hill (A Deal with God)": {
+   "year": 1985,
+   "was": 2022,
+   "charted": "2022",
+   "why": "Wikidata Q56043480 1985; MusicBrainz 1985 (2/20 recordings)"
+  },
+  "KC and the Sunshine Band — Please Don't Go": {
+   "year": 1979,
+   "was": 1980,
+   "charted": "1980",
+   "why": "Wikidata Q2584225 1979; MusicBrainz 1979 (1/28 recordings)"
+  },
+  "Kenny Rogers — Coward of the County": {
+   "year": 1979,
+   "was": 1980,
+   "charted": "1980",
+   "why": "Wikidata Q3431882 1979; MusicBrainz 1979 (2/24 recordings)"
+  },
+  "La Bouche — Be My Lover": {
+   "year": 1994,
+   "was": 1995,
+   "charted": "1996",
+   "why": "Wikidata Q1750724 1994; MusicBrainz 1994 (1/55 recordings)"
+  },
+  "Lewis Capaldi — Before You Go": {
+   "year": 2019,
+   "was": 2020,
+   "charted": "2020–2021",
+   "why": "Wikidata Q79879927 2019; MusicBrainz 2019 (1/4 recordings)"
+  },
+  "Lighthouse Family — High": {
+   "year": 1997,
+   "was": 1998,
+   "charted": "1998",
+   "why": "Wikidata Q3785514 1997; MusicBrainz 1997 (3/51 recordings)"
+  },
+  "Limp Bizkit — Rollin'": {
+   "year": 2000,
+   "was": 2001,
+   "charted": "2001",
+   "why": "Wikidata Q2262044 2000; MusicBrainz 2000 (10/24 recordings)"
+  },
+  "Lizzo — Good as Hell": {
+   "year": 2016,
+   "was": 2019,
+   "charted": "2019–2020",
+   "why": "Wikidata Q66126425 2016; MusicBrainz 2016 (1/2 recordings)"
+  },
+  "Los del Río — Macarena": {
+   "year": 1993,
+   "was": 1996,
+   "charted": "1996–1997",
+   "why": "Wikidata Q1149738 1993; MusicBrainz 1993 (1/80 recordings)"
+  },
+  "Marty Robbins — El Paso": {
+   "year": 1959,
+   "was": 1960,
+   "charted": "1960",
+   "why": "Wikidata Q5351760 1959; MusicBrainz 1959 (3/87 recordings)"
+  },
+  "Meghan Trainor — Made You Look": {
+   "year": 2022,
+   "was": 2023,
+   "charted": "2023",
+   "why": "Wikidata Q115111032 2022; MusicBrainz 2022 (2/4 recordings)"
+  },
+  "Melanie C — Never Be the Same Again": {
+   "year": 1999,
+   "was": 2000,
+   "charted": "2000",
+   "why": "Wikidata Q2579091 1999; MusicBrainz 1999 (1/13 recordings)"
+  },
+  "N-Trance — Set You Free": {
+   "year": 1994,
+   "was": 1995,
+   "charted": "1995",
+   "why": "Wikidata Q7456266 1994; MusicBrainz 1994 (3/65 recordings)"
+  },
+  "Nico & Vinz — Am I Wrong": {
+   "year": 2013,
+   "was": 2014,
+   "charted": "2014",
+   "why": "Wikidata Q15579435 2013; MusicBrainz 2013 (1/8 recordings)"
+  },
+  "Norman Greenbaum — Spirit in the Sky": {
+   "year": 1969,
+   "was": 1970,
+   "charted": "1970",
+   "why": "Wikidata Q1394529 1969; MusicBrainz 1969 (1/6 recordings)"
+  },
+  "Paul & Paula — Hey Paula": {
+   "year": 1962,
+   "was": 1963,
+   "charted": "1963",
+   "why": "Wikidata Q3135094 1962; MusicBrainz 1962 (1/79 recordings)"
+  },
+  "Post Malone — Wow": {
+   "year": 2018,
+   "was": 2019,
+   "charted": "2019",
+   "why": "Wikidata Q60097328 2018; MusicBrainz 2018 (2/6 recordings)"
+  },
+  "R. Kelly — I Believe I Can Fly": {
+   "year": 1996,
+   "was": 1997,
+   "charted": "1997",
+   "why": "Wikidata Q509722 1996; MusicBrainz 1996 (1/88 recordings)"
+  },
+  "Reel 2 Real — I Like to Move It": {
+   "year": 1993,
+   "was": 1994,
+   "charted": "1994",
+   "why": "Wikidata Q284422 1993; MusicBrainz 1993 (1/44 recordings)"
+  },
+  "Robert Miles — Children": {
+   "year": 1995,
+   "was": 1996,
+   "charted": "1996",
+   "why": "Wikidata Q2606509 1995; MusicBrainz 1995 (3/57 recordings)"
+  },
+  "Roxette — It Must Have Been Love": {
+   "year": 1987,
+   "was": 1990,
+   "charted": "1990",
+   "why": "Wikidata Q1507812 1987; MusicBrainz 1987 (1/49 recordings)"
+  },
+  "Run–D.M.C. vs. Jason Nevins — It's Like That": {
+   "year": 1983,
+   "was": 1997,
+   "charted": "1998",
+   "why": "Wikidata Q4178096 1983; MusicBrainz 1983 (1/71 recordings)",
+   "blurb": "\"It's Like That\" was first released by Run–D.M.C. in 1983; Jason Nevins's remix made it a hit again in 1997–98.",
+   "hand": true
+  },
+  "Rupert Holmes — Escape (The Piña Colada Song)": {
+   "year": 1979,
+   "was": 1980,
+   "charted": "1980",
+   "why": "Wikidata Q5396914 1979; MusicBrainz 1979 (2/27 recordings)"
+  },
+  "Savage Garden — To the Moon and Back": {
+   "year": 1996,
+   "was": 1997,
+   "charted": "1997–1998",
+   "why": "Wikidata Q3495656 1996; MusicBrainz 1996 (2/28 recordings)"
+  },
+  "Scatman John — Scatman (Ski Ba Bop Ba Dop Bop)": {
+   "year": 1994,
+   "was": 1995,
+   "charted": "1995",
+   "why": "Wikidata Q1080885 1994; MusicBrainz 1994 (2/45 recordings)"
+  },
+  "Seal — Crazy": {
+   "year": 1990,
+   "was": 1991,
+   "charted": "1991",
+   "why": "Wikidata Q1403341 1990; MusicBrainz 1990 (2/21 recordings)"
+  },
+  "Shocking Blue — Venus": {
+   "year": 1969,
+   "was": 1970,
+   "charted": "1970",
+   "why": "Wikidata Q749752 1969; MusicBrainz 1969 (1/11 recordings)"
+  },
+  "Sia — Cheap Thrills": {
+   "year": 2015,
+   "was": 2016,
+   "charted": "2016",
+   "why": "Wikidata Q22338688 2015; MusicBrainz 2015 (1/9 recordings)"
+  },
+  "Sia — Elastic Heart": {
+   "year": 2013,
+   "was": 2014,
+   "charted": "2015",
+   "why": "Wikidata Q16385579 2013; MusicBrainz 2013 (1/19 recordings)"
+  },
+  "Snow — Informer": {
+   "year": 1992,
+   "was": 1993,
+   "charted": "1993",
+   "why": "Wikidata Q3798619 1992; MusicBrainz 1992 (1/87 recordings)"
+  },
+  "Stephen Sanchez — Until I Found You": {
+   "year": 2021,
+   "was": 2022,
+   "charted": "2023",
+   "why": "Wikidata Q113630190 2021; MusicBrainz 2021 (1/1 recordings)"
+  },
+  "Stevie B — Because I Love You (The Postman Song)": {
+   "year": 1990,
+   "was": 1991,
+   "charted": "1991",
+   "why": "Wikidata Q4878477 1990; MusicBrainz 1990 (1/42 recordings)"
+  },
+  "Tears for Fears — Shout": {
+   "year": 1984,
+   "was": 1985,
+   "charted": "1985",
+   "why": "Wikidata Q950244 1984; MusicBrainz 1984 (2/64 recordings)"
+  },
+  "The Cascades — Rhythm of the Rain": {
+   "year": 1962,
+   "was": 1963,
+   "charted": "1963",
+   "why": "Wikidata Q1908401 1962; MusicBrainz 1962 (1/81 recordings)"
+  },
+  "The Dave Clark Five — Glad All Over": {
+   "year": 1963,
+   "was": 1964,
+   "charted": "1964",
+   "why": "Wikidata Q2437143 1963; MusicBrainz 1963 (2/20 recordings)"
+  },
+  "The Jackson 5 — I Want You Back": {
+   "year": 1969,
+   "was": 1970,
+   "charted": "1970",
+   "why": "Wikidata Q1445942 1969; MusicBrainz 1969 (2/21 recordings)"
+  },
+  "The Pointer Sisters — Neutron Dance": {
+   "year": 1983,
+   "was": 1984,
+   "charted": "1985",
+   "why": "Wikidata Q1981932 1983; MusicBrainz 1983 (1/50 recordings)"
+  },
+  "The Stranglers — Golden Brown": {
+   "year": 1981,
+   "was": 1982,
+   "charted": "1982",
+   "why": "Wikidata Q1534853 1981; MusicBrainz 1981 (1/56 recordings)"
+  },
+  "The String-A-Longs — Wheels": {
+   "year": 1960,
+   "was": 1961,
+   "charted": "1961",
+   "why": "Wikidata Q12010577 1960; MusicBrainz 1960 (1/16 recordings)"
+  },
+  "Vengaboys — We Like to Party! (The Vengabus)": {
+   "year": 1998,
+   "was": 1999,
+   "charted": "1999",
+   "why": "Wikidata Q7977649 1998; MusicBrainz 1998 (12/37 recordings)"
+  },
+  "Vicki Lawrence — The Night the Lights Went Out in Georgia": {
+   "year": 1972,
+   "was": 1973,
+   "charted": "1973",
+   "why": "Wikidata Q3988503 1972; MusicBrainz 1972 (1/9 recordings)"
+  }
+ }
+}

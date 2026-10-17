@@ -45,73 +45,6 @@
  },
  "items": [
   {
-   "id": "maria-maria-santana",
-   "name": "Maria Maria",
-   "group": "1990s",
-   "facts": {
-    "artist": "Santana",
-    "year": 1999,
-    "decade": "1990s"
-   },
-   "charts": {
-    "us": 3
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Maria Maria\" by Santana, released in 1999. Year-end charts: the US #3.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/33/a0/f8/33a0f89e-4d1e-44a3-5b29-07629f62e22a/mzaf_10671385530310908346.plus.aac.p.m4a",
-      "credit": "Santana: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/maria-maria-feat-the-product-g-b/1726954467?i=1726954846&uo=4",
-      "apple": {
-       "trackId": 1726954846,
-       "url": "https://music.apple.com/us/album/maria-maria-feat-the-product-g-b/1726954467?i=1726954846&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/20/31/8f/20318f92-bfc3-452e-1d1f-95a86366afc3/196871785426.jpg/300x300bb.jpg",
-       "term": "Santana Maria Maria"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
-   "id": "breathe-faith-hill",
-   "name": "Breathe",
-   "group": "1990s",
-   "facts": {
-    "artist": "Faith Hill",
-    "year": 1999,
-    "decade": "1990s",
-    "act": "Female solo artist"
-   },
-   "charts": {
-    "us": 1
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Breathe\" by Faith Hill, released in 1999. Year-end charts: the US #1.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1c/3d/e1/1c3de12f-bffb-a854-5db6-f7793920ca09/mzaf_15487578874960967185.plus.aac.p.m4a",
-      "credit": "Faith Hill: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/breathe/321981503?i=321981540&uo=4",
-      "apple": {
-       "trackId": 321981540,
-       "url": "https://music.apple.com/us/album/breathe/321981503?i=321981540&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/d2/81/53/d281539a-05d9-c2c0-8c7e-457cab47ed7b/mzi.ltpnekph.jpg/300x300bb.jpg",
-       "term": "Faith Hill Breathe"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "music-madonna",
    "name": "Music",
    "group": "2000s",
@@ -885,41 +818,6 @@
        "url": "https://music.apple.com/us/album/7-days/1207938108?i=1207938311&uo=4",
        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/13/f0/e0/13f0e07e-2879-3e00-8284-bb9d81a57400/886446379388.jpg/300x300bb.jpg",
        "term": "Craig David 7 Days"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
-   "id": "never-be-the-same-again-melanie-c",
-   "name": "Never Be the Same Again",
-   "group": "2000s",
-   "facts": {
-    "artist": "Melanie C",
-    "year": 2000,
-    "decade": "2000s",
-    "act": "Female solo artist"
-   },
-   "charts": {
-    "uk": 18,
-    "au": 14
-   },
-   "artistCountry": "GBR",
-   "blurb": "\"Never Be the Same Again\" by Melanie C, released in 2000. Year-end charts: the UK #18, Australia #14.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0e/85/e2/0e85e2aa-6ea1-bc5c-04fb-264276f2f82a/mzaf_13827864060930008810.plus.aac.p.m4a",
-      "credit": "Melanie C: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/never-be-the-same-again/724545802?i=724546269&uo=4",
-      "apple": {
-       "trackId": 724546269,
-       "url": "https://music.apple.com/us/album/never-be-the-same-again/724545802?i=724546269&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a7/29/6d/a7296db0-4792-31b9-1abc-394441db12e5/13ULAIM49428.rgb.jpg/300x300bb.jpg",
-       "term": "Melanie C Never Be the Same Again"
       },
       "dur": 30
      }
@@ -1808,7 +1706,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Limp Bizkit",
-    "year": 2001,
+    "year": 2000,
     "decade": "2000s",
     "act": "Group or duo"
    },
@@ -1817,7 +1715,7 @@
     "au": 45
    },
    "artistCountry": "USA",
-   "blurb": "\"Rollin'\" by Limp Bizkit, released in 2001. Year-end charts: the UK #27, Australia #45.",
+   "blurb": "\"Rollin'\" by Limp Bizkit, released in 2000; year-end charts 2001: the UK #27, Australia #45.",
    "media": {
     "audio": [
      {
@@ -2348,40 +2246,6 @@
        "url": "https://music.apple.com/us/album/the-ketchup-song-aserej%C3%A9-chiringuito-club-single-edit/1362213722?i=1362216854&uo=4",
        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music62/v4/05/56/27/05562700-1d3a-0f27-9fa3-1fd9cdd05f9f/192562272527.jpg/300x300bb.jpg",
        "term": "Las Ketchup The Ketchup Song"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
-   "id": "a-little-less-conversation-elvis-vs-jxl",
-   "name": "A Little Less Conversation",
-   "group": "2000s",
-   "facts": {
-    "artist": "Elvis vs JXL",
-    "year": 2001,
-    "decade": "2000s"
-   },
-   "charts": {
-    "uk": 5,
-    "au": 5
-   },
-   "artistCountry": "USA",
-   "blurb": "\"A Little Less Conversation\" by Elvis vs JXL, released in 2001. Year-end charts: the UK #5, Australia #5.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5b/d8/8d/5bd88d3b-5fbf-37e3-1a68-2c91b37f1ce6/mzaf_3002018162174375865.plus.aac.p.m4a",
-      "credit": "Elvis vs JXL: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/a-little-less-conversation/1280531136?i=1280531429&uo=4",
-      "apple": {
-       "trackId": 1280531429,
-       "url": "https://music.apple.com/us/album/a-little-less-conversation/1280531136?i=1280531429&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/67/d2/7c/67d27c53-3551-e88f-878c-e8a13de4baa5/886446728377.jpg/300x300bb.jpg",
-       "term": "Elvis Presley A Little Less Conversation"
       },
       "dur": 30
      }
@@ -3153,7 +3017,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Christina Aguilera",
-    "year": 2003,
+    "year": 2002,
     "decade": "2000s",
     "act": "Female solo artist"
    },
@@ -3163,7 +3027,7 @@
     "au": 24
    },
    "artistCountry": "USA",
-   "blurb": "\"Beautiful\" by Christina Aguilera, released in 2003. Year-end charts: the US #16, the UK #23, Australia #24.",
+   "blurb": "\"Beautiful\" by Christina Aguilera, released in 2002; year-end charts 2003: the US #16, the UK #23, Australia #24.",
    "media": {
     "audio": [
      {
@@ -3371,7 +3235,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Jay-Z",
-    "year": 2003,
+    "year": 2002,
     "decade": "2000s",
     "act": "Male solo artist"
    },
@@ -3381,7 +3245,7 @@
     "au": 16
    },
    "artistCountry": "USA",
-   "blurb": "\"'03 Bonnie & Clyde\" by Jay-Z, released in 2003. Year-end charts: the US #37, the UK #50, Australia #16.",
+   "blurb": "\"'03 Bonnie & Clyde\" by Jay-Z, released in 2002; year-end charts 2003: the US #37, the UK #50, Australia #16.",
    "media": {
     "audio": [
      {
@@ -7367,7 +7231,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Gym Class Heroes",
-    "year": 2006,
+    "year": 2005,
     "decade": "2000s",
     "act": "Group or duo"
    },
@@ -7377,7 +7241,7 @@
     "au": 72
    },
    "artistCountry": "USA",
-   "blurb": "\"Cupid's Chokehold\" by Gym Class Heroes, released in 2006. Year-end charts: the US #23, the UK #27, Australia #72.",
+   "blurb": "\"Cupid's Chokehold\" by Gym Class Heroes, released in 2005; year-end charts 2007: the US #23, the UK #27, Australia #72.",
    "media": {
     "audio": [
      {
@@ -9568,6 +9432,147 @@
     ]
    },
    "difficulty": 3
+  },
+  {
+   "id": "in-my-head-jason-derulo",
+   "name": "In My Head",
+   "group": "2000s",
+   "facts": {
+    "artist": "Jason Derulo",
+    "year": 2009,
+    "decade": "2000s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 14,
+    "uk": 40,
+    "au": 13
+   },
+   "artistCountry": "USA",
+   "blurb": "\"In My Head\" by Jason Derulo, released in 2009; year-end charts 2010: the US #14, the UK #40, Australia #13.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d3/0a/9a/d30a9a07-e2dd-78ee-cecd-a44ca50bf032/mzaf_14167067778678001690.plus.aac.p.m4a",
+      "credit": "Jason Derulo: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/in-my-head-feat-nicki-minaj/446308124?i=446308126&uo=4",
+      "apple": {
+       "trackId": 446308126,
+       "url": "https://music.apple.com/us/album/in-my-head-feat-nicki-minaj/446308124?i=446308126&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e5/02/e0/e502e027-a708-e341-2e82-a6eec28f3b46/mzi.emrxzqxr.jpg/300x300bb.jpg",
+       "term": "Jason Derulo In My Head"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hey-soul-sister-train",
+   "name": "Hey, Soul Sister",
+   "group": "2000s",
+   "facts": {
+    "artist": "Train",
+    "year": 2009,
+    "decade": "2000s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 3,
+    "uk": 84,
+    "au": 4
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Hey, Soul Sister\" by Train, released in 2009. Year-end charts: the US #3, the UK #84, Australia #4.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/22/b2/3b/22b23b2d-db40-0fa1-b714-140aff15ecbe/mzaf_699506205855316636.plus.aac.p.m4a",
+      "credit": "Train: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hey-soul-sister/425320463?i=425320500&uo=4",
+      "apple": {
+       "trackId": 425320500,
+       "url": "https://music.apple.com/us/album/hey-soul-sister/425320463?i=425320500&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/fa/e8/28/fae8283a-ad10-a642-1d41-a4b3402da4ba/884977817027.jpg/300x300bb.jpg",
+       "term": "Train Hey, Soul Sister"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tik-tok-kesha",
+   "name": "TiK ToK",
+   "group": "2000s",
+   "facts": {
+    "artist": "Kesha",
+    "year": 2009,
+    "decade": "2000s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 1,
+    "uk": 45
+   },
+   "artistCountry": "USA",
+   "blurb": "\"TiK ToK\" by Kesha, released in 2009. Year-end charts: the US #1, the UK #45.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ca/c4/5d/cac45d18-3920-16ab-33b9-5b85cc5e394b/mzaf_18125601085374059686.plus.aac.p.m4a",
+      "credit": "Kesha: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/tik-tok/381237317?i=381237322&uo=4",
+      "apple": {
+       "trackId": 381237322,
+       "url": "https://music.apple.com/us/album/tik-tok/381237317?i=381237322&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/92/d2/a7/92d2a780-3aa9-8b58-b753-62e4175dd2ec/884977451856.jpg/300x300bb.jpg",
+       "term": "Kesha TiK ToK"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "breathe-faith-hill",
+   "name": "Breathe",
+   "group": "1990s",
+   "facts": {
+    "artist": "Faith Hill",
+    "year": 1999,
+    "decade": "1990s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 1
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Breathe\" by Faith Hill, released in 1999. Year-end charts: the US #1.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1c/3d/e1/1c3de12f-bffb-a854-5db6-f7793920ca09/mzaf_15487578874960967185.plus.aac.p.m4a",
+      "credit": "Faith Hill: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/breathe/321981503?i=321981540&uo=4",
+      "apple": {
+       "trackId": 321981540,
+       "url": "https://music.apple.com/us/album/breathe/321981503?i=321981540&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/d2/81/53/d281539a-05d9-c2c0-8c7e-457cab47ed7b/mzi.ltpnekph.jpg/300x300bb.jpg",
+       "term": "Faith Hill Breathe"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
   }
  ],
  "questions": [],
@@ -9593,5 +9598,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-13"
+ "built": "2026-10-17"
 }

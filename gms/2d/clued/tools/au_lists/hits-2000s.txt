@@ -3,8 +3,6 @@
 @icon 📱
 @sources [{"name":"Billboard Year-End Hot 100 singles (2000s)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2000"},{"name":"UK year-end best-selling singles (Music Week / Official Charts Company)","url":"https://www.officialcharts.com/charts/end-of-year-singles-chart/"},{"name":"ARIA year-end singles chart","url":"https://www.aria.com.au/charts/2000/singles-chart"},{"name":"Wikipedia pageviews (lasting fame) and Wikidata (artist country)","url":"https://www.wikidata.org/"}]
 # chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
-1999 | Santana | Maria Maria | us=3 uk=- au=- pv=6377 from=USA | am=santana
-1999 | Faith Hill | Breathe | us=1 uk=- au=- pv=2326 from=USA
 2000 | Madonna | Music | us=17 uk=24 au=4 pv=6732 from=USA
 2000 | Britney Spears | Oops!...I Did It Again | us=55 uk=15 au=35 pv=10354 from=USA | d=1; tm=oops
 2000 | Destiny's Child | Say My Name | us=6 uk=- au=5 pv=7770 from=USA
@@ -29,7 +27,6 @@
 2000 | Craig David | Fill Me In | us=37 uk=10 au=68 pv=1334 from=GBR
 2000 | All Saints | Pure Shores | us=- uk=2 au=43 pv=5213 from=GBR
 2000 | Craig David | 7 Days | us=52 uk=17 au=58 pv=2062 from=GBR
-2000 | Melanie C | Never Be the Same Again | us=- uk=18 au=14 pv=2368 from=GBR
 2000 | Eminem | The Real Slim Shady | us=51 uk=14 au=- pv=10137 from=USA
 2000 | Creed | With Arms Wide Open | us=36 uk=- au=20 pv=4544 from=USA
 2001 | Christina Aguilera, Lil' Kim, Mýa & P!nk | Lady Marmalade | us=24 uk=14 au=13 pv=23581 from=USA | am=aguilera; kids=0
@@ -71,7 +68,6 @@
 2002 | DJ Sammy | Heaven | us=31 uk=19 au=22 pv=9971 from=ESP
 2002 | Pink | Get the Party Started | us=24 uk=21 au=35 pv=7462 from=USA
 2002 | Las Ketchup | The Ketchup Song (Aserejé) | us=- uk=8 au=3 pv=15579 from=ESP
-2002 | Elvis vs JXL | A Little Less Conversation | us=- uk=5 au=5 pv=6672 from=USA
 2002 | Atomic Kitten | The Tide Is High (Get the Feeling) | us=- uk=13 au=16 pv=9947 from=GBR
 2002 | Scooter | The Logical Song | us=- uk=15 au=20 pv=11681 from=DEU
 2002 | Holly Valance | Kiss Kiss | us=- uk=14 au=10 pv=4263 from=AUS
@@ -274,3 +270,9 @@
 2009 | The Fray | You Found Me | us=13 uk=- au=13 pv=2101 from=USA
 2009 | Jay-Z | Run This Town | us=31 uk=60 au=60 pv=3421 from=USA
 2009 | The Script | Breakeven | us=27 uk=- au=24 pv=2453 from=IRL
+
+2010 | Jason Derulo | In My Head | us=14 uk=40 au=13 pv=1964 from=USA | note=first released 2009, moved from hits-2010s
+
+2009 | Train | Hey, Soul Sister | us=3 uk=84 au=4 pv=8950 from=USA | note=released 2009, moved from hits-2010s
+2009 | Kesha | TiK ToK | us=1 uk=45 au=- pv=16670 from=USA | tm=tik ?tok; note=released 2009, moved from hits-2010s
+1999 | Faith Hill | Breathe | us=1 uk=- au=- pv=2326 from=USA | note=released 1999; stays in hits-2000s (hits-1990s has The Prodigy's "Breathe")

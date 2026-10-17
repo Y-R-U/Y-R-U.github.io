@@ -1,10 +1,10 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
   spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk, givesAway,
-} from './registry.js?v=202610170710';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610170710';
-import { yearOptions, plainYear } from './years.js?v=202610170710';
-import { isCredit, leadOf, people } from './cocredit.js?v=202610170710';
+} from './registry.js?v=202610170717';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610170717';
+import { yearOptions, plainYear } from './years.js?v=202610170717';
+import { isCredit, leadOf, people } from './cocredit.js?v=202610170717';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 

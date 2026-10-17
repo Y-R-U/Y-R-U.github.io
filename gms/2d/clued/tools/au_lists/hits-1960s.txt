@@ -276,3 +276,8 @@
 1969 | Elvis Presley | If I Can Dream | us=- uk=- au=21 pv=4899 from=USA
 1969 | Tom Jones | I'll Never Fall in Love Again | us=8 uk=- au=- pv=2581 from=GBR
 1969 | Canned Heat | Going Up the Country | us=- uk=- au=25 pv=5495 from=USA
+
+1970 | Norman Greenbaum | Spirit in the Sky | us=22 uk=4 au=4 pv=11961 from=USA | note=first released 1969, moved from hits-1970s
+1970 | Shocking Blue | Venus | us=33 uk=- au=19 pv=13427 from=NLD | note=first released 1969, moved from hits-1970s
+1970 | The Jackson 5 | I Want You Back | us=28 uk=35 au=- pv=15080 from=USA | note=first released 1969, moved from hits-1970s
+2002 | Elvis vs JXL | A Little Less Conversation | us=- uk=5 au=5 pv=6672 from=USA | note=first released 1968, moved from hits-2000s

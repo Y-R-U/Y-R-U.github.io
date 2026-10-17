@@ -60,7 +60,7 @@
     "au": 4
    },
    "artistCountry": "USA",
-   "blurb": "\"Spirit in the Sky\" by Norman Greenbaum, released in 1969. Year-end charts: the US #22, the UK #4, Australia #4.",
+   "blurb": "\"Spirit in the Sky\" by Norman Greenbaum, released in 1969; year-end charts 1970: the US #22, the UK #4, Australia #4.",
    "media": {
     "audio": [
      {
@@ -825,11 +825,11 @@
   {
    "id": "black-velvet-alannah-myles",
    "name": "Black Velvet",
-   "group": "1990s",
+   "group": "1980s",
    "facts": {
     "artist": "Alannah Myles",
-    "year": 1990,
-    "decade": "1990s",
+    "year": 1989,
+    "decade": "1980s",
     "act": "Female solo artist"
    },
    "charts": {
@@ -838,7 +838,7 @@
     "au": 13
    },
    "artistCountry": "CAN",
-   "blurb": "\"Black Velvet\" by Alannah Myles, released in 1990. Year-end charts: the US #18, the UK #18, Australia #13.",
+   "blurb": "\"Black Velvet\" by Alannah Myles, released in 1989; year-end charts 1990: the US #18, the UK #18, Australia #13.",
    "media": {
     "audio": [
      {
@@ -973,7 +973,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Snow",
-    "year": 1993,
+    "year": 1992,
     "decade": "1990s",
     "act": "Male solo artist"
    },
@@ -983,7 +983,7 @@
     "au": 6
    },
    "artistCountry": "CAN",
-   "blurb": "\"Informer\" by Snow, released in 1993. Year-end charts: the US #10, the UK #17, Australia #6.",
+   "blurb": "\"Informer\" by Snow, released in 1992; year-end charts 1993: the US #10, the UK #17, Australia #6.",
    "media": {
     "audio": [
      {
@@ -1186,7 +1186,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Los del Río",
-    "year": 1996,
+    "year": 1993,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -1196,7 +1196,7 @@
     "au": 1
    },
    "artistCountry": "ESP",
-   "blurb": "\"Macarena\" by Los del Río, released in 1996. Year-end charts: the US #1, the UK #22, Australia #1.",
+   "blurb": "\"Macarena\" by Los del Río, released in 1993; year-end charts 1996–1997: the US #1, the UK #22, Australia #1.",
    "media": {
     "audio": [
      {
@@ -1371,7 +1371,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Eiffel 65",
-    "year": 1999,
+    "year": 1998,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -1381,7 +1381,7 @@
     "au": 3
    },
    "artistCountry": "ITA",
-   "blurb": "\"Blue (Da Ba Dee)\" by Eiffel 65, released in 1999. Year-end charts: the US #49, the UK #2, Australia #3.",
+   "blurb": "\"Blue (Da Ba Dee)\" by Eiffel 65, released in 1998; year-end charts 1999–2000: the US #49, the UK #2, Australia #3.",
    "media": {
     "audio": [
      {
@@ -2236,7 +2236,7 @@
    "group": "2020s",
    "facts": {
     "artist": "Glass Animals",
-    "year": 2021,
+    "year": 2020,
     "decade": "2020s",
     "act": "Group or duo"
    },
@@ -2246,7 +2246,7 @@
     "au": 1
    },
    "artistCountry": "GBR",
-   "blurb": "\"Heat Waves\" by Glass Animals, released in 2021. Year-end charts: the US #1, the UK #7, Australia #1.",
+   "blurb": "\"Heat Waves\" by Glass Animals, released in 2020; year-end charts 2021–2024: the US #1, the UK #7, Australia #1.",
    "media": {
     "audio": [
      {
@@ -2282,5 +2282,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-13"
+ "built": "2026-10-17"
 }

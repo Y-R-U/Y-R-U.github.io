@@ -14,12 +14,8 @@
   "SAME TITLE  1997 All Saints — Under the Bridge (kept the Red Hot Chili Peppers song)"
  ],
  "offby": [
-  "1990 apple 1990 (earliest original 1986)  Roxette — It Must Have Been Love  [It Must Have Been Love - Single]",
-  "1990 apple 1989 (earliest original 1989)  Alannah Myles — Black Velvet  [Alannah Myles]",
   "1990 apple 1989 (earliest original 1966)  Michael Bolton — How Am I Supposed to Live Without You  [Soul Provider]",
   "1990 apple 1991 (earliest original 1991)  EMF — Unbelievable  [Coyote Ugly (Soundtrack from the Motion Picture)]",
-  "1990 apple 1989 (earliest original 1989)  Elton John — Sacrifice  [To Be Continued (Box Set)]",
-  "1991 apple 1991 (earliest original 1988)  Stevie B — Because I Love You (The Postman Song)  [Stevie B: Essential Gold (Remastered)]",
   "1992 apple 1992 (earliest original 1989)  Shakespears Sister — Stay  [Singles Party (1988-2019)]",
   "1993 apple 1998 (earliest original 1998)  Tag Team — Whoomp! (There It Is)  [Twice as Nice]",
   "1993 apple 1993 (earliest original 1965)  Billy Joel — The River of Dreams  [River of Dreams]",
@@ -29,10 +25,8 @@
   "1994 apple 1995 (earliest original -)  Prince — The Most Beautiful Girl in the World  [The Gold Experience]",
   "1995 apple 1995 (earliest original 1990)  Diana King — Shy Guy  [Tougher Than Love]",
   "1995 apple 1996 (earliest original 1996)  Peter Andre — Mysterious Girl  [Natural]",
-  "1996 apple 1996 (earliest original 1993)  Los del Río — Macarena  [NOW That's What I Call the 90's]",
   "1999 apple 2000 (earliest original 1997)  Sixpence None the Richer — Kiss Me  [The Best of Sixpence None the Richer]",
-  "1999 apple 1998 (earliest original 2023)  Vengaboys — Boom, Boom, Boom, Boom!!  [The Greatest Hits Collection]",
-  "1999 apple 1998 (earliest original 2021)  Vengaboys — We Like to Party! (The Vengabus)  [The Greatest Hits Collection]"
+  "1999 apple 1998 (earliest original 2023)  Vengaboys — Boom, Boom, Boom, Boom!!  [The Greatest Hits Collection]"
  ],
  "items": [
   {
@@ -116,26 +110,6 @@
    "d": 2
   },
   {
-   "id": "it-must-have-been-love-roxette",
-   "appleYear": 1990,
-   "album": "It Must Have Been Love - Single",
-   "appleArtist": "Roxette",
-   "appleTitle": "It Must Have Been Love (L.A. Version 1992)",
-   "store": "US",
-   "year": 1990,
-   "d": 1
-  },
-  {
-   "id": "black-velvet-alannah-myles",
-   "appleYear": 1989,
-   "album": "Alannah Myles",
-   "appleArtist": "Alannah Myles",
-   "appleTitle": "Black Velvet",
-   "store": "US",
-   "year": 1990,
-   "d": 2
-  },
-  {
    "id": "how-am-i-supposed-to-live-without-you-michael-bolton",
    "appleYear": 1989,
    "album": "Soul Provider",
@@ -196,16 +170,6 @@
    "d": 2
   },
   {
-   "id": "sacrifice-elton-john",
-   "appleYear": 1989,
-   "album": "To Be Continued (Box Set)",
-   "appleArtist": "Elton John",
-   "appleTitle": "Sacrifice",
-   "store": "US",
-   "year": 1990,
-   "d": 1
-  },
-  {
    "id": "justify-my-love-madonna",
    "appleYear": 1990,
    "album": "Celebration (Deluxe Version)",
@@ -231,16 +195,6 @@
    "album": "Mona - Single",
    "appleArtist": "Craig McLachlan & Check 1-2",
    "appleTitle": "Mona",
-   "store": "US",
-   "year": 1990,
-   "d": 2
-  },
-  {
-   "id": "janies-got-a-gun-aerosmith",
-   "appleYear": 1990,
-   "album": "The Very Best of Aerosmith",
-   "appleArtist": "Aerosmith",
-   "appleTitle": "Janie's Got a Gun",
    "store": "US",
    "year": 1990,
    "d": 2
@@ -428,12 +382,14 @@
   },
   {
    "id": "crazy-seal",
+   "chartYear": 1991,
+   "firstYear": 1990,
    "appleYear": 1991,
    "album": "Seal (Deluxe Edition)",
    "appleArtist": "Seal",
    "appleTitle": "Crazy (2022 Remaster)",
    "store": "US",
-   "year": 1991,
+   "year": 1990,
    "d": 2
   },
   {
@@ -498,12 +454,14 @@
   },
   {
    "id": "because-i-love-you-the-postman-song-stevie-b",
+   "chartYear": 1991,
+   "firstYear": 1990,
    "appleYear": 1991,
    "album": "Stevie B: Essential Gold (Remastered)",
    "appleArtist": "Stevie B",
    "appleTitle": "Because I Love You (The Postman Song)",
    "store": "US",
-   "year": 1991,
+   "year": 1990,
    "d": 2
   },
   {
@@ -799,12 +757,14 @@
   },
   {
    "id": "what-is-love-haddaway",
+   "chartYear": 1993,
+   "firstYear": 1992,
    "appleYear": 1993,
    "album": "What Is Love 2K9",
    "appleArtist": "Klaas & Haddaway",
    "appleTitle": "What Is Love (Klaas Radio Edit)",
    "store": "US",
-   "year": 1993,
+   "year": 1992,
    "d": 1
   },
   {
@@ -829,22 +789,26 @@
   },
   {
    "id": "all-that-she-wants-ace-of-base",
+   "chartYear": 1993,
+   "firstYear": 1992,
    "appleYear": 1993,
    "album": "Beautiful Life - The Singles Box",
    "appleArtist": "Ace of Base",
    "appleTitle": "All That She Wants (Banghra Version)",
    "store": "US",
-   "year": 1993,
+   "year": 1992,
    "d": 1
   },
   {
    "id": "informer-snow",
+   "chartYear": 1993,
+   "firstYear": 1992,
    "appleYear": 1993,
    "album": "Rhino Hi-Five: Rap, Vol. 1 - EP",
    "appleArtist": "Snow",
    "appleTitle": "Informer",
    "store": "US",
-   "year": 1993,
+   "year": 1992,
    "d": 1
   },
   {
@@ -1239,12 +1203,14 @@
   },
   {
    "id": "i-like-to-move-it-reel-2-real",
+   "chartYear": 1994,
+   "firstYear": 1993,
    "appleYear": 1994,
    "album": "I Like to Move It (feat. The Mad Stuntman) - Single",
    "appleArtist": "Reel 2 Real",
    "appleTitle": "I Like to Move It (feat. The Mad Stuntman) [Radio Edit]",
    "store": "US",
-   "year": 1994,
+   "year": 1993,
    "d": 2
   },
   {
@@ -1490,12 +1456,14 @@
   },
   {
    "id": "scatman-ski-ba-bop-ba-dop-bop-scatman-john",
+   "chartYear": 1995,
+   "firstYear": 1994,
    "appleYear": 1995,
    "album": "Scatman's World",
    "appleArtist": "Scatman John",
    "appleTitle": "Scatman's World",
    "store": "US",
-   "year": 1995,
+   "year": 1994,
    "d": 2
   },
   {
@@ -1520,12 +1488,14 @@
   },
   {
    "id": "set-you-free-n-trance",
+   "chartYear": 1995,
+   "firstYear": 1994,
    "appleYear": 1995,
    "album": "Set You Free",
    "appleArtist": "N-Trance",
    "appleTitle": "Set You Free",
    "store": "US",
-   "year": 1995,
+   "year": 1994,
    "d": 2
   },
   {
@@ -1570,12 +1540,14 @@
   },
   {
    "id": "because-you-loved-me-celine-dion",
+   "chartYear": 1996,
+   "firstYear": 1995,
    "appleYear": 1996,
    "album": "Pop Music: The Modern Era 1976-1999",
    "appleArtist": "Céline Dion",
    "appleTitle": "Because You Loved Me",
    "store": "US",
-   "year": 1996,
+   "year": 1995,
    "d": 1
   },
   {
@@ -1611,12 +1583,14 @@
   },
   {
    "id": "macarena-los-del-rio",
+   "chartYear": 1996,
+   "firstYear": 1993,
    "appleYear": 1996,
    "album": "NOW That's What I Call the 90's",
    "appleArtist": "Los del Río",
    "appleTitle": "Macarena",
    "store": "US",
-   "year": 1996,
+   "year": 1993,
    "d": 1
   },
   {
@@ -1711,12 +1685,14 @@
   },
   {
    "id": "children-robert-miles",
+   "chartYear": 1996,
+   "firstYear": 1995,
    "appleYear": 1996,
    "album": "Dance Vault Mixes: Robert Miles - Children - EP",
    "appleArtist": "Robert Miles",
    "appleTitle": "Children (Radio Edit)",
    "store": "US",
-   "year": 1996,
+   "year": 1995,
    "d": 1
   },
   {
@@ -1781,12 +1757,14 @@
   },
   {
    "id": "be-my-lover-la-bouche",
+   "chartYear": 1996,
+   "firstYear": 1994,
    "appleYear": 1995,
    "album": "Sweet Dreams",
    "appleArtist": "La Bouche",
    "appleTitle": "Be My Lover",
    "store": "US",
-   "year": 1995,
+   "year": 1994,
    "d": 2
   },
   {
@@ -1955,12 +1933,14 @@
   },
   {
    "id": "i-believe-i-can-fly-r-kelly",
+   "chartYear": 1997,
+   "firstYear": 1996,
    "appleYear": 1997,
    "album": "Die Jury - Die besten Rock-Popballaden",
    "appleArtist": "R. Kelly",
    "appleTitle": "I Believe I Can Fly (Radio Edit)",
    "store": "US",
-   "year": 1997,
+   "year": 1996,
    "d": 1
   },
   {
@@ -2055,12 +2035,14 @@
   },
   {
    "id": "to-the-moon-and-back-savage-garden",
+   "chartYear": 1997,
+   "firstYear": 1996,
    "appleYear": 1997,
    "album": "To the Moon & Back - EP",
    "appleArtist": "Savage Garden",
    "appleTitle": "To the Moon & Back (Hani's NUM Radio Edit)",
    "store": "US",
-   "year": 1997,
+   "year": 1996,
    "d": 2
   },
   {
@@ -2162,16 +2144,6 @@
    "store": "US",
    "year": 1998,
    "d": 1
-  },
-  {
-   "id": "its-like-that-run-d-m-c-vs-jason-nevins",
-   "appleYear": 1997,
-   "album": "The Masters Series: Hip Hop",
-   "appleArtist": "RUN-DMC vs. Jason Nevins",
-   "appleTitle": "It's Like That",
-   "store": "GB",
-   "year": 1997,
-   "d": 2
   },
   {
    "id": "pretty-fly-for-a-white-guy-the-offspring",
@@ -2285,12 +2257,14 @@
   },
   {
    "id": "high-lighthouse-family",
+   "chartYear": 1998,
+   "firstYear": 1997,
    "appleYear": 1998,
    "album": "High",
    "appleArtist": "Lighthouse Family",
    "appleTitle": "High (Francois K Vocal 12\" (Pt 1&2))",
    "store": "US",
-   "year": 1998,
+   "year": 1997,
    "d": 2
   },
   {
@@ -2397,12 +2371,14 @@
   },
   {
    "id": "blue-da-ba-dee-eiffel-65",
+   "chartYear": 1999,
+   "firstYear": 1998,
    "appleYear": 1999,
    "album": "Blue - Single",
    "appleArtist": "Mat1ne, PED1NE & Eiffel 65",
    "appleTitle": "Blue",
    "store": "US",
-   "year": 1999,
+   "year": 1998,
    "d": 1
   },
   {
@@ -2577,12 +2553,14 @@
   },
   {
    "id": "we-like-to-party-the-vengabus-vengaboys",
+   "chartYear": 1999,
+   "firstYear": 1998,
    "appleYear": 1998,
    "album": "The Greatest Hits Collection",
    "appleArtist": "Vengaboys",
    "appleTitle": "We Like To Party! (The Vengabus)",
    "store": "US",
-   "year": 1999,
+   "year": 1998,
    "d": 2
   },
   {
@@ -2624,6 +2602,28 @@
    "store": "US",
    "year": 1998,
    "d": 2
+  },
+  {
+   "id": "never-be-the-same-again-melanie-c",
+   "chartYear": 2000,
+   "firstYear": 1999,
+   "appleYear": 1999,
+   "album": "Northern Star",
+   "appleArtist": "Melanie C",
+   "appleTitle": "Never Be the Same Again",
+   "store": "US",
+   "year": 1999,
+   "d": 2
+  },
+  {
+   "id": "maria-maria-santana",
+   "appleYear": 1999,
+   "album": "Knuffelrock 14",
+   "appleArtist": "Santana",
+   "appleTitle": "Maria Maria (feat. The Product G&B)",
+   "store": "US",
+   "year": 1999,
+   "d": 1
   }
  ]
 }

@@ -3,8 +3,6 @@
 @icon 🎧
 @sources [{"name":"Billboard Year-End Hot 100 singles (2010s)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2010"},{"name":"UK year-end best-selling singles (Music Week / Official Charts Company)","url":"https://www.officialcharts.com/charts/end-of-year-singles-chart/"},{"name":"ARIA year-end singles chart","url":"https://www.aria.com.au/charts/2010/singles-chart"},{"name":"Wikipedia pageviews (lasting fame) and Wikidata (artist country)","url":"https://www.wikidata.org/"}]
 # chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
-2009 | Train | Hey, Soul Sister | us=3 uk=84 au=4 pv=8950 from=USA
-2009 | Kesha | TiK ToK | us=1 uk=45 au=- pv=16670 from=USA | tm=tik ?tok
 2010 | Eminem | Love the Way You Lie | us=7 uk=1 au=1 pv=10063 from=USA | am=eminem
 2010 | Adele | Rolling in the Deep | us=1 uk=9 au=5 pv=10261 from=GBR | d=1
 2010 | Katy Perry | California Gurls | us=4 uk=8 au=5 pv=10155 from=USA
@@ -18,7 +16,6 @@
 2010 | Katy Perry | Teenage Dream | us=17 uk=32 au=9 pv=5641 from=USA
 2010 | Rihanna | Rude Boy | us=15 uk=14 au=33 pv=4357 from=BRB
 2010 | Travie McCoy | Billionaire | us=23 uk=23 au=30 pv=3162 from=USA
-2010 | Jason Derulo | In My Head | us=14 uk=40 au=13 pv=1964 from=USA
 2010 | Eminem | Not Afraid | us=24 uk=34 au=22 pv=3547 from=USA
 2010 | Justin Bieber | Baby | us=44 uk=47 au=35 pv=28381 from=CAN
 2010 | Flo Rida | Club Can't Handle Me | us=40 uk=20 au=18 pv=2743 from=USA
@@ -275,3 +272,12 @@
 2019 | Dominic Fike | 3 Nights | us=- uk=24 au=11 pv=0 from=USA | nm=apple
 2019 | Taylor Swift | You Need to Calm Down | us=39 uk=- au=61 pv=4962 from=USA
 2019 | Meek Mill | Going Bad | us=18 uk=81 au=69 pv=819 from=USA
+
+2020 | Lewis Capaldi | Before You Go | us=21 uk=4 au=8 pv=2247 from=GBR | note=first released 2019, moved from hits-2020s
+2020 | Billie Eilish | Everything I Wanted | us=18 uk=29 au=38 pv=3444 from=USA | note=first released 2019, moved from hits-2020s
+2020 | Arizona Zervas | Roxanne | us=16 uk=31 au=29 pv=1302 from=USA | note=first released 2019, moved from hits-2020s
+
+2019 | Dua Lipa | Don't Start Now | us=4 uk=6 au=3 pv=4976 from=GBR/ALB/XKX | d=1; note=released 2019, moved from hits-2020s
+2019 | Harry Styles | Watermelon Sugar | us=20 uk=10 au=6 pv=7319 from=GBR | d=1; note=released 2019, moved from hits-2020s
+2019 | Harry Styles | Adore You | us=6 uk=16 au=11 pv=2836 from=GBR | note=released 2019, moved from hits-2020s
+2019 | Post Malone | Circles | us=2 uk=50 au=7 pv=3983 from=USA | note=released 2019, moved from hits-2020s

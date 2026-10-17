@@ -1,5 +1,5 @@
 {
- "build": "202610161426",
+ "build": "202610170717",
  "themes": [
   {
    "id": "animals",
@@ -4894,14 +4894,14 @@
    "theme": "music",
    "icon": "🎙️",
    "kids": false,
-   "items": 250,
+   "items": 254,
    "questions": 0,
    "notice": "30-second previews stream from Apple Music.",
    "caps": {
     "img": 0,
-    "audio": 250,
+    "audio": 254,
     "itemImg": 0,
-    "itemAudio": 250,
+    "itemAudio": 254,
     "clues": 0,
     "facts": {
      "artist": "cat",
@@ -4914,12 +4914,12 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 90,
+    "easy": 93,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
      "artist": 7,
-     "decade": 1,
+     "decade": 2,
      "act": 3
     },
     "formats": {
@@ -4933,7 +4933,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 8,
+     "blitz60": 9,
      "pickall": 18,
      "trio": 20
     },
@@ -4948,7 +4948,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 8,
+     "blitz60": 9,
      "pickall": 18,
      "trio": 20
     },
@@ -4975,14 +4975,14 @@
    "theme": "music",
    "icon": "🕺",
    "kids": false,
-   "items": 250,
+   "items": 253,
    "questions": 0,
    "notice": "30-second previews stream from Apple Music.",
    "caps": {
     "img": 0,
-    "audio": 250,
+    "audio": 253,
     "itemImg": 0,
-    "itemAudio": 250,
+    "itemAudio": 253,
     "clues": 0,
     "facts": {
      "artist": "cat",
@@ -4995,7 +4995,7 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 97,
+    "easy": 99,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
@@ -5076,7 +5076,7 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 105,
+    "easy": 104,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
@@ -5095,7 +5095,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 7,
+     "blitz60": 6,
      "pickall": 20,
      "trio": 20
     },
@@ -5110,7 +5110,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 7,
+     "blitz60": 6,
      "pickall": 20,
      "trio": 20
     },
@@ -5125,7 +5125,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 6,
+     "blitz60": 4,
      "pickall": 0,
      "trio": 0
     }
@@ -5137,14 +5137,14 @@
    "theme": "music",
    "icon": "💿",
    "kids": false,
-   "items": 258,
+   "items": 255,
    "questions": 0,
    "notice": "30-second previews stream from Apple Music.",
    "caps": {
     "img": 0,
-    "audio": 258,
+    "audio": 255,
     "itemImg": 0,
-    "itemAudio": 258,
+    "itemAudio": 255,
     "clues": 0,
     "facts": {
      "artist": "cat",
@@ -5157,7 +5157,7 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 89,
+    "easy": 88,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
@@ -5287,7 +5287,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 5,
+     "blitz60": 4,
      "pickall": 0,
      "trio": 0
     }
@@ -5299,14 +5299,14 @@
    "theme": "music",
    "icon": "🎧",
    "kids": false,
-   "items": 266,
+   "items": 270,
    "questions": 0,
    "notice": "30-second previews stream from Apple Music.",
    "caps": {
     "img": 0,
-    "audio": 266,
+    "audio": 270,
     "itemImg": 0,
-    "itemAudio": 266,
+    "itemAudio": 270,
     "clues": 0,
     "facts": {
      "artist": "cat",
@@ -5314,12 +5314,12 @@
      "decade": "cat",
      "act": "cat"
     },
-    "groups": 2,
+    "groups": 1,
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 91,
+    "easy": 92,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
@@ -5338,7 +5338,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 14,
+     "blitz60": 13,
      "pickall": 20,
      "trio": 20
     },
@@ -5353,7 +5353,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 14,
+     "blitz60": 13,
      "pickall": 20,
      "trio": 20
     },
@@ -5368,7 +5368,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 6,
+     "blitz60": 5,
      "pickall": 0,
      "trio": 0
     }
@@ -5380,14 +5380,14 @@
    "theme": "music",
    "icon": "🔥",
    "kids": false,
-   "items": 152,
+   "items": 144,
    "questions": 0,
    "notice": "30-second previews stream from Apple Music.",
    "caps": {
     "img": 0,
-    "audio": 152,
+    "audio": 144,
     "itemImg": 0,
-    "itemAudio": 152,
+    "itemAudio": 144,
     "clues": 0,
     "facts": {
      "artist": "cat",
@@ -5395,17 +5395,17 @@
      "decade": "cat",
      "act": "cat"
     },
-    "groups": 2,
+    "groups": 1,
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 37,
+    "easy": 34,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
-     "artist": 8,
-     "decade": 2,
+     "artist": 6,
+     "decade": 1,
      "act": 4
     },
     "formats": {
@@ -5419,7 +5419,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 7,
+     "blitz60": 6,
      "pickall": 20,
      "trio": 20
     },
@@ -5434,7 +5434,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 7,
+     "blitz60": 6,
      "pickall": 20,
      "trio": 20
     },
@@ -5449,7 +5449,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 4,
+     "blitz60": 3,
      "pickall": 0,
      "trio": 0
     }
@@ -5765,7 +5765,7 @@
      "listen": 20,
      "match": 0,
      "hilo": 20,
-     "order": 15,
+     "order": 13,
      "odd": 20,
      "sort": 20,
      "number": 20,

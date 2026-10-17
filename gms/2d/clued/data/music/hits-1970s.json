@@ -258,42 +258,6 @@
    "difficulty": 1
   },
   {
-   "id": "spirit-in-the-sky-norman-greenbaum",
-   "name": "Spirit in the Sky",
-   "group": "1970s",
-   "facts": {
-    "artist": "Norman Greenbaum",
-    "year": 1970,
-    "decade": "1970s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 22,
-    "uk": 4,
-    "au": 4
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Spirit in the Sky\" by Norman Greenbaum, released in 1970. Year-end charts: the US #22, the UK #4, Australia #4.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9d/bc/9e/9dbc9e1d-599e-711d-46fe-15afd75a3988/mzaf_11053192268213103738.plus.aac.p.m4a",
-      "credit": "Norman Greenbaum: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/spirit-in-the-sky/1462211353?i=1462211356&uo=4",
-      "apple": {
-       "trackId": 1462211356,
-       "url": "https://music.apple.com/us/album/spirit-in-the-sky/1462211353?i=1462211356&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/91/78/c8/9178c88b-ff65-6e4b-f8af-a5ab0c938b53/14UMDIM02986.rgb.jpg/300x300bb.jpg",
-       "term": "Norman Greenbaum Spirit In the Sky"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
    "id": "band-of-gold-freda-payne",
    "name": "Band of Gold",
    "group": "1970s",
@@ -512,41 +476,6 @@
    "difficulty": 1
   },
   {
-   "id": "venus-shocking-blue",
-   "name": "Venus",
-   "group": "1970s",
-   "facts": {
-    "artist": "Shocking Blue",
-    "year": 1970,
-    "decade": "1970s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "us": 33,
-    "au": 19
-   },
-   "artistCountry": "NLD",
-   "blurb": "\"Venus\" by Shocking Blue, released in 1970. Year-end charts: the US #33, Australia #19.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1e/dc/3b/1edc3b4f-e8f3-eedf-5edd-54e1bfbf16d6/mzaf_565175607364259087.plus.aac.p.m4a",
-      "credit": "Shocking Blue: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/venus/293336477?i=293336485&uo=4",
-      "apple": {
-       "trackId": 293336485,
-       "url": "https://music.apple.com/us/album/venus/293336477?i=293336485&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5c/d5/25/5cd52578-4325-b85a-2724-0f3f3ffc763d/8712944661958.png/300x300bb.jpg",
-       "term": "Shocking Blue Venus"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "up-around-the-bend-creedence-clearwater-revival",
    "name": "Up Around the Bend",
    "group": "1970s",
@@ -616,41 +545,6 @@
     ]
    },
    "difficulty": 2
-  },
-  {
-   "id": "i-want-you-back-the-jackson-5",
-   "name": "I Want You Back",
-   "group": "1970s",
-   "facts": {
-    "artist": "The Jackson 5",
-    "year": 1970,
-    "decade": "1970s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "us": 28,
-    "uk": 35
-   },
-   "artistCountry": "USA",
-   "blurb": "\"I Want You Back\" by The Jackson 5, released in 1970. Year-end charts: the US #28, the UK #35.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/51/c5/27/51c527f5-c9fd-8fc7-175b-53c365c13664/mzaf_7763659600534750503.plus.aac.p.m4a",
-      "credit": "The Jackson 5: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/i-want-you-back/1443221837?i=1443222051&uo=4",
-      "apple": {
-       "trackId": 1443222051,
-       "url": "https://music.apple.com/us/album/i-want-you-back/1443221837?i=1443222051&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/dc/5d/6d/dc5d6d8e-61dc-401b-80a6-c2a745fe048a/08UMGIM28826.rgb.jpg/300x300bb.jpg",
-       "term": "Jackson 5 I Want You Back"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
   },
   {
    "id": "lola-the-kinks",
@@ -3213,7 +3107,7 @@
    "group": "1970s",
    "facts": {
     "artist": "Vicki Lawrence",
-    "year": 1973,
+    "year": 1972,
     "decade": "1970s",
     "act": "Female solo artist"
    },
@@ -3221,7 +3115,7 @@
     "us": 11
    },
    "artistCountry": "USA",
-   "blurb": "\"The Night the Lights Went Out in Georgia\" by Vicki Lawrence, released in 1973. Year-end charts: the US #11.",
+   "blurb": "\"The Night the Lights Went Out in Georgia\" by Vicki Lawrence, released in 1972; year-end charts 1973: the US #11.",
    "media": {
     "audio": [
      {
@@ -6404,7 +6298,7 @@
    "group": "1970s",
    "facts": {
     "artist": "Fleetwood Mac",
-    "year": 1977,
+    "year": 1976,
     "decade": "1970s",
     "act": "Group or duo"
    },
@@ -6412,7 +6306,7 @@
     "us": 94
    },
    "artistCountry": "GBR",
-   "blurb": "\"Go Your Own Way\" by Fleetwood Mac, released in 1977. Year-end charts: the US #94.",
+   "blurb": "\"Go Your Own Way\" by Fleetwood Mac, released in 1976; year-end charts 1977: the US #94.",
    "media": {
     "audio": [
      {
@@ -8913,6 +8807,222 @@
     ]
    },
    "difficulty": 2
+  },
+  {
+   "id": "please-dont-go-kc-and-the-sunshine-band",
+   "name": "Please Don't Go",
+   "group": "1970s",
+   "facts": {
+    "artist": "KC and the Sunshine Band",
+    "year": 1979,
+    "decade": "1970s"
+   },
+   "charts": {
+    "us": 19,
+    "au": 10
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Please Don't Go\" by KC and the Sunshine Band, released in 1979; year-end charts 1980: the US #19, Australia #10.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8f/1c/72/8f1c728e-f749-5ad2-ed95-34442530e74a/mzaf_7348861842360863739.plus.aac.p.m4a",
+      "credit": "KC and the Sunshine Band: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/please-dont-go/27496656?i=27496664&uo=4",
+      "apple": {
+       "trackId": 27496664,
+       "url": "https://music.apple.com/us/album/please-dont-go/27496656?i=27496664&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/y2004/m10/d21/h13/s06.uxenjjhu.jpg/300x300bb.jpg",
+       "term": "KC and the Sunshine Band Please Don't Go"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "coward-of-the-county-kenny-rogers",
+   "name": "Coward of the County",
+   "group": "1970s",
+   "facts": {
+    "artist": "Kenny Rogers",
+    "year": 1979,
+    "decade": "1970s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 34,
+    "uk": 9
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Coward of the County\" by Kenny Rogers, released in 1979; year-end charts 1980: the US #34, the UK #9.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7d/8c/37/7d8c37b0-a19a-a229-763e-7f83b069b497/mzaf_15034017920978618737.plus.aac.p.m4a",
+      "credit": "Kenny Rogers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/coward-of-the-county/1443292623?i=1443293079&uo=4",
+      "apple": {
+       "trackId": 1443293079,
+       "url": "https://music.apple.com/us/album/coward-of-the-county/1443292623?i=1443293079&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/47/0a/99/470a9938-2d07-d4bb-768d-83b1f5be3e87/14UMGIM37189.rgb.jpg/300x300bb.jpg",
+       "term": "Kenny Rogers Coward of the County"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "escape-the-pina-colada-song-rupert-holmes",
+   "name": "Escape (The Piña Colada Song)",
+   "alt": [
+    "Escape"
+   ],
+   "group": "1970s",
+   "facts": {
+    "artist": "Rupert Holmes",
+    "year": 1979,
+    "decade": "1970s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 11
+   },
+   "artistCountry": "GBR",
+   "artistCountries": [
+    "GBR",
+    "USA"
+   ],
+   "blurb": "\"Escape (The Piña Colada Song)\" by Rupert Holmes, released in 1979; year-end charts 1980: the US #11.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/47/63/e5/4763e510-a446-d285-2e90-b743ceae62b2/mzaf_4218584407198042659.plus.aac.p.m4a",
+      "credit": "Rupert Holmes: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/escape-the-pina-colada-song/1443846037?i=1443846163&uo=4",
+      "apple": {
+       "trackId": 1443846163,
+       "url": "https://music.apple.com/us/album/escape-the-pina-colada-song/1443846037?i=1443846163&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/3f/d7/3d/3fd73db9-d2dc-9769-8419-67ab5ae4a1f7/06UMGIM03861.rgb.jpg/300x300bb.jpg",
+       "term": "Rupert Holmes Escape"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ive-never-been-to-me-charlene",
+   "name": "I've Never Been to Me",
+   "group": "1970s",
+   "facts": {
+    "artist": "Charlene",
+    "year": 1976,
+    "decade": "1970s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 38,
+    "uk": 48,
+    "au": 11
+   },
+   "artistCountry": "USA",
+   "blurb": "\"I've Never Been to Me\" by Charlene, released in 1976; year-end charts 1982: the US #38, the UK #48, Australia #11.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/4e/04/46/4e0446a4-99cb-346d-da4d-42e0bd0dba79/mzaf_16349177011590582276.plus.aac.p.m4a",
+      "credit": "Charlene: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ive-never-been-to-me/1171164885?i=1171166443&uo=4",
+      "apple": {
+       "trackId": 1171166443,
+       "url": "https://music.apple.com/us/album/ive-never-been-to-me/1171164885?i=1171166443&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music71/v4/c2/09/cf/c209cff6-448b-63af-9581-24730c32605d/191018391683.jpg/300x300bb.jpg",
+       "term": "Charlene I've Never Been to Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "crazy-little-thing-called-love-queen",
+   "name": "Crazy Little Thing Called Love",
+   "group": "1970s",
+   "facts": {
+    "artist": "Queen",
+    "year": 1979,
+    "decade": "1970s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 6,
+    "uk": 25,
+    "au": 3
+   },
+   "artistCountry": "GBR",
+   "blurb": "\"Crazy Little Thing Called Love\" by Queen, released in 1979. Year-end charts: the US #6, the UK #25, Australia #3.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/04/f0/78/04f078ae-9d1b-2f8a-b173-8b54b0288058/mzaf_9972199097319129995.plus.aac.p.m4a",
+      "credit": "Queen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/crazy-little-thing-called-love/6781076388?i=6781076401&uo=4",
+      "apple": {
+       "trackId": 6781076401,
+       "url": "https://music.apple.com/us/album/crazy-little-thing-called-love/6781076388?i=6781076401&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/08/ee/da/08eeda1f-d44d-aec1-ec9d-0c5b9f8c8536/602527717524.jpg/300x300bb.jpg",
+       "term": "Queen Crazy Little Thing Called Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rock-with-you-michael-jackson",
+   "name": "Rock with You",
+   "group": "1970s",
+   "facts": {
+    "artist": "Michael Jackson",
+    "year": 1979,
+    "decade": "1970s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 4
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Rock with You\" by Michael Jackson, released in 1979. Year-end charts: the US #4.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ba/c3/12/bac31216-bfc5-68dd-1f86-955777ba5c77/mzaf_5177525496066876810.plus.aac.p.m4a",
+      "credit": "Michael Jackson: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/rock-with-you-single-version/186166282?i=186166358&uo=4",
+      "apple": {
+       "trackId": 186166358,
+       "url": "https://music.apple.com/us/album/rock-with-you-single-version/186166282?i=186166358&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/fe/a3/0cfea324-57c1-d530-5248-9bb591bbd7bf/074643574525.jpg/300x300bb.jpg",
+       "term": "Michael Jackson Rock with You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
   }
  ],
  "questions": [],
@@ -8938,5 +9048,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-13"
+ "built": "2026-10-17"
 }

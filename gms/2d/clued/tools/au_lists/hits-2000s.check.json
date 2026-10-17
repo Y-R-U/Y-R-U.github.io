@@ -13,10 +13,8 @@
  "offby": [
   "2000 apple 1999 (earliest original 1999)  Sisqó — Thong Song  [Unleash the Dragon]",
   "2000 apple 1999 (earliest original 1999)  Bomfunk MCs — Freestyler  [In Stereo]",
-  "2000 apple 1999 (earliest original 1999)  Melanie C — Never Be the Same Again  [Northern Star]",
   "2001 apple 2001 (earliest original 1999)  City High — What Would You Do?  [City High (Expanded Edition)]",
   "2002 apple 2002 (earliest original 2000)  Las Ketchup — The Ketchup Song (Aserejé)  [Aserejé (The Ketchup Song) - Single]",
-  "2001 apple 2001 (earliest original 1968)  Elvis vs JXL — A Little Less Conversation  [A Little Less Conversation: Elvis vs JXL - Single]",
   "2003 apple 2003 (earliest original 2001)  Kevin Lyttle — Turn Me On  [Turn Me On - Single]",
   "2004 apple 2004 (earliest original 2001)  Destiny's Child — Lose My Breath  [Destiny Fulfilled]",
   "2004 apple 2004 (earliest original 2000)  DJ Casper — Cha Cha Slide  [Cha Cha Slide - Single]",
@@ -25,26 +23,6 @@
   "2007 apple 2006 (earliest original 2005)  Nickelback — Rockstar  [The Best of Nickelback, Vol. 1]"
  ],
  "items": [
-  {
-   "id": "maria-maria-santana",
-   "appleYear": 1999,
-   "album": "Knuffelrock 14",
-   "appleArtist": "Santana",
-   "appleTitle": "Maria Maria (feat. The Product G&B)",
-   "store": "US",
-   "year": 1999,
-   "d": 1
-  },
-  {
-   "id": "breathe-faith-hill",
-   "appleYear": 1999,
-   "album": "Breathe",
-   "appleArtist": "Faith Hill",
-   "appleTitle": "Breathe",
-   "store": "US",
-   "year": 1999,
-   "d": 2
-  },
   {
    "id": "music-madonna",
    "appleYear": 2000,
@@ -266,16 +244,6 @@
    "album": "Born to Do It",
    "appleArtist": "Craig David",
    "appleTitle": "7 Days",
-   "store": "US",
-   "year": 2000,
-   "d": 2
-  },
-  {
-   "id": "never-be-the-same-again-melanie-c",
-   "appleYear": 1999,
-   "album": "Northern Star",
-   "appleArtist": "Melanie C",
-   "appleTitle": "Never Be the Same Again",
    "store": "US",
    "year": 2000,
    "d": 2
@@ -528,12 +496,14 @@
   },
   {
    "id": "rollin-limp-bizkit",
+   "chartYear": 2001,
+   "firstYear": 2000,
    "appleYear": 2001,
    "album": "The Fast And The Furious (Original Motion Picture Soundtrack)",
    "appleArtist": "Limp Bizkit",
    "appleTitle": "Rollin' (Urban Assault Vehicle) [feat. Redman, Method Man & DMX]",
    "store": "US",
-   "year": 2001,
+   "year": 2000,
    "d": 2,
    "explicit": true
   },
@@ -683,16 +653,6 @@
    "appleTitle": "The Ketchup Song (Aserejé) [Chiringuito Club Single Edit]",
    "store": "US",
    "year": 2002,
-   "d": 1
-  },
-  {
-   "id": "a-little-less-conversation-elvis-vs-jxl",
-   "appleYear": 2001,
-   "album": "A Little Less Conversation: Elvis vs JXL - Single",
-   "appleArtist": "Elvis Presley",
-   "appleTitle": "A Little Less Conversation",
-   "store": "US",
-   "year": 2001,
    "d": 1
   },
   {
@@ -913,12 +873,14 @@
   },
   {
    "id": "beautiful-christina-aguilera",
+   "chartYear": 2003,
+   "firstYear": 2002,
    "appleYear": 2003,
    "album": "Beautiful (The Voice Performance) - Single",
    "appleArtist": "Christina Aguilera & Beverly McClellan",
    "appleTitle": "Beautiful (The Voice Performance)",
    "store": "US",
-   "year": 2003,
+   "year": 2002,
    "d": 2
   },
   {
@@ -976,12 +938,14 @@
   },
   {
    "id": "03-bonnie-and-clyde-jay-z",
+   "chartYear": 2003,
+   "firstYear": 2002,
    "appleYear": 2003,
    "album": "Blueprint 2.1",
    "appleArtist": "JAŸ-Z",
    "appleTitle": "03' Bonnie & Clyde (feat. Beyoncé Knowles)",
    "store": "US",
-   "year": 2003,
+   "year": 2002,
    "d": 2,
    "explicit": true
   },
@@ -2103,12 +2067,14 @@
   },
   {
    "id": "cupids-chokehold-gym-class-heroes",
+   "chartYear": 2007,
+   "firstYear": 2005,
    "appleYear": 2006,
    "album": "As Cruel As School Children",
    "appleArtist": "Gym Class Heroes",
    "appleTitle": "Cupid's Chokehold (Featuring Patrick Stump)",
    "store": "US",
-   "year": 2006,
+   "year": 2005,
    "d": 2
   },
   {
@@ -2720,6 +2686,48 @@
    "store": "US",
    "year": 2008,
    "d": 3
+  },
+  {
+   "id": "in-my-head-jason-derulo",
+   "chartYear": 2010,
+   "firstYear": 2009,
+   "appleYear": 2010,
+   "album": "Jason Derulo (Special Edition) - EP",
+   "appleArtist": "Jason Derulo",
+   "appleTitle": "In My Head (feat. Nicki Minaj)",
+   "store": "US",
+   "year": 2009,
+   "d": 2
+  },
+  {
+   "id": "hey-soul-sister-train",
+   "appleYear": 2009,
+   "album": "Save Me, San Francisco (Golden Gate Edition)",
+   "appleArtist": "Train",
+   "appleTitle": "Hey, Soul Sister",
+   "store": "US",
+   "year": 2009,
+   "d": 1
+  },
+  {
+   "id": "tik-tok-kesha",
+   "appleYear": 2009,
+   "album": "Animal (Expanded Edition)",
+   "appleArtist": "Kesha",
+   "appleTitle": "TiK ToK",
+   "store": "US",
+   "year": 2009,
+   "d": 1
+  },
+  {
+   "id": "breathe-faith-hill",
+   "appleYear": 1999,
+   "album": "Breathe",
+   "appleArtist": "Faith Hill",
+   "appleTitle": "Breathe",
+   "store": "US",
+   "year": 1999,
+   "d": 2
   }
  ]
 }

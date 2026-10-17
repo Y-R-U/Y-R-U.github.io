@@ -13,30 +13,9 @@
   "2010 apple 2009 (earliest original 2009)  Mike Posner — Cooler Than Me  [Cooler Than Me - EP]",
   "2010 apple 2009 (earliest original 2009)  Lady Gaga — Alejandro  [The Fame Monster (Deluxe Edition)]",
   "2018 apple 2019 (earliest original 2019)  XXXTentacion — Sad!  [? (Deluxe)]",
-  "2019 apple 2019 (earliest original 2016)  Lizzo — Good as Hell  [Cuz I Love You (Super Deluxe)]",
   "2019 apple 2019 (earliest original 1990)  MEDUZA — Piece Of Your Heart  [Piece Of Your Heart - Single]"
  ],
  "items": [
-  {
-   "id": "hey-soul-sister-train",
-   "appleYear": 2009,
-   "album": "Save Me, San Francisco (Golden Gate Edition)",
-   "appleArtist": "Train",
-   "appleTitle": "Hey, Soul Sister",
-   "store": "US",
-   "year": 2009,
-   "d": 1
-  },
-  {
-   "id": "tik-tok-kesha",
-   "appleYear": 2009,
-   "album": "Animal (Expanded Edition)",
-   "appleArtist": "Kesha",
-   "appleTitle": "TiK ToK",
-   "store": "US",
-   "year": 2009,
-   "d": 1
-  },
   {
    "id": "love-the-way-you-lie-eminem",
    "appleYear": 2010,
@@ -169,16 +148,6 @@
    "year": 2010,
    "d": 3,
    "explicit": true
-  },
-  {
-   "id": "in-my-head-jason-derulo",
-   "appleYear": 2010,
-   "album": "Jason Derulo (Special Edition) - EP",
-   "appleArtist": "Jason Derulo",
-   "appleTitle": "In My Head (feat. Nicki Minaj)",
-   "store": "US",
-   "year": 2010,
-   "d": 2
   },
   {
    "id": "not-afraid-eminem",
@@ -534,7 +503,7 @@
    "appleTitle": "The Edge of Glory",
    "store": "US",
    "year": 2011,
-   "d": 3
+   "d": 2
   },
   {
    "id": "the-a-team-ed-sheeran",
@@ -1253,12 +1222,14 @@
   },
   {
    "id": "am-i-wrong-nico-and-vinz",
+   "chartYear": 2014,
+   "firstYear": 2013,
    "appleYear": 2014,
    "album": "Am I Wrong - Single",
    "appleArtist": "Nico & Vinz",
    "appleTitle": "Am I Wrong",
    "store": "US",
-   "year": 2014,
+   "year": 2013,
    "d": 2
   },
   {
@@ -1323,12 +1294,14 @@
   },
   {
    "id": "budapest-george-ezra",
+   "chartYear": 2014,
+   "firstYear": 2013,
    "appleYear": 2014,
    "album": "Wanted On Voyage",
    "appleArtist": "George Ezra",
    "appleTitle": "Budapest",
    "store": "US",
-   "year": 2014,
+   "year": 2013,
    "d": 2
   },
   {
@@ -1547,12 +1520,14 @@
   },
   {
    "id": "elastic-heart-sia",
+   "chartYear": 2015,
+   "firstYear": 2013,
    "appleYear": 2014,
    "album": "1000 Forms of Fear",
    "appleArtist": "Sia",
    "appleTitle": "Elastic Heart",
    "store": "US",
-   "year": 2014,
+   "year": 2013,
    "d": 2
   },
   {
@@ -1659,12 +1634,14 @@
   },
   {
    "id": "hold-back-the-river-james-bay",
+   "chartYear": 2015,
+   "firstYear": 2014,
    "appleYear": 2015,
    "album": "Chaos And The Calm 10 Years",
    "appleArtist": "James Bay",
    "appleTitle": "Hold Back The River (Original Session)",
    "store": "US",
-   "year": 2015,
+   "year": 2014,
    "d": 2
   },
   {
@@ -1689,12 +1666,14 @@
   },
   {
    "id": "cheap-thrills-sia",
+   "chartYear": 2016,
+   "firstYear": 2015,
    "appleYear": 2016,
    "album": "Cheap Thrills (feat. Sean Paul) - Single",
    "appleArtist": "Sia",
    "appleTitle": "Cheap Thrills (feat. Sean Paul)",
    "store": "US",
-   "year": 2016,
+   "year": 2015,
    "d": 1
   },
   {
@@ -1846,12 +1825,14 @@
   },
   {
    "id": "panda-desiigner",
+   "chartYear": 2016,
+   "firstYear": 2015,
    "appleYear": 2016,
    "album": "Panda - Single",
    "appleArtist": "Desiigner",
    "appleTitle": "Panda",
    "store": "US",
-   "year": 2016,
+   "year": 2015,
    "d": 2,
    "explicit": true
   },
@@ -2323,7 +2304,7 @@
    "appleTitle": "no tears left to cry",
    "store": "US",
    "year": 2018,
-   "d": 2
+   "d": 1
   },
   {
    "id": "without-me-halsey",
@@ -2568,12 +2549,14 @@
   },
   {
    "id": "wow-post-malone",
+   "chartYear": 2019,
+   "firstYear": 2018,
    "appleYear": 2019,
    "album": "Wow. (Instrumental) - Single",
    "appleArtist": "Post Malone",
    "appleTitle": "Wow. (Instrumental)",
    "store": "US",
-   "year": 2019,
+   "year": 2018,
    "d": 2
   },
   {
@@ -2651,12 +2634,14 @@
   },
   {
    "id": "good-as-hell-lizzo",
+   "chartYear": 2019,
+   "firstYear": 2016,
    "appleYear": 2019,
    "album": "Cuz I Love You (Super Deluxe)",
    "appleArtist": "Lizzo",
    "appleTitle": "Good as Hell (feat. Ariana Grande)",
    "store": "US",
-   "year": 2019,
+   "year": 2016,
    "d": 3
   },
   {
@@ -2751,6 +2736,83 @@
    "year": 2018,
    "d": 2,
    "explicit": true
+  },
+  {
+   "id": "before-you-go-lewis-capaldi",
+   "chartYear": 2020,
+   "firstYear": 2019,
+   "appleYear": 2020,
+   "album": "Before You Go (Orchestral) - Single",
+   "appleArtist": "Lewis Capaldi",
+   "appleTitle": "Before You Go (Orchestral)",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "everything-i-wanted-billie-eilish",
+   "chartYear": 2020,
+   "firstYear": 2019,
+   "appleYear": 2019,
+   "album": "everything i wanted - Single",
+   "appleArtist": "Billie Eilish",
+   "appleTitle": "everything i wanted",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "roxanne-arizona-zervas",
+   "chartYear": 2020,
+   "firstYear": 2019,
+   "appleYear": 2019,
+   "album": "ROXANNE - Single",
+   "appleArtist": "Arizona Zervas",
+   "appleTitle": "ROXANNE",
+   "store": "US",
+   "year": 2019,
+   "d": 2,
+   "explicit": true
+  },
+  {
+   "id": "dont-start-now-dua-lipa",
+   "appleYear": 2019,
+   "album": "Don't Start Now - Single",
+   "appleArtist": "Dua Lipa",
+   "appleTitle": "Don't Start Now",
+   "store": "US",
+   "year": 2019,
+   "d": 1
+  },
+  {
+   "id": "watermelon-sugar-harry-styles",
+   "appleYear": 2019,
+   "album": "Fine Line",
+   "appleArtist": "Harry Styles",
+   "appleTitle": "Watermelon Sugar",
+   "store": "US",
+   "year": 2019,
+   "d": 1
+  },
+  {
+   "id": "adore-you-harry-styles",
+   "appleYear": 2019,
+   "album": "Fine Line",
+   "appleArtist": "Harry Styles",
+   "appleTitle": "Adore You",
+   "store": "US",
+   "year": 2019,
+   "d": 2
+  },
+  {
+   "id": "circles-post-malone",
+   "appleYear": 2019,
+   "album": "Hollywood's Bleeding",
+   "appleArtist": "Post Malone",
+   "appleTitle": "Circles",
+   "store": "US",
+   "year": 2019,
+   "d": 2
   }
  ]
 }

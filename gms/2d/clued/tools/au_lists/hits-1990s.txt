@@ -11,8 +11,6 @@
 1990 | C+C Music Factory | Gonna Make You Sweat (Everybody Dance Now) | us=3 uk=- au=26 pv=7895 from=USA | am=c\+c
 1990 | Deee-Lite | Groove Is in the Heart | us=91 uk=26 au=38 pv=12275 from=USA
 1990 | Mariah Carey | Vision of Love | us=6 uk=- au=- pv=4341 from=USA
-1990 | Roxette | It Must Have Been Love | us=2 uk=14 au=4 pv=10884 from=SWE
-1990 | Alannah Myles | Black Velvet | us=18 uk=18 au=13 pv=14927 from=CAN
 1990 | Michael Bolton | How Am I Supposed to Live Without You | us=12 uk=28 au=7 pv=5857 from=USA
 1990 | Paula Abdul | Opposites Attract | us=14 uk=25 au=6 pv=4391 from=USA
 1990 | Londonbeat | I've Been Thinking About You | us=31 uk=29 au=8 pv=3007 from=GBR
@@ -20,13 +18,11 @@
 1990 | Snap! | The Power | us=26 uk=10 au=- pv=6766 from=DEU
 1990 | EMF | Unbelievable | us=6 uk=30 au=- pv=6464 from=GBR
 1990 | Jon Bon Jovi | Blaze of Glory | us=10 uk=- au=20 pv=3650 from=USA
-1990 | Elton John | Sacrifice | us=- uk=3 au=47 pv=5330 from=GBR
 1990 | Madonna | Justify My Love | us=21 uk=43 au=- pv=8401 from=USA
 1990 | DNA | Tom's Diner | us=53 uk=32 au=- pv=18004 from=GBR
 1990 | Billy Idol | Cradle of Love | us=9 uk=- au=48 pv=2433 from=GBR
 1990 | Luciano Pavarotti | Nessun Dorma | us=- uk=11 au=- pv=29147 from=ITA
 1990 | Craig McLachlan & Check 1–2 | Mona | us=- uk=22 au=15 pv=890 from=AUS
-1990 | Aerosmith | Janie's Got a Gun | us=61 uk=- au=19 pv=6141 from=USA
 1990 | Maxi Priest | Close to You | us=17 uk=- au=36 pv=1699 from=GBR
 1990 | Black Box | Fantasy | us=- uk=47 au=17 pv=2773 from=ITA
 1990 | En Vogue | Hold On | us=8 uk=45 au=- pv=1542 from=USA
@@ -226,7 +222,6 @@
 1998 | Brandy and Monica | The Boy Is Mine | us=2 uk=18 au=17 pv=9278 from=USA
 1998 | Madonna | Frozen | us=32 uk=22 au=44 pv=9767 from=USA
 1998 | Shania Twain | You're Still the One | us=3 uk=- au=9 pv=9574 from=CAN
-1998 | Run–D.M.C. vs. Jason Nevins | It's Like That | us=- uk=3 au=2 pv=2787 from=USA
 1998 | The Offspring | Pretty Fly (For a White Guy) | us=- uk=30 au=5 pv=10827 from=USA
 1998 | K-Ci & JoJo | All My Life | us=7 uk=- au=12 pv=5063 from=USA
 1998 | Stardust | Music Sounds Better with You | us=- uk=11 au=36 pv=12755
@@ -273,3 +268,7 @@
 1999 | Ann Lee | 2 Times | us=- uk=21 au=20 pv=1546 from=GBR
 1999 | Lonestar | Amazed | us=8 uk=- au=49 pv=2987 from=USA
 1999 | Monica | Angel of Mine | us=3 uk=- au=57 pv=2843 from=USA
+
+2000 | Melanie C | Never Be the Same Again | us=- uk=18 au=14 pv=2368 from=GBR | note=first released 1999, moved from hits-2000s
+
+1999 | Santana | Maria Maria | us=3 uk=- au=- pv=6377 from=USA | am=santana; note=released 1999, moved from hits-2000s

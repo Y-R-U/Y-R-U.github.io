@@ -15,26 +15,19 @@
  "offby": [
   "1980 apple 1980 (earliest original 1969)  Kool & The Gang — Celebration  [Celebrate!]",
   "1980 apple 1980 (earliest original 1976)  Leo Sayer — More Than I Can Say  [Play Soft Rock]",
-  "1980 apple 1979 (earliest original 1979)  KC and the Sunshine Band — Please Don't Go  [Do You Wanna Go Party]",
   "1980 apple 1979 (earliest original 1979)  The Spinners — Working My Way Back to You/Forgive Me, Girl  [Smooth & Sweet: The Spinners]",
-  "1980 apple 1979 (earliest original 1979)  Kenny Rogers — Coward of the County  [Kenny]",
   "1980 apple 1980 (earliest original 1972)  Don McLean — Crying  [Favorites & Rarities]",
-  "1980 apple 1979 (earliest original 1979)  Rupert Holmes — Escape (The Piña Colada Song)  [Partners In Crime]",
   "1980 apple 1979 (earliest original 1979)  Rocky Burnette — Tired of Toein' the Line  [Tired of Toein' the Line - Single]",
   "1981 apple 1981 (earliest original 1973)  Earth, Wind & Fire — Let's Groove  [Raise!]",
   "1982 apple 1982 (earliest original 1966)  Michael Jackson — Billie Jean  [Thriller]",
   "1982 apple 1982 (earliest original 1974)  Dexys Midnight Runners — Come On Eileen  [Too Rye Ay]",
-  "1982 apple 1982 (earliest original 1977)  Charlene — I've Never Been to Me  [25 Best Hits of the 80's]",
   "1981 apple 1981 (earliest original 1978)  Foreigner — Waiting for a Girl Like You  [40]",
   "1981 apple 1981 (earliest original 1961)  Rod Stewart — Young Turks  [Tonight I'm Yours (Bonus Track Version)]",
-  "1982 apple 1983 (earliest original 1983)  The Stranglers — Golden Brown  [La folie]",
-  "1983 apple 1982 (earliest original -)  Joe Cocker and Jennifer Warnes — Up Where We Belong  [20th Century Masters - The Millennium Collection: The Best of Joe Cocker]",
   "1983 apple 1983 (earliest original 1981)  Duran Duran — Is There Something I Should Know?  [Duran Duran]",
   "1983 apple 1984 (earliest original 1984)  The Flying Pickets — Only You  [Lost Boys]",
   "1984 apple 1984 (earliest original 1977)  Foreigner — I Want to Know What Love Is  [Agent Provocateur]",
   "1985 apple 1985 (earliest original 1978)  Dire Straits — Money for Nothing  [Brothers in Arms (40th Anniversary)]",
   "1985 apple 1985 (earliest original 1972)  Dionne Warwick — That's What Friends Are For  [Friends]",
-  "1985 apple 1985 (earliest original 1983)  Dead or Alive — You Spin Me Round (Like a Record)  [Stranger Things: Soundtrack from the Netflix Series, Season 4]",
   "1985 apple 1985 (earliest original 1983)  Katrina and the Waves — Walking on Sunshine  [Katrina and the Waves]",
   "1986 apple 1986 (earliest original 1981)  Kim Wilde — You Keep Me Hangin' On  [Another Step]",
   "1986 apple 1986 (earliest original 1984)  Nu Shooz — I Can't Wait  [Poolside]",
@@ -48,26 +41,6 @@
   "1989 apple 1989 (earliest original 1966)  Billy Joel — We Didn't Start the Fire  [Storm Front]"
  ],
  "items": [
-  {
-   "id": "crazy-little-thing-called-love-queen",
-   "appleYear": 1979,
-   "album": "The Game (Deluxe Edition)",
-   "appleArtist": "Queen",
-   "appleTitle": "Crazy Little Thing Called Love",
-   "store": "US",
-   "year": 1979,
-   "d": 1
-  },
-  {
-   "id": "rock-with-you-michael-jackson",
-   "appleYear": 1979,
-   "album": "Off the Wall",
-   "appleArtist": "Michael Jackson",
-   "appleTitle": "Rock with You (Single Version)",
-   "store": "US",
-   "year": 1979,
-   "d": 1
-  },
   {
    "id": "funkytown-lipps-inc",
    "appleYear": 1980,
@@ -229,16 +202,6 @@
    "d": 2
   },
   {
-   "id": "please-dont-go-kc-and-the-sunshine-band",
-   "appleYear": 1979,
-   "album": "Do You Wanna Go Party",
-   "appleArtist": "KC and the Sunshine Band",
-   "appleTitle": "Please Don't Go",
-   "store": "US",
-   "year": 1980,
-   "d": 2
-  },
-  {
    "id": "ashes-to-ashes-david-bowie",
    "appleYear": 1980,
    "album": "Leto (Original Motion Picture Soundtrack)",
@@ -269,16 +232,6 @@
    "d": 2
   },
   {
-   "id": "coward-of-the-county-kenny-rogers",
-   "appleYear": 1979,
-   "album": "Kenny",
-   "appleArtist": "Kenny Rogers",
-   "appleTitle": "Coward of the County",
-   "store": "US",
-   "year": 1980,
-   "d": 2
-  },
-  {
    "id": "crying-don-mclean",
    "appleYear": 1980,
    "album": "Favorites & Rarities",
@@ -304,16 +257,6 @@
    "album": "Fame (Original Motion Picture Soundtrack)",
    "appleArtist": "Irene Cara",
    "appleTitle": "Fame",
-   "store": "US",
-   "year": 1980,
-   "d": 2
-  },
-  {
-   "id": "escape-the-pina-colada-song-rupert-holmes",
-   "appleYear": 1979,
-   "album": "Partners In Crime",
-   "appleArtist": "Rupert Holmes",
-   "appleTitle": "Escape (The Pina Colada Song)",
    "store": "US",
    "year": 1980,
    "d": 2
@@ -690,16 +633,6 @@
    "d": 2
   },
   {
-   "id": "ive-never-been-to-me-charlene",
-   "appleYear": 1982,
-   "album": "25 Best Hits of the 80's",
-   "appleArtist": "Charlene",
-   "appleTitle": "I've Never Been to Me",
-   "store": "US",
-   "year": 1982,
-   "d": 2
-  },
-  {
    "id": "heartbreaker-dionne-warwick",
    "appleYear": 1982,
    "album": "Heartbreaker",
@@ -731,12 +664,14 @@
   },
   {
    "id": "key-largo-bertie-higgins",
+   "chartYear": 1982,
+   "firstYear": 1981,
    "appleYear": 1982,
    "album": "Just Another Day in Paradise",
    "appleArtist": "Bertie Higgins",
    "appleTitle": "Key Largo",
    "store": "US",
-   "year": 1982,
+   "year": 1981,
    "d": 2
   },
   {
@@ -801,12 +736,14 @@
   },
   {
    "id": "golden-brown-the-stranglers",
+   "chartYear": 1982,
+   "firstYear": 1981,
    "appleYear": 1983,
    "album": "La folie",
    "appleArtist": "The Stranglers",
    "appleTitle": "Golden Brown",
    "store": "US",
-   "year": 1982,
+   "year": 1981,
    "d": 1
   },
   {
@@ -961,12 +898,14 @@
   },
   {
    "id": "up-where-we-belong-joe-cocker-and-jennifer-warnes",
+   "chartYear": 1983,
+   "firstYear": 1982,
    "appleYear": 1982,
    "album": "20th Century Masters - The Millennium Collection: The Best of Joe Cocker",
    "appleArtist": "Joe Cocker & Jennifer Warnes",
    "appleTitle": "Up Where We Belong (From \"An Officer and a Gentleman\")",
    "store": "US",
-   "year": 1983,
+   "year": 1982,
    "d": 1
   },
   {
@@ -1413,12 +1352,14 @@
   },
   {
    "id": "shout-tears-for-fears",
+   "chartYear": 1985,
+   "firstYear": 1984,
    "appleYear": 1985,
    "album": "Songs from the Big Chair (Deluxe)",
    "appleArtist": "Tears for Fears",
    "appleTitle": "Shout (U.S. Single Edit)",
    "store": "US",
-   "year": 1985,
+   "year": 1984,
    "d": 2
   },
   {
@@ -1463,12 +1404,14 @@
   },
   {
    "id": "you-spin-me-round-like-a-record-dead-or-alive",
+   "chartYear": 1985,
+   "firstYear": 1984,
    "appleYear": 1985,
    "album": "Stranger Things: Soundtrack from the Netflix Series, Season 4",
    "appleArtist": "Dead or Alive",
    "appleTitle": "You Spin Me Round (Like a Record)",
    "store": "US",
-   "year": 1985,
+   "year": 1984,
    "d": 2
   },
   {
@@ -1509,7 +1452,7 @@
    "appleTitle": "One Night in Bangkok (Radio Edit / From “Chess” / Remastered 2016)",
    "store": "US",
    "year": 1984,
-   "d": 1
+   "d": 2
   },
   {
    "id": "saving-all-my-love-for-you-whitney-houston",
@@ -1583,12 +1526,14 @@
   },
   {
    "id": "neutron-dance-the-pointer-sisters",
+   "chartYear": 1985,
+   "firstYear": 1983,
    "appleYear": 1984,
    "album": "Beverly Hills Cop (Music From the Motion Picture Soundtrack)",
    "appleArtist": "The Pointer Sisters",
    "appleTitle": "Neutron Dance",
    "store": "US",
-   "year": 1984,
+   "year": 1983,
    "d": 2
   },
   {
@@ -1654,12 +1599,14 @@
   },
   {
    "id": "when-the-going-gets-tough-the-tough-get-going-billy-ocean",
+   "chartYear": 1986,
+   "firstYear": 1985,
    "appleYear": 1986,
    "album": "Love Zone (Expanded Edition)",
    "appleArtist": "Billy Ocean",
    "appleTitle": "When the Going Gets Tough, The Tough Get Going",
    "store": "US",
-   "year": 1986,
+   "year": 1985,
    "d": 2
   },
   {
@@ -1754,12 +1701,14 @@
   },
   {
    "id": "rock-me-amadeus-falco",
+   "chartYear": 1986,
+   "firstYear": 1985,
    "appleYear": 1986,
    "album": "Rock Me Amadeus (30th Anniversary) - EP",
    "appleArtist": "Falco",
    "appleTitle": "Rock Me Amadeus (12\" American Edit)",
    "store": "US",
-   "year": 1986,
+   "year": 1985,
    "d": 2
   },
   {
@@ -1784,12 +1733,14 @@
   },
   {
    "id": "living-doll-cliff-richard-and-the-young-ones",
+   "chartYear": 1986,
+   "firstYear": 1959,
    "appleYear": 1986,
    "album": "Living Doll - Single",
    "appleArtist": "Cliff Richard & The Young Ones",
    "appleTitle": "Living Doll (feat. Hank Marvin)",
    "store": "US",
-   "year": 1986,
+   "year": 1959,
    "d": 2
   },
   {
@@ -2364,12 +2315,14 @@
   },
   {
    "id": "hands-to-heaven-breathe",
+   "chartYear": 1988,
+   "firstYear": 1987,
    "appleYear": 1988,
    "album": "All That Jazz",
    "appleArtist": "Breathe",
    "appleTitle": "Hands to Heaven",
    "store": "US",
-   "year": 1988,
+   "year": 1987,
    "d": 2
   },
   {
@@ -2661,6 +2614,78 @@
    "store": "US",
    "year": 1989,
    "d": 2
+  },
+  {
+   "id": "it-must-have-been-love-roxette",
+   "chartYear": 1990,
+   "firstYear": 1987,
+   "appleYear": 1990,
+   "album": "It Must Have Been Love - Single",
+   "appleArtist": "Roxette",
+   "appleTitle": "It Must Have Been Love (L.A. Version 1992)",
+   "store": "US",
+   "year": 1987,
+   "d": 1
+  },
+  {
+   "id": "black-velvet-alannah-myles",
+   "chartYear": 1990,
+   "firstYear": 1989,
+   "appleYear": 1989,
+   "album": "Alannah Myles",
+   "appleArtist": "Alannah Myles",
+   "appleTitle": "Black Velvet",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "sacrifice-elton-john",
+   "chartYear": 1990,
+   "firstYear": 1989,
+   "appleYear": 1989,
+   "album": "To Be Continued (Box Set)",
+   "appleArtist": "Elton John",
+   "appleTitle": "Sacrifice",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "janies-got-a-gun-aerosmith",
+   "chartYear": 1990,
+   "firstYear": 1989,
+   "appleYear": 1990,
+   "album": "The Very Best of Aerosmith",
+   "appleArtist": "Aerosmith",
+   "appleTitle": "Janie's Got a Gun",
+   "store": "US",
+   "year": 1989,
+   "d": 2
+  },
+  {
+   "id": "its-like-that-run-d-m-c-vs-jason-nevins",
+   "chartYear": 1998,
+   "firstYear": 1983,
+   "appleYear": 1997,
+   "album": "The Masters Series: Hip Hop",
+   "appleArtist": "RUN-DMC vs. Jason Nevins",
+   "appleTitle": "It's Like That",
+   "store": "GB",
+   "year": 1983,
+   "d": 2
+  },
+  {
+   "id": "running-up-that-hill-a-deal-with-god-kate-bush",
+   "chartYear": 2022,
+   "firstYear": 1985,
+   "appleYear": 2022,
+   "album": "Stranger Things: Soundtrack from the Netflix Series, Season 4",
+   "appleArtist": "Kate Bush",
+   "appleTitle": "Running Up That Hill (A Deal with God)",
+   "store": "US",
+   "year": 1985,
+   "d": 1
   }
  ]
 }

@@ -10,14 +10,14 @@
   "1979 apple 1980 (earliest original 1980)  The Sugarhill Gang — Rapper's Delight  [Disco]",
   "1981 apple 1982 (earliest original 1982)  Toni Basil — Mickey  [Mickey - Single]",
   "1982 apple 1982 (earliest original 1974)  Dexys Midnight Runners — Come On Eileen  [Too Rye Ay]",
-  "1990 apple 1989 (earliest original 1989)  Alannah Myles — Black Velvet  [Alannah Myles]",
-  "1996 apple 1996 (earliest original 1993)  Los del Río — Macarena  [NOW That's What I Call the 90's]",
   "1999 apple 2000 (earliest original 1997)  Sixpence None the Richer — Kiss Me  [The Best of Sixpence None the Richer]",
   "2002 apple 2002 (earliest original 2000)  Las Ketchup — The Ketchup Song (Aserejé)  [Aserejé (The Ketchup Song) - Single]"
  ],
  "items": [
   {
    "id": "spirit-in-the-sky-norman-greenbaum",
+   "chartYear": 1969,
+   "firstYear": 1969,
    "appleYear": 1969,
    "album": "Spirit In the Sky (Deluxe Edition)",
    "appleArtist": "Norman Greenbaum",
@@ -238,12 +238,14 @@
   },
   {
    "id": "black-velvet-alannah-myles",
+   "chartYear": 1990,
+   "firstYear": 1989,
    "appleYear": 1989,
    "album": "Alannah Myles",
    "appleArtist": "Alannah Myles",
    "appleTitle": "Black Velvet",
    "store": "US",
-   "year": 1990,
+   "year": 1989,
    "d": 2
   },
   {
@@ -279,12 +281,14 @@
   },
   {
    "id": "informer-snow",
+   "chartYear": 1993,
+   "firstYear": 1992,
    "appleYear": 1993,
    "album": "Rhino Hi-Five: Rap, Vol. 1 - EP",
    "appleArtist": "Snow",
    "appleTitle": "Informer",
    "store": "US",
-   "year": 1993,
+   "year": 1992,
    "d": 2
   },
   {
@@ -339,12 +343,14 @@
   },
   {
    "id": "macarena-los-del-rio",
+   "chartYear": 1996,
+   "firstYear": 1993,
    "appleYear": 1996,
    "album": "NOW That's What I Call the 90's",
    "appleArtist": "Los del Río",
    "appleTitle": "Macarena",
    "store": "US",
-   "year": 1996,
+   "year": 1993,
    "d": 1
   },
   {
@@ -389,12 +395,14 @@
   },
   {
    "id": "blue-da-ba-dee-eiffel-65",
+   "chartYear": 1999,
+   "firstYear": 1998,
    "appleYear": 1999,
    "album": "Blue - Single",
    "appleArtist": "Mat1ne, PED1NE & Eiffel 65",
    "appleTitle": "Blue",
    "store": "US",
-   "year": 1999,
+   "year": 1998,
    "d": 1
   },
   {
@@ -630,12 +638,14 @@
   },
   {
    "id": "heat-waves-glass-animals",
+   "chartYear": 2021,
+   "firstYear": 2020,
    "appleYear": 2021,
    "album": "Dreamland (Real Life Edition)",
    "appleArtist": "Glass Animals & iann dior",
    "appleTitle": "Heat Waves (with iann dior)",
    "store": "US",
-   "year": 2021,
+   "year": 2020,
    "d": 2
   }
  ]

@@ -27,7 +27,7 @@ Bee Gees | UK | 1960s | Stayin' Alive ; How Deep Is Your Love
 Fleetwood Mac | UK | 1970s | Dreams ; Go Your Own Way
 Pink Floyd | UK | 1970s | Another Brick in the Wall, Pt. 2 ; Wish You Were Here
 Eagles | US | 1970s | Hotel California ; Take It Easy
-Bob Marley & The Wailers | Jamaica | 1970s | No Woman, No Cry ; Three Little Birds ; Could You Be Loved | am=marley; alt=Bob Marley
+Bob Marley & The Wailers | Jamaica | 1970s | No Woman, No Cry ; Three Little Birds ; Could You Be Loved | am=^bob marley; alt=Bob Marley
 Dolly Parton | US | 1970s | Jolene ; 9 to 5 | d=1
 Bruce Springsteen | US | 1970s | Born to Run ; Dancing in the Dark
 Billy Joel | US | 1970s | Piano Man ; Uptown Girl
@@ -46,7 +46,7 @@ Bon Jovi | US | 1980s | Livin' on a Prayer ; It's My Life
 Guns N' Roses | US | 1980s | Sweet Child o' Mine ; Paradise City
 Cyndi Lauper | US | 1980s | Girls Just Want to Have Fun ; Time After Time
 Lionel Richie | US | 1980s | Hello ; All Night Long (All Night)
-Dire Straits | UK | 1970s | Sultans of Swing ; Money for Nothing
+Dire Straits | UK | 1970s | Sultans of Swing ; Money for Nothing | am=^dire straits$
 Kylie Minogue | Australia | 1980s | Can't Get You Out of My Head ; Spinning Around
 Metallica | US | 1980s | Enter Sandman ; Nothing Else Matters
 Mariah Carey | US | 1990s | All I Want for Christmas Is You ; We Belong Together ; Fantasy

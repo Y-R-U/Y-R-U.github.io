@@ -45,155 +45,6 @@
  },
  "items": [
   {
-   "id": "dont-start-now-dua-lipa",
-   "name": "Don't Start Now",
-   "group": "2010s",
-   "facts": {
-    "artist": "Dua Lipa",
-    "year": 2019,
-    "decade": "2010s",
-    "act": "Female solo artist"
-   },
-   "charts": {
-    "us": 4,
-    "uk": 6,
-    "au": 3
-   },
-   "artistCountry": "GBR",
-   "artistCountries": [
-    "GBR",
-    "ALB",
-    "XKX"
-   ],
-   "blurb": "\"Don't Start Now\" by Dua Lipa, released in 2019. Year-end charts: the US #4, the UK #6, Australia #3.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/24/3d/34/243d3413-a0fc-b229-f54a-1715ebd3a9ca/mzaf_11578996572221800393.plus.aac.p.m4a",
-      "credit": "Dua Lipa: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/dont-start-now/1484636581?i=1484636829&uo=4",
-      "apple": {
-       "trackId": 1484636829,
-       "url": "https://music.apple.com/us/album/dont-start-now/1484636581?i=1484636829&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/41/ee/66/41ee66fa-f8dd-7e82-155a-3a1b360dc562/190295322175.jpg/300x300bb.jpg",
-       "term": "Dua Lipa Don't Start Now"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
-   "id": "watermelon-sugar-harry-styles",
-   "name": "Watermelon Sugar",
-   "group": "2010s",
-   "facts": {
-    "artist": "Harry Styles",
-    "year": 2019,
-    "decade": "2010s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 20,
-    "uk": 10,
-    "au": 6
-   },
-   "artistCountry": "GBR",
-   "blurb": "\"Watermelon Sugar\" by Harry Styles, released in 2019. Year-end charts: the US #20, the UK #10, Australia #6.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/25/54/81/255481c0-1ef2-c1bc-f3b3-ea2b1419c1f1/mzaf_5289557126888202047.plus.aac.p.m4a",
-      "credit": "Harry Styles: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/watermelon-sugar/1485802965?i=1485802967&uo=4",
-      "apple": {
-       "trackId": 1485802967,
-       "url": "https://music.apple.com/us/album/watermelon-sugar/1485802965?i=1485802967&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/300x300bb.jpg",
-       "term": "Harry Styles Watermelon Sugar"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
-   "id": "adore-you-harry-styles",
-   "name": "Adore You",
-   "group": "2010s",
-   "facts": {
-    "artist": "Harry Styles",
-    "year": 2019,
-    "decade": "2010s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 6,
-    "uk": 16,
-    "au": 11
-   },
-   "artistCountry": "GBR",
-   "blurb": "\"Adore You\" by Harry Styles, released in 2019. Year-end charts: the US #6, the UK #16, Australia #11.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/75/41/de/7541ded7-1699-85a7-0723-65f913ecc8a8/mzaf_8413154903682037570.plus.aac.p.m4a",
-      "credit": "Harry Styles: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/adore-you/1485802965?i=1485802970&uo=4",
-      "apple": {
-       "trackId": 1485802970,
-       "url": "https://music.apple.com/us/album/adore-you/1485802965?i=1485802970&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/300x300bb.jpg",
-       "term": "Harry Styles Adore You"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
-   "id": "circles-post-malone",
-   "name": "Circles",
-   "group": "2010s",
-   "facts": {
-    "artist": "Post Malone",
-    "year": 2019,
-    "decade": "2010s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 2,
-    "uk": 50,
-    "au": 7
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Circles\" by Post Malone, released in 2019. Year-end charts: the US #2, the UK #50, Australia #7.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f9/b1/aa/f9b1aaed-3e24-227f-153d-99969f8b8464/mzaf_6272498007975402144.plus.aac.p.m4a",
-      "credit": "Post Malone: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/circles/1477880265?i=1477880561&uo=4",
-      "apple": {
-       "trackId": 1477880561,
-       "url": "https://music.apple.com/us/album/circles/1477880265?i=1477880561&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7b/1b/1b/7b1b1b0b-7ce2-b223-f9e0-8e36abe51877/19UMGIM78325.rgb.jpg/300x300bb.jpg",
-       "term": "Post Malone Circles"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "levitating-dua-lipa",
    "name": "Levitating",
    "group": "2020s",
@@ -250,7 +101,7 @@
     "au": 1
    },
    "artistCountry": "GBR",
-   "blurb": "\"Heat Waves\" by Glass Animals, released in 2020. Year-end charts: the US #1, the UK #7, Australia #1.",
+   "blurb": "\"Heat Waves\" by Glass Animals, released in 2020; year-end charts 2021–2024: the US #1, the UK #7, Australia #1.",
    "media": {
     "audio": [
      {
@@ -537,42 +388,6 @@
    "kids": false
   },
   {
-   "id": "before-you-go-lewis-capaldi",
-   "name": "Before You Go",
-   "group": "2020s",
-   "facts": {
-    "artist": "Lewis Capaldi",
-    "year": 2020,
-    "decade": "2020s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 21,
-    "uk": 4,
-    "au": 8
-   },
-   "artistCountry": "GBR",
-   "blurb": "\"Before You Go\" by Lewis Capaldi, released in 2020. Year-end charts: the US #21, the UK #4, Australia #8.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/27/43/38/2743383c-f0a0-2e97-cbd0-2ff6bf0d382d/mzaf_13019359257674877387.plus.aac.p.m4a",
-      "credit": "Lewis Capaldi: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/before-you-go-orchestral/1527103351?i=1527103352&uo=4",
-      "apple": {
-       "trackId": 1527103352,
-       "url": "https://music.apple.com/us/album/before-you-go-orchestral/1527103351?i=1527103352&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/5e/b5/aa5eb5a7-c276-f993-e26c-0b67cb6f6fc1/20UMGIM65379.rgb.jpg/300x300bb.jpg",
-       "term": "Lewis Capaldi Before You Go"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "intentions-justin-bieber",
    "name": "Intentions",
    "group": "2020s",
@@ -601,42 +416,6 @@
        "url": "https://music.apple.com/us/album/intentions-feat-quavo/1496639180?i=1496639586&uo=4",
        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d2/21/4e/d2214ea9-97ff-46ef-ac45-7fca6fb73839/20UMGIM03126.rgb.jpg/300x300bb.jpg",
        "term": "Justin Bieber Intentions"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
-   "id": "everything-i-wanted-billie-eilish",
-   "name": "Everything I Wanted",
-   "group": "2020s",
-   "facts": {
-    "artist": "Billie Eilish",
-    "year": 2020,
-    "decade": "2020s",
-    "act": "Female solo artist"
-   },
-   "charts": {
-    "us": 18,
-    "uk": 29,
-    "au": 38
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Everything I Wanted\" by Billie Eilish, released in 2020. Year-end charts: the US #18, the UK #29, Australia #38.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/23/f3/6b/23f36bc0-9edc-8d55-df7f-7b806310d4b4/mzaf_15718469078111904528.plus.aac.p.m4a",
-      "credit": "Billie Eilish: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/everything-i-wanted/1487502456?i=1487502476&uo=4",
-      "apple": {
-       "trackId": 1487502476,
-       "url": "https://music.apple.com/us/album/everything-i-wanted/1487502456?i=1487502476&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/c5/6c/b1/c56cb16a-52c3-33b5-5189-6c65028001fb/19UM1IM00404.rgb.jpg/300x300bb.jpg",
-       "term": "Billie Eilish everything i wanted"
       },
       "dur": 30
      }
@@ -752,44 +531,6 @@
     ]
    },
    "difficulty": 2
-  },
-  {
-   "id": "roxanne-arizona-zervas",
-   "name": "Roxanne",
-   "group": "2020s",
-   "facts": {
-    "artist": "Arizona Zervas",
-    "year": 2020,
-    "decade": "2020s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 16,
-    "uk": 31,
-    "au": 29
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Roxanne\" by Arizona Zervas, released in 2020. Year-end charts: the US #16, the UK #31, Australia #29.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/0e/d8/57/0ed85735-222d-f853-339a-674db1deab59/mzaf_13516983249408034524.plus.aac.p.m4a",
-      "credit": "Arizona Zervas: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/roxanne/1496062760?i=1496062761&uo=4",
-      "apple": {
-       "trackId": 1496062761,
-       "url": "https://music.apple.com/us/album/roxanne/1496062760?i=1496062761&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/9c/19/1b/9c191bbf-15e1-ffd6-c36d-2e480a1a156e/886448153238.jpg/300x300bb.jpg",
-       "term": "Arizona Zervas ROXANNE"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2,
-   "explicit": true,
-   "kids": false
   },
   {
    "id": "savage-megan-thee-stallion",
@@ -2210,45 +1951,6 @@
    "kids": false
   },
   {
-   "id": "running-up-that-hill-a-deal-with-god-kate-bush",
-   "name": "Running Up That Hill (A Deal with God)",
-   "alt": [
-    "Running Up That Hill"
-   ],
-   "group": "2020s",
-   "facts": {
-    "artist": "Kate Bush",
-    "year": 2022,
-    "decade": "2020s",
-    "act": "Female solo artist"
-   },
-   "charts": {
-    "us": 23,
-    "uk": 6,
-    "au": 11
-   },
-   "artistCountry": "GBR",
-   "blurb": "\"Running Up That Hill (A Deal with God)\" by Kate Bush, released in 2022. Year-end charts: the US #23, the UK #6, Australia #11.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/60/a8/fb/60a8fb49-fcf6-42ac-b9d4-6dfbfd517a54/mzaf_13233345866871199423.plus.aac.p.m4a",
-      "credit": "Kate Bush: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/running-up-that-hill-a-deal-with-god/1623616562?i=1623617264&uo=4",
-      "apple": {
-       "trackId": 1623617264,
-       "url": "https://music.apple.com/us/album/running-up-that-hill-a-deal-with-god/1623616562?i=1623617264&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/fa/aa/2e/faaa2e7b-f344-df5e-681e-5adb4fa91255/196589171115.jpg/300x300bb.jpg",
-       "term": "Kate Bush Running Up That Hill"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
    "id": "im-good-blue-david-guetta-and-bebe-rexha",
    "name": "I'm Good (Blue)",
    "alt": [
@@ -2535,7 +2237,7 @@
      }
     ]
    },
-   "difficulty": 2,
+   "difficulty": 3,
    "explicit": true,
    "kids": false
   },
@@ -3323,7 +3025,7 @@
    "group": "2020s",
    "facts": {
     "artist": "Stephen Sanchez",
-    "year": 2022,
+    "year": 2021,
     "decade": "2020s",
     "act": "Male solo artist"
    },
@@ -3333,7 +3035,7 @@
     "au": 17
    },
    "artistCountry": "USA",
-   "blurb": "\"Until I Found You\" by Stephen Sanchez, released in 2022. Year-end charts: the US #50, the UK #39, Australia #17.",
+   "blurb": "\"Until I Found You\" by Stephen Sanchez, released in 2021; year-end charts 2023: the US #50, the UK #39, Australia #17.",
    "media": {
     "audio": [
      {
@@ -3469,7 +3171,7 @@
    "group": "2020s",
    "facts": {
     "artist": "Meghan Trainor",
-    "year": 2023,
+    "year": 2022,
     "decade": "2020s",
     "act": "Female solo artist"
    },
@@ -3479,7 +3181,7 @@
     "au": 38
    },
    "artistCountry": "USA",
-   "blurb": "\"Made You Look\" by Meghan Trainor, released in 2023. Year-end charts: the US #53, the UK #36, Australia #38.",
+   "blurb": "\"Made You Look\" by Meghan Trainor, released in 2022; year-end charts 2023: the US #53, the UK #36, Australia #38.",
    "media": {
     "audio": [
      {
@@ -3505,7 +3207,7 @@
    "group": "2020s",
    "facts": {
     "artist": "Coi Leray",
-    "year": 2023,
+    "year": 2022,
     "decade": "2020s",
     "act": "Female solo artist"
    },
@@ -3515,7 +3217,7 @@
     "au": 31
    },
    "artistCountry": "USA",
-   "blurb": "\"Players\" by Coi Leray, released in 2023. Year-end charts: the US #33, the UK #54, Australia #31.",
+   "blurb": "\"Players\" by Coi Leray, released in 2022; year-end charts 2023: the US #33, the UK #54, Australia #31.",
    "media": {
     "audio": [
      {
@@ -3581,7 +3283,7 @@
    "group": "2020s",
    "facts": {
     "artist": "Jvke",
-    "year": 2023,
+    "year": 2022,
     "decade": "2020s",
     "act": "Male solo artist"
    },
@@ -3591,7 +3293,7 @@
     "au": 57
    },
    "artistCountry": "USA",
-   "blurb": "\"Golden Hour\" by Jvke, released in 2023. Year-end charts: the US #41, the UK #71, Australia #57.",
+   "blurb": "\"Golden Hour\" by Jvke, released in 2022; year-end charts 2023: the US #41, the UK #71, Australia #57.",
    "media": {
     "audio": [
      {
@@ -4354,7 +4056,7 @@
    "group": "2020s",
    "facts": {
     "artist": "Dasha",
-    "year": 2024,
+    "year": 2023,
     "decade": "2020s",
     "act": "Female solo artist"
    },
@@ -4364,7 +4066,7 @@
     "au": 12
    },
    "artistCountry": "USA",
-   "blurb": "\"Austin\" by Dasha, released in 2024. Year-end charts: the US #27, the UK #9, Australia #12.",
+   "blurb": "\"Austin\" by Dasha, released in 2023; year-end charts 2024–2025: the US #27, the UK #9, Australia #12.",
    "media": {
     "audio": [
      {
@@ -5687,5 +5389,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-13"
+ "built": "2026-10-17"
 }

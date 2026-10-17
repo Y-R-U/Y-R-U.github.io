@@ -258,11 +258,11 @@
   {
    "id": "running-bear-johnny-preston",
    "name": "Running Bear",
-   "group": "1960s",
+   "group": "1950s",
    "facts": {
     "artist": "Johnny Preston",
-    "year": 1960,
-    "decade": "1960s",
+    "year": 1959,
+    "decade": "1950s",
     "act": "Male solo artist"
    },
    "charts": {
@@ -270,7 +270,7 @@
     "au": 19
    },
    "artistCountry": "USA",
-   "blurb": "\"Running Bear\" by Johnny Preston, released in 1960. Year-end charts: the US #4, Australia #19.",
+   "blurb": "\"Running Bear\" by Johnny Preston, released in 1959; year-end charts 1960: the US #4, Australia #19.",
    "media": {
     "audio": [
      {
@@ -398,11 +398,11 @@
   {
    "id": "what-in-the-worlds-come-over-you-jack-scott",
    "name": "What in the World's Come Over You",
-   "group": "1960s",
+   "group": "1950s",
    "facts": {
     "artist": "Jack Scott",
-    "year": 1960,
-    "decade": "1960s",
+    "year": 1959,
+    "decade": "1950s",
     "act": "Male solo artist"
    },
    "charts": {
@@ -410,7 +410,7 @@
     "au": 23
    },
    "artistCountry": "USA",
-   "blurb": "\"What in the World's Come Over You\" by Jack Scott, released in 1960. Year-end charts: the US #14, Australia #23.",
+   "blurb": "\"What in the World's Come Over You\" by Jack Scott, released in 1959; year-end charts 1960: the US #14, Australia #23.",
    "media": {
     "audio": [
      {
@@ -536,18 +536,18 @@
   {
    "id": "el-paso-marty-robbins",
    "name": "El Paso",
-   "group": "1960s",
+   "group": "1950s",
    "facts": {
     "artist": "Marty Robbins",
-    "year": 1960,
-    "decade": "1960s",
+    "year": 1959,
+    "decade": "1950s",
     "act": "Male solo artist"
    },
    "charts": {
     "us": 15
    },
    "artistCountry": "USA",
-   "blurb": "\"El Paso\" by Marty Robbins, released in 1960. Year-end charts: the US #15.",
+   "blurb": "\"El Paso\" by Marty Robbins, released in 1959; year-end charts 1960: the US #15.",
    "media": {
     "audio": [
      {
@@ -604,18 +604,18 @@
   {
    "id": "peter-gunn-duane-eddy",
    "name": "Peter Gunn",
-   "group": "1960s",
+   "group": "1950s",
    "facts": {
     "artist": "Duane Eddy",
-    "year": 1960,
-    "decade": "1960s",
+    "year": 1959,
+    "decade": "1950s",
     "act": "Male solo artist"
    },
    "charts": {
     "au": 15
    },
    "artistCountry": "USA",
-   "blurb": "\"Peter Gunn\" by Duane Eddy, released in 1960. Year-end charts: Australia #15.",
+   "blurb": "\"Peter Gunn\" by Duane Eddy, released in 1959; year-end charts 1960: Australia #15.",
    "media": {
     "audio": [
      {
@@ -638,18 +638,18 @@
   {
    "id": "beyond-the-sea-bobby-darin",
    "name": "Beyond the Sea",
-   "group": "1960s",
+   "group": "1950s",
    "facts": {
     "artist": "Bobby Darin",
-    "year": 1960,
-    "decade": "1960s",
+    "year": 1959,
+    "decade": "1950s",
     "act": "Male solo artist"
    },
    "charts": {
     "us": 32
    },
    "artistCountry": "USA",
-   "blurb": "\"Beyond the Sea\" by Bobby Darin, released in 1960. Year-end charts: the US #32.",
+   "blurb": "\"Beyond the Sea\" by Bobby Darin, released in 1959; year-end charts 1960: the US #32.",
    "media": {
     "audio": [
      {
@@ -672,18 +672,18 @@
   {
    "id": "handy-man-jimmy-jones",
    "name": "Handy Man",
-   "group": "1960s",
+   "group": "1950s",
    "facts": {
     "artist": "Jimmy Jones",
-    "year": 1960,
-    "decade": "1960s",
+    "year": 1959,
+    "decade": "1950s",
     "act": "Male solo artist"
    },
    "charts": {
     "us": 8
    },
    "artistCountry": "USA",
-   "blurb": "\"Handy Man\" by Jimmy Jones, released in 1960. Year-end charts: the US #8.",
+   "blurb": "\"Handy Man\" by Jimmy Jones, released in 1959; year-end charts 1960: the US #8.",
    "media": {
     "audio": [
      {
@@ -1293,7 +1293,7 @@
    "group": "1960s",
    "facts": {
     "artist": "The String-A-Longs",
-    "year": 1961,
+    "year": 1960,
     "decade": "1960s",
     "act": "Group or duo"
    },
@@ -1302,7 +1302,7 @@
     "au": 16
    },
    "artistCountry": "USA",
-   "blurb": "\"Wheels\" by The String-A-Longs, released in 1961. Year-end charts: the US #8, Australia #16.",
+   "blurb": "\"Wheels\" by The String-A-Longs, released in 1960; year-end charts 1961: the US #8, Australia #16.",
    "media": {
     "audio": [
      {
@@ -2990,7 +2990,7 @@
    "group": "1960s",
    "facts": {
     "artist": "Paul & Paula",
-    "year": 1963,
+    "year": 1962,
     "decade": "1960s"
    },
    "charts": {
@@ -2998,7 +2998,7 @@
     "au": 6
    },
    "artistCountry": "USA",
-   "blurb": "\"Hey Paula\" by Paul & Paula, released in 1963. Year-end charts: the US #6, Australia #6.",
+   "blurb": "\"Hey Paula\" by Paul & Paula, released in 1962; year-end charts 1963: the US #6, Australia #6.",
    "media": {
     "audio": [
      {
@@ -3398,7 +3398,7 @@
    "group": "1960s",
    "facts": {
     "artist": "The Cascades",
-    "year": 1963,
+    "year": 1962,
     "decade": "1960s",
     "act": "Group or duo"
    },
@@ -3406,7 +3406,7 @@
     "us": 3
    },
    "artistCountry": "USA",
-   "blurb": "\"Rhythm of the Rain\" by The Cascades, released in 1963. Year-end charts: the US #3.",
+   "blurb": "\"Rhythm of the Rain\" by The Cascades, released in 1962; year-end charts 1963: the US #3.",
    "media": {
     "audio": [
      {
@@ -3770,7 +3770,7 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 2
   },
   {
    "id": "hello-dolly-louis-armstrong",
@@ -4020,7 +4020,7 @@
    "group": "1960s",
    "facts": {
     "artist": "The Dave Clark Five",
-    "year": 1964,
+    "year": 1963,
     "decade": "1960s",
     "act": "Group or duo"
    },
@@ -4029,7 +4029,7 @@
     "au": 22
    },
    "artistCountry": "GBR",
-   "blurb": "\"Glad All Over\" by The Dave Clark Five, released in 1964. Year-end charts: the US #23, Australia #22.",
+   "blurb": "\"Glad All Over\" by The Dave Clark Five, released in 1963; year-end charts 1964: the US #23, Australia #22.",
    "media": {
     "audio": [
      {
@@ -8679,6 +8679,146 @@
     ]
    },
    "difficulty": 2
+  },
+  {
+   "id": "spirit-in-the-sky-norman-greenbaum",
+   "name": "Spirit in the Sky",
+   "group": "1960s",
+   "facts": {
+    "artist": "Norman Greenbaum",
+    "year": 1969,
+    "decade": "1960s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 22,
+    "uk": 4,
+    "au": 4
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Spirit in the Sky\" by Norman Greenbaum, released in 1969; year-end charts 1970: the US #22, the UK #4, Australia #4.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9d/bc/9e/9dbc9e1d-599e-711d-46fe-15afd75a3988/mzaf_11053192268213103738.plus.aac.p.m4a",
+      "credit": "Norman Greenbaum: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/spirit-in-the-sky/1462211353?i=1462211356&uo=4",
+      "apple": {
+       "trackId": 1462211356,
+       "url": "https://music.apple.com/us/album/spirit-in-the-sky/1462211353?i=1462211356&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/91/78/c8/9178c88b-ff65-6e4b-f8af-a5ab0c938b53/14UMDIM02986.rgb.jpg/300x300bb.jpg",
+       "term": "Norman Greenbaum Spirit In the Sky"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "venus-shocking-blue",
+   "name": "Venus",
+   "group": "1960s",
+   "facts": {
+    "artist": "Shocking Blue",
+    "year": 1969,
+    "decade": "1960s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 33,
+    "au": 19
+   },
+   "artistCountry": "NLD",
+   "blurb": "\"Venus\" by Shocking Blue, released in 1969; year-end charts 1970: the US #33, Australia #19.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1e/dc/3b/1edc3b4f-e8f3-eedf-5edd-54e1bfbf16d6/mzaf_565175607364259087.plus.aac.p.m4a",
+      "credit": "Shocking Blue: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/venus/293336477?i=293336485&uo=4",
+      "apple": {
+       "trackId": 293336485,
+       "url": "https://music.apple.com/us/album/venus/293336477?i=293336485&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5c/d5/25/5cd52578-4325-b85a-2724-0f3f3ffc763d/8712944661958.png/300x300bb.jpg",
+       "term": "Shocking Blue Venus"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "i-want-you-back-the-jackson-5",
+   "name": "I Want You Back",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Jackson 5",
+    "year": 1969,
+    "decade": "1960s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 28,
+    "uk": 35
+   },
+   "artistCountry": "USA",
+   "blurb": "\"I Want You Back\" by The Jackson 5, released in 1969; year-end charts 1970: the US #28, the UK #35.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/51/c5/27/51c527f5-c9fd-8fc7-175b-53c365c13664/mzaf_7763659600534750503.plus.aac.p.m4a",
+      "credit": "The Jackson 5: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-want-you-back/1443221837?i=1443222051&uo=4",
+      "apple": {
+       "trackId": 1443222051,
+       "url": "https://music.apple.com/us/album/i-want-you-back/1443221837?i=1443222051&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/dc/5d/6d/dc5d6d8e-61dc-401b-80a6-c2a745fe048a/08UMGIM28826.rgb.jpg/300x300bb.jpg",
+       "term": "Jackson 5 I Want You Back"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "a-little-less-conversation-elvis-vs-jxl",
+   "name": "A Little Less Conversation",
+   "group": "1960s",
+   "facts": {
+    "artist": "Elvis vs JXL",
+    "year": 1968,
+    "decade": "1960s"
+   },
+   "charts": {
+    "uk": 5,
+    "au": 5
+   },
+   "artistCountry": "USA",
+   "blurb": "\"A Little Less Conversation\" was first released by Elvis Presley in 1968; the JXL remix made it a hit again in 2002. Year-end charts 2002: the UK #5, Australia #5.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5b/d8/8d/5bd88d3b-5fbf-37e3-1a68-2c91b37f1ce6/mzaf_3002018162174375865.plus.aac.p.m4a",
+      "credit": "Elvis vs JXL: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/a-little-less-conversation/1280531136?i=1280531429&uo=4",
+      "apple": {
+       "trackId": 1280531429,
+       "url": "https://music.apple.com/us/album/a-little-less-conversation/1280531136?i=1280531429&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/67/d2/7c/67d27c53-3551-e88f-878c-e8a13de4baa5/886446728377.jpg/300x300bb.jpg",
+       "term": "Elvis Presley A Little Less Conversation"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
   }
  ],
  "questions": [],
@@ -8704,5 +8844,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-13"
+ "built": "2026-10-17"
 }
