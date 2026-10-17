@@ -1,0 +1,883 @@
+{
+ "id": "tv-moments-candidates-more",
+ "title": "TV moments: second pictures",
+ "theme": "screen",
+ "icon": "📺",
+ "notice": "Original illustrations of famous TV series, not real stills.",
+ "nameImgPrompt": "What TV show is this?",
+ "imgPrompt": "Which picture shows {name}?",
+ "factsMeta": {
+  "year": {
+   "type": "year",
+   "label": "First shown",
+   "askHigh": "Which of these shows started most recently?",
+   "askLow": "Which of these shows started first?",
+   "askNumber": "In what year was {name} first shown?"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade",
+   "ask": "In which decade did {name} start?",
+   "askReverse": "Which of these TV shows started in the {value}?",
+   "stmt": "{name} started in the {value}."
+  },
+  "country": {
+   "type": "cat",
+   "label": "Country of origin",
+   "ask": "Which country does {name} come from?",
+   "askReverse": "Which of these TV shows comes from {value}?",
+   "stmt": "Country of origin of {name}: {value}."
+  },
+  "network": {
+   "type": "cat",
+   "label": "First shown on",
+   "noun": "channel",
+   "ask": "Which channel first showed {name}?",
+   "askReverse": "Which of these shows was first shown on {value}?",
+   "stmt": "{name} was first shown on {value}."
+  },
+  "kids": {
+   "type": "bool",
+   "label": "Children's show",
+   "yes": "Children's show",
+   "no": "Not a children’s show",
+   "askBool": "Which of these is a children's show?",
+   "stmt": "{name} is a children's show."
+  }
+ },
+ "kids": false,
+ "version": 1,
+ "items": [
+  {
+   "id": "friends",
+   "name": "Friends",
+   "alt": [],
+   "facts": {
+    "year": 1994,
+    "decade": "1990s",
+    "country": "United States",
+    "network": "NBC",
+    "kids": false
+   },
+   "blurb": "Six pals in their twenties share flats, jokes and love lives in Manhattan.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/2abaaf8671db.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Splashing in the fountain",
+      "key": "friends-2",
+      "ref": "tv-moments:more/friends-2"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "live": [
+    {
+     "src": "media/tv-moments/741dba9b939d.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "stranger-things",
+   "name": "Stranger Things",
+   "alt": [],
+   "facts": {
+    "year": 2016,
+    "decade": "2010s",
+    "country": "United States",
+    "network": "Netflix",
+    "kids": false
+   },
+   "blurb": "Children search for their missing friend Will.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/14a265ee5b05.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Talking through the Christmas lights",
+      "key": "stranger-things-1",
+      "ref": "tv-moments:more/stranger-things-1"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/d0f030092c1c.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "the-big-bang-theory",
+   "name": "The Big Bang Theory",
+   "alt": [],
+   "facts": {
+    "year": 2007,
+    "decade": "2000s",
+    "country": "United States",
+    "network": "CBS",
+    "kids": false
+   },
+   "blurb": "Nerdy scientists in Pasadena befriend their neighbour.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/517828f5bcfe.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The lift is still broken",
+      "key": "the-big-bang-theory-2",
+      "ref": "tv-moments:more/the-big-bang-theory-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/214e49a8ac5b.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "game-of-thrones",
+   "name": "Game of Thrones",
+   "alt": [
+    "GoT"
+   ],
+   "facts": {
+    "year": 2011,
+    "decade": "2010s",
+    "country": "United States",
+    "network": "HBO",
+    "kids": false
+   },
+   "blurb": "Noble families battle to rule the Seven Kingdoms of Westeros.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/c1b2c4ebeddc.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The Wall of ice",
+      "key": "game-of-thrones-2",
+      "ref": "tv-moments:more/game-of-thrones-2"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "live": [
+    {
+     "src": "media/tv-moments/a3493595dea7.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "breaking-bad",
+   "name": "Breaking Bad",
+   "alt": [],
+   "facts": {
+    "year": 2008,
+    "decade": "2000s",
+    "country": "United States",
+    "network": "AMC",
+    "kids": false
+   },
+   "blurb": "A chemistry teacher turns to crime after a cancer diagnosis.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/cf6072bc3c80.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Pizza on the roof",
+      "key": "breaking-bad-2",
+      "ref": "tv-moments:more/breaking-bad-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/165e858aa51b.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "star-trek",
+   "name": "Star Trek",
+   "alt": [
+    "Star Trek: The Original Series"
+   ],
+   "facts": {
+    "year": 1966,
+    "decade": "1960s",
+    "country": "United States",
+    "kids": false
+   },
+   "blurb": "Captain Kirk and Mr Spock explore strange new worlds.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/6acdcefb2675.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The starship in orbit",
+      "key": "star-trek-1",
+      "ref": "tv-moments:more/star-trek-1"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/a2a696cf12e5.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "the-walking-dead",
+   "name": "The Walking Dead",
+   "alt": [],
+   "facts": {
+    "year": 2010,
+    "decade": "2010s",
+    "country": "United States",
+    "network": "AMC",
+    "kids": false
+   },
+   "blurb": "Sheriff Rick Grimes leads survivors after a zombie outbreak.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/8a95ac3b4a48.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The prison fence",
+      "key": "the-walking-dead-2",
+      "ref": "tv-moments:more/the-walking-dead-2"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "live": [
+    {
+     "src": "media/tv-moments/15c6324c2688.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "wednesday",
+   "name": "Wednesday",
+   "alt": [],
+   "facts": {
+    "year": 2022,
+    "decade": "2020s",
+    "country": "United States",
+    "network": "Netflix",
+    "kids": false
+   },
+   "blurb": "Morticia's daughter solves a murder at Nevermore Academy.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/5254e52c03b6.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The hand",
+      "key": "wednesday-2",
+      "ref": "tv-moments:more/wednesday-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/257441603eaf.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "money-heist",
+   "name": "Money Heist",
+   "alt": [
+    "La casa de papel"
+   ],
+   "facts": {
+    "year": 2017,
+    "decade": "2010s",
+    "country": "Spain",
+    "network": "Antena 3",
+    "kids": false
+   },
+   "blurb": "A mastermind called the Professor plans a huge raid on the Royal Mint of Spain.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/8b5806a436fc.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Raining money",
+      "key": "money-heist-2",
+      "ref": "tv-moments:more/money-heist-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/89dc5fcd2130.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "squid-game",
+   "name": "Squid Game",
+   "alt": [],
+   "facts": {
+    "year": 2021,
+    "decade": "2020s",
+    "country": "South Korea",
+    "network": "Netflix",
+    "kids": false
+   },
+   "blurb": "Debt-ridden contestants play for a huge cash prize.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/925a4dd51f03.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The pastel staircase",
+      "key": "squid-game-2",
+      "ref": "tv-moments:more/squid-game-2"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "live": [
+    {
+     "src": "media/tv-moments/516c25d75764.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "lost",
+   "name": "Lost",
+   "alt": [],
+   "facts": {
+    "year": 2004,
+    "decade": "2000s",
+    "country": "United States",
+    "network": "ABC (US)",
+    "kids": false
+   },
+   "blurb": "Plane-crash survivors are stranded on a strange tropical island.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/4438daf84794.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The hatch",
+      "key": "lost-2",
+      "ref": "tv-moments:more/lost-2"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "live": [
+    {
+     "src": "media/tv-moments/0df750dc5c6c.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "the-x-files",
+   "name": "The X-Files",
+   "alt": [],
+   "facts": {
+    "year": 1993,
+    "decade": "1990s",
+    "country": "United States",
+    "network": "Fox",
+    "kids": false
+   },
+   "blurb": "Two FBI agents investigate the paranormal.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/fbd7c63e4e77.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The basement office",
+      "key": "the-x-files-2",
+      "ref": "tv-moments:more/the-x-files-2"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "live": [
+    {
+     "src": "media/tv-moments/1e50056ecb6f.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "only-fools-and-horses",
+   "name": "Only Fools and Horses",
+   "alt": [],
+   "facts": {
+    "year": 1981,
+    "decade": "1980s",
+    "country": "United Kingdom",
+    "network": "BBC One",
+    "kids": false
+   },
+   "blurb": "Del Boy is a market trader in Peckham who dreams of being a millionaire.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/632de2ce3ffa.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Falling through the bar",
+      "key": "only-fools-and-horses-2",
+      "ref": "tv-moments:more/only-fools-and-horses-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/79216cec3fb1.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "thunderbirds",
+   "name": "Thunderbirds",
+   "alt": [],
+   "facts": {
+    "year": 1965,
+    "decade": "1960s",
+    "country": "United Kingdom",
+    "network": "ITV",
+    "kids": true
+   },
+   "blurb": "Puppet heroes fly rescue craft from a secret island.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/2eeae749e658.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The pink car",
+      "key": "thunderbirds-2",
+      "ref": "tv-moments:more/thunderbirds-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/45047cbcbd5f.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "the-flintstones",
+   "name": "The Flintstones",
+   "alt": [],
+   "facts": {
+    "year": 1960,
+    "decade": "1960s",
+    "country": "United States",
+    "network": "ABC (US)",
+    "kids": true
+   },
+   "blurb": "A Stone Age family with dinosaur pets and gadgets.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/9c764588cc28.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Dino crane",
+      "key": "the-flintstones-2",
+      "ref": "tv-moments:more/the-flintstones-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/f51bd1f60226.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "the-office-us",
+   "name": "The Office (US)",
+   "alt": [
+    "The Office"
+   ],
+   "facts": {
+    "year": 2005,
+    "decade": "2000s",
+    "country": "United States",
+    "network": "NBC",
+    "kids": false
+   },
+   "blurb": "A mockumentary about workers at the Dunder Mifflin paper company.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/efd0b1df1c51.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The stapler in jelly",
+      "key": "the-office-us-1",
+      "ref": "tv-moments:more/the-office-us-1"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "live": [
+    {
+     "src": "media/tv-moments/7bb74c1a7448.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "blackadder",
+   "name": "Blackadder",
+   "alt": [],
+   "facts": {
+    "year": 1983,
+    "decade": "1980s",
+    "country": "United Kingdom",
+    "network": "BBC One",
+    "kids": false
+   },
+   "blurb": "Rowan Atkinson plays a scheming coward.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/f77e09173f43.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Going over the top",
+      "key": "blackadder-1",
+      "ref": "tv-moments:more/blackadder-1"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/69b17ba8e126.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "planet-earth",
+   "name": "Planet Earth",
+   "alt": [],
+   "facts": {
+    "year": 2006,
+    "decade": "2000s",
+    "country": "United Kingdom",
+    "kids": false
+   },
+   "blurb": "Planet Earth (first shown 2006, United Kingdom). David Attenborough narrates a tour of the world's habitats.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/a8ac477cb0d8.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The breach",
+      "key": "planet-earth-2",
+      "ref": "tv-moments:more/planet-earth-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/7d8508a883b6.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "mr-bean",
+   "name": "Mr. Bean",
+   "alt": [
+    "Mr Bean"
+   ],
+   "facts": {
+    "year": 1990,
+    "decade": "1990s",
+    "country": "United Kingdom",
+    "network": "ITV",
+    "kids": true
+   },
+   "blurb": "Rowan Atkinson plays a clumsy, almost silent man.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/d88f75228cc4.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Teddy",
+      "key": "mr-bean-2",
+      "ref": "tv-moments:more/mr-bean-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/a367b07863c9.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "the-golden-girls",
+   "name": "The Golden Girls",
+   "alt": [],
+   "facts": {
+    "year": 1985,
+    "decade": "1980s",
+    "country": "United States",
+    "network": "NBC",
+    "kids": false
+   },
+   "blurb": "Four older women share a house in Miami.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/373d21c4ca21.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The lanai",
+      "key": "the-golden-girls-2",
+      "ref": "tv-moments:more/the-golden-girls-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/f9c77252b36f.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "father-ted",
+   "name": "Father Ted",
+   "alt": [],
+   "facts": {
+    "year": 1995,
+    "decade": "1990s",
+    "country": "United Kingdom",
+    "network": "Channel 4",
+    "kids": false
+   },
+   "blurb": "Three hapless Catholic priests in a remote Irish parochial house.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/e801993792b9.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Lost in the department store",
+      "key": "father-ted-2",
+      "ref": "tv-moments:more/father-ted-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/d7fd13336e03.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  },
+  {
+   "id": "spongebob-squarepants",
+   "name": "SpongeBob SquarePants",
+   "alt": [
+    "SpongeBob"
+   ],
+   "facts": {
+    "year": 1999,
+    "decade": "1990s",
+    "country": "United States",
+    "network": "Nickelodeon",
+    "kids": true
+   },
+   "blurb": "A yellow, square sea creature lives in a pineapple under the sea.",
+   "media": {
+    "img": [
+     {
+      "src": "media/cand/tv-moments/150d3e456ff9.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The burger shack",
+      "key": "spongebob-squarepants-2",
+      "ref": "tv-moments:more/spongebob-squarepants-2"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "live": [
+    {
+     "src": "media/tv-moments/73a2ee5c5b06.webp",
+     "w": 640,
+     "h": 432
+    }
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "Generated locally with FLUX.2 [klein] (Clued house style)",
+   "url": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md"
+  }
+ ],
+ "candidate": true
+}

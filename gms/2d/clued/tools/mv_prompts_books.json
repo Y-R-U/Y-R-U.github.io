@@ -433,15 +433,13 @@
      "p": "the open doors of an old wardrobe full of fur coats revealing a snowy forest with a glowing lamppost",
      "d": 3,
      "cap": "Through the wardrobe to Narnia",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-lion-the-witch-and-the-wardrobe-3 was picked)"
+     "cand": true
     },
     {
      "p": "a faun with an umbrella and parcels walking past a lamppost in a snowy forest",
      "d": 3,
      "cap": "Meeting a faun by the lamppost",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-lion-the-witch-and-the-wardrobe-3 was picked)"
+     "cand": true
     },
     {
      "p": "a great golden lion beside a cracked stone table at dawn",
@@ -521,8 +519,7 @@
      "p": "shelves of glass jars each holding a glowing swirling dream in a giant's cave",
      "d": 3,
      "cap": "The jars of dreams",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-bfg-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -546,8 +543,7 @@
      "p": "three farmers, one fat, one short, one thin, with shotguns waiting at a fox hole at night",
      "d": 3,
      "cap": "Boggis, Bunce and Bean",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (fantastic-mr-fox-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -594,8 +590,7 @@
      "p": "a black foal with a white star galloping in a green English meadow beside its mother",
      "d": 1,
      "cap": "Growing up in the meadow",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (black-beauty-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -619,8 +614,7 @@
      "p": "a mole and a water rat in a little rowing boat with a picnic basket on a willow-lined river",
      "d": 1,
      "cap": "Messing about in boats",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-wind-in-the-willows-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -644,8 +638,7 @@
      "p": "a man the size of a doll standing on a giant's dining table",
      "d": 3,
      "cap": "Tiny among the giants",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (gulliver-s-travels-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -709,8 +702,7 @@
      "p": "a pair of spectacles focusing sunlight to light a signal fire on a mountain top on an island",
      "d": 3,
      "cap": "Fire from the spectacles",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (lord-of-the-flies-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -754,8 +746,7 @@
      "p": "the knothole of an old oak tree holding small gifts: two carved soap dolls, chewing gum and a pocket watch, a quiet Southern street",
      "d": 3,
      "cap": "Gifts in the knothole",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (to-kill-a-mockingbird-2 was picked)"
+     "cand": true
     },
     {
      "p": "a lawyer in a 1930s suit seen from behind addressing a packed small-town Alabama courtroom",
@@ -784,8 +775,7 @@
      "p": "a man seen from behind writing in a diary in an alcove hidden from a telescreen in a shabby flat",
      "d": 3,
      "cap": "The forbidden diary",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (nineteen-eighty-four-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1199,8 +1189,7 @@
      "p": "a pirate captain with an iron hook for a hand on the deck of a pirate ship at night, a crocodile circling in the water below",
      "d": 3,
      "cap": "The captain and the crocodile",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (peter-pan-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1224,8 +1213,7 @@
      "p": "a small wooden farmhouse spinning high up inside a tornado over flat grey prairie",
      "d": 3,
      "cap": "Carried away by the cyclone",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-wonderful-wizard-of-oz-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1247,8 +1235,7 @@
      "p": "a boy raised by wolves sitting with a wolf pack on a moonlit council rock in the Indian jungle, a black panther watching",
      "d": 1,
      "cap": "The wolf pack council",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-jungle-book-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1272,8 +1259,7 @@
      "p": "a teddy bear, a small piglet and a boy dropping sticks off the side of a little wooden bridge into a stream",
      "d": 3,
      "cap": "Poohsticks",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (winnie-the-pooh-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1295,8 +1281,7 @@
      "p": "nine walkers on a mountain path in the snow: a wizard with a staff, an elf archer, a dwarf with an axe, men and four small hobbits",
      "d": 2,
      "cap": "The fellowship sets out",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-lord-of-the-rings-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1313,8 +1298,7 @@
      "p": "two children watching from a window on a rainy day while a goldfish in a bowl balances on top of an umbrella held up by a mischievous figure, toppling books and a cake",
      "d": 3,
      "cap": "A rainy day turned upside down",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-cat-in-the-hat-2 was picked)"
+     "cand": true
     },
     {
      "p": "a big red kite flying through a house, knocking over furniture, a goldfish in a bowl looking alarmed",
@@ -1338,8 +1322,7 @@
      "p": "a cupboard under the stairs with a small camp bed and spiders, hundreds of sealed letters pouring through the letterbox of a suburban house",
      "d": 3,
      "cap": "Letters from no one",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (harry-potter-and-the-philosopher-s-stone-2 was picked)"
+     "cand": true
     },
     {
      "p": "a giant three-headed dog guarding a trapdoor in a stone castle corridor, a harp playing",
@@ -1385,8 +1368,7 @@
      "p": "a boy finding a shining golden ticket inside the wrapper of a chocolate bar in a snowy street",
      "d": 3,
      "cap": "The golden ticket",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (charlie-and-the-chocolate-factory-2 was picked)"
+     "cand": true
     },
     {
      "p": "a giant room with a chocolate river and waterfall, candy trees and lollipop flowers, a glass elevator",
@@ -1413,8 +1395,7 @@
      "p": "a boy's bedroom where trees grow out of the floor and walls until it becomes a forest",
      "d": 3,
      "cap": "The room becomes a forest",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (where-the-wild-things-are-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1436,8 +1417,7 @@
      "p": "a little mouse eating a nut at the edge of a dark wood at night",
      "d": 3,
      "cap": "The mouse and the nut",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-gruffalo-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1459,8 +1439,7 @@
      "p": "children and a nanny floating near the ceiling having tea with an old man laughing",
      "d": 3,
      "cap": "Tea on the ceiling",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (mary-poppins-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1510,8 +1489,7 @@
      "p": "a family eating at a cafe at night after the tiger ate all their food",
      "d": 3,
      "cap": "Supper out",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-tiger-who-came-to-tea-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1535,8 +1513,7 @@
      "p": "a boy and a girl lost in a dark cave holding a candle",
      "d": 3,
      "cap": "Lost in the cave",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-adventures-of-tom-sawyer-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1558,8 +1535,7 @@
      "p": "a cosy Victorian sitting room with a violin, chemistry equipment, and a pipe by the fire",
      "d": 3,
      "cap": "Two-twenty-one B",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-adventures-of-sherlock-holmes-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1581,8 +1557,7 @@
      "p": "three children sitting on a fence by a railway line waving to a passing steam train",
      "d": 1,
      "cap": "Waving to the old gentleman",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-railway-children-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1601,8 +1576,7 @@
      "p": "a wooden puppet boy whose nose grows long like a branch with a bird's nest on it, a fairy watching",
      "d": 1,
      "cap": "The growing nose",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-adventures-of-pinocchio-2 was picked)"
+     "cand": true
     },
     {
      "p": "an old woodcarver in his workshop carving a wooden puppet boy",
@@ -1624,8 +1598,7 @@
      "p": "a red-haired girl with stiff sticking-out plaits lifting a spotted horse above her head on a house veranda",
      "d": 3,
      "cap": "The strongest girl in the world",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (pippi-longstocking-2 was picked)"
+     "cand": true
     },
     {
      "p": "a girl with red plaits and mismatched stockings with a monkey on her shoulder",
@@ -1670,8 +1643,7 @@
      "p": "a hippogriff flying over a misty Scottish lake with a boy on its back",
      "d": 3,
      "cap": "Riding the hippogriff",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (harry-potter-and-the-prisoner-of-azkaban-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1695,8 +1667,7 @@
      "p": "a cracked stone castle at night under attack, lights in the sky",
      "d": 3,
      "cap": "The battle for the castle",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (harry-potter-and-the-deathly-hallows-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1718,8 +1689,7 @@
      "p": "a witch and her animals in a magic cauldron",
      "d": 3,
      "cap": "The cauldron",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (room-on-the-broom-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1736,8 +1706,7 @@
      "p": "a boy in pyjamas flying hand in hand with a snowman over snowy countryside and the sea at night",
      "d": 2,
      "cap": "Walking in the air",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-snowman-2 was picked)"
+     "cand": true
     },
     {
      "p": "a boy building a big snowman with a scarf and a hat in a snowy garden",
@@ -1764,8 +1733,7 @@
      "p": "a family running in a line away from a bear across a beach and a river",
      "d": 3,
      "cap": "Running from the bear",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (we-re-going-on-a-bear-hunt-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1787,8 +1755,7 @@
      "p": "a small boy turned into a mouse peeking out of a knitted handbag",
      "d": 3,
      "cap": "A boy turned into a mouse",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-witches-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1805,8 +1772,7 @@
      "p": "an ugly bearded man with bits of food in his beard and his wife glaring at each other at a dinner table, a plate of wormy spaghetti",
      "d": 3,
      "cap": "Wormy spaghetti",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-twits-2 was picked)"
+     "cand": true
     },
     {
      "p": "birds stuck with glue to the branches of a big dead tree",
@@ -1833,8 +1799,7 @@
      "p": "a grandmother growing so tall that her head bursts through the roof of a farmhouse",
      "d": 3,
      "cap": "Grandma grows through the roof",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (george-s-marvellous-medicine-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1869,8 +1834,7 @@
      "p": "a sleigh piled high with stolen Christmas presents and trees teetering on a snowy mountain peak above a little town, a small dog with an antler tied to its head pulling it",
      "d": 3,
      "cap": "Up the mountain with the stolen Christmas",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (how-the-grinch-stole-christmas-2 was picked)"
+     "cand": true
     },
     {
      "p": "a little snowy town with houses where people are singing in a circle holding hands",
@@ -1897,8 +1861,7 @@
      "p": "a single seed in a child's hand in a grey polluted wasteland",
      "d": 3,
      "cap": "Unless",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-lorax-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1936,8 +1899,7 @@
      "p": "a man climbing to the guillotine in Paris",
      "d": 3,
      "cap": "A far, far better thing",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (a-tale-of-two-cities-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1959,8 +1921,7 @@
      "p": "a Victorian gentleman with a knife in front of a portrait under a cloth",
      "d": 3,
      "cap": "The cloth is lifted",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-picture-of-dorian-gray-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1985,8 +1946,7 @@
      "p": "a boy in a straw hat fishing on a riverbank",
      "d": 3,
      "cap": "Fishing on the bank",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (adventures-of-huckleberry-finn-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2008,8 +1968,7 @@
      "p": "a grand ballroom in Saint Petersburg, 1805, a young woman at her first ball",
      "d": 3,
      "cap": "The first ball",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (war-and-peace-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2044,8 +2003,7 @@
      "p": "a giant brown beetle-like insect lying on its back on a bed in a small early 20th century bedroom, a travelling salesman's sample case, the family at the door horrified",
      "d": 1,
      "cap": "He woke up as a giant insect",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-metamorphosis-2 was picked)"
+     "cand": true
     },
     {
      "p": "an apple stuck in the back of a giant insect",
@@ -2075,8 +2033,7 @@
      "p": "divers in old brass diving suits walking on the seabed in an underwater forest",
      "d": 1,
      "cap": "The underwater forest",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (twenty-thousand-leagues-under-the-seas-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2101,8 +2058,7 @@
      "p": "a hunched figure running through a foggy London alley at night",
      "d": 3,
      "cap": "Hyde in the fog",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (strange-case-of-dr-jekyll-and-mr-hyde-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2140,8 +2096,7 @@
      "p": "a golden horn-shaped structure in a field with weapons around it, tributes running",
      "d": 3,
      "cap": "The Cornucopia",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-hunger-games-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2179,8 +2134,7 @@
      "p": "a floating island of meerkats in the middle of the ocean",
      "d": 3,
      "cap": "The meerkat island",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (life-of-pi-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2220,8 +2174,7 @@
      "p": "a man with a magnificent moustache examining a compartment",
      "d": 3,
      "cap": "The detective",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (murder-on-the-orient-express-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2243,8 +2196,7 @@
      "p": "a house on a rocky island with no boat coming",
      "d": 3,
      "cap": "Stranded on the island",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (and-then-there-were-none-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2266,8 +2218,7 @@
      "p": "two moons rising over a vast desert",
      "d": 1,
      "cap": "Arrakis",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (dune-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2305,8 +2256,7 @@
      "p": "an empty suit of clothes walking down a village street",
      "d": 3,
      "cap": "The empty clothes",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-invisible-man-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2355,8 +2305,7 @@
      "p": "a toy rabbit in a garden with real rabbits",
      "d": 3,
      "cap": "Real rabbits",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-velveteen-rabbit-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2378,8 +2327,7 @@
      "p": "a huge crystal chandelier crashing down in a grand theatre",
      "d": 1,
      "cap": "The chandelier falls",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-phantom-of-the-opera-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2401,8 +2349,7 @@
      "p": "a boy reading a book in a school attic, candles",
      "d": 3,
      "cap": "Reading in the attic",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-neverending-story-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2435,8 +2382,7 @@
      "p": "a sheep station homestead on the Australian outback, a priest on horseback",
      "d": 3,
      "cap": "Drogheda",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-thorn-birds-2 was picked)"
+     "cand": true
     },
     {
      "p": "a bird impaling itself on a thorn tree at dawn",
@@ -2463,8 +2409,7 @@
      "p": "girls in white climbing up into a crack in a rock",
      "d": 3,
      "cap": "Climbing the rock",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (picnic-at-hanging-rock-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2486,8 +2431,7 @@
      "p": "a pelican pulling a rope out to a ship in a storm",
      "d": 3,
      "cap": "The pelican in the storm",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (storm-boy-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2525,8 +2469,7 @@
      "p": "a big house beside a camp",
      "d": 3,
      "cap": "Out-With",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-boy-in-the-striped-pyjamas-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2566,8 +2509,7 @@
      "p": "a tiny girl climbing a curtain with a hatpin",
      "d": 1,
      "cap": "Borrowing",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-borrowers-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2591,8 +2533,7 @@
      "p": "a golden compass with symbols",
      "d": 1,
      "cap": "The alethiometer",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (northern-lights-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2609,8 +2550,7 @@
      "p": "a boy and his father in a gypsy caravan by a filling station at night, pheasants",
      "d": 3,
      "cap": "The caravan",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (danny-the-champion-of-the-world-2 was picked)"
+     "cand": true
     },
     {
      "p": "pheasants falling asleep in trees in a wood at night after eating raisins",
@@ -2639,8 +2579,7 @@
      "p": "children in a dungeon with a dog, gold ingots",
      "d": 3,
      "cap": "Treasure in the dungeon",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (five-on-a-treasure-island-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2678,8 +2617,7 @@
      "p": "a small fishing boat chased by a giant shark",
      "d": 3,
      "cap": "A bigger boat",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (jaws-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2696,8 +2634,7 @@
      "p": "a grand isolated mountain hotel snowed in during winter, a hedge maze in front",
      "d": 2,
      "cap": "The snowbound hotel",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-shining-2 was picked)"
+     "cand": true
     },
     {
      "p": "a little boy riding a tricycle down a long hotel corridor with patterned carpet",
@@ -2740,8 +2677,7 @@
      "p": "a mosquito trapped in amber",
      "d": 3,
      "cap": "Dinosaur DNA",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (jurassic-park-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2763,8 +2699,7 @@
      "p": "a boy rising out of the sea surrounded by water",
      "d": 3,
      "cap": "Son of the sea god",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-lightning-thief-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2805,8 +2740,7 @@
      "p": "a tiny mouse in a little sailor suit sailing a toy sailboat across a boat pond in Central Park",
      "d": 3,
      "cap": "The boat race in Central Park",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (stuart-little-2 was picked)"
+     "cand": true
     },
     {
      "p": "a mouse driving a tiny car",
@@ -2828,8 +2762,7 @@
      "p": "an old man sitting on the stump of a tree",
      "d": 3,
      "cap": "The stump",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-giving-tree-2 was picked)"
+     "cand": true
     },
     {
      "p": "a boy swinging from the branches of a big apple tree",
@@ -2851,8 +2784,7 @@
      "p": "a boy in pyjamas boarding a steam train in the snow outside his house at night",
      "d": 2,
      "cap": "All aboard",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-polar-express-2 was picked)"
+     "cand": true
     },
     {
      "p": "a steam train arriving at a Christmas village at the North Pole full of elves",
@@ -2895,8 +2827,7 @@
      "p": "an astronaut in a rover driving across Mars",
      "d": 1,
      "cap": "Driving across Mars",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-martian-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -2971,8 +2902,7 @@
      "p": "a woman in a fur hat and black dress on a snowy Russian railway platform in a cloud of steam, a train arriving",
      "d": 1,
      "cap": "Meeting at the station",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (anna-karenina-2 was picked)"
+     "cand": true
     },
     {
      "p": "a horse race in the countryside",
@@ -3015,8 +2945,7 @@
      "p": "a man alone in a lighthouse",
      "d": 3,
      "cap": "The savage",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (brave-new-world-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -3038,8 +2967,7 @@
      "p": "a puppy in a barn",
      "d": 1,
      "cap": "The puppy",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (of-mice-and-men-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -3056,8 +2984,7 @@
      "p": "an old jalopy truck piled high with furniture and a family driving across the Dust Bowl toward California",
      "d": 2,
      "cap": "The road to California",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-grapes-of-wrath-2 was picked)"
+     "cand": true
     },
     {
      "p": "a migrant camp",
@@ -3079,8 +3006,7 @@
      "p": "a woman in a green dress silhouetted on a hill under a huge tree at sunset, a burning city in the distance",
      "d": 3,
      "cap": "Tomorrow is another day",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (gone-with-the-wind-2 was picked)"
+     "cand": true
     },
     {
      "p": "a dress made from green velvet curtains",
@@ -3152,8 +3078,7 @@
      "p": "a young man and a Highlander on the run across the heather of the Scottish Highlands",
      "d": 3,
      "cap": "On the run in the Highlands",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (kidnapped-2 was picked)"
+     "cand": true
     },
     {
      "p": "a ship wrecked on a rock",
@@ -3180,8 +3105,7 @@
      "p": "an upturned boat converted into a house on the beach at Yarmouth",
      "d": 3,
      "cap": "The boat house",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (david-copperfield-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -3214,8 +3138,7 @@
      "p": "giant carnivorous walking plants with stingers roaming the empty streets of London",
      "d": 3,
      "cap": "The triffids",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-day-of-the-triffids-2 was picked)"
+     "cand": true
     },
     {
      "p": "a green meteor shower in the sky",
@@ -3242,8 +3165,7 @@
      "p": "a giant eel in the sea",
      "d": 3,
      "cap": "The shrieking eels",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-princess-bride-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -3325,8 +3247,7 @@
      "p": "a wooden chest with hundreds of little legs following a tourist",
      "d": 3,
      "cap": "The Luggage",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-colour-of-magic-1 was picked)"
+     "cand": true
     }
    ]
   },

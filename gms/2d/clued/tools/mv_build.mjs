@@ -1,9 +1,11 @@
 // Builds data/packs/<pack>.json from tools/mv_prompts*.json + the webp files that exist (approved scenes only), and
-// data/candidates/<pack>.json from the `cand: true` scenes (review.html only; never in data/index.json).
+// data/candidates/<pack>.json from the `cand: true` scenes of titles not live yet (review.html only; never in data/index.json),
+// and data/candidates/<pack>-more.json from candidates of titles that already have a live picture (offered as extras,
+// each item carrying `live`: the pictures already in the pack, shown small beside the candidate).
 // Usage: node tools/mv_build.mjs [movie-moments|book-moments|song-pictures|all] [--candidates]
 import fs from 'fs';
 import path from 'path';
-import { PACKS, sceneRel, candRef } from './mv_paths.mjs';
+import { PACKS, sceneRel, refFor, hasLive } from './mv_paths.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const CREDIT = 'Clued (AI-generated illustration)';
@@ -88,26 +90,36 @@ function build(id, cands = false) {
   const src = path.join(ROOT, PACKS[id].prompts);
   if (!fs.existsSync(src)) return console.log(id, ': no prompts file, skipped');
   const cfg = JSON.parse(fs.readFileSync(src, 'utf8'));
-  const items = [];
+  const items = [], more = [];
+  const exists = rel => fs.existsSync(path.join(ROOT, rel));
   for (const f of cfg.films) {
+    const live = cands && hasLive(exists, id, f);
     const img = [];
     f.scenes.forEach((sc, i) => {
       const key = `${f.id}-${i + 1}`, file = sceneRel(id, key, sc);
       if (sc.drop || !sc.cand !== !cands || !fs.existsSync(path.join(ROOT, file))) return;
       const [w, h] = webpSize(path.join(ROOT, file));
-      img.push({ src: file, w, h, credit: CREDIT, license: 'CC0', page: PAGE, difficulty: sc.d, caption: sc.cap, ...(cands ? { key, ref: candRef(id, key) } : {}) });
+      img.push({ src: file, w, h, credit: CREDIT, license: 'CC0', page: PAGE, difficulty: sc.d, caption: sc.cap, ...(cands ? { key, ref: refFor(id, key, live) } : {}) });
     });
     if (!img.length) continue;
     img.sort((a, b) => a.difficulty - b.difficulty);
-    // candidates: Aaron picks one of at most two per title on review.html (easiest first = shown first)
-    if (cands) img.splice(2);
-    items.push({
+    // new titles: at most two candidates on review.html (easiest first = shown first), Aaron keeps one or both
+    if (cands && !live) img.splice(2);
+    const item = {
       id: f.id, name: f.name, alt: f.alt || [], facts: def.facts(f), blurb: f.blurb,
       media: { img }, difficulty: f.difficulty || img[0].difficulty,
-    });
+    };
+    if (live) {
+      item.live = f.scenes.map((sc, i) => (!sc.cand && !sc.drop ? sceneRel(id, `${f.id}-${i + 1}`, sc) : null)).filter(r => r && exists(r))
+        .map(src => { const [w, h] = webpSize(path.join(ROOT, src)); return { src, w, h }; });
+      more.push(item);
+    } else items.push(item);
   }
   const pack = { id, ...def.head, kids: false, version: 1, items, sources: [{ name: 'Generated locally with FLUX.2 [klein] (Clued house style)', url: PAGE }] };
-  if (cands) return writeCandidates(id, pack);
+  if (cands) {
+    writeCandidates(id, pack, 'new');
+    return writeCandidates(id, { ...pack, items: more }, 'more');
+  }
   if (!items.length) return console.log(id, ': no approved pictures, no pack written');
   fs.writeFileSync(path.join(ROOT, 'data/packs', id + '.json'), JSON.stringify(pack, null, 1) + '\n');
   const n = items.reduce((s, i) => s + i.media.img.length, 0);
@@ -116,22 +128,24 @@ function build(id, cands = false) {
 }
 
 // data/candidates/index.json lists the files review.html shows next to the live packs
-const CAND_TITLES = { 'movie-moments': 'Movie moments: new', 'book-moments': 'Book moments: new', 'tv-moments': 'TV moments: new', 'song-pictures': 'Song pictures: new' };
-function writeCandidates(id, pack) {
+const CAND_TITLES = { 'movie-moments': 'Movie moments', 'book-moments': 'Book moments', 'tv-moments': 'TV moments', 'song-pictures': 'Song pictures' };
+const KIND = { new: { suffix: '', title: 'new' }, more: { suffix: '-more', title: 'second pictures' } };
+function writeCandidates(id, pack, kind) {
   const dir = path.join(ROOT, 'data/candidates');
   fs.mkdirSync(dir, { recursive: true });
-  const file = path.join(dir, id + '.json'), idxFile = path.join(dir, 'index.json');
+  const file = path.join(dir, id + KIND[kind].suffix + '.json'), idxFile = path.join(dir, 'index.json');
+  const title = `${CAND_TITLES[id]}: ${KIND[kind].title}`;
   const idx = fs.existsSync(idxFile) ? JSON.parse(fs.readFileSync(idxFile, 'utf8')) : { candidates: [] };
-  idx.candidates = idx.candidates.filter(c => c.pack !== id);
+  idx.candidates = idx.candidates.filter(c => c.pack !== id || (c.kind || 'new') !== kind);
   const n = pack.items.reduce((s, i) => s + i.media.img.length, 0);
   if (n) {
-    fs.writeFileSync(file, JSON.stringify({ ...pack, id: id + '-candidates', title: CAND_TITLES[id], candidate: true }, null, 1) + '\n');
-    idx.candidates.push({ pack: id, title: CAND_TITLES[id], path: `candidates/${id}.json`, pictures: n, titles: pack.items.length });
+    fs.writeFileSync(file, JSON.stringify({ ...pack, id: `${id}-candidates${KIND[kind].suffix}`, title, candidate: true }, null, 1) + '\n');
+    idx.candidates.push({ pack: id, kind, title, path: `candidates/${path.basename(file)}`, pictures: n, titles: pack.items.length });
   } else if (fs.existsSync(file)) fs.unlinkSync(file);
-  const rank = c => (k => (k < 0 ? 99 : k))(Object.keys(DEFS).indexOf(c.pack));
+  const rank = c => (k => (k < 0 ? 99 : k))(Object.keys(DEFS).indexOf(c.pack)) * 2 + ((c.kind || 'new') === 'new' ? 0 : 1);
   idx.candidates.sort((a, b) => rank(a) - rank(b) || a.pack.localeCompare(b.pack));
   fs.writeFileSync(idxFile, JSON.stringify(idx, null, 1) + '\n');
-  console.log(`${id} candidates: ${pack.items.length} titles, ${n} pictures -> data/candidates/${id}.json`);
+  console.log(`${id} candidates (${kind}): ${pack.items.length} titles, ${n} pictures -> data/candidates/${path.basename(file)}`);
 }
 
 const which = process.argv.slice(2).find(a => !a.startsWith('--')) || 'movie-moments';

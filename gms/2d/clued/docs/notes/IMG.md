@@ -108,3 +108,29 @@ Running log, newest last. Pipeline background: docs/notes/MV.md.
   only added a gold border).
   Lesson: edit mode suits covers whose art carries the picture. Survey covers for real artwork before spending GPU,
   and add "do not add borders, keep the colours" to PROMPT. Nothing is staged as candidates yet.
+- 2026-10-17 (round 4) Aaron: "Some of the images I wanted to say yes to both, but it cancelled the other yes". His picks
+  were promoted by the manager (ee508a3d, build 202610170843); the siblings were dropped as "not chosen" (movie 80, book 79,
+  TV 22) and their files restored from the server.
+  review.js: OK no longer clears the sibling's OK; a "✓ 2 kept" badge (bottom left of the picture) shows when both are OK.
+  ⇄ toggle, Bad → sibling and Mark-the-rest (shown picture only) unchanged.
+  img_promote: every OK picture of a title is promoted. Unreviewed siblings of an OK stay candidates; `--finished` (review
+  explicitly over) drops them as "not chosen (<keys> kept)". Stale-src guard kept.
+  "Second pictures": a candidate whose title already has a live picture gets the ref `<pack>:more/<key>` (mv_paths
+  refFor/hasLive, same rule in mv_build and img_promote, decided before a promote's moves), so rows left on the old
+  `:new/` refs (OKs cleared by the old page) never count, on the page or in promote. mv_build --candidates writes
+  `<pack>.json` (new titles, ≤2 each) and `<pack>-more.json` (items carry `live`: the pack's pictures); index entries gain
+  `kind`. review.html shows a more-card per picture with the live ones small, labelled "already in"; OK adds it as an
+  extra picture, Bad drops it. A sibling left over after an OK moves to the more set at the next build by itself.
+  verdictOf: a live ref whose row is for a different src (index refs shift when a title gains a picture) now falls back
+  to the candidate carry-over instead of showing "to review".
+  The 181 siblings un-dropped (only dropWhy "Aaron review … not chosen"), cand:true restored, d unchanged (all match
+  mv_blind_*.json). Staged: Movie moments: second pictures 80 titles / 80 pictures, Book 78 / 79, TV 22 / 22. No "new"
+  sets left. Note: media/cand still holds copies of 125/140/64 already-promoted pictures (restored from the server);
+  harmless, nothing lists them.
+  Tests: cand_e2e now serves a fixture "Movie moments: new" set (60 movie titles from the prompts file) in front of the
+  real sets and covers both-OK, the badge, un-OK one, the more set (already-in thumbnails, :more refs, 3 seeded stale
+  :new rows show as to review), :more carry-over: all ok (51); --falsify-ok (old clearing patched into review.js) 5 FAILED;
+  --falsify 1 FAILED. marks_e2e all ok, img_marks_test 21/0, leak_scan 0, a_test 487/0. Promote sandbox (copy in
+  scratchpad, 3 movie titles turned back into new candidates): both OK → 2 pictures live; OK + Bad → 1 live + drop;
+  OK + unreviewed → 1 live, sibling moves to the more set (dropped with --finished); more OK → extra picture live; more
+  Bad → drop; old :new OK row → ignored; wrong src → stale.

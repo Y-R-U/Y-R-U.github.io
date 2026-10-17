@@ -2,12 +2,14 @@
 // A verdict is tied to the picture's src, so a swapped or regenerated picture comes back as "to review".
 // New AI pictures wait in data/candidates/*.json (refs "<pack>:new/<key>", never loaded by the game) until
 // tools/img_promote.mjs moves the OK ones into the live pack; an OK candidate verdict then carries over to the live copy.
-// A candidate title can have two pictures: the card shows one with a "1/2 ⇄" toggle. OK picks it (the sibling is just not
-// chosen), Bad flips to the sibling; the title is rejected only when every picture is Bad. Verdicts stay one row per picture.
+// A new candidate title can have two pictures: the card shows one with a "1/2 ⇄" toggle. OK keeps it (both can be OK:
+// "✓ 2 kept"), Bad flips to the sibling; the title is rejected only when every picture is Bad. Verdicts stay one row per picture.
+// "…: second pictures" sets (refs "<pack>:more/<key>") offer extra pictures for titles already live: one card per picture,
+// with the pictures already in the pack shown small ("already in"). OK adds it, Bad drops it.
 // A picture can also carry a drawn circle around the target (mark, 0–1 image coordinates); tools/img_marks.mjs puts those in the packs.
-import { h, markRect } from '../ui/kit.js?v=202610170843';
-import { toast } from '../ui/popup.js?v=202610170843';
-import { API } from './api.js?v=202610170843';
+import { h, markRect } from '../ui/kit.js?v=202610170857';
+import { toast } from '../ui/popup.js?v=202610170857';
+import { API } from './api.js?v=202610170857';
 
 const root = document.getElementById('rv');
 const gate = document.getElementById('gate');
@@ -72,12 +74,14 @@ async function loadPics() {
   const cands = await fetch(`data/candidates/index.json?r=${Date.now()}`, { cache: 'no-store' }).then(r => (r.ok ? r.json() : null)).catch(() => null);
   for (const c of cands?.candidates || []) {
     const p = await fetch(`data/${c.path}`, { cache: 'no-cache' }).then(r => r.json()).catch(() => null);
+    const kind = c.kind || 'new', more = kind === 'more';
     for (const it of p?.items || []) {
       const group = [];
       for (const m of it.media?.img || []) {
         if (!m.src || !m.key) continue;
-        const pic = { ref: m.ref || `${c.pack}:new/${m.key}`, src: m.src, pack: `${c.pack}:new`, packTitle: c.title, name: it.name, ai: true, cand: true, caption: m.caption || '', page: m.page || '', group };
-        group.push(pic);
+        const pic = { ref: m.ref || `${c.pack}:${kind}/${m.key}`, src: m.src, pack: `${c.pack}:${kind}`, packTitle: c.title, name: it.name, ai: true, cand: true, caption: m.caption || '', page: m.page || '',
+          ...(more ? { more: true, live: (it.live || []).map(l => l.src).filter(Boolean) } : { group }) };
+        if (!more) group.push(pic);
         pics.push(pic);
       }
     }
@@ -91,7 +95,7 @@ async function loadPics() {
   }
 }
 
-// a title is OK when one picture is OK, Bad when every picture is Bad, else still to review
+// a title is OK when one or more pictures are OK, Bad when every picture is Bad, else still to review
 function unitVerdict(u) {
   const vs = u.pics.map(p => verdictOf(p)?.verdict);
   return vs.includes('ok') ? 'ok' : vs.every(v => v === 'bad') ? 'bad' : '';
@@ -107,7 +111,7 @@ function pickCur(u) {
 function carryCandidates() {
   carried.clear();
   for (const r of reviews.values()) {
-    const m = /^([^/:]+):new\//.exec(r.ref);
+    const m = /^([^/:]+):(?:new|more)\//.exec(r.ref);
     if (m && r.verdict === 'ok') carried.set(`${m[1]}|${fileName(r.src)}`, r);
   }
 }
@@ -116,7 +120,8 @@ function carryCandidates() {
 const verdictOf = p => {
   const r = reviews.get(p.ref);
   // the server used to clip src at 600 chars, so a clipped row still matches its picture
-  if (r) return r.src === p.src || (r.src.length >= 600 && p.src.startsWith(r.src)) ? r : null;
+  if (r && (r.src === p.src || (r.src.length >= 600 && p.src.startsWith(r.src)))) return r;
+  // live refs are indexes, so a row can be for the picture that used to sit there: fall back to the candidate's OK
   const c = p.ai && !p.cand && carried.get(`${p.pack}|${fileName(p.src)}`);
   return c ? { ...c, ref: p.ref, src: p.src } : null;
 };
@@ -141,7 +146,7 @@ function summary() {
   const inPack = view.pack === 'all' ? units : view.pack === 'ai' ? units.filter(u => u.ai) : units.filter(u => u.pack === view.pack);
   let ok = 0, bad = 0, marked = 0;
   for (const u of inPack) { const v = unitVerdict(u); if (v === 'ok') ok++; else if (v === 'bad') bad++; if (u.pics.some(p => verdictOf(p)?.mark)) marked++; }
-  const titles = inPack.length && inPack.every(u => u.pics[0].cand);
+  const titles = inPack.length && inPack.every(u => u.pics[0].cand && !u.pics[0].more);
   sumEl.replaceChildren(
     h('span', {}, h('b', {}, String(inPack.length)), titles ? ' titles' : ' pictures'),
     h('span', {}, h('b', {}, String(inPack.length - ok - bad)), ' to review'),
@@ -166,7 +171,11 @@ function card(u) {
   const flip = i => { u.cur = (i + u.pics.length) % u.pics.length; el.replaceWith(card(u)); };
   const alt = u.pics.length > 1 ? h('button.rv-alt', { type: 'button', title: 'Show the other picture for this title', onclick: e => { e.preventDefault(); e.stopPropagation(); flip(u.cur + 1); } }, `${u.cur + 1}/${u.pics.length} ⇄`) : null;
   const img = h('img', { src: p.src, alt: p.name, loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' });
-  const pic = h('a.rv-pic', { href: p.src, target: '_blank', rel: 'noopener' }, img, p.ai ? h('span.ai', {}, 'AI') : null);
+  const kept = h('span.rv-kept', { hidden: true });
+  const pic = h('a.rv-pic', { href: p.src, target: '_blank', rel: 'noopener' }, img, p.ai ? h('span.ai', {}, 'AI') : null, kept);
+  // an extra picture for a live title: the pictures already in the pack, small, so the call is "keep this one too?"
+  const already = p.more && p.live.length ? h('div.rv-live', {}, h('span', {}, 'already in'),
+    ...p.live.map(src => h('a', { href: src, target: '_blank', rel: 'noopener' }, h('img', { src, alt: `${p.name} (already in the pack)`, loading: 'lazy', decoding: 'async' })))) : null;
   img.addEventListener('error', () => pic.classList.add('broken'));
   const ring = h('span.rv-ring', { hidden: true });
   pic.append(ring);
@@ -188,6 +197,9 @@ function card(u) {
     for (const b of why.querySelectorAll('button')) b.classList.toggle('on', b.dataset.r === v?.reason);
     if (document.activeElement !== note) note.value = v?.note || '';
     el.classList.toggle('marked', !!v?.mark);
+    const nOk = u.pics.filter(q => verdictOf(q)?.verdict === 'ok').length;
+    kept.hidden = nOk < 2;
+    kept.textContent = `✓ ${nOk} kept`;
     unring.hidden = !v?.mark;
     showRing(draft || v?.mark);
   };
@@ -241,8 +253,7 @@ function card(u) {
   unring.addEventListener('click', () => { const v = verdictOf(p); if (v) setVerdict(p, v.verdict, v.reason, v.note, null).then(paint); paint(); });
   yes.addEventListener('click', () => {
     const on = verdictOf(p)?.verdict === 'ok';
-    // one OK picks the title: an OK on its sibling is cleared (not chosen, not Bad)
-    if (!on) for (const q of u.pics) if (q !== p && verdictOf(q)?.verdict === 'ok') setVerdict(q, '');
+    // each picture of a title is kept on its own: an OK never touches its sibling
     setVerdict(p, on ? '' : 'ok').then(paint); paint();
   });
   no.addEventListener('click', () => {
@@ -263,7 +274,7 @@ function card(u) {
   note.addEventListener('change', () => { const v = verdictOf(p); setVerdict(p, 'bad', v?.reason || 'poor', note.value).then(paint); paint(); });
   why.append(note);
   if (alt) pic.append(alt);
-  el.append(pic, h('div.rv-meta', {}, h('b', {}, p.name || '(no name)'), h('small', {}, p.caption ? `${p.packTitle} · ${p.caption}` : p.packTitle)),
+  el.append(pic, ...(already ? [already] : []), h('div.rv-meta', {}, h('b', {}, p.name || '(no name)'), h('small', {}, p.caption ? `${p.packTitle} · ${p.caption}` : p.packTitle)),
     h('div.rv-acts', {}, yes, no), h('div.rv-acts.rv-circ', {}, circle, unring), why);
   paint();
   return el;
@@ -340,12 +351,13 @@ function controls() {
   const counts = new Map();
   for (const u of units) counts.set(u.pack, (counts.get(u.pack) || 0) + 1);
   const titles = new Map(pics.map(p => [p.pack, p.packTitle]));
-  const cand = [...counts].filter(([id]) => id.endsWith(':new'));
+  const isCand = id => /:(new|more)$/.test(id);
+  const cand = [...counts].filter(([id]) => isCand(id));
   const sel = h('select', { id: 'rv-pack', 'aria-label': 'Pack' },
     ...cand.map(([id, n]) => h('option', { value: id }, `${titles.get(id)} (${n})`)),
     h('option', { value: 'all' }, `All packs (${units.length})`),
     h('option', { value: 'ai' }, `AI pictures only (${units.filter(u => u.ai).length})`),
-    ...[...counts].filter(([id]) => !id.endsWith(':new')).map(([id, n]) => h('option', { value: id }, `${titles.get(id)} (${n})`)));
+    ...[...counts].filter(([id]) => !isCand(id)).map(([id, n]) => h('option', { value: id }, `${titles.get(id)} (${n})`)));
   sel.value = view.pack;
   sel.addEventListener('change', () => { view.pack = sel.value; view.shown = PAGE; summary(); render(); });
   const seg = h('div.rv-seg', { role: 'group', 'aria-label': 'Show' });

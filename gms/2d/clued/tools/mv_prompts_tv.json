@@ -52,8 +52,7 @@
      "p": "six friends dancing in a fountain at night in a park, an old lamp post",
      "d": 1,
      "cap": "Splashing in the fountain",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (friends-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -71,8 +70,7 @@
      "p": "a wall of a 1980s living room with strings of Christmas fairy lights flickering over painted marks, a frightened mother holding an axe",
      "d": 3,
      "cap": "Talking through the Christmas lights",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (stranger-things-2 was picked)"
+     "cand": true
     },
     {
      "p": "four kids on BMX bikes riding through a misty forest road at night with torches, 1983 small-town America",
@@ -125,8 +123,7 @@
      "p": "two young physicists in cardigans climbing an apartment staircase past an out-of-order lift with yellow tape across its doors, carrying plain brown paper bags",
      "d": 3,
      "cap": "The lift is still broken",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-big-bang-theory-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -151,8 +148,7 @@
      "p": "a gigantic wall of ice towering over a snowy forest, tiny figures on top, a small castle at its foot",
      "d": 1,
      "cap": "The Wall of ice",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (game-of-thrones-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -175,8 +171,7 @@
      "p": "a pizza on the roof of a suburban house",
      "d": 3,
      "cap": "Pizza on the roof",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (breaking-bad-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -195,8 +190,7 @@
      "p": "a sleek white starship with a saucer section and two long engine nacelles cruising past a red planet",
      "d": 3,
      "cap": "The starship in orbit",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (star-trek-2 was picked)"
+     "cand": true
     },
     {
      "p": "three crew members in yellow, blue and red tunics dissolving into shimmering columns of golden light on a transporter platform",
@@ -224,8 +218,7 @@
      "p": "a crowd of shambling zombies pressing against a chain-link prison fence at dusk",
      "d": 1,
      "cap": "The prison fence",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-walking-dead-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -248,8 +241,7 @@
      "p": "a disembodied hand scuttling across a gothic boarding school desk",
      "d": 3,
      "cap": "The hand",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (wednesday-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -274,8 +266,7 @@
      "p": "banknotes raining down from an airship over a crowded Madrid square",
      "d": 3,
      "cap": "Raining money",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (money-heist-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -298,8 +289,7 @@
      "p": "a pink-suited guard with a mask seen in a pastel staircase maze",
      "d": 1,
      "cap": "The pastel staircase",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (squid-game-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -364,8 +354,7 @@
      "p": "a round metal hatch in the jungle floor",
      "d": 1,
      "cap": "The hatch",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (lost-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -413,8 +402,7 @@
      "p": "a basement office with a poster of a flying saucer and pencils stuck in the ceiling",
      "d": 1,
      "cap": "The basement office",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-x-files-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -463,8 +451,7 @@
      "p": "two men in a pub, one falling through a bar flap that has been lifted",
      "d": 3,
      "cap": "Falling through the bar",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (only-fools-and-horses-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -506,8 +493,7 @@
      "p": "a pink Rolls-Royce with six wheels",
      "d": 3,
      "cap": "The pink car",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (thunderbirds-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -547,8 +533,7 @@
      "p": "a quarry where a dinosaur works as a crane",
      "d": 3,
      "cap": "Dino crane",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-flintstones-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -623,8 +608,7 @@
      "p": "a stapler sealed inside a wobbly block of jelly on an office desk",
      "d": 1,
      "cap": "The stapler in jelly",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-office-us-2 was picked)"
+     "cand": true
     },
     {
      "p": "an office paper company with cubicles and a conference room",
@@ -672,8 +656,7 @@
      "p": "British soldiers going over the top of a First World War trench into poppy fields",
      "d": 3,
      "cap": "Going over the top",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (blackadder-2 was picked)"
+     "cand": true
     },
     {
      "p": "a Tudor nobleman and his servant with a turnip",
@@ -739,8 +722,7 @@
      "p": "a great white shark breaching out of the sea catching a seal",
      "d": 3,
      "cap": "The breach",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (planet-earth-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -783,8 +765,7 @@
      "p": "a teddy bear on a bed",
      "d": 3,
      "cap": "Teddy",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (mr-bean-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -955,8 +936,7 @@
      "p": "a lanai with palm print",
      "d": 3,
      "cap": "The lanai",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (the-golden-girls-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1104,8 +1084,7 @@
      "p": "priests in a lingerie section",
      "d": 3,
      "cap": "Lost in the department store",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (father-ted-1 was picked)"
+     "cand": true
     }
    ]
   },
@@ -1164,8 +1143,7 @@
      "p": "an underwater burger restaurant shaped like a lobster trap",
      "d": 3,
      "cap": "The burger shack",
-     "drop": true,
-     "dropWhy": "Aaron review 2026-10-17: not chosen (spongebob-squarepants-1 was picked)"
+     "cand": true
     }
    ]
   },
