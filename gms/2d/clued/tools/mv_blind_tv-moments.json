@@ -1,0 +1,784 @@
+{
+ "friends-1": {
+  "guesses": [
+   "Friends",
+   "The Office",
+   "How I Met Your Mother"
+  ],
+  "rank": 1
+ },
+ "friends-2": {
+  "guesses": [
+   "Friends",
+   "How I Met Your Mother",
+   "The Office"
+  ],
+  "rank": 1
+ },
+ "stranger-things-1": {
+  "guesses": [
+   "The Handmaid's Tale",
+   "The Haunting of Hill House",
+   "The Haunting of Bly Manor"
+  ],
+  "rank": 0
+ },
+ "stranger-things-2": {
+  "guesses": [
+   "Stranger Things",
+   "The Goonies",
+   "The A-Team"
+  ],
+  "rank": 1
+ },
+ "sherlock-2": {
+  "guesses": [
+   "Sherlock",
+   "Fleabag",
+   "The Crown"
+  ],
+  "rank": 1
+ },
+ "game-of-thrones-1": {
+  "guesses": [
+   "Game of Thrones",
+   "A Song of Ice and Fire",
+   "The Iron Throne"
+  ],
+  "rank": 1
+ },
+ "game-of-thrones-2": {
+  "guesses": [
+   "Game of Thrones",
+   "The Lord of the Rings: The Rings of Power",
+   "The Witcher"
+  ],
+  "rank": 1
+ },
+ "breaking-bad-1": {
+  "guesses": [
+   "Breaking Bad",
+   "Better Call Saul",
+   "The X-Files"
+  ],
+  "rank": 1
+ },
+ "breaking-bad-2": {
+  "guesses": [
+   "Friends",
+   "The Big Bang Theory",
+   "How I Met Your Mother"
+  ],
+  "rank": 0
+ },
+ "star-trek-1": {
+  "guesses": [
+   "Buck Rogers",
+   "The Invaders in Space",
+   "Space: 1999"
+  ],
+  "rank": 0
+ },
+ "star-trek-2": {
+  "guesses": [
+   "The Three Stooges",
+   "The A-Team",
+   "The X-Files"
+  ],
+  "rank": 0
+ },
+ "the-walking-dead-1": {
+  "guesses": [
+   "Deadwood",
+   "True Detective",
+   "The Wire"
+  ],
+  "rank": 0
+ },
+ "the-walking-dead-2": {
+  "guesses": [
+   "The Walking Dead",
+   "World War Z",
+   "The Last of Us"
+  ],
+  "rank": 1
+ },
+ "wednesday-1": {
+  "guesses": [
+   "Wednesday",
+   "The Addams Family",
+   "Dark"
+  ],
+  "rank": 1
+ },
+ "wednesday-2": {
+  "guesses": [
+   "Game of Thrones",
+   "The Lord of the Rings: The Rings of Power",
+   "The Witcher"
+  ],
+  "rank": 0
+ },
+ "money-heist-1": {
+  "guesses": [
+   "Squid Game",
+   "Money Heist",
+   "The Boys"
+  ],
+  "rank": 2
+ },
+ "money-heist-2": {
+  "guesses": [
+   "Breaking Bad",
+   "Better Call Saul",
+   "The Wire"
+  ],
+  "rank": 0
+ },
+ "squid-game-1": {
+  "guesses": [
+   "Squid Game",
+   "Parasite",
+   "The Hunger Games"
+  ],
+  "rank": 1
+ },
+ "squid-game-2": {
+  "guesses": [
+   "Squid Game",
+   "Parasite",
+   "The Handmaid's Tale"
+  ],
+  "rank": 1
+ },
+ "downton-abbey-2": {
+  "guesses": [
+   "The Good Place",
+   "Frasier",
+   "Seinfeld"
+  ],
+  "rank": 0
+ },
+ "the-crown-1": {
+  "guesses": [
+   "The Crown",
+   "Game of Thrones",
+   "The Tudors"
+  ],
+  "rank": 1
+ },
+ "lost-1": {
+  "guesses": [
+   "Lost",
+   "The X-Files"
+  ],
+  "rank": 1
+ },
+ "lost-2": {
+  "guesses": [
+   "Lost",
+   "The X-Files",
+   "Fringe"
+  ],
+  "rank": 1
+ },
+ "the-mandalorian-2": {
+  "guesses": [
+   "The Expanse",
+   "Battlestar Galactica",
+   "The 100"
+  ],
+  "rank": 0
+ },
+ "the-x-files-1": {
+  "guesses": [
+   "The X-Files",
+   "Twin Peaks",
+   "Fringe"
+  ],
+  "rank": 1
+ },
+ "the-x-files-2": {
+  "guesses": [
+   "The X-Files",
+   "Fringe",
+   "The Twilight Zone"
+  ],
+  "rank": 1
+ },
+ "fawlty-towers-1": {
+  "guesses": [
+   "The Fall",
+   "The Office",
+   "Fleabag"
+  ],
+  "rank": 0
+ },
+ "fawlty-towers-2": {
+  "guesses": [
+   "The Big Bang Theory",
+   "How I Met Your Mother",
+   "Friends"
+  ],
+  "rank": 0
+ },
+ "only-fools-and-horses-1": {
+  "guesses": [
+   "The Big Bang Theory",
+   "How I Met Your Mother",
+   "Friends"
+  ],
+  "rank": 0
+ },
+ "only-fools-and-horses-2": {
+  "guesses": [
+   "The Godfather",
+   "The Sopranos",
+   "Peaky Blinders"
+  ],
+  "rank": 0
+ },
+ "top-gear-1": {
+  "guesses": [
+   "The X-Files",
+   "Fringe",
+   "Severance"
+  ],
+  "rank": 0
+ },
+ "thunderbirds-1": {
+  "guesses": [
+   "Lost",
+   "Fringe",
+   "The X-Files"
+  ],
+  "rank": 0
+ },
+ "thunderbirds-2": {
+  "guesses": [
+   "Sex and the City",
+   "The Golden Girls",
+   "Friends"
+  ],
+  "rank": 0
+ },
+ "baywatch-1": {
+  "guesses": [
+   "Baywatch",
+   "The Baywatch",
+   "Baywatch: The Movie"
+  ],
+  "rank": 1
+ },
+ "the-flintstones-1": {
+  "guesses": [
+   "The Wild Thornberrys",
+   "The Dinosaur",
+   "The Croods"
+  ],
+  "rank": 0
+ },
+ "the-flintstones-2": {
+  "guesses": [
+   "The Big Bang Theory",
+   "Futurama",
+   "The Simpsons"
+  ],
+  "rank": 0
+ },
+ "the-simpsons-1": {
+  "guesses": [
+   "The Simpsons",
+   "Futurama",
+   "The Critic"
+  ],
+  "rank": 1
+ },
+ "the-addams-family-1": {
+  "guesses": [
+   "Little House on the Prairie",
+   "The Waltons",
+   "Little Women"
+  ],
+  "rank": 0
+ },
+ "the-office-us-1": {
+  "guesses": [
+   "The Office",
+   "Severance",
+   "Fleabag"
+  ],
+  "rank": 1
+ },
+ "the-office-us-2": {
+  "guesses": [
+   "The Office",
+   "Severance",
+   "Succession"
+  ],
+  "rank": 1
+ },
+ "peaky-blinders-2": {
+  "guesses": [
+   "The Wire",
+   "The Shield",
+   "Homicide: Life on the Street"
+  ],
+  "rank": 0
+ },
+ "blackadder-1": {
+  "guesses": [
+   "Band of Brothers",
+   "The Pacific"
+  ],
+  "rank": 0
+ },
+ "blackadder-2": {
+  "guesses": [
+   "Outlander",
+   "The Great",
+   "Poldark"
+  ],
+  "rank": 0
+ },
+ "dad-s-army-1": {
+  "guesses": [
+   "Sherlock",
+   "The Crown",
+   "Peaky Blinders"
+  ],
+  "rank": 0
+ },
+ "planet-earth-1": {
+  "guesses": [
+   "The Big Bang Theory",
+   "Friends",
+   "The Office"
+  ],
+  "rank": 0
+ },
+ "planet-earth-2": {
+  "guesses": [
+   "Jaws",
+   "Shark Week",
+   "The Shark"
+  ],
+  "rank": 0
+ },
+ "the-great-british-bake-off-1": {
+  "guesses": [
+   "The Great British Bake Off",
+   "Bake It With Love",
+   "The Great American Baking"
+  ],
+  "rank": 1
+ },
+ "mr-bean-1": {
+  "guesses": [
+   "The IT Crowd",
+   "Frasier",
+   "The Office"
+  ],
+  "rank": 0
+ },
+ "mr-bean-2": {
+  "guesses": [
+   "Ted",
+   "Care Bears",
+   "The Carebears"
+  ],
+  "rank": 0
+ },
+ "thomas-and-friends-1": {
+  "guesses": [
+   "Thomas & Friends",
+   "Thomas the Tank Engine",
+   "The Railway Series"
+  ],
+  "rank": 1
+ },
+ "bluey-1": {
+  "guesses": [
+   "Home and Away",
+   "Neighbours",
+   "Blue Heelers"
+  ],
+  "rank": 0
+ },
+ "home-and-away-1": {
+  "guesses": [
+   "The TV series depicted is likely:",
+   "The Dukes of Hazzard",
+   "The Beverly Hillbillies"
+  ],
+  "rank": 0
+ },
+ "neighbours-1": {
+  "guesses": [
+   "Friends",
+   "Seinfeld",
+   "The Fresh Prince of Bel-Air"
+  ],
+  "rank": 0
+ },
+ "emmerdale-1": {
+  "guesses": [
+   "Downton Abbey",
+   "Midsomer Murders",
+   "Poldark"
+  ],
+  "rank": 0
+ },
+ "the-golden-girls-1": {
+  "guesses": [
+   "The Golden Girls",
+   "Roseanne",
+   "The Mary Tyler Moore Show"
+  ],
+  "rank": 1
+ },
+ "the-golden-girls-2": {
+  "guesses": [
+   "Lost",
+   "The O.C.",
+   "Baywatch"
+  ],
+  "rank": 0
+ },
+ "how-i-met-your-mother-2": {
+  "guesses": [
+   "The Big Bang Theory",
+   "How I Met Your Mother",
+   "Friends"
+  ],
+  "rank": 2
+ },
+ "kath-and-kim-1": {
+  "guesses": [
+   "Friends",
+   "The Office",
+   "Modern Family"
+  ],
+  "rank": 0
+ },
+ "line-of-duty-1": {
+  "guesses": [
+   "Hill Street Blues",
+   "NYPD Blue",
+   "Law & Order"
+  ],
+  "rank": 0
+ },
+ "black-mirror-1": {
+  "guesses": [
+   "Breaking Bad",
+   "The Wire",
+   "Fargo"
+  ],
+  "rank": 0
+ },
+ "red-dwarf-1": {
+  "guesses": [
+   "Babylon 5",
+   "The Expanse",
+   "Star Trek"
+  ],
+  "rank": 0
+ },
+ "father-ted-1": {
+  "guesses": [
+   "Derry Girls",
+   "The IT Crowd",
+   "Fleabag"
+  ],
+  "rank": 0
+ },
+ "father-ted-2": {
+  "guesses": [
+   "The Good Place",
+   "Fleabag",
+   "The Office"
+  ],
+  "rank": 0
+ },
+ "the-inbetweeners-1": {
+  "guesses": [
+   "Glee",
+   "The O.C.",
+   "Freaks and Geeks"
+  ],
+  "rank": 0
+ },
+ "derry-girls-1": {
+  "guesses": [
+   "Derry Girls",
+   "The O.C.",
+   "Gossip Girl"
+  ],
+  "rank": 1
+ },
+ "spongebob-squarepants-1": {
+  "guesses": [
+   "Lost",
+   "The X-Files",
+   "Fringe"
+  ],
+  "rank": 0
+ },
+ "spongebob-squarepants-2": {
+  "guesses": [
+   "Squid Game",
+   "The Hunger Games",
+   "Lost"
+  ],
+  "rank": 0
+ },
+ "peppa-pig-1": {
+  "guesses": [
+   "The Simpsons",
+   "Family Guy",
+   "South Park"
+  ],
+  "rank": 0
+ },
+ "teletubbies-1": {
+  "guesses": [
+   "Peter Rabbit",
+   "The Rabbit Show",
+   "Bun in the Grass"
+  ],
+  "rank": 0
+ },
+ "scooby-doo-where-are-you-2": {
+  "guesses": [
+   "Stranger Things",
+   "The Haunting of Hill House",
+   "Ghostbusters"
+  ],
+  "rank": 0
+ },
+ "play-school-1": {
+  "guesses": [
+   "Ted",
+   "Care Bears",
+   "The Carebears"
+  ],
+  "rank": 0
+ },
+ "bananas-in-pyjamas-1": {
+  "guesses": [
+   "Friends",
+   "The Big Bang Theory",
+   "How I Met Your Mother"
+  ],
+  "rank": 0
+ },
+ "the-twilight-zone-1": {
+  "guesses": [
+   "Stranger Things",
+   "Dark",
+   "The Twilight Zone"
+  ],
+  "rank": 3
+ },
+ "bewitched-1": {
+  "guesses": [
+   "The Good Place",
+   "Fleabag",
+   "The Office"
+  ],
+  "rank": 0
+ },
+ "happy-days-1": {
+  "guesses": [
+   "The Wire",
+   "Breaking Bad",
+   "The Sopranos"
+  ],
+  "rank": 0
+ },
+ "frasier-1": {
+  "guesses": [
+   "Severance",
+   "The Office",
+   "Fleabag"
+  ],
+  "rank": 0
+ },
+ "ted-lasso-1": {
+  "guesses": [
+   "The White Lotus",
+   "Succession",
+   "The Bear"
+  ],
+  "rank": 0
+ },
+ "the-vicar-of-dibley-1": {
+  "guesses": [
+   "The Good Place",
+   "Gilmore Girls",
+   "The Middle"
+  ],
+  "rank": 0
+ },
+ "keeping-up-appearances-1": {
+  "guesses": [
+   "Mad Men",
+   "The Good Wife",
+   "Frasier"
+  ],
+  "rank": 0
+ },
+ "call-the-midwife-1": {
+  "guesses": [
+   "Derry Girls",
+   "Peaky Blinders",
+   "Gorbad"
+  ],
+  "rank": 0
+ },
+ "poirot-1": {
+  "guesses": [
+   "Fargo",
+   "True Detective",
+   "The Americans"
+  ],
+  "rank": 0
+ },
+ "skippy-the-bush-kangaroo-1": {
+  "guesses": [
+   "Bluey",
+   "Watership Down",
+   "The Croods"
+  ],
+  "rank": 0
+ },
+ "mcleod-s-daughters-1": {
+  "guesses": [
+   "Brokeback Mountain",
+   "True Grit",
+   "The Dukes of Hazzard"
+  ],
+  "rank": 0
+ },
+ "are-you-being-served-1": {
+  "guesses": [
+   "Mad Men",
+   "The Good Place",
+   "Severance"
+  ],
+  "rank": 0
+ },
+ "the-good-life-1": {
+  "guesses": [
+   "Fawlty Towers",
+   "The Good Life",
+   "The Royle Family"
+  ],
+  "rank": 2
+ },
+ "strictly-come-dancing-1": {
+  "guesses": [
+   "Gossip Girl",
+   "The Great Gatsby",
+   "Dynasty"
+  ],
+  "rank": 0
+ },
+ "grey-s-anatomy-1": {
+  "guesses": [
+   "Grey's Anatomy",
+   "House",
+   "ER"
+  ],
+  "rank": 1
+ },
+ "the-office-uk-1": {
+  "guesses": [
+   "The Office",
+   "Parks and Recreation",
+   "Rock"
+  ],
+  "rank": 1
+ },
+ "absolutely-fabulous-1": {
+  "guesses": [
+   "Baywatch",
+   "Charlie's Angels",
+   "The A-Team"
+  ],
+  "rank": 0
+ },
+ "last-of-the-summer-wine-1": {
+  "guesses": [
+   "The Three Body Problem",
+   "The Good Place",
+   "Futurama"
+  ],
+  "rank": 0
+ },
+ "who-wants-to-be-a-millionaire-1": {
+  "guesses": [
+   "The Office",
+   "Fleabag",
+   "The Good Place"
+  ],
+  "rank": 0
+ },
+ "killing-eve-1": {
+  "guesses": [
+   "Sex and the City",
+   "Gossip Girl",
+   "The Handmaid's Tale"
+  ],
+  "rank": 0
+ },
+ "the-big-bang-theory-1": {
+  "guesses": [
+   "The Big Bang Theory",
+   "Young Sheldon",
+   "The IT Crowd"
+  ],
+  "rank": 1
+ },
+ "the-big-bang-theory-2": {
+  "guesses": [
+   "Friends",
+   "Seinfeld",
+   "The Office"
+  ],
+  "rank": 0
+ },
+ "seinfeld-1": {
+  "guesses": [
+   "Friends",
+   "Seinfeld",
+   "How I Met Your Father"
+  ],
+  "rank": 2
+ },
+ "coronation-street-1": {
+  "guesses": [
+   "Peaky Blinders",
+   "Downton Abbey",
+   "Sherlock"
+  ],
+  "rank": 0
+ },
+ "eastenders-1": {
+  "guesses": [
+   "Friends",
+   "The Office",
+   "Frasier"
+  ],
+  "rank": 0
+ },
+ "allo-allo-1": {
+  "guesses": [
+   "Friends",
+   "Seinfeld",
+   "The Office"
+  ],
+  "rank": 0
+ }
+}

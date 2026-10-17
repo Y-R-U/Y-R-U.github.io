@@ -79,17 +79,63 @@ ok(p2 && p2.ref.includes(':new/') && p2.verdict === 'bad' && p2.reason === 'poor
 const keys = (await b.eval(`[...document.querySelectorAll('.rv-card img')].map(i => i.getAttribute('src'))`));
 ok(keys.every(s => s.startsWith('media/cand/')), 'the candidate set shows only candidate pictures');
 
+// two candidates per title: one card per title with a "1/2 ⇄" toggle; titles with one picture show none
+const firstPack = JSON.parse(readFileSync(join(ROOT, 'data', first.path), 'utf8'));
+const nPics = new Map(firstPack.items.map(it => [it.name, it.media.img.map(m => m.src)]));
+const cards = await b.eval(`[...document.querySelectorAll('.rv-card')].map(c => ({ name: c.querySelector('.rv-meta b').textContent, src: c.querySelector('img').getAttribute('src'), alt: c.querySelector('.rv-alt')?.textContent || null }))`);
+ok(new Set(cards.map(c => c.name)).size === cards.length, `one card per title (${cards.length} cards)`);
+ok(cards.every(c => (nPics.get(c.name)?.length > 1) === !!c.alt), `toggle only on titles with two pictures (${cards.filter(c => c.alt).length} with, ${cards.filter(c => !c.alt).length} without)`);
+const pairAt = (from = 0) => b.eval(`[...document.querySelectorAll('.rv-card')].findIndex((c, i) => i >= ${from} && c.querySelector('.rv-alt') && !c.classList.contains('ok') && !c.classList.contains('bad'))`);
+const cardAt = i => b.eval(`(() => { const c = document.querySelectorAll('.rv-card')[${i}]; return { name: c.querySelector('.rv-meta b').textContent, src: c.querySelector('img').getAttribute('src'), alt: c.querySelector('.rv-alt')?.textContent, ok: c.classList.contains('ok'), bad: c.classList.contains('bad') }; })()`);
+const click = (i, sel) => b.eval(`document.querySelectorAll('.rv-card')[${i}].querySelector('${sel}').click(); true`);
+let pi = await pairAt(2);
+if (pi < 0) ok(false, 'a title with two candidates is listed');
+else {
+  const c0 = await cardAt(pi), sib = nPics.get(c0.name).find(x => x !== c0.src);
+  const nPosts = posts.length;
+  await click(pi, '.rv-alt'); await b.sleep(200);
+  const c1 = await cardAt(pi);
+  ok(c0.alt === '1/2 ⇄' && c1.alt === '2/2 ⇄' && c1.src === sib && c1.name === c0.name, `toggle flips to the sibling: ${c0.alt} → ${c1.alt}`);
+  ok(posts.length === nPosts && (await b.eval('location.pathname')).endsWith('review.html'), 'the toggle saves nothing and does not open the picture');
+  await click(pi, '.rv-alt'); await b.sleep(200);
+  ok((await cardAt(pi)).src === c0.src, 'toggle flips back');
+  await click(pi, '.rv-acts .n'); await b.sleep(400);
+  const pb = posts.flat().pop(), c2 = await cardAt(pi);
+  ok(pb.verdict === 'bad' && pb.src === c0.src, `Bad saved for the shown picture: ${pb.ref}`);
+  ok(c2.src === sib && c2.name === c0.name && !c2.ok && !c2.bad, 'Bad flips to the sibling, title still to review');
+  await click(pi, '.rv-acts .y'); await b.sleep(400);
+  const po = posts.flat().pop(), c3 = await cardAt(pi);
+  ok(po.verdict === 'ok' && po.src === sib && c3.ok, `OK on the sibling picks the title: ${po.ref}`);
+  ok(reviews.get(pb.ref)?.verdict === 'bad', 'the first picture stays Bad');
+  // OK on one, then OK on the other: the first OK is cleared (not chosen, not Bad)
+  const pj = await pairAt(pi + 1);
+  if (pj >= 0) {
+    const d0 = await cardAt(pj);
+    await click(pj, '.rv-acts .y'); await b.sleep(300);
+    await click(pj, '.rv-alt'); await b.sleep(200);
+    await click(pj, '.rv-acts .y'); await b.sleep(500);
+    const d1 = await cardAt(pj), refA = posts.flat().find(x => x.src === d0.src && x.verdict === 'ok')?.ref;
+    ok(d1.ok && !reviews.has(refA) && reviews.get(posts.flat().pop().ref)?.verdict === 'ok', 'a second OK in a title clears the first (one picked, the other just not chosen)');
+  }
+}
+
 // "Mark the rest OK" on the second candidate set: only unmarked pictures of this pack and filter, two taps, batched
 const second = idx.candidates[1];
-if (second) {
-  await b.eval(`(() => { const s = document.querySelector('#rv-pack'); s.value = '${second.pack}:new'; s.dispatchEvent(new Event('change')); return true; })()`);
+{
+  const restPack = (second || first).pack;
+  await b.eval(`(() => { const s = document.querySelector('#rv-pack'); s.value = '${restPack}:new'; s.dispatchEvent(new Event('change')); return true; })()`);
   await b.sleep(300);
-  await b.eval(`document.querySelectorAll('.rv-card')[0].querySelector('.rv-acts .n').click(); true`);
+  // Bad on a title with two pictures flips to the sibling, which "Mark the rest OK" then picks
+  const ri = Math.max(0, await pairAt(0));
+  const rPair = !!(await cardAt(ri)).alt;
+  await b.eval(`document.querySelectorAll('.rv-card')[${ri}].querySelector('.rv-acts .n').click(); true`);
   await b.sleep(400);
   const badRef = posts.flat().pop().ref;
+  const shownSib = rPair ? (await cardAt(ri)).src : null;
   const listed = await b.eval(`document.querySelectorAll('.rv-card').length`);
+  const rest = listed - (rPair ? 0 : 1);
   const restLabel = await b.eval(`document.querySelector('.rv-rest').textContent`);
-  ok(restLabel === `✓ Mark the rest OK (${listed - 1})`, `button counts the unmarked listed pictures: ${restLabel} (${listed} listed)`);
+  ok(restLabel === `✓ Mark the rest OK (${rest})`, `button counts the untouched listed titles: ${restLabel} (${listed} listed)`);
   const before = posts.length;
   await b.eval(`document.querySelector('.rv-rest').click(); true`);
   await b.sleep(200);
@@ -101,12 +147,15 @@ if (second) {
   await b.waitFor(`!!document.querySelector('.rv-err')`, 10000);
   const err = await b.eval(`document.querySelector('.rv-err').textContent`);
   const saved1 = posts.slice(before).flat();
-  ok(/not saved/.test(err) && saved1.length === listed - 1 - 50 || (listed - 1 <= 50 && saved1.length === 0), `a failed batch is reported inline: ${err.slice(0, 80)}`);
-  ok(saved1.every(p => p.verdict === 'ok' && p.ref.startsWith(`${second.pack}:new/`) && p.ref !== badRef), 'only this pack, never the Bad one');
+  ok(/not saved/.test(err) && saved1.length === rest - 50 || (rest <= 50 && saved1.length === 0), `a failed batch is reported inline: ${err.slice(0, 80)}`);
+  ok(saved1.every(p => p.verdict === 'ok' && p.ref.startsWith(`${restPack}:new/`) && p.ref !== badRef), 'only this pack, never the Bad one');
   await b.eval(`[...document.querySelectorAll('.rv-fails button')].pop().click(); true`);
   await b.waitFor(`!document.querySelector('.rv-err')`, 10000);
   const saved = posts.slice(before).flat();
-  ok(saved.length === listed - 1 && new Set(saved.map(p => p.ref)).size === listed - 1, `retry saves the rest: ${saved.length} OK in ${posts.length - before} posts`);
+  ok(saved.length === rest && new Set(saved.map(p => p.ref)).size === rest, `retry saves the rest: ${saved.length} OK in ${posts.length - before} posts`);
+  if (rPair) ok(saved.some(p => p.src === shownSib && p.verdict === 'ok'), 'Mark the rest OK picks the shown sibling of the Bad picture');
+  const groups = JSON.parse(readFileSync(join(ROOT, 'data', (second || first).path), 'utf8')).items.filter(it => it.media.img.length > 1);
+  ok(groups.every(it => it.media.img.filter(m => saved.some(p => p.src === m.src)).length <= 1), 'never more than one picture per title marked OK');
   ok(reviews.get(badRef)?.verdict === 'bad', 'the Bad verdict is untouched');
   ok(posts.slice(before).every(p => p.length <= 50), 'saved in batches of at most 50');
   await b.shot(`${OUT}/cand-rest-ok.png`);

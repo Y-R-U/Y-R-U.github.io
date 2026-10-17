@@ -1,0 +1,1957 @@
+{
+ "moby-dick-1": {
+  "guesses": [
+   "Moby-Dick",
+   "The Old Man and the Sea",
+   "The Whale"
+  ],
+  "rank": 1
+ },
+ "moby-dick-2": {
+  "guesses": [
+   "Moby-Dick",
+   "The Old Man and the Sea",
+   "Treasure Island"
+  ],
+  "rank": 1
+ },
+ "treasure-island-1": {
+  "guesses": [
+   "Treasure Island",
+   "The Swiss Family Robinson",
+   "Moby-Dick"
+  ],
+  "rank": 1
+ },
+ "treasure-island-2": {
+  "guesses": [
+   "Treasure Island",
+   "Moby-Dick",
+   "The Count of Monte Cristo"
+  ],
+  "rank": 1
+ },
+ "alice-s-adventures-in-wonderland-1": {
+  "guesses": [
+   "Alice's Adventures in Wonderland",
+   "The Wind in the Willows",
+   "Peter Rabbit"
+  ],
+  "rank": 1
+ },
+ "alice-s-adventures-in-wonderland-2": {
+  "guesses": [
+   "Peter Rabbit",
+   "The Wind in the Willows",
+   "The Borrowers"
+  ],
+  "rank": 0
+ },
+ "robinson-crusoe-1": {
+  "guesses": [
+   "Castaway",
+   "The Revenant",
+   "Life of Pi"
+  ],
+  "rank": 0
+ },
+ "robinson-crusoe-2": {
+  "guesses": [
+   "Robinson Crusoe",
+   "The Swiss Family Robinson",
+   "The Adventures of Tom Sawyer"
+  ],
+  "rank": 1
+ },
+ "frankenstein-1": {
+  "guesses": [
+   "Frankenstein",
+   "The Lightning Thief",
+   "The Sorcerer's Apprentice"
+  ],
+  "rank": 1
+ },
+ "frankenstein-2": {
+  "guesses": [
+   "All Quiet on the Western Front",
+   "The Call of the Wild",
+   "The Old Man and the Sea"
+  ],
+  "rank": 0
+ },
+ "dracula-1": {
+  "guesses": [
+   "Dracula",
+   "The Castle of Oath",
+   "The Moonstone"
+  ],
+  "rank": 1
+ },
+ "dracula-2": {
+  "guesses": [
+   "The Call of the Wild",
+   "Moby-Dick",
+   "The Hound of the Baskervilles"
+  ],
+  "rank": 0
+ },
+ "the-hobbit-1": {
+  "guesses": [
+   "Harry Potter and the Philosopher's Stone",
+   "The Hobbit",
+   "The Dragon's Hoard"
+  ],
+  "rank": 2
+ },
+ "the-hobbit-2": {
+  "guesses": [
+   "The Hobbit",
+   "The Lord of the Rings",
+   "The Silmarillion"
+  ],
+  "rank": 1
+ },
+ "around-the-world-in-eighty-days-1": {
+  "guesses": [
+   "The Jungle Book",
+   "King Solomon's Mines",
+   "The Lost World"
+  ],
+  "rank": 0
+ },
+ "around-the-world-in-eighty-days-2": {
+  "guesses": [
+   "A Tale of Two Cities",
+   "The Count of Monte Cristo",
+   "The Time Machine"
+  ],
+  "rank": 0
+ },
+ "pride-and-prejudice-1": {
+  "guesses": [
+   "Pride and Prejudice",
+   "Emma",
+   "Sense and Sensibility"
+  ],
+  "rank": 1
+ },
+ "pride-and-prejudice-2": {
+  "guesses": [
+   "Jane Eyre",
+   "Pride and Prejudice",
+   "Wuthering Heights"
+  ],
+  "rank": 2
+ },
+ "jane-eyre-1": {
+  "guesses": [
+   "Gone with the Wind",
+   "The Great Fire of London",
+   "The Shining"
+  ],
+  "rank": 0
+ },
+ "jane-eyre-2": {
+  "guesses": [
+   "Wuthering Heights",
+   "Jane Eyre",
+   "The Wind in the Willows"
+  ],
+  "rank": 2
+ },
+ "wuthering-heights-1": {
+  "guesses": [
+   "Wuthering Heights",
+   "The Wind in the Willows",
+   "Bleak House"
+  ],
+  "rank": 1
+ },
+ "wuthering-heights-2": {
+  "guesses": [
+   "The Glass Castle",
+   "The Bell Jar",
+   "The Perks of Being a Wallflower"
+  ],
+  "rank": 0
+ },
+ "great-expectations-1": {
+  "guesses": [
+   "Rebecca",
+   "The Yellow Wallpaper",
+   "The Turn of the Screw"
+  ],
+  "rank": 0
+ },
+ "great-expectations-2": {
+  "guesses": [
+   "The Perks of Being a Wallflower",
+   "The Fault in Our Stars",
+   "A Monster Calls"
+  ],
+  "rank": 0
+ },
+ "a-christmas-carol-1": {
+  "guesses": [
+   "The Haunting of Hill House",
+   "The Turn of the Screw",
+   "The Woman in Black"
+  ],
+  "rank": 0
+ },
+ "a-christmas-carol-2": {
+  "guesses": [
+   "A Christmas Carol",
+   "The Gift of the Magi",
+   "A Christmas Story"
+  ],
+  "rank": 1
+ },
+ "oliver-twist-1": {
+  "guesses": [
+   "Oliver Twist",
+   "David Copperfield",
+   "The Old Curiosity Shop"
+  ],
+  "rank": 1
+ },
+ "oliver-twist-2": {
+  "guesses": [
+   "Bartleby the Scrivener",
+   "The Invisible Man",
+   "The Man Who Was Thursday"
+  ],
+  "rank": 0
+ },
+ "charlotte-s-web-1": {
+  "guesses": [
+   "The Three Little Pigs",
+   "The Ugly Duckling",
+   "The Little Red Hen"
+  ],
+  "rank": 0
+ },
+ "charlotte-s-web-2": {
+  "guesses": [
+   "Animal Farm",
+   "The Wind in the Willows",
+   "Watership Down"
+  ],
+  "rank": 0
+ },
+ "the-lion-the-witch-and-the-wardrobe-1": {
+  "guesses": [
+   "The Snowman",
+   "The Winter's Tale",
+   "The Secret Garden"
+  ],
+  "rank": 0
+ },
+ "the-lion-the-witch-and-the-wardrobe-2": {
+  "guesses": [
+   "The Gift of the Magi",
+   "A Christmas Carol",
+   "The Christmas Tree"
+  ],
+  "rank": 0
+ },
+ "the-very-hungry-caterpillar-1": {
+  "guesses": [
+   "The Very Hungry Caterpillar",
+   "Caterpillar in the Garden",
+   "The Caterpillar's Feast"
+  ],
+  "rank": 1
+ },
+ "the-very-hungry-caterpillar-2": {
+  "guesses": [
+   "The Perks of Being a Wallflower",
+   "The Giver",
+   "The Alchemist"
+  ],
+  "rank": 0
+ },
+ "james-and-the-giant-peach-1": {
+  "guesses": [
+   "Of Mice and Men",
+   "The Old Man and the Sea",
+   "Slaughterhouse-Five"
+  ],
+  "rank": 0
+ },
+ "james-and-the-giant-peach-2": {
+  "guesses": [
+   "Gulliver's Travels",
+   "The Giant Peach",
+   "Alice's Adventures in Wonderland"
+  ],
+  "rank": 2
+ },
+ "the-bfg-2": {
+  "guesses": [
+   "The Hobbit",
+   "Harry Potter and the Sorcerer's Stone",
+   "The Lord of the Rings"
+  ],
+  "rank": 0
+ },
+ "fantastic-mr-fox-1": {
+  "guesses": [
+   "Of Mice and Men",
+   "The Grapes of Wrath",
+   "Babbitt"
+  ],
+  "rank": 0
+ },
+ "the-secret-garden-1": {
+  "guesses": [
+   "The Secret Garden",
+   "A Little Princess",
+   "The Wind in the Willows"
+  ],
+  "rank": 1
+ },
+ "the-wind-in-the-willows-1": {
+  "guesses": [
+   "Toad to the Rescue",
+   "The Wind in the Willows",
+   "The Adventures of Toad"
+  ],
+  "rank": 2
+ },
+ "gulliver-s-travels-1": {
+  "guesses": [
+   "Lord of the Flies",
+   "The Count of Monte Cristo",
+   "The Old Man and the Sea"
+  ],
+  "rank": 0
+ },
+ "don-quixote-1": {
+  "guesses": [
+   "Don Quixote",
+   "The Wind in the Willows",
+   "Gulliver's Travels"
+  ],
+  "rank": 1
+ },
+ "the-old-man-and-the-sea-1": {
+  "guesses": [
+   "The Old Man and the Sea",
+   "Moby-Dick",
+   "The Sun Also Rises"
+  ],
+  "rank": 1
+ },
+ "lord-of-the-flies-1": {
+  "guesses": [
+   "Treasure Island",
+   "The Secret Garden",
+   "The Adventures of Tom Sawyer"
+  ],
+  "rank": 0
+ },
+ "the-great-gatsby-1": {
+  "guesses": [
+   "The Great Gatsby",
+   "A Farewell to Arms",
+   "Of Mice and Men"
+  ],
+  "rank": 1
+ },
+ "to-kill-a-mockingbird-1": {
+  "guesses": [
+   "A Christmas Carol",
+   "The Old Curiosity Shop",
+   "The Adventures of Tom Sawyer"
+  ],
+  "rank": 0
+ },
+ "nineteen-eighty-four-1": {
+  "guesses": [
+   "Fahrenheit 451",
+   "A Clockwork Orange"
+  ],
+  "rank": 0
+ },
+ "animal-farm-1": {
+  "guesses": [
+   "Animal Farm",
+   "Watership Down",
+   "The Wind in the Willows"
+  ],
+  "rank": 1
+ },
+ "fahrenheit-451-1": {
+  "guesses": [
+   "Fahrenheit 451",
+   "The Trial"
+  ],
+  "rank": 1
+ },
+ "the-war-of-the-worlds-1": {
+  "guesses": [
+   "The War of the Worlds",
+   ",000 Leagues Under the Sea",
+   "The Time Machine"
+  ],
+  "rank": 1
+ },
+ "the-time-machine-1": {
+  "guesses": [
+   "The Time Machine",
+   "A Clockwork Orange",
+   "The Golem"
+  ],
+  "rank": 1
+ },
+ "little-women-1": {
+  "guesses": [
+   "Little Women",
+   "The Secret Garden",
+   "Anne of Green Gables"
+  ],
+  "rank": 1
+ },
+ "heidi-1": {
+  "guesses": [
+   "Heidi",
+   "The Swiss Family Robinson",
+   "The Adventures of Tom Sawyer"
+  ],
+  "rank": 1
+ },
+ "the-little-prince-1": {
+  "guesses": [
+   "The Little Prince",
+   "The Little Prince and the Rose",
+   "A Little Prince"
+  ],
+  "rank": 1
+ },
+ "the-tale-of-peter-rabbit-1": {
+  "guesses": [
+   "Watership Down",
+   "The Borrowers",
+   "The Wind in the Willows"
+  ],
+  "rank": 0
+ },
+ "the-hound-of-the-baskervilles-1": {
+  "guesses": [
+   "The Hound of the Baskerville",
+   "The Call of Cthulhu",
+   "The Fire Wolf"
+  ],
+  "rank": 1
+ },
+ "journey-to-the-center-of-the-earth-1": {
+  "guesses": [
+   "The Hobbit",
+   "The Lord of the Rings",
+   "The Name of the Wind"
+  ],
+  "rank": 0
+ },
+ "the-call-of-the-wild-1": {
+  "guesses": [
+   "All Quiet on the Western Front",
+   "The Call of the Wild",
+   "White Fang"
+  ],
+  "rank": 2
+ },
+ "les-miserables-1": {
+  "guesses": [
+   "Les Misérables",
+   "The Hunchback of Notre-Dame",
+   "A Tale of Two Cities"
+  ],
+  "rank": 1
+ },
+ "the-hunchback-of-notre-dame-1": {
+  "guesses": [
+   "The Bell Jar",
+   "A Clockwork Orange",
+   "The Catcher in the Rye"
+  ],
+  "rank": 0
+ },
+ "the-count-of-monte-cristo-1": {
+  "guesses": [
+   "The Count of Monte Cristo",
+   "Robinson Crusoe",
+   "The Prisoner of Zenda"
+  ],
+  "rank": 1
+ },
+ "the-three-musketeers-1": {
+  "guesses": [
+   "The Three Musketeers",
+   "A Tale of Two Cities",
+   "Les Misérables"
+  ],
+  "rank": 1
+ },
+ "anne-of-green-gables-1": {
+  "guesses": [
+   "Anne of Green Gables",
+   "Little Women",
+   "The Secret Garden"
+  ],
+  "rank": 1
+ },
+ "the-hitchhiker-s-guide-to-the-galaxy-1": {
+  "guesses": [
+   ",000 Leagues Under the Sea",
+   "A Wizard of Mars",
+   "The Martian"
+  ],
+  "rank": 0
+ },
+ "watership-down-1": {
+  "guesses": [
+   "Watership Down",
+   "The Hobbit",
+   "The Wind in the Willows"
+  ],
+  "rank": 1
+ },
+ "the-lion-the-witch-and-the-wardrobe-3": {
+  "guesses": [
+   "The Lion, the Witch and the Wardrobe",
+   "The Jungle Book",
+   "The Lion King"
+  ],
+  "rank": 1
+ },
+ "the-bfg-1": {
+  "guesses": [
+   "The Hobbit",
+   "The Lord of the Rings",
+   "The Chronicles of Narnia"
+  ],
+  "rank": 0
+ },
+ "fantastic-mr-fox-2": {
+  "guesses": [
+   "The Illustrated Man",
+   "A Farewell to Arms",
+   "The Grapes of Wrath"
+  ],
+  "rank": 0
+ },
+ "black-beauty-1": {
+  "guesses": [
+   "Great Expectations",
+   "A Tale of Two Cities",
+   "The Hound of the Baskervilles"
+  ],
+  "rank": 0
+ },
+ "black-beauty-2": {
+  "guesses": [
+   "Black Beauty",
+   "The Black Stallion",
+   "Misty"
+  ],
+  "rank": 1
+ },
+ "the-wind-in-the-willows-2": {
+  "guesses": [
+   "The Wind in the Willows",
+   "The Adventures of Tom Sawyer",
+   "The Secret Garden"
+  ],
+  "rank": 1
+ },
+ "gulliver-s-travels-2": {
+  "guesses": [
+   "The Goldfinch",
+   "The Great Gatsby",
+   "The Catcher in the Rye"
+  ],
+  "rank": 0
+ },
+ "lord-of-the-flies-2": {
+  "guesses": [
+   "The Island",
+   "The Glass Castle",
+   "A Man Called Ove"
+  ],
+  "rank": 0
+ },
+ "to-kill-a-mockingbird-2": {
+  "guesses": [
+   "To Kill a Mockingbird",
+   "The Trial",
+   "Inherit the Wind"
+  ],
+  "rank": 1
+ },
+ "nineteen-eighty-four-2": {
+  "guesses": [
+   "The Secret Diary of Laura Palmer",
+   "The Shining",
+   "The Master and Margarita"
+  ],
+  "rank": 0
+ },
+ "peter-pan-1": {
+  "guesses": [
+   "Peter Pan",
+   "The BFG",
+   "A Series of Unfortunate Events"
+  ],
+  "rank": 1
+ },
+ "peter-pan-2": {
+  "guesses": [
+   "The Secret of the Crocodile",
+   "The Crocodile",
+   "Captain Crocodile"
+  ],
+  "rank": 0
+ },
+ "the-wonderful-wizard-of-oz-1": {
+  "guesses": [
+   "The Wonderful Wizard of Oz",
+   "The Wizard of Oz",
+   "Oz"
+  ],
+  "rank": 1
+ },
+ "the-wonderful-wizard-of-oz-2": {
+  "guesses": [
+   "The House on the Rock",
+   "The House with the Chalk Marks",
+   "The House of the Seven Gables"
+  ],
+  "rank": 0
+ },
+ "the-jungle-book-1": {
+  "guesses": [
+   "The Jungle Book",
+   "Mowgli",
+   "The Jungle Book: Mowgli's Story"
+  ],
+  "rank": 1
+ },
+ "the-jungle-book-2": {
+  "guesses": [
+   "The Jungle Book",
+   "Mowgli",
+   "The Jungle Book: Mowgli's Story"
+  ],
+  "rank": 1
+ },
+ "winnie-the-pooh-1": {
+  "guesses": [
+   "Winnie-the-Pooh",
+   "The Wind in the Willows",
+   "The Borrowed Pig"
+  ],
+  "rank": 1
+ },
+ "winnie-the-pooh-2": {
+  "guesses": [
+   "The Adventures of Tom Sawyer",
+   "The Secret Garden",
+   "The Wind in the Willows"
+  ],
+  "rank": 0
+ },
+ "the-lord-of-the-rings-1": {
+  "guesses": [
+   "The Lord of the Rings",
+   "The Hobbit",
+   "The Silmarillion"
+  ],
+  "rank": 1
+ },
+ "the-lord-of-the-rings-2": {
+  "guesses": [
+   "The Hobbit",
+   "The Lord of the Rings",
+   "The Chronicles of Narnia"
+  ],
+  "rank": 2
+ },
+ "the-cat-in-the-hat-1": {
+  "guesses": [
+   "The Giver",
+   "The Hobbit",
+   "A Fish Called Wanda"
+  ],
+  "rank": 0
+ },
+ "the-cat-in-the-hat-2": {
+  "guesses": [
+   "Of Mice and Men",
+   "The Goldfish",
+   "A Fish Out of Water"
+  ],
+  "rank": 0
+ },
+ "harry-potter-and-the-philosopher-s-stone-1": {
+  "guesses": [
+   "The House with the Cracked Floor",
+   "The House on the Edge of the City",
+   "The House of the Seven Gables"
+  ],
+  "rank": 0
+ },
+ "harry-potter-and-the-philosopher-s-stone-2": {
+  "guesses": [
+   "The Hobbit",
+   "The Lord of the Rings",
+   "The Chronicles of Narnia"
+  ],
+  "rank": 0
+ },
+ "matilda-1": {
+  "guesses": [
+   "The Secret Life of Walter Mitty",
+   "The Alchemist",
+   "The Perks of Being a Wallflower"
+  ],
+  "rank": 0
+ },
+ "charlie-and-the-chocolate-factory-1": {
+  "guesses": [
+   "The Perks of Being a Wallflower",
+   "The Fault in Our Stars",
+   "The Giver"
+  ],
+  "rank": 0
+ },
+ "charlie-and-the-chocolate-factory-2": {
+  "guesses": [
+   "Willy Wonka and the Chocolate Factory",
+   "Charlie and the Chocolate Factory",
+   "The Chocolate Factory"
+  ],
+  "rank": 2
+ },
+ "where-the-wild-things-are-1": {
+  "guesses": [
+   "The Hobbit",
+   "The Lord of the Rings",
+   "The Chronicles of Narnia"
+  ],
+  "rank": 0
+ },
+ "where-the-wild-things-are-2": {
+  "guesses": [
+   "The Secret Garden",
+   "The Jungle Book",
+   "Alice's Adventures in Wonderland"
+  ],
+  "rank": 0
+ },
+ "the-gruffalo-1": {
+  "guesses": [
+   "The Fox, the Mouse and the Owl",
+   "The Owl in the Tree",
+   "A Forest Fable"
+  ],
+  "rank": 0
+ },
+ "the-gruffalo-2": {
+  "guesses": [
+   "The Hobbit",
+   "The Mice of St. Nicholas",
+   "The Tale of the Wood"
+  ],
+  "rank": 0
+ },
+ "mary-poppins-1": {
+  "guesses": [
+   "Jane Eyre",
+   "Wuthering Heights",
+   "Great Expectations"
+  ],
+  "rank": 0
+ },
+ "mary-poppins-2": {
+  "guesses": [
+   "Anne of Green Gables",
+   "The Secret Garden",
+   "A Little Princess"
+  ],
+  "rank": 0
+ },
+ "a-bear-called-paddington-2": {
+  "guesses": [
+   "The Great Gatsby",
+   "On the Road",
+   "Catch-22"
+  ],
+  "rank": 0
+ },
+ "the-tiger-who-came-to-tea-1": {
+  "guesses": [
+   "The Tiger Who Came to Tea",
+   "Where the Wild Things Are",
+   "The Tiger's Apprentice"
+  ],
+  "rank": 1
+ },
+ "the-tiger-who-came-to-tea-2": {
+  "guesses": [
+   "The Perks of Being a Wallflower",
+   "The Fault in Our Stars",
+   "The Kite Runner"
+  ],
+  "rank": 0
+ },
+ "the-adventures-of-tom-sawyer-1": {
+  "guesses": [
+   "To Kill a Mockingbird",
+   "The Catcher in the Rye",
+   "Of Mice and Men"
+  ],
+  "rank": 0
+ },
+ "the-adventures-of-tom-sawyer-2": {
+  "guesses": [
+   "The Secret Garden",
+   "Anne of Green Gables",
+   "The Wind in the Willows"
+  ],
+  "rank": 0
+ },
+ "the-adventures-of-sherlock-holmes-1": {
+  "guesses": [
+   "A Study in Scarlet",
+   "The Hound of the Baskervilles",
+   "The Sign of Four"
+  ],
+  "rank": 0
+ },
+ "the-adventures-of-sherlock-holmes-2": {
+  "guesses": [
+   "Harry Potter and the Philosopher's Stone",
+   "The Hobbit",
+   "The Secret of the Amulet"
+  ],
+  "rank": 0
+ },
+ "the-railway-children-1": {
+  "guesses": [
+   "The Railway Children",
+   "The Little Engine That Could",
+   "The Secret Garden"
+  ],
+  "rank": 1
+ },
+ "the-railway-children-2": {
+  "guesses": [
+   "The Railway Children",
+   "The Little Engine That Could",
+   "The Secret Garden"
+  ],
+  "rank": 1
+ },
+ "the-adventures-of-pinocchio-1": {
+  "guesses": [
+   "Pinocchio",
+   "The Adventures of Pinocchio",
+   "Pinocchio: The Story of a Puppet"
+  ],
+  "rank": 1
+ },
+ "the-adventures-of-pinocchio-2": {
+  "guesses": [
+   "The Old Man and the Sea",
+   "The Woodcutter",
+   "The Carpenter's Boy"
+  ],
+  "rank": 0
+ },
+ "pippi-longstocking-1": {
+  "guesses": [
+   "The Hitchhiker's Guide to the Galaxy",
+   "The Magician's Nephew",
+   "The Chronicles of Narnia"
+  ],
+  "rank": 0
+ },
+ "pippi-longstocking-2": {
+  "guesses": [
+   "The Perks of Being a Wallflower",
+   "The House with the Chiffonier",
+   "The Secret Life of Bees"
+  ],
+  "rank": 0
+ },
+ "harry-potter-and-the-prisoner-of-azkaban-1": {
+  "guesses": [
+   "Harry Potter and the Philosopher's Stone",
+   "Harry Potter and the Chamber of Secrets",
+   "Harry Potter and the Prisoner of Azkaban"
+  ],
+  "rank": 3
+ },
+ "harry-potter-and-the-prisoner-of-azkaban-2": {
+  "guesses": [
+   "Wings of Fire",
+   "The Horse and the Wings",
+   "Sky Rider"
+  ],
+  "rank": 0
+ },
+ "harry-potter-and-the-deathly-hallows-1": {
+  "guesses": [
+   "Eragon",
+   "Harry Potter and the Sorcerer's Stone",
+   "The Hobbit"
+  ],
+  "rank": 0
+ },
+ "harry-potter-and-the-deathly-hallows-2": {
+  "guesses": [
+   "The Lord of the Rings",
+   "The Hobbit",
+   "A Song of Ice and Fire"
+  ],
+  "rank": 0
+ },
+ "room-on-the-broom-1": {
+  "guesses": [
+   "Harry Potter and the Philosopher's Stone",
+   "Harry Potter and the Chamber of Secrets",
+   "Harry Potter and the Prisoner of Azkaban"
+  ],
+  "rank": 0
+ },
+ "room-on-the-broom-2": {
+  "guesses": [
+   "Harry Potter and the Sorcerer's Stone",
+   "Harry Potter and the Chamber of Secrets",
+   "Harry Potter and the Prisoner of Azkaban"
+  ],
+  "rank": 0
+ },
+ "the-snowman-1": {
+  "guesses": [
+   "A Christmas Carol",
+   "The Snowman",
+   "The Polar Express"
+  ],
+  "rank": 2
+ },
+ "the-snowman-2": {
+  "guesses": [
+   "The Snowman",
+   "A Christmas Carol",
+   "The Snowy Day"
+  ],
+  "rank": 1
+ },
+ "we-re-going-on-a-bear-hunt-1": {
+  "guesses": [
+   "Of Mice and Men",
+   "The Grapes of Wrath",
+   "To Kill a Mockingbird"
+  ],
+  "rank": 0
+ },
+ "we-re-going-on-a-bear-hunt-2": {
+  "guesses": [
+   "The Shining",
+   "Into the Wild",
+   "The Road"
+  ],
+  "rank": 0
+ },
+ "the-witches-1": {
+  "guesses": [
+   "The Giver",
+   "Fahrenheit 451",
+   "A Clockwork Orange"
+  ],
+  "rank": 0
+ },
+ "the-witches-2": {
+  "guesses": [
+   "The Borrowed Pig",
+   "The Mice of Bagend",
+   "The Borrowed Mouse"
+  ],
+  "rank": 0
+ },
+ "the-twits-1": {
+  "guesses": [
+   "The Godfather",
+   "A Streetcar Named Desire",
+   "The Postman Always Rings Twice"
+  ],
+  "rank": 0
+ },
+ "the-twits-2": {
+  "guesses": [
+   "To Kill a Mockingbird",
+   "The Jungle",
+   "Of Mice and Men"
+  ],
+  "rank": 0
+ },
+ "george-s-marvellous-medicine-1": {
+  "guesses": [
+   "Charlie and the Chocolate Factory",
+   "Willy Wonka and the Chocolate Factory",
+   "The Chocolate Factory"
+  ],
+  "rank": 0
+ },
+ "george-s-marvellous-medicine-2": {
+  "guesses": [
+   "To Kill a Mockingbird",
+   "The Grapes of Wrath",
+   "A Tree Grows in Brooklyn"
+  ],
+  "rank": 0
+ },
+ "green-eggs-and-ham-1": {
+  "guesses": [
+   "The Green Mile",
+   "A Separate Peace",
+   "The Color of"
+  ],
+  "rank": 0
+ },
+ "how-the-grinch-stole-christmas-1": {
+  "guesses": [
+   "A Christmas Carol",
+   "The Night Before Christmas",
+   "The Gift of the Magi"
+  ],
+  "rank": 0
+ },
+ "how-the-grinch-stole-christmas-2": {
+  "guesses": [
+   "A Christmas Carol",
+   "The Snowy Day",
+   "A Christmas Story"
+  ],
+  "rank": 0
+ },
+ "the-lorax-1": {
+  "guesses": [
+   "The Jungle Book",
+   "A Tree Grows in Brooklyn",
+   "The Wind in the Willows"
+  ],
+  "rank": 0
+ },
+ "the-lorax-2": {
+  "guesses": [
+   "Fahrenheit 451",
+   "The Road",
+   "A Clockwork Orange"
+  ],
+  "rank": 0
+ },
+ "goodnight-moon-1": {
+  "guesses": [
+   "Harry Potter and the Philosopher's Stone",
+   "The Hobbit",
+   "A Series of Unfortunate Events"
+  ],
+  "rank": 0
+ },
+ "a-tale-of-two-cities-1": {
+  "guesses": [
+   "A Tale of Two Cities",
+   "Les Misérables",
+   "The Count of Monte Cristo"
+  ],
+  "rank": 1
+ },
+ "a-tale-of-two-cities-2": {
+  "guesses": [
+   "The Hunchback of Notre-Dame",
+   "Les Misérables",
+   "The Count of Monte Cristo"
+  ],
+  "rank": 0
+ },
+ "the-picture-of-dorian-gray-1": {
+  "guesses": [
+   "The Portrait of Dorian Gray",
+   "The Talented Mr. Ripley",
+   "The Secret Life of Walter Mitty"
+  ],
+  "rank": 0
+ },
+ "the-picture-of-dorian-gray-2": {
+  "guesses": [
+   "The Woman in White",
+   "The Moonstone",
+   "The Time Machine"
+  ],
+  "rank": 0
+ },
+ "adventures-of-huckleberry-finn-1": {
+  "guesses": [
+   "The Adventures of Tom Sawyer",
+   "Huckleberry Finn",
+   "The Adventures of Huckleberry Finn"
+  ],
+  "rank": 2
+ },
+ "adventures-of-huckleberry-finn-2": {
+  "guesses": [
+   "Of Mice and Men",
+   "The Old Man and the Sea",
+   "A River Runs Through It"
+  ],
+  "rank": 0
+ },
+ "war-and-peace-1": {
+  "guesses": [
+   "War and Peace",
+   "The Cossacks",
+   "Farewell to the Cossacks"
+  ],
+  "rank": 1
+ },
+ "war-and-peace-2": {
+  "guesses": [
+   "Pride and Prejudice",
+   "Jane Eyre",
+   "Emma"
+  ],
+  "rank": 0
+ },
+ "emma-1": {
+  "guesses": [
+   "Anne of Green Gables",
+   "Little Women",
+   "The Secret Garden"
+  ],
+  "rank": 0
+ },
+ "the-metamorphosis-1": {
+  "guesses": [
+   "The Metamorphosis",
+   "The House of the Seven Gables",
+   "The Yellow Wallpaper"
+  ],
+  "rank": 1
+ },
+ "the-metamorphosis-2": {
+  "guesses": [
+   "The Metamorphosis",
+   "Fahrenheit 451",
+   "Brave New World"
+  ],
+  "rank": 1
+ },
+ "twenty-thousand-leagues-under-the-seas-1": {
+  "guesses": [
+   ",000 Leagues Under the Sea",
+   "The Mysterious Island",
+   "The Sea-Wolf"
+  ],
+  "rank": 1
+ },
+ "twenty-thousand-leagues-under-the-seas-2": {
+  "guesses": [
+   ",000 Leagues Under the Sea",
+   "A Voyage to the Bottom of the Sea",
+   "The Abyss"
+  ],
+  "rank": 1
+ },
+ "strange-case-of-dr-jekyll-and-mr-hyde-1": {
+  "guesses": [
+   "Dr. Jekyll and Mr. Hyde",
+   "The Island of Doctor Moreau",
+   "Frankenstein"
+  ],
+  "rank": 1
+ },
+ "strange-case-of-dr-jekyll-and-mr-hyde-2": {
+  "guesses": [
+   "The Hound of the Baskervilles",
+   "A Study in Scarlet",
+   "The Sign of the Four"
+  ],
+  "rank": 0
+ },
+ "sense-and-sensibility-1": {
+  "guesses": [
+   "Pride and Prejudice",
+   "Jane Eyre",
+   "Wuthering Heights"
+  ],
+  "rank": 0
+ },
+ "the-hunger-games-1": {
+  "guesses": [
+   "The Hunger Games",
+   "The Maze Runner",
+   "Divergent"
+  ],
+  "rank": 1
+ },
+ "the-hunger-games-2": {
+  "guesses": [
+   "The Time Machine",
+   "A Clockwork Orange"
+  ],
+  "rank": 0
+ },
+ "the-da-vinci-code-1": {
+  "guesses": [
+   "The Da Vinci Code",
+   "Angels & Demons",
+   "The Lost Symbol"
+  ],
+  "rank": 1
+ },
+ "life-of-pi-1": {
+  "guesses": [
+   "Life of Pi",
+   "The Tiger Who Came to the Window",
+   "The Jungle Book"
+  ],
+  "rank": 1
+ },
+ "life-of-pi-2": {
+  "guesses": [
+   "Water for Elephants",
+   "The Great Gatsby",
+   "Of Mice and Men"
+  ],
+  "rank": 0
+ },
+ "rebecca-1": {
+  "guesses": [
+   "The Haunting of Hill House",
+   "The Turn of the Screw",
+   "The House of the Seven Gables"
+  ],
+  "rank": 0
+ },
+ "murder-on-the-orient-express-1": {
+  "guesses": [
+   "Murder on the Orient Express",
+   "The Snow Queen",
+   "The Railway Man"
+  ],
+  "rank": 1
+ },
+ "murder-on-the-orient-express-2": {
+  "guesses": [
+   "The Picture of Dorian Gray",
+   "The Secret of the Blue Room",
+   "The Woman in Black"
+  ],
+  "rank": 0
+ },
+ "and-then-there-were-none-1": {
+  "guesses": [
+   "The Most Dangerous Game",
+   "Lord of the Flies",
+   "The Island"
+  ],
+  "rank": 0
+ },
+ "and-then-there-were-none-2": {
+  "guesses": [
+   "The House on the Rock",
+   "The Secret Life of Bees",
+   "The Lighthouse"
+  ],
+  "rank": 0
+ },
+ "dune-1": {
+  "guesses": [
+   "Dune",
+   "The Martian",
+   "Red Planet"
+  ],
+  "rank": 1
+ },
+ "dune-2": {
+  "guesses": [
+   "Dune",
+   "The Martian",
+   "Red Planet"
+  ],
+  "rank": 1
+ },
+ "white-fang-1": {
+  "guesses": [
+   "The Call of the Wild",
+   "White Fang",
+   "North by Northwest"
+  ],
+  "rank": 2
+ },
+ "the-invisible-man-1": {
+  "guesses": [
+   "The Mummy",
+   "The Count of Monte Cristo",
+   "The Name of the Rose"
+  ],
+  "rank": 0
+ },
+ "the-invisible-man-2": {
+  "guesses": [
+   "The Great Gatsby",
+   "On the Road",
+   "A Farewell to Arms"
+  ],
+  "rank": 0
+ },
+ "through-the-looking-glass-1": {
+  "guesses": [
+   "Alice's Adventures in Wonderland",
+   "The Wonderful Wizard of Oz",
+   "Through the Looking-Glass"
+  ],
+  "rank": 3
+ },
+ "through-the-looking-glass-2": {
+  "guesses": [
+   "Alice's Adventures in Wonderland",
+   "The Wonderful Wizard of Oz",
+   "Through the Looking-Glass"
+  ],
+  "rank": 3
+ },
+ "the-velveteen-rabbit-1": {
+  "guesses": [
+   "Watership Down",
+   "The Borrowers",
+   "The Hobbit"
+  ],
+  "rank": 0
+ },
+ "the-velveteen-rabbit-2": {
+  "guesses": [
+   "Watership Down",
+   "The Rabbit Book",
+   "The Tale of the Rabbit"
+  ],
+  "rank": 0
+ },
+ "the-phantom-of-the-opera-1": {
+  "guesses": [
+   "The Name of the Wind",
+   "The Hobbit",
+   "The Lord of the Rings"
+  ],
+  "rank": 0
+ },
+ "the-phantom-of-the-opera-2": {
+  "guesses": [
+   "The Phantom of the Opera",
+   "The Magic Flute",
+   "A Midsummer Night's Dream"
+  ],
+  "rank": 1
+ },
+ "the-neverending-story-1": {
+  "guesses": [
+   "Eragon",
+   "Harry Potter and the Sorcerer's Stone",
+   "The Hobbit"
+  ],
+  "rank": 0
+ },
+ "the-neverending-story-2": {
+  "guesses": [
+   "Harry Potter and the Philosopher's Stone",
+   "The Hobbit",
+   "A Series of Unfortunate Events"
+  ],
+  "rank": 0
+ },
+ "the-alchemist-1": {
+  "guesses": [
+   "The Alchemist",
+   "The Prophet",
+   "The Little Prince"
+  ],
+  "rank": 1
+ },
+ "the-thorn-birds-1": {
+  "guesses": [
+   "The Outback",
+   "The Man from Snowy River",
+   "The Power of the Dog"
+  ],
+  "rank": 0
+ },
+ "the-thorn-birds-2": {
+  "guesses": [
+   "To Kill a Mockingbird",
+   "The Wind in the Willows",
+   "The Secret Garden"
+  ],
+  "rank": 0
+ },
+ "picnic-at-hanging-rock-1": {
+  "guesses": [
+   "Little Women",
+   "The Secret Garden",
+   "Anne of Green Gables"
+  ],
+  "rank": 0
+ },
+ "picnic-at-hanging-rock-2": {
+  "guesses": [
+   "The Perks of Being a Wallflower",
+   "The Catcher in the Rye",
+   "A Separate Peace"
+  ],
+  "rank": 0
+ },
+ "storm-boy-1": {
+  "guesses": [
+   "The Old Man and the Sea",
+   "Of Mice and Men",
+   "The Grapes of Wrath"
+  ],
+  "rank": 0
+ },
+ "storm-boy-2": {
+  "guesses": [
+   "Moby-Dick",
+   "The Old Man and the Sea",
+   "Treasure Island"
+  ],
+  "rank": 0
+ },
+ "the-magic-pudding-1": {
+  "guesses": [
+   "The Hobbit",
+   "The Lord of the Rings",
+   "The Chronicles of Narnia"
+  ],
+  "rank": 0
+ },
+ "the-boy-in-the-striped-pyjamas-1": {
+  "guesses": [
+   "The Boy in the Striped Pajamas",
+   "The Book Thief",
+   "Number the Stars"
+  ],
+  "rank": 0
+ },
+ "the-boy-in-the-striped-pyjamas-2": {
+  "guesses": [
+   "To Kill a Mockingbird",
+   "The Grapes of Wrath",
+   "Of Mice and Men"
+  ],
+  "rank": 0
+ },
+ "goodnight-mister-tom-1": {
+  "guesses": [
+   "The Old Man and the Sea",
+   "The Adventures of Tom Sawyer",
+   "The Secret Garden"
+  ],
+  "rank": 0
+ },
+ "the-borrowers-1": {
+  "guesses": [
+   "The Hobbit",
+   "A Wizard of Earthsea",
+   "The Lord of the Rings"
+  ],
+  "rank": 0
+ },
+ "the-borrowers-2": {
+  "guesses": [
+   "The Borrowers",
+   "The Secret Garden",
+   "The Wind in the Willows"
+  ],
+  "rank": 1
+ },
+ "northern-lights-1": {
+  "guesses": [
+   "The Snowy Day",
+   "The Polar Express",
+   "The Snowman"
+  ],
+  "rank": 0
+ },
+ "northern-lights-2": {
+  "guesses": [
+   "The Compass",
+   "The Golden Compass",
+   "The Compass of the North"
+  ],
+  "rank": 1
+ },
+ "danny-the-champion-of-the-world-1": {
+  "guesses": [
+   "Of Mice and Men",
+   "The Grapes of Wrath",
+   "A Farewell to Arms"
+  ],
+  "rank": 0
+ },
+ "danny-the-champion-of-the-world-2": {
+  "guesses": [
+   "The Jungle Book",
+   "The Secret Garden",
+   "The Wind in the Willows"
+  ],
+  "rank": 0
+ },
+ "five-on-a-treasure-island-1": {
+  "guesses": [
+   "The Adventures of Tom Sawyer",
+   "Treasure Island",
+   "The Secret Garden"
+  ],
+  "rank": 2
+ },
+ "five-on-a-treasure-island-2": {
+  "guesses": [
+   "The Hobbit",
+   "The Lord of the Rings",
+   "The Golden Goose"
+  ],
+  "rank": 0
+ },
+ "gangsta-granny-1": {
+  "guesses": [
+   "Harry Potter and the Philosopher's Stone",
+   "Harry Potter and the Chamber of Secrets",
+   "Harry Potter and the Prisoner of Azkaban"
+  ],
+  "rank": 0
+ },
+ "jaws-1": {
+  "guesses": [
+   "Jaws",
+   "The Old Man and the Sea",
+   "The Beach"
+  ],
+  "rank": 1
+ },
+ "jaws-2": {
+  "guesses": [
+   "The Old Man and the Sea",
+   "Moby-Dick",
+   "The Call of the Wild"
+  ],
+  "rank": 0
+ },
+ "the-shining-1": {
+  "guesses": [
+   "The Snowman",
+   "The Shining",
+   "The Talented Mr. Ripley"
+  ],
+  "rank": 2
+ },
+ "the-shining-2": {
+  "guesses": [
+   "The Shining",
+   "Room",
+   "The Haunting"
+  ],
+  "rank": 1
+ },
+ "it-1": {
+  "guesses": [
+   "The Giver",
+   "Holes",
+   "The Paperboy"
+  ],
+  "rank": 0
+ },
+ "jurassic-park-1": {
+  "guesses": [
+   "Jurassic Park",
+   "The Lost World",
+   "Jurassic World"
+  ],
+  "rank": 1
+ },
+ "jurassic-park-2": {
+  "guesses": [
+   "Of Mice and Men",
+   "The Fly",
+   "A Farewell to Arms"
+  ],
+  "rank": 0
+ },
+ "the-lightning-thief-1": {
+  "guesses": [
+   "The Hobbit",
+   "The Lord of the Rings",
+   "The Chronicles of Narnia"
+  ],
+  "rank": 0
+ },
+ "the-lightning-thief-2": {
+  "guesses": [
+   "Life of Pi",
+   "The Old Man and the Sea",
+   "Moby-Dick"
+  ],
+  "rank": 0
+ },
+ "holes-1": {
+  "guesses": [
+   "The image depicts a vast desert landscape with numerous figures in orange jumpsuits kneeling and digging holes in the sand. This is a well-known visual representation of the ending of the novel The Road by Cormac McCarthy, where the father and son travel through a post-apocalyptic, ash-covered landscape. However, the specific imagery of many people in orange jumpsuits digging in a desert is more directly associated with the novel The Road's themes of survival and desolation, but the specific scene of many people in orange jumpsuits digging holes is actually a famous illustration for the novel The Road? No, that's not quite right.",
+   "Let's re-evaluate. The image shows a surreal, repetitive scene of people in orange prison jumpsuits digging holes in a desert. This is a very specific and iconic image.",
+   "Actually, this image is a famous piece of art/illustration that is widely recognized as depicting the ending or a key scene from the novel The"
+  ],
+  "rank": 1
+ },
+ "stuart-little-1": {
+  "guesses": [
+   "The Wind in the Willows",
+   "The Adventures of Tom Sawyer",
+   "The Secret Garden"
+  ],
+  "rank": 0
+ },
+ "stuart-little-2": {
+  "guesses": [
+   "The Borrowers",
+   "The Wind in the Willows",
+   "The Secret Garden"
+  ],
+  "rank": 0
+ },
+ "the-giving-tree-1": {
+  "guesses": [
+   "Walden",
+   "The Old Man and the Sea",
+   "The Jungle Book"
+  ],
+  "rank": 0
+ },
+ "the-giving-tree-2": {
+  "guesses": [
+   "The Perks of Being a Wallflower",
+   "Holes",
+   "The Giver"
+  ],
+  "rank": 0
+ },
+ "the-polar-express-1": {
+  "guesses": [
+   "A Christmas Carol",
+   "The Snowman",
+   "The Polar Express"
+  ],
+  "rank": 3
+ },
+ "the-polar-express-2": {
+  "guesses": [
+   "The Polar Express",
+   "A Christmas Carol",
+   "The Night Before Christmas"
+  ],
+  "rank": 1
+ },
+ "a-wrinkle-in-time-1": {
+  "guesses": [
+   "The Left Hand of the Emperor",
+   "The Long Way to a Small, Orange Planet",
+   "The Long Way to a Small, Orange Planet"
+  ],
+  "rank": 0
+ },
+ "the-martian-1": {
+  "guesses": [
+   "The Martian",
+   "Red Planet",
+   "Ares"
+  ],
+  "rank": 1
+ },
+ "the-martian-2": {
+  "guesses": [
+   "The Martian",
+   "Red Planet",
+   "Ares"
+  ],
+  "rank": 1
+ },
+ "ready-player-one-1": {
+  "guesses": [
+   "The Road",
+   "Snowpiercer",
+   "The Wind-Up Girl"
+  ],
+  "rank": 0
+ },
+ "twilight-1": {
+  "guesses": [
+   "The Giver",
+   "The Fault in Our Stars",
+   "A Tree Called Pine"
+  ],
+  "rank": 0
+ },
+ "the-fault-in-our-stars-1": {
+  "guesses": [
+   "The Perks of Being a Wallflower",
+   "The Fault in Our Stars",
+   "A Tree Grows in Brooklyn"
+  ],
+  "rank": 2
+ },
+ "anna-karenina-1": {
+  "guesses": [
+   "Anna Karenina",
+   "The Railway Children",
+   "North Country"
+  ],
+  "rank": 1
+ },
+ "anna-karenina-2": {
+  "guesses": [
+   "Black Beauty",
+   "National Velvet",
+   "Seabiscit"
+  ],
+  "rank": 0
+ },
+ "crime-and-punishment-1": {
+  "guesses": [
+   "The Shining",
+   "Of Mice and Men",
+   "The Road"
+  ],
+  "rank": 0
+ },
+ "brave-new-world-1": {
+  "guesses": [
+   "Brave New World",
+   "Never Let Me Go",
+   "The Giver"
+  ],
+  "rank": 1
+ },
+ "brave-new-world-2": {
+  "guesses": [
+   "The Lighthouse",
+   "The Lighthouse Keeper",
+   "A Lighthouse in the Storm"
+  ],
+  "rank": 0
+ },
+ "of-mice-and-men-1": {
+  "guesses": [
+   "Of Mice and Men",
+   "The Grapes of Wrath",
+   "To Kill a Mockingbird"
+  ],
+  "rank": 1
+ },
+ "of-mice-and-men-2": {
+  "guesses": [
+   "Of Mice and Men",
+   "The Call of the Wild",
+   "Watership Down"
+  ],
+  "rank": 1
+ },
+ "the-grapes-of-wrath-1": {
+  "guesses": [
+   "Of Mice and Men",
+   "The Grapes of Wrath",
+   "Gone with the Wind"
+  ],
+  "rank": 2
+ },
+ "the-grapes-of-wrath-2": {
+  "guesses": [
+   "The Grapes of Wrath",
+   "Slaughterhouse-Five",
+   "The Road"
+  ],
+  "rank": 1
+ },
+ "gone-with-the-wind-1": {
+  "guesses": [
+   "The Giver",
+   "The Road",
+   "Fahrenheit 451"
+  ],
+  "rank": 0
+ },
+ "gone-with-the-wind-2": {
+  "guesses": [
+   "The Great Gatsby",
+   "A Farewell to Arms",
+   "The Sun Also Rises"
+  ],
+  "rank": 0
+ },
+ "the-handmaid-s-tale-1": {
+  "guesses": [
+   "The Handmaid's Tale",
+   "The Giver",
+   "A Separate Peace"
+  ],
+  "rank": 1
+ },
+ "heart-of-darkness-1": {
+  "guesses": [
+   "Heart of Darkness",
+   "The Jungle Book",
+   "Lord of the Flies"
+  ],
+  "rank": 1
+ },
+ "kidnapped-1": {
+  "guesses": [
+   "Treasure Island",
+   "The Call of the Wild",
+   "The Wind in the Willows"
+  ],
+  "rank": 0
+ },
+ "kidnapped-2": {
+  "guesses": [
+   "Moby-Dick",
+   "The Old Man and the Sea",
+   "Treasure Island"
+  ],
+  "rank": 0
+ },
+ "david-copperfield-1": {
+  "guesses": [
+   "The Grapes of Wrath",
+   "Of Mice and Men",
+   "The Great Gatsby"
+  ],
+  "rank": 0
+ },
+ "david-copperfield-2": {
+  "guesses": [
+   "The Houseboat",
+   "The Boat House",
+   "The Ship House"
+  ],
+  "rank": 0
+ },
+ "the-catcher-in-the-rye-1": {
+  "guesses": [
+   "The Perks of Being a Wallflower",
+   "The Fault in Our Stars",
+   "A Tree Grows in Brooklyn"
+  ],
+  "rank": 0
+ },
+ "the-day-of-the-triffids-1": {
+  "guesses": [
+   "The War of the Worlds",
+   "The Jungle Book",
+   "Jurassic Park"
+  ],
+  "rank": 0
+ },
+ "the-day-of-the-triffids-2": {
+  "guesses": [
+   "The War of the Worlds",
+   "The Day the Earth Stood Still",
+   "Independence Day"
+  ],
+  "rank": 0
+ },
+ "the-princess-bride-1": {
+  "guesses": [
+   "The Count of Monte Cristo",
+   "The Three Musketeers",
+   "The Man in the Iron Mask"
+  ],
+  "rank": 0
+ },
+ "the-princess-bride-2": {
+  "guesses": [
+   "Moby-Dick",
+   "The Sea of Rats",
+   "The Snake in the Ocean"
+  ],
+  "rank": 0
+ },
+ "the-outsiders-1": {
+  "guesses": [
+   "The Outsiders",
+   "A Separate Peace",
+   "The Catcher in the Rye"
+  ],
+  "rank": 1
+ },
+ "the-road-1": {
+  "guesses": [
+   "The Road",
+   "On the Road",
+   "A Farewell to Arms"
+  ],
+  "rank": 1
+ },
+ "ender-s-game-1": {
+  "guesses": [
+   "A Space Odyssey",
+   "The Martian"
+  ],
+  "rank": 0
+ },
+ "the-colour-of-magic-1": {
+  "guesses": [
+   "A Wizard of Mars",
+   "The Martian",
+   "Red Planet"
+  ],
+  "rank": 0
+ },
+ "the-colour-of-magic-2": {
+  "guesses": [
+   "The Treasure of the Sierra Madre",
+   "The Maltese Falcon",
+   "The Gold Rush"
+  ],
+  "rank": 0
+ },
+ "the-secret-river-1": {
+  "guesses": [
+   "The Grapes of Wrath",
+   "Of Mice and Men",
+   "The Jungle"
+  ],
+  "rank": 0
+ },
+ "cloudstreet-1": {
+  "guesses": [
+   "To Kill a Mockingbird",
+   "The Grapes of Wrath",
+   "Of Mice and Men"
+  ],
+  "rank": 0
+ },
+ "possum-magic-1": {
+  "guesses": [
+   "The Wind in the Willows",
+   "The Secret Garden",
+   "The Jungle Book"
+  ],
+  "rank": 0
+ },
+ "slaughterhouse-five-1": {
+  "guesses": [
+   "Fahrenheit 451",
+   "The Road"
+  ],
+  "rank": 0
+ }
+}

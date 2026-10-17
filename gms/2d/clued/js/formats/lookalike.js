@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, fill, placeAnswer, collect, pick, shuffle, factAllowed, nameArgs } from './registry.js?v=202610170738';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610170738';
-import { norm, fmtFact, escHtml, injectCSS, hasImg } from './fkit.js?v=202610170738';
+import { register, poolItems, pickPack, byDifficulty, imageOf, fill, placeAnswer, collect, pick, shuffle, factAllowed, nameArgs } from './registry.js?v=202610170746';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610170746';
+import { norm, fmtFact, escHtml, injectCSS, hasImg } from './fkit.js?v=202610170746';
 
 const CSS = `
 .lk-diff{border-collapse:collapse;width:100%;table-layout:fixed;font-size:14px;margin-top:2px}

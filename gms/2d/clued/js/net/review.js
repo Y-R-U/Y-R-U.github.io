@@ -2,10 +2,12 @@
 // A verdict is tied to the picture's src, so a swapped or regenerated picture comes back as "to review".
 // New AI pictures wait in data/candidates/*.json (refs "<pack>:new/<key>", never loaded by the game) until
 // tools/img_promote.mjs moves the OK ones into the live pack; an OK candidate verdict then carries over to the live copy.
+// A candidate title can have two pictures: the card shows one with a "1/2 ⇄" toggle. OK picks it (the sibling is just not
+// chosen), Bad flips to the sibling; the title is rejected only when every picture is Bad. Verdicts stay one row per picture.
 // A picture can also carry a drawn circle around the target (mark, 0–1 image coordinates); tools/img_marks.mjs puts those in the packs.
-import { h, markRect } from '../ui/kit.js?v=202610170738';
-import { toast } from '../ui/popup.js?v=202610170738';
-import { API } from './api.js?v=202610170738';
+import { h, markRect } from '../ui/kit.js?v=202610170746';
+import { toast } from '../ui/popup.js?v=202610170746';
+import { API } from './api.js?v=202610170746';
 
 const root = document.getElementById('rv');
 const gate = document.getElementById('gate');
@@ -13,6 +15,8 @@ const PAGE = 60;
 const REASONS = [['poor', 'Looks bad / poor'], ['text', 'Words in it'], ['wrong', 'Wrong thing'], ['giveaway', 'Gives answer away'], ['broken', 'Won’t load']];
 let auth = null;
 const pics = [];
+// display units: one per live picture, one per candidate title (its pictures in `pics`, `cur` = the one shown)
+const units = [];
 const reviews = new Map();
 const view = { pack: 'all', show: 'todo', shown: PAGE, compact: compactPref() };
 // compact = two cards per row on a phone; remembered per device
@@ -68,11 +72,35 @@ async function loadPics() {
   const cands = await fetch(`data/candidates/index.json?r=${Date.now()}`, { cache: 'no-store' }).then(r => (r.ok ? r.json() : null)).catch(() => null);
   for (const c of cands?.candidates || []) {
     const p = await fetch(`data/${c.path}`, { cache: 'no-cache' }).then(r => r.json()).catch(() => null);
-    for (const it of p?.items || []) for (const m of it.media?.img || []) {
-      if (!m.src || !m.key) continue;
-      pics.push({ ref: m.ref || `${c.pack}:new/${m.key}`, src: m.src, pack: `${c.pack}:new`, packTitle: c.title, name: it.name, ai: true, cand: true, caption: m.caption || '', page: m.page || '' });
+    for (const it of p?.items || []) {
+      const group = [];
+      for (const m of it.media?.img || []) {
+        if (!m.src || !m.key) continue;
+        const pic = { ref: m.ref || `${c.pack}:new/${m.key}`, src: m.src, pack: `${c.pack}:new`, packTitle: c.title, name: it.name, ai: true, cand: true, caption: m.caption || '', page: m.page || '', group };
+        group.push(pic);
+        pics.push(pic);
+      }
     }
   }
+  const done = new Set();
+  for (const p of pics) {
+    if (!p.group) { units.push({ pics: [p], cur: 0, pack: p.pack, ai: p.ai }); continue; }
+    if (done.has(p.group)) continue;
+    done.add(p.group);
+    units.push({ pics: p.group, cur: 0, pack: p.pack, ai: true });
+  }
+}
+
+// a title is OK when one picture is OK, Bad when every picture is Bad, else still to review
+function unitVerdict(u) {
+  const vs = u.pics.map(p => verdictOf(p)?.verdict);
+  return vs.includes('ok') ? 'ok' : vs.every(v => v === 'bad') ? 'bad' : '';
+}
+// show the chosen picture, else the first one not marked Bad
+function pickCur(u) {
+  const vs = u.pics.map(p => verdictOf(p)?.verdict);
+  const i = vs.indexOf('ok') >= 0 ? vs.indexOf('ok') : vs.findIndex(v => v !== 'bad');
+  u.cur = i >= 0 ? i : Math.min(u.cur, u.pics.length - 1);
 }
 
 // an OK on a candidate counts for the live copy img_promote made of it (same hashed file name, same pack)
@@ -110,11 +138,12 @@ function setVerdict(p, verdict, reason = '', note = '', mark = verdictOf(p)?.mar
 
 const sumEl = h('div.rv-sum');
 function summary() {
-  const inPack = view.pack === 'all' ? pics : view.pack === 'ai' ? pics.filter(p => p.ai) : pics.filter(p => p.pack === view.pack);
+  const inPack = view.pack === 'all' ? units : view.pack === 'ai' ? units.filter(u => u.ai) : units.filter(u => u.pack === view.pack);
   let ok = 0, bad = 0, marked = 0;
-  for (const p of inPack) { const r = verdictOf(p), v = r?.verdict; if (v === 'ok') ok++; else if (v === 'bad') bad++; if (r?.mark) marked++; }
+  for (const u of inPack) { const v = unitVerdict(u); if (v === 'ok') ok++; else if (v === 'bad') bad++; if (u.pics.some(p => verdictOf(p)?.mark)) marked++; }
+  const titles = inPack.length && inPack.every(u => u.pics[0].cand);
   sumEl.replaceChildren(
-    h('span', {}, h('b', {}, String(inPack.length)), ' pictures'),
+    h('span', {}, h('b', {}, String(inPack.length)), titles ? ' titles' : ' pictures'),
     h('span', {}, h('b', {}, String(inPack.length - ok - bad)), ' to review'),
     h('span', {}, h('b', {}, String(ok)), ' OK'),
     h('span', {}, h('b', {}, String(bad)), ' bad'),
@@ -123,16 +152,19 @@ function summary() {
 }
 
 function filtered() {
-  return pics.filter(p => {
-    if (view.pack === 'ai' ? !p.ai : view.pack !== 'all' && p.pack !== view.pack) return false;
-    const r = verdictOf(p), v = r?.verdict;
-    if (view.show === 'marked') return !!r?.mark;
+  return units.filter(u => {
+    if (view.pack === 'ai' ? !u.ai : view.pack !== 'all' && u.pack !== view.pack) return false;
+    const v = unitVerdict(u);
+    if (view.show === 'marked') return u.pics.some(p => verdictOf(p)?.mark);
     return view.show === 'all' || (view.show === 'todo' ? !v : v === view.show);
   });
 }
 
-function card(p) {
+function card(u) {
+  const p = u.pics[u.cur];
   const el = h('div.rv-card');
+  const flip = i => { u.cur = (i + u.pics.length) % u.pics.length; el.replaceWith(card(u)); };
+  const alt = u.pics.length > 1 ? h('button.rv-alt', { type: 'button', title: 'Show the other picture for this title', onclick: e => { e.preventDefault(); e.stopPropagation(); flip(u.cur + 1); } }, `${u.cur + 1}/${u.pics.length} ⇄`) : null;
   const img = h('img', { src: p.src, alt: p.name, loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' });
   const pic = h('a.rv-pic', { href: p.src, target: '_blank', rel: 'noopener' }, img, p.ai ? h('span.ai', {}, 'AI') : null);
   img.addEventListener('error', () => pic.classList.add('broken'));
@@ -207,19 +239,30 @@ function card(p) {
     if (on) el.scrollIntoView({ block: 'nearest' });
   });
   unring.addEventListener('click', () => { const v = verdictOf(p); if (v) setVerdict(p, v.verdict, v.reason, v.note, null).then(paint); paint(); });
-  yes.addEventListener('click', () => { setVerdict(p, verdictOf(p)?.verdict === 'ok' ? '' : 'ok').then(paint); paint(); });
+  yes.addEventListener('click', () => {
+    const on = verdictOf(p)?.verdict === 'ok';
+    // one OK picks the title: an OK on its sibling is cleared (not chosen, not Bad)
+    if (!on) for (const q of u.pics) if (q !== p && verdictOf(q)?.verdict === 'ok') setVerdict(q, '');
+    setVerdict(p, on ? '' : 'ok').then(paint); paint();
+  });
   no.addEventListener('click', () => {
     const v = verdictOf(p);
     if (view.compact && v?.verdict === 'bad' && !el.dataset.open) { el.dataset.open = '1'; paint(); return; }
     if (v?.verdict !== 'bad') el.dataset.open = '1';
     setVerdict(p, v?.verdict === 'bad' ? '' : 'bad', v?.reason || (pic.classList.contains('broken') ? 'broken' : 'poor'), v?.note || '').then(paint);
     paint();
+    // Bad on a title's picture moves on to its next picture not yet marked Bad
+    if (v?.verdict !== 'bad' && u.pics.length > 1) {
+      const next = u.pics.findIndex((q, i) => i !== u.cur && verdictOf(q)?.verdict !== 'bad');
+      if (next >= 0) flip(next);
+    }
   });
   for (const [r, label] of REASONS) {
     why.append(h('button', { type: 'button', dataset: { r }, onclick: () => { setVerdict(p, 'bad', r, note.value).then(paint); paint(); } }, label));
   }
   note.addEventListener('change', () => { const v = verdictOf(p); setVerdict(p, 'bad', v?.reason || 'poor', note.value).then(paint); paint(); });
   why.append(note);
+  if (alt) pic.append(alt);
   el.append(pic, h('div.rv-meta', {}, h('b', {}, p.name || '(no name)'), h('small', {}, p.caption ? `${p.packTitle} · ${p.caption}` : p.packTitle)),
     h('div.rv-acts', {}, yes, no), h('div.rv-acts.rv-circ', {}, circle, unring), why);
   paint();
@@ -233,7 +276,7 @@ const more = h('div.rv-more');
 const BATCH = 50;
 let refreshRest = null;
 function restOk(page) {
-  const todo = () => page.filter(p => !verdictOf(p));
+  const todo = () => page.filter(u => !unitVerdict(u)).map(u => u.pics[u.cur]);
   const btn = h('button.btn.go.rv-rest', { type: 'button' });
   let armed = 0, timer = null;
   refreshRest = () => {
@@ -282,6 +325,7 @@ async function markOk(list, btn) {
 
 function render() {
   const list = filtered();
+  list.forEach(pickCur);
   const page = list.slice(0, view.shown);
   grid.classList.toggle('compact', view.compact);
   grid.replaceChildren(...page.map(card));
@@ -294,13 +338,13 @@ function render() {
 
 function controls() {
   const counts = new Map();
-  for (const p of pics) counts.set(p.pack, (counts.get(p.pack) || 0) + 1);
+  for (const u of units) counts.set(u.pack, (counts.get(u.pack) || 0) + 1);
   const titles = new Map(pics.map(p => [p.pack, p.packTitle]));
   const cand = [...counts].filter(([id]) => id.endsWith(':new'));
   const sel = h('select', { id: 'rv-pack', 'aria-label': 'Pack' },
     ...cand.map(([id, n]) => h('option', { value: id }, `${titles.get(id)} (${n})`)),
-    h('option', { value: 'all' }, `All packs (${pics.length})`),
-    h('option', { value: 'ai' }, `AI pictures only (${pics.filter(p => p.ai).length})`),
+    h('option', { value: 'all' }, `All packs (${units.length})`),
+    h('option', { value: 'ai' }, `AI pictures only (${units.filter(u => u.ai).length})`),
     ...[...counts].filter(([id]) => !id.endsWith(':new')).map(([id, n]) => h('option', { value: id }, `${titles.get(id)} (${n})`)));
   sel.value = view.pack;
   sel.addEventListener('change', () => { view.pack = sel.value; view.shown = PAGE; summary(); render(); });

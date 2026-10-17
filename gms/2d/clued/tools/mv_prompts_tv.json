@@ -1,0 +1,1730 @@
+{
+ "style": "painterly gouache illustration in the style of a vintage television poster, bold simplified shapes, visible brush texture, rich limited colour palette, dramatic cinematic lighting, cream paper border, no text, any signs or labels left blank, no letters, no words, no numbers, no logos, no signature",
+ "model": "flux2-klein-9b-mlx-4bit",
+ "steps": 4,
+ "width": 640,
+ "height": 432,
+ "films": [
+  {
+   "id": "doctor-who",
+   "name": "Doctor Who",
+   "alt": [],
+   "year": 1963,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": true,
+   "blurb": "A time-travelling alien flies a ship that looks like a blue police box.",
+   "scenes": [
+    {
+     "p": "a tall plain blue wooden police box with a small lamp on top and blank dark panels above the doors, materialising in a swirl of light on a windswept hillside at night",
+     "d": 1,
+     "cap": "The blue box lands",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: regenerated once without signs, still lettering on the police box sign (title dropped; the robots were a studio design)"
+    },
+    {
+     "p": "a gang of squat metal pepper-pot shaped robots with sink-plunger arms and eye stalks gliding through a ruined London street",
+     "d": 3,
+     "cap": "The pepper-pot robots invade",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: studio character design (the pepper-pot robots are the BBC design)"
+    }
+   ]
+  },
+  {
+   "id": "friends",
+   "name": "Friends",
+   "alt": [],
+   "year": 1994,
+   "country": "United States",
+   "network": "NBC",
+   "kids": false,
+   "blurb": "Six pals in their twenties share flats, jokes and love lives in Manhattan.",
+   "scenes": [
+    {
+     "p": "six friends seen from behind sitting on a big orange sofa in a cosy New York coffee house with brick walls and mismatched lamps",
+     "d": 1,
+     "cap": "The big orange sofa",
+     "cand": true
+    },
+    {
+     "p": "six friends dancing in a fountain at night in a park, an old lamp post",
+     "d": 1,
+     "cap": "Splashing in the fountain",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "stranger-things",
+   "name": "Stranger Things",
+   "alt": [],
+   "year": 2016,
+   "country": "United States",
+   "network": "Netflix",
+   "kids": false,
+   "blurb": "Children search for their missing friend Will.",
+   "scenes": [
+    {
+     "p": "a wall of a 1980s living room with strings of Christmas fairy lights flickering over painted marks, a frightened mother holding an axe",
+     "d": 3,
+     "cap": "Talking through the Christmas lights",
+     "cand": true
+    },
+    {
+     "p": "four kids on BMX bikes riding through a misty forest road at night with torches, 1983 small-town America",
+     "d": 1,
+     "cap": "Bikes in the woods at night",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "sherlock",
+   "name": "Sherlock",
+   "alt": [],
+   "year": 2010,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "A modern-day version of Conan Doyle's detective in London.",
+   "scenes": [
+    {
+     "p": "a cluttered Victorian-style London flat with a skull on the mantelpiece, a smiley face spray-painted on the wallpaper with bullet holes, a violin",
+     "d": 2,
+     "cap": "The flat at 221B",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: lettering in the picture (poster)"
+    },
+    {
+     "p": "a man in a long dark coat with the collar up and a blue scarf standing on a London rooftop at night",
+     "d": 1,
+     "cap": "The coat on the rooftop",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-big-bang-theory",
+   "name": "The Big Bang Theory",
+   "alt": [],
+   "year": 2007,
+   "country": "United States",
+   "network": "CBS",
+   "kids": false,
+   "blurb": "Nerdy scientists in Pasadena befriend their neighbour.",
+   "scenes": [
+    {
+     "p": "an apartment living room with a whiteboard covered in drawings of atoms and orbits, a worn sofa with one special spot cushion, a brass telescope by the window and toy robot figures",
+     "d": 1,
+     "cap": "His spot on the sofa",
+     "cand": true
+    },
+    {
+     "p": "two young physicists in cardigans climbing an apartment staircase past an out-of-order lift with yellow tape across its doors, carrying plain brown paper bags",
+     "d": 3,
+     "cap": "The lift is still broken",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "game-of-thrones",
+   "name": "Game of Thrones",
+   "alt": [
+    "GoT"
+   ],
+   "year": 2011,
+   "country": "United States",
+   "network": "HBO",
+   "kids": false,
+   "blurb": "Noble families battle to rule the Seven Kingdoms of Westeros.",
+   "scenes": [
+    {
+     "p": "an enormous throne made of hundreds of melted swords in a dark stone hall",
+     "d": 1,
+     "cap": "The throne of swords",
+     "cand": true
+    },
+    {
+     "p": "a gigantic wall of ice towering over a snowy forest, tiny figures on top, a small castle at its foot",
+     "d": 1,
+     "cap": "The Wall of ice",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "breaking-bad",
+   "name": "Breaking Bad",
+   "alt": [],
+   "year": 2008,
+   "country": "United States",
+   "network": "AMC",
+   "kids": false,
+   "blurb": "A chemistry teacher turns to crime after a cancer diagnosis.",
+   "scenes": [
+    {
+     "p": "an old cream-and-brown RV camper van parked alone in the New Mexico desert, a man in green underpants and a white shirt standing beside it holding a gun",
+     "d": 1,
+     "cap": "The RV in the desert",
+     "cand": true
+    },
+    {
+     "p": "a pizza on the roof of a suburban house",
+     "d": 3,
+     "cap": "Pizza on the roof",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "star-trek",
+   "name": "Star Trek",
+   "alt": [
+    "Star Trek: The Original Series"
+   ],
+   "year": 1966,
+   "country": "United States",
+   "kids": false,
+   "blurb": "Captain Kirk and Mr Spock explore strange new worlds.",
+   "scenes": [
+    {
+     "p": "a sleek white starship with a saucer section and two long engine nacelles cruising past a red planet",
+     "d": 3,
+     "cap": "The starship in orbit",
+     "cand": true
+    },
+    {
+     "p": "three crew members in yellow, blue and red tunics dissolving into shimmering columns of golden light on a transporter platform",
+     "d": 3,
+     "cap": "Beam me up",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-walking-dead",
+   "name": "The Walking Dead",
+   "alt": [],
+   "year": 2010,
+   "country": "United States",
+   "network": "AMC",
+   "kids": false,
+   "blurb": "Sheriff Rick Grimes leads survivors after a zombie outbreak.",
+   "scenes": [
+    {
+     "p": "a man on horseback in a sheriff hat riding into an empty abandoned Atlanta highway, the opposite lanes jammed with abandoned cars",
+     "d": 3,
+     "cap": "Riding into Atlanta",
+     "cand": true
+    },
+    {
+     "p": "a crowd of shambling zombies pressing against a chain-link prison fence at dusk",
+     "d": 1,
+     "cap": "The prison fence",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "wednesday",
+   "name": "Wednesday",
+   "alt": [],
+   "year": 2022,
+   "country": "United States",
+   "network": "Netflix",
+   "kids": false,
+   "blurb": "Morticia's daughter solves a murder at Nevermore Academy.",
+   "scenes": [
+    {
+     "p": "a pale girl with two black plaits and a black dress with a white collar dancing stiffly alone in a ballroom of a gothic school",
+     "d": 1,
+     "cap": "The dance",
+     "cand": true
+    },
+    {
+     "p": "a disembodied hand scuttling across a gothic boarding school desk",
+     "d": 3,
+     "cap": "The hand",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "money-heist",
+   "name": "Money Heist",
+   "alt": [
+    "La casa de papel"
+   ],
+   "year": 2017,
+   "country": "Spain",
+   "network": "Antena 3",
+   "kids": false,
+   "blurb": "A mastermind called the Professor plans a huge raid on the Royal Mint of Spain.",
+   "scenes": [
+    {
+     "p": "a gang of robbers in red jumpsuits and white masks inside a banknote printing hall, money flying",
+     "d": 2,
+     "cap": "Red jumpsuits in the mint",
+     "cand": true
+    },
+    {
+     "p": "banknotes raining down from an airship over a crowded Madrid square",
+     "d": 3,
+     "cap": "Raining money",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "squid-game",
+   "name": "Squid Game",
+   "alt": [],
+   "year": 2021,
+   "country": "South Korea",
+   "network": "Netflix",
+   "kids": false,
+   "blurb": "Debt-ridden contestants play for a huge cash prize.",
+   "scenes": [
+    {
+     "p": "a giant doll of a girl in an orange pinafore standing in a vast sandy yard facing away, hundreds of players in green tracksuits frozen mid-step",
+     "d": 1,
+     "cap": "Red light, green light",
+     "cand": true
+    },
+    {
+     "p": "a pink-suited guard with a mask seen in a pastel staircase maze",
+     "d": 1,
+     "cap": "The pastel staircase",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "downton-abbey",
+   "name": "Downton Abbey",
+   "alt": [],
+   "year": 2010,
+   "country": "United Kingdom",
+   "network": "ITV",
+   "kids": false,
+   "blurb": "A drama about an aristocratic family and their servants in the early 1900s.",
+   "scenes": [
+    {
+     "p": "a grand Jacobean stately home in the English countryside at dawn, servants lined up at the front door, 1912",
+     "d": 2,
+     "cap": "The great house",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: lettering in the picture (door plaque)"
+    },
+    {
+     "p": "a long servants' hall below stairs with a row of bells on the wall and staff at the dining table",
+     "d": 3,
+     "cap": "Below stairs",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-crown",
+   "name": "The Crown",
+   "alt": [],
+   "year": 2016,
+   "country": "United Kingdom",
+   "network": "Netflix",
+   "kids": false,
+   "blurb": "A drama about the reign of Elizabeth II.",
+   "scenes": [
+    {
+     "p": "a young queen in coronation robes seen from behind in Westminster Abbey, crowds, a jewelled crown being lowered",
+     "d": 1,
+     "cap": "The coronation",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "lost",
+   "name": "Lost",
+   "alt": [],
+   "year": 2004,
+   "country": "United States",
+   "network": "ABC (US)",
+   "kids": false,
+   "blurb": "Plane-crash survivors are stranded on a strange tropical island.",
+   "scenes": [
+    {
+     "p": "the burning wreckage of a passenger jet on a tropical beach, survivors running, palm trees",
+     "d": 1,
+     "cap": "Crash on the island",
+     "cand": true
+    },
+    {
+     "p": "a round metal hatch in the jungle floor",
+     "d": 1,
+     "cap": "The hatch",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-mandalorian",
+   "name": "The Mandalorian",
+   "alt": [],
+   "year": 2019,
+   "country": "United States",
+   "network": "Disney+",
+   "kids": false,
+   "blurb": "A bounty hunter in the Star Wars universe protects a small green child.",
+   "scenes": [
+    {
+     "p": "a bounty hunter in silver beskar armour and a T-visor helmet seen from behind holding a tiny green big-eared child in a floating cradle",
+     "d": 2,
+     "cap": "The armoured hunter and the child",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: studio character design (the green child)"
+    },
+    {
+     "p": "a lone armoured bounty hunter walking on an icy planet toward a bar",
+     "d": 3,
+     "cap": "The bounty",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-x-files",
+   "name": "The X-Files",
+   "alt": [],
+   "year": 1993,
+   "country": "United States",
+   "network": "Fox",
+   "kids": false,
+   "blurb": "Two FBI agents investigate the paranormal.",
+   "scenes": [
+    {
+     "p": "two FBI agents in trench coats in a dark forest at night shining torches at a bright UFO light hovering above the trees",
+     "d": 1,
+     "cap": "The truth is out there",
+     "cand": true
+    },
+    {
+     "p": "a basement office with a poster of a flying saucer and pencils stuck in the ceiling",
+     "d": 1,
+     "cap": "The basement office",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "fawlty-towers",
+   "name": "Fawlty Towers",
+   "alt": [],
+   "year": 1975,
+   "country": "United Kingdom",
+   "network": "BBC Two",
+   "kids": false,
+   "blurb": "John Cleese plays a rude hotel owner in Torquay.",
+   "scenes": [
+    {
+     "p": "a flustered tall hotel owner in a blazer beating his small broken-down red car with a tree branch on a country road",
+     "d": 3,
+     "cap": "Thrashing the car",
+     "cand": true
+    },
+    {
+     "p": "a small seaside hotel in Torquay with a front desk bell, a moose head",
+     "d": 3,
+     "cap": "The hotel",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "only-fools-and-horses",
+   "name": "Only Fools and Horses",
+   "alt": [],
+   "year": 1981,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "Del Boy is a market trader in Peckham who dreams of being a millionaire.",
+   "scenes": [
+    {
+     "p": "a battered yellow three-wheeled van parked in a 1980s south London street",
+     "d": 3,
+     "cap": "The yellow three-wheeler",
+     "cand": true
+    },
+    {
+     "p": "two men in a pub, one falling through a bar flap that has been lifted",
+     "d": 3,
+     "cap": "Falling through the bar",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "top-gear",
+   "name": "Top Gear",
+   "alt": [],
+   "year": 1977,
+   "country": "United Kingdom",
+   "network": "BBC Two",
+   "kids": false,
+   "blurb": "A BBC programme about cars and road trips.",
+   "scenes": [
+    {
+     "p": "three presenters seen from behind beside a car on a disused airfield track, a cardboard test driver in a white helmet",
+     "d": 3,
+     "cap": "The test track",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "thunderbirds",
+   "name": "Thunderbirds",
+   "alt": [],
+   "year": 1965,
+   "country": "United Kingdom",
+   "network": "ITV",
+   "kids": true,
+   "blurb": "Puppet heroes fly rescue craft from a secret island.",
+   "scenes": [
+    {
+     "p": "a tropical island where a swimming pool slides back to reveal a rocket launching, palm trees folding aside for a green cargo plane",
+     "d": 3,
+     "cap": "Thunderbirds are go",
+     "cand": true
+    },
+    {
+     "p": "a pink Rolls-Royce with six wheels",
+     "d": 3,
+     "cap": "The pink car",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "baywatch",
+   "name": "Baywatch",
+   "alt": [],
+   "year": 1989,
+   "country": "United States",
+   "network": "NBC",
+   "kids": false,
+   "blurb": "A drama about lifeguards.",
+   "scenes": [
+    {
+     "p": "lifeguards in red swimsuits running in slow motion along a sunny Californian beach with red rescue floats",
+     "d": 1,
+     "cap": "Running on the beach",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-flintstones",
+   "name": "The Flintstones",
+   "alt": [],
+   "year": 1960,
+   "country": "United States",
+   "network": "ABC (US)",
+   "kids": true,
+   "blurb": "A Stone Age family with dinosaur pets and gadgets.",
+   "scenes": [
+    {
+     "p": "a stone-age family car made of logs and stone with a canvas roof, powered by running feet, a pet dinosaur",
+     "d": 3,
+     "cap": "Foot-powered car",
+     "cand": true
+    },
+    {
+     "p": "a quarry where a dinosaur works as a crane",
+     "d": 3,
+     "cap": "Dino crane",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-simpsons",
+   "name": "The Simpsons",
+   "alt": [
+    "Simpsons"
+   ],
+   "year": 1989,
+   "country": "United States",
+   "network": "Fox",
+   "kids": false,
+   "blurb": "A yellow cartoon family: Homer, Marge, Bart, Lisa and Maggie.",
+   "scenes": [
+    {
+     "p": "a pink family car pulling into the drive of a two-storey suburban house in front of a nuclear power plant's cooling towers",
+     "d": 1,
+     "cap": "Coming home to Springfield",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-addams-family",
+   "name": "The Addams Family",
+   "alt": [],
+   "year": 1964,
+   "country": "United States",
+   "network": "ABC (US)",
+   "kids": false,
+   "blurb": "It starred Carolyn Jones and John Astin.",
+   "scenes": [
+    {
+     "p": "a gothic Victorian mansion on a hill with a creepy family on the porch",
+     "d": 3,
+     "cap": "The creepy house",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "seinfeld",
+   "name": "Seinfeld",
+   "alt": [],
+   "year": 1989,
+   "country": "United States",
+   "network": "NBC",
+   "kids": false,
+   "blurb": "A New York comedian and his friends obsess over small things.",
+   "scenes": [
+    {
+     "p": "four friends in a New York diner booth by the window, coffee cups and a plate of fries, plain painted walls",
+     "d": 2,
+     "cap": "At the diner",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-office-us",
+   "name": "The Office (US)",
+   "alt": [
+    "The Office"
+   ],
+   "year": 2005,
+   "country": "United States",
+   "network": "NBC",
+   "kids": false,
+   "blurb": "A mockumentary about workers at the Dunder Mifflin paper company.",
+   "scenes": [
+    {
+     "p": "a stapler sealed inside a wobbly block of jelly on an office desk",
+     "d": 1,
+     "cap": "The stapler in jelly",
+     "cand": true
+    },
+    {
+     "p": "an office paper company with cubicles and a conference room",
+     "d": 1,
+     "cap": "The office",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "peaky-blinders",
+   "name": "Peaky Blinders",
+   "alt": [],
+   "year": 2013,
+   "country": "United Kingdom",
+   "network": "BBC Two",
+   "kids": false,
+   "blurb": "Tommy Shelby's crime family in Birmingham after the First World War.",
+   "scenes": [
+    {
+     "p": "men in flat caps and long coats walking through a smoky industrial Birmingham street of furnaces, 1919, sparks",
+     "d": 2,
+     "cap": "Walking through the furnaces",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: lettering in the picture (street sign)"
+    },
+    {
+     "p": "a flat cap with razor blades sewn into the peak",
+     "d": 3,
+     "cap": "The razor cap",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "blackadder",
+   "name": "Blackadder",
+   "alt": [],
+   "year": 1983,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "Rowan Atkinson plays a scheming coward.",
+   "scenes": [
+    {
+     "p": "British soldiers going over the top of a First World War trench into poppy fields",
+     "d": 3,
+     "cap": "Going over the top",
+     "cand": true
+    },
+    {
+     "p": "a Tudor nobleman and his servant with a turnip",
+     "d": 3,
+     "cap": "The turnip",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "dad-s-army",
+   "name": "Dad's Army",
+   "alt": [],
+   "year": 1968,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "A comedy about the Home Guard in the Second World War.",
+   "scenes": [
+    {
+     "p": "a group of elderly Home Guard volunteers marching in a seaside town, 1940",
+     "d": 3,
+     "cap": "The Home Guard",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-fresh-prince-of-bel-air",
+   "name": "The Fresh Prince of Bel-Air",
+   "alt": [
+    "Fresh Prince"
+   ],
+   "year": 1990,
+   "country": "United States",
+   "network": "NBC",
+   "kids": false,
+   "blurb": "A teenager from West Philadelphia moves in with rich relatives.",
+   "scenes": [
+    {
+     "p": "a teenager in a backwards cap seen from behind with a suitcase, arriving at a white Bel Air mansion among palm trees, a plain yellow taxi driving away",
+     "d": 3,
+     "cap": "Arriving in Bel Air",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: regenerated once without signs, still lettering on the taxi door"
+    }
+   ]
+  },
+  {
+   "id": "planet-earth",
+   "name": "Planet Earth",
+   "alt": [],
+   "year": 2006,
+   "country": "United Kingdom",
+   "kids": false,
+   "blurb": "Planet Earth (first shown 2006, United Kingdom). David Attenborough narrates a tour of the world's habitats.",
+   "scenes": [
+    {
+     "p": "snow leopards on a Himalayan mountain cliff",
+     "d": 3,
+     "cap": "The snow leopard",
+     "cand": true
+    },
+    {
+     "p": "a great white shark breaching out of the sea catching a seal",
+     "d": 3,
+     "cap": "The breach",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-great-british-bake-off",
+   "name": "The Great British Bake Off",
+   "alt": [
+    "Bake Off"
+   ],
+   "year": 2010,
+   "country": "United Kingdom",
+   "kids": false,
+   "blurb": "Amateur cooks compete to make cakes, bread and pastry.",
+   "scenes": [
+    {
+     "p": "a big white marquee in an English country garden with bunting and baking stations, ovens and mixers",
+     "d": 1,
+     "cap": "The tent",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "mr-bean",
+   "name": "Mr. Bean",
+   "alt": [
+    "Mr Bean"
+   ],
+   "year": 1990,
+   "country": "United Kingdom",
+   "network": "ITV",
+   "kids": true,
+   "blurb": "Rowan Atkinson plays a clumsy, almost silent man.",
+   "scenes": [
+    {
+     "p": "a small lime green 1970s Mini car with a padlock on the door and an armchair strapped on the roof, a man driving from the armchair",
+     "d": 3,
+     "cap": "Driving from the armchair",
+     "cand": true
+    },
+    {
+     "p": "a teddy bear on a bed",
+     "d": 3,
+     "cap": "Teddy",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "thomas-and-friends",
+   "name": "Thomas & Friends",
+   "alt": [
+    "Thomas the Tank Engine"
+   ],
+   "year": 1984,
+   "country": "United Kingdom",
+   "kids": true,
+   "blurb": "A cheeky little blue steam locomotive with the number 1.",
+   "scenes": [
+    {
+     "p": "a cheerful blue tank engine with a smiling face on a branch line in the green hills of an island railway",
+     "d": 1,
+     "cap": "The little blue engine",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "bluey",
+   "name": "Bluey",
+   "alt": [],
+   "year": 2018,
+   "country": "Australia",
+   "network": "ABC Kids",
+   "kids": true,
+   "blurb": "A cattle-dog puppy loves playing imaginative games.",
+   "scenes": [
+    {
+     "p": "a Queenslander house on stilts with a big veranda and a garden in Brisbane, two puppies playing",
+     "d": 3,
+     "cap": "The house in Brisbane",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "home-and-away",
+   "name": "Home and Away",
+   "alt": [],
+   "year": 1988,
+   "country": "Australia",
+   "network": "Seven Network",
+   "kids": false,
+   "blurb": "Life, love and drama in the beachside town of Summer Bay.",
+   "scenes": [
+    {
+     "p": "a sunny Australian beach town with a surf club and a caravan park on a headland",
+     "d": 3,
+     "cap": "Summer Bay",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "neighbours",
+   "name": "Neighbours",
+   "alt": [],
+   "year": 1985,
+   "country": "Australia",
+   "network": "Seven Network",
+   "kids": false,
+   "blurb": "An Australian soap about families on one suburban street.",
+   "scenes": [
+    {
+     "p": "a quiet suburban cul-de-sac in Melbourne with brick houses, sprinklers and neighbours chatting",
+     "d": 3,
+     "cap": "The cul-de-sac",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "coronation-street",
+   "name": "Coronation Street",
+   "alt": [
+    "Corrie"
+   ],
+   "year": 1960,
+   "country": "United Kingdom",
+   "network": "ITV",
+   "kids": false,
+   "blurb": "A soap opera about life on a cobbled terrace near Manchester.",
+   "scenes": [
+    {
+     "p": "a terraced northern English cobbled street of red brick houses ending in a corner pub with dark green tiles, chimney smoke, grey sky",
+     "d": 3,
+     "cap": "The cobbled street",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "eastenders",
+   "name": "EastEnders",
+   "alt": [],
+   "year": 1985,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "A BBC soap opera set around Albert Square in East London.",
+   "scenes": [
+    {
+     "p": "a Victorian square in east London with a corner pub, market stalls with striped awnings and a small fenced garden with a tree in the middle",
+     "d": 3,
+     "cap": "The Square",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "emmerdale",
+   "name": "Emmerdale",
+   "alt": [
+    "Emmerdale Farm"
+   ],
+   "year": 1972,
+   "country": "United Kingdom",
+   "network": "ITV",
+   "kids": false,
+   "blurb": "Emmerdale (first shown 1972, United Kingdom, ITV). A British soap set in a Yorkshire Dales village.",
+   "scenes": [
+    {
+     "p": "a picturesque Yorkshire Dales village with stone cottages, a pub and a duck pond",
+     "d": 3,
+     "cap": "The village",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "cheers",
+   "name": "Cheers",
+   "alt": [],
+   "year": 1982,
+   "country": "United States",
+   "network": "NBC",
+   "kids": false,
+   "blurb": "Regulars in a Boston bar where everybody knows your name.",
+   "scenes": [
+    {
+     "p": "a cosy wood-panelled basement bar with regulars on stools along a brass rail, a wooden staircase leading up to the street door, plain walls",
+     "d": 3,
+     "cap": "The bar",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: regenerated once without signs, still lettering on a wall poster"
+    }
+   ]
+  },
+  {
+   "id": "the-golden-girls",
+   "name": "The Golden Girls",
+   "alt": [],
+   "year": 1985,
+   "country": "United States",
+   "network": "NBC",
+   "kids": false,
+   "blurb": "Four older women share a house in Miami.",
+   "scenes": [
+    {
+     "p": "four older women eating cheesecake around a kitchen table late at night in a Miami house with wicker furniture",
+     "d": 1,
+     "cap": "Cheesecake at midnight",
+     "cand": true
+    },
+    {
+     "p": "a lanai with palm print",
+     "d": 3,
+     "cap": "The lanai",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "how-i-met-your-mother",
+   "name": "How I Met Your Mother",
+   "alt": [
+    "HIMYM"
+   ],
+   "year": 2005,
+   "country": "United States",
+   "network": "CBS",
+   "kids": false,
+   "blurb": "It starred Josh Radnor and Jason Segel.",
+   "scenes": [
+    {
+     "p": "a yellow umbrella in a rainy New York street",
+     "d": 2,
+     "cap": "The yellow umbrella",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: lettering in the picture (shop sign)"
+    },
+    {
+     "p": "a blue French horn on a wall",
+     "d": 2,
+     "cap": "The blue French horn",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "gavin-and-stacey",
+   "name": "Gavin & Stacey",
+   "alt": [
+    "Gavin and Stacey"
+   ],
+   "year": 2007,
+   "country": "United Kingdom",
+   "network": "BBC Three",
+   "kids": false,
+   "blurb": "A couple from Essex and Barry Island in Wales fall in love over the phone.",
+   "scenes": [
+    {
+     "p": "a Welsh seaside promenade with colourful amusement arcades and a sandy bay under a grey summer sky, a family stepping off a coach",
+     "d": 3,
+     "cap": "Barry Island",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: regenerated once without signs, still lettering on an arcade sign"
+    }
+   ]
+  },
+  {
+   "id": "kath-and-kim",
+   "name": "Kath & Kim",
+   "alt": [
+    "Kath and Kim"
+   ],
+   "year": 2002,
+   "country": "Australia",
+   "network": "ABC (Australia)",
+   "kids": false,
+   "blurb": "A suburban Melbourne mother and her self-absorbed daughter in Fountain Lakes.",
+   "scenes": [
+    {
+     "p": "a suburban Australian living room with a mother in tight lycra and her daughter on a fitness ball",
+     "d": 3,
+     "cap": "Look at moiye",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "line-of-duty",
+   "name": "Line of Duty",
+   "alt": [],
+   "year": 2012,
+   "country": "United Kingdom",
+   "network": "BBC Two",
+   "kids": false,
+   "blurb": "An anti-corruption police unit, AC-12, investigates bent coppers.",
+   "scenes": [
+    {
+     "p": "police officers in an interview room with a tape machine, three detectives facing one suspect",
+     "d": 3,
+     "cap": "The interview room",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "black-mirror",
+   "name": "Black Mirror",
+   "alt": [],
+   "year": 2011,
+   "country": "United Kingdom",
+   "network": "Channel 4",
+   "kids": false,
+   "blurb": "Dark stand-alone stories about technology going wrong.",
+   "scenes": [
+    {
+     "p": "a smashed black smartphone lying on a table",
+     "d": 3,
+     "cap": "The black mirror",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "red-dwarf",
+   "name": "Red Dwarf",
+   "alt": [],
+   "year": 1988,
+   "country": "United Kingdom",
+   "network": "BBC Two",
+   "kids": false,
+   "blurb": "The last human alive is stranded on a mining spaceship three million years from Earth.",
+   "scenes": [
+    {
+     "p": "a huge red mining spaceship drifting through deep space",
+     "d": 3,
+     "cap": "The mining ship",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "father-ted",
+   "name": "Father Ted",
+   "alt": [],
+   "year": 1995,
+   "country": "United Kingdom",
+   "network": "Channel 4",
+   "kids": false,
+   "blurb": "Three hapless Catholic priests in a remote Irish parochial house.",
+   "scenes": [
+    {
+     "p": "a lonely parochial house on a craggy Irish island, rain, a sheep",
+     "d": 3,
+     "cap": "The parochial house",
+     "cand": true
+    },
+    {
+     "p": "priests in a lingerie section",
+     "d": 3,
+     "cap": "Lost in the department store",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-inbetweeners",
+   "name": "The Inbetweeners",
+   "alt": [],
+   "year": 2008,
+   "country": "United Kingdom",
+   "network": "E4",
+   "kids": false,
+   "blurb": "Awkward teenage boys at a suburban sixth form.",
+   "scenes": [
+    {
+     "p": "four teenagers in maroon school blazers walking past a sixth form college",
+     "d": 3,
+     "cap": "The lads",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "derry-girls",
+   "name": "Derry Girls",
+   "alt": [],
+   "year": 2018,
+   "country": "United Kingdom",
+   "network": "Channel 4",
+   "kids": false,
+   "blurb": "Teenagers growing up in Northern Ireland in the 1990s.",
+   "scenes": [
+    {
+     "p": "four teenage girls and a boy in school uniform in 1990s Derry",
+     "d": 1,
+     "cap": "The gang",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "spongebob-squarepants",
+   "name": "SpongeBob SquarePants",
+   "alt": [
+    "SpongeBob"
+   ],
+   "year": 1999,
+   "country": "United States",
+   "network": "Nickelodeon",
+   "kids": true,
+   "blurb": "A yellow, square sea creature lives in a pineapple under the sea.",
+   "scenes": [
+    {
+     "p": "a pineapple-shaped house under the sea next to a stone head-shaped house, jellyfish fields",
+     "d": 3,
+     "cap": "Who lives in a pineapple",
+     "cand": true
+    },
+    {
+     "p": "an underwater burger restaurant shaped like a lobster trap",
+     "d": 3,
+     "cap": "The burger shack",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "peppa-pig",
+   "name": "Peppa Pig",
+   "alt": [],
+   "year": 2004,
+   "country": "United Kingdom",
+   "network": "Channel 5",
+   "kids": true,
+   "blurb": "A cheerful little piglet and her family.",
+   "scenes": [
+    {
+     "p": "a little house on top of a round green hill, muddy puddles at the bottom",
+     "d": 3,
+     "cap": "The house on the hill",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "teletubbies",
+   "name": "Teletubbies",
+   "alt": [],
+   "year": 1997,
+   "country": "United Kingdom",
+   "network": "BBC Two",
+   "kids": true,
+   "blurb": "Four colourful creatures live in a grassy dome.",
+   "scenes": [
+    {
+     "p": "bright green rolling hills with a baby-faced sun in the sky and real rabbits, a grass-covered dome home",
+     "d": 3,
+     "cap": "The sun baby",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "scooby-doo-where-are-you",
+   "name": "Scooby-Doo, Where Are You!",
+   "alt": [
+    "Scooby-Doo"
+   ],
+   "year": 1969,
+   "country": "United States",
+   "network": "CBS",
+   "kids": true,
+   "blurb": "A talking Great Dane and four teenagers solve mysteries.",
+   "scenes": [
+    {
+     "p": "a green psychedelic 1960s van with flowers parked outside a spooky abandoned mansion at night, a great dane hiding",
+     "d": 2,
+     "cap": "The van at the haunted house",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: car maker logo on the van"
+    },
+    {
+     "p": "a masked ghost being unmasked by teenagers",
+     "d": 3,
+     "cap": "The unmasking",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "postman-pat",
+   "name": "Postman Pat",
+   "alt": [],
+   "year": 1981,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": true,
+   "blurb": "A cheerful mail carrier delivers letters in the countryside.",
+   "scenes": [
+    {
+     "p": "a cheerful postman driving a small round plain red post van through a green valley village with stone walls, a black and white cat looking out of the passenger window",
+     "d": 3,
+     "cap": "Postman and his cat",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: regenerated once without signs, still a car-maker style badge on the van"
+    }
+   ]
+  },
+  {
+   "id": "play-school",
+   "name": "Play School",
+   "alt": [],
+   "year": 1966,
+   "country": "Australia",
+   "kids": true,
+   "blurb": "Play School (first shown 1966, Australia). Presenters ask which window we will look through today.",
+   "scenes": [
+    {
+     "p": "a toy shelf with a teddy, a rag doll and a clock beside a round window, a square window and an arched window",
+     "d": 3,
+     "cap": "Through the windows",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "bananas-in-pyjamas",
+   "name": "Bananas in Pyjamas",
+   "alt": [],
+   "year": 1992,
+   "country": "Australia",
+   "kids": true,
+   "blurb": "Bananas in Pyjamas (first shown 1992, Australia). Two fruit in striped nightwear live in Cuddles Avenue with teddy bears.",
+   "scenes": [
+    {
+     "p": "two people in banana costumes wearing blue-and-white striped pyjamas coming down a staircase",
+     "d": 3,
+     "cap": "Coming down the stairs",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "fireman-sam",
+   "name": "Fireman Sam",
+   "alt": [],
+   "year": 1987,
+   "country": "United Kingdom",
+   "network": "S4C",
+   "kids": true,
+   "blurb": "Fireman Sam (first shown 1987, United Kingdom, S4C). A firefighter rescues people from trouble caused by naughty Norman Price.",
+   "scenes": [
+    {
+     "p": "a bright red fire engine with no markings parked outside a small stone fire station in a Welsh valley village, a fireman in a yellow helmet beside it",
+     "d": 1,
+     "cap": "The fire station",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: regenerated once without signs, still a letter on the fire engine door"
+    }
+   ]
+  },
+  {
+   "id": "the-twilight-zone",
+   "name": "The Twilight Zone",
+   "alt": [],
+   "year": 1959,
+   "country": "United States",
+   "network": "CBS",
+   "kids": false,
+   "blurb": "Strange stand-alone tales of science fiction and suspense.",
+   "scenes": [
+    {
+     "p": "a black and white surreal scene: a door floating in starry space, a clock without hands, an eye and a window drifting in a spiral",
+     "d": 2,
+     "cap": "Another dimension",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "bewitched",
+   "name": "Bewitched",
+   "alt": [],
+   "year": 1964,
+   "country": "United States",
+   "network": "ABC (US)",
+   "kids": false,
+   "blurb": "A witch marries an ordinary advertising man.",
+   "scenes": [
+    {
+     "p": "a 1960s suburban living room where a vacuum cleaner and dishes clean themselves in mid-air, a woman twitching her nose",
+     "d": 3,
+     "cap": "A twitch of the nose",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "happy-days",
+   "name": "Happy Days",
+   "alt": [],
+   "year": 1974,
+   "country": "United States",
+   "network": "ABC (US)",
+   "kids": false,
+   "blurb": "The Cunningham family and the cool Fonz in 1950s Milwaukee.",
+   "scenes": [
+    {
+     "p": "a 1950s Milwaukee diner with a jukebox, a man in a leather jacket hitting the jukebox with his fist to make it play",
+     "d": 3,
+     "cap": "Hitting the jukebox",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "batman",
+   "name": "Batman",
+   "alt": [],
+   "year": 1966,
+   "country": "United States",
+   "network": "ABC (US)",
+   "kids": true,
+   "blurb": "Adam West plays the caped crusader of Gotham City.",
+   "scenes": [
+    {
+     "p": "two masked crime fighters in grey and blue capes climbing up the side of a building on a rope, 1960s pop art colours, a cartoon burst of comic-book sound effect shapes without letters",
+     "d": 3,
+     "cap": "Climbing the wall",
+     "cand": true,
+     "drop": true,
+     "dropWhy": "IMG contact sheet 2026-10-17: studio character design (the costumes) and comic lettering"
+    }
+   ]
+  },
+  {
+   "id": "frasier",
+   "name": "Frasier",
+   "alt": [],
+   "year": 1993,
+   "country": "United States",
+   "network": "NBC",
+   "kids": false,
+   "blurb": "A psychiatrist hosts a radio phone-in show.",
+   "scenes": [
+    {
+     "p": "an elegant Seattle apartment with a big window view of the Space Needle at night, a battered old recliner armchair among designer furniture",
+     "d": 3,
+     "cap": "The recliner and the view",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "ted-lasso",
+   "name": "Ted Lasso",
+   "alt": [],
+   "year": 2020,
+   "country": "United States",
+   "network": "Apple TV",
+   "kids": false,
+   "blurb": "An American football coach takes over an English soccer team.",
+   "scenes": [
+    {
+     "p": "a football coach with a moustache and a visor seen from behind sticking a hand-drawn sign on a locker room wall, an English football pitch outside, blank paper sign",
+     "d": 3,
+     "cap": "Believe",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-vicar-of-dibley",
+   "name": "The Vicar of Dibley",
+   "alt": [],
+   "year": 1994,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "A woman priest is sent to a sleepy Oxfordshire village parish.",
+   "scenes": [
+    {
+     "p": "a woman vicar in a cassock jumping into a deep puddle that is actually a hole, splash, an English village churchyard",
+     "d": 3,
+     "cap": "The puddle",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "keeping-up-appearances",
+   "name": "Keeping Up Appearances",
+   "alt": [],
+   "year": 1990,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "A social climber tries to hide her working-class relatives.",
+   "scenes": [
+    {
+     "p": "a prim woman in a hat with a candlelight supper set for guests in a neat suburban bungalow, a pink telephone",
+     "d": 3,
+     "cap": "The candlelight supper",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "call-the-midwife",
+   "name": "Call the Midwife",
+   "alt": [],
+   "year": 2012,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "Nurses and nuns deliver babies in London's East End from the late 1950s.",
+   "scenes": [
+    {
+     "p": "midwives in blue uniforms riding bicycles through a 1950s East London street of terraced houses and washing lines",
+     "d": 3,
+     "cap": "Midwives on bicycles",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "poirot",
+   "name": "Poirot",
+   "alt": [
+    "Agatha Christie's Poirot"
+   ],
+   "year": 1989,
+   "country": "United Kingdom",
+   "kids": false,
+   "blurb": "A Belgian detective with a perfect moustache solves murders.",
+   "scenes": [
+    {
+     "p": "a short dapper Belgian detective with a waxed moustache and a homburg hat seen from behind in an Art Deco London mansion block lobby",
+     "d": 3,
+     "cap": "The little grey cells",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "skippy-the-bush-kangaroo",
+   "name": "Skippy the Bush Kangaroo",
+   "alt": [
+    "Skippy"
+   ],
+   "year": 1968,
+   "country": "Australia",
+   "kids": true,
+   "blurb": "Skippy the Bush Kangaroo (first shown 1968, Australia). A clever marsupial helps a ranger's son solve problems in the bush.",
+   "scenes": [
+    {
+     "p": "a boy and a kangaroo in an Australian national park, a ranger station, gum trees",
+     "d": 3,
+     "cap": "A boy and his kangaroo",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "mcleod-s-daughters",
+   "name": "McLeod's Daughters",
+   "alt": [],
+   "year": 2001,
+   "country": "Australia",
+   "network": "Nine Network",
+   "kids": false,
+   "blurb": "Two half-sisters run a South Australian cattle station with an all-women crew.",
+   "scenes": [
+    {
+     "p": "two women on horseback mustering cattle on a dusty South Australian outback station",
+     "d": 3,
+     "cap": "Drovers' Run",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "are-you-being-served",
+   "name": "Are You Being Served?",
+   "alt": [],
+   "year": 1972,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "Staff on the clothing floor of the Grace Brothers department store.",
+   "scenes": [
+    {
+     "p": "a 1970s department store menswear floor with an old-fashioned lift and shop assistants lined up",
+     "d": 3,
+     "cap": "I'm free!",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "allo-allo",
+   "name": "'Allo 'Allo!",
+   "alt": [
+    "Allo Allo"
+   ],
+   "year": 1982,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "A café owner in occupied France juggles the Resistance and the Germans.",
+   "scenes": [
+    {
+     "p": "a French café in wartime 1940s with a waiter in an apron, a portrait painting hidden inside a giant sausage on the counter, plain walls",
+     "d": 3,
+     "cap": "The cafe",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-good-life",
+   "name": "The Good Life",
+   "alt": [],
+   "year": 1975,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "A couple quit the rat race to become self-sufficient in suburban Surbiton.",
+   "scenes": [
+    {
+     "p": "a suburban couple digging up their front garden in Surbiton to grow vegetables, a pig and a goat, the neighbours aghast",
+     "d": 2,
+     "cap": "Self-sufficient in Surbiton",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "strictly-come-dancing",
+   "name": "Strictly Come Dancing",
+   "alt": [
+    "Strictly"
+   ],
+   "year": 2004,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "Celebrities learn the waltz, tango and salsa with professionals.",
+   "scenes": [
+    {
+     "p": "a glittering mirror ball over a ballroom dance floor with couples in sequinned ballgowns dancing",
+     "d": 3,
+     "cap": "Keep dancing",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "grey-s-anatomy",
+   "name": "Grey's Anatomy",
+   "alt": [],
+   "year": 2005,
+   "country": "United States",
+   "network": "ABC (US)",
+   "kids": false,
+   "blurb": "A drama about young surgeons led by Meredith.",
+   "scenes": [
+    {
+     "p": "surgeons in navy scrubs and caps in an operating theatre in a Seattle hospital, rain on the windows",
+     "d": 1,
+     "cap": "Seattle Grace",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "the-office-uk",
+   "name": "The Office (UK)",
+   "alt": [
+    "The Office"
+   ],
+   "year": 2001,
+   "country": "United Kingdom",
+   "network": "BBC Two",
+   "kids": false,
+   "blurb": "A mockumentary set at the Slough branch of the paper company Wernham Hogg.",
+   "scenes": [
+    {
+     "p": "a dreary paper company office in Slough with a man in a tie doing an awkward dance",
+     "d": 1,
+     "cap": "The dance",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "absolutely-fabulous",
+   "name": "Absolutely Fabulous",
+   "alt": [
+    "Ab Fab"
+   ],
+   "year": 1992,
+   "country": "United Kingdom",
+   "kids": false,
+   "blurb": "A fashion PR woman's chaos is watched by her sensible daughter Saffron.",
+   "scenes": [
+    {
+     "p": "two women in outrageous designer outfits drinking champagne and falling out of a car",
+     "d": 3,
+     "cap": "Sweetie, darling",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "last-of-the-summer-wine",
+   "name": "Last of the Summer Wine",
+   "alt": [],
+   "year": 1973,
+   "country": "United Kingdom",
+   "network": "BBC One",
+   "kids": false,
+   "blurb": "Elderly men get into scrapes in a Yorkshire town.",
+   "scenes": [
+    {
+     "p": "three elderly men rolling down a hill in a bathtub in the Yorkshire Dales",
+     "d": 3,
+     "cap": "Downhill in a bathtub",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "who-wants-to-be-a-millionaire",
+   "name": "Who Wants to Be a Millionaire?",
+   "alt": [
+    "Millionaire"
+   ],
+   "year": 1998,
+   "country": "United Kingdom",
+   "network": "ITV",
+   "kids": false,
+   "blurb": "A quiz show where fifteen questions lead to a top prize of a million pounds.",
+   "scenes": [
+    {
+     "p": "a dark television studio with two chairs facing each other in a pool of light, blue spotlights sweeping a round stage",
+     "d": 3,
+     "cap": "In the hot seat",
+     "cand": true
+    }
+   ]
+  },
+  {
+   "id": "killing-eve",
+   "name": "Killing Eve",
+   "alt": [],
+   "year": 2018,
+   "country": "United Kingdom",
+   "network": "BBC America",
+   "kids": false,
+   "blurb": "It starred Sandra Oh and Jodie Comer.",
+   "scenes": [
+    {
+     "p": "a woman in a huge frilly pink tulle dress walking down a Paris street",
+     "d": 3,
+     "cap": "The pink dress",
+     "cand": true
+    }
+   ]
+  }
+ ]
+}

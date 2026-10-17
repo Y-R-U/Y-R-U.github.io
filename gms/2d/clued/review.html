@@ -27,6 +27,7 @@
   .rv-pic { display: block; aspect-ratio: 4 / 3; background: repeating-conic-gradient(#f1ecf9 0 25%, #fff 0 50%) 0 0 / 16px 16px; position: relative; }
   .rv-pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
   .rv-pic .ai { position: absolute; z-index: 1; top: 6px; left: 6px; background: var(--grape); color: #fff; font-weight: 900; font-size: 11px; letter-spacing: .5px; padding: 2px 7px; border-radius: 8px; }
+  .rv-pic .rv-alt { position: absolute; z-index: 2; top: 6px; right: 6px; min-width: 56px; min-height: 36px; padding: 4px 10px; border: 0; border-radius: 18px; background: rgba(30, 20, 50, .78); color: #fff; font: 900 14px/1 Nunito, sans-serif; cursor: pointer; }
   .rv-pic.broken::after { content: 'Won’t load'; position: absolute; inset: 0; display: grid; place-items: center; font-weight: 900; color: var(--bad); }
   .rv-meta { padding: 8px 10px 0; min-width: 0; }
   .rv-meta b { display: block; overflow-wrap: anywhere; }
@@ -75,6 +76,6 @@
   <div class="panel" id="gate"><p class="muted">Checking your sign-in…</p></div>
 </main>
 <div id="popups"></div>
-<script type="module" src="js/net/review.js?v=202610131128"></script>
+<script type="module" src="js/net/review.js?v=202610170738"></script>
 </body>
 </html>
