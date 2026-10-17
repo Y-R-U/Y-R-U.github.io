@@ -1,27 +1,27 @@
-import { BUILD } from './build.js?v=202610171359';
-import './core/debuglog.js?v=202610171359';   // remote debug log (server-switched, docs/notes/DEBUGLOG.md)
-import { loadFormats } from './formats/index.js?v=202610171359';
-import { getFormat, listFormats, register } from './formats/registry.js?v=202610171359';
-import { loadIndex, loadPack, loadPacks, getIndex } from './core/packs.js?v=202610171359';
-import { buildQuestions, makeSpec } from './core/spec.js?v=202610171359';
-import { preflight, urlsOf, swapFailed } from './core/media.js?v=202610171359';
-import * as store from './core/store.js?v=202610171359';
-import { mountApp, defineScreen, go, back, reset, header, current, canPester } from './ui/app.js?v=202610171359';
-import { h } from './ui/kit.js?v=202610171359';
-import { popup, toast, confirmPop } from './ui/popup.js?v=202610171359';
-import { sfx, haptic, confetti } from './ui/fx.js?v=202610171359';
-import { shareText } from './ui/share.js?v=202610171359';
-import { loadNet } from './ui/net.js?v=202610171359';
-import { watchVersion, checkVersion, updateState, reloadFresh } from './ui/update.js?v=202610171359';
-import { applyAll } from './ui/settings.js?v=202610171359';
-import { setMatchCompleted } from './ui/results.js?v=202610171359';
-import './ui/home.js?v=202610171359';
-import './ui/setup.js?v=202610171359';
-import './ui/statspage.js?v=202610171359';
-import { createRunner } from './structures/runner.js?v=202610171359';
-import { prepare, playSpec } from './structures/session.js?v=202610171359';
-import { STRUCTURES } from './structures/index.js?v=202610171359';
-import { handoff } from './structures/handoff.js?v=202610171359';
+import { BUILD } from './build.js?v=202610171455';
+import './core/debuglog.js?v=202610171455';   // remote debug log (server-switched, docs/notes/DEBUGLOG.md)
+import { loadFormats } from './formats/index.js?v=202610171455';
+import { getFormat, listFormats, register } from './formats/registry.js?v=202610171455';
+import { loadIndex, loadPack, loadPacks, getIndex } from './core/packs.js?v=202610171455';
+import { buildQuestions, makeSpec } from './core/spec.js?v=202610171455';
+import { preflight, urlsOf, swapFailed } from './core/media.js?v=202610171455';
+import * as store from './core/store.js?v=202610171455';
+import { mountApp, defineScreen, go, back, reset, header, current, canPester } from './ui/app.js?v=202610171455';
+import { h } from './ui/kit.js?v=202610171455';
+import { popup, toast, confirmPop } from './ui/popup.js?v=202610171455';
+import { sfx, haptic, confetti } from './ui/fx.js?v=202610171455';
+import { shareText } from './ui/share.js?v=202610171455';
+import { loadNet } from './ui/net.js?v=202610171455';
+import { watchVersion, checkVersion, updateState, reloadFresh } from './ui/update.js?v=202610171455';
+import { applyAll } from './ui/settings.js?v=202610171455';
+import { setMatchCompleted } from './ui/results.js?v=202610171455';
+import './ui/home.js?v=202610171455';
+import './ui/setup.js?v=202610171455';
+import './ui/statspage.js?v=202610171455';
+import { createRunner } from './structures/runner.js?v=202610171455';
+import { prepare, playSpec } from './structures/session.js?v=202610171455';
+import { STRUCTURES } from './structures/index.js?v=202610171455';
+import { handoff } from './structures/handoff.js?v=202610171455';
 
 const params = new URLSearchParams(location.search);
 const TEST = params.has('test') || params.has('noauth');
@@ -80,7 +80,9 @@ function joinWatch(code, ms = 7000) {
     if (s.name !== 'join') return true;
     return !!s.el.querySelector('input, .net-wrap button, [data-act=retry]');
   };
-  const gaveUp = () => { const s = current(); return s && !['home', 'join', 'room'].includes(s.name); };
+  // a new home screen (not the one boot opened) = the player backed out
+  const home0 = current();
+  const gaveUp = () => { const s = current(); return s && (!['home', 'join', 'room'].includes(s.name) || (s.name === 'home' && s !== home0)); };
   function stop() { clearInterval(timer); panel?.remove(); panel = null; }
   function retry() {
     panel?.remove(); panel = null;
@@ -88,8 +90,8 @@ function joinWatch(code, ms = 7000) {
     go('join', { code, ...(JOIN_KEY === 'p2p' ? { via: 'p2p' } : {}) }, { replace: true, skipGuard: true });
   }
   timer = setInterval(() => {
-    if (settled()) { if (panel) { panel.remove(); panel = null; } if (Date.now() - t0 > ms) stop(); return; }
     if (gaveUp()) { stop(); return; }
+    if (settled()) { if (panel) { panel.remove(); panel = null; } if (Date.now() - t0 > ms) stop(); return; }
     if (panel || Date.now() - t0 < ms) return;
     panel = h('div.join-rescue', { role: 'alert' },
       h('b', {}, 'Still joining…'),

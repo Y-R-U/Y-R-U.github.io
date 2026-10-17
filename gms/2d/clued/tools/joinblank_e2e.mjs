@@ -4,6 +4,7 @@
 //   bootreload a module stalls during boot, the boot guard's Reload is tapped: the join survives the reload
 //   netstall   js/net/ stalls after boot: the "Still joining" panel appears; Try again reaches the name prompt
 //   peekstall  the room lookup stalls: the panel appears; Try again (request answered now) reaches the name prompt
+//   backout    the room lookup stalls and the player taps Back: home stays clean (no "Still joining" panel later)
 //   node tools/joinblank_e2e.mjs [scenarios,comma,separated] [--shots DIR] [--port 9551]
 // CLUED_URL=http://localhost:PORT/ runs it against another copy of the files (the falsify run).
 // Needs the :8888 site server and ~/.claude/bin/cdp. Uses a local clued server; production is blocked.
@@ -15,7 +16,7 @@ import { startLocalServer, blockProd, PROD_API } from './lib/localserver.mjs';
 
 const argv = process.argv.slice(2);
 const argOf = k => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
-const ALL = ['fontstall', 'reload', 'bootreload', 'netstall', 'peekstall'];
+const ALL = ['fontstall', 'reload', 'bootreload', 'netstall', 'peekstall', 'backout'];
 const RUN = argv[0] && !argv[0].startsWith('--') ? argv[0].split(',') : ALL;
 const SITE = process.env.CLUED_URL || 'http://localhost:8888/gms/2d/clued/';
 const ORIGIN = new URL(SITE).origin;
@@ -141,6 +142,15 @@ for (const sc of RUN) {
     await sleep(500);
     const got = await p.waitFor(NAME, 15000);
     ok(got, 'its Reload button lands on the name prompt (the join survives)', await state(p));
+  }
+  if (sc === 'backout') {
+    await p.stall(new RegExp(`/api/rooms/${code}$`));
+    p.send('Page.navigate', { url: joinUrl(code) }).catch(() => {});
+    ok(await p.waitFor(`document.querySelector('.screen:not(.leaving)[data-screen=join] .net-wait')`, 10000), 'join screen is looking for the room', await state(p));
+    await p.eval(`document.querySelector('.screen:not(.leaving)[data-screen=join] .bar .back').click(); 1`).catch(() => {});
+    ok(await p.waitFor(`document.body.dataset.screen === 'home'`, 4000), 'Back goes home', await state(p));
+    await sleep(8500);
+    ok(!(await p.eval(`!!document.querySelector('.join-rescue')`).catch(() => true)), 'no "Still joining" panel on home after backing out', await state(p));
   }
   if (sc === 'netstall' || sc === 'peekstall') {
     await p.stall(sc === 'netstall' ? /\/js\/net\/join\.js/ : new RegExp(`/api/rooms/${code}$`));

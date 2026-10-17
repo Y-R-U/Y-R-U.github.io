@@ -1,5 +1,5 @@
 // Shared AudioContext, buses and the mobile unlock. sfx, piano and clips all route through here.
-import { dlog, modLoaded } from '../core/debuglog.js?v=202610171359';
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610171455';
 const MOD_ID = modLoaded('ctx', import.meta.url);
 let ctx = null, master = null, sfxBus = null, musicBus = null, comp = null;
 const state = { volume: 0.8, sfx: 1, music: 1, muted: false };
@@ -15,7 +15,8 @@ export function getCtx() {
   ctx = new AC({ latencyHint: 'interactive' });
   ctx.__id ||= 'ac?-' + Math.random().toString(36).slice(2, 5);
   dlog('ctx', 'create', { ac: ctx.__id, m: MOD_ID, n: globalThis.__cluedAC?.n, state: ctx.state, sr: ctx.sampleRate, base: ctx.baseLatency, out: ctx.outputLatency, webkit: !globalThis.AudioContext });
-  ctx.addEventListener?.('statechange', () => dlog('ctx', 'statechange', { ac: ctx.__id, state: ctx.state, t: ctx.currentTime, vis: globalThis.document?.visibilityState }));
+  const c = ctx;   // after an iOS rebuild the old context still reports (closed) under its own id
+  c.addEventListener?.('statechange', () => dlog('ctx', 'statechange', { ac: c.__id, state: c.state, t: c.currentTime, vis: globalThis.document?.visibilityState }));
   comp = ctx.createDynamicsCompressor();
   comp.threshold.value = -10; comp.knee.value = 8; comp.ratio.value = 4;
   comp.attack.value = 0.003; comp.release.value = 0.2;

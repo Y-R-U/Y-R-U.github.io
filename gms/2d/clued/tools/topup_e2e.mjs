@@ -149,6 +149,14 @@ try {
   await b.key('Escape');
   await sheetGone();
   ok(true, 'Escape dismisses');
+  // the phone's back button (any screen change) takes the sheet with it: no overlay left over the next screen
+  await b.click('[data-act=topup-open]');
+  await b.waitFor(`document.querySelector('[data-sheet=topup]')`);
+  await b.eval('history.back(); true');
+  await b.waitFor(`document.body.dataset.screen !== 'host'`, 5000);
+  ok(await b.waitFor(`!document.querySelector('[data-sheet=topup]')`, 3000).catch(() => false), 'back button closes the sheet with the screen');
+  await hostScreen();
+  await typeName();
   await b.click('[data-act=create]');
   await b.waitFor(`document.querySelector('[data-sheet=topup][data-state=offer]')`);
   await b.click('[data-act=topup-yes]');

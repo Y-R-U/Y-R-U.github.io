@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import net from 'node:net';
 
 const SERVER = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'server');
-export const PROD_API = ['*games.br8t.com/gms/2d/clued/api*', '*games.br8t.com/api/br8t/*'];
+export const PROD_API = ['*games.br8t.com/gms/2d/clued/api*', '*games.br8t.com/api/br8t/*', '*://*.br8t.com/*api/*', '*://br8t.com/*api/*'];
 
 const freePort = () => new Promise(res => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); }); });
 

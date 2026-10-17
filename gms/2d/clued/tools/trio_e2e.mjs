@@ -25,11 +25,12 @@ const ok = (c, m, x = '') => { if (c) pass++; else { fail++; console.log(`  FAIL
 const HARD = setTimeout(() => { console.log('FATAL: over 8 min'); process.exit(1); }, 8 * 60 * 1000); HARD.unref();
 
 const qOf = b => b.eval('(() => { const q = window.__cluedRoom?.q?.() || window.__clued.state().q; return q && { answer: q.answer, rows: q.rows.map(r => r.options.length), labels: q.rows.map(r => r.label), id: q.id, layout: q.data.layout }; })()');
-const chip = (r, i) => `.stage .tr-chip[data-r="${r}"][data-i="${i}"]`;
+// .screen:not(.leaving): the last game's screen lingers 180 ms with its own chips and reveal (a fast restart matched them)
+const chip = (r, i) => `.screen:not(.leaving) .stage .tr-chip[data-r="${r}"][data-i="${i}"]`;
 const lastRec = b => b.eval('window.__clued.run().state.answers.at(-1)');
 const fits = b => b.eval(`(() => { const s = document.querySelector('.stage'), l = document.querySelector('.stage .tr-lock'), c = [...document.querySelectorAll('.stage .tr-chip')];
   return { scroll: s.scrollHeight - s.clientHeight, lock: l ? Math.round(l.getBoundingClientRect().bottom - innerHeight) : 0, chips: Math.round(Math.max(...c.map(x => x.getBoundingClientRect().bottom)) - innerHeight), h: document.documentElement.scrollWidth - innerWidth }; })()`);
-const reveal = b => b.eval(`(() => { const r = document.querySelector('.reveal.show'); return r && { cls: r.className, title: r.querySelector('.rv-title')?.textContent, mark: r.querySelector('.rv-mark')?.textContent, pts: r.querySelector('.pts:not(.hat)')?.textContent || '', hat: r.querySelector('.pts.hat')?.textContent || '', top: !!document.querySelector('.stage .tr-top')?.offsetParent }; })()`);
+const reveal = b => b.eval(`(() => { const r = document.querySelector('.screen:not(.leaving) .reveal.show'); return r && { cls: r.className, title: r.querySelector('.rv-title')?.textContent, mark: r.querySelector('.rv-mark')?.textContent, pts: r.querySelector('.pts:not(.hat)')?.textContent || '', hat: r.querySelector('.pts.hat')?.textContent || '', top: !!document.querySelector('.screen:not(.leaving) .stage .tr-top')?.offsetParent }; })()`);
 // picks per row: the right one where right[i], else the next option
 const picksFor = (Q, rightRows) => Q.answer.map((a, i) => (rightRows.includes(i) ? a : (a + 1) % Q.rows[i]));
 
@@ -72,7 +73,7 @@ async function solo() {
     if (r === 0) await b.shot(`${OUT}/${tag}-film-q.png`);
     ok(!(await b.eval(`document.querySelector('.stage .tr-lock').disabled`)), `q${r} Lock in enabled`);
     await b.click('.stage .tr-lock');
-    await b.waitFor('document.querySelector(".reveal.show")', 10000);
+    await b.waitFor('document.querySelector(".screen:not(.leaving) .reveal.show")', 10000);
     await sleep(700);
     const rec = await lastRec(b), rv = await reveal(b);
     streaks.push(rec.streak);
@@ -83,7 +84,7 @@ async function solo() {
     const marks = await b.eval(`[...document.querySelectorAll('.stage .tr-row')].map(r => r.querySelector('.tk').textContent + [...r.querySelectorAll('.tr-chip')].map(c => /\\bok\\b/.test(c.className) ? 'O' : /\\bmiss\\b/.test(c.className) ? 'M' : /\\bbad\\b/.test(c.className) ? 'B' : '.').join(''))`);
     ok(marks.every((m, i) => (want.includes(i) ? m[0] === '✓' && m.includes('O') : m[0] === '✗' && m.includes('M') && m.includes('B'))), `q${r} rows marked right / wrong / missed`, JSON.stringify(marks));
     ok((await fits(b)).h <= 1, `q${r} no horizontal scroll after the reveal`);
-    const next = await b.eval(`(() => { const n = document.querySelector('.reveal.show .next'); if (!n) return null; const r = n.getBoundingClientRect(); return r.bottom <= innerHeight + 1 && r.top >= 0; })()`);
+    const next = await b.eval(`(() => { const n = document.querySelector('.screen:not(.leaving) .reveal.show .next'); if (!n) return null; const r = n.getBoundingClientRect(); return r.bottom <= innerHeight + 1 && r.top >= 0; })()`);
     ok(next, `q${r} Next is on screen`);
     if (r === 0 || r === 1) await b.shot(`${OUT}/${tag}-film-reveal${n}.png`);
     await b.click('.reveal.show .next');
@@ -112,11 +113,11 @@ async function solo() {
     await b.shot(`${OUT}/${tag}-${name}-q.png`);
     await tapAll(b, picksFor(Q, Q.answer.map((_, i) => i).slice(0, Q.rows.length - 1)));
     await b.click('.stage .tr-lock');
-    await b.waitFor('document.querySelector(".reveal.show")', 10000);
+    await b.waitFor('document.querySelector(".screen:not(.leaving) .reveal.show")', 10000);
     await sleep(700);
     const rec = await lastRec(b);
     ok(!rec.correct && rec.partial && rec.points > 0, `${name}: all but one row right is partial`, JSON.stringify(rec));
-    if (name === 'songs') ok(await b.eval(`!!document.querySelector('.reveal.show .au-reveal')`), 'songs: the reveal credits the track');
+    if (name === 'songs') ok(await b.eval(`!!document.querySelector('.screen:not(.leaving) .reveal.show .au-reveal')`), 'songs: the reveal credits the track');
     await b.shot(`${OUT}/${tag}-${name}-reveal.png`);
     await b.click('.reveal.show .next');
     await b.waitFor('document.body.dataset.screen === "results"', 15000);
@@ -126,13 +127,13 @@ async function solo() {
   // never marked wrong; nothing picked scores nothing
   for (const [k, label] of [[2, 'two right picked'], [0, 'nothing picked']]) {
     await b.eval(`window.__clued.start({ structure: 'quick', format: 'trio', packs: ['movie-moments'], count: 1, timer: 3 }); true`);
-    await b.waitFor(`window.__clued.state().run?.answers === 0 && document.querySelectorAll('.stage .tr-chip').length >= 12`, 20000);
+    await b.waitFor(`window.__clued.state().run?.answers === 0 && document.querySelectorAll('.screen:not(.leaving) .stage .tr-chip').length >= 12`, 20000);
     const Q = await qOf(b);
     for (let r = 0; r < k; r++) await b.click(chip(r, Q.answer[r]));
-    await b.waitFor('document.querySelector(".reveal.show")', 20000);
+    await b.waitFor('document.querySelector(".screen:not(.leaving) .reveal.show")', 20000);
     await sleep(500);
     const rec = await lastRec(b), rv = await reveal(b);
-    const marks = await b.eval(`[document.querySelectorAll('.stage .tr-chip.bad').length, document.querySelectorAll('.stage .tr-chip.ok').length, document.querySelectorAll('.stage .tr-chip.miss').length, [...document.querySelectorAll('.stage .tk')].map(t => t.textContent).join('')]`);
+    const marks = await b.eval(`[document.querySelectorAll('.screen:not(.leaving) .stage .tr-chip.bad').length, document.querySelectorAll('.screen:not(.leaving) .stage .tr-chip.ok').length, document.querySelectorAll('.screen:not(.leaving) .stage .tr-chip.miss').length, [...document.querySelectorAll('.screen:not(.leaving) .stage .tk')].map(t => t.textContent).join('')]`);
     if (k) ok(rec.timeout && rec.auto && !rec.correct && rec.points === 67 && /partial/.test(rv.cls) && rv.mark === '2/3' && /Time's up · 2 of 3 right/.test(rv.title), `timeout, ${label}: scores 2/3 of minimum speed (67)`, JSON.stringify([rec, rv]));
     else ok(rec.timeout && !rec.points && /bad/.test(rv.cls) && rv.title === "Time's up", `timeout, ${label}: 0 points`, JSON.stringify([rec, rv]));
     ok(marks[0] === 0 && marks[1] === k && marks[2] === 3 - k && marks[3] === '✓'.repeat(k) + '–'.repeat(3 - k), `timeout, ${label}: unpicked rows shown, none marked wrong`, JSON.stringify(marks));
@@ -220,7 +221,7 @@ async function roomPlay(host, ann, API) {
       if (n === 3) ok(last.points >= 200 && last.hat === 100, `q${st.q} ${who}: hat-trick scores speed points + 100`, JSON.stringify(last));
       else if (b.unlocked) ok(last.points === 67 && !last.correct, `q${st.q} ${who}: picks never locked in are scored at the deadline (67)`, JSON.stringify(last));
       else ok(last.points > 0 && last.points <= Math.round(500 * n / 3), `q${st.q} ${who}: ${n}/3 → ≤ ${Math.round(500 * n / 3)}`, JSON.stringify(last));
-      const shown = await b.eval(`document.querySelector('.reveal.show .pts:not(.hat)')?.textContent || ''`);
+      const shown = await b.eval(`document.querySelector('.screen:not(.leaving) .reveal.show .pts:not(.hat)')?.textContent || ''`);
       const note = await host.eval(`[...document.querySelectorAll('.net-row')].find(r => r.textContent.includes('${who === 'host' ? 'Hosty' : 'Ann'}'))?.querySelector('.net-note-row')?.textContent || ''`);
       ok(n === 3 ? !/◐|✗/.test(note) : /^◐/.test(note), `q${st.q} ${who}: scoreboard row ${n === 3 ? 'right' : 'partly right'} (${note})`);
       ok(shown === `+${last.points - (last.hat || 0)}`, `q${st.q} ${who}: the card shows the server's points (${shown})`);

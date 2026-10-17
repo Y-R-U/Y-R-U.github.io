@@ -1,5 +1,7 @@
 // Minimal raw-CDP driver for lane A tests. import { open } from './a_cdp.mjs'
-export async function open({ port: portArg = 9401, url, width = 384, height = 854, dpr = 2, mobile = true } = {}) {
+// Production API requests (*.br8t.com) fail by default; open({ allowProd: true }) or CLUED_ALLOW_PROD=1 lets them through.
+import { PROD_API } from './lib/localserver.mjs';
+export async function open({ port: portArg = 9401, url, width = 384, height = 854, dpr = 2, mobile = true, allowProd = !!process.env.CLUED_ALLOW_PROD } = {}) {
   const port = +process.env.CDP_PORT || portArg;   // CDP_PORT lets the integration lane drive any lane's e2e
   const list = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
   let page = list.find(t => t.type === 'page');
@@ -22,6 +24,7 @@ export async function open({ port: portArg = 9401, url, width = 384, height = 85
   await send('Page.enable');
   await send('Network.enable');
   await send('Network.setCacheDisabled', { cacheDisabled: true });
+  if (!allowProd) await send('Network.setBlockedURLs', { urls: PROD_API });
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const api = {
     send, logs, sleep,
@@ -42,7 +45,13 @@ export async function open({ port: portArg = 9401, url, width = 384, height = 85
       throw new Error('timeout waiting for ' + expr);
     },
     async click(sel, { index = 0 } = {}) {
-      const box = await api.eval(`(() => { const els = [...document.querySelectorAll(${JSON.stringify(sel)})].filter(e => e.offsetParent || e.getClientRects().length); const e = els[${index}]; if (!e) return null; e.scrollIntoView({block:'center'}); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
+      // skips a leaving (inert) screen's copy of the element, and waits for it to stop moving (a question slides in)
+      const box = await api.eval(`(async () => { const els = [...document.querySelectorAll(${JSON.stringify(sel)})].filter(e => (e.offsetParent || e.getClientRects().length) && !e.closest('[inert]')); const e = els[${index}]; if (!e) return null; e.scrollIntoView({block:'center'});
+        const at = () => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+        const frame = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+        let a = at();
+        for (let i = 0; i < 30; i++) { await Promise.race([frame(), new Promise(r => setTimeout(r, 50))]); const b = at(); if (Math.abs(b.x - a.x) < 0.5 && Math.abs(b.y - a.y) < 0.5) break; a = b; }
+        return at(); })()`);
       if (!box) throw new Error('no element ' + sel);
       await sleep(60);
       for (const type of ['mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x: box.x, y: box.y, button: 'left', clickCount: 1 });

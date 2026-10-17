@@ -157,6 +157,8 @@ async function main() {
   await ann.waitFor(`${chipName(hostId)} === 'Captain Aaron'`, 10000, 'ann sees the new host name').catch(() => {});
   ok(await ann.eval(chipName(hostId)) === 'Captain Aaron', `${tag}: joiner sees the host's new name`, await ann.eval(chipName(hostId)));
   ok(await ann.eval(`document.querySelector('.net-wait')?.textContent.includes('Captain Aaron')`), `${tag}: joiner's "Waiting for …" uses the new name`);
+  // the joiner's long-poll can beat the host's own rename reply: wait for the host page to settle
+  await host.waitFor(`${chipName(hostId)} === 'Captain Aaron' && !document.querySelector('[data-field=rename]') && localStorage.getItem('clued.name') === '"Captain Aaron"'`, 10000, 'host rename settled').catch(() => {});
   ok(await host.eval(`${chipName(hostId)} === 'Captain Aaron' && !document.querySelector('[data-field=rename]')`), `${tag}: host chip shows the new name, editor closed`);
   ok(await host.eval(`localStorage.getItem('clued.name')`) === '"Captain Aaron"', `${tag}: rename remembered as the default name`);
 
@@ -173,6 +175,7 @@ async function main() {
   await ann.waitFor(`document.activeElement?.dataset?.field === 'rename'`, 4000, 'ann rename focused 2');
   await ann.send('Input.insertText', { text: 'Nope' });
   await ann.key('Escape');
+  await ann.waitFor(`!document.querySelector('[data-field=rename]')`, 4000, 'ann editor closed').catch(() => {});
   await sleep(800);
   ok(await host.eval(chipName(annId)) === 'captain aaron 2' && await ann.eval(chipName(annId)) === 'captain aaron 2', `${tag}: Escape cancels`);
 

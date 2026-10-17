@@ -1,10 +1,10 @@
 // Out of online games: an in-page sheet offering a free top-up (Yes / No), with a short br8t Pass pitch.
 // After the last top-up of the day it shows a friendly end-of-day note instead (no Yes).
-import { h } from '../ui/kit.js?v=202610171359';
-import { toast } from '../ui/popup.js?v=202610171359';
-import { go } from '../ui/app.js?v=202610171359';
-import { ensureStyles } from './util.js?v=202610171359';
-import { topUp, canTopUp, doneForToday, resetTime, passPrices, buyPass, uuid } from './pass.js?v=202610171359';
+import { h } from '../ui/kit.js?v=202610171455';
+import { toast } from '../ui/popup.js?v=202610171455';
+import { go } from '../ui/app.js?v=202610171455';
+import { ensureStyles } from './util.js?v=202610171455';
+import { topUp, canTopUp, doneForToday, resetTime, passPrices, buyPass, uuid } from './pass.js?v=202610171455';
 
 let layer = null;
 const ensureLayer = () => layer || (layer = document.getElementById('popups') || document.body.appendChild(h('div', { id: 'popups' })));
@@ -46,6 +46,7 @@ export function offerTopUp(a, { extra = [] } = {}) {
       setTimeout(() => back.remove(), 220);
       resolve(v);
     };
+    back._close = close;   // popup.closeAll (any screen change, e.g. the Android back button) closes the sheet too
     const onKey = e => { if (e.key === 'Escape') { e.stopPropagation(); close(null); } };
     back.addEventListener('click', e => { if (e.target === back) close(null); });
     const shopStatus = h('p.topup-status', { role: 'status' });

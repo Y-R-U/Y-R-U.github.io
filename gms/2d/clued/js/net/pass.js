@@ -107,6 +107,7 @@ export const passPrices = () => offerP || (offerP = fetch(API + 'offer', { cache
     const money = new Intl.NumberFormat(undefined, { style: 'currency', currency: String(it.currency || 'aud').toUpperCase() }).format(it.amount / 100);
     out[it.interval === 'year' ? 'yearly' : 'monthly'] = money;
   }
+  if (!Object.keys(out).length) offerP = null;   // a failed or empty offer is asked again next time
   return out;
 }).catch(() => { offerP = null; return {}; }));
 

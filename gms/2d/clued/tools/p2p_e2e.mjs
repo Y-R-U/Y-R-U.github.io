@@ -189,7 +189,9 @@ async function main() {
         await host.send('Page.reload', { ignoreCache: true });
         await host.waitFor(`!window.__preReload && window.__cluedReady`, 20000, 'host page reloaded');
         await host.waitFor(`window.__cluedRoom?.st?.you?.host && window.__cluedRoom.st.q >= ${st.q}`, 40000, 'host resumes after refresh');
-        await j1.waitFor(`window.__cluedRoom?.st && document.querySelector('.net-link-dot')?.hidden !== false`, 40000, 'joiner reconnects to the resumed host');
+        // both joiners must be back before the next question, or a still-reconnecting one is (rightly) not waited for
+        for (const j of [j1, j2]) await j.waitFor(`window.__cluedRoom?.st && document.querySelector('.net-link-dot')?.hidden !== false && window.__cluedRoom.st.q >= ${st.q}`, 60000, `${j.name} reconnects to the resumed host`);
+        await host.waitFor(`window.__cluedRoom.st.players.every(p => p.online)`, 20000, 'host sees every joiner online again');
         console.log(`  …host refresh: room back in ${Date.now() - tr} ms`);
         const after = (await host.room()).players.map(p => `${p.name}:${p.score}`).join(',');
         ok(before.split(',').sort().join() === after.split(',').sort().join(), 'host refresh keeps the room and scores', `${before} vs ${after}`);

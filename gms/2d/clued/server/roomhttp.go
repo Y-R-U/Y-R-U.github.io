@@ -794,7 +794,6 @@ func resetPublicCache() {
 	pubCache.Unlock()
 }
 
-// handleReady: the client has the question and its media loaded (see Room.checkHold).
 // handleRename: any player (host included) changes their own name; cleaned and capped like a join name.
 func handleRename(w http.ResponseWriter, r *http.Request) {
 	if !allow(r, "join") {
@@ -822,6 +821,7 @@ func handleRename(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// handleReady: the client has the question and its media loaded (see Room.checkHold).
 func handleReady(w http.ResponseWriter, r *http.Request) {
 	if !allow(r, "answer") {
 		rateLimited(w)

@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, comparison, lcLabel, plainLabel } from './registry.js?v=202610171359';
-import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=202610171359';
-import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=202610171359';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, comparison, lcLabel, plainLabel } from './registry.js?v=202610171455';
+import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=202610171455';
+import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=202610171455';
 
 const CSS = `
 .hl-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
@@ -26,12 +26,23 @@ const CSS = `
 @media (min-width:900px) and (min-height:560px){.hl-card{min-height:240px}.hl-name{font-size:24px}.hl-val{font-size:30px}}
 `;
 
-const PASSIVE = /^(released|born|built|founded|discovered|first published|published|painted|completed|opened|written|launched|formed|invented)$/i;
+const PASSIVE = /^(released|born|built|founded|discovered|first published|published|painted|completed|opened|written|launched|formed|invented|first shown)$/i;
+// "Came to power": a past-tense verb phrase ("Did Modi come to power earlier or later?")
+const ACTIVE = { came: 'come', took: 'take', became: 'become', won: 'win', began: 'begin' };
+const activeBase = l => { const [w, ...rest] = lcLabel(l).split(' '); return ACTIVE[w] ? [ACTIVE[w], ...rest].join(' ') : null; };
 function yearQuestion(meta, b) {
   const l = String(meta.label || '').trim();
   if (/^died$/i.test(l)) return `Did ${b} die earlier or later?`;
   if (PASSIVE.test(l)) return `Was ${b} ${lcLabel(l)} earlier or later?`;
+  const base = activeBase(l);
+  if (base) return `Did ${b} ${base} earlier or later?`;
   return `${capFirst(b)}: earlier or later?`;
+}
+// "Aurangzeb came to power in 1658" / "Angela Merkel, born 1954" / "Moon landing, 1969"
+function yearFact(name, label, v) {
+  const yl = lcLabel(label);
+  if (activeBase(label)) return `${name} ${yl} in ${v}`;
+  return PASSIVE.test(yl) || yl === 'died' ? `${name}, ${yl} ${v}` : `${name}, ${v}`;
 }
 
 function make(rng, pack, key, difficulty, kids) {
@@ -54,12 +65,12 @@ function make(rng, pack, key, difficulty, kids) {
   const an = capFirst(midName(a.item, pack)), bn = midName(b.item, pack);
   const ask = year ? yearQuestion(meta, bn) : cmp ? cmp.ask(bn) : `Is ${bn} higher or lower?`;
   const prompt = year
-    ? `${a.item.name}: ${PASSIVE.test(yl) || yl === 'died' ? `${yl} ` : ''}${fmtFact(meta, va)}. ${ask}`
+    ? (activeBase(label) ? `${yearFact(a.item.name, label, fmtFact(meta, va))}. ${ask}` : `${a.item.name}: ${PASSIVE.test(yl) || yl === 'died' ? `${yl} ` : ''}${fmtFact(meta, va)}. ${ask}`)
     : cmp?.stmt ? `${cmp.stmt(an, fmtFact(meta, va))} ${ask}` : `${label}: ${an} is ${fmtFact(meta, va)}. ${ask}`;
   const pics = hasImg(a.item) && hasImg(b.item);
   return {
     format: 'hilo', id: `hilo:${key}:${a.ref}:${b.ref}`, prompt, options, answer,
-    answerText: `${options[answer].text}: ${b.item.name} is ${fmtFact(meta, vb)}`,
+    answerText: `${options[answer].text}: ${year ? yearFact(b.item.name, label, fmtFact(meta, vb)) : `${b.item.name} is ${fmtFact(meta, vb)}`}`,
     explain: `${b.item.name}: ${fmtFact(meta, vb)} · ${a.item.name}: ${fmtFact(meta, va)}`,
     refs: [a.ref, b.ref], pack: pack.id,
     data: {

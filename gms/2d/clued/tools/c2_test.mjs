@@ -92,8 +92,10 @@ export function checkPack(p) {
       const byName = new Map(items.map(i => [i.name, i]));
       for (const i of items) if (!year(f(i).year, -3000, NOW)) E(`${i.id}: year out of range`);
       for (const q of qs.filter(q => q.kind === 'order')) {
-        const ys = q.answer.map(n => byName.get(n)?.facts.year);
-        if (ys.some(y => y == null) || ys.some((y, k) => k && y < ys[k - 1])) E(`${q.id}: timeline not in order`);
+        let ys = q.answer.map(n => byName.get(n)?.facts.year);
+        // hand-written timelines (c2c_src) aren't items: their explain gives one year per answer, in order
+        if (ys.every(y => y == null)) ys = [...String(q.explain || '').matchAll(/(\d{1,4})(\s*BCE?\b)?/g)].map(m => (m[2] ? -m[1] : +m[1]));
+        if (ys.length !== q.answer.length || ys.some(y => y == null) || ys.some((y, k) => k && y < ys[k - 1])) E(`${q.id}: timeline not in order`);
       }
       break;
     }

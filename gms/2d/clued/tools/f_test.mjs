@@ -101,6 +101,11 @@ function wordingCheck(fid, q, tag) {
   }
   if (fid === 'hilo' || fid === 'order') {
     const meta = pack?.factsMeta?.[q.id.split(':')[1]];
+    // a year question names what happened in that year ("came to power"), unless the fact is just "Year"
+    if (fid === 'hilo' && meta?.type === 'year' && !/^year$/i.test(meta.label || '')) {
+      const l = String(meta.label || '').toLowerCase(), p = q.prompt.toLowerCase();
+      ok(p.includes(l) || p.includes(l.replace(/^came\b/, 'come')),`${fid} :: year prompt names its fact (${tag}) ${q.id}: ${q.prompt}`);
+    }
     if (meta && meta.type === 'num' && (/^(Bigger|Longer|Heavier|Taller|Wider|Harder|Denser)$/.test(meta.higherLabel || '') || /\bago\b/.test(meta.unit || ''))) ok(!/higher or lower|highest first/.test(q.prompt) && !/ is [\d.,]+ million years ago/.test(q.prompt), `${fid} :: size/age wording from higherLabel (${tag}) ${q.id}: ${q.prompt}`);
   }
   if (fid === 'sort' && (q.data?.bins || []).some(b => /\bor\b/i.test(b))) ok(q.prompt.includes(' / '), `${fid} :: bins containing "or" (${tag}) ${q.id}: ${q.prompt}`);

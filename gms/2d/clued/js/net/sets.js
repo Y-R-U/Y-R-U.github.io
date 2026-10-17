@@ -1,11 +1,11 @@
 // Saved sets: named online round lists (+ answer time, gap, streak), per mode, synced with the br8t account.
-import { h } from '../ui/kit.js?v=202610171359';
-import { popup, confirmPop, toast } from '../ui/popup.js?v=202610171359';
-import { read, write, KEYS } from '../core/store.js?v=202610171359';
-import { getFormat } from '../formats/registry.js?v=202610171359';
-import { roundThemes } from '../structures/rounds.js?v=202610171359';
-import { getSuggested } from './suggested.js?v=202610171359';
-import { isOn, localLabel } from '../core/local.js?v=202610171359';
+import { h } from '../ui/kit.js?v=202610171455';
+import { popup, confirmPop, toast } from '../ui/popup.js?v=202610171455';
+import { read, write, KEYS } from '../core/store.js?v=202610171455';
+import { getFormat } from '../formats/registry.js?v=202610171455';
+import { roundThemes } from '../structures/rounds.js?v=202610171455';
+import { getSuggested } from './suggested.js?v=202610171455';
+import { isOn, localLabel } from '../core/local.js?v=202610171455';
 
 export const MAX_SETS = 20;
 const total = rounds => rounds.reduce((n, r) => n + (r.count || 0), 0);
@@ -63,7 +63,7 @@ export function pickSet(kids) {
       h('small', {}, roundsLine(set)),
       h('small', {}, themesLine(set, kids))),
     del ? h('button.icon-btn', { type: 'button', 'aria-label': `Delete ${set.name}`, dataset: { act: 'set-delete' }, onclick: async () => {
-      if (!(await confirmPop('Delete this set?', `“${set.name}” will be gone for good.`, 'Delete', 'Keep', true))) return;
+      if (!(await confirmPop('Delete this set?', h('p', {}, `“${set.name}” will be gone for good.`), 'Delete', 'Keep', true))) return;
       writeSets(allSets().filter(x => !(!!x.kids === kids && sameName(x.name, set.name))));
       fill();
     } }, '✕') : null);

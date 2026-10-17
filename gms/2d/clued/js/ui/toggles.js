@@ -1,4 +1,4 @@
-import { h } from './kit.js?v=202610171359';
+import { h } from './kit.js?v=202610171455';
 
 const root = globalThis.document?.documentElement || {};
 const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;

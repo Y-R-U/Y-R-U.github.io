@@ -1,7 +1,7 @@
 // Stale-deploy guard. No build step means a page left open across a deploy can import new modules next to the
 // old ones it already holds; a failed or mixed lazy import used to make a tap silently do nothing.
-import { BUILD } from '../build.js?v=202610171359';
-import { h } from './kit.js?v=202610171359';
+import { BUILD } from '../build.js?v=202610171455';
+import { h } from './kit.js?v=202610171455';
 
 const G = globalThis.__cluedUpd || (globalThis.__cluedUpd = { armed: false, latest: null, reason: null });
 const ROOT = new URL('../../', import.meta.url).href;
@@ -10,7 +10,7 @@ const quietScreens = new Set(['home']);
 export function reloadFresh() {
   const q = new URLSearchParams(location.search);
   q.set('v', Date.now());
-  location.replace(location.pathname + '?' + q);
+  location.replace(location.pathname + '?' + q + location.hash);   // #lc= (link challenge) survives the reload
 }
 
 const canReloadQuietly = () => quietScreens.has(document.body.dataset.screen) && !document.querySelector('#popups .pop')
