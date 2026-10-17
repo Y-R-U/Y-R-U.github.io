@@ -1,5 +1,5 @@
 // Flashcard faces: what a card's front shows for any item, without ever giving the answer away. Pure (tools/cards_test.mjs).
-import { factText } from '../formats/registry.js?v=202610171251';
+import { factText } from '../formats/registry.js?v=202610171317';
 
 export const MIN_LEAK = 4;   // names shorter than this are too common as substrings to police
 export const BLANK = '____';
@@ -33,7 +33,7 @@ export function redact(text, item) {
 }
 
 const WEAK_CLUE = /\bletters?\b|first letter|starts with|begins with|ends with|\bwords? \(/i;
-const PEOPLE = new Set(['people', 'actors', 'artists', 'explorers', 'leaders', 'quotes']);
+const PEOPLE = new Set(['people', 'actors', 'artists', 'explorers', 'leaders', 'quotes', 'directors']);
 const NOUN = { books: 'book', movies: 'film', tv: 'TV show', history: 'event', sport: 'event', words: 'word', languages: 'language',
   currencies: 'currency', capitals: 'capital city', elements: 'element', inventions: 'invention', countries: 'country',
   flags: 'country', landmarks: 'landmark', paintings: 'painting', dishes: 'dish', gems: 'gemstone', space: 'space object',

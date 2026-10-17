@@ -1,0 +1,2 @@
+directors/charlie-chaplin: dropped clue leaking "char": He created the Little Tramp character.
+directors/john-ford: dropped clue leaking "john": He made many films with John Wayne.

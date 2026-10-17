@@ -1,0 +1,1138 @@
+1126 works, 12 not found on Wikidata: movies/aladdin, movies/the-lion-king-2019, movies/roman-holiday, movies/borat, movies/gravity, movies/beauty-and-the-beast-2017, movies/aladdin-2019, tv/the-great-british-bake-off, tv/britain-s-got-talent, tv/american-idol, tv/yo-soy-betty-la-fea, kids-film-tv/baby-shark-pinkfong
+
+scifi      movies:82  tv:24  books:27  movie-moments:53  tv-moments:9  book-moments:19  screen-themes:13  kids-film-tv:0
+horror     movies:25  tv:7  books:10  movie-moments:16  tv-moments:5  book-moments:6  screen-themes:7  kids-film-tv:0
+fantasy    movies:101  tv:18  books:40  movie-moments:67  tv-moments:6  book-moments:32  screen-themes:6  kids-film-tv:11
+crime      movies:94  tv:42  books:27  movie-moments:30  tv-moments:7  book-moments:8  screen-themes:11  kids-film-tv:0
+comedy     movies:164  tv:94  books:5  movie-moments:74  tv-moments:28  book-moments:3  screen-themes:7  kids-film-tv:8
+family     movies:137  tv:54  books:94  movie-moments:87  tv-moments:12  book-moments:70  screen-themes:8  kids-film-tv:21
+war        movies:27  tv:2  books:11  movie-moments:14  tv-moments:0  book-moments:2  screen-themes:1  kids-film-tv:0
+romance    movies:81  tv:9  books:30  movie-moments:38  tv-moments:1  book-moments:13  screen-themes:2  kids-film-tv:3
+superhero  movies:27  tv:3  books:0  movie-moments:9  tv-moments:0  book-moments:0  screen-themes:3  kids-film-tv:0
+
+movies/jaws                                      Q189505     [horror]  thriller film; horror film; adventure film; suspense film; science fiction horror film; survival film; science fiction film; natural horror film  {hand-scifi}
+movies/rocky                                     Q188652     []  drama film; action film; boxing film
+movies/star-wars                                 Q17738      [family,scifi]  space opera; science fiction film; action film; adventure film; coming-of-age film  {kids flag}
+movies/grease                                    Q267721     [comedy,romance]  romantic comedy; musical film; teen film  {}
+movies/moonraker                                 Q334780     [crime]  science fiction action film; adventure film; spy film; action film; speculative fiction film; thriller film  {hand-scifi}
+movies/the-empire-strikes-back                   Q181795     [family,scifi]  science fiction film; adventure film; action film; fantasy film; epic film; space opera  {kids flag; hand-fantasy}
+movies/raiders-of-the-lost-ark                   Q174284     []  action film; treasure hunt film
+movies/e-t-the-extra-terrestrial                 Q11621      [family,scifi]  science fiction film; drama film; children's film; family film  {family film; kids flag}
+movies/return-of-the-jedi                        Q181803     [family,scifi]  science fiction film; adventure film; fantasy film; action film  {kids flag; hand-fantasy}
+movies/ghostbusters                              Q108745     [comedy,fantasy,scifi]  fantasy film; comedy horror; monster film; action film; adventure film; comedy film; science fiction film; buddy film; ghost film  {hand-horror}
+movies/back-to-the-future                        Q91540      [comedy,family,scifi]  science fiction film; adventure film; comedy film; teen film; time-travel film  {kids flag}
+movies/top-gun                                   Q110138     []  action film; drama film; romance film; melodrama  {hand-romance}
+movies/fatal-attraction                          Q504157     [crime]  psychological thriller film; erotic thriller; mystery film; drama film; thriller film; erotic film  {}
+movies/rain-man                                  Q188845     []  drama film; comedy drama; buddy film
+movies/indiana-jones-and-the-last-crusade        Q185658     []  action comedy film; adventure film; treasure hunt film  {hand-comedy}
+movies/ghost                                     Q49003      [fantasy,romance]  romance film; fantasy film; drama film; ghost film  {}
+movies/terminator-2-judgment-day                 Q170564     [scifi]  action film; thriller film; science fiction film; post-apocalyptic film; dystopian film; drama film; time-travel film; science fiction action film; black comedy film; girls with guns; chase film; comedy film; cyberpunk; suspense film; adventure film; techno-thriller  {hand-comedy}
+movies/aladdin                                   —           [family,fantasy]    {kids flag; hand+family; hand+fantasy}
+movies/jurassic-park                             Q167726     [scifi]  science fiction film; adventure film; action film; thriller film  {}
+movies/the-lion-king                             Q36479      [family]  musical film; drama film; adventure film; family film  {family film; kids flag}
+movies/toy-story                                 Q171048     [comedy,family]  buddy film; fantasy film; adventure film; comedy film  {kids flag; hand-fantasy}
+movies/independence-day                          Q105387     [scifi]  adventure science fiction; thriller film; alien invasion; disaster film; science fiction film; adventure film; action film  {}
+movies/titanic                                   Q44578      [romance]  disaster film; drama film; romance film; flashback film; melodrama; historical film; epic film  {}
+movies/armageddon                                Q208344     [scifi]  action film; science fiction film; adventure film; disaster film; drama film; speculative fiction film  {}
+movies/star-wars-episode-i-the-phantom-menace    Q165713     [family,scifi]  science fiction film; action film; adventure film; fantasy film  {kids flag; hand-fantasy}
+movies/mission-impossible-2                      Q505790     [crime]  action film; thriller film; spy film  {}
+movies/harry-potter-and-the-philosopher-s-stone  Q102438     [family,fantasy]  fantasy film; adventure film; speculative fiction film; children's film  {kids flag}
+movies/the-lord-of-the-rings-the-two-towers      Q164963     [fantasy]  fantasy film; adventure film; action film  {}
+movies/the-lord-of-the-rings-the-return-of-the-king Q131074     [fantasy]  fantasy film; adventure film  {}
+movies/shrek-2                                   Q485983     [comedy,family,fantasy]  action film; fantasy film; comedy film; fantasy comedy; adventure film; family film; cinematic fairy tale  {family film; kids flag}
+movies/harry-potter-and-the-goblet-of-fire       Q102225     [family,fantasy]  fantasy film; children's film; adventure film  {}
+movies/pirates-of-the-caribbean-dead-man-s-chest Q161087     [fantasy]  fantasy film; swashbuckler film; treasure hunt film; comedy film; action film; adventure film; pirate film  {hand-comedy}
+movies/pirates-of-the-caribbean-at-world-s-end   Q54274      [fantasy]  fantasy film; comedy drama; swashbuckler film; comedy film; action film; epic film; adventure film; pirate film  {hand-comedy}
+movies/the-dark-knight                           Q163872     [crime,superhero]  action film; neo-noir; crime thriller film; crime film; superhero film; drama film; thriller film  {}
+movies/avatar                                    Q24871      [scifi]  science fiction film; action film; adventure film; military science fiction; live-action/animated film; epic film; white savior film  {hand-family}
+movies/toy-story-3                               Q187278     [comedy,family]  buddy film; comedy drama; comedy film; flashback film  {kids flag}
+movies/harry-potter-and-the-deathly-hallows-part-2 Q232009     [fantasy]  fantasy film; adventure film  {}
+movies/the-avengers                              Q182218     [scifi,superhero]  action film; science fiction film; crossover fiction; superhero film; speculative fiction film; adventure film  {}
+movies/frozen                                    Q246283     [family,fantasy]  comedy drama; musical film; comedy film; coming-of-age film; fantasy film; family film; cinematic fairy tale  {family film; kids flag; hand-comedy}
+movies/transformers-age-of-extinction            Q6151665    [scifi]  science fiction film; action film; comedy film  {hand-comedy}
+movies/star-wars-the-force-awakens               Q6074       [scifi]  science fiction film; adventure film; action film; fantasy film; space opera; speculative fiction film  {hand-fantasy}
+movies/captain-america-civil-war                 Q18407657   [scifi,superhero]  superhero film; science fiction film; action film; adventure film  {}
+movies/star-wars-the-last-jedi                   Q18486021   [scifi]  science fiction film; space opera; adventure film; action film; fantasy film  {hand-fantasy}
+movies/avengers-infinity-war                     Q23780914   [scifi,superhero]  superhero film; science fiction film; action film; adventure film  {}
+movies/avengers-endgame                          Q23781155   [superhero]  superhero film; action film; adventure film  {}
+movies/demon-slayer-kimetsu-no-yaiba-the-movie-mugen-train Q96376192   [fantasy]  anime film; dark fantasy; action film  {}
+movies/spider-man-no-way-home                    Q68934496   [scifi,superhero]  superhero film; action film; adventure film; science fiction film; technofantasy  {hand-fantasy}
+movies/avatar-the-way-of-water                   Q3604746    [scifi]  science fiction film; action film; adventure film; drama film; epic film  {}
+movies/barbie                                    Q55436290   [comedy,family,fantasy]  romantic comedy film; adventure film; comedy film; family film; teen film; fantasy film; musical film; romance film; musical comedy; fantasy comedy film; chick flick; satirical film  {family film; hand-romance}
+movies/inside-out-2                              Q113877606  [family]  coming-of-age film; comedy drama  {kids flag}
+movies/ne-zha-2                                  Q131937861  [family,fantasy]  adventure film; action film; drama film; fantasy film  {}
+movies/superman                                  Q213053     [family,scifi,superhero]  action film; science fiction film; superhero film  {kids flag}
+movies/the-godfather                             Q47703      [crime]  epic film; gangster film; crime film; drama film; crime drama film; historical film; historical drama film; suspense film; crime thriller film; police procedural film; thriller film  {}
+movies/smokey-and-the-bandit                     Q521948     [comedy]  action film; adventure film; comedy film  {}
+movies/animal-house                              Q960125     [comedy]  comedy film  {}
+movies/close-encounters-of-the-third-kind        Q320588     [scifi]  science fiction film; adventure film; drama film; speculative fiction film; thriller film  {}
+movies/kramer-vs-kramer                          Q193577     []  drama film
+movies/enter-the-dragon                          Q331617     []  action film; thriller film; martial arts film
+movies/batman                                    Q116852     [crime,superhero]  neo-noir; action film; superhero film  {}
+movies/indiana-jones-and-the-temple-of-doom      Q179215     []  action film; adventure film; treasure hunt film
+movies/forrest-gump                              Q134773     [comedy,romance]  coming-of-age film; flashback film; comedy film; drama film; historical drama; romantic comedy film; tragicomedy; American football film  {}
+movies/the-sixth-sense                           Q183063     [horror]  horror film; thriller film; drama film; ghost film; psychological thriller film; psychological horror film; mystery film; psychological drama film; suspense film  {hand-crime}
+movies/the-lost-world-jurassic-park              Q200873     [scifi]  science fiction film; adventure film; action film  {}
+movies/men-in-black                              Q51416      [comedy,scifi]  action film; science fiction film; buddy film; buddy cop film; comedy film  {}
+movies/harry-potter-and-the-order-of-the-phoenix Q102235     [family,fantasy]  fantasy film; family film  {family film}
+movies/harry-potter-and-the-half-blood-prince    Q161687     [fantasy]  fantasy film  {}
+movies/jurassic-world                            Q3512046    [scifi]  science fiction film; adventure film; action film  {}
+movies/the-lion-king-2019                        —           [family]    {kids flag; hand+family}
+movies/furious-7                                 Q14650496   [crime]  thriller film; action film; comedy film; drama film; heist film  {hand-comedy}
+movies/frozen-ii                                 Q24733929   [family,fantasy]  family film; fantasy film; adventure film; drama film; musical film  {family film; kids flag}
+movies/avengers-age-of-ultron                    Q14171368   [scifi,superhero]  science fiction film; superhero film  {}
+movies/black-panther                             Q23780734   [scifi,superhero]  superhero film; action film; adventure film; science fiction film  {}
+movies/zootopia-2                                Q116764712  [comedy,family]  comedy film; adventure film; buddy cop film; family film  {family film; kids flag}
+movies/top-gun-maverick                          Q31202708   []  action film; drama film; adventure film
+movies/avatar-fire-and-ash                       Q29580929   [scifi]  action film; science fiction film  {}
+movies/the-super-mario-bros-movie                Q108671102  [comedy,family,fantasy]  comedy film; adventure film; fantasy film  {kids flag}
+movies/deadpool-and-wolverine                    Q102180106  [comedy,scifi,superhero]  superhero film; action film; black comedy film; science fiction film; splatter film  {hand-horror}
+movies/king-kong                                 Q309048     [fantasy]  speculative fiction film; kaiju; adventure film; horror film; fantasy film; drama film; science fiction film  {hand-scifi; hand-horror}
+movies/snow-white-and-the-seven-dwarfs           Q134430     [family,fantasy]  romance film; fantasy film; musical film; cinematic fairy tale  {kids flag; hand-romance}
+movies/the-wizard-of-oz                          Q193695     [family,fantasy]  fantasy film; musical film; adventure film; family film; drama film; cinematic fairy tale  {family film; kids flag}
+movies/gone-with-the-wind                        Q2875       [romance,war]  romance film; drama film; historical film; war film; melodrama  {}
+movies/pinocchio                                 Q4341553    [family,fantasy]  fantasy film; buddy film; musical film; coming-of-age film; cinematic fairy tale  {kids flag}
+movies/citizen-kane                              Q24815      []  drama film; fiction film; flashback film; biographical film; mystery film  {hand-crime}
+movies/dumbo                                     Q40895      [family,fantasy]  buddy film; musical film; fantasy film; family film; musical play; melodrama  {family film; kids flag}
+movies/bambi                                     Q43051      [family,fantasy]  musical film; coming-of-age film; children's film; fantasy film; drama film  {kids flag}
+movies/casablanca                                Q132689     [romance]  romance film; war film; drama film; flashback film; film noir  {hand-crime; hand-war}
+movies/it-s-a-wonderful-life                     Q204191     [fantasy,romance]  romantic comedy film; fantasy film; drama film; flashback film; comedy film; Christmas film  {hand-comedy}
+movies/bicycle-thieves                           Q172837     []  drama film; art film
+movies/the-third-man                             Q271830     [crime]  film noir; mystery film; drama film; thriller film; adventure film  {}
+movies/cinderella                                Q191753     [family,fantasy,romance]  romance film; fantasy film; musical film; family film; cinematic fairy tale; musical play; melodrama  {family film; kids flag}
+movies/sunset-boulevard                          Q193570     [crime]  drama film; flashback film; film noir  {}
+movies/rashomon                                  Q135465     [crime]  drama film; crime film; flashback film; samurai cinema; medieval film  {}
+movies/all-about-eve                             Q200299     []  drama film; comedy film  {hand-comedy}
+movies/a-streetcar-named-desire                  Q212129     []  drama film
+movies/singin-in-the-rain                        Q309153     [comedy,romance]  romantic comedy film; musical film; comedy film  {}
+movies/high-noon                                 Q245208     []  Western film; revisionist Western  {}
+movies/peter-pan                                 Q270470     [family,fantasy]  fantasy film; musical film; traditionally animated film; pirate film; children's film; cinematic fairy tale  {kids flag}
+movies/roman-holiday                             —           [comedy,romance]    {hand+romance; hand+comedy}
+movies/tokyo-story                               Q26060      []  drama film
+movies/on-the-waterfront                         Q211372     [crime]  drama film; crime film; thriller film  {}
+movies/seven-samurai                             Q189540     []  drama film; samurai cinema; epic film; action film; historical drama; adventure film
+movies/rear-window                               Q34414      [crime]  crime film; mystery film; thriller film; detective film; drama film; crime thriller film; crime drama film; psychological drama film; psychological thriller film  {}
+movies/godzilla                                  Q860461     [scifi]  horror film; science fiction film; action film; kaiju  {hand-horror}
+movies/lady-and-the-tramp                        Q172284     [family,fantasy,romance]  romantic comedy film; musical film; fantasy film; traditionally animated film  {kids flag; hand-comedy}
+movies/rebel-without-a-cause                     Q426346     []  teen film; coming-of-age film; drama film
+movies/pather-panchali                           Q622380     []  drama film; coming-of-age film
+movies/the-searchers                             Q276769     []  Western film; drama film; war film  {hand-war}
+movies/around-the-world-in-80-days               Q696057     []  adventure film; action comedy film; fantasy film  {hand-fantasy; hand-comedy}
+movies/the-seventh-seal                          Q217189     [fantasy]  fantasy film; drama film; historical film  {}
+movies/the-bridge-on-the-river-kwai              Q188718     [war]  drama film; war film  {}
+movies/mother-india                              Q1411238    []  drama film
+movies/vertigo                                   Q202548     [crime,romance]  mystery film; thriller film; drama film; romance film; psychological thriller film; psychological drama film; melodrama  {}
+movies/ben-hur                                   Q180098     []  epic film; drama film; action film; sword-and-sandal film
+movies/north-by-northwest                        Q223139     [crime]  crime film; thriller film; mystery film; spy film; action film; crime drama film; adventure film; drama film; crime thriller film  {}
+movies/some-like-it-hot                          Q190086     [comedy,romance]  romantic comedy film; LGBTQ-related film; crime film; musical film; screwball comedy film; drama film; gangster film  {hand-crime}
+movies/sleeping-beauty                           Q215617     [family,fantasy]  fantasy film; musical film; family film; cinematic fairy tale  {family film; kids flag}
+movies/the-400-blows                             Q162331     []  drama film; crime film  {hand-crime}
+movies/psycho                                    Q163038     [crime,horror]  thriller film; slasher film; mystery film; psychological horror film; film noir; suspense film; psychological drama film; psychological thriller film; horror film; crime film; crime drama film; crime thriller film; LGBTQ-related film; independent film; drama film  {}
+movies/the-apartment                             Q270510     [comedy,romance]  romantic comedy film; drama film; Christmas film  {}
+movies/spartacus                                 Q108297     [war]  drama film; romance film; historical film; war film; biographical film; epic film; action film; sword-and-sandal film; historical drama film  {hand-romance}
+movies/la-dolce-vita                             Q18407      []  comedy film; drama film  {hand-comedy}
+movies/breathless                                Q86427      [crime]  drama film; crime film  {}
+movies/one-hundred-and-one-dalmatians            Q165512     [family]  musical film; comedy film; adventure film; crime film; drama film; fantasy film  {kids flag; hand-fantasy; hand-crime; hand-comedy}
+movies/breakfast-at-tiffany-s                    Q193066     [comedy,romance]  romantic comedy film; drama film  {}
+movies/west-side-story                           Q273704     [romance]  musical film; romance film; drama film; crime film  {hand-crime}
+movies/lawrence-of-arabia                        Q228186     [war]  war film; biographical film; drama film; adventure film; flashback film; epic film  {}
+movies/to-kill-a-mockingbird                     Q177922     [crime]  drama film; trial film; crime film  {}
+movies/dr-no                                     Q102754     [crime]  spy film; action film; adventure film; thriller film  {}
+movies/8                                         Q12018      []  comedy drama; drama film; fantasy film  {hand-fantasy}
+movies/the-great-escape                          Q110354     [war]  war film; drama film; adventure film; thriller film; historical film  {}
+movies/goldfinger                                Q106440     [crime]  action film; spy film  {}
+movies/mary-poppins                              Q209170     [comedy,family,fantasy]  fantasy film; musical film; comedy film; family film; live-action/animated film  {family film; kids flag}
+movies/my-fair-lady                              Q201215     [comedy,romance]  musical film; romance film; drama film; romantic comedy film  {}
+movies/dr-strangelove                            Q105702     [comedy,war]  black comedy film; comedy film; war film  {}
+movies/a-fistful-of-dollars                      Q76479      []  Spaghetti Western; Western film; action film  {}
+movies/the-sound-of-music                        Q60072      [family,romance]  musical film; biographical film; drama film; romance film  {kids flag}
+movies/doctor-zhivago                            Q323827     [romance,war]  romance film; drama film; war film; melodrama  {}
+movies/the-good-the-bad-and-the-ugly             Q41483      []  Spaghetti Western; treasure hunt film; war film; drama film; Western film; action film; epic film  {hand-war}
+movies/the-jungle-book                           Q199839     [comedy,family]  musical film; comedy film  {kids flag}
+movies/the-graduate                              Q217627     [comedy,romance]  comedy drama; coming-of-age film; drama film; romantic comedy film; independent film  {}
+movies/bonnie-and-clyde                          Q181776     [crime]  drama film; crime film; biographical film; action film  {}
+movies/in-the-heat-of-the-night                  Q622240     [crime]  crime film; drama film; buddy cop film; mystery film  {}
+movies/2001-a-space-odyssey                      Q103474     [scifi]  space adventure film; mystery film; epic film; arthouse science fiction film  {hand-crime}
+movies/planet-of-the-apes                        Q59534      [scifi]  science fiction film; speculative fiction film; dystopian film  {}
+movies/chitty-chitty-bang-bang                   Q1637791    [comedy,family,fantasy]  fantasy film; musical film; children's film; comedy film  {kids flag}
+movies/oliver                                    Q141359     [family]  musical film; drama film; crime film  {kids flag; hand-crime}
+movies/once-upon-a-time-in-the-west              Q168154     []  Spaghetti Western; flashback film; drama film; action film; melodrama; Western film; epic film  {}
+movies/butch-cassidy-and-the-sundance-kid        Q232000     []  buddy film; comedy drama; Western film; biographical film  {}
+movies/the-italian-job                           Q1051032    [comedy,crime]  crime comedy film; heist film; action comedy film  {}
+movies/midnight-cowboy                           Q61696      []  buddy film; drama film; LGBTQ-related film
+movies/easy-rider                                Q503638     []  drama film; road movie
+movies/the-railway-children                      Q211525     [family]  children's film; drama film  {kids flag}
+movies/willy-wonka-and-the-chocolate-factory     Q936327     [family,fantasy]  fantasy film; musical film; children's film; family film; drama film  {family film; kids flag}
+movies/a-clockwork-orange                        Q181086     [crime,scifi]  drama film; crime film; dystopian film; thriller film; prison film; mystery film; speculative fiction film; science fiction film; arthouse science fiction film; black comedy film; crime drama film; crime thriller film; action film; satirical film; crime comedy film; exploitation film; comedy drama  {hand-comedy}
+movies/the-french-connection                     Q220735     [crime]  crime film; action film; crime thriller film; drama film; thriller film; crime drama film; neo-noir; action thriller; chase film; buddy cop film; mystery film; suspense film; detective film; police procedural film  {}
+movies/fiddler-on-the-roof                       Q934036     []  comedy drama; musical film; drama film
+movies/cabaret                                   Q918363     []  musical film; LGBTQ-related film; drama film
+movies/the-sting                                 Q62665      [comedy,crime]  heist film; buddy film; comedy film; drama film  {}
+movies/the-exorcist                              Q274167     [horror]  horror film; satanic film; mystery film; drama film; supernatural horror film; thriller film  {hand-crime}
+movies/robin-hood                                Q19090      [family]  musical film; buddy film; fantasy film; family film; comedy film  {family film; kids flag; hand-fantasy; hand-comedy}
+movies/the-wicker-man                            Q1140649    [crime,horror]  horror film; mystery film; drama film; dystopian film; crime film  {}
+movies/the-godfather-part-ii                     Q184768     [crime]  drama film; crime film; flashback film; epic film; crime thriller film; crime drama film; gangster film; historical film; historical drama film; thriller film; suspense film; mystery film; police procedural film; action film  {}
+movies/chinatown                                 Q644987     [crime]  neo-noir; mystery film; film noir; crime thriller film; drama film  {}
+movies/sholay                                    Q949228     []  action film; buddy film; musical film; Western film; drama film; comedy film; adventure film; romance film; Masala film  {hand-romance; hand-comedy}
+movies/one-flew-over-the-cuckoo-s-nest           Q171669     []  comedy film; medical drama; prison film  {hand-crime; hand-comedy}
+movies/monty-python-and-the-holy-grail           Q25043      [comedy,fantasy]  fantasy film; adventure film; period drama film; comedy film; parody film; knight film  {}
+movies/the-rocky-horror-picture-show             Q751921     [horror,scifi]  musical film; comedy horror; horror film; erotic thriller; science fiction film; LGBTQ-related film  {hand-comedy}
+movies/picnic-at-hanging-rock                    Q1421747    [crime]  drama film; mystery film; coming-of-age film  {}
+movies/taxi-driver                               Q47221      [crime]  neo-noir; psychological drama film; crime film; film noir; action film; crime drama film; crime thriller film; psychological thriller film; police procedural film; suspense film; vigilante film; drama film; thriller film  {}
+movies/network                                   Q572165     [comedy]  comedy drama; drama film; comedy film; black comedy film; satirical film; romantic comedy film  {hand-romance}
+movies/storm-boy                                 Q958772     [family]  drama film  {kids flag}
+movies/annie-hall                                Q233464     [comedy,romance]  romantic comedy; comedy film; drama film  {}
+movies/saturday-night-fever                      Q47654      []  drama film; coming-of-age film; music-themed film
+movies/halloween                                 Q221103     [horror]  horror film; slasher film; teen film; drama film; crime thriller film; crime film; crime drama film; mystery film; independent film; thriller film; teen horror film  {hand-crime}
+movies/the-deer-hunter                           Q201674     [war]  war film; drama film; anti-war film; war drama; epic film  {}
+movies/drunken-master                            Q838514     [comedy]  action comedy film; martial arts film  {}
+movies/alien                                     Q103569     [horror,scifi]  horror film; science fiction film; thriller film; body horror film; science fiction horror film; adventure film; fantasy film; mystery film; suspense film; action film; monster film; girls with guns; science fiction action film  {hand-fantasy; hand-crime}
+movies/apocalypse-now                            Q182692     [war]  war film; action film; drama film; thriller film; epic film; war drama; horror film; psychological horror film; psychological thriller film; adventure film; psychological drama film; satirical film  {hand-horror; hand-crime}
+movies/mad-max                                   Q248775     []  action film; thriller film; vigilante film; dystopian film
+movies/life-of-brian                             Q24953      [comedy]  comedy film; religious satire; parody film  {}
+movies/stalker                                   Q200437     [scifi]  science fiction film; art film; drama film; arthouse science fiction film  {}
+movies/the-shining                               Q186341     [horror]  horror film; psychological horror film; drama film; mystery film; ghost film; supernatural horror film; thriller film; psychological thriller film; psychological drama film; suspense film  {hand-crime}
+movies/airplane                                  Q497256     [comedy]  comedy film; parody film; disaster film; slapstick; romantic comedy film  {hand-romance}
+movies/the-blues-brothers                        Q109767     [comedy]  musical film; comedy film  {}
+movies/raging-bull                               Q220780     []  biographical film; drama film; boxing film; historical film; historical drama film; action film; sport film; neo-noir; period drama film  {hand-crime}
+movies/the-gods-must-be-crazy                    Q647665     [comedy]  comedy film; road movie; adventure film; action film  {}
+movies/breaker-morant                            Q1195774    []  trial film  {hand-crime}
+movies/mad-max-2                                 Q1125262    []  action film; adventure film; thriller film; road movie; dystopian film
+movies/gallipoli                                 Q1077160    [war]  historical film; war film  {}
+movies/chariots-of-fire                          Q207921     []  biographical film; sport film; drama film; historical film
+movies/das-boot                                  Q62730      [war]  drama film; historical film; war film; submarine film  {}
+movies/gandhi                                    Q202211     []  biographical film; flashback film; drama film; historical drama
+movies/blade-runner                              Q184843     [crime,scifi]  tech noir; cyberpunk; thriller film; neo-noir; dystopian film; film noir; science fiction film; drama film; action film; crime film; crime drama film; crime thriller film  {}
+movies/first-blood                               Q244963     []  action thriller; drama film; war film; action film  {hand-war}
+movies/tootsie                                   Q221249     [comedy,romance]  romantic comedy film; comedy drama; LGBTQ-related film; satirical film  {}
+movies/the-man-from-snowy-river                  Q2259533    []  Western film; adventure film; Australian Western  {}
+movies/scarface                                  Q47075      [crime]  gangster film; drama film; crime film; thriller film; crime thriller film; crime drama film; suspense film; police procedural film; neo-noir; action film; epic film  {}
+movies/terms-of-endearment                       Q185071     [romance]  romantic comedy film; drama film; comedy drama  {hand-comedy}
+movies/the-terminator                            Q162255     [scifi]  action film; science fiction film; cyberpunk; dystopian film; thriller film; chase film; time-travel film; horror film; fantasy film; science fiction horror film; post-apocalyptic film; science fiction action film; tech-noir film; adventure film; independent film; drama film; suspense film; techno-thriller  {hand-horror; hand-fantasy}
+movies/the-karate-kid                            Q846679     [family]  romance film; drama film; teen film; martial arts film; coming-of-age film; action film  {kids flag; hand-romance}
+movies/amadeus                                   Q190956     []  biographical film; musical film; drama film; flashback film; period drama film
+movies/gremlins                                  Q241958     [comedy,family]  monster film; comedy horror film; Christmas film  {kids flag; family≠horror}
+movies/a-nightmare-on-elm-street                 Q329434     [horror]  horror film; teen film; slasher film; supernatural horror film; thriller film; splatter film; suspense film; crime film; fantasy film; exploitation film; crime thriller film; psychological drama film; crime drama film; psychological thriller film; drama film; independent film; teen horror film; supernatural film; ghost film  {hand-fantasy; hand-crime}
+movies/the-neverending-story                     Q316555     [family,fantasy]  fantasy film; children's film; drama film; sword and sorcery film  {kids flag}
+movies/footloose                                 Q627533     [romance]  romance film; musical film; drama film; teen film; coming-of-age film; dance film  {}
+movies/police-story                              Q594033     [comedy,crime]  action comedy film; martial arts film; crime film; police film  {}
+movies/the-breakfast-club                        Q499152     []  teen film; comedy drama; coming-of-age film; drama film
+movies/the-goonies                               Q636043     [comedy,family]  adventure film; comedy film; children's film; treasure hunt film; action film; pirate film; family film  {family film; kids flag}
+movies/out-of-africa                             Q208266     [romance]  biographical film; drama film; romance film; adventure film  {}
+movies/ran                                       Q565231     [war]  war film; drama film  {}
+movies/ferris-bueller-s-day-off                  Q498906     [comedy]  teen film; coming-of-age film; comedy film  {}
+movies/aliens                                    Q104814     [horror,scifi]  action film; horror film; thriller film; science fiction horror film; adventure film; science fiction film; monster film; suspense film; war film; science fiction action film  {hand-war}
+movies/platoon                                   Q190643     [war]  war film; drama film; action film  {}
+movies/crocodile-dundee                          Q615254     [comedy,romance]  adventure film; romantic comedy film  {}
+movies/stand-by-me                               Q494722     []  teen film; coming-of-age film; adventure film; comedy film; drama film  {hand-comedy}
+movies/jean-de-florette                          Q1315577    []  drama film
+movies/dirty-dancing                             Q253978     [romance]  romance film; musical film; drama film; teen film; dance film  {}
+movies/the-princess-bride                        Q506418     [comedy,family,fantasy,romance]  romantic comedy film; fantasy film; pirate film; swashbuckler film; sword and sorcery film; cinematic fairy tale  {kids flag}
+movies/lethal-weapon                             Q462447     [crime]  crime film; action film; thriller film; buddy film; buddy cop film; Christmas film  {}
+movies/predator                                  Q200804     [scifi]  action film; science fiction film; horror film; thriller film; suspense film; science fiction horror film; adventure film; monster film; science fiction action film  {hand-horror}
+movies/robocop                                   Q372514     [scifi]  action film; science fiction film; superhero film; dystopian film; speculative fiction film; thriller film; splatter film; cyberpunk  {hand-horror; hand-superhero}
+movies/the-last-emperor                          Q212775     []  drama film; biographical film; historical film; epic film
+movies/wings-of-desire                           Q156911     [fantasy]  fantasy film; drama film  {}
+movies/die-hard                                  Q105598     [crime]  action film; action thriller; Christmas film; heist film  {}
+movies/who-framed-roger-rabbit                   Q379873     [comedy,crime,family,fantasy]  neo-noir; buddy film; crossover fiction; fantasy film; live-action/animated film; comedy film  {kids flag}
+movies/big                                       Q858467     [comedy,fantasy,romance]  romantic comedy film; coming-of-age film; fantasy film; drama film  {}
+movies/beetlejuice                               Q320384     [comedy,fantasy,horror]  comedy horror; fantasy film; ghost film; Gothic film; dark fantasy  {}
+movies/a-fish-called-wanda                       Q466186     [comedy,crime]  heist film; crime comedy film; black comedy film  {}
+movies/my-neighbor-totoro                        Q39571      [family,fantasy]  fantasy film; drama anime and manga; fantasy anime and manga; children's film; supernatural anime  {kids flag}
+movies/akira                                     Q1905968    [scifi]  science fiction film; cyberpunk; post-apocalyptic film; dystopian film; action film; science fiction anime  {}
+movies/grave-of-the-fireflies                    Q274520     [war]  drama anime and manga; drama film; flashback film; coming-of-age film; anti-war film; ghost film  {}
+movies/cinema-paradiso                           Q464032     []  coming-of-age film; drama film
+movies/crocodile-dundee-ii                       Q1140745    [comedy]  comedy film; action film; adventure film  {}
+movies/back-to-the-future-part-ii                Q109331     [comedy,scifi]  science fiction film; teen film; comedy film; time-travel film; dystopian film  {}
+movies/driving-miss-daisy                        Q211373     []  buddy film; comedy film; drama film  {hand-comedy}
+movies/when-harry-met-sally                      Q471169     [comedy,romance]  romantic comedy; Christmas film; comedy film  {}
+movies/the-little-mermaid                        Q190135     [family,fantasy,romance]  romance film; musical film; fantasy film; children's film; melodrama; cinematic fairy tale  {kids flag}
+movies/dead-poets-society                        Q106316     []  coming-of-age film; drama film; teen film
+movies/honey-i-shrunk-the-kids                   Q1426248    [comedy,family,scifi]  science fiction comedy; science fiction film; comedy film  {kids flag}
+movies/kiki-s-delivery-service                   Q196602     [family,fantasy]  fantasy film; children's film; coming-of-age film  {kids flag}
+movies/my-left-foot                              Q746574     []  drama film; biographical film; film based on a book
+movies/home-alone                                Q105031     [comedy,family]  comedy film; family film; adventure film; Christmas film  {family film; kids flag}
+movies/pretty-woman                              Q207954     [comedy,romance]  romantic comedy film; romance film  {}
+movies/goodfellas                                Q42047      [crime]  biographical film; gangster film; crime thriller film; crime film; thriller film; historical drama film; police procedural film; crime drama film; drama film; period drama film; historical film; suspense film  {}
+movies/dances-with-wolves                        Q20456      []  drama film; war film; Western film; adventure film; white savior film  {hand-war}
+movies/edward-scissorhands                       Q217182     [fantasy,romance]  romance film; fantasy film; drama film; Christmas film; cinematic fairy tale  {}
+movies/the-silence-of-the-lambs                  Q133654     [crime,horror]  thriller film; horror film; psychological horror film; psychological thriller film; crime film; drama film; police procedural film; crime thriller film; crime drama film; psychological drama film; LGBTQ-related film  {}
+movies/beauty-and-the-beast                      Q179673     [family,fantasy,romance]  romance film; musical film; comedy drama; cinematic fairy tale; romantic fantasy  {kids flag}
+movies/thelma-and-louise                         Q658041     [crime]  female buddy film; girls with guns; comedy drama; crime film; road movie; adventure film  {}
+movies/the-commitments                           Q644065     [comedy]  musical film; drama film; comedy film  {}
+movies/raise-the-red-lantern                     Q665146     [romance]  romantic drama film; historical film  {}
+movies/unforgiven                                Q104137     [crime]  Western film; drama film; crime film  {}
+movies/reservoir-dogs                            Q72962      [crime]  heist film; thriller film; crime film; drama film; gangster film; crime thriller film; crime drama film; action film; suspense film; crime comedy film; adventure film; black comedy film; psychological drama film; mystery film; independent film; flashback film; neo-noir; comedy drama; psychological thriller film  {hand-comedy}
+movies/sister-act                                Q776302     [comedy]  musical film; comedy film  {}
+movies/the-bodyguard                             Q725946     [crime,romance]  romance film; drama film; thriller film; crime film  {}
+movies/wayne-s-world                             Q1146194    [comedy]  buddy film; comedy film; musical film  {}
+movies/strictly-ballroom                         Q1346439    [comedy,romance]  romantic comedy; sport film; dance film  {}
+movies/schindler-s-list                          Q483941     [war]  anti-war film; biographical film; drama film; historical film; war drama; historical drama film; war film; epic film; psychological drama film  {}
+movies/mrs-doubtfire                             Q483852     [comedy,family]  comedy drama; screwball comedy film; LGBTQ-related film; drama film  {kids flag}
+movies/groundhog-day                             Q488655     [comedy,fantasy,romance]  comedy film; romance film; comedy drama; fantasy film; romantic comedy; science fiction film; melodrama; magic realist film  {hand-scifi}
+movies/sleepless-in-seattle                      Q107167     [comedy,romance]  romantic comedy film; comedy drama; drama film  {}
+movies/the-nightmare-before-christmas            Q322328     [comedy,family,fantasy]  musical film; monster film; Christmas film; fantasy film; dark fantasy; comedy film  {kids flag}
+movies/free-willy                                Q473628     [family]  drama film; adventure film; family film  {family film; kids flag}
+movies/farewell-my-concubine                     Q696413     [romance]  drama film; romance film; historical film  {}
+movies/pulp-fiction                              Q104123     [crime]  independent film; crime film; crime drama film; drama film; crime thriller film; action film; thriller film; suspense film; black comedy film; crime comedy film; action thriller; comedy drama; comedy film; neo-noir; gangster film  {hand-comedy}
+movies/the-shawshank-redemption                  Q172241     [crime]  drama film; buddy film; prison film; crime film  {}
+movies/speed                                     Q108006     [crime]  action thriller; action film; adventure film; crime film  {}
+movies/four-weddings-and-a-funeral               Q901213     [comedy,romance]  romantic comedy film; drama film  {}
+movies/the-mask                                  Q219421     [comedy,fantasy,superhero]  fantasy film; superhero film; comedy film; speculative fiction film; gangster film  {hand-crime}
+movies/dumb-and-dumber                           Q462418     [comedy]  buddy film; comedy film; road movie  {}
+movies/ace-ventura-pet-detective                 Q340138     [comedy]  comedy film; action film; LGBTQ-related film; American football film  {}
+movies/leon-the-professional                     Q484675     [crime]  crime thriller film; buddy film; gangster film; drama film; mystery film; action film; crime film  {}
+movies/the-adventures-of-priscilla-queen-of-the-desert Q255328     []  buddy film; comedy drama; LGBTQ-related film; transgender film; road movie
+movies/muriel-s-wedding                          Q1348275    [comedy,romance]  romantic comedy; drama film  {}
+movies/once-were-warriors                        Q919579     []  drama film
+movies/heavenly-creatures                        Q322206     [crime]  drama film; crime film; biographical film; thriller film; coming-of-age film; LGBTQ-related film  {}
+movies/chungking-express                         Q766263     [crime,romance]  comedy drama; romance film; crime film  {}
+movies/braveheart                                Q162729     [war]  biographical film; drama film; war film; action film; medieval film  {}
+movies/babe                                      Q720724     [comedy,family]  comedy film; drama film  {kids flag}
+movies/apollo-13                                 Q106428     []  docudrama; adventure film; drama film; survival film; disaster film; historical film
+movies/jumanji                                   Q222939     [comedy,family,fantasy]  fantasy film; comedy film; action film; adventure film  {kids flag}
+movies/se7en                                     Q190908     [crime]  crime film; mystery film; buddy cop film; drama film; thriller film; detective film; suspense film; psychological horror film; crime drama film; action film; crime thriller film; psychological thriller film; psychological drama film; independent film; chase film; police procedural film; horror film; neo-noir  {hand-horror}
+movies/the-usual-suspects                        Q132351     [crime]  heist film; neo-noir; mystery film; flashback film; thriller film; drama film; action film; detective film; crime drama film; crime thriller film; gangster film; suspense film  {}
+movies/clueless                                  Q931165     [comedy,romance]  romantic comedy film; teen film; coming-of-age film; LGBTQ-related film; comedy film  {}
+movies/pocahontas                                Q218894     [family,fantasy,romance]  romance film; biographical film; musical film; comedy drama; fantasy film; family film; historical drama; adventure film  {family film; kids flag}
+movies/dilwale-dulhania-le-jayenge               Q849343     [comedy,romance]  drama film; romance film; coming-of-age film; comedy drama; comedy film; musical film  {}
+movies/la-haine                                  Q466101     [crime]  drama film; hood film; crime film  {}
+movies/trainspotting                             Q109135     [crime]  buddy film; crime film; drama film; independent film; magic realist film  {}
+movies/fargo                                     Q222720     [crime]  crime film; drama film; neo-noir; black comedy film; thriller film; police procedural film; crime thriller film; crime drama film; comedy film; suspense film; action film; mystery film; film noir; comedy drama  {hand-comedy}
+movies/jerry-maguire                             Q329131     [romance]  romance film; comedy film; drama film; American football film; sport film  {hand-comedy}
+movies/twister                                   Q683663     []  disaster film; drama film; action film
+movies/space-jam                                 Q207659     [comedy,family]  crossover fiction; children's film; comedy film; fantasy film; sport film; live-action/animated film  {kids flag; hand-fantasy}
+movies/scream                                    Q27411      [crime,horror]  horror film; slasher film; teen film; comedy film; mystery film  {hand-comedy}
+movies/mission-impossible                        Q1741232    [crime]  heist film; action film; thriller film; spy film  {}
+movies/the-english-patient                       Q63026      [romance,war]  romance film; war film; drama film; flashback film; spy film  {hand-crime}
+movies/shine                                     Q826494     []  musical film; biographical film; drama film; romance film  {hand-romance}
+movies/the-full-monty                            Q775970     [comedy]  comedy drama; comedy film; LGBTQ-related film  {}
+movies/good-will-hunting                         Q193835     []  romance film; coming-of-age film; drama film  {hand-romance}
+movies/life-is-beautiful                         Q19355      [comedy]  comedy film; drama film  {}
+movies/austin-powers-international-man-of-mystery Q501703     [comedy]  spy film; parody film; crime film  {hand-crime}
+movies/princess-mononoke                         Q186572     [fantasy]  fantasy film; fantasy anime; action film; anime film; drama film; coming-of-age film; anti-war film  {hand-war}
+movies/the-castle                                Q2471493    []  trial film  {hand-crime}
+movies/the-fifth-element                         Q106506     [comedy,scifi]  science fiction film; adventure film; comedy film; action film; fantasy film; dystopian film  {hand-fantasy}
+movies/saving-private-ryan                       Q165817     [war]  war film; drama film; action film  {}
+movies/shakespeare-in-love                       Q182944     [comedy,romance]  romantic comedy film; comedy drama; drama film; biographical film  {}
+movies/the-truman-show                           Q214801     [comedy,scifi]  science fiction film; comedy film; drama film; tragicomedy; dystopian film; dystopian fiction  {}
+movies/mulan                                     Q537407     [family,fantasy]  musical film; fantasy film; adventure film; martial arts film; comedy drama; family film  {family film; kids flag}
+movies/lock-stock-and-two-smoking-barrels        Q851095     [comedy,crime]  heist film; black comedy film; crime comedy film  {}
+movies/rush-hour                                 Q255342     []  action film; buddy cop film; martial arts film
+movies/run-lola-run                              Q468697     [crime]  drama film; thriller film; crime film; experimental film  {}
+movies/kuch-kuch-hota-hai                        Q623336     [comedy,romance]  drama film; romance film; coming-of-age film; comedy drama; comedy film  {}
+movies/ringu                                     Q531328     [fantasy,horror]  horror film; fantasy film; Japanese horror; thriller film; ghost film; supernatural film  {}
+movies/central-station                           Q1054036    []  drama film
+movies/the-matrix                                Q83495      [scifi]  thriller film; dystopian film; cyberpunk; action thriller; post-apocalyptic film; science fiction film; action film; film noir; superhero film  {hand-crime; hand-superhero}
+movies/notting-hill                              Q200672     [comedy,romance]  romantic comedy film; comedy drama  {}
+movies/american-beauty                           Q25139      []  black comedy film; comedy drama; drama film; flashback film; LGBTQ-related film  {hand-comedy}
+movies/fight-club                                Q190050     [crime]  flashback film; drama film; thriller film; psychological thriller  {}
+movies/toy-story-2                               Q187266     [comedy,family]  buddy film; flashback film; fantasy film; comedy film  {kids flag; hand-fantasy}
+movies/the-mummy                                 Q202508     [comedy,fantasy]  horror film; fantasy film; treasure hunt film; action film; comedy film  {hand-horror}
+movies/tarzan                                    Q208696     [family]  comedy drama; musical film; adventure film; family film; drama fiction  {family film; kids flag}
+movies/the-iron-giant                            Q867283     [family,scifi]  action film; science fiction film; comedy drama; fantasy film; children's film; drama film; adventure film  {kids flag; hand-fantasy}
+movies/stuart-little                             Q1048958    [comedy,family]  comedy film; family film  {family film; kids flag}
+movies/all-about-my-mother                       Q329805     []  comedy drama; transgender film
+movies/gladiator                                 Q128518     []  sword-and-sandal film; melodrama; action film; drama film; adventure film; epic film; historical film; historical drama film
+movies/cast-away                                 Q213411     []  adventure film; drama film; robinsonade
+movies/chicken-run                               Q156401     [comedy,family]  fantasy film; children's film; family film; comedy film  {family film; kids flag; hand-fantasy}
+movies/crouching-tiger-hidden-dragon             Q273978     [fantasy,romance]  romance film; fantasy film; martial arts film; action film; adventure film; drama film  {}
+movies/meet-the-parents                          Q623724     [comedy]  romantic comedy film; comedy film  {hand-romance}
+movies/billy-elliot                              Q458629     []  coming-of-age film; comedy drama; drama film
+movies/snatch                                    Q335160     [crime]  crime comedy film; boxing film  {}
+movies/in-the-mood-for-love                      Q1056853    [romance]  romance film; drama film  {}
+movies/amores-perros                             Q474098     []  drama film; thriller film; independent film; flashback film
+movies/the-dish                                  Q1410845    []  comedy drama
+movies/shrek                                     Q483815     [family,fantasy]  fantasy film; buddy film; fantasy comedy; adventure film; cinematic fairy tale  {kids flag}
+movies/monsters-inc                              Q187726     [comedy,family,fantasy]  buddy film; children's film; monster film; fantasy film; comedy film  {kids flag}
+movies/amelie                                    Q484048     [comedy,romance]  romantic comedy film; comedy film; drama film; magic realist film  {}
+movies/spirited-away                             Q155653     [family,fantasy]  fantasy film; fantasy anime and manga; children's film; coming-of-age film; isekai; drama film; supernatural anime  {kids flag}
+movies/the-lord-of-the-rings-the-fellowship-of-the-ring Q127367     [fantasy]  fantasy film; adventure film; action film; high fantasy  {}
+movies/ocean-s-eleven                            Q205447     [comedy,crime]  heist film; comedy film; mystery film; adventure film; action film  {}
+movies/moulin-rouge                              Q193573     [romance]  romance film; musical film; drama film; melodrama; dance film  {}
+movies/a-beautiful-mind                          Q164103     []  biographical film; drama film
+movies/bridget-jones-s-diary                     Q752313     [comedy,romance]  romantic comedy film; Christmas film; comedy film  {}
+movies/legally-blonde                            Q500093     [comedy]  comedy film  {}
+movies/lagaan                                    Q843949     [romance]  musical film; drama film; romance film  {}
+movies/kabhi-khushi-kabhie-gham                  Q466443     [comedy,romance]  musical film; romance film; comedy film; drama film  {}
+movies/y-tu-mama-tambien                         Q128848     [comedy,romance]  drama film; coming-of-age film; comedy film; LGBTQ-related film; romance film  {}
+movies/the-fast-and-the-furious                  Q155476     [crime]  action film; crime film; thriller film  {}
+movies/ice-age                                   Q305250     [comedy,family]  fantasy film; children's film; adventure film; family film; comedy film  {family film; kids flag; hand-fantasy}
+movies/spider-man                                Q484442     [scifi,superhero]  science fiction film; drama film; coming-of-age film; superhero film; action film  {}
+movies/lilo-and-stitch                           Q36092      [comedy,family,scifi]  buddy film; comedy drama; science fiction film; comedy film  {kids flag}
+movies/chicago                                   Q189889     [crime]  musical film; comedy drama; prison film; drama film; comedy film; detective film  {hand-comedy}
+movies/harry-potter-and-the-chamber-of-secrets   Q102244     [family,fantasy]  fantasy film; adventure film; children's film  {kids flag}
+movies/star-wars-episode-ii-attack-of-the-clones Q181069     [scifi]  science fiction film; action film; adventure film; fantasy film  {hand-fantasy}
+movies/the-bourne-identity                       Q105624     [crime]  spy film; action thriller; action film; thriller film; mystery film; political thriller film  {}
+movies/hero                                      Q260379     []  martial arts film; action film; drama film
+movies/city-of-god                               Q220741     [crime]  drama film; crime film; coming-of-age film; hood film  {}
+movies/28-days-later                             Q221075     [horror,scifi]  horror film; zombie film; post-apocalyptic film; dystopian film; science fiction horror film; science fiction film; independent film; action film; drama film  {}
+movies/bend-it-like-beckham                      Q369492     [comedy]  romantic comedy; female buddy film; comedy drama; teen film; coming-of-age film; LGBTQ-related film; association football film  {hand-romance}
+movies/rabbit-proof-fence                        Q1142799    []  drama film; adventure film; biographical film; historical film
+movies/whale-rider                               Q19393      [family]  drama film; family film; coming-of-age film  {family film; kids flag}
+movies/infernal-affairs                          Q714057     [crime]  crime film; drama film; police film; thriller film; action film  {}
+movies/finding-nemo                              Q132863     [comedy,family]  adventure film; family film; comedy film; children's film  {family film; kids flag}
+movies/pirates-of-the-caribbean-the-curse-of-the-black-pearl Q46717      [comedy,family,fantasy]  fantasy film; swashbuckler film; treasure hunt film; comedy film; action film; adventure film; pirate film  {kids flag}
+movies/love-actually                             Q190588     [comedy,romance]  romantic comedy film; Christmas film; tragicomedy  {}
+movies/elf                                       Q949879     [comedy,family,fantasy]  comedy film; fantasy film; Christmas film; family film  {family film; kids flag}
+movies/kill-bill-volume-1                        Q165325     []  action thriller; girls with guns; martial arts film; wuxia film; vigilante film; samurai cinema; crime film; action film; thriller film; crime drama film; crime thriller film; drama film; splatter film; neo-noir  {hand-horror; hand-fantasy; hand-crime}
+movies/school-of-rock                            Q820753     [comedy,family]  musical film; comedy film  {kids flag}
+movies/oldboy                                    Q475693     [crime]  drama film; thriller film; mystery film; action film  {}
+movies/good-bye-lenin                            Q154817     [comedy]  drama film; coming-of-age film; comedy film  {}
+movies/johnny-english                            Q337881     [comedy,crime]  action film; spy film; parody film  {}
+movies/calendar-girls                            Q83789      [comedy]  comedy film; drama film  {}
+movies/ong-bak-muay-thai-warrior                 Q831437     [crime]  action film; thriller film; martial arts film; crime film  {}
+movies/the-incredibles                           Q213326     [comedy,family,superhero]  superhero film; action film; comedy film; family film  {family film; kids flag}
+movies/mean-girls                                Q631103     [comedy]  teen film; romantic comedy film; LGBTQ-related film; comedy film  {hand-romance}
+movies/million-dollar-baby                       Q184255     []  buddy film; drama film; boxing film
+movies/harry-potter-and-the-prisoner-of-azkaban  Q102448     [family,fantasy]  fantasy film; children's film; werewolf film; time-travel film; adventure film  {kids flag; hand-scifi; family≠horror}
+movies/the-notebook                              Q223374     [romance]  romance film; drama film; coming-of-age film  {}
+movies/anchorman-the-legend-of-ron-burgundy      Q467076     [comedy]  comedy film  {}
+movies/the-polar-express                         Q862197     [family,fantasy]  fantasy film; Christmas film; adventure film; children's film; family film  {family film; kids flag}
+movies/howl-s-moving-castle                      Q29011      [family,fantasy]  fantasy film; fantasy anime and manga; adventure film; science fiction film; drama film; anti-war film  {kids flag; hand-scifi; hand-war}
+movies/kung-fu-hustle                            Q470759     [comedy]  action comedy film; parody film; martial arts film  {}
+movies/house-of-flying-daggers                   Q369388     [fantasy,romance]  fantasy film; martial arts film; action film; romance film; drama film; adventure film; wuxia  {}
+movies/downfall                                  Q152857     [war]  biographical film; war film; drama film; historical film  {}
+movies/shaun-of-the-dead                         Q858724     [comedy,horror]  romantic comedy; horror film; buddy film; comedy film; parody film; zombie film; zombie comedy  {hand-romance}
+movies/madagascar                                Q174555     [comedy,family]  buddy film; children's film; adventure film; comedy film; survival film  {kids flag}
+movies/charlie-and-the-chocolate-factory         Q218235     [comedy,family,fantasy]  family film; fantasy film; black comedy film; musical film  {family film; kids flag}
+movies/batman-begins                             Q166262     [crime,superhero]  action film; neo-noir; crime film; drama film; crime thriller film; superhero film; adventure film; ninja film  {}
+movies/brokeback-mountain                        Q160618     [romance]  romance film; drama film; LGBTQ-related film  {}
+movies/star-wars-episode-iii-revenge-of-the-sith Q42051      [scifi]  science fiction film; action film; adventure film; fantasy film; dystopian film; space opera; epic film  {hand-fantasy}
+movies/crash                                     Q188000     [crime]  drama film; crime film  {}
+movies/wallace-and-gromit-the-curse-of-the-were-rabbit Q318428     [comedy,family]  fantasy film; children's film; comedy film; mystery film; buddy film; family film  {family film; kids flag; hand-fantasy; hand-crime}
+movies/tsotsi                                    Q626215     [crime]  drama film; crime film  {}
+movies/the-world-s-fastest-indian                Q128924     []  biographical film; road movie; drama film; LGBTQ-related film
+movies/wolf-creek                                Q1633106    [horror]  horror film; slasher film  {}
+movies/casino-royale                             Q151904     [crime]  spy film; action film; adventure film; crime film; thriller film  {}
+movies/happy-feet                                Q126800     [comedy,family]  buddy film; musical film; comedy film; family film; adventure film; live-action/animated film  {family film; kids flag}
+movies/cars                                      Q182153     [comedy,family]  comedy film; buddy film; flashback film  {kids flag}
+movies/the-departed                              Q172975     [crime]  crime thriller film; drama film; crime film; thriller film; gangster film; crime drama film; mystery film; suspense film; epic film; neo-noir  {}
+movies/pan-s-labyrinth                           Q216006     [fantasy]  fantasy film; drama film; war film; teen film  {hand-war}
+movies/borat                                     —           [comedy]    {hand+comedy}
+movies/night-at-the-museum                       Q387601     [comedy,family,fantasy]  fantasy film; action comedy film  {kids flag}
+movies/the-devil-wears-prada                     Q223316     []  comedy drama; drama film
+movies/the-lives-of-others                       Q153882     [crime]  drama film; thriller film; political thriller film  {}
+movies/the-host                                  Q488222     [horror,scifi]  horror film; science fiction film; kaiju; comedy film; drama film  {hand-comedy}
+movies/ratatouille                               Q170035     [family]  buddy film; coming-of-age film; flashback film; comedy drama  {kids flag}
+movies/no-country-for-old-men                    Q183081     [crime]  thriller film; Western film; drama film; contemporary Western film; crime drama film; adventure film; neo-noir; mystery film; psychological thriller film; suspense film; crime film; action film; crime thriller film; psychological drama film; gangster film  {}
+movies/the-simpsons-movie                        Q182254     [comedy,family]  comedy film; adventure film; action film  {kids flag}
+movies/hot-fuzz                                  Q729788     [comedy,crime]  crime film; action film; buddy film; parody film; comedy film  {}
+movies/atonement                                 Q1626186    [romance,war]  drama film; war film; romance film  {}
+movies/mr-bean-s-holiday                         Q330332     [comedy,family]  comedy film; slapstick; family film; road movie  {family film; kids flag}
+movies/taare-zameen-par                          Q1043614    [family]  drama film; children's film; musical film  {kids flag}
+movies/once                                      Q137754     []  musical film
+movies/the-orphanage                             Q923911     [horror]  horror film; drama film  {}
+movies/wall-e                                    Q104905     [comedy,family,romance,scifi]  romantic comedy film; post-apocalyptic film; science fiction comedy; adventure film; flashback film; children's film; romance film; dystopian film; adventure science fiction; science fiction film; comedy film  {kids flag}
+movies/iron-man                                  Q192724     [scifi,superhero]  action film; science fiction film; adventure film; superhero film  {}
+movies/kung-fu-panda                             Q129193     [comedy,family]  flashback film; action film; comedy film; adventure film; kung fu film; family film; wuxia  {family film; kids flag; hand-fantasy}
+movies/mamma-mia                                 Q188850     [comedy,romance]  romantic comedy; musical film; musical comedy  {}
+movies/slumdog-millionaire                       Q125076     [romance]  romance film; drama film; coming-of-age film; crime film  {hand-crime}
+movies/twilight                                  Q160071     [fantasy,romance]  romance film; teen film; vampire film; drama film; action film; melodrama; fantasy film  {hand-horror}
+movies/taken                                     Q277080     [crime]  action film; vigilante film; thriller film; crime film  {}
+movies/the-hurt-locker                           Q183066     [war]  action thriller; war film; independent film; drama film; action film  {}
+movies/ponyo                                     Q236728     [family,fantasy]  fantasy film; children's film; adventure film  {kids flag}
+movies/let-the-right-one-in                      Q144756     [fantasy,horror,romance]  horror film; vampire film; drama film; fantasy film; romance film  {}
+movies/departures                                Q1044598    []  drama film; musical film
+movies/up                                        Q174811     [comedy,family,fantasy]  adventure film; comedy film; fantasy film  {kids flag}
+movies/the-hangover                              Q219315     [comedy]  comedy film  {}
+movies/inglourious-basterds                      Q153723     [war]  war film; alternate history film; drama film; adventure film; comedy film; black comedy film; parody film; war drama; action film; suspense film; historical film; historical drama film; comedy drama; epic film; thriller film; period drama film; action comedy film; political satire  {hand-comedy}
+movies/district-9                                Q201819     [scifi]  thriller film; science fiction film; action film; drama film; dystopian film; biopunk; adventure film; suspense film; horror film; independent film; action thriller; science fiction action film; science fiction horror film; mockumentary  {hand-horror; hand-comedy}
+movies/3-idiots                                  Q229633     [comedy]  comedy drama; buddy film; comedy film; musical film; drama film; romance film  {hand-romance}
+movies/cloudy-with-a-chance-of-meatballs         Q637169     [comedy,family,scifi]  disaster film; comedy film; fantasy film; teen film; flashback film; family film; science fiction comedy  {family film; kids flag; hand-fantasy}
+movies/coraline                                  Q632668     [family,fantasy]  horror film; fantasy film; cinematic fairy tale; family film; stitchpunk; thriller film; ghost film; dark fantasy  {family film; kids flag; hand-scifi; family≠horror}
+movies/the-girl-with-the-dragon-tattoo           Q276343     [crime]  thriller film; drama film; crime film  {}
+movies/the-secret-in-their-eyes                  Q748851     [crime]  crime film; drama film; thriller film; romance film; melodrama; detective film  {hand-romance}
+movies/inception                                 Q25188      [crime,scifi]  heist film; science fiction film; thriller film; science fiction action film; adventure film; drama film; mystery film; action film  {}
+movies/the-king-s-speech                         Q160060     []  biographical film; drama film; historical film
+movies/despicable-me                             Q4447       [comedy,family]  comedy film; family film  {family film; kids flag}
+movies/how-to-train-your-dragon                  Q373096     [family,fantasy]  fantasy film; children's film; adventure film; comedy film; medieval film; action film; family film; monster film  {family film; kids flag; hand-comedy}
+movies/tangled                                   Q188439     [comedy,family]  musical film; cinematic fairy tale; comedy film; coming-of-age film  {kids flag}
+movies/the-social-network                        Q185888     []  biographical film; trial film; drama film  {hand-crime}
+movies/alice-in-wonderland                       Q174385     [family,fantasy]  fantasy film; cinematic fairy tale  {kids flag}
+movies/harry-potter-and-the-deathly-hallows-part-1 Q161678     [fantasy]  fantasy film; adventure film; action film  {}
+movies/animal-kingdom                            Q1144983    [crime]  drama film; crime film; thriller film  {}
+movies/boy                                       Q659671     []  coming-of-age film; comedy drama
+movies/incendies                                 Q1212650    []  drama film; mystery film  {hand-crime}
+movies/the-artist                                Q171861     [comedy,romance]  romantic comedy film; drama film; romance film; comedy drama; comedy film; silent film  {}
+movies/bridesmaids                               Q837264     [comedy]  female buddy film; romantic comedy film  {hand-romance}
+movies/the-intouchables                          Q595        [comedy]  comedy film; biographical film; drama film  {}
+movies/a-separation                              Q640561     []  drama film
+movies/rio                                       Q223359     [comedy,family]  fantasy film; musical film; family film; adventure film; comedy film  {family film; kids flag; hand-fantasy}
+movies/red-dog                                   Q2135949    [comedy,family]  drama film; comedy film  {kids flag}
+movies/the-raid                                  Q1573662    [crime]  action film; martial arts film; crime film  {}
+movies/the-hunger-games                          Q212965     [scifi]  science fiction film; adventure film; psychological thriller film; dystopian film; post-apocalyptic film; drama film; action film; fantasy film  {hand-fantasy; hand-crime}
+movies/skyfall                                   Q4941       [crime]  action thriller; spy film; action film  {}
+movies/life-of-pi                                Q152780     []  fantasy film; drama film; adventure film; magic realist film; survival film  {hand-fantasy}
+movies/les-miserables                            Q28234      []  musical film; drama film; romance film  {hand-romance}
+movies/django-unchained                          Q571032     []  revisionist Western; Western film; action film; blaxploitation film; historical drama film; historical film; comedy drama; drama film  {}
+movies/argo                                      Q59653      [crime]  political thriller film; drama film; biographical film; thriller film; historical film  {}
+movies/brave                                     Q126796     [family,fantasy]  fantasy film; comedy drama; coming-of-age film  {kids flag}
+movies/wreck-it-ralph                            Q28891      [comedy,family,fantasy]  fantasy film; comedy film; crossover fiction; comedy drama; science fiction film; family film; adventure film  {family film; kids flag; hand-scifi}
+movies/hotel-transylvania                        Q249967     [comedy,family]  comedy horror film; monster film; vampire film; zombie film; werewolf film; family film  {family film; kids flag; family≠horror}
+movies/the-hobbit-an-unexpected-journey          Q80379      [fantasy]  fantasy film; adventure film; action film  {}
+movies/the-dark-knight-rises                     Q189330     [crime,superhero]  superhero film; action film; crime thriller film; thriller film; drama film  {}
+movies/amour                                     Q637820     []  drama film
+movies/the-sapphires                             Q2715076    [comedy]  biographical film; musical film; comedy drama; comedy film  {}
+movies/gravity                                   —           [scifi]    {hand+scifi}
+movies/12-years-a-slave                          Q3023357    []  drama film; biographical film
+movies/the-wolf-of-wall-street                   Q1392744    [comedy,crime]  black comedy film; biographical film; crime film; drama film; crime drama film; comedy film; comedy drama; epic film  {}
+movies/despicable-me-2                           Q637212     [comedy,family]  comedy film; adventure film; science fiction film; family film  {family film; kids flag; hand-scifi}
+movies/iron-man-3                                Q209538     [scifi,superhero]  science fiction film; superhero film; action film; adventure film; comedy film  {hand-comedy}
+movies/the-great-gatsby                          Q892735     [romance]  romance film; drama film; historical film  {}
+movies/interstellar                              Q13417189   [scifi]  science fiction film; adventure film; dystopian film; drama film; time-travel film; thriller film; hard science fiction  {}
+movies/guardians-of-the-galaxy                   Q5887360    [comedy,scifi,superhero]  science fiction film; superhero film; comedy film; crime film  {hand-crime}
+movies/paddington                                Q15055478   [comedy,family]  comedy film; family film; teen film  {family film; kids flag}
+movies/birdman                                   Q13255497   [comedy]  comedy film; drama film; black comedy; tragicomedy  {}
+movies/the-grand-budapest-hotel                  Q3521099    [comedy,crime]  comedy film; drama film; adventure film; romance film; crime film; tragicomedy  {hand-romance}
+movies/whiplash                                  Q15648198   []  musical film; drama film
+movies/big-hero-6                                Q13091172   [family,scifi]  teen film; science fiction film; fantasy film; buddy film; action film  {kids flag; hand-fantasy}
+movies/the-lego-movie                            Q2608065    [comedy,family,fantasy]  comedy film; crossover fiction; teen film; dystopian film; action film; fantasy film; adventure film; family film; live-action/animated film  {family film; kids flag}
+movies/john-wick                                 Q15732802   [crime]  action film; thriller film; crime thriller film  {}
+movies/kingsman-the-secret-service               Q15068238   [comedy,crime]  spy film; action film; comedy film; action comedy film; crime film  {}
+movies/what-we-do-in-the-shadows                 Q17036671   [comedy,horror]  comedy horror; vampire film; mockumentary; horror film; comedy film  {}
+movies/the-babadook                              Q16011764   [horror]  horror film; drama film  {}
+movies/wild-tales                                Q16672466   [comedy]  comedy drama; thriller film; black comedy film; anthology film  {}
+movies/pk                                        Q7117022    [comedy]  drama film; comedy film; speculative fiction film; musical film  {}
+movies/mad-max-fury-road                         Q1757288    [scifi]  action film; adventure film; science fiction film; dystopian film; post-apocalyptic film  {}
+movies/inside-out                                Q6144664    [comedy,family,fantasy]  comedy film; fantasy film; family film; adventure film; drama film; comedy drama; children's film  {family film; kids flag}
+movies/the-martian                               Q18547944   [scifi]  science fiction film; survival film; adventure film; drama film; action film  {}
+movies/spotlight                                 Q18154496   []  drama film; biographical film
+movies/the-revenant                              Q18002795   []  Western film; survival film; thriller film; drama film; biographical film  {}
+movies/minions                                   Q13619743   [comedy,family]  comedy film; children's film; heist film  {kids flag; hand-crime}
+movies/son-of-saul                               Q19816400   [war]  drama film; war film  {}
+movies/brooklyn                                  Q16954098   []  drama film; melodrama
+movies/zootopia                                  Q15270647   [comedy,family]  action comedy film; adventure film; family film; comedy film; detective film; buddy cop film  {family film; kids flag; hand-crime}
+movies/moana                                     Q18647981   [family]  comedy film; musical film; adventure film; comedy drama; action film  {kids flag; hand-comedy}
+movies/la-la-land                                Q20856802   [romance]  romance film; comedy drama; comedy film; musical film; drama film; dance film  {hand-comedy}
+movies/moonlight                                 Q21527875   []  drama film; LGBTQ-related film; coming-of-age film
+movies/finding-dory                              Q9321426    [comedy,family]  comedy film; adventure film; flashback film; family film; comedy drama  {family film; kids flag}
+movies/rogue-one                                 Q19590955   [scifi]  space opera; fantasy film; action film; science fiction film; war film  {hand-fantasy; hand-war}
+movies/deadpool                                  Q19347291   [comedy,superhero]  action film; superhero film; black comedy film; erotic film  {}
+movies/lion                                      Q23013699   []  drama film; biographical film
+movies/hunt-for-the-wilderpeople                 Q22236109   [comedy,family]  adventure film; comedy film; drama film  {kids flag}
+movies/train-to-busan                            Q20948236   [horror,scifi]  zombie film; horror film; action film; thriller film; apocalyptic film  {}
+movies/your-name                                 Q21697406   [fantasy,romance]  coming-of-age film; time-travel film; romance film; fantasy film  {hand-scifi}
+movies/dangal                                    Q20762668   []  drama film; sport film
+movies/sing                                      Q20762698   [comedy,family]  musical film; comedy film; family film; drama film  {family film; kids flag}
+movies/trolls                                    Q7845294    [family,fantasy]  fantasy film  {kids flag}
+movies/hacksaw-ridge                             Q21010856   [war]  biographical film; drama film; war film  {}
+movies/the-handmaiden                            Q20444585   [romance]  drama film; romance film; LGBTQ-related film; erotic thriller  {}
+movies/wonder-woman                              Q20502242   [fantasy,superhero]  superhero film; action film; adventure film; drama film; war film; fantasy film  {hand-war}
+movies/get-out                                   Q25136235   [horror]  horror film; mystery film; comedy horror; thriller film  {hand-crime; hand-comedy}
+movies/coco                                      Q5815826    [family,fantasy]  musical film; fantasy film; adventure film; detective film; family film; drama film; comedy film; melodrama; ghost film  {family film; kids flag; hand-crime; hand-comedy}
+movies/dunkirk                                   Q21935651   [war]  drama film; war film; historical film  {}
+movies/the-shape-of-water                        Q26698156   [fantasy,romance]  thriller film; fantasy film; drama film; romance film; magic realist film; melodrama  {}
+movies/the-greatest-showman                      Q27942936   [romance]  biographical film; drama film; musical film; romance film  {}
+movies/paddington-2                              Q27590871   [comedy,family]  family film; comedy film; adventure film  {family film; kids flag}
+movies/thor-ragnarok                             Q22665878   [comedy,fantasy,scifi,superhero]  superhero film; science fiction film; fantasy film; action film; adventure film; comedy film  {}
+movies/despicable-me-3                           Q22997984   [comedy,family]  comedy film  {kids flag}
+movies/beauty-and-the-beast-2017                 —           [family,fantasy,romance]    {kids flag; hand+family; hand+fantasy; hand+romance}
+movies/the-fate-of-the-furious                   Q19829521   [crime]  action film; crime film  {}
+movies/baahubali-2-the-conclusion                Q21001674   [fantasy]  drama film; action film; fantasy film  {}
+movies/wolf-warrior-2                            Q27964540   []  action film; thriller film
+movies/a-fantastic-woman                         Q28127580   []  drama film; LGBTQ-related film
+movies/bohemian-rhapsody                         Q27894574   []  biographical film; drama film; musical film; LGBTQ-related film
+movies/a-star-is-born                            Q3286391    [romance]  musical film; romantic drama; romance film  {}
+movies/crazy-rich-asians                         Q29588623   [comedy,romance]  drama film; romantic comedy film  {}
+movies/green-book                                Q48673898   []  comedy drama; comedy film; biographical film; drama film; LGBTQ-related film; road movie  {hand-comedy}
+movies/incredibles-2                             Q24832112   [comedy,family,superhero]  action film; comedy film; adventure film; superhero film  {kids flag}
+movies/jurassic-world-fallen-kingdom             Q21877685   [scifi]  science fiction film; adventure film; action film  {}
+movies/aquaman                                   Q22998395   [fantasy,scifi,superhero]  action film; adventure film; superhero film; science fiction film; fantasy film  {}
+movies/spider-man-into-the-spider-verse          Q29588607   [comedy,family,scifi,superhero]  action film; adventure film; science fiction film; superhero film; drama film; comedy film  {kids flag}
+movies/roma                                      Q27959455   []  drama film
+movies/shoplifters                               Q48765577   []  drama film
+movies/capernaum                                 Q51803319   []  drama film
+movies/cold-war                                  Q51834363   [romance]  drama film; romance film  {}
+movies/peter-rabbit                              Q27964337   [comedy,family]  adventure film; comedy film; live-action/animated film; family film; fantasy film  {family film; kids flag; hand-fantasy}
+movies/joker                                     Q42759035   [crime]  crime film; thriller film; drama film; psychological thriller film  {}
+movies/parasite                                  Q61448040   []  comedy drama; black comedy; thriller film  {hand-comedy}
+movies/1917                                      Q62721520   [war]  war film; drama film  {}
+movies/knives-out                                Q57982486   [comedy,crime]  thriller film; crime film; mystery film; drama film; comedy film  {}
+movies/toy-story-4                               Q18517638   [comedy,family]  children's film; comedy film; adventure film; fantasy film; action film  {kids flag; hand-fantasy}
+movies/captain-marvel                            Q23781129   [scifi,superhero]  superhero film; science fiction film; action film; adventure film  {}
+movies/spider-man-far-from-home                  Q27985819   [scifi,superhero]  action film; adventure film; science fiction film; superhero film; speculative fiction film  {}
+movies/aladdin-2019                              —           [family,fantasy]    {kids flag; hand+family; hand+fantasy}
+movies/star-wars-the-rise-of-skywalker           Q20977110   [scifi]  space opera; fantasy film; action film; adventure film  {hand-fantasy}
+movies/portrait-of-a-lady-on-fire                Q63246568   [romance]  historical film; drama film; romance film; LGBTQ-related film  {}
+movies/the-wandering-earth                       Q57966215   [scifi]  science fiction film; disaster film; post-apocalyptic film  {}
+movies/soul                                      Q64744044   [family,fantasy]  adventure film; fantasy film; comedy drama; ghost film  {kids flag}
+movies/nomadland                                 Q61740820   []  drama film; road movie
+movies/another-round                             Q69303989   []  comedy film; drama film  {hand-comedy}
+movies/encanto                                   Q103372692  [family,fantasy]  fantasy film; musical film  {kids flag}
+movies/dune                                      Q60834962   [scifi]  science fiction film; action film; adventure film; speculative fiction film  {}
+movies/coda                                      Q104686893  []  comedy drama; musical film
+movies/luca                                      Q97925311   [comedy,family,fantasy]  comedy film; adventure film; fantasy film; buddy film; triathlon films; coming-of-age film; family film  {family film; kids flag}
+movies/drive-my-car                              Q107107865  []  drama film
+movies/everything-everywhere-all-at-once         Q83808444   [scifi]  science fiction film; action film; comedy drama; absurdist fiction; martial arts film; psychedelic film  {}
+movies/rrr                                       Q60424165   []  action film
+movies/turning-red                               Q104845027  [comedy,family,fantasy]  adventure film; comedy film; animated film; fantasy film; family film  {family film; kids flag}
+movies/elvis                                     Q84362533   []  biographical film; musical film; drama film; gambling film
+movies/all-quiet-on-the-western-front            Q108837349  [war]  war film; drama film; historical film  {}
+movies/the-banshees-of-inisherin                 Q108314506  [comedy]  comedy film; drama film; black comedy; tragicomedy  {}
+movies/jurassic-world-dominion                   Q55178974   [scifi]  action film; adventure film; science fiction film; fantasy film; biopunk; thriller film  {hand-fantasy}
+movies/oppenheimer                               Q108839994  []  historical film; biographical film; thriller film; epic film; drama film
+movies/anatomy-of-a-fall                         Q117037697  [crime]  thriller film; crime film; drama film; trial film  {}
+movies/the-boy-and-the-heron                     Q47482560   [family,fantasy]  adventure film; drama film; fantasy film  {kids flag}
+movies/dune-part-two                             Q109228991  [scifi]  science fiction film; action film; adventure film; speculative fiction film; epic film  {}
+movies/wicked                                    Q24797403   [family,fantasy]  fantasy film; musical film; cinematic fairy tale  {kids flag}
+movies/anora                                     Q123185887  []  comedy drama
+movies/moana-2                                   Q124457266  [family,fantasy]  musical film; fantasy film; adventure film; family film  {family film; kids flag}
+movies/the-wild-robot                            Q124378349  [family,scifi]  science fiction film; adventure film; drama film  {kids flag}
+movies/kpop-demon-hunters                        Q130268157  [family,fantasy]  musical film; fantasy film; action film  {kids flag}
+tv/doctor-who                                    Q34316      [family,scifi]  science fiction television series; action television series; time-travel fiction; adventure television series; drama television series  {kids flag}
+tv/the-simpsons                                  Q886        [comedy,family]  animated sitcom; satire; black comedy  {}
+tv/friends                                       Q79784      [comedy,romance]  comedy television series; romance television series; sitcom  {}
+tv/star-trek                                     Q1077       [scifi]  adventure television series; science fiction television series  {}
+tv/sesame-street                                 Q155629     [family]  sketch comedy; children's television series; educational television; puppet show; educational entertainment  {kids flag; hand-comedy}
+tv/coronation-street                             Q945030     []  soap opera
+tv/eastenders                                    Q607514     []  soap opera; drama television series
+tv/neighbours                                    Q908708     []  soap opera
+tv/game-of-thrones                               Q23572      [fantasy]  action television series; adventure television series; fantasy television series; drama television series  {}
+tv/breaking-bad                                  Q1079       [crime]  crime television series; drama television series; thriller television series; black comedy television series; contemporary Western film  {hand-comedy}
+tv/the-office-us                                 Q23831      [comedy]  sitcom; mockumentary  {}
+tv/seinfeld                                      Q23733      [comedy]  sitcom  {}
+tv/fawlty-towers                                 Q212731     [comedy]  sitcom  {}
+tv/only-fools-and-horses                         Q1247858    [comedy]  sitcom  {}
+tv/blue-peter                                    Q1247639    [family]  children's television  {kids flag}
+tv/top-gear                                      Q3040066    []  automotive television show
+tv/the-x-files                                   Q2744       [horror,scifi]  science fiction television series; thriller television series; horror television series; supernatural fiction  {}
+tv/mr-bean                                       Q484020     [comedy,family]  sitcom; physical comedy; family film; comedy film  {family film; kids flag}
+tv/thomas-and-friends                            Q501663     [family]  children's television series; fantasy television series  {kids flag; hand-fantasy}
+tv/peppa-pig                                     Q938985     [comedy,family]  children's television series; comedy television series; educational television  {kids flag}
+tv/spongebob-squarepants                         Q83279      [comedy,family]  animated sitcom; comedy television series; fantasy television series; adventure television series; science fiction television series  {kids flag; hand-scifi; hand-fantasy}
+tv/stranger-things                               Q19798734   [fantasy,horror,scifi]  science fiction television series; horror television series; drama television series; fantasy television series; youth series; coming-of-age television program  {}
+tv/the-crown                                     Q20707362   []  drama television series; historical television series
+tv/downton-abbey                                 Q83071      []  historical drama; drama television series; historical television series
+tv/sherlock                                      Q192837     [crime]  crime television series; detective television series; drama television series  {}
+tv/lost                                          Q23567      [scifi]  science fiction television series; drama television series; adventure television series; thriller television series  {}
+tv/the-sopranos                                  Q23628      [crime]  crime television series; drama television series  {}
+tv/twin-peaks                                    Q2085       [crime,horror]  drama television series; thriller television series; horror television series; crime television series; surrealist television series; mystery television series  {}
+tv/m-a-s-h                                       Q494244     [comedy,war]  medical drama; comedy television program; war film; black comedy; comedy drama  {}
+tv/i-love-lucy                                   Q181943     [comedy]  comedy television series; sitcom  {}
+tv/the-muppet-show                               Q2120540    [comedy,family]  comedy television series; puppetry; sketch comedy; variety show  {kids flag}
+tv/bluey                                         Q39071378   [family]  children's television series; adventure television series  {kids flag}
+tv/pokemon                                       Q239937     [family,fantasy]  fantasy anime and manga; action anime and manga; adventure anime and manga; children's television series; comedy drama anime and manga  {kids flag; hand-comedy}
+tv/squid-game                                    Q106582931  [crime]  thriller television series; action television series; mystery television series; drama television series; survival film  {}
+tv/grey-s-anatomy                                Q438406     []  medical drama
+tv/the-big-bang-theory                           Q8539       [comedy]  sitcom  {}
+tv/strictly-come-dancing                         Q8070684    []  talent show; ballroom dance
+tv/who-wants-to-be-a-millionaire                 Q7997397    []  game show; quiz show
+tv/the-great-british-bake-off                    —           []  
+tv/blackadder                                    Q49019      [comedy]  comedy television series; alternate history television series; historical television series  {}
+tv/monty-python-s-flying-circus                  Q16401      [comedy]  comedy television series  {}
+tv/teletubbies                                   Q41403      [family]  children's television series  {kids flag}
+tv/scooby-doo-where-are-you                      Q936279     [comedy,family]  horror television series; thriller television program; adventure television series; comedy thriller; comedy television series  {kids flag; family≠horror}
+tv/the-flintstones                               Q201358     [comedy,family]  sitcom; fantasy television series  {kids flag; hand-fantasy}
+tv/the-mandalorian                               Q56876444   [scifi]  science fiction television series; space Western; adventure television series  {}
+tv/dad-s-army                                    Q659575     [comedy]  sitcom  {}
+tv/frasier                                       Q209282     [comedy]  sitcom  {}
+tv/baywatch                                      Q223320     []  drama television series
+tv/the-fresh-prince-of-bel-air                   Q309063     [comedy]  sitcom; teen sitcom  {}
+tv/thunderbirds                                  Q288085     [family,scifi]  science fiction television series; adventure television series; action television series; children's television series  {kids flag}
+tv/postman-pat                                   Q1143800    [family]  children's television series; educational television  {kids flag}
+tv/paw-patrol                                    Q15106029   [family]  children's television series; comedy television series; adventure television series; educational television  {kids flag; hand-comedy}
+tv/ted-lasso                                     Q96407897   [comedy]  comedy television series  {}
+tv/home-and-away                                 Q1324189    []  soap opera
+tv/kath-and-kim                                  Q6376050    [comedy]  sitcom  {}
+tv/prisoner-cell-block-h                         Q3397425    []  soap opera; drama television series; LGBT-related television series
+tv/skippy-the-bush-kangaroo                      Q1479213    [family]  children's television series  {kids flag}
+tv/play-school                                   Q7203069    [family]  children's television series  {kids flag}
+tv/bananas-in-pyjamas                            Q806094     [family]  children's television series  {kids flag}
+tv/hi-5                                          Q3234199    [family]  children's television series; educational television  {kids flag}
+tv/summer-heights-high                           Q7637338    [comedy]  teen sitcom; comedy television series; LGBT-related television series  {}
+tv/wentworth                                     Q7983000    []  drama television series; LGBT-related television series
+tv/packed-to-the-rafters                         Q2408186    []  drama television series
+tv/a-country-practice                            Q2359414    []  soap opera
+tv/blue-heelers                                  Q804565     []  drama television series
+tv/mcleod-s-daughters                            Q947743     []  drama television series
+tv/underbelly                                    Q14848728   []  drama television series
+tv/mother-and-son                                Q1764382    [comedy]  comedy television series  {}
+tv/hey-hey-it-s-saturday                         Q5749290    [comedy]  comedy television series  {}
+tv/masterchef-australia                          Q3234943    []  cooking show; reality television
+tv/mr-squiggle                                   Q6929205    [family]  children's television series  {kids flag}
+tv/heartbreak-high                               Q1082594    []  drama television series; youth series
+tv/rake                                          Q4945995    [comedy]  drama television series; comedy television series  {}
+tv/the-sullivans                                 Q932217     []  soap opera
+tv/shortland-street                              Q494202     []  soap opera; medical drama
+tv/outrageous-fortune                            Q3500700    [crime]  crime television series; comedy drama  {}
+tv/the-brokenwood-mysteries                      Q17462701   []  drama film
+tv/emmerdale                                     Q1247575    []  soap opera
+tv/hollyoaks                                     Q1585857    []  soap opera; drama television series; youth series
+tv/grange-hill                                   Q5595658    [family]  LGBT-related television series  {kids flag}
+tv/casualty                                      Q2316316    []  medical drama; soap opera
+tv/last-of-the-summer-wine                       Q1247701    [comedy]  sitcom  {}
+tv/are-you-being-served                          Q640327     [comedy]  sitcom  {}
+tv/yes-minister                                  Q732383     [comedy]  comedy television series; political satire  {}
+tv/red-dwarf                                     Q5902       [comedy,scifi]  science fiction television series; comedy television series  {}
+tv/the-vicar-of-dibley                           Q2360590    [comedy]  sitcom  {}
+tv/absolutely-fabulous                           Q332554     [comedy]  sitcom  {}
+tv/father-ted                                    Q1366945    [comedy]  sitcom  {}
+tv/the-office-uk                                 Q23829      [comedy]  sitcom; mockumentary; pseudo-documentary  {}
+tv/gavin-and-stacey                              Q3395368    [comedy]  sitcom  {}
+tv/peep-show                                     Q1519256    [comedy]  sitcom  {}
+tv/the-inbetweeners                              Q978011     [comedy]  sitcom; youth series  {}
+tv/keeping-up-appearances                        Q922616     [comedy]  sitcom  {}
+tv/one-foot-in-the-grave                         Q1303493    [comedy]  sitcom  {}
+tv/fleabag                                       Q16868648   []  comedy drama
+tv/line-of-duty                                  Q6553279    [crime]  drama television series; police procedural  {}
+tv/peaky-blinders                                Q14944179   [crime]  drama television series; historical drama; crime television series  {}
+tv/luther                                        Q734629     [crime]  police procedural; drama television series  {}
+tv/broadchurch                                   Q4972159    [crime]  thriller television series; police television drama  {}
+tv/midsomer-murders                              Q751917     [crime]  detective television series; drama television series; mystery television series  {}
+tv/inspector-morse                               Q2685847    [crime]  detective fiction; drama television series; crime television series  {}
+tv/poirot                                        Q391101     [crime]  detective television series  {}
+tv/call-the-midwife                              Q172230     []  medical drama; drama television series; historical drama
+tv/bodyguard                                     Q39070168   []  drama television series
+tv/happy-valley                                  Q16993664   [crime]  crime television series; drama television series  {}
+tv/black-mirror                                  Q558112     [scifi]  science fiction television series; drama television series; anthology series; dystopian television series; satirical television series; thriller television series  {}
+tv/skins                                         Q326180     []  drama television series; teen drama television; coming-of-age television program
+tv/upstairs-downstairs                           Q1168760    []  drama television series
+tv/the-prisoner                                  Q714753     [crime,scifi]  science fiction television series; espionage television series; mystery television series; thriller television series; surrealist television series  {}
+tv/the-good-life                                 Q2789136    [comedy]  sitcom  {}
+tv/steptoe-and-son                               Q1248747    [comedy]  comedy television series  {}
+tv/allo-allo                                     Q425628     [comedy]  comedy television series  {}
+tv/mrs-brown-s-boys                              Q4118733    [comedy]  sitcom; LGBT-related television series  {}
+tv/ghosts-uk                                     Q63438775   [comedy,fantasy]  sitcom; comedy television series; fantasy television series; science fiction television series  {hand-scifi}
+tv/derry-girls                                   Q47090557   [comedy]  sitcom  {}
+tv/the-x-factor-uk                               Q4431988    []  talent show; music program
+tv/britain-s-got-talent                          —           []  
+tv/countdown                                     Q6657456    []  game show
+tv/university-challenge                          Q287137     []  quiz show
+tv/qi                                            Q1286698    [comedy]  panel game; humor  {}
+tv/have-i-got-news-for-you                       Q1768525    [comedy]  panel game; humor  {}
+tv/the-chase                                     Q1498075    []  game show
+tv/pointless                                     Q2004615    []  game show
+tv/gogglebox                                     Q16993042   []  documentary television program
+tv/match-of-the-day                              Q1908130    []  sports journalism
+tv/antiques-roadshow                             Q3052933    []  documentary television program
+tv/the-blue-planet                               Q1646474    []  nature documentary
+tv/planet-earth                                  Q377165     []  documentary television program
+tv/fireman-sam                                   Q2572813    [family]  educational television; children's television series  {kids flag}
+tv/shaun-the-sheep                               Q477959     [comedy,family]  children's television series; comedy television series  {kids flag}
+tv/bagpuss                                       Q2879179    [family]  children's television series  {kids flag}
+tv/danger-mouse                                  Q1159583    [comedy,family]  comedy television series  {kids flag}
+tv/in-the-night-garden                           Q496021     [family]  children's television series  {kids flag}
+tv/pride-and-prejudice-1995                      Q855673     [romance]  drama television series; romance television series  {}
+tv/killing-eve                                   Q39049904   []  thriller television series; LGBT-related television series; drama film; black comedy  {hand-comedy}
+tv/sex-education                                 Q55632932   [comedy]  teen drama television; LGBT-related television series; coming-of-age television program; comedy drama; sex education film; raunchy comedy television program  {}
+tv/i-m-a-celebrity-get-me-out-of-here            Q3235466    []  reality television
+tv/doc-martin                                    Q1072839    [romance]  medical drama; drama television series; romantic television drama  {}
+tv/heartbeat                                     Q1810368    []  historical drama; drama television series
+tv/minder                                        Q632653     []  drama television series
+tv/the-two-ronnies                               Q1325878    [comedy]  comedy television series  {}
+tv/cheers                                        Q732063     [comedy]  comedy television series  {}
+tv/happy-days                                    Q518589     [comedy]  youth series; comedy television series  {}
+tv/the-brady-bunch                               Q250767     [comedy,family]  comedy television series  {kids flag}
+tv/gilligan-s-island                             Q1141741    [comedy]  comedy television series  {}
+tv/bewitched                                     Q1044635    [comedy,fantasy]  comedy television series; fantasy television program; drama television series  {}
+tv/the-twilight-zone                             Q742103     [fantasy,horror,scifi]  fantasy television series; science fiction television series; anthology series; horror television series  {}
+tv/the-addams-family                             Q266532     [comedy,fantasy]  fantasy television series; comedy television series; sitcom  {}
+tv/batman                                        Q1247201    [comedy,family,superhero]  science fiction television series; superhero television series; adventure television series; action television series; comedy television series; crime television series  {kids flag; hand-scifi; hand-crime}
+tv/the-golden-girls                              Q912467     [comedy]  sitcom  {}
+tv/roseanne                                      Q575373     [comedy]  sitcom  {}
+tv/married-with-children                         Q208647     [comedy]  sitcom  {}
+tv/full-house                                    Q465472     [comedy,family]  sitcom; drama film; family film; comedy television program  {family film}
+tv/the-wonder-years                              Q691581     [comedy]  comedy drama; comedy television series; youth series  {}
+tv/saved-by-the-bell                             Q1026823    [comedy]  teen sitcom; comedy film; sitcom  {}
+tv/beverly-hills-90210                           Q117590     []  soap opera; teen drama television
+tv/er                                            Q207375     []  medical drama
+tv/buffy-the-vampire-slayer                      Q183513     [fantasy,horror]  fantasy television series; horror television series; drama television series; LGBT-related television series; vampire television program; werewolf television program; paranormal television program; youth series  {}
+tv/will-and-grace                                Q212135     [comedy]  sitcom; LGBT-related television series  {}
+tv/sex-and-the-city                              Q35791      [comedy,romance]  sitcom; LGBT-related television series; erotic television series; raunchy comedy television program; romantic comedy television program  {}
+tv/gilmore-girls                                 Q193462     []  comedy drama; youth series
+tv/malcolm-in-the-middle                         Q242596     [comedy]  sitcom; black comedy television series; coming-of-age television program  {}
+tv/the-west-wing                                 Q3577037    []  drama television series; political drama
+tv/csi-crime-scene-investigation                 Q117396     [crime]  police procedural; drama television series; thriller television series  {}
+tv/24                                            Q56194      [crime]  crime television series; action television series; drama television series; espionage television series  {}
+tv/desperate-housewives                          Q131758     []  comedy drama; soap opera
+tv/house                                         Q23558      []  medical drama
+tv/prison-break                                  Q80044      [crime]  drama television series; action television series; crime television series; thriller television series  {}
+tv/how-i-met-your-mother                         Q147235     [comedy,romance]  comedy drama; sitcom; romantic comedy television program  {}
+tv/mad-men                                       Q223977     []  drama television series
+tv/glee                                          Q152178     []  comedy drama; musical; youth series; LGBT-related television series
+tv/modern-family                                 Q16756      [comedy]  sitcom; mockumentary; LGBT-related television series  {}
+tv/parks-and-recreation                          Q218035     [comedy]  sitcom; mockumentary  {}
+tv/the-walking-dead                              Q232737     [horror,scifi]  horror television series; drama television series; post-apocalyptic television series  {}
+tv/homeland                                      Q23594      [crime]  drama television series; thriller television series; espionage television series  {}
+tv/house-of-cards                                Q3330940    [crime]  political thriller; political drama  {}
+tv/orange-is-the-new-black                       Q7099650    [crime]  comedy drama; LGBT-related television series; crime television series  {}
+tv/brooklyn-nine-nine                            Q13417244   [comedy,crime]  sitcom; police procedural  {}
+tv/better-call-saul                              Q14925221   [crime]  legal drama; crime television series; drama fiction; tragedy  {}
+tv/this-is-us                                    Q24068191   []  comedy drama
+tv/the-handmaid-s-tale                           Q25207350   [scifi]  drama television series; dystopian fiction; LGBT-related television series; post-apocalyptic television program  {}
+tv/succession                                    Q30599007   []  comedy drama
+tv/euphoria                                      Q56275505   []  LGBT-related television series; teen drama television
+tv/the-last-of-us                                Q87131973   [scifi]  thriller television series; drama television series; post-apocalyptic television series  {}
+tv/wednesday                                     Q105553568  [comedy,fantasy,horror]  fantasy television series; thriller television series; youth series; comedy television series; comedy horror film  {}
+tv/the-bear                                      Q112761982  []  comedy drama
+tv/yellowstone                                   Q47452423   []  drama television series; Westerns on television  {}
+tv/bridgerton                                    Q85748936   [romance]  alternate history television series; historical drama; romantic fiction  {}
+tv/the-queen-s-gambit                            Q85808226   []  drama television series; coming-of-age television program; sport film
+tv/chernobyl                                     Q48741246   []  historical drama
+tv/band-of-brothers                              Q208048     [war]  war television series; drama television series; historical television series; miniseries  {}
+tv/the-wire                                      Q478360     [crime]  crime television series; drama television series; police television drama  {}
+tv/dallas                                        Q168708     []  soap opera
+tv/dynasty                                       Q584025     []  soap opera
+tv/knight-rider                                  Q464009     [crime,scifi]  action television series; crime television series; science fiction television series  {}
+tv/the-a-team                                    Q464123     []  action television series; adventure television series
+tv/magnum-p-i                                    Q254689     [crime]  detective fiction; action television series; drama television series  {}
+tv/macgyver                                      Q210257     []  action television series; adventure television series
+tv/miami-vice                                    Q559321     [crime]  crime television series; police television drama; drama television series; action television series  {}
+tv/murder-she-wrote                              Q833322     [crime]  detective television series; procedural television drama  {}
+tv/charlie-s-angels                              Q617274     [crime]  crime television series; drama television series; action television series  {}
+tv/the-dukes-of-hazzard                          Q1304408    [comedy]  comedy television series; action television series  {}
+tv/the-waltons                                   Q48777      []  drama television series
+tv/bonanza                                       Q862187     []  Westerns on television; drama television series  {}
+tv/star-trek-the-next-generation                 Q16290      [scifi]  science fiction television series; adventure television series  {}
+tv/family-guy                                    Q5930       [comedy]  comedy television series; satire; slapstick  {hand-family}
+tv/south-park                                    Q16538      [comedy]  comedy television series; surreal humour; raunchy comedy television program  {hand-family}
+tv/futurama                                      Q73622      [comedy,family,scifi]  action television series; comedy television series; science fiction television series; science fiction comedy; adult animated television series  {}
+tv/rugrats                                       Q304290     [comedy,family]  comedy television series; adventure television series; slice of life; children's television series  {kids flag}
+tv/the-jetsons                                   Q457409     [comedy,family,scifi]  science fiction television series; comedy television series; fantasy television series; children's television series  {kids flag; hand-fantasy}
+tv/arthur                                        Q1056342    [family]  comedy drama; slice of life; problem solving; educational entertainment  {kids flag}
+tv/barney-and-friends                            Q213588     [family]  children's television series; music program; children's music; educational television  {kids flag}
+tv/blue-s-clues                                  Q886105     [family]  educational television  {kids flag}
+tv/mister-rogers-neighborhood                    Q3234484    [family]    {kids flag}
+tv/teenage-mutant-ninja-turtles                  Q249056     [comedy,family,scifi]  children's television series; adventure television series; action television series; comedy television series; fantasy television series; science fiction television series  {kids flag; hand-fantasy}
+tv/mighty-morphin-power-rangers                  Q513809     [family,fantasy,scifi,superhero]  action television series; superhero fiction; adventure television series; science fiction television series; science fantasy; teen television series; teen drama television; drama television series  {kids flag}
+tv/hannah-montana                                Q126631     [comedy,family]  teen sitcom; music television  {kids flag}
+tv/adventure-time                                Q53093      [comedy,family,fantasy]  fantasy television series; adventure television series; comedy television series; post-apocalyptic television series; action television series  {kids flag; hand-scifi}
+tv/avatar-the-last-airbender                     Q11572      [family,fantasy]  fantasy television series; comedy drama; children's television series; adventure television series; action television series  {kids flag}
+tv/gravity-falls                                 Q550555     [comedy,family,fantasy]  fantasy television series; comedy television series; adventure television series; children's television series  {kids flag}
+tv/the-powerpuff-girls                           Q1236206    [comedy,family,superhero]  children's television series; comedy television series; fantasy television series; superhero television series  {kids flag; hand-fantasy}
+tv/dexter                                        Q23577      [crime]  thriller; police procedural; drama television series  {}
+tv/saturday-night-live                           Q13979      [comedy]  sketch show; stand-up comedy; humor; political satire; variety show  {}
+tv/survivor                                      Q28856068   []  reality television
+tv/american-idol                                 —           []  
+tv/keeping-up-with-the-kardashians               Q152108     []  docu-soap; reality show
+tv/schitt-s-creek                                Q17111973   [comedy]  sitcom; LGBT-related television series  {}
+tv/kim-s-convenience                             Q27821111   [comedy]  sitcom  {}
+tv/trailer-park-boys                             Q1400775    [comedy]  comedy television series; mockumentary; raunchy comedy television program  {}
+tv/corner-gas                                    Q2276079    [comedy]  sitcom  {}
+tv/anne-with-an-e                                Q28091065   []  drama television series
+tv/fraggle-rock                                  Q1212572    [comedy,family,fantasy]  fantasy television series; adventure television series; comedy television series; musical; children's television series  {kids flag}
+tv/degrassi-junior-high                          Q1080213    [family]  children's television series; soap opera; teen drama television; LGBT-related television series  {}
+tv/dragon-ball-z                                 Q477916     [family,fantasy,scifi]  action anime and manga; adventure anime and manga; fantasy anime and manga; science fiction anime and manga  {kids flag}
+tv/one-piece                                     Q710324     [family]  adventure anime and manga; comedy anime and manga; action anime and manga; time-travel anime and manga; pirate fiction  {kids flag; hand-scifi; hand-comedy}
+tv/doraemon                                      Q664927     [comedy,family,fantasy,scifi]  comedy anime and manga; science fiction anime and manga; fantasy anime and manga  {kids flag}
+tv/neon-genesis-evangelion                       Q662        [scifi]  drama anime; mecha; science fantasy; psychological thriller; apocalyptic fiction; action anime  {hand-fantasy; hand-crime}
+tv/death-note                                    Q718624     [crime]  thriller anime; mystery anime; supernatural anime  {}
+tv/takeshi-s-castle                              Q1124647    []  game show
+tv/monkey                                        Q6900702    [fantasy]  fantasy television program; drama television series  {}
+tv/crash-landing-on-you                          Q65258113   [romance]  romantic comedy; drama  {hand-comedy}
+tv/descendants-of-the-sun                        Q18652415   [romance]  romance television series; action television series; comedy television series; drama television series  {hand-comedy}
+tv/winter-sonata                                 Q495410     []  drama television series
+tv/money-heist                                   Q29647346   [crime]  action television series; black comedy television series; buddy film; buddy cop film; crime television series; action thriller; romance television series  {hand-romance; hand-comedy}
+tv/elite                                         Q53000974   []  thriller television series; teen drama television; LGBT-related television series
+tv/dark                                          Q28443710   [scifi]  science fiction television series; drama television series; thriller television series; LGBT-related television series  {}
+tv/derrick                                       Q511224     [crime]  crime television series  {}
+tv/tatort                                        Q689438     [crime]  crime television series  {}
+tv/babylon-berlin                                Q22998408   [crime]  thriller television series; historical drama; period drama film; crime fiction  {}
+tv/lupin                                         Q104082429  [crime]  crime television series; mystery television series  {}
+tv/call-my-agent                                 Q21008333   []  comedy drama; LGBT-related television series
+tv/miraculous-tales-of-ladybug-and-cat-noir      Q6470744    [comedy,family,fantasy]  magical girl anime and manga; comedy television series; fantasy television series; adventure television series; action film; children's television series  {kids flag}
+tv/the-killing-danish                            Q956446     [crime]  drama television series; detective television series; thriller television series; Nordic noir; crime television series  {}
+tv/the-bridge                                    Q1211796    [crime]  Nordic noir; detective television series  {}
+tv/pippi-longstocking                            Q941053     [comedy,family]  fantasy television series; adventure television series; children's television series; family television series; comedy television series; drama television series  {family television series; kids flag; hand-fantasy}
+tv/gomorrah                                      Q16876411   [crime]  crime television series; drama television series; drama film  {}
+tv/inspector-montalbano                          Q9302120    [crime]  detective fiction; crime television series  {}
+tv/el-chavo-del-ocho                             Q1323981    [comedy,family]  sitcom  {kids flag}
+tv/yo-soy-betty-la-fea                           —           [comedy,romance]    {hand+romance; hand+comedy}
+tv/magnificent-century                           Q176615     []  historical drama; drama television series; soap opera
+tv/ramayan                                       Q3345634    []  
+tv/mahabharat                                    Q3312543    []  
+tv/kaun-banega-crorepati                         Q2122128    []  
+tv/sacred-games                                  Q48727094   [crime]  crime television series; thriller television series; LGBT-related television series  {}
+tv/masha-and-the-bear                            Q2667119    [family]  children's television series  {kids flag}
+tv/fauda                                         Q19319517   [crime]  political thriller; thriller television series; action television series; drama television series  {}
+tv/big-brother-netherlands                       Q102055462  []  reality television
+books/pride-and-prejudice                        Q170583     [romance]  novel of manners; satirical fiction; psychological fiction; romantic fiction  {pack:romance}
+books/moby-dick                                  Q174596     []  nautical fiction; adventure fiction
+books/alice-s-adventures-in-wonderland           Q92640      [family,fantasy]  fairy tale; literary nonsense; children's fiction; children's book  {pack:fantasy; kids flag}
+books/frankenstein                               Q150827     [horror,scifi]  epistolary novel; body horror literature; Gothic fiction; science fiction; fantasy; epic  {pack:horror; hand-fantasy}
+books/dracula                                    Q41542      [horror]  epistolary fiction; Gothic fiction; horror fiction; romantic fiction; vampire fiction  {pack:horror; hand-romance}
+books/a-tale-of-two-cities                       Q308918     []  social fiction; historical fiction
+books/great-expectations                         Q219552     []  black comedy; Bildungsroman  {hand-comedy}
+books/a-christmas-carol                          Q62879      [family]  Christmas fiction  {kids flag}
+books/jane-eyre                                  Q182961     [romance]  education novel; autobiographical novel; Gothic fiction; romance; Bildungsroman  {pack:romance}
+books/wuthering-heights                          Q202975     [romance]  Gothic fiction; Victorian literature; romantic fiction; cautionary tale  {pack:romance}
+books/treasure-island                            Q185118     [family]  coming-of-age fiction; nautical fiction; adventure fiction; pirate fiction  {kids flag}
+books/the-hound-of-the-baskervilles              Q45192      [crime]  crime fiction; mystery fiction; detective fiction  {pack:mystery}
+books/the-picture-of-dorian-gray                 Q82464      []  Gothic novel
+books/adventures-of-huckleberry-finn             Q215410     [comedy]  satire; humor; picaresque novel; adventure fiction  {}
+books/little-women                               Q523076     [family]  developmental novel; Bildungsroman; autobiography; realist novel; family saga  {kids flag}
+books/peter-pan                                  Q3435337    [family,fantasy]  fantasy  {pack:fantasy; kids flag}
+books/the-wonderful-wizard-of-oz                 Q130295     [family,fantasy]  children's story; fantasy  {pack:fantasy; kids flag}
+books/the-jungle-book                            Q189509     [family]  didactic literature  {kids flag}
+books/the-war-of-the-worlds                      Q213019     [scifi]  apocalyptic fiction; science fiction; war fiction; invasion literature; serialized fiction  {pack:science fiction; hand-war}
+books/the-time-machine                           Q627333     [scifi]  time-travel fiction; romantic fiction; dystopian fiction; science fiction; post-apocalyptic fiction  {pack:science fiction; hand-romance}
+books/robinson-crusoe                            Q483034     []  developmental novel; robinsonade; adventure fiction; pirate fiction
+books/gulliver-s-travels                         Q181488     [fantasy]  political satire; fantasy; nautical fiction; Menippean satire; satirical novel  {}
+books/don-quixote                                Q480        [comedy]  chivalric romance; adventure fiction; parody; found manuscript  {}
+books/les-miserables                             Q180736     []  tragedy; historical fiction
+books/anna-karenina                              Q147787     [romance]  realist novel  {pack:romance}
+books/crime-and-punishment                       Q165318     [crime]  philosophical fiction; serialized fiction; crime fiction; psychological fiction  {}
+books/war-and-peace                              Q161531     [romance,war]  romantic fiction; war fiction; philosophical fiction; historical fiction  {}
+books/the-count-of-monte-cristo                  Q191838     []  serialized fiction; romantic fiction; adventure fiction; historical fiction  {hand-romance}
+books/emma                                       Q223880     [romance]  romantic fiction  {pack:romance}
+books/oliver-twist                               Q164974     []  Bildungsroman
+books/david-copperfield                          Q189811     []  autobiographical novel; Bildungsroman
+books/heart-of-darkness                          Q129778     []  fiction literature; serialized fiction; historical fiction
+books/the-great-gatsby                           Q214371     []  tragedy; Great American Novel
+books/the-metamorphosis                          Q184222     []  epic literature; absurdist literature; body horror literature  {hand-horror}
+books/the-secret-garden                          Q472194     [family]  children's book; serialized fiction  {pack:children's; kids flag}
+books/black-beauty                               Q880092     [family]  young adult fiction  {pack:children's; kids flag}
+books/anne-of-green-gables                       Q565911     [family]  developmental novel; children's fiction  {pack:children's; kids flag}
+books/the-wind-in-the-willows                    Q936276     [family]  children's fiction  {pack:children's; kids flag}
+books/the-call-of-the-wild                       Q476871     [family]  adventure fiction  {kids flag}
+books/around-the-world-in-eighty-days            Q1219561    [family]  serialized fiction; adventure fiction; children's fiction  {kids flag}
+books/twenty-thousand-leagues-under-the-seas     Q183565     [family,scifi]  science fiction; nautical fiction; scientific romance; travel literature; adventure fiction; merveilleux scientifique  {pack:science fiction; kids flag}
+books/strange-case-of-dr-jekyll-and-mr-hyde      Q217352     [horror,scifi]  sensation fiction; Gothic fiction; science fiction; crime fiction; horror fiction  {pack:horror; hand-crime}
+books/winnie-the-pooh                            Q3766392    [family]  children's fiction  {pack:children's; kids flag}
+books/kidnapped                                  Q2349094    [family]  fiction; adventure fiction; children's fiction; historical fiction; speculative fiction  {}
+books/sense-and-sensibility                      Q274744     [romance]  Bildungsroman; romantic fiction  {pack:romance}
+books/nineteen-eighty-four                       Q208460     [scifi]  social science fiction; political fiction; science fiction; dystopian fiction  {}
+books/animal-farm                                Q1396889    []  roman à clef; satirical fiction; fable; dystopian fiction
+books/brave-new-world                            Q191949     [scifi]  parody; political fiction; science fiction; philosophical fiction; dystopian fiction  {hand-comedy}
+books/to-kill-a-mockingbird                      Q212340     [crime]  Bildungsroman; Southern Gothic; social fiction; legal fiction  {}
+books/the-catcher-in-the-rye                     Q183883     []  Bildungsroman
+books/the-hobbit                                 Q74287      [family,fantasy]  juvenile fantasy; young adult fiction; fairy tale; fantasy; high fantasy  {pack:fantasy; kids flag}
+books/the-lord-of-the-rings                      Q15228      [fantasy]  fantasy; high fantasy; adventure fiction  {pack:fantasy}
+books/the-lion-the-witch-and-the-wardrobe        Q485093     [family,fantasy]  fantasy; children's fiction  {pack:fantasy; kids flag}
+books/charlotte-s-web                            Q45735      [family,fantasy]  fairy tale; children's fiction; fantasy  {pack:children's; kids flag}
+books/the-cat-in-the-hat                         Q973053     [family]  children's literature  {pack:children's; kids flag}
+books/fahrenheit-451                             Q202009     [scifi]  science fiction; philosophical fiction; dystopian fiction; philosophical novel; political fiction  {}
+books/harry-potter-and-the-philosopher-s-stone   Q43361      [family,fantasy]  young adult fiction; fantasy; adventure fiction  {pack:fantasy; kids flag}
+books/the-hunger-games                           Q11679      []  young adult fiction; dystopian fiction; adventure fiction
+books/the-very-hungry-caterpillar                Q491657     [family]    {pack:picture book; kids flag}
+books/matilda                                    Q1426188    [family,fantasy]  fantasy  {pack:children's; kids flag}
+books/charlie-and-the-chocolate-factory          Q466605     [comedy,family]  children's fiction; humorous fiction; children's book  {pack:children's; kids flag}
+books/the-bfg                                    Q1476462    [family,fantasy]  children's fiction; fantasy  {pack:children's; kids flag}
+books/the-little-prince                          Q25338      [family,fantasy]  lyrical novel; philosophical fiction; tale; children's and young adult literature; children's fiction; science fantasy  {kids flag}
+books/of-mice-and-men                            Q457977     []  short novel; social novel
+books/the-grapes-of-wrath                        Q215983     []  historical fiction
+books/the-old-man-and-the-sea                    Q26505      []  literature; novella
+books/lord-of-the-flies                          Q271764     []  young adult fiction; allegory; robinsonade; science fiction; dystopian fiction  {hand-scifi}
+books/one-hundred-years-of-solitude              Q178869     []  magic realism
+books/beloved                                    Q971767     []  magic realist fiction; historical fiction
+books/the-handmaid-s-tale                        Q1541914    [scifi]  feminist science fiction; social science fiction novel; science fiction; dystopian fiction; historical fiction  {}
+books/the-da-vinci-code                          Q81689      [crime]  conspiracy fiction; esoteric novel; crime fiction; thriller; detective fiction  {pack:thriller}
+books/the-hitchhiker-s-guide-to-the-galaxy       Q3107329    [scifi]  science fiction comedy; comic novel; science fiction  {pack:science fiction}
+books/gone-with-the-wind                         Q2870       [romance]  epic; historical novel; romance novel  {}
+books/things-fall-apart                          Q622400     []  fiction literature; historical fiction
+books/the-diary-of-a-young-girl                  Q6911       [war]  autobiography; diary literature; Holocaust literature  {}
+books/where-the-wild-things-are                  Q13912      [family,fantasy]  fantasy  {pack:picture book; kids flag}
+books/the-gruffalo                               Q775917     [family]  children's literature; children's and young adult literature  {pack:picture book; kids flag}
+books/diary-of-a-wimpy-kid                       Q1339580    [comedy,family]  humorous fiction; children's fiction  {pack:children's; kids flag}
+books/watership-down                             Q936801     [family,fantasy]  fantasy; children's book  {kids flag}
+books/life-of-pi                                 Q374204     [fantasy]  fantasy; adventure fiction; philosophical fiction; magic realist fiction  {}
+books/the-book-thief                             Q819101     [war]  young adult fiction; historical fiction; Holocaust fiction  {}
+books/slaughterhouse-five                        Q265954     [scifi,war]  time-travel fiction; satirical fiction; black comedy; war fiction; metafiction; science fiction; anti-war fiction  {hand-comedy}
+books/catch-22                                   Q278208     [comedy,war]  black comedy; absurdist literature; military fiction; war fiction; war literature; war novel; historical fiction; satirical novel  {}
+books/rebecca                                    Q1334940    [crime,romance]  romantic suspense fiction; Gothic novel; romance; crime fiction  {}
+books/murder-on-the-orient-express               Q845889     [crime]  detective fiction  {pack:mystery}
+books/and-then-there-were-none                   Q214132     [crime]  crime fiction  {pack:mystery}
+books/dune                                       Q190192     [scifi]  soft science fiction; planetary romance; social science fiction; science fiction; adventure fiction  {pack:science fiction}
+books/mary-poppins                               Q858705     [family,fantasy]  fantasy  {pack:children's; kids flag}
+books/a-bear-called-paddington                   Q632908     [family]  children's literature  {pack:children's; kids flag}
+books/the-tiger-who-came-to-tea                  Q13560128   [family]    {pack:picture book; kids flag}
+books/persuasion                                 Q333179     [romance]  romantic fiction  {pack:romance}
+books/northanger-abbey                           Q477508     [romance]  romantic fiction  {}
+books/mansfield-park                             Q469690     [romance]  romantic fiction  {pack:romance}
+books/middlemarch                                Q313129     []  realist novel; Bildungsroman; psychological fiction; social novel
+books/silas-marner                               Q638327     []  novel of manners
+books/tess-of-the-d-urbervilles                  Q649409     []  tragedy; social novel
+books/far-from-the-madding-crowd                 Q5642996    [romance]    {pack:romance}
+books/vanity-fair                                Q612836     []  satirical fiction
+books/bleak-house                                Q883305     []  detective fiction  {hand-crime}
+books/ivanhoe                                    Q840974     []  historical fiction
+books/uncle-tom-s-cabin                          Q2222       []  serialized fiction
+books/the-scarlet-letter                         Q907568     [romance]  romantic fiction; historical fiction  {}
+books/the-adventures-of-tom-sawyer               Q326914     [family]  Bildungsroman; adventure fiction  {kids flag}
+books/the-prince-and-the-pauper                  Q869725     [family]  cloak and dagger novel; historical fiction; children's fiction  {kids flag; hand-crime}
+books/the-red-badge-of-courage                   Q1219239    [war]  war fiction; historical fiction  {}
+books/white-fang                                 Q152267     [family]  adventure fiction; young adult fiction  {kids flag}
+books/ethan-frome                                Q5402934    []  American realism
+books/the-age-of-innocence                       Q1045464    [romance]  romance; novel of manners  {}
+books/the-turn-of-the-screw                      Q625923     [horror]  fantasy; Gothic fiction; ghost story; horror fiction  {hand-fantasy}
+books/a-study-in-scarlet                         Q223131     [crime]  crime fiction; mystery fiction; detective fiction  {pack:mystery}
+books/the-adventures-of-sherlock-holmes          Q392147     [crime]  detective fiction  {pack:mystery}
+books/the-invisible-man                          Q1539509    [scifi]  science fiction  {pack:science fiction}
+books/the-island-of-doctor-moreau                Q718268     [horror,scifi]  science fiction; horror fiction  {pack:science fiction}
+books/the-thirty-nine-steps                      Q2609365    [crime]  spy fiction; mystery fiction  {pack:thriller}
+books/howards-end                                Q1146642    []  family drama
+books/a-room-with-a-view                         Q120288     [romance]  romance  {pack:romance}
+books/a-passage-to-india                         Q622303     []  
+books/sons-and-lovers                            Q80771      []  autobiographical novel
+books/ulysses                                    Q6511       []  modernist literature; experimental literature; high literature; metafiction; serialized fiction; autobiography; Bildungsroman
+books/dubliners                                  Q459592     []  
+books/mrs-dalloway                               Q752584     []  modernist literature; psychological fiction
+books/to-the-lighthouse                          Q478016     []  modernist literature; psychological fiction
+books/five-children-and-it                       Q651866     [family,fantasy]  fantasy; children's fiction  {pack:fantasy; kids flag}
+books/the-railway-children                       Q969970     [family]  children's novel  {pack:children's; kids flag}
+books/a-little-princess                          Q10483376   [family]  children's fiction  {pack:children's; kids flag}
+books/through-the-looking-glass                  Q220331     [family,fantasy]  fantasy  {pack:fantasy; kids flag}
+books/the-tale-of-peter-rabbit                   Q580463     [family]  children's literature  {pack:picture book; kids flag}
+books/the-velveteen-rabbit                       Q168351     [family]  children's fiction  {pack:children's; kids flag}
+books/heidi                                      Q271697     [family]  children's fiction  {pack:children's; kids flag}
+books/the-adventures-of-pinocchio                Q8065468    [family]  literary fairy tale; children's story; children's fiction; adventure fiction  {pack:children's; kids flag}
+books/the-three-musketeers                       Q140527     []  serialized fiction; adventure fiction
+books/the-hunchback-of-notre-dame                Q191380     [romance]  Gothic fiction; Romanticism; historical fiction  {}
+books/madame-bovary                              Q193417     []  realist novel
+books/journey-to-the-center-of-the-earth         Q219457     [family,scifi]  lost world fiction; subterranean fiction; scientific romance; adventure fiction; adventure  {pack:science fiction; kids flag}
+books/the-phantom-of-the-opera                   Q272506     [horror,romance]  romantic fiction; Gothic fiction; fantasy; horror fiction; mystery fiction  {hand-fantasy; hand-crime}
+books/candide                                    Q215894     []  Bildungsroman
+books/the-brothers-karamazov                     Q183157     []  serialized fiction; philosophical fiction
+books/doctor-zhivago                             Q206870     []  historical fiction; historical novel
+books/the-master-and-margarita                   Q188538     [fantasy]  Fantastic Realism  {pack:fantasy}
+books/the-trial                                  Q36097      []  absurdist literature; dystopian fiction
+books/siddhartha                                 Q457289     []  philosophical novel; developmental novel
+books/all-quiet-on-the-western-front             Q207332     [war]  roman à clef; war novel; historical fiction  {}
+books/the-name-of-the-rose                       Q172850     [crime]  historical mystery; crime fiction; thriller; found manuscript; historical fiction  {pack:mystery}
+books/the-leopard                                Q1193736    []  high literature
+books/the-stranger                               Q163297     []  philosophical novel; absurdist literature
+books/perfume                                    Q459303     [crime]  developmental novel; Künstlerroman; historical fiction  {pack:thriller}
+books/the-neverending-story                      Q463108     [family,fantasy]  metafiction; Bildungsroman; literary fairy tale; fantasy; adventure fiction; speculative fiction; children's fiction  {pack:fantasy; kids flag}
+books/pippi-longstocking                         Q2446285    [family,fantasy]  fantasy; children's fiction  {pack:children's; kids flag}
+books/the-girl-with-the-dragon-tattoo            Q678288     [crime]  Nordic noir; crime fiction; thriller; mystery fiction  {pack:thriller}
+books/sophie-s-world                             Q61324      []  philosophical fiction
+books/finn-family-moomintroll                    Q2604653    [family]  fairy tale; children's fiction  {pack:children's; kids flag}
+books/norwegian-wood                             Q751348     [romance]  romance; Bildungsroman  {pack:romance}
+books/the-alchemist                              Q179021     [fantasy]  adventure fiction; fantasy  {}
+books/love-in-the-time-of-cholera                Q499396     [romance]  romance novel  {pack:romance}
+books/the-house-of-the-spirits                   Q1168267    []  magic realist fiction
+books/like-water-for-chocolate                   Q1777072    []  magic realism
+books/midnight-s-children                        Q625764     []  magic realist fiction; historical fiction
+books/the-god-of-small-things                    Q378786     []  magic realist fiction
+books/a-suitable-boy                             Q2918491    [romance]  romance novel  {}
+books/the-white-tiger                            Q2301826    []  epistolary novel
+books/the-kite-runner                            Q637839     []  
+books/half-of-a-yellow-sun                       Q3235393    []  historical fiction
+books/cry-the-beloved-country                    Q2916551    []  historical fiction
+books/disgrace                                   Q958560     []  fiction
+books/the-good-earth                             Q1218608    []  historical fiction
+books/my-brilliant-career                        Q1249439    []  
+books/seven-little-australians                   Q7457323    [family]  children's fiction  {pack:children's; kids flag}
+books/the-magic-pudding                          Q5497433    [family]  children's fiction; picaresque novel  {pack:children's; kids flag}
+books/snugglepot-and-cuddlepie                   Q3487213    [family]  children's literature  {pack:children's; kids flag}
+books/possum-magic                               Q7233443    [family]    {pack:picture book; kids flag}
+books/cloudstreet                                Q5135780    []  
+books/the-thorn-birds                            Q606465     [romance]  historical fiction  {pack:romance}
+books/picnic-at-hanging-rock                     Q3902680    [crime]    {pack:mystery}
+books/the-harp-in-the-south                      Q7738930    []  
+books/a-town-like-alice                          Q4660252    [romance]    {pack:romance}
+books/on-the-beach                               Q3819831    [scifi]  post-apocalyptic literature; science fiction  {pack:science fiction}
+books/the-secret-river                           Q7763079    []  historical fiction
+books/schindler-s-ark                            Q1975638    []  biographical novel
+books/jasper-jones                               Q15969906   []  
+books/looking-for-alibrandi                      Q6675369    []  Bildungsroman; young adult fiction
+books/tomorrow-when-the-war-began                Q137629     [war]  young adult fiction; science fiction; adventure fiction; war fiction  {hand-scifi}
+books/the-slap                                   Q7764741    []  
+books/storm-boy                                  Q7620110    [family]    {pack:children's; kids flag}
+books/big-little-lies                            Q20313303   [crime]    {pack:mystery}
+books/the-dry                                    Q28524515   [crime]  crime fiction  {pack:mystery}
+books/the-power-of-one                           Q1089763    []  Bildungsroman; historical fiction
+books/shantaram                                  Q2373810    []  
+books/the-narrow-road-to-the-deep-north          Q17056599   []  historical fiction
+books/the-bone-people                            Q1247962    []  drama fiction
+books/the-luminaries                             Q15076530   []  historical fiction
+books/the-whale-rider                            Q107719019  [family]    {kids flag}
+books/hairy-maclary-from-donaldson-s-dairy       Q5639616    [family]    {pack:picture book; kids flag}
+books/the-english-patient                        Q1292533    []  historiographic metafiction; spy fiction  {hand-crime}
+books/normal-people                              Q55360383   [romance]    {pack:romance}
+books/angela-s-ashes                             Q892456     []  autobiographical novel; memoir
+books/room                                       Q2133301    []  
+books/the-boy-in-the-striped-pyjamas             Q322156     [family,war]  Holocaust literature; historical fiction; children's fiction  {}
+books/artemis-fowl                               Q706725     [family,fantasy]  fantasy; young adult fiction  {pack:fantasy; kids flag}
+books/harry-potter-and-the-chamber-of-secrets    Q47209      [family,fantasy]  young adult fiction; fantasy; adventure fiction  {pack:fantasy; kids flag}
+books/harry-potter-and-the-prisoner-of-azkaban   Q47598      [family,fantasy]  young adult fiction; fantasy; adventure fiction  {pack:fantasy; kids flag}
+books/harry-potter-and-the-goblet-of-fire        Q46751      [family,fantasy]  fantasy; adventure fiction; young adult fiction  {pack:fantasy; kids flag}
+books/harry-potter-and-the-order-of-the-phoenix  Q80817      [family,fantasy]  fantasy; young adult fiction; adventure fiction  {pack:fantasy; kids flag}
+books/harry-potter-and-the-half-blood-prince     Q46887      [family,fantasy]  young adult fiction; fantasy; adventure fiction  {pack:fantasy; kids flag}
+books/harry-potter-and-the-deathly-hallows       Q46758      [family,fantasy]  fantasy; adventure fiction; young adult fiction  {pack:fantasy; kids flag}
+books/a-clockwork-orange                         Q692557     []  black comedy; satirical fiction; philosophical fiction; dystopian fiction  {hand-comedy}
+books/brideshead-revisited                       Q6992413    []  religious fiction
+books/the-remains-of-the-day                     Q829934     []  postmodern fiction; historical fiction
+books/never-let-me-go                            Q951587     [scifi]  science fiction; dystopian fiction; alternate history  {}
+books/atonement                                  Q306619     []  metafiction
+books/bridget-jones-s-diary                      Q2387225    [romance]  epistolary novel; comic novel  {pack:romance}
+books/white-teeth                                Q866980     []  family saga
+books/the-curious-incident-of-the-dog-in-the-night-time Q876848     [crime]  crime fiction  {pack:mystery}
+books/wolf-hall                                  Q2657795    []  historical fiction
+books/the-day-of-the-triffids                    Q1216940    [scifi]  science fiction; post-apocalyptic fiction  {pack:science fiction}
+books/goodnight-mister-tom                       Q4348264    [family,war]  Bildungsroman; war novel  {pack:children's; kids flag}
+books/the-borrowers                              Q3045043    [family,fantasy]  children's fiction; fantasy  {pack:children's; kids flag}
+books/northern-lights                            Q169976     [family,fantasy]  steampunk; young adult fiction; science fiction; fantasy; children's book  {pack:fantasy; kids flag; hand-scifi}
+books/stormbreaker                               Q2027418    [crime,family]  thriller; children's literature; adventure fiction; spy fiction  {kids flag}
+books/room-on-the-broom                          Q7366291    [family]  fairy tale; children's and young adult literature  {pack:picture book; kids flag}
+books/the-snowman                                Q1461197    [family]  children's literature  {pack:picture book; kids flag}
+books/we-re-going-on-a-bear-hunt                 Q28793114   [family]  children's fiction  {pack:picture book; kids flag}
+books/guess-how-much-i-love-you                  Q278995     [family]  children's literature; picture book  {pack:picture book; kids flag}
+books/james-and-the-giant-peach                  Q1426258    [family,fantasy]  children's fiction; fantasy  {pack:children's; kids flag}
+books/the-witches                                Q1422745    [family,fantasy]  adventure fiction; fantasy  {pack:children's; kids flag}
+books/fantastic-mr-fox                           Q2320903    [family,fantasy]  children's novel; fantasy  {pack:children's; kids flag}
+books/the-twits                                  Q1217792    [family]  children's novel  {pack:children's; kids flag}
+books/george-s-marvellous-medicine               Q643203     [family,fantasy]  children's and young adult literature; children's novel; fantasy literature  {pack:children's; kids flag}
+books/danny-the-champion-of-the-world            Q1164830    [family]  children's literature; Bildungsroman; adventure fiction; children's book  {pack:children's; kids flag}
+books/five-on-a-treasure-island                  Q590799     [family]  mystery fiction; children's and young adult literature; adventure fiction  {kids flag; hand-crime}
+books/gangsta-granny                             Q16385772   [family]    {pack:children's; kids flag}
+books/the-murder-of-roger-ackroyd                Q224078     [crime]  crime fiction; detective fiction  {pack:mystery}
+books/death-on-the-nile                          Q381756     [crime]  crime fiction  {pack:mystery}
+books/casino-royale                              Q1047711    [crime]  spy fiction; crime fiction  {pack:thriller}
+books/tinker-tailor-soldier-spy                  Q582811     [crime]  spy fiction  {pack:thriller}
+books/the-colour-of-magic                        Q32136      [fantasy]  fantasy; speculative fiction comedy  {pack:fantasy}
+books/fifty-shades-of-grey                       Q557867     [romance]  erotic romance novel; BDSM-themed literature; dark romance  {pack:romance}
+books/the-girl-on-the-train                      Q19843206   [crime]  psychological thriller; thriller  {pack:thriller}
+books/little-house-in-the-big-woods              Q7173181    [family]  family saga; Western; children's fiction  {pack:children's; kids flag}
+books/east-of-eden                               Q849701     []  family saga
+books/the-sun-also-rises                         Q501351     []  
+books/a-farewell-to-arms                         Q235795     [romance,war]  war novel  {pack:romance}
+books/the-sound-and-the-fury                     Q135515     []  Southern Gothic
+books/on-the-road                                Q743180     []  roman à clef; road fiction
+books/the-bell-jar                               Q1213085    []  roman à clef; autofiction
+books/the-color-purple                           Q1897870    []  epistolary novel; feminist novel
+books/the-godfather                              Q243556     [crime]  crime fiction  {pack:thriller}
+books/jaws                                       Q1322449    []  thriller  {pack:thriller; hand-crime}
+books/carrie                                     Q623394     [horror]  epistolary fiction; horror fiction; thriller  {pack:horror}
+books/the-shining                                Q470937     [horror]  psychological horror fiction; Gothic fiction; thriller; horror fiction  {pack:horror}
+books/it                                         Q602288     [horror]  horror fiction  {pack:horror}
+books/the-silence-of-the-lambs                   Q897685     [crime,horror]  horror fiction; thriller; crime fiction; psychological thriller  {pack:thriller}
+books/jurassic-park                              Q756866     [scifi]  techno-thriller; hard science fiction; science fiction; thriller; horror fiction  {pack:science fiction; hand-horror}
+books/gone-girl                                  Q5581570    [crime]  thriller  {pack:thriller}
+books/twilight                                   Q189378     [fantasy,romance]  young adult fiction; romantic fiction; vampire fiction  {pack:fantasy; hand-horror}
+books/the-fault-in-our-stars                     Q658375     [romance]  young adult fiction; romantic fiction  {pack:romance}
+books/the-lightning-thief                        Q501514     [family,fantasy]  young adult fiction; adventure fiction; children's fiction; urban fantasy; fantasy  {pack:fantasy; kids flag}
+books/wonder                                     Q13476115   [family]  drama film; fiction; children's fiction  {pack:children's; kids flag}
+books/holes                                      Q175421     [family]  adventure fiction; magic realist fiction; satirical fiction; family saga; young adult fiction  {pack:children's; kids flag}
+books/stuart-little                              Q5241443    [family]  fairy tale; children's fiction  {pack:children's; kids flag}
+books/green-eggs-and-ham                         Q2759523    [family]  children's literature; literary nonsense  {pack:picture book; kids flag}
+books/how-the-grinch-stole-christmas             Q446612     [family]  children's literature; Christmas fiction; fairy tale  {pack:picture book; kids flag}
+books/the-lorax                                  Q772236     [family]  children's literature  {pack:picture book; kids flag}
+books/goodnight-moon                             Q5583528    [family]  children's literature  {pack:picture book; kids flag}
+books/the-giving-tree                            Q2915384    [family]  children's literature  {pack:picture book; kids flag}
+books/the-polar-express                          Q1316325    [family]  children's fiction; Christmas fiction  {pack:picture book; kids flag}
+books/a-wrinkle-in-time                          Q2268391    [family,fantasy,scifi]  science fiction; fantasy; science fantasy  {pack:science fiction; kids flag}
+books/bridge-to-terabithia                       Q838776     [family]  fantasy; children's fiction  {pack:children's; kids flag; hand-fantasy}
+books/the-outsiders                              Q1215312    []  Bildungsroman; young adult fiction
+books/the-giver                                  Q258953     [family,scifi]  soft science fiction; young adult fiction; dystopian fiction; children's science fiction novel; dystopian novel  {kids flag}
+books/the-road                                   Q1140295    [scifi]  post-apocalyptic fiction; science fiction; dystopian fiction  {}
+books/ender-s-game                               Q816016     [scifi]  science fiction  {pack:science fiction}
+books/the-martian                                Q17111624   [scifi]  hard science fiction; science fiction  {pack:science fiction}
+books/where-the-crawdads-sing                    Q65063529   [crime]    {pack:mystery}
+books/ready-player-one                           Q3906523    [scifi]  cyberpunk; LitRPG; science fiction; adventure fiction; dystopian fiction  {pack:science fiction}
+books/the-princess-bride                         Q1935913    [fantasy,romance]  romantic fiction; fantasy  {pack:fantasy}
+books/the-joy-luck-club                          Q1857708    []  
+books/divergent                                  Q627192     [scifi]  thriller; science fiction; dystopian fiction  {}
+books/catching-fire                              Q837140     [scifi]  adventure fiction; dystopian fiction; young adult fiction; science fiction; post-apocalyptic fiction  {}
+books/the-adventures-of-captain-underpants       Q3283542    [family]  science fiction; children's fiction  {pack:children's; kids flag; hand-scifi}
+movie-moments/fantasia                           Q943192     [family,fantasy]  musical film; fantasy film; live-action/animated film; puppetoon animation; clay animation  {kids flag}
+movie-moments/the-ten-commandments               Q746733     []  drama film; adventure film; historical film; sword-and-sandal film
+movie-moments/20000-leagues-under-the-sea        Q64110      [scifi]  science fiction film; submarine film; drama film  {}
+movie-moments/the-birds                          Q110043     [crime,horror]  adventure film; horror film; mystery film; natural horror film; thriller film; drama film; melodrama; suspense film; action film  {}
+movie-moments/field-of-dreams                    Q517958     [fantasy]  fantasy film; drama film; sport film; ghost film  {}
+movie-moments/matilda                            Q280400     [comedy,family,fantasy]  fantasy film; children's film; comedy film; drama film  {kids flag}
+screen-themes/the-pink-panther                   Q1131556    [comedy,crime]  heist film; comedy film  {}
+screen-themes/beverly-hills-cop                  Q722267     [comedy]  action film; buddy film; buddy cop film; comedy film  {}
+screen-themes/the-sopranos                       Q23628      [crime]  crime television series; drama television series  {}
+kids-film-tv/baby-shark-pinkfong                 —           [family]    {hand+family}

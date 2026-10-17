@@ -1,10 +1,10 @@
-import { BUILD } from '../build.js?v=202610171251';
+import { BUILD } from '../build.js?v=202610171317';
 
 export const THEMES = [
   { id: 'animals', title: 'Animals', icon: '🐾' }, { id: 'nature', title: 'Nature', icon: '🌿' },
   { id: 'geography', title: 'Geography', icon: '🌍' }, { id: 'screen', title: 'Screen', icon: '🎬' },
   { id: 'music', title: 'Music', icon: '🎵' }, { id: 'books', title: 'Books & words', icon: '📚' },
-  { id: 'people', title: 'People', icon: '🧑' }, { id: 'science', title: 'Science', icon: '🔬' },
+  { id: 'genres', title: 'Genres', icon: '🎭' }, { id: 'people', title: 'People', icon: '🧑' }, { id: 'science', title: 'Science', icon: '🔬' },
   { id: 'art', title: 'Art', icon: '🎨' }, { id: 'history', title: 'History', icon: '🏛️' },
   { id: 'sport', title: 'Sport', icon: '⚽' }, { id: 'food', title: 'Food & drink', icon: '🍕' },
   { id: 'general', title: 'General knowledge', icon: '💡' }, { id: 'kids', title: 'Kids', icon: '🧸' },
@@ -107,11 +107,55 @@ export const getIndex = () => G.index;
 export const packInfo = id => G.index?.packs?.[id] || null;
 export const allPackIds = () => Object.keys(G.index?.packs || {});
 
-// general~science: the base pack's questions tagged with that theme (see tools/build_index.mjs)
+// Virtual packs (tools/build_index.mjs builds the same views for caps):
+//   { of, tag }    general~science: the base pack's questions tagged with that theme
+//   { of, group }  people~music: the base pack's items of one group and the questions about them
+//   { merge: [] }  people~all: several people packs mixed, with the shared facts only (field says acting, directing …)
+//   { of, genre }  movies~scifi: the base pack's items of one genre (data/genres.json) and the questions about them
+//   { parts: [] }  genre~scifi: every { of, genre } view of that genre; spec.js plays the parts as separate packs, so a
+//                  question's wrong answers always come from its own pack (a film question never offers a book)
+const ERA = y => (y == null ? undefined : y < 500 ? 'ancient world' : y < 1500 ? 'Middle Ages' : y < 1800 ? '1500s to 1700s' : y < 1900 ? '1800s' : '1900s or later');
+const MERGE_FIELD = { actors: 'acting', directors: 'film directing' };
+export function virtualView(id, v, bases, info = {}) {
+  const base = bases[0];
+  if (v.genre) return genreView(id, base, info);
+  if (v.parts) return { id, title: info.title, icon: info.icon, theme: 'genres', parts: bases, items: bases.flatMap(p => p.items || []), questions: bases.flatMap(p => p.questions || []) };
+  if (v.tag) return { ...base, id, title: info.title || base.title, theme: v.tag, questions: (base.questions || []).filter(q => (q.tags || []).includes(v.tag)) };
+  if (v.group) {
+    const items = (base.items || []).filter(it => it.group === v.group);
+    const ids = new Set(items.map(it => `${base.id}/${it.id}`));
+    return { ...base, id, title: info.title || base.title, icon: info.icon || base.icon, items, questions: (base.questions || []).filter(q => (q.refs || []).some(r => ids.has(r))) };
+  }
+  const seen = new Set(), items = [], questions = [];
+  for (const p of bases) {
+    for (const it of p.items || []) {
+      if (seen.has(it.id)) continue;
+      seen.add(it.id);
+      const f = it.facts || {}, field = f.field || MERGE_FIELD[p.id];
+      items.push({ ...it, group: field || it.group, facts: { born: f.born, died: f.died, nationality: f.nationality, era: ERA(f.born), field } });
+    }
+    questions.push(...(p.questions || []));
+  }
+  const people = bases.find(p => p.id === 'people') || base;
+  return { ...people, id, title: info.title || people.title, icon: info.icon || people.icon, theme: people.theme, items, questions, factsMeta: people.factsMeta };
+}
+// info.genreIds: the base items in this genre. In kids mode a genre only plays family films, shows and books (kids flag
+// or a kids pack); info.adult: never for kids at all
+function genreView(id, base, info) {
+  const keep = new Set(info.genreIds || []);
+  const forKids = it => !info.adult && (base.kids || it.kids === true || it.facts?.kids === true);
+  const items = (base.items || []).filter(it => keep.has(it.id)).map(it => (forKids(it) ? it : { ...it, kids: false }));
+  const refs = new Map(items.map(it => [`${base.id}/${it.id}`, it.kids !== false]));
+  const questions = (base.questions || []).filter(q => refs.has((q.refs || [])[0])).map(q => (refs.get(q.refs[0]) ? q : { ...q, kids: false }));
+  return { ...base, id, base: base.id, title: info.title || base.title, items, questions, fakes: [], ...(info.adult ? { kids: false, kidsSafe: false } : {}) };
+}
+let genresP = null;
+export const loadGenres = () => (genresP ||= getJSON(dataUrl(`data/genres.json?v=${BUILD}&b=${G.index?.build || ''}`)).catch(() => (genresP = null, { packs: {} })));
 async function loadVirtual(id, v) {
-  const base = await loadPack(v.of);
-  const info = G.index?.packs?.[id] || {};
-  const pack = { ...base, id, title: info.title || base.title, theme: v.tag, questions: (base.questions || []).filter(q => (q.tags || []).includes(v.tag)) };
+  let info = G.index?.packs?.[id] || {};
+  if (v.genre) info = { ...info, genreIds: (await loadGenres()).packs?.[v.of]?.[v.genre] || [], adult: info.kidsSafe === false };
+  const bases = await Promise.all((v.parts || v.merge || [v.of]).map(loadPack));
+  const pack = virtualView(id, v, bases, info);
   G.packs.set(id, pack);
   return pack;
 }

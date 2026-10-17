@@ -1,6 +1,6 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610171251';
-import { SERIES } from './series_data.js?v=202610171251';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610171317';
+import { SERIES } from './series_data.js?v=202610171317';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -28,6 +28,12 @@ export const NOT_ENOUGH = 'Not enough for this game yet';
 // supports() reads index caps; caps.formats (tools/build_index.mjs) then says how many questions generate() really made.
 export function supportsPack(fmt, info, { kids = false } = {}) {
   if (!fmt || !info) return 'Not available';
+  // a genre (genre~scifi) is measured over the parts this format can use (tools/build_index.mjs)
+  if (info.virtual?.parts) {
+    if (kids && fmt.noKids) return 'Not in kids mode';
+    const n = (kids ? info.caps?.formatsKids : info.caps?.formats)?.[fmt.id];
+    return fmt.packless ? 'Not available' : n == null ? (info.caps?.formats ? 'Not available for genres' : true) : n >= (fmt.minPerPack || 5) ? true : NOT_ENOUGH;
+  }
   let r;
   try { r = fmt.supports(info); } catch (e) { r = false; }
   if (kids && fmt.noKids) return 'Not in kids mode';

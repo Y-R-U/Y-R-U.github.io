@@ -3600,6 +3600,3061 @@
    },
    "difficulty": 3,
    "gender": "m"
+  },
+  {
+   "id": "george-orwell",
+   "name": "George Orwell",
+   "alt": [
+    "Orwell"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1903,
+    "died": 1950,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "George Orwell (1903–1950): Wrote Nineteen Eighty-Four.",
+   "clues": [
+    "His real name was Eric Blair.",
+    "He fought in the Spanish Civil War.",
+    "He wrote the fable Animal Farm.",
+    "Born in 1903.",
+    "Nationality: English.",
+    "He wrote Nineteen Eighty-Four."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/George_Orwell%2C_c._1940_%2841928180381%29.jpg/330px-George_Orwell%2C_c._1940_%2841928180381%29.jpg",
+      "w": 330,
+      "h": 476,
+      "credit": "Cassowary Colorizations",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:George_Orwell,_c._1940_(41928180381).jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "m"
+  },
+  {
+   "id": "ernest-hemingway",
+   "name": "Ernest Hemingway",
+   "alt": [
+    "Hemingway"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1899,
+    "died": 1961,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Ernest Hemingway (1899–1961): Wrote The Old Man and the Sea.",
+   "clues": [
+    "He was wounded as an ambulance driver in the First World War.",
+    "He lived for years in Cuba.",
+    "He won the Nobel Prize in Literature in 1954.",
+    "Born in 1899.",
+    "Nationality: American.",
+    "He wrote The Old Man and the Sea."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/ErnestHemingway.jpg/500px-ErnestHemingway.jpg",
+      "w": 500,
+      "h": 624,
+      "credit": "Lloyd Arnold",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:ErnestHemingway.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "leo-tolstoy",
+   "name": "Leo Tolstoy",
+   "alt": [
+    "Tolstoy"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1828,
+    "died": 1910,
+    "nationality": "Russian",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Leo Tolstoy (1828–1910): Wrote War and Peace.",
+   "clues": [
+    "He fought in the Crimean War.",
+    "His ideas on non-violence inspired Gandhi.",
+    "He wrote Anna Karenina.",
+    "Born in 1828.",
+    "Nationality: Russian.",
+    "He wrote War and Peace."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/L.N.Tolstoy_Prokudin-Gorsky.jpg/330px-L.N.Tolstoy_Prokudin-Gorsky.jpg",
+      "w": 330,
+      "h": 457,
+      "credit": "Sergei Prokudin-Gorskii",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:L.N.Tolstoy_Prokudin-Gorsky.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "fyodor-dostoevsky",
+   "name": "Fyodor Dostoevsky",
+   "alt": [
+    "Dostoevsky",
+    "Dostoyevsky"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1821,
+    "died": 1881,
+    "nationality": "Russian",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Fyodor Dostoevsky (1821–1881): Wrote Crime and Punishment.",
+   "clues": [
+    "He faced a mock execution and was sent to a Siberian prison camp.",
+    "He struggled with gambling debts.",
+    "He wrote The Brothers Karamazov.",
+    "Born in 1821.",
+    "Nationality: Russian.",
+    "He wrote Crime and Punishment."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Vasily_Perov_-_%D0%9F%D0%BE%D1%80%D1%82%D1%80%D0%B5%D1%82_%D0%A4.%D0%9C.%D0%94%D0%BE%D1%81%D1%82%D0%BE%D0%B5%D0%B2%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_-_Google_Art_Project.jpg/500px-Vasily_Perov_-_%D0%9F%D0%BE%D1%80%D1%82%D1%80%D0%B5%D1%82_%D0%A4.%D0%9C.%D0%94%D0%BE%D1%81%D1%82%D0%BE%D0%B5%D0%B2%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Vasily Perov",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Vasily_Perov_-_%D0%9F%D0%BE%D1%80%D1%82%D1%80%D0%B5%D1%82_%D0%A4.%D0%9C.%D0%94%D0%BE%D1%81%D1%82%D0%BE%D0%B5%D0%B2%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "victor-hugo",
+   "name": "Victor Hugo",
+   "alt": [
+    "Hugo"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1802,
+    "died": 1885,
+    "nationality": "French",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Victor Hugo (1802–1885): Wrote Les Misérables.",
+   "clues": [
+    "He lived in exile on Guernsey for many years.",
+    "He was buried in the Panthéon in Paris.",
+    "He wrote The Hunchback of Notre-Dame.",
+    "Born in 1802.",
+    "Nationality: French.",
+    "He wrote Les Misérables."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Victor_Hugo_by_%C3%89tienne_Carjat_1876_-_full.jpg/500px-Victor_Hugo_by_%C3%89tienne_Carjat_1876_-_full.jpg",
+      "w": 500,
+      "h": 615,
+      "credit": "Étienne Carjat",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Victor_Hugo_by_%C3%89tienne_Carjat_1876_-_full.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "miguel-de-cervantes",
+   "name": "Miguel de Cervantes",
+   "alt": [
+    "Cervantes"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1547,
+    "died": 1616,
+    "nationality": "Spanish",
+    "era": "1500s to 1700s",
+    "field": "literature"
+   },
+   "blurb": "Miguel de Cervantes (1547–1616): Wrote Don Quixote.",
+   "clues": [
+    "He lost the use of his left hand at the Battle of Lepanto.",
+    "He was held captive in Algiers for five years.",
+    "His hero rides a horse called Rocinante.",
+    "Born in 1547.",
+    "Nationality: Spanish.",
+    "He wrote Don Quixote."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Cervantes_J%C3%A1uregui.jpg/330px-Cervantes_J%C3%A1uregui.jpg",
+      "w": 330,
+      "h": 433,
+      "credit": "Attributed to Juan de Jáuregui",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Cervantes_J%C3%A1uregui.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "dante-alighieri",
+   "name": "Dante Alighieri",
+   "alt": [
+    "Dante"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1265,
+    "died": 1321,
+    "nationality": "Italian",
+    "era": "Middle Ages",
+    "field": "literature"
+   },
+   "blurb": "Dante Alighieri (1265–1321): Wrote the Divine Comedy.",
+   "clues": [
+    "He was exiled from his home city of Florence.",
+    "He wrote poems about his love for Beatrice.",
+    "His great poem is divided into Inferno, Purgatorio and Paradiso.",
+    "Born in 1265.",
+    "Nationality: Italian.",
+    "He wrote the Divine Comedy."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Portrait_de_Dante.jpg/330px-Portrait_de_Dante.jpg",
+      "w": 330,
+      "h": 504,
+      "credit": "Sandro Botticelli",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Portrait_de_Dante.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "oscar-wilde",
+   "name": "Oscar Wilde",
+   "alt": [
+    "Wilde"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1854,
+    "died": 1900,
+    "nationality": "Irish",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Oscar Wilde (1854–1900): Wrote The Picture of Dorian Gray.",
+   "clues": [
+    "He was imprisoned in Reading Gaol.",
+    "He was famous for his wit and epigrams.",
+    "He wrote The Importance of Being Earnest.",
+    "Born in 1854.",
+    "Nationality: Irish.",
+    "He wrote The Picture of Dorian Gray."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Oscar_Wilde_by_Napoleon_Sarony._Three-quarter-length_photograph%2C_seated.jpg/330px-Oscar_Wilde_by_Napoleon_Sarony._Three-quarter-length_photograph%2C_seated.jpg",
+      "w": 330,
+      "h": 547,
+      "credit": "Napoleon Sarony / Adam Cuerden",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Oscar_Wilde_by_Napoleon_Sarony._Three-quarter-length_photograph,_seated.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "edgar-allan-poe",
+   "name": "Edgar Allan Poe",
+   "alt": [],
+   "group": "literature",
+   "facts": {
+    "born": 1809,
+    "died": 1849,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Edgar Allan Poe (1809–1849): Wrote The Raven.",
+   "clues": [
+    "He is credited with inventing the detective story.",
+    "He wrote The Tell-Tale Heart.",
+    "In his most famous verse a bird repeats one word.",
+    "Born in 1809.",
+    "Nationality: American.",
+    "He wrote The Raven."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Edgar_Allan_Poe%2C_circa_1849%2C_restored%2C_squared_off.jpg/330px-Edgar_Allan_Poe%2C_circa_1849%2C_restored%2C_squared_off.jpg",
+      "w": 330,
+      "h": 464,
+      "credit": "Unknown authorUnknown author; Restored by Yann Forget and Adam Cuerden",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Edgar_Allan_Poe,_circa_1849,_restored,_squared_off.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "charlotte-bronte",
+   "name": "Charlotte Brontë",
+   "alt": [
+    "Bronte",
+    "Charlotte Bronte"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1816,
+    "died": 1855,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Charlotte Brontë (1816–1855): Wrote Jane Eyre.",
+   "clues": [
+    "She grew up in Haworth, Yorkshire.",
+    "She first published under the name Currer Bell.",
+    "Her sisters Emily and Anne were also novelists.",
+    "Born in 1816.",
+    "Nationality: English.",
+    "She wrote Jane Eyre."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/3a/CBRichmond.png",
+      "w": 200,
+      "h": 286,
+      "credit": "George Richmond",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:CBRichmond.png"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "virginia-woolf",
+   "name": "Virginia Woolf",
+   "alt": [
+    "Woolf"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1882,
+    "died": 1941,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Virginia Woolf (1882–1941): Wrote Mrs Dalloway and To the Lighthouse.",
+   "clues": [
+    "She was a central figure in the Bloomsbury Group.",
+    "She and her husband founded the Hogarth Press.",
+    "She wrote the essay A Room of One's Own.",
+    "Born in 1882.",
+    "Nationality: English.",
+    "She wrote Mrs Dalloway and To the Lighthouse."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Virginia_Woolf_1927.jpg/330px-Virginia_Woolf_1927.jpg",
+      "w": 330,
+      "h": 482,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Virginia_Woolf_1927.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "f"
+  },
+  {
+   "id": "f-scott-fitzgerald",
+   "name": "F. Scott Fitzgerald",
+   "alt": [
+    "Scott Fitzgerald",
+    "Fitzgerald"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1896,
+    "died": 1940,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "F. Scott Fitzgerald (1896–1940): Wrote The Great Gatsby.",
+   "clues": [
+    "He popularised the term the Jazz Age.",
+    "His wife was the writer Zelda Sayre.",
+    "He died in Hollywood in 1940.",
+    "Born in 1896.",
+    "Nationality: American.",
+    "He wrote The Great Gatsby."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/F._Scott_Fitzgerald_%281929_photo_portrait_by_Nickolas_Muray%29_Cropped.jpg/500px-F._Scott_Fitzgerald_%281929_photo_portrait_by_Nickolas_Muray%29_Cropped.jpg",
+      "w": 500,
+      "h": 618,
+      "credit": "Nickolas Muray",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:F._Scott_Fitzgerald_(1929_photo_portrait_by_Nickolas_Muray)_Cropped.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "stephen-king",
+   "name": "Stephen King",
+   "alt": [],
+   "group": "literature",
+   "facts": {
+    "born": 1947,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "Stephen King (1947): Wrote the horror novels It and Carrie.",
+   "clues": [
+    "He lives in Maine, where many of his stories are set.",
+    "He also wrote as Richard Bachman.",
+    "He wrote The Shining and Misery.",
+    "Born in 1947.",
+    "Nationality: American.",
+    "He wrote the horror novels It and Carrie."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Stephen_King_at_the_2024_Toronto_International_Film_Festival_2_%28cropped%29.jpg/500px-Stephen_King_at_the_2024_Toronto_International_Film_Festival_2_%28cropped%29.jpg",
+      "w": 500,
+      "h": 620,
+      "credit": "Kevin Payravi",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Stephen_King_at_the_2024_Toronto_International_Film_Festival_2_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "m"
+  },
+  {
+   "id": "lewis-carroll",
+   "name": "Lewis Carroll",
+   "alt": [
+    "Carroll"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1832,
+    "died": 1898,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Lewis Carroll (1832–1898): Wrote Alice's Adventures in Wonderland.",
+   "clues": [
+    "His real name was Charles Dodgson.",
+    "He taught mathematics at Oxford.",
+    "He wrote the nonsense poem Jabberwocky.",
+    "Born in 1832.",
+    "Nationality: English.",
+    "He wrote Alice's Adventures in Wonderland."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/LewisCarrollSelfPhoto.jpg/330px-LewisCarrollSelfPhoto.jpg",
+      "w": 330,
+      "h": 467,
+      "credit": "Lewis Carroll",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:LewisCarrollSelfPhoto.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "c-s-lewis",
+   "name": "C. S. Lewis",
+   "alt": [
+    "CS Lewis"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1898,
+    "died": 1963,
+    "nationality": "British",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "C. S. Lewis (1898–1963): Wrote The Chronicles of Narnia.",
+   "clues": [
+    "He was a close friend of J. R. R. Tolkien.",
+    "He taught at Oxford and Cambridge.",
+    "He wrote The Screwtape Letters.",
+    "Born in 1898.",
+    "Nationality: British.",
+    "He wrote The Chronicles of Narnia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/CS_Lewis_photo_on_dust_jacket.jpg/500px-CS_Lewis_photo_on_dust_jacket.jpg",
+      "w": 500,
+      "h": 613,
+      "credit": "John S. Murray",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:CS_Lewis_photo_on_dust_jacket.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "arthur-conan-doyle",
+   "name": "Arthur Conan Doyle",
+   "alt": [
+    "Conan Doyle",
+    "Sir Arthur Conan Doyle"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1859,
+    "died": 1930,
+    "nationality": "Scottish",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Arthur Conan Doyle (1859–1930): Created Sherlock Holmes.",
+   "clues": [
+    "He trained as a doctor in Edinburgh.",
+    "He tried to kill off his hero at the Reichenbach Falls.",
+    "He wrote The Hound of the Baskervilles.",
+    "Born in 1859.",
+    "Nationality: Scottish.",
+    "He created Sherlock Holmes."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Arthur_Conan_Doyle_by_Walter_Benington%2C_1914.png/330px-Arthur_Conan_Doyle_by_Walter_Benington%2C_1914.png",
+      "w": 330,
+      "h": 435,
+      "credit": "Walter Benington",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Arthur_Conan_Doyle_by_Walter_Benington,_1914.png"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "h-g-wells",
+   "name": "H. G. Wells",
+   "alt": [
+    "HG Wells"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1866,
+    "died": 1946,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "H. G. Wells (1866–1946): Wrote The War of the Worlds.",
+   "clues": [
+    "He trained as a science teacher.",
+    "He wrote The Invisible Man.",
+    "He wrote The Time Machine.",
+    "Born in 1866.",
+    "Nationality: English.",
+    "He wrote The War of the Worlds."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/H.G._Wells_by_Beresford.jpg/330px-H.G._Wells_by_Beresford.jpg",
+      "w": 330,
+      "h": 461,
+      "credit": "George Charles Beresford",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:H.G._Wells_by_Beresford.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "jules-verne",
+   "name": "Jules Verne",
+   "alt": [
+    "Verne"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1828,
+    "died": 1905,
+    "nationality": "French",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Jules Verne (1828–1905): Wrote Around the World in Eighty Days.",
+   "clues": [
+    "He trained as a lawyer.",
+    "He wrote Twenty Thousand Leagues Under the Seas.",
+    "He wrote Journey to the Centre of the Earth.",
+    "Born in 1828.",
+    "Nationality: French.",
+    "He wrote Around the World in Eighty Days."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/F%C3%A9lix_Nadar_1820-1910_portraits_Jules_Verne.jpg/330px-F%C3%A9lix_Nadar_1820-1910_portraits_Jules_Verne.jpg",
+      "w": 330,
+      "h": 462,
+      "credit": "Nadar",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:F%C3%A9lix_Nadar_1820-1910_portraits_Jules_Verne.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "mary-shelley",
+   "name": "Mary Shelley",
+   "alt": [],
+   "group": "literature",
+   "facts": {
+    "born": 1797,
+    "died": 1851,
+    "nationality": "English",
+    "era": "1500s to 1700s",
+    "field": "literature"
+   },
+   "blurb": "Mary Shelley (1797–1851): Wrote Frankenstein.",
+   "clues": [
+    "Her mother wrote A Vindication of the Rights of Woman.",
+    "She married a famous Romantic poet.",
+    "She began her most famous novel during a ghost-story contest at Lake Geneva.",
+    "Born in 1797.",
+    "Nationality: English.",
+    "She wrote Frankenstein."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Richard_Rothwell_%281800-1868%29_-_Mary_Wollstonecraft_Shelley_-_NPG_1235_-_National_Portrait_Gallery.jpg/500px-Richard_Rothwell_%281800-1868%29_-_Mary_Wollstonecraft_Shelley_-_NPG_1235_-_National_Portrait_Gallery.jpg",
+      "w": 500,
+      "h": 611,
+      "credit": "Richard Rothwell",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Richard_Rothwell_(1800-1868)_-_Mary_Wollstonecraft_Shelley_-_NPG_1235_-_National_Portrait_Gallery.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "toni-morrison",
+   "name": "Toni Morrison",
+   "alt": [
+    "Morrison"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1931,
+    "died": 2019,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "Toni Morrison (1931–2019): Wrote Beloved.",
+   "clues": [
+    "She worked as an editor at Random House.",
+    "She won the Nobel Prize in Literature in 1993.",
+    "She wrote Song of Solomon.",
+    "Born in 1931.",
+    "Nationality: American.",
+    "She wrote Beloved."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Toni_Morrison.jpg/330px-Toni_Morrison.jpg",
+      "w": 330,
+      "h": 470,
+      "credit": "John Mathew Smith (celebrity-photos.com)",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Toni_Morrison.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "f"
+  },
+  {
+   "id": "gabriel-garcia-marquez",
+   "name": "Gabriel García Márquez",
+   "alt": [
+    "García Márquez",
+    "Garcia Marquez",
+    "Gabo"
+   ],
+   "group": "literature",
+   "facts": {
+    "died": 2014,
+    "nationality": "Colombian",
+    "field": "literature"
+   },
+   "blurb": "Gabriel García Márquez (died 2014): Wrote One Hundred Years of Solitude.",
+   "clues": [
+    "He was a journalist before his novels made him famous.",
+    "He won the Nobel Prize in Literature in 1982.",
+    "He wrote Love in the Time of Cholera.",
+    "Nationality: Colombian.",
+    "He wrote One Hundred Years of Solitude."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Gabriel_Garcia_Marquez.jpg/330px-Gabriel_Garcia_Marquez.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Jose Lara",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gabriel_Garcia_Marquez.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "franz-kafka",
+   "name": "Franz Kafka",
+   "alt": [
+    "Kafka"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1883,
+    "died": 1924,
+    "nationality": "Czech",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Franz Kafka (1883–1924): Wrote The Metamorphosis, about a man who wakes up as an insect.",
+   "clues": [
+    "He worked for an insurance institute in Prague.",
+    "He asked his friend Max Brod to burn his writings.",
+    "He wrote The Trial.",
+    "Born in 1883.",
+    "Nationality: Czech.",
+    "He wrote The Metamorphosis, about a man who wakes up as an insect."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Franz_Kafka%2C_1923.jpg/330px-Franz_Kafka%2C_1923.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Unknown photographer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Franz_Kafka,_1923.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "beatrix-potter",
+   "name": "Beatrix Potter",
+   "alt": [
+    "Potter"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1866,
+    "died": 1943,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Beatrix Potter (1866–1943): Created Peter Rabbit.",
+   "clues": [
+    "She was also a skilled scientific illustrator of fungi.",
+    "She left her farms in the Lake District to the National Trust.",
+    "She wrote The Tale of Jemima Puddle-Duck.",
+    "Born in 1866.",
+    "Nationality: English.",
+    "She created Peter Rabbit."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Beatrix_Potter_by_King_cropped.jpg/250px-Beatrix_Potter_by_King_cropped.jpg",
+      "w": 250,
+      "h": 543,
+      "credit": "Charles G.Y. King (1854-1937)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Beatrix_Potter_by_King_cropped.jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "f"
+  },
+  {
+   "id": "enid-blyton",
+   "name": "Enid Blyton",
+   "alt": [
+    "Blyton"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1897,
+    "died": 1968,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Enid Blyton (1897–1968): Wrote The Famous Five books.",
+   "clues": [
+    "She was a teacher before becoming a writer.",
+    "She wrote the Malory Towers school stories.",
+    "She created Noddy.",
+    "Born in 1897.",
+    "Nationality: English.",
+    "She wrote The Famous Five books."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Enid_Blyton_c._1923.jpg/330px-Enid_Blyton_c._1923.jpg",
+      "w": 330,
+      "h": 504,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Enid_Blyton_c._1923.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "harper-lee",
+   "name": "Harper Lee",
+   "alt": [],
+   "group": "literature",
+   "facts": {
+    "born": 1926,
+    "died": 2016,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "Harper Lee (1926–2016): Wrote To Kill a Mockingbird.",
+   "clues": [
+    "Her childhood friend was the writer Truman Capote.",
+    "Her second novel, Go Set a Watchman, came out in 2015.",
+    "She won the Pulitzer Prize for Fiction in 1961.",
+    "Born in 1926.",
+    "Nationality: American.",
+    "She wrote To Kill a Mockingbird."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Harper_Lee_Medal_%28cropped%29.jpg",
+      "w": 169,
+      "h": 244,
+      "credit": "Eric Draper",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Harper_Lee_Medal_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "john-steinbeck",
+   "name": "John Steinbeck",
+   "alt": [
+    "Steinbeck"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1902,
+    "died": 1968,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "John Steinbeck (1902–1968): Wrote The Grapes of Wrath.",
+   "clues": [
+    "He won the Nobel Prize in Literature in 1962.",
+    "Many of his stories are set in California's Salinas Valley.",
+    "He wrote Of Mice and Men.",
+    "Born in 1902.",
+    "Nationality: American.",
+    "He wrote The Grapes of Wrath."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/John_Steinbeck_1939_%28cropped%29.jpg/500px-John_Steinbeck_1939_%28cropped%29.jpg",
+      "w": 500,
+      "h": 600,
+      "credit": "McFadden Publications, Inc.; no photographer credited; photo likely the work of Sonya N…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_Steinbeck_1939_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "robert-louis-stevenson",
+   "name": "Robert Louis Stevenson",
+   "alt": [
+    "RLS"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1850,
+    "died": 1894,
+    "nationality": "Scottish",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Robert Louis Stevenson (1850–1894): Wrote Treasure Island.",
+   "clues": [
+    "He died on the island of Samoa.",
+    "He wrote Kidnapped.",
+    "He wrote Strange Case of Dr Jekyll and Mr Hyde.",
+    "Born in 1850.",
+    "Nationality: Scottish.",
+    "He wrote Treasure Island."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Robert_Louis_Stevenson_by_Henry_Walter_Barnett_bw.jpg/330px-Robert_Louis_Stevenson_by_Henry_Walter_Barnett_bw.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Henry Walter Barnett",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Robert_Louis_Stevenson_by_Henry_Walter_Barnett_bw.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "rudyard-kipling",
+   "name": "Rudyard Kipling",
+   "alt": [
+    "Kipling"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1865,
+    "died": 1936,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Rudyard Kipling (1865–1936): Wrote The Jungle Book.",
+   "clues": [
+    "He was born in Bombay, India.",
+    "He was the first English-language writer to win the Nobel Prize in Literature.",
+    "He wrote the poem If—.",
+    "Born in 1865.",
+    "Nationality: English.",
+    "He wrote The Jungle Book."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Kipling_nd.jpg/500px-Kipling_nd.jpg",
+      "w": 500,
+      "h": 580,
+      "credit": "Bain News Service, publisher",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kipling_nd.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "haruki-murakami",
+   "name": "Haruki Murakami",
+   "alt": [
+    "Murakami"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1949,
+    "nationality": "Japanese",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "Haruki Murakami (1949): Wrote Norwegian Wood.",
+   "clues": [
+    "He ran a jazz bar in Tokyo before writing.",
+    "He is a keen marathon runner.",
+    "He wrote Kafka on the Shore.",
+    "Born in 1949.",
+    "Nationality: Japanese.",
+    "He wrote Norwegian Wood."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Conversatorio_Haruki_Murakami_%2812_de_12%29_%2845747009452%29_%28cropped%29.jpg/330px-Conversatorio_Haruki_Murakami_%2812_de_12%29_%2845747009452%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Ministerio Cultura y Patrimonio from Quito, Ecuador",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Conversatorio_Haruki_Murakami_(12_de_12)_(45747009452)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "margaret-atwood",
+   "name": "Margaret Atwood",
+   "alt": [
+    "Atwood"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1939,
+    "nationality": "Canadian",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "Margaret Atwood (1939): Wrote The Handmaid's Tale.",
+   "clues": [
+    "She has won the Booker Prize twice.",
+    "She wrote the sequel The Testaments.",
+    "She wrote Alias Grace.",
+    "Born in 1939.",
+    "Nationality: Canadian.",
+    "She wrote The Handmaid's Tale."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Margaret_Atwood_%2852161564186%29_%28cropped%29.jpg/330px-Margaret_Atwood_%2852161564186%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 456,
+      "credit": "Collision Conf",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Margaret_Atwood_(52161564186)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "f"
+  },
+  {
+   "id": "johann-wolfgang-von-goethe",
+   "name": "Johann Wolfgang von Goethe",
+   "alt": [
+    "Goethe"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1749,
+    "died": 1832,
+    "nationality": "German",
+    "era": "1500s to 1700s",
+    "field": "literature"
+   },
+   "blurb": "Johann Wolfgang von Goethe (1749–1832): Wrote the play Faust.",
+   "clues": [
+    "He also studied plants and the theory of colour.",
+    "He served as a minister at the court of Weimar.",
+    "He wrote The Sorrows of Young Werther.",
+    "Born in 1749.",
+    "Nationality: German.",
+    "He wrote the play Faust."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Goethe_%28Stieler_1828%29.jpg/500px-Goethe_%28Stieler_1828%29.jpg",
+      "w": 500,
+      "h": 617,
+      "credit": "Joseph Karl Stieler",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Goethe_(Stieler_1828).jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "geoffrey-chaucer",
+   "name": "Geoffrey Chaucer",
+   "alt": [
+    "Chaucer"
+   ],
+   "group": "literature",
+   "facts": {
+    "died": 1400,
+    "nationality": "English",
+    "field": "literature"
+   },
+   "blurb": "Geoffrey Chaucer (died 1400): Wrote The Canterbury Tales.",
+   "clues": [
+    "He worked as a diplomat and a customs official.",
+    "He was buried in Westminster Abbey.",
+    "He is called the father of English literature.",
+    "Nationality: English.",
+    "He wrote The Canterbury Tales."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Portrait_of_Geoffrey_Chaucer_%284671380%29_%28cropped%29_02.jpg/500px-Portrait_of_Geoffrey_Chaucer_%284671380%29_%28cropped%29_02.jpg",
+      "w": 500,
+      "h": 629,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Portrait_of_Geoffrey_Chaucer_(4671380)_(cropped)_02.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "emily-dickinson",
+   "name": "Emily Dickinson",
+   "alt": [
+    "Dickinson"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1830,
+    "died": 1886,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Emily Dickinson (1830–1886): Wrote the poem Because I could not stop for Death.",
+   "clues": [
+    "She rarely left her family home in Amherst, Massachusetts.",
+    "Only a handful of her poems were published in her lifetime.",
+    "Her poems are famous for their dashes.",
+    "Born in 1830.",
+    "Nationality: American.",
+    "She wrote the poem Because I could not stop for Death."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Emily_Dickinson_daguerreotype_%28Restored%2C_cropped%2C_blown_up%2C_sepia%29.jpg/330px-Emily_Dickinson_daguerreotype_%28Restored%2C_cropped%2C_blown_up%2C_sepia%29.jpg",
+      "w": 330,
+      "h": 405,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Emily_Dickinson_daguerreotype_(Restored,_cropped,_blown_up,_sepia).jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "f"
+  },
+  {
+   "id": "james-watt",
+   "name": "James Watt",
+   "alt": [],
+   "group": "science",
+   "facts": {
+    "born": 1736,
+    "died": 1819,
+    "nationality": "Scottish",
+    "era": "1500s to 1700s",
+    "field": "science"
+   },
+   "blurb": "James Watt (1736–1819): Greatly improved the steam engine.",
+   "clues": [
+    "The unit of power is named after him.",
+    "He was an instrument maker at the University of Glasgow.",
+    "He went into business with Matthew Boulton.",
+    "Born in 1736.",
+    "Nationality: Scottish.",
+    "He greatly improved the steam engine."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/James_Watt_by_Henry_Howard.jpg/500px-James_Watt_by_Henry_Howard.jpg",
+      "w": 500,
+      "h": 637,
+      "credit": "Henry Howard",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:James_Watt_by_Henry_Howard.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "johannes-gutenberg",
+   "name": "Johannes Gutenberg",
+   "alt": [
+    "Gutenberg"
+   ],
+   "group": "science",
+   "facts": {
+    "died": 1468,
+    "nationality": "German",
+    "field": "science"
+   },
+   "blurb": "Johannes Gutenberg (died 1468): Brought the printing press to Europe.",
+   "clues": [
+    "He was a goldsmith from Mainz.",
+    "His famous Bible was printed in the 1450s.",
+    "He used metal movable type.",
+    "Nationality: German.",
+    "He brought the printing press to Europe."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Gutenberg.jpg/500px-Gutenberg.jpg",
+      "w": 500,
+      "h": 636,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gutenberg.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "max-planck",
+   "name": "Max Planck",
+   "alt": [
+    "Planck"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1858,
+    "died": 1947,
+    "nationality": "German",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Max Planck (1858–1947): The founder of quantum theory.",
+   "clues": [
+    "A society of German research institutes is named after him.",
+    "He won the Nobel Prize in Physics in 1918.",
+    "A fundamental constant of nature is named after him.",
+    "Born in 1858.",
+    "Nationality: German.",
+    "He was the founder of quantum theory."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/32/Max_Planck.png",
+      "w": 236,
+      "h": 351,
+      "credit": "Courtesy of the Clendening History of Medicine Library, University of Kansas Medical Ce…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Max_Planck.png"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "ernest-rutherford",
+   "name": "Ernest Rutherford",
+   "alt": [
+    "Rutherford"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1871,
+    "died": 1937,
+    "nationality": "New Zealander",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Ernest Rutherford (1871–1937): Known as the father of nuclear physics.",
+   "clues": [
+    "He won the Nobel Prize in Chemistry in 1908.",
+    "He appears on New Zealand's $100 note.",
+    "He discovered the atomic nucleus.",
+    "Born in 1871.",
+    "Nationality: New Zealander.",
+    "He is known as the father of nuclear physics."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Ernest_Rutherford_LOC.jpg/330px-Ernest_Rutherford_LOC.jpg",
+      "w": 330,
+      "h": 443,
+      "credit": "George Grantham Bain Collection (Library of Congress)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ernest_Rutherford_LOC.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "j-robert-oppenheimer",
+   "name": "J. Robert Oppenheimer",
+   "alt": [
+    "Oppenheimer",
+    "Robert Oppenheimer"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1904,
+    "died": 1967,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "science"
+   },
+   "blurb": "J. Robert Oppenheimer (1904–1967): Called the father of the atomic bomb.",
+   "clues": [
+    "He quoted Hindu scripture after the first nuclear test.",
+    "He later lost his security clearance.",
+    "He led the Los Alamos laboratory.",
+    "Born in 1904.",
+    "Nationality: American.",
+    "He is called the father of the atomic bomb."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Oppenheimer_%28cropped%29.jpg/330px-Oppenheimer_%28cropped%29.jpg",
+      "w": 330,
+      "h": 480,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Oppenheimer_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "carl-linnaeus",
+   "name": "Carl Linnaeus",
+   "alt": [
+    "Linnaeus",
+    "Carl von Linné"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1707,
+    "died": 1778,
+    "nationality": "Swedish",
+    "era": "1500s to 1700s",
+    "field": "science"
+   },
+   "blurb": "Carl Linnaeus (1707–1778): Called the father of modern taxonomy.",
+   "clues": [
+    "He taught at Uppsala University.",
+    "He gave humans the scientific name Homo sapiens.",
+    "He gave every species a two-part Latin name.",
+    "Born in 1707.",
+    "Nationality: Swedish.",
+    "He is called the father of modern taxonomy."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Carl_von_Linn%C3%A9.jpg/500px-Carl_von_Linn%C3%A9.jpg",
+      "w": 500,
+      "h": 604,
+      "credit": "Alexander Roslin",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Carl_von_Linn%C3%A9.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "louis-braille",
+   "name": "Louis Braille",
+   "alt": [],
+   "group": "science",
+   "facts": {
+    "born": 1809,
+    "died": 1852,
+    "nationality": "French",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Louis Braille (1809–1852): Invented a system of raised dots for blind readers.",
+   "clues": [
+    "He lost his sight after an accident in his father's workshop.",
+    "He taught at the Royal Institute for Blind Youth in Paris.",
+    "His system grew out of a military night-writing code.",
+    "Born in 1809.",
+    "Nationality: French.",
+    "He invented a system of raised dots for blind readers."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Engraving_of_Louis_Braille_by_Henri_Thiriat_%28cropped%29.jpg/330px-Engraving_of_Louis_Braille_by_Henri_Thiriat_%28cropped%29.jpg",
+      "w": 330,
+      "h": 424,
+      "credit": "Henri Thiriat",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Engraving_of_Louis_Braille_by_Henri_Thiriat_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "alfred-nobel",
+   "name": "Alfred Nobel",
+   "alt": [
+    "Nobel"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1833,
+    "died": 1896,
+    "nationality": "Swedish",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Alfred Nobel (1833–1896): Invented dynamite.",
+   "clues": [
+    "He owned the arms maker Bofors.",
+    "Element 102 is named after him.",
+    "He left his fortune to fund international prizes.",
+    "Born in 1833.",
+    "Nationality: Swedish.",
+    "He invented dynamite."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/AlfredNobel2.jpg/500px-AlfredNobel2.jpg",
+      "w": 500,
+      "h": 633,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:AlfredNobel2.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "grace-hopper",
+   "name": "Grace Hopper",
+   "alt": [
+    "Hopper"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1906,
+    "died": 1992,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "science"
+   },
+   "blurb": "Grace Hopper (1906–1992): A pioneer of computer programming.",
+   "clues": [
+    "She was a rear admiral in the US Navy.",
+    "She popularised the word bug for a computer fault.",
+    "She helped develop the programming language COBOL.",
+    "Born in 1906.",
+    "Nationality: American.",
+    "She was a pioneer of computer programming."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Commodore_Grace_M._Hopper%2C_USN_%28covered%29.jpg/500px-Commodore_Grace_M._Hopper%2C_USN_%28covered%29.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "James S. Davis",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Commodore_Grace_M._Hopper,_USN_(covered).jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "f"
+  },
+  {
+   "id": "guglielmo-marconi",
+   "name": "Guglielmo Marconi",
+   "alt": [
+    "Marconi"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1874,
+    "died": 1937,
+    "nationality": "Italian",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Guglielmo Marconi (1874–1937): Pioneered long-distance radio.",
+   "clues": [
+    "He shared the 1909 Nobel Prize in Physics.",
+    "He sent the first radio signal across the Atlantic in 1901.",
+    "He was born in Bologna.",
+    "Born in 1874.",
+    "Nationality: Italian.",
+    "He pioneered long-distance radio."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Guglielmo_Marconi.jpg/330px-Guglielmo_Marconi.jpg",
+      "w": 330,
+      "h": 439,
+      "credit": "Pach Brothers",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Guglielmo_Marconi.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "archimedes",
+   "name": "Archimedes",
+   "alt": [],
+   "group": "science",
+   "facts": {
+    "nationality": "Greek",
+    "field": "science"
+   },
+   "blurb": "Archimedes: Discovered the principle of buoyancy.",
+   "clues": [
+    "He lived in Syracuse on Sicily.",
+    "He designed machines to defend his city against the Romans.",
+    "He is said to have shouted Eureka in his bath.",
+    "Nationality: Greek.",
+    "He discovered the principle of buoyancy."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Retrato_de_un_erudito_%28%C2%BFArqu%C3%ADmedes%3F%29%2C_por_Domenico_Fetti.jpg/330px-Retrato_de_un_erudito_%28%C2%BFArqu%C3%ADmedes%3F%29%2C_por_Domenico_Fetti.jpg",
+      "w": 330,
+      "h": 437,
+      "credit": "Domenico Fetti",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Retrato_de_un_erudito_(%C2%BFArqu%C3%ADmedes%3F),_por_Domenico_Fetti.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "bob-dylan",
+   "name": "Bob Dylan",
+   "alt": [
+    "Dylan"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1941,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Bob Dylan (1941): Wrote Blowin' in the Wind.",
+   "clues": [
+    "He was born Robert Zimmerman.",
+    "He shocked folk fans by going electric in 1965.",
+    "He won the Nobel Prize in Literature in 2016.",
+    "Born in 1941.",
+    "Nationality: American.",
+    "He wrote Blowin' in the Wind."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/DylanYoungKilkenny140719v2_%2850_of_52%29_%2852246124397%29_%28cropped%29.jpg/330px-DylanYoungKilkenny140719v2_%2850_of_52%29_%2852246124397%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 441,
+      "credit": "Raph_PH",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:DylanYoungKilkenny140719v2_(50_of_52)_(52246124397)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "david-bowie",
+   "name": "David Bowie",
+   "alt": [
+    "Bowie"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1947,
+    "died": 2016,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "David Bowie (1947–2016): Sang Space Oddity and Heroes.",
+   "clues": [
+    "His eyes looked different colours after a school fight.",
+    "He played the Goblin King in Labyrinth.",
+    "He created the alter ego Ziggy Stardust.",
+    "Born in 1947.",
+    "Nationality: English.",
+    "He sang Space Oddity and Heroes."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/David-Bowie_Chicago_2002-08-08_photoby_Adam-Bielawski-cropped.jpg/330px-David-Bowie_Chicago_2002-08-08_photoby_Adam-Bielawski-cropped.jpg",
+      "w": 330,
+      "h": 386,
+      "credit": "Adam Bielawski",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:David-Bowie_Chicago_2002-08-08_photoby_Adam-Bielawski-cropped.jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "m"
+  },
+  {
+   "id": "elton-john",
+   "name": "Elton John",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1947,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Elton John (1947): Sang Rocket Man and Your Song.",
+   "clues": [
+    "He was born Reginald Dwight.",
+    "He writes his songs with the lyricist Bernie Taupin.",
+    "He wrote songs for Disney's The Lion King.",
+    "Born in 1947.",
+    "Nationality: English.",
+    "He sang Rocket Man and Your Song."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Elton_John_2023.jpg/330px-Elton_John_2023.jpg",
+      "w": 330,
+      "h": 432,
+      "credit": "Raph_PH",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Elton_John_2023.jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "m"
+  },
+  {
+   "id": "frank-sinatra",
+   "name": "Frank Sinatra",
+   "alt": [
+    "Sinatra"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1915,
+    "died": 1998,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Frank Sinatra (1915–1998): Sang My Way and New York, New York.",
+   "clues": [
+    "He was nicknamed Ol' Blue Eyes.",
+    "He won an Oscar for acting in From Here to Eternity.",
+    "He was a member of the Rat Pack.",
+    "Born in 1915.",
+    "Nationality: American.",
+    "He sang My Way and New York, New York."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Frank_Sinatra_%281957_studio_portrait_close-up%29.jpg/330px-Frank_Sinatra_%281957_studio_portrait_close-up%29.jpg",
+      "w": 330,
+      "h": 434,
+      "credit": "Photograph by Capitol Records, per a credit found in the 1959 edition of the Internatio…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Frank_Sinatra_(1957_studio_portrait_close-up).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "whitney-houston",
+   "name": "Whitney Houston",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1963,
+    "died": 2012,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Whitney Houston (1963–2012): Sang I Will Always Love You.",
+   "clues": [
+    "Her mother Cissy and cousin Dionne Warwick were singers.",
+    "She starred in The Bodyguard.",
+    "She sang the US national anthem at the 1991 Super Bowl.",
+    "Born in 1963.",
+    "Nationality: American.",
+    "She sang I Will Always Love You."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Whitney_Houston_%28cropped3%29.JPEG/330px-Whitney_Houston_%28cropped3%29.JPEG",
+      "w": 330,
+      "h": 469,
+      "credit": "PH2 Mark Kettenhofen",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Whitney_Houston_(cropped3).JPEG"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "aretha-franklin",
+   "name": "Aretha Franklin",
+   "alt": [
+    "Aretha"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1942,
+    "died": 2018,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Aretha Franklin (1942–2018): Sang Respect.",
+   "clues": [
+    "She began singing in her father's church in Detroit.",
+    "She was the first woman inducted into the Rock and Roll Hall of Fame.",
+    "She was called the Queen of Soul.",
+    "Born in 1942.",
+    "Nationality: American.",
+    "She sang Respect."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Aretha_Franklin_1968.jpg/500px-Aretha_Franklin_1968.jpg",
+      "w": 500,
+      "h": 589,
+      "credit": "Atlantic Records (Life time: Published before 1978 without a copyright notice)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Aretha_Franklin_1968.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "prince",
+   "name": "Prince",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1958,
+    "died": 2016,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Prince (1958–2016): Sang Purple Rain.",
+   "clues": [
+    "He came from Minneapolis.",
+    "He once changed his name to a symbol.",
+    "He played almost every instrument on his early albums.",
+    "Born in 1958.",
+    "Nationality: American.",
+    "He sang Purple Rain."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Prince_promo_picture_%281988%3B_cropped_and_retouched%29.png/500px-Prince_promo_picture_%281988%3B_cropped_and_retouched%29.png",
+      "w": 500,
+      "h": 638,
+      "credit": "Unknown authorUnknown author, based on File:Prince promo picture (1988; cropped).png",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Prince_promo_picture_(1988;_cropped_and_retouched).png"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "jimi-hendrix",
+   "name": "Jimi Hendrix",
+   "alt": [
+    "Hendrix"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1942,
+    "died": 1970,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Jimi Hendrix (1942–1970): Often called the greatest electric guitarist of all time.",
+   "clues": [
+    "He served briefly as a paratrooper in the US Army.",
+    "He set his guitar on fire at the Monterey Pop Festival.",
+    "He played The Star-Spangled Banner at Woodstock.",
+    "Born in 1942.",
+    "Nationality: American.",
+    "He is often called the greatest electric guitarist of all time."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Jimi_Hendrix_%281967%29_%28cropped%29.jpg/330px-Jimi_Hendrix_%281967%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 470,
+      "credit": "Original photographer unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jimi_Hendrix_(1967)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "johnny-cash",
+   "name": "Johnny Cash",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1932,
+    "died": 2003,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Johnny Cash (1932–2003): Sang I Walk the Line and Ring of Fire.",
+   "clues": [
+    "He played famous concerts at Folsom Prison and San Quentin.",
+    "He was married to June Carter.",
+    "He was known as the Man in Black.",
+    "Born in 1932.",
+    "Nationality: American.",
+    "He sang I Walk the Line and Ring of Fire."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Johnny_Cash_%22The_Johnny_Cash_Spring_Special%22_%281979_CBS_press_photo%29.jpg/330px-Johnny_Cash_%22The_Johnny_Cash_Spring_Special%22_%281979_CBS_press_photo%29.jpg",
+      "w": 330,
+      "h": 431,
+      "credit": "CBS Television",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Johnny_Cash_%22The_Johnny_Cash_Spring_Special%22_(1979_CBS_press_photo).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "stevie-wonder",
+   "name": "Stevie Wonder",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1950,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Stevie Wonder (1950): Sang Superstition and Isn't She Lovely.",
+   "clues": [
+    "He has been blind since shortly after birth.",
+    "He signed with Motown at the age of 11.",
+    "He campaigned for a national holiday for Martin Luther King Jr..",
+    "Born in 1950.",
+    "Nationality: American.",
+    "He sang Superstition and Isn't She Lovely."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Stevie_Wonder_1994.jpg/330px-Stevie_Wonder_1994.jpg",
+      "w": 330,
+      "h": 447,
+      "credit": "Kingkongphoto & www.celebrity-photos.com from Laurel Maryland, USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Stevie_Wonder_1994.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "ella-fitzgerald",
+   "name": "Ella Fitzgerald",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1917,
+    "died": 1996,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Ella Fitzgerald (1917–1996): Known as the First Lady of Song.",
+   "clues": [
+    "She won an amateur contest at the Apollo Theater in Harlem.",
+    "She was famous for scat singing.",
+    "She recorded a series of Songbook albums.",
+    "Born in 1917.",
+    "Nationality: American.",
+    "She was known as the First Lady of Song."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Ella_Fitzgerald_by_Carl_Van_Vechten_-_American_Flag_%28cropped%29.jpg/330px-Ella_Fitzgerald_by_Carl_Van_Vechten_-_American_Flag_%28cropped%29.jpg",
+      "w": 330,
+      "h": 477,
+      "credit": "Carl Van Vechten",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ella_Fitzgerald_by_Carl_Van_Vechten_-_American_Flag_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "f"
+  },
+  {
+   "id": "adele",
+   "name": "Adele",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1988,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Adele (1988): Sang Rolling in the Deep and Hello.",
+   "clues": [
+    "She grew up in Tottenham, north London.",
+    "She won an Oscar for the James Bond song Skyfall.",
+    "Her albums are named after her age, such as 21 and 25.",
+    "Born in 1988.",
+    "Nationality: English.",
+    "She sang Rolling in the Deep and Hello."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Adele_2016.jpg/330px-Adele_2016.jpg",
+      "w": 330,
+      "h": 438,
+      "credit": "Marc E.",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Adele_2016.jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "f"
+  },
+  {
+   "id": "ed-sheeran",
+   "name": "Ed Sheeran",
+   "alt": [
+    "Sheeran"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1991,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Ed Sheeran (1991): Sang Shape of You.",
+   "clues": [
+    "He grew up in Suffolk.",
+    "He uses a loop pedal on stage.",
+    "His albums are named after mathematical symbols.",
+    "Born in 1991.",
+    "Nationality: English.",
+    "He sang Shape of You."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Ed_Sheeran-6886_%28cropped%29.jpg/500px-Ed_Sheeran-6886_%28cropped%29.jpg",
+      "w": 500,
+      "h": 632,
+      "credit": "Harald Krichel",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ed_Sheeran-6886_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "m"
+  },
+  {
+   "id": "lady-gaga",
+   "name": "Lady Gaga",
+   "alt": [
+    "Gaga"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1986,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Lady Gaga (1986): Sang Poker Face and Bad Romance.",
+   "clues": [
+    "Her real name is Stefani Germanotta.",
+    "She won an Oscar for the song Shallow.",
+    "Her fans are called Little Monsters.",
+    "Born in 1986.",
+    "Nationality: American.",
+    "She sang Poker Face and Bad Romance."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Lady_Gaga_at_the_White_House_in_2023_%281%29.jpg/330px-Lady_Gaga_at_the_White_House_in_2023_%281%29.jpg",
+      "w": 330,
+      "h": 467,
+      "credit": "The White House",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lady_Gaga_at_the_White_House_in_2023_(1).jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "f"
+  },
+  {
+   "id": "rihanna",
+   "name": "Rihanna",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1988,
+    "nationality": "Barbadian",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Rihanna (1988): Sang Umbrella and Diamonds.",
+   "clues": [
+    "She founded the beauty brand Fenty Beauty.",
+    "She headlined the 2023 Super Bowl half-time show.",
+    "She was born in Barbados.",
+    "Born in 1988.",
+    "Nationality: Barbadian.",
+    "She sang Umbrella and Diamonds."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Rihanna_visits_U.S._Embassy_in_Barbados_2024_%28cropped%29.jpg/250px-Rihanna_visits_U.S._Embassy_in_Barbados_2024_%28cropped%29.jpg",
+      "w": 250,
+      "h": 365,
+      "credit": "U.S. Embassy Bridgetown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Rihanna_visits_U.S._Embassy_in_Barbados_2024_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "f"
+  },
+  {
+   "id": "mick-jagger",
+   "name": "Mick Jagger",
+   "alt": [
+    "Jagger"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1943,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Mick Jagger (1943): The lead singer of the Rolling Stones.",
+   "clues": [
+    "He studied at the London School of Economics.",
+    "He was knighted in 2003.",
+    "He writes songs with Keith Richards.",
+    "Born in 1943.",
+    "Nationality: English.",
+    "He is the lead singer of the Rolling Stones."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/RStonesHydePark030722_%2849_of_125%29_%2852193656268%29_%28cropped%29.jpg/330px-RStonesHydePark030722_%2849_of_125%29_%2852193656268%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Raph_PH",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:RStonesHydePark030722_(49_of_125)_(52193656268)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "kylie-minogue",
+   "name": "Kylie Minogue",
+   "alt": [
+    "Kylie"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1968,
+    "nationality": "Australian",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Kylie Minogue (1968): Sang I Should Be So Lucky.",
+   "clues": [
+    "She played Charlene in the soap opera Neighbours.",
+    "Her hit Can't Get You Out of My Head topped charts around the world.",
+    "She is often called the Princess of Pop.",
+    "Born in 1968.",
+    "Nationality: Australian.",
+    "She sang I Should Be So Lucky."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/KylieMinogue-byPhilipRomano_%28cropped%29.jpg/500px-KylieMinogue-byPhilipRomano_%28cropped%29.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "PhilipRomanoPhoto",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:KylieMinogue-byPhilipRomano_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "kurt-cobain",
+   "name": "Kurt Cobain",
+   "alt": [
+    "Cobain"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1967,
+    "died": 1994,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Kurt Cobain (1967–1994): The singer and guitarist of Nirvana.",
+   "clues": [
+    "He grew up in Aberdeen, Washington.",
+    "He was married to Courtney Love.",
+    "He died in 1994 at the age of 27.",
+    "Born in 1967.",
+    "Nationality: American.",
+    "He was the singer and guitarist of Nirvana."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Nirvana_around_1992_%28cropped%29.jpg/250px-Nirvana_around_1992_%28cropped%29.jpg",
+      "w": 250,
+      "h": 333,
+      "credit": "P.B. Rage from USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nirvana_around_1992_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "george-frideric-handel",
+   "name": "George Frideric Handel",
+   "alt": [
+    "Handel",
+    "Händel"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1685,
+    "died": 1759,
+    "nationality": "German-British",
+    "era": "1500s to 1700s",
+    "field": "music"
+   },
+   "blurb": "George Frideric Handel (1685–1759): Composed Messiah, with its Hallelujah chorus.",
+   "clues": [
+    "He wrote Water Music for a Hanoverian king.",
+    "He settled in London and became a British subject.",
+    "He is buried in Westminster Abbey.",
+    "Born in 1685.",
+    "Nationality: German-British.",
+    "He composed Messiah, with its Hallelujah chorus."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/George_Frideric_Handel_by_Balthasar_Denner.jpg/500px-George_Frideric_Handel_by_Balthasar_Denner.jpg",
+      "w": 500,
+      "h": 604,
+      "credit": "Attributed to Balthasar Denner",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:George_Frideric_Handel_by_Balthasar_Denner.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "giuseppe-verdi",
+   "name": "Giuseppe Verdi",
+   "alt": [
+    "Verdi"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1813,
+    "died": 1901,
+    "nationality": "Italian",
+    "era": "1800s",
+    "field": "music"
+   },
+   "blurb": "Giuseppe Verdi (1813–1901): Composed the opera Rigoletto.",
+   "clues": [
+    "He became a symbol of Italian unification.",
+    "He wrote an opera set in ancient Egypt, Aida.",
+    "He wrote La traviata.",
+    "Born in 1813.",
+    "Nationality: Italian.",
+    "He composed the opera Rigoletto."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Giuseppi_Verdi_by_Ferdinand_Mulnier_c1870.jpg/330px-Giuseppi_Verdi_by_Ferdinand_Mulnier_c1870.jpg",
+      "w": 330,
+      "h": 462,
+      "credit": "Ferdinand Mulnier",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Giuseppi_Verdi_by_Ferdinand_Mulnier_c1870.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "novak-djokovic",
+   "name": "Novak Djokovic",
+   "alt": [
+    "Djokovic"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1987,
+    "nationality": "Serbian",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Novak Djokovic (1987): Has won a record number of men's Grand Slam singles titles.",
+   "clues": [
+    "He was born in Belgrade.",
+    "He won Olympic gold in Paris in 2024.",
+    "He has won the Australian Open more than any other man.",
+    "Born in 1987.",
+    "Nationality: Serbian.",
+    "He has won a record number of men's Grand Slam singles titles."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Novak_Djokovic_Paris_2024_Olympic_Games_%28cropped%29.jpg/330px-Novak_Djokovic_Paris_2024_Olympic_Games_%28cropped%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Andymiah",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Novak_Djokovic_Paris_2024_Olympic_Games_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "m"
+  },
+  {
+   "id": "ayrton-senna",
+   "name": "Ayrton Senna",
+   "alt": [
+    "Senna"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1960,
+    "died": 1994,
+    "nationality": "Brazilian",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Ayrton Senna (1960–1994): A three-time Formula One world champion.",
+   "clues": [
+    "He drove for McLaren alongside Alain Prost.",
+    "He won the Monaco Grand Prix six times.",
+    "He was killed at the San Marino Grand Prix in 1994.",
+    "Born in 1960.",
+    "Nationality: Brazilian.",
+    "He was a three-time Formula One world champion."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Ayrton_Senna_Pesawat_RC_Cropped.jpg/250px-Ayrton_Senna_Pesawat_RC_Cropped.jpg",
+      "w": 250,
+      "h": 318,
+      "credit": "File:Ayrton Senna 2.jpg: Instituto Ayrton Senna derivative work: F1fans",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ayrton_Senna_Pesawat_RC_Cropped.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "michael-schumacher",
+   "name": "Michael Schumacher",
+   "alt": [
+    "Schumacher"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1969,
+    "nationality": "German",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Michael Schumacher (1969): Won seven Formula One world championships.",
+   "clues": [
+    "He won his first two titles with Benetton.",
+    "He suffered a serious brain injury while skiing in 2013.",
+    "He won five titles in a row with Ferrari.",
+    "Born in 1969.",
+    "Nationality: German.",
+    "He won seven Formula One world championships."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Michael_Schumacher%2C_September_2005.jpg/330px-Michael_Schumacher%2C_September_2005.jpg",
+      "w": 330,
+      "h": 452,
+      "credit": "Original: Aécio Neves – Wellington Pedro/Imprensa MG / Derivative work: F1fans, FMSky",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Michael_Schumacher,_September_2005.jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "m"
+  },
+  {
+   "id": "lebron-james",
+   "name": "LeBron James",
+   "alt": [
+    "LeBron"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1984,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "LeBron James (1984): Won NBA titles with Miami, Cleveland and the Los Angeles Lakers.",
+   "clues": [
+    "He went straight from high school to the NBA in 2003.",
+    "He comes from Akron, Ohio.",
+    "He became the NBA's all-time top points scorer in 2023.",
+    "Born in 1984.",
+    "Nationality: American.",
+    "He won NBA titles with Miami, Cleveland and the Los Angeles Lakers."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/LeBron_James_%2851959977144%29_%28cropped2%29.jpg/500px-LeBron_James_%2851959977144%29_%28cropped2%29.jpg",
+      "w": 500,
+      "h": 579,
+      "credit": "Erik Drost",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:LeBron_James_(51959977144)_(cropped2).jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "m"
+  },
+  {
+   "id": "zinedine-zidane",
+   "name": "Zinedine Zidane",
+   "alt": [
+    "Zidane",
+    "Zizou"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1972,
+    "nationality": "French",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Zinedine Zidane (1972): A French midfielder who won the 1998 World Cup.",
+   "clues": [
+    "He was sent off for a headbutt in the 2006 World Cup final.",
+    "He later managed Real Madrid to three Champions League titles in a row.",
+    "He scored twice in the 1998 World Cup final.",
+    "Born in 1972.",
+    "Nationality: French.",
+    "He was a French midfielder who won the 1998 World Cup."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Zinedine_Zidane_by_Tasnim_03.jpg/330px-Zinedine_Zidane_by_Tasnim_03.jpg",
+      "w": 330,
+      "h": 438,
+      "credit": "Hadi Abyar",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Zinedine_Zidane_by_Tasnim_03.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "david-beckham",
+   "name": "David Beckham",
+   "alt": [
+    "Beckham"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1975,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "David Beckham (1975): Famous for his free kicks for Manchester United and England.",
+   "clues": [
+    "He was sent off against Argentina at the 1998 World Cup.",
+    "He co-owns the football club Inter Miami.",
+    "He married a Spice Girl.",
+    "Born in 1975.",
+    "Nationality: English.",
+    "He was famous for his free kicks for Manchester United and England."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/David_Beckham_UNICEF_%28cropped%29.jpg/500px-David_Beckham_UNICEF_%28cropped%29.jpg",
+      "w": 500,
+      "h": 493,
+      "credit": "Soccer Aid for Unicef",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:David_Beckham_UNICEF_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "gender": "m"
+  },
+  {
+   "id": "johan-cruyff",
+   "name": "Johan Cruyff",
+   "alt": [
+    "Cruyff",
+    "Johan Cruijff"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1947,
+    "died": 2016,
+    "nationality": "Dutch",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Johan Cruyff (1947–2016): Won the Ballon d'Or three times.",
+   "clues": [
+    "A famous turn is named after him.",
+    "He played for and managed Barcelona.",
+    "He was the star of the Dutch Total Football team.",
+    "Born in 1947.",
+    "Nationality: Dutch.",
+    "He won the Ballon d'Or three times."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Johan_Cruyff_in_trainingspak_Nederlands_Elftal_%2C_kop.jpg/330px-Johan_Cruyff_in_trainingspak_Nederlands_Elftal_%2C_kop.jpg",
+      "w": 330,
+      "h": 437,
+      "credit": "Nationaal Archief",
+      "license": "CC BY-SA 3.0 nl",
+      "page": "https://commons.wikimedia.org/wiki/File:Johan_Cruyff_in_trainingspak_Nederlands_Elftal_,_kop.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "shane-warne",
+   "name": "Shane Warne",
+   "alt": [
+    "Warne"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1969,
+    "died": 2022,
+    "nationality": "Australian",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Shane Warne (1969–2022): An Australian leg-spin bowler.",
+   "clues": [
+    "His first ball in an Ashes Test was called the Ball of the Century.",
+    "He took over 700 Test wickets.",
+    "He died in Thailand in 2022.",
+    "Born in 1969.",
+    "Nationality: Australian.",
+    "He was an Australian leg-spin bowler."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Shane_Warne_February_2015.jpg/500px-Shane_Warne_February_2015.jpg",
+      "w": 500,
+      "h": 617,
+      "credit": "Tourism Victoria from Australia",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shane_Warne_February_2015.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "cathy-freeman",
+   "name": "Cathy Freeman",
+   "alt": [
+    "Freeman"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1973,
+    "nationality": "Australian",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Cathy Freeman (1973): An Aboriginal Australian sprinter.",
+   "clues": [
+    "She lit the Olympic cauldron in Sydney.",
+    "She carried both the Aboriginal and Australian flags on her lap of honour.",
+    "She won 400 metres gold at the 2000 Sydney Olympics.",
+    "Born in 1973.",
+    "Nationality: Australian.",
+    "She is an Aboriginal Australian sprinter."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Cathy_Freeman_%28cropped%29.jpg/330px-Cathy_Freeman_%28cropped%29.jpg",
+      "w": 330,
+      "h": 460,
+      "credit": "Jason Pini/AusAID",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cathy_Freeman_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "jonah-lomu",
+   "name": "Jonah Lomu",
+   "alt": [
+    "Lomu"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1975,
+    "died": 2015,
+    "nationality": "New Zealander",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Jonah Lomu (1975–2015): A giant rugby union winger.",
+   "clues": [
+    "He ran over England's Mike Catt at the 1995 World Cup.",
+    "He had a kidney transplant in 2004.",
+    "He played on the wing for the All Blacks.",
+    "Born in 1975.",
+    "Nationality: New Zealander.",
+    "He was a giant rugby union winger."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Jonah_Lomu_%28cropped%29.jpg",
+      "w": 200,
+      "h": 250,
+      "credit": "Bjorn Bednarek from Brisbane, Australia",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jonah_Lomu_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "carl-lewis",
+   "name": "Carl Lewis",
+   "alt": [],
+   "group": "sport",
+   "facts": {
+    "born": 1961,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Carl Lewis (1961): An American sprinter and long jumper.",
+   "clues": [
+    "He won four gold medals at the 1984 Los Angeles Olympics.",
+    "He won the long jump at four Olympic Games in a row.",
+    "He won nine Olympic gold medals.",
+    "Born in 1961.",
+    "Nationality: American.",
+    "He was an American sprinter and long jumper."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Save_The_World_Awards_2009_show06_-_Carl_Lewis.jpg/500px-Save_The_World_Awards_2009_show06_-_Carl_Lewis.jpg",
+      "w": 500,
+      "h": 425,
+      "credit": "Manfred Werner - Tsui",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Save_The_World_Awards_2009_show06_-_Carl_Lewis.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "billie-jean-king",
+   "name": "Billie Jean King",
+   "alt": [],
+   "group": "sport",
+   "facts": {
+    "born": 1943,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Billie Jean King (1943): Won 39 Grand Slam titles in singles and doubles.",
+   "clues": [
+    "She beat Bobby Riggs in the Battle of the Sexes in 1973.",
+    "She founded the Women's Tennis Association.",
+    "The Fed Cup was renamed in her honour.",
+    "Born in 1943.",
+    "Nationality: American.",
+    "She won 39 Grand Slam titles in singles and doubles."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Billie_Jean_King_at_the_2026_Sundance_Film_Festival_02_%28cropped%29.jpg/500px-Billie_Jean_King_at_the_2026_Sundance_Film_Festival_02_%28cropped%29.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Claire Fridkin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Billie_Jean_King_at_the_2026_Sundance_Film_Festival_02_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "martina-navratilova",
+   "name": "Martina Navratilova",
+   "alt": [
+    "Navratilova",
+    "Martina Navrátilová"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1956,
+    "nationality": "Czech-American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Martina Navratilova (1956): A dominant women's tennis player of the 1980s.",
+   "clues": [
+    "She defected from Czechoslovakia in 1975.",
+    "She won nine Wimbledon singles titles.",
+    "She was famous for serve-and-volley tennis.",
+    "Born in 1956.",
+    "Nationality: Czech-American.",
+    "She was a dominant women's tennis player of the 1980s."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Tennis_Nederland_tegen_Verenigde_Staten_in_Den_Haag_Navratilova_in_aktie%2C_Bestanddeelnr_930-9118_%28cropped%29.jpg/330px-Tennis_Nederland_tegen_Verenigde_Staten_in_Den_Haag_Navratilova_in_aktie%2C_Bestanddeelnr_930-9118_%28cropped%29.jpg",
+      "w": 330,
+      "h": 475,
+      "credit": "Hans van Dijk for Anefo",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tennis_Nederland_tegen_Verenigde_Staten_in_Den_Haag_Navratilova_in_aktie,_Bestanddeelnr_930-9118_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "steffi-graf",
+   "name": "Steffi Graf",
+   "alt": [
+    "Graf"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1969,
+    "nationality": "German",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Steffi Graf (1969): A German tennis star.",
+   "clues": [
+    "She is married to Andre Agassi.",
+    "She won 22 Grand Slam singles titles.",
+    "She won the Golden Slam in 1988.",
+    "Born in 1969.",
+    "Nationality: German.",
+    "She was a German tennis star."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Steffi_Graf_in_Hamburg_2010_%28cropped%29.jpg/330px-Steffi_Graf_in_Hamburg_2010_%28cropped%29.jpg",
+      "w": 330,
+      "h": 481,
+      "credit": "Steffi_Graf_in_Hamburg.jpg: Mark Henckel from Hamburg-Altona, Deutschland (http://somme…",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Steffi_Graf_in_Hamburg_2010_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "f"
+  },
+  {
+   "id": "tom-brady",
+   "name": "Tom Brady",
+   "alt": [
+    "Brady"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1977,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Tom Brady (1977): An American football quarterback.",
+   "clues": [
+    "He was picked 199th in the NFL draft.",
+    "He won six Super Bowls with the New England Patriots.",
+    "He won another Super Bowl with Tampa Bay.",
+    "Born in 1977.",
+    "Nationality: American.",
+    "He is an American football quarterback."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Tom_Brady_2021.png/330px-Tom_Brady_2021.png",
+      "w": 330,
+      "h": 467,
+      "credit": "Congressman Charlie Crist",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tom_Brady_2021.png"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "mike-tyson",
+   "name": "Mike Tyson",
+   "alt": [
+    "Tyson"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1966,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Mike Tyson (1966): A ferocious American heavyweight boxer.",
+   "clues": [
+    "He bit Evander Holyfield's ear in a 1997 fight.",
+    "He was trained by Cus D'Amato.",
+    "He became the youngest heavyweight champion at the age of 20.",
+    "Born in 1966.",
+    "Nationality: American.",
+    "He was a ferocious American heavyweight boxer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Mike_Tyson_Photo_Op_GalaxyCon_Austin_2023.jpg/330px-Mike_Tyson_Photo_Op_GalaxyCon_Austin_2023.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Super Festivals",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mike_Tyson_Photo_Op_GalaxyCon_Austin_2023.jpg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "gender": "m"
+  },
+  {
+   "id": "eliud-kipchoge",
+   "name": "Eliud Kipchoge",
+   "alt": [
+    "Kipchoge"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1984,
+    "nationality": "Kenyan",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Eliud Kipchoge (1984): A Kenyan marathon runner.",
+   "clues": [
+    "He won Olympic marathon gold in 2016 and 2021.",
+    "He ran a marathon distance in under two hours in Vienna in 2019.",
+    "He won 5000 metres world gold as a teenager in 2003.",
+    "Born in 1984.",
+    "Nationality: Kenyan.",
+    "He is a Kenyan marathon runner."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Berlin-Marathon_2015_Runners_1.jpg/330px-Berlin-Marathon_2015_Runners_1.jpg",
+      "w": 330,
+      "h": 427,
+      "credit": "Denis Barthel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Berlin-Marathon_2015_Runners_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
+  },
+  {
+   "id": "jack-nicklaus",
+   "name": "Jack Nicklaus",
+   "alt": [
+    "Nicklaus"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1940,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Jack Nicklaus (1940): An American golfer.",
+   "clues": [
+    "He was nicknamed the Golden Bear.",
+    "He won the Masters six times.",
+    "He won 18 major championships.",
+    "Born in 1940.",
+    "Nationality: American.",
+    "He was an American golfer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/JackNicklausMedalOfFreedom.jpg/250px-JackNicklausMedalOfFreedom.jpg",
+      "w": 250,
+      "h": 333,
+      "credit": "Shealeah Craighead",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:JackNicklausMedalOfFreedom.jpg"
+     }
+    ]
+   },
+   "difficulty": 3,
+   "gender": "m"
   }
  ],
  "questions": [
@@ -6610,6 +9665,2566 @@
    "refs": [
     "people/martin-luther"
    ]
+  },
+  {
+   "id": "who-george-orwell",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Nineteen Eighty-Four.",
+   "answer": "George Orwell",
+   "wrong": [
+    "F. Scott Fitzgerald",
+    "Robert Louis Stevenson",
+    "Lewis Carroll"
+   ],
+   "explain": "George Orwell (1903–1950): Wrote Nineteen Eighty-Four.",
+   "difficulty": 1,
+   "refs": [
+    "people/george-orwell"
+   ]
+  },
+  {
+   "id": "born-george-orwell",
+   "kind": "mc",
+   "prompt": "In which year was George Orwell born?",
+   "answer": "1903",
+   "wrong": [
+    "1933",
+    "1923",
+    "1913"
+   ],
+   "explain": "George Orwell (1903–1950): Wrote Nineteen Eighty-Four.",
+   "difficulty": 3,
+   "refs": [
+    "people/george-orwell"
+   ]
+  },
+  {
+   "id": "who-ernest-hemingway",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Old Man and the Sea.",
+   "answer": "Ernest Hemingway",
+   "wrong": [
+    "George Orwell",
+    "Hans Christian Andersen",
+    "J. R. R. Tolkien"
+   ],
+   "explain": "Ernest Hemingway (1899–1961): Wrote The Old Man and the Sea.",
+   "difficulty": 2,
+   "refs": [
+    "people/ernest-hemingway"
+   ]
+  },
+  {
+   "id": "born-ernest-hemingway",
+   "kind": "mc",
+   "prompt": "In which year was Ernest Hemingway born?",
+   "answer": "1899",
+   "wrong": [
+    "1909",
+    "1869",
+    "1929"
+   ],
+   "explain": "Ernest Hemingway (1899–1961): Wrote The Old Man and the Sea.",
+   "difficulty": 3,
+   "refs": [
+    "people/ernest-hemingway"
+   ]
+  },
+  {
+   "id": "who-leo-tolstoy",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote War and Peace.",
+   "answer": "Leo Tolstoy",
+   "wrong": [
+    "William Shakespeare",
+    "Robert Louis Stevenson",
+    "Fyodor Dostoevsky"
+   ],
+   "explain": "Leo Tolstoy (1828–1910): Wrote War and Peace.",
+   "difficulty": 2,
+   "refs": [
+    "people/leo-tolstoy"
+   ]
+  },
+  {
+   "id": "born-leo-tolstoy",
+   "kind": "mc",
+   "prompt": "In which year was Leo Tolstoy born?",
+   "answer": "1828",
+   "wrong": [
+    "1838",
+    "1798",
+    "1808"
+   ],
+   "explain": "Leo Tolstoy (1828–1910): Wrote War and Peace.",
+   "difficulty": 3,
+   "refs": [
+    "people/leo-tolstoy"
+   ]
+  },
+  {
+   "id": "who-fyodor-dostoevsky",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Crime and Punishment.",
+   "answer": "Fyodor Dostoevsky",
+   "wrong": [
+    "Miguel de Cervantes",
+    "F. Scott Fitzgerald",
+    "C. S. Lewis"
+   ],
+   "explain": "Fyodor Dostoevsky (1821–1881): Wrote Crime and Punishment.",
+   "difficulty": 3,
+   "refs": [
+    "people/fyodor-dostoevsky"
+   ]
+  },
+  {
+   "id": "born-fyodor-dostoevsky",
+   "kind": "mc",
+   "prompt": "In which year was Fyodor Dostoevsky born?",
+   "answer": "1821",
+   "wrong": [
+    "1791",
+    "1851",
+    "1801"
+   ],
+   "explain": "Fyodor Dostoevsky (1821–1881): Wrote Crime and Punishment.",
+   "difficulty": 3,
+   "refs": [
+    "people/fyodor-dostoevsky"
+   ]
+  },
+  {
+   "id": "who-victor-hugo",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Les Misérables.",
+   "answer": "Victor Hugo",
+   "wrong": [
+    "Jules Verne",
+    "J. R. R. Tolkien",
+    "Hans Christian Andersen"
+   ],
+   "explain": "Victor Hugo (1802–1885): Wrote Les Misérables.",
+   "difficulty": 2,
+   "refs": [
+    "people/victor-hugo"
+   ]
+  },
+  {
+   "id": "born-victor-hugo",
+   "kind": "mc",
+   "prompt": "In which year was Victor Hugo born?",
+   "answer": "1802",
+   "wrong": [
+    "1772",
+    "1792",
+    "1782"
+   ],
+   "explain": "Victor Hugo (1802–1885): Wrote Les Misérables.",
+   "difficulty": 3,
+   "refs": [
+    "people/victor-hugo"
+   ]
+  },
+  {
+   "id": "who-miguel-de-cervantes",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Don Quixote.",
+   "answer": "Miguel de Cervantes",
+   "wrong": [
+    "Victor Hugo",
+    "Franz Kafka",
+    "Hans Christian Andersen"
+   ],
+   "explain": "Miguel de Cervantes (1547–1616): Wrote Don Quixote.",
+   "difficulty": 2,
+   "refs": [
+    "people/miguel-de-cervantes"
+   ]
+  },
+  {
+   "id": "born-miguel-de-cervantes",
+   "kind": "mc",
+   "prompt": "In which year was Miguel de Cervantes born?",
+   "answer": "1547",
+   "wrong": [
+    "1577",
+    "1517",
+    "1537"
+   ],
+   "explain": "Miguel de Cervantes (1547–1616): Wrote Don Quixote.",
+   "difficulty": 3,
+   "refs": [
+    "people/miguel-de-cervantes"
+   ]
+  },
+  {
+   "id": "who-dante-alighieri",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote the Divine Comedy.",
+   "answer": "Dante Alighieri",
+   "wrong": [
+    "Edgar Allan Poe",
+    "Dr. Seuss",
+    "H. G. Wells"
+   ],
+   "explain": "Dante Alighieri (1265–1321): Wrote the Divine Comedy.",
+   "difficulty": 3,
+   "refs": [
+    "people/dante-alighieri"
+   ]
+  },
+  {
+   "id": "born-dante-alighieri",
+   "kind": "mc",
+   "prompt": "In which year was Dante Alighieri born?",
+   "answer": "1265",
+   "wrong": [
+    "1275",
+    "1235",
+    "1245"
+   ],
+   "explain": "Dante Alighieri (1265–1321): Wrote the Divine Comedy.",
+   "difficulty": 3,
+   "refs": [
+    "people/dante-alighieri"
+   ]
+  },
+  {
+   "id": "who-oscar-wilde",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Picture of Dorian Gray.",
+   "answer": "Oscar Wilde",
+   "wrong": [
+    "Ernest Hemingway",
+    "F. Scott Fitzgerald",
+    "Hans Christian Andersen"
+   ],
+   "explain": "Oscar Wilde (1854–1900): Wrote The Picture of Dorian Gray.",
+   "difficulty": 2,
+   "refs": [
+    "people/oscar-wilde"
+   ]
+  },
+  {
+   "id": "born-oscar-wilde",
+   "kind": "mc",
+   "prompt": "In which year was Oscar Wilde born?",
+   "answer": "1854",
+   "wrong": [
+    "1874",
+    "1834",
+    "1824"
+   ],
+   "explain": "Oscar Wilde (1854–1900): Wrote The Picture of Dorian Gray.",
+   "difficulty": 3,
+   "refs": [
+    "people/oscar-wilde"
+   ]
+  },
+  {
+   "id": "who-edgar-allan-poe",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Raven.",
+   "answer": "Edgar Allan Poe",
+   "wrong": [
+    "Haruki Murakami",
+    "Rudyard Kipling",
+    "George Orwell"
+   ],
+   "explain": "Edgar Allan Poe (1809–1849): Wrote The Raven.",
+   "difficulty": 2,
+   "refs": [
+    "people/edgar-allan-poe"
+   ]
+  },
+  {
+   "id": "born-edgar-allan-poe",
+   "kind": "mc",
+   "prompt": "In which year was Edgar Allan Poe born?",
+   "answer": "1809",
+   "wrong": [
+    "1789",
+    "1779",
+    "1819"
+   ],
+   "explain": "Edgar Allan Poe (1809–1849): Wrote The Raven.",
+   "difficulty": 3,
+   "refs": [
+    "people/edgar-allan-poe"
+   ]
+  },
+  {
+   "id": "who-charlotte-bronte",
+   "kind": "mc",
+   "prompt": "Who is this? She wrote Jane Eyre.",
+   "answer": "Charlotte Brontë",
+   "wrong": [
+    "Mary Shelley",
+    "Toni Morrison",
+    "Margaret Atwood"
+   ],
+   "explain": "Charlotte Brontë (1816–1855): Wrote Jane Eyre.",
+   "difficulty": 2,
+   "refs": [
+    "people/charlotte-bronte"
+   ]
+  },
+  {
+   "id": "born-charlotte-bronte",
+   "kind": "mc",
+   "prompt": "In which year was Charlotte Brontë born?",
+   "answer": "1816",
+   "wrong": [
+    "1806",
+    "1786",
+    "1846"
+   ],
+   "explain": "Charlotte Brontë (1816–1855): Wrote Jane Eyre.",
+   "difficulty": 3,
+   "refs": [
+    "people/charlotte-bronte"
+   ]
+  },
+  {
+   "id": "who-virginia-woolf",
+   "kind": "mc",
+   "prompt": "Who is this? She wrote Mrs Dalloway and To the Lighthouse.",
+   "answer": "Virginia Woolf",
+   "wrong": [
+    "Agatha Christie",
+    "Enid Blyton",
+    "Harper Lee"
+   ],
+   "explain": "Virginia Woolf (1882–1941): Wrote Mrs Dalloway and To the Lighthouse.",
+   "difficulty": 3,
+   "refs": [
+    "people/virginia-woolf"
+   ]
+  },
+  {
+   "id": "born-virginia-woolf",
+   "kind": "mc",
+   "prompt": "In which year was Virginia Woolf born?",
+   "answer": "1882",
+   "wrong": [
+    "1912",
+    "1902",
+    "1862"
+   ],
+   "explain": "Virginia Woolf (1882–1941): Wrote Mrs Dalloway and To the Lighthouse.",
+   "difficulty": 3,
+   "refs": [
+    "people/virginia-woolf"
+   ]
+  },
+  {
+   "id": "who-f-scott-fitzgerald",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Great Gatsby.",
+   "answer": "F. Scott Fitzgerald",
+   "wrong": [
+    "Dante Alighieri",
+    "Victor Hugo",
+    "Hans Christian Andersen"
+   ],
+   "explain": "F. Scott Fitzgerald (1896–1940): Wrote The Great Gatsby.",
+   "difficulty": 2,
+   "refs": [
+    "people/f-scott-fitzgerald"
+   ]
+  },
+  {
+   "id": "born-f-scott-fitzgerald",
+   "kind": "mc",
+   "prompt": "In which year was F. Scott Fitzgerald born?",
+   "answer": "1896",
+   "wrong": [
+    "1916",
+    "1926",
+    "1886"
+   ],
+   "explain": "F. Scott Fitzgerald (1896–1940): Wrote The Great Gatsby.",
+   "difficulty": 3,
+   "refs": [
+    "people/f-scott-fitzgerald"
+   ]
+  },
+  {
+   "id": "who-stephen-king",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote the horror novels It and Carrie.",
+   "answer": "Stephen King",
+   "wrong": [
+    "Rudyard Kipling",
+    "Geoffrey Chaucer",
+    "Haruki Murakami"
+   ],
+   "explain": "Stephen King (1947): Wrote the horror novels It and Carrie.",
+   "difficulty": 1,
+   "refs": [
+    "people/stephen-king"
+   ]
+  },
+  {
+   "id": "born-stephen-king",
+   "kind": "mc",
+   "prompt": "In which year was Stephen King born?",
+   "answer": "1947",
+   "wrong": [
+    "1927",
+    "1917",
+    "1937"
+   ],
+   "explain": "Stephen King (1947): Wrote the horror novels It and Carrie.",
+   "difficulty": 3,
+   "refs": [
+    "people/stephen-king"
+   ]
+  },
+  {
+   "id": "who-lewis-carroll",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Alice's Adventures in Wonderland.",
+   "answer": "Lewis Carroll",
+   "wrong": [
+    "Jules Verne",
+    "Miguel de Cervantes",
+    "Geoffrey Chaucer"
+   ],
+   "explain": "Lewis Carroll (1832–1898): Wrote Alice's Adventures in Wonderland.",
+   "difficulty": 2,
+   "refs": [
+    "people/lewis-carroll"
+   ]
+  },
+  {
+   "id": "born-lewis-carroll",
+   "kind": "mc",
+   "prompt": "In which year was Lewis Carroll born?",
+   "answer": "1832",
+   "wrong": [
+    "1802",
+    "1842",
+    "1852"
+   ],
+   "explain": "Lewis Carroll (1832–1898): Wrote Alice's Adventures in Wonderland.",
+   "difficulty": 3,
+   "refs": [
+    "people/lewis-carroll"
+   ]
+  },
+  {
+   "id": "who-c-s-lewis",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Chronicles of Narnia.",
+   "answer": "C. S. Lewis",
+   "wrong": [
+    "Ernest Hemingway",
+    "Franz Kafka",
+    "Johann Wolfgang von Goethe"
+   ],
+   "explain": "C. S. Lewis (1898–1963): Wrote The Chronicles of Narnia.",
+   "difficulty": 2,
+   "refs": [
+    "people/c-s-lewis"
+   ]
+  },
+  {
+   "id": "born-c-s-lewis",
+   "kind": "mc",
+   "prompt": "In which year was C. S. Lewis born?",
+   "answer": "1898",
+   "wrong": [
+    "1888",
+    "1878",
+    "1868"
+   ],
+   "explain": "C. S. Lewis (1898–1963): Wrote The Chronicles of Narnia.",
+   "difficulty": 3,
+   "refs": [
+    "people/c-s-lewis"
+   ]
+  },
+  {
+   "id": "who-arthur-conan-doyle",
+   "kind": "mc",
+   "prompt": "Who is this? He created Sherlock Holmes.",
+   "answer": "Arthur Conan Doyle",
+   "wrong": [
+    "Roald Dahl",
+    "Gabriel García Márquez",
+    "Rudyard Kipling"
+   ],
+   "explain": "Arthur Conan Doyle (1859–1930): Created Sherlock Holmes.",
+   "difficulty": 2,
+   "refs": [
+    "people/arthur-conan-doyle"
+   ]
+  },
+  {
+   "id": "born-arthur-conan-doyle",
+   "kind": "mc",
+   "prompt": "In which year was Arthur Conan Doyle born?",
+   "answer": "1859",
+   "wrong": [
+    "1849",
+    "1869",
+    "1829"
+   ],
+   "explain": "Arthur Conan Doyle (1859–1930): Created Sherlock Holmes.",
+   "difficulty": 3,
+   "refs": [
+    "people/arthur-conan-doyle"
+   ]
+  },
+  {
+   "id": "who-h-g-wells",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The War of the Worlds.",
+   "answer": "H. G. Wells",
+   "wrong": [
+    "Dante Alighieri",
+    "Arthur Conan Doyle",
+    "William Shakespeare"
+   ],
+   "explain": "H. G. Wells (1866–1946): Wrote The War of the Worlds.",
+   "difficulty": 2,
+   "refs": [
+    "people/h-g-wells"
+   ]
+  },
+  {
+   "id": "born-h-g-wells",
+   "kind": "mc",
+   "prompt": "In which year was H. G. Wells born?",
+   "answer": "1866",
+   "wrong": [
+    "1896",
+    "1836",
+    "1846"
+   ],
+   "explain": "H. G. Wells (1866–1946): Wrote The War of the Worlds.",
+   "difficulty": 3,
+   "refs": [
+    "people/h-g-wells"
+   ]
+  },
+  {
+   "id": "who-jules-verne",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Around the World in Eighty Days.",
+   "answer": "Jules Verne",
+   "wrong": [
+    "F. Scott Fitzgerald",
+    "Mark Twain",
+    "Dr. Seuss"
+   ],
+   "explain": "Jules Verne (1828–1905): Wrote Around the World in Eighty Days.",
+   "difficulty": 2,
+   "refs": [
+    "people/jules-verne"
+   ]
+  },
+  {
+   "id": "born-jules-verne",
+   "kind": "mc",
+   "prompt": "In which year was Jules Verne born?",
+   "answer": "1828",
+   "wrong": [
+    "1798",
+    "1808",
+    "1848"
+   ],
+   "explain": "Jules Verne (1828–1905): Wrote Around the World in Eighty Days.",
+   "difficulty": 3,
+   "refs": [
+    "people/jules-verne"
+   ]
+  },
+  {
+   "id": "who-mary-shelley",
+   "kind": "mc",
+   "prompt": "Who is this? She wrote Frankenstein.",
+   "answer": "Mary Shelley",
+   "wrong": [
+    "Emily Dickinson",
+    "Maya Angelou",
+    "Charlotte Brontë"
+   ],
+   "explain": "Mary Shelley (1797–1851): Wrote Frankenstein.",
+   "difficulty": 2,
+   "refs": [
+    "people/mary-shelley"
+   ]
+  },
+  {
+   "id": "born-mary-shelley",
+   "kind": "mc",
+   "prompt": "In which year was Mary Shelley born?",
+   "answer": "1797",
+   "wrong": [
+    "1767",
+    "1817",
+    "1787"
+   ],
+   "explain": "Mary Shelley (1797–1851): Wrote Frankenstein.",
+   "difficulty": 3,
+   "refs": [
+    "people/mary-shelley"
+   ]
+  },
+  {
+   "id": "who-toni-morrison",
+   "kind": "mc",
+   "prompt": "Who is this? She wrote Beloved.",
+   "answer": "Toni Morrison",
+   "wrong": [
+    "Margaret Atwood",
+    "Jane Austen",
+    "J. K. Rowling"
+   ],
+   "explain": "Toni Morrison (1931–2019): Wrote Beloved.",
+   "difficulty": 3,
+   "refs": [
+    "people/toni-morrison"
+   ]
+  },
+  {
+   "id": "born-toni-morrison",
+   "kind": "mc",
+   "prompt": "In which year was Toni Morrison born?",
+   "answer": "1931",
+   "wrong": [
+    "1951",
+    "1961",
+    "1901"
+   ],
+   "explain": "Toni Morrison (1931–2019): Wrote Beloved.",
+   "difficulty": 3,
+   "refs": [
+    "people/toni-morrison"
+   ]
+  },
+  {
+   "id": "who-gabriel-garcia-marquez",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote One Hundred Years of Solitude.",
+   "answer": "Gabriel García Márquez",
+   "wrong": [
+    "J. R. R. Tolkien",
+    "William Shakespeare",
+    "Miguel de Cervantes"
+   ],
+   "explain": "Gabriel García Márquez (died 2014): Wrote One Hundred Years of Solitude.",
+   "difficulty": 3,
+   "refs": [
+    "people/gabriel-garcia-marquez"
+   ]
+  },
+  {
+   "id": "who-franz-kafka",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Metamorphosis, about a man who wakes up as an insect.",
+   "answer": "Franz Kafka",
+   "wrong": [
+    "Haruki Murakami",
+    "William Shakespeare",
+    "Fyodor Dostoevsky"
+   ],
+   "explain": "Franz Kafka (1883–1924): Wrote The Metamorphosis, about a man who wakes up as an insect.",
+   "difficulty": 3,
+   "refs": [
+    "people/franz-kafka"
+   ]
+  },
+  {
+   "id": "born-franz-kafka",
+   "kind": "mc",
+   "prompt": "In which year was Franz Kafka born?",
+   "answer": "1883",
+   "wrong": [
+    "1903",
+    "1863",
+    "1853"
+   ],
+   "explain": "Franz Kafka (1883–1924): Wrote The Metamorphosis, about a man who wakes up as an insect.",
+   "difficulty": 3,
+   "refs": [
+    "people/franz-kafka"
+   ]
+  },
+  {
+   "id": "who-beatrix-potter",
+   "kind": "mc",
+   "prompt": "Who is this? She created Peter Rabbit.",
+   "answer": "Beatrix Potter",
+   "wrong": [
+    "Toni Morrison",
+    "Charlotte Brontë",
+    "Emily Dickinson"
+   ],
+   "explain": "Beatrix Potter (1866–1943): Created Peter Rabbit.",
+   "difficulty": 1,
+   "refs": [
+    "people/beatrix-potter"
+   ]
+  },
+  {
+   "id": "born-beatrix-potter",
+   "kind": "mc",
+   "prompt": "In which year was Beatrix Potter born?",
+   "answer": "1866",
+   "wrong": [
+    "1836",
+    "1896",
+    "1886"
+   ],
+   "explain": "Beatrix Potter (1866–1943): Created Peter Rabbit.",
+   "difficulty": 3,
+   "refs": [
+    "people/beatrix-potter"
+   ]
+  },
+  {
+   "id": "who-enid-blyton",
+   "kind": "mc",
+   "prompt": "Who is this? She wrote The Famous Five books.",
+   "answer": "Enid Blyton",
+   "wrong": [
+    "Beatrix Potter",
+    "Margaret Atwood",
+    "Agatha Christie"
+   ],
+   "explain": "Enid Blyton (1897–1968): Wrote The Famous Five books.",
+   "difficulty": 2,
+   "refs": [
+    "people/enid-blyton"
+   ]
+  },
+  {
+   "id": "born-enid-blyton",
+   "kind": "mc",
+   "prompt": "In which year was Enid Blyton born?",
+   "answer": "1897",
+   "wrong": [
+    "1877",
+    "1927",
+    "1867"
+   ],
+   "explain": "Enid Blyton (1897–1968): Wrote The Famous Five books.",
+   "difficulty": 3,
+   "refs": [
+    "people/enid-blyton"
+   ]
+  },
+  {
+   "id": "who-harper-lee",
+   "kind": "mc",
+   "prompt": "Who is this? She wrote To Kill a Mockingbird.",
+   "answer": "Harper Lee",
+   "wrong": [
+    "Margaret Atwood",
+    "Toni Morrison",
+    "Maya Angelou"
+   ],
+   "explain": "Harper Lee (1926–2016): Wrote To Kill a Mockingbird.",
+   "difficulty": 2,
+   "refs": [
+    "people/harper-lee"
+   ]
+  },
+  {
+   "id": "born-harper-lee",
+   "kind": "mc",
+   "prompt": "In which year was Harper Lee born?",
+   "answer": "1926",
+   "wrong": [
+    "1946",
+    "1916",
+    "1956"
+   ],
+   "explain": "Harper Lee (1926–2016): Wrote To Kill a Mockingbird.",
+   "difficulty": 3,
+   "refs": [
+    "people/harper-lee"
+   ]
+  },
+  {
+   "id": "who-john-steinbeck",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Grapes of Wrath.",
+   "answer": "John Steinbeck",
+   "wrong": [
+    "Dante Alighieri",
+    "Johann Wolfgang von Goethe",
+    "Fyodor Dostoevsky"
+   ],
+   "explain": "John Steinbeck (1902–1968): Wrote The Grapes of Wrath.",
+   "difficulty": 2,
+   "refs": [
+    "people/john-steinbeck"
+   ]
+  },
+  {
+   "id": "born-john-steinbeck",
+   "kind": "mc",
+   "prompt": "In which year was John Steinbeck born?",
+   "answer": "1902",
+   "wrong": [
+    "1892",
+    "1912",
+    "1872"
+   ],
+   "explain": "John Steinbeck (1902–1968): Wrote The Grapes of Wrath.",
+   "difficulty": 3,
+   "refs": [
+    "people/john-steinbeck"
+   ]
+  },
+  {
+   "id": "who-robert-louis-stevenson",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Treasure Island.",
+   "answer": "Robert Louis Stevenson",
+   "wrong": [
+    "Stephen King",
+    "Oscar Wilde",
+    "Arthur Conan Doyle"
+   ],
+   "explain": "Robert Louis Stevenson (1850–1894): Wrote Treasure Island.",
+   "difficulty": 2,
+   "refs": [
+    "people/robert-louis-stevenson"
+   ]
+  },
+  {
+   "id": "born-robert-louis-stevenson",
+   "kind": "mc",
+   "prompt": "In which year was Robert Louis Stevenson born?",
+   "answer": "1850",
+   "wrong": [
+    "1870",
+    "1820",
+    "1860"
+   ],
+   "explain": "Robert Louis Stevenson (1850–1894): Wrote Treasure Island.",
+   "difficulty": 3,
+   "refs": [
+    "people/robert-louis-stevenson"
+   ]
+  },
+  {
+   "id": "who-rudyard-kipling",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Jungle Book.",
+   "answer": "Rudyard Kipling",
+   "wrong": [
+    "Roald Dahl",
+    "Charles Dickens",
+    "Stephen King"
+   ],
+   "explain": "Rudyard Kipling (1865–1936): Wrote The Jungle Book.",
+   "difficulty": 2,
+   "refs": [
+    "people/rudyard-kipling"
+   ]
+  },
+  {
+   "id": "born-rudyard-kipling",
+   "kind": "mc",
+   "prompt": "In which year was Rudyard Kipling born?",
+   "answer": "1865",
+   "wrong": [
+    "1855",
+    "1885",
+    "1875"
+   ],
+   "explain": "Rudyard Kipling (1865–1936): Wrote The Jungle Book.",
+   "difficulty": 3,
+   "refs": [
+    "people/rudyard-kipling"
+   ]
+  },
+  {
+   "id": "who-haruki-murakami",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Norwegian Wood.",
+   "answer": "Haruki Murakami",
+   "wrong": [
+    "Jules Verne",
+    "H. G. Wells",
+    "Mark Twain"
+   ],
+   "explain": "Haruki Murakami (1949): Wrote Norwegian Wood.",
+   "difficulty": 3,
+   "refs": [
+    "people/haruki-murakami"
+   ]
+  },
+  {
+   "id": "born-haruki-murakami",
+   "kind": "mc",
+   "prompt": "In which year was Haruki Murakami born?",
+   "answer": "1949",
+   "wrong": [
+    "1969",
+    "1919",
+    "1959"
+   ],
+   "explain": "Haruki Murakami (1949): Wrote Norwegian Wood.",
+   "difficulty": 3,
+   "refs": [
+    "people/haruki-murakami"
+   ]
+  },
+  {
+   "id": "who-margaret-atwood",
+   "kind": "mc",
+   "prompt": "Who is this? She wrote The Handmaid's Tale.",
+   "answer": "Margaret Atwood",
+   "wrong": [
+    "Emily Dickinson",
+    "Enid Blyton",
+    "Maya Angelou"
+   ],
+   "explain": "Margaret Atwood (1939): Wrote The Handmaid's Tale.",
+   "difficulty": 3,
+   "refs": [
+    "people/margaret-atwood"
+   ]
+  },
+  {
+   "id": "born-margaret-atwood",
+   "kind": "mc",
+   "prompt": "In which year was Margaret Atwood born?",
+   "answer": "1939",
+   "wrong": [
+    "1949",
+    "1919",
+    "1909"
+   ],
+   "explain": "Margaret Atwood (1939): Wrote The Handmaid's Tale.",
+   "difficulty": 3,
+   "refs": [
+    "people/margaret-atwood"
+   ]
+  },
+  {
+   "id": "who-johann-wolfgang-von-goethe",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote the play Faust.",
+   "answer": "Johann Wolfgang von Goethe",
+   "wrong": [
+    "Roald Dahl",
+    "Hans Christian Andersen",
+    "Fyodor Dostoevsky"
+   ],
+   "explain": "Johann Wolfgang von Goethe (1749–1832): Wrote the play Faust.",
+   "difficulty": 3,
+   "refs": [
+    "people/johann-wolfgang-von-goethe"
+   ]
+  },
+  {
+   "id": "born-johann-wolfgang-von-goethe",
+   "kind": "mc",
+   "prompt": "In which year was Johann Wolfgang von Goethe born?",
+   "answer": "1749",
+   "wrong": [
+    "1719",
+    "1729",
+    "1769"
+   ],
+   "explain": "Johann Wolfgang von Goethe (1749–1832): Wrote the play Faust.",
+   "difficulty": 3,
+   "refs": [
+    "people/johann-wolfgang-von-goethe"
+   ]
+  },
+  {
+   "id": "who-geoffrey-chaucer",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Canterbury Tales.",
+   "answer": "Geoffrey Chaucer",
+   "wrong": [
+    "Rudyard Kipling",
+    "Ernest Hemingway",
+    "Hans Christian Andersen"
+   ],
+   "explain": "Geoffrey Chaucer (died 1400): Wrote The Canterbury Tales.",
+   "difficulty": 3,
+   "refs": [
+    "people/geoffrey-chaucer"
+   ]
+  },
+  {
+   "id": "who-emily-dickinson",
+   "kind": "mc",
+   "prompt": "Who is this? She wrote the poem Because I could not stop for Death.",
+   "answer": "Emily Dickinson",
+   "wrong": [
+    "Charlotte Brontë",
+    "Virginia Woolf",
+    "Margaret Atwood"
+   ],
+   "explain": "Emily Dickinson (1830–1886): Wrote the poem Because I could not stop for Death.",
+   "difficulty": 3,
+   "refs": [
+    "people/emily-dickinson"
+   ]
+  },
+  {
+   "id": "born-emily-dickinson",
+   "kind": "mc",
+   "prompt": "In which year was Emily Dickinson born?",
+   "answer": "1830",
+   "wrong": [
+    "1850",
+    "1860",
+    "1820"
+   ],
+   "explain": "Emily Dickinson (1830–1886): Wrote the poem Because I could not stop for Death.",
+   "difficulty": 3,
+   "refs": [
+    "people/emily-dickinson"
+   ]
+  },
+  {
+   "id": "who-james-watt",
+   "kind": "mc",
+   "prompt": "Who is this? He greatly improved the steam engine.",
+   "answer": "James Watt",
+   "wrong": [
+    "Carl Sagan",
+    "Alan Turing",
+    "Alfred Nobel"
+   ],
+   "explain": "James Watt (1736–1819): Greatly improved the steam engine.",
+   "difficulty": 2,
+   "refs": [
+    "people/james-watt"
+   ]
+  },
+  {
+   "id": "born-james-watt",
+   "kind": "mc",
+   "prompt": "In which year was James Watt born?",
+   "answer": "1736",
+   "wrong": [
+    "1766",
+    "1716",
+    "1746"
+   ],
+   "explain": "James Watt (1736–1819): Greatly improved the steam engine.",
+   "difficulty": 3,
+   "refs": [
+    "people/james-watt"
+   ]
+  },
+  {
+   "id": "who-johannes-gutenberg",
+   "kind": "mc",
+   "prompt": "Who is this? He brought the printing press to Europe.",
+   "answer": "Johannes Gutenberg",
+   "wrong": [
+    "Charles Darwin",
+    "Galileo Galilei",
+    "Richard Feynman"
+   ],
+   "explain": "Johannes Gutenberg (died 1468): Brought the printing press to Europe.",
+   "difficulty": 2,
+   "refs": [
+    "people/johannes-gutenberg"
+   ]
+  },
+  {
+   "id": "who-max-planck",
+   "kind": "mc",
+   "prompt": "Who is this? He was the founder of quantum theory.",
+   "answer": "Max Planck",
+   "wrong": [
+    "Gregor Mendel",
+    "Sigmund Freud",
+    "Johannes Kepler"
+   ],
+   "explain": "Max Planck (1858–1947): The founder of quantum theory.",
+   "difficulty": 3,
+   "refs": [
+    "people/max-planck"
+   ]
+  },
+  {
+   "id": "born-max-planck",
+   "kind": "mc",
+   "prompt": "In which year was Max Planck born?",
+   "answer": "1858",
+   "wrong": [
+    "1848",
+    "1828",
+    "1878"
+   ],
+   "explain": "Max Planck (1858–1947): The founder of quantum theory.",
+   "difficulty": 3,
+   "refs": [
+    "people/max-planck"
+   ]
+  },
+  {
+   "id": "who-ernest-rutherford",
+   "kind": "mc",
+   "prompt": "Who is this? He is known as the father of nuclear physics.",
+   "answer": "Ernest Rutherford",
+   "wrong": [
+    "Dmitri Mendeleev",
+    "Alfred Nobel",
+    "Gregor Mendel"
+   ],
+   "explain": "Ernest Rutherford (1871–1937): Known as the father of nuclear physics.",
+   "difficulty": 3,
+   "refs": [
+    "people/ernest-rutherford"
+   ]
+  },
+  {
+   "id": "born-ernest-rutherford",
+   "kind": "mc",
+   "prompt": "In which year was Ernest Rutherford born?",
+   "answer": "1871",
+   "wrong": [
+    "1891",
+    "1881",
+    "1861"
+   ],
+   "explain": "Ernest Rutherford (1871–1937): Known as the father of nuclear physics.",
+   "difficulty": 3,
+   "refs": [
+    "people/ernest-rutherford"
+   ]
+  },
+  {
+   "id": "who-j-robert-oppenheimer",
+   "kind": "mc",
+   "prompt": "Who is this? He is called the father of the atomic bomb.",
+   "answer": "J. Robert Oppenheimer",
+   "wrong": [
+    "Stephen Hawking",
+    "Johannes Kepler",
+    "Gregor Mendel"
+   ],
+   "explain": "J. Robert Oppenheimer (1904–1967): Called the father of the atomic bomb.",
+   "difficulty": 2,
+   "refs": [
+    "people/j-robert-oppenheimer"
+   ]
+  },
+  {
+   "id": "born-j-robert-oppenheimer",
+   "kind": "mc",
+   "prompt": "In which year was J. Robert Oppenheimer born?",
+   "answer": "1904",
+   "wrong": [
+    "1934",
+    "1924",
+    "1884"
+   ],
+   "explain": "J. Robert Oppenheimer (1904–1967): Called the father of the atomic bomb.",
+   "difficulty": 3,
+   "refs": [
+    "people/j-robert-oppenheimer"
+   ]
+  },
+  {
+   "id": "who-carl-linnaeus",
+   "kind": "mc",
+   "prompt": "Who is this? He is called the father of modern taxonomy.",
+   "answer": "Carl Linnaeus",
+   "wrong": [
+    "Carl Sagan",
+    "Charles Darwin",
+    "Albert Einstein"
+   ],
+   "explain": "Carl Linnaeus (1707–1778): Called the father of modern taxonomy.",
+   "difficulty": 3,
+   "refs": [
+    "people/carl-linnaeus"
+   ]
+  },
+  {
+   "id": "born-carl-linnaeus",
+   "kind": "mc",
+   "prompt": "In which year was Carl Linnaeus born?",
+   "answer": "1707",
+   "wrong": [
+    "1717",
+    "1737",
+    "1687"
+   ],
+   "explain": "Carl Linnaeus (1707–1778): Called the father of modern taxonomy.",
+   "difficulty": 3,
+   "refs": [
+    "people/carl-linnaeus"
+   ]
+  },
+  {
+   "id": "who-louis-braille",
+   "kind": "mc",
+   "prompt": "Who is this? He invented a system of raised dots for blind readers.",
+   "answer": "Louis Braille",
+   "wrong": [
+    "Isaac Newton",
+    "Ernest Rutherford",
+    "Richard Feynman"
+   ],
+   "explain": "Louis Braille (1809–1852): Invented a system of raised dots for blind readers.",
+   "difficulty": 2,
+   "refs": [
+    "people/louis-braille"
+   ]
+  },
+  {
+   "id": "born-louis-braille",
+   "kind": "mc",
+   "prompt": "In which year was Louis Braille born?",
+   "answer": "1809",
+   "wrong": [
+    "1779",
+    "1839",
+    "1789"
+   ],
+   "explain": "Louis Braille (1809–1852): Invented a system of raised dots for blind readers.",
+   "difficulty": 3,
+   "refs": [
+    "people/louis-braille"
+   ]
+  },
+  {
+   "id": "who-alfred-nobel",
+   "kind": "mc",
+   "prompt": "Who is this? He invented dynamite.",
+   "answer": "Alfred Nobel",
+   "wrong": [
+    "Louis Pasteur",
+    "Alexander Graham Bell",
+    "Carl Sagan"
+   ],
+   "explain": "Alfred Nobel (1833–1896): Invented dynamite.",
+   "difficulty": 2,
+   "refs": [
+    "people/alfred-nobel"
+   ]
+  },
+  {
+   "id": "born-alfred-nobel",
+   "kind": "mc",
+   "prompt": "In which year was Alfred Nobel born?",
+   "answer": "1833",
+   "wrong": [
+    "1863",
+    "1853",
+    "1823"
+   ],
+   "explain": "Alfred Nobel (1833–1896): Invented dynamite.",
+   "difficulty": 3,
+   "refs": [
+    "people/alfred-nobel"
+   ]
+  },
+  {
+   "id": "who-grace-hopper",
+   "kind": "mc",
+   "prompt": "Who is this? She was a pioneer of computer programming.",
+   "answer": "Grace Hopper",
+   "wrong": [
+    "Jane Goodall",
+    "Marie Curie",
+    "Florence Nightingale"
+   ],
+   "explain": "Grace Hopper (1906–1992): A pioneer of computer programming.",
+   "difficulty": 3,
+   "refs": [
+    "people/grace-hopper"
+   ]
+  },
+  {
+   "id": "born-grace-hopper",
+   "kind": "mc",
+   "prompt": "In which year was Grace Hopper born?",
+   "answer": "1906",
+   "wrong": [
+    "1876",
+    "1936",
+    "1886"
+   ],
+   "explain": "Grace Hopper (1906–1992): A pioneer of computer programming.",
+   "difficulty": 3,
+   "refs": [
+    "people/grace-hopper"
+   ]
+  },
+  {
+   "id": "who-guglielmo-marconi",
+   "kind": "mc",
+   "prompt": "Who is this? He pioneered long-distance radio.",
+   "answer": "Guglielmo Marconi",
+   "wrong": [
+    "Alexander Fleming",
+    "Nikola Tesla",
+    "Max Planck"
+   ],
+   "explain": "Guglielmo Marconi (1874–1937): Pioneered long-distance radio.",
+   "difficulty": 3,
+   "refs": [
+    "people/guglielmo-marconi"
+   ]
+  },
+  {
+   "id": "born-guglielmo-marconi",
+   "kind": "mc",
+   "prompt": "In which year was Guglielmo Marconi born?",
+   "answer": "1874",
+   "wrong": [
+    "1904",
+    "1894",
+    "1884"
+   ],
+   "explain": "Guglielmo Marconi (1874–1937): Pioneered long-distance radio.",
+   "difficulty": 3,
+   "refs": [
+    "people/guglielmo-marconi"
+   ]
+  },
+  {
+   "id": "who-archimedes",
+   "kind": "mc",
+   "prompt": "Who is this? He discovered the principle of buoyancy.",
+   "answer": "Archimedes",
+   "wrong": [
+    "Sigmund Freud",
+    "Alexander Fleming",
+    "Charles Darwin"
+   ],
+   "explain": "Archimedes: Discovered the principle of buoyancy.",
+   "difficulty": 2,
+   "refs": [
+    "people/archimedes"
+   ]
+  },
+  {
+   "id": "who-bob-dylan",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Blowin' in the Wind.",
+   "answer": "Bob Dylan",
+   "wrong": [
+    "Bob Marley",
+    "Stevie Wonder",
+    "Freddie Mercury"
+   ],
+   "explain": "Bob Dylan (1941): Wrote Blowin' in the Wind.",
+   "difficulty": 2,
+   "refs": [
+    "people/bob-dylan"
+   ]
+  },
+  {
+   "id": "born-bob-dylan",
+   "kind": "mc",
+   "prompt": "In which year was Bob Dylan born?",
+   "answer": "1941",
+   "wrong": [
+    "1971",
+    "1921",
+    "1911"
+   ],
+   "explain": "Bob Dylan (1941): Wrote Blowin' in the Wind.",
+   "difficulty": 3,
+   "refs": [
+    "people/bob-dylan"
+   ]
+  },
+  {
+   "id": "who-david-bowie",
+   "kind": "mc",
+   "prompt": "Who is this? He sang Space Oddity and Heroes.",
+   "answer": "David Bowie",
+   "wrong": [
+    "Elton John",
+    "Stevie Wonder",
+    "Giuseppe Verdi"
+   ],
+   "explain": "David Bowie (1947–2016): Sang Space Oddity and Heroes.",
+   "difficulty": 1,
+   "refs": [
+    "people/david-bowie"
+   ]
+  },
+  {
+   "id": "born-david-bowie",
+   "kind": "mc",
+   "prompt": "In which year was David Bowie born?",
+   "answer": "1947",
+   "wrong": [
+    "1957",
+    "1937",
+    "1927"
+   ],
+   "explain": "David Bowie (1947–2016): Sang Space Oddity and Heroes.",
+   "difficulty": 3,
+   "refs": [
+    "people/david-bowie"
+   ]
+  },
+  {
+   "id": "who-elton-john",
+   "kind": "mc",
+   "prompt": "Who is this? He sang Rocket Man and Your Song.",
+   "answer": "Elton John",
+   "wrong": [
+    "Michael Jackson",
+    "Pyotr Ilyich Tchaikovsky",
+    "Ludwig van Beethoven"
+   ],
+   "explain": "Elton John (1947): Sang Rocket Man and Your Song.",
+   "difficulty": 1,
+   "refs": [
+    "people/elton-john"
+   ]
+  },
+  {
+   "id": "born-elton-john",
+   "kind": "mc",
+   "prompt": "In which year was Elton John born?",
+   "answer": "1947",
+   "wrong": [
+    "1967",
+    "1957",
+    "1937"
+   ],
+   "explain": "Elton John (1947): Sang Rocket Man and Your Song.",
+   "difficulty": 3,
+   "refs": [
+    "people/elton-john"
+   ]
+  },
+  {
+   "id": "who-frank-sinatra",
+   "kind": "mc",
+   "prompt": "Who is this? He sang My Way and New York, New York.",
+   "answer": "Frank Sinatra",
+   "wrong": [
+    "Elton John",
+    "John Lennon",
+    "Freddie Mercury"
+   ],
+   "explain": "Frank Sinatra (1915–1998): Sang My Way and New York, New York.",
+   "difficulty": 2,
+   "refs": [
+    "people/frank-sinatra"
+   ]
+  },
+  {
+   "id": "born-frank-sinatra",
+   "kind": "mc",
+   "prompt": "In which year was Frank Sinatra born?",
+   "answer": "1915",
+   "wrong": [
+    "1945",
+    "1935",
+    "1895"
+   ],
+   "explain": "Frank Sinatra (1915–1998): Sang My Way and New York, New York.",
+   "difficulty": 3,
+   "refs": [
+    "people/frank-sinatra"
+   ]
+  },
+  {
+   "id": "who-whitney-houston",
+   "kind": "mc",
+   "prompt": "Who is this? She sang I Will Always Love You.",
+   "answer": "Whitney Houston",
+   "wrong": [
+    "Beyoncé",
+    "Aretha Franklin",
+    "Madonna"
+   ],
+   "explain": "Whitney Houston (1963–2012): Sang I Will Always Love You.",
+   "difficulty": 2,
+   "refs": [
+    "people/whitney-houston"
+   ]
+  },
+  {
+   "id": "born-whitney-houston",
+   "kind": "mc",
+   "prompt": "In which year was Whitney Houston born?",
+   "answer": "1963",
+   "wrong": [
+    "1943",
+    "1933",
+    "1953"
+   ],
+   "explain": "Whitney Houston (1963–2012): Sang I Will Always Love You.",
+   "difficulty": 3,
+   "refs": [
+    "people/whitney-houston"
+   ]
+  },
+  {
+   "id": "who-aretha-franklin",
+   "kind": "mc",
+   "prompt": "Who is this? She sang Respect.",
+   "answer": "Aretha Franklin",
+   "wrong": [
+    "Taylor Swift",
+    "Adele",
+    "Kylie Minogue"
+   ],
+   "explain": "Aretha Franklin (1942–2018): Sang Respect.",
+   "difficulty": 2,
+   "refs": [
+    "people/aretha-franklin"
+   ]
+  },
+  {
+   "id": "born-aretha-franklin",
+   "kind": "mc",
+   "prompt": "In which year was Aretha Franklin born?",
+   "answer": "1942",
+   "wrong": [
+    "1932",
+    "1952",
+    "1972"
+   ],
+   "explain": "Aretha Franklin (1942–2018): Sang Respect.",
+   "difficulty": 3,
+   "refs": [
+    "people/aretha-franklin"
+   ]
+  },
+  {
+   "id": "who-prince",
+   "kind": "mc",
+   "prompt": "Who is this? He sang Purple Rain.",
+   "answer": "Prince",
+   "wrong": [
+    "Elvis Presley",
+    "Antonio Vivaldi",
+    "Freddie Mercury"
+   ],
+   "explain": "Prince (1958–2016): Sang Purple Rain.",
+   "difficulty": 2,
+   "refs": [
+    "people/prince"
+   ]
+  },
+  {
+   "id": "born-prince",
+   "kind": "mc",
+   "prompt": "In which year was Prince born?",
+   "answer": "1958",
+   "wrong": [
+    "1978",
+    "1938",
+    "1988"
+   ],
+   "explain": "Prince (1958–2016): Sang Purple Rain.",
+   "difficulty": 3,
+   "refs": [
+    "people/prince"
+   ]
+  },
+  {
+   "id": "who-jimi-hendrix",
+   "kind": "mc",
+   "prompt": "Who is this? He is often called the greatest electric guitarist of all time.",
+   "answer": "Jimi Hendrix",
+   "wrong": [
+    "Frank Sinatra",
+    "Stevie Wonder",
+    "Paul McCartney"
+   ],
+   "explain": "Jimi Hendrix (1942–1970): Often called the greatest electric guitarist of all time.",
+   "difficulty": 2,
+   "refs": [
+    "people/jimi-hendrix"
+   ]
+  },
+  {
+   "id": "born-jimi-hendrix",
+   "kind": "mc",
+   "prompt": "In which year was Jimi Hendrix born?",
+   "answer": "1942",
+   "wrong": [
+    "1932",
+    "1972",
+    "1962"
+   ],
+   "explain": "Jimi Hendrix (1942–1970): Often called the greatest electric guitarist of all time.",
+   "difficulty": 3,
+   "refs": [
+    "people/jimi-hendrix"
+   ]
+  },
+  {
+   "id": "who-johnny-cash",
+   "kind": "mc",
+   "prompt": "Who is this? He sang I Walk the Line and Ring of Fire.",
+   "answer": "Johnny Cash",
+   "wrong": [
+    "John Lennon",
+    "Prince",
+    "Elton John"
+   ],
+   "explain": "Johnny Cash (1932–2003): Sang I Walk the Line and Ring of Fire.",
+   "difficulty": 2,
+   "refs": [
+    "people/johnny-cash"
+   ]
+  },
+  {
+   "id": "born-johnny-cash",
+   "kind": "mc",
+   "prompt": "In which year was Johnny Cash born?",
+   "answer": "1932",
+   "wrong": [
+    "1912",
+    "1962",
+    "1942"
+   ],
+   "explain": "Johnny Cash (1932–2003): Sang I Walk the Line and Ring of Fire.",
+   "difficulty": 3,
+   "refs": [
+    "people/johnny-cash"
+   ]
+  },
+  {
+   "id": "who-stevie-wonder",
+   "kind": "mc",
+   "prompt": "Who is this? He sang Superstition and Isn't She Lovely.",
+   "answer": "Stevie Wonder",
+   "wrong": [
+    "Giuseppe Verdi",
+    "Antonio Vivaldi",
+    "Johann Sebastian Bach"
+   ],
+   "explain": "Stevie Wonder (1950): Sang Superstition and Isn't She Lovely.",
+   "difficulty": 2,
+   "refs": [
+    "people/stevie-wonder"
+   ]
+  },
+  {
+   "id": "born-stevie-wonder",
+   "kind": "mc",
+   "prompt": "In which year was Stevie Wonder born?",
+   "answer": "1950",
+   "wrong": [
+    "1980",
+    "1940",
+    "1960"
+   ],
+   "explain": "Stevie Wonder (1950): Sang Superstition and Isn't She Lovely.",
+   "difficulty": 3,
+   "refs": [
+    "people/stevie-wonder"
+   ]
+  },
+  {
+   "id": "who-ella-fitzgerald",
+   "kind": "mc",
+   "prompt": "Who is this? She was known as the First Lady of Song.",
+   "answer": "Ella Fitzgerald",
+   "wrong": [
+    "Aretha Franklin",
+    "Whitney Houston",
+    "Adele"
+   ],
+   "explain": "Ella Fitzgerald (1917–1996): Known as the First Lady of Song.",
+   "difficulty": 3,
+   "refs": [
+    "people/ella-fitzgerald"
+   ]
+  },
+  {
+   "id": "born-ella-fitzgerald",
+   "kind": "mc",
+   "prompt": "In which year was Ella Fitzgerald born?",
+   "answer": "1917",
+   "wrong": [
+    "1927",
+    "1887",
+    "1897"
+   ],
+   "explain": "Ella Fitzgerald (1917–1996): Known as the First Lady of Song.",
+   "difficulty": 3,
+   "refs": [
+    "people/ella-fitzgerald"
+   ]
+  },
+  {
+   "id": "who-adele",
+   "kind": "mc",
+   "prompt": "Who is this? She sang Rolling in the Deep and Hello.",
+   "answer": "Adele",
+   "wrong": [
+    "Madonna",
+    "Kylie Minogue",
+    "Aretha Franklin"
+   ],
+   "explain": "Adele (1988): Sang Rolling in the Deep and Hello.",
+   "difficulty": 1,
+   "refs": [
+    "people/adele"
+   ]
+  },
+  {
+   "id": "born-adele",
+   "kind": "mc",
+   "prompt": "In which year was Adele born?",
+   "answer": "1988",
+   "wrong": [
+    "1968",
+    "2008",
+    "1998"
+   ],
+   "explain": "Adele (1988): Sang Rolling in the Deep and Hello.",
+   "difficulty": 3,
+   "refs": [
+    "people/adele"
+   ]
+  },
+  {
+   "id": "who-ed-sheeran",
+   "kind": "mc",
+   "prompt": "Who is this? He sang Shape of You.",
+   "answer": "Ed Sheeran",
+   "wrong": [
+    "Frédéric Chopin",
+    "Johnny Cash",
+    "Kurt Cobain"
+   ],
+   "explain": "Ed Sheeran (1991): Sang Shape of You.",
+   "difficulty": 1,
+   "refs": [
+    "people/ed-sheeran"
+   ]
+  },
+  {
+   "id": "born-ed-sheeran",
+   "kind": "mc",
+   "prompt": "In which year was Ed Sheeran born?",
+   "answer": "1991",
+   "wrong": [
+    "1981",
+    "2001",
+    "1971"
+   ],
+   "explain": "Ed Sheeran (1991): Sang Shape of You.",
+   "difficulty": 3,
+   "refs": [
+    "people/ed-sheeran"
+   ]
+  },
+  {
+   "id": "who-lady-gaga",
+   "kind": "mc",
+   "prompt": "Who is this? She sang Poker Face and Bad Romance.",
+   "answer": "Lady Gaga",
+   "wrong": [
+    "Ella Fitzgerald",
+    "Dolly Parton",
+    "Taylor Swift"
+   ],
+   "explain": "Lady Gaga (1986): Sang Poker Face and Bad Romance.",
+   "difficulty": 1,
+   "refs": [
+    "people/lady-gaga"
+   ]
+  },
+  {
+   "id": "born-lady-gaga",
+   "kind": "mc",
+   "prompt": "In which year was Lady Gaga born?",
+   "answer": "1986",
+   "wrong": [
+    "1956",
+    "1966",
+    "1996"
+   ],
+   "explain": "Lady Gaga (1986): Sang Poker Face and Bad Romance.",
+   "difficulty": 3,
+   "refs": [
+    "people/lady-gaga"
+   ]
+  },
+  {
+   "id": "who-rihanna",
+   "kind": "mc",
+   "prompt": "Who is this? She sang Umbrella and Diamonds.",
+   "answer": "Rihanna",
+   "wrong": [
+    "Dolly Parton",
+    "Madonna",
+    "Lady Gaga"
+   ],
+   "explain": "Rihanna (1988): Sang Umbrella and Diamonds.",
+   "difficulty": 1,
+   "refs": [
+    "people/rihanna"
+   ]
+  },
+  {
+   "id": "born-rihanna",
+   "kind": "mc",
+   "prompt": "In which year was Rihanna born?",
+   "answer": "1988",
+   "wrong": [
+    "2008",
+    "1958",
+    "1968"
+   ],
+   "explain": "Rihanna (1988): Sang Umbrella and Diamonds.",
+   "difficulty": 3,
+   "refs": [
+    "people/rihanna"
+   ]
+  },
+  {
+   "id": "who-mick-jagger",
+   "kind": "mc",
+   "prompt": "Who is this? He is the lead singer of the Rolling Stones.",
+   "answer": "Mick Jagger",
+   "wrong": [
+    "Bob Marley",
+    "Wolfgang Amadeus Mozart",
+    "Elvis Presley"
+   ],
+   "explain": "Mick Jagger (1943): The lead singer of the Rolling Stones.",
+   "difficulty": 2,
+   "refs": [
+    "people/mick-jagger"
+   ]
+  },
+  {
+   "id": "born-mick-jagger",
+   "kind": "mc",
+   "prompt": "In which year was Mick Jagger born?",
+   "answer": "1943",
+   "wrong": [
+    "1973",
+    "1933",
+    "1923"
+   ],
+   "explain": "Mick Jagger (1943): The lead singer of the Rolling Stones.",
+   "difficulty": 3,
+   "refs": [
+    "people/mick-jagger"
+   ]
+  },
+  {
+   "id": "who-kylie-minogue",
+   "kind": "mc",
+   "prompt": "Who is this? She sang I Should Be So Lucky.",
+   "answer": "Kylie Minogue",
+   "wrong": [
+    "Aretha Franklin",
+    "Rihanna",
+    "Lady Gaga"
+   ],
+   "explain": "Kylie Minogue (1968): Sang I Should Be So Lucky.",
+   "difficulty": 2,
+   "refs": [
+    "people/kylie-minogue"
+   ]
+  },
+  {
+   "id": "born-kylie-minogue",
+   "kind": "mc",
+   "prompt": "In which year was Kylie Minogue born?",
+   "answer": "1968",
+   "wrong": [
+    "1948",
+    "1998",
+    "1988"
+   ],
+   "explain": "Kylie Minogue (1968): Sang I Should Be So Lucky.",
+   "difficulty": 3,
+   "refs": [
+    "people/kylie-minogue"
+   ]
+  },
+  {
+   "id": "who-kurt-cobain",
+   "kind": "mc",
+   "prompt": "Who is this? He was the singer and guitarist of Nirvana.",
+   "answer": "Kurt Cobain",
+   "wrong": [
+    "Ludwig van Beethoven",
+    "Bob Marley",
+    "Louis Armstrong"
+   ],
+   "explain": "Kurt Cobain (1967–1994): The singer and guitarist of Nirvana.",
+   "difficulty": 3,
+   "refs": [
+    "people/kurt-cobain"
+   ]
+  },
+  {
+   "id": "born-kurt-cobain",
+   "kind": "mc",
+   "prompt": "In which year was Kurt Cobain born?",
+   "answer": "1967",
+   "wrong": [
+    "1937",
+    "1957",
+    "1977"
+   ],
+   "explain": "Kurt Cobain (1967–1994): The singer and guitarist of Nirvana.",
+   "difficulty": 3,
+   "refs": [
+    "people/kurt-cobain"
+   ]
+  },
+  {
+   "id": "who-george-frideric-handel",
+   "kind": "mc",
+   "prompt": "Who is this? He composed Messiah, with its Hallelujah chorus.",
+   "answer": "George Frideric Handel",
+   "wrong": [
+    "David Bowie",
+    "Freddie Mercury",
+    "Elvis Presley"
+   ],
+   "explain": "George Frideric Handel (1685–1759): Composed Messiah, with its Hallelujah chorus.",
+   "difficulty": 2,
+   "refs": [
+    "people/george-frideric-handel"
+   ]
+  },
+  {
+   "id": "born-george-frideric-handel",
+   "kind": "mc",
+   "prompt": "In which year was George Frideric Handel born?",
+   "answer": "1685",
+   "wrong": [
+    "1655",
+    "1665",
+    "1695"
+   ],
+   "explain": "George Frideric Handel (1685–1759): Composed Messiah, with its Hallelujah chorus.",
+   "difficulty": 3,
+   "refs": [
+    "people/george-frideric-handel"
+   ]
+  },
+  {
+   "id": "who-giuseppe-verdi",
+   "kind": "mc",
+   "prompt": "Who is this? He composed the opera Rigoletto.",
+   "answer": "Giuseppe Verdi",
+   "wrong": [
+    "Pyotr Ilyich Tchaikovsky",
+    "Elton John",
+    "George Frideric Handel"
+   ],
+   "explain": "Giuseppe Verdi (1813–1901): Composed the opera Rigoletto.",
+   "difficulty": 3,
+   "refs": [
+    "people/giuseppe-verdi"
+   ]
+  },
+  {
+   "id": "born-giuseppe-verdi",
+   "kind": "mc",
+   "prompt": "In which year was Giuseppe Verdi born?",
+   "answer": "1813",
+   "wrong": [
+    "1783",
+    "1793",
+    "1803"
+   ],
+   "explain": "Giuseppe Verdi (1813–1901): Composed the opera Rigoletto.",
+   "difficulty": 3,
+   "refs": [
+    "people/giuseppe-verdi"
+   ]
+  },
+  {
+   "id": "who-novak-djokovic",
+   "kind": "mc",
+   "prompt": "Who is this? He has won a record number of men's Grand Slam singles titles.",
+   "answer": "Novak Djokovic",
+   "wrong": [
+    "Cristiano Ronaldo",
+    "Diego Maradona",
+    "Lionel Messi"
+   ],
+   "explain": "Novak Djokovic (1987): Has won a record number of men's Grand Slam singles titles.",
+   "difficulty": 1,
+   "refs": [
+    "people/novak-djokovic"
+   ]
+  },
+  {
+   "id": "born-novak-djokovic",
+   "kind": "mc",
+   "prompt": "In which year was Novak Djokovic born?",
+   "answer": "1987",
+   "wrong": [
+    "1957",
+    "1967",
+    "2007"
+   ],
+   "explain": "Novak Djokovic (1987): Has won a record number of men's Grand Slam singles titles.",
+   "difficulty": 3,
+   "refs": [
+    "people/novak-djokovic"
+   ]
+  },
+  {
+   "id": "who-ayrton-senna",
+   "kind": "mc",
+   "prompt": "Who is this? He was a three-time Formula One world champion.",
+   "answer": "Ayrton Senna",
+   "wrong": [
+    "Jesse Owens",
+    "Jonah Lomu",
+    "Sachin Tendulkar"
+   ],
+   "explain": "Ayrton Senna (1960–1994): A three-time Formula One world champion.",
+   "difficulty": 2,
+   "refs": [
+    "people/ayrton-senna"
+   ]
+  },
+  {
+   "id": "born-ayrton-senna",
+   "kind": "mc",
+   "prompt": "In which year was Ayrton Senna born?",
+   "answer": "1960",
+   "wrong": [
+    "1940",
+    "1990",
+    "1950"
+   ],
+   "explain": "Ayrton Senna (1960–1994): A three-time Formula One world champion.",
+   "difficulty": 3,
+   "refs": [
+    "people/ayrton-senna"
+   ]
+  },
+  {
+   "id": "who-michael-schumacher",
+   "kind": "mc",
+   "prompt": "Who is this? He won seven Formula One world championships.",
+   "answer": "Michael Schumacher",
+   "wrong": [
+    "Michael Phelps",
+    "Roger Federer",
+    "Muhammad Ali"
+   ],
+   "explain": "Michael Schumacher (1969): Won seven Formula One world championships.",
+   "difficulty": 1,
+   "refs": [
+    "people/michael-schumacher"
+   ]
+  },
+  {
+   "id": "born-michael-schumacher",
+   "kind": "mc",
+   "prompt": "In which year was Michael Schumacher born?",
+   "answer": "1969",
+   "wrong": [
+    "1989",
+    "1959",
+    "1939"
+   ],
+   "explain": "Michael Schumacher (1969): Won seven Formula One world championships.",
+   "difficulty": 3,
+   "refs": [
+    "people/michael-schumacher"
+   ]
+  },
+  {
+   "id": "who-lebron-james",
+   "kind": "mc",
+   "prompt": "Who is this? He won NBA titles with Miami, Cleveland and the Los Angeles Lakers.",
+   "answer": "LeBron James",
+   "wrong": [
+    "Zinedine Zidane",
+    "Usain Bolt",
+    "Jack Nicklaus"
+   ],
+   "explain": "LeBron James (1984): Won NBA titles with Miami, Cleveland and the Los Angeles Lakers.",
+   "difficulty": 1,
+   "refs": [
+    "people/lebron-james"
+   ]
+  },
+  {
+   "id": "born-lebron-james",
+   "kind": "mc",
+   "prompt": "In which year was LeBron James born?",
+   "answer": "1984",
+   "wrong": [
+    "2004",
+    "1994",
+    "1964"
+   ],
+   "explain": "LeBron James (1984): Won NBA titles with Miami, Cleveland and the Los Angeles Lakers.",
+   "difficulty": 3,
+   "refs": [
+    "people/lebron-james"
+   ]
+  },
+  {
+   "id": "who-zinedine-zidane",
+   "kind": "mc",
+   "prompt": "Who is this? He was a French midfielder who won the 1998 World Cup.",
+   "answer": "Zinedine Zidane",
+   "wrong": [
+    "Johan Cruyff",
+    "Michael Jordan",
+    "David Beckham"
+   ],
+   "explain": "Zinedine Zidane (1972): A French midfielder who won the 1998 World Cup.",
+   "difficulty": 2,
+   "refs": [
+    "people/zinedine-zidane"
+   ]
+  },
+  {
+   "id": "born-zinedine-zidane",
+   "kind": "mc",
+   "prompt": "In which year was Zinedine Zidane born?",
+   "answer": "1972",
+   "wrong": [
+    "1962",
+    "1942",
+    "1952"
+   ],
+   "explain": "Zinedine Zidane (1972): A French midfielder who won the 1998 World Cup.",
+   "difficulty": 3,
+   "refs": [
+    "people/zinedine-zidane"
+   ]
+  },
+  {
+   "id": "who-david-beckham",
+   "kind": "mc",
+   "prompt": "Who is this? He was famous for his free kicks for Manchester United and England.",
+   "answer": "David Beckham",
+   "wrong": [
+    "Mike Tyson",
+    "Diego Maradona",
+    "Babe Ruth"
+   ],
+   "explain": "David Beckham (1975): Famous for his free kicks for Manchester United and England.",
+   "difficulty": 1,
+   "refs": [
+    "people/david-beckham"
+   ]
+  },
+  {
+   "id": "born-david-beckham",
+   "kind": "mc",
+   "prompt": "In which year was David Beckham born?",
+   "answer": "1975",
+   "wrong": [
+    "1985",
+    "1955",
+    "1965"
+   ],
+   "explain": "David Beckham (1975): Famous for his free kicks for Manchester United and England.",
+   "difficulty": 3,
+   "refs": [
+    "people/david-beckham"
+   ]
+  },
+  {
+   "id": "who-johan-cruyff",
+   "kind": "mc",
+   "prompt": "Who is this? He won the Ballon d'Or three times.",
+   "answer": "Johan Cruyff",
+   "wrong": [
+    "Cristiano Ronaldo",
+    "Michael Phelps",
+    "Diego Maradona"
+   ],
+   "explain": "Johan Cruyff (1947–2016): Won the Ballon d'Or three times.",
+   "difficulty": 2,
+   "refs": [
+    "people/johan-cruyff"
+   ]
+  },
+  {
+   "id": "born-johan-cruyff",
+   "kind": "mc",
+   "prompt": "In which year was Johan Cruyff born?",
+   "answer": "1947",
+   "wrong": [
+    "1957",
+    "1917",
+    "1937"
+   ],
+   "explain": "Johan Cruyff (1947–2016): Won the Ballon d'Or three times.",
+   "difficulty": 3,
+   "refs": [
+    "people/johan-cruyff"
+   ]
+  },
+  {
+   "id": "who-shane-warne",
+   "kind": "mc",
+   "prompt": "Who is this? He was an Australian leg-spin bowler.",
+   "answer": "Shane Warne",
+   "wrong": [
+    "Michael Schumacher",
+    "Johan Cruyff",
+    "Wayne Gretzky"
+   ],
+   "explain": "Shane Warne (1969–2022): An Australian leg-spin bowler.",
+   "difficulty": 2,
+   "refs": [
+    "people/shane-warne"
+   ]
+  },
+  {
+   "id": "born-shane-warne",
+   "kind": "mc",
+   "prompt": "In which year was Shane Warne born?",
+   "answer": "1969",
+   "wrong": [
+    "1959",
+    "1989",
+    "1979"
+   ],
+   "explain": "Shane Warne (1969–2022): An Australian leg-spin bowler.",
+   "difficulty": 3,
+   "refs": [
+    "people/shane-warne"
+   ]
+  },
+  {
+   "id": "who-cathy-freeman",
+   "kind": "mc",
+   "prompt": "Who is this? She is an Aboriginal Australian sprinter.",
+   "answer": "Cathy Freeman",
+   "wrong": [
+    "Billie Jean King",
+    "Steffi Graf",
+    "Serena Williams"
+   ],
+   "explain": "Cathy Freeman (1973): An Aboriginal Australian sprinter.",
+   "difficulty": 2,
+   "refs": [
+    "people/cathy-freeman"
+   ]
+  },
+  {
+   "id": "born-cathy-freeman",
+   "kind": "mc",
+   "prompt": "In which year was Cathy Freeman born?",
+   "answer": "1973",
+   "wrong": [
+    "1993",
+    "1983",
+    "1943"
+   ],
+   "explain": "Cathy Freeman (1973): An Aboriginal Australian sprinter.",
+   "difficulty": 3,
+   "refs": [
+    "people/cathy-freeman"
+   ]
+  },
+  {
+   "id": "who-jonah-lomu",
+   "kind": "mc",
+   "prompt": "Who is this? He was a giant rugby union winger.",
+   "answer": "Jonah Lomu",
+   "wrong": [
+    "Michael Schumacher",
+    "Diego Maradona",
+    "Lionel Messi"
+   ],
+   "explain": "Jonah Lomu (1975–2015): A giant rugby union winger.",
+   "difficulty": 3,
+   "refs": [
+    "people/jonah-lomu"
+   ]
+  },
+  {
+   "id": "born-jonah-lomu",
+   "kind": "mc",
+   "prompt": "In which year was Jonah Lomu born?",
+   "answer": "1975",
+   "wrong": [
+    "1945",
+    "1985",
+    "1995"
+   ],
+   "explain": "Jonah Lomu (1975–2015): A giant rugby union winger.",
+   "difficulty": 3,
+   "refs": [
+    "people/jonah-lomu"
+   ]
+  },
+  {
+   "id": "who-carl-lewis",
+   "kind": "mc",
+   "prompt": "Who is this? He was an American sprinter and long jumper.",
+   "answer": "Carl Lewis",
+   "wrong": [
+    "Muhammad Ali",
+    "Michael Jordan",
+    "Sachin Tendulkar"
+   ],
+   "explain": "Carl Lewis (1961): An American sprinter and long jumper.",
+   "difficulty": 2,
+   "refs": [
+    "people/carl-lewis"
+   ]
+  },
+  {
+   "id": "born-carl-lewis",
+   "kind": "mc",
+   "prompt": "In which year was Carl Lewis born?",
+   "answer": "1961",
+   "wrong": [
+    "1931",
+    "1951",
+    "1941"
+   ],
+   "explain": "Carl Lewis (1961): An American sprinter and long jumper.",
+   "difficulty": 3,
+   "refs": [
+    "people/carl-lewis"
+   ]
+  },
+  {
+   "id": "who-billie-jean-king",
+   "kind": "mc",
+   "prompt": "Who is this? She won 39 Grand Slam titles in singles and doubles.",
+   "answer": "Billie Jean King",
+   "wrong": [
+    "Cathy Freeman",
+    "Steffi Graf",
+    "Martina Navratilova"
+   ],
+   "explain": "Billie Jean King (1943): Won 39 Grand Slam titles in singles and doubles.",
+   "difficulty": 2,
+   "refs": [
+    "people/billie-jean-king"
+   ]
+  },
+  {
+   "id": "born-billie-jean-king",
+   "kind": "mc",
+   "prompt": "In which year was Billie Jean King born?",
+   "answer": "1943",
+   "wrong": [
+    "1963",
+    "1923",
+    "1933"
+   ],
+   "explain": "Billie Jean King (1943): Won 39 Grand Slam titles in singles and doubles.",
+   "difficulty": 3,
+   "refs": [
+    "people/billie-jean-king"
+   ]
+  },
+  {
+   "id": "who-martina-navratilova",
+   "kind": "mc",
+   "prompt": "Who is this? She was a dominant women's tennis player of the 1980s.",
+   "answer": "Martina Navratilova",
+   "wrong": [
+    "Simone Biles",
+    "Billie Jean King",
+    "Serena Williams"
+   ],
+   "explain": "Martina Navratilova (1956): A dominant women's tennis player of the 1980s.",
+   "difficulty": 2,
+   "refs": [
+    "people/martina-navratilova"
+   ]
+  },
+  {
+   "id": "born-martina-navratilova",
+   "kind": "mc",
+   "prompt": "In which year was Martina Navratilova born?",
+   "answer": "1956",
+   "wrong": [
+    "1966",
+    "1946",
+    "1976"
+   ],
+   "explain": "Martina Navratilova (1956): A dominant women's tennis player of the 1980s.",
+   "difficulty": 3,
+   "refs": [
+    "people/martina-navratilova"
+   ]
+  },
+  {
+   "id": "who-steffi-graf",
+   "kind": "mc",
+   "prompt": "Who is this? She was a German tennis star.",
+   "answer": "Steffi Graf",
+   "wrong": [
+    "Nadia Comăneci",
+    "Martina Navratilova",
+    "Billie Jean King"
+   ],
+   "explain": "Steffi Graf (1969): A German tennis star.",
+   "difficulty": 2,
+   "refs": [
+    "people/steffi-graf"
+   ]
+  },
+  {
+   "id": "born-steffi-graf",
+   "kind": "mc",
+   "prompt": "In which year was Steffi Graf born?",
+   "answer": "1969",
+   "wrong": [
+    "1979",
+    "1959",
+    "1999"
+   ],
+   "explain": "Steffi Graf (1969): A German tennis star.",
+   "difficulty": 3,
+   "refs": [
+    "people/steffi-graf"
+   ]
+  },
+  {
+   "id": "who-tom-brady",
+   "kind": "mc",
+   "prompt": "Who is this? He is an American football quarterback.",
+   "answer": "Tom Brady",
+   "wrong": [
+    "Michael Jordan",
+    "Michael Phelps",
+    "Lionel Messi"
+   ],
+   "explain": "Tom Brady (1977): An American football quarterback.",
+   "difficulty": 2,
+   "refs": [
+    "people/tom-brady"
+   ]
+  },
+  {
+   "id": "born-tom-brady",
+   "kind": "mc",
+   "prompt": "In which year was Tom Brady born?",
+   "answer": "1977",
+   "wrong": [
+    "1947",
+    "1957",
+    "1987"
+   ],
+   "explain": "Tom Brady (1977): An American football quarterback.",
+   "difficulty": 3,
+   "refs": [
+    "people/tom-brady"
+   ]
+  },
+  {
+   "id": "who-mike-tyson",
+   "kind": "mc",
+   "prompt": "Who is this? He was a ferocious American heavyweight boxer.",
+   "answer": "Mike Tyson",
+   "wrong": [
+    "Michael Schumacher",
+    "Wayne Gretzky",
+    "Rafael Nadal"
+   ],
+   "explain": "Mike Tyson (1966): A ferocious American heavyweight boxer.",
+   "difficulty": 2,
+   "refs": [
+    "people/mike-tyson"
+   ]
+  },
+  {
+   "id": "born-mike-tyson",
+   "kind": "mc",
+   "prompt": "In which year was Mike Tyson born?",
+   "answer": "1966",
+   "wrong": [
+    "1986",
+    "1956",
+    "1996"
+   ],
+   "explain": "Mike Tyson (1966): A ferocious American heavyweight boxer.",
+   "difficulty": 3,
+   "refs": [
+    "people/mike-tyson"
+   ]
+  },
+  {
+   "id": "who-eliud-kipchoge",
+   "kind": "mc",
+   "prompt": "Who is this? He is a Kenyan marathon runner.",
+   "answer": "Eliud Kipchoge",
+   "wrong": [
+    "Pelé",
+    "Shane Warne",
+    "Tiger Woods"
+   ],
+   "explain": "Eliud Kipchoge (1984): A Kenyan marathon runner.",
+   "difficulty": 3,
+   "refs": [
+    "people/eliud-kipchoge"
+   ]
+  },
+  {
+   "id": "born-eliud-kipchoge",
+   "kind": "mc",
+   "prompt": "In which year was Eliud Kipchoge born?",
+   "answer": "1984",
+   "wrong": [
+    "1994",
+    "1954",
+    "1964"
+   ],
+   "explain": "Eliud Kipchoge (1984): A Kenyan marathon runner.",
+   "difficulty": 3,
+   "refs": [
+    "people/eliud-kipchoge"
+   ]
+  },
+  {
+   "id": "who-jack-nicklaus",
+   "kind": "mc",
+   "prompt": "Who is this? He was an American golfer.",
+   "answer": "Jack Nicklaus",
+   "wrong": [
+    "LeBron James",
+    "Tiger Woods",
+    "David Beckham"
+   ],
+   "explain": "Jack Nicklaus (1940): An American golfer.",
+   "difficulty": 3,
+   "refs": [
+    "people/jack-nicklaus"
+   ]
+  },
+  {
+   "id": "born-jack-nicklaus",
+   "kind": "mc",
+   "prompt": "In which year was Jack Nicklaus born?",
+   "answer": "1940",
+   "wrong": [
+    "1960",
+    "1970",
+    "1930"
+   ],
+   "explain": "Jack Nicklaus (1940): An American golfer.",
+   "difficulty": 3,
+   "refs": [
+    "people/jack-nicklaus"
+   ]
   }
  ],
  "sources": [
@@ -6622,5 +12237,35 @@
    "url": "https://commons.wikimedia.org"
   }
  ],
- "noun": "famous person"
+ "noun": "famous person",
+ "groupPacks": {
+  "science": {
+   "title": "Scientists & inventors",
+   "icon": "🔬"
+  },
+  "literature": {
+   "title": "Writers",
+   "icon": "✍️"
+  },
+  "music": {
+   "title": "Musicians",
+   "icon": "🎤"
+  },
+  "sport": {
+   "title": "Sport stars",
+   "icon": "🏅"
+  }
+ },
+ "mergePack": {
+  "id": "people~all",
+  "title": "All famous people",
+  "icon": "🌟",
+  "of": [
+   "people",
+   "actors",
+   "directors",
+   "leaders",
+   "explorers"
+  ]
+ }
 }

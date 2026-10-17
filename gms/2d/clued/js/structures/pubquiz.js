@@ -1,21 +1,21 @@
 // Pub quiz: 4–8 rounds of different formats/themes, one double-points joker per player, builder or "surprise me".
-import { playSpec } from './session.js?v=202610171251';
-import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610171251';
-import { mySetting, saveMySetting, specLocal } from '../core/local.js?v=202610171251';
-import { localChip, localLine, localTotal } from '../ui/local.js?v=202610171251';
-import { handoff } from './handoff.js?v=202610171251';
-import { playersEditor } from './party.js?v=202610171251';
-import { defineScreen, go, header } from '../ui/app.js?v=202610171251';
-import { h, esc, fmtNum } from '../ui/kit.js?v=202610171251';
-import { toast } from '../ui/popup.js?v=202610171251';
-import { getFormat, defaultOpts } from '../formats/registry.js?v=202610171251';
-import { getIndex } from '../core/packs.js?v=202610171251';
-import { getSettings, setSettings, read, write, getFavs } from '../core/store.js?v=202610171251';
-import { streakOption } from '../ui/streakopt.js?v=202610171251';
-import { cleanFav, favKey } from '../ui/favmodel.js?v=202610171251';
-import { roundTitle, usable, roundCard, moveItem, registerRoundList, addRound } from './rounds.js?v=202610171251';
-import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610171251';
-import { sfx } from '../ui/fx.js?v=202610171251';
+import { playSpec } from './session.js?v=202610171317';
+import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610171317';
+import { mySetting, saveMySetting, specLocal } from '../core/local.js?v=202610171317';
+import { localChip, localLine, localTotal } from '../ui/local.js?v=202610171317';
+import { handoff } from './handoff.js?v=202610171317';
+import { playersEditor } from './party.js?v=202610171317';
+import { defineScreen, go, header } from '../ui/app.js?v=202610171317';
+import { h, esc, fmtNum } from '../ui/kit.js?v=202610171317';
+import { toast } from '../ui/popup.js?v=202610171317';
+import { getFormat, defaultOpts } from '../formats/registry.js?v=202610171317';
+import { getIndex } from '../core/packs.js?v=202610171317';
+import { getSettings, setSettings, read, write, getFavs } from '../core/store.js?v=202610171317';
+import { streakOption } from '../ui/streakopt.js?v=202610171317';
+import { cleanFav, favKey } from '../ui/favmodel.js?v=202610171317';
+import { roundTitle, usable, roundCard, moveItem, registerRoundList, addRound } from './rounds.js?v=202610171317';
+import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610171317';
+import { sfx } from '../ui/fx.js?v=202610171317';
 
 const KEY = 'clued.pubquiz';
 const MAX_ROUNDS = 8;
@@ -73,7 +73,7 @@ function surpriseBase(seed, kids) {
   const music = tagged('music')[0]; if (music) rounds.push({ format: music.id, title: 'Music round' });
   const map = tagged('map'); if (map.length) rounds.push({ format: pick(rng, map).id, title: 'Map round' });
   const pool = shuffle(rng, fmts.filter(f => !rounds.some(r => r.format === f.id)));
-  const themes = shuffle(rng, idx.themes);
+  const themes = shuffle(rng, idx.themes.filter(t => t.id !== 'genres'));
   for (const f of pool) {
     if (rounds.length >= 5) break;
     const t = themes.find(th => th.packs.some(id => supportedPackIds(f, idx).includes(id)));
@@ -88,14 +88,27 @@ function surpriseBase(seed, kids) {
   return rounds.map(r => ({ packs: 'all', count: 6, difficulty: 0, ...r, preset: r.opts, opts: { ...defaultOpts(getFormat(r.format)), ...(r.opts || {}) } }));
 }
 
+// A suggested or saved online set as pub-quiz rounds (Sci-fi Night …): shorter rounds, since each player gets the count
+export const readyMade = rounds => rounds.filter(r => getFormat(r.format)).slice(0, MAX_ROUNDS).map(r => ({
+  format: r.format, packs: r.packs, count: Math.max(2, Math.ceil((r.count || 10) * 0.6)), opts: { ...defaultOpts(getFormat(r.format)), ...(r.opts || {}) },
+  difficulty: r.difficulty || 0, ...(r.title ? { title: r.title } : {}),
+}));
+
 defineScreen('pubquiz', el => {
   const s = state();
   const kids = !!getSettings().kids;
   el.append(header('Pub quiz'));
-  el.append(h('p.muted.center', { style: { marginTop: '0', marginBottom: '12px' } }, 'Build 4–8 rounds or let us surprise you. Each player gets one joker: double points on the round they choose.'));
+  el.append(h('p.muted.center', { style: { marginTop: '0', marginBottom: '12px' } }, 'Build 4–8 rounds, start from a ready-made night (Sci-fi, Horror, Music…) or let us surprise you. Each player gets one joker: double points on the round they choose.'));
   const top = h('div.row', { style: { justifyContent: 'center' } },
     h('button.btn.sun', { type: 'button', dataset: { act: 'surprise' }, onclick: () => { s.rounds = surprise(randomSeed(), kids); s.jokers = {}; save(); sfx('reveal'); draw(); } }, '🎲 Surprise me'),
-    h('button.btn', { type: 'button', dataset: { act: 'kids-preset' }, onclick: () => { s.rounds = surprise(randomSeed(), true); s.jokers = {}; save(); draw(); } }, '🧸 Kids quiz'));
+    h('button.btn', { type: 'button', dataset: { act: 'kids-preset' }, onclick: () => { s.rounds = surprise(randomSeed(), true); s.jokers = {}; save(); draw(); } }, '🧸 Kids quiz'),
+    h('button.btn', { type: 'button', dataset: { act: 'ready-made' }, onclick: async () => {
+      const set = await (await import('../net/sets.js?v=202610171317')).pickSet(kids);
+      if (!set) return;
+      s.rounds = readyMade(set.rounds);
+      s.jokers = {}; save(); draw();
+      toast(`Loaded “${set.name}”: edit or remove any round`);
+    } }, '📋 Ready-made'));
   const list = h('div.rounds');
   const playersBox = h('div.panel');
   const locSum = h('p.rounds-sum', { dataset: { loc: 'total' } });

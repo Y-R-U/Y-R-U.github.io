@@ -1,5 +1,5 @@
 // DIFFMIX: an Easy/Medium/Hard round is a blend of levels, not one level (Aaron 2026-10-13). docs/notes/DIFFMIX.md
-import { rngFrom, shuffle } from './rng.js?v=202610171251';
+import { rngFrom, shuffle } from './rng.js?v=202610171317';
 
 export const BLEND = { 1: [6, 3, 1], 2: [2, 6, 2], 3: [1, 3, 6] };
 
@@ -29,7 +29,7 @@ export const nearest = (lv, difficulty) => [1, 2, 3].filter(x => x !== lv)
   .sort((a, b) => Math.abs(a - lv) - Math.abs(b - lv) || Math.abs(a - difficulty) - Math.abs(b - difficulty));
 
 let geoP = null;
-export const loadGeoLevels = () => (geoP ||= import('../geo/formats/common.js?v=202610171251').catch(() => null));
+export const loadGeoLevels = () => (geoP ||= import('../geo/formats/common.js?v=202610171317').catch(() => null));
 
 const clamp = d => Math.min(3, Math.max(1, Math.round(Number(d)) || 2));
 
@@ -38,6 +38,7 @@ const clamp = d => Math.min(3, Math.max(1, Math.round(Number(d)) || 2));
 export function levelOf(q, asked, { levels, packless = false, geoL = null } = {}) {
   if (q.lv) return q.lv;
   const d = q.data || {};
+  if (d.lv) return d.lv;
   if (packless && geoL) {
     const G = geoL.geo;
     if (d.kind === 'state' && G.states?.[d.region]) {

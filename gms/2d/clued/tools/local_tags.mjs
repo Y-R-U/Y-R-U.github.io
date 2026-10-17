@@ -108,7 +108,7 @@ const byId = Object.fromEntries(PACKS.map(p => [p.id, p]));
 
 // People → countries, from every pack that records nationality / origin of a person or act.
 const PERSON = new Map();
-for (const id of ['people', 'actors', 'artists', 'explorers', 'leaders', 'music-artists']) {
+for (const id of ['people', 'actors', 'artists', 'explorers', 'leaders', 'music-artists', 'directors']) {
   for (const it of byId[id]?.items || []) {
     const isos = valueIsos(it.facts?.nationality ?? it.facts?.origin);
     if (isos.length) PERSON.set(it.name, isos);

@@ -48,6 +48,24 @@ export const SUGGESTED = [
     R('In order of publication', 'order', ['books'], {}),
     R('Pick all by the author', 'pickall', ['books'], { tiles: 6 }),
   ] },
+  // Genre nights (Aaron 2026-10-17): every round restricted to one genre (data/genres.json); the Genres theme in any
+  // round editor offers the same packs
+  { id: 'scifi', name: 'Sci-fi Night', blurb: 'Film and TV pictures, theme tunes, famous lines, books and a hat-trick.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
+    R('Picture round: name the film, show or book', 'mc', ['genre~scifi'], { answers: 4, source: 'pictures' }),
+    R('Sci-fi theme tunes', 'listen', ['genre~scifi'], LISTEN),
+    R('Famous lines', 'quote', ['genre~scifi'], { answers: 4 }),
+    R('Sci-fi books', 'mc', ['books~scifi', 'book-moments~scifi'], { answers: 4, source: 'mix' }),
+    R('Sci-fi film & TV', 'mc', ['movies~scifi', 'tv~scifi'], { answers: 4, source: 'mix' }),
+    TRIO('Hat-trick: name it, who, when', ['genre~scifi']),
+  ] },
+  { id: 'horror', name: 'Horror Night', blurb: 'Scary scenes, creepy theme tunes, horror films, shows, books and a hat-trick.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
+    R('Picture round: name the film, show or book', 'mc', ['genre~horror'], { answers: 4, source: 'pictures' }),
+    { ...R('Horror theme tunes', 'listen', ['genre~horror'], LISTEN), count: 6 },
+    R('Horror films & TV', 'mc', ['movies~horror', 'tv~horror'], { answers: 4, source: 'mix' }),
+    R('Horror books', 'mc', ['books~horror', 'book-moments~horror'], { answers: 4, source: 'mix' }),
+    R('Which came first?', 'order', ['movies~horror', 'books~horror'], {}),
+    TRIO('Hat-trick: name it, who, when', ['genre~horror']),
+  ] },
   { id: 'science', name: 'Science & Nature', blurb: 'Science trivia, space, animal pictures, the body, animal calls, inventions.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
     R('Science', 'mc', ['general~science'], { answers: 4, source: 'mix' }),
     R('Space', 'mc', ['space'], { answers: 4, source: 'mix' }),

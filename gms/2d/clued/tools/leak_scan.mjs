@@ -3,7 +3,7 @@
 //  1. item media: an image/audio URL whose file name spells the item's name. Our own files (media/…) count as leaks;
 //     remote ones are reported apart: players can't see them since every in-game picture blocks long-press/context menus.
 //  2. pack questions: the answer in the prompt or the question's own media URL
-//  3. generated questions (every format × pack × normal/easy/kids, several seeds): the answer in the prompt, hint,
+//  3. generated questions (every format × pack × normal/easy/kids, several seeds; genre views too): the answer in the prompt, hint,
 //     clues or picture URL. Formats that show every name by design (match/sort/order/connect/hilo/blitz/chain/lookalike)
 //     are skipped in pass 3; their pictures are covered by pass 1. tf prompts and picture-choice prompts ("Which of these
 //     is X?") name things by design. A word only counts when few other answers share it and no wrong option has it.
@@ -97,11 +97,20 @@ for (const m of MODULES) { try { await import(new URL(m, js('formats/index.js'))
 const reg = await import(js('formats/registry.js'));
 const { rngFrom } = await import(js('core/rng.js'));
 const { kidsView } = await import(js('core/spec.js'));
+// genre views (movies~scifi …) too: the same items with a smaller pool of other answers
+const { virtualView } = await import(js('core/packs.js'));
+const genreMeta = (() => { try { return JSON.parse(readFileSync(join(ROOT, 'data/genres.json'), 'utf8')); } catch (e) { return null; } })();
+const genreIds = Object.keys(index.packs).filter(id => index.packs[id].virtual?.genre);
+const scanPack = id => {
+  const v = index.packs[id].virtual;
+  if (!v?.genre) return loadPack(id);
+  return virtualView(id, v, [loadPack(v.of)], { title: index.packs[id].title, genreIds: genreMeta?.packs?.[v.of]?.[v.genre] || [], adult: index.packs[id].kidsSafe === false });
+};
 const SKIP_FMT = new Set(['match', 'sort', 'order', 'connect', 'hilo', 'blitz60', 'chain', 'lookalike', 'fake']);
 const seen = new Set();
 const answerOf = q => q.answerText ?? (Array.isArray(q.options) && typeof q.answer === 'number' ? q.options[q.answer]?.text : q.answer);
-for (const id of realIds) {
-  const info = index.packs[id], pack = loadPack(id);
+for (const id of [...realIds, ...genreIds]) {
+  const info = index.packs[id], pack = scanPack(id);
   const ctx = [pack.title, pack.noun || ''];
   const kv = info.kidsSafe === false ? null : kidsView(pack);
   const qs = [];
@@ -126,7 +135,10 @@ for (const id of realIds) {
       }
     }
   }
-  const leak = makeLeakTest([...(pack.items || []).map(i => i.name), ...qs.map(x => x[2])]);
+  // a genre view counts shared words over its whole base pack, as the base pack's own scan does (pack questions keep
+  // their own wrong answers in every view)
+  const names = info.virtual?.genre ? loadPack(info.virtual.of) : pack;
+  const leak = makeLeakTest([...(names.items || []).map(i => i.name), ...qs.map(x => x[2])]);
   const corpus = new Map();
   for (const [fid, q, ans] of qs) { const k = fid + (q.id || '').split(':').slice(0, 2).join(':'); if (!corpus.has(k)) corpus.set(k, new Set()); corpus.get(k).add(ans); }
   for (const [fid, q, ans] of qs) {

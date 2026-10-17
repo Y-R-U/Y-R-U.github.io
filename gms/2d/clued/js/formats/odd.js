@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, factText, placeAnswer, collect, pick, sample, factAllowed, nested, factPhrase } from './registry.js?v=202610171251';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610171251';
-import { uniqueByName, norm, hasImg } from './fkit.js?v=202610171251';
+import { register, poolItems, pickPack, byDifficulty, imageOf, factText, placeAnswer, collect, pick, sample, factAllowed, nested, factPhrase, givesAway } from './registry.js?v=202610171317';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610171317';
+import { uniqueByName, norm, hasImg } from './fkit.js?v=202610171317';
 
 const vals = v => [].concat(v).map(String);
 
@@ -67,6 +67,8 @@ function make(rng, pack, [type, key], n, difficulty, kids) {
   }
   if (same.length < n - 1 || same.some(c => norm(c.item.name) === norm(odd.item.name))) return null;
   if (!onlyOneOdd([odd, ...same], c => (type === 'bool' ? [String(val(c))] : vals(val(c))))) return null;
+  // "think country of origin" with No Country for Old Men as the odd one
+  if (givesAway(odd.item.name, `Odd one out: think ${label}`, same.map(c => c.item.name))) return null;
   const { options, answer } = placeAnswer(rng, odd, same);
   const pics = options.every(c => hasImg(c.item)) && (kids || rng() < 0.45);
   return {

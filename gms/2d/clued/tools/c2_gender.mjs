@@ -9,7 +9,7 @@ import { rng, sample } from './c2_lib.mjs';
 
 const PACKS = join(dirname(fileURLToPath(import.meta.url)), '..', 'data/packs');
 const KNOWN = { 'Louis XIV': 'm', 'Peter the Great': 'm' };
-export const PEOPLE_PACKS = ['actors', 'people', 'explorers', 'leaders', 'artists'];
+export const PEOPLE_PACKS = ['actors', 'people', 'explorers', 'leaders', 'artists', 'directors'];
 const pron = p => { const m = String(p).match(/\b(he|she|his|her|him)\b/i); return m ? (/^(she|her)$/i.test(m[1]) ? 'f' : 'm') : null; };
 
 export function run() {

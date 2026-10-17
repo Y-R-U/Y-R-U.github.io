@@ -27,7 +27,10 @@
    "noun": "director",
    "ask": "Who directed {name}?",
    "askReverse": "Which of these films was directed by {value}?",
-   "stmt": "{name} was directed by {value}."
+   "stmt": "{name} was directed by {value}.",
+   "askImg": "Who directed this film?",
+   "near": "year",
+   "levelled": true
   },
   "kids": {
    "type": "bool",
@@ -88,7 +91,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "king-kong",
@@ -201,7 +207,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "pinocchio",
@@ -385,7 +394,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "its-a-wonderful-life",
@@ -424,7 +436,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "cinderella",
@@ -564,7 +579,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "lady-and-the-tramp",
@@ -717,7 +735,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "sleeping-beauty",
@@ -890,7 +911,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-birds",
@@ -927,7 +951,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-great-escape",
@@ -1018,7 +1045,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "the-jungle-book",
@@ -1097,7 +1127,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "planet-of-the-apes",
@@ -1258,7 +1291,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "rocky",
@@ -1295,7 +1331,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "star-wars",
@@ -1346,7 +1385,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "close-encounters-of-the-third-kind",
@@ -1385,7 +1427,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "saturday-night-fever",
@@ -1466,7 +1511,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "apocalypse-now",
@@ -1503,7 +1551,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-shining",
@@ -1552,7 +1603,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "raiders-of-the-lost-ark",
@@ -1602,7 +1656,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "e-t-the-extra-terrestrial",
@@ -1642,7 +1699,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "ghostbusters",
@@ -1689,7 +1749,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-karate-kid",
@@ -1728,7 +1791,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-terminator",
@@ -1757,7 +1823,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-neverending-story",
@@ -1844,7 +1913,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-goonies",
@@ -1883,7 +1955,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "top-gun",
@@ -1920,7 +1995,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "dirty-dancing",
@@ -1986,7 +2064,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "ferris-buellers-day-off",
@@ -2025,7 +2106,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "big",
@@ -2052,7 +2136,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-little-mermaid",
@@ -2175,7 +2262,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "honey-i-shrunk-the-kids",
@@ -2253,7 +2343,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "home-alone",
@@ -2290,7 +2383,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "ghost",
@@ -2354,7 +2450,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "beauty-and-the-beast",
@@ -2485,7 +2584,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "mrs-doubtfire",
@@ -2514,7 +2616,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "groundhog-day",
@@ -2684,7 +2789,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-shawshank-redemption",
@@ -2778,7 +2886,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "jumanji",
@@ -2889,7 +3000,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "independence-day",
@@ -2926,7 +3040,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "twister",
@@ -3027,7 +3144,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "men-in-black",
@@ -3128,7 +3248,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-matrix",
@@ -3216,7 +3339,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "stuart-little",
@@ -3290,7 +3416,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "cast-away",
@@ -3319,7 +3448,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "chicken-run",
@@ -3433,7 +3565,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "lotr-fellowship",
@@ -3484,7 +3619,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "monsters-inc",
@@ -3523,7 +3661,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "spirited-away",
@@ -3570,7 +3711,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "ice-age",
@@ -3644,7 +3788,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "pirates-of-the-caribbean",
@@ -3694,7 +3841,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "elf",
@@ -3721,7 +3871,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-polar-express",
@@ -3760,7 +3913,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "madagascar",
@@ -3834,7 +3990,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "night-at-the-museum",
@@ -3908,7 +4067,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "wall-e",
@@ -3938,7 +4100,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "kung-fu-panda",
@@ -4041,7 +4206,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "avatar",
@@ -4078,7 +4246,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "inception",
@@ -4125,7 +4296,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "tangled",
@@ -4226,7 +4400,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "brave",
@@ -4356,7 +4533,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "interstellar",
@@ -4393,7 +4573,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "paddington",
@@ -4449,7 +4632,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "mad-max-fury-road",
@@ -4489,7 +4675,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "the-martian",
@@ -4528,7 +4717,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "la-la-land",
@@ -4565,7 +4757,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "moana",
@@ -4680,7 +4875,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "dunkirk",
@@ -4717,7 +4915,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "dune",
@@ -4746,7 +4947,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "encanto",
@@ -4894,7 +5098,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-wild-robot",
@@ -5019,7 +5226,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "avengers-infinity-war",
@@ -5131,7 +5341,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-lord-of-the-rings-the-return-of-the-king",
@@ -5160,7 +5373,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "shrek-2",
@@ -5214,7 +5430,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "star-wars-episode-i-the-phantom-menace",
@@ -5244,7 +5463,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "pirates-of-the-caribbean-dead-man-s-chest",
@@ -5273,7 +5495,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "indiana-jones-and-the-last-crusade",
@@ -5300,7 +5525,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "return-of-the-jedi",
@@ -5381,7 +5609,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "harry-potter-and-the-prisoner-of-azkaban",
@@ -5408,7 +5639,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-incredibles",
@@ -5435,7 +5669,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "the-lord-of-the-rings-the-two-towers",
@@ -5464,7 +5701,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "jurassic-world",
@@ -5518,7 +5758,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "iron-man",
@@ -5545,7 +5788,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "guardians-of-the-galaxy",
@@ -5572,7 +5818,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "star-wars-the-last-jedi",
@@ -5601,7 +5850,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "harry-potter-and-the-goblet-of-fire",
@@ -5657,7 +5909,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "furious-7",
@@ -5711,7 +5966,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "west-side-story",
@@ -5738,7 +5996,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "platoon",
@@ -5765,7 +6026,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "dances-with-wolves",
@@ -5846,7 +6110,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "braveheart",
@@ -5873,7 +6140,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-hurt-locker",
@@ -5900,7 +6170,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-shape-of-water",
@@ -5927,7 +6200,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "parasite",
@@ -5954,7 +6230,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "jurassic-world-fallen-kingdom",
@@ -6047,7 +6326,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "superman",
@@ -6074,7 +6356,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-nightmare-before-christmas",
@@ -6185,7 +6470,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "ponyo",
@@ -6212,7 +6500,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "cloudy-with-a-chance-of-meatballs",
@@ -6276,7 +6567,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "seven-samurai",
@@ -6313,7 +6607,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "vertigo",
@@ -6340,7 +6637,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "some-like-it-hot",
@@ -6367,7 +6667,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "psycho",
@@ -6404,7 +6707,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "dr-no",
@@ -6497,7 +6803,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-good-the-bad-and-the-ugly",
@@ -6524,7 +6833,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "the-italian-job",
@@ -6578,7 +6890,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "the-exorcist",
@@ -6632,7 +6947,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "airplane",
@@ -6686,7 +7004,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "a-nightmare-on-elm-street",
@@ -6713,7 +7034,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-breakfast-club",
@@ -6740,7 +7064,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "aliens",
@@ -6767,7 +7094,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "predator",
@@ -6804,7 +7134,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "beetlejuice",
@@ -6831,7 +7164,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "back-to-the-future-part-ii",
@@ -6858,7 +7194,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "reservoir-dogs",
@@ -6885,7 +7224,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "sister-act",
@@ -6976,7 +7318,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-mask",
@@ -7040,7 +7385,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "se7en",
@@ -7069,7 +7417,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "princess-mononoke",
@@ -7096,7 +7447,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "saving-private-ryan",
@@ -7123,7 +7477,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "the-truman-show",
@@ -7160,7 +7517,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "the-mummy",
@@ -7214,7 +7574,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "legally-blonde",
@@ -7295,7 +7658,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "the-hangover",
@@ -7322,7 +7688,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "les-miserables",
@@ -7386,7 +7755,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "the-revenant",
@@ -7423,7 +7795,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "the-greatest-showman",
@@ -7531,7 +7906,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-fifth-element",
@@ -7558,7 +7936,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "kill-bill-volume-1",
@@ -7597,7 +7978,10 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "factLv": {
+    "director": 1
+   }
   },
   {
    "id": "pan-s-labyrinth",
@@ -7624,7 +8008,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-wicker-man",
@@ -7678,7 +8065,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-man-from-snowy-river",
@@ -7769,7 +8159,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "fargo",
@@ -7860,7 +8253,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "akira",
@@ -7944,7 +8340,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "1917",
@@ -7981,7 +8380,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "moulin-rouge",
@@ -8018,7 +8420,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-gods-must-be-crazy",
@@ -8136,7 +8541,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "the-english-patient",
@@ -8190,7 +8598,10 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "gremlins",
@@ -8244,7 +8655,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "my-fair-lady",
@@ -8335,7 +8749,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 3
+   }
   },
   {
    "id": "chinatown",
@@ -8389,7 +8806,10 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "factLv": {
+    "director": 2
+   }
   },
   {
    "id": "casino-royale",

@@ -2,15 +2,15 @@
 // year from a clip, country / capital / continent from a flag; with no picture or clip the name is shown and the other
 // rows asked). Tap one per row, lock in; each right row is a share of the points (js/formats/trio_score.js).
 // Packs opt in through TRIO (or pack.trio, same shape): the rows, the facts behind them and the media to show.
-import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick, looksAlike } from './registry.js?v=202610171251';
-import { h, mediaBox, onKey } from '../ui/kit.js?v=202610171251';
-import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610171251';
-import { basePoints } from '../core/scoring.js?v=202610171251';
-import { preflight, urlsOf } from '../core/media.js?v=202610171251';
-import { confetti } from '../ui/fx.js?v=202610171251';
-import { trioScore, trioCap } from './trio_score.js?v=202610171251';
-import { yearOptions, MAX_YEAR } from './years.js?v=202610171251';
-import { isCredit, leadOf } from './cocredit.js?v=202610171251';
+import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick, looksAlike } from './registry.js?v=202610171317';
+import { h, mediaBox, onKey } from '../ui/kit.js?v=202610171317';
+import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610171317';
+import { basePoints } from '../core/scoring.js?v=202610171317';
+import { preflight, urlsOf } from '../core/media.js?v=202610171317';
+import { confetti } from '../ui/fx.js?v=202610171317';
+import { trioScore, trioCap } from './trio_score.js?v=202610171317';
+import { yearOptions, MAX_YEAR } from './years.js?v=202610171317';
+import { isCredit, leadOf } from './cocredit.js?v=202610171317';
 
 export { trioScore, trioCap };
 // every row right: a flat bonus on top, after the streak (the server and P2P host award the same)
@@ -70,7 +70,8 @@ export const TRIO = {
   'movie-moments': FILM, movies: FILM, books: BOOK, 'book-moments': BOOK, countries: COUNTRY, 'one-hit-wonders': SONG,
   ...Object.fromEntries(['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'].map(d => [`hits-${d}`, SONG])),
 };
-const confOf = pack => pack?.trio || TRIO[pack?.id] || null;
+// genre views (movies~scifi) play as their base pack
+const confOf = pack => pack?.trio || TRIO[pack?.id] || TRIO[String(pack?.id || '').split('~')[0]] || null;
 
 export const NEAR = [8, 15];                          // fact distractors: from an item within this many years (conf.near)
 const NAME_NEAR = [5, 10, 15, 25, Infinity];
@@ -273,7 +274,7 @@ function makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame,
 }
 
 const packId = info => info.id || String(info.path || '').replace(/^.*\//, '').replace(/\.json$/, '');
-const audioMod = () => import('./trio_audio.js?v=202610171251');
+const audioMod = () => import('./trio_audio.js?v=202610171317');
 
 export default register({
   id: 'trio', title: 'Hat-trick', icon: '🎩', blurb: 'Three questions in one: name it, who, when', tags: ['slow'], noKids: true,

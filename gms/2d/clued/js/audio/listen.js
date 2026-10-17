@@ -2,16 +2,16 @@
 // Also "finish the line" for public-domain songs (items with `lyrics`).
 import {
   register, poolItems, distractors, byDifficulty, placeAnswer, collect, pick, shuffle, hasAudio, imageOf, hasImg, pickPack,
-} from '../formats/registry.js?v=202610171251';
-import { h, choiceGrid, esc } from '../ui/kit.js?v=202610171251';
-import { basePoints } from '../core/scoring.js?v=202610171251';
-import * as clip from './clip.js?v=202610171251';
-import { revealHTML, BADGE_CSS, art as artUrl, previewUrl, setArt } from './apple.js?v=202610171251';
-import { net, appleSrc } from './applenet.js?v=202610171251';
-import { maybeProbe } from './probe.js?v=202610171251';
-import { getCtx, unlock, begin, end, ctxInfo } from './ctx.js?v=202610171251';
-import { LISTEN_CSS } from './listen_css.js?v=202610171251';
-import { dlog, modLoaded, buildsSeen } from '../core/debuglog.js?v=202610171251';
+} from '../formats/registry.js?v=202610171317';
+import { h, choiceGrid, esc } from '../ui/kit.js?v=202610171317';
+import { basePoints } from '../core/scoring.js?v=202610171317';
+import * as clip from './clip.js?v=202610171317';
+import { revealHTML, BADGE_CSS, art as artUrl, previewUrl, setArt } from './apple.js?v=202610171317';
+import { net, appleSrc } from './applenet.js?v=202610171317';
+import { maybeProbe } from './probe.js?v=202610171317';
+import { getCtx, unlock, begin, end, ctxInfo } from './ctx.js?v=202610171317';
+import { LISTEN_CSS } from './listen_css.js?v=202610171317';
+import { dlog, modLoaded, buildsSeen } from '../core/debuglog.js?v=202610171317';
 const MOD_ID = modLoaded('listen', import.meta.url);
 
 let renderSeq = 0;
@@ -49,7 +49,7 @@ const PROMPTS = {
   'artist-name': () => 'Who is the artist?',
   decade: () => 'Which decade is this song from?',
   composer: (it) => (isTheme(it) ? 'Who wrote this theme?' : 'Who composed this?'),
-  film: (it) => (it.facts.type === 'tv' ? 'Which TV show is this theme from?' : 'Which film is this music from?'),
+  film: (it, p, mixed) => (mixed ? 'Which film or TV show is this music from?' : it.facts.type === 'tv' ? 'Which TV show is this theme from?' : 'Which film is this music from?'),
   name: (it, p) => p.listenPrompt || (p.id === 'birds' ? 'Which bird is this?' : p.theme === 'animals' ? 'Which animal makes this sound?' : null) || (it.media.audio.some((a) => clip.isPiano(a)) ? 'Which song is this?' : 'What is this sound?'),
 };
 
@@ -150,7 +150,8 @@ function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, 
     if (!o) return null;
     const pics = (kids || kind === 'name') && o.items && o.items.every((c) => hasImg(c.item));
     return {
-      ...base, id: `listen:${kind}:${t.ref}`, prompt: PROMPTS[kind](t.item, p),
+      // a small pack (Sci-fi theme tunes) can't always fill four of one kind: films and shows mixed get a neutral prompt
+      ...base, id: `listen:${kind}:${t.ref}`, prompt: PROMPTS[kind](t.item, p, kind === 'film' && new Set((o.items || []).map((c) => c.item.facts.type || 'film')).size > 1),
       options: o.options.map((text, i) => (pics ? { text, img: imageOf(o.items[i].item, rng) } : { text: String(text) })),
       answer: o.answer, answerText: String(o.options[o.answer]),
       data: { ...base.data, layout: pics ? 'images' : 'text' },

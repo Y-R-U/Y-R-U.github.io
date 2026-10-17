@@ -1,0 +1,3 @@
+born dropped Gabriel García Márquez: 1927 not in the Wikipedia lead
+died left out Archimedes: Wikidata -212, not in the Wikipedia lead
+people: 95 old + 82 new; by group {"science":40,"literature":44,"music":37,"film":2,"sport":38,"activism":6,"religion":2,"history":1,"philosophy":3,"business":4}

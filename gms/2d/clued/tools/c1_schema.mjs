@@ -1,5 +1,5 @@
 // Pack schema validation shared by build_index.mjs and c1_test.mjs (see docs/CONTRACT.md).
-export const THEMES = ['animals', 'nature', 'geography', 'screen', 'music', 'books', 'people', 'science', 'art', 'history', 'sport', 'food', 'general', 'kids'];
+export const THEMES = ['animals', 'nature', 'geography', 'screen', 'music', 'books', 'genres', 'people', 'science', 'art', 'history', 'sport', 'food', 'general', 'kids'];
 export const ALLOWED_LICENSE = /^(CC0( 1\.0)?|Public domain|PD|PDM(-owner)?|CC BY(-SA)? [1-4]\.[05]( [A-Za-z-]{2,})?)$/;
 // Apple previews are streamed at play time, never stored (DESIGN.md media policy); allowed for audio only.
 const APPLE_PREVIEW = /^Apple Music preview/;

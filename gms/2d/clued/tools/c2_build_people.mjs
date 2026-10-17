@@ -126,6 +126,8 @@ for (const [id, title, theme, icon, text, factsMeta] of packs) {
   if (id === 'actors') await (await import('./c2_screen_actors.mjs')).extendActors(pack, note);
   // lane LEADERS: c2_src/leaders_more.mjs + country/role/came-to-power facts (tools/c2_leaders_add.mjs)
   if (id === 'leaders') await (await import('./c2_leaders_add.mjs')).extendLeaders(pack, note);
+  // lane DIRECTORS: c2_src/people_more.mjs + People sub-categories (tools/c2_people_add.mjs)
+  if (id === 'people') await (await import('./c2_people_add.mjs')).extendPeople(pack, note);
   writePack(pack);
 }
 (await import('./c2_gender.mjs')).run();

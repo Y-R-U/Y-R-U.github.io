@@ -1,12 +1,12 @@
 // GameSpec -> questions. A spec fully describes a game; same spec + same packs = same questions.
-import { rngFrom, sample, shuffle, randomSeed } from './rng.js?v=202610171251';
-import { loadIndex, loadPacks } from './packs.js?v=202610171251';
-import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610171251';
-import { isOn, loadTags, loadLocalGeo, loadNames, easeView, localView, mixRound, countryName, packHasLocal, isLocalQ, targetOf } from './local.js?v=202610171251';
-import { homeQuestions, HOME_FORMATS, HOME_PACKS } from './localgeo.js?v=202610171251';
-import { loadIndex as loadGeoIndex, geo as GEO } from '../geo/data.js?v=202610171251';
-import { dupKey, freshRanker } from './fresh.js?v=202610171251';
-import { BLEND, blendCounts, blendOn, levelMap, levelOf, loadGeoLevels, pickBlend } from './diffmix.js?v=202610171251';
+import { rngFrom, sample, shuffle, randomSeed } from './rng.js?v=202610171317';
+import { loadIndex, loadPacks } from './packs.js?v=202610171317';
+import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610171317';
+import { isOn, loadTags, loadLocalGeo, loadNames, easeView, localView, mixRound, countryName, packHasLocal, isLocalQ, targetOf } from './local.js?v=202610171317';
+import { homeQuestions, HOME_FORMATS, HOME_PACKS } from './localgeo.js?v=202610171317';
+import { loadIndex as loadGeoIndex, geo as GEO } from '../geo/data.js?v=202610171317';
+import { dupKey, freshRanker } from './fresh.js?v=202610171317';
+import { BLEND, blendCounts, blendOn, levelMap, levelOf, loadGeoLevels, pickBlend } from './diffmix.js?v=202610171317';
 
 export const MAX_ALL_PACKS = 8;
 
@@ -30,6 +30,19 @@ export const kidsOk = (x, pack) => x.kids !== false && x.facts?.kids !== false &
 export function kidsView(pack) {
   return { ...pack, items: (pack.items || []).filter(it => kidsOk(it, pack)), questions: (pack.questions || []).filter(q => kidsOk(q, pack)), kidsView: true };
 }
+
+// A genre part (movies~scifi) this format can make at least one question from; genre~scifi plays every such part
+export function partOk(fmt, info, kids = false) {
+  if (!fmt || !info || (kids && info.kidsSafe === false)) return false;
+  let r;
+  try { r = fmt.supports(info); } catch (e) { r = false; }
+  const counts = kids ? info.caps?.formatsKids : info.caps?.formats;
+  return r === true && (!counts || !(fmt.id in counts) || counts[fmt.id] > 0);
+}
+export const partsFor = (fmt, ids, index, { kids = false } = {}) => [...new Set(ids.flatMap(id => {
+  const parts = index.packs[id]?.virtual?.parts;
+  return parts ? parts.filter(p => partOk(fmt, index.packs[p], kids)) : [id];
+}))];
 
 export function resolvePackIds(fmt, packs, index, rng, opts = {}) {
   let ok = supportedPackIds(fmt, index, opts);
@@ -71,7 +84,7 @@ export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(
     if (L && !fmt.packless && (r.packs === 'all' || !Array.isArray(r.packs) || !r.packs.length)) {
       for (const id of supportedPackIds(fmt, index, { kids }).filter(id => !index.packs[id].virtual && !ids.includes(id) && packHasLocal(id, L.cc)).slice(0, 4)) ids.push(id);
     }
-    let packs = await loadPacks(ids);
+    let packs = await loadPacks(partsFor(fmt, ids, index, { kids }));
     if (L?.live) packs = packs.map(p => easeView(p, L.cc));
     if (kids) packs = packs.map(kidsView).filter(p => p.items.length + p.questions.length > 0);
     if (!packs.length && !fmt.packless) throw new Error(`No packs can play ${fmt.title}`);

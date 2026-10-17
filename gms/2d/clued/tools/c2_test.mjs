@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { validatePack } from './c1_schema.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-export const C2_PACKS = ['countries', 'capitals', 'currencies', 'flags', 'landmarks', 'languages', 'movies', 'actors', 'people', 'leaders', 'explorers', 'artists', 'paintings', 'books', 'quotes', 'words', 'history', 'tv'];
+export const C2_PACKS = ['countries', 'capitals', 'currencies', 'flags', 'landmarks', 'languages', 'movies', 'actors', 'people', 'leaders', 'explorers', 'artists', 'paintings', 'books', 'quotes', 'words', 'history', 'tv', 'directors'];
 const CONTINENTS = new Set(['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania']);
 const NOW = 2026;
 const words = s => String(s).trim().split(/\s+/).length;
@@ -63,7 +63,8 @@ export function checkPack(p) {
       }
       break;
     }
-    case 'people': case 'leaders': case 'explorers': case 'artists': case 'actors':
+    case 'people': case 'leaders': case 'explorers': case 'artists': case 'actors': case 'directors':
+      if (p.id === 'directors') directorChecks(p, E);
       for (const i of items) {
         if (f(i).born != null && !year(f(i).born, -800, 2015)) E(`${i.id}: birth year out of range`);
         if (f(i).died != null && !year(f(i).died, -800, NOW)) E(`${i.id}: death year out of range`);
@@ -103,6 +104,14 @@ export function checkPack(p) {
   return err;
 }
 
+function directorChecks(p, E) {
+  const names = new Set(p.items.map(i => i.name));
+  for (const q of (p.questions || []).filter(q => q.id.startsWith('dir-'))) {
+    if (!names.has(q.answer) || q.wrong.some(w => !names.has(w))) E(`${q.id}: director not in the pack`);
+    if (!/^Who directed .+ \(\d{4}\)\?$/.test(q.prompt)) E(`${q.id}: prompt must name the film and year`);
+  }
+}
+
 // Self-test: each broken copy must be caught.
 function selfTest(load) {
   const clone = o => JSON.parse(JSON.stringify(o));
@@ -115,6 +124,7 @@ function selfTest(load) {
     ['history', p => { const q = p.questions.find(q => q.kind === 'order'); q.answer.reverse(); }, 'not in order'],
     ['people', p => { p.items[0].facts.died = p.items[0].facts.born - 10; }, 'lifespan'],
     ['flags', p => { const i = p.items.find(i => i.facts.flagDisputed); i.media.img = [p.items[5].media.img[0]]; }, 'disputed flag'],
+    ['directors', p => { const q = p.questions.find(q => q.id.startsWith('dir-')); q.wrong[0] = 'Nobody Real'; }, 'not in the pack'],
     ['words', p => { p.items.forEach(i => { if (i.difficulty === 1) i.difficulty = 2; }); }, 'difficulty-1'],
   ];
   let bad = 0;

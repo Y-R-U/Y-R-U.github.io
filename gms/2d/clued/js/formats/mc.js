@@ -1,10 +1,10 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
   spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk, givesAway,
-} from './registry.js?v=202610171251';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610171251';
-import { yearOptions, plainYear } from './years.js?v=202610171251';
-import { isCredit, leadOf, people } from './cocredit.js?v=202610171251';
+} from './registry.js?v=202610171317';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610171317';
+import { yearOptions, plainYear } from './years.js?v=202610171317';
+import { isCredit, leadOf, people } from './cocredit.js?v=202610171317';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
@@ -81,7 +81,10 @@ function fromItems(rng, pack, kind, n, difficulty) {
     };
   }
 
-  const pool = all.filter(c => fv(c.item) != null);
+  // factsMeta.levelled: only items rated for this fact (item.factLv[key], e.g. movie-moments directors) take part, at that level
+  const flv = c => c.item.factLv?.[key];
+  const pool = all.filter(c => fv(c.item) != null && (!meta?.levelled || flv(c) != null));
+  if (type === 'cat' && meta.askImg && pool.some(c => hasImg(c.item))) return fromPicture(rng, pack, key, meta, pool.filter(c => hasImg(c.item)), n, difficulty);
   if (type === 'cat' || type === 'rev') {
     const t = pick(rng, byDifficulty(pool, difficulty, n, c => c.item.difficulty || 2));
     // shared credits (two directors): only the best-known one is asked or offered, and no co-credit is ever a wrong option
@@ -149,6 +152,39 @@ function fromItems(rng, pack, kind, n, difficulty) {
   return null;
 }
 
+// "Who directed this film?" over the picture (factsMeta.askImg). Wrong answers come from items close in meta.near (a
+// year fact) in widening bands, as trio.js does; shared credits are never offered as wrong.
+const NEAR_BANDS = [8, 15, Infinity];
+function fromPicture(rng, pack, key, meta, pool, n, difficulty) {
+  const lv = c => c.item.factLv?.[key] || c.item.difficulty || 2;
+  const t = pick(rng, byDifficulty(pool, difficulty, n, lv));
+  const fv = it => it.facts?.[key];
+  const value = isCredit(key) ? leadOf(fv(t.item)) : String(fv(t.item));
+  const banned = new Set((isCredit(key) ? people(fv(t.item)) : [value]).map(s => s.toLowerCase()));
+  const y = meta.near ? Number(t.item.facts?.[meta.near]) : NaN;
+  const dist = c => (Number.isFinite(y) ? Math.abs(Number(c.item.facts?.[meta.near]) - y) : 0);
+  const wrong = [];
+  for (const band of NEAR_BANDS) {
+    for (const c of shuffle(rng, pool.filter(c => c.item !== t.item && dist(c) <= band))) {
+      if (wrong.length >= n - 1) break;
+      const ps = isCredit(key) ? people(fv(c.item)) : [String(fv(c.item))];
+      const v = isCredit(key) ? leadOf(fv(c.item)) : ps[0];
+      if (!v || ps.some(p => banned.has(p.toLowerCase())) || wrong.includes(v)) continue;
+      ps.forEach(p => banned.add(p.toLowerCase()));
+      wrong.push(v);
+    }
+    if (wrong.length >= n - 1) break;
+  }
+  if (wrong.length < n - 1) return null;
+  const img = t.item.media.img.slice().sort((a, b) => (a.difficulty || 2) - (b.difficulty || 2))[0];
+  const { options, answer } = placeAnswer(rng, value, wrong);
+  return {
+    format: 'mc', id: `mc:img:${key}:${t.ref}`, prompt: meta.askImg, media: { img: [img] },
+    options: options.map(text => ({ text })), answer, answerText: value, data: { lv: lv(t) },
+    explain: [fill(meta.stmt || '{name}: {value}.', { name: t.item.name, value }), t.item.blurb].filter(Boolean).join(' '), refs: [t.ref], hint: `It starts with “${value.charAt(0)}”`,
+  };
+}
+
 function hintFor(item, pack) {
   const clues = (item.clues || []).filter(c => !c.toLowerCase().includes(item.name.toLowerCase()) && !givesAway(item.name, c));
   if (clues.length) return clues[clues.length - 1];
@@ -175,8 +211,10 @@ export default register({
     let n = ANSWERS.includes(+opts.answers) ? +opts.answers : 4;
     if (kids) n = Math.min(n, 3);
     const src = opts.source || 'mix';
-    // a question-only pack (the kids quizzes) has no item pictures: fall back to everything it does have
-    const srcOf = p => { const s = sources(p, n, src, { kids, difficulty }); return s.length || src === 'mix' ? s : sources(p, n, 'mix', { kids, difficulty }); };
+    // a question-only pack (the kids quizzes) has no item pictures: fall back to everything it does have, but only when
+    // no pack in the round has the type asked for (a Picture round on Sci-fi plays the pictures, not the books pack)
+    const has = packs.some(p => sources(p, n, src, { kids, difficulty }).length);
+    const srcOf = p => { const s = sources(p, n, src, { kids, difficulty }); return s.length || src === 'mix' || has ? s : sources(p, n, 'mix', { kids, difficulty }); };
     const usable = packs.map(p => ({ p, s: srcOf(p).map(([k, w]) => [k, kids && /img|Img/.test(k) ? w * 3 : w]) }))
       .filter(x => x.s.length);
     if (!usable.length) return [];

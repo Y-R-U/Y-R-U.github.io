@@ -6,6 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import { PACKS, sceneRel, refFor, hasLive } from './mv_paths.mjs';
+import { directorLevels, DIRECTOR_PICTURE } from './c2_directors.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const CREDIT = 'Clued (AI-generated illustration)';
@@ -20,7 +21,7 @@ const DEFS = {
       factsMeta: {
         year: { type: 'year', label: 'Released', askHigh: 'Which of these films came out most recently?', askLow: 'Which of these films came out first?', askNumber: 'In what year did {name} come out?' },
         decade: { type: 'cat', label: 'Decade', ask: 'In which decade did {name} come out?', askReverse: 'Which of these films came out in the {value}?', stmt: '{name} came out in the {value}.' },
-        director: { type: 'cat', label: 'Directed by', noun: 'director', ask: 'Who directed {name}?', askReverse: 'Which of these films was directed by {value}?', stmt: '{name} was directed by {value}.' },
+        director: { type: 'cat', label: 'Directed by', noun: 'director', ask: 'Who directed {name}?', askReverse: 'Which of these films was directed by {value}?', stmt: '{name} was directed by {value}.', ...DIRECTOR_PICTURE },
         kids: { type: 'bool', label: 'Family film', yes: 'Family film', no: 'Not a family film', askBool: 'Which of these is a family film?', stmt: '{name} is a family film.' },
       },
     },
@@ -121,6 +122,8 @@ function build(id, cands = false) {
     return writeCandidates(id, { ...pack, items: more }, 'more');
   }
   if (!items.length) return console.log(id, ': no approved pictures, no pack written');
+  // lane DIRECTORS: "Who directed this film?" levels (tools/c2_directors.mjs)
+  if (id === 'movie-moments') directorLevels(items);
   fs.writeFileSync(path.join(ROOT, 'data/packs', id + '.json'), JSON.stringify(pack, null, 1) + '\n');
   const n = items.reduce((s, i) => s + i.media.img.length, 0);
   const d1 = items.filter(i => i.difficulty === 1).length, kd1 = items.filter(i => i.difficulty === 1 && i.facts.kids).length;

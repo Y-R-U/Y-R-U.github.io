@@ -13,10 +13,16 @@ import { THEMES, validatePack, packCaps } from './c1_schema.mjs';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const quiet = process.argv.includes('--quiet'), strict = process.argv.includes('--strict'), nogen = process.argv.includes('--nogen');
 const GEN_COUNT = 20, VIRTUAL_MIN = 12;
+const { virtualView } = await import(pathToFileURL(join(ROOT, 'js/core/packs.js')).href);
+// a pack can be listed under more themes than its own (the theme picker shows it in each); `people` is offered through
+// its sub-categories (people~science …) and "All famous people" (people~all) instead of on its own
+const ALSO_IN = { actors: ['people'], directors: ['screen'] };
+const UNLISTED = new Set(['people']);
+const THEME_ORDER = { people: ['people~all', 'actors', 'directors', 'people~music', 'people~science', 'people~literature', 'people~sport', 'leaders', 'explorers'] };
 
 const THEME_META = {
   animals: ['Animals', '🦁'], nature: ['Nature', '🌿'], geography: ['Geography', '🌍'], screen: ['Screen', '🎬'],
-  music: ['Music', '🎵'], books: ['Books & words', '📚'], people: ['People', '🧑'], science: ['Science', '🔬'],
+  music: ['Music', '🎵'], books: ['Books & words', '📚'], genres: ['Genres', '🎭'], people: ['People', '🧑'], science: ['Science', '🔬'],
   art: ['Art', '🎨'], history: ['History', '🏛️'], sport: ['Sport', '⚽'], food: ['Food & drink', '🍜'],
   general: ['General knowledge', '💡'], kids: ['Kids', '🧸'],
 };
@@ -50,6 +56,48 @@ for (const f of files) {
       addPack(vid, f, view, { virtual: { of: 'general', tag: t } });
     }
   }
+  // people~<group>: the sub-categories a pack declares (tools/c2_people_add.mjs GROUP_PACKS)
+  for (const [g, meta] of Object.entries(pack.groupPacks || {})) {
+    const v = { of: id, group: g };
+    const view = virtualView(`${id}~${g}`, v, [pack], meta);
+    if ((view.items || []).length < VIRTUAL_MIN) { allWarn.push(`pack ${id}~${g}: only ${view.items.length} items, not offered`); continue; }
+    addPack(`${id}~${g}`, f, view, { virtual: v });
+  }
+}
+// merged views (people~all) need their packs loaded first
+for (const [id, pack] of [...loaded]) {
+  const m = pack.mergePack;
+  if (!m || packs[id].virtual) continue;
+  const bases = m.of.map(x => loaded.get(x)).filter(Boolean);
+  if (bases.length !== m.of.length) { allErr.push(`pack ${m.id}: missing ${m.of.filter(x => !loaded.has(x)).join(', ')}`); continue; }
+  const v = { merge: m.of };
+  addPack(m.id, packs[id].path, virtualView(m.id, v, bases, m), { virtual: v });
+}
+// Genres (data/genres.json, tools/genre_build.mjs): movies~scifi … one view per source pack, unlisted, and genre~scifi
+// listed under Genres, which plays them all (each as its own pack, so wrong answers stay within a pack)
+const GENRE_PART_MIN = 4;
+const PART_NOUN = { movies: 'films', 'movie-moments': 'film pictures', tv: 'TV', 'tv-moments': 'TV pictures', books: 'books', 'book-moments': 'book pictures', 'screen-themes': 'theme tunes', 'kids-film-tv': 'film & TV songs' };
+const genres = (() => { try { return JSON.parse(readFileSync(join(ROOT, 'data/genres.json'), 'utf8')); } catch { return null; } })();
+for (const [g, meta] of Object.entries(genres?.genres || {})) {
+  const parts = [];
+  for (const [of, byG] of Object.entries(genres.packs || {})) {
+    const base = loaded.get(of);
+    if (!base || !byG[g]) continue;
+    const id = `${of}~${g}`, v = { of, genre: g };
+    const view = virtualView(id, v, [base], { title: PART_NOUN[of] ? `${meta.title} ${PART_NOUN[of]}` : `${meta.title}: ${base.title}`, genreIds: byG[g], adult: !!meta.adult });
+    if (view.items.length < GENRE_PART_MIN) continue;
+    addPack(id, packs[of].path, view, { virtual: v, ...(meta.adult ? { kidsSafe: false } : {}) }, { listed: false });
+    parts.push(id);
+  }
+  if (!parts.length) continue;
+  const v = { parts };
+  const view = virtualView(`genre~${g}`, v, parts.map(id => loaded.get(id)), meta);
+  addPack(`genre~${g}`, 'genres.json', view, { virtual: v, ...(meta.adult ? { kidsSafe: false } : {}) });
+}
+for (const [id, ts] of Object.entries(ALSO_IN)) if (packs[id]) for (const t of ts) if (!byTheme[t].includes(id)) byTheme[t].push(id);
+for (const [t, order] of Object.entries(THEME_ORDER)) {
+  const at = id => (order.includes(id) ? order.indexOf(id) : order.length);
+  byTheme[t].sort((a, b) => at(a) - at(b));
 }
 
 function virtualPack(pack, tag, title) {
@@ -71,7 +119,7 @@ function extraCaps(pack) {
   return { multi, catBins, firstLines: items.filter(i => i.firstLine).length };
 }
 
-function addPack(id, f, pack, extra = {}) {
+function addPack(id, f, pack, extra = {}, { listed = true } = {}) {
   const caps = packCaps(pack);
   const x = extraCaps(pack);
   caps.multi = x.multi;
@@ -79,6 +127,7 @@ function addPack(id, f, pack, extra = {}) {
   caps.quotes = (caps.quotes || 0) + x.firstLines;
   packs[id] = {
     path: f, title: pack.title, theme: pack.theme, icon: pack.icon, kids: !!pack.kids,
+    ...(ALSO_IN[id] ? { alsoIn: ALSO_IN[id] } : {}),
     items: (pack.items || []).length, questions: (pack.questions || []).length,
     ...(pack.notice ? { notice: pack.notice } : {}),
     ...(pack.kidsSafe === false ? { kidsSafe: false } : {}),
@@ -86,7 +135,8 @@ function addPack(id, f, pack, extra = {}) {
     caps,
   };
   loaded.set(id, pack);
-  byTheme[pack.theme].push(id);
+  if (!listed) return;
+  if (!UNLISTED.has(id)) byTheme[pack.theme].push(id);
   if (pack.kids && pack.theme !== 'kids' && !extra.virtual) byTheme.kids.push(id);
 }
 
@@ -108,7 +158,7 @@ async function formatCaps() {
   }
   const reg = await import(js('formats/registry.js'));
   const { rngFrom } = await import(js('core/rng.js'));
-  const { kidsView } = await import(js('core/spec.js'));
+  const { kidsView, partOk } = await import(js('core/spec.js'));
   const fmts = reg.listFormats().filter(f => !f.packless);
   const t0 = Date.now();
   for (const [id, info] of Object.entries(packs)) {
@@ -117,12 +167,14 @@ async function formatCaps() {
     const out = { formats: {}, formatsEasy: {}, formatsKids: {} };
     for (const fmt of fmts) {
       if (reg.supportsPack(fmt, { id, ...info }) !== true) continue;
+      // a genre plays the parts this format can use (spec.js partsFor), each as its own pack
+      const ps = (p, kids) => (info.virtual?.parts ? info.virtual.parts.filter(pid => partOk(fmt, packs[pid], kids)).map(pid => (kids ? kidsView(loaded.get(pid)) : loaded.get(pid))) : [p]);
       const run = (p, difficulty, kids) => {
-        if (!p || (p.items || []).length + (p.questions || []).length === 0) return 0;
+        if (!p || (p.items || []).length + (p.questions || []).length === 0 || !ps(p, kids).length) return 0;
         const opts = reg.defaultOpts(fmt);
         if (kids) for (const o of fmt.options || []) if (o.kidsDefault != null) opts[o.key] = o.kidsDefault;
         try {
-          const list = fmt.generate({ rng: rngFrom(`caps:${id}:${fmt.id}:${difficulty}:${kids}`), packs: [p], count: GEN_COUNT, opts, difficulty, kids, avoid: new Set(), round: 0, spec: { seed: 'caps' } }) || [];
+          const list = fmt.generate({ rng: rngFrom(`caps:${id}:${fmt.id}:${difficulty}:${kids}`), packs: ps(p, kids), count: GEN_COUNT, opts, difficulty, kids, avoid: new Set(), round: 0, spec: { seed: 'caps' } }) || [];
           return new Set(list.map(q => q.id)).size;
         } catch (e) { allWarn.push(`format ${fmt.id} on ${id}: generate threw (${e.message})`); return 0; }
       };

@@ -285,8 +285,11 @@ ok(L('landmarks').every(q => q.data.layout === 'pic' && /^Landmark,Country(,Cont
   for (const id of ['movie-moments', 'books', 'inventions']) {
     if (!index.packs[id]) continue;
     const pack = loadPack(id);
+    // movie-moments asks only films whose director is in the directors pack (factsMeta.levelled); lift that here so every
+    // co-credited film goes through the picture question's credit rules
+    if (pack.factsMeta?.director?.levelled) pack.factsMeta = { ...pack.factsMeta, director: { ...pack.factsMeta.director, levelled: false } };
     const qs = mcF.generate({ rng: rngFrom('cc' + id), packs: [{ ...pack, questions: [] }], count: 400, opts: { answers: 4, source: 'facts' }, difficulty: 0 });
-    for (const q of qs.filter(q => /^mc:cat:(director|author|inventor):/.test(q.id))) {
+    for (const q of qs.filter(q => /^mc:(cat|img):(director|author|inventor):/.test(q.id))) {
       const key = q.id.split(':')[2], t = pack.items.find(it => `${id}/${it.id}` === q.refs[0]);
       const ps = CC.people(t.facts[key]).map(norm);
       if (ps.length > 1) seen++;

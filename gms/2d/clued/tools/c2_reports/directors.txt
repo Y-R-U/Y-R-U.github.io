@@ -1,0 +1,161 @@
+born dropped Zhang Yimou: 1950 not in the Wikipedia lead
+nationality check Richard Curtis: mine British (GBR), Wikidata NZL
+human by Wikipedia lead (Wikidata P31 is Q705891): Jean-Pierre Jeunet
+film confirmed by Wikipedia infobox only (not Wikidata P57): Robert Zemeckis — Forrest Gump
+film confirmed by Wikipedia infobox only (not Wikidata P57): Damien Chazelle — La La Land
+no portrait: Tony Scott
+level by hand Peter Jackson: fame 2 -> 1
+level by hand Robert Zemeckis: fame 2 -> 1
+level by hand Hayao Miyazaki: fame 2 -> 1
+level by hand Guillermo del Toro: fame 1 -> 2
+level by hand Denis Villeneuve: fame 1 -> 2
+level by hand Sam Raimi: fame 1 -> 2
+level by hand Orson Welles: fame 1 -> 2
+level by hand Frank Capra: fame 3 -> 2
+level by hand Sergio Leone: fame 3 -> 2
+level by hand Spike Lee: fame 1 -> 2
+level by hand Jordan Peele: fame 1 -> 2
+level by hand Sofia Coppola: fame 1 -> 2
+level by hand Rob Reiner: fame 1 -> 2
+level by hand John Hughes: fame 3 -> 2
+level by hand Michael Bay: fame 2 -> 1
+level by hand Pedro Almodóvar: fame 3 -> 2
+level by hand Luc Besson: fame 1 -> 2
+level by hand Paul Thomas Anderson: fame 1 -> 3
+level by hand Ryan Coogler: fame 1 -> 2
+level by hand Chloé Zhao: fame 1 -> 3
+level by hand Penny Marshall: fame 1 -> 3
+level by hand David Lynch: fame 1 -> 2
+level by hand J. J. Abrams: fame 1 -> 2
+level by hand James Gunn: fame 1 -> 2
+level by hand Mira Nair: fame 1 -> 3
+movies.json credit confirmed by Wikipedia infobox only: Forrest Gump (1994) — Robert Zemeckis
+movies.json credit confirmed by Wikipedia infobox only: La La Land (2016) — Damien Chazelle
+questions: 577 who-directed, 252 which-film
+fame Steven Spielberg: d1 score 0.96 (4332530 views)
+fame Alfred Hitchcock: d1 score 0.91 (2512175 views)
+fame Quentin Tarantino: d1 score 0.94 (3047809 views)
+fame James Cameron: d1 score 0.94 (3035055 views)
+fame Christopher Nolan: d1 score 0.99 (6561404 views)
+fame George Lucas: d1 score 0.74 (1531522 views)
+fame Tim Burton: d1 score 0.84 (1941019 views)
+fame Stanley Kubrick: d1 score 0.90 (2488788 views)
+fame Martin Scorsese: d1 score 0.93 (2994738 views)
+fame Peter Jackson: d1 score 0.66 (1135861 views)
+fame Ridley Scott: d1 score 0.82 (1864294 views)
+fame Francis Ford Coppola: d1 score 0.86 (2006495 views)
+fame Charlie Chaplin: d1 score 0.92 (2925571 views)
+fame Robert Zemeckis: d1 score 0.60 (875290 views)
+fame Hayao Miyazaki: d1 score 0.68 (1214927 views)
+fame Clint Eastwood: d1 score 0.98 (5102477 views)
+fame Wes Anderson: d1 score 0.78 (1608108 views)
+fame Greta Gerwig: d2 score 0.65 (1104381 views)
+fame Guillermo del Toro: d2 score 0.89 (2295700 views)
+fame Ron Howard: d1 score 0.85 (1988695 views)
+fame Mel Gibson: d1 score 0.95 (3096890 views)
+fame Denis Villeneuve: d2 score 0.71 (1352708 views)
+fame David Fincher: d1 score 0.73 (1483467 views)
+fame Sam Raimi: d2 score 0.81 (1684516 views)
+fame Jon Favreau: d1 score 0.80 (1677373 views)
+fame Taika Waititi: d1 score 0.72 (1475068 views)
+fame Baz Luhrmann: d2 score 0.46 (618387 views)
+fame George Miller: d3 score 0.26 (385553 views)
+fame Peter Weir: d3 score 0.32 (460755 views)
+fame Danny Boyle: d2 score 0.57 (786992 views)
+fame Guy Ritchie: d1 score 0.86 (2141009 views)
+fame Sam Mendes: d2 score 0.69 (1246462 views)
+fame Ang Lee: d2 score 0.43 (594159 views)
+fame Bong Joon-ho: d2 score 0.49 (685175 views)
+fame Akira Kurosawa: d2 score 0.62 (909723 views)
+fame Ingmar Bergman: d2 score 0.42 (586113 views)
+fame Federico Fellini: d3 score 0.26 (381347 views)
+fame Orson Welles: d2 score 0.77 (1592010 views)
+fame Billy Wilder: d2 score 0.38 (516696 views)
+fame Frank Capra: d2 score 0.22 (318800 views)
+fame John Ford: d3 score 0.33 (461629 views)
+fame David Lean: d3 score 0.18 (300883 views)
+fame Sergio Leone: d2 score 0.31 (460459 views)
+fame Spike Lee: d2 score 0.76 (1549931 views)
+fame Jordan Peele: d2 score 0.83 (1929019 views)
+fame Kathryn Bigelow: d2 score 0.67 (1182754 views)
+fame Sofia Coppola: d2 score 0.75 (1534457 views)
+fame Steven Soderbergh: d2 score 0.56 (784953 views)
+fame Rob Reiner: d2 score 1.00 (15210575 views)
+fame John Hughes: d2 score 0.09 (196128 views)
+fame Richard Donner: d3 score 0.20 (307574 views)
+fame Ivan Reitman: d3 score 0.27 (397022 views)
+fame John Carpenter: d2 score 0.66 (1139070 views)
+fame Wes Craven: d2 score 0.48 (649230 views)
+fame M. Night Shyamalan: d1 score 0.78 (1611114 views)
+fame Michael Bay: d1 score 0.58 (791415 views)
+fame Chris Columbus: d2 score 0.55 (775977 views)
+fame Brad Bird: d3 score 0.30 (450979 views)
+fame Pete Docter: d3 score 0.10 (205086 views)
+fame John Lasseter: d2 score 0.42 (573488 views)
+fame Andrew Stanton: d3 score 0.30 (452065 views)
+fame Lee Unkrich: d3 score 0.00 (100815 views)
+fame Alfonso Cuarón: d2 score 0.45 (599186 views)
+fame Alejandro González Iñárritu: d2 score 0.44 (596424 views)
+fame Pedro Almodóvar: d2 score 0.25 (370289 views)
+fame Luc Besson: d2 score 0.70 (1333119 views)
+fame Jean-Luc Godard: d2 score 0.38 (532896 views)
+fame François Truffaut: d3 score 0.19 (302350 views)
+fame Satyajit Ray: d2 score 0.37 (512478 views)
+fame Yasujirō Ozu: d3 score 0.10 (200039 views)
+fame Zhang Yimou: d3 score 0.07 (193845 views)
+fame Wong Kar-wai: d2 score 0.35 (495489 views)
+fame Park Chan-wook: d2 score 0.64 (1101494 views)
+fame S. S. Rajamouli: d2 score 0.63 (1019259 views)
+fame Andrei Tarkovsky: d2 score 0.40 (542874 views)
+fame Sidney Lumet: d2 score 0.46 (626610 views)
+fame William Wyler: d3 score 0.17 (247834 views)
+fame Elia Kazan: d2 score 0.51 (736046 views)
+fame Oliver Stone: d2 score 0.54 (766490 views)
+fame Brian De Palma: d2 score 0.52 (744731 views)
+fame Edgar Wright: d2 score 0.61 (901628 views)
+fame Damien Chazelle: d2 score 0.41 (553134 views)
+fame Paul Thomas Anderson: d3 score 0.98 (5705094 views)
+fame Terry Gilliam: d2 score 0.54 (767380 views)
+fame Mike Nichols: d2 score 0.39 (536034 views)
+fame Miloš Forman: d3 score 0.22 (320386 views)
+fame Richard Linklater: d2 score 0.62 (1009939 views)
+fame Ryan Coogler: d2 score 0.87 (2170738 views)
+fame Chloé Zhao: d3 score 0.74 (1516815 views)
+fame Jane Campion: d3 score 0.13 (207406 views)
+fame Nora Ephron: d2 score 0.58 (795020 views)
+fame Penny Marshall: d3 score 0.88 (2295177 views)
+fame David Lynch: d2 score 0.90 (2461056 views)
+fame Tony Scott: d2 score 0.53 (749500 views)
+fame J. J. Abrams: d2 score 0.79 (1624397 views)
+fame James Gunn: d2 score 0.82 (1848646 views)
+fame Rian Johnson: d2 score 0.59 (862729 views)
+fame Gore Verbinski: d2 score 0.47 (640326 views)
+fame Roland Emmerich: d3 score 0.29 (449521 views)
+fame Barry Jenkins: d3 score 0.08 (194736 views)
+fame Hirokazu Kore-eda: d3 score 0.14 (215855 views)
+fame Michael Curtiz: d3 score 0.02 (135896 views)
+fame Victor Fleming: d3 score 0.03 (139477 views)
+fame Robert Wise: d3 score 0.06 (153283 views)
+fame Bernardo Bertolucci: d3 score 0.14 (212260 views)
+fame Werner Herzog: d2 score 0.70 (1314894 views)
+fame John Huston: d2 score 0.50 (701204 views)
+fame Howard Hawks: d3 score 0.15 (220805 views)
+fame Fritz Lang: d3 score 0.18 (270648 views)
+fame Sergei Eisenstein: d3 score 0.06 (177741 views)
+fame Makoto Shinkai: d3 score 0.23 (343114 views)
+fame Isao Takahata: d3 score 0.11 (205479 views)
+fame Todd Phillips: d3 score 0.24 (361756 views)
+fame Matthew Vaughn: d2 score 0.36 (500191 views)
+fame Paul Verhoeven: d3 score 0.34 (481194 views)
+fame Martin McDonagh: d2 score 0.50 (697794 views)
+fame Patty Jenkins: d3 score 0.01 (116391 views)
+fame Peter Farrelly: d3 score 0.16 (247562 views)
+fame John G. Avildsen: d3 score 0.02 (136843 views)
+fame John McTiernan: d3 score 0.21 (307785 views)
+fame Richard Curtis: d3 score 0.34 (474018 views)
+fame Jean-Pierre Jeunet: d3 score 0.05 (140792 views)
+fame Agnès Varda: d3 score 0.12 (205770 views)
+fame Mira Nair: d3 score 0.97 (4377956 views)
+fame Gurinder Chadha: d3 score 0.04 (140093 views)
+fame Wim Wenders: d3 score 0.28 (405895 views)
+movie-moments: 139 of 257 films have a pack director (factLv.director)

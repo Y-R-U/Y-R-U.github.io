@@ -1,0 +1,636 @@
+{
+ "note": "Hand fixes for tools/genre_build.mjs, keyed by the primary pack item (movies/, tv/, books/; Moments and theme tunes inherit). add wins over Wikidata, drop removes.",
+ "add": {
+  "movies/gravity": [
+   "scifi"
+  ],
+  "movies/aladdin": [
+   "family",
+   "fantasy"
+  ],
+  "movies/the-lion-king-2019": [
+   "family"
+  ],
+  "movies/beauty-and-the-beast-2017": [
+   "family",
+   "fantasy",
+   "romance"
+  ],
+  "movies/aladdin-2019": [
+   "family",
+   "fantasy"
+  ],
+  "kids-film-tv/baby-shark-pinkfong": [
+   "family"
+  ],
+  "movies/roman-holiday": [
+   "romance",
+   "comedy"
+  ],
+  "tv/yo-soy-betty-la-fea": [
+   "romance",
+   "comedy"
+  ],
+  "movies/borat": [
+   "comedy"
+  ]
+ },
+ "drop": {
+  "movies/jaws": [
+   "scifi"
+  ],
+  "movies/moonraker": [
+   "scifi"
+  ],
+  "movies/harry-potter-and-the-prisoner-of-azkaban": [
+   "scifi"
+  ],
+  "movies/coraline": [
+   "scifi"
+  ],
+  "movies/groundhog-day": [
+   "scifi"
+  ],
+  "movies/your-name": [
+   "scifi"
+  ],
+  "movies/despicable-me-2": [
+   "scifi"
+  ],
+  "movies/wreck-it-ralph": [
+   "scifi"
+  ],
+  "movies/howl-s-moving-castle": [
+   "scifi",
+   "war"
+  ],
+  "movies/king-kong": [
+   "scifi",
+   "horror"
+  ],
+  "books/lord-of-the-flies": [
+   "scifi"
+  ],
+  "books/the-adventures-of-captain-underpants": [
+   "scifi"
+  ],
+  "books/northern-lights": [
+   "scifi"
+  ],
+  "books/tomorrow-when-the-war-began": [
+   "scifi"
+  ],
+  "tv/ghosts-uk": [
+   "scifi"
+  ],
+  "tv/spongebob-squarepants": [
+   "scifi",
+   "fantasy"
+  ],
+  "tv/one-piece": [
+   "scifi",
+   "comedy"
+  ],
+  "tv/adventure-time": [
+   "scifi"
+  ],
+  "tv/batman": [
+   "scifi",
+   "crime"
+  ],
+  "movies/ghostbusters": [
+   "horror"
+  ],
+  "movies/deadpool-and-wolverine": [
+   "horror"
+  ],
+  "movies/godzilla": [
+   "horror"
+  ],
+  "movies/the-terminator": [
+   "horror",
+   "fantasy"
+  ],
+  "movies/predator": [
+   "horror"
+  ],
+  "movies/robocop": [
+   "horror",
+   "superhero"
+  ],
+  "movies/district-9": [
+   "horror",
+   "comedy"
+  ],
+  "movies/apocalypse-now": [
+   "horror",
+   "crime"
+  ],
+  "movies/kill-bill-volume-1": [
+   "horror",
+   "fantasy",
+   "crime"
+  ],
+  "movies/the-mummy": [
+   "horror"
+  ],
+  "movies/twilight": [
+   "horror"
+  ],
+  "movies/se7en": [
+   "horror"
+  ],
+  "books/the-metamorphosis": [
+   "horror"
+  ],
+  "books/twilight": [
+   "horror"
+  ],
+  "books/jurassic-park": [
+   "horror"
+  ],
+  "movies/toy-story": [
+   "fantasy"
+  ],
+  "movies/toy-story-2": [
+   "fantasy"
+  ],
+  "movies/toy-story-4": [
+   "fantasy"
+  ],
+  "movies/around-the-world-in-80-days": [
+   "fantasy",
+   "comedy"
+  ],
+  "movies/one-hundred-and-one-dalmatians": [
+   "fantasy",
+   "crime",
+   "comedy"
+  ],
+  "movies/8": [
+   "fantasy"
+  ],
+  "movies/robin-hood": [
+   "fantasy",
+   "comedy"
+  ],
+  "movies/alien": [
+   "fantasy",
+   "crime"
+  ],
+  "movies/a-nightmare-on-elm-street": [
+   "fantasy",
+   "crime"
+  ],
+  "movies/space-jam": [
+   "fantasy"
+  ],
+  "movies/ice-age": [
+   "fantasy"
+  ],
+  "movies/chicken-run": [
+   "fantasy"
+  ],
+  "movies/kung-fu-panda": [
+   "fantasy"
+  ],
+  "movies/rio": [
+   "fantasy"
+  ],
+  "movies/the-hunger-games": [
+   "fantasy",
+   "crime"
+  ],
+  "movies/life-of-pi": [
+   "fantasy"
+  ],
+  "movies/peter-rabbit": [
+   "fantasy"
+  ],
+  "movies/wallace-and-gromit-the-curse-of-the-were-rabbit": [
+   "fantasy",
+   "crime"
+  ],
+  "movies/big-hero-6": [
+   "fantasy"
+  ],
+  "movies/rogue-one": [
+   "fantasy",
+   "war"
+  ],
+  "movies/jurassic-world-dominion": [
+   "fantasy"
+  ],
+  "movies/the-empire-strikes-back": [
+   "fantasy"
+  ],
+  "movies/return-of-the-jedi": [
+   "fantasy"
+  ],
+  "movies/star-wars-episode-i-the-phantom-menace": [
+   "fantasy"
+  ],
+  "movies/star-wars-episode-ii-attack-of-the-clones": [
+   "fantasy"
+  ],
+  "movies/star-wars-episode-iii-revenge-of-the-sith": [
+   "fantasy"
+  ],
+  "movies/star-wars-the-force-awakens": [
+   "fantasy"
+  ],
+  "movies/star-wars-the-last-jedi": [
+   "fantasy"
+  ],
+  "movies/star-wars-the-rise-of-skywalker": [
+   "fantasy"
+  ],
+  "movies/spider-man-no-way-home": [
+   "fantasy"
+  ],
+  "movies/the-iron-giant": [
+   "fantasy"
+  ],
+  "movies/the-fifth-element": [
+   "fantasy"
+  ],
+  "movies/cloudy-with-a-chance-of-meatballs": [
+   "fantasy"
+  ],
+  "tv/thomas-and-friends": [
+   "fantasy"
+  ],
+  "tv/the-flintstones": [
+   "fantasy"
+  ],
+  "tv/the-jetsons": [
+   "fantasy"
+  ],
+  "tv/teenage-mutant-ninja-turtles": [
+   "fantasy"
+  ],
+  "tv/the-powerpuff-girls": [
+   "fantasy"
+  ],
+  "tv/neon-genesis-evangelion": [
+   "fantasy",
+   "crime"
+  ],
+  "tv/pippi-longstocking": [
+   "fantasy"
+  ],
+  "books/the-turn-of-the-screw": [
+   "fantasy"
+  ],
+  "books/frankenstein": [
+   "fantasy"
+  ],
+  "books/the-phantom-of-the-opera": [
+   "fantasy",
+   "crime"
+  ],
+  "books/bridge-to-terabithia": [
+   "fantasy"
+  ],
+  "movies/the-sixth-sense": [
+   "crime"
+  ],
+  "movies/citizen-kane": [
+   "crime"
+  ],
+  "movies/casablanca": [
+   "crime",
+   "war"
+  ],
+  "movies/some-like-it-hot": [
+   "crime"
+  ],
+  "movies/the-400-blows": [
+   "crime"
+  ],
+  "movies/west-side-story": [
+   "crime"
+  ],
+  "movies/oliver": [
+   "crime"
+  ],
+  "movies/2001-a-space-odyssey": [
+   "crime"
+  ],
+  "movies/the-exorcist": [
+   "crime"
+  ],
+  "movies/halloween": [
+   "crime"
+  ],
+  "movies/the-shining": [
+   "crime"
+  ],
+  "movies/one-flew-over-the-cuckoo-s-nest": [
+   "crime",
+   "comedy"
+  ],
+  "movies/raging-bull": [
+   "crime"
+  ],
+  "movies/breaker-morant": [
+   "crime"
+  ],
+  "movies/the-mask": [
+   "crime"
+  ],
+  "movies/the-english-patient": [
+   "crime"
+  ],
+  "movies/austin-powers-international-man-of-mystery": [
+   "crime"
+  ],
+  "movies/the-castle": [
+   "crime"
+  ],
+  "movies/the-matrix": [
+   "crime",
+   "superhero"
+  ],
+  "movies/slumdog-millionaire": [
+   "crime"
+  ],
+  "movies/the-social-network": [
+   "crime"
+  ],
+  "movies/incendies": [
+   "crime"
+  ],
+  "movies/guardians-of-the-galaxy": [
+   "crime"
+  ],
+  "movies/minions": [
+   "crime"
+  ],
+  "movies/zootopia": [
+   "crime"
+  ],
+  "movies/get-out": [
+   "crime",
+   "comedy"
+  ],
+  "movies/coco": [
+   "crime",
+   "comedy"
+  ],
+  "books/bleak-house": [
+   "crime"
+  ],
+  "books/the-prince-and-the-pauper": [
+   "crime"
+  ],
+  "books/the-english-patient": [
+   "crime"
+  ],
+  "books/five-on-a-treasure-island": [
+   "crime"
+  ],
+  "books/jaws": [
+   "crime"
+  ],
+  "books/strange-case-of-dr-jekyll-and-mr-hyde": [
+   "crime"
+  ],
+  "movies/the-searchers": [
+   "war"
+  ],
+  "movies/the-good-the-bad-and-the-ugly": [
+   "war"
+  ],
+  "movies/first-blood": [
+   "war"
+  ],
+  "movies/aliens": [
+   "war"
+  ],
+  "movies/dances-with-wolves": [
+   "war"
+  ],
+  "movies/princess-mononoke": [
+   "war"
+  ],
+  "movies/pan-s-labyrinth": [
+   "war"
+  ],
+  "movies/wonder-woman": [
+   "war"
+  ],
+  "books/the-war-of-the-worlds": [
+   "war"
+  ],
+  "movies/top-gun": [
+   "romance"
+  ],
+  "movies/barbie": [
+   "romance"
+  ],
+  "movies/snow-white-and-the-seven-dwarfs": [
+   "romance"
+  ],
+  "movies/spartacus": [
+   "romance"
+  ],
+  "movies/sholay": [
+   "romance",
+   "comedy"
+  ],
+  "movies/network": [
+   "romance"
+  ],
+  "movies/airplane": [
+   "romance"
+  ],
+  "movies/the-karate-kid": [
+   "romance"
+  ],
+  "movies/shine": [
+   "romance"
+  ],
+  "movies/good-will-hunting": [
+   "romance"
+  ],
+  "movies/meet-the-parents": [
+   "romance"
+  ],
+  "movies/bend-it-like-beckham": [
+   "romance"
+  ],
+  "movies/mean-girls": [
+   "romance"
+  ],
+  "movies/shaun-of-the-dead": [
+   "romance"
+  ],
+  "movies/3-idiots": [
+   "romance"
+  ],
+  "movies/the-secret-in-their-eyes": [
+   "romance"
+  ],
+  "movies/bridesmaids": [
+   "romance"
+  ],
+  "movies/les-miserables": [
+   "romance"
+  ],
+  "movies/the-grand-budapest-hotel": [
+   "romance"
+  ],
+  "tv/money-heist": [
+   "romance",
+   "comedy"
+  ],
+  "books/dracula": [
+   "romance"
+  ],
+  "books/the-time-machine": [
+   "romance"
+  ],
+  "books/the-count-of-monte-cristo": [
+   "romance"
+  ],
+  "movies/indiana-jones-and-the-last-crusade": [
+   "comedy"
+  ],
+  "movies/terminator-2-judgment-day": [
+   "comedy"
+  ],
+  "movies/pirates-of-the-caribbean-dead-man-s-chest": [
+   "comedy"
+  ],
+  "movies/pirates-of-the-caribbean-at-world-s-end": [
+   "comedy"
+  ],
+  "movies/frozen": [
+   "comedy"
+  ],
+  "movies/transformers-age-of-extinction": [
+   "comedy"
+  ],
+  "movies/furious-7": [
+   "comedy"
+  ],
+  "movies/it-s-a-wonderful-life": [
+   "comedy"
+  ],
+  "movies/all-about-eve": [
+   "comedy"
+  ],
+  "movies/lady-and-the-tramp": [
+   "comedy"
+  ],
+  "movies/la-dolce-vita": [
+   "comedy"
+  ],
+  "movies/a-clockwork-orange": [
+   "comedy"
+  ],
+  "movies/terms-of-endearment": [
+   "comedy"
+  ],
+  "movies/stand-by-me": [
+   "comedy"
+  ],
+  "movies/driving-miss-daisy": [
+   "comedy"
+  ],
+  "movies/reservoir-dogs": [
+   "comedy"
+  ],
+  "movies/pulp-fiction": [
+   "comedy"
+  ],
+  "movies/fargo": [
+   "comedy"
+  ],
+  "movies/jerry-maguire": [
+   "comedy"
+  ],
+  "movies/scream": [
+   "comedy"
+  ],
+  "movies/american-beauty": [
+   "comedy"
+  ],
+  "movies/chicago": [
+   "comedy"
+  ],
+  "movies/inglourious-basterds": [
+   "comedy"
+  ],
+  "movies/the-host": [
+   "comedy"
+  ],
+  "movies/iron-man-3": [
+   "comedy"
+  ],
+  "movies/parasite": [
+   "comedy"
+  ],
+  "movies/green-book": [
+   "comedy"
+  ],
+  "movies/another-round": [
+   "comedy"
+  ],
+  "movies/la-la-land": [
+   "comedy"
+  ],
+  "movies/how-to-train-your-dragon": [
+   "comedy"
+  ],
+  "movies/moana": [
+   "comedy"
+  ],
+  "movies/the-rocky-horror-picture-show": [
+   "comedy"
+  ],
+  "tv/breaking-bad": [
+   "comedy"
+  ],
+  "tv/killing-eve": [
+   "comedy"
+  ],
+  "tv/crash-landing-on-you": [
+   "comedy"
+  ],
+  "tv/descendants-of-the-sun": [
+   "comedy"
+  ],
+  "tv/pokemon": [
+   "comedy"
+  ],
+  "tv/sesame-street": [
+   "comedy"
+  ],
+  "tv/paw-patrol": [
+   "comedy"
+  ],
+  "books/great-expectations": [
+   "comedy"
+  ],
+  "books/brave-new-world": [
+   "comedy"
+  ],
+  "books/slaughterhouse-five": [
+   "comedy"
+  ],
+  "books/a-clockwork-orange": [
+   "comedy"
+  ],
+  "movies/avatar": [
+   "family"
+  ],
+  "tv/family-guy": [
+   "family"
+  ],
+  "tv/south-park": [
+   "family"
+  ]
+ }
+}

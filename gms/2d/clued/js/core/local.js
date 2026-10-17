@@ -1,9 +1,9 @@
 // Local focus: a game-level setting { cc: ISO3, level: 'off'|'more'|'most'|'all', live } that makes a share of each
 // round about one country (docs/notes/LOCAL.md). Tags come from data/local/tags.json (tools/local_tags.mjs);
 // in-country geography from data/local/geo.json (js/core/localgeo.js). Pure helpers + loaders; spec.js applies it.
-import { dataUrl } from './packs.js?v=202610171251';
-import { rngFrom, shuffle } from './rng.js?v=202610171251';
-import { getSettings, setSettings } from './store.js?v=202610171251';
+import { dataUrl, getIndex } from './packs.js?v=202610171317';
+import { rngFrom, shuffle } from './rng.js?v=202610171317';
+import { getSettings, setSettings } from './store.js?v=202610171317';
 
 export const LEVELS = [['off', 'Off', 0], ['more', 'More', 0.25], ['most', 'Most', 0.6], ['all', 'ALL', 1]];
 export const SHARE = Object.fromEntries(LEVELS.map(([k, , s]) => [k, s]));
@@ -60,12 +60,16 @@ export const localLabel = l => (isOn(l) ? `📍 ${countryName(l.cc)} focus · ${
 export const targetOf = (count, level) => Math.min(count, Math.round(count * (SHARE[level] || 0)));
 
 /* ---------------------------------------------------------------- tags */
+// a virtual pack reads its base pack's tags; a merged one (people~all) reads each of its packs
+const tagPacks = packId => (getIndex()?.packs?.[packId]?.virtual?.merge || [String(packId).split('~')[0]]).map(id => G.tags?.packs?.[id]).filter(Boolean);
 const tagsOf = (packId, key) => {
-  const p = G.tags?.packs?.[String(packId).split('~')[0]];
-  const t = key.startsWith('q:') ? p?.q?.[key.slice(2)] : p?.i?.[key];
-  return t == null ? [] : [].concat(t);
+  for (const p of tagPacks(packId)) {
+    const t = key.startsWith('q:') ? p.q?.[key.slice(2)] : p.i?.[key];
+    if (t != null) return [].concat(t);
+  }
+  return [];
 };
-export const packHasLocal = (packId, cc) => { const p = G.tags?.packs?.[String(packId).split('~')[0]]; return !!p && [...Object.values(p.i), ...Object.values(p.q)].some(t => t === cc || (Array.isArray(t) && t.includes(cc))); };
+export const packHasLocal = (packId, cc) => tagPacks(packId).some(p => [...Object.values(p.i), ...Object.values(p.q)].some(t => t === cc || (Array.isArray(t) && t.includes(cc))));
 export const itemLocal = (pack, it, cc) => tagsOf(pack.id, it.id).includes(cc);
 export const questionLocal = (pack, q, cc) => tagsOf(pack.id, `q:${q.id}`).includes(cc);
 const refLocal = (ref, cc) => {
