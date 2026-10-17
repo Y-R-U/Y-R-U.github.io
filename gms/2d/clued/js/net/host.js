@@ -1,29 +1,30 @@
 // Host setup (server rooms and device rooms): a list of rounds (＋ Add round → ♥ favourite or format → themes),
 // 10 questions each by default, plus the room-wide settings (answer time, gap, private/public, auto-start).
-import { h } from '../ui/kit.js?v=202610171109';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610171109';
-import { toast } from '../ui/popup.js?v=202610171109';
-import { saveSetPrompt, pickSet, copyRounds } from './sets.js?v=202610171109';
-import { getFormat, defaultOpts } from '../formats/registry.js?v=202610171109';
-import { getSettings, getLast, read, write } from '../core/store.js?v=202610171109';
-import { makeSpec } from '../core/spec.js?v=202610171109';
-import { randomSeed } from '../core/rng.js?v=202610171109';
-import { prepare } from '../structures/session.js?v=202610171109';
-import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610171109';
-import { rooms, friendly } from './api.js?v=202610171109';
-import { rememberName, tidyName } from './ident.js?v=202610171109';
-import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610171109';
-import { timingPanel, choiceChips } from './board.js?v=202610171109';
-import { streakOption } from '../ui/streakopt.js?v=202610171109';
-import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610171109';
-import { signInPrompt, isSignedIn, pausedText, busyText, allowanceNote, noGamesPanel } from './signin.js?v=202610171109';
-import { allowanceState, outOfGames } from './pass.js?v=202610171109';
-import { offerTopUp, wantsSheet } from './topup.js?v=202610171109';
-import { ensureFormats } from './room.js?v=202610171109';
-import { nameField } from './join.js?v=202610171109';
-import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610171109';
-import { mySetting, saveMySetting, specLocal, resolveLocal } from '../core/local.js?v=202610171109';
-import { localChip, localLine, localTotal, localReady } from '../ui/local.js?v=202610171109';
+import { h } from '../ui/kit.js?v=202610171135';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610171135';
+import { toast } from '../ui/popup.js?v=202610171135';
+import { saveSetPrompt, pickSet, copyRounds } from './sets.js?v=202610171135';
+import { getFormat, defaultOpts } from '../formats/registry.js?v=202610171135';
+import { getSettings, getLast, read, write } from '../core/store.js?v=202610171135';
+import { makeSpec } from '../core/spec.js?v=202610171135';
+import { randomSeed } from '../core/rng.js?v=202610171135';
+import { prepare } from '../structures/session.js?v=202610171135';
+import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610171135';
+import { rooms, friendly } from './api.js?v=202610171135';
+import { rememberName, tidyName } from './ident.js?v=202610171135';
+import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610171135';
+import { timingPanel, choiceChips } from './board.js?v=202610171135';
+import { streakOption } from '../ui/streakopt.js?v=202610171135';
+import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610171135';
+import { signInPrompt, isSignedIn, pausedText, busyText, allowanceNote, noGamesPanel } from './signin.js?v=202610171135';
+import { allowanceState, outOfGames } from './pass.js?v=202610171135';
+import { offerTopUp, wantsSheet } from './topup.js?v=202610171135';
+import { ensureFormats } from './room.js?v=202610171135';
+import { nameField } from './join.js?v=202610171135';
+import { surprise } from '../structures/pubquiz.js?v=202610171135';
+import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610171135';
+import { mySetting, saveMySetting, specLocal, resolveLocal } from '../core/local.js?v=202610171135';
+import { localChip, localLine, localTotal, localReady } from '../ui/local.js?v=202610171135';
 
 const KEY = 'clued.online';   // { rounds, kidsRounds }: the last hosted round list, per mode
 const MAX_ROUNDS = 8;
@@ -118,6 +119,13 @@ defineScreen('host', async (el, params, cur) => {
           go('host', { ...params, seeded: true }, { replace: true });   // re-render so the timing panel shows the set's times
         } else drawSetBar();
       } }, '📂 Sets'),
+      h('button.btn.small', { type: 'button', dataset: { act: 'surprise' }, onclick: () => {
+        S.rounds = surprise(randomSeed(), kids);
+        S.setName = '';
+        saveHost();
+        drawSetBar();
+        draw();
+      } }, '🎲 Surprise me'),
       h('button.btn.small', { type: 'button', dataset: { act: 'sets-save' }, onclick: async () => {
         const nm = await saveSetPrompt({ kids, rounds: S.rounds, timing: S.timing, name: S.setName || '', local: specLocal(S.local) || null });
         if (!nm) return;

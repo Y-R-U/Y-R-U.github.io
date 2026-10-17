@@ -1,16 +1,16 @@
 // Round lists shared by the pub quiz builder and the online host setup: round cards (edit/remove/reorder),
 // the "add a round" picker (♥ favourites first, then formats) and the round editor screen ('pqround').
-import { defineScreen, go, back, header } from '../ui/app.js?v=202610171109';
-import { h } from '../ui/kit.js?v=202610171109';
-import { popup, toast } from '../ui/popup.js?v=202610171109';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610171109';
-import { getIndex } from '../core/packs.js?v=202610171109';
-import { supportedPackIds } from '../core/spec.js?v=202610171109';
-import { getSettings, getFavs } from '../core/store.js?v=202610171109';
-import { cleanFav, favKey, favLabel } from '../ui/favmodel.js?v=202610171109';
-import { optionsPanel } from '../ui/setup.js?v=202610171109';
-import { sfx } from '../ui/fx.js?v=202610171109';
-import { mySetting } from '../core/local.js?v=202610171109';
+import { defineScreen, go, back, header } from '../ui/app.js?v=202610171135';
+import { h } from '../ui/kit.js?v=202610171135';
+import { popup, toast } from '../ui/popup.js?v=202610171135';
+import { listFormats, getFormat, defaultOpts, popularFirst } from '../formats/registry.js?v=202610171135';
+import { getIndex } from '../core/packs.js?v=202610171135';
+import { supportedPackIds } from '../core/spec.js?v=202610171135';
+import { getSettings, getFavs } from '../core/store.js?v=202610171135';
+import { cleanFav, favKey, favLabel } from '../ui/favmodel.js?v=202610171135';
+import { optionsPanel } from '../ui/setup.js?v=202610171135';
+import { sfx } from '../ui/fx.js?v=202610171135';
+import { mySetting } from '../core/local.js?v=202610171135';
 
 const CSS = `
 .round-card.rc { grid-template-columns: 44px minmax(0, 1fr) auto; cursor: pointer; }
@@ -113,7 +113,7 @@ export function pickRound(kids, { title = 'Add a round', favs = true } = {}) {
       h('div.rp-sec', {}, 'Or pick a format'));
   }
   const grid = h('div.tiles');
-  for (const f of usable(kids)) grid.append(h('button.tile', { type: 'button', dataset: { format: f.id }, onclick: () => close({ format: f.id }) }, h('span.t-ico', {}, f.icon), h('span.t-title', {}, f.title)));
+  for (const f of popularFirst(usable(kids))) grid.append(h('button.tile', { type: 'button', dataset: { format: f.id }, onclick: () => close({ format: f.id }) }, h('span.t-ico', {}, f.icon), h('span.t-title', {}, f.title)));
   body.append(grid);
   return popup({ title, body, cls: 'rp-pop', actions: [{ label: 'Cancel', value: null }] });
 }

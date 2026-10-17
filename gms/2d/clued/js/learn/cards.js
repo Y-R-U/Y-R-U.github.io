@@ -1,17 +1,17 @@
 // Flashcards: choose packs, study them (multiple choice or flip), or review everything due.
-import { h, choiceGrid } from '../ui/kit.js?v=202610171109';
-import { header, go, back } from '../ui/app.js?v=202610171109';
-import { popup } from '../ui/popup.js?v=202610171109';
-import { sfx, haptic, confetti } from '../ui/fx.js?v=202610171109';
-import { addStars } from '../ui/stickers.js?v=202610171109';
-import { getIndex } from '../core/packs.js?v=202610171109';
-import { themeTree, getPack, itemsFor, refOf, factRows, kidsOn } from './data.js?v=202610171109';
-import { getCards, updateCards, gradeCard, today, deckCounts, dueCount } from './model.js?v=202610171109';
-import { studyQueue, cramQueue, packOf, INTERVALS, MAX_BOX } from './srs.js?v=202610171109';
-import { cardFace, mcOptions } from './face.js?v=202610171109';
-import { carousel } from './item.js?v=202610171109';
-import { say, sayBtn, emptyState, notice, stopAudio, soundBtn, playAudio, put } from './ui.js?v=202610171109';
-import { recordStudy } from '../core/stats.js?v=202610171109';
+import { h, choiceGrid } from '../ui/kit.js?v=202610171135';
+import { header, go, back } from '../ui/app.js?v=202610171135';
+import { popup } from '../ui/popup.js?v=202610171135';
+import { sfx, haptic, confetti } from '../ui/fx.js?v=202610171135';
+import { addStars } from '../ui/stickers.js?v=202610171135';
+import { getIndex } from '../core/packs.js?v=202610171135';
+import { themeTree, getPack, itemsFor, refOf, factRows, kidsOn } from './data.js?v=202610171135';
+import { getCards, updateCards, gradeCard, today, deckCounts, dueCount } from './model.js?v=202610171135';
+import { studyQueue, cramQueue, packOf, INTERVALS, MAX_BOX } from './srs.js?v=202610171135';
+import { cardFace, mcOptions } from './face.js?v=202610171135';
+import { carousel } from './item.js?v=202610171135';
+import { say, sayBtn, emptyState, notice, stopAudio, soundBtn, playAudio, put } from './ui.js?v=202610171135';
+import { recordStudy } from '../core/stats.js?v=202610171135';
 
 const KIDS_STAR_CAP = 10;
 

@@ -1,6 +1,6 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610171109';
-import { SERIES } from './series_data.js?v=202610171109';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610171135';
+import { SERIES } from './series_data.js?v=202610171135';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -17,6 +17,10 @@ export function register(fmt) {
 
 export const getFormat = id => R.map.get(id) || null;
 export const listFormats = () => [...R.map.values()];
+// Pickers show the most-picked round types first, the rest in load order.
+const TOP = ['reveal', 'listen', 'mc', 'tf', 'trio', 'quote', 'fake'];
+const rank = f => { const i = TOP.indexOf(f.id); return i < 0 ? TOP.length : i; };
+export const popularFirst = list => [...list].sort((a, b) => rank(a) - rank(b));
 export const onRegister = fn => (R.listeners.add(fn), () => R.listeners.delete(fn));
 
 export const NOT_ENOUGH = 'Not enough for this game yet';
