@@ -1,5 +1,5 @@
 // Clued server client: base URL, JSON requests, server clock, live room subscription (SSE → long-poll fallback).
-import { idToken } from './ident.js?v=202610161426';
+import { idToken } from './ident.js?v=202610170627';
 
 const DEFAULT_API = location.hostname === 'games.br8t.com' ? '/gms/2d/clued/api' : 'https://games.br8t.com/gms/2d/clued/api';
 
@@ -51,6 +51,7 @@ const FRIENDLY = {
   challenge_not_found: 'This challenge has expired or the link is wrong.',
   busy: 'Clued is busy right now. Please try again soon.',
   no_games_left: 'No online games left today.',
+  in_question: 'Change your name between questions.',
 };
 export const friendly = e => FRIENDLY[e?.code] || e?.message || 'Something went wrong.';
 
@@ -111,6 +112,7 @@ export const rooms = {
   mine: list => req('POST', '/rooms/mine', { rooms: list }, { timeout: 8000 }),
   vote: (code, key, q) => req('POST', `/rooms/${code}/vote`, { key, q }),
   ready: (code, key, q) => req('POST', `/rooms/${code}/ready`, { key, q }),
+  rename: (code, key, name) => req('POST', `/rooms/${code}/rename`, { key, name }),
   // start spends the host's allowance; settings/again keep the server's copy of the token fresh for a public auto-start
   host: (code, key, action, extra = {}) => req('POST', `/rooms/${code}/${action}`, { key, ...extra }, { timeout: action === 'again' ? 20000 : 12000, auth: HOST_AUTH.has(action) }),
 };

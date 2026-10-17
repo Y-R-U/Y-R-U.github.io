@@ -1,18 +1,18 @@
 // Pass and play: 2–8 named players take turns on one device. Each player can be in kids mode.
-import { playSpec } from './session.js?v=202610161426';
-import { specFor, fmtTitle } from './common.js?v=202610161426';
-import { handoff } from './handoff.js?v=202610161426';
-import { defineScreen, go, header } from '../ui/app.js?v=202610161426';
-import { h, esc, fmtNum } from '../ui/kit.js?v=202610161426';
-import { read, write, getSettings } from '../core/store.js?v=202610161426';
-import { toast } from '../ui/popup.js?v=202610161426';
+import { playSpec } from './session.js?v=202610170627';
+import { specFor, fmtTitle } from './common.js?v=202610170627';
+import { handoff } from './handoff.js?v=202610170627';
+import { defineScreen, go, header } from '../ui/app.js?v=202610170627';
+import { h, esc, fmtNum } from '../ui/kit.js?v=202610170627';
+import { read, write, getSettings, getName } from '../core/store.js?v=202610170627';
+import { toast } from '../ui/popup.js?v=202610170627';
 
 const KEY = 'clued.party';
 export function getPlayers() {
   const p = read(KEY);
   if (Array.isArray(p) && p.length >= 2) return p;
   const kids = !!getSettings().kids;
-  return [{ name: 'Player 1', kids }, { name: 'Player 2', kids }];
+  return [{ name: getName().slice(0, 16) || 'Player 1', kids }, { name: 'Player 2', kids }];
 }
 const savePlayers = p => write(KEY, p);
 

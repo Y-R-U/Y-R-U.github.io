@@ -315,5 +315,24 @@ for (const [f, n, ans, lim, step] of [['reveal', 10, 30000, 45000, 4111], ['ladd
   eq(new P2PRoom({ questions: [mc(0)], spec: { streak: 'off' }, now, rand }).stateFor(null).streakBonus, false, 'spec.streak off');
 }
 
+/* rename (lane HOSTNAME): same cleaning + dedupe as joins, locked while a question is open */
+{
+  const { r, host } = room();
+  const p = join(r, 'Sam');
+  const v0 = r.ver;
+  eq(r.rename(host, '  Aaron\u200b  the   Host ').name, 'Aaron the Host', 'host rename cleaned');
+  ok(r.ver > v0, 'rename bumps the version (broadcast)');
+  eq(r.stateFor(p).players.find(x => x.id === host.id).name, 'Aaron the Host', 'joiner state carries the new host name');
+  eq(r.rename(p, 'aaron the host').name, 'aaron the host 2', 'duplicate rename deduped like a join');
+  eq(r.rename(p, 'AARON THE HOST 2').name, 'AARON THE HOST 2', 'recasing your own name is not a clash');
+  eq(r.rename(p, 'x'.repeat(40)).name.length, 20, 'rename capped at 20');
+  eq(r.rename(p, ' <> ').error, 'name_required', 'blank rename refused');
+  r.hostAction(host, 'start');
+  eq(r.rename(p, 'Mid').error, 'in_question', 'locked during a question');
+  openQ(r); r.hostAction(host, 'next', { q: 0 });
+  eq(r.phase, 'reveal', 'at the reveal');
+  eq(r.rename(p, 'Between').name, 'Between', 'allowed between questions');
+}
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

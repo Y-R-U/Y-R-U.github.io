@@ -1,5 +1,5 @@
-import { playSpec } from './session.js?v=202610161426';
-import { specFor, fmtTitle } from './common.js?v=202610161426';
+import { playSpec } from './session.js?v=202610170627';
+import { specFor, fmtTitle } from './common.js?v=202610170627';
 
 const survival = {
   id: 'survival', title: 'Survival', icon: '❤️', blurb: 'Keep going until you lose three lives.', count: false,

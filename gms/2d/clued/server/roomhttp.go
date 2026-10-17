@@ -795,6 +795,33 @@ func resetPublicCache() {
 }
 
 // handleReady: the client has the question and its media loaded (see Room.checkHold).
+// handleRename: any player (host included) changes their own name; cleaned and capped like a join name.
+func handleRename(w http.ResponseWriter, r *http.Request) {
+	if !allow(r, "join") {
+		rateLimited(w)
+		return
+	}
+	var in struct {
+		Key  string `json:"key"`
+		Name string `json:"name"`
+	}
+	if !readJSON(w, r, smallBody, &in) {
+		return
+	}
+	name, err := cleanName(in.Name)
+	if err != nil {
+		nameErr(w, err)
+		return
+	}
+	withPlayer(w, r.PathValue("code"), in.Key, func(room *Room, p *Player) {
+		if code := room.rename(p, name); code != "" {
+			writeErr(w, 409, code, strings.ReplaceAll(code, "_", " "))
+			return
+		}
+		writeJSON(w, 200, room.stateFor(p))
+	})
+}
+
 func handleReady(w http.ResponseWriter, r *http.Request) {
 	if !allow(r, "answer") {
 		rateLimited(w)

@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, comparison, lcLabel, plainLabel } from './registry.js?v=202610161426';
-import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=202610161426';
-import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=202610161426';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, comparison, lcLabel, plainLabel } from './registry.js?v=202610170627';
+import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=202610170627';
+import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=202610170627';
 
 const CSS = `
 .hl-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}

@@ -1,19 +1,42 @@
-import { h, esc } from './kit.js?v=202610161426';
-import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610161426';
-import { defineScreen, header, back, go } from './app.js?v=202610161426';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610161426';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610161426';
-import { applyAudioSettings, sfx } from './fx.js?v=202610161426';
-import { applyKids } from './home.js?v=202610161426';
-import { loadLearn, loadNet } from './net.js?v=202610161426';
-import { BUILD } from '../build.js?v=202610161426';
-import { canSpeak, speak } from './speech.js?v=202610161426';
-import { streakOption } from './streakopt.js?v=202610161426';
-import { localChip } from './local.js?v=202610161426';
-import { confirmPop, toast } from './popup.js?v=202610161426';
-import { seenInfo, resetSeen } from '../core/fresh.js?v=202610161426';
-import { mySetting, saveMySetting } from '../core/local.js?v=202610161426';
-import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610161426';
+import { h, esc } from './kit.js?v=202610170627';
+import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610170627';
+import { defineScreen, header, back, go } from './app.js?v=202610170627';
+import { getSettings, setSettings, ANSWER_TIMES, getName } from '../core/store.js?v=202610170627';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610170627';
+import { applyAudioSettings, sfx } from './fx.js?v=202610170627';
+import { applyKids } from './home.js?v=202610170627';
+import { loadLearn, loadNet } from './net.js?v=202610170627';
+import { BUILD } from '../build.js?v=202610170627';
+import { canSpeak, speak } from './speech.js?v=202610170627';
+import { streakOption } from './streakopt.js?v=202610170627';
+import { localChip } from './local.js?v=202610170627';
+import { confirmPop, toast } from './popup.js?v=202610170627';
+import { seenInfo, resetSeen } from '../core/fresh.js?v=202610170627';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610170627';
+import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610170627';
+import { accountFirstName, rememberName, tidyName, MAX_NAME } from '../net/ident.js?v=202610170627';
+
+// The default name for hosting and joining (clued.name, the same key the host/join screens remember).
+// Empty = your br8t account's first name when signed in; shown, but never saved over a name you typed.
+function nameRow() {
+  const note = h('small', {}, 'Used when you host or join a game. You can still change it in the lobby.');
+  const input = h('input.field', { type: 'text', maxlength: String(MAX_NAME), placeholder: 'Your name', autocomplete: 'nickname', autocapitalize: 'words', spellcheck: 'false', enterkeyhint: 'done', 'aria-label': 'Your name', dataset: { field: 'settings-name' }, style: { width: '100%', fontSize: '16px', padding: '10px 12px', marginTop: '8px' } });
+  input.value = getName();
+  let edited = false;
+  if (!input.value) accountFirstName().then(n => { if (n && !edited && !input.value && input.isConnected) { input.value = n; note.textContent = 'From your br8t account. Type to change it.'; } });
+  const save = () => {
+    if (!edited) return;
+    const n = tidyName(input.value);
+    input.value = n;
+    if (n === getName()) return;
+    rememberName(n);
+    toast(n ? `Name saved: ${n}` : 'Name cleared');
+  };
+  input.addEventListener('input', () => { edited = true; });
+  input.addEventListener('change', save);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } });
+  return h('div.panel.set-list', { dataset: { set: 'name' }, style: { marginBottom: '14px' } }, h('div.opt-row', {}, h('span.lbl', {}, 'Your name', note)), input);
+}
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -68,6 +91,7 @@ function feedbackPanel() {
 defineScreen('settings', (el, params = {}) => {
   const s = getSettings();
   el.append(header('Settings'));
+  el.append(nameRow());
   const vol = h('input', { type: 'range', min: 0, max: 1, step: 0.05, value: s.music, 'aria-label': 'Music volume' });
   vol.addEventListener('input', () => applyAll(setSettings({ music: +vol.value })));
   const secs = h('div.chips');

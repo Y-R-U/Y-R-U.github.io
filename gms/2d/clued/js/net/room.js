@@ -1,29 +1,30 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=202610161426';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=202610161426';
-import { confirmPop, toast } from '../ui/popup.js?v=202610161426';
-import { sfx, confetti } from '../ui/fx.js?v=202610161426';
-import { createRunner } from '../structures/runner.js?v=202610161426';
-import { prepare, prepareFormats } from '../structures/session.js?v=202610161426';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610161426';
-import { urlsOf, preflight } from '../core/media.js?v=202610161426';
-import { randomSeed } from '../core/rng.js?v=202610161426';
-import { listFormats } from '../formats/registry.js?v=202610161426';
-import { loadFormats } from '../formats/index.js?v=202610161426';
-import { friendly } from './api.js?v=202610161426';
-import { getTransport } from './transport.js?v=202610161426';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610161426';
-import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610161426';
-import { streakOption } from '../ui/streakopt.js?v=202610161426';
-import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610161426';
-import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610161426';
-import { getFormat } from '../formats/registry.js?v=202610161426';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610161426';
-import { trackRoom } from '../core/stats.js?v=202610161426';
-import { cleanQuestion } from './sanitize.js?v=202610161426';
-import { saveSetPrompt } from './sets.js?v=202610161426';
-import { isOn, localLabel, loadNames } from '../core/local.js?v=202610161426';
-import { noGamesPanel, signInPrompt } from './signin.js?v=202610161426';
+import { h, fmtNum } from '../ui/kit.js?v=202610170627';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610170627';
+import { confirmPop, toast } from '../ui/popup.js?v=202610170627';
+import { sfx, confetti } from '../ui/fx.js?v=202610170627';
+import { createRunner } from '../structures/runner.js?v=202610170627';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610170627';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610170627';
+import { urlsOf, preflight } from '../core/media.js?v=202610170627';
+import { randomSeed } from '../core/rng.js?v=202610170627';
+import { listFormats } from '../formats/registry.js?v=202610170627';
+import { loadFormats } from '../formats/index.js?v=202610170627';
+import { friendly } from './api.js?v=202610170627';
+import { getTransport } from './transport.js?v=202610170627';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610170627';
+import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610170627';
+import { streakOption } from '../ui/streakopt.js?v=202610170627';
+import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610170627';
+import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610170627';
+import { getFormat } from '../formats/registry.js?v=202610170627';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610170627';
+import { trackRoom } from '../core/stats.js?v=202610170627';
+import { cleanQuestion } from './sanitize.js?v=202610170627';
+import { saveSetPrompt } from './sets.js?v=202610170627';
+import { isOn, localLabel, loadNames } from '../core/local.js?v=202610170627';
+import { noGamesPanel, signInPrompt } from './signin.js?v=202610170627';
+import { tidyName, rememberName, MAX_NAME } from './ident.js?v=202610170627';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;
@@ -160,10 +161,8 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       !st.kids && st.difficulty ? h('span.net-badge.diff', {}, DIFF[st.difficulty] || '') : null,
       isOn(st.spec?.local) ? h('span.net-badge.diff', { dataset: { badge: 'local' } }, localLabel(st.spec.local)) : null].filter(Boolean));
     r.count.textContent = `${st.players.length} player${st.players.length === 1 ? '' : 's'}`;
-    r.players.replaceChildren(...st.players.map(p => h('span.net-player', { class: `${p.id === st.you.id ? 'me' : ''} ${p.online ? '' : 'off'}`, dataset: { id: p.id } },
-      p.host ? h('span.crown', { title: 'Host' }, '👑') : null,
-      h('span.nm', {}, p.name),
-      st.you.host && p.id !== st.you.id ? h('button.kick', { type: 'button', 'aria-label': `Remove ${p.name}`, onclick: () => kick(p) }, '×') : null)));
+    // while you edit your name, state pushes keep your chip (and its input) instead of rebuilding it
+    r.players.replaceChildren(...st.players.map(p => (p.id === st.you.id && r.edit ? r.edit.chip : playerChip(st, p))));
     const streakOn = st.streakBonus !== false;
     const timingKey = `${st.you.host}|${st.answerSec}|${st.gapSec}|${streakOn}`;
     if (r.timingKey !== timingKey) {
@@ -201,6 +200,50 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       const id = every(tick, 500);
       tick();
     }
+  }
+
+  function playerChip(st, p) {
+    const me = p.id === st.you.id;
+    return h('span.net-player', { class: `${me ? 'me' : ''} ${p.online ? '' : 'off'}`, dataset: { id: p.id } },
+      p.host ? h('span.crown', { title: 'Host' }, '👑') : null,
+      h('span.nm', {}, p.name),
+      me && T.rename ? h('button.net-rename', { type: 'button', 'aria-label': 'Change your name', title: 'Change your name', dataset: { act: 'rename' }, onclick: e => editName(e.currentTarget.parentNode, p.name) }, '✎') : null,
+      st.you.host && !me ? h('button.kick', { type: 'button', 'aria-label': `Remove ${p.name}`, onclick: () => kick(p) }, '×') : null);
+  }
+
+  // Inline rename in your own lobby chip: Enter or leaving the field saves, Escape cancels.
+  function editName(chip, cur) {
+    const L = lobbyRefs;
+    if (!L || L.edit) return;
+    const input = h('input.net-name-edit', { type: 'text', maxlength: String(MAX_NAME), autocomplete: 'nickname', autocapitalize: 'words', spellcheck: 'false', enterkeyhint: 'done', 'aria-label': 'Your name', dataset: { field: 'rename' } });
+    input.value = cur;
+    chip.querySelector('.nm')?.replaceWith(input);
+    chip.querySelector('.net-rename')?.remove();
+    chip.classList.add('editing');
+    L.edit = { chip };
+    let done = false;
+    const finish = async save => {
+      if (done) return;
+      done = true;
+      const n = tidyName(input.value);
+      if (save && n && n !== cur && input.isConnected) {
+        input.disabled = true;
+        try {
+          const s = await T.rename(code, key, n);
+          rememberName(n);
+          L.edit = null;
+          sub.push(s);
+        } catch (e) { toast(friendly(e)); }
+      }
+      L.edit = null;
+      if (ctx.st?.phase === 'lobby' && ctx.view === 'lobby') showLobby(ctx.st);
+    };
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); finish(true); } else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    });
+    input.addEventListener('blur', () => finish(true));
+    input.focus({ preventScroll: true });
+    input.select();
   }
 
   async function kick(p) {

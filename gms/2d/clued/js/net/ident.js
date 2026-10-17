@@ -1,5 +1,5 @@
 // Who is playing: the remembered name, plus the optional br8t account (name prefill + ID token for the server).
-import { getName, setName } from '../core/store.js?v=202610161426';
+import { getName, setName } from '../core/store.js?v=202610170627';
 
 let authP = null;
 
@@ -24,15 +24,17 @@ export async function idToken() {
   } catch (e) { return null; }
 }
 
-// Remembered name first, then the signed-in display name.
-export async function suggestedName() {
-  const n = getName();
-  if (n) return n;
+// The name you set (Settings › Your name, or the last one you hosted/joined with) always wins;
+// with none, the signed-in br8t account's first name.
+export async function accountFirstName() {
   try {
     const a = await account();
-    if (a && a.signedIn && a.user?.name) return a.user.name.slice(0, 20);
+    if (a && a.signedIn && a.user?.name) return tidyName(String(a.user.name).trim().split(/\s+/)[0]);
   } catch (e) {}
   return '';
+}
+export async function suggestedName() {
+  return getName() || accountFirstName();
 }
 
 export const rememberName = n => { try { setName(String(n).trim().slice(0, 20)); } catch (e) {} };

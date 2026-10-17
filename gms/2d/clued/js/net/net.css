@@ -38,6 +38,10 @@
 .net-player .crown { font-size: 16px; }
 .net-player .kick { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink); background: var(--paper-2); font-weight: 900; line-height: 1; padding: 0; }
 .net-player:not(:has(.kick)) { padding-right: 12px; }
+.net-player .net-rename { width: 28px; height: 28px; flex: none; border-radius: 50%; border: 2px solid var(--ink); background: #fff; font-size: 15px; font-weight: 900; line-height: 1; padding: 0; cursor: pointer; }
+.net-player:has(.net-rename):not(:has(.kick)) { padding-right: 6px; }
+.net-player.editing { padding-right: 6px; }
+.net-name-edit { width: 11em; max-width: 100%; min-width: 0; height: 30px; padding: 0 8px; border: 2px solid var(--ink); border-radius: 10px; font: inherit; font-weight: 900; background: #fff; color: var(--ink); }
 @keyframes net-pop { from { transform: scale(.6); opacity: 0; } }
 .net-count { font-family: var(--font-display); font-size: 20px; margin: 4px 2px 0; }
 .net-setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; }

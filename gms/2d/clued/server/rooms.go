@@ -297,6 +297,31 @@ func (r *Room) active() []*Player {
 	return out
 }
 
+// rename gives p a new display name (already cleaned), deduped against the other active players the way a join is.
+// Locked while a question is open (including its lead-in) so the live answered list never changes under the players.
+func (r *Room) rename(p *Player, name string) string {
+	if r.Ended {
+		return "room_ended"
+	}
+	if r.Phase == "question" {
+		return "in_question"
+	}
+	act := r.active()
+	name = dedupeName(name, func(n string) bool {
+		for _, o := range act {
+			if o != p && equalFoldName(o.Name, n) {
+				return true
+			}
+		}
+		return false
+	})
+	if name != p.Name {
+		p.Name = name
+		r.changed()
+	}
+	return ""
+}
+
 func (p *Player) online(now int64) bool { return !p.Gone && (p.conns > 0 || now-p.LastSeen < onlineMs) }
 
 // addPlayer joins a new player, or returns the existing one for a signed-in uid.

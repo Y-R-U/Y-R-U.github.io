@@ -1,8 +1,8 @@
 // Device-hosted room logic: a port of server/rooms.go + scoring.go so the host's tab can be the room
 // server. Pure (no DOM, no network), so tools/p2p_test.mjs runs it in node. State shape = the server's.
-import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610161426';
-import { pickScore } from '../formats/pickall_score.js?v=202610161426';
-import { trioScore } from '../formats/trio_score.js?v=202610161426';
+import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610170627';
+import { pickScore } from '../formats/pickall_score.js?v=202610170627';
+import { trioScore } from '../formats/trio_score.js?v=202610170627';
 export { stageMultiplier, withStreak };
 
 export const MAX_PLAYERS = 8;
@@ -192,6 +192,18 @@ export class P2PRoom {
     if (!this.hostId) this.hostId = p.id;
     this.changed();
     return { player: p };
+  }
+
+  // Same rules as the server's rename: cleaned like a join name, deduped against the others, locked while a question is open.
+  rename(p, rawName) {
+    const name0 = tidy(rawName);
+    if (!name0) return err('name_required', 'Type a name first.');
+    if (this.closed) return err('room_ended');
+    if (this.phase === 'question') return err('in_question', 'Change your name between questions.');
+    const others = this.active().filter(o => o !== p);
+    const name = dedupe(name0, n => others.some(o => o.name.toLowerCase() === n.toLowerCase()));
+    if (name !== p.name) { p.name = name; this.changed(); }
+    return { name };
   }
 
   rejoin(key) {
