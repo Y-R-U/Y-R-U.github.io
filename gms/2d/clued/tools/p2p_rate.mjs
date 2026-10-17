@@ -3,8 +3,11 @@
 import { execFileSync } from 'node:child_process';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { startLocalServer, blockProd } from './lib/localserver.mjs';
 
-const SITE = 'http://localhost:8888/gms/2d/clued/?noauth=1';
+// page boots talk to a local server, never the live one
+const srv = await startLocalServer({ tag: 'clued-p2p-rate' });
+const SITE = `http://localhost:8888/gms/2d/clued/?noauth=1&${srv.query}`;
 const CDP = join(homedir(), '.claude/bin/cdp');
 const N = Number(process.argv.find(a => /^\d+$/.test(a)) || 20);
 const flags = process.argv.includes('--mdns') ? [] : ['--', '--disable-features=WebRtcHideLocalIpsWithMdns'];
@@ -19,6 +22,7 @@ async function page(port) {
   const send = (method, params = {}) => new Promise(r => { cbs.set(++id, r); ws.send(JSON.stringify({ id, method, params })); });
   const ev = async e => { const r = await send('Runtime.evaluate', { expression: e, awaitPromise: true, returnByValue: true }); if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description); return r.result?.result?.value; };
   await send('Network.setCacheDisabled', { cacheDisabled: true });
+  await blockProd(send);
   const boot = async () => {
     await send('Page.navigate', { url: SITE });
     for (let i = 0; i < 100 && !(await ev('!!window.__cluedReady').catch(() => false)); i++) await sleep(200);
@@ -47,4 +51,5 @@ try {
   console.log(`\n${times.length}/${N} connected (${Math.round(100 * times.length / N)} %), median ${times[times.length >> 1] ?? '-'} ms, max ${times.at(-1) ?? '-'} ms, fails ${JSON.stringify(errs)}`);
 } finally {
   for (const p of ports) { try { execFileSync(CDP, ['stop', String(p)], { stdio: 'ignore' }); } catch (e) {} }
+  srv.stop();
 }

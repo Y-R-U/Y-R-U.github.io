@@ -2,16 +2,16 @@
 // Also "finish the line" for public-domain songs (items with `lyrics`).
 import {
   register, poolItems, distractors, byDifficulty, placeAnswer, collect, pick, shuffle, hasAudio, imageOf, hasImg, pickPack,
-} from '../formats/registry.js?v=202610170627';
-import { h, choiceGrid, esc } from '../ui/kit.js?v=202610170627';
-import { basePoints } from '../core/scoring.js?v=202610170627';
-import * as clip from './clip.js?v=202610170627';
-import { revealHTML, BADGE_CSS, art as artUrl, previewUrl, setArt } from './apple.js?v=202610170627';
-import { net, appleSrc } from './applenet.js?v=202610170627';
-import { maybeProbe } from './probe.js?v=202610170627';
-import { getCtx, unlock, begin, end, ctxInfo } from './ctx.js?v=202610170627';
-import { LISTEN_CSS } from './listen_css.js?v=202610170627';
-import { dlog, modLoaded, buildsSeen } from '../core/debuglog.js?v=202610170627';
+} from '../formats/registry.js?v=202610170705';
+import { h, choiceGrid, esc } from '../ui/kit.js?v=202610170705';
+import { basePoints } from '../core/scoring.js?v=202610170705';
+import * as clip from './clip.js?v=202610170705';
+import { revealHTML, BADGE_CSS, art as artUrl, previewUrl, setArt } from './apple.js?v=202610170705';
+import { net, appleSrc } from './applenet.js?v=202610170705';
+import { maybeProbe } from './probe.js?v=202610170705';
+import { getCtx, unlock, begin, end, ctxInfo } from './ctx.js?v=202610170705';
+import { LISTEN_CSS } from './listen_css.js?v=202610170705';
+import { dlog, modLoaded, buildsSeen } from '../core/debuglog.js?v=202610170705';
 const MOD_ID = modLoaded('listen', import.meta.url);
 
 let renderSeq = 0;
@@ -30,11 +30,11 @@ const audioOf = (it, rng) => {
 };
 
 // which questions an item can produce, weighted
-function asks(item, pack, want) {
+function asks(item, pack, want, noDecade = false) {
   const out = [];
   const MAP = { title: ['title', 'name', 'film'], artist: ['artist', 'artist-name'], decade: ['decade'], composer: ['composer'] };
   const add = (k, w) => { if (want === 'auto' || MAP[want]?.includes(k)) out.push([k, w]); };
-  if (isSong(item)) { add('title', 6); add('artist', 3); add('decade', 1.5); }
+  if (isSong(item)) { add('title', 6); add('artist', 3); if (!noDecade) add('decade', 1.5); }
   else if (isTheme(item)) { add('film', 6); if (item.facts.composer) add('composer', 1); }
   else if (item.facts?.composer) { add('title', 5); add('composer', 3); }
   else if (pack.factsMeta?.origin && item.facts?.origin && item.media.audio[0]?.apple) add('artist-name', 5);
@@ -110,13 +110,15 @@ function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, 
   const qPool = packs.flatMap((p) => (p.questions || []).filter((q) => (q.kind || 'mc') === 'mc' && q.media?.audio?.some((a) => a.src) && (q.wrong || []).length >= 2).map((q) => ({ p, q })));
   if (!usable.length && !qPool.length) return [];
   const itemN = usable.reduce((s, p) => s + (p.items || []).filter(hasAudio).length, 0);
+  // a round on one decade's hits pack (Music through the decades) never asks "Which decade?": its title says
+  const oneDecade = usable.length === 1 && /^hits-\d{4}s$/.test(usable[0].id);
   return collect(count, () => {
     if (qPool.length && (!usable.length || rng() < qPool.length / (qPool.length + itemN))) return fromQuestion(rng, pick(rng, qPool), n, opts, difficulty, kids);
     const p = pickPack(rng, usable);
     const pool = poolItems([p], (it) => hasAudio(it) && (!kids || p.kids || (it.difficulty || 2) === 1));
     if (pool.length < n) return null;
     const t = pick(rng, byDifficulty(pool, difficulty, n, (c) => c.item.difficulty || 2));
-    const kinds = asks(t.item, p, want);
+    const kinds = asks(t.item, p, want, oneDecade && want === 'auto');
     if (!kinds.length) return null;
     const total = kinds.reduce((s, k) => s + k[1], 0);
     let r = rng() * total, kind = kinds[0][0];

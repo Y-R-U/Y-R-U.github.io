@@ -1,8 +1,8 @@
 // Screen manager: one screen at a time, a back stack, and the hardware/browser back button.
-import { h } from './kit.js?v=202610170627';
-import { closeAll } from './popup.js?v=202610170627';
-import { showBanner, reloadFresh } from './update.js?v=202610170627';
-import { fsButton } from './toggles.js?v=202610170627';
+import { h } from './kit.js?v=202610170705';
+import { closeAll } from './popup.js?v=202610170705';
+import { showBanner, reloadFresh } from './update.js?v=202610170705';
+import { fsButton } from './toggles.js?v=202610170705';
 
 // State lives on globalThis: a module loaded across a deploy can import a second copy of this file,
 // and that copy must still drive the same screens.

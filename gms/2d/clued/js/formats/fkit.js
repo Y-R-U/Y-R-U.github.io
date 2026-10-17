@@ -1,8 +1,8 @@
 // Lane F shared helpers: CSS injection, timer stretch, fact maths, pointer drag. Used by F's formats only.
-import { normalize } from '../core/fuzzy.js?v=202610170627';
-import { factText, shuffle, lcLabel } from './registry.js?v=202610170627';
-import { basePoints } from '../core/scoring.js?v=202610170627';
-import { reducedMotion } from '../ui/fx.js?v=202610170627';
+import { normalize } from '../core/fuzzy.js?v=202610170705';
+import { factText, shuffle, lcLabel } from './registry.js?v=202610170705';
+import { basePoints } from '../core/scoring.js?v=202610170705';
+import { reducedMotion } from '../ui/fx.js?v=202610170705';
 
 export const norm = normalize;
 

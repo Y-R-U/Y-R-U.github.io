@@ -81,6 +81,23 @@ for (const [r, kids] of bad) ok((await roundProblems(r, kids)).length > 0, `vali
   ok(sci.rounds.some(r => r.format === 'trio' && r.packs.includes('inventions')) && pub.rounds.length === 5, 'Science & Nature carries the inventions hat-trick; the pub quiz stays at 5 rounds');
   ok(world.rounds.filter(r => ['reveal', 'trio'].includes(r.format) && r.packs.includes('landmarks')).length === 1, 'Around the World: landmark pictures in one round only');
   const bk = SUGGESTED.find(s => s.id === 'books');
+  const dec = SUGGESTED.find(s => s.id === 'decades');
+  const DECS = ['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
+  ok(dec && dec.name === 'Music through the decades' && dec.rounds.length === DECS.length
+    && dec.rounds.every((r, i) => r.format === 'listen' && r.packs.length === 1 && r.packs[0] === `hits-${DECS[i]}` && r.title.startsWith(DECS[i]) && r.count === 8),
+    'Music through the decades: one 8-clip listen round per decade, 1960s → 2020s in order');
+  // a decade round never asks "Which decade?" (its title gives it away); a mixed-decade round still does, so the check can fail
+  const kinds = async (r, seeds) => {
+    const out = [];
+    for (const seed of seeds) {
+      const spec = makeSpec('online', [{ format: r.format, packs: r.packs, count: 40, difficulty: 0, opts: { ...r.opts, online: true } }], seed, {});
+      out.push(...(await buildQuestions(spec, { sparesRatio: 0 })).questions.map(q => q.data?.kind));
+    }
+    return out;
+  };
+  const decKinds = (await Promise.all(dec.rounds.map(r => kinds(r, ['d1', 'd2'])))).flat();
+  ok(decKinds.length >= 400 && !decKinds.includes('decade') && decKinds.includes('artist'), `decade rounds: no decade asks in ${decKinds.length} questions (titles + artists only)`);
+  ok((await kinds(music.rounds[0], ['d1', 'd2'])).includes('decade'), 'Music Night\'s mixed-decade round still asks the decade');
   ok(bk && bk.rounds.length === 5 && bk.rounds[0].format === 'trio' && bk.rounds.every(r => Array.isArray(r.packs) && r.packs.includes('books')) && new Set(bk.rounds.map(r => r.format)).size === 5, 'Books & Authors: 5 rounds, all on books, a hat-trick first, five different kinds');
 }
 for (const [list, kids] of [[SUGGESTED, false], [SUGGESTED_KIDS, true]]) {

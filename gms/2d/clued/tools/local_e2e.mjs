@@ -3,16 +3,20 @@
 // shows the warning → Change round opens the editor → Keep clears it → device room → lobby badge on every player →
 // play questions and check all three players see the same ones.
 //   CDP_PORT=9550 node tools/local_e2e.mjs OUT
-// Needs the :8888 site server, internet (PeerJS broker) and ~/.claude/bin/cdp. Uses CDP_PORT, +1 and +2.
+// Needs the :8888 site server, go (own local clued server), internet (PeerJS broker) and ~/.claude/bin/cdp. Uses CDP_PORT, +1 and +2.
 import { execFileSync } from 'node:child_process';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { startLocalServer, blockProd } from './lib/localserver.mjs';
 
 const OUT = process.argv[2] || '/tmp/clued-local';
 mkdirSync(OUT, { recursive: true });
 const BASE = +process.env.CDP_PORT || 9550;
 const SITE = 'http://localhost:8888/gms/2d/clued/';
+// server calls go to a local server: the live one has the daily allowance on (a signed-out host stops at sign-in)
+const srv = await startLocalServer({ tag: 'clued-local' });
+const QS = `noauth=1&${srv.query}`;
 const CDP = join(homedir(), '.claude/bin/cdp');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let pass = 0, fail = 0;
@@ -32,6 +36,7 @@ class Page {
     };
     for (const m of ['Network.enable', 'Runtime.enable', 'Page.enable']) await this.send(m);
     await this.send('Network.setCacheDisabled', { cacheDisabled: true });
+    await blockProd((m, p) => this.send(m, p));
     await this.send('Emulation.setDeviceMetricsOverride', { width: 384, height: 854, deviceScaleFactor: 2, mobile: true });
   }
   send(method, params = {}) { const id = ++this.id; this.ws.send(JSON.stringify({ id, method, params })); return new Promise((res, rej) => this.cbs.set(id, { res, rej })); }
@@ -65,9 +70,9 @@ const q = JSON.stringify;
 
 try {
   // 1. Settings: the chip edits the player's own setting
-  await host.go(`${SITE}?test&noauth=1`); await host.waitFor('window.__cluedReady', 20000);
+  await host.go(`${SITE}?test&${QS}`); await host.waitFor('window.__cluedReady', 20000);
   await host.eval(`localStorage.clear(); localStorage.setItem('clued.settings', JSON.stringify({ bgm: false })); true`);
-  await host.go(`${SITE}?test&noauth=1`); await host.waitFor('window.__cluedReady', 20000); await sleep(400);
+  await host.go(`${SITE}?test&${QS}`); await host.waitFor('window.__cluedReady', 20000); await sleep(400);
   await host.eval(`window.__cluedCtx.go('settings')`);
   await host.click('[data-set=local] [data-act=local]');
   await host.click('.pop [data-act=loc-country]');
@@ -128,7 +133,7 @@ try {
   const st0 = await host.room();
   ok(st0.spec?.local?.cc === 'JPN' && st0.spec.local.level === 'most', 'room spec carries the focus', q(st0.spec?.local));
   for (const [p, name] of [[ann, 'Ann'], [bob, 'Bob']]) {
-    await p.go(`http://${link}&noauth=1`);
+    await p.go(`http://${link}&${QS}`);
     await p.waitFor(`document.querySelector('[data-field=name]')`, 40000, 'join form');
     await p.type('[data-field=name]', name);
     await p.click('[data-act=join]');

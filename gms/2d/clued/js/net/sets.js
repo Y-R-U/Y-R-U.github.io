@@ -1,11 +1,11 @@
 // Saved sets: named online round lists (+ answer time, gap, streak), per mode, synced with the br8t account.
-import { h } from '../ui/kit.js?v=202610170627';
-import { popup, confirmPop, toast } from '../ui/popup.js?v=202610170627';
-import { read, write, KEYS } from '../core/store.js?v=202610170627';
-import { getFormat } from '../formats/registry.js?v=202610170627';
-import { roundThemes } from '../structures/rounds.js?v=202610170627';
-import { getSuggested } from './suggested.js?v=202610170627';
-import { isOn, localLabel } from '../core/local.js?v=202610170627';
+import { h } from '../ui/kit.js?v=202610170705';
+import { popup, confirmPop, toast } from '../ui/popup.js?v=202610170705';
+import { read, write, KEYS } from '../core/store.js?v=202610170705';
+import { getFormat } from '../formats/registry.js?v=202610170705';
+import { roundThemes } from '../structures/rounds.js?v=202610170705';
+import { getSuggested } from './suggested.js?v=202610170705';
+import { isOn, localLabel } from '../core/local.js?v=202610170705';
 
 export const MAX_SETS = 20;
 const total = rounds => rounds.reduce((n, r) => n + (r.count || 0), 0);

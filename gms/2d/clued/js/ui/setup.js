@@ -1,19 +1,19 @@
 // Format grid + per-game setup (themes, count, options, difficulty, timer).
-import { h } from './kit.js?v=202610170627';
-import { defineScreen, go, header } from './app.js?v=202610170627';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610170627';
-import { getIndex } from '../core/packs.js?v=202610170627';
-import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610170627';
-import { getSettings, setSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610170627';
-import { streakOption } from './streakopt.js?v=202610170627';
-import { themePicker } from './picker.js?v=202610170627';
-import { STRUCTURES } from '../structures/index.js?v=202610170627';
-import { sfx } from './fx.js?v=202610170627';
-import { favControls } from './favs.js?v=202610170627';
-import { favKey } from './favmodel.js?v=202610170627';
-import { mySetting, saveMySetting, isOn } from '../core/local.js?v=202610170627';
-import { localChip, localLine } from './local.js?v=202610170627';
-import { BLEND_NOTE } from '../core/diffmix.js?v=202610170627';
+import { h } from './kit.js?v=202610170705';
+import { defineScreen, go, header } from './app.js?v=202610170705';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610170705';
+import { getIndex } from '../core/packs.js?v=202610170705';
+import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610170705';
+import { getSettings, setSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610170705';
+import { streakOption } from './streakopt.js?v=202610170705';
+import { themePicker } from './picker.js?v=202610170705';
+import { STRUCTURES } from '../structures/index.js?v=202610170705';
+import { sfx } from './fx.js?v=202610170705';
+import { favControls } from './favs.js?v=202610170705';
+import { favKey } from './favmodel.js?v=202610170705';
+import { mySetting, saveMySetting, isOn } from '../core/local.js?v=202610170705';
+import { localChip, localLine } from './local.js?v=202610170705';
+import { BLEND_NOTE } from '../core/diffmix.js?v=202610170705';
 
 export const DIFFS = [[0, 'Mixed'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']];
 

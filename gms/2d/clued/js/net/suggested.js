@@ -4,6 +4,9 @@ const R = (title, format, packs, opts = {}, difficulty = 0) => ({ title, format,
 const LISTEN = { clip: 10, art: 'off', ask: 'auto', answers: 4 };
 // Hat-trick rounds are three questions each, so they run five long
 const TRIO = (title, packs, difficulty = 0) => ({ ...R(title, 'trio', packs, {}, difficulty), count: 5 });
+// One listen round per decade's hits pack, 8 clips each, so all seven run about as long as Music Night (~20 min)
+const DECADES = ['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
+const DECADE = d => ({ ...R(`${d} hits`, 'listen', [`hits-${d}`], LISTEN), count: 8 });
 
 export const SUGGESTED = [
   { id: 'pub', name: 'Classic Pub Quiz', blurb: 'The Friday-night five: general, history, map, sport, theme tunes.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
@@ -21,6 +24,8 @@ export const SUGGESTED = [
     R('Artists', 'mc', ['music-artists', 'general~music'], { answers: 4, source: 'mix' }),
     TRIO('Hat-trick: song, artist, year', ['hits-1970s', 'hits-1980s', 'hits-1990s', 'hits-2000s']),
   ] },
+  { id: 'decades', name: 'Music through the decades', blurb: 'Name that tune, one decade a round: the 60s through to the 2020s.', timing: { answerSec: 15, gapSec: 5 },
+    rounds: DECADES.map(DECADE) },
   { id: 'world', name: 'Around the World', blurb: 'Flags, capitals, the map, landmarks, pick-all and a flag hat-trick.', timing: { answerSec: 15, gapSec: 5 }, rounds: [
     R('Flags', 'reveal', ['flags'], { mode: 'full', answers: 4 }, 1),
     R('Capital cities', 'mc', ['capitals'], { answers: 4, source: 'questions' }, 1),

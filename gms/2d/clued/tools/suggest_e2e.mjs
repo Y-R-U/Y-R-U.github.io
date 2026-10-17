@@ -2,19 +2,24 @@
 // Suggested sets on the host screen, real clicks: no saves → Sets opens on Suggested → load Classic Pub Quiz (5 rounds)
 // → remove one → Save set → Sets now opens on My sets with the 4-round copy, Suggested still shows the 5-round original.
 // Then (portrait, unless --no-room) a device room from a suggestion: create, start, play one round to the podium, save
-// the podium's set, and load that set back into the host screen.
+// the podium's set, and load that set back into the host screen. Music through the decades: ✕ / ▲ / ▼ at 390x844.
 //   node tools/suggest_e2e.mjs [OUT] [portrait|landscape|both] [--no-room]
 // Needs the :8888 site server and a cdp Chrome (CDP_PORT, e.g. 9540); the room part needs internet (PeerJS broker).
 import { open } from './a_cdp.mjs';
+import { startLocalServer, blockProd } from './lib/localserver.mjs';
+import { SUGGESTED } from '../js/net/suggested.js';
 const args = process.argv.slice(2).filter(a => !a.startsWith('--'));
 const OUT = args[0] || '/tmp';
 const which = args[1] || 'both';
 const ROOM = !process.argv.includes('--no-room');
-const URL = 'http://localhost:8888/gms/2d/clued/?test&noauth=1';
+// the host screen's server calls go to a local server, never the live one (it has the daily allowance on)
+const srv = await startLocalServer({ tag: 'clued-suggest' });
+const URL = `http://localhost:8888/gms/2d/clued/?test&noauth=1&${srv.query}`;
 const SIZES = { portrait: [384, 854], landscape: [854, 384] };
 let fails = 0;
 const ok = (c, m) => { console.log(c ? 'ok  ' : 'FAIL', m); if (!c) fails++; };
 const b = await open({ width: 384, height: 854, mobile: true });
+await blockProd(b.send);
 const q = s => JSON.stringify(s);
 const count = sel => b.eval(`document.querySelectorAll(${q(sel)}).length`);
 const tabOn = () => b.eval(`document.querySelector('.pop .set-tab[aria-selected=true]')?.dataset.tab || null`);
@@ -39,7 +44,7 @@ async function flow(orient) {
   ok(await tabOn() === 'suggested', `${orient}: popup opens on Suggested`);
   ok(await b.eval(`document.querySelector('.pop .set-tab[data-tab=mine]')?.textContent`) === 'My sets (0)', `${orient}: My sets (0) tab`);
   const n = await count('.pop .set-row.no-del');
-  ok(n === 7, `${orient}: 7 suggestions listed (${n})`);
+  ok(n === SUGGESTED.length, `${orient}: ${SUGGESTED.length} suggestions listed (${n})`);
   ok(await count('.pop [data-act=set-delete]') === 0, `${orient}: suggestions have no ✕`);
   const pub = await rowText('Classic Pub Quiz', 'suggested');
   ok(pub.includes('5 rounds · 50 questions') && pub.includes('Friday-night'), `${orient}: pub quiz row: rounds line + blurb`);
@@ -65,6 +70,36 @@ async function flow(orient) {
   await closePop();
   const stored = await b.eval(`JSON.parse(localStorage.getItem('clued.sets')).list.map(s => s.rounds.length).join()`);
   ok(stored === '4', `${orient}: one user set stored (${stored})`);
+}
+
+// Music through the decades at 390x844: seven decade rounds in order, ✕ removes one in a single tap, ▲/▼ keep order sane.
+async function decades() {
+  await b.viewport(390, 844, 2, true);
+  await boot('host');
+  const titles = () => b.eval(`[...document.querySelectorAll('.round-card .r-t')].map(e => e.textContent.replace(/^\\d+\\. /, '')).join('|')`);
+  await b.click('[data-act=sets-load]'); await b.sleep(500);
+  ok((await rowText('Music through the decades', 'suggested')).includes('7 rounds · 56 questions'), 'decades: row shows 7 rounds · 56 questions');
+  await b.click('.pop .set-row.no-del[data-set="Music through the decades"] .set-load'); await b.sleep(1500);
+  const all = ['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'].map(d => `${d} hits`);
+  ok(await titles() === all.join('|'), `decades: 7 rounds, 1960s → 2020s (${await titles()})`);
+  ok((await b.eval(`document.querySelector('.rounds-sum').textContent`)).startsWith('7 rounds · 56 questions'), 'decades: 56 questions');
+  ok(await count('.round-card [data-act=round-remove]:not([disabled])') === 7, 'decades: every round has an enabled ✕');
+  await b.eval('scrollTo(0, 0)');
+  await b.shot(`${OUT}/decades-loaded-390x844.png`);
+  await b.click('.round-card[data-round="0"] [data-act=round-remove]'); await b.sleep(300);
+  ok(await titles() === all.slice(1).join('|'), 'decades: one tap on ✕ removed the 1960s, no confirm');
+  await b.click('.round-card[data-round="5"] [data-act=round-remove]'); await b.sleep(300);
+  ok(await titles() === all.slice(1, 6).join('|'), 'decades: one more tap removed the 2020s');
+  await b.click('.round-card[data-round="4"] [data-act=round-up]'); await b.sleep(300);
+  ok(await titles() === [all[1], all[2], all[3], all[5], all[4]].join('|'), 'decades: ▲ swaps the 2010s above the 2000s');
+  await b.click('.round-card[data-round="3"] [data-act=round-down]'); await b.sleep(300);
+  ok(await titles() === all.slice(1, 6).join('|'), 'decades: ▼ puts it back; numbering follows');
+  ok(await b.eval(`[...document.querySelectorAll('.round-card .r-t')].map(e => e.textContent.match(/^\\d+/)[0]).join()`) === '1,2,3,4,5', 'decades: rounds renumber 1–5');
+  ok((await b.eval(`document.querySelector('.rounds-sum').textContent`)).startsWith('5 rounds · 40 questions'), 'decades: summary follows (5 rounds · 40 questions)');
+  await b.eval('scrollTo(0, 0)');
+  await b.shot(`${OUT}/decades-after-remove-390x844.png`);
+  for (let k = 0; k < 4; k++) { await b.click('.round-card[data-round="0"] [data-act=round-remove]'); await b.sleep(250); }
+  ok(await count('.round-card') === 1 && await b.eval(`document.querySelector('.round-card [data-act=round-remove]').disabled`), 'decades: the last round keeps a disabled ✕');
 }
 
 async function room() {
@@ -118,6 +153,7 @@ async function room() {
 
 try {
   for (const o of which === 'both' ? ['portrait', 'landscape'] : [which]) await flow(o);
+  await decades();
   if (ROOM) await room();
 } catch (e) { fails++; console.log('FAIL', e.message); await b.shot(`${OUT}/suggest-error.png`).catch(() => {}); }
 const errs = b.logs.filter(l => /\[exception\]|\[error\]/.test(l));

@@ -1,11 +1,11 @@
 // Explore map: tap any country → flag, capital, population, languages, currency, landmark photo, anthem.
-import { h } from '../ui/kit.js?v=202610170627';
-import { header, go } from '../ui/app.js?v=202610170627';
-import { getPack, loadMusic, kidsOn, refOf } from './data.js?v=202610170627';
-import { soundBtn, creditBtn, sayBtn, say, stopAudio, emptyState } from './ui.js?v=202610170627';
-import { factText } from '../formats/registry.js?v=202610170627';
-import { BUILD } from '../build.js?v=202610170627';
-import { lazyImport } from '../ui/update.js?v=202610170627';
+import { h } from '../ui/kit.js?v=202610170705';
+import { header, go } from '../ui/app.js?v=202610170705';
+import { getPack, loadMusic, kidsOn, refOf } from './data.js?v=202610170705';
+import { soundBtn, creditBtn, sayBtn, say, stopAudio, emptyState } from './ui.js?v=202610170705';
+import { factText } from '../formats/registry.js?v=202610170705';
+import { BUILD } from '../build.js?v=202610170705';
+import { lazyImport } from '../ui/update.js?v=202610170705';
 
 const CONT = { AF: 'Africa', AS: 'Asia', EU: 'Europe', NA: 'North America', SA: 'South America', OC: 'Oceania', AN: 'Antarctica' };
 

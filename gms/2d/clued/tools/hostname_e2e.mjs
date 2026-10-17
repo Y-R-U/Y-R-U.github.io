@@ -3,14 +3,12 @@
 // Server room (a local clued server) by default; --p2p runs the same lobby checks on a device room (needs 0.peerjs.com).
 //   node tools/hostname_e2e.mjs [--p2p] [--shots DIR] [--ports 9531,9532]
 // Needs the :8888 site server and ~/.claude/bin/cdp (started with --use-angle=metal).
-import { spawn, execFileSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir, homedir } from 'node:os';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import net from 'node:net';
+import { join } from 'node:path';
+import { startLocalServer, blockProd } from './lib/localserver.mjs';
 
-const HERE = dirname(fileURLToPath(import.meta.url));
 const argv = process.argv.slice(2);
 const argOf = k => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
 const P2P = argv.includes('--p2p');
@@ -24,7 +22,6 @@ setTimeout(() => { console.log('FATAL: run exceeded 4 min'); process.exit(1); },
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let pass = 0, fail = 0;
 const ok = (c, msg, extra = '') => { if (c) { pass++; console.log(`  ok   ${msg}`); } else { fail++; console.log(`  FAIL ${msg} ${extra}`); } };
-const freePort = () => new Promise(res => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); }); });
 
 class Page {
   constructor(name, port) { this.name = name; this.port = port; this.id = 0; this.cbs = new Map(); this.events = []; }
@@ -40,6 +37,7 @@ class Page {
     await this.send('Network.setCacheDisabled', { cacheDisabled: true });
     await this.send('Runtime.enable');
     await this.send('Page.enable');
+    await blockProd((m, p) => this.send(m, p));
     await this.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
   }
   send(method, params = {}) {
@@ -86,23 +84,15 @@ class Page {
 }
 
 const chipName = (id) => `document.querySelector('.net-player[data-id="' + ${JSON.stringify(id)} + '"] .nm')?.textContent`;
-let srv, dataDir;
+let srv;
 
 async function main() {
   let q = 'noauth=1';
   // --p2p also points ?api= at the local server: the live one has the daily allowance on, which makes a signed-out
   // device host stop at the sign-in panel (the room itself never touches the server)
-  {
-    const port = await freePort();
-    dataDir = mkdtempSync(join(tmpdir(), 'clued-hostname-'));
-    const bin = join(dataDir, 'clued');
-    execFileSync('go', ['build', '-o', bin, '.'], { cwd: join(HERE, '..', 'server'), env: { ...process.env, CGO_ENABLED: '0' } });
-    srv = spawn(bin, [], { env: { ...process.env, CLUED_ADDR: `127.0.0.1:${port}`, CLUED_DATA: join(dataDir, 'data'), CLUED_ORIGINS: 'http://localhost:8888' }, stdio: 'ignore' });
-    const API = `http://127.0.0.1:${port}/gms/2d/clued/api`;
-    for (let i = 0; i < 50; i++) { try { if ((await fetch(API + '/health')).ok) break; } catch (e) {} await sleep(100); }
-    console.log(`server ${API}`);
-    q += `&api=${encodeURIComponent(API)}`;
-  }
+  srv = await startLocalServer({ tag: 'clued-hostname' });
+  console.log(`server ${srv.api}`);
+  q += `&${srv.query}`;
   for (const p of PORTS) execFileSync(CDP, ['start', '--port', String(p), '--idle', '120', '--', '--use-angle=metal', '--disable-features=WebRtcHideLocalIpsWithMdns'], { stdio: 'ignore' });
   const host = new Page('host', PORTS[0]), ann = new Page('ann', PORTS[1]);
   pages = [host, ann];
@@ -199,8 +189,7 @@ main().catch(async e => {
   fail++; console.log('FATAL', e.message);
   for (const p of pages) { try { console.log(`  [${p.name}] `, (await p.eval(`(document.querySelector('.screen')?.innerText || '').replace(/\\s+/g, ' ').slice(0, 300)`))); } catch (err) {} }
 }).finally(() => {
-  try { srv?.kill(); } catch (e) {}
-  try { if (dataDir) rmSync(dataDir, { recursive: true, force: true }); } catch (e) {}
+  srv?.stop();
   for (const p of PORTS) { try { execFileSync(CDP, ['stop', String(p)], { stdio: 'ignore' }); } catch (e) {} }
   console.log(`${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

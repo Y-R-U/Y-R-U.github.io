@@ -2,9 +2,13 @@
 // Saved sets on the host screen: save a 2-round set, reset, load it back; full-screen button in bars.
 // Needs: ~/.claude/bin/cdp start --port 9401 and the :8888 site server.
 import { open } from './a_cdp.mjs';
+import { startLocalServer, blockProd } from './lib/localserver.mjs';
 const OUT = process.argv[2] || '/tmp';
-const URL = 'http://localhost:8888/gms/2d/clued/?test';
+// the host screen's server calls go to a local server, never the live one (it has the daily allowance on)
+const srv = await startLocalServer({ tag: 'clued-sets' });
+const URL = `http://localhost:8888/gms/2d/clued/?test&${srv.query}`;
 const b = await open({ width: 384, height: 854, mobile: true });
+await blockProd(b.send);
 let fails = 0;
 const ok = (c, m) => { console.log(c ? 'ok  ' : 'FAIL', m); if (!c) fails++; };
 await b.goto(URL); await b.waitFor('window.__cluedReady');

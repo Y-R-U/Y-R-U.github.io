@@ -1,11 +1,12 @@
 // Short multi-round device room (lane P2P + ROUNDS): host builds 2 rounds through real clicks (round 2 from a ♥
 // favourite), one joiner plays via the ?p2p= link, round cards on both screens, a joiner refresh mid-round-2,
-// per-round scores on the podium. Needs :8888, internet (0.peerjs.com) and ~/.claude/bin/cdp. Ports 9451, 9452.
+// per-round scores on the podium. Needs :8888, go (own local clued server), internet (0.peerjs.com) and ~/.claude/bin/cdp. Ports 9451, 9452.
 //   node tools/rounds_p2p_e2e.mjs [--shots DIR] [--keep]
 import { execFileSync } from 'node:child_process';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir, homedir } from 'node:os';
 import { join } from 'node:path';
+import { startLocalServer, blockProd } from './lib/localserver.mjs';
 
 const SITE = 'http://localhost:8888/gms/2d/clued/';
 const CDP = join(homedir(), '.claude/bin/cdp');
@@ -35,6 +36,7 @@ class Page {
       else if (d.method === 'Runtime.consoleAPICalled' && d.params.type === 'error') this.events.push('ERR ' + d.params.args.map(a => a.value ?? a.description).join(' '));
     };
     await this.send('Network.enable');
+    await blockProd((m, p) => this.send(m, p));
     await this.send('Network.setCacheDisabled', { cacheDisabled: true });
     await this.send('Runtime.enable');
     await this.send('Page.enable');
@@ -80,11 +82,14 @@ const PORTS = [9451, 9452];
 let all = [];
 
 async function main() {
+  // server calls go to a local server: the live one has the daily allowance on (a signed-out host stops at sign-in)
+  const srv = await startLocalServer({ tag: 'clued-rounds-p2p' });
+  const Q = `noauth=1&${srv.query}`;
   for (const p of PORTS) execFileSync(CDP, ['start', '--port', String(p), '--idle', '240', '--', '--use-angle=metal', '--disable-features=WebRtcHideLocalIpsWithMdns'], { stdio: 'ignore' });
   const [host, ann] = [new Page('host', PORTS[0]), new Page('ann', PORTS[1])];
   all = [host, ann];
   for (const p of all) await p.open();
-  await host.go(`${SITE}?noauth=1`);
+  await host.go(`${SITE}?${Q}`);
   await host.waitFor('window.__cluedReady', 20000, 'boot');
   await host.eval(`(() => { localStorage.removeItem('clued.online'); localStorage.setItem('clued.favs', JSON.stringify({ v: 1, slots: { tf: [{ packs: 'all', opts: {}, count: 3, at: 1 }, null, null, null, null] } })); return true; })()`);
   await host.eval(`import('./js/net/index.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)).then(() => window.__cluedCtx.go('online'))`);
@@ -115,7 +120,7 @@ async function main() {
   await host.waitFor(`document.querySelector('.net-code')?.textContent`, 60000, 'lobby code');
   const link = await host.eval(`document.querySelector('.net-link').textContent`);
   ok(link.includes('p2p='), 'device room created', link);
-  await ann.go('http://' + link + '&noauth=1');
+  await ann.go('http://' + link + '&' + Q);
   await ann.waitFor(`document.querySelector('[data-field=name]')`, 40000, 'join form');
   ok(await ann.eval(`document.querySelector('.net-hero p')?.textContent.includes('2 rounds')`), 'join screen says 2 rounds');
   await ann.type('[data-field=name]', 'Ann');

@@ -2,15 +2,15 @@
 // year from a clip, country / capital / continent from a flag; with no picture or clip the name is shown and the other
 // rows asked). Tap one per row, lock in; each right row is a share of the points (js/formats/trio_score.js).
 // Packs opt in through TRIO (or pack.trio, same shape): the rows, the facts behind them and the media to show.
-import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick, looksAlike } from './registry.js?v=202610170627';
-import { h, mediaBox, onKey } from '../ui/kit.js?v=202610170627';
-import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610170627';
-import { basePoints } from '../core/scoring.js?v=202610170627';
-import { preflight, urlsOf } from '../core/media.js?v=202610170627';
-import { confetti } from '../ui/fx.js?v=202610170627';
-import { trioScore, trioCap } from './trio_score.js?v=202610170627';
-import { yearOptions, MAX_YEAR } from './years.js?v=202610170627';
-import { isCredit, leadOf } from './cocredit.js?v=202610170627';
+import { register, poolItems, byDifficulty, collect, pick, shuffle, givesAway, weightedPick, looksAlike } from './registry.js?v=202610170705';
+import { h, mediaBox, onKey } from '../ui/kit.js?v=202610170705';
+import { injectCSS, baseCSS, once, hasImg, norm } from './fkit.js?v=202610170705';
+import { basePoints } from '../core/scoring.js?v=202610170705';
+import { preflight, urlsOf } from '../core/media.js?v=202610170705';
+import { confetti } from '../ui/fx.js?v=202610170705';
+import { trioScore, trioCap } from './trio_score.js?v=202610170705';
+import { yearOptions, MAX_YEAR } from './years.js?v=202610170705';
+import { isCredit, leadOf } from './cocredit.js?v=202610170705';
 
 export { trioScore, trioCap };
 // every row right: a flat bonus on top, after the streak (the server and P2P host award the same)
@@ -273,7 +273,7 @@ function makeFactRow(rng, row, t, all, others, { taken, targetAll, dist, byFame,
 }
 
 const packId = info => info.id || String(info.path || '').replace(/^.*\//, '').replace(/\.json$/, '');
-const audioMod = () => import('./trio_audio.js?v=202610170627');
+const audioMod = () => import('./trio_audio.js?v=202610170705');
 
 export default register({
   id: 'trio', title: 'Hat-trick', icon: '🎩', blurb: 'Three questions in one: name it, who, when', tags: ['slow'], noKids: true,

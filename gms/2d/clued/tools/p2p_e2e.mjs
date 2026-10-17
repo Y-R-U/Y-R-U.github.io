@@ -2,11 +2,12 @@
 // Host creates via real clicks, 2 joiners open the ?p2p= share link, full game with a joiner refresh and a
 // host refresh mid-game, an auto-advancing progressive round (no voting), then the host leaves and the room ends with final scores.
 //   node tools/p2p_e2e.mjs [--shots DIR] [--keep] [--peerhost host:port]
-// Needs the :8888 site server, internet (0.peerjs.com) and ~/.claude/bin/cdp. Ports 9411 (host), 9412, 9413.
+// Needs the :8888 site server, go (starts its own local clued server), internet (0.peerjs.com) and ~/.claude/bin/cdp. Ports 9411 (host), 9412, 9413.
 import { execFileSync } from 'node:child_process';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir, homedir } from 'node:os';
 import { join } from 'node:path';
+import { startLocalServer, blockProd } from './lib/localserver.mjs';
 
 const SITE = 'http://localhost:8888/gms/2d/clued/';
 const CDP = join(homedir(), '.claude/bin/cdp');
@@ -35,6 +36,7 @@ class Page {
       else if (d.method === 'Runtime.consoleAPICalled' && d.params.type === 'error') this.events.push('ERR ' + d.params.args.map(a => a.value ?? a.description).join(' '));
     };
     await this.send('Network.enable');
+    await blockProd((m, p) => this.send(m, p));
     await this.send('Network.setCacheDisabled', { cacheDisabled: true });
     await this.send('Runtime.enable');
     await this.send('Page.enable');
@@ -78,7 +80,7 @@ class Page {
 
 const PORTS = args.includes('--ports') ? args[args.indexOf('--ports') + 1].split(',').map(Number) : [9411, 9412, 9413];
 let all = [];
-const extra = `noauth=1${PEERHOST ? `&peerhost=${PEERHOST}` : ''}`;
+let extra = `noauth=1${PEERHOST ? `&peerhost=${PEERHOST}` : ''}`;
 
 // One question round: everyone in `who` taps a choice (skip = sits out).
 async function playQuestion(pages, st, { skip = [], pick = () => '.stage .choices .choice' } = {}) {
@@ -91,6 +93,9 @@ async function playQuestion(pages, st, { skip = [], pick = () => '.stage .choice
 }
 
 async function main() {
+  // the page's server calls (status, allowance) go to a local server: the live one has the daily allowance on
+  const srv = await startLocalServer({ tag: 'clued-p2p' });
+  extra += `&${srv.query}`;
   for (const p of PORTS) execFileSync(CDP, ['start', '--port', String(p), '--idle', '240', ...(args.includes('--mdns') ? [] : ['--', '--disable-features=WebRtcHideLocalIpsWithMdns'])], { stdio: 'ignore' });
   const [host, j1, j2] = [new Page('host', PORTS[0]), new Page('ann', PORTS[1]), new Page('bob', PORTS[2])];
   all = [host, j1, j2];
