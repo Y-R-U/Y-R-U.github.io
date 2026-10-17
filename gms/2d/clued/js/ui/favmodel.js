@@ -1,6 +1,6 @@
 // Favourite picks, pure logic (node-testable): sanitising a saved fav against today's packs/options, matching, labels.
-import { supportsPack } from '../formats/registry.js?v=202610170746';
-import { ANSWER_TIMES } from '../core/store.js?v=202610170746';
+import { supportsPack } from '../formats/registry.js?v=202610170843';
+import { ANSWER_TIMES } from '../core/store.js?v=202610170843';
 
 export const favKey = (fmt, kids) => (kids ? `${fmt.id}:kids` : fmt.id);
 const KIDS_TIMES = [0, 20, 30];

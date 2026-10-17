@@ -1,6 +1,6 @@
 {
- "id": "tv-moments-candidates",
- "title": "TV moments: new",
+ "id": "tv-moments",
+ "title": "TV Moments",
  "theme": "screen",
  "icon": "📺",
  "notice": "Original illustrations of famous TV series, not real stills.",
@@ -63,28 +63,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/741dba9b939d.webp",
+      "src": "media/tv-moments/741dba9b939d.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The big orange sofa",
-      "key": "friends-1",
-      "ref": "tv-moments:new/friends-1"
-     },
-     {
-      "src": "media/cand/tv-moments/2abaaf8671db.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "Splashing in the fountain",
-      "key": "friends-2",
-      "ref": "tv-moments:new/friends-2"
+      "caption": "The big orange sofa"
      }
     ]
    },
@@ -105,28 +91,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/d0f030092c1c.webp",
+      "src": "media/tv-moments/d0f030092c1c.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "Bikes in the woods at night",
-      "key": "stranger-things-2",
-      "ref": "tv-moments:new/stranger-things-2"
-     },
-     {
-      "src": "media/cand/tv-moments/14a265ee5b05.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Talking through the Christmas lights",
-      "key": "stranger-things-1",
-      "ref": "tv-moments:new/stranger-things-1"
+      "caption": "Bikes in the woods at night"
      }
     ]
    },
@@ -147,16 +119,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/9c4c3adf8b36.webp",
+      "src": "media/tv-moments/9c4c3adf8b36.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The coat on the rooftop",
-      "key": "sherlock-2",
-      "ref": "tv-moments:new/sherlock-2"
+      "caption": "The coat on the rooftop"
      }
     ]
    },
@@ -177,28 +147,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/214e49a8ac5b.webp",
+      "src": "media/tv-moments/214e49a8ac5b.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "His spot on the sofa",
-      "key": "the-big-bang-theory-1",
-      "ref": "tv-moments:new/the-big-bang-theory-1"
-     },
-     {
-      "src": "media/cand/tv-moments/517828f5bcfe.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The lift is still broken",
-      "key": "the-big-bang-theory-2",
-      "ref": "tv-moments:new/the-big-bang-theory-2"
+      "caption": "His spot on the sofa"
      }
     ]
    },
@@ -221,28 +177,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/a3493595dea7.webp",
+      "src": "media/tv-moments/a3493595dea7.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The throne of swords",
-      "key": "game-of-thrones-1",
-      "ref": "tv-moments:new/game-of-thrones-1"
-     },
-     {
-      "src": "media/cand/tv-moments/c1b2c4ebeddc.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "The Wall of ice",
-      "key": "game-of-thrones-2",
-      "ref": "tv-moments:new/game-of-thrones-2"
+      "caption": "The throne of swords"
      }
     ]
    },
@@ -263,28 +205,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/165e858aa51b.webp",
+      "src": "media/tv-moments/165e858aa51b.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The RV in the desert",
-      "key": "breaking-bad-1",
-      "ref": "tv-moments:new/breaking-bad-1"
-     },
-     {
-      "src": "media/cand/tv-moments/cf6072bc3c80.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Pizza on the roof",
-      "key": "breaking-bad-2",
-      "ref": "tv-moments:new/breaking-bad-2"
+      "caption": "The RV in the desert"
      }
     ]
    },
@@ -306,28 +234,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/6acdcefb2675.webp",
+      "src": "media/tv-moments/a2a696cf12e5.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The starship in orbit",
-      "key": "star-trek-1",
-      "ref": "tv-moments:new/star-trek-1"
-     },
-     {
-      "src": "media/cand/tv-moments/a2a696cf12e5.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Beam me up",
-      "key": "star-trek-2",
-      "ref": "tv-moments:new/star-trek-2"
+      "caption": "Beam me up"
      }
     ]
    },
@@ -348,32 +262,18 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/8a95ac3b4a48.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "The prison fence",
-      "key": "the-walking-dead-2",
-      "ref": "tv-moments:new/the-walking-dead-2"
-     },
-     {
-      "src": "media/cand/tv-moments/15c6324c2688.webp",
+      "src": "media/tv-moments/15c6324c2688.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Riding into Atlanta",
-      "key": "the-walking-dead-1",
-      "ref": "tv-moments:new/the-walking-dead-1"
+      "caption": "Riding into Atlanta"
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 3
   },
   {
    "id": "wednesday",
@@ -390,28 +290,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/257441603eaf.webp",
+      "src": "media/tv-moments/257441603eaf.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The dance",
-      "key": "wednesday-1",
-      "ref": "tv-moments:new/wednesday-1"
-     },
-     {
-      "src": "media/cand/tv-moments/5254e52c03b6.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The hand",
-      "key": "wednesday-2",
-      "ref": "tv-moments:new/wednesday-2"
+      "caption": "The dance"
      }
     ]
    },
@@ -434,28 +320,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/89dc5fcd2130.webp",
+      "src": "media/tv-moments/89dc5fcd2130.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
-      "caption": "Red jumpsuits in the mint",
-      "key": "money-heist-1",
-      "ref": "tv-moments:new/money-heist-1"
-     },
-     {
-      "src": "media/cand/tv-moments/8b5806a436fc.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Raining money",
-      "key": "money-heist-2",
-      "ref": "tv-moments:new/money-heist-2"
+      "caption": "Red jumpsuits in the mint"
      }
     ]
    },
@@ -476,28 +348,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/516c25d75764.webp",
+      "src": "media/tv-moments/516c25d75764.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "Red light, green light",
-      "key": "squid-game-1",
-      "ref": "tv-moments:new/squid-game-1"
-     },
-     {
-      "src": "media/cand/tv-moments/925a4dd51f03.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "The pastel staircase",
-      "key": "squid-game-2",
-      "ref": "tv-moments:new/squid-game-2"
+      "caption": "Red light, green light"
      }
     ]
    },
@@ -518,16 +376,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/76d92153674b.webp",
+      "src": "media/tv-moments/76d92153674b.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Below stairs",
-      "key": "downton-abbey-2",
-      "ref": "tv-moments:new/downton-abbey-2"
+      "caption": "Below stairs"
      }
     ]
    },
@@ -548,16 +404,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/320d8489139b.webp",
+      "src": "media/tv-moments/320d8489139b.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The coronation",
-      "key": "the-crown-1",
-      "ref": "tv-moments:new/the-crown-1"
+      "caption": "The coronation"
      }
     ]
    },
@@ -578,28 +432,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/0df750dc5c6c.webp",
+      "src": "media/tv-moments/0df750dc5c6c.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "Crash on the island",
-      "key": "lost-1",
-      "ref": "tv-moments:new/lost-1"
-     },
-     {
-      "src": "media/cand/tv-moments/4438daf84794.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "The hatch",
-      "key": "lost-2",
-      "ref": "tv-moments:new/lost-2"
+      "caption": "Crash on the island"
      }
     ]
    },
@@ -620,16 +460,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/dbe12a757370.webp",
+      "src": "media/tv-moments/dbe12a757370.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The bounty",
-      "key": "the-mandalorian-2",
-      "ref": "tv-moments:new/the-mandalorian-2"
+      "caption": "The bounty"
      }
     ]
    },
@@ -650,74 +488,18 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/1e50056ecb6f.webp",
+      "src": "media/tv-moments/1e50056ecb6f.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The truth is out there",
-      "key": "the-x-files-1",
-      "ref": "tv-moments:new/the-x-files-1"
-     },
-     {
-      "src": "media/cand/tv-moments/fbd7c63e4e77.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "The basement office",
-      "key": "the-x-files-2",
-      "ref": "tv-moments:new/the-x-files-2"
+      "caption": "The truth is out there"
      }
     ]
    },
    "difficulty": 1
-  },
-  {
-   "id": "fawlty-towers",
-   "name": "Fawlty Towers",
-   "alt": [],
-   "facts": {
-    "year": 1975,
-    "decade": "1970s",
-    "country": "United Kingdom",
-    "network": "BBC Two",
-    "kids": false
-   },
-   "blurb": "John Cleese plays a rude hotel owner in Torquay.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/89307ff5faef.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Thrashing the car",
-      "key": "fawlty-towers-1",
-      "ref": "tv-moments:new/fawlty-towers-1"
-     },
-     {
-      "src": "media/cand/tv-moments/c97f2da7323d.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The hotel",
-      "key": "fawlty-towers-2",
-      "ref": "tv-moments:new/fawlty-towers-2"
-     }
-    ]
-   },
-   "difficulty": 3
   },
   {
    "id": "only-fools-and-horses",
@@ -734,58 +516,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/79216cec3fb1.webp",
+      "src": "media/tv-moments/79216cec3fb1.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The yellow three-wheeler",
-      "key": "only-fools-and-horses-1",
-      "ref": "tv-moments:new/only-fools-and-horses-1"
-     },
-     {
-      "src": "media/cand/tv-moments/632de2ce3ffa.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Falling through the bar",
-      "key": "only-fools-and-horses-2",
-      "ref": "tv-moments:new/only-fools-and-horses-2"
-     }
-    ]
-   },
-   "difficulty": 3
-  },
-  {
-   "id": "top-gear",
-   "name": "Top Gear",
-   "alt": [],
-   "facts": {
-    "year": 1977,
-    "decade": "1970s",
-    "country": "United Kingdom",
-    "network": "BBC Two",
-    "kids": false
-   },
-   "blurb": "A BBC programme about cars and road trips.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/65a0180493d4.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The test track",
-      "key": "top-gear-1",
-      "ref": "tv-moments:new/top-gear-1"
+      "caption": "The yellow three-wheeler"
      }
     ]
    },
@@ -806,28 +544,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/45047cbcbd5f.webp",
+      "src": "media/tv-moments/45047cbcbd5f.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Thunderbirds are go",
-      "key": "thunderbirds-1",
-      "ref": "tv-moments:new/thunderbirds-1"
-     },
-     {
-      "src": "media/cand/tv-moments/2eeae749e658.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The pink car",
-      "key": "thunderbirds-2",
-      "ref": "tv-moments:new/thunderbirds-2"
+      "caption": "Thunderbirds are go"
      }
     ]
    },
@@ -848,16 +572,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/aef2af4b524c.webp",
+      "src": "media/tv-moments/aef2af4b524c.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "Running on the beach",
-      "key": "baywatch-1",
-      "ref": "tv-moments:new/baywatch-1"
+      "caption": "Running on the beach"
      }
     ]
    },
@@ -878,28 +600,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/f51bd1f60226.webp",
+      "src": "media/tv-moments/f51bd1f60226.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Foot-powered car",
-      "key": "the-flintstones-1",
-      "ref": "tv-moments:new/the-flintstones-1"
-     },
-     {
-      "src": "media/cand/tv-moments/9c764588cc28.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Dino crane",
-      "key": "the-flintstones-2",
-      "ref": "tv-moments:new/the-flintstones-2"
+      "caption": "Foot-powered car"
      }
     ]
    },
@@ -922,16 +630,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/845cf75db722.webp",
+      "src": "media/tv-moments/845cf75db722.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "Coming home to Springfield",
-      "key": "the-simpsons-1",
-      "ref": "tv-moments:new/the-simpsons-1"
+      "caption": "Coming home to Springfield"
      }
     ]
    },
@@ -952,50 +658,18 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/f80d17ca946f.webp",
+      "src": "media/tv-moments/f80d17ca946f.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The creepy house",
-      "key": "the-addams-family-1",
-      "ref": "tv-moments:new/the-addams-family-1"
+      "caption": "The creepy house"
      }
     ]
    },
    "difficulty": 3
-  },
-  {
-   "id": "seinfeld",
-   "name": "Seinfeld",
-   "alt": [],
-   "facts": {
-    "year": 1989,
-    "decade": "1980s",
-    "country": "United States",
-    "network": "NBC",
-    "kids": false
-   },
-   "blurb": "A New York comedian and his friends obsess over small things.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/f8603d05b869.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "At the diner",
-      "key": "seinfeld-1",
-      "ref": "tv-moments:new/seinfeld-1"
-     }
-    ]
-   },
-   "difficulty": 2
   },
   {
    "id": "the-office-us",
@@ -1014,28 +688,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/efd0b1df1c51.webp",
+      "src": "media/tv-moments/7bb74c1a7448.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The stapler in jelly",
-      "key": "the-office-us-1",
-      "ref": "tv-moments:new/the-office-us-1"
-     },
-     {
-      "src": "media/cand/tv-moments/7bb74c1a7448.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "The office",
-      "key": "the-office-us-2",
-      "ref": "tv-moments:new/the-office-us-2"
+      "caption": "The office"
      }
     ]
    },
@@ -1056,16 +716,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/72f7ae1ef9a9.webp",
+      "src": "media/tv-moments/72f7ae1ef9a9.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The razor cap",
-      "key": "peaky-blinders-2",
-      "ref": "tv-moments:new/peaky-blinders-2"
+      "caption": "The razor cap"
      }
     ]
    },
@@ -1086,28 +744,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/f77e09173f43.webp",
+      "src": "media/tv-moments/69b17ba8e126.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Going over the top",
-      "key": "blackadder-1",
-      "ref": "tv-moments:new/blackadder-1"
-     },
-     {
-      "src": "media/cand/tv-moments/69b17ba8e126.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The turnip",
-      "key": "blackadder-2",
-      "ref": "tv-moments:new/blackadder-2"
+      "caption": "The turnip"
      }
     ]
    },
@@ -1128,16 +772,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/491298579693.webp",
+      "src": "media/tv-moments/491298579693.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The Home Guard",
-      "key": "dad-s-army-1",
-      "ref": "tv-moments:new/dad-s-army-1"
+      "caption": "The Home Guard"
      }
     ]
    },
@@ -1157,28 +799,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/7d8508a883b6.webp",
+      "src": "media/tv-moments/7d8508a883b6.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The snow leopard",
-      "key": "planet-earth-1",
-      "ref": "tv-moments:new/planet-earth-1"
-     },
-     {
-      "src": "media/cand/tv-moments/a8ac477cb0d8.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The breach",
-      "key": "planet-earth-2",
-      "ref": "tv-moments:new/planet-earth-2"
+      "caption": "The snow leopard"
      }
     ]
    },
@@ -1200,16 +828,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/438b798d5010.webp",
+      "src": "media/tv-moments/438b798d5010.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The tent",
-      "key": "the-great-british-bake-off-1",
-      "ref": "tv-moments:new/the-great-british-bake-off-1"
+      "caption": "The tent"
      }
     ]
    },
@@ -1232,28 +858,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/a367b07863c9.webp",
+      "src": "media/tv-moments/a367b07863c9.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Driving from the armchair",
-      "key": "mr-bean-1",
-      "ref": "tv-moments:new/mr-bean-1"
-     },
-     {
-      "src": "media/cand/tv-moments/d88f75228cc4.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Teddy",
-      "key": "mr-bean-2",
-      "ref": "tv-moments:new/mr-bean-2"
+      "caption": "Driving from the armchair"
      }
     ]
    },
@@ -1275,16 +887,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/5d301af5701e.webp",
+      "src": "media/tv-moments/5d301af5701e.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The little blue engine",
-      "key": "thomas-and-friends-1",
-      "ref": "tv-moments:new/thomas-and-friends-1"
+      "caption": "The little blue engine"
      }
     ]
    },
@@ -1305,16 +915,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/adbb564d6dc6.webp",
+      "src": "media/tv-moments/adbb564d6dc6.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The house in Brisbane",
-      "key": "bluey-1",
-      "ref": "tv-moments:new/bluey-1"
+      "caption": "The house in Brisbane"
      }
     ]
    },
@@ -1335,16 +943,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/94b05696a2b9.webp",
+      "src": "media/tv-moments/94b05696a2b9.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Summer Bay",
-      "key": "home-and-away-1",
-      "ref": "tv-moments:new/home-and-away-1"
+      "caption": "Summer Bay"
      }
     ]
    },
@@ -1365,16 +971,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/7a3642fa1dba.webp",
+      "src": "media/tv-moments/7a3642fa1dba.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The cul-de-sac",
-      "key": "neighbours-1",
-      "ref": "tv-moments:new/neighbours-1"
+      "caption": "The cul-de-sac"
      }
     ]
    },
@@ -1397,78 +1001,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/e8ac0b77cfa0.webp",
+      "src": "media/tv-moments/e8ac0b77cfa0.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The cobbled street",
-      "key": "coronation-street-1",
-      "ref": "tv-moments:new/coronation-street-1"
-     }
-    ]
-   },
-   "difficulty": 3
-  },
-  {
-   "id": "eastenders",
-   "name": "EastEnders",
-   "alt": [],
-   "facts": {
-    "year": 1985,
-    "decade": "1980s",
-    "country": "United Kingdom",
-    "network": "BBC One",
-    "kids": false
-   },
-   "blurb": "A BBC soap opera set around Albert Square in East London.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/ad324facea23.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The Square",
-      "key": "eastenders-1",
-      "ref": "tv-moments:new/eastenders-1"
-     }
-    ]
-   },
-   "difficulty": 3
-  },
-  {
-   "id": "emmerdale",
-   "name": "Emmerdale",
-   "alt": [
-    "Emmerdale Farm"
-   ],
-   "facts": {
-    "year": 1972,
-    "decade": "1970s",
-    "country": "United Kingdom",
-    "network": "ITV",
-    "kids": false
-   },
-   "blurb": "Emmerdale (first shown 1972, United Kingdom, ITV). A British soap set in a Yorkshire Dales village.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/287eb3a546f1.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The village",
-      "key": "emmerdale-1",
-      "ref": "tv-moments:new/emmerdale-1"
+      "caption": "The cobbled street"
      }
     ]
    },
@@ -1489,96 +1029,18 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/f9c77252b36f.webp",
+      "src": "media/tv-moments/f9c77252b36f.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "Cheesecake at midnight",
-      "key": "the-golden-girls-1",
-      "ref": "tv-moments:new/the-golden-girls-1"
-     },
-     {
-      "src": "media/cand/tv-moments/373d21c4ca21.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The lanai",
-      "key": "the-golden-girls-2",
-      "ref": "tv-moments:new/the-golden-girls-2"
+      "caption": "Cheesecake at midnight"
      }
     ]
    },
    "difficulty": 1
-  },
-  {
-   "id": "how-i-met-your-mother",
-   "name": "How I Met Your Mother",
-   "alt": [
-    "HIMYM"
-   ],
-   "facts": {
-    "year": 2005,
-    "decade": "2000s",
-    "country": "United States",
-    "network": "CBS",
-    "kids": false
-   },
-   "blurb": "It starred Josh Radnor and Jason Segel.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/fb0fbad14686.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 2,
-      "caption": "The blue French horn",
-      "key": "how-i-met-your-mother-2",
-      "ref": "tv-moments:new/how-i-met-your-mother-2"
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
-   "id": "kath-and-kim",
-   "name": "Kath & Kim",
-   "alt": [
-    "Kath and Kim"
-   ],
-   "facts": {
-    "year": 2002,
-    "decade": "2000s",
-    "country": "Australia",
-    "network": "ABC (Australia)",
-    "kids": false
-   },
-   "blurb": "A suburban Melbourne mother and her self-absorbed daughter in Fountain Lakes.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/e2c01c7a0152.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Look at moiye",
-      "key": "kath-and-kim-1",
-      "ref": "tv-moments:new/kath-and-kim-1"
-     }
-    ]
-   },
-   "difficulty": 3
   },
   {
    "id": "line-of-duty",
@@ -1595,46 +1057,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/1a44b60ed88d.webp",
+      "src": "media/tv-moments/1a44b60ed88d.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The interview room",
-      "key": "line-of-duty-1",
-      "ref": "tv-moments:new/line-of-duty-1"
-     }
-    ]
-   },
-   "difficulty": 3
-  },
-  {
-   "id": "black-mirror",
-   "name": "Black Mirror",
-   "alt": [],
-   "facts": {
-    "year": 2011,
-    "decade": "2010s",
-    "country": "United Kingdom",
-    "network": "Channel 4",
-    "kids": false
-   },
-   "blurb": "Dark stand-alone stories about technology going wrong.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/74b97d839986.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The black mirror",
-      "key": "black-mirror-1",
-      "ref": "tv-moments:new/black-mirror-1"
+      "caption": "The interview room"
      }
     ]
    },
@@ -1655,16 +1085,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/d9e7eed8bcf5.webp",
+      "src": "media/tv-moments/d9e7eed8bcf5.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The mining ship",
-      "key": "red-dwarf-1",
-      "ref": "tv-moments:new/red-dwarf-1"
+      "caption": "The mining ship"
      }
     ]
    },
@@ -1685,28 +1113,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/d7fd13336e03.webp",
+      "src": "media/tv-moments/d7fd13336e03.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The parochial house",
-      "key": "father-ted-1",
-      "ref": "tv-moments:new/father-ted-1"
-     },
-     {
-      "src": "media/cand/tv-moments/e801993792b9.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "Lost in the department store",
-      "key": "father-ted-2",
-      "ref": "tv-moments:new/father-ted-2"
+      "caption": "The parochial house"
      }
     ]
    },
@@ -1727,16 +1141,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/59933d75b57a.webp",
+      "src": "media/tv-moments/59933d75b57a.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The lads",
-      "key": "the-inbetweeners-1",
-      "ref": "tv-moments:new/the-inbetweeners-1"
+      "caption": "The lads"
      }
     ]
    },
@@ -1757,16 +1169,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/0767ff506902.webp",
+      "src": "media/tv-moments/0767ff506902.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "The gang",
-      "key": "derry-girls-1",
-      "ref": "tv-moments:new/derry-girls-1"
+      "caption": "The gang"
      }
     ]
    },
@@ -1789,28 +1199,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/73a2ee5c5b06.webp",
+      "src": "media/tv-moments/73a2ee5c5b06.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Who lives in a pineapple",
-      "key": "spongebob-squarepants-1",
-      "ref": "tv-moments:new/spongebob-squarepants-1"
-     },
-     {
-      "src": "media/cand/tv-moments/150d3e456ff9.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The burger shack",
-      "key": "spongebob-squarepants-2",
-      "ref": "tv-moments:new/spongebob-squarepants-2"
+      "caption": "Who lives in a pineapple"
      }
     ]
    },
@@ -1831,16 +1227,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/526402184004.webp",
+      "src": "media/tv-moments/526402184004.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The house on the hill",
-      "key": "peppa-pig-1",
-      "ref": "tv-moments:new/peppa-pig-1"
+      "caption": "The house on the hill"
      }
     ]
    },
@@ -1861,48 +1255,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/8ba7056f15b7.webp",
+      "src": "media/tv-moments/8ba7056f15b7.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The sun baby",
-      "key": "teletubbies-1",
-      "ref": "tv-moments:new/teletubbies-1"
-     }
-    ]
-   },
-   "difficulty": 3
-  },
-  {
-   "id": "scooby-doo-where-are-you",
-   "name": "Scooby-Doo, Where Are You!",
-   "alt": [
-    "Scooby-Doo"
-   ],
-   "facts": {
-    "year": 1969,
-    "decade": "1960s",
-    "country": "United States",
-    "network": "CBS",
-    "kids": true
-   },
-   "blurb": "A talking Great Dane and four teenagers solve mysteries.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/9d608250d229.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The unmasking",
-      "key": "scooby-doo-where-are-you-2",
-      "ref": "tv-moments:new/scooby-doo-where-are-you-2"
+      "caption": "The sun baby"
      }
     ]
    },
@@ -1922,16 +1282,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/acd6add8b842.webp",
+      "src": "media/tv-moments/acd6add8b842.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Through the windows",
-      "key": "play-school-1",
-      "ref": "tv-moments:new/play-school-1"
+      "caption": "Through the windows"
      }
     ]
    },
@@ -1951,16 +1309,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/ef4be3c92f60.webp",
+      "src": "media/tv-moments/ef4be3c92f60.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Coming down the stairs",
-      "key": "bananas-in-pyjamas-1",
-      "ref": "tv-moments:new/bananas-in-pyjamas-1"
+      "caption": "Coming down the stairs"
      }
     ]
    },
@@ -1981,16 +1337,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/615fa9c4c915.webp",
+      "src": "media/tv-moments/615fa9c4c915.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
-      "caption": "Another dimension",
-      "key": "the-twilight-zone-1",
-      "ref": "tv-moments:new/the-twilight-zone-1"
+      "caption": "Another dimension"
      }
     ]
    },
@@ -2011,16 +1365,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/f118ff90a646.webp",
+      "src": "media/tv-moments/f118ff90a646.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "A twitch of the nose",
-      "key": "bewitched-1",
-      "ref": "tv-moments:new/bewitched-1"
+      "caption": "A twitch of the nose"
      }
     ]
    },
@@ -2041,16 +1393,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/4a550b47498b.webp",
+      "src": "media/tv-moments/4a550b47498b.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Hitting the jukebox",
-      "key": "happy-days-1",
-      "ref": "tv-moments:new/happy-days-1"
+      "caption": "Hitting the jukebox"
      }
     ]
    },
@@ -2071,16 +1421,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/44c292e37617.webp",
+      "src": "media/tv-moments/44c292e37617.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The recliner and the view",
-      "key": "frasier-1",
-      "ref": "tv-moments:new/frasier-1"
+      "caption": "The recliner and the view"
      }
     ]
    },
@@ -2101,16 +1449,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/48ec27430d07.webp",
+      "src": "media/tv-moments/48ec27430d07.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Believe",
-      "key": "ted-lasso-1",
-      "ref": "tv-moments:new/ted-lasso-1"
+      "caption": "Believe"
      }
     ]
    },
@@ -2131,46 +1477,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/a01427129941.webp",
+      "src": "media/tv-moments/a01427129941.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The puddle",
-      "key": "the-vicar-of-dibley-1",
-      "ref": "tv-moments:new/the-vicar-of-dibley-1"
-     }
-    ]
-   },
-   "difficulty": 3
-  },
-  {
-   "id": "keeping-up-appearances",
-   "name": "Keeping Up Appearances",
-   "alt": [],
-   "facts": {
-    "year": 1990,
-    "decade": "1990s",
-    "country": "United Kingdom",
-    "network": "BBC One",
-    "kids": false
-   },
-   "blurb": "A social climber tries to hide her working-class relatives.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/26081b815ffd.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 3,
-      "caption": "The candlelight supper",
-      "key": "keeping-up-appearances-1",
-      "ref": "tv-moments:new/keeping-up-appearances-1"
+      "caption": "The puddle"
      }
     ]
    },
@@ -2191,16 +1505,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/39305e7d3da4.webp",
+      "src": "media/tv-moments/39305e7d3da4.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Midwives on bicycles",
-      "key": "call-the-midwife-1",
-      "ref": "tv-moments:new/call-the-midwife-1"
+      "caption": "Midwives on bicycles"
      }
     ]
    },
@@ -2222,16 +1534,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/6ca5a29a3c85.webp",
+      "src": "media/tv-moments/6ca5a29a3c85.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The little grey cells",
-      "key": "poirot-1",
-      "ref": "tv-moments:new/poirot-1"
+      "caption": "The little grey cells"
      }
     ]
    },
@@ -2253,16 +1563,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/9708c06720b4.webp",
+      "src": "media/tv-moments/9708c06720b4.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "A boy and his kangaroo",
-      "key": "skippy-the-bush-kangaroo-1",
-      "ref": "tv-moments:new/skippy-the-bush-kangaroo-1"
+      "caption": "A boy and his kangaroo"
      }
     ]
    },
@@ -2283,16 +1591,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/44efff6df3b3.webp",
+      "src": "media/tv-moments/44efff6df3b3.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Drovers' Run",
-      "key": "mcleod-s-daughters-1",
-      "ref": "tv-moments:new/mcleod-s-daughters-1"
+      "caption": "Drovers' Run"
      }
     ]
    },
@@ -2313,16 +1619,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/69844d1d9541.webp",
+      "src": "media/tv-moments/69844d1d9541.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "I'm free!",
-      "key": "are-you-being-served-1",
-      "ref": "tv-moments:new/are-you-being-served-1"
+      "caption": "I'm free!"
      }
     ]
    },
@@ -2345,16 +1649,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/1d301974f861.webp",
+      "src": "media/tv-moments/1d301974f861.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The cafe",
-      "key": "allo-allo-1",
-      "ref": "tv-moments:new/allo-allo-1"
+      "caption": "The cafe"
      }
     ]
    },
@@ -2375,16 +1677,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/43159c54b47b.webp",
+      "src": "media/tv-moments/43159c54b47b.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
-      "caption": "Self-sufficient in Surbiton",
-      "key": "the-good-life-1",
-      "ref": "tv-moments:new/the-good-life-1"
+      "caption": "Self-sufficient in Surbiton"
      }
     ]
    },
@@ -2407,16 +1707,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/7fa71e0ac4fb.webp",
+      "src": "media/tv-moments/7fa71e0ac4fb.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Keep dancing",
-      "key": "strictly-come-dancing-1",
-      "ref": "tv-moments:new/strictly-come-dancing-1"
+      "caption": "Keep dancing"
      }
     ]
    },
@@ -2437,48 +1735,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/06adcb744aa6.webp",
+      "src": "media/tv-moments/06adcb744aa6.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 1,
-      "caption": "Seattle Grace",
-      "key": "grey-s-anatomy-1",
-      "ref": "tv-moments:new/grey-s-anatomy-1"
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
-   "id": "the-office-uk",
-   "name": "The Office (UK)",
-   "alt": [
-    "The Office"
-   ],
-   "facts": {
-    "year": 2001,
-    "decade": "2000s",
-    "country": "United Kingdom",
-    "network": "BBC Two",
-    "kids": false
-   },
-   "blurb": "A mockumentary set at the Slough branch of the paper company Wernham Hogg.",
-   "media": {
-    "img": [
-     {
-      "src": "media/cand/tv-moments/0577f74495a5.webp",
-      "w": 640,
-      "h": 432,
-      "credit": "Clued (AI-generated illustration)",
-      "license": "CC0",
-      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
-      "difficulty": 1,
-      "caption": "The dance",
-      "key": "the-office-uk-1",
-      "ref": "tv-moments:new/the-office-uk-1"
+      "caption": "Seattle Grace"
      }
     ]
    },
@@ -2500,16 +1764,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/51f3d621573f.webp",
+      "src": "media/tv-moments/51f3d621573f.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Sweetie, darling",
-      "key": "absolutely-fabulous-1",
-      "ref": "tv-moments:new/absolutely-fabulous-1"
+      "caption": "Sweetie, darling"
      }
     ]
    },
@@ -2530,16 +1792,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/0063d9d74a3a.webp",
+      "src": "media/tv-moments/0063d9d74a3a.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "Downhill in a bathtub",
-      "key": "last-of-the-summer-wine-1",
-      "ref": "tv-moments:new/last-of-the-summer-wine-1"
+      "caption": "Downhill in a bathtub"
      }
     ]
    },
@@ -2562,16 +1822,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/c11eec378da5.webp",
+      "src": "media/tv-moments/c11eec378da5.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "In the hot seat",
-      "key": "who-wants-to-be-a-millionaire-1",
-      "ref": "tv-moments:new/who-wants-to-be-a-millionaire-1"
+      "caption": "In the hot seat"
      }
     ]
    },
@@ -2592,16 +1850,14 @@
    "media": {
     "img": [
      {
-      "src": "media/cand/tv-moments/1f4e4a7c8193.webp",
+      "src": "media/tv-moments/1f4e4a7c8193.webp",
       "w": 640,
       "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 3,
-      "caption": "The pink dress",
-      "key": "killing-eve-1",
-      "ref": "tv-moments:new/killing-eve-1"
+      "caption": "The pink dress"
      }
     ]
    },
@@ -2613,6 +1869,5 @@
    "name": "Generated locally with FLUX.2 [klein] (Clued house style)",
    "url": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md"
   }
- ],
- "candidate": true
+ ]
 }

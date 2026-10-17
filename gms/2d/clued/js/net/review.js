@@ -5,9 +5,9 @@
 // A candidate title can have two pictures: the card shows one with a "1/2 ⇄" toggle. OK picks it (the sibling is just not
 // chosen), Bad flips to the sibling; the title is rejected only when every picture is Bad. Verdicts stay one row per picture.
 // A picture can also carry a drawn circle around the target (mark, 0–1 image coordinates); tools/img_marks.mjs puts those in the packs.
-import { h, markRect } from '../ui/kit.js?v=202610170746';
-import { toast } from '../ui/popup.js?v=202610170746';
-import { API } from './api.js?v=202610170746';
+import { h, markRect } from '../ui/kit.js?v=202610170843';
+import { toast } from '../ui/popup.js?v=202610170843';
+import { API } from './api.js?v=202610170843';
 
 const root = document.getElementById('rv');
 const gate = document.getElementById('gate');

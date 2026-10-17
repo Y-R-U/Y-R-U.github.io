@@ -1,25 +1,3 @@
 {
- "candidates": [
-  {
-   "pack": "movie-moments",
-   "title": "Movie moments: new",
-   "path": "candidates/movie-moments.json",
-   "pictures": 192,
-   "titles": 103
-  },
-  {
-   "pack": "book-moments",
-   "title": "Book moments: new",
-   "path": "candidates/book-moments.json",
-   "pictures": 189,
-   "titles": 110
-  },
-  {
-   "pack": "tv-moments",
-   "title": "TV moments: new",
-   "path": "candidates/tv-moments.json",
-   "pictures": 98,
-   "titles": 75
-  }
- ]
+ "candidates": []
 }

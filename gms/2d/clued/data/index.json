@@ -1,5 +1,5 @@
 {
- "build": "202610170739",
+ "build": "202610170843",
  "themes": [
   {
    "id": "animals",
@@ -57,6 +57,7 @@
     "general~screen",
     "movie-moments",
     "movies",
+    "tv-moments",
     "tv"
    ]
   },
@@ -649,13 +650,13 @@
    "theme": "books",
    "icon": "📖",
    "kids": false,
-   "items": 37,
+   "items": 140,
    "questions": 0,
    "notice": "Original illustrations of scenes from famous books.",
    "caps": {
-    "img": 37,
+    "img": 140,
     "audio": 0,
-    "itemImg": 37,
+    "itemImg": 140,
     "itemAudio": 0,
     "clues": 0,
     "facts": {
@@ -669,11 +670,12 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 28,
-    "kidsItems": 11,
+    "easy": 62,
+    "kidsItems": 22,
     "multi": [],
     "catBins": {
-     "century": 2
+     "author": 3,
+     "century": 3
     },
     "formats": {
      "mc": 20,
@@ -685,11 +687,11 @@
      "sort": 20,
      "reveal": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 4,
+     "connect": 20,
+     "blitz60": 6,
      "type": 20,
      "quote": 0,
-     "trio": 18
+     "trio": 20
     },
     "formatsEasy": {
      "mc": 20,
@@ -701,11 +703,11 @@
      "sort": 20,
      "reveal": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 4,
+     "connect": 20,
+     "blitz60": 6,
      "type": 20,
      "quote": 0,
-     "trio": 13
+     "trio": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -715,10 +717,10 @@
      "order": 20,
      "odd": 20,
      "sort": 20,
-     "reveal": 11,
-     "number": 11,
+     "reveal": 20,
+     "number": 20,
      "connect": 0,
-     "blitz60": 2,
+     "blitz60": 4,
      "type": 20,
      "quote": 0,
      "trio": 0
@@ -3243,13 +3245,13 @@
    "theme": "screen",
    "icon": "🎬",
    "kids": false,
-   "items": 165,
+   "items": 257,
    "questions": 0,
    "notice": "Original illustrations of famous film scenes, not real stills.",
    "caps": {
-    "img": 165,
+    "img": 257,
     "audio": 0,
-    "itemImg": 165,
+    "itemImg": 257,
     "itemAudio": 0,
     "clues": 0,
     "facts": {
@@ -3263,12 +3265,12 @@
     "fakes": 0,
     "quotes": 0,
     "qkinds": {},
-    "easy": 88,
+    "easy": 101,
     "kidsItems": 61,
     "multi": [],
     "catBins": {
      "decade": 10,
-     "director": 5
+     "director": 9
     },
     "formats": {
      "mc": 20,
@@ -3281,7 +3283,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 11,
+     "blitz60": 12,
      "type": 20,
      "trio": 20
     },
@@ -3296,7 +3298,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 11,
+     "blitz60": 12,
      "type": 20,
      "trio": 20
     },
@@ -3311,7 +3313,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 5,
+     "blitz60": 6,
      "type": 20,
      "trio": 0
     }
@@ -4525,6 +4527,85 @@
      "type": 20,
      "lookalike": 0,
      "pickall": 2
+    }
+   }
+  },
+  "tv-moments": {
+   "path": "packs/tv-moments.json",
+   "title": "TV Moments",
+   "theme": "screen",
+   "icon": "📺",
+   "kids": false,
+   "items": 64,
+   "questions": 0,
+   "notice": "Original illustrations of famous TV series, not real stills.",
+   "caps": {
+    "img": 64,
+    "audio": 0,
+    "itemImg": 64,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {
+     "year": "year",
+     "decade": "cat",
+     "country": "cat",
+     "network": "cat",
+     "kids": "bool"
+    },
+    "groups": 0,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 19,
+    "kidsItems": 1,
+    "multi": [],
+    "catBins": {
+     "decade": 6,
+     "country": 3,
+     "network": 6
+    },
+    "formats": {
+     "mc": 20,
+     "tf": 20,
+     "match": 20,
+     "hilo": 20,
+     "order": 20,
+     "odd": 20,
+     "sort": 20,
+     "reveal": 20,
+     "number": 20,
+     "connect": 20,
+     "blitz60": 12,
+     "type": 20
+    },
+    "formatsEasy": {
+     "mc": 20,
+     "tf": 20,
+     "match": 20,
+     "hilo": 20,
+     "order": 0,
+     "odd": 20,
+     "sort": 20,
+     "reveal": 19,
+     "number": 19,
+     "connect": 20,
+     "blitz60": 12,
+     "type": 20
+    },
+    "formatsKids": {
+     "mc": 20,
+     "tf": 20,
+     "match": 20,
+     "hilo": 20,
+     "order": 14,
+     "odd": 20,
+     "sort": 20,
+     "reveal": 11,
+     "number": 11,
+     "connect": 0,
+     "blitz60": 1,
+     "type": 20
     }
    }
   },

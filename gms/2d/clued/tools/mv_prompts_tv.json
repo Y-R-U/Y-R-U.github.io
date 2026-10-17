@@ -46,14 +46,14 @@
     {
      "p": "six friends seen from behind sitting on a big orange sofa in a cosy New York coffee house with brick walls and mismatched lamps",
      "d": 1,
-     "cap": "The big orange sofa",
-     "cand": true
+     "cap": "The big orange sofa"
     },
     {
      "p": "six friends dancing in a fountain at night in a park, an old lamp post",
      "d": 1,
      "cap": "Splashing in the fountain",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (friends-1 was picked)"
     }
    ]
   },
@@ -71,13 +71,13 @@
      "p": "a wall of a 1980s living room with strings of Christmas fairy lights flickering over painted marks, a frightened mother holding an axe",
      "d": 3,
      "cap": "Talking through the Christmas lights",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (stranger-things-2 was picked)"
     },
     {
      "p": "four kids on BMX bikes riding through a misty forest road at night with torches, 1983 small-town America",
      "d": 1,
-     "cap": "Bikes in the woods at night",
-     "cand": true
+     "cap": "Bikes in the woods at night"
     }
    ]
   },
@@ -102,8 +102,7 @@
     {
      "p": "a man in a long dark coat with the collar up and a blue scarf standing on a London rooftop at night",
      "d": 1,
-     "cap": "The coat on the rooftop",
-     "cand": true
+     "cap": "The coat on the rooftop"
     }
    ]
   },
@@ -120,14 +119,14 @@
     {
      "p": "an apartment living room with a whiteboard covered in drawings of atoms and orbits, a worn sofa with one special spot cushion, a brass telescope by the window and toy robot figures",
      "d": 1,
-     "cap": "His spot on the sofa",
-     "cand": true
+     "cap": "His spot on the sofa"
     },
     {
      "p": "two young physicists in cardigans climbing an apartment staircase past an out-of-order lift with yellow tape across its doors, carrying plain brown paper bags",
      "d": 3,
      "cap": "The lift is still broken",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (the-big-bang-theory-1 was picked)"
     }
    ]
   },
@@ -146,14 +145,14 @@
     {
      "p": "an enormous throne made of hundreds of melted swords in a dark stone hall",
      "d": 1,
-     "cap": "The throne of swords",
-     "cand": true
+     "cap": "The throne of swords"
     },
     {
      "p": "a gigantic wall of ice towering over a snowy forest, tiny figures on top, a small castle at its foot",
      "d": 1,
      "cap": "The Wall of ice",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (game-of-thrones-1 was picked)"
     }
    ]
   },
@@ -170,14 +169,14 @@
     {
      "p": "an old cream-and-brown RV camper van parked alone in the New Mexico desert, a man in green underpants and a white shirt standing beside it holding a gun",
      "d": 1,
-     "cap": "The RV in the desert",
-     "cand": true
+     "cap": "The RV in the desert"
     },
     {
      "p": "a pizza on the roof of a suburban house",
      "d": 3,
      "cap": "Pizza on the roof",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (breaking-bad-1 was picked)"
     }
    ]
   },
@@ -196,13 +195,13 @@
      "p": "a sleek white starship with a saucer section and two long engine nacelles cruising past a red planet",
      "d": 3,
      "cap": "The starship in orbit",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (star-trek-2 was picked)"
     },
     {
      "p": "three crew members in yellow, blue and red tunics dissolving into shimmering columns of golden light on a transporter platform",
      "d": 3,
-     "cap": "Beam me up",
-     "cand": true
+     "cap": "Beam me up"
     }
    ]
   },
@@ -219,14 +218,14 @@
     {
      "p": "a man on horseback in a sheriff hat riding into an empty abandoned Atlanta highway, the opposite lanes jammed with abandoned cars",
      "d": 3,
-     "cap": "Riding into Atlanta",
-     "cand": true
+     "cap": "Riding into Atlanta"
     },
     {
      "p": "a crowd of shambling zombies pressing against a chain-link prison fence at dusk",
      "d": 1,
      "cap": "The prison fence",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (the-walking-dead-1 was picked)"
     }
    ]
   },
@@ -243,14 +242,14 @@
     {
      "p": "a pale girl with two black plaits and a black dress with a white collar dancing stiffly alone in a ballroom of a gothic school",
      "d": 1,
-     "cap": "The dance",
-     "cand": true
+     "cap": "The dance"
     },
     {
      "p": "a disembodied hand scuttling across a gothic boarding school desk",
      "d": 3,
      "cap": "The hand",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (wednesday-1 was picked)"
     }
    ]
   },
@@ -269,14 +268,14 @@
     {
      "p": "a gang of robbers in red jumpsuits and white masks inside a banknote printing hall, money flying",
      "d": 2,
-     "cap": "Red jumpsuits in the mint",
-     "cand": true
+     "cap": "Red jumpsuits in the mint"
     },
     {
      "p": "banknotes raining down from an airship over a crowded Madrid square",
      "d": 3,
      "cap": "Raining money",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (money-heist-1 was picked)"
     }
    ]
   },
@@ -293,14 +292,14 @@
     {
      "p": "a giant doll of a girl in an orange pinafore standing in a vast sandy yard facing away, hundreds of players in green tracksuits frozen mid-step",
      "d": 1,
-     "cap": "Red light, green light",
-     "cand": true
+     "cap": "Red light, green light"
     },
     {
      "p": "a pink-suited guard with a mask seen in a pastel staircase maze",
      "d": 1,
      "cap": "The pastel staircase",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (squid-game-1 was picked)"
     }
    ]
   },
@@ -325,8 +324,7 @@
     {
      "p": "a long servants' hall below stairs with a row of bells on the wall and staff at the dining table",
      "d": 3,
-     "cap": "Below stairs",
-     "cand": true
+     "cap": "Below stairs"
     }
    ]
   },
@@ -343,8 +341,7 @@
     {
      "p": "a young queen in coronation robes seen from behind in Westminster Abbey, crowds, a jewelled crown being lowered",
      "d": 1,
-     "cap": "The coronation",
-     "cand": true
+     "cap": "The coronation"
     }
    ]
   },
@@ -361,14 +358,14 @@
     {
      "p": "the burning wreckage of a passenger jet on a tropical beach, survivors running, palm trees",
      "d": 1,
-     "cap": "Crash on the island",
-     "cand": true
+     "cap": "Crash on the island"
     },
     {
      "p": "a round metal hatch in the jungle floor",
      "d": 1,
      "cap": "The hatch",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (lost-1 was picked)"
     }
    ]
   },
@@ -393,8 +390,7 @@
     {
      "p": "a lone armoured bounty hunter walking on an icy planet toward a bar",
      "d": 3,
-     "cap": "The bounty",
-     "cand": true
+     "cap": "The bounty"
     }
    ]
   },
@@ -411,14 +407,14 @@
     {
      "p": "two FBI agents in trench coats in a dark forest at night shining torches at a bright UFO light hovering above the trees",
      "d": 1,
-     "cap": "The truth is out there",
-     "cand": true
+     "cap": "The truth is out there"
     },
     {
      "p": "a basement office with a poster of a flying saucer and pencils stuck in the ceiling",
      "d": 1,
      "cap": "The basement office",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (the-x-files-1 was picked)"
     }
    ]
   },
@@ -436,13 +432,15 @@
      "p": "a flustered tall hotel owner in a blazer beating his small broken-down red car with a tree branch on a country road",
      "d": 3,
      "cap": "Thrashing the car",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor"
     },
     {
      "p": "a small seaside hotel in Torquay with a front desk bell, a moose head",
      "d": 3,
      "cap": "The hotel",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor"
     }
    ]
   },
@@ -459,14 +457,14 @@
     {
      "p": "a battered yellow three-wheeled van parked in a 1980s south London street",
      "d": 3,
-     "cap": "The yellow three-wheeler",
-     "cand": true
+     "cap": "The yellow three-wheeler"
     },
     {
      "p": "two men in a pub, one falling through a bar flap that has been lifted",
      "d": 3,
      "cap": "Falling through the bar",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (only-fools-and-horses-1 was picked)"
     }
    ]
   },
@@ -484,7 +482,8 @@
      "p": "three presenters seen from behind beside a car on a disused airfield track, a cardboard test driver in a white helmet",
      "d": 3,
      "cap": "The test track",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor"
     }
    ]
   },
@@ -501,14 +500,14 @@
     {
      "p": "a tropical island where a swimming pool slides back to reveal a rocket launching, palm trees folding aside for a green cargo plane",
      "d": 3,
-     "cap": "Thunderbirds are go",
-     "cand": true
+     "cap": "Thunderbirds are go"
     },
     {
      "p": "a pink Rolls-Royce with six wheels",
      "d": 3,
      "cap": "The pink car",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (thunderbirds-1 was picked)"
     }
    ]
   },
@@ -525,8 +524,7 @@
     {
      "p": "lifeguards in red swimsuits running in slow motion along a sunny Californian beach with red rescue floats",
      "d": 1,
-     "cap": "Running on the beach",
-     "cand": true
+     "cap": "Running on the beach"
     }
    ]
   },
@@ -543,14 +541,14 @@
     {
      "p": "a stone-age family car made of logs and stone with a canvas roof, powered by running feet, a pet dinosaur",
      "d": 3,
-     "cap": "Foot-powered car",
-     "cand": true
+     "cap": "Foot-powered car"
     },
     {
      "p": "a quarry where a dinosaur works as a crane",
      "d": 3,
      "cap": "Dino crane",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (the-flintstones-1 was picked)"
     }
    ]
   },
@@ -569,8 +567,7 @@
     {
      "p": "a pink family car pulling into the drive of a two-storey suburban house in front of a nuclear power plant's cooling towers",
      "d": 1,
-     "cap": "Coming home to Springfield",
-     "cand": true
+     "cap": "Coming home to Springfield"
     }
    ]
   },
@@ -587,8 +584,7 @@
     {
      "p": "a gothic Victorian mansion on a hill with a creepy family on the porch",
      "d": 3,
-     "cap": "The creepy house",
-     "cand": true
+     "cap": "The creepy house"
     }
    ]
   },
@@ -606,7 +602,8 @@
      "p": "four friends in a New York diner booth by the window, coffee cups and a plate of fries, plain painted walls",
      "d": 2,
      "cap": "At the diner",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor"
     }
    ]
   },
@@ -626,13 +623,13 @@
      "p": "a stapler sealed inside a wobbly block of jelly on an office desk",
      "d": 1,
      "cap": "The stapler in jelly",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (the-office-us-2 was picked)"
     },
     {
      "p": "an office paper company with cubicles and a conference room",
      "d": 1,
-     "cap": "The office",
-     "cand": true
+     "cap": "The office"
     }
    ]
   },
@@ -657,8 +654,7 @@
     {
      "p": "a flat cap with razor blades sewn into the peak",
      "d": 3,
-     "cap": "The razor cap",
-     "cand": true
+     "cap": "The razor cap"
     }
    ]
   },
@@ -676,13 +672,13 @@
      "p": "British soldiers going over the top of a First World War trench into poppy fields",
      "d": 3,
      "cap": "Going over the top",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (blackadder-2 was picked)"
     },
     {
      "p": "a Tudor nobleman and his servant with a turnip",
      "d": 3,
-     "cap": "The turnip",
-     "cand": true
+     "cap": "The turnip"
     }
    ]
   },
@@ -699,8 +695,7 @@
     {
      "p": "a group of elderly Home Guard volunteers marching in a seaside town, 1940",
      "d": 3,
-     "cap": "The Home Guard",
-     "cand": true
+     "cap": "The Home Guard"
     }
    ]
   },
@@ -738,14 +733,14 @@
     {
      "p": "snow leopards on a Himalayan mountain cliff",
      "d": 3,
-     "cap": "The snow leopard",
-     "cand": true
+     "cap": "The snow leopard"
     },
     {
      "p": "a great white shark breaching out of the sea catching a seal",
      "d": 3,
      "cap": "The breach",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (planet-earth-1 was picked)"
     }
    ]
   },
@@ -763,8 +758,7 @@
     {
      "p": "a big white marquee in an English country garden with bunting and baking stations, ovens and mixers",
      "d": 1,
-     "cap": "The tent",
-     "cand": true
+     "cap": "The tent"
     }
    ]
   },
@@ -783,14 +777,14 @@
     {
      "p": "a small lime green 1970s Mini car with a padlock on the door and an armchair strapped on the roof, a man driving from the armchair",
      "d": 3,
-     "cap": "Driving from the armchair",
-     "cand": true
+     "cap": "Driving from the armchair"
     },
     {
      "p": "a teddy bear on a bed",
      "d": 3,
      "cap": "Teddy",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (mr-bean-1 was picked)"
     }
    ]
   },
@@ -808,8 +802,7 @@
     {
      "p": "a cheerful blue tank engine with a smiling face on a branch line in the green hills of an island railway",
      "d": 1,
-     "cap": "The little blue engine",
-     "cand": true
+     "cap": "The little blue engine"
     }
    ]
   },
@@ -826,8 +819,7 @@
     {
      "p": "a Queenslander house on stilts with a big veranda and a garden in Brisbane, two puppies playing",
      "d": 3,
-     "cap": "The house in Brisbane",
-     "cand": true
+     "cap": "The house in Brisbane"
     }
    ]
   },
@@ -844,8 +836,7 @@
     {
      "p": "a sunny Australian beach town with a surf club and a caravan park on a headland",
      "d": 3,
-     "cap": "Summer Bay",
-     "cand": true
+     "cap": "Summer Bay"
     }
    ]
   },
@@ -862,8 +853,7 @@
     {
      "p": "a quiet suburban cul-de-sac in Melbourne with brick houses, sprinklers and neighbours chatting",
      "d": 3,
-     "cap": "The cul-de-sac",
-     "cand": true
+     "cap": "The cul-de-sac"
     }
    ]
   },
@@ -882,8 +872,7 @@
     {
      "p": "a terraced northern English cobbled street of red brick houses ending in a corner pub with dark green tiles, chimney smoke, grey sky",
      "d": 3,
-     "cap": "The cobbled street",
-     "cand": true
+     "cap": "The cobbled street"
     }
    ]
   },
@@ -901,7 +890,8 @@
      "p": "a Victorian square in east London with a corner pub, market stalls with striped awnings and a small fenced garden with a tree in the middle",
      "d": 3,
      "cap": "The Square",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor"
     }
    ]
   },
@@ -921,7 +911,8 @@
      "p": "a picturesque Yorkshire Dales village with stone cottages, a pub and a duck pond",
      "d": 3,
      "cap": "The village",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor"
     }
    ]
   },
@@ -958,14 +949,14 @@
     {
      "p": "four older women eating cheesecake around a kitchen table late at night in a Miami house with wicker furniture",
      "d": 1,
-     "cap": "Cheesecake at midnight",
-     "cand": true
+     "cap": "Cheesecake at midnight"
     },
     {
      "p": "a lanai with palm print",
      "d": 3,
      "cap": "The lanai",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (the-golden-girls-1 was picked)"
     }
    ]
   },
@@ -993,7 +984,8 @@
      "p": "a blue French horn on a wall",
      "d": 2,
      "cap": "The blue French horn",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor"
     }
    ]
   },
@@ -1035,7 +1027,8 @@
      "p": "a suburban Australian living room with a mother in tight lycra and her daughter on a fitness ball",
      "d": 3,
      "cap": "Look at moiye",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor"
     }
    ]
   },
@@ -1052,8 +1045,7 @@
     {
      "p": "police officers in an interview room with a tape machine, three detectives facing one suspect",
      "d": 3,
-     "cap": "The interview room",
-     "cand": true
+     "cap": "The interview room"
     }
    ]
   },
@@ -1071,7 +1063,8 @@
      "p": "a smashed black smartphone lying on a table",
      "d": 3,
      "cap": "The black mirror",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor"
     }
    ]
   },
@@ -1088,8 +1081,7 @@
     {
      "p": "a huge red mining spaceship drifting through deep space",
      "d": 3,
-     "cap": "The mining ship",
-     "cand": true
+     "cap": "The mining ship"
     }
    ]
   },
@@ -1106,14 +1098,14 @@
     {
      "p": "a lonely parochial house on a craggy Irish island, rain, a sheep",
      "d": 3,
-     "cap": "The parochial house",
-     "cand": true
+     "cap": "The parochial house"
     },
     {
      "p": "priests in a lingerie section",
      "d": 3,
      "cap": "Lost in the department store",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (father-ted-1 was picked)"
     }
    ]
   },
@@ -1130,8 +1122,7 @@
     {
      "p": "four teenagers in maroon school blazers walking past a sixth form college",
      "d": 3,
-     "cap": "The lads",
-     "cand": true
+     "cap": "The lads"
     }
    ]
   },
@@ -1148,8 +1139,7 @@
     {
      "p": "four teenage girls and a boy in school uniform in 1990s Derry",
      "d": 1,
-     "cap": "The gang",
-     "cand": true
+     "cap": "The gang"
     }
    ]
   },
@@ -1168,14 +1158,14 @@
     {
      "p": "a pineapple-shaped house under the sea next to a stone head-shaped house, jellyfish fields",
      "d": 3,
-     "cap": "Who lives in a pineapple",
-     "cand": true
+     "cap": "Who lives in a pineapple"
     },
     {
      "p": "an underwater burger restaurant shaped like a lobster trap",
      "d": 3,
      "cap": "The burger shack",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: not chosen (spongebob-squarepants-1 was picked)"
     }
    ]
   },
@@ -1192,8 +1182,7 @@
     {
      "p": "a little house on top of a round green hill, muddy puddles at the bottom",
      "d": 3,
-     "cap": "The house on the hill",
-     "cand": true
+     "cap": "The house on the hill"
     }
    ]
   },
@@ -1210,8 +1199,7 @@
     {
      "p": "bright green rolling hills with a baby-faced sun in the sky and real rabbits, a grass-covered dome home",
      "d": 3,
-     "cap": "The sun baby",
-     "cand": true
+     "cap": "The sun baby"
     }
    ]
   },
@@ -1239,7 +1227,8 @@
      "p": "a masked ghost being unmasked by teenagers",
      "d": 3,
      "cap": "The unmasking",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor — Missing vital character  scooby"
     }
    ]
   },
@@ -1275,8 +1264,7 @@
     {
      "p": "a toy shelf with a teddy, a rag doll and a clock beside a round window, a square window and an arched window",
      "d": 3,
-     "cap": "Through the windows",
-     "cand": true
+     "cap": "Through the windows"
     }
    ]
   },
@@ -1292,8 +1280,7 @@
     {
      "p": "two people in banana costumes wearing blue-and-white striped pyjamas coming down a staircase",
      "d": 3,
-     "cap": "Coming down the stairs",
-     "cand": true
+     "cap": "Coming down the stairs"
     }
    ]
   },
@@ -1330,8 +1317,7 @@
     {
      "p": "a black and white surreal scene: a door floating in starry space, a clock without hands, an eye and a window drifting in a spiral",
      "d": 2,
-     "cap": "Another dimension",
-     "cand": true
+     "cap": "Another dimension"
     }
    ]
   },
@@ -1348,8 +1334,7 @@
     {
      "p": "a 1960s suburban living room where a vacuum cleaner and dishes clean themselves in mid-air, a woman twitching her nose",
      "d": 3,
-     "cap": "A twitch of the nose",
-     "cand": true
+     "cap": "A twitch of the nose"
     }
    ]
   },
@@ -1366,8 +1351,7 @@
     {
      "p": "a 1950s Milwaukee diner with a jukebox, a man in a leather jacket hitting the jukebox with his fist to make it play",
      "d": 3,
-     "cap": "Hitting the jukebox",
-     "cand": true
+     "cap": "Hitting the jukebox"
     }
    ]
   },
@@ -1404,8 +1388,7 @@
     {
      "p": "an elegant Seattle apartment with a big window view of the Space Needle at night, a battered old recliner armchair among designer furniture",
      "d": 3,
-     "cap": "The recliner and the view",
-     "cand": true
+     "cap": "The recliner and the view"
     }
    ]
   },
@@ -1422,8 +1405,7 @@
     {
      "p": "a football coach with a moustache and a visor seen from behind sticking a hand-drawn sign on a locker room wall, an English football pitch outside, blank paper sign",
      "d": 3,
-     "cap": "Believe",
-     "cand": true
+     "cap": "Believe"
     }
    ]
   },
@@ -1440,8 +1422,7 @@
     {
      "p": "a woman vicar in a cassock jumping into a deep puddle that is actually a hole, splash, an English village churchyard",
      "d": 3,
-     "cap": "The puddle",
-     "cand": true
+     "cap": "The puddle"
     }
    ]
   },
@@ -1459,7 +1440,8 @@
      "p": "a prim woman in a hat with a candlelight supper set for guests in a neat suburban bungalow, a pink telephone",
      "d": 3,
      "cap": "The candlelight supper",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor"
     }
    ]
   },
@@ -1476,8 +1458,7 @@
     {
      "p": "midwives in blue uniforms riding bicycles through a 1950s East London street of terraced houses and washing lines",
      "d": 3,
-     "cap": "Midwives on bicycles",
-     "cand": true
+     "cap": "Midwives on bicycles"
     }
    ]
   },
@@ -1495,8 +1476,7 @@
     {
      "p": "a short dapper Belgian detective with a waxed moustache and a homburg hat seen from behind in an Art Deco London mansion block lobby",
      "d": 3,
-     "cap": "The little grey cells",
-     "cand": true
+     "cap": "The little grey cells"
     }
    ]
   },
@@ -1514,8 +1494,7 @@
     {
      "p": "a boy and a kangaroo in an Australian national park, a ranger station, gum trees",
      "d": 3,
-     "cap": "A boy and his kangaroo",
-     "cand": true
+     "cap": "A boy and his kangaroo"
     }
    ]
   },
@@ -1532,8 +1511,7 @@
     {
      "p": "two women on horseback mustering cattle on a dusty South Australian outback station",
      "d": 3,
-     "cap": "Drovers' Run",
-     "cand": true
+     "cap": "Drovers' Run"
     }
    ]
   },
@@ -1550,8 +1528,7 @@
     {
      "p": "a 1970s department store menswear floor with an old-fashioned lift and shop assistants lined up",
      "d": 3,
-     "cap": "I'm free!",
-     "cand": true
+     "cap": "I'm free!"
     }
    ]
   },
@@ -1570,8 +1547,7 @@
     {
      "p": "a French café in wartime 1940s with a waiter in an apron, a portrait painting hidden inside a giant sausage on the counter, plain walls",
      "d": 3,
-     "cap": "The cafe",
-     "cand": true
+     "cap": "The cafe"
     }
    ]
   },
@@ -1588,8 +1564,7 @@
     {
      "p": "a suburban couple digging up their front garden in Surbiton to grow vegetables, a pig and a goat, the neighbours aghast",
      "d": 2,
-     "cap": "Self-sufficient in Surbiton",
-     "cand": true
+     "cap": "Self-sufficient in Surbiton"
     }
    ]
   },
@@ -1608,8 +1583,7 @@
     {
      "p": "a glittering mirror ball over a ballroom dance floor with couples in sequinned ballgowns dancing",
      "d": 3,
-     "cap": "Keep dancing",
-     "cand": true
+     "cap": "Keep dancing"
     }
    ]
   },
@@ -1626,8 +1600,7 @@
     {
      "p": "surgeons in navy scrubs and caps in an operating theatre in a Seattle hospital, rain on the windows",
      "d": 1,
-     "cap": "Seattle Grace",
-     "cand": true
+     "cap": "Seattle Grace"
     }
    ]
   },
@@ -1647,7 +1620,8 @@
      "p": "a dreary paper company office in Slough with a man in a tie doing an awkward dance",
      "d": 1,
      "cap": "The dance",
-     "cand": true
+     "drop": true,
+     "dropWhy": "Aaron review 2026-10-17: poor — Too many arms"
     }
    ]
   },
@@ -1665,8 +1639,7 @@
     {
      "p": "two women in outrageous designer outfits drinking champagne and falling out of a car",
      "d": 3,
-     "cap": "Sweetie, darling",
-     "cand": true
+     "cap": "Sweetie, darling"
     }
    ]
   },
@@ -1683,8 +1656,7 @@
     {
      "p": "three elderly men rolling down a hill in a bathtub in the Yorkshire Dales",
      "d": 3,
-     "cap": "Downhill in a bathtub",
-     "cand": true
+     "cap": "Downhill in a bathtub"
     }
    ]
   },
@@ -1703,8 +1675,7 @@
     {
      "p": "a dark television studio with two chairs facing each other in a pool of light, blue spotlights sweeping a round stage",
      "d": 3,
-     "cap": "In the hot seat",
-     "cand": true
+     "cap": "In the hot seat"
     }
    ]
   },
@@ -1721,8 +1692,7 @@
     {
      "p": "a woman in a huge frilly pink tulle dress walking down a Paris street",
      "d": 3,
-     "cap": "The pink dress",
-     "cand": true
+     "cap": "The pink dress"
     }
    ]
   }
