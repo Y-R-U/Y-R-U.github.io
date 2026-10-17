@@ -87,18 +87,6 @@
    "d": 1
   },
   {
-   "id": "say-so-doja-cat",
-   "appleYear": 2020,
-   "album": "Say So (Original Version) [feat. Nicki Minaj] - Single",
-   "appleArtist": "Doja Cat",
-   "appleTitle": "Say So (feat. Nicki Minaj) [Original Version]",
-   "store": "US",
-   "kidsFloor": 1,
-   "year": 2020,
-   "d": 2,
-   "explicit": true
-  },
-  {
    "id": "wap-cardi-b",
    "appleYear": 2020,
    "album": "WAP (feat. Megan Thee Stallion) - Single",
@@ -649,7 +637,7 @@
    "appleTitle": "Bad Habit",
    "store": "US",
    "year": 2022,
-   "d": 3,
+   "d": 2,
    "explicit": true
   },
   {
@@ -1139,12 +1127,14 @@
   },
   {
    "id": "end-of-beginning-djo",
+   "chartYear": 2024,
+   "firstYear": 2022,
    "appleYear": 2024,
    "album": "DECIDE",
    "appleArtist": "Djo",
    "appleTitle": "End of Beginning",
    "store": "US",
-   "year": 2024,
+   "year": 2022,
    "d": 1
   },
   {

@@ -445,42 +445,6 @@
    "difficulty": 1
   },
   {
-   "id": "rude-boy-rihanna",
-   "name": "Rude Boy",
-   "group": "2010s",
-   "facts": {
-    "artist": "Rihanna",
-    "year": 2010,
-    "decade": "2010s",
-    "act": "Female solo artist"
-   },
-   "charts": {
-    "us": 15,
-    "uk": 14,
-    "au": 33
-   },
-   "artistCountry": "BRB",
-   "blurb": "\"Rude Boy\" by Rihanna, released in 2010. Year-end charts: the US #15, the UK #14, Australia #33.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e9/88/f8/e988f8ae-219b-8581-9a41-d8de95537559/mzaf_17042403963475929980.plus.aac.p.m4a",
-      "credit": "Rihanna: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/rude-boy/1440775689?i=1440775739&uo=4",
-      "apple": {
-       "trackId": 1440775739,
-       "url": "https://music.apple.com/us/album/rude-boy/1440775689?i=1440775739&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/b8/50/89/b850892e-9e83-99dd-f6d8-54fe7d764852/09UMGIM39077.rgb.jpg/300x300bb.jpg",
-       "term": "Rihanna Rude Boy"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "billionaire-travie-mccoy",
    "name": "Billionaire",
    "group": "2010s",
@@ -1870,7 +1834,7 @@
    "group": "2010s",
    "facts": {
     "artist": "Katy Perry",
-    "year": 2011,
+    "year": 2010,
     "decade": "2010s",
     "act": "Female solo artist"
    },
@@ -1879,7 +1843,7 @@
     "au": 15
    },
    "artistCountry": "USA",
-   "blurb": "\"E.T.\" by Katy Perry, released in 2011. Year-end charts: the US #4, Australia #15.",
+   "blurb": "\"E.T.\" by Katy Perry, released in 2010; year-end charts 2011: the US #4, Australia #15.",
    "media": {
     "audio": [
      {
@@ -5028,7 +4992,7 @@
    "group": "2010s",
    "facts": {
     "artist": "OMI",
-    "year": 2014,
+    "year": 2012,
     "decade": "2010s",
     "act": "Male solo artist"
    },
@@ -5038,7 +5002,7 @@
     "au": 2
    },
    "artistCountry": "JAM",
-   "blurb": "\"Cheerleader\" by OMI, released in 2014. Year-end charts: the US #11, the UK #2, Australia #2.",
+   "blurb": "\"Cheerleader\" by OMI, released in 2012; year-end charts 2015: the US #11, the UK #2, Australia #2.",
    "media": {
     "audio": [
      {
@@ -5502,7 +5466,7 @@
    "group": "2010s",
    "facts": {
     "artist": "Taylor Swift",
-    "year": 2015,
+    "year": 2014,
     "decade": "2010s",
     "act": "Female solo artist"
    },
@@ -5511,7 +5475,7 @@
     "au": 18
    },
    "artistCountry": "USA",
-   "blurb": "\"Bad Blood\" by Taylor Swift, released in 2015. Year-end charts: the US #15, Australia #18.",
+   "blurb": "\"Bad Blood\" by Taylor Swift, released in 2014; year-end charts 2015: the US #15, Australia #18.",
    "media": {
     "audio": [
      {
@@ -7944,7 +7908,7 @@
    "group": "2010s",
    "facts": {
     "artist": "Maroon 5",
-    "year": 2018,
+    "year": 2017,
     "decade": "2010s",
     "act": "Group or duo"
    },
@@ -7954,7 +7918,7 @@
     "au": 8
    },
    "artistCountry": "USA",
-   "blurb": "\"Girls Like You\" by Maroon 5, released in 2018. Year-end charts: the US #10, the UK #26, Australia #8.",
+   "blurb": "\"Girls Like You\" by Maroon 5, released in 2017; year-end charts 2018–2019: the US #10, the UK #26, Australia #8.",
    "media": {
     "audio": [
      {
@@ -9925,6 +9889,44 @@
     ]
    },
    "difficulty": 2
+  },
+  {
+   "id": "say-so-doja-cat",
+   "name": "Say So",
+   "group": "2010s",
+   "facts": {
+    "artist": "Doja Cat",
+    "year": 2019,
+    "decade": "2010s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 11,
+    "uk": 13,
+    "au": 10
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Say So\" by Doja Cat, released in 2019; year-end charts 2020: the US #11, the UK #13, Australia #10.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0f/ef/4f/0fef4f2e-9937-3553-ff43-abdb250de809/mzaf_2511003867975078888.plus.aac.p.m4a",
+      "credit": "Doja Cat: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/say-so-feat-nicki-minaj-original-version/1512329644?i=1512329645&uo=4",
+      "apple": {
+       "trackId": 1512329645,
+       "url": "https://music.apple.com/us/album/say-so-feat-nicki-minaj-original-version/1512329644?i=1512329645&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/0e/3a/bf/0e3abfd5-1c7a-b05f-4601-42c7bb1ff8a8/886448482680.jpg/300x300bb.jpg",
+       "term": "Doja Cat Say So"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2,
+   "explicit": true,
+   "kids": false
   }
  ],
  "questions": [],

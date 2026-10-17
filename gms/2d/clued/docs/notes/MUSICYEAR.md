@@ -117,3 +117,62 @@ tools/au_lists/artists.txt: Bob Marley's "No Woman, No Cry" was "Ángeles & Bob 
 musicyear_test all passed (10 known songs, 82 override items; fails 230× on the HEAD packs), au_test all passed,
 a_test 487/0, trio_test 174287/0, leak_scan 0, build_index 0 errors, c2_test 8 failures (the known history timeline
 ones).
+
+## Round 2 (2026-10-17): hand-checked disagreements
+Rule (manager): the earliest OFFICIAL release by the same act: a single, or an album track on a commercially released
+album. Ignore demos, live/bootleg, promo-only and tiny regional pressings; same-act re-recordings count as the same
+song. Each entry was checked against the song's Wikipedia article (infobox "Released", the album's release, the prose)
+plus Wikidata or MusicBrainz, and added as `hand: true` with a one-line `why`. Method: the 272 `disagree` songs were
+scored by Wikipedia infobox year + album-article year (scratch script, cache `~/.cache/clued-au/firstyear/wp.json`);
+86 candidates where Wikipedia matched Wikidata or MusicBrainz were read by hand. 80 entries added (156 overrides in all,
+164 pack items).
+
+Changed (old → new):
+- Singles released late in the year before their chart year: Teen Angel 1960→1959, Where or When 1960→1959, Michael
+  (Highwaymen) 1961→1960, Exodus 1961→1960, Hey! Baby 1962→1961, Pipeline 1963→1962, Georgy Girl 1967→1966, Green,
+  Green Grass of Home 1967→1966, For What It's Worth 1967→1966, Spooky 1968→1967, Rose Garden 1971→1970, Seasons in
+  the Sun 1974→1973, Love's Theme 1974→1973, Never Can Say Goodbye 1975→1974, Feelings 1975→1974, Convoy 1976→1975,
+  Mississippi 1976→1975, Don't Cry for Me Argentina 1977→1976, Torn Between Two Lovers 1977→1976, Love Is in the Air
+  1978→1977, Born to Be Alive 1979→1978, Brass in Pocket 1980→1979, Relax 1984→1983, Tell It to My Heart 1988→1987,
+  She Drives Me Crazy 1989→1988, Tears in Heaven 1992→1991, Finally 1992→1991, All for Love 1994→1993, Freestyler
+  2000→1999, Say My Name 2000→1999, Somebody to Love (Boogie Pimps) 2004→2003, So Sick 2006→2005, This Ain't a Scene
+  2007→2006, Push It 1988→1987 (B-side of "Tramp", 1987; not on the 1986 album edition).
+- Album tracks released as singles later: One (Three Dog Night) 1969→1968, Crystal Blue Persuasion 1969→1968, The
+  First Time Ever I Saw Your Face 1972→1969, You Make Me Feel Brand New 1974→1973, Band on the Run 1974→1973, Dancing
+  Machine 1974→1973, When I Need You 1977→1976, Knowing Me, Knowing You 1977→1976, When You're in Love with a Beautiful
+  Woman 1979→1978, Crying (Don McLean) 1980→1978, Antmusic 1981→1980, Rapture 1981→1980, Time After Time 1984→1983,
+  I Can't Wait 1986→1985, Toy Soldiers 1989→1988, How Am I Supposed to Live Without You 1990→1989, Freak Me 1993→1992,
+  Waterfalls 1995→1994, Boom Boom Boom 1995→1994, You're Still the One 1998→1997, Viva Forever 1998→1997, Kiss Me
+  (Sixpence) 1999→1997 (both packs), Jumpin', Jumpin' 2000→1999, With Arms Wide Open 2000→1999, Angel (Shaggy)
+  2001→2000, What's Luv? 2002→2001, Everytime 2004→2003, Because of You 2005→2004, I Write Sins Not Tragedies
+  2006→2005, What Goes Around... Comes Around 2007→2006, Rockstar 2007→2005, Rude Boy 2010→2009, E.T. 2011→2010, Bad
+  Blood 2015→2014, Girls Like You 2018→2017 (original on Red Pill Blues), Say So 2020→2019, End of Beginning 2024→2022.
+- Re-releases, re-charts, re-recordings: From a Jack to a King 1963→1957 (re-released 1962), Dedicated to the One I
+  Love (Shirelles) 1961→1959 (1959 single re-released 1961), Mickey 1982→1981, Down Under 1982→1981 (the 1980
+  self-released local B-side ignored), Take On Me 1985→1984 (Oct 1984 original; the hit is a re-recording), Walking
+  on Sunshine 1985→1983 (1983 album; the hit is a re-recording), Nothing's Gonna Change My Love for You 1987→1986
+  (independent label 1986, Europe 1986), Cha Cha Slide 2004→2000, Cheerleader (OMI, hits-2010s) 2014→2012 (2012
+  Oufah original).
+
+Kept, with the reason:
+- Jason Mraz — I'm Yours (2008): the 2005 release was a limited-edition demo EP (Extra Credit); studio single 2008.
+- Kid Cudi — Day 'n' Nite (2008): 2007 was a MySpace upload; commercial single Feb 2008.
+- Doechii — Anxiety (2025): 2019 was a YouTube demo; the official (re-recorded) release is March 2025.
+- Kevin Lyttle — Turn Me On (2003): Wikipedia mentions a 2002 soca original on a VP sublabel, but neither Wikidata
+  (2003) nor MusicBrainz (earliest 2003 in its recordings) confirms 2002.
+- Shaggy — Oh Carolina (1993): released Jan 1993 (the MusicBrainz 1992 is not backed by Wikipedia).
+- OMI — Cheerleader (Felix Jaehn Remix) in one-hit-wonders (2014): the item names the remix, released May 2014.
+- ATB, Topic and A7S — Your Love (9PM) (2021): a new song that samples ATB's 1998 "9 PM", not the same song.
+- Proud Mary (1969, single and album Jan 1969; 1968 is the recording year), Fernando (ABBA's own version March
+  1976; the 1975 recording was Frida's solo album), This Ole House (Shakin' Stevens released it in 1981), Killing Me
+  Softly (Roberta Flack's single 1973; 1972 is Lori Lieberman's), Hips Don't Lie (2006; not on the original 2005
+  Oral Fixation Vol. 2), Drake — Nice for What (2018; MusicBrainz 2016 is noise).
+- The other disagreements are covers dated by the composition, or single-source noise; unchanged.
+
+Pack moves (same rule): The First Time Ever I Saw Your Face → hits-1960s; Brass in Pocket, Crying → hits-1970s;
+How Am I Supposed to Live Without You → hits-1980s; Say My Name, Freestyler, Jumpin', Jumpin', With Arms Wide Open →
+hits-1990s; Rude Boy → hits-2000s; Say So → hits-2010s. 1950s years (Teen Angel, Where or When, Dedicated to the One
+I Love, From a Jack to a King) stay in hits-1960s. No song was dropped. Packs: 1960s 255, 1970s 254, 1980s 260,
+1990s 258, 2000s 259, 2010s 270, 2020s 143.
+Tests: musicyear_test (15 known songs, 164 override items) passed, au_test passed, a_test 487/0, trio_test 174287/0,
+leak_scan 0, build_index 0 errors, c2_test the 8 known history failures.

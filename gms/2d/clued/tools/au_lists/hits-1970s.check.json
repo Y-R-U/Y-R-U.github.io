@@ -25,9 +25,7 @@
   "1970 apple 1969 (earliest original 1969)  Beach Boys — Cottonfields  [20/20]",
   "1970 apple 1970 (earliest original 1967)  Diana Ross — Ain't No Mountain High Enough  [Diana Ross (1970)]",
   "1970 apple 1970 (earliest original 1968)  Clarence Carter — Patches  [Patches]",
-  "1971 apple 1971 (earliest original 1969)  Lynn Anderson — Rose Garden  [Lynn Anderson]",
   "1972 apple 1972 (earliest original 1900)  The Pipes and Drums and the Military Band of the Royal Scots Dragoon Guards — Amazing Grace  [The Best Year of My Life: 1972]",
-  "1972 apple 1972 (earliest original 1969)  Roberta Flack — The First Time Ever I Saw Your Face  [X-Men: Days of Future Past (Original Motion Picture Soundtrack)]",
   "1972 apple 1972 (earliest original 1968)  Sammy Davis Jr. — The Candy Man  [Now]",
   "1972 apple 1972 (earliest original 1900)  Looking Glass — Brandy (You're a Fine Girl)  [Looking Glass]",
   "1973 apple 1973 (earliest original 1970)  Roberta Flack — Killing Me Softly with His Song  [Killing Me Softly]",
@@ -38,17 +36,12 @@
   "1973 apple 1974 (earliest original 1974)  Alvin Stardust — My Coo Ca Choo  [My Coo-Ca-Choo]",
   "1973 apple 1972 (earliest original 1984)  Barry Blue — Dancin' (on a Saturday Night)  [Out of the Blue (50 Years of Discovery)]",
   "1973 apple 1973 (earliest original 1969)  Shirley Bassey — Never Never Never (Grande Grande Grande)  [20 of the Best]",
-  "1974 apple 1974 (earliest original 1971)  The Stylistics — You Make Me Feel Brand New  [Let's Put It All Together]",
   "1974 apple 1974 (earliest original 1972)  Ken Boothe — Everything I Own  [Everything I Own - Single]",
-  "1974 apple 1974 (earliest original 1972)  The Jackson 5 — Dancing Machine  [Dancing Machine]",
   "1975 apple 1975 (earliest original 1972)  Eagles — One of These Nights  [One of These Nights]",
   "1975 apple 1975 (earliest original 1900)  Van McCoy & the Soul City Symphony — The Hustle  [Disco Nights]",
-  "1976 apple 1975 (earliest original 1990)  C. W. McCall — Convoy  [C. W. McCall's Greatest Hits]",
   "1976 apple 1976 (earliest original 1900)  The Manhattans — Kiss and Say Goodbye  [The Manhattans (Expanded Version)]",
   "1976 apple 1976 (earliest original 1972)  Dr. Hook — A Little Bit More  [A Little Bit More]",
-  "1977 apple 1976 (earliest original -)  Julie Covington — Don't Cry for Me Argentina  [Unmasked: The Platinum Collection (Deluxe Version)]",
   "1976 apple 1976 (earliest original 1972)  Thelma Houston — Don't Leave Me This Way  [Any Way You Like It]",
-  "1977 apple 1976 (earliest original -)  Mary MacGregor — Torn Between Two Lovers  [Essential Love Ballads]",
   "1977 apple 1977 (earliest original 1972)  Elvis Presley — Way Down  [Moody Blue]",
   "1978 apple 1978 (earliest original 1900)  Boney M — Rivers of Babylon  [Rivers of Babylon]",
   "1978 apple 1977 (earliest original 2022)  Kate Bush — Wuthering Heights  [Molly: Counting Down the Hits]",
@@ -56,7 +49,6 @@
   "1979 apple 1979 (earliest original 1974)  M — Pop Muzik  [New York, London, Paris, Munich]",
   "1979 apple 1979 (earliest original 1974)  The Buggles — Video Killed the Radio Star  [The Age of Plastic]",
   "1978 apple 1978 (earliest original 1973)  Suzi Quatro & Chris Norman — Stumblin' In  [The Montreux Album (New Extended Version)]",
-  "1979 apple 1979 (earliest original 1977)  Dr. Hook — When You're in Love with a Beautiful Woman  [Completely Hooked - The Best of Dr. Hook]",
   "1979 apple 1979 (earliest original 1977)  Commodores — Still  [Truly: The Love Songs]"
  ],
  "items": [
@@ -402,12 +394,14 @@
   },
   {
    "id": "rose-garden-lynn-anderson",
+   "chartYear": 1971,
+   "firstYear": 1970,
    "appleYear": 1971,
    "album": "Lynn Anderson",
    "appleArtist": "Lynn Anderson",
    "appleTitle": "Rose Garden",
    "store": "US",
-   "year": 1971,
+   "year": 1970,
    "d": 2
   },
   {
@@ -586,16 +580,6 @@
    "album": "God Bless America",
    "appleArtist": "Bill Withers",
    "appleTitle": "Lean On Me (Single Version)",
-   "store": "US",
-   "year": 1972,
-   "d": 1
-  },
-  {
-   "id": "the-first-time-ever-i-saw-your-face-roberta-flack",
-   "appleYear": 1972,
-   "album": "X-Men: Days of Future Past (Original Motion Picture Soundtrack)",
-   "appleArtist": "Roberta Flack",
-   "appleTitle": "The First Time Ever I Saw Your Face",
    "store": "US",
    "year": 1972,
    "d": 1
@@ -1026,12 +1010,14 @@
   },
   {
    "id": "seasons-in-the-sun-terry-jacks",
+   "chartYear": 1974,
+   "firstYear": 1973,
    "appleYear": 1974,
    "album": "Radio Hits of the '70s",
    "appleArtist": "Terry Jacks",
    "appleTitle": "Seasons In the Sun",
    "store": "US",
-   "year": 1974,
+   "year": 1973,
    "d": 1
   },
   {
@@ -1086,12 +1072,14 @@
   },
   {
    "id": "you-make-me-feel-brand-new-the-stylistics",
+   "chartYear": 1974,
+   "firstYear": 1973,
    "appleYear": 1974,
    "album": "Let's Put It All Together",
    "appleArtist": "The Stylistics",
    "appleTitle": "You Make Me Feel Brand New",
    "store": "US",
-   "year": 1974,
+   "year": 1973,
    "d": 2
   },
   {
@@ -1166,12 +1154,14 @@
   },
   {
    "id": "band-on-the-run-paul-mccartney-and-wings",
+   "chartYear": 1974,
+   "firstYear": 1973,
    "appleYear": 1974,
    "album": "Wings Greatest",
    "appleArtist": "Paul McCartney & Wings",
    "appleTitle": "Band On the Run",
    "store": "US",
-   "year": 1974,
+   "year": 1973,
    "d": 2
   },
   {
@@ -1236,22 +1226,26 @@
   },
   {
    "id": "loves-theme-love-unlimited-orchestra",
+   "chartYear": 1974,
+   "firstYear": 1973,
    "appleYear": 1974,
    "album": "In Heat",
    "appleArtist": "The Love Unlimited Orchestra",
    "appleTitle": "Love's Theme",
    "store": "US",
-   "year": 1974,
+   "year": 1973,
    "d": 2
   },
   {
    "id": "dancing-machine-the-jackson-5",
+   "chartYear": 1974,
+   "firstYear": 1973,
    "appleYear": 1974,
    "album": "Dancing Machine",
    "appleArtist": "Jackson 5",
    "appleTitle": "Dancing Machine",
    "store": "US",
-   "year": 1974,
+   "year": 1973,
    "d": 2
   },
   {
@@ -1342,7 +1336,7 @@
    "appleTitle": "Fox On the Run",
    "store": "US",
    "year": 1974,
-   "d": 2
+   "d": 1
   },
   {
    "id": "mamma-mia-abba",
@@ -1466,12 +1460,14 @@
   },
   {
    "id": "never-can-say-goodbye-gloria-gaynor",
+   "chartYear": 1975,
+   "firstYear": 1974,
    "appleYear": 1975,
    "album": "Never Can Say Goodbye (Deluxe Edition)",
    "appleArtist": "Gloria Gaynor",
    "appleTitle": "Never Can Say Goodbye (Single Version)",
    "store": "US",
-   "year": 1975,
+   "year": 1974,
    "d": 2
   },
   {
@@ -1496,12 +1492,14 @@
   },
   {
    "id": "feelings-morris-albert",
+   "chartYear": 1975,
+   "firstYear": 1974,
    "appleYear": 1975,
    "album": "Feelings - Single",
    "appleArtist": "Morris Albert",
    "appleTitle": "Feelings",
    "store": "GB",
-   "year": 1975,
+   "year": 1974,
    "d": 3
   },
   {
@@ -1606,12 +1604,14 @@
   },
   {
    "id": "convoy-c-w-mccall",
+   "chartYear": 1976,
+   "firstYear": 1975,
    "appleYear": 1975,
    "album": "C. W. McCall's Greatest Hits",
    "appleArtist": "C.W. McCall",
    "appleTitle": "Convoy",
    "store": "US",
-   "year": 1976,
+   "year": 1975,
    "d": 1
   },
   {
@@ -1626,12 +1626,14 @@
   },
   {
    "id": "mississippi-pussycat",
+   "chartYear": 1976,
+   "firstYear": 1975,
    "appleYear": 1976,
    "album": "Mississippi - Single",
    "appleArtist": "Pussycat",
    "appleTitle": "Mississippi",
    "store": "US",
-   "year": 1976,
+   "year": 1975,
    "d": 2
   },
   {
@@ -1848,12 +1850,14 @@
   },
   {
    "id": "when-i-need-you-leo-sayer",
+   "chartYear": 1977,
+   "firstYear": 1976,
    "appleYear": 1977,
    "album": "Endless Flight",
    "appleArtist": "Leo Sayer",
    "appleTitle": "When I Need You (Remastered)",
    "store": "US",
-   "year": 1977,
+   "year": 1976,
    "d": 2
   },
   {
@@ -1868,12 +1872,14 @@
   },
   {
    "id": "dont-cry-for-me-argentina-julie-covington",
+   "chartYear": 1977,
+   "firstYear": 1976,
    "appleYear": 1976,
    "album": "Unmasked: The Platinum Collection (Deluxe Version)",
    "appleArtist": "Andrew Lloyd Webber, Julie Covington & Tim Rice",
    "appleTitle": "Don't Cry for Me Argentina",
    "store": "US",
-   "year": 1977,
+   "year": 1976,
    "d": 1
   },
   {
@@ -1938,12 +1944,14 @@
   },
   {
    "id": "torn-between-two-lovers-mary-macgregor",
+   "chartYear": 1977,
+   "firstYear": 1976,
    "appleYear": 1976,
    "album": "Essential Love Ballads",
    "appleArtist": "Mary MacGregor",
    "appleTitle": "Torn Between Two Lovers",
    "store": "US",
-   "year": 1977,
+   "year": 1976,
    "d": 2
   },
   {
@@ -2028,12 +2036,14 @@
   },
   {
    "id": "knowing-me-knowing-you-abba",
+   "chartYear": 1977,
+   "firstYear": 1976,
    "appleYear": 1977,
    "album": "ABBA Gold: Greatest Hits",
    "appleArtist": "ABBA",
    "appleTitle": "Knowing Me, Knowing You",
    "store": "US",
-   "year": 1977,
+   "year": 1976,
    "d": 2
   },
   {
@@ -2239,12 +2249,14 @@
   },
   {
    "id": "love-is-in-the-air-john-paul-young",
+   "chartYear": 1978,
+   "firstYear": 1977,
    "appleYear": 1978,
    "album": "Love Is in the Air",
    "appleArtist": "John Paul Young",
    "appleTitle": "Love Is in the Air",
    "store": "US",
-   "year": 1978,
+   "year": 1977,
    "d": 2
   },
   {
@@ -2420,12 +2432,14 @@
   },
   {
    "id": "when-youre-in-love-with-a-beautiful-woman-dr-hook",
+   "chartYear": 1979,
+   "firstYear": 1978,
    "appleYear": 1979,
    "album": "Completely Hooked - The Best of Dr. Hook",
    "appleArtist": "Dr. Hook",
    "appleTitle": "When You're In Love With a Beautiful Woman (Extend",
    "store": "US",
-   "year": 1979,
+   "year": 1978,
    "d": 2
   },
   {
@@ -2450,12 +2464,14 @@
   },
   {
    "id": "born-to-be-alive-patrick-hernandez",
+   "chartYear": 1979,
+   "firstYear": 1978,
    "appleYear": 1979,
    "album": "Born to Be Alive  (Extended Version) - Single",
    "appleArtist": "Patrick Hernandez",
    "appleTitle": "Born to Be Alive (Extended Version)",
    "store": "US",
-   "year": 1979,
+   "year": 1978,
    "d": 1
   },
   {
@@ -2605,6 +2621,30 @@
    "store": "US",
    "year": 1979,
    "d": 1
+  },
+  {
+   "id": "brass-in-pocket-the-pretenders",
+   "chartYear": 1980,
+   "firstYear": 1979,
+   "appleYear": 1980,
+   "album": "The Singles",
+   "appleArtist": "Pretenders",
+   "appleTitle": "Brass in Pocket (2018 Remaster)",
+   "store": "US",
+   "year": 1979,
+   "d": 2
+  },
+  {
+   "id": "crying-don-mclean",
+   "chartYear": 1980,
+   "firstYear": 1978,
+   "appleYear": 1980,
+   "album": "Favorites & Rarities",
+   "appleArtist": "Don Mclean",
+   "appleTitle": "Crying In the Chapel",
+   "store": "US",
+   "year": 1978,
+   "d": 2
   }
  ]
 }

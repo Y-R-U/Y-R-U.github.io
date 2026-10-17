@@ -44,6 +44,7 @@ YEAR | Artist | Title | us=1 uk=4 au=12 pv=8100 from=GBR/AUS | d=1; am=…; tm=�
   without a factsMeta entry and object values, and a factsMeta entry would let mc/odd/match word questions from them.
   LOCAL wave 2 ("charted in Australia", "made in …") reads `item.charts` / `item.artistCountry`. The blurb adds
   "Year-end charts: the US #1, Australia #12."
+- First-release years (re-releases, re-charts, album tracks issued as singles later): see docs/notes/MUSICYEAR.md (tools/music_firstyear.json overrides the chart year in au_resolve).
 - Year: the chart year, or Apple's original (non-compilation) album year when that is 1–3 years earlier in the same
   decade (December singles, album tracks released as singles later). A hand `note=keepyear` freezes it.
 

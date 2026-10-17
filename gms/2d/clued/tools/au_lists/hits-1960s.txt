@@ -281,3 +281,5 @@
 1970 | Shocking Blue | Venus | us=33 uk=- au=19 pv=13427 from=NLD | note=first released 1969, moved from hits-1970s
 1970 | The Jackson 5 | I Want You Back | us=28 uk=35 au=- pv=15080 from=USA | note=first released 1969, moved from hits-1970s
 2002 | Elvis vs JXL | A Little Less Conversation | us=- uk=5 au=5 pv=6672 from=USA | note=first released 1968, moved from hits-2000s
+
+1972 | Roberta Flack | The First Time Ever I Saw Your Face | us=1 uk=- au=8 pv=11322 from=USA | note=first released 1969, moved from hits-1970s

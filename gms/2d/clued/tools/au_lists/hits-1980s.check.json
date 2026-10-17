@@ -16,7 +16,6 @@
   "1980 apple 1980 (earliest original 1969)  Kool & The Gang — Celebration  [Celebrate!]",
   "1980 apple 1980 (earliest original 1976)  Leo Sayer — More Than I Can Say  [Play Soft Rock]",
   "1980 apple 1979 (earliest original 1979)  The Spinners — Working My Way Back to You/Forgive Me, Girl  [Smooth & Sweet: The Spinners]",
-  "1980 apple 1980 (earliest original 1972)  Don McLean — Crying  [Favorites & Rarities]",
   "1980 apple 1979 (earliest original 1979)  Rocky Burnette — Tired of Toein' the Line  [Tired of Toein' the Line - Single]",
   "1981 apple 1981 (earliest original 1973)  Earth, Wind & Fire — Let's Groove  [Raise!]",
   "1982 apple 1982 (earliest original 1966)  Michael Jackson — Billie Jean  [Thriller]",
@@ -28,11 +27,8 @@
   "1984 apple 1984 (earliest original 1977)  Foreigner — I Want to Know What Love Is  [Agent Provocateur]",
   "1985 apple 1985 (earliest original 1978)  Dire Straits — Money for Nothing  [Brothers in Arms (40th Anniversary)]",
   "1985 apple 1985 (earliest original 1972)  Dionne Warwick — That's What Friends Are For  [Friends]",
-  "1985 apple 1985 (earliest original 1983)  Katrina and the Waves — Walking on Sunshine  [Katrina and the Waves]",
   "1986 apple 1986 (earliest original 1981)  Kim Wilde — You Keep Me Hangin' On  [Another Step]",
-  "1986 apple 1986 (earliest original 1984)  Nu Shooz — I Can't Wait  [Poolside]",
   "1987 apple 1987 (earliest original 1970)  Michael Jackson — I Just Can't Stop Loving You  [Bad]",
-  "1988 apple 1987 (earliest original 1986)  Salt-n-Pepa — Push It  [20 #1's: Party Hits]",
   "1987 apple 1987 (earliest original 1980)  Eric Carmen — Hungry Eyes  [Dirty Dancing (Original Motion Picture Soundtrack)]",
   "1987 apple 1987 (earliest original 1985)  Sabrina — Boys (Summertime Love)  [Boys (Summertime Love) - Single]",
   "1988 apple 1987 (earliest original -)  Wet Wet Wet — With a Little Help from My Friends  [End of Part One - Their Greatest Hits]",
@@ -152,16 +148,6 @@
    "d": 2
   },
   {
-   "id": "brass-in-pocket-the-pretenders",
-   "appleYear": 1980,
-   "album": "The Singles",
-   "appleArtist": "Pretenders",
-   "appleTitle": "Brass in Pocket (2018 Remaster)",
-   "store": "US",
-   "year": 1980,
-   "d": 2
-  },
-  {
    "id": "the-tide-is-high-blondie",
    "appleYear": 1980,
    "album": "The Tide Is High - Single",
@@ -227,16 +213,6 @@
    "album": "New Clear Days",
    "appleArtist": "The Vapors",
    "appleTitle": "Turning Japanese (Non Stop Edit)",
-   "store": "US",
-   "year": 1980,
-   "d": 2
-  },
-  {
-   "id": "crying-don-mclean",
-   "appleYear": 1980,
-   "album": "Favorites & Rarities",
-   "appleArtist": "Don Mclean",
-   "appleTitle": "Crying In the Chapel",
    "store": "US",
    "year": 1980,
    "d": 2
@@ -434,12 +410,14 @@
   },
   {
    "id": "antmusic-adam-and-the-ants",
+   "chartYear": 1981,
+   "firstYear": 1980,
    "appleYear": 1981,
    "album": "The Essential 80s Rock",
    "appleArtist": "Adam & The Ants",
    "appleTitle": "Antmusic",
    "store": "US",
-   "year": 1981,
+   "year": 1980,
    "d": 2
   },
   {
@@ -474,12 +452,14 @@
   },
   {
    "id": "rapture-blondie",
+   "chartYear": 1981,
+   "firstYear": 1980,
    "appleYear": 1981,
    "album": "The Best of Blondie",
    "appleArtist": "Blondie",
    "appleTitle": "Rapture",
    "store": "US",
-   "year": 1981,
+   "year": 1980,
    "d": 2
   },
   {
@@ -574,12 +554,14 @@
   },
   {
    "id": "down-under-men-at-work",
+   "chartYear": 1982,
+   "firstYear": 1981,
    "appleYear": 1982,
    "album": "The Works",
    "appleArtist": "Men At Work",
    "appleTitle": "Down Under",
    "store": "US",
-   "year": 1982,
+   "year": 1981,
    "d": 1
   },
   {
@@ -594,12 +576,14 @@
   },
   {
    "id": "mickey-toni-basil",
+   "chartYear": 1982,
+   "firstYear": 1981,
    "appleYear": 1982,
    "album": "Mickey (Spanish Version) - Single",
    "appleArtist": "Toni Basil",
    "appleTitle": "Mickey (Spanish Version)",
    "store": "US",
-   "year": 1982,
+   "year": 1981,
    "d": 1
   },
   {
@@ -1161,13 +1145,15 @@
   },
   {
    "id": "relax-frankie-goes-to-hollywood",
+   "chartYear": 1984,
+   "firstYear": 1983,
    "appleYear": 1984,
    "album": "Maximum Joy",
    "appleArtist": "Frankie Goes to Hollywood",
    "appleTitle": "Relax (Club 69 Future Anthem Pt. 1)",
    "store": "US",
    "kidsFloor": 1,
-   "year": 1984,
+   "year": 1983,
    "d": 2
   },
   {
@@ -1192,12 +1178,14 @@
   },
   {
    "id": "time-after-time-cyndi-lauper",
+   "chartYear": 1984,
+   "firstYear": 1983,
    "appleYear": 1984,
    "album": "She's So Unusual: A 30th Anniversary Celebration (Deluxe Edition)",
    "appleArtist": "Cyndi Lauper",
    "appleTitle": "Time After Time",
    "store": "US",
-   "year": 1984,
+   "year": 1983,
    "d": 2
   },
   {
@@ -1332,12 +1320,14 @@
   },
   {
    "id": "take-on-me-a-ha",
+   "chartYear": 1985,
+   "firstYear": 1984,
    "appleYear": 1985,
    "album": "Hunting High and Low (Deluxe Edition)",
    "appleArtist": "a-ha",
    "appleTitle": "Take On Me",
    "store": "US",
-   "year": 1985,
+   "year": 1984,
    "d": 1
   },
   {
@@ -1348,7 +1338,7 @@
    "appleTitle": "Crazy for You",
    "store": "US",
    "year": 1985,
-   "d": 1
+   "d": 2
   },
   {
    "id": "shout-tears-for-fears",
@@ -1548,12 +1538,14 @@
   },
   {
    "id": "walking-on-sunshine-katrina-and-the-waves",
+   "chartYear": 1985,
+   "firstYear": 1983,
    "appleYear": 1985,
    "album": "Katrina and the Waves",
    "appleArtist": "Katrina and the Waves",
    "appleTitle": "Walking On Sunshine",
    "store": "US",
-   "year": 1985,
+   "year": 1983,
    "d": 2
   },
   {
@@ -1815,12 +1807,14 @@
   },
   {
    "id": "i-cant-wait-nu-shooz",
+   "chartYear": 1986,
+   "firstYear": 1985,
    "appleYear": 1986,
    "album": "Poolside",
    "appleArtist": "Nu Shooz",
    "appleTitle": "I Can't Wait",
    "store": "US",
-   "year": 1986,
+   "year": 1985,
    "d": 3
   },
   {
@@ -1965,12 +1959,14 @@
   },
   {
    "id": "nothings-gonna-change-my-love-for-you-glenn-medeiros",
+   "chartYear": 1987,
+   "firstYear": 1986,
    "appleYear": 1987,
    "album": "Nothing's Gonna Change My Love for You",
    "appleArtist": "Glenn Medeiros",
    "appleTitle": "Nothing's Gonna Change My Love for You",
    "store": "US",
-   "year": 1987,
+   "year": 1986,
    "d": 1
   },
   {
@@ -2165,12 +2161,14 @@
   },
   {
    "id": "tell-it-to-my-heart-taylor-dayne",
+   "chartYear": 1988,
+   "firstYear": 1987,
    "appleYear": 1988,
    "album": "Tell It to My Heart (Expanded Edition)",
    "appleArtist": "Taylor Dayne",
    "appleTitle": "Tell It to My Heart",
    "store": "US",
-   "year": 1988,
+   "year": 1987,
    "d": 3
   },
   {
@@ -2235,12 +2233,14 @@
   },
   {
    "id": "push-it-salt-n-pepa",
+   "chartYear": 1988,
+   "firstYear": 1987,
    "appleYear": 1987,
    "album": "20 #1's: Party Hits",
    "appleArtist": "Salt-N-Pepa",
    "appleTitle": "Push It (Single Version)",
    "store": "US",
-   "year": 1988,
+   "year": 1987,
    "d": 2
   },
   {
@@ -2487,12 +2487,14 @@
   },
   {
    "id": "she-drives-me-crazy-fine-young-cannibals",
+   "chartYear": 1989,
+   "firstYear": 1988,
    "appleYear": 1989,
    "album": "The Raw & the Cooked",
    "appleArtist": "Fine Young Cannibals",
    "appleTitle": "She Drives Me Crazy",
    "store": "US",
-   "year": 1989,
+   "year": 1988,
    "d": 2
   },
   {
@@ -2557,12 +2559,14 @@
   },
   {
    "id": "toy-soldiers-martika",
+   "chartYear": 1989,
+   "firstYear": 1988,
    "appleYear": 1989,
    "album": "Toy Soldiers - The Best of Martika",
    "appleArtist": "Martika",
    "appleTitle": "Toy Soldiers (Japanese Version)",
    "store": "US",
-   "year": 1989,
+   "year": 1988,
    "d": 2
   },
   {
@@ -2686,6 +2690,18 @@
    "store": "US",
    "year": 1985,
    "d": 1
+  },
+  {
+   "id": "how-am-i-supposed-to-live-without-you-michael-bolton",
+   "chartYear": 1990,
+   "firstYear": 1989,
+   "appleYear": 1989,
+   "album": "Soul Provider",
+   "appleArtist": "Michael Bolton",
+   "appleTitle": "How Am I Supposed to Live Without You",
+   "store": "US",
+   "year": 1989,
+   "d": 2
   }
  ]
 }

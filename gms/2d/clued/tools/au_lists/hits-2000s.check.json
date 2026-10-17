@@ -12,15 +12,11 @@
  ],
  "offby": [
   "2000 apple 1999 (earliest original 1999)  Sisqó — Thong Song  [Unleash the Dragon]",
-  "2000 apple 1999 (earliest original 1999)  Bomfunk MCs — Freestyler  [In Stereo]",
   "2001 apple 2001 (earliest original 1999)  City High — What Would You Do?  [City High (Expanded Edition)]",
   "2002 apple 2002 (earliest original 2000)  Las Ketchup — The Ketchup Song (Aserejé)  [Aserejé (The Ketchup Song) - Single]",
   "2003 apple 2003 (earliest original 2001)  Kevin Lyttle — Turn Me On  [Turn Me On - Single]",
   "2004 apple 2004 (earliest original 2001)  Destiny's Child — Lose My Breath  [Destiny Fulfilled]",
-  "2004 apple 2004 (earliest original 2000)  DJ Casper — Cha Cha Slide  [Cha Cha Slide - Single]",
-  "2004 apple 2004 (earliest original 1990)  Ciara — 1, 2 Step  [1,2 Step]",
-  "2006 apple 2005 (earliest original -)  Panic! at the Disco — I Write Sins Not Tragedies  [Rock Classics: The Collection]",
-  "2007 apple 2006 (earliest original 2005)  Nickelback — Rockstar  [The Best of Nickelback, Vol. 1]"
+  "2004 apple 2004 (earliest original 1990)  Ciara — 1, 2 Step  [1,2 Step]"
  ],
  "items": [
   {
@@ -39,16 +35,6 @@
    "album": "Oops!... I Did It Again (25th Anniversary Edition)",
    "appleArtist": "Britney Spears",
    "appleTitle": "Oops!...I Did It Again",
-   "store": "US",
-   "year": 2000,
-   "d": 1
-  },
-  {
-   "id": "say-my-name-destinys-child",
-   "appleYear": 2000,
-   "album": "Say My Name - EP",
-   "appleArtist": "Destiny's Child",
-   "appleTitle": "Say My Name (feat. Kobe Bryant)",
    "store": "US",
    "year": 2000,
    "d": 1
@@ -169,16 +155,6 @@
    "d": 2
   },
   {
-   "id": "freestyler-bomfunk-mcs",
-   "appleYear": 1999,
-   "album": "In Stereo",
-   "appleArtist": "Bomfunk MC's",
-   "appleTitle": "Freestyler",
-   "store": "US",
-   "year": 2000,
-   "d": 1
-  },
-  {
    "id": "rock-dj-robbie-williams",
    "appleYear": 2000,
    "album": "Sing When You're Winning",
@@ -204,16 +180,6 @@
    "album": "The Better Life",
    "appleArtist": "3 Doors Down",
    "appleTitle": "Kryptonite",
-   "store": "US",
-   "year": 2000,
-   "d": 2
-  },
-  {
-   "id": "jumpin-jumpin-destinys-child",
-   "appleYear": 2000,
-   "album": "Jumpin', Jumpin' - EP",
-   "appleArtist": "Destiny's Child",
-   "appleTitle": "Jumpin', Jumpin'",
    "store": "US",
    "year": 2000,
    "d": 2
@@ -258,16 +224,6 @@
    "year": 2000,
    "d": 2,
    "explicit": true
-  },
-  {
-   "id": "with-arms-wide-open-creed",
-   "appleYear": 2000,
-   "album": "Greatest Hits",
-   "appleArtist": "Creed",
-   "appleTitle": "With Arms Wide Open",
-   "store": "US",
-   "year": 2000,
-   "d": 2
   },
   {
    "id": "lady-marmalade-christina-aguilera-lil-kim-mya-and-p-nk",
@@ -322,12 +278,14 @@
   },
   {
    "id": "angel-shaggy",
+   "chartYear": 2001,
+   "firstYear": 2000,
    "appleYear": 2001,
    "album": "Angel - EP",
    "appleArtist": "Shaggy",
    "appleTitle": "Angel (Instrumental)",
    "store": "US",
-   "year": 2001,
+   "year": 2000,
    "d": 1
   },
   {
@@ -768,12 +726,14 @@
   },
   {
    "id": "whats-luv-fat-joe",
+   "chartYear": 2002,
+   "firstYear": 2001,
    "appleYear": 2002,
    "album": "What's Luv? (feat. Ashanti) - Single",
    "appleArtist": "Fat Joe",
    "appleTitle": "What's Luv? (feat. Ashanti)",
    "store": "US",
-   "year": 2002,
+   "year": 2001,
    "d": 2,
    "explicit": true
   },
@@ -1285,22 +1245,26 @@
   },
   {
    "id": "everytime-britney-spears",
+   "chartYear": 2004,
+   "firstYear": 2003,
    "appleYear": 2004,
    "album": "Everytime - EP",
    "appleArtist": "Britney Spears",
    "appleTitle": "Everytime (Dr. Octavo's Translucent Mixshow Edit)",
    "store": "US",
-   "year": 2004,
+   "year": 2003,
    "d": 2
   },
   {
    "id": "somebody-to-love-boogie-pimps",
+   "chartYear": 2004,
+   "firstYear": 2003,
    "appleYear": 2004,
    "album": "Somebody to Love",
    "appleArtist": "Boogie Pimps",
    "appleTitle": "Somebody to Love (Radio Edit)",
    "store": "US",
-   "year": 2004,
+   "year": 2003,
    "d": 2
   },
   {
@@ -1315,12 +1279,14 @@
   },
   {
    "id": "cha-cha-slide-dj-casper",
+   "chartYear": 2004,
+   "firstYear": 2000,
    "appleYear": 2004,
    "album": "Cha Cha Slide - Single",
    "appleArtist": "Robot Kids Electric, Mr. C & DJ Casper",
    "appleTitle": "Cha Cha Slide",
    "store": "US",
-   "year": 2004,
+   "year": 2000,
    "d": 1
   },
   {
@@ -1572,12 +1538,14 @@
   },
   {
    "id": "because-of-you-kelly-clarkson",
+   "chartYear": 2005,
+   "firstYear": 2004,
    "appleYear": 2005,
    "album": "Dance Vault Mixes: Because of You",
    "appleArtist": "Kelly Clarkson",
    "appleTitle": "Because of You (Jason Nevins Club with Intro Breakdown)",
    "store": "US",
-   "year": 2005,
+   "year": 2004,
    "d": 2
   },
   {
@@ -1696,12 +1664,14 @@
   },
   {
    "id": "so-sick-ne-yo",
+   "chartYear": 2006,
+   "firstYear": 2005,
    "appleYear": 2006,
    "album": "In My Own Words (Deluxe Edition)",
    "appleArtist": "Ne-Yo",
    "appleTitle": "So Sick (Instrumental)",
    "store": "US",
-   "year": 2006,
+   "year": 2005,
    "d": 2
   },
   {
@@ -1850,12 +1820,14 @@
   },
   {
    "id": "i-write-sins-not-tragedies-panic-at-the-disco",
+   "chartYear": 2006,
+   "firstYear": 2005,
    "appleYear": 2005,
    "album": "Rock Classics: The Collection",
    "appleArtist": "Panic! At the Disco",
    "appleTitle": "I Write Sins Not Tragedies (Edit)",
    "store": "GB",
-   "year": 2006,
+   "year": 2005,
    "d": 2
   },
   {
@@ -2004,12 +1976,14 @@
   },
   {
    "id": "what-goes-around-comes-around-justin-timberlake",
+   "chartYear": 2007,
+   "firstYear": 2006,
    "appleYear": 2007,
    "album": "What Goes Around...Comes Around - Single",
    "appleArtist": "Justin Timberlake",
    "appleTitle": "What Goes Around...Comes Around (Instrumental)",
    "store": "US",
-   "year": 2007,
+   "year": 2006,
    "d": 2
   },
   {
@@ -2025,12 +1999,14 @@
   },
   {
    "id": "this-aint-a-scene-its-an-arms-race-fall-out-boy",
+   "chartYear": 2007,
+   "firstYear": 2006,
    "appleYear": 2007,
    "album": "Infinity On High",
    "appleArtist": "Fall Out Boy",
    "appleTitle": "This Ain't A Scene, It's An Arms Race",
    "store": "US",
-   "year": 2007,
+   "year": 2006,
    "d": 2
   },
   {
@@ -2121,12 +2097,14 @@
   },
   {
    "id": "rockstar-nickelback",
+   "chartYear": 2007,
+   "firstYear": 2005,
    "appleYear": 2006,
    "album": "The Best of Nickelback, Vol. 1",
    "appleArtist": "Nickelback",
    "appleTitle": "Rockstar",
    "store": "US",
-   "year": 2007,
+   "year": 2005,
    "d": 1
   },
   {
@@ -2727,6 +2705,18 @@
    "appleTitle": "Breathe",
    "store": "US",
    "year": 1999,
+   "d": 2
+  },
+  {
+   "id": "rude-boy-rihanna",
+   "chartYear": 2010,
+   "firstYear": 2009,
+   "appleYear": 2009,
+   "album": "Rated R",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Rude Boy",
+   "store": "US",
+   "year": 2009,
    "d": 2
   }
  ]

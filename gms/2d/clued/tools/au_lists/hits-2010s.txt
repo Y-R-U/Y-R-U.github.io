@@ -14,7 +14,6 @@
 2010 | Lady Gaga | Telephone | us=16 uk=15 au=20 pv=8181 from=USA
 2010 | Rihanna | Only Girl (In the World) | us=40 uk=4 au=7 pv=5907 from=BRB
 2010 | Katy Perry | Teenage Dream | us=17 uk=32 au=9 pv=5641 from=USA
-2010 | Rihanna | Rude Boy | us=15 uk=14 au=33 pv=4357 from=BRB
 2010 | Travie McCoy | Billionaire | us=23 uk=23 au=30 pv=3162 from=USA
 2010 | Eminem | Not Afraid | us=24 uk=34 au=22 pv=3547 from=USA
 2010 | Justin Bieber | Baby | us=44 uk=47 au=35 pv=28381 from=CAN
@@ -281,3 +280,5 @@
 2019 | Harry Styles | Watermelon Sugar | us=20 uk=10 au=6 pv=7319 from=GBR | d=1; note=released 2019, moved from hits-2020s
 2019 | Harry Styles | Adore You | us=6 uk=16 au=11 pv=2836 from=GBR | note=released 2019, moved from hits-2020s
 2019 | Post Malone | Circles | us=2 uk=50 au=7 pv=3983 from=USA | note=released 2019, moved from hits-2020s
+
+2020 | Doja Cat | Say So | us=11 uk=13 au=10 pv=4884 from=USA | note=first released 2019, moved from hits-2020s

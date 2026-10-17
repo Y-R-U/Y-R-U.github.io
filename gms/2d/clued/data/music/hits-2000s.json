@@ -117,41 +117,6 @@
    "difficulty": 1
   },
   {
-   "id": "say-my-name-destinys-child",
-   "name": "Say My Name",
-   "group": "2000s",
-   "facts": {
-    "artist": "Destiny's Child",
-    "year": 2000,
-    "decade": "2000s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "us": 6,
-    "au": 5
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Say My Name\" by Destiny's Child, released in 2000. Year-end charts: the US #6, Australia #5.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/05/ef/f6/05eff600-67a3-b51c-0308-d60bec096e24/mzaf_2579965979958664714.plus.aac.p.m4a",
-      "credit": "Destiny's Child: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/say-my-name-feat-kobe-bryant/400079116?i=400079143&uo=4",
-      "apple": {
-       "trackId": 400079143,
-       "url": "https://music.apple.com/us/album/say-my-name-feat-kobe-bryant/400079116?i=400079143&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/17/1c/38/171c3806-789a-0ed1-6c71-ee077c7034de/mzi.dfdgaaof.jpg/300x300bb.jpg",
-       "term": "Destiny's Child Say My Name"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
    "id": "who-let-the-dogs-out-baha-men",
    "name": "Who Let the Dogs Out",
    "group": "2000s",
@@ -544,41 +509,6 @@
    "difficulty": 2
   },
   {
-   "id": "freestyler-bomfunk-mcs",
-   "name": "Freestyler",
-   "group": "2000s",
-   "facts": {
-    "artist": "Bomfunk MCs",
-    "year": 2000,
-    "decade": "2000s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "uk": 23,
-    "au": 3
-   },
-   "artistCountry": "FIN",
-   "blurb": "\"Freestyler\" by Bomfunk MCs, released in 2000. Year-end charts: the UK #23, Australia #3.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/80/d6/6b/80d66bdf-c9cb-9f8a-8377-2a7d51ae84a6/mzaf_5044420887548566846.plus.aac.p.m4a",
-      "credit": "Bomfunk MCs: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/freestyler/260654973?i=260655284&uo=4",
-      "apple": {
-       "trackId": 260655284,
-       "url": "https://music.apple.com/us/album/freestyler/260654973?i=260655284&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/b7/89/75/mzi.avnvijfg.jpg/300x300bb.jpg",
-       "term": "Bomfunk MC's Freestyler"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
    "id": "rock-dj-robbie-williams",
    "name": "Rock DJ",
    "group": "2000s",
@@ -676,41 +606,6 @@
        "url": "https://music.apple.com/us/album/kryptonite/1440664882?i=1440664900&uo=4",
        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/61/2a/58/612a58ca-af10-cc8f-07ef-b3368ebc9564/07UMGIM12238.rgb.jpg/300x300bb.jpg",
        "term": "3 Doors Down Kryptonite"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
-   "id": "jumpin-jumpin-destinys-child",
-   "name": "Jumpin', Jumpin'",
-   "group": "2000s",
-   "facts": {
-    "artist": "Destiny's Child",
-    "year": 2000,
-    "decade": "2000s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "us": 13,
-    "au": 17
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Jumpin', Jumpin'\" by Destiny's Child, released in 2000. Year-end charts: the US #13, Australia #17.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/bf/86/6f/bf866f36-c548-9f37-b142-174044ae5941/mzaf_14658302462469723856.plus.aac.p.m4a",
-      "credit": "Destiny's Child: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/jumpin-jumpin/400075587?i=400075589&uo=4",
-      "apple": {
-       "trackId": 400075589,
-       "url": "https://music.apple.com/us/album/jumpin-jumpin/400075587?i=400075589&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/80/e4/3f/mzi.xqedmdgy.jpg/300x300bb.jpg",
-       "term": "Destiny's Child Jumpin', Jumpin'"
       },
       "dur": 30
      }
@@ -861,41 +756,6 @@
    "difficulty": 2,
    "explicit": true,
    "kids": false
-  },
-  {
-   "id": "with-arms-wide-open-creed",
-   "name": "With Arms Wide Open",
-   "group": "2000s",
-   "facts": {
-    "artist": "Creed",
-    "year": 2000,
-    "decade": "2000s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "us": 36,
-    "au": 20
-   },
-   "artistCountry": "USA",
-   "blurb": "\"With Arms Wide Open\" by Creed, released in 2000. Year-end charts: the US #36, Australia #20.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b4/3e/a9/b43ea92f-0b34-9a29-d921-80e532309159/mzaf_13383524515543160021.plus.aac.p.m4a",
-      "credit": "Creed: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/with-arms-wide-open/1440717897?i=1440718229&uo=4",
-      "apple": {
-       "trackId": 1440718229,
-       "url": "https://music.apple.com/us/album/with-arms-wide-open/1440717897?i=1440718229&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d5/b4/ef/d5b4ef8a-a68f-223b-df91-16294395ffce/00601501410321.rgb.jpg/300x300bb.jpg",
-       "term": "Creed With Arms Wide Open"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
   },
   {
    "id": "lady-marmalade-christina-aguilera-lil-kim-mya-and-p-nk",
@@ -1087,7 +947,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Shaggy",
-    "year": 2001,
+    "year": 2000,
     "decade": "2000s",
     "act": "Male solo artist"
    },
@@ -1097,7 +957,7 @@
     "au": 4
    },
    "artistCountry": "JAM",
-   "blurb": "\"Angel\" by Shaggy, released in 2001. Year-end charts: the US #17, the UK #8, Australia #4.",
+   "blurb": "\"Angel\" by Shaggy, released in 2000; year-end charts 2001: the US #17, the UK #8, Australia #4.",
    "media": {
     "audio": [
      {
@@ -2655,7 +2515,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Fat Joe",
-    "year": 2002,
+    "year": 2001,
     "decade": "2000s",
     "act": "Male solo artist"
    },
@@ -2664,7 +2524,7 @@
     "au": 49
    },
    "artistCountry": "USA",
-   "blurb": "\"What's Luv?\" by Fat Joe, released in 2002. Year-end charts: the US #8, Australia #49.",
+   "blurb": "\"What's Luv?\" by Fat Joe, released in 2001; year-end charts 2002: the US #8, Australia #49.",
    "media": {
     "audio": [
      {
@@ -4438,7 +4298,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Britney Spears",
-    "year": 2004,
+    "year": 2003,
     "decade": "2000s",
     "act": "Female solo artist"
    },
@@ -4448,7 +4308,7 @@
     "au": 72
    },
    "artistCountry": "USA",
-   "blurb": "\"Everytime\" by Britney Spears, released in 2004. Year-end charts: the US #83, the UK #18, Australia #72.",
+   "blurb": "\"Everytime\" by Britney Spears, released in 2003; year-end charts 2004: the US #83, the UK #18, Australia #72.",
    "media": {
     "audio": [
      {
@@ -4474,7 +4334,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Boogie Pimps",
-    "year": 2004,
+    "year": 2003,
     "decade": "2000s",
     "act": "Group or duo"
    },
@@ -4483,7 +4343,7 @@
     "au": 53
    },
    "artistCountry": "DEU",
-   "blurb": "\"Somebody to Love\" by Boogie Pimps, released in 2004. Year-end charts: the UK #31, Australia #53.",
+   "blurb": "\"Somebody to Love\" by Boogie Pimps, released in 2003; year-end charts 2004: the UK #31, Australia #53.",
    "media": {
     "audio": [
      {
@@ -4548,7 +4408,7 @@
    "group": "2000s",
    "facts": {
     "artist": "DJ Casper",
-    "year": 2004,
+    "year": 2000,
     "decade": "2000s",
     "act": "Male solo artist"
    },
@@ -4556,7 +4416,7 @@
     "uk": 3
    },
    "artistCountry": "USA",
-   "blurb": "\"Cha Cha Slide\" by DJ Casper, released in 2004. Year-end charts: the UK #3.",
+   "blurb": "\"Cha Cha Slide\" by DJ Casper, released in 2000; year-end charts 2004: the UK #3.",
    "media": {
     "audio": [
      {
@@ -5464,7 +5324,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Kelly Clarkson",
-    "year": 2005,
+    "year": 2004,
     "decade": "2000s",
     "act": "Female solo artist"
    },
@@ -5474,7 +5334,7 @@
     "au": 58
    },
    "artistCountry": "USA",
-   "blurb": "\"Because of You\" by Kelly Clarkson, released in 2005. Year-end charts: the US #39, the UK #83, Australia #58.",
+   "blurb": "\"Because of You\" by Kelly Clarkson, released in 2004; year-end charts 2005–2006: the US #39, the UK #83, Australia #58.",
    "media": {
     "audio": [
      {
@@ -5911,7 +5771,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Ne-Yo",
-    "year": 2006,
+    "year": 2005,
     "decade": "2000s",
     "act": "Male solo artist"
    },
@@ -5921,7 +5781,7 @@
     "au": 28
    },
    "artistCountry": "USA",
-   "blurb": "\"So Sick\" by Ne-Yo, released in 2006. Year-end charts: the US #17, the UK #32, Australia #28.",
+   "blurb": "\"So Sick\" by Ne-Yo, released in 2005; year-end charts 2006: the US #17, the UK #32, Australia #28.",
    "media": {
     "audio": [
      {
@@ -6451,7 +6311,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Panic! at the Disco",
-    "year": 2006,
+    "year": 2005,
     "decade": "2000s",
     "act": "Group or duo"
    },
@@ -6460,7 +6320,7 @@
     "au": 50
    },
    "artistCountry": "USA",
-   "blurb": "\"I Write Sins Not Tragedies\" by Panic! at the Disco, released in 2006. Year-end charts: the US #20, Australia #50.",
+   "blurb": "\"I Write Sins Not Tragedies\" by Panic! at the Disco, released in 2005; year-end charts 2006: the US #20, Australia #50.",
    "media": {
     "audio": [
      {
@@ -7002,7 +6862,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Justin Timberlake",
-    "year": 2007,
+    "year": 2006,
     "decade": "2000s",
     "act": "Male solo artist"
    },
@@ -7012,7 +6872,7 @@
     "au": 31
    },
    "artistCountry": "USA",
-   "blurb": "\"What Goes Around... Comes Around\" by Justin Timberlake, released in 2007. Year-end charts: the US #22, the UK #28, Australia #31.",
+   "blurb": "\"What Goes Around... Comes Around\" by Justin Timberlake, released in 2006; year-end charts 2007: the US #22, the UK #28, Australia #31.",
    "media": {
     "audio": [
      {
@@ -7079,7 +6939,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Fall Out Boy",
-    "year": 2007,
+    "year": 2006,
     "decade": "2000s",
     "act": "Group or duo"
    },
@@ -7089,7 +6949,7 @@
     "au": 14
    },
    "artistCountry": "USA",
-   "blurb": "\"This Ain't a Scene, It's an Arms Race\" by Fall Out Boy, released in 2007. Year-end charts: the US #32, the UK #35, Australia #14.",
+   "blurb": "\"This Ain't a Scene, It's an Arms Race\" by Fall Out Boy, released in 2006; year-end charts 2007: the US #32, the UK #35, Australia #14.",
    "media": {
     "audio": [
      {
@@ -7418,7 +7278,7 @@
    "group": "2000s",
    "facts": {
     "artist": "Nickelback",
-    "year": 2007,
+    "year": 2005,
     "decade": "2000s",
     "act": "Group or duo"
    },
@@ -7427,7 +7287,7 @@
     "uk": 5
    },
    "artistCountry": "CAN",
-   "blurb": "\"Rockstar\" by Nickelback, released in 2007. Year-end charts: the US #36, the UK #5.",
+   "blurb": "\"Rockstar\" by Nickelback, released in 2005; year-end charts 2007–2008: the US #36, the UK #5.",
    "media": {
     "audio": [
      {
@@ -9567,6 +9427,42 @@
        "url": "https://music.apple.com/us/album/breathe/321981503?i=321981540&uo=4",
        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/d2/81/53/d281539a-05d9-c2c0-8c7e-457cab47ed7b/mzi.ltpnekph.jpg/300x300bb.jpg",
        "term": "Faith Hill Breathe"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rude-boy-rihanna",
+   "name": "Rude Boy",
+   "group": "2000s",
+   "facts": {
+    "artist": "Rihanna",
+    "year": 2009,
+    "decade": "2000s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 15,
+    "uk": 14,
+    "au": 33
+   },
+   "artistCountry": "BRB",
+   "blurb": "\"Rude Boy\" by Rihanna, released in 2009; year-end charts 2010: the US #15, the UK #14, Australia #33.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e9/88/f8/e988f8ae-219b-8581-9a41-d8de95537559/mzaf_17042403963475929980.plus.aac.p.m4a",
+      "credit": "Rihanna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/rude-boy/1440775689?i=1440775739&uo=4",
+      "apple": {
+       "trackId": 1440775739,
+       "url": "https://music.apple.com/us/album/rude-boy/1440775689?i=1440775739&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/b8/50/89/b850892e-9e83-99dd-f6d8-54fe7d764852/09UMGIM39077.rgb.jpg/300x300bb.jpg",
+       "term": "Rihanna Rude Boy"
       },
       "dur": 30
      }

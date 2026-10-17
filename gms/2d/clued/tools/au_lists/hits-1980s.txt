@@ -15,7 +15,6 @@
 1980 | John Lennon | (Just Like) Starting Over | us=4 uk=10 au=18 pv=3729 from=GBR
 1980 | Barbra Streisand | Woman in Love | us=35 uk=2 au=21 pv=5715 from=USA
 1980 | Pink Floyd | Another Brick in the Wall, Part II | us=2 uk=- au=4 pv=16700 from=GBR
-1980 | The Pretenders | Brass in Pocket | us=41 uk=35 au=5 pv=4163 from=GBR
 1980 | Blondie | The Tide Is High | us=17 uk=6 au=- pv=9947 from=USA
 1980 | ABBA | The Winner Takes It All | us=23 uk=18 au=- pv=17060 from=SWE
 1980 | Paul McCartney | Coming Up | us=7 uk=- au=22 pv=7943 from=GBR
@@ -23,7 +22,6 @@
 1980 | David Bowie | Ashes to Ashes | us=- uk=14 au=25 pv=6845 from=GBR
 1980 | The Spinners | Working My Way Back to You/Forgive Me, Girl | us=14 uk=11 au=- pv=3151 from=USA
 1980 | The Vapors | Turning Japanese | us=- uk=42 au=2 pv=6424 from=GBR
-1980 | Don McLean | Crying | us=40 uk=17 au=- pv=4177 from=USA
 1980 | The Police | Don't Stand So Close to Me | us=71 uk=1 au=- pv=6658 from=GBR
 1980 | Irene Cara | Fame | us=66 uk=2 au=- pv=4344 from=USA
 1980 | Rocky Burnette | Tired of Toein' the Line | us=48 uk=- au=11 pv=1076 from=USA
@@ -276,3 +274,5 @@
 1990 | Aerosmith | Janie's Got a Gun | us=61 uk=- au=19 pv=6141 from=USA | note=first released 1989, moved from hits-1990s
 1998 | Run–D.M.C. vs. Jason Nevins | It's Like That | us=- uk=3 au=2 pv=2787 from=USA | note=first released 1983, moved from hits-1990s
 2022 | Kate Bush | Running Up That Hill (A Deal with God) | us=23 uk=6 au=11 pv=35792 from=GBR | note=first released 1985, moved from hits-2020s
+
+1990 | Michael Bolton | How Am I Supposed to Live Without You | us=12 uk=28 au=7 pv=5857 from=USA | note=first released 1989, moved from hits-1990s

@@ -8,9 +8,7 @@
   "1972 apple 1972 (earliest original 1900)  Looking Glass — Brandy (You're a Fine Girl)  [Looking Glass]",
   "1979 apple 1979 (earliest original 1974)  The Buggles — Video Killed the Radio Star  [The Age of Plastic]",
   "1979 apple 1980 (earliest original 1980)  The Sugarhill Gang — Rapper's Delight  [Disco]",
-  "1981 apple 1982 (earliest original 1982)  Toni Basil — Mickey  [Mickey - Single]",
   "1982 apple 1982 (earliest original 1974)  Dexys Midnight Runners — Come On Eileen  [Too Rye Ay]",
-  "1999 apple 2000 (earliest original 1997)  Sixpence None the Richer — Kiss Me  [The Best of Sixpence None the Richer]",
   "2002 apple 2002 (earliest original 2000)  Las Ketchup — The Ketchup Song (Aserejé)  [Aserejé (The Ketchup Song) - Single]"
  ],
  "items": [
@@ -148,6 +146,8 @@
   },
   {
    "id": "mickey-toni-basil",
+   "chartYear": 1981,
+   "firstYear": 1981,
    "appleYear": 1982,
    "album": "Mickey - Single",
    "appleArtist": "Toni Basil",
@@ -407,12 +407,14 @@
   },
   {
    "id": "kiss-me-sixpence-none-the-richer",
+   "chartYear": 1999,
+   "firstYear": 1997,
    "appleYear": 2000,
    "album": "The Best of Sixpence None the Richer",
    "appleArtist": "Sixpence None the Richer",
    "appleTitle": "Kiss Me (Japanese Version)",
    "store": "US",
-   "year": 1999,
+   "year": 1997,
    "d": 1
   },
   {

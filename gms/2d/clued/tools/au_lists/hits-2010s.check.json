@@ -9,7 +9,6 @@
  ],
  "offby": [
   "2010 apple 2009 (earliest original 2009)  Lady Gaga — Telephone  [The Fame Monster (Deluxe Edition)]",
-  "2010 apple 2009 (earliest original 2009)  Rihanna — Rude Boy  [Rated R]",
   "2010 apple 2009 (earliest original 2009)  Mike Posner — Cooler Than Me  [Cooler Than Me - EP]",
   "2010 apple 2009 (earliest original 2009)  Lady Gaga — Alejandro  [The Fame Monster (Deluxe Edition)]",
   "2018 apple 2019 (earliest original 2019)  XXXTentacion — Sad!  [? (Deluxe)]",
@@ -127,16 +126,6 @@
    "store": "US",
    "year": 2010,
    "d": 1
-  },
-  {
-   "id": "rude-boy-rihanna",
-   "appleYear": 2009,
-   "album": "Rated R",
-   "appleArtist": "Rihanna",
-   "appleTitle": "Rude Boy",
-   "store": "US",
-   "year": 2010,
-   "d": 2
   },
   {
    "id": "billionaire-travie-mccoy",
@@ -527,12 +516,14 @@
   },
   {
    "id": "e-t-katy-perry",
+   "chartYear": 2011,
+   "firstYear": 2010,
    "appleYear": 2011,
    "album": "Teenage Dream: The Complete Confection",
    "appleArtist": "Katy Perry",
    "appleTitle": "E.T. (feat. Kanye West)",
    "store": "US",
-   "year": 2011,
+   "year": 2010,
    "d": 1
   },
   {
@@ -1417,12 +1408,14 @@
   },
   {
    "id": "cheerleader-omi",
+   "chartYear": 2015,
+   "firstYear": 2012,
    "appleYear": 2014,
    "album": "Verano 2016",
    "appleArtist": "Omi",
    "appleTitle": "Cheerleader",
    "store": "US",
-   "year": 2014,
+   "year": 2012,
    "d": 1
   },
   {
@@ -1552,12 +1545,14 @@
   },
   {
    "id": "bad-blood-taylor-swift",
+   "chartYear": 2015,
+   "firstYear": 2014,
    "appleYear": 2015,
    "album": "Bad Blood (feat. Kendrick Lamar) - Single",
    "appleArtist": "Taylor Swift",
    "appleTitle": "Bad Blood (feat. Kendrick Lamar)",
    "store": "US",
-   "year": 2015,
+   "year": 2014,
    "d": 1
   },
   {
@@ -2242,13 +2237,15 @@
   },
   {
    "id": "girls-like-you-maroon-5",
+   "chartYear": 2018,
+   "firstYear": 2017,
    "appleYear": 2018,
    "album": "Girls Like You (feat. Cardi B) - Single",
    "appleArtist": "Maroon 5",
    "appleTitle": "Girls Like You (feat. Cardi B)",
    "store": "US",
    "kidsFloor": 1,
-   "year": 2018,
+   "year": 2017,
    "d": 2,
    "explicit": true
   },
@@ -2813,6 +2810,20 @@
    "store": "US",
    "year": 2019,
    "d": 2
+  },
+  {
+   "id": "say-so-doja-cat",
+   "chartYear": 2020,
+   "firstYear": 2019,
+   "appleYear": 2020,
+   "album": "Say So (Original Version) [feat. Nicki Minaj] - Single",
+   "appleArtist": "Doja Cat",
+   "appleTitle": "Say So (feat. Nicki Minaj) [Original Version]",
+   "store": "US",
+   "kidsFloor": 1,
+   "year": 2019,
+   "d": 2,
+   "explicit": true
   }
  ]
 }

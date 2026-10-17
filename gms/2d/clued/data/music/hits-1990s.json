@@ -332,42 +332,6 @@
    "difficulty": 2
   },
   {
-   "id": "how-am-i-supposed-to-live-without-you-michael-bolton",
-   "name": "How Am I Supposed to Live Without You",
-   "group": "1990s",
-   "facts": {
-    "artist": "Michael Bolton",
-    "year": 1990,
-    "decade": "1990s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 12,
-    "uk": 28,
-    "au": 7
-   },
-   "artistCountry": "USA",
-   "blurb": "\"How Am I Supposed to Live Without You\" by Michael Bolton, released in 1990. Year-end charts: the US #12, the UK #28, Australia #7.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bf/5f/0a/bf5f0a77-eba2-e4da-0149-041ed7d43959/mzaf_17473234268883154456.plus.aac.p.m4a",
-      "credit": "Michael Bolton: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/how-am-i-supposed-to-live-without-you/157279141?i=157279456&uo=4",
-      "apple": {
-       "trackId": 157279456,
-       "url": "https://music.apple.com/us/album/how-am-i-supposed-to-live-without-you/157279141?i=157279456&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/7f/f1/ea/mzi.nbdfxooj.jpg/300x300bb.jpg",
-       "term": "Michael Bolton How Am I Supposed to Live Without You"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 1
-  },
-  {
    "id": "ive-been-thinking-about-you-londonbeat",
    "name": "I've Been Thinking About You",
    "group": "1990s",
@@ -2373,7 +2337,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Eric Clapton",
-    "year": 1992,
+    "year": 1991,
     "decade": "1990s",
     "act": "Male solo artist"
    },
@@ -2385,7 +2349,7 @@
     "GBR",
     "USA"
    ],
-   "blurb": "\"Tears in Heaven\" by Eric Clapton, released in 1992. Year-end charts: the US #6.",
+   "blurb": "\"Tears in Heaven\" by Eric Clapton, released in 1991; year-end charts 1992: the US #6.",
    "media": {
     "audio": [
      {
@@ -2480,7 +2444,7 @@
    "group": "1990s",
    "facts": {
     "artist": "CeCe Peniston",
-    "year": 1992,
+    "year": 1991,
     "decade": "1990s",
     "act": "Female solo artist"
    },
@@ -2489,7 +2453,7 @@
     "uk": 48
    },
    "artistCountry": "USA",
-   "blurb": "\"Finally\" by CeCe Peniston, released in 1992. Year-end charts: the US #20, the UK #48.",
+   "blurb": "\"Finally\" by CeCe Peniston, released in 1991; year-end charts 1992: the US #20, the UK #48.",
    "media": {
     "audio": [
      {
@@ -3175,7 +3139,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Silk",
-    "year": 1993,
+    "year": 1992,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -3184,7 +3148,7 @@
     "au": 15
    },
    "artistCountry": "USA",
-   "blurb": "\"Freak Me\" by Silk, released in 1993. Year-end charts: the US #5, Australia #15.",
+   "blurb": "\"Freak Me\" by Silk, released in 1992; year-end charts 1993: the US #5, Australia #15.",
    "media": {
     "audio": [
      {
@@ -3783,7 +3747,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Bryan Adams, Rod Stewart and Sting",
-    "year": 1994,
+    "year": 1993,
     "decade": "1990s"
    },
    "charts": {
@@ -3796,7 +3760,7 @@
     "CAN",
     "GBR"
    ],
-   "blurb": "\"All for Love\" by Bryan Adams, Rod Stewart and Sting, released in 1994. Year-end charts: the US #8, the UK #37, Australia #10.",
+   "blurb": "\"All for Love\" by Bryan Adams, Rod Stewart and Sting, released in 1993; year-end charts 1994: the US #8, the UK #37, Australia #10.",
    "media": {
     "audio": [
      {
@@ -3814,7 +3778,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "baby-i-love-your-way-big-mountain",
@@ -4530,7 +4494,7 @@
    "group": "1990s",
    "facts": {
     "artist": "TLC",
-    "year": 1995,
+    "year": 1994,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -4539,7 +4503,7 @@
     "uk": 29
    },
    "artistCountry": "USA",
-   "blurb": "\"Waterfalls\" by TLC, released in 1995. Year-end charts: the US #2, the UK #29.",
+   "blurb": "\"Waterfalls\" by TLC, released in 1994; year-end charts 1995: the US #2, the UK #29.",
    "media": {
     "audio": [
      {
@@ -5069,7 +5033,7 @@
    "group": "1990s",
    "facts": {
     "artist": "The Outhere Brothers",
-    "year": 1995,
+    "year": 1994,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -5078,7 +5042,7 @@
     "au": 13
    },
    "artistCountry": "USA",
-   "blurb": "\"Boom Boom Boom\" by The Outhere Brothers, released in 1995. Year-end charts: the UK #11, Australia #13.",
+   "blurb": "\"Boom Boom Boom\" by The Outhere Brothers, released in 1994; year-end charts 1995–1996: the UK #11, Australia #13.",
    "media": {
     "audio": [
      {
@@ -7469,7 +7433,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Shania Twain",
-    "year": 1998,
+    "year": 1997,
     "decade": "1990s",
     "act": "Female solo artist"
    },
@@ -7478,7 +7442,7 @@
     "au": 9
    },
    "artistCountry": "CAN",
-   "blurb": "\"You're Still the One\" by Shania Twain, released in 1998. Year-end charts: the US #3, Australia #9.",
+   "blurb": "\"You're Still the One\" by Shania Twain, released in 1997; year-end charts 1998: the US #3, Australia #9.",
    "media": {
     "audio": [
      {
@@ -7680,7 +7644,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Spice Girls",
-    "year": 1998,
+    "year": 1997,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -7689,7 +7653,7 @@
     "au": 23
    },
    "artistCountry": "GBR",
-   "blurb": "\"Viva Forever\" by Spice Girls, released in 1998. Year-end charts: the UK #13, Australia #23.",
+   "blurb": "\"Viva Forever\" by Spice Girls, released in 1997; year-end charts 1998: the UK #13, Australia #23.",
    "media": {
     "audio": [
      {
@@ -8512,7 +8476,7 @@
    "group": "1990s",
    "facts": {
     "artist": "Sixpence None the Richer",
-    "year": 1999,
+    "year": 1997,
     "decade": "1990s",
     "act": "Group or duo"
    },
@@ -8521,7 +8485,7 @@
     "au": 19
    },
    "artistCountry": "USA",
-   "blurb": "\"Kiss Me\" by Sixpence None the Richer, released in 1999. Year-end charts: the US #6, Australia #19.",
+   "blurb": "\"Kiss Me\" by Sixpence None the Richer, released in 1997; year-end charts 1999: the US #6, Australia #19.",
    "media": {
     "audio": [
      {
@@ -9175,6 +9139,146 @@
     ]
    },
    "difficulty": 1
+  },
+  {
+   "id": "say-my-name-destinys-child",
+   "name": "Say My Name",
+   "group": "1990s",
+   "facts": {
+    "artist": "Destiny's Child",
+    "year": 1999,
+    "decade": "1990s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 6,
+    "au": 5
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Say My Name\" by Destiny's Child, released in 1999; year-end charts 2000: the US #6, Australia #5.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/05/ef/f6/05eff600-67a3-b51c-0308-d60bec096e24/mzaf_2579965979958664714.plus.aac.p.m4a",
+      "credit": "Destiny's Child: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/say-my-name-feat-kobe-bryant/400079116?i=400079143&uo=4",
+      "apple": {
+       "trackId": 400079143,
+       "url": "https://music.apple.com/us/album/say-my-name-feat-kobe-bryant/400079116?i=400079143&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/17/1c/38/171c3806-789a-0ed1-6c71-ee077c7034de/mzi.dfdgaaof.jpg/300x300bb.jpg",
+       "term": "Destiny's Child Say My Name"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "freestyler-bomfunk-mcs",
+   "name": "Freestyler",
+   "group": "1990s",
+   "facts": {
+    "artist": "Bomfunk MCs",
+    "year": 1999,
+    "decade": "1990s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "uk": 23,
+    "au": 3
+   },
+   "artistCountry": "FIN",
+   "blurb": "\"Freestyler\" by Bomfunk MCs, released in 1999; year-end charts 2000: the UK #23, Australia #3.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/80/d6/6b/80d66bdf-c9cb-9f8a-8377-2a7d51ae84a6/mzaf_5044420887548566846.plus.aac.p.m4a",
+      "credit": "Bomfunk MCs: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/freestyler/260654973?i=260655284&uo=4",
+      "apple": {
+       "trackId": 260655284,
+       "url": "https://music.apple.com/us/album/freestyler/260654973?i=260655284&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/b7/89/75/mzi.avnvijfg.jpg/300x300bb.jpg",
+       "term": "Bomfunk MC's Freestyler"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jumpin-jumpin-destinys-child",
+   "name": "Jumpin', Jumpin'",
+   "group": "1990s",
+   "facts": {
+    "artist": "Destiny's Child",
+    "year": 1999,
+    "decade": "1990s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 13,
+    "au": 17
+   },
+   "artistCountry": "USA",
+   "blurb": "\"Jumpin', Jumpin'\" by Destiny's Child, released in 1999; year-end charts 2000: the US #13, Australia #17.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/bf/86/6f/bf866f36-c548-9f37-b142-174044ae5941/mzaf_14658302462469723856.plus.aac.p.m4a",
+      "credit": "Destiny's Child: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/jumpin-jumpin/400075587?i=400075589&uo=4",
+      "apple": {
+       "trackId": 400075589,
+       "url": "https://music.apple.com/us/album/jumpin-jumpin/400075587?i=400075589&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/80/e4/3f/mzi.xqedmdgy.jpg/300x300bb.jpg",
+       "term": "Destiny's Child Jumpin', Jumpin'"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "with-arms-wide-open-creed",
+   "name": "With Arms Wide Open",
+   "group": "1990s",
+   "facts": {
+    "artist": "Creed",
+    "year": 1999,
+    "decade": "1990s",
+    "act": "Group or duo"
+   },
+   "charts": {
+    "us": 36,
+    "au": 20
+   },
+   "artistCountry": "USA",
+   "blurb": "\"With Arms Wide Open\" by Creed, released in 1999; year-end charts 2000–2001: the US #36, Australia #20.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b4/3e/a9/b43ea92f-0b34-9a29-d921-80e532309159/mzaf_13383524515543160021.plus.aac.p.m4a",
+      "credit": "Creed: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/with-arms-wide-open/1440717897?i=1440718229&uo=4",
+      "apple": {
+       "trackId": 1440718229,
+       "url": "https://music.apple.com/us/album/with-arms-wide-open/1440717897?i=1440718229&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d5/b4/ef/d5b4ef8a-a68f-223b-df91-16294395ffce/00601501410321.rgb.jpg/300x300bb.jpg",
+       "term": "Creed With Arms Wide Open"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
   }
  ],
  "questions": [],

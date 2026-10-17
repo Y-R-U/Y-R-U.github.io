@@ -774,18 +774,18 @@
   {
    "id": "teen-angel-mark-dinning",
    "name": "Teen Angel",
-   "group": "1960s",
+   "group": "1950s",
    "facts": {
     "artist": "Mark Dinning",
-    "year": 1960,
-    "decade": "1960s",
+    "year": 1959,
+    "decade": "1950s",
     "act": "Male solo artist"
    },
    "charts": {
     "us": 5
    },
    "artistCountry": "USA",
-   "blurb": "\"Teen Angel\" by Mark Dinning, released in 1960. Year-end charts: the US #5.",
+   "blurb": "\"Teen Angel\" by Mark Dinning, released in 1959; year-end charts 1960: the US #5.",
    "media": {
     "audio": [
      {
@@ -876,17 +876,17 @@
   {
    "id": "where-or-when-dion-and-the-belmonts",
    "name": "Where or When",
-   "group": "1960s",
+   "group": "1950s",
    "facts": {
     "artist": "Dion and the Belmonts",
-    "year": 1960,
-    "decade": "1960s"
+    "year": 1959,
+    "decade": "1950s"
    },
    "charts": {
     "us": 21
    },
    "artistCountry": "USA",
-   "blurb": "\"Where or When\" by Dion and the Belmonts, released in 1960. Year-end charts: the US #21.",
+   "blurb": "\"Where or When\" by Dion and the Belmonts, released in 1959; year-end charts 1960: the US #21.",
    "media": {
     "audio": [
      {
@@ -1145,7 +1145,7 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 2
   },
   {
    "id": "michael-the-highwaymen",
@@ -1153,7 +1153,7 @@
    "group": "1960s",
    "facts": {
     "artist": "The Highwaymen",
-    "year": 1961,
+    "year": 1960,
     "decade": "1960s",
     "act": "Group or duo"
    },
@@ -1162,7 +1162,7 @@
     "au": 17
    },
    "artistCountry": "USA",
-   "blurb": "\"Michael\" by The Highwaymen, released in 1961. Year-end charts: the US #3, Australia #17.",
+   "blurb": "\"Michael\" by The Highwaymen, released in 1960; year-end charts 1961: the US #3, Australia #17.",
    "media": {
     "audio": [
      {
@@ -1608,18 +1608,18 @@
   {
    "id": "dedicated-to-the-one-i-love-the-shirelles",
    "name": "Dedicated to the One I Love",
-   "group": "1960s",
+   "group": "1950s",
    "facts": {
     "artist": "The Shirelles",
-    "year": 1961,
-    "decade": "1960s",
+    "year": 1959,
+    "decade": "1950s",
     "act": "Group or duo"
    },
    "charts": {
     "us": 14
    },
    "artistCountry": "USA",
-   "blurb": "\"Dedicated to the One I Love\" by The Shirelles, released in 1961. Year-end charts: the US #14.",
+   "blurb": "\"Dedicated to the One I Love\" by The Shirelles, released in 1959; year-end charts 1961: the US #14.",
    "media": {
     "audio": [
      {
@@ -1679,14 +1679,14 @@
    "group": "1960s",
    "facts": {
     "artist": "Ferrante & Teicher",
-    "year": 1961,
+    "year": 1960,
     "decade": "1960s"
    },
    "charts": {
     "us": 17
    },
    "artistCountry": "USA",
-   "blurb": "\"Exodus\" by Ferrante & Teicher, released in 1961. Year-end charts: the US #17.",
+   "blurb": "\"Exodus\" by Ferrante & Teicher, released in 1960; year-end charts 1961: the US #17.",
    "media": {
     "audio": [
      {
@@ -2339,7 +2339,7 @@
    "group": "1960s",
    "facts": {
     "artist": "Bruce Channel",
-    "year": 1962,
+    "year": 1961,
     "decade": "1960s",
     "act": "Male solo artist"
    },
@@ -2347,7 +2347,7 @@
     "us": 11
    },
    "artistCountry": "USA",
-   "blurb": "\"Hey! Baby\" by Bruce Channel, released in 1962. Year-end charts: the US #11.",
+   "blurb": "\"Hey! Baby\" by Bruce Channel, released in 1961; year-end charts 1962: the US #11.",
    "media": {
     "audio": [
      {
@@ -3024,7 +3024,7 @@
    "group": "1960s",
    "facts": {
     "artist": "The Chantays",
-    "year": 1963,
+    "year": 1962,
     "decade": "1960s",
     "act": "Group or duo"
    },
@@ -3033,7 +3033,7 @@
     "au": 5
    },
    "artistCountry": "USA",
-   "blurb": "\"Pipeline\" by The Chantays, released in 1963. Year-end charts: the US #21, Australia #5.",
+   "blurb": "\"Pipeline\" by The Chantays, released in 1962; year-end charts 1963: the US #21, Australia #5.",
    "media": {
     "audio": [
      {
@@ -3326,11 +3326,11 @@
   {
    "id": "from-a-jack-to-a-king-ned-miller",
    "name": "From a Jack to a King",
-   "group": "1960s",
+   "group": "1950s",
    "facts": {
     "artist": "Ned Miller",
-    "year": 1963,
-    "decade": "1960s",
+    "year": 1957,
+    "decade": "1950s",
     "act": "Male solo artist"
    },
    "charts": {
@@ -3338,7 +3338,7 @@
     "au": 4
    },
    "artistCountry": "USA",
-   "blurb": "\"From a Jack to a King\" by Ned Miller, released in 1963. Year-end charts: the US #63, Australia #4.",
+   "blurb": "\"From a Jack to a King\" by Ned Miller, released in 1957; year-end charts 1963: the US #63, Australia #4.",
    "media": {
     "audio": [
      {
@@ -6508,7 +6508,7 @@
    "group": "1960s",
    "facts": {
     "artist": "The Seekers",
-    "year": 1967,
+    "year": 1966,
     "decade": "1960s",
     "act": "Group or duo"
    },
@@ -6517,7 +6517,7 @@
     "au": 7
    },
    "artistCountry": "AUS",
-   "blurb": "\"Georgy Girl\" by The Seekers, released in 1967. Year-end charts: the US #57, Australia #7.",
+   "blurb": "\"Georgy Girl\" by The Seekers, released in 1966; year-end charts 1967: the US #57, Australia #7.",
    "media": {
     "audio": [
      {
@@ -6680,7 +6680,7 @@
    "group": "1960s",
    "facts": {
     "artist": "Tom Jones",
-    "year": 1967,
+    "year": 1966,
     "decade": "1960s",
     "act": "Male solo artist"
    },
@@ -6689,7 +6689,7 @@
     "au": 4
    },
    "artistCountry": "GBR",
-   "blurb": "\"Green, Green Grass of Home\" by Tom Jones, released in 1967. Year-end charts: the US #97, Australia #4.",
+   "blurb": "\"Green, Green Grass of Home\" by Tom Jones, released in 1966; year-end charts 1967: the US #97, Australia #4.",
    "media": {
     "audio": [
      {
@@ -6750,7 +6750,7 @@
    "group": "1960s",
    "facts": {
     "artist": "Buffalo Springfield",
-    "year": 1967,
+    "year": 1966,
     "decade": "1960s",
     "act": "Group or duo"
    },
@@ -6762,7 +6762,7 @@
     "USA",
     "CAN"
    ],
-   "blurb": "\"For What It's Worth\" by Buffalo Springfield, released in 1967. Year-end charts: the US #27.",
+   "blurb": "\"For What It's Worth\" by Buffalo Springfield, released in 1966; year-end charts 1967: the US #27.",
    "media": {
     "audio": [
      {
@@ -7760,7 +7760,7 @@
    "group": "1960s",
    "facts": {
     "artist": "Classics IV",
-    "year": 1968,
+    "year": 1967,
     "decade": "1960s",
     "act": "Group or duo"
    },
@@ -7768,7 +7768,7 @@
     "us": 26
    },
    "artistCountry": "USA",
-   "blurb": "\"Spooky\" by Classics IV, released in 1968. Year-end charts: the US #26.",
+   "blurb": "\"Spooky\" by Classics IV, released in 1967; year-end charts 1968: the US #26.",
    "media": {
     "audio": [
      {
@@ -8409,7 +8409,7 @@
    "group": "1960s",
    "facts": {
     "artist": "Three Dog Night",
-    "year": 1969,
+    "year": 1968,
     "decade": "1960s",
     "act": "Group or duo"
    },
@@ -8417,7 +8417,7 @@
     "us": 11
    },
    "artistCountry": "USA",
-   "blurb": "\"One\" by Three Dog Night, released in 1969. Year-end charts: the US #11.",
+   "blurb": "\"One\" by Three Dog Night, released in 1968; year-end charts 1969: the US #11.",
    "media": {
     "audio": [
      {
@@ -8585,14 +8585,14 @@
    "group": "1960s",
    "facts": {
     "artist": "Tommy James and the Shondells",
-    "year": 1969,
+    "year": 1968,
     "decade": "1960s"
    },
    "charts": {
     "us": 12
    },
    "artistCountry": "USA",
-   "blurb": "\"Crystal Blue Persuasion\" by Tommy James and the Shondells, released in 1969. Year-end charts: the US #12.",
+   "blurb": "\"Crystal Blue Persuasion\" by Tommy James and the Shondells, released in 1968; year-end charts 1969: the US #12.",
    "media": {
     "audio": [
      {
@@ -8813,6 +8813,41 @@
        "url": "https://music.apple.com/us/album/a-little-less-conversation/1280531136?i=1280531429&uo=4",
        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/67/d2/7c/67d27c53-3551-e88f-878c-e8a13de4baa5/886446728377.jpg/300x300bb.jpg",
        "term": "Elvis Presley A Little Less Conversation"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-first-time-ever-i-saw-your-face-roberta-flack",
+   "name": "The First Time Ever I Saw Your Face",
+   "group": "1960s",
+   "facts": {
+    "artist": "Roberta Flack",
+    "year": 1969,
+    "decade": "1960s",
+    "act": "Female solo artist"
+   },
+   "charts": {
+    "us": 1,
+    "au": 8
+   },
+   "artistCountry": "USA",
+   "blurb": "\"The First Time Ever I Saw Your Face\" by Roberta Flack, released in 1969; year-end charts 1972: the US #1, Australia #8.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b2/74/6a/b2746add-b6c2-3a1f-a3ae-2e1d3efbb2ad/mzaf_4636429205434789630.plus.aac.p.m4a",
+      "credit": "Roberta Flack: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-first-time-ever-i-saw-your-face/879524426?i=879524494&uo=4",
+      "apple": {
+       "trackId": 879524494,
+       "url": "https://music.apple.com/us/album/the-first-time-ever-i-saw-your-face/879524426?i=879524494&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/23/3d/35/233d35cd-5bb2-d44a-4edd-e046eb7ab076/886444498166.jpg/300x300bb.jpg",
+       "term": "Roberta Flack The First Time Ever I Saw Your Face"
       },
       "dur": 30
      }

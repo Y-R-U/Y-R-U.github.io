@@ -436,42 +436,6 @@
    "difficulty": 2
   },
   {
-   "id": "brass-in-pocket-the-pretenders",
-   "name": "Brass in Pocket",
-   "group": "1980s",
-   "facts": {
-    "artist": "The Pretenders",
-    "year": 1980,
-    "decade": "1980s",
-    "act": "Group or duo"
-   },
-   "charts": {
-    "us": 41,
-    "uk": 35,
-    "au": 5
-   },
-   "artistCountry": "GBR",
-   "blurb": "\"Brass in Pocket\" by The Pretenders, released in 1980. Year-end charts: the US #41, the UK #35, Australia #5.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/17/6c/ea/176ceaff-3474-9748-d6b2-f07e1ffa5e54/mzaf_17379207195030722326.plus.aac.p.m4a",
-      "credit": "The Pretenders: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/brass-in-pocket-2018-remaster/1829569257?i=1829569260&uo=4",
-      "apple": {
-       "trackId": 1829569260,
-       "url": "https://music.apple.com/us/album/brass-in-pocket-2018-remaster/1829569257?i=1829569260&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/9a/b0/25/9ab025d6-2f2f-7144-8127-7cf885273b4a/5021732635792.jpg/300x300bb.jpg",
-       "term": "Pretenders Brass in Pocket"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
    "id": "the-tide-is-high-blondie",
    "name": "The Tide Is High",
    "group": "1980s",
@@ -710,41 +674,6 @@
        "url": "https://music.apple.com/us/album/turning-japanese-non-stop-edit/1343833738?i=1343834082&uo=4",
        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/e7/4b/19/e74b191d-7703-ea08-9738-96c384272924/888072050648.jpg/300x300bb.jpg",
        "term": "The Vapors Turning Japanese"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2
-  },
-  {
-   "id": "crying-don-mclean",
-   "name": "Crying",
-   "group": "1980s",
-   "facts": {
-    "artist": "Don McLean",
-    "year": 1980,
-    "decade": "1980s",
-    "act": "Male solo artist"
-   },
-   "charts": {
-    "us": 40,
-    "uk": 17
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Crying\" by Don McLean, released in 1980. Year-end charts: the US #40, the UK #17.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b7/c7/1c/b7c71c81-7ae9-6c23-bfe2-2fee282c44f8/mzaf_11161294522457833540.plus.aac.p.m4a",
-      "credit": "Don McLean: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/crying-in-the-chapel/723758505?i=723758751&uo=4",
-      "apple": {
-       "trackId": 723758751,
-       "url": "https://music.apple.com/us/album/crying-in-the-chapel/723758505?i=723758751&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/dc/03/dd/dc03dd0b-430b-a919-9af1-2531c01178b0/13UABIM50642.rgb.jpg/300x300bb.jpg",
-       "term": "Don Mclean Crying In the Chapel"
       },
       "dur": 30
      }
@@ -1432,7 +1361,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Adam and the Ants",
-    "year": 1981,
+    "year": 1980,
     "decade": "1980s"
    },
    "charts": {
@@ -1440,7 +1369,7 @@
     "au": 3
    },
    "artistCountry": "GBR",
-   "blurb": "\"Antmusic\" by Adam and the Ants, released in 1981. Year-end charts: the UK #30, Australia #3.",
+   "blurb": "\"Antmusic\" by Adam and the Ants, released in 1980; year-end charts 1981: the UK #30, Australia #3.",
    "media": {
     "audio": [
      {
@@ -1570,7 +1499,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Blondie",
-    "year": 1981,
+    "year": 1980,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -1578,7 +1507,7 @@
     "us": 15
    },
    "artistCountry": "USA",
-   "blurb": "\"Rapture\" by Blondie, released in 1981. Year-end charts: the US #15.",
+   "blurb": "\"Rapture\" by Blondie, released in 1980; year-end charts 1981: the US #15.",
    "media": {
     "audio": [
      {
@@ -1921,7 +1850,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Men at Work",
-    "year": 1982,
+    "year": 1981,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -1931,7 +1860,7 @@
     "au": 24
    },
    "artistCountry": "AUS",
-   "blurb": "\"Down Under\" by Men at Work, released in 1982. Year-end charts: the US #4, the UK #7, Australia #24.",
+   "blurb": "\"Down Under\" by Men at Work, released in 1981; year-end charts 1982–1983: the US #4, the UK #7, Australia #24.",
    "media": {
     "audio": [
      {
@@ -1993,7 +1922,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Toni Basil",
-    "year": 1982,
+    "year": 1981,
     "decade": "1980s",
     "act": "Female solo artist"
    },
@@ -2003,7 +1932,7 @@
     "au": 6
    },
    "artistCountry": "USA",
-   "blurb": "\"Mickey\" by Toni Basil, released in 1982. Year-end charts: the US #36, the UK #13, Australia #6.",
+   "blurb": "\"Mickey\" by Toni Basil, released in 1981; year-end charts 1982–1983: the US #36, the UK #13, Australia #6.",
    "media": {
     "audio": [
      {
@@ -3995,7 +3924,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Frankie Goes to Hollywood",
-    "year": 1984,
+    "year": 1983,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -4004,7 +3933,7 @@
     "au": 16
    },
    "artistCountry": "GBR",
-   "blurb": "\"Relax\" by Frankie Goes to Hollywood, released in 1984. Year-end charts: the UK #3, Australia #16.",
+   "blurb": "\"Relax\" by Frankie Goes to Hollywood, released in 1983; year-end charts 1984: the UK #3, Australia #16.",
    "media": {
     "audio": [
      {
@@ -4101,7 +4030,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Cyndi Lauper",
-    "year": 1984,
+    "year": 1983,
     "decade": "1980s",
     "act": "Female solo artist"
    },
@@ -4110,7 +4039,7 @@
     "uk": 25
    },
    "artistCountry": "USA",
-   "blurb": "\"Time After Time\" by Cyndi Lauper, released in 1984. Year-end charts: the US #17, the UK #25.",
+   "blurb": "\"Time After Time\" by Cyndi Lauper, released in 1983; year-end charts 1984: the US #17, the UK #25.",
    "media": {
     "audio": [
      {
@@ -4589,7 +4518,7 @@
    "group": "1980s",
    "facts": {
     "artist": "a-ha",
-    "year": 1985,
+    "year": 1984,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -4599,7 +4528,7 @@
     "au": 12
    },
    "artistCountry": "NOR",
-   "blurb": "\"Take On Me\" by a-ha, released in 1985. Year-end charts: the US #10, the UK #9, Australia #12.",
+   "blurb": "\"Take On Me\" by a-ha, released in 1984; year-end charts 1985: the US #10, the UK #9, Australia #12.",
    "media": {
     "audio": [
      {
@@ -4653,7 +4582,7 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 2
   },
   {
    "id": "shout-tears-for-fears",
@@ -5338,7 +5267,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Katrina and the Waves",
-    "year": 1985,
+    "year": 1983,
     "decade": "1980s"
    },
    "charts": {
@@ -5346,7 +5275,7 @@
     "au": 21
    },
    "artistCountry": "GBR",
-   "blurb": "\"Walking on Sunshine\" by Katrina and the Waves, released in 1985. Year-end charts: the US #75, Australia #21.",
+   "blurb": "\"Walking on Sunshine\" by Katrina and the Waves, released in 1983; year-end charts 1985: the US #75, Australia #21.",
    "media": {
     "audio": [
      {
@@ -6270,7 +6199,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Nu Shooz",
-    "year": 1986,
+    "year": 1985,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -6279,7 +6208,7 @@
     "uk": 38
    },
    "artistCountry": "USA",
-   "blurb": "\"I Can't Wait\" by Nu Shooz, released in 1986. Year-end charts: the US #26, the UK #38.",
+   "blurb": "\"I Can't Wait\" by Nu Shooz, released in 1985; year-end charts 1986: the US #26, the UK #38.",
    "media": {
     "audio": [
      {
@@ -6806,7 +6735,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Glenn Medeiros",
-    "year": 1987,
+    "year": 1986,
     "decade": "1980s",
     "act": "Male solo artist"
    },
@@ -6816,7 +6745,7 @@
     "au": 36
    },
    "artistCountry": "USA",
-   "blurb": "\"Nothing's Gonna Change My Love for You\" by Glenn Medeiros, released in 1987. Year-end charts: the US #85, the UK #6, Australia #36.",
+   "blurb": "\"Nothing's Gonna Change My Love for You\" by Glenn Medeiros, released in 1986; year-end charts 1987–1988: the US #85, the UK #6, Australia #36.",
    "media": {
     "audio": [
      {
@@ -7519,7 +7448,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Taylor Dayne",
-    "year": 1988,
+    "year": 1987,
     "decade": "1980s",
     "act": "Female solo artist"
    },
@@ -7529,7 +7458,7 @@
     "au": 43
    },
    "artistCountry": "USA",
-   "blurb": "\"Tell It to My Heart\" by Taylor Dayne, released in 1988. Year-end charts: the US #53, the UK #23, Australia #43.",
+   "blurb": "\"Tell It to My Heart\" by Taylor Dayne, released in 1987; year-end charts 1988: the US #53, the UK #23, Australia #43.",
    "media": {
     "audio": [
      {
@@ -7775,7 +7704,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Salt-n-Pepa",
-    "year": 1988,
+    "year": 1987,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -7784,7 +7713,7 @@
     "au": 29
    },
    "artistCountry": "USA",
-   "blurb": "\"Push It\" by Salt-n-Pepa, released in 1988. Year-end charts: the UK #15, Australia #29.",
+   "blurb": "\"Push It\" by Salt-n-Pepa, released in 1987; year-end charts 1988: the UK #15, Australia #29.",
    "media": {
     "audio": [
      {
@@ -8671,7 +8600,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Fine Young Cannibals",
-    "year": 1989,
+    "year": 1988,
     "decade": "1980s",
     "act": "Group or duo"
    },
@@ -8680,7 +8609,7 @@
     "au": 6
    },
    "artistCountry": "GBR",
-   "blurb": "\"She Drives Me Crazy\" by Fine Young Cannibals, released in 1989. Year-end charts: the US #18, Australia #6.",
+   "blurb": "\"She Drives Me Crazy\" by Fine Young Cannibals, released in 1988; year-end charts 1989: the US #18, Australia #6.",
    "media": {
     "audio": [
      {
@@ -8924,7 +8853,7 @@
    "group": "1980s",
    "facts": {
     "artist": "Martika",
-    "year": 1989,
+    "year": 1988,
     "decade": "1980s",
     "act": "Female solo artist"
    },
@@ -8933,7 +8862,7 @@
     "au": 30
    },
    "artistCountry": "USA",
-   "blurb": "\"Toy Soldiers\" by Martika, released in 1989. Year-end charts: the US #29, Australia #30.",
+   "blurb": "\"Toy Soldiers\" by Martika, released in 1988; year-end charts 1989: the US #29, Australia #30.",
    "media": {
     "audio": [
      {
@@ -9346,6 +9275,42 @@
     ]
    },
    "difficulty": 1
+  },
+  {
+   "id": "how-am-i-supposed-to-live-without-you-michael-bolton",
+   "name": "How Am I Supposed to Live Without You",
+   "group": "1980s",
+   "facts": {
+    "artist": "Michael Bolton",
+    "year": 1989,
+    "decade": "1980s",
+    "act": "Male solo artist"
+   },
+   "charts": {
+    "us": 12,
+    "uk": 28,
+    "au": 7
+   },
+   "artistCountry": "USA",
+   "blurb": "\"How Am I Supposed to Live Without You\" by Michael Bolton, released in 1989; year-end charts 1990: the US #12, the UK #28, Australia #7.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bf/5f/0a/bf5f0a77-eba2-e4da-0149-041ed7d43959/mzaf_17473234268883154456.plus.aac.p.m4a",
+      "credit": "Michael Bolton: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/how-am-i-supposed-to-live-without-you/157279141?i=157279456&uo=4",
+      "apple": {
+       "trackId": 157279456,
+       "url": "https://music.apple.com/us/album/how-am-i-supposed-to-live-without-you/157279141?i=157279456&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/7f/f1/ea/mzi.nbdfxooj.jpg/300x300bb.jpg",
+       "term": "Michael Bolton How Am I Supposed to Live Without You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
   }
  ],
  "questions": [],

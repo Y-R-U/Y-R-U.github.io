@@ -5,7 +5,6 @@
 # chart column: best year-end position us/uk/au (- = not on that year-end chart), pv = monthly Wikipedia views of the song, from = artist country (Wikidata ISO3)
 2000 | Madonna | Music | us=17 uk=24 au=4 pv=6732 from=USA
 2000 | Britney Spears | Oops!...I Did It Again | us=55 uk=15 au=35 pv=10354 from=USA | d=1; tm=oops
-2000 | Destiny's Child | Say My Name | us=6 uk=- au=5 pv=7770 from=USA
 2000 | Baha Men | Who Let the Dogs Out | us=- uk=4 au=22 pv=13242 from=BHS | d=1
 2000 | *NSYNC | Bye Bye Bye | us=21 uk=- au=7 pv=12018 from=USA | am=sync
 2000 | Lifehouse | Hanging by a Moment | us=1 uk=- au=5 pv=3369 from=USA
@@ -17,18 +16,15 @@
 2000 | Eminem | Stan | us=- uk=6 au=6 pv=21558 from=USA
 2000 | Destiny's Child | Independent Women Part I | us=10 uk=25 au=57 pv=3354 from=USA
 2000 | Spiller | Groovejet (If This Ain't Love) | us=- uk=8 au=9 pv=4560 from=ITA
-2000 | Bomfunk MCs | Freestyler | us=- uk=23 au=3 pv=6873 from=FIN
 2000 | Sonique | It Feels So Good | us=34 uk=3 au=84 pv=4402 from=GBR
 2000 | Bob the Builder | Can We Fix It? | us=- uk=1 au=9 pv=1760 from=GBR
 2000 | Robbie Williams | Rock DJ | us=- uk=5 au=21 pv=3430 from=GBR
 2000 | Madonna | American Pie | us=- uk=19 au=66 pv=51171 from=USA
 2000 | 3 Doors Down | Kryptonite | us=15 uk=- au=41 pv=11668 from=USA
-2000 | Destiny's Child | Jumpin', Jumpin' | us=13 uk=- au=17 pv=3325 from=USA
 2000 | Craig David | Fill Me In | us=37 uk=10 au=68 pv=1334 from=GBR
 2000 | All Saints | Pure Shores | us=- uk=2 au=43 pv=5213 from=GBR
 2000 | Craig David | 7 Days | us=52 uk=17 au=58 pv=2062 from=GBR
 2000 | Eminem | The Real Slim Shady | us=51 uk=14 au=- pv=10137 from=USA
-2000 | Creed | With Arms Wide Open | us=36 uk=- au=20 pv=4544 from=USA
 2001 | Christina Aguilera, Lil' Kim, Mýa & P!nk | Lady Marmalade | us=24 uk=14 au=13 pv=23581 from=USA | am=aguilera; kids=0
 2001 | Nickelback | How You Remind Me | us=1 uk=12 au=18 pv=8337 from=CAN
 2001 | Kylie Minogue | Can't Get You Out of My Head | us=45 uk=3 au=3 pv=14636 from=AUS/GBR | d=1
@@ -276,3 +272,5 @@
 2009 | Train | Hey, Soul Sister | us=3 uk=84 au=4 pv=8950 from=USA | note=released 2009, moved from hits-2010s
 2009 | Kesha | TiK ToK | us=1 uk=45 au=- pv=16670 from=USA | tm=tik ?tok; note=released 2009, moved from hits-2010s
 1999 | Faith Hill | Breathe | us=1 uk=- au=- pv=2326 from=USA | note=released 1999; stays in hits-2000s (hits-1990s has The Prodigy's "Breathe")
+
+2010 | Rihanna | Rude Boy | us=15 uk=14 au=33 pv=4357 from=BRB | note=first released 2009, moved from hits-2010s

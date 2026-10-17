@@ -59,7 +59,6 @@
 1972 | Elton John | Crocodile Rock | us=7 uk=- au=5 pv=4850 from=GBR
 1972 | Bill Withers | Lean on Me | us=7 uk=- au=- pv=8395 from=USA | d=1
 1972 | The Pipes and Drums and the Military Band of the Royal Scots Dragoon Guards | Amazing Grace | us=- uk=1 au=10 pv=32592
-1972 | Roberta Flack | The First Time Ever I Saw Your Face | us=1 uk=- au=8 pv=11322 from=USA
 1972 | Donny Osmond | Puppy Love | us=67 uk=3 au=1 pv=1876 from=USA
 1972 | Dr. Hook & the Medicine Show | Sylvia's Mother | us=64 uk=20 au=15 pv=3939 from=USA
 1972 | Melanie | Brand New Key | us=9 uk=- au=11 pv=7113 from=USA
@@ -278,3 +277,6 @@
 
 1979 | Queen | Crazy Little Thing Called Love | us=6 uk=25 au=3 pv=9213 from=GBR | note=released 1979, moved from hits-1980s
 1979 | Michael Jackson | Rock with You | us=4 uk=- au=- pv=12372 from=USA | note=released 1979, moved from hits-1980s
+
+1980 | The Pretenders | Brass in Pocket | us=41 uk=35 au=5 pv=4163 from=GBR | note=first released 1979, moved from hits-1980s
+1980 | Don McLean | Crying | us=40 uk=17 au=- pv=4177 from=USA | note=first released 1978, moved from hits-1980s

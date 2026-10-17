@@ -1,13 +1,13 @@
 // Shared game flow: build questions from a spec, preflight media, run them, go to results.
-import { buildQuestions } from '../core/spec.js?v=202610170717';
-import { getFormat } from '../formats/registry.js?v=202610170717';
-import { urlsOf, preflight, swapFailed, questionFailed } from '../core/media.js?v=202610170717';
-import { createRunner } from './runner.js?v=202610170717';
-import { defineScreen, go, back, current } from '../ui/app.js?v=202610170717';
-import { h } from '../ui/kit.js?v=202610170717';
-import { toast } from '../ui/popup.js?v=202610170717';
-import { getSettings } from '../core/store.js?v=202610170717';
-import { freshFrom } from '../core/fresh.js?v=202610170717';
+import { buildQuestions } from '../core/spec.js?v=202610170738';
+import { getFormat } from '../formats/registry.js?v=202610170738';
+import { urlsOf, preflight, swapFailed, questionFailed } from '../core/media.js?v=202610170738';
+import { createRunner } from './runner.js?v=202610170738';
+import { defineScreen, go, back, current } from '../ui/app.js?v=202610170738';
+import { h } from '../ui/kit.js?v=202610170738';
+import { toast } from '../ui/popup.js?v=202610170738';
+import { getSettings } from '../core/store.js?v=202610170738';
+import { freshFrom } from '../core/fresh.js?v=202610170738';
 
 const TIPS = [
   'Keys 1–6 pick an answer, Enter moves on.',

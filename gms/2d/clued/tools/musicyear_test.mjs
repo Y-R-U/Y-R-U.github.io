@@ -28,6 +28,12 @@ const KNOWN = [
   ['Norman Greenbaum', 'Spirit in the Sky', 1969, 'hits-1960s'],
   ['Lizzo', 'Good as Hell', 2016, 'hits-2010s'],                                 // 2019 re-release
   ['Fleetwood Mac', 'Go Your Own Way', 1976, 'hits-1970s'],
+  // round 2 (hand-checked against Wikipedia): album tracks and re-recordings
+  ['Katrina and the Waves', 'Walking on Sunshine', 1983, 'hits-1980s'],      // 1983 album; the 1985 hit is a re-recording
+  ['a-ha', 'Take On Me', 1984, 'hits-1980s'],                                // first released Oct 1984
+  ["Destiny's Child", 'Say My Name', 1999, 'hits-1990s'],
+  ['Sixpence None the Richer', 'Kiss Me', 1997, 'one-hit-wonders'],           // 1997 album, 1999 film revival
+  ['Men at Work', 'Down Under', 1981, 'hits-1980s'],                          // 1980 local B-side ignored
 ];
 for (const [artist, title, year, pack] of KNOWN) {
   const hit = find(artist, title).find((x) => x.pack === pack);
@@ -43,7 +49,7 @@ const OV = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools/music_firstyear.jso
 let applied = 0;
 for (const [key, o] of Object.entries(OV)) {
   const [artist, title] = key.split(' — ');
-  for (const { pack, it } of items.filter((x) => x.it.facts.artist === artist && (x.it.name === title || x.it.alt?.includes(title)))) {
+  for (const { pack, it } of items.filter((x) => x.it.facts.artist === artist && x.it.name === title)) {
     applied++;
     if (it.facts.year !== o.year) fail(`${pack} ${key}: year ${it.facts.year}, override ${o.year}`);
     if (it.facts.decade !== decade(o.year) || it.group !== decade(o.year)) fail(`${pack} ${key}: decade/group ${it.facts.decade}/${it.group}`);

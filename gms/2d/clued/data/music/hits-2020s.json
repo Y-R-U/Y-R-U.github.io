@@ -274,44 +274,6 @@
    "difficulty": 1
   },
   {
-   "id": "say-so-doja-cat",
-   "name": "Say So",
-   "group": "2020s",
-   "facts": {
-    "artist": "Doja Cat",
-    "year": 2020,
-    "decade": "2020s",
-    "act": "Female solo artist"
-   },
-   "charts": {
-    "us": 11,
-    "uk": 13,
-    "au": 10
-   },
-   "artistCountry": "USA",
-   "blurb": "\"Say So\" by Doja Cat, released in 2020. Year-end charts: the US #11, the UK #13, Australia #10.",
-   "media": {
-    "audio": [
-     {
-      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0f/ef/4f/0fef4f2e-9937-3553-ff43-abdb250de809/mzaf_2511003867975078888.plus.aac.p.m4a",
-      "credit": "Doja Cat: 30-second preview courtesy of Apple Music",
-      "license": "Apple Music preview (streamed, not stored)",
-      "page": "https://music.apple.com/us/album/say-so-feat-nicki-minaj-original-version/1512329644?i=1512329645&uo=4",
-      "apple": {
-       "trackId": 1512329645,
-       "url": "https://music.apple.com/us/album/say-so-feat-nicki-minaj-original-version/1512329644?i=1512329645&uo=4",
-       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/0e/3a/bf/0e3abfd5-1c7a-b05f-4601-42c7bb1ff8a8/886448482680.jpg/300x300bb.jpg",
-       "term": "Doja Cat Say So"
-      },
-      "dur": 30
-     }
-    ]
-   },
-   "difficulty": 2,
-   "explicit": true,
-   "kids": false
-  },
-  {
    "id": "wap-cardi-b",
    "name": "WAP",
    "group": "2020s",
@@ -2237,7 +2199,7 @@
      }
     ]
    },
-   "difficulty": 3,
+   "difficulty": 2,
    "explicit": true,
    "kids": false
   },
@@ -3912,7 +3874,7 @@
    "group": "2020s",
    "facts": {
     "artist": "Djo",
-    "year": 2024,
+    "year": 2022,
     "decade": "2020s",
     "act": "Male solo artist"
    },
@@ -3922,7 +3884,7 @@
     "au": 22
    },
    "artistCountry": "USA",
-   "blurb": "\"End of Beginning\" by Djo, released in 2024. Year-end charts: the US #47, the UK #23, Australia #22.",
+   "blurb": "\"End of Beginning\" by Djo, released in 2022; year-end charts 2024: the US #47, the UK #23, Australia #22.",
    "media": {
     "audio": [
      {

@@ -11,7 +11,6 @@
 1990 | C+C Music Factory | Gonna Make You Sweat (Everybody Dance Now) | us=3 uk=- au=26 pv=7895 from=USA | am=c\+c
 1990 | Deee-Lite | Groove Is in the Heart | us=91 uk=26 au=38 pv=12275 from=USA
 1990 | Mariah Carey | Vision of Love | us=6 uk=- au=- pv=4341 from=USA
-1990 | Michael Bolton | How Am I Supposed to Live Without You | us=12 uk=28 au=7 pv=5857 from=USA
 1990 | Paula Abdul | Opposites Attract | us=14 uk=25 au=6 pv=4391 from=USA
 1990 | Londonbeat | I've Been Thinking About You | us=31 uk=29 au=8 pv=3007 from=GBR
 1990 | Heart | All I Wanna Do Is Make Love to You | us=16 uk=- au=5 pv=4551 from=USA
@@ -272,3 +271,8 @@
 2000 | Melanie C | Never Be the Same Again | us=- uk=18 au=14 pv=2368 from=GBR | note=first released 1999, moved from hits-2000s
 
 1999 | Santana | Maria Maria | us=3 uk=- au=- pv=6377 from=USA | am=santana; note=released 1999, moved from hits-2000s
+
+2000 | Destiny's Child | Say My Name | us=6 uk=- au=5 pv=7770 from=USA | note=first released 1999, moved from hits-2000s
+2000 | Bomfunk MCs | Freestyler | us=- uk=23 au=3 pv=6873 from=FIN | note=first released 1999, moved from hits-2000s
+2000 | Destiny's Child | Jumpin', Jumpin' | us=13 uk=- au=17 pv=3325 from=USA | note=first released 1999, moved from hits-2000s
+2000 | Creed | With Arms Wide Open | us=36 uk=- au=20 pv=4544 from=USA | note=first released 1999, moved from hits-2000s
