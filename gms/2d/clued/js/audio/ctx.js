@@ -1,5 +1,5 @@
 // Shared AudioContext, buses and the mobile unlock. sfx, piano and clips all route through here.
-import { dlog, modLoaded } from '../core/debuglog.js?v=202610171247';
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610171251';
 const MOD_ID = modLoaded('ctx', import.meta.url);
 let ctx = null, master = null, sfxBus = null, musicBus = null, comp = null;
 const state = { volume: 0.8, sfx: 1, music: 1, muted: false };
@@ -122,12 +122,13 @@ export function installUnlock(target = globalThis.document) {
   // so these stay installed for the page's lifetime: every tap re-wakes a sleeping context.
   const wake = () => {
     if (!ctx) return unlock();
-    if (stale) return (stale = false, rebuild('back'), unlock());
+    // a fresh context only starts inside an activating gesture (iOS: not pointerdown), so wait for one
+    if (stale && navigator.userActivation?.isActive !== false) return (stale = false, rebuild('back'), unlock());
     try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
     if (keepAlive && keepAlive.paused) { dlog('ctx', 'keepAlive.replay'); keepAlive.play()?.catch?.(() => {}); }
     if (ctx.state !== 'running') unlock();
   };
-  ['pointerdown', 'touchend', 'keydown'].forEach((e) => target.addEventListener(e, wake, true));
+  ['pointerdown', 'touchend', 'click', 'keydown'].forEach((e) => target.addEventListener(e, wake, true));
   // Hidden: nothing keeps playing in the background (Web Audio clips, piano, sfx and the streamed Apple preview).
   const away = () => {
     if (target.visibilityState !== 'hidden') return;

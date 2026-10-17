@@ -1,20 +1,20 @@
-import { h, esc } from './kit.js?v=202610171247';
-import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610171247';
-import { defineScreen, header, back, go } from './app.js?v=202610171247';
-import { getSettings, setSettings, ANSWER_TIMES, getName } from '../core/store.js?v=202610171247';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610171247';
-import { applyAudioSettings, sfx } from './fx.js?v=202610171247';
-import { applyKids } from './home.js?v=202610171247';
-import { loadLearn, loadNet } from './net.js?v=202610171247';
-import { BUILD } from '../build.js?v=202610171247';
-import { canSpeak, speak } from './speech.js?v=202610171247';
-import { streakOption } from './streakopt.js?v=202610171247';
-import { localChip } from './local.js?v=202610171247';
-import { confirmPop, toast } from './popup.js?v=202610171247';
-import { seenInfo, resetSeen } from '../core/fresh.js?v=202610171247';
-import { mySetting, saveMySetting } from '../core/local.js?v=202610171247';
-import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610171247';
-import { accountFirstName, rememberName, tidyName, MAX_NAME } from '../net/ident.js?v=202610171247';
+import { h, esc } from './kit.js?v=202610171251';
+import { canFullscreen, toggleFullscreen } from './toggles.js?v=202610171251';
+import { defineScreen, header, back, go } from './app.js?v=202610171251';
+import { getSettings, setSettings, ANSWER_TIMES, getName } from '../core/store.js?v=202610171251';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610171251';
+import { applyAudioSettings, sfx } from './fx.js?v=202610171251';
+import { applyKids } from './home.js?v=202610171251';
+import { loadLearn, loadNet } from './net.js?v=202610171251';
+import { BUILD } from '../build.js?v=202610171251';
+import { canSpeak, speak } from './speech.js?v=202610171251';
+import { streakOption } from './streakopt.js?v=202610171251';
+import { localChip } from './local.js?v=202610171251';
+import { confirmPop, toast } from './popup.js?v=202610171251';
+import { seenInfo, resetSeen } from '../core/fresh.js?v=202610171251';
+import { mySetting, saveMySetting } from '../core/local.js?v=202610171251';
+import { passUntil, redeemCode, fmtDate } from '../net/pass.js?v=202610171251';
+import { accountFirstName, rememberName, tidyName, MAX_NAME } from '../net/ident.js?v=202610171251';
 
 // The default name for hosting and joining (clued.name, the same key the host/join screens remember).
 // Empty = your br8t account's first name when signed in; shown, but never saved over a name you typed.
