@@ -1,9 +1,9 @@
 // Hat-trick sound clips: a compact player for song questions (clip loading, unlock and Apple handling as in listen.js).
-import { h, esc } from '../ui/kit.js?v=202610171327';
-import * as clip from '../audio/clip.js?v=202610171327';
-import { revealHTML, BADGE_CSS, previewUrl } from '../audio/apple.js?v=202610171327';
-import { net, appleSrc } from '../audio/applenet.js?v=202610171327';
-import { getCtx, unlock, begin, end } from '../audio/ctx.js?v=202610171327';
+import { h, esc } from '../ui/kit.js?v=202610171359';
+import * as clip from '../audio/clip.js?v=202610171359';
+import { revealHTML, BADGE_CSS, previewUrl } from '../audio/apple.js?v=202610171359';
+import { net, appleSrc } from '../audio/applenet.js?v=202610171359';
+import { getCtx, unlock, begin, end } from '../audio/ctx.js?v=202610171359';
 
 const CSS = `
 .tr-audio{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#1f1a4d;color:#fff}

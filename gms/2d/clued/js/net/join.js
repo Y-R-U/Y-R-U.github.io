@@ -1,16 +1,16 @@
 // Online hub, join-by-name screen and host setup. Joining needs only a name.
-import { h } from '../ui/kit.js?v=202610171327';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610171327';
-import { sfx } from '../ui/fx.js?v=202610171327';
-import { toast } from '../ui/popup.js?v=202610171327';
-import { getFormat } from '../formats/registry.js?v=202610171327';
-import { rooms, friendly } from './api.js?v=202610171327';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610171327';
-import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss, myRooms, forgetRoom } from './util.js?v=202610171327';
-import { packInfo } from '../core/packs.js?v=202610171327';
-import { countryName, loadNames } from '../core/local.js?v=202610171327';
-import { getTransport, hasTransport } from './transport.js?v=202610171327';
-import { signInPrompt, busyText } from './signin.js?v=202610171327';
+import { h } from '../ui/kit.js?v=202610171359';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610171359';
+import { sfx } from '../ui/fx.js?v=202610171359';
+import { toast } from '../ui/popup.js?v=202610171359';
+import { getFormat } from '../formats/registry.js?v=202610171359';
+import { rooms, friendly } from './api.js?v=202610171359';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610171359';
+import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss, myRooms, forgetRoom } from './util.js?v=202610171359';
+import { packInfo } from '../core/packs.js?v=202610171359';
+import { countryName, loadNames } from '../core/local.js?v=202610171359';
+import { getTransport, hasTransport } from './transport.js?v=202610171359';
+import { signInPrompt, busyText } from './signin.js?v=202610171359';
 
 
 export function nameField(value = '') {
@@ -138,7 +138,14 @@ defineScreen('online', (el, params, cur) => {
   const mineSec = yourRooms(cur);
   const pubList = h('div.net-pubs', {}, h('div.net-wait', {}, 'Looking for public games', h('span.dots')));
   const pubSec = h('div.stack', {}, h('h3.sec-title', {}, 'Public games'), pubList);
-  const live = h('button.net-livechip', { type: 'button', hidden: true, onclick: () => pubSec.scrollIntoView({ behavior: 'smooth', block: 'start' }) });
+  const flash = node => { node.classList.remove('net-flash'); void node.offsetWidth; node.classList.add('net-flash'); };
+  const liveSub = h('span.nj-sub', {}, 'Join with a code'), liveN = h('span.nj-count');
+  const live = h('button.btn.big.wide.net-joinbtn', { type: 'button', dataset: { act: 'join-games', open: '0' }, onclick: () => {
+    sfx('button');
+    if (live.dataset.open !== '0') { pubSec.scrollIntoView({ behavior: 'smooth', block: 'start' }); flash(pubList); return; }
+    joinForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); flash(joinForm.parentNode);
+    code.focus({ preventScroll: true });
+  } }, h('span.nj-main', {}, h('span.nj-dot'), 'JOIN A GAME', liveN), liveSub);
   const joinForm = h('form.net-form', {}, h('label', {}, 'Join with a code'), code, err, h('button.btn.primary.wide', { type: 'submit' }, 'Join'));
   joinForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -148,7 +155,8 @@ defineScreen('online', (el, params, cur) => {
   });
   el.append(header('Play online'),
     h('div.net-wrap', {},
-      h('div.net-hero', {}, live, h('div', { style: { fontSize: '48px' } }, '🌐'), h('h2', {}, 'Play with friends'), h('p', {}, 'Host a game and share the link. Friends type a name and they’re in. No sign-in needed.')),
+      live,
+      h('div.net-hero', {}, h('div', { style: { fontSize: '48px' } }, '🌐'), h('h2', {}, 'Play with friends'), h('p', {}, 'Host a game and share the link. Friends type a name and they’re in. No sign-in needed.')),
       mineSec.el,
       h('div.panel.stack', {}, h('h3', {}, 'Host a game'), h('p.muted', { style: { margin: 0 } }, 'Add rounds, pick themes (or a ♥ favourite) for each, then share the link or QR code.'),
         h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'host' }, onclick: () => go('host') }, 'Host a game'),
@@ -167,8 +175,12 @@ defineScreen('online', (el, params, cur) => {
       if (d.rooms.some(focusOf)) await loadNames().catch(() => {});
       if (stop || cur !== current()) return;
       cards = d.rooms.map(r => publicCard(r, offset));
-      live.hidden = !cards.length;
-      live.textContent = `🟢 ${cards.length} public game${cards.length === 1 ? '' : 's'} open`;
+      const n = cards.length;
+      live.dataset.open = String(n);
+      live.classList.toggle('sun', n > 0);
+      liveN.textContent = n ? ` · ${n} waiting` : '';
+      liveSub.textContent = n ? `Public game${n === 1 ? '' : 's'} open now: tap to pick` : 'No public games yet · join with a code';
+      live.setAttribute('aria-label', n ? `Join a game: ${n} public game${n === 1 ? '' : 's'} waiting` : 'Join a game with a code');
       pubList.replaceChildren(...(cards.length ? cards.map(c => c.el) : [h('p.net-note', {}, 'No public games right now. Host one and pick “Public”.')]));
     } catch (e) {
       pubList.replaceChildren(h('p.net-note', {}, friendly(e)));
@@ -183,7 +195,16 @@ defineScreen('online', (el, params, cur) => {
 });
 
 /* --------------------------------------------------------------- join */
-defineScreen('join', async (el, { code: raw = '', fresh = false, via = 'server' }, cur) => {
+// The link's ?join=/?p2p= stays in the address bar while this screen is up (a reload lands back here) and goes
+// when the player leaves for anything but the room, which sets its own.
+defineScreen('join', async (el, params, cur) => {
+  const c = cleanCode(params.code || '');
+  if (validCode(c)) setQuery(params.via === 'p2p' ? 'p2p' : 'join', c);
+  await joinScreen(el, params, cur);
+  return () => setTimeout(() => { if (!['join', 'room'].includes(current()?.name)) setQuery('join', null); });
+});
+
+async function joinScreen(el, { code: raw = '', fresh = false, via = 'server' }, cur) {
   ensureStyles();
   const T = getTransport(via);
   const code = cleanCode(raw);
@@ -280,4 +301,4 @@ defineScreen('join', async (el, { code: raw = '', fresh = false, via = 'server' 
     });
     return f;
   }
-});
+}

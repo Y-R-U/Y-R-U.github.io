@@ -1,8 +1,16 @@
 /* CLUED online rooms + challenges (lane S). Uses the shell's tokens from css/base.css. */
 .net-wrap { display: flex; flex-direction: column; gap: 14px; padding-bottom: 18px; }
 .net-hero { text-align: center; margin: 6px 0 2px; position: relative; }
-.net-livechip { display: inline-block; margin: 0 0 6px; padding: 5px 10px; border: 2px solid var(--ink); border-radius: 999px; background: var(--card); color: var(--ink); font: 800 13px/1 var(--font-body, sans-serif); box-shadow: var(--shadow-sm); cursor: pointer; }
-.net-livechip[hidden] { display: none; }
+.btn.net-joinbtn { flex-direction: column; gap: 2px; min-height: 84px; margin-top: 4px; border-radius: var(--r); padding: 10px 18px; }
+.net-joinbtn .nj-main { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 10px; font-size: 26px; line-height: 1.1; }
+.net-joinbtn .nj-count { font-size: 22px; }
+.net-joinbtn .nj-sub { font: 800 14px/1.25 var(--font); letter-spacing: 0; color: var(--ink-2); }
+.net-joinbtn .nj-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink); background: var(--ink-3); flex: none; }
+.net-joinbtn.sun .nj-dot { background: var(--good); animation: nj-pulse 1.6s ease-out infinite; }
+.net-joinbtn.sun .nj-sub { color: var(--ink); }
+@keyframes nj-pulse { 0% { box-shadow: 0 0 0 0 rgba(31, 191, 106, .7); } 70%, 100% { box-shadow: 0 0 0 9px rgba(31, 191, 106, 0); } }
+.net-flash { animation: net-flash 1.2s ease-out; }
+@keyframes net-flash { 0%, 40% { box-shadow: 0 0 0 4px var(--sun); border-radius: var(--r); } 100% { box-shadow: 0 0 0 0 transparent; } }
 .net-hero h2 { font-size: 30px; line-height: 1.1; }
 .net-hero p { margin: 6px 0 0; color: var(--ink-2); }
 .net-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border: 2px solid var(--ink); border-radius: 999px; background: var(--sun); font-size: 14px; font-weight: 900; }

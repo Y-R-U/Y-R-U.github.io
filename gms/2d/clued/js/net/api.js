@@ -1,5 +1,5 @@
 // Clued server client: base URL, JSON requests, server clock, live room subscription (SSE → long-poll fallback).
-import { idToken } from './ident.js?v=202610171327';
+import { idToken } from './ident.js?v=202610171359';
 
 const DEFAULT_API = location.hostname === 'games.br8t.com' ? '/gms/2d/clued/api' : 'https://games.br8t.com/gms/2d/clued/api';
 
@@ -68,12 +68,13 @@ export async function req(method, path, body, { timeout = 12000, auth = false } 
   try {
     res = await fetch(API + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: ctl.signal, cache: 'no-store' });
   } catch (e) {
-    throw new ApiError(0, 'network', FRIENDLY.network);
-  } finally {
     clearTimeout(timer);
+    throw new ApiError(0, 'network', FRIENDLY.network);
   }
   let data = null;
-  try { data = await res.json(); } catch (e) {}
+  try { data = await res.json(); } catch (e) {}   // the abort timer also covers a body that stalls
+  clearTimeout(timer);
+  if (ctl.signal.aborted) throw new ApiError(0, 'network', FRIENDLY.network);
   if (!res.ok) throw Object.assign(new ApiError(res.status, data?.code, data?.error), data?.allowance ? { allowance: data.allowance } : {});
   return data;
 }

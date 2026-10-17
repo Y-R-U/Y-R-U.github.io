@@ -7,9 +7,9 @@
 // "…: second pictures" sets (refs "<pack>:more/<key>") offer extra pictures for titles already live: one card per picture,
 // with the pictures already in the pack shown small ("already in"). OK adds it, Bad drops it.
 // A picture can also carry a drawn circle around the target (mark, 0–1 image coordinates); tools/img_marks.mjs puts those in the packs.
-import { h, markRect } from '../ui/kit.js?v=202610171327';
-import { toast } from '../ui/popup.js?v=202610171327';
-import { API } from './api.js?v=202610171327';
+import { h, markRect } from '../ui/kit.js?v=202610171359';
+import { toast } from '../ui/popup.js?v=202610171359';
+import { API } from './api.js?v=202610171359';
 
 const root = document.getElementById('rv');
 const gate = document.getElementById('gate');
