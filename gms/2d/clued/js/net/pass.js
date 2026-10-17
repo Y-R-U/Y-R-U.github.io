@@ -69,17 +69,62 @@ export async function spendGame(id) {
   } catch (e) { return { status: 'open' }; }
 }
 
-const shortDay = ymd => new Date(`${ymd}T12:00:00Z`).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-
 export function allowanceText(a) {
   if (!a) return '';
   if (a.unlimited) return 'Unlimited online games with your br8t Pass';
-  const base = a.perDay - (a.promoPerDay || 0);
-  const parts = a.promoPerDay > 0 ? ` (${base} free + ${a.promoPerDay} bonus until ${shortDay(a.promoUntil)})` : '';
-  return `Online games today: ${Math.max(0, a.remaining)} of ${a.perDay} left${parts}`;
+  const extra = a.topUpExtra > 0 ? ` (${a.perDay - a.topUpExtra} free + ${a.topUpExtra} extra)` : '';
+  return `Online games today: ${Math.max(0, a.remaining)} of ${a.perDay} left${extra}`;
 }
 
 export const outOfGames = a => !!a && !a.unlimited && a.remaining <= 0;
+// Can this account claim a free top-up right now? (topUpSize 0 = the payments service has none for Clued)
+export const canTopUp = a => outOfGames(a) && a.topUpSize > 0 && a.topUpsLeft > 0;
+// Out of games and every free top-up claimed today.
+export const doneForToday = a => outOfGames(a) && a.topUpSize > 0 && a.topUpsLeft <= 0;
+
+// Claims a free top-up (the payments service grants topUpSize more games today, at 0 left, up to topUpMax a day).
+// { status: 'ok' | 'cap' | 'left' | 'unlimited' | 'signin' | 'error', allowance }. A retried claim reuses its id.
+export async function topUp(id = uuid()) {
+  const tok = await token();
+  if (!tok) return { status: 'signin' };
+  try {
+    const res = await fetch(API + 'allowance/topup', { method: 'POST', cache: 'no-store',
+      headers: { Authorization: `Bearer ${tok}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ game: GAME, id }) });
+    const d = await res.json().catch(() => ({}));
+    if (res.ok) return { status: 'ok', allowance: d.allowance, granted: d.granted };
+    const status = { topup_cap: 'cap', games_left: 'left', unlimited: 'unlimited' }[d.code] || 'error';
+    return { status, allowance: d.allowance };
+  } catch (e) { return { status: 'error' }; }
+}
+export const uuid = () => crypto.randomUUID?.() || '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
+
+// The br8t Pass prices ({ monthly, yearly } display strings), or {} when the shop is unreachable.
+let offerP = null;
+export const passPrices = () => offerP || (offerP = fetch(API + 'offer', { cache: 'no-store' }).then(r => (r.ok ? r.json() : null)).then(d => {
+  const out = {};
+  for (const it of d?.items || []) {
+    if (it.entitlement !== 'br8t_pass' || !it.amount) continue;
+    const money = new Intl.NumberFormat(undefined, { style: 'currency', currency: String(it.currency || 'aud').toUpperCase() }).format(it.amount / 100);
+    out[it.interval === 'year' ? 'yearly' : 'monthly'] = money;
+  }
+  return out;
+}).catch(() => { offerP = null; return {}; }));
+
+// Opens Stripe Checkout for a br8t Pass (product 'br8t_pass_monthly' | 'br8t_pass_yearly'); resolves only on failure.
+export async function buyPass(product) {
+  const tok = await token();
+  if (!tok) throw new Error('Sign in first, so the Pass goes on your br8t account.');
+  const post = game => fetch(API + 'checkout', { method: 'POST', cache: 'no-store',
+    headers: { Authorization: `Bearer ${tok}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ product, game }) });
+  let res;
+  try {
+    res = await post('clued');
+    if (res.status === 400) res = await post('hub');   // a payments build without Clued's return page
+  } catch (e) { throw new Error('The shop is unavailable right now. Try again later.'); }
+  const d = await res.json().catch(() => ({}));
+  if (!res.ok || !d.url) throw new Error(d.error || 'The shop is unavailable right now. Try again later.');
+  location.assign(d.url);
+}
 
 // Local time the allowance resets (the next UTC midnight).
 export const resetTime = (a, opts = { hour: 'numeric', minute: '2-digit' }) =>

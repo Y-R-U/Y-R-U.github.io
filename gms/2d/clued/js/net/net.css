@@ -203,3 +203,26 @@
 .net-myroom .mr-acts { display: flex; gap: 8px; }
 .net-myroom .mr-acts .btn { flex: 1; }
 .net-myroom .mr-acts .btn.armed { background: var(--bad); color: #fff; }
+
+/* out of online games: the free top-up sheet (topup.js) */
+.topup-card { text-align: center; display: flex; flex-direction: column; gap: 10px; }
+.topup-card .pop-title { margin: 0; font-size: 22px; line-height: 1.2; }
+.topup-icon { font-size: 40px; line-height: 1; }
+.topup-lead { margin: 0; font-size: 15px; color: var(--ink-2); }
+.topup-pitch { background: #f3efff; border: 2px solid var(--ink); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.topup-pitch p { margin: 0; font-size: 14px; line-height: 1.4; color: var(--ink-2); }
+.topup-passrow { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.topup-passrow .btn { flex: 1 1 130px; background: var(--grape); color: #fff; font-size: 14px; }
+.topup-link { align-self: center; background: none; border: 0; padding: 2px 6px; font: inherit; font-size: 13px; font-weight: 800; color: var(--grape); text-decoration: underline; cursor: pointer; }
+.topup-status:empty, .topup-note:empty { display: none; }
+.topup-status { margin: 0; font-size: 13px; color: var(--ink-2); }
+.topup-note { margin: 0; font-size: 14px; font-weight: 800; color: #9a3b00; }
+.topup-card .pop-actions { margin-top: 4px; }
+.topup-card .pop-actions .btn { flex: 1 1 0; }
+@media (max-height: 520px) {
+  .topup-pop { place-items: center; padding-top: 8px; padding-bottom: 8px; }
+  .topup-card { width: min(640px, 100%); max-height: calc(100vh - 16px); padding: 12px 16px; gap: 6px; }
+  .topup-icon { display: none; }
+  .topup-card .pop-title { font-size: 19px; }
+  .topup-pitch { padding: 8px 10px; gap: 6px; }
+}

@@ -1,22 +1,23 @@
 // Challenge links: "beat my score on this exact set". Create from a results screen, play via ?c=ID.
-import { h, fmtNum } from '../ui/kit.js?v=202610170705';
-import { defineScreen, header, current, reset, go } from '../ui/app.js?v=202610170705';
-import { popup, toast } from '../ui/popup.js?v=202610170705';
-import { sfx, confetti } from '../ui/fx.js?v=202610170705';
-import { getSettings } from '../core/store.js?v=202610170705';
-import { createRunner } from '../structures/runner.js?v=202610170705';
-import { replayCfg, replayScore } from '../structures/index.js?v=202610170705';
-import { challenges, friendly } from './api.js?v=202610170705';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610170705';
-import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610170705';
-import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610170705';
-import { ensureStyles, setQuery } from './util.js?v=202610170705';
-import { ensureFormats } from './room.js?v=202610170705';
-import { openSignIn } from './signin.js?v=202610170705';
-import { resetTime } from './pass.js?v=202610170705';
-import { linkChallengeShare } from './linkchallenge.js?v=202610170705';
-import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610170705';
-import { cleanQuestions } from './sanitize.js?v=202610170705';
+import { h, fmtNum } from '../ui/kit.js?v=202610170710';
+import { defineScreen, header, current, reset, go } from '../ui/app.js?v=202610170710';
+import { popup, toast } from '../ui/popup.js?v=202610170710';
+import { sfx, confetti } from '../ui/fx.js?v=202610170710';
+import { getSettings } from '../core/store.js?v=202610170710';
+import { createRunner } from '../structures/runner.js?v=202610170710';
+import { replayCfg, replayScore } from '../structures/index.js?v=202610170710';
+import { challenges, friendly } from './api.js?v=202610170710';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610170710';
+import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610170710';
+import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610170710';
+import { ensureStyles, setQuery } from './util.js?v=202610170710';
+import { ensureFormats } from './room.js?v=202610170710';
+import { openSignIn } from './signin.js?v=202610170710';
+import { resetTime } from './pass.js?v=202610170710';
+import { offerTopUp, wantsSheet } from './topup.js?v=202610170710';
+import { linkChallengeShare } from './linkchallenge.js?v=202610170710';
+import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610170710';
+import { cleanQuestions } from './sanitize.js?v=202610170710';
 
 const MAX_SET = 500 * 1024;
 
@@ -44,8 +45,9 @@ export async function createChallenge(out) {
   const questions = r.questions;
   if (JSON.stringify(questions).length > MAX_SET) { toast('This game is too big to share'); return null; }
   const ms = (r.answers || []).reduce((s, a) => s + (a.ms || 0), 0);
-  try {
-    const res = await challenges.create({ name, title: out.title || '', spec, questions, score: Math.round(r.score || 0), correct: r.correct || 0, ms, detail: detailOf(r.answers) });
+  const body = { name, title: out.title || '', spec, questions, score: Math.round(r.score || 0), correct: r.correct || 0, ms, detail: detailOf(r.answers) };
+  for (let tries = 0; ; tries++) try {
+    const res = await challenges.create(body);
     const url = challengeUrl(res.id);
     const kids = !!spec.kids;
     openShare({ url, heading: 'Challenge a friend', title: 'Clued challenge',
@@ -53,6 +55,12 @@ export async function createChallenge(out) {
     return { id: res.id, url };
   } catch (e) {
     // The server path is refused (sign-in level, daily cap, paused): the serverless link always works.
+    if (e.code === 'no_games_left' && tries < 2 && wantsSheet(e.allowance)) {
+      const pick = await offerTopUp(e.allowance, { extra: [{ label: '⚔️ Send a link challenge instead', value: 'link' }] });
+      if (pick === 'yes') continue;
+      if (pick === 'link') return linkChallengeShare(out, name);
+      return null;
+    }
     if (e.code === 'no_games_left') {
       const at = resetTime(e.allowance);
       const pick = await popup({ title: 'No online games left today',

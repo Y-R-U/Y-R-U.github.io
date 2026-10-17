@@ -1,9 +1,9 @@
 // Protection-level sign-in asks. Never a blocking modal: an inline panel with a button that opens
 // the br8t account panel (or Google sign-in when the panel isn't mounted).
-import { h } from '../ui/kit.js?v=202610170705';
-import { toast } from '../ui/popup.js?v=202610170705';
-import { go } from '../ui/app.js?v=202610170705';
-import { allowanceText, resetTime } from './pass.js?v=202610170705';
+import { h } from '../ui/kit.js?v=202610170710';
+import { toast } from '../ui/popup.js?v=202610170710';
+import { go } from '../ui/app.js?v=202610170710';
+import { allowanceText, resetTime, canTopUp, doneForToday } from './pass.js?v=202610170710';
 
 let authMod = null;
 const loadAuth = () => authMod || (authMod = import('/lib/auth/auth.js').catch(() => null));
@@ -48,11 +48,17 @@ export function allowanceNote(a) {
   return h('p.net-note', { dataset: { allowance: a.unlimited ? 'pass' : String(a.remaining) } }, `${a.unlimited ? '⭐' : '🎟️'} ${allowanceText(a)}`);
 }
 
-export function noGamesPanel(a) {
+// onMore: opens the free top-up sheet (topup.js), shown while this account still has a top-up today.
+export function noGamesPanel(a, onMore) {
   const at = resetTime(a);
+  const more = onMore && canTopUp(a);
+  const late = doneForToday(a);
   return h('div.panel.stack.net-signin', { dataset: { panel: 'no-games' } },
-    h('b', {}, '🎟️ No online games left today'),
-    h('p.muted', { style: { margin: 0 } }, `You’ve used today’s ${a?.perDay || ''} online games${at ? `. More at ${at} your time` : ''}.`.replace('  ', ' ')),
-    h('p.muted', { style: { margin: 0 } }, 'A br8t Pass (monthly or yearly) makes online play unlimited, in Clued and every br8t game. Players who join your games always play free, so a friend with a Pass can host.'),
+    h('b', {}, late ? `🌙 That’s ${a.usedToday || a.perDay} games today` : '🎟️ No online games left today'),
+    h('p.muted', { style: { margin: 0 } }, late ? `More at ${at || 'midnight UTC'} your time. Players who join always play free, so a friend can host.`
+      : `You’ve used today’s ${a?.perDay || ''} online games${at ? `. More at ${at} your time` : ''}.`.replace('  ', ' ')),
+    ...(more ? [h('button.btn.go.wide', { type: 'button', dataset: { act: 'topup-open' }, onclick: () => onMore() }, `🎟️ Get ${a.topUpSize} more free games`)] : []),
+    h('p.muted', { style: { margin: 0 } }, more || late ? 'A br8t Pass (monthly or yearly) makes hosting unlimited, in Clued and every br8t game.'
+      : 'A br8t Pass (monthly or yearly) makes online play unlimited, in Clued and every br8t game. Players who join your games always play free, so a friend with a Pass can host.'),
     h('button.btn.wide', { type: 'button', dataset: { act: 'pass-code' }, onclick: () => go('settings', { focus: 'pass' }) }, 'Got a Pass code?'));
 }

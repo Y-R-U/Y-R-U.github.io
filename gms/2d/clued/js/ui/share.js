@@ -1,4 +1,4 @@
-import { toast } from './popup.js?v=202610170705';
+import { toast } from './popup.js?v=202610170710';
 
 export async function shareText(text, title = 'Clued') {
   try {

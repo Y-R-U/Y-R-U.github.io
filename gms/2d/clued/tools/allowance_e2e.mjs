@@ -116,7 +116,7 @@ try {
   await hostScreen();
   await b.waitFor(`document.querySelector('[data-box=allowance] [data-allowance]')`);
   const line = await text('[data-box=allowance]');
-  ok(/Online games today: 2 of 5 left \(3 free \+ 2 bonus until 31 Dec\)/.test(line), `host line: ${line}`);
+  ok(/Online games today: 2 of 5 left/.test(line) && !/bonus/.test(line), `host line: ${line}`);
   await b.eval(`document.querySelector('[data-box=allowance]').scrollIntoView({ block: 'center' }), true`);
   await b.shot(`${OUT}/host-left.png`);
 

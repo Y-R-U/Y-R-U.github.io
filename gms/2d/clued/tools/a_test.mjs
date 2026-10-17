@@ -195,7 +195,11 @@ ok(registry.fill('The {lname} is {aValue}.', { name: 'Tiger', value: 'Mammal' })
 {
   const pass = await imp('js/net/pass.js');
   const free = { perDay: 5, promoPerDay: 2, promoUntil: '2026-12-31', remaining: 2, unlimited: false, resetsAt: 1791936000 };
-  ok(pass.allowanceText(free) === 'Online games today: 2 of 5 left (3 free + 2 bonus until 31 Dec)', `promo line: ${pass.allowanceText(free)}`);
+  ok(pass.allowanceText(free) === 'Online games today: 2 of 5 left', `promo is not spelled out: ${pass.allowanceText(free)}`);
+  const topped = { perDay: 10, topUpExtra: 5, topUpSize: 5, topUpsLeft: 2, remaining: 0, unlimited: false };
+  ok(pass.allowanceText({ ...topped, remaining: 4 }) === 'Online games today: 4 of 10 left (5 free + 5 extra)', `top-up line: ${pass.allowanceText({ ...topped, remaining: 4 })}`);
+  ok(pass.canTopUp(topped) && !pass.doneForToday(topped) && !pass.canTopUp({ ...topped, remaining: 1 }) && !pass.canTopUp({ ...free, remaining: 0 }), 'canTopUp: 0 left, a top-up size and claims left');
+  ok(pass.doneForToday({ ...topped, topUpsLeft: 0 }) && !pass.canTopUp({ ...topped, topUpsLeft: 0 }) && !pass.doneForToday({ ...free, remaining: 0 }), 'doneForToday: every claim used; old payments builds never');
   ok(pass.allowanceText({ perDay: 3, promoPerDay: 0, promoUntil: '', remaining: 1 }) === 'Online games today: 1 of 3 left', 'no promo line');
   ok(pass.allowanceText({ perDay: -1, remaining: -1, unlimited: true, promoPerDay: 2 }) === 'Unlimited online games with your br8t Pass', 'pass line');
   ok(pass.allowanceText({ perDay: 5, promoPerDay: 2, promoUntil: '2026-12-31', remaining: -3 }).startsWith('Online games today: 0 of 5'), 'never negative');

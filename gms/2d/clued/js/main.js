@@ -1,27 +1,27 @@
-import { BUILD } from './build.js?v=202610170705';
-import './core/debuglog.js?v=202610170705';   // remote debug log (server-switched, docs/notes/DEBUGLOG.md)
-import { loadFormats } from './formats/index.js?v=202610170705';
-import { getFormat, listFormats, register } from './formats/registry.js?v=202610170705';
-import { loadIndex, loadPack, loadPacks, getIndex } from './core/packs.js?v=202610170705';
-import { buildQuestions, makeSpec } from './core/spec.js?v=202610170705';
-import { preflight, urlsOf, swapFailed } from './core/media.js?v=202610170705';
-import * as store from './core/store.js?v=202610170705';
-import { mountApp, defineScreen, go, back, reset, header, current, canPester } from './ui/app.js?v=202610170705';
-import { h } from './ui/kit.js?v=202610170705';
-import { popup, toast, confirmPop } from './ui/popup.js?v=202610170705';
-import { sfx, haptic, confetti } from './ui/fx.js?v=202610170705';
-import { shareText } from './ui/share.js?v=202610170705';
-import { loadNet } from './ui/net.js?v=202610170705';
-import { watchVersion, checkVersion, updateState } from './ui/update.js?v=202610170705';
-import { applyAll } from './ui/settings.js?v=202610170705';
-import { setMatchCompleted } from './ui/results.js?v=202610170705';
-import './ui/home.js?v=202610170705';
-import './ui/setup.js?v=202610170705';
-import './ui/statspage.js?v=202610170705';
-import { createRunner } from './structures/runner.js?v=202610170705';
-import { prepare, playSpec } from './structures/session.js?v=202610170705';
-import { STRUCTURES } from './structures/index.js?v=202610170705';
-import { handoff } from './structures/handoff.js?v=202610170705';
+import { BUILD } from './build.js?v=202610170710';
+import './core/debuglog.js?v=202610170710';   // remote debug log (server-switched, docs/notes/DEBUGLOG.md)
+import { loadFormats } from './formats/index.js?v=202610170710';
+import { getFormat, listFormats, register } from './formats/registry.js?v=202610170710';
+import { loadIndex, loadPack, loadPacks, getIndex } from './core/packs.js?v=202610170710';
+import { buildQuestions, makeSpec } from './core/spec.js?v=202610170710';
+import { preflight, urlsOf, swapFailed } from './core/media.js?v=202610170710';
+import * as store from './core/store.js?v=202610170710';
+import { mountApp, defineScreen, go, back, reset, header, current, canPester } from './ui/app.js?v=202610170710';
+import { h } from './ui/kit.js?v=202610170710';
+import { popup, toast, confirmPop } from './ui/popup.js?v=202610170710';
+import { sfx, haptic, confetti } from './ui/fx.js?v=202610170710';
+import { shareText } from './ui/share.js?v=202610170710';
+import { loadNet } from './ui/net.js?v=202610170710';
+import { watchVersion, checkVersion, updateState } from './ui/update.js?v=202610170710';
+import { applyAll } from './ui/settings.js?v=202610170710';
+import { setMatchCompleted } from './ui/results.js?v=202610170710';
+import './ui/home.js?v=202610170710';
+import './ui/setup.js?v=202610170710';
+import './ui/statspage.js?v=202610170710';
+import { createRunner } from './structures/runner.js?v=202610170710';
+import { prepare, playSpec } from './structures/session.js?v=202610170710';
+import { STRUCTURES } from './structures/index.js?v=202610170710';
+import { handoff } from './structures/handoff.js?v=202610170710';
 
 const params = new URLSearchParams(location.search);
 const TEST = params.has('test') || params.has('noauth');
@@ -105,6 +105,14 @@ async function boot() {
     }).catch(e => console.info('[clued] account layer unavailable', e?.message));
   }
   route();
+  // back from a br8t Pass checkout (js/net/topup.js → Stripe → ?checkout=success|cancel)
+  const bought = params.get('checkout');
+  if (bought) {
+    const keep = new URLSearchParams(location.search);
+    keep.delete('checkout');
+    history.replaceState(history.state, '', location.pathname + (keep.size ? '?' + keep : '') + location.hash);
+    if (bought === 'success') toast('Thank you! Your br8t Pass is on its way: unlimited online games', 4000);
+  }
 }
 
 boot().catch(e => {

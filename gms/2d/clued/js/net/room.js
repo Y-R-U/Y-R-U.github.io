@@ -1,30 +1,31 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=202610170705';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=202610170705';
-import { confirmPop, toast } from '../ui/popup.js?v=202610170705';
-import { sfx, confetti } from '../ui/fx.js?v=202610170705';
-import { createRunner } from '../structures/runner.js?v=202610170705';
-import { prepare, prepareFormats } from '../structures/session.js?v=202610170705';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610170705';
-import { urlsOf, preflight } from '../core/media.js?v=202610170705';
-import { randomSeed } from '../core/rng.js?v=202610170705';
-import { listFormats } from '../formats/registry.js?v=202610170705';
-import { loadFormats } from '../formats/index.js?v=202610170705';
-import { friendly } from './api.js?v=202610170705';
-import { getTransport } from './transport.js?v=202610170705';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610170705';
-import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610170705';
-import { streakOption } from '../ui/streakopt.js?v=202610170705';
-import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610170705';
-import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610170705';
-import { getFormat } from '../formats/registry.js?v=202610170705';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610170705';
-import { trackRoom } from '../core/stats.js?v=202610170705';
-import { cleanQuestion } from './sanitize.js?v=202610170705';
-import { saveSetPrompt } from './sets.js?v=202610170705';
-import { isOn, localLabel, loadNames } from '../core/local.js?v=202610170705';
-import { noGamesPanel, signInPrompt } from './signin.js?v=202610170705';
-import { tidyName, rememberName, MAX_NAME } from './ident.js?v=202610170705';
+import { h, fmtNum } from '../ui/kit.js?v=202610170710';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610170710';
+import { confirmPop, toast } from '../ui/popup.js?v=202610170710';
+import { sfx, confetti } from '../ui/fx.js?v=202610170710';
+import { createRunner } from '../structures/runner.js?v=202610170710';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610170710';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610170710';
+import { urlsOf, preflight } from '../core/media.js?v=202610170710';
+import { randomSeed } from '../core/rng.js?v=202610170710';
+import { listFormats } from '../formats/registry.js?v=202610170710';
+import { loadFormats } from '../formats/index.js?v=202610170710';
+import { friendly } from './api.js?v=202610170710';
+import { getTransport } from './transport.js?v=202610170710';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610170710';
+import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610170710';
+import { streakOption } from '../ui/streakopt.js?v=202610170710';
+import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610170710';
+import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610170710';
+import { getFormat } from '../formats/registry.js?v=202610170710';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610170710';
+import { trackRoom } from '../core/stats.js?v=202610170710';
+import { cleanQuestion } from './sanitize.js?v=202610170710';
+import { saveSetPrompt } from './sets.js?v=202610170710';
+import { isOn, localLabel, loadNames } from '../core/local.js?v=202610170710';
+import { noGamesPanel, signInPrompt } from './signin.js?v=202610170710';
+import { offerTopUp, wantsSheet } from './topup.js?v=202610170710';
+import { tidyName, rememberName, MAX_NAME } from './ident.js?v=202610170710';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;
@@ -181,7 +182,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     // the host's daily online games ran out (a refused start, or the public countdown stopped by the server)
     const limit = st.you.host ? ctx.limit || st.you.limit : null;
     const lkey = JSON.stringify(limit);
-    if (lkey !== r.limit && !r.signingIn) { r.limit = lkey; r.limitBox.replaceChildren(...(limit ? [noGamesPanel(limit)] : [])); }
+    if (lkey !== r.limit && !r.signingIn) { r.limit = lkey; r.limitBox.replaceChildren(...(limit ? [noGamesPanel(limit, () => hostAct('start', null))] : [])); }
     r.actions.replaceChildren();
     if (st.you.host) {
       r.actions.append(h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'start' }, onclick: e => hostAct('start', e.currentTarget) },
@@ -264,6 +265,8 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
         ctx.limit = e.allowance || {};
         showLobby(ctx.st);
         L.limitBox.scrollIntoView?.({ block: 'nearest' });
+        // a free top-up, then the same start again (same game id: never spent twice)
+        if (action === 'start' && wantsSheet(e.allowance) && (await offerTopUp(e.allowance)) === 'yes' && ctx.st?.phase === 'lobby') hostAct(action, null, extra);
       } else if (e.code === 'signin_required' && action === 'start' && L) {
         L.signingIn = true;
         const ok = await signInPrompt(L.limitBox, 'start');
