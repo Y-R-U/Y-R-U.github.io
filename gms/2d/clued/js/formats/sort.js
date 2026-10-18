@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, factText, collect, pick, shuffle, sample, factAllowed, lcLabel, factHeading, valueText } from './registry.js?v=202610171455';
-import { h, imgEl } from '../ui/kit.js?v=202610171455';
-import { norm, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610171455';
+import { register, poolItems, pickPack, byDifficulty, imageOf, factText, collect, pick, shuffle, sample, factAllowed, lcLabel, factHeading, valueText } from './registry.js?v=202610181234';
+import { h, imgEl } from '../ui/kit.js?v=202610181234';
+import { norm, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610181234';
 
 const CSS = `
 .so{gap:10px}

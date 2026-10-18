@@ -1,31 +1,31 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=202610171455';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=202610171455';
-import { confirmPop, toast } from '../ui/popup.js?v=202610171455';
-import { sfx, confetti } from '../ui/fx.js?v=202610171455';
-import { createRunner } from '../structures/runner.js?v=202610171455';
-import { prepare, prepareFormats } from '../structures/session.js?v=202610171455';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610171455';
-import { urlsOf, preflight } from '../core/media.js?v=202610171455';
-import { randomSeed } from '../core/rng.js?v=202610171455';
-import { listFormats } from '../formats/registry.js?v=202610171455';
-import { loadFormats } from '../formats/index.js?v=202610171455';
-import { friendly } from './api.js?v=202610171455';
-import { getTransport } from './transport.js?v=202610171455';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610171455';
-import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610171455';
-import { streakOption } from '../ui/streakopt.js?v=202610171455';
-import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610171455';
-import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610171455';
-import { getFormat } from '../formats/registry.js?v=202610171455';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610171455';
-import { trackRoom } from '../core/stats.js?v=202610171455';
-import { cleanQuestion } from './sanitize.js?v=202610171455';
-import { saveSetPrompt } from './sets.js?v=202610171455';
-import { isOn, localLabel, loadNames } from '../core/local.js?v=202610171455';
-import { noGamesPanel, signInPrompt } from './signin.js?v=202610171455';
-import { offerTopUp, wantsSheet } from './topup.js?v=202610171455';
-import { tidyName, rememberName, MAX_NAME } from './ident.js?v=202610171455';
+import { h, fmtNum } from '../ui/kit.js?v=202610181234';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610181234';
+import { popup, confirmPop, toast } from '../ui/popup.js?v=202610181234';
+import { sfx, confetti } from '../ui/fx.js?v=202610181234';
+import { createRunner } from '../structures/runner.js?v=202610181234';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610181234';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610181234';
+import { urlsOf, preflight } from '../core/media.js?v=202610181234';
+import { randomSeed } from '../core/rng.js?v=202610181234';
+import { listFormats } from '../formats/registry.js?v=202610181234';
+import { loadFormats } from '../formats/index.js?v=202610181234';
+import { friendly } from './api.js?v=202610181234';
+import { getTransport } from './transport.js?v=202610181234';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610181234';
+import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610181234';
+import { streakOption } from '../ui/streakopt.js?v=202610181234';
+import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610181234';
+import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610181234';
+import { getFormat } from '../formats/registry.js?v=202610181234';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610181234';
+import { trackRoom } from '../core/stats.js?v=202610181234';
+import { cleanQuestion } from './sanitize.js?v=202610181234';
+import { saveSetPrompt } from './sets.js?v=202610181234';
+import { isOn, localLabel, loadNames } from '../core/local.js?v=202610181234';
+import { noGamesPanel, signInPrompt } from './signin.js?v=202610181234';
+import { offerTopUp, wantsSheet } from './topup.js?v=202610181234';
+import { tidyName, rememberName, MAX_NAME } from './ident.js?v=202610181234';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;
@@ -185,7 +185,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     if (lkey !== r.limit && !r.signingIn) { r.limit = lkey; r.limitBox.replaceChildren(...(limit ? [noGamesPanel(limit, () => hostAct('start', null))] : [])); }
     r.actions.replaceChildren();
     if (st.you.host) {
-      r.actions.append(h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'start' }, onclick: e => hostAct('start', e.currentTarget) },
+      r.actions.append(h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'start' }, onclick: e => startGame(e.currentTarget) },
         st.players.length > 1 ? `Start game · ${st.players.length} players` : 'Start game'));
       if (st.players.length < 2) r.actions.append(h('p.net-note', {}, 'Waiting for friends to join… you can also start solo.'));
     } else if (!st.startAt) {
@@ -250,6 +250,17 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   async function kick(p) {
     if (!(await confirmPop(`Remove ${p.name}?`, 'They’ll be taken out of this room.', 'Remove', 'Cancel', true))) return;
     T.host(code, key, 'kick', { playerId: p.id }).then(s => sub.push(s)).catch(e => toast(friendly(e)));
+  }
+
+  async function startGame(btn) {
+    if ((ctx.st?.players.length || 0) < 2) {
+      btn.disabled = true;
+      const ok = await popup({ title: 'No one else is in the game yet', body: 'Start anyway and play solo, or keep waiting for friends to join.', cls: 'pop-solo',
+        actions: [{ label: 'Keep waiting', value: false }, { label: 'Start solo', value: true, primary: true }] });
+      btn.disabled = false;
+      if (!ok || ctx.st?.phase !== 'lobby') return;
+    }
+    hostAct('start', btn);
   }
 
   async function hostAct(action, btn, extra) {

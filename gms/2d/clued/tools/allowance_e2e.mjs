@@ -168,6 +168,14 @@ try {
   await b.click('[data-act=create]');
   await b.waitFor(`window.__cluedRoom?.st?.phase === 'lobby'`, 60000);
   ok(P.spends.length === 0, 'creating a room spends nothing');
+  // alone in the room: Start asks first; Keep waiting stays in the lobby and spends nothing
+  await b.click('[data-act=start]', { solo: false });
+  await b.waitFor(`document.querySelector('.pop:not(.out) .pop-solo')`);
+  ok(/No one else is in the game yet/.test(await b.eval(`document.querySelector('.pop-solo').textContent`)), 'solo start asks "No one else is in the game yet"');
+  await b.shot(`${OUT}/lobby-solo-confirm.png`);
+  await b.click('.pop-solo .btn.ghost');
+  await sleep(800);
+  ok(P.spends.length === 0 && await b.eval(`window.__cluedRoom.st.phase === 'lobby' && !document.querySelector('.pop:not(.out)')`), 'Keep waiting: still in the lobby, nothing spent');
   await b.click('[data-act=start]');
   await b.waitFor(`document.querySelector('[data-box=limit] [data-panel=no-games]')`);
   ok(P.spends.length === 1 && P.spends[0].game === 'clued' && P.spends[0].auth === `Bearer ${TOKEN}`, `server spent the host's game: ${JSON.stringify(P.spends.map(s => s.game))}`);

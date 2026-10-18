@@ -44,7 +44,7 @@ export async function open({ port: portArg = 9401, url, width = 384, height = 85
       while (Date.now() - t0 < ms) { try { if (await api.eval(expr)) return true; } catch (e) {} await sleep(150); }
       throw new Error('timeout waiting for ' + expr);
     },
-    async click(sel, { index = 0 } = {}) {
+    async click(sel, { index = 0, solo = true } = {}) {
       // skips a leaving (inert) screen's copy of the element, and waits for it to stop moving (a question slides in)
       const box = await api.eval(`(async () => { const els = [...document.querySelectorAll(${JSON.stringify(sel)})].filter(e => (e.offsetParent || e.getClientRects().length) && !e.closest('[inert]')); const e = els[${index}]; if (!e) return null; e.scrollIntoView({block:'center'});
         const at = () => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
@@ -56,6 +56,11 @@ export async function open({ port: portArg = 9401, url, width = 384, height = 85
       await sleep(60);
       for (const type of ['mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x: box.x, y: box.y, button: 'left', clickCount: 1 });
       await sleep(120);
+      // an online host starting alone gets a "no one else is here" confirm: accept it unless the test opts out
+      if (solo && sel === '[data-act=start]') for (let i = 0; i < 6; i++) {
+        if (await api.eval(`!!document.querySelector('.pop:not(.out) .pop-solo .btn.primary')`)) { await api.click('.pop-solo .btn.primary'); break; }
+        await sleep(80);
+      }
     },
     async key(key) {
       await send('Input.dispatchKeyEvent', { type: 'keyDown', key, text: key.length === 1 ? key : undefined, windowsVirtualKeyCode: key === 'Enter' ? 13 : key.charCodeAt(0) });
