@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VECTOR PROTOCOL — battle test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; height: 100%; background: #03060e; overflow: hidden; color: #cfe6ff; font: 13px system-ui, sans-serif; }
+  #col { position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100vw, calc(100vh * 9 / 16)); overflow: hidden; }
+  @media (max-aspect-ratio: 9/16) { #col { width: 100vw; } }
+  canvas { display: block; width: 100%; height: 100%; }
+  #ctl { position: absolute; right: 6px; top: 25%; display: flex; flex-direction: column; gap: 6px; z-index: 5; }
+  #ctl button { font: 700 12px Orbitron, system-ui; color: #bfe6ff; background: rgba(6,20,44,.85); border: 1px solid #2c7cc8; border-radius: 6px; padding: 8px 6px; min-width: 50px; }
+  #od { position: absolute; left: 0; right: 0; bottom: 6px; display: flex; justify-content: center; gap: 4px; z-index: 5; }
+  #od button { font: 700 11px Orbitron, system-ui; color: #fff; background: rgba(6,20,44,.85); border: 1px solid #2c7cc8; border-radius: 6px; padding: 6px 4px; width: 15%; }
+  #od button.rdy { border-color: #ffd24a; box-shadow: 0 0 10px #ffb400; }
+  #perf { position: absolute; left: 4px; top: 4px; font: 11px monospace; color: #9fe; background: rgba(0,0,0,.5); padding: 3px 5px; z-index: 6; white-space: pre; display: none; }
+  .mockhud .top { position: absolute; left: 0; right: 0; top: 0; height: 64px; background: linear-gradient(rgba(4,10,24,.85), rgba(4,10,24,.55)); border-bottom: 1px solid #2c7cc8; z-index: 4; }
+  .mockhud .bot { position: absolute; left: 0; right: 0; bottom: 0; height: 150px; background: linear-gradient(rgba(4,10,24,.6), rgba(4,10,24,.92)); border-top: 1px solid #2c7cc8; z-index: 4; }
+</style>
+<script type="importmap">{ "imports": { "three": "../../../lib/three/0.180.0/three.module.js", "three/addons/": "../../../lib/three/0.180.0/addons/" } }</script>
+</head>
+<body>
+<div id="col">
+  <canvas id="c"></canvas>
+  <div id="ctl"><button id="spd">×1</button><button id="auto">AUTO</button><button id="re">↻</button></div>
+  <div id="od"></div>
+  <div id="perf"></div>
+</div>
+<script type="module">
+import { createEngine } from '../js/engine/engine.js';
+import { createBattleScene } from '../js/battle/battle.js';
+import { loadData } from '../js/sim/data.js';
+import { BOARD, configureBoard } from '../js/battle/layout.js';
+
+// ?p=aegis,lancer,-,halo,prism,monolith (slot order 0..5: front near/mid/far, back near/mid/far; '-' = empty)
+// &e=... (enemy wave 1) &e2=... &e3=... &waves=N (repeat e) &seed= &speed=1|2|4 &auto=0 &hud=1 (mock HUD bars) &perf=1 &freeze=secs &ot=secs (overtime start)
+const qs = new URLSearchParams(location.search);
+// &bW=14&blaneZ=1,-5,-11&bunitScale=1.7 ... override js/battle/layout.js BOARD (layout experiments)
+configureBoard(Object.fromEntries(Object.keys(BOARD).filter((k) => qs.has('b' + k)).map((k) => [k, Array.isArray(BOARD[k]) ? qs.get('b' + k).split(',').map(Number) : +qs.get('b' + k)])));
+const parse = (s) => s.split(',').map((id, i) => (id && id !== '-' ? { def: id.trim(), level: +(qs.get('lvl') || 10), slot: { col: i >= 3 ? 1 : 0, lane: i % 3 } } : null)).filter(Boolean);
+const P = parse(qs.get('p') || 'gunner,paladin,lancer,oracle,aegis,bulwark');
+const E1 = qs.get('e') || 'tarantula,scrapper,riot,halo,barb,rattler';
+const waves = [parse(E1)];
+if (qs.get('e2')) waves.push(parse(qs.get('e2')));
+if (qs.get('e3')) waves.push(parse(qs.get('e3')));
+for (let i = waves.length; i < +(qs.get('waves') || 1); i++) waves.push(parse(E1));
+// &charge=0.9 (every unit), &charge=p2:1 / e0:0.95 / 2:1 (one slot; bare slot = player), comma-separate to mix: starting Overdrive charge (0..1)
+if (qs.get('charge')) {
+  const cv = (x) => { const v = +x; return Math.max(0, Math.min(100, v <= 1 ? v * 100 : v)); };
+  for (const tok of qs.get('charge').split(',')) {
+    const m = /^([pe]?)(\d+):([\d.]+)$/.exec(tok.trim());
+    if (m) { const list = m[1] === 'e' ? waves.flat() : P; for (const u of list) if (u.slot.col * 3 + u.slot.lane === +m[2]) u.charge = cv(m[3]); }
+    else if (tok.trim()) for (const u of [...P, ...waves.flat()]) u.charge = cv(tok);
+  }
+}
+if (qs.get('hud') === '1') document.getElementById('col').classList.add('mockhud'), document.getElementById('col').insertAdjacentHTML('beforeend', '<div class="top"></div><div class="bot"></div>');
+
+const engine = createEngine(document.getElementById('c'), { quality: qs.get('q') || undefined });
+let battle = null;
+const dbg = window.__battle = { ready: false, state: null, stats: () => ({ ...engine.stats(), vfx: battle?.vfx.count(), units: battle?.unitStats?.() }), engine, ended: null, events: 0 };
+async function run() {
+  if (battle) { engine.setScene(null); battle.dispose(); }
+  dbg.ready = false; dbg.ended = null;
+  // &ot=secs: overtime starts after `secs` of a wave (test only)
+  let data;
+  // &theme=fantasy|scifi|forest (arena theme) / &realm=fantasy; with neither, battle derives it from the enemy units (needs data)
+  if (!qs.has('theme') && !qs.has('realm')) data = await loadData();
+  if (qs.has('ot')) { data = data || await loadData(); if (data._rules?.overtime) data._rules.overtime = { ...data._rules.overtime, start: +qs.get('ot') }; }
+  battle = createBattleScene(engine, { data, playerSquad: { units: P }, enemyWaves: waves.map((u) => ({ units: u })), seed: +(qs.get('seed') || 7),
+    auto: qs.get('auto') !== '0', speed: +(qs.get('speed') || 1), overlay: document.getElementById('col'),
+    margins: qs.get('margins') === '0' ? null : { top: 64, bottom: 150 },
+    ...(qs.has('theme') ? { theme: qs.get('theme') } : {}), ...(qs.has('fk') ? { themeUnitK: +qs.get('fk') } : {}), ...(qs.has('realm') ? { realm: qs.get('realm') } : {}),
+    frame: Object.fromEntries(['fov', 'widthFill', 'farY', 'nearY', 'gapTop', 'gapBottom', 'pitch'].filter((k) => qs.has(k)).map((k) => [k, +qs.get(k)])) });
+  dbg.battle = battle;
+  engine.setScene(battle);
+  battle.on('state', (s) => { dbg.state = s; renderOD(s); });
+  battle.on('event', () => dbg.events++);
+  battle.on('end', (r) => { dbg.ended = r; });
+  await battle.ready;
+  dbg.ready = true;
+  if (qs.get('nostart') !== '1') battle.start();
+}
+const odBox = document.getElementById('od');
+function renderOD(s) {
+  const us = s.player.units;
+  if (odBox.children.length !== us.length) {
+    odBox.innerHTML = us.map((u) => `<button data-slot="${u.slotIndex}">${u.name}</button>`).join('');
+    for (const b of odBox.children) b.onclick = () => battle.fireOverdrive(+b.dataset.slot);
+  }
+  us.forEach((u, i) => { const b = odBox.children[i]; b.classList.toggle('rdy', u.overdriveReady); b.style.opacity = u.alive ? 1 : 0.35; b.textContent = `${u.name} ${u.charge}`; });
+}
+let sp = +(qs.get('speed') || 1);
+document.getElementById('spd').textContent = '×' + sp;
+document.getElementById('spd').onclick = (e) => { sp = sp === 4 ? 1 : sp * 2; battle.setSpeed(sp); e.target.textContent = '×' + sp; };
+document.getElementById('auto').onclick = (e) => { const on = !battle.state.auto; battle.setAuto(on); e.target.style.opacity = on ? 1 : 0.5; };
+document.getElementById('re').onclick = run;
+if (qs.get('perf') === '1') {
+  const el = document.getElementById('perf'); el.style.display = 'block';
+  setInterval(() => { const s = dbg.stats(); el.textContent = `${s.tier} ${s.fps}fps ${s.ms}ms cpu${s.cpu}\n${s.calls} calls ${(s.tris / 1000).toFixed(0)}k tris dpr${s.dpr}\nvfx ${s.vfx} · units ${s.units?.calls ?? '-'}dc (+${s.units?.extra ?? 0})`; }, 500);
+}
+run().catch((e) => { console.error(e); document.body.insertAdjacentHTML('beforeend', `<pre style="color:#f88;position:absolute;top:0;z-index:9">${e.stack || e}</pre>`); });
+</script>
+</body>
+</html>

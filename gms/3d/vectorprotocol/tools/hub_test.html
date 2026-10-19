@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VP hub test</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<style>
+  html,body{margin:0;height:100%;background:#03050c;color:#cfe;overflow:hidden;font-family:Rajdhani,sans-serif}
+  #col{position:relative;height:100%;margin:0 auto;aspect-ratio:9/19.5;max-width:100%}
+  @media (max-aspect-ratio: 9/19.5){#col{width:100%;aspect-ratio:auto}}
+  #c{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #mapHost{position:absolute;inset:0}
+  #dbg{position:fixed;left:6px;bottom:6px;font:11px monospace;color:#7ad;opacity:.7;z-index:9;pointer-events:none;white-space:pre}
+  /* ?wide=1 mock landscape chrome (the real one is ui's): top bar, left rail dock, bottom-right CONTINUE */
+  .mock{position:absolute;z-index:3;pointer-events:none;border:1px dashed rgba(120,220,255,.55);background:rgba(4,12,26,.55);color:#9fe;font:700 11px Rajdhani;letter-spacing:.1em;display:flex;align-items:center;justify-content:center}
+  #mTop{left:6px;right:6px;top:6px;height:40px}
+  #mRail{left:8px;top:52px;bottom:8px;width:68px;flex-direction:column;gap:6px;padding:4px 0}
+  #mRail i{flex:1;width:58px;border:1px solid rgba(120,220,255,.35);font-style:normal;display:flex;align-items:center;justify-content:center}
+  #mCta{right:12px;bottom:12px;width:260px;height:52px;background:rgba(40,200,255,.35)}
+  #col:not(.land) .mock{display:none}
+  #toast{position:absolute;left:50%;top:12%;transform:translateX(-50%);padding:6px 14px;border:1px solid #38e8ff;background:#061224cc;font:700 14px Rajdhani;letter-spacing:.1em;color:#eaffff;opacity:0;transition:opacity .3s;z-index:5}
+</style>
+<script type="importmap">{"imports":{"three":"../../../lib/three/0.180.0/three.module.js","three/addons/":"../../../lib/three/0.180.0/addons/"}}</script>
+</head>
+<body>
+<div id="col"><canvas id="c"></canvas><div id="toast"></div></div>
+<div id="dbg"></div>
+<script type="module">
+const qs = new URLSearchParams(location.search);
+const view = qs.get('view') || 'hub';
+// ?full=1 drops the 9:19.5 column; ?wide=1 = full + mock landscape chrome (hub margins follow it, like ui's scr_hub);
+// ?rot=SECONDS swaps the column between 412x915 and 915x412 (rotation soak without CDP); &chrome=0 hides the mock chrome
+const wideT = qs.has('wide') || qs.has('rot');
+if (qs.has('full') || wideT) document.getElementById('col').style.cssText = 'width:100%;max-width:none;aspect-ratio:auto';
+const col = document.getElementById('col'), dbg = document.getElementById('dbg'), toast = document.getElementById('toast');
+if (wideT && qs.get('chrome') !== '0') col.insertAdjacentHTML('beforeend', '<div class="mock" id="mTop">TOP BAR</div><div class="mock" id="mRail">' + '<i>DOCK</i>'.repeat(5) + '</div><div class="mock" id="mCta">CONTINUE</div>');
+if (qs.has('rot')) { let t = 0; col.style.cssText = 'width:412px;height:915px;max-width:none;aspect-ratio:auto;margin:0'; setInterval(() => { t ^= 1; col.style.width = t ? '915px' : '412px'; col.style.height = t ? '412px' : '915px'; }, +qs.get('rot') * 1000 || 3000); }
+const say = (t) => { toast.textContent = t; toast.style.opacity = 1; clearTimeout(say.t); say.t = setTimeout(() => toast.style.opacity = 0, 1200); };
+window.__hub = { ready: false, stats: {}, view, errors: [] };
+addEventListener('error', (e) => window.__hub.errors.push(String(e.message)));
+if (view === 'hub') {
+  const { createEngine } = await import('../js/engine/engine.js');
+  const { createHubScene, STAGE_LEVELS } = await import('../js/hub/hub.js');
+  const stage = Math.max(1, Math.min(4, +(qs.get('level') || 1))) - 1;
+  const engine = createEngine(document.getElementById('c'), { quality: qs.get('q') || undefined });
+  const all = ['story', 'arena', 'events', 'squad', 'workshop', 'recruit', 'hq'];
+  const unlocked = qs.get('unlock') ? qs.get('unlock').split(',') : [['story', 'squad', 'workshop'], ['story', 'squad', 'workshop', 'recruit', 'hq'], all.filter((x) => x !== 'events'), all][stage];
+  const camO = {}; for (const k of ['pitch', 'shift', 'tz', 'half', 'k', 'fx', 'pitchWide', 'nearCrop']) if (qs.has(k)) camO[k] = +qs.get(k);
+  // ?squad=gunner,bulwark:epic:3,riot:rare  (model[:rarity[:rank]]); ?rift=1 opens the D21 sky tear
+  const squad = qs.get('squad') === 'none' ? false : qs.get('squad') ? qs.get('squad').split(',').map((s) => { const [model, rarity, rank] = s.split(':'); return { model, rarity: rarity || undefined, rank: rank !== undefined ? +rank : undefined }; }) : undefined;
+  const hub = createHubScene(engine, { companyLevel: STAGE_LEVELS[stage], unlocked, container: col, cam: camO, highlight: 'story', badges: { recruit: stage >= 1 ? '1' : '' }, squad, riftOpen: qs.has('rift') });
+  hub.on('select', (id) => { say('SELECT ' + id); window.__hub.lastSelect = id; });
+  hub.on('locked', (id) => { say('LOCKED ' + id); window.__hub.lastLocked = id; });
+  engine.setScene(hub);
+  window.__hub.engine = engine; window.__hub.scene = hub;
+  if (wideT) {
+    // what ui's scr_hub does on orient change: landscape margins from the dock rail + CTA, portrait the old ones
+    const fit = () => {
+      const land = col.clientWidth >= col.clientHeight; col.classList.toggle('land', land);
+      if (!land) { hub.setMargins({}); return; }
+      const cr = col.getBoundingClientRect(), cta = document.getElementById('mCta')?.getBoundingClientRect();
+      const avoid = cta ? [{ x: cta.left - cr.left, y: cta.top - cr.top, w: cta.width, h: cta.height }] : [];
+      hub.setMargins({ top: 52, bottom: 16, left: qs.get('chrome') === '0' ? 12 : 84, right: 12, avoid });
+    };
+    new ResizeObserver(fit).observe(col); fit();
+  }
+  setTimeout(() => { window.__hub.ready = true; }, 300);
+  setInterval(() => { const s = engine.stats(); window.__hub.stats = { ...s, ...hub.stats() }; dbg.textContent = `${s.fps}fps ${s.ms}ms cpu${s.cpu} calls${s.calls} tris${s.tris} dpr${s.dpr} ${s.tier}`; }, 500);
+} else {
+  document.getElementById('c').remove();
+  const host = document.createElement('div'); host.id = 'mapHost'; col.appendChild(host);
+  const { createStoryMap, createMapSelect, DEMO_MAPS } = await import('../js/map/story_map.js');
+  const mapN = +(qs.get('map') || 1);
+  let maps = DEMO_MAPS;
+  try { const D = (await import('../js/data/index.js')).default; if (D?.maps?.length) maps = D.maps; } catch (e) { console.warn('demo maps', e.message); }
+  const progress = {};
+  const cleared = qs.has('cleared') ? +qs.get('cleared') : 5;
+  maps.forEach((m, mi) => m.levels.forEach((l, i) => { if (mi < mapN - 1 || i < cleared) progress[l.id] = 1 + ((i * 7 + mi) % 3); }));
+  let ui;
+  const show = (n) => {
+    ui?.dispose();
+    if (n === 0) { ui = createMapSelect(host, { maps, progress }); ui.on('map', (id) => show(maps.findIndex((m) => m.id === id) + 1)); }
+    else { ui = createStoryMap(host, { mapId: maps[n - 1].id, map: maps[n - 1], progress, animateUnlock: qs.has('anim'), showBack: qs.has('back') }); ui.on('level', (id) => { say('LEVEL ' + id); window.__hub.lastLevel = id; }); ui.on('back', () => show(0)); }
+    window.__hub.map = ui;
+  };
+  show(qs.get('select') ? 0 : mapN);
+  setTimeout(() => { window.__hub.ready = true; }, 400);
+}
+</script>
+</body>
+</html>

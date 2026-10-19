@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#040814">
+<link rel="icon" href="data:,">
+<title>VECTOR PROTOCOL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="css/vp.css">
+<link rel="stylesheet" href="css/screens.css">
+<link rel="stylesheet" href="css/hud_fantasy.css">
+<link rel="stylesheet" href="css/landscape.css">
+<style>
+  /* Boot screen is inline so it paints before any stylesheet or module arrives. */
+  html, body { margin: 0; height: 100%; background: #02040b; overflow: hidden; }
+  #boot { position: absolute; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 16px; transition: opacity .6s ease; color: #cfefff;
+    font-family: Rajdhani, "Bahnschrift", "Arial Narrow", system-ui, sans-serif;
+    background: radial-gradient(ellipse at 50% 40%, #0d2a52 0%, #061229 45%, #02050d 100%); }
+  #boot.gone { opacity: 0; pointer-events: none; }
+  #boot .logo { width: 92px; height: 92px; filter: drop-shadow(0 0 14px #26d9ff); }
+  #boot h1 { margin: 0; font: 800 clamp(22px, 7.5vw, 34px)/1 Orbitron, "Bahnschrift", system-ui, sans-serif; letter-spacing: .14em;
+    color: #e9fbff; text-shadow: 0 0 18px #22d3ffaa; text-align: center; }
+  #boot .sub { font-weight: 600; font-size: 12px; letter-spacing: .42em; color: #5fc6ec; text-transform: uppercase; }
+  #boot .bar { width: min(260px, 64%); height: 4px; background: #0b2340; overflow: hidden;
+    clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%); }
+  #boot .fill { height: 100%; width: 0%; background: linear-gradient(90deg, #1677ff, #2ee6ff, #d9fbff); transition: width .3s;
+    box-shadow: 0 0 10px #2ee6ff; }
+  #boot .msg { font-size: 13px; letter-spacing: .12em; color: #7fb2cf; min-height: 1.2em; text-align: center; max-width: 80%; text-transform: uppercase; }
+  #boot button { display: none; font: 700 14px Rajdhani, system-ui, sans-serif; letter-spacing: .25em; text-transform: uppercase;
+    color: #021019; background: linear-gradient(180deg, #8ff3ff, #1fc6f0); border: 0; padding: 11px 28px; cursor: pointer;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
+  #boot.failed button { display: block; }
+  #boot.failed .msg { color: #ff9aa9; }
+  #boot .scan { position: absolute; inset: 0; pointer-events: none; opacity: .18;
+    background: repeating-linear-gradient(180deg, transparent 0 3px, #2ee6ff22 3px 4px); }
+</style>
+<script>
+  // First-paint orientation guess so the boot screen is already full-bleed in landscape; js/app/orient.js owns it after boot.
+  (function () {
+    try {
+      var q = location.search, w = innerWidth, h = innerHeight, m = /[?&]orient=(landscape|portrait)/.exec(q);
+      var st = JSON.parse(localStorage.getItem('vectorprotocol.settings' + (/[?&]dev\b/.test(q) ? '_dev' : '')) || '{}') || {};
+      var phone = Math.min(w, h) < 500;
+      var mode = m ? m[1] : (!phone && st.layout === 'portrait') ? 'portrait' : (w / h >= 1.15 ? 'landscape' : 'portrait');
+      var r = document.documentElement;
+      r.setAttribute('data-orient', mode);
+      r.setAttribute('data-form', phone ? 'phone' : matchMedia('(pointer: coarse)').matches ? 'tablet' : 'desktop');
+      if (mode === 'landscape' && h < 480) r.className += ' l-short';
+    } catch (e) { /* orient.js sets it on boot */ }
+  })();
+  // Classic (non-module) watchdog: a module-graph failure never reaches a module's own error handler.
+  (function () {
+    var t0 = Date.now();
+    window.__bootErrors = [];
+    window.addEventListener('error', function (e) { window.__bootErrors.push(String(e.message || e)); });
+    window.addEventListener('unhandledrejection', function (e) { window.__bootErrors.push(String(e.reason && e.reason.message || e.reason)); });
+    function check() {
+      if (window.__vp && window.__vp.ready) return;
+      if (Date.now() - t0 > 20000) {
+        var b = document.getElementById('boot');
+        if (!b) return;
+        b.classList.add('failed');
+        var m = b.querySelector('.msg');
+        var err = window.__bootErrors[0];
+        m.textContent = 'Uplink failed to establish.' + (err ? ' (' + err + ')' : ' Check your connection and retry.');
+        return;
+      }
+      setTimeout(check, 1000);
+    }
+    setTimeout(check, 1000);
+    window.__reload = function () {
+      var u = location.href.replace(/([?&])_r=\d+&?/, '$1').replace(/[?&]$/, '');
+      var h = location.hash; u = u.replace(h, '');
+      location.replace(u + (u.indexOf('?') < 0 ? '?' : '&') + '_r=' + Date.now() + h);
+    };
+  })();
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "../../lib/three/0.180.0/three.module.js",
+  "three/addons/": "../../lib/three/0.180.0/addons/"
+} }
+</script>
+</head>
+<body>
+<div id="backdrop"></div>
+<div id="app">
+  <canvas id="game" tabindex="0"></canvas>
+  <div id="screen-bg"></div>
+  <div id="ui-root"></div>
+  <div id="overlay-root"></div>
+  <div id="boot">
+    <div class="scan"></div>
+    <svg class="logo" viewBox="0 0 100 100" aria-hidden="true">
+      <defs><linearGradient id="bootg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9fbff"/><stop offset="1" stop-color="#1fa8ff"/></linearGradient></defs>
+      <path d="M8 18 L30 18 L50 62 L70 18 L92 18 L56 90 L44 90 Z" fill="none" stroke="url(#bootg)" stroke-width="5" stroke-linejoin="bevel"/>
+      <path d="M30 30 L42 30 L50 48 L58 30 L70 30 L50 74 Z" fill="url(#bootg)" opacity=".85"/>
+    </svg>
+    <h1>VECTOR<br>PROTOCOL</h1>
+    <div class="sub">Mercenary Combat League</div>
+    <div class="bar"><div class="fill"></div></div>
+    <div class="msg">Establishing uplink…</div>
+    <button type="button" onclick="window.__reload()">Retry</button>
+  </div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

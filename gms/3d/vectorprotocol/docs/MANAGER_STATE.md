@@ -1,0 +1,167 @@
+# VECTOR PROTOCOL — Manager State
+
+Read this first when resuming, then DECISIONS.md, then TEAM_BRIEF.md, then docs/notes/*.md.
+
+## Run protocol
+- Cap: **6 agents** (Aaron, 2026-10-19). If Aaron sends a number N → let running agents finish until only N remain.
+- **"continue" after a usage limit** = the limit reset. In that same turn: for each agent below, check whether it's still alive (SendMessage it a short "status?" or check its notes timestamp); resume dead ones via SendMessage to their id (transcript survives), else relaunch fresh with "continue from docs/notes/<name>.md". Don't ask Aaron first.
+- Manager makes game decisions; collect the non-obvious ones in "Questions for Aaron" below for the end-of-run summary.
+- Not pushed to Pages yet — Aaron didn't ask. Local: http://192.168.0.236:8888/gms/3d/vectorprotocol/ (yru-site server). Commit only `gms/3d/vectorprotocol` (+ any new `gms/lib` vendored files) when asked or when a playable milestone is agreed.
+
+## Phase 0 (started 2026-10-19) — 6 agents
+| Agent | id | Status |
+|---|---|---|
+| design | a565bfa01baec2d64 | DONE (all docs + js/data; run 10 balance) |
+| sim | ac9e3ba45304f9632 | DONE (15/15 tests, harness) |
+| robots | a4dd4f5b1b5b05eb6 | DONE round 4 (boss flag, rim override, mats merge, fur kit, gallery &theme=fantasy, touch-ups) (glow2, rarity rim, noDrop, sockets, bodyScale, setMirror, touch-ups) (kit polish, rank ladder, detail textures, power hooks, fantasy beast/organic stubs; robots now uses CDP 9420) |
+| battle | a4c9def36f445043f | DONE (engine, two-camera arena, playback, FX toolkit) |
+| hub | a3f16a0c18b23dd81 | DONE (compound 4 stages, story map, 8 Flux backdrops) |
+| ui | ad761a9daf7000bb6 | DONE (first playable loop) |
+| sculptor-1 gunner+scrapper | a81e55f06be5efdf8 | DONE (bespoke models/anims/FX, testAll 0 fail) |
+| ui-2 integrator | a49e118dcca5252f1 | DONE (battle API wiring, results MVP, arena/event formation, ×10 recruit, tutorial, tap targets) |
+| sculptor-2 paladin+halo | a0f4f9fe66ba023a5 | DONE |
+| sculptor-3 riot+barb | ada6f2201422c7b8c | DONE |
+| sculptor-4 tarantula+jammer | aac464878e67cb145 | DONE |
+| audio | a8949f25e41663593 | DONE (engine, 43 sfx, 5 loops live; 7 renders pending — finish via scratchpad/audio/process.py) |
+| sculptor-10 aegis+husk | a4033ea3c56323345 | DONE (husk ~5.5/10 → touch-up list) |
+| sculptor-13 specter+monolith | a8621ca8d8393cf50 | DONE (~6/6.5) |
+| sculptor-17 wolf+minotaur (fantasy) | accc782e9e43a08f8 | DONE (fur tufts; ember/frost variants) |
+| sculptor-7 rattler+warden | ac8c1c470fcc0c951 | DONE |
+| sculptor-8 juggernaut+sparkplug | a055e3c3862515b29 | DONE (Big Rusty boss look) |
+| sim-2 | a74b2820efd0ac102 | DONE (stars, chests, rift, shard exchange, save v2; balance pass UNFINISHED) |
+| sculptor-9 warlord+widowmaker | a47de5ba2426e939e | DONE (Redline/Corona bosses) |
+| sculptor-14 seraph+wisp | ab8e0d5194108ef36 | DONE (Choir boss = R5) |
+| sculptor-18 knight+elf_ranger (fantasy) | af567646feb5e7b96 | DONE |
+| sculptor-21 elf_sage + husk polish | a73cb07ae5c0a8823 | DONE |
+| landscape planner | a489da909c0dd76d9 | DONE (docs/LANDSCAPE.md) |
+| ui-L | a6599756e5dfb4934 | running (9406): UI-L0→L1→L2 |
+| hub-L | ad549bb6aa111371a | running (9405): HUB-L |
+| battle-2 | ab5d29419dcf09623 | DONE (~6/10; scale 1.9, rim bubbles, crowd, overtime, drop-in/victory) |
+| battle-3 | a689e52f42b59f0b1 | DONE (~6.5/10; full-width 14×29 board, ~40° camera, scale 2.0) |
+| ui-3 | ab1b1ae2043fb088b | DONE (star goals UI, chests, shard convert, rift banner, OT chip, card scaling, audio wired via js/app/sound.js) |
+| sculptor-11 meridian+citadel | a9b60b28444adbcf7 | DONE (Stormcrow + Dreadnought bosses; ~5–5.5 real) |
+| battle-5 | aecb966036dac1f81 | DONE (~7/10; boss footprint fit, rarity pips, fx.dim/lean/darkCore, Ghost Net stealth, slate floor, lit console) |
+| battle-6 | a0a77ed766beec597 | DONE (fantasy ruins arena ~6/10, faction colours, debuff hook, Redline step-out, paladin flare fix, hover shadow) |
+| battle-7 | a2ff5f5a5ece1eb40 | running (9404): fantasy polish, ribbon FX, cloak sfx, dark-core no-bloom |
+| sculptor-12 pyre+needle | a7d26d327f9e59f30 | DONE |
+| sculptor-19 treant+shaman (fantasy) | a52b4c53c64c41d8a | DONE (Elderbark boss) |
+| sculptor-22 touch-ups | a3a662ed151b88e88 | DONE (oracle 6 slots, halo 14k, aegis legs, elf face/legs/victory, executor jacket, specter darker) |
+| ui-5 | a634ebaaf4beadfe7 | DONE (D25 phone fixes, fantasy HUD, hub squad, dev cheats, touch-drag fix) |
+| battle-4 | a51075e869165f720 | DONE (shot/heal/shield/buff/deploy hooks, noDrop, unitStats, &charge=, audio ctx, haze, far rows, OD plate) |
+| audio-2 | a37eff16258d1f310 | DONE (8 loops + 3 stings + crowd, 9.5 MB; manifest; per-weapon sfx; route-music fix) |
+| sculptor-15 executor+leviathan | a3db2940d7ded51c0 | DONE (~6/6.5) |
+| sculptor-20 paragon+arbiter | ac03eccdb277187fe | DONE (Aurelian = R5) |
+| sim-4 | a075a32f914dbee7b | running: dev cheat flags, m6–m8 recruit-luck smoothing, balance re-run |
+| hub-2 | ae4bee1e152f90ff3 | DONE (~6.5–7/10; building identities, scrapyard stage 0, backdrops re-encoded) |
+| sim-3 | a3655c82777096c08 | DONE (smart 14.9/19.2/16.4 h; economy ~3× slower; harness bugs fixed) |
+| sculptor-16 singularity+kingpin | a561d2ee768294054 | DONE (Vector Prime = R5; Cataclysm V-beams → black hole) |
+| hub-3 | a259e5aaa7000b4b6 | DONE (squad mechs in compound, flagship stage 3, rift, corner keep-outs, fit-by-aspect) |
+| sculptor-23 touch-ups 2 | a01fc726f832471f2 | DONE (10 units +0.5–1.5) |
+| ui-4 | a0b0de1f0ba2f8449 | DONE (dev mode ?dev=1, LOCKED notices, rift gate reveal, 6-frame HUD strip, nav event) |
+| qa | a7c0521f5e54ba442 | running (9434): full playthrough + all bosses, bug list docs/notes/qa.md |
+| sculptor-5 phase+prism | a4f2280907b03503a | DONE (prism under tris 6k) |
+| sculptor-6 oracle+patch | af30b01f61f528db4 | DONE (~6/10 self) |
+
+## On each agent hand-back
+Verify: index.html boots (no console errors), `node tools/sim/test.mjs` passes, gallery/battle_test/hub_test load. Then decide the next agent for that slot (see Next).
+
+## Next (Phase 1 candidates)
+- Characters round 2 (more models/rarity tiers, a blind critique vs ref), battle VFX polish, audio (music via Music Studio + SFX), full content pass (all maps), balance pass with harness, cloud saves, projects.js registration.
+
+## Questions for Aaron (decisions I made so work could continue)
+- (see the end-of-run summary)
+
+## Log
+- 2026-10-19: folder scaffolded, ref copied, DECISIONS D1–D20 + TEAM_BRIEF written, 6 agents launched.
+- 2026-10-19: new refs ref_battle_02 + ref_fantasy_01; D21 fantasy crossover approved by Aaron; design/battle/robots/hub messaged.
+- 2026-10-19: D22 sculptor agents. Robots told to ship kit + registry stubs + MODEL_GUIDE.md + 1–2 exemplars, then ping main; battle told to ship FX toolkit + js/fx/units/<id>.js hook, then ping main. **Then launch sculptor waves (~3 at a time, 1–2 units each, by ROSTER launch-set priority)**; (superseded: cap stays 6, see below).
+- 2026-10-19: Aaron: **keep the cap at 6 total running agents**. Sculptors launch only as slots free up (an agent hands back) — never exceed 6 concurrently. Queue: sculptor waves by ROSTER launch-set priority.
+- 2026-10-19: robots: the kit, the registry (14 launch ids, all working stubs) and MODEL_GUIDE.md are ready. The exemplars bulwark + lancer are in progress. Sculptor CDP ports start at 9410. All 6 slots are full, so sculptors wait for the first hand-back (ideally after the exemplars land). Sculptor queue (pairs): [paladin+halo] [gunner+tarantula] [riot+barb] [scrapper+patch] [jammer+phase] [prism+oracle]. The robots agent does bulwark+lancer itself.
+- 2026-10-19: battle: FX toolkit + per-unit hook ready (js/fx/README.md, js/fx/units/_example.js). Sculptors may add ONE line to js/fx/units/index.js: `<id>: () => import('./<id>.js'),` (battle owns the file). Test: tools/battle_test.html?p=gunner,paladin,lancer,oracle,aegis,bulwark&e=tarantula,scrapper,riot,halo,barb,rattler&seed=7&speed=1 — runs on the real sim + robots units.
+  **Sculptor brief must include:** own js/actors/models/<id>.js + js/fx/units/<id>.js (+1 line in fx/units/index.js); read MODEL_GUIDE.md, js/fx/README.md, ROSTER.md entry, refs; copy bulwark/lancer exemplars; CDP port 9410+; gallery + battle_test screenshots vs ref_battle_02; notes docs/notes/sculpt_<id>.md.
+- 2026-10-19: Aaron: battle camera pitched down → boring rooftops; refs show the backdrop straight-on (skyline, sky, screens) while the board looks tilted up. Sent to battle with options (two-layer backdrop camera / lens shift / other); awaiting before/after shots.
+- 2026-10-19: UI DONE: first playable loop (hub → map → level → formation → battle HUD → results → map, saved). Verified boot (ready, /hub, 0 errors). Requests relayed (robots: bulwark throws parts.js:43; battle: setPaused/forfeit; hub: lock hints vs DATA.features + m1.jpg 404; sim: data.js 404 probe). UI's next-agent list in docs/notes/ui.md. Slot → sculptor-1 (gunner+scrapper).
+- 2026-10-19: battle two-layer camera (backdrop layer 3, DualRenderPass) approved. Sent next: fill the dead band below the board / bigger board, damage-number collisions, a richer floor, backdrop depth.
+- Remaining sculptor queue: [paladin+halo] [riot+barb] [tarantula+jammer] [phase+prism] [oracle+patch]; bulwark+lancer by robots.
+- 2026-10-19: robots fixed the bulwark crash; `__gallery.testAll()` (all ids × rarities × ranks × q, all anims) is the gate before any checkpoint; include it in every sculptor brief.
+- 2026-10-19: exemplars bulwark/lancer "ready", but my review: below the ref (one saturated hue, 1/3 of the tris budget used, faceted boxes, rarity tiers indistinguishable). Sent back to robots to raise the kit + exemplars + MODEL_GUIDE quality bar; sculptor-1 told the bar is higher. Hold further sculptor launches until the re-done exemplars land.
+- 2026-10-19: exemplars v2 approved (bulwark 13k: gunmetal + blue panels, hydraulics, rank ladder R0–R5 with fins/crown; MODEL_GUIDE §9 tri targets). Next sculptors are cleared to launch when a slot frees. Asked battle for a warmer key/fill on the units (blue-wash).
+- 2026-10-19: battle round 2 approved (floor, backdrop bands, warm key, numbers, setMargins). Sent: declutter the Overdrive moments (banner, proc names, blur), the front dead band, draw calls (303 high).
+- 2026-10-19: hub DONE (map ~7.5/10 looks great; hub ~6/10, boxy buildings → hub round 2 later). assets/maps/*.jpg (~3.5 MB) to commit. Slot → ui-2 integrator (hub/map/battle API wiring, unlocked list, results/MVP, arena/event formation, multi-pull, status icons, tutorial hints, phone feel).
+- Queue for next free slots: sculptor-2 [paladin+halo], sculptor-3 [riot+barb], [tarantula+jammer], [phase+prism], [oracle+patch]; later hub round 2, audio, balance pass.
+- 2026-10-19: sim DONE. Tests 15/15, validate 0 errors (verified). Balance: credits are the cap; map 5 too easy, maps 6–7 cliffs; 59–66% of time in arena/events (target 25–40%); hard binary role triangle; weak archers; rare ≈ common. Sent to design as priorities; design now owns the sim balance constants too. Slot → sculptor-2 (paladin+halo, 9411). Robots (art lead) now reviews sculptors directly.
+- Questions for Aaron (from sim): overtime after 45 s (+4%/s damage, half heals); the 75 s wave timer = loss; a lost story battle gives 20% XP.
+- 2026-10-19: robots DONE (kit owner/art lead; testAll 0 failures; useProxy 257→125 calls). Waking it for reviews counts against the cap. Slot → sculptor-3 (riot+barb, 9412). Relayed 'face units ~0.45 rad to camera' to battle. Open: R0–R2 subtle at battle size; lancer 8k < 10–16k target.
+- Running now (6): design, battle, sculptor-1, ui-2, sculptor-2, sculptor-3. Queue: [tarantula+jammer] (9413), [phase+prism] (9414), [oracle+patch] (9415), robots art review, hub round 2, audio.
+- 2026-10-19: battle readability round done (compact OD plate, proc captions, spotlight grade, numbers capped, front rim, 3/4 facing, useProxy: 306→172 calls high). Asked Aaron for an S22 number: tools/battle_test.html?perf=1.
+- 2026-10-19: sculptor-1 DONE (gunner 9–11k, scrapper 7–8k; all anims+FX bespoke). My review: good, coherent. Slot → sculptor-4 (tarantula+jammer, 9413). Note: sculptor-1 had no SendMessage tool, so sculptors write requests in their notes.
+- **Kit-polish queue (for robots when woken):** panel-line shader speckle on small dark metal at battle size (sculptor-1 works around it via mats.*.panel.groove); a per-slot texture hook for panel/grime maps; rarity ladder below legendary too subtle at battle size; R0–R2 subtle.
+- 2026-10-19: battle DONE (~5/10 vs ref by its own and my judgement; 172 dc high). Slot → **battle-2** (unit size ~1.5×, shield bubbles obscuring units, crowd bar code, OVERTIME treatment, melee overlap, generic VFX, deploy/victory, in-game route check). Its id is in the table below once known. Open sim request: forfeit() returning the end event with stats (sim done, so this is for whoever touches js/sim next).
+- 2026-10-19: ui-2 DONE; boot verified (#/map/1 ready). Relayed OD-plate position + overtime state to battle-2. Queued small fixes: hub `.vpm-back` 38→44 px; Scrapper plate looks gold/purple on the turntable (robots); HUD portrait strip too small with 1–2 units. Slot → sculptor-5 (phase+prism, 9414). Remaining sculptor pair: [oracle+patch] (9415).
+- Questions for Aaron: ×10 recruit has no bulk discount; the story briefing plays on Deploy; hints on for the first 3 contracts.
+- 2026-10-19: design DONE. Run 10: smart player 15.2 h (in target), grinder 23.5 h, story-only stalls m3/m4. Grind share 55–60% (> target). Harness says the story itself is only ~5 h of play, so D10's 15–25 h and 25–40% grind can't both hold → **question for Aaron**. ROSTER/MAPS/STORY .md are GENERATED from js/data via js/data/_gen_*.mjs; edit the data/templates. Slot → sculptor-6 (oracle+patch, 9415). All 14 launch units are now assigned.
+- **Next queue (as slots free):** (1) robots art-lead review + kit polish (speckle, texture hook, rarity ladder below legendary, R0–R2, Scrapper plate colour, then fantasy organic rig prep); (2) sim-2: Rift banner-only recruit pool, shard→chips for maxed units, forfeit() returning end stats, m8 tweak [48,54]→[48,52]; (3) hub-2: buildings richer than boxes, stage-0 sparsity, .vpm-back 44 px, city window noise; (4) audio (music via Music Studio + SFX); (5) sculptors for the non-launch roster (22 recruitables, bosses, fantasy NPCs); (6) ui-3: HUD strip scaling for small squads, OVERTIME chip, ×10 discount if Aaron wants.
+- Questions for Aaron (design): rarity = starting rank + rank ceiling + stat bump; archers +35% vs tanks from the back row; credits bottleneck/arena main source; story beats (Novaline villain, Mags' backdoor, patch-not-delete ending, experimental robots = refugee minds from the fantasy realm).
+- 2026-10-19: sculptor-2 DONE (paladin 14–18k with forced gold, greatsword OD; halo 9–15k, under budget). Manager edits: units.js setShield floors at M.aura; MODEL_GUIDE "Kit notes added by the manager". testAll 0 fails (verified; phase briefly failed mid-edit). Slot → robots woken (kit polish list 1–8 incl. fantasy organic rig prep). Future sculptor touch-ups: halo +tris, paladin waist taper, paladin lane wave length.
+- 2026-10-19: battle-2 DONE (164 dc high, 7.7 ms M5). sculptor-3 DONE (riot 13–14k, barb 9–11k; kit requests: legs() accent slot, per-event FX hook).
+- **USAGE LIMIT hit** (reset 2:40 Brisbane): robots, sculptor-4, sculptor-5 and sculptor-6 died mid-task. Aaron typed 'continue' → all 4 resumed via SendMessage. Free slots → battle-3 + hub-2. Running (6): robots, sculptor-4, sculptor-5, sculptor-6, battle-3, hub-2.
+- Next queue: sim-2 (Rift pool, shard→chips, forfeit stats, m8 tweak); audio; ui-3 (HUD strip scaling for small squads, OVERTIME chip); sculptors for the non-launch roster + fantasy (after robots preps the organic rigs); a first Pages push only if Aaron asks.
+- 2026-10-19: sculptor-4 DONE (tarantula 15–16k quad, jammer 12–13k tracked; testAll 0). Relayed: back-near enemy slot clipped by the side buttons → battle-3; setPowerScale hook → robots (may edit jammer FX). Slot → sim-2 (star challenges = my lean on Aaron's length question, pending his answer).
+- 2026-10-19: sculptor-4 stopped; art-lead requested edits sit untested in scratchpad/s4/{tarantula,jammer}.js → robots told it may take over those two model files and apply them.
+- 2026-10-19: manager: css/screens.css .hud-right top 40% → 25% (battle-3: full-width layout puts the back enemy slots under a mid-height rail; ref_02 has x2/AUTO at ~25%).
+- 2026-10-19: robots round 2 DONE (testAll 0 incl. fantasy stubs; tarantula/jammer scratch edits applied). Future sculptor touch-ups: gunner cyan, scrapper accent, paladin blade blow-out, halo thin, barb spine lights, prism under tris, oracle orbs 1.3×. Battle owner: the attack FX hook fires only on the first fire/impact (multi-shot bursts). Slot → **audio** agent (Music Studio ACE instrumentals + WebAudio sfx).
+- 2026-10-19: sculptor-5 DONE. Kit requests: unit.extraDrawCalls for ghosts; a no-deploy-drop flag for blink units. Slot → sculptor-7 (rattler+warden, map-1 commons, 9416; registers new ids in models/index.js).
+- Enemy usage per map (for sculptor priority): m1 dock_thug, scrapper, scrap_drone, rattler, warden, boss_big_rusty; m2 adds sparkplug, pyre, boss_redline; m3 husk, aegis, needle, boss_corona; m4 sec_drone, meridian, citadel, arbiter, boss_stormcrow. **Next sculptor pairs:** [dock_thug+scrap_drone grunts], [boss_big_rusty], [sparkplug+pyre], [boss_redline], [aegis+husk], [needle+meridian], [citadel+arbiter], then the rest + fantasy.
+- 2026-10-19: sculptor-6 DONE (oracle rebuilt as a biped, patch medic drone). **All 14 launch units built.** testAll 0 (prism's brief break was fixed by sculptor-5). Kit requests: per-part emissive tint/2nd glow colour; a dark normal-blended particle type; a heal(ctx) FX hook (battle owner); extraDrawCalls; a no-deploy-drop flag. Slot → sculptor-8 (juggernaut = BIG RUSTY's model + sparkplug, 9417). dock_thug reuses scrapper; scrap_drone uses drone.
+- Touch-up list (a future polish sculptor): oracle orb colour + upper body, patch R0/R1, prism tris + R1 facets, phase contrast, gunner cyan, paladin blade blow-out, halo fuller, barb spine lights.
+- 2026-10-19: sim-2 star goals in (save v2 with migration; API in js/sim/README.md "Star goals" / "Shards & the Rift banner"). Manager edit: js/ui/scr_battle.js fallback createBattle passes `goals: B.goals`; intel text no longer hard-codes +25%. battle-3 asked to pass `goals: cfg.goals` in battle.js.
+- **ui-3 brief (next UI slot):** show the 3 star goals (game.goals) on the level sheet, map nodes and results; star chests (maps()/chests, out.chests); shard conversion (convertShards, surplusShards); the Rift banner (bannerPool('rift')); an OVERTIME chip (state.overtime); scale the HUD portrait strip up for small squads; audio wiring from docs/notes/audio.md "Integration requests"; ×10 recruit discount if Aaron wants one.
+- manager: scr_battle.js also passes goals: B.goals to createBattleScene (battle-3 does the battle.js side).
+- 2026-10-19: battle-3 DONE (162 dc high). In-game battle screenshot (g_b2) now resembles ref_02 with the real HUD. Open: blue haze over the floor centre, near console hidden under the HUD gradient, units darker/busier than the painted ref, far rows close to the back barrier. Side-button clearance is only 2–6 px. Slot → ui-3.
+- 2026-10-19: audio engine landed; relayed its 2 integration edits (main.js import, scr_battle.js audio: audio.forBattle(B)) + optional calls to ui-3. **For the next battle owner:** pass ctx to audio.sfx in battle.js (fire_<delivery> {ability,x}, hit {x,melee,absorbed,amount}, overdrive_fire, shield_break on e.broken). Note: ACE is slow under swap pressure (too many Chrome processes?).
+- 2026-10-19: sim-2 DONE: tests 23/23, validate 0 (verified). Balance unfinished: the smart player is ~13 h with stars (target 15–25), back-loaded (m7–m8 heavy, m3–m6 quick); straight-through stalls from m3 (met); outliers ±10 met. **After any wave/stat/rule change, re-run `node js/data/_gen_star_times.mjs`.** sim-3 is needed later: harder m3–m6, easier m7–m8, a full 3-seed pass, ECONOMY balance status.
+- Questions for Aaron (sim-2): star rewards add power (shortening the game); should they be cosmetic/smaller? Rift units have no synergies (add a realm synergy?); shard exchange 1/1.5/2/3 chips.
+- Boss models: m1 Big Rusty = juggernaut (sculptor-8), m2 Redline = warlord + m3 Corona = widowmaker (sculptor-9), m4 Stormcrow = meridian (next).
+- 2026-10-19: sim-2 final curve (3 seeds): smart+stars finished 1/3 (16.8 h); the others stalled 21–39 h. **m8 takes 10–17 h** (main problem), m6 11.5 h on seed 1. Straight walls m5–m7. Arena+events 42–46%; with stars 62–69%. sim-3 next tune: ease m8 (lv / swap legendaries→epics in the core pool), raise m3–m4, regen star_times, re-run 3 seeds (~30 min). Output in scratchpad/sim2/r1.
+- 2026-10-19: hub-2 DONE (draw calls ~116–166 avg with the mirror every other frame; peak frames ~212 at stage 3). Open: stages 2/3 look alike, the BARRACKS label overlaps at 390 on stage 3, VTOL readability. Question for Aaron: regenerate the map backdrops at 2048×800 (only ~14% more resolution)? Slot → sim-3.
+- 2026-10-19: audio handed back but is still waiting on its renders (counts as a running slot until they finish). Live: hub, map, battle_1, battle_4 (4.9 MB). Queued in Music Studio: battle_2/3, boss, rift, 3 stings, crowd. Memory: the ACE worker (pid 92921) is ~23 GB and swap is 22.4/23.5 GB, so ACE runs ~10 min/job; no LLM or mflux is loaded. Left running; avoid launching heavy sim + many Chromes together. To finish: process.py in scratchpad/audio → audio/music, then set loop in tracks.js (audio agent or the next owner).
+- 2026-10-19: audio DONE (battle_2 landed). Pending Music Studio jobs: battle_3 05796495a6, boss 9961675e81, rift 08df28b968, stings d22a8fef32/69d04b7d61/c8058f4c7c, crowd 37e1598708 → **audio-finish task** (process.py, copy, loop lengths in tracks.js, battle_3 rotation, sting trim, crowd → audio/sfx/crowd.mp3). Slot → sculptor-10 (aegis+husk, 9419).
+- 2026-10-19: sculptor-8 + ui-3 DONE. Manager edit: battle.js spawn passes `rank` (boss_* → 5; others → gameplay rank, so rank-ups show in battle). Verified the Big Rusty fight (looks great). Audio 404s for the unshipped stings/crowd remain until the audio-finish task (ask the audio-finish agent for a manifest so missing files are skipped). Slots → sculptor-11 + battle-4.
+- 2026-10-19: sculptor-7 DONE (rattler 8.5–9.5k, warden 10.5–12k). &charge= relayed to battle-4. Slot → robots round 3 (resumed).
+- 2026-10-19: robots round 3 DONE (oracle now 7 slots; open: oracle upper body, halo tris need a sculptor). Battle-4 got from robots: rarity pips/trim on hex plates, setMirror for mirrorSide, skip the root drop for noDrop, the dark particle type. Slot → sculptor-12 (pyre+needle, 9422). Remaining unbuilt: arbiter, executor, paragon, monolith, leviathan, specter, seraph, wisp, kingpin, singularity, sec_drone(?), bosses m5–m8 + raid, fantasy ×8.
+- 2026-10-19: battle-4 DONE (~6.5–7/10; 162 dc high; board 14×31.66, back col x4.3, widthFill 1.06; side-button clearance 3–5 px). Hooks broadcast to sculptors 9–12. Next battle round: rarity pips/trim on hex plates (unit.rarityColor), floor still bluer than the ref slate, the console reads dark. Music queue empty → slot → audio-2.
+- 2026-10-19: sculptor-10 DONE (testAll 0; citadel's 48 fails were sculptor-11 mid-edit, now clean). Slot → sculptor-13 (specter+monolith). Boss models: m5 The Choir = seraph, m6 Elderbark = treant (fantasy stub), m7 Aurelian = paladin(?), m8 Vector Prime = singularity. Map enemy cores: m5 phase/lab_drone/husk/prism/needle/halo/monolith/specter/wisp; m6 fantasy ×8; m8 executor/leviathan/seraph. **Next pairs:** [seraph+wisp], [executor+leviathan], [arbiter+paragon], [kingpin+singularity], fantasy [knight+elf_ranger], [wolf+minotaur], [treant+elf_sage+shaman]. Touch-ups: husk, aegis legs, oracle upper body, halo tris.
+- 2026-10-19: sculptor-9 DONE (warlord 22–25k, widowmaker 15–19k). Its rank request was already done by me; motes.color already exists. **Kit queue:** per-slot rim strength / accent opt-out for dark legendaries (the gold rim outlines black plates), `legs({shinGlow:false})`. **Battle queue:** fx.dim(k,dur); a Ghost Net wave-start stealth visual; check REDLINE's ×1.35 whirlwind vs the side buttons; rarity pips on plates. Note: the tutorial Field Manual popup blocks wave-3 play in automated tests. Slot → sculptor-14 (seraph+wisp).
+- 2026-10-19: USAGE LIMIT #2 (reset 7:40 Brisbane): all 6 (sculptors 11–14, sim-3, audio-2) died mid-task; Aaron typed continue → all 6 resumed via SendMessage.
+- 2026-10-19: sculptor-11 DONE. Slot → battle-5 (boss scale/overlap, rarity pips on plates, fx.dim, Ghost Net stealth, floor look, meridian barrel spacing).
+- 2026-10-19: audio-2 DONE (re-run `node js/audio/gen_manifest.mjs` when audio files change). Boss/rift tracks not yet heard in a live battle. Slot → sculptor-15 (executor+leviathan).
+- 2026-10-19: sim-3 DONE (verified tests 23/23, validate 0). sim-2's slow numbers were harness-player bugs. Missed: one map per seed > 3.5 h (recruit luck), arena+events 56–58% (structural: story+stars ≈ 7 h). Sensitivity: star rewards → cosmetic adds 3–5 h; realm synergy < 1 h; shard exchange < 0.5 h. Suggested: late-epic pity/targeted shards for m6–m8. **Question for Aaron:** count star replays as grind, or lengthen story fights? Slot → sculptor-16.
+- 2026-10-19: sculptor-13 DONE. fx.darkCore draws nothing → sent to battle-5 (plus a unit.lean hook idea). Slot → sculptor-17, the first fantasy sculptor (wolf for dire+frost, minotaur). **TODO: a fantasy ruins arena theme (battle) for map 6, per D21; still unbuilt.** Remaining fantasy after this: knight+elf_ranger, treant (Elderbark boss)+elf_sage+shaman.
+- 2026-10-19: sculptor-14 DONE. MODEL_GUIDE: added the dims.parents order gotcha (kit guard for robots later). Open: seraph wings too bright, wisp small. A boss in a back slot can sit under the top HUD (battle). Slot → sculptor-18 (knight+elf_ranger).
+- 2026-10-19: sculptor-12 DONE (pyre ~6, needle ~5). **Kit queue (robots round 4):** a per-model rim tint/strength override (warlord, pyre, dark legendaries); unit.drawCalls includes the instance extraDrawCalls; a dims.parents guard; legs({shinGlow:false}). Particle-size doc → battle-5. Slot → sculptor-19 (treant/Elderbark + shaman). Remaining fantasy: elf_sage.
+- 2026-10-19: battle-5 delivered fx.dim, the darkCore fix, fx.lean and the README note. Manager edit: widowmaker FX uses fx.dim(0.85,1.2) for Last Light (falls back to screenFlash). Monolith still writes body.rotation (works; switch to fx.lean at the next touch-up).
+- 2026-10-19: sculptor-15 DONE. Slot → sculptor-20 (paragon = Aurelian m7 boss, + arbiter). After this, all scifi recruitables + all 8 bosses + raid are assigned. sec_drone/lab_drone grunts use the robots' `drone` model (could get palette variants). Remaining: elf_sage (fantasy), the fantasy arena theme, touch-ups, a robots kit round 4.
+- 2026-10-19: battle-5 DONE (165 dc high). Checked: boss levels 'not starting' = correctly locked (`?unlockall` is features only). **ui-4 queue:** a toast on locked ENGAGE; a dev panel (?dev=1, HEIRFRAME D24 style: jump to any map/level, unlock all levels, currencies, god mode, skip tutorials) so testing reaches bosses. Monolith → fx.lean (pending touch-up). Slot → battle-6 (fantasy arena).
+- 2026-10-19: sculptor-18 DONE (knight 13–16k, elf_ranger 10–13k; real bow draw). TEAM_BRIEF: added the module syntax-check rule (a duplicate function in paragon.js broke pages briefly). Fantasy faction colours → battle-6. Touch-ups: knight pauldrons too chrome from above, elf face/legs. Slot → sculptor-21 (elf_sage).
+- 2026-10-19: sculptor-16 DONE. **Kit round 4 queue (robots):** pass a `boss` flag / def id into build() o (so a player's R5 Singularity ≠ Vector Prime); per-model rim tint/strength; unit.drawCalls includes the instance extraDrawCalls; dims.parents guard; legs({shinGlow:false}); per-faction mats replace mats.all entirely (doc it). **Battle queue:** a no-bloom/masked path so dark cores stay black. Slot → ui-4.
+- 2026-10-19: sculptor-17 DONE. debuff(ctx) hook → battle-6. Slot → robots kit round 4 (resumed).
+- 2026-10-19: sculptor-19 DONE. Kit requests: a per-rarity palette override; an FX ribbon/tube primitive for roots/vines (battle). Slot → sculptor-22 (touch-ups; avoids robots' set).
+- 2026-10-19: robots round 4 DONE (note: the mats merge is a behaviour change; watch for visual regressions). Other boss models can switch to o.boss. Slot → hub-3.
+- 2026-10-19: battle-6 DONE (fantasy 114 dc high; m6 runs on it in-game). New files to commit: themes/fantasy.js, fantasy_backdrop.js, js/fx/textures_fantasy.js. Slot → battle-7 (also owns js/audio this round).
+- 2026-10-19: ui-4 DONE. **Dev mode:** `?dev=1&fresh&god=1&onehit=1&level=m6_l16` (own save key _dev; window.__vp.dev). Requests: sim `cheats:{invulnerable, oneHit}` (god is a +999 hack now; the HUD shows 1.9M HP); battle ×8 speed (→ battle-7); the cloak sfx (→ battle-7); next ui round: a stone/gold HUD variant for the fantasy theme. Slot → qa agent.
+- Queue: sim-4 (cheat flags, late-epic pity/targeted shards for m6–m8), ui-5 (fantasy HUD variant + QA ui bugs), then fixes from the QA list.
+- 2026-10-19: sculptor-20 DONE. **ALL sci-fi recruitables + all 8 bosses + raid now have models.** Remaining: elf_sage (sculptor-21). Kit request: cap the per-rank seam glow per slot from the def. Arbiter ~5.5 (touch-up candidate). Slot → sim-4.
+- 2026-10-19: sculptor-22 DONE. Remaining touch-ups: oracle faceplate, halo face/R0, elf cloak lining, arbiter (~5.5), wisp small. Slot → ui-5.
+- 2026-10-19: USAGE LIMIT #3 (reset 12:40 Brisbane): sim-4, ui-5, qa, sculptor-21, hub-3 and battle-7 all died; Aaron typed feedback → all 6 resumed. **Aaron playtest feedback → D24 (landscape + portrait phase) + D25 (Deploy button below the fold on mobile = BLOCKER, fullscreen toggle, login badge space, collapsing hub box)**, all D25 items sent to ui-5 as first priority. Next phase after the current agents: **landscape layouts** (battle framing + HUD sides, hub, menus), probably ui + battle + hub agents.
+- 2026-10-19: sculptor-21 DONE → **EVERY unit model is now built** (36 recruitables + 8 bosses + raid + 8 fantasy). Slot → landscape planner (spec only, docs/LANDSCAPE.md), so the build agents can start when ui-5/hub-3/battle-7 free their files.
+- 2026-10-19: hub-3 DONE (stage 3 peak 200 dc). API relayed to ui-5: squad/riftOpen. Slot → sculptor-23 (touch-up round 2).
+- 2026-10-19: ui-5 DONE (verified ENGAGE pinned at 390×700). Planner DONE → D24a. Launching UI-L (L0→L1→L2, one agent) + HUB-L now; BATTLE-L after battle-7; QA-L last. Asked Aaron about committing.
+- Queue: BATTLE-L when battle-7 finishes; QA-L after the L packages; then the commit if Aaron says yes.
+
+## RESUME SNAPSHOT (2026-10-19, before manager compaction)
+- **Running (5):** ui-L a6599756e5dfb4934 (UI-L0→L1→L2, port 9406); hub-L ad549bb6aa111371a (9405); battle-7 a2ff5f5a5ece1eb40 (fantasy polish, ribbon FX, cloak sfx, dark-core no-bloom, ×8 speed; it also owns js/audio this round); qa a7c0521f5e54ba442 (bug list docs/notes/qa.md; route bugs to their owners); sim-4 a075a32f914dbee7b (dev cheats are in; m6–m8 recruit-luck 'focus shards' + balance re-run).
+- **One free slot reserved for BATTLE-L** (docs/LANDSCAPE.md package): launch as soon as battle-7 hands back. Then QA-L after the L packages.
+- **All unit models are built** (36 recruitables, 8 bosses + raid, 8 fantasy). Touch-ups done in 2 rounds. Kit leftover: HALO aura by rank (robots).
+- **Awaiting Aaron:** (1) commit gms/3d/vectorprotocol now? (no push); (2) the D24a landscape picks; (3) the balance questions: star rewards power vs cosmetic, realm synergy, shard exchange rates, whether star replays count as grind / longer story fights; the ×10 recruit discount; the minotaur axe vs ROSTER twin scythes; the story beats (Novaline villain, Mags' backdoor, patch-not-delete ending, refugee minds).
+- Dev mode: `?dev=1&fresh&god=1&onehit=1&level=<id>`. Local URL: http://192.168.0.236:8888/gms/3d/vectorprotocol/
+- Manager checks used: scratchpad/mgr/shot.mjs (node shot.mjs URL out.png w h waitMs, CDP 9399) and ta.mjs (testAll).

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VECTOR PROTOCOL — UI kit</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="../css/vp.css">
+<link rel="stylesheet" href="../css/screens.css">
+<style>
+  html, body { overflow: auto; height: auto; }
+  body { padding: 16px; background: radial-gradient(ellipse at 50% 0%, #0b2148, #02040b 60%); min-height: 100vh; }
+  main { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+  section { display: flex; flex-direction: column; gap: 10px; }
+  .demo { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .swatch { width: 92px; height: 54px; display: flex; align-items: flex-end; padding: 4px 6px; font: 700 11px var(--font); letter-spacing: .1em; text-transform: uppercase; color: #021019; clip-path: var(--chamfer); --cut: 8px; }
+  .phone { position: relative; width: 390px; height: 300px; overflow: hidden; background: linear-gradient(180deg, #030914, #0a2550); box-shadow: 0 0 0 1px #1c4c80; }
+  #overlay-root { position: fixed; inset: 0; pointer-events: none; }
+  #overlay-root > * { pointer-events: auto; }
+</style>
+</head>
+<body>
+<main id="kit"></main>
+<div id="overlay-root"></div>
+<script type="module">
+import { h } from '../js/ui/dom.js';
+import { ICONS, icon, roleBadge } from '../js/ui/icons.js';
+import { btn, ibtn, bar, panel, currency, toast, modal, confirmBox, stars, unitCard, header } from '../js/ui/components.js';
+import { createHud } from '../js/ui/hud.js';
+import { goalList, chestBar } from '../js/ui/scr_map.js';
+
+const K = document.getElementById('kit');
+const sec = (title, ...kids) => K.appendChild(h('section', h('div.vp-kicker', title), ...kids));
+
+K.appendChild(h('div', h('h2.vp-title', 'VECTOR PROTOCOL · UI kit'), h('small.t-muted', 'Every component in css/vp.css + js/ui/components.js')));
+sec('Colour tokens', h('div.demo', [['cyan', 'Corporate'], ['orange', 'Rogue'], ['purple', 'Experimental'], ['gold', 'Legendary'], ['red', 'Enemy'], ['hp', 'HP'], ['f-common', 'Common'], ['f-rare', 'Rare'], ['f-epic', 'Epic']]
+  .map(([v, n]) => h('div.swatch', { style: { background: `var(--${v})` } }, n))));
+sec('Type', h('h2.vp-title', 'Display / Orbitron'), h('div', { style: { fontSize: '18px', fontWeight: 600 } }, 'Body / Rajdhani 600 — Squad integrity holding at 98%'), h('div.vp-kicker', 'Kicker label'));
+sec('Buttons', h('div.demo', btn('Engage', () => toast('Engage!'), { cls: 'primary big', icon: 'play' }), btn('Deploy', null, { cls: 'primary', icon: 'play' }), btn('Secondary', null),
+  btn('Gold', null, { cls: 'gold primary', icon: 'star' }), btn('Retreat', null, { cls: 'danger' }), btn('Small', null, { cls: 'sm', icon: 'up' }), btn('Disabled', null, { disabled: true })));
+sec('Icon buttons (HUD rails)', h('div.demo', ibtn('menu', ''), ibtn('squad', ''), ibtn('info', ''), ibtn('ffwd', '×2', null, 'on'), ibtn('auto', 'Auto', null, 'on'), ibtn('auto', 'Auto', null, 'off'), ibtn('gear', '')));
+sec('Icons', h('div.demo', Object.keys(ICONS).map((k) => h('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', width: '58px', gap: '3px', fontSize: '10px', color: 'var(--muted)' } }, icon(k, ''), k))));
+document.querySelectorAll('section:last-child .ic').forEach((e) => { e.style.width = '26px'; e.style.height = '26px'; e.style.color = 'var(--cyan)'; });
+sec('Role badges', h('div.demo', roleBadge('tank'), roleBadge('archer'), roleBadge('mage'), roleBadge('tank', true), roleBadge('archer', true), roleBadge('mage', true)));
+sec('Bars', h('div.col', { style: { maxWidth: '360px' } }, bar(0.98), bar(0.87, 'red'), bar(0.6, 'hp'), bar(0.4, 'gold'), bar(0.7, 'seg'), bar(0.5, 'thin purple')));
+sec('Panels', h('div.demo', panel('vp-pad', h('b', 'Cyan glass')), panel('red vp-pad', h('b', 'Enemy')), panel('gold vp-pad', h('b', 'Legendary')), panel('purple vp-pad', h('b', 'Experimental')),
+  panel('orange vp-pad', h('b', 'Rogue')), panel('dim vp-pad', h('b', 'Dim')), panel('c4 vp-pad', h('b', 'Four cuts'))));
+sec('Chips / tags / currency', h('div.demo', currency('credits', 12500), currency('scrap', 840), currency('cores', 55), currency('token', 120),
+  h('span.vp-tag.r-common', 'common'), h('span.vp-tag.r-rare', 'rare'), h('span.vp-tag.r-epic', 'epic'), h('span.vp-tag.r-legendary', 'legendary'), h('span.vp-tag.red', 'live'), stars(2)));
+const units = [
+  { name: 'Warden-3', role: 'tank', faction: 'corporate', rarity: 'common', level: 12, stars: 1 },
+  { name: 'Lancer', role: 'archer', faction: 'corporate', rarity: 'rare', level: 11, stars: 2 },
+  { name: 'Paladin', role: 'tank', faction: 'corporate', rarity: 'legendary', level: 12, stars: 4 },
+  { name: 'Oracle', role: 'mage', faction: 'experimental', rarity: 'epic', level: 11, stars: 3 },
+  { name: 'Scrapjaw', role: 'tank', faction: 'rogue', rarity: 'common', level: 9, stars: 1 },
+];
+sec('Unit cards (rarity frame · faction plate)', h('div.demo', units.map((u) => h('div', { style: { width: '104px' } }, unitCard(u, { portrait: false })))));
+sec('Tabs', h('div.vp-tabs', { style: { maxWidth: '380px' } }, h('button.vp-tab.on', 'All'), h('button.vp-tab', 'Tank'), h('button.vp-tab', 'Archer'), h('button.vp-tab', 'Mage')));
+sec('Toasts & modals', h('div.demo', btn('Toast', () => toast('Contract accepted')), btn('Error toast', () => toast('Not enough scrap', 'err')), btn('Gold toast', () => toast('Rank up!', 'gold')),
+  btn('Modal', () => modal({ title: 'Paused', body: 'Combat feed suspended.', actions: [{ label: 'Retreat', value: 0, cls: 'danger' }, { label: 'Resume', value: 1, cls: 'primary' }] })),
+  btn('Confirm', async () => toast('Answer: ' + await confirmBox('Reset company?', 'This wipes the save on this device.', 'Wipe', 'Keep'))),
+  btn('Notice (locked)', () => toast('Contract locked', 'err', 3.2, { sub: 'Clear Rustline Docks · Night Shift first.' })),
+  btn('Locked', null, { cls: 'big locked', icon: 'lock' })));
+sec('Star goals (level sheet)', h('div', { style: { maxWidth: '380px' } }, goalList([
+  { index: 0, text: 'Win the contract', done: true, reward: null },
+  { index: 1, text: 'Win without losing a unit', done: false, reward: { credits: 400, chips: 15 } },
+  { index: 2, text: 'Win with 3 units or fewer', done: false, squad: { maxUnits: 3 }, reward: { scrap: 158, chips: 20 } }])));
+const kitStore = { maps: () => [{ id: 'm1', stars: 17, maxStars: 36 }], chests: () => [
+  { index: 0, stars: 18, ready: false, claimed: false, rewards: { credits: 800 } }, { index: 1, stars: 27, ready: false, claimed: false, rewards: { chips: 40 } },
+  { index: 2, stars: 36, ready: false, claimed: false, rewards: { chips: 80 } }] };
+const chestHost = h('div.chest-kit', { style: { position: 'relative', maxWidth: '400px', height: '64px' } });
+chestHost.appendChild(chestBar({ store: kitStore, modal }, 'm1')).style.top = '0px';
+sec('Map star-chest bar', chestHost);
+const phone = h('div.phone');
+sec('Battle HUD (live demo)', phone);
+const hud = createHud(phone, { slots: 6, onFire: (id) => { toast('Overdrive ' + id, 'gold'); hud.fired(id); } });
+const mk = (i, u) => ({ id: 'p' + i, slotIndex: i, ...u, model: u.name, hp: 4000, maxHp: 4800, hpPct: 0.83, chargePct: 0, alive: true, abilities: { attack: { name: 'Strike' }, passive: { name: 'Shield' }, overdrive: { name: 'Burst' } } });
+const st = { wave: 2, waves: 3, auto: false, player: { integrity: 0.98, units: units.map((u, i) => mk(i, u)) }, enemy: { integrity: 0.87 } };
+let t = 0;
+setInterval(() => { t += 0.1; st.player.units.forEach((u, i) => { u.chargePct = Math.min(1, ((t * (0.2 + i * 0.05)) % 1.4)); u.overdriveReady = u.chargePct >= 1; u.hp = Math.round(4800 * (0.6 + 0.4 * Math.abs(Math.sin(t / 3 + i)))); u.hpPct = u.hp / u.maxHp; });
+  st.enemy.integrity = Math.max(0, 0.87 - (t % 20) / 25); hud.update(st); }, 100);
+const phone2 = h('div.phone');
+sec('Battle HUD · 2-unit squad, 3 slots open (empty + locked frames keep the row full)', phone2);
+const hud2 = createHud(phone2, { slots: 3 });
+hud2.update({ wave: 1, waves: 3, auto: true, player: { integrity: 1, units: units.slice(0, 2).map((u, i) => mk(i, u)) }, enemy: { integrity: 1 } });
+window.__uikit = { ready: true };
+</script>
+</body>
+</html>

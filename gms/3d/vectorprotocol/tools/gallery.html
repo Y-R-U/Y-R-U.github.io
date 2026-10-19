@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VP Unit Gallery</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #04060c; color: #cfe8ff; font: 12px/1.3 system-ui, sans-serif; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+  #hud { position: fixed; left: 8px; top: 8px; pointer-events: none; white-space: pre; text-shadow: 0 1px 2px #000; }
+  #labels { position: fixed; inset: 0; pointer-events: none; }
+  #labels div { position: absolute; transform: translate(-50%, 0); font-weight: 600; letter-spacing: .04em; color: #9fe6ff; text-shadow: 0 0 6px #000; white-space: nowrap; }
+  body.clean #hud, body.clean #labels { display: none; }
+</style>
+<script type="importmap">{"imports":{"three":"../../../lib/three/0.180.0/three.module.js","three/addons/":"../../../lib/three/0.180.0/addons/"}}</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="labels"></div>
+<div id="hud"></div>
+<script type="module">
+import * as THREE from 'three';
+import { createUnit, MODELS, ANIMS, renderPortrait, createTurntable, FACTIONS } from '../js/actors/units.js';
+const plateOf = (id) => { const m = MODELS[id] || {}; return m.rarity === 'legendary' || m.faction === 'legendary' ? 0xffc33a : (FACTIONS[m.faction]?.plate ?? 0x29d6ff); };
+import { neonRoom } from '../js/actors/portrait.js';
+
+// ?view=lineup|single|turntable|sheet|battle|tiers|factions|portraits  model= rarity= faction= anim= t= yaw= q= live=1 clean=1
+const Q = new URLSearchParams(location.search);
+const view = Q.get('view') || 'lineup';
+const q = Q.get('q') || 'high';
+const T0 = +(Q.get('t') ?? 0.8);
+const live = Q.get('live') === '1';
+if (Q.get('clean') === '1') document.body.classList.add('clean');
+const canvas = document.getElementById('c');
+const G = window.__gallery = { ready: false, view, units: [], errors: [] };
+addEventListener('error', (e) => G.errors.push(String(e.message)));
+
+let engine = null, R, env;
+try {
+  const E = await import('../js/engine/engine.js');
+  engine = E.createEngine(canvas, { quality: q, autoStart: false, governor: false });
+  R = engine.renderer; env = engine.env;
+} catch (e) {
+  console.warn('gallery: engine unavailable, using own renderer', e);
+  R = new THREE.WebGLRenderer({ canvas, antialias: true });
+  R.setPixelRatio(Math.min(2, devicePixelRatio));
+  R.setSize(innerWidth, innerHeight, false);
+  R.toneMapping = THREE.ACESFilmicToneMapping;
+  R.outputColorSpace = THREE.SRGBColorSpace;
+  R.shadowMap.enabled = true;
+  env = new THREE.PMREMGenerator(R).fromScene(neonRoom(), 0.04).texture;
+}
+G.engine = engine;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x05070e);
+scene.environment = env;
+scene.environmentIntensity = +(Q.get('envI') ?? 0.8);
+let camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.1, 400);
+
+// lights: cool key + coloured rims like the arena
+const key = new THREE.DirectionalLight(0xe8f0ff, +(Q.get('key') ?? 2.2));
+key.position.set(4, 9, 6); key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024);
+Object.assign(key.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, near: 1, far: 40 });
+key.shadow.bias = -0.0005;
+scene.add(key, key.target);
+const rimL = new THREE.DirectionalLight(0x29d6ff, 1.6); rimL.position.set(-8, 4, -6);
+const rimR = new THREE.DirectionalLight(0xff5a2a, 1.2); rimR.position.set(8, 4, -6);
+scene.add(rimL, rimR, new THREE.HemisphereLight(0x5a7cff, 0x0a0812, 0.35));
+
+// glossy dark floor with hex lines (+ planar mirror when the battle fx module is present)
+function hexTex() {
+  const c = document.createElement('canvas'); c.width = c.height = 512;
+  const g = c.getContext('2d');
+  g.fillStyle = '#0b1220'; g.fillRect(0, 0, 512, 512);
+  g.strokeStyle = 'rgba(70,140,255,0.35)'; g.lineWidth = 2;
+  const r = 64, h = r * Math.sqrt(3);
+  for (let y = -1; y < 6; y++) for (let x = -1; x < 6; x++) {
+    const cx = x * r * 1.5, cy = y * h + (x & 1 ? h / 2 : 0);
+    g.beginPath();
+    for (let k = 0; k <= 6; k++) { const a = k * Math.PI / 3; g.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); }
+    g.stroke();
+  }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  return t;
+}
+const floorMat = new THREE.MeshStandardMaterial({ color: 0xffffff, map: hexTex(), metalness: 0.5, roughness: 0.22 });
+floorMat.map.repeat.set(8, 8);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), floorMat);
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
+scene.add(floor);
+let mirror = null;
+try {
+  const F = await import('../js/fx/reflection.js');
+  mirror = F.createPlanarReflection(R, { scale: 0.5 });
+  F.addPlanarReflection(floorMat, mirror, { strength: 0.75, base: 0.25, blur: 2.5 });
+  G.mirrorLayer = F.REFLECT_LAYER;
+  camera.layers.enable(F.REFLECT_LAYER);
+} catch (e) { console.warn('gallery: no mirror', e); }
+
+function plate(color, x, z, r = 1.0) {
+  const g = new THREE.Group();
+  const ring = new THREE.Mesh(new THREE.RingGeometry(r * 0.86, r, 6, 1), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(2.6), side: THREE.DoubleSide }));
+  ring.rotation.x = -Math.PI / 2; ring.rotation.z = Math.PI / 6; ring.position.y = 0.012;
+  const inner = new THREE.Mesh(new THREE.CircleGeometry(r * 0.86, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(0.12), transparent: true, opacity: 0.6 }));
+  inner.rotation.x = -Math.PI / 2; inner.rotation.z = Math.PI / 6; inner.position.y = 0.01;
+  g.add(ring, inner); g.position.set(x, 0, z);
+  scene.add(g);
+  return g;
+}
+
+const labels = document.getElementById('labels');
+function addUnit(opts, x, z, yaw, label) {
+  const rk = Q.get('rank');
+  const u = createUnit({ quality: q, ...(rk !== null ? { rank: +rk } : {}), ...opts });
+  u.root.position.set(x, 0, z);
+  u.setFacing(yaw);
+  if (G.mirrorLayer) u.root.traverse((o) => o.layers.enable(G.mirrorLayer));
+  scene.add(u.root);
+  const anim = opts.anim || Q.get('anim') || 'idle';
+  u._dur = u.play(anim, { loop: anim !== 'die', fade: 0 });
+  u._label = label;
+  G.units.push(u);
+  return u;
+}
+// &arena=1: light non-battle views with the real battle arena (lights, env, mirror floor) to judge in context
+if (view !== 'battle' && (Q.get('arena') === '1' || Q.get('theme')) && engine) {
+  try {
+    const A = await import('../js/battle/arena.js');
+    const arena = A.buildArena(engine, { theme: Q.get('theme') || 'scifi' });
+    scene.add(arena.group);
+    floor.visible = false; key.visible = rimL.visible = rimR.visible = false;
+    scene.children.filter((o) => o.isHemisphereLight).forEach((o) => (o.visible = false));
+    if (arena.theme.look) engine.post.set(arena.theme.look);
+    mirror = arena.reflection.enabled ? arena.reflection : null;
+    G.arena = arena;
+    G.arenaZ = -3.9;
+  } catch (e) { G.errors.push('arena: ' + e.message); }
+}
+const ids = (Q.get('models') || Object.keys(MODELS).join(',')).split(',');
+const model = Q.get('model') || 'bulwark';
+const pick = (k, d) => Q.get(k) || d;
+
+function frameCam(pos, target, fov = 30) {
+  camera.fov = fov; camera.position.set(...pos); camera.lookAt(...target); camera.updateProjectionMatrix();
+}
+let sceneObj = null;
+const yawQ = +(Q.get('yaw') ?? 0.5);
+
+if (view === 'lineup') {
+  const n = ids.length, cols = +(Q.get('cols') || 5), sp = 2.3, rowZ = 3.2;
+  ids.forEach((id, i) => {
+    const c = i % cols, r = (i / cols) | 0;
+    const x = (c - (cols - 1) / 2) * sp, z = -r * rowZ;
+    plate(plateOf(id), x, z, 0.95);
+    addUnit({ model: id, rarity: Q.get('rarity') || undefined, faction: Q.get('faction') || undefined }, x, z, yawQ, MODELS[id].name);
+  });
+  const rows = Math.ceil(n / cols);
+  frameCam([0, 3.6 + rows * 0.6, 9 + rows * 1.5], [0, 0.9, -(rows - 1) * rowZ / 2], +(Q.get('fov') || 38));
+} else if (view === 'single' || view === 'tiers' || view === 'factions' || view === 'ranks') {
+  const list = view === 'tiers' ? ['common', 'rare', 'epic', 'legendary'].map((r) => ({ rarity: r }))
+    : view === 'ranks' ? [0, 1, 2, 3, 4, 5].map((r) => ({ rank: r }))
+    : view === 'factions' ? ['corporate', 'rogue', 'experimental', 'legendary'].map((f) => ({ faction: f }))
+    : [{}];
+  const sp = 2.4;
+  list.forEach((o, i) => {
+    const x = (i - (list.length - 1) / 2) * sp;
+    addUnit({ model, rarity: pick('rarity'), faction: pick('faction'), ...o }, x - (G.arena ? 3.5 : 0) * 0, G.arenaZ || 0, yawQ, o.rarity || o.faction || (o.rank !== undefined ? 'R' + o.rank : MODELS[model].name));
+  });
+  const h = G.units[0].height, wide = list.length > 1;
+  const d = +(Q.get('dist') || (wide ? 10.5 : 5.2));
+  const pitch = +(Q.get('pitch') ?? 0.18);
+  const ox = 0, oz = G.arenaZ || 0;
+  frameCam([ox, h * 0.55 + Math.sin(pitch) * d, oz + Math.cos(pitch) * d], [ox, h * 0.5, oz], wide ? 34 : 30);
+} else if (view === 'sheet') {
+  // anim contact sheet: each anim at a few normalised times
+  const anims = (Q.get('anims') || 'idle,advance,attack,attack_alt,cast,overdrive,hit,die,victory,deploy').split(',');
+  const times = (Q.get('times') || '0.15,0.35,0.5,0.7,0.9').split(',').map(Number);
+  const sx = 2.2, sz = 2.9;
+  anims.forEach((a, r) => times.forEach((tt, c) => {
+    const u = addUnit({ model, rarity: pick('rarity'), faction: pick('faction'), anim: 'idle' }, (c - (times.length - 1) / 2) * sx, -r * sz, yawQ);
+    u._sheet = { a, tt };
+  }));
+  const rows = anims.length;
+  frameCam([0, 5 + rows * 2.2, 6 + rows * 1.2], [0, 0.6, -(rows - 1) * sz / 2], 40);
+} else if (view === 'battle') {
+  // true battle framing: the real arena theme + board (battle agent's), the battle camera, battle.js role scaling
+  let slotPos, cam, arena = null, plateH = 0;
+  try {
+    const L = await import('../js/battle/layout.js');
+    const C = await import('../js/battle/camera.js');
+    slotPos = L.slotPos;
+    cam = C.createBattleCamera();
+    camera = cam.camera;
+    cam.resize(innerWidth, innerHeight);
+    G.battleCam = cam;
+    if (Q.get('arena') !== '0') {
+      const A = await import('../js/battle/arena.js');
+      arena = A.buildArena(engine, { theme: Q.get('theme') || 'scifi' });
+      scene.add(arena.group);
+      plateH = arena.plateH || 0;
+      floor.visible = false; key.visible = rimL.visible = rimR.visible = false;
+      scene.children.filter((o) => o.isHemisphereLight).forEach((o) => (o.visible = false));
+      if (arena.theme.fog) scene.fog = arena.theme.fog;
+      if (arena.theme.look) engine.post.set(arena.theme.look);
+      mirror = arena.reflection.enabled ? arena.reflection : null;
+      G.arena = arena;
+    }
+  } catch (e) {
+    console.warn('gallery: battle camera/arena unavailable', e);
+    G.errors.push('arena: ' + e.message);
+    slotPos = (side, s) => ({ x: (side === 'enemy' ? 1 : -1) * [2.35, 5.15][s >= 3 ? 1 : 0], z: [0.9, -3.9, -8.7][s % 3] + (s >= 3 ? -2 : 0) });
+    frameCam([0, 18, 14], [0, 0, -5], 40);
+  }
+  if (G.mirrorLayer) camera.layers.enable(G.mirrorLayer);
+  const P = (Q.get('player') || 'gunner,paladin,bulwark,oracle,patch,lancer').split(',');
+  const E = (Q.get('enemy') || 'tarantula,scrapper,riot,halo,barb,jammer').split(',');
+  const face = +(Q.get('face') ?? 0.45);
+  const ROLE_H = { tank: 3.3, archer: 3.0, mage: 3.0 };   // legacy per-role mode
+  let BOARD_K = 1.9;
+  try { BOARD_K = (await import('../js/battle/layout.js')).BOARD.unitScale || 1.9; } catch (e) {}
+  const scaleMode = Q.get('scale') || 'board';            // board (mirrors battle.js D23) | role | natural | k (number)
+  const col = plateOf;
+  const put = (side, id, s) => {
+    if (!id) return;
+    const p = slotPos(side, s);
+    if (!arena) plate(side === 'enemy' ? 0xff6a1a : col(id), p.x, p.z, 1.15);
+    const rks = (Q.get(side === 'enemy' ? 'eranks' : 'pranks') || '').split(',');
+    const rk = rks[s] !== undefined && rks[s] !== '' ? { rank: +rks[s] } : {};
+    const rrs = (Q.get(side === 'enemy' ? 'erar' : 'prar') || '').split(',');
+    if (rrs[s]) rk.rarity = rrs[s];
+    const u = addUnit({ model: id, ...rk, faction: side === 'enemy' ? (Q.get('efaction') || undefined) : undefined }, p.x, plateH, side === 'enemy' ? -Math.PI / 2 + face : Math.PI / 2 - face);
+    u.root.position.set(p.x, plateH, p.z);
+    const k = scaleMode === 'natural' ? 1 : scaleMode === 'board' ? BOARD_K : scaleMode === 'role' ? (ROLE_H[u.role] || 2.2) / u.height : +scaleMode;
+    u.root.scale.setScalar(k);
+    if (Q.get('proxy') !== '0') { u.useProxy(2); G.arena?.lights?.key?.shadow.camera.layers.enable(2); }
+  };
+  P.forEach((id, s) => put('player', id, s));
+  E.forEach((id, s) => put('enemy', id, s));
+  floorMat.map.repeat.set(10, 10);
+} else if (view === 'turntable') {
+  sceneObj = createTurntable(engine || { renderer: R, env }, { model, rarity: pick('rarity'), faction: pick('faction'), quality: q });
+  G.units.push(sceneObj.unit);
+} else if (view === 'portraits') {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;inset:0;display:flex;flex-wrap:wrap;gap:8px;padding:8px;background:#05070e;overflow:auto;z-index:2';
+  document.body.appendChild(wrap);
+  for (const id of ids) {
+    const url = await renderPortrait(id, { engine: engine || undefined, renderer: R, env, framing: Q.get('framing') || 'bust' });
+    const card = document.createElement('div');
+    card.style.cssText = 'width:128px;height:160px;border:1px solid #2a6fd6;border-radius:6px;background:radial-gradient(#1a2a50,#070a14);background-size:cover;position:relative';
+    card.innerHTML = `<img src="${url}" style="width:100%;height:100%"><span style="position:absolute;left:4px;bottom:3px">${MODELS[id].name}</span>`;
+    wrap.appendChild(card);
+  }
+}
+
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  if (engine) engine.resize(); else R.setSize(w, h, false);
+  const c = sceneObj ? sceneObj.camera : camera;
+  if (G.battleCam) G.battleCam.resize(w, h);
+  else { c.aspect = w / h; c.updateProjectionMatrix(); }
+  mirror?.setSize?.(R.getDrawingBufferSize(new THREE.Vector2()).x, R.getDrawingBufferSize(new THREE.Vector2()).y);
+}
+addEventListener('resize', resize);
+
+const main = sceneObj || {
+  scene, camera,
+  update(dt) {
+    G.arena?.update(dt, (G._t = (G._t || 0) + dt));
+    G.battleCam?.update?.(0, 0);
+    for (const u of G.units) {
+      if (u._sheet && !u._posed) continue;
+      u.update(dt);
+    }
+  },
+  preRender(r) { mirror?.update(scene, camera); },
+  resize() {},
+};
+if (engine) engine.setScene(main);
+resize();
+
+function poseSheet() {
+  for (const u of G.units) if (u._sheet) {
+    const d = u.play(u._sheet.a, { fade: 0 });
+    const dur = isFinite(d) ? d : 2;
+    const steps = Math.max(1, Math.round(dur * u._sheet.tt * 60));
+    for (let i = 0; i < steps; i++) u.update(1 / 60);
+    u._posed = true;
+  }
+}
+function render(dt) {
+  if (engine) engine.renderOnce(dt);
+  else { main.update(dt); main.preRender?.(R); R.render(main.scene, main.camera); }
+}
+function drawLabels() {
+  labels.innerHTML = '';
+  const v = new THREE.Vector3();
+  for (const u of G.units) if (u._label) {
+    u.root.getWorldPosition(v); v.y -= 0.15; v.project(main.camera);
+    const d = document.createElement('div');
+    d.textContent = u._label;
+    d.style.left = ((v.x + 1) / 2 * innerWidth) + 'px'; d.style.top = ((1 - v.y) / 2 * innerHeight) + 'px';
+    labels.appendChild(d);
+  }
+}
+G.step = (dt = 1 / 60, n = 1) => { for (let i = 0; i < n; i++) render(dt); drawLabels(); };
+G.stats = () => {
+  const s = engine ? engine.stats() : { calls: R.info.render.calls, tris: R.info.render.triangles };
+  return { ...s, units: G.units.map((u) => ({ model: u.model, rarity: u.rarity, faction: u.faction, dc: u.drawCalls, tris: u.tris, height: u.height })) };
+};
+// build every registered model at every rarity x rank x quality and run each anim briefly; returns failures
+G.testAll = (quality = ['high', 'low']) => {
+  const fails = [], rows = [];
+  for (const id of Object.keys(MODELS)) for (const rarity of ['common', 'rare', 'epic', 'legendary']) for (let rank = 0; rank <= 5; rank++) for (const qq of quality) {
+    try {
+      const u = createUnit({ model: id, rarity, rank, quality: qq });
+      if (rank === 0 || rank === 5) for (const a of ANIMS) { u.play(a); for (let i = 0; i < 20; i++) u.update(0.05); }
+      if (qq === 'high' && rank === ({ common: 0, rare: 1, epic: 2, legendary: 3 })[rarity]) rows.push({ id, rarity, rank, dc: u.drawCalls, tris: u.tris | 0 });
+      u.dispose();
+    } catch (e) { fails.push(`${id} ${rarity} r${rank} ${qq}: ${e.message}`); }
+  }
+  return { fails, rows };
+};
+G.play = (name) => { for (const u of G.units) u.play(name, { loop: true }); };
+G.events = [];
+for (const u of G.units) u.onEvent((type, info) => G.events.push({ model: u.model, type, anim: info.anim, index: info.index }));
+
+if (view === 'sheet') poseSheet();
+if (view !== 'portraits') {
+  // &u=0..1 poses one-shots at a normalised time (contact sheets via sheet.sh); else &t= seconds
+  const uQ = Q.get('u');
+  const d0 = G.units[0]?._dur;
+  const warm = Math.max(1, Math.round((uQ !== null && isFinite(d0) ? +uQ * d0 : T0) * 60));
+  for (let i = 0; i < warm; i++) { if (view === 'sheet') break; main.update(1 / 60); }
+  G.step(1 / 60, 2);
+}
+if (live && view !== 'portraits') {
+  let last = performance.now();
+  const loop = (now) => { requestAnimationFrame(loop); const dt = Math.min(0.1, (now - last) / 1000); last = now; render(dt); };
+  requestAnimationFrame(loop);
+}
+document.getElementById('hud').textContent = `${view}  ${q}  ` + (G.units[0] ? `${G.units[0].model} dc ${G.units[0].drawCalls} tris ${G.units[0].tris | 0}` : '');
+G.ready = true;
+</script>
+</body>
+</html>

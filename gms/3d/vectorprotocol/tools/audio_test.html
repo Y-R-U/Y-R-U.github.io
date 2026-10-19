@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VECTOR PROTOCOL · Audio test</title>
+<style>
+  :root { --bg:#070b14; --panel:#0e1626; --line:#1d2a44; --text:#d8e6ff; --dim:#7f93b8; --cyan:#3fd8ff; --gold:#ffd24a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.4 system-ui, sans-serif; padding:16px; max-width:720px; margin:auto; }
+  h1 { font-size:18px; letter-spacing:.12em; color:var(--cyan); margin:0 0 4px; }
+  h2 { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:18px 0 8px; }
+  .grid { display:flex; flex-wrap:wrap; gap:6px; }
+  button { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:9px 11px; min-height:40px; font:inherit; cursor:pointer; }
+  button:active, button.on { border-color:var(--cyan); color:var(--cyan); }
+  .row { display:flex; align-items:center; gap:8px; margin:4px 0; flex-wrap:wrap; }
+  .row b { min-width:86px; font-weight:600; }
+  .row small { color:var(--dim); }
+  label { display:flex; align-items:center; gap:8px; margin:4px 0; }
+  input[type=range] { flex:1; }
+  #info { font:12px ui-monospace, monospace; color:var(--dim); white-space:pre-wrap; background:var(--panel); padding:8px; border-radius:6px; border:1px solid var(--line); }
+</style>
+</head>
+<body>
+<h1>VECTOR PROTOCOL · AUDIO</h1>
+<div class="row"><small>Tap anything to unlock audio. <code>window.__audio</code> is the engine.</small></div>
+
+<h2>Volumes</h2>
+<label>master <input id="v_master" type="range" min="0" max="1" step="0.01"></label>
+<label>music <input id="v_music" type="range" min="0" max="1" step="0.01"></label>
+<label>sfx <input id="v_sfx" type="range" min="0" max="1" step="0.01"></label>
+
+<h2>Music (loops)</h2>
+<div class="row"><small>Only files listed in js/audio/manifest.js are offered (run <code>node js/audio/gen_manifest.mjs</code> after adding audio).</small></div>
+<div id="tracks"></div>
+<div class="grid"><button id="stop">Stop music</button></div>
+
+<h2>Stings</h2>
+<div class="grid" id="stings"></div>
+
+<h2>Battle hooks (as battle.js calls them)</h2>
+<div class="grid" id="hooks"></div>
+
+<h2>SFX</h2>
+<div class="grid" id="sfx"></div>
+
+<h2>Status</h2>
+<div id="info"></div>
+
+<script type="module">
+import { audio } from '../js/audio/audio.js';
+audio.autoRoute = false;
+const $ = (s) => document.querySelector(s);
+const mk = (label, fn, parent) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.dataset.sfx = 'none'; b.onclick = fn; parent.appendChild(b); return b; };
+
+const vols = audio.getVolumes();
+for (const k of ['master', 'music', 'sfx']) { const el = $('#v_' + k); el.value = vols[k]; el.oninput = () => audio.setVolumes({ [k]: +el.value }); }
+
+for (const id of Object.keys(audio.debug.tracks)) {
+  const row = document.createElement('div'); row.className = 'row';
+  const tr = audio.debug.tracks[id];
+  row.innerHTML = `<b>${id}</b><small>${tr.file} · loop ${tr.loop.toFixed(2)} s · gain ${tr.gain}</small>`;
+  mk('Play', async () => { await audio.unlock(); audio.music(id, { fade: 0.5, restart: true }); }, row);
+  mk('Seam in 4 s', () => audio.debug.seam(4), row);
+  $('#tracks').appendChild(row);
+}
+$('#stop').dataset.sfx = 'none'; $('#stop').onclick = () => audio.music(null, { fade: 1 });
+for (const [k, l] of Object.entries(audio.debug.states)) { const b = document.createElement('button'); b.type = 'button'; b.dataset.state = k; b.textContent = `state: ${k} (${l.join(', ')})`; $('#stop').parentNode.appendChild(b); }
+document.querySelectorAll('[data-state]').forEach((b) => { b.dataset.sfx = 'none'; b.onclick = async () => { await audio.unlock(); audio.music(b.dataset.state, { restart: true, fade: 1 }); }; });
+
+for (const id of Object.keys(audio.debug.stings)) mk(id, async () => { await audio.unlock(); audio.sting(id); }, $('#stings'));
+
+const bat = audio.forBattle.bind(audio);
+let hooks = null;
+for (const h of audio.debug.battleHooks) mk(h, async () => { await audio.unlock(); hooks ||= { sfx: audio.battleSfx }; hooks.sfx(h, { x: (Math.random() - 0.5) * 10 }); }, $('#hooks'));
+// battle context exactly as battle.js sends it (docs/notes/battle.md battle-4 section 2)
+const CTX = [
+  ['fire_projectile', { ability: 'rail_shot' }], ['fire_projectile', { ability: 'rotary_burst' }], ['fire_projectile', { ability: 'twin_cannon' }],
+  ['fire_projectile', { ability: 'longbow' }], ['fire_projectile', { ability: 'hardlight_bolt' }], ['fire_projectile', { ability: 'static_burst' }],
+  ['fire_melee', { ability: 'slug_shot' }], ['fire_melee', { ability: 'chainblade' }], ['fire_melee', { ability: 'piston_punch' }],
+  ['fire_beam', { ability: 'mend_beam' }], ['fire_beam', { ability: 'prism_bolt' }], ['fire_beam', { ability: 'arc_zap' }],
+  ['hit', { melee: true, amount: 120 }], ['hit', { absorbed: 40, amount: 0 }], ['hit', { absorbed: 30, amount: 60 }], ['hit_crit', { amount: 400 }],
+  ['shield_break', {}],
+];
+for (const [h, c] of CTX) {
+  const side = Math.random() < 0.5 ? -1 : 1;
+  mk(`${h} ${JSON.stringify(c)}`, async () => { await audio.unlock(); audio.battleSfx(h, { ...c, x: side * 4.3 }); }, $('#hooks'));
+}
+mk('pan L x=-4.3 / R x=+4.3', async () => { await audio.unlock(); audio.battleSfx('hit', { x: -4.3, amount: 50 }); setTimeout(() => audio.battleSfx('hit', { x: 4.3, amount: 50 }), 350); }, $('#hooks'));
+mk('overdrive charge -> fire (0.8 s)', async () => {
+  await audio.unlock(); audio.battleSfx('overdrive', { x: -2.3, ability: 'satellite_lance' });
+  setTimeout(() => audio.battleSfx('overdrive_fire', { x: -2.3, ability: 'satellite_lance' }), 800);
+}, $('#hooks'));
+mk('forBattle({mapIndex:6})', () => bat({ mapIndex: 6 }), $('#hooks'));
+mk('forBattle({boss:true})', () => bat({ boss: true }), $('#hooks'));
+mk('Barrage x4 speed', async () => {
+  await audio.unlock();
+  // ~10 units at x4: shots, hits, absorbed hits, heals, crits, deaths every 40 ms for 2.4 s
+  const ab = ['rotary_burst', 'rail_shot', 'hardlight_bolt', 'twin_cannon', 'chainblade', 'piston_punch', 'longbow'];
+  for (let i = 0; i < 60; i++) setTimeout(() => {
+    const x = (Math.random() < 0.5 ? -1 : 1) * (2.3 + Math.random() * 2), k = i % 6;
+    if (k < 2) audio.battleSfx(i % 4 ? 'fire_projectile' : 'fire_melee', { ability: ab[i % ab.length], x });
+    else if (k < 4) audio.battleSfx('hit', { x, melee: i % 5 === 0, absorbed: i % 7 === 0 ? 30 : 0, amount: i % 7 === 0 ? 0 : 80 });
+    else if (k === 4) audio.battleSfx(i % 3 ? 'hit_crit' : 'heal', { x, amount: 300 });
+    else if (i % 18 === 5) audio.battleSfx('death', { x });
+  }, i * 40);
+}, $('#hooks'));
+
+for (const n of audio.debug.sfxNames) {
+  if (n === 'rarity_reveal') { for (const r of ['common', 'rare', 'epic', 'legendary']) mk('rarity_reveal ' + r, async () => { await audio.unlock(); audio.sfx(n, { rarity: r }); }, $('#sfx')); continue; }
+  mk(n, async () => { await audio.unlock(); audio.sfx(n); }, $('#sfx'));
+}
+
+setInterval(() => {
+  const i = audio.debug.info(), p = audio.debug.position();
+  $('#info').textContent = JSON.stringify(i, null, 1) + (p ? `\nloop ${p.track}: ${p.inLoop.toFixed(1)} / ${p.loopLen.toFixed(2)} s` : '') + `\nlevel ${audio.debug.level().toFixed(1)} dBFS`;
+}, 300);
+window.__audioTest = { ready: true };
+</script>
+</body>
+</html>

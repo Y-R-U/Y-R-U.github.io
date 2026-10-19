@@ -1,0 +1,87 @@
+/* ui-5: fantasy-realm battle HUD (`.hud.fantasy`, set from the battle's theme/realm).
+   Carved stone panels, gold-leaf trim, Cinzel headings, warm parchment numerals (refs/ref_fantasy_01.jpg).
+   Colours, fills and fonts only: every box keeps the sci-fi HUD's size and position. */
+.hud.fantasy {
+  --st-hi: #5d574c; --st-mid: #3a3630; --st-lo: #1f1c18;
+  --gl-hi: #f6dc94; --gl: #c9a24a; --gl-lo: #6d4c17;
+  --parch: #f3e2b8; --parch-2: #cdb88c;
+  --serif: "Cinzel", "Georgia", "Times New Roman", serif;
+  --stone-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .47 0 0 0 0 .42 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  --stone: var(--stone-tex), radial-gradient(ellipse at 30% 0%, #ffffff12, transparent 60%), linear-gradient(180deg, var(--st-mid), var(--st-lo));
+  --gold-rim: linear-gradient(180deg, var(--gl-hi), var(--gl) 35%, var(--gl-lo) 70%, #d9b25e);
+}
+/* warm, darker vignettes behind the top bar and the strip */
+.hud.fantasy::before { background: linear-gradient(180deg, #0d0a06c4, transparent); }
+.hud.fantasy::after { background: linear-gradient(180deg, transparent, #120d07d9 45%, #0a0704f5); }
+
+/* ---- panels: gold rim + carved stone fill, softly rounded instead of chamfered */
+.hud.fantasy .vp-panel { --bw: 2px; filter: drop-shadow(0 2px 3px #000c) drop-shadow(0 0 4px #e0b25a40); }
+.hud.fantasy .vp-panel::before { clip-path: none; border-radius: 4px; background: var(--gold-rim); }
+.hud.fantasy .vp-panel::after { clip-path: none; border-radius: 3px; background: var(--stone);
+  box-shadow: inset 0 1px 0 #ffffff1c, inset 0 -2px 3px #0009, inset 0 0 0 1px #0007; }
+
+/* ---- top bar: integrity plaques + round box */
+.hud.fantasy .hud-integ .lbl { font-family: var(--serif); font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--parch);
+  font-size: min(10px, 2.3cqw);
+  text-shadow: 0 1px 1px #000; }
+.hud.fantasy .hud-integ.foe .lbl { color: #f1cdb4; }
+.hud.fantasy .hud-integ .pct { font-family: var(--serif); font-weight: 700; color: var(--parch); text-shadow: 0 1px 2px #000; }
+.hud.fantasy .vp-bar { clip-path: none; border-radius: 2px; background: #0f0b07; box-shadow: inset 0 1px 2px #000, 0 0 0 1px #8a6a2b; }
+.hud.fantasy .vp-bar > i { background: linear-gradient(180deg, color-mix(in srgb, var(--c) 55%, #fff6dc), var(--c) 45%, color-mix(in srgb, var(--c) 50%, #000)); }
+.hud.fantasy .vp-bar > b { background: #fff1c980; }
+.hud.fantasy .hud-integ .vp-bar { --c: #3fbf4f; }
+.hud.fantasy .hud-integ .vp-bar.red { --c: #d2352a; }
+.hud.fantasy .hud-round { --fill: transparent; }
+.hud.fantasy .hud-round small { font-family: var(--serif); font-weight: 700; text-transform: none; letter-spacing: .08em; color: var(--gl-hi); }
+.hud.fantasy .hud-round b { font-family: var(--serif); font-weight: 700; color: var(--parch); text-shadow: 0 1px 2px #000, 0 0 8px #e0b25a66; }
+.hud.fantasy .hud-round.ot::after { background: var(--stone-tex), linear-gradient(180deg, #5a1d14, #2a0b07); }
+.hud.fantasy .hud-round.ot small { color: #ffc2a8; }
+.hud.fantasy .hud-round.ot b { text-shadow: 0 1px 2px #000, 0 0 10px #ff5a3a; }
+
+/* ---- side buttons: stone tiles with a gold rim, parchment glyphs */
+.hud.fantasy .vp-ibtn { filter: drop-shadow(0 2px 3px #000c); color: var(--parch); font-family: var(--serif); font-weight: 700; text-transform: none; letter-spacing: .04em; }
+.hud.fantasy .vp-ibtn::before { clip-path: none; border-radius: 4px; background: var(--gold-rim); }
+.hud.fantasy .vp-ibtn::after { clip-path: none; inset: 2px; border-radius: 3px; background: var(--stone); box-shadow: inset 0 1px 0 #ffffff1c, inset 0 -2px 3px #0009; }
+.hud.fantasy .vp-ibtn .ic { color: var(--parch); filter: drop-shadow(0 1px 1px #000); }
+.hud.fantasy .vp-ibtn.on { color: #fff3cf; }
+.hud.fantasy .vp-ibtn.on::after { background: var(--stone-tex), radial-gradient(ellipse at 50% 30%, #8a6526, transparent 75%), linear-gradient(180deg, #4d3d24, #241a0e); }
+.hud.fantasy .vp-ibtn.on .ic { color: var(--gl-hi); filter: drop-shadow(0 0 4px #e0b25a); }
+.hud.fantasy .vp-ibtn.off { color: #8f8572; }
+.hud.fantasy .vp-ibtn.off::before { background: linear-gradient(180deg, #8c7a55, #4a3f2b); }
+.hud.fantasy .vp-ibtn.off .ic { color: #8f8572; filter: none; }
+/* the menu/squad/info rail is one stone column: its inner buttons stay flat inside it */
+.hud.fantasy .hud-left .vp-ibtn { filter: none; }
+.hud.fantasy .hud-left .vp-ibtn::before, .hud.fantasy .hud-left .vp-ibtn::after { background: transparent; box-shadow: none; }
+
+/* ---- portrait strip: a stone ledge, gold-framed portraits */
+.hud.fantasy .hud-strip { background: var(--stone-tex), linear-gradient(180deg, #2c2822e6, #15120ef2);
+  box-shadow: inset 0 2px 0 #c9a24a, inset 0 3px 0 #0008, inset 0 4px 6px #0006; }
+.hud.fantasy .pc { filter: drop-shadow(0 2px 3px #000c); }
+.hud.fantasy .pc::before { clip-path: none; border-radius: 4px; background: var(--gold-rim); }
+.hud.fantasy .pc::after { clip-path: none; border-radius: 3px; background: var(--stone); box-shadow: inset 0 -2px 3px #0009; }
+/* faction stays readable as a thin jewel line under the portrait */
+.hud.fantasy .pc-art { clip-path: none; border-radius: 3px 3px 0 0; box-shadow: inset 0 -2px 0 var(--fc), inset 0 0 0 1px #0008; }
+.hud.fantasy .pc-art .ph { color: var(--parch-2); }
+.hud.fantasy .pc-lv { font-family: var(--serif); font-weight: 700; color: var(--parch); }
+.hud.fantasy .pc-od { background: #0f0b07d9; box-shadow: 0 0 0 1px #6d4c17; }
+.hud.fantasy .pc-hp .vp-bar { --c: #3fbf4f; }
+.hud.fantasy .pc-hptxt { font-family: var(--serif); font-weight: 700; color: #fff6dc; text-shadow: 0 1px 1px #000, 0 0 3px #000; letter-spacing: -.02em;
+  font-size: min(9.5px, 2.2cqw); white-space: nowrap; }
+.hud.fantasy .pc-ab { clip-path: none; border-radius: 3px; background: radial-gradient(circle at 50% 35%, #3b342a, #17130e);
+  box-shadow: inset 0 0 0 1px #8a6a2b, inset 0 1px 0 #ffffff14; color: var(--parch-2); }
+.hud.fantasy .pc-ab.od { color: var(--gl-hi); }
+.hud.fantasy .pc-fire { font-family: var(--serif); font-weight: 700; letter-spacing: .02em; color: #fff3cf; text-shadow: 0 0 6px #e0b25a, 0 1px 2px #000; }
+.hud.fantasy .pc.ready::before { background: linear-gradient(180deg, #fff3c4, #f0c35a 40%, #a8741c); }
+.hud.fantasy .pc.ready .pc-ab.od { background: radial-gradient(circle at 50% 35%, #a8741c, #4a300a); color: #fff; }
+.hud.fantasy .pc.dead { --fc: #4a443a; }
+.hud.fantasy .pc.dead::after { background: #14110d; }
+.hud.fantasy .pc-sti { background: #17120ccc; }
+.hud.fantasy .vp-role { background: #1a150fee; }
+.hud.fantasy .pc-empty::before, .hud.fantasy .pc-empty::after { clip-path: none; border-radius: 4px; }
+.hud.fantasy .pc-empty::before { background: linear-gradient(180deg, #7a6236, #3a2e1a); }
+.hud.fantasy .pc-empty::after { background: var(--stone-tex), linear-gradient(180deg, #2a2620, #17140f); }
+.hud.fantasy .pc-empty { color: #6e6352; }
+.hud.fantasy .pc-empty.locked::before { background: linear-gradient(180deg, #4a4336, #24201a); }
+.hud.fantasy .pc-empty.locked { color: #4e463a; }
+/* fallback banners (only when the 3D overlay is down) */
+.hud.fantasy .hud-banner { font-family: var(--serif); font-weight: 700; color: var(--parch); text-shadow: 0 0 18px #e0b25a, 0 2px 3px #000; }
