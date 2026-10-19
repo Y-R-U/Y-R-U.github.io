@@ -469,3 +469,65 @@ dpr 2 costs the same as 1.5 on M5, so the frame is submit/CPU-bound, not fill-bo
 - Requests
   - ui: none blocking. All APIs above are live; margins are honoured as measured from hud.margins().
   - manager: no new files or vendored addons this round.
+
+# battle-8 (eighth round: fantasy landscape forest, intro composition, wide units, OD callout, scifi landscape calls)
+## Checkpoint 1
+- DONE (all syntax-checked)
+  - New js/battle/themes/fantasy_forest.js: `buildFantasyForest(engine, {hw, fz0, fz1, bz0, seed, stone, foliage})`, board-camera geometry beyond
+    the side walls: instanced trunks (flared, gnarled), lumpy canopies in the battle-7 style (welded icospheres -> smooth normals, dark
+    underside vertex colour, world-space leaf mottling) in near (detail 2) and far (detail 1) LOD meshes, leaf-cluster cards on the crowns,
+    bushes (far crown mesh), fern/grass cards, mossy rocks, merged ruin fragments (toppled drums, wall stubs, pillar + fallen lintel),
+    hazed forest floor, two low mist sheets. Haze = mix toward 0x87917a by distance from the arena centre (stable during the intro).
+    ~9 draws. Replaces BATTLE-L's flat flank planes. Per-tier instance budget K: high 1 / med 0.68 / low 0.42.
+  - fantasy.js: forest visible when wide OR during the intro (`theme.setIntro(on)`, called by battle.js playIntro / endIntro). The
+    portrait fight framing only sees a crown at the top-right corner under the HUD, so it is hidden there.
+  - camera.js: wide intro start puts the backdrop horizon on the seam (as portrait), easing to the wide bgHorizon offset as the intro
+    lands. Before, the wide intro dropped the backdrop horizon ~0.5 NDC below the back wall, so the arch / Rift / towers were hidden
+    behind the wall and the gap showed blank sky. Portrait is unchanged (shift0 == seam0 there). Also `F.intro` / `F.introWide`
+    overrides of FRAME_INTRO (theme frameWide or opts.frame).
+  - fantasy_backdrop.js: giant tree canopy lobes welded before normals (were flat-shaded facets).
+  - scifi_backdrop.js: sky below the horizon fades to a dark stadium floor (the intro in both orientations showed a pale lavender void
+    under the stands).
+  - battle_test: `&introAt=K` freezes the intro camera at pose K (0 = first frame); `&introPose=zoomOut,rise,lookUp,lookFar`.
+- NEXT: wide fantasy unit size vs ref, OD callout placement, scifi landscape draw calls, perf per tier, before/after sheet, in-game check.
+## Checkpoint 2
+- DONE since #1
+  - Wide fantasy units vs ref_fantasy_01 (6v6 fantasy roster, idle, 915x412 mock HUD): kept `wideUnitK` 1.12. Near-lane units already fill
+    ~45% of the frame height (the ref's heroes are ~25%), the wide lanes are tight (neighbours overlap on screen) and at 1.12 the far-lane
+    TREANT's HP bar already sits under the top HUD (head clears). 1.25 pushes far heads ~15 px into the HUD. Bigger would hurt, not help.
+  - OD callout (overlay.js): in landscape (side bands set) it hugs the caster's edge of the board band (player left, enemy right) at
+    top + 6 px, slightly smaller type (`.vpb-od.side`). 915x412: rect 198..354 / 671..833 x 58..95, no unit bbox overlap in 3 callouts
+    (was centred over the far-lane heads). Portrait unchanged.
+  - Scifi landscape calls: the 6 floating data panels were 6 meshes (landscape sees all of them; portrait culls some). Now one mesh
+    (canvas atlas + per-panel bob in the vertex shader). Empty board, still=1: portrait 80 -> 76, landscape 86 -> 76 (delta 0, was +6).
+- NEXT: perf per tier, before/after sheet, in-game m6_l16 + scifi landscape check, hand-back.
+## Checkpoint 3 (battle-8 hand-back)
+- Perf (M5 metal, 6v6 mid-fight, battle_test, engine cpu median over 7 s, tris median):
+  | config | cpu ms | calls | tris | dpr |
+  |---|---|---|---|---|
+  | fantasy wide high | 2.9 | 126 (was 118) | 402k (was ~227k) | 1.5 |
+  | fantasy wide med | 2.7 | 126 | 338k | 1.25 |
+  | fantasy wide low | 2.0 | 110 | 187k | 1 |
+  | fantasy portrait high / med / low | 2.3 / 2.5 / 2.5 | 117 / 117 / 101 | 229k / 208k / 126k | 1.5 / 1.25 / 1 |
+  | scifi wide high / med / low | 2.8 / 2.8 / 2.3 | 160 / 160 / 124 | 300k / 257k / 94k | |
+  | scifi portrait high / low | 2.7 / 2.2 | 160 / 124 | 300k / 94k | |
+  Forest instances: high 188 trees, 69 near + 273 far crowns (incl. bushes), 1200 leaf cards, 520 undergrowth cards, 70 rocks; med x0.68,
+  low x0.42 (low uses detail-1 near crowns). Intro start (no units, forest on): fantasy wide 48 calls / 260k tris.
+  In game: m6_l16 915x412 120 calls, 412x915 fine; m1_l3 scifi landscape 95 calls = portrait 95. No console errors.
+- Shots (scratch battle8/): before_after.png (rows: fantasy wide intro start, fantasy wide fight, scifi wide intro start; right
+  columns portrait intro fantasy / scifi, before top, after bottom), g_sheet.png (in game m6_l16 intro + fight 915x412),
+  gi_sheet.png (in-game intros), u_cmp.png (wide fantasy units vs ref), od_land_*.png (OD callout).
+- Intro judgement: fantasy wide was the weak one (flat green flanks + a blank sky wedge; the backdrop hid behind the back wall). Now
+  forest canopy on both sides, the Rift + arch in the opening, giant trees framing the top: ~6.5/10 vs ref mood. Scifi wide is good
+  (now shows the VECTOR PROTOCOL screen; the pale void under the stands is gone). Portrait both fine; FRAME_INTRO left at defaults
+  (variants with less look-up hid the Rift or exposed a void under the near ledge).
+- Open issues
+  - Fantasy wide high tris +175k from the forest (402k total). Fine on M5; on the S22 at ~1.5 dpr it should hold, but if QA sees
+    drops, cut the far crown count / leaf cards first (fantasy_forest.js K, `near/far` lists).
+  - The forest pops off in portrait at the end of the intro; only a crown under the top HUD at the top-right is affected.
+  - Forest canopies are lit lobes + cards, still a little "soft cotton" up close in the intro's lower corners.
+  - OD callout at narrow landscape (740x360) can still touch a back-column head; side gap there is ~93 px vs a ~156 px callout.
+- Requests
+  - manager: new file js/battle/themes/fantasy_forest.js (imported by fantasy.js). No new vendored addons (mergeVertices is in the
+    existing BufferGeometryUtils).
+  - ui: none. `theme.setIntro` is battle-internal.

@@ -3,6 +3,7 @@ import { box, merge, toLayer, BACKDROP_LAYER } from '../geo.js';
 import { rng } from '../../fx/textures.js';
 import { stoneBlockTextures, treelineTexture, foliageTexture } from '../../fx/textures_fantasy.js';
 import { mossy } from './fantasy.js';
+import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 
 // Everything beyond the back wall of the fantasy arena, seen by the near-level backdrop camera (BACKDROP_LAYER):
 // misty sky with a violet Rift tear (the sci-fi world bleeding through), layered forest silhouettes, giant ancient trees,
@@ -212,9 +213,11 @@ export function buildFantasyBackdrop(engine, { iW, fz0, fz1, seed = 7 }) {
         const f = R * (0.92 + n * 0.45);
         pp.setXYZ(i, dv.x * f, dv.y * f * 0.72, dv.z * f);
       }
-      g.deleteAttribute('uv'); g.computeVertexNormals();
-      g.translate(x + Math.cos(a) * d, canopyY + (r() - 0.3) * canopyR * 0.5, z + Math.sin(a) * d * 0.6);
-      LG.push(g);
+      // battle-8: weld before computing normals (the icosphere is non-indexed, so the lobes were flat-shaded facets)
+      g.deleteAttribute('uv'); g.deleteAttribute('normal');
+      const w = mergeVertices(g, 1e-4); g.dispose(); w.computeVertexNormals();
+      w.translate(x + Math.cos(a) * d, canopyY + (r() - 0.3) * canopyR * 0.5, z + Math.sin(a) * d * 0.6);
+      LG.push(w);
     }
     for (let k = 0; k < (lowT ? 24 : 90); k++) {
       const a = r() * Math.PI * 2, d = Math.sqrt(r()) * canopyR * 1.05;

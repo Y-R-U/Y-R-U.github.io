@@ -62,3 +62,94 @@ Screens: scratchpad qa/*.png. Base URL http://localhost:8888/gms/3d/vectorprotoc
 - Q22 [polish] tools/battle_test.html requests /favicon.ico -> 404 in the console.
 - Q23 [minor, ui] Background mid-battle: the fight correctly stops (frozen 5 s / hidden 4 s, integrity unchanged, audio ctx suspended) but no pause sheet is shown on return - the battle resumes instantly. Opening the pause menu on visibility return would be kinder on phones.
 - Checked OK: save survives reload; slot 3 at m1_l5 / slot 5 at m3_l14 per MAPS.md (dev clears); Patch joins on m1_l3 first clear (NEW RECRUIT on results); workshop unlocks after m1_l2 (store.isUnlocked); fantasy arena + stone HUD on m6; boss music; recruit x1/x10 all 7 banners; arena win (+15 rating, tokens); raid win; settings sliders/toggles render; every unit card in Barracks has a 256 px portrait.
+
+---
+# QA-L (landscape + D26 intro + portrait loader round, 2026-10-19, CDP 9434, M5 metal, touch emulation for phones)
+Scripts/shots: scratchpad/qaL/. drive.mjs (driver), audit.js + sweep.mjs (per route: data-orient/form/l-short, horizontal page
+scroll, buttons off-screen outside a scroller, interactive elements inside the ?insets zones), t_rot.mjs (9.2.1), t_rot2.mjs (9.2.2),
+t_rot3.mjs / t_hyst.mjs (9.2.3/9.2.4), t_intro.mjs, t_misc.mjs, t_modal.mjs, t_barr.mjs, t_loop.mjs (full loops), t_lv.mjs, t_bin.mjs,
+t_rev.mjs (old list), t_hudp*.mjs (HUD portraits). Contact sheets cs_*.png.
+
+## Status: pass complete. Counts: 0 blocker · 0 major · 6 minor · 7 polish (new). Old list: every major fixed.
+
+## Matrix results (§9)
+- **Portrait regression** 412x915, 390x844, 360x780 and URL-bar heights 412x785, 390x714 (+ 412x780, 390x700, 360x640 formation):
+  12 routes each, zero console errors, no h-scroll, no action off-screen. Formation roster row (74x100) + ENGAGE visible at every
+  height (ENGAGE 412x780 y714-770, 390x700 y634-690, 360x640 y574-630). cs_390x714.png, cs_412x785.png, rv_form_*.png.
+  1280x800 with Layout = Portrait column: #app 450x800 centred (D3 column); switching back to Auto mid-battle re-lays out live (col_battle_auto.png).
+- **Landscape phones** 915x412, 915x360, 844x390, 844x340, 960x412, 740x360 (12 routes each) + 915x360 / 844x340 / 915x412 with
+  `?insets=0,47,21,47`: all `landscape/phone/l-short`, zero console errors, no h-scroll, no primary action off-screen. Only inset hit:
+  the story map head (QL3). Battle with insets: HUD, grid, rail all inside the safe area (bin_915x360.png).
+- **Tablet** 1024x768, 1180x820, 1366x1024 (landscape/tablet), 768x1024 (portrait/tablet column); **desktop** 1280x800, 1440x900,
+  1920x1080, 2560x1080 (landscape/desktop), 1000x900 starts portrait: all clean (cs_1024.png, cs_1920.png). Note: shots above ~3 Mpx
+  needed jpeg capture (CDP png hung) - test artefact.
+- **9.2.1** 412x915 -> 915x412 -> 412x915 mid-fight: same scene object, same 4 `.pc` nodes, sim tick strictly rising [26,41,57,74,90],
+  lane profile tall->wide->tall and margins switch within 60 ms, 60 fps in both, no errors. PASS.
+- **9.2.2** rotate during drop-in, right after an Overdrive fire, while paused (modal kept, tick frozen), and on the VICTORY banner; then
+  rotate on results: all PASS, no errors (r2_*.png). Overtime plate not provoked.
+- **9.2.3** formation mid-drag rotate: ghost removed, unit kept (squad still 4). Recruit x10 mid-reveal rotate: finishes, 10/10 portraits.
+  Unit profile reframed (r3_unit_L.png).
+- **9.2.4** desktop width drag at h 900: 1300 -> 900 -> 1300 flips exactly once each way (portrait at 940, landscape at 1040). See QL13.
+- **9.3 / QA-L loops**: full loop hub -> map -> sheet -> formation -> battle -> results -> map -> recruit -> reveal -> unit -> settings by
+  real taps at 915x360 and at 412x785: zero console errors, every tapped action fully on screen (cs_loop_915x360.png, cs_loop_412x785.png).
+  HUD card size: 915x412 78x112 and 844x340 62x88 (QL2). Fantasy m6_l16 at 915x412 / 844x340: stone HUD, 6/6 portraits, 122 calls.
+- **D26 intro**: bar (DON'T SHOW AGAIN + SKIP) appears ~250 ms into the intro, bottom-right above the strip in portrait / corner in
+  landscape; sim tick stays 0 during it. SKIP lands in ~490 ms. DON'T SHOW AGAIN -> toast "Battle intro off · turn it back on in
+  Settings", setting false, next load no intro. Settings "Battle intro: On" brings it back. `&nointro` off. Retry from results -> no intro
+  (session rule). Rotate 1 s into the intro: intro continues, bar re-anchors to the landscape corner, lands correctly (mi_intro_rot*.png).
+- **Barracks loader** (cache off, 46+ cards): cold (IndexedDB deleted, fresh save) cards at 9 ms, all art 1.84 s (412x915) / 1.90 s
+  (915x360), 13-14 long tasks, max 72-84 ms, none > 100 ms. Warm reload: all art 60 ms, 0 long tasks.
+- **Back during battle**: history.back() -> stays #/battle, PAUSED sheet, sim frozen; Forward stays; Retreat -> results. PASS (QL4 aside).
+- **Modals across routes**: arena shard picker + route change -> closed (Q9 fixed).
+
+## Specific check: battle HUD portraits (manager's landscape shots)
+- **Not reproducible on the current tree.** 8 runs: portrait + landscape, cold (IndexedDB deleted) and warm, ENGAGE tapped the instant
+  it appears (12 formation renders still queued), 1600x900 desktop like promo.mjs, fantasy m6_l16 6-unit squad, both full loops:
+  every run has all cards filled (6/6 within ~1.5 s of the battle start, 4/4 immediately when the formation rendered them).
+- Cause of the shots: the role-icon-only HUD is battleL/g_m6_l16_915x412.png (BATTLE-L's game.mjs, 21:31-21:32). ui-L was rewriting
+  js/ui/portraits.js at that moment (file saved 21:33:22). The manager's promo_m1/m3.jpg at 21:39 already show portraits.
+- QL1 [minor, ui] **Latent cause that can still produce exactly this:** portraits.js never retries a failed portrait. `render()` ->
+  `done(j, null)` resolves the job but leaves it in `jobs`; every later `fill()` for that key adds its art to the already-resolved job,
+  so that card keeps its role icon for the whole session (HUD, roster, barracks alike). `put()` also has no `img.onerror`. Triggers:
+  `units.renderPortrait` missing (units stub after a failed module fetch at boot), a throw (context loss), a bad IndexedDB blob.
+  Fix: on a null/failed render delete the job (retry on the next fill, with a cap), and onerror -> drop the cached URL / IDB key.
+
+## New findings (QA-L)
+- QL1 [minor, ui] see above (portrait failures are cached for the session).
+- QL2 [minor, ui] Landscape HUD cards under the §9.3 sizes: 844x340 = 62x88 (target >= 68x97), 915x412 = 78x112 (target >= 80x114).
+  Repro: `?dev=1&fresh&god=1&level=m6_l16`, Engage, measure `.pc`. lv_m6_l16_844x340.png. Readable, but the spec floor is missed.
+- QL3 [minor, hub] Story map head ignores side insets in landscape: `.vpm-back` sits at x=16 with `--sal` 47 (under a notch), and the
+  stars / "1/14 CLEARED" reach the right edge under `--sar`. Repro: `?dev=1&fresh&insets=0,47,21,47&level=m3_l2`, `#/map/3` at
+  844x340 / 915x360 / 915x412. sw_844x340_in_sheet.png. (Every other route honours the insets.)
+- QL4 [minor, ui] Back with a battle modal open (Squad status or Info) stacks PAUSED on top of it (two modals). Android Back should close
+  the top modal first (and only then open Paused). Repro: battle, tap the squad icon, history.back(). mo_battle_back.png.
+- QL5 [minor, battle] Old Q12 still open in landscape: m8_l15 wave 2 XL enemies (Kingpin / Leviathan / Widowmaker) overlap into one
+  mass. Repro: `?dev=1&fresh&god=1&onehit=1&level=m8_l15` at 915x412, wait for round 2. lv_m8_l15_915x412_w2.png.
+- QL6 [minor, battle] The Overdrive callout sits on the CHEATS chip / far-lane HP bars and damage numbers draw through it ("SUPPRESS201")
+  in landscape. r2_od.png. (BATTLE-L lists it as open.)
+- QL7 [polish, ui] Map level sheet with `--sab` 21: the sticky DEPLOY SQUAD floats mid-sheet with a goal row visible under it.
+  sw_844x340_in_sheet.png.
+- QL8 [polish, ui] Barracks in landscape: SOVEREIGN PALADIN wraps into the Lv / stars on the squad mini-card and the grid card.
+  barr_cold_915x360.png.
+- QL9 [polish, ui] 1920x1080 formation: small field and type, right column top-anchored with ~600 px of empty space above POWER /
+  ENGAGE. sw_1920x1080_formation_m3_l2.png.
+- QL10 [polish, ui] Unit profile at the level cap: the disabled LEVEL CAP button keeps the bright primary fill with a faint label (reads
+  as broken); landscape turntable stage is flat black. sw_915x412_unit.png.
+- QL11 [polish, battle+ui] Fantasy intro start pose shows the flat ground and a hard backdrop edge above the ruins wall (battle: known
+  open); SKIP / DON'T SHOW AGAIN use the cyan sci-fi buttons over the stone HUD (ui). lv_m6_l16_915x412_intro.png.
+- QL12 [polish, ui] Remaining sub-44 px targets (landscape formation): W1/W2 tabs 40x30, FIT GOALS 32 tall, buff chips 34 tall.
+- QL13 [polish, manager/docs] LANDSCAPE.md §9.2.4 says drag 1300 -> 1000 -> 1300 at h 900 flips once each way, but 1000/900 = 1.11 is
+  inside the 1.05-1.15 band, so it never flips (correct behaviour). Use 900 in the spec.
+- Dev-only: the landscape DEV badge covers the lowest HUD card / dock button (known, ui).
+
+## Previous list re-verified
+- FIXED: A1 / A1b (roster + ENGAGE at 412x780, 390x700, 360x640, 412x785, 390x714), A1c (arena touch-scroll: last shop button
+  763 -> 636 at 390x700), A2 (fullscreen toggle everywhere), A3 (badge reservation; portrait battle intentionally none), Q1, Q2 (m1_l1
+  goals now win / no losses / time - code), Q3 (hub-4 44 px hit bands; fresh save says START), Q4 (sim: mutual KO = win), Q5 (D27 eased
+  m1), Q8 (picker lists every owned unit, Cancel, nothing off-screen), Q9, Q10 (#/chapters -> #/map/1), Q11 (modules.js + battle retry,
+  code), Q16, Q17, Q18 (RANK UP disabled below cap), Q20 (watchdog = 20 s without progress), Q21 (not reproduced: in-game cpu 1.8-2.0
+  ms here), Q22 (battle_test favicon data:), Q23 (hidden -> visible opens PAUSED).
+- MOSTLY FIXED: Q15 (settings / events / sm buttons 44; landscape formation leftovers = QL12). Q19 (robots-5 fit; spot-checked only).
+- STILL OPEN: Q12 (= QL5), Q6 (results thumbnail lighting, polish), Q14 (rift x10 frames, polish), Q13 (fantasy boss cue, polish),
+  Q7 (Patch silhouette, not re-checked).
+- REGRESSED: none.

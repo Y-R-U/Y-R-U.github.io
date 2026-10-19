@@ -117,13 +117,13 @@ export function createBattleScene(engine, opts = {}) {
     intro.on = true; intro.t = 0; intro.speed = 1; intro.deadline = 0;
     intro.s = Math.max(0, Math.min(1, strength ?? (wide ? 1 : 0.6)));
     intro.dur = 2.6 + 0.8 * intro.s;
-    rig.setIntro(0, intro.s);
+    rig.setIntro(0, intro.s); arena.theme.setIntro?.(true);
     intro.done = new Promise((r) => { intro.resolve = r; });
     return intro.done;
   }
   function endIntro() {
     if (!intro.on) return;
-    intro.on = false; intro.t = intro.dur; rig.setIntro(1);
+    intro.on = false; intro.t = intro.dur; rig.setIntro(1); arena.theme.setIntro?.(false);
     const r = intro.resolve; intro.resolve = null; r?.();
     stateDirty = true;
   }

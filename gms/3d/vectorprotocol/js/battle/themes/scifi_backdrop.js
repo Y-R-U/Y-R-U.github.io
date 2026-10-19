@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { box, merge, onLayers, toLayer, BACKDROP_LAYER } from '../geo.js';
 import { rng, crowdTex, windowTex, logoScreen, sloganScreen, bannerTex, dataPanelTex } from '../../fx/textures.js';
 import { REFLECT_LAYER } from '../../fx/reflection.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 // Everything outside the barriers: sky, tiered stands with crowd impostors, the far VECTOR PROTOCOL tower and screens,
 // floating data panels, the megacity skyline and flying craft.
@@ -35,6 +36,8 @@ export function buildBackdrop(engine, { iW, fz0, fz1, seed = 7 }) {
         vec2 sg = floor(vec2(atan(vD.x, -vD.z), y) * 260.0);
         float st = step(0.9965, h21(sg)) * smoothstep(0.12, 0.4, y) * (0.6 + 0.4 * sin(uTime * 2.0 + h21(sg + 3.0) * 30.0));
         c += vec3(0.8, 0.9, 1.0) * st;
+        // battle-8: below the horizon is the stadium floor under the stands, not more glowing sky (the D26 intro and landscape see it)
+        c = mix(c, vec3(0.012, 0.02, 0.06), smoothstep(-0.015, -0.09, y));
         gl_FragColor = vec4(c, 1.0);
       }`,
   });
@@ -211,18 +214,38 @@ export function buildBackdrop(engine, { iW, fz0, fz1, seed = 7 }) {
   onLayers(banners, REFLECT_LAYER);
   group.add(banners);
 
-  // floating data panels above the barriers
-  const panels = [];
+  // floating data panels above the barriers. battle-8: one draw (texture atlas + per-panel bob phase in the vertex shader); they were
+  // 6 separate meshes, which is most of the extra draws landscape made (it sees all of them)
   const panelDefs = [[-(wx - 0.6), 3.9, -2, 0.9], [wx - 0.6, 3.9, -6, -0.9], [-(wx - 0.6), 4.4, -11, 0.9], [wx - 0.6, 4.2, 1.5, -0.9]];
   if (tier.holoDetail > 0.5) panelDefs.push([-(wx + 6), 9, -14, 0.6], [wx + 6, 9.5, -12, -0.6]);
-  panelDefs.forEach(([x, y, z, ry], i) => {
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.4), new THREE.MeshBasicMaterial({
-      map: dataPanelTex(seed + i, 256, 160, i % 2 ? '#ff7ad8' : '#5cd0ff'), color: new THREE.Color(1.4, 1.4, 1.4),
-      transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
-    m.position.set(x, y, z); m.rotation.y = ry; m.userData.y0 = y; m.userData.ph = r() * 6;
-    group.add(m); panels.push(m);
-  });
-  updaters.push((dt, t) => { for (const p of panels) p.position.y = p.userData.y0 + Math.sin(t * 0.8 + p.userData.ph) * 0.12; });
+  {
+    const n = panelDefs.length, atlas = document.createElement('canvas');
+    atlas.width = 256; atlas.height = 160 * n;
+    const ac = atlas.getContext('2d'), PG = [];
+    panelDefs.forEach(([x, y, z, ry], i) => {
+      const t = dataPanelTex(seed + i, 256, 160, i % 2 ? '#ff7ad8' : '#5cd0ff');
+      ac.drawImage(t.image, 0, 160 * i); t.dispose();
+      const g = new THREE.PlaneGeometry(2.2, 1.4);
+      const uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setY(k, (uv.getY(k) + (n - 1 - i)) / n);
+      g.rotateY(ry); g.translate(x, y, z);
+      g.setAttribute('aPh', new THREE.Float32BufferAttribute(new Array(uv.count).fill(r() * 6), 1));
+      PG.push(g);
+    });
+    const at = new THREE.CanvasTexture(atlas); at.colorSpace = THREE.SRGBColorSpace; at.anisotropy = 4;
+    const pm = new THREE.MeshBasicMaterial({ map: at, color: new THREE.Color(1.4, 1.4, 1.4),
+      transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+    const uT = { value: 0 };
+    pm.onBeforeCompile = (sh) => {
+      sh.uniforms.uT = uT;
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float aPh; uniform float uT;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed.y += sin(uT * 0.8 + aPh) * 0.12;');
+    };
+    pm.customProgramCacheKey = () => 'vp-panels';
+    const pmesh = new THREE.Mesh(mergeGeometries(PG, false), pm);
+    for (const g of PG) g.dispose();
+    group.add(pmesh);
+    updaters.push((dt, t) => { uT.value = t; });
+  }
 
   // --- skyline ---
   const wTex = windowTex();

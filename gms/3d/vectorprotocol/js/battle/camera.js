@@ -202,14 +202,15 @@ export function createBattleCamera(opts = {}) {
     get introK() { return intro.k; },
     update(dt, t) {
       cur.pos.copy(base.pos); cur.target.copy(base.target);
-      let iy = 1;
+      let iy = 1, ir = 0;
       if (intro.k < 1) {
         const k = intro.k, e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; // easeInOutCubic
-        const r = intro.s * (1 - e), I = FRAME_INTRO;
+        const r = intro.s * (1 - e), I = { ...FRAME_INTRO, ...(F.intro || {}), ...(base.wide ? F.introWide || {} : {}) };
         v.copy(base.pos).sub(base.target);
         cur.target.y += I.lookUp * r; cur.target.z -= I.lookFar * r;
         cur.pos.copy(base.target).addScaledVector(v, 1 + I.zoomOut * r); cur.pos.y += I.rise * r;
         iy = 1 - r; // the lens shift fades in with the move
+        ir = intro.s > 0 ? r / intro.s : 0;
       }
       // idle breathing
       const ds = (base.dist || 27) / 27; // breathing / shake were tuned at 27 m; keep the same on-screen amount
@@ -228,7 +229,9 @@ export function createBattleCamera(opts = {}) {
       }
       apply(cur.pos, cur.target, base.shiftY * (1 - push.k * 0.4) * iy, base.shiftX);
       // intro: the backdrop horizon follows the barrier top as the board camera tilts, so the join stays hidden
-      if (bgCamera && intro.k < 1) bg.shift = bg.shift0 + (v.copy(BD.seam).project(camera).y - bg.seam0);
+      // battle-8: wide drops its horizon below the seam (bgHorizon); at the intro start it sits on the seam (as portrait), so the
+      // backdrop's ruins / arch / Rift show above the back wall instead of hiding behind it, then eases to the wide offset
+      if (bgCamera && intro.k < 1) bg.shift = v.copy(BD.seam).project(camera).y + (bg.shift0 - bg.seam0) * (1 - ir);
       else if (bgCamera) bg.shift = bg.shift0;
       // backdrop parallax follows the breathing/shake a little (it is far away, so it should move less)
       if (bgCamera) applyBg((cur.pos.x - base.pos.x) * 1.2, (cur.pos.y - base.pos.y) * 0.3);

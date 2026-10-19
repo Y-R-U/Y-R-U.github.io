@@ -38,6 +38,7 @@ const CSS = `
 .vpb-od.enemy{border-right-width:4px;--x0:60%}
 .vpb-od .s{font-size:9px;letter-spacing:.18em;color:#9fc8ff;white-space:nowrap}
 .vpb-od .t{font-size:16px;font-weight:900;letter-spacing:.08em;color:#fff;white-space:nowrap}
+.vpb-od.side{padding:4px 9px 5px}.vpb-od.side .t{font-size:13px}.vpb-od.side .s{font-size:8px}
 .vpb-od.go{animation:vpbOd 2.1s cubic-bezier(.2,.9,.3,1) forwards}
 @keyframes vpbOd{0%{opacity:0}10%{opacity:1;transform:translateX(-50%)}82%{opacity:1;transform:translateX(-50%)}100%{opacity:0;transform:translateX(-50%)}}
 .vpb-ot{position:absolute;left:var(--cx,50%);transform:translateX(-50%) scale(.8);padding:2px 12px 3px;font-size:11px;font-weight:900;letter-spacing:.32em;color:#ffd0d0;background:linear-gradient(90deg,rgba(60,0,8,0),rgba(90,6,16,.85) 20%,rgba(90,6,16,.85) 80%,rgba(60,0,8,0));border-top:1px solid #ff3a4a;border-bottom:1px solid #ff3a4a;text-shadow:0 0 8px #ff2030;opacity:0;transition:opacity .4s,transform .4s;pointer-events:none;white-space:nowrap}
@@ -165,6 +166,14 @@ export function createOverlay(container, camera, { maxNums = 48, bars = true } =
       odEl.className = 'vpb-od ' + side;
       odEl.style.color = color;
       odEl.innerHTML = `<div class="s">${sub}</div><div class="t">${title}</div>`;
+      // battle-8: landscape (side bands set) - under the top HUD the far-lane heads fill the board's centre, so the callout hugs the
+      // caster's edge of the board band (over the walls / forest) instead of covering them; portrait keeps it centred
+      odEl.classList.toggle('side', !!(frame.left || frame.right));
+      if (frame.left || frame.right) {
+        const w = odEl.offsetWidth, pad = 8;
+        odEl.style.left = Math.round(side === 'enemy' ? W - frame.right - pad - w / 2 : frame.left + pad + w / 2) + 'px';
+        odEl.style.top = (topPx + 6) + 'px';
+      } else { odEl.style.left = ''; if (plateY != null) O.setPlateY(plateY); }
       void odEl.offsetWidth;
       odEl.classList.add('go');
     },

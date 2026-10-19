@@ -98,7 +98,9 @@ async function run() {
     // D26 intro camera on by default (as in game); &nointro (or &still=1) skips it, &intro=0.5 sets its strength
     intro: qs.has('nointro') || qs.get('still') === '1' ? false : qs.has('intro') ? { strength: +qs.get('intro') } : true,
     ...(qs.has('theme') ? { theme: qs.get('theme') } : {}), ...(qs.has('fk') ? { themeUnitK: +qs.get('fk') } : {}), ...(qs.has('realm') ? { realm: qs.get('realm') } : {}),
-    frame: Object.fromEntries(['fov', 'widthFill', 'farY', 'nearY', 'gapTop', 'gapBottom', 'pitch', 'bgHFov', 'bgHorizon', 'boxTop'].filter((k) => qs.has(k)).map((k) => [k, +qs.get(k)])) });
+    // battle-8: &introPose=zoomOut,rise,lookUp,lookFar overrides the D26 intro start pose (both orientations)
+    frame: { ...Object.fromEntries(['fov', 'widthFill', 'farY', 'nearY', 'gapTop', 'gapBottom', 'pitch', 'bgHFov', 'bgHorizon', 'boxTop'].filter((k) => qs.has(k)).map((k) => [k, +qs.get(k)])),
+      ...(qs.has('introPose') ? { intro: Object.fromEntries(qs.get('introPose').split(',').map((v, i) => [['zoomOut', 'rise', 'lookUp', 'lookFar'][i], +v])), introWide: {} } : {}) } });
   dbg.battle = battle;
   // &still=1: every frame is tick(0, 0) (no time passes: deterministic frames for pixel diffs; units never deploy)
   if (qs.get('still') === '1') { const u = battle.update; battle.update = () => u(0, 0); }

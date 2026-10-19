@@ -6,6 +6,7 @@ import { flagstoneTextures, stoneBlockTextures, pedestalTextures, foliageTexture
 import { createPlanarReflection, REFLECT_LAYER } from '../../fx/reflection.js';
 import { buildForestEnv } from '../../engine/env.js';
 import { buildFantasyBackdrop } from './fantasy_backdrop.js';
+import { buildFantasyForest } from './fantasy_forest.js';
 import { tubeGeometry } from '../../fx/tube.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -371,21 +372,20 @@ export function createTheme(engine, { seed = 7 } = {}) {
   let otK = 0;
   updaters.push(() => { flyMat.uniforms.uFly.value.copy(fly0).lerp(emb, otK); flyMat.uniforms.uMote.value.copy(mote0).lerp(emb, otK * 0.8); });
 
-  // --- BATTLE-L: forest floor flanks, shown only on the wide (landscape) board. The wide camera sees past the side walls, where only
-  // the fogged backdrop ground was (flat grey slabs). Dark forest floor out to the backdrop's tree bands; hidden in portrait.
-  // (Tree-line cards here read as giant hedge walls from the intro pose; the backdrop's own bands do the skyline.)
-  const flanks = new THREE.Group(); flanks.visible = false;
-  {
-    const len = fz0 - fz1 + 330, zc = (fz0 + fz1 - 330) / 2;
-    const gg = [];
-    for (const s of [-1, 1]) { const g = new THREE.PlaneGeometry(200, len); g.rotateX(-Math.PI / 2); g.translate(s * (rect.x1 + 100), -0.03, zc); gg.push(g); }
-    flanks.add(new THREE.Mesh(mergeGeometries(gg), new THREE.MeshStandardMaterial({ color: 0x1e2817, roughness: 1, metalness: 0 })));
-    group.add(flanks);
-  }
+  // --- battle-8: the forest beyond the side walls (fantasy_forest.js), shown on the wide (landscape) board, where the camera sees
+  // past the walls, and during the D26 intro (which looks out over them). The portrait fight framing barely sees it: hidden there.
+  const forest = buildFantasyForest(engine, { hw, fz0, fz1, bz0, seed, stone: stoneMat, foliage: folTex });
+  forest.group.visible = false;
+  const forestOn = { wide: false, intro: false };
+  group.add(forest.group);
+  updaters.push((dt, t) => { if (forest.group.visible) forest.update(dt, t); });
 
   disposables.push(environment);
   return {
-    setWide(on) { flanks.visible = !!on; },
+    // the forest shows on the wide board, and in portrait only while the D26 intro looks out over the walls (battle.js setIntro)
+    setWide(on) { forestOn.wide = !!on; forest.group.visible = forestOn.wide || forestOn.intro; },
+    setIntro(on) { forestOn.intro = !!on; forest.group.visible = forestOn.wide || forestOn.intro; },
+    forest,
     id, group, reflection, lights: { hemi, key, rim, fill }, environment, envIntensity: 0.75,
     fog: new THREE.Fog(0x5f6b4a, 48, 240),
     look: { strength: 0.5, radius: 0.35, threshold: 1.25, factors: [1, 0.7, 0.45, 0.25, 0.1], vignette: 0.75, sat: 0.98, contrast: 1.16 },
