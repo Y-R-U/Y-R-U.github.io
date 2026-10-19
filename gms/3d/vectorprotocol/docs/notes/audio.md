@@ -107,3 +107,37 @@
 - Requests
   - ui: (optional) dispatch a `popstate`/`hashchange` after `router.go` so audio reacts instantly instead of on the 250 ms hash poll.
   - ui: recruit reveal should call `audio.sting('reveal')` for epic/legendary (file now ships).
+
+# audio-3
+
+## Checkpoint 1 (2026-10-20)
+- Music Studio project **"VECTOR PROTOCOL v2" id aa890ebe98**. YuE2 instrumental route (`instrumental:true`: YuE2 plans a song from
+  section tags, the worker moves the Vocal line to Ins and renders), `intro: short` (4 bars), cot full, one take per job so A/B
+  are separate rows with the same title. Briefs + seeds: scratchpad `audio3/submit.py`, job list `audio3/jobs.json`.
+- Round A queued (track ids): hub 671c6ac523, battle_1 092a6ef1b4, boss 75a1854b70, rift ab5ed16a28, map fbf9f592c3,
+  battle_2 281e28feec, battle_3 75ed55c8bc, sting_victory 2721cdd75f, sting_defeat 0b5ae6f85a, sting_reveal b78cbb6e9b,
+  battle_4 c533b087b4. Round B (seed +2101) to be queued after hub A is checked.
+- NEXT: overlap fix in js/audio/audio.js (menu routes share one track; max 2 decks; shorter fade-out).
+- hub A 671c6ac523 FAILED (YuE2 plan had a malformed bar: `AbcError ... duration 7/2 quarter notes != meter duration 4`; the
+  instrumental converter rejects it). Deleted; resubmitted as hub A 0508d77e5f (seed 7151). Failures get one resubmit with a new seed.
+- DONE (code, not yet browser-verified): overlap fix in js/audio/audio.js — `decks[]` tracks every unstopped source; starting a deck
+  hard-stops (30 ms) everything except the one it replaces; outgoing fade capped at 0.8 s; same track already playing is never
+  restarted; menu route changes settle 350 ms before music changes; forBattle cancels a pending route change. Also fixed: results ->
+  hub within 2.2 s left the music silent (music() returned early on the pending state). `__audio.debug.decks()` lists live decks.
+  Node mock test (scratchpad audio3/decktest.mjs, fake WebAudio): menu hopping starts 0 new sources, hub/map ping-pong max 2
+  audible, results->hub plays hub (the original file fails that case: silent).
+- Analysis tools: audio3/analyze.py (ebur128 LUFS/true peak, clipping, silent seconds, bands, onset tempo vs score Q:),
+  audio3/tag.py (AudioSet AST tagger, sheetsage venv, CPU). Baseline: the old ACE tracks tag as Electronic/Techno with
+  Guitar/Drum kit ~0.00, i.e. the "midi" verdict shows up objectively; a YuE2 blues-rock clip tags Guitar 0.50 / Distortion 0.34.
+
+## Checkpoint 2 (2026-10-20)
+- Every instrumental YuE2 plan failed the strict converter (6/6, also after adding placeholder lyrics). Fix outside the game:
+  `~/cc/airon/audio/yue2/service/abc_repair.py` + a try/except in `worker.py` (instrumental branch only; backup of the old
+  worker in scratchpad audio3/worker.py.orig). Documented in audio/yue2/CLAUDE.md. The salvage keeps the clean prefix of the
+  plan and repeats its body to max_seconds, so takes are verse-heavy and repetitive (fine for loops).
+- Round A re-queued with the same ids (retry): hub 87da33b74a, battle_1 07f2dee9ba, boss c9c51b4850, rift d6f401c8ed,
+  map 14928300ad, battle_2 e6bae75015, battle_3 72e3392185, sting_victory 54c023b2c2, sting_defeat 59936d7cd1,
+  sting_reveal c022f9a684, battle_4 19649f2a38 (seeds 7301+index, briefs in scratchpad audio3/submit.py).
+- Overlap fix VERIFIED in headless Chrome (port 9407, run while YuE2 was unloaded; audio3/overlap.mjs): hub<->barracks x6 at
+  150 ms -> 1 deck, never restarted; all 10 menu screens at 120 ms -> 1 deck; hub<->map x5 at 250 ms -> map never started
+  (350 ms settle), 1 deck; hub<->map x3 at 1.2 s -> max 2 audible. No console errors.

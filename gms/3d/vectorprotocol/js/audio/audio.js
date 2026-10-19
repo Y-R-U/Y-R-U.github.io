@@ -79,7 +79,7 @@ function silentWav() {
 export function createAudio() {
   const hasDOM = typeof window !== 'undefined' && typeof document !== 'undefined';
   let ctx = null, B = null, analyser = null, levelBuf = null, primed = false, vis = true, muted = false;
-  let vols = { ...DEFAULTS }, curState = null, curTrack = null, deck = null, pendingTimer = 0, battleTimer = 0;
+  let vols = { ...DEFAULTS }, curState = null, curTrack = null, deck = null, pendingTimer = 0, battleTimer = 0, routeTimer = 0;
   let live = 0, autoRoute = true, autoUi = true, odSplit = false, readyResolve;
   const ready = new Promise((r) => (readyResolve = r));
   const rotation = {}, bufCache = new Map(), inflight = new Map(), missing = new Set();
@@ -181,18 +181,25 @@ export function createAudio() {
   }
 
   // ---- music ---------------------------------------------------------------------------------
+  // Every source that has not been stopped yet. At most two are ever audible: the current deck and the one
+  // fading out under it. Starting a third kills the older outgoing one at once (QA: fast menu taps stacked tracks).
+  let decks = [];
+  const FADE_OUT = 0.8;
   function stopDeck(d, fade) {
-    if (!d) return;
-    const g = d.g.gain, t = ctx.currentTime;
-    g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(0, t + Math.max(0.05, fade));
-    try { d.src.stop(t + fade + 0.05); } catch (e) { /* already stopped */ }
-    setTimeout(() => { try { d.g.disconnect(); } catch (e) { /* gone */ } }, fade * 1000 + 300);
+    if (!d || d.dying === 'hard') return;
+    const g = d.g.gain, t = ctx.currentTime, f = Math.max(0.03, fade);
+    d.dying = fade <= 0.05 ? 'hard' : 'fade';
+    g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(0, t + f);
+    try { d.src.stop(t + f + 0.02); } catch (e) { /* already stopped */ }
+    clearTimeout(d.kill);
+    d.kill = setTimeout(() => { decks = decks.filter((x) => x !== d); try { d.g.disconnect(); } catch (e) { /* gone */ } }, f * 1000 + 150);
   }
 
   function playTrack(id, fade) {
     const tr = TRACKS[id];
     if (!tr || !ctx) return;
     curTrack = id;
+    if (deck && deck.id === id && !deck.dying) { playTrack.token = null; return; }   // already playing: never restart
     const token = id + ':' + now();
     playTrack.token = token;
     loadBuffer(BASE + 'music/' + tr.file).then((buf) => {
@@ -207,8 +214,10 @@ export function createAudio() {
       g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + Math.max(0.05, fade));
       src.start(t, pad);
       const old = deck;
+      for (const d of decks) if (d !== old) stopDeck(d, 0.03);
+      if (old) stopDeck(old, Math.min(fade, FADE_OUT));
       deck = { src, g, id, t0: t, pad, loopLen: src.loopEnd - pad };
-      if (old) stopDeck(old, fade);
+      decks.push(deck);
     });
   }
 
@@ -218,27 +227,28 @@ export function createAudio() {
     const i = rotation[state] ?? Math.floor(Math.random() * list.length);
     rotation[state] = (i + 1) % list.length;
     const id = list[i % list.length];
-    if (id === curTrack && deck) return;
+    if (deck && deck.id === id && !deck.dying) { curTrack = id; playTrack.token = null; return; }
     playTrack(id, fade);
   }
 
   // music(name|null, {fade, delay, restart}) — name is a track id or a STATES key; null/'none' fades out.
   function music(name, opts = {}) {
-    clearTimeout(pendingTimer);
+    const wasPending = !!pendingTimer;
+    clearTimeout(pendingTimer); pendingTimer = 0;
     const fade = opts.fade ?? 2;
     if (!name || name === 'none' || name === 'off') {
       curState = null; curTrack = null; playTrack.token = null;
-      if (ctx && deck) { stopDeck(deck, fade); deck = null; }
+      if (ctx) { for (const d of decks) stopDeck(d, d === deck ? Math.min(fade, FADE_OUT) : 0.03); deck = null; }
       return;
     }
     if (!STATES[name] && !TRACKS[name]) { console.warn('[audio] unknown music', name); return; }
-    if (name === curState && !opts.restart) return;
+    if (name === curState && !opts.restart && !wasPending) return;
     const go = () => {
       curState = name;
       if (opts.restart) curTrack = null;
       if (running()) startState(name, fade);
     };
-    if (opts.delay) { curState = name; pendingTimer = setTimeout(() => { curState = null; go(); }, opts.delay * 1000); } else go();
+    if (opts.delay) { curState = name; pendingTimer = setTimeout(() => { pendingTimer = 0; curState = null; go(); }, opts.delay * 1000); } else go();
   }
 
   function sting(name, opts = {}) {
@@ -357,16 +367,18 @@ export function createAudio() {
   }
 
   function forBattle(info = {}) {
-    clearTimeout(battleTimer);
+    clearTimeout(battleTimer); clearTimeout(routeTimer);
     music(battleTrackFor(info), { fade: info.fade ?? 1.2, restart: true });
     return { sfx: battleSfx, music, sting };
   }
 
   // ---- auto hooks: route music + UI taps --------------------------------------------------------
+  // Every menu screen shares the menu state (one track, never restarted between them); map has its own.
+  // A route change is applied after a short settle so tapping through screens never starts a track it leaves at once.
   function onRoute() {
     if (!autoRoute) return;
     const seg = location.hash.replace(/^#\/?/, '').split(/[/?]/)[0] || 'hub';
-    clearTimeout(battleTimer);
+    clearTimeout(battleTimer); clearTimeout(routeTimer);
     if (seg !== 'battle') ambience(null);
     if (seg === 'battle') { // the battle screen should call forBattle(); if it doesn't, fall back to the rotation
       battleTimer = setTimeout(() => { if (!/^(battle|boss|rift)/.test(curState || '')) music('battle'); }, 900);
@@ -375,7 +387,9 @@ export function createAudio() {
     const st = ROUTES[seg];
     if (st === undefined || st === null) return;
     const fromFight = /^(battle|boss|rift)/.test(curState || '') || curState === null;
-    music(st, { fade: fromFight ? 3 : 2, delay: seg === 'results' ? 2.2 : 0 });
+    if (seg === 'results') { music(st, { fade: 2, delay: 2.2 }); return; }
+    if (st === curState && !pendingTimer) return;
+    routeTimer = setTimeout(() => music(st, { fade: fromFight ? 2 : 1.2 }), fromFight ? 0 : 350);
   }
 
   const BACK = '.vpm-back, [aria-label="back"], [aria-label="Back"], [aria-label*="close" i], .back, .close, [data-back]';
@@ -446,7 +460,9 @@ export function createAudio() {
         src.start(ctx.currentTime, off);
         deck = { ...d, src, g, t0: ctx.currentTime - (off - d.pad) };
       },
-      info: () => ({ ctx: ctx && ctx.state, state: curState, track: curTrack, live, cache: bufCache.size, missing: [...missing], unshipped: UNSHIPPED, groups: { ...groupLive }, vols: { ...vols }, errors: errors.slice(-5) }),
+      // decks not yet stopped (audible = gain above ~-60 dB right now)
+      decks: () => decks.map((d) => ({ id: d.id, dying: d.dying || null, gain: +d.g.gain.value.toFixed(3) })),
+      info: () => ({ ctx: ctx && ctx.state, state: curState, track: curTrack, live, decks: decks.length, cache: bufCache.size, missing: [...missing], unshipped: UNSHIPPED, groups: { ...groupLive }, vols: { ...vols }, errors: errors.slice(-5) }),
       tracks: TRACKS, stings: STINGS, states: STATES, routes: ROUTES, sfxNames: SFX_NAMES, battleHooks: Object.keys(BATTLE).concat(['victory', 'defeat']),
     },
   };
