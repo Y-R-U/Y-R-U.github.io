@@ -6,14 +6,15 @@
 import { FILES } from './manifest.js';
 
 const ALL_TRACKS = {
-  hub: { file: 'hub.mp3', loop: 91.205, gain: 1 },
-  map: { file: 'map.mp3', loop: 85.1966, gain: 1 },
-  battle_1: { file: 'battle_1.mp3', loop: 68.4277, gain: 1 },
-  battle_2: { file: 'battle_2.mp3', loop: 64.0072, gain: 1 },
-  battle_3: { file: 'battle_3.mp3', loop: 79.1208, gain: 1 },
-  battle_4: { file: 'battle_4.mp3', loop: 72.8302, gain: 1 },
-  boss: { file: 'boss.mp3', loop: 47.9883, gain: 1 },
-  rift: { file: 'rift.mp3', loop: 54.0025, gain: 0.8 },
+  // v2 (audio-3, YuE2 via Music Studio project aa890ebe98). Gains bring each loop to about -15 LUFS (hub -16, calmer).
+  hub: { file: 'hub.mp3', loop: 54.8057, gain: 0.55 },        // 87da33b74a, 20 bars @ 87.5
+  map: { file: 'map.mp3', loop: 0, gain: 1 },                 // not shipped: map routes use the menu track
+  battle_1: { file: 'battle_1.mp3', loop: 0, gain: 1 },       // round B pending
+  battle_2: { file: 'battle_2.mp3', loop: 55.4003, gain: 0.55 }, // e6bae75015, 28 bars @ 121.6
+  battle_3: { file: 'battle_3.mp3', loop: 62.4911, gain: 0.77 }, // 72e3392185, 39 bars @ 149.6
+  battle_4: { file: 'battle_4.mp3', loop: 0, gain: 1 },       // round B pending
+  boss: { file: 'boss.mp3', loop: 0, gain: 1 },               // round B pending (falls back to battle_3)
+  rift: { file: 'rift.mp3', loop: 56.1812, gain: 0.73 },      // d6f401c8ed, 14 bars @ 59.8
 };
 
 const ALL_STINGS = {
@@ -36,7 +37,7 @@ const ALL_STATES = {
 export const ROUTES = {
   hub: 'menu', squad: 'menu', barracks: 'menu', collection: 'menu', workshop: 'menu', unit: 'menu', hq: 'menu',
   recruit: 'menu', arena: 'menu', events: 'menu', settings: 'menu', results: 'menu',
-  map: 'map', chapters: 'map', formation: 'map',
+  map: 'menu', chapters: 'menu', formation: 'menu',
   battle: null,
 };
 

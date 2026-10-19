@@ -141,3 +141,30 @@
 - Overlap fix VERIFIED in headless Chrome (port 9407, run while YuE2 was unloaded; audio3/overlap.mjs): hub<->barracks x6 at
   150 ms -> 1 deck, never restarted; all 10 menu screens at 120 ms -> 1 deck; hub<->map x5 at 250 ms -> map never started
   (350 ms settle), 1 deck; hub<->map x3 at 1.2 s -> max 2 audible. No console errors.
+
+## Checkpoint 3 (2026-10-20): v2 shipped (partial)
+Music Studio project "VECTOR PROTOCOL v2" (aa890ebe98). All 11 round-A takes went through abc_repair salvage (Aaron approved the patch).
+AST tags (Guitar / Drum kit / Violin): the old ACE tracks scored about 0.00 / 0.00 / 0.00. No take shows vocals (Singing <= 0.033).
+
+| cue | take | verdict | loop | gain | tags gtr / kit / vln | why |
+|---|---|---|---|---|---|---|
+| hub | 87da33b74a | SHIPPED | 54.806 s, 20 bars @87.5, from 41.45 s, seam_sim 1.37 | 0.55 (-10.8 LUFS -> about -16) | 0.15 / 0.02 (drum 0.04) / 0.00 | guitar band, steady level |
+| battle_2 | e6bae75015 | SHIPPED | 55.400 s, 28 bars @121.6, from 11.87 s, seam 1.12 | 0.55 (-9.8) | 0.33 / 0.02 / 0.00 (metal 0.35) | heaviest; the render saturates after about 75 s, so the loop is cut before that |
+| battle_3 | 72e3392185 | SHIPPED | 62.491 s, 39 bars @149.6, from 9.89 s, seam 1.07 | 0.77 (-12.7) | 0.05 / 0.14 (drum 0.18) / 0.03 | live drums strongest |
+| rift | d6f401c8ed | SHIPPED | 56.181 s, 14 bars @59.8, from 36.33 s, seam 1.28 | 0.73 (-12.3) | 0.01 / 0.08 / 0.42 | fiddle-led folk; guitar barely registers |
+| sting_victory | 54c023b2c2 | SHIPPED | 12-20 s, 1.5 s fade | -15.8 LUFS | 0.16 / 0.02 / 0.00 (metal 0.29) | |
+| sting_defeat | 59936d7cd1 | SHIPPED | 0.3-9.8 s, 2.5 s fade | -16.3 | 0.27 / 0.00 / 0.00 | quiet guitar + cello |
+| sting_reveal | c022f9a684 | SHIPPED | 13-21 s (build into the hit at 17 s) | -13.7 | 0.29 / 0.01 / 0.00 (dist 0.21) | |
+| battle_1 | 07f2dee9ba | REJECTED | | | 0.01 / 0.05 / 0.00 | render runs away to -1.6 LUFS, 1M clipped samples, tags as Electronic |
+| battle_4 | 19649f2a38 | REJECTED | | | 0.01 / 0.03 / 0.08 | same runaway (-2.3 LUFS, 459k clipped) |
+| boss | c9c51b4850 | REJECTED | | | 0.13 / 0.01 / 0.00 | only 69 s with a silent second at 40 s; best loop 18 s, seam_sim -0.03 |
+| map | 14928300ad | REJECTED | | | 0.23 / 0.01 / 0.00 (metal 0.38) | heavier than battle, runaway to -5 RMS; usable span gave a 27 s loop |
+
+- Round B queued at 80 s (the runaway starts 35-75 s in): battle_1 a9ce9dc6b7, battle_4 71a5cba878, boss b849d54b8b, map 26bd2e3494.
+- tracks.js: map/chapters/formation now route to 'menu' (the hub track, never restarted). Battle rotation is battle_2 + battle_3; boss falls back to battle_3.
+  The old ACE files are removed from audio/music (backup: scratchpad audio3/ace_backup/). audio/ is 8 files, 4.15 MB. gen_manifest re-run.
+- In game (CDP 9407, m1_l1): hub plays; hub -> map keeps the hub deck running (no restart); battle plays battle_3 with every hook arriving;
+  victory sting + crowd; results -> hub returns to hub. Requests are all 200, no console errors.
+- To swap a take: pick another row in Music Studio, then `loopcut.py master.flac out.mp3 <score bpm> --skip <intro s> --end <before runaway> --starts 40`,
+  and set loop/gain in tracks.js (gain = 10^((-15 - LUFS)/20)).
+- Round B finishing: run analyze.py + tag.py, cut, add the cues back (battle rotation, boss; map only if it is calmer than hub).
