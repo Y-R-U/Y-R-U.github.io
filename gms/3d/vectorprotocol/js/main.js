@@ -48,7 +48,7 @@ async function start() {
 
   progress(0.65, 'Calibrating unit optics…');
   const units = await load('units');
-  const portraits = vp.portraits = createPortraits({ engine, units });
+  const portraits = vp.portraits = createPortraits({ engine, units, reload: () => load('units') });
 
   progress(0.8, 'Plotting routes…');
   const router = createRouter({ fallback: 'hub' });

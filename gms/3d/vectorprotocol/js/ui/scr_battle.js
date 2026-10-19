@@ -5,6 +5,7 @@ import { icon, roleBadge } from './icons.js';
 import { load } from '../app/modules.js';
 import { data, unitDef } from '../app/data.js';
 import { createHud } from './hud.js';
+import { closeTopModal } from './components.js';
 import { modsText } from './scr_formation.js';
 import { hint, hintSeen } from './tutorial.js';
 import { snd, audioReady } from '../app/sound.js';
@@ -115,7 +116,7 @@ export async function mount(root, ctx) {
   requestAnimationFrame(fitMargins);
   // rotation: same HUD nodes, new layout; the scene refits from the new margins (no restart, docs/LANDSCAPE.md §1.4)
   // Back / Forward during the fight opens the pause sheet instead of silently dropping the battle (QA Q16)
-  const offGuard = (router.setGuard || (() => () => {}))(() => { if (ended) return true; if (!paused) pauseMenu(); return false; });
+  const offGuard = (router.setGuard || (() => () => {}))(() => { if (ended) return true; if (!paused && !closeTopModal()) pauseMenu(); return false; });
   // returning to a backgrounded tab: the fight was frozen by the browser, so offer the pause sheet first (QA Q23)
   const onVis = () => { if (document.visibilityState === 'visible' && !ended && !paused && ctl) pauseMenu(); };
   document.addEventListener('visibilitychange', onVis);
@@ -154,6 +155,7 @@ export async function mount(root, ctx) {
       btn("Don't show again", () => { store.setSetting('battleIntro', false); skip(); ctx.toast('Battle intro off · turn it back on in Settings'); }, { cls: 'sm bi-never' }),
       btn('Skip', skip, { cls: 'sm primary bi-skip', icon: 'ffwd' }));
     const place = () => { if (introEl && !orient.landscape) introEl.style.bottom = ((hud.margins()?.bottom ?? 150) + 8) + 'px'; else if (introEl) introEl.style.bottom = ''; };
+    if (hud.el.classList.contains('fantasy')) introEl.classList.add('fantasy');   // stone/gold buttons over the stone HUD (QL11)
     root.appendChild(introEl); place();
     hud.el.classList.add('intro');
     done?.then(finish, finish);

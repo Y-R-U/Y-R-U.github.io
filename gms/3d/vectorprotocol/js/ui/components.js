@@ -62,6 +62,8 @@ export function toast(msg, kind = '', life = 2.4, opts = {}) {
 const openModals = new Set();
 // screens.show() closes every open modal on a route change (QA Q9: a picker left over from the arena blocked ENGAGE)
 export function closeModals() { for (const c of [...openModals]) c(null); }
+// Android Back closes the top modal first (QA QL4); returns false when none was open
+export function closeTopModal() { const c = [...openModals].pop(); if (!c) return false; c(null); return true; }
 export function modal({ title, body, actions = [{ label: 'OK', value: true, cls: 'primary' }], cls = '', dismissable = true }) {
   return new Promise((resolve) => {
     const close = (v) => { openModals.delete(close); wrap.remove(); resolve(v); };
@@ -86,7 +88,7 @@ export function stars(n, max = 3) {
 // Unit card: frame around a 3D-rendered portrait (filled asynchronously by portraits.js).
 export function unitCard(u, opts = {}) {
   const art = h('div.art', h('div.ph', icon(u.role || 'hex')));
-  const card = h('div.vp-card', { dataset: { rarity: u.rarity || 'common', faction: u.rarity === 'legendary' ? 'legendary' : (u.faction || 'corporate'), uid: u.uid || u.id }, onclick: opts.onclick },
+  const card = h('div.vp-card' + (u.realm === 'fantasy' ? '.fantasy' : ''), { dataset: { rarity: u.rarity || 'common', faction: u.rarity === 'legendary' ? 'legendary' : (u.faction || 'corporate'), uid: u.uid || u.id }, onclick: opts.onclick },
     art, h('div.rl', roleBadge(u.role)),
     u.stars != null ? h('div.stars', '★'.repeat(u.stars)) : null,
     u.level != null ? h('div.lv', 'Lv.' + u.level) : null,

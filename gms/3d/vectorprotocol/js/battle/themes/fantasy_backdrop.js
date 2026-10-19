@@ -91,14 +91,33 @@ export function buildFantasyBackdrop(engine, { iW, fz0, fz1, seed = 7 }) {
 
   // --- forest silhouettes: three curved bands, darker + taller near, hazier far (fog does the depth) ---
   const tl = treelineTexture(seed + 1);
-  const band = (rad, hgt, color, rep, yb = -1) => {
+  // battle-9 (QL11): the bands were alpha-tested, solid dark green against the pale horizon: from the intro pose the near band read as a
+  // flat hill with a hard, stair-stepped top above the ruins wall. Now alpha-blended (mip-filtered soft canopy edges), their upper part
+  // hazes toward the horizon sky colour (aerial perspective), and the arc ends fade out. Drawn far -> near (renderOrder), no depth write.
+  const HAZE = new THREE.Color(0.62, 0.62, 0.46);
+  const band = (rad, hgt, color, rep, haze0, haze, order, yb = -1) => {
     const g = new THREE.CylinderGeometry(rad, rad, hgt, 48, 1, true, Math.PI - 1.15, 2.3);
     const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) * rep);
     g.translate(0, hgt / 2 + yb, camZ);
-    const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ map: tl, color, alphaTest: 0.5, side: THREE.DoubleSide }));
+    const mat = new THREE.MeshBasicMaterial({ map: tl, color, transparent: true, depthWrite: false, fog: false, side: THREE.DoubleSide });
+    mat.onBeforeCompile = (sh) => {
+      sh.uniforms.uHaze = { value: HAZE }; sh.uniforms.uHz = { value: new THREE.Vector3(haze, rep, haze0) };
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vBand;')
+        .replace('#include <uv_vertex>', '#include <uv_vertex>\nvBand = uv;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 vBand; uniform vec3 uHaze; uniform vec3 uHz;')
+        .replace('#include <map_fragment>', `#include <map_fragment>
+          diffuseColor.a = smoothstep(0.2, 0.75, diffuseColor.a);
+          float ends = smoothstep(0.0, 0.12, vBand.x / uHz.y) * smoothstep(1.0, 0.88, vBand.x / uHz.y);
+          diffuseColor.a *= ends * smoothstep(0.99, 0.8, vBand.y); // the canvas clips the tallest crowns flat at its top row (and wraps)
+          diffuseColor.rgb = mix(diffuseColor.rgb, uHaze, uHz.z + (1.0 - uHz.z) * uHz.x * smoothstep(0.25, 1.0, vBand.y));`);
+    };
+    mat.customProgramCacheKey = () => 'fbBand';
+    const m = new THREE.Mesh(g, mat);
+    m.renderOrder = order;
     return m;
   };
-  group.add(band(260, 50, 0x93a088, 5), band(160, 34, 0x5d7050, 4), band(95, 21, 0x2c3d22, 3));
+  // own haze instead of scene fog (fog 0x5f6b4a is far darker than the horizon sky, which made the far bands dark cut-outs)
+  group.add(band(260, 50, 0x93a088, 5, 0.42, 0.6, -9), band(160, 34, 0x5d7050, 4, 0.2, 0.35, -8), band(95, 21, 0x2c3d22, 3, 0.0, 0.18, -7));
 
   // --- ruins beyond the wall: broken towers, a wall run with an arch, columns (stone blocks, mossy) ---
   const st = stoneBlockTextures(seed + 5, 128);

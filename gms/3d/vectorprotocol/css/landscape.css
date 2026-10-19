@@ -7,7 +7,8 @@ html[data-orient=landscape] #app { left: 0; top: 0; transform: none; width: 100v
 html[data-orient=landscape] { --badge-w: 120px; }
 
 /* ---------- UI-L1 battle HUD (§2.1): top cluster, 2x3 card grid on the left, rail on the right */
-html[data-orient=landscape] .hud { --card-h: clamp(84px, (100cqh - var(--sat) - var(--sab) - 64px - 10px) / 3, 137px); --card-w: calc(var(--card-h) * .7); }
+/* card height = what is left under the top cluster (top 52 + bottom 6 + 2 gaps of 4) / 3 -> 115x80 at 915x412, 98x68 at 915x360 (§9.3) */
+html[data-orient=landscape] .hud { --card-h: clamp(84px, (100cqh - var(--sat) - var(--sab) - 66px) / 3, 137px); --card-w: calc(var(--card-h) * .7); }
 html[data-orient=landscape] .hud-top { left: calc(var(--sal) + 6px); right: calc(var(--sar) + 6px); top: calc(var(--sat) + 6px); height: 40px;
   grid-template-columns: 40px minmax(0, 1fr) minmax(0, 320px) 58px minmax(0, 320px) minmax(0, 1fr) 40px; }
 html[data-orient=landscape] .hud-top > .hud-menu { grid-column: 1; }
@@ -119,8 +120,19 @@ html[data-orient=landscape].l-short .scr-formation .fm-syn > .vp-kicker, html[da
   flex: none; width: 62px; font-size: 8.5px; letter-spacing: .14em; line-height: 1.15; white-space: normal; }
 html[data-orient=landscape].l-short .scr-formation .syn-row, html[data-orient=landscape].l-short .scr-formation .buff-row { flex: 1; min-width: 0; }
 html[data-orient=landscape].l-short .scr-formation .syn-chip { flex-direction: row; align-items: baseline; gap: 6px; padding: 5px 9px; }
-html[data-orient=landscape].l-short .scr-formation .buff { min-height: 34px; padding: 4px 10px 4px 6px; }
-html[data-orient=landscape].l-short .scr-formation .fm-goals .vp-btn { min-height: 32px; }
+html[data-orient=landscape].l-short .scr-formation .buff { padding: 4px 10px 4px 6px; }
+/* QA QL12: short landscape has no height for 44 px chips, so FIT GOALS / buff chips / wave tabs keep their drawn size but get a
+   44 px hit box (visuals inset, negative margins keep the layout identical) */
+html[data-orient=landscape].l-short .scr-formation .fm-goals .vp-btn { min-height: 44px; margin-block: -6px; }
+html[data-orient=landscape].l-short .scr-formation .fm-goals .vp-btn::before { inset: 6px 0; }
+html[data-orient=landscape].l-short .scr-formation .fm-goals .vp-btn::after { inset: 7.5px 1.5px; }
+html[data-orient=landscape].l-short .scr-formation .buff-row { padding-block: 5px; margin-block: -5px; }
+html[data-orient=landscape].l-short .scr-formation .buff { min-height: 44px; margin-block: -5px; position: relative; isolation: isolate; clip-path: none; background: none; box-shadow: none; }
+html[data-orient=landscape].l-short .scr-formation .buff::before { content: ""; position: absolute; inset: 5px 0; z-index: -1; background: #04132bcc;
+  box-shadow: inset 0 0 0 1px #1c4c80; clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+html[data-orient=landscape].l-short .scr-formation .buff.on::before { background: #3a2a0699; box-shadow: inset 0 0 0 1.5px var(--gold); }
+html[data-orient=landscape] .scr-formation .fm-wtab { min-width: 44px; }
+html[data-orient=landscape].l-short .scr-formation :is(.fm-goals, .fm-buffs) { position: relative; z-index: 2; }
 html[data-orient=landscape].l-short .scr-formation .fm-goal { padding: 2px 8px 2px 5px; }
 html[data-orient=landscape].l-short .scr-formation .fm-bench-wrap { gap: 2px; }
 html[data-orient=landscape].l-short .scr-formation .fm-bench-wrap > .vp-kicker { font-size: 9px; }
@@ -136,9 +148,10 @@ html[data-orient=landscape] .scr-map .lvl-sheet { left: auto; right: 0; top: var
   overflow-y: auto; touch-action: pan-y; }
 html[data-orient=landscape] .scr-map .lvl-sheet.hide { display: none !important; }
 @keyframes sheetIn { from { transform: translateX(40px); opacity: 0; } }
-html[data-orient=landscape] .scr-map .lvl-card > #lvl-deploy { position: sticky; bottom: 4px; z-index: 2; flex: none; margin-top: 2px; }
+html[data-orient=landscape] .scr-map .lvl-sheet { padding-bottom: 0; }
+html[data-orient=landscape] .scr-map .lvl-foot { padding-bottom: calc(var(--sab) + 8px); }
 html[data-orient=landscape].l-short .scr-map .lvl-card { gap: 6px; padding-top: 10px; }
-html[data-orient=landscape].l-short .scr-map .lvl-card > #lvl-deploy { min-height: 48px; font-size: 17px; }
+html[data-orient=landscape].l-short .scr-map .lvl-foot > #lvl-deploy { min-height: 48px; font-size: 17px; }
 html[data-orient=landscape] .chest-bar.in-slot { position: relative; left: auto; right: auto; top: auto; flex: 1 1 auto; min-width: 0; max-width: 460px; padding: 4px 12px 4px 8px; gap: 8px; }
 html[data-orient=landscape] .chest-bar.in-slot .chest-lbl small { display: none; }
 html[data-orient=landscape] .chest-bar:not(.in-slot) { right: auto; width: min(460px, 50%); }
@@ -162,6 +175,8 @@ html[data-orient=landscape] .screen.l2 > .l2-b { grid-column: 2; overflow: hidde
 html[data-orient=landscape] .l2 .col-squad { grid-template-columns: repeat(2, 64px); grid-template-rows: repeat(3, auto); justify-content: center; gap: 5px 6px; }
 html[data-orient=landscape]:not(.l-short) .l2 .col-squad { grid-template-columns: repeat(2, 84px); }
 html[data-orient=landscape] .l2 .col-squad .vp-card .nm { font-size: 9.5px; }
+html[data-orient=landscape] .l2 .col-squad .vp-card .nm.xlong { font-size: min(9.5px, 15cqi); overflow-wrap: normal; letter-spacing: 0; left: 2px; right: 2px; }
+html[data-orient=landscape] .l2 .col-squad .vp-card:has(> .nm.xlong) > .lv { bottom: 26px; }
 html[data-orient=landscape].l-short .l2 .col-squad { grid-template-columns: repeat(2, 54px); }
 html[data-orient=landscape] .l2 .col-squad-wrap > .row { flex-direction: column; align-items: flex-start; gap: 0; }
 html[data-orient=landscape] .l2 .col-scroll { flex: 1; }
@@ -255,3 +270,33 @@ html[data-orient=landscape] .ch-host { margin: 0 calc(-4px - max(var(--sar), 12p
 html[data-orient=landscape] .hud-top { right: calc(var(--sar) + 6px + var(--badge-w)); }
 html[data-orient=landscape] .bi-bar { bottom: calc(var(--sab) + 10px); right: calc(var(--sar) + 8px); }
 html[data-orient=landscape] .hud-cheats { top: calc(var(--sat) + 50px); }
+/* very short landscape (844x340): under the top cluster there is only room for 3 x 91 px, so the card grid takes the
+   full height of the left edge and the top cluster starts right of it (QA QL2: 68x97 floor) */
+@media (max-height: 356px) {
+  html[data-orient=landscape] .hud { --card-h: clamp(84px, (100cqh - var(--sat) - var(--sab) - 20px) / 3, 137px); }
+  html[data-orient=landscape] .hud-strip { top: calc(var(--sat) + 6px); }
+  html[data-orient=landscape] .hud-top { left: calc(var(--sal) + 18px + 2 * var(--card-w));
+    grid-template-columns: 40px minmax(0, 1fr) minmax(0, 300px) 58px minmax(0, 300px) minmax(0, 1fr) 40px; }
+  html[data-orient=landscape] .hud::before { left: calc(var(--sal) + 12px + 2 * var(--card-w)); }
+}
+/* big desktop (QA QL9, 1920x1080): larger field, the right column scaled up and centred on the field instead of top-anchored */
+@media (min-width: 1600px) and (min-height: 900px) {
+  html[data-orient=landscape][data-form=desktop] .scr-formation {
+    padding-left: max(calc(max(var(--sal), 12px) + 4px), (100cqw - 1560px) / 2); padding-right: max(calc(max(var(--sar), 12px) + 4px), (100cqw - 1560px) / 2);
+    grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto auto minmax(0, 1fr); column-gap: 40px;
+    --hex-h: clamp(60px, (100cqh - var(--sat) - var(--sab) - 104px) / 3, 175px); }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-field { grid-row: 2 / -1; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation :is(.fm-goals, .fm-syn, .fm-buffs, .fm-bench-wrap, .fm-pow), 
+  html[data-orient=landscape][data-form=desktop] .scr-formation > .fm-go { zoom: 1.3; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-goals { grid-row: 3; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-syn { grid-row: 4; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-buffs { grid-row: 5; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-bench-wrap { grid-row: 6; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-pow { grid-row: 7; margin-top: 10px; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation > .fm-go { grid-row: 8; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-lbl { font-size: 14px; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-u { font-size: 15px; gap: 5px; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-u .vp-role { width: 22px; height: 22px; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-bonus { font-size: 11px; }
+  html[data-orient=landscape][data-form=desktop] .scr-formation .fm-hint small { font-size: 11px; }
+}

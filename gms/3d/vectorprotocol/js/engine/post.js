@@ -76,7 +76,7 @@ const GradeShader = {
   name: 'VPGrade',
   uniforms: {
     tDiffuse: { value: null }, tBloom: { value: null }, uBloomOn: { value: 0 }, toneMappingExposure: { value: 1 },
-    uVignette: { value: 0.42 }, uSat: { value: 1.12 }, uContrast: { value: 1.1 },
+    uVignette: { value: 0.42 }, uVigAspect: { value: 99 }, uSat: { value: 1.12 }, uContrast: { value: 1.1 },
     uLift: { value: new THREE.Vector3(0.0, 0.004, 0.012) }, uGain: { value: new THREE.Vector3(0.98, 1.0, 1.04) },
     uAspect: { value: 0.45 }, uTime: { value: 0 }, uPulse: { value: 0 }, uPulseC: { value: new THREE.Vector2(0.5, 0.5) },
     uFlash: { value: new THREE.Vector4(1, 1, 1, 0) },
@@ -90,7 +90,7 @@ const GradeShader = {
     void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }`,
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse, tBloom;
-    uniform float uBloomOn, uVignette, uSat, uContrast, uAspect, uTime, uPulse;
+    uniform float uBloomOn, uVignette, uVigAspect, uSat, uContrast, uAspect, uTime, uPulse;
     uniform vec2 uPulseC;
     uniform vec3 uLift, uGain;
     uniform vec4 uFlash;
@@ -141,7 +141,7 @@ const GradeShader = {
       }
       c.rgb = mix( c.rgb, c.rgb * uTint.rgb, uTint.a );
       c.rgb = c.rgb * uGain + uLift * ( 1.0 - c.rgb ) * bm;
-      vec2 v = ( vUv - 0.5 ) * vec2( uAspect, 1.0 ) * 0.9;
+      vec2 v = ( vUv - 0.5 ) * vec2( min( uAspect, uVigAspect ), 1.0 ) * 0.9; // vignetteAspect caps how far a wide frame's sides darken
       c.rgb *= 1.0 - uVignette * smoothstep( 0.12, 0.7, dot( v, v ) * 1.6 );
       c.a = 1.0;
       c = sRGBTransferOETF( clamp( c, 0.0, 1.0 ) );
@@ -174,7 +174,7 @@ export function createPost(renderer, tier) {
   composer.addPass(grade);
   const post = {
     composer, bloom, grade, renderPass,
-    // per-scene look: post.set({ strength, radius, threshold, factors?, vignette, sat, contrast, exposure })
+    // per-scene look: post.set({ strength, radius, threshold, factors?, vignette, vignetteAspect?, sat, contrast, exposure })
     defaults: { strength: 0.55, radius: 0.5, threshold: 0.92, vignette: 0.42, sat: 1.12, contrast: 1.1 },
     set(o = {}) {
       const d = { ...post.defaults, ...o };
@@ -184,7 +184,7 @@ export function createPost(renderer, tier) {
         const f = d.factors || [1, 0.8, 0.6, 0.4, 0.2], bf = bloom.compositeMaterial.uniforms.bloomFactors.value;
         for (let i = 0; i < bf.length; i++) bf[i] = f[i] ?? 0;
       }
-      grade.uniforms.uVignette.value = d.vignette; grade.uniforms.uSat.value = d.sat; grade.uniforms.uContrast.value = d.contrast;
+      grade.uniforms.uVignette.value = d.vignette; grade.uniforms.uVigAspect.value = d.vignetteAspect ?? 99; grade.uniforms.uSat.value = d.sat; grade.uniforms.uContrast.value = d.contrast;
       if (o.exposure) renderer.toneMappingExposure = o.exposure;
     },
     tint(r, g, b, a) { grade.uniforms.uTint.value.set(r, g, b, a); },

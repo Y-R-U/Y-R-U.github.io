@@ -165,11 +165,15 @@ export function buildFantasyForest(engine, { hw, fz0, fz1, bz0, seed = 7, stone,
     im.count = list.length;
     return im;
   };
-  group.add(crowns(near, canopyGeometry(rng(seed + 3), { lobes: lowT ? 4 : 5, detail: lowT ? 1 : 2 })));
-  group.add(crowns(far, canopyGeometry(rng(seed + 5), { lobes: 4, detail: 1 })));
+  // battle-9: far crowns ordered inner -> outer rows, so trim() (frame guard) drops the haziest outer ones first by lowering the count
+  far.sort((a, b) => a[5] - b[5]);
+  const nearGeo = canopyGeometry(rng(seed + 3), { lobes: lowT ? 4 : 5, detail: lowT ? 1 : 2 }), farGeo = canopyGeometry(rng(seed + 5), { lobes: 4, detail: 1 });
+  const nearIM = crowns(near, nearGeo), farIM = crowns(far, farGeo);
+  group.add(nearIM, farIM);
 
   // leaf-cluster cards on the crown surfaces (foliage atlas tile 0) break up the lobe silhouettes, as on the backdrop giants
   const cardList = [];
+  let nearCards = 0;
   const dv = new THREE.Vector3();
   for (const [list, n] of [[near, lowT ? 4 : 9], [far, lowT ? 1 : 3]]) for (const [x, y, z, s] of list) {
     if (y < s * 0.4) continue; // bushes
@@ -177,6 +181,7 @@ export function buildFantasyForest(engine, { hw, fz0, fz1, bz0, seed = 7, stone,
       dv.set(r() - 0.5, r() * 0.9 - 0.15, r() - 0.5).normalize();
       cardList.push([x + dv.x * s * 0.85, y + dv.y * s * 0.62, z + dv.z * s * 0.85, s * (0.45 + r() * 0.3)]);
     }
+    if (list === near) nearCards = cardList.length;
   }
   const cGeo = new THREE.PlaneGeometry(1, 1);
   { const uv = cGeo.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) / 3); }
@@ -283,6 +288,16 @@ export function buildFantasyForest(engine, { hw, fz0, fz1, bz0, seed = 7, stone,
   return {
     group,
     update(dt, t) { mistMat.uniforms.uTime.value = t; },
+    // battle-9 (S22 lever): 0 = full, 1 = far-crown leaf cards off + outer 40% of far crowns, 2 = no leaf cards, far crowns 35%,
+    // near crowns on the far (detail-1) canopy mesh
+    dispose() { nearGeo.dispose(); farGeo.dispose(); }, // the group traversal misses whichever crown mesh trim() swapped out
+    trim(level) {
+      const L = Math.max(0, Math.min(2, level | 0));
+      nearIM.geometry = L === 2 ? farGeo : nearGeo;
+      cIM.count = L === 0 ? cardList.length : L === 1 ? nearCards : 0;
+      farIM.count = Math.round(far.length * [1, 0.6, 0.35][L]);
+      return L;
+    },
     counts: { cards: cardList.length, trees: trunks.length, crownsNear: near.length, crownsFar: far.length, under: ui, rocks: nRock },
   };
 }

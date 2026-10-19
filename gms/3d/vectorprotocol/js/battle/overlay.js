@@ -31,7 +31,7 @@ const CSS = `
 .vpb-bar .note{flex-basis:100%;font-size:7.5px;font-weight:700;letter-spacing:.1em;color:#d8b8ff;text-shadow:0 0 4px #000,0 1px 0 #000;
   opacity:0;transition:opacity .25s;white-space:nowrap}
 .vpb-bar .note.on{opacity:1}
-.vpb-od{position:absolute;top:70px;max-width:94%;padding:5px 12px 6px;background:linear-gradient(90deg,rgba(4,10,26,.92),rgba(4,10,26,.72));
+.vpb-od{position:absolute;z-index:5;top:70px;max-width:94%;padding:5px 12px 6px;background:linear-gradient(90deg,rgba(4,10,26,.92),rgba(4,10,26,.72));
   border:1px solid currentColor;box-shadow:0 0 12px currentColor,inset 0 0 10px rgba(0,0,0,.6);opacity:0;pointer-events:none}
 .vpb-od{left:var(--cx,50%);text-align:center;--x0:-160%;transform:translateX(var(--x0))}
 .vpb-od.player{border-left-width:4px}
@@ -39,13 +39,14 @@ const CSS = `
 .vpb-od .s{font-size:9px;letter-spacing:.18em;color:#9fc8ff;white-space:nowrap}
 .vpb-od .t{font-size:16px;font-weight:900;letter-spacing:.08em;color:#fff;white-space:nowrap}
 .vpb-od.side{padding:4px 9px 5px}.vpb-od.side .t{font-size:13px}.vpb-od.side .s{font-size:8px}
+.vpb-od.tight{padding:3px 6px 4px;max-width:none}.vpb-od.tight .t{font-size:11px;letter-spacing:.04em}.vpb-od.tight .s{font-size:7px;letter-spacing:.1em}
 .vpb-od.go{animation:vpbOd 2.1s cubic-bezier(.2,.9,.3,1) forwards}
 @keyframes vpbOd{0%{opacity:0}10%{opacity:1;transform:translateX(-50%)}82%{opacity:1;transform:translateX(-50%)}100%{opacity:0;transform:translateX(-50%)}}
-.vpb-ot{position:absolute;left:var(--cx,50%);transform:translateX(-50%) scale(.8);padding:2px 12px 3px;font-size:11px;font-weight:900;letter-spacing:.32em;color:#ffd0d0;background:linear-gradient(90deg,rgba(60,0,8,0),rgba(90,6,16,.85) 20%,rgba(90,6,16,.85) 80%,rgba(60,0,8,0));border-top:1px solid #ff3a4a;border-bottom:1px solid #ff3a4a;text-shadow:0 0 8px #ff2030;opacity:0;transition:opacity .4s,transform .4s;pointer-events:none;white-space:nowrap}
+.vpb-ot{position:absolute;z-index:4;left:var(--cx,50%);transform:translateX(-50%) scale(.8);padding:2px 12px 3px;font-size:11px;font-weight:900;letter-spacing:.32em;color:#ffd0d0;background:linear-gradient(90deg,rgba(60,0,8,0),rgba(90,6,16,.85) 20%,rgba(90,6,16,.85) 80%,rgba(60,0,8,0));border-top:1px solid #ff3a4a;border-bottom:1px solid #ff3a4a;text-shadow:0 0 8px #ff2030;opacity:0;transition:opacity .4s,transform .4s;pointer-events:none;white-space:nowrap}
 .vpb-ot.on{opacity:1;transform:translateX(-50%) scale(1);animation:vpbOt 1.1s ease-in-out infinite}
 .vpb-ot small{font-size:9px;letter-spacing:.12em;margin-left:8px;color:#ff9aa4}
 @keyframes vpbOt{50%{box-shadow:0 0 18px rgba(255,40,60,.55)}}
-.vpb-banner{position:absolute;left:0;right:0;top:40%;display:flex;flex-direction:column;align-items:center;text-align:center;opacity:0;transform:scale(.9);color:#e8f6ff;
+.vpb-banner{position:absolute;z-index:6;left:0;right:0;top:40%;display:flex;flex-direction:column;align-items:center;text-align:center;opacity:0;transform:scale(.9);color:#e8f6ff;
   font-weight:900;letter-spacing:.14em;text-shadow:0 0 14px #29a8ff,0 0 3px #fff}
 .vpb-banner .t{font-size:clamp(28px,9vw,44px)}
 .vpb-banner .s{font-size:clamp(11px,3.4vw,15px);letter-spacing:.3em;color:#9fd6ff;margin-top:4px}
@@ -81,13 +82,44 @@ export function createOverlay(container, camera, { maxNums = 48, bars = true } =
   const banner = document.createElement('div'); banner.className = 'vpb-banner'; root.appendChild(banner);
   const odEl = document.createElement('div'); odEl.className = 'vpb-od'; root.appendChild(odEl);
   const otEl = document.createElement('div'); otEl.className = 'vpb-ot'; otEl.style.top = '70px'; root.appendChild(otEl);
-  let lifeK = 1, topPx = 64, plateY = null;
+  let lifeK = 1, topPx = 64, plateY = null, bottomPx = 0;
   const frame = { left: 0, right: 0 };
   const MAX_PER_TARGET = 1; // battle-3: one number per target (ref_02 clutter); a new hit merges or replaces it
 
   function project(x, y, z) {
     v.set(x, y, z).project(camera);
     return [(v.x * 0.5 + 0.5) * W, (-v.y * 0.5 + 0.5) * H, v.z];
+  }
+  // the bars' current rects (their transform is written each frame in update()): 56 x ~14 px from (sx - 25, sy - 8)
+  function barRects() {
+    const out = [];
+    for (const B of unitBars.values()) {
+      if (!B.anchor || B.el.classList.contains('off') || B.el.classList.contains('dead')) continue;
+      const m = /translate3d\((-?\d+)px,\s*(-?\d+)px/.exec(B.el.style.transform || '');
+      if (m) out.push([+m[1], +m[2], +m[1] + 56, +m[2] + 14]);
+    }
+    return out;
+  }
+  function placeSide(side) {
+    const obs = [...barRects(), ...(O.obstacles?.() || [])];
+    const bandL = frame.left, bandR = W - frame.right, pad = 8, top0 = topPx + 6, bot = H - Math.max(bottomPx, 4) - 6;
+    const cover = (x0, y0, x1, y1) => { let a = 0; for (const r of obs) { const ox = Math.min(x1, r[2]) - Math.max(x0, r[0]), oy = Math.min(y1, r[3]) - Math.max(y0, r[1]); if (ox > 0 && oy > 0) a += ox * oy; } return a; };
+    let best = null;
+    for (const tight of [false, true]) {
+      odEl.classList.toggle('tight', tight);
+      const w = odEl.offsetWidth, h = odEl.offsetHeight;
+      const x0 = side === 'enemy' ? bandR - pad - w : bandL + pad;
+      // down the caster's edge: under the top HUD, then lower over the walls; the band's middle third is the units'
+      for (const k of [0, 0.22, 0.42, 0.62]) {
+        const y0 = Math.round(top0 + (bot - h - top0) * k);
+        if (y0 + h > bot) continue;
+        const c = cover(x0, y0, x0 + w, y0 + h) / (w * h) + k * 0.04 + (tight ? 0.05 : 0);
+        if (!best || c < best.c) best = { c, x: x0 + w / 2, y: y0, tight };
+      }
+      if (best && best.c < 0.02) break;
+    }
+    odEl.classList.toggle('tight', best.tight);
+    odEl.style.left = Math.round(best.x) + 'px'; odEl.style.top = best.y + 'px';
   }
   const O = {
     root,
@@ -168,15 +200,18 @@ export function createOverlay(container, camera, { maxNums = 48, bars = true } =
       odEl.innerHTML = `<div class="s">${sub}</div><div class="t">${title}</div>`;
       // battle-8: landscape (side bands set) - under the top HUD the far-lane heads fill the board's centre, so the callout hugs the
       // caster's edge of the board band (over the walls / forest) instead of covering them; portrait keeps it centred
-      odEl.classList.toggle('side', !!(frame.left || frame.right));
-      if (frame.left || frame.right) {
-        const w = odEl.offsetWidth, pad = 8;
-        odEl.style.left = Math.round(side === 'enemy' ? W - frame.right - pad - w / 2 : frame.left + pad + w / 2) + 'px';
-        odEl.style.top = (topPx + 6) + 'px';
-      } else { odEl.style.left = ''; if (plateY != null) O.setPlateY(plateY); }
+      // battle-9 (QL6): it still sat on far-lane HP bars / back-column heads (740x360). Now it tries a few spots down the caster's edge
+      // of the band (then a compact size) and takes the one that covers the least of the units + HP bars (O.obstacles, from battle)
+      const sideMode = !!(frame.left || frame.right);
+      odEl.classList.toggle('side', sideMode); odEl.classList.remove('tight');
+      if (sideMode) placeSide(side);
+      else { odEl.style.left = ''; if (plateY != null) O.setPlateY(plateY); }
       void odEl.offsetWidth;
       odEl.classList.add('go');
     },
+    // battle-9: () => [[x0, y0, x1, y1], ...] screen rects (CSS px, overlay space) the OD callout should avoid; set by battle
+    obstacles: null,
+    setBottom(px) { bottomPx = +px || 0; },
     banner(title, sub = '', { cls = '', color = '#29a8ff', hold = false } = {}) {
       banner.className = 'vpb-banner ' + cls;
       banner.style.color = color;

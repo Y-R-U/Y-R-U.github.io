@@ -186,3 +186,20 @@ rects, tap-edge elementFromPoint check, overlaps, chrome hits). before_*/after_*
 - Pitch 0.50 on landscape phones (hub-L) still awaits Aaron's taste call.
 - QA Q3 second half ("CONTINUE" vs "START" on a fresh save) is scr_hub (ui).
 - ui: `.chest-mk` on the map head is 40x44 in landscape (ui-owned).
+
+---
+# hub-5 (round hub-5: QL3 map head insets, QL7 triage, QL13 spec)
+Scripts/shots: scratchpad/hub5 (drv.mjs = hub-4 driver; before_/after_<size>.png, before_in_/after_in_ = `&insets=0,47,21,47`,
+ch_/ch_in_ = chapter select). Backup of the old CSS: scratchpad/hub5/map_css.orig.js.
+## Checkpoint 1 (hub-5 hand-back)
+- QL3 DONE map_css.js: every `env(safe-area-inset-*)` -> `var(--sa*, env(safe-area-inset-*, 0px))`, so the story map + chapter
+  select follow the app's `--sat/--sar/--sab/--sal` tokens (and `?insets=` emulation) like every other route. With insets 0,47,21,47:
+  back 16 -> 63 px, stars/CLEARED right edge 899 -> 852 (915x412) / 828 -> 781 (844x340), rail inset both sides, CTA lifted 21 px and
+  narrowed inside the safe area, chapter cards start at 61. Without insets: every probed rect identical before/after at 915x412,
+  844x340, 412x915 (portrait unchanged). No h-scroll, zero console errors. Track end margins (90 / 120 px) already clear a 47 px notch.
+- QL7 (Deploy floats mid-sheet with a bottom inset) is NOT hub: the level sheet `.lvl-sheet` / `#lvl-deploy` is built in
+  js/ui/scr_map.js `showLevel()` and styled in css/landscape.css (~l.135). Stays with ui.
+- QL13 DONE: docs/LANDSCAPE.md §9.2.4 step 4 now drags 1300 -> 900 -> 1300 (1000x900 = 1.11 sits in the 1.05-1.15 band).
+- No other hub/map items open in QA-L.
+## Open
+- Pitch 0.50 on landscape phones (hub-L) still awaits Aaron's taste call.

@@ -66,8 +66,9 @@ export function createTheme(engine, { seed = 7 } = {}) {
   // ~190 ms on an M5 at high: cached per module (dispose() frees the GPU copy; three re-uploads it on the next battle)
   const ftKey = [lowT ? 22 : tier.name === 'med' ? 30 : 36, seed, BOARD.W, BOARD.zNear, BOARD.zFar].join();
   const ft = FT_CACHE.get(ftKey) || FT_CACHE.set(ftKey, flagstoneTextures({ rect, board: BOARD, px: +ftKey.split(',')[0], seed })).get(ftKey);
+  // battle-9: the slab texture is lifted and pulled off the forest's yellow-green toward the ref's warm neutral grey (colour > 1 on purpose)
   const groundMat = new THREE.MeshStandardMaterial({ map: ft.map, normalMap: ft.normal, normalScale: new THREE.Vector2(1.1, 1.1),
-    roughness: 0.88, metalness: 0.0, envMapIntensity: 0.55 });
+    color: new THREE.Color(1.1, 1.06, 1.3), roughness: 0.88, metalness: 0.0, envMapIntensity: 0.55 });
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(rect.x1 - rect.x0, rect.zNear - rect.zFar), groundMat);
   ground.rotation.x = -Math.PI / 2; ground.position.set((rect.x0 + rect.x1) / 2, 0, (rect.zNear + rect.zFar) / 2);
   ground.receiveShadow = true;
@@ -348,9 +349,11 @@ export function createTheme(engine, { seed = 7 } = {}) {
   group.add(backdrop.group);
   updaters.push(backdrop.update);
 
-  // --- lighting: warm low sun from the front-left (units read), green-gold back light from the forest, cool fill ---
-  const hemi = new THREE.HemisphereLight(0xd4dccb, 0x2a2e1e, 0.8);
-  const key = new THREE.DirectionalLight(0xffe2b4, 2.6);
+  // --- lighting: warm low sun from the front-left (units read), warm back light from the forest (unit rims), cool fill ---
+  // battle-9: brighter warm key, neutral-warm hemi, stronger rim, more fill: the board was murky olive (floor 61,67,43 -> ~95,88,72;
+  // ref_fantasy_01's floor is ~84,75,64). The surroundings stay moody through the texture's darker wild margins + the vignette.
+  const hemi = new THREE.HemisphereLight(0xdcd6c4, 0x30281c, 0.9);
+  const key = new THREE.DirectionalLight(0xffd49a, 3.6);
   key.position.set(-9, 19, 9); key.target.position.set(0, 0, BOARD.zMid);
   if (tier.shadowMap) {
     key.castShadow = true;
@@ -359,8 +362,8 @@ export function createTheme(engine, { seed = 7 } = {}) {
     key.shadow.bias = -0.0006; key.shadow.normalBias = 0.03;
     key.shadow.camera.layers.enable(2); // unit shadow proxies live on the mirror-only layer
   }
-  const rim = new THREE.DirectionalLight(0xd2e2a6, 1.6); rim.position.set(4, 9, -30);
-  const fill = new THREE.DirectionalLight(0xb0c8ff, 0.55); fill.position.set(10, 4, 22);
+  const rim = new THREE.DirectionalLight(0xe6dcb0, 2.4); rim.position.set(4, 9, -30);
+  const fill = new THREE.DirectionalLight(0xc8d4ff, 1.0); fill.position.set(10, 4, 22);
   group.add(hemi, key, key.target, rim, fill);
   for (const l of [hemi, key, rim, fill]) l.layers.enableAll();
 
@@ -379,16 +382,41 @@ export function createTheme(engine, { seed = 7 } = {}) {
   const forestOn = { wide: false, intro: false };
   group.add(forest.group);
   updaters.push((dt, t) => { if (forest.group.visible) forest.update(dt, t); });
+  // battle-9 S22 guard: the forest is the wide board's big triangle cost (+175k tris at high). If frames stay slow while it shows
+  // (2 windows of 1.5 s under 45 fps, 90th-percentile like the engine governor), trim it a level (far leaf cards, then far crowns).
+  // One-way for this battle; the dpr governor still runs on its own. `?forestTrim=N` forces a level (tests).
+  const guard = { acc: 0, dts: [], slow: 0, level: 0 };
+  const forced = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('forestTrim') : null;
+  if (forced != null) guard.level = forest.trim(+forced);
+  updaters.push((dt) => {
+    if (!forest.group.visible || forced != null || guard.level >= 2 || !(dt > 0)) return;
+    guard.acc += dt; guard.dts.push(dt);
+    if (guard.acc < 1.5) return;
+    guard.dts.sort((x, y) => x - y);
+    const keep = Math.max(1, Math.floor(guard.dts.length * 0.9));
+    let sum = 0; for (let i = 0; i < keep; i++) sum += guard.dts[i];
+    const fps = keep / sum; guard.acc = 0; guard.dts.length = 0;
+    guard.slow = fps < 45 ? guard.slow + 1 : 0;
+    if (guard.slow >= 2) { guard.slow = 0; guard.level = forest.trim(guard.level + 1); console.info('[battle] forest trimmed to level', guard.level, 'at', fps.toFixed(1), 'fps'); }
+  });
 
   disposables.push(environment);
+  // battle-9: the wide board wants a lighter vignette (its sides are HUD bands + forest); portrait keeps more edge darkness and contrast,
+  // since the lifted floor would otherwise read flat in the tall frame
+  const look = { strength: 0.5, radius: 0.35, threshold: 1.25, factors: [1, 0.7, 0.45, 0.25, 0.1], vignette: 0.66, vignetteAspect: 1.25, sat: 0.98, contrast: 1.14 };
+  const setLook = (wide) => {
+    look.vignette = wide ? 0.5 : 0.66; look.contrast = wide ? 1.1 : 1.14;
+    const u = engine.post?.grade?.uniforms;
+    if (u && engine.scene?.look === look) { u.uVignette.value = look.vignette; u.uContrast.value = look.contrast; }
+  };
   return {
     // the forest shows on the wide board, and in portrait only while the D26 intro looks out over the walls (battle.js setIntro)
-    setWide(on) { forestOn.wide = !!on; forest.group.visible = forestOn.wide || forestOn.intro; },
+    setWide(on) { forestOn.wide = !!on; forest.group.visible = forestOn.wide || forestOn.intro; setLook(forestOn.wide); },
     setIntro(on) { forestOn.intro = !!on; forest.group.visible = forestOn.wide || forestOn.intro; },
-    forest,
-    id, group, reflection, lights: { hemi, key, rim, fill }, environment, envIntensity: 0.75,
+    forest, get forestTrim() { return guard.level; },
+    id, group, reflection, lights: { hemi, key, rim, fill }, environment, envIntensity: 1.05,
     fog: new THREE.Fog(0x5f6b4a, 48, 240),
-    look: { strength: 0.5, radius: 0.35, threshold: 1.25, factors: [1, 0.7, 0.45, 0.25, 0.1], vignette: 0.75, sat: 0.98, contrast: 1.16 },
+    look,
     board: { plate, lineColor: new THREE.Color(0.55, 0.38, 0.12), ringShape: 'oct', ringK: { floor: 0, top: 0.45 }, pipFace: { y: plateH * 0.5, z: 1.065, s: 0.62 } },
     nearRim: { dz: 1.35, y: 0.66 },
     backdrop: { height: 3.0, back: 10, topAngle: 21, seam: new THREE.Vector3(0, 3.3, fz1) },
@@ -404,6 +432,7 @@ export function createTheme(engine, { seed = 7 } = {}) {
       group.traverse((o) => { o.geometry?.dispose(); const m = o.material; if (m) (Array.isArray(m) ? m : [m]).forEach((x) => { for (const k in x) if (x[k]?.isTexture) x[k].dispose(); x.dispose(); }); });
       plateMat.map?.dispose(); plateMat.normalMap?.dispose(); plateMat.dispose();
       for (const d of disposables) d.dispose?.();
+      forest.dispose?.();
       reflection.rt.dispose();
     },
   };

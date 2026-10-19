@@ -140,7 +140,8 @@ function showLevel(sheet, ctx, map, levelId) {
       r.xp ? h('span.vp-chip', icon('xp'), fmt(r.xp) + ' XP') : null,
       ...Object.entries(r.shards || {}).map(([k, n]) => h('span.vp-chip', icon('hex'), (unitDef(k)?.name || k) + ' ×' + n)),
       lvl.firstClear?.unlockSlot && !store.levelStars(levelId) ? h('span.vp-chip.t-gold', icon('plus'), 'Squad slot ' + lvl.firstClear.unlockSlot) : null),
-    btn('Deploy squad', deploy, { cls: 'primary big', icon: 'play', id: 'lvl-deploy' })));
+    // sticky footer: an opaque strip down to the screen edge, so nothing scrolls visibly under Deploy (QA QL7)
+    h('div.lvl-foot', btn('Deploy squad', deploy, { cls: 'primary big', icon: 'play', id: 'lvl-deploy' }))));
   sheet.classList.remove('hide');
   async function deploy() {
     // the briefing plays once per session, before the squad screen (design's suggestion)

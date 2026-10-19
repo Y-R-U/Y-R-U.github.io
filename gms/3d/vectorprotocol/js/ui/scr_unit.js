@@ -94,7 +94,7 @@ export async function mount(root, ctx, route) {
         btn('Rank up', () => act(store.rankUp(uid), 'Rank up!'), { cls: 'gold', disabled: !rc || v.shards < rc.shards || v.level < v.cap, icon: 'star', sfx: !rc || v.shards < rc.shards || v.level < v.cap ? undefined : 'none' }),
         rc ? (v.level < v.cap ? h('div.up-cost', h('small.t-muted', 'Reach Lv ' + v.cap + ' first'))
           : v.shards >= rc.shards && (store.state.cur.credits || 0) < rc.credits ? h('div.up-cost', h('small.t-gold', 'Save ' + fmt(rc.credits - (store.state.cur.credits || 0)) + ' more credits'))
-          : h('div.up-cost', h('span', icon('hex'), rc.shards), h('span', icon('credits'), fmt(rc.credits)))) : h('div')),
+          : h('div.up-cost', h('span', icon('hex'), rc.shards), h('span', icon('credits'), fmt(rc.credits)))) : h('div.up-cost', h('small.t-muted', 'Max rank'))),
       h('div.vp-kicker', 'Abilities'),
       h('div.up-abs', ['attack', 'passive', 'overdrive'].map((k) => {
         const ab = ability(v[k]);

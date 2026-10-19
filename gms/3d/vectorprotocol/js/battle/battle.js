@@ -104,7 +104,23 @@ export function createBattleScene(engine, opts = {}) {
   let dimFx = null;
   const container = opts.overlay || engine.canvas.parentElement || document.body;
   const overlay = createOverlay(container, camera, { bars });
-  overlay.setSpeed(speedInit); overlay.setTop(opts.margins?.top ?? 64);
+  overlay.setSpeed(speedInit); overlay.setTop(opts.margins?.top ?? 64); overlay.setBottom(opts.margins?.bottom ?? 0);
+  // battle-9 (QL6): live unit rects for the OD callout's placement (cheap fastBox projection, only when a callout fires)
+  overlay.obstacles = () => {
+    const el = engine.renderer.domElement, W = el.clientWidth, H = el.clientHeight, out = [], bb = new THREE.Box3(), c = new THREE.Vector3();
+    for (const a of U.values()) {
+      if (!a.alive || !a.unit.root.visible) continue;
+      fastBox(a.unit.root, bb); if (bb.isEmpty()) continue;
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      for (let i = 0; i < 8; i++) {
+        c.set(i & 1 ? bb.max.x : bb.min.x, i & 2 ? bb.max.y : bb.min.y, i & 4 ? bb.max.z : bb.min.z).project(camera);
+        const sx = (c.x * 0.5 + 0.5) * W, sy = (0.5 - c.y * 0.5) * H;
+        x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy);
+      }
+      out.push([x0, y0, x1, y1]);
+    }
+    return out;
+  };
   if (opts.margins) overlay.setFrame(opts.margins);
 
   // D26 intro: the camera flies in from a wide backdrop view; no sim ticks (and no queued events) until it ends, the squad drop-ins
@@ -220,7 +236,7 @@ export function createBattleScene(engine, opts = {}) {
       if (want !== laneProfile) setLaneProfile(want, { animate: true }); // before the camera refit: fitWide frames the active profile
       rig.resize(w, h); overlay.resize(); placePlate();
     },
-    setMargins(m) { rig.setMargins(m); overlay.setTop(m?.top ?? 64); overlay.setFrame(m || {}); placePlate(); },
+    setMargins(m) { rig.setMargins(m); overlay.setTop(m?.top ?? 64); overlay.setBottom(m?.bottom ?? 0); overlay.setFrame(m || {}); placePlate(); },
     // 'tall' (portrait lanes) | 'wide' (closer lanes on landscape). animate: idle actors glide home over 0.35 s; busy ones
     // (attack, Overdrive, lunge, deploy) wait for their anim to end, at most 1.5 s. Pins the profile only when opts.laneProfile did.
     setLaneProfile(name, o = {}) { setLaneProfile(name, o); },
@@ -259,6 +275,7 @@ export function createBattleScene(engine, opts = {}) {
     // BATTLE-L: build wave 1 now (same deploy delays as the wave handler, which then finds them spawned): its precise-bbox fits cost
     // ~400 ms, which used to land on the first frame (or on the last frames of the intro)
     for (const e of sim.events) if (e.type === 'wave' && e.phase === 'start') (e.units || []).forEach((id, i) => { const v = sim.state.units[id]; if (v) spawn(v, 0.2 + i * 0.11); });
+    refitWide();
     stateDirty = true;
     // the units are hidden until their drop-in, so their shaders compiled on that frame (a ~400 ms hitch on M5). Compile them now
     // (compile() gathers the visible scene synchronously, so the roots are only shown for the duration of that call)
@@ -329,6 +346,10 @@ export function createBattleScene(engine, opts = {}) {
       const over = new THREE.Box3().setFromObject(unit.root).max.z - (BOARD.zNear - 0.3);
       if (over > 0) { p.z -= Math.min(1.5, over); unit.root.position.z = p.z; }
     }
+    // battle-9 (QL5): idle footprint on the floor relative to the root, per unit of scale (wide-profile spacing, fitWide)
+    let foot = null;
+    { const fb = fastBox(unit.root, new THREE.Box3());
+      if (!fb.isEmpty()) foot = { x0: (fb.min.x - p.x) / s, x1: (fb.max.x - p.x) / s, z0: (fb.min.z - p.z) / s, z1: (fb.max.z - p.z) / s }; }
     // robots' single-draw skinned proxy renders the mirror + shadow passes (257 -> ~125 calls); else the full mesh does
     let proxy = null;
     if (typeof unit.useProxy === 'function' && !qsNoProxy) proxy = unit.useProxy(MIRROR_ONLY_LAYER);
@@ -344,7 +365,7 @@ export function createBattleScene(engine, opts = {}) {
       proxy, deployT: -delay, deployed: false, lunge: null, sink: 0, removed: false, barAnchor, busy: 0,
       place: Math.abs(p.x) !== BOARD.colX[p.col] || s > BOARD.unitScale ? Math.max(1, Math.min(1.45, s / BOARD.unitScale)) : 0,
       ufx: unitFx([v.def, v.model]), noDrop: !!(unit.def?.noDrop || unit.noDrop), odFit, hoverPad,
-      def, tk, homeDz: p.z - slotPos(v.side, v.slotIndex).z };
+      def, tk, wk: 1, foot, homeDz: p.z - slotPos(v.side, v.slotIndex).z };
     // robots' built-in bubble (setShield / M.aura) is replaced by the pooled fresnel bubble (js/fx/vfx.js), one draw for all
     const auraK = unit.def?.aura || 0;
     unit.setShield?.(0);
@@ -370,10 +391,11 @@ export function createBattleScene(engine, opts = {}) {
     applyLaneProfile(name);
     arena.theme.setWide?.(name === 'wide');
     for (let i = 0; i < 6; i++) for (const side of ['player', 'enemy']) { const p = slotPos(side, i); arena.setHome(side, i, p.x, p.z); }
+    const wk = wideFit(name);
     for (const a of U.values()) {
       const z1 = slotPos(a.side, a.slot).z + a.homeDz;
-      const tk = themeK(a.def, name), s1 = a.scale * tk / a.tk;
-      a.tk = tk;
+      const tk = themeK(a.def, name), w1 = wk.get(a) ?? 1, s1 = a.scale * (tk / a.tk) * (w1 / a.wk);
+      a.tk = tk; a.wk = w1;
       if (a.removed || !a.deployed || !animate) {
         a.z = z1; a.scale = s1; a.h = (a.unit.height || 2) * s1;
         a.unit.root.scale.setScalar(s1); a.unit.root.position.z = z1; a.rehome = null;
@@ -387,6 +409,56 @@ export function createBattleScene(engine, opts = {}) {
     rig.refit?.(); placePlate();
     return laneProfile;
   }
+  // battle-9 (QL5): the wide profile packs lanes 2 lattice rows apart (portrait 3), so XL units and bosses (KINGPIN behind PALADIN,
+  // JUGGERNAUT beside them, VECTOR PRIME over three slots) merged into one mass. Size class caps (WIDE_XL / WIDE_L / WIDE_BOSS), then
+  // footprint-aware spacing: per side, while two units'
+  // floor footprints (idle boxes at their wide homes) overlap by more than WIDE_OVERLAP of the smaller one, the bigger unit shrinks 5%
+  // (down to WIDE_MIN of its size). Regular squads sit under the threshold and keep their size. Returns Map(actor -> factor).
+  function wideFit(prof = laneProfile) {
+    const out = new Map();
+    if (prof !== 'wide') return out;
+    for (const side of ['player', 'enemy']) {
+      const L = [...U.values()].filter((a) => a.side === side && a.alive && !a.removed && a.foot);
+      const R = L.map((a) => {
+        const base = a.scale / a.wk * themeK(a.def, prof) / a.tk, z = slotPos(a.side, a.slot).z + a.homeDz, f = a.foot;
+        const cls = a.def.visual?.size, boss = (a.def.scale || 1) > 1 || !!a.def.boss;
+        return { a, base, k: 1, x: a.x, z, f, cls: boss ? 'boss' : cls, sc: a.def.scale || 1 };
+      });
+      // size class first: XL hulls and bosses always come down in wide; an L unit only when an XL or boss neighbour shares its corner
+      for (const r of R) {
+        const bigNb = R.some((o) => o !== r && (o.cls === 'XL' || o.cls === 'boss') && Math.abs(o.z - r.z) < 5.4);
+        r.k = r.cls === 'boss' ? Math.min(1, WIDE_BOSS / Math.min(BOSS_SCALE_MAX, r.sc)) : r.cls === 'XL' ? WIDE_XL * (bigNb ? WIDE_L : 1) : r.cls === 'L' && bigNb ? WIDE_L : 1;
+      }
+      const rect = (r) => { const S = r.base * r.k; return [r.x + r.f.x0 * S, r.x + r.f.x1 * S, r.z + r.f.z0 * S, r.z + r.f.z1 * S]; };
+      for (let it = 0; it < 40; it++) {
+        let worst = null, wv = WIDE_OVERLAP;
+        for (let i = 0; i < R.length; i++) for (let j = i + 1; j < R.length; j++) {
+          const A = rect(R[i]), B = rect(R[j]);
+          const ox = Math.min(A[1], B[1]) - Math.max(A[0], B[0]), oz = Math.min(A[3], B[3]) - Math.max(A[2], B[2]);
+          if (ox <= 0 || oz <= 0) continue;
+          const aA = (A[1] - A[0]) * (A[3] - A[2]), aB = (B[1] - B[0]) * (B[3] - B[2]), v = ox * oz / Math.min(aA, aB);
+          if (v > wv) { wv = v; worst = aA >= aB ? R[i] : R[j]; if (worst.k <= WIDE_MIN) worst = worst === R[i] ? R[j] : R[i]; }
+        }
+        if (!worst || worst.k <= WIDE_MIN) break;
+        worst.k = Math.max(WIDE_MIN, worst.k * 0.95);
+      }
+      for (const r of R) out.set(r.a, r.k);
+    }
+    return out;
+  }
+  // after a batch of spawns (a new wave) or a death-free refit: apply wideFit's factors (undeployed units at once, others tween)
+  function refitWide() {
+    if (laneProfile !== 'wide') return;
+    const wk = wideFit();
+    for (const [a, w1] of wk) {
+      if (Math.abs(w1 - a.wk) < 1e-3) continue;
+      const s1 = a.scale * w1 / a.wk; a.wk = w1;
+      if (!a.deployed || a.removed) { a.scale = s1; a.h = (a.unit.height || 2) * s1; a.unit.root.scale.setScalar(s1); if (a.armed) placeSlot(a); else a.place = placeK(a); continue; }
+      a.rehome = { z0: a.z, z1: a.rehome?.z1 ?? a.z, s0: a.scale, s1, t: 0, wait: 0 };
+      placeSlot(a);
+    }
+  }
+  api._wideFit = () => [...wideFit()].map(([a, k]) => [a.id, a.v.def, +k.toFixed(3)]);
   function placeK(a) { return Math.abs(a.x) !== BOARD.colX[a.slot >= 3 ? 1 : 0] || a.scale > BOARD.unitScale + 1e-6 ? Math.max(1, Math.min(1.45, a.scale / BOARD.unitScale)) : 0; }
   function placeSlot(a) {
     const k = placeK(a) || a.place;
@@ -467,6 +539,7 @@ export function createBattleScene(engine, opts = {}) {
           // sink the previous wave's wrecks, deploy the new one
           for (const a of U.values()) if (a.side === 'enemy' && !a.alive && !a.removed) a.sink = 0.001;
           (e.units || []).forEach((id, i) => { const v = sim.state.units[id]; if (v) spawn(v, 0.2 + i * 0.11); });
+          refitWide();
         } else {
           audio.sfx('wave_clear');
           for (const a of U.values()) if (a.side === 'player' && a.alive) a.unit.play('victory', { speed: 1.2 });
@@ -941,6 +1014,7 @@ export function createBattleScene(engine, opts = {}) {
 // units: stop 0.35 short of it) and BOSS_OUTER out to the side (the HUD side buttons sit over the outer edge). First the boss steps back from
 // its front slot, then it shrinks until the box fits. Returns the final scale + root x.
 const BOSS_SCALE_MAX = 1.6, BOSS_OUTER = 6.2;
+const WIDE_OVERLAP = 0.3, WIDE_MIN = 0.62, WIDE_XL = 0.85, WIDE_L = 0.92, WIDE_BOSS = 1.25; // battle-9 wideFit
 const _odBox = new THREE.Box3();
 export const _fastBox = (root) => fastBox(root, new THREE.Box3()); // tests
 function unitBox(root, bb = new THREE.Box3()) {

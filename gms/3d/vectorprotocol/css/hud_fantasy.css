@@ -85,3 +85,15 @@
 .hud.fantasy .pc-empty.locked { color: #4e463a; }
 /* fallback banners (only when the 3D overlay is down) */
 .hud.fantasy .hud-banner { font-family: var(--serif); font-weight: 700; color: var(--parch); text-shadow: 0 0 18px #e0b25a, 0 2px 3px #000; }
+
+/* ---- D26 intro bar (SKIP / DON'T SHOW AGAIN) over the stone HUD: it lives outside .hud, so it carries .fantasy itself */
+.bi-bar.fantasy { --st-mid: #3a3630; --st-lo: #1f1c18; --gl-hi: #f6dc94; --gl: #c9a24a; --gl-lo: #6d4c17; --parch: #f3e2b8; }
+.bi-bar.fantasy .vp-btn { color: #f3e2b8; font-family: "Cinzel", "Georgia", serif; font-weight: 700; letter-spacing: .06em; text-shadow: 0 1px 2px #000;
+  filter: drop-shadow(0 2px 3px #000c); }
+.bi-bar.fantasy .vp-btn::before { clip-path: none; border-radius: 4px; background: linear-gradient(180deg, #f6dc94, #c9a24a 35%, #6d4c17 70%, #d9b25e); }
+.bi-bar.fantasy .vp-btn::after { clip-path: none; inset: 2px; border-radius: 3px; background: linear-gradient(180deg, #4a453c, #1f1c18);
+  box-shadow: inset 0 1px 0 #ffffff1c, inset 0 -2px 3px #0009; }
+.bi-bar.fantasy .vp-btn.primary { color: #fff3cf; text-shadow: 0 1px 2px #000, 0 0 8px #e0b25a; }
+.bi-bar.fantasy .vp-btn.primary::after { background: radial-gradient(ellipse at 50% 30%, #8a6526, transparent 75%), linear-gradient(180deg, #5a472a, #241a0e); }
+.bi-bar.fantasy .vp-btn .ic { color: #f6dc94; }
+.bi-bar.fantasy .bi-never { color: #cdb88c; }

@@ -109,7 +109,7 @@ export async function mount(root, ctx) {
     const { v, s } = r;
     const lu = rw.levelUps?.find((x) => x.uid === r.u.uid);
     const xb = bar(0, 'gold');
-    const th = h('div.rs-th', h('div.ph', icon(v.role)));
+    const th = h('div.rs-th', { dataset: { faction: v.rarity === 'legendary' ? 'legendary' : (v.faction || 'corporate') } }, h('div.ph', icon(v.role)));
     portraits.fill(th, v);
     units.append(h('div.rs-u' + (r.lost ? '.lost' : ''), th,
       h('div.grow',

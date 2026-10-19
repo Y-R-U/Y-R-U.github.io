@@ -531,3 +531,61 @@ dpr 2 costs the same as 1.5 on M5, so the frame is submit/CPU-bound, not fill-bo
   - manager: new file js/battle/themes/fantasy_forest.js (imported by fantasy.js). No new vendored addons (mergeVertices is in the
     existing BufferGeometryUtils).
   - ui: none. `theme.setIntro` is battle-internal.
+
+# battle-9 (ninth round: fantasy fight lighting, QL5 XL spacing in wide, QL6 OD callout layering, intro backdrop edge, S22 guard)
+## Checkpoint 1
+- DONE (syntax-checked)
+  - Fantasy lighting (themes/fantasy.js): key 0xffe2b4 x2.6 -> 0xffd49a x3.6, hemi 0xd4dccb/0x2a2e1e x0.8 -> 0xdcd6c4/0x30281c x0.9, rim
+    0xd2e2a6 x1.6 -> 0xe6dcb0 x2.4, fill 0.55 -> 1.0, envIntensity 0.75 -> 1.05, ground material colour (1.1, 1.06, 1.3) (lifts the slabs and
+    pulls them off yellow-green). Look per orientation via theme.setWide: wide vignette 0.5 / contrast 1.1, portrait 0.66 / 1.14 (was
+    0.75 / 1.16). Floor between the lanes (915x412) 61,67,43 -> ~95,88,72 (ref ~84,75,64).
+  - post.js: `vignetteAspect` look option (uVigAspect): caps the aspect used by the vignette so a wide frame's sides don't eat the board.
+    Default 99 = old behaviour; fantasy uses 1.25 (portrait unaffected).
+  - QL5 (battle.js `wideFit` / `refitWide`): in the wide profile, XL units x0.85 (x0.92 more beside an XL/boss), L units x0.92 only beside
+    an XL/boss, bosses capped at 1.25x board scale; then a floor-footprint overlap pass (idle fastBox per unit, `a.foot`) shrinks the bigger
+    of any pair overlapping > 30% (min 0.62). Runs after each wave's spawns and on profile switches (a.wk factor, tweened via rehome).
+    Regular squads: no change. `scene._wideFit()` debug.
+- NEXT: QL6 OD callout layering + 740x360, intro backdrop edge, S22 guard, in-game check (ui had a broken import at 1st try), perf, sheet.
+## Checkpoint 2
+- DONE since #1 (syntax-checked)
+  - QL6 (overlay.js): z-order numbers < HP bars < OVERTIME (4) < OD callout (5) < banners (6); crits (z 2) and bars no longer draw over the
+    callout. Landscape placement `placeSide()`: candidates down the caster's edge of the board band (top, 22/42/62% of the band), normal
+    then a compact `.tight` size; picks the least coverage of HP bars + unit rects (`overlay.obstacles`, battle.js: fastBox projected, only
+    when a callout fires). `overlay.setBottom(px)` from setMargins. 740x360: compact callout 162..284 x 56..88, clear of heads/bars.
+  - QL11 intro edge (fantasy_backdrop.js): tree-line bands alpha-blended (soft mip edges), own haze toward the horizon colour instead of the
+    scene fog (far bands were dark cut-outs), top 20% of each band fades (the canvas clipped crowns flat at its top row + wrap), arc ends
+    fade. Ordered far -> near, no depth write. The flat dark hill with a hard top above the ruins wall is gone.
+  - S22 guard (fantasy.js + fantasy_forest.js): `forest.trim(level)` 1 = far-crown leaf cards off + outer 40% far crowns, 2 = no cards,
+    far crowns 35%, near crowns on the detail-1 mesh. Guard: 2 consecutive 1.5 s windows < 45 fps (p90) with the forest visible -> next
+    level (one-way per battle, console.info). `?forestTrim=N` forces. Wide high: 407k tris -> L1 371k -> L2 308k (calls 127 -> 126).
+  - Rotation soak (?rot=2.5, wave-2 XL squad): wk factors flip 1 <-> 0.85/0.92 with each profile change, scales return to 2.00 in tall.
+- In game (?dev=1&fresh&god=1, 915x412 + 412x915): m6_l16 no console errors, 125 / 115 calls; m8_l15 wave 2 wideFit = juggernaut 0.85,
+  paladin 0.83, kingpin 0.92.
+- NEXT: before/after sheet, final perf table, hand-back.
+## Checkpoint 3 (battle-9 hand-back)
+- Perf (M5 metal, battle_test 6v6 mid-fight, engine cpu median over 7 s; budget 180 calls):
+  | config | cpu ms | calls | tris | dpr |
+  |---|---|---|---|---|
+  | fantasy wide high | 2.5 | 127 | 407k | 1.5 |
+  | fantasy wide high, forestTrim 1 / 2 | 2.6 / 2.8 | 127 / 126 | 371k / 308k | 1.5 |
+  | fantasy wide med / low | 2.5 / 2.6 | 127 / 111 | 335k / 177k | 1.25 / 1 |
+  | fantasy portrait high / low | 2.5 / 1.9 | 118 / 102 | 233k / 117k | 1.5 / 1 |
+  | scifi wide high (m8 wave-2 squad) | 2.5 | 156 | 299k | 1.5 |
+  | scifi portrait high | 2.9 | 160 | 300k | 1.5 |
+  In game: m6_l16 915x412 125 calls / 2.1 ms, 412x915 115 / 2.1 ms; m8_l15 wave 2 915x412 166 calls / 3.2 ms. No console errors.
+- Shots (scratch battle9/): before_after.png (rows: fantasy wide fight, fantasy wide intro, m8_l15 wave 2 [QA before], boss wave 3;
+  bottom: portrait fantasy before|after, OD callout at 740x360), lit_ab.png / lit_p2.png (lighting A/B), xl_ab.png, in_edge_ab.png,
+  dbg3_c.png (intro gap, both orientations), trim_ab.png (forest trim 0 vs 2), od_915_*.png / od_740_*.png.
+- Honest look: fantasy fight ~7/10 vs ref_fantasy_01 (was ~6.5): warm key, floor reads as warm grey stone, units' colours readable and
+  separated by rim + contact shadows. Still: dark-painted mechs (GUNNER navy) stay darkish; floor is now close to unit brightness in the
+  near rows, so separation leans on the rim light.
+- Open issues
+  - m8_l15 wave 2/3 is better, not solved: the boss wave is still a big cluster (VECTOR PRIME at 1.19x board scale + LEVIATHAN in front).
+    Next lever if wanted: WIDE_BOSS 1.25 -> 1.1, or move a boss's flank units back half a lane in wide.
+  - m8_l15 in-game 915x412: a far unit (SERAPH wings) reaches ~16 px into the top HUD mid-fight (gapTop -16; likely OD camera push).
+  - Intro gap is now hazy distance (soft tree silhouettes); the Rift's dark void reads a little weaker against the paler haze.
+  - Forest guard is untested on a real S22 (only forced levels measured); it only acts after ~3 s under 45 fps.
+- Requests
+  - manager: no new files, no vendored addons. New public bits: post look `vignetteAspect`, overlay `obstacles` / `setBottom`,
+    scene `_wideFit()` (debug), theme `forest.trim(level)` / `forestTrim`, battle_test-independent `?forestTrim=N`.
+  - ui: none.

@@ -267,3 +267,37 @@
   with 46 cards at 3 ms, all art at 3.0 s, 33 long tasks, max 75 ms (none > 100). Warm (later session): all 46 art at 107 ms, 0 long tasks.
 - Request (robots): one renderPortrait is the 55-75 ms floor (createUnit + MSAA render + readPixels). A split API (build, then render on a
   later frame) or a cheaper path would cut the cold-load jank further.
+
+# ui-6 (QA-L work list)
+## Checkpoint 1
+- DONE: QL1 portraits.js retry (3 tries, backoff 0.5/2 s, then the job is dropped so the next fill() retries; `reload` = load('units')
+  when units is a stub; img.onerror drops the URL + IndexedDB key and re-fills; empty stored blobs discarded). QL4 Back closes the top
+  modal first (components.closeTopModal). QL2 card sizes: 915x412 80x115, 915x360 68x98, 844x340 74x106 (grid takes the full left edge
+  under 357 px tall, top cluster starts right of it). QL11 intro buttons stone/gold on the fantasy HUD (.bi-bar.fantasy).
+  QL9 1920x1080 formation (bigger hexes, right column zoom 1.3, centred). QL8 long names (two-line name lifts Lv/stars; container query).
+- NEXT: QL10 LEVEL CAP, QL12 formation <44 px, QL7 map sheet Deploy, START/CONTINUE, chest-mk, Q6, Q14.
+## Checkpoint 2
+- DONE since cp1: QL10 disabled primary/gold buttons lose the bright fill (vp.css). QL12 landscape l-short formation: FIT GOALS + buff
+  chips keep their drawn size but get 44 px hit boxes (inset visuals, negative margins, rows z-index 2; elementFromPoint verified at the
+  top and bottom edges); W tabs 44 wide (their ::after already gives a 46 px tall hit band). QL7 map level sheet (mine, scr_map.js):
+  Deploy now sits in an opaque sticky `.lvl-foot` that reaches the screen edge (sheet/card bottom padding moved into it), both orientations.
+  chest-mk 44x44. Q6 results thumbs get the card's lit faction backdrop. Q14 fantasy units (`realm:'fantasy'`) get a stone/gold
+  `.vp-card.fantasy` frame everywhere (unitCard), rift x10 names wrap to two lines, kicker gold. START/CONTINUE was already right (scr_hub:77).
+- NEXT: verify QL4 / intro bar / results / LEVEL CAP / QL1 in the browser; portrait regression 412x915 + 412x785.
+## Checkpoint 3 (ui-6 hand-back) - tested on CDP 9406 (touch), zero console errors on every route
+- Verified: QL1 in-page test (scratch ui6/t_pt.mjs): throw x2 then OK -> 3 calls, art filled (~2.9 s with backoff); always-null -> gives
+  up after 3, job dropped, next fill() starts again; units stub + `reload` -> renders; a bad image URL -> onerror drops it and re-renders.
+  QL4 (t_battle.mjs): Squad status open + history.back() -> modal closed, still #/battle, no PAUSED; a second Back -> PAUSED.
+  QL2 (t_hud.mjs, m6_l16, 6/6 portraits): 915x412 80x115, 915x360 68x98, 844x340 74x106, 412x915 unchanged.
+  QL11 fantasy intro bar = `.bi-bar.fantasy` (intro_915x412.png). QL10 unit at cap: LEVEL CAP greyed; also fixed the action grid at max
+  rank (a plain placeholder div had order 0, so RANK UP and LEVEL CAP sat on different rows); turntable stage gets a navy halo
+  (`.up-stage::before`, lighten blend, the canvas is opaque so DOM can't go behind it).
+  Sweep (sweep.mjs, 12 routes) at 412x915, 412x785, 915x412, 844x340: no h-scroll, nothing off-screen, only W1/W2 flagged by box size
+  (their ::after hit band is 46 px tall). Fresh hub CTA "START RUSTLINE DOCKS".
+- Shots (scratch ui6/): hud_m6_l16_{915x412,844x340,915x360,412x915}, barr_{915x360,844x340,412x915}, form_{1920x1080,1280x800},
+  fm_{844x340,915x412}, sheet_in_{844x340,412x915,412x785}, rift10_{412x915,915x412}, unit_{915x412,412x915}, intro_915x412,
+  back_915x412, results_915x412, sw_*.
+## Requests (ui-6)
+- robots: the unit-profile turntable renders on flat black (opaque canvas). A subtle backdrop in createTurntable (gradient
+  plane / fog / scene.background) would beat the DOM halo I added; drop `.up-stage::before` in screens.css when it lands.
+- hub: QL3 (map head ignores side insets) is still yours.

@@ -295,7 +295,7 @@ API changes in one place (append-only; feature-detect on the caller side):
 1. **Battle at ×1**: rotate 412×915 → 915×412 → 412×915 at t ≈ 3 s and 6 s. The battle must not restart: same `window.__vp.battle` scene object, sim tick strictly increasing. The HUD card DOM nodes are the same objects. The camera refits within 1 frame. Units re-home within ≤ 1.5 s. No console errors. Median fps unchanged within 10%.
 2. Rotate during the drop-in deploy, during an Overdrive (camera push), during the overtime plate, during the VICTORY banner, and while paused (with the pause modal open).
 3. Formation mid-drag: the drag is cancelled and no ghost is left. Hub mid-pan: the momentum is dropped and labels relax within 2 frames. Map: the current node stays centred (story_map's ResizeObserver already keeps `st.cur`). Unit profile: the turntable is reframed and the spin angle kept. Recruit reveal mid-animation: it finishes correctly.
-4. Desktop: drag the window width 1300 → 1000 → 1300 at height 900. The mode flips exactly once each way (hysteresis), with no flicker loop.
+4. Desktop: drag the window width 1300 → 900 → 1300 at height 900. The mode flips exactly once each way (hysteresis), with no flicker loop.
 
 ### 9.3 Acceptance per package
 - **UI-L0**: `data-orient` and `data-form` are correct for every viewport in §9.1. There is no rotate hint. Portrait screenshots at 412×915 and 390×844 match pre-change shots (pixel diff only where dynamic). The 1280×800 "Portrait column" setting reproduces D3.

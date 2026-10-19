@@ -88,6 +88,9 @@ h2.vp-title { margin: 0; font: 800 18px/1.1 var(--font-d); letter-spacing: .12em
 .vp-btn.locked { --bc: #7a3346; --fill: #1a0d18; color: #ff9fb2; filter: none; }
 .vp-btn[disabled] { --bc: #34506b; color: #6c87a0; filter: none; cursor: default; }
 .vp-btn[disabled]:active { transform: none; }
+/* disabled primary / gold buttons drop their bright fill too, so LEVEL CAP reads as off, not broken (QA QL10) */
+.vp-btn.vp-btn[disabled] { text-shadow: none; }
+.vp-btn.vp-btn[disabled]::after { background: linear-gradient(180deg, #13263c, #0a1626 70%); }
 .vp-btn .ic { width: 20px; height: 20px; }
 /* square icon button (HUD side rails) */
 .vp-ibtn { --bc: var(--cyan); position: relative; isolation: isolate; border: 0; background: none; cursor: pointer; color: var(--text);
@@ -165,6 +168,19 @@ h2.vp-title { margin: 0; font: 800 18px/1.1 var(--font-d); letter-spacing: .12em
 .vp-card { container-type: inline-size; }
 .vp-card .nm.long { font-size: min(12px, 12.5cqi); letter-spacing: .02em; }
 .vp-card .nm.xlong { font-size: min(12px, 13cqi); letter-spacing: .02em; white-space: normal; line-height: 1; text-wrap: balance; overflow-wrap: anywhere; }
+/* a two-line name pushes the level / stars row up one line instead of running into it (QA QL8) */
+.vp-card:has(> .nm.xlong) > :is(.lv, .stars) { bottom: calc(26px + 1.05em); }
+@container (min-width: 118px) { .vp-card:has(> .nm.xlong) > :is(.lv, .stars) { bottom: 26px; } }
+/* fantasy-realm units (Rift Gate, D21): carved stone art box inside a gold-leaf rim instead of the sci-fi faction frame (QA Q14) */
+.vp-card.fantasy { --fc: #e0b25a; --rc2: #c9a24a; --cut: 0px; filter: drop-shadow(0 2px 3px #000c) drop-shadow(0 0 5px #e0b25a55); }
+.vp-card.fantasy::before { clip-path: none; border-radius: 5px; background: linear-gradient(180deg, #f6dc94, #c9a24a 35%, #6d4c17 70%, #d9b25e); }
+.vp-card.fantasy .art { clip-path: none; border-radius: 4px; inset: 2.5px;
+  background: radial-gradient(ellipse at 50% 35%, #6a6152 0%, #3a3630 45%, #1f1c18 85%); }
+.vp-card.fantasy .art::after { background: linear-gradient(180deg, transparent 50%, #120d07ee 88%); }
+.vp-card.fantasy .nm { font-family: "Cinzel", "Georgia", serif; color: #f3e2b8; text-shadow: 0 1px 2px #000; letter-spacing: .02em; }
+.vp-card.fantasy .lv { font-family: "Cinzel", "Georgia", serif; color: #f3e2b8; }
+.vp-card.fantasy .rl .vp-role { --rc: #e0b25a; color: #f6dc94; background: #2a2620ee; clip-path: none; border-radius: 4px; }
+.vp-card.fantasy .plate { background: linear-gradient(90deg, #6d4c17, #f6dc94, #6d4c17); box-shadow: 0 0 6px #e0b25a88; }
 .vp-card.locked { filter: grayscale(1) brightness(.5); }
 .vp-card.picked::before { background: linear-gradient(160deg, #fff, var(--cyan)); }
 .vp-card.used { opacity: .45; }
