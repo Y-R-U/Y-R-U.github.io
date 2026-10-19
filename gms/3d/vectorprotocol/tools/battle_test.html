@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>VECTOR PROTOCOL — battle test</title>
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
 <style>
@@ -18,6 +19,12 @@
   #od button.rdy { border-color: #ffd24a; box-shadow: 0 0 10px #ffb400; }
   #perf { position: absolute; left: 4px; top: 4px; font: 11px monospace; color: #9fe; background: rgba(0,0,0,.5); padding: 3px 5px; z-index: 6; white-space: pre; display: none; }
   .mockhud .top { position: absolute; left: 0; right: 0; top: 0; height: 64px; background: linear-gradient(rgba(4,10,24,.85), rgba(4,10,24,.55)); border-bottom: 1px solid #2c7cc8; z-index: 4; }
+  #col.wide { width: 100vw; }
+  #col.fixed { left: 0; top: 0; bottom: auto; transform: none; }
+  .mockhud.land .top { height: 52px; } .mockhud.land .bot { display: none; }
+  .mockhud .lft, .mockhud .rgt { display: none; }
+  .mockhud.land .lft { display: block; position: absolute; left: 0; top: 52px; bottom: 0; width: 190px; background: rgba(4,10,24,.55); border-right: 1px solid #2c7cc8; z-index: 4; }
+  .mockhud.land .rgt { display: block; position: absolute; right: 0; top: 52px; bottom: 0; width: 74px; background: rgba(4,10,24,.55); border-left: 1px solid #2c7cc8; z-index: 4; }
   .mockhud .bot { position: absolute; left: 0; right: 0; bottom: 0; height: 150px; background: linear-gradient(rgba(4,10,24,.6), rgba(4,10,24,.92)); border-top: 1px solid #2c7cc8; z-index: 4; }
 </style>
 <script type="importmap">{ "imports": { "three": "../../../lib/three/0.180.0/three.module.js", "three/addons/": "../../../lib/three/0.180.0/addons/" } }</script>
@@ -56,7 +63,22 @@ if (qs.get('charge')) {
     else if (tok.trim()) for (const u of [...P, ...waves.flat()]) u.charge = cv(tok);
   }
 }
-if (qs.get('hud') === '1') document.getElementById('col').classList.add('mockhud'), document.getElementById('col').insertAdjacentHTML('beforeend', '<div class="top"></div><div class="bot"></div>');
+// BATTLE-L: &wide=1 full-width #col (landscape framing at a landscape viewport); &hud=1 then mocks the landscape HUD
+// (top 52 / left 190 / right 74). &rot=SECONDS swaps #col between 412x915 and 915x412 every N s (rotation soak, no CDP needed).
+const col = document.getElementById('col');
+const WIDE = qs.get('wide') === '1', ROT = +(qs.get('rot') || 0), HUD = qs.get('hud') === '1';
+if (WIDE) col.classList.add('wide');
+if (HUD) col.classList.add('mockhud'), col.insertAdjacentHTML('beforeend', '<div class="top"></div><div class="bot"></div><div class="lft"></div><div class="rgt"></div>');
+const isLand = () => col.clientWidth / Math.max(1, col.clientHeight) >= 1;
+function marginsNow() {
+  if (qs.get('margins') === '0') return null;
+  // &m=top,bottom,left,right: exact HUD margins (e.g. measured from the real game HUD at this viewport)
+  if (qs.has('m')) { const [top, bottom, left, right] = qs.get('m').split(',').map(Number); if (isLand() || !left) return { top, bottom, left, right }; }
+  if (!isLand()) return { top: 64, bottom: 150 };
+  return HUD ? { top: 52, bottom: 6, left: 190, right: 74 } : { top: 6, bottom: 6 };
+}
+function applyMode() { col.classList.toggle('land', isLand()); if (HUD) col.classList.toggle('mockhud', true); }
+applyMode();
 
 const engine = createEngine(document.getElementById('c'), { quality: qs.get('q') || undefined });
 let battle = null;
@@ -71,10 +93,17 @@ async function run() {
   if (qs.has('ot')) { data = data || await loadData(); if (data._rules?.overtime) data._rules.overtime = { ...data._rules.overtime, start: +qs.get('ot') }; }
   battle = createBattleScene(engine, { data, playerSquad: { units: P }, enemyWaves: waves.map((u) => ({ units: u })), seed: +(qs.get('seed') || 7),
     auto: qs.get('auto') !== '0', speed: +(qs.get('speed') || 1), overlay: document.getElementById('col'),
-    margins: qs.get('margins') === '0' ? null : { top: 64, bottom: 150 },
+    margins: marginsNow(),
+    ...(qs.has('lanes') ? { laneProfile: qs.get('lanes') } : {}),
+    // D26 intro camera on by default (as in game); &nointro (or &still=1) skips it, &intro=0.5 sets its strength
+    intro: qs.has('nointro') || qs.get('still') === '1' ? false : qs.has('intro') ? { strength: +qs.get('intro') } : true,
     ...(qs.has('theme') ? { theme: qs.get('theme') } : {}), ...(qs.has('fk') ? { themeUnitK: +qs.get('fk') } : {}), ...(qs.has('realm') ? { realm: qs.get('realm') } : {}),
-    frame: Object.fromEntries(['fov', 'widthFill', 'farY', 'nearY', 'gapTop', 'gapBottom', 'pitch'].filter((k) => qs.has(k)).map((k) => [k, +qs.get(k)])) });
+    frame: Object.fromEntries(['fov', 'widthFill', 'farY', 'nearY', 'gapTop', 'gapBottom', 'pitch', 'bgHFov', 'bgHorizon', 'boxTop'].filter((k) => qs.has(k)).map((k) => [k, +qs.get(k)])) });
   dbg.battle = battle;
+  // &still=1: every frame is tick(0, 0) (no time passes: deterministic frames for pixel diffs; units never deploy)
+  if (qs.get('still') === '1') { const u = battle.update; battle.update = () => u(0, 0); }
+  // battle-8: &introAt=K freezes the D26 intro camera at pose K (0 = first frame) for composition shots
+  if (qs.has('introAt') && battle.rig) { const si = battle.rig.setIntro, K = +qs.get('introAt'); battle.rig.setIntro = (k, s) => si(K, s ?? 1); }
   engine.setScene(battle);
   battle.on('state', (s) => { dbg.state = s; renderOD(s); });
   battle.on('event', () => dbg.events++);
@@ -97,6 +126,24 @@ document.getElementById('spd').textContent = '×' + sp;
 document.getElementById('spd').onclick = (e) => { sp = sp === 4 ? 1 : sp * 2; battle.setSpeed(sp); e.target.textContent = '×' + sp; };
 document.getElementById('auto').onclick = (e) => { const on = !battle.state.auto; battle.setAuto(on); e.target.style.opacity = on ? 1 : 0.5; };
 document.getElementById('re').onclick = run;
+// margins follow the column shape (ui does the same from hud.margins() on orient change)
+new ResizeObserver(() => { applyMode(); battle?.setMargins?.(marginsNow()); }).observe(col);
+if (ROT > 0) {
+  col.classList.add('fixed');
+  const sizes = [[412, 915], [915, 412]];
+  let r = 0;
+  const setSize = () => { const [w, h] = sizes[r % 2]; col.style.width = w + 'px'; col.style.height = h + 'px'; };
+  setSize();
+  dbg.rot = [];
+  setInterval(() => {
+    r++; setSize();
+    const t0 = performance.now(), tick0 = battle?.sim?.t ?? -1, aspect = col.clientWidth / col.clientHeight;
+    // refit check: frames until the battle camera has the new aspect
+    let frames = 0;
+    const chk = () => { frames++; if (Math.abs((battle?.camera.aspect ?? 0) - aspect) < 1e-3 || frames > 30) dbg.rot.push({ n: r, tick0, frames, ms: +(performance.now() - t0).toFixed(1), profile: battle?.laneProfile }); else requestAnimationFrame(chk); };
+    requestAnimationFrame(chk);
+  }, ROT * 1000);
+}
 if (qs.get('perf') === '1') {
   const el = document.getElementById('perf'); el.style.display = 'block';
   setInterval(() => { const s = dbg.stats(); el.textContent = `${s.tier} ${s.fps}fps ${s.ms}ms cpu${s.cpu}\n${s.calls} calls ${(s.tris / 1000).toFixed(0)}k tris dpr${s.dpr}\nvfx ${s.vfx} · units ${s.units?.calls ?? '-'}dc (+${s.units?.extra ?? 0})`; }, 500);

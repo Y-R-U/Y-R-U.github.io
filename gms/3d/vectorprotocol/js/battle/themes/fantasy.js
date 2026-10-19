@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { BOARD } from '../layout.js';
 import { box, merge, onLayers } from '../geo.js';
 import { rng } from '../../fx/textures.js';
-import { flagstoneTextures, stoneBlockTextures, pedestalTextures, foliageTexture } from '../../fx/textures_fantasy.js';
+import { flagstoneTextures, stoneBlockTextures, pedestalTextures, foliageTexture, } from '../../fx/textures_fantasy.js';
 import { createPlanarReflection, REFLECT_LAYER } from '../../fx/reflection.js';
 import { buildForestEnv } from '../../engine/env.js';
 import { buildFantasyBackdrop } from './fantasy_backdrop.js';
@@ -14,6 +14,8 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 export const id = 'fantasy';
 const FT_CACHE = new Map();
 const FANTASY_UNIT_K = 1;
+// BATTLE-L: the wide (landscape) board has horizontal room for bigger fantasy units (battle-7 open issue); portrait stays 1
+const FANTASY_UNIT_K_WIDE = 1.12;
 
 // world-space moss on up-facing surfaces + a damp band at the base, for any MeshStandardMaterial (instanced or not)
 export function mossy(mat, { amount = 0.75, base = 0.5, scale = 1.1, color = new THREE.Color(0.05, 0.068, 0.02) } = {}) {
@@ -369,8 +371,21 @@ export function createTheme(engine, { seed = 7 } = {}) {
   let otK = 0;
   updaters.push(() => { flyMat.uniforms.uFly.value.copy(fly0).lerp(emb, otK); flyMat.uniforms.uMote.value.copy(mote0).lerp(emb, otK * 0.8); });
 
+  // --- BATTLE-L: forest floor flanks, shown only on the wide (landscape) board. The wide camera sees past the side walls, where only
+  // the fogged backdrop ground was (flat grey slabs). Dark forest floor out to the backdrop's tree bands; hidden in portrait.
+  // (Tree-line cards here read as giant hedge walls from the intro pose; the backdrop's own bands do the skyline.)
+  const flanks = new THREE.Group(); flanks.visible = false;
+  {
+    const len = fz0 - fz1 + 330, zc = (fz0 + fz1 - 330) / 2;
+    const gg = [];
+    for (const s of [-1, 1]) { const g = new THREE.PlaneGeometry(200, len); g.rotateX(-Math.PI / 2); g.translate(s * (rect.x1 + 100), -0.03, zc); gg.push(g); }
+    flanks.add(new THREE.Mesh(mergeGeometries(gg), new THREE.MeshStandardMaterial({ color: 0x1e2817, roughness: 1, metalness: 0 })));
+    group.add(flanks);
+  }
+
   disposables.push(environment);
   return {
+    setWide(on) { flanks.visible = !!on; },
     id, group, reflection, lights: { hemi, key, rim, fill }, environment, envIntensity: 0.75,
     fog: new THREE.Fog(0x5f6b4a, 48, 240),
     look: { strength: 0.5, radius: 0.35, threshold: 1.25, factors: [1, 0.7, 0.45, 0.25, 0.1], vignette: 0.75, sat: 0.98, contrast: 1.16 },
@@ -380,6 +395,9 @@ export function createTheme(engine, { seed = 7 } = {}) {
     update(dt, t) { for (const u of updaters) u(dt, t); },
     setOvertime(k) { otK = Math.max(0, Math.min(1, k)); },
     // battle-7: fantasy-realm units scale up a little on their home arena (natural creature sizes read small beside the mechs)
+    wideUnitK: FANTASY_UNIT_K_WIDE,
+    // the bigger units in the far lane (TREANT, ELF SAGE at 1.12) need a taller fit box to clear the top HUD
+    frameWide: { boxTop: 5.6 },
     unitScale(def, k = FANTASY_UNIT_K) { return def?.realm === 'fantasy' && def.body !== 'quadruped' ? k : 1; },
     crowd: { hype: (k) => backdrop.stir?.(k), wave: () => backdrop.stir?.(1) },
     dispose() {

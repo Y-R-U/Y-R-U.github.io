@@ -133,11 +133,12 @@ export function createStoryMap(container, opts = {}) {
     let yAt;
     if (wide) {
       // the road lives in the free band between the head and the CTA + rail
-      const rr = root.getBoundingClientRect();
-      const top = (opts.showTitle === false ? 0 : head.getBoundingClientRect().bottom - rr.top) + 24;
-      const bot = (opts.cta === false ? root.querySelector('.vpm-rail').getBoundingClientRect().top : cta.getBoundingClientRect().top) - rr.top - 46; // room for the name plate / stars under a node
+      // offset* (not getBoundingClientRect): layout boxes, unaffected by a screen's enter transition transform
+      const top = (opts.showTitle === false ? 0 : head.offsetTop + head.offsetHeight) + 24;
+      const bot = (opts.cta === false ? root.querySelector('.vpm-rail').offsetTop : cta.offsetTop) - 46; // room for the name plate / stars under a node
       const mid = (top + bot) / 2, A = Math.max(0, bot - top) * 0.30;
-      yAt = (l, i) => (l.y != null ? VH * l.y : mid + A * (Math.sin(i * 1.15 + 0.4) + 0.33 * Math.sin(i * 2.9 + 1)));
+      // design's l.y is a portrait VH fraction (0.5 +- 0.18): remap it into the band
+      yAt = (l, i) => mid + A * (l.y != null ? Math.max(-1.33, Math.min(1.33, (l.y - 0.5) / 0.18)) : Math.sin(i * 1.15 + 0.4) + 0.33 * Math.sin(i * 2.9 + 1));
     } else {
       const band = { mid: 0.53, amp: VH > 600 ? 0.15 : 0.11 };
       yAt = (l, i) => VH * (l.y != null ? l.y : band.mid + band.amp * Math.sin(i * 1.15 + 0.4) + 0.05 * Math.sin(i * 2.9 + 1));
@@ -317,11 +318,34 @@ export function createMapSelect(container, { maps = DEMO_MAPS, progress = {}, is
       <span class="meta">${open ? `<span class="bar"><i style="width:${pct}%"></i></span><span class="st">${STAR}${stars}/${m.levels.length * 3}</span>` : `<span class="lk">${LOCK} Clear chapter ${pad2(i)} to unlock</span>`}</span></span>
     </button>`;
   }).join('');
-  root.innerHTML = `<div class="vpms-head"><div class="k">VECTOR PROTOCOL</div><div class="n">${title}</div></div><div class="vpms-list">${cards}</div>`;
+  root.innerHTML = `<div class="vpms-head"><div class="k">VECTOR PROTOCOL</div><div class="n">${title}</div></div><div class="vpms-list">${cards}</div>`
+    + `<div class="vpms-more"><button type="button" aria-label="More chapters">${CHEV}<span>MORE</span></button></div>`;
   container.appendChild(root);
-  const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => root.classList.toggle('wide', root.clientWidth >= root.clientHeight)) : null;
+  // landscape: the grid scrolls vertically; a sticky fade + MORE chip says so until the last row is in view
+  const last = root.querySelector('.vpms-list > :last-child');
+  const onScroll = () => root.classList.toggle('end', !last || last.offsetTop + last.offsetHeight <= root.scrollTop + root.clientHeight - 4);
+  const fit = () => {
+    const w = root.clientWidth >= root.clientHeight;
+    root.classList.toggle('wide', w); root.classList.toggle('short', w && root.clientHeight < 400);
+    onScroll();
+  };
+  const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(fit) : null;
   ro?.observe(root);
+  root.addEventListener('scroll', onScroll, { passive: true });
+  // open on the chapter in progress when it starts below the fold (no snap for this jump: it would eat the peek)
+  requestAnimationFrame(() => {
+    fit();
+    const a = root.querySelector('.vpms-card.active');
+    if (a && a.offsetTop + a.offsetHeight > root.scrollTop + root.clientHeight - 8) {
+      root.style.scrollSnapType = 'none'; // until the player touches the list
+      root.scrollTop = a.offsetTop - 44; // peek of the row above says the list scrolls back up
+      const snapBack = () => { root.style.scrollSnapType = ''; };
+      root.addEventListener('pointerdown', snapBack, { once: true }); root.addEventListener('wheel', snapBack, { once: true, passive: true });
+    }
+    onScroll();
+  });
   root.addEventListener('click', (e) => {
+    if (e.target.closest('.vpms-more button')) { root.scrollBy({ top: root.clientHeight * 0.6, behavior: 'smooth' }); return; }
     const c = e.target.closest('.vpms-card'); if (!c) return;
     if (c.classList.contains('locked')) { c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); return; }
     ev.emit('map', c.dataset.id);

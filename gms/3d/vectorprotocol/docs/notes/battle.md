@@ -357,3 +357,115 @@ dpr 2 costs the same as 1.5 on M5, so the frame is submit/CPU-bound, not fill-bo
     camera (as in the ref) and step 0.35 m inward in the back column: idle gap 2-19 px. A fantasy-realm scale hook exists (theme.unitScale,
     battle_test `&fk=`), left at 1: at 1.12 the minotaur and wolves reach the rail. Bigger units need a layout change (see Requests).
 - NEXT: perf, scifi regression shot, final before/after/ref, in-game m6_l16 via ?dev=1.
+## Checkpoint 3 (battle-7 hand-back)
+- DONE since #2
+  - PERF FIX: the reach guard first used precise bboxes (skins every vertex: ~13 ms per skinned unit under load, so CPU went 2.5 -> 25-37 ms).
+    It now uses `fastBox` (battle.js): rigid parts = cached geometry box x matrixWorld, skinned meshes = ~400 strided skinned vertices (bones
+    alone missed REDLINE's chainblade by 1.85 m), every 2nd frame, only while a front/odFit unit lunges or overdrives. 12 units: 0.9-2.9 ms
+    for all; in practice ~0.1-0.3 ms. REDLINE re-verified: worst -0.02 m at the first OD frame (push ramping in), was -0.56.
+  - README: dark pool / `fx.noBloom`, tubes (`fx.tube`, `fx.roots`, `fx.entangle`), tube.js builder, pool budgets.
+  - Audio verified offline: cloak 0.5 s peak 0.14, decloak 0.45 s peak 0.13, forest bed peak 0.11 / rms 0.024 (quiet under the music).
+- Perf (M5 metal, 412x915, 12 units mid-fight, engine cpu median; load avg ~26-58 from other agents):
+  | config | cpu ms | calls | tris | fps |
+  |---|---|---|---|---|
+  | fantasy high | 4.2-4.5 | 115 | 234k | 60 |
+  | fantasy med (dpr 1.25) | 5.6 | 115 | 206k | 60 |
+  | fantasy low (dpr 1) | 3.9 | 99 | 117k | 60 |
+  | fantasy high charge=1 | 4.4 | 115 | 234k | 60 |
+  | scifi high | 5.1 | 166 | 300k | 60 |
+  | scifi high charge=1 | 5.2 | 166 | 299k | 60 |
+  Fantasy +1 call (vines/roots); dark + tube pools draw only while live. All under the 180-call budget.
+- Shots (scratch battle7/): before_after_ref.png (battle-6 | battle-7 | ref), after_412/390/1280.png, scifi_land.png (scifi regression +
+  915x412 landscape: fit works, the margins leave a small board), g7_b1/b2.png (in game, ?dev=1&fresh&god=1&onehit=1&level=m6_l16, no console
+  errors), tube_c.png (roots + entangles), dc.png (darkCore old vs new), lens_ab.png (VECTOR PRIME lens with noBloom), floor_cmp.png.
+- Honest look vs ref_fantasy_01: ~6.5/10 (was ~6). Better: big cracked slabs with dark joints, a real ruined ledge with roots + ferns, vines on
+  every wall, smoother canopies, a Rift you can see. Gaps: units are still smaller than the ref's chunky heroes (layout-bound, below); the floor
+  lacks the ref's gritty high-frequency texture and is lit flatter; the ledge is only ~25 CSS px tall between the floor and the strip; joints
+  could carry more moss/grass; canopies sit mostly under the top HUD.
+- Open issues
+  - Unit size: the side-button rail is the limit. With the fantasy roster, wolves touched the rail even at 1x; after the quadruped turn and the
+    0.35 m nudge, idle gaps are 2-19 px, but MINOTAUR's attack anims (sweep / leap to ~7.8 m) dip to -3..-12 px (p5 over a fight). Scaling fantasy
+    units 1.12x costs another ~10 px. Hook is in (theme.unitScale, FANTASY_UNIT_K = 1, battle_test `&fk=`).
+  - Tubes are not in the shadow map (they cast nothing) and not in the planar mirror (scifi); fine for roots and vines.
+  - The forest ambience starts on battle start(); if audio is still locked (no gesture yet) it is skipped for that battle.
+- Requests
+  - manager / ui: to grow units on the fantasy board we need horizontal room, e.g. side buttons a little higher (above the back-lane rows) or
+    narrower colX on fantasy. Then FANTASY_UNIT_K ~1.12 in themes/fantasy.js.
+  - sculptor-16 (SINGULARITY / VECTOR PRIME): `fx.noBloom(mat)` (or `markNoBloom` from js/fx/vfx.js in the model) on the lens billboard and the
+    blackHole() ShaderMaterial. Verified at runtime: core 0,5,32 -> 0,0,0 with the photon ring still glowing.
+  - sculptor-19 (TREANT) and the wolf/minotaur sculptors: `fx.roots` / `fx.entangle` / `fx.tube` are ready (README). MINOTAUR: keep attack
+    sweeps within ~0.5 model m sideways (they reach the side-button rail).
+  - audio (if anyone owns it again): `ambience` is a battle hook {theme}; add other themes' beds to forestAmbience's sibling if wanted.
+  - manager: new files js/fx/tube.js; battle.js `setSpeed` accepts 8 (ui-4).
+
+# BATTLE-L (landscape package, docs/LANDSCAPE.md §2)
+## Checkpoint 1
+- DONE (all syntax-checked): layout.js `LANE_PROFILES` + `applyLaneProfile(name)` (BOARD.laneZ/backShift hold the active profile;
+  scifi floor lattice pinned to the tall profile); camera.js `FRAME_WIDE` + `fitWide()` (w/h >= 1, pitch by aspect, slot-box fit,
+  shiftX via elements[8], bg camera same shiftX, seam rule bumps pitch); board.js `setHome`; battle.js `setLaneProfile/laneProfile`,
+  re-home tween, 4-side `setMargins`; overlay.js `setFrame` (--cx); engine `quality.maxPixels` cap; fantasy `wideUnitK` 1.12;
+  battle_test `?wide=1`, `&hud=1` (landscape mock 52/190/74), `?rot=N`, `&lanes=tall|wide`, `&still=1`.
+- Portrait proof: baseline tree (git show HEAD of my files) served from scratch :9414 vs current tree also served from :9414,
+  `still=1` (time frozen, overlay hidden): scifi 412x915 max diff 1/255, fantasy 412/390 0 px; camera + bg matrices identical
+  to 5 decimals. (8888 vs 9414 differ in MSAA edge resolve: an origin effect, not code.)
+- NEXT: landscape shots (test page), in-game real HUD clearance, rotation soak, perf, Q11 retry, in-game cpu 9.2 ms.
+## Checkpoint 2
+- DONE since #1: fitWide verified at all landscape sizes; backdrop camera in wide caps its horizontal fov (bgHFov 96) and drops its horizon
+  to 0.3 H (the seam is under the top HUD in landscape; the old formula gave a 125 deg smeared backdrop). Tall landscape (h 480..800)
+  blends the fit box toward the whole arena ("roomy"; 1920x1080 units 374 -> 301 px, whole floor + stands visible like ref_02).
+  D26 intro (camera.setIntro / battle playIntro, skipIntro, introActive, opts.intro; battle_test &nointro / &intro=0.5).
+  Fantasy wide: units x1.12 (`wideUnitK`), `frameWide.boxTop` 5.6 (treant/elf sage heads cleared the top HUD), forest flanks
+  (`theme.setWide`, 3 draws, hidden in portrait). Rotation soak (?rot=3, 16 s): same scene, sim tick never decreased, refit within the
+  frame of the change, profile flips each time, rotation mid-intro OK.
+- NEXT: Q11 import retry, in-game cpu 9.2 ms profile, final perf table, portrait re-diff, in-game 412/915 + nointro, report.
+## Checkpoint 3 (BATTLE-L hand-back)
+- DONE since #2
+  - Q11: `unitsModule()` retries js/actors/units.js 3x (300 / 900 ms backoff, cache-busting query on retries); a placeholder fallback
+    is not cached, so the next battle tries again.
+  - Wave 1 is spawned in `ready` (same deploy delays) and unit shaders are precompiled (`compileAsync`) while the intro plays: the
+    ~400 ms stall at the first frame / drop-in (precise-bbox fits in spawn) is gone (worst frame 440 -> 64 ms).
+  - Fantasy flanks are now forest-floor planes only (tree-line cards read as giant hedge walls from the intro pose).
+  - `skipIntro()` also has a 300 ms wall-clock deadline.
+- APIs (as implemented)
+  - `createBattleScene(engine, {..., margins:{top,bottom,left?,right?}, laneProfile?:'tall'|'wide' (pins it), intro?: true|{strength}})`
+  - `scene.setMargins({top, bottom, left?, right?})`: CSS px; landscape fits between left/right bands, portrait ignores left/right.
+  - `scene.setLaneProfile('tall'|'wide', {animate=true})`, `scene.laneProfile`. resize() flips it by aspect (w/h >= 1) unless pinned.
+  - `scene.overlay.setFrame({left, right})`: OD callout / OVERTIME plate / banners centre on the board band (setMargins calls it).
+  - D26: `scene.playIntro({strength})` -> Promise; `scene.skipIntro()` -> Promise (ends in ~0.25 s); `scene.introActive` (true from
+    creation when opts.intro). No sim ticks or queued events during the intro; drop-ins overlap its last 0.5 s. Duration 2.6 + 0.8 *
+    strength s (default strength 1 wide, 0.6 portrait). Survives rotation (pose is an offset from the refitted camera).
+  - `engine.quality.maxPixels` (high 2.4e6 / med 1.6e6 / low 1.0e6; `?maxpx=`), applied in engine.resize.
+  - camera.js: `FRAME_WIDE` (pitch(aspect), box, roomyH, bgHFov, bgHorizon, seam rule), `FRAME_INTRO`, rig.setIntro(k, s), rig.refit().
+  - Themes may export `setWide(bool)`, `wideUnitK`, `frameWide: {boxTop}`.
+  - battle_test: `?wide=1 [&hud=1]`, `&m=top,bottom,left,right`, `?rot=N`, `&lanes=`, `&nointro`, `&intro=0.5`, `&still=1`, `&boxTop=`,
+    `&bgHorizon=`, `&bgHFov=`.
+- Acceptance (battle_test 6v6 with the real HUD margins measured in game; idle; px CSS)
+  | size | margins t/b/l/r | avg unit h | side gap idle L/R | mid-fight min L/R | far heads vs top |
+  |---|---|---|---|---|---|
+  | 915x412 scifi | 50/4/178/66 | 129 (portrait 122) | 137 / 111 | 22 / 52 | +15 |
+  | 844x390 scifi | 50/4/167/66 | 121 (portrait 114) | 120 / 95 | 18 / 41 | +14 |
+  | 915x360 | 50/4/153/66 | 111 | 180 / 158 | 85 / 109 | +14 |
+  | 844x340 | 50/4/144/66 | 103 | 161 / 140 | 76 / 95 | +13 |
+  | 960x412 | 50/4/178/66 | 129 | 160 / 134 | 46 / 74 | +15 |
+  | 740x360 | 50/4/153/66 | 110 | 93 / 70 | -3 / 21 | +14 |
+  | 915x412 fantasy (k 1.12, boxTop 5.6) | 50/4/178/66 | 139 | - | - | +7 |
+  (the top intrusion during fights is the Overdrive camera push, by design.)
+- Perf (M5 metal, 6v6 mid-fight, engine cpu): portrait scifi 2.4 ms / 162 calls; landscape 915x412 scifi 2.6 / 170; portrait fantasy
+  2.4 / 115; landscape fantasy 2.6 / 118; 1280x800 2.9 / 170 (2.40 Mpx, dpr 1.53); 1920x1080 3.0 / 170 (2.40 Mpx, dpr 1.08);
+  2560x1080 2.9 / 170 (dpr 0.93). In game m8_l15 412x915: 3.1 ms / 158 calls (QA's 9.2 ms did not reproduce; the profile shows
+  three.js matrix updates + render, no HUD hot spot).
+- Portrait proof: camera + backdrop matrices identical to baseline (5 decimals) at 412x915 and 390x844, both themes. Pixel diffs:
+  0 px or max 1/255 in most runs; some runs show edge-only differences (MSAA resolve), which also appear between two runs of the
+  identical baseline build. Interior pixels are identical.
+- Shots (scratch battleL/): w2.png, hz.png (backdrop horizon), in_sheet.png (intro), d_1920.png (desktop), fl3.png / fi_sheet.png
+  (fantasy wide + intro), game_sheet.png (in game: fantasy + scifi intro and fight at 915x412), g_m1_l3_*.png (all sizes, real HUD),
+  gi_m1_l3_412x915.png (portrait intro), c_*.png (clearance runs).
+- Open issues
+  - Fantasy wide surroundings are plain: forest-floor flanks only; the intro shows a flat green ground to a misty horizon. A real
+    forest flank (instanced trees beyond the side walls) is the next look task.
+  - Landscape scifi draws +8 calls vs portrait (more stands/backdrop in view); spec said +5. Still under 180.
+  - The OD callout can overlap far-lane heads in landscape (it sits right under the top cluster); short-lived.
+  - Re-home tween peaks at ~0.48 m/frame for a back-far unit (6.6 m in 0.35 s); busy units wait up to 1.5 s.
+- Requests
+  - ui: none blocking. All APIs above are live; margins are honoured as measured from hud.margins().
+  - manager: no new files or vendored addons this round.

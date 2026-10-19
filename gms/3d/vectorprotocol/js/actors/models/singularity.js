@@ -17,6 +17,7 @@
 // (spins in post), aux3 (chest) = core sphere + gimbal (spins; scaled in tick for swell/collapse), aux0 (chest) = back engine
 // + R5 V, aux1 (head) = crown. Tail = thighL/shinL/footL (hipX 0); the R leg chain carries no geometry.
 import { THREE, plate, fin, LIB, PI, BI } from '../kit.js';
+import { markNoBloom } from '../../fx/vfx.js';
 
 const L = LIB;
 const SIDES = ['L', 'R'];
@@ -449,6 +450,7 @@ function lensFor(unit) {
       uRing: { value: new THREE.Color(...(R5 ? [0.35, 1.5, 1.9] : [1.9, 1.25, 0.45])) }, uOuter: { value: new THREE.Color(...(R5 ? [0.8, 0.22, 1.6] : [1.0, 0.35, 1.5])) } },
     vertexShader: LENS_VS, fragmentShader: LENS_FS, transparent: true, depthWrite: false,
   }));
+  markNoBloom(m.material);
   m.frustumCulled = false; m.renderOrder = 7; m.castShadow = false; m.name = 'singularity-lens';
   unit.bones[BI.aux3].add(m);
   const dis = unit.dispose.bind(unit);

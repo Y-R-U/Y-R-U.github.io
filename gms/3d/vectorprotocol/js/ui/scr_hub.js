@@ -1,4 +1,4 @@
-import { h } from './dom.js';
+import { h, fmt } from './dom.js';
 import { icon } from './icons.js';
 import { load } from '../app/modules.js';
 import { maps, levelById, data } from '../app/data.js';
@@ -93,6 +93,16 @@ export async function mount(root, ctx) {
   };
   const offOrient = orient.on(() => { layout(); requestAnimationFrame(layout); });
   requestAnimationFrame(layout);
+  // sim-4: a squad unit has its rank-up shards but credits are short -> one notice per unit and rank per session
+  const told = (ctx.session.rankSave ||= new Set());
+  for (const v of store.squad()) {
+    const rc = store.rankUpCost(v.uid), cr = store.state.cur.credits || 0;
+    const key = v.uid + ':' + v.rank;
+    if (!rc || told.has(key) || (v.shards || 0) < rc.shards || cr >= rc.credits) continue;
+    told.add(key);
+    setTimeout(() => ctx.toast('Save credits for a rank-up', 'gold', 4.5, { icon: 'credits', sub: v.name + ' has the shards; ' + fmt(rc.credits - cr) + ' more credits to rank it up.' }), 1200);
+    break;
+  }
   // upgrade loop: once the first contract has paid out scrap, point at the Barracks
   if (store.levelStars('m1_l1') && (store.state.cur?.scrap || 0) > 0)
     hint(store, 'barracks', dock.querySelector('[data-feature="squad"]'), 'Contracts pay out scrap. Spend it in the Barracks to level up your robots: tougher contracts need stronger squads.', { delay: 900 });

@@ -31,8 +31,17 @@ export function mount(root, ctx) {
     h('div.ar-shop', (data().arena?.shop || []).map((s) => h('div.ar-item.vp-panel.dim', h('b', s.name || s.id), btn(String(s.cost.arena_tokens), async () => {
       let choice;
       if (s.item.shardsChoice) {
-        const opts = store.roster().sort((a, b) => b.power - a.power).slice(0, 4);
-        choice = await ctx.modal({ title: 'Shards for…', body: 'Pick the unit that receives ' + s.item.shardsChoice + ' shards.', actions: opts.map((u) => ({ label: u.name, value: u.id })) });
+        // every owned unit, strongest first, as a scrolling list (QA Q8: the old button row showed 4 and ran off-screen)
+        const opts = store.roster().sort((a, b) => b.power - a.power);
+        let pick = null;
+        const list = h('div.pick-list', opts.map((u) => h('button.pick-row', { type: 'button', onclick: () => { pick = u.id; done?.(u.id); } },
+          roleBadge(u.role), h('b.grow', u.name), h('small.t-muted', 'Lv' + u.level + ' · ' + fmt(u.power) + ' PWR'))));
+        let done = null;
+        const pr = ctx.modal({ title: 'Shards for…', body: h('div.col', h('small.t-muted', 'Pick the unit that receives ' + s.item.shardsChoice + ' shards.'), list),
+          actions: [{ label: 'Cancel', value: null }], cls: 'pick' });
+        done = () => document.querySelector('.vp-modal.pick')?.closest('.vp-modal-wrap')?.click();
+        await pr;
+        choice = pick;
         if (!choice) return;
       }
       const r = store.buyArena(s.id, choice);

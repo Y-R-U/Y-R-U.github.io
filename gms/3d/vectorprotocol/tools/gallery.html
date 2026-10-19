@@ -240,8 +240,23 @@ if (view === 'lineup') {
   E.forEach((id, s) => put('enemy', id, s));
   floorMat.map.repeat.set(10, 10);
 } else if (view === 'turntable') {
-  sceneObj = createTurntable(engine || { renderer: R, env }, { model, rarity: pick('rarity'), faction: pick('faction'), quality: q });
-  G.units.push(sceneObj.unit);
+  const rk = Q.get('rank') !== null ? { rank: +Q.get('rank') } : {};
+  sceneObj = createTurntable(engine || { renderer: R, env }, { model, rarity: pick('rarity'), faction: pick('faction'), quality: q, ...rk });
+  G.units.push(sceneObj.unit); G.turntable = sceneObj;
+  // &ui=0 shows the raw frame; default mimics scr_unit.js (zoom + setViewOffset, subject in the top stage) + a stage guide box
+  if (Q.get('ui') !== '0') {
+    const r0 = sceneObj.resize.bind(sceneObj);
+    sceneObj.resize = (w, hh) => {
+      r0(w, hh); const cam = sceneObj.camera;
+      if (w / hh >= 1) { cam.zoom = 0.85; cam.setViewOffset(w, hh, w * 0.27, -hh * 0.03, w, hh); }
+      else { cam.zoom = 0.6; cam.setViewOffset(w, hh, 0, hh * 0.27, w, hh); }
+      cam.updateProjectionMatrix();
+      let g = document.getElementById('stageGuide');
+      if (!g) { g = document.createElement('div'); g.id = 'stageGuide'; document.body.appendChild(g); }
+      g.style.cssText = w / hh >= 1 ? 'position:fixed;left:0;top:64px;width:46%;bottom:0;border:1px dashed #5f5;pointer-events:none;z-index:3'
+        : 'position:fixed;left:10px;right:10px;top:64px;height:' + Math.round(hh * 0.376) + 'px;border:1px dashed #5f5;pointer-events:none;z-index:3';
+    };
+  }
 } else if (view === 'portraits') {
   const wrap = document.createElement('div');
   wrap.style.cssText = 'position:fixed;inset:0;display:flex;flex-wrap:wrap;gap:8px;padding:8px;background:#05070e;overflow:auto;z-index:2';
@@ -260,6 +275,7 @@ function resize() {
   if (engine) engine.resize(); else R.setSize(w, h, false);
   const c = sceneObj ? sceneObj.camera : camera;
   if (G.battleCam) G.battleCam.resize(w, h);
+  else if (sceneObj?.resize) sceneObj.resize(w, h);
   else { c.aspect = w / h; c.updateProjectionMatrix(); }
   mirror?.setSize?.(R.getDrawingBufferSize(new THREE.Vector2()).x, R.getDrawingBufferSize(new THREE.Vector2()).y);
 }

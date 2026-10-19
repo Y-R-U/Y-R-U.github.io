@@ -202,7 +202,7 @@ const anims = {
 
 export default {
   id: 'wisp', name: 'WISP', role: 'mage', faction: 'experimental', rarity: 'common', realm: 'scifi',
-  rig: 'hover', dims: DIMS, height: 1.15, radius: 0.44, bodyScale: [1.5, 1.5, 1.5], walkSpeed: 1.3, scheme: 'bold',
+  rig: 'hover', dims: DIMS, height: 1.35, radius: 0.48, bodyScale: [1.8, 1.8, 1.8], walkSpeed: 1.3, scheme: 'bold',
   style: { weapon: 'orbs' },
   glow2: 0xf6eaff,
   mats: { all: { glow2: { color: 0xe6c0ff, ei: 2.0 }, metal: { color: 0x0c0a12, metal: 0.4, rough: 0.08, env: 1.2, panel: { groove: 0 } }, paint: { rough: 0.25 } } },

@@ -92,6 +92,7 @@ UI: max 4 status icons above the HP bar (CC first); CC also rings the base plate
 
 ## 8. Waves, win, stars
 - Win: all waves cleared. Lose: squad wiped, or a wave times out.
+- **Mutual KO** (sim-4): if your last unit and the final wave's last enemy fall on the same tick, it's a **win** (0 survivors, so only the *win* goal). A wipe while waves are still to come is a loss: nobody is left to fight them.
 - **Squad integrity** (top bars) = Σ hp / Σ max hp of that side (enemy bar resets each wave).
 - Stars = **3 goals per level** (sim-2): goal 1 is always *win*; goals 2–3 are replay challenges (no unit lost, win in ≤ N s, win with ≤ K units, win without a role, win with 3+ units of a faction, finish with ≥ X% integrity). Each goal is earned **once and independently**, and each first completion pays a small reward (`goalRewards`). Every map has **3 star chests** at ~50/75/100% of its stars (chips, Overclock Cores, a card at 100%). Goals are generated in `js/data/maps.js` (`goalsFor`); time limits come from `node js/data/_gen_star_times.mjs`. Levels without `goals` fall back to the old rule (★ win, ★★ ≤ 1 lost, ★★★ no losses).
 

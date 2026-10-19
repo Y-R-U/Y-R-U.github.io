@@ -2,11 +2,11 @@
 // Adapted from HEIRFRAME's engine/quality.js.
 export const TIERS = {
   high: { name: 'high', dprMax: 1.5, dprDesktop: 1.75, shadowMap: 1024, shadowSoft: true, msaa: 4, bloom: true, bloomDiv: 4,
-          reflect: 0.5, envSize: 256, crowd: 1, particles: 1400, skyline: 1, craft: 12, holoDetail: 1 },
+          reflect: 0.5, maxPixels: 2.4e6, envSize: 256, crowd: 1, particles: 1400, skyline: 1, craft: 12, holoDetail: 1 },
   med:  { name: 'med', dprMax: 1.25, dprDesktop: 1.25, shadowMap: 1024, shadowSoft: false, msaa: 0, bloom: true, bloomDiv: 4,
-          reflect: 0.33, envSize: 128, crowd: 0.6, particles: 900, skyline: 0.7, craft: 7, holoDetail: 0.6 },
+          reflect: 0.33, maxPixels: 1.6e6, envSize: 128, crowd: 0.6, particles: 900, skyline: 0.7, craft: 7, holoDetail: 0.6 },
   low:  { name: 'low', dprMax: 1.0, dprDesktop: 1.0, shadowMap: 0, shadowSoft: false, msaa: 0, bloom: false, bloomDiv: 2,
-          reflect: 0, envSize: 64, crowd: 0.35, particles: 500, skyline: 0.45, craft: 2, holoDetail: 0.3 },
+          reflect: 0, maxPixels: 1.0e6, envSize: 64, crowd: 0.35, particles: 500, skyline: 0.45, craft: 2, holoDetail: 0.3 },
 };
 
 let gpuCache = null;
@@ -57,6 +57,7 @@ export function detectQuality(flag) {
   if (num('bloomdiv') !== null) tier.bloomDiv = Math.max(2, num('bloomdiv'));
   if (num('shadow') !== null) tier.shadowMap = num('shadow');
   if (num('reflect') !== null) tier.reflect = num('reflect');
+  if (num('maxpx') !== null) tier.maxPixels = num('maxpx') * (num('maxpx') < 100 ? 1e6 : 1); // ?maxpx=2.4 (Mpx)
   const dpr = window.devicePixelRatio || 1;
   tier.dpr = Math.min(dpr, isMobile ? tier.dprMax : tier.dprDesktop);
   if (num('dpr') !== null) tier.dpr = Math.min(dpr, num('dpr'));

@@ -789,3 +789,39 @@
 /* QA Q1: board hexes own the touch (drag a unit); the body scrolls from everywhere else */
 .fm-hex[data-side="mine"] { touch-action: none; }
 .fm-ghost, .fm-ghost * { pointer-events: none !important; }   /* hit-testing under the finger must reach the hex */
+
+/* ui-L: two-column wrappers for landscape (css/landscape.css); in portrait they vanish, so the old single column is unchanged */
+.l2-a, .l2-b { display: contents; }
+
+/* ui-L / QA round: tap targets >= 44 px (Q15), arena shard picker list (Q8). Login badge (A3): reserved on every top-bar screen (topbar.js);
+   the portrait battle HUD keeps its full width (the avatar is never shown in battle and the integrity labels would truncate). */
+.st-seg button { min-width: 44px; min-height: 44px; }
+.vp-btn.sm, .up-acts .vp-btn.sm, .ab-row .vp-btn.sm { min-height: 44px; }
+.ev-tier .vp-btn { min-width: 44px; min-height: 44px; }
+.vp-modal.pick .acts { justify-content: center; }
+.pick-list { display: flex; flex-direction: column; gap: 4px; }
+.pick-row { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 4px 12px 4px 6px; border: 0; cursor: pointer; text-align: left;
+  color: var(--text); font: 600 15px var(--font); background: #06183acc; box-shadow: inset 0 0 0 1px #16406b; }
+.pick-row:active { background: #0e4f8a; }
+.pick-row b { letter-spacing: .06em; text-transform: uppercase; font-size: 14px; }
+/* roster pinned above ENGAGE (outside .fm-body); the body above it scrolls on short screens */
+.scr-formation > .fm-bench-wrap { flex: none; margin-top: 0; }
+.scr-formation > .fm-body { flex: 1 1 auto; }
+.scr-formation > .fm-bench-wrap > .vp-kicker { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* "content scrolls, action bar pinned" everywhere (manager, S22 URL-bar heights): level-sheet Deploy and unit Level/Rank stay in view */
+.lvl-card > #lvl-deploy { position: sticky; bottom: 0; z-index: 2; flex: none; }
+.scr-unit .up-acts { order: 9; position: sticky; bottom: calc(-14px - var(--sab)); z-index: 2; margin: 0 -14px; padding: 8px 14px calc(var(--sab) + 14px);
+  background: linear-gradient(180deg, #040d20e0, #040d20 30%); }
+.scr-unit .up-sheet > * { flex: none; }
+
+/* D26 battle intro: SKIP / DON'T SHOW AGAIN (bottom-right, clear of the board centre and the badge corner); HUD eases in after */
+.bi-bar { position: absolute; z-index: 6; right: calc(var(--sar) + 8px); bottom: 160px; display: flex; gap: 6px; pointer-events: auto; animation: fadeIn .3s; }
+.bi-bar .vp-btn.sm { min-height: 44px; font-size: 11.5px; padding: 0 12px; }
+.bi-bar .bi-never { --bc: #4b6c8f; color: var(--text-2); }
+.hud > .hud-top, .hud > .hud-strip, .hud > .hud-right, .hud > .hud-left { transition: opacity .6s ease-out; }
+.hud.intro > .hud-top, .hud.intro > .hud-strip, .hud.intro > .hud-right, .hud.intro > .hud-left { opacity: .3; }
+.hud-cheats { position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--sat) + 56px); padding: 2px 8px; font: 800 9.5px var(--font); letter-spacing: .14em;
+  text-transform: uppercase; color: #1a1204; background: #ffd27acc; pointer-events: none; }
+/* portraits loading progressively (js/ui/portraits.js): the role-icon placeholder breathes until the render lands */
+.pt-wait .ph { animation: ptWait 1.3s ease-in-out infinite; }
+@keyframes ptWait { 50% { opacity: .25; } }

@@ -8,7 +8,12 @@ Screens: scratchpad qa/*.png. Base URL http://localhost:8888/gms/3d/vectorprotoc
 - DONE: Aaron's phone findings checked (A1 confirmed + 2 more of the same class). Real play m1_l1..l4 (fresh save, touch): story scenes, hints, Barracks level-up, save survives reload (slots/stars/hash #/hub).
 - DONE: all 8 bosses won in dev (god+onehit) at 412x915 touch: Big Rusty, Redline, Corona, Stormcrow, The Choir, Elderbark (fantasy ruins + stone HUD), Aurelian, Vector Prime. 0 console errors, 3/3 stars, results OK. Music: map->boss->hub per route.
   Recruit x1/x10 on all 7 banners incl. Rift Gate (no errors). Arena fight + shop, Special Ops, Raid: Dreadnought won. HQ/settings/events/chapters audited.
-- NEXT: unit profile every unit, perf, landscape/back-forward/background, 1280 desktop.
+- DONE: all 44 unit profiles (spin, Level up, Rank up, Convert; contact sheets sheet0.png/sheet1.png), perf (battle_test q=high/med/low + real m8_l15),
+  back/forward mid-battle, background (frozen + hidden) mid-battle, landscape phone, 1280x800 desktop, 390x844 spot check.
+- Pass complete (hand-back). Counts: 0 blocker · 7 major open (+1 major fixed during the pass) · 15 minor · 7 polish.
+- Env note: the :8888 python static server intermittently times out under multi-agent load (ERR_CONNECTION_TIMED_OUT on single module files);
+  that is the trigger for Q11, not a game bug by itself. Also: `Page.setWebLifecycleState frozen` wedged my headless tab so later boots hit the
+  20 s "Uplink failed" watchdog - a test artefact, ignore; fresh browser booted in 9.4 s (cache off) / 0.8 s (cached).
 
 ## Bugs
 
@@ -27,7 +32,7 @@ Screens: scratchpad qa/*.png. Base URL http://localhost:8888/gms/3d/vectorprotoc
   - A3 note: top-right is occupied by currencies (hub/topbar) and the ENEMY SQUAD INTEGRITY bar (battle) - both need to shift for a badge.
 
 ### QA findings
-- Q1 [MAJOR, ui] **Formation drag & drop does not work on touch; dragging a placed unit REMOVES it from the board.**
+- Q1 [MAJOR, ui] **FIXED - re-verified 20:55: `.fm-hex` now computes `touch-action: none`; board->board and roster->board touch drags both work.** Original: **Formation drag & drop does not work on touch; dragging a placed unit REMOVES it from the board.**
   Repro: 412x915 touch, `#/formation/m1_l1`, touch-drag the Gunner from back-mid hex to back-near hex.
   Expected: unit moves. Actual: browser fires `pointercancel` straight after pointerdown+move (html/body are `touch-action: manipulation`, hexes compute `auto`, so the browser claims the pan);
   `up()` in scr_formation.js dragSource runs on pointercancel with `ghost` set and `over` null -> "dragged off the board = bench it" -> unit is benched.
@@ -48,3 +53,12 @@ Screens: scratchpad qa/*.png. Base URL http://localhost:8888/gms/3d/vectorprotoc
 - Q13 [polish, audio] Elderbark (m6 fantasy boss) plays the sci-fi `boss` track; m6 normal levels get `rift`. Intentional per audio.js (boss wins) but the ruins boss would suit a fantasy boss cue.
 - Q14 [polish, ui] Rift Gate x10 reveal uses the sci-fi cyan card frames under the stone/gold header; "HORDE SHAM..." name truncates. r_pull7.png.
 - Q15 [polish, ui] Tap targets under 44 px: Settings segmented buttons 40x36 (Low/Med/High, x1/x2/x4, On/Off), Events GO buttons 41x40, Arena/Formation sm buttons 40 tall, hub labels 36 tall. Fullscreen button sits at x=362 on most screens but x=316 on hub/settings (ui-5 in flight).
+- Q16 [major, ui] Android back / browser back during a battle silently leaves it: `#/battle` -> `#/formation/m2_l3`, no "Retreat?" confirm, the fight is just gone. Then Forward goes to `#/map/2` (not back to the battle), so history is inconsistent. Repro: hub -> map 2 -> node -> Deploy -> Engage, then `history.back()` 3 s in. nav_back_battle.png. Expected: back opens the pause/retreat sheet (same as the menu button) and the route stays on #/battle until confirmed.
+- Q17 [major, battle+ui, D24 landscape in flight] Landscape phone 915x412 touch, mid-battle rotate: no rotate hint, HUD moves into side columns but the battle camera shows only the stands - the board and all units are below the frame (land_battle.png). 1280x800 desktop is now a full-width landscape layout: battle camera is far too close, units fill the middle and a near unit covers the bottom centre (d1280_battle.png - that run also had placeholder units from Q11). LANDSCAPE.md BATTLE-L work has not landed; rotating mid-battle should at least re-fit.
+- Q18 [minor, ui] Unit profile: RANK UP button is gold/enabled before the unit reaches its level cap; tapping gives "Reach the level cap first". CONVERT spends all surplus shards immediately with no confirm (e.g. "+690 chips from 230 shards" on a legendary). Disable Rank up below cap; confirm Convert. All 44 units, no console errors.
+- Q19 [minor, robots] Profile turntable framing (createTurntable): Tarantula overflows the stage on both sides and its plate is hidden (units/u19_tarantula.png); Rattler, Needle and Wisp plates are cut at the frame edge; hovering units (Needle, Prism, Wisp, Specter) float far above an oversized plate. Every one of the 44 models renders (no placeholders) - sheet0.png / sheet1.png.
+- Q20 [minor, perf, ui] Cold boot loads 124 JS modules / ~4 MB unbundled; locally with cache off it took 9.4 s, and model files (paragon/seraph/arbiter/...) each waited ~5 s in the request queue. On a phone over LAN/4G that can cross the 20 s boot watchdog, which fails on wall-clock even while modules are still arriving. Consider: watchdog fails only when progress stalls, and lazy-load unit model files.
+- Q21 [minor, perf, battle] Real m8_l15 battle on high: 60 fps, 153 calls, 302k tris, but **cpu 9.2 ms/frame** vs 4.8 ms for a heavier 6v6 in tools/battle_test (?perf=1: high 162 calls/389k tris/4.8 ms; med 163/320k/4.7 ms; low 126/110k/4.5 ms; real low 114/92k/3.8 ms). The in-game extra ~4 ms (DOM HUD/overlay?) is the thing to watch on the S22. M5 numbers, GPU shared with other agents.
+- Q22 [polish] tools/battle_test.html requests /favicon.ico -> 404 in the console.
+- Q23 [minor, ui] Background mid-battle: the fight correctly stops (frozen 5 s / hidden 4 s, integrity unchanged, audio ctx suspended) but no pause sheet is shown on return - the battle resumes instantly. Opening the pause menu on visibility return would be kinder on phones.
+- Checked OK: save survives reload; slot 3 at m1_l5 / slot 5 at m3_l14 per MAPS.md (dev clears); Patch joins on m1_l3 first clear (NEW RECRUIT on results); workshop unlocks after m1_l2 (store.isUnlocked); fantasy arena + stone HUD on m6; boss music; recruit x1/x10 all 7 banners; arena win (+15 rating, tokens); raid win; settings sliders/toggles render; every unit card in Barracks has a 256 px portrait.

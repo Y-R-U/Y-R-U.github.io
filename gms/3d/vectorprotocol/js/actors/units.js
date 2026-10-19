@@ -178,12 +178,15 @@ export function createUnit({ model = 'bulwark', rarity, faction, rank, seed = 1,
   }
 
   // ---- shield bubble (contract setShield) — optional permanent aura
-  let shield = null, shieldV = M.aura ? M.aura : 0, shieldShown = 0;
+  // def.aura scales with rank like every other rank cue (R0 x0.55 .. R5 x1.2, bubble swells ~2%/rank); a function aura(rank) overrides
+  const auraV = typeof M.aura === 'function' ? M.aura(rank) || 0 : (M.aura || 0) * [0.55, 0.7, 0.85, 1, 1.1, 1.2][rank];
+  let shield = null, shieldV = auraV, shieldShown = 0;
   function ensureShield() {
     if (shield) return shield;
     const g = new THREE.IcosahedronGeometry(1, quality === 'low' ? 2 : 3);
     shield = new THREE.Mesh(g, shieldMat(M.auraColor ?? palette.glow));
-    shield.scale.set(M.radius * 1.55, M.height * 0.68, M.radius * 1.55);
+    const sw = auraV ? 1 + 0.02 * rank : 1;
+    shield.scale.set(M.radius * 1.55 * sw, M.height * 0.68 * sw, M.radius * 1.55 * sw);
     shield.position.y = M.height * 0.52;
     shield.renderOrder = 5;
     shield.castShadow = false;
@@ -296,7 +299,7 @@ export function createUnit({ model = 'bulwark', rarity, faction, rank, seed = 1,
     mirrorSide: M.mirrorSide || null,
     // One-shot EMP blackout: lights stutter off for `dur` seconds, then come back (on top of setPowerScale).
     flickerPower(dur = 1, { min = 0.03 } = {}) { flick = { t: 0, dur, min }; },
-    setShield(v) { shieldV = Math.max(M.aura || 0, Math.min(1, v)); if (shieldV > 0) ensureShield(); },
+    setShield(v) { shieldV = Math.max(auraV, Math.min(1, v || 0)); if (shieldV > 0) ensureShield(); },
     onEvent(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     update(dt) {
       dt = Math.min(dt, 0.1);

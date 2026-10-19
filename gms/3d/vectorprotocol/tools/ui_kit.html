@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>VECTOR PROTOCOL — UI kit</title>
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="../css/vp.css">
 <link rel="stylesheet" href="../css/screens.css">
+<link rel="stylesheet" href="../css/hud_fantasy.css">
+<link rel="stylesheet" href="../css/landscape.css">
 <style>
   html, body { overflow: auto; height: auto; }
   body { padding: 16px; background: radial-gradient(ellipse at 50% 0%, #0b2148, #02040b 60%); min-height: 100vh; }
@@ -15,7 +17,12 @@
   section { display: flex; flex-direction: column; gap: 10px; }
   .demo { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .swatch { width: 92px; height: 54px; display: flex; align-items: flex-end; padding: 4px 6px; font: 700 11px var(--font); letter-spacing: .1em; text-transform: uppercase; color: #021019; clip-path: var(--chamfer); --cut: 8px; }
-  .phone { position: relative; width: 390px; height: 300px; overflow: hidden; background: linear-gradient(180deg, #030914, #0a2550); box-shadow: 0 0 0 1px #1c4c80; }
+  .phone { position: relative; width: 390px; height: 300px; overflow: hidden; background: linear-gradient(180deg, #030914, #0a2550); box-shadow: 0 0 0 1px #1c4c80;
+    container-type: size; container-name: app; }
+  .phone.fantasy-bg { background: linear-gradient(180deg, #1a1d12, #3a3524 60%, #22301a); }
+  html[data-orient=landscape] .phone { width: 844px; height: 390px; max-width: 100%; }
+  html[data-orient=landscape] main { max-width: 900px; }
+  .kit-orient { position: fixed; right: 16px; top: 16px; z-index: 90; }
   #overlay-root { position: fixed; inset: 0; pointer-events: none; }
   #overlay-root > * { pointer-events: auto; }
 </style>
@@ -84,7 +91,28 @@ const phone2 = h('div.phone');
 sec('Battle HUD · 2-unit squad, 3 slots open (empty + locked frames keep the row full)', phone2);
 const hud2 = createHud(phone2, { slots: 3 });
 hud2.update({ wave: 1, waves: 3, auto: true, player: { integrity: 1, units: units.slice(0, 2).map((u, i) => mk(i, u)) }, enemy: { integrity: 1 } });
-window.__uikit = { ready: true };
+// ui-5 leftover: the fantasy HUD (css/hud_fantasy.css, createHud({theme:'fantasy'}), stone/gold for m6+ ruins battles)
+const fant = [
+  { name: 'Knight', role: 'tank', faction: 'order', rarity: 'rare', level: 30, stars: 2 },
+  { name: 'Elf Ranger', role: 'archer', faction: 'wild', rarity: 'epic', level: 30, stars: 3 },
+  { name: 'Treant Shaman', role: 'mage', faction: 'wild', rarity: 'legendary', level: 31, stars: 4 },
+];
+const phone3 = h('div.phone.fantasy-bg');
+sec('Battle HUD · fantasy theme (m6+ ruins)', phone3);
+const hud3 = createHud(phone3, { slots: 5, theme: 'fantasy' });
+hud3.update({ wave: 2, waves: 3, auto: true, player: { integrity: 0.74, units: fant.map((u, i) => ({ ...mk(i, u), hpPct: 0.55 + i * 0.15, chargePct: 0.3 * i, slot: { col: i % 2, lane: i } })) }, enemy: { integrity: 0.41 } });
+// landscape preview (docs/LANDSCAPE.md): every HUD demo switches to its 844x390 landscape layout (2x3 card grid + right rail)
+const huds = [hud, hud2, hud3];
+const setOrient = (land) => {
+  const r = document.documentElement;
+  r.dataset.orient = land ? 'landscape' : 'portrait'; r.dataset.form = 'phone'; r.classList.toggle('l-short', land);
+  huds.forEach((x) => x.setMode(land ? 'landscape' : 'portrait'));
+  orientBtn.querySelector('span:last-child').textContent = land ? 'Portrait' : 'Landscape';
+};
+const orientBtn = btn('Landscape', () => setOrient(document.documentElement.dataset.orient !== 'landscape'), { cls: 'sm kit-orient', icon: 'fs_enter' });
+document.body.appendChild(orientBtn);
+if (new URLSearchParams(location.search).get('orient') === 'landscape') setOrient(true);
+window.__uikit = { ready: true, setOrient };
 </script>
 </body>
 </html>

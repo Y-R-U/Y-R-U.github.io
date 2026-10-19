@@ -33,14 +33,14 @@ const CSS = `
 .vpb-bar .note.on{opacity:1}
 .vpb-od{position:absolute;top:70px;max-width:94%;padding:5px 12px 6px;background:linear-gradient(90deg,rgba(4,10,26,.92),rgba(4,10,26,.72));
   border:1px solid currentColor;box-shadow:0 0 12px currentColor,inset 0 0 10px rgba(0,0,0,.6);opacity:0;pointer-events:none}
-.vpb-od{left:50%;text-align:center;--x0:-160%;transform:translateX(var(--x0))}
+.vpb-od{left:var(--cx,50%);text-align:center;--x0:-160%;transform:translateX(var(--x0))}
 .vpb-od.player{border-left-width:4px}
 .vpb-od.enemy{border-right-width:4px;--x0:60%}
 .vpb-od .s{font-size:9px;letter-spacing:.18em;color:#9fc8ff;white-space:nowrap}
 .vpb-od .t{font-size:16px;font-weight:900;letter-spacing:.08em;color:#fff;white-space:nowrap}
 .vpb-od.go{animation:vpbOd 2.1s cubic-bezier(.2,.9,.3,1) forwards}
 @keyframes vpbOd{0%{opacity:0}10%{opacity:1;transform:translateX(-50%)}82%{opacity:1;transform:translateX(-50%)}100%{opacity:0;transform:translateX(-50%)}}
-.vpb-ot{position:absolute;left:50%;transform:translateX(-50%) scale(.8);padding:2px 12px 3px;font-size:11px;font-weight:900;letter-spacing:.32em;color:#ffd0d0;background:linear-gradient(90deg,rgba(60,0,8,0),rgba(90,6,16,.85) 20%,rgba(90,6,16,.85) 80%,rgba(60,0,8,0));border-top:1px solid #ff3a4a;border-bottom:1px solid #ff3a4a;text-shadow:0 0 8px #ff2030;opacity:0;transition:opacity .4s,transform .4s;pointer-events:none;white-space:nowrap}
+.vpb-ot{position:absolute;left:var(--cx,50%);transform:translateX(-50%) scale(.8);padding:2px 12px 3px;font-size:11px;font-weight:900;letter-spacing:.32em;color:#ffd0d0;background:linear-gradient(90deg,rgba(60,0,8,0),rgba(90,6,16,.85) 20%,rgba(90,6,16,.85) 80%,rgba(60,0,8,0));border-top:1px solid #ff3a4a;border-bottom:1px solid #ff3a4a;text-shadow:0 0 8px #ff2030;opacity:0;transition:opacity .4s,transform .4s;pointer-events:none;white-space:nowrap}
 .vpb-ot.on{opacity:1;transform:translateX(-50%) scale(1);animation:vpbOt 1.1s ease-in-out infinite}
 .vpb-ot small{font-size:9px;letter-spacing:.12em;margin-left:8px;color:#ff9aa4}
 @keyframes vpbOt{50%{box-shadow:0 0 18px rgba(255,40,60,.55)}}
@@ -81,6 +81,7 @@ export function createOverlay(container, camera, { maxNums = 48, bars = true } =
   const odEl = document.createElement('div'); odEl.className = 'vpb-od'; root.appendChild(odEl);
   const otEl = document.createElement('div'); otEl.className = 'vpb-ot'; otEl.style.top = '70px'; root.appendChild(otEl);
   let lifeK = 1, topPx = 64, plateY = null;
+  const frame = { left: 0, right: 0 };
   const MAX_PER_TARGET = 1; // battle-3: one number per target (ref_02 clutter); a new hit merges or replaces it
 
   function project(x, y, z) {
@@ -89,7 +90,7 @@ export function createOverlay(container, camera, { maxNums = 48, bars = true } =
   }
   const O = {
     root,
-    resize() { W = container.clientWidth || 1; H = container.clientHeight || 1; },
+    resize() { W = container.clientWidth || 1; H = container.clientHeight || 1; if (frame.left || frame.right) O.setFrame(frame); },
     // kind: dmg | edmg | crit | heal | shield | status | dot. value: number (mergeable) or string.
     // opts.key (target id) stacks numbers per target in free rows so they never overlap; rapid same-kind numbers on
     // one target (DoT ticks, multi-hits) merge into one rising total instead of spawning new ones.
@@ -140,6 +141,14 @@ export function createOverlay(container, camera, { maxNums = 48, bars = true } =
     killBar(id) { const B = unitBars.get(id); if (B) B.el.classList.add('dead'); },
     removeBar(id) { const B = unitBars.get(id); if (B) { B.el.remove(); unitBars.delete(id); } },
     setSpeed(sp) { lifeK = sp >= 4 ? 0.6 : sp >= 2 ? 0.78 : 1; },
+    // BATTLE-L: centre the OD callout, OVERTIME plate and banners on the board band between the side HUD bands (CSS px)
+    setFrame({ left = 0, right = 0 } = {}) {
+      left = +left || 0; right = +right || 0;
+      if (!left && !right) { frame.left = frame.right = 0; root.style.removeProperty('--cx'); banner.style.left = banner.style.right = ''; return; }
+      root.style.setProperty('--cx', Math.round((left + W - right) / 2) + 'px');
+      banner.style.left = left + 'px'; banner.style.right = right + 'px';
+      frame.left = left; frame.right = right;
+    },
     setTop(px) { topPx = px; if (plateY == null) odEl.style.top = (px + 30) + 'px'; otEl.style.top = (px + 6) + 'px'; },
     // battle-4: the OD callout sits in the dark deck band between the back barrier and the floor's far edge (centre y, CSS px),
     // clear of the league screen and of the top HUD whatever its height

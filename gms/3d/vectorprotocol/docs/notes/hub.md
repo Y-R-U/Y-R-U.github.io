@@ -144,3 +144,45 @@ perf.js, rot.mjs live rotation). before_*/after_* = portrait regression pairs.
 - DONE hub_test: `?wide=1` (full width + mock top bar / rail dock / CONTINUE, margins like scr_hub), `&chrome=0`,
   `?rot=SECONDS`, `&pitchWide= &nearCrop=` overrides.
 - NEXT: verify in the real game with ui-L's scr_hub/scr_map.
+## Checkpoint 2 (hub-L hand-back)
+- Verified in the real game with ui-L (scr_hub calls setMargins with the rail dock + CTA avoid rect; scr_map mounts the chest
+  bar in map.headSlot): 915x412, 844x340 hub + map OK, 412x915 unchanged.
+- Map fix found in-game: design's maps carry l.x/l.y (portrait VH fractions, 0.5 +- 0.18); in wide l.y is remapped into the
+  band. Band measured with offsetTop/offsetHeight (getBoundingClientRect picked up the screen's enter transform).
+- Perf (M5 metal, dpr 2, 4 units + rift, peak = mirror frame): 412x915 st3 200; 915x412 / 844x390 / 1280x800 st3 201
+  (min 155); 915x412 st0 144. 60 fps everywhere. Labels: no overlaps, none on rail/top bar/CTA, leaders <= 79 px.
+- Slab width: 915x412 st3 45%, st0 56%; 915x360 45%; 844x390 45%; tablet/desktop capped at 55%.
+- Rotation (CDP 412x915 <-> 915x412 x3): same scene object, no geometry growth, portrait dist/projection restored exactly.
+- Test-script gotcha: Page.navigate to the same URL that only differs by #hash does not reload, so modules stay stale;
+  navigate to about:blank first.
+## Open
+- ui-5 request Q3 (label tap target 44 px) not done: the label's clip-path also clips a pseudo-element hit area; needs a
+  wrapper element. Labels are 36 px tall.
+- Pitch deviates from the spec (0.66 -> 0.50 on phones) to reach the 45% width goal; Aaron may prefer less top-down.
+- CTA (bottom-right) covers the near-right corner of the slab in landscape (allowed by spec; labels avoid it).
+
+---
+# hub-4 (round hub-4: label tap targets, chapter grid, quick qa items)
+Scripts: scratchpad/hub4 (drv.mjs <prefix> <WxH,..> <route> [probeExpr] = dev save m2 open, lprobe.js = label visual/hit
+rects, tap-edge elementFromPoint check, overlaps, chrome hits). before_*/after_* pairs.
+## Checkpoint 1
+- DONE labels.js (Q3/Q15): label = transparent positioned wrapper `.vp-hub-lab` + visual box `.b` (clip-path, border, bg,
+  accent bar, pulse moved inside it). Wrapper `::after` band of `--hp` px above/below (`it.p` = ceil((44 - h)/2) = 4) makes the
+  hit area 44 px; visual stays 36 px. Relax loop separates hit bands (not visual boxes); top/bottom/corner clamps and avoid
+  rects include the band. Portrait rects identical before/after at 412x915 / 390x844; landscape moved <= 10 px. All 7 tap at
+  the band edges, no hit-band overlaps, none on dock/CTA (844x340, 915x360, 915x412, 412x915, 390x844).
+## Checkpoint 2 (hub-4 hand-back)
+- Chapter select (ui-L request): no horizontal overflow at any tested size (scrollWidth == clientWidth at 844x340, 915x360,
+  915x412, 412x915, 390x844); the real problem was a 2-col grid that scrolls vertically with no cue (~2.3 rows visible).
+  createMapSelect now: `.short` (wide and < 400 px tall) -> 96 px cards (numeral 60, title 19/21); wide -> scroll-snap y
+  proximity; sticky bottom fade + 44 px `MORE` chip (scrolls 60% of the view, hidden once the last card is in view, `.end`);
+  opens scrolled to the in-progress chapter if it starts below the fold, with a 34 px peek of the row above (snap suspended
+  until the first pointerdown/wheel so it doesn't eat the peek). Portrait: no visual change (pixel diff = image noise only).
+- Story map wide CTA: DEPLOY 40 -> 44 px tall (was the only < 44 target in js/map at 844x340).
+- hub_test.html boots, 7 labels, 0 errors. 0 console errors on /hub, /chapters, /map/2 at all sizes.
+- Shots (scratchpad/hub4): before_/after_hub_<size>.png, before_/after_ch_<size>.png, m6_ch_844x340.png (auto-scroll),
+  end_ch_844x340.png (MORE hidden at end), map2_844x340.png, hubtest_412.png.
+## Open
+- Pitch 0.50 on landscape phones (hub-L) still awaits Aaron's taste call.
+- QA Q3 second half ("CONTINUE" vs "START" on a fresh save) is scr_hub (ui).
+- ui: `.chest-mk` on the map head is 40x44 in landscape (ui-owned).

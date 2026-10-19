@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { createBattle, TICKS_PER_SEC } from '../sim/battle.js';
 import { loadData } from '../sim/data.js';
-import { BOARD, slotPos, plateColor, RARITY_INDEX, RARITY_COLORS } from './layout.js';
+import { BOARD, slotPos, plateColor, RARITY_INDEX, RARITY_COLORS, LANE_PROFILES, applyLaneProfile } from './layout.js';
 import { buildArena } from './arena.js';
 import { createBattleCamera } from './camera.js';
 import { createVFX } from '../fx/vfx.js';
@@ -18,6 +18,8 @@ import * as placeholder from './placeholder_unit.js';
 //  goals = the level's star goals (game.startLevel cfg.goals, js/sim/README "Star goals"); the sim scores the end stars with them
 //  → scene object { scene, camera, update, resize, preRender, dispose, pick } +
 //    { ready (Promise), start(), setSpeed(1|2|4|8; 8 = dev), setAuto(bool), fireOverdrive(slot|id), on('state'|'end'|'event', fn), state, units }
+//  BATTLE-L (docs/LANDSCAPE.md §2): setMargins({top, bottom, left?, right?}), setLaneProfile('tall'|'wide', {animate}), laneProfile,
+//    overlay.setFrame({left, right, top}). The lane profile follows the aspect (w/h >= 1 = 'wide') unless opts.laneProfile pins it.
 const TPS = TICKS_PER_SEC;
 const FCOL = { corporate: PAL.cyan, rogue: PAL.orange, experimental: PAL.purple, legendary: PAL.gold, order: PAL.blue, horde: PAL.red, wild: PAL.green };
 
@@ -35,12 +37,22 @@ function unitFx(keys) {
   return null;
 }
 
+// QA Q11: one failed fetch used to mean placeholder units until a reload. 3 tries with backoff (a cache-busting query on the retries),
+// and a fallback to placeholders is not cached, so the next battle tries again. (A failed transitive import can stay in the browser's
+// module map for the page; the busting query only helps when units.js itself failed.)
 let unitsModP = null;
 function unitsModule() {
-  if (!unitsModP) unitsModP = import('../actors/units.js').catch((e) => {
-    console.warn('[battle] js/actors/units.js failed, using placeholder units', e);
+  if (unitsModP) return unitsModP;
+  unitsModP = (async () => {
+    let err = null;
+    for (let i = 0; i < 3; i++) {
+      try { return await import(i ? `../actors/units.js?retry=${i}-${Date.now()}` : '../actors/units.js'); } catch (e) { err = e; }
+      await new Promise((r) => setTimeout(r, 300 * 3 ** i));
+    }
+    console.warn('[battle] js/actors/units.js failed 3x, using placeholder units', err);
+    unitsModP = null;
     return import('./placeholder_unit.js');
-  });
+  })();
   return unitsModP;
 }
 
@@ -66,13 +78,18 @@ export function createBattleScene(engine, opts = {}) {
   const themeId = (typeof opts.theme === 'string' && opts.theme) || (typeof opts.arena === 'string' && opts.arena) || opts.arena?.theme
     || opts.realm || realmFromWaves(enemyWaves, opts.data) || 'scifi';
   const tier = engine.quality;
+  // BATTLE-L: lane profile from the aspect at creation (resize() flips it later); the board furniture is built on it
+  const pinnedProfile = LANE_PROFILES[opts.laneProfile] ? opts.laneProfile : null;
+  let laneProfile = pinnedProfile || ((engine.size?.w || 1) / (engine.size?.h || 1) >= 1 ? 'wide' : 'tall');
+  applyLaneProfile(laneProfile);
   const scene = new THREE.Scene();
   const arena = buildArena(engine, { theme: themeId, seed: 7 });
   scene.environment = arena.theme.environment || engine.env;
   scene.environmentIntensity = arena.theme.envIntensity ?? 0.6; // the neon env is very blue; units should keep their paint colours
   scene.add(arena.group);
   if (arena.theme.fog) scene.fog = arena.theme.fog;
-  const rig = createBattleCamera({ nearRim: arena.theme.nearRim, ...(opts.frame || {}), backdrop: arena.theme.backdrop });
+  arena.theme.setWide?.(laneProfile === 'wide');
+  const rig = createBattleCamera({ nearRim: arena.theme.nearRim, ...(arena.theme.frameWide || {}), ...(opts.frame || {}), backdrop: arena.theme.backdrop });
   if (opts.margins) rig.setMargins(opts.margins);
   const camera = rig.camera;
   const vfx = createVFX(scene, tier);
@@ -88,6 +105,35 @@ export function createBattleScene(engine, opts = {}) {
   const container = opts.overlay || engine.canvas.parentElement || document.body;
   const overlay = createOverlay(container, camera, { bars });
   overlay.setSpeed(speedInit); overlay.setTop(opts.margins?.top ?? 64);
+  if (opts.margins) overlay.setFrame(opts.margins);
+
+  // D26 intro: the camera flies in from a wide backdrop view; no sim ticks (and no queued events) until it ends, the squad drop-ins
+  // overlap its last INTRO_OVERLAP s. opts.intro: true = start it now (camera parked at the start pose until ready); or playIntro().
+  const INTRO_OVERLAP = 0.5;
+  const intro = { on: false, t: 0, dur: 3, s: 1, speed: 1, done: null, resolve: null };
+  function playIntro({ strength } = {}) {
+    if (intro.on) return intro.done;
+    const wide = (engine.size?.w || 1) / (engine.size?.h || 1) >= 1;
+    intro.on = true; intro.t = 0; intro.speed = 1; intro.deadline = 0;
+    intro.s = Math.max(0, Math.min(1, strength ?? (wide ? 1 : 0.6)));
+    intro.dur = 2.6 + 0.8 * intro.s;
+    rig.setIntro(0, intro.s);
+    intro.done = new Promise((r) => { intro.resolve = r; });
+    return intro.done;
+  }
+  function endIntro() {
+    if (!intro.on) return;
+    intro.on = false; intro.t = intro.dur; rig.setIntro(1);
+    const r = intro.resolve; intro.resolve = null; r?.();
+    stateDirty = true;
+  }
+  function tickIntro(dtReal) {
+    if (!intro.on) return;
+    if (sim && !paused) intro.t += dtReal * intro.speed; // parked at the start pose until the units are loaded
+    rig.setIntro(intro.t / intro.dur, intro.s);
+    if (intro.t >= intro.dur || (intro.deadline && performance.now() >= intro.deadline)) endIntro();
+  }
+  if (opts.intro) playIntro(typeof opts.intro === 'object' ? opts.intro : {});
 
   const listeners = { state: new Set(), end: new Set(), event: new Set() };
   const emit = (k, v) => { for (const f of listeners[k]) { try { f(v); } catch (e) { console.error(e); } } };
@@ -169,8 +215,19 @@ export function createBattleScene(engine, opts = {}) {
       stateDirty = true;
       return ok;
     },
-    resize(w, h) { rig.resize(w, h); overlay.resize(); placePlate(); },
-    setMargins(m) { rig.setMargins(m); overlay.setTop(m?.top ?? 64); placePlate(); },
+    resize(w, h) {
+      const want = pinnedProfile || (w / h >= 1 ? 'wide' : 'tall');
+      if (want !== laneProfile) setLaneProfile(want, { animate: true }); // before the camera refit: fitWide frames the active profile
+      rig.resize(w, h); overlay.resize(); placePlate();
+    },
+    setMargins(m) { rig.setMargins(m); overlay.setTop(m?.top ?? 64); overlay.setFrame(m || {}); placePlate(); },
+    // 'tall' (portrait lanes) | 'wide' (closer lanes on landscape). animate: idle actors glide home over 0.35 s; busy ones
+    // (attack, Overdrive, lunge, deploy) wait for their anim to end, at most 1.5 s. Pins the profile only when opts.laneProfile did.
+    setLaneProfile(name, o = {}) { setLaneProfile(name, o); },
+    get laneProfile() { return laneProfile; },
+    // D26: playIntro({strength 0..1}) -> Promise (resolves when the camera has landed); skipIntro() eases out in 0.25 s
+    playIntro, get introActive() { return intro.on; },
+    skipIntro() { if (intro.on) { const left = Math.max(0, intro.dur - intro.t); intro.speed = Math.max(1, left / 0.25); intro.deadline = performance.now() + 300; } return intro.done || Promise.resolve(); },
     preRender() { if (arena.reflection.enabled) arena.reflection.update(scene, camera); },
     pick(x, y) {
       const rc = new THREE.Raycaster(); rc.layers.enableAll();
@@ -199,7 +256,19 @@ export function createBattleScene(engine, opts = {}) {
     // player units exist from the start; deploy them before the first wave arrives
     sim.state.player.units.forEach((v, i) => spawn(v, 0.1 + i * 0.11));
     for (const e of sim.events) queue.push(e); // events emitted while the sim was created (wave 1 start)
+    // BATTLE-L: build wave 1 now (same deploy delays as the wave handler, which then finds them spawned): its precise-bbox fits cost
+    // ~400 ms, which used to land on the first frame (or on the last frames of the intro)
+    for (const e of sim.events) if (e.type === 'wave' && e.phase === 'start') (e.units || []).forEach((id, i) => { const v = sim.state.units[id]; if (v) spawn(v, 0.2 + i * 0.11); });
     stateDirty = true;
+    // the units are hidden until their drop-in, so their shaders compiled on that frame (a ~400 ms hitch on M5). Compile them now
+    // (compile() gathers the visible scene synchronously, so the roots are only shown for the duration of that call)
+    try {
+      const R = engine.renderer, roots = [...U.values()].map((a) => a.unit.root);
+      roots.forEach((r) => { r.visible = true; });
+      const p = R.compileAsync ? R.compileAsync(scene, camera) : (R.compile(scene, camera), null);
+      roots.forEach((r) => { r.visible = false; });
+      if (p) await Promise.race([p, new Promise((r) => setTimeout(r, 1500))]);
+    } catch (e) { console.warn('[battle] precompile failed', e); }
     return api;
   })();
 
@@ -228,7 +297,8 @@ export function createBattleScene(engine, opts = {}) {
     // D23: one uniform scale so roster size classes survive; bosses carry a scale hint, capped (battle-5: DREADNOUGHT's 1.9 crossed the line)
     let s = BOARD.unitScale * Math.min(BOSS_SCALE_MAX, def.scale || 1);
     // battle-7: a theme may enlarge its own realm's units (fantasy creatures are naturally small next to mechs); opts.themeUnitK overrides its factor (tests)
-    s *= arena.theme.unitScale?.(def, opts.themeUnitK) ?? 1;
+    const tk = themeK(def, laneProfile);
+    s *= tk;
     unit.root.scale.setScalar(s);
     unit.root.position.set(p.x, arena.plateH, p.z);
     // 3/4 view: idle facing turns ~0.45 rad toward the camera (+z) from straight across the centre line
@@ -273,7 +343,8 @@ export function createBattleScene(engine, opts = {}) {
       color: FCOL[v.rarity === 'legendary' ? 'legendary' : v.faction] || PAL.cyan, plate: color, alive: true, pending: [],
       proxy, deployT: -delay, deployed: false, lunge: null, sink: 0, removed: false, barAnchor, busy: 0,
       place: Math.abs(p.x) !== BOARD.colX[p.col] || s > BOARD.unitScale ? Math.max(1, Math.min(1.45, s / BOARD.unitScale)) : 0,
-      ufx: unitFx([v.def, v.model]), noDrop: !!(unit.def?.noDrop || unit.noDrop), odFit, hoverPad };
+      ufx: unitFx([v.def, v.model]), noDrop: !!(unit.def?.noDrop || unit.noDrop), odFit, hoverPad,
+      def, tk, homeDz: p.z - slotPos(v.side, v.slotIndex).z };
     // robots' built-in bubble (setShield / M.aura) is replaced by the pooled fresnel bubble (js/fx/vfx.js), one draw for all
     const auraK = unit.def?.aura || 0;
     unit.setShield?.(0);
@@ -286,6 +357,53 @@ export function createBattleScene(engine, opts = {}) {
     overlay.setBar(v.id, v.hpPct ?? 1, 0);
     overlay.showBar(v.id, false);
     return a;
+  }
+  // ---------- lane profiles (BATTLE-L) ----------
+  // theme realm scale per profile: the wide board has horizontal room, so the fantasy theme may use a bigger factor there (wideUnitK)
+  function themeK(def, prof) {
+    const k = opts.themeUnitK ?? (prof === 'wide' ? arena.theme.wideUnitK : undefined);
+    return arena.theme.unitScale?.(def, k) ?? 1;
+  }
+  function setLaneProfile(name, { animate = true } = {}) {
+    if (!LANE_PROFILES[name] || name === laneProfile) return laneProfile;
+    laneProfile = name;
+    applyLaneProfile(name);
+    arena.theme.setWide?.(name === 'wide');
+    for (let i = 0; i < 6; i++) for (const side of ['player', 'enemy']) { const p = slotPos(side, i); arena.setHome(side, i, p.x, p.z); }
+    for (const a of U.values()) {
+      const z1 = slotPos(a.side, a.slot).z + a.homeDz;
+      const tk = themeK(a.def, name), s1 = a.scale * tk / a.tk;
+      a.tk = tk;
+      if (a.removed || !a.deployed || !animate) {
+        a.z = z1; a.scale = s1; a.h = (a.unit.height || 2) * s1;
+        a.unit.root.scale.setScalar(s1); a.unit.root.position.z = z1; a.rehome = null;
+        if (a.hoverPad) a.hoverPad.position.z = z1;
+        if (a.armed && !a.removed) placeSlot(a);
+        continue;
+      }
+      a.rehome = { z0: a.z, z1, s0: a.scale, s1, t: 0, wait: 0 };
+      placeSlot(a);
+    }
+    rig.refit?.(); placePlate();
+    return laneProfile;
+  }
+  function placeK(a) { return Math.abs(a.x) !== BOARD.colX[a.slot >= 3 ? 1 : 0] || a.scale > BOARD.unitScale + 1e-6 ? Math.max(1, Math.min(1.45, a.scale / BOARD.unitScale)) : 0; }
+  function placeSlot(a) {
+    const k = placeK(a) || a.place;
+    if (k || a.rehome) arena.setPlace(a.side, a.slot, a.x, a.z, k || 1);
+    a.place = k;
+  }
+  function tickRehome(a, dt) {
+    const R = a.rehome;
+    const busy = a.lunge || a.odShift || a.sink > 0 || a.busy > 0;
+    if (busy && R.wait < 1.5 && a.alive) { R.wait += dt; return; }
+    R.t += dt;
+    const k0 = Math.min(1, R.t / 0.35), k = k0 * k0 * (3 - 2 * k0);
+    a.z = R.z0 + (R.z1 - R.z0) * k; a.scale = R.s0 + (R.s1 - R.s0) * k;
+    a.unit.root.scale.setScalar(a.scale); a.h = (a.unit.height || 2) * a.scale;
+    if (!a.lunge) a.unit.root.position.z = a.z;
+    if (!a.removed) placeSlot(a);
+    if (k0 >= 1) a.rehome = null;
   }
   // shield bubble: k = sim shield fraction (0..1); a permanent aura (robots' M.aura) keeps a fainter one up
   function setBubble(a, k, flare = false) {
@@ -651,7 +769,10 @@ export function createBattleScene(engine, opts = {}) {
     if (slowT > 0 && !paused) { slowT -= dtReal; if (slowT <= 0) slow = 1; }
     const ts = paused ? 0 : (ended ? 1 : speed) * (slowT > 0 ? slow : 1); // the victory moment plays at real time
     const dt = Math.min(dtReal, 0.05) * ts;
-    if (sim && started && !sim.done && !forfeited) {
+    tickIntro(dtReal);
+    // intro: the sim clock and the event queue wait for the camera; drop-ins may start in the last INTRO_OVERLAP s
+    const introHold = intro.on, introDeploy = !intro.on || (intro.dur - intro.t) / intro.speed <= INTRO_OVERLAP;
+    if (introHold) { /* no ticks */ } else if (sim && started && !sim.done && !forfeited) {
       simT += dt * TPS;
       let guard = 0;
       while (sim.t < Math.floor(simT) && !sim.done && guard++ < 40) {
@@ -659,7 +780,7 @@ export function createBattleScene(engine, opts = {}) {
         for (const e of evts) queue.push(e);
       }
     } else if (sim && sim.done) simT = Math.max(simT, sim.t);
-    while (queue.length) handle(queue.shift());
+    while (queue.length && !introHold) handle(queue.shift());
     // fallback launch if an anim never fired
     for (const a of U.values()) {
       for (let i = a.pending.length - 1; i >= 0; i--) {
@@ -672,6 +793,7 @@ export function createBattleScene(engine, opts = {}) {
     for (const a of U.values()) {
       if (a.removed) continue;
       if (!a.deployed) {
+        if (!introDeploy) { a.unit.update(0); continue; }
         a.deployT += dt;
         // squad drop-in: the hex plate lights ~0.28 s before the unit arrives in a beam, then a landing shockwave
         if (!a.armed && a.deployT >= -0.28) {
@@ -703,6 +825,7 @@ export function createBattleScene(engine, opts = {}) {
           }
         }
       }
+      if (a.rehome) tickRehome(a, dtReal);
       if (a.lunge) {
         const L = a.lunge; L.t += dt;
         const k = Math.min(1, L.t / L.dur), s = Math.sin(Math.PI * k);

@@ -11,7 +11,7 @@ import { closeHints } from './ui/tutorial.js';
 
 const Q = new URLSearchParams(location.search);
 const boot = document.getElementById('boot');
-const progress = (p, msg) => { boot.querySelector('.fill').style.width = (p * 100).toFixed(0) + '%'; if (msg) boot.querySelector('.msg').textContent = msg; };
+const progress = (p, msg) => { window.__bootTick = Date.now(); boot.querySelector('.fill').style.width = (p * 100).toFixed(0) + '%'; if (msg) boot.querySelector('.msg').textContent = msg; };
 const frame = () => new Promise((r) => requestAnimationFrame(() => r()));
 
 // orientation first: its resize listener must run before the engine's ResizeObserver refits a scene (docs/LANDSCAPE.md §1.3)
@@ -48,7 +48,7 @@ async function start() {
 
   progress(0.65, 'Calibrating unit optics…');
   const units = await load('units');
-  const portraits = createPortraits({ engine, units });
+  const portraits = vp.portraits = createPortraits({ engine, units });
 
   progress(0.8, 'Plotting routes…');
   const router = createRouter({ fallback: 'hub' });

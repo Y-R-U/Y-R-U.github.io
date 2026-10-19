@@ -177,7 +177,7 @@ const CSS = `
 .vpm.wide .vpm-cta .n{flex:0 1 auto;min-width:0;font-size:17px}
 .vpm.wide .vpm-cta .p{flex:none}
 .vpm.wide .vpm-cta .n::before,.vpm.wide .vpm-cta .p::before{content:"·";margin-right:8px;color:var(--a);font-weight:800}
-.vpm.wide .vpm-cta .go{height:40px}
+.vpm.wide .vpm-cta .go{height:44px}
 .vpm.wide .vpm-rail{left:calc(16px + env(safe-area-inset-left));right:calc(16px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom))}
 .vpm.short .vpm-node{width:46px;height:46px}
 .vpm.short .vpm-node.k-elite{width:51px;height:51px}
@@ -193,6 +193,23 @@ const CSS = `
 .vpms.wide{padding-left:calc(14px + env(safe-area-inset-left));padding-right:calc(14px + env(safe-area-inset-right))}
 .vpms.wide .vpms-head,.vpms.wide .vpms-list{max-width:1180px;margin-left:auto;margin-right:auto}
 .vpms.wide .vpms-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+.vpms-more{display:none}
+.vpms.wide{scroll-snap-type:y proximity;scroll-padding-top:10px}
+.vpms.wide .vpms-card{scroll-snap-align:start}
+.vpms.wide .vpms-more{display:flex;position:sticky;bottom:-40px;height:64px;margin:-24px -14px 0;align-items:flex-end;justify-content:center;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(3,6,14,0),rgba(3,6,14,.92) 72%);pointer-events:none;transition:opacity .2s}
+.vpms.wide.end .vpms-more{opacity:0}
+.vpms.wide.end .vpms-more button{pointer-events:none}
+.vpms-more button{pointer-events:auto;display:flex;align-items:center;gap:6px;height:44px;padding:0 16px;border:1px solid rgba(56,232,255,.55);background:rgba(4,12,26,.9);
+  color:#bff6ff;font:800 10.5px/1 "Orbitron",sans-serif;letter-spacing:.22em;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);box-shadow:inset 0 0 12px -4px #38e8ff}
+.vpms-more svg{width:14px;height:14px;fill:#38e8ff;filter:drop-shadow(0 0 4px #38e8ff);animation:vpmsBob 1.6s ease-in-out infinite}
+@keyframes vpmsBob{50%{transform:translateY(2px)}}
+.vpms.short .vpms-card{height:96px}
+.vpms.short .vpms-card .tx{top:12px;bottom:11px}
+.vpms.short .vpms-card .no{font-size:60px;bottom:-11px}
+.vpms.short .vpms-card .n{font-size:19px}
+.vpms.short .vpms-card.r-fantasy .n,.vpms.short .vpms-card.r-rift .n{font-size:21px}
 `;
 export function injectMapCss() {
   if (document.getElementById('vp-map-style')) return;

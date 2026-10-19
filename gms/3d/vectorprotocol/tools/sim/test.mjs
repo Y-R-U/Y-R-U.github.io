@@ -354,6 +354,25 @@ test('focus shards go to the deployed unit closest to completing its next rank',
   }
 });
 
+test('mutual KO on the last wave is a win (QA Q4); mid-fight wipe with waves left is a loss', () => {
+  const one = (d) => ({ units: [{ def: d, level: 1, rank: 0, slot: { col: 0, lane: 1 } }] });
+  let n = 0;
+  for (let seed = 1; seed < 200; seed++) {
+    const b = createBattle({ data: REAL, player: one('scrapper'), enemyWaves: [one('scrapper')], seed });
+    b.runToEnd();
+    const d = b.events.filter((e) => e.type === 'death');
+    if (d.length === 2 && d[0].t === d[1].t) {
+      n++;
+      ok(b.result.win && b.result.reason === 'victory' && b.result.lost.length === 1, `seed ${seed} mutual KO wins`);
+      ok(b.events.some((e) => e.type === 'wave' && e.phase === 'clear'), 'wave clear emitted');
+      const b2 = createBattle({ data: REAL, player: one('scrapper'), enemyWaves: [one('scrapper'), one('scrapper')], seed });
+      b2.runToEnd();
+      ok(!b2.result.win, 'wipe with a wave still to come is a defeat');
+    }
+  }
+  ok(n > 0, 'found mutual KO seeds');
+});
+
 test('dev cheats: invulnerable, oneHit, no timer loss, never from game_state', () => {
   const weak = { units: [S('lancer', 1, 1, 1)] };
   const strong = [{ units: [S('monolith', 30, 0, 1, 3), S('pyre', 30, 1, 1, 3)] }];

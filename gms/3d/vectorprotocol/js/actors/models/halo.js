@@ -8,7 +8,7 @@
 //   glow rings (base) · R3 hex-node stasis ring + second ring, blade teeth, wing veins glow · R4 orbiting stasis motes on the
 //   rings, third ring, halo crown spikes · R5 outer lattice cage = a second bubble layer, brighter halo.
 // Technique: the stasis rings live on aux1 (re-parented to the pelvis) and precess in post(); tick() scales them out to bubble
-// size in the overdrive and collapses them on death. The kit aura bubble is kept permanent by wrapping setShield (kit request).
+// size in the overdrive and collapses them on death. The kit keeps the aura bubble permanent (setShield floors at it) and scales it by rank.
 import { THREE, P, PS, plate, fin, discX, shell, LIB, PI, BI } from '../kit.js';
 
 const AURA = 0.38;
@@ -356,12 +356,6 @@ export default {
     P[i] = 0.18 * Math.sin(t * 0.7); P[i + 1] = t * 0.9 * fast; P[i + 2] = 0.12 * Math.cos(t * 0.5);
   },
   tick(unit, dt, ctx, bones) {
-    // keep the permanent bubble: the battle's setShield(0) after a hit would otherwise pop it (kit request in notes)
-    if (!unit._haloAura) {
-      unit._haloAura = true;
-      const set = unit.setShield.bind(unit);
-      unit.setShield = (v) => set(Math.max(AURA, v || 0));
-    }
     const a = unit.state.action;
     let target = 1;
     if (a === 'overdrive') target = 1 + 1.15 * L.kf(ctx.odU || 0, [[0, 0], [0.1, -0.4], [0.17, 1], [0.75, 1], [0.95, 0]]);

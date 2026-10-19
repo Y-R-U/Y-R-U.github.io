@@ -35,21 +35,21 @@ const POOLS = {
 // lv = enemy level start→end; size = units per wave start→end; rankBonus = enemy ranks above the
 // minimum their level needs; elites = level numbers (1-based) that are elite nodes.
 export const MAP_SPEC = [
-  { id: 'm1', theme: 'docks', name: 'Rustline Docks', realm: 'scifi', n: 12, lv: [1, 8], size: [1, 3], waves: [1, 2], rankBonus: 0, pool: 'docks', elites: [8], boss: 'boss_big_rusty', shardPool: ['scrapper', 'gunner', 'patch'], shardsPer: 2,
+  { id: 'm1', theme: 'docks', name: 'Rustline Docks', realm: 'scifi', n: 12, lv: [1, 5], size: [1, 3], waves: [1, 2], rankBonus: 0, pool: 'docks', elites: [8], boss: 'boss_big_rusty', shardPool: ['scrapper', 'gunner', 'patch'], shardsPer: 2,
     blurb: 'Two robots, one leaking hangar, every job nobody else wants.' },
   { id: 'm2', theme: 'slums', name: 'Neon Undercity', realm: 'scifi', n: 14, lv: [8, 15], size: [3, 4], waves: [1, 3], rankBonus: 0, pool: 'undercity', elites: [5, 10], boss: 'boss_redline', shardPool: ['scrapper', 'gunner', 'patch', 'bulwark', 'barb', 'riot', 'rattler'], shardsPer: 2,
     blurb: 'Red Ledger turf. Somebody paid them to want you dead.' },
-  { id: 'm3', theme: 'league', name: 'Protocol League', realm: 'scifi', n: 14, lv: [17, 26], size: [3, 4], waves: [2, 3], rankBonus: 0, pool: 'league', elites: [5, 10], boss: 'boss_corona',
+  { id: 'm3', theme: 'league', name: 'Protocol League', realm: 'scifi', n: 14, lv: [18, 27], size: [3, 4], waves: [2, 3], rankBonus: 0, pool: 'league', elites: [5, 10], boss: 'boss_corona',
     blurb: 'Qualifiers for the Vector Protocol league. Cameras, sponsors, champions.' },
-  { id: 'm4', theme: 'skyport', name: 'Kestrel Skyport', realm: 'scifi', n: 15, lv: [26, 34], size: [4, 5], waves: [2, 3], rankBonus: 0, pool: 'skyport', elites: [5, 10], boss: 'boss_stormcrow',
+  { id: 'm4', theme: 'skyport', name: 'Kestrel Skyport', realm: 'scifi', n: 15, lv: [27, 35], size: [4, 5], waves: [2, 3], rankBonus: 0, pool: 'skyport', elites: [5, 10], boss: 'boss_stormcrow',
     blurb: 'Corporate contracts in the clouds. The clients are worse than the targets.' },
-  { id: 'm5', theme: 'lab', name: 'The Lattice', realm: 'scifi', n: 16, lv: [33, 40], size: [5, 6], waves: [2, 3], rankBonus: 0, pool: 'lattice', elites: [5, 11], boss: 'boss_the_choir',
+  { id: 'm5', theme: 'lab', name: 'The Lattice', realm: 'scifi', n: 16, lv: [33, 40], size: [5, 6], waves: [2, 3], rankBonus: 0, pool: 'lattice', elites: [5, 11], boss: 'boss_the_choir', focusShards: [4, 8, 16], focusOnly: true,
     blurb: 'Novaline Lab 9, quarantined. The robots inside are not malfunctioning.' },
-  { id: 'm6', theme: 'forest', name: 'The Verdance', realm: 'fantasy', n: 16, lv: [40, 45], size: [5, 6], waves: [2, 3], rankBonus: 1, pool: 'verdance', elites: [5, 11], boss: 'boss_elderbark', shardPool: ['dire_wolf', 'elf_ranger', 'frost_wolf', 'horde_shaman', 'rift_knight', 'elf_sage'],
+  { id: 'm6', theme: 'forest', name: 'The Verdance', realm: 'fantasy', n: 16, lv: [41, 47], size: [5, 6], waves: [2, 3], rankBonus: 1, pool: 'verdance', elites: [5, 11], boss: 'boss_elderbark', shardPool: ['dire_wolf', 'elf_ranger', 'frost_wolf', 'horde_shaman', 'rift_knight', 'elf_sage'], focusShards: [4, 8, 16],
     blurb: 'Through the Rift: a living realm of knights and elves who think you are the invasion.' },
-  { id: 'm7', theme: 'spirewar', name: 'Spire War', realm: 'scifi', n: 18, lv: [45, 49], size: [6, 6], waves: [2, 3], rankBonus: 0, pool: 'spire', elites: [6, 12], boss: 'boss_aurelian',
+  { id: 'm7', theme: 'spirewar', name: 'Spire War', realm: 'scifi', n: 18, lv: [45, 49], size: [6, 6], waves: [2, 3], rankBonus: 0, pool: 'spire', elites: [6, 12], boss: 'boss_aurelian', focusShards: [4, 8, 16], focusOnly: true,
     blurb: 'Open corporate war over Halcyon Reach, fought with stolen monsters.' },
-  { id: 'm8', theme: 'core', name: 'Protocol Core', realm: 'scifi', n: 15, lv: [48, 50], size: [6, 6], waves: [3, 3], rankBonus: 0, pool: 'core', elites: [5, 10], boss: 'boss_vector_prime',
+  { id: 'm8', theme: 'core', name: 'Protocol Core', realm: 'scifi', n: 15, lv: [48, 50], size: [6, 6], waves: [3, 3], rankBonus: 0, pool: 'core', elites: [5, 10], boss: 'boss_vector_prime', focusShards: [4, 8, 16], focusOnly: true,
     blurb: 'Inside the standard every robot runs. Rewrite it, or be rewritten.' },
 ];
 

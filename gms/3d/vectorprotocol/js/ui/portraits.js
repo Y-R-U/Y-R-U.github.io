@@ -1,45 +1,137 @@
-// Card portraits: robots' renderPortrait (cached 3D renders) -> <img>/<canvas> in a card's .art box.
-// Renders are serialised so a 30-card grid doesn't stall a frame per card all at once.
-export function createPortraits({ engine, units }) {
-  const cache = new Map();
-  let chain = Promise.resolve();
+// Card portraits: robots' renderPortrait (a 3D render per model) -> <img> in a card's .art box.
+// A grid of 46 cards used to render every portrait back to back in one microtask chain (one 3.7 s long task on the M5).
+// Now: the card shows its role-icon placeholder at once; renders run one at a time with a real yield (paint) between
+// them, cards on screen first (IntersectionObserver); every result is kept as a PNG blob in IndexedDB, so later visits
+// and sessions only decode images. Bump PORTRAIT_VERSION when robots change how portraits look.
+export const PORTRAIT_VERSION = 1;
+const BUDGET_MS = 8;
 
-  function get(u) {
+const DB = 'vectorprotocol-portraits', ST = 'p';
+let dbp = null;
+function db() {
+  if (dbp) return dbp;
+  dbp = new Promise((res) => {
+    try {
+      const r = indexedDB.open(DB, 1);
+      r.onupgradeneeded = () => { try { r.result.createObjectStore(ST); } catch (e) { /* exists */ } };
+      r.onsuccess = () => res(r.result); r.onerror = () => res(null); r.onblocked = () => res(null);
+    } catch (e) { res(null); }
+  });
+  return dbp;
+}
+async function idbGet(k) {
+  const d = await db(); if (!d) return null;
+  return new Promise((res) => { try { const q = d.transaction(ST).objectStore(ST).get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch (e) { res(null); } });
+}
+async function idbPut(k, v) {
+  const d = await db(); if (!d) return;
+  try { d.transaction(ST, 'readwrite').objectStore(ST).put(v, k); } catch (e) { /* quota / private mode: memory cache only */ }
+}
+
+const yieldFrame = () => new Promise((r) => { let done = false; const go = () => { if (!done) { done = true; setTimeout(r, 0); } };
+  requestAnimationFrame(go); setTimeout(go, 50); });   // rAF lets the frame paint; the timeout covers hidden tabs
+
+export function createPortraits({ engine, units }) {
+  const urls = new Map();      // key -> object URL (resolved)
+  const jobs = new Map();      // key -> { u, arts:Set, promise, resolve }
+  const queue = [];            // keys waiting for a render
+  let pumping = false;
+  const io = typeof IntersectionObserver === 'function'
+    ? new IntersectionObserver((es) => { for (const e of es) e.target.__vpVis = e.isIntersecting; }) : null;
+
+  const keyOf = (u) => {
     const model = u.model || u.id;
     const faction = u.rarity === 'legendary' ? 'legendary' : u.faction;
-    const key = [model, u.rarity, faction].join('|');
-    if (!cache.has(key)) {
-      const p = chain = chain.then(async () => {
-        if (!units?.renderPortrait) return null;
-        try { return await units.renderPortrait(model, { rarity: u.rarity, faction, engine, renderer: engine?.renderer, size: 256 }); }
-        catch (e) { console.warn('[portraits] render failed', model, e.message); return null; }
-      });
-      cache.set(key, p);
-    }
-    return cache.get(key);
+    return { model, faction, key: ['v' + PORTRAIT_VERSION, model, u.rarity, faction].join('|') };
+  };
+
+  function job(u) {
+    const { key } = keyOf(u);
+    let j = jobs.get(key);
+    if (j) return j;
+    j = { u, key, arts: new Set() };
+    j.promise = new Promise((res) => { j.resolve = res; });
+    jobs.set(key, j);
+    // stored portrait first (fast path); only a miss goes into the render queue
+    idbGet(key).then((blob) => {
+      if (blob instanceof Blob) return done(j, URL.createObjectURL(blob));
+      queue.push(key); pump();
+    });
+    return j;
   }
 
-  async function fill(art, u) {
-    const img = await get(u);
-    if (!img || !art.isConnected) return;
-    let el;
-    if (typeof img === 'string') { el = new Image(); el.src = img; el.decoding = 'async'; }
-    else if (img instanceof HTMLCanvasElement || img instanceof HTMLImageElement) el = img.cloneNode ? cloneVisual(img) : img;
-    else if (typeof ImageBitmap !== 'undefined' && img instanceof ImageBitmap) {
-      el = document.createElement('canvas'); el.width = img.width; el.height = img.height;
-      el.getContext('2d').drawImage(img, 0, 0);
+  function done(j, url) {
+    if (url) urls.set(j.key, url);
+    for (const art of j.arts) put(art, url);
+    j.arts.clear();
+    j.resolve(url || null);
+  }
+
+  // visible cards first, then in request order
+  function next() {
+    let best = -1;
+    for (let i = 0; i < queue.length; i++) {
+      const j = jobs.get(queue[i]);
+      if ([...j.arts].some((a) => a.isConnected && a.__vpVis !== false)) { best = i; break; }
+      if (best < 0 && [...j.arts].some((a) => a.isConnected)) best = i;
     }
-    if (!el) return;
-    el.className = 'portrait';
-    art.querySelector('.ph')?.remove();
+    if (best < 0) best = 0;
+    return queue.splice(best, 1)[0];
+  }
+
+  async function pump() {
+    if (pumping) return;
+    pumping = true;
+    await yieldFrame();   // let the screen that asked for these paint first
+    while (queue.length) {
+      const t0 = performance.now();
+      do {
+        const j = jobs.get(next());
+        await render(j);
+      } while (queue.length && performance.now() - t0 < BUDGET_MS);
+      await yieldFrame();
+    }
+    pumping = false;
+  }
+
+  async function render(j) {
+    const { model, faction } = keyOf(j.u);
+    if (!units?.renderPortrait) return done(j, null);
+    let c = null;
+    try { c = await units.renderPortrait(model, { rarity: j.u.rarity, faction, engine, renderer: engine?.renderer, format: 'canvas' }); }
+    catch (e) { console.warn('[portraits] render failed', model, e.message); }
+    if (!c) return done(j, null);
+    if (typeof c === 'string') return done(j, c);
+    // PNG encode happens off the main thread (toBlob); the blob is both the <img> source and the stored copy
+    const blob = c.toBlob ? await new Promise((r) => c.toBlob(r, 'image/png')) : null;
+    if (!blob) return done(j, c.toDataURL ? c.toDataURL('image/png') : null);
+    idbPut(j.key, blob);
+    done(j, URL.createObjectURL(blob));
+  }
+
+  function put(art, url) {
+    if (!url) return;   // the art may not be in the DOM yet (unitCard fills before the card is appended)
+    io?.unobserve(art);
+    const el = new Image();
+    el.decoding = 'async'; el.className = 'portrait'; el.alt = '';
+    el.src = url;
+    el.onload = () => { art.querySelector('.ph')?.remove(); art.classList.remove('pt-wait'); };
     art.prepend(el);
   }
 
-  function cloneVisual(src) {
-    if (src instanceof HTMLImageElement) return src.cloneNode();
-    const c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
-    c.getContext('2d').drawImage(src, 0, 0); return c;
+  // fill(art, u): placeholder (the card's role icon, shimmering) now, portrait when ready
+  function fill(art, u) {
+    const { key } = keyOf(u);
+    const url = urls.get(key);
+    if (url) { put(art, url); return Promise.resolve(url); }
+    art.classList.add('pt-wait');
+    const j = job(u);
+    j.arts.add(art);
+    io?.observe(art);
+    return j.promise;
   }
 
-  return { get, fill };
+  function get(u) { const url = urls.get(keyOf(u).key); return url ? Promise.resolve(url) : job(u).promise; }
+
+  return { get, fill, get pending() { return queue.length; }, debug: () => ({ queue: [...queue], jobs: [...jobs.values()].map((j) => [j.key, j.arts.size, urls.has(j.key)]) }) };
 }

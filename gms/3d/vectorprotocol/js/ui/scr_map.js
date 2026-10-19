@@ -13,6 +13,8 @@ export const openMaps = (store) => maps().filter((m, i) => store.mapOpen(i + 1))
 export async function mountChapters(root, ctx) {
   const { store, router } = ctx;
   const all = maps();
+  // one chapter open: the chapter list would be a dead end (QA Q10), go straight to the map
+  if (openMaps(store) <= 1) { router.go('/map/1', { replace: true }); return {}; }
   const mapMod = await load('map');
   root.append(header('Operations', () => router.go('/hub')));
   const host = h('div.ch-host');

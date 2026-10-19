@@ -62,7 +62,7 @@
     window.addEventListener('unhandledrejection', function (e) { window.__bootErrors.push(String(e.reason && e.reason.message || e.reason)); });
     function check() {
       if (window.__vp && window.__vp.ready) return;
-      if (Date.now() - t0 > 20000) {
+      if (Date.now() - Math.max(t0, window.__bootTick || 0) > 20000) {   // stalled, not merely slow (main.js ticks it)
         var b = document.getElementById('boot');
         if (!b) return;
         b.classList.add('failed');

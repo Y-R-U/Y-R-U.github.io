@@ -189,6 +189,13 @@ export function buildBoard(engine, { plate = null, lineColor = new THREE.Color(0
     setRarity(side, slot, ri, color) { const sl = get(side, slot); if (!sl) return; sl.rar = ri ?? -1; if (color != null) sl.rarC.set(color).multiplyScalar(1.25); writeSlot(sl); flush(); },
     // big bosses stand on their own footprint: move + grow the node (reset when the slot is cleared)
     setPlace(side, slot, x, z, k = 1) { const sl = get(side, slot); if (!sl) return; sl.x = x; sl.z = z; sl.k = k; writeSlot(sl); flush(); },
+    // BATTLE-L lane profile switch: move a slot's home (an unplaced slot follows it; a placed one keeps its own x/z until setPlace)
+    setHome(side, slot, x, z) {
+      const sl = get(side, slot); if (!sl) return;
+      const placed = sl.x !== sl.x0 || sl.z !== sl.z0;
+      sl.x0 = x; sl.z0 = z; if (!placed) { sl.x = x; sl.z = z; }
+      writeSlot(sl); flush();
+    },
     // dim = 0..1 (dead unit: plate stays, light dies down)
     dimSlot(side, slot, k) { const sl = get(side, slot); if (!sl) return; sl.base = k; writeSlot(sl); flush(); },
     // permanent marker ring (elite red-gold, boss) / crowd-control ring (stun yellow, shock blue-white, taunt red); null clears

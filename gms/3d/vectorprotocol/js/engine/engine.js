@@ -42,7 +42,9 @@ export function createEngine(canvas, { quality, toneMapping = 'aces', autoStart 
       const w = Math.max(1, canvas.clientWidth || canvas.parentElement?.clientWidth || innerWidth);
       const h = Math.max(1, canvas.clientHeight || canvas.parentElement?.clientHeight || innerHeight);
       size.w = w; size.h = h;
-      renderer.setPixelRatio(gov ? gov.dpr : tier.dpr);
+      // BATTLE-L: pixel budget (wide desktop windows): lower the dpr so w*h*dpr^2 <= tier.maxPixels
+      const cap = tier.maxPixels ? Math.sqrt(tier.maxPixels / (w * h)) : Infinity;
+      renderer.setPixelRatio(Math.min(gov ? gov.dpr : tier.dpr, cap));
       renderer.setSize(w, h, false);
       post.setSize(w, h, renderer.getPixelRatio());
       active?.resize?.(w, h);

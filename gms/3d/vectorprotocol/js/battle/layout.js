@@ -15,8 +15,28 @@ export const BOARD = {
 };
 function derive() { BOARD.zMid = (BOARD.zNear + BOARD.zFar) / 2; BOARD.L = BOARD.zNear - BOARD.zFar; }
 derive();
+
+// BATTLE-L (docs/LANDSCAPE.md §2.3): lane spacing per orientation. 'tall' = portrait (3 lattice rows between lanes), 'wide' =
+// landscape (2 rows) so units stay at least portrait size on a landscape phone. The floor, walls and theme geometry never change;
+// only homes, plates and rings move. BOARD.laneZ / backShift always hold the active profile (one battle at a time).
+export const LANE_PROFILES = {
+  tall: { laneZ: [1.5, -6.467, -14.433], backShift: -3.983 },
+  wide: { laneZ: [1.5, -3.811, -9.122], backShift: -2.656 },
+};
+BOARD.laneProfile = 'tall';
+export function applyLaneProfile(name) {
+  const P = LANE_PROFILES[name] || LANE_PROFILES.tall;
+  BOARD.laneZ = P.laneZ.slice(); BOARD.backShift = P.backShift; BOARD.laneProfile = LANE_PROFILES[name] ? name : 'tall';
+  return BOARD;
+}
 // test hook (tools/battle_test.html ?bW=..&blaneZ=a,b,c): override board constants before a battle is built
-export function configureBoard(over = {}) { Object.assign(BOARD, over); derive(); return BOARD; }
+// (a laneZ / backShift override becomes the 'tall' profile, so profile switches keep it)
+export function configureBoard(over = {}) {
+  Object.assign(BOARD, over);
+  if (over.laneZ) LANE_PROFILES.tall.laneZ = over.laneZ.slice();
+  if (over.backShift != null) LANE_PROFILES.tall.backShift = over.backShift;
+  derive(); return BOARD;
+}
 
 export function slotPos(side, slot) {
   const col = slot >= 3 ? 1 : 0, lane = slot % 3;

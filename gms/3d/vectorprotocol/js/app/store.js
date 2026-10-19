@@ -16,7 +16,7 @@ const SUFFIX = DEV ? '_dev' : '';
 const SAVE_KEY = 'vectorprotocol.save.v1' + SUFFIX;
 
 const SETTINGS_KEY = 'vectorprotocol.settings' + SUFFIX;
-const DEFAULT_SETTINGS = { quality: 'auto', speed: 1, auto: true, damageNumbers: true, hints: true, introSeen: false, layout: 'auto' };
+const DEFAULT_SETTINGS = { quality: 'auto', speed: 1, auto: true, damageNumbers: true, hints: true, introSeen: false, layout: 'auto', battleIntro: true };
 function readJSON(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
 function writeJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode */ } }
 

@@ -88,6 +88,7 @@ function blackHole(ctx, c, size, dur, ringCol, outerCol) {
     uniforms: { uSize: { value: 0.01 }, uTime: { value: 0 }, uA: { value: 1 }, uRing: { value: ringCol.clone() }, uOuter: { value: outerCol.clone() } },
     vertexShader: HOLE_VS, fragmentShader: HOLE_FS, transparent: true, depthWrite: false, depthTest: false,
   }));
+  fx.noBloom?.(m.material);
   m.position.copy(c); m.frustumCulled = false; m.renderOrder = 30;
   host.add(m);
   const S = 40;

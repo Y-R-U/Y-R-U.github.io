@@ -18,7 +18,7 @@ export function buildArena(engine, { theme = 'scifi', seed = 7 } = {}) {
   group.add(env.group, board.group);
   return {
     group, theme: env, board, reflection: env.reflection, lights: env.lights,
-    setSlot: board.setSlot, nodePulse: board.nodePulse, dimSlot: board.dimSlot, setPlace: board.setPlace, setRarity: board.setRarity, plateH: board.plateH,
+    setSlot: board.setSlot, nodePulse: board.nodePulse, dimSlot: board.dimSlot, setPlace: board.setPlace, setHome: board.setHome, setRarity: board.setRarity, plateH: board.plateH,
     update(dt, t) { env.update(dt, t); board.update(dt, t); },
     dispose() {
       env.dispose?.();

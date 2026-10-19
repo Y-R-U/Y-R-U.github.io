@@ -22,13 +22,25 @@ export const loaded = {};
 export async function load(key) {
   if (cache.has(key)) return cache.get(key);
   const path = AVAILABLE[key];
-  const p = path ? import(path).then((m) => { loaded[key] = true; return m; }).catch((e) => {
+  const p = path ? importRetry(path).then((m) => { loaded[key] = true; window.__bootTick = Date.now(); return m; }).catch((e) => {
     console.warn('[modules] ' + key + ' unavailable, using stub:', e.message);
-    loaded[key] = false; return null;
+    loaded[key] = false; cache.delete(key);   // a later load() tries again instead of keeping the stub all session (QA Q11)
+    return null;
   }) : Promise.resolve(null);
   if (!path) loaded[key] = false;
   cache.set(key, p);
   return p;
+}
+
+// A dynamic import that fails on a network hiccup is cached as failed by the browser for that URL, so retries
+// add a cache-busting query (the module's own static imports still resolve normally). Backoff 0.6 s, 1.8 s.
+async function importRetry(path, tries = 3) {
+  let err;
+  for (let i = 0; i < tries; i++) {
+    try { return await import(i ? path + '?retry=' + i + '_' + Date.now() : path); }
+    catch (e) { err = e; if (e instanceof SyntaxError) break; await new Promise((r) => setTimeout(r, 600 * 3 ** i)); }
+  }
+  throw err;
 }
 
 export const status = () => Object.fromEntries(Object.keys(AVAILABLE).map((k) => [k, loaded[k] ?? (AVAILABLE[k] ? 'pending' : 'stub')]));

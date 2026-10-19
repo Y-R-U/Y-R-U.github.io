@@ -3,6 +3,7 @@
 import { h, clear } from '../ui/dom.js';
 import { createTopbar } from '../ui/topbar.js';
 import { closeHints } from '../ui/tutorial.js';
+import { closeModals } from '../ui/components.js';
 
 const SCREENS = {
   hub: () => import('../ui/scr_hub.js'),
@@ -45,7 +46,7 @@ export function createScreens(ctx) {
     const name = SCREENS[route.name] ? route.name : 'hub';
     const run = async () => {
       if (ctx.router.current && ctx.router.current !== route) return;   // superseded by a newer route
-      closeHints();
+      closeHints(); closeModals();
       if (cur) { try { cur.unmount?.(); } catch (e) { console.warn('[screens] unmount failed', e); } }
       const root = h('div.screen.scr-' + name);
       clear(uiRoot).appendChild(root);

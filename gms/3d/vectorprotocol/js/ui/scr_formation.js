@@ -64,8 +64,9 @@ export async function mount(root, ctx, route) {
         h('div.fm-side', h('div.fm-lbl.t-cyan', 'Your squad ', countEl), boardEl),
         h('div.fm-mid'),
         h('div.fm-side', h('div.fm-lbl.t-red', 'Hostiles ', waveTabs), enemyEl)),
-      goalsEl, powEl, synEl, buffEl,
-      h('div.fm-bench-wrap', h('div.vp-kicker', 'Roster — drag onto a hex, tap to auto-place'), benchEl)),
+      goalsEl, powEl, synEl, buffEl),
+    // the roster is pinned with ENGAGE (never inside the scroller): on a short phone the middle scrolls, the cards stay (Aaron's S22)
+    h('div.fm-bench-wrap', h('div.vp-kicker', 'Roster — drag onto a hex, tap to auto-place'), benchEl),
     h('div.fm-go', engageBtn));
 
   // ---- my board (back column on the left, front next to the centre line, far lane on top)

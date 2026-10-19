@@ -11,13 +11,19 @@ export function createRouter({ fallback = 'hub' } = {}) {
   const handlers = new Set();
   let current = null;
   let busy = Promise.resolve();
+  let guard = null, internal = false;
   const router = {
     get current() { return current; },
+    // guard(nextRoute) -> false blocks a history (Back/Forward) navigation: the URL is put back and nothing remounts.
+    // Programmatic router.go() is never blocked. Used by the battle screen (QA Q16: Back must ask before retreating).
+    setGuard(fn) { guard = fn || null; return () => { if (guard === fn) guard = null; }; },
     go(path, { replace = false } = {}) {
       const h = '#' + (path.startsWith('/') ? path : '/' + path);
       if (location.hash === h) { router.reload(); return; }
       if (replace) history.replaceState(null, '', h); else history.pushState(null, '', h);
+      internal = true;
       fire();
+      internal = false;
       // pushState fires no event; tell listeners (js/audio route music) now instead of on their 250 ms hash poll.
       // Our own popstate handler sees the hash it just routed and ignores it.
       try { dispatchEvent(new PopStateEvent('popstate', { state: null })); } catch (e) { /* old browsers: the poll still catches it */ }
@@ -37,8 +43,13 @@ export function createRouter({ fallback = 'hub' } = {}) {
   let lastHash = null;
   function fire(force = false) {
     if (!force && location.hash === lastHash) return;
-    lastHash = location.hash;
     const r = parseHash();
+    if (!internal && !force && guard && lastHash && guard(r) === false) {
+      // pushState (not replaceState) also drops the forward entries, so Forward can't land somewhere stale afterwards
+      history.pushState(null, '', lastHash);
+      return;
+    }
+    lastHash = location.hash;
     r.from = current?.path || null;
     current = r;
     // route changes are serialised so a fast double-tap can't interleave mount/unmount

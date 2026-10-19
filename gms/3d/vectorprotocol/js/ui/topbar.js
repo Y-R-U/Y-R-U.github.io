@@ -45,8 +45,9 @@ export function createTopbar(ctx) {
     el,
     show(on, title, route) {
       el.classList.toggle('hide', !on);
-      // the avatar only shows on the hub and in settings (account.js reads the same rule)
-      el.classList.toggle('acct', !!on && ACCOUNT_SCREENS.has(route?.name || 'hub'));
+      // the avatar only shows on the hub and in settings (account.js reads the same rule), but its corner stays
+      // reserved on every top-bar screen so the layout doesn't jump between screens (QA A3)
+      el.classList.toggle('acct', !!on);
       if (on) { refresh(); if (!co.classList.contains('folded') && !foldT) fold(false); }
     },
     refresh,

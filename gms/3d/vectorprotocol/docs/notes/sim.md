@@ -145,3 +145,42 @@
 - p2 = n4 with m8 back to [48,50], m6 [41,47], rankUp ×1.25 (shards [18,43,68,93,118], credits [900,5k,17k,34k,50k]):
   **max map ≤3.25 on all 6 seeds**, totals 12.0–14.1. p1 (m6 [41,46], ×1.15) had a 7.2 h outlier.
 - IN PROGRESS: q1 (p2 with ×1.4 rank), q2 (×1.33) to lift totals to 15+.
+## sim-4 — checkpoint 7
+- q1 (×1.4) / q2 (×1.33): means 15.5 / 15.0 h but maps >3.5 h on 5/48 and 4/48 (slower economy = more spread).
+  r1/r2 (p2 + m7 [46,50] / + m5 [34,41]): means 13.8 / 13.9, new walls 4.8 / 5.0 h. Harder maps = new walls.
+- IN PROGRESS: s1 (p2 at ×1.3), s2 (p2 + shop shards 150 tokens). Then apply the winner (likely p2-family) to live data.
+## sim-4 — checkpoint 8
+- s1 (×1.3) mean 12.8, 2 outliers; s2 (p2 + shop 150 tokens) mean 15.25 but 5/48 maps 3.6–4.8 h; t1 (shop 135) mean 12.75, one 5.2 h.
+  → **Applied p2 to live js/data** (backup <scratchpad>/sim4/live_bak): m5–m8 first-clear focus [4,8,16] (m5/m7/m8 focusOnly; m6 keeps
+  Rift shards), faction trials all tiers `focusShards: 3` (replacing the fixed-unit 2 shards), m3 [18,27], m4 [27,35], m6 [41,47],
+  rankUp shards [18,43,68,93,118] credits [900,5k,17k,34k,50k]. Shop/exchange/star rewards untouched (pending owner decisions).
+- QA Q4 done: mutual KO on the **last** wave = victory (wave clear + end win, 0 survivors → goal "win" only). A wipe with waves still
+  to come stays a defeat (nobody left to fight them). Test added.
+- QA Q5 done: m1 lv [1,8] → [1,5]. Probe (<scratchpad>/sim4/m1probe.mjs, AUTO on, 100 seeds): m1_l4 at the QA squad (413) 34% → 89%;
+  at 398 85% (rec now 377). m1_l7 at rec 90%. m1_l8 elite stays a check (37–59%). AUTO **off** without tapping overdrives is ~19%
+  (ui: maybe nudge the overdrive tap in the tutorial). Note my first probe was wrong: calling completeBattle in the loop levelled the
+  company and inflated power. Star times + MAPS/ROSTER/STORY regenerated. Tests 26/26, validate 0.
+- IN PROGRESS: final `balance.mjs --seeds=1,2,3 --hours=60` → <scratchpad>/sim4/final/all.txt (+ all.json).
+## sim-4 — checkpoint 9
+- final #1 (p2 + m1 [1,5]): smart 9.1 / 14.1 / 12.7 h, max map 3.52 / 2.74 / 2.92 h (all finish); straight walls m3_l8/m3_l8/m3_l11
+  (10.6/9.6/15.5 h); **naive grinder walled m2_l14 on all seeds**: shards ready for R2 but 3.6k credits < 5k (its Street-Hire-at-3.75k
+  habit never lets 5k accumulate). → kept sim-3's R1/R2 costs (shards [14,34,…], credits [700,4000,…]), ×1.25 only from R3 up:
+  rankUp shards [14,34,68,93,118] credits [700,4000,17000,34000,50000]. Re-running → <scratchpad>/sim4/final2/all.txt.
+## sim-4 — final (handed back)
+- final2 (R1/R2 at 4k) fixed the naive grinder (reaches m4/m5) but smart got 8.5 / 18.0 / 10.8 h with worst maps 3.25 / 4.44 / 3.72 →
+  **reverted to p2 costs** (rankUp shards [18,43,68,93,118], credits [900,5k,17k,34k,50k]). Live data = final #1 (<scratchpad>/sim4/final/all.txt):
+  smart 9.1 / 14.1 / 12.7 h, worst map 3.5 / 2.7 / 2.9 h, arena+events 47–52%; straight walls m3; naive grinder walls m2_l14 (credit trap).
+  ECONOMY § Balance status rewritten; DESIGN §8 mutual KO; README "Dev cheats" + "Focus shards"; SCHEMA focusShards. Tests 26/26, validate 0.
+- Misses: total < 15 h (every lever that lifts it widens the spread; shop shards at 150 tokens = mean 15.3 h, worst maps ~4 h);
+  arena+events ~50% (structural; pending Aaron's call on star replays).
+
+### Cheat API (for ui / js/dev/dev.js — route via manager)
+- `createBattle({ ...cfg, cheats: { invulnerable: true, oneHit: true } })`, **or** with no battle-agent change: `cfg.player = { ...cfg.player,
+  cheats: {...} }` (battle.js and scr_battle's fallback stepper both pass `B.player` through as `player`). Drop the `mods.hp/atk += 999` hack.
+- invulnerable: 0 damage to player units, wave timeout can't lose (overtime still ramps so the fight ends). oneHit: any player damage kills.
+- `state.cheats` = `{invulnerable, oneHit}` | null (for a HUD badge), `result.cheats` on a cheated run. game_state never emits them.
+
+### Requests
+- ui: switch dev.js to `player.cheats` (above); optionally show `state.cheats` on the HUD. With AUTO off and no overdrive taps, m1_l4 is ~19%
+  even at good power: maybe a tutorial nudge to tap the overdrive. A "save credits for the rank-up" hint when a squad unit is shard-ready.
+- manager/Aaron: total-time vs per-map-ceiling trade-off (see ECONOMY § Balance status); the 4 pending decisions untouched.

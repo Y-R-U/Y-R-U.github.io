@@ -6,9 +6,11 @@ import { load } from '../app/modules.js';
 import { data, unitDef } from '../app/data.js';
 import { createHud } from './hud.js';
 import { modsText } from './scr_formation.js';
-import { hint } from './tutorial.js';
+import { hint, hintSeen } from './tutorial.js';
 import { snd, audioReady } from '../app/sound.js';
 import { orient } from '../app/orient.js';
+import { DEV } from '../app/store.js';
+import { btn } from './components.js';
 
 // same rule as js/battle/battle.js picks the arena: the session theme (level.realm || map.realm, or a map theme alias),
 // else a wave made mostly of realm:'fantasy' units
@@ -50,8 +52,21 @@ export async function mount(root, ctx) {
   window.__vp.hud = hud;
   // tutorial: the first time an Overdrive charges, point at the glowing portrait and the AUTO toggle
   let odHinted = false;
+  // AUTO off and a charged Overdrive left untapped for 1.5 s: point at it once, ever (sim-4: m1_l4 drops to ~19 % without taps)
+  let readySince = 0, manualHinted = hintSeen(store, 'od_manual') || store.settings.hints === false;
+  const manualNudge = (s) => {
+    if (manualHinted || hud.auto || ended || s?.done) { readySince = 0; return; }
+    const u = s?.player?.units?.find((x) => x.alive && x.overdriveReady);
+    if (!u) { readySince = 0; return; }
+    if (!readySince || document.querySelector('.tut-tip')) { readySince ||= performance.now(); return; }
+    if (performance.now() - readySince < 1500) return;
+    manualHinted = true;
+    const card = root.querySelector('.pc[data-id="' + u.id + '"]');
+    hint(store, 'od_manual', card, 'Overdrive ready! AUTO is off, so it waits for you: tap the glowing portrait to fire it.', { force: true, delay: 0, life: 8000, compact: true, width: 250 });
+  };
   const onState = (s) => {
     hud.update(s);
+    manualNudge(s);
     // AUTO fires on the tick it charges, so 'ready' is rarely visible: trigger just before full charge
     const near = (u) => u.alive && (u.overdriveReady || (u.chargePct || 0) >= 0.85);
     if (odHinted || ended || s?.done || !s?.player?.units?.some(near)) return;
@@ -62,12 +77,19 @@ export async function mount(root, ctx) {
     hint(store, 'overdrive', card, hud.auto ? 'Gold bar = Overdrive charge. AUTO fires it when full; turn AUTO off to tap the glowing portrait yourself.' : 'Overdrive charging: tap the portrait when it glows.', { delay: 50, life: 7000, compact: true, width: 250 });
   };
 
+  // D26 battle intro (camera fly-in, battle-owned): off when the setting is off, under ?dev&nointro, and on a replay of a contract
+  // already fought this session (Retry/Replay from results goes straight into the fight)
+  const seenIntro = (ctx.session.introSeen ||= new Set());
+  const introKey = (B.kind || 'story') + ':' + (B.levelId || B.title || '');
+  const wantIntro = store.settings.battleIntro !== false && !(DEV && new URLSearchParams(location.search).has('nointro')) && !seenIntro.has(introKey);
+  seenIntro.add(introKey);
+
   const battleMod = engine ? await load('battle') : null;
   await Promise.race([audioReady, new Promise((r) => setTimeout(r, 1500))]);
   const au = snd.forBattle(B);   // starts the battle/boss/rift track; null without js/audio
   if (battleMod?.createBattleScene) {
     try {
-      scene = battleMod.createBattleScene(engine, { playerSquad: B.player, enemyWaves: B.enemyWaves, seed: B.seed, goals: B.goals, arena: B.arena, theme: B.theme, data: B.data || data(), auto: auto0, overlay: root, speed: speed0, ...(au ? { audio: au } : {}), margins: hud.margins() || { top: 64, bottom: 150 } });
+      scene = battleMod.createBattleScene(engine, { playerSquad: B.player, enemyWaves: B.enemyWaves, seed: B.seed, goals: B.goals, arena: B.arena, theme: B.theme, data: B.data || data(), auto: auto0, overlay: root, speed: speed0, ...(au ? { audio: au } : {}), intro: wantIntro, margins: hud.margins() || { top: 64, bottom: 150 } });
       ctl = {
         setSpeed: (s) => scene.setSpeed(s), setAuto: (a) => scene.setAuto(a), fireOverdrive: (id) => scene.fireOverdrive(id),
         pause: (p) => { if (scene.setPaused) scene.setPaused(p); else if (p) engine.stop(); else engine.start(); },
@@ -92,11 +114,16 @@ export async function mount(root, ctx) {
   ro.observe(root); ro.observe(hud.strip); ro.observe(hud.rail);   // the strip grows when a small squad gets bigger cards
   requestAnimationFrame(fitMargins);
   // rotation: same HUD nodes, new layout; the scene refits from the new margins (no restart, docs/LANDSCAPE.md §1.4)
+  // Back / Forward during the fight opens the pause sheet instead of silently dropping the battle (QA Q16)
+  const offGuard = (router.setGuard || (() => () => {}))(() => { if (ended) return true; if (!paused) pauseMenu(); return false; });
+  // returning to a backgrounded tab: the fight was frozen by the browser, so offer the pause sheet first (QA Q23)
+  const onVis = () => { if (document.visibilityState === 'visible' && !ended && !paused && ctl) pauseMenu(); };
+  document.addEventListener('visibilitychange', onVis);
   const offOrient = orient.on(({ mode }) => { hud.setMode(mode); fitMargins(); requestAnimationFrame(fitMargins); });
   hud.update(ctl.state);
   if (!scene) setTimeout(() => hud.flash(B.title || 'Engage', 'big'), 150);
   if (scene) {
-    Promise.resolve(scene.ready).then(() => scene.start?.()).catch(async (e) => {
+    Promise.resolve(scene.ready).then(() => { scene.start?.(); if (wantIntro) introUi(); }).catch(async (e) => {
       console.warn('[battle] 3D scene failed to load, switching to tactical feed', e);
       if (ended) return;
       ctx.screens.setScene(null);
@@ -104,6 +131,34 @@ export async function mount(root, ctx) {
       scene = null;
       ctl = await tacticalFeed(root, ctx, B, hud, onEnd, { speed: hud.speed, auto: hud.auto, onState });
     });
+  }
+
+  // SKIP / DON'T SHOW AGAIN while the intro plays; feature-detected (D19): without the battle API nothing shows
+  let introEl = null;
+  function introUi() {
+    if (!scene || ended) return;
+    let done = null;
+    if ('introActive' in scene) {
+      if (!scene.introActive && typeof scene.playIntro === 'function') done = Promise.resolve(scene.playIntro({ strength: orient.landscape ? 1 : 0.6 }));
+    } else if (typeof scene.playIntro === 'function') done = Promise.resolve(scene.playIntro({ strength: orient.landscape ? 1 : 0.6 }));
+    else return;
+    const active = () => !ended && (scene.introActive ?? !!done);
+    if (!active()) return;
+    const finish = () => {
+      if (!introEl) return;
+      hud.el.classList.remove('intro'); hud.el.classList.add('intro-out');
+      introEl.remove(); introEl = null;
+    };
+    const skip = () => { try { scene.skipIntro?.(); } catch (e) { /* battle owns it */ } finish(); };
+    introEl = h('div.bi-bar',
+      btn("Don't show again", () => { store.setSetting('battleIntro', false); skip(); ctx.toast('Battle intro off · turn it back on in Settings'); }, { cls: 'sm bi-never' }),
+      btn('Skip', skip, { cls: 'sm primary bi-skip', icon: 'ffwd' }));
+    const place = () => { if (introEl && !orient.landscape) introEl.style.bottom = ((hud.margins()?.bottom ?? 150) + 8) + 'px'; else if (introEl) introEl.style.bottom = ''; };
+    root.appendChild(introEl); place();
+    hud.el.classList.add('intro');
+    done?.then(finish, finish);
+    const poll = () => { if (!introEl) return; if (!active()) finish(); else { place(); setTimeout(poll, 150); } };
+    setTimeout(poll, 300);
   }
 
   function onEnd(result) {
@@ -141,7 +196,7 @@ export async function mount(root, ctx) {
 
   return {
     scene, topbar: false, bg: scene ? 'off' : 'on',
-    unmount() { ended = true; ro.disconnect(); offOrient(); if (window.__vp.hud === hud) window.__vp.hud = null; ctl?.dispose?.(); hud.dispose(); },
+    unmount() { ended = true; ro.disconnect(); offOrient(); offGuard(); document.removeEventListener('visibilitychange', onVis); if (window.__vp.hud === hud) window.__vp.hud = null; ctl?.dispose?.(); hud.dispose(); },
   };
 }
 

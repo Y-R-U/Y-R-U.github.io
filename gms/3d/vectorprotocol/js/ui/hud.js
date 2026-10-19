@@ -21,6 +21,7 @@ export function createHud(root, { portraits, onSpeed, onAuto, onFire, onMenu, on
   const autoBtn = ibtn('auto', 'Auto', () => { curAuto = !curAuto; autoBtn.classList.toggle('on', curAuto); autoBtn.classList.toggle('off', !curAuto); onAuto?.(curAuto); }, auto ? 'on' : 'off');
   let curSpeed = speed, curAuto = auto;
   const strip = h('div.hud-strip');
+  const cheatEl = h('div.hud-cheats.hide');   // dev: sim state.cheats (god / one-hit) so a cheated run is obvious
   const banner = h('div.hud-banner');
   const el = h('div.hud' + (theme === 'fantasy' ? '.fantasy' : ''), { dataset: { theme } },
     h('div.hud-top',
@@ -30,7 +31,7 @@ export function createHud(root, { portraits, onSpeed, onAuto, onFire, onMenu, on
       h('div.hud-integ.vp-panel.red.foe', h('div.lbl', theme === 'fantasy' ? 'Enemy forces' : 'Enemy squad integrity'), h('div.row', eBar, ePct))),
     h('div.hud-left.vp-panel', ibtn('squad', '', onSquad), ibtn('info', '', onInfo), fullscreenButton('hud-fs')),
     h('div.hud-right', speedBtn, autoBtn),
-    banner,
+    banner, cheatEl,
     strip);
   root.appendChild(el);
   const top = el.querySelector('.hud-top'), left = el.querySelector('.hud-left'), right = el.querySelector('.hud-right');
@@ -65,6 +66,8 @@ export function createHud(root, { portraits, onSpeed, onAuto, onFire, onMenu, on
     setBar(pBar, pi); setBar(eBar, ei);
     pPct.textContent = Math.ceil(pi * 100) + '%'; ePct.textContent = Math.ceil(ei * 100) + '%';
     roundN.textContent = (s.wave || 1) + '/' + (s.waves || 1);
+    const ch = s.cheats ? ['invulnerable', 'oneHit'].filter((k) => s.cheats[k]).map((k) => (k === 'oneHit' ? 'one-hit' : 'god')).join(' · ') : '';
+    if (ch !== cheatEl.dataset.k) { cheatEl.dataset.k = ch; cheatEl.textContent = ch ? 'Cheats: ' + ch : ''; cheatEl.classList.toggle('hide', !ch); }
     // OVERTIME: the 3D overlay draws its own plate under the bar, so this stays a tint + tag on the round box
     const ot = !!s.overtime && !s.done;
     if (ot !== otOn) { otOn = ot; roundEl.classList.toggle('ot', ot); if (!ot) roundLbl.textContent = 'Round'; }

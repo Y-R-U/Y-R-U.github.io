@@ -178,3 +178,31 @@ M=Image.new('RGB',(w*n,h*rows)); d=ImageDraw.Draw(M)
 for i,im in enumerate(ims): M.paste(im,((i%n)*w,(i//n)*h))
 M.save(sys.argv[1])" $out $n "${files[@]}"
 ```
+
+## Round 5 (robots) — checkpoint 1
+- DONE 1 (Q19 profile clipping): portrait.js `createTurntable` now measures the idle pose (`unitBands`: per-height-band max radius about
+  the spin axis, all visible meshes incl. aura bubble / R4 ring) and fits the camera with `fitCamera` (aspect-independent, units = frame
+  height at zoom 1; defaults halfH .29 / halfW .37 / cy -.045 tuned for scr_unit's zoom 0.6 + setViewOffset stage). Pedestal is sized to
+  the footprint (radius x1.45, ground parts, clamp 0.7..1.6). API unchanged; additive 3rd arg `createTurntable(engine, unitOpts, view)`
+  takes fitCamera opts + `offsetX`; honours `tt.spinPaused` (scr_unit sets it on drag). Gallery `view=turntable` now mimics scr_unit's
+  resize (`&ui=0` = raw) and draws the stage guide; `&rank=`. All 44 fit at R0 and R5 (portrait) and in landscape.
+  `renderPortrait`: bust only for upright bipeds (quad/beast/hover/tracked frame whole), width fit tighter.
+  Shots: scratchpad robots5/shots/b0_sheet.png (before, in-game) -> a3_sheet.png (after), a2_r0.png / a2_r5.png / a2_land.png,
+  b0_portraits.png -> a4_portraits.png.
+- NEXT: 2 HALO aura by rank, 3 MINOTAUR attack sideways travel, 4 touch-ups.
+- DONE 2 (HALO aura by rank): kit `units.js`: `def.aura` x [0.55, 0.7, 0.85, 1, 1.1, 1.2][rank] (or `aura: (rank) => v`), bubble swells
+  2%/rank, setShield floors at the ranked value. HALO's local setShield wrapper removed (it pinned the floor at 0.38 for every rank).
+  Shot: shots/b_halo_ranks.png.
+- DONE 3 (MINOTAUR rail): measured rail-ward reach (player back = max(-0.43x - 0.9z), enemy = max(0.43x - 0.9z), model m, battle yaw
+  ±(π/2-0.45)); idle 0.57. Before: attack 1.15, attack_alt 1.56, victory 1.18. After: attack 0.79/0.87, attack_alt 0.76, victory 0.98,
+  overdrive 0.66-0.72 (all ≤ +0.4 over idle). Smaller wind-up twist, coil arm forward, overhead heave raised over the horns instead of
+  dropping behind the back. Script: robots5/reach.mjs <model> <anims>. Contact sheet shots/mino_after.png.
+- NEXT: testAll, then touch-ups (two weakest of arbiter / wisp / oracle faceplate / halo face R0 / elf cloak lining).
+- DONE 4 touch-ups (two weakest at battle size, judged in view=battle 412x915: shots/c1_battle.png -> c2_battle.png):
+  WISP read smallest on the board: bodyScale 1.5 -> 1.8, height 1.35, radius 0.48 (now Patch-sized). ARBITER (~5.5) read as a
+  scatter of white drones with glowing rotor rings: drone orbit 0.56 -> 0.5, drones ~15% smaller, rotor rings trim (glow only R4+).
+  Honest: arbiter is still busy from the top camera (maybe 6/10); a real fix is a bigger, darker coat mass + fewer drones (sculpt job).
+- Gate: testAll 0 fails (high and q=low). Module syntax checks pass (portrait.js, units.js, halo.js, minotaur.js, arbiter.js, wisp.js).
+- OPEN: oracle faceplate, halo face/R0, elf cloak lining not touched. Specter is small on the turntable (rifle radius 2.17 m forces
+  the fit); Halo's aura bubble pokes past the card-portrait edge (shield not in the bust box). Paladin's sword glare blooms on the plate.
+  Request (ui): none needed; scr_unit's resize wrapper keeps working (fit is aspect-independent, computed in setUnit).

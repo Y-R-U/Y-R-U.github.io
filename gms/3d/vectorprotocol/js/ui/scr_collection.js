@@ -2,9 +2,10 @@
 import { h, fmt } from './dom.js';
 import { icon } from './icons.js';
 import { data } from '../app/data.js';
-import { header, unitCard, btn } from './components.js';
+import { header, unitCard, btn, confirmBox } from './components.js';
 import { snd } from '../app/sound.js';
 import { hint } from './tutorial.js';
+import { orient } from '../app/orient.js';
 
 const RARITY_ORDER = { legendary: 0, epic: 1, rare: 2, common: 3 };
 
@@ -18,25 +19,28 @@ export function mount(root, ctx, route) {
   const squadRow = h('div.col-squad');
   const surplusEl = h('div.col-surplus-wrap');
 
-  root.append(header(title, () => router.go('/hub')));
-  if (route.name === 'workshop') root.append(h('div.col-hint.vp-panel.dim', icon('wrench'), h('span', 'Pick a unit to level, rank up or train abilities.')));
-  root.append(
-    h('div.col-squad-wrap', h('div.row.between', h('div.vp-kicker', 'Active squad ' + store.state.squad.length + '/' + store.state.slots), h('small.t-muted', 'Edit before each deployment')), squadRow),
-    surplusEl, h('div.row', tabs, sortBtn), h('div.col-scroll.scroll', grid));
+  // .l2-a / .l2-b: the two landscape columns (display: contents in portrait, so the DOM reads as the old single column)
+  root.classList.add('l2');
+  root.append(header(title, () => router.go('/hub')),
+    h('div.l2-a',
+      route.name === 'workshop' ? h('div.col-hint.vp-panel.dim', icon('wrench'), h('span', 'Pick a unit to level, rank up or train abilities.')) : null,
+      h('div.col-squad-wrap', h('div.row.between', h('div.vp-kicker', 'Active squad ' + store.state.squad.length + '/' + store.state.slots), h('small.t-muted', 'Edit before each deployment')), squadRow),
+      surplusEl),
+    h('div.l2-b', h('div.row', tabs, sortBtn), h('div.col-scroll.scroll', grid)));
 
   function render() {
     const sp = store.surplusTotal();
     surplusEl.replaceChildren(...(sp.shards ? [h('div.col-surplus.vp-panel.purple', { '--cut': '10px' }, icon('hex'),
       h('div.grow', h('b', sp.shards + ' surplus shards'), h('small', 'Beyond max rank · worth ' + fmt(sp.chips) + ' chips')),
-      btn('Convert all', () => { const r = store.convertAllShards(); if (!r.ok) return ctx.toast(r.why, 'err'); snd.sfx('reward');
+      btn('Convert all', async () => { if (!await confirmBox('Convert all surplus?', sp.shards + ' surplus shards become ' + fmt(sp.chips) + ' chips. This can\'t be undone.', 'Convert', 'Keep')) return; const r = store.convertAllShards(); if (!r.ok) return ctx.toast(r.why, 'err'); snd.sfx('reward');
         ctx.toast('+' + fmt(r.gained?.chips || 0) + ' chips', 'gold'); render(); }, { cls: 'gold sm', icon: 'cores', sfx: 'none' }))] : []));
     tabs.replaceChildren(...['all', 'tank', 'archer', 'mage'].map((f) => h('button.vp-tab' + (f === filter ? '.on' : ''), { type: 'button', onclick: () => { filter = f; render(); } }, f === 'all' ? 'All' : icon(f), f === 'all' ? null : h('span', f))));
     sortBtn.textContent = '⇅ ' + sort;
-    squadRow.replaceChildren(...Array.from({ length: 6 }, (_, i) => {
+    squadRow.replaceChildren(...(orient.landscape ? squadGrid() : Array.from({ length: 6 }, (_, i) => {
       const e = store.state.squad[i];
       if (e) { const v = store.view(e.uid); return unitCard(v, { portraits, onclick: () => router.go('/unit/' + v.uid) }); }
       return h('div.col-empty' + (i >= store.state.slots ? '.locked' : ''), i >= store.state.slots ? icon('lock') : icon('plus'));
-    }));
+    })));
     const owned = store.roster();
     const ownedIds = new Set(owned.map((u) => u.id));
     let list = owned.filter((u) => filter === 'all' || u.role === filter);
@@ -59,7 +63,21 @@ export function mount(root, ctx, route) {
         return c;
       }));
   }
+  // landscape: the squad as a 2x3 grid mirroring the formation (same mapping as the battle HUD / scr_formation)
+  function squadGrid() {
+    const pos = (col, lane) => ({ gridColumn: col === 0 ? 2 : 1, gridRow: 3 - lane });
+    const taken = new Set(), out = [];
+    for (const e of store.state.squad) {
+      const v = store.view(e.uid); if (!v) continue;
+      const c = unitCard(v, { portraits, onclick: () => router.go('/unit/' + v.uid) });
+      Object.assign(c.style, pos(e.slot.col, e.slot.lane)); taken.add(e.slot.col + ':' + e.slot.lane); out.push(c);
+    }
+    for (let col = 0; col < 2; col++) for (let lane = 0; lane < 3; lane++)
+      if (!taken.has(col + ':' + lane)) out.push(h('div.col-empty', { style: pos(col, lane) }, icon('plus')));
+    return out;
+  }
   render();
+  const offOrient = orient.on(render);
   hint(store, 'collection', grid.firstElementChild, 'Tap a robot to open its profile and upgrades.', { place: 'below', delay: 500 });
-  return { topbar: true, bg: 'on' };
+  return { topbar: true, bg: 'on', unmount: offOrient };
 }

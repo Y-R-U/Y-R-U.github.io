@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { BOARD } from '../layout.js';
+import { BOARD, LANE_PROFILES } from '../layout.js';
 import { box, merge, onLayers, BACKDROP_LAYER } from '../geo.js';
 import { floorTextures } from '../../fx/textures.js';
 import { createPlanarReflection, addPlanarReflection, REFLECT_LAYER, MIRROR_ONLY_LAYER } from '../../fx/reflection.js';
@@ -22,7 +22,7 @@ export function createTheme(engine, { seed = 7 } = {}) {
 
   // --- board floor: hex lattice + circuits, glossy, mirrored ---
   const ft = floorTextures({ W: BOARD.W, L: BOARD.L, px: tier.name === 'low' ? 40 : 60, seed, hexR: BOARD.gridR,
-    hexOrigin: [0, BOARD.laneZ[0] + BOARD.backShift], zFar: bz1, traces: 0.45 });
+    hexOrigin: [0, LANE_PROFILES.tall.laneZ[0] + LANE_PROFILES.tall.backShift], zFar: bz1, traces: 0.45 });
   const floorMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color(1.28, 1.12, 0.9), // battle-5: warm the blue-grey albedo under the cool lights -> ref_02's slate (measured avg 63,78,119)
     map: ft.map, emissiveMap: ft.emissive, emissive: new THREE.Color(1.0, 1.2, 1.75),

@@ -59,9 +59,13 @@ export function toast(msg, kind = '', life = 2.4, opts = {}) {
 }
 
 // Styled modal. Resolves with the value of the chosen action (or null on backdrop dismiss).
+const openModals = new Set();
+// screens.show() closes every open modal on a route change (QA Q9: a picker left over from the arena blocked ENGAGE)
+export function closeModals() { for (const c of [...openModals]) c(null); }
 export function modal({ title, body, actions = [{ label: 'OK', value: true, cls: 'primary' }], cls = '', dismissable = true }) {
   return new Promise((resolve) => {
-    const close = (v) => { wrap.remove(); resolve(v); };
+    const close = (v) => { openModals.delete(close); wrap.remove(); resolve(v); };
+    openModals.add(close);
     const content = typeof body === 'string' ? h('div.body', body) : h('div.body', body);
     const box = h('div.vp-panel.vp-modal' + (cls ? '.' + cls : ''), { onclick: (e) => e.stopPropagation() },
       title ? h('h2.vp-title', title) : null, h('div.divider'), content,

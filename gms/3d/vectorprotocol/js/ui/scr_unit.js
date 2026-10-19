@@ -2,7 +2,7 @@
 import { h, fmt } from './dom.js';
 import { icon, roleBadge, abilityIcon } from './icons.js';
 import { ability } from '../app/data.js';
-import { btn, bar, header } from './components.js';
+import { btn, bar, header, confirmBox } from './components.js';
 import { hint } from './tutorial.js';
 import { snd } from '../app/sound.js';
 
@@ -47,7 +47,10 @@ export async function mount(root, ctx, route) {
       scene.resize = (w, hh) => {
         r0?.(w, hh);
         const cam = scene.camera; if (!cam?.setViewOffset) return;
-        cam.zoom = 0.6; cam.setViewOffset(w, hh, 0, hh * 0.27, w, hh); cam.updateProjectionMatrix();
+        // portrait: subject in the top 38 %; landscape (w/h >= 1): subject centred in the left 46 % stage, beside the sheet
+        if (w / hh >= 1) { cam.zoom = 0.85; cam.setViewOffset(w, hh, w * 0.27, -hh * 0.03, w, hh); }
+        else { cam.zoom = 0.6; cam.setViewOffset(w, hh, 0, hh * 0.27, w, hh); }
+        cam.updateProjectionMatrix();
       };
     } catch (e) { console.warn('[unit] turntable failed', e); scene = null; }
   }
@@ -73,7 +76,9 @@ export async function mount(root, ctx, route) {
         h('span.grow'), rc ? h('small', 'Shards ' + v.shards + '/' + rc.shards) : h('small.t-gold', 'MAX RANK')),
       v.surplusShards > 0 ? h('div.up-surplus', icon('hex'), h('div.grow', h('b', v.surplusShards + ' surplus shard' + (v.surplusShards > 1 ? 's' : '')),
         h('small', (rc ? 'More than this unit needs to reach max rank' : 'Max rank: these shards have no further use') + ' · worth ' + fmt(Math.floor(v.surplusShards * (v.shardValue?.chips ?? 1))) + ' chips')),
-        btn('Convert', () => {
+        btn('Convert', async () => {
+          const chips = Math.floor(v.surplusShards * (v.shardValue?.chips ?? 1));
+          if (!await confirmBox('Convert shards?', 'Turn ' + v.surplusShards + ' surplus ' + v.name + ' shards into ' + fmt(chips) + ' chips. This can\'t be undone.', 'Convert', 'Keep')) return;
           const r = store.convertShards(v.id);
           if (!r.ok) return ctx.toast(r.why, 'err');
           snd.sfx('currency_tick'); snd.sfx('reward');
@@ -85,8 +90,11 @@ export async function mount(root, ctx, route) {
       h('div.up-acts',
         btn(lc.capped ? 'Level cap' : 'Level up', () => act(store.levelUp(uid), 'Level up!'), { cls: 'primary', sfx: 'none', disabled: lc.capped, icon: 'up', id: 'up-level' }),
         h('div.up-cost', lc.capped ? h('small.t-muted', 'Rank up to raise the cap') : [h('span', icon('scrap'), fmt(lc.scrap)), h('span', icon('credits'), fmt(lc.credits))]),
-        btn('Rank up', () => act(store.rankUp(uid), 'Rank up!'), { cls: 'gold', disabled: !rc || v.shards < rc.shards, icon: 'star', sfx: !rc || v.shards < rc.shards ? undefined : 'none' }),
-        rc ? h('div.up-cost', h('span', icon('hex'), rc.shards), h('span', icon('credits'), fmt(rc.credits))) : h('div')),
+        // rank up needs the level cap first (QA Q18): disabled until then, the cost row says why
+        btn('Rank up', () => act(store.rankUp(uid), 'Rank up!'), { cls: 'gold', disabled: !rc || v.shards < rc.shards || v.level < v.cap, icon: 'star', sfx: !rc || v.shards < rc.shards || v.level < v.cap ? undefined : 'none' }),
+        rc ? (v.level < v.cap ? h('div.up-cost', h('small.t-muted', 'Reach Lv ' + v.cap + ' first'))
+          : v.shards >= rc.shards && (store.state.cur.credits || 0) < rc.credits ? h('div.up-cost', h('small.t-gold', 'Save ' + fmt(rc.credits - (store.state.cur.credits || 0)) + ' more credits'))
+          : h('div.up-cost', h('span', icon('hex'), rc.shards), h('span', icon('credits'), fmt(rc.credits)))) : h('div')),
       h('div.vp-kicker', 'Abilities'),
       h('div.up-abs', ['attack', 'passive', 'overdrive'].map((k) => {
         const ab = ability(v[k]);

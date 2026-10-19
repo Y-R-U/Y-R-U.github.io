@@ -95,10 +95,12 @@ export async function renderPortrait(model, opts = {}) {
     const box = new THREE.Box3().setFromObject(unit.mesh, true);
     // frame on the bounding box: bust = upper ~60% (wide units like quads fall back to full); always fit the width too
     const bh = box.max.y - box.min.y, bw = Math.max(box.max.x - box.min.x, 0.1);
-    const bust = o.framing === 'bust' && bh > bw * 0.7;
+    // bust only for upright bipeds; quads, hovers and tracked units (and anything squat) frame whole
+    const upright = !['quad', 'beast', 'hover', 'tracked'].includes(def.rig);
+    const bust = o.framing === 'bust' && upright && bh > bw * 0.9;
     const cx = (box.min.x + box.max.x) / 2, cz = (box.min.z + box.max.z) / 2;
     const cy = bust ? box.max.y - bh * 0.3 : (box.max.y + box.min.y) / 2;
-    const span = Math.max(bust ? bh * 0.62 : bh * 1.08, (bust ? bw * 0.5 : bw * 0.9) / cam.aspect);
+    const span = Math.max(bust ? bh * 0.62 : bh * 1.06, (bust ? bw * 0.62 : bw * 0.98) / cam.aspect);
     const dist = span / 2 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
     cam.position.set(cx, cy + H * 0.08, box.max.z + Math.max(dist, 1));
     cam.lookAt(cx, cy, cz);
@@ -126,29 +128,96 @@ export async function renderPortrait(model, opts = {}) {
   return job;
 }
 
+// Real silhouette of a posed unit as height bands: [{y0, y1, r}] (r = max distance from the spin axis, so any yaw fits).
+export function unitBands(unit, n = 10) {
+  const v = new THREE.Vector3();
+  unit.root.updateMatrixWorld(true);
+  let y0 = 1e9, y1 = -1e9;
+  const pts = [];
+  unit.root.traverse((m) => {
+    if (!m.isMesh || !m.visible || !m.geometry?.attributes?.position) return;
+    for (let o = m; o; o = o.parent) if (!o.visible) return;
+    const p = m.geometry.attributes.position, st = Math.max(1, Math.floor(p.count / 3000));
+    for (let i = 0; i < p.count; i += st) {
+      m.getVertexPosition(i, v).applyMatrix4(m.matrixWorld);
+      pts.push(v.y, Math.hypot(v.x, v.z));
+      if (v.y < y0) y0 = v.y; if (v.y > y1) y1 = v.y;
+    }
+  });
+  if (!pts.length) return [{ y0: 0, y1: unit.height, r: unit.radius }];
+  const bh = Math.max(y1 - y0, 0.01), bands = Array.from({ length: n }, (_, i) => ({ y0: y0 + bh * i / n, y1: y0 + bh * (i + 1) / n, r: 0 }));
+  for (let i = 0; i < pts.length; i += 2) bands[Math.min(n - 1, Math.floor((pts[i] - y0) / bh * n))].r = Math.max(bands[Math.min(n - 1, Math.floor((pts[i] - y0) / bh * n))].r, pts[i + 1]);
+  return bands.filter((b) => b.r > 0);
+}
+
+// Fit a camera (fixed pitch, looking along -z) so every band circle projects inside the target box. Units are fractions of the
+// frame HEIGHT at zoom 1 (aspect-independent): halfH / halfW = allowed half extents, cy = vertical centre, cx = horizontal centre.
+export function fitCamera(camera, bands, { halfH = 0.3, halfW = 0.34, cy = 0, cx = 0, pitch = 0.1, margin = 1.05 } = {}) {
+  const k = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const ring = [];
+  for (const b of bands) for (const y of [b.y0, b.y1]) for (let a = 0; a < 24; a++) {
+    const t = a / 24 * Math.PI * 2;
+    ring.push(Math.cos(t) * b.r * margin, y, Math.sin(t) * b.r * margin);
+  }
+  let ymin = 1e9, ymax = -1e9; for (const b of bands) { ymin = Math.min(ymin, b.y0); ymax = Math.max(ymax, b.y1); }
+  let D = 6, tY = (ymin + ymax) / 2, tX = 0;
+  const cp = Math.cos(pitch), sp = Math.sin(pitch);
+  for (let it = 0; it < 40; it++) {
+    // camera at target + D*(0, sp, cp); camera-space: right = +x, up = (0, cp, -sp), forward = (0, -sp, -cp)
+    let u0 = 1e9, u1 = -1e9, v0 = 1e9, v1 = -1e9;
+    for (let i = 0; i < ring.length; i += 3) {
+      const dx = ring[i] - tX, dy = ring[i + 1] - (tY + D * sp), dz = ring[i + 2] - D * cp;
+      const z = -sp * dy - cp * dz, xr = dx, yr = dy * cp - dz * sp;
+      const u = xr / (Math.max(z, 0.05) * k), vv = yr / (Math.max(z, 0.05) * k);
+      if (u < u0) u0 = u; if (u > u1) u1 = u; if (vv < v0) v0 = vv; if (vv > v1) v1 = vv;
+    }
+    const s = D * k;
+    tY += ((v0 + v1) / 2 - cy) * s;
+    tX += ((u0 + u1) / 2 - cx) * s;
+    const need = Math.max((v1 - v0) / 2 / halfH, (u1 - u0) / 2 / halfW);
+    D = Math.max(0.5, D * (1 + (need - 1) * 0.8));
+  }
+  camera.position.set(tX, tY + D * sp, D * cp);
+  camera.lookAt(tX, tY, 0);
+  return { D, tX, tY };
+}
+
 // Scene object for the 3D profile view (engine.setScene(tt)). Drag with tt.rotate(dxPixels).
-export function createTurntable(engine, unitOpts = {}) {
+// view (optional): fitCamera options. Defaults suit scr_unit's portrait layout (zoom 0.6 + setViewOffset: subject in the top stage);
+// view.offsetX shifts the subject sideways (frame-height units).
+export function createTurntable(engine, unitOpts = {}, view = {}) {
   const scene = new THREE.Scene();
   scene.environment = engine?.env || null;
   scene.environmentIntensity = 0.85;
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
-  let unit = null, lights = [], yaw = 0.5, spin = 0.35, idleFor = 0, pedestal = null;
+  let unit = null, lights = [], yaw = 0.5, spin = 0.35, idleFor = 0, pedestal = null, pedR = 1.2;
   const group = new THREE.Group(); scene.add(group);
 
-  function buildPedestal(color) {
+  function buildPedestal(color, R) {
     if (pedestal) { group.remove(pedestal); pedestal.traverse((m) => { m.geometry?.dispose(); m.material?.dispose(); }); }
     pedestal = new THREE.Group();
     // neutral dark pedestal (low metalness so it doesn't mirror the coloured env/rims) + the faction plate colour at a
-    // brightness that survives tone mapping without hue-shifting (orange x3 went gold)
-    const top = new THREE.Mesh(new THREE.CylinderGeometry(1.15, 1.25, 0.12, 6), new THREE.MeshStandardMaterial({ color: 0x14171d, metalness: 0.25, roughness: 0.55 }));
+    // brightness that survives tone mapping without hue-shifting (orange x3 went gold). Sized to the unit's footprint.
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.92, R, 0.12, 6), new THREE.MeshStandardMaterial({ color: 0x14171d, metalness: 0.25, roughness: 0.55 }));
     top.position.y = -0.06;
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.12, 0.025, 6, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(1.35) }));
-    const glowDisc = new THREE.Mesh(new THREE.CircleGeometry(1.08, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(0.18), transparent: true, opacity: 0.8, depthWrite: false }));
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(R * 0.9, 0.025, 6, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(1.35) }));
+    const glowDisc = new THREE.Mesh(new THREE.CircleGeometry(R * 0.86, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(0.18), transparent: true, opacity: 0.8, depthWrite: false }));
     glowDisc.rotation.x = -Math.PI / 2; glowDisc.rotation.z = Math.PI / 6; glowDisc.position.y = 0.004;
     pedestal.add(glowDisc);
     ring.rotation.x = Math.PI / 2; ring.rotation.z = Math.PI / 6; ring.position.y = 0.005;
     pedestal.add(top, ring);
     group.add(pedestal);
+  }
+  function frame() {
+    // measure the idle pose (a few frames in, so bobbing hovers and fur settle), then fit unit + plate
+    unit.play('idle');
+    for (let i = 0; i < 12; i++) unit.update(1 / 30);
+    group.rotation.y = 0; group.updateMatrixWorld(true);
+    const bands = unitBands(unit);
+    const ground = bands.filter((b) => b.y0 < 0.3).reduce((m, b) => Math.max(m, b.r), 0);
+    pedR = Math.min(Math.max(unit.radius * 1.45, Math.min(ground * 1.08, unit.radius * 1.6), 0.7), 1.6);
+    bands.push({ y0: -0.12, y1: 0, r: pedR });
+    fitCamera(camera, bands, { halfH: 0.29, halfW: 0.37, cy: -0.045, pitch: 0.1, margin: 1.03, ...view, cx: view.cx ?? view.offsetX ?? 0 });
   }
   function setUnit(opts) {
     if (unit) unit.dispose();
@@ -156,21 +225,19 @@ export function createTurntable(engine, unitOpts = {}) {
     unit = createUnit({ quality: engine?.quality?.name === 'low' ? 'med' : 'high', ...opts });
     lights = studio(scene, unit.palette, 0.9);
     group.add(unit.root);
-    buildPedestal(unit.rarity === 'legendary' || unit.faction === 'legendary' ? 0xffc23a : unit.palette.plate);
+    frame();
+    buildPedestal(unit.rarity === 'legendary' || unit.faction === 'legendary' ? 0xffc23a : unit.palette.plate, pedR);
     unit.play('deploy');
-    const h = unit.height;
-    camera.position.set(0, h * 0.8, h * 2.9 + 1.6);
-    camera.lookAt(0, h * 0.48, 0);
     obj.unit = unit;
     return unit;
   }
   const obj = {
-    scene, camera, unit: null,
+    scene, camera, unit: null, spinPaused: false,
     setUnit,
     play(name, o) { return unit?.play(name, o); },
     rotate(dx) { yaw += dx * 0.01; idleFor = 0; },
     update(dt) {
-      idleFor += dt;
+      idleFor = obj.spinPaused ? 0 : idleFor + dt;
       if (idleFor > 2) yaw += dt * spin;
       group.rotation.y = yaw;
       unit?.update(dt);

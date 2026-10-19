@@ -49,6 +49,23 @@ and units stand ~3-5 m tall, so flames, fireballs and explosion cores need `size
   `deathBurst(pos, color)`, `orbital(pos, color)`.
 - **Dark**: `darkCore(pos, size, life, color?, alpha?)` = normal-blended solid dark disc (holds full strength for 60% of `life`) + smoke skirt
   (void cores; battle-5 fix: it used to be a soft glow the bloom washed out). `size` 1.5-3 for a core that reads. Raw: `fx.vfx.alpha.spawn({kind: 0, color: dark, ...})` draws black.
+- **Dark / no bloom** (battle-7): `fx.darkCore` discs now go into the bloom-masked `vfx.dark` pool and stay truly black (bloom, screen flash and
+  grade lift are all gated off where it covers). For your own black meshes / billboards call **`fx.noBloom(materialOrObject3D)`** once (or
+  `import { markNoBloom } from '../vfx.js'` in a model file): colour blends exactly as before (normal, or premultiplied if the material already
+  was), and the material's output alpha becomes the bloom mask, so write alpha = how black/opaque that pixel is. A bright rim drawn by the same
+  material loses its bloom halo inside its own footprint (the glow outside stays); keep a big emissive ring in a separate material if that matters.
+  Raw: `fx.vfx.dark.spawn({...same as particles, kind: 5})`. Debug view: `engine.post.grade.uniforms.uMaskDbg.value = 1` (white = bloom allowed).
+- **Tubes** (battle-7, roots / vines / tendrils): lit, normal-blended solid tubes that grow along a path, hold, then wither back toward the root.
+  One draw call for all of them (pool of 32, 16 on low); geometry is written once at spawn and the animation runs on the GPU.
+  - `fx.tube(points | THREE.Curve, { radius 0.12, radius1 (tip, default radius/4), color (albedo, LDR THREE.Color), emissive k (glow = color * k),
+    tipGlow k (hot growing tip), grow 0.35 s, life 2 s (total), wither 0.4 s, delay, bulge: t => radius multiplier })` -> `{ kill(), alive }`.
+    `points` are world Vector3s along the path (centripetal Catmull-Rom; 3-12 points is plenty). Tubes are lit by the arena lights, so use
+    real albedo colours (bark ~0.3,0.21,0.13; vine ~0.2,0.3,0.1) and `emissive` 0.3-1 for magic vines.
+  - `fx.roots(from, to, { n 3, radius 0.2, spread 0.7, height 2.4, color, emissive, tipGlow, grow 0.4, life 1.8, wither 0.45, stagger 0.06 })`:
+    roots erupt at `from`, snake across the floor and coil up around `to` (outside the pedestal, r ~1.1 m). Returns the handles.
+  - `fx.entangle(pos, { n 4, height 3.4, radius 1.15, vine 0.14, color, emissive, tipGlow, grow 0.5, life 2.2, wither 0.5 })`: vines spiral up
+    around a unit from the ground. `fx.entangle(target.pos('core').setY(0), { emissive: 0.5, tipGlow: 2 })` for a glowing snare.
+  - Sizes: the board is ~14 m wide, a 0.15 m radius root is ~9 px on a phone. Pedestals are r ~1.1 m, so coils smaller than that hide in the plate.
 - **Arrivals**: `deploy(pos, color)` (sky beam), `land(pos, color, k)`, `plateArm(pos, color, dur)`, `materialize(pos, color, height)` (blink-in).
 - **Support / areas**: `heal(pos)`, `healField(center, radius, color, life)`, `areaField(center, {radius, color, life, kind:'zone'|'heal'|'debuff'|'hex', motes})`,
   `emp(center, color, radius)`, `buffAura(pos, color)`, `debuffAura(pos, color)`, `charge(pos, color, dur)`, `deploy(pos, color)`.
@@ -63,10 +80,10 @@ and units stand ~3-5 m tall, so flames, fireballs and explosion cores need `size
 - **Raw pools** (`fx.vfx`): `add` / `alpha` particles `spawn({pos, vel, color, alpha, life, size, size1, drag, grav, kind:0 glow|1 spark|2 smoke|3 chunk|4 star|5 solid disc, streak, floor, fadeIn, hold})`
   (`hold` = fraction of life at full alpha before the fade),
   `beams.spawn({a, b, color, width, width1, core, life, taper, hold, jitter, fn(beam,k)})`, `rings.spawn({pos, color, r0, r1, thick, life, kind:0 ring|1 disc|2 hex, face, hold})`.
-  One draw call per pool; budgets (high): ~1400 additive particles, 160 beams, 96 rings, 16 bubbles, 24 drones. Oldest entries are recycled.
+  One draw call per pool (the dark and tube pools draw nothing while empty); budgets (high): ~1400 additive particles, 96 dark discs, 32 tubes, 160 beams, 96 rings, 16 bubbles, 24 drones. Oldest entries are recycled.
 
 ## Other modules
-- `vfx.js` pools, `reflection.js` planar mirror (from HEIRFRAME), `textures.js` procedural canvas textures.
+- `vfx.js` pools, `tube.js` tube builder (`tubeGeometry(points, {r0, r1, seg, rad, bulge})` for static scenery, `samplePath`), `reflection.js` planar mirror (from HEIRFRAME), `textures.js` / `textures_fantasy.js` procedural canvas textures.
 
 ## Testing an effect in isolation (tools/battle_test.html)
 - `&charge=1` starts every unit with a full Overdrive (auto fires it at once); `&charge=p2:1` / `e0:0.95` / `2:1` sets one slot (bare slot = player;

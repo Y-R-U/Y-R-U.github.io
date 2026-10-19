@@ -193,3 +193,77 @@
   shares the ENGAGE row so a full roster row fits at 844x340), rotate cancels a drag; map level sheet = right panel with Deploy pinned, chest
   bar into `.vpm-slot`; dev badge bottom-left in landscape.
 - NEXT: settings Layout row, UI-L2 menus, rotation tests, portrait regression diff, BATTLE-L integration check once it lands.
+## Checkpoint 2
+- DONE: Settings "Layout: Auto / Portrait column" (non-phones). UI-L2 CSS for barracks/workshop (.l2 wrappers, 2x3 squad mirror grid),
+  unit profile (turntable left 46 % via setViewOffset(+w*.27), zoom .85; sheet right max 560, Level/Rank pinned at the bottom), recruit (banner
+  row, x1 reveal card|info grid, x10 one row of 10 at >= 9:5), HQ, arena, events, results, dialogue, toasts, modals. ui_kit: fantasy HUD sample +
+  Landscape preview toggle (`?orient=landscape`).
+- Tests: rotation mid-battle (same scene object, sim t rising, same .pc nodes, margins switch), pause modal survives rotation, formation
+  mid-drag rotation cancels the drag (no ghost, unit kept), hub gear moves topbar<->side, desktop hysteresis flips once each way
+  (1100 -> landscape, 900 -> portrait, 1040 -> landscape). Portrait DOM-rect diff vs baseline: identical at 412x915 / 390x844 except
+  dynamic content; 1280x800 with Layout=Portrait column equals the old D3 column (only the new Layout row differs).
+- NEXT: tablet/desktop sweep, BATTLE-L check (camera fitWide not in js/battle yet).
+## QA round (manager list, docs/notes/qa.md) — status
+1. A1/A1b formation on short phones: FIXED (ui-5) and re-verified with the landscape CSS in: 412x780 ENGAGE 714-770, 390x700 634-690,
+   roster inside the scrolling body at full 74x100; landscape 844x340 / 915x360 ENGAGE + a full roster row visible (scratch uiL/qa_form_*.png).
+2. A1c arena scroll: FIXED (ui-5), re-verified (ar-body scrolls at 412x780 / 390x700; landscape 2-column).
+3. Q8 shard picker: FIXED. Scrolling list of every owned unit (role, name, level, power), Cancel button; no off-screen buttons.
+4. Q16 Back during battle: FIXED. router.setGuard(fn): a history navigation the guard refuses is undone with pushState (also drops
+   the forward entries); scr_battle's guard opens the Paused sheet. Verified: history.back() -> still #/battle + Paused; forward ->
+   #/battle; Retreat -> #/results. Q23 also done: returning to a hidden tab opens the Paused sheet.
+5. Q11 module fetch: FIXED in modules.js: 3 tries with backoff (0.6 s, 1.8 s; retries cache-bust the URL because Chrome caches a failed
+   module fetch), and a failed key is dropped from the cache so a later load() retries. Battle's own static import of js/actors/units.js is
+   battle-owned (request below).
+6. Q9 modals across routes: FIXED. components.closeModals(); screens.show() calls it with closeHints().
+7. A3 badge space: the top bar now reserves the avatar slot on every top-bar screen (portrait 46 px, landscape --badge-w 120 px). Battle:
+   landscape top cluster ends before --badge-w; portrait battle left as is on purpose (the avatar is hidden in battle by design and the
+   reservation truncated "YOUR SQUAD INTEGRITY"); revisit if the avatar ever shows in battle.
+8. Q10 #/chapters with one chapter -> redirects to #/map/1. Q18 Rank up disabled below the level cap ("Reach Lv N first"); Convert and
+   Convert all ask first. Q15 tap targets: settings segments 44x44, `.vp-btn.sm` 44 tall, events Go 44. Q20: boot watchdog fails only after
+   20 s with no progress (main.js progress + every module load tick it).
+- Not done (polish): Q6 results after-action thumbnail lighting, Q14 rift x10 card frames.
+## Requests (ui-L)
+- battle (BATTLE-L): per LANDSCAPE.md §2. ui passes `hud.margins()` = {top, bottom, left, right} via setMargins (portrait left/right 0).
+  Also: retry the dynamic/static units import once before placeholder units (QA Q11).
+- hub: chapter select at 915x360 lists locked cards past the right edge inside its own scroller (fine if intended).
+## Checkpoint 3 (ui-L hand-back)
+- BATTLE-L integration verified as it landed (camera fitWide in js/battle): with the real HUD margins the board sits between the 2x3 card grid
+  and the rail at 915x412, 844x340 and 1280x800; rotation mid-battle refits with the same scene / HUD nodes (scratch uiL/rot_b1.png,
+  lb_*_bl.png). Battle agent should still run its own §9.3 clearance numbers.
+- Shots (scratch uiL/): portrait regression base_* vs after_* (+ .sig rect dumps), afterP_1280x800_* (Portrait column setting);
+  landscape ls_{844x340,915x360_in,915x412,1024x768,1280x800,1920x1080}_*.png, lb_* battle, rot_* rotation, rv_x1/x10, dlg_844, kit_*.
+- Open: dev badge (bottom-left in landscape, per spec) overlaps the lowest card / dock button in dev mode only; menu screens on l-short
+  spend ~90 px on top bar + header (could merge into one row later); Q6 / Q14 polish.
+## Manager follow-up: roster must never be squashed (Aaron's S22, URL bar)
+- Cause: the roster lived inside the scrolling `.fm-body`, below the fold under the pinned ENGAGE on short heights. Fix: `.fm-bench-wrap`
+  moved out of the scroller (scr_formation.js) and pinned above ENGAGE; the board/goals/power/synergies/buff block scrolls. 412x915 is
+  pixel-identical (bench 729-839 as before). Full card row + ENGAGE visible at 412x780/720/660/785, 384x740, 360x640/600, 390x714 and
+  landscape 844x340 (scratch uiL/fm_*_b.png, act_*.png).
+- Same rule elsewhere: map level-sheet Deploy is sticky at the sheet bottom; unit profile Level up / Rank up bar is sticky at the bottom of
+  the sheet (portrait too); results actions were already pinned; recruit pull buttons sit at the top of the list (visible at 360x600).
+- A stale cached router.js explains "router.setGuard is not a function"; the manager's feature-detect in scr_battle is fine to keep.
+## D26 battle intro (ui side) + sim-4 requests
+- Intro: scr_battle passes `intro: wantIntro` to createBattleScene; after start() it shows SKIP / DON'T SHOW AGAIN (`.bi-bar`, bottom-right:
+  above the card strip in portrait, bottom-right corner in landscape; badge corner untouched) only if the scene has `introActive` true or a
+  `playIntro()` to call (feature-detected, D19: today nothing appears). Bar hides when introActive goes false / playIntro resolves / skip.
+  DON'T SHOW AGAIN = settings.battleIntro=false + skipIntro() + toast. HUD panels sit at 30 % opacity during the intro, ease to full in .6 s.
+  Off when: Settings "Battle intro: Off" (new row, default On), `?dev&nointro`, and **replays of a contract already fought this session**
+  (ctx.session.introSeen keyed kind:levelId) — my call: Retry/Replay should go straight into the fight.
+  Tested with a mocked API at 412x915 and 915x412 (scratch uiL/intro_*_true.png); without the API no bar, no errors.
+- sim-4: (1) dev.js already used `player.cheats` (ui-5); added a "CHEATS: GOD · ONE-HIT" chip on the HUD from state.cheats.
+  (2) One-time nudge (hint key od_manual, any level, honours Field-manual-tips Off): AUTO off and a charged Overdrive untapped for 1.5 s ->
+  Field-manual tip on that card (sim4_od.png). (3) Rank-up credits: hub shows one notice per unit+rank per session ("Save credits for a
+  rank-up · X has the shards; N more credits"), and the unit profile's rank-up cost line reads "Save N more credits" in that state.
+## Barracks hang (manager, Aaron incognito) — progressive + persisted portraits
+- Cause: portraits.js serialised renders on a promise chain = microtasks, so 46 renderPortrait calls ran back to back without a yield
+  (one 3.7 s long task on the M5).
+- js/ui/portraits.js rewritten: cards show the role-icon placeholder at once (breathing, `.pt-wait`); renders run from a queue with a real
+  yield (rAF + timeout) after each ~8 ms budget, on-screen cards first (IntersectionObserver); renderPortrait(format:'canvas') -> toBlob
+  (async encode) -> <img src=objectURL>; blobs stored in IndexedDB `vectorprotocol-portraits`, key `v{PORTRAIT_VERSION}|model|rarity|faction`
+  (renderPortrait has no rank input, so rank isn't in the key; bump PORTRAIT_VERSION when robots change portraits). All storage try/catch,
+  falls back to memory. Every card grid (barracks, formation roster/hexes, HUD, recruit x10/x1, results) goes through fill(), so all get it.
+  `__vp.portraits.debug()` lists jobs.
+- Timing (barr.mjs, cache disabled, 412x915, M5): before = screen after ~4.0 s, one 3.7 s long task. After, cold (empty profile): screen
+  with 46 cards at 3 ms, all art at 3.0 s, 33 long tasks, max 75 ms (none > 100). Warm (later session): all 46 art at 107 ms, 0 long tasks.
+- Request (robots): one renderPortrait is the 55-75 ms floor (createUnit + MSAA render + readPixels). A split API (build, then render on a
+  later frame) or a cheaper path would cut the cold-load jank further.

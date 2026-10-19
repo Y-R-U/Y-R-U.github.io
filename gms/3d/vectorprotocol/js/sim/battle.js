@@ -672,7 +672,14 @@ export function createBattle(opts = {}) {
 
   function checkEnd() {
     if (done) return true;
-    if (!playerIds.some((id) => units[id].alive)) { finish(false, 'defeat'); return true; }
+    if (!playerIds.some((id) => units[id].alive)) {
+      // mutual KO (QA Q4): the final wave's last enemy fell on the same tick as your last unit = a win (0 survivors, so 1 star)
+      if (phase === 'fight' && waveIdx + 1 >= waves.length && !enemyIds.some((id) => units[id].alive)) {
+        emit({ type: 'wave', phase: 'clear', wave: waveIdx + 1, of: waves.length });
+        finish(true, 'victory'); return true;
+      }
+      finish(false, 'defeat'); return true;
+    }
     if (phase === 'fight' && !enemyIds.some((id) => units[id].alive)) {
       emit({ type: 'wave', phase: 'clear', wave: waveIdx + 1, of: waves.length });
       if (waveIdx + 1 < waves.length) {

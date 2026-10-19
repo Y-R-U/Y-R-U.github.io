@@ -28,6 +28,7 @@ export function mount(root, ctx) {
       // D24a: wide windows get the landscape layouts; "Portrait column" brings back the D3 column (not offered on phones)
       orient.form !== 'phone' ? seg('layout', [['auto', 'Auto'], ['portrait', 'Portrait column']], 'Layout', 'Auto = wide layouts when the window is wide') : null,
       seg('speed', [[1, '×1'], [2, '×2'], [4, '×4']], 'Battle speed', 'Default for new battles'),
+      seg('battleIntro', [[true, 'On'], [false, 'Off']], 'Battle intro', 'Camera fly-in before each fight'),
       seg('auto', [[true, 'On'], [false, 'Off']], 'Auto Overdrive', 'Off = tap glowing portraits to fire'),
       seg('damageNumbers', [[true, 'On'], [false, 'Off']], 'Damage numbers'),
       seg('hints', [[true, 'On'], [false, 'Off']], 'Field manual tips', 'First-contract hints'),

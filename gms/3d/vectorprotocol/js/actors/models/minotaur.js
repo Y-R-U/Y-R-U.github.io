@@ -318,9 +318,9 @@ const anims = {
     const kf = L.kf;
     const low = kf(u, [[0, 0], [0.3, 0.4], [0.5, 1], [0.7, 0.8], [1, 0]]);
     stance(P, ctx, ctx.t, L, { py: -0.12 * low, pz: 0.14 * kf(u, [[0, 0], [0.45, 1], [0.7, 0.8], [1, 0]]), sp: 0.1 * low, np: 0.1 * low, look: 0.3, jaw: 0.3 * low });
-    const T = [[0, 0], [0.3, -1], [0.5, 0.75], [0.66, 1.1], [1, 0]];
+    const T = [[0, 0], [0.3, -0.45], [0.5, 0.7], [0.66, 0.85], [1, 0]];
     L.A(P, 'pelvis', 0, 0.15 * kf(u, T), 0); L.A(P, 'spine', 0, 0.3 * kf(u, T), 0); L.A(P, 'chest', 0, 0.55 * kf(u, T), 0);
-    keyR(P, L, 'upArmR', u, [[0, IDLE_R.upArmR], [0.3, [0.1, 0, -1.3]], [0.5, [-1.25, -0.5, 0.1]], [0.66, [-1.0, -0.7, 0.5]], [1, IDLE_R.upArmR]]);
+    keyR(P, L, 'upArmR', u, [[0, IDLE_R.upArmR], [0.3, [-0.6, -0.2, -1.3]], [0.5, [-1.25, -0.5, 0.1]], [0.66, [-1.0, -0.7, 0.5]], [1, IDLE_R.upArmR]]);
     keyR(P, L, 'foreArmR', u, [[0, IDLE_R.foreArmR], [0.3, [-0.3, 0, 0]], [0.5, [-0.3, 0, 0]], [0.66, [-0.5, 0, 0]], [1, IDLE_R.foreArmR]]);
     keyR(P, L, 'handR', u, [[0, IDLE_R.handR], [0.3, [0.3, 0, -1.57]], [0.66, [0.25, 0, -1.57]], [1, IDLE_R.handR]]);
     L.RS(P, 'upArm', 'L', kf(u, [[0, -0.15], [0.3, -0.7], [0.5, 0.25], [1, -0.15]]), 0, kf(u, [[0, 0.32], [0.3, 0.55], [0.5, 0.6], [1, 0.32]]));
@@ -332,12 +332,12 @@ const anims = {
     const kf = L.kf;
     const up = kf(u, [[0, 0], [0.34, 1], [0.44, 1.05], [0.52, 0], [1, 0]]);
     const chop = kf(u, [[0, 0], [0.44, 0], [0.52, 1], [0.78, 1], [1, 0]]);
-    stance(P, ctx, ctx.t, L, { py: 0.05 * up - 0.24 * chop, pz: 0.16 * chop, sp: -0.3 * up + 0.3 * chop, cp: -0.25 * up + 0.25 * chop, np: 0.3 * up - 0.15 * chop, hp: 0.15 * up, jaw: 0.4 * up + 0.2 * chop, look: 0.2 });
-    keyR(P, L, 'upArmR', u, [[0, IDLE_R.upArmR], [0.34, [-3.0, -0.1, -0.16]], [0.44, [-3.05, -0.1, -0.16]], [0.52, [-0.9, -0.1, -0.3]], [0.78, [-0.85, -0.1, -0.3]], [1, IDLE_R.upArmR]]);
-    keyR(P, L, 'foreArmR', u, [[0, IDLE_R.foreArmR], [0.34, [-1.05, 0, 0]], [0.52, [-0.1, 0, 0]], [0.78, [-0.15, 0, 0]], [1, IDLE_R.foreArmR]]);
-    keyR(P, L, 'handR', u, [[0, IDLE_R.handR], [0.34, [-0.35, 0, 0.0]], [0.44, [-0.4, 0, 0]], [0.52, [1.5, 0, 0.15]], [0.78, [1.5, 0, 0.15]], [1, IDLE_R.handR]]);
-    L.RS(P, 'upArm', 'L', -0.15 - 2.6 * up - 0.8 * chop, -0.1, 0.32 - 0.15 * up);
-    L.RS(P, 'foreArm', 'L', -0.45 - 0.7 * up, 0, 0);
+    stance(P, ctx, ctx.t, L, { py: 0.05 * up - 0.24 * chop, pz: 0.16 * chop, sp: -0.12 * up + 0.3 * chop, cp: -0.1 * up + 0.25 * chop, np: 0.3 * up - 0.15 * chop, hp: 0.15 * up, jaw: 0.4 * up + 0.2 * chop, look: 0.2 });
+    keyR(P, L, 'upArmR', u, [[0, IDLE_R.upArmR], [0.34, [-2.45, -0.1, -0.16]], [0.44, [-2.5, -0.1, -0.16]], [0.52, [-0.9, -0.1, -0.3]], [0.78, [-0.85, -0.1, -0.3]], [1, IDLE_R.upArmR]]);
+    keyR(P, L, 'foreArmR', u, [[0, IDLE_R.foreArmR], [0.34, [-0.55, 0, 0]], [0.52, [-0.1, 0, 0]], [0.78, [-0.15, 0, 0]], [1, IDLE_R.foreArmR]]);
+    keyR(P, L, 'handR', u, [[0, IDLE_R.handR], [0.34, [0.45, 0, 0.0]], [0.44, [0.4, 0, 0]], [0.52, [1.5, 0, 0.15]], [0.78, [1.5, 0, 0.15]], [1, IDLE_R.handR]]);
+    L.RS(P, 'upArm', 'L', -0.15 - 2.3 * up - 0.8 * chop, -0.1, 0.32 - 0.15 * up);
+    L.RS(P, 'foreArm', 'L', -0.45 - 0.4 * up, 0, 0);
     feet(P, ctx, L, 0.34, -0.24, 1.6, 0, 0.25);
     // the left hand closes on the haft below the right fist while the axe is up and through the chop
     const g = Math.max(up, chop);
@@ -401,10 +401,10 @@ const anims = {
   victory(P, t, ctx, L) {
     // the labrys raised high, roaring in pulses, left fist pounding the chest
     const k = L.smooth(Math.min(1, t / 0.6)), pump = Math.max(0, Math.sin(t * 2.6)), beat = Math.max(0, Math.sin(t * 5.2));
-    stance(P, ctx, t, L, { sp: -0.15 * k, cp: -0.2 * k - 0.05 * pump, np: -0.2 * k, hp: -0.3 * k - 0.15 * pump, jaw: 0.25 * k + 0.35 * pump, look: 1 - k });
-    L.RS(P, 'upArm', 'R', -0.25 - 2.55 * k - 0.15 * pump, 0.1, 0.36 + 0.15 * k);
+    stance(P, ctx, t, L, { sp: -0.08 * k, cp: -0.12 * k - 0.05 * pump, np: -0.2 * k, hp: -0.3 * k - 0.15 * pump, jaw: 0.25 * k + 0.35 * pump, look: 1 - k });
+    L.RS(P, 'upArm', 'R', -0.25 - 2.35 * k - 0.15 * pump, 0.1, 0.36 + 0.15 * k);
     L.RS(P, 'foreArm', 'R', -0.5 + 0.25 * k, 0, 0);
-    L.RS(P, 'hand', 'R', 0.75 - 1.6 * k, 0, -0.15);
+    L.RS(P, 'hand', 'R', 0.75 - 0.9 * k, 0, -0.15);
     L.RS(P, 'upArm', 'L', -0.15 - 0.9 * k + 0.2 * beat, 0.5 * k, 0.32 + 0.1 * k);
     L.RS(P, 'foreArm', 'L', -0.45 - 1.6 * k, 0, 0);
     feet(P, ctx, L, 0.16, -0.14, 1.55);

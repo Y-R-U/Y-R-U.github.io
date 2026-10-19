@@ -23,7 +23,7 @@ const DIMS = {
   parents: { aux2: 'chest' },
   aux0: [0, 0.3, -0.12], aux2: [0, 0.2, 0],
 };
-const DR = 0.56;            // drone orbit radius
+const DR = 0.5;             // drone orbit radius
 const OD_REL = 0.167;
 const STAFF_UP = 0.98, STAFF_DN = 0.9;   // staff extent above / below the grip
 
@@ -231,7 +231,7 @@ function droneAt(b, o, a, k = 1, outer = false) {
   const d = [Math.cos(a), 0, Math.sin(a)];
   // face along the orbit tangent of travel (decreasing angle) so the lens leads
   const yaw = Math.atan2(Math.sin(a), -Math.cos(a));
-  b.scope([d[0] * R, outer ? 0.12 : 0, d[2] * R], [0, yaw, 0], k * (o.rank >= 3 ? 1.75 : o.rank >= 2 ? 1.6 : 1.4), () => {
+  b.scope([d[0] * R, outer ? 0.12 : 0, d[2] * R], [0, yaw, 0], k * (o.rank >= 3 ? 1.5 : o.rank >= 2 ? 1.4 : 1.3), () => {
     b.add(b.sph(16, 12), H, 'paint', [0, 0, 0], [0, 0, 0], [0.06, 0.045, 0.075]);
     b.add(b.sph(14, 8, 0, PI * 2, PI * 0.5, PI * 0.5), H, 'accent', [0, -0.004, 0], [0, 0, 0], [0.064, 0.042, 0.079]);
     b.add(b.cyl(0.022, 0.022, 0.02, 12), H, 'eye', [0, 0.004, 0.068], [PI / 2, 0, 0]);
@@ -239,7 +239,7 @@ function droneAt(b, o, a, k = 1, outer = false) {
     // outrigger rotors
     for (const s of [1, -1]) {
       b.add(b.cbox(0.05, 0.01, 0.014, 0.003), H, 'metal', [s * 0.075, 0.012, -0.01]);
-      b.add(b.tor(0.032, 0.006, 14, 3), H, rk >= 2 ? 'glow' : 'trim', [s * 0.11, 0.016, -0.01], [PI / 2, 0, 0]);
+      b.add(b.tor(0.032, 0.006, 14, 3), H, rk >= 4 ? 'glow' : 'trim', [s * 0.11, 0.016, -0.01], [PI / 2, 0, 0]);
       if (!far) b.add(b.cbox(0.06, 0.003, 0.008, 0.001), H, 'metal', [s * 0.11, 0.018, -0.01], [0, s * 0.6, 0]);
     }
     if (!far) b.add(b.cyl(0.003, 0.003, 0.05, 4), H, 'metal', [0, 0.065, -0.02]);
