@@ -80,7 +80,7 @@ The fights are a sport, a job, then a cause.
 
 **m1_l2 · Container Rats · post**
 - **TINK**: I'm Tink. I fix stuff. You break stuff. I think this is gonna work out.
-- **SYSTEM**: WORKSHOP unlocked — feed scrap to level up your robots.
+- **SYSTEM**: UPGRADES unlocked — spend scrap in the BARRACKS to level up your robots.
 
 **m1_l3 · House Call · pre**
 - **MAGS OKORO**: Clinic down Pier 6 can't pay us in cash. They're offering a drone instead.
@@ -126,7 +126,7 @@ The fights are a sport, a job, then a cause.
 - **MAGS OKORO**: Red Ledger runs it. Don't start anything with them. Today.
 
 **m2_l3 · Back-Alley Clinic · post**
-- **SYSTEM**: ABILITY UPGRADES and BUFFS unlocked.
+- **SYSTEM**: ABILITY UPGRADES and the WORKSHOP unlocked — fabricate combat buffs there.
 - **TINK**: Stim Packs! Plating Kits! Don't ask where I got them.
 
 **m2_l4 · Pit Night · pre**

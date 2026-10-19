@@ -5,7 +5,7 @@ export const FEATURES = [
   { id: 'arena',    name: 'ARENA',      sub: 'Vector Protocol league', color: '#ff4fd8', unlockHint: 'Clear mission 2-4' },
   { id: 'events',   name: 'SPECIAL OPS', sub: 'Rotating events', color: '#ffb547', unlockHint: 'Clear mission 2-10' },
   { id: 'squad',    name: 'BARRACKS',   sub: 'Squad & formation', color: '#5cf2a6', unlockHint: '' },
-  { id: 'workshop', name: 'WORKSHOP',   sub: 'Upgrade units', color: '#ffd34d', unlockHint: 'Clear mission 1-2' },
+  { id: 'workshop', name: 'WORKSHOP',   sub: 'Buffs & fabrication', color: '#ffd34d', unlockHint: 'Clear mission 2-3' },
   { id: 'recruit',  name: 'RECRUITMENT', sub: 'Hire new units', color: '#a77bff', unlockHint: 'Clear mission 1-4' },
   { id: 'hq',       name: 'HQ',         sub: 'Company skills', color: '#4f9dff', unlockHint: 'Clear mission 1-12' },
 ];
@@ -20,7 +20,7 @@ export function stageForLevel(level = 1) {
 }
 
 // hub feature -> unlock key in DATA.features (js/data/maps.js FEATURE_UNLOCKS: levelId -> [keys])
-export const UNLOCK_KEYS = { workshop: 'workshop', recruit: 'recruit_street', hq: 'hq', arena: 'arena', events: 'daily_ops' };
+export const UNLOCK_KEYS = { workshop: 'buffs', recruit: 'recruit_street', hq: 'hq', arena: 'arena', events: 'daily_ops' };
 export function hintsFromFeatures(table = {}) {
   const out = {};
   for (const [levelId, keys] of Object.entries(table)) {

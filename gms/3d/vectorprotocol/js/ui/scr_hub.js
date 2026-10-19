@@ -12,11 +12,13 @@ export const FEATURES = [
   { id: 'recruit', label: 'Recruitment', sub: 'New mercs', icon: 'recruit' },
   { id: 'arena', label: 'Arena', sub: 'Vector League', icon: 'trophy' },
   { id: 'events', label: 'Special Ops', sub: 'Rotating events', icon: 'calendar' },
-  { id: 'workshop', label: 'Workshop', sub: 'Upgrades', icon: 'wrench' },
+  { id: 'workshop', label: 'Workshop', sub: 'Buffs & fabrication', icon: 'wrench' },
   { id: 'hq', label: 'HQ', sub: 'Company skills', icon: 'hq' },
 ];
 
-const GATE = { workshop: 'workshop', recruit: 'recruit_street', hq: 'hq', arena: 'arena', events: 'daily_ops' };
+// D28: the two easily-confused buildings get our subtitles on their 3D labels too
+const SUBS = Object.fromEntries(FEATURES.filter((f) => f.id === 'squad' || f.id === 'workshop').map((f) => [f.id, f.sub]));
+const GATE = { workshop: 'buffs', recruit: 'recruit_street', hq: 'hq', arena: 'arena', events: 'daily_ops' };
 export const featureOpen = (store, id) => store.isUnlocked(GATE[id]);
 export function lockedMsg(store, id) {
   const lid = store.unlockLevelFor(GATE[id]);
@@ -51,7 +53,7 @@ export async function mount(root, ctx) {
   if (hubMod?.createHubScene) {
     try {
       scene = hubMod.createHubScene(engine, { companyLevel: store.state.company.level, unlocked, container: root,
-        names: Object.fromEntries(FEATURES.map((f) => [f.id, f.label])), features: data().features, squad: squad.length ? squad : undefined, riftOpen, margins: TALL_M });
+        names: Object.fromEntries(FEATURES.map((f) => [f.id, f.label])), subs: SUBS, features: data().features, squad: squad.length ? squad : undefined, riftOpen, margins: TALL_M });
       scene.on?.('select', go);
       scene.on?.('locked', go);
     } catch (e) { console.warn('[hub] scene failed, using stub', e); scene = null; }

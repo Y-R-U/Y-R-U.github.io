@@ -1,8 +1,10 @@
-// Barracks / collection: current squad strip + roster grid (+ unrecruited units as locked cards).
+// Barracks (D28): your units. Squad strip + roster grid (+ unrecruited units as locked cards); a card opens the unit profile
+// (level up, rank up, abilities). Company-wide fabrication (buffs, shard exchange) is the Workshop (scr_workshop.js).
 import { h, fmt } from './dom.js';
 import { icon } from './icons.js';
 import { data } from '../app/data.js';
 import { header, unitCard, btn, confirmBox } from './components.js';
+import { featureOpen } from './scr_hub.js';
 import { snd } from '../app/sound.js';
 import { hint } from './tutorial.js';
 import { orient } from '../app/orient.js';
@@ -12,7 +14,6 @@ const RARITY_ORDER = { legendary: 0, epic: 1, rare: 2, common: 3 };
 export function mount(root, ctx, route) {
   const { store, router, portraits } = ctx;
   let filter = 'all', sort = 'power';
-  const title = route.name === 'workshop' ? 'Workshop' : 'Barracks';
   const grid = h('div.col-grid');
   const tabs = h('div.vp-tabs');
   const sortBtn = h('button.vp-tab.sort', { type: 'button', onclick: () => { sort = sort === 'power' ? 'rarity' : sort === 'rarity' ? 'level' : 'power'; render(); } });
@@ -21,19 +22,22 @@ export function mount(root, ctx, route) {
 
   // .l2-a / .l2-b: the two landscape columns (display: contents in portrait, so the DOM reads as the old single column)
   root.classList.add('l2');
-  root.append(header(title, () => router.go('/hub')),
+  root.append(header('Barracks', () => router.go('/hub')),
     h('div.l2-a',
-      route.name === 'workshop' ? h('div.col-hint.vp-panel.dim', icon('wrench'), h('span', 'Pick a unit to level, rank up or train abilities.')) : null,
+      h('div.col-hint.vp-panel.dim', icon('up'), h('span', 'Tap a robot to level up, rank up or train it')),
       h('div.col-squad-wrap', h('div.row.between', h('div.vp-kicker', 'Active squad ' + store.state.squad.length + '/' + store.state.slots), h('small.t-muted', 'Edit before each deployment')), squadRow),
       surplusEl),
     h('div.l2-b', h('div.row', tabs, sortBtn), h('div.col-scroll.scroll', grid)));
 
   function render() {
     const sp = store.surplusTotal();
+    // the shard exchange lives in the Workshop (D28); before the Workshop opens, convert here as before
+    const ws = featureOpen(store, 'workshop');
     surplusEl.replaceChildren(...(sp.shards ? [h('div.col-surplus.vp-panel.purple', { '--cut': '10px' }, icon('hex'),
-      h('div.grow', h('b', sp.shards + ' surplus shards'), h('small', 'Beyond max rank · worth ' + fmt(sp.chips) + ' chips')),
-      btn('Convert all', async () => { if (!await confirmBox('Convert all surplus?', sp.shards + ' surplus shards become ' + fmt(sp.chips) + ' chips. This can\'t be undone.', 'Convert', 'Keep')) return; const r = store.convertAllShards(); if (!r.ok) return ctx.toast(r.why, 'err'); snd.sfx('reward');
-        ctx.toast('+' + fmt(r.gained?.chips || 0) + ' chips', 'gold'); render(); }, { cls: 'gold sm', icon: 'cores', sfx: 'none' }))] : []));
+      h('div.grow', h('b', sp.shards + ' surplus shards'), h('small', 'Beyond max rank · worth ' + fmt(sp.chips) + ' chips' + (ws ? ' at the Workshop exchange' : ''))),
+      ws ? btn('Workshop', () => router.go('/workshop'), { cls: 'gold sm', icon: 'wrench' })
+        : btn('Convert all', async () => { if (!await confirmBox('Convert all surplus?', sp.shards + ' surplus shards become ' + fmt(sp.chips) + ' chips. This can\'t be undone.', 'Convert', 'Keep')) return; const r = store.convertAllShards(); if (!r.ok) return ctx.toast(r.why, 'err'); snd.sfx('reward');
+          ctx.toast('+' + fmt(r.gained?.chips || 0) + ' chips', 'gold'); render(); }, { cls: 'gold sm', icon: 'cores', sfx: 'none' }))] : []));
     tabs.replaceChildren(...['all', 'tank', 'archer', 'mage'].map((f) => h('button.vp-tab' + (f === filter ? '.on' : ''), { type: 'button', onclick: () => { filter = f; render(); } }, f === 'all' ? 'All' : icon(f), f === 'all' ? null : h('span', f))));
     sortBtn.textContent = '⇅ ' + sort;
     squadRow.replaceChildren(...(orient.landscape ? squadGrid() : Array.from({ length: 6 }, (_, i) => {
@@ -78,6 +82,6 @@ export function mount(root, ctx, route) {
   }
   render();
   const offOrient = orient.on(render);
-  hint(store, 'collection', grid.firstElementChild, 'Tap a robot to open its profile and upgrades.', { place: 'below', delay: 500 });
+  hint(store, 'collection', grid.firstElementChild, 'Tap a robot to open its profile: level up with scrap, rank up and train abilities there.', { place: 'below', delay: 500 });
   return { topbar: true, bg: 'on', unmount: offOrient };
 }

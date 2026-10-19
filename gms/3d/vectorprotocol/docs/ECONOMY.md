@@ -7,7 +7,7 @@ Owner: design. Data: `js/data/economy.js`, `hq.js`, `recruit.js`, `arena.js`, `e
 | id | name | what it's for | main sources | main sinks |
 |---|---|---|---|---|
 | `credits` | Credits | everything: levelling fee, rank-ups, abilities, HQ, Street Hire, buffs. Co-binds with shards (sim-3 harness): a capped unit usually waits on both | every battle, arena (tier-scaled), Vault Job, raid | levelling (0.3/xp), rank-up, ability, HQ, Street Hire 1500, buffs 400–800 |
-| `scrap` | Scrap | **unit XP** (1 scrap = 1 xp) | every battle, **Salvage Run**, arena, raid, arena shop crate | feeding robots in the Workshop |
+| `scrap` | Scrap | **unit XP** (1 scrap = 1 xp) | every battle, **Salvage Run**, arena, raid, arena shop crate | levelling robots in the Barracks (unit profile) |
 | `chips` | Chips | premium-feel currency, earned only by play | first clears (10 / elite 25 / boss 60), star goals (4+6, elite 8+10, boss 15+20), map star chests, **surplus-shard exchange**, trials, arena season, raid, arena shop | Corporate Contract 120, **Rift Gate 150**, ability levels 3–5, HQ tiers |
 | `arena_tokens` | Arena Tokens | arena shop + League Draft | arena wins (4–15 by tier, 30% on a loss) | shards of your choice, scrap crates, buffs, chips, League Draft 250 |
 | `event_marks` | Event Marks | faction drafts | faction trials (10–50 per tier) | Halvorsen Surplus / Ledger Black Market / Lattice Signal (100 each) |

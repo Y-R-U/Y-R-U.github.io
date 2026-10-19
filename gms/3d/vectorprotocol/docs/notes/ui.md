@@ -301,3 +301,36 @@
 - robots: the unit-profile turntable renders on flat black (opaque canvas). A subtle backdrop in createTurntable (gradient
   plane / fog / scene.background) would beat the DOM halo I added; drop `.up-stage::before` in screens.css when it lands.
 - hub: QL3 (map head ignores side insets) is still yours.
+
+# ui-7 (D28: Barracks vs Workshop split)
+## Checkpoint 1
+- DONE: new `js/ui/scr_workshop.js` (bays: 01 combat buffs fabricate + arm, 02 shard exchange per unit + convert all, 03 scrap overview
+  + sources, 04 gear chips locked shutter; pinned footer = armed buff + BARRACKS). `#/workshop` routed to it (screens.js). Barracks
+  (scr_collection) is Barracks-only now, its surplus panel links to the Workshop (inline convert only while the Workshop is locked);
+  unit profile Convert -> EXCHANGE link (same rule). Formation buff row keeps quick buy + a WORKSHOP link. Hub FEATURES subs
+  "Squad & units" / "Buffs & fabrication", passed to the hub scene as `subs`. CSS: screens.css + landscape.css (Workshop blocks at the end).
+- NEXT: browser test 412x915, 412x785, 915x412, 844x340; D28 bullet in DECISIONS.md.
+## Checkpoint 2 (ui-7 hand-back) - tested on CDP 9406 (touch), zero console errors
+- Workshop (`js/ui/scr_workshop.js`, gunmetal + amber hazard-stripe bays, no unit grid): intro strip ("Robots level up, rank up and
+  train in the Barracks"); BAY 01 combat buffs = one fabricator row per buff (hex port with stock count, desc, FABRICATE <cost> via
+  store.buyBuff, ARM/ARMED via store.selectBuff; sealed rows show the unlock level; whole bay is a shutter until the `buffs` feature);
+  BAY 02 shard exchange = per-shard rates from economy.shardExchange, CONVERT ALL (if 2+ units), one row per unit with surplus (convertShards);
+  BAY 03 scrap = in stock, squad's next-level scrap need (levelUpCost sum), how to spend it (Barracks), sources (contracts / Salvage Run /
+  arena, locked ones show their unlock); BAY 04 gear chips = locked shutter "Coming soon". Pinned footer: armed buff for the next battle +
+  BARRACKS. Landscape: bay 01 left column, 02-04 right, each column scrolls; l-short hides the intro and puts bay subtitles inline.
+- Barracks: title always Barracks; one-line hint "Tap a robot to level up, rank up or train it"; surplus panel -> WORKSHOP link (inline
+  Convert all only while the Workshop is locked). Unit profile: surplus Convert -> EXCHANGE link (same rule). Formation buff row: quick buy
+  unchanged + a WORKSHOP link on the kicker line (44 px hit band); Back from the Workshop returns to the formation.
+- Hints: Workshop first visit (key `workshop`) "fabricates for the whole company: combat buffs and the shard exchange. Robots level up in
+  the Barracks"; Barracks card hint now "level up with scrap, rank up and train abilities there"; hub hint "Spend it in the Barracks to
+  level up" unchanged and still true. Hub 3D labels get subs "Squad & units" / "Buffs & fabrication" (createHubScene `subs`).
+- Shots (scratch ui7/): {412x915,412x785,915x412,844x340}_{workshop,wsscroll,squad,unit_u1,formation_m3_l2,hub}.png, early_412x915_*
+  (m1_l3: buff bay sealed, empty exchange), fn_412x915.png (fabricated + armed + converted). Scripts t_ws.mjs, t_fn.mjs.
+## Requests (ui-7)
+- design: `js/data/story.js` m1_l2_post still says "WORKSHOP unlocked — feed scrap to level up your robots." Per D28 suggest
+  "WORKSHOP unlocked: fabricate combat buffs for the company. Level up robots with scrap in the BARRACKS." ECONOMY.md scrap row
+  ("feeding robots in the Workshop") and buffs.js header comment are fine to leave but should say Barracks / Workshop per D28.
+  The workshop feature unlocks at m1_l2 but buffs only at m2_l3, so the Workshop is mostly a locked buff bay + scrap guide until then;
+  consider moving the `workshop` unlock to m2_l3 alongside `buffs`.
+- hub: `js/hub/features.js` default subs ("Squad & formation", "Upgrade units") are overridden by ui; update them to match if you like.
+- sim/design: gear chips (D9 optional) have no API or data; the Workshop shows a locked "Coming soon" bay until they exist.

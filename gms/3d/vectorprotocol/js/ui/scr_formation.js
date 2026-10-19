@@ -5,6 +5,7 @@ import { levelById, unitDef, wavePower, synergies, rules, data } from '../app/da
 import { btn, header, unitCard } from './components.js';
 import { hint } from './tutorial.js';
 import { orient } from '../app/orient.js';
+import { featureOpen } from './scr_hub.js';
 
 const SLOT_NAMES = ['Front · Near', 'Front · Mid', 'Front · Far', 'Back · Near', 'Back · Mid', 'Back · Far'];
 const idx = (s) => s.col * 3 + s.lane;
@@ -153,7 +154,9 @@ export async function mount(root, ctx, route) {
     const shop = Object.values(data().buffs || {}).filter((b) => store.isUnlocked(b.unlock) || store.state.buffs?.[b.id] > 0);
     if (!shop.length) { buffEl.replaceChildren(); return; }
     const sel = store.state.selectedBuff;
-    buffEl.replaceChildren(h('div.vp-kicker', 'Combat buff · one per battle'), h('div.buff-row.scroll-x', shop.map((b) => {
+    // quick buy stays here; the full fabrication bay is the Workshop (D28)
+    const wsLink = featureOpen(store, 'workshop') ? h('button.fm-wslink', { type: 'button', onclick: () => router.go('/workshop') }, icon('wrench'), h('span', 'Workshop')) : null;
+    buffEl.replaceChildren(h('div.fm-buffh', h('div.vp-kicker', 'Combat buff · one per battle'), wsLink), h('div.buff-row.scroll-x', shop.map((b) => {
       const n = store.state.buffs?.[b.id] || 0;
       const on = sel === b.id;
       return h('button.buff' + (on ? '.on' : '') + (n ? '' : '.empty'), { type: 'button', title: b.desc, onclick: async () => {

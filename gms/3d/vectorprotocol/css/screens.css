@@ -338,7 +338,8 @@
 
 /* ---------- collection ---------- */
 .col-hint { display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-weight: 600; color: var(--text-2); }
-.col-hint .ic { width: 18px; height: 18px; color: var(--cyan); }
+.col-hint .ic { width: 18px; height: 18px; color: var(--cyan); flex: none; }
+.scr-squad .col-hint, .scr-collection .col-hint { padding: 5px 12px; font-size: 13.5px; }
 .col-squad-wrap { display: flex; flex-direction: column; gap: 4px; }
 .col-squad { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
 .col-squad .vp-card .nm { font-size: 9px; } .col-squad .vp-card .lv { font-size: 11px; bottom: 20px; } .col-squad .vp-card .stars { display: none; }
@@ -837,3 +838,96 @@
 /* portraits loading progressively (js/ui/portraits.js): the role-icon placeholder breathes until the render lands */
 .pt-wait .ph { animation: ptWait 1.3s ease-in-out infinite; }
 @keyframes ptWait { 50% { opacity: .25; } }
+
+/* ---------- Workshop (D28): fabrication bays, industrial amber on gunmetal; deliberately not a card grid */
+.scr-workshop { --ws: #ffd34d; --ws-2: #c98a12; --steel: #0d1621; --steel-2: #16222f; --rivet: radial-gradient(circle, #5a6b7c 1.4px, transparent 1.9px); }
+.ws-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; padding-bottom: 10px; }
+.ws-col { display: flex; flex-direction: column; gap: 10px; }
+.ws-intro { display: flex; align-items: center; gap: 10px; padding: 9px 12px; color: var(--text-2);
+  background: linear-gradient(90deg, #2a1f0688, #0b121ab0 60%); border-left: 3px solid var(--ws); }
+.ws-intro > .ic { width: 26px; height: 26px; flex: none; color: var(--ws); filter: drop-shadow(0 0 5px #ffd34d88); }
+.ws-intro b { display: block; font: 700 13px var(--font); letter-spacing: .24em; text-transform: uppercase; color: var(--ws); }
+.ws-intro small { font-size: 12.5px; line-height: 1.3; }
+.ws-bay { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 0 10px 10px; background:
+  var(--rivet) calc(100% - 16px) calc(100% - 3px) / 8px 8px no-repeat, var(--rivet) calc(100% - 3px) calc(100% - 3px) / 8px 8px no-repeat,
+  linear-gradient(180deg, var(--steel-2), var(--steel)); box-shadow: inset 0 0 0 1px #2a3a4b, inset 0 1px 0 #3c4f63, 0 6px 18px #0008;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); }
+.ws-bay-h { display: flex; align-items: center; gap: 10px; margin: 0 -10px; padding: 7px 12px 7px 10px; position: relative;
+  background: linear-gradient(90deg, #1d2a38, #121c27); border-bottom: 1px solid #000; }
+.ws-bay-h::after { content: ""; position: absolute; left: 0; right: 0; bottom: -5px; height: 4px;
+  background: repeating-linear-gradient(-45deg, var(--ws) 0 6px, #111 6px 12px); opacity: .75; }
+.ws-no { flex: none; font: 800 11px var(--font-d); letter-spacing: .12em; color: #111; background: var(--ws); padding: 3px 7px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+.ws-bay-h b { display: block; font: 700 15px var(--font); letter-spacing: .2em; text-transform: uppercase; color: #f1f5f9; }
+.ws-bay-h small { display: block; font-size: 11.5px; color: #8fa3b6; letter-spacing: .04em; }
+.ws-bay > :nth-child(2) { margin-top: 6px; }
+/* bay 01: fabricator stations, one row each */
+.ws-fab { display: flex; flex-direction: column; gap: 6px; }
+.ws-unit { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 6px 8px 6px 6px;
+  background: linear-gradient(90deg, #0a1017, #101a24); box-shadow: inset 0 0 0 1px #233140; }
+.ws-unit.armed { box-shadow: inset 0 0 0 1.5px var(--ws), 0 0 12px #ffd34d33; background: linear-gradient(90deg, #2a1f06, #121a22); }
+.ws-unit.sealed { opacity: .55; }
+.ws-port { position: relative; width: 54px; height: 54px; display: grid; place-items: center; color: var(--ws);
+  background: radial-gradient(circle at 50% 45%, #3a2c0a, #0a0e13 70%); box-shadow: inset 0 0 0 2px #3b4a5a, inset 0 0 0 5px #0a0e13, inset 0 0 0 6px #2a3a4b;
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); }
+.ws-port .ic { width: 24px; height: 24px; filter: drop-shadow(0 0 5px var(--ws)); }
+.ws-unit.sealed .ws-port { color: #6c7a90; }
+.ws-stock { position: absolute; bottom: 5px; font: 800 10px var(--font-d); color: #fff; text-shadow: 0 0 3px #000, 0 0 6px #000; }
+.ws-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ws-txt b { font: 700 15px var(--font); letter-spacing: .08em; text-transform: uppercase; }
+.ws-txt small { font-size: 12px; color: #9fb3c6; line-height: 1.25; }
+.ws-acts { display: flex; flex-direction: column; gap: 4px; align-items: stretch; }
+.ws-acts .vp-btn { padding: 0 12px; font-size: 13px; letter-spacing: .1em; min-width: 92px; }
+/* locked shutters (sealed bay, gear chips) */
+.ws-shutter { display: flex; align-items: center; gap: 12px; padding: 14px 12px; color: #8fa3b6;
+  background: repeating-linear-gradient(0deg, #0e151d 0 9px, #17212c 9px 11px); box-shadow: inset 0 0 0 1px #2a3a4b; }
+.ws-shutter.sm { padding: 10px 12px; }
+.ws-shutter b { display: block; font: 700 14px var(--font); letter-spacing: .22em; text-transform: uppercase; color: #c6d3df; }
+.ws-shutter small { font-size: 12px; }
+.ws-lock { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: var(--ws); background: #0a0e13;
+  box-shadow: inset 0 0 0 2px #3b4a5a; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); }
+.ws-lock .ic { width: 20px; height: 20px; }
+.locked-bay { --ws: #8a7a4a; }
+.locked-bay .ws-bay-h b { color: #9aa8b6; }
+/* bay 02: exchange */
+.ws-rates { display: flex; flex-wrap: wrap; gap: 4px 10px; font: 700 11px var(--font); letter-spacing: .14em; text-transform: uppercase; color: #8fa3b6; }
+.ws-rate { display: inline-flex; align-items: center; gap: 5px; }
+.ws-rate i { width: 8px; height: 8px; transform: rotate(45deg); background: var(--f-common); }
+.ws-rate.r-rare i { background: var(--f-rare); } .ws-rate.r-epic i { background: var(--f-epic); } .ws-rate.r-legendary i { background: var(--f-legendary); }
+.ws-rate b { color: var(--purple); }
+.ws-rates::before { content: "Chips per shard"; color: #5d7086; letter-spacing: .1em; width: 100%; }
+.ws-exrow { display: flex; align-items: center; gap: 10px; padding: 4px 4px 4px 10px; background: #0a1017; box-shadow: inset 0 0 0 1px #233140; }
+.ws-exrow > .ic { width: 20px; height: 20px; color: var(--cyan); flex: none; }
+.ws-exrow b { display: block; font: 700 14px var(--font); letter-spacing: .06em; text-transform: uppercase; }
+.ws-exrow small { color: #9fb3c6; font-size: 12px; }
+.ws-empty { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; color: #8fa3b6; background: #0a1017; box-shadow: inset 0 0 0 1px #1c2833; }
+.ws-empty .ic { width: 20px; height: 20px; flex: none; color: var(--purple); opacity: .7; }
+.ws-empty small { font-size: 12px; line-height: 1.3; }
+/* bay 03: scrap */
+.ws-gauge { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.ws-gauge > div { padding: 6px 10px; background: #0a1017; box-shadow: inset 0 0 0 1px #233140; border-left: 3px solid #7f8fa0; }
+.ws-gauge small { display: block; font: 700 10.5px var(--font); letter-spacing: .2em; text-transform: uppercase; color: #8fa3b6; }
+.ws-gauge b { display: flex; align-items: center; gap: 6px; font: 800 20px var(--font-d); color: #e3eaf1; }
+.ws-gauge b .ic { width: 18px; height: 18px; color: var(--text-2); }
+.ws-note { font-size: 12px; color: #9fb3c6; line-height: 1.3; }
+.ws-src { display: flex; flex-direction: column; gap: 4px; }
+.ws-src > div { display: flex; align-items: center; gap: 10px; padding: 5px 8px; background: #0a1017; }
+.ws-src > div.off { opacity: .5; }
+.ws-src .ic { width: 18px; height: 18px; flex: none; color: var(--ws); }
+.ws-src b { font: 700 13px var(--font); letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; }
+.ws-src small { color: #8fa3b6; font-size: 12px; }
+/* pinned footer */
+.ws-foot { flex: none; display: flex; align-items: center; gap: 10px; margin: 0 -10px calc(-10px - var(--sab)); padding: 8px 12px calc(var(--sab) + 10px);
+  background: linear-gradient(180deg, #0f1822, #070b10); box-shadow: 0 -1px 0 #2a3a4b, 0 -4px 0 -1px #0007; position: relative; }
+.ws-foot::before { content: ""; position: absolute; left: 0; right: 0; top: -4px; height: 3px; background: repeating-linear-gradient(-45deg, var(--ws) 0 6px, #111 6px 12px); opacity: .55; }
+.ws-load { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ws-load small { font: 700 10px var(--font); letter-spacing: .24em; text-transform: uppercase; color: #8fa3b6; }
+.ws-load b { display: flex; align-items: center; gap: 6px; font: 700 15px var(--font); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ws-load b .ic { width: 18px; height: 18px; }
+/* formation buff row: quick buy stays, a link to the Workshop's fabrication bay sits on the kicker line (D28) */
+.fm-buffh { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.fm-wslink { position: relative; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 0 2px; min-height: 26px;
+  color: #ffd34d; font: 700 11px var(--font); letter-spacing: .18em; text-transform: uppercase; }
+.fm-wslink::after { content: ""; position: absolute; inset: -9px -8px; }
+.fm-wslink .ic { width: 14px; height: 14px; }
+.ws-fnote { display: none; }

@@ -5,6 +5,7 @@ import { ability } from '../app/data.js';
 import { btn, bar, header, confirmBox } from './components.js';
 import { hint } from './tutorial.js';
 import { snd } from '../app/sound.js';
+import { featureOpen } from './scr_hub.js';
 
 const FACTION_NAME = { corporate: 'Corporate', rogue: 'Rogue', experimental: 'Experimental' };
 
@@ -76,7 +77,8 @@ export async function mount(root, ctx, route) {
         h('span.grow'), rc ? h('small', 'Shards ' + v.shards + '/' + rc.shards) : h('small.t-gold', 'MAX RANK')),
       v.surplusShards > 0 ? h('div.up-surplus', icon('hex'), h('div.grow', h('b', v.surplusShards + ' surplus shard' + (v.surplusShards > 1 ? 's' : '')),
         h('small', (rc ? 'More than this unit needs to reach max rank' : 'Max rank: these shards have no further use') + ' · worth ' + fmt(Math.floor(v.surplusShards * (v.shardValue?.chips ?? 1))) + ' chips')),
-        btn('Convert', async () => {
+        // D28: the shard exchange is the Workshop's; convert in place only while the Workshop is still locked
+        featureOpen(store, 'workshop') ? btn('Exchange', () => router.go('/workshop'), { cls: 'gold sm', icon: 'wrench', id: 'up-convert' }) : btn('Convert', async () => {
           const chips = Math.floor(v.surplusShards * (v.shardValue?.chips ?? 1));
           if (!await confirmBox('Convert shards?', 'Turn ' + v.surplusShards + ' surplus ' + v.name + ' shards into ' + fmt(chips) + ' chips. This can\'t be undone.', 'Convert', 'Keep')) return;
           const r = store.convertShards(v.id);

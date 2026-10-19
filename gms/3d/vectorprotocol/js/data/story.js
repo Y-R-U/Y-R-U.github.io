@@ -31,7 +31,7 @@ export const SCENES = {
     L('mags', 'First job: some dock thug is sitting on a client\'s container. Go be persuasive.'),
   ],
   m1_l1_post: [L('mags', 'Huh. They work. Don\'t tell them I sounded surprised.')],
-  m1_l2_post: [L('tink', 'I\'m Tink. I fix stuff. You break stuff. I think this is gonna work out.'), L('sys', 'WORKSHOP unlocked — feed scrap to level up your robots.')],
+  m1_l2_post: [L('tink', 'I\'m Tink. I fix stuff. You break stuff. I think this is gonna work out.'), L('sys', 'UPGRADES unlocked — spend scrap in the BARRACKS to level up your robots.')],
   m1_l3_pre: [L('mags', 'Clinic down Pier 6 can\'t pay us in cash. They\'re offering a drone instead.'), L('mags', 'Take it. A medic is worth more than money, and it\'s worth more than you.')],
   m1_l3_post: [L('sys', 'PATCH joined the company.'), L('tink', 'It keeps trying to bandage me. I\'m fine. I\'m mostly fine.')],
   m1_l4_post: [L('sys', 'RECRUITMENT unlocked — hire new robots with credits.')],
@@ -49,7 +49,7 @@ export const SCENES = {
 
   // ═══ MAP 2 — NEON UNDERCITY ═══
   m2_l1_pre: [L('mags', 'The Undercity. Under the platforms, under the law, under a lot of neon.'), L('mags', 'Red Ledger runs it. Don\'t start anything with them. Today.')],
-  m2_l3_post: [L('sys', 'ABILITY UPGRADES and BUFFS unlocked.'), L('tink', 'Stim Packs! Plating Kits! Don\'t ask where I got them.')],
+  m2_l3_post: [L('sys', 'ABILITY UPGRADES and the WORKSHOP unlocked — fabricate combat buffs there.'), L('tink', 'Stim Packs! Plating Kits! Don\'t ask where I got them.')],
   m2_l4_pre: [L('mags', 'Pit night. Robots fight, people bet, everyone pretends it\'s legal.')],
   m2_l4_post: [L('sys', 'ARENA unlocked — fight rival companies for tokens and XP.'), L('mags', 'When the jobs get too hard, the Arena makes you harder. Remember that.')],
   m2_l5_pre: [L('jax', 'Nightshift. Cute name. You\'re working Ledger streets without paying Ledger.'), L('jax', 'Consider this the invoice.')],
