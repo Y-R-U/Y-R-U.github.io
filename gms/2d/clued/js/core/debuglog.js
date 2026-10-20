@@ -3,7 +3,7 @@
 // visible (max once per 20 s; every 20 s while on, so switching it off is picked up too). `?debug=1` forces it on for this tab (developers).
 // dlog() always fills a 600-line ring so the first batch after switching on carries the recent history.
 // No imports beyond BUILD so audio modules can use it in node tests. See docs/notes/DEBUGLOG.md.
-import { BUILD } from '../build.js?v=202610201048';
+import { BUILD } from '../build.js?v=202610201106';
 
 const RING = 600, QUEUE_MAX = 3000, BATCH_LINES = 300, BATCH_BYTES = 56000, FLUSH_MS = 3000, CHECK_MS = 20000, IDLE_CHECK_MS = 30000;
 
@@ -148,13 +148,16 @@ function roomOf() {
   } catch (e) { return ''; }
 }
 
+const timeout = ms => { try { return AbortSignal.timeout(ms); } catch (e) { const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; } };
+
 let inst = G.__cluedDbg;   // one instance even if the module is loaded twice across a deploy
 if (!inst) {
   const API = isBrowser ? apiBase() : '';
   inst = createDebugLog({
+    // a fetch that never settles would leave `sending` set and silently stop all logging, so each one times out
     fetch: (url, b, post) => (post
-      ? G.fetch(url, { method: 'POST', body: b, keepalive: b.length < 60000, mode: 'cors', credentials: 'omit', headers: { 'Content-Type': 'text/plain' } })
-      : G.fetch(url, { cache: 'no-store', mode: 'cors', credentials: 'omit' })),
+      ? G.fetch(url, { method: 'POST', body: b, keepalive: b.length < 60000, mode: 'cors', credentials: 'omit', headers: { 'Content-Type': 'text/plain' }, signal: timeout(15000) })
+      : G.fetch(url, { cache: 'no-store', mode: 'cors', credentials: 'omit', signal: timeout(10000) })),
     beacon: (url, b) => { try { return !!G.navigator?.sendBeacon?.(url, new Blob([b], { type: 'text/plain' })); } catch (e) { return false; } },
     now: () => Date.now(),
     perf: () => (G.performance ? performance.now() : Date.now()),
