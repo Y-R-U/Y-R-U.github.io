@@ -1,21 +1,21 @@
 // Pub quiz: 4–8 rounds of different formats/themes, one double-points joker per player, builder or "surprise me".
-import { playSpec } from './session.js?v=202610201106';
-import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610201106';
-import { mySetting, saveMySetting, specLocal } from '../core/local.js?v=202610201106';
-import { localChip, localLine, localTotal } from '../ui/local.js?v=202610201106';
-import { handoff } from './handoff.js?v=202610201106';
-import { playersEditor } from './party.js?v=202610201106';
-import { defineScreen, go, header } from '../ui/app.js?v=202610201106';
-import { h, esc, fmtNum } from '../ui/kit.js?v=202610201106';
-import { toast } from '../ui/popup.js?v=202610201106';
-import { getFormat, defaultOpts } from '../formats/registry.js?v=202610201106';
-import { getIndex } from '../core/packs.js?v=202610201106';
-import { getSettings, setSettings, read, write, getFavs } from '../core/store.js?v=202610201106';
-import { streakOption } from '../ui/streakopt.js?v=202610201106';
-import { cleanFav, favKey } from '../ui/favmodel.js?v=202610201106';
-import { roundTitle, usable, roundCard, moveItem, registerRoundList, addRound } from './rounds.js?v=202610201106';
-import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610201106';
-import { sfx } from '../ui/fx.js?v=202610201106';
+import { playSpec } from './session.js?v=202610201109';
+import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610201109';
+import { mySetting, saveMySetting, specLocal } from '../core/local.js?v=202610201109';
+import { localChip, localLine, localTotal } from '../ui/local.js?v=202610201109';
+import { handoff } from './handoff.js?v=202610201109';
+import { playersEditor } from './party.js?v=202610201109';
+import { defineScreen, go, header } from '../ui/app.js?v=202610201109';
+import { h, esc, fmtNum } from '../ui/kit.js?v=202610201109';
+import { toast } from '../ui/popup.js?v=202610201109';
+import { getFormat, defaultOpts } from '../formats/registry.js?v=202610201109';
+import { getIndex } from '../core/packs.js?v=202610201109';
+import { getSettings, setSettings, read, write, getFavs } from '../core/store.js?v=202610201109';
+import { streakOption } from '../ui/streakopt.js?v=202610201109';
+import { cleanFav, favKey } from '../ui/favmodel.js?v=202610201109';
+import { roundTitle, usable, roundCard, moveItem, registerRoundList, addRound } from './rounds.js?v=202610201109';
+import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610201109';
+import { sfx } from '../ui/fx.js?v=202610201109';
 
 const KEY = 'clued.pubquiz';
 const MAX_ROUNDS = 8;
@@ -103,7 +103,7 @@ defineScreen('pubquiz', el => {
     h('button.btn.sun', { type: 'button', dataset: { act: 'surprise' }, onclick: () => { s.rounds = surprise(randomSeed(), kids); s.jokers = {}; save(); sfx('reveal'); draw(); } }, '🎲 Surprise me'),
     h('button.btn', { type: 'button', dataset: { act: 'kids-preset' }, onclick: () => { s.rounds = surprise(randomSeed(), true); s.jokers = {}; save(); draw(); } }, '🧸 Kids quiz'),
     h('button.btn', { type: 'button', dataset: { act: 'ready-made' }, onclick: async () => {
-      const set = await (await import('../net/sets.js?v=202610201106')).pickSet(kids);
+      const set = await (await import('../net/sets.js?v=202610201109')).pickSet(kids);
       if (!set) return;
       s.rounds = readyMade(set.rounds);
       s.jokers = {}; save(); draw();

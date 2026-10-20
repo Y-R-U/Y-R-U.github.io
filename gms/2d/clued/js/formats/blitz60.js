@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, collect, pick, factText, isIucn, lcLabel, factHeading } from './registry.js?v=202610201106';
-import { h, typeBox } from '../ui/kit.js?v=202610201106';
-import { fuzzyMatch, distance, answersFor } from '../core/fuzzy.js?v=202610201106';
-import { norm, injectCSS, baseCSS, ownClock, once } from './fkit.js?v=202610201106';
+import { register, poolItems, pickPack, collect, pick, factText, isIucn, lcLabel, factHeading } from './registry.js?v=202610201109';
+import { h, typeBox } from '../ui/kit.js?v=202610201109';
+import { fuzzyMatch, distance, answersFor } from '../core/fuzzy.js?v=202610201109';
+import { norm, injectCSS, baseCSS, ownClock, once } from './fkit.js?v=202610201109';
 
 const CSS = `
 .bz{gap:10px}

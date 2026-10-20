@@ -1,13 +1,13 @@
-import { h } from './kit.js?v=202610201106';
-import { defineScreen, go, header } from './app.js?v=202610201106';
-import { getSettings, setSettings, dailyDone, todayUTC } from '../core/store.js?v=202610201106';
-import { kidsProgress } from './stickers.js?v=202610201106';
-import { sfx } from './fx.js?v=202610201106';
-import { toast } from './popup.js?v=202610201106';
-import { loadNet } from './net.js?v=202610201106';
-import { toolButtons } from './toggles.js?v=202610201106';
-import { statsLine } from './statsline.js?v=202610201106';
-import { BUILD } from '../build.js?v=202610201106';
+import { h } from './kit.js?v=202610201109';
+import { defineScreen, go, header } from './app.js?v=202610201109';
+import { getSettings, setSettings, dailyDone, todayUTC } from '../core/store.js?v=202610201109';
+import { kidsProgress } from './stickers.js?v=202610201109';
+import { sfx } from './fx.js?v=202610201109';
+import { toast } from './popup.js?v=202610201109';
+import { loadNet } from './net.js?v=202610201109';
+import { toolButtons } from './toggles.js?v=202610201109';
+import { statsLine } from './statsline.js?v=202610201109';
+import { BUILD } from '../build.js?v=202610201109';
 
 export const logo = (sm = false) => h('div.logo', { class: sm ? 'sm' : '', 'aria-label': 'Clued' },
   h('span.lens', {}, '?'), ...'lued'.split('').map(c => h('span.l', {}, c)));

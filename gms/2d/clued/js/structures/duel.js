@@ -1,11 +1,11 @@
 // Duel: two players, one device. Portrait = top half flipped; landscape = left vs right. First right answer scores.
-import { specFor, fmtTitle } from './common.js?v=202610201106';
-import { prepare } from './session.js?v=202610201106';
-import { defineScreen, go, back } from '../ui/app.js?v=202610201106';
-import { h, choiceGrid, mediaBox, onKey } from '../ui/kit.js?v=202610201106';
-import { confirmPop } from '../ui/popup.js?v=202610201106';
-import { sfx, haptic } from '../ui/fx.js?v=202610201106';
-import { recordSeen } from '../core/fresh.js?v=202610201106';
+import { specFor, fmtTitle } from './common.js?v=202610201109';
+import { prepare } from './session.js?v=202610201109';
+import { defineScreen, go, back } from '../ui/app.js?v=202610201109';
+import { h, choiceGrid, mediaBox, onKey } from '../ui/kit.js?v=202610201109';
+import { confirmPop } from '../ui/popup.js?v=202610201109';
+import { sfx, haptic } from '../ui/fx.js?v=202610201109';
+import { recordSeen } from '../core/fresh.js?v=202610201109';
 
 const asChoice = q => {
   if (q.format === 'tf') return { ...q, options: [{ text: 'True' }, { text: 'False' }], answer: q.answer ? 0 : 1 };

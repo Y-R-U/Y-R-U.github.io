@@ -3,7 +3,7 @@
 // visible (max once per 20 s; every 20 s while on, so switching it off is picked up too). `?debug=1` forces it on for this tab (developers).
 // dlog() always fills a 600-line ring so the first batch after switching on carries the recent history.
 // No imports beyond BUILD so audio modules can use it in node tests. See docs/notes/DEBUGLOG.md.
-import { BUILD } from '../build.js?v=202610201106';
+import { BUILD } from '../build.js?v=202610201109';
 
 const RING = 600, QUEUE_MAX = 3000, BATCH_LINES = 300, BATCH_BYTES = 56000, FLUSH_MS = 3000, CHECK_MS = 20000, IDLE_CHECK_MS = 30000;
 

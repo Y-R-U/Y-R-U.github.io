@@ -1,23 +1,23 @@
 // Serverless link challenges: the URL hash carries the GameSpec (with its seed), BUILD and a chain of
 // up to 8 { name, score }. The receiver regenerates the identical set locally, plays it, and gets a
 // reply link with their score appended. No server, no caps; works on Pages.
-import { playUrl } from './share.js?v=202610201106';
-import { h, fmtNum } from '../ui/kit.js?v=202610201106';
-import { defineScreen, header, current, reset } from '../ui/app.js?v=202610201106';
-import { toast } from '../ui/popup.js?v=202610201106';
-import { sfx, confetti } from '../ui/fx.js?v=202610201106';
-import { BUILD } from '../build.js?v=202610201106';
-import { getSettings } from '../core/store.js?v=202610201106';
-import { hashString } from '../core/rng.js?v=202610201106';
-import { createRunner } from '../structures/runner.js?v=202610201106';
-import { replayCfg, replayScore } from '../structures/index.js?v=202610201106';
-import { prepare } from '../structures/session.js?v=202610201106';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610201106';
-import { openShare, shareOrCopy } from './share.js?v=202610201106';
-import { ordinal, detailOf, comparison } from './board.js?v=202610201106';
-import { ensureStyles } from './util.js?v=202610201106';
-import { ensureFormats } from './room.js?v=202610201106';
-import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610201106';
+import { playUrl } from './share.js?v=202610201109';
+import { h, fmtNum } from '../ui/kit.js?v=202610201109';
+import { defineScreen, header, current, reset } from '../ui/app.js?v=202610201109';
+import { toast } from '../ui/popup.js?v=202610201109';
+import { sfx, confetti } from '../ui/fx.js?v=202610201109';
+import { BUILD } from '../build.js?v=202610201109';
+import { getSettings } from '../core/store.js?v=202610201109';
+import { hashString } from '../core/rng.js?v=202610201109';
+import { createRunner } from '../structures/runner.js?v=202610201109';
+import { replayCfg, replayScore } from '../structures/index.js?v=202610201109';
+import { prepare } from '../structures/session.js?v=202610201109';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610201109';
+import { openShare, shareOrCopy } from './share.js?v=202610201109';
+import { ordinal, detailOf, comparison } from './board.js?v=202610201109';
+import { ensureStyles } from './util.js?v=202610201109';
+import { ensureFormats } from './room.js?v=202610201109';
+import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610201109';
 
 const MAX_CHAIN = 8;
 const MAX_ROUNDS = 10, MAX_COUNT = 60;   // a solo game is at most 50 (Blitz); a pub quiz 8 rounds
