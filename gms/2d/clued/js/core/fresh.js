@@ -1,7 +1,7 @@
 // FRESH: a rolling history of questions this device has shown (clued.seen, synced), so new games prefer unseen ones.
 // Stored as one string of fixed-width tokens, oldest first: { v: 1, h: 'abcde…', g: [[new, total] × last 10 games] }.
-import { KEYS, read, write } from './store.js?v=202610201109';
-import { hashString } from './rng.js?v=202610201109';
+import { KEYS, read, write } from './store.js?v=202610201133';
+import { hashString } from './rng.js?v=202610201133';
 
 export const SEEN_MAX = 3000, W = 5, SPEC_W = 4;
 const SPACE = 36 ** W;

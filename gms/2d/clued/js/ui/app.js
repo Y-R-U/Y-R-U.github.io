@@ -1,8 +1,9 @@
 // Screen manager: one screen at a time, a back stack, and the hardware/browser back button.
-import { h } from './kit.js?v=202610201109';
-import { closeAll } from './popup.js?v=202610201109';
-import { showBanner, reloadFresh } from './update.js?v=202610201109';
-import { fsButton } from './toggles.js?v=202610201109';
+import { h } from './kit.js?v=202610201133';
+import { closeAll } from './popup.js?v=202610201133';
+import { showBanner, reloadFresh } from './update.js?v=202610201133';
+import { fsButton } from './toggles.js?v=202610201133';
+import { dlog } from '../core/debuglog.js?v=202610201133';
 
 // State lives on globalThis: a module loaded across a deploy can import a second copy of this file,
 // and that copy must still drive the same screens.
@@ -57,6 +58,7 @@ export async function go(name, params = {}, { replace = false, fromHistory = fal
   const el = h('section.screen', { class: `scr-${name} ${def.cls}`, dataset: { screen: name } });
   N.root.querySelectorAll('.screen').forEach(s => { s.classList.add('leaving'); s.inert = true; setTimeout(() => s.remove(), 180); });
   N.root.append(el);
+  setTimeout(() => unstick(el, name), 700);
   const me = N.cur = { name, params, el, cleanup: null, guard: null };
   document.body.dataset.screen = name;
   let r;
@@ -71,6 +73,16 @@ export async function go(name, params = {}, { replace = false, fromHistory = fal
   el.scrollTop = 0;
   listeners.forEach(fn => { try { fn(name, params); } catch (e) {} });
   return true;
+}
+
+// A screen starts at opacity 0 and fades in; if the browser never runs that animation (seen once on Android Chrome:
+// a blank join screen until the tab was switched away and back) the screen stays invisible, so finish it.
+function unstick(el, name) {
+  if (!el.isConnected || el.classList.contains('leaving')) return;
+  const a = el.getAnimations?.().find(x => x.animationName === 'scr-in');
+  if (!a || a.playState === 'finished') return;
+  dlog('nav', 'stuck-anim', { screen: name, state: a.playState, t: a.currentTime, vis: document.visibilityState, op: getComputedStyle(el).opacity }, 'warn');
+  try { a.finish(); } catch (e) { el.style.animation = 'none'; }
 }
 
 export function back(fromHistory = false) {

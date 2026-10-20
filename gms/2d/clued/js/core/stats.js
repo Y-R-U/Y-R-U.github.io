@@ -6,9 +6,9 @@
 //   dd { 'YYYY-MM-DD': daily kinds bitmask }   h [newest-first game entries, capped]
 // Games recorded before this existed only live in the old totals; the difference shows as "earlier games".
 // Reading never writes: a write moves the cloud savedAt stamp, and a boot-time write would beat a newer account save.
-import { getStats, updateStats } from './store.js?v=202610201109';
-import { hashString } from './rng.js?v=202610201109';
-import { getIndex } from './packs.js?v=202610201109';
+import { getStats, updateStats } from './store.js?v=202610201133';
+import { hashString } from './rng.js?v=202610201133';
+import { getIndex } from './packs.js?v=202610201133';
 
 export const HISTORY_CAP = 200;
 export const DAYS_CAP = 120;

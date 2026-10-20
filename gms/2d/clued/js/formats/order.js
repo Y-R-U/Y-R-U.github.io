@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, comparison, capFirst, factPhrase, whenPhrase } from './registry.js?v=202610201109';
-import { h, imgEl } from '../ui/kit.js?v=202610201109';
-import { numericKeys, numOf, spreadSet, rangeOf, fmtFact, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610201109';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, comparison, capFirst, factPhrase, whenPhrase } from './registry.js?v=202610201133';
+import { h, imgEl } from '../ui/kit.js?v=202610201133';
+import { numericKeys, numOf, spreadSet, rangeOf, fmtFact, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610201133';
 
 const CSS = `
 .or-wrap{display:flex;flex-direction:column;gap:6px}

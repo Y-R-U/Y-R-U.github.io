@@ -1,8 +1,8 @@
 // Share links: navigator.share, clipboard fallback, and a QR code people in the room can scan.
-import { h } from '../ui/kit.js?v=202610201109';
-import { popup, toast } from '../ui/popup.js?v=202610201109';
-import { qrSvg } from '../vendor/qr.js?v=202610201109';
-import { API_OVERRIDE } from './api.js?v=202610201109';
+import { h } from '../ui/kit.js?v=202610201133';
+import { popup, toast } from '../ui/popup.js?v=202610201133';
+import { qrSvg } from '../vendor/qr.js?v=202610201133';
+import { API_OVERRIDE } from './api.js?v=202610201133';
 
 // Shared links always open the games.br8t.com copy: sign-in and the room server work there. Local dev keeps its own host.
 const LOCAL = /^(localhost|127\.|192\.168\.)/.test(location.hostname);
