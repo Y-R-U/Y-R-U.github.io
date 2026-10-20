@@ -253,3 +253,7 @@ OPEN for Aaron: none blocking. Follow-ups: room scoreboard fine; Book moments to
   blank join screen 11:03, stuckanim_e2e). Log review of the session: every Listen clip played on all 3 devices, iPhone
   sound recovered after each app switch (2× "Failed to start the audio device" on resume, both recovered by the next tap).
   Debug log OFF again. Unconfirmed: whether stuck-anim is the real blank-screen cause — check `--tag nav` next time.
+- 2026-10-20 iOS Simulator set up (Xcode 26.6, iOS 26.5 runtime, device `clued-test`; same Safari 26 engine as Amanda's phone).
+  `tools/ios_sim_formats.sh` fresh-loads a build in simulated Safari and counts format failures via a LOCAL server's debug
+  log: the pre-fix build failed 10/10 (neighbours + flag-map, Amanda's exact error), HEAD 0/10. Good for load/layout bugs;
+  NOT for sound (no real app-switch/silent-switch/audio-session behaviour): sound needs the real phone + debuglog.
