@@ -1,11 +1,11 @@
 // Remote debug log. Off unless the server's debugLogs setting is on (GET /status → debugLogs), which the client
-// re-checks at boot, on visibility/pageshow, on screen changes and at the start of every game (max once a minute;
-// every minute while on, so switching it off is picked up too). `?debug=1` forces it on for this tab (developers).
-// dlog() always fills a 200-line ring so the first batch after switching on carries the recent history.
+// re-checks at boot, on visibility/pageshow, on screen changes, at the start of every game and every 30 s while
+// visible (max once per 20 s; every 20 s while on, so switching it off is picked up too). `?debug=1` forces it on for this tab (developers).
+// dlog() always fills a 600-line ring so the first batch after switching on carries the recent history.
 // No imports beyond BUILD so audio modules can use it in node tests. See docs/notes/DEBUGLOG.md.
-import { BUILD } from '../build.js?v=202610181234';
+import { BUILD } from '../build.js?v=202610201048';
 
-const RING = 200, QUEUE_MAX = 3000, BATCH_LINES = 300, BATCH_BYTES = 56000, FLUSH_MS = 3000, CHECK_MS = 60000;
+const RING = 600, QUEUE_MAX = 3000, BATCH_LINES = 300, BATCH_BYTES = 56000, FLUSH_MS = 3000, CHECK_MS = 20000, IDLE_CHECK_MS = 30000;
 
 const rid = n => Math.random().toString(36).slice(2, 2 + n).padEnd(n, '0');
 
@@ -200,7 +200,7 @@ export function buildsSeen() {
   } catch (e) { return { err: String(e) }; }
 }
 export const debugOn = () => inst.on;
-// Call at the start of a game / room: picks up the server setting without a reload (throttled to once a minute).
+// Call at the start of a game / room: picks up the server setting without a reload (throttled to every 20 s).
 export const debugCheck = () => inst.check();
 export const debugLog = inst;
 
@@ -246,7 +246,11 @@ function install(d) {
   const q = (() => { try { return new URL(performance.getEntriesByType('navigation')[0]?.name || location.href).search + location.search; } catch (e) { return location.search; } })();
   const testOnly = /[?&](test|soak)(=|&|$)/.test(q) && !/[?&]api=/.test(q);
   d.dlog('page', 'boot', { url: location.pathname + location.search, build: BUILD, ref: document.referrer ? new URL(document.referrer).host : '', w: innerWidth, h: innerHeight, dpr: devicePixelRatio, mem: navigator.deviceMemory, cores: navigator.hardwareConcurrency });
-  if (!testOnly) d.check(true);
+  if (!testOnly) {
+    d.check(true);
+    // while off, a visible page keeps asking, so switching logging on reaches open tabs (with their recent history)
+    setInterval(() => { if (!d.on && document.visibilityState === 'visible') d.check(); }, IDLE_CHECK_MS);
+  }
   addEventListener('load', () => setTimeout(() => d.dlog('page', 'builds', buildsSeen()), 0), { once: true });
   wrapAudioContext(d);
 }

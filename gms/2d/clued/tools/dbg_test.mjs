@@ -32,9 +32,9 @@ function harness({ flag = false } = {}) {
 // 1. Off: ring only, no network, no timers.
 {
   const H = harness();
-  for (let i = 0; i < 250; i++) H.d.dlog('clip', 'm' + i, { i });
-  ok(H.d.ring.length === 200, 'ring keeps 200');
-  ok(H.d.ring[0].msg === 'm50' && H.d.ring[199].msg === 'm249', 'ring drops oldest');
+  for (let i = 0; i < 650; i++) H.d.dlog('clip', 'm' + i, { i });
+  ok(H.d.ring.length === 600, 'ring keeps 600');
+  ok(H.d.ring[0].msg === 'm50' && H.d.ring[599].msg === 'm649', 'ring drops oldest');
   ok(H.d.queue.length === 0, 'nothing queued while off');
   ok(H.timers.size === 0, 'no timers while off');
   await H.d.flush();
@@ -125,21 +125,21 @@ function harness({ flag = false } = {}) {
   const H = harness({ flag: true });
   await H.d.check(true);
   H.flag = false;
-  await [...H.timers.values()].find(t => t.ms === 60000).fn();
+  await [...H.timers.values()].find(t => t.ms === 20000).fn();
   ok(!H.d.on, 'status re-check switches off');
 }
 
-// 7. Throttle: unforced checks at most once a minute.
+// 7. Throttle: unforced checks at most every 20 s.
 {
   const H = harness();
   let n = 0;
   const f = H.d.check;
   await H.d.check(); n = H.d.stats.checks;
   await H.d.check(); await H.d.check();
-  ok(H.d.stats.checks === n, 'throttled within a minute');
-  H.tick(61000);
+  ok(H.d.stats.checks === n, 'throttled within 20 s');
+  H.tick(21000);
   await H.d.check();
-  ok(H.d.stats.checks === n + 1, 'checks again after a minute');
+  ok(H.d.stats.checks === n + 1, 'checks again after 20 s');
   void f;
 }
 

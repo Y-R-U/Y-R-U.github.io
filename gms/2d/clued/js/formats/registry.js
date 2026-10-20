@@ -1,6 +1,6 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610181234';
-import { SERIES } from './series_data.js?v=202610181234';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610201048';
+import { SERIES } from './series_data.js?v=202610201048';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
