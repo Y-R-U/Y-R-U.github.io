@@ -1,8 +1,10 @@
 # Krayzee online rooms: architecture (lane ONLINE, 2026-10-21)
 
-Status: **design + local prototype**. Nothing is deployed. The prototype is in `server/` (Go, local only), and
-`node gms/3d/krayzee/server/test.mjs` runs it and checks the room rules (26 checks; the voice-claim and host-only checks
-were broken on purpose to prove they can fail).
+Status (2026-10-22, lane NET): **O1 done, O2 done, local only**. Nothing is deployed and nothing is wired into the game
+yet. `server/` is the real `krayzeenet` (snakenet fork + RAGDOJO ID tokens + the Krayzee rules); `js/net/` is the browser
+client (links, clock, plane stream, lobby screen). Tests: `go test ./...` (13 tests), `server/test.mjs` (39 protocol checks
+over real sockets, incl. a server restart), `tools/net/test-interp.mjs` (10), `tools/net/test-mp.mjs` (two Chrome
+windows, direct + relay + a falsification run, 23 checks each). How to run: §16. GAMEPLAY wiring API: §15.
 
 Prior art this copies:
 - `gms/pwa/snake/MULTIPLAYER.md`: browser-hosted rooms, WebRTC full mesh, relay fallback, reconnect grace, host handoff
@@ -156,10 +158,11 @@ Ranks follow DESIGN §1.6 exactly. **The host computes them; nobody else does.**
 - **Room PP** = PP banked this session. Pending PP does not count until banked, so a crash still costs you. The host
   keeps the ledger from accepted `inf` events and `bank` events.
 - Players are sorted by room PP. Ties go to whoever reached the total first, by host room time.
-  - 1st holds the **Crown**: Court rank King or Queen, and **Emperor or Empress** if their PP is at least 2× the PP of
-    2nd.
-  - 2nd is Crown Prince or Princess, 3rd is Prince or Princess, and so on down one rung per place: Archduke, Duke,
-    Marquess, Earl, Viscount, Baron. 11th and below are all Baron.
+  - 1st holds the **Crown**: King or Queen; **Emperor or Empress** only if that player has already earned Emperor in
+    their career (DECISIONS D4, no points-ratio rule). Then 2nd is King/Queen and everyone steps down a rung per place.
+    The server passes each member's `emp` flag (on trust) so the host can apply this.
+  - Otherwise 2nd is Crown Prince or Princess, 3rd is Prince or Princess, and so on down one rung per place: Archduke,
+    Duke, Marquess, Earl, Viscount, Baron. 11th and below are all Baron.
   - Anyone on 0 PP is Baron.
   - AI never holds Court rank.
 - The ledger and ranks go out in every `atc` keyframe. When the Crown changes hands, the host emits `crown {id}`. Every
@@ -220,8 +223,8 @@ create (options) ──► LOBBY (claim voices, see options, host taps Start or 
   notices a hiccup. When the player returns, control goes back to them.
 - WebRTC links survive a short WebSocket drop.
 - After a server restart, browsers rebuild their rooms within 60 s (Snake's `rebuildWindow`).
-- The prototype has the grace, resume token, voice holding and immediate host handoff, with tests. It does not yet have
-  the rebuild window.
+- krayzeenet has the grace, resume token, voice holding, immediate host handoff on a drop, silence handoff, and the
+  60 s rebuild window (the rebuilt room keeps its code, options, phase, line order, voices and callsigns), with tests.
 
 **The host leaving**
 - A **goodbye** (tab closed, page left) or a **hidden tab** (`visibilitychange`) hands off at once.
@@ -274,6 +277,8 @@ create (options) ──► LOBBY (claim voices, see options, host taps Start or 
   - apply per-account rate limits, and
   - (later) a ranked-room gate.
 - Display name, title and gender come from the Krayzee profile (`ui.getProfile()`), not from the Google account.
+- As built: `/lib/auth` `getIdToken()` returns null for anonymous users, so they send no token and get no uid; their
+  seat and kick bans key on the socket id instead. Signed-in players get the per-uid rules.
 - No server database is needed for v1. Rooms are in memory, and career PP lives in each player's own cloud save.
 
 ## 12. Server: shape and deployment (when approved)
@@ -296,32 +301,46 @@ create (options) ──► LOBBY (claim voices, see options, host taps Start or 
   - later, a `tools/mpgate.mjs` with 4 headless Chromes, like Snake's: create, join, voice claim, the host vanishing,
     the server killed mid-room. Every key check must be falsified.
 
-### Prototype wire (what `server/` speaks today)
+### Wire protocol (what `server/` speaks)
+
+Text frames are JSON. Binary frames are the relay: `[len][to id][lane 'u'|'r'][payload]` in, `[len][from id][lane][payload]` out.
 
 | client → server | |
 |---|---|
-| `hello {name, title, voices[]}` | voices = favourites in order |
-| `list` · `create {name, priv, set}` · `join {code}` or `join {id}` · `leave` | |
-| `claim {voice}` | atomic; answered with `claim {ok, voice, by?}` |
-| `set {set}` | host only; the room is re-broadcast |
-| `rl {to?, d}` | relay to one member or the whole room |
+| `hello {name, title, rank, g, emp, voices[≤3], tz, tok?}` | profile; `rank` = data/ranks.js id (hosting gates on trust); `voices` = favourites in order; may be resent |
+| `auth {tok}` | Firebase ID token (or `dev:<uid>` with `KRAYZEE_DEV_AUTH=1`); one seat per uid per room, kick bans stick |
+| `b {r, pk}` | heartbeat from the game loop, every 500 ms: `r` = fit to host, `pk` = landed/parked (may change voice) |
+| `list` · `quick` · `create {name, priv, set}` · `join {code}` / `join {id}` · `leave` · `rejoin {rj}` | `rejoin` rebuilds the room after a server restart |
+| `claim {voice}` | atomic; refused in flight unless parked (D5) |
+| `set {set}` · `phase {p: lobby\|flight\|podium}` · `meta {crown, left}` · `handoff` | host only; `set` not in flight |
+| `rdy {on}` | lobby ready tick |
+| `kick {id}` · `vote {id}` | private room: the creator kicks; public room: `kick` counts as a vote, majority of the others removes |
+| `sig {to, d}` | WebRTC offer/answer/candidate to one peer |
+| `rl {to?, d}` | JSON relay to one member or (no `to`) the room |
 
 | server → client | |
 |---|---|
-| `welcome {id, tok, voices}` | the token resumes the seat via `?id=&tok=` |
-| `rooms {rooms[]}` | public only, no codes |
-| `room {room:{id, code, name, priv, n, set, host, epoch, members:[{id, name, title, voice, call, away}]}, you}` | |
-| `err {code: full\|nocode}` | |
+| `welcome {id, tok, ice, voices, grace, resumed}` | reconnect with `/ws?id=&tok=` within `grace` ms keeps the seat |
+| `rooms {rooms[], players, online, region}` | public only, never codes; each `{id, name, region, n, max, set, phase, meta, open}` |
+| `room {room, you, ice?, joined?}` | `room = {id, code, name, priv, region, n, max, set, phase, meta, host, owner, epoch, members:[{id, name, title, rank, g, emp, voice, call, away, rdy, kv}]}`; TURN only when n > 1 |
+| `claim {ok, voice, by?, byName?, why?}` | `why: "airborne"` when refused in flight |
+| `auth {ok, ranked}` · `kicked {code: kicked\|replaced\|banned, msg}` · `err {code: full\|nocode\|joust\|banned\|gone\|slow, msg}` | |
+| `sig {from, d}` · `rl {from, d}` | |
+
+Server limits: 500 clients, 200 rooms, 8 per room, 32 KB messages, 64 sockets per address (IPv6 per /64), relay budget
+400 msgs/s and 512 KB/s per client, 20 control msgs/s (burst 40). Names: 14 chars, rooms 24, profanity filtered (Clued's
+list). Settings are cleaned against `data/modes.js` HOST_OPTIONS; joust is forced to 2 players; Royal Decrees need a King+
+host, ranked rooms a Duke+ host (both on trust). Codes skip 0/O/1/I/L.
 
 ## 13. Build phases and effort
 
 | phase | what | effort |
 |---|---|---|
 | O0 ✅ | this design, prototype broker, protocol test (26 checks, 2 falsified) | done |
-| O1 | productionise the server: fork snakenet, merge the prototype pieces, ID token, kick/vote, meta; go tests; deploy scripts (not run) | 1 agent session |
-| O2 | client net layer: port Snake's `js/net.js` (NetLink, chunking, reconnect) into `js/net/`; lobby, list and voice-picker UI hooks | 1 session (parallel with O1) |
+| O1 ✅ | krayzeenet: snakenet fork + prototype pieces, ID token (dev bypass), kick/vote, meta, phase, rank gates, rebuild window, per-IP cap; go tests; deploy scripts **written, not run** | done 2026-10-22 |
+| O2 ✅ | `js/net/`: links (Snake port: chunking, reconnect, relay fallback), room clock, plane stream + interpolation buffer, options from modes.js, lobby screen; two-window CDP test | done 2026-10-22 |
 | O3 | net game: own-state broadcast, interpolator and dead reckoning, clock sync, AI and ATC snapshots, follower ATC replica, `inf`/`hit`/`bank`, radio floor control, Court ledger and crown | 2 sessions; **needs ATC and RADIO P2 APIs (§10) first** |
-| O4 | robustness: host migration from the replica, autopilot for away players, hidden tab, ICE restart, the mpgate 4-Chrome gate with falsified checks | 1 session |
+| O4 | robustness: host migration from the replica, autopilot for away players, ICE restart, inactive-player removal (5 min, public), the mpgate 4-Chrome gate with falsified checks (hidden-tab handoff is already in O2) | 1 session |
 | O5 | polish: quick join, public list meta, data saver, ping bars, kick-vote UI, LAN mode (as RAGDOJO) if wanted | 1 session |
 
 That is about 6 agent sessions, and online fits after P2 gameplay works in single player. The longest pole is O3,
@@ -340,3 +359,58 @@ which depends on ATC being serialisable and clock-injected. Asking for that **no
 6. **Home LAN mode** like RAGDOJO's (no internet, local server, no sign-in) for family play?
 7. **Deploy:** port 8018 on the br8t box (8012–8014, 8016 and 8017 are taken in repo configs; 8015 is unaccounted for),
    sharing Snake's TURN cap. The box has to be checked before deploy.
+
+## 15. Client API for GAMEPLAY (`js/net/index.js`)
+
+```js
+import { createNet } from './net/index.js';
+import { createLobby } from './net/lobby.js';
+const net = createNet({ profile: () => ui.getProfile(), getToken: () => account.auth.getIdToken() });
+// server: ?net=ws://127.0.0.1:8018/gms/3d/krayzee/net overrides wss://games.br8t.com/gms/3d/krayzee/net; ?p2p=0 forces relay
+const lobby = createLobby({ net, profile: () => ui.getProfile(), onStart: (room) => startOnline(room), onClose: () => showMenu() });
+lobby.show(true);                       // ?room=CODE in the URL joins straight away
+```
+
+| call | what |
+|---|---|
+| `net.tick(now, {ready, parked})` | **every frame**. Heartbeats (a hidden tab stops → hands off), pings, room clock. `ready` = in sync with stable fps (host candidate); `parked` = landed/parked (voice change allowed) |
+| `net.sendPlane(ac, {hull, overriding, parachute})` | own plane to every peer, unreliable, self-limited to 15 Hz; uses `ac.packState` with room time |
+| `net.applyRemote(peerId, ac)` | draws a peer's plane into an `Aircraft` 100–300 ms in the past (Hermite/slerp, dead-reckons ≤ 600 ms): `'interp' \| 'reckon' \| 'lost' \| 'empty'` |
+| `net.track(peerId).health(net.roomTime())` | `'live' \| 'lost'` (> 600 ms, ghost) `\| 'autopilot'` (> 2.5 s: host flies it, O4) |
+| `net.roomTime()` | host milliseconds (ping/pong clock to the host; continuous across host handoff) |
+| `net.send(to, obj)` · `net.broadcast(obj)` · `net.toHost(obj)` | reliable ordered JSON (`atc`, `inf`, `bank`, `radio`, `crown`… in O3) |
+| `net.create({name, priv, set})` · `join(code \| {id})` · `quick()` · `list()` · `leave()` | membership |
+| `net.claim(voice)` · `setOptions(set)` · `setPhase('lobby'\|'flight'\|'podium')` · `ready(on)` · `kick(id)` · `vote(id)` · `meta(crownName, secondsLeft)` · `handoff(why)` | lobby / host |
+| getters | `id, room, members, me, isHost, hostId, phase, connected, voices, linkSummary()` |
+
+Events (`net.on(ev, fn)` returns an unsubscribe): `connected`, `rooms`, `joined(room)`, `room(room, prev)`, `host({host,
+prev, epoch, me})`, `phase(p, prev)`, `claim(m)`, `error(m)`, `kicked(m)`, `left({why})`, `peerLeft(id)`,
+`plane(peerId, state, track)`, `msg(from, obj)`, `link(peer, direct)`, `linkLost(peer)`, `reconnecting(bool)`, `auth(m)`,
+`disconnected`.
+
+Options: `js/net/options.js` (`defaultsFor(type)`, `normalise(set, hostRank)`, `fixedKeys`, `summary`) applies each
+room type's fixed values from `data/modes.js`; the host's game should read `net.room.set` through `normalise` too.
+
+UI asks (not built, UI lane): up to 3 starred favourite voices in the profile (`profile.favourites`, the lobby already
+sends them), an Online button on the menu (currently SOON) that opens `createLobby`, the in-flight connection pill and
+Court ladder.
+
+## 16. Running it locally
+
+```sh
+cd gms/3d/krayzee/server
+go test ./...                                   # hub rules with a fake clock + ID-token verifier
+node test.mjs                                   # builds krayzeenet, 39 checks over real sockets
+KRAYZEE_DEV_AUTH=1 KRAYZEE_ICE_URL=off go run . # serves ws://127.0.0.1:8018/gms/3d/krayzee/net/ws
+```
+
+With the site on `http://localhost:8888` (repo root), open two windows of
+`/gms/3d/krayzee/tools/net/sandbox.html?net=ws://127.0.0.1:8018/gms/3d/krayzee/net&name=Dirk&uid=a` (second: `&name=Mo&uid=b`;
+also `&voices=toff,bubba&rank=king&g=f&p2p=0`). Each member flies a fake circle once the host taps Start.
+`node tools/net/test-mp.mjs` does all of that headless on CDP port 9561 (own server on 8738), with screenshots in
+`docs/shots/net/`. Headless Chrome needs `--disable-features=WebRtcHideLocalIpsWithMdns` for two windows to connect
+directly (Snake's mpgate does the same).
+
+Deploy (**not done; needs Aaron**): `server/deploy.sh` refuses without `CONFIRM=1` and refuses if port 8018 is taken on the
+box; `server/krayzeenet.service` (MemoryMax 64M), `server/caddy_route.py` adds `handle /gms/3d/krayzee/net/*`. TURN comes
+from snakenet's loopback `:8014/ice` (shared 800 GB cap).
