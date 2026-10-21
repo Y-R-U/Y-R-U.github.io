@@ -15,19 +15,25 @@ export const T = {
   sepVertical: 60,
   cutMargin: 120,                  // must get this much closer to the threshold than the victim to count as passing
   circuitSpeed: 44, finalSpeed: 34, // m/s FLIGHT's autopilot flies (85 kt pattern, 65 kt final); turns distance into time
+  finalFastSpeed: 38.6, finalSlowFrom: 2400, // a long final is flown at 75 kt until 2.4 km out
   spacingTG: 45,                   // seconds at the threshold behind a touch-and-go
   spacingFull: 60,                 // behind a full-stop lander (rollout + vacate)
   spacingPlayer: 65,               // behind a human (who knows)
   minFinalGap: 22,                 // seconds; on final with less than this behind the leader = go around
   maxExtend: 5000,
+  rwChangeMax: 180,                // s a runway change waits for the old runway to go quiet
   clearLandDist: 2600,             // landing clearance offered inside this remaining distance
-  goAroundDist: 500,               // no clearance by here = go around
+  goAroundDist: 500,
+  tgFullStopSpeed: 18,             // m/s: a touch-and-go slower than this on the runway is treated as a full stop               // no clearance by here = go around
   revokeDist: 1500,                // blocked runway with the lander further out: revoke instead of go-around
   arrivalBlockDep: 2200,           // DESIGN says 3 km; 2.2 km keeps a busy light-aircraft circuit flowing
-  lineUpArrivalClear: 4200,
-  depSlotWait: 20,                 // s at the hold before ATC stretches an arrival to make a gap
-  depSlot: 115,                    // seconds opened behind the leader for a waiting departure
-  depSpacing: 700,                 // previous departure/touch-and-go this far down the runway before the next roll
+  arrivalBlockLinedUp: 1800,       // already lined up: it rolls at once
+  lineUpArrivalClear: 3000,        // line up and wait only if the next arrival is at least this far out
+  lineUpBehind: 250,               // ...or behind a lander already this far down the runway
+  depSlotWait: 0,                  // s at the hold before ATC stretches an arrival to make a gap
+  depSlotNear: 450,                // ...or already this close to the hold while taxiing out
+  depSlot: 130,                    // seconds opened behind the leader for a waiting departure
+  depSpacing: 1500,                // previous departure/touch-and-go this far down the runway before the next roll
   mutexRelease: 60,                // past the intersection by this many metres (or above mutexAlt)
   mutexAlt: 150,
   taxiReleaseGap: 25,              // s between taxi clearances

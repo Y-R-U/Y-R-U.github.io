@@ -82,6 +82,36 @@ Taxi paths stop `HOLD_OFFSET` short of every runway they cross (04/22 on taxiway
 when ATC clears it (or, ATC-linked, after 25 s with the runway free; unlinked, as soon as it is free).
 `circuitLegs` matches ATC `circuitFor`: upwind to L+750, downwind offset 1150, final turn 1800 m out.
 
+### TRAFFIC lane additions (2026-10-22)
+| API | what |
+|---|---|
+| `ap.landAt(plan)` / `ap.cancelLand()` | ASSIST §2 LAND: fly `plan.route` (approach legs may carry a **virtual end object** `{id:'LAND', virtual:true, thr, far, hdg, u, len, width, elev}` and `leg.fafDist`) to a stop; any stick input > 0.5 s or `cancelLand()` restores the previous route + replans. Virtual ends skip `landingClear` and touch-and-go. `ap.landing` is the active plan. Event `replan {to:'land'}` / `landcancel`. |
+| `ap.demandTakeoff({ends, prefer, minRun})` | D21: from anywhere on the ground, taxi straight to the nearest usable runway entry (≥ 600 m left; the preferred end wins ties) and go — no queue, no clearance, no hold lines. Returns the end id or false. Bridge: `link.demandTakeoff(entry)`. ATC is not told: it calls `queue_jump`/`unauth_takeoff`/`runway_steal` as they happen. |
+| `ap.skipToRunway(end)` | D22: placed lined up 12 m past the threshold, phase LINED UP, waiting for the clearance. Bridge: `link.skipToRunway(entry)` also resets the ATC strip (line-up-and-wait + 10 s crime grace). `link.placed(entry, secs)` after any respawn/teleport. |
+| `ap.changeRunway(end, oldEnd)` | active-runway change (bridge calls it on `atc.on('runwayChange')` for every AP on a circuits/arrival/departure route; the player only while on AUTOPILOT, `linkTraffic(..., {reroutePlayer:false})` to opt out). Rolling, flaring and rolling-out planes are left alone; airborne planes ignore the old end for 4 min so they never land on it. |
+| `routes.rerouteRunway(route, i, {onGround,x,z}, end)` | the route half of the above (same kind of route for `end` + the leg index to resume) |
+| `arrivalRoute(end, {from:[x,z]})` | from the far side of the circuit the arrival first crosses the extended centreline 1.5 km beyond the upwind end at pattern + 150 m (it used to fly straight across the field and the final approach) |
+| `traffic.airConflict(ap)` | see-and-avoid for AI on `fly` legs: the closest airborne plane passed within 300 m in the next 45 s at ±160 m. The AI gives way to the player, to anyone not on a fly leg (final, climb-out) and to whoever is ahead on a common track (abeam: higher id gives way): offsets ±100 m from it and, if it is ahead on the same heading, slows to max(1.35 Vs, 64 kt). `ap.sep` shows the active resolution; `ap.noAvoid = true` disables it (tests). |
+| `ap.mischief` | `'speed'` (≈ 32 kt down the next long straight of this taxi, braking in time for turns/crossings/the end) or `'lowpass'` (a 4.5 m, 74 kt pass down the runway instead of the landing, then a go-around). Set per taxi/approach by the bridge (`linkTraffic(..., { mischief: 'low', rnd })`). |
+| `aircraft` fuel (D20) | `ac.fuel {cap, L, R}` litres per tank, burn 6 L/h idle … 50 L/h full × `ac.fuelBurnScale`; `instruments()` adds `fuelL, fuelR` (0–1), `fuel` (L), `lowFuel`, `engineOut`; events `lowfuel {litres, fraction}` once below 15 %, engine stops at empty (glide); `ac.refuel(fraction = 1)` refills and restarts (`refuel` event). |
+| `impact` event | now `{ result, reason, kind, restitution, other, n:[x,y,z] }` — `n` is the unit contact normal: terrain normal (finite differences of `groundHeightAt`) for ground/touchdown/cartwheel hits, the face normal for collider AABBs, the separation direction for plane-to-plane. `groundNormal(env, x, z)` is exported. |
+| `aiImpactHandler(mode)` / `traffic.setAIProtection(mode)` | AI under Rubber / Partial bounce like the player (Partial loses protection per hit, DESIGN PROTECTION table); `null`/realistic crashes. |
+
+Player-override fixes (PLAYTEST_1): **#1** a released throttle stays LATCHED (`axis.throttle.mode === 'latched'`) — on the
+ground until `resume()` or idle, in the air until every other axis has been back on AP for wait + blend; throttle
+> 0.3 at a hold (> 0.15 at a stand/park) releases that leg and goes. **#3** releasing the stick at AGL < 150 m, sinking
+> 3.6 m/s, banked > 60° or stalled skips the 1.5 s wait: 0.6 s blend + immediate RECOVERY. **#7** stick-only override
+in the air: the AP holds the flaps/speed it had when the stick was taken (no stale-phase flap/idle schedule) and the
+phase label is MANUAL. **#2** `ap.lastOverride` (game time of the last stick takeover): the bridge drops ATC go-arounds
+for the player for 60 s after it, so a cut-in lands, the victim goes round and `cut_in_final` scores. **Ground (Aaron)**:
+in flare/rollout/vacate/taxi/hold/park the player's throttle/steer/brake win — stick X steers the nosewheel when the
+rudder buttons are idle, the AP never brakes against a player throttle, crossings/holds/parking never pin the plane, and
+release replans from the ground position.
+
+Terrain: AP `fly` legs keep `leg.clearance ?? 120` m above terrain and collider tops sampled 0–1.8 km ahead along the
+track and the commanded heading (`_terrainFloor`); aircraft ground contact/crash uses `env.groundHeightAt` and
+`env.colliders` (the castle box to 190 m).
+
 ### Status for HUD / ATC
 `ap.status()` → `{ engaged, overridden, phase, sub, leg, legIndex, label, route, recovering, done, target, speedKt, end }`;
 `ap.events` (`phase`, `override`, `replan`, `goaround`, `recovery`, `landed`, `takeoffroll`, `waypoint`) — drained by main
@@ -133,7 +163,9 @@ phones. `__game.quality` → `{ tier, auto, fps, history }`. The shadow box foll
 
 ## Tests
 ```
-node tools/flight-sim.mjs            # node, ~10 s: circuit, override, cut-in on 27, stall recovery, 3-plane traffic
+node tools/flight-sim.mjs            # node, ~2 s, 42 checks: impact normals, fuel, landAt (runway + field plan to a stop),
+                                     # ground override (hold/stand/rollout), handback, circuits 09/27, override, cut-in, stall, traffic
+node tools/flight-sim.mjs landat     # one scenario
 ~/.claude/bin/cdp start --port 9431 -- --use-angle=metal
 node tools/test-flight.mjs           # boot/attract, layout (390×844, 844×390 touch, 1280×800), pitch sign (real touch drag
                                      # + ArrowDown), circuit, override — real time ~12 min; add --timescale=4 for ~4 min

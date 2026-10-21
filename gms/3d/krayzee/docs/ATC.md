@@ -98,6 +98,24 @@ No landing clearance by 500 m from the threshold → ATC sends you around. Takeo
   ignores a go-around and keeps descending in the cone stays sequenced (so cutting in after being sent round still counts).
 - Active runway: headwind end among departure-capable ends (09/27), 3 kt hysteresis. 04/22 is arrivals-only when opened
   (land, vacate east onto taxiway A, taxi to the active hold).
+- **Runway change** (`setWind` picks a new end): the change is *pending* (`atc.pendingRunway`) until the old runway is
+  quiet — nobody cleared/lined up on it, nobody on it, nobody on final inside 1.5 km — or `T.rwChangeMax` (180 s) passes
+  (then cleared finals go around, `reason:'runwayChange'`, and lined-up planes get `cancelTakeoff`). No new departures
+  are released while pending; landings carry on. On the switch every plane at/taxiing to the old hold gets a `taxi` to
+  the new one, and `runwayChange {from, to, t}` fires; the bridge then calls `ap.changeRunway(to, from)` on every
+  autopilot (FLIGHT.md). Soak: two wind shifts in 30 min, zero AI infractions, zero landings on the old end.
+- ETA model: final flown at 75 kt (38.6 m/s) until 2.4 km, 65 kt (34 m/s) inside (`T.finalFastSpeed`,
+  `T.finalSlowFrom`); circuit 44 m/s. A landing clearance needs base, or final *inside the aligned final cone*
+  (a plane crossing the extended centreline is not "on final").
+
+## aiMischief
+`linkTraffic(atc, traffic, { mischief, rnd })` — `mischief` is a probability or a level from `MISCHIEF`
+(`off` 0, `low` 0.12, `high` 0.4; export of bridge.js); `link.setMischief(v)` changes it live. One roll per AI taxi leg
+(→ `ap.mischief = 'speed'`: ~32 kt down the next long straight → `taxi_speeding`) and per full-stop approach
+(→ `'lowpass'`: a 4.5 m pass down its own cleared runway, then a go-around → `low_pass`). Both are mild, AI-only, and
+safe for the traffic around them (soak: 11 speeding + 1 low pass in 30 min at `high`, zero other infractions, zero
+separation losses). AI events don't move the outrage meter unless `aiOutrage`. Default for the game: `low`.
+
 
 ## Events
 Every event: `{ id, type, t, actor, callsign, isPlayer, victim, victimCallsign, severity 1–3, pp, name, scold, controller:'tower', tier, tierName, outrage, frozen, at:[x,y,z], data }`.
@@ -183,11 +201,23 @@ rule-break detectors for its own plane only and issues nothing. `setLocal(id, bo
 
 ## Tests
 ```
-node tools/atc-sim.mjs                 # 49 checks, ~2 s: 6-plane 30-min soak, cut-ins, out-of-turn, buzz, crossing, crimes, online
+node tools/atc-sim.mjs                 # 92 checks, ~3 min: kinematic ATC scenarios (circuits, cut-ins, out-of-turn, buzz,
+                                       # crossing, crimes, online), then the real Aircraft/Autopilot through bridge.js:
+                                       # flight cut-in, gameplay (spawn rivals, demand takeoff, skip, rubber/partial/none
+                                       # protection), see-and-avoid, and five 30-min AI soaks (attract 5 / 4 + 2 circuits /
+                                       # attract 6 / runway change ×2 / mischief high) on the rolling terrain + castle
 node tools/atc-sim.mjs --falsify       # breaks each detector in a temp copy of js/atc; all 26 must be CAUGHT
-node tools/atc-sim.mjs --only=flight [--minutes=30]   # informational: real FLIGHT Aircraft/Autopilot through bridge.js
+node tools/atc-sim.mjs --only=flight "--run=attract 6" [--minutes=30] [--watch=ac3,ac7 --from=600 --to=700] [--trace=name] [--dbgap]
 node tools/atc-sim.mjs --only=circuits --dbg=goAround,clearedLand --dbgev --peek=600
 ```
+Soak gates per run: zero AI infractions and separation losses; ≤ 1 go-around / 15 min (ATC + autopilot); nobody held at
+the runway > 5 min or > 10 min from spawn to touchdown, nobody stopped on a taxiway 4 min; ≥ 1 movement / 2 min with
+arrivals and departures both served; no crashes; ≥ 100 m terrain/castle clearance on fly legs > 1.5 km from the field.
+
+2026-10-22 soak (before → after): separation losses 6 → 0 (4 + 2 circuits: an arrival merging onto a circuit plane's
+downwind), go-arounds 2/30 min → 0 in all three base runs, starved departures 2 (342 s at the hold) → 0 (max 261 s;
+an arrival crossing the field held a landing clearance for minutes), runway change and mischief soaks new.
+
 
 ## Deviations from DESIGN (for DESIGN/manager)
 - Departures need arrivals > 2.2 km, not 3 km (3 km starved the queue in a 6-plane circuit). `T.arrivalBlockDep`.

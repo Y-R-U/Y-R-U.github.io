@@ -15,6 +15,7 @@ export const TYPES = {
     gear: { main: [1.25, 0.32], nose: -1.62, kMain: 42000, kNose: 22000, cMain: 3800, cNose: 2400, maxSteer: 0.55 },
     vr: 55 * KT, vy: 74 * KT, vapp: 65 * KT, vcruise: 95 * KT, vs0: 44 * KT,
     flapNotches: [0, 1 / 3, 2 / 3, 1],
+    fuelCap: 100,                         // litres usable per wing tank
   },
 };
 
@@ -33,6 +34,8 @@ export class Aircraft {
     this.prevPos = new V3(); this.prevQ = new Quat();
     this.ctl = { aileron: 0, elevator: 0, rudder: 0, throttle: 0, flaps: 0, brake: 0 };
     this.eng = 0; this.flapsPos = 0;
+    this.fuel = { cap: this.P.fuelCap ?? 100, L: this.P.fuelCap ?? 100, R: this.P.fuelCap ?? 100, idleLph: 6, fullLph: 50, lowFrac: 0.15, lowSent: false };
+    this.engineOut = false;
     this.events = [];
     this.wind = new V3();
     this._buildPoints();
@@ -90,7 +93,8 @@ export class Aircraft {
     if (this.crashed) { this.vel.scale(0.9); this.w.scale(0.9); return; }
     this.time += dt;
     const P = this.P, c = this.ctl;
-    this.eng = moveTo(this.eng, clamp(c.throttle, 0, 1), dt * 1.2);
+    this._burn(dt);
+    this.eng = moveTo(this.eng, this.engineOut ? 0 : clamp(c.throttle, 0, 1), dt * 1.2);
     this.flapsPos = moveTo(this.flapsPos, clamp(c.flaps, 0, 1), dt * 0.35);
 
     const F = _f.set(0, 0, -1).applyQuat(this.q), U = _u.set(0, 1, 0).applyQuat(this.q), R = _r.set(1, 0, 0).applyQuat(this.q);
@@ -117,7 +121,7 @@ export class Aircraft {
       force.addScaled(vdir, -qd * P.wingArea * CD);
       force.addScaled(R, -qd * P.wingArea * P.CY * beta * 0.25);
     }
-    const thrust = P.thrustMax * (P.idle + (1 - P.idle) * this.eng) * clamp(1 - V / P.thrustV0, -0.15, 1);
+    const thrust = this.engineOut ? 0 : P.thrustMax * (P.idle + (1 - P.idle) * this.eng) * clamp(1 - V / P.thrustV0, -0.15, 1);
     force.addScaled(F, thrust);
 
     // Wheels: spring/damper normal force, rolling+brake friction, lateral grip, nosewheel steering.
@@ -183,8 +187,8 @@ export class Aircraft {
     this.q.integrateBody(this.w, dt);
 
     if (this.onGround) { this.groundTime += dt; this.airTime = 0; } else { this.airTime += dt; this.groundTime = 0; }
-    if (this.mainsDown && !wasDown && this._lastAirTime > 0.6) this._touchdown(gearOver);
-    else if (gearOver && this._vsWas < -4.5) this._crash('gear collapsed');
+    if (this.mainsDown && !wasDown && this._lastAirTime > 0.6) this._touchdown(gearOver, env);
+    else if (gearOver && this._vsWas < -4.5) this._impact('touchdown', 'gear collapsed', { n: groundNormal(env, this.pos.x, this.pos.z), pen: 0, onGear: false, speedKt: -this._vsWas / KT });
     if (!this.onGround) this._lastAirTime = this.airTime;
     else if (this.groundTime > 1.5) this._lastAirTime = 0;
     this._vsWas = this.vel.y;
@@ -193,7 +197,7 @@ export class Aircraft {
     this._derive(env, alpha, beta, V, bank);
   }
 
-  _touchdown(gearOver) {
+  _touchdown(gearOver, env) {
     const vs = this._vsWas ?? this.vel.y;
     const fpm = -vs / FT * 60;
     const bounce = this.lastTouchdown && this.time - this.lastTouchdown.t < 4;
@@ -201,9 +205,28 @@ export class Aircraft {
     this.lastTouchdown = { t: this.time, fpm, grade, x: this.pos.x, z: this.pos.z, surface: this.surface, speed: this.speed };
     if (bounce) this.bounces++; else this.bounces = 0;
     this.emit('touchdown', { fpm: Math.round(fpm), grade, bounce: !!bounce, surface: this.surface });
-    if (grade === 'crash' || (gearOver && fpm > 900)) this._impact('touchdown', 'hard landing', { n: [0, 1, 0], pen: 0, onGear: false, speedKt: -vs / KT });
+    if (grade === 'crash' || (gearOver && fpm > 900)) this._impact('touchdown', 'hard landing', { n: groundNormal(env, this.pos.x, this.pos.z), pen: 0, onGear: false, speedKt: -vs / KT });
     else if (grade === 'hard') this.emit('hardlanding', { fpm: Math.round(fpm) });
   }
+
+  // D20 fuel: both tanks feed; burn ≈ 6 L/h idle … 50 L/h full power (× fuelBurnScale). Empty → the engine stops.
+  _burn(dt) {
+    const F = this.fuel;
+    if (!F || this.engineOut) return;
+    const lps = (F.idleLph + (F.fullLph - F.idleLph) * this.eng) / 3600 * (this.fuelBurnScale ?? 1) * dt;
+    F.L = Math.max(0, F.L - lps / 2); F.R = Math.max(0, F.R - lps / 2);
+    const frac = (F.L + F.R) / (2 * F.cap);
+    if (frac < F.lowFrac && !F.lowSent) { F.lowSent = true; this.emit('lowfuel', { litres: Math.round(F.L + F.R), fraction: +frac.toFixed(3) }); }
+    if (F.L + F.R <= 0) { this.engineOut = true; this.emit('fuelempty', {}); }
+  }
+  refuel(fraction = 1) {
+    const F = this.fuel;
+    F.L = F.R = F.cap * clamp(fraction, 0, 1);
+    F.lowSent = (F.L + F.R) / (2 * F.cap) < F.lowFrac;
+    this.engineOut = false;
+    this.emit('refuel', { fraction });
+  }
+  get fuelFraction() { return (this.fuel.L + this.fuel.R) / (2 * this.fuel.cap); }
 
   // Something solid was hit. Without an impactHandler (SCORE protection modes) that is a crash; with one, the
   // handler decides: 'bounce'/'damage' reflect the velocity (impossiRubber), 'destroyed' crashes.
@@ -220,7 +243,7 @@ export class Aircraft {
     this._push(n, pen);
     if (r.spinDegPerS) this.w.y += (r.spinDegPerS * DEG);
     this.w.scale(0.5);
-    this.emit('impact', { result: r.result, reason, kind, restitution: e, other });
+    this.emit('impact', { result: r.result, reason, kind, restitution: e, other, n: [n[0], n[1], n[2]] });
   }
   _push(n, pen) { if (pen > 0) this.pos.addScaled(_n.set(n[0], n[1], n[2]), pen + 0.05); }
 
@@ -236,7 +259,7 @@ export class Aircraft {
       const r = _rw.copy(hp.r).applyQuat(this.q);
       const x = this.pos.x + r.x, y = this.pos.y + r.y, z = this.pos.z + r.z;
       const gy = env.groundHeightAt(x, z);
-      if (y < gy) return this._impact('ground', `${hp.name} hit the ground`, { n: [0, 1, 0], pen: gy - y });
+      if (y < gy) return this._impact('ground', `${hp.name} hit the ground`, { n: groundNormal(env, x, z), pen: gy - y });
       if (env.colliders) for (const b of env.colliders) {
         if (x > b.min[0] && x < b.max[0] && y > b.min[1] && y < b.max[1] && z > b.min[2] && z < b.max[2]) {
           const d = [x - b.min[0], b.max[0] - x, y - b.min[1], b.max[1] - y, z - b.min[2], b.max[2] - z];
@@ -250,7 +273,7 @@ export class Aircraft {
     if (this.pos.y + ts.y < this.groundY && !this._tailStruck) { this._tailStruck = true; this.emit('tailstrike', {}); }
     else if (this.pos.y + ts.y > this.groundY + 0.3) this._tailStruck = false;
     if (this.mainsDown && Math.abs(this.bank) > 0.5) {
-      this._impact('ground', 'cartwheeled', { n: [0, 1, 0], pen: 0.3 });
+      this._impact('ground', 'cartwheeled', { n: groundNormal(env, this.pos.x, this.pos.z), pen: 0.3 });
       if (!this.crashed) this.w.z += this.bank * 2;
     }
   }
@@ -274,8 +297,9 @@ export class Aircraft {
   instruments() {
     return {
       airspeed: this.speed / KT, altitude: this.alt / FT, vsi: this.vs / FT * 60, heading: this.heading,
-      pitch: this.pitch, roll: this.bank, rpm: 600 + this.eng * 2100 + Math.min(300, this.speed * 4),
+      pitch: this.pitch, roll: this.bank, rpm: this.engineOut ? Math.min(900, this.speed * 12) : 600 + this.eng * 2100 + Math.min(300, this.speed * 4),
       slip: clamp(this.beta * 4, -1, 1), flaps: this.flapsPos,
+      fuelL: this.fuel.L / this.fuel.cap, fuelR: this.fuel.R / this.fuel.cap, fuel: this.fuel.L + this.fuel.R, lowFuel: this.fuelFraction < this.fuel.lowFrac, engineOut: this.engineOut,
     };
   }
 
@@ -293,3 +317,11 @@ export class Aircraft {
 const _f = new V3(), _u = new V3(), _r = new V3(), _va = new V3(), _vb = new V3(), _force = new V3(), _torque = new V3();
 const _vd = new V3(), _ld = new V3(), _ww = new V3(), _rw = new V3(), _pv = new V3(), _wf = new V3(), _ws = new V3();
 const _wfo = new V3(), _tq = new V3(), _n = new V3();
+
+// Terrain surface normal (unit [x, y, z]) for impact FX; flat [0, 1, 0] without a height function.
+export function groundNormal(env, x, z) {
+  const h = env?.groundHeightAt;
+  if (!h) return [0, 1, 0];
+  const e = 2, gx = (h(x + e, z) - h(x - e, z)) / (2 * e), gz = (h(x, z + e) - h(x, z - e)) / (2 * e), l = Math.hypot(gx, 1, gz);
+  return [-gx / l, 1 / l, -gz / l];
+}

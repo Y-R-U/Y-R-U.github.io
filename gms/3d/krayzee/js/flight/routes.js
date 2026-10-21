@@ -1,4 +1,6 @@
-import { RUNWAYS, TAXIWAYS, STANDS, PATTERN_ALT, HOLD_OFFSET, CIRCUIT, headingToVec, threshold, runwayHeadingFor } from '../world/layout.js';
+import { RUNWAYS, TAXIWAYS, STANDS, APRON, PATTERN_ALT, HOLD_OFFSET, CIRCUIT, headingToVec, threshold, runwayHeadingFor } from '../world/layout.js';
+
+const APRON_LANE_Z = APRON.center[2] + APRON.size[1] / 2 - 35; // same lane ATC's taxiToStand uses
 
 export const circuitSide = (endId) => ((CIRCUIT && CIRCUIT[endId]) === 'R' ? 'right' : 'left');
 
@@ -64,9 +66,9 @@ function buildGraph() {
     }
     if (!best) continue;
     const exit = best[1];
-    segs.push({ a: p, b: exit, runway: false, name: st.id, stand: st.id });
+    segs.push({ a: p, b: exit, runway: false, name: st.id, stand: st.id, dir: true }); // stand stubs are taxi-out only
     const off = 24;
-    const laneBot = [exit[0] + rx * off, exit[1] + rz * off];
+    const laneBot = [exit[0] + rx * off, APRON_LANE_Z];
     const laneTop = [p[0] + rx * off - fx * 32, p[1] + rz * off - fz * 32];
     segs.push({ a: laneBot, b: laneTop, runway: false, name: st.id + 'in', lane: true });
     standInfo[st.id] = {
@@ -74,6 +76,11 @@ function buildGraph() {
       loop: [[p[0] + rx * 13 - fx * 42, p[1] + rz * 13 - fz * 42], [p[0] - fx * 30, p[1] - fz * 30], [p[0] - fx * 8, p[1] - fz * 8], p],
     };
   }
+  // Inbound apron lane, one-way westbound, fed from A3 northbound: taxi-in never meets taxi-out head-on on A.
+  const lx = Math.max(...Object.values(standInfo).map((t) => t.exit[0])) + 64;
+  const a3 = TAXIWAYS.filter((t) => t.id !== 'A').map((t) => t.points[0][0]).filter((x) => x >= lx - 70).sort((p, q) => p - q)[0] ?? lx;
+  segs.push({ a: [a3, TAXIWAYS[0].points[0][1]], b: [a3, APRON_LANE_Z], runway: false, name: 'inN', dir: true });
+  segs.push({ a: [a3, APRON_LANE_Z], b: [Math.min(...Object.values(standInfo).map((t) => t.laneBot[0])) - 20, APRON_LANE_Z], runway: false, name: 'inW', dir: true });
   // split every segment at every intersection and endpoint touch
   const nodes = new Map();
   const node = (pt) => {
@@ -98,7 +105,7 @@ function buildGraph() {
         if (len > 0.5) {
           const cost = len * (s.runway ? 4 : 1);
           prev.edges.push({ to: n, cost, runway: s.runway, lane: !!s.lane });
-          n.edges.push({ to: prev, cost, runway: s.runway, lane: !!s.lane });
+          if (!s.dir) n.edges.push({ to: prev, cost, runway: s.runway, lane: !!s.lane });
         }
       }
       prev = n;
@@ -211,6 +218,18 @@ export function taxiPath(x, z, heading, dest) {
 }
 
 export function holdPoint(endId) { return taxiGraph().holds[endId]; }
+
+// Where a taxiway meets the runway of `endId` (incl. its threshold), with the runway left ahead: [{ x, z, s, left }].
+export function runwayEntries(endId) {
+  const e = runwayEnd(endId), out = [];
+  for (const n of taxiGraph().nodes.values()) {
+    if (!n.edges.some((x) => x.runway) || !n.edges.some((x) => !x.runway && !x.lane)) continue;
+    const p = toRunway(e, n.x, n.z);
+    if (Math.abs(p.l) > 2 || p.s < -2 || p.s > e.len) continue;
+    out.push({ x: n.x, z: n.z, s: Math.max(0, p.s), left: e.len - Math.max(0, p.s) });
+  }
+  return out.sort((a, b) => a.s - b.s);
+}
 export function standInfo(id) { return taxiGraph().stands[id]; }
 
 // ---------- route builders ----------
@@ -268,14 +287,20 @@ export function departureRoute(endId = '09', { outHeading = null, dist = 9000, a
 }
 
 // Arrival from wherever the plane is: join downwind at 45°, land, taxi to a stand, park.
-export function arrivalRoute(endId = '09', { stand = 'auto', parkSeconds = 25, then = null, ...o } = {}) {
+// From the far side (`from` = [x, z]) it first crosses the extended centreline well beyond the upwind end, high, so it
+// never cuts through the final approach or the field.
+export function arrivalRoute(endId = '09', { stand = 'auto', parkSeconds = 25, then = null, from = null, ...o } = {}) {
   const c = circuitLegs(endId, o);
   const e = runwayEnd(endId), sg = (o.side || circuitSide(endId)) === 'left' ? -1 : 1, w = o.width || 1150;
+  const alt = o.alt || PATTERN_ALT;
   const [jx, jz] = fromRunway(e, e.len + 300, (w + 900) * sg);
+  const far = from && toRunway(e, from[0], from[1]).l * sg < 200;
+  const [cx, cz] = fromRunway(e, e.len + 1500, 0);
   return {
     name: `arrival ${endId}`,
     legs: [
-      { kind: 'fly', to: [jx, (o.alt || PATTERN_ALT) + 60, jz], speed: 95, flaps: 0, label: 'INBOUND' },
+      ...(far ? [{ kind: 'fly', to: [cx, alt + 150, cz], speed: 95, flaps: 0, label: 'INBOUND' }] : []),
+      { kind: 'fly', to: [jx, alt + 60, jz], speed: 95, flaps: 0, label: 'INBOUND' },
       ...c.slice(2),
       { kind: 'approach', end: endId, label: 'FINAL' },
       { kind: 'taxi', dest: { stand }, label: 'TAXI IN' },
@@ -286,7 +311,70 @@ export function arrivalRoute(endId = '09', { stand = 'auto', parkSeconds = 25, t
   };
 }
 
+// Active-runway change: the same kind of route for `end`, and the leg index to carry on from (null = leave it alone).
+export function rerouteRunway(route, i, { onGround, x = 0, z = 0 }, end) {
+  const name = route?.name || '', legs = route?.legs || [];
+  if (name.startsWith('circuits')) {
+    const c = circuitRoute(end);
+    return { route: { ...c, laps: route.laps }, i: onGround ? c.legs.findIndex((l) => l.kind === 'taxi') : 1 };
+  }
+  const pk = legs.findIndex((l) => l.kind === 'park' && l.label !== 'BOARDING');
+  const dep = departureRoute(end);
+  if (name.startsWith('arrival')) {
+    const ai = legs.findIndex((l) => l.kind === 'approach');
+    if (!onGround && i <= ai) return { route: arrivalRoute(end, { stand: 'auto', parkSeconds: legs[pk]?.seconds ?? 25, then: dep, from: [x, z] }), i: 0 };
+    if (pk < 0 || !onGround) return null;
+    return { route: { ...route, legs: [...legs.slice(0, pk + 1), ...dep.legs] }, i: Math.min(i, pk + 1) };
+  }
+  if (name.startsWith('departure')) {
+    const ti = legs.findIndex((l) => l.kind === 'takeoff');
+    if (!onGround || i > ti) return null;
+    const lead = legs[0]?.kind === 'park' ? [legs[0]] : [];
+    return { route: { ...dep, legs: [...lead, ...dep.legs] }, i: i === 0 && lead.length ? 0 : lead.length };
+  }
+  return null;
+}
+
 // Turnaround: park → taxi out → depart. Used by attract traffic after arriving.
 export function turnaroundRoute(endId = '09', opts = {}) {
   return departureRoute(endId, opts);
+}
+
+// Where and how an AI plane of `kind` starts: { place, route, stand }. Kinds: parked|depart (at a stand, then departs),
+// downwind, final (dist), arrive (5 km out, random bearing), circuits (at the hold, touch-and-goes forever).
+// `rnd` lets node harnesses stay deterministic; `claimStand(prefer)` returns a free stand id or null.
+export function aiSpawn(kind, endId, { rnd = Math.random, claimStand = () => null, stand, wait, dist, laps } = {}) {
+  const e = runwayEnd(endId), KTS = 0.514444;
+  if (kind === 'parked' || kind === 'depart') {
+    const sid = stand || claimStand();
+    if (!sid) return null;
+    const s = standInfo(sid);
+    const r = departureRoute(endId, { outHeading: e.hdg + (rnd() < 0.5 ? -50 : 40) });
+    return { stand: sid, place: { x: s.pos[0], z: s.pos[1], heading: s.heading }, route: { ...r, legs: [{ kind: 'park', seconds: wait ?? 4 + rnd() * 20, label: 'BOARDING' }, ...r.legs] } };
+  }
+  const then = departureRoute(endId, { outHeading: e.hdg + (rnd() < 0.5 ? -50 : 40) });
+  if (kind === 'downwind') {
+    const legs = circuitLegs(endId), d = legs[2].to, c = legs[1].to;
+    const r = arrivalRoute(endId, { stand: 'auto', parkSeconds: 15 + rnd() * 20, then });
+    return { place: { x: (c[0] + d[0]) / 2, z: (c[2] + d[2]) / 2, alt: 300, heading: (e.hdg + 180) % 360, speed: 85 * KTS, throttle: 0.6 }, route: { ...r, legs: r.legs.slice(1) } };
+  }
+  if (kind === 'final') {
+    const D = dist || 2600, [x, z] = fromRunway(e, -D, 0);
+    const r = arrivalRoute(endId, { stand: 'auto', parkSeconds: 20 + rnd() * 20, then });
+    return { place: { x, z, alt: D * 0.07 + 10, heading: e.hdg, speed: 68 * KTS, throttle: 0.4, flaps: 1 }, route: { ...r, legs: r.legs.filter((l) => l.kind !== 'fly') } };
+  }
+  if (kind === 'holding') {
+    // a rival already at the hold, about to go (spawned to give the player someone to push in front of)
+    const h = holdPoint(endId), r = departureRoute(endId, { outHeading: e.hdg + (rnd() < 0.5 ? -50 : 40) });
+    const hd = Math.atan2(e.thr[0] - h[0], -(e.thr[1] - h[1])) * 180 / Math.PI;
+    return { place: { x: h[0], z: h[1], heading: (hd + 360) % 360 }, route: { ...r, legs: r.legs.filter((l) => l.kind !== 'taxi') } };
+  }
+  if (kind === 'circuits') {
+    const h = holdPoint(endId);
+    const c = circuitRoute(endId);
+    const legs = [{ kind: 'hold', end: endId, seconds: 2, untilClear: true, label: 'HOLD SHORT' }, ...c.legs];
+    return { place: { x: h[0], z: h[1], heading: (e.hdg + 90) % 360 }, route: { ...c, legs, loop: 1, laps } };
+  }
+  const a = rnd() * Math.PI * 2, R = 5000, x = Math.cos(a) * R, z = Math.sin(a) * R;
+  return { place: { x, z, alt: 420, heading: (Math.atan2(-x, z) * 180 / Math.PI + 360) % 360, speed: 95 * KTS, throttle: 0.6 }, route: arrivalRoute(endId, { stand: 'auto', parkSeconds: 20 + rnd() * 30, then, from: [x, z] }) };
 }

@@ -62,6 +62,7 @@ export function createATC(opts = {}) {
     const rule = INFRACTIONS[type] || {};
     const a = S.strips[actor];
     const victim = extra.victim;
+    if (a && a.graceUntil > S.t && !rule.good) return null;   // spawn / respawn / skip-to-runway grace: no crimes
     const coolKey = `${type}|${actor}${rule.cooldownPerVictim || type === 'forced_goaround' || type === 'near_miss' || type === 'separation_loss' || type === 'collision' ? '|' + (victim ?? '') : ''}`;
     const cd = extra.cooldown ?? (rule.good ? 0 : COOLDOWN);
     if (cd && (S.cool[coolKey] ?? -1e9) > S.t) return null;
@@ -131,6 +132,7 @@ export function createATC(opts = {}) {
       let s = S.strips[id];
       if (!s) {
         s = S.strips[id] = newStrip(id, raw);
+        if (S.pendingGrace?.[id]) { s.graceUntil = S.pendingGrace[id]; delete S.pendingGrace[id]; }
         const st = STANDS.find((x) => x.id === raw.stand);
         if (st && raw.onGround && hyp(v3(raw.pos)[0] - st.position[0], v3(raw.pos)[2] - st.position[2]) < T.standReached && !S.standOwner[st.id]) S.standOwner[st.id] = id;
       }
@@ -266,6 +268,14 @@ export function createATC(opts = {}) {
           issue(s, { type: 'joinCircuit', runwayEnd: S.activeEnd, side: Gm.circuitFor(S.activeEnd).side, alt: Gm.circuitFor(S.activeEnd).alt, leg: 'upwind' });
         }
       }
+      // Cleared for a touch-and-go but braking to a stop (a human, or an autopilot doing full stops): it's a full stop.
+      if (cfg.authority && d.g && !d.touchdown && s.cmds.clearedTouchAndGo && d.paved && S.t - (s.touchT ?? 1e9) > 2 && d.gs < T.tgFullStopSpeed) {
+        const cl = s.cmds.clearedTouchAndGo;
+        drop(s, 'clearedTouchAndGo');
+        const end = d.alignedEnd || cl.runwayEnd;
+        const ex = Gm.exitFor(end, Math.max(Gm.G.EXIT_MIN, Gm.toEnd(info(end), d.p2).a + 120));
+        if (ex) issue(s, { type: 'vacate', runway: d.paved.id, via: ex.via, at: ex.at, route: ex.route, clearAt: ex.clearAt });
+      }
       if (s.rollRw && !d.occ.includes(s.rollRw)) s.rollRw = null;
     }
   }
@@ -334,6 +344,9 @@ export function createATC(opts = {}) {
     if (!da || !dv) return;
     if (!force && (!inCone(da, end) || !inCone(dv, end))) { if (da.over || S.strips[actor].isPlayer) S.strips[actor].cutPending = { victim, end, t: S.t }; return; }
     S.strips[actor].cutPending = null;
+    const ck = `${actor}>${victim}`;
+    if ((S.cutDone ||= {})[ck] > S.t - 120) return;   // one cut-in per pass, however often the order is re-checked
+    S.cutDone[ck] = S.t;
     const gap = S.strips[victim].rem - S.strips[actor].rem;
     S.strips[actor].penaltyUntil = S.t + 60;
     if (detecting(S.strips[actor])) emitEvent('cut_in_final', actor, { victim, severity: gap < 400 ? 3 : gap < 1000 ? 2 : 1, data: { gap: Math.round(gap), runwayEnd: end, close: gap < 400 } });
@@ -373,10 +386,10 @@ export function createATC(opts = {}) {
   const spacingBehind = (lead) => (lead.isPlayer ? T.spacingPlayer : lead.intent === 'circuits' ? T.spacingTG : T.spacingFull);
   // Seconds to the threshold: finals are flown slower than the rest of the circuit.
   const eta = (s, rem = s.rem, ext = s.ext) => {
-    const fin = Math.min(rem, Gm.G.FINAL_LEN + ext);
-    return fin / T.finalSpeed + (rem - fin) / T.circuitSpeed;
+    const fin = Math.min(rem, Gm.G.FINAL_LEN + ext), slow = Math.min(fin, T.finalSlowFrom);
+    return slow / T.finalSpeed + (fin - slow) / T.finalFastSpeed + (rem - fin) / T.circuitSpeed;
   };
-  const EXT_SECS = 1 / T.circuitSpeed + 1 / T.finalSpeed; // seconds added per metre of downwind extension
+  const EXT_SECS = 1 / T.circuitSpeed + 1 / T.finalFastSpeed; // seconds added per metre of downwind extension
   function stretch(s, d, end, secs, follow, reason) {
     if (secs <= 2 || s.ext >= T.maxExtend) return;
     s.ext = Math.min(T.maxExtend, s.ext + secs / EXT_SECS + 50);
@@ -387,12 +400,14 @@ export function createATC(opts = {}) {
   // A departure that has waited too long gets a slot: the first arrival still before base is stretched.
   function departureSlot(end) {
     const q = S.deps[S.activeEnd] || [];
-    const w = q.map((id) => S.strips[id]).find((s) => s && s.holdT != null && !s.cmds.clearedTakeoff);
-    if (!w || S.t - w.holdT < T.depSlotWait || rwOfEnd(end).id !== rwOfEnd(S.activeEnd).id) return null;
+    const dp = Gm.departurePoint(S.activeEnd);
+    // planned as soon as a departure is at the hold or close to it, so the gap arrives about when it is ready
+    const w = q.map((id) => S.strips[id]).find((s) => s && D[s.id] && !s.cmds.clearedTakeoff && (s.holdT != null ? S.t - s.holdT >= T.depSlotWait : Gm.dist2(D[s.id].p2, dp.hold) < T.depSlotNear));
+    if (!w || rwOfEnd(end).id !== rwOfEnd(S.activeEnd).id) return null;
     const list = S.seqs[end];
-    const k = list.findIndex((id) => ['upwind', 'crosswind', 'downwind'].includes(S.strips[id]?.leg));
+    if (list.some((id) => S.strips[id]?.slotFor === w.id)) return null;
+    const k = list.findIndex((id) => ['upwind', 'crosswind', 'downwind'].includes(S.strips[id]?.leg) && S.strips[id].ext < T.maxExtend - 600);
     if (k < 0) return null;
-    if (S.strips[list[k]].slotFor === w.id) return null;
     return { k, dep: w.id };
   }
 
@@ -464,7 +479,7 @@ export function createATC(opts = {}) {
       }
       return;
     }
-    const want = s.rem < T.clearLandDist && (s.leg === 'base' || s.leg === 'final');
+    const want = s.rem < T.clearLandDist && (s.leg === 'base' || (s.leg === 'final' && d.prog?.onFinal));
     const needM = mutexKeys(rwId);
     if (want && needM.length && !S.mutexWait.includes(s.id)) S.mutexWait.push(s.id);
     const ok = want && s.penaltyUntil <= S.t && !s.cutPending && !blockers.length && !intruder && !reservations(rwId, s.id).length && mutexFree(s.id, needM) && S.open[rwId];
@@ -564,7 +579,7 @@ export function createATC(opts = {}) {
     }
 
     const first = q[0];
-    if (!first) return;
+    if (!first || S.pendingEnd) return;
     const s = S.strips[first], d = D[first];
     if (s.cmds.clearedTakeoff) return;
     const ready = s.holdT != null || d.linedUp || (d.gs < 1 && Gm.dist2(d.p2, dp.hold) < 150);
@@ -579,18 +594,23 @@ export function createATC(opts = {}) {
       if (id === first || D[id].g) continue;
       const loc = Gm.toEnd(inf, D[id].p2);
       if (loc.a > -300 && loc.a < T.depSpacing && Math.abs(loc.c) < 450 && D[id].agl < 450) traffic = true;
+      if (D[id].s.cmds.goAround && loc.a > -2500 && loc.a < info(end).length + 1500 && Math.abs(loc.c) < 600) traffic = true; // going round overhead
     }
     const keys = mutexKeys(rw.id);
     const runwayClear = !blk.length && !resv.length && !intr;
-    const goOk = runwayClear && minRem > T.arrivalBlockDep && !traffic;
+    const goOk = runwayClear && minRem > (d.linedUp ? T.arrivalBlockLinedUp : T.arrivalBlockDep) && !traffic;
+    // line up behind a lander that is already rolling away down the runway
+    const behindLander = blk.length && blk.every((o) => D[o].g && Gm.toEnd(inf, D[o].p2).a > T.lineUpBehind && Math.abs(Gm.angDiff(D[o].track, inf.heading)) < 60 && !legitTakeoff(o));
     if (goOk && keys.length && !S.mutexWait.includes(first)) S.mutexWait.push(first);
     if (goOk && mutexFree(first, keys)) {
       issue(s, { type: 'clearedTakeoff', runwayEnd: end, at: dp.lineUp, heading: inf.heading, then: s.intent === 'depart' ? 'depart' : 'circuit', circuit: s.intent === 'depart' ? null : { runwayEnd: end, side: circ(end).side, alt: circ(end).alt } });
       takeMutex(first, keys); s.opEnd = end; s.holdT = null;
-    } else if (runwayClear && !s.cmds.lineUpWait && !d.linedUp && minRem > T.lineUpArrivalClear) {
+    } else if ((runwayClear || (behindLander && !resv.length && !intr)) && !traffic && mutexFree(first, keys) && !s.cmds.lineUpWait && !d.linedUp && minRem > T.lineUpArrivalClear) {
       issue(s, { type: 'lineUpWait', runwayEnd: end, at: dp.lineUp, heading: inf.heading });
     }
   }
+
+  const legitTakeoff = (id) => !!S.strips[id]?.cmds.clearedTakeoff;
 
   function ground() {
     if (!cfg.authority) return;
@@ -602,11 +622,14 @@ export function createATC(opts = {}) {
       if (!d.g || d.crashed) continue;
       const c = s.cmds;
       // runway crossings along the taxi route
-      if (c.taxi) for (const h of c.taxi.holdShort || []) {
+      // Taxiway crossings: the route's hold list, or (taxiing on its own) any taxiway-A crossing it is heading for.
+      const holds = [...(c.taxi?.holdShort || []), ...(!d.occ.length ? Gm.TAXI_CROSSINGS.flatMap((k) => [{ runway: k.runway, at: k.west, beyond: k.east }, { runway: k.runway, at: k.east, beyond: k.west }])
+        .filter((h) => Gm.dist2(d.p2, h.at) < T.crossApproach && Gm.dist2(d.p2, h.beyond) > Gm.dist2(d.p2, h.at) && Math.abs(Gm.angDiff(d.track, Math.atan2(h.beyond[0] - h.at[0], -(h.beyond[1] - h.at[1])) * 180 / Math.PI)) < 60) : [])];
+      for (const h of holds) {
         if (h.departure || (c.crossRunway && c.crossRunway.runway === h.runway)) continue;
         if (s.crossed?.includes(h.runway + '@' + Math.round(h.at[0]))) continue;
         if (Gm.dist2(d.p2, h.at) > T.crossApproach) continue;
-        const free = mutexFree(id, mutexKeys(h.runway)) && !occupants(h.runway, id).length && !reservations(h.runway, id).length && !Gm.runwayById(h.runway).ends.some((e) => coneIntruder(e, id));
+        const free = !occupants(h.runway, id).filter((o) => !S.strips[o].cmds.crossRunway).length && !reservations(h.runway, id, [...LAND_CMDS, 'clearedTakeoff', 'lineUpWait']).length && !Gm.runwayById(h.runway).ends.some((e) => coneIntruder(e, id));
         if (free) issue(s, { type: 'crossRunway', runway: h.runway, at: h.at, beyond: h.beyond });
         break;
       }
@@ -675,7 +698,11 @@ export function createATC(opts = {}) {
       const pv = s.pv;
       if (!pv) continue;
 
-      if (d.touchdown) {
+      if (d.touchdown && d.raw.impact) {
+        // a smash/bounce is not a landing: no surface bonus, no landing crimes
+        const landed = { type: 'landed', actor: id, impeccable: false, impact: true, fpm: 0, surface: d.surface, runway: Gm.runwayAt(d.p2, 2)?.id ?? null, t: S.t };
+        emitRaw('landed', landed);
+      } else if (d.touchdown) {
         const fpm = d.raw.touchdownFpm ?? Math.max(0, -(s.airVy ?? pv.vy ?? 0) * 196.85);
         let imp = false;
         const rw = Gm.runwayAt(d.p2, 2);
@@ -736,7 +763,9 @@ export function createATC(opts = {}) {
         const wasIn = pv.inX?.[i];
         (s.pv.inXNext ||= {})[i] = inX;
         if (!inX || wasIn || S.mutex[`X${i}`] === id) return;
-        const other = Object.keys(D).find((o) => o !== id && X.runways.some((r) => D[o].occ.includes(r)));
+        // someone on the runway we are crossing (not merely ahead of us on our own runway)
+        const mine = d.paved && aligned(d.paved, d.g ? d.heading : d.track) ? d.paved.id : null;
+        const other = Object.keys(D).find((o) => o !== id && X.runways.some((r) => r !== mine && D[o].occ.includes(r) && !viaIntersectionOnly(D[o], r, d)));
         if (other) emitEvent('intersection_dash', id, { victim: other, severity: 2 });
       });
 
@@ -805,11 +834,29 @@ export function createATC(opts = {}) {
       // shared runway
       for (const rwId of a.occ) {
         if (!b.occ.includes(rwId)) continue;
+        if (viaIntersectionOnly(a, rwId, b) || viaIntersectionOnly(b, rwId, a)) continue;
+        if (linedUpBehind(a, b, rwId) || linedUpBehind(b, a, rwId)) continue;
         if (Math.max(a.gs, b.gs) < T.doubleOccKt * KT) continue;
         if (climbingAway(a) || climbingAway(b)) continue;
         for (const x of blame()) if (actors.includes(x)) emitEvent('double_occupancy', x, { victim: x === ids[i] ? ids[j] : ids[i], severity: 2, data: { runway: rwId } });
       }
     }
+  }
+
+  // `x` counts as on rwId only because it is at the intersection on the other runway, and `y` is nowhere near it.
+  function viaIntersectionOnly(x, rwId, y) {
+    if (!x.paved || x.paved.id === rwId) return false;
+    const X = Gm.INTERSECTIONS.find((k) => k.runways.includes(rwId) && k.runways.includes(x.paved.id));
+    return !!X && Gm.dist2(y.p2, X.at) > T.intersectionR * 3;
+  }
+
+  // `x` is stopped, legitimately lined up, and `y` is well ahead of it rolling away (line up behind landing traffic).
+  function linedUpBehind(x, y, rwId) {
+    const c = x.s.cmds.lineUpWait || x.s.cmds.clearedTakeoff;
+    if (x.gs > 8 || !c || cmdRw(c) !== rwId) return false;
+    const h = info(c.runwayEnd).heading * Math.PI / 180, ux = Math.sin(h), uz = -Math.cos(h);
+    const ahead = (y.p2[0] - x.p2[0]) * ux + (y.p2[1] - x.p2[1]) * uz;
+    return ahead > 150 && y.vel[0] * ux + y.vel[2] * uz > 0;
   }
 
   function savePrev() {
@@ -862,6 +909,35 @@ export function createATC(opts = {}) {
     return best;
   }
 
+  function runwayChangePass() {
+    const P = S.pendingEnd;
+    if (!P) return;
+    const rwOld = rwOfEnd(S.activeEnd).id;
+    const ops = strips().some((s) => ['clearedLand', 'clearedTouchAndGo', 'clearedTakeoff', 'lineUpWait'].some((k) => s.cmds[k] && cmdRw(s.cmds[k]) === rwOld));
+    const short = (S.seqs[S.activeEnd] || []).some((id) => D[id]?.prog?.onFinal && S.strips[id].rem < 1500);
+    if ((ops || short || occupants(rwOld).length) && S.t - P.t < T.rwChangeMax) return;
+    switchRunway();
+  }
+  function switchRunway() {
+    const prev = S.activeEnd, end = S.pendingEnd.end;
+    S.pendingEnd = null; S.activeEnd = end;
+    if (cfg.authority) {
+      const rwOld = rwOfEnd(prev).id;
+      for (const s of strips()) {
+        const d = D[s.id];
+        if ((s.cmds.clearedLand || s.cmds.clearedTouchAndGo) && cmdRw(s.cmds.clearedLand || s.cmds.clearedTouchAndGo) === rwOld && d && !d.g) goAround(s, 'runwayChange');
+        if (!d?.g) continue;
+        if ((s.cmds.lineUpWait || s.cmds.clearedTakeoff) && d.gs < 10) issue(s, { type: 'cancelTakeoff', runwayEnd: prev, reason: 'runwayChange' });
+        if ((s.cmds.taxi?.dest === 'runway' || s.holdT != null || s.cmds.cancelTakeoff) && Gm.departurePoint(end)) {
+          const r = Gm.taxiToRunway(d.p2, end);
+          if (r) { issue(s, { type: 'taxi', ...r }); s.holdT = null; s.crossed = []; }
+        }
+      }
+      S.deps[prev] = [];
+    }
+    emitRaw('runwayChange', { type: 'runwayChange', from: prev, to: end, t: S.t });
+  }
+
   // ---------- public API ----------
   function step(dt, roomTime, states) {
     if (Array.isArray(roomTime)) { states = roomTime; roomTime = undefined; }
@@ -871,7 +947,7 @@ export function createATC(opts = {}) {
     transitions(dt);
     detect(dt);
     sequencePass();
-    if (cfg.authority) { arrivals(); departures(); ground(); mutexHousekeeping(); }
+    if (cfg.authority) { runwayChangePass(); arrivals(); departures(); ground(); mutexHousekeeping(); }
     else departures();
     for (const id in D) if (D[id].s.pv) D[id].s.pv.inXNext = D[id].s.pv.inXNext || {};
     savePrev();
@@ -891,7 +967,10 @@ export function createATC(opts = {}) {
     sequence(end = S.activeEnd) { return (S.seqs[end] || []).slice(); },
     departureQueue() { return (S.depQueue || []).slice(); },
     activeRunway() { return { end: S.activeEnd, runway: rwOfEnd(S.activeEnd).id, open: { ...S.open }, wind: { ...S.wind } }; },
-    setWind(from, kt) { S.wind = { from, kt }; const e = chooseActive(); if (e !== S.activeEnd) { const prev = S.activeEnd; S.activeEnd = e; emitRaw('runwayChange', { type: 'runwayChange', from: prev, to: e, t: S.t }); } },
+    // A wind shift changes the active runway once the old one is quiet (nobody cleared on it, no one on short final),
+    // or after T.rwChangeMax seconds regardless (then finals go around). Until then no new departures are released.
+    setWind(from, kt) { S.wind = { from, kt }; const e = chooseActive(); S.pendingEnd = e !== S.activeEnd ? { end: e, t: S.t } : null; if (S.pendingEnd && !cfg.authority) switchRunway(); },
+    get pendingRunway() { return S.pendingEnd?.end ?? null; },
     setRunwayOpen(rwId, open) { S.open[rwId] = !!open; },
     composure(key = 'tower') { const m = meter(key); return { outrage: Math.round(m.v), tier: m.tier, tierName: tierName(m.tier), frozen: m.frozenUntil > S.t, scandals: m.scandals }; },
     report(type, actor, extra = {}) { return S.strips[String(actor)] ? emitEvent(type, String(actor), extra) : null; },
@@ -899,6 +978,21 @@ export function createATC(opts = {}) {
     setLocal(id, local) { const s = S.strips[String(id)]; if (s) s.local = !!local; },
     configure(o) { for (const k of ['authority', 'detectRemote', 'detectCollisions', 'aiOutrage', 'outragePerPlayer', 'outrageGain']) if (o[k] != null) cfg[k] = o[k]; },
     remove(id) { removeStrip(String(id)); },
+    // No crimes for this plane for `secs` (spawn, respawn, skip-to-runway). Good events still count.
+    grace(id, secs = 8) { const s = S.strips[String(id)]; if (s) s.graceUntil = S.t + secs; else (S.pendingGrace ||= {})[String(id)] = S.t + secs; },
+    // The game moved this plane by hand: forget its ground/landing state. lineUp: end → it is legitimately lined up there.
+    resetStrip(id, { lineUp = null, grace = 10 } = {}) {
+      id = String(id);
+      const s = S.strips[id];
+      if (!s) { (S.pendingGrace ||= {})[id] = S.t + grace; return; }
+      s.cmds = {}; s.rollRw = null; s.holdT = null; s.cutPending = null; s.penaltyUntil = -1e9; s.touchT = null; s.liftT = null;
+      s.ext = 0; s.leg = null; s.issuedSeq = null; s.air = null; s.pv = null; s.done = false;
+      removeFromSeqs(id); releaseMutex(id);
+      S.mutexWait = S.mutexWait.filter((x) => x !== id);
+      for (const k of Object.keys(S.deps)) S.deps[k] = S.deps[k].filter((x) => x !== id);
+      s.graceUntil = S.t + grace;
+      if (lineUp && cfg.authority) { const dp = Gm.departurePoint(lineUp) || { lineUp: info(lineUp).T }; issue(s, { type: 'lineUpWait', runwayEnd: lineUp, at: dp.lineUp, heading: info(lineUp).heading }); (S.deps[lineUp] ||= []).unshift(id); }
+    },
     serialize() { return clone(S); },
     restore(json) { S = clone(typeof json === 'string' ? JSON.parse(json) : json); circCache.clear(); },
     get time() { return S.t; },

@@ -612,36 +612,310 @@ function crimes() {
   return out;
 }
 
-// Integration smoke against FLIGHT's real Aircraft/Autopilot/Traffic through js/atc/bridge.js. Reports, does not assert.
-async function flightLink() {
-  const { Aircraft } = await import('../js/flight/aircraft.js');
-  const { Autopilot } = await import('../js/flight/autopilot.js');
-  const { Traffic } = await import('../js/flight/traffic.js');
-  const R = await import('../js/flight/routes.js');
-  const { linkTraffic } = await import('../js/atc/bridge.js');
+// ---------- real FLIGHT Aircraft/Autopilot/Traffic through js/atc/bridge.js (attract-style AI traffic) ----------
+function seeded(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+let FL = null;
+async function flightLib() {
+  if (FL) return FL;
+  const [{ Aircraft }, { Autopilot }, { Traffic }, R, { linkTraffic }] = await Promise.all([import('../js/flight/aircraft.js'), import('../js/flight/autopilot.js'), import('../js/flight/traffic.js'), import('../js/flight/routes.js'), import(args.atc ? pathToFileURL(path.join(args.atc, 'js/atc/bridge.js')).href : '../js/atc/bridge.js')]);
+  let terrain = null;
+  try {
+    const { register } = await import('node:module');
+    const three = pathToFileURL(path.resolve(ROOT, '../../lib/three/0.180.0/three.module.js')).href;
+    register('data:text/javascript,' + encodeURIComponent(`export async function resolve(s, c, n) { if (s === 'three') return { url: ${JSON.stringify(three)}, shortCircuit: true }; return n(s, c); }`));
+    const T = await import('../js/world/terrain.js');
+    terrain = { heightAt: T.terrainHeight, castle: T.CASTLE };
+  } catch (err) { console.log('  (terrain.js not loadable in node: flat ground)', String(err).slice(0, 120)); }
+  let M = null;
+  try { M = await import(args.atc ? pathToFileURL(path.join(args.atc, 'js/atc/mischief.js')).href : '../js/atc/mischief.js'); } catch { /* optional */ }
+  return (FL = { Aircraft, Autopilot, Traffic, R, linkTraffic, M, terrain });
+}
+
+// o: { minutes, max, start:[kinds], circuits, seed, wind:{from,kt}, windAt:[[sec, from, kt]], mischief, protection, label }
+async function flightWorld(o = {}) {
+  const { Aircraft, Autopilot, Traffic, R, linkTraffic, M, terrain } = await flightLib();
+  const rnd = seeded(o.seed ?? 7), realRandom = Math.random;
+  Math.random = rnd;
+  const C = terrain?.castle;
+  const env = terrain && o.terrain !== false
+    ? { groundHeightAt: terrain.heightAt, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [{ min: [C.x - 70, 0, C.z - 70], max: [C.x + 70, 190, C.z + 70], kind: 'castle' }] }
+    : { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
+  const tr = new Traffic(env, { aiProtection: o.protection });
+  const atc = createATC({ wind: o.wind || { from: 270, kt: 8 }, detectCollisions: false });
+  const link = linkTraffic(atc, tr, { mischief: o.mischief ?? 0, rnd });
+  const W = { atc, tr, link, t: 0, ai: [], evs: [], instr: [], ap: {}, stats: { arrivals: 0, departures: 0, tgs: 0, crashes: 0, spawned: 0, apGA: 0, holdWaitMax: 0, patternMax: 0, stuck: 0, ext: 0, slow: 0, bounces: 0, minClear: 1e9, minClearAt: '' }, runwayChanges: [] };
+  atc.on('event', (e) => W.evs.push(e));
+  atc.on('instruction', (e) => { W.instr.push(e); if (args.dbg && (args.dbg === true || args.dbg.split(',').includes(e.cmd.type))) console.log(`  t=${e.t} ${e.to} ${JSON.stringify(e.cmd).slice(0, 150)} ${JSON.stringify(atc.strip(e.to))}`); });
+  atc.on('runwayChange', (e) => W.runwayChanges.push(e));
+  const spawn = (kind, opts = {}) => {
+    const ac = new Aircraft({ dims: { gearHeight: 1.2 } });
+    const plan = R.aiSpawn(kind, atc.activeRunway().end, { ...opts, rnd, claimStand: () => tr.claimStand(ac) });
+    if (!plan) return null;
+    ac.place(plan.place, env);
+    if (plan.stand) tr.standOwner.set(plan.stand, ac);
+    const ap = new Autopilot(ac);
+    const ent = tr.add({ aircraft: ac, ap, name: `${kind}${++W.stats.spawned}` });
+    ap.setRoute(plan.route);
+    ent.kind = kind; ent.born = ac.onGround ? null : W.t; ent.lastMove = { t: W.t, x: ac.pos.x, z: ac.pos.z };
+    W.ai.push(ent);
+    return ent;
+  };
+  const despawn = (ent) => { atc.remove(link.idOf(ent)); tr.remove(ent); W.ai.splice(W.ai.indexOf(ent), 1); };
+  const max = o.max ?? 5;
+  for (const [i, k] of (o.start || ['downwind', 'final', 'parked', 'parked', 'arrive', 'parked'].slice(0, max)).entries()) spawn(k, { wait: i === 2 ? 3 : 35 + i * 20, dist: 2600 });
+  for (let i = 0; i < (o.circuits || 0); i++) spawn('circuits');
+  let respawnT = 0;
+  const dt = 1 / 60, H = (o.minutes ?? 30) * 60;
+  W.run = (secs = H) => {
+    const until = W.t + secs;
+    for (; W.t < until; W.t += dt) {
+      for (const w of o.windAt || []) if (!w.done && W.t >= w[0]) { w.done = true; atc.setWind(w[1], w[2]); }
+      tr.update(dt); link.update(dt);
+      if (args.watch && W.t >= +(args.from || 0) && W.t <= +(args.to || 1e9) && Math.floor(W.t) !== Math.floor(W.t - dt)) {
+        const { S, D } = atc._debug();
+        for (const id of args.watch.split(',')) { const d = D[id], e = W.ai.find((x) => link.idOf(x) === id); if (d) console.log(`  W t=${W.t.toFixed(0)} ${id} ${d.p2.map(Math.round)} gs ${d.gs.toFixed(1)} g ${d.g} occ ${d.occ} ap ${e?.ap.phase}/${e?.ap.sub} cmds ${Object.keys(d.s.cmds)} mutex ${JSON.stringify(S.mutex)} st ${d.s.state}`); }
+      }
+      for (const e of [...W.ai]) {
+        const ac = e.ac;
+        for (const ev of e.ap.events.splice(0)) {
+          if (args.trace && (args.trace === true || e.name === args.trace || link.idOf(e) === args.trace)) console.log(`  TR t=${W.t.toFixed(1)} ${e.name}/${link.idOf(e)} ${JSON.stringify(ev)} leg=${e.ap.i}:${e.ap.leg?.kind}/${e.ap.leg?.label} ${ac.pos.x.toFixed(0)},${ac.alt.toFixed(0)},${ac.pos.z.toFixed(0)} ${(ac.speed / 0.5144).toFixed(0)}kt`);
+          if (ev.type === 'landed' && ev.end !== atc.activeRunway().end) W.stats.wrongEnd = (W.stats.wrongEnd || 0) + 1;
+          if (ev.type === 'landed') { W.stats.arrivals++; if (e.born != null && !e.landedOnce) W.stats.patternMax = Math.max(W.stats.patternMax, W.t - e.born); e.landedOnce = true; }
+          if (ev.type === 'touchandgo') W.stats.tgs++;
+          if (ev.type === 'goaround' && !/^Tower/.test(ev.reason || '')) { W.stats.apGA++; W.ap[ev.reason] = (W.ap[ev.reason] || 0) + 1; if (args.dbgap) console.log(`  AP-GA t=${W.t.toFixed(0)} ${e.name} ${ev.reason} ${JSON.stringify(atc.strip(link.idOf(e)))}`); }
+          if (ev.type === 'extend') W.stats.ext++;
+          if (ev.type === 'takeoffroll' && e.holdAt != null) { W.stats.holdWaitMax = Math.max(W.stats.holdWaitMax, W.t - e.holdAt); e.holdAt = null; }
+        }
+        for (const ev of ac.events.splice(0)) { if (ev.type === 'crash') { W.stats.crashes++; if (!args.quiet) console.log(`  CRASH t=${W.t.toFixed(0)} ${e.name} ${ev.reason} ${e.ap.phase} ${ac.pos.x.toFixed(0)},${ac.pos.z.toFixed(0)} hdg ${ac.heading.toFixed(0)} gs ${ac.gs.toFixed(1)} wait ${e.ap.waitAhead?.toFixed(1)}`); } if (ev.type === 'impact') W.stats.bounces++; }
+        if (args.trace && (e.name === args.trace || link.idOf(e) === args.trace) && Math.floor(W.t / 10) !== Math.floor((W.t - dt) / 10)) { const st = e.ap.status(); console.log(`  TS t=${W.t.toFixed(0)} ${st.phase}/${st.sub} leg ${st.legIndex} ${ac.pos.x.toFixed(0)},${ac.alt.toFixed(0)},${ac.pos.z.toFixed(0)} ${(ac.speed / 0.5144).toFixed(0)}kt hdg ${ac.heading.toFixed(0)} thr ${ac.ctl.throttle.toFixed(2)} tgt ${JSON.stringify(st.target)} path ${JSON.stringify(e.ap.cur?.path?.map((p) => [p.x | 0, p.z | 0, p.a | 0]))}`); }
+        if (/HOLD/.test(e.ap.phase) && ac.onGround && e.holdAt == null) e.holdAt = W.t;
+        const lk = e.ap.leg?.kind, lb = e.ap.leg?.label || '';
+        if (!ac.onGround && lk === 'fly' && !/UPWIND|CLIMB OUT/.test(lb) && Math.hypot(ac.pos.x, ac.pos.z) > 1500) {
+          let top = env.groundHeightAt(ac.pos.x, ac.pos.z);
+          for (const b of env.colliders) if (ac.pos.x > b.min[0] - 60 && ac.pos.x < b.max[0] + 60 && ac.pos.z > b.min[2] - 60 && ac.pos.z < b.max[2] + 60) top = Math.max(top, b.max[1]);
+          const clr = ac.pos.y - top;
+          if (clr < W.stats.minClear) { W.stats.minClear = clr; W.stats.minClearAt = `${e.name} ${lb} ${ac.pos.x.toFixed(0)},${ac.pos.z.toFixed(0)} t=${W.t.toFixed(0)}`; }
+        }
+        if (Math.hypot(ac.pos.x - e.lastMove.x, ac.pos.z - e.lastMove.z) > 5 || /PARK|BOARD|HOLD SHORT$|LINED UP/.test(e.ap.phase) || !ac.onGround) e.lastMove = { t: W.t, x: ac.pos.x, z: ac.pos.z };
+        else if (W.t - e.lastMove.t > 240) { W.stats.stuck++; if (!args.quiet) console.log(`  STUCK t=${W.t.toFixed(0)} ${e.name} ${e.ap.phase} ${ac.pos.x.toFixed(0)},${ac.pos.z.toFixed(0)} ${JSON.stringify(atc.strip(link.idOf(e)))} ${atc.instructionsFor(link.idOf(e)).map((c) => c.type)} cx=${JSON.stringify(e.ap.cur?.crossings)} cc=${[...(e.ap.crossClear || [])]} yield=${e.ap.yieldTo} ${whyHeld(atc)}`); e.lastMove = { t: W.t, x: ac.pos.x, z: ac.pos.z }; }
+        if (e.ap.done && e.ap.phase === 'GONE') { W.stats.departures++; despawn(e); }
+        else if (ac.crashed) { e.deadT = (e.deadT || 0) + dt; if (e.deadT > 5) despawn(e); }
+      }
+      if (W.ai.length < max + (o.circuits || 0) && (respawnT -= dt) <= 0) { respawnT = 12 + rnd() * 15; spawn(rnd() < 0.55 ? 'arrive' : 'depart', { wait: 2 }); }
+    }
+  };
+  W.done = () => { Math.random = realRandom; };
+  W.aiBad = () => W.evs.filter((e) => AI_BAD.includes(e.type) && !e.isPlayer);
+  W.summary = () => `arr ${W.stats.arrivals} dep ${W.stats.departures} t&g ${W.stats.tgs} GA ${W.atc.counts.goArounds || 0}+ap${W.stats.apGA}${Object.keys(W.ap).length ? JSON.stringify(W.ap) : ''} sepLoss ${W.atc.counts.separation_loss || 0} holdMax ${W.stats.holdWaitMax.toFixed(0)}s patternMax ${W.stats.patternMax.toFixed(0)}s stuck ${W.stats.stuck} crash ${W.stats.crashes}`;
+  return W;
+}
+
+function whyHeld(atc) {
+  const { S, D } = atc._debug();
+  const seq = Object.entries(S.seqs).map(([k, v]) => `${k}:` + v.map((id) => `${id}(${S.strips[id]?.rem}/${S.strips[id]?.leg})`).join(',')).join(' ');
+  const air = Object.values(D).filter((d) => !d.g).map((d) => `${d.s.id}@${d.p2.map(Math.round)}/${Math.round(d.agl)} ${Object.keys(d.s.cmds).join('+')}`).join('; ');
+  const st = Object.values(S.strips).map((x) => `${x.id}:${x.crossed?.join('/') || ''}:${JSON.stringify(x.cmds.taxi?.holdShort || null)}`).join(' ');
+  return `\n     strips ${st}\n     depQ=${S.depQueue} mutex=${JSON.stringify(S.mutex)} wait=${S.mutexWait} seqs=${seq}\n     air: ${air}`;
+}
+
+// PLAYTEST B7: a royal who just had the controls cuts in on final. The tower sends the VICTIM round, the player's AP
+// refuses its own go-around, lands, and the cut-in scores.
+async function flightCutIn() {
+  const { Aircraft, Autopilot, Traffic, R, linkTraffic } = await flightLib();
   const env = { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
   const tr = new Traffic(env);
-  const route = () => { const c = R.circuitRoute('27'); return { name: c.name, legs: [{ kind: 'hold', end: '27', seconds: 2, untilClear: true, label: 'HOLD SHORT' }, ...c.legs], loop: 1 }; };
-  const mk = (place, name) => { const ac = new Aircraft({ dims: { gearHeight: 1.2 } }); ac.place(place, env); const ap = new Autopilot(ac); tr.add({ aircraft: ac, ap, name }); ap.setRoute(route()); };
-  mk({ x: 700, z: -60, heading: 180 }, 'A'); mk({ x: 700, z: -110, heading: 0 }, 'B'); mk({ x: 640, z: -110, heading: 90 }, 'C');
   const atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false });
   const link = linkTraffic(atc, tr);
-  const evs = [];
-  atc.on('event', (e) => { if (e.type !== 'impeccable') evs.push(e); });
-  let nd = 0;
-  if (args.dbg) atc.on('instruction', (e) => { if ((args.dbg === true || args.dbg.split(',').includes(e.cmd.type)) && nd++ < 40) console.log(`  t=${e.t} ${e.to} ${JSON.stringify(e.cmd).slice(0, 150)} ${JSON.stringify(atc.strip(e.to))}`); });
-  const tally = {};
-  const mins = +(args.minutes || 15);
-  for (let t = 0; t < mins * 60; t += 1 / 60) {
+  const evs = [], instr = [];
+  atc.on('event', (e) => evs.push(e)); atc.on('instruction', (e) => instr.push(e));
+  const e27 = R.runwayEnd('27');
+  const ai = new Aircraft({ dims: { gearHeight: 1.2 } });
+  const [ax, az] = R.fromRunway(e27, -2100, 0);
+  ai.place({ x: ax, z: az, alt: 160, heading: 270, speed: 68 * 0.5144, throttle: 0.4, flaps: 1 }, env);
+  const aap = new Autopilot(ai);
+  const A = tr.add({ aircraft: ai, ap: aap, name: 'victim' });
+  aap.setRoute({ name: 'arrival 27', legs: [{ kind: 'approach', end: '27' }, { kind: 'taxi', dest: { stand: 'S2' } }, { kind: 'park', seconds: 99 }], loop: null });
+  const pl = new Aircraft({ dims: { gearHeight: 1.2 } });
+  const [px, pz] = R.fromRunway(e27, -1700, -750);
+  pl.place({ x: px, z: pz, alt: 130, heading: 320, speed: 85 * 0.5144, throttle: 0.6 }, env);
+  const pap = new Autopilot(pl);
+  const P = tr.add({ aircraft: pl, ap: pap, player: true, name: 'player' });
+  const [cx, cz] = R.fromRunway(e27, -1000, -250);
+  pap.setRoute({ name: 'circuits 27', legs: [{ kind: 'fly', to: [cx, 75, cz], speed: 80, flaps: 1 / 3 }, { kind: 'approach', end: '27' }, ...R.circuitRoute('27').legs.slice(-2)], loop: null });
+  let pGA = 0, pTD = null;
+  for (let t = 0; t < 150; t += 1 / 60) {
+    pap.lastOverride = pl.time;   // the player has just been hand-flying
     tr.update(1 / 60); link.update(1 / 60);
-    for (const e of tr.list) for (const ev of e.ap.events.splice(0)) if (ev.type === 'landed' || ev.type === 'goaround') tally[`${e.name}.${ev.type}`] = (tally[`${e.name}.${ev.type}`] || 0) + 1;
+    for (const ev of pap.events.splice(0)) { if (ev.type === 'goaround') pGA++; if (args.dbg && ev.type !== 'waypoint') console.log(`  P t=${t.toFixed(1)} ${JSON.stringify(ev)} ${pl.pos.x.toFixed(0)},${pl.agl.toFixed(0)},${pl.pos.z.toFixed(0)} | AI ${ai.pos.x.toFixed(0)},${ai.agl.toFixed(0)} ${JSON.stringify(atc.sequence('27'))}`); }
+    for (const ev of pl.events.splice(0)) if (ev.type === 'touchdown' && !pTD) pTD = ev;
   }
-  console.log(`  FLIGHT link ${mins} min: AP ${JSON.stringify(tally)}; ATC ${JSON.stringify(atc.counts)}`);
-  for (const e of evs.slice(0, 10)) console.log(`   ${e.t.toFixed(0)}s ${e.type} ${e.actor}>${e.victim ?? ''} at ${e.at} ${JSON.stringify(e.data)}`);
+  const cut = evs.filter((e) => e.type === 'cut_in_final' && e.actor === 'player');
+  const vga = instr.find((e) => e.to === link.idOf(A) && e.cmd.type === 'goAround');
+  check('flight cut-in: cut_in_final scored for the player (victim = the AI)', cut.length === 1 && cut[0].victim === link.idOf(A), cut.map((e) => `gap ${e.data.gap}@${e.t.toFixed(0)}`).join() || evs.map((e) => e.type).join());
+  check('flight cut-in: the victim is sent round (cause = player), the player is not', vga?.cmd.cause === 'player' && pGA === 0, `victim GA ${vga?.cmd.reason}/${vga?.cmd.cause}; player AP go-arounds ${pGA}; player GA cmds ${instr.filter((e) => e.to === 'player' && e.cmd.type === 'goAround').length}`);
+  check('flight cut-in: the player lands on the runway', pTD?.surface === 'runway' && !pl.crashed, JSON.stringify(pTD));
+}
+
+// Player-facing flows through the real flight core: spawn rivals + skip to runway, DEMAND TAKEOFF, Rubber smash.
+async function gameplay() {
+  const { Aircraft, Autopilot, Traffic, R, linkTraffic } = await flightLib();
+  const env = { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
+  const world = (aiProtection) => {
+    const tr = new Traffic(env, { aiProtection });
+    const atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false });
+    const link = linkTraffic(atc, tr);
+    const W = { tr, atc, link, evs: [], instr: [], t: 0 };
+    atc.on('event', (e) => W.evs.push(e)); atc.on('instruction', (e) => W.instr.push(e));
+    tr.onContact = (ev) => atc.report('collision', link.idOf(ev.a.player ? ev.a : ev.b), { victim: link.idOf(ev.a.player ? ev.b : ev.a) });
+    W.add = (kind, o = {}, player = false) => {
+      const ac = new Aircraft({ dims: { gearHeight: 1.2 } });
+      const plan = R.aiSpawn(kind, '27', { ...o, claimStand: () => tr.claimStand(ac) });
+      ac.place(plan.place, env);
+      const ap = new Autopilot(ac);
+      const e = tr.add({ aircraft: ac, ap, player, name: player ? 'player' : kind });
+      ap.setRoute(player ? R.circuitRoute('27') : plan.route);
+      return e;
+    };
+    W.run = (secs, each) => { for (let k = 0; k < secs * 60; k++) { W.t += 1 / 60; tr.update(1 / 60); link.update(1 / 60); if (each && each(W) === false) break; } };
+    W.pEvents = () => W.evs.filter((e) => e.actor === 'player' && !INFRACTIONS[e.type]?.good);
+    return W;
+  };
+  const { INFRACTIONS } = await import('../js/atc/index.js');
+
+  // 1. play start: rivals seeded (final 3.6 km + one at the hold), player skipped to the runway — no wait, no crimes
+  let W = world('rubber');
+  const fin = W.add('final', { dist: 3600 }), hold = W.add('holding');
+  const P = W.add('circuits', {}, true);
+  W.link.skipToRunway(P);
+  let rollAt = null, finalCone = null;
+  let holdQ = false;
+  W.run(90, (w) => {
+    if (w.t > 5 && w.t < 60 && w.atc.departureQueue().includes(w.link.idOf(hold))) holdQ = true;
+    if (rollAt == null && P.ap.sub === 'roll' && P.ac.speed > 3) rollAt = w.t;
+    if (finalCone == null && fin.ap.leg?.kind === 'approach' && Math.abs(R.toRunway(R.runwayEnd('27'), fin.ac.pos.x, fin.ac.pos.z).l) < 60) finalCone = w.t;
+  });
+  check('spawn: player lined up rolls within 10 s (no dead air)', rollAt != null && rollAt < 10, `roll at ${rollAt?.toFixed(1)} s`);
+  check('spawn: a rival is on final and one at the hold inside 60 s', finalCone != null && finalCone < 60 && holdQ, `final at ${finalCone?.toFixed(0)} s, hold rival queued ${holdQ}`);
+  check('spawn: no crimes for the player from the spawn itself', W.pEvents().length === 0, W.pEvents().map((e) => e.type).join());
+
+  // 2. DEMAND TAKEOFF from a stand with a rival at the hold and one on final: player goes, ATC calls the crimes, AI stays safe
+  W = world('rubber');
+  const f2 = W.add('final', { dist: 2400 }), h2 = W.add('holding');
+  const P2 = W.add('depart', { stand: 'S4', wait: 999 }, true);
+  P2.ap.setRoute(R.circuitRoute('27')); P2.ap.setRoute({ ...P2.ap.route, legs: [{ kind: 'park', seconds: 999 }, ...P2.ap.route.legs] });
+  W.link.placed(P2, 1);
+  W.run(4);
+  const end = W.link.demandTakeoff(P2);
+  let airAt = null, minSep = 1e9;
+  W.run(150, (w) => {
+    if (airAt == null && !P2.ac.onGround && P2.ac.agl > 20) airAt = w.t;
+    if (args.dbg && Math.round(w.t * 60) % 300 === 0) console.log(`  D t=${w.t.toFixed(0)} ${P2.ap.phase}/${P2.ap.sub} ${P2.ac.pos.x.toFixed(0)},${P2.ac.pos.z.toFixed(0)} ${(P2.ac.speed).toFixed(1)} yield=${P2.ap.yieldTo} thr=${P2.ac.ctl.throttle.toFixed(2)} brk=${P2.ac.ctl.brake.toFixed(2)}`);
+    for (const o of [f2, h2]) minSep = Math.min(minSep, Math.hypot(o.ac.pos.x - P2.ac.pos.x, o.ac.pos.y - P2.ac.pos.y, o.ac.pos.z - P2.ac.pos.z));
+  });
+  const crimes = W.pEvents().map((e) => e.type);
+  const crashes = [f2, h2, P2].filter((e) => e.ac.crashed).length;
+  check('demand takeoff: taxis straight to a runway and gets airborne', !!end && airAt != null && airAt < 150, `end ${end}, airborne at ${airAt?.toFixed(0)} s`);
+  check('demand takeoff: ATC calls it (queue jump / unauthorised takeoff / incursion), no exemption', crimes.some((t) => /queue_jump|unauth_takeoff|runway_incursion|runway_steal/.test(t)), crimes.join() || 'none');
+  check('demand takeoff: the AI react safely (no crash, nobody within 30 m)', !crashes && minSep > 30, `crashes ${crashes}, min sep ${minSep.toFixed(0)} m; AI cmds ${W.instr.filter((e) => e.to !== 'player' && /cancelTakeoff|goAround/.test(e.cmd.type)).map((e) => e.cmd.type).join() || '-'}`);
+
+  // 3. Rubber smash: nose-dive into the grass bounces (no crash, no "gear collapsed"), pays no landing bonus
+  W = world('rubber');
+  const P3 = W.add('circuits', {}, true);
+  P3.ac.place({ x: 300, z: 200, alt: 60, heading: 270, speed: 100 * 0.5144, throttle: 0.6 }, env);
+  P3.ap.replan();
+  P3.ac.impactHandler = (await import('../js/flight/traffic.js')).aiImpactHandler('rubber');
+  let crash = null, bounces = 0;
+  W.run(25, (w) => { P3.manual.elevator = w.t < 6 ? -1 : null; for (const ev of P3.ac.events.splice(0)) { if (ev.type === 'crash') crash = ev; if (ev.type === 'impact') bounces++; } });
+  const landEv = W.pEvents().filter((e) => /grass_landing|taxiway_landing|apron_landing|unauth_landing|hard_landing/.test(e.type));
+  check('rubber smash: bounces, never destroyed (no gear-collapse crash)', !crash && bounces > 0, `bounces ${bounces}, crash ${crash?.reason || '-'}`);
+  check('rubber smash: no landing bonus/crime for a smash', landEv.length === 0, landEv.map((e) => e.type).join());
+
+  // 4. AI protection: two AI collide mid-air — Rubber bounces both and they fly on; Realistic destroys them
+  for (const mode of ['rubber', 'partial', null]) {
+    W = world(mode);
+    const a = W.add('circuits'), b = W.add('circuits');
+    a.ac.place({ x: -300, z: 1500, alt: 300, heading: 90, speed: 85 * 0.5144, throttle: 0.6 }, env);
+    b.ac.place({ x: 300, z: 1500, alt: 300, heading: 270, speed: 85 * 0.5144, throttle: 0.6 }, env);
+    for (const e of [a, b]) { e.ap.noAvoid = true; e.ap.setRoute({ name: 'test', legs: [{ kind: 'fly', to: [e === a ? 3000 : -3000, 300, 1500], speed: 85 }, { kind: 'fly', to: [0, 300, 4000], speed: 85 }], loop: 0 }); }
+    let hits = 0;
+    W.run(40, () => { for (const e of [a, b]) for (const ev of e.ac.events.splice(0)) if (ev.type === 'impact') hits++; });
+    if (mode) check(`AI protection ${mode}: mid-air contact bounces, both fly on`, hits > 0 && !a.ac.crashed && !b.ac.crashed && a.ac.agl > 100 && b.ac.agl > 100, `impacts ${hits}, agl ${a.ac.agl.toFixed(0)}/${b.ac.agl.toFixed(0)}`);
+    else check('AI protection realistic (none): the same contact destroys them', a.ac.crashed && b.ac.crashed, `crashed ${a.ac.crashed}/${b.ac.crashed}`);
+  }
+}
+
+// See-and-avoid between AI on fly legs: head-on, and a fast plane catching a slow one on the same track.
+async function seeAvoid() {
+  const { Aircraft, Autopilot, Traffic, linkTraffic } = await flightLib();
+  const env = { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
+  for (const [name, A, B] of [
+    ['head-on', { x: -2500, z: 3000, heading: 90, kt: 85, to: [4000, 300, 3000] }, { x: 2500, z: 3000, heading: 270, kt: 85, to: [-4000, 300, 3000] }],
+    ['catching up', { x: -1500, z: 3000, heading: 90, kt: 70, to: [6000, 300, 3000] }, { x: -2600, z: 3000, heading: 90, kt: 100, to: [6000, 300, 3000] }],
+  ]) {
+    const tr = new Traffic(env);
+    const atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false });
+    const link = linkTraffic(atc, tr);
+    const evs = []; atc.on('event', (e) => evs.push(e));
+    const mk = (o) => {
+      const ac = new Aircraft({ dims: { gearHeight: 1.2 } });
+      ac.place({ x: o.x, z: o.z, alt: 300, heading: o.heading, speed: o.kt * 0.5144, throttle: 0.6 }, env);
+      const ap = new Autopilot(ac); const e = tr.add({ aircraft: ac, ap, name: name + o.kt });
+      ap.setRoute({ name: 'transit', legs: [{ kind: 'fly', to: o.to, speed: o.kt }, { kind: 'fly', to: [o.to[0] * 2, 300, o.to[2] + 3000], speed: o.kt }], loop: 0 });
+      return e;
+    };
+    const a = mk(A), b = mk(B);
+    let minH = 1e9, atMin = 0, hits = 0;
+    for (let t = 0; t < 120; t += 1 / 60) {
+      tr.update(1 / 60); link.update(1 / 60);
+      const h = Math.hypot(a.ac.pos.x - b.ac.pos.x, a.ac.pos.z - b.ac.pos.z), v = Math.abs(a.ac.pos.y - b.ac.pos.y);
+      if (h < 150 && v < 60) hits++;
+      if (h < minH) { minH = h; atMin = v; }
+    }
+    const sl = evs.filter((e) => e.type === 'separation_loss' || e.type === 'near_miss' || e.type === 'formation');
+    check(`see-and-avoid ${name}: no separation loss between AI on fly legs`, !sl.length && !hits && !a.ac.crashed && !b.ac.crashed, `closest ${minH.toFixed(0)} m horizontally with ${atMin.toFixed(0)} m vertical; ${sl.map((e) => e.type).join() || 'no events'}`);
+  }
+}
+
+async function flightSoak() {
+  const mins = +(args.minutes || 30);
+  const runs = [
+    { label: 'attract 5', max: 5, seed: 11 },
+    { label: 'attract 4 + 2 circuits', max: 4, circuits: 2, seed: 23 },
+    { label: 'attract 6', max: 6, seed: 5 },
+    { label: 'runway change', max: 5, seed: 31, windAt: [[500, 90, 12], [1150, 270, 12]] },
+    { label: 'mischief high', max: 5, seed: 41, mischief: 'high' },
+  ];
+  const MILD = ['taxi_speeding', 'low_pass'];
+  for (const r of runs) {
+    if (args.run && !r.label.includes(args.run)) continue;
+    const W = await flightWorld({ ...r, minutes: mins });
+    W.run(); W.done();
+    const all = W.aiBad(), mild = r.mischief ? all.filter((e) => MILD.includes(e.type)) : [];
+    const bad = all.filter((e) => !mild.includes(e));
+    const ga = (W.atc.counts.goArounds || 0) + W.stats.apGA - (W.ap['low pass'] || 0);
+    const per15 = ga / (mins / 15);
+    console.log(`  [${r.label}] ${mins} min: ${W.summary()}`);
+    for (const e of bad.slice(0, 6)) console.log(`   ${e.t.toFixed(0)}s ${e.type} ${e.actor}>${e.victim ?? ''} at ${e.at} ${JSON.stringify(e.data)}`);
+    const tag = `flight soak [${r.label}]`;
+    if (r.mischief) check(`${tag}: rival royals misbehave, mildly (taxi speeding / low pass only)`, mild.length > 0, Object.entries(mild.reduce((m, e) => ((m[e.type] = (m[e.type] || 0) + 1), m), {})).map(([k, v]) => `${k} ${v}`).join(', ') || 'none');
+    check(`${tag}: zero ${r.mischief ? 'other ' : ''}AI infractions/separation losses in ${mins} min`, bad.length === 0, bad.slice(0, 4).map((e) => `${e.type}:${e.actor}@${e.t.toFixed(0)}`).join(', ') || W.summary());
+    check(`${tag}: <= 1 go-around per 15 min`, per15 <= 1, `${ga} go-arounds (${per15.toFixed(2)}/15 min)`);
+    // starvation = anyone held at the runway > 5 min, an arrival > 10 min from spawn to touchdown, or a plane parked
+    // on a taxiway; throughput floor = one movement every 2 min with both arrivals and departures served (every 2.5 min
+    // with mischief: a low pass costs that arrival a whole circuit)
+    const moves = W.stats.arrivals + W.stats.departures + W.stats.tgs;
+    check(`${tag}: steady flow (arrivals and departures, nobody stuck or starved)`, moves >= mins * (r.mischief ? 0.4 : 0.5) && W.stats.arrivals >= mins * 0.15 && W.stats.departures >= mins * 0.2 && !W.stats.stuck && W.stats.holdWaitMax < 300 && W.stats.patternMax < 600, `moves ${moves} (arr ${W.stats.arrivals} dep ${W.stats.departures} t&g ${W.stats.tgs}) stuck ${W.stats.stuck} holdMax ${W.stats.holdWaitMax.toFixed(0)}s patternMax ${W.stats.patternMax.toFixed(0)}s`);
+    check(`${tag}: no crashes`, W.stats.crashes === 0, `crashes=${W.stats.crashes}`);
+    if (r.windAt) check(`${tag}: active runway switched ${r.windAt.length}x mid-session, every landing on the active end`, W.runwayChanges.length === r.windAt.length && !W.stats.wrongEnd, `${W.runwayChanges.map((c) => `${c.from}->${c.to}@${c.t.toFixed(0)}`).join(' ')} wrong-end landings ${W.stats.wrongEnd || 0}`);
+    check(`${tag}: terrain/castle clearance >= 100 m away from the field (except approach/climb-out)`, W.stats.minClear >= 100, `min ${W.stats.minClear.toFixed(0)} m (${W.stats.minClearAt})${FL.terrain ? '' : ' FLAT GROUND'}`);
+  }
 }
 
 const SCEN = { circuits: aiCircuits, cutin: cutIn, corner: cutInCorner, blocked: blockedRunway, overtake, outofturn: outOfTurn, buzz: towerBuzz, crossing, crimes, online: serialization };
-if (args.only === 'flight') SCEN.flight = flightLink;
+SCEN.flightcut = flightCutIn;
+SCEN.gameplay = gameplay;
+SCEN.avoid = seeAvoid;
+SCEN.flight = flightSoak;
 for (const [name, fn] of Object.entries(SCEN)) {
   if (args.only && args.only !== name) continue;
   const t0 = Date.now();

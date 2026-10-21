@@ -3,7 +3,7 @@
 import { Aircraft } from '../js/flight/aircraft.js';
 import { Autopilot } from '../js/flight/autopilot.js';
 import { Traffic } from '../js/flight/traffic.js';
-import { circuitRoute, arrivalRoute, departureRoute, runwayEnd, onRunway, fromRunway, standInfo } from '../js/flight/routes.js';
+import { circuitRoute, arrivalRoute, departureRoute, runwayEnd, onRunway, fromRunway, standInfo, holdPoint } from '../js/flight/routes.js';
 import { KT, FT } from '../js/flight/vmath.js';
 
 const env = {
@@ -144,8 +144,187 @@ function scTraffic() {
   check('traffic: arrival parked', b.ap.leg?.kind === 'park', `${b.ap.phase} at ${b.ac.pos.x.toFixed(0)},${b.ac.pos.z.toFixed(0)} hdg ${b.ac.heading.toFixed(0)}`);
 }
 
-const S = { circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic };
-for (const [k, f] of Object.entries(S)) if (scen === 'all' || scen === k) { console.log(`\n== ${k}`); f(); }
+async function scLandAt() {
+  const { planLandAhead } = await import('../js/assist/landahead.js');
+  const { fakeWorld, layout } = await import('../js/assist/test/fakeworld.mjs');
+  const w = fakeWorld();
+  const wenv = { groundHeightAt: w.groundHeightAt, surfaceAt: w.surfaceAt, colliders: w.colliders };
+  const cases = [
+    { name: 'runway plan (lined up with 27, 2.6 km)', place: () => { const e = runwayEnd('27'); const [x, z] = fromRunway(e, -2600, 30); return { x, z, alt: 230, heading: e.hdg, speed: 80 * KT }; }, kind: 'runway' },
+    { name: 'field plan (over open country)', place: () => ({ x: 2600, z: 1500, alt: 260, heading: 90, speed: 80 * KT }), kind: null },
+  ];
+  for (const c of cases) {
+    const tr = new Traffic(wenv);
+    const ac = new Aircraft({ dims: { gearHeight: 1.2 } });
+    const pl = c.place();
+    ac.place(pl, wenv);
+    const ap = new Autopilot(ac);
+    const p = tr.add({ aircraft: ac, ap, player: true, name: 'P' });
+    ap.setRoute(circuitRoute('27'));
+    const v = ac.vel;
+    const plan = planLandAhead({ pos: [ac.pos.x, ac.pos.y, ac.pos.z], vel: [v.x, v.y, v.z], heading: ac.heading, altitude: ac.pos.y, world: w, layout });
+    if (plan.fail) { check(`landAt ${c.name}: planner found a spot`, false, plan.fail); continue; }
+    ap.landAt(plan);
+    let td = null, crash = null;
+    for (let t = 0; t < 400 && !(ap.done && ac.speed < 0.5); t += 1 / 60) {
+      tr.update(1 / 60);
+      for (const ev of ac.events.splice(0)) { if (ev.type === 'touchdown' && !td) td = { ...ev, x: ac.pos.x, z: ac.pos.z }; if (ev.type === 'crash') crash = ev; }
+    }
+    const miss = td ? Math.hypot(td.x - plan.touchdown[0], td.z - plan.touchdown[1]) : 1e9;
+    check(`landAt ${c.name}: flew the ${plan.kind} plan to a stop`, !crash && ap.done && ac.onGround && ac.speed < 0.5 && (!c.kind || plan.kind === c.kind), `${plan.kind} ${plan.label} td miss ${miss.toFixed(0)} m, ${td?.fpm} fpm on ${td?.surface}, stopped at ${ac.pos.x.toFixed(0)},${ac.pos.z.toFixed(0)} ${crash?.reason || ''}`);
+    check(`landAt ${c.name}: touched down near the planned spot on its surface`, td && miss < 220 && td.fpm < 700 && (plan.kind !== 'runway' || td.surface === 'runway'), `miss ${miss.toFixed(0)} m, ${td?.fpm} fpm`);
+  }
+  // any real input cancels: the previous route comes back
+  const tr = new Traffic(wenv);
+  const ac = new Aircraft({ dims: { gearHeight: 1.2 } });
+  const e = runwayEnd('27'); const [x, z] = fromRunway(e, -2600, 30);
+  ac.place({ x, z, alt: 230, heading: e.hdg, speed: 80 * KT }, wenv);
+  const ap = new Autopilot(ac);
+  const p = tr.add({ aircraft: ac, ap, player: true, name: 'P' });
+  ap.setRoute(circuitRoute('27'));
+  const v = ac.vel;
+  ap.landAt(planLandAhead({ pos: [ac.pos.x, ac.pos.y, ac.pos.z], vel: [v.x, v.y, v.z], heading: ac.heading, altitude: ac.pos.y, world: w, layout }));
+  for (let t = 0; t < 3; t += 1 / 60) { if (t > 1) p.manual.aileron = 0.3; tr.update(1 / 60); }
+  p.manual.aileron = null;
+  check('landAt: stick input > 0.5 s cancels back to the previous route', !ap.landing && ap.route.name.startsWith('circuits'), ap.route.name);
+}
+
+// The player drives on the ground: throttle set once (then lifted: it must latch), stick X steers to `hdg`.
+function drive(tr, p, hdg, thr, secs, { elev = null } = {}) {
+  const ac = p.ac, x0 = ac.pos.x, z0 = ac.pos.z;
+  let along = 0, t = 0, lx = x0, lz = z0;
+  const [ux, uz] = [Math.sin(hdg * Math.PI / 180), -Math.cos(hdg * Math.PI / 180)];
+  for (; t < secs; t += 1 / 60) {
+    p.manual.throttle = t < 0.5 ? thr : null;
+    const err = ((hdg - ac.heading + 540) % 360) - 180;
+    p.manual.aileron = Math.max(-1, Math.min(1, err / 25));
+    if (elev != null) p.manual.elevator = elev;
+    tr.update(1 / 60);
+    along += (ac.pos.x - lx) * ux + (ac.pos.z - lz) * uz; lx = ac.pos.x; lz = ac.pos.z;
+  }
+  p.manual.aileron = null; p.manual.elevator = null;
+  return { along, latched: p.axis.throttle.mode, hdgErr: Math.abs(((hdg - ac.heading + 540) % 360) - 180), crashed: ac.crashed };
+}
+
+function scGround() {
+  const mkP = (place, route) => { const tr = new Traffic(env); const p = mk(tr, place, route, { name: 'P', player: true }); return { tr, p }; };
+  // from the hold short of 27, turn off onto the grass by hand
+  let { tr, p } = mkP((() => { const h = holdPoint('27'); return { x: h[0], z: h[1], heading: 180 }; })(), { name: 'circuits 27', legs: [{ kind: 'hold', end: '27', seconds: 600, untilClear: true }, ...circuitRoute('27').legs], loop: 1 });
+  run(tr, 3);
+  let r = drive(tr, p, 135, 0.45, 22);
+  check('ground override: from the hold, latched throttle + stick steer moves >= 50 m on the chosen heading', r.along >= 50 && r.hdgErr < 20 && !r.crashed, `along ${r.along.toFixed(0)} m, hdg err ${r.hdgErr.toFixed(0)}°, throttle ${r.latched}`);
+  check('ground override: throttle stays latched after the finger lifts', r.latched === 'latched' && p.ac.ctl.throttle > 0.4, `${r.latched} ${p.ac.ctl.throttle.toFixed(2)}`);
+  // from a stand (boarding), pull out across the apron
+  const s = standInfo('S3');
+  ({ tr, p } = mkP({ x: s.pos[0], z: s.pos[1], heading: 180 }, departureRoute('27')));
+  p.ap.setRoute({ ...p.ap.route, legs: [{ kind: 'park', seconds: 600 }, ...p.ap.route.legs] });
+  run(tr, 2);
+  r = drive(tr, p, 200, 0.4, 25);
+  check('ground override: from a stand, latched throttle + steer moves >= 50 m on the chosen heading', r.along >= 50 && r.hdgErr < 20 && !r.crashed, `along ${r.along.toFixed(0)} m, hdg err ${r.hdgErr.toFixed(0)}°`);
+  // after an autopilot landing: on the rollout, throttle up and turn off onto the grass
+  const e = runwayEnd('27'); const [fx, fz] = fromRunway(e, -1500, 0);
+  ({ tr, p } = mkP({ x: fx, z: fz, alt: 105, heading: e.hdg, speed: 68 * KT, throttle: 0.4, flaps: 1 }, { name: 'arrival 27', legs: [{ kind: 'approach', end: '27' }, { kind: 'taxi', dest: { stand: 'S2' } }, { kind: 'park', seconds: 99 }], loop: null }));
+  p.ap.replan();
+  run(tr, 120, () => !(p.ap.sub === 'rollout' && p.ac.onGround && p.ac.speed < 20));
+  const v0 = p.ac.speed;
+  r = drive(tr, p, (e.hdg + 320) % 360, 0.5, 20);
+  const offMain = onRunway(p.ac.pos.x, p.ac.pos.z, 0)?.id !== '09/27';
+  check('ground override: on the rollout after an AP landing, throttle + steer turns off and keeps going', r.along >= 50 && r.hdgErr < 20 && !r.crashed && offMain, `rollout at ${(v0 / KT).toFixed(0)} kt; along ${r.along.toFixed(0)} m, hdg err ${r.hdgErr.toFixed(0)}°, off 09/27 ${offMain}`);
+  // rollout touch-and-go by hand: full throttle + back stick flies again; letting go, the AP carries on in the air
+  ({ tr, p } = mkP({ x: fx, z: fz, alt: 105, heading: e.hdg, speed: 68 * KT, throttle: 0.4, flaps: 1 }, circuitRoute('27')));
+  p.ap.replan();
+  run(tr, 120, () => !(p.ap.sub === 'rollout' && p.ac.onGround && p.ac.speed < 22));
+  p.manual.flaps = 0;
+  r = drive(tr, p, e.hdg, 1, 14, { elev: 0.35 });
+  p.manual.flaps = null;
+  const air = !p.ac.onGround && p.ac.agl > 5;
+  run(tr, 40);
+  check('ground override: rollout touch-and-go by hand (throttle up + back stick) gets airborne, AP carries on', air && !p.ac.onGround && p.ac.agl > 40 && !p.ac.crashed, `air ${air} agl ${p.ac.agl.toFixed(0)} phase ${p.ap.phase}`);
+}
+
+// PLAYTEST B4/B5/B7-flight: handback near the ground, stick-only override.
+function scHandback() {
+  const tr = new Traffic(env);
+  const e = runwayEnd('09');
+  const p = mk(tr, { x: 0, z: 1500, alt: 60, heading: 90, speed: 85 * KT, throttle: 0.6 }, circuitRoute('09'), { name: 'P', player: true });
+  p.ap.replan();
+  // nose down hard at 60 m, then let go: must recover at once (no 1.5 s neutral wait)
+  for (let t = 0; t < 1.2; t += 1 / 60) { p.manual.elevator = -0.6; tr.update(1 / 60); }
+  p.manual.elevator = null;
+  const rel = { agl: p.ac.agl, vs: p.ac.vs };
+  let minAgl = p.ac.agl, t2 = 0, recAt = null;
+  for (; t2 < 12; t2 += 1 / 60) { tr.update(1 / 60); minAgl = Math.min(minAgl, p.ac.agl); if (recAt == null && p.ap.phase === 'RECOVERY') recAt = t2; }
+  check('handback: releasing a dive low recovers immediately (no ground contact, climbing)', !p.ac.crashed && minAgl > 8 && p.ac.vs > 0 && recAt != null && recAt < 0.1, `released at ${rel.agl.toFixed(0)} m / ${rel.vs.toFixed(1)} m/s; recovery after ${recAt?.toFixed(2)} s, min agl ${minAgl.toFixed(0)} m, vs ${p.ac.vs.toFixed(1)}`);
+  // full roll at 150 m then release: no hit
+  const q = mk(tr, { x: 0, z: -2500, alt: 150, heading: 270, speed: 90 * KT, throttle: 0.6 }, circuitRoute('09'), { name: 'Q', player: false });
+  q.ap.replan();
+  for (let t = 0; t < 2; t += 1 / 60) { q.manual.aileron = 1; tr.update(1 / 60); }
+  q.manual.aileron = null;
+  let qMin = q.ac.agl;
+  for (let t = 0; t < 20; t += 1 / 60) { tr.update(1 / 60); qMin = Math.min(qMin, q.ac.agl); }
+  check('handback: full roll for 2 s at 150 m, release: recovers without touching the ground', !q.ac.crashed && qMin > 20, `min agl ${qMin.toFixed(0)} m`);
+  // stick-only low pass: flaps stay as they were, throttle holds speed, phase reads MANUAL
+  const tr2 = new Traffic(env);
+  const [lx, lz] = fromRunway(runwayEnd('27'), -400, 0);
+  const r = mk(tr2, { x: lx, z: lz, alt: 15, heading: 270, speed: 95 * KT, throttle: 0.7 }, circuitRoute('27'), { name: 'R', player: true });
+  r.ap.replan();
+  let maxAlt = 0, minKt = 999, phase = '';
+  for (let t = 0; t < 12; t += 1 / 60) {
+    r.manual.elevator = Math.max(-0.5, Math.min(0.5, (12 - r.ac.agl) * 0.05 - r.ac.vs * 0.08));
+    tr2.update(1 / 60);
+    if (t > 2) { maxAlt = Math.max(maxAlt, r.ac.agl); minKt = Math.min(minKt, r.ac.speed / KT); phase = r.ap.phase; }
+  }
+  r.manual.elevator = null;
+  check('stick-only override: low pass holds height and speed (AP no longer flaps/idles underneath)', maxAlt < 25 && minKt > 80 && r.ac.flapsPos < 0.2, `max agl ${maxAlt.toFixed(0)} m, min ${minKt.toFixed(0)} kt, flaps ${r.ac.flapsPos.toFixed(2)}`);
+  check('stick-only override: phase label reads MANUAL', phase === 'MANUAL', phase);
+}
+
+// D20 fuel: burn rate, low-fuel warning, engine stops when empty (glide), refuel() restores it.
+function scFuel() {
+  const tr = new Traffic(env);
+  const p = mk(tr, { x: 0, z: 3000, alt: 600, heading: 90, speed: 90 * KT, throttle: 0.7 }, circuitRoute('09'), { name: 'P' });
+  p.ap.replan();
+  const f0 = p.ac.fuel.L + p.ac.fuel.R;
+  run(tr, 600);
+  const used = f0 - (p.ac.fuel.L + p.ac.fuel.R), lph = used * 6;
+  check('fuel: burns a C172-ish 15–45 L/h flying the circuit', lph > 15 && lph < 45, `${lph.toFixed(1)} L/h`);
+  p.ac.fuel.L = p.ac.fuel.R = 14;
+  const ev = run(tr, 30).filter((l) => l.who === 'P').map((l) => l.type);
+  const s0 = p.ac.instruments();
+  check('fuel: low-fuel warning fires once below 15 %', ev.filter((t) => t === 'lowfuel').length === 1 && s0.lowFuel && s0.fuelL < 0.15 && s0.fuelR < 0.15, `events ${ev.join()}`);
+  p.ac.fuel.L = p.ac.fuel.R = 0.02;
+  let out = false, thrustGone = false;
+  run(tr, 20, () => { if (p.ac.engineOut) out = true; if (out && p.ac.eng < 0.01) thrustGone = true; });
+  check('fuel: engine stops at empty (eng → 0, glides on)', out && thrustGone && !p.ac.crashed, `engineOut ${out} eng ${p.ac.eng.toFixed(2)}`);
+  p.ac.refuel();
+  run(tr, 5);
+  check('fuel: refuel() fills both tanks and restarts the engine', !p.ac.engineOut && p.ac.fuelFraction > 0.99 && p.ac.eng > 0.05, `frac ${p.ac.fuelFraction.toFixed(3)} eng ${p.ac.eng.toFixed(2)}`);
+}
+
+// Impact events carry the contact normal for FX: the slope's normal on a hillside, the wall's on a collider.
+function scImpact() {
+  const slope = { ...env, groundHeightAt: (x) => x * 0.25, colliders: [{ min: [-20, 0, 980], max: [20, 60, 1020], kind: 'castle' }] };
+  const bounce = () => ({ result: 'bounce', restitution: 0.4 });
+  const hit = (place, elev, secs = 8) => {
+    const tr = new Traffic(slope);
+    const ac = new Aircraft({ dims: { gearHeight: 1.2 } });
+    ac.place(place, slope);
+    ac.impactHandler = bounce;
+    const E = tr.add({ aircraft: ac, name: 'X' });
+    ac.ctl.throttle = 0.7;
+    let ev = null;
+    for (let t = 0; t < secs && !ev; t += 1 / 60) { E.manual.elevator = elev; tr.update(1 / 60); ev = ac.events.find((e) => e.type === 'impact'); }
+    return ev;
+  };
+  const g = hit({ x: 0, z: 0, alt: 40, heading: 0, speed: 90 * KT }, -1);
+  const okN = (n) => Array.isArray(n) && n.length === 3 && Math.abs(Math.hypot(...n) - 1) < 1e-6;
+  check('impact: ground hit carries the terrain normal n:[x,y,z]', g && okN(g.n) && g.n[0] < -0.2 && g.n[1] > 0.9, g ? JSON.stringify(g.n.map((v) => +v.toFixed(3))) + ' ' + g.reason : 'no impact');
+  const w = hit({ x: 0, z: 1200, alt: 30, heading: 0, speed: 90 * KT }, 0, 6);
+  check('impact: collider hit carries the wall normal', w && okN(w.n) && w.n[2] === 1, w ? JSON.stringify(w.n) + ' ' + w.reason : 'no impact');
+}
+
+const S = { impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic };
+for (const [k, f] of Object.entries(S)) if (scen === 'all' || scen === k) { console.log(`\n== ${k}`); await f(); }
 const fails = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - fails}/${results.length} passed`);
 process.exit(fails ? 1 : 0);

@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { Aircraft } from './aircraft.js';
 import { Autopilot } from './autopilot.js';
-import { circuitRoute, departureRoute, arrivalRoute, runwayEnd, fromRunway, standInfo, circuitLegs } from './routes.js';
-import { KT } from './vmath.js';
+import { aiSpawn } from './routes.js';
 import { TOWER } from '../world/layout.js';
+import { fitFov } from './cameras.js';
 
 const NAMES = ['Wobble', 'Fizz', 'Crumpet', 'Toff', 'Bunty', 'Pip', 'Monty', 'Gussie', 'Plum', 'Biffy', 'Tuppence', 'Hector', 'Dottie', 'Jasper', 'Clarice'];
 const COMPANIES = ['Fizz Air', 'Posh Wings', 'Crumpet Air', 'Monocle Jet', 'Royal Wobble', 'Tiara Air', 'Scone Air', 'Gin & Wings', 'Duke Air', 'Corgi Air'];
@@ -34,33 +34,11 @@ export function createAttract({ scene, traffic, env, createPlane, quality, max =
     onRig?.(rig);
     const ac = new Aircraft({ dims: rig.dims });
     const ap = new Autopilot(ac);
-    const E = activeEnd(), e9 = runwayEnd(E);
-    let route;
-    if (kind === 'parked' || kind === 'depart') {
-      const sid = opts.stand || traffic.claimStand(ac);
-      if (!sid) { rig.dispose(); return null; }
-      const s = standInfo(sid);
-      ac.place({ x: s.pos[0], z: s.pos[1], heading: s.heading }, env);
-      route = departureRoute(E);
-      route = { ...route, legs: [{ kind: 'park', seconds: opts.wait ?? 4 + Math.random() * 20, label: 'BOARDING' }, ...route.legs] };
-      traffic.standOwner.set(sid, ac);
-    } else if (kind === 'downwind') {
-      const legs = circuitLegs(E);
-      const d = legs[2].to, c = legs[1].to;
-      ac.place({ x: (c[0] + d[0]) / 2, z: (c[2] + d[2]) / 2, alt: 300, heading: (e9.hdg + 180) % 360, speed: 85 * KT, throttle: 0.6 }, env);
-      route = arrivalRoute(E, { stand: 'auto', parkSeconds: 15 + Math.random() * 20, then: departureRoute(E) });
-      route = { ...route, legs: route.legs.slice(1) };
-    } else if (kind === 'final') {
-      const [x, z] = fromRunway(e9, -opts.dist || -2600, 0);
-      ac.place({ x, z, alt: (opts.dist || 2600) * 0.07 + 10, heading: e9.hdg, speed: 68 * KT, throttle: 0.4, flaps: 1 }, env);
-      route = arrivalRoute(E, { stand: 'auto', parkSeconds: 20 + Math.random() * 20, then: departureRoute(E) });
-      route = { ...route, legs: route.legs.filter((l) => l.kind !== 'fly') };
-    } else {
-      const a = Math.random() * Math.PI * 2, r = 5000;
-      const x = Math.cos(a) * r, z = Math.sin(a) * r;
-      ac.place({ x, z, alt: 420, heading: (Math.atan2(-x, z) * 180 / Math.PI + 360) % 360, speed: 95 * KT, throttle: 0.6 }, env);
-      route = arrivalRoute(E, { stand: 'auto', parkSeconds: 20 + Math.random() * 30, then: departureRoute(E) });
-    }
+    const plan = aiSpawn(kind, activeEnd(), { ...opts, claimStand: () => traffic.claimStand(ac) });
+    if (!plan) { rig.dispose(); return null; }
+    ac.place(plan.place, env);
+    if (plan.stand) traffic.standOwner.set(plan.stand, ac);
+    const route = plan.route;
     scene.add(rig.root);
     const ent = traffic.add({ aircraft: ac, ap, rig, name: rig.livery?.().registration || kind });
     ap.setRoute(route);
@@ -94,14 +72,27 @@ export function createAttract({ scene, traffic, env, createPlane, quality, max =
     }
   }
 
+  // PLAYTEST #6/#9: someone to be rude to within the first minute — a rival on a long final (≈ 75 s out, so a
+  // lined-up player is still cleared at once) and one at the hold. Call on play start and after a respawn.
+  async function seedRivals({ final = true, hold = true, finalDist = 3600 } = {}) {
+    const out = [];
+    const busyFinal = ai.some((e) => e.ap.leg?.kind === 'approach' && !e.ac.onGround);
+    const busyHold = ai.some((e) => e.ac.onGround && /HOLD|LINE/.test(e.ap.phase));
+    if (final && !busyFinal) out.push(await spawn('final', { dist: finalDist }));
+    if (hold && !busyHold) out.push(await spawn('holding'));
+    return out.filter(Boolean);
+  }
+
   // Remove AI that would sit on top of the player when play begins.
   function clearAround(x, z, r) {
     for (const e of [...ai]) if (Math.hypot(e.ac.pos.x - x, e.ac.pos.z - z) < r && e.ac.onGround) despawn(e);
   }
 
   // ---------- cinematic camera ----------
-  const cine = { shot: null, t: 0, dur: 0, i: 0, look: new THREE.Vector3(0, 0, -100), pos: new THREE.Vector3(-900, 200, 700), target: null };
-  const SHOTS = ['wide', 'orbit', 'tripod', 'tower', 'follow'];
+  const cine = { shot: null, t: 0, dur: 0, i: 0, fov: 70, look: new THREE.Vector3(0, 0, -100), pos: new THREE.Vector3(-900, 200, 700), target: null };
+  // PLAYTEST: planes read as specks. Every shot has a plane in it, close: no scenery-only wide orbit while there is
+  // traffic, the tower shot only for a plane within 600 m, and long shots zoom so the plane is ~1/8 of the frame.
+  const SHOTS = ['orbit', 'tripod', 'follow', 'tower'];
   const interest = (e) => {
     const p = e.ap.phase;
     if (/ROLL|ROTATE|FLARE|ROLLOUT/.test(p)) return 5;
@@ -116,6 +107,7 @@ export function createAttract({ scene, traffic, env, createPlane, quality, max =
     live.sort((a, b) => interest(b) - interest(a) + (Math.random() - 0.5));
     cine.target = live[0] || null;
     cine.shot = cine.target ? SHOTS[cine.i++ % SHOTS.length] : 'wide';
+    if (cine.shot === 'tower' && Math.hypot(cine.target.ac.pos.x - TOWER.position[0], cine.target.ac.pos.z - TOWER.position[2]) > 600) cine.shot = 'follow';
     cine.dur = cine.shot === 'wide' ? 9 : 7 + Math.random() * 3;
     const t = cine.target?.ac;
     if (cine.shot === 'tripod' && t) {
@@ -145,16 +137,25 @@ export function createAttract({ scene, traffic, env, createPlane, quality, max =
       pos.set(TOWER.position[0], TOWER.height + 4, TOWER.position[2] + 10); look.copy(tp);
     } else {
       const h = t.track * Math.PI / 180;
-      pos.set(tp.x - Math.sin(h) * 30 + Math.cos(h) * 14, tp.y + 7, tp.z + Math.cos(h) * 30 + Math.sin(h) * 14); look.copy(tp);
+      pos.set(tp.x - Math.sin(h) * 22 + Math.cos(h) * 11, tp.y + 5, tp.z + Math.cos(h) * 22 + Math.sin(h) * 11); look.copy(tp);
     }
     const gy = env.groundHeightAt(pos.x, pos.z) + 1.5;
     if (pos.y < gy) pos.y = gy;
-    if (cine.snap) { cine.pos.copy(pos); cine.look.copy(look); cine.snap = false; }
-    cine.pos.lerp(pos, 1 - Math.exp(-dt * 2.5));
+    fitFov(camera, 70, 45, 85);
+    const base = camera.fov;
+    const want = tp && s !== 'wide' ? Math.min(base, Math.max(10, 16 * Math.atan(5.5 / Math.max(1, pos.distanceTo(tp))) * 180 / Math.PI)) : base;
+    if (cine.snap) { cine.pos.copy(pos); cine.look.copy(look); cine.fov = want; cine.snap = false; }
+    cine.pos.lerp(pos, 1 - Math.exp(-dt * (s === 'follow' || s === 'orbit' ? 6 : 2.5)));
     cine.look.lerp(look, 1 - Math.exp(-dt * 4));
+    cine.fov += (want - cine.fov) * (1 - Math.exp(-dt * 3));
+    camera.fov = Math.min(base, cine.fov); camera.updateProjectionMatrix();
     camera.position.copy(cine.pos);
     camera.lookAt(cine.look);
+    // the menu covers the left half (landscape) / the bottom (portrait): put the plane in the open part of the screen
+    const vf = (camera.fov * Math.PI) / 360;
+    if (camera.aspect >= 1) camera.rotateY(Math.atan(0.4 * Math.tan(vf) * camera.aspect));
+    else camera.rotateX(-Math.atan(0.1 * Math.tan(vf)));
   }
 
-  return { ai, start, update, updateCamera, clearAround, spawn, despawn, get shot() { return cine.shot; } };
+  return { ai, start, update, updateCamera, clearAround, spawn, despawn, seedRivals, get shot() { return cine.shot; } };
 }
