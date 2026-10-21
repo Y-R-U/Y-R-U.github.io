@@ -6,11 +6,20 @@ import { buildExterior } from './exterior.js';
 import { buildCockpit } from './cockpit.js';
 import { createPilot } from './pilot.js';
 import { srgb } from './geom.js';
+import { mergeFarLOD } from './farlod.js';
 
 const D2R = Math.PI / 180;
 const MAX = { aileron: 20 * D2R, elevUp: 28 * D2R, elevDown: 23 * D2R, rudder: 22 * D2R, flaps: 30 * D2R };
 
+// Other aircraft types build through js/plane/types/** (loaded on demand); 'c172' (default) is built below.
+const TYPE_BUILDERS = {
+  tiger: () => import('./types/tiger.js').then((m) => m.createTiger),
+  bathtub: () => import('./types/bathtub.js').then((m) => m.createBathtub),
+};
+export const PLANE_TYPES = ['c172', ...Object.keys(TYPE_BUILDERS)];
+
 export async function createPlane(opts = {}) {
+  if (opts.type && opts.type !== 'c172' && TYPE_BUILDERS[opts.type]) return (await TYPE_BUILDERS[opts.type]())(opts);
   const quality = opts.quality === 'low' ? 'low' : 'high';
   const high = quality === 'high';
   const wantCockpit = opts.cockpit !== false;
@@ -42,6 +51,7 @@ export async function createPlane(opts = {}) {
     frame.name = i ? 'plane-far2' : 'plane-far';
     frame.position.copy(airframe.position);
     frame.add(f.group);
+    if (opts.mergeFar !== false) f.merged = mergeFarLOD(frame, { paint: mats.paint, glass: holes ? 0x2f3a44 : null });
     lod.addLevel(frame, i ? lodDistance2 : lodDistance, 0.08);
     return f;
   });
@@ -150,6 +160,7 @@ export async function createPlane(opts = {}) {
       for (let i = 0; i < spinCol.count; i++) spinCol.setXYZ(i, c[0], c[1], c[2]);
       spinCol.needsUpdate = true;
     }
+    for (const f of fars) f.merged?.recolor('spinner', c);
   }
   setLivery(L);
 

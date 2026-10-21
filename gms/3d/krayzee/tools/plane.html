@@ -29,7 +29,8 @@
 </head>
 <body>
 <div id="ui">
-  <h1>C172 — PLANE lane test</h1>
+  <h1>PLANE lane test</h1>
+  <div class="row"><label>Type</label><select id="type" style="flex:1;min-width:0;background:#0b0f14;color:#fff;border:1px solid #334;border-radius:6px;padding:4px"><option value="c172">C172 Royal Runabout</option><option value="tiger">Tiger Moth — Grandfather's Moth</option><option value="bathtub">Royal Flying Bathtub</option></select></div>
   <div class="row"><label>Name</label><input id="name" type="text" maxlength="14" value="Dirk Air"></div>
   <div class="row"><label>Reg</label><input id="reg" type="text" maxlength="8" value="K-DIRK"></div>
   <div class="row"><label>Primary</label><input id="primary" type="color" value="#f4f1ea"></div>
@@ -37,6 +38,7 @@
   <div class="row"><label>Accent</label><input id="accent" type="color" value="#e8b21c"></div>
   <div class="row"><button id="vChase" class="on">Chase</button><button id="vCenter">Center</button><button id="vCockpit">Cockpit</button></div>
   <div class="row"><button id="qBtn"></button><button id="anim">Animate</button><button id="gBtn">Pilot: m</button><button id="sBtn">Skin</button></div>
+  <div class="row" id="goldRow" style="display:none"><button id="goldBtn">Gold taps (Emperor)</button></div>
   <div class="row"><label>Night</label><input id="night" type="range" min="0" max="1" step="0.01" value="0.35"><output id="nightO">0.35</output></div>
   <details open><summary>Controls</summary><div id="ctl"></div></details>
   <details><summary>Instruments</summary><div id="ins"></div></details>
@@ -89,8 +91,17 @@ const lines = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 40), new THREE.MeshSta
 lines.rotation.x = -Math.PI / 2; lines.position.set(0, 0.003, 0);
 scene.add(lines);
 
-const plane = await createPlane({ type: 'c172', quality, cockpit: true, livery: { company: 'Dirk Air', registration: 'K-DIRK', primary: '#f4f1ea', secondary: '#1f4fa8', accent: '#e8b21c' } });
-plane.root.position.y = plane.dims.gearHeight;
+const TYPE = Q.get('type') || 'c172';
+const typeSel = document.getElementById('type');
+typeSel.value = TYPE;
+typeSel.onchange = () => { const u = new URL(location.href); u.searchParams.set('type', typeSel.value); location.href = u; };
+const LIV = { company: Q.get('name') ?? 'Dirk Air', registration: Q.get('reg') ?? 'K-DIRK', primary: Q.get('p') ? '#' + Q.get('p') : '#f4f1ea', secondary: Q.get('s') ? '#' + Q.get('s') : '#1f4fa8', accent: Q.get('a') ? '#' + Q.get('a') : '#e8b21c', goldTaps: Q.has('gold') };
+for (const [id, k] of [['name', 'company'], ['reg', 'registration'], ['primary', 'primary'], ['secondary', 'secondary'], ['accent', 'accent']]) document.getElementById(id).value = LIV[k];
+const plane = await createPlane({ type: TYPE, quality, cockpit: Q.get('cockpit') !== '0', pilot: Q.get('pilot') === '0' ? false : undefined, livery: LIV });
+// taildraggers sit tail-down: restHeight + groundPitch (3-point attitude); ?level=1 shows the flight datum level
+const gp = Q.has('level') ? 0 : plane.dims.groundPitch || 0;
+plane.root.position.y = gp ? plane.dims.restHeight : plane.dims.gearHeight;
+plane.root.rotation.x = gp;
 scene.add(plane.root);
 window.__plane = plane;
 
@@ -108,7 +119,7 @@ function placeCamera() {
     const e = (ve ? ve.eye : (view === 'center' ? plane.eyeCenter : plane.eye)).clone(); plane.root.localToWorld(e);
     camera.position.copy(e);
     const pitch = ve && !Q.has('pitch') ? ve.pitch : look.pitch * Math.PI / 180;
-    camera.quaternion.setFromEuler(new THREE.Euler(pitch, look.yaw * Math.PI / 180, 0, 'YXZ'));
+    camera.quaternion.copy(plane.root.quaternion).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch, look.yaw * Math.PI / 180, 0, 'YXZ')));
   } else {
     camera.fov = +(Q.get('fov') ?? 36);
     camera.near = 0.1;
@@ -147,6 +158,7 @@ renderer.domElement.addEventListener('wheel', (e) => { orbit.dist = Math.min(60,
 // UI
 const ui = document.getElementById('ui');
 if (Q.get('ui') === '0') ui.classList.add('hide');
+if (Q.has('shot')) for (const id of ['stats', 'tog']) document.getElementById(id).style.display = 'none';
 document.getElementById('tog').onclick = () => ui.classList.toggle('hide');
 document.getElementById('vChase').onclick = () => setView('chase');
 document.getElementById('vCockpit').onclick = () => setView('cockpit');
@@ -169,7 +181,11 @@ qb.onclick = () => { const u = new URL(location.href); u.searchParams.set('q', q
 let animate = Q.get('anim') === '1';
 const ab = document.getElementById('anim'); ab.classList.toggle('on', animate);
 ab.onclick = () => { animate = !animate; ab.classList.toggle('on', animate); };
-const liv = () => ({ company: document.getElementById('name').value, registration: document.getElementById('reg').value, primary: document.getElementById('primary').value, secondary: document.getElementById('secondary').value, accent: document.getElementById('accent').value });
+const goldBtn = document.getElementById('goldBtn');
+document.getElementById('goldRow').style.display = TYPE === 'bathtub' ? '' : 'none';
+goldBtn.classList.toggle('on', LIV.goldTaps);
+goldBtn.onclick = () => { LIV.goldTaps = !LIV.goldTaps; goldBtn.classList.toggle('on', LIV.goldTaps); plane.setLivery(liv()); };
+const liv = () => ({ goldTaps: LIV.goldTaps, company: document.getElementById('name').value, registration: document.getElementById('reg').value, primary: document.getElementById('primary').value, secondary: document.getElementById('secondary').value, accent: document.getElementById('accent').value });
 for (const id of ['name', 'reg', 'primary', 'secondary', 'accent']) document.getElementById(id).addEventListener('input', () => { const t0 = performance.now(); plane.setLivery(liv()); lastLiveryMs = performance.now() - t0; });
 let lastLiveryMs = 0;
 const controls = { aileron: 0, elevator: 0, rudder: 0, throttle: 0.0, flaps: 0, brake: 0 };

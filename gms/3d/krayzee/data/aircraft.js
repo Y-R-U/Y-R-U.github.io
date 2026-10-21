@@ -1,5 +1,7 @@
 // Aircraft roster. Speeds kt IAS, mass kg, lengths m, climb fpm, rates deg/s.
-// status 'ready' = model + flight model exist; 'planned' = roster/filters only.
+// status 'ready' = model + flight model exist; 'model' = 3D model built (js/plane/types), flight model pending in
+// js/flight/aircraft.js (its TYPES entry is `flight` below); 'planned' = roster/filters only.
+const KT = 0.514444;
 // handling (0..1): rollAuthority, pitchAuthority, yawAuthority, stability (higher = returns to trim faster), groundHandling.
 
 export const AIRCRAFT = {
@@ -18,7 +20,43 @@ export const AIRCRAFT = {
   },
   flexwing:  { name: 'Hang-Glider-with-Opinions', type: 'flex-wing microlight', class: 'ultralight', status: 'planned', ppMult: 1.4, unlockRank: 'earl',      speeds: { vr: 35, approach: 45, cruise: 55 }, notes: 'weight-shift; sluggish roll; blown about by wake', cockpit: 'open_trike' },
   cub:       { name: 'Butter Cub', type: 'Piper J-3 Cub', class: 'light', status: 'planned', ppMult: 1.3, unlockRank: 'viscount',                          speeds: { vr: 40, approach: 50, cruise: 75 }, notes: 'tailwheel ground-loops; lands in 100 m; grass-friendly', gear: 'tailwheel', cockpit: 'ga_generic' },
-  tiger:     { name: "Grandfather's Moth", type: 'DH.82 Tiger Moth', class: 'vintage', status: 'planned', ppMult: 1.3, unlockRank: 'earl',                   speeds: { vr: 45, approach: 55, cruise: 80 }, notes: 'open-cockpit biplane; draggy; scarf physics', gear: 'tailwheel', cockpit: 'open_biplane' },
+  tiger: {
+    name: "Grandfather's Moth", type: 'DH.82A Tiger Moth', class: 'vintage', status: 'model', model: 'tiger', ppMult: 1.3, unlockRank: 'earl',
+    dims: { length: 7.29, span: 8.94, height: 2.68, wingArea: 22.2 },
+    mass: { empty: 506, mtow: 828, typical: 780 },
+    engine: { hp: 130, kind: 'piston', props: 1, maxRpm: 2350, idleRpm: 650, note: 'Gipsy Major I, inverted inline four' },
+    speeds: { vs0: 40, vs1: 40, vr: 45, vx: 52, vy: 60, approach: 55, cruise: 80, vfe: null, vno: 95, vne: 139, taxi: 10 },
+    performance: { climbFpm: 580, ceilingFt: 13600, takeoffRollM: 160, landingRollM: 140, glideRatio: 8.5 },
+    flaps: [0],
+    handling: { rollRate: 45, pitchRate: 40, yawRate: 30, rollAuthority: 0.45, pitchAuthority: 0.6, yawAuthority: 0.7, stability: 0.65, groundHandling: 0.4 },
+    gear: 'tailwheel', water: false,
+    cockpit: 'open_biplane',
+    patternAltM: 240, circuitScale: 0.85,
+    notes: 'open-cockpit biplane; draggy; scarf physics; tail-down 3-point attitude on the ground, ground-loops if you let it',
+    // TYPES entry for js/flight/aircraft.js (SI units: kg, m, N, rad, m/s). See docs/PLANES.md for the tailwheel changes it needs.
+    flight: {
+      mass: 780, wingArea: 22.2, span: 8.94, length: 7.29,
+      CL0: 0.25, CLa: 4.6, alphaStall: 0.22, flapCL: 0, CD0: 0.04, flapCD: 0, K: 0.075, CY: 0.9,
+      thrustMax: 2400, thrustV0: 115, idle: 0.05,
+      maxPitchRate: 0.75, maxRollRate: 0.8, maxYawRate: 0.55,
+      kAlpha: 2.2, alphaTrim: 0.04, kBeta: 2.6, kBank: 0.05, kTrack: 5.0, vRef: 36,
+      inertia: [1000, 1500, 1300],
+      gear: {
+        tailwheel: true,
+        main: [0.8, -0.58], mainY: -1.25, tail: 4.4, tailY: -0.27,
+        kMain: 30000, kTail: 9000, cMain: 2600, cTail: 900, maxSteer: 0.35, tailBrake: false,
+        // fallback for the current tricycle code (sits level, tail wheel steers the wrong way) until tailwheel support lands
+        nose: 4.4, kNose: 9000, cNose: 900,
+      },
+      groundPitch: 0.194, restHeight: 1.13,
+      vr: 45 * KT, vy: 60 * KT, vapp: 55 * KT, vcruise: 80 * KT, vs0: 40 * KT,
+      flapNotches: [0],
+      fuelCap: 43,
+      eye: [0, 0.68, 1.1], eyeCenter: [0, 0.73, 1.16],
+      tailSkid: [0, -0.09, 4.7],
+      hardPoints: { nose: [0, 0.2, -2.15], tail: [0, 0.25, 4.9], wingL: [-4.47, 1.1, -0.4], wingR: [4.47, 1.1, -0.4], lowerWingL: [-4.4, 0.0, 0.2], lowerWingR: [4.4, 0.0, 0.2], belly: [0, -0.33, 0], propTip: [0, -1.0, -2.14] },
+    },
+  },
   sopwith:   { name: 'Jolly Camel', type: 'Sopwith Camel-ish', class: 'vintage', status: 'planned', ppMult: 1.4, unlockRank: 'archduke',                    speeds: { vr: 45, approach: 55, cruise: 90 }, notes: 'vicious right torque roll; rotary engine', gear: 'tailwheel', cockpit: 'open_biplane' },
   spitfire:  { name: 'Teatime', type: 'Supermarine Spitfire-ish', class: 'vintage', status: 'planned', ppMult: 0.9, unlockRank: 'crownprince',             speeds: { vr: 90, approach: 100, cruise: 260 }, notes: 'fast; no forward view on the ground', gear: 'tailwheel', cockpit: 'ga_generic' },
   pitts:     { name: 'Show-Off', type: 'Pitts Special S-2', class: 'aerobatic', status: 'planned', ppMult: 1.1, unlockRank: 'marquess',                     speeds: { vr: 60, approach: 80, cruise: 140 }, notes: '240 deg/s roll; twitchy; short wings', gear: 'tailwheel', cockpit: 'open_biplane' },
@@ -34,7 +72,39 @@ export const AIRCRAFT = {
   a320:      { name: 'Peasant Express', type: 'Airbus A320-ish', class: 'airliner', status: 'planned', ppMult: 0.8, unlockRank: 'king',                      speeds: { vr: 145, approach: 140, cruise: 450 }, notes: 'heavy wake flips light planes', circuitScale: 3.5, wake: 'heavy', cockpit: 'glass_generic' },
   jumbo:     { name: 'Royal Jumbo', type: 'Boeing 747-ish', class: 'airliner', status: 'planned', ppMult: 0.8, unlockRank: 'king',                          speeds: { vr: 160, approach: 150, cruise: 490 }, notes: 'needs the full 1400 m, barely; catastrophic wake', circuitScale: 4, wake: 'super', cockpit: 'glass_generic' },
   autogyro:  { name: 'Spinning Jenny', type: 'autogyro', class: 'silly', status: 'planned', ppMult: 1.4, unlockRank: 'prince',                             speeds: { vr: 30, approach: 35, cruise: 70 }, notes: 'near-vertical landings; cannot hover', cockpit: 'open_trike' },
-  bathtub:   { name: 'Royal Flying Bathtub', type: 'clawfoot tub, propeller on the taps', class: 'silly', status: 'planned', ppMult: 1.6, unlockRank: 'story', speeds: { vr: 40, approach: 45, cruise: 60 }, notes: 'rubber duck co-pilot; wobbles in roll; gold taps at Emperor', cockpit: 'bathtub' },
+  bathtub: {
+    name: 'Royal Flying Bathtub', type: 'clawfoot tub, propeller on the taps', class: 'silly', status: 'model', model: 'bathtub', ppMult: 1.6, unlockRank: 'story',
+    dims: { length: 5.72, span: 5.5, height: 2.5, wingArea: 15 },
+    mass: { empty: 330, mtow: 520, typical: 450 },
+    engine: { hp: 95, kind: 'piston', props: 1, maxRpm: 2700, idleRpm: 700, note: 'hidden under the soap dish; drives the brass three-blade on the tap spout' },
+    speeds: { vs0: 37, vs1: 37, vr: 40, vx: 44, vy: 48, approach: 45, cruise: 60, vfe: null, vno: 68, vne: 85, taxi: 12 },
+    performance: { climbFpm: 560, ceilingFt: 6000, takeoffRollM: 150, landingRollM: 90, glideRatio: 4.8 },
+    flaps: [0],
+    handling: { rollRate: 55, pitchRate: 30, yawRate: 28, rollAuthority: 0.55, pitchAuthority: 0.5, yawAuthority: 0.5, stability: 0.35, groundHandling: 0.7 },
+    gear: 'clawfoot', water: false,
+    cockpit: 'bathtub',
+    patternAltM: 200, circuitScale: 0.7,
+    notes: 'rubber duck co-pilot; wobbles in roll; gold taps at Emperor (livery.goldTaps)',
+    // TYPES entry for js/flight/aircraft.js. wingArea is a game value (the stubby wings are ~5.4 m²; the tub "lifts by decree").
+    flight: {
+      mass: 450, wingArea: 15, span: 5.5, length: 5.72,
+      CL0: 0.3, CLa: 4.0, alphaStall: 0.24, flapCL: 0, CD0: 0.09, flapCD: 0, K: 0.12, CY: 1.2,
+      thrustMax: 1900, thrustV0: 108, idle: 0.05,
+      maxPitchRate: 0.6, maxRollRate: 0.9, maxYawRate: 0.5,
+      kAlpha: 2.0, alphaTrim: 0.05, kBeta: 1.8, kBank: 0.02, kTrack: 4.5, vRef: 30,
+      inertia: [700, 900, 600],
+      rollWobble: { amp: 0.22, hz: 0.45 },
+      gear: {
+        // four ball-and-claw feet: rear pair = mains, front pair = 'nose' (two wheels, track 0.86 m, castoring)
+        main: [0.43, 0.66], nose: -1.19, noseTrack: 0.43, kMain: 26000, kNose: 14000, cMain: 2000, cNose: 1200, maxSteer: 0.5,
+      },
+      vr: 40 * KT, vy: 48 * KT, vapp: 45 * KT, vcruise: 60 * KT, vs0: 37 * KT,
+      flapNotches: [0],
+      fuelCap: 40,
+      eye: [0, 0.72, 0.4], eyeCenter: [0, 0.78, 0.48],
+      hardPoints: { nose: [0, 0.37, -2.05], tail: [0, 0.6, 3.6], wingL: [-2.75, -0.05, -0.2], wingR: [2.75, -0.05, -0.2], belly: [0, -0.45, 0], propTip: [0, -0.4, -1.97] },
+    },
+  },
   throne:    { name: 'Divine Right', type: 'flying throne with jet pack', class: 'silly', status: 'planned', ppMult: 1.5, unlockRank: 'emperor',             speeds: { vr: 50, approach: 55, cruise: 90 }, notes: 'handles like a shopping trolley', cockpit: 'throne' },
   balloon:   { name: 'Hot Air', type: 'hot-air balloon', class: 'silly', status: 'planned', ppMult: 2.0, unlockRank: null, decreeOnly: true,                speeds: { vr: 0, approach: 0, cruise: 15 }, notes: 'altitude only; drifts with wind; landing anywhere counts', cockpit: 'basket' },
 };
