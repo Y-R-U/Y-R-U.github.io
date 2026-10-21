@@ -277,6 +277,17 @@ P['charmer'] = {
  'bump': ["Boing! Ah, that's grand!", "Bounced! Lucky I'm handsome."],
 }
 
+# D14: the tower calls itself "C-Tower <n>", one number per airport. Welcome lines carry {TOWER}; each airport gets its own
+# set (airport 1 keeps ids <voice>.welcome.N; airport n>1 gets <voice>.welcome_a<n>.N, intent 'welcome', airport: n).
+# TTS reads "See Tower One" (a bare "C" gets spelt or dropped); the subtitle says "C-Tower 1".
+AIRPORTS = [1]
+NUM_WORDS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine']
+
+
+def tower_name(n):
+    return f'C-Tower {n}', f'See Tower {NUM_WORDS[n] if n < 10 else n}'
+
+
 # Tower: (intent, tier|None, text, callsign 'pre'|None, rwy 'post'|None)
 ROUTINE = ['taxi', 'hold_short', 'lineup', 'clear_takeoff', 'clear_land', 'go_around', 'traffic',
            'sequence_1', 'sequence_2', 'sequence_3', 'sequence_4', 'extend', 'vacate', 'welcome',
@@ -300,7 +311,7 @@ T['tower_m'] = {
  'sequence_3': ["number three, follow the traffic ahead."], 'sequence_4': ["number four. Make yourself comfortable."],
  'extend': ["extend downwind, I'll call your base.", "extend downwind. Enjoy the view."],
  'vacate': ["vacate next left, taxi to stand.", "vacate when able. Welcome home."],
- 'welcome': ["Krayzee Tower, good morning all stations. Nice and calm today.", "Krayzee Tower is open. Please. Just once. By the book."],
+ 'welcome': ["{TOWER}, good morning all stations. Nice and calm today.", "{TOWER} is open. Please. Just once. By the book."],
  'impeccable': ["lovely landing. Genuinely. I'm writing it down.", "that was textbook. I may frame it."],
  'crown_change': ["All stations. New monarch. Long may they... whatever.", "All stations, the Crown has changed hands. Heaven help us."],
  'scandal': ["return to stand immediately. The press are on line two.", "taxi straight to stand. The Palace has phoned."],
@@ -317,7 +328,7 @@ T['tower_f'] = {
  'sequence_3': ["number three. Follow the traffic."], 'sequence_4': ["number four. Patience is a royal virtue."],
  'extend': ["extend downwind. I'll call your base.", "extend downwind. Think about what you've done."],
  'vacate': ["vacate next exit, taxi to stand.", "vacate promptly. Others have places to be."],
- 'welcome': ["Krayzee Tower. All stations, standard procedures apply. Without exception.", "Krayzee Tower. Good afternoon. Behave."],
+ 'welcome': ["{TOWER}. All stations, standard procedures apply. Without exception.", "{TOWER}. Good afternoon. Behave."],
  'impeccable': ["acceptable landing. Very acceptable.", "that was correct. I'm as surprised as you are."],
  'crown_change': ["All stations. New monarch. Same rules.", "All stations. The Crown has moved. The runway has not."],
  'scandal': ["return to stand. The Herald would like a word.", "taxi to stand immediately. Your flight is under review."],
@@ -334,7 +345,7 @@ T['tower_trainee'] = {
  'sequence_3': ["number three! Nearly there!"], 'sequence_4': ["number four! Sorry!"],
  'extend': ["extend downwind, please! I'll call you! Probably!", "um, could you extend downwind? Thanks!"],
  'vacate': ["vacate the runway, please! Brilliant landing!", "vacate when you can! Lovely!"],
- 'welcome': ["Hi! Krayzee Tower! It's Toby! First week!", "Krayzee Tower, good morning! I've got my cards!"],
+ 'welcome': ["Hi! {TOWER}! It's Toby! First week!", "{TOWER}, good morning! I've got my cards!"],
  'impeccable': ["wow! That was amazing! Can I have your autograph?", "perfect landing! I'm telling Gerald!"],
  'crown_change': ["Everyone! There's a new king! Or queen! Hooray!", "All stations! New monarch! Should I bow?"],
  'scandal': ["um, the newspaper's here? Please go to your stand?", "the Palace is on the phone! For you! Stand, please!"],
@@ -441,7 +452,16 @@ def main():
                 if s != t: e['say'] = s; e['subtitle'] = t
                 out.append(e)
     for v in T:
+        for n in AIRPORTS:
+            sub_name, say_name = tower_name(n)
+            for i, t in enumerate(T[v]['welcome'], 1):
+                e = {'id': f'{v}.welcome.{i}' if n == 1 else f'{v}.welcome_a{n}.{i}', 'voice': v, 'intent': 'welcome',
+                     'airport': n, 'text': t.replace('{TOWER}', sub_name), 'say': t.replace('{TOWER}', say_name),
+                     'delivery': f'{TOWER_STYLE[v]}; standard ATC cadence', 'maxSeconds': secs(t.replace('{TOWER}', say_name))}
+                e['subtitle'] = e['text']
+                out.append(e)
         for intent in ROUTINE:
+            if intent == 'welcome': continue
             for i, t in enumerate(T[v][intent], 1):
                 e = {'id': f'{v}.{intent}.{i}', 'voice': v, 'intent': intent, 'text': t,
                      'delivery': f'{TOWER_STYLE[v]}; standard ATC cadence', 'maxSeconds': secs(t)}

@@ -10,8 +10,8 @@ Audition page: `http://localhost:8888/gms/3d/krayzee/tools/voice/audition.html`
 | `audio/voices/manifest.json` | per voice: `voiceId` (Qwen Voice Studio saved clone), `design`, `seed`, `pick`, `audition` (the reference transcript), `clone` (exact settings), every scored candidate, `sample`, `quality`, `note` |
 | `audio/voices/<id>/sample.mp3` | voice-picker sample, ≤ 4 s, mono 24 kHz 64 kbps, about −16 LUFS, −1.5 dBTP. Clean, with no radio effect (the radio filter is added at runtime) |
 | `audio/voices/<id>/design_<tag>.mp3` | the two best design takes (the saved one and one alternate), 48 kbps, for auditioning |
-| `audio/voices/barks.json` | `{voice: {barkId: {file, duration, text, intent, maxSeconds, callsign?, rwy?, tier?, wer, asr, flags?}}}`. `file` is relative to `audio/voices/` |
-| `audio/voices/<voice>/<barkId>.mp3` | rendered barks. Phase-2 test lines only so far (see below) |
+| `audio/voices/barks.json` | `{voice: {barkId: {file, duration, text, intent, maxSeconds, callsign?, rwy?, tier?, say?, subtitle?, airport?, wer, asr, flags?}}}`. `file` is relative to `audio/voices/` |
+| `audio/voices/<voice>/<barkId>.mp3` | rendered barks, all 816 script lines |
 | `tools/voice/roster.json` | the 18 design descriptions, audition lines, fallback sample lines and expected pitch ranges |
 | `tools/voice/design_voices.py` | `design` / `sample` / `promote` / `repost` / `report` |
 | `tools/voice/gen_barks.py` | phase-2 bark renderer |
@@ -58,10 +58,11 @@ cached in `~/.cache/huggingface`). Scratch WAVs: `~/.cache/krayzee-voice/` (outs
 
 ## Per-voice notes
 
-Pitch is the YIN median of the saved design take. "Accent unverified" means nothing here can measure it, so Aaron's
-audition decides.
+Pitch is the YIN median of the saved design take. **2026-10-22: Aaron auditioned all 18 voices and approved every one,
+including those flagged weak below.** The quality column is the pre-audition machine guess and is kept only as
+history; no voice is to be redesigned.
 
-| id | quality | pitch | notes |
+| id | pre-audition guess | pitch | notes |
 |---|---|---|---|
 | toff | strong | 105 Hz | RP posh is Qwen's home ground. The first design went falsetto; this is the rewrite. |
 | duchess | strong | 182 Hz | Cut-glass RP. All takes clean. |
@@ -78,7 +79,7 @@ audition decides.
 | nan | ok | 232 Hz | Sweet elderly delivery is clean. The Yorkshire accent is probably generic northern. |
 | prince | ok | 156 Hz | Second design. The stammer survives in the clone. |
 | charmer | ok | 106 Hz | Second design. Irish is usually one of Qwen's better accents. |
-| tower_m | strong | 115 Hz | Clear on runway numbers and "Crazy Tower". Splice cuts tested. |
+| tower_m | strong | 115 Hz | Clear on runway numbers and "Crazy Tower" (now "See Tower One", D14). Splice cuts tested. |
 | tower_f | strong | 208 Hz | Icy, clear. All takes clean. |
 | tower_trainee | ok | 152 Hz | Panic now comes from the text. The picked sample says "go round" (flagged); the other take was 296 Hz. |
 
@@ -105,10 +106,24 @@ $PY gen_barks.py --only toff.greeting.1 --redo    # force one line
   suits splicing. Each word is cut at its Whisper word timestamps, snapped to the quietest point of the pause, then
   re-transcribed on its own. The chunk is retried on another seed if any cut fails. A 23-word single read ran the words
   together, which is why the lists are chunked.
-- **Tested so far:** toff.greeting.1/2, tower_m.taxi.1, all 10 tower_m digits (all re-transcribe correctly) and all
-  23 tower_m titles. Titles: 21/23 clean. "Marchioness" re-heard alone as "Martian S" (it was fine in the list read).
-  "Archduchess" is 1.2 s and "Crown Princess" can exceed DESIGN's 1.0 s `maxSeconds`. Four-syllable titles need
-  about 1.2 s.
+- **Status (2026-10-22): complete.** All 816 script ids are in barks.json with an mp3 on disk (0 missing, 0 stale,
+  0 extra). 68 takes carry a flag: 39 `wer`, 29 `long`, 3 `listen` (some carry two). Nearly all `wer` flags are Whisper
+  mishearing dialect or phonetic spellings ("Landon" for "Landin'", "eat" for comte's "eet", "take off" for
+  "takeoff"), which is the accent working. `long` overruns are all ≤ 0.6 s past `maxSeconds` after the 1.25× cap.
+  Worth an ear: `tower_*.cs_title_marchioness` (all three tower voices), `tower_f.cs_title_queen` (heard as "Queen
+  and..."; the cut may carry a breath of "and"), `tower_m.rwy_09` ("0-9-er"), `baronin.queue_jump.2` ("vape").
+  Four broken splice cuts were re-rendered with `--redo` (trainee "Earl" was a 0.23 s fragment; "Four" ×2 and tower_f
+  "Countess" had bled cuts); all four now re-transcribe correctly.
+- **D14 welcome lines.** The six `tower_*.welcome.1/2` lines say "See Tower One" (`say`) with `text`/`subtitle`
+  "C-Tower 1". `AIRPORTS` in build_script.py lists airport numbers; airport n > 1 adds `<voice>.welcome_a<n>.<i>` with
+  `airport: n`. Add the number, rebuild the script, then run gen_barks.py; only the new ids render.
+- **Subtitles.** `text` is always the normal spelling and is what RADIO shows (js/radio/lines.js reads `text`; it
+  never reads `subtitle`, which is fine because `subtitle == text` whenever present). `say` is the TTS spelling.
+  barks.json carries `say`, `subtitle` and `airport` from the script.
+- **Size:** 870 mp3s, `audio/voices/` totals 15 MB (barks 11.3 MB at 48 kbps mono). Under the 25 MB budget, so no
+  re-encode was needed.
+- **Playback check:** tools/radio.html over CDP (port 9471), every bench event fired: 48 clip requests, all 200, no
+  console errors apart from the server's missing favicon.
 - **Cost:** one take is about 8.4 s wall on average (4.6–16.6 s). That is mostly the per-job model load, since the
   studio spawns a fresh worker each time, so short lines cost nearly as much as long ones. Splice lists need about
   4 takes per 6 words. Estimate for the full script: 717 sentences × ~1.4 takes × ~9 s ≈ **2.5 h**, plus splices for
@@ -119,4 +134,4 @@ $PY gen_barks.py --only toff.greeting.1 --redo    # force one line
 
 - Voice Studio has no delete endpoint. Superseded `Krayzee · toff/comte/baronin` entries remain on its shelf; their
   ids are listed under `_superseded` in manifest.json. The manifest is the source of truth.
-- Audio total right now is about 2.9 MB: samples 444 KB, design takes 2.1 MB, test barks the rest.
+- Audio total is 15 MB: samples 444 KB, design takes 2.1 MB, barks 11.3 MB.

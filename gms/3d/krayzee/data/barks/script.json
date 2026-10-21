@@ -4117,6 +4117,28 @@
    "maxSeconds": 2.0
   },
   {
+   "id": "tower_m.welcome.1",
+   "voice": "tower_m",
+   "intent": "welcome",
+   "airport": 1,
+   "text": "C-Tower 1, good morning all stations. Nice and calm today.",
+   "say": "See Tower One, good morning all stations. Nice and calm today.",
+   "delivery": "calm male controller, weary; standard ATC cadence",
+   "maxSeconds": 4.4,
+   "subtitle": "C-Tower 1, good morning all stations. Nice and calm today."
+  },
+  {
+   "id": "tower_m.welcome.2",
+   "voice": "tower_m",
+   "intent": "welcome",
+   "airport": 1,
+   "text": "C-Tower 1 is open. Please. Just once. By the book.",
+   "say": "See Tower One is open. Please. Just once. By the book.",
+   "delivery": "calm male controller, weary; standard ATC cadence",
+   "maxSeconds": 4.4,
+   "subtitle": "C-Tower 1 is open. Please. Just once. By the book."
+  },
+  {
    "id": "tower_m.taxi.1",
    "voice": "tower_m",
    "intent": "taxi",
@@ -4317,22 +4339,6 @@
    "delivery": "calm male controller, weary; standard ATC cadence",
    "maxSeconds": 2.3,
    "callsign": "pre"
-  },
-  {
-   "id": "tower_m.welcome.1",
-   "voice": "tower_m",
-   "intent": "welcome",
-   "text": "Krayzee Tower, good morning all stations. Nice and calm today.",
-   "delivery": "calm male controller, weary; standard ATC cadence",
-   "maxSeconds": 4.0
-  },
-  {
-   "id": "tower_m.welcome.2",
-   "voice": "tower_m",
-   "intent": "welcome",
-   "text": "Krayzee Tower is open. Please. Just once. By the book.",
-   "delivery": "calm male controller, weary; standard ATC cadence",
-   "maxSeconds": 4.0
   },
   {
    "id": "tower_m.impeccable.1",
@@ -5064,6 +5070,28 @@
    "maxSeconds": 1.6
   },
   {
+   "id": "tower_f.welcome.1",
+   "voice": "tower_f",
+   "intent": "welcome",
+   "airport": 1,
+   "text": "C-Tower 1. All stations, standard procedures apply. Without exception.",
+   "say": "See Tower One. All stations, standard procedures apply. Without exception.",
+   "delivery": "icy precise female controller; standard ATC cadence",
+   "maxSeconds": 4.0,
+   "subtitle": "C-Tower 1. All stations, standard procedures apply. Without exception."
+  },
+  {
+   "id": "tower_f.welcome.2",
+   "voice": "tower_f",
+   "intent": "welcome",
+   "airport": 1,
+   "text": "C-Tower 1. Good afternoon. Behave.",
+   "say": "See Tower One. Good afternoon. Behave.",
+   "delivery": "icy precise female controller; standard ATC cadence",
+   "maxSeconds": 2.7,
+   "subtitle": "C-Tower 1. Good afternoon. Behave."
+  },
+  {
    "id": "tower_f.taxi.1",
    "voice": "tower_f",
    "intent": "taxi",
@@ -5264,22 +5292,6 @@
    "delivery": "icy precise female controller; standard ATC cadence",
    "maxSeconds": 3.0,
    "callsign": "pre"
-  },
-  {
-   "id": "tower_f.welcome.1",
-   "voice": "tower_f",
-   "intent": "welcome",
-   "text": "Krayzee Tower. All stations, standard procedures apply. Without exception.",
-   "delivery": "icy precise female controller; standard ATC cadence",
-   "maxSeconds": 3.7
-  },
-  {
-   "id": "tower_f.welcome.2",
-   "voice": "tower_f",
-   "intent": "welcome",
-   "text": "Krayzee Tower. Good afternoon. Behave.",
-   "delivery": "icy precise female controller; standard ATC cadence",
-   "maxSeconds": 2.3
   },
   {
    "id": "tower_f.impeccable.1",
@@ -6011,6 +6023,28 @@
    "maxSeconds": 1.6
   },
   {
+   "id": "tower_trainee.welcome.1",
+   "voice": "tower_trainee",
+   "intent": "welcome",
+   "airport": 1,
+   "text": "Hi! C-Tower 1! It's Toby! First week!",
+   "say": "Hi! See Tower One! It's Toby! First week!",
+   "delivery": "eager nervous young trainee; standard ATC cadence",
+   "maxSeconds": 3.4,
+   "subtitle": "Hi! C-Tower 1! It's Toby! First week!"
+  },
+  {
+   "id": "tower_trainee.welcome.2",
+   "voice": "tower_trainee",
+   "intent": "welcome",
+   "airport": 1,
+   "text": "C-Tower 1, good morning! I've got my cards!",
+   "say": "See Tower One, good morning! I've got my cards!",
+   "delivery": "eager nervous young trainee; standard ATC cadence",
+   "maxSeconds": 3.7,
+   "subtitle": "C-Tower 1, good morning! I've got my cards!"
+  },
+  {
    "id": "tower_trainee.taxi.1",
    "voice": "tower_trainee",
    "intent": "taxi",
@@ -6211,22 +6245,6 @@
    "delivery": "eager nervous young trainee; standard ATC cadence",
    "maxSeconds": 2.3,
    "callsign": "pre"
-  },
-  {
-   "id": "tower_trainee.welcome.1",
-   "voice": "tower_trainee",
-   "intent": "welcome",
-   "text": "Hi! Krayzee Tower! It's Toby! First week!",
-   "delivery": "eager nervous young trainee; standard ATC cadence",
-   "maxSeconds": 3.0
-  },
-  {
-   "id": "tower_trainee.welcome.2",
-   "voice": "tower_trainee",
-   "intent": "welcome",
-   "text": "Krayzee Tower, good morning! I've got my cards!",
-   "delivery": "eager nervous young trainee; standard ATC cadence",
-   "maxSeconds": 3.4
   },
   {
    "id": "tower_trainee.impeccable.1",

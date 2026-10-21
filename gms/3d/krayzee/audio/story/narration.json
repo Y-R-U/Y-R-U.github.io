@@ -1,0 +1,215 @@
+{
+ "voice": {
+  "voiceId": "60aba71828f642718a09d0f0978475cf",
+  "name": "Krayzee · narrator",
+  "seed": 37,
+  "clone": {
+   "mode": "clone",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "",
+   "reference_id": "c7f90464f2c841e689758fbe6357048d",
+   "ref_text": "Once upon a time, in a kingdom with far too many aeroplanes, there lived a family who had never once waited their turn. This is their story, more or less.",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1,
+   "seed": 37
+  },
+  "audition": "Once upon a time, in a kingdom with far too many aeroplanes, there lived a family who had never once waited their turn. This is their story, more or less.",
+  "candidates": [
+   {
+    "seed": 11,
+    "job": "25d4d43e53fb4586b07d2f012725722c",
+    "wer": 0.0,
+    "f0": 162,
+    "spread": 5.01,
+    "dur": 11.2,
+    "score": 1.052,
+    "asr": "Once upon a time in a kingdom with far too many aeroplanes, there lived a family who had never once waited their turn. This is their story, more or less.",
+    "settings": {
+     "mode": "design",
+     "speaker": "Ryan",
+     "language": "English",
+     "instruct": "A warm, deep, low-pitched mature British male narrator with received pronunciation. An ordinary adult male speaking voice at normal volume, unhurried storytelling pace, dry and gently amused, like a fond documentary presenter reading a fairy tale aloud.",
+     "temperature": 0.9,
+     "top_p": 1.0,
+     "top_k": 50,
+     "repetition_penalty": 1.05,
+     "speed": 1,
+     "seed": 11
+    }
+   },
+   {
+    "seed": 23,
+    "job": "5a4e53c94d2942999beec3a42504955a",
+    "wer": 0.0,
+    "f0": 158,
+    "spread": 3.46,
+    "dur": 14.16,
+    "score": 0.706,
+    "asr": "Once upon a time, in a kingdom with far too many aeroplanes, there lived a family who had never once waited their turn. This is their story, more or less.",
+    "settings": {
+     "mode": "design",
+     "speaker": "Ryan",
+     "language": "English",
+     "instruct": "A warm, deep, low-pitched mature British male narrator with received pronunciation. An ordinary adult male speaking voice at normal volume, unhurried storytelling pace, dry and gently amused, like a fond documentary presenter reading a fairy tale aloud.",
+     "temperature": 0.9,
+     "top_p": 1.0,
+     "top_k": 50,
+     "repetition_penalty": 1.05,
+     "speed": 1,
+     "seed": 23
+    }
+   },
+   {
+    "seed": 37,
+    "job": "9040ee6553f843859774edb11aeafe8e",
+    "wer": 0.0,
+    "f0": 83,
+    "spread": 2.21,
+    "dur": 13.12,
+    "score": -0.221,
+    "asr": "Once upon a time, in a kingdom with far too many aeroplanes, there lived a family who had never once waited their turn. This is their story, more or less.",
+    "settings": {
+     "mode": "design",
+     "speaker": "Ryan",
+     "language": "English",
+     "instruct": "A warm, deep, low-pitched mature British male narrator with received pronunciation. An ordinary adult male speaking voice at normal volume, unhurried storytelling pace, dry and gently amused, like a fond documentary presenter reading a fairy tale aloud.",
+     "temperature": 0.9,
+     "top_p": 1.0,
+     "top_k": 50,
+     "repetition_penalty": 1.05,
+     "speed": 1,
+     "seed": 37
+    }
+   }
+  ]
+ },
+ "lines": {
+  "i01": {
+   "file": "i01.mp3",
+   "text": "Once upon a time, last Tuesday or thereabouts, there was a kingdom called Krayzee.",
+   "dur": 5.33,
+   "wer": 0.071,
+   "asr": "Once upon a time, last Tuesday or thereabouts, there was a kingdom called Krazy.",
+   "seed": 3,
+   "lufs": -17.0,
+   "bytes": 43437,
+   "flags": []
+  },
+  "i02": {
+   "file": "i02.mp3",
+   "text": "Its royal family did not hunt, or fish, or open hospitals. They flew.",
+   "dur": 5.31,
+   "wer": 0.0,
+   "asr": "Its royal family did not hunt, or fish, or open hospitals, they flew.",
+   "seed": 1,
+   "lufs": -16.9,
+   "bytes": 43245,
+   "flags": []
+  },
+  "i03": {
+   "file": "i03.mp3",
+   "text": "In nineteen oh seven, the Royal Chemist, attempting a self-buttering crumpet, invented impossi-rubber instead.",
+   "dur": 7.47,
+   "wer": 0.188,
+   "asr": "In 1907, the royal chemist, attempting a self-buttering crumpet, invented impossi rubber instead.",
+   "seed": 3,
+   "lufs": -16.8,
+   "bytes": 60525,
+   "flags": [
+    "wer"
+   ]
+  },
+  "i04": {
+   "file": "i04.mp3",
+   "text": "The King had a biplane made of it that afternoon, flew it into the cathedral, bounced off, and declared aviation perfectly safe.",
+   "dur": 8.37,
+   "wer": 0.0,
+   "asr": "The king had a biplane made of it that afternoon, flew it into the cathedral, bounced off and declared aviation perfectly safe.",
+   "seed": 1,
+   "lufs": -16.9,
+   "bytes": 67629,
+   "flags": []
+  },
+  "i05": {
+   "file": "i05.mp3",
+   "text": "Every royal aircraft since has been made of the stuff. And every rule of the air was written for other people.",
+   "dur": 5.66,
+   "wer": 0.0,
+   "asr": "Every Royal aircraft since has been made of the stuff, and every rule of the air was written for other people.",
+   "seed": 1,
+   "lufs": -16.7,
+   "bytes": 45933,
+   "flags": []
+  },
+  "i06": {
+   "file": "i06.mp3",
+   "text": "Somebody still has to read those rules out. That is the control tower.",
+   "dur": 3.94,
+   "wer": 0.0,
+   "asr": "Somebody still has to read those rules out. That is the control tower.",
+   "seed": 1,
+   "lufs": -16.7,
+   "bytes": 32109,
+   "flags": []
+  },
+  "i07": {
+   "file": "i07.mp3",
+   "text": "The tower remains calm. Mostly. It has a therapist, and a great deal of tea.",
+   "dur": 6.03,
+   "wer": 0.0,
+   "asr": "The tower remains calm, mostly. It has a therapist and a great deal of tea.",
+   "seed": 1,
+   "lufs": -16.7,
+   "bytes": 49005,
+   "flags": []
+  },
+  "i08": {
+   "file": "i08.mp3",
+   "text": "The House of Pomfrey Smythe has won the Royal Hangar for two hundred years. They fly in mauve. They are insufferable.",
+   "dur": 7.63,
+   "wer": 0.0,
+   "asr": "The House of Pomfrey Smythe has won the royal hangar for two hundred years. They fly in mauve. They are insufferable.",
+   "seed": 1,
+   "lufs": -16.9,
+   "bytes": 61677,
+   "flags": []
+  },
+  "i09": {
+   "file": "i09.mp3",
+   "text": "Which brings us... to you. This morning, the Queen ennobled you, for reasons nobody can quite remember.",
+   "dur": 6.88,
+   "wer": 0.0,
+   "asr": "Which brings us... to you. This morning the Queen ennobled you for reasons nobody can quite remember.",
+   "seed": 1,
+   "lufs": -16.9,
+   "bytes": 55725,
+   "flags": []
+  },
+  "i10": {
+   "file": "i10.mp3",
+   "text": "You have a title, an aeroplane, and absolutely no intention of waiting your turn.",
+   "dur": 5.41,
+   "wer": 0.0,
+   "asr": "You have a title, an aeroplane, and absolutely no intention of waiting your turn.",
+   "seed": 1,
+   "lufs": -16.8,
+   "bytes": 44013,
+   "flags": []
+  },
+  "i11": {
+   "file": "i11.mp3",
+   "text": "Welcome to Crazy.",
+   "dur": 1.15,
+   "wer": 0.0,
+   "asr": "Welcome to crazy.",
+   "seed": 1,
+   "lufs": -16.6,
+   "bytes": 9837,
+   "flags": []
+  }
+ }
+}

@@ -67,7 +67,7 @@ def entry(v, l, M, out, **kw):
     du = dur(out)
     e = dict(file=f"{v}/{l['id']}.mp3", duration=round(du, 2), text=l['text'], intent=l.get('intent'),
              maxSeconds=float(l.get('maxSeconds') or 4.0), bytes=os.path.getsize(out), voiceId=M[v]['voiceId'], **kw)
-    for k in ('callsign', 'rwy', 'tier', 'say', 'review'):
+    for k in ('callsign', 'rwy', 'tier', 'say', 'subtitle', 'airport', 'review'):
         if k in l:
             e[k] = l[k]
     return reflag(e, e.pop('flags', []))
