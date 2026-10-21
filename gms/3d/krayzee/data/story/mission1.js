@@ -35,9 +35,9 @@ export function mission1Route(end = '27', diff = 'medium') {
     { kind: 'fly', to: [-250, 250, -1600], speed: 92, flaps: 0, label: 'TO THE CASTLE' },
     { kind: 'fly', to: [480, 200, -2050], speed: 90, flaps: 0, label: 'CASTLE' },
     { kind: 'fly', to: [1120, 200, -1980], speed: 90, flaps: 0, label: 'CASTLE' },
-    { kind: 'fly', to: [ix, 170, iz], speed: 92, flaps: 0, label: 'TO THE TOWER' },
-    { kind: 'fly', to: [px - dx * 450, tp.alt + 15, pz - dz * 450], speed: 88, flaps: 0, clearance: 25, label: 'TOWER' },
-    { kind: 'fly', to: [px, tp.alt, pz], speed: 85, flaps: 0, clearance: 25, label: 'TOWER' },
+    { kind: 'fly', to: [ix, Math.max(90, tp.alt + 20), iz], speed: 88, flaps: 0, clearance: 40, label: 'TO THE TOWER' },
+    { kind: 'fly', to: [px - dx * 700, tp.alt - 8, pz - dz * 700], speed: 85, flaps: 0, clearance: 25, label: 'TOWER' },
+    { kind: 'fly', to: [px, tp.alt - 8, pz], speed: 85, flaps: 0, clearance: 25, label: 'TOWER' },
     { kind: 'fly', to: [px + dx * 700, tp.alt + 60, pz + dz * 700], speed: 90, flaps: 0, label: 'CLIMB AWAY' },
     { kind: 'fly', to: [p0x, 230, p0z], speed: 95, flaps: 0, label: 'POSITIONING' },
     { kind: 'fly', to: [p1x, 210, p1z], speed: 88, flaps: 0, label: 'LINE UP' },
@@ -45,7 +45,7 @@ export function mission1Route(end = '27', diff = 'medium') {
     { kind: 'fly', to: [p3x, 220, p3z], speed: 88, flaps: 0, label: 'GO ROUND' },
     { kind: 'fly', to: [p4x, 230, p4z], speed: 92, flaps: 0, label: 'GO ROUND' },
   ];
-  return { name: `mission 1 ${end}`, legs, loop: 12, marks: { towerIn: 7, towerOut: 11, lineUp: 12, landWindow: 13 }, threshold: [e.thr[0], 1, e.thr[1]], end };
+  return { name: `mission 1 ${end}`, legs, loop: 12, marks: { castle: 4, towerIn: 7, towerOut: 11, lineUp: 12, landWindow: 13 }, threshold: [e.thr[0], 1, e.thr[1]], end };
 }
 
 export const MISSION_1 = {
@@ -64,6 +64,7 @@ export const MISSION_1 = {
         : 'The autopilot taxis you out and waits its turn. Tap <b>2×</b> or <b>5×</b> to hurry things along.',
       target: (c) => ({ pos: c.route.threshold, label: `RWY ${c.route.end}` }),
       done: (c) => !c.s.onGround || (c.s.leg === 'takeoff' && c.s.gsKt > 30),
+      hint: { after: 45, text: () => 'Stuck behind someone? <b>SKIP TO RUNWAY</b> puts you there at once.' },
     },
     {
       id: 'takeoff',
@@ -78,7 +79,7 @@ export const MISSION_1 = {
       update: (c, dt) => {
         if (c.s.stick) { c.flag.manualT += dt; c.flag.turned = Math.max(c.flag.turned, Math.abs((((c.s.heading - c.flag.hdg0) + 540) % 360) - 180)); }
       },
-      done: (c) => c.flag.manualT > 1.2 && (c.flag.turned > 20 || c.flag.manualT > 4),
+      done: (c) => c.flag.manualT > 1.2 && (c.flag.turned > 15 || c.flag.manualT > 3.5),
       hint: { after: 14, text: (c) => (c.touch ? 'Put a thumb on the left side of the screen and drag. Anywhere there.' : 'Press an arrow key and hold it.') },
       warpHold: 'Your turn',
     },
@@ -89,20 +90,31 @@ export const MISSION_1 = {
     },
     {
       id: 'radio',
+      resumeLeg: (c) => c.route.marks.castle,
       coach: () => 'Lord Rupert Pomfrey-Smythe is on the radio, being rude. <b>Answer him</b>: tap a reply.',
-      enter: (c) => { c.host.rivalBark('insult'); },
-      update: (c) => { if (c.stepT > 9 && !c.flag.again && !c.s.radioWindow) { c.flag.again = 1; c.setCoach('Tap <b>RADIO</b> and say something to him. Anything.'); } },
+      enter: (c) => {
+        if (c.s.legIndex < c.route.marks.castle || c.s.legIndex >= c.route.marks.towerIn) c.host.setRoute(c.route, c.route.marks.castle);
+        c.flag.tries = 0; c.flag.next = 0;
+      },
+      update: (c) => {
+        if (c.s.radioWindow) c.flag.win = 1;
+        // the radio drops a bark that lands too soon after another response window: ask again until one opens
+        if (!c.flag.win && c.flag.tries < 3 && c.stepT >= c.flag.next) { c.host.rivalBark('insult'); c.flag.tries++; c.flag.next = c.stepT + 9; }
+        if (!c.flag.again && !c.s.radioWindow && c.stepT > 9 && (c.flag.win || c.flag.tries >= 3)) { c.flag.again = 1; c.setCoach('Tap <b>RADIO</b> and say something to him. Anything.'); }
+      },
       done: (c) => c.since('barked') > 0,
       warpHold: 'Radio',
     },
     {
       id: 'castle',
+      resumeLeg: (c) => c.route.marks.castle,
       coach: () => 'Follow the <b>gold marker</b> to the castle. Wave at Mother.',
       target: () => ({ pos: CASTLE_PT, label: 'CASTLE' }),
       done: (c) => d2(c.s, CASTLE_PT) < 650,
     },
     {
       id: 'crime',
+      resumeLeg: (c) => c.route.marks.towerIn,
       coach: (c) => (c.diff === 'easy'
         ? 'Now a small crime. The autopilot is heading for the <b>control tower</b>. Low. Enjoy it.'
         : 'Now a small crime: <b>buzz the control tower</b>. Steer for it and get down low.'),
@@ -119,21 +131,24 @@ export const MISSION_1 = {
     },
     {
       id: 'land',
-      coach: () => 'The tower is speechless. Head for the runway and press <b>LAND</b>.',
+      resumeLeg: (c) => c.route.marks.towerOut,
+      coach: () => 'The tower is speechless. The autopilot lines you up: press <b>LAND</b> once the runway is dead ahead.',
       target: (c) => ({ pos: c.route.threshold, label: `RWY ${c.route.end}` }),
       enter: (c) => { if (c.s.legIndex < c.route.marks.towerOut) c.host.setRoute(c.route, c.route.marks.towerOut); },
-      update: (c) => { c.showLandButton(c.s.legIndex >= c.route.marks.lineUp); },
+      update: (c) => { c.showLandButton(c.s.legIndex >= c.route.marks.landWindow); },
       done: (c) => c.s.landing || (c.s.onGround && c.s.leg === 'approach'),
       hint: { after: 50, text: () => 'Point the nose at the runway, then press <b>LAND</b>.' },
     },
     {
       id: 'touchdown',
+      noRelaunch: true,
       coach: () => 'Hands off. The autopilot flies the approach, flares, and stops.',
       done: (c) => c.s.onGround && c.s.gsKt < 6,
       warpHold: 'Landing',
     },
     {
       id: 'stop',
+      noRelaunch: true,
       coach: (c) => ({ easy: 'Stopped near the runway. That will do nicely.', medium: 'You must stop <b>on the runway</b> or the terminal apron.', hard: 'Hard rules: taxi to the <b>marked stand</b> at the terminal.' })[c.diff],
       target: (c) => (c.diff === 'hard' ? { pos: [DEFAULT_SPOT.x, 2, DEFAULT_SPOT.z], label: DEFAULT_SPOT.id } : null),
       enter: (c) => { if (c.diff === 'hard') c.host.taxiTo(DEFAULT_SPOT.id); },
@@ -141,6 +156,7 @@ export const MISSION_1 = {
     },
     {
       id: 'demand',
+      noRelaunch: true,
       coach: () => 'Now press <b>LANDED — DEMAND IT</b>. It banks your Privilege, and they refuel you. Naturally.',
       update: (c) => { c.showDemandButton(c.s.finishState == null); },
       done: (c) => c.since('finished') > 0,
