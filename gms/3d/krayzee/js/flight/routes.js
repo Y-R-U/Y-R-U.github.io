@@ -1,4 +1,5 @@
 import { RUNWAYS, TAXIWAYS, STANDS, APRON, PATTERN_ALT, HOLD_OFFSET, CIRCUIT, headingToVec, threshold, runwayHeadingFor } from '../world/layout.js';
+import { AIRCRAFT } from '../../data/aircraft.js';
 
 const APRON_LANE_Z = APRON.center[2] + APRON.size[1] / 2 - 35; // same lane ATC's taxiToStand uses
 
@@ -240,15 +241,26 @@ export const GLIDE_DEG = 4;
 export const AIM_DIST = 130;
 export const FAF_DIST = 1900;
 
-export function circuitLegs(endId, { alt = PATTERN_ALT, side = circuitSide(endId), width = 1150, speed = 85 } = {}) {
+// Slower types fly a lower, tighter circuit (roster patternAltM / circuitScale) inside the C172's: pass { type }.
+export function circuitOpts(type) {
+  const a = type && type !== 'c172' ? AIRCRAFT[type] : null;
+  const k = a?.circuitScale ?? 1;   // alt ~ scale²: tiger ~217 m, bathtub ~147 m, vertically clear of each other's downwinds
+  return a?.flight ? { alt: Math.min(a.patternAltM ?? PATTERN_ALT, Math.round(PATTERN_ALT * k * k)), width: Math.round(1150 * k) } : {};
+}
+const withType = (o = {}) => (o.type ? { ...circuitOpts(o.type), ...o } : o);
+const circOf = (o = {}) => { const c = {}; for (const k of ['type', 'alt', 'width', 'side']) if (o[k] != null) c[k] = o[k]; return Object.keys(c).length ? c : undefined; };
+
+export function circuitLegs(endId, opts = {}) {
+  const { alt = PATTERN_ALT, side = circuitSide(endId), width = 1150, speed = 85 } = withType(opts);
   const e = runwayEnd(endId), sg = side === 'left' ? -1 : 1, L = e.len;
   const p = (s, l, a) => { const [x, z] = fromRunway(e, s, l * sg); return [x, a, z]; };
+  const gp = (s) => (alt < PATTERN_ALT ? Math.max(e.elev + (AIM_DIST - s) * Math.tan(GLIDE_DEG * Math.PI / 180), 0) : 0); // low circuits: base not below the glide path
   return [
     { kind: 'fly', to: p(L + 450, 0, alt * 0.6), speed: 74, flaps: 0, label: 'UPWIND' },
     { kind: 'fly', to: p(L + 750, width * 0.75, alt), speed, flaps: 0, label: 'CROSSWIND' },
     { kind: 'fly', to: p(L * 0.5, width, alt), speed, flaps: 0, label: 'DOWNWIND' },
-    { kind: 'fly', to: p(-1500, width, alt * 0.78), speed: 75, flaps: 1 / 3, label: 'DOWNWIND', end: endId, ext: true },
-    { kind: 'fly', to: p(-1800, width * 0.35, alt * 0.55), speed: 72, flaps: 1 / 3, label: 'BASE', end: endId, ext: true },
+    { kind: 'fly', to: p(-1500, width, Math.max(alt * 0.78, gp(-1500))), speed: 75, flaps: 1 / 3, label: 'DOWNWIND', end: endId, ext: true },
+    { kind: 'fly', to: p(-1800, width * 0.35, Math.max(alt * 0.55, gp(-1800))), speed: 72, flaps: 1 / 3, label: 'BASE', end: endId, ext: true },
   ];
 }
 
@@ -263,6 +275,7 @@ export function circuitRoute(endId = '09', opts = {}) {
       { kind: 'hold', end: endId, seconds: opts.holdSeconds ?? 4, untilClear: true, label: 'HOLD SHORT' },
     ],
     loop: 0,
+    circ: circOf(opts),
   };
 }
 
@@ -289,7 +302,8 @@ export function departureRoute(endId = '09', { outHeading = null, dist = 9000, a
 // Arrival from wherever the plane is: join downwind at 45°, land, taxi to a stand, park.
 // From the far side (`from` = [x, z]) it first crosses the extended centreline well beyond the upwind end, high, so it
 // never cuts through the final approach or the field.
-export function arrivalRoute(endId = '09', { stand = 'auto', parkSeconds = 25, then = null, from = null, ...o } = {}) {
+export function arrivalRoute(endId = '09', { stand = 'auto', parkSeconds = 25, then = null, from = null, ...o0 } = {}) {
+  const o = withType(o0);
   const c = circuitLegs(endId, o);
   const e = runwayEnd(endId), sg = (o.side || circuitSide(endId)) === 'left' ? -1 : 1, w = o.width || 1150;
   const alt = o.alt || PATTERN_ALT;
@@ -308,6 +322,7 @@ export function arrivalRoute(endId = '09', { stand = 'auto', parkSeconds = 25, t
       ...(then ? then.legs : []),
     ],
     loop: null,
+    circ: circOf(o0),
   };
 }
 
@@ -315,14 +330,14 @@ export function arrivalRoute(endId = '09', { stand = 'auto', parkSeconds = 25, t
 export function rerouteRunway(route, i, { onGround, x = 0, z = 0 }, end) {
   const name = route?.name || '', legs = route?.legs || [];
   if (name.startsWith('circuits')) {
-    const c = circuitRoute(end);
+    const c = circuitRoute(end, route.circ || {});
     return { route: { ...c, laps: route.laps }, i: onGround ? c.legs.findIndex((l) => l.kind === 'taxi') : 1 };
   }
   const pk = legs.findIndex((l) => l.kind === 'park' && l.label !== 'BOARDING');
   const dep = departureRoute(end);
   if (name.startsWith('arrival')) {
     const ai = legs.findIndex((l) => l.kind === 'approach');
-    if (!onGround && i <= ai) return { route: arrivalRoute(end, { stand: 'auto', parkSeconds: legs[pk]?.seconds ?? 25, then: dep, from: [x, z] }), i: 0 };
+    if (!onGround && i <= ai) return { route: arrivalRoute(end, { ...(route.circ || {}), stand: 'auto', parkSeconds: legs[pk]?.seconds ?? 25, then: dep, from: [x, z] }), i: 0 };
     if (pk < 0 || !onGround) return null;
     return { route: { ...route, legs: [...legs.slice(0, pk + 1), ...dep.legs] }, i: Math.min(i, pk + 1) };
   }
@@ -343,8 +358,11 @@ export function turnaroundRoute(endId = '09', opts = {}) {
 // Where and how an AI plane of `kind` starts: { place, route, stand }. Kinds: parked|depart (at a stand, then departs),
 // downwind, final (dist), arrive (5 km out, random bearing), circuits (at the hold, touch-and-goes forever).
 // `rnd` lets node harnesses stay deterministic; `claimStand(prefer)` returns a free stand id or null.
-export function aiSpawn(kind, endId, { rnd = Math.random, claimStand = () => null, stand, wait, dist, laps } = {}) {
-  const e = runwayEnd(endId), KTS = 0.514444;
+// speedScale: the aircraft type's speed vs the C172 (aircraft.js typeSpeedScale) for the airborne start speeds.
+// type: the aircraft type (its circuit + start speeds); speedScale overrides the speed ratio vs the C172.
+export function aiSpawn(kind, endId, { rnd = Math.random, claimStand = () => null, stand, wait, dist, laps, type = null, speedScale } = {}) {
+  const fl = type && AIRCRAFT[type]?.flight, ct = type ? { type } : {};
+  const e = runwayEnd(endId), KTS = 0.514444 * (speedScale ?? (fl ? fl.vcruise / (95 * 0.514444) : 1));
   if (kind === 'parked' || kind === 'depart') {
     const sid = stand || claimStand();
     if (!sid) return null;
@@ -354,13 +372,13 @@ export function aiSpawn(kind, endId, { rnd = Math.random, claimStand = () => nul
   }
   const then = departureRoute(endId, { outHeading: e.hdg + (rnd() < 0.5 ? -50 : 40) });
   if (kind === 'downwind') {
-    const legs = circuitLegs(endId), d = legs[2].to, c = legs[1].to;
-    const r = arrivalRoute(endId, { stand: 'auto', parkSeconds: 15 + rnd() * 20, then });
+    const legs = circuitLegs(endId, ct), d = legs[2].to, c = legs[1].to;
+    const r = arrivalRoute(endId, { ...ct, stand: 'auto', parkSeconds: 15 + rnd() * 20, then });
     return { place: { x: (c[0] + d[0]) / 2, z: (c[2] + d[2]) / 2, alt: 300, heading: (e.hdg + 180) % 360, speed: 85 * KTS, throttle: 0.6 }, route: { ...r, legs: r.legs.slice(1) } };
   }
   if (kind === 'final') {
     const D = dist || 2600, [x, z] = fromRunway(e, -D, 0);
-    const r = arrivalRoute(endId, { stand: 'auto', parkSeconds: 20 + rnd() * 20, then });
+    const r = arrivalRoute(endId, { ...ct, stand: 'auto', parkSeconds: 20 + rnd() * 20, then });
     return { place: { x, z, alt: D * 0.07 + 10, heading: e.hdg, speed: 68 * KTS, throttle: 0.4, flaps: 1 }, route: { ...r, legs: r.legs.filter((l) => l.kind !== 'fly') } };
   }
   if (kind === 'holding') {
@@ -371,10 +389,10 @@ export function aiSpawn(kind, endId, { rnd = Math.random, claimStand = () => nul
   }
   if (kind === 'circuits') {
     const h = holdPoint(endId);
-    const c = circuitRoute(endId);
+    const c = circuitRoute(endId, ct);
     const legs = [{ kind: 'hold', end: endId, seconds: 2, untilClear: true, label: 'HOLD SHORT' }, ...c.legs];
     return { place: { x: h[0], z: h[1], heading: (e.hdg + 90) % 360 }, route: { ...c, legs, loop: 1, laps } };
   }
   const a = rnd() * Math.PI * 2, R = 5000, x = Math.cos(a) * R, z = Math.sin(a) * R;
-  return { place: { x, z, alt: 420, heading: (Math.atan2(-x, z) * 180 / Math.PI + 360) % 360, speed: 95 * KTS, throttle: 0.6 }, route: arrivalRoute(endId, { stand: 'auto', parkSeconds: 20 + rnd() * 30, then, from: [x, z] }) };
+  return { place: { x, z, alt: 420, heading: (Math.atan2(-x, z) * 180 / Math.PI + 360) % 360, speed: 95 * KTS, throttle: 0.6 }, route: arrivalRoute(endId, { ...ct, stand: 'auto', parkSeconds: 20 + rnd() * 30, then, from: [x, z] }) };
 }

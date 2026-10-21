@@ -617,7 +617,7 @@ function seeded(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) 
 let FL = null;
 async function flightLib() {
   if (FL) return FL;
-  const [{ Aircraft }, { Autopilot }, { Traffic }, R, { linkTraffic }] = await Promise.all([import('../js/flight/aircraft.js'), import('../js/flight/autopilot.js'), import('../js/flight/traffic.js'), import('../js/flight/routes.js'), import(args.atc ? pathToFileURL(path.join(args.atc, 'js/atc/bridge.js')).href : '../js/atc/bridge.js')]);
+  const [{ Aircraft, typeSpeedScale }, { Autopilot }, { Traffic }, R, { linkTraffic }] = await Promise.all([import('../js/flight/aircraft.js'), import('../js/flight/autopilot.js'), import('../js/flight/traffic.js'), import('../js/flight/routes.js'), import(args.atc ? pathToFileURL(path.join(args.atc, 'js/atc/bridge.js')).href : '../js/atc/bridge.js')]);
   let terrain = null;
   try {
     const { register } = await import('node:module');
@@ -628,12 +628,12 @@ async function flightLib() {
   } catch (err) { console.log('  (terrain.js not loadable in node: flat ground)', String(err).slice(0, 120)); }
   let M = null;
   try { M = await import(args.atc ? pathToFileURL(path.join(args.atc, 'js/atc/mischief.js')).href : '../js/atc/mischief.js'); } catch { /* optional */ }
-  return (FL = { Aircraft, Autopilot, Traffic, R, linkTraffic, M, terrain });
+  return (FL = { Aircraft, typeSpeedScale, Autopilot, Traffic, R, linkTraffic, M, terrain });
 }
 
 // o: { minutes, max, start:[kinds], circuits, seed, wind:{from,kt}, windAt:[[sec, from, kt]], mischief, protection, label }
 async function flightWorld(o = {}) {
-  const { Aircraft, Autopilot, Traffic, R, linkTraffic, M, terrain } = await flightLib();
+  const { Aircraft, typeSpeedScale, Autopilot, Traffic, R, linkTraffic, M, terrain } = await flightLib();
   const rnd = seeded(o.seed ?? 7), realRandom = Math.random;
   Math.random = rnd;
   const C = terrain?.castle;
@@ -648,13 +648,14 @@ async function flightWorld(o = {}) {
   atc.on('instruction', (e) => { W.instr.push(e); if (args.dbg && (args.dbg === true || args.dbg.split(',').includes(e.cmd.type))) console.log(`  t=${e.t} ${e.to} ${JSON.stringify(e.cmd).slice(0, 150)} ${JSON.stringify(atc.strip(e.to))}`); });
   atc.on('runwayChange', (e) => W.runwayChanges.push(e));
   const spawn = (kind, opts = {}) => {
-    const ac = new Aircraft({ dims: { gearHeight: 1.2 } });
-    const plan = R.aiSpawn(kind, atc.activeRunway().end, { ...opts, rnd, claimStand: () => tr.claimStand(ac) });
+    const type = o.types ? o.types[Math.floor(rnd() * o.types.length)] : null;
+    const ac = new Aircraft(type ? { type } : { dims: { gearHeight: 1.2 } });
+    const plan = R.aiSpawn(kind, atc.activeRunway().end, { ...opts, rnd, claimStand: () => tr.claimStand(ac), type });
     if (!plan) return null;
     ac.place(plan.place, env);
     if (plan.stand) tr.standOwner.set(plan.stand, ac);
     const ap = new Autopilot(ac);
-    const ent = tr.add({ aircraft: ac, ap, name: `${kind}${++W.stats.spawned}` });
+    const ent = tr.add({ aircraft: ac, ap, name: `${kind}${++W.stats.spawned}${type ? '-' + type : ''}` });
     ap.setRoute(plan.route);
     ent.kind = kind; ent.born = ac.onGround ? null : W.t; ent.lastMove = { t: W.t, x: ac.pos.x, z: ac.pos.z };
     W.ai.push(ent);
@@ -884,6 +885,9 @@ async function flightSoak() {
     { label: 'attract 6', max: 6, seed: 5 },
     { label: 'runway change', max: 5, seed: 31, windAt: [[500, 90, 12], [1150, 270, 12]] },
     { label: 'mischief high', max: 5, seed: 41, mischief: 'high' },
+    // slow types cost runway capacity: the C172-only control of this seed makes 2 go-arounds, mixed makes 2-5 (seeds 53/61/77/89)
+    { label: 'mixed types', max: 5, circuits: 1, seed: +(args.seed || 53), types: ['c172', 'tiger', 'bathtub'], gaPer15: 2.5 },
+    ...(args.control ? [{ label: 'control c172', max: 5, circuits: 1, seed: +(args.seed || 53), types: ['c172', 'c172', 'c172'] }] : []),
   ];
   const MILD = ['taxi_speeding', 'low_pass'];
   for (const r of runs) {
@@ -899,7 +903,7 @@ async function flightSoak() {
     const tag = `flight soak [${r.label}]`;
     if (r.mischief) check(`${tag}: rival royals misbehave, mildly (taxi speeding / low pass only)`, mild.length > 0, Object.entries(mild.reduce((m, e) => ((m[e.type] = (m[e.type] || 0) + 1), m), {})).map(([k, v]) => `${k} ${v}`).join(', ') || 'none');
     check(`${tag}: zero ${r.mischief ? 'other ' : ''}AI infractions/separation losses in ${mins} min`, bad.length === 0, bad.slice(0, 4).map((e) => `${e.type}:${e.actor}@${e.t.toFixed(0)}`).join(', ') || W.summary());
-    check(`${tag}: <= 1 go-around per 15 min`, per15 <= 1, `${ga} go-arounds (${per15.toFixed(2)}/15 min)`);
+    check(`${tag}: <= ${r.gaPer15 ?? 1} go-around per 15 min`, per15 <= (r.gaPer15 ?? 1), `${ga} go-arounds (${per15.toFixed(2)}/15 min)`);
     // starvation = anyone held at the runway > 5 min, an arrival > 10 min from spawn to touchdown, or a plane parked
     // on a taxiway; throughput floor = one movement every 2 min with both arrivals and departures served (every 2.5 min
     // with mischief: a low pass costs that arrival a whole circuit)

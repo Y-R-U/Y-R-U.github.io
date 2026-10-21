@@ -41,6 +41,45 @@ Fixed 120 Hz (`Traffic.update` accumulates, `Aircraft.pose(alpha)` interpolates 
   `traffic.onContact({a, b, relSpeed, remote})` (main reports it to ATC), `collision {other, remote, relSpeed}` events on
   both, then each local plane's impact path. Gentle ground bumps without a handler just push apart.
 
+### Aircraft types (TRAFFIC round 3, docs/PLANES.md items 1–11)
+`new Aircraft({ type: 'c172' | 'tiger' | 'bathtub', dims })`. `TYPES.tiger/bathtub` are the roster's `AIRCRAFT.<id>.flight`
+blocks (bathtub + `rollDrag 0.06`: rubber-ball feet). The C172 path is unchanged (its 80/20 load split, gear, tach).
+| | C172 | Tiger Moth | Royal Flying Bathtub |
+|---|---|---|---|
+| gear | tricycle | taildragger (`ac.taildragger`, `ac.tailDown`), steerable tail wheel | 4 feet: fixed rear pair + castoring front pair (`noseTrack`) |
+| at rest | level, CG 1.20 | 3-point 11.6° (`groundPitch` 11.1°), CG 1.11 (`restHeight` 1.13) | level, CG 1.05 |
+| AP takeoff run (book) | ~255 m @ 58 kt | 144 m @ 47 kt (160) | 134 m @ 48 kt (150) |
+| technique | rotate at Vr 55 | stick back, tail up from 0.8 Vr (~36 kt), rotate gently at 45 | rotate at Vr 40 |
+| circuit (alt / downwind offset) | 300 m / 1150 m | 217 m / 977 m | 147 m / 805 m |
+| circuit speeds (leg kt × scale) | 74–95 kt | ×0.84: 62–80 kt, final 55 | ×0.63: 47–60 kt, final 45 |
+| AP touchdown | ~157 fpm @ 52 kt | 3-point: 72 fpm @ 42 kt, 10.6° | 157 fpm @ 40 kt |
+| AP circuit, roll to touchdown | ~3.5 min | ~5 min | ~6.3 min |
+| tach idle–max | 650–2700 | 650–2350 | 700–2700 |
+| fuel per tank / burn | 100 L / 6–50 L/h | 43 L / ×130/180 hp | 40 L / ×95/180 hp |
+| quirks | — | ground-loops if you let it (hands-off 19° swing after a yaw kick at 30 kt; rudder holds it to 2°); lower wingtip scrapes at ~16° bank on the ground; prop strike on hard braking tail-up | wobbles in roll (0.45 Hz) in the air; narrow track: taxi turns at ≤ 1.6 m/s or it tips onto a wingtip |
+
+Model changes (all additive): per-wheel heights (`gear.mainY/tailY`) + geometric static load split; tail-wheel steering
+reversed (aft of the CG) and castoring (side grip 0.3–0.75·N with rudder) — front feet the same; on the ground a
+taildragger's yaw rate-tracking is weak (`GL.track 0.2`, damping `GL.damp 0.5`) so the mains-ahead-of-CG instability
+shows; `place()` on the ground sits a taildragger in its 3-point attitude; `P.tailSkid` / `P.hardPoints` (named
+`left lower wingtip`, `propeller` …); no `tailstrike` while the tail wheel is down; touchdowns grade from the mains (a
+3-point arrival counts; a few-cm skip while the tail settles is not a bounce — mains must leave > 0.6 s and > 0.4 m);
+`rollWobble`; `instruments().rpm` from the roster's idle/max rpm; burn scales with hp. `ac.aglRef` = CG height at rest
+(`restHeight ?? gearHeight`), used for `agl`. `typeSpeedScale(type)`, `typeInfo(type)` exported.
+
+Autopilot per type: route/leg speeds are C172 knots scaled by `vcruise` (`ap._kt`, never below Vapp / 1.22 Vs0);
+pursuit lookaheads scale too (fly legs ∝ 1/scale, the final ∝ scale²) so slow types still roll out on the centreline.
+Taxi speed × roster `taxi/15` (not on a runway: vacate briskly), turns × tip-over stability (main half-track / CG
+height vs the C172's). Taildragger: tail up at 0.8 Vr, rotate to 0.11 rad; flare holds off ~1 m until near Vs0 with
+pitch rising to the 3-point attitude; rollout stick back once the tail is down, light braking only tail-down.
+Taxi paths no longer hold short of a crossing runway in the middle of the runway the plane is still rolling along.
+
+Routes per type: `circuitRoute(end, { type })`, `arrivalRoute(end, { type, ... })`, `circuitLegs(end, { type })`,
+`circuitOpts(type)` → `{ alt, width }` (lower, tighter circuit inside the C172's: vertically clear on the downwinds; the
+base is never below the 4° glide path). Routes remember `route.circ`, so `rerouteRunway` / runway changes keep it.
+`aiSpawn(kind, end, { type })` (start speeds + circuit). `createAttract({ ..., types: ['c172', 'tiger', 'bathtub'] })`
+draws AI from that list (default `['c172']`).
+
 ## Autopilot + override (the core mechanic)
 Every aircraft (player and AI) has an `Autopilot` that outputs the same control set a player would.
 `Traffic._mix` chooses per axis: **manual** (player input beyond the 0.08 dead-zone) → on release **wait 1.5 s** (neutral
@@ -163,8 +202,12 @@ phones. `__game.quality` → `{ tier, auto, fps, history }`. The shadow box foll
 
 ## Tests
 ```
-node tools/flight-sim.mjs            # node, ~2 s, 42 checks: impact normals, fuel, landAt (runway + field plan to a stop),
-                                     # ground override (hold/stand/rollout), handback, circuits 09/27, override, cut-in, stall, traffic
+node tools/flight-sim.mjs            # node, ~25 s, 81 checks: impact normals, fuel, landAt (runway + field plan to a stop),
+                                     # ground override (hold/stand/rollout), handback, circuits 09/27, override, cut-in, stall, traffic,
+                                     # types (Tiger + bathtub AP circuits 09/27: takeoff run ±25 % of book, no ground loop, 3-point
+                                     # touchdown, centreline), typeoverride (hand-flown + release, low dive handback), typeground (rest
+                                     # attitude, tail-wheel steering sign, ground loop lively/survivable, wobble, rpm, fuel)
+node tools/flight-sim.mjs mixed      # opt-in: atc-sim's 30-min C172 + Tiger + bathtub soak through real ATC (~30 s)
 node tools/flight-sim.mjs landat     # one scenario
 ~/.claude/bin/cdp start --port 9431 -- --use-angle=metal
 node tools/test-flight.mjs           # boot/attract, layout (390×844, 844×390 touch, 1280×800), pitch sign (real touch drag

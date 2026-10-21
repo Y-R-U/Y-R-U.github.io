@@ -1,6 +1,7 @@
 import { clamp, lerp, DEG, KT, wrap180, bearing, moveTo } from './vmath.js';
 import { runwayEnd, allRunwayEnds, toRunway, fromRunway, taxiPath, GLIDE_DEG, AIM_DIST, FAF_DIST, onRunway, circuitLegs, segInter, departureRoute, runwayEntries, rerouteRunway } from './routes.js';
 import { RUNWAYS, HOLD_OFFSET, threshold } from '../world/layout.js';
+import { TYPES, typeInfo } from './aircraft.js';
 
 const G = 9.81, RHO = 1.225, TANG = Math.tan(GLIDE_DEG * DEG);
 const endOf = (x) => (typeof x === 'object' && x ? x : runwayEnd(x)); // ASSIST plans pass virtual runway-end objects
@@ -28,6 +29,32 @@ export class Autopilot {
   get leg() {
     const l = this.route?.legs[this.i];
     return l && this.override ? { ...l, ...this.override } : l;
+  }
+
+  // Route/leg speeds are C172 knots: other types fly them scaled by cruise speed, never below ~1.2 Vs0 / Vapp.
+  _kt(kt) {
+    const P = this.ac.P, s = P.vcruise / TYPES.c172.vcruise;
+    return s === 1 ? kt * KT : Math.max(kt * KT * s, P.vapp, P.vs0 * 1.22);
+  }
+
+  // Ground: taxi speed by type (roster taxi kt vs the C172's 15), turns slower still on a narrow, tall track (tip-over).
+  get _gnd() {
+    if (this.__gnd?.ac === this.ac) return this.__gnd;
+    const P = this.ac.P, taxi = typeInfo(this.ac.type).speeds?.taxi ?? 15;
+    const tip = clamp((P.gear.main[0] / this.ac.aglRef) / (1.25 / 1.2), 0.3, 1);
+    return (this.__gnd = { ac: this.ac, v: P === TYPES.c172 ? 1 : taxi / 15, turn: P === TYPES.c172 ? 1 : tip });
+  }
+  _turnCaps(pr, vt) {
+    const ac = this.ac, g = this._gnd;
+    if (Math.abs(wrap180(pr.hdg - ac.heading)) > 25) vt = Math.min(vt, 3.5 * g.turn);
+    const nk = this.cur.path[pr.k + 2];
+    if (nk) {
+      const b = this.cur.path[pr.k + 1], a = this.cur.path[pr.k];
+      const turn = Math.abs(wrap180(bearing(b.x, b.z, nk.x, nk.z) - bearing(a.x, a.z, b.x, b.z)));
+      const db = Math.hypot(b.x - ac.pos.x, b.z - ac.pos.z);
+      if (turn > 30 && db < 30) vt = Math.min(vt, 4 * g.turn);
+    }
+    return vt;
   }
 
   _emit(type, data) { this.events.push({ type, ...data }); if (this.events.length > 30) this.events.shift(); }
@@ -171,7 +198,7 @@ export class Autopilot {
       if (this._lovT > 0.5) this.cancelLand();
     }
     if (this.done) {
-      if (this.phase === 'GONE' && !ac.onGround) { t.air = true; t.bank = 0; t.vs = 0; t.speed = 95 * KT; t.flaps = 0; return this._finish(dt); }
+      if (this.phase === 'GONE' && !ac.onGround) { t.air = true; t.bank = 0; t.vs = 0; t.speed = this._kt(95); t.flaps = 0; return this._finish(dt); }
       this._groundStop(t); if (this.phase !== 'GONE') this.phase = 'DONE'; return this._finish(dt);
     }
     const leg = this.leg;
@@ -243,17 +270,9 @@ export class Autopilot {
   _taxi(t, leg) {
     const ac = this.ac;
     const pr = this._pursue(this.cur.path, clamp(ac.speed * 2.4, 7, 22));
-    let vt = leg.speed ?? 9;
+    let vt = (leg.speed ?? 9) * (onRunway(ac.pos.x, ac.pos.z, 0) ? 1 : this._gnd.v);   // vacate a runway briskly, whatever the type
     t.flaps = 0;
-    const herr = Math.abs(wrap180(pr.hdg - ac.heading));
-    if (herr > 25) vt = Math.min(vt, 3.5);
-    const nk = this.cur.path[pr.k + 2];
-    if (nk) {
-      const b = this.cur.path[pr.k + 1], a = this.cur.path[pr.k];
-      const turn = Math.abs(wrap180(bearing(b.x, b.z, nk.x, nk.z) - bearing(a.x, a.z, b.x, b.z)));
-      const db = Math.hypot(b.x - ac.pos.x, b.z - ac.pos.z);
-      if (turn > 30 && db < 30) vt = Math.min(vt, 4);
-    }
+    vt = this._turnCaps(pr, vt);
     vt = Math.min(vt, Math.sqrt(2 * 0.7 * Math.max(0, pr.toEnd - 1.5)));
     if (this.mischief === 'speed') vt = Math.max(vt, this._naughtyTaxi(pr));
     this._holdLbl = null;
@@ -292,6 +311,9 @@ export class Autopilot {
         if (rw === here) continue;
         const h = segInter([a.x, a.z], [b.x, b.z], threshold(rw, rw.ends[0]), threshold(rw, rw.ends[1]));
         if (!h || (k === path.length - 2 && h[0] > 0.97)) continue;
+        // still rolling along the runway we landed on (a slow type stopping short of an intersection): no hold-short
+        // in the middle of it — the landing clearance already holds that intersection
+        if (here && onRunway(a.x + (b.x - a.x) * h[0], a.z + (b.z - a.z) * h[0], 2) === here) continue;
         const [ux, uz] = runwayEnd(rw.ends[0]).u;
         const sinA = Math.abs(((b.x - a.x) * uz - (b.z - a.z) * ux) / len);
         out.push({ rw: rw.id, at: along + h[0] * len - (HOLD_OFFSET ?? 50) / Math.max(sinA, 0.3), cleared: false, wait: 0 });
@@ -483,7 +505,8 @@ export class Autopilot {
     const ac = this.ac, e = this.cur.e, P = ac.P;
     if (this.sub === 'taxi') {
       const pr = this._pursue(this.cur.path, clamp(ac.speed * 2.4, 7, 22));
-      let vt = Math.min(this.demand ? 12 : 9, Math.sqrt(2 * 0.7 * Math.max(0, pr.toEnd - 1.5)));
+      let vt = Math.min((this.demand ? 12 : 9) * this._gnd.v, Math.sqrt(2 * 0.7 * Math.max(0, pr.toEnd - 1.5)));
+      if (this._gnd.turn < 1) vt = this._turnCaps(pr, vt);
       if (this.mischief === 'speed') vt = Math.max(vt, this._naughtyTaxi(pr));
       if (this.demand && pr.toEnd < 30) vt = Math.max(vt, 4);
       this._holdLbl = null;
@@ -514,7 +537,7 @@ export class Autopilot {
     if (this.sub === 'lineup') {
       this._setPhase('LINE UP');
       const pr = this._pursue(this.cur.path, 13);
-      t.gHeading = pr.hdg; t.gSpeed = 4.5; t.flaps = 0;
+      t.gHeading = pr.hdg; t.gSpeed = 4.5 * this._gnd.turn; t.flaps = 0;
       const p = toRunway(e, ac.pos.x, ac.pos.z);
       if (Math.abs(p.l) < 2.5 && Math.abs(wrap180(e.hdg - ac.heading)) < 6) { this.sub = this._mayEnterRunway(e, true) ? 'roll' : 'ready'; this.cur.k = 0; if (this.sub === 'roll') this._emit('takeoffroll', { end: e.id }); }
       return;
@@ -524,12 +547,15 @@ export class Autopilot {
     if (this.sub === 'roll') {
       this._setPhase('TAKEOFF ROLL');
       t.gHeading = pr.hdg; t.gSpeed = 99; t.thr = 1; t.flaps = 0; t.elev = -0.05;
+      // taildragger: stick back to keep the tail wheel planted, then forward to fly the tail up at ~0.8 Vr
+      if (ac.taildragger) t.elev = ac.speed > 0.8 * P.vr ? clamp((0.035 - ac.pitch) * 5 - ac.w.x * 1.5, -0.7, 0.3) : 0.25;
       if (ac.speed >= P.vr) this.sub = 'rotate';
       return;
     }
     if (this.sub === 'rotate') {
       this._setPhase('ROTATE');
       t.air = true; t.pitch = 0.14; t.bank = 0; t.thr = 1; t.flaps = 0; t.rudHeading = pr.hdg; t.elevMin = ac.onGround && ac.pitch < 0.1 ? 0.8 : null;
+      if (ac.taildragger) { t.pitch = 0.11; t.elevMin = ac.onGround && ac.pitch < 0.07 ? 0.3 : null; }
       if (!ac.onGround && ac.agl > 4) this.sub = 'climb';
       return;
     }
@@ -544,7 +570,7 @@ export class Autopilot {
     const ac = this.ac;
     this._setPhase(leg.label || 'ENROUTE');
     if (ac.onGround && ac.speed < 15 && this.legT > 2) return this.replan();
-    const pr = this._pursue(this.cur.path, clamp(ac.speed * 7, 170, 380));
+    const pr = this._pursue(this.cur.path, clamp(ac.speed * 7 * TYPES.c172.vcruise / ac.P.vcruise, 170, 380));
     if (pr.advanced > 0) {
       const steps = pr.advanced;
       for (let s = 0; s < steps; s++) {
@@ -563,14 +589,14 @@ export class Autopilot {
       this._next(); return;
     }
     t.air = true;
-    t.speed = (leg.speed ?? 85) * KT; t.flaps = leg.flaps ?? 0;
+    t.speed = this._kt(leg.speed ?? 85); t.flaps = leg.flaps ?? 0;
     if (pr.alt - ac.alt > 25 && t.flaps === 0) t.speed = Math.min(t.speed, ac.P.vy);
     t.vs = clamp((pr.alt - ac.alt) * 0.12 + pr.slope * ac.gs, -5, 5);
     const sep = !this.overridden && !this.noAvoid && this.traffic?.airConflict?.(this);
     this.sep = sep || null;
     if (sep) {
       t.vs = clamp((sep.alt - ac.alt) * 0.15, -4, 5);
-      if (sep.slow) t.speed = Math.min(t.speed, Math.max(this._vstall() * 1.35, 64 * KT));
+      if (sep.slow) t.speed = Math.min(t.speed, Math.max(this._vstall() * 1.35, this._kt(64)));
     }
     if (!(this._floorT > ac.time - 0.5)) { this._floorT = ac.time; this._floor = this._terrainFloor(pr.hdg, leg.clearance ?? 120); }
     const floor = this._floor;
@@ -620,18 +646,24 @@ export class Autopilot {
       t.elev = ac.speed > 20 ? 0.25 : 0;
       t.gSpeed = 7;
       t.brakeOverride = ac.noseDown && ac.speed > 9 ? clamp(0.25 + (ac.speed - 9) * 0.03, 0, 0.75) : null;
+      if (ac.taildragger) { t.elev = ac.tailDown ? 0.7 : ac.speed < P.vr ? 0.35 : 0; t.brakeOverride = ac.tailDown && ac.speed > 9 ? clamp(0.15 + (ac.speed - 9) * 0.02, 0, 0.4) : ac.tailDown ? null : 0; }
       if (!ac.mainsDown && ac.agl > 1.2) { this.sub = 'flare'; return; }
       if (this.tgo && !this.overridden && ac.mainsDown && ac.groundTime > 1.2 && this._touchAndGo(e)) return;
       if (ac.speed < 9 && ac.onGround) { this._emit('landed', { end: e.id }); this._next(); }
       return;
     }
-    const pr = this._pursue(this.cur.path, clamp(d * 0.22, 70, 350));
+    const sc = ac.P.vcruise / TYPES.c172.vcruise, pr = this._pursue(this.cur.path, clamp(d * 0.22, 70, 350) * sc * sc);
     t.air = true;
     if (sub === 'flare') {
       this._setPhase('FLARE');
       t.thr = ac.agl > 3 ? 0.08 : 0; t.flaps = 1;
       t.vs = -clamp(ac.agl * 0.42, 0.3, 2.6);
       t.pitchMin = 0.012; t.free = true;
+      if (ac.taildragger) {
+        const hold = clamp((ac.speed - P.vs0) / (P.vapp - P.vs0) * 1.3, 0, 1);
+        t.vs = -clamp((ac.agl - hold) * 0.6, 0.06, 2.6);
+      }
+      if (ac.taildragger) t.pitchMin = P.groundPitch * clamp((P.vapp - ac.speed) / (P.vapp - P.vs0 * 1.05), 0.1, 0.95);  // hold off into the 3-point attitude as it slows
       t.bank = this._bankFor(pr.hdg, 5); t.rudHeading = e.hdg;
       t.speed = P.vapp;
       if (ac.mainsDown) { this.sub = 'rollout'; this.cur.k = 0; }
@@ -640,7 +672,7 @@ export class Autopilot {
     }
     if (sub === 'lowpass') {
       this._setPhase('LOW PASS');
-      t.flaps = 1 / 3; t.speed = 74 * KT; t.vs = clamp((4.5 - ac.agl) * 0.6, -1.5, 2.5);
+      t.flaps = 1 / 3; t.speed = this._kt(74); t.vs = clamp((4.5 - ac.agl) * 0.6, -1.5, 2.5);
       t.bank = this._bankFor(pr.hdg, 5); t.rudHeading = e.hdg;
       if (p.s > e.len * 0.75 || ac.onGround) { this.mischief = null; this._goAround('low pass'); }
       return;
@@ -648,7 +680,7 @@ export class Autopilot {
     this._setPhase('FINAL');
     const est = d < 2400;
     t.flaps = est ? 1 : 1 / 3;
-    t.speed = est ? P.vapp : 75 * KT;
+    t.speed = est ? P.vapp : this._kt(75);
     let vs = -ac.gs * TANG + (gpAlt - ac.alt) * 0.22;
     if (d > 2600 && ac.alt < gpAlt) vs = Math.max(vs, 0);
     t.vs = clamp(vs, -4.2, 3);
@@ -745,7 +777,7 @@ export class Autopilot {
     const ai = legs.findIndex((l) => l.kind === 'approach');
     if (ai >= 0) { this.i = ai; this._begin(true); return; }
     const e = allRunwayEnds().sort((p, q) => Math.abs(wrap180(p.hdg - ac.track)) - Math.abs(wrap180(q.hdg - ac.track)))[0];
-    this.route = { name: 'divert', legs: [...circuitLegs(e.id).slice(2), { kind: 'approach', end: e.id, label: 'FINAL' }, { kind: 'taxi', dest: { stand: 'auto' }, label: 'TAXI IN' }, { kind: 'park', seconds: 30 }], loop: null };
+    this.route = { name: 'divert', legs: [...circuitLegs(e.id, this.route.circ || { type: ac.type }).slice(2), { kind: 'approach', end: e.id, label: 'FINAL' }, { kind: 'taxi', dest: { stand: 'auto' }, label: 'TAXI IN' }, { kind: 'park', seconds: 30 }], loop: null };
     this.i = 0; this._begin(true);
   }
 
@@ -857,7 +889,7 @@ export class Autopilot {
     const err = wrap180((t.gHeading ?? ac.heading) - ac.heading) * DEG;
     const yawRate = -ac.w.y;
     const want = clamp(err * 1.6, -0.6, 0.6);
-    const wb = Math.abs(P.gear.nose - P.gear.main[1]);
+    const wb = Math.abs((ac.taildragger ? P.gear.tail : P.gear.nose) - P.gear.main[1]);
     const steerScale = P.gear.maxSteer * clamp(1.2 - V / 30, 0.15, 1);
     let rudder = Math.atan((want * wb) / Math.max(V, 0.6)) / steerScale + (want - yawRate) * (V > 15 ? 2.5 : 0.8);
     if (V < 0.3 && Math.abs(err) < 0.02) rudder = 0;

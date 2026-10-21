@@ -47,7 +47,8 @@ atc.serialize() / atc.restore(json)   // plain JSON, ~2–5 KB
   intent,                             // 'circuits' | 'fullStop' | 'depart' | 'park'  (see below)
   runwayIntent,                       // optional end, e.g. '22' (only honoured if that runway is open)
   apOverridden,                       // player hands on the controls (blame + outrage decay)
-  remote, crashed, stand, vrKt, touchdownFpm }   // all optional
+  remote, crashed, stand, vrKt, touchdownFpm,
+  speedScale }                        // type's cruise vs the C172 (Tiger 0.84, bathtub 0.63); bridge sends it. All optional
 ```
 Intents: `circuits` = touch-and-goes forever; `fullStop` = next landing is a full stop, taxi to a stand, then done;
 `depart` = take off and leave; `park` = stay put. ATC never changes intent; the game does. A plane missing for 5 s is
@@ -105,7 +106,8 @@ No landing clearance by 500 m from the threshold → ATC sends you around. Takeo
   the new one, and `runwayChange {from, to, t}` fires; the bridge then calls `ap.changeRunway(to, from)` on every
   autopilot (FLIGHT.md). Soak: two wind shifts in 30 min, zero AI infractions, zero landings on the old end.
 - ETA model: final flown at 75 kt (38.6 m/s) until 2.4 km, 65 kt (34 m/s) inside (`T.finalFastSpeed`,
-  `T.finalSlowFrom`); circuit 44 m/s. A landing clearance needs base, or final *inside the aligned final cone*
+  `T.finalSlowFrom`); circuit 44 m/s; all divided by the strip's `speedScale` (slow types; extensions and the
+  touch-and-go/full-stop speed scale with it). A landing clearance needs base, or final *inside the aligned final cone*
   (a plane crossing the extended centreline is not "on final").
 
 ## aiMischief
@@ -201,11 +203,13 @@ rule-break detectors for its own plane only and issues nothing. `setLocal(id, bo
 
 ## Tests
 ```
-node tools/atc-sim.mjs                 # 92 checks, ~3 min: kinematic ATC scenarios (circuits, cut-ins, out-of-turn, buzz,
+node tools/atc-sim.mjs                 # 97 checks, ~3.5 min: kinematic ATC scenarios (circuits, cut-ins, out-of-turn, buzz,
                                        # crossing, crimes, online), then the real Aircraft/Autopilot through bridge.js:
                                        # flight cut-in, gameplay (spawn rivals, demand takeoff, skip, rubber/partial/none
                                        # protection), see-and-avoid, and five 30-min AI soaks (attract 5 / 4 + 2 circuits /
-                                       # attract 6 / runway change ×2 / mischief high) on the rolling terrain + castle
+                                       # attract 6 / runway change ×2 / mischief high / mixed types
+                                       # C172+Tiger+bathtub) on the rolling terrain + castle
+node tools/atc-sim.mjs --only=flight --run=mixed [--seed=61] [--control]   # --control adds a C172-only run, same seed
 node tools/atc-sim.mjs --falsify       # breaks each detector in a temp copy of js/atc; all 26 must be CAUGHT
 node tools/atc-sim.mjs --only=flight "--run=attract 6" [--minutes=30] [--watch=ac3,ac7 --from=600 --to=700] [--trace=name] [--dbgap]
 node tools/atc-sim.mjs --only=circuits --dbg=goAround,clearedLand --dbgev --peek=600
@@ -213,6 +217,10 @@ node tools/atc-sim.mjs --only=circuits --dbg=goAround,clearedLand --dbgev --peek
 Soak gates per run: zero AI infractions and separation losses; ≤ 1 go-around / 15 min (ATC + autopilot); nobody held at
 the runway > 5 min or > 10 min from spawn to touchdown, nobody stopped on a taxiway 4 min; ≥ 1 movement / 2 min with
 arrivals and departures both served; no crashes; ≥ 100 m terrain/castle clearance on fly legs > 1.5 km from the field.
+The mixed-types run allows 2.5 go-arounds / 15 min: slow types cost runway capacity (seeds 53/61/77/89: 0 separation
+losses everywhere, 2–5 go-arounds per 30 min vs 0–2 for the same seed C172-only, mostly `runwayOccupied` behind a slow
+departure or lander; seed 61 holds one departure 582 s). Slow types fly a lower, tighter circuit inside the C172's
+(FLIGHT.md), which is what took separation losses to zero.
 
 2026-10-22 soak (before → after): separation losses 6 → 0 (4 + 2 circuits: an arrival merging onto a circuit plane's
 downwind), go-arounds 2/30 min → 0 in all three base runs, starved departures 2 (342 s at the hold) → 0 (max 261 s;

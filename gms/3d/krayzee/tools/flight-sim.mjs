@@ -1,6 +1,7 @@
 // Headless flight-core harness (no browser): node tools/flight-sim.mjs [scenario] [--trace]
-// Scenarios: circuit | override | cutin | stall | taxi | traffic | all
-import { Aircraft } from '../js/flight/aircraft.js';
+// Scenarios: circuit | override | cutin | stall | taxi | traffic | types | typeoverride | typeground | all
+import { Aircraft, TYPES, GL } from '../js/flight/aircraft.js';
+import { AIRCRAFT } from '../data/aircraft.js';
 import { Autopilot } from '../js/flight/autopilot.js';
 import { Traffic } from '../js/flight/traffic.js';
 import { circuitRoute, arrivalRoute, departureRoute, runwayEnd, onRunway, fromRunway, standInfo, holdPoint } from '../js/flight/routes.js';
@@ -16,7 +17,7 @@ const TRACE = args.includes('--trace');
 const scen = args.find((a) => !a.startsWith('--')) || 'all';
 
 function mk(traffic, place, route, opts = {}) {
-  const ac = new Aircraft({ dims: { gearHeight: 1.2 } });
+  const ac = new Aircraft(opts.type ? { type: opts.type } : { dims: { gearHeight: 1.2 } });
   ac.place(place, env);
   const ap = new Autopilot(ac);
   const ent = traffic.add({ aircraft: ac, ap, player: !!opts.player, name: opts.name || ac.id });
@@ -323,8 +324,118 @@ function scImpact() {
   check('impact: collider hit carries the wall normal', w && okN(w.n) && w.n[2] === 1, w ? JSON.stringify(w.n) + ' ' + w.reason : 'no impact');
 }
 
-const S = { impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic };
-for (const [k, f] of Object.entries(S)) if (scen === 'all' || scen === k) { console.log(`\n== ${k}`); await f(); }
+// ---------- docs/PLANES.md: Tiger Moth (taildragger) and the Royal Flying Bathtub ----------
+const wrapD = (d) => ((d + 540) % 360) - 180;
+function scTypeCircuit(type, END) {
+  const tr = new Traffic(env);
+  const p = mk(tr, lined(END), circuitRoute(END, { type }), { name: type, type });
+  const e = runwayEnd(END), ac = p.ac, P = ac.P, book = AIRCRAFT[type].performance.takeoffRollM;
+  let lift = null, x0 = ac.pos.x, z0 = ac.pos.z, maxDevTO = 0, maxDevRoll = 0, tdPitch = null, tdTail = null, maxXtk = 0, tdSeen = false;
+  const log = run(tr, 1100, (t) => {
+    if (!lift && !ac.onGround) lift = { d: Math.hypot(ac.pos.x - x0, ac.pos.z - z0), kt: ac.speed / KT };
+    const dev = Math.abs(wrapD(ac.heading - e.hdg));
+    if (ac.onGround && !lift) maxDevTO = Math.max(maxDevTO, dev);
+    if (ac.onGround && p.ap.sub === 'rollout') maxDevRoll = Math.max(maxDevRoll, dev);
+    if (!tdSeen && ac.lastTouchdown) { tdSeen = true; tdPitch = ac.pitch; tdTail = { at: t, down: null }; }
+    if (tdTail && tdTail.down == null && ac.tailDown) tdTail.down = t - tdTail.at;
+    const dx = ac.pos.x - e.thr[0], dz = ac.pos.z - e.thr[1], sAl = dx * e.u[0] + dz * e.u[1], l = dx * -e.u[1] + dz * e.u[0];
+    if (p.ap.phase === 'FINAL' && sAl > -1200 && sAl < 0) maxXtk = Math.max(maxXtk, Math.abs(l));
+    return !(lift && p.ap.leg.kind === 'hold');
+  });
+  const td = log.find((l) => l.type === 'touchdown'), tag = `${type} circuit ${END}`;
+  const bad = log.filter((l) => ['crash', 'impact', 'tailstrike', 'hardlanding'].includes(l.type));
+  check(`${tag}: takeoff ground run within ±25% of the book ${book} m`, lift && Math.abs(lift.d - book) <= book * 0.25, lift && `${lift.d.toFixed(0)} m, airborne at ${lift.kt.toFixed(0)} kt`);
+  check(`${tag}: no ground loop on the AP takeoff roll / rollout (heading within 5°)`, maxDevTO < 5 && maxDevRoll < 5, `takeoff ${maxDevTO.toFixed(1)}°, rollout ${maxDevRoll.toFixed(1)}°`);
+  check(`${tag}: no crash / impact / tail strike / hard landing`, !bad.length, bad.map((b) => b.type + (b.reason ? ' ' + b.reason : '')).join() || 'clean');
+  check(`${tag}: final within 12 m of centreline inside 1.2 km`, maxXtk < 12, `max ${maxXtk.toFixed(1)} m`);
+  check(`${tag}: good landing on the runway (one touchdown, < 400 fpm)`, td && td.surface === 'runway' && !td.bounce && td.fpm < 400 && log.filter((l) => l.type === 'touchdown').length === 1, td && `${td.fpm} fpm ${td.grade} at ${(ac.lastTouchdown.speed / KT).toFixed(0)} kt`);
+  if (P.groundPitch) check(`${tag}: three-point touchdown (attitude >= 80% of ${(P.groundPitch / DEG_).toFixed(1)}°, tail down within 1 s)`, tdPitch >= P.groundPitch * 0.8 && tdTail?.down != null && tdTail.down < 1, `pitch ${(tdPitch / DEG_).toFixed(1)}°, tail down after ${tdTail?.down?.toFixed(2)} s`);
+  check(`${tag}: rolled out, taxied back to the hold`, !!log.find((l) => l.type === 'landed') && p.ap.leg.kind === 'hold', p.ap.phase);
+}
+const DEG_ = Math.PI / 180;
+function scTypes() { for (const type of ['tiger', 'bathtub']) for (const END of ['09', '27']) scTypeCircuit(type, END); }
+
+function scTypeOverride() {
+  for (const type of ['tiger', 'bathtub']) {
+    const tr = new Traffic(env);
+    const p = mk(tr, lined('09'), circuitRoute('09', { type }), { name: type, type, player: true });
+    let t0 = null, released = false, devHdg = null;
+    const log = run(tr, 1100, (t) => {
+      const ac = p.ac;
+      if (t0 == null && p.ap.phase === 'DOWNWIND') t0 = t;
+      if (t0 != null && t - t0 < 14) { const k = t - t0; p.manual.aileron = k < 2.5 ? -0.45 : Math.abs(ac.bank) > 0.6 ? 0.2 : 0; p.manual.elevator = k < 2.5 ? 0.1 : 0.3; }
+      else if (t0 != null && !released) { p.manual.aileron = null; p.manual.elevator = null; released = true; devHdg = ac.heading; }
+      return !(released && p.ap.leg.kind === 'hold');
+    });
+    const repl = log.find((l) => l.type === 'replan'), td = log.filter((l) => l.type === 'touchdown').pop();
+    const bad = log.filter((l) => ['crash', 'impact', 'tailstrike'].includes(l.type));
+    check(`${type} override: hand-flown off the downwind, released, replans and lands`, devHdg != null && Math.abs(wrapD(devHdg - 270)) > 60 && repl && !bad.length && td?.surface === 'runway' && p.ap.leg.kind === 'hold', `hdg at release ${devHdg?.toFixed(0)}, ${repl ? 'replan ' + repl.to : 'no replan'}, td ${td?.fpm} fpm ${bad.map((b) => b.type).join()}`);
+    // dive released low: immediate recovery
+    const tr2 = new Traffic(env);
+    const q = mk(tr2, { x: 0, z: 1500, alt: 60, heading: 90, speed: TYPES[type].vcruise * 0.95, throttle: 0.6 }, circuitRoute('09', { type }), { name: type, type, player: true });
+    q.ap.replan();
+    for (let t = 0; t < 1.2; t += 1 / 60) { q.manual.elevator = -0.6; tr2.update(1 / 60); }
+    q.manual.elevator = null;
+    let minAgl = q.ac.agl;
+    for (let t = 0; t < 15; t += 1 / 60) { tr2.update(1 / 60); minAgl = Math.min(minAgl, q.ac.agl); }
+    check(`${type} handback: dive released at 60 m recovers (no ground contact, climbing)`, !q.ac.crashed && minAgl > 8 && q.ac.vs > 0, `min agl ${minAgl.toFixed(0)} m, vs ${q.ac.vs.toFixed(1)}`);
+  }
+}
+
+function scTypeGround() {
+  const flat = { groundHeightAt: () => 0, surfaceAt: () => 'runway', colliders: [] };
+  for (const type of ['tiger', 'bathtub']) {
+    const ac = new Aircraft({ type }), P = ac.P, R = AIRCRAFT[type].engine;
+    ac.place({ x: 0, z: 0, heading: 90 }, flat);
+    const y0 = ac.pos.y, p0 = ac.pitch;
+    for (let i = 0; i < 600; i++) ac.step(1 / 120, flat);
+    const evs = ac.events.splice(0).map((e) => e.type);
+    if (P.groundPitch) check(`${type} at rest: placed and settled in the 3-point attitude, tail wheel down, no tail strike`, Math.abs(p0 - P.groundPitch) < 0.01 && Math.abs(ac.pitch - P.groundPitch) < 0.015 && Math.abs(ac.pos.y - y0) < 0.05 && ac.tailDown && !ac.noseDown && !evs.length, `placed ${(p0 / DEG_).toFixed(1)}° → ${(ac.pitch / DEG_).toFixed(1)}°, y ${y0.toFixed(2)} → ${ac.pos.y.toFixed(2)}, agl ${ac.agl.toFixed(2)}, events ${evs.join() || '-'}`);
+    else check(`${type} at rest: four feet loaded, level, no events`, ac.wheels.length === 4 && ac.wheels.every((w) => w.load > 300) && Math.abs(ac.pitch) < 0.02 && !evs.length, `loads ${ac.wheels.map((w) => w.load.toFixed(0)).join('/')}`);
+    const rpm = ac.instruments().rpm;
+    check(`${type}: idle rpm from the roster (${R.idleRpm}), full-power static < max ${R.maxRpm}`, Math.abs(rpm - R.idleRpm) < 60 && (ac.eng = 1, ac.instruments().rpm < R.maxRpm), `${rpm.toFixed(0)} / ${ac.instruments().rpm.toFixed(0)}`);
+    check(`${type}: fuel tanks hold ${P.fuelCap} L each`, ac.fuel.cap === P.fuelCap && ac.fuel.L > P.fuelCap - 0.5, `${ac.fuel.cap}`);
+  }
+  // tail wheel steering: right rudder yaws right on the ground at taxi speed
+  const tw = new Aircraft({ type: 'tiger' });
+  tw.place({ x: 0, z: 0, heading: 90 }, flat);
+  for (let t = 0; t < 6; t += 1 / 120) { tw.ctl.throttle = 0.35; tw.ctl.rudder = t > 2 ? 1 : 0; tw.ctl.elevator = 0.3; tw.step(1 / 120, flat); }
+  check('tiger: right rudder steers right on the ground (tail wheel turns the other way)', wrapD(tw.heading - 90) > 15, `heading ${tw.heading.toFixed(0)}`);
+  // ground loop: lively (hands off after a yaw kick it swings far) but survivable (rudder catches it)
+  const loop = (ctrl) => {
+    const ac = new Aircraft({ type: 'tiger' });
+    ac.place({ x: 0, z: 0, heading: 90, speed: 30 * KT }, flat);
+    for (let i = 0; i < 60; i++) { ac.ctl.throttle = 0.5; ac.ctl.elevator = 0.3; ac.step(1 / 120, flat); }
+    ac.w.y -= 0.15;
+    let dev = 0;
+    for (let t = 0; t < 12; t += 1 / 120) {
+      ac.ctl.throttle = 0.5; ac.ctl.elevator = 0.3;
+      ac.ctl.rudder = ctrl ? Math.max(-1, Math.min(1, wrapD(90 - ac.heading) * 0.05 + ac.w.y * 1.5)) : 0;
+      ac.step(1 / 120, flat); dev = Math.max(dev, Math.abs(wrapD(ac.heading - 90)));
+    }
+    return dev;
+  };
+  const free = loop(false), held = loop(true);
+  check('tiger ground loop: lively hands-off (a yaw kick at 30 kt swings > 10°), survivable with rudder (< 5°)', free > 10 && held < 5, `hands off ${free.toFixed(0)}°, with rudder ${held.toFixed(1)}°`);
+  // bathtub wobble: hands-off level flight rocks in roll
+  const b = new Aircraft({ type: 'bathtub' });
+  b.place({ x: 0, z: 0, alt: 300, heading: 90, speed: 55 * KT, throttle: 0.7 }, flat);
+  let flips = 0, sg = 0, peak = 0;
+  for (let t = 0; t < 10; t += 1 / 120) {
+    b.step(1 / 120, flat);
+    if (t > 2 && Math.abs(b.w.z) > 0.01) { const s = Math.sign(b.w.z); if (sg && s !== sg) flips++; sg = s; peak = Math.max(peak, Math.abs(b.w.z)); }
+  }
+  check('bathtub: wobbles in roll hands-off (~0.45 Hz roll-rate reversals, not a spin)', flips >= 5 && flips <= 12 && peak < 0.5 && !b.crashed, `${flips} reversals in 8 s, peak ${(peak / DEG_).toFixed(1)}°/s`);
+}
+
+// Mixed-type traffic (C172 + Tiger + bathtub) through real ATC for 30 min: lives in atc-sim (needs the ATC); opt-in here.
+async function scMixed() {
+  const { spawnSync } = await import('node:child_process');
+  const r = spawnSync(process.execPath, [new URL('./atc-sim.mjs', import.meta.url).pathname, '--only=flight', '--run=mixed', '--quiet'], { encoding: 'utf8' });
+  for (const l of (r.stdout || '').split('\n').filter((x) => /^(PASS|FAIL)/.test(x))) check(l.replace(/^(PASS|FAIL)\s+/, ''), l.startsWith('PASS'));
+}
+const S = { impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed };
+for (const [k, f] of Object.entries(S)) if ((scen === 'all' && k !== 'mixed') || scen === k) { console.log(`\n== ${k}`); await f(); }
 const fails = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - fails}/${results.length} passed`);
 process.exit(fails ? 1 : 0);

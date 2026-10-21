@@ -142,6 +142,7 @@ export function createATC(opts = {}) {
       if (raw.remote != null) s.local = !raw.remote;
       if (raw.intent && raw.intent !== s.intent) { s.intent = raw.intent; s.done = false; }
       s.runwayIntent = raw.runwayIntent ?? null;
+      s.spd = raw.speedScale || 1;   // slower types (Tiger, bathtub) fly the same circuit slower
       const pos = v3(raw.pos), vel = v3(raw.vel);
       const g = !!raw.onGround;
       const agl = raw.agl != null ? Math.max(0, raw.agl) : g ? 0 : Math.max(0, pos[1]);
@@ -269,7 +270,7 @@ export function createATC(opts = {}) {
         }
       }
       // Cleared for a touch-and-go but braking to a stop (a human, or an autopilot doing full stops): it's a full stop.
-      if (cfg.authority && d.g && !d.touchdown && s.cmds.clearedTouchAndGo && d.paved && S.t - (s.touchT ?? 1e9) > 2 && d.gs < T.tgFullStopSpeed) {
+      if (cfg.authority && d.g && !d.touchdown && s.cmds.clearedTouchAndGo && d.paved && S.t - (s.touchT ?? 1e9) > 2 && d.gs < T.tgFullStopSpeed * (s.spd || 1)) {
         const cl = s.cmds.clearedTouchAndGo;
         drop(s, 'clearedTouchAndGo');
         const end = d.alignedEnd || cl.runwayEnd;
@@ -387,12 +388,12 @@ export function createATC(opts = {}) {
   // Seconds to the threshold: finals are flown slower than the rest of the circuit.
   const eta = (s, rem = s.rem, ext = s.ext) => {
     const fin = Math.min(rem, Gm.G.FINAL_LEN + ext), slow = Math.min(fin, T.finalSlowFrom);
-    return slow / T.finalSpeed + (fin - slow) / T.finalFastSpeed + (rem - fin) / T.circuitSpeed;
+    return (slow / T.finalSpeed + (fin - slow) / T.finalFastSpeed + (rem - fin) / T.circuitSpeed) / (s.spd || 1);
   };
   const EXT_SECS = 1 / T.circuitSpeed + 1 / T.finalFastSpeed; // seconds added per metre of downwind extension
   function stretch(s, d, end, secs, follow, reason) {
     if (secs <= 2 || s.ext >= T.maxExtend) return;
-    s.ext = Math.min(T.maxExtend, s.ext + secs / EXT_SECS + 50);
+    s.ext = Math.min(T.maxExtend, s.ext + secs / (EXT_SECS / (s.spd || 1)) + 50);
     s.rem = Math.round(Gm.circuitProgress(circ(end, s.ext), d.p2, d.track, s.leg, d.agl).remaining);
     issue(s, { type: 'extendDownwind', metres: Math.round(s.ext / 25) * 25, runwayEnd: end, follow, ...(reason ? { reason } : {}) });
   }

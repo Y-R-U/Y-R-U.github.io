@@ -22,19 +22,21 @@ export function randomLivery() {
 }
 
 // AI traffic that keeps the airport busy (also used as background traffic during play), plus the menu's cinematic camera.
-export function createAttract({ scene, traffic, env, createPlane, quality, max = 4, onRig, onSpawn, onDespawn, activeEnd = () => '09' }) {
+// types: aircraft types to draw AI from (repeat an id to weight it), e.g. ['c172', 'c172', 'tiger', 'bathtub'].
+export function createAttract({ scene, traffic, env, createPlane, quality, max = 4, onRig, onSpawn, onDespawn, activeEnd = () => '09', types = ['c172'] }) {
   const ai = [];
   const pending = new Set();
   let respawnT = 0;
 
   async function spawn(kind, opts = {}) {
-    const rig = await createPlane({ type: 'c172', livery: randomLivery(), quality: quality === 'high' ? 'high' : 'low', cockpit: false });
+    const type = opts.type || pick(types);
+    const rig = await createPlane({ type, livery: randomLivery(), quality: quality === 'high' ? 'high' : 'low', cockpit: false });
     rig.setView('chase');
     rig.root.traverse((o) => { if (o.isMesh) { o.castShadow = true; } });
     onRig?.(rig);
-    const ac = new Aircraft({ dims: rig.dims });
+    const ac = new Aircraft({ type, dims: rig.dims });
     const ap = new Autopilot(ac);
-    const plan = aiSpawn(kind, activeEnd(), { ...opts, claimStand: () => traffic.claimStand(ac) });
+    const plan = aiSpawn(kind, activeEnd(), { ...opts, type, claimStand: () => traffic.claimStand(ac) });
     if (!plan) { rig.dispose(); return null; }
     ac.place(plan.place, env);
     if (plan.stand) traffic.standOwner.set(plan.stand, ac);
@@ -42,7 +44,7 @@ export function createAttract({ scene, traffic, env, createPlane, quality, max =
     scene.add(rig.root);
     const ent = traffic.add({ aircraft: ac, ap, rig, name: rig.livery?.().registration || kind });
     ap.setRoute(route);
-    ent.kind = kind;
+    ent.kind = kind; ent.type = type;
     ai.push(ent);
     onSpawn?.(ent);
     return ent;

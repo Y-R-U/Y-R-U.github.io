@@ -51,6 +51,7 @@ export function linkTraffic(atc, traffic, { playerId = 'player', intentOf = null
         intent: intentFor(e), runwayIntent: runwayIntentOf ? runwayIntentOf(e) : null,
         touchdownFpm: ac.lastTouchdown && ac.time - ac.lastTouchdown.t < 0.05 ? ac.lastTouchdown.fpm : undefined,
         impact: ac._lastImpact != null && ac.time - ac._lastImpact < 1.5,
+        vrKt: ac.P?.vr ? ac.P.vr / 0.514444 : undefined, speedScale: ac.P?.vcruise ? ac.P.vcruise / (95 * 0.514444) : undefined,
       };
     });
   }

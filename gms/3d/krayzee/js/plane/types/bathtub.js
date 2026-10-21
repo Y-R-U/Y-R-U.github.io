@@ -505,6 +505,7 @@ function buildBathCockpit(quality, mats, ctx) {
   const gauges = new THREE.Mesh(gq.build(), gaugeMat);
   gauges.name = 'gauges';
   board.add(gauges);
+  inst.attach?.(gauges);
   group.add(board);
   const caddy = new THREE.Mesh(B.build(), cpMat);
   caddy.name = 'caddy'; caddy.receiveShadow = true; caddy.castShadow = high;

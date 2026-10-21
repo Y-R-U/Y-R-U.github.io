@@ -1,5 +1,6 @@
 import { V3, Quat, clamp, moveTo, DEG, KT, FT } from './vmath.js';
 import { packState, applyRemote } from './netstate.js';
+import { AIRCRAFT } from '../../data/aircraft.js';
 
 const RHO = 1.225, G = 9.81;
 
@@ -18,7 +19,17 @@ export const TYPES = {
     fuelCap: 100,                         // litres usable per wing tank
   },
 };
+// docs/PLANES.md: the roster's flight blocks. gearHeight = CG over the main contact with the datum level (rig dims).
+TYPES.tiger = { gearHeight: 1.25, ...AIRCRAFT.tiger.flight };
+// rubber-ball feet: lots of rolling drag (the roster's 150 m takeoff run)
+TYPES.bathtub = { gearHeight: 1.05, ...AIRCRAFT.bathtub.flight, gear: { rollDrag: 0.06, ...AIRCRAFT.bathtub.flight.gear } };
 
+// Leg/route speeds are written for the C172 (kt); other types fly them scaled by cruise speed.
+export function typeSpeedScale(type) { const P = TYPES[type] || TYPES.c172; return P.vcruise / TYPES.c172.vcruise; }
+export function typeInfo(type) { return AIRCRAFT[type] || AIRCRAFT.c172; }
+const HP_NAMES = { nose: 'nose', tail: 'tail', wingL: 'left wingtip', wingR: 'right wingtip', lowerWingL: 'left lower wingtip', lowerWingR: 'right lower wingtip', belly: 'belly', propTip: 'propeller' };
+
+export const GL = { track: 0.2, damp: 0.5 };
 const ROLL_MU = { runway: 0.02, taxiway: 0.022, apron: 0.022, grass: 0.075, building: 0.3, water: 0.6 };
 
 let nextId = 1;
@@ -29,12 +40,17 @@ export class Aircraft {
     this.type = opts.type || 'c172';
     this.P = TYPES[this.type] || TYPES.c172;
     const d = opts.dims || {};
-    this.dims = { length: d.length || this.P.length, span: d.span || this.P.span, height: d.height || 2.7, gearHeight: d.gearHeight || 1.2 };
+    this.dims = { length: d.length || this.P.length, span: d.span || this.P.span, height: d.height || 2.7, gearHeight: d.gearHeight || this.P.gearHeight || 1.2 };
+    if (this.P.groundPitch != null) Object.assign(this.dims, { groundPitch: this.P.groundPitch, restHeight: this.P.restHeight });
+    this.taildragger = !!this.P.gear.tailwheel;
+    const E = typeInfo(this.type).engine || {};
+    this.rpmRange = [E.idleRpm || 650, E.maxRpm || 2700];
+    const burn = (E.hp || 180) / 180;
     this.pos = new V3(); this.vel = new V3(); this.q = new Quat(); this.w = new V3();
     this.prevPos = new V3(); this.prevQ = new Quat();
     this.ctl = { aileron: 0, elevator: 0, rudder: 0, throttle: 0, flaps: 0, brake: 0 };
     this.eng = 0; this.flapsPos = 0;
-    this.fuel = { cap: this.P.fuelCap ?? 100, L: this.P.fuelCap ?? 100, R: this.P.fuelCap ?? 100, idleLph: 6, fullLph: 50, lowFrac: 0.15, lowSent: false };
+    this.fuel = { cap: this.P.fuelCap ?? 100, L: this.P.fuelCap ?? 100, R: this.P.fuelCap ?? 100, idleLph: 6 * burn, fullLph: 50 * burn, lowFrac: 0.15, lowSent: false };
     this.engineOut = false;
     this.events = [];
     this.wind = new V3();
@@ -42,26 +58,35 @@ export class Aircraft {
     this.reset();
   }
 
+  // Gear: two mains + a third point (nose wheel, tail wheel, or the bathtub's castoring front pair). Static loads
+  // come from the geometry for the new types (the C172 keeps its tuned 80/20 split).
   _buildPoints() {
-    const gh = this.dims.gearHeight, g = this.P.gear, L = this.dims.length, S = this.dims.span;
-    const sMain = 0.8 * this.P.mass * G / 2 / g.kMain, sNose = 0.2 * this.P.mass * G / g.kNose;
+    const P = this.P, gh = this.dims.gearHeight, g = P.gear, L = this.dims.length, S = this.dims.span, W = P.mass * G;
+    const tw = this.taildragger, z3 = tw ? g.tail : g.nose, pair = !tw && g.noseTrack != null;
+    const share3 = tw || pair ? Math.abs(g.main[1]) / Math.abs(z3 - g.main[1]) : 0.2;
+    const k3 = tw ? g.kTail : g.kNose, c3 = tw ? g.cTail : g.cNose;
+    const yM = g.mainY ?? -gh, y3 = tw ? g.tailY : (g.noseY ?? -gh);
+    const sMain = (1 - share3) * W / 2 / g.kMain, s3 = share3 * W / (pair ? 2 : 1) / k3;
+    const third = (x) => ({ r: new V3(x, y3 - s3, z3), k: k3, c: c3, nose: true, tail: tw, castor: pair, contact: false, load: 0 });
     this.wheels = [
-      { r: new V3(-g.main[0], -(gh + sMain), g.main[1]), k: g.kMain, c: g.cMain, nose: false, contact: false, load: 0 },
-      { r: new V3(g.main[0], -(gh + sMain), g.main[1]), k: g.kMain, c: g.cMain, nose: false, contact: false, load: 0 },
-      { r: new V3(0, -(gh + sNose), g.nose), k: g.kNose, c: g.cNose, nose: true, contact: false, load: 0 },
+      { r: new V3(-g.main[0], yM - sMain, g.main[1]), k: g.kMain, c: g.cMain, nose: false, contact: false, load: 0 },
+      { r: new V3(g.main[0], yM - sMain, g.main[1]), k: g.kMain, c: g.cMain, nose: false, contact: false, load: 0 },
+      ...(pair ? [third(-g.noseTrack), third(g.noseTrack)] : [third(0)]),
     ];
-    this.hardPoints = [
-      { r: new V3(0, -0.2, -L * 0.47), name: 'nose' },
-      { r: new V3(0, 0.6, L * 0.55), name: 'tail' },
-      { r: new V3(-S / 2, 0.7, 0), name: 'left wingtip' },
-      { r: new V3(S / 2, 0.7, 0), name: 'right wingtip' },
-      { r: new V3(0, -gh * 0.55, -0.2), name: 'belly' },
-    ];
-    this.tailSkid = new V3(0, -gh * 0.2, L * 0.5);
+    this.hardPoints = P.hardPoints
+      ? Object.entries(P.hardPoints).map(([k, r]) => ({ r: new V3(r[0], r[1], r[2]), name: HP_NAMES[k] || k }))
+      : [
+        { r: new V3(0, -0.2, -L * 0.47), name: 'nose' },
+        { r: new V3(0, 0.6, L * 0.55), name: 'tail' },
+        { r: new V3(-S / 2, 0.7, 0), name: 'left wingtip' },
+        { r: new V3(S / 2, 0.7, 0), name: 'right wingtip' },
+        { r: new V3(0, -gh * 0.55, -0.2), name: 'belly' },
+      ];
+    this.tailSkid = P.tailSkid ? new V3(...P.tailSkid) : new V3(0, -gh * 0.2, L * 0.5);
   }
 
   reset() {
-    this.crashed = false; this.crashReason = ''; this.onGround = false; this.mainsDown = false; this.noseDown = false;
+    this.crashed = false; this.crashReason = ''; this.onGround = false; this.mainsDown = false; this.noseDown = false; this.tailDown = false;
     this.airTime = 0; this.groundTime = 0; this.lastTouchdown = null; this.bounces = 0;
     this.stalled = false; this.surface = 'grass'; this.groundY = 0; this.time = 0;
     this.w.set(0, 0, 0);
@@ -72,9 +97,10 @@ export class Aircraft {
     this.reset();
     const gy = env ? env.groundHeightAt(o.x, o.z) : 0;
     const air = o.alt != null && o.alt > 2;
-    const y = o.y != null ? o.y : air ? gy + o.alt : gy + this.dims.gearHeight;
+    const sit = !air && this.P.groundPitch != null;
+    const y = o.y != null ? o.y : air ? gy + o.alt : gy + (sit ? this.P.restHeight : this.dims.gearHeight);
     this.pos.set(o.x, y, o.z);
-    this.q.setFromHPR(o.heading || 0, o.pitch || 0, o.roll || 0);
+    this.q.setFromHPR(o.heading || 0, o.pitch ?? (sit ? this.P.groundPitch : 0), o.roll || 0);
     const sp = o.speed || 0;
     this.vel.set(0, 0, -sp).applyQuat(this.q);
     this.eng = this.ctl.throttle = o.throttle != null ? o.throttle : air ? 0.6 : 0;
@@ -83,6 +109,9 @@ export class Aircraft {
     this.prevPos.copy(this.pos); this.prevQ.copy(this.q);
     this._derive(env);
   }
+
+  // CG height when sitting on the ground (taildraggers sit tail-down, lower than gearHeight)
+  get aglRef() { return this.P.restHeight ?? this.dims.gearHeight; }
 
   setControls(c) { Object.assign(this.ctl, c); }
 
@@ -104,7 +133,7 @@ export class Aircraft {
     const qd = 0.5 * RHO * V * V;
     const force = _force.set(0, -P.mass * G, 0), torque = _torque.set(0, 0, 0);
 
-    const agl = this.pos.y - this.groundY - this.dims.gearHeight;
+    const agl = this.pos.y - this.groundY - this.aglRef;
     let CL, stalled = false;
     const aS = P.alphaStall - this.flapsPos * 0.025;
     const lin = (a) => P.CL0 + P.CLa * a + this.flapsPos * P.flapCL;
@@ -146,22 +175,26 @@ export class Aircraft {
       if (wh.nose) nose = true; else mains++;
       const fwd = _wf.set(F.x, 0, F.z);
       if (wh.nose) {
-        const steer = -c.rudder * P.gear.maxSteer * clamp(1.2 - V / 30, 0.15, 1);
+        // a tail wheel is aft of the CG: it turns the other way for the same yaw
+        const steer = (wh.tail ? 1 : -1) * c.rudder * P.gear.maxSteer * clamp(1.2 - V / 30, 0.15, 1);
         const cs = Math.cos(steer), sn = Math.sin(steer);
         fwd.set(fwd.x * cs + fwd.z * sn, 0, -fwd.x * sn + fwd.z * cs);
       }
       fwd.normalize();
       const side = _ws.set(-fwd.z, 0, fwd.x);
       const vl = pv.x * fwd.x + pv.z * fwd.z, vs = pv.x * side.x + pv.z * side.z;
-      const mu = (ROLL_MU[surf] ?? 0.05) + (wh.nose ? 0 : c.brake * 0.55);
+      const mu = (ROLL_MU[surf] ?? 0.05) + (P.gear.rollDrag ?? 0) + (wh.nose ? 0 : c.brake * 0.55);
       const fl = -clamp(vl / 0.4, -1, 1) * mu * N;
-      const fs = -clamp(vs * 2.2, -1, 1) * 0.85 * N;
+      // tail wheel / castoring feet: grip only as far as the rudder holds them, beyond that they swivel
+      const grip = wh.tail || wh.castor ? (wh.tail ? 0.3 : 0.35) + 0.45 * Math.min(1, Math.abs(c.rudder) * 3) : 0.85;
+      const fs = -clamp(vs * 2.2, -1, 1) * grip * N;
       const wf = _wfo.set(fwd.x * fl + side.x * fs, N, fwd.z * fl + side.z * fs);
       force.add(wf);
       torque.add(_tq.crossVectors(rw, wf));
     }
     this.mainsDown = mains > 0;
-    this.noseDown = nose;
+    this.noseDown = nose && !this.taildragger;
+    this.tailDown = nose && this.taildragger;
     this.onGround = mains > 0 || nose;
 
     // Aerodynamic rotation: rate tracking toward what the surfaces + stability ask for.
@@ -173,8 +206,14 @@ export class Aircraft {
     let ty = -(c.rudder * P.maxYawRate * effE + P.kBeta * beta * eff);
     let tz = -(c.aileron * P.maxRollRate * eff) + (this.onGround ? 0 : P.kBank * bank * eff * (Math.abs(bank) < 1.2 ? 1 : 0));
     if (this.stalled) tz += Math.sin(this.time * 1.7 + this.pos.x) * 0.5 * eff;
+    if (P.rollWobble && !this.onGround) tz += P.rollWobble.amp * Math.sin(2 * Math.PI * P.rollWobble.hz * this.time) * eff;
     const kt = P.kTrack * (this.onGround ? 0.35 + eff : Math.max(0.4, eff));
-    const ax = (tq - this.w.x) * kt, ay = (ty - this.w.y) * kt, az = (tz - this.w.z) * kt;
+    // taildragger on its wheels: weak aerodynamic yaw tracking, so the mains-ahead-of-CG instability shows (it will
+    // ground-loop if you let it) but some damping keeps it catchable with the rudder
+    const td = this.taildragger && this.onGround;
+    let ay = (ty - this.w.y) * kt * (td ? GL.track : 1);
+    if (td) ay -= this.w.y * GL.damp;
+    const ax = (tq - this.w.x) * kt, az = (tz - this.w.z) * kt;
     const tb = torque.applyQuatInv(this.q);
     if (this.onGround) tb.x += c.elevator * qd * P.wingArea * 0.09 * (1 + this.eng * 0.3);
     const I = P.inertia;
@@ -187,7 +226,13 @@ export class Aircraft {
     this.q.integrateBody(this.w, dt);
 
     if (this.onGround) { this.groundTime += dt; this.airTime = 0; } else { this.airTime += dt; this.groundTime = 0; }
-    if (this.mainsDown && !wasDown && this._lastAirTime > 0.6) this._touchdown(gearOver, env);
+    // taildraggers grade from the mains: a tail-first or 3-point arrival still counts the mains' air time
+    if (this.taildragger) {
+      if (this.mainsDown) { this._mGnd = (this._mGnd || 0) + dt; if (this._mGnd > 1.5) this._mAir = this._mHi = 0; } else { this._mGnd = 0; this._mAir = (this._mAir || 0) + dt; this._mHi = Math.max(this._mHi || 0, agl); }
+    }
+    // (a taildragger's mains skipping a few cm while the tail settles is not a bounce)
+    if (this.mainsDown && !wasDown && (this.taildragger ? this._mAir > 0.6 && this._mHi > 0.4 : this._lastAirTime > 0.6)) this._touchdown(gearOver, env);
+    if (this.taildragger && this.mainsDown && !wasDown) this._mAir = this._mHi = 0;
     else if (gearOver && this._vsWas < -4.5) this._impact('touchdown', 'gear collapsed', { n: groundNormal(env, this.pos.x, this.pos.z), pen: 0, onGear: false, speedKt: -this._vsWas / KT });
     if (!this.onGround) this._lastAirTime = this.airTime;
     else if (this.groundTime > 1.5) this._lastAirTime = 0;
@@ -270,7 +315,8 @@ export class Aircraft {
       }
     }
     const ts = _rw.copy(this.tailSkid).applyQuat(this.q);
-    if (this.pos.y + ts.y < this.groundY && !this._tailStruck) { this._tailStruck = true; this.emit('tailstrike', {}); }
+    if (this.tailDown) this._tailStruck = false;
+    else if (this.pos.y + ts.y < this.groundY && !this._tailStruck) { this._tailStruck = true; this.emit('tailstrike', {}); }
     else if (this.pos.y + ts.y > this.groundY + 0.3) this._tailStruck = false;
     if (this.mainsDown && Math.abs(this.bank) > 0.5) {
       this._impact('ground', 'cartwheeled', { n: groundNormal(env, this.pos.x, this.pos.z), pen: 0.3 });
@@ -289,7 +335,7 @@ export class Aircraft {
     this.track = this.gs > 2 ? ((Math.atan2(this.vel.x, -this.vel.z) / DEG) + 360) % 360 : this.heading;
     this.vs = this.vel.y;
     if (env) this.groundY = env.groundHeightAt(this.pos.x, this.pos.z);
-    this.agl = this.pos.y - this.groundY - this.dims.gearHeight;
+    this.agl = this.pos.y - this.groundY - this.aglRef;
     this.alt = this.pos.y;
   }
 
@@ -297,10 +343,16 @@ export class Aircraft {
   instruments() {
     return {
       airspeed: this.speed / KT, altitude: this.alt / FT, vsi: this.vs / FT * 60, heading: this.heading,
-      pitch: this.pitch, roll: this.bank, rpm: this.engineOut ? Math.min(900, this.speed * 12) : 600 + this.eng * 2100 + Math.min(300, this.speed * 4),
+      pitch: this.pitch, roll: this.bank, rpm: this._rpm(),
       slip: clamp(this.beta * 4, -1, 1), flaps: this.flapsPos,
       fuelL: this.fuel.L / this.fuel.cap, fuelR: this.fuel.R / this.fuel.cap, fuel: this.fuel.L + this.fuel.R, lowFuel: this.fuelFraction < this.fuel.lowFrac, engineOut: this.engineOut,
     };
+  }
+
+  _rpm() {
+    const [lo, hi] = this.rpmRange, span = hi - lo;
+    if (this.engineOut) return Math.min(lo * 1.4, this.speed * 12 * hi / 2700);
+    return lo + this.eng * span * 0.86 + Math.min(span * 0.14, this.speed * 4);
   }
 
   // Online: 32-byte snapshot of this plane / drive it from received snapshots instead of simulating.

@@ -134,6 +134,7 @@ export function buildTigerCockpit(quality, mats, ctx) {
   const gauges = new THREE.Mesh(gq.build(), gaugeMat);
   gauges.name = 'gauges';
   group.add(gauges);
+  inst.attach?.(gauges);
 
   // stick (child of the rig's stick pivot so the pilot's hand follows it)
   const sb = new Builder();
