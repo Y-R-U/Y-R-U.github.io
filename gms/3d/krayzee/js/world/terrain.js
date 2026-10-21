@@ -18,6 +18,7 @@ export const LONG_ROAD_Z = -1240;
 const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const rectDist = (r, x, z) => Math.hypot(Math.max(r.x0 - x, 0, x - r.x1), Math.max(r.z0 - z, 0, z - r.z1));
 
+const RWV = new Map(RUNWAYS.map((rw) => [rw, headingToVec(rw.heading)]));
 export function lakeR(a) { return 1 + 0.16 * Math.sin(2 * a + 1.1) + 0.09 * Math.sin(3 * a + 0.4) + 0.05 * Math.sin(5 * a + 2.3); }
 export function lakeDist(x, z) {
   const u = (x - LAKE.x) / LAKE.rx, v = (z - LAKE.z) / LAKE.rz;
@@ -34,7 +35,13 @@ export function castleMound(x, z) {
 function openness(x, z) {
   let d = Math.min(rectDist(AIRFIELD_FLAT, x, z), rectDist(TOWN, x, z) + 40, Math.max(0, (lakeDist(x, z) - 1.35) * 300));
   if (Math.abs(x) < 3700) d = Math.min(d, Math.max(0, Math.abs(z - LONG_ROAD_Z) - 25));
-  return sstep(0, 650, d);
+  for (const rw of RUNWAYS) {
+    const [dx, dz] = RWV.get(rw);
+    const rx = x - rw.center[0], rz = z - rw.center[2];
+    const a = Math.abs(rx * dx + rz * dz) - rw.length / 2, b = Math.abs(-rx * dz + rz * dx);
+    if (a > 0 && a < 3400) d = Math.min(d, Math.max(0, b - 160 - a * 0.15) + Math.max(0, a - 2600));
+  }
+  return sstep(0, 650, d) * sstep(CASTLE.r0, CASTLE.r1 * 0.8, Math.hypot(x - CASTLE.x, z - CASTLE.z));
 }
 
 export function terrainHeight(x, z) {
@@ -58,7 +65,6 @@ export function airfieldMask(x, z) {
   return 1 - Math.min(1, Math.max(0, d / 10));
 }
 
-const RWV = new Map(RUNWAYS.map((rw) => [rw, headingToVec(rw.heading)]));
 export function stripMaskFor(rw, x, z) {
   const [dx, dz] = RWV.get(rw);
   const rx = x - rw.center[0], rz = z - rw.center[2];

@@ -53,7 +53,7 @@ export function createRadio(opts = {}) {
   const speakerFree = new Map();
   const intentFree = new Map();
   let player = null;
-  let tower = { id: 'tower', voice: 'tower_m', name: 'Krayzee Tower', color: '#9fb8ff' };
+  let tower = { id: 'tower', voice: 'tower_m', name: 'C-Tower 1', color: '#9fb8ff' };
   let outrage = 0, tier = 1, scandal = false;
   let t = 0, gapUntil = 0, lastAi = -99, lastInbound = -99, playerFree = 0, token = 0;
   let queue = [], current = null, win = null, pendingScold = null, scheduled = [];

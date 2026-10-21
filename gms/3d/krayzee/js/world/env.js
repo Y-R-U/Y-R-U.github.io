@@ -16,6 +16,9 @@ function installAtmosphere() {
   C.fog_vertex = '#ifdef USE_FOG\n vFogDepth = - mvPosition.z; vFogDir = (vec4(mvPosition.xyz, 0.0) * viewMatrix).xyz;\n#endif';
   C.fog_pars_fragment = `#ifdef USE_FOG
   uniform vec3 fogColor; varying float vFogDepth; varying vec3 vFogDir;
+  float cloudH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  float cloudN(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(cloudH(i), cloudH(i + vec2(1, 0)), f.x), mix(cloudH(i + vec2(0, 1)), cloudH(i + vec2(1, 1)), f.x), f.y); }
   #ifdef FOG_EXP2
     uniform float fogDensity;
   #else
@@ -32,6 +35,10 @@ function installAtmosphere() {
     fogFactor = max(fogFactor, smoothstep(9000.0, 13800.0, fDist));
     float fSun = pow(max(dot(vFogDir / max(fDist, 1e-3), vec3(${s.x.toFixed(4)}, ${s.y.toFixed(4)}, ${s.z.toFixed(4)})), 0.0), 5.0);
     vec3 fCol = mix(fogColor, vec3(1.0, 0.93, 0.8), fSun * 0.45);
+    vec3 fWp = cameraPosition + vFogDir;
+    vec2 cp = (fWp.xz - vec2(${(-s.x / s.y).toFixed(4)}, ${(-s.z / s.y).toFixed(4)}) * max(0.0, 1800.0 - fWp.y)) / 650.0;
+    float cShadow = smoothstep(0.56, 0.66, cloudN(cp) * 0.6 + cloudN(cp * 2.3 + 3.1) * 0.28 + cloudN(cp * 5.1 + 7.7) * 0.12) * step(fWp.y, 1800.0);
+    gl_FragColor.rgb *= 1.0 - 0.38 * cShadow * (1.0 - fogFactor);
     gl_FragColor.rgb = mix(gl_FragColor.rgb * mix(vec3(1.0), vec3(0.92, 0.97, 1.04), fogFactor), fCol, fogFactor);
   #else
     float fogFactor = smoothstep(fogNear, fogFar, vFogDepth);
