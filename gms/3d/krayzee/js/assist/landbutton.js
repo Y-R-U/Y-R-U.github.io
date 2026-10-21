@@ -1,4 +1,4 @@
-// The LAND assist button (D13). Sits above the throttle-side controls; FLIGHT decides what a press means.
+// The LAND assist button (D13). Sits above the stick zone (RADIO owns the throttle side); FLIGHT decides what a press means.
 
 const ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M2.5 19.5h19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 13.2l2.3-.6 2.4 2 4.6-1.2-4-6.3 2.2-.6 6.6 5.3 3.3-.9c1-.3 2 .3 2.2 1.2.2.8-.3 1.6-1.1 1.8L5.9 17.4z" fill="currentColor"/></svg>';
 
@@ -30,7 +30,7 @@ export function createLandButton({ container, onPress, stickRight = false } = {}
     else { b.textContent = 'LAND'; small.textContent = why; }
     el.setAttribute('aria-disabled', s === 'unavailable' ? 'true' : 'false');
   }
-  function setSide(right) { el.dataset.side = right ? 'left' : 'right'; }
+  function setSide(stickOnRight) { el.dataset.side = stickOnRight ? 'right' : 'left'; }
   setSide(stickRight);
   setState('idle');
   el.dataset.state = 'idle';

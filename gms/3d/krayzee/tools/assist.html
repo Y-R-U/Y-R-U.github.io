@@ -28,7 +28,7 @@
 <body>
 <canvas id="krz-canvas"></canvas>
 <div id="krz-overlay"></div>
-<div class="krz-radio"><div class="krz-r-tower" style="width:70px;height:120px;border:2px solid #ffd75e;border-radius:14px;background:#1b2230"></div><button class="krz-r-btn"><span class="krz-r-btn-lbl">RADIO</span></button></div>
+<div class="krz-radio"><div class="krz-r-tower" style="width:70px;height:clamp(52px,14vh,120px);border:2px solid #ffd75e;border-radius:14px;background:#1b2230"></div><button class="krz-r-btn"><span class="krz-r-btn-lbl">RADIO</span></button></div>
 <div id="bar"></div>
 <div id="info"></div>
 <canvas id="map"></canvas>
@@ -99,7 +99,7 @@ const land = createLandButton({ container: overlay, stickRight: settings.stickRi
 const SC = {
   final27: { x: 3400, z: 260, alt: 260, hdg: 268 },
   field: { x: 2600, z: 1500, alt: 220, hdg: 90 },
-  cross: { x: -450, z: 1700, alt: 220, hdg: 0 },
+  cross: { x: -1000, z: 1400, alt: 220, hdg: 0 },
 };
 const sc = SC[q.get('sc')] || SC.final27;
 const P = { x: sc.x, z: sc.z, alt: sc.alt, hdg: sc.hdg, spd: 41, t: 0, moving: !q.has('freeze') };
@@ -163,7 +163,7 @@ btn('map', () => showMap(true));
 const info = document.getElementById('info');
 
 // ---- loop ----
-let last = performance.now(), mkMs = 0, mkN = 0, availT = 0;
+let last = performance.now(), mkMs = 0, mkN = 0, availT = 0, loopMs = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   place(dt);
@@ -171,7 +171,7 @@ function frame(now) {
   renderer.render(scene, camera);
   const t0 = performance.now(); markers.update(); mkMs += performance.now() - t0; mkN++;
   if ((availT -= dt) <= 0 && land.state !== 'active') { availT = 2; const p = planNow(); land.setState(p.fail ? 'unavailable' : 'idle', p.fail ? p.hint : ''); }
-  if (mkN >= 60) { info.textContent = `markers ${(mkMs / mkN).toFixed(3)} ms/frame · ${view}\nland: ${lastPlan?.fail || lastPlan?.label + ' ' + lastPlan?.reason} (${lastPlan?.ms?.toFixed(1)} ms)`; mkMs = 0; mkN = 0; }
+  if (mkN >= 60) { loopMs = mkMs / mkN; info.textContent = `markers ${(mkMs / mkN).toFixed(3)} ms/frame · ${view}\nland: ${lastPlan?.fail || lastPlan?.label + ' ' + lastPlan?.reason} (${lastPlan?.ms?.toFixed(1)} ms)`; mkMs = 0; mkN = 0; }
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
@@ -273,6 +273,10 @@ function exactViolations(p) {
     for (const c of world.colliders) if (x >= c.min[0] - 1 && x <= c.max[0] + 1 && z >= c.min[2] - 1 && z <= c.max[2] + 1) return `${c.kind}@${x | 0},${z | 0}`;
     for (const t of world.trees) if (Math.abs(t[0] - x) < 4 && Math.abs(t[1] - z) < 4) return `tree@${x | 0},${z | 0}`;
   }
+  for (let s = 0; s + 50 <= L; s += 10) {
+    const h0 = world.groundHeightAt(sx + ux * s, sz + uz * s), h1 = world.groundHeightAt(sx + ux * (s + 50), sz + uz * (s + 50));
+    if (Math.abs(h1 - h0) / 50 > 0.025) return `grade ${(Math.abs(h1 - h0) / 2).toFixed(1)}%@${(sx + ux * s) | 0},${(sz + uz * s) | 0}`;
+  }
   return null;
 }
 window.__bench = {
@@ -288,7 +292,7 @@ window.__bench = {
   },
   sweep(n = 200, seed = 5, blind = false) {
     rs = seed;
-    const w = blind ? { ...world, colliders: [], trees: [], surfaceAt: (x, z) => { const s = world.surfaceAt(x, z); return s === 'water' || s === 'building' ? 'grass' : s; } } : world;
+    const w = blind ? { ...world, colliders: [], trees: [], groundHeightAt: () => 0, surfaceAt: (x, z) => { const s = world.surfaceAt(x, z); return s === 'water' || s === 'building' ? 'grass' : s; } } : world;
     const out = { n, plans: 0, kinds: {}, violations: [], ms: 0, maxMs: 0 };
     for (let i = 0; i < n; i++) {
       const s = randomState(), v = [Math.sin(s.hdg * DEG) * s.spd, 0, -Math.cos(s.hdg * DEG) * s.spd];
@@ -305,6 +309,7 @@ window.__bench = {
     return out;
   },
   plan: (debug) => planNow(debug),
+  loopMs: () => loopMs,
   FAIL_TEXT,
 };
 window.__ready = true;

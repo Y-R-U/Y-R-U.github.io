@@ -1,12 +1,12 @@
 // node js/assist/test/landahead.test.mjs [--falsify] [--n=400]
-// --falsify hands the planner a world with no colliders, trees or water: the safety check MUST then fail.
+// --falsify hands the planner a flat world with no colliders, trees or water: the safety check MUST then fail.
 import { planLandAhead, LAND } from '../landahead.js';
 import { fakeWorld, layout } from './fakeworld.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
 const N = +args.n || 400;
 const world = fakeWorld();
-const blind = args.falsify ? { ...world, colliders: [], trees: [], surfaceAt: (x, z) => { const s = world.surfaceAt(x, z); return s === 'water' || s === 'building' ? 'grass' : s; } } : world;
+const blind = args.falsify ? { ...world, colliders: [], trees: [], groundHeightAt: () => 0, surfaceAt: (x, z) => { const s = world.surfaceAt(x, z); return s === 'water' || s === 'building' ? 'grass' : s; } } : world;
 let pass = 0, fail = 0;
 const ok = (cond, name, detail = '') => { if (cond) pass++; else { fail++; console.log(`  FAIL ${name} ${detail}`); } };
 const DEG = Math.PI / 180;
@@ -20,12 +20,20 @@ function stripViolations(p) {
   const out = [];
   const [sx, sz] = p.strip.start, [ex, ez] = p.strip.end;
   const L = Math.hypot(ex - sx, ez - sz), ux = (ex - sx) / L, uz = (ez - sz) / L, half = 10;
+  const x0 = Math.min(sx, ex) - 20, x1 = Math.max(sx, ex) + 20, z0 = Math.min(sz, ez) - 20, z1 = Math.max(sz, ez) + 20;
+
+  for (let s = 0; s + 50 <= L; s += 10) {
+    const h0 = world.groundHeightAt(sx + ux * s, sz + uz * s), h1 = world.groundHeightAt(sx + ux * (s + 50), sz + uz * (s + 50));
+    if (Math.abs(h1 - h0) / 50 > 0.025) { out.push(`grade ${(Math.abs(h1 - h0) / 50 * 100).toFixed(1)}%@${(sx + ux * s) | 0},${(sz + uz * s) | 0}`); return out; }
+  }
+  const cols = world.colliders.filter((c) => c.max[0] > x0 && c.min[0] < x1 && c.max[2] > z0 && c.min[2] < z1);
+  const trees = world.trees.filter((t) => t[0] > x0 && t[0] < x1 && t[1] > z0 && t[1] < z1);
   for (let s = 0; s <= L; s += 2) for (let l = -half; l <= half; l += 2) {
     const x = sx + ux * s - uz * l, z = sz + uz * s + ux * l;
     const surf = world.surfaceAt(x, z);
     if (surf === 'water' || surf === 'building') { out.push(`${surf}@${x | 0},${z | 0}`); return out; }
-    for (const c of world.colliders) if (x >= c.min[0] - 1 && x <= c.max[0] + 1 && z >= c.min[2] - 1 && z <= c.max[2] + 1) { out.push(`${c.kind}@${x | 0},${z | 0}`); return out; }
-    for (const t of world.trees) if (Math.hypot(t[0] - x, t[1] - z) < 4) { out.push(`tree@${x | 0},${z | 0}`); return out; }
+    for (const c of cols) if (x >= c.min[0] - 1 && x <= c.max[0] + 1 && z >= c.min[2] - 1 && z <= c.max[2] + 1) { out.push(`${c.kind}@${x | 0},${z | 0}`); return out; }
+    for (const t of trees) if (Math.hypot(t[0] - x, t[1] - z) < 4) { out.push(`tree@${x | 0},${z | 0}`); return out; }
   }
   return out;
 }
@@ -36,7 +44,7 @@ console.log('aligned runway preference');
   ok(p.kind === 'runway' && p.runway === '09', 'final 09 picks RWY 09', JSON.stringify({ k: p.kind, r: p.runway, f: p.fail }));
   const q = plan(700 + 2200, 30, 160, 268);
   ok(q.kind === 'runway' && q.runway === '27', 'final 27 picks RWY 27', JSON.stringify({ k: q.kind, r: q.runway, f: q.fail }));
-  const c = plan(-450, 1500, 200, 0);
+  const c = plan(-1000, 1400, 200, 0);
   ok(c.kind === 'runway' && (c.runway === '09' || c.runway === '27'), 'crosswise runway ahead still preferred over grass', JSON.stringify({ k: c.kind, r: c.runway, f: c.fail }));
   ok(c.approach?.some((w) => w.kind === 'base'), 'crosswise runway uses a base turn', c.pattern);
   const c4 = plan(-200, 1800, 200, 355);
@@ -86,7 +94,7 @@ console.log(`random sweep ×${N}`);
     for (const w of p.approach) if (w.kind !== 'rollout' && w.kind !== 'touchdown' && w.alt < world.groundHeightAt(w.x, w.z) + 20) { badAlt++; break; }
   }
   console.log(`  ${plans} plans, ${JSON.stringify(kinds)}, avg ${(ms / N).toFixed(1)} ms, max ${maxMs.toFixed(1)} ms`);
-  ok(viol === 0, 'no strip crosses a building, tree, collider or water', `${viol} violations`);
+  ok(viol === 0, 'no strip crosses a building, tree, collider or water, or exceeds 2.5 % grade over 50 m', `${viol} violations`);
   ok(badCone === 0, 'every strip ≥ minLen');
   ok(badAlt === 0, 'approach waypoints clear terrain by ≥ 20 m', `${badAlt}`);
   ok(plans > N * 0.3, 'planner finds something most of the time', `${plans}/${N}`);

@@ -41,7 +41,7 @@ const VPS = [[390, 844, true, 'portrait'], [844, 390, true, 'landscape'], [1280,
 for (const [w, h, mobile, tag] of VPS) {
   console.log(`\n${tag} ${w}x${h}`);
   for (const hand of ['left', 'right']) {
-    await load(w, h, mobile, `freeze&sc=final27&hand=${hand}`);
+    await load(w, h, mobile, `freeze&shot=1&sc=final27&hand=${hand}`);
     await ev('__bench.freeze(14)');
     await sleep(600);
     const ctl = { stick: await rect('.krz-stick-zone'), thr: await rect('.krz-thr'), pad: await rect('.krz-pad'), radio: await rect('.krz-r-btn'), tower: await rect('.krz-r-tower'), topR: await rect('.krz-top-r'), topL: await rect('.krz-top-l') };
@@ -55,17 +55,28 @@ for (const [w, h, mobile, tag] of VPS) {
       const covered = await ev(`!!document.elementFromPoint(${r.x + r.w / 2}, ${r.y + r.h / 2})?.closest('.krz-land, .krz-mk')`);
       ok(!covered, `[${hand}] ${k} centre not covered by assist UI`);
     }
-    const dbg = await ev('__bench.markers.debug()');
-    const offs = dbg.drawn.filter((d) => d.off);
-    const bad = offs.filter((d) => Object.entries(ctl).some(([k, r]) => r && d.x > r.x - 6 && d.x < r.x + r.w + 6 && d.y > r.y - 6 && d.y < r.y + r.h + 6));
-    ok(offs.length > 0 && bad.length === 0, `[${hand}] ${offs.length} edge arrows, none under controls/buttons`, JSON.stringify(bad));
-    const onS = dbg.drawn.filter((d) => !d.off).length;
-    ok(onS > 0, `[${hand}] ${onS} on-screen tags`);
+    ctl.land = landR;
+    let dbg;
+    for (const v of ['chase', 'center', 'cockpit']) {
+      await ev(`__bench.setView('${v}')`); await sleep(400);
+      dbg = await ev('__bench.markers.debug()');
+      const offs = dbg.drawn.filter((d) => d.off);
+      const near = (d, r, p) => r && d.x > r.x - p && d.x < r.x + r.w + p && d.y > r.y - p && d.y < r.y + r.h + p;
+      const bad = offs.filter((d) => Object.values(ctl).some((r) => near(d, r, 12)));
+      ok(offs.length > 0 && bad.length === 0, `[${hand}/${v}] ${offs.length} edge arrows, none within 12 px of controls/buttons`, JSON.stringify(bad));
+      const zones = { stick: ctl.stick, thr: ctl.thr, pad: ctl.pad, radio: ctl.radio, land: ctl.land };
+      const pb = dbg.pills.filter((p) => Object.values(zones).some((r) => overlap({ x: p[0], y: p[1], w: p[2] - p[0], h: p[3] - p[1] }, r)));
+      ok(pb.length === 0, `[${hand}/${v}] ${dbg.pills.length} label pills clear of stick/throttle/pad/radio/LAND`, JSON.stringify(pb));
+      if (v === 'chase') ok(dbg.drawn.some((d) => !d.off), `[${hand}] on-screen tags present`);
+    }
+    await ev(`__bench.setView('chase')`); await sleep(300);
     if (hand === 'left') {
       await shot(`markers_${w}x${h}_chase`);
       for (const v of ['center', 'cockpit']) { await ev(`__bench.setView('${v}')`); await sleep(500); await shot(`markers_${w}x${h}_${v}`); }
       await ev(`__bench.setView('chase')`);
       const ms = await ev('__bench.perf(400)');
+      const loopMs = await ev('new Promise((r)=>setTimeout(()=>r(__bench.loopMs()), 2500))');
+      console.log(`  (in-loop, after render: ${loopMs.toFixed(3)} ms/frame)`);
       ok(ms <= 0.3, `markers.update() ${ms.toFixed(3)} ms for ${dbg.n} markers (≤ 0.3)`);
       // tap LAND: final 27 → should plan RWY 27 and go active
       const lr = landR;
@@ -83,7 +94,7 @@ for (const [w, h, mobile, tag] of VPS) {
       await ev(`__bench.land.setState('unavailable', 'GO LOWER')`); await sleep(200);
       await shot(`land_unavailable_${w}x${h}`);
       const lr2 = await rect('.krz-land');
-      ok(!Object.values(ctl).some((r) => overlap(lr2, r)), 'unavailable LAND (with reason) still clear of controls');
+      ok(!Object.entries(ctl).some(([k, r]) => k !== 'land' && overlap(lr2, r)), 'unavailable LAND (with reason) still clear of controls');
     }
   }
 }
@@ -95,7 +106,8 @@ console.log(`  ${sw.plans}/${sw.n} plans ${JSON.stringify(sw.kinds)} avg ${sw.ms
 ok(sw.violations.length === 0, 'no chosen strip crosses water/building/collider/tree', sw.violations.slice(0, 5).join(' | '));
 ok(sw.plans > 100, 'planner finds strips on the real world');
 const fz = await ev('__bench.sweep(300, 11, true)');
-ok(fz.violations.length > 0, `FALSIFY: blind planner (no colliders/trees/water) is caught: ${fz.violations.length} violations`, '');
+const fzGrade = fz.violations.filter((v) => v.includes('grade')).length;
+ok(fz.violations.length - fzGrade > 0 && fzGrade > 0, `FALSIFY: blind planner (flat, no colliders/trees/water) is caught: ${fz.violations.length - fzGrade} obstacle + ${fzGrade} grade violations`, '');
 for (const sc of ['final27', 'cross', 'field']) {
   await ev(`__bench.scenario('${sc}')`);
   const p = await ev('(()=>{const p=__bench.plan(); return {f:p.fail,l:p.label,k:p.kind,r:p.reason,ms:p.ms}})()');

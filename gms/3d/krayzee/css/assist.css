@@ -1,11 +1,11 @@
-/* ASSIST lane: HUD markers canvas + LAND button. Uses FLIGHT's safe-zone vars (docs/RADIO.md). */
+/* ASSIST lane: HUD markers canvas + LAND button. Uses FLIGHT's safe-zone vars (docs/RADIO.md). LAND sits on the stick side. */
 .krz-mk { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9; }
 .krz-mk[hidden] { display: none; }
 
 .krz-land {
   --land: #7ee0ff;
-  position: absolute; z-index: 41; pointer-events: auto; touch-action: manipulation; cursor: pointer;
-  display: flex; align-items: center; gap: 7px; height: 48px; min-width: 84px; max-width: 150px; padding: 0 12px 0 10px;
+  position: absolute; z-index: 39; pointer-events: auto; touch-action: manipulation; cursor: pointer;
+  display: flex; align-items: center; gap: 7px; height: 48px; min-width: 84px; max-width: 190px; padding: 0 12px 0 10px;
   border-radius: 24px; border: 2px solid var(--land); background: rgba(14, 22, 38, .78); color: var(--land);
   box-shadow: 0 4px 14px rgba(0, 0, 0, .4); font-family: system-ui, sans-serif; text-align: left;
   bottom: calc(var(--sb, 0px) + var(--krz-ctl-bottom, 200px) + 10px);
@@ -27,8 +27,10 @@
 @keyframes krz-land-pulse { 50% { box-shadow: 0 0 0 5px rgba(94, 224, 143, .25), 0 4px 14px rgba(0, 0, 0, .4); } }
 @keyframes krz-land-nope { 20%, 60% { translate: -5px 0; } 40%, 80% { translate: 5px 0; } }
 
-/* landscape: right side sits left of RADIO's button (60 px at right 14 px); left side sits above the stick zone */
+/* LAND lives by the stick zone (RADIO's button sits above BRAKE on the throttle side):
+   portrait above it, landscape just inboard of it at the bottom (short screens have no room above it) */
 @media (orientation: landscape) {
-  .krz-land[data-side="right"] { right: calc(var(--sr, 0px) + 84px); bottom: calc(var(--sb, 0px) + var(--krz-ctl-right-h, 200px) + 18px); }
-  .krz-land[data-side="left"] { left: calc(var(--sl, 0px) + 14px); bottom: calc(var(--sb, 0px) + var(--krz-ctl-bottom, 200px) + 12px); }
+  .krz-land { bottom: calc(var(--sb, 0px) + 14px); }
+  .krz-land[data-side="left"] { left: calc(var(--krz-ctl-left, 190px) + 10px); }
+  .krz-land[data-side="right"] { right: calc(var(--krz-ctl-right, 190px) + 10px); }
 }

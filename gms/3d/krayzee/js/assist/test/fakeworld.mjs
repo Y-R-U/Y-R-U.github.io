@@ -55,9 +55,13 @@ export function fakeWorld({ seed = 7, extra = [] } = {}) {
   }
   function groundHeightAt(x, z) {
     const d = Math.hypot(x, z);
-    if (d <= 3800) return 0;
+    // WORLD r2-style rolling ground outside the airfield, plus a castle hill ~2.4 km NE
+    const roll = Math.max(0, Math.min(1, (Math.max(Math.abs(x) - 1050, Math.abs(z) - 640, 0)) / 300));
+    const castle = 70 * Math.max(0, 1 - Math.hypot(x - 780, z + 2300) / 640) ** 1.5;
+    const base = roll * (7 + 9 * Math.sin(x / 260 + 1.3) * Math.cos(z / 330) + 6 * Math.sin((x + z) / 140)) + castle;
+    if (d <= 3800) return base;
     const k = Math.min(1, (d - 3800) / 3500);
-    return k * k * (3 - 2 * k) * (60 + 140 * (0.5 + 0.5 * Math.sin(x / 900) * Math.cos(z / 1100)));
+    return base + k * k * (3 - 2 * k) * (60 + 140 * (0.5 + 0.5 * Math.sin(x / 900) * Math.cos(z / 1100)));
   }
   return { surfaceAt, groundHeightAt, colliders, trees, runwayAt: () => null, LAKE };
 }

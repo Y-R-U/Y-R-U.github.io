@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Krayzee — FX bench</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; overflow: hidden; font: 13px system-ui, sans-serif; color: #fff; }
+  canvas { display: block; touch-action: none; }
+  #ui { position: fixed; top: 6px; left: 6px; right: 6px; display: flex; flex-wrap: wrap; gap: 5px; pointer-events: none; }
+  #ui button { pointer-events: auto; background: rgba(20, 16, 40, 0.78); color: #fff; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 8px; padding: 5px 9px; font: inherit; }
+  #ui button.on { background: #4b1f7a; border-color: #e2ac2c; }
+  #ui .sep { flex-basis: 100%; height: 0; }
+  #stats { position: fixed; left: 6px; bottom: 6px; background: rgba(0, 0, 0, 0.6); padding: 6px 8px; border-radius: 6px; font: 11px ui-monospace, monospace; white-space: pre; pointer-events: none; }
+  body.shot #ui, body.shot #stats { display: none; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../../../lib/three/0.180.0/three.module.js", "three/addons/": "../../../lib/three/0.180.0/addons/" } }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui"></div>
+<div id="stats"></div>
+<script type="module">
+import * as THREE from 'three';
+import { buildWorld } from '../js/world/airport.js';
+import { createPlane } from '../js/plane/index.js';
+import { createRenderer } from '../js/core/renderer.js';
+import { createFX } from '../js/fx/index.js';
+
+const qs = new URLSearchParams(location.search);
+let tierName = ['low', 'medium', 'high'].includes(qs.get('q')) ? qs.get('q') : 'high';
+if (qs.has('shot')) document.body.classList.add('shot');
+
+const R = createRenderer(document.getElementById('c'), tierName, { antialias: true });
+const renderer = R.renderer;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.4, 24000);
+R.onResize.push((w, h) => { camera.aspect = w / h; camera.updateProjectionMatrix(); });
+R.resize();
+const world = await buildWorld(scene, renderer, { quality: tierName === 'low' ? 'low' : 'high' });
+world.setQuality?.(tierName);
+const livery = { name: 'Dirk', company: 'Dirk Air', primary: '#5b2a86', secondary: '#f2f2f2', accent: '#e2ac2c', registration: 'K-DIRK' };
+const rig = await createPlane({ type: 'c172', livery, quality: tierName === 'low' ? 'low' : 'high', cockpit: true, pilot: { gender: 'm' }, view: 'chase' });
+rig.root.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+if (world.envMap) rig.root.traverse((o) => { if (o.isMesh) for (const m of [].concat(o.material)) if (m.isMeshStandardMaterial && !m.envMap) { m.envMap = world.envMap; m.needsUpdate = true; } });
+scene.add(rig.root);
+
+const fx = createFX({ scene, camera, renderer, quality: tierName, world });
+const ac = { vel: { x: 0, y: 0, z: 0 }, alpha: 0.05, beta: 0, agl: 0, onGround: true, surface: 'runway', eng: 0.2, ctl: { brake: 0, throttle: 0.2 }, crashed: false };
+fx.track('player', { rig, ac, player: true });
+fx.setTiming(!qs.has('notiming'));
+
+// ---------- places ----------
+const GH = rig.dims.gearHeight;
+function findSurface(kind, near = [0, 0], maxR = 4000) {
+  for (let r = 0; r < maxR; r += 20) for (let a = 0; a < 64; a++) {
+    const x = near[0] + Math.cos(a / 64 * 6.283) * r, z = near[1] + Math.sin(a / 64 * 6.283) * r;
+    if (world.surfaceAt(x, z) === kind) return [x, z];
+  }
+  return null;
+}
+const GRASS = findSurface('grass', [-450, 70]) || [-450, 80];
+const WATER = findSurface('water', [0, 0], 6000);
+const PLACES = { runway: [-560, 0], grass: GRASS, water: WATER };
+
+// ---------- plane pose ----------
+const m4 = new THREE.Matrix4(), fwd = new THREE.Vector3(), upv = new THREE.Vector3(), rgt = new THREE.Vector3();
+function pose(x, y, z, f, u) {
+  fwd.copy(f).normalize(); rgt.crossVectors(fwd, u).normalize(); upv.crossVectors(rgt, fwd);
+  m4.makeBasis(rgt, upv, fwd.clone().negate());
+  rig.root.quaternion.setFromRotationMatrix(m4);
+  rig.root.position.set(x, y, z);
+}
+const hdgVec = (h) => new THREE.Vector3(Math.sin(h * Math.PI / 180), 0, -Math.cos(h * Math.PI / 180));
+
+// ---------- scenarios ----------
+let scen = null, st = 0, view = 'chase', camMode = 'chase', orbit = 0, bounceY = 0, bounceV = 0;
+const set = (o) => Object.assign(ac, { alpha: 0.05, beta: 0, crashed: false, ...o });
+const S = {
+  idle: { tick() {} },
+  runup: {
+    start() { fx.reset('player'); this.at = 'runway'; },
+    tick(t) {
+      const [x, z] = PLACES[this.at];
+      pose(x, world.groundHeightAt(x, z) + GH, z, hdgVec(90), new THREE.Vector3(0, 1, 0));
+      set({ vel: { x: 0, y: 0, z: 0 }, onGround: true, agl: 0, surface: world.surfaceAt(x, z), eng: 1, ctl: { brake: 1, throttle: 1 } });
+    },
+  },
+  runupGrass: { start() { fx.reset('player'); }, tick(t) { S.runup.at = 'grass'; S.runup.tick(t); } },
+  taxiGrass: {
+    start() { fx.reset('player'); this.x = PLACES.grass[0] - 80; },
+    tick(t, dt) {
+      this.x += 9 * dt; if (this.x > PLACES.grass[0] + 120) this.x = PLACES.grass[0] - 80;
+      const z = PLACES.grass[1];
+      pose(this.x, world.groundHeightAt(this.x, z) + GH, z, hdgVec(90), new THREE.Vector3(0, 1, 0));
+      set({ vel: { x: 9, y: 0, z: 0 }, onGround: true, agl: 0, surface: world.surfaceAt(this.x, z), eng: 0.7, ctl: { brake: 0, throttle: 0.7 } });
+    },
+  },
+  roll: {
+    // rolling down the runway; touchdown() fires the event at t=0.15
+    start(o = {}) { fx.reset('player'); this.o = o; this.x = (o.at === 'grass' ? PLACES.grass[0] - 100 : -640); this.v = 31; this.fired = false; },
+    tick(t, dt) {
+      const z = this.o.at === 'grass' ? PLACES.grass[1] : 0;
+      this.v = Math.max(0, this.v - 3 * dt); this.x += this.v * dt;
+      const air = t < 0.15;
+      const yaw = this.o.slip ? 90 + 6 * Math.max(0, 1 - t) : 90;
+      const sink = this.o.fpm / 196.85;
+      pose(this.x, world.groundHeightAt(this.x, z) + GH + (air ? (0.15 - t) * sink : 0), z, hdgVec(yaw), new THREE.Vector3(0, 1, 0));
+      set({ vel: { x: this.v, y: air ? -sink : 0, z: 0 }, onGround: !air, agl: 0, surface: world.surfaceAt(this.x, z), eng: 0.1, beta: this.o.slip ? 0.1 : 0, ctl: { brake: 0, throttle: 0.1 } });
+      if (!air && !this.fired) { this.fired = true; fx.onAircraftEvent('player', { type: 'touchdown', fpm: this.o.fpm, grade: 'x', bounce: false, surface: ac.surface }); }
+    },
+  },
+  turn: {
+    start() { fx.reset('player'); },
+    tick(t) {
+      const Rr = 85, v = 52, w = v / Rr, a = t * w, cx = -200, cz = 250, alt = 160;
+      const x = cx + Math.cos(a) * Rr, z = cz + Math.sin(a) * Rr;
+      const f = new THREE.Vector3(-Math.sin(a), 0.0, Math.cos(a));
+      const cent = new THREE.Vector3(cx - x, 0, cz - z).normalize().multiplyScalar(v * v / Rr);
+      const u = cent.add(new THREE.Vector3(0, 9.81, 0)).normalize();
+      pose(x, alt, z, f, u);
+      set({ vel: { x: f.x * v, y: 0, z: f.z * v }, onGround: false, agl: alt - GH, surface: 'grass', eng: 0.8, alpha: 0.2, ctl: { brake: 0, throttle: 0.8 } });
+    },
+  },
+  fast: {
+    start() { fx.reset('player'); this.x = -2500; },
+    tick(t, dt) {
+      const v = 78; this.x += v * dt; if (this.x > 2500) { this.x = -2500; fx.reset('player'); }
+      pose(this.x, 650, 300, new THREE.Vector3(1, -0.02, 0), new THREE.Vector3(0, 1, 0));
+      set({ vel: { x: v, y: -1.5, z: 0 }, onGround: false, agl: 640, surface: 'grass', eng: 1, ctl: { brake: 0, throttle: 1 } });
+    },
+  },
+  cruise: {
+    start(o = {}) { fx.reset('player'); this.x = -900; this.alt = o.alt || 40; },
+    tick(t, dt) {
+      const v = 45; this.x += v * dt; if (this.x > 900) this.x = -900;
+      pose(this.x, this.alt, 120, new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0));
+      set({ vel: { x: v, y: 0, z: 0 }, onGround: false, agl: this.alt - GH, surface: 'grass', eng: 0.75, ctl: { brake: 0, throttle: 0.75 } });
+    },
+  },
+  bounce: {
+    start() { fx.reset('player'); this.x = -560; this.v = 22; bounceY = 0; bounceV = 0; this.next = 0.3; },
+    tick(t, dt) {
+      this.x += this.v * dt;
+      bounceV -= 9.81 * dt; bounceY += bounceV * dt;
+      if (bounceY < 0) { bounceY = 0; bounceV = 0; }
+      if (t > this.next) { this.next = 1e9; bounceV = 7; fx.impact({ id: 'player', kind: 'bounce', strength: 0.8 }); }
+      pose(this.x, GH + bounceY, 0, hdgVec(90), new THREE.Vector3(0, 1, 0));
+      set({ vel: { x: this.v, y: bounceV, z: 0 }, onGround: bounceY < 0.05, agl: bounceY, surface: 'runway', eng: 0.4, ctl: { brake: 0, throttle: 0.4 } });
+    },
+  },
+  crash: {
+    start() { fx.reset('player'); this.x = -560; this.v = 26; this.done = false; },
+    tick(t, dt) {
+      if (!this.done && t > 0.25) { this.done = true; ac.crashed = true; fx.onAircraftEvent('player', { type: 'crash', reason: 'cartwheeled' }); }
+      if (!this.done) this.x += this.v * dt;
+      const f = this.done ? new THREE.Vector3(1, -0.25, 0.3) : hdgVec(90);
+      pose(this.x, GH * (this.done ? 0.6 : 1), 0, f, this.done ? new THREE.Vector3(0.3, 1, 0.5) : new THREE.Vector3(0, 1, 0));
+      Object.assign(ac, { vel: { x: this.done ? 0 : this.v, y: 0, z: 0 }, onGround: true, agl: 0, surface: 'runway', eng: 0 });
+    },
+  },
+  water: {
+    start() { fx.reset('player'); this.done = false; },
+    tick(t, dt) {
+      if (!WATER) return;
+      const [wx, wz] = WATER, gy = world.groundHeightAt(wx, wz);
+      const k = Math.min(t, 0.6) / 0.6;
+      const x = wx - 20 + 20 * k, y = gy + GH + 6 * (1 - k) - (this.done ? Math.min(1.2, (t - 0.6) * 0.5) : 0);
+      pose(x, y, wz, new THREE.Vector3(1, -0.15, 0), new THREE.Vector3(0, 1, 0));
+      Object.assign(ac, { vel: { x: this.done ? 0 : 33, y: this.done ? 0 : -10, z: 0 }, onGround: k >= 1, agl: 0, surface: 'water', eng: 0.3, crashed: this.done });
+      if (!this.done && k >= 1) { this.done = true; fx.onAircraftEvent('player', { type: 'crash', reason: 'ditched in the water' }); }
+    },
+  },
+  sun: {
+    start() { fx.reset('player'); this.x = -300; },
+    tick(t, dt) {
+      const sd = new THREE.Vector3(-0.42, 0, 0.55).normalize();
+      const f = sd.clone().add(new THREE.Vector3(0, 0.45, 0)).normalize();
+      pose(-300 + sd.x * 40 * t, 300, 200 + sd.z * 40 * t, f, new THREE.Vector3(0, 1, 0));
+      set({ vel: { x: sd.x * 40, y: 0, z: sd.z * 40 }, onGround: false, agl: 300, eng: 0.8, ctl: { brake: 0, throttle: 0.8 } });
+    },
+  },
+};
+function run(name, o) {
+  scen = S[name]; st = 0;
+  if (name !== 'crash' && name !== 'water') ac.crashed = false;
+  scen.start?.(o);
+}
+
+// ---------- camera ----------
+const tmp = new THREE.Vector3(), look = new THREE.Vector3();
+let camOverride = null;
+function updateCamera(dt) {
+  const p = rig.root.position;
+  if (view !== 'chase') {
+    tmp.copy(view === 'center' ? rig.eyeCenter || rig.eye : rig.eye).applyMatrix4(rig.root.matrixWorld);
+    camera.position.copy(tmp);
+    camera.quaternion.copy(rig.root.quaternion);
+    camera.rotateX(rig.eyePitch || -0.09);
+    camera.fov = 70; camera.updateProjectionMatrix();
+    return;
+  }
+  camera.fov = innerWidth < innerHeight ? 70 : 55; camera.updateProjectionMatrix();
+  if (camOverride) { camOverride(p); return; }
+  const f = tmp.set(0, 0, -1).applyQuaternion(rig.root.quaternion);
+  f.y = 0; if (f.lengthSq() < 0.01) f.set(1, 0, 0); f.normalize();
+  const side = new THREE.Vector3(-f.z, 0, f.x);
+  const dist = camMode === 'side' ? 0 : 16;
+  const pos = p.clone().addScaledVector(f, -dist).add(new THREE.Vector3(0, 4.5, 0));
+  if (camMode === 'side') pos.addScaledVector(side, 22).add(new THREE.Vector3(0, -2, 0));
+  if (camMode === 'orbit') { orbit += dt * 0.25; pos.copy(p).add(new THREE.Vector3(Math.cos(orbit) * 22, 7, Math.sin(orbit) * 22)); }
+  const gy = world.groundHeightAt(pos.x, pos.z) + 1.2;
+  if (pos.y < gy) pos.y = gy;
+  camera.position.copy(pos);
+  look.copy(p).add(new THREE.Vector3(0, 1, 0));
+  camera.lookAt(look);
+}
+
+// ---------- UI ----------
+const ui = document.getElementById('ui');
+const btn = (label, fn, group) => { const b = document.createElement('button'); b.textContent = label; b.onclick = () => { fn(); if (group) { for (const o of ui.querySelectorAll(`[data-g="${group}"]`)) o.classList.remove('on'); b.classList.add('on'); } }; if (group) b.dataset.g = group; ui.append(b); return b; };
+const sep = () => { const d = document.createElement('div'); d.className = 'sep'; ui.append(d); };
+btn('Butter', () => run('roll', { fpm: 180 }));
+btn('Firm', () => run('roll', { fpm: 600 }));
+btn('Hard+slip', () => run('roll', { fpm: 1000, slip: true }));
+btn('Grass land', () => run('roll', { fpm: 450, at: 'grass' }));
+btn('Run-up', () => run('runup'));
+btn('Grass run-up', () => run('runupGrass'));
+btn('Taxi grass', () => run('taxiGrass'));
+btn('3g turn', () => run('turn'));
+btn('Fast', () => run('fast'));
+sep();
+btn('BOING', () => run('bounce'));
+btn('Dmg 30%', () => { run('cruise'); fx.onGameEvent('protection', { mode: 'partial', pct: 70 }); fx.impact({ id: 'player', kind: 'damage', strength: 0.4 }); });
+btn('Dmg 60%', () => { run('cruise'); fx.onGameEvent('protection', { mode: 'partial', pct: 40 }); fx.impact({ id: 'player', kind: 'damage', strength: 0.6 }); });
+btn('Dmg 90%', () => { run('cruise'); fx.onGameEvent('protection', { mode: 'partial', pct: 10 }); fx.impact({ id: 'player', kind: 'damage', strength: 0.9 }); });
+btn('Crash', () => run('crash'));
+btn('Water', () => run('water'));
+btn('Combo', () => { if (scen !== S.cruise) run('cruise', { alt: 60 }); fx.onGameEvent('combo', { mult: 2.5 }); });
+btn('Rank up', () => { if (scen !== S.cruise) run('cruise', { alt: 60 }); fx.onGameEvent('rankUp', {}); });
+btn('Sun glare', () => { run('sun'); setView('cockpit'); });
+btn('Clear', () => { fx.clear(); run('idle'); });
+sep();
+for (const t of ['low', 'medium', 'high']) btn(t, () => setTier(t), 'tier').classList.toggle('on', t === tierName);
+for (const v of ['chase', 'center', 'cockpit']) btn(v, () => setView(v), 'view').classList.toggle('on', v === 'chase');
+for (const c of ['chase', 'side', 'orbit']) btn('cam ' + c, () => { camMode = c; camOverride = null; }, 'cam').classList.toggle('on', c === 'chase');
+
+function setTier(t) { tierName = t; R.setQuality(t); world.setQuality?.(t); fx.setQuality(t); }
+function setView(v) { view = v; rig.setView(v === 'chase' ? 'chase' : v); fx.setView(v); }
+
+// ---------- loop ----------
+const stats = document.getElementById('stats');
+let last = performance.now(), fpsAcc = 0, fpsN = 0, fps = 0, paused = false, frames = 0, noFx = false;
+function step(dt) {
+  st += dt;
+  scen?.tick(st, dt);
+  rig.setControls({ aileron: 0, elevator: 0, rudder: 0, throttle: ac.eng, flaps: 0, brake: 0 });
+  rig.updateInstruments({ airspeed: Math.hypot(ac.vel.x, ac.vel.y, ac.vel.z) / 0.5144, altitude: rig.root.position.y * 3.28, vsi: 0, heading: 90, pitch: 0, roll: 0, rpm: 700 + ac.eng * 2000, slip: 0, flaps: 0 });
+  rig.update(dt);
+  rig.root.updateMatrixWorld();
+  updateCamera(dt);
+  world.update?.(dt, camera);
+  world.setShadowFocus?.(rig.root.position.x, rig.root.position.z, 90);
+  if (!noFx) fx.update(dt);
+}
+renderer.setAnimationLoop((now) => {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (paused) return;
+  step(dt);
+  renderer.render(scene, camera);
+  frames++;
+  fpsAcc += dt; fpsN++;
+  if (fpsAcc > 0.5) { fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
+  if (frames % 10 === 0) {
+    const s = fx.stats();
+    stats.textContent = `fps ${fps.toFixed(0)}  calls ${renderer.info.render.calls}  fx calls ${s.calls}  tier ${s.quality}\n` +
+      `particles ${s.particles}/${s.cap}  debris ${s.debris}  fx cpu ${s.cpuMs.toFixed(3)} ms\n` +
+      `shimmer ${s.shimmer}${s.shimmerOk ? '' : ' (unsupported)'}  glare ${s.glare}  dropped ${s.dropped}`;
+  }
+});
+run('runup');
+
+// ---------- test hooks (CDP) ----------
+function frameOnce(dt = 1 / 60) { step(dt); renderer.render(scene, camera); }
+const fxMeshes = [];
+scene.traverse((o) => { if (o.name && o.name.startsWith('fx-')) fxMeshes.push(o); });
+window.__fx = {
+  fx, run, setTier, setView, ac, rig, camera, renderer, places: PLACES,
+  pause(on) { paused = on; },
+  advance(sec, dt = 1 / 60) { for (let t = 0; t < sec; t += dt) frameOnce(dt); return fx.stats(); },
+  cam(m) { camMode = m; camOverride = null; },
+  camAt(pos, lk) { camOverride = () => { camera.position.set(...pos); camera.lookAt(...lk); }; },
+  callsWithout() {
+    const vis = [];
+    scene.traverse((o) => { if (o.name && o.name.startsWith('fx-')) { vis.push([o, o.visible]); o.visible = false; } });
+    renderer.render(scene, camera);
+    const base = renderer.info.render.calls;
+    for (const [o, v] of vis) o.visible = v;
+    renderer.render(scene, camera);
+    return { total: renderer.info.render.calls, base, fx: renderer.info.render.calls - base };
+  },
+  // Pixel proof that the shimmer refraction does something: same frame with the shimmer on vs forced off.
+  shimmerDiff() {
+    const gl = renderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight;
+    const a = new Uint8Array(w * h * 4), b = new Uint8Array(w * h * 4);
+    const sh = fx._internals.screen.shimmer;
+    renderer.render(scene, camera); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, a);
+    const was = sh.visible; sh.visible = false;
+    renderer.render(scene, camera); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, b);
+    sh.visible = was;
+    let n = 0, sum = 0;
+    for (let i = 0; i < a.length; i += 4) { const d = Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]); if (d > 6) n++; sum += d; }
+    return { visible: was, changedPixels: n, meanDiff: +(sum / (w * h)).toFixed(4), err: gl.getError() };
+  },
+  // Steady-state allocation probe: continuous effects only (wash + vapour + damage smoke + skids + columns live).
+  // Worst case: crash column + fire + debris, damaged plane smoke, vapour, skids, a combo and a bounce every 2 s.
+  stress(on = true) {
+    run('crash'); this.advance(0.5);
+    const ac2 = { vel: { x: 60, y: 0, z: 0 }, alpha: 0.26, beta: 0, agl: 200, onGround: false, surface: 'grass', eng: 1, ctl: { brake: 0, throttle: 1 }, crashed: false };
+    if (on) { fx.track('probe2', { rig, ac: ac2, applyScale: false }); fx.damageSmoke('probe2', { level: 0.8 }); }
+    else fx.untrack('probe2');
+  },
+  perf(sec = 6, skip = false) {
+    noFx = skip;
+    for (const o of fxMeshes) o.visible = skip ? false : o.visible;
+    let maxCalls = 0, maxP = 0, fxCalls = 0, n = 0, t2 = 0;
+    const t0 = performance.now();
+    for (let t = 0; t < sec; t += 1 / 60) {
+      if ((t2 += 1 / 60) > 2) { t2 = 0; if (!skip) { fx.celebrate({ id: 'player', kind: 'combo', mult: 2.5 }); fx.impact({ id: 'probe2', kind: 'bounce', strength: 0.8 }); fx.touchdown({ id: 'probe2', sinkFpm: 900, surface: 'runway' }); } }
+      step(1 / 60); renderer.render(scene, camera); n++;
+      const c = renderer.info.render.calls; if (c > maxCalls) maxCalls = c;
+      const s = fx.stats(); if (s.particles > maxP) maxP = s.particles; if (s.calls > fxCalls) fxCalls = s.calls;
+    }
+    renderer.getContext().finish();
+    const ms = (performance.now() - t0) / n;
+    noFx = false;
+    return { frameMs: +ms.toFixed(3), maxCalls, maxParticles: maxP, maxFxCalls: fxCalls, fxCpuMs: fx.stats().cpuMs, quality: fx.quality };
+  },
+  allocProbe(iter = 3000, withRender = false) {
+    const g = window.gc || (() => {});
+    for (let i = 0; i < 300; i++) { step(1 / 60); if (withRender) renderer.render(scene, camera); }
+    g(); g();
+    const h0 = performance.memory ? performance.memory.usedJSHeapSize : 0;
+    const t0 = performance.now();
+    for (let i = 0; i < iter; i++) fx.update(1 / 60);
+    const ms = (performance.now() - t0) / iter;
+    const h1 = performance.memory ? performance.memory.usedJSHeapSize : 0;
+    let h2 = h1, h3 = h1;
+    if (withRender) {
+      g(); g(); h2 = performance.memory.usedJSHeapSize;
+      for (let i = 0; i < iter; i++) { fx.update(1 / 60); renderer.render(scene, camera); }
+      h3 = performance.memory.usedJSHeapSize;
+    }
+    return { iter, fxUpdateMs: +ms.toFixed(4), fxBytes: h1 - h0, perFrameBytes: +((h1 - h0) / iter).toFixed(2), withRenderBytes: h3 - h2, withRenderPerFrame: +((h3 - h2) / iter).toFixed(2), stats: fx.stats() };
+  },
+};
+window.__fxReady = true;
+</script>
+</body>
+</html>

@@ -2,12 +2,13 @@
 // One 2D canvas, redrawn every update(); nothing is allocated per frame once labels/distances stop changing.
 
 const KIND = {
-  rival: { size: 9, font: '700 12px system-ui, sans-serif', alpha: 1, label: true },
-  player: { size: 9, font: '700 12px system-ui, sans-serif', alpha: 1, label: true },
-  traffic: { size: 6, font: '600 10px system-ui, sans-serif', alpha: 0.62, label: false },
-  target: { size: 9, font: '800 12px system-ui, sans-serif', alpha: 1, label: true },
+  traffic: { size: 6, alpha: 0.6, z: 0 },
+  rival: { size: 9, alpha: 1, z: 1 },
+  player: { size: 9, alpha: 1, z: 1 },
+  target: { size: 9, alpha: 1, z: 2 },
 };
-const GOLD = '#ffd25e', TRAFFIC = '#e6edf5', SUB = '600 10px system-ui, sans-serif';
+const GOLD = '#ffd25e', TRAFFIC = '#e6edf5', FONT = '700 11px system-ui, sans-serif', SMALL = '600 10px system-ui, sans-serif';
+const TRAFFIC_TEXT_M = 2000;
 const AVOID = ['.krz-r-btn', '.krz-r-tower', '.krz-land', '.krz-top-l', '.krz-top-r'];
 const PERIM_STEP = 4;
 
@@ -28,7 +29,7 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
 
   function slot(i) {
     let s = slots[i];
-    if (!s) s = slots[i] = { item: null, id: '', kind: 'traffic', label: '', rawLabel: '', color: TRAFFIC, sx: 0, sy: 0, off: false, drawn: false, dBucket: -1, dStr: '', bBucket: -1, bStr: '' };
+    if (!s) s = slots[i] = { item: null, id: '', kind: 'traffic', label: '', rawLabel: '', color: TRAFFIC, sx: 0, sy: 0, off: false, drawn: false, dBucket: -1, dStr: '', bBucket: -1, bStr: '', tag: '', tagW: 0, tagOff: '', tagOffW: 0, dirty: true };
     return s;
   }
 
@@ -41,11 +42,17 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
       if (s.rawLabel !== (it.label || '')) {
         s.rawLabel = it.label || '';
         s.label = s.rawLabel.length > opt.maxLabel ? s.rawLabel.slice(0, opt.maxLabel - 1) + '…' : s.rawLabel;
+        s.dirty = true;
       }
       s.color = s.kind === 'target' ? (it.color || GOLD) : (it.color || TRAFFIC);
     }
-    // the target draws last so it sits on top
-    for (let i = 0; i < n - 1; i++) if (slots[i].kind === 'target') { const t = slots[i]; slots[i] = slots[n - 1]; slots[n - 1] = t; break; }
+    // draw order: traffic, then rivals/players, target on top
+    for (let i = 1; i < n; i++) {
+      const t = slots[i];
+      let j = i - 1;
+      while (j >= 0 && KIND[slots[j].kind].z > KIND[t.kind].z) { slots[j + 1] = slots[j]; j--; }
+      slots[j + 1] = t;
+    }
   }
 
   function resize() {
@@ -81,7 +88,7 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
     safe.perim = 2 * (w + h);
     const len = Math.ceil(safe.perim / PERIM_STEP) + 1;
     if (mask.length < len) mask = new Uint8Array(len * 2);
-    const pad = 16;
+    const pad = 22;
     for (let i = 0; i < len; i++) {
       perimPoint(i * PERIM_STEP, P);
       let hit = 0;
@@ -130,28 +137,68 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
       if (nm < 0.3) { b = Math.round(d / 0.3048 / 100); if (b !== s.dBucket) str = b * 100 + ' ft'; }
       else { b = 1000 + Math.round(nm * 10); if (b !== s.dBucket) str = nm.toFixed(1) + ' nm'; }
     }
-    if (str !== undefined) { s.dBucket = b; s.dStr = str; }
+    if (str !== undefined) { s.dBucket = b; s.dStr = str; s.dirty = true; }
     return s.dStr;
   }
 
-  function text(str, x, y, font, color, align) {
-    ctx.font = font; ctx.textAlign = align;
-    ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(8,12,20,.72)';
-    ctx.strokeText(str, x, y);
-    ctx.fillStyle = color; ctx.fillText(str, x, y);
+  // tag strings and their widths only change when the label, distance bucket or bearing bucket changes
+  function refresh(s) {
+    s.dirty = false;
+    ctx.font = FONT;
+    if (s.kind === 'target') {
+      s.tag = s.label + ' · ' + s.dStr;
+      s.tagOff = s.tag + ' · ' + s.bStr;
+    } else if (s.kind === 'traffic') {
+      s.tag = s.dStr; s.tagOff = '';
+      ctx.font = SMALL;
+    } else {
+      s.tag = s.label ? s.label + ' · ' + s.dStr : s.dStr;
+      s.tagOff = s.tag;
+    }
+    s.tagW = s.tag ? ctx.measureText(s.tag).width : 0;
+    ctx.font = FONT;
+    s.tagOffW = s.tagOff ? ctx.measureText(s.tagOff).width : 0;
+  }
+
+  // pill with text; x is the pill centre unless align is -1 (x = right edge) / 1 (x = left edge).
+  // Steps clear of the control rects and of pills already placed this frame.
+  const placed = new Float32Array(4 * 64);
+  let nPlaced = 0;
+  function pill(str, w, x, y, align, color, border, edge) {
+    const pw = w + 12, ph = 17;
+    let x0 = align < 0 ? x - pw : align > 0 ? x : x - pw / 2;
+    let y0 = y - ph / 2;
+    if (edge) y0 = Math.max(safe.t - 14, Math.min(safe.b + 8 - ph, y0));
+    for (const r of rects) {
+      if (x0 < r[2] + 4 && x0 + pw > r[0] - 4 && y0 < r[3] + 4 && y0 + ph > r[1] - 4) x0 = (r[0] + r[2]) / 2 > W / 2 ? r[0] - pw - 6 : r[2] + 6;
+    }
+    x0 = Math.max(4, Math.min(W - pw - 4, x0));
+    for (let tries = 0; tries < 4; tries++) {
+      let hit = false;
+      for (let i = 0; i < nPlaced; i++) {
+        const j = i * 4;
+        if (x0 < placed[j + 2] && x0 + pw > placed[j] && y0 < placed[j + 3] && y0 + ph > placed[j + 1]) { hit = true; y0 = edge && y < H / 2 ? placed[j + 3] + 2 : placed[j + 1] - ph - 2; break; }
+      }
+      if (!hit) break;
+    }
+    y0 = Math.max(4, Math.min(H - ph - 4, y0));
+    if (nPlaced < 64) { const j = nPlaced++ * 4; placed[j] = x0; placed[j + 1] = y0; placed[j + 2] = x0 + pw; placed[j + 3] = y0 + ph; }
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x0, y0, pw, ph, 8.5); else ctx.rect(x0, y0, pw, ph);
+    ctx.fillStyle = 'rgba(10,15,26,.66)'; ctx.fill();
+    if (border) { ctx.lineWidth = 1.5; ctx.strokeStyle = border; ctx.stroke(); }
+    ctx.fillStyle = color; ctx.fillText(str, x0 + pw / 2, y0 + 12.5);
   }
 
   function glyph(s, x, y, ang, off) {
-    const k = KIND[s.kind], z = k.size;
+    const z = KIND[s.kind].size;
     ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
     ctx.beginPath();
     if (s.kind === 'target') {
       ctx.moveTo(0, -z); ctx.lineTo(z * 0.8, 0); ctx.lineTo(0, z); ctx.lineTo(-z * 0.8, 0); ctx.closePath();
       ctx.fillStyle = 'rgba(30,22,4,.55)'; ctx.fill();
       ctx.lineWidth = 2.5; ctx.strokeStyle = s.color; ctx.stroke();
-      if (off) { ctx.beginPath(); ctx.moveTo(z * 1.1, -z * 0.55); ctx.lineTo(z * 1.9, 0); ctx.lineTo(z * 1.1, z * 0.55); ctx.closePath(); ctx.fillStyle = s.color; ctx.fill(); }
     } else if (off) {
-      // arrow pointing +x (outward)
       ctx.moveTo(z * 1.3, 0); ctx.lineTo(-z * 0.8, -z); ctx.lineTo(-z * 0.3, 0); ctx.lineTo(-z * 0.8, z); ctx.closePath();
       ctx.fillStyle = s.color; ctx.fill();
       ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(8,12,20,.75)'; ctx.stroke();
@@ -163,11 +210,17 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
     }
     ctx.restore();
   }
+  function targetArrow(s, x, y, ang) {
+    const z = KIND.target.size;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
+    ctx.beginPath(); ctx.moveTo(z * 1.2, -z * 0.6); ctx.lineTo(z * 2.1, 0); ctx.lineTo(z * 1.2, z * 0.6); ctx.closePath();
+    ctx.fillStyle = s.color; ctx.fill();
+    ctx.restore();
+  }
 
-  function bearingStr(s, deg) {
+  function bearing(s, deg) {
     const b = Math.round(((deg % 360) + 360) % 360 / 5) * 5 % 360;
-    if (b !== s.bBucket) { s.bBucket = b; s.bStr = (b < 100 ? (b < 10 ? '00' : '0') : '') + b + '°'; }
-    return s.bStr;
+    if (b !== s.bBucket) { s.bBucket = b; s.bStr = (b < 100 ? (b < 10 ? '00' : '0') : '') + b + '°'; s.dirty = true; }
   }
 
   function update() {
@@ -184,7 +237,9 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
     const near = camera.near || 0.1;
     if (opt.getOrigin) { const o = opt.getOrigin(); O[0] = o.x ?? o[0]; O[1] = o.y ?? o[1]; O[2] = o.z ?? o[2]; }
     else { O[0] = camera.position.x; O[1] = camera.position.y; O[2] = camera.position.z; }
-    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    nPlaced = 0;
+    const cys = (safe.t + safe.b) / 2;
     for (let i = 0; i < n; i++) {
       const s = slots[i], it = s.item, wp = it.worldPos, k = KIND[s.kind];
       s.drawn = false;
@@ -195,7 +250,9 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
       const vy = m[1] * x + m[5] * y + m[9] * z + m[13];
       const vz = m[2] * x + m[6] * y + m[10] * z + m[14];
       const dist = it.distance ?? Math.hypot(x - O[0], y - O[1], z - O[2]);
-      const dStr = fmtDist(s, dist);
+      fmtDist(s, dist);
+      if (s.kind === 'target') bearing(s, Math.atan2(x - O[0], -(z - O[2])) * 57.29578);
+      if (s.dirty) refresh(s);
       ctx.globalAlpha = k.alpha;
       let sx = 0, sy = 0, on = false;
       if (vz < -near) {
@@ -204,42 +261,34 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
         on = sx > 4 && sx < W - 4 && sy > safe.t - 10 && sy < H - 4;
       }
       if (on) {
-        const rad = Math.max(10, (s.kind === 'target' ? 0 : 6) * p5 * 0.5 * H / -vz);
+        const rad = s.kind === 'target' ? 0 : Math.max(10, 6 * p5 * 0.5 * H / -vz);
         const gy = s.kind === 'target' ? sy : sy - Math.min(rad, 90) - 6;
         glyph(s, sx, gy, 0, false);
         s.sx = sx; s.sy = gy; s.off = false;
-        const ty = gy - k.size - 4;
-        if (s.kind === 'target') {
-          text(s.label, sx, ty, k.font, s.color, 'center');
-          text(dStr, sx, gy + k.size + 13, SUB, s.color, 'center');
-        } else if (k.label && s.label) {
-          text(dStr, sx, ty, SUB, '#f6f1e4', 'center');
-          text(s.label, sx, ty - 12, k.font, '#ffffff', 'center');
-        } else text(dStr, sx, ty, SUB, s.color, 'center');
+        if (s.kind === 'traffic') {
+          if (dist < TRAFFIC_TEXT_M) { ctx.font = SMALL; ctx.fillStyle = s.color; ctx.fillText(s.tag, sx, gy - k.size - 3); }
+        } else {
+          ctx.font = FONT;
+          pill(s.tag, s.tagW, sx, s.kind === 'target' ? gy - k.size - 12 : gy - k.size - 11, 0, s.kind === 'target' ? s.color : '#fff', s.kind === 'target' ? null : s.color);
+        }
       } else {
         let dx = vx * p0, dy = -vy * p5;
         if (vz >= -near) { if (Math.abs(dx) + Math.abs(dy) < 1e-4) dy = 1; }
         else { dx /= -vz; dy /= -vz; }
         const L = Math.hypot(dx, dy) || 1;
-        dx /= L; dy /= L;
-        edgePoint(dx * W, dy * H);
+        edgePoint(dx / L * W, dy / L * H);
         const ex = P[0], ey = P[1];
         s.sx = ex; s.sy = ey; s.off = true;
-        const ang = Math.atan2(ey - (safe.t + safe.b) / 2, ex - (safe.l + safe.r) / 2);
-        glyph(s, ex, ey, s.kind === 'target' ? 0 : Math.atan2(dy, dx), true);
-        // label inward from the arrow, kept on screen
-        const ix = ex - Math.cos(ang) * 30, iy = ey - Math.sin(ang) * 22;
-        const align = ex < W * 0.25 ? 'left' : ex > W * 0.75 ? 'right' : 'center';
-        const tx = align === 'left' ? Math.max(ix - 14, safe.l) : align === 'right' ? Math.min(ix + 14, safe.r) : ix;
-        if (s.kind === 'target') {
-          text(s.label, tx, iy - 2, k.font, s.color, align);
-          const b = Math.atan2(x - O[0], -(z - O[2])) * 57.29578;
-          text(dStr, tx, iy + 11, SUB, s.color, align);
-          text(bearingStr(s, b), tx, iy + 23, SUB, s.color, align);
-        } else if (k.label && s.label) {
-          text(s.label, tx, iy - 2, SUB, '#ffffff', align);
-          text(dStr, tx, iy + 11, SUB, s.color, align);
-        } else text(dStr, tx, iy + 4, SUB, s.color, align);
+        const ang = Math.atan2(dy, dx);
+        glyph(s, ex, ey, s.kind === 'target' ? 0 : ang, true);
+        if (s.kind === 'target') targetArrow(s, ex, ey, ang);
+        if (s.kind === 'traffic' || !s.tagOff) continue;
+        // pill inward from the arrow: beside it on the side edges, under/over it on the top/bottom edges
+        const side = Math.abs(ex - safe.l) < 1 ? 1 : Math.abs(ex - safe.r) < 1 ? -1 : 0;
+        ctx.font = FONT;
+        const col = s.kind === 'target' ? s.color : '#fff';
+        if (side) pill(s.tagOff, s.tagOffW, ex + side * 20, ey, side, col, s.kind === 'target' ? null : s.color, true);
+        else pill(s.tagOff, s.tagOffW, ex, ey + (ey < cys ? 24 : -24), 0, col, s.kind === 'target' ? null : s.color, true);
       }
     }
     ctx.globalAlpha = 1;
@@ -262,7 +311,8 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
     el: cv, set, update, setVisible, setOptions,
     remeasure: () => { nextMeasure = 0; },
     debug: () => ({ safe: { ...safe }, rects: rects.map((r) => r.slice()), n,
-      drawn: slots.slice(0, n).filter((s) => s.drawn).map((s) => ({ id: s.id, kind: s.kind, x: s.sx, y: s.sy, off: s.off })) }),
+      drawn: slots.slice(0, n).filter((s) => s.drawn).map((s) => ({ id: s.id, kind: s.kind, x: s.sx, y: s.sy, off: s.off })),
+      pills: Array.from({ length: nPlaced }, (_, i) => Array.from(placed.slice(i * 4, i * 4 + 4))) }),
     dispose() { cv.remove(); },
   };
 }

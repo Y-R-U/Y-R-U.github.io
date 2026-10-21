@@ -10,7 +10,7 @@ export const LAND = {
   glideDeg: 4,         // matches FLIGHT's approach leg (routes.js GLIDE_DEG)
   flightAim: 130,      // FLIGHT's approach aims 130 m past its threshold (routes.js AIM_DIST)
   runwayAim: 130, fieldAim: 60,
-  maxGrad: 0.08,       // steepest pre-final descent the AP can fly at 75 kt with idle + 1/3 flap
+  maxGrad: 0.08, grade: 0.015, bump: 0.35,       // steepest pre-final descent the AP can fly at 75 kt with idle + 1/3 flap
   vApp: 38.6, bankDeg: 25, orbitR: 450, maxOrbits: 2,
   margin: 6, treeR: 4, treeH: 11, step: 8, trim: 12, clearance: 10,
 };
@@ -24,41 +24,58 @@ const xz = (p) => (Array.isArray(p) ? [p[0], p[2] ?? p[1]] : [p.x, p.z]);
 
 // ---- cached obstacle / surface field per world ----
 const FIELDS = new WeakMap();
-const OC = 8, SC = 8, CB = 48;
+const OC = 8, SC = 8, HC = 8, CB = 48;
 const key = (ix, iz) => ix * 262147 + iz;
+const UNK = Math.fround(1e30);
+
+// sparse grid of 64×64-cell Float32 tiles; the last tile is remembered because scans march along lines
+class Grid {
+  constructor(cell, init) { this.c = cell; this.init = init; this.tiles = new Map(); this.lk = NaN; this.lt = null; }
+  tile(ix, iz, make) {
+    const k = (ix >> 6) * 65537 + (iz >> 6);
+    if (k === this.lk) return this.lt;
+    let t = this.tiles.get(k);
+    if (!t) { if (!make) return null; t = new Float32Array(4096).fill(this.init); this.tiles.set(k, t); }
+    this.lk = k; this.lt = t;
+    return t;
+  }
+}
 
 class Field {
   constructor(world) {
     this.w = world;
-    this.obst = new Map();
-    this.surf = new Map();
-    this.hgt = new Map();
+    this.obst = new Grid(OC, -1e9);
+    this.surf = new Grid(SC, UNK);
+    this.hgt = new Grid(HC, UNK);
     this.blk = new Map();
     const m = LAND.margin;
     for (const c of world.colliders || []) this._box(c.min[0] - m, c.min[2] - m, c.max[0] + m, c.max[2] + m, c.max[1]);
     const trees = world.trees || collectTrees(world);
     const r = LAND.treeR + m;
-    for (const t of trees) this._box(t[0] - r, t[1] - r, t[0] + r, t[1] + r, (t[2] ?? LAND.treeH) + this.ground(t[0], t[1]));
+    for (const t of trees) this._box(t[0] - r, t[1] - r, t[0] + r, t[1] + r, (t[2] ?? LAND.treeH) + this.height(t[0], t[1]));
     this.treeCount = trees.length;
   }
   _box(x0, z0, x1, z1, top) {
     for (let ix = Math.floor(x0 / OC); ix <= Math.floor(x1 / OC); ix++) {
       for (let iz = Math.floor(z0 / OC); iz <= Math.floor(z1 / OC); iz++) {
-        const k = key(ix, iz), v = this.obst.get(k);
-        if (v === undefined || v < top) this.obst.set(k, top);
+        const t = this.obst.tile(ix, iz, true), i = ((iz & 63) << 6) | (ix & 63);
+        if (t[i] < top) t[i] = top;
       }
     }
   }
-  top(x, z) { const v = this.obst.get(key(Math.floor(x / OC), Math.floor(z / OC))); return v === undefined ? -1e9 : v; }
+  top(x, z) {
+    const ix = Math.floor(x / OC), iz = Math.floor(z / OC), t = this.obst.tile(ix, iz, false);
+    return t ? t[((iz & 63) << 6) | (ix & 63)] : -1e9;
+  }
   // ground height of the 8 m cell, NaN where the surface is building/water
   ground(x, z) {
-    const ix = Math.floor(x / SC), iz = Math.floor(z / SC), k = key(ix, iz);
-    let v = this.surf.get(k);
-    if (v === undefined) {
+    const ix = Math.floor(x / SC), iz = Math.floor(z / SC), t = this.surf.tile(ix, iz, true), i = ((iz & 63) << 6) | (ix & 63);
+    let v = t[i];
+    if (v === UNK) {
       const cx = (ix + 0.5) * SC, cz = (iz + 0.5) * SC;
       const s = this.w.surfaceAt && this.dirty(cx, cz) ? this.w.surfaceAt(cx, cz) : 'grass';
       v = s === 'building' || s === 'water' ? NaN : this.height(cx, cz);
-      this.surf.set(k, v);
+      t[i] = v;
     }
     return v;
   }
@@ -83,9 +100,9 @@ class Field {
   _wet(x, z) { const q = this.w.surfaceAt(x, z); return q === 'water' || q === 'building'; }
   height(x, z) {
     if (!this.w.groundHeightAt) return 0;
-    const k = key(Math.floor(x / 16), Math.floor(z / 16));
-    let v = this.hgt.get(k);
-    if (v === undefined) { v = this.w.groundHeightAt(x, z); this.hgt.set(k, v); }
+    const ix = Math.floor(x / HC), iz = Math.floor(z / HC), t = this.hgt.tile(ix, iz, true), i = ((iz & 63) << 6) | (ix & 63);
+    let v = t[i];
+    if (v === UNK) v = t[i] = this.w.groundHeightAt((ix + 0.5) * HC, (iz + 0.5) * HC);
     return v;
   }
 }
@@ -109,11 +126,12 @@ export function collectTrees(world) {
   return out;
 }
 
+const HIST = new Float64Array(4096), WIN = 6;
 // March along a line, returning clear, flat runs [s0, s1] (metres along the line from its origin).
 function scanLine(F, ox, oz, ux, uz, s0, s1, out) {
   const { step, halfW } = LAND, px = -uz, pz = ux;
   const lat = [0, -halfW, halfW];
-  let runS = null, last = 0, hmin = 0, hmax = 0;
+  let runS = null, last = 0, hmin = 0, hmax = 0, hs = 0, k = 0;
   for (let s = s0; s <= s1; s += step) {
     const cx = ox + ux * s, cz = oz + uz * s;
     let ok = true, h = 0;
@@ -122,15 +140,19 @@ function scanLine(F, ox, oz, ux, uz, s0, s1, out) {
       const g = F.ground(x, z);
       if (g !== g) { ok = false; break; }
       if (j === 0) h = g;
-      else if (Math.abs(g - h) > 1.2) ok = false;
+      else if (Math.abs(g - h) > 0.8) ok = false;
       if (F.top(x, z) > -1e8) ok = false;
     }
     if (ok && runS !== null) {
-      if (Math.abs(h - hmin) > 3 || Math.abs(h - hmax) > 3 || Math.abs(h - last) > step * 0.03) ok = false;
+      // grade ≤ 1.5 % over the whole run and over every 48 m window, plus a small bump allowance
+      const back = k >= WIN ? HIST[(k - WIN) & 4095] : hs, span = k >= WIN ? WIN * step : s - runS;
+      if (Math.abs(h - hs) > LAND.grade * (s - runS) + LAND.bump || Math.abs(h - back) > LAND.grade * span + LAND.bump ||
+        Math.abs(h - last) > LAND.grade * step + LAND.bump) ok = false;
     }
     if (ok) {
-      if (runS === null) { runS = s; hmin = hmax = h; }
+      if (runS === null) { runS = s; hmin = hmax = hs = h; k = 0; }
       hmin = Math.min(hmin, h); hmax = Math.max(hmax, h); last = h;
+      HIST[k++ & 4095] = h;
     } else if (runS !== null) {
       out.push([runS, s - step, (hmin + hmax) / 2]);
       runS = null;
@@ -369,21 +391,28 @@ export function planLandAhead(o) {
         if (s0 > aim) { rej('blocked'); continue; }
       }
       if (s1 - s0 < LAND.minLen) { rej('short'); continue; }
-      let ok = false;
-      for (let tries = 0; tries < 6 && s1 - s0 >= LAND.minLen; tries++, s0 += 40) {
-        if (approachClear(F, c.origin[0] + ux * s0, c.origin[1] + uz * s0, ux, uz, r[2], aim)) { ok = true; break; }
-      }
-      if (!ok) { rej('approach'); continue; }
       const T = [c.origin[0] + ux * (s0 + aim), c.origin[1] + uz * (s0 + aim)];
       if (!inCone(T[0], T[1]) && c.kind === 'grass') { rej('cone'); continue; }
       if (Math.hypot(T[0] - x, T[1] - z) < minD) { rej('close'); continue; }
       if (avoid.some((a) => segDist(a[0], a[1], c.origin[0] + ux * s0, c.origin[1] + uz * s0, c.origin[0] + ux * s1, c.origin[1] + uz * s1) < (a[2] || 15))) { rej('traffic'); continue; }
-      const surf = o.world.surfaceAt ? o.world.surfaceAt(T[0], T[1]) : c.surface;
-      cands.push({
-        ...c, touchdown: T, elev: r[2], start: [c.origin[0] + ux * s0, c.origin[1] + uz * s0], stripEnd: [c.origin[0] + ux * s1, c.origin[1] + uz * s1],
-        stripLength: s1 - s0, rollout: s1 - s0 - aim, surface: c.kind === 'grass' ? surf : c.surface,
-      });
+      cands.push({ ...c, ux, uz, s0, s1, elev: r[2], touchdown: T, stripLength: s1 - s0 });
     }
+  };
+  // glide path clear of obstacles? Slides the threshold up to 200 m in. Only run for candidates worth building.
+  const settle = (c) => {
+    const { ux, uz, aim, s1 } = c;
+    let s0 = c.s0, ok = false;
+    for (let tries = 0; tries < 6 && s1 - s0 >= LAND.minLen; tries++, s0 += 40) {
+      if (approachClear(F, c.origin[0] + ux * s0, c.origin[1] + uz * s0, ux, uz, F.height(c.origin[0] + ux * (s0 + aim), c.origin[1] + uz * (s0 + aim)), aim)) { ok = true; break; }
+    }
+    if (!ok) return false;
+    c.touchdown = [c.origin[0] + ux * (s0 + aim), c.origin[1] + uz * (s0 + aim)];
+    c.start = [c.origin[0] + ux * s0, c.origin[1] + uz * s0];
+    c.stripEnd = [c.origin[0] + ux * s1, c.origin[1] + uz * s1];
+    c.stripLength = s1 - s0; c.rollout = s1 - s0 - aim;
+    c.elev = F.height(c.touchdown[0], c.touchdown[1]);
+    if (c.kind === 'grass') c.surface = o.world.surfaceAt ? o.world.surfaceAt(c.touchdown[0], c.touchdown[1]) : 'grass';
+    return true;
   };
 
   const pre = (c) => Math.hypot(c.touchdown[0] - x, c.touchdown[1] - z) * 0.2 + c.pref * 12 - Math.min(c.stripLength, 900) * (c.kind === 'grass' ? 0.8 : 0.1);
@@ -398,6 +427,7 @@ export function planLandAhead(o) {
       if (best && rank > RANK[best.c.kind]) break;
       perRank[rank] = (perRank[rank] || 0) + 1;
       if (perRank[rank] > 14) continue;
+      if (!settle(c)) { perRank[rank]--; if (dbg) dbg.rejects.push({ kind: c.kind, label: c.label, why: 'approach', at: c.touchdown, heading: c.heading }); continue; }
       const p = buildPath(c, st, F);
       if (p.fail) { fails[p.fail]++; if (dbg) dbg.rejects.push({ kind: c.kind, label: c.label, why: p.fail, at: c.touchdown, heading: c.heading }); continue; }
       const cost = p.feas.pathLength + (p.feas.turn || 0) * 4 + p.feas.orbits * 900 + c.pref * 25 - Math.min(c.stripLength, 900) * (c.kind === 'grass' ? 1 : 0.2);
@@ -441,7 +471,7 @@ function makePlan(c, p, st, dbg, t0) {
   };
   const fly = p.approach.filter((w) => w.kind !== 'faf' && w.kind !== 'touchdown' && w.kind !== 'rollout');
   const legs = fly.map((w) => ({ kind: 'fly', to: [w.x, w.alt, w.z], speed: w.speed, flaps: w.flaps, label: w.kind === 'orbit' ? 'LAND · DESCEND' : 'LAND · JOIN' }));
-  legs.push({ kind: 'approach', end, fafDist: p.Lf - A, label: 'LAND', land: true });
+  legs.push({ kind: 'approach', end: c.runway || end, fafDist: Math.round(p.Lf - A), label: 'LAND', land: true });
   const off = Math.round(Math.abs(wrap180(c.heading - st.H)));
   const why = c.kind === 'runway' ? `runway ${c.runway} ahead` : c.kind === 'grass' ? `${Math.round(c.stripLength)} m clear ${c.surface === 'grass' ? 'field' : c.surface}` : `${c.label.toLowerCase()} ahead`;
   const plan = {
