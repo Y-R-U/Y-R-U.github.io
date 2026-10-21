@@ -212,6 +212,7 @@ export function buildTower(B, atlas, quality) {
 }
 
 // Three controllers: seated duo and a standing supervisor; heads follow the camera, the supervisor flaps.
+// One skinned mesh: every part is rigidly bound to its own bone, so animating costs a 1 KB bone texture, not a draw call.
 function buildCrew(tx, floor, tz) {
   const mat0 = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8 });
   const skinTones = ['#e8b894', '#8d5a3b', '#c99470'];
@@ -223,7 +224,9 @@ function buildCrew(tx, floor, tz) {
     { a: Math.PI * 0.47, r: 1.6, stand: true },
   ];
   const people = [];
-  const objects = [];
+  const rootBone = new THREE.Bone();
+  const bones = [rootBone], parts = [];
+  const bone = (parent, x, y, z, yaw = 0) => { const b = new THREE.Bone(); b.position.set(x, y, z); b.rotation.y = yaw; parent.add(b); bones.push(b); return b; };
   spots.forEach((s, i) => {
     const x = tx + Math.cos(s.a) * s.r, z = tz + Math.sin(s.a) * s.r;
     const yaw = -s.a + Math.PI / 2;
@@ -241,10 +244,8 @@ function buildCrew(tx, floor, tz) {
     }
     body.geo(new THREE.CylinderGeometry(0.2, 0.17, 0.62, 8), mat(0, hip + 0.31, 0, 0, 0, 0, 1.15, 1, 0.75), sh);
     body.geo(new THREE.CylinderGeometry(0.07, 0.08, 0.1, 6), mat(0, hip + 0.66, 0), sk);
-    const bodyMesh = new THREE.Mesh(body.build(), mat0);
-    bodyMesh.position.set(x, floor + 0.2, z);
-    bodyMesh.rotation.y = yaw;
-    objects.push(bodyMesh);
+    const bodyBone = bone(rootBone, x, floor + 0.2, z, yaw);
+    parts.push([body, bodyBone]);
 
     const head = new Builder();
     head.geo(new THREE.SphereGeometry(0.13, 10, 8), mat(0, 0.12, 0, 0, 0, 0, 0.95, 1.08, 1), sk);
@@ -254,9 +255,8 @@ function buildCrew(tx, floor, tz) {
     head.geo(new THREE.BoxGeometry(0.02, 0.02, 0.12), mat(0.12, 0.06, 0.08, 0, 0.5, 0), col('#111'));
     head.geo(new THREE.BoxGeometry(0.03, 0.03, 0.03), mat(0, 0.1, 0.13), sk);
     if (i === 0) head.geo(new THREE.BoxGeometry(0.26, 0.05, 0.02), mat(0, 0.15, 0.13), col('#111'));
-    const headMesh = new THREE.Mesh(head.build(), mat0);
-    headMesh.position.set(0, hip + 0.7, 0);
-    bodyMesh.add(headMesh);
+    const headBone = bone(bodyBone, 0, hip + 0.7, 0);
+    parts.push([head, headBone]);
 
     const arms = [];
     for (const side of [-1, 1]) {
@@ -267,16 +267,42 @@ function buildCrew(tx, floor, tz) {
         arm.geo(new THREE.CylinderGeometry(0.05, 0.05, 0.16, 8), mat(0.0, -0.62, 0.07, Math.PI / 2, 0, 0), col('#1a1a1a'));
       }
       if (i === 1 && side < 0) arm.geo(new THREE.CylinderGeometry(0.05, 0.045, 0.1, 10), mat(0, -0.64, 0.05), col('#d61f45'));
-      const am = new THREE.Mesh(arm.build(), mat0);
-      am.position.set(side * 0.25, hip + 0.58, 0);
-      bodyMesh.add(am);
-      arms.push(am);
+      const armBone = bone(bodyBone, side * 0.25, hip + 0.58, 0);
+      parts.push([arm, armBone]);
+      arms.push(armBone);
     }
-    people.push({ body: bodyMesh, head: headMesh, arms, stand: s.stand, yaw, phase: i * 2.1 });
+    people.push({ body: bodyBone, head: headBone, arms, stand: s.stand, yaw, phase: i * 2.1 });
   });
 
+  rootBone.updateMatrixWorld(true);
+  const P = [], N = [], C = [], I = [], SI = [];
+  for (const [b, bn] of parts) {
+    const g = b.build(), k = bones.indexOf(bn), base = P.length / 3;
+    g.applyMatrix4(bn.matrixWorld);
+    P.push(...g.attributes.position.array); N.push(...g.attributes.normal.array); C.push(...g.attributes.color.array);
+    for (const v of g.index.array) I.push(base + v);
+    for (let v = 0; v < g.attributes.position.count; v++) SI.push(k, 0, 0, 0);
+    g.dispose();
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(C, 3));
+  geo.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(SI, 4));
+  geo.setAttribute('skinWeight', new THREE.Float32BufferAttribute(SI.map((_, n) => (n % 4 ? 0 : 1)), 4));
+  geo.setIndex(I);
+  geo.computeBoundingSphere();
+  const mesh = new THREE.SkinnedMesh(geo, mat0);
+  mesh.name = 'towerCrewMesh';
+  mesh.add(rootBone);
+  mesh.bind(new THREE.Skeleton(bones));
+  const objects = [mesh];
+
   const tmp = new THREE.Vector3();
+  const cab = new THREE.Vector3(tx, floor, tz);
   function update(dt, t, camera) {
+    mesh.visible = !camera || camera.position.distanceToSquared(cab) < 400 * 400;
+    if (!mesh.visible) return;
     for (const p of people) {
       p.body.getWorldPosition(tmp);
       let target = 0;

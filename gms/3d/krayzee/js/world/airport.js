@@ -20,6 +20,16 @@ export async function buildWorld(scene, renderer, opts = {}) {
   const timings = {};
   let tm = performance.now();
   const mark = (k) => { const n = performance.now(); timings[k] = Math.round(n - tm); tm = n; };
+  // opts.onProgress(fraction 0..1, stage) is called between build stages, and then the build yields a frame so the
+  // loading bar can paint (no single task runs the whole build). Without onProgress (or opts.yield) it never yields.
+  const yields = !!(opts.onProgress || opts.yield);
+  const step = async (f, label) => {
+    try { opts.onProgress?.(f, label); } catch (e) { /* */ }
+    if (!yields) return;
+    const y0 = performance.now();
+    await new Promise((r) => { requestAnimationFrame(() => setTimeout(r, 0)); setTimeout(r, 100); });
+    tm += performance.now() - y0;
+  };
   const root = new THREE.Group();
   root.name = 'world';
   scene.add(root);
@@ -30,15 +40,18 @@ export async function buildWorld(scene, renderer, opts = {}) {
   const { hemi, sun } = createLights(scene, quality);
 
   mark('sky');
+  await step(0.03, 'terrain');
   const terrain = createTerrain(renderer, quality);
   mark('terrain');
   const lake = createLake(renderer, env);
   root.add(terrain.mesh, lake.mesh);
 
   mark('lake');
+  await step(0.2, 'pavement');
   const atlas = decalAtlas(renderer);
   const pave = buildPavement(renderer, quality, atlas);
   root.add(...pave.meshes);
+  await step(0.36, 'buildings');
 
   const B = {
     matte: new Builder(), metal: new Builder(), glass: new Builder(), decal: new Builder(true), lit: new Builder(), flags: [],
@@ -53,6 +66,7 @@ export async function buildWorld(scene, renderer, opts = {}) {
   buildVehicles(B);
   buildFlagpoles(B, atlas);
   mark('airport');
+  await step(0.54, 'town');
   // the village church and the castle get their own meshes so they cull (and skip the shadow pass) away from them
   const TB = { matte: new Builder(), metal: new Builder(), flags: B.flags, matteMaterial: B.matteMaterial };
   const town = buildTown(TB, atlas, quality, terrain.heightAt);
@@ -127,9 +141,11 @@ export async function buildWorld(scene, renderer, opts = {}) {
     return block.has(x, z);
   };
   mark('meshes');
-  const trees = buildTrees(renderer, quality, { heightAt: terrain.heightAt, noGo, extra: [...town.treeSpots, ...edge.trees] });
+  await step(0.58, 'trees');
+  const trees = await buildTrees(renderer, quality, { heightAt: terrain.heightAt, noGo, extra: [...town.treeSpots, ...edge.trees], pause: (f) => step(0.58 + 0.3 * f, 'trees') });
   mark('trees');
   root.add(trees.group);
+  await step(0.88, 'shade');
   terrain.uniforms.uShade.value = shadeTexture(SHADE_EXTENT, quality === 'low' ? 1024 : 2048, trees, town.boxes, town.houses.filter((h) => h.type !== 'barn'));
   mark('shade');
   const scenery = buildScenery(quality);
@@ -191,6 +207,7 @@ export async function buildWorld(scene, renderer, opts = {}) {
     }
   }
 
+  try { opts.onProgress?.(1, 'done'); } catch (e) { /* */ }
   return {
     update,
     setQuality,

@@ -154,20 +154,21 @@ export function skidAtlas(renderer) {
   const [c, g] = canvas(S, S);
   const r = rng(7);
   // cells: [0..3] streaks (each 64x1024 column), [4] cracks 512x512 at (512,0), [5] cracks (512,512), patch (256,0) 256x512
+  // streaks straight into pixels (was 262k fillRects); same rng order, so the cracks below are unchanged
+  const img = g.createImageData(256, S), px = img.data;
+  const tracks = Float32Array.from({ length: 64 }, (_, x) => Math.exp(-Math.pow((Math.abs((x - 32) / 32) - 0.45) / 0.22, 2)));
   for (let k = 0; k < 4; k++) {
     const x0 = k * 64;
     for (let y = 0; y < S; y++) {
-      const t = y / S;
-      const env = Math.pow(Math.sin(Math.PI * t), 0.6) * (0.55 + 0.45 * fbm(k * 9, y / 40, 2));
+      const env = Math.pow(Math.sin(Math.PI * y / S), 0.6) * (0.55 + 0.45 * fbm(k * 9, y / 40, 2));
       for (let x = 0; x < 64; x++) {
-        const u = (x - 32) / 32;
-        const tracks = Math.exp(-Math.pow((Math.abs(u) - 0.45) / 0.22, 2));
-        const a = env * tracks * (0.7 + 0.3 * r());
-        g.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
-        g.fillRect(x0 + x, y, 1, 1);
+        const i = (y * 256 + x0 + x) * 4;
+        px[i] = px[i + 1] = px[i + 2] = 255;
+        px[i + 3] = Math.round(env * tracks[x] * (0.7 + 0.3 * r()) * 255);
       }
     }
   }
+  g.putImageData(img, 0, 0);
   for (let cellY = 0; cellY < 2; cellY++) {
     g.save();
     g.beginPath(); g.rect(512, cellY * 512, 512, 512); g.clip();

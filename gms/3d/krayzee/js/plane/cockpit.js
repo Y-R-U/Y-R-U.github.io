@@ -483,6 +483,7 @@ export function buildCockpit({ quality, mats }) {
   }
   const gauges = new THREE.Mesh(gq.build(), gaugeMat);
   gauges.name = 'gauges';
+  inst.attach(gauges);
   group.add(gauges);
 
   let glowTex = null;

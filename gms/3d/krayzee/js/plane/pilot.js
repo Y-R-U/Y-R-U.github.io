@@ -3,7 +3,7 @@ import { Builder, srgb, sweepRings, circle, lerp } from './geom.js';
 import { SEAT_S } from './cockpit.js';
 
 // Royal pilot (left seat) and, at high quality, a royal corgi on a stack of cushions (rear bench, right).
-// One dynamic mesh: every part is a static vertex block re-posed on the CPU by its own matrix.
+// One mesh: every part is a static vertex block posed on the GPU by its own matrix (uPart[pid]).
 
 const SKIN = { light: '#ecc4a2', fair: '#e2b48f', tan: '#c68e62', brown: '#8d5a3b', dark: '#5e3a26' };
 const HAIR = { m: '#4a3222', f: '#4e2414' };
@@ -196,63 +196,62 @@ export function createPilot({ quality, opts = {} }) {
     }
   }
 
-  // ---- assemble the dynamic mesh ----
-  let mesh = null, base = null, ranges = null;
+  // ---- assemble: one static mesh, each part rigidly posed on the GPU by its own matrix (nothing re-uploads) ----
+  const MAXP = 12;
+  const uPart = { value: Array.from({ length: MAXP }, () => new THREE.Matrix4()) };
+  const uPartN = { value: Array.from({ length: MAXP }, () => new THREE.Matrix3()) };
+  const rig = (sh) => {
+    sh.uniforms.uPart = uPart; sh.uniforms.uPartN = uPartN;
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', `#include <common>\nattribute float pid;\nuniform mat4 uPart[${MAXP}];\nuniform mat3 uPartN[${MAXP}];`)
+      .replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\nobjectNormal = uPartN[int(pid)] * objectNormal;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed = (uPart[int(pid)] * vec4(transformed, 1.0)).xyz;');
+  };
+  let mesh = null, ranges = null;
   const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8, metalness: 0 });
   mat.onBeforeCompile = (sh) => {
+    rig(sh);
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec2 rm;\nvarying vec2 vRM;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvRM = rm;');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 vRM;')
       .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = vRM.x;')
       .replace('#include <metalnessmap_fragment>', 'float metalnessFactor = vRM.y;');
   };
-  mat.customProgramCacheKey = () => 'krayzee-pilot';
+  mat.customProgramCacheKey = () => 'krayzee-pilot-rig';
+  const depthMat = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
+  depthMat.onBeforeCompile = rig;
+  depthMat.customProgramCacheKey = () => 'krayzee-pilot-rig-depth';
 
   function assemble() {
     build();
     const all = new Builder();
     ranges = {};
-    for (const p of parts) {
+    const pid = [];
+    parts.forEach((p, k) => {
       const start = all.count;
       all.append(p.b);
-      ranges[p.name] = { start, count: all.count - start, frame: p.frame };
-    }
+      ranges[p.name] = { k, frame: p.frame };
+      for (let i = start; i < all.count; i++) pid.push(k);
+    });
     const geo = all.build();
     geo.setAttribute('rm', geo.attributes.uv);
     geo.deleteAttribute('uv');
-    base = { pos: geo.attributes.position.array.slice(), nrm: geo.attributes.normal.array.slice() };
-    geo.attributes.position.setUsage(THREE.DynamicDrawUsage);
-    geo.attributes.normal.setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute('pid', new THREE.BufferAttribute(new Uint8Array(pid), 1));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 1.3, 2.4), 1.2);
     if (!mesh) {
       mesh = new THREE.Mesh(geo, mat); mesh.name = 'pilot'; mesh.castShadow = high; mesh.receiveShadow = true;
+      mesh.customDepthMaterial = depthMat;
       if (!high) Object.defineProperty(mesh, 'castShadow', { get: () => false, set() {} });
+      mesh.onBeforeRender = poseNow;
+      mesh.onBeforeShadow = poseNow;
     }
     else { mesh.geometry.dispose(); mesh.geometry = geo; }
-    for (const k in ranges) ranges[k].dirty = true;
   }
 
-  const nm = new THREE.Matrix3();
-  const mats = {};
   function pose(name, m) {
     const r = ranges[name];
     if (!r) return;
-    const pos = mesh.geometry.attributes.position.array, nr = mesh.geometry.attributes.normal.array;
-    const e = m.elements;
-    nm.getNormalMatrix(m);
-    const ne = nm.elements;
-    for (let i = r.start * 3, end = (r.start + r.count) * 3; i < end; i += 3) {
-      const x = base.pos[i], y = base.pos[i + 1], z = base.pos[i + 2];
-      pos[i] = e[0] * x + e[4] * y + e[8] * z + e[12];
-      pos[i + 1] = e[1] * x + e[5] * y + e[9] * z + e[13];
-      pos[i + 2] = e[2] * x + e[6] * y + e[10] * z + e[14];
-      const a = base.nrm[i], b = base.nrm[i + 1], c = base.nrm[i + 2];
-      const nx = ne[0] * a + ne[3] * b + ne[6] * c, ny = ne[1] * a + ne[4] * b + ne[7] * c, nz = ne[2] * a + ne[5] * b + ne[8] * c;
-      const l = Math.hypot(nx, ny, nz) || 1;
-      nr[i] = nx / l; nr[i + 1] = ny / l; nr[i + 2] = nz / l;
-    }
-    mesh.geometry.attributes.position.needsUpdate = true;
-    mesh.geometry.attributes.normal.needsUpdate = true;
+    uPart.value[r.k].copy(m);
+    uPartN.value[r.k].getNormalMatrix(m);
   }
 
   const ZERO = new THREE.Matrix4().makeScale(0, 0, 0), ID = new THREE.Matrix4();
@@ -260,7 +259,7 @@ export function createPilot({ quality, opts = {} }) {
   const SH = { L: new THREE.Vector3(XP - 0.185, 1.45, 2.61), R: new THREE.Vector3(XP + 0.185, 1.45, 2.61) };
   const WRIST = { L: new THREE.Vector3(-0.15, 0.02, 0.335), R: new THREE.Vector3(0.15, 0.02, 0.335) };
   const L1 = 0.33, L2 = 0.31;
-  const st = { yaw: 0, pitch: 0, cyaw: 0, t: 0, hideBody: false, visible: true, staticDone: false };
+  const st = { yaw: 0, pitch: 0, cyaw: 0, aileron: 0, t: 0, hideBody: false, visible: true, staticDone: false, yoke: null, posed: -1 };
   const segM = (a, b) => {
     _v.subVectors(b, a); const len = _v.length();
     _q.setFromUnitVectors(UPY, _v.divideScalar(len));
@@ -268,6 +267,7 @@ export function createPilot({ quality, opts = {} }) {
   };
   const _w = new THREE.Vector3(), _el = new THREE.Vector3(), _d = new THREE.Vector3(), _p = new THREE.Vector3();
 
+  // animation state only; the matrices are built when the mesh is actually drawn (never while hidden/far LOD)
   function update(dt, cur, yoke) {
     if (!mesh || !st.visible) return;
     st.t += dt;
@@ -276,16 +276,23 @@ export function createPilot({ quality, opts = {} }) {
     const wantYaw = -(cur.rudder * 0.28 + cur.aileron * 0.32) + 0.1 * Math.sin(t * 0.23) + 0.06 * Math.sin(t * 0.71);
     st.yaw += (wantYaw - st.yaw) * k;
     st.pitch += (-cur.elevator * 0.08 + 0.03 * Math.sin(t * 0.4) - st.pitch) * k;
+    if (ranges.corgiHead) {
+      const cy = 0.55 * Math.sin(t * 0.37) + 0.3 * Math.sin(t * 1.13 + 1) - cur.aileron * 0.4;
+      st.cyaw += (cy - st.cyaw) * k;
+    }
+    st.yoke = yoke;
+  }
+
+  function poseNow() {
+    if (st.posed === st.t || !st.yoke) return;
+    st.posed = st.t;
+    const t = st.t, yoke = st.yoke;
     if (!st.staticDone) {
       for (const [name, r] of Object.entries(ranges)) if (r.frame === 'static') pose(name, name === 'torso' && st.hideBody ? ZERO : ID);
       st.staticDone = true;
     }
     pose('head', st.hideBody ? ZERO : _m.compose(HEAD, _q.setFromEuler(_e.set(st.pitch, st.yaw, 0, 'YXZ')), _s.set(1, 1, 1)));
-    if (ranges.corgiHead) {
-      const cy = 0.55 * Math.sin(t * 0.37) + 0.3 * Math.sin(t * 1.13 + 1) - cur.aileron * 0.4;
-      st.cyaw += (cy - st.cyaw) * k;
-      pose('corgiHead', _m.compose(CHEAD, _q.setFromEuler(_e.set(0.1 * Math.sin(t * 0.9), st.cyaw, 0.08 * Math.sin(t * 0.6), 'YXZ')), _s.set(1, 1, 1)));
-    }
+    if (ranges.corgiHead) pose('corgiHead', _m.compose(CHEAD, _q.setFromEuler(_e.set(0.1 * Math.sin(t * 0.9), st.cyaw, 0.08 * Math.sin(t * 0.6), 'YXZ')), _s.set(1, 1, 1)));
     yoke.updateMatrix();
     for (const side of ['L', 'R']) {
       pose('glove' + side, yoke.matrix);
@@ -310,10 +317,10 @@ export function createPilot({ quality, opts = {} }) {
   return {
     get mesh() { return mesh; },
     update,
-    setHideBody(v) { if (st.hideBody !== !!v) { st.hideBody = !!v; st.staticDone = false; } },
+    setHideBody(v) { if (st.hideBody !== !!v) { st.hideBody = !!v; st.staticDone = false; st.posed = -1; } },
     setVisible(v) { st.visible = !!v; mesh.visible = !!v; },
-    setConfig(o = {}) { cfg = { ...cfg, ...o }; assemble(); st.staticDone = false; },
+    setConfig(o = {}) { cfg = { ...cfg, ...o }; assemble(); st.staticDone = false; st.posed = -1; },
     get config() { return { ...cfg }; },
-    dispose() { mesh.geometry.dispose(); mat.dispose(); },
+    dispose() { mesh.geometry.dispose(); mat.dispose(); depthMat.dispose(); },
   };
 }

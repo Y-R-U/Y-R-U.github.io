@@ -129,13 +129,16 @@ function bakeAtlas(renderer, geos) {
 
 function impostorMaterial(atlas, a2c) {
   const m = new THREE.ShaderMaterial({
-    uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { map: { value: null } }]),
+    uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { map: { value: null }, uNear: { value: new THREE.Vector4(1e9, 0, 0, 0) } }]),
     vertexShader: /* glsl */`
       attribute vec4 iPos; attribute vec4 iDat;
+      uniform vec4 uNear;
       varying vec2 vUv; varying float vTint;
       #include <common>
       #include <fog_pars_vertex>
       void main() {
+        vec3 dn = iPos.xyz - uNear.xyz;
+        if (dot(dn, dn) < uNear.w) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
         vec4 mvc = modelViewMatrix * vec4(iPos.xyz + vec3(0.0, iPos.w * 0.5, 0.0), 1.0);
         vec4 mvPosition = mvc + vec4(position.x * iDat.x, position.y * iPos.w, 0.0, 0.0);
         gl_Position = projectionMatrix * mvPosition;
@@ -167,7 +170,7 @@ function impostorMaterial(atlas, a2c) {
 }
 
 // Placement. ctx: { heightAt, noGo(x,z), extra: [[x,z,species,h]] }
-function plant(ctx, quality) {
+async function plant(ctx, quality) {
   const out = [];
   const r = rng(7);
   const add = (x, z, sp, h, edge, tint = 0.78 + r() * 0.42) => {
@@ -202,6 +205,7 @@ function plant(ctx, quality) {
       }
     });
   }
+  if (ctx.pause) await ctx.pause(0.4);
   const CG = 48, step = quality === 'low' ? 10 : 8.5;
   for (let gz = -RAD; gz < RAD; gz += CG) for (let gx = -RAD; gx < RAD; gx += CG) {
     if (gx * gx + gz * gz > RAD * RAD) continue;
@@ -223,9 +227,11 @@ function plant(ctx, quality) {
   return Float32Array.from(out);
 }
 
-export function buildTrees(renderer, quality, ctx) {
+// ctx.pause(fraction): optional async hook between the heavy stages (boot yields to paint the loading bar)
+export async function buildTrees(renderer, quality, ctx) {
   const CH = 200, HALF = 6400, NC = Math.ceil(2 * HALF / CH);
-  const raw = plant(ctx, quality);
+  const raw = await plant(ctx, quality);
+  if (ctx.pause) await ctx.pause(0.8);
   const count = raw.length / S;
   // bucket by chunk
   const counts = new Int32Array(NC * NC);
@@ -286,58 +292,55 @@ export function buildTrees(renderer, quality, ctx) {
   far.name = 'tree-impostors';
   group.add(far);
 
+  // Near meshes refresh in one go every NT metres; the far impostors refresh every ~2.5×NT, time-sliced (~3 ms a frame,
+  // never more than SLICES frames) into back buffers. The impostor shader hides any instance inside the current near set (uNear), so the two
+  // sets never double up or leave a hole even though they were built from different camera positions.
+  const SLICES = 8, SLICE_MS = 3;
   const nearN = [0, 0, 0];
-  const last = new THREE.Vector3(1e9, 0, 0);
-  let dirty = true;
-  function refresh(cam) {
-    const cx = cam.x, cy = cam.y, cz = cam.z;
-    const groundY = ctx.heightAt(cx, cz);
-    const alt = Math.max(0, cy - groundY);
-    const nearR = tier.nearR, farR = tier.farR;
-    const nearR2 = nearR * nearR;
-    const vis = [];
-    for (const c of chunks) {
-      const dx = Math.max(0, Math.abs(c.x - cx) - CH * 0.71), dz = Math.max(0, Math.abs(c.z - cz) - CH * 0.71);
-      c.d = Math.hypot(dx, dz, alt);
-      if (c.d < farR) vis.push(c);
-    }
-    vis.sort((a, b) => a.d - b.d);
-    nearN[0] = nearN[1] = nearN[2] = 0;
-    let nf = 0;
-    const P = iPos.array, D = iDat.array;
-    for (let pass = 0; pass < 2; pass++) {
-      for (const c of vis) {
-        if (nf >= tier.farCap) break;
-        for (let i = c.s; i < c.s + c.n; i++) {
-          const o = i * S;
-          const x = T[o], y = T[o + 1], z = T[o + 2], h = T[o + 3], w = T[o + 4], sp = T[o + 7];
-          const dx = x - cx, dy = y - cy, dz = z - cz, d2 = dx * dx + dy * dy + dz * dz;
-          if (d2 < nearR2 && (pass === 1 || nearN[sp] < tier.nearCap)) {
-            if (pass === 1) continue;
-            const m = near[sp], k = nearN[sp]++;
-            const e = m.instanceMatrix.array, rot = T[o + 5], sh = h / SPECIES[sp].H, sw = w * sh;
-            const co = Math.cos(rot) * sw, si = Math.sin(rot) * sw;
-            const b = k * 16;
-            e[b] = co; e[b + 1] = 0; e[b + 2] = -si; e[b + 3] = 0;
-            e[b + 4] = 0; e[b + 5] = sh; e[b + 6] = 0; e[b + 7] = 0;
-            e[b + 8] = si; e[b + 9] = 0; e[b + 10] = co; e[b + 11] = 0;
-            e[b + 12] = x; e[b + 13] = y; e[b + 14] = z; e[b + 15] = 1;
-            const t = T[o + 6], ca = m.instanceColor.array;
-            ca[k * 3] = t * (0.9 + (t - 0.78) * 0.5); ca[k * 3 + 1] = t; ca[k * 3 + 2] = t * (1.05 - (t - 0.78) * 0.4);
-            continue;
-          }
-          const edge = T[o + 8] === 1;
-          if (edge !== (pass === 0)) continue;
-          if (nf >= tier.farCap) break;
-          const dd = Math.sqrt(d2);
-          if (T[o + 9] > (edge ? Math.max(0.4, 1.5 - dd / (tier.thin * 1.5)) : Math.max(tier.floor, 1.25 - dd / tier.thin))) continue;
-          const tile = tileOf(sp, T[o + 9]), dim = atlas.dims[tile];
-          const sh = h / SPECIES[sp].H;
-          P[nf * 4] = x; P[nf * 4 + 1] = y; P[nf * 4 + 2] = z; P[nf * 4 + 3] = dim[1] * sh;
-          D[nf * 4] = dim[0] * w * sh; D[nf * 4 + 1] = tile; D[nf * 4 + 2] = T[o + 6]; D[nf * 4 + 3] = 0;
-          nf++;
-        }
+  const lastNear = new THREE.Vector3(1e9, 0, 0), lastFar = new THREE.Vector3(1e9, 0, 0);
+  const uNear = far.material.uniforms.uNear.value;
+  const grid = new Array(NC * NC).fill(null);
+  for (const c of chunks) grid[Math.round((c.z + HALF) / CH - 0.5) * NC + Math.round((c.x + HALF) / CH - 0.5)] = c;
+  const candO = [], candD = [], spD = [[], [], []];
+  let nearR2eff = 0, dirty = true, farDirty = true;
+
+  function refreshNear(cam) {
+    const cx = cam.x, cy = cam.y, cz = cam.z, nearR = tier.nearR, nearR2 = nearR * nearR;
+    candO.length = candD.length = 0;
+    const cnt = [0, 0, 0];
+    const x0 = Math.max(0, Math.floor((cx - nearR + HALF) / CH)), x1 = Math.min(NC - 1, Math.floor((cx + nearR + HALF) / CH));
+    const z0 = Math.max(0, Math.floor((cz - nearR + HALF) / CH)), z1 = Math.min(NC - 1, Math.floor((cz + nearR + HALF) / CH));
+    for (let iz = z0; iz <= z1; iz++) for (let ix = x0; ix <= x1; ix++) {
+      const c = grid[iz * NC + ix];
+      if (!c) continue;
+      for (let i = c.s; i < c.s + c.n; i++) {
+        const o = i * S, dx = T[o] - cx, dy = T[o + 1] - cy, dz = T[o + 2] - cz, d2 = dx * dx + dy * dy + dz * dz;
+        if (d2 >= nearR2) continue;
+        candO.push(o); candD.push(d2); cnt[T[o + 7]]++;
       }
+    }
+    // over a species cap: shrink the near radius to that species' cap-th nearest tree (the rest stay impostors)
+    let r2 = nearR2;
+    for (let sp = 0; sp < 3; sp++) {
+      if (cnt[sp] <= tier.nearCap) continue;
+      const a = spD[sp]; a.length = 0;
+      for (let k = 0; k < candO.length; k++) if (T[candO[k] + 7] === sp) a.push(candD[k]);
+      a.sort((p, q) => p - q);
+      r2 = Math.min(r2, a[tier.nearCap]);
+    }
+    nearN[0] = nearN[1] = nearN[2] = 0;
+    for (let k = 0; k < candO.length; k++) {
+      if (candD[k] >= r2) continue;
+      const o = candO[k], sp = T[o + 7], m = near[sp], n = nearN[sp]++;
+      const e = m.instanceMatrix.array, rot = T[o + 5], sh = T[o + 3] / SPECIES[sp].H, sw = T[o + 4] * sh;
+      const co = Math.cos(rot) * sw, si = Math.sin(rot) * sw;
+      const b = n * 16;
+      e[b] = co; e[b + 1] = 0; e[b + 2] = -si; e[b + 3] = 0;
+      e[b + 4] = 0; e[b + 5] = sh; e[b + 6] = 0; e[b + 7] = 0;
+      e[b + 8] = si; e[b + 9] = 0; e[b + 10] = co; e[b + 11] = 0;
+      e[b + 12] = T[o]; e[b + 13] = T[o + 1]; e[b + 14] = T[o + 2]; e[b + 15] = 1;
+      const t = T[o + 6], ca = m.instanceColor.array;
+      ca[n * 3] = t * (0.9 + (t - 0.78) * 0.5); ca[n * 3 + 1] = t; ca[n * 3 + 2] = t * (1.05 - (t - 0.78) * 0.4);
     }
     for (let s = 0; s < 3; s++) {
       const m = near[s];
@@ -345,17 +348,84 @@ export function buildTrees(renderer, quality, ctx) {
       m.instanceMatrix.clearUpdateRanges(); m.instanceMatrix.addUpdateRange(0, nearN[s] * 16); m.instanceMatrix.needsUpdate = true;
       m.instanceColor.clearUpdateRanges(); m.instanceColor.addUpdateRange(0, nearN[s] * 3); m.instanceColor.needsUpdate = true;
     }
+    // a borderline tree may show as both, never as neither
+    uNear.set(cx, cy, cz, r2 * 0.9999);
+    if (r2 < nearR2eff - 1) farDirty = true;
+    nearR2eff = r2;
+    lastNear.copy(cam);
+  }
+
+  const backP = new Float32Array(MAXFAR * 4), backD = new Float32Array(MAXFAR * 4);
+  const job = { on: false, cx: 0, cy: 0, cz: 0, rx2: 0, vis: [], pass: 0, ci: 0, nf: 0, budget: 0 };
+  function startFar(cam, margin) {
+    const cx = cam.x, cy = cam.y, cz = cam.z, alt = Math.max(0, cy - ctx.heightAt(cx, cz)), farR = tier.farR;
+    const vis = job.vis; vis.length = 0;
+    let total = 0;
+    const x0 = Math.max(0, Math.floor((cx - farR + HALF) / CH)), x1 = Math.min(NC - 1, Math.floor((cx + farR + HALF) / CH));
+    const z0 = Math.max(0, Math.floor((cz - farR + HALF) / CH)), z1 = Math.min(NC - 1, Math.floor((cz + farR + HALF) / CH));
+    for (let iz = z0; iz <= z1; iz++) for (let ix = x0; ix <= x1; ix++) {
+      const c = grid[iz * NC + ix];
+      if (!c) continue;
+      const dx = Math.max(0, Math.abs(c.x - cx) - CH * 0.71), dz = Math.max(0, Math.abs(c.z - cz) - CH * 0.71);
+      c.d = Math.sqrt(dx * dx + dz * dz + alt * alt);
+      if (c.d < farR) { vis.push(c); total += c.n; }
+    }
+    vis.sort((a, b) => a.d - b.d);
+    const rx = Math.max(0, Math.sqrt(nearR2eff) - margin);
+    Object.assign(job, { on: true, cx, cy, cz, rx2: rx * rx, pass: 0, ci: 0, nf: 0, budget: Math.ceil((2 * total) / SLICES) + 1 });
+    farDirty = false;
+  }
+  function stepFar(budget) {
+    const { cx, cy, cz, rx2, vis } = job, cap = tier.farCap, P = backP, D = backD;
+    let nf = job.nf, work = 0;
+    const t0 = performance.now();
+    while (job.pass < 2 && (work < budget || performance.now() - t0 < SLICE_MS)) {
+      if (job.ci >= vis.length || nf >= cap) { job.pass++; job.ci = 0; continue; }
+      const c = vis[job.ci++], edgePass = job.pass === 0;
+      work += c.n;
+      for (let i = c.s; i < c.s + c.n; i++) {
+        const o = i * S;
+        if ((T[o + 8] === 1) !== edgePass) continue;
+        const x = T[o], y = T[o + 1], z = T[o + 2];
+        const dx = x - cx, dy = y - cy, dz = z - cz, d2 = dx * dx + dy * dy + dz * dz;
+        if (d2 < rx2) continue;
+        if (nf >= cap) break;
+        const dd = Math.sqrt(d2);
+        if (T[o + 9] > (edgePass ? Math.max(0.4, 1.5 - dd / (tier.thin * 1.5)) : Math.max(tier.floor, 1.25 - dd / tier.thin))) continue;
+        const sp = T[o + 7], h = T[o + 3], w = T[o + 4];
+        const tile = tileOf(sp, T[o + 9]), dim = atlas.dims[tile];
+        const sh = h / SPECIES[sp].H;
+        P[nf * 4] = x; P[nf * 4 + 1] = y; P[nf * 4 + 2] = z; P[nf * 4 + 3] = dim[1] * sh;
+        D[nf * 4] = dim[0] * w * sh; D[nf * 4 + 1] = tile; D[nf * 4 + 2] = T[o + 6]; D[nf * 4 + 3] = 0;
+        nf++;
+      }
+    }
+    job.nf = nf;
+    if (job.pass < 2) return;
+    job.on = false;
+    iPos.array.set(backP.subarray(0, nf * 4)); iDat.array.set(backD.subarray(0, nf * 4));
     quad.instanceCount = nf;
     iPos.clearUpdateRanges(); iPos.addUpdateRange(0, nf * 4); iPos.needsUpdate = true;
     iDat.clearUpdateRanges(); iDat.addUpdateRange(0, nf * 4); iDat.needsUpdate = true;
-    last.copy(cam);
-    dirty = false;
+    lastFar.set(job.cx, job.cy, job.cz);
   }
 
+  let farMargin = 0;
   function update(camera) {
     const p = camera.position;
-    const alt = Math.max(1, p.y);
-    if (dirty || last.distanceToSquared(p) > Math.pow(Math.min(60, 12 + alt * 0.08), 2)) refresh(p);
+    const nt = Math.min(60, 12 + Math.max(1, p.y) * 0.08), ft = nt * 2.5;
+    if (dirty) {
+      refreshNear(p);
+      startFar(p, farMargin = nt + ft + 20);
+      stepFar(Infinity);
+      dirty = false;
+      return;
+    }
+    if (lastNear.distanceToSquared(p) > nt * nt) refreshNear(p);
+    if (job.on) { stepFar(job.budget); return; }
+    // the far set covers everything beyond (near radius - farMargin) of where it was built: rebuild before the near set can drift out of it
+    const lim = Math.max(0, farMargin - nt - 20);
+    if (farDirty || lastFar.distanceToSquared(p) > lim * lim) startFar(p, farMargin = nt + ft + 20);
   }
   function setQuality(q) {
     const t = TREE_TIERS[q];

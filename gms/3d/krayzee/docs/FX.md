@@ -147,6 +147,12 @@ I checked these with the CDP heap sampling profiler, 16-byte interval, over 3000
   and ribbon and skid arguments pass through typed arrays; per-effect functions are small enough for V8 to inline.
 - `performance.now()` boxes a double on every call, so CPU timing is opt-in (`fx.setTiming(true)`). The bench turns it on.
 
+### Perf pass (PERFFIX, 2026-10-22)
+- Ribbons are `forceSinglePass`: three drew the transparent double-sided ribbon mesh twice (back, then front) and
+  re-resolved its program each time. Now one draw; flat strips look the same.
+- The skid/crack decal atlas lives in `js/world/textures.js` (`skidAtlas`) and now builds in ~27 ms at 4× CPU
+  (was 838 ms); see AIRPORT.md.
+
 ## Test bench: `tools/fx.html`
 `http://localhost:8888/gms/3d/krayzee/tools/fx.html?q=low|medium|high` (`&shot=1` hides UI, `&notiming=1`).
 It shows the real world, a real `createPlane` rig with the pilot, and a fake Aircraft state driven by scripted scenarios.

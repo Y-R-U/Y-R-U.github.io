@@ -214,3 +214,25 @@ Screenshots in `docs/shots/art3/`: `before_*` / `after_*` (chase, center, cockpi
 `_viewEye` = portrait framing as GAMEPLAY would wire it), `after_towerbuzz_*`, `after_carpark_*`, `after_hedge_*`
 (+ `_noui`), tower close-ups `t1_*`/`t2_*`, cars `t3_*`, LOD levels `l2_lod_{near,far,far2}`, shadow proxy
 `l2_shadowproxy_low`. Test-bed presets added: `towerbuzz`, `towerfront`, `towerfar`, `carpark`, `carparkhigh`, `hedge`.
+
+## Perf pass (PERFFIX, 2026-10-22)
+- **`buildWorld(scene, renderer, { onProgress(fraction, stage) })`**: new optional callback. When given (or with
+  `opts.yield: true`) the build yields a frame between stages (`terrain` 0.03, `pavement` 0.2, `buildings` 0.36,
+  `town` 0.54, `trees` 0.58/0.7/0.82, `shade` 0.88, `done` 1) so a loading bar can paint. Without it nothing yields
+  (tools and `perf.mjs` timings unchanged; `debug.timings` excludes the yield waits). At 4× CPU (low content) the build
+  goes from one 4.7 s task to tasks of ≤ 0.8 s (terrain), wall ~2.7–3.4 s. `buildTrees` is now `async` (only caller:
+  `buildWorld`) with an optional `ctx.pause`.
+- **`skidAtlas`**: streaks written into `ImageData` (was 262k `fillRect`s): 838 → 27 ms at 4×. Same rng order, so the
+  cracks/patch are bit-identical; streak alpha differs by ≤ 1/255 (rounding).
+- **Tree LOD refresh** (`trees.js`): near meshes refresh every NT (12–60 m, as before) but only walk the chunks within
+  the near radius; the far impostors refresh every 2.5×NT, time-sliced into back buffers (≥ 1/8 of the work and up to
+  3 ms per frame, ≤ 9 frames) and swapped in one go. The impostor shader hides any instance inside the current near set
+  (`uNear` = near centre + effective radius²), so the two sets never double up or leave a gap although they are built
+  from different camera positions; the far set is rebuilt before the camera can drift out of its covered annulus.
+  Near-cap overflow now keeps the nearest trees per species (was chunk order). Flyover over the woods at 4× CPU:
+  medium content max 58–64 ms → 6–9 ms per frame (frames over 8 ms: 107–122 → 0–1), low 35 → 9 ms; refresh total
+  per 5 s profile 122/270/422 → 50/91/73 ms (low/medium/high). Stopped-camera screenshots are pixel-identical
+  (`docs/shots/perffix/trees-{ref,new}-*`).
+- **Tower crew**: 12 meshes → one `SkinnedMesh` (one bone per body/head/arm, rigid weights; same animation code on the
+  bones), hidden and not animated beyond 400 m of the cab. 13 calls → 2 (crew + radar) near the tower, 1 beyond 400 m.
+  `tower.crew` still lists `{ body, head, arms }` (now bones). Shots: `tower-a/b.jpg` (arms animate).

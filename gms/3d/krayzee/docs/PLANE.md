@@ -133,6 +133,41 @@ Textures added: interior atlas 1024² (high) / 512² (low), panel glow mask (onl
 | shadow pass at low | 2.6k (1 call) | full rig |
 An AI plane at 150–525 m now costs 5k tris instead of ~14k (low) / ~37k (high); beyond 525 m (low) / 910 m (high), 2.9k.
 
+## Perf pass (PERFFIX, 2026-10-22)
+Measured with `tools/perf.mjs --quick` (portrait phone, 30 tier×view×moment rows) on the old code (mirror) vs the new one;
+JSON in `docs/shots/perffix/{ref,after}.json`, A/B screenshots alongside (`far*`, `pilot-*`, `gauges-*`).
+- **Far LODs are one mesh each** (`js/plane/farlod.js`, `mergeFarLOD(frame, { paint, glass })`). Every part of
+  `plane-far`/`plane-far2` is baked into one geometry with one material per rig (a clone of the paint material plus
+  vertex colours and a per-vertex `tm` flag): livery parts keep their UVs and the livery texture (registration, cheat
+  line and logo stay), trim/prop hub/lights become vertex colour. 13–14 draws → **1** per far plane. Dropped at far:
+  the prop blades and prop disc (sub-pixel beyond 150 m), clearcoat-free trim metalness (one shared 0.4/0.55 value).
+  Painted glass (AI) is unchanged; cockpit rigs get an opaque dark tint behind the window holes. `setLivery` recolours
+  the baked spinner; `opts.mergeFar: false` builds the old multi-mesh far levels (A/B only).
+  PLANES lane: the same call works on a `types/` far frame (`f.merged = mergeFarLOD(frame, { paint })`).
+- **Pilot is posed on the GPU**: each part carries a `pid` attribute and the vertex shader applies `uPart[pid]` /
+  `uPartN[pid]` (custom depth material too, so the shadow matches). No buffer re-uploads at all (was 42–190 KB/frame);
+  matrices are built in `onBeforeRender`, so a hidden or far-LOD pilot costs nothing; no `Math.hypot`, no per-frame
+  garbage. Plane update 0.35–1.0 → 0.07–0.23 ms at 4× CPU. Arms/gloves still track the yoke every drawn frame
+  (a 30 Hz cap would make the hands lag the yoke; posing now costs ~11 matrix composes).
+- **Gauges**: each dial redraws into its own cell canvas only when its quantised reading changes (fast dials 20 Hz,
+  alt/vsi/tach/tc/fuel 10 Hz) and is uploaded with `texSubImage2D` for that cell only. Drawing happens from the gauge
+  mesh's `onBeforeRender` (`inst.attach(mesh)`), so chase view (gauges hidden) does no canvas work and no upload.
+  Gauge uploads in the inside views 150–170 → 55–105 KB/frame; steady cruise ~1 KB/frame. Unattached instruments
+  (the `types/` cockpits today) keep the old behaviour; one line, `inst.attach(gaugeMesh)`, opts them in.
+- **Program churn**: three draws a transparent `DoubleSide` material twice (back, then front) and flips
+  `needsUpdate` each time, which is what re-resolved the program 13×/frame. `glass` and `propDisc` are now
+  `forceSinglePass` (one draw, no churn; flat discs and thin glass look the same). `getParameters` (52 ms/5 s at 4×)
+  is gone from the profile.
+
+| portrait, mean of 30 rows | before | after |
+|---|---|---|
+| draw calls (main) | 72.6 | 45.6 |
+| worst row (final, traffic) | 116 | 52 |
+| frame CPU (1×) | 4.41 ms | 3.50 ms |
+| render() CPU (1×) | 2.15 ms | 1.59 ms |
+| buffer uploads | 56 KB/f | 8.7 KB/f (tree refresh only) |
+| plane update, 5 s profile at 4× | 189–201 ms | 77–97 ms |
+
 ## Known gaps / ideas
 - Ailerons have no Frise nose gap; the flap slot shows the wing's blunt rear spar face (no cove/shroud lip).
 - Yokes sit out of the default forward view in landscape (they are visible looking down, and in portrait with a tall FOV).

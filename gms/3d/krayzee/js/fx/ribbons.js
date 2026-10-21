@@ -57,7 +57,7 @@ export function createRibbons(scene, { trails = 8, points = 64 } = {}) {
   const mat = new THREE.ShaderMaterial({
     vertexShader: vert, fragmentShader: frag,
     uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uLight: { value: 1 } }]),
-    transparent: true, depthWrite: false, fog: true, side: THREE.DoubleSide,
+    transparent: true, depthWrite: false, fog: true, side: THREE.DoubleSide, forceSinglePass: true,
     blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
     blendSrcAlpha: THREE.OneFactor, blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
   });

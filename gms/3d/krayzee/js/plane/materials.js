@@ -14,10 +14,11 @@ export function createMaterials({ quality, livery, holes }) {
   const trim = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.62, metalness: 0.35 });
   const glass = new THREE.MeshPhysicalMaterial({
     color: 0x9fb4c4, roughness: 0.04, metalness: 0.0, transparent: true, opacity: high ? 0.24 : 0.3,
-    side: THREE.DoubleSide, depthWrite: false, envMapIntensity: 1.6, specularIntensity: 1,
+    side: THREE.DoubleSide, forceSinglePass: true, depthWrite: false, envMapIntensity: 1.6, specularIntensity: 1,
   });
   const prop = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.38, metalness: 0.55 });
-  const disc = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, opacity: 0, toneMapped: true });
+  // single pass: three otherwise draws transparent double-sided meshes twice and re-resolves the program each time
+  const disc = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true, opacity: 0, toneMapped: true });
   const lights = new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
   const beacon = new THREE.MeshBasicMaterial({ color: 0x400000, toneMapped: false });
   const interior = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0.05 });

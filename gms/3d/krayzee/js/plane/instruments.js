@@ -252,28 +252,33 @@ export function createInstruments({ quality }) {
 
   const target = { airspeed: 0, altitude: 0, vsi: 0, heading: 0, pitch: 0, roll: 0, rpm: 0, slip: 0, flaps: 0, fuelL: 0.8, fuelR: 0.76 };
   const shown = { ...target, turn: 0 };
-  let lastHeading = null, turnRate = 0, acc = 1, dirty = true, lastKey = '';
+  let lastHeading = null, turnRate = 0, acc = 1;
 
   function set(s) {
     for (const k of Object.keys(target)) if (typeof s[k] === 'number' && Number.isFinite(s[k])) target[k] = s[k];
   }
 
-  function draw() {
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    GAUGES.forEach((k, i) => {
-      const ox = (i % COLS) * C, oy = Math.floor(i / COLS) * C;
-      ctx.save();
-      ctx.setTransform(1, 0, 0, 1, ox, oy);
-      ctx.beginPath(); ctx.rect(0, 0, C, C); ctx.clip();
-      if (faces[k]) ctx.drawImage(faces[k], 0, 0);
-      ctx.setTransform(C / 2, 0, 0, C / 2, ox + C / 2, oy + C / 2);
-      DYN[k](ctx, shown, card);
-      ctx.setTransform(1, 0, 0, 1, ox, oy);
-      ctx.drawImage(glareC, 0, 0);
-      ctx.restore();
-    });
-    texture.needsUpdate = true;
+  // each gauge redraws only when its quantised reading changes, into its own cell canvas; flush() uploads just those cells
+  const R = Math.round;
+  const KEY = {
+    asi: (v) => [R(v.airspeed * 10)], alt: (v) => [R(v.altitude)], vsi: (v) => [R(v.vsi)], tach: (v) => [R(v.rpm)],
+    ai: (v) => [R(v.pitch * 1000), R(v.roll * 1000)], tc: (v) => [R(v.slip * 100), R(v.turn * 10)], dg: (v) => [R(v.heading * 10)],
+    fuel: (v) => [v.fuelL, v.fuelR],
+  };
+  const cellC = {}, keys = {}, dirty = new Set(GAUGES);
+  for (const k of GAUGES) { cellC[k] = mkCanvas(C); keys[k] = []; }
+
+  function drawCell(k) {
+    const c = cellC[k], x = c.getContext('2d');
+    x.setTransform(1, 0, 0, 1, 0, 0);
+    x.fillStyle = '#000'; x.fillRect(0, 0, C, C);
+    if (faces[k]) x.drawImage(faces[k], 0, 0);
+    unit(x, C);
+    DYN[k](x, shown, card);
+    x.setTransform(1, 0, 0, 1, 0, 0);
+    x.drawImage(glareC, 0, 0);
+    const i = GAUGES.indexOf(k);
+    ctx.drawImage(c, (i % COLS) * C, Math.floor(i / COLS) * C);
   }
 
   function update(dt) {
@@ -296,12 +301,47 @@ export function createInstruments({ quality }) {
     lastHeading = target.heading;
     shown.turn = turnRate;
     acc += dt;
-    if (acc < 0.05) return;
-    acc = 0;
-    const key = [shown.airspeed.toFixed(1), shown.altitude.toFixed(0), shown.vsi.toFixed(0), shown.rpm.toFixed(0), shown.pitch.toFixed(3), shown.roll.toFixed(3), shown.slip.toFixed(2), shown.heading.toFixed(1), shown.turn.toFixed(1), shown.fuelL, shown.fuelR].join();
-    if (key !== lastKey || dirty) { lastKey = key; dirty = false; draw(); }
+    if (!attached) flush(null);
   }
 
-  draw();
-  return { canvas, texture, cells, set, update, shown, dispose() { texture.dispose(); } };
+  // call when the gauges are about to be drawn (mesh.onBeforeRender): 20 Hz (slow gauges 10 Hz), changed cells only,
+  // nothing while hidden
+  const SLOW = new Set(['alt', 'vsi', 'tach', 'tc', 'fuel']);
+  // attach(mesh): redraw/upload from that mesh's onBeforeRender only (so never while it is hidden). Unattached
+  // instruments keep the old behaviour: redraw from update() and re-upload the whole canvas.
+  let attached = false;
+  function attach(mesh) { attached = true; mesh.onBeforeRender = (renderer) => flush(renderer); }
+  let tick = 0;
+  function flush(renderer) {
+    if (acc < 0.05) return;
+    acc = 0;
+    tick++;
+    for (const k of GAUGES) {
+      if (tick & 1 && SLOW.has(k)) continue;
+      const nk = KEY[k](shown), ok = keys[k];
+      if (nk.length === ok.length && nk.every((v, i) => v === ok[i])) continue;
+      keys[k] = nk; dirty.add(k);
+    }
+    if (!dirty.size) return;
+    for (const k of dirty) drawCell(k);
+    const props = renderer?.properties.get(texture);
+    if (!props?.__webglTexture || props.__version !== texture.version) { texture.needsUpdate = true; dirty.clear(); return; }
+    const gl = renderer.getContext();
+    renderer.state.bindTexture(gl.TEXTURE_2D, props.__webglTexture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, texture.flipY);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
+    for (const k of dirty) {
+      const i = GAUGES.indexOf(k), ox = (i % COLS) * C, oy = Math.floor(i / COLS) * C;
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, ox, texture.flipY ? canvas.height - oy - C : oy, gl.RGBA, gl.UNSIGNED_BYTE, cellC[k]);
+    }
+    if (texture.generateMipmaps) gl.generateMipmap(gl.TEXTURE_2D);
+    dirty.clear();
+  }
+
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  for (const k of GAUGES) drawCell(k);
+  dirty.clear();
+  texture.needsUpdate = true;
+  return { canvas, texture, cells, set, update, attach, flush, shown, dispose() { texture.dispose(); } };
 }
