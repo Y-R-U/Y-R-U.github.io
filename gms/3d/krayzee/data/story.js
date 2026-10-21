@@ -1,0 +1,59 @@
+// Story campaign "The Peerage". Spec: docs/DESIGN.md §3.2. targetPP is Medium; scale by DIFFICULTY[x].targetMult.
+
+export const RIVALS = {
+  house: 'Pomfrey-Smythe',
+  livery: { primary: '#8a5aa8', secondary: '#f2e6c9', accent: '#d4af37' },
+  members: [
+    { id: 'rupert', name: 'Lord Rupert Pomfrey-Smythe', voice: 'toff', rank: 'earl', aircraft: 'c172' },
+    { id: 'hyacinth', name: 'Dowager Duchess Hyacinth Pomfrey-Smythe', voice: 'duchess', rank: 'duke', aircraft: 'c172' },
+  ],
+};
+
+export const CONTROLLERS = {
+  gerald: { name: 'Gerald Calloway', voice: 'tower_m', blurb: '31 years in the tower, three of them calm. Collects ceramic owls. Retiring this season, whatever happens.' },
+  imogen: { name: 'Imogen Frost', voice: 'tower_f', blurb: 'Flawless phraseology. Has never raised her voice. Yet.' },
+  toby:   { name: 'Tobias "Toby" Wren', voice: 'tower_trainee', blurb: 'First week. Laminated cards. Thinks you are all wonderful, which is worse.' },
+};
+
+export const MISSIONS = [
+  { id: 1, title: 'First Solo, Sort Of', tower: 'toby', startRank: 'baron', traffic: 'light',
+    brief: ['Welcome to Krayzee Royal Aerodrome, Your Lordship.', 'Fly one circuit on autopilot. Then take the controls and land it yourself.', 'And then, just once, push in at the hold line. For tradition.'],
+    objectives: [{ type: 'circuit_auto' }, { type: 'land_manual' }, { type: 'infraction', id: 'queue_jump', count: 1 }],
+    flourish: { type: 'infraction', id: 'low_pass', count: 1 } },
+  { id: 2, title: "Queue Is a Commoner's Word", tower: 'toby', startRank: 'baron', traffic: 'busy', setup: 'departure_queue_5',
+    brief: ['Five aircraft are waiting to depart. You are sixth.', 'You will not be sixth.'],
+    objectives: [{ type: 'first_airborne' }, { type: 'pp', target: 600 }], flourish: { type: 'infraction', id: 'unauth_takeoff', count: 1 } },
+  { id: 3, title: 'The Pomfrey-Smythe Welcome', tower: 'gerald', startRank: 'baron', traffic: 'light', rivals: ['rupert'],
+    brief: ['Lord Rupert Pomfrey-Smythe has cut in front of you. On your first day.', 'Return the favour before he lands.'],
+    objectives: [{ type: 'cut_in_victim', who: 'rupert' }, { type: 'respond', to: 'insult' }], flourish: { type: 'forced_goaround', who: 'rupert' } },
+  { id: 4, title: 'Tea at Altitude', tower: 'gerald', startRank: 'viscount', traffic: 'busy',
+    brief: ['The Duchess has left her teapot at the far field. She wants it delivered to the terminal door.', 'The terminal door. Not the stand.'],
+    objectives: [{ type: 'infraction', id: 'apron_landing', count: 1 }, { type: 'no_contact' }], cargo: 'teapot', flourish: { type: 'pp', target: 1500 } },
+  { id: 5, title: 'Tower Tour', tower: 'imogen', startRank: 'viscount', traffic: 'light', imogenTierCap: 2,
+    brief: ['Controller Frost has never once raised her voice.', 'Buzz her tower three times. Politely.'],
+    objectives: [{ type: 'infraction', id: 'tower_buzz', count: 3 }, { type: 'no_scandal' }], flourish: { type: 'outrage_tier', tier: 3 } },
+  { id: 6, title: 'The Crosswind Runway Is Closed', tower: 'gerald', startRank: 'earl', traffic: 'busy',
+    brief: ['Runway zero-four is closed for "resurfacing". Gerald is very firm about it.', 'Land on it. Then dash across the intersection while the main runway is busy.'],
+    objectives: [{ type: 'infraction', id: 'closed_runway', count: 1 }, { type: 'infraction', id: 'intersection_dash', count: 1 }], flourish: { type: 'pp', target: 2000 } },
+  { id: 7, title: 'Formation, Uninvited', tower: 'toby', startRank: 'earl', traffic: 'light', rivals: ['hyacinth'],
+    brief: ['The Dowager Duchess is taking her afternoon flight.', 'Keep her company. Very, very close company. Thirty seconds in all.'],
+    objectives: [{ type: 'formation_secs', who: 'hyacinth', secs: 30 }], flourish: { type: 'infraction', id: 'near_miss', count: 1 } },
+  { id: 8, title: 'Rush Hour', tower: 'imogen', startRank: 'marquess', traffic: 'chaos', timeLimit: 360,
+    brief: ['Fourteen aircraft. One runway. Six minutes.', 'Bank three thousand Privilege.'],
+    objectives: [{ type: 'pp_banked', target: 3000 }], flourish: { type: 'combo', mult: 2.5 } },
+  { id: 9, title: 'Wrong Way Round', tower: 'gerald', startRank: 'marquess', traffic: 'busy', windShiftAt: 60,
+    brief: ['The wind is about to change and everyone will switch to runway zero-niner.', 'You prefer two-seven.'],
+    objectives: [{ type: 'infraction', id: 'wrong_way', count: 1 }, { type: 'infraction', id: 'forced_goaround', count: 3 }], flourish: { type: 'no_contact' } },
+  { id: 10, title: 'The Royal Flypast', tower: 'imogen', startRank: 'duke', traffic: 'light', event: 'garden_party',
+    brief: ["The Queen's garden party is on the terminal lawn.", 'Flypast down the runway, rattle the terminal windows, then land like a gentleman. No bumps.'],
+    objectives: [{ type: 'infraction', id: 'low_pass', count: 1 }, { type: 'infraction', id: 'terminal_buzz', count: 1 }, { type: 'impeccable' }, { type: 'no_contact' }], flourish: { type: 'pp', target: 2500 } },
+  { id: 11, title: 'Sabotage', tower: 'toby', startRank: 'duke', traffic: 'busy', rivals: ['rupert', 'hyacinth'], towerBias: 'player_last',
+    brief: ['The Pomfrey-Smythes have bribed young Toby with a hamper.', 'You will be sequenced last. Forever. Unless you take it.'],
+    objectives: [{ type: 'infraction', id: 'queue_jump', count: 1 }, { type: 'infraction', id: 'unauth_takeoff', count: 1 }, { type: 'infraction', id: 'runway_steal', count: 1 }], flourish: { type: 'beat_rival_pp' } },
+  { id: 12, title: 'Imogen Snaps', tower: 'imogen', startRank: 'archduke', traffic: 'busy', rivals: ['rupert'], rivalRace: 'outrage',
+    brief: ['Lord Rupert has bet the family silver he can make Controller Frost lose her temper first.', 'Beat him to it. Without a scandal.'],
+    objectives: [{ type: 'outrage_tier', tier: 4, beforeRival: true }, { type: 'no_scandal' }], failOn: ['scandal'], flourish: { type: 'respond', to: 'scold', count: 3 } },
+  { id: 13, title: 'Coronation Day', tower: ['gerald', 'imogen', 'toby'], startRank: 'prince', traffic: 'busy', rivals: ['rupert', 'hyacinth'], aircraft: 'bathtub', timeLimit: 480,
+    brief: ['The season ends today. The Royal Hangar goes to the boldest house.', 'Gerald is working his last shift. Make it memorable.'],
+    objectives: [{ type: 'beat_rival_pp', all: true }], reward: { rankFloor: 'prince', unlock: 'bathtub' }, flourish: { type: 'outrage_tier', tier: 4, controller: 'gerald' } },
+];

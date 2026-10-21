@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Krayzee Audio Bench</title>
+<style>
+  :root { --bg:#14161b; --panel:#1e2129; --ink:#e8eaf0; --dim:#8a90a0; --acc:#f2b632; --ok:#4cc38a; --bad:#e5534b; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui, sans-serif; padding:12px 16px 40px; }
+  h1 { font-size:18px; margin:4px 0 10px; }
+  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--acc); margin:0 0 8px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px; }
+  section { background:var(--panel); border-radius:10px; padding:12px; }
+  label { display:flex; align-items:center; gap:8px; margin:6px 0; }
+  label span:first-child { width:92px; color:var(--dim); flex:none; }
+  input[type=range] { flex:1; min-width:0; }
+  output { width:72px; text-align:right; font-variant-numeric:tabular-nums; }
+  button, select { background:#2c313c; color:var(--ink); border:1px solid #3a4150; border-radius:7px; padding:8px 10px; margin:3px 2px; font:inherit; touch-action:manipulation; }
+  button:active { background:#3a4150; }
+  #status { padding:6px 10px; border-radius:7px; display:inline-block; background:#3a2a20; }
+  #status.on { background:#1d3a2c; color:var(--ok); }
+  #sub { min-height:3em; margin-top:8px; padding:8px; border-radius:7px; background:#111318; color:var(--dim); }
+  #sub b { color:var(--acc); }
+  pre { white-space:pre-wrap; font-size:12px; color:var(--dim); }
+</style>
+</head>
+<body>
+<h1>Krayzee audio bench <span id="status">tap anywhere to unlock audio</span></h1>
+<div class="grid">
+  <section>
+    <h2>Mix</h2>
+    <label><span>Master</span><input id="vMaster" type="range" min="0" max="1" step="0.01" value="0.9"><output></output></label>
+    <label><span>SFX</span><input id="vSfx" type="range" min="0" max="1" step="0.01" value="1"><output></output></label>
+    <label><span>Voice</span><input id="vVoice" type="range" min="0" max="1" step="0.01" value="1"><output></output></label>
+    <label><span>Music</span><input id="vMusic" type="range" min="0" max="1" step="0.01" value="1"><output></output></label>
+  </section>
+  <section>
+    <h2>Engine (own plane)</h2>
+    <button id="engOn">Start engine</button><button id="engOff">Stop</button>
+    <label><span>Throttle</span><input id="thr" type="range" min="0" max="1" step="0.01" value="0"><output></output></label>
+    <label><span>Interior</span><input id="interior" type="checkbox" checked></label>
+    <label><span>Chase dist m</span><input id="chase" type="range" min="5" max="400" step="1" value="12"><output></output></label>
+  </section>
+  <section>
+    <h2>Other planes</h2>
+    <button id="flyby">Flyby (low pass, 60 m/s)</button>
+    <button id="swarm">10 circling planes</button><button id="swarmOff">Clear</button>
+    <pre id="capInfo"></pre>
+  </section>
+  <section>
+    <h2>Airflow &amp; warnings</h2>
+    <label><span>Airspeed kt</span><input id="ias" type="range" min="0" max="160" step="1" value="0"><output></output></label>
+    <label><span>Stall horn</span><input id="horn" type="range" min="0" max="1" step="0.01" value="0"><output></output></label>
+    <button id="flaps">Hold: flaps motor</button>
+  </section>
+  <section>
+    <h2>Ground</h2>
+    <label><span>Ground m/s</span><input id="gs" type="range" min="0" max="40" step="0.5" value="0"><output></output></label>
+    <label><span>Surface</span><select id="surf"><option>runway</option><option>taxiway</option><option>grass</option></select></label>
+    <label><span>Intensity</span><input id="inten" type="range" min="0" max="1" step="0.01" value="0.6"><output></output></label>
+    <button id="td">Touchdown</button><button id="gear">Gear thump</button><button id="crash">Crash</button><button id="boing">BOING</button>
+  </section>
+  <section>
+    <h2>UI &amp; radio clicks</h2>
+    <button data-ui="click">click</button><button data-ui="confirm">confirm</button><button data-ui="back">back</button><button data-ui="toggle">toggle</button><button data-ui="error">error</button>
+    <br><button id="sqOn">squelch on</button><button id="sqOff">squelch off</button>
+  </section>
+  <section>
+    <h2>Radio</h2>
+    <label><span>Voice</span><select id="voice"></select></label>
+    <button id="rPilot">Pilot transmits</button><button id="rTower">Tower transmits</button>
+    <button id="rQueue">Queue 3</button><button id="rStep">Step on (priority)</button><button id="rStop">Stop all</button>
+    <div id="sub">subtitles appear here</div>
+  </section>
+  <section>
+    <h2>Offline level check</h2>
+    <button id="runTest">Render all offline</button>
+    <pre id="testOut"></pre>
+  </section>
+</div>
+<script type="module">
+import * as A from '../js/audio/index.js';
+import { createAudioSystem } from '../js/audio/index.js';
+
+const $ = (id) => document.getElementById(id);
+const PILOTS = ['toff','duchess','bubba','darlene','wingco','geezer','sheila','laird','heiress','comte','baronin','tex','nan','prince','charmer'];
+const TOWERS = ['tower_m','tower_f','tower_trainee'];
+const params = new URLSearchParams(location.search);
+
+for (const id of [...PILOTS, ...TOWERS]) { const o = document.createElement('option'); o.value = o.textContent = id; $('voice').append(o); }
+const haveSample = {};
+Promise.all([...PILOTS, ...TOWERS].map(async (id) => {
+  try { const r = await fetch(`../audio/voices/${id}/sample.mp3`, { method: 'HEAD' }); haveSample[id] = r.ok; } catch { haveSample[id] = false; }
+})).then(() => { for (const o of $('voice').options) if (haveSample[o.value]) o.textContent = o.value + ' (sample)'; });
+
+// Fake formant "speech" so the radio chain has something voice-like to chew on.
+async function babble(seconds = 2.2, pitch = 120, seed = 1) {
+  const sr = 44100, oc = new OfflineAudioContext(1, Math.round(sr * seconds), sr);
+  let s = seed;
+  const r = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+  const src = oc.createOscillator(); src.type = 'sawtooth';
+  const env = oc.createGain(); env.gain.value = 0;
+  const f = [oc.createBiquadFilter(), oc.createBiquadFilter(), oc.createBiquadFilter()];
+  const mix = oc.createGain();
+  f.forEach((b, i) => { b.type = 'bandpass'; b.Q.value = 6; src.connect(b); b.connect(mix); });
+  mix.connect(env); env.connect(oc.destination);
+  const vowels = [[730,1090,2440],[270,2290,3010],[530,1840,2480],[570,840,2410],[300,870,2240],[640,1190,2390]];
+  let t = 0.05;
+  while (t < seconds - 0.25) {
+    const d = 0.09 + r() * 0.16, v = vowels[(r() * vowels.length) | 0];
+    f.forEach((b, i) => b.frequency.setTargetAtTime(v[i], t, 0.02));
+    src.frequency.setTargetAtTime(pitch * (0.85 + r() * 0.4), t, 0.03);
+    env.gain.setTargetAtTime(0.9, t, 0.015); env.gain.setTargetAtTime(0, t + d, 0.02);
+    t += d + (r() < 0.2 ? 0.15 : 0.04);
+  }
+  src.start();
+  return oc.startRendering();
+}
+
+const sys = () => A.getAudio();
+A.initAudio();
+A.onUnlock(() => { $('status').textContent = 'audio running'; $('status').classList.add('on'); });
+window.__audio = A;
+
+const bindRange = (id, fn) => { const el = $(id), out = el.parentElement.querySelector('output'); const go = () => { if (out) out.textContent = (+el.value).toFixed(2); fn(+el.value); }; el.addEventListener('input', go); go(); };
+const vol = () => A.setVolumes({ master: +$('vMaster').value, sfx: +$('vSfx').value, voice: +$('vVoice').value, music: +$('vMusic').value });
+['vMaster','vSfx','vVoice','vMusic'].forEach((id) => bindRange(id, vol));
+
+let eng = null;
+const ownUpdate = () => {
+  if (!eng) return;
+  const inside = $('interior').checked;
+  eng.setInterior(inside);
+  if (!inside) eng.update([0, 2, +$('chase').value], [0, 0, -30], [0, 0, 0], [0, 0, -30]);
+};
+$('engOn').onclick = () => { if (!eng) eng = A.createEngineVoice(); eng.setThrottle(+$('thr').value); ownUpdate(); };
+$('engOff').onclick = () => { eng?.dispose(); eng = null; };
+bindRange('thr', (v) => { eng?.setThrottle(v); $('thr').parentElement.querySelector('output').textContent = Math.round(A.rpmFromThrottle(v)) + ' rpm'; });
+$('interior').onchange = ownUpdate;
+bindRange('chase', ownUpdate);
+bindRange('ias', (v) => A.setWind(v, { interior: $('interior').checked }));
+bindRange('horn', (v) => A.setStallHorn(v));
+const roll = () => A.setRolling(+$('gs').value, $('surf').value, { interior: $('interior').checked });
+bindRange('gs', roll); $('surf').onchange = roll;
+bindRange('inten', () => {});
+const hold = (el, on, off) => { el.addEventListener('pointerdown', on); for (const e of ['pointerup','pointerleave','pointercancel']) el.addEventListener(e, off); };
+hold($('flaps'), () => A.setFlapsMotor(true), () => A.setFlapsMotor(false));
+$('td').onclick = () => A.playTouchdown(+$('inten').value);
+$('gear').onclick = () => A.playGearThump();
+$('crash').onclick = () => A.playCrash(+$('inten').value);
+$('boing').onclick = () => A.playBoing(+$('inten').value);
+document.querySelectorAll('[data-ui]').forEach((b) => (b.onclick = () => A.playUI(b.dataset.ui)));
+$('sqOn').onclick = () => A.playSquelch('on');
+$('sqOff').onclick = () => A.playSquelch('off');
+
+// Other planes, simulated in a rAF loop; listener sits at the origin facing north.
+const others = [];
+let last = performance.now();
+function tick(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  A.setListener({ position: [0, 0, 0], velocity: [0, 0, 0], forward: [0, 0, -1], up: [0, 1, 0] });
+  for (let i = others.length - 1; i >= 0; i--) {
+    const o = others[i]; o.t += dt;
+    if (o.kind === 'flyby') { o.pos[0] += o.vel[0] * dt; if (o.pos[0] > 700) { o.v.dispose(); others.splice(i, 1); continue; } }
+    else { const a = o.t * o.w + o.ph; o.pos = [Math.cos(a) * o.r, 60, Math.sin(a) * o.r]; o.vel = [-Math.sin(a) * o.r * o.w, 0, Math.cos(a) * o.r * o.w]; }
+    o.v.update(null, null, o.pos, o.vel);
+  }
+  const live = [...(sys()?.engines || [])].filter((v) => v._st.active).length;
+  $('capInfo').textContent = `engine voices: ${sys()?.engines.size || 0}, sounding: ${live} (cap ${sys()?.voiceCap})`;
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+$('flyby').onclick = () => { const v = A.createEngineVoice(); v.setThrottle(0.9); others.push({ kind: 'flyby', v, pos: [-700, 25, -40], vel: [60, 0, 0], t: 0 }); };
+$('swarm').onclick = () => { for (let i = 0; i < 10; i++) { const v = A.createEngineVoice(); v.setThrottle(0.5 + Math.random() * 0.5); others.push({ kind: 'circle', v, r: 150 + i * 120, w: 0.15 + Math.random() * 0.1, ph: Math.random() * 6, t: 0, pos: [0,0,0], vel: [0,0,0] }); } };
+$('swarmOff').onclick = () => { for (const o of others.splice(0)) o.v.dispose(); };
+
+const voiceSrc = async (id, seed) => haveSample[id] ? `../audio/voices/${id}/sample.mp3` : babble(1.6 + (seed % 3) * 0.5, id.startsWith('tower') ? 105 : 150, seed);
+const sub = (info, on) => { $('sub').innerHTML = on ? `<b>${info.speaker}/${info.voiceId}</b> ${info.text || '(transmitting)'}` : `<span>${info.voiceId} ${info.steppedOn ? 'got stepped on' : 'out'}</span>`; };
+const tx = async (speaker, voiceId, text, priority = 0, seed = 1) =>
+  A.playRadio(await voiceSrc(voiceId, seed), { speaker, voiceId, text, priority, onStart: (i) => sub(i, true), onEnd: (i) => sub(i, false) });
+$('rPilot').onclick = () => tx('pilot', $('voice').value.startsWith('tower') ? 'toff' : $('voice').value, 'Krayzee Tower, Baron Dirk, ready for departure, whether you like it or not.');
+$('rTower').onclick = () => tx('tower', $('voice').value.startsWith('tower') ? $('voice').value : 'tower_m', 'Baron Dirk, Krayzee Tower, hold short. Please. I am begging you.');
+$('rQueue').onclick = () => { tx('pilot', 'bubba', 'Yeehaw, comin in hot.', 0, 2); tx('tower', 'tower_f', 'Negative. Go around.', 0, 3); tx('pilot', 'duchess', 'I shall do no such thing.', 0, 4); };
+$('rStep').onclick = async () => { tx('pilot', 'geezer', 'Tower, I am just gonna nip in front of this lot, alright?', 0, 5); setTimeout(() => tx('tower', 'tower_trainee', 'STOP! STOP STOP STOP!', 2, 6), 700); };
+$('rStop').onclick = () => A.stopRadio();
+
+// Offline render of every sound: peak/RMS per scenario (no clipping, nothing silent).
+async function offlineCheck() {
+  const sr = 44100, results = {};
+  const speech = await babble(2, 130, 9);
+  const scen = {
+    engineIdleChase: (S) => { const v = S.createEngineVoice(); v.setThrottle(0); v.update([0, 2, 12], [0, 0, 0], [0, 0, 0], [0, 0, 0]); },
+    engineFullChase: (S) => { const v = S.createEngineVoice(); v.setThrottle(1); v.update([0, 2, 12], [0, 0, -50], [0, 0, 0], [0, 0, -50]); },
+    engineFullCockpit: (S) => { const v = S.createEngineVoice(); v.setThrottle(1); v.setInterior(true); },
+    engineFar800m: (S) => { const v = S.createEngineVoice(); v.setThrottle(1); v.update([0, 0, 0], [0, 0, 0], [800, 100, 0], [0, 0, -50]); },
+    wind140ext: (S) => S.setWind(140, {}),
+    wind100cockpit: (S) => S.setWind(100, { interior: true }),
+    stallHorn: (S) => S.setStallHorn(1),
+    rollRunway: (S) => S.setRolling(30, 'runway'),
+    rollGrass: (S) => S.setRolling(20, 'grass'),
+    flapsMotor: (S) => S.setFlapsMotor(true),
+    touchdownHard: (S) => S.playTouchdown(1),
+    gearThump: (S) => S.playGearThump(),
+    crash: (S) => S.playCrash(1),
+    boing: (S) => S.playBoing(1),
+    uiConfirm: (S) => S.playUI('confirm'),
+    radioVoice: (S) => { S.playRadio(speech, { speaker: 'tower', voiceId: 'tower_m' }); },
+    everythingAtOnce: (S) => {
+      const v = S.createEngineVoice(); v.setThrottle(1); v.setInterior(true);
+      S.setWind(160, { interior: true }); S.setStallHorn(1); S.setRolling(35, 'grass', { interior: true });
+      S.playCrash(1); S.playBoing(1); S.playTouchdown(1); S.playRadio(speech, {});
+    },
+  };
+  for (const [name, fn] of Object.entries(scen)) {
+    const oc = new OfflineAudioContext(2, sr * 2.5, sr);
+    const S = createAudioSystem(oc);
+    fn(S);
+    await new Promise((r) => setTimeout(r, 30));
+    const buf = await oc.startRendering();
+    let peak = 0, sum = 0, nan = 0;
+    const from = 0;
+    for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); for (let i = from; i < d.length; i++) { const x = d[i]; if (!Number.isFinite(x)) { nan++; continue; } peak = Math.max(peak, Math.abs(x)); sum += x * x; } }
+    const rms = Math.sqrt(sum / (2 * (buf.length - from)));
+    results[name] = { peakDb: +(20 * Math.log10(peak || 1e-9)).toFixed(1), rmsDb: +(20 * Math.log10(rms || 1e-9)).toFixed(1), nan };
+  }
+  // voice cap: 10 planes, nearest 6 sound
+  const oc = new OfflineAudioContext(2, sr, sr), S = createAudioSystem(oc);
+  const vs = Array.from({ length: 10 }, (_, i) => { const v = S.createEngineVoice(); v.setThrottle(1); v.update([0, 0, 0], [0, 0, 0], [100 * (i + 1), 0, 0], [0, 0, 0]); return v; });
+  await Promise.resolve(); await new Promise((r) => setTimeout(r, 10));
+  results.voiceCap = { active: vs.map((v) => (v._st.active ? 1 : 0)).join(''), expect: '1111110000' };
+  return results;
+}
+$('runTest').onclick = async () => { $('testOut').textContent = 'rendering...'; const r = await offlineCheck(); $('testOut').textContent = Object.entries(r).map(([k, v]) => `${k.padEnd(18)} ${JSON.stringify(v)}`).join('\n'); };
+if (params.has('test')) offlineCheck().then((r) => { window.__audioTest = r; }).catch((e) => { window.__audioTest = { error: String(e && e.stack || e) }; });
+</script>
+</body>
+</html>

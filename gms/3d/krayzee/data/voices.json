@@ -1,0 +1,132 @@
+{
+  "pilots": {
+    "toff": {
+      "name": "The Toff",
+      "blurb": "Old money, new plane, no manners. Thinks a queue is a type of hat.",
+      "gender": "m", "style": "posh",
+      "ttsDesign": "Upper-class English man, early 30s, exaggerated Received Pronunciation, plummy and nasal with a braying laugh in the voice. Loud, confident, entitled, fast and bouncy delivery, medium pitch.",
+      "sample": "Terribly sorry, old bean. Not sorry at all, actually."
+    },
+    "duchess": {
+      "name": "The Dowager",
+      "blurb": "Has outlived three husbands and four controllers. Expects the runway to curtsey.",
+      "gender": "f", "style": "posh",
+      "ttsDesign": "Elderly English aristocratic woman, about 75, cut-glass Received Pronunciation, slow, deliberate and imperious, frosty and disdainful, slightly tremulous but commanding, medium-low pitch.",
+      "sample": "Move aside. I was flying before you were invented."
+    },
+    "bubba": {
+      "name": "Bubba",
+      "blurb": "Bought his title at a county fair. Flies like he drives his pickup: sideways and happy.",
+      "gender": "m", "style": "redneck",
+      "ttsDesign": "Rural Southern US man, about 40, thick Georgia/Alabama drawl, warm, loud and good-natured, laughing easily, relaxed rhythm with sudden whoops, medium-low pitch.",
+      "sample": "Scuse me, partner, I'm a-squeezin' in!"
+    },
+    "darlene": {
+      "name": "Darlene",
+      "blurb": "Married into royalty, kept the rhinestones. Lands like she enters a room: loudly.",
+      "gender": "f", "style": "redneck",
+      "ttsDesign": "Loud, sassy Southern US woman, about 45, strong Tennessee twang, brassy and big-hearted, quick and punchy delivery, a cackle at the edges, medium pitch.",
+      "sample": "Move it, sweet pea, Darlene's comin' through!"
+    },
+    "wingco": {
+      "name": "The Wing Commander",
+      "blurb": "Handlebar moustache, three medals, no idea which war. Still shouts 'tally-ho' at pigeons.",
+      "gender": "m", "style": "posh",
+      "ttsDesign": "1940s RAF officer, English man about 55, clipped old-fashioned Received Pronunciation like a wartime newsreel, jolly and hearty, crisp consonants, energetic, medium pitch.",
+      "sample": "Bandit at six o'clock! Oh wait, that's me."
+    },
+    "geezer": {
+      "name": "The Geezer",
+      "blurb": "Won his barony in a card game. Swears it was all above board, guv.",
+      "gender": "m", "style": "street",
+      "ttsDesign": "London Cockney man, about 35, East End accent with dropped h's and glottal stops, cheeky, fast-talking, cheerful wide-boy swagger, medium pitch.",
+      "sample": "Shove up, mate, I'm 'avin' that!"
+    },
+    "sheila": {
+      "name": "Sheila",
+      "blurb": "Flew in from the outback and never slowed down. Treats a runway like a suggestion.",
+      "gender": "f", "style": "larrikin",
+      "ttsDesign": "Brash Australian woman, about 35, broad Australian accent, loud, laughing, irreverent and upbeat, rising intonation, quick delivery, medium pitch.",
+      "sample": "Sorry mate, too slow! See ya!"
+    },
+    "laird": {
+      "name": "The Laird",
+      "blurb": "Owns a mountain, three sheep and a grudge. Says very little, all of it rude.",
+      "gender": "m", "style": "gruff",
+      "ttsDesign": "Gruff Scottish Highland man, about 60, broad Scots accent with rolled r's, deep gravelly voice, terse and grumpy, slow then explosive, low pitch.",
+      "sample": "Shift, ye numpty! Laird comin' through!"
+    },
+    "heiress": {
+      "name": "The Heiress",
+      "blurb": "Daddy bought her the plane. And the airport. And possibly you.",
+      "gender": "f", "style": "spoilt",
+      "ttsDesign": "Young American woman, about 22, Californian valley-girl accent, heavy vocal fry, bored and drawn-out, uptalk, sarcastic and unimpressed, medium-high pitch, low energy.",
+      "sample": "Oh, were you landing? That's so sad."
+    },
+    "comte": {
+      "name": "Le Comte",
+      "blurb": "His family has been disappointed by everyone since 1642. You are next.",
+      "gender": "m", "style": "posh",
+      "ttsDesign": "French aristocrat man, about 50, strong French accent speaking English, languid, disdainful and theatrical, long sighs, smooth baritone, slow delivery.",
+      "sample": "Pardon. No, I am not sorry."
+    },
+    "baronin": {
+      "name": "Die Baronin",
+      "blurb": "Runs her estate, her family and the traffic pattern with a stopwatch.",
+      "gender": "f", "style": "stern",
+      "ttsDesign": "Stern German baroness, about 50, clear German accent speaking English, clipped, precise and cold, every consonant crisp, controlled energy, medium-low pitch.",
+      "sample": "You were too slow. I have corrected this."
+    },
+    "tex": {
+      "name": "Big Tex",
+      "blurb": "Struck oil, bought a title, then bought the title's neighbours. Everything's bigger, especially the ego.",
+      "gender": "m", "style": "tycoon",
+      "ttsDesign": "Booming Texas oil tycoon, man about 60, big West Texas drawl, deep chesty baritone, loud and jovial, larger-than-life showman, low pitch, high energy.",
+      "sample": "Outta my way, I'm late for a merger!"
+    },
+    "nan": {
+      "name": "Nana",
+      "blurb": "Bakes for the whole aerodrome. Remembers every slight. Every single one.",
+      "gender": "f", "style": "sweet-menacing",
+      "ttsDesign": "Yorkshire grandmother, about 78, broad Yorkshire accent, sweet and warm on the surface with steel underneath, soft but firm, slightly creaky, medium pitch, unhurried.",
+      "sample": "Shift, love, or I'll tell your mother."
+    },
+    "prince": {
+      "name": "The Young Prince",
+      "blurb": "Eleventh in line, first in panic. Apologises to the clouds.",
+      "gender": "m", "style": "posh-nervous",
+      "ttsDesign": "Nervous young English aristocrat, man about 19, posh Received Pronunciation, breathless and stammering, voice cracking upward when excited, fast and apologetic, medium-high pitch.",
+      "sample": "Coming through! Sorry! Royal! Sorry!"
+    },
+    "charmer": {
+      "name": "The Charmer",
+      "blurb": "Talked his way into the peerage and out of nine fines. Working on the tenth.",
+      "gender": "m", "style": "charming",
+      "ttsDesign": "Silver-tongued Irish man, about 40, soft lilting Dublin accent, warm, flirtatious and playful, smiling voice, easy musical rhythm, medium-low pitch.",
+      "sample": "Ah, sorry now. You don't mind, sure you don't?"
+    }
+  },
+  "towers": {
+    "tower_m": {
+      "name": "Gerald Calloway",
+      "blurb": "31 years in the tower, three of them calm. Collects ceramic owls.",
+      "gender": "m", "style": "controller",
+      "ttsDesign": "Calm professional English air traffic controller, man about 58, neutral southern English accent, measured radio cadence, weary and patient, capable of cracking into exasperation, medium-low pitch.",
+      "sample": "Line up and wait. And wait. Please wait."
+    },
+    "tower_f": {
+      "name": "Imogen Frost",
+      "blurb": "Flawless phraseology. Has never raised her voice. Yet.",
+      "gender": "f", "style": "controller",
+      "ttsDesign": "Icy professional English air traffic controller, woman about 40, crisp precise Received Pronunciation, cool and controlled, clipped sentences, cutting understatement, medium pitch.",
+      "sample": "Extend downwind. Think about what you've done."
+    },
+    "tower_trainee": {
+      "name": "Toby Wren",
+      "blurb": "First week on the job. Laminated cards. Thinks you're all wonderful.",
+      "gender": "m", "style": "trainee",
+      "ttsDesign": "Panicky junior English air traffic controller, young man about 21, light English accent, eager and friendly but nervous, voice rising in pitch when stressed, rushed delivery, medium-high pitch.",
+      "sample": "Go around! Go around! Sorry! Go around!"
+    }
+  }
+}

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Krayzee Radio Bench</title>
+<link rel="stylesheet" href="../css/radio.css">
+<style>
+  :root {
+    /* What FLIGHT would set. Bench draws these zones so overlap is visible. */
+    --krz-hud-top: 44px;
+    --krz-ctl-bottom: 200px;
+  }
+  @media (orientation: landscape) { :root { --krz-ctl-left: 190px; --krz-ctl-right: 190px; --krz-ctl-right-h: 200px; } }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #6fb2e8; font-family: system-ui, sans-serif; }
+  body { background: linear-gradient(#3f86cf 0%, #8cc6ee 55%, #d9ecf5 70%, #6e9e52 70.5%, #4f7d3a 100%); }
+  .hudbar { position: fixed; top: 0; left: 0; right: 0; height: var(--krz-hud-top); background: rgba(0,0,0,.25); color: #fff; font: 700 12px system-ui; display: flex; align-items: center; justify-content: center; letter-spacing: .1em; }
+  .zone { position: fixed; bottom: 0; border: 2px dashed rgba(255,255,255,.6); background: rgba(255,0,80,.12); color: #fff; font: 700 11px system-ui; display: grid; place-items: center; box-sizing: border-box; }
+  .zone .knob { width: 110px; height: 110px; border-radius: 50%; border: 3px solid rgba(255,255,255,.8); background: rgba(0,0,0,.2); }
+  .zone .thr { width: 54px; height: 150px; border-radius: 14px; border: 3px solid rgba(255,255,255,.8); background: rgba(0,0,0,.2); }
+  .zl { left: 0; width: 50%; height: var(--krz-ctl-bottom); }
+  .zr { right: 0; width: 50%; height: var(--krz-ctl-bottom); }
+  @media (orientation: landscape) { .zl { width: var(--krz-ctl-left); height: 62%; } .zr { width: var(--krz-ctl-right); height: var(--krz-ctl-right-h); } }
+  .tr { position: fixed; top: 4px; right: 6px; display: flex; gap: 6px; z-index: 50; }
+  .tr i { width: 36px; height: 36px; border-radius: 10px; background: rgba(0,0,0,.4); border: 2px solid rgba(255,255,255,.6); }
+  .plane { position: fixed; left: 50%; top: 52%; transform: translate(-50%, -50%); width: 120px; height: 40px; }
+  #bench { position: fixed; top: 4px; left: 6px; z-index: 60; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  #bench > button { width: 36px; height: 36px; border-radius: 10px; border: 0; background: rgba(0,0,0,.55); color: #fff; font-weight: 800; }
+  #bench .list { display: none; flex-direction: column; gap: 4px; background: rgba(0,0,0,.7); padding: 6px; border-radius: 10px; max-height: 70vh; overflow: auto; }
+  #bench.open .list { display: flex; }
+  #bench .list button { font: 600 12px system-ui; padding: 7px 10px; border-radius: 8px; border: 0; background: #2d3648; color: #fff; text-align: left; }
+  #evlog { position: fixed; left: 6px; bottom: 4px; color: #fff; font: 11px ui-monospace, monospace; text-shadow: 0 1px 2px #000; z-index: 30; max-width: 60%; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="hudbar">FLIGHT HUD STRIP (--krz-hud-top)</div>
+<svg class="plane" viewBox="0 0 120 40"><path d="M10 22 L110 18 L114 22 L110 26 Z M50 6 L64 6 L66 36 L52 36 Z M14 12 L22 12 L24 30 L16 30 Z" fill="#b3122e" stroke="#fff" stroke-width="1.5"/></svg>
+<div class="tr"><i title="view"></i><i title="fullscreen"></i></div>
+<div class="zone zl"><div class="knob"></div></div>
+<div class="zone zr"><div class="thr"></div></div>
+<div id="bench"><button id="benchToggle" aria-label="Bench">EV</button><div class="list"></div></div>
+<div id="evlog"></div>
+<script type="module">
+import { createRadio } from '../js/radio/index.js';
+import * as audio from '../js/audio/index.js';
+
+const qs = new URLSearchParams(location.search);
+const useAudio = qs.get('audio') !== '0';
+if (useAudio) audio.initAudio();
+let ctxPhase = 'hold';
+const radio = createRadio({
+  base: '../',
+  audio: useAudio ? audio : null,
+  profile: { name: 'Dirk', title: 'Baron', voice: qs.get('voice') || 'toff', registration: 'K-DIRK', primary: '#b3122e', flightNo: 42 },
+  getContext: () => ({ phase: ctxPhase, nearest: 'p2', runway: '27' }),
+  rng: qs.has('seed') ? mulberry(+qs.get('seed')) : Math.random,
+  chatter: qs.get('chatter') || 'normal',
+});
+radio.registerPilot({ id: 'p1', name: 'Margot', title: 'Duchess', voice: 'duchess', callsign: 'K-MRGT', color: '#b48cff' });
+radio.registerPilot({ id: 'p2', name: 'Bubba', title: 'Earl', voice: 'bubba', callsign: 'K-BUBA', color: '#7be38b' });
+radio.registerPilot({ id: 'p3', name: 'Rupert', title: 'Lord', voice: 'wingco', callsign: 'K-RUPE', color: '#4de0c8', rival: true });
+
+const log = [];
+const evlog = document.getElementById('evlog');
+const note = (s) => { log.push(s); evlog.textContent = log.slice(-3).join('\n'); };
+radio.on('barked', (b) => note(`barked ${b.intent} -> ${b.target ?? 'all'} (${b.source}${b.reaction != null ? ' ' + b.reaction + 's' : ''})`));
+radio.on('window', (w) => note(w.open ? `window ${w.kind}: ${w.intents.join(',')}` : `window ${w.kind} closed: ${w.reason}`));
+
+let outrage = 0;
+const bumpOutrage = (n) => { outrage = Math.min(100, outrage + n); return outrage; };
+const EVENTS = {
+  'AI cuts in on you': () => ({ type: 'infraction', id: 'cut_in_final', actor: 'p3', victim: 'player' }),
+  'You cut in (scold)': () => ({ type: 'infraction', id: 'cut_in_final', actor: 'player', victim: 'p1', outrage: bumpOutrage(15) }),
+  'You: unauth take-off': () => ({ type: 'infraction', id: 'unauth_takeoff', actor: 'player', outrage: bumpOutrage(12) }),
+  'You: tower buzz': () => ({ type: 'infraction', id: 'tower_buzz', actor: 'player', outrage: bumpOutrage(15) }),
+  'You sent AI round': () => ({ type: 'goAround', actor: 'p2', cause: 'player' }),
+  'You sent round': () => ({ type: 'goAround', actor: 'player', cause: 'p3' }),
+  'Near miss with AI': () => ({ type: 'infraction', id: 'near_miss', actor: 'p2', victim: 'player' }),
+  'You bounce off AI': () => ({ type: 'collision', actor: 'player', victim: 'p2', outrage: bumpOutrage(8) }),
+  'AI vs AI cut-in': () => ({ type: 'infraction', id: 'cut_in_final', actor: 'p2', victim: 'p1' }),
+  'Rival insults you': () => ({ type: 'bark', actor: 'p3', target: 'player', intent: 'insult' }),
+  'AI at hold (routine)': () => ({ type: 'phase', actor: 'p1', phase: 'hold' }),
+  'Clear you to land': () => ({ type: 'tower', intent: 'clear_land', actor: 'player', runway: '27' }),
+  'Outrage +20': () => ({ type: 'outrage', value: bumpOutrage(20) }),
+  'Outrage reset': () => { outrage = 0; return { type: 'outrage', value: 0 }; },
+  'Royal Scandal': () => { outrage = 100; return { type: 'scandal' }; },
+  'Online: schedule remote bark': () => { radio.schedule(performance.now() + 300, { speaker: 'p1', intent: 'insult', variant: 1, target: 'player', respond: { kind: 'Insulted online', intents: ['retort', 'insult', 'complain'] } }); return null; },
+  'Phase: hold/air/landed': () => { ctxPhase = { hold: 'air', air: 'landed', landed: 'taxi', taxi: 'hold' }[ctxPhase]; note('phase ' + ctxPhase); return null; },
+  'Auto stream on/off': () => { auto = !auto; note('auto ' + auto); return null; },
+};
+const fire = (name) => { const e = EVENTS[name](); if (e) { radio.handleEvent(e); note('event ' + (e.id || e.type)); } };
+const list = document.querySelector('#bench .list');
+for (const name of Object.keys(EVENTS)) { const b = document.createElement('button'); b.textContent = name; b.onclick = () => fire(name); list.appendChild(b); }
+document.getElementById('benchToggle').onclick = () => document.getElementById('bench').classList.toggle('open');
+
+let auto = qs.has('auto'), next = 2;
+let last = performance.now();
+const names = Object.keys(EVENTS).slice(0, 13);
+(function loop(now) {
+  const dt = (now - last) / 1000; last = now;
+  radio.update(dt);
+  if (auto && (next -= dt) <= 0) { fire(names[Math.floor(Math.random() * names.length)]); next = 4 + Math.random() * 4; }
+  requestAnimationFrame(loop);
+})(last);
+
+function mulberry(a) { return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+window.__radio = radio;
+window.__bench = { fire, EVENTS, log, setPhase: (p) => (ctxPhase = p) };
+radio.ready.then((r) => note(`loaded script:${r.script} manifest:${r.manifest}`));
+</script>
+</body>
+</html>

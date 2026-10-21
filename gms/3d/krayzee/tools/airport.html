@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Krayzee — airport test bed</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; overflow: hidden; font: 13px system-ui, sans-serif; color: #fff; }
+  canvas { display: block; touch-action: none; }
+  #ui { position: fixed; top: 8px; left: 8px; right: 8px; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none; }
+  #ui button { pointer-events: auto; background: rgba(20, 16, 40, 0.75); color: #fff; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 8px; padding: 6px 10px; font: inherit; }
+  #ui button.on { background: #4b1f7a; border-color: #e2ac2c; }
+  #stats { position: fixed; left: 8px; bottom: 8px; background: rgba(0, 0, 0, 0.55); padding: 6px 8px; border-radius: 6px; font: 12px ui-monospace, monospace; white-space: pre; }
+  body.shot #ui, body.shot #stats { display: none; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../../../lib/three/0.180.0/three.module.js", "three/addons/": "../../../lib/three/0.180.0/addons/" } }
+</script>
+</head>
+<body>
+<div id="ui"></div>
+<div id="stats"></div>
+<script type="module">
+import * as THREE from 'three';
+import { buildWorld } from '../js/world/airport.js';
+import { STANDS, HOLD_OFFSET } from '../js/world/layout.js';
+
+const q = new URLSearchParams(location.search);
+const quality = q.get('q') === 'low' || q.has('lite') ? 'low' : 'high';
+if (q.has('shot')) document.body.classList.add('shot');
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'low' ? 1.5 : 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = quality === 'low' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, +(q.get('near') || 0.3), 30000);
+const t0 = performance.now();
+const world = await buildWorld(scene, renderer, { quality });
+const buildMs = performance.now() - t0;
+
+if (q.has('plane')) {
+  try {
+    const { createPlane } = await import('../js/plane/index.js');
+    const spots = [[150, -HOLD_OFFSET - 6, 180], [STANDS[2].position[0], STANDS[2].position[2], 180], [STANDS[5].position[0], STANDS[5].position[2], 180], [-640, 0, 90]];
+    for (const [x, z, h] of spots) {
+      const p = await createPlane({ type: 'c172', quality, cockpit: false, livery: { name: 'Dirk', company: 'Dirk Air', primary: '#c4122f', secondary: '#ffffff', accent: '#e2ac2c', registration: 'K-DIRK' } });
+      p.root.position.set(x, p.dims.gearHeight, z);
+      p.root.rotation.y = -h * Math.PI / 180;
+      p.root.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+      scene.add(p.root);
+    }
+  } catch (e) { console.warn('plane', e); }
+}
+
+const presets = {
+  final09: { pos: [-2200, 80, 0], look: [-400, 0, 0], fov: 55 },
+  final22: { pos: [565 + 0.643 * 1500, 82, -404 - 0.766 * 1500], look: [565 - 0.643 * 265, 0, -404 + 0.766 * 265], fov: 55 },
+  mid09: { pos: [-1300, 33, 0], look: [-400, 0, 0], fov: 55 },
+  flare09: { pos: [-760, 8, 0], look: [-300, 0, 0], fov: 55 },
+  tdz09: { pos: [-735, 14, 0], look: [-640, 0, 0], fov: 50 },
+  short09: { pos: [-1050, 20, 0], look: [-600, 0, 0], fov: 55 },
+  hold: { pos: [-250, 2.3, -HOLD_OFFSET - 7], look: [-215, 0, 0], fov: 65 },
+  crossing: { pos: [140, 25, 60], look: [230, 0, -10], fov: 60 },
+  apron: { pos: [-30, 5, -205], look: [-80, 9, -320], fov: 60 },
+  terminal: { pos: [60, 22, -215], look: [-90, 6, -315], fov: 55 },
+  hangars: { pos: [-280, 10, -190], look: [-360, 5, -280], fov: 60 },
+  tower: { pos: [204, 37.6, -244], look: [190, 34.6, -260], fov: 55 },
+  towercab: { pos: [193.5, 35.6, -249.5], look: [190.5, 34.9, -258], fov: 50 },
+  fromtower: { pos: [189.5, 35.4, -258.5], look: [-200, 0, 0], fov: 60 },
+  overhead: { pos: [0, 1700, 650], look: [20, 0, -110], fov: 55 },
+};
+const yawPitch = { yaw: 0, pitch: 0 };
+function setPreset(name) {
+  const p = presets[name];
+  camera.position.set(...p.pos);
+  camera.fov = p.fov;
+  camera.updateProjectionMatrix();
+  camera.lookAt(...p.look);
+  const e = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
+  yawPitch.yaw = e.y; yawPitch.pitch = e.x;
+  document.querySelectorAll('#ui button').forEach((b) => b.classList.toggle('on', b.dataset.p === name));
+}
+const ui = document.getElementById('ui');
+for (const name of Object.keys(presets)) {
+  const b = document.createElement('button');
+  b.textContent = name; b.dataset.p = name;
+  b.onclick = () => setPreset(name);
+  ui.appendChild(b);
+}
+const qb = document.createElement('button');
+qb.textContent = 'quality: ' + quality;
+qb.onclick = () => { q.set('q', quality === 'low' ? 'high' : 'low'); location.search = q.toString(); };
+ui.appendChild(qb);
+setPreset(q.get('cam') in presets ? q.get('cam') : 'final09');
+
+const keys = new Set();
+addEventListener('keydown', (e) => keys.add(e.key.toLowerCase()));
+addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
+let drag = null;
+renderer.domElement.addEventListener('pointerdown', (e) => { drag = [e.clientX, e.clientY]; renderer.domElement.setPointerCapture(e.pointerId); });
+renderer.domElement.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  yawPitch.yaw -= (e.clientX - drag[0]) * 0.004;
+  yawPitch.pitch = Math.max(-1.5, Math.min(1.5, yawPitch.pitch - (e.clientY - drag[1]) * 0.004));
+  drag = [e.clientX, e.clientY];
+});
+addEventListener('pointerup', () => { drag = null; });
+renderer.domElement.addEventListener('wheel', (e) => {
+  const f = new THREE.Vector3(); camera.getWorldDirection(f);
+  camera.position.addScaledVector(f, -e.deltaY * 0.2 * Math.max(1, camera.position.y / 20));
+});
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+const stats = document.getElementById('stats');
+const fwd = new THREE.Vector3(), right = new THREE.Vector3();
+let last = performance.now(), fpsAcc = 0, fpsN = 0, fps = 0;
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  fpsAcc += dt; fpsN++;
+  if (fpsAcc > 0.5) { fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
+  camera.quaternion.setFromEuler(new THREE.Euler(yawPitch.pitch, yawPitch.yaw, 0, 'YXZ'));
+  const sp = (keys.has('shift') ? 300 : 60) * dt;
+  camera.getWorldDirection(fwd); right.crossVectors(fwd, camera.up).normalize();
+  if (keys.has('w')) camera.position.addScaledVector(fwd, sp);
+  if (keys.has('s')) camera.position.addScaledVector(fwd, -sp);
+  if (keys.has('a')) camera.position.addScaledVector(right, -sp);
+  if (keys.has('d')) camera.position.addScaledVector(right, sp);
+  if (keys.has('e')) camera.position.y += sp;
+  if (keys.has('q')) camera.position.y -= sp;
+  world.update(dt, camera);
+  renderer.render(scene, camera);
+  const i = renderer.info.render;
+  const p = camera.position;
+  window.__stats = { calls: i.calls, triangles: i.triangles, fps, buildMs, quality };
+  stats.textContent = `${quality}  calls ${i.calls}  tris ${(i.triangles / 1000).toFixed(1)}k  fps ${fps.toFixed(0)}  build ${buildMs.toFixed(0)}ms\n` +
+    `cam ${p.x.toFixed(0)} ${p.y.toFixed(1)} ${p.z.toFixed(0)}  surface ${world.surfaceAt(p.x, p.z)}  ground ${world.groundHeightAt(p.x, p.z).toFixed(1)}`;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+window.__world = world;
+window.__setPreset = setPreset;
+window.__ready = true;
+</script>
+</body>
+</html>

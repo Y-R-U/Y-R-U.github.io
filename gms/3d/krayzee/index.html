@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#16233a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="The Kingdom of Krayzee — royal pilots who break every rule in the book. Autopilot does it properly; you don't have to.">
+<title>The Kingdom of Krayzee</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/game.css">
+<script type="importmap">
+{ "imports": { "three": "../../lib/three/0.180.0/three.module.js", "three/addons/": "../../lib/three/0.180.0/addons/" } }
+</script>
+<script>
+// Boot watchdog (classic script on purpose: a module that fails to load can't report itself).
+(function () {
+  var shown = false, errs = [];
+  function reload() {
+    var p = new URLSearchParams(location.search); p.set('v', Date.now());
+    location.replace(location.pathname + '?' + p.toString());
+  }
+  function show(why) {
+    if (shown || window.__krayzeeReady) return;
+    shown = true;
+    var d = document.createElement('div');
+    d.id = 'krz-boot-fail';
+    d.innerHTML = '<div class="krz-fatal-card"><h2>The airfield is fogged in</h2><p>The game didn\'t finish loading. A fresh reload usually clears it.</p><pre></pre><button type="button">Reload</button></div>';
+    d.querySelector('pre').textContent = why || '';
+    d.querySelector('button').onclick = reload;
+    (document.body || document.documentElement).appendChild(d);
+  }
+  addEventListener('error', function (e) {
+    if (window.__krayzeeReady) return;
+    var t = e.target;
+    if (t && (t.tagName === 'SCRIPT' || t.tagName === 'LINK')) { errs.push('failed to load ' + (t.src || t.href)); return show(errs.join('\n')); }
+    if (e.message && /SyntaxError|import|export|module/i.test(e.message)) { errs.push(e.message); show(errs.join('\n')); }
+    else if (e.message) errs.push(e.message);
+  }, true);
+  addEventListener('unhandledrejection', function (e) { if (!window.__krayzeeReady) errs.push(String(e.reason && e.reason.message || e.reason)); });
+  setTimeout(function () { if (!window.__krayzeeReady) show(errs.join('\n') || 'Timed out after 20 s.'); }, 20000);
+  window.__krayzeeReload = reload;
+})();
+</script>
+</head>
+<body>
+<canvas id="krz-canvas"></canvas>
+<div id="krz-overlay"></div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

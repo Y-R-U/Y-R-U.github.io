@@ -1,0 +1,1862 @@
+{
+ "toff": [
+  {
+   "at": "2026-10-21 22:51",
+   "design": "A pompous upper-class English gentleman in his fifties with a deep, rich, plummy Received Pronunciation baritone, an ordinary male speaking voice at normal volume. Drawn-out aristocratic vowels, nasal and self-satisfied, utterly entitled and condescending. Clear and unhurried, speaking over an aircraft radio.",
+   "candidates": [
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "dbc7b801b136492495a644df0c8ba0c1",
+     "wall": 7.7,
+     "wer": 0.08,
+     "asr": "Tower! This is Lord Fothering Gay. I shall be landing first, naturally. Do tell the peasants in the queue to shuffle along. There's a good chap!",
+     "f0": 160,
+     "spread": 6.71,
+     "dur": 12.0,
+     "lufs": -20.9,
+     "peak": -5.2,
+     "score": -0.08
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "8612ec699ae749f98f63f802c4581e51",
+     "wall": 6.6,
+     "wer": 0.08,
+     "asr": "Tower, this is Lord Fothering Gay. I shall be landing first, naturally. Do tell the peasants in the queue to shuffle along, there's a good chap.",
+     "f0": 105,
+     "spread": 5.17,
+     "dur": 10.4,
+     "lufs": -22.6,
+     "peak": -6.3,
+     "score": -0.08
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "4395480999c24686bd45503d38626413",
+     "wall": 7.1,
+     "wer": 0.04,
+     "asr": "Tower, this is Lord Futheringay. I shall be landing first, naturally. Do tell the peasants in the queue to shuffle along. There's a good chap.",
+     "f0": 176,
+     "spread": 3.18,
+     "dur": 11.04,
+     "lufs": -20.4,
+     "peak": -3.9,
+     "score": 1.82
+    }
+   ]
+  }
+ ],
+ "duchess": [
+  {
+   "at": "2026-10-21 22:52",
+   "design": "An imperious elderly English duchess in her late seventies with a cut-glass upper-class Received Pronunciation accent, a deep voice, low for a woman but unmistakably female. Slow, precise, icy and commanding, every word dripping with disdain, like a grand dame of the theatre.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "944264060838457897b45cccca61128d",
+     "wall": 7.6,
+     "wer": 0.0,
+     "asr": "Control, this is the duchess. I do not queue, I have never queued. Kindly clear that runway before I have it abolished.",
+     "f0": 182,
+     "spread": 3.8,
+     "dur": 10.88,
+     "lufs": -18.8,
+     "peak": -1.9,
+     "score": -0.371,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "bb0455f61c854474be8e0b26c7c04e4d",
+     "wall": 6.6,
+     "wer": 0.0,
+     "asr": "Control. This is the Duchess. I do not queue. I have never queued. Kindly clear that runway before I have it abolished.",
+     "f0": 208,
+     "spread": 3.56,
+     "dur": 9.44,
+     "lufs": -19.2,
+     "peak": -4.2,
+     "score": -0.255,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "0d475894801a45f392c0b14e86d351f6",
+     "wall": 8.1,
+     "wer": 0.0,
+     "asr": "Control, this is the duchess. I do not queue. I have never queued. Kindly clear that runway before I have it abolished.",
+     "f0": 148,
+     "spread": 2.39,
+     "dur": 12.56,
+     "lufs": -23.4,
+     "peak": -1.8,
+     "score": -0.107
+    }
+   ]
+  }
+ ],
+ "bubba": [
+  {
+   "at": "2026-10-21 22:52",
+   "design": "A good ol' boy from the rural American Deep South in his forties, with a thick, slow, twangy Southern redneck drawl. Ordinary male speaking voice at normal volume, warm, chuckling and easy-going, friendly and a little dim, completely unbothered by rules.",
+   "candidates": [
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "b535b2e9c4994866a5cda165ddbde1aa",
+     "wall": 6.1,
+     "wer": 0.0,
+     "asr": "Well, Howdy Tower, y'all mind if I just set her down right here on the highway. Ain't nobody using it, but a couple of cows.",
+     "f0": 118,
+     "spread": 5.72,
+     "dur": 8.88,
+     "lufs": -19.7,
+     "peak": -2.9,
+     "score": -0.362,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "7eff97dc80b14cc5b51ba0e06744eaca",
+     "wall": 5.6,
+     "wer": 0.038,
+     "asr": "Whoa, howdy, Tower. Y'all mind if I just set her down right here on the highway? Ain't nobody using it but a couple of cows.",
+     "f0": 121,
+     "spread": 3.62,
+     "dur": 8.32,
+     "lufs": -22.3,
+     "peak": -5.3,
+     "score": -0.15,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "989a7bdc7a5d49ac94e5f6178b4883ca",
+     "wall": 6.6,
+     "wer": 0.038,
+     "asr": "Hahaha, well, howdy tower. Y'all mind if I just set her down right here on the highway? Ain't nobody usin' it but a couple of cows.",
+     "f0": 173,
+     "spread": 2.57,
+     "dur": 10.08,
+     "lufs": -20.3,
+     "peak": -3.7,
+     "score": 2.449
+    }
+   ]
+  }
+ ],
+ "darlene": [
+  {
+   "at": "2026-10-21 22:53",
+   "design": "A brash Southern American woman in her forties with a strong, twangy Deep South redneck accent. Sassy, brassy and full of attitude, a husky smoker's alto, low for a woman but unmistakably female. Fast, punchy and confident, speaking at a normal volume.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "f535e689ff814035bdecd7ec010139ad",
+     "wall": 6.1,
+     "wer": 0.0,
+     "asr": "Hey sugar, this is Darlene and I am coming in hot. Y'all better move them fancy little planes cause mama ain't stopping.",
+     "f0": 246,
+     "spread": 4.27,
+     "dur": 8.88,
+     "lufs": -20.9,
+     "peak": -6.4,
+     "score": -0.234,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "91357ce847d544a5abdc89ebfc859916",
+     "wall": 5.6,
+     "wer": 0.0,
+     "asr": "Hey sugar, this is Darlene, and I am coming in hot. Y'all better move them fancy little planes, cause mama ain't stopping.",
+     "f0": 278,
+     "spread": 3.96,
+     "dur": 8.48,
+     "lufs": -20.3,
+     "peak": -2.8,
+     "score": 3.391,
+     "kept": "design_s23.mp3"
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "4c35b003d3624123a277e5fc7908c003",
+     "wall": 5.1,
+     "wer": 0.0,
+     "asr": "Hey sugar, this is Darlene and I am coming in hot. Y'all better move them fancy little planes cause mama ain't stopping.",
+     "f0": 314,
+     "spread": 3.09,
+     "dur": 7.2,
+     "lufs": -21.3,
+     "peak": -4.1,
+     "score": 7.991
+    }
+   ]
+  }
+ ],
+ "wingco": [
+  {
+   "at": "2026-10-21 22:53",
+   "design": "A Second World War Royal Air Force wing commander in his forties with a crisp, clipped, upper-class 1940s British accent, like an old newsreel. Hearty, jolly enthusiasm, a rich baritone, brisk and stiff-upper-lip, ordinary male speaking voice at normal volume.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "ff1156b5ec7345b7bb4137dd524dbf63",
+     "wall": 5.1,
+     "wer": 0.176,
+     "asr": "Tally Ho chaps, Wing Commander here, Bandits at 12 o'clock, T at 4, Wizard Show absolutely wizard!",
+     "f0": 241,
+     "spread": 4.82,
+     "dur": 7.84,
+     "lufs": -21.2,
+     "peak": -3.5,
+     "score": 10.249
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "0695298243da4ec1acc7ef30263c7b22",
+     "wall": 5.6,
+     "wer": 0.235,
+     "asr": "Tallyhoo, Chops, Wing Commander here. Bandits at 12 o'clock, Tea at four. Wizard Show, absolutely wizard.",
+     "f0": 246,
+     "spread": 2.58,
+     "dur": 8.8,
+     "lufs": -19.7,
+     "peak": -2.8,
+     "score": 11.334
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "6a4c03c872024b48b49c508b228f7dc9",
+     "wall": 4.6,
+     "wer": 0.294,
+     "asr": "Tally Ho Chaps, Wing Commander here. And it's at 12 o'clock, T at 4. Wizard Show, absolutely wizard.",
+     "f0": 337,
+     "spread": 2.37,
+     "dur": 6.32,
+     "lufs": -19.2,
+     "peak": -4.2,
+     "score": 23.148
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21 23:02",
+   "design": "A Second World War Royal Air Force wing commander in his forties with a crisp, clipped, upper-class 1940s British accent, like an old newsreel announcer. A deep, low-pitched, steady male baritone at normal speaking volume, brisk, confident and stiff-upper-lip.",
+   "candidates": [
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "c4fbf4f5d5614749b50a116d46b56ddc",
+     "wall": 6.6,
+     "text": "Tally-ho, chaps! Wing Commander here. Bandits at twelve o'clock, tea at four. Wizard show, absolutely wizard!",
+     "wer": 0.118,
+     "asr": "Tally Ho chaps, Wing Commander here, bandits at 12 o'clock, T at four, Wizard Show, absolutely wizard.",
+     "f0": 144,
+     "spread": 3.41,
+     "dur": 9.52,
+     "lufs": -21.3,
+     "peak": -5.7,
+     "score": 0.266,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "b133e3e13fa0448d87acf93cddca003c",
+     "wall": 6.6,
+     "text": "Tally-ho, chaps! Wing Commander here. Bandits at twelve o'clock, tea at four. Wizard show, absolutely wizard!",
+     "wer": 0.118,
+     "asr": "Tally Ho chaps, Wing Commander here. Bandits at 12 o'clock, T at four. Wizard Show, absolutely wizard.",
+     "f0": 246,
+     "spread": 3.5,
+     "dur": 9.84,
+     "lufs": -21.3,
+     "peak": -4.3,
+     "score": 10.771,
+     "kept": "design_s23.mp3"
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "394dae7f31984bbc9265efce078e8f82",
+     "wall": 5.6,
+     "text": "Tally-ho, chaps! Wing Commander here. Bandits at twelve o'clock, tea at four. Wizard show, absolutely wizard!",
+     "wer": 0.059,
+     "asr": "Tally-ho chaps, wing commander here. Bandits at 12 o'clock, tea at four. Wizard show, absolutely wizard.",
+     "f0": 258,
+     "spread": 6.22,
+     "dur": 8.24,
+     "lufs": -19.1,
+     "peak": -3.2,
+     "score": 12.008
+    }
+   ]
+  }
+ ],
+ "geezer": [
+  {
+   "at": "2026-10-21 22:54",
+   "design": "A cheeky London Cockney wide boy in his thirties, a market-trader hustler with a strong East London accent, dropped h's and glottal stops. Fast, chirpy, confident patter, ordinary male speaking voice, always sounds like he's selling you something dodgy.",
+   "candidates": [
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "003c4b56880b4727b3187aab08c98f6e",
+     "wall": 5.1,
+     "wer": 0.136,
+     "asr": "Aye aye tower, listen I've got a proper little landing for you mate. Cash only, no questions asked, you know what I mean?",
+     "f0": 213,
+     "spread": 3.45,
+     "dur": 6.96,
+     "lufs": -21.5,
+     "peak": -6.7,
+     "score": 5.995
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "5a67967af56a4ffea4f3e3ba3c9e1922",
+     "wall": 5.1,
+     "wer": 0.0,
+     "asr": "Oi oi, Tower. Listen, I've got a proper little landing for you, mate. Cash only, no questions asked, know what I mean?",
+     "f0": 219,
+     "spread": 3.19,
+     "dur": 7.2,
+     "lufs": -19.2,
+     "peak": -3.9,
+     "score": 6.224
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "6120a1e80b0a427ca8b2f24c2ea009c3",
+     "wall": 5.1,
+     "wer": 0.091,
+     "asr": "Woyoid Tower, listen, I've got a proper little landing for you, mate. Cash only, no questions asked, know what I mean?",
+     "f0": 234,
+     "spread": 4.54,
+     "dur": 6.88,
+     "lufs": -21.3,
+     "peak": -5.4,
+     "score": 8.353
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21 23:03",
+   "design": "A London Cockney wide boy in his thirties with a strong East London accent, dropped h's and glottal stops. A low, slightly gravelly, ordinary adult male speaking voice at normal volume, relaxed and sly, a market trader's patter, always sounds like he's selling you something dodgy.",
+   "candidates": [
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "0a38b47abec04472acf82d9791280cf9",
+     "wall": 5.6,
+     "text": "Oi oi, tower! Listen, I've got a proper little landing for ya, mate. Cash only, no questions asked, know what I mean?",
+     "wer": 0.0,
+     "asr": "Oi oi, Tower. Listen, I've got a proper little landing for you, mate. Cash only. No questions asked. Know what I mean?",
+     "f0": 170,
+     "spread": 3.0,
+     "dur": 7.6,
+     "lufs": -21.7,
+     "peak": -4.5,
+     "score": -0.053,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "90202f2da89c4a2393ea254a2abeb934",
+     "wall": 6.1,
+     "text": "Oi oi, tower! Listen, I've got a proper little landing for ya, mate. Cash only, no questions asked, know what I mean?",
+     "wer": 0.091,
+     "asr": "Boyoi Tower. Listen, I've got a proper little landing for you, mate. Cash only. No questions asked. Know what I mean?",
+     "f0": 155,
+     "spread": 5.38,
+     "dur": 8.56,
+     "lufs": -22.2,
+     "peak": -4.1,
+     "score": 0.121,
+     "kept": "design_s23.mp3"
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "6f8be74fe74940edb7106151584aef26",
+     "wall": 6.1,
+     "text": "Oi oi, tower! Listen, I've got a proper little landing for ya, mate. Cash only, no questions asked, know what I mean?",
+     "wer": 0.0,
+     "asr": "Oi oi tower! Listen, I've got a proper little landing for you, mate. Cash only, no questions asked, know what I mean?",
+     "f0": 216,
+     "spread": 3.59,
+     "dur": 8.24,
+     "lufs": -18.7,
+     "peak": -3.0,
+     "score": 5.805
+    }
+   ]
+  }
+ ],
+ "sheila": [
+  {
+   "at": "2026-10-21 22:54",
+   "design": "A brash Australian woman in her thirties with a broad, strong Aussie accent and rising intonation. Loud-mouthed larrikin energy, cheerful, cheeky and fearless, a slightly raspy mid-pitched female voice, laughing as she talks, normal speaking volume.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "20605415e4f74427ac6451f569513d83",
+     "wall": 5.6,
+     "wer": 0.095,
+     "asr": "Kibby Tower? Sheila here, coming in for a landing or a crash? Honestly could go either way. No worries though.",
+     "f0": 352,
+     "spread": 3.42,
+     "dur": 7.68,
+     "lufs": -19.2,
+     "peak": -4.6,
+     "score": 11.9
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "ffdf76bd2ec647e1bb499f64ddea30b0",
+     "wall": 5.6,
+     "wer": 0.0,
+     "asr": "G'day tower, Sheila here, coming in for a landing or a crash? Honestly could go either way. No worries though.",
+     "f0": 356,
+     "spread": 2.76,
+     "dur": 8.56,
+     "lufs": -18.9,
+     "peak": -2.9,
+     "score": 12.076
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "6dbb7e790b9b4af99dd9b3545bf7c4cb",
+     "wall": 5.6,
+     "wer": 0.095,
+     "asr": "Oh, Diddy Tower! Sheila here! Comin' in for a landing or a crash! Honestly could go either way! No worries, though!",
+     "f0": 372,
+     "spread": 5.18,
+     "dur": 8.8,
+     "lufs": -19.6,
+     "peak": -4.5,
+     "score": 14.431
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21 23:03",
+   "design": "A brash Australian woman in her thirties with a broad, strong Aussie accent. A low, husky, slightly raspy female voice at normal speaking volume, relaxed and laid-back, cheeky, fearless and unbothered.",
+   "candidates": [
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "373f4431d0e74ed1aa8b9b6be47bdbfa",
+     "wall": 5.6,
+     "text": "G'day tower! Sheila here, comin' in for a landing, or a crash, honestly could go either way. No worries though!",
+     "wer": 0.0,
+     "asr": "G'day tower, Sheila here coming in for a landing, or a crash, honestly could go either way. No worries though.",
+     "f0": 222,
+     "spread": 2.98,
+     "dur": 8.0,
+     "lufs": -20.2,
+     "peak": -3.2,
+     "score": -0.217,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "294e26aff454452a85d01311051a5e77",
+     "wall": 7.7,
+     "text": "G'day tower! Sheila here, comin' in for a landing, or a crash, honestly could go either way. No worries though!",
+     "wer": 0.143,
+     "asr": "Got any Sheila here coming in for a landing or a crash Honestly could go either way. No worries, though",
+     "f0": 225,
+     "spread": 5.3,
+     "dur": 9.04,
+     "lufs": -20.9,
+     "peak": -4.6,
+     "score": 0.263,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "7834affb36c54f65b59f5f78cddf736f",
+     "wall": 6.6,
+     "text": "G'day tower! Sheila here, comin' in for a landing, or a crash, honestly could go either way. No worries though!",
+     "wer": 0.0,
+     "asr": "G'day tower, Sheila here coming in for a landing or a crash. Honestly could go either way. No worries though.",
+     "f0": 340,
+     "spread": 4.64,
+     "dur": 8.0,
+     "lufs": -17.1,
+     "peak": -3.2,
+     "score": 10.03
+    }
+   ]
+  }
+ ],
+ "laird": [
+  {
+   "at": "2026-10-21 22:54",
+   "design": "A gruff Scottish Highland laird in his sixties with a thick, rolling Scottish accent and rolled r's. Deep, gravelly bass voice, stern and growling but secretly enjoying himself, slow and weighty delivery at normal volume.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "a4c47914b7bf4235a6dea71634198b2e",
+     "wall": 6.6,
+     "wer": 0.167,
+     "asr": "This is the Laird of Glendoo. You'll clear that runway, laddie, or I'll land on your hide and charge you for the privilege.",
+     "f0": 77,
+     "spread": 3.91,
+     "dur": 9.6,
+     "lufs": -21.6,
+     "peak": -3.8,
+     "score": 0.452,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "70b286870e7b431a82087cc6d3d4af1b",
+     "wall": 5.6,
+     "wer": 0.167,
+     "asr": "This is the Laird of Glendoo. You'll clear that runway, laddie, or I'll land on your hide and charge you for the privilege.",
+     "f0": 126,
+     "spread": 3.25,
+     "dur": 7.76,
+     "lufs": -20.0,
+     "peak": -3.7,
+     "score": 0.509,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "77ac7da1a5e34c6eb5a271e89fbfc421",
+     "wall": 5.6,
+     "wer": 0.167,
+     "asr": "This is the Laird of Glendoo. You'll clear that runway, laddie. Or I'll land on your hide and charge you for the privilege.",
+     "f0": 94,
+     "spread": 1.87,
+     "dur": 7.44,
+     "lufs": -23.1,
+     "peak": -5.9,
+     "score": 0.518
+    }
+   ]
+  }
+ ],
+ "heiress": [
+  {
+   "at": "2026-10-21 22:55",
+   "design": "A spoilt, rich young American heiress in her early twenties with a bored Valley Girl drawl and heavy vocal fry. Languid, unimpressed and whiny, upspeak at the end of sentences, a mid-pitched young female voice, speaking lazily as if texting at the same time.",
+   "candidates": [
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "445615bf803e47ac86e060b090a5b25c",
+     "wall": 6.6,
+     "wer": 0.0,
+     "asr": "Um, hi tower? Like, I'm literally landing now, so can you just like move everyone? This is so boring!",
+     "f0": 333,
+     "spread": 3.66,
+     "dur": 9.12,
+     "lufs": -20.1,
+     "peak": -4.1,
+     "score": 9.187
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "2c166d6df97f4f159b489dd432f36524",
+     "wall": 9.1,
+     "wer": 0.053,
+     "asr": "Um... Pi... Tower? Like... I'm literally landing now, so can you just... Like, move everyone? This is so boring...",
+     "f0": 356,
+     "spread": 3.73,
+     "dur": 13.76,
+     "lufs": -19.7,
+     "peak": -2.0,
+     "score": 12.213
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "7b4caf8a397c4fb79b6592fd1fdbebe2",
+     "wall": 8.1,
+     "wer": 0.053,
+     "asr": "Umm, hi? Tower? Like, I'm literally landing now, so can you just, like, move everyone? This is so boring.",
+     "f0": 364,
+     "spread": 3.48,
+     "dur": 12.48,
+     "lufs": -21.3,
+     "peak": -6.7,
+     "score": 13.263
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21 23:04",
+   "design": "A spoilt, rich young American heiress in her early twenties with a slow, bored, low-pitched Valley Girl drawl and heavy creaky vocal fry at the ends of words. Flat, monotone, unimpressed and dismissive, speaking lazily and quietly, as if texting at the same time.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "c6735fdcd59b4ab2938b48a8bb116ed0",
+     "wall": 10.2,
+     "text": "Um, hi? Tower? Like, I'm literally landing now, so can you just, like, move everyone? This is so boring.",
+     "wer": 0.053,
+     "asr": "Umm, hi. Tower? Like, I'm literally landing now, so can you just... Like, move everyone? This is so boring.",
+     "f0": 258,
+     "spread": 3.04,
+     "dur": 11.36,
+     "lufs": -19.5,
+     "peak": -4.0,
+     "score": 0.116,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "d1f44d07e8114779a4b12f2afaa63074",
+     "wall": 12.2,
+     "text": "Um, hi? Tower? Like, I'm literally landing now, so can you just, like, move everyone? This is so boring.",
+     "wer": 0.0,
+     "asr": "Um, hi... tower? Like, I'm literally landing now, so can you just like, move everyone? This is so boring.",
+     "f0": 340,
+     "spread": 3.55,
+     "dur": 12.48,
+     "lufs": -18.8,
+     "peak": -4.7,
+     "score": 10.099,
+     "kept": "design_s23.mp3"
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "86f9c7fdcf31427eb678ad5c87aa78ca",
+     "wall": 8.7,
+     "text": "Um, hi? Tower? Like, I'm literally landing now, so can you just, like, move everyone? This is so boring.",
+     "wer": 0.0,
+     "asr": "Um, hi, Tower? Like, I'm literally landing now, so can you just, like, move everyone? This is so boring!",
+     "f0": 364,
+     "spread": 3.63,
+     "dur": 8.4,
+     "lufs": -17.1,
+     "peak": -4.6,
+     "score": 13.038
+    }
+   ]
+  }
+ ],
+ "comte": [
+  {
+   "at": "2026-10-21 22:56",
+   "design": "A disdainful French aristocrat in his fifties speaking English with a thick, strong French accent. Haughty, languid and condescending, a smooth nasal baritone, sighing with boredom, speaking slowly as if everything is beneath him.",
+   "candidates": [
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "e879e95f63e546f3b26c48d6a5009739",
+     "wall": 7.6,
+     "wer": 0.04,
+     "asr": "Hello tower, here is the compt. Your runway is, how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "f0": 119,
+     "spread": 4.39,
+     "dur": 12.08,
+     "lufs": -20.1,
+     "peak": -4.3,
+     "lang": {
+      "en": 0.973,
+      "nn": 0.007,
+      "th": 0.002,
+      "fr": 0.002,
+      "ja": 0.002
+     },
+     "accent_p": 0.002,
+     "score": -0.214,
+     "kept": "design_s23.mp3"
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "340f518806864cd781da960b47c5716b",
+     "wall": 8.6,
+     "wer": 0.08,
+     "asr": "Heh, hello tower, here is the compt. Your runway is... how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "f0": 120,
+     "spread": 5.54,
+     "dur": 13.44,
+     "lufs": -23.2,
+     "peak": -6.5,
+     "lang": {
+      "en": 0.978,
+      "nn": 0.006,
+      "pt": 0.003,
+      "ja": 0.002,
+      "cy": 0.002
+     },
+     "accent_p": 0,
+     "score": -0.037,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "4bd8ad92bcb34a518121a5b2bf489374",
+     "wall": 7.6,
+     "wer": 0.08,
+     "asr": "Hehehe. Hello tower. Here is the compt. Your runway is, how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "f0": 103,
+     "spread": 3.59,
+     "dur": 11.52,
+     "lufs": -23.4,
+     "peak": -2.6,
+     "lang": {
+      "en": 0.971,
+      "pt": 0.003,
+      "zh": 0.003,
+      "ja": 0.003,
+      "nn": 0.003
+     },
+     "accent_p": 0,
+     "score": 0.029
+    },
+    {
+     "tag": "fr23",
+     "seed": 23,
+     "language": "French",
+     "job": "3f815d0dc17149ebbff24cd926e5c7a6",
+     "wall": 9.1,
+     "wer": 0.12,
+     "asr": "Heh, heh, hello tower, here is the compt. Your runway is, how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "f0": 134,
+     "spread": 3.76,
+     "dur": 13.6,
+     "lufs": -20.2,
+     "peak": -3.9,
+     "lang": {
+      "en": 0.982,
+      "nn": 0.004,
+      "ja": 0.003,
+      "pt": 0.001,
+      "fr": 0.001
+     },
+     "accent_p": 0.001,
+     "score": 0.221
+    },
+    {
+     "tag": "fr11",
+     "seed": 11,
+     "language": "French",
+     "job": "f4212d91c4ab4b4cad71e3ef78cce277",
+     "wall": 8.6,
+     "wer": 0.2,
+     "asr": "Ha ha ha ha! Hello tower! Here is the conte. Your runway is, how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "f0": 152,
+     "spread": 5.72,
+     "dur": 12.8,
+     "lufs": -20.4,
+     "peak": -4.0,
+     "lang": {
+      "en": 0.985,
+      "nn": 0.002,
+      "zh": 0.002,
+      "th": 0.002,
+      "ja": 0.001
+     },
+     "accent_p": 0,
+     "score": 0.606
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21 23:08",
+   "design": "A disdainful French aristocrat in his fifties speaking English with a thick, strong French accent. Haughty, languid and condescending, a smooth nasal baritone, sighing with boredom, speaking slowly as if everything is beneath him.",
+   "candidates": [
+    {
+     "tag": "ph11",
+     "seed": 11,
+     "language": "English",
+     "job": "e84e14f45b8045ab97d37c8098003b7b",
+     "wall": 13.8,
+     "text": "Allo, tower. Zis is ze Comte. Your runway is, 'ow you say, ugly. I will land on eet anyway, but I will not enjoy eet.",
+     "wer": 0.24,
+     "asr": "Hello, Tower, Caesar's Comte. Your runway is, now you say, ugly. I will land on eat anyway, but I will not enjoy eat.",
+     "f0": 115,
+     "spread": 3.9,
+     "dur": 14.48,
+     "lufs": -21.9,
+     "peak": -4.1,
+     "lang": {
+      "en": 0.984,
+      "nn": 0.006,
+      "ja": 0.003,
+      "la": 0.001,
+      "zh": 0.001
+     },
+     "accent_p": 0,
+     "score": -0.418
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "384813e45e0a42e38cad0eebe76035af",
+     "wall": 12.2,
+     "text": "Hello, tower. Here is the Comte. Your runway is, how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "wer": 0.0,
+     "asr": "Hello tower, here is the compt. Your runway is, how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "f0": 119,
+     "spread": 4.39,
+     "dur": 12.08,
+     "lufs": -20.1,
+     "peak": -4.3,
+     "lang": {
+      "en": 0.973,
+      "nn": 0.007,
+      "th": 0.002,
+      "fr": 0.002,
+      "ja": 0.002
+     },
+     "accent_p": 0.002,
+     "score": -0.374
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "e016412bb81d4bb58b6dd40b0fd3804b",
+     "wall": 12.8,
+     "text": "Hello, tower. Here is the Comte. Your runway is, how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "wer": 0.04,
+     "asr": "Heh, hello tower, here is the compt. Your runway is... how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "f0": 120,
+     "spread": 5.54,
+     "dur": 13.44,
+     "lufs": -23.2,
+     "peak": -6.5,
+     "lang": {
+      "en": 0.978,
+      "nn": 0.006,
+      "pt": 0.003,
+      "ja": 0.002,
+      "cy": 0.002
+     },
+     "accent_p": 0,
+     "score": -0.197
+    },
+    {
+     "tag": "ph37",
+     "seed": 37,
+     "language": "English",
+     "job": "4b33161a7b094a17ba262b7b3304dde9",
+     "wall": 16.3,
+     "text": "Allo, tower. Zis is ze Comte. Your runway is, 'ow you say, ugly. I will land on eet anyway, but I will not enjoy eet.",
+     "wer": 0.28,
+     "asr": "Hahaha, low tower, sis is zakant. Your runway is… how you say ugly. I will land on eat anyway, but I will not enjoy eat.",
+     "f0": 96,
+     "spread": 5.97,
+     "dur": 14.64,
+     "lufs": -22.4,
+     "peak": -1.1,
+     "lang": {
+      "en": 0.97,
+      "nn": 0.006,
+      "ja": 0.003,
+      "pt": 0.002,
+      "th": 0.002
+     },
+     "accent_p": 0,
+     "score": -0.165
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "80c293f4c7e94b6abbc398d41f1f1f52",
+     "wall": 11.3,
+     "text": "Hello, tower. Here is the Comte. Your runway is, how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "wer": 0.04,
+     "asr": "Hehehe. Hello tower. Here is the compt. Your runway is, how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+     "f0": 103,
+     "spread": 3.59,
+     "dur": 11.52,
+     "lufs": -23.4,
+     "peak": -2.6,
+     "lang": {
+      "en": 0.971,
+      "pt": 0.003,
+      "zh": 0.003,
+      "ja": 0.003,
+      "nn": 0.003
+     },
+     "accent_p": 0,
+     "score": -0.131
+    },
+    {
+     "tag": "ph23",
+     "seed": 23,
+     "language": "English",
+     "job": "c7f514c3ac874abd81dbf9cfc040636a",
+     "wall": 14.3,
+     "text": "Allo, tower. Zis is ze Comte. Your runway is, 'ow you say, ugly. I will land on eet anyway, but I will not enjoy eet.",
+     "wer": 0.12,
+     "asr": "Hello, Tower. This is the Comte. Your runway is... Oh, you say ugly. I will land on Eat anyway, but I will not enjoy Eat.",
+     "f0": 208,
+     "spread": 7.49,
+     "dur": 13.68,
+     "lufs": -19.5,
+     "peak": -3.2,
+     "lang": {
+      "en": 0.992,
+      "nn": 0.001,
+      "th": 0.001,
+      "ja": 0.001,
+      "fr": 0.001
+     },
+     "accent_p": 0.001,
+     "score": 5.472
+    }
+   ]
+  }
+ ],
+ "baronin": [
+  {
+   "at": "2026-10-21 22:57",
+   "design": "A stern, aristocratic German baroness in her fifties speaking English with a strong, clipped German accent. Cold, precise and military, every consonant sharp, a low, firm voice, unmistakably female. Impatient and commanding, she does not repeat herself.",
+   "candidates": [
+    {
+     "tag": "de23",
+     "seed": 23,
+     "language": "German",
+     "job": "61366a638273497c91b6a7318936b2f9",
+     "wall": 7.6,
+     "wer": 0.05,
+     "asr": "Tower. This is Baroness von Eisenberg. You have exactly 10 seconds to clear the runway. I am counting. One, two...",
+     "f0": 211,
+     "spread": 3.93,
+     "dur": 9.92,
+     "lufs": -21.4,
+     "peak": -3.1,
+     "lang": {
+      "en": 0.986,
+      "de": 0.002,
+      "fr": 0.002,
+      "cy": 0.002,
+      "nn": 0.001
+     },
+     "accent_p": 0.002,
+     "score": -0.088,
+     "kept": "design_de23.mp3"
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "23aca8c3f4fe4ac2934326d5631625c8",
+     "wall": 7.1,
+     "wer": 0.05,
+     "asr": "Tower. This is Baroness von Eisenberg. You have exactly 10 seconds to clear the runway. I am counting. One, two...",
+     "f0": 235,
+     "spread": 3.69,
+     "dur": 9.12,
+     "lufs": -20.1,
+     "peak": -1.0,
+     "lang": {
+      "en": 0.992,
+      "cy": 0.001,
+      "nn": 0.001,
+      "ja": 0.001,
+      "es": 0.0
+     },
+     "accent_p": 0,
+     "score": 0.681,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "de11",
+     "seed": 11,
+     "language": "German",
+     "job": "3c04d95f652e462fa423e41af093062d",
+     "wall": 7.1,
+     "wer": 0.05,
+     "asr": "Tower, this is Baroness von Eisenberg. You have exactly 10 seconds to clear the runway. I am counting. One, two.",
+     "f0": 242,
+     "spread": 3.4,
+     "dur": 9.12,
+     "lufs": -21.0,
+     "peak": -3.2,
+     "lang": {
+      "en": 0.978,
+      "nn": 0.004,
+      "ja": 0.002,
+      "vi": 0.002,
+      "fr": 0.002
+     },
+     "accent_p": 0,
+     "score": 1.621
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "8228b9b5e61f49f69e36376a6396180b",
+     "wall": 7.1,
+     "wer": 0.05,
+     "asr": "Tower. This is Baroness von Eisenberg. You have exactly 10 seconds to clear the runway. I am counting. One. Two.",
+     "f0": 254,
+     "spread": 2.67,
+     "dur": 9.84,
+     "lufs": -18.9,
+     "peak": -3.2,
+     "lang": {
+      "en": 0.993,
+      "ja": 0.001,
+      "nn": 0.001,
+      "cy": 0.001,
+      "ko": 0.001
+     },
+     "accent_p": 0,
+     "score": 3.17
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "1039fd82b1a64f21b88bccf8d8b2dafb",
+     "wall": 7.1,
+     "wer": 0.05,
+     "asr": "Tower, this is Baroness von Eisenberg. You have exactly 10 seconds to clear the runway. I am counting. One, two.",
+     "f0": 320,
+     "spread": 4.46,
+     "dur": 9.68,
+     "lufs": -20.7,
+     "peak": -3.4,
+     "lang": {
+      "en": 0.995,
+      "ja": 0.001,
+      "cy": 0.001,
+      "nn": 0.0,
+      "th": 0.0
+     },
+     "accent_p": 0,
+     "score": 11.451
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21 23:10",
+   "design": "A stern, aristocratic German baroness in her fifties speaking English with a strong, clipped German accent. Cold, precise and military, every consonant sharp, a low, firm voice, unmistakably female. Impatient and commanding, she does not repeat herself.",
+   "candidates": [
+    {
+     "tag": "ph11",
+     "seed": 11,
+     "language": "English",
+     "job": "a34d56d22a254e328568120324969bac",
+     "wall": 13.4,
+     "text": "Tower, zis is Baroness von Eisenberg. You haff exactly ten seconds to clear ze runvay. I am counting. Eins. Zwei.",
+     "wer": 0.05,
+     "asr": "Tower. This is Baroness von Eisenberg. You have exactly 10 seconds to clear the runway. I am counting. Eins. Zwei.",
+     "f0": 211,
+     "spread": 2.9,
+     "dur": 10.64,
+     "lufs": -21.4,
+     "peak": -2.1,
+     "lang": {
+      "en": 0.994,
+      "nn": 0.001,
+      "cy": 0.001,
+      "ja": 0.001,
+      "th": 0.0
+     },
+     "accent_p": 0,
+     "score": -0.979
+    },
+    {
+     "tag": "ph23",
+     "seed": 23,
+     "language": "English",
+     "job": "d273875ceaf04276b32cf29a4509ee05",
+     "wall": 13.3,
+     "text": "Tower, zis is Baroness von Eisenberg. You haff exactly ten seconds to clear ze runvay. I am counting. Eins. Zwei.",
+     "wer": 0.1,
+     "asr": "Tower, Ziz is Baroness von Eisenberg. You have exactly 10 seconds to clear the runway. I am counting. Eins, zwei.",
+     "f0": 213,
+     "spread": 2.54,
+     "dur": 10.96,
+     "lufs": -18.4,
+     "peak": -4.2,
+     "lang": {
+      "en": 0.975,
+      "th": 0.004,
+      "de": 0.003,
+      "ja": 0.002,
+      "nn": 0.002
+     },
+     "accent_p": 0.003,
+     "score": -0.743
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "b634f5f3c1fa4c5e92b949531012c009",
+     "wall": 10.7,
+     "text": "Tower, this is Baroness von Eisenberg. You have exactly ten seconds to clear the runway. I am counting. One. Two.",
+     "wer": 0.05,
+     "asr": "Tower. This is Baroness von Eisenberg. You have exactly 10 seconds to clear the runway. I am counting. One, two...",
+     "f0": 235,
+     "spread": 3.69,
+     "dur": 9.12,
+     "lufs": -20.1,
+     "peak": -1.0,
+     "lang": {
+      "en": 0.992,
+      "cy": 0.001,
+      "nn": 0.001,
+      "ja": 0.001,
+      "es": 0.0
+     },
+     "accent_p": 0,
+     "score": 0.681
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "318cdf0d64314fb194ea4d765ae89fe2",
+     "wall": 10.7,
+     "text": "Tower, this is Baroness von Eisenberg. You have exactly ten seconds to clear the runway. I am counting. One. Two.",
+     "wer": 0.05,
+     "asr": "Tower. This is Baroness von Eisenberg. You have exactly 10 seconds to clear the runway. I am counting. One. Two.",
+     "f0": 254,
+     "spread": 2.67,
+     "dur": 9.84,
+     "lufs": -18.9,
+     "peak": -3.2,
+     "lang": {
+      "en": 0.993,
+      "ja": 0.001,
+      "nn": 0.001,
+      "cy": 0.001,
+      "ko": 0.001
+     },
+     "accent_p": 0,
+     "score": 3.17
+    },
+    {
+     "tag": "ph37",
+     "seed": 37,
+     "language": "English",
+     "job": "13e7dda2766949c18093051093a34d2d",
+     "wall": 16.6,
+     "text": "Tower, zis is Baroness von Eisenberg. You haff exactly ten seconds to clear ze runvay. I am counting. Eins. Zwei.",
+     "wer": 0.3,
+     "asr": "Tower, this is Baroness Finneisenberg. You have exactly 10 seconds to clear the runway. I am counting. Einz, it's why.",
+     "f0": 271,
+     "spread": 3.24,
+     "dur": 11.6,
+     "lufs": -18.9,
+     "peak": -1.8,
+     "lang": {
+      "en": 0.982,
+      "th": 0.003,
+      "ja": 0.002,
+      "nn": 0.001,
+      "fr": 0.001
+     },
+     "accent_p": 0,
+     "score": 5.31
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "5d9aa298134745db80f9d523703fea42",
+     "wall": 13.9,
+     "text": "Tower, this is Baroness von Eisenberg. You have exactly ten seconds to clear the runway. I am counting. One. Two.",
+     "wer": 0.05,
+     "asr": "Tower, this is Baroness von Eisenberg. You have exactly 10 seconds to clear the runway. I am counting. One, two.",
+     "f0": 320,
+     "spread": 4.46,
+     "dur": 9.68,
+     "lufs": -20.7,
+     "peak": -3.4,
+     "lang": {
+      "en": 0.995,
+      "ja": 0.001,
+      "cy": 0.001,
+      "nn": 0.0,
+      "th": 0.0
+     },
+     "accent_p": 0,
+     "score": 11.451
+    }
+   ]
+  }
+ ],
+ "tex": [
+  {
+   "at": "2026-10-21 22:57",
+   "design": "A booming Texas oil tycoon in his sixties with a big, deep, rich Texan drawl. Larger-than-life, generous and bossy, a hearty barrel-chested bass-baritone, slow and swaggering, laughing as he talks, ordinary male speaking volume.",
+   "candidates": [
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "00e7fef41a234ef6a96fc77c81631bfb",
+     "wall": 6.1,
+     "wer": 0.0,
+     "asr": "Howdy tower! This here's Tex and I just bought your airport son, so I reckon I'll land wherever I darn well, please.",
+     "f0": 235,
+     "spread": 3.94,
+     "dur": 7.84,
+     "lufs": -19.7,
+     "peak": -5.8,
+     "score": 12.117
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "9afc3a5cb7ec4db4a2fde44802cad237",
+     "wall": 7.6,
+     "wer": 0.0,
+     "asr": "Howdy, Tower! This here's Tex, and I just bought your airport, son. So I reckon I'll land wherever I darn well, please!",
+     "f0": 239,
+     "spread": 3.96,
+     "dur": 9.44,
+     "lufs": -20.2,
+     "peak": -3.8,
+     "score": 12.564
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "90c44e1db3154642a7f5099de81400a0",
+     "wall": 9.2,
+     "wer": 0.0,
+     "asr": "Howdy, Tower! This here's Tex and I just bought your airport, son! So I reckon I'll land wherever I darn well, please!",
+     "f0": 348,
+     "spread": 1.9,
+     "dur": 11.28,
+     "lufs": -22.5,
+     "peak": -5.2,
+     "score": 26.658
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21 23:04",
+   "design": "A Texas oil tycoon in his sixties with a big, slow, rich Texan drawl. A very deep, low, gravelly bass voice, an ordinary older male speaking voice at normal volume, relaxed, swaggering and bossy, like a cattle baron who owns everything he can see.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "bcb234a54e8e4e3eae382d0555257dca",
+     "wall": 9.7,
+     "text": "Howdy, tower! This here's Tex, and I just bought your airport, son. So I reckon I'll land wherever I darn well please!",
+     "wer": 0.0,
+     "asr": "Howdy, Tower. This here's Tex and I just bought your airport, son, so I reckon I'll land wherever I darn well please.",
+     "f0": 120,
+     "spread": 2.86,
+     "dur": 9.76,
+     "lufs": -19.8,
+     "peak": -4.3,
+     "score": -0.151,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "c5698292cca248db9604635b33a4eef4",
+     "wall": 8.7,
+     "text": "Howdy, tower! This here's Tex, and I just bought your airport, son. So I reckon I'll land wherever I darn well please!",
+     "wer": 0.0,
+     "asr": "Howdy, Tower. This here's Tex, and I just bought your airport, son, so I reckon I'll land wherever I darn well, please.",
+     "f0": 134,
+     "spread": 2.62,
+     "dur": 9.2,
+     "lufs": -20.5,
+     "peak": -2.2,
+     "score": -0.05,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "e32cf01ed85b41f39028df383d4be527",
+     "wall": 8.1,
+     "text": "Howdy, tower! This here's Tex, and I just bought your airport, son. So I reckon I'll land wherever I darn well please!",
+     "wer": 0.0,
+     "asr": "Howdy, Tower. This here's Tex and I just bought your airport, son. So I reckon I'll land wherever I darn well, please.",
+     "f0": 170,
+     "spread": 2.81,
+     "dur": 8.24,
+     "lufs": -19.5,
+     "peak": -2.6,
+     "score": 3.871
+    }
+   ]
+  }
+ ],
+ "nan": [
+  {
+   "at": "2026-10-21 22:58",
+   "design": "A sweet little Yorkshire grandma in her eighties with a warm, broad Yorkshire accent from northern England. Soft, kindly and cosy, but with a quiet steely menace underneath, a slightly creaky elderly female voice, speaking slowly and sweetly.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "3e3a888d77624e43b01b627b40e50857",
+     "wall": 7.6,
+     "wer": 0.042,
+     "asr": "Oh, hello, love. It's your nan. Now you let me land first. There's a good lad. Or I'll be having words with your mother.",
+     "f0": 232,
+     "spread": 4.37,
+     "dur": 9.12,
+     "lufs": -21.7,
+     "peak": -8.2,
+     "score": -0.085,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "e30decaf9b9b4d878628590a0ea5f7e2",
+     "wall": 6.6,
+     "wer": 0.042,
+     "asr": "Oh, hello, love, it's your nan. Now you let me land first. There's a good lad, or I'll be having words with your mother.",
+     "f0": 213,
+     "spread": 3.04,
+     "dur": 8.24,
+     "lufs": -19.3,
+     "peak": -3.8,
+     "score": -0.046,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "a0ecd65be5f3496fa9e78c66aebadc3e",
+     "wall": 8.6,
+     "wer": 0.0,
+     "asr": "Ooh, hello, love. It's your nan. Now you let me land first. There's a good lad, or I'll be having words with your mother.",
+     "f0": 296,
+     "spread": 3.7,
+     "dur": 11.44,
+     "lufs": -18.8,
+     "peak": -4.4,
+     "score": 5.735
+    }
+   ]
+  }
+ ],
+ "prince": [
+  {
+   "at": "2026-10-21 22:58",
+   "design": "A nervous, breathless young English prince in his early twenties with a posh, upper-class Received Pronunciation accent. Polite, flustered and stammering, apologising constantly, a soft light tenor, ordinary young male speaking voice, talking quickly and anxiously.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "fe6967ace15d4a5b9043d65bb6fba26b",
+     "wall": 7.6,
+     "wer": 0.0,
+     "asr": "Oh, gosh, um, Tower? Terribly sorry it's the prince. I think I've pressed something I oughtn't to have. Is that, is that bad?",
+     "f0": 250,
+     "spread": 5.31,
+     "dur": 9.36,
+     "lufs": -22.8,
+     "peak": -5.7,
+     "score": 7.512
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "a03a0b3ba3664b4bb7a84564625401a4",
+     "wall": 9.7,
+     "wer": 0.0,
+     "asr": "Oh, gosh. Um, Tower. Terribly sorry, it's the prince. I think I've pressed something I oughtn't to have. Is that, is that bad?",
+     "f0": 286,
+     "spread": 3.32,
+     "dur": 11.36,
+     "lufs": -21.5,
+     "peak": -3.1,
+     "score": 12.137
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "eb495028149d4b14ab875d17129cd083",
+     "wall": 9.7,
+     "wer": 0.0,
+     "asr": "Oh, gosh, um, Tower? Terribly sorry, it's the Prince! I think I've pressed something I oughtn't to have. Is that... is that bad?",
+     "f0": 327,
+     "spread": 2.66,
+     "dur": 12.32,
+     "lufs": -21.8,
+     "peak": -7.0,
+     "score": 17.398
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21 23:05",
+   "design": "A nervous young English prince in his twenties with a posh, upper-class Received Pronunciation accent. An ordinary adult male speaking voice, soft and mid-low pitched, at normal volume. Polite, hesitant and flustered, stammering and apologising.",
+   "candidates": [
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "28c2e20f9ae84eed91967643b57e1187",
+     "wall": 10.7,
+     "text": "Oh gosh, um, tower? Terribly sorry, it's the Prince. I think I've pressed something I oughtn't to have. Is that, is that bad?",
+     "wer": 0.0,
+     "asr": "Oh gosh, um, Tower? Terribly sorry, it's the prince. I think I've pressed something I oughtn't to have. Is that... is that bad?",
+     "f0": 156,
+     "spread": 5.37,
+     "dur": 12.32,
+     "lufs": -24.9,
+     "peak": -6.1,
+     "score": -0.314,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "bd7e3d85e189458a89406229a67eb2b9",
+     "wall": 9.2,
+     "text": "Oh gosh, um, tower? Terribly sorry, it's the Prince. I think I've pressed something I oughtn't to have. Is that, is that bad?",
+     "wer": 0.0,
+     "asr": "Oh gosh, um, Tower? Terribly sorry, it's the prince. I think I've pressed something I oughtn't to have. Is that, is that bad?",
+     "f0": 213,
+     "spread": 5.04,
+     "dur": 9.84,
+     "lufs": -21.0,
+     "peak": -2.2,
+     "score": 2.819,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "b90d76a062b9428b8e2f18699b1b0046",
+     "wall": 9.7,
+     "text": "Oh gosh, um, tower? Terribly sorry, it's the Prince. I think I've pressed something I oughtn't to have. Is that, is that bad?",
+     "wer": 0.0,
+     "asr": "Oh gosh, um, Tower? Terribly sorry, it's the Prince! I think I've pressed something I oughtn't to have. Is that, is that bad?",
+     "f0": 246,
+     "spread": 3.86,
+     "dur": 10.32,
+     "lufs": -21.6,
+     "peak": -5.1,
+     "score": 7.035
+    }
+   ]
+  }
+ ],
+ "charmer": [
+  {
+   "at": "2026-10-21 22:59",
+   "design": "A silver-tongued Irish charmer in his thirties with a soft, lilting Irish accent from Dublin. Warm, smooth and twinkly, a velvety baritone, flirtatious and persuasive, speaking easily with a smile in his voice.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "d392d6545c3148a1b5cf7e497b9a9ef6",
+     "wall": 7.6,
+     "wer": 0.0,
+     "asr": "Ah, Tower, would you look at that lovely runway? Sure, it'd be a crime not to land on it, wouldn't it? I'll be quick, I promise.",
+     "f0": 235,
+     "spread": 3.63,
+     "dur": 9.52,
+     "lufs": -20.7,
+     "peak": -1.8,
+     "score": 8.899
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "e5e1330b657d4227ae2ad9bd763e9e2e",
+     "wall": 7.7,
+     "wer": 0.0,
+     "asr": "Ah, Tower, would you look at that lovely runway? Sure, it'd be a crime not to land on it, wouldn't it? I'll be quick, I promise.",
+     "f0": 246,
+     "spread": 2.93,
+     "dur": 9.84,
+     "lufs": -21.8,
+     "peak": -5.2,
+     "score": 10.358
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "da8ef183b59747c28ed282077f76d773",
+     "wall": 8.7,
+     "wer": 0.0,
+     "asr": "Ah, Tower? Would you look at that lovely runway? Sure, it'd be a crime not to land on it, wouldn't it? I'll be quick, I promise.",
+     "f0": 262,
+     "spread": 3.93,
+     "dur": 9.36,
+     "lufs": -20.3,
+     "peak": -5.5,
+     "score": 12.32
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21 23:06",
+   "design": "A silver-tongued Irishman in his thirties with a soft, lilting Dublin accent. A low, warm, velvety baritone, an ordinary adult male speaking voice at normal volume, relaxed, smooth and persuasive, speaking slowly with a smile in his voice.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "54aaa0c3bbb34048a039aa596e6e454e",
+     "wall": 11.7,
+     "text": "Ah, tower, would you look at that lovely runway. Sure, it'd be a crime not to land on it, wouldn't it? I'll be quick, I promise.",
+     "wer": 0.0,
+     "asr": "Ah, Tower, would you look at that lovely runway? Sure, it'd be a crime not to land on it, wouldn't it? I'll be quick, I promise.",
+     "f0": 106,
+     "spread": 3.62,
+     "dur": 11.12,
+     "lufs": -20.5,
+     "peak": -3.8,
+     "score": -0.285,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "6399b070fabc46a39e46019600200b27",
+     "wall": 9.7,
+     "text": "Ah, tower, would you look at that lovely runway. Sure, it'd be a crime not to land on it, wouldn't it? I'll be quick, I promise.",
+     "wer": 0.038,
+     "asr": "Tower, would you look at that lovely runway? Sure, it'd be a crime not to land on it, wouldn't it? I'll be quick, I promise.",
+     "f0": 107,
+     "spread": 4.19,
+     "dur": 9.52,
+     "lufs": -20.4,
+     "peak": -4.5,
+     "score": -0.178,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "7c5d6969331b40fbbf35183b048948d8",
+     "wall": 10.7,
+     "text": "Ah, tower, would you look at that lovely runway. Sure, it'd be a crime not to land on it, wouldn't it? I'll be quick, I promise.",
+     "wer": 0.038,
+     "asr": "Tower, would you look at that lovely runway? Sure it'd be a crime not to land on it, wouldn't it? I'll be quick, I promise.",
+     "f0": 122,
+     "spread": 2.24,
+     "dur": 10.16,
+     "lufs": -21.0,
+     "peak": -2.4,
+     "score": -0.049
+    }
+   ]
+  }
+ ],
+ "tower_m": [
+  {
+   "at": "2026-10-21 22:59",
+   "design": "A calm, professional male British air traffic controller in his forties, measured and neutral, a clear mid-low baritone. Speaks in clipped radio phraseology, steady and polite, but you can hear his composure straining and cracking underneath.",
+   "candidates": [
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "f5d75de1a58243ea80d0b0140f248a73",
+     "wall": 8.7,
+     "wer": 0.087,
+     "asr": "Crazy Tower! Aircraft on runway 27, you are not cleared to land. You are, in fact, landing on the terminal. Please stop.",
+     "f0": 115,
+     "spread": 4.08,
+     "dur": 9.84,
+     "lufs": -21.2,
+     "peak": -2.8,
+     "score": -0.029,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "70995cc1240347bfa688aac5899f2557",
+     "wall": 8.7,
+     "wer": 0.087,
+     "asr": "Crazy Tower. Aircraft on runway 27. You are not cleared to land. You are, in fact, landing on the terminal. Please stop.",
+     "f0": 94,
+     "spread": 4.19,
+     "dur": 10.56,
+     "lufs": -21.7,
+     "peak": -4.0,
+     "score": 0.064,
+     "kept": "design_s23.mp3"
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "b06370f1e3d447a69f96f4e74e490fb7",
+     "wall": 8.2,
+     "wer": 0.087,
+     "asr": "Crazy tower. Aircraft on runway 27, you are not cleared to land. You are, in fact, landing on the terminal. Please stop.",
+     "f0": 92,
+     "spread": 2.02,
+     "dur": 10.4,
+     "lufs": -22.8,
+     "peak": -4.2,
+     "score": 0.274
+    }
+   ]
+  }
+ ],
+ "tower_f": [
+  {
+   "at": "2026-10-21 23:00",
+   "design": "A calm, cool, professional female air traffic controller in her thirties with a crisp neutral British accent. Icy, measured and precise, a clear mid-pitched female voice, dry and deadpan, never raising her voice, quietly terrifying.",
+   "candidates": [
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "bb2a2450dc2d4a7ab4ce09a58786c989",
+     "wall": 7.6,
+     "wer": 0.0,
+     "asr": "Crazy Tower. All aircraft. Whoever just took off sideways, I have your registration, and I have your mother's phone number.",
+     "f0": 208,
+     "spread": 2.89,
+     "dur": 8.8,
+     "lufs": -20.9,
+     "peak": -5.6,
+     "score": -0.226,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "40eb28e659134b0badddb7e19fa97c7e",
+     "wall": 6.6,
+     "wer": 0.05,
+     "asr": "Kazy Tower, all aircraft. Whoever just took off sideways, I have your registration and I have your mother's phone number.",
+     "f0": 193,
+     "spread": 2.54,
+     "dur": 7.52,
+     "lufs": -20.7,
+     "peak": -4.9,
+     "score": -0.043,
+     "kept": "design_s37.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "823f60049d7b4060aa5242c3660c5e04",
+     "wall": 7.1,
+     "wer": 0.0,
+     "asr": "Crazy Tower, all aircraft. Whoever just took off sideways, I have your registration, and I have your mother's phone number.",
+     "f0": 250,
+     "spread": 1.57,
+     "dur": 8.16,
+     "lufs": -18.7,
+     "peak": -4.1,
+     "score": 1.284
+    }
+   ]
+  }
+ ],
+ "tower_trainee": [
+  {
+   "at": "2026-10-21 23:00",
+   "design": "A panicky junior air traffic controller, a young man in his early twenties on his very first day, with a mild English accent and an ordinary male speaking voice. Nervous, gulping and flustered, talking too fast, voice wobbling with panic, trying desperately and failing to sound professional.",
+   "candidates": [
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "a7cff6631f80477081776cab4c79cf0a",
+     "wall": 9.7,
+     "wer": 0.0,
+     "asr": "Um, Crazy Tower, uh... Everyone, please, please stop landing. Oh no, oh no no no! Is this thing on? Is it Mayday?",
+     "f0": 258,
+     "spread": 4.58,
+     "dur": 10.96,
+     "lufs": -19.9,
+     "peak": -3.9,
+     "score": 7.275
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "dde6ba0b2025485480a52e334f57f39c",
+     "wall": 8.7,
+     "wer": 0.0,
+     "asr": "Um, Crazy Tower? Uh, everyone, please, please stop landing. Oh no, oh no no no. Is this thing on? Is it... Mayday?",
+     "f0": 258,
+     "spread": 1.96,
+     "dur": 10.32,
+     "lufs": -19.3,
+     "peak": -4.8,
+     "score": 7.478
+    },
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "e06edcd4266946a1b712911da496394e",
+     "wall": 10.2,
+     "wer": 0.0,
+     "asr": "Um, crazy tower? Uh, everyone? Please, please stop landing! Oh no, oh no no no, is this thing on? Is it Mayday?",
+     "f0": 372,
+     "spread": 3.32,
+     "dur": 12.72,
+     "lufs": -20.2,
+     "peak": -5.5,
+     "score": 21.849
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21 23:06",
+   "design": "A junior air traffic controller, a young man in his twenties in his first week, with a mild English accent. An ordinary adult male speaking voice, mid-low pitched, at normal volume. Nervous and flustered, hesitant and gulping, trying hard and failing to sound professional.",
+   "candidates": [
+    {
+     "tag": "s11",
+     "seed": 11,
+     "language": "English",
+     "job": "b1f10bfc03e240d4974a2167192f466a",
+     "wall": 12.2,
+     "text": "Um, Crazy Tower, uh, everyone? Please, please stop landing! Oh no. Oh no no no. Is this thing on? Is it mayday?",
+     "wer": 0.091,
+     "asr": "Umm... Crazy Tower? Uhh... Everyone? Please, please stop landing! Oh no... Oh no no no... Is this thing on? Is it Mayday?",
+     "f0": 152,
+     "spread": 6.26,
+     "dur": 12.56,
+     "lufs": -22.2,
+     "peak": -2.9,
+     "score": 0.015,
+     "kept": "design_s11.mp3"
+    },
+    {
+     "tag": "s23",
+     "seed": 23,
+     "language": "English",
+     "job": "8a47bb4b0aa040029ee344db4289a54f",
+     "wall": 13.3,
+     "text": "Um, Crazy Tower, uh, everyone? Please, please stop landing! Oh no. Oh no no no. Is this thing on? Is it mayday?",
+     "wer": 0.0,
+     "asr": "Um, Crazy Tower? Uh, everyone? Please, please stop landing. Oh no, oh no no no. Is this thing on? Is it Mayday?",
+     "f0": 219,
+     "spread": 5.7,
+     "dur": 13.12,
+     "lufs": -23.6,
+     "peak": -5.7,
+     "score": 2.301,
+     "kept": "design_s23.mp3"
+    },
+    {
+     "tag": "s37",
+     "seed": 37,
+     "language": "English",
+     "job": "f5cbcb94592140a2a4f49593b93b3593",
+     "wall": 13.2,
+     "text": "Um, Crazy Tower, uh, everyone? Please, please stop landing! Oh no. Oh no no no. Is this thing on? Is it mayday?",
+     "wer": 0.0,
+     "asr": "Um, Crazy Tower, uh, everyone? Please, please stop landing. Oh, no. Oh, no, no, no. Is this thing on? Is it Mayday?",
+     "f0": 254,
+     "spread": 6.05,
+     "dur": 13.44,
+     "lufs": -22.2,
+     "peak": -4.4,
+     "score": 6.751
+    }
+   ]
+  }
+ ]
+}

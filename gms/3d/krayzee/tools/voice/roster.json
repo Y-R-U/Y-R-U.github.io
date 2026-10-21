@@ -1,0 +1,206 @@
+{
+ "toff": {
+  "label": "The Toff",
+  "kind": "pilot",
+  "f0": [
+   80,
+   160
+  ],
+  "design": "A pompous upper-class English gentleman in his fifties with a deep, rich, plummy Received Pronunciation baritone, an ordinary male speaking voice at normal volume. Drawn-out aristocratic vowels, nasal and self-satisfied, utterly entitled and condescending. Clear and unhurried, speaking over an aircraft radio.",
+  "audition": "Tower, this is Lord Fotheringay. I shall be landing first, naturally. Do tell the peasants in the queue to shuffle along, there's a good chap.",
+  "sample": "Make way, peasants! Lord coming through!"
+ },
+ "duchess": {
+  "label": "The Duchess",
+  "kind": "pilot",
+  "f0": [
+   140,
+   230
+  ],
+  "design": "An imperious elderly English duchess in her late seventies with a cut-glass upper-class Received Pronunciation accent, a deep voice, low for a woman but unmistakably female. Slow, precise, icy and commanding, every word dripping with disdain, like a grand dame of the theatre.",
+  "audition": "Control, this is the Duchess. I do not queue. I have never queued. Kindly clear that runway before I have it abolished.",
+  "sample": "Clear the runway. One does not queue."
+ },
+ "bubba": {
+  "label": "Bubba",
+  "kind": "pilot",
+  "f0": [
+   80,
+   155
+  ],
+  "design": "A good ol' boy from the rural American Deep South in his forties, with a thick, slow, twangy Southern redneck drawl. Ordinary male speaking voice at normal volume, warm, chuckling and easy-going, friendly and a little dim, completely unbothered by rules.",
+  "audition": "Well howdy, tower! Y'all mind if I just set her down right here on the highway? Ain't nobody usin' it but a couple of cows.",
+  "sample": "Hold my sweet tea, I'm landin' this thing!"
+ },
+ "darlene": {
+  "label": "Darlene",
+  "kind": "pilot",
+  "f0": [
+   150,
+   250
+  ],
+  "design": "A brash Southern American woman in her forties with a strong, twangy Deep South redneck accent. Sassy, brassy and full of attitude, a husky smoker's alto, low for a woman but unmistakably female. Fast, punchy and confident, speaking at a normal volume.",
+  "audition": "Hey sugar, this is Darlene, and I am comin' in hot! Y'all better move them fancy little planes, 'cause mama ain't stoppin'.",
+  "sample": "Move it, sugar, mama's comin' in hot!"
+ },
+ "wingco": {
+  "label": "The Wing Commander",
+  "kind": "pilot",
+  "f0": [
+   85,
+   165
+  ],
+  "design": "A Second World War Royal Air Force wing commander in his forties with a crisp, clipped, upper-class 1940s British accent, like an old newsreel announcer. A deep, low-pitched, steady male baritone at normal speaking volume, brisk, confident and stiff-upper-lip.",
+  "audition": "Tally-ho, chaps! Wing Commander here. Bandits at twelve o'clock, tea at four. Wizard show, absolutely wizard!",
+  "sample": "Tally-ho! Wizard landing, chaps, absolutely wizard!"
+ },
+ "geezer": {
+  "label": "The Geezer",
+  "kind": "pilot",
+  "f0": [
+   90,
+   170
+  ],
+  "design": "A London Cockney wide boy in his thirties with a strong East London accent, dropped h's and glottal stops. A low, slightly gravelly, ordinary adult male speaking voice at normal volume, relaxed and sly, a market trader's patter, always sounds like he's selling you something dodgy.",
+  "audition": "Oi oi, tower! Listen, I've got a proper little landing for ya, mate. Cash only, no questions asked, know what I mean?",
+  "sample": "Oi! Cash only, mate, no questions asked!"
+ },
+ "sheila": {
+  "label": "Sheila",
+  "kind": "pilot",
+  "f0": [
+   150,
+   260
+  ],
+  "design": "A brash Australian woman in her thirties with a broad, strong Aussie accent. A low, husky, slightly raspy female voice at normal speaking volume, relaxed and laid-back, cheeky, fearless and unbothered.",
+  "audition": "G'day tower! Sheila here, comin' in for a landing, or a crash, honestly could go either way. No worries though!",
+  "sample": "Strewth! Comin' in sideways, no worries!"
+ },
+ "laird": {
+  "label": "The Laird",
+  "kind": "pilot",
+  "f0": [
+   70,
+   140
+  ],
+  "design": "A gruff Scottish Highland laird in his sixties with a thick, rolling Scottish accent and rolled r's. Deep, gravelly bass voice, stern and growling but secretly enjoying himself, slow and weighty delivery at normal volume.",
+  "audition": "This is the Laird of Glen Dhu. Ye'll clear that runway, laddie, or I'll land on yer heid and charge ye for the privilege.",
+  "sample": "Out ma way, laddie, or I land on ye!"
+ },
+ "heiress": {
+  "label": "The Heiress",
+  "kind": "pilot",
+  "f0": [
+   140,
+   260
+  ],
+  "design": "A spoilt, rich young American heiress in her early twenties with a slow, bored, low-pitched Valley Girl drawl and heavy creaky vocal fry at the ends of words. Flat, monotone, unimpressed and dismissive, speaking lazily and quietly, as if texting at the same time.",
+  "audition": "Um, hi? Tower? Like, I'm literally landing now, so can you just, like, move everyone? This is so boring.",
+  "sample": "Ugh. Can, like, everyone just move?"
+ },
+ "comte": {
+  "label": "Le Comte",
+  "kind": "pilot",
+  "f0": [
+   80,
+   160
+  ],
+  "accent_lang": "fr",
+  "design": "A disdainful French aristocrat in his fifties speaking English with a thick, strong French accent. Haughty, languid and condescending, a smooth nasal baritone, sighing with boredom, speaking slowly as if everything is beneath him.",
+  "audition": "Hello, tower. Here is the Comte. Your runway is, how you say, ugly. I will land on it anyway, but I will not enjoy it.",
+  "sample": "Your runway is ugly. I land on eet anyway.",
+  "prefer_alt": true,
+  "audition_alt": "Allo, tower. Zis is ze Comte. Your runway is, 'ow you say, ugly. I will land on eet anyway, but I will not enjoy eet."
+ },
+ "baronin": {
+  "label": "Die Baronin",
+  "kind": "pilot",
+  "f0": [
+   140,
+   230
+  ],
+  "accent_lang": "de",
+  "design": "A stern, aristocratic German baroness in her fifties speaking English with a strong, clipped German accent. Cold, precise and military, every consonant sharp, a low, firm voice, unmistakably female. Impatient and commanding, she does not repeat herself.",
+  "audition": "Tower, this is Baroness von Eisenberg. You have exactly ten seconds to clear the runway. I am counting. One. Two.",
+  "sample": "You haff ten seconds to clear ze runvay.",
+  "prefer_alt": true,
+  "audition_alt": "Tower, zis is Baroness von Eisenberg. You haff exactly ten seconds to clear ze runvay. I am counting. Eins. Zwei."
+ },
+ "tex": {
+  "label": "Tex",
+  "kind": "pilot",
+  "f0": [
+   70,
+   140
+  ],
+  "design": "A Texas oil tycoon in his sixties with a big, slow, rich Texan drawl. A very deep, low, gravelly bass voice, an ordinary older male speaking voice at normal volume, relaxed, swaggering and bossy, like a cattle baron who owns everything he can see.",
+  "audition": "Howdy, tower! This here's Tex, and I just bought your airport, son. So I reckon I'll land wherever I darn well please!",
+  "sample": "Son, I just bought this airport!"
+ },
+ "nan": {
+  "label": "Nan",
+  "kind": "pilot",
+  "f0": [
+   140,
+   250
+  ],
+  "design": "A sweet little Yorkshire grandma in her eighties with a warm, broad Yorkshire accent from northern England. Soft, kindly and cosy, but with a quiet steely menace underneath, a slightly creaky elderly female voice, speaking slowly and sweetly.",
+  "audition": "Ooh, hello love, it's your nan. Now you let me land first, there's a good lad, or I'll be having words with your mother.",
+  "sample": "Let your nan land first, love."
+ },
+ "prince": {
+  "label": "The Prince",
+  "kind": "pilot",
+  "f0": [
+   100,
+   190
+  ],
+  "design": "A nervous young English prince in his twenties with a posh, upper-class Received Pronunciation accent. An ordinary adult male speaking voice, soft and mid-low pitched, at normal volume. Polite, hesitant and flustered, stammering and apologising.",
+  "audition": "Oh gosh, um, tower? Terribly sorry, it's the Prince. I think I've pressed something I oughtn't to have. Is that, is that bad?",
+  "sample": "Terribly sorry! Is this the runway?"
+ },
+ "charmer": {
+  "label": "The Charmer",
+  "kind": "pilot",
+  "f0": [
+   85,
+   165
+  ],
+  "design": "A silver-tongued Irishman in his thirties with a soft, lilting Dublin accent. A low, warm, velvety baritone, an ordinary adult male speaking voice at normal volume, relaxed, smooth and persuasive, speaking slowly with a smile in his voice.",
+  "audition": "Ah, tower, would you look at that lovely runway. Sure, it'd be a crime not to land on it, wouldn't it? I'll be quick, I promise.",
+  "sample": "Ah sure, it'd be a crime not to land."
+ },
+ "tower_m": {
+  "label": "Tower (male)",
+  "kind": "tower",
+  "f0": [
+   80,
+   155
+  ],
+  "design": "A calm, professional male British air traffic controller in his forties, measured and neutral, a clear mid-low baritone. Speaks in clipped radio phraseology, steady and polite, but you can hear his composure straining and cracking underneath.",
+  "audition": "Crazy Tower. Aircraft on runway two seven, you are not cleared to land. You are, in fact, landing on the terminal. Please stop.",
+  "sample": "You are not cleared to land. Please stop."
+ },
+ "tower_f": {
+  "label": "Tower (female)",
+  "kind": "tower",
+  "f0": [
+   150,
+   240
+  ],
+  "design": "A calm, cool, professional female air traffic controller in her thirties with a crisp neutral British accent. Icy, measured and precise, a clear mid-pitched female voice, dry and deadpan, never raising her voice, quietly terrifying.",
+  "audition": "Crazy Tower, all aircraft. Whoever just took off sideways, I have your registration. And I have your mother's phone number.",
+  "sample": "I have your registration. And your mother's number."
+ },
+ "tower_trainee": {
+  "label": "Tower (trainee)",
+  "kind": "tower",
+  "f0": [
+   100,
+   200
+  ],
+  "design": "A junior air traffic controller, a young man in his twenties in his first week, with a mild English accent. An ordinary adult male speaking voice, mid-low pitched, at normal volume. Nervous and flustered, hesitant and gulping, trying hard and failing to sound professional.",
+  "audition": "Um, Crazy Tower, uh, everyone? Please, please stop landing! Oh no. Oh no no no. Is this thing on? Is it mayday?",
+  "sample": "Is this thing on? Is it mayday?"
+ }
+}

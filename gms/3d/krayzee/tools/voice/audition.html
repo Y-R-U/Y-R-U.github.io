@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krayzee Voice Audition</title>
+<style>
+:root{--bg:#14161c;--card:#1d2029;--ink:#e9e6df;--dim:#9a9aa3;--acc:#f2b84b;--bad:#ef6f6c;--ok:#7bc47f;--line:#2c3040}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:20px 16px 8px;max-width:980px;margin:auto}
+h1{margin:0 0 4px;font-size:22px}
+header p{margin:4px 0;color:var(--dim)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}
+button:hover{border-color:var(--acc)}
+button.on{background:var(--acc);color:#14161c;border-color:var(--acc)}
+main{max-width:980px;margin:auto;padding:8px 16px 40px;display:grid;gap:12px}
+.v{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.top h2{margin:0;font-size:18px}
+.id{color:var(--dim);font:13px ui-monospace,monospace}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--dim)}
+.tag.weak{color:var(--bad);border-color:var(--bad)}
+.tag.strong{color:var(--ok);border-color:var(--ok)}
+.design{color:var(--dim);font-size:13px;margin:6px 0 10px}
+.clip{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.clip .play{width:44px;height:44px;border-radius:50%;padding:0;font-size:16px}
+.clip .t{font-size:14px}
+.clip .m{grid-column:2;color:var(--dim);font-size:12px}
+.clip label{grid-column:2;font-size:12px;color:var(--acc);cursor:pointer}
+.note{font-size:13px;margin-top:8px;color:var(--ink);background:#262a36;border-radius:8px;padding:8px 10px}
+#out{display:none;white-space:pre-wrap;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;font:12px ui-monospace,monospace;max-width:980px;margin:8px auto}
+</style>
+</head>
+<body>
+<header>
+  <h1>Kingdom of Krayzee: voice audition</h1>
+  <p>Each voice: the picker sample (rendered with the saved clone voice), then the design takes that were kept. Tick the take you like best; picks are remembered in this browser.</p>
+  <div class="bar"><button id="all">Play all samples</button><button id="radio">Radio filter: off</button><button id="copy">Copy my picks</button></div>
+</header>
+<pre id="out"></pre>
+<main id="list">Loading manifest…</main>
+<script>
+const BASE = '../../audio/voices/';
+let radio = false, ctx, cur, curBtn;
+const picks = (() => { try { return JSON.parse(localStorage.getItem('krayzee-voice-picks') || '{}'); } catch { return {}; } })();
+const savePicks = () => { try { localStorage.setItem('krayzee-voice-picks', JSON.stringify(picks)); } catch {} };
+
+function stop() { if (cur) { cur.pause(); cur.onended = null; } if (curBtn) curBtn.textContent = '▶'; cur = curBtn = null; }
+function play(src, btn) {
+  return new Promise(res => {
+    const same = cur && cur.dataset.src === src; stop(); if (same) return res();
+    const a = new Audio(src); a.dataset.src = src; cur = a; curBtn = btn; if (btn) btn.textContent = '■';
+    if (radio) {
+      ctx ??= new AudioContext();
+      const s = ctx.createMediaElementSource(a), hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), sh = ctx.createWaveShaper();
+      hp.type = 'highpass'; hp.frequency.value = 400; lp.type = 'lowpass'; lp.frequency.value = 3200;
+      const c = new Float32Array(256); for (let i = 0; i < 256; i++) { const x = i / 128 - 1; c[i] = Math.tanh(2.2 * x); } sh.curve = c;
+      s.connect(hp).connect(sh).connect(lp).connect(ctx.destination);
+    }
+    a.onended = () => { stop(); res(); }; a.onerror = () => { stop(); res(); };
+    a.play().catch(() => { stop(); res(); });
+  });
+}
+
+function clip(id, file, text, meta, pickKey) {
+  const d = document.createElement('div'); d.className = 'clip';
+  const b = document.createElement('button'); b.className = 'play'; b.textContent = '▶';
+  b.onclick = () => play(BASE + id + '/' + file, b);
+  d.append(b);
+  const t = document.createElement('div'); t.className = 't'; t.textContent = text; d.append(t);
+  const m = document.createElement('div'); m.className = 'm'; m.textContent = meta; d.append(m);
+  if (pickKey) {
+    const l = document.createElement('label');
+    l.innerHTML = `<input type="radio" name="pick-${id}"> I prefer this one`;
+    const r = l.querySelector('input'); r.checked = picks[id] === pickKey;
+    r.onchange = () => { picks[id] = pickKey; savePicks(); };
+    d.append(l);
+  }
+  return d;
+}
+
+fetch(BASE + 'manifest.json', { cache: 'no-store' }).then(r => r.json()).then(M => {
+  const list = document.getElementById('list'); list.textContent = '';
+  for (const [id, v] of Object.entries(M)) {
+    if (id.startsWith('_')) continue;
+    const el = document.createElement('section'); el.className = 'v';
+    const q = v.quality || '';
+    el.innerHTML = `<div class="top"><h2></h2><span class="id">${id} · ${v.kind}</span>${q ? `<span class="tag ${q}">${q}</span>` : ''}</div><div class="design"></div>`;
+    el.querySelector('h2').textContent = v.label;
+    el.querySelector('.design').textContent = v.design;
+    if (v.sample) {
+      const s = v.sample;
+      el.append(clip(id, 'sample.mp3', '“' + s.text + '”', `picker sample · ${s.dur}s · heard as: “${s.asr}”`));
+    }
+    for (const c of v.candidates || []) {
+      if (!c.kept) continue;
+      const chosen = c.tag === v.pick ? 'SAVED VOICE' : 'alternate';
+      const acc = c.accent_p != null ? ` · ${c.language} accent p=${c.accent_p}` : '';
+      el.append(clip(id, c.kept, `${chosen} (${c.tag}): “${c.text || v.audition}”`,
+        `${c.dur}s · pitch ${c.f0} Hz · whisper WER ${c.wer}${acc} · heard as: “${c.asr}”`, c.tag));
+    }
+    if (v.note) { const n = document.createElement('div'); n.className = 'note'; n.textContent = v.note; el.append(n); }
+    list.append(el);
+  }
+  document.getElementById('all').onclick = async () => {
+    for (const [id, v] of Object.entries(M)) if (!id.startsWith('_') && v.sample) await play(BASE + id + '/sample.mp3', null);
+  };
+}).catch(e => { document.getElementById('list').textContent = 'Could not load manifest.json: ' + e; });
+
+document.getElementById('radio').onclick = e => { radio = !radio; e.target.textContent = 'Radio filter: ' + (radio ? 'on' : 'off'); e.target.classList.toggle('on', radio); };
+document.getElementById('copy').onclick = () => {
+  const o = document.getElementById('out'); o.style.display = 'block'; o.textContent = JSON.stringify(picks, null, 1);
+  navigator.clipboard?.writeText(o.textContent).catch(() => {});
+};
+</script>
+</body>
+</html>

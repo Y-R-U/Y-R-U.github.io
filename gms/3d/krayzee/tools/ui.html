@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Krayzee UI test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b1230; overflow: hidden; }
+  #bg { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #hud { position: fixed; left: 12px; top: 12px; z-index: 5; display: none; gap: 8px; }
+  #hud button { min-height: 44px; padding: 0 14px; border-radius: 10px; border: 0; font: 600 13px system-ui; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../../../lib/three/0.180.0/three.module.js", "three/addons/": "../../../lib/three/0.180.0/addons/" } }
+</script>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div id="hud"><button id="pause">Pause</button></div>
+<script type="module">
+import * as THREE from 'three';
+import * as UI from '../js/ui/index.js';
+
+const Q = new URLSearchParams(location.search);
+if (Q.has('seed')) { try { localStorage.setItem('krayzee.profile', JSON.stringify({ name: 'Dirk', gender: 'm', company: 'Dirk Air', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017', voice: 'toff', registration: 'K-DIRK', rank: 0 })); } catch (e) {} }
+if (Q.has('reset')) { try { ['krayzee.profile', 'krayzee.settings', 'krayzee.career'].forEach((k) => localStorage.removeItem(k)); } catch (e) {} }
+// career=<lifetimePP>[,<onlineWins>[,story]] e.g. career=60000 (Archduke), career=200000,7 (King, 7/10 wins)
+if (Q.has('career')) { const [pp, wins, story] = Q.get('career').split(','); try { localStorage.setItem('krayzee.career', JSON.stringify({ v: 1, lifetimePP: +pp || 0, onlineWins: +wins || 0, storyComplete: story === 'story', rankFloor: 0, unlockedTitles: ['baron'], selectedTitle: null, savedAt: 1 })); } catch (e) {} }
+
+// Stand-in attract scene so the translucent menu has something behind it.
+const canvas = document.getElementById('bg');
+const r = new THREE.WebGLRenderer({ canvas, antialias: true });
+r.setPixelRatio(Math.min(devicePixelRatio, 2));
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#9fc6ea');
+scene.fog = new THREE.Fog('#bcd7ee', 200, 1600);
+const cam = new THREE.PerspectiveCamera(50, 1, 0.5, 3000);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x557744, 1.6));
+const sun = new THREE.DirectionalLight(0xfff0d8, 2); sun.position.set(100, 200, 80); scene.add(sun);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000), new THREE.MeshLambertMaterial({ color: '#6f9a4e' }));
+ground.rotation.x = -Math.PI / 2; scene.add(ground);
+const rwy = new THREE.Mesh(new THREE.PlaneGeometry(45, 1600), new THREE.MeshLambertMaterial({ color: '#3a3d42' }));
+rwy.rotation.x = -Math.PI / 2; rwy.position.y = 0.05; scene.add(rwy);
+for (let z = -760; z < 760; z += 60) { const d = new THREE.Mesh(new THREE.PlaneGeometry(1, 30), new THREE.MeshBasicMaterial({ color: '#eee' })); d.rotation.x = -Math.PI / 2; d.position.set(0, 0.08, z); scene.add(d); }
+const term = new THREE.Mesh(new THREE.BoxGeometry(120, 18, 40), new THREE.MeshLambertMaterial({ color: '#e8e0cf' })); term.position.set(-130, 9, 0); scene.add(term);
+const tower = new THREE.Mesh(new THREE.CylinderGeometry(4, 5, 40), new THREE.MeshLambertMaterial({ color: '#ddd' })); tower.position.set(-90, 20, 120); scene.add(tower);
+const fit = () => { r.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); };
+addEventListener('resize', fit); fit();
+let t = 0;
+r.setAnimationLoop(() => { t += 0.004; cam.position.set(Math.cos(t) * 260, 70, Math.sin(t) * 260); cam.lookAt(0, 0, 0); r.render(scene, cam); });
+
+const log = (...a) => { (window.__uiLog ||= []).push(a); console.log('[hook]', ...a); };
+UI.initUI({
+  onPlay: (m) => { log('play', m); document.getElementById('hud').style.display = 'flex'; },
+  onSettings: (s) => log('settings', s),
+  onProfile: (p) => log('profile', p),
+  onResume: () => log('resume'),
+  onSound: (k) => (window.__sounds ||= []).push(k),
+  onQuit: () => { log('quit'); document.getElementById('hud').style.display = 'none'; },
+});
+document.getElementById('pause').addEventListener('click', () => UI.openSettings());
+window.__ui = UI;
+
+const want = Q.get('state') || 'auto';
+if (want === 'loading') { UI.setLoading(0.42, 'Fuelling the aeroplanes'); }
+else {
+  let f = 0;
+  const labels = ['Unrolling the runways', 'Waking the tower', 'Fuelling the aeroplanes', 'Rehearsing excuses'];
+  const step = () => {
+    f += want === 'auto' ? 0.07 : 0.5;
+    UI.setLoading(f, labels[Math.min(labels.length - 1, Math.floor(f * labels.length))]);
+    if (f < 1) setTimeout(step, want === 'auto' ? 140 : 10);
+    else {
+      UI.showMenu();
+      if (want === 'creator') UI.openProfile({ first: Q.has('first') });
+      if (want === 'settings') UI.openSettings();
+      if (want === 'game') { UI.enterGameplay(); document.getElementById('hud').style.display = 'flex'; }
+      if (want === 'pause') { UI.enterGameplay(); UI.openSettings(); }
+    }
+  };
+  step();
+}
+</script>
+</body>
+</html>

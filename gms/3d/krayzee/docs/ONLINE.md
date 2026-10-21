@@ -1,0 +1,342 @@
+# Krayzee online rooms: architecture (lane ONLINE, 2026-10-21)
+
+Status: **design + local prototype**. Nothing is deployed. The prototype is in `server/` (Go, local only), and
+`node gms/3d/krayzee/server/test.mjs` runs it and checks the room rules (26 checks; the voice-claim and host-only checks
+were broken on purpose to prove they can fail).
+
+Prior art this copies:
+- `gms/pwa/snake/MULTIPLAYER.md`: browser-hosted rooms, WebRTC full mesh, relay fallback, reconnect grace, host handoff
+  and server-restart rebuild. The Go server is `snakenet`, port 8013.
+- `gms/2d/ragdojo/docs/ONLINE.md`: the same model for a fighting game, plus host migration, Firebase ID-token checks and
+  abuse rules. Its server is the arena, port 8017.
+- `gms/2d/clued/server`: deploy shape (`deploy.sh` builds on the box with a health check and rollback,
+  `caddy_route.py`, a hardened systemd unit, and secrets kept in `/srv/data/<app>/<app>.env`). Clued's rooms are
+  HTTP+SSE because trivia is turn-based. That model does not fit flight.
+- `/games/CLAUDE.md`: the shared Firebase account layer. One origin is one login, so the game is served at
+  `games.br8t.com/gms/3d/krayzee/`.
+
+---
+
+## 1. Decision: browser-hosted rooms with a small Go room server
+
+**The host's browser runs the shared world: ATC, AI traffic, scoring, the radio and the Court. Each player's browser
+flies its own plane. The Go server (`krayzeenet`) only introduces players, keeps the list of who is in each room,
+hands out voice claims and callsign numbers, enforces the room options, and relays traffic for pairs that cannot
+connect directly.** Game traffic goes browser to browser over WebRTC.
+
+Why not a Go server that runs the game itself:
+
+1. **There is one simulation, and it is JavaScript.** Flight model, autopilot, ATC sequencing and infraction detection
+   live in `js/flight`, `js/atc` and `data/rules.js`. A Go server that ran the game would need all of that written a
+   second time, and the two copies would drift. Running node on the box per room is possible, but it puts real CPU
+   load on a small shared VPS (Clued is capped at `MemoryMax=128M`) to buy almost nothing (point 2).
+2. **Authority over your own plane has to be local anyway.** A plane you steer through a server 180 ms away (the box is
+   in the US and Aaron's family is in Australia) feels like steering through treacle. Snake found the same thing and
+   wrote it into its fairness rules. Once each player owns their plane, what is left to share (ATC clearances, AI
+   traffic, points) tolerates 100–300 ms easily. The tower already waits 0.6–1.2 s before it scolds you (DESIGN §5.5).
+3. **The pattern is proven twice on this box.** Snake and RAGDOJO already handle the hard parts: the WebRTC mesh,
+   Safari's SCTP size limit, TURN under a spending cap, reconnects and host handoff. Krayzee forks that code; it does not
+   invent new code.
+4. **Cheating is accepted, as in Snake and RAGDOJO (Aaron's call).** Online PP only feeds your own career and a
+   room-local Court, so a cheater mostly cheats themselves. The host still runs plausibility caps (§8).
+
+What this costs: the host's phone does more work. ATC and about 20 AI planes on autopilot are cheap; uploading to 7
+followers is about 25 KB/s. Host migration is mandatory, so **ATC state must be serialisable** (§10, a requirement on
+the ATC lane).
+
+> Note for DESIGN: §3.3 says "Host-authoritative ATC sim on the server". Please read that as **"in the host's
+> browser"**, with the Go server holding only membership, claims and the relay.
+
+## 2. Who owns what
+
+| thing | owner | sent as |
+|---|---|---|
+| your plane: flight model, ground and world collisions, rubber bounce, hull % | **your browser** | `S` state, 15 Hz, unreliable, peer to peer to everyone |
+| player vs player contact | **each victim's browser**, against what it sees (Snake rule 1) | `hit` event → host |
+| your own rule-breaks (cut-in, queue-jump, uncleared takeoff, buzz…) | **your browser**, checked against its copy of ATC state | `inf` event → host, which checks it is plausible |
+| ATC sequences and clearances, per-player outrage, tower lines | **host** | `atc` 5 Hz reliable delta, plus a 1 Hz keyframe |
+| AI traffic | **host** (it flies the AI on autopilot) | `T` snapshot, 10 Hz, unreliable |
+| radio timeline: who speaks when, which clip | **host** (the single "floor controller") | `radio`, reliable |
+| room PP ledger, Court ranks, crown changes, session timer | **host** | inside the `atc` keyframe; `crown` event |
+| membership, host line, voice claims, callsign numbers, room options, kicks | **Go server** | WebSocket JSON |
+| your career and lifetime PP | **your browser**, cloud-saved by `/lib/auth` | no network traffic |
+
+The full mesh (Snake's design) means players' own states reach each other in one hop instead of going through the host.
+The host is also always the right peer to take over, because it already has a link to everyone.
+
+## 3. Tick and snapshot rates, interpolation
+
+**Plane state packet**, about 32 bytes:
+- position: 3 × f32
+- orientation: smallest-three quaternion, 4 bytes
+- velocity: 3 × i16 at 0.05 m/s
+- angular rate: 3 × i8
+- control surfaces and throttle: 4 × i8
+- flags (on ground, overriding, gear, crashed, parachute): 1 byte
+- flaps and hull %: 1 byte each
+- room-time milliseconds: u16, wrapping
+
+| stream | rate | per follower | notes |
+|---|---|---|---|
+| own plane → every peer | **15 Hz** | 7 × 0.5 KB/s | 30 Hz was considered: planes are inertial, and 15 Hz with Hermite interpolation looks the same |
+| AI traffic, host → all | **10 Hz** | 20 planes ≈ 6.5 KB/s | only planes inside 3 km of the receiver get the full rate; farther ones get 2 Hz |
+| ATC delta / keyframe | 5 Hz / 1 Hz | < 1 KB/s | reliable, ordered |
+| radio, barks, events | on demand | tiny | reliable |
+
+That is about **10 KB/s down and 4 KB/s up for a follower, and about 50 KB/s up for the host**: roughly 35–180 MB an
+hour. `?lite=1` and a "data saver" setting halve the AI rate and drop far planes to 1 Hz.
+
+**Room time.** Every peer runs Snake's ping/pong clock to the host and keeps an offset, so all timestamps are in host
+milliseconds. Joust touchdowns are judged by these timestamps, not by what anyone's screen showed.
+
+**Drawing other planes.** Other planes are drawn **100 ms in the past** using cubic Hermite interpolation of position
+with the sent velocity, and slerp for rotation. The buffer grows with measured jitter, up to 300 ms (Snake does the
+same, with 80–400 ms). If the buffer runs dry, the plane is **dead-reckoned forward with its velocity and angular rate
+for up to 600 ms**, blending back over 200 ms when packets resume. After 600 ms a faint "signal lost" ghost holds
+position. After 2.5 s the host's autopilot flies that plane (§9).
+
+At 120 kt a 100 ms delay is about 6 m of lag. That is fine for rubber bumps and near-misses, and fairness does not depend
+on it because each victim judges its own contact. Formation flying between Australia and the US will look loose. That
+is accepted.
+
+## 4. ATC and AI traffic on the host
+
+- The host runs the same `js/atc` sim as single player, with every human plane fed in as a "remote" plane whose state
+  arrives in `S` packets. AI planes are local to the host.
+- Followers keep a **replica** of ATC state: sequences, clearances, outrage and the PP ledger. They use it to
+  - show their own clearance,
+  - detect their own infractions with no round trip, and
+  - be ready to become host.
+- Infractions: your browser raises them (`inf {rule, victim, pp, t}`). The host applies the outrage, picks the tower's
+  scold and schedules it on the radio. The host may reject an `inf` (§8). Scolds land 0.6–1.2 s later anyway, so the
+  round trip is hidden.
+- AI density comes from the room's `traffic` option. AI voices are only voices no human holds (DESIGN §3.3). If a human
+  claims a voice an AI is using, the host re-voices that AI from its next transmission.
+
+## 5. Radio over the network
+
+**No audio is ever sent.**
+- Barks go as `{voice, intent, variant, target}`, exactly as DESIGN §5.3 sets out.
+- Tower lines go as `{tower, line, callsign:[titleWord, d1, d2], rwy}`. Every client already has the clips cached.
+
+**Floor control.** The radio is one frequency, so the host orders transmissions. A player's bark is sent to the host
+and also **played at once on their own device**, so it feels immediate. The host stamps it into the timeline, and
+others play it at that time. If two people talk at once, the later one is queued, up to 1.5 s, then dropped. The host
+gives the tower priority.
+
+**Response windows.** These are opened by the host for the target, at most one inbound window per 8 s per player
+(DESIGN).
+
+**Clip loading.** Clips are fetched only for voices in use. A voice claim (§6) triggers a preload on every peer.
+
+## 6. Voices: first to pick gets it
+
+The Go server owns voice claims, in its single hub goroutine, so **a claim is atomic**. Two players tapping the same
+card in the same millisecond produce exactly one winner. The loser is told who holds it (`claim {ok:false, by}`).
+Prototype checks: "simultaneous claim", "loser is told who holds it".
+
+- On join, the client sends its **starred favourites**: up to 3 in the profile, with the saved voice first (DESIGN
+  §3.3). The server gives the first free one, otherwise the first free voice in roster order. There are 15 voices and
+  at most 8 players, so there is always one free.
+- In the lobby, a taken voice card shows the holder's name, greyed. You can claim any free card. Your profile's saved
+  voice is never overwritten by what the room gave you.
+- **Late joiners** see the same greyed cards and get their first free favourite automatically.
+- During a session, a voice can be changed only while landed or parked. That stops a mid-air voice swap that would
+  confuse the radio.
+- A dropped player **keeps their voice during the reconnect grace** (10 s). It is freed when they leave or the grace
+  runs out (prototype checks).
+- Room option `voices: duplicates_allowed` turns claims off (DESIGN host option).
+- The server also assigns each member a **callsign number from 11 to 99, unique in the room, never ending in 0**, for
+  the tower's "Baroness Four-Two" splice. Doing it there makes it atomic too.
+
+## 7. Points and the Court
+
+Ranks follow DESIGN §1.6 exactly. **The host computes them; nobody else does.**
+
+- **Room PP** = PP banked this session. Pending PP does not count until banked, so a crash still costs you. The host
+  keeps the ledger from accepted `inf` events and `bank` events.
+- Players are sorted by room PP. Ties go to whoever reached the total first, by host room time.
+  - 1st holds the **Crown**: Court rank King or Queen, and **Emperor or Empress** if their PP is at least 2× the PP of
+    2nd.
+  - 2nd is Crown Prince or Princess, 3rd is Prince or Princess, and so on down one rung per place: Archduke, Duke,
+    Marquess, Earl, Viscount, Baron. 11th and below are all Baron.
+  - Anyone on 0 PP is Baron.
+  - AI never holds Court rank.
+- The ledger and ranks go out in every `atc` keyframe. When the Crown changes hands, the host emits `crown {id}`. Every
+  client plays the fanfare and the tower's `crown_change` line, and the new monarch gets a response window.
+- When a session ends, the host sends `end {court}` and every client shows the podium.
+- Room types with a target (Coronation, first to 5 000) or rounds (Joust) are judged by the host on room time.
+- Your banked online PP goes into **your own career save** as you bank it ("Online all count", DESIGN §1.5).
+- **Public room list.** The host sends the server a tiny `meta {crown: name, left: seconds}` every 10 s, so the list can
+  show "♛ Baroness Dirk, 4:12 left".
+
+## 8. Anti-grief basics
+
+- **No free-text chat. Barks only.** This removes most abuse in one decision.
+- Names are typed but limited to 14 characters (the livery limit), with Clued's profanity filter (`server/names.go`
+  there). Room names allow 24 characters. Nothing from the network reaches `innerHTML`.
+- **Kick.** In a private room the creator can kick, and that uid is barred from the room for its lifetime. In a public
+  room the host is just first in line, so kicking needs a **vote: a majority of the other humans**.
+- **Bark spam.** At most 1 bark per 3 s per player at the host, and the host's 8 s response-window limit. Each listener
+  can mute any player locally.
+- **Ramming in Realistic.** The protected spawn lasts 5 s, and stands are no-collision zones. Hitting the same player 3
+  times in 60 s while overriding is a Royal Scandal (DESIGN), with PP forfeited. Blame for a `hit` goes to whoever was
+  overriding; if neither was, nobody is blamed.
+- **Host plausibility caps.** The host drops an `inf` for a rule needing state the reporter could not have been in, for
+  example a cut-in when the reporter is not in the arrival sequence. It caps PP to the rule's per-minute ceiling from
+  `data/rules.js`. A `bank` without a landing in the ledger is ignored.
+- **Inactive players.** An idle player is simply flown by autopilot, which is the game's normal state. In a public
+  room, a player with no input for 5 minutes is removed.
+- **Server-side limits** come from Snake and RAGDOJO: a relay budget per client, 32 KB messages, sockets per IP (IPv6
+  counted per /64), and a room cap. Identity rate limits (§11) key on uid.
+
+## 9. Room lifecycle, reconnects, mobile realities
+
+**Lifecycle**
+
+```
+create (options) ──► LOBBY (claim voices, see options, host taps Start or Quick countdown when n ≥ 2)
+     ▲                 │
+     │                 ▼
+  rematch ◄── PODIUM ◄── IN FLIGHT (session timer / target / rounds, per room type)
+```
+
+- **Create.** The client sends `create {name, priv, set}` and gets a 6-character code (`ABCDEFGHJKMNPQRSTUVWXYZ23456789`,
+  with no 0/O/1/I/L). The share link is `…/krayzee/?room=CODE`.
+- **Join.** By code (case-insensitive), from the public list, or with **Quick join**. Quick join picks the busiest public
+  room in your region that has space, otherwise it creates a public Court Session.
+- **Joining mid-session** is allowed, except in Joust. You spawn at a free stand as a Baron on 0 room PP.
+- **Public list.** It shows name, type, players/max, protection, traffic and the meta line. Private rooms are never
+  listed and codes never appear in the list (prototype checks). The list is sorted by your region first (Snake's
+  timezone regions), then by the busiest room.
+- **End of a room.** A room dies when its last member leaves or their grace runs out.
+- **Options.** Only the host can change them (prototype check), in the lobby or between sessions. The host's game
+  applies the room type's fixed values. The server only checks shape and range.
+
+**Reconnects** (Snake's design, already proven)
+- A dropped socket keeps its seat, voice, callsign and room PP for **10 s**. The browser reconnects quietly with
+  `?id=&tok=`.
+- While it is away, **the host's autopilot flies the player's plane**. This is the game's own mechanic, so nobody
+  notices a hiccup. When the player returns, control goes back to them.
+- WebRTC links survive a short WebSocket drop.
+- After a server restart, browsers rebuild their rooms within 60 s (Snake's `rebuildWindow`).
+- The prototype has the grace, resume token, voice holding and immediate host handoff, with tests. It does not yet have
+  the rebuild window.
+
+**The host leaving**
+- A **goodbye** (tab closed, page left) or a **hidden tab** (`visibilitychange`) hands off at once.
+- **Silence** for 2.5 s of game-loop beats hands off too. Snake tried 1.5 s first, and stalls replaced hosts for no
+  reason.
+- The new host is the next connected player who is in sync. It rebuilds ATC, AI and the ledger from its replica and
+  the last keyframe, and continues. The epoch goes up, so two browsers can never both act as host.
+
+**Mobile realities**
+- iOS Safari freezes background tabs, so a hidden tab is treated as away.
+- A switch from Wi-Fi to 4G changes IP, so the client runs an ICE restart. Until the new link is up, traffic goes
+  through the relay.
+- Two phones on the same home Wi-Fi often cannot connect directly. Cloudflare TURN fixes that through Sydney.
+  Credentials come from snakenet's loopback `127.0.0.1:8014/ice` under its shared 800 GB cap (`SHARED_TURN.md`).
+  Without TURN, that pair goes through the US relay, and an amber pill suggests one player switch to mobile data.
+- Being host drains battery. The client sends `ready` beats only when it is not in lite mode and has had a stable frame
+  rate for 5 s. Promotion prefers ready members.
+
+## 10. Requirements on other lanes
+
+- **ATC.** All state must be plain JSON, through `serialize()` and `restore(json)`. `step(dt, roomTime)` must take an
+  injected clock: no `Date.now` or `performance.now` inside. Any plane must be a "remote" (state fed in) or "local"
+  (autopilot-driven) plane, switchable at runtime. Infraction checks must run per plane against a given state. The
+  rule-break detector should be callable on the follower's replica.
+- **FLIGHT.**
+  - `packState(plane) → Uint8Array(32)` and `applyRemote(plane, samples)` for the interpolator.
+  - The autopilot can take over any plane from any state (already in the brief).
+  - Collision callbacks must say whether the other plane is remote.
+- **RADIO.** Play a clip sequence at a given room time (`schedule(at, clips)`), and play your own bark at once and
+  locally without waiting for the network. Preload by voice id.
+- **UI.**
+  - Lobby screens: create (room type + options), join by code, public list, quick join.
+  - A voice picker with greyed taken cards showing the holder's name, and up to 3 starred favourites in the profile.
+  - A Court ladder in the HUD (top 3 + you, DESIGN §6).
+  - A connection pill (relay or direct, ping bars), a "Reconnecting…" pill and a kick-vote sheet.
+- **DESIGN.**
+  - `data/modes.js` ROOM_TYPES ids: the prototype uses `court rumble coronation strict garden joust open`. Please use
+    those ids or tell ONLINE.
+  - The §3.3 wording note in §1.
+  - Plausibility ceilings, as PP per minute per rule.
+
+## 11. Identity: reuse of the account layer
+
+- `hello` carries `idToken` from `/lib/auth` (`auth.getIdToken()`, the RAGDOJO addition). The server verifies it
+  without credentials, using Google's x509 certs and the `br8t-games` audience. It copies RAGDOJO's `idtoken.go`
+  (Clued's `firebase.go` is the same approach).
+- **Anonymous users can play.** A token is still sent, and it is a uid. The uid is used to:
+  - give one seat per uid per room (a second tab replaces the first),
+  - make kick bans stick,
+  - apply per-account rate limits, and
+  - (later) a ranked-room gate.
+- Display name, title and gender come from the Krayzee profile (`ui.getProfile()`), not from the Google account.
+- No server database is needed for v1. Rooms are in memory, and career PP lives in each player's own cloud save.
+
+## 12. Server: shape and deployment (when approved)
+
+- Fork `gms/pwa/snake/server` into `gms/3d/krayzee/server`, as module `br8t/krayzeenet`, keeping:
+  - the hub goroutine,
+  - WebRTC `sig` and `rl` relay with budgets,
+  - TURN through `:8014/ice`,
+  - reconnect grace and the rebuild window,
+  - regions.
+- Add the Krayzee pieces from the prototype: voices, callsigns, options, the host-only `set` command, the `meta`
+  message, kick/vote and the ID token.
+- Listen on `127.0.0.1:8018`. Caddy routes `handle /gms/3d/krayzee/net/*`, and the page uses
+  `wss://games.br8t.com/gms/3d/krayzee/net/ws`, with a `?net=` override for local testing.
+- Copy Clued's `deploy.sh` (build on the box, health check, rollback) and `caddy_route.py`. Use a systemd unit like
+  `clued.service` with `MemoryMax=64M`. **Commit first, then deploy**, and only after Aaron approves the named steps.
+- Tests:
+  - `go test ./...`
+  - `server/test.mjs`, the protocol test that exists now
+  - later, a `tools/mpgate.mjs` with 4 headless Chromes, like Snake's: create, join, voice claim, the host vanishing,
+    the server killed mid-room. Every key check must be falsified.
+
+### Prototype wire (what `server/` speaks today)
+
+| client → server | |
+|---|---|
+| `hello {name, title, voices[]}` | voices = favourites in order |
+| `list` · `create {name, priv, set}` · `join {code}` or `join {id}` · `leave` | |
+| `claim {voice}` | atomic; answered with `claim {ok, voice, by?}` |
+| `set {set}` | host only; the room is re-broadcast |
+| `rl {to?, d}` | relay to one member or the whole room |
+
+| server → client | |
+|---|---|
+| `welcome {id, tok, voices}` | the token resumes the seat via `?id=&tok=` |
+| `rooms {rooms[]}` | public only, no codes |
+| `room {room:{id, code, name, priv, n, set, host, epoch, members:[{id, name, title, voice, call, away}]}, you}` | |
+| `err {code: full\|nocode}` | |
+
+## 13. Build phases and effort
+
+| phase | what | effort |
+|---|---|---|
+| O0 ✅ | this design, prototype broker, protocol test (26 checks, 2 falsified) | done |
+| O1 | productionise the server: fork snakenet, merge the prototype pieces, ID token, kick/vote, meta; go tests; deploy scripts (not run) | 1 agent session |
+| O2 | client net layer: port Snake's `js/net.js` (NetLink, chunking, reconnect) into `js/net/`; lobby, list and voice-picker UI hooks | 1 session (parallel with O1) |
+| O3 | net game: own-state broadcast, interpolator and dead reckoning, clock sync, AI and ATC snapshots, follower ATC replica, `inf`/`hit`/`bank`, radio floor control, Court ledger and crown | 2 sessions; **needs ATC and RADIO P2 APIs (§10) first** |
+| O4 | robustness: host migration from the replica, autopilot for away players, hidden tab, ICE restart, the mpgate 4-Chrome gate with falsified checks | 1 session |
+| O5 | polish: quick join, public list meta, data saver, ping bars, kick-vote UI, LAN mode (as RAGDOJO) if wanted | 1 session |
+
+That is about 6 agent sessions, and online fits after P2 gameplay works in single player. The longest pole is O3,
+which depends on ATC being serialisable and clock-injected. Asking for that **now**, in P2, costs nothing.
+
+## 14. Open questions for Aaron
+
+1. **Browser-hosted, like Snake and RAGDOJO**, with client-side cheating accepted? The alternative, a server running
+   the game, means a second copy of the flight and ATC code, or node processes on the box.
+2. **Ranked rooms:** DESIGN gates hosting by career rank (Duke+ for ranked rooms, King+ for Royal Decree). Career PP
+   lives in each player's own save, so the gate is on trust unless the server reads Firestore. That needs a service
+   account on the box. Is trust OK?
+3. **Changing voice:** lobby and while parked only, or free at any time?
+4. **Join mid-session:** allowed, except in Joust?
+5. **Limits:** any daily online limit like RAGDOJO's 3 a day, or free and unlimited?
+6. **Home LAN mode** like RAGDOJO's (no internet, local server, no sign-in) for family play?
+7. **Deploy:** port 8018 on the br8t box (8012–8014, 8016 and 8017 are taken in repo configs; 8015 is unaccounted for),
+   sharing Snake's TURN cap. The box has to be checked before deploy.
