@@ -31,3 +31,4 @@
 - D23 (2026-10-22) Remove/replace the high-pitched squeal Aaron hears (identify it: stall reed-horn, radio "stepped on" squeal, flaps whine?). No piercing high-frequency sounds; a stall warning, if kept, is short, soft and only near a real stall.
 - D24 (2026-10-22) Newspaper headlines never cover the screen in flight. In flight: a small newspaper icon/counter ("+1 headline — this will hit the papers"). After landing (DEMAND IT / mission complete) show the collected headlines as a reel, with Skip and Skip all.
 - D25 (2026-10-22) Stall horn OFF by default; Settings toggle 'Stall warning' to turn it on (and quiet when on).
+- (2026-10-22) Aaron soundboard verdict: ONLY the stall horn is bad; every other sound is fine — keep them.

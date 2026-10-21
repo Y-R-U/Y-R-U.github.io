@@ -17,7 +17,15 @@ export function createAudioSystem(ctx, opts = {}) {
   const S = { ctx, voiceCap: opts.voiceCap || 6, engines: new Set(), listener: { pos: [0, 0, 0], vel: [0, 0, 0] } };
   const g = (v = 1) => { const n = ctx.createGain(); n.gain.value = v; return n; };
   const now = () => ctx.currentTime;
-  const ramp = (p, v, tau = 0.05) => p.setTargetAtTime(v, now(), tau);
+  // PERF #6: while the context is suspended currentTime is frozen and every setTargetAtTime piles up; also skip re-sends
+  // of (nearly) the same target, which most per-frame calls are.
+  const ramp = (p, v, tau = 0.05) => {
+    if (ctx.state !== 'running') return;
+    const last = p._kz;
+    if (last !== undefined && Math.abs(v - last) <= Math.abs(last) * 0.005 + 1e-5) return;
+    p._kz = v;
+    p.setTargetAtTime(v, now(), tau);
+  };
 
   const limiter = ctx.createDynamicsCompressor();
   limiter.threshold.value = -6; limiter.knee.value = 4; limiter.ratio.value = 12;
@@ -62,6 +70,7 @@ export function createAudioSystem(ctx, opts = {}) {
   }
   // Sources are placed relative to the listener, so ctx.listener stays at the origin and only its orientation changes.
   S.setListener = ({ position, velocity, forward, up } = {}) => {
+    if (ctx.state !== 'running') return;
     if (position) S.listener.pos = v3(position);
     if (velocity) S.listener.vel = v3(velocity);
     if (forward) {
@@ -191,20 +200,21 @@ export function createAudioSystem(ctx, opts = {}) {
     ramp(wind.lp.frequency, interior ? 700 + 500 * n : 1200 + 3500 * n, 0.2);
   };
 
+  // D23/D25: the old reed horn (1.5 kHz saw through a clipper) was the squeal. Now a soft, low two-tone hum that pulses.
   const horn = (() => {
-    const o1 = ctx.createOscillator(), o2 = ctx.createOscillator();
-    o1.type = 'sawtooth'; o2.type = 'square'; o1.frequency.value = 1580; o2.frequency.value = 1592;
-    const bp = filt('bandpass', 1700, 2.5), shp = ctx.createWaveShaper(), out = g(0);
-    shp.curve = softClipCurve(2.5);
-    const m2 = g(0.35); o2.connect(m2); m2.connect(bp); o1.connect(bp);
-    chain(bp, shp, out, S.buses.sfx);
-    o1.start(); o2.start();
+    const o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), lfo = ctx.createOscillator();
+    o1.type = 'triangle'; o2.type = 'sine'; o1.frequency.value = 440; o2.frequency.value = 554;
+    const lp = filt('lowpass', 900, 0.5), out = g(0), pulse = g(0.5), depth = g(0.5);
+    lfo.type = 'sine'; lfo.frequency.value = 3;
+    lfo.connect(depth); depth.connect(pulse.gain);
+    const m2 = g(0.4); o2.connect(m2); m2.connect(lp); o1.connect(lp);
+    chain(lp, pulse, out, S.buses.sfx);
+    o1.start(); o2.start(); lfo.start();
     return { o1, o2, out };
   })();
   S.setStallHorn = (intensity) => {
     const i = clamp01(intensity === true ? 1 : intensity);
-    ramp(horn.out.gain, i > 0.02 ? 0.05 + 0.13 * i : 0, 0.03);
-    ramp(horn.o1.frequency, 1450 + 300 * i, 0.08); ramp(horn.o2.frequency, 1462 + 302 * i, 0.08);
+    ramp(horn.out.gain, i > 0.05 ? 0.012 + 0.03 * i : 0, 0.12);
   };
 
   const roll = (() => {

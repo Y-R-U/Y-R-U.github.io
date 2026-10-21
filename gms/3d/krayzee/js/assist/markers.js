@@ -55,8 +55,11 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
     }
   }
 
+  // PERF #3: read the viewport only after a resize event, never per frame
+  let vpDirty = true, blank = false;
+  addEventListener('resize', () => { vpDirty = true; });
   function resize() {
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = Math.min(1.5, window.devicePixelRatio || 1); // PERF #8: a second full-screen layer; 1.5 is plenty for tags
     W = innerWidth; H = innerHeight;
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
     cv.style.width = W + 'px'; cv.style.height = H + 'px';
@@ -225,12 +228,13 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
 
   function update() {
     if (!opt.visible) return;
-    if (W !== innerWidth || H !== innerHeight) resize();
+    if (vpDirty) { vpDirty = false; if (W !== innerWidth || H !== innerHeight) resize(); }
     const now = performance.now();
     if (now >= nextMeasure) measure(now);
+    if (!n) { if (!blank) { ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); blank = true; } return; }
+    blank = false;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
-    if (!n) return;
     camera.updateMatrixWorld();
     const m = camera.matrixWorldInverse.copy(camera.matrixWorld).invert().elements;
     const pm = camera.projectionMatrix.elements, p0 = pm[0], p5 = pm[5];

@@ -117,3 +117,18 @@ icy), `tower_trainee` (panicky junior controller). Keep the comedy affectionate 
 | ONLINE | `docs/ONLINE.md`, `server/**` (design + prototype only) | — |
 | SCORE | `js/game/**`, `tools/score-sim.mjs`, `docs/SCORE.md` | — (node) |
 | ASSIST | `js/assist/**`, `css/assist.css`, `tools/assist.html`, `docs/ASSIST.md` | 9481 |
+
+## Phase 2 lanes (2026-10-22) — FLIGHT's phase-1 ownership is now split:
+| lane | owns | CDP port |
+|---|---|---|
+| GAMEPLAY | `js/main.js`, `js/core/**`, `js/flight/hud.js`, `js/flight/controls.js`, `js/flight/cameras.js`, `js/hud/**`, `css/game.css`, `index.html`, `docs/GAMEPLAY.md` | 9491 |
+| TRAFFIC | `js/atc/**`, `js/flight/{autopilot,routes,traffic,aircraft,attract,netstate}.js`, `tools/{atc-sim,flight-sim}.mjs`, `docs/ATC.md`, `docs/FLIGHT.md` | 9501 |
+| PLAYTEST | read-only; writes `docs/review/**` | 9511 |
+| FX | `js/fx/**`, `tools/fx.html`, `docs/FX.md` | 9521 |
+| STORY | `js/story/**`, `data/story/**`, `data/story.js`, `audio/story/**`, `tools/story/**`, `docs/STORY.md` | 9531 |
+| ART3 | `js/plane/**`, `js/world/**` (not layout.js), `tools/plane.html`, `tools/airport.html`, `docs/PLANE.md`, `docs/AIRPORT.md` | 9541 |
+| PERF | `tools/perf.mjs`, `docs/PERF.md` (read-only elsewhere) | 9551 |
+| NET | `server/**`, `js/net/**`, `tools/net/**`, `docs/ONLINE.md` | 9561 |
+| PLANES | `js/plane/types/**`, `js/plane/index.js` (type dispatch only), `data/aircraft.js`, `tools/plane.html`, `docs/PLANES.md` | 9571 |
+| PERFFIX | `js/world/**` (not layout.js), `js/plane/*.js` (not types/ — PLANES lane), `js/fx/**` | 9581 |
+| AIRPORTS-A0A1 | `js/world/layout.js` (granted), `data/airports/**`, `js/atc/**`, `js/flight/routes.js`, `js/world/**` (only de-hardcoding), `tools/{atc-sim,flight-sim}.mjs` | 9591 |

@@ -6,6 +6,7 @@ import { RANKS } from '../../data/ranks.js';
 export { createScore, basePP, audacityMult, heatMult, comboMult, partialLoss, partialRestitution, withinGearLimits, resolveMode } from './score.js';
 export { loadCareer, careerRankIndex, CAREER_KEY, EMPEROR_MIN_WINS, newerCareer } from './career.js';
 export { createCourt, courtStandings } from './court.js';
+export { finishZone, difficultyFor, DEFAULT_SPOT, FINISH, DIFFICULTIES } from './finish.js';
 
 // opts: { mode:'free'|'story'|<room type id>, protection?, difficulty?, rankIndex?, aircraft?, playerId?, name?, gender?,
 //         career? (loadCareer() instance; omit = load from localStorage; false = no career), outragePerPlayer?, rng? }
@@ -39,6 +40,7 @@ export function createGame(opts = {}) {
     reportImpact: score.reportImpact,
     update: score.update,
     bank: score.bank,
+    demand: score.demand,
     setPilotRank: score.setPilotRank,
     setRankIndex: score.setRankIndex,
     setAircraft: score.setAircraft,

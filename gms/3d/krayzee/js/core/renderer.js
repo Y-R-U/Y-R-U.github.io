@@ -4,7 +4,7 @@ export const params = new URLSearchParams(location.search);
 
 const TIERS = {
   low: { dpr: 1.25, shadows: true, shadowSize: 1024, shadowBox: 45, aa: false },
-  medium: { dpr: 1.75, shadows: true, shadowSize: 2048, shadowBox: 70, aa: true },
+  medium: { dpr: 1.5, shadows: true, shadowSize: 2048, shadowBox: 70, aa: true },
   high: { dpr: 2, shadows: true, shadowSize: 2048, shadowBox: 90, aa: true },
 };
 
@@ -22,6 +22,7 @@ export function pickQuality(setting) {
 export function createRenderer(canvas, quality, { antialias = true } = {}) {
   const tier = TIERS[quality] || TIERS.medium;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias, powerPreference: 'high-performance', stencil: false });
+  renderer.debug.checkShaderErrors = params.get('debug') === '1'; // PERF #5: getProgramInfoLog stalls every compile
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
@@ -75,25 +76,30 @@ export function showFatal(title, text) {
 // step down on sustained trouble. A tier we had to leave is never retried (no thrash); 4 s minimum between changes.
 const ORDER = ['low', 'medium', 'high'];
 export function createFpsGovernor(R, { enabled }) {
-  let acc = 0, frames = 0, worst = 0, warm = 3, since = 0, bad = 0, ceiling = 2, slow = 0;
+  let acc = 0, frames = 0, worst = 0, warm = 3, since = 0, bad = 0, ceiling = 2, slow = 0, cpu = 0, meh = 0;
   const G = { fps: 60, auto: enabled, history: [] };
   G.setAuto = (on) => { G.auto = on; warm = 2; acc = frames = 0; };
-  G.tick = (dt) => {
+  G.tick = (dt, cpuMs = 0) => {
     if (document.hidden) return;
     if (warm > 0) { warm -= dt; return; }
-    acc += dt; frames++; since += dt;
+    acc += dt; frames++; since += dt; cpu += cpuMs;
     if (dt > 1 / 40) slow++;
     if (acc < 2.5) return;
     G.fps = frames / acc;
-    const slowFrac = slow / frames;
-    acc = 0; frames = 0; slow = 0;
+    const slowFrac = slow / frames, cpuFrac = cpu / frames / (1000 / G.fps);
+    G.cpuFrac = cpuFrac;
+    acc = 0; frames = 0; slow = 0; cpu = 0;
     if (!G.auto || since < 4) return;
     const i = ORDER.indexOf(R.quality);
-    if (G.fps >= 56 && slowFrac < 0.03 && i < ceiling) {
-      bad = 0;
+    // PERF: a phone held near 50 fps by the main thread never reaches 56; if our frame CPU leaves room, the GPU has headroom.
+    const cpuRoom = G.fps >= 50 && cpuMs >= 0 && cpuFrac > 0 && cpuFrac < 0.6 && slowFrac < 0.1;
+    meh = G.fps < 52 ? meh + 1 : 0;
+    if ((G.fps >= 56 && slowFrac < 0.03 || cpuRoom) && i < ceiling) {
+      bad = 0; meh = 0;
       R.setQuality(ORDER[i + 1]); since = 0; G.history.push(`up:${R.quality}@${G.fps.toFixed(0)}`);
-    } else if (G.fps < 47 || slowFrac > 0.15) {
-      if (++bad >= 2 && i > 0) {
+    } else if (G.fps < 47 || slowFrac > 0.15 || meh >= 4) {
+      if ((++bad >= 2 || meh >= 4) && i > 0) {
+        meh = 0;
         ceiling = i - 1; R.setQuality(ORDER[i - 1]); since = 0; bad = 0; G.history.push(`down:${R.quality}@${G.fps.toFixed(0)}`);
       }
     } else bad = 0;

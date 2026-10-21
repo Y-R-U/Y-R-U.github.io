@@ -94,16 +94,26 @@ export function createRadioHud(parent, { onChoose, onOpenMenu, onClose } = {}) {
   subs.addEventListener('pointerdown', (e) => (swipeY = e.clientY));
   subs.addEventListener('pointerup', (e) => { if (swipeY != null && e.clientY - swipeY > 30) setLog(true); swipeY = null; });
 
+  let lastPill = null;
   const header = (speaker, to) => `<b>${esc(speaker)}</b>${to ? `<span class="krz-r-arrow">&rarr;</span><span class="krz-r-to">${esc(to)}</span>` : ''}`;
 
   return {
     root,
     addLog({ speaker, to, color, text, isTower, isPlayer, tier }) {
+      // PLAYTEST_1 B8: the same line twice in a row (two infractions together) shows once.
+      const key = `${speaker}|${text}`, nowMs = performance.now();
+      if (lastPill && lastPill.key === key && nowMs - lastPill.t < 6000 && lastPill.pill.isConnected) {
+        lastPill.t = nowMs;
+        const p0 = lastPill.pill;
+        p0.classList.remove('out'); p0.classList.add('on-air', 'in');
+        return { end(hold = 3.2) { p0.classList.remove('on-air'); setTimeout(() => { if (lastPill?.pill !== p0 || performance.now() - lastPill.t >= hold * 1000 - 50) { p0.classList.add('out'); setTimeout(() => p0.remove(), 500); } }, hold * 1000); } };
+      }
       const pill = el('div', `krz-r-pill${isTower ? ' is-tower' : ''}${isPlayer ? ' is-player' : ''} on-air`);
       pill.style.setProperty('--c', color || '#ffd75e');
       if (isTower) pill.dataset.tier = tier;
       pill.innerHTML = `<div class="krz-r-who">${isTower ? icon('tower', 'krz-r-tw') : '<i class="krz-r-dot"></i>'}${header(speaker, to)}</div><div class="krz-r-text">${esc(text)}</div>`;
       subs.appendChild(pill);
+      lastPill = { key, t: nowMs, pill };
       const live = subs.querySelectorAll('.krz-r-pill:not(.out)');
       if (live.length > 2) live[0].classList.add('out');
       requestAnimationFrame(() => pill.classList.add('in'));

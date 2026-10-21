@@ -11,6 +11,7 @@ export function createHUD(root) {
       <div class="krz-cell"><b data-k="alt">0</b><small data-k="altU">FT</small></div>
       <div class="krz-cell"><b data-k="hdg">000</b><small>HDG</small></div>
       <div class="krz-cell"><b data-k="vs">0</b><small data-k="vsU">FPM</small></div>
+      <div class="krz-cell" data-k2="fuel" hidden><b data-k="fuel">100</b><small>FUEL</small></div>
     </div>
     <div class="krz-ap" data-mode="AUTOPILOT">
       <span class="krz-ap-mode">AUTOPILOT</span><span class="krz-ap-phase">—</span>
@@ -22,7 +23,8 @@ export function createHUD(root) {
   const ap = el.querySelector('.krz-ap'), apMode = el.querySelector('.krz-ap-mode'), apPhase = el.querySelector('.krz-ap-phase');
   const banner = el.querySelector('.krz-banner');
   const axes = Object.fromEntries(AXL.map(([k]) => [k, el.querySelector(`[data-ax="${k}"]`)]));
-  let bannerT = 0, last = '';
+  const fuelCell = el.querySelector('[data-k2="fuel"]');
+  let bannerT = 0, last = '', lastFuel = -1, lowWarned = false;
   return {
     el,
     setVisible(v) { el.hidden = !v; },
@@ -41,11 +43,22 @@ export function createHUD(root) {
         q('vsU').textContent = metric ? 'M/S' : 'FPM';
         ap.dataset.mode = mode;
         apMode.textContent = mode;
-        apPhase.textContent = status.phase || '';
+        apPhase.textContent = status.phase && status.phase !== mode ? status.phase : '';
       }
       const stick = modes.elevator === 'manual' || modes.aileron === 'manual' ? 'manual' : modes.elevator;
       const m2 = { stick, throttle: modes.throttle, rudder: modes.rudder, brake: modes.brake, flaps: modes.flaps };
       for (const k in axes) if (axes[k].dataset.m !== m2[k]) axes[k].dataset.m = m2[k];
+      // D20: fuel as a fraction (TRAFFIC's aircraft API); hidden until the aircraft reports fuel.
+      const ff = ac.fuelFraction ?? ac.fuelFrac ?? null;
+      if (ff != null) {
+        const pct = Math.max(0, Math.round(ff * 100));
+        if (pct !== lastFuel) {
+          lastFuel = pct; fuelCell.hidden = false; q('fuel').textContent = pct + '%';
+          fuelCell.dataset.low = pct <= 15 ? '1' : '';
+          if (pct <= 15 && !lowWarned) { lowWarned = true; this.flash('LOW FUEL · LAND AND DEMAND IT TO REFUEL', 'warn', 4); }
+          if (pct > 30) lowWarned = false;
+        }
+      } else if (!fuelCell.hidden) fuelCell.hidden = true;
       if (bannerT > 0 && (bannerT -= dt) <= 0) banner.hidden = true;
     },
     flash(text, kind = 'info', secs = 2.5) {

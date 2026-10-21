@@ -2,6 +2,7 @@
 import { INFRACTIONS, BANK, CLEAN, BANTER, MULTIPLIERS as M, OUTRAGE, PROTECTION as P, DIFFICULTY } from '../../data/rules.js';
 import { AIRCRAFT } from '../../data/aircraft.js';
 import { FREE_FLIGHT, ROOM_TYPES } from '../../data/modes.js';
+import { FINISH } from './finish.js';
 
 export const PAVED = ['runway', 'taxiway', 'apron'];
 const round10 = (x) => Math.round(x / M.roundTo) * M.roundTo;
@@ -71,7 +72,7 @@ export function createScore(opts = {}) {
     comboStep: -1, comboLeft: 0, frozen: 0,
     protectionMode: mode.protection, protection: mode.protection === 'partial' ? mode.partialStart : mode.protection === 'rubber' ? 100 : 0,
     rankIndex: opts.rankIndex ?? 0, aircraft: opts.aircraft || 'c172', ppScale: 1,
-    airborne: false, landed: false, stopT: 0, impeccableDone: false, gag: 0,
+    airborne: false, landed: false, stopT: 0, gsKt: 0, impeccableDone: false, gag: 0,
     stats: { infractions: 0, bestCombo: 1, bounces: 0, crashes: 0, scandals: 0, sorties: 0, ripostes: 0 },
   };
 
@@ -244,19 +245,32 @@ export function createScore(opts = {}) {
     if (S.gag > 0) S.gag = Math.max(0, S.gag - dt);
     if (S.outrageSource !== 'events' && f?.calm && S.outrage > 0) setOutrage(S.outrage - OUTRAGE.decayPer3s / 3 * dt, 'decay');
     if (!f) return;
+    S.gsKt = f.gsKt ?? S.gsKt;
     if (f.onGround === false) { if (!S.airborne) S.impeccableDone = false; S.airborne = true; S.landed = false; S.stopT = 0; return; }
     if (f.onGround && S.airborne) { S.airborne = false; S.landed = true; }
     const stopped = (f.gsKt ?? 99) < BANK.stopSpeedKt;
     const where = f.atStand || (S.landed && PAVED.includes(f.surface));
     S.stopT = stopped && where ? S.stopT + dt : 0;
-    if (S.stopT >= BANK.stopTime) {
+    // D19: the DEMAND IT button is the main finish; this silent bank is a fallback (opts.autoBank seconds, false = off).
+    const auto = opts.autoBank === undefined ? BANK.stopTime : opts.autoBank;
+    if (auto !== false && S.stopT >= auto) {
       const refill = S.protectionMode === 'partial' && S.protection < 100 && (S.landed || f.atStand);
       if (S.pending > 0 || refill) bank(!!f.atStand);
     }
   }
 
+  // D19 "LANDED — DEMAND IT". zone = finishZone(...) result. Banks pending (even 0) and completes the flight.
+  function demand(zone = { ok: true }, { atStand = false } = {}) {
+    if (!S.landed) return { ok: false, reason: 'Land first' };
+    if (S.gsKt >= FINISH.stopKt) return { ok: false, reason: 'Come to a stop' };
+    if (!zone.ok) return { ok: false, reason: zone.reason || 'Not here' };
+    const amount = bank(atStand);
+    emit('finished', { amount, sessionBanked: S.banked, sorties: S.stats.sorties });
+    return { ok: true, amount };
+  }
+
   return {
-    handleEvent, reportImpact, update, bank,
+    handleEvent, reportImpact, update, bank, demand,
     on(t, fn) { (listeners[t] ||= []).push(fn); return () => { listeners[t] = listeners[t].filter((x) => x !== fn); }; },
     setPilotRank(id, idx) { pilotRanks.set(id, idx); },
     setRankIndex(i) { S.rankIndex = i; },
@@ -269,7 +283,7 @@ export function createScore(opts = {}) {
         pending: S.pending, banked: S.banked, outrage: Math.round(S.outrage), tier: S.tier, outrageSource: S.outrageSource,
         combo: S.comboStep >= 0 ? comboMult(S.comboStep) : 1, comboLeft: S.comboLeft, comboFrac: S.comboLeft / M.comboWindow,
         frozen: S.frozen, protectionMode: S.protectionMode, protection: S.protection, effectiveProtection: effective(),
-        rankIndex: S.rankIndex, aircraft: S.aircraft, landed: S.landed, airborne: S.airborne, gag: S.gag, stats: { ...S.stats },
+        rankIndex: S.rankIndex, aircraft: S.aircraft, landed: S.landed, finishReady: S.landed && S.gsKt < FINISH.stopKt, airborne: S.airborne, gag: S.gag, stats: { ...S.stats },
       };
     },
     serialize() { return JSON.parse(JSON.stringify({ ...S, pilotRanks: [...pilotRanks] })); },

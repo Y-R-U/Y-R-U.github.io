@@ -2,6 +2,8 @@ import { clamp, moveTo } from './vmath.js';
 import { OVERRIDE } from './traffic.js';
 
 const NOTCHES = [0, 1 / 3, 2 / 3, 1];
+const EXPO = 0.45;
+const expo = (x) => Math.sign(x) * (EXPO * Math.abs(x) ** 3 + (1 - EXPO) * Math.abs(x));
 // D9: invertPitch false = stick/ArrowDown/S DOWN → nose UP. D10: stickRight false = stick on the LEFT.
 // (UI migrates old saves; see docs/UI.md.)
 export function flightPrefs(s = {}) {
@@ -50,7 +52,11 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
   };
 
   // ---- stick ----
-  const R = () => Math.max(46, Math.min(70, base.offsetWidth * 0.42 || 60));
+  // PLAYTEST_1 #5: ~54 px full throw was twitchy. Travel scales with the screen: ~94 px on a phone, 110 on desktop.
+  // PERF #3: viewport cached on resize; reading innerWidth after paint's writes forced a layout every frame
+  let VW = innerWidth, VH = innerHeight;
+  addEventListener('resize', () => { VW = innerWidth; VH = innerHeight; });
+  const R = () => Math.max(80, Math.min(110, Math.min(VW, VH) * 0.24));
   zone.addEventListener('pointerdown', (e) => {
     if (st.stick != null) return;
     e.preventDefault();
@@ -166,6 +172,20 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
     return out;
   }
 
+  // Bank soft limit (~60°, Easy/Medium) unless the stick is held hard over for a second; plus roll-rate damping.
+  const BANK_LIM = 60 * Math.PI / 180, BANK_SOFT = 12 * Math.PI / 180;
+  function rollAssist(ail, ac, dt) {
+    if (!ac || ac.onGround) return ail;
+    st.hardT = Math.abs(ail) > 0.9 ? (st.hardT || 0) + dt : 0;
+    const rr = -(ac.w?.z || 0);
+    let a = ail - 0.22 * clamp(rr / 1.4, -1, 1) * (1 - Math.abs(ail) * 0.6);
+    const hard = getSettings?.().difficulty === 'hard';
+    if (!hard && st.hardT < 1) {
+      const s = Math.sign(ail) || 1, b = (ac.bank || 0) * s;
+      if (b > BANK_LIM - BANK_SOFT) a = a * clamp((BANK_LIM - b) / BANK_SOFT, 0, 1) - s * clamp((b - BANK_LIM) / BANK_SOFT, 0, 0.6);
+    }
+    return a;
+  }
   let safeT = 0;
   addEventListener('resize', () => { safeT = 3; });
   const api = {
@@ -177,7 +197,11 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
       const k = st.keys;
       const m = { aileron: null, elevator: null, rudder: null, throttle: null, flaps: null, brake: null };
       // touch stick
-      if (st.stick != null && st.stickLive) { m.aileron = st.stickX; m.elevator = st.stickY * inv; }
+      if (st.stick != null && st.stickLive) {
+        m.aileron = expo(st.stickX); m.elevator = expo(st.stickY) * inv;
+        // on the ground the same thumb steers the nosewheel (unless a rudder button is held)
+        if (ac.onGround) m.rudder = clamp(st.stickX * 1.2, -1, 1);
+      }
       // keyboard axes (ramped)
       const ka = (k.has('ArrowRight') || k.has('KeyD') ? 1 : 0) - (k.has('ArrowLeft') || k.has('KeyA') ? 1 : 0);
       const ke = ((k.has('ArrowDown') || k.has('KeyS') ? 1 : 0) - (k.has('ArrowUp') || k.has('KeyW') ? 1 : 0)) * inv;
@@ -210,31 +234,35 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
       // test injection wins
       if (st.inject && performance.now() < st.injectUntil) for (const a in st.inject) m[a] = st.inject[a];
       else st.inject = null;
+      if (m.aileron != null && !st.inject) m.aileron = rollAssist(m.aileron, ac, dt);
       for (const a of ['aileron', 'elevator', 'rudder']) if (m[a] != null) m[a] = clamp(m[a], -1, 1);
       return m;
     },
     paint(ac, modes, view, multiView = true) {
-      const t = ac.ctl.throttle;
-      thrThumb.style.bottom = `calc(${t * 100}% - ${t * 28}px)`;
-      thrFill.style.height = `${t * 100}%`;
-      thrV.textContent = Math.round(t * 100);
-      thr.dataset.mode = modes.throttle;
-      stickTag.textContent = modes.elevator === 'auto' && modes.aileron === 'auto' ? 'AUTO' : modes.elevator === 'manual' || modes.aileron === 'manual' ? 'MANUAL' : 'RESUMING';
-      base.dataset.mode = modes.elevator === 'manual' || modes.aileron === 'manual' ? 'manual' : modes.elevator === 'auto' ? 'auto' : 'wait';
-      if (st.stick == null) knob.style.transform = `translate(${ac.ctl.aileron * R() * 0.5}px, ${ac.ctl.elevator * R() * 0.5 * (flightPrefs(getSettings?.()).invert ? -1 : 1)}px)`;
-      $('.krz-flaps-v').textContent = `${Math.round(ac.ctl.flaps * 30)}°`;
-      $('[data-act="flaps"]').dataset.mode = modes.flaps;
-      $('[data-hold="brake"]').dataset.mode = modes.brake;
-      $('[data-hold="rudL"]').dataset.mode = modes.rudder;
-      $('[data-hold="rudR"]').dataset.mode = modes.rudder;
-      $('[data-act="view"] .krz-btn-l').textContent = view === 'cockpit' ? 'COCKPIT' : view === 'center' ? 'CENTRE' : 'CHASE';
-      $('[data-act="view"]').hidden = !multiView;
-      el.dataset.hand = flightPrefs(getSettings?.()).side;
+      const t = Math.round(ac.ctl.throttle * 200) / 200, P = st.paint ||= {};
+      const set = (k, v, f) => { if (P[k] !== v) { P[k] = v; f(v); } };
+      set('t', t, () => { thrThumb.style.bottom = `calc(${t * 100}% - ${t * 28}px)`; thrFill.style.height = `${t * 100}%`; thrV.textContent = Math.round(t * 100); });
+      set('tm', modes.throttle, (v) => { thr.dataset.mode = v; });
+      const man = modes.elevator === 'manual' || modes.aileron === 'manual';
+      set('stag', man ? 'MANUAL' : modes.elevator === 'auto' && modes.aileron === 'auto' ? 'AUTO' : 'RESUMING', (v) => { stickTag.textContent = v; });
+      set('bm', man ? 'manual' : modes.elevator === 'auto' ? 'auto' : 'wait', (v) => { base.dataset.mode = v; });
+      const prefs = flightPrefs(getSettings?.());
+      if (st.stick == null) {
+        const k = R() * 0.5, x = Math.round(ac.ctl.aileron * k * 2) / 2, y = Math.round(ac.ctl.elevator * k * (prefs.invert ? -1 : 1) * 2) / 2;
+        set('knob', x + ',' + y, () => { knob.style.transform = `translate(${x}px, ${y}px)`; });
+      } else P.knob = null;
+      set('fl', Math.round(ac.ctl.flaps * 30), (v) => { $('.krz-flaps-v').textContent = `${v}°`; });
+      set('fm', modes.flaps, (v) => { $('[data-act="flaps"]').dataset.mode = v; });
+      set('bk', modes.brake, (v) => { $('[data-hold="brake"]').dataset.mode = v; });
+      set('rd', modes.rudder, (v) => { $('[data-hold="rudL"]').dataset.mode = v; $('[data-hold="rudR"]').dataset.mode = v; });
+      set('vw', view, (v) => { $('[data-act="view"] .krz-btn-l').textContent = v === 'cockpit' ? 'COCKPIT' : v === 'center' ? 'CENTRE' : 'CHASE'; });
+      set('mv', multiView, (v) => { $('[data-act="view"]').hidden = !v; });
+      set('hand', prefs.side, (v) => { el.dataset.hand = v; });
       if ((safeT -= 1) <= 0) { safeT = 20; api.publishSafeZones(); }
     },
     // RADIO's layout vars (docs/RADIO.md), measured from the real control rects so side swaps stay correct.
     publishSafeZones() {
-      const r = api.rects(), W = innerWidth, H = innerHeight, rs = document.documentElement.style;
+      const r = api.rects(), W = VW, H = VH, rs = document.documentElement.style;
       const hud = document.querySelector('#krz-hud')?.getBoundingClientRect();
       const vis = !el.hidden && r.stick && r.stick.width;
       if (hud && hud.height) rs.setProperty('--krz-hud-top', Math.round(hud.bottom) + 'px');
@@ -251,6 +279,12 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
       rs.setProperty('--krz-ctl-right', Math.round(rw) + 'px');
       rs.setProperty('--krz-ctl-right-h', Math.round(rh) + 'px');
       rs.setProperty('--krz-tr-w', '78px');
+      // D15: RADIO's button sits just above BRAKE (whichever side the cluster is on).
+      if (r.brake?.width) {
+        rs.setProperty('--krz-brake-cx', Math.round(r.brake.left + r.brake.width / 2) + 'px');
+        rs.setProperty('--krz-brake-b', Math.round(H - r.brake.top) + 'px');
+      }
+      document.documentElement.dataset.krzHand = flightPrefs(getSettings?.()).side;
     },
     inject(c, ms = 1000) { st.inject = c; st.injectUntil = performance.now() + ms; },
     release() { st.inject = null; st.flapsManual = null; st.kThr = null; },
@@ -258,7 +292,7 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
     look: st.look,
     rects() {
       const q = (s) => el.querySelector(s)?.getBoundingClientRect();
-      return { stick: q('.krz-stick-zone'), thr: q('.krz-thr'), pad: q('.krz-pad'), topL: q('.krz-top-l'), topR: q('.krz-top-r') };
+      return { stick: q('.krz-stick-zone'), thr: q('.krz-thr'), pad: q('.krz-pad'), brake: q('[data-hold="brake"]'), topL: q('.krz-top-l'), topR: q('.krz-top-r') };
     },
   };
   return api;

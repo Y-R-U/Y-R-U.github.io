@@ -48,6 +48,34 @@ eq(G.basePP('near_miss', {}, true), 300, 'near miss ×1.5 under Realistic');
 eq(G.basePP('apron_landing', {}), 600, 'valet parking 600');
 ok(G.basePP('runway_incursion', {}) == null, 'ATC extras with pp 0 do not score');
 
+section('D19 LANDED — DEMAND IT (finish zones, demand(), autoBank fallback)');
+{
+  const Z = G.finishZone;
+  ok(Z('easy', { x: 0, z: 200, surface: 'grass' }).ok && !Z('easy', { x: 0, z: 700, surface: 'grass' }).ok, 'easy: grass within 300 m of a runway ok, 700 m out not');
+  ok(Z('medium', { x: 300, z: 0, surface: 'runway' }).ok && Z('medium', { x: -80, z: -200, surface: 'apron' }).ok && !Z('medium', { x: 0, z: 60, surface: 'grass' }).ok, 'medium: runway or terminal apron only');
+  ok(Z('medium', { x: 0, z: 60, surface: 'grass' }).reason === 'Stop on a runway or the terminal apron', 'medium reason line');
+  ok(!Z('hard', { x: 300, z: 0, surface: 'runway' }).ok && Z('hard', { x: G.DEFAULT_SPOT.x, z: G.DEFAULT_SPOT.z, surface: 'apron' }).ok, 'hard: runway refused, designated spot ok');
+  ok(Z('hard', { x: 300, z: 0, surface: 'runway' }).reason === 'Taxi to the terminal', 'hard reason line');
+  ok(G.difficultyFor({ protection: 'realistic' }) === 'hard', 'protection realistic → hard');
+  const g = game({ autoBank: false }); g.handleEvent(inf('low_pass', { outrage: 0 }));
+  eq(g.demand().ok, false, 'demand before landing refused');
+  landAndStop(g, 'runway');
+  eq(g.state().banked, 0, 'autoBank:false never banks silently');
+  ok(g.state().finishReady, 'finishReady once landed and stopped');
+  ok(g.demand({ ok: false, reason: 'Taxi to the terminal' }).reason === 'Taxi to the terminal', 'outside the zone: refused with the reason');
+  let fin = null; g.on('finished', (e) => (fin = e));
+  const r = g.demand({ ok: true });
+  ok(r.ok && r.amount === 250 && g.state().banked === 250 && fin?.amount === 250, 'demand inside the zone banks + emits finished');
+  ok(!g.state().finishReady, 'finish consumed until the next landing');
+  const h = game({ autoBank: 15 }); h.handleEvent(inf('low_pass', { outrage: 0 }));
+  landAndStop(h, 'runway'); eq(h.state().banked, 0, 'Free Flight fallback: not after 2.5 s');
+  for (let i = 0; i < 130; i++) h.update(0.1, { onGround: true, gsKt: 0, surface: 'runway' });
+  eq(h.state().banked, 250, 'Free Flight fallback: banks after a 15 s stop');
+  const m = game({ autoBank: false }); m.handleEvent(inf('low_pass', { outrage: 0 }));
+  m.update(0.1, { onGround: false, gsKt: 60 }); m.update(0.1, { onGround: true, gsKt: 30, surface: 'runway' });
+  ok(m.demand().reason === 'Come to a stop', 'rolling fast: come to a stop');
+}
+
 section('multipliers');
 {
   const g = game(); const got = [];
@@ -377,11 +405,14 @@ function falsify() {
     { name: 'D2 gate removed (Emperor on points alone)', file: 'js/game/career.js', from: 'if (i >= EMPEROR && onlineWins < EMPEROR_MIN_WINS) i = KING;', to: '' },
     { name: 'D4 broken (Emperor ignores career flag)', file: 'js/game/court.js', from: "sorted[0].emperorEarned ? EMPEROR : KING", to: 'true ? KING : EMPEROR' },
     { name: 'partial loss clamp dropped', file: 'js/game/score.js', from: 'return clamp(kt * P.partial.lossPerKt, P.partial.lossMin, P.partial.lossMax);', to: 'return kt * P.partial.lossPerKt;' },
+    { name: 'D19 zone ignored (demand anywhere)', file: 'js/game/score.js', from: "if (!zone.ok) return { ok: false, reason: zone.reason || 'Not here' };", to: '' },
+    { name: 'D19 hard accepts runways', file: 'js/game/finish.js', from: 'const ok = atSpot || (onApron(x, z) && nearStand(x, z));', to: 'const ok = true;' },
   ];
   let allCaught = true;
   for (const b of breaks) {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'krz-falsify-'));
     for (const d of ['js/game', 'data']) fs.cpSync(path.join(ROOT, d), path.join(tmp, d), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'js/world'), { recursive: true }); fs.copyFileSync(path.join(ROOT, 'js/world/layout.js'), path.join(tmp, 'js/world/layout.js'));
     fs.writeFileSync(path.join(tmp, 'package.json'), '{"type":"module"}');
     const f = path.join(tmp, b.file); const src = fs.readFileSync(f, 'utf8');
     if (!src.includes(b.from)) { console.log(`BREAK NOT APPLIED: ${b.name}`); allCaught = false; continue; }
