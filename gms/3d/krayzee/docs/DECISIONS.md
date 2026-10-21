@@ -16,3 +16,18 @@
 - D13 (2026-10-21) "LAND" assist button: asks the autopilot to land on the ground ahead of you — it picks the best touchdown spot roughly in front (runway/taxiway if one is ahead, otherwise a field), flies a short approach, flares and stops. It's up to the player to get near the target/runway first. Any control input cancels it (normal override rules).
 - D14 (2026-10-22) Tower callsign is "C-Tower <n>" (spoken "See Tower One"), one number per airport — the first airport is C-Tower 1. "Krayzee Tower" sounded like a description of the chaos, not a callsign. Subtitles/HUD show "C-Tower 1". Pilots keep just saying "Tower".
 - (2026-10-22) Aaron reviewed all 18 voices: all sound good, including the ones flagged weak.
+- D15 (2026-10-22) HUD: settings/pause popup must sit ABOVE the tower badge and radio button (they showed on top). Radio button sits just above the BRAKE button. Radio choice chips and the radio chatter/subtitles are more transparent.
+- D16 (2026-10-22) Story intro: a short skippable intro introducing the Kingdom of Krayzee and its flight-obsessed royalty.
+- D17 (2026-10-22) Guided first mission: walks the player through a full first flight (override/let go, radio, find the target/markers, LAND assist, land and stop to bank points).
+- D18 (2026-10-22) Time warp in missions/free flight: 1× / 2× / 5×, never online. Manager refinement: warp only while the autopilot is flying; any stick input, a radio response window, or an imminent event (final approach, conflict) drops it to 1× automatically.
+- D19 (2026-10-22) "LANDED — DEMAND IT" finish button. Once the plane has landed and is (nearly) stopped, a button appears; pressing it banks points and completes the flight/mission. Where it's allowed depends on difficulty (story difficulty / room protection setting):
+  - Easy: stopped anywhere near a runway (≈300 m), grass included.
+  - Medium: stopped on a runway, or on the apron in front of the terminal.
+  - Hard: stopped in front of the terminal (apron/stand area) or at the designated spot; a designated-spot indicator (marker + ground ring) shows where.
+  Outside the allowed area the button shows greyed with a one-line reason ("Taxi to the terminal"). Replaces silent auto-banking as the main finish; auto-bank after a long stop stays as a fallback only in Free Flight.
+- D20 (2026-10-22) Fuel: simple fuel burn (gauges + low-fuel warning, no fuel management chores). Pressing LANDED — DEMAND IT (D19) auto-refuels to full along with banking.
+- D21 (2026-10-22) "DEMAND TAKEOFF" button, available any time on the ground: the autopilot taxis straight to the nearest usable runway entry and goes, ignoring the queue and clearances. It's a royal privilege, so ATC treats it as queue_jump / unauthorised takeoff (scores PP, raises outrage) unless you happened to be cleared anyway.
+- D22 (2026-10-22) Next flight starts where you stopped (continuity; DEMAND TAKEOFF makes it quick). A "Skip to runway" option during taxi instantly places the plane at the runway start (lined up, as if you'd taxied). Story missions may define their own start position.
+- D23 (2026-10-22) Remove/replace the high-pitched squeal Aaron hears (identify it: stall reed-horn, radio "stepped on" squeal, flaps whine?). No piercing high-frequency sounds; a stall warning, if kept, is short, soft and only near a real stall.
+- D24 (2026-10-22) Newspaper headlines never cover the screen in flight. In flight: a small newspaper icon/counter ("+1 headline — this will hit the papers"). After landing (DEMAND IT / mission complete) show the collected headlines as a reel, with Skip and Skip all.
+- D25 (2026-10-22) Stall horn OFF by default; Settings toggle 'Stall warning' to turn it on (and quiet when on).

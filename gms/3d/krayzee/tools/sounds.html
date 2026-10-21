@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krayzee Sounds</title>
+<style>
+  :root { --bg:#0f1530; --card:#1a2246; --ink:#f3ecd8; --dim:#a9b0cf; --gold:#e8c060; --bad:#e0505a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.4 system-ui, sans-serif; padding:16px; }
+  h1 { font:italic 600 28px Georgia, serif; color:var(--gold); margin:4px 0 4px; }
+  p { color:var(--dim); margin:0 0 14px; }
+  .grid { display:grid; gap:10px; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); }
+  .s { background:var(--card); border-radius:12px; padding:12px; display:flex; gap:10px; align-items:center; }
+  .s.bad { outline:2px solid var(--bad); }
+  .n { color:var(--gold); font-weight:700; min-width:26px; }
+  .t { flex:1; }
+  .t small { display:block; color:var(--dim); font-size:13px; }
+  button { font:600 15px system-ui; border:0; border-radius:10px; padding:10px 14px; background:var(--gold); color:#221a05; }
+  button.flag { background:#2b3566; color:var(--ink); padding:10px; }
+  .s.bad button.flag { background:var(--bad); }
+  .bar { position:sticky; top:0; background:var(--bg); padding:8px 0 12px; display:flex; gap:10px; flex-wrap:wrap; z-index:2; }
+  #out { width:100%; margin-top:8px; background:#0a0f22; color:var(--ink); border:1px solid #2b3566; border-radius:8px; padding:8px; font:13px monospace; }
+</style>
+</head>
+<body>
+<h1>Krayzee sounds</h1>
+<p>Tap ▶ to hear each sound (about 3 seconds). Tap ✕ on any you don't like, then Copy and paste the list back to Claude.</p>
+<div class="bar"><button id="stop">■ Stop all</button><button id="copy" class="flag">Copy flagged list</button></div>
+<div class="grid" id="grid"></div>
+<textarea id="out" rows="2" readonly placeholder="Flagged sounds appear here"></textarea>
+<script type="module">
+import * as A from '../js/audio/index.js';
+
+let stopFns = [];
+const later = (ms, fn) => { const t = setTimeout(fn, ms); stopFns.push(() => clearTimeout(t)); };
+function stopAll() { stopFns.forEach(f => f()); stopFns = []; A.setWind(0); A.setStallHorn(0); A.setRolling(0, 'runway'); A.setFlapsMotor(false); A.stopRadio(); }
+
+function engine(throttle, interior) {
+  A.setListener({ position: [0, 0, 0], velocity: [0, 0, 0], forward: [0, 0, -1], up: [0, 1, 0] });
+  const v = A.createEngineVoice();
+  v.setInterior(interior);
+  v.setRPM(A.rpmFromThrottle(throttle), throttle);
+  const pos = interior ? [0, 0, -2] : [8, 2, -15];
+  const tick = setInterval(() => v.update(null, null, pos, [0, 0, 0]), 50);
+  stopFns.push(() => { clearInterval(tick); v.dispose(); });
+  later(3000, () => { clearInterval(tick); v.dispose(); });
+}
+const hold = (on, off, ms = 3000) => { on(); later(ms, off); };
+
+const SOUNDS = [
+  ['Engine idle (cockpit)', 'piston engine, inside', () => engine(0, true)],
+  ['Engine full power (cockpit)', 'piston engine, inside', () => engine(1, true)],
+  ['Engine full power (outside)', 'chase view', () => engine(1, false)],
+  ['Wind at 60 kt', 'airflow noise', () => hold(() => A.setWind(60, { interior: true }), () => A.setWind(0))],
+  ['Wind at 120 kt', 'airflow noise, fast', () => hold(() => A.setWind(120, { interior: false }), () => A.setWind(0))],
+  ['Stall warning horn', 'the suspected squeal', () => hold(() => A.setStallHorn(1), () => A.setStallHorn(0))],
+  ['Rolling on runway', 'wheels on tarmac', () => hold(() => A.setRolling(20, 'runway', { interior: true }), () => A.setRolling(0, 'runway'))],
+  ['Rolling on grass', 'wheels on grass', () => hold(() => A.setRolling(15, 'grass', { interior: true }), () => A.setRolling(0, 'grass'))],
+  ['Flaps motor', 'electric flap whine', () => hold(() => A.setFlapsMotor(true), () => A.setFlapsMotor(false), 2000)],
+  ['Touchdown (soft)', 'tyres touching', () => A.playTouchdown(0.3)],
+  ['Touchdown (hard)', 'tyre screech', () => A.playTouchdown(1)],
+  ['Gear thump', 'heavy landing thud', () => A.playGearThump()],
+  ['Crash', 'realistic mode', () => A.playCrash(1)],
+  ['Rubber BOING', 'impossiRubber bounce', () => A.playBoing(1)],
+  ['Radio click on', 'squelch', () => A.playSquelch('on')],
+  ['Radio click off', 'squelch', () => A.playSquelch('off')],
+  ['Radio line', 'a voice through the radio filter', () => A.playRadio('../audio/voices/toff/sample.mp3', { speaker: 'pilot', voiceId: 'toff' })],
+  ['Radio "stepped on"', 'one transmission cutting off another', () => {
+    A.playRadio('../audio/voices/bubba/sample.mp3', { speaker: 'pilot', voiceId: 'bubba', priority: 1 });
+    later(700, () => A.playRadio('../audio/voices/tower_f/sample.mp3', { speaker: 'tower', voiceId: 'tower_f', priority: 3 }));
+  }],
+  ['Button click', 'menus', () => A.playUI('click')],
+  ['Button confirm', 'menus', () => A.playUI('confirm')],
+  ['Button back', 'menus', () => A.playUI('back')],
+  ['Toggle', 'menus', () => A.playUI('toggle')],
+  ['Error', 'menus', () => A.playUI('error')],
+];
+
+const bad = new Set();
+const grid = document.getElementById('grid');
+const out = document.getElementById('out');
+SOUNDS.forEach(([name, desc, play], i) => {
+  const el = document.createElement('div');
+  el.className = 's';
+  el.innerHTML = `<span class="n">${i + 1}</span><span class="t">${name}<small>${desc}</small></span><button>▶</button><button class="flag" title="Sounds bad">✕</button>`;
+  const [pb, fb] = el.querySelectorAll('button');
+  pb.onclick = () => { A.initAudio(); A.unlock(); stopAll(); A.onUnlock(() => play()); };
+  fb.onclick = () => {
+    bad.has(i) ? bad.delete(i) : bad.add(i);
+    el.classList.toggle('bad', bad.has(i));
+    out.value = [...bad].sort((a, b) => a - b).map(j => `${j + 1}. ${SOUNDS[j][0]}`).join('\n');
+  };
+  grid.append(el);
+});
+document.getElementById('stop').onclick = stopAll;
+document.getElementById('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(out.value || '(none flagged)'); } catch { out.select(); }
+};
+A.setVolumes({ sfx: 1, voice: 1, music: 0.6, master: 1 });
+</script>
+</body>
+</html>
