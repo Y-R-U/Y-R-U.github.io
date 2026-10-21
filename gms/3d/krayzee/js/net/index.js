@@ -11,7 +11,7 @@ const STATE_MS = 1000 / 15;
 // Profile (ui.getProfile()) → what the server needs. Favourites: profile.favourites (up to 3) else the saved voice.
 export function helloFromProfile(p = {}) {
   const r = typeof p.rank === 'number' ? RANKS[Math.max(0, Math.min(RANKS.length - 1, p.rank))] : RANKS.find((x) => x.id === p.rank) || RANKS[0];
-  const favs = (Array.isArray(p.favourites) && p.favourites.length ? p.favourites : [p.voice]).filter(Boolean).slice(0, 3);
+  const favs = [...new Set([p.voice, ...(Array.isArray(p.favourites) ? p.favourites : [])].filter(Boolean))].slice(0, 3);
   return { name: p.name || 'Pilot', title: p.title || p.display || (p.gender === 'f' ? r.f : r.m), rank: r.id, g: p.gender === 'f' ? 'f' : 'm',
     emp: r.id === 'emperor', voices: favs };
 }

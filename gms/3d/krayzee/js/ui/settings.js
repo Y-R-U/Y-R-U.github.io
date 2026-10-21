@@ -24,6 +24,10 @@ export function createSettings(root, { onChange, onTitle, onResume, onQuit, onCl
       <div class="kz-row"><span>Invert pitch<small data-say="invertPitch"></small></span><button class="kz-switch" role="switch" data-k="invertPitch" aria-label="Invert pitch"></button></div>
       <div class="kz-row"><span>Stick on right<small data-say="stickRight"></small></span><button class="kz-switch" role="switch" data-k="stickRight" aria-label="Stick on right"></button></div>
       <div class="kz-row"><span>Units</span>${seg('units', [['aviation', 'kt · ft'], ['metric', 'km/h · m']])}</div>
+      <div class="kz-row stack"><span>Free Flight difficulty<small data-say="difficulty"></small></span>${seg('difficulty', [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard']]).replace('kz-seg"', 'kz-seg wide"')}</div>
+      <div class="kz-row"><span>Opportunity hints<small>Prompts suggesting the next rule to break</small></span><button class="kz-switch" role="switch" data-k="hints" aria-label="Opportunity hints"></button></div>
+      <div class="kz-row"><span>Traffic markers<small>Tags and edge arrows for other aircraft</small></span><button class="kz-switch" role="switch" data-k="trafficMarkers" aria-label="Traffic markers"></button></div>
+      <div class="kz-row stack"><span>AI mischief<small data-say="aiMischief"></small></span>${seg('aiMischief', [['off', 'Off'], ['low', 'Low'], ['high', 'High']]).replace('kz-seg"', 'kz-seg wide"')}</div>
     </div>
     <div class="kz-sec kz-views"><h3>Views</h3>
       ${VIEW_OPTS.map(([v, t, d]) => `<div class="kz-row"><span>${t}<small>${d}</small></span><button class="kz-switch" role="switch" data-view="${v}" aria-label="${t} view"></button></div>`).join('')}
@@ -37,6 +41,7 @@ export function createSettings(root, { onChange, onTitle, onResume, onQuit, onCl
       <div class="kz-row"><span>Effects</span>${range('sfx')}</div>
       <div class="kz-row"><span>Radio voices</span>${range('voice')}</div>
       <div class="kz-row"><span>Music</span>${range('music')}</div>
+      <div class="kz-row"><span>Stall warning<small>A soft hum just before a real stall</small></span><button class="kz-switch" role="switch" data-k="stallHorn" aria-label="Stall warning"></button></div>
     </div>
     <div class="kz-sec"><h3>Account</h3>
       <div class="kz-acct-row"><p>Sign in to keep your pilot and settings on every device.</p><button class="kz-btn ghost" data-act="account">Account</button></div>
@@ -89,7 +94,9 @@ export function createSettings(root, { onChange, onTitle, onResume, onQuit, onCl
       b.disabled = on && s.views.length === 1;
     });
     pop.body.querySelectorAll('.kz-seg[data-k="view"] button').forEach((b) => { b.hidden = !s.views.includes(b.dataset.v); });
-    pop.body.querySelector('[data-say="invertPitch"]').textContent = s.invertPitch ? 'On: stick down = nose down' : 'Off: stick down = nose up';
+    pop.body.querySelector('[data-say="invertPitch"]').textContent = s.invertPitch ? 'On: drag the stick up (away from you) to climb' : 'Off: drag the stick down (towards you) to climb, like a real yoke';
+    pop.body.querySelector('[data-say="difficulty"]').textContent = { easy: 'impossiRubber: bounce off anything. Finish near any runway', medium: 'Rubber wears thin. Finish on a runway or the terminal apron', hard: 'Real metal. Finish at the terminal' }[s.difficulty] || '';
+    pop.body.querySelector('[data-say="aiMischief"]').textContent = { off: 'AI pilots fly by the book', low: 'Now and then an AI pilot speeds or buzzes the runway', high: 'The AI are nearly as badly behaved as you' }[s.aiMischief] || '';
     pop.body.querySelector('[data-say="stickRight"]').textContent = s.stickRight ? 'Stick on the right, buttons on the left' : 'Stick on the left, buttons on the right';
     pop.body.querySelectorAll('input[type=range]').forEach((r) => {
       const v = Math.round((s[r.dataset.k] ?? 1) * 100);

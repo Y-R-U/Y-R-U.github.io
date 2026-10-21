@@ -3,7 +3,7 @@ import { createPopup } from './popup.js';
 import { titleFor } from './ranks.js';
 import { career } from './career.js';
 import { VOICES, sampleUrl, loadRoster } from './voices.js';
-import { loadSettings, loadProfile, saveProfile, liveryOf, cleanText, checkName, checkCompany, checkReg, suggestReg, LIMITS } from './store.js';
+import { loadSettings, loadProfile, saveProfile, liveryOf, cleanText, checkName, checkCompany, checkReg, suggestReg, LIMITS, MAX_FAVOURITES } from './store.js';
 
 export const PRESETS = [
   { name: 'Royal Crimson', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017' },
@@ -20,6 +20,8 @@ export const PRESETS = [
 
 const SILLY = ['Dirk', 'Bunty', 'Rupert', 'Hattie', 'Monty', 'Pips', 'Fenella', 'Basil', 'Clemmie', 'Archie', 'Tilly', 'Bertie', 'Wilhelmina', 'Gussie', 'Dotty'];
 
+const names = {};
+const voiceName = (id) => names[id] || VOICES.find((v) => v.id === id)?.name || id;
 const hex = (c) => (/^#[0-9a-f]{6}$/i.test(c) ? c.toLowerCase() : null);
 
 export function createProfile(root, { onSave, onClose }) {
@@ -64,8 +66,9 @@ export function createProfile(root, { onSave, onClose }) {
       </div>
     </div>
     <div class="kz-sec"><h3>Radio voice</h3>
+      <div class="kz-hint kz-fav-hint" data-hint="fav"></div>
       <div class="kz-voices" role="radiogroup" aria-label="Radio voice">${VOICES.map((v) => `<div class="kz-voice" role="radio" tabindex="0" data-v="${v.id}" aria-checked="false">
-        <b>${esc(v.name)}</b><p>${esc(v.desc)}</p><button data-sample="${v.id}" disabled>${ICON.mute}Sample soon</button></div>`).join('')}</div>
+        <b>${esc(v.name)}</b><p>${esc(v.desc)}</p><div class="kz-vact"><button data-sample="${v.id}" disabled>${ICON.mute}Sample soon</button><button class="kz-star" data-star="${v.id}" aria-pressed="false" aria-label="Favourite ${esc(v.name)}">${ICON.star}<em></em></button></div></div>`).join('')}</div>
     </div>`;
 
   const $ = (s) => pop.body.querySelector(s);
@@ -107,6 +110,15 @@ export function createProfile(root, { onSave, onClose }) {
       b.setAttribute('aria-pressed', String(p.primary === draft.primary && p.secondary === draft.secondary && p.accent === draft.accent));
     });
     pop.body.querySelectorAll('.kz-voice').forEach((c) => c.setAttribute('aria-checked', String(c.dataset.v === draft.voice)));
+    pop.body.querySelectorAll('.kz-star').forEach((b) => {
+      const n = draft.favourites.indexOf(b.dataset.star) + 1;
+      b.setAttribute('aria-pressed', String(n > 0));
+      b.querySelector('em').textContent = n || '';
+    });
+    const favHint = $('[data-hint="fav"]');
+    if (!favHint.classList.contains('bad')) favHint.textContent = draft.favourites.length
+      ? `Online favourites: ${draft.favourites.map((id) => voiceName(id)).join(' → ')}. You get the first one nobody else has.`
+      : `Star up to ${MAX_FAVOURITES} favourites, in order. Online, you get the first one nobody else has taken.`;
     const title = career().displayTitle({ context: 'menu', gender: draft.gender, rankIndex: draft.rank });
     const nm = draft.name.trim() || 'Nobody';
     const display = (draft.company.trim() || nm).slice(0, LIMITS.display);
@@ -161,8 +173,25 @@ export function createProfile(root, { onSave, onClose }) {
   pop.body.querySelectorAll('.kz-voice').forEach((c) => {
     const pick = () => { if (draft.voice !== c.dataset.v) sound('toggle'); draft.voice = c.dataset.v; change(); };
     c.addEventListener('click', pick);
-    c.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    c.addEventListener('keydown', (e) => { if (e.target !== c) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
   });
+
+  let favTimer = 0;
+  pop.body.querySelectorAll('.kz-star').forEach((b) => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const id = b.dataset.star, favs = draft.favourites;
+    if (favs.includes(id)) { draft.favourites = favs.filter((v) => v !== id); sound('toggle'); }
+    else if (favs.length >= MAX_FAVOURITES) {
+      sound('error');
+      const h = $('[data-hint="fav"]');
+      h.textContent = `${MAX_FAVOURITES} favourites at most. Unstar one first.`;
+      h.classList.add('bad');
+      clearTimeout(favTimer);
+      favTimer = setTimeout(() => { h.classList.remove('bad'); paint(); }, 2200);
+      return;
+    } else { draft.favourites = [...favs, id]; sound('toggle'); }
+    paint();
+  }));
 
   let audio = null, playingBtn = null;
   function stopSample() {
@@ -191,6 +220,8 @@ export function createProfile(root, { onSave, onClose }) {
     const card = pop.body.querySelector(`.kz-voice[data-v="${v.id}"]`);
     if (!card) return;
     card.querySelector('b').textContent = v.name;
+    names[v.id] = v.name;
+    card.querySelector('.kz-star').setAttribute('aria-label', `Favourite ${v.name}`);
     card.querySelector('p').textContent = v.desc;
     if (v.line) card.title = `“${v.line}”`;
   }));

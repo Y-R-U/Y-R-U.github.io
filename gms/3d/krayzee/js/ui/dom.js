@@ -36,6 +36,7 @@ export function toast(root, title, text, ms = 2800) {
 export const ICON = {
   lock: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4.5" y="9" width="11" height="8" rx="2"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9"/></svg>',
   crown: '<svg viewBox="0 0 20 20"><path d="M3 15h14l1-9-4.5 3.5L10 4 6.5 9.5 2 6z" fill="currentColor"/></svg>',
+  star: '<svg viewBox="0 0 20 20"><path d="M10 2.6l2.3 4.8 5.2.7-3.8 3.6.9 5.2L10 14.4l-4.6 2.5.9-5.2-3.8-3.6 5.2-.7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>',
   close: '<svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
   play: '<svg viewBox="0 0 20 20"><path d="M7 5l8 5-8 5z" fill="currentColor"/></svg>',
   stop: '<svg viewBox="0 0 20 20"><rect x="6" y="6" width="8" height="8" rx="1" fill="currentColor"/></svg>',

@@ -1,14 +1,17 @@
 import { titleFor } from './ranks.js';
 import { career } from './career.js';
+import { VOICES } from './voices.js';
 
 export const PROFILE_KEY = 'krayzee.profile';
 export const SETTINGS_KEY = 'krayzee.settings';
 
-export const DEFAULT_PROFILE = { name: 'Dirk', gender: 'm', company: 'Dirk Air', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017', voice: 'toff', registration: 'K-DIRK', rank: 0 };
+export const DEFAULT_PROFILE = { name: 'Dirk', gender: 'm', company: 'Dirk Air', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017', voice: 'toff', registration: 'K-DIRK', rank: 0, favourites: [] };
+export const MAX_FAVOURITES = 3;
+export const MISCHIEF = ['off', 'low', 'high'];
 export const QUALITIES = ['auto', 'low', 'medium', 'high'];
 export const VIEWS = ['chase', 'center', 'cockpit'];
 const SETTINGS_V = 3;
-export const DEFAULT_SETTINGS = { view: 'chase', views: VIEWS, quality: 'auto', sfx: 1, voice: 1, music: 0.6, invertPitch: false, stickRight: false, units: 'aviation' };
+export const DEFAULT_SETTINGS = { view: 'chase', views: VIEWS, quality: 'auto', sfx: 1, voice: 1, music: 0.6, invertPitch: false, stickRight: false, units: 'aviation', difficulty: 'easy', hints: true, trafficMarkers: true, stallHorn: false, aiMischief: 'low' };
 
 export const LIMITS = { name: 12, company: 14, display: 14 };
 
@@ -18,8 +21,14 @@ const lite = () => { try { return new URLSearchParams(location.search).get('lite
 
 export function hasProfile() { return !!read(PROFILE_KEY)?.name; }
 
+export function cleanFavourites(list) {
+  const ids = VOICES.map((v) => v.id);
+  return (Array.isArray(list) ? list : []).filter((v, i, a) => ids.includes(v) && a.indexOf(v) === i).slice(0, MAX_FAVOURITES);
+}
+
 export function loadProfile() {
   const p = { ...DEFAULT_PROFILE, ...(read(PROFILE_KEY) || {}) };
+  p.favourites = cleanFavourites(p.favourites);
   const c = career();
   p.rank = c.rankIndex;
   p.title = c.displayTitle({ context: 'menu', gender: p.gender, rankIndex: p.rank });
@@ -31,7 +40,7 @@ export function loadProfile() {
 
 export function saveProfile(p) {
   const { name, gender, company, primary, secondary, accent, voice, registration } = p;
-  write(PROFILE_KEY, { name, gender, company, primary, secondary, accent, voice, registration });
+  write(PROFILE_KEY, { name, gender, company, primary, secondary, accent, voice, registration, favourites: cleanFavourites(p.favourites) });
   return loadProfile();
 }
 
@@ -46,6 +55,11 @@ function storedSettings() {
   s.views = VIEWS.filter((v) => Array.isArray(s.views) && s.views.includes(v));
   if (!s.views.length) s.views = VIEWS.slice();
   if (!s.views.includes(s.view)) s.view = s.views[0];
+  if (!['easy', 'medium', 'hard'].includes(s.difficulty)) s.difficulty = 'easy';
+  s.hints = s.hints !== false;
+  s.trafficMarkers = s.trafficMarkers !== false;
+  s.stallHorn = s.stallHorn === true;
+  if (!MISCHIEF.includes(s.aiMischief)) s.aiMischief = 'low';
   s.invertPitch = !!s.invertPitch;
   s.stickRight = !!s.stickRight;
   s.v = SETTINGS_V;

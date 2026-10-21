@@ -267,6 +267,15 @@ html.kz-acct-off #br8t-account { opacity: 0; visibility: hidden; pointer-events:
 .kz-voice button svg { width: 16px; height: 16px; }
 .kz-voice button:disabled { color: var(--kz-faint) !important; border-color: var(--kz-line2); cursor: default; }
 .kz-voice button.playing { background: var(--kz-gold); color: #2a1a02 !important; }
+.kz-vact { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.kz-voice .kz-star { position: relative; padding: 0; width: 40px; min-width: 40px; justify-content: center; color: var(--kz-faint) !important; }
+.kz-voice .kz-star svg { width: 19px; height: 19px; fill: none; }
+.kz-voice .kz-star[aria-pressed="true"] { color: var(--kz-gold) !important; border-color: var(--kz-gold); }
+.kz-voice .kz-star[aria-pressed="true"] svg { fill: currentColor; }
+.kz-star em { position: absolute; top: -6px; right: -6px; min-width: 16px; height: 16px; border-radius: 8px; background: var(--kz-gold); color: #2a1a02;
+  font: 700 10px/16px var(--kz-sans); font-style: normal; letter-spacing: 0; text-align: center; }
+.kz-star em:empty { display: none; }
+.kz-fav-hint { margin: -2px 0 8px; }
 
 /* ------------------------------------------------------------------- toast */
 .kz-toast { position: absolute; left: 50%; bottom: calc(22px + var(--kz-sb)); transform: translate(-50%, 20px); max-width: min(440px, calc(100vw - 32px)); width: max-content;

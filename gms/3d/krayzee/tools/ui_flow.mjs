@@ -137,9 +137,9 @@ async function run(view) {
   await shot('quality');
 
   // 3b. D9/D10 switches.
-  ok((await text('[data-say="invertPitch"]')) === 'Off: stick down = nose up', 'invert label states default', await text('[data-say="invertPitch"]'));
+  ok((await text('[data-say="invertPitch"]')) === 'Off: drag the stick down (towards you) to climb, like a real yoke', 'invert label states default', await text('[data-say="invertPitch"]'));
   await tap('.kz-switch[data-k="invertPitch"]');
-  ok((await ev('__ui.getSettings()')).invertPitch === true && (await text('[data-say="invertPitch"]')) === 'On: stick down = nose down', 'invert pitch on');
+  ok((await ev('__ui.getSettings()')).invertPitch === true && (await text('[data-say="invertPitch"]')) === 'On: drag the stick up (away from you) to climb', 'invert pitch on');
   await tap('.kz-switch[data-k="invertPitch"]');
   await tap('.kz-switch[data-k="stickRight"]');
   s = await store('krayzee.settings');
@@ -229,6 +229,80 @@ async function run(view) {
   await tap('#pause');
   await tap('.kz-settings .kz-foot .kz-btn.danger');
   ok((await ev('__ui.getUIState()')).state === 'menu' && await ev(`__uiLog.some((l) => l[0] === 'quit')`), 'Quit → menu');
+
+  // 12. Round 3 settings keys: defaults, switches, mischief, repair.
+  await go('state=loading&reset&nocloud=1', 300);
+  await go('state=settings&seed&nocloud=1');
+  s = await ev('__ui.getSettings()');
+  ok(s.hints === true && s.trafficMarkers === true && s.stallHorn === false && s.aiMischief === 'low' && s.difficulty === 'easy', 'r3 defaults: hints on, markers on, stall off, mischief low, easy', JSON.stringify(s));
+  ok((await ev(`[...document.querySelectorAll('.kz-settings .kz-row > span')].map((n) => n.firstChild.textContent.trim()).join('|')`)).match(/Opportunity hints.*Traffic markers.*AI mischief.*Stall warning/), 'r3 settings rows present');
+  ok(await ev(`document.querySelector('.kz-switch[data-k="stallHorn"]').getAttribute('aria-checked') === 'false' && document.querySelector('.kz-seg[data-k="aiMischief"] [data-v="low"]').getAttribute('aria-pressed') === 'true'`), 'stall off + Low pressed in the UI');
+  await tap('.kz-switch[data-k="stallHorn"]');
+  ok((await store('krayzee.settings')).stallHorn === true && await ev(`__uiLog.filter((l) => l[0] === 'settings').pop()[1].stallHorn === true`), 'Stall warning on saves + onSettings');
+  await tap('.kz-seg[data-k="aiMischief"] [data-v="high"]');
+  ok((await store('krayzee.settings')).aiMischief === 'high' && (await text('[data-say="aiMischief"]'))?.includes('badly behaved'), 'AI mischief High saves + label');
+  await tap('.kz-seg[data-k="aiMischief"] [data-v="off"]');
+  ok(await ev(`__uiLog.filter((l) => l[0] === 'settings').pop()[1].aiMischief === 'off'`), 'onSettings gets mischief off');
+  await tap('.kz-switch[data-k="hints"]');
+  await tap('.kz-switch[data-k="trafficMarkers"]');
+  await tap('.kz-seg[data-k="difficulty"] [data-v="hard"]');
+  s = await store('krayzee.settings');
+  ok(s.hints === false && s.trafficMarkers === false && s.difficulty === 'hard', 'hints/markers off, Hard saved', JSON.stringify(s));
+  await noOverflow('settings r3');
+  await shot('settings-r3');
+  await ev(`localStorage.setItem('krayzee.settings', JSON.stringify({ ...JSON.parse(localStorage.getItem('krayzee.settings')), aiMischief: 'chaos', stallHorn: 'yes' }))`);
+  s = await ev('__ui.getSettings()');
+  ok(s.aiMischief === 'low' && s.stallHorn === false, 'bad mischief/stall values repaired', `${s.aiMischief}/${s.stallHorn}`);
+
+  // 13. Favourite voices (profile.favourites, ≤ 3, ordered).
+  await go('state=menu&seed&nocloud=1');
+  await tap('.kz-menu [data-a="hangar"]');
+  // roster names (data/voices.json) re-flow the cards when they land; tap after that
+  for (let i = 0; i < 20 && (await text('.kz-voice[data-v="tex"] b')) === 'Tex'; i++) await sleep(150);
+  await sleep(400);
+  for (const v of ['bubba', 'nan', 'comte']) await tap(`.kz-star[data-star="${v}"]`);
+  ok((await ev(`[...document.querySelectorAll('.kz-star[aria-pressed="true"]')].map((b) => b.dataset.star + b.textContent).join()`)) === 'bubba1,comte3,nan2', 'three stars numbered in order');
+  ok(await ev(`document.querySelector('.kz-voice[data-v="toff"]').getAttribute('aria-checked') === 'true'`), 'starring does not change the voice');
+  await tap('.kz-star[data-star="tex"]');
+  ok(await ev(`document.querySelector('.kz-star[data-star="tex"]').getAttribute('aria-pressed') === 'false' && document.querySelector('[data-hint="fav"]').classList.contains('bad')`), 'fourth star refused with a hint');
+  ok(await ev(`(__sounds || []).at(-1) === 'error'`), 'fourth star plays error');
+  await shot('favourites');
+  await noOverflow('hangar favourites');
+  await tap('.kz-star[data-star="nan"]');
+  await tap('.kz-star[data-star="tex"]');
+  await tap('.kz-creator [data-act="save"]');
+  ok((await store('krayzee.profile')).favourites?.join() === 'bubba,comte,tex', 'favourites saved in order', JSON.stringify((await store('krayzee.profile')).favourites));
+  ok((await ev('__ui.getProfile().favourites.join()')) === 'bubba,comte,tex' && await ev(`__uiLog.filter((l) => l[0] === 'profile').pop()[1].favourites.join() === 'bubba,comte,tex'`), 'getProfile + onProfile carry favourites');
+  ok((await ev(`import('../js/net/index.js').then((m) => m.helloFromProfile(__ui.getProfile()).voices.join())`)) === 'bubba,comte,tex', 'net hello sends the favourites');
+  await tap('.kz-menu [data-a="hangar"]');
+  await tap('.kz-star[data-star="bubba"]');
+  await tap('.kz-creator [data-act="cancel"]');
+  ok((await ev('__ui.getProfile().favourites.join()')) === 'bubba,comte,tex', 'Cancel discards star changes');
+  await ev(`localStorage.setItem('krayzee.profile', JSON.stringify({ ...JSON.parse(localStorage.getItem('krayzee.profile')), favourites: ['nan', 'bogus', 'nan', 'laird', 'tex', 'toff'] }))`);
+  ok((await ev('__ui.getProfile().favourites.join()')) === 'nan,laird,tex', 'stored favourites cleaned (valid, unique, ≤ 3)');
+
+  // 14. Online button: SOON until GAMEPLAY says the endpoint is configured.
+  ok(await ev(`!!document.querySelector('.kz-menu [data-a="online"] .kz-soon')`), 'Online shows SOON by default');
+  await tap('.kz-menu [data-a="online"]');
+  ok((await text('.kz-toast b')) === 'Online rooms' && !(await ev(`__uiLog.some((l) => l[0] === 'online')`)), 'SOON Online → toast, no hook');
+  await go('state=menu&seed&online=1&nocloud=1');
+  ok(await ev(`!document.querySelector('.kz-menu [data-a="online"] .kz-soon') && !document.querySelector('.kz-menu [data-a="online"]').classList.contains('soon')`), 'setOnlineAvailable(true) drops SOON');
+  await shot('menu-online');
+  await tap('.kz-menu [data-a="online"]');
+  ok(await ev(`(window.__uiLog || []).filter((l) => l[0] === 'online').length === 1`), 'Online fires onOnline');
+  let u = await ev('__ui.getUIState()');
+  ok(u.lobby && u.state === 'menu' && await ev(`document.documentElement.classList.contains('kz-acct-off')`), 'lobby open: account hidden', JSON.stringify(u));
+  await ev('__ui.showMenu()');
+  ok(!(await ev('__ui.getUIState()')).lobby && !(await ev(`document.documentElement.classList.contains('kz-acct-off')`)), 'showMenu() after lobby → account back');
+  await ev('__ui.setOnlineAvailable(false)');
+  ok(await ev(`!!document.querySelector('.kz-menu [data-a="online"] .kz-soon')`), 'setOnlineAvailable(false) restores SOON');
+  await go('state=loading&reset&nocloud=1', 300);
+  await go('state=menu&online=1&nocloud=1', 200);
+  await tap('.kz-menu [data-a="online"]');
+  ok(await ev(`document.querySelector('.kz-creator').classList.contains('on') && !(window.__uiLog || []).some((l) => l[0] === 'online')`), 'no profile: Online opens the creator first');
+  await tap('.kz-creator [data-act="random"]');
+  await tap('.kz-creator [data-act="save"]');
+  ok(await ev(`(window.__uiLog || []).filter((l) => l[0] === 'online').length === 1 && __ui.getUIState().lobby`), 'creator saved → onOnline fires');
 
   // 11. Cloud sync watches krayzee.career (desktop only; needs the account layer).
   if (!view.touch) {

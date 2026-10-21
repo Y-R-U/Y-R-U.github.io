@@ -9,7 +9,7 @@ import { hasProfile, loadProfile, loadSettings, liveryOf } from './store.js';
 
 let hooks = {};
 let root = null, loading = null, menu = null, settings = null, profile = null;
-let state = 'loading', pendingPlay = null, quitting = false;
+let state = 'loading', pendingPlay = null, quitting = false, onlineOn = false, lobbyOpen = false;
 
 const SOON = {
   story: ['Story mode', 'The Royal Aero Club is still drafting the scandal. Coming soon.'],
@@ -18,7 +18,7 @@ const SOON = {
 
 function syncAccount() {
   const popup = settings?.pop.isOpen ? 'settings' : profile?.pop.isOpen ? 'profile' : null;
-  setAccountVisible(popup === 'settings' || (state !== 'game' && popup !== 'profile'));
+  setAccountVisible(popup === 'settings' || (state !== 'game' && !lobbyOpen && popup !== 'profile'));
 }
 
 function ensureRoot() {
@@ -42,7 +42,8 @@ function ensureRoot() {
       hooks.onProfile?.(getProfile());
       const go = pendingPlay;
       pendingPlay = null;
-      if (go) play(go);
+      if (go === 'online') goOnline();
+      else if (go) play(go);
     },
     onClose: (saved) => { if (!saved) pendingPlay = null; syncAccount(); },
   });
@@ -53,7 +54,7 @@ function ensureRoot() {
     else if (profile.pop.isOpen && profile.pop.closable) profile.pop.close();
     else if (state === 'game') openSettings();
   });
-  mountKrayzeeAccount(() => state === 'menu' && !settings.pop.isOpen && !profile.pop.isOpen).then(syncAccount);
+  mountKrayzeeAccount(() => state === 'menu' && !lobbyOpen && !settings.pop.isOpen && !profile.pop.isOpen).then(syncAccount);
   syncAccount();
 }
 
@@ -63,8 +64,18 @@ function play(mode) {
   hooks.onPlay?.(mode);
 }
 
+// Online stays on the menu: GAMEPLAY's lobby overlay (z 40) covers it and calls showMenu() when it closes.
+function goOnline() {
+  if (!onlineOn || !hooks.onOnline) { showToast(root, ...SOON.online); return; }
+  if (!hasProfile()) { pendingPlay = 'online'; openProfile({ first: true }); return; }
+  lobbyOpen = true;
+  syncAccount();
+  hooks.onOnline();
+}
+
 function menuAction(a) {
   if (a === 'free') play('free');
+  else if (a === 'online') goOnline();
   else if (SOON[a]) showToast(root, ...SOON[a]);
   else if (a === 'profile' || a === 'hangar') openProfile();
   else if (a === 'settings') openSettings();
@@ -77,6 +88,12 @@ export function initUI(h) {
   ensureRoot();
 }
 
+export function setOnlineAvailable(on) {
+  onlineOn = !!on;
+  ensureRoot();
+  menu.setSoon('online', !onlineOn);
+}
+
 export function setLoading(fraction, label) {
   ensureRoot();
   loading?.set(fraction, label);
@@ -86,6 +103,7 @@ export function showMenu() {
   ensureRoot();
   const fromLoading = state === 'loading';
   state = 'menu';
+  lobbyOpen = false;
   if (loading) { loading.set(1); loading.hide(); loading = null; }
   if (settings.pop.isOpen) settings.pop.close();
   menu.setProfile(loadProfile());
@@ -97,6 +115,7 @@ export function showMenu() {
 export function enterGameplay() {
   ensureRoot();
   state = 'game';
+  lobbyOpen = false;
   if (loading) { loading.hide(); loading = null; }
   menu.show(false);
   if (settings.pop.isOpen) { quitting = true; settings.pop.close(); quitting = false; }
@@ -121,7 +140,7 @@ export function toast(title, text, ms) { ensureRoot(); showToast(root, title, te
 export function getProfile() {
   const p = loadProfile();
   return { name: p.name, title: p.title, gender: p.gender, company: p.company, primary: p.primary, secondary: p.secondary, accent: p.accent,
-    voice: p.voice, registration: p.registration, rank: p.rank, display: p.display, flightTitle: p.flightTitle, rankTitle: p.rankTitle };
+    voice: p.voice, favourites: p.favourites.slice(), registration: p.registration, rank: p.rank, display: p.display, flightTitle: p.flightTitle, rankTitle: p.rankTitle };
 }
 
 export function setCareer(c) { useCareer(c); refreshProfile(); }
@@ -133,5 +152,5 @@ export function getLivery() { return liveryOf(loadProfile()); }
 export function getSettings() { return loadSettings(); }
 
 export function getUIState() {
-  return { state, settings: !!settings?.pop.isOpen, profile: !!profile?.pop.isOpen, firstRun: !hasProfile() };
+  return { state, lobby: lobbyOpen, online: onlineOn, settings: !!settings?.pop.isOpen, profile: !!profile?.pop.isOpen, firstRun: !hasProfile() };
 }

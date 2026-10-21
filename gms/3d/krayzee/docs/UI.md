@@ -21,17 +21,22 @@ Everything is injected from JS: `initUI()` adds `<link id="kz-ui-css" href="css/
 ## API (contract + additive extras)
 ```js
 initUI({ onPlay(mode), onSettings(settings), onProfile(profile),      // contract
-         onResume(), onQuit(), onSound(kind), career })               // extras, all optional
+         onResume(), onQuit(), onSound(kind), career, onOnline() })   // extras, all optional
 setLoading(fraction, label)   showMenu()   enterGameplay()   openSettings()
-getProfile()  // { name, title, gender, company, primary, secondary, accent, voice, registration, rank, display, flightTitle, rankTitle }
+getProfile()  // { name, title, gender, company, primary, secondary, accent, voice, favourites, registration, rank, display, flightTitle, rankTitle }
 getSettings() // { view, views, quality:'auto'|'low'|'medium'|'high', sfx, voice, music (0..1), invertPitch, stickRight, hand:'left'|'right', units:'aviation'|'metric', v }
 getLivery()   // { name, company, primary, secondary, accent, registration } — straight into plane.setLivery
-openProfile({ first })   toast(title, text, ms)   getUIState()  // { state, settings, profile, firstRun }
+openProfile({ first })   toast(title, text, ms)   getUIState()  // { state, lobby, online, settings, profile, firstRun }
+setOnlineAvailable(bool)      // Online menu button live (true) or SOON (false, the default)
 setCareer(career)   refreshProfile()   getRankProgress()  // { rankIndex, rankTitle, title, pp, next:{title, ppNeeded, frac, wins, winsNeeded, winsMax, emperor, text} | null }
 ```
 - `initUI` shows the loading screen immediately. `showMenu()` crossfades it away (0.9 s) and, on first run (no saved
   profile), opens the creator ~1 s later. Free Flight with no profile also opens the creator first, then plays.
-- Free Flight calls `enterGameplay()` itself and then `hooks.onPlay('free')`. Story/Online show a "coming soon" toast.
+- Free Flight calls `enterGameplay()` itself and then `hooks.onPlay('free')`. Story shows a "coming soon" toast (GAMEPLAY
+  takes the button over at runtime).
+- Online: SOON + toast until `setOnlineAvailable(true)`. Then a tap calls `hooks.onOnline()` (no profile → the creator
+  first, then `onOnline` on save). UI stays in `state: 'menu'` with `lobby: true` and fades the account badge (the lobby
+  is a full-screen z 40 overlay); `showMenu()` (lobby closed) or `enterGameplay()` (room started) clears it.
 - `openSettings()` during play shows Resume + Quit to menu. Closing (Resume, ✕, backdrop, Escape) fires `onResume`;
   Quit fires `onQuit` after `showMenu()`. Escape in play opens settings.
 - `onSettings(s)` fires on every change, including while a volume slider is dragged (persisted on release).
@@ -55,13 +60,19 @@ setCareer(career)   refreshProfile()   getRankProgress()  // { rankIndex, rankTi
 | `hand` | `'left'\|'right'` | `'left'` | derived from `stickRight` (= the stick's side) for round-1 code; never stored |
 | `views` | ordered subset of `['chase','center','cockpit']`, ≥ 1 | all three | D11: views the in-game button cycles (always in that order). One view = fixed view, hide the button |
 | `view` | one of `views` | `'chase'` | current view; always a member of `views` (else `views[0]`) |
+| `difficulty` | `'easy'\|'medium'\|'hard'` | `'easy'` | Free Flight difficulty (D19) = protection Rubber / Partial / Realistic (`core/wiring.js`). GAMEPLAY's chips save it too |
+| `hints` | bool | `true` | "Opportunity hints": `js/hud/prompts.js` rule-break prompts |
+| `trafficMarkers` | bool | `true` | D12 tags/edge arrows for other aircraft |
+| `aiMischief` | `'off'\|'low'\|'high'` | `'low'` | AI rule-breaking; same ids as ATC `MISCHIEF` (`linkTraffic(..., { mischief })`, `link.setMischief(v)`) |
+| `stallHorn` | bool | `false` | D23/D25 "Stall warning" (Sound section) |
 | `sfx`, `voice`, `music`, `units` | as before | | |
 
 Saved settings carry `v`. Migration happens on read and is written only when the player next changes a setting
 (no boot write, so a first visit never stamps a save over the cloud): `v < 2` → `quality = 'auto'` (round 1's
 'high'/'low' was a default nobody chose); `v < 3` → `invertPitch = false`, `stickRight = false` (D9/D10 changed
 their meaning). Saves are `v: 3`. `views` is repaired on every read: missing/invalid/empty → all three, re-ordered to
-chase → center → cockpit, and `view` falls back to `views[0]` if it is not enabled.
+chase → center → cockpit, and `view` falls back to `views[0]` if it is not enabled. `difficulty`, `aiMischief` fall back
+to their defaults if unknown; `hints`/`trafficMarkers` are on unless stored `false`; `stallHorn` is on only if stored `true`.
 
 Settings → Views: three switches (Chase / Centre cockpit / Pilot's seat); the last one on is disabled so it can't be
 turned off; hint "Only one view on = fixed view, the view button is hidden."; "Current view" offers only enabled views.
@@ -87,13 +98,21 @@ loading + menu visible; creator hidden (it would sit on the close button); setti
 Settings also has an "Account" button that opens the panel. Neither profile nor settings is written until the player
 changes something, so a first visit never stamps a blank save over a cloud one.
 
+## Favourite voices
+Each voice card has a star button (beside Sample). Up to 3, in the order starred; the badge shows 1–3 and the hint above
+the grid reads "Online favourites: Bubba → Le Comte → Tex". A fourth star is refused with an error sound and a red hint.
+Stars are part of the Hangar draft (Save keeps, Cancel drops). Stored as `krayzee.profile.favourites` (only valid ids,
+unique, ≤ 3, cleaned on read); `getProfile().favourites` is a copy. Starring does not change the chosen voice. The net
+layer's `helloFromProfile` sends `favourites` as `voices` (falls back to `[voice]` when none are starred); the server
+gives the first free one.
+
 ## Voice samples
 Cards probe `audio/voices/<id>/sample.mp3` with a HEAD request once per session; missing → disabled "Sample soon"
 (those 404s in the console are expected until VOICE writes them). Playback respects the Radio voices volume.
 
 ## Testing
 `tools/ui.html` = stand-in attract scene + the real UI. Params: `state=loading|menu|creator|settings|game|pause`,
-`seed` (write a Dirk profile), `reset` (clear profile/settings/career), `career=<pp>[,<wins>[,story]]` (seed a career), `first` (creator in first-run mode), `shot=1`.
+`seed` (write a Dirk profile), `reset` (clear profile/settings/career), `career=<pp>[,<wins>[,story]]` (seed a career), `first` (creator in first-run mode), `online=1` (Online live, hook logs), `shot=1`.
 Hooks log to `window.__uiLog`, sounds to `window.__sounds`; the module is `window.__ui`.
 Verified with raw CDP on port 9441 (`--use-angle=metal`, cache disabled) at 390×844 touch, 844×390 touch, 1280×800 mouse:
 23 real-input checks each (typing, validation, 12-char cap, auto registration, gender title, preset, voice pick, save →
@@ -111,3 +130,14 @@ wins (pips 7/10, still King at 300k PP with 4 wins, Emperor at 10); story-comple
 play/pause/resume/quit regression; desktop with cloud on: a career write moves `br8t_savedAt_krayzee`. No overflow, no
 page errors. Result 2026-10-21: 55/55, 55/55, 56/56. Falsified: dropping `krayzee.career` from the sync keys and
 removing the quality migration each turn the suite red. Screenshots `docs/shots/ui/flow-*.png`.
+
+### Round 3 (2026-10-22): favourites, Online hook, settings keys
+Added to `ui_flow.mjs`: r3 defaults (hints/markers on, stall off, mischief low, easy), rows present, Stall warning and
+AI mischief save + `onSettings`, hints/markers/Hard saved, bad values repaired; favourites (3 numbered stars, voice
+unchanged, 4th refused with error, unstar/restar order, saved order, `getProfile`/`onProfile`, `helloFromProfile` from
+`js/net/index.js` sends them, Cancel discards, stored junk cleaned); Online SOON by default → toast and no hook,
+`setOnlineAvailable(true)` drops SOON → `onOnline`, lobby flag hides the account, `showMenu()` restores it,
+`setOnlineAvailable(false)` brings SOON back, no profile → creator then `onOnline`. Result: 83/83, 83/83, 84/84.
+Falsified: dropping favourites from `saveProfile`, the stallHorn normalisation and the SOON toggle turn 6 checks red per
+viewport. `tools/ui.html?online=1` makes Online live (hook logs `online`). Gotcha: the roster (`data/voices.json`) re-flows
+the voice cards when it lands, so tests wait for it before tapping stars.

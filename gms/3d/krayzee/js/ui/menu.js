@@ -37,5 +37,13 @@ export function createMenu(root, act) {
       nx.title = g.next?.emperor ? `${g.next.title} needs ${g.next.winsMax} online wins (${g.next.wins}/${g.next.winsMax})` : '';
     },
     show(on) { node.classList.toggle('on', on); },
+    setSoon(a, soon) {
+      const b = node.querySelector(`[data-a="${a}"]`);
+      if (!b) return;
+      b.classList.toggle('soon', soon);
+      const tag = b.querySelector('.kz-soon');
+      if (soon && !tag) b.append(el('<span class="kz-soon">SOON</span>'));
+      else if (!soon) tag?.remove();
+    },
   };
 }

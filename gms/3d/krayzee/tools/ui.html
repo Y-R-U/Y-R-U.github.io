@@ -56,10 +56,12 @@ UI.initUI({
   onProfile: (p) => log('profile', p),
   onResume: () => log('resume'),
   onSound: (k) => (window.__sounds ||= []).push(k),
+  onOnline: () => log('online'),
   onQuit: () => { log('quit'); document.getElementById('hud').style.display = 'none'; },
 });
 document.getElementById('pause').addEventListener('click', () => UI.openSettings());
 window.__ui = UI;
+if (Q.has('online')) UI.setOnlineAvailable(Q.get('online') !== '0');
 
 const want = Q.get('state') || 'auto';
 if (want === 'loading') { UI.setLoading(0.42, 'Fuelling the aeroplanes'); }
