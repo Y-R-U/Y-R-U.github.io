@@ -22,7 +22,7 @@ export function randomLivery() {
 }
 
 // AI traffic that keeps the airport busy (also used as background traffic during play), plus the menu's cinematic camera.
-export function createAttract({ scene, traffic, env, createPlane, quality, max = 4, onRig }) {
+export function createAttract({ scene, traffic, env, createPlane, quality, max = 4, onRig, onSpawn, onDespawn, activeEnd = () => '09' }) {
   const ai = [];
   const pending = new Set();
   let respawnT = 0;
@@ -34,42 +34,44 @@ export function createAttract({ scene, traffic, env, createPlane, quality, max =
     onRig?.(rig);
     const ac = new Aircraft({ dims: rig.dims });
     const ap = new Autopilot(ac);
-    const e9 = runwayEnd('09');
+    const E = activeEnd(), e9 = runwayEnd(E);
     let route;
     if (kind === 'parked' || kind === 'depart') {
       const sid = opts.stand || traffic.claimStand(ac);
       if (!sid) { rig.dispose(); return null; }
       const s = standInfo(sid);
       ac.place({ x: s.pos[0], z: s.pos[1], heading: s.heading }, env);
-      route = departureRoute('09');
+      route = departureRoute(E);
       route = { ...route, legs: [{ kind: 'park', seconds: opts.wait ?? 4 + Math.random() * 20, label: 'BOARDING' }, ...route.legs] };
       traffic.standOwner.set(sid, ac);
     } else if (kind === 'downwind') {
-      const legs = circuitLegs('09');
+      const legs = circuitLegs(E);
       const d = legs[2].to, c = legs[1].to;
-      ac.place({ x: (c[0] + d[0]) / 2, z: (c[2] + d[2]) / 2, alt: 300, heading: 270, speed: 85 * KT, throttle: 0.6 }, env);
-      route = arrivalRoute('09', { stand: 'auto', parkSeconds: 15 + Math.random() * 20, then: departureRoute('09') });
+      ac.place({ x: (c[0] + d[0]) / 2, z: (c[2] + d[2]) / 2, alt: 300, heading: (e9.hdg + 180) % 360, speed: 85 * KT, throttle: 0.6 }, env);
+      route = arrivalRoute(E, { stand: 'auto', parkSeconds: 15 + Math.random() * 20, then: departureRoute(E) });
       route = { ...route, legs: route.legs.slice(1) };
     } else if (kind === 'final') {
       const [x, z] = fromRunway(e9, -opts.dist || -2600, 0);
       ac.place({ x, z, alt: (opts.dist || 2600) * 0.07 + 10, heading: e9.hdg, speed: 68 * KT, throttle: 0.4, flaps: 1 }, env);
-      route = arrivalRoute('09', { stand: 'auto', parkSeconds: 20 + Math.random() * 20, then: departureRoute('09') });
+      route = arrivalRoute(E, { stand: 'auto', parkSeconds: 20 + Math.random() * 20, then: departureRoute(E) });
       route = { ...route, legs: route.legs.filter((l) => l.kind !== 'fly') };
     } else {
       const a = Math.random() * Math.PI * 2, r = 5000;
       const x = Math.cos(a) * r, z = Math.sin(a) * r;
       ac.place({ x, z, alt: 420, heading: (Math.atan2(-x, z) * 180 / Math.PI + 360) % 360, speed: 95 * KT, throttle: 0.6 }, env);
-      route = arrivalRoute('09', { stand: 'auto', parkSeconds: 20 + Math.random() * 30, then: departureRoute('09') });
+      route = arrivalRoute(E, { stand: 'auto', parkSeconds: 20 + Math.random() * 30, then: departureRoute(E) });
     }
     scene.add(rig.root);
     const ent = traffic.add({ aircraft: ac, ap, rig, name: rig.livery?.().registration || kind });
     ap.setRoute(route);
     ent.kind = kind;
     ai.push(ent);
+    onSpawn?.(ent);
     return ent;
   }
 
   function despawn(ent) {
+    onDespawn?.(ent);
     traffic.remove(ent);
     ent.rig.dispose();
     ai.splice(ai.indexOf(ent), 1);

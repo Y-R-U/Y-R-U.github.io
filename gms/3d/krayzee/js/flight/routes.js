@@ -38,7 +38,7 @@ export function onRunway(x, z, margin = 4) {
 let GRAPH = null;
 const KEY = (x, z) => `${Math.round(x)},${Math.round(z)}`;
 
-function segInter(a, b, c, d) {
+export function segInter(a, b, c, d) {
   const rx = b[0] - a[0], rz = b[1] - a[1], sx = d[0] - c[0], sz = d[1] - c[1];
   const den = rx * sz - rz * sx;
   if (Math.abs(den) < 1e-9) return null;
@@ -219,7 +219,7 @@ export function standInfo(id) { return taxiGraph().stands[id]; }
 //   approach { end }  park { seconds }  despawn {}
 export const GLIDE_DEG = 4;
 export const AIM_DIST = 130;
-export const FAF_DIST = 1850;
+export const FAF_DIST = 1900;
 
 export function circuitLegs(endId, { alt = PATTERN_ALT, side = circuitSide(endId), width = 1150, speed = 85 } = {}) {
   const e = runwayEnd(endId), sg = side === 'left' ? -1 : 1, L = e.len;
@@ -228,8 +228,8 @@ export function circuitLegs(endId, { alt = PATTERN_ALT, side = circuitSide(endId
     { kind: 'fly', to: p(L + 450, 0, alt * 0.6), speed: 74, flaps: 0, label: 'UPWIND' },
     { kind: 'fly', to: p(L + 750, width * 0.75, alt), speed, flaps: 0, label: 'CROSSWIND' },
     { kind: 'fly', to: p(L * 0.5, width, alt), speed, flaps: 0, label: 'DOWNWIND' },
-    { kind: 'fly', to: p(-1450, width, alt * 0.78), speed: 75, flaps: 1 / 3, label: 'DOWNWIND' },
-    { kind: 'fly', to: p(-1750, width * 0.35, alt * 0.58), speed: 72, flaps: 1 / 3, label: 'BASE' },
+    { kind: 'fly', to: p(-1500, width, alt * 0.78), speed: 75, flaps: 1 / 3, label: 'DOWNWIND', end: endId, ext: true },
+    { kind: 'fly', to: p(-1800, width * 0.35, alt * 0.55), speed: 72, flaps: 1 / 3, label: 'BASE', end: endId, ext: true },
   ];
 }
 

@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Krayzee — assist bench</title>
+<link rel="stylesheet" href="../css/game.css">
+<link rel="stylesheet" href="../css/radio.css">
+<link rel="stylesheet" href="../css/assist.css">
+<style>
+  #bar { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(var(--krz-ctl-bottom, 200px) + 70px); display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; max-width: 96vw; }
+  #bar button { background: rgba(20, 16, 40, .8); color: #fff; border: 1px solid rgba(255,255,255,.3); border-radius: 8px; padding: 5px 8px; font: 12px system-ui; }
+  #bar button.on { background: #4b1f7a; border-color: #e2ac2c; }
+  #info { position: fixed; z-index: 60; left: 8px; top: calc(var(--krz-hud-top, 90px) + 8px); font: 11px ui-monospace, monospace; color: #fff; background: rgba(0,0,0,.5); padding: 4px 6px; border-radius: 6px; white-space: pre; pointer-events: none; }
+  #map { position: fixed; inset: 0; z-index: 70; background: #10161f; display: none; touch-action: none; }
+  #map.on { display: block; }
+  #legend { position: fixed; z-index: 71; left: 8px; top: 8px; font: 12px system-ui; color: #fff; background: rgba(0,0,0,.6); padding: 6px 8px; border-radius: 8px; display: none; max-width: 92vw; }
+  #map.on + #legend { display: block; }
+  #legend button { background: #233; color: #fff; border: 1px solid #567; border-radius: 6px; padding: 3px 7px; margin: 2px; font: 12px system-ui; }
+  html.shot #bar, html.shot #info { display: none; }
+  .krz-radio { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
+  .krz-r-tower { position: absolute; top: var(--krz-tr-top, 70px); right: calc(var(--sr) + 10px); }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../../../lib/three/0.180.0/three.module.js", "three/addons/": "../../../lib/three/0.180.0/addons/" } }
+</script>
+</head>
+<body>
+<canvas id="krz-canvas"></canvas>
+<div id="krz-overlay"></div>
+<div class="krz-radio"><div class="krz-r-tower" style="width:70px;height:120px;border:2px solid #ffd75e;border-radius:14px;background:#1b2230"></div><button class="krz-r-btn"><span class="krz-r-btn-lbl">RADIO</span></button></div>
+<div id="bar"></div>
+<div id="info"></div>
+<canvas id="map"></canvas>
+<div id="legend"></div>
+<script type="module">
+import * as THREE from 'three';
+import { buildWorld } from '../js/world/airport.js';
+import * as layout from '../js/world/layout.js';
+import { createPlane } from '../js/plane/index.js';
+import { createControls } from '../js/flight/controls.js';
+import { createHUD } from '../js/flight/hud.js';
+import { createMarkers } from '../js/assist/markers.js';
+import { planLandAhead, collectTrees, createLandButton, FAIL_TEXT } from '../js/assist/landahead.js';
+
+const q = new URLSearchParams(location.search);
+if (q.has('shot')) document.documentElement.classList.add('shot');
+const settings = { stickRight: q.get('hand') === 'right', units: q.get('units') || 'aviation', views: ['chase', 'center', 'cockpit'] };
+const DEG = Math.PI / 180;
+
+const canvas = document.getElementById('krz-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.4, 24000);
+const overlay = document.getElementById('krz-overlay');
+const hud = createHUD(overlay);
+const controls = createControls({ root: overlay, getSettings: () => settings, onView: () => cycleView(), onPause: () => {}, onFullscreen: () => {} });
+const world = await buildWorld(scene, renderer, { quality: q.get('q') === 'low' ? 'low' : 'high' });
+world.trees = collectTrees(world);
+
+// ---- planes ----
+const LIVERIES = [
+  { name: 'Bubba', company: 'Bubba Air', primary: '#d62828', secondary: '#f6f1e4', accent: '#1d3557', registration: 'K-BUBA' },
+  { name: 'Duchess', company: 'Duchess', primary: '#6a2c91', secondary: '#f1d36b', accent: '#111111', registration: 'K-DUCH' },
+  { name: 'Tex', company: 'Tex Oil', primary: '#f18f01', secondary: '#222222', accent: '#ffffff', registration: 'K-TEXX' },
+  { name: 'Sheila', company: 'Sheila', primary: '#2a9d8f', secondary: '#ffffff', accent: '#e9c46a', registration: 'K-SHEL' },
+];
+const player = await createPlane({ type: 'c172', livery: { name: 'Dirk', company: 'Dirk Air', primary: '#c1121f', secondary: '#fdf0d5', accent: '#003049', registration: 'K-DIRK' }, quality: 'high', cockpit: true });
+scene.add(player.root);
+const proto = await createPlane({ type: 'c172', livery: LIVERIES[0], quality: 'low', cockpit: false });
+const others = [];
+const TITLES = ['Earl Bubba', 'Duchess Mauve', 'Viscount Tex', 'Countess Sheila', '', '', '', '', '', '', ''];
+const COLORS = ['#ff4d4d', '#c77dff', '#ffa62b', '#2ee6c9'];
+for (let i = 0; i < 11; i++) {
+  const rig = i < 4 ? await createPlane({ type: 'c172', livery: LIVERIES[i], quality: 'low', cockpit: false }) : { root: proto.root.clone() };
+  scene.add(rig.root);
+  const kind = i < 3 ? 'rival' : i === 3 ? 'player' : 'traffic';
+  others.push({ rig, i, pos: new THREE.Vector3(), marker: { id: 'p' + i, kind, label: TITLES[i] || `K-${(1000 + i * 37) % 9000}`, color: COLORS[i] || null, worldPos: [0, 0, 0] } });
+}
+const thr27 = layout.threshold(layout.RUNWAYS[0], '27');
+const target = { id: 'tgt', kind: 'target', label: 'RWY 27', worldPos: [thr27[0], 2, thr27[1]] };
+
+const markers = createMarkers({ container: overlay, camera, units: settings.units, getOrigin: () => player.root.position });
+markers.set([...others.map((o) => o.marker), target]);
+
+// ---- LAND button ----
+let landState = 'idle', lastPlan = null;
+const land = createLandButton({ container: overlay, stickRight: settings.stickRight, onPress: (state) => {
+  if (state === 'active') { land.setState('idle'); return; }
+  const p = planNow();
+  if (p.fail) land.setState('unavailable', p.hint);
+  else land.setState('active');
+} });
+
+// ---- player kinematics: straight-ish track toward 27, or whatever ?sc= says ----
+const SC = {
+  final27: { x: 3400, z: 260, alt: 260, hdg: 268 },
+  field: { x: 2600, z: 1500, alt: 220, hdg: 90 },
+  cross: { x: -450, z: 1700, alt: 220, hdg: 0 },
+};
+const sc = SC[q.get('sc')] || SC.final27;
+const P = { x: sc.x, z: sc.z, alt: sc.alt, hdg: sc.hdg, spd: 41, t: 0, moving: !q.has('freeze') };
+let view = q.get('view') || 'chase';
+function cycleView() { const v = settings.views; view = v[(v.indexOf(view) + 1) % v.length]; player.setView(view === 'chase' ? 'chase' : 'cockpit'); fitCam(); }
+function fitCam() {
+  camera.aspect = innerWidth / innerHeight;
+  if (view === 'chase') { camera.near = 0.4; camera.fov = Math.min(90, Math.max(45, 2 * Math.atan(Math.tan(78 * DEG / 2) / camera.aspect) / DEG)); }
+  else { camera.near = 0.05; camera.fov = camera.aspect >= 1 ? 66 : 80; }
+  camera.updateProjectionMatrix();
+}
+player.setView(view === 'chase' ? 'chase' : 'cockpit');
+
+function resize() { renderer.setSize(innerWidth, innerHeight, false); canvas.style.width = innerWidth + 'px'; canvas.style.height = innerHeight + 'px'; fitCam(); controls.publishSafeZones(); markers.remeasure(); }
+addEventListener('resize', resize);
+controls.setVisible(true);
+hud.setVisible(true);
+resize();
+
+const tmpQ = new THREE.Quaternion(), eul = new THREE.Euler(0, 0, 0, 'YXZ'), eyeW = new THREE.Vector3();
+function place(dt) {
+  if (P.moving) { P.t += dt; P.x += Math.sin(P.hdg * DEG) * P.spd * dt; P.z -= Math.cos(P.hdg * DEG) * P.spd * dt; }
+  player.root.position.set(P.x, P.alt, P.z);
+  eul.set(0, -P.hdg * DEG, 0); player.root.quaternion.setFromEuler(eul);
+  // others: rivals circling ahead/around, traffic in a wider ring; some behind the camera on purpose
+  for (const o of others) {
+    const ring = o.i < 4 ? 650 + o.i * 260 : 1400 + (o.i - 4) * 330;
+    const a = P.t * (o.i % 2 ? 0.05 : -0.04) + o.i * 1.7;
+    const cx = P.x + Math.sin(P.hdg * DEG) * 900, cz = P.z - Math.cos(P.hdg * DEG) * 900;
+    o.pos.set(cx + Math.cos(a) * ring, P.alt + Math.sin(a * 2 + o.i) * 60 + (o.i - 5) * 6, cz + Math.sin(a) * ring);
+    const hd = Math.atan2(-Math.sin(a), Math.cos(a)) * (o.i % 2 ? 1 : -1);
+    o.rig.root.position.copy(o.pos);
+    eul.set(0, hd + Math.PI, (o.i % 2 ? -0.35 : 0.35)); o.rig.root.quaternion.setFromEuler(eul);
+    o.marker.worldPos[0] = o.pos.x; o.marker.worldPos[1] = o.pos.y + 1.5; o.marker.worldPos[2] = o.pos.z;
+  }
+  if (view === 'chase') {
+    const bx = -Math.sin(P.hdg * DEG), bz = Math.cos(P.hdg * DEG);
+    camera.position.set(P.x + bx * 17, P.alt + 4.5, P.z + bz * 17);
+    camera.lookAt(P.x - bx * 30, P.alt + 1.2, P.z - bz * 30);
+  } else {
+    eyeW.copy(view === 'center' ? player.eyeCenter : player.eye).applyQuaternion(player.root.quaternion).add(player.root.position);
+    camera.position.copy(eyeW);
+    eul.set(-(view === 'center' ? player.eyeCenterPitch : player.eyePitch) || -0.05, -P.hdg * DEG, 0); camera.quaternion.setFromEuler(eul);
+  }
+}
+
+function planNow(debug = false) {
+  const v = [Math.sin(P.hdg * DEG) * P.spd, 0, -Math.cos(P.hdg * DEG) * P.spd];
+  lastPlan = planLandAhead({ pos: [P.x, P.alt, P.z], vel: v, heading: P.hdg, altitude: P.alt, world, layout, debug });
+  return lastPlan;
+}
+
+// ---- bar ----
+const bar = document.getElementById('bar');
+const btn = (label, fn) => { const b = document.createElement('button'); b.textContent = label; b.onclick = (e) => { e.stopPropagation(); fn(b); }; bar.append(b); return b; };
+btn('view', () => cycleView());
+btn('traffic', (b) => { b.classList.toggle('on'); markers.setOptions({ traffic: !b.classList.contains('on') }); });
+btn('units', () => { settings.units = settings.units === 'metric' ? 'aviation' : 'metric'; markers.setOptions({ units: settings.units }); });
+btn('hand', () => { settings.stickRight = !settings.stickRight; overlay.querySelector('#krz-controls').dataset.hand = settings.stickRight ? 'right' : 'left'; land.setSide(settings.stickRight); setTimeout(resize, 50); });
+btn('map', () => showMap(true));
+const info = document.getElementById('info');
+
+// ---- loop ----
+let last = performance.now(), mkMs = 0, mkN = 0, availT = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  place(dt);
+  world.update(dt, camera);
+  renderer.render(scene, camera);
+  const t0 = performance.now(); markers.update(); mkMs += performance.now() - t0; mkN++;
+  if ((availT -= dt) <= 0 && land.state !== 'active') { availT = 2; const p = planNow(); land.setState(p.fail ? 'unavailable' : 'idle', p.fail ? p.hint : ''); }
+  if (mkN >= 60) { info.textContent = `markers ${(mkMs / mkN).toFixed(3)} ms/frame · ${view}\nland: ${lastPlan?.fail || lastPlan?.label + ' ' + lastPlan?.reason} (${lastPlan?.ms?.toFixed(1)} ms)`; mkMs = 0; mkN = 0; }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// ---- top-down debug map ----
+const map = document.getElementById('map'), legend = document.getElementById('legend');
+const mctx = map.getContext('2d');
+const M = { cx: 0, cz: 0, scale: 0.1, bg: null, plans: [], single: null };
+function w2s(x, z) { return [map.width / 2 + (x - M.cx) * M.scale, map.height / 2 + (z - M.cz) * M.scale]; }
+function bakeBg() {
+  const c = document.createElement('canvas'); c.width = map.width; c.height = map.height;
+  const g = c.getContext('2d'), step = 4;
+  const col = { grass: '#2d4a2a', runway: '#666', taxiway: '#7a7340', apron: '#555b66', water: '#2b5d86', building: '#c96' };
+  for (let py = 0; py < c.height; py += step) for (let px = 0; px < c.width; px += step) {
+    const x = M.cx + (px - c.width / 2) / M.scale, z = M.cz + (py - c.height / 2) / M.scale;
+    const h = world.groundHeightAt(x, z);
+    g.fillStyle = h > 5 ? `rgb(${60 + h * 0.3},${70 + h * 0.2},50)` : col[world.surfaceAt(x, z)] || '#333';
+    g.fillRect(px, py, step, step);
+  }
+  g.fillStyle = '#e8b06a';
+  for (const b of world.colliders) { const [x0, z0] = w2s(b.min[0], b.min[2]), [x1, z1] = w2s(b.max[0], b.max[2]); g.fillRect(x0, z0, Math.max(1, x1 - x0), Math.max(1, z1 - z0)); }
+  g.fillStyle = '#163d18';
+  for (const t of world.trees) { const [x, z] = w2s(t[0], t[1]); g.fillRect(x - 1, z - 1, 2, 2); }
+  M.bg = c;
+}
+function drawPlan(p, pos, hdg) {
+  const g = mctx, [sx, sz] = w2s(pos[0], pos[1]);
+  const c = p.debug?.cone;
+  if (c) {
+    g.strokeStyle = 'rgba(255,255,255,.25)'; g.lineWidth = 1; g.beginPath();
+    for (const s of [-1, 1]) { const a = (hdg + s * c.half) * DEG; g.moveTo(...w2s(pos[0] + Math.sin(a) * c.minD, pos[1] - Math.cos(a) * c.minD)); g.lineTo(...w2s(pos[0] + Math.sin(a) * c.maxD, pos[1] - Math.cos(a) * c.maxD)); }
+    g.stroke();
+    g.beginPath(); for (let a = -c.half; a <= c.half; a += 5) { const r = (hdg + a) * DEG; g.lineTo(...w2s(pos[0] + Math.sin(r) * c.maxD, pos[1] - Math.cos(r) * c.maxD)); } g.stroke();
+  }
+  if (p.debug && M.single) {
+    for (const l of p.debug.lines) for (const r of l.runs) {
+      const ux = Math.sin(l.heading * DEG), uz = -Math.cos(l.heading * DEG);
+      g.strokeStyle = 'rgba(160,220,255,.22)'; g.lineWidth = 2; g.beginPath();
+      g.moveTo(...w2s(l.origin[0] + ux * r[0], l.origin[1] + uz * r[0])); g.lineTo(...w2s(l.origin[0] + ux * r[1], l.origin[1] + uz * r[1])); g.stroke();
+    }
+    g.font = '10px system-ui';
+    for (const r of p.debug.rejects) { const [x, z] = w2s(...r.at); g.strokeStyle = '#ff5050'; g.beginPath(); g.moveTo(x - 3, z - 3); g.lineTo(x + 3, z + 3); g.moveTo(x + 3, z - 3); g.lineTo(x - 3, z + 3); g.stroke(); g.fillStyle = '#ff9090'; g.fillText(r.why, x + 4, z - 3); }
+    for (const cd of p.debug.cands) { g.strokeStyle = 'rgba(255,230,120,.6)'; g.lineWidth = 2; g.beginPath(); g.moveTo(...w2s(...cd.start)); g.lineTo(...w2s(...cd.end)); g.stroke(); }
+  }
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(sx, sz, 4, 0, 7); g.fill();
+  g.strokeStyle = '#fff'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(sx, sz); g.lineTo(sx + Math.sin(hdg * DEG) * 16, sz - Math.cos(hdg * DEG) * 16); g.stroke();
+  if (p.fail) { g.fillStyle = '#ff6060'; g.font = 'bold 11px system-ui'; g.fillText(p.fail, sx + 6, sz + 4); return; }
+  g.strokeStyle = '#4fd8ff'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(sx, sz);
+  for (const w of p.approach) g.lineTo(...w2s(w.x, w.z));
+  g.stroke();
+  g.strokeStyle = '#5ee08f'; g.lineWidth = 5; g.beginPath(); g.moveTo(...w2s(...p.strip.start)); g.lineTo(...w2s(...p.strip.end)); g.stroke();
+  const [tx, tz] = w2s(...p.touchdown); g.fillStyle = '#ffd25e'; g.beginPath(); g.arc(tx, tz, 4, 0, 7); g.fill();
+  g.fillStyle = '#fff'; g.font = '10px system-ui'; g.fillText(`${p.label} ${p.stripLength}m${p.feasibility.orbits ? ' ⟲' + p.feasibility.orbits : ''}`, tx + 6, tz - 4);
+}
+function redraw() {
+  mctx.setTransform(1, 0, 0, 1, 0, 0);
+  mctx.drawImage(M.bg, 0, 0);
+  for (const r of M.plans) drawPlan(r.p, r.pos, r.hdg);
+}
+let rs = +q.get('seed') || 1;
+const rnd = () => ((rs = (rs * 1664525 + 1013904223) >>> 0) / 4294967296);
+function randomState() { return { pos: [(rnd() - 0.5) * 7000, (rnd() - 0.5) * 7000], hdg: rnd() * 360, alt: 40 + rnd() * 480, spd: 34 + rnd() * 25 }; }
+function runPlan(s, debug) {
+  const v = [Math.sin(s.hdg * DEG) * s.spd, 0, -Math.cos(s.hdg * DEG) * s.spd];
+  return planLandAhead({ pos: [s.pos[0], s.alt + world.groundHeightAt(s.pos[0], s.pos[1]), s.pos[1]], vel: v, heading: s.hdg, world, layout, debug });
+}
+function addRandom(n, debug) {
+  for (let i = 0; i < n; i++) { const s = randomState(); M.plans.push({ p: runPlan(s, debug), pos: s.pos, hdg: s.hdg }); }
+  redraw();
+}
+function showMap(on, n = 30) {
+  map.classList.toggle('on', on);
+  if (!on) return;
+  map.width = innerWidth; map.height = innerHeight;
+  M.scale = Math.min(map.width, map.height) / 9000;
+  bakeBg(); M.plans = []; M.single = n === 1;
+  addRandom(n, n === 1);
+  legend.innerHTML = `<b>LAND planner</b> · green strip / gold touchdown / cyan approach / red ✕ reject${n === 1 ? ' / blue = scanned clear runs, yellow = candidates' : ''}<br>`;
+  for (const [l, f] of [['×30', () => showMap(true, 30)], ['1 + debug', () => showMap(true, 1)], ['close', () => showMap(false)]]) { const b = document.createElement('button'); b.textContent = l; b.onclick = f; legend.append(b); }
+}
+// tap the map: plan from there toward the drag direction
+let down = null;
+map.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY]; });
+map.addEventListener('pointerup', (e) => {
+  if (!down) return;
+  const dx = e.clientX - down[0], dy = e.clientY - down[1];
+  const pos = [M.cx + (down[0] - map.width / 2) / M.scale, M.cz + (down[1] - map.height / 2) / M.scale];
+  const hdg = Math.hypot(dx, dy) > 8 ? (Math.atan2(dx, -dy) / DEG + 360) % 360 : 0;
+  M.single = true; M.plans = [{ p: runPlan({ pos, hdg, alt: 220, spd: 40 }, true), pos, hdg }]; redraw(); down = null;
+});
+
+// ---- test hooks ----
+function exactViolations(p) {
+  const [sx, sz] = p.strip.start, [ex, ez] = p.strip.end, L = Math.hypot(ex - sx, ez - sz), ux = (ex - sx) / L, uz = (ez - sz) / L;
+  for (let s = 0; s <= L; s += 2) for (let l = -10; l <= 10; l += 2) {
+    const x = sx + ux * s - uz * l, z = sz + uz * s + ux * l;
+    const surf = world.surfaceAt(x, z);
+    if (surf === 'water' || surf === 'building') return `${surf}@${x | 0},${z | 0}`;
+    for (const c of world.colliders) if (x >= c.min[0] - 1 && x <= c.max[0] + 1 && z >= c.min[2] - 1 && z <= c.max[2] + 1) return `${c.kind}@${x | 0},${z | 0}`;
+    for (const t of world.trees) if (Math.abs(t[0] - x) < 4 && Math.abs(t[1] - z) < 4) return `tree@${x | 0},${z | 0}`;
+  }
+  return null;
+}
+window.__bench = {
+  markers, land, world, P,
+  setView(v) { view = v; player.setView(v === 'chase' ? 'chase' : 'cockpit'); fitCam(); },
+  freeze(t) { P.moving = false; if (t != null) P.t = t; },
+  scenario(name) { Object.assign(P, SC[name]); },
+  showMap, addRandom,
+  perf(frames = 300) {
+    let t = 0;
+    for (let i = 0; i < frames; i++) { const a = performance.now(); markers.update(); t += performance.now() - a; }
+    return t / frames;
+  },
+  sweep(n = 200, seed = 5, blind = false) {
+    rs = seed;
+    const w = blind ? { ...world, colliders: [], trees: [], surfaceAt: (x, z) => { const s = world.surfaceAt(x, z); return s === 'water' || s === 'building' ? 'grass' : s; } } : world;
+    const out = { n, plans: 0, kinds: {}, violations: [], ms: 0, maxMs: 0 };
+    for (let i = 0; i < n; i++) {
+      const s = randomState(), v = [Math.sin(s.hdg * DEG) * s.spd, 0, -Math.cos(s.hdg * DEG) * s.spd];
+      const t0 = performance.now();
+      const p = planLandAhead({ pos: [s.pos[0], s.alt + world.groundHeightAt(s.pos[0], s.pos[1]), s.pos[1]], vel: v, heading: s.hdg, world: w, layout });
+      const dt = performance.now() - t0; out.ms += dt; out.maxMs = Math.max(out.maxMs, dt);
+      const k = p.fail || p.kind; out.kinds[k] = (out.kinds[k] || 0) + 1;
+      if (p.fail) continue;
+      out.plans++;
+      const bad = exactViolations(p);
+      if (bad) out.violations.push(`${p.label} from ${s.pos.map((v) => v | 0)} hdg ${s.hdg | 0}: ${bad}`);
+    }
+    out.ms /= n;
+    return out;
+  },
+  plan: (debug) => planNow(debug),
+  FAIL_TEXT,
+};
+window.__ready = true;
+</script>
+</body>
+</html>

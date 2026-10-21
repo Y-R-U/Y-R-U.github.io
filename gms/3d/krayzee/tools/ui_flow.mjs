@@ -96,6 +96,7 @@ async function run(view) {
   let s = await ev('__ui.getSettings()');
   ok(s.quality === 'auto', 'legacy high → auto', s.quality);
   ok(s.sfx === 0.5, 'other legacy settings kept');
+  ok(s.views.join() === 'chase,center,cockpit' && s.view === 'chase', 'D11 migration adds all three views', JSON.stringify(s.views));
   ok(s.invertPitch === false && s.stickRight === false && s.hand === 'left', 'D9/D10 migration: pitch not inverted, stick left', JSON.stringify(s));
   ok((await store('krayzee.settings')).v === undefined, 'migration does not write at boot');
   let p = await ev('__ui.getProfile()');
@@ -128,7 +129,7 @@ async function run(view) {
   ok(await ev(`document.querySelector('.kz-seg[data-k="quality"] [data-v="auto"]').getAttribute('aria-pressed') === 'true'`), 'Auto pressed by default');
   await tap('.kz-seg[data-k="quality"] [data-v="medium"]');
   s = await store('krayzee.settings');
-  ok(s.quality === 'medium' && s.v === 2, 'Medium saves with v2', JSON.stringify(s));
+  ok(s.quality === 'medium' && s.v === 3, 'Medium saves with v3', JSON.stringify(s));
   ok(await ev(`__uiLog.filter((l) => l[0] === 'settings').pop()[1].quality === 'medium'`), 'onSettings gets medium');
   await tap('.kz-seg[data-k="quality"] [data-v="low"]');
   await tap('.kz-seg[data-k="quality"] [data-v="auto"]');
@@ -146,6 +147,24 @@ async function run(view) {
   ok(await ev(`__uiLog.filter((l) => l[0] === 'settings').pop()[1].hand === 'right'`), 'onSettings gets hand right');
   await tap('.kz-switch[data-k="stickRight"]');
   await shot('controls');
+
+  // 3c. D11 views.
+  const vs = () => ev('__ui.getSettings()').then((x) => `${x.views.join()}|${x.view}`);
+  await tap('.kz-seg[data-k="view"] [data-v="center"]');
+  ok((await vs()) === 'chase,center,cockpit|center', 'pick Centre view', await vs());
+  await tap('.kz-switch[data-view="center"]');
+  ok((await vs()) === 'chase,cockpit|chase', 'Centre off → current falls back to views[0]', await vs());
+  ok(await ev(`document.querySelector('.kz-seg[data-k="view"] [data-v="center"]').hidden`), 'disabled view hidden from the view choice');
+  ok(await ev(`__uiLog.filter((l) => l[0] === 'settings').pop()[1].views.join() === 'chase,cockpit'`), 'onSettings gets views');
+  await tap('.kz-switch[data-view="cockpit"]');
+  ok((await vs()) === 'chase|chase' && await ev(`document.querySelector('.kz-switch[data-view="chase"]').disabled`), 'last view locked on');
+  await shot('views-one');
+  await ev(`document.querySelector('.kz-switch[data-view="chase"]').click()`);
+  ok((await vs()) === 'chase|chase', 'cannot turn off the last view');
+  await tap('.kz-switch[data-view="cockpit"]');
+  await tap('.kz-switch[data-view="center"]');
+  ok((await vs()) === 'chase,center,cockpit|chase', 'views stay in canonical order', await vs());
+  ok((await store('krayzee.settings')).views.join() === 'chase,center,cockpit', 'views saved');
   await tap('.kz-settings .kz-foot .kz-btn.primary');
   ok(!(await ev(`document.querySelector('.kz-settings').classList.contains('on')`)), 'Done closes settings');
 
@@ -154,6 +173,12 @@ async function run(view) {
   await tap('.kz-seg[data-k="quality"] [data-v="low"]');
   await go('state=menu&nocloud=1');
   ok((await ev('__ui.getSettings()')).quality === 'low', 'explicit Low survives reload');
+
+  // 4b. Bad stored views are repaired on read.
+  await ev(`localStorage.setItem('krayzee.settings', JSON.stringify({ ...JSON.parse(localStorage.getItem('krayzee.settings')), views: ['cockpit'], view: 'chase' }))`);
+  ok((await vs()) === 'cockpit|cockpit', 'view not in views → views[0]', await vs());
+  await ev(`localStorage.setItem('krayzee.settings', JSON.stringify({ ...JSON.parse(localStorage.getItem('krayzee.settings')), views: ['bogus'], view: 'cockpit' }))`);
+  ok((await vs()) === 'chase,center,cockpit|cockpit', 'empty/invalid views → all three', await vs());
 
   // 5. Lady titles.
   await ev(`localStorage.setItem('krayzee.profile', JSON.stringify({ ...JSON.parse(localStorage.getItem('krayzee.profile')), gender: 'f' }))`);

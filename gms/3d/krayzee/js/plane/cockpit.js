@@ -3,15 +3,18 @@ import { Builder, sweepRings, circle, srgb, lerp } from './geom.js';
 import { WINDOWS, PANEL, EYE } from './spec.js';
 import { fusSec, ringPoint, fusHalfWidth } from './exterior.js';
 import { createInstruments, GAUGES } from './instruments.js';
+import { createTrimTexture, uvWall, uvHead, uvCarpet, uvSeat } from './trim.js';
 
 const COL = {
-  lining: srgb('#a9a397'), liningUp: srgb('#7d7a74'), liningDark: srgb('#77726a'), carpet: srgb('#3a3c41'), head: srgb('#cdc8bd'),
-  glare: srgb('#141517'), seat: srgb('#6d5440'), seatDark: srgb('#4a3a2e'), frame: srgb('#2a2b2e'),
+  lining: [1, 1, 1], liningUp: [0.96, 0.95, 0.93], liningDark: srgb('#8d8273'), carpet: [1, 1, 1], head: srgb('#d8d0c1'),
+  glare: srgb('#141517'), seat: srgb('#a8744a'), seatDark: srgb('#7d5434'), frame: srgb('#2a2b2e'), armrest: srgb('#8a7660'),
+  pillar: srgb('#8f877b'), seal: srgb('#18191b'), console: srgb('#bfb5a5'),
   black: srgb('#0e0f11'), chrome: srgb('#c9ced3'), white: srgb('#eeeeea'), red: srgb('#c0262b'),
   bezel: srgb('#18191b'), shaft: srgb('#7f8388'), trim: srgb('#4a4945'), knob: srgb('#151617'), panel: srgb('#2b2d31'), grey: srgb('#55585e'), amber: srgb('#d38a1a'),
 };
 
 const FLOOR = 0.7, FRONT = 1.62, REAR = 4.3, HEAD = 1.94;
+export const SEAT_S = 2.55;
 const floorY = (s) => Math.max(FLOOR, fusSec(s).yb + 0.09);
 
 // gauge layout on the panel, metres (x, y, diameter)
@@ -26,7 +29,7 @@ const STATIC_GAUGES = [
 ];
 const SWITCHES = ['FUEL PUMP', 'BEACON', 'LAND', 'TAXI', 'NAV', 'STROBE', 'PITOT HT'];
 
-function pillow(B, m, w, h, d, color, n = 4.5) {
+function pillow(B, m, w, h, d, color, n = 4.5, uvMode = null) {
   const b = new Builder(), R = [], K = 12, N = 20;
   for (let k = 0; k <= K; k++) {
     const t = -1 + (2 * k) / K;
@@ -36,8 +39,9 @@ function pillow(B, m, w, h, d, color, n = 4.5) {
       return [ex * (w / 2) * f, ey * (h / 2) * f, t * d / 2];
     }));
   }
-  b.loft(R, { color });
-  B.addGeo(b.build(), m, [0, 0], color);
+  const uv = uvMode === 'wd' ? (p) => uvSeat(p[0] / w + 0.5, p[2] / d + 0.5) : uvMode === 'wh' ? (p) => uvSeat(p[0] / w + 0.5, p[1] / h + 0.5) : null;
+  b.loft(R, { color, uv });
+  B.addGeo(b.build(), m, uv ? (p, o) => o : [0, 0], color);
 }
 
 function panelCanvas(quality) {
@@ -153,11 +157,33 @@ function panelCanvas(quality) {
   return t;
 }
 
+// backlight mask: only the light labels, scales and displays of the panel art glow
+function panelGlow(src) {
+  const c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
+  const g = c.getContext('2d');
+  g.drawImage(src, 0, 0);
+  const d = g.getImageData(0, 0, c.width, c.height), a = d.data;
+  for (let i = 0; i < a.length; i += 4) {
+    const r = a[i], gg = a[i + 1], b = a[i + 2];
+    const mx = Math.max(r, gg, b), mn = Math.min(r, gg, b);
+    let k = Math.min(1, Math.max(0, (mx - 110) / 90));
+    if (mx - mn < 40 && mx > 170 && mx < 215) k *= 0.15; // beige placards are not lit
+    a[i] = r * k; a[i + 1] = gg * k; a[i + 2] = b * k;
+  }
+  g.putImageData(d, 0, 0);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 export function buildCockpit({ quality, mats }) {
   const high = quality !== 'low';
   const group = new THREE.Group();
   group.name = 'cockpit';
   const B = new Builder();
+  const trimTex = createTrimTexture(quality);
+  mats.interior.map = trimTex;
+  mats.interior.needsUpdate = true;
   const inset = 0.03;
 
   // ---- side linings: window band with exact holes, plus curved lower band ----
@@ -181,7 +207,7 @@ export function buildCockpit({ quality, mats }) {
     for (let i = 0; i < P.count; i++) {
       const s = P.getX(i), y = P.getY(i);
       const x = sg * (fusHalfWidth(s, y) - inset);
-      b.v([x, y, s], [-sg, 0, 0], [0, 0], y > 1.46 ? COL.liningUp : COL.lining);
+      b.v([x, y, s], [-sg, 0, 0], uvWall(s, y), y > 1.46 ? COL.liningUp : COL.lining);
     }
     for (let i = 0; i < geo.index.count; i += 3) {
       const a = geo.index.getX(i), c = geo.index.getX(i + 1), d = geo.index.getX(i + 2);
@@ -200,11 +226,22 @@ export function buildCockpit({ quality, mats }) {
       }
       rings.push(r);
     }
-    B.loft(rings, { closed: false, out: (p) => [-p[0], 0, 0], color: COL.liningDark });
+    B.loft(rings, { closed: false, out: (p) => [-p[0], 0, 0], color: COL.lining, uv: (p) => uvWall(p[2], p[1]) });
     // armrest + door handle + pocket
-    pillow(B, new THREE.Matrix4().setPosition(sg * (fusHalfWidth(2.45, 1.2) - inset - 0.04), 1.22, 2.42), 0.08, 0.05, 0.5, COL.liningDark, 3);
-    pillow(B, new THREE.Matrix4().setPosition(sg * (fusHalfWidth(3.5, 1.2) - inset - 0.03), 1.18, 3.5), 0.06, 0.045, 0.4, COL.liningDark, 3);
-    B.addGeo(new THREE.BoxGeometry(0.02, 0.025, 0.11), new THREE.Matrix4().setPosition(sg * (fusHalfWidth(2.8, 1.33) - inset - 0.015), 1.33, 2.8), [0, 0], COL.chrome);
+    const wx = (s, y, d) => sg * (fusHalfWidth(s, y) - inset - d);
+    pillow(B, new THREE.Matrix4().makeRotationX(0.06).setPosition(wx(2.43, 1.2, 0.045), 1.2, 2.43), 0.085, 0.055, 0.6, COL.armrest, 3);
+    pillow(B, new THREE.Matrix4().setPosition(wx(3.5, 1.17, 0.035), 1.17, 3.5), 0.065, 0.05, 0.48, COL.armrest, 3);
+    // map pocket flap, bulging out a little at the top
+    B.addGeo(new THREE.BoxGeometry(0.012, 0.21, 0.66), new THREE.Matrix4().makeRotationZ(sg * 0.07).setPosition(wx(2.32, 0.9, 0.012), 0.9, 2.32), (p) => uvWall(p[2], p[1]), COL.lining);
+    // door handle: escutcheon + lever
+    B.addGeo(new THREE.CylinderGeometry(0.03, 0.03, 0.008, 16), new THREE.Matrix4().makeRotationZ(Math.PI / 2).scale(new THREE.Vector3(1, 0.6, 1)).setPosition(wx(2.13, 1.31, 0.004), 1.31, 2.13), [0, 0], COL.chrome);
+    B.addGeo(new THREE.BoxGeometry(0.02, 0.016, 0.11), new THREE.Matrix4().makeRotationX(-0.25).setPosition(wx(2.17, 1.3, 0.016), 1.3, 2.17), [0, 0], COL.black);
+    // window latch on the sill + the little opening window's hinge line
+    B.addGeo(new THREE.BoxGeometry(0.016, 0.016, 0.045), new THREE.Matrix4().setPosition(wx(2.55, 1.465, 0.008), 1.465, 2.55), [0, 0], COL.knob);
+    B.addGeo(new THREE.BoxGeometry(0.02, 0.006, 0.012), new THREE.Matrix4().setPosition(wx(2.55, 1.472, 0.022), 1.472, 2.55), [0, 0], COL.grey);
+    // wing-root fresh-air vent
+    B.addGeo(new THREE.CylinderGeometry(0.026, 0.03, 0.03, 14), new THREE.Matrix4().makeRotationZ(sg * 1.1).setPosition(wx(2.3, 1.9, 0.02), 1.9, 2.3), [0, 0], COL.chrome);
+    B.addGeo(new THREE.CylinderGeometry(0.019, 0.019, 0.032, 12), new THREE.Matrix4().makeRotationZ(sg * 1.1).setPosition(wx(2.3, 1.9, 0.024), 1.9, 2.3), [0, 0], COL.black);
     // window frames (soft trim) around door and rear windows
     for (const k of ['door', 'rear']) {
       const pts = resample(WINDOWS[k], 0.05);
@@ -214,11 +251,18 @@ export function buildCockpit({ quality, mats }) {
       B.loft(sweepRings(path, prof, { upHint: [sg, 0, 0] }), { color: COL.trim });
     }
   }
-  // A-pillar trim (windscreen edge)
+  // A-pillar: one moulded post from the door-window edge to the windscreen seal
   for (const sg of [-1, 1]) {
-    const path = [];
-    for (let k = 0; k <= 8; k++) { const t = k / 8; const s = lerp(1.69, 2.15, t), y = lerp(1.47, 1.945, t); path.push([sg * (fusHalfWidth(s, y) - inset - 0.01), y, s]); }
-    B.loft(sweepRings(path, circle(8, 0.016, 0.012), { upHint: [sg, 0, 0] }), { color: COL.trim, capStart: true, capEnd: true });
+    const R = [];
+    const w = (s, y, d) => [sg * (fusHalfWidth(s, y) - inset - d), y, s];
+    for (let k = 0; k <= 10; k++) {
+      const t = k / 10;
+      const ds = lerp(1.718, 2.158, t), dy = lerp(1.47, 1.9, t);
+      const ws = lerp(1.69, 2.165, t), wy = lerp(1.468, 1.952, t);
+      const ms = (ds + ws) / 2, my = (dy + wy) / 2;
+      R.push([w(ds + 0.01, dy - 0.004, 0.0), w(ds, dy, 0.014), w(ms, my, 0.022), w(ws + 0.004, wy + 0.004, 0.017), w(ws - 0.006, wy + 0.008, 0.008), w(ws - 0.012, wy + 0.012, -0.004)]);
+    }
+    B.loft(R, { closed: false, out: (p) => [-p[0], 0, 0], color: (p, i, j) => (j >= 4 ? COL.seal : COL.pillar) });
   }
 
   // ---- floor, headliner, firewall, rear bulkhead ----
@@ -228,7 +272,7 @@ export function buildCockpit({ quality, mats }) {
       const fy = floorY(s), w = Math.max(0.05, fusHalfWidth(s, fy + 0.005) - inset);
       fl.push([[-w, fy, s], [0, fy, s], [w, fy, s]]);
     }
-    B.loft(fl, { closed: false, out: () => [0, 1, 0], color: COL.carpet });
+    B.loft(fl, { closed: false, out: () => [0, 1, 0], color: COL.carpet, uv: (p) => uvCarpet(p[0], p[2]) });
     const hl = [];
     for (let s = 2.13; s <= 3.9; s += high ? 0.0885 : 0.177) {
       const sec = fusSec(s), r = [];
@@ -239,7 +283,15 @@ export function buildCockpit({ quality, mats }) {
       }
       hl.push(r);
     }
-    B.loft(hl, { closed: false, out: () => [0, -1, 0], color: COL.head });
+    B.loft(hl, { closed: false, out: () => [0, -1, 0], color: [1, 1, 1], uv: (p) => uvHead(p[0], p[2]) });
+    // overhead console: dome light, eyeball vents, speaker
+    pillow(B, new THREE.Matrix4().setPosition(0, 1.962, 2.52), 0.2, 0.04, 0.5, COL.console, 3);
+    B.addGeo(new THREE.BoxGeometry(0.07, 0.006, 0.12), new THREE.Matrix4().setPosition(0, 1.941, 2.36), [0, 0], srgb('#f4f0e2'));
+    B.addGeo(new THREE.BoxGeometry(0.1, 0.004, 0.09), new THREE.Matrix4().setPosition(0, 1.941, 2.66), [0, 0], srgb('#2a2826'));
+    for (const x of [-0.07, 0.07]) {
+      B.addGeo(new THREE.SphereGeometry(0.018, 12, 6, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.Matrix4().setPosition(x, 1.945, 2.5), [0, 0], COL.chrome);
+      B.addGeo(new THREE.CylinderGeometry(0.008, 0.008, 0.01, 10), new THREE.Matrix4().makeRotationX(0.4).setPosition(x, 1.93, 2.495), [0, 0], COL.black);
+    }
     // firewall / footwell
     const section = (sAt, y0, y1, flip, color) => {
       const sec = fusSec(sAt), pts = [];
@@ -310,23 +362,25 @@ export function buildCockpit({ quality, mats }) {
     }
     B.addGeo(new THREE.BoxGeometry(0.03, 0.008, 0.03), new THREE.Matrix4().setPosition(0.15, 1.065, PANEL.s + 0.015), [0, 0], COL.white);
     // compass at the top of the windscreen
-    B.addGeo(new THREE.BoxGeometry(0.06, 0.05, 0.05), new THREE.Matrix4().setPosition(0, 1.905, 2.15), [0, 0], COL.black);
-    B.addGeo(new THREE.PlaneGeometry(0.04, 0.022), new THREE.Matrix4().setPosition(0, 1.905, 2.176), [0, 0], srgb('#e8e2cf'));
+    B.addGeo(new THREE.BoxGeometry(0.012, 0.03, 0.03), new THREE.Matrix4().setPosition(0, 1.94, 2.14), [0, 0], COL.black);
+    B.addGeo(new THREE.SphereGeometry(1, 14, 8), new THREE.Matrix4().makeScale(0.03, 0.022, 0.026).setPosition(0, 1.912, 2.15), [0, 0], COL.black);
+    B.addGeo(new THREE.CircleGeometry(0.016, 14, Math.PI, Math.PI), new THREE.Matrix4().makeRotationX(-0.3).setPosition(0, 1.916, 2.172), [0, 0], srgb('#e8e2cf'));
     // sun visors
     for (const sg of [-1, 1]) pillow(B, new THREE.Matrix4().makeRotationX(-0.25).setPosition(sg * 0.25, 1.955, 2.25), 0.36, 0.012, 0.15, COL.head, 4);
   }
 
   // ---- seats ----
   const seat = (x, s, w) => {
-    pillow(B, new THREE.Matrix4().makeRotationX(-0.08).setPosition(x, 1.0, s), w, 0.11, 0.48, COL.seat);
-    pillow(B, new THREE.Matrix4().makeRotationX(0.22).setPosition(x, 1.33, s + 0.27), w, 0.56, 0.11, COL.seat);
-    pillow(B, new THREE.Matrix4().makeRotationX(0.22).setPosition(x, 1.68, s + 0.36), w * 0.62, 0.16, 0.08, COL.seatDark);
-    B.addGeo(new THREE.BoxGeometry(w * 0.55, 0.2, 0.34), new THREE.Matrix4().setPosition(x * 0.9, floorY(s) + 0.1, s), [0, 0], COL.frame);
+    pillow(B, new THREE.Matrix4().makeRotationX(-0.08).setPosition(x, 0.94, s), w, 0.11, 0.48, COL.seat, 4.5, 'wd');
+    pillow(B, new THREE.Matrix4().makeRotationX(0.22).setPosition(x, 1.28, s + 0.27), w, 0.6, 0.11, COL.seat, 4.5, 'wh');
+    pillow(B, new THREE.Matrix4().makeRotationX(0.22).setPosition(x, 1.66, s + 0.36), w * 0.62, 0.16, 0.08, COL.seatDark);
+    B.addGeo(new THREE.BoxGeometry(w * 0.55, 0.16, 0.34), new THREE.Matrix4().setPosition(x * 0.9, floorY(s) + 0.08, s), [0, 0], COL.frame);
+    for (const dx of [-0.12, 0.12]) B.addGeo(new THREE.BoxGeometry(0.025, 0.02, 0.9), new THREE.Matrix4().setPosition(x + dx, floorY(s) + 0.01, s - 0.05), [0, 0], COL.shaft);
   };
-  seat(-0.27, 2.75, 0.44);
-  seat(0.27, 2.75, 0.44);
-  pillow(B, new THREE.Matrix4().makeRotationX(-0.08).setPosition(0, 0.96, 3.6), 0.9, 0.12, 0.46, COL.seat);
-  pillow(B, new THREE.Matrix4().makeRotationX(0.18).setPosition(0, 1.3, 3.9), 0.86, 0.55, 0.12, COL.seat);
+  seat(-0.27, SEAT_S, 0.44);
+  seat(0.27, SEAT_S, 0.44);
+  pillow(B, new THREE.Matrix4().makeRotationX(-0.08).setPosition(0, 0.96, 3.6), 0.9, 0.12, 0.46, COL.seat, 4.5, 'wd');
+  pillow(B, new THREE.Matrix4().makeRotationX(0.18).setPosition(0, 1.3, 3.9), 0.86, 0.55, 0.12, COL.seat, 4.5, 'wh');
   B.addGeo(new THREE.BoxGeometry(0.7, 0.17, 0.4), new THREE.Matrix4().setPosition(0, floorY(3.6) + 0.085, 3.6), [0, 0], COL.frame);
 
   // ---- moving parts ----
@@ -403,6 +457,23 @@ export function buildCockpit({ quality, mats }) {
   gauges.name = 'gauges';
   group.add(gauges);
 
+  let glowTex = null;
+  function setNight(n) {
+    n = Math.max(0, Math.min(1, n));
+    if (n > 0 && !glowTex) {
+      glowTex = panelGlow(panelTex.image);
+      panelMat.emissiveMap = glowTex;
+      panelMat.emissive.setRGB(1, 0.93, 0.82);
+      panelMat.needsUpdate = true;
+    }
+    panelMat.emissiveIntensity = n * 0.9;
+    gaugeMat.emissiveIntensity = 0.3 + n * 0.75;
+    gaugeMat.emissive.setRGB(1, 1 - n * 0.06, 1 - n * 0.15);
+  }
+  // parts nobody can see from the chase camera
+  const detail = [gauges, throttle, pedals.L, pedals.R];
+  function setDetail(on) { for (const o of detail) o.visible = on; }
+
   function update(dt, cur) {
     for (const y of yokes) {
       y.rotation.z = -cur.aileron * 0.75;
@@ -415,7 +486,7 @@ export function buildCockpit({ quality, mats }) {
   }
 
   return {
-    group, yokes, throttle, pedals, instruments: inst, update, eyeHint: EYE,
-    dispose() { panelTex.dispose(); panelMat.dispose(); gaugeMat.alphaMap.dispose(); gaugeMat.dispose(); inst.dispose(); },
+    group, yokes, throttle, pedals, instruments: inst, update, eyeHint: EYE, setNight, setDetail,
+    dispose() { panelTex.dispose(); glowTex?.dispose(); trimTex.dispose(); panelMat.dispose(); gaugeMat.alphaMap.dispose(); gaugeMat.dispose(); inst.dispose(); },
   };
 }

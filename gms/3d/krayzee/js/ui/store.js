@@ -6,8 +6,9 @@ export const SETTINGS_KEY = 'krayzee.settings';
 
 export const DEFAULT_PROFILE = { name: 'Dirk', gender: 'm', company: 'Dirk Air', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017', voice: 'toff', registration: 'K-DIRK', rank: 0 };
 export const QUALITIES = ['auto', 'low', 'medium', 'high'];
+export const VIEWS = ['chase', 'center', 'cockpit'];
 const SETTINGS_V = 3;
-export const DEFAULT_SETTINGS = { view: 'chase', quality: 'auto', sfx: 1, voice: 1, music: 0.6, invertPitch: false, stickRight: false, units: 'aviation' };
+export const DEFAULT_SETTINGS = { view: 'chase', views: VIEWS, quality: 'auto', sfx: 1, voice: 1, music: 0.6, invertPitch: false, stickRight: false, units: 'aviation' };
 
 export const LIMITS = { name: 12, company: 14, display: 14 };
 
@@ -42,6 +43,9 @@ function storedSettings() {
   // D9/D10 changed what the pitch and stick-side defaults mean, so older saves start again from the new defaults.
   if ((raw.v | 0) < 3) { s.invertPitch = false; s.stickRight = false; }
   delete s.hand;
+  s.views = VIEWS.filter((v) => Array.isArray(s.views) && s.views.includes(v));
+  if (!s.views.length) s.views = VIEWS.slice();
+  if (!s.views.includes(s.view)) s.view = s.views[0];
   s.invertPitch = !!s.invertPitch;
   s.stickRight = !!s.stickRight;
   s.v = SETTINGS_V;

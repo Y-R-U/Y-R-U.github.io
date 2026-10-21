@@ -116,3 +116,4 @@ icy), `tower_trainee` (panicky junior controller). Keep the comedy affectionate 
 | RADIO | `js/radio/**`, `css/radio.css`, `tools/radio.html`, `docs/RADIO.md` | 9461 |
 | ONLINE | `docs/ONLINE.md`, `server/**` (design + prototype only) | — |
 | SCORE | `js/game/**`, `tools/score-sim.mjs`, `docs/SCORE.md` | — (node) |
+| ASSIST | `js/assist/**`, `css/assist.css`, `tools/assist.html`, `docs/ASSIST.md` | 9481 |

@@ -5,8 +5,13 @@ import { Builder, col, mat, inRect } from './util.js';
 
 const PAPI_ANGLES = [3.5, 3.17, 2.83, 2.5];
 
-function fixtureGeometry() {
+function fixtureGeometry(lo) {
   const b = new Builder();
+  if (lo) {
+    b.geo(new THREE.CylinderGeometry(0.07, 0.08, 0.34, 4, 1, true), mat(0, 0.17, 0), [0.75, 0.75, 0.72]);
+    b.geo(new THREE.ConeGeometry(0.12, 0.12, 4), mat(0, 0.4, 0), [1, 1, 1]);
+    return b.build();
+  }
   b.geo(new THREE.CylinderGeometry(0.06, 0.08, 0.32, 6), mat(0, 0.16, 0), [0.75, 0.75, 0.72]);
   b.geo(new THREE.CylinderGeometry(0.11, 0.13, 0.05, 8), mat(0, 0.34, 0), [0.6, 0.6, 0.58]);
   b.geo(new THREE.SphereGeometry(0.11, 8, 4, 0, Math.PI * 2, 0, Math.PI / 2), mat(0, 0.36, 0), [1, 1, 1]);
@@ -48,7 +53,7 @@ export function buildLights(quality) {
     }
   }
 
-  const geo = fixtureGeometry();
+  const geo = fixtureGeometry(quality === 'low');
   const lampMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.35, metalness: 0.2 });
   const fixtures = new THREE.InstancedMesh(geo, lampMat, fx.length);
   const m = new THREE.Matrix4(), c = new THREE.Color();

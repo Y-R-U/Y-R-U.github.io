@@ -388,6 +388,43 @@ DIGITS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'
 RWYS = {'09': 'runway zero niner.', '27': 'runway two seven.', '04': 'runway zero four.', '22': 'runway two two.'}
 
 
+# TTS-only spelling: the clone reads spelling, not intent, so accents survive only when spelled (docs/VOICES.md).
+# `text` stays the subtitle (RADIO shows `text`); `say` is what the TTS reads; `subtitle` repeats `text` when they differ.
+_TH = [(r'\bthe\b', 'ze'), (r'\bthis\b', 'zis'), (r'\bthat\b', 'zat'), (r'\bthey\b', 'zey'), (r'\bthem\b', 'zem'),
+       (r'\bthere\b', 'zere'), (r'\bwith\b', 'wiz'), (r'\bthink\b', 'sink'), (r'\bthank\b', 'sank')]
+ACCENT = {
+    'comte': _TH + [(r'\bit\b', 'eet'), (r'\bis\b', 'eez'), (r'\bhave\b', "'ave"), (r'\bhair\b', "'air"),
+                    (r'\bhorror\b', "'orror"), (r'\bheard\b', "'eard"), (r'\bvery\b', 'verry'), (r'\bweep\b', 'weeep'),
+                    (r'\bhow\b', "'ow"), (r'\b(\w{3,})ing\b', r'\1eeng')],
+    'baronin': _TH + [(r'\bwe\b', 've'), (r'\bwas\b', 'vas'), (r'\bwere\b', 'vere'), (r'\bwill\b', 'vill'), (r'\bwhat\b', 'vat'),
+                      (r'\bwait\b', 'vait'), (r'\bwaiting\b', 'vaiting'), (r'\bwasted\b', 'vasted'),
+                      (r'\bwheels\b', 'veels'), (r'\bwriting\b', 'vriting'), (r'\bway\b', 'vay'),
+                      (r'\brunway\b', 'runvay'), (r'\bhave\b', 'haff'), (r'\bgood\b', 'goot'), (r'\band\b', 'und'),
+                      (r'\bis\b', 'iss'), (r'\bschedule\b', 'shedule'), (r'\bvery\b', 'fery'),
+                      (r'\bseconds\b', 'zeconds'), (r'\bsimply\b', 'zimply')],
+    # Scots: Qwen reads nae/heid/tae as English words; spell the sound instead. Light.
+    'laird': [(r'nae\b', 'nay'), (r'\bheid\b', 'heed'), (r'\btae\b', 'tay'), (r'\bwi\'', 'wee')],
+    # Cockney: th-fronting and a dropped t, lightly.
+    'geezer': [(r'\bAlright\b', 'Awright'), (r'\bwith\b', 'wiv'), (r'\bthink\b', 'fink'), (r'\bnothing\b', 'nuffin'),
+               (r'\bLittle\b', 'Li\'l'), (r'\bGot a\b', 'Go\' a'), (r'\bWotcha\b', 'Wotcher'),
+               (r'\bout of order\b', 'aht of order')],
+}
+
+
+def accented(voice, text):
+    out = text
+    for pat, rep in ACCENT.get(voice, []):
+        def sub(m, rep=rep):
+            r = m.expand(rep)
+            return r[:1].upper() + r[1:] if m.group(0)[:1].isupper() else r
+        out = re.sub(pat, sub, out, flags=re.I)
+    return out
+
+
+# Manual-listen notes, carried into barks.json as a 'listen' flag.
+REVIEW = {'cs_title_marchioness': 'tower_m: re-heard alone as "Martian S" (fine in the list read); listen before shipping'}
+
+
 def secs(text):
     words = len(re.findall(r"[\w'’-]+", text))
     return round(min(4.5, 0.6 + words / 2.9), 1)
@@ -398,8 +435,11 @@ def main():
     for v, intents in P.items():
         for intent, lines in intents.items():
             for i, t in enumerate(lines, 1):
-                out.append({'id': f'{v}.{intent}.{i}', 'voice': v, 'intent': intent, 'text': t,
-                            'delivery': f'{INTENT_MOOD[intent]}; {VOICE_STYLE[v]}; radio-clipped', 'maxSeconds': secs(t)})
+                e = {'id': f'{v}.{intent}.{i}', 'voice': v, 'intent': intent, 'text': t,
+                     'delivery': f'{INTENT_MOOD[intent]}; {VOICE_STYLE[v]}; radio-clipped', 'maxSeconds': secs(t)}
+                s = accented(v, t)
+                if s != t: e['say'] = s; e['subtitle'] = t
+                out.append(e)
     for v in T:
         for intent in ROUTINE:
             for i, t in enumerate(T[v][intent], 1):
@@ -416,8 +456,10 @@ def main():
                 if tier <= 2: e['callsign'] = 'pre'
                 out.append(e)
         for w in SPLICE_TITLES:
-            out.append({'id': f'{v}.cs_title_{w}', 'voice': v, 'intent': 'splice_title', 'text': w.replace('_', ' ').title(),
-                        'delivery': 'level list intonation, no final fall, crisp', 'maxSeconds': 1.0})
+            e = {'id': f'{v}.cs_title_{w}', 'voice': v, 'intent': 'splice_title', 'text': w.replace('_', ' ').title(),
+                 'delivery': 'level list intonation, no final fall, crisp', 'maxSeconds': 1.2}
+            if f'cs_title_{w}' in REVIEW: e['review'] = REVIEW[f'cs_title_{w}']
+            out.append(e)
         for d in DIGITS:
             out.append({'id': f'{v}.cs_digit_{d}', 'voice': v, 'intent': 'splice_digit', 'text': d.title(),
                         'delivery': 'flat ATC digit, cut from one list read', 'maxSeconds': 0.6})

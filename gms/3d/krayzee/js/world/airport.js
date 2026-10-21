@@ -1,7 +1,10 @@
 import * as THREE from 'three';
 import { Builder, inRect } from './util.js';
 import { createSky, createLights, bakeEnvironment, setShadowFocus, SUN_DIR } from './env.js';
-import { createTerrain, createLake, inLake, airfieldMask } from './terrain.js';
+import { createTerrain, createLake, inLake, lakeDist, airfieldMask, SHADE_EXTENT, CASTLE } from './terrain.js';
+import { buildTown } from './town.js';
+import { buildTrees, shadeTexture } from './trees.js';
+import { buildAirfieldEdge, BlockGrid } from './land.js';
 import { decalAtlas } from './textures.js';
 import { buildPavement, APRON_RECT, HANGAR_APRON, TOWER_PAD, ROADS, CAR_PARK } from './pavement.js';
 import { buildLights } from './lights.js';
@@ -13,7 +16,10 @@ import { FRAMES, SEGMENTS } from './geom.js';
 const aa = (r, x, z, pad = 0) => x >= r.x0 - pad && x <= r.x1 + pad && z >= r.z0 - pad && z <= r.z1 + pad;
 
 export async function buildWorld(scene, renderer, opts = {}) {
-  const quality = opts.quality === 'low' ? 'low' : 'high';
+  let quality = ['low', 'medium', 'high'].includes(opts.quality) ? opts.quality : 'high';
+  const timings = {};
+  let tm = performance.now();
+  const mark = (k) => { const n = performance.now(); timings[k] = Math.round(n - tm); tm = n; };
   const root = new THREE.Group();
   root.name = 'world';
   scene.add(root);
@@ -23,15 +29,19 @@ export async function buildWorld(scene, renderer, opts = {}) {
   const env = bakeEnvironment(renderer, sky);
   const { hemi, sun } = createLights(scene, quality);
 
+  mark('sky');
   const terrain = createTerrain(renderer, quality);
-  root.add(terrain.mesh, createLake());
+  mark('terrain');
+  const lake = createLake(renderer, env);
+  root.add(terrain.mesh, lake.mesh);
 
+  mark('lake');
   const atlas = decalAtlas(renderer);
   const pave = buildPavement(renderer, quality, atlas);
   root.add(...pave.meshes);
 
   const B = {
-    matte: new Builder(), metal: new Builder(), glass: new Builder(), decal: new Builder(true), flags: [],
+    matte: new Builder(), metal: new Builder(), glass: new Builder(), decal: new Builder(true), lit: new Builder(), flags: [],
   };
   B.matteMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0 });
   const colliders = [];
@@ -42,6 +52,13 @@ export async function buildWorld(scene, renderer, opts = {}) {
   buildSigns(B, atlas);
   buildVehicles(B);
   buildFlagpoles(B, atlas);
+  mark('airport');
+  const town = buildTown(B, atlas, quality, terrain.heightAt);
+  mark('town');
+  colliders.push(...town.colliders);
+  root.add(...town.objects);
+  const edge = buildAirfieldEdge(quality);
+  root.add(...edge.objects);
   const socks = buildWindsocks(B);
   const flags = buildFlags(B.flags, atlas.texture);
 
@@ -52,10 +69,13 @@ export async function buildWorld(scene, renderer, opts = {}) {
   metal.castShadow = metal.receiveShadow = true;
   metal.name = 'metal';
   const glass = new THREE.Mesh(B.glass.build(), new THREE.MeshStandardMaterial({
-    vertexColors: true, color: '#3d6670', roughness: 0.04, metalness: 0.35, envMap: env, envMapIntensity: 1.6,
-    transparent: true, opacity: 0.5, depthWrite: false,
+    vertexColors: true, color: '#4d6a70', roughness: 0.04, metalness: 0.3, envMap: env, envMapIntensity: 1.4,
+    transparent: true, opacity: 0.4, depthWrite: false,
   }));
   glass.renderOrder = 2;
+  const lit = new THREE.Mesh(B.lit.build(), new THREE.MeshBasicMaterial({ vertexColors: true }));
+  lit.name = 'interiors';
+  root.add(lit);
   glass.name = 'glass';
   const decals = new THREE.Mesh(B.decal.build(), new THREE.MeshStandardMaterial({
     map: atlas.texture, alphaTest: 0.5, roughness: 0.6, emissive: '#ffffff', emissiveMap: atlas.texture, emissiveIntensity: 0.22,
@@ -67,18 +87,29 @@ export async function buildWorld(scene, renderer, opts = {}) {
   const lights = buildLights(quality);
   root.add(...lights.objects);
 
-  const noGo = (x, z, pad) => {
+  const block = new BlockGrid();
+  for (const p of town.paths) block.line(p.pts, p.w / 2 + 5);
+  for (const h of town.houses) block.disc(h.x, h.z, Math.max(h.w || 10, h.d || 10) * 0.6 + 2);
+  for (const c of colliders) block.rect(c.min[0] - 3, c.min[2] - 3, c.max[0] + 3, c.max[2] + 3);
+  block.rect(town.green.x0 + 14, town.green.z0 + 14, town.green.x1 - 14, town.green.z1 - 14);
+  block.disc(CASTLE.x, CASTLE.z, 140);
+  const noGo = (x, z) => {
     if (airfieldMask(x, z) > 0) return true;
     for (const F of FRAMES) {
       const rx = x - F.cx, rz = z - F.cz;
       const a = Math.abs(rx * F.dx + rz * F.dz) - F.L / 2, b = Math.abs(-rx * F.dz + rz * F.dx);
       if (a > 0 && a < 3200 && b < 160 + a * 0.15) return true;
     }
-    if (inLake(x, z) || ROADS.some((r) => aa(r, x, z, pad))) return true;
-    if (x > -620 && x < 300 && z < -1250 && z > -1800) return true;
-    return false;
+    if (lakeDist(x, z) < 1.1 || ROADS.some((r) => aa(r, x, z, 7))) return true;
+    return block.has(x, z);
   };
-  const scenery = buildScenery(quality, noGo);
+  mark('meshes');
+  const trees = buildTrees(renderer, quality, { heightAt: terrain.heightAt, noGo, extra: [...town.treeSpots, ...edge.trees] });
+  mark('trees');
+  root.add(trees.group);
+  terrain.uniforms.uShade.value = shadeTexture(SHADE_EXTENT, quality === 'low' ? 1024 : 2048, trees, town.boxes, town.houses.filter((h) => h.type !== 'barn'));
+  mark('shade');
+  const scenery = buildScenery(quality);
   root.add(...scenery.objects);
   colliders.push(...scenery.colliders);
 
@@ -114,13 +145,31 @@ export async function buildWorld(scene, renderer, opts = {}) {
       lights.update(camera, renderer.getPixelRatio());
     }
     sky.material.uniforms.uTime.value = time;
+    lake.uniforms.uTime.value = time;
+    if (camera) trees.update(camera);
     flags.uniforms.uTime.value = time;
     socks.update(time, wind.from, wind.kt);
     tower.update(dt, time, camera);
   }
 
+  function setQuality(q) {
+    if (!['low', 'medium', 'high'].includes(q) || q === quality) return;
+    quality = q;
+    trees.setQuality(q);
+    terrain.uniforms.uBump.value = q === 'low' ? 0 : 1;
+    const size = q === 'low' ? 1024 : 2048;
+    if (sun.shadow.mapSize.x !== size) {
+      sun.shadow.mapSize.set(size, size);
+      sun.shadow.map?.dispose();
+      sun.shadow.map = null;
+    }
+  }
+
   return {
     update,
+    setQuality,
+    get quality() { return quality; },
+    treeStats: trees.stats,
     groundHeightAt: terrain.heightAt,
     surfaceAt,
     runwayAt,
@@ -135,5 +184,6 @@ export async function buildWorld(scene, renderer, opts = {}) {
     tower: { cab: tower.cab, crew: tower.crew },
     papi: lights.papi,
     root,
+    debug: { terrain, trees, lake, timings },
   };
 }

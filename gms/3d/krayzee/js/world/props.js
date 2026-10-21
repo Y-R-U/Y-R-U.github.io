@@ -4,7 +4,6 @@ import { FRAMES, HOLDS, SEGMENTS, rwPt } from './geom.js';
 import { TAXIWAY_WIDTH, TERMINAL, STANDS } from './layout.js';
 import { decalQuad } from './terminal.js';
 import { APRON_RECT, HANGAR_APRON, ROADS, CAR_PARK, TOWER_PAD } from './pavement.js';
-import { LAKE } from './terrain.js';
 
 const POST = col('#d9d9d2');
 
@@ -190,94 +189,14 @@ export function buildFlags(flags, atlasTex) {
   return { mesh, uniforms };
 }
 
-// Low-poly instanced vegetation, a basic town and parked cars.
-export function buildScenery(quality, noGo) {
+// Parked and road cars (trees: trees.js, town: town.js).
+export function buildScenery(quality) {
   const r = rng(2024);
   const low = quality === 'low';
   const objs = [];
   const colliders = [];
 
-  const decid = new Builder();
-  decid.geo(new THREE.CylinderGeometry(0.18, 0.28, 3, 5), mat(0, 1.5, 0), col('#5a4030'));
-  decid.geo(new THREE.IcosahedronGeometry(2.4, 0), mat(0, 4.6, 0, 0, 0, 0, 1, 0.9, 1), col('#4d7a34'));
-  decid.geo(new THREE.IcosahedronGeometry(1.7, 0), mat(0.9, 5.8, 0.4, 0.4, 0.3, 0), col('#5a8a3a'));
-  decid.geo(new THREE.IcosahedronGeometry(1.5, 0), mat(-1.0, 5.2, -0.6, 0.2, 0.9, 0), col('#44702e'));
-  const conif = new Builder();
-  conif.geo(new THREE.CylinderGeometry(0.15, 0.22, 2, 5), mat(0, 1, 0), col('#4a3428'));
-  conif.geo(new THREE.ConeGeometry(2.0, 4.5, 7), mat(0, 3.6, 0), col('#2f5a32'));
-  conif.geo(new THREE.ConeGeometry(1.5, 3.6, 7), mat(0, 5.6, 0), col('#386838'));
-  const placeTrees = [];
-  const ok = (x, z) => !noGo(x, z, 18);
-  const clusters = low ? 55 : 120;
-  for (let c = 0; c < clusters; c++) {
-    const ang = r() * Math.PI * 2, d = 650 + Math.pow(r(), 0.7) * 3200;
-    const cx = Math.cos(ang) * d * 1.2, cz = Math.sin(ang) * d;
-    const n = 6 + ((r() * (low ? 10 : 22)) | 0);
-    for (let k = 0; k < n; k++) {
-      const x = cx + (r() - 0.5) * 90, z = cz + (r() - 0.5) * 90;
-      if (ok(x, z)) placeTrees.push([x, z, r() < 0.35]);
-    }
-  }
-  for (let x = -1100; x < 1100; x += low ? 34 : 17) {
-    for (const z of [-560, 470]) if (r() < 0.8 && ok(x, z)) placeTrees.push([x + (r() - 0.5) * 8, z + (r() - 0.5) * 6, r() < 0.2]);
-  }
-  for (let k = 0; k < (low ? 60 : 140); k++) {
-    const a = r() * Math.PI * 2, rr = 1.15 + r() * 0.35;
-    const x = LAKE.x + Math.cos(a) * LAKE.rx * rr, z = LAKE.z + Math.sin(a) * LAKE.rz * rr;
-    if (ok(x, z)) placeTrees.push([x, z, r() < 0.5]);
-  }
-  for (const [geoB, conifer] of [[decid, false], [conif, true]]) {
-    const list = placeTrees.filter((t) => t[2] === conifer);
-    const im = new THREE.InstancedMesh(geoB.build(), new THREE.MeshLambertMaterial({ vertexColors: true }), list.length);
-    const m4 = new THREE.Matrix4(), c = new THREE.Color();
-    list.forEach(([x, z], i) => {
-      const s = 0.8 + r() * 0.7;
-      m4.compose(new THREE.Vector3(x, 0, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), r() * 6.28), new THREE.Vector3(s, s * (0.85 + r() * 0.4), s));
-      im.setMatrixAt(i, m4);
-      im.setColorAt(i, c.setRGB(0.85 + r() * 0.3, 0.85 + r() * 0.25, 0.8 + r() * 0.2));
-    });
-    im.castShadow = !low;
-    im.receiveShadow = false;
-    im.computeBoundingSphere();
-    im.name = conifer ? 'conifers' : 'trees';
-    objs.push(im);
-  }
-
-  // town north of the field
-  const houses = [];
-  for (let gx = -560; gx <= 260; gx += 64) {
-    for (let gz = -1300; gz >= -1760; gz -= 46) {
-      if (Math.abs(gx + 80) < 22) continue;
-      for (const off of [-14, 14]) {
-        if (r() < 0.15) continue;
-        const tall = Math.hypot(gx + 140, gz + 1520) < 200 && r() < 0.5;
-        const w = tall ? 14 + r() * 8 : 8 + r() * 4, d = tall ? 12 + r() * 6 : 7 + r() * 3, h = tall ? 10 + r() * 12 : 4.5 + r() * 2;
-        houses.push({ x: gx + off, z: gz, w, d, h, tall, ry: (r() < 0.5 ? 0 : Math.PI / 2) });
-      }
-    }
-  }
-  const walls = new Builder(), roofs = new Builder();
-  walls.geo(new THREE.BoxGeometry(1, 1, 1), mat(0, 0.5, 0), [1, 1, 1], 3);
-  const roofShape = new THREE.Shape([new THREE.Vector2(-0.56, 0), new THREE.Vector2(0.56, 0), new THREE.Vector2(0, 0.5)]);
-  roofs.geo(new THREE.ExtrudeGeometry(roofShape, { depth: 1.04, bevelEnabled: false }), mat(0, 0, -0.52), [1, 1, 1]);
-  const wallM = new THREE.InstancedMesh(walls.build(), new THREE.MeshLambertMaterial({ vertexColors: true }), houses.length);
-  const roofM = new THREE.InstancedMesh(roofs.build(), new THREE.MeshLambertMaterial({ vertexColors: true }), houses.length);
-  const wallCols = ['#efe6d6', '#e8d9c0', '#f4f1ea', '#d9c7a8', '#c9d3d8', '#e6d0c8'], roofCols = ['#8a3b2a', '#6b3a2c', '#4f4f55', '#7a4a32', '#5c6370'];
   const m4 = new THREE.Matrix4(), c = new THREE.Color(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
-  houses.forEach((h, i) => {
-    q.setFromAxisAngle(up, h.ry);
-    m4.compose(new THREE.Vector3(h.x, 0, h.z), q, new THREE.Vector3(h.w, h.h, h.d));
-    wallM.setMatrixAt(i, m4);
-    const rh = h.tall ? 0.6 : Math.min(h.w, h.d) * 0.45;
-    roofM.setMatrixAt(i, m4.compose(new THREE.Vector3(h.x, h.h, h.z), q, new THREE.Vector3(h.w, rh * 2, h.d)));
-    wallM.setColorAt(i, c.set(wallCols[(r() * wallCols.length) | 0]));
-    roofM.setColorAt(i, c.set(roofCols[(r() * roofCols.length) | 0]));
-    const ex = h.ry ? h.d : h.w, ez = h.ry ? h.w : h.d;
-    colliders.push({ min: [h.x - ex / 2, 0, h.z - ez / 2], max: [h.x + ex / 2, h.h + (h.tall ? 0 : Math.min(h.w, h.d) * 0.45), h.z + ez / 2], kind: 'house' });
-  });
-  for (const im of [wallM, roofM]) { im.castShadow = false; im.receiveShadow = false; im.computeBoundingSphere(); objs.push(im); }
-  wallM.name = 'houses'; roofM.name = 'roofs';
-
   const cars = [];
   for (let x = CAR_PARK.x0 + 5.3; x < CAR_PARK.x1 - 2; x += 2.6) {
     for (const zz of [CAR_PARK.z0 + 6.5, CAR_PARK.z0 + 25, CAR_PARK.z0 + 43.5, CAR_PARK.z1 - 15.5]) if (r() < 0.6) cars.push([x, zz, Math.PI / 2 + (r() < 0.5 ? 0 : Math.PI)]);

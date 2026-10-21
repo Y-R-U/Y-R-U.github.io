@@ -9,7 +9,7 @@ export function createMaterials({ quality, livery, holes }) {
   const paint = high
     ? new THREE.MeshPhysicalMaterial({ ...paintOpts, clearcoat: 0.7, clearcoatRoughness: 0.14 })
     : new THREE.MeshStandardMaterial(paintOpts);
-  if (holes && high) paint.alphaToCoverage = true;
+  if (holes) paint.alphaToCoverage = true;
 
   const trim = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.62, metalness: 0.35 });
   const glass = new THREE.MeshPhysicalMaterial({
@@ -41,23 +41,29 @@ export function glowTexture() {
 }
 
 export function discTexture() {
-  const c = document.createElement('canvas');
-  c.width = c.height = 256;
+  const N = 256, c = document.createElement('canvas');
+  c.width = c.height = N;
   const g = c.getContext('2d');
-  g.translate(128, 128);
-  const R = 128;
-  const ring = (r0, r1, col, a) => { g.beginPath(); g.arc(0, 0, r1 * R, 0, 7); g.arc(0, 0, r0 * R, 0, 7, true); g.fillStyle = col; g.globalAlpha = a; g.fill(); };
-  ring(0.17, 0.83, '#202124', 0.13);
-  for (let i = 0; i < 2; i++) {
-    g.rotate(Math.PI);
-    const gr = g.createLinearGradient(0, 0, R, 0);
-    gr.addColorStop(0, 'rgba(30,30,32,0)'); gr.addColorStop(0.5, 'rgba(30,30,32,0.06)'); gr.addColorStop(0.95, 'rgba(30,30,32,0.03)');
-    g.globalAlpha = 1; g.fillStyle = gr;
-    g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, R * 0.86, -0.5, 0.15); g.closePath(); g.fill();
+  const img = g.createImageData(N, N), d = img.data;
+  // polar shimmer: faint haze, two soft blade bands, slight radial banding, barely-there tip stripes
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const u = (x + 0.5) / N * 2 - 1, v = (y + 0.5) / N * 2 - 1, r = Math.hypot(u, v), a = Math.atan2(v, u);
+    if (r > 0.97 || r < 0.15) continue;
+    const edge = Math.min(1, (0.97 - r) / 0.14) * Math.min(1, (r - 0.15) / 0.06);
+    const band = Math.pow(0.5 + 0.5 * Math.cos(2 * (a + 0.9 * r * r)), 6);
+    const ring = 0.5 + 0.5 * Math.sin(r * 58);
+    let al = 0.035 + 0.05 * band * (0.4 + r) + 0.012 * ring;
+    let col = [34, 35, 38];
+    if (r > 0.855 && r < 0.95) {
+      const w = r > 0.885 && r < 0.915;
+      col = w ? [235, 235, 232] : [170, 40, 44];
+      al = 0.018 + 0.028 * band;
+    }
+    al *= edge;
+    const i = (y * N + x) * 4;
+    d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; d[i + 3] = Math.round(al * 255);
   }
-  ring(0.83, 0.87, '#c8202a', 0.1);
-  ring(0.87, 0.91, '#f2f2f2', 0.13);
-  ring(0.91, 0.95, '#c8202a', 0.1);
+  g.putImageData(img, 0, 0);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   return t;

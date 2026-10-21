@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { TOWN_ROADS } from './town.js';
 import { Builder, col, fbm, rng, ribbon, arc, segInRect } from './util.js';
 import { asphaltTexture, skidAtlas, uvQuad } from './textures.js';
 import { FRAMES, SEGMENTS, HOLDS, rwPt, rwDir, PAD_LEN } from './geom.js';
@@ -16,7 +17,8 @@ export const ROADS = [
   { x0: -235, x1: 230, z0: -364, z1: -352 },
   { x0: -86, x1: -74, z0: -1240, z1: -352 },
   { x0: 184, x1: 196, z0: -352, z1: -282 },
-  { x0: -1500, x1: 3600, z0: -1246, z1: -1234 },
+  { x0: -3600, x1: 3600, z0: -1246, z1: -1234 },
+  ...TOWN_ROADS,
 ];
 export const CAR_PARK = { x0: -210, x1: 40, z0: -440, z1: -372 };
 

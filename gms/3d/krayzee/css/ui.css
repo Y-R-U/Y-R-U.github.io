@@ -322,3 +322,6 @@ html.kz-acct-off #br8t-account { opacity: 0; visibility: hidden; pointer-events:
 .kz-note svg { width: 20px; height: 20px; flex: none; color: var(--kz-gold); margin-top: 1px; }
 .kz-note p { margin: 0; font: 13px/1.4 var(--kz-sans); color: var(--kz-dim); }
 .kz-note b { font: italic 400 16px var(--kz-serif); color: var(--kz-gold2); }
+.kz-seg button[hidden] { display: none; }
+.kz-switch:disabled { opacity: .45; cursor: not-allowed; }
+.kz-views .kz-hint { margin: 2px 0 6px; }

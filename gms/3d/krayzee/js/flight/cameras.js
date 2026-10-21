@@ -18,9 +18,9 @@ export function createFlightCamera(camera, env) {
   };
   const api = {
     get view() { return S.view; },
-    setView(v) { S.view = v === 'cockpit' ? 'cockpit' : 'chase'; S.inited = false; api.fit(); },
+    setView(v) { S.view = v === 'cockpit' || v === 'center' ? v : 'chase'; S.inited = false; api.fit(); },
     fit() {
-      if (S.view === 'cockpit') { camera.near = 0.05; camera.fov = camera.aspect >= 1 ? 66 : 80; camera.updateProjectionMatrix(); }
+      if (S.view !== 'chase') { camera.near = 0.05; camera.fov = camera.aspect >= 1 ? 66 : 80; camera.updateProjectionMatrix(); }
       else { camera.near = 0.4; fitFov(camera, 78, 45, 90); }
     },
     kick(a) { S.shake = Math.max(S.shake, a); },
@@ -28,9 +28,11 @@ export function createFlightCamera(camera, env) {
     update(dt, rig, ac, look) {
       if (!look.active) { const k = 1 - Math.exp(-dt * 3.5); look.x -= look.x * k; look.y -= look.y * k; }
       const root = rig.root;
-      if (S.view === 'cockpit') {
-        camera.position.copy(rig.eye).applyMatrix4(root.matrixWorld);
-        _e.set(look.y + (rig.eyePitch || 0), look.x, 0);
+      if (S.view !== 'chase') {
+        const center = S.view === 'center';
+        const eye = center ? (rig.eyeCenter || _v.set(0, rig.eye.y, rig.eye.z)) : rig.eye;
+        camera.position.copy(eye).applyMatrix4(root.matrixWorld);
+        _e.set(look.y + ((center ? rig.eyeCenterPitch ?? rig.eyePitch : rig.eyePitch) || 0), look.x, 0);
         camera.quaternion.copy(root.quaternion).multiply(_q.setFromEuler(_e));
       } else {
         const p = root.position;

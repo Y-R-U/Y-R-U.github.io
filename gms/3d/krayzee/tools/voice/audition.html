@@ -29,6 +29,15 @@ main{max-width:980px;margin:auto;padding:8px 16px 40px;display:grid;gap:12px}
 .clip .t{font-size:14px}
 .clip .m{grid-column:2;color:var(--dim);font-size:12px}
 .clip label{grid-column:2;font-size:12px;color:var(--acc);cursor:pointer}
+.tabs{display:flex;gap:6px;margin:4px 0 6px}
+.tabs button{padding:5px 12px;font-size:13px}
+.barks{display:none}
+.v.showbarks .barks{display:block}
+.v.showbarks .voice{display:none}
+.intent{margin:12px 0 2px;font:600 12px ui-monospace,monospace;color:var(--acc);text-transform:uppercase;letter-spacing:.04em}
+.flag{display:inline-block;font-size:11px;padding:0 6px;margin-left:4px;border-radius:99px;border:1px solid var(--bad);color:var(--bad)}
+body.flagged .barks .clip:not(.flagged){display:none}
+body.flagged .barks .intent{display:none}
 .note{font-size:13px;margin-top:8px;color:var(--ink);background:#262a36;border-radius:8px;padding:8px 10px}
 #out{display:none;white-space:pre-wrap;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;font:12px ui-monospace,monospace;max-width:980px;margin:8px auto}
 </style>
@@ -36,8 +45,8 @@ main{max-width:980px;margin:auto;padding:8px 16px 40px;display:grid;gap:12px}
 <body>
 <header>
   <h1>Kingdom of Krayzee: voice audition</h1>
-  <p>Each voice: the picker sample (rendered with the saved clone voice), then the design takes that were kept. Tick the take you like best; picks are remembered in this browser.</p>
-  <div class="bar"><button id="all">Play all samples</button><button id="radio">Radio filter: off</button><button id="copy">Copy my picks</button></div>
+  <p>Each voice has two tabs. <b>Voice</b>: the picker sample (rendered with the saved clone voice), then the design takes that were kept. Tick the take you like best; picks are remembered in this browser. <b>Barks</b>: every rendered radio line (subtitle text; the phonetic TTS spelling underneath when it differs), with Whisper's hearing and any flags.</p>
+  <div class="bar"><button id="all">Play all samples</button><button id="radio">Radio filter: off</button><button id="copy">Copy my picks</button><button id="flagged">Barks: flagged only</button></div>
 </header>
 <pre id="out"></pre>
 <main id="list">Loading manifest…</main>
@@ -67,7 +76,7 @@ function play(src, btn) {
 function clip(id, file, text, meta, pickKey) {
   const d = document.createElement('div'); d.className = 'clip';
   const b = document.createElement('button'); b.className = 'play'; b.textContent = '▶';
-  b.onclick = () => play(BASE + id + '/' + file, b);
+  b.onclick = () => play(BASE + (file.includes('/') ? file : id + '/' + file), b);
   d.append(b);
   const t = document.createElement('div'); t.className = 't'; t.textContent = text; d.append(t);
   const m = document.createElement('div'); m.className = 'm'; m.textContent = meta; d.append(m);
@@ -81,27 +90,61 @@ function clip(id, file, text, meta, pickKey) {
   return d;
 }
 
-fetch(BASE + 'manifest.json', { cache: 'no-store' }).then(r => r.json()).then(M => {
+const barksP = fetch(BASE + 'barks.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+
+function barksPanel(id, B) {
+  const box = document.createElement('div'); box.className = 'barks';
+  const lines = Object.entries(B[id] || {});
+  if (!lines.length) { box.textContent = 'No barks rendered for this voice yet.'; return box; }
+  const nf = lines.filter(([, e]) => e.flags?.length).length;
+  const sum = document.createElement('div'); sum.className = 'design';
+  sum.textContent = `${lines.length} clips · ${nf} flagged · ${(lines.reduce((a, [, e]) => a + (e.bytes || 0), 0) / 1024).toFixed(0)} KB`;
+  box.append(sum);
+  let last;
+  for (const [k, e] of lines) {
+    if (e.intent !== last) { const h = document.createElement('div'); h.className = 'intent'; h.textContent = e.intent; box.append(h); last = e.intent; }
+    const say = e.say && e.say !== e.text ? `  ·  TTS: “${e.say}”` : '';
+    const c = clip(id, e.file, (e.tier ? `T${e.tier} ` : '') + '“' + e.text + '”',
+      `${k.slice(id.length + 1)} · ${e.duration}s / ${e.maxSeconds}s${e.tempo > 1 ? ' ×' + e.tempo : ''} · WER ${e.wer ?? '–'} · heard: “${e.asr ?? ''}”${say}${e.review ? ' · ' + e.review : ''}`);
+    if (e.flags?.length) {
+      c.classList.add('flagged');
+      for (const f of e.flags) { const s = document.createElement('span'); s.className = 'flag'; s.textContent = f; c.querySelector('.t').append(s); }
+    }
+    box.append(c);
+  }
+  return box;
+}
+
+Promise.all([fetch(BASE + 'manifest.json', { cache: 'no-store' }).then(r => r.json()), barksP]).then(([M, B]) => {
   const list = document.getElementById('list'); list.textContent = '';
   for (const [id, v] of Object.entries(M)) {
     if (id.startsWith('_')) continue;
     const el = document.createElement('section'); el.className = 'v';
     const q = v.quality || '';
-    el.innerHTML = `<div class="top"><h2></h2><span class="id">${id} · ${v.kind}</span>${q ? `<span class="tag ${q}">${q}</span>` : ''}</div><div class="design"></div>`;
+    el.innerHTML = `<div class="top"><h2></h2><span class="id">${id} · ${v.kind}</span>${q ? `<span class="tag ${q.replace("?", "")}">${q}</span>` : ''}</div><div class="design"></div>`;
     el.querySelector('h2').textContent = v.label;
     el.querySelector('.design').textContent = v.design;
+    const tabs = document.createElement('div'); tabs.className = 'tabs';
+    const n = Object.keys(B[id] || {}).length;
+    tabs.innerHTML = `<button class="on">Voice</button><button>Barks (${n})</button>`;
+    const [tv, tb] = tabs.children;
+    tv.onclick = () => { el.classList.remove('showbarks'); tv.classList.add('on'); tb.classList.remove('on'); };
+    tb.onclick = () => { el.classList.add('showbarks'); tb.classList.add('on'); tv.classList.remove('on'); };
+    el.append(tabs);
+    const vbox = document.createElement('div'); vbox.className = 'voice';
+    el.append(vbox, barksPanel(id, B));
     if (v.sample) {
       const s = v.sample;
-      el.append(clip(id, 'sample.mp3', '“' + s.text + '”', `picker sample · ${s.dur}s · heard as: “${s.asr}”`));
+      vbox.append(clip(id, 'sample.mp3', '“' + s.text + '”', `picker sample · ${s.dur}s · heard as: “${s.asr}”`));
     }
     for (const c of v.candidates || []) {
       if (!c.kept) continue;
       const chosen = c.tag === v.pick ? 'SAVED VOICE' : 'alternate';
       const acc = c.accent_p != null ? ` · ${c.language} accent p=${c.accent_p}` : '';
-      el.append(clip(id, c.kept, `${chosen} (${c.tag}): “${c.text || v.audition}”`,
+      vbox.append(clip(id, c.kept, `${chosen} (${c.tag}): “${c.text || v.audition}”`,
         `${c.dur}s · pitch ${c.f0} Hz · whisper WER ${c.wer}${acc} · heard as: “${c.asr}”`, c.tag));
     }
-    if (v.note) { const n = document.createElement('div'); n.className = 'note'; n.textContent = v.note; el.append(n); }
+    if (v.note) { const n = document.createElement('div'); n.className = 'note'; n.textContent = v.note; vbox.append(n); }
     list.append(el);
   }
   document.getElementById('all').onclick = async () => {
@@ -109,6 +152,7 @@ fetch(BASE + 'manifest.json', { cache: 'no-store' }).then(r => r.json()).then(M 
   };
 }).catch(e => { document.getElementById('list').textContent = 'Could not load manifest.json: ' + e; });
 
+document.getElementById('flagged').onclick = e => { const on = document.body.classList.toggle('flagged'); e.target.classList.toggle('on', on); };
 document.getElementById('radio').onclick = e => { radio = !radio; e.target.textContent = 'Radio filter: ' + (radio ? 'on' : 'off'); e.target.classList.toggle('on', radio); };
 document.getElementById('copy').onclick = () => {
   const o = document.getElementById('out'); o.style.display = 'block'; o.textContent = JSON.stringify(picks, null, 1);

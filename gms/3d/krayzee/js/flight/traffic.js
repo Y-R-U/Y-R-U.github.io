@@ -42,7 +42,41 @@ export class Traffic {
         e.ac.step(this.h, this.env);
       }
     }
+    this._contacts();
     return this.acc / this.h;
+  }
+
+  // Aircraft-to-aircraft contact. onContact({ a, b, relSpeed, remote }) may handle it (SCORE/ATC);
+  // the physical response goes through each aircraft's impact handler, so rubber planes bounce off each other.
+  _contacts() {
+    const L = this.list;
+    for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) {
+      const A = L[i], B = L[j], a = A.ac, b = B.ac;
+      if (a.crashed || b.crashed) continue;
+      const dx = b.pos.x - a.pos.x, dy = b.pos.y - a.pos.y, dz = b.pos.z - a.pos.z;
+      const r = (a.dims.span + b.dims.span) * 0.3;
+      const d = Math.hypot(dx, dz);
+      const key = a.id + '|' + b.id;
+      if (d > r || Math.abs(dy) > 2.6) { this._touching?.delete(key); continue; }
+      (this._touching ||= new Set());
+      const fresh = !this._touching.has(key);
+      this._touching.add(key);
+      const nx = d > 0.01 ? dx / d : 1, nz = d > 0.01 ? dz / d : 0, pen = (r - d) / 2;
+      const rel = Math.hypot(a.vel.x - b.vel.x, a.vel.y - b.vel.y, a.vel.z - b.vel.z);
+      if (!fresh) { a.pos.x -= nx * pen; a.pos.z -= nz * pen; b.pos.x += nx * pen; b.pos.z += nz * pen; continue; }
+      const ev = { a: A, b: B, relSpeed: rel, remote: !!(A.remote || B.remote) };
+      this.onContact?.(ev);
+      a.emit('collision', { other: b.id, remote: !!B.remote, relSpeed: rel });
+      b.emit('collision', { other: a.id, remote: !!A.remote, relSpeed: rel });
+      const why = (o) => (a.onGround && b.onGround ? `bumped into ${o}` : `mid-air collision with ${o}`);
+      const gentle = rel < 6 && a.onGround && b.onGround;
+      for (const [E, o, s] of [[A, B, -1], [B, A, 1]]) {
+        if (E.remote) continue;
+        const n = [s * nx, 0, s * nz];
+        if (gentle && !E.ac.impactHandler) { E.ac._push(n, pen); E.ac.vel.scale(0.3); }
+        else E.ac._impact('aircraft', why(o.name || o.ac.id), { n, pen, onGear: false, other: o.ac.id, speedKt: rel / 0.514444 });
+      }
+    }
   }
 
   // Player input → per-axis override; release → wait, blend back, replan.
@@ -111,8 +145,10 @@ export class Traffic {
   // ---- shared knowledge for autopilots / ATC ----
   _others(self) { return this.list.filter((e) => e.ac !== self && !e.ac.crashed); }
 
-  runwayClear(endId, self) {
-    const rw = runwayEnd(endId).rw;
+  runwayClear(endId, self) { return this.runwayFree(runwayEnd(endId).rw.id, self); }
+
+  runwayFree(rwId, self) {
+    const rw = runwayEnd(rwId.split('/')[0]).rw;
     for (const o of this._others(self)) {
       const ac = o.ac;
       if (ac.onGround && onRunway(ac.pos.x, ac.pos.z, 6) === rw) return false;

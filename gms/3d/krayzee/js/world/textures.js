@@ -41,98 +41,110 @@ export function asphaltTexture(renderer, size = 512) {
   return tex(c, renderer, { repeat: true });
 }
 
-export function grassTexture(renderer, size = 512) {
-  const [c, g] = canvas(size, size);
-  const img = g.createImageData(size, size);
-  const r = rng(5);
-  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
-    const n = tfbm(x, y, size, 40, 4);
-    const b = 0.86 + (n - 0.5) * 0.35 + (r() - 0.5) * 0.22;
-    const k = (y * size + x) * 4;
-    img.data[k] = 200 * b; img.data[k + 1] = 215 * b; img.data[k + 2] = 190 * b; img.data[k + 3] = 255;
-  }
-  g.putImageData(img, 0, 0);
-  return tex(c, renderer, { repeat: true });
+// Periodic value noise (period p lattice cells) — seamless when sampled over [0, p).
+function pnoise(x, y, p, seed) {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+  const h = (a, b) => {
+    let k = (((a % p) + p) % p) * 374761393 + (((b % p) + p) % p) * 668265263 + seed * 2246822519;
+    k = Math.imul(k ^ (k >>> 13), 1274126177);
+    return ((k ^ (k >>> 16)) >>> 0) / 4294967296;
+  };
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  const a = h(xi, yi), b = h(xi + 1, yi), c = h(xi, yi + 1), d = h(xi + 1, yi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+function pfbm(x, y, p, oct, seed) {
+  let s = 0, a = 0.5, n = 0;
+  for (let i = 0; i < oct; i++) { s += a * pnoise(x, y, p, seed + i); n += a; x *= 2; y *= 2; p *= 2; a *= 0.5; }
+  return s / n;
 }
 
-// Patchwork farmland, mirrored-tiled across the world.
-export function farmTexture(renderer, size = 2048) {
+// Tiling detail: R = grass blades / soil grain, G = soft fbm, B = clumpy cells (canopy, hedges). Linear data.
+export function detailTexture(renderer, size = 512) {
   const [c, g] = canvas(size, size);
-  const r = rng(42);
-  g.fillStyle = '#6f8646';
+  g.fillStyle = '#808080';
   g.fillRect(0, 0, size, size);
-  const cols = ['#7b8f4c', '#a39a63', '#687f40', '#b3a46c', '#7f9550', '#8f7e58', '#62793e', '#97a05e', '#857452', '#748a49'];
-  const fields = [];
-  const split = (x, y, w, h, depth) => {
-    const lim = 110 + r() * 260;
-    if ((w < lim && h < lim) || depth > 9) { fields.push([x, y, w, h]); return; }
-    const t = 0.3 + r() * 0.4;
-    if (w > h * (0.7 + r() * 0.6)) { split(x, y, w * t, h, depth + 1); split(x + w * t, y, w * (1 - t), h, depth + 1); }
-    else { split(x, y, w, h * t, depth + 1); split(x, y + h * t, w, h * (1 - t), depth + 1); }
-  };
-  split(0, 0, size, size, 0);
-  for (const [px, py, w, h] of fields) {
-    const wood = r() < 0.1;
-    g.fillStyle = wood ? '#3f5a2c' : cols[(r() * cols.length) | 0];
-    g.fillRect(px, py, w + 1, h + 1);
-    if (wood) {
-      for (let k = 0; k < w * h / 5; k++) {
-        g.fillStyle = r() < 0.5 ? 'rgba(30,48,22,0.55)' : 'rgba(92,118,62,0.45)';
-        g.beginPath(); g.arc(px + r() * w, py + r() * h, 1 + r() * 2.2, 0, Math.PI * 2); g.fill();
-      }
-    } else if (r() < 0.75) {
-      g.globalAlpha = 0.12 + r() * 0.1;
-      g.fillStyle = r() < 0.6 ? '#3d3a26' : '#e8e2c0';
-      const step = 8 + r() * 8;
-      const vert = r() < 0.5;
-      for (let q = step / 2; q < (vert ? w : h); q += step) {
-        if (vert) g.fillRect(px + q, py, 1.2, h); else g.fillRect(px, py + q, w, 1.2);
-      }
-      g.globalAlpha = 1;
-    }
-    g.strokeStyle = 'rgba(52,70,36,0.6)';
-    g.lineWidth = 2.2;
-    g.strokeRect(px + 1, py + 1, w - 2, h - 2);
-    if (r() < 0.5) {
-      g.fillStyle = 'rgba(40,62,30,0.85)';
-      for (let k = 0; k < (w + h) / 14; k++) {
-        const e = r() < 0.5, along = r();
-        g.beginPath(); g.arc(e ? px + along * w : px + 1, e ? py + 1 : py + along * h, 2.5 + r() * 2.5, 0, Math.PI * 2); g.fill();
-      }
+  const r = rng(5);
+  g.lineCap = 'round';
+  for (let k = 0; k < size * size / 22; k++) {
+    const x = r() * size, y = r() * size, a = r() * Math.PI * 2, L = 1.5 + r() * 4.5;
+    const v = (r() < 0.5 ? 40 + r() * 70 : 150 + r() * 100) | 0;
+    g.strokeStyle = `rgba(${v},${v},${v},${0.35 + r() * 0.4})`;
+    g.lineWidth = 0.6 + r() * 0.9;
+    for (const ox of [-size, 0, size]) for (const oy of [-size, 0, size]) {
+      if (x + ox < -8 || x + ox > size + 8 || y + oy < -8 || y + oy > size + 8) continue;
+      g.beginPath(); g.moveTo(x + ox, y + oy); g.lineTo(x + ox + Math.cos(a) * L, y + oy + Math.sin(a) * L); g.stroke();
     }
   }
-  const img = g.getImageData(0, 0, size, size);
-  const d = img.data;
+  const blades = g.getImageData(0, 0, size, size).data;
+  const data = new Uint8Array(size * size * 4);
+  const CP = 10, jit = new Float32Array(CP * CP * 2);
+  for (let k = 0; k < CP * CP; k++) { jit[k * 2] = 0.5 + (pnoise(k % CP + 0.5, (k / CP | 0) + 0.5, CP, 21) - 0.5) * 0.9; jit[k * 2 + 1] = 0.5 + (pnoise(k % CP + 0.5, (k / CP | 0) + 0.5, CP, 37) - 0.5) * 0.9; }
   for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
     const k = (y * size + x) * 4;
-    const v = 0.9 + (fbm(x / 70, y / 70, 3) - 0.5) * 0.22 + (r() - 0.5) * 0.06;
-    d[k] *= v; d[k + 1] *= v; d[k + 2] *= v;
+    const u = x / size, v = y / size;
+    const grain = pfbm(u * 32, v * 32, 32, 3, 3);
+    data[k] = Math.max(0, Math.min(255, blades[k] * 0.75 + grain * 64));
+    data[k + 1] = pfbm(u * 6, v * 6, 6, 5, 11) * 255;
+    let md = 9;
+    {
+      const px = u * CP, py = v * CP, ix = Math.floor(px), iy = Math.floor(py);
+      for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) {
+        const cx = ix + i, cy = iy + j, ci = (((cy % CP) + CP) % CP) * CP + (((cx % CP) + CP) % CP);
+        const jx = cx + jit[ci * 2] - px, jy = cy + jit[ci * 2 + 1] - py;
+        md = Math.min(md, jx * jx + jy * jy);
+      }
+    }
+    const cell = Math.max(0, 1 - Math.sqrt(md) * 1.45);
+    data[k + 2] = Math.min(255, (cell * 0.75 + pfbm(u * 16, v * 16, 16, 2, 5) * 0.35) * 255);
+    data[k + 3] = 255;
   }
-  g.putImageData(img, 0, 0);
-  const t = tex(c, renderer);
-  t.wrapS = t.wrapT = THREE.MirroredRepeatWrapping;
+  const t = new THREE.DataTexture(data, size, size);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.magFilter = THREE.LinearFilter;
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  t.generateMipmaps = true;
+  t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  t.needsUpdate = true;
   return t;
 }
 
-// R = mown airfield grass, G = lake shore, over [-extent, extent]^2.
-export function maskTexture(renderer, extent, isAirfield, lake, isStrip, size = 512) {
-  const [c, g] = canvas(size, size);
-  const img = g.createImageData(size, size);
+// Ripple normal map (xy in RG), tiling.
+export function waterNormalTexture(renderer, size = 256) {
+  const data = new Uint8Array(size * size * 4);
+  const hgt = new Float32Array(size * size);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) hgt[y * size + x] = pfbm(x / size * 8, y / size * 8, 8, 4, 71);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const hx = hgt[y * size + (x + 1) % size] - hgt[y * size + (x + size - 1) % size];
+    const hy = hgt[((y + 1) % size) * size + x] - hgt[((y + size - 1) % size) * size + x];
+    const k = (y * size + x) * 4;
+    data[k] = Math.max(0, Math.min(255, 128 - hx * 900));
+    data[k + 1] = Math.max(0, Math.min(255, 128 - hy * 900));
+    data[k + 2] = 255; data[k + 3] = 255;
+  }
+  const t = new THREE.DataTexture(data, size, size);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  t.magFilter = THREE.LinearFilter;
+  t.generateMipmaps = true;
+  t.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+  t.needsUpdate = true;
+  return t;
+}
+
+// World mask over [-extent, extent]^2: fn(x, z) -> [r, g, b, a] in 0..1.
+export function maskTexture(extent, size, fn) {
+  const data = new Uint8Array(size * size * 4);
   const cell = (2 * extent) / size;
   for (let py = 0; py < size; py++) for (let px = 0; px < size; px++) {
-    const x = -extent + (px + 0.5) * cell, z = -extent + (py + 0.5) * cell;
+    const v = fn(-extent + (px + 0.5) * cell, -extent + (py + 0.5) * cell);
     const k = (py * size + px) * 4;
-    const ld = Math.hypot((x - lake.x) / lake.rx, (z - lake.z) / lake.rz);
-    img.data[k] = isAirfield(x, z) * 255;
-    img.data[k + 1] = Math.max(0, Math.min(1, (1.25 - ld) / 0.25)) * 255;
-    img.data[k + 2] = isStrip(x, z) * 255;
-    img.data[k + 3] = 255;
+    for (let c = 0; c < 4; c++) data[k + c] = Math.max(0, Math.min(1, v[c])) * 255;
   }
-  g.putImageData(img, 0, 0);
-  const t = new THREE.CanvasTexture(c);
-  t.flipY = false;
+  const t = new THREE.DataTexture(data, size, size);
   t.minFilter = THREE.LinearFilter;
-  t.generateMipmaps = false;
+  t.magFilter = THREE.LinearFilter;
+  t.needsUpdate = true;
   return t;
 }
 

@@ -6,13 +6,17 @@ Reads data/barks/script.json — {"lines": [...]} or a bare list of
 Writes audio/voices/<voice>/<id>.mp3 and audio/voices/barks.json:
   {"<voice>": {"<id>": {file, duration, text, intent, ...}}}      file is relative to audio/voices/
 
-Sentence lines: up to 4 seeds; a take is accepted as soon as Whisper agrees (WER <= 0.25) and it fits maxSeconds.
+Sentence lines: up to 4 seeds; a take is accepted as soon as Whisper agrees (WER <= 0.25) and it fits maxSeconds after at most a FIT_TEMPO (1.2x) speed-up.
 Otherwise the best take wins, sped up (pitch-preserving, <= 1.25x) to fit, and is flagged if it still misses.
 Splice lines (intent splice_title / splice_digit): the clone returns nothing or a mangled word for one-word text, so
 the words are read as short lists ("Zero, one, two, three, four, five, and so on.") and cut out at Whisper's word
 timestamps snapped to the pause; every cut is re-transcribed on its own and the chunk retried on another seed if one fails. The list read also gives the level, non-final intonation a splice needs.
 
-Resumable: a line is skipped when its mp3 exists and barks.json holds the same text + voiceId.
+`say` (optional) is the TTS spelling (light phonetic accents); `text` stays the subtitle. Whisper is scored against
+whichever of the two it matches better. `review` (optional) adds a 'listen' flag for a manual check.
+Voices render one at a time in ORDER (strong voices first), splices then sentences, so a partial run leaves whole voices.
+Resumable: a line is skipped when its mp3 exists and barks.json holds the same text + say + voiceId
+(a changed maxSeconds/review only refreshes the entry's metadata).
   gen_barks.py [--voice toff,bubba] [--only id1,id2] [--intent splice_digit] [--limit N] [--dry-run] [--redo] [--kbps 48]
 Python: ~/.cache/krayzee-asr/bin/python"""
 import argparse, difflib, json, os, shutil, sys, time
@@ -24,8 +28,15 @@ OUT_JSON = os.path.join(VOICES, 'barks.json')
 # The model reads spelling, not intent. Whisper hears the sound, so the ASR reference uses the spoken form too.
 SAY = {'Krayzee': 'Crazy', 'KRAYZEE': 'CRAZY', 'krayzee': 'crazy'}
 WER_OK = 0.25
+FIT_TEMPO = 1.2
 SEEDS = [1, 2, 3, 4]
 SPLICE = ('splice_title', 'splice_digit')
+ORDER = ['toff', 'duchess', 'tower_m', 'tower_f', 'tower_trainee', 'bubba', 'darlene', 'wingco', 'sheila', 'tex', 'nan',
+         'prince', 'charmer', 'geezer', 'laird', 'heiress', 'baronin', 'comte']
+
+
+def tts_text(l):
+    return spoken(l.get('say') or l['text'])
 
 
 def spoken(text):
@@ -56,12 +67,19 @@ def entry(v, l, M, out, **kw):
     du = dur(out)
     e = dict(file=f"{v}/{l['id']}.mp3", duration=round(du, 2), text=l['text'], intent=l.get('intent'),
              maxSeconds=float(l.get('maxSeconds') or 4.0), bytes=os.path.getsize(out), voiceId=M[v]['voiceId'], **kw)
-    for k in ('callsign', 'rwy', 'tier'):
+    for k in ('callsign', 'rwy', 'tier', 'say', 'review'):
         if k in l:
             e[k] = l[k]
-    flags = e.pop('flags', [])
-    if du > e['maxSeconds'] + 0.02:
+    return reflag(e, e.pop('flags', []))
+
+
+def reflag(e, flags):
+    flags = [f for f in flags if f not in ('long', 'listen')]
+    if e['duration'] > e['maxSeconds'] + 0.02:
         flags.append('long')
+    if e.get('review'):
+        flags.append('listen')
+    e.pop('flags', None)
     if flags:
         e['flags'] = flags
     return e
@@ -69,7 +87,8 @@ def entry(v, l, M, out, **kw):
 
 def render(v, l, M, B, kbps):
     st = M[v]['clone']
-    text = spoken(l['text'])
+    text = tts_text(l)
+    sub = spoken(l['text'])
     cap = float(l.get('maxSeconds') or 4.0)
     d = f'{SCR}/barks/{v}'
     os.makedirs(d, exist_ok=True); os.makedirs(f'{VOICES}/{v}', exist_ok=True)
@@ -82,11 +101,11 @@ def render(v, l, M, B, kbps):
             print(v, l['id'], 'take failed', seed, e, flush=True); continue
         tmp = f"{d}/{l['id']}_s{seed}.mp3"
         du = post(wav, tmp, kbps=kbps)
-        hyp = asr(tmp); w = wer(text, hyp)
+        hyp = asr(tmp); w = min(wer(text, hyp), wer(sub, hyp))
         sc = 4 * w + max(0, du - cap) * 1.5
         takes.append(dict(seed=seed, wall=round(wall, 1), dur=round(du, 2), wer=round(w, 3), asr=hyp, score=round(sc, 3), file=tmp, wav=wav))
         print(f"  {v}/{l['id']} s{seed} {du:.2f}s/{cap}s wer={w:.2f} wall={wall:.1f}s | {hyp}", flush=True)
-        if w <= WER_OK and du <= cap:
+        if w <= WER_OK and du <= cap * FIT_TEMPO:  # sped up to fit below; cheaper than another ~11 s take
             break
     if not takes:
         return None
@@ -125,7 +144,7 @@ def _try_chunk(v, items, st, seed, tag, kbps):
     nwav = f'{d}/{tag}_s{seed}.norm.wav'
     post(wav, nwav)  # normalise the whole read once; a 0.4 s cut is too short for loudnorm to measure
     words = asr_words(nwav)
-    want = [norm_words(t) for t in items]
+    want = [norm_words(t) for t in items] + [norm_words('and so on')]  # the tail bounds the last item's cut
     flat = [w for ws in want for w in ws]
     sm = difflib.SequenceMatcher(a=flat, b=[w[0] for w in words], autojunk=False)
     pos = {}
@@ -139,7 +158,7 @@ def _try_chunk(v, items, st, seed, tag, kbps):
         spans.append((got[0][1], got[-1][2]) if got else None)
     x = load_pcm(nwav); total = len(x) / 16000
     cuts = []
-    for j, sp in enumerate(spans):
+    for j, sp in enumerate(spans[:-1]):
         if not sp:
             cuts.append(None); continue
         # Whisper word edges overlap their neighbours: cut at the quietest point of the gap, never past its middle.
@@ -167,7 +186,7 @@ def render_splices(v, group, M, B, kbps):
     n = 0
     for c0 in range(0, len(group), CHUNK):
         chunk = group[c0:c0 + CHUNK]
-        items = [spoken(l['text']).rstrip('.,') for l in chunk]
+        items = [tts_text(l).rstrip('.,') for l in chunk]
         tag = f"{chunk[0]['intent']}_{c0 // CHUNK}"
         best = None
         for seed in SEEDS:
@@ -213,9 +232,17 @@ def main():
         if not M.get(v, {}).get('voiceId'):
             print('no saved voice for', v, '- skipping', l['id']); continue
         e = B.get(v, {}).get(l['id'])
-        if not a.redo and e and e['text'] == l['text'] and e.get('voiceId') == M[v]['voiceId'] and os.path.exists(f"{VOICES}/{v}/{l['id']}.mp3"):
+        if not a.redo and e and e['text'] == l['text'] and e.get('say') == l.get('say') and e.get('voiceId') == M[v]['voiceId'] and os.path.exists(f"{VOICES}/{v}/{l['id']}.mp3"):
+            e['maxSeconds'] = float(l.get('maxSeconds') or 4.0)
+            e.pop('review', None)
+            if l.get('review'): e['review'] = l['review']
+            reflag(e, e.get('flags', []))
             continue
         todo.append((v, l))
+    if not a.dry_run:
+        jsave(OUT_JSON, B)
+    rank = {v: i for i, v in enumerate(ORDER)}
+    todo.sort(key=lambda j: (rank.get(j[0], 99), j[1].get('intent') not in SPLICE))  # stable: script order within
     if a.limit:
         todo = todo[:a.limit]
     groups = {}
@@ -228,14 +255,19 @@ def main():
         for v, l in todo: print(' ', v, l['id'], '|', l['text'])
         return
     t0 = time.time()
-    for (v, intent), g in groups.items():
-        n = render_splices(v, g, M, B, a.kbps)
-        jsave(OUT_JSON, B)
-        print(f'{v} {intent}: {n}/{len(g)} cut', flush=True)
-    for i, (v, l) in enumerate(singles):
-        e = render(v, l, M, B, a.kbps)
-        jsave(OUT_JSON, B)
-        print(f"[{i + 1}/{len(singles)}] {v}/{l['id']}", 'FAILED' if not e else f"{e['duration']}s x{e['tempo']} {e.get('flags', '')}", flush=True)
+    i = 0
+    for v in dict.fromkeys(j[0] for j in todo):
+        for (gv, intent), g in groups.items():
+            if gv != v: continue
+            n = render_splices(v, g, M, B, a.kbps)
+            jsave(OUT_JSON, B)
+            print(f'{v} {intent}: {n}/{len(g)} cut', flush=True)
+        for sv, l in singles:
+            if sv != v: continue
+            i += 1
+            e = render(v, l, M, B, a.kbps)
+            jsave(OUT_JSON, B)
+            print(f"[{i}/{len(singles)}] {v}/{l['id']} {time.time() - t0:.0f}s", 'FAILED' if not e else f"{e['duration']}s x{e['tempo']} {e.get('flags', '')}", flush=True)
     bad = [(v, k) for v in B for k, e in B[v].items() if e.get('flags')]
     print(f'done in {time.time() - t0:.0f}s; flagged: {len(bad)}', bad[:20])
 

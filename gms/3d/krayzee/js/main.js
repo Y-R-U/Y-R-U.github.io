@@ -8,24 +8,27 @@ import { Aircraft } from './flight/aircraft.js';
 import { Autopilot } from './flight/autopilot.js';
 import { Traffic, AXES } from './flight/traffic.js';
 import { circuitRoute, runwayEnd, fromRunway } from './flight/routes.js';
-import { createControls, noteSettings } from './flight/controls.js';
+import { createControls } from './flight/controls.js';
 import { createFlightCamera, fitFov } from './flight/cameras.js';
 import { createHUD } from './flight/hud.js';
 import { createAttract } from './flight/attract.js';
 import { V3, Quat, KT, FT, clamp } from './flight/vmath.js';
+import { createWiring } from './core/wiring.js';
+import { loadCareer } from './game/index.js';
 
 const AUTO = params.get('auto') === '1';
 const SHOT = params.get('shot') === '1';
 const TIMESCALE = Math.min(8, Math.max(0.1, +params.get('timescale') || 1));
 const S = { mode: 'boot', paused: false, view: 'chase', player: null, log: [], respawnT: 0, startT: 0 };
-let R, scene, camera, world, env, traffic, attract, controls, hud, fcam, sunFollow, gov, engine = null;
+let R, scene, camera, world, env, traffic, attract, controls, hud, fcam, sunFollow, gov, wiring, career, engine = null;
 const aiVoices = new Map(), errSeen = new Set();
 const tmpP = new V3(), tmpQ = new Quat();
 
 const log = (type, data = {}) => { S.log.push({ t: +(performance.now() / 1000).toFixed(1), ...data, type }); if (S.log.length > 200) S.log.shift(); };
 
 async function boot() {
-  ui.initUI({ onPlay, onSettings, onProfile, onResume, onQuit, onSound: (k) => audio.playUI(k) });
+  try { career = loadCareer(); } catch (e) { career = undefined; }
+  ui.initUI({ onPlay, onSettings, onProfile, onResume, onQuit, onSound: (k) => audio.playUI(k), career });
   ui.setLoading(0.05, 'Warming up the engines');
   try { audio.initAudio(); audio.setVolumes(ui.getSettings()); } catch (e) { console.warn('audio', e); }
   const settings = ui.getSettings();
@@ -34,7 +37,7 @@ async function boot() {
   // Scene content (trees, decals, plane detail) is built once: auto uses high on desktop, low on phones (D6 steps the renderer).
   const contentQ = qpick.auto ? (isMobile() ? 'low' : 'high') : quality;
   S.contentQ = contentQ;
-  S.view = params.get('view') || settings.view || 'chase';
+  S.view = params.get('view') || settings.view || viewList()[0];
   if (SHOT) document.documentElement.classList.add('krz-shot');
 
   const canvas = document.getElementById('krz-canvas');
@@ -50,19 +53,23 @@ async function boot() {
   env = { groundHeightAt: world.groundHeightAt, surfaceAt: world.surfaceAt, colliders: world.colliders || [] };
   traffic = new Traffic(env);
   ui.setLoading(0.5, 'Waking the tower');
-  attract = createAttract({ scene, traffic, env, createPlane, quality: contentQ, max: params.get('lite') === '1' ? 3 : 4, onRig: (rig) => applyEnv(rig) });
+  const overlayEl = document.getElementById('krz-overlay');
+  hud = createHUD(overlayEl);
+  hud.setVisible(false);
+  wiring = createWiring({ ui, audio, world, traffic, hud, career, log });
+  attract = createAttract({ scene, traffic, env, createPlane, quality: contentQ, max: params.get('lite') === '1' ? 3 : 4,
+    onRig: (rig) => applyEnv(rig), onSpawn: (e) => wiring.addAI(e), onDespawn: (e) => wiring.removeAI(e), activeEnd: () => wiring.activeEnd() });
   await attract.start();
   ui.setLoading(0.8, 'Briefing the pilots');
 
   controls = createControls({
     root: overlay, getSettings: ui.getSettings,
-    onView: () => setView(S.view === 'cockpit' ? 'chase' : 'cockpit'),
+    onView: () => { const v = viewList(); setView(v[(v.indexOf(S.view) + 1) % v.length]); },
     onPause: pause,
     onFullscreen: toggleFullscreen,
   });
   if (!document.fullscreenEnabled) controls.el.querySelector('[data-act="fs"]').hidden = true;
-  hud = createHUD(overlay);
-  controls.setVisible(false); hud.setVisible(false);
+  controls.setVisible(false);
   fcam = createFlightCamera(camera, env);
   sunFollow = world.setShadowFocus ? (p) => world.setShadowFocus(p.x, p.z, S.player ? R.tier.shadowBox : 160) : followSun(world.sun, R);
   gov = createFpsGovernor(R, { enabled: qpick.auto });
@@ -100,7 +107,7 @@ async function onPlay(mode) {
   S.starting = true;
   try {
     const livery = ui.getLivery ? ui.getLivery() : ui.getProfile();
-    const rig = await createPlane({ type: 'c172', livery, quality: S.contentQ === 'low' ? 'low' : 'high', cockpit: true });
+    const rig = await createPlane({ type: 'c172', livery, quality: S.contentQ === 'low' ? 'low' : 'high', cockpit: true, pilot: { gender: ui.getProfile().gender }, view: S.view });
     rig.root.traverse((o) => { if (o.isMesh) o.castShadow = true; });
     applyEnv(rig);
     rig.setLivery?.(livery);
@@ -110,6 +117,7 @@ async function onPlay(mode) {
     S.player = traffic.add({ aircraft: ac, ap, rig, player: true, name: livery.registration || 'PLAYER' });
     S.mode = 'play'; S.playMode = mode;
     placePlayer();
+    wiring.startPlay(mode, S.player);
     controls.setVisible(!SHOT && !AUTO); hud.setVisible(!SHOT);
     setView(S.view);
     try { engine?.dispose(); engine = audio.createEngineVoice({ gain: 1, priority: 1 }); } catch (e) { engine = null; }
@@ -118,7 +126,8 @@ async function onPlay(mode) {
 }
 
 function placePlayer() {
-  const e = runwayEnd('09');
+  const E = wiring.activeEnd();
+  const e = runwayEnd(E);
   const [x, z] = fromRunway(e, 12, 0);
   attract.clearAround(x, z, 160);
   for (const a of attract.ai) {
@@ -127,7 +136,7 @@ function placePlayer() {
   }
   const ent = S.player;
   ent.ac.place({ x, z, heading: e.hdg }, env);
-  ent.ap.setRoute(circuitRoute('09'));
+  ent.ap.setRoute(circuitRoute(E));
   for (const k of AXES) { ent.axis[k].mode = 'auto'; ent.manual[k] = null; }
   controls.release();
   S.respawnT = 0;
@@ -138,14 +147,20 @@ function quitPlay() {
   traffic.remove(S.player);
   S.player.rig.dispose();
   S.player = null;
+  wiring.endPlay();
   engine?.dispose(); engine = null;
   controls.setVisible(false); hud.setVisible(false);
   S.mode = 'attract'; S.paused = false;
   fitFov(camera, 70, 45, 85);
 }
 
+const VIEWS = ['chase', 'center', 'cockpit'];
+function viewList() {
+  const v = (ui.getSettings().views || VIEWS).filter((x) => VIEWS.includes(x));
+  return v.length ? v : VIEWS;
+}
 function setView(v) {
-  S.view = v === 'cockpit' ? 'cockpit' : 'chase';
+  S.view = VIEWS.includes(v) ? v : 'chase';
   if (S.player) S.player.rig.setView(S.view);
   fcam?.setView(S.view);
   if (S.mode !== 'play') fitFov(camera, 70, 45, 85);
@@ -160,14 +175,16 @@ function pause() {
 function onResume() { S.paused = false; try { audio.setVolumes(ui.getSettings()); } catch (e) { /* */ } }
 function onQuit() { quitPlay(); try { audio.setVolumes(ui.getSettings()); } catch (e) { /* */ } }
 function onSettings(s) {
-  noteSettings(s);
   if (s.view && s.view !== S.view && !params.get('view')) setView(s.view);
   const q = pickQuality(s.quality);
   gov.setAuto(q.auto);
   if (!q.auto && q.tier !== R.quality) R.setQuality(q.tier);
   if (!S.paused) try { audio.setVolumes(s); } catch (e) { /* */ }
 }
-function onProfile() { if (S.player && ui.getLivery) S.player.rig.setLivery(ui.getLivery()); }
+function onProfile() {
+  if (S.player && ui.getLivery) { S.player.rig.setLivery(ui.getLivery()); S.player.rig.setPilot?.({ gender: ui.getProfile().gender }); }
+  wiring?.refreshProfile();
+}
 
 function toggleFullscreen() {
   const d = document;
@@ -186,7 +203,7 @@ function frame(dt) {
     Object.assign(P.manual, m);
   }
   const alpha = S.paused ? traffic.acc / traffic.h : traffic.update(dt * TIMESCALE);
-  if (!S.paused) attract.update(dt * TIMESCALE);
+  if (!S.paused) { attract.update(dt * TIMESCALE); wiring.update(dt * TIMESCALE, P); }
   traffic.sync(alpha, S.paused ? 0 : dt, tmpP, tmpQ);
   for (const e of traffic.list) e.rig?.root.updateMatrixWorld();
 
@@ -196,7 +213,7 @@ function frame(dt) {
     const status = P.ap.status();
     const modes = modesOf(P);
     hud.update(dt, P.ac, status, traffic.modeOf(P), modes, ui.getSettings().units);
-    controls.paint(P.ac, modes, S.view);
+    controls.paint(P.ac, modes, S.view, viewList().length > 1);
   } else attract.updateCamera(dt, camera);
   for (const e of traffic.list) if (!e.player) { e.ac.events.length = 0; e.ap?.events.splice(0); }
 
@@ -220,8 +237,10 @@ function handleEvents(P, dt) {
       try { audio.playCrash(1); } catch (e) { /* */ }
       fcam.kick(2.5);
       hud.flash(`CRASHED · ${ev.reason.toUpperCase()}`, 'bad', 3.5);
-      S.respawnT = 3.5;
+      S.respawnT = wiring.lastImpact?.gagSecs ?? 3.5;
     } else if (ev.type === 'tailstrike') hud.flash('TAIL STRIKE!', 'warn');
+    else if (ev.type === 'impact' && ev.result === 'bounce') { fcam.kick(1.2); hud.flash('BOING!', 'warn', 1.2); }
+    else if (ev.type === 'impact') fcam.kick(1.5);
   }
   for (const ev of P.ap.events.splice(0)) {
     log('ap.' + ev.type, ev);
@@ -229,7 +248,7 @@ function handleEvents(P, dt) {
     else if (ev.type === 'replan' && ev.to === 'approach') hud.flash(`AUTOPILOT · LANDING RUNWAY ${ev.end}`, 'info');
     else if (ev.type === 'recovery') hud.flash('AUTOPILOT · RECOVERING', 'warn');
   }
-  if (ac.crashed && S.respawnT > 0 && (S.respawnT -= dt) <= 0) placePlayer();
+  if (ac.crashed && S.respawnT > 0 && (S.respawnT -= dt) <= 0) { placePlayer(); try { wiring.game?.respawn(); } catch (e) { /* */ } }
 }
 
 function updateAudio(dt) {
@@ -238,7 +257,7 @@ function updateAudio(dt) {
     const up = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion);
     const P = S.player;
     audio.setListener({ position: camera.position, velocity: P ? P.ac.vel : { x: 0, y: 0, z: 0 }, forward: fwd, up });
-    const interior = S.view === 'cockpit' && !!P;
+    const interior = S.view !== 'chase' && !!P;
     if (P && engine) {
       const ac = P.ac;
       engine.setRPM(ac.crashed ? 0 : ac.instruments().rpm, ac.eng);
@@ -276,7 +295,7 @@ window.__game = {
   get S() { return S; },
   state: () => ({
     mode: S.mode, paused: S.paused, view: S.view, quality: R?.quality, fps: gov ? +gov.fps.toFixed(1) : 0, shot: attract?.shot,
-    player: S.player ? summary(S.player) : null, ai: traffic ? traffic.list.filter((e) => !e.player).map(summary) : [],
+    activeEnd: wiring?.activeEnd(), game: wiring?.state(), player: S.player ? summary(S.player) : null, ai: traffic ? traffic.list.filter((e) => !e.player).map(summary) : [],
   }),
   setControls: (c, ms = 1000) => controls.inject(c, ms),
   release: () => controls.release(),

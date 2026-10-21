@@ -111,7 +111,7 @@ ALIASES = {'krayzee': 'crazy', 'crazee': 'crazy', 'yall': 'you all', 'ya': 'you'
            'gday': 'good day', 'comin': 'coming', 'landin': 'landing', 'stoppin': 'stopping', 'usin': 'using',
            'darn': 'darn', 'oughtnt': 'ought not', 'ma': 'my', 'heid': 'head', 'allo': 'hello', 'ici': 'here',
            'eins': 'one', 'zwei': 'two', 'okay': 'ok', 'tallyho': 'tally ho', 'gonna': 'going to', 'zis': 'this', 'ze': 'the', 'eet': 'it', 'haff': 'have',
-           'runvay': 'runway', 'ow': 'how', 'vill': 'will', 'vat': 'what', 'compt': 'comte', 'conte': 'comte', 'nine': 'niner', 'scuse': 'excuse', 'outta': 'out of', 'avin': 'having',
+           'runvay': 'runway', 'ow': 'how', 'vill': 'will', 'vat': 'what', 'compt': 'comte', 'conte': 'comte', 'nine': 'niner', 'marquis': 'marquess', 'scuse': 'excuse', 'outta': 'out of', 'avin': 'having',
            'squeezin': 'squeezing', 'im': 'i am', 'thats': 'that is', 'its': 'it is', 'ill': 'i will', 'youll': 'you will',
            'dont': 'do not', 'wont': 'will not', 'cant': 'can not', 'ive': 'i have', 'theres': 'there is'}
 

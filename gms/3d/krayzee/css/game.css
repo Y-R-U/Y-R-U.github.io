@@ -59,9 +59,11 @@ html.krz-shot #krz-controls, html.krz-shot #krz-hud { display: none !important; 
 .krz-thr-fill { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(94,224,143,.35), rgba(94,224,143,.08)); }
 .krz-thr[data-mode="manual"] .krz-thr-fill { background: linear-gradient(to top, rgba(255,181,71,.45), rgba(255,181,71,.1)); }
 .krz-thr[data-mode="manual"] { border-color: var(--krz-man); }
-.krz-thr-thumb { position: absolute; left: 6px; right: 6px; height: 28px; bottom: 0; border-radius: 9px; background: rgba(246,241,228,.88); }
-.krz-thr-l, .krz-thr-v { position: absolute; left: 0; right: 0; text-align: center; font: 700 10px/1 system-ui; letter-spacing: .08em; text-shadow: 0 1px 2px #000; }
-.krz-thr-l { top: 8px; } .krz-thr-v { top: 22px; color: var(--krz-dim); }
+.krz-thr-thumb { position: absolute; left: 6px; right: 6px; height: 28px; bottom: 0; border-radius: 9px; background: rgba(246,241,228,.9);
+  display: grid; place-items: center; }
+.krz-thr-v { font: 800 12px/1 ui-monospace, Menlo, monospace; color: #16233a; }
+.krz-thr-l { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%) rotate(-90deg); text-align: center;
+  font: 700 10px/1 system-ui; letter-spacing: .3em; color: var(--krz-dim); text-shadow: 0 1px 2px #000; }
 .krz-pad { display: grid; grid-template-columns: repeat(2, var(--btn)); gap: 8px; }
 .krz-sq { width: var(--btn); height: var(--btn); grid-auto-flow: row; gap: 3px; align-content: center; }
 .krz-sq b { font-size: 12px; } .krz-sq span { font-size: 9px; color: var(--krz-dim); }

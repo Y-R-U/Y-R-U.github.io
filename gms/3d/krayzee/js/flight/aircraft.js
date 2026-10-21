@@ -201,9 +201,28 @@ export class Aircraft {
     this.lastTouchdown = { t: this.time, fpm, grade, x: this.pos.x, z: this.pos.z, surface: this.surface, speed: this.speed };
     if (bounce) this.bounces++; else this.bounces = 0;
     this.emit('touchdown', { fpm: Math.round(fpm), grade, bounce: !!bounce, surface: this.surface });
-    if (grade === 'crash' || (gearOver && fpm > 900)) this._crash('hard landing');
+    if (grade === 'crash' || (gearOver && fpm > 900)) this._impact('touchdown', 'hard landing', { n: [0, 1, 0], pen: 0, onGear: false, speedKt: -vs / KT });
     else if (grade === 'hard') this.emit('hardlanding', { fpm: Math.round(fpm) });
   }
+
+  // Something solid was hit. Without an impactHandler (SCORE protection modes) that is a crash; with one, the
+  // handler decides: 'bounce'/'damage' reflect the velocity (impossiRubber), 'destroyed' crashes.
+  _impact(kind, reason, { n = [0, 1, 0], pen = 0, onGear = false, other = null, speedKt } = {}) {
+    if (!this.impactHandler) return this._crash(reason);
+    if (this.time - (this._lastImpact ?? -9) < 0.35) { this._push(n, pen); return; }
+    this._lastImpact = this.time;
+    const vn = this.vel.x * n[0] + this.vel.y * n[1] + this.vel.z * n[2];
+    const r = this.impactHandler({ kind, reason, speedKt: speedKt ?? Math.max(Math.abs(vn), this.speed * 0.5) / KT, onGear, other, ac: this });
+    if (!r || r.result === 'destroyed') return this._crash(reason);
+    const e = r.restitution ?? 0.5;
+    if (vn < 0) this.vel.addScaled(_n.set(n[0], n[1], n[2]), -(1 + e) * vn);
+    if (n[1] > 0.5 && this.vel.y < 2) this.vel.y = Math.max(this.vel.y, 2 + e * 4);
+    this._push(n, pen);
+    if (r.spinDegPerS) this.w.y += (r.spinDegPerS * DEG);
+    this.w.scale(0.5);
+    this.emit('impact', { result: r.result, reason, kind, restitution: e, other });
+  }
+  _push(n, pen) { if (pen > 0) this.pos.addScaled(_n.set(n[0], n[1], n[2]), pen + 0.05); }
 
   _crash(reason) {
     if (this.crashed) return;
@@ -212,19 +231,28 @@ export class Aircraft {
   }
 
   _checkCrash(env, surf) {
-    if (this.onGround && (surf === 'water' || surf === 'building') && this.speed > 3) return this._crash(surf === 'water' ? 'ditched in the water' : 'hit a building');
+    if (this.onGround && (surf === 'water' || surf === 'building') && this.speed > 3) return this._impact('surface', surf === 'water' ? 'ditched in the water' : 'hit a building', { n: [-this.vel.x, 0, -this.vel.z].map((v) => v / (this.gs || 1)), pen: 1 });
     for (const hp of this.hardPoints) {
       const r = _rw.copy(hp.r).applyQuat(this.q);
       const x = this.pos.x + r.x, y = this.pos.y + r.y, z = this.pos.z + r.z;
-      if (y < env.groundHeightAt(x, z)) return this._crash(`${hp.name} hit the ground`);
+      const gy = env.groundHeightAt(x, z);
+      if (y < gy) return this._impact('ground', `${hp.name} hit the ground`, { n: [0, 1, 0], pen: gy - y });
       if (env.colliders) for (const b of env.colliders) {
-        if (x > b.min[0] && x < b.max[0] && y > b.min[1] && y < b.max[1] && z > b.min[2] && z < b.max[2]) return this._crash(`hit the ${b.kind || 'building'}`);
+        if (x > b.min[0] && x < b.max[0] && y > b.min[1] && y < b.max[1] && z > b.min[2] && z < b.max[2]) {
+          const d = [x - b.min[0], b.max[0] - x, y - b.min[1], b.max[1] - y, z - b.min[2], b.max[2] - z];
+          const i = d.indexOf(Math.min(...d));
+          const n = [[-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, -1], [0, 0, 1]][i];
+          return this._impact('collider', `hit the ${b.kind || 'building'}`, { n, pen: d[i] });
+        }
       }
     }
     const ts = _rw.copy(this.tailSkid).applyQuat(this.q);
     if (this.pos.y + ts.y < this.groundY && !this._tailStruck) { this._tailStruck = true; this.emit('tailstrike', {}); }
     else if (this.pos.y + ts.y > this.groundY + 0.3) this._tailStruck = false;
-    if (this.mainsDown && Math.abs(this.bank) > 0.5) this._crash('cartwheeled');
+    if (this.mainsDown && Math.abs(this.bank) > 0.5) {
+      this._impact('ground', 'cartwheeled', { n: [0, 1, 0], pen: 0.3 });
+      if (!this.crashed) this.w.z += this.bank * 2;
+    }
   }
 
   _derive(env, alpha = 0, beta = 0, V = this.vel.len(), bank) {
@@ -264,4 +292,4 @@ export class Aircraft {
 
 const _f = new V3(), _u = new V3(), _r = new V3(), _va = new V3(), _vb = new V3(), _force = new V3(), _torque = new V3();
 const _vd = new V3(), _ld = new V3(), _ww = new V3(), _rw = new V3(), _pv = new V3(), _wf = new V3(), _ws = new V3();
-const _wfo = new V3(), _tq = new V3();
+const _wfo = new V3(), _tq = new V3(), _n = new V3();

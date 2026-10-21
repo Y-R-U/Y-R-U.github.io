@@ -14,6 +14,8 @@ Procedural C172 (exterior + full cockpit), no external assets. Test page: `tools
 | `instruments.js` | 8 live gauges drawn into one canvas atlas (ASI, AI, ALT, TC, DG, VSI, TACH, FUEL) |
 | `livery.js` | one paint atlas canvas: fuselage L/R, fin L/R, wing top/bottom, colour swatches; text layout |
 | `materials.js` | PBR materials, glow + prop-disc textures |
+| `trim.js` | interior atlas canvas (door/sidewall upholstery, map pocket, seams, AO; perforated headliner; pleated seat leather; carpet). uv [0,0] = white patch |
+| `pilot.js` | royal pilot (+ corgi passenger at high): ONE dynamic mesh, parts re-posed on the CPU (head look, 2-bone arm IK to the yoke grips) |
 
 Build frame inside the rig: y = height above ground, z = station aft of the spinner tip; an inner group offsets it so the
 root origin is the CG (station 2.45 m, 1.2 m above ground). Forward = -Z, up = +Y, right = +X as per contract.
@@ -48,29 +50,57 @@ accent = pinstripes + text outline + spinner. Text colours are picked automatica
 `setLivery` only redraws the canvas (CPU < 1 ms measured; the GPU upload of the 2048² (high) / 1024² (low) atlas happens on the
 next frame) — safe to call from a colour picker `input` event; consider throttling to ~10 Hz on mobile.
 
-## Budgets (measured, whole rig, headless Chrome + ANGLE Metal)
-| quality / view | draw calls | triangles |
-|---|---|---|
-| high, chase (interior visible through windows) | 23 | 57.8k |
-| high, cockpit | 23 (15 after frustum culling) | 57.8k |
-| low, chase (interior hidden) | 13 | 13.1k |
-| low, cockpit | 22 (14 after frustum culling) | 30.9k |
+## Round 2 (2026-10-21)
+- **Pilot**: left seat, seated eye = `EYE` (the cockpit camera *is* the pilot's head). Navy tunic, red sash, gold
+  epaulettes, white silk scarf, cream jodhpurs + riding boots, tan gauntlets, green David-Clark-style headset with boom mic,
+  gold-rimmed aviators, and a small jewelled crown worn jauntily over the headset. `gender:'m'` = handlebar moustache,
+  `'f'` = fuller hair + chignon + lipstick. Head looks into turns (rudder/aileron) with slow idle glances. Both gloved hands
+  are on the left yoke horns and follow it (IK arms; the forearm stretches ≤ ~8 % at full forward yoke).
+  `opts.pilot = { gender:'m'|'f', skin:'light'|'fair'|'tan'|'brown'|'dark'|'#hex', hair:'#hex', passenger:true }`,
+  `opts.pilot = false` → no pilot. `setPilot({...})` rebuilds (≈2 ms), `pilot()` returns the config.
+  Cockpit view hides torso + head (legs, arms and gloves stay — you see your own hands and knees); center view shows all.
+- **Passenger** (high only): a royal corgi with goggles pushed up, sitting on two velvet cushions with gold tassels so it
+  can see out; head wanders and leans into turns. `passenger:false` removes it.
+- Front seats moved forward to station 2.55 (real C172 pilot position for this eye point; the arms reach the yoke).
+- **Prop disc**: new polar shimmer texture — ~4–9 % haze, two soft blade bands drifting slowly (stroboscopic beat),
+  faint radial banding, tip stripes at ~2–4 %. Same in all views.
+- **Cockpit interior**: textured atlas on the interior material (no extra calls): door + rear sidewall fabric inserts with
+  pleats and stitching, map pocket (with a chart in it) + 3D flap, moulded armrests, door handle (escutcheon + lever),
+  window latch, door shut line + seams + screws, kick-panel vent, baked AO (floor, firewall, window reveals, under armrests),
+  perforated headliner with transverse bows, overhead console (dome light, 2 eyeball vents, speaker), wing-root fresh-air
+  vents, carpet, pleated caramel leather seats, seat rails. The A-pillar is now one moulded post with a black windscreen
+  seal (door-window front edge moved 1.5 cm forward in `WINDOWS.door`, shared with the livery holes).
+- **Flaps**: Fowler-ish track motion — 0→30° rotation plus up to 12 cm aft (mostly in the first 2/3 of travel) and 3 cm down.
+- **Night**: `setLightLevel(k)` now also drives the panel backlight (smoothstep 0.45→0.9): labels/scales/displays of the
+  panel art glow (mask built lazily on first use, ~10 ms once) and gauge self-illumination rises. `setPanelLight(v|null)`
+  forces it (null = follow light level); `opts.panelLight` same at creation.
+- **Center view (D11)**: `setView('center')`, `eyeCenter` (Vector3 root-local, x = 0, same height/station as `eye`),
+  `eyeCenterPitch` (= eyePitch). Nothing pokes up between the seats; both yokes visible either side.
+- **Low quality now has real window holes** whenever `cockpit !== false` (so the pilot is visible in chase at low too).
+  `cockpit:false` rigs (attract/AI traffic) now get painted dark glass at both qualities instead of see-through empty cabins.
+- In chase view the gauges, throttle and pedals are hidden (unseeable; saves 4 calls).
 
-Counts are mesh/points objects visible (upper bound, no culling); blades and disc are never both drawn, so real is −1.
-Shadow pass adds one call per shadow-casting mesh. Textures: paint atlas 2048² / 1024², panel 2048×1024 / 1024×512,
-gauges 1024×512 / 512×256 (only this one updates, ≤20 Hz).
+## Budgets (measured r2, whole rig incl. pilot/corgi, headless Chrome + ANGLE Metal)
+| quality / view | draw calls (no culling) | rendered calls (default camera) | triangles |
+|---|---|---|---|
+| high, chase | 19 | 20* | 66.1k |
+| high, cockpit / center | 23 | 16 | 66.6k |
+| low, chase | 18 | 19* | 34.8k |
+| low, cockpit / center | 22 | 15 | 35.4k |
 
-## Screenshots (`docs/shots/plane/`)
-plane_34_1280, plane_34_390, plane_front34_1280, plane_side_1280/390, plane_tail_1280/390, plane_top_1280/390,
-plane_cockpit_1280/390/844x390, plane_cockpit_down_1280 (yokes/throttle/pedals), plane_cockpit_left_1280 (strut + wing from the seat),
-plane_low_34_1280, plane_low_cockpit_390, plane_livery_red_1280, plane_livery_green_side (1-char name), plane_controls_1280,
-plane_tool_ui_1280/390.
+*renderer.info counts include the prop/disc pair. Pilot = 1 call (7.4k tris high incl. corgi, 1.7k low); shadow pass +1.
+Pilot CPU: re-poses ~1–2.5k vertices per frame (head, arms, gloves, corgi head) — well under 0.1 ms.
+Textures added: interior atlas 1024² (high) / 512² (low), panel glow mask (only once night is used).
 
 ## Known gaps / ideas
-- No pilot figure in the seats (chase view at high shows empty seats through the windows).
-- Flaps rotate about a fixed hinge (real C172 flaps also slide aft); ailerons have no Frise nose gap.
+- Ailerons have no Frise nose gap; the flap slot shows the wing's blunt rear spar face (no cove/shroud lip).
 - Yokes sit out of the default forward view in landscape (they are visible looking down, and in portrait with a tall FOV).
-- Cockpit is daylight-only: no panel/flood lighting for night yet (gauges have a mild self-illumination).
+- Night: panel backlight only — no red flood/dome light pool, GPS screen background does not glow.
 - No damage/deformation states, no doors that open, no landing-light beam (FLIGHT/AIRPORT can add a SpotLight at
   the left-wing leading edge lens, build frame x −1.65, y ≈ 2.07, station ≈ 2.27).
 - Low-quality windows are painted, so the chase camera cannot see inside at low (by design for the budget).
+- Rear seats empty (butler idea skipped); pilot has no seat belt/harness; feet don't follow pedal travel (±4.5 cm).
+- r2 screenshots: `r2_chase34_pilot_1280/390`, `r2_chase34_low_1280`, `r2_pilot_m_close`, `r2_pilot_f_close`, `r2_pilot_corgi`,
+  `r2_cockpit_1280/390x844/844x390`, `r2_cockpit_door_1280`, `r2_cockpit_right_1280`, `r2_cockpit_up_1280`,
+  `r2_cockpit_low_390x844`, `r2_center_1280/390x844/844x390`, `r2_flaps_down_1280`, `r2_night_center_1280`.
+  Cockpit FOVs used: 69° (1280×800), 80° (390×844), 55° (844×390, FLIGHT's fitFov clamp).

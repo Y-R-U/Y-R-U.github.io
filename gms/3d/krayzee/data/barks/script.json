@@ -1376,7 +1376,9 @@
    "intent": "greeting",
    "text": "Alright, tower? Lovely jubbly day for it.",
    "delivery": "cheery radio hello; cheeky Cockney; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Awright, tower? Lovely jubbly day for it.",
+   "subtitle": "Alright, tower? Lovely jubbly day for it."
   },
   {
    "id": "geezer.greeting.2",
@@ -1384,7 +1386,9 @@
    "intent": "greeting",
    "text": "Wotcha, tower! Miss me?",
    "delivery": "cheery radio hello; cheeky Cockney; radio-clipped",
-   "maxSeconds": 2.0
+   "maxSeconds": 2.0,
+   "say": "Wotcher, tower! Miss me?",
+   "subtitle": "Wotcha, tower! Miss me?"
   },
   {
    "id": "geezer.req_takeoff.1",
@@ -1472,7 +1476,9 @@
    "intent": "queue_jump",
    "text": "Got a mate on the inside, innit.",
    "delivery": "airily dismissive; cheeky Cockney; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Go' a mate on the inside, innit.",
+   "subtitle": "Got a mate on the inside, innit."
   },
   {
    "id": "geezer.apology.1",
@@ -1544,7 +1550,9 @@
    "intent": "complain",
    "text": "Oi, tower! They've pushed in! Out of order!",
    "delivery": "indignant, outraged; cheeky Cockney; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "Oi, tower! They've pushed in! Aht of order!",
+   "subtitle": "Oi, tower! They've pushed in! Out of order!"
   },
   {
    "id": "geezer.complain.2",
@@ -1920,7 +1928,9 @@
    "intent": "req_takeoff",
    "text": "Tower, I'm away. Dinnae argue.",
    "delivery": "impatient request; gruff Highland Scots; radio-clipped",
-   "maxSeconds": 2.3
+   "maxSeconds": 2.3,
+   "say": "Tower, I'm away. Dinnay argue.",
+   "subtitle": "Tower, I'm away. Dinnae argue."
   },
   {
    "id": "laird.req_takeoff.2",
@@ -1928,7 +1938,9 @@
    "intent": "req_takeoff",
    "text": "Ready tae go, tower. Get on wi' it.",
    "delivery": "impatient request; gruff Highland Scots; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "Ready tay go, tower. Get on wee it.",
+   "subtitle": "Ready tae go, tower. Get on wi' it."
   },
   {
    "id": "laird.req_land.1",
@@ -2016,7 +2028,9 @@
    "intent": "apology",
    "text": "Sorry, tower. Wasnae me. Well, it was.",
    "delivery": "insincere, offhand; gruff Highland Scots; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Sorry, tower. Wasnay me. Well, it was.",
+   "subtitle": "Sorry, tower. Wasnae me. Well, it was."
   },
   {
    "id": "laird.insult.1",
@@ -2040,7 +2054,9 @@
    "intent": "insult",
    "text": "Away an' bile yer heid!",
    "delivery": "cheeky taunt; gruff Highland Scots; radio-clipped",
-   "maxSeconds": 2.3
+   "maxSeconds": 2.3,
+   "say": "Away an' bile yer heed!",
+   "subtitle": "Away an' bile yer heid!"
   },
   {
    "id": "laird.retort.1",
@@ -2064,7 +2080,9 @@
    "intent": "retort",
    "text": "Ye'll say that tae ma face, will ye?",
    "delivery": "quick comeback, withering; gruff Highland Scots; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "Ye'll say that tay ma face, will ye?",
+   "subtitle": "Ye'll say that tae ma face, will ye?"
   },
   {
    "id": "laird.complain.1",
@@ -2440,7 +2458,9 @@
    "intent": "greeting",
    "text": "Allô, tower. It is I. Rejoice.",
    "delivery": "cheery radio hello; languid disdainful French; radio-clipped",
-   "maxSeconds": 2.7
+   "maxSeconds": 2.7,
+   "say": "Allô, tower. Eet eez I. Rejoice.",
+   "subtitle": "Allô, tower. It is I. Rejoice."
   },
   {
    "id": "comte.req_takeoff.1",
@@ -2448,7 +2468,9 @@
    "intent": "req_takeoff",
    "text": "Tower, I depart now. It is decided.",
    "delivery": "impatient request; languid disdainful French; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Tower, I depart now. Eet eez decided.",
+   "subtitle": "Tower, I depart now. It is decided."
   },
   {
    "id": "comte.req_takeoff.2",
@@ -2472,7 +2494,9 @@
    "intent": "req_land",
    "text": "I am landing. Try to look impressed.",
    "delivery": "breezy radio call; languid disdainful French; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "I am landeeng. Try to look impressed.",
+   "subtitle": "I am landing. Try to look impressed."
   },
   {
    "id": "comte.takeoff.1",
@@ -2512,7 +2536,9 @@
    "intent": "cut_in",
    "text": "After me, peasant. It is tradition.",
    "delivery": "smug, gleeful; languid disdainful French; radio-clipped",
-   "maxSeconds": 2.7
+   "maxSeconds": 2.7,
+   "say": "After me, peasant. Eet eez tradition.",
+   "subtitle": "After me, peasant. It is tradition."
   },
   {
    "id": "comte.queue_jump.1",
@@ -2520,7 +2546,9 @@
    "intent": "queue_jump",
    "text": "A queue? How very... English.",
    "delivery": "airily dismissive; languid disdainful French; radio-clipped",
-   "maxSeconds": 2.3
+   "maxSeconds": 2.3,
+   "say": "A queue? 'ow verry... English.",
+   "subtitle": "A queue? How very... English."
   },
   {
    "id": "comte.queue_jump.2",
@@ -2536,7 +2564,9 @@
    "intent": "apology",
    "text": "I apologise. Very well. It is done.",
    "delivery": "insincere, offhand; languid disdainful French; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "I apologise. Verry well. Eet eez done.",
+   "subtitle": "I apologise. Very well. It is done."
   },
   {
    "id": "comte.apology.2",
@@ -2544,7 +2574,9 @@
    "intent": "apology",
    "text": "Sorry? Non. But I say it for you.",
    "delivery": "insincere, offhand; languid disdainful French; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "Sorry? Non. But I say eet for you.",
+   "subtitle": "Sorry? Non. But I say it for you."
   },
   {
    "id": "comte.insult.1",
@@ -2552,7 +2584,9 @@
    "intent": "insult",
    "text": "Your landing is an insult to gravity.",
    "delivery": "cheeky taunt; languid disdainful French; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Your landeeng eez an insult to gravity.",
+   "subtitle": "Your landing is an insult to gravity."
   },
   {
    "id": "comte.insult.2",
@@ -2560,7 +2594,9 @@
    "intent": "insult",
    "text": "You fly like a baguette in the wind.",
    "delivery": "cheeky taunt; languid disdainful French; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "You fly like a baguette in ze wind.",
+   "subtitle": "You fly like a baguette in the wind."
   },
   {
    "id": "comte.insult.3",
@@ -2576,7 +2612,9 @@
    "intent": "retort",
    "text": "Your opinion is noted. And ignored.",
    "delivery": "quick comeback, withering; languid disdainful French; radio-clipped",
-   "maxSeconds": 2.7
+   "maxSeconds": 2.7,
+   "say": "Your opinion eez noted. And ignored.",
+   "subtitle": "Your opinion is noted. And ignored."
   },
   {
    "id": "comte.retort.2",
@@ -2584,7 +2622,9 @@
    "intent": "retort",
    "text": "Ah, the peasant speaks. How charming.",
    "delivery": "quick comeback, withering; languid disdainful French; radio-clipped",
-   "maxSeconds": 2.7
+   "maxSeconds": 2.7,
+   "say": "Ah, ze peasant speaks. 'ow charmeeng.",
+   "subtitle": "Ah, the peasant speaks. How charming."
   },
   {
    "id": "comte.retort.3",
@@ -2592,7 +2632,9 @@
    "intent": "retort",
    "text": "Pfff. I have heard better from a snail.",
    "delivery": "quick comeback, withering; languid disdainful French; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "Pfff. I 'ave 'eard better from a snail.",
+   "subtitle": "Pfff. I have heard better from a snail."
   },
   {
    "id": "comte.complain.1",
@@ -2600,7 +2642,9 @@
    "intent": "complain",
    "text": "Tower, I have been... overtaken. Unacceptable.",
    "delivery": "indignant, outraged; languid disdainful French; radio-clipped",
-   "maxSeconds": 2.7
+   "maxSeconds": 2.7,
+   "say": "Tower, I 'ave been... overtaken. Unacceptable.",
+   "subtitle": "Tower, I have been... overtaken. Unacceptable."
   },
   {
    "id": "comte.complain.2",
@@ -2608,7 +2652,9 @@
    "intent": "complain",
    "text": "Tower! This is a scandal! Une catastrophe!",
    "delivery": "indignant, outraged; languid disdainful French; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Tower! Zis eez a scandal! Une catastrophe!",
+   "subtitle": "Tower! This is a scandal! Une catastrophe!"
   },
   {
    "id": "comte.priority.1",
@@ -2624,7 +2670,9 @@
    "intent": "priority",
    "text": "Tower, my family is older than your runway.",
    "delivery": "pompous, demanding; languid disdainful French; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "Tower, my family eez older than your runway.",
+   "subtitle": "Tower, my family is older than your runway."
   },
   {
    "id": "comte.near_miss.1",
@@ -2640,7 +2688,9 @@
    "intent": "near_miss",
    "text": "Mon Dieu! You nearly ruined my hair!",
    "delivery": "startled yelp; languid disdainful French; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Mon Dieu! You nearly ruined my 'air!",
+   "subtitle": "Mon Dieu! You nearly ruined my hair!"
   },
   {
    "id": "comte.landing_brag.1",
@@ -2648,7 +2698,9 @@
    "intent": "landing_brag",
    "text": "Perfection. You may weep.",
    "delivery": "triumphant, preening; languid disdainful French; radio-clipped",
-   "maxSeconds": 2.0
+   "maxSeconds": 2.0,
+   "say": "Perfection. You may weeep.",
+   "subtitle": "Perfection. You may weep."
   },
   {
    "id": "comte.landing_brag.2",
@@ -2680,7 +2732,9 @@
    "intent": "bump",
    "text": "Boing? How undignified.",
    "delivery": "surprised, then amused; languid disdainful French; radio-clipped",
-   "maxSeconds": 1.6
+   "maxSeconds": 1.6,
+   "say": "Boing? 'ow undignified.",
+   "subtitle": "Boing? How undignified."
   },
   {
    "id": "comte.bump.2",
@@ -2688,7 +2742,9 @@
    "intent": "bump",
    "text": "Ah. A bounce. It was intentional.",
    "delivery": "surprised, then amused; languid disdainful French; radio-clipped",
-   "maxSeconds": 2.7
+   "maxSeconds": 2.7,
+   "say": "Ah. A bounce. Eet was intentional.",
+   "subtitle": "Ah. A bounce. It was intentional."
   },
   {
    "id": "baronin.greeting.1",
@@ -2696,7 +2752,9 @@
    "intent": "greeting",
    "text": "Tower. Good morning. Let us be efficient.",
    "delivery": "cheery radio hello; clipped stern German; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Tower. Goot morning. Let us be efficient.",
+   "subtitle": "Tower. Good morning. Let us be efficient."
   },
   {
    "id": "baronin.greeting.2",
@@ -2712,7 +2770,9 @@
    "intent": "req_takeoff",
    "text": "Tower, I am ready. Exactly on schedule.",
    "delivery": "impatient request; clipped stern German; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Tower, I am ready. Exactly on shedule.",
+   "subtitle": "Tower, I am ready. Exactly on schedule."
   },
   {
    "id": "baronin.req_takeoff.2",
@@ -2728,7 +2788,9 @@
    "intent": "req_land",
    "text": "Tower, I land in ninety seconds. Precisely.",
    "delivery": "breezy radio call; clipped stern German; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Tower, I land in ninety zeconds. Precisely.",
+   "subtitle": "Tower, I land in ninety seconds. Precisely."
   },
   {
    "id": "baronin.req_land.2",
@@ -2736,7 +2798,9 @@
    "intent": "req_land",
    "text": "Landing now. Clear the runway. Thank you.",
    "delivery": "breezy radio call; clipped stern German; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Landing now. Clear ze runvay. Sank you.",
+   "subtitle": "Landing now. Clear the runway. Thank you."
   },
   {
    "id": "baronin.takeoff.1",
@@ -2752,7 +2816,9 @@
    "intent": "takeoff",
    "text": "Wheels up. Excellent.",
    "delivery": "exhilarated; clipped stern German; radio-clipped",
-   "maxSeconds": 1.6
+   "maxSeconds": 1.6,
+   "say": "Veels up. Excellent.",
+   "subtitle": "Wheels up. Excellent."
   },
   {
    "id": "baronin.cut_in.1",
@@ -2760,7 +2826,9 @@
    "intent": "cut_in",
    "text": "You were too slow. I have corrected this.",
    "delivery": "smug, gleeful; clipped stern German; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "You vere too slow. I haff corrected zis.",
+   "subtitle": "You were too slow. I have corrected this."
   },
   {
    "id": "baronin.cut_in.2",
@@ -2776,7 +2844,9 @@
    "intent": "cut_in",
    "text": "Move. Your spacing is unacceptable.",
    "delivery": "smug, gleeful; clipped stern German; radio-clipped",
-   "maxSeconds": 2.3
+   "maxSeconds": 2.3,
+   "say": "Move. Your spacing iss unacceptable.",
+   "subtitle": "Move. Your spacing is unacceptable."
   },
   {
    "id": "baronin.queue_jump.1",
@@ -2784,7 +2854,9 @@
    "intent": "queue_jump",
    "text": "This queue is badly organised. I fix it.",
    "delivery": "airily dismissive; clipped stern German; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "Zis queue iss badly organised. I fix it.",
+   "subtitle": "This queue is badly organised. I fix it."
   },
   {
    "id": "baronin.queue_jump.2",
@@ -2792,7 +2864,9 @@
    "intent": "queue_jump",
    "text": "I do not wait. Waiting is wasted time.",
    "delivery": "airily dismissive; clipped stern German; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "I do not vait. Vaiting iss vasted time.",
+   "subtitle": "I do not wait. Waiting is wasted time."
   },
   {
    "id": "baronin.apology.1",
@@ -2800,7 +2874,9 @@
    "intent": "apology",
    "text": "Very well. A small error. It is logged.",
    "delivery": "insincere, offhand; clipped stern German; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "Fery well. A small error. It iss logged.",
+   "subtitle": "Very well. A small error. It is logged."
   },
   {
    "id": "baronin.apology.2",
@@ -2808,7 +2884,9 @@
    "intent": "apology",
    "text": "I apologise. Formally. Now we proceed.",
    "delivery": "insincere, offhand; clipped stern German; radio-clipped",
-   "maxSeconds": 2.7
+   "maxSeconds": 2.7,
+   "say": "I apologise. Formally. Now ve proceed.",
+   "subtitle": "I apologise. Formally. Now we proceed."
   },
   {
    "id": "baronin.insult.1",
@@ -2816,7 +2894,9 @@
    "intent": "insult",
    "text": "Your approach was a catastrophe.",
    "delivery": "cheeky taunt; clipped stern German; radio-clipped",
-   "maxSeconds": 2.3
+   "maxSeconds": 2.3,
+   "say": "Your approach vas a catastrophe.",
+   "subtitle": "Your approach was a catastrophe."
   },
   {
    "id": "baronin.insult.2",
@@ -2824,7 +2904,9 @@
    "intent": "insult",
    "text": "That landing had no discipline.",
    "delivery": "cheeky taunt; clipped stern German; radio-clipped",
-   "maxSeconds": 2.3
+   "maxSeconds": 2.3,
+   "say": "Zat landing had no discipline.",
+   "subtitle": "That landing had no discipline."
   },
   {
    "id": "baronin.insult.3",
@@ -2832,7 +2914,9 @@
    "intent": "insult",
    "text": "Your plane is dirty. And so is your flying.",
    "delivery": "cheeky taunt; clipped stern German; radio-clipped",
-   "maxSeconds": 3.7
+   "maxSeconds": 3.7,
+   "say": "Your plane iss dirty. Und so iss your flying.",
+   "subtitle": "Your plane is dirty. And so is your flying."
   },
   {
    "id": "baronin.retort.1",
@@ -2840,7 +2924,9 @@
    "intent": "retort",
    "text": "Your opinion is not in the manual.",
    "delivery": "quick comeback, withering; clipped stern German; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Your opinion iss not in ze manual.",
+   "subtitle": "Your opinion is not in the manual."
   },
   {
    "id": "baronin.retort.2",
@@ -2848,7 +2934,9 @@
    "intent": "retort",
    "text": "I have filed your complaint. In the bin.",
    "delivery": "quick comeback, withering; clipped stern German; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "I haff filed your complaint. In ze bin.",
+   "subtitle": "I have filed your complaint. In the bin."
   },
   {
    "id": "baronin.retort.3",
@@ -2856,7 +2944,9 @@
    "intent": "retort",
    "text": "Nein. Simply nein.",
    "delivery": "quick comeback, withering; clipped stern German; radio-clipped",
-   "maxSeconds": 1.6
+   "maxSeconds": 1.6,
+   "say": "Nein. Zimply nein.",
+   "subtitle": "Nein. Simply nein."
   },
   {
    "id": "baronin.complain.1",
@@ -2864,7 +2954,9 @@
    "intent": "complain",
    "text": "Tower, I was overtaken. This is not correct.",
    "delivery": "indignant, outraged; clipped stern German; radio-clipped",
-   "maxSeconds": 3.4
+   "maxSeconds": 3.4,
+   "say": "Tower, I vas overtaken. Zis iss not correct.",
+   "subtitle": "Tower, I was overtaken. This is not correct."
   },
   {
    "id": "baronin.complain.2",
@@ -2872,7 +2964,9 @@
    "intent": "complain",
    "text": "Tower, I demand an explanation. In writing.",
    "delivery": "indignant, outraged; clipped stern German; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Tower, I demand an explanation. In vriting.",
+   "subtitle": "Tower, I demand an explanation. In writing."
   },
   {
    "id": "baronin.priority.1",
@@ -2880,7 +2974,9 @@
    "intent": "priority",
    "text": "Do you know who I am? I have a schedule.",
    "delivery": "pompous, demanding; clipped stern German; radio-clipped",
-   "maxSeconds": 4.0
+   "maxSeconds": 4.0,
+   "say": "Do you know who I am? I haff a shedule.",
+   "subtitle": "Do you know who I am? I have a schedule."
   },
   {
    "id": "baronin.priority.2",
@@ -2888,7 +2984,9 @@
    "intent": "priority",
    "text": "Tower, I require priority. This is not a request.",
    "delivery": "pompous, demanding; clipped stern German; radio-clipped",
-   "maxSeconds": 3.7
+   "maxSeconds": 3.7,
+   "say": "Tower, I require priority. Zis iss not a request.",
+   "subtitle": "Tower, I require priority. This is not a request."
   },
   {
    "id": "baronin.near_miss.1",
@@ -2920,7 +3018,9 @@
    "intent": "landing_brag",
    "text": "On the centreline. Of course.",
    "delivery": "triumphant, preening; clipped stern German; radio-clipped",
-   "maxSeconds": 2.3
+   "maxSeconds": 2.3,
+   "say": "On ze centreline. Of course.",
+   "subtitle": "On the centreline. Of course."
   },
   {
    "id": "baronin.go_around.1",
@@ -2928,7 +3028,9 @@
    "intent": "go_around",
    "text": "Going around. Someone will hear about this.",
    "delivery": "grumbling, sulky; clipped stern German; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Going around. Someone vill hear about zis.",
+   "subtitle": "Going around. Someone will hear about this."
   },
   {
    "id": "baronin.go_around.2",
@@ -2936,7 +3038,9 @@
    "intent": "go_around",
    "text": "This is very inefficient.",
    "delivery": "grumbling, sulky; clipped stern German; radio-clipped",
-   "maxSeconds": 2.0
+   "maxSeconds": 2.0,
+   "say": "Zis iss fery inefficient.",
+   "subtitle": "This is very inefficient."
   },
   {
    "id": "baronin.bump.1",
@@ -2944,7 +3048,9 @@
    "intent": "bump",
    "text": "Boing. This was not in the plan.",
    "delivery": "surprised, then amused; clipped stern German; radio-clipped",
-   "maxSeconds": 3.0
+   "maxSeconds": 3.0,
+   "say": "Boing. Zis vas not in ze plan.",
+   "subtitle": "Boing. This was not in the plan."
   },
   {
    "id": "baronin.bump.2",
@@ -4666,7 +4772,7 @@
    "intent": "splice_title",
    "text": "Baron",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_baroness",
@@ -4674,7 +4780,7 @@
    "intent": "splice_title",
    "text": "Baroness",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_viscount",
@@ -4682,7 +4788,7 @@
    "intent": "splice_title",
    "text": "Viscount",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_viscountess",
@@ -4690,7 +4796,7 @@
    "intent": "splice_title",
    "text": "Viscountess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_earl",
@@ -4698,7 +4804,7 @@
    "intent": "splice_title",
    "text": "Earl",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_countess",
@@ -4706,7 +4812,7 @@
    "intent": "splice_title",
    "text": "Countess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_marquess",
@@ -4714,7 +4820,7 @@
    "intent": "splice_title",
    "text": "Marquess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_marchioness",
@@ -4722,7 +4828,8 @@
    "intent": "splice_title",
    "text": "Marchioness",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2,
+   "review": "tower_m: re-heard alone as \"Martian S\" (fine in the list read); listen before shipping"
   },
   {
    "id": "tower_m.cs_title_duke",
@@ -4730,7 +4837,7 @@
    "intent": "splice_title",
    "text": "Duke",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_duchess",
@@ -4738,7 +4845,7 @@
    "intent": "splice_title",
    "text": "Duchess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_archduke",
@@ -4746,7 +4853,7 @@
    "intent": "splice_title",
    "text": "Archduke",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_archduchess",
@@ -4754,7 +4861,7 @@
    "intent": "splice_title",
    "text": "Archduchess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_prince",
@@ -4762,7 +4869,7 @@
    "intent": "splice_title",
    "text": "Prince",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_princess",
@@ -4770,7 +4877,7 @@
    "intent": "splice_title",
    "text": "Princess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_crown_prince",
@@ -4778,7 +4885,7 @@
    "intent": "splice_title",
    "text": "Crown Prince",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_crown_princess",
@@ -4786,7 +4893,7 @@
    "intent": "splice_title",
    "text": "Crown Princess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_king",
@@ -4794,7 +4901,7 @@
    "intent": "splice_title",
    "text": "King",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_queen",
@@ -4802,7 +4909,7 @@
    "intent": "splice_title",
    "text": "Queen",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_emperor",
@@ -4810,7 +4917,7 @@
    "intent": "splice_title",
    "text": "Emperor",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_empress",
@@ -4818,7 +4925,7 @@
    "intent": "splice_title",
    "text": "Empress",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_majesty",
@@ -4826,7 +4933,7 @@
    "intent": "splice_title",
    "text": "Majesty",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_highness",
@@ -4834,7 +4941,7 @@
    "intent": "splice_title",
    "text": "Highness",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_title_grace",
@@ -4842,7 +4949,7 @@
    "intent": "splice_title",
    "text": "Grace",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_m.cs_digit_zero",
@@ -5612,7 +5719,7 @@
    "intent": "splice_title",
    "text": "Baron",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_baroness",
@@ -5620,7 +5727,7 @@
    "intent": "splice_title",
    "text": "Baroness",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_viscount",
@@ -5628,7 +5735,7 @@
    "intent": "splice_title",
    "text": "Viscount",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_viscountess",
@@ -5636,7 +5743,7 @@
    "intent": "splice_title",
    "text": "Viscountess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_earl",
@@ -5644,7 +5751,7 @@
    "intent": "splice_title",
    "text": "Earl",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_countess",
@@ -5652,7 +5759,7 @@
    "intent": "splice_title",
    "text": "Countess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_marquess",
@@ -5660,7 +5767,7 @@
    "intent": "splice_title",
    "text": "Marquess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_marchioness",
@@ -5668,7 +5775,8 @@
    "intent": "splice_title",
    "text": "Marchioness",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2,
+   "review": "tower_m: re-heard alone as \"Martian S\" (fine in the list read); listen before shipping"
   },
   {
    "id": "tower_f.cs_title_duke",
@@ -5676,7 +5784,7 @@
    "intent": "splice_title",
    "text": "Duke",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_duchess",
@@ -5684,7 +5792,7 @@
    "intent": "splice_title",
    "text": "Duchess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_archduke",
@@ -5692,7 +5800,7 @@
    "intent": "splice_title",
    "text": "Archduke",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_archduchess",
@@ -5700,7 +5808,7 @@
    "intent": "splice_title",
    "text": "Archduchess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_prince",
@@ -5708,7 +5816,7 @@
    "intent": "splice_title",
    "text": "Prince",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_princess",
@@ -5716,7 +5824,7 @@
    "intent": "splice_title",
    "text": "Princess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_crown_prince",
@@ -5724,7 +5832,7 @@
    "intent": "splice_title",
    "text": "Crown Prince",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_crown_princess",
@@ -5732,7 +5840,7 @@
    "intent": "splice_title",
    "text": "Crown Princess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_king",
@@ -5740,7 +5848,7 @@
    "intent": "splice_title",
    "text": "King",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_queen",
@@ -5748,7 +5856,7 @@
    "intent": "splice_title",
    "text": "Queen",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_emperor",
@@ -5756,7 +5864,7 @@
    "intent": "splice_title",
    "text": "Emperor",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_empress",
@@ -5764,7 +5872,7 @@
    "intent": "splice_title",
    "text": "Empress",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_majesty",
@@ -5772,7 +5880,7 @@
    "intent": "splice_title",
    "text": "Majesty",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_highness",
@@ -5780,7 +5888,7 @@
    "intent": "splice_title",
    "text": "Highness",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_title_grace",
@@ -5788,7 +5896,7 @@
    "intent": "splice_title",
    "text": "Grace",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_f.cs_digit_zero",
@@ -6558,7 +6666,7 @@
    "intent": "splice_title",
    "text": "Baron",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_baroness",
@@ -6566,7 +6674,7 @@
    "intent": "splice_title",
    "text": "Baroness",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_viscount",
@@ -6574,7 +6682,7 @@
    "intent": "splice_title",
    "text": "Viscount",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_viscountess",
@@ -6582,7 +6690,7 @@
    "intent": "splice_title",
    "text": "Viscountess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_earl",
@@ -6590,7 +6698,7 @@
    "intent": "splice_title",
    "text": "Earl",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_countess",
@@ -6598,7 +6706,7 @@
    "intent": "splice_title",
    "text": "Countess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_marquess",
@@ -6606,7 +6714,7 @@
    "intent": "splice_title",
    "text": "Marquess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_marchioness",
@@ -6614,7 +6722,8 @@
    "intent": "splice_title",
    "text": "Marchioness",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2,
+   "review": "tower_m: re-heard alone as \"Martian S\" (fine in the list read); listen before shipping"
   },
   {
    "id": "tower_trainee.cs_title_duke",
@@ -6622,7 +6731,7 @@
    "intent": "splice_title",
    "text": "Duke",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_duchess",
@@ -6630,7 +6739,7 @@
    "intent": "splice_title",
    "text": "Duchess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_archduke",
@@ -6638,7 +6747,7 @@
    "intent": "splice_title",
    "text": "Archduke",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_archduchess",
@@ -6646,7 +6755,7 @@
    "intent": "splice_title",
    "text": "Archduchess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_prince",
@@ -6654,7 +6763,7 @@
    "intent": "splice_title",
    "text": "Prince",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_princess",
@@ -6662,7 +6771,7 @@
    "intent": "splice_title",
    "text": "Princess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_crown_prince",
@@ -6670,7 +6779,7 @@
    "intent": "splice_title",
    "text": "Crown Prince",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_crown_princess",
@@ -6678,7 +6787,7 @@
    "intent": "splice_title",
    "text": "Crown Princess",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_king",
@@ -6686,7 +6795,7 @@
    "intent": "splice_title",
    "text": "King",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_queen",
@@ -6694,7 +6803,7 @@
    "intent": "splice_title",
    "text": "Queen",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_emperor",
@@ -6702,7 +6811,7 @@
    "intent": "splice_title",
    "text": "Emperor",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_empress",
@@ -6710,7 +6819,7 @@
    "intent": "splice_title",
    "text": "Empress",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_majesty",
@@ -6718,7 +6827,7 @@
    "intent": "splice_title",
    "text": "Majesty",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_highness",
@@ -6726,7 +6835,7 @@
    "intent": "splice_title",
    "text": "Highness",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_title_grace",
@@ -6734,7 +6843,7 @@
    "intent": "splice_title",
    "text": "Grace",
    "delivery": "level list intonation, no final fall, crisp",
-   "maxSeconds": 1.0
+   "maxSeconds": 1.2
   },
   {
    "id": "tower_trainee.cs_digit_zero",

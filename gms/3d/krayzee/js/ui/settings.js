@@ -8,6 +8,8 @@ import { openAccountPanel } from './account.js';
 const seg = (key, opts) => `<div class="kz-seg" data-k="${key}">${opts.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join('')}</div>`;
 const range = (key) => `<div class="kz-range"><input type="range" min="0" max="100" step="5" data-k="${key}" aria-label="${key} volume"><output></output></div>`;
 
+const VIEW_OPTS = [['chase', 'Chase', 'Behind the aeroplane'], ['center', 'Centre cockpit', 'Between the seats, panel centred'], ['cockpit', "Pilot's seat", 'Left seat, as the real thing']];
+
 const LITE = (() => { try { return new URLSearchParams(location.search).get('lite') === '1'; } catch (e) { return false; } })();
 
 export function createSettings(root, { onChange, onTitle, onResume, onQuit, onClose }) {
@@ -19,10 +21,14 @@ export function createSettings(root, { onChange, onTitle, onResume, onQuit, onCl
         <div class="kz-titles" role="radiogroup" aria-label="Title"></div></div>
     </div>
     <div class="kz-sec"><h3>Flying</h3>
-      <div class="kz-row"><span>View<small>Also on the in-flight view button</small></span>${seg('view', [['cockpit', 'Cockpit'], ['chase', 'Chase']])}</div>
       <div class="kz-row"><span>Invert pitch<small data-say="invertPitch"></small></span><button class="kz-switch" role="switch" data-k="invertPitch" aria-label="Invert pitch"></button></div>
       <div class="kz-row"><span>Stick on right<small data-say="stickRight"></small></span><button class="kz-switch" role="switch" data-k="stickRight" aria-label="Stick on right"></button></div>
       <div class="kz-row"><span>Units</span>${seg('units', [['aviation', 'kt · ft'], ['metric', 'km/h · m']])}</div>
+    </div>
+    <div class="kz-sec kz-views"><h3>Views</h3>
+      ${VIEW_OPTS.map(([v, t, d]) => `<div class="kz-row"><span>${t}<small>${d}</small></span><button class="kz-switch" role="switch" data-view="${v}" aria-label="${t} view"></button></div>`).join('')}
+      <div class="kz-hint">Only one view on = fixed view, the view button is hidden.</div>
+      <div class="kz-row stack"><span>Current view<small>Also on the in-flight view button</small></span>${seg('view', VIEW_OPTS.map(([v, t]) => [v, t])).replace('kz-seg"', 'kz-seg wide"')}</div>
     </div>
     <div class="kz-sec"><h3>Graphics</h3>
       <div class="kz-row stack"><span>Quality<small>${LITE ? 'Held at Low by the lite link' : 'Auto starts low and steps up once your device keeps pace'}</small></span>${seg('quality', [['auto', 'Auto'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High']]).replace('kz-seg"', 'kz-seg wide"')}</div>
@@ -76,7 +82,13 @@ export function createSettings(root, { onChange, onTitle, onResume, onQuit, onCl
     paintPeerage();
     pop.body.querySelectorAll('.kz-seg[data-k="quality"] button').forEach((b) => { b.disabled = LITE; });
     pop.body.querySelectorAll('.kz-seg').forEach((g) => g.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(s[g.dataset.k] === b.dataset.v))));
-    pop.body.querySelectorAll('.kz-switch').forEach((b) => b.setAttribute('aria-checked', String(!!s[b.dataset.k])));
+    pop.body.querySelectorAll('.kz-switch[data-k]').forEach((b) => b.setAttribute('aria-checked', String(!!s[b.dataset.k])));
+    pop.body.querySelectorAll('.kz-switch[data-view]').forEach((b) => {
+      const on = s.views.includes(b.dataset.view);
+      b.setAttribute('aria-checked', String(on));
+      b.disabled = on && s.views.length === 1;
+    });
+    pop.body.querySelectorAll('.kz-seg[data-k="view"] button').forEach((b) => { b.hidden = !s.views.includes(b.dataset.v); });
     pop.body.querySelector('[data-say="invertPitch"]').textContent = s.invertPitch ? 'On: stick down = nose down' : 'Off: stick down = nose up';
     pop.body.querySelector('[data-say="stickRight"]').textContent = s.stickRight ? 'Stick on the right, buttons on the left' : 'Stick on the left, buttons on the right';
     pop.body.querySelectorAll('input[type=range]').forEach((r) => {
@@ -89,7 +101,15 @@ export function createSettings(root, { onChange, onTitle, onResume, onQuit, onCl
   const set = (k, v) => { s = saveSettings({ ...s, [k]: v }); paint(); onChange?.(s); };
 
   pop.body.querySelectorAll('.kz-seg button').forEach((b) => onTap(b, () => set(b.parentElement.dataset.k, b.dataset.v), 'toggle'));
-  pop.body.querySelectorAll('.kz-switch').forEach((b) => onTap(b, () => set(b.dataset.k, !s[b.dataset.k]), 'toggle'));
+  pop.body.querySelectorAll('.kz-switch[data-k]').forEach((b) => onTap(b, () => set(b.dataset.k, !s[b.dataset.k]), 'toggle'));
+  pop.body.querySelectorAll('.kz-switch[data-view]').forEach((b) => onTap(b, () => {
+    const v = b.dataset.view, on = s.views.includes(v);
+    if (on && s.views.length === 1) return;
+    const views = VIEW_OPTS.map(([k]) => k).filter((k) => (k === v ? !on : s.views.includes(k)));
+    s = saveSettings({ ...s, views, view: views.includes(s.view) ? s.view : views[0] });
+    paint();
+    onChange?.(s);
+  }, 'toggle'));
   pop.body.querySelectorAll('input[type=range]').forEach((r) => {
     r.addEventListener('input', () => { r.style.setProperty('--v', r.value + '%'); r.nextElementSibling.textContent = r.value; s = { ...s, [r.dataset.k]: r.value / 100 }; onChange?.(s); });
     r.addEventListener('change', () => set(r.dataset.k, r.value / 100));

@@ -2,36 +2,11 @@ import { clamp, moveTo } from './vmath.js';
 import { OVERRIDE } from './traffic.js';
 
 const NOTCHES = [0, 1 / 3, 2 / 3, 1];
-const PREF_KEY = 'krayzee.flight.prefs';
-
-// D9/D10 migration: pitch default flipped to "drag down = nose up" and the stick moved to the left. Settings saved
-// before that are ignored once, until the player touches that setting again (see noteSettings).
-function loadPrefs() {
-  let p = null;
-  try { p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null'); } catch (e) { /* private mode */ }
-  if (!p || p.v !== 2) { p = { v: 2, ignoreInvert: true, ignoreHand: true, seen: null }; savePrefs(p); }
-  return p;
-}
-function savePrefs(p) { try { localStorage.setItem(PREF_KEY, JSON.stringify(p)); } catch (e) { /* */ } }
-const prefs = loadPrefs();
-// effective { invert, side } from the UI settings
+// D9: invertPitch false = stick/ArrowDown/S DOWN → nose UP. D10: stickRight false = stick on the LEFT.
+// (UI migrates old saves; see docs/UI.md.)
 export function flightPrefs(s = {}) {
-  return {
-    invert: prefs.ignoreInvert ? false : !!s.invertPitch,
-    side: prefs.ignoreHand ? 'left' : s.hand === 'right' ? 'right' : 'left',
-  };
+  return { invert: !!s.invertPitch, side: s.stickRight ? 'right' : 'left' };
 }
-export function noteSettings(s = {}) {
-  const seen = prefs.seen;
-  if (seen) {
-    if (seen.invertPitch !== s.invertPitch) prefs.ignoreInvert = false;
-    if (seen.hand !== s.hand) prefs.ignoreHand = false;
-  }
-  prefs.seen = { invertPitch: s.invertPitch, hand: s.hand };
-  savePrefs(prefs);
-}
-const FLAP_HOLD = 10;
-const KEY_THR_HOLD = 3;
 
 // Player input → per-axis "manual" values (null = released, autopilot has it).
 export function createControls({ root, getSettings, onView, onPause, onFullscreen }) {
@@ -48,7 +23,7 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
     </div>
     <div class="krz-cluster">
       <div class="krz-thr" data-zone="thr" aria-label="Throttle">
-        <div class="krz-thr-fill"></div><div class="krz-thr-thumb"></div><span class="krz-thr-l">THR</span><span class="krz-thr-v">0</span>
+        <div class="krz-thr-fill"></div><span class="krz-thr-l">THR</span><div class="krz-thr-thumb"><span class="krz-thr-v">0</span></div>
       </div>
       <div class="krz-pad">
         <button class="krz-btn krz-sq" data-act="flaps"><b>FLAPS</b><span class="krz-flaps-v">0°</span></button>
@@ -58,7 +33,6 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
       </div>
     </div>`;
   root.append(el);
-  noteSettings(getSettings?.());
   el.dataset.hand = flightPrefs(getSettings?.()).side;
   const $ = (s) => el.querySelector(s);
   const zone = $('.krz-stick-zone'), base = $('.krz-stick-base'), knob = $('.krz-stick-knob'), stickTag = $('.krz-stick-tag');
@@ -239,7 +213,7 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
       for (const a of ['aileron', 'elevator', 'rudder']) if (m[a] != null) m[a] = clamp(m[a], -1, 1);
       return m;
     },
-    paint(ac, modes, view) {
+    paint(ac, modes, view, multiView = true) {
       const t = ac.ctl.throttle;
       thrThumb.style.bottom = `calc(${t * 100}% - ${t * 28}px)`;
       thrFill.style.height = `${t * 100}%`;
@@ -253,7 +227,8 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
       $('[data-hold="brake"]').dataset.mode = modes.brake;
       $('[data-hold="rudL"]').dataset.mode = modes.rudder;
       $('[data-hold="rudR"]').dataset.mode = modes.rudder;
-      $('[data-act="view"] .krz-btn-l').textContent = view === 'cockpit' ? 'COCKPIT' : 'CHASE';
+      $('[data-act="view"] .krz-btn-l').textContent = view === 'cockpit' ? 'COCKPIT' : view === 'center' ? 'CENTRE' : 'CHASE';
+      $('[data-act="view"]').hidden = !multiView;
       el.dataset.hand = flightPrefs(getSettings?.()).side;
       if ((safeT -= 1) <= 0) { safeT = 20; api.publishSafeZones(); }
     },

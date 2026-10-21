@@ -14,7 +14,7 @@ mkdirSync(SHOTS, { recursive: true });
 const arg = (k, d) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').split('=')[1] || d;
 const PORT = +arg('port', 9431);
 const BASE = arg('url', 'http://localhost:8888/gms/3d/krayzee/');
-const ONLY = arg('only', 'boot,layout,circuit,override').split(',');
+const ONLY = arg('only', 'boot,layout,pitch,circuit,override').split(',');
 const TS = +arg('timescale', 1);
 const TSQ = TS !== 1 ? `&timescale=${TS}` : '';
 
@@ -136,8 +136,42 @@ async function main() {
     }
   }
 
+  if (ONLY.includes('pitch')) {
+    console.log('\n== pitch sign (D9/D10): real touch drag DOWN on the stick → nose UP; stick on the left');
+    await load('?start=free&noaccount=1&view=chase', 390, 844, true);
+    await sleep(1500);
+    await evaluate(`window.__game.teleport({ x: 0, z: 2500, alt: 400, heading: 90, speedKt: 90, throttle: 0.6 })`);
+    await sleep(2500);
+    const r = (await evaluate('window.__game.controlsRects()')).stick;
+    check('stick: on the LEFT by default (D10)', r.x + r.w / 2 < 390 / 2, `stick centre x ${(r.x + r.w / 2).toFixed(0)}`);
+    const cx = r.x + r.w / 2, cy = r.y + r.h * 0.55;
+    const p0 = (await evaluate('window.__game.state()')).player;
+    const tp = (x, y) => [{ x, y, id: 1, radiusX: 8, radiusY: 8, force: 1 }];
+    await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tp(cx, cy) });
+    for (let i = 1; i <= 8; i++) { await send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tp(cx, cy + i * 8) }); await sleep(30); }
+    await sleep(300);
+    const mid = (await evaluate('window.__game.state()')).player;
+    await sleep(1200);
+    const p1 = (await evaluate('window.__game.state()')).player;
+    await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    check('pitch: drag down → elevator positive (nose-up command)', mid.ctl.elevator > 0.3 && mid.modes.elevator === 'manual', `elevator ${mid.ctl.elevator.toFixed(2)} mode ${mid.modes.elevator}`);
+    check('pitch: drag down → the nose rises', p1.pitch > p0.pitch + 3, `pitch ${p0.pitch}° → ${p1.pitch}°`);
+    await sleep(500);
+    const p2 = (await evaluate('window.__game.state()')).player;
+    check('pitch: finger up → stick released (RESUMING)', p2.modes.elevator !== 'manual', p2.modes.elevator);
+    // keyboard: ArrowDown = nose up too
+    await sleep(4500);
+    const k0 = (await evaluate('window.__game.state()')).player;
+    await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'ArrowDown', code: 'ArrowDown', windowsVirtualKeyCode: 40 });
+    await sleep(1200);
+    const k1 = (await evaluate('window.__game.state()')).player;
+    await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'ArrowDown', code: 'ArrowDown', windowsVirtualKeyCode: 40 });
+    check('pitch: ArrowDown → nose up', k1.ctl.elevator > 0.3 && k1.pitch > k0.pitch + 2, `elevator ${k1.ctl.elevator.toFixed(2)}, pitch ${k0.pitch}° → ${k1.pitch}°`);
+    check('pitch: no console errors', errors.length === 0, errors.slice(0, 3).join(' | '));
+  }
+
   if (ONLY.includes('circuit')) {
-    console.log('\n== circuit (AP: takeoff → circuit → land on 09)');
+    console.log('\n== circuit (AP: takeoff → circuit → land on the active runway)');
     await load('?auto=1&noaccount=1&view=chase' + TSQ, 844, 390, true);
     const seen = new Set();
     let maxAlt = 0, shotTaken = {};
@@ -150,8 +184,13 @@ async function main() {
     check('circuit: took off and climbed to pattern height', maxAlt > 220, `max alt ${maxAlt.toFixed(0)} m`);
     check('circuit: flew downwind, base and final', ['DOWNWIND', 'BASE', 'FINAL'].every((x) => seen.has(x)), [...seen].join(' > '));
     check('circuit: no crash', p && !p.crashed, p?.crashReason);
-    const td = p?.lastTouchdown;
-    check('circuit: landed on the runway, heading east (09)', !!td && td.surface === 'runway' && Math.abs(p.heading - 90) < 100 && td.fpm < 800, td && `${Math.round(td.fpm)} fpm ${td.grade}`);
+    const td = p?.lastTouchdown, end = res.st?.activeEnd || '09', hdg = +end * 10;
+    const herr = p ? Math.abs(((p.heading - hdg + 540) % 360) - 180) : 999;
+    check(`circuit: landed on runway ${end} (ATC active end)`, !!td && td.surface === 'runway' && herr < 100 && td.fpm < 800, td && `${Math.round(td.fpm)} fpm ${td.grade}, heading ${p.heading}`);
+    const g = res.st?.game?.game;
+    const pps = (await evaluate('window.__game.log()')).filter((l) => l.type === 'pp');
+    const crimes = pps.filter((l) => l.id !== 'impeccable');
+    check('circuit: autopilot alone commits no infractions (DESIGN §1)', g && g.stats.infractions === 0 && crimes.length === 0, `infractions ${g?.stats.infractions}; PP events: ${pps.map((l) => `${l.id}+${l.amount}`).join(', ') || 'none'}`);
     check('circuit: no console errors', errors.length === 0, errors.slice(0, 3).join(' | '));
   }
 

@@ -53,17 +53,25 @@ const results = [];
 function check(name, ok, detail) { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${detail ? ' — ' + detail : ''}`); }
 const lined = (end) => { const e = runwayEnd(end); const [x, z] = fromRunway(e, 10, 0); return { x, z, heading: e.hdg }; };
 
-function scCircuit() {
+function scCircuit(END = '09') {
   const tr = new Traffic(env);
-  const p = mk(tr, lined('09'), circuitRoute('09'), { name: 'P' });
-  const log = run(tr, 600, (t) => !(p.ap.leg.kind === 'hold'));
+  const p = mk(tr, lined(END), circuitRoute(END), { name: 'P' });
+  let maxXtk = 0;
+  const e = runwayEnd(END);
+  const log = run(tr, 600, (t) => {
+    const a = p.ac, dx = a.pos.x - e.thr[0], dz = a.pos.z - e.thr[1];
+    const s = dx * e.u[0] + dz * e.u[1], l = dx * -e.u[1] + dz * e.u[0];
+    if (p.ap.phase === 'FINAL' && s > -1200 && s < 0) maxXtk = Math.max(maxXtk, Math.abs(l));
+    return !(p.ap.leg.kind === 'hold');
+  });
   if (!TRACE) for (const l of log) console.log(JSON.stringify(l));
+  check(`circuit ${END}: final within 12 m of centreline inside 1.2 km`, maxXtk < 12, `max ${maxXtk.toFixed(1)} m`);
   const td = log.find((l) => l.type === 'touchdown');
   const landed = log.find((l) => l.type === 'landed');
   const crash = log.find((l) => l.type === 'crash');
   const maxAlt = Math.max(0, ...log.filter((l) => l.at).map((l) => +l.at.split(',')[1]));
   check('circuit: no crash', !crash, crash?.reason);
-  check('circuit: touched down on 09', !!td && td.surface === 'runway' && !td.bounce, td && `${td.fpm} fpm ${td.grade} on ${td.surface}`);
+  check(`circuit: touched down on ${END}`, !!td && td.surface === 'runway' && !td.bounce, td && `${td.fpm} fpm ${td.grade} on ${td.surface}`);
   check('circuit: soft landing (<700 fpm)', !!td && td.fpm < 700);
   check('circuit: rolled out + landed', !!landed);
   check('circuit: reached hold short again', p.ap.leg.kind === 'hold', p.ap.phase);
@@ -136,7 +144,7 @@ function scTraffic() {
   check('traffic: arrival parked', b.ap.leg?.kind === 'park', `${b.ap.phase} at ${b.ac.pos.x.toFixed(0)},${b.ac.pos.z.toFixed(0)} hdg ${b.ac.heading.toFixed(0)}`);
 }
 
-const S = { circuit: scCircuit, override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic };
+const S = { circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic };
 for (const [k, f] of Object.entries(S)) if (scen === 'all' || scen === k) { console.log(`\n== ${k}`); f(); }
 const fails = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - fails}/${results.length} passed`);

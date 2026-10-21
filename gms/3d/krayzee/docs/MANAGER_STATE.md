@@ -28,3 +28,9 @@ If agents vanished (ListAgents), check each lane's docs/<LANE>.md and newest fil
 - 2026-10-21 Aaron D6–D8 (adaptive quality start-low-step-up; roadmap planes/landscape/effects; weapons later as story ext + room option).
 - 2026-10-21 PLANE done (C172 ext+cockpit, livery canvases; high 23 calls/58k, low 13/13k). Exterior looks great. Cockpit v1 OK; noted: prop-disc red ring prominent from cockpit, bare grey walls, no pilot. Launched PLANE r2. 5 active.
 - 2026-10-21 ATC done (49/49, 26/26 falsify). FLIGHT sent its AP hook list (extendDownwind etc., 27 final tracking 70 m off, taxi crossing 04/22 w/o hold). 4 active (FLIGHT VOICE UI2 PLANE2).
+- 2026-10-21 Committed c7c9af5a (foundations, audio/ excluded until VOICE done). NOT pushed; push + projects.js once FLIGHT integrates a playable build.
+- 2026-10-21 UI r2 done (career sync, peerage/title picker, Auto quality v2 migration, D9/D10 keys invertPitch/stickRight v3; ui_flow.mjs 44/44/45). FLIGHT told: pitch sign flip in controls.js, auto-start-low, shared career. 3 active (FLIGHT VOICE PLANE2).
+- 2026-10-21 Launched WORLD r2 (landscape look pass: grass/trees/town+castle/water/haze, tiers, setQuality). 4 active.
+- 2026-10-21 UI r2 + D11 Views done (ui_flow 55/55/56). 4 active (FLIGHT VOICE PLANE2 WORLD2).
+- 2026-10-21 VOICE done (18 voices, samples, audition page tools/voice/audition.html; weak: comte, baronin, heiress, laird, geezer). Launched BARKS (script phonetic fixes + full ~3h batch). Aaron D12 markers + D13 LAND assist → launched ASSIST lane. 5 active (FLIGHT PLANE2 WORLD2 BARKS ASSIST).
+- 2026-10-21 PLANE r2 done (royal pilot m/f, corgi at high, prop shimmer, trim texture, flap slide, panel night light, eyeCenter). Nit for later: black blob top-centre in center portrait (overhead console/compass?), corgi big in right look. 4 active (FLIGHT WORLD2 BARKS ASSIST).

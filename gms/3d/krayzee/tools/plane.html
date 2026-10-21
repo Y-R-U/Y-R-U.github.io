@@ -35,7 +35,9 @@
   <div class="row"><label>Primary</label><input id="primary" type="color" value="#f4f1ea"></div>
   <div class="row"><label>Secondary</label><input id="secondary" type="color" value="#1f4fa8"></div>
   <div class="row"><label>Accent</label><input id="accent" type="color" value="#e8b21c"></div>
-  <div class="row"><button id="vChase" class="on">Chase</button><button id="vCockpit">Cockpit</button><button id="qBtn"></button><button id="anim">Animate</button></div>
+  <div class="row"><button id="vChase" class="on">Chase</button><button id="vCenter">Center</button><button id="vCockpit">Cockpit</button></div>
+  <div class="row"><button id="qBtn"></button><button id="anim">Animate</button><button id="gBtn">Pilot: m</button><button id="sBtn">Skin</button></div>
+  <div class="row"><label>Night</label><input id="night" type="range" min="0" max="1" step="0.01" value="0.35"><output id="nightO">0.35</output></div>
   <details open><summary>Controls</summary><div id="ctl"></div></details>
   <details><summary>Instruments</summary><div id="ins"></div></details>
 </div>
@@ -68,6 +70,7 @@ scene.environmentIntensity = 0.55;
   g.fillStyle = gr; g.fillRect(0, 0, 2, 256);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   scene.background = t;
+  window.__sky = t;
 }
 const hemi = new THREE.HemisphereLight(0xcfe3ff, 0x6b6656, 0.9);
 scene.add(hemi);
@@ -94,13 +97,13 @@ window.__plane = plane;
 const camera = new THREE.PerspectiveCamera(36, innerWidth / innerHeight, 0.05, 400);
 const orbit = { az: +(Q.get('az') ?? 225), el: +(Q.get('el') ?? 14), dist: +(Q.get('dist') ?? 15.5), target: new THREE.Vector3(+(Q.get('tx') ?? 0), +(Q.get('ty') ?? 1.25), +(Q.get('tz') ?? -0.2)) };
 const look = { yaw: +(Q.get('yaw') ?? 0), pitch: +(Q.get('pitch') ?? (plane.eyePitch * 180 / Math.PI)) };
-let view = Q.get('view') === 'cockpit' ? 'cockpit' : 'chase';
+let view = ['cockpit', 'center'].includes(Q.get('view')) ? Q.get('view') : 'chase';
 
 function placeCamera() {
-  if (view === 'cockpit') {
+  if (view !== 'chase') {
     camera.fov = +(Q.get('fov') ?? 66);
     camera.near = 0.03;
-    const e = plane.eye.clone(); plane.root.localToWorld(e);
+    const e = (view === 'center' ? plane.eyeCenter : plane.eye).clone(); plane.root.localToWorld(e);
     camera.position.copy(e);
     camera.quaternion.setFromEuler(new THREE.Euler(look.pitch * Math.PI / 180, look.yaw * Math.PI / 180, 0, 'YXZ'));
   } else {
@@ -116,6 +119,7 @@ function setView(v) {
   view = v; plane.setView(v);
   document.getElementById('vChase').classList.toggle('on', v === 'chase');
   document.getElementById('vCockpit').classList.toggle('on', v === 'cockpit');
+  document.getElementById('vCenter').classList.toggle('on', v === 'center');
 }
 window.__setView = setView; window.__orbit = orbit; window.__look = look;
 setView(view);
@@ -132,7 +136,7 @@ renderer.domElement.addEventListener('pointermove', (e) => {
     const [a, b] = [...ptrs.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
     if (pinch0) orbit.dist = Math.min(60, Math.max(3, orbit.dist * pinch0 / d)); pinch0 = d; return;
   }
-  if (view === 'cockpit') { look.yaw -= dx * 0.25; look.pitch = Math.max(-80, Math.min(80, look.pitch - dy * 0.25)); }
+  if (view !== 'chase') { look.yaw -= dx * 0.25; look.pitch = Math.max(-80, Math.min(80, look.pitch - dy * 0.25)); }
   else { orbit.az -= dx * 0.4; orbit.el = Math.max(-30, Math.min(85, orbit.el + dy * 0.3)); }
 });
 renderer.domElement.addEventListener('wheel', (e) => { orbit.dist = Math.min(60, Math.max(3, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: true });
@@ -143,6 +147,20 @@ if (Q.get('ui') === '0') ui.classList.add('hide');
 document.getElementById('tog').onclick = () => ui.classList.toggle('hide');
 document.getElementById('vChase').onclick = () => setView('chase');
 document.getElementById('vCockpit').onclick = () => setView('cockpit');
+document.getElementById('vCenter').onclick = () => setView('center');
+const gb = document.getElementById('gBtn');
+gb.onclick = () => { const g = plane.pilot()?.gender === 'm' ? 'f' : 'm'; plane.setPilot({ gender: g }); gb.textContent = 'Pilot: ' + g; };
+const SKINS = ['light', 'fair', 'tan', 'brown', 'dark'];
+document.getElementById('sBtn').onclick = () => { const i = SKINS.indexOf(plane.pilot()?.skin); plane.setPilot({ skin: SKINS[(i + 1) % SKINS.length] }); };
+const nightI = document.getElementById('night');
+const setNight = (v) => {
+  plane.setLightLevel(v); nightI.value = v; document.getElementById('nightO').textContent = (+v).toFixed(2);
+  scene.background = v > 0.6 ? new THREE.Color(0x070a12) : window.__sky;
+  hemi.intensity = 0.9 * (1 - v * 0.93); sun.intensity = 2.6 * (1 - v * 0.97); scene.environmentIntensity = 0.55 * (1 - v * 0.92);
+};
+nightI.addEventListener('input', () => setNight(+nightI.value));
+if (Q.has('night')) setNight(+Q.get('night'));
+if (Q.has('gender')) plane.setPilot({ gender: Q.get('gender') });
 const qb = document.getElementById('qBtn'); qb.textContent = 'Quality: ' + quality;
 qb.onclick = () => { const u = new URL(location.href); u.searchParams.set('q', quality === 'low' ? 'high' : 'low'); location.href = u; };
 let animate = Q.get('anim') === '1';

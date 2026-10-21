@@ -1,7 +1,44 @@
 import * as THREE from 'three';
 
 export const SUN_DIR = new THREE.Vector3(-0.42, 0.72, 0.55).normalize();
-export const FOG_COLOR = new THREE.Color('#c9d9e6');
+export const FOG_COLOR = new THREE.Color('#bfd2e4');
+export const FOG_DENSITY = 0.00026;
+const HAZE_H = 1100;
+
+// Aerial perspective for every fogged material: height-falloff exponential haze (thick near the ground, thin aloft),
+// warmed toward the sun, and a hard fade to the haze colour before the terrain edge. scene.fog must be FogExp2.
+let atmosphereInstalled = false;
+function installAtmosphere() {
+  if (atmosphereInstalled) return;
+  atmosphereInstalled = true;
+  const C = THREE.ShaderChunk;
+  C.fog_pars_vertex = '#ifdef USE_FOG\n varying float vFogDepth; varying vec3 vFogDir;\n#endif';
+  C.fog_vertex = '#ifdef USE_FOG\n vFogDepth = - mvPosition.z; vFogDir = (vec4(mvPosition.xyz, 0.0) * viewMatrix).xyz;\n#endif';
+  C.fog_pars_fragment = `#ifdef USE_FOG
+  uniform vec3 fogColor; varying float vFogDepth; varying vec3 vFogDir;
+  #ifdef FOG_EXP2
+    uniform float fogDensity;
+  #else
+    uniform float fogNear; uniform float fogFar;
+  #endif
+#endif`;
+  const s = SUN_DIR;
+  C.fog_fragment = `#ifdef USE_FOG
+  #ifdef FOG_EXP2
+    float fDist = length(vFogDir);
+    float fa = exp(-max(cameraPosition.y, 0.0) / ${HAZE_H.toFixed(1)}), fb = exp(-max(cameraPosition.y + vFogDir.y, 0.0) / ${HAZE_H.toFixed(1)});
+    float fAvg = abs(vFogDir.y) > 1.0 ? ${HAZE_H.toFixed(1)} * (fa - fb) / vFogDir.y : fa;
+    float fogFactor = 1.0 - exp(-fogDensity * fDist * fAvg);
+    fogFactor = max(fogFactor, smoothstep(9000.0, 13800.0, fDist));
+    float fSun = pow(max(dot(vFogDir / max(fDist, 1e-3), vec3(${s.x.toFixed(4)}, ${s.y.toFixed(4)}, ${s.z.toFixed(4)})), 0.0), 5.0);
+    vec3 fCol = mix(fogColor, vec3(1.0, 0.93, 0.8), fSun * 0.45);
+    gl_FragColor.rgb = mix(gl_FragColor.rgb * mix(vec3(1.0), vec3(0.92, 0.97, 1.04), fogFactor), fCol, fogFactor);
+  #else
+    float fogFactor = smoothstep(fogNear, fogFar, vFogDepth);
+    gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, fogFactor);
+  #endif
+#endif`;
+}
 
 const skyVert = /* glsl */`
 varying vec3 vDir;
@@ -12,7 +49,7 @@ void main() {
 }`;
 
 const skyFrag = /* glsl */`
-uniform vec3 uSun, uZenith, uHorizon, uGround;
+uniform vec3 uSun, uZenith, uHorizon, uGround, uHaze;
 uniform float uTime, uClouds;
 varying vec3 vDir;
 float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -22,32 +59,40 @@ float fbm(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { s += a*
 void main() {
   vec3 d = normalize(vDir);
   float y = d.y;
-  float t = pow(clamp(y, 0.0, 1.0), 0.45);
+  float t = pow(clamp(y, 0.0, 1.0), 0.5);
   vec3 col = mix(uHorizon, uZenith, t);
   float sd = max(dot(d, uSun), 0.0);
-  col += vec3(1.0, 0.85, 0.6) * (pow(sd, 8.0) * 0.18 + pow(sd, 64.0) * 0.35);
+  col = mix(col, uHaze, (1.0 - smoothstep(0.0, 0.09, abs(y))) * 0.85);
+  col += vec3(1.0, 0.85, 0.6) * (pow(sd, 8.0) * 0.16 + pow(sd, 64.0) * 0.3);
   col += vec3(1.0, 0.95, 0.85) * smoothstep(0.9993, 0.9997, sd) * 3.0;
   if (y > 0.0 && uClouds > 0.0) {
-    vec2 uv = d.xz / (y + 0.06) * 1.6 + vec2(uTime * 0.004, 0.0);
-    float c = fbm(uv);
-    c = smoothstep(0.52, 0.78, c) * smoothstep(0.0, 0.12, y);
-    float shade = 0.82 + 0.18 * fbm(uv * 1.7 + 4.0);
-    vec3 cc = mix(vec3(0.78, 0.82, 0.88), vec3(1.0), shade) + vec3(1.0, 0.9, 0.75) * pow(sd, 6.0) * 0.25;
-    col = mix(col, cc, c * 0.9 * uClouds);
+    vec2 uv = d.xz / (y + 0.08) * 1.4 + vec2(uTime * 0.004, 0.0);
+    vec2 toSun = normalize(uSun.xz + 1e-4) * 0.12;
+    float c0 = fbm(uv);
+    float c = smoothstep(0.5, 0.74, c0);
+    float c1 = smoothstep(0.5, 0.74, fbm(uv + toSun));
+    float lit = clamp(0.62 + (c - c1) * 1.6, 0.25, 1.0);
+    float fine = fbm(uv * 3.1 + 7.0);
+    vec3 cc = mix(vec3(0.6, 0.66, 0.76), vec3(1.04, 1.02, 0.98), lit * (0.8 + 0.3 * fine));
+    cc += vec3(1.0, 0.88, 0.7) * pow(sd, 10.0) * (1.0 - c) * 0.9;
+    float a = c * smoothstep(0.0, 0.18, y) * uClouds;
+    col = mix(col, cc, a * 0.95);
   }
-  col = mix(col, uGround, smoothstep(0.0, -0.08, y));
+  col = mix(col, uGround, smoothstep(0.0, -0.06, y));
   gl_FragColor = vec4(col, 1.0);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
 }`;
 
 export function createSky(quality) {
+  installAtmosphere();
   const mat = new THREE.ShaderMaterial({
     vertexShader: skyVert, fragmentShader: skyFrag,
     uniforms: {
       uSun: { value: SUN_DIR.clone() },
-      uZenith: { value: new THREE.Color('#2f6fc2') },
-      uHorizon: { value: new THREE.Color('#c6dcef') },
+      uZenith: { value: new THREE.Color('#2a66bd') },
+      uHorizon: { value: new THREE.Color('#a9c8e8') },
+      uHaze: { value: FOG_COLOR.clone() },
       uGround: { value: FOG_COLOR.clone() },
       uTime: { value: 0 },
       uClouds: { value: 1 },
@@ -75,7 +120,7 @@ export function createLights(scene, quality) {
   s.camera.far = 2400;
   setShadowFocus(sun, -40, -170, 430);
   scene.add(sun, sun.target);
-  scene.fog = new THREE.Fog(FOG_COLOR.clone(), 1500, 14000);
+  scene.fog = new THREE.FogExp2(FOG_COLOR.clone(), FOG_DENSITY);
   return { hemi, sun };
 }
 

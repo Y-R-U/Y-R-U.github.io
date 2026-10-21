@@ -4,6 +4,7 @@ import { createLivery, normalizeLivery } from './livery.js';
 import { createMaterials, glowTexture, discTexture } from './materials.js';
 import { buildExterior } from './exterior.js';
 import { buildCockpit } from './cockpit.js';
+import { createPilot } from './pilot.js';
 import { srgb } from './geom.js';
 
 const D2R = Math.PI / 180;
@@ -13,7 +14,8 @@ export async function createPlane(opts = {}) {
   const quality = opts.quality === 'low' ? 'low' : 'high';
   const high = quality === 'high';
   const wantCockpit = opts.cockpit !== false;
-  const holes = high;
+  // real window holes need an interior behind them; cockpit-less (AI) planes get painted glass
+  const holes = wantCockpit;
 
   const livery = createLivery({ quality, holes });
   const mats = createMaterials({ quality, livery, holes });
@@ -32,6 +34,11 @@ export async function createPlane(opts = {}) {
     cockpit = cp.group;
     cockpit.position.set(0, -CG.y, -CG.s);
     root.add(cockpit);
+  }
+  let pilot = null;
+  if (cp && opts.pilot !== false) {
+    pilot = createPilot({ quality, opts: typeof opts.pilot === 'object' ? opts.pilot : {} });
+    cockpit.add(pilot.mesh);
   }
 
   // light glow sprites
@@ -57,6 +64,8 @@ export async function createPlane(opts = {}) {
 
   const eye = new THREE.Vector3(...toLocal(EYE.x, EYE.y, EYE.s));
   const eyePitch = EYE.pitch;
+  const eyeCenter = new THREE.Vector3(...toLocal(0, EYE.y, EYE.s));
+  const eyeCenterPitch = EYE.pitch;
   const dims = { length: 8.28, span: 11.0, height: 2.72, gearHeight: CG.y };
 
   const ctl = { aileron: 0, elevator: 0, rudder: 0, throttle: 0, flaps: 0, brake: 0 };
@@ -79,11 +88,11 @@ export async function createPlane(opts = {}) {
   }
 
   function setView(v) {
-    view = v === 'cockpit' ? 'cockpit' : 'chase';
-    const inCockpit = view === 'cockpit';
-    if (cockpit) cockpit.visible = inCockpit || high;
-    // the hole-less low-quality shell has opaque painted windows, so the glass is only needed inside
-    ext.meshes.glass.visible = high || inCockpit;
+    view = v === 'cockpit' || v === 'center' ? v : 'chase';
+    const inside = view !== 'chase';
+    if (cp) cp.setDetail(inside);
+    if (pilot) pilot.setHideBody(view === 'cockpit');
+    ext.meshes.glass.visible = holes;
     if (glow) glow.visible = true;
   }
   setView(opts.view || 'chase');
@@ -108,16 +117,19 @@ export async function createPlane(opts = {}) {
     h.ailL.rotation.x = cur.aileron * MAX.aileron;
     h.elevator.rotation.x = -(cur.elevator > 0 ? cur.elevator * MAX.elevUp : cur.elevator * MAX.elevDown);
     h.rudder.rotation.x = cur.rudder * MAX.rudder;
-    h.flapR.rotation.x = h.flapL.rotation.x = cur.flaps * MAX.flaps;
+    // C172 flaps run aft on curved tracks (Fowler motion) while they rotate down
+    const fl = Math.max(0, cur.flaps), aft = 0.12 * Math.min(1, fl * 1.5) ** 0.85, drop = 0.03 * fl;
+    for (const f of [h.flapR, h.flapL]) { f.rotation.x = fl * MAX.flaps; f.position.z = aft; f.position.y = -drop; }
 
     const r = rpmKnown ? rpm : 600 + cur.throttle * 2100;
     const omega = (r / 60) * Math.PI * 2;
     ext.propGroup.rotation.z -= omega * dt;
     const blur = THREE.MathUtils.smoothstep(r, 250, 1100);
     ext.propMesh.visible = blur < 0.98;
-    mats.disc.opacity = blur * 0.7;
+    mats.disc.opacity = blur;
     ext.disc.visible = blur > 0.01;
-    ext.disc.rotation.z += omega * dt * 0.013;
+    // a slow stroboscopic drift of the blade bands, like a camera/eye beat against the blade rate
+    ext.disc.rotation.z += dt * (0.6 + 0.25 * Math.sin(t * 0.37));
 
     // beacon: double flash ~1 Hz; strobes: double flash every 1.2 s
     const bph = t % 1.0, sph = t % 1.2;
@@ -134,19 +146,26 @@ export async function createPlane(opts = {}) {
     }
 
     if (cp) cp.update(dt, cur, ctl);
+    if (pilot) pilot.update(dt, cur, cp.yokes[0]);
   }
 
   // 0 = bright day (small glows) .. 1 = night (full halos)
+  let panelLight = opts.panelLight ?? null;
   function setLightLevel(k) {
     lightLevel = Math.max(0, Math.min(1, k));
     if (glow) glow.material.size = 0.3 + 0.5 * lightLevel;
+    if (cp) cp.setNight(panelLight ?? THREE.MathUtils.smoothstep(lightLevel, 0.45, 0.9));
   }
+  // null = follow setLightLevel; 0..1 forces the panel backlight
+  function setPanelLight(v) { panelLight = v == null ? null : Math.max(0, Math.min(1, +v)); setLightLevel(lightLevel); }
+  function setPilot(p = {}) { if (pilot) pilot.setConfig(p); }
 
   function dispose() {
     root.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
     for (const m of mats.all()) { if (m.map && m.map !== livery.texture) m.map.dispose(); m.dispose(); }
     if (glow) { glow.material.map.dispose(); glow.material.dispose(); }
     livery.dispose();
+    if (pilot) pilot.dispose();
     if (cp) cp.dispose();
     root.removeFromParent();
   }
@@ -154,7 +173,8 @@ export async function createPlane(opts = {}) {
   setLightLevel(lightLevel);
   update(0);
   return {
-    root, cockpit, eye, eyePitch, dims, setLivery, setControls, setView, updateInstruments, update, dispose, setLightLevel,
-    get view() { return view; }, quality, livery: () => ({ ...L }), _ext: ext, _cp: cp, _livery: livery,
+    root, cockpit, eye, eyePitch, eyeCenter, eyeCenterPitch, dims, setLivery, setControls, setView, updateInstruments, update, dispose,
+    setLightLevel, setPanelLight, setPilot, pilot: () => (pilot ? pilot.config : null),
+    get view() { return view; }, quality, livery: () => ({ ...L }), _ext: ext, _cp: cp, _livery: livery, _pilot: pilot,
   };
 }
