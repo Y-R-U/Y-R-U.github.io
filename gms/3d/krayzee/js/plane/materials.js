@@ -22,6 +22,19 @@ export function createMaterials({ quality, livery, holes }) {
   const beacon = new THREE.MeshBasicMaterial({ color: 0x400000, toneMapped: false });
   const interior = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0.05 });
   const interiorMetal = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.35, metalness: 0.6 });
+  // Inside the cabin the sky/ground bounce arrives through small windows: keep its brightness, drop most of its tint
+  // (otherwise the grass-green ground bounce paints the headliner green).
+  for (const m of [interior, interiorMetal]) {
+    m.onBeforeCompile = (sh) => {
+      sh.fragmentShader = sh.fragmentShader.replace('#include <lights_fragment_end>', `
+        #if defined( RE_IndirectDiffuse )
+          irradiance = mix( vec3( dot( irradiance, vec3( 0.299, 0.587, 0.114 ) ) ), irradiance, 0.3 );
+          iblIrradiance = mix( vec3( dot( iblIrradiance, vec3( 0.299, 0.587, 0.114 ) ) ), iblIrradiance, 0.3 );
+        #endif
+        #include <lights_fragment_end>`);
+    };
+    m.customProgramCacheKey = () => 'krayzee-cabin';
+  }
   return { paint, trim, glass, prop, disc, lights, beacon, interior, interiorMetal, all() { return [paint, trim, glass, prop, disc, lights, beacon, interior, interiorMetal]; } };
 }
 

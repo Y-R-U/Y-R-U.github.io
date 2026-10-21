@@ -91,9 +91,9 @@ const hex = (h) => { const c = new THREE.Color(h); return `vec3(${c.r.toFixed(4)
 
 export function createTerrain(renderer, quality) {
   const low = quality === 'low';
-  const N = low ? 120 : 176;
-  const xs = gridLines(N, CASTLE.x - 560, CASTLE.x + 560, low ? 50 : 35);
-  const zs = gridLines(N, CASTLE.z - 560, CASTLE.z + 560, low ? 50 : 35);
+  const N = low ? 96 : 176;
+  const xs = gridLines(N, CASTLE.x - 560, CASTLE.x + 560, low ? 70 : 35);
+  const zs = gridLines(N, CASTLE.z - 560, CASTLE.z + 560, low ? 70 : 35);
   const NX = xs.length, NZ = zs.length;
   const H = new Float32Array(NX * NZ);
   const pos = new Float32Array(NX * NZ * 3);

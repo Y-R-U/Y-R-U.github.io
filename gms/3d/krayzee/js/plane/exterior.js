@@ -52,13 +52,18 @@ function spanSamples(a, b, step) {
 }
 
 export function buildExterior({ quality, mats }) {
-  const high = quality !== 'low';
+  // 'lod' / 'lod2' = far static airframes for distant traffic: same parts and UVs, ~half / ~third of the low tessellation
+  const lod2 = quality === 'lod2', lod = quality === 'lod' || lod2, high = quality !== 'low' && !lod;
+  const [lk, lmin, ls] = lod2 ? [0.34, 3, 3.2] : [0.55, 4, 2];
+  // lod2 keeps each count's parity (several loops split a ring in half)
+  const qi = (l) => (lod2 ? Math.max(l % 2 ? 3 : 4, 2 * Math.round((l * lk - (l % 2)) / 2) + (l % 2)) : Math.max(lmin, Math.round(l * lk)));
+  const Q = (h, l) => (lod ? (Number.isInteger(l) ? qi(l) : l * ls) : high ? h : l);
   const body = new Builder(), trim = new Builder(), glass = new Builder(), lights = new Builder();
-  const M = high ? 24 : 14;
+  const M = Q(24, 14);
 
   // ---------- fuselage ----------
   const stations = [0.255, 0.258, 0.263, 0.27, 0.28, 0.295, 0.32, 0.35, 0.39, 0.44];
-  const step = high ? 0.075 : 0.16;
+  const step = Q(0.075, 0.16);
   for (let s = 0.5; s < 7.9; s += step) stations.push(s);
   stations.push(7.93, 7.95);
   const rings = stations.map((s) => {
@@ -77,7 +82,7 @@ export function buildExterior({ quality, mats }) {
   {
     const g = [];
     const arc = Math.round(M * 0.66);
-    for (let s = 1.49; s <= 4.72; s += high ? 0.06 : 0.12) {
+    for (let s = 1.49; s <= 4.72; s += Q(0.06, 0.12)) {
       const sec = fusSec(s), r = [];
       for (let j = -arc; j <= arc; j++) r.push(ringPoint(sec, s, (j / (2 * M)) * Math.PI * 2, 0.006));
       g.push(r);
@@ -87,8 +92,8 @@ export function buildExterior({ quality, mats }) {
 
   // ---------- wing ----------
   const foil = naca(0.02, 0.4, 0.12);
-  const nC = high ? 22 : 11;
-  const wingStep = high ? 0.32 : 0.7;
+  const nC = Q(22, 11);
+  const wingStep = Q(0.32, 0.7);
   const wingRing = (x, loop) => {
     const w = wingSec(x);
     return loop.map(([xc, yv]) => [x, w.y + yv * w.c * w.thk, w.le + xc * w.c]);
@@ -110,7 +115,7 @@ export function buildExterior({ quality, mats }) {
   const H = WING.hingeChord;
   const tipXs = (sign) => {
     const r = spanSamples(5.12, WING.tipX, wingStep);
-    for (let k = 1; k <= (high ? 6 : 3); k++) r.push(WING.tipX + (WING.halfSpan - WING.tipX) * (k / (high ? 6 : 3)));
+    for (let k = 1; k <= (Q(6, 3)); k++) r.push(WING.tipX + (WING.halfSpan - WING.tipX) * (k / (Q(6, 3))));
     return r.map((x) => x * sign);
   };
   wingPanel(body, spanSamples(-WING.flap[0], WING.flap[0], 0.6), 0, 1, false);
@@ -145,11 +150,11 @@ export function buildExterior({ quality, mats }) {
   const tailRing = (x, f0, f1, roundNose) => {
     const s = stabSec(x);
     const fh = (STAB.hinge - s.le) / s.c;
-    const { loop } = airfoilLoop(sym9, high ? 14 : 8, f0 === 'h' ? fh + 0.012 : f0, f1 === 'h' ? fh : f1, roundNose);
+    const { loop } = airfoilLoop(sym9, Q(14, 8), f0 === 'h' ? fh + 0.012 : f0, f1 === 'h' ? fh : f1, roundNose);
     return loop.map(([xc, yv]) => [x, STAB.y + yv * s.c * s.thk, s.le + xc * s.c]);
   };
   const stabXs = [];
-  for (let k = 0; k <= (high ? 14 : 7); k++) { const t = k / (high ? 14 : 7); stabXs.push(-STAB.halfSpan + 2 * STAB.halfSpan * (0.5 - 0.5 * Math.cos(Math.PI * t))); }
+  for (let k = 0; k <= (Q(14, 7)); k++) { const t = k / (Q(14, 7)); stabXs.push(-STAB.halfSpan + 2 * STAB.halfSpan * (0.5 - 0.5 * Math.cos(Math.PI * t))); }
   const swP = () => uvSwatch('primary');
   body.loft(stabXs.map((x) => tailRing(x, 0, 'h', false)), { out: () => [0, 1, 0], uv: swP, capStart: true, capEnd: true, capUV: swP });
   const elev = new Builder();
@@ -173,12 +178,12 @@ export function buildExterior({ quality, mats }) {
   const finSplits = (L, mid) => [[0, mid, (p) => uvSide(REG.finR, p[2], p[1])], [mid, L, (p) => uvSide(REG.finL, p[2], p[1])]];
   const finRing = (y, part, thkMul = 1) => {
     const le = finLe(y), te = finTe(y), c = te - le, fh = (finHinge(y) - le) / c;
-    const { loop, topCount } = airfoilLoop(sym10, high ? 14 : 8, part === 'rudder' ? fh + 0.012 : 0, part === 'rudder' ? 1 : fh, part === 'rudder');
+    const { loop, topCount } = airfoilLoop(sym10, Q(14, 8), part === 'rudder' ? fh + 0.012 : 0, part === 'rudder' ? 1 : fh, part === 'rudder');
     return { pts: loop.map(([xc, yv]) => [yv * c * thkMul, y, le + xc * c]), topCount };
   };
   {
     const ys = [];
-    const n = high ? 12 : 6;
+    const n = Q(12, 6);
     for (let k = 0; k <= n; k++) ys.push(FIN.base + (FIN.top - 0.035 - FIN.base) * (k / n));
     ys.push(FIN.top - 0.012, FIN.top);
     const mul = (y) => (y > FIN.top - 0.04 ? Math.sqrt(Math.max(0.05, 1 - ((y - (FIN.top - 0.04)) / 0.04) ** 2)) : 1);
@@ -196,12 +201,12 @@ export function buildExterior({ quality, mats }) {
     const dors = [];
     const lens = (s, yb, yt, t) => {
       const r = [];
-      const N = high ? 16 : 10;
+      const N = Q(16, 10);
       for (let k = 0; k < N; k++) { const a = (k / N) * Math.PI * 2; r.push([Math.sin(a) * t * (0.35 + 0.65 * Math.abs(Math.sin(a))), yb + (yt - yb) * (1 - Math.cos(a)) / 2, s]); }
       return r;
     };
     const ds = [];
-    for (let k = 0; k <= (high ? 10 : 5); k++) ds.push(lerp(5.25, 7.2, k / (high ? 10 : 5)));
+    for (let k = 0; k <= (Q(10, 5)); k++) ds.push(lerp(5.25, 7.2, k / (Q(10, 5))));
     for (const s of ds) {
       const yb = fusSec(s).yt - 0.04;
       const k = (s - 5.25) / (7.2 - 5.25);
@@ -219,7 +224,7 @@ export function buildExterior({ quality, mats }) {
     const a = [sg * 0.5, 0.8, 2.6], b = [sg * xw, w.y - 0.06, w.le + 0.27 * w.c];
     const path = [];
     for (let k = 0; k <= 6; k++) path.push([lerp(a[0], b[0], k / 6), lerp(a[1], b[1], k / 6), lerp(a[2], b[2], k / 6)]);
-    const prof = streamline(high ? 14 : 8, 0.1, 0.034).map(([u, v]) => [u, v]);
+    const prof = streamline(Q(14, 8), 0.1, 0.034).map(([u, v]) => [u, v]);
     body.loft(sweepRings(path, prof, { upHint: [0, 0, 1], scale: (i, n) => (i === 0 || i === n - 1 ? 1.25 : 1) }), { uv: swS, capStart: true, capEnd: true, capUV: swS });
     // fuselage strut fitting fairing
     const fit = [];
@@ -229,17 +234,18 @@ export function buildExterior({ quality, mats }) {
 
   // ---------- landing gear ----------
   const wheel = (B, x, y, s, r, w) => {
-    const tire = new THREE.TorusGeometry(r - w * 0.42, w * 0.42, high ? 10 : 6, high ? 26 : 14);
+    const tire = new THREE.TorusGeometry(r - w * 0.42, w * 0.42, Q(10, 6), Q(26, 14));
     tire.scale(1, 1, 1.25);
     B.addGeo(tire, new THREE.Matrix4().makeRotationY(Math.PI / 2).setPosition(x, y, s), [0, 0], C.tire);
-    const hub = new THREE.CylinderGeometry(r * 0.58, r * 0.58, w * 0.92, high ? 18 : 10);
+    const hub = new THREE.CylinderGeometry(r * 0.58, r * 0.58, w * 0.92, Q(18, 10));
     B.addGeo(hub, new THREE.Matrix4().makeRotationZ(Math.PI / 2).setPosition(x, y, s), [0, 0], C.hub);
+    if (lod) return;
     const cap = new THREE.SphereGeometry(r * 0.3, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2);
     for (const d of [1, -1]) B.addGeo(cap.clone(), new THREE.Matrix4().makeRotationZ(-d * Math.PI / 2).scale(new THREE.Vector3(1, 0.35, 1)).setPosition(x + d * w * 0.46, y, s), [0, 0], C.metal);
     cap.dispose();
   };
   const fairing = (B, x, y, s, len, wid, hgt, front, uv) => {
-    const R = [], N = high ? 20 : 12, ks = high ? 16 : 9;
+    const R = [], N = Q(20, 12), ks = Q(16, 9);
     for (let k = 0; k <= ks; k++) {
       const t = k / ks;
       const z = s - front + t * len;
@@ -265,6 +271,7 @@ export function buildExterior({ quality, mats }) {
     wheel(trim, ax, g.wheelR, g.mainS, g.wheelR, 0.14);
     fairing(body, ax, g.wheelR, g.mainS, 0.92, 0.105, 0.205, 0.3, () => uvSwatch('primary'));
     // step on the leg
+    if (lod) continue;
     const step = new THREE.BoxGeometry(0.1, 0.01, 0.07);
     trim.addGeo(step, new THREE.Matrix4().setPosition(sg * 0.66, 0.5, g.mainS - 0.075), [0, 0], C.metal);
     const stem = new THREE.CylinderGeometry(0.008, 0.008, 0.08, 6);
@@ -275,20 +282,20 @@ export function buildExterior({ quality, mats }) {
     const ns = g.noseS;
     const tilt = new THREE.Matrix4().makeRotationX(-0.1);
     const at = (y, z) => new THREE.Matrix4().makeTranslation(0, y, z).multiply(tilt);
-    trim.addGeo(new THREE.CylinderGeometry(0.026, 0.026, 0.3, 14), at(0.52, ns - 0.035), [0, 0], C.metal);
-    trim.addGeo(new THREE.CylinderGeometry(0.042, 0.042, 0.16, 14), at(0.69, ns - 0.055), [0, 0], C.dark);
-    trim.addGeo(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 14), at(0.6, ns - 0.045), [0, 0], C.dark);
-    for (const [y, r] of [[0.5, 0.5], [0.58, -0.5]]) trim.addGeo(new THREE.BoxGeometry(0.018, 0.1, 0.022), new THREE.Matrix4().makeRotationX(r).setPosition(0, y, ns - 0.085), [0, 0], C.dark);
+    trim.addGeo(new THREE.CylinderGeometry(0.026, 0.026, 0.3, Q(14, 14)), at(0.52, ns - 0.035), [0, 0], C.metal);
+    trim.addGeo(new THREE.CylinderGeometry(0.042, 0.042, 0.16, Q(14, 14)), at(0.69, ns - 0.055), [0, 0], C.dark);
+    if (!lod) trim.addGeo(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 14), at(0.6, ns - 0.045), [0, 0], C.dark);
+    if (!lod) for (const [y, r] of [[0.5, 0.5], [0.58, -0.5]]) trim.addGeo(new THREE.BoxGeometry(0.018, 0.1, 0.022), new THREE.Matrix4().makeRotationX(r).setPosition(0, y, ns - 0.085), [0, 0], C.dark);
     wheel(trim, 0, g.noseR, ns, g.noseR, 0.12);
     fairing(body, 0, g.noseR, ns, 0.7, 0.088, 0.175, 0.27, () => uvSwatch('primary'));
   }
 
   // ---------- cowl details ----------
   for (const sg of [1, -1]) {
-    const inlet = new THREE.SphereGeometry(1, high ? 18 : 10, high ? 10 : 6);
+    const inlet = new THREE.SphereGeometry(1, Q(18, 10), Q(10, 6));
     trim.addGeo(inlet, new THREE.Matrix4().makeRotationY(sg * 0.5).scale(new THREE.Vector3(0.1, 0.062, 0.03)).setPosition(sg * 0.27, 1.21, 0.305), [0, 0], C.inlet);
   }
-  {
+  if (!lod) {
     const lower = new THREE.SphereGeometry(1, 14, 8);
     trim.addGeo(lower, new THREE.Matrix4().scale(new THREE.Vector3(0.1, 0.035, 0.05)).setPosition(0, 0.86, 0.42), [0, 0], C.inlet);
     const exPath = [[0.16, 0.8, 1.2], [0.2, 0.68, 1.3], [0.22, 0.62, 1.38]];
@@ -296,7 +303,7 @@ export function buildExterior({ quality, mats }) {
     trim.loft(R, { out: (p) => [p[0] - 0.2, p[1] - 0.7, 0], color: C.exhaust, capStart: true, capEnd: false });
   }
   // antennas, pitot, tie-downs, tail skid
-  {
+  if (!lod) {
     const ant = (s, y, h, rake) => {
       const g2 = new THREE.CylinderGeometry(0.004, 0.012, h, 8);
       trim.addGeo(g2, new THREE.Matrix4().makeRotationX(rake).setPosition(0, y + h / 2 * Math.cos(rake), s + (h / 2) * Math.sin(rake)), [0, 0], C.black);
@@ -329,40 +336,40 @@ export function buildExterior({ quality, mats }) {
     const tipW = wingSec(WING.halfSpan - 0.04);
     for (const [sg, col] of [[-1, C.lensR], [1, C.lensG]]) {
       const p = [sg * (WING.halfSpan - 0.02), tipW.y, tipW.le + 0.1];
-      const lens = new THREE.SphereGeometry(0.035, 10, 8);
+      const lens = new THREE.SphereGeometry(0.035, Q(10, 10), Q(8, 8));
       lights.addGeo(lens, new THREE.Matrix4().makeScale(0.8, 0.8, 1.3).setPosition(...p), [0, 0], col);
       lightPts.push({ p, col: sg < 0 ? [1, 0.08, 0.06] : [0.1, 1, 0.3], kind: 'nav' });
-      const strobe = new THREE.SphereGeometry(0.02, 8, 6);
+      const strobe = new THREE.SphereGeometry(0.02, Q(8, 8), Q(6, 6));
       const ps = [sg * (WING.halfSpan - 0.01), tipW.y, tipW.le + tipW.c * 0.65];
       lights.addGeo(strobe, new THREE.Matrix4().setPosition(...ps), [0, 0], [1.6, 1.6, 1.6]);
       lightPts.push({ p: ps, col: [1, 1, 1], kind: 'strobe' });
     }
     const tail = [0, 1.42, 8.2];
-    const tl = new THREE.SphereGeometry(0.028, 10, 8);
+    const tl = new THREE.SphereGeometry(0.028, Q(10, 10), Q(8, 8));
     lights.addGeo(tl, new THREE.Matrix4().setPosition(...tail), [0, 0], C.lensW);
     lightPts.push({ p: tail, col: [1, 1, 0.92], kind: 'nav' });
   }
   const beaconPos = [0, FIN.top + 0.035, (FIN.leTop + FIN.hingeTop) / 2];
   const beaconGeo = new Builder();
   beaconGeo.addGeo(new THREE.CylinderGeometry(0.035, 0.04, 0.07, 14), new THREE.Matrix4().setPosition(...beaconPos), [0, 0]);
-  trim.addGeo(new THREE.CylinderGeometry(0.045, 0.045, 0.015, 14), new THREE.Matrix4().setPosition(beaconPos[0], beaconPos[1] - 0.04, beaconPos[2]), [0, 0], C.dark);
+  trim.addGeo(new THREE.CylinderGeometry(0.045, 0.045, 0.015, Q(14, 14)), new THREE.Matrix4().setPosition(beaconPos[0], beaconPos[1] - 0.04, beaconPos[2]), [0, 0], C.dark);
   lightPts.push({ p: beaconPos, col: [1, 0.1, 0.05], kind: 'beacon' });
 
   // ---------- propeller ----------
   const prop = new Builder();
   const spinnerProfile = [];
-  for (let k = 0; k <= (high ? 14 : 8); k++) {
-    const u = 0.015 + (0.985 * k) / (high ? 14 : 8);
+  for (let k = 0; k <= (Q(14, 8)); k++) {
+    const u = 0.015 + (0.985 * k) / (Q(14, 8));
     spinnerProfile.push([-0.265 * (1 - u), 0.172 * (1 - (1 - u) ** 2.3) ** 0.55]);
   }
   spinnerProfile.push([0, 0.172]);
-  const spinRings = latheRings(spinnerProfile, high ? 28 : 16);
+  const spinRings = latheRings(spinnerProfile, Q(28, 16));
   const spin = new Builder();
   spin.loft(spinRings, { out: (p) => [p[0], p[1], 0], color: C.white, capEnd: true });
   spin.addGeo(new THREE.CylinderGeometry(0.03, 0.03, 0.02, 10), new THREE.Matrix4().makeRotationX(Math.PI / 2).setPosition(0, 0, -0.27), [0, 0], C.white);
   const pfoil = (t) => naca(0.04, 0.4, t);
   const bladeR = [];
-  for (let k = 0; k <= (high ? 18 : 9); k++) bladeR.push(lerp(0.12, 0.95, k / (high ? 18 : 9)));
+  for (let k = 0; k <= (Q(18, 9)); k++) bladeR.push(lerp(0.12, 0.95, k / (Q(18, 9))));
   bladeR.splice(bladeR.length - 1, 0, 0.935, 0.945);
   for (const rot of [0, Math.PI]) {
     const R = [];
@@ -373,7 +380,7 @@ export function buildExterior({ quality, mats }) {
       if (r > 0.9) c *= Math.sqrt(Math.max(0.12, 1 - ((r - 0.9) / 0.052) ** 2));
       const t = lerp(0.3, 0.075, Math.min(1, u * 1.5));
       const phi = Math.atan(1.6 / (2 * Math.PI * r));
-      const { loop, topCount } = airfoilLoop(pfoil(t), high ? 10 : 6, 0, 1, false);
+      const { loop, topCount } = airfoilLoop(pfoil(t), Q(10, 6), 0, 1, false);
       topC = topCount;
       const cp = Math.cos(phi), sp = Math.sin(phi);
       R.push(loop.map(([xc, yv]) => {
@@ -438,7 +445,7 @@ export function buildExterior({ quality, mats }) {
   spinnerMesh.castShadow = true;
   spinnerMesh.name = 'spinner';
   propGroup.add(propMesh, spinnerMesh);
-  const disc = new THREE.Mesh(new THREE.CircleGeometry(0.95, high ? 48 : 28), mats.disc);
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(0.95, Q(48, 28)), mats.disc);
   disc.position.z = -0.07;
   disc.renderOrder = 3;
   disc.name = 'propDisc';

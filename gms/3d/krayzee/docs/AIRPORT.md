@@ -172,3 +172,45 @@ height at a wood edge), `village`, `castle`, `lake`, `town`. `?q=low|medium|high
 - Cloud shadows are static (the sky's clouds drift); they are not tied to the sky dome's cloud layout.
 - No 3D grass near the camera (shader detail only). No night lighting. Village streets have no pavements/kerbs.
 - The airport build is now ~2 s on desktop; a worker for tree placement/shade map would hide it on mobile.
+
+## Round 3 (ART3, playtest 1 item 10) — 2026-10-22
+- **C-TOWER 1** (D14): rebuilt in `tower.js`, same footprint, collider, `tower.cab` and `tower.crew` API. Ops building at
+  the foot (glass doors, canopy on posts, purple runner); tapered octagonal shaft with corner pilasters, floor bands,
+  staggered slot windows, a glazed stair core on the north-west side, and a royal banner (crest, gold edging,
+  swallowtail) down the runway face; equipment floor (bowl + louvred band); catwalk deck with railing; outward-leaning
+  mullioned glass cab with lit ceiling, blinds and consoles (crew of three kept, heads still track the camera); roof
+  overhang with a purple fascia lettered **C-TOWER 1** in gold between crowns, a drum with a big gold crown, the
+  rotating radar on a plinth, and a red/white lattice antenna mast with crossbars, obstruction light and the royal flag.
+- **Cars** (`props.js`): five shaped low-poly types (hatch, saloon, estate, van, limo) extruded from side profiles
+  (bonnet, windscreen rake, greenhouse, roof), 12 weighted paint colours, black limos. Merged static meshes (one call
+  each), not InstancedMesh: car park near (wheels; lamps + bumper above low), car park far (body + greenhouse), road
+  cars (far form). Swap at 200 m (low) / 520 m; at low the car park drops out beyond 2.4 km.
+- **Black band across fields**: it was the boundary hedge's shaded side (Lambert, double-sided, normals facing away from
+  the sun went near-black). Hedge normals are now bent toward the sky, so the shaded side reads dark green; the leaf
+  colour is lighter; hedges stop casting shadows at low (`h1_*` before, `h3_*` / `after_hedge_noui_*` after).
+- **Low tier** (in-game `lite=1`, worst case over 10 spots × chase/cockpit, incl. the shadow pass, 390×844 and 1280×800):
+  ~215k → **≤ 150k** typical worst (152k at the village, 150–158k when traffic happens to park beside you). Changes:
+  - terrain grid 120² → 96² (castle refinement band coarser at low);
+  - trees: impostor range 2.6 → 2.4 km, cap 12k → 6k, thinning tightened;
+  - village houses: per-archetype near/far InstancedMesh pair (far = walls + roof only), re-bucketed at 380 m (low) /
+    900 m; church + castle split into their own meshes (`townBuildings`, `townMetal`) so they frustum-cull;
+  - airport buildings leave the shadow pass at low; one box per terminal/hangar/tower collider casts instead
+    (`shadowProxy`, colour-masked);
+  - hedge boundary sampled every 8 m at low (was 5 m);
+  - plane rig LOD + low shadow proxy (see PLANE.md round 3): AI traffic is now 5k / 2.9k tris past 150 / 525 m.
+  `setQuality(q)` also drives the car and house LOD radii now.
+
+| spot (low, chase, 390×844) | main / shadow tris | calls |
+|---|---|---|
+| runway | 136k / 3k | 70 |
+| apron | 146k / 3k | 63 |
+| tower buzz | 138k / 3k | 66 |
+| downwind 300 m | 115k / 0 | 47 |
+| over the village 150 m | 149k / 0 | 96 |
+| cruise 1500 m | 142k / 0 | 100 |
+| low over a wood 70 m | 99k / 2k | 52 |
+
+Screenshots in `docs/shots/art3/`: `before_*` / `after_*` (chase, center, cockpit at 1280×800, 390×844, 844×390;
+`_viewEye` = portrait framing as GAMEPLAY would wire it), `after_towerbuzz_*`, `after_carpark_*`, `after_hedge_*`
+(+ `_noui`), tower close-ups `t1_*`/`t2_*`, cars `t3_*`, LOD levels `l2_lod_{near,far,far2}`, shadow proxy
+`l2_shadowproxy_low`. Test-bed presets added: `towerbuzz`, `towerfront`, `towerfar`, `carpark`, `carparkhigh`, `hedge`.

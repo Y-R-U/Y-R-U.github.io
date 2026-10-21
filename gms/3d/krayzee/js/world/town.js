@@ -167,9 +167,18 @@ const ARCH = {
   },
 };
 
-function archetypeGeometry(name) {
+// Far LOD: the same walls and roof, no windows, doors or chimneys.
+const ARCH_LO = {
+  cottage: (W, R) => { W.box(0, 2.5, 0, 8.6, 5.0, 6.8, [1, 1, 1], 0, false); gable(W, R, 8.6, 6.8, 5.0, 3.3); },
+  terrace: (W, R) => { W.box(0, 2.9, 0, 19, 5.8, 8, [1, 1, 1], 0, false); gable(W, R, 19, 8, 5.8, 3.4, 0.35); },
+  manor: (W, R) => { W.box(0, 3.2, 0, 13, 6.4, 10, [1, 1, 1], 0, false); hip(R, 13, 10, 6.4, 3.8); },
+  shop: (W, R) => { W.box(0, 3.3, 0, 9.5, 6.6, 11, [1, 1, 1], 0, false); gable(W, R, 9.5, 11, 6.6, 3.6, 0.35, true); },
+  barn: (W, R) => { W.box(0, 2.6, 0, 22, 5.2, 11, [1, 1, 1], 0, false); gable(W, R, 22, 11, 5.2, 2.6, 0.5); },
+};
+
+function archetypeGeometry(name, lo = false) {
   const W = new Builder(), R = new Builder(), F = new Builder();
-  const dims = ARCH[name](W, R, F);
+  const dims = lo ? ARCH_LO[name](W, R, F) : ARCH[name](W, R, F);
   const parts = [W.build(), R.build(), F.build()];
   const n = parts.reduce((s, g) => s + g.attributes.position.count, 0);
   const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), colr = new Float32Array(n * 3), part = new Float32Array(n);
@@ -374,13 +383,13 @@ function drape(b, pts, width, heightAt, lift, color, shade) {
     b.i.push(i, i + 2, i + 1, i + 1, i + 2, i + 3);
   }
 }
-function dashes(pts, on, off) {
+function dashes(pts, on, off, step = 1.5) {
   const out = [];
   let acc = 0, cur = [];
   for (let k = 0; k < pts.length - 1; k++) {
     const [x0, z0] = pts[k], [x1, z1] = pts[k + 1];
     const L = Math.hypot(x1 - x0, z1 - z0);
-    for (let s = 0; s < L; s += 1.5) {
+    for (let s = 0; s < L; s += step) {
       const t = s / L, x = x0 + (x1 - x0) * t, z = z0 + (z1 - z0) * t;
       const ph = (acc + s) % (on + off);
       if (ph < on) cur.push([x, z]); else if (cur.length > 1) { out.push(cur); cur = []; } else cur = [];
@@ -414,32 +423,67 @@ export function buildTown(B, atlas, quality, heightAt) {
 
   const mtl = houseMaterial();
   const boxes = [];
+  // Houses: a near (windows, chimneys) and a far (walls + roof) instanced mesh per archetype; instances are re-bucketed
+  // between them by camera distance in update().
+  const lods = [];
   for (const [type, list] of Object.entries(byType)) {
     const { geo, dims } = archetypeGeometry(type);
+    const { geo: geoLo } = archetypeGeometry(type, true);
     const n = list.length;
-    const im = new THREE.InstancedMesh(geo, mtl, n);
-    const iWall = new Float32Array(n * 3), iRoof = new Float32Array(n * 3);
+    const im = new THREE.InstancedMesh(geo, mtl, n), imLo = new THREE.InstancedMesh(geoLo, mtl, n);
+    const mats = new Float32Array(n * 16), walls = new Float32Array(n * 3), roofs = new Float32Array(n * 3), xz = new Float32Array(n * 2);
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), c3 = new THREE.Color();
     list.forEach((h, i) => {
       const sx = 0.9 + r() * 0.25, sy = 0.95 + r() * 0.12;
       q.setFromAxisAngle(up, h.ry);
       m4.compose(new THREE.Vector3(h.x, h.y - 0.2, h.z), q, new THREE.Vector3(sx, sy, 1));
-      im.setMatrixAt(i, m4);
+      m4.toArray(mats, i * 16);
+      xz[i * 2] = h.x; xz[i * 2 + 1] = h.z;
       const wl = type === 'barn' ? (r() < 0.5 ? '#5a4234' : '#7c3a2c') : WALLS[(r() * WALLS.length) | 0];
       const rf = type === 'barn' ? (r() < 0.5 ? '#6e7276' : '#8b4632') : ROOFS[(r() * ROOFS.length) | 0];
-      c3.set(wl).toArray(iWall, i * 3);
-      c3.set(rf).toArray(iRoof, i * 3);
+      c3.set(wl).toArray(walls, i * 3);
+      c3.set(rf).toArray(roofs, i * 3);
       const ex = Math.abs(Math.cos(h.ry)) > 0.5 ? dims.w * sx : dims.d, ez = Math.abs(Math.cos(h.ry)) > 0.5 ? dims.d : dims.w * sx;
       const box = { min: [h.x - ex / 2, h.y, h.z - ez / 2], max: [h.x + ex / 2, h.y + dims.h * sy, h.z + ez / 2], kind: 'house' };
       colliders.push(box); boxes.push(box);
     });
-    geo.setAttribute('iWall', new THREE.InstancedBufferAttribute(iWall, 3));
-    geo.setAttribute('iRoof', new THREE.InstancedBufferAttribute(iRoof, 3));
-    im.castShadow = quality !== 'low'; im.receiveShadow = true;
-    im.computeBoundingSphere();
+    const meshes = [im, imLo];
+    for (const m of meshes) {
+      m.geometry.setAttribute('iWall', new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3));
+      m.geometry.setAttribute('iRoof', new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3));
+      m.castShadow = quality !== 'low'; m.receiveShadow = true;
+      m.count = 0;
+    }
     im.name = 'houses-' + type;
-    objects.push(im);
+    imLo.name = 'housesFar-' + type;
+    imLo.castShadow = false;
+    // bounding sphere of all instances so frustum culling still works whatever the split
+    im.instanceMatrix.array.set(mats); im.count = n; im.computeBoundingSphere(); imLo.boundingSphere = im.boundingSphere.clone();
+    lods.push({ n, mats, walls, roofs, xz, meshes });
+    objects.push(im, imLo);
   }
+  let lodR = quality === 'low' ? 380 : 900, lastX = Infinity, lastZ = Infinity;
+  function updateHouses(camera, force = false) {
+    const cx = camera.position.x, cz = camera.position.z;
+    if (!force && Math.hypot(cx - lastX, cz - lastZ) < 25) return;
+    lastX = cx; lastZ = cz;
+    const r2 = lodR * lodR;
+    for (const L of lods) {
+      const cnt = [0, 0];
+      for (let i = 0; i < L.n; i++) {
+        const dx = L.xz[i * 2] - cx, dz = L.xz[i * 2 + 1] - cz, k = dx * dx + dz * dz < r2 ? 0 : 1, m = L.meshes[k], j = cnt[k]++;
+        m.instanceMatrix.array.set(L.mats.subarray(i * 16, i * 16 + 16), j * 16);
+        m.geometry.attributes.iWall.array.set(L.walls.subarray(i * 3, i * 3 + 3), j * 3);
+        m.geometry.attributes.iRoof.array.set(L.roofs.subarray(i * 3, i * 3 + 3), j * 3);
+      }
+      L.meshes.forEach((m, k) => {
+        m.count = cnt[k];
+        m.instanceMatrix.needsUpdate = true;
+        m.geometry.attributes.iWall.needsUpdate = m.geometry.attributes.iRoof.needsUpdate = true;
+      });
+    }
+  }
+  updateHouses({ position: { x: 0, z: 0 } }, true);
   colliders.push(...buildChurch(B.matte, village.church, 0));
   boxes.push(...colliders.slice(-2));
   const castle = buildCastle(B, atlas);
@@ -450,9 +494,10 @@ export function buildTown(B, atlas, quality, heightAt) {
   const asphalt = (x, z) => col('#5d5d5a', 0.85 + 0.15 * ((Math.sin(x * 0.05) * Math.cos(z * 0.043) + 1) / 2));
   const tracks = [];
   for (const f of FARMS) tracks.push({ w: 3.4, pts: bez([[f.x, f.z], [(f.x + f.to[0]) / 2 + 40, (f.z + f.to[1]) / 2 - 30], f.to], 8) });
+  const thin = (pts) => (quality === 'low' ? pts.filter((_, i) => i % 2 === 0 || i === pts.length - 1) : pts);
   for (const ln of LANES) {
-    drape(L, ln.pts, ln.w, heightAt, 0.3, null, asphalt);
-    if (ln.kind === 'road') for (const d of dashes(ln.pts, 4, 8)) drape(L, d, 0.15, heightAt, 0.34, col('#e8e6df'));
+    drape(L, thin(ln.pts), ln.w, heightAt, 0.3, null, asphalt);
+    if (ln.kind === 'road' && quality !== 'low') for (const d of dashes(ln.pts, 4, 8)) drape(L, d, 0.15, heightAt, 0.34, col('#e8e6df'));
   }
   for (const t of tracks) drape(L, t.pts, t.w, heightAt, 0.28, null, (x, z) => col('#8a7a5c', 0.85 + 0.2 * ((Math.sin(x * 0.11 + z * 0.07) + 1) / 2)));
   const lanes = new THREE.Mesh(L.build(), new THREE.MeshLambertMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }));
@@ -474,6 +519,8 @@ export function buildTown(B, atlas, quality, heightAt) {
   for (const f of FARMS) for (let k = 0; k < 6; k++) treeSpots.push([f.x + (r() - 0.5) * 90, f.z + (r() - 0.5) * 90, r() < 0.3 ? 2 : 0, 12 + r() * 8]);
 
   return {
+    update: (camera) => updateHouses(camera),
+    setQuality: (q) => { lodR = q === 'low' ? 380 : 900; lastX = Infinity; },
     objects, colliders, boxes: [...boxes, ...castle], treeSpots,
     paths: [...LANES, ...tracks],
     houses: [...village.houses, ...farmHouses],

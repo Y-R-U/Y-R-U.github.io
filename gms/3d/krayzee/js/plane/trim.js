@@ -9,6 +9,8 @@ export const uvWall = (s, y) => [(s - W0) / (W1 - W0), 0.5 + ((y - Y0) / (Y1 - Y
 export const uvHead = (x, s) => [0.5 + ((x + 0.62) / 1.24) * 0.5, ((s - 2.05) / 1.95) * 0.5];
 export const uvCarpet = (x, s) => [0.25 + ((x + 0.6) / 1.2) * 0.25, 0.01 + ((s - 1.55) / 2.8) * 0.48];
 export const uvSeat = (u, v) => [0.004 + u * 0.242, 0.13 + v * 0.36];
+// glareshield vinyl: a across the width, b from the aft lip (0) to the windscreen (1)
+export const uvGlare = (a, b) => [0.075 + a * 0.168, 0.006 + b * 0.116];
 
 function noise(g, x, y, w, h, n, a, dark = true, size = 1) {
   for (let i = 0; i < n; i++) {
@@ -160,6 +162,26 @@ export function createTrimTexture(quality) {
   noise(g, S / 4, S / 2, S / 4, S / 2, 14000 * k * k, 0.3, true, 1.5 * k);
   noise(g, S / 4, S / 2, S / 4, S / 2, 8000 * k * k, 0.12, false, 1.5 * k);
   g.restore();
+
+  // ---- glareshield vinyl: grain, worn lip, stitched seam, defroster slots ----
+  {
+    const gx = (a) => (0.075 + a * 0.168) * S, gy = (b) => S - (0.006 + b * 0.116) * S;
+    const x0 = gx(0), x1 = gx(1), y0 = gy(1), y1 = gy(0);
+    g.save(); g.beginPath(); g.rect(x0 - 2, y0 - 2, x1 - x0 + 4, y1 - y0 + 4); g.clip();
+    const bg = g.createLinearGradient(0, y1, 0, y0);
+    bg.addColorStop(0, '#5e5c59'); bg.addColorStop(0.1, '#474644'); bg.addColorStop(0.22, '#393837'); bg.addColorStop(1, '#31302f');
+    g.fillStyle = bg; g.fillRect(x0 - 2, y0 - 2, x1 - x0 + 4, y1 - y0 + 4);
+    noise(g, x0, y0, x1 - x0, y1 - y0, 5000 * k * k, 0.07, true, 1);
+    noise(g, x0, y0, x1 - x0, y1 - y0, 2000 * k * k, 0.03, false, 1);
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(x0, gy(0.27) - 1 * k, x1 - x0, 1.6 * k);
+    g.fillStyle = 'rgba(255,255,255,0.08)'; g.fillRect(x0, gy(0.27) + 0.8 * k, x1 - x0, 1 * k);
+    g.setLineDash([1.6 * k, 1.4 * k]); g.lineWidth = 0.8 * k; g.strokeStyle = 'rgba(205,195,175,0.55)';
+    for (const b of [0.2, 0.34]) { g.beginPath(); g.moveTo(x0, gy(b)); g.lineTo(x1, gy(b)); g.stroke(); }
+    g.setLineDash([]);
+    g.fillStyle = 'rgba(8,8,8,0.8)';
+    for (const [a0, a1] of [[0.12, 0.38], [0.62, 0.88]]) for (let a = a0; a < a1; a += 0.022) g.fillRect(gx(a), gy(0.93), 0.012 * 0.168 * S, gy(0.83) - gy(0.93));
+    g.restore();
+  }
 
   // white patch for uv [0,0]
   g.fillStyle = '#fff'; g.fillRect(0, S - 64 * k, 64 * k, 64 * k);

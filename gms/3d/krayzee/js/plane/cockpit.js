@@ -3,7 +3,7 @@ import { Builder, sweepRings, circle, srgb, lerp } from './geom.js';
 import { WINDOWS, PANEL, EYE } from './spec.js';
 import { fusSec, ringPoint, fusHalfWidth } from './exterior.js';
 import { createInstruments, GAUGES } from './instruments.js';
-import { createTrimTexture, uvWall, uvHead, uvCarpet, uvSeat } from './trim.js';
+import { createTrimTexture, uvWall, uvHead, uvCarpet, uvSeat, uvGlare } from './trim.js';
 
 const COL = {
   lining: [1, 1, 1], liningUp: [0.96, 0.95, 0.93], liningDark: srgb('#8d8273'), carpet: [1, 1, 1], head: srgb('#d8d0c1'),
@@ -29,8 +29,9 @@ const STATIC_GAUGES = [
 ];
 const SWITCHES = ['FUEL PUMP', 'BEACON', 'LAND', 'TAXI', 'NAV', 'STROBE', 'PITOT HT'];
 
+let PILLOW_K = 12, PILLOW_N = 20;
 function pillow(B, m, w, h, d, color, n = 4.5, uvMode = null) {
-  const b = new Builder(), R = [], K = 12, N = 20;
+  const b = new Builder(), R = [], K = PILLOW_K, N = PILLOW_N;
   for (let k = 0; k <= K; k++) {
     const t = -1 + (2 * k) / K;
     const f = Math.max(0.02, (1 - Math.abs(t) ** n) ** (1 / n));
@@ -178,6 +179,7 @@ function panelGlow(src) {
 
 export function buildCockpit({ quality, mats }) {
   const high = quality !== 'low';
+  PILLOW_K = high ? 12 : 6; PILLOW_N = high ? 20 : 12;
   const group = new THREE.Group();
   group.name = 'cockpit';
   const B = new Builder();
@@ -244,7 +246,7 @@ export function buildCockpit({ quality, mats }) {
     B.addGeo(new THREE.CylinderGeometry(0.019, 0.019, 0.032, 12), new THREE.Matrix4().makeRotationZ(sg * 1.1).setPosition(wx(2.3, 1.9, 0.024), 1.9, 2.3), [0, 0], COL.black);
     // window frames (soft trim) around door and rear windows
     for (const k of ['door', 'rear']) {
-      const pts = resample(WINDOWS[k], 0.05);
+      const pts = resample(WINDOWS[k], high ? 0.05 : 0.11);
       pts.push(pts[0]);
       const path = pts.map(([s, y]) => [sg * (fusHalfWidth(s, y) - inset - 0.004), y, s]);
       const prof = [[-0.006, -0.012], [0.006, -0.012], [0.006, 0.012], [-0.006, 0.012]];
@@ -320,10 +322,24 @@ export function buildCockpit({ quality, mats }) {
   panelMesh.name = 'panel';
   panelMesh.receiveShadow = true;
   {
-    const prof = [[1.797, 1.443], [1.804, 1.452], [1.8, 1.462], [1.785, 1.468], [1.5, 1.5], [1.5, 1.44]];
-    const R = [];
-    for (const f of [-1, -0.94, 0.94, 1]) R.push(prof.map(([s, y]) => [f * (fusHalfWidth(s, y) - 0.035), y - (Math.abs(f) === 1 ? 0.006 : 0), s]));
-    B.loft(R, { color: COL.glare, capStart: true, capEnd: true });
+    // padded coaming: crowned across the width, trailing edge bowed aft in the middle, rolled lip with a stitched seam
+    const prof = [[1.79, 1.437], [1.803, 1.447], [1.806, 1.458], [1.797, 1.468], [1.78, 1.473], [1.5, 1.502], [1.5, 1.44]];
+    const pv = [0, 0.05, 0.1, 0.15, 0.2, 1, 1];
+    const shade = [0.55, 0.95, 1.18, 1.08, 1, 1, 0.5];
+    const fs = [-1, -0.975];
+    const nx = high ? 14 : 6;
+    for (let i = 0; i <= nx; i++) fs.push(-0.93 + (1.86 * i) / nx);
+    fs.push(0.975, 1);
+    const R = fs.map((f) => prof.map(([s, y], j) => {
+      const c = 1 - f * f, top = j >= 1 && j <= 5;
+      const ds = j <= 4 ? 0.022 * c : 0, dy = (top ? 0.014 * c : 0) - (Math.abs(f) === 1 ? 0.007 : Math.abs(f) > 0.95 ? 0.002 : 0);
+      return [f * (fusHalfWidth(s + ds, y + dy) - 0.035), y + dy, s + ds];
+    }));
+    B.loft(R, {
+      capStart: true, capEnd: true,
+      uv: (p, i, j) => uvGlare((fs[i] + 1) / 2, pv[j]),
+      color: (p, i, j) => { const e = Math.abs(fs[i]) > 0.95 ? 0.8 : 1; const v = shade[j] * e; return [v, v, v]; },
+    });
     const ped = new THREE.BoxGeometry(0.13, 0.26, 0.24);
     B.addGeo(ped, new THREE.Matrix4().setPosition(0, FLOOR + 0.13, 1.88), [0, 0], COL.frame);
     const trimW = new THREE.CylinderGeometry(0.06, 0.06, 0.018, 24);
@@ -362,9 +378,18 @@ export function buildCockpit({ quality, mats }) {
     }
     B.addGeo(new THREE.BoxGeometry(0.03, 0.008, 0.03), new THREE.Matrix4().setPosition(0.15, 1.065, PANEL.s + 0.015), [0, 0], COL.white);
     // compass at the top of the windscreen
-    B.addGeo(new THREE.BoxGeometry(0.012, 0.03, 0.03), new THREE.Matrix4().setPosition(0, 1.94, 2.14), [0, 0], COL.black);
-    B.addGeo(new THREE.SphereGeometry(1, 14, 8), new THREE.Matrix4().makeScale(0.03, 0.022, 0.026).setPosition(0, 1.912, 2.15), [0, 0], COL.black);
-    B.addGeo(new THREE.CircleGeometry(0.016, 14, Math.PI, Math.PI), new THREE.Matrix4().makeRotationX(-0.3).setPosition(0, 1.916, 2.172), [0, 0], srgb('#e8e2cf'));
+    {
+      // wet compass on a bracket, tilted toward the pilots so the card reads instead of a black ball
+      const cm = new THREE.Matrix4().makeRotationX(0.55).setPosition(0, 1.918, 2.15);
+      const at = (m) => m.premultiply(cm);
+      B.addGeo(new THREE.BoxGeometry(0.014, 0.05, 0.02), new THREE.Matrix4().setPosition(0, 1.955, 2.15), [0, 0], COL.frame);
+      B.addGeo(new THREE.CylinderGeometry(0.027, 0.03, 0.046, high ? 18 : 10), at(new THREE.Matrix4().makeRotationX(Math.PI / 2)), [0, 0], srgb('#3a3c40'));
+      B.addGeo(new THREE.TorusGeometry(0.024, 0.004, 6, high ? 20 : 10), at(new THREE.Matrix4().setPosition(0, 0, 0.024)), [0, 0], srgb('#6c6f74'));
+      B.addGeo(new THREE.CircleGeometry(0.023, high ? 18 : 10), at(new THREE.Matrix4().setPosition(0, 0, 0.0235)), [0, 0], srgb('#191a1c'));
+      B.addGeo(new THREE.PlaneGeometry(0.04, 0.013), at(new THREE.Matrix4().setPosition(0, 0, 0.025)), [0, 0], srgb('#ece6d2'));
+      for (const dx of [-0.014, -0.005, 0.005, 0.014]) B.addGeo(new THREE.PlaneGeometry(0.0016, 0.006), at(new THREE.Matrix4().setPosition(dx, 0.002, 0.0255)), [0, 0], COL.black);
+      B.addGeo(new THREE.PlaneGeometry(0.0022, 0.02), at(new THREE.Matrix4().setPosition(0, 0, 0.026)), [0, 0], COL.red);
+    }
     // sun visors
     for (const sg of [-1, 1]) pillow(B, new THREE.Matrix4().makeRotationX(-0.25).setPosition(sg * 0.25, 1.955, 2.25), 0.36, 0.012, 0.15, COL.head, 4);
   }
@@ -432,6 +457,9 @@ export function buildCockpit({ quality, mats }) {
   interior.name = 'interior';
   interior.receiveShadow = true;
   interior.castShadow = high;
+  // the fuselage shell already shades the cabin; at low the interior must stay out of the shadow pass even if a caller
+  // sets castShadow on every mesh of the rig
+  if (!high) Object.defineProperty(interior, 'castShadow', { get: () => false, set() {} });
   group.add(interior, panelMesh);
 
   // ---- live gauges: one quad per dial, one shared canvas texture ----

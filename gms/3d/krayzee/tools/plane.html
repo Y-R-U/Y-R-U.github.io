@@ -101,11 +101,14 @@ let view = ['cockpit', 'center'].includes(Q.get('view')) ? Q.get('view') : 'chas
 
 function placeCamera() {
   if (view !== 'chase') {
-    camera.fov = +(Q.get('fov') ?? 66);
     camera.near = 0.03;
-    const e = (view === 'center' ? plane.eyeCenter : plane.eye).clone(); plane.root.localToWorld(e);
+    // ?portrait=1 previews rig.viewEye(): the eye/fov/pitch the game camera should use on tall screens
+    const ve = Q.get('portrait') === '1' ? plane.viewEye(view, camera.aspect) : null;
+    camera.fov = +(Q.get('fov') ?? (ve?.fov || 66));
+    const e = (ve ? ve.eye : (view === 'center' ? plane.eyeCenter : plane.eye)).clone(); plane.root.localToWorld(e);
     camera.position.copy(e);
-    camera.quaternion.setFromEuler(new THREE.Euler(look.pitch * Math.PI / 180, look.yaw * Math.PI / 180, 0, 'YXZ'));
+    const pitch = ve && !Q.has('pitch') ? ve.pitch : look.pitch * Math.PI / 180;
+    camera.quaternion.setFromEuler(new THREE.Euler(pitch, look.yaw * Math.PI / 180, 0, 'YXZ'));
   } else {
     camera.fov = +(Q.get('fov') ?? 36);
     camera.near = 0.1;

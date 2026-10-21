@@ -352,9 +352,14 @@ export function decalAtlas(renderer) {
   });
   place('twr', 512, 128, (px, py, w, h) => {
     g.fillStyle = '#4b1f7a'; g.fillRect(px, py, w, h);
-    fitText(g, 'ROYAL TOWER', px + 30, py + 30, w - 60, h - 60, '#f3d36b', 700, false);
+    g.strokeStyle = '#e7b631'; g.lineWidth = 6; g.strokeRect(px + 8, py + 8, w - 16, h - 16);
+    crown(g, px + 50, py + h / 2, 60, 46);
+    crown(g, px + w - 50, py + h / 2, 60, 46);
+    fitText(g, 'C-TOWER 1', px + 94, py + 26, w - 188, h - 52, '#f7dc7a', 700, false);
   });
-  place('screen', 128, 96, (px, py, w, h) => {
+  uv.ctwr = uv.twr;
+  place('ctwrW', 512, 128, (px, py, w, h) => fitText(g, 'C-TOWER 1', px + 6, py + 10, w - 12, h - 20, '#ffffff', 700, false));
+  place('screen', 128, 96,(px, py, w, h) => {
     g.fillStyle = '#061a2a'; g.fillRect(px, py, w, h);
     g.strokeStyle = '#3cf0a0'; g.lineWidth = 2;
     g.beginPath(); g.arc(px + w * 0.35, py + h / 2, h * 0.4, 0, Math.PI * 2); g.stroke();

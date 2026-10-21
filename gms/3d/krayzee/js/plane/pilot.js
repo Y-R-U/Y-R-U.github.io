@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Builder, srgb, sweepRings, circle, lerp } from './geom.js';
 import { SEAT_S } from './cockpit.js';
 
-// Royal pilot (left seat) and, at high quality, a royal corgi on a stack of cushions (right seat).
+// Royal pilot (left seat) and, at high quality, a royal corgi on a stack of cushions (rear bench, right).
 // One dynamic mesh: every part is a static vertex block re-posed on the CPU by its own matrix.
 
 const SKIN = { light: '#ecc4a2', fair: '#e2b48f', tan: '#c68e62', brown: '#8d5a3b', dark: '#5e3a26' };
@@ -16,6 +16,8 @@ const P = {
 const RM = { cloth: [0.85, 0], skin: [0.6, 0], leather: [0.5, 0], gold: [0.28, 1], lens: [0.08, 0.3], plastic: [0.45, 0], velvet: [0.95, 0], chrome: [0.25, 1] };
 
 const XP = -0.27, XC = 0.27;
+// corgi rides on the rear bench (right side) so it doesn't fill the right-hand view from the front seats
+const CS = SEAT_S + 1.06, CDY = 0.03;
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _v = new THREE.Vector3(), _s = new THREE.Vector3(), _e = new THREE.Euler();
 const UPY = new THREE.Vector3(0, 1, 0);
 const M = (x, y, z, sx = 1, sy = sx, sz = sx, rx = 0, ry = 0, rz = 0) =>
@@ -163,17 +165,17 @@ export function createPilot({ quality, opts = {} }) {
       // royal corgi on two velvet cushions
       part('corgiBody', (b) => {
         for (const [y, sc] of [[1.025, 1], [1.105, 0.88]]) {
-          ell(b, XC, y, SEAT_S + 0.02, 0.19 * sc, 0.045, 0.2 * sc, c.cushion, RM.velvet, 14, 6);
-          for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) ell(b, XC + dx * 0.16 * sc, y, SEAT_S + 0.02 + dz * 0.17 * sc, 0.012, 0.022, 0.012, c.tassel, RM.gold, 6, 4);
+          ell(b, XC, y + CDY, CS + 0.02, 0.19 * sc, 0.045, 0.2 * sc, c.cushion, RM.velvet, 14, 6);
+          for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) ell(b, XC + dx * 0.16 * sc, y + CDY, CS + 0.02 + dz * 0.17 * sc, 0.012, 0.022, 0.012, c.tassel, RM.gold, 6, 4);
         }
-        ell(b, XC, 1.22, SEAT_S + 0.08, 0.1, 0.075, 0.12, c.corgi, RM.cloth, 12, 8);
-        ell(b, XC, 1.33, SEAT_S + 0.02, 0.085, 0.13, 0.085, c.corgi, RM.cloth, 12, 8, [-0.25, 0, 0]);
-        ell(b, XC, 1.33, SEAT_S - 0.045, 0.06, 0.1, 0.04, c.corgiWhite, RM.cloth, 10, 6, [-0.2, 0, 0]);
+        ell(b, XC, 1.22 + CDY, CS + 0.08, 0.1, 0.075, 0.12, c.corgi, RM.cloth, 12, 8);
+        ell(b, XC, 1.33 + CDY, CS + 0.02, 0.085, 0.13, 0.085, c.corgi, RM.cloth, 12, 8, [-0.25, 0, 0]);
+        ell(b, XC, 1.33 + CDY, CS - 0.045, 0.06, 0.1, 0.04, c.corgiWhite, RM.cloth, 10, 6, [-0.2, 0, 0]);
         for (const sg of [-1, 1]) {
-          tube(b, [[XC + sg * 0.04, 1.29, SEAT_S - 0.04], [XC + sg * 0.042, 1.17, SEAT_S - 0.06]], 0.024, c.corgiWhite, RM.cloth, 6);
-          ell(b, XC + sg * 0.042, 1.165, SEAT_S - 0.08, 0.026, 0.016, 0.034, c.corgiWhite, RM.cloth, 6, 4);
+          tube(b, [[XC + sg * 0.04, 1.29 + CDY, CS - 0.04], [XC + sg * 0.042, 1.17 + CDY, CS - 0.06]], 0.024, c.corgiWhite, RM.cloth, 6);
+          ell(b, XC + sg * 0.042, 1.165 + CDY, CS - 0.08, 0.026, 0.016, 0.034, c.corgiWhite, RM.cloth, 6, 4);
         }
-        ell(b, XC + 0.08, 1.19, SEAT_S + 0.17, 0.03, 0.025, 0.05, c.corgi, RM.cloth, 6, 4);
+        ell(b, XC + 0.08, 1.19 + CDY, CS + 0.17, 0.03, 0.025, 0.05, c.corgi, RM.cloth, 6, 4);
       });
       part('corgiHead', (b) => {
         ell(b, 0, 0.05, -0.01, 0.075, 0.068, 0.078, c.corgi, RM.cloth, 12, 8);
@@ -222,7 +224,10 @@ export function createPilot({ quality, opts = {} }) {
     geo.attributes.position.setUsage(THREE.DynamicDrawUsage);
     geo.attributes.normal.setUsage(THREE.DynamicDrawUsage);
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 1.3, 2.4), 1.2);
-    if (!mesh) { mesh = new THREE.Mesh(geo, mat); mesh.name = 'pilot'; mesh.castShadow = true; mesh.receiveShadow = true; }
+    if (!mesh) {
+      mesh = new THREE.Mesh(geo, mat); mesh.name = 'pilot'; mesh.castShadow = high; mesh.receiveShadow = true;
+      if (!high) Object.defineProperty(mesh, 'castShadow', { get: () => false, set() {} });
+    }
     else { mesh.geometry.dispose(); mesh.geometry = geo; }
     for (const k in ranges) ranges[k].dirty = true;
   }
@@ -251,7 +256,7 @@ export function createPilot({ quality, opts = {} }) {
   }
 
   const ZERO = new THREE.Matrix4().makeScale(0, 0, 0), ID = new THREE.Matrix4();
-  const HEAD = new THREE.Vector3(XP, 1.575, 2.625), CHEAD = new THREE.Vector3(XC, 1.43, SEAT_S - 0.0);
+  const HEAD = new THREE.Vector3(XP, 1.575, 2.625), CHEAD = new THREE.Vector3(XC, 1.43 + CDY, CS);
   const SH = { L: new THREE.Vector3(XP - 0.185, 1.45, 2.61), R: new THREE.Vector3(XP + 0.185, 1.45, 2.61) };
   const WRIST = { L: new THREE.Vector3(-0.15, 0.02, 0.335), R: new THREE.Vector3(0.15, 0.02, 0.335) };
   const L1 = 0.33, L2 = 0.31;

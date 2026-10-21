@@ -11,7 +11,7 @@ const SPECIES = [
   { name: 'poplar', H: 22 },
 ];
 export const TREE_TIERS = {
-  low: { nearR: 110, nearCap: 400, farR: 2600, farCap: 12000, shadows: false, lo: true, thin: 900, floor: 0.12 },
+  low: { nearR: 110, nearCap: 400, farR: 2400, farCap: 6000, shadows: false, lo: true, thin: 800, floor: 0.1 },
   medium: { nearR: 180, nearCap: 1000, farR: 3800, farCap: 22000, shadows: true, lo: false, thin: 1600, floor: 0.2 },
   high: { nearR: 260, nearCap: 2000, farR: 5200, farCap: 40000, shadows: true, lo: false, thin: 2600, floor: 0.3 },
 };

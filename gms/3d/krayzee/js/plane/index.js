@@ -26,14 +26,63 @@ export async function createPlane(opts = {}) {
   const airframe = new THREE.Group();
   airframe.position.set(0, -CG.y, -CG.s);
   airframe.add(ext.group);
-  root.add(airframe);
+  // Distance LOD: beyond lodDistance the renderer swaps in a coarse static airframe (no cockpit, surfaces neutral).
+  const near = new THREE.Group();
+  near.name = 'plane-near';
+  near.add(airframe);
+  const lodDistance = opts.lodDistance ?? (high ? 260 : 150);
+  const lodDistance2 = opts.lodDistance2 ?? lodDistance * 3.5;
+  const lod = new THREE.LOD();
+  lod.name = 'plane-lod';
+  lod.addLevel(near, 0);
+  const fars = ['lod', 'lod2'].map((q, i) => {
+    const f = buildExterior({ quality: q, mats });
+    f.propMesh.visible = false;
+    const frame = new THREE.Group();
+    frame.name = i ? 'plane-far2' : 'plane-far';
+    frame.position.copy(airframe.position);
+    frame.add(f.group);
+    lod.addLevel(frame, i ? lodDistance2 : lodDistance, 0.08);
+    return f;
+  });
+  const far = fars[0];
+  root.add(lod);
+  // low: the near rig casts its shadow through an invisible copy of the coarsest airframe (~1/5 of the shadow-pass tris)
+  const shadowProxy = opts.shadowProxy ?? !high;
+  let proxyMat = null;
+  if (shadowProxy) {
+    proxyMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });
+    const src = lod.levels[2].object, pos = [], idx = [], v = new THREE.Vector3();
+    src.updateMatrixWorld(true);
+    const inv = src.matrixWorld.clone().invert(), m = new THREE.Matrix4();
+    src.traverse((o) => {
+      if (!o.isMesh || ['glass', 'lights', 'beacon', 'propDisc', 'prop'].includes(o.name)) return;
+      m.multiplyMatrices(inv, o.matrixWorld);
+      const P = o.geometry.attributes.position, base = pos.length / 3;
+      for (let i = 0; i < P.count; i++) pos.push(...v.fromBufferAttribute(P, i).applyMatrix4(m).toArray());
+      const I = o.geometry.index;
+      if (I) for (let i = 0; i < I.count; i++) idx.push(base + I.getX(i));
+      else for (let i = 0; i < P.count; i++) idx.push(base + i);
+    });
+    const pg = new THREE.BufferGeometry();
+    pg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    pg.setIndex(idx);
+    const proxy = new THREE.Mesh(pg, proxyMat);
+    proxy.name = 'plane-shadow';
+    proxy.castShadow = true;
+    // drawn only by the shadow pass: the colour pass gets an empty draw range
+    proxy.onBeforeShadow = () => pg.setDrawRange(0, Infinity);
+    proxy.onBeforeRender = () => pg.setDrawRange(0, 0);
+    proxy.position.copy(src.position);
+    near.add(proxy);
+  }
 
   let cockpit = null, cp = null;
   if (wantCockpit) {
     cp = buildCockpit({ quality, mats });
     cockpit = cp.group;
     cockpit.position.set(0, -CG.y, -CG.s);
-    root.add(cockpit);
+    near.add(cockpit);
   }
   let pilot = null;
   if (cp && opts.pilot !== false) {
@@ -66,20 +115,41 @@ export async function createPlane(opts = {}) {
   const eyePitch = EYE.pitch;
   const eyeCenter = new THREE.Vector3(...toLocal(0, EYE.y, EYE.s));
   const eyeCenterPitch = EYE.pitch;
+  // Tall portrait screens can't fit the panel from the real eye point: slide the eye back (and up a touch) and open the fov.
+  const eyePortraitOffset = new THREE.Vector3(0, 0.09, 0.26), eyePortraitOffsetCockpit = new THREE.Vector3(0.05, 0.05, 0.3);
+  const eyePortraitFov = 92, eyePortraitPitch = -0.12;
+  function viewEye(v, aspect = 1, out = new THREE.Vector3()) {
+    const center = v === 'center';
+    out.copy(center ? eyeCenter : eye);
+    let pitch = center ? eyeCenterPitch : eyePitch, fov = null;
+    const k = Math.min(1, Math.max(0, (1 - aspect) / 0.45));
+    if (k > 0) {
+      out.addScaledVector(center ? eyePortraitOffset : eyePortraitOffsetCockpit, k);
+      fov = 80 + (eyePortraitFov - 80) * k;
+      pitch += (eyePortraitPitch - pitch) * k;
+    }
+    return { eye: out, pitch, fov };
+  }
   const dims = { length: 8.28, span: 11.0, height: 2.72, gearHeight: CG.y };
+  // Framing helpers for attract/menu shots: the span fills `fill` of the screen width.
+  const frameFov = (distance, aspect = 16 / 9, fill = 0.35) =>
+    Math.min(60, Math.max(4, 2 * Math.atan(dims.span / 2 / fill / Math.max(1, distance) / aspect) / D2R));
+  const frameDistance = (fovDeg, aspect = 16 / 9, fill = 0.35) => dims.span / 2 / fill / (Math.tan((fovDeg * D2R) / 2) * aspect);
 
   const ctl = { aileron: 0, elevator: 0, rudder: 0, throttle: 0, flaps: 0, brake: 0 };
   const cur = { aileron: 0, elevator: 0, rudder: 0, throttle: 0, flaps: 0 };
   let rpm = 0, rpmKnown = false, view = 'chase', t = 0, lightLevel = opts.lightLevel ?? 0.35;
   let L = normalizeLivery(opts.livery);
 
-  const spinCol = ext.spinnerMesh.geometry.attributes.color;
   function setLivery(l) {
     L = normalizeLivery({ ...l });
     livery.draw(L);
     const c = srgb(L.accent);
-    for (let i = 0; i < spinCol.count; i++) spinCol.setXYZ(i, c[0], c[1], c[2]);
-    spinCol.needsUpdate = true;
+    for (const sm of [ext.spinnerMesh, ...fars.map((f) => f.spinnerMesh)]) {
+      const spinCol = sm.geometry.attributes.color;
+      for (let i = 0; i < spinCol.count; i++) spinCol.setXYZ(i, c[0], c[1], c[2]);
+      spinCol.needsUpdate = true;
+    }
   }
   setLivery(L);
 
@@ -130,6 +200,11 @@ export async function createPlane(opts = {}) {
     ext.disc.visible = blur > 0.01;
     // a slow stroboscopic drift of the blade bands, like a camera/eye beat against the blade rate
     ext.disc.rotation.z += dt * (0.6 + 0.25 * Math.sin(t * 0.37));
+    for (const f of fars) {
+      f.disc.visible = blur > 0.3;
+      f.propMesh.visible = !f.disc.visible;
+      f.meshes.glass.visible = ext.meshes.glass.visible;
+    }
 
     // beacon: double flash ~1 Hz; strobes: double flash every 1.2 s
     const bph = t % 1.0, sph = t % 1.2;
@@ -164,16 +239,27 @@ export async function createPlane(opts = {}) {
     root.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
     for (const m of mats.all()) { if (m.map && m.map !== livery.texture) m.map.dispose(); m.dispose(); }
     if (glow) { glow.material.map.dispose(); glow.material.dispose(); }
+    if (proxyMat) proxyMat.dispose();
     livery.dispose();
     if (pilot) pilot.dispose();
     if (cp) cp.dispose();
     root.removeFromParent();
   }
 
+  if (shadowProxy) {
+    // callers set castShadow on every mesh of the rig, so pin the near meshes off
+    const proxy = near.getObjectByName('plane-shadow');
+    near.traverse((o) => {
+      if (!o.isMesh) return;
+      for (let p = o; p; p = p.parent) if (p === proxy) return;
+      if (!Object.getOwnPropertyDescriptor(o, 'castShadow')?.get) Object.defineProperty(o, 'castShadow', { get: () => false, set() {} });
+    });
+  }
+
   setLightLevel(lightLevel);
   update(0);
   return {
-    root, cockpit, eye, eyePitch, eyeCenter, eyeCenterPitch, dims, setLivery, setControls, setView, updateInstruments, update, dispose,
+    root, cockpit, eye, eyePitch, eyeCenter, eyeCenterPitch, eyePortraitOffset, eyePortraitOffsetCockpit, eyePortraitFov, eyePortraitPitch, viewEye, lod, lodDistance, lodDistance2, frameFov, frameDistance, dims, setLivery, setControls, setView, updateInstruments, update, dispose,
     setLightLevel, setPanelLight, setPilot, pilot: () => (pilot ? pilot.config : null),
     get view() { return view; }, quality, livery: () => ({ ...L }), _ext: ext, _cp: cp, _livery: livery, _pilot: pilot,
   };

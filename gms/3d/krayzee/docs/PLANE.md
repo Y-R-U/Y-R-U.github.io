@@ -92,13 +92,54 @@ next frame) — safe to call from a colour picker `input` event; consider thrott
 Pilot CPU: re-poses ~1–2.5k vertices per frame (head, arms, gloves, corgi head) — well under 0.1 ms.
 Textures added: interior atlas 1024² (high) / 512² (low), panel glow mask (only once night is used).
 
+## Round 3 (ART3, playtest 1 item 10)
+- **Glareshield**: no longer a black slab. Padded vinyl coaming, crowned across the width with the trailing edge bowed aft,
+  rolled lip with a stitched seam, grain + worn lip + defroster slots in the interior atlas; dark brown-grey vinyl that reads as a shape, not a black hole.
+- **Centre-view "black disc"**: it was the wet compass seen edge-on. Now a proper compass on a bracket, tilted toward the
+  pilots so the card reads. In portrait (without `viewEye`) it peeks in at the top edge; with `viewEye` it sits in the
+  windscreen as on the real aircraft.
+- **Cabin bounce light**: the hemisphere/ground bounce keeps its brightness but loses most of its tint inside the cabin
+  (the grass-green bounce no longer paints the headliner green).
+- **Corgi** moved to the rear bench, right side: a look to the right from the front seats shows the door and the wing
+  strut, not a dog (`p1_cockpit_right_1280x800`).
+- **Portrait framing (for GAMEPLAY, who owns `cameras.js`)** — additive rig fields, nothing changes until cameras.js uses them:
+  - `rig.viewEye(view, aspect, out?) → { eye: Vector3 (root-local), pitch: rad, fov: deg | null }` for `'cockpit'`/`'center'`.
+    `aspect ≥ 1` returns the stock `eye`/`eyeCenter` + pitch and `fov: null` (keep your own fov). Below 1 it blends
+    (full at aspect ≤ 0.55) toward a seat-back eye: centre slides 0.26 m aft and 0.09 m up, cockpit 0.30 m aft,
+    0.05 m up, 0.05 m inboard; fov eases 80° → 92° (vertical), pitch → −0.12 rad. Result at 390×844: the whole panel
+    fits, ASI and the right-hand gauges included (`after_center_390x844_viewEye`, `after_cockpit_390x844_viewEye`).
+  - Raw constants if you'd rather blend yourself: `eyePortraitOffset`, `eyePortraitOffsetCockpit` (Vector3),
+    `eyePortraitFov` (deg), `eyePortraitPitch` (rad).
+  - Suggested wiring, every frame or on resize: `const v = rig.viewEye(view, cam.aspect); eye.copy(v.eye); pitch = v.pitch;
+    if (v.fov) cam.fov = v.fov;` (that is what `after.mjs` simulates for the `_viewEye` shots).
+- **Distance LOD** (`THREE.LOD` named `plane-lod` inside `root`): level 0 = the full rig (`plane-near`), level 1
+  (`plane-far`, from `lodDistance`, default 150 m low / 260 m high) = static airframe at ~half the low tessellation,
+  level 2 (`plane-far2`, from `lodDistance2`, default 3.5 × lodDistance) = ~a third, no small parts (steps, nose-gear
+  links, cowl inlet/exhaust, antennas, pitot, landing-light lenses, hub caps). Far levels share materials and the livery
+  texture; control surfaces are neutral, the prop shows a disc above ~1100 rpm. `opts.lodDistance` / `opts.lodDistance2`
+  override. The camera inside the cockpit is always level 0. Renderer auto-updates `THREE.LOD` (`autoUpdate` true).
+- **Low-tier shadow proxy** (`opts.shadowProxy`, default on at low): the near rig's meshes are pinned out of the shadow
+  pass (castShadow is a no-op getter, so callers that set castShadow on every mesh can't re-add them) and one merged
+  position-only copy of the level-2 airframe (`plane-shadow`) casts instead. It is skipped in the colour pass (empty draw
+  range in `onBeforeRender`), so it costs one shadow-pass call and ~2.6k tris. Pilot + cockpit never cast at low.
+
+### Budgets (round 3, triangles per rig, excluding shadow pass)
+| level | low | high |
+|---|---|---|
+| near: exterior | 14.1k | 37.1k |
+| near: cockpit + pilot (+corgi high) | 13.5k | 29.7k |
+| far (`plane-far`) | 5.0k | 5.0k |
+| far2 (`plane-far2`) | 2.9k | 2.9k |
+| shadow pass at low | 2.6k (1 call) | full rig |
+An AI plane at 150–525 m now costs 5k tris instead of ~14k (low) / ~37k (high); beyond 525 m (low) / 910 m (high), 2.9k.
+
 ## Known gaps / ideas
 - Ailerons have no Frise nose gap; the flap slot shows the wing's blunt rear spar face (no cove/shroud lip).
 - Yokes sit out of the default forward view in landscape (they are visible looking down, and in portrait with a tall FOV).
 - Night: panel backlight only — no red flood/dome light pool, GPS screen background does not glow.
 - No damage/deformation states, no doors that open, no landing-light beam (FLIGHT/AIRPORT can add a SpotLight at
   the left-wing leading edge lens, build frame x −1.65, y ≈ 2.07, station ≈ 2.27).
-- Low-quality windows are painted, so the chase camera cannot see inside at low (by design for the budget).
+- `cockpit:false` rigs have painted windows at both qualities (no cabin behind them).
 - Rear seats empty (butler idea skipped); pilot has no seat belt/harness; feet don't follow pedal travel (±4.5 cm).
 - r2 screenshots: `r2_chase34_pilot_1280/390`, `r2_chase34_low_1280`, `r2_pilot_m_close`, `r2_pilot_f_close`, `r2_pilot_corgi`,
   `r2_cockpit_1280/390x844/844x390`, `r2_cockpit_door_1280`, `r2_cockpit_right_1280`, `r2_cockpit_up_1280`,

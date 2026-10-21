@@ -53,7 +53,9 @@ export async function buildWorld(scene, renderer, opts = {}) {
   buildVehicles(B);
   buildFlagpoles(B, atlas);
   mark('airport');
-  const town = buildTown(B, atlas, quality, terrain.heightAt);
+  // the village church and the castle get their own meshes so they cull (and skip the shadow pass) away from them
+  const TB = { matte: new Builder(), metal: new Builder(), flags: B.flags, matteMaterial: B.matteMaterial };
+  const town = buildTown(TB, atlas, quality, terrain.heightAt);
   mark('town');
   colliders.push(...town.colliders);
   root.add(...town.objects);
@@ -65,9 +67,13 @@ export async function buildWorld(scene, renderer, opts = {}) {
   const matte = new THREE.Mesh(B.matte.build(), B.matteMaterial);
   matte.castShadow = matte.receiveShadow = true;
   matte.name = 'buildings';
-  const metal = new THREE.Mesh(B.metal.build(), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.32, metalness: 0.85, envMap: env, envMapIntensity: 1.1 }));
+  const metalMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.32, metalness: 0.85, envMap: env, envMapIntensity: 1.1 });
+  const metal = new THREE.Mesh(B.metal.build(), metalMat);
   metal.castShadow = metal.receiveShadow = true;
   metal.name = 'metal';
+  const townMatte = new THREE.Mesh(TB.matte.build(), B.matteMaterial), townMetal = new THREE.Mesh(TB.metal.build(), metalMat);
+  townMatte.name = 'townBuildings'; townMetal.name = 'townMetal';
+  for (const m of [townMatte, townMetal]) { m.castShadow = m.receiveShadow = true; root.add(m); }
   const glass = new THREE.Mesh(B.glass.build(), new THREE.MeshStandardMaterial({
     vertexColors: true, color: '#4d6a70', roughness: 0.04, metalness: 0.3, envMap: env, envMapIntensity: 1.4,
     transparent: true, opacity: 0.4, depthWrite: false,
@@ -83,6 +89,23 @@ export async function buildWorld(scene, renderer, opts = {}) {
   }));
   decals.name = 'signs';
   root.add(matte, metal, glass, decals, flags.mesh, socks.mesh, tower.group);
+
+  // Low tier: the merged airport buildings (~15k tris) leave the shadow pass; a box per collider casts instead.
+  const PB = new Builder();
+  for (const c of colliders) {
+    if (!['terminal', 'hangar', 'tower'].includes(c.kind)) continue;
+    PB.box((c.min[0] + c.max[0]) / 2, (c.min[1] + c.max[1]) / 2, (c.min[2] + c.max[2]) / 2, c.max[0] - c.min[0], c.max[1] - c.min[1], c.max[2] - c.min[2], [1, 1, 1]);
+  }
+  const shadowProxy = new THREE.Mesh(PB.build(), new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }));
+  shadowProxy.name = 'shadowProxy';
+  shadowProxy.castShadow = true;
+  root.add(shadowProxy);
+  const applyShadowTier = (q) => {
+    const low = q === 'low';
+    matte.castShadow = metal.castShadow = !low;
+    shadowProxy.visible = low;
+  };
+  applyShadowTier(quality);
 
   const lights = buildLights(quality);
   root.add(...lights.objects);
@@ -146,7 +169,7 @@ export async function buildWorld(scene, renderer, opts = {}) {
     }
     sky.material.uniforms.uTime.value = time;
     lake.uniforms.uTime.value = time;
-    if (camera) trees.update(camera);
+    if (camera) { trees.update(camera); scenery.update(camera); town.update(camera); }
     flags.uniforms.uTime.value = time;
     socks.update(time, wind.from, wind.kt);
     tower.update(dt, time, camera);
@@ -156,6 +179,9 @@ export async function buildWorld(scene, renderer, opts = {}) {
     if (!['low', 'medium', 'high'].includes(q) || q === quality) return;
     quality = q;
     trees.setQuality(q);
+    scenery.setQuality(q);
+    town.setQuality(q);
+    applyShadowTier(q);
     terrain.uniforms.uBump.value = q === 'low' ? 0 : 1;
     const size = q === 'low' ? 1024 : 2048;
     if (sun.shadow.mapSize.x !== size) {

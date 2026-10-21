@@ -27,8 +27,8 @@ const gap = (x, z) => z < -480 && Math.abs(x + 80) < 22;
 export function buildAirfieldEdge(quality) {
   const r = rng(31);
   const H = new Builder();
-  const pts = boundary(7, quality === 'low' ? 5 : 3.5);
-  const leaf = (x, z, k) => col('#2f4720', 0.75 + 0.45 * fbm(x / 9, z / 9, 2) * k);
+  const pts = boundary(7, quality === 'low' ? 8 : 3.5);
+  const leaf = (x, z, k) => col('#4a6b30', 0.78 + 0.4 * fbm(x / 9, z / 9, 2) * k);
   for (let k = 0; k < pts.length; k++) {
     const [x0, z0] = pts[k], [x1, z1] = pts[(k + 1) % pts.length];
     if (gap(x0, z0) || gap(x1, z1)) continue;
@@ -43,8 +43,16 @@ export function buildAirfieldEdge(quality) {
     H.quad(P(x0, z0, 0.3, w0, h0), P(x1, z1, 0.3, w1, h1), P(x1, z1, -1, w1, h1 * 0.88), P(x0, z0, -1, w0, h0 * 0.88), c0.map((v) => v * 1.08));
     H.quad(P(x0, z0, -1, w0, h0 * 0.88), P(x1, z1, -1, w1, h1 * 0.88), P(x1, z1, -1, w1 + 0.25, -0.1), P(x0, z0, -1, w0 + 0.25, -0.1), c1.map((v) => v * 0.9));
   }
-  const hedge = new THREE.Mesh(H.build(), new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }));
-  hedge.castShadow = hedge.receiveShadow = true;
+  const hg = H.build();
+  // a hedge is a rounded mass of leaves: bend every normal toward the sky so the shaded side reads dark green, not black
+  const N = hg.attributes.normal;
+  for (let i = 0; i < N.count; i++) {
+    const nx = N.getX(i), ny = Math.abs(N.getY(i)) + 2.2, nz = N.getZ(i), l = Math.hypot(nx, ny, nz);
+    N.setXYZ(i, nx / l, ny / l, nz / l);
+  }
+  const hedge = new THREE.Mesh(hg, new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }));
+  hedge.castShadow = quality !== 'low';
+  hedge.receiveShadow = true;
   hedge.name = 'boundaryHedge';
 
   const Tk = new Builder();

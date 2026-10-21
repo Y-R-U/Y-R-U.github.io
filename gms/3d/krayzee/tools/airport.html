@@ -85,6 +85,12 @@ const presets = {
   lake: { pos: [-1230, 70, -330], look: [-1700, 0, -720], fov: 60 },
   castle: { pos: [560, 140, -1700], look: [780, 90, -2300], fov: 55 },
   village: { pos: [-20, 35, -1430], look: [110, 8, -1620], fov: 60 },
+  towerbuzz: { pos: [236, 40, -196], look: [188, 26, -262], fov: 60 },
+  towerfront: { pos: [196, 22, -150], look: [192, 24, -262], fov: 55 },
+  towerfar: { pos: [120, 60, 120], look: [190, 20, -260], fov: 50 },
+  carpark: { pos: [-40, 14, -340], look: [-100, 0, -420], fov: 60 },
+  carparkhigh: { pos: [120, 120, -200], look: [-90, 0, -405], fov: 50 },
+  hedge: { pos: [-1040, 16, -40], look: [-1080, 0, -40], fov: 60 },
 };
 const yawPitch = { yaw: 0, pitch: 0 };
 function setPreset(name) {
@@ -169,6 +175,8 @@ window.__breakdown = () => {
   return out;
 };
 window.__setPreset = setPreset;
+window.__cam = (pos, look, fov = 60) => { presets._ = { pos, look, fov }; setPreset('_'); };
+window.__scene = scene; window.__camera = camera; window.__renderer = renderer;
 window.__ready = true;
 </script>
 </body>

@@ -189,17 +189,79 @@ export function buildFlags(flags, atlasTex) {
   return { mesh, uniforms };
 }
 
-// Parked and road cars (trees: trees.js, town: town.js).
+// Low-poly cars: [length, width, sill, hood-front, belt-front, belt-rear, windscreen base z, roof front z, roof rear z,
+// rear-window base z, roof height, greenhouse width factor]. z runs front (-) to rear (+), metres from the car's centre.
+const CAR_TYPES = {
+  hatch: [3.9, 1.72, 0.3, 0.72, 0.86, 0.9, -0.62, -0.05, 1.3, 1.88, 1.46, 0.86],
+  saloon: [4.6, 1.8, 0.28, 0.7, 0.82, 0.95, -0.8, -0.15, 0.95, 1.6, 1.42, 0.86],
+  estate: [4.7, 1.88, 0.38, 0.86, 1.02, 1.05, -0.95, -0.4, 2.05, 2.3, 1.74, 0.9],
+  van: [5.0, 1.95, 0.34, 0.9, 1.02, 1.02, -1.95, -1.4, 2.45, 2.5, 2.1, 0.96],
+  limo: [5.9, 1.86, 0.26, 0.68, 0.8, 0.9, -1.2, -0.55, 1.85, 2.4, 1.42, 0.86],
+};
+const CAR_PAINT = [['#f2f2f0', 4], ['#a9aeb3', 4], ['#55595e', 3], ['#16181b', 3], ['#1f3f78', 2], ['#9e1b24', 2], ['#2f5a3a', 1], ['#c9b48a', 1], ['#d9661e', 1], ['#4b1f7a', 1], ['#f2c21b', 0.5], ['#6ea7d8', 1]];
+const GLASS = col('#1c242c'), TYRE = col('#151515'), LAMP = col('#f4f1e4', 1.2), TAIL = col('#b0161c', 1.1), TRIMC = col('#2a2c2f');
+
+// Extrudes a convex side profile [[z, y]...] (CCW seen from +x) across width w; colour(i) per edge quad, capCol for the sides.
+function prism(b, T, pts, w, capCol, edgeCol, skipEdge = -1) {
+  const hw = w / 2, n = pts.length, nm = new THREE.Vector3(), v = new THREE.Vector3();
+  const P = (x, z, y) => v.set(x, y, z).applyMatrix4(T).toArray();
+  const N = (x, y, z) => nm.set(x, y, z).transformDirection(T).toArray();
+  for (const sx of [-1, 1]) {
+    const nn = N(sx, 0, 0), base = b.count;
+    for (const [z, y] of pts) b.v(...P(sx * hw, z, y), ...nn, capCol);
+    for (let k = 1; k < n - 1; k++) sx > 0 ? b.tri(base, base + k + 1, base + k) : b.tri(base, base + k, base + k + 1);
+  }
+  for (let k = 0; k < n; k++) {
+    if (k === skipEdge) continue;
+    const [z0, y0] = pts[k], [z1, y1] = pts[(k + 1) % n];
+    const ez = z1 - z0, ey = y1 - y0, l = Math.hypot(ez, ey) || 1;
+    const nn = N(0, -ez / l, ey / l), c = edgeCol(k), base = b.count;
+    b.v(...P(-hw, z0, y0), ...nn, c); b.v(...P(hw, z0, y0), ...nn, c); b.v(...P(hw, z1, y1), ...nn, c); b.v(...P(-hw, z1, y1), ...nn, c);
+    b.tri(base, base + 1, base + 2); b.tri(base, base + 2, base + 3);
+  }
+}
+
+function addCar(b, type, x, z, ry, paint, hi, trim = true) {
+  const [L, W, sill, hoodF, beltF, beltR, zWs, zRf, zRr, zRw, roof, gw] = CAR_TYPES[type];
+  const T = new THREE.Matrix4().makeRotationY(ry).setPosition(x, 0, z);
+  const h = L / 2;
+  const body = hi ? [[-h, sill], [h, sill], [h, beltR - 0.12], [h - 0.12, beltR], [zWs, beltF], [-h + 0.35, hoodF + 0.06], [-h, hoodF - 0.08]]
+    : [[-h, sill], [h, sill], [h, beltR], [zWs, beltF], [-h, hoodF]];
+  prism(b, T, body, W, paint, (k) => (k === 0 ? TRIMC : paint), 0);
+  const top = [[zWs, beltF], [Math.min(zRw, h - 0.1), beltR], [zRr, roof], [zRf, roof]];
+  prism(b, T, top, W * gw, GLASS, (k) => (k === 2 ? paint : GLASS), 0);
+  if (!hi) return;
+  for (const az of [-h + 0.78, h - 0.8]) prism(b, T.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0, az)), [[-0.3, 0.02], [0.3, 0.02], [0.3, sill + 0.02], [-0.3, sill + 0.02]], W * 0.97, TYRE, () => TYRE, 0);
+  if (!trim) return;
+  const lamp = (lx, lz, y, c, dir) => {
+    const m = new THREE.Matrix4().makeRotationY(dir < 0 ? Math.PI : 0).setPosition(lx, y, lz).premultiply(T);
+    b.geo(new THREE.PlaneGeometry(0.34, 0.12), m, c);
+  };
+  for (const sx of [-1, 1]) {
+    lamp(sx * (W / 2 - 0.25), -h - 0.012, hoodF - 0.12, LAMP, -1);
+    lamp(sx * (W / 2 - 0.25), h + 0.012, beltR - 0.2, TAIL, 1);
+  }
+  b.geo(new THREE.BoxGeometry(W + 0.02, 0.1, 0.1), new THREE.Matrix4().makeTranslation(0, sill + 0.08, -h - 0.02).premultiply(T), TRIMC);
+}
+
+// Parked and road cars (trees: trees.js, town: town.js). Static merged meshes: the car park has a near (wheels, lamps)
+// and a far version swapped by camera distance; road cars are always the far version.
 export function buildScenery(quality) {
   const r = rng(2024);
-  const low = quality === 'low';
   const objs = [];
   const colliders = [];
-
-  const m4 = new THREE.Matrix4(), c = new THREE.Color(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
-  const cars = [];
+  const pick = () => {
+    const tot = CAR_PAINT.reduce((s, c) => s + c[1], 0);
+    let k = r() * tot;
+    for (const [c, w] of CAR_PAINT) if ((k -= w) <= 0) return col(c);
+    return col('#ffffff');
+  };
+  const kind = () => { const k = r(); return k < 0.3 ? 'hatch' : k < 0.62 ? 'saloon' : k < 0.86 ? 'estate' : k < 0.97 ? 'van' : 'limo'; };
+  const park = [], road = [];
   for (let x = CAR_PARK.x0 + 5.3; x < CAR_PARK.x1 - 2; x += 2.6) {
-    for (const zz of [CAR_PARK.z0 + 6.5, CAR_PARK.z0 + 25, CAR_PARK.z0 + 43.5, CAR_PARK.z1 - 15.5]) if (r() < 0.6) cars.push([x, zz, Math.PI / 2 + (r() < 0.5 ? 0 : Math.PI)]);
+    for (const zz of [CAR_PARK.z0 + 6.5, CAR_PARK.z0 + 25, CAR_PARK.z0 + 43.5, CAR_PARK.z1 - 15.5]) {
+      if (r() < 0.6) park.push([x + (r() - 0.5) * 0.25, zz + (r() - 0.5) * 0.5 + (r() < 0.5 ? 0.4 : -0.4), Math.PI / 2 + (r() < 0.5 ? 0 : Math.PI) + (r() - 0.5) * 0.06]);
+    }
   }
   for (const rd of ROADS) {
     const horiz = rd.x1 - rd.x0 > rd.z1 - rd.z0;
@@ -208,23 +270,33 @@ export function buildScenery(quality) {
       if (r() < 0.5) continue;
       const lane = r() < 0.5 ? -1 : 1;
       const mx = (rd.x0 + rd.x1) / 2, mz = (rd.z0 + rd.z1) / 2;
-      cars.push(horiz ? [rd.x0 + r() * (rd.x1 - rd.x0), mz + lane * 2.6, lane > 0 ? Math.PI / 2 : -Math.PI / 2] : [mx + lane * 2.6, rd.z0 + r() * (rd.z1 - rd.z0), lane > 0 ? Math.PI : 0]);
+      road.push(horiz ? [rd.x0 + r() * (rd.x1 - rd.x0), mz + lane * 2.6, lane > 0 ? Math.PI / 2 : -Math.PI / 2] : [mx + lane * 2.6, rd.z0 + r() * (rd.z1 - rd.z0), lane > 0 ? Math.PI : 0]);
     }
   }
-  const carB = new Builder();
-  carB.geo(new THREE.BoxGeometry(1.8, 0.75, 4.3), mat(0, 0.6, 0), [1, 1, 1]);
-  carB.geo(new THREE.BoxGeometry(1.6, 0.6, 2.2), mat(0, 1.25, -0.2), [0.35, 0.4, 0.45]);
-  const carM = new THREE.InstancedMesh(carB.build(), new THREE.MeshLambertMaterial({ vertexColors: true }), cars.length);
-  const carCols = ['#c4122f', '#1f4f8f', '#e8e8e8', '#202020', '#9aa0a6', '#4b1f7a', '#f2c21b', '#2f6b3a'];
-  cars.forEach(([x, z, ry], i) => {
-    q.setFromAxisAngle(up, ry);
-    carM.setMatrixAt(i, m4.compose(new THREE.Vector3(x, 0, z), q, new THREE.Vector3(1, 1, 1)));
-    carM.setColorAt(i, c.set(carCols[(r() * carCols.length) | 0]));
-  });
-  carM.computeBoundingSphere();
-  carM.name = 'cars';
-  objs.push(carM);
-  return { objects: objs, colliders };
+  // car park stores x along the rows, so ry = ±π/2 points the bonnet at the aisle
+  const parkSpec = park.map((p) => { const t = kind(); return [...p, t, t === 'limo' ? col('#101114') : pick()]; });
+  const roadSpec = road.map((p) => [...p, kind(), pick()]);
+  const mtl = new THREE.MeshLambertMaterial({ vertexColors: true });
+  const mesh = (list, hi, name) => {
+    const b = new Builder();
+    for (const [x, z, ry, t, c] of list) addCar(b, t, x, z, ry, c, hi, quality !== 'low');
+    const m = new THREE.Mesh(b.build(), mtl);
+    m.name = name;
+    m.receiveShadow = true;
+    return m;
+  };
+  const parkHi = mesh(parkSpec, true, 'cars'), parkLo = mesh(parkSpec, false, 'carsFar'), roadM = mesh(roadSpec, false, 'roadCars');
+  parkLo.visible = false;
+  objs.push(parkHi, parkLo, roadM);
+  const cx = (CAR_PARK.x0 + CAR_PARK.x1) / 2, cz = (CAR_PARK.z0 + CAR_PARK.z1) / 2;
+  let nearR = quality === 'low' ? 200 : 520, farR = quality === 'low' ? 2400 : 1e9;
+  function update(camera) {
+    const d = Math.hypot(camera.position.x - cx, camera.position.y, camera.position.z - cz);
+    parkHi.visible = d < nearR;
+    parkLo.visible = !parkHi.visible && d < farR;
+  }
+  function setQuality(q) { nearR = q === 'low' ? 200 : 520; farR = q === 'low' ? 2400 : 1e9; }
+  return { objects: objs, colliders, update, setQuality };
 }
 
 export { TOWER_PAD, HANGAR_APRON };
