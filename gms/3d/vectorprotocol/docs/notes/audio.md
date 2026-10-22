@@ -168,3 +168,15 @@ AST tags (Guitar / Drum kit / Violin): the old ACE tracks scored about 0.00 / 0.
 - To swap a take: pick another row in Music Studio, then `loopcut.py master.flac out.mp3 <score bpm> --skip <intro s> --end <before runaway> --starts 40`,
   and set loop/gain in tracks.js (gain = 10^((-15 - LUFS)/20)).
 - Round B finishing: run analyze.py + tag.py, cut, add the cues back (battle rotation, boss; map only if it is calmer than hub).
+
+## Checkpoint 4 (2026-10-20): round B shipped, full v2 soundtrack live
+All four round-B takes (80 s cap) passed; no runaway loudness this time. Tags are guitar / drum kit / violin (bowed).
+| cue | take | loop | gain | tags | notes |
+|---|---|---|---|---|---|
+| battle_1 | a9ce9dc6b7 | 20.767 s, 6 bars @69.5 (half-time 139), from 10.65 s, seam 0.90 | 1.2 (-19.3 LUFS) | 0.02 / 0.12 (drum 0.14) / 0.02 | drum-led, guitar weak; dropout at 37-42 s, so the loop sits before it; short loop |
+| battle_4 | 71a5cba878 | 53.896 s, 29 bars @129, from 13.38 s, seam 1.41 | 0.79 (-12.9) | 0.09 / 0.06 (drum 0.08) / 0.00 | tops: Grunge, Prog rock, Heavy metal 0.11 |
+| boss | b849d54b8b | 26.725 s, 12 bars @107.8, from 9.44 s, seam 0.98 | 0.75 (-12.5) | 0.14 / 0.005 / 0.06 (bowed 0.21) | cello/strings + metal 0.20; almost no drums |
+| map | 26bd2e3494 | 43.202 s, 18 bars @99.9, from 12.17 s, seam 1.77 | 1.0 (-18.1) | 0.08 / 0.23 (drum 0.24) / 0.00 | calmer (-18 vs battle -12) and drum-led, so map has its own track again (ROUTES map/chapters/formation -> 'map') |
+- audio/ = 12 files, 6.47 MB; manifest regenerated; nothing unshipped. Battle rotation battle_1..4, boss = boss.
+- CDP 9407 (YuE2 unloaded): every state plays its own loop with the right loop length, 1 deck each; overlap test unchanged
+  (menu hopping 1 deck, max 2 on slow hub<->map); m1_l1: map track on the map, battle_4 in battle, victory sting + crowd, back to hub. No console errors.

@@ -8,12 +8,12 @@ import { FILES } from './manifest.js';
 const ALL_TRACKS = {
   // v2 (audio-3, YuE2 via Music Studio project aa890ebe98). Gains bring each loop to about -15 LUFS (hub -16, calmer).
   hub: { file: 'hub.mp3', loop: 54.8057, gain: 0.55 },        // 87da33b74a, 20 bars @ 87.5
-  map: { file: 'map.mp3', loop: 0, gain: 1 },                 // not shipped: map routes use the menu track
-  battle_1: { file: 'battle_1.mp3', loop: 0, gain: 1 },       // round B pending
+  map: { file: 'map.mp3', loop: 43.2017, gain: 1 },           // 26bd2e3494 (B), 18 bars @ 99.9, drum-led, -18 LUFS: calmer than battle
+  battle_1: { file: 'battle_1.mp3', loop: 20.7665, gain: 1.2 }, // a9ce9dc6b7 (B), 6 bars @ 69.5 (half-time 139)
   battle_2: { file: 'battle_2.mp3', loop: 55.4003, gain: 0.55 }, // e6bae75015, 28 bars @ 121.6
   battle_3: { file: 'battle_3.mp3', loop: 62.4911, gain: 0.77 }, // 72e3392185, 39 bars @ 149.6
-  battle_4: { file: 'battle_4.mp3', loop: 0, gain: 1 },       // round B pending
-  boss: { file: 'boss.mp3', loop: 0, gain: 1 },               // round B pending (falls back to battle_3)
+  battle_4: { file: 'battle_4.mp3', loop: 53.896, gain: 0.79 }, // 71a5cba878 (B), 29 bars @ 129
+  boss: { file: 'boss.mp3', loop: 26.7248, gain: 0.75 },      // b849d54b8b (B), 12 bars @ 107.8
   rift: { file: 'rift.mp3', loop: 56.1812, gain: 0.73 },      // d6f401c8ed, 14 bars @ 59.8
 };
 
@@ -37,7 +37,7 @@ const ALL_STATES = {
 export const ROUTES = {
   hub: 'menu', squad: 'menu', barracks: 'menu', collection: 'menu', workshop: 'menu', unit: 'menu', hq: 'menu',
   recruit: 'menu', arena: 'menu', events: 'menu', settings: 'menu', results: 'menu',
-  map: 'menu', chapters: 'menu', formation: 'menu',
+  map: 'map', chapters: 'map', formation: 'map',
   battle: null,
 };
 
