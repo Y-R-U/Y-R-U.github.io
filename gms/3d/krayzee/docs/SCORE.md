@@ -6,8 +6,8 @@ Pure ES modules: no DOM, no clock (time only moves through `update(dt)`), all nu
 `data/ranks.js`, `data/modes.js`, `data/aircraft.js`.
 
 ```
-node tools/score-sim.mjs            # 174 assertions + 30 h pacing sim
-node tools/score-sim.mjs --falsify  # breaks 14 rules in scratch copies; every break must make the suite fail
+node tools/score-sim.mjs            # 187 assertions + 30 h pacing sim
+node tools/score-sim.mjs --falsify  # breaks 18 rules in scratch copies; every break must make the suite fail
 ```
 
 ## API
@@ -26,7 +26,7 @@ const game = createGame({
   partialStartPct,         // host option 50/75/100
 });
 game.handleEvent(ev);                         // ATC / RADIO events, see below
-game.reportImpact({ speedKt, onGear, other }); // FLIGHT collisions (other = the other plane's id, null for ground/buildings) → { result:'bounce'|'damage'|'destroyed', protectionLeft, restitution, spinDegPerS?, apResumeAfter?, shake?, gagSecs?, pendingLost, lightTouch: false|'scored'|'cooldown' }
+game.reportImpact({ speedKt, onGear, other }); // FLIGHT collisions (other = the other plane's id, null for ground/buildings) → { result:'bounce'|'damage'|'destroyed', protectionLeft, restitution, spinDegPerS?, apResumeAfter?, shake?, gagSecs?, pendingLost, lightTouch: false|'scored'|'pending'|'cooldown' }
 game.update(dt, { gsKt, onGround, surface, atStand, calm }); // every sim frame; banking needs the flight fields
 game.state();   // { pending, banked (session/room PP), outrage, tier, combo, comboLeft, comboFrac, frozen, protection, protectionMode, effectiveProtection, rankIndex, lifetimePP, careerRankIndex, nextGoal, stats, ... }
 game.on(evt, fn);                             // returns an unsubscribe
@@ -83,7 +83,7 @@ game.bank();                                  // force a bank (mission end)
   ≤ 15 kt = prang (−10 %, +10 outrage, shake 1.5 s). `withinGearLimits({sinkFpm, bankDeg, pitchDeg})` helps FLIGHT
   decide `onGear`.
 
-## D28 — contact by difficulty (light touches, close calls)
+## D28 + D30 — close calls (touch or miss) by difficulty
 Difficulty for contact scoring = the story difficulty when `difficulty` is passed, otherwise the protection mode
 (`difficultyFor`, the same table as D19): **Rubber = Easy, Partial = Medium, Realistic = Hard**. So Royal Rumble /
 Garden Party / Joust (and any room set to Rubber) play Easy, Court Session / Coronation / Open Court (Partial) Medium,
@@ -91,26 +91,39 @@ Strict Tower (Realistic) Hard; Free Flight follows its difficulty setting. It is
 is swapped in after `createGame` (net/session.js `applyProtection`) gets the right rule. `game.difficulty` /
 `state().difficulty` expose it.
 
-**Love Tap** (`light_touch`, base 150 PP, +8 outrage, scold `scold_bump`) — a plane-to-plane contact that:
-- is between aircraft (`reportImpact` got an `other` id; ground, buildings and water never count);
-- has relative speed ≤ **12 kt** (`maxRelKt`; ≈ 6 m/s, traffic.js's own "gentle" bump line, and under Realistic's
-  15 kt survivable-prang line);
-- happens while the player is moving, ground speed ≥ **5 kt** (`minOwnKt`), so being nudged while parked pays nothing;
-- was absorbed by protection (result `bounce`) on an Easy/Medium difficulty (`DIFFICULTY[d].contact === 'light'`).
+**Contact close call** (internal id `light_touch`, shown as **CLOSE CALL** — toast "CLOSE CALL! +150", headline
+"CLOSE CALL! {T} {N} SWAPS PAINT WITH A COMMONER"; base 150 PP, +8 outrage, scold `scold_bump`). A contact is *light* when:
+- it is between aircraft (`reportImpact` got an `other` id; ground, buildings and water never count);
+- relative speed ≤ **12 kt** (`maxRelKt`; ≈ 6 m/s, traffic.js's own "gentle" bump line, under Realistic's 15 kt);
+- the player is moving, ground speed ≥ **5 kt** (`minOwnKt`), so being nudged while parked pays nothing.
 
-A light contact never costs dignity: no −15 % pending, no Rubber +8 bounce outrage (ATC already adds its own +8 for
-the `collision` it is told about, and scolds with `scold_bump`). Partial still scuffs the rubber (−5…−10 % at ≤ 12 kt).
-It pays **once per pair per 30 s** (`pairCooldown`, same as ATC's per-victim collision cooldown); a repeat touch inside
-the window is free but worthless (`lightTouch:'cooldown'`). It is an ordinary infraction otherwise: combo, Audacity
-(victim rank), heat, aircraft, scale; 0 while frozen.
+How a light contact pays, by what actually happened (`DIFFICULTY[d].contact`):
+- **Easy/Medium bounce** (`'glancing'`): pays at once and costs no dignity (no −15 % pending, no Rubber +8 bounce
+  outrage; ATC still adds +8 for the `collision` and scolds). Partial still scuffs the rubber (−5…−10 %).
+- **Real-metal prang, any difficulty** (Hard, Strict Tower, or Partial emptied to 0 %): the prang penalties stand
+  (−10 % pending, +10 outrage, shake), and the close call is held for **3 s** (`surviveSecs`, `lightTouch:'pending'`).
+  It pays only if no `destroyed` arrives first — a follow-on ground/obstacle hit from the tumble, or a later >15 kt hit,
+  cancels it, and so does `respawn()`. Detection is by outcome, not prediction: score already sees every destroying
+  impact through `reportImpact`, so "survived" = 3 s of sim time without one. Medium at 0 % gets the same deal as
+  Hard, so Medium is never stingier than Hard.
+- **Hard with a bounce** (a Rubber/Partial override on Hard): pays nothing and keeps the bounce penalty. Chosen:
+  Hard rewards surviving *real* contact; a rubber bounce risks nothing, so it would be free money.
 
-**Big hits** (> 12 kt) never score: Rubber/Partial bounce with −15 % pending and +8 outrage as before; Realistic
-prang/destroy as before; online Realistic ramming scandal (3 overriding hits in 60 s, net/session.js) unchanged.
+**Big hits** (> 12 kt, any difficulty) and **destroying contact** never score and keep their penalties (bounce −15 %
++8; prang; destroyed; Strict −500; online Realistic ramming scandal unchanged).
 
-**Hard** (`contact:'none'`): no contact earns anything, even if a Rubber override would have bounced it; penalties stand.
-Partial emptied to 0 % is real metal (effective Realistic), so a touch there is a prang and pays nothing.
+**One window per pair (D30).** `near_miss`, the contact close call and `formation` share one window:
+**60 s per other plane** (`CLOSE_CALL.pairCooldown`). The first close call with a plane claims it; any other close call
+with that plane inside 60 s pays nothing (a repeat touch is still penalty-free on Easy/Medium, `lightTouch:'cooldown'`).
+Why 60 s: one pass at a plane often produces two events (near miss on the way in, touch or formation as you sit on its
+wing), which is one stunt; a fresh set-up means turning back onto the same plane, and even a tight 360 at circuit speed
+is ~40–60 s, so 30 s let an orbiting player farm one victim every lap. 60 s is still short against a 5–10 min sortie
+and wider than the 20 s combo window, so chaining crimes still works — just not on the same victim. Formation is
+included because sitting on a wing *then* nudging it is the same act. Other crimes (cut-in, buzz…) are not gated;
+ATC's own per-type cooldowns (near miss 10 s, formation/collision 30 s) still apply first.
 
-**Close calls** score on every difficulty as before: `near_miss` 200 (×1.5 when effectively Realistic), `formation`.
+**Close calls without contact** score on every difficulty as before: `near_miss` 200 (×1.5 effectively Realistic),
+`formation`.
 
 ### goaroundrefused
 The autopilot emits `goaroundrefused` when LAND ignores a tower go-around. Score pays it as `ignored_instruction`

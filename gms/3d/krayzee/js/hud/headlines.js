@@ -12,7 +12,7 @@ const STORIES = {
   tower_buzz: ['OWL COLLECTION SHAKEN AS {T} {N} BUZZES TOWER', 'Controller found under desk with tea'],
   terminal_buzz: ['WINDOWS RATTLED: {T} {N} BUZZES TERMINAL', 'Passengers "thrilled", say peer\'s staff'],
   low_pass: ['ROYAL FLYPAST NOBODY ASKED FOR', '{T} {N} skims runway at knee height'],
-  light_touch: ['LOVE TAP! {T} {N} "MERELY SAID HELLO" WITH WINGTIP', 'Victim\'s paintwork "emotionally scarred"'],
+  light_touch: ['CLOSE CALL! {T} {N} SWAPS PAINT WITH A COMMONER', 'Victim\'s paintwork "emotionally scarred"'],
   near_miss: ['NEAR MISS! {T} {N} "DIDN\'T SEE THEM, DIDN\'T LOOK"', 'Aviation authority sends strongly worded card'],
   double_occupancy: ['TWO PLANES, ONE RUNWAY, ONE {T}', 'Sharing is "for commoners", says {N}'],
   forced_goaround: ['COMMONERS SENT ROUND BY {T} {N}', 'Fuel bills mount across the shire'],

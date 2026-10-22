@@ -36,11 +36,13 @@ export const INFRACTIONS = {
   stand_steal:       { name: 'Stand Steal',           pp: 150, outrage: 6, scold: 'scold_generic', detect: "stopped 3 s on another plane's stand" },
   ignored_instruction:{ name: 'Selective Hearing',    pp: 120, outrage: 10, scold: 'scold_generic', refusedWindow: 90, detect: 'still violating goaround/hold 8 s after instruction; or autopilot goaroundrefused (LAND) — scored once per go-around' },
   double_occupancy:  { name: 'Shared Runway',         pp: 300, outrage: 15, scold: 'scold_runway', detect: 'two planes on same runway rect, one > 40kt, player involved' },
-  // D28: SCORE-side (from reportImpact), never an ATC detector. Easy/Medium only, and only when protection bounced it.
-  light_touch:       { name: 'Love Tap',              pp: 150, outrage: 8, scold: 'scold_bump', maxRelKt: 12, minOwnKt: 5, pairCooldown: 30, detect: 'plane-to-plane contact, relative speed <= 12 kt, own gs >= 5 kt, result bounce; 30 s per pair' },
+  // D28/D30: SCORE-side contact close call (from reportImpact), never an ATC detector.
+  light_touch:       { name: 'Close Call',            pp: 150, outrage: 8, scold: 'scold_bump', maxRelKt: 12, minOwnKt: 5, surviveSecs: 3, detect: 'plane-to-plane contact <= 12 kt, own gs >= 5 kt; Easy/Medium: bounced or survived; Hard: survived (not destroyed 3 s later)' },
   intersection_dash: { name: 'Crossroads',            pp: 200, outrage: 10, scold: 'scold_runway', detect: '09/27 x 04/22 intersection crossed while other plane on either runway' },
 };
 export const INFRACTION_COOLDOWN = 30;
+// D30: one window per pair across every close call, touch or miss.
+export const CLOSE_CALL = { ids: ['near_miss', 'light_touch', 'formation'], pairCooldown: 60 };
 
 export const CLEAN = {
   impeccable: { pp: 50, centreline: 5, touchdownZone: 450, maxSinkFpm: 300, outrage: -10 },
@@ -72,9 +74,9 @@ export const PROTECTION = {
 };
 
 export const DIFFICULTY = {
-  easy:   { protection: 'rubber',    outrageGain: 0.75, ai: 'yields',  scandalFails: 'never',      targetMult: 0.7, contact: 'light' },
-  medium: { protection: 'partial',   outrageGain: 1.0,  ai: 'holds',   scandalFails: 'flagged',    targetMult: 1.0, contact: 'light' },
-  hard:   { protection: 'realistic', outrageGain: 1.25, ai: 'blocks',  scandalFails: 'always',     targetMult: 1.3, contact: 'none' },
+  easy:   { protection: 'rubber',    outrageGain: 0.75, ai: 'yields',  scandalFails: 'never',      targetMult: 0.7, contact: 'glancing' },
+  medium: { protection: 'partial',   outrageGain: 1.0,  ai: 'holds',   scandalFails: 'flagged',    targetMult: 1.0, contact: 'glancing' },
+  hard:   { protection: 'realistic', outrageGain: 1.25, ai: 'blocks',  scandalFails: 'always',     targetMult: 1.3, contact: 'survived' },
 };
 
 export const RADIO = {

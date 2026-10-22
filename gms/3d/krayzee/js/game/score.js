@@ -1,5 +1,5 @@
 // Royal Privilege economy (DESIGN §1.2–1.4, rules.js). Pure: no DOM, no clock; time only advances through update(dt).
-import { INFRACTIONS, BANK, CLEAN, BANTER, MULTIPLIERS as M, OUTRAGE, PROTECTION as P, DIFFICULTY } from '../../data/rules.js';
+import { INFRACTIONS, BANK, CLEAN, BANTER, MULTIPLIERS as M, OUTRAGE, PROTECTION as P, DIFFICULTY, CLOSE_CALL } from '../../data/rules.js';
 import { AIRCRAFT } from '../../data/aircraft.js';
 import { FREE_FLIGHT, ROOM_TYPES } from '../../data/modes.js';
 import { FINISH, difficultyFor } from './finish.js';
@@ -72,7 +72,7 @@ export function createScore(opts = {}) {
     comboStep: -1, comboLeft: 0, frozen: 0,
     protectionMode: mode.protection, protection: mode.protection === 'partial' ? mode.partialStart : mode.protection === 'rubber' ? 100 : 0,
     rankIndex: opts.rankIndex ?? 0, aircraft: opts.aircraft || 'c172', ppScale: 1,
-    airborne: false, landed: false, stopT: 0, gsKt: 0, impeccableDone: false, gag: 0, t: 0, touchAt: {}, gaIgnoredAt: -1e9,
+    airborne: false, landed: false, stopT: 0, gsKt: 0, impeccableDone: false, gag: 0, t: 0, closeAt: {}, touchWait: null, gaIgnoredAt: -1e9,
     stats: { infractions: 0, bestCombo: 1, bounces: 0, crashes: 0, scandals: 0, sorties: 0, ripostes: 0 },
   };
 
@@ -205,7 +205,7 @@ export function createScore(opts = {}) {
     else if (ev.type === 'landed' && mine(ev)) { S.landed = true; if (ev.impeccable) impeccable(); }
     else if (ev.type === 'goaroundrefused' && (ev.actor == null || mine(ev))) ignoredGoAround(ev, true);
     else if (id === 'ignored_instruction' && ev.data?.instruction === 'goAround' && mine(ev)) ignoredGoAround(ev, false);
-    else if (typeof id === 'string' && INFRACTIONS[id] && mine(ev)) infraction(id, ev);
+    else if (typeof id === 'string' && INFRACTIONS[id] && mine(ev) && closeCallFree(id, ev.victim)) infraction(id, ev);
 
     if (outr != null && meterIsMine && S.outrageSource !== 'internal') {
       S.outrageSource = 'events';
@@ -220,14 +220,29 @@ export function createScore(opts = {}) {
     infraction('ignored_instruction', refused ? { ...ev, type: 'ignored_instruction', data: { instruction: 'goAround', refused: true, reason: ev.reason } } : ev, refused);
   }
 
-  // D28 light touch: free of the bounce penalty; pays once per pair per pairCooldown. false = an ordinary bump.
-  function lightTouch(kt, other) {
-    const r = INFRACTIONS.light_touch;
-    if (other == null || DIFFICULTY[difficulty()]?.contact !== 'light' || kt > r.maxRelKt || S.gsKt < r.minOwnKt) return false;
-    if (S.t - (S.touchAt[other] ?? -1e9) < r.pairCooldown) return 'cooldown';
-    S.touchAt[other] = S.t;
-    infraction('light_touch', { type: 'light_touch', actor: me, victim: other, data: { kt: Math.round(kt) } });
+  // D30: near miss, contact close call and formation share one window per pair. Claims the pair when free.
+  function closeCallFree(id, victim) {
+    if (victim == null || !CLOSE_CALL.ids.includes(id)) return true;
+    if (S.t - (S.closeAt[victim] ?? -1e9) < CLOSE_CALL.pairCooldown) return false;
+    S.closeAt[victim] = S.t;
+    return true;
+  }
+  const isLight = (kt, other) => other != null && kt <= INFRACTIONS.light_touch.maxRelKt && S.gsKt >= INFRACTIONS.light_touch.minOwnKt;
+  const payTouch = (other, kt) => infraction('light_touch', { type: 'light_touch', actor: me, victim: other, data: { kt: Math.round(kt) } });
+
+  // Easy/Medium bounce: no bounce penalty, pays at once (a bounce cannot destroy). false = an ordinary bump.
+  function glancingTouch(kt, other) {
+    if (!isLight(kt, other) || DIFFICULTY[difficulty()]?.contact !== 'glancing') return false;
+    if (!closeCallFree('light_touch', other)) return 'cooldown';
+    payTouch(other, kt);
     return 'scored';
+  }
+  // Real metal: a light prang pays only if the plane is still in one piece surviveSecs later (no 'destroyed' first).
+  function survivedTouch(kt, other) {
+    if (!isLight(kt, other)) return false;
+    if (!closeCallFree('light_touch', other)) return 'cooldown';
+    S.touchWait = { other, kt, left: INFRACTIONS.light_touch.surviveSecs };
+    return 'pending';
   }
 
   // FLIGHT collisions. onGear:false = ground contact outside the gear envelope (or water/building touchdown).
@@ -239,7 +254,7 @@ export function createScore(opts = {}) {
       let restitution = P.rubber.restitution;
       if (eff === 'partial') { restitution = partialRestitution(before); S.protection = Math.max(0, before - partialLoss(kt)); }
       S.stats.bounces++;
-      const tap = lightTouch(kt, other);
+      const tap = glancingTouch(kt, other);
       const pendingLost = tap ? 0 : lose(P.rubber.pendingLoss, 'bounce', 'DIGNITY LOST');
       if (!tap) addOutrage(P.rubber.outrage, 'bounce');
       const out = { result: 'bounce', protectionLeft: S.protection, restitution, spinDegPerS: (rng() * 2 - 1) * P.rubber.spinMaxDegPerS, apResumeAfter: P.rubber.apResumeAfter, pendingLost, other, lightTouch: tap };
@@ -248,7 +263,7 @@ export function createScore(opts = {}) {
     }
     const R = P.realistic;
     if (!onGear || kt > R.destroyAboveKt) {
-      S.stats.crashes++;
+      S.stats.crashes++; S.touchWait = null;
       const pendingLost = lose(R.destroyed.pendingLoss, 'destroyed', 'DESTROYED');
       S.comboStep = -1; S.comboLeft = 0; S.landed = false; S.airborne = false; S.gag = R.destroyed.gagSecs;
       if (mode.crashPenalty) S.banked = Math.max(0, S.banked - mode.crashPenalty);
@@ -257,7 +272,7 @@ export function createScore(opts = {}) {
     }
     const pendingLost = lose(R.prang.pendingLoss, 'prang', 'PRANG');
     addOutrage(R.prang.outrage, 'prang');
-    return { result: 'damage', protectionLeft: 0, restitution: 0.1, shake: R.prang.shake, pendingLost, other };
+    return { result: 'damage', protectionLeft: 0, restitution: 0.1, shake: R.prang.shake, pendingLost, other, lightTouch: survivedTouch(kt, other) };
   }
 
   // f: { gsKt, onGround, surface, atStand, calm } from FLIGHT; all optional.
@@ -266,6 +281,7 @@ export function createScore(opts = {}) {
     if (S.comboLeft > 0) { S.comboLeft = Math.max(0, S.comboLeft - dt); if (!S.comboLeft) { S.comboStep = -1; emit('combo', { mult: 1, step: -1, left: 0 }); } }
     if (S.frozen > 0) { S.frozen = Math.max(0, S.frozen - dt); if (!S.frozen) emit('unfrozen', {}); }
     if (S.gag > 0) S.gag = Math.max(0, S.gag - dt);
+    if (S.touchWait && (S.touchWait.left -= dt) <= 0) { const w = S.touchWait; S.touchWait = null; payTouch(w.other, w.kt); }
     if (S.outrageSource !== 'events' && f?.calm && S.outrage > 0) setOutrage(S.outrage - OUTRAGE.decayPer3s / 3 * dt, 'decay');
     if (!f) return;
     S.gsKt = f.gsKt ?? S.gsKt;
@@ -299,7 +315,7 @@ export function createScore(opts = {}) {
     setRankIndex(i) { S.rankIndex = i; },
     setAircraft(id) { S.aircraft = id; },
     setPPScale(x) { S.ppScale = x; },
-    respawn() { S.landed = false; S.airborne = false; S.stopT = 0; S.gag = 0; if (S.protectionMode === 'partial') S.protection = mode.partialStart; },
+    respawn() { S.touchWait = null; S.landed = false; S.airborne = false; S.stopT = 0; S.gag = 0; if (S.protectionMode === 'partial') S.protection = mode.partialStart; },
     get mode() { return mode; },
     get difficulty() { return difficulty(); },
     state() {
