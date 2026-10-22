@@ -141,6 +141,20 @@ narrower than ~48 m could be missed (none exists today).
 - `collectTrees(world)` reads AIRPORT's planted set `world.debug.trees {data, stride, count}` (the 'trees'/'conifers' meshes are gone: LAND saw no trees and landed in a wood).
 - markers.js: traffic distance text steps clear of labels already drawn ("1500 ft" twice no longer overprints).
 
+## 3c. LANDFIX2 (2026-10-23)
+- **Low = straight ahead.** Below 120 m AGL (`LAND.lowAgl`) every rank is searched, straight-in plans (runway, field) beat
+  any join/base/orbit (+5000), taxiway/apron straight-ins rank behind runway/field (+3000), touchdown may be 200 m out
+  (`minD`), and a straight-in must be flyable: `distance > 12·lateral + 14·heading° + 100`. Too high for the near end of
+  a long strip → the touchdown slides along it (200 m steps). Still nothing → a relaxed second pass (no line-up rule)
+  before any circuit. Over a runway, aligned (< 25 m, < 12°): the rest of that runway ahead is a candidate.
+- **LAND NOW** (Aaron): while LAND flies a non-straight pattern (`plan.pattern` not `straight` and the AP still on
+  fly legs: `ap.landing.leg`), a second amber button shows directly under LAND (LAND moves up 58 px). It calls
+  `onPress('now')`; `armLandNow()` makes main's next `planLandAhead()` straight-only (`opts.straight` does the same):
+  straight ahead only (fields out to +1.5 km further); nothing straight (too high for any 4° straight-in ahead) → the
+  normal plan with `nowFallback: true`, and the button keeps offering LAND NOW. The styles are injected by landbutton.js (`#krz-landnow-css`). LAND
+  itself still toggles (second tap cancels). `land.nowShown`.
+- Plans for a remaining-runway or slid touchdown use a virtual end object with the runway id (`virtual: true`).
+
 ## 4. Tests (2026-10-22, after WORLD r2)
 ```
 node js/assist/test/landahead.test.mjs            # node, fake world with r2-style rolling ground + castle hill

@@ -162,6 +162,20 @@ track and the commanded heading (`_terrainFloor`); aircraft ground contact/crash
 | B7 pacing | the player's AP turns base at `ap.finalLen` (default 1300 m, set per difficulty if wanted; `null` = published 1.8 km) when no-one else is in that runway's pattern and ATC has not extended the downwind. `ap.stableFinal` (also in `status()`): on a lined-up final within 20 m / 10° / 20 m of the glide path, > 350 m out — STORY's warp may run 2× while it is true. Player taxi runs up to 10 m/s (narrow types 8) on long straights; DEMAND TAKEOFF rolls from the entry without a full stop. |
 | misc | `ap.isPlayer` (set by `traffic.add`); ATC `taxi` commands do not re-route the player's own taxi to a named stand; AI registrations unique per session (`randomLivery(taken)`); `_pursue` pads 1-point paths; braked + stopped at low power the wheels hold (no creep over hold lines); turning round from a stop pivots tight (≤ 0.8 m/s); `demandTakeoff()` defaults to the layout's open runway ends. |
 
+### LANDFIX2 (Aaron's phone log aaron1.jsonl + PLAYTEST_3, 2026-10-23)
+| item | behaviour |
+|---|---|
+| low LAND | Under 120 m AGL the planner (ASSIST §3c) wants straight ahead and down; on final a LAND never climbs back to the glide path (levels off and lets it come down; over the strip already: −1.2 m/s), never trades excess speed for height (`t.noClimb` keeps the speed term out of the minimum flight-path angle), and only lowers full flap below 1.2 Vapp. Banks to 15° low on a LAND final (taildraggers above 6 m) to line up. Lateral/heading go-arounds only above 5 m AGL; a LAND that has touched down never goes around. |
+| upset + LAND | a LAND during an upset recovery ends the recovery as soon as wings are level and the nose is out of the dive (> −0.12 rad); the approach arrests the sink. `_begin` only starts an approach as a go-around when LAND is steeper than ~9°. |
+| flare (LAND only; circuit flares unchanged) | entry at `clamp(−vs·1.3, 2 (taildragger 1.5), 4.5)` m; sink target `0.55·agl`, floor 0.95 m/s rising after 1.5 s, pitch floor relaxed after 0.8 s, so touchdown follows in ~1–3 s. Fast (> 1.12 Vapp, e.g. after a dive): flaps up, idle, nose may go 2° below level, never climbs (vy > 0.3 → sink ≥ 2 m/s). Taildragger 3-point hold-off fades out by 3 s; LAND taildragger final at min(Vapp, 1.25 Vs0). |
+| bounce / rollout | ROLLOUT only with mains down and vy < 1 (a Rubber bounce pops ≥ 2 m/s: still FLARE); airborne again > 0.5 m → FLARE; a bounce in FINAL (touchdown < 3 s ago) → FLARE; down short of the aim point → ROLLOUT. LAND rollout: nose-wheel pitch hold (no rotating back into the air), flaps up after 0.3 s, brakes 0.6 (tailwheel 0.4 tail-down). |
+| #2 loop wrap | `_fly` stepping past the last leg goes through `_next()` (wraps to `route.loop` or ends); `update` repairs an out-of-range `i`. Test: flight-sim `loopext`. |
+| #8 throttle | stick grab: the throttle under the player is at least 0.55 (never an idle engine). Releasing the stick low/sinking keeps a latched lever unless it is a real upset/stall or the lever is < 0.3. |
+| #9 low/slow takeback | player AP on a fly leg below 60 m: bank ≤ 15°; also slower than 1.4 Vs: wings level (≤ 5°), full power, climbing ≥ 1 m/s, no dive for speed. |
+| #4 hand-flown bank | controls.js `pitchAssist` (GAMEPLAY file, minimal edit): with the stick off-centre in pitch by < 0.5 and bank > 8°, adds back-pressure for the bank plus a sink damper (Hard: half), none near the stall. |
+
+Tests: `node tools/flight-sim.mjs aaron|loopext|throttle` (25 checks; all fail on the pre-LANDFIX2 autopilot). Real game: scratch `landcdp2.mjs` (see the LANDFIX2 report).
+
 ### Status for HUD / ATC
 `ap.status()` → `{ engaged, overridden, phase, sub, leg, legIndex, label, route, recovering, done, target, speedKt, end }`;
 `ap.events` (`phase`, `override`, `replan`, `goaround`, `recovery`, `landed`, `takeoffroll`, `waypoint`) — drained by main

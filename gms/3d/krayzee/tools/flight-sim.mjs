@@ -487,6 +487,97 @@ async function scLandMany() {
   check(`LAND go-around (${plan.label}): circuits back and lands on the planned strip`, forced && ac.onGround && ap.done && far < 3500 && Math.hypot(ac.pos.x - plan.touchdown[0], ac.pos.z - plan.touchdown[1]) < 900, `forced at ${(+forced).toFixed(0)} s, stopped ${(t - forced).toFixed(0)} s later, max ${far.toFixed(0)} m out`);
 }
 
+// LANDFIX2: Aaron's three LAND taps from his phone log (aaron1.jsonl), LAND NOW off a circuit, PLAYTEST_3 #2/#8/#9.
+// State at the tap: log x/z, AGL, kt, heading, fpm, pitch, flaps; C2/C3 were mid upset-recovery.
+export const AARON = [
+  { name: 'C1 8 m after takeoff, off 27', x: 174, z: 32, agl: 5, kt: 73, hdg: 255, fpm: 327, pitch: 9, bank: -1, flaps: 0 },
+  { name: 'C2 15 m, -2864 fpm dive', x: -28, z: 597, agl: 15, kt: 90, hdg: 191, fpm: -2864, pitch: -23, bank: 5, flaps: 0, rec: true },
+  { name: 'C3 15 m, -2972 fpm dive', x: -260, z: 940, agl: 15, kt: 80, hdg: 260, fpm: -2972, pitch: -13, bank: 0, flaps: 1 / 3, rec: true },
+];
+// Flies one LAND tap to a stop; the metrics behind the LANDFIX2 targets.
+export function flyLandTap(W, layout, planLandAhead, type, c, { now = false, armLandNow = null, setup = null, secs = 180 } = {}) {
+  const wenv = { groundHeightAt: W.groundHeightAt, surfaceAt: W.surfaceAt, colliders: W.colliders };
+  const tr = new Traffic(wenv), ac = new Aircraft({ type });
+  const kt = Math.min(c.kt, ac.P.vcruise / KT * 0.97);
+  ac.place({ x: c.x, z: c.z, alt: c.agl, heading: c.hdg, speed: kt * KT, throttle: 1, flaps: c.flaps || 0, pitch: (c.pitch || 0) * DEG_, roll: (c.bank || 0) * DEG_ }, wenv);
+  if (c.fpm != null) { const vs = c.fpm * FT / 60, gs = Math.sqrt(Math.max(0, (kt * KT) ** 2 - vs * vs)), h = c.hdg * DEG_; ac.vel.set(Math.sin(h) * gs, vs, -Math.cos(h) * gs); }
+  ac.impactHandler = () => ({ result: 'bounce', restitution: 0.35 });   // Free Flight is Rubber
+  const ap = new Autopilot(ac);
+  tr.add({ aircraft: ac, ap, player: true, name: 'P' });
+  ap.setRoute(circuitRoute('27', { type })); ap.replan();
+  if (c.rec) { ap.recovering = true; ap.wantThrottleAuto = true; }
+  const plan = () => planLandAhead({ pos: ac.pos, vel: ac.vel, heading: ac.heading, altitude: ac.alt, onGround: ac.onGround, world: W, layout });
+  let p = plan(), first = null;
+  if (p.fail) return { fail: p.fail };
+  ap.landAt(p);
+  if (setup) { for (let t = 0; t < setup; t += 1 / 60) tr.update(1 / 60); first = p; armLandNow(); p = plan(); if (p.fail) return { fail: p.fail }; ap.landAt(p); }
+  const alt0 = ac.alt; let t = 0, climb = 0, airRoll = 0, run = 0, flT = null, td = null, tdT = null, rise = 0, crash = null, ga = 0, last = '';
+  for (; t < secs; t += 1 / 60) {
+    tr.update(1 / 60);
+    for (const ev of ac.events.splice(0)) { if (ev.type === 'crash') crash = ev; if (ev.type === 'touchdown' && !td) { td = ev; tdT = t; } }
+    for (const ev of ap.events.splice(0)) if (ev.type === 'goaround') ga++;
+    if (!td) climb = Math.max(climb, ac.alt - alt0);
+    if (ap.sub === 'rollout' && ap.leg?.kind === 'approach' && !ac.mainsDown && ac.agl > 0.5) { run += 1 / 60; airRoll = Math.max(airRoll, run); } else run = 0;
+    if (ap.sub === 'flare' && last !== 'flare' && !td) flT = t;
+    if (td && !ac.onGround) rise = Math.max(rise, ac.agl);
+    last = ap.sub;
+    if (crash || (ap.done && ac.onGround && ac.speed < 0.5)) break;
+  }
+  return { plan: p, first, stopped: !crash && ap.done && ac.onGround && ac.speed < 0.5, t, climb, airRoll, f2td: flT != null && tdT != null ? tdT - flT : null, rise, td, ga, crash };
+}
+async function scAaron() {
+  const { planLandAhead, armLandNow } = await import('../js/assist/landahead.js');
+  const { fakeWorld, layout } = await import('../js/assist/test/fakeworld.mjs');
+  const W = fakeWorld();
+  for (const type of ['c172', 'tiger', 'bathtub']) for (const c of AARON) {
+    const r = flyLandTap(W, layout, planLandAhead, type, c);
+    const d = r.fail ? r.fail : `${r.plan.label}/${r.plan.pattern} stop ${r.t.toFixed(0)} s, climb ${r.climb.toFixed(1)} m, flare→td ${r.f2td?.toFixed(1)} s, bounce rise ${r.rise.toFixed(1)} m, airborne ROLLOUT ${r.airRoll.toFixed(2)} s, td ${r.td?.fpm} fpm, GA ${r.ga}`;
+    check(`LANDFIX2 ${type} ${c.name}: straight ahead and down, stopped ≤ 60 s`, !r.fail && r.stopped && r.plan.pattern === 'straight' && r.t <= 60 && r.ga === 0, d);
+    check(`LANDFIX2 ${type} ${c.name}: no climb > 10 m, no airborne ROLLOUT, no balloon, flare→td ≤ 4 s`, !r.fail && r.climb <= 10 && r.airRoll < 0.03 && r.rise < 3 && (r.f2td == null || r.f2td <= 4), d);
+  }
+  // LAND NOW: LAND chose a circuit/join; the second button flies straight ahead instead
+  const e27 = runwayEnd('27'), [nx, nz] = fromRunway(e27, -900, -200);
+  for (const type of ['c172', 'tiger', 'bathtub']) {
+    const r = flyLandTap(W, layout, planLandAhead, type, { x: nx, z: nz, agl: 150, kt: 85, hdg: 270 }, { setup: 6, armLandNow });
+    check(`LAND NOW ${type} (from a RWY 27 circuit, 150 m): straight ahead, stopped`, !r.fail && r.first?.pattern !== 'straight' && r.plan.pattern === 'straight' && r.stopped && r.climb < 5, r.fail || `LAND ${r.first?.label}/${r.first?.pattern} → NOW ${r.plan.label}/${r.plan.pattern}, stopped ${r.t.toFixed(0)} s`);
+  }
+}
+// PLAYTEST_3 #2: ATC extends the downwind while the AP is on a looping route's last leg → it must wrap, not throw.
+function scLoopExtend() {
+  const tr = new Traffic(env), ac = new Aircraft({ type: 'c172' });
+  ac.place({ x: 4000, z: 1000, alt: 240, heading: 270, speed: 85 * KT }, env);
+  const ap = new Autopilot(ac); tr.add({ aircraft: ac, ap, player: true, name: 'P' });
+  const legs = [[3000, -1000], [5000, -1000], [5000, 1000], [3000, 1000]].map(([x, z], i) => ({ kind: 'fly', to: [x, 240, z], speed: 85, label: 'RACE', ...(i === 3 ? { ext: true, end: '27' } : {}) }));
+  ap.setRoute({ name: 'race', legs, loop: 0 }, { start: 3 });
+  ap.extendDownwind(1175, '27');
+  let err = null, maxI = 0;
+  try { for (let t = 0; t < 200; t += 1 / 60) { tr.update(1 / 60); maxI = Math.max(maxI, ap.i); } } catch (e) { err = e; }
+  check('PLAYTEST_3 #2: extendDownwind on a looping route\'s last leg wraps to route.loop (no TypeError, no freeze)', !err && maxI < legs.length && ac.speed > 30, err ? err.message : `max i ${maxI}/${legs.length}`);
+}
+// PLAYTEST_3 #8/#9: stick grab never hands over idle; a latched lever survives a low stick release; low+slow takeback.
+function scThrottleTakeback() {
+  const tr = new Traffic(env);
+  const p = mk(tr, { x: 0, z: 2500, alt: 300, heading: 90, speed: 80 * KT, throttle: 0 }, circuitRoute('09'), { name: 'P', player: true });
+  p.ap.replan();
+  p.ac.ctl.throttle = 0; p.ap.out.throttle = 0;
+  for (let t = 0; t < 3; t += 1 / 60) { p.manual.elevator = 0.05; tr.update(1 / 60); }
+  check('PLAYTEST_3 #8: grabbing the stick with the AP at idle gives cruise-ish power, not 0', p.ac.ctl.throttle >= 0.5, `thr ${p.ac.ctl.throttle.toFixed(2)}`);
+  p.manual.elevator = null;
+  const q = mk(tr, { x: 0, z: -2500, alt: 100, heading: 270, speed: 85 * KT, throttle: 0.6 }, circuitRoute('09'), { name: 'Q', player: true });
+  q.ap.replan();
+  for (let t = 0; t < 1; t += 1 / 60) { q.manual.throttle = 0.46; q.manual.elevator = -0.15; tr.update(1 / 60); }
+  q.manual.throttle = null;
+  for (let t = 0; t < 1; t += 1 / 60) { q.manual.elevator = -0.15; tr.update(1 / 60); }
+  q.manual.elevator = null;
+  for (let t = 0; t < 4; t += 1 / 60) tr.update(1 / 60);
+  check('PLAYTEST_3 #8: a latched lever stays latched when the stick is let go low (only AUTO / an upset hands it back)', q.axis.throttle.mode === 'latched' && Math.abs(q.axis.throttle.val - 0.46) < 0.01, `${q.axis.throttle.mode} ${q.axis.throttle.val?.toFixed(2)}`);
+  const r = mk(tr, { x: 2000, z: 2000, alt: 41, heading: 0, speed: 50 * KT, throttle: 1, pitch: 0.12 }, circuitRoute('09'), { name: 'R', player: true });
+  r.ap.replan();
+  let minAgl = 99, maxBank = 0;
+  for (let t = 0; t < 12; t += 1 / 60) { tr.update(1 / 60); minAgl = Math.min(minAgl, r.ac.agl); if (r.ac.agl < 55) maxBank = Math.max(maxBank, Math.abs(r.ac.bank) / DEG_); }
+  check('PLAYTEST_3 #9: AP takeback at 41 m / 50 kt: wings nearly level below 55 m, no sink below 30 m', minAgl > 30 && maxBank < 12, `min agl ${minAgl.toFixed(0)} m, max bank ${maxBank.toFixed(0)}°`);
+}
+
 // PLAYTEST_2 B3/B4/B5 and the player's short final (B7).
 function scPlayerFeel() {
   const types = ['c172', 'tiger', 'bathtub'];
@@ -617,7 +708,7 @@ async function scMixed() {
   const r = spawnSync(process.execPath, [new URL('./atc-sim.mjs', import.meta.url).pathname, '--only=flight', '--run=mixed', '--quiet'], { encoding: 'utf8' });
   for (const l of (r.stdout || '').split('\n').filter((x) => /^(PASS|FAIL)/.test(x))) check(l.replace(/^(PASS|FAIL)\s+/, ''), l.startsWith('PASS'));
 }
-const S = { landmany: scLandMany, feel: scPlayerFeel, spawn: scSpawn, impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed };
+const S = { aaron: scAaron, loopext: scLoopExtend, throttle: scThrottleTakeback, landmany: scLandMany, feel: scPlayerFeel, spawn: scSpawn, impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed };
 for (const [k, f] of Object.entries(S)) if ((scen === 'all' && k !== 'mixed') || scen === k) { console.log(`\n== ${k}`); await f(); }
 const fails = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - fails}/${results.length} passed`);

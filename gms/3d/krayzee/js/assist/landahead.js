@@ -1,6 +1,8 @@
 // LAND assist (D13): find the best place to put the aeroplane down roughly ahead, and the path to get there.
 // Three-free, runs in node. World frame: +X east, -Z north, heading 0 = north.
 
+import { takeLandNow, noteLandPlan } from './landbutton.js';
+
 const DEG = Math.PI / 180, G = 9.81;
 export const LAND = {
   cone: 35,            // ± degrees either side of the heading
@@ -10,6 +12,7 @@ export const LAND = {
   glideDeg: 4,         // matches FLIGHT's approach leg (routes.js GLIDE_DEG)
   flightAim: 130,      // FLIGHT's approach aims 130 m past its threshold (routes.js AIM_DIST)
   runwayAim: 130, fieldAim: 60,
+  lowAgl: 120,
   maxGrad: 0.12, grade: 0.015, bump: 0.35,       // steepest pre-final descent the AP can fly at 75 kt with idle + 1/3 flap
   vApp: 38.6, bankDeg: 25, orbitR: 450, maxOrbits: 2,
   joinFinal: 2.6, baseFinal: 3.5, baseIn: 0.4, baseLat: 1.4,   // turn radii: final after a join / a base turn, base point
@@ -204,7 +207,7 @@ function buildPath(c, st, F) {
   const decel = Math.max(0, V * V - LAND.vApp * LAND.vApp) / (2 * 0.8);
   let pts = [], kind;
 
-  if (-sP > 260 && Math.abs(lP) < 50 + 0.22 * -sP && Math.abs(hRel) < 30) {
+  if (-sP > Math.min(260, st.minD - 30) && Math.abs(lP) < 50 + 0.22 * -sP && Math.abs(hRel) < 30 && (!st.low || st.relax || -sP > Math.abs(lP) * 12 + Math.abs(hRel) * 14 + 100)) {
     // straight in: FLIGHT's approach leg can take it from here; FAF wherever we are (≤ 1400 m)
     kind = 'straight';
     const fd = Math.min(-sP, Lf);
@@ -215,6 +218,7 @@ function buildPath(c, st, F) {
     const budget = Math.max(0.035 * -sP + 10, (st.sink - va * tg) * Math.max(0, -sP - 450) / va + 20) - decel * 0.03;
     if (excess <= budget) return finish(c, st, [], Math.max(LAND.flightAim + 150, fd), kind, { excess, budget, orbits: 0, pathLength: -sP, required: Math.max(0, excess) }, toW, F);
   }
+  if (st.straight) return { fail: 'tooHigh', kind: 'straight', orbits: 0, required: 0, pathLength: 0 };
   // joining from the side: a straight final of at least ~2.6 turn radii after the last turn, entered from a base point
   // slightly inside the FAF (the autopilot's pursuit rounds it onto the centreline, like its own circuit's base)
   Lf = Math.max(Lf, LAND.flightAim + LAND.joinFinal * r);
@@ -304,7 +308,12 @@ function runwayCandidates(st, layout, inCone, push) {
       if (e !== ends[0] && Math.abs(wrap180(e.hdg - st.H)) > Math.abs(wrap180(ends[0].hdg - st.H)) + 5) continue;
       const [ux, uz] = hvec(e.hdg);
       const thr = [rw.center[0] - ux * rw.length / 2, rw.center[2] - uz * rw.length / 2];
-      push({ kind: 'runway', surface: 'runway', label: `RWY ${e.id}`, runway: e.id, heading: e.hdg, origin: thr, length: rw.length, aim: LAND.runwayAim, width: rw.width, pref: Math.abs(wrap180(e.hdg - st.H)), closed: !!rw.closed });
+      const base = { kind: 'runway', surface: 'runway', label: `RWY ${e.id}`, runway: e.id, heading: e.hdg, aim: LAND.runwayAim, width: rw.width, pref: Math.abs(wrap180(e.hdg - st.H)), closed: !!rw.closed };
+      push({ ...base, origin: thr, length: rw.length });
+      // already over (or just short of) it and low: the rest of the runway ahead, straight down onto it
+      const lat = Math.abs((st.x - thr[0]) * -uz + (st.z - thr[1]) * ux), herr = Math.abs(wrap180(e.hdg - st.H));
+      const sOff = (st.x - thr[0]) * ux + (st.z - thr[1]) * uz + st.minD + lat * 3 + herr * 8 - LAND.runwayAim;
+      if (st.low && sOff > 0 && lat < 25 && herr < 12 && rw.length - sOff >= LAND.minLen + LAND.runwayAim) push({ ...base, origin: [thr[0] + ux * sOff, thr[1] + uz * sOff], length: rw.length - sOff, remain: true });
     }
   }
 }
@@ -358,6 +367,19 @@ function grassLines(st, maxD) {
  * → plan (see docs/ASSIST.md) or { fail: 'tooHigh'|'tooFast'|'nothingAhead'|'onGround', hint }
  */
 export function planLandAhead(o) {
+  // LAND NOW: straight ahead only; if nothing straight ahead works, the ordinary best plan (marked nowFallback)
+  if (takeLandNow() && !o.straight) {
+    const p = planLandAhead({ ...o, straight: true });
+    if (!p.fail) return p;
+    const q = planLandAhead(o);
+    if (!q.fail) q.nowFallback = true;
+    return q;
+  }
+  const p = planCore(o);
+  noteLandPlan(p);
+  return p;
+}
+function planCore(o) {
   const t0 = typeof performance !== 'undefined' ? performance.now() : 0;
   const [x, z] = xz(o.pos);
   const y = Array.isArray(o.pos) ? o.pos[1] : o.pos.y;
@@ -371,9 +393,11 @@ export function planLandAhead(o) {
   const dbg = o.debug ? { cone: null, lines: [], cands: [], rejects: [] } : null;
   const failOut = (fail, extra) => ({ fail, hint: FAIL_TEXT[fail] || fail, ...extra, ...(dbg ? { debug: dbg } : {}), ms: (typeof performance !== 'undefined' ? performance.now() : 0) - t0 });
   if (o.onGround || agl < 3) return failOut('onGround');
-  const st = { x, z, alt, agl, H, V, sink: o.sink ?? 3 };
-  const maxD = Math.max(1800, Math.min(LAND.maxD, 1500 + agl * 9 + Math.max(0, V - 40) * 20));
-  const minD = LAND.minD;
+  // low (or LAND NOW, opts.straight): straight ahead and down beats any circuit; touchdown may be closer than 300 m
+  const straight = !!o.straight, low = straight || agl < LAND.lowAgl;
+  const minD = low ? 200 : LAND.minD;
+  const st = { x, z, alt, agl, H, V, sink: o.sink ?? 3, low, straight, minD };
+  const maxD = Math.max(1800, Math.min(LAND.maxD + (straight ? 1500 : 0), 1500 + agl * 9 + Math.max(0, V - 40) * 20));
   if (dbg) dbg.cone = { x, z, heading: H, half: LAND.cone, minD, maxD };
   const inCone = (px, pz) => {
     const d = Math.hypot(px - x, pz - z);
@@ -440,13 +464,26 @@ export function planLandAhead(o) {
     const perRank = {};
     for (const c of cands) {
       const rank = rk(c);
-      if (best && rank > rk(best.c)) break;
+      if (best && rank > rk(best.c) && !low) break;
       perRank[rank] = (perRank[rank] || 0) + 1;
       if (perRank[rank] > 14) continue;
       if (!settle(c)) { perRank[rank]--; if (dbg) dbg.rejects.push({ kind: c.kind, label: c.label, why: 'approach', at: c.touchdown, heading: c.heading }); continue; }
-      const p = buildPath(c, st, F);
+      const st1 = low ? { ...st, straight: true } : st, keep = { touchdown: c.touchdown, start: c.start, stripLength: c.stripLength, rollout: c.rollout, remain: c.remain };
+      let p = buildPath(c, st1, F);
+      // low / LAND NOW: too high for the near end of a long strip → touch down further along it
+      for (let k = 0; low && p.fail === 'tooHigh' && k < 8 && c.stripLength - 200 >= LAND.minLen; k++) {
+        const m = 200;
+        c.touchdown = [c.touchdown[0] + c.ux * m, c.touchdown[1] + c.uz * m];
+        c.start = [c.start[0] + c.ux * m, c.start[1] + c.uz * m];
+        c.stripLength -= m; c.rollout -= m; c.remain = true;
+        p = buildPath(c, st1, F);
+      }
+      if (p.fail && low && !straight) { Object.assign(c, keep); p = buildPath(c, st, F); }
+      if (p.fail && low) perRank[rank]--;
       if (p.fail) { fails[p.fail]++; if (dbg) dbg.rejects.push({ kind: c.kind, label: c.label, why: p.fail, at: c.touchdown, heading: c.heading }); continue; }
-      const cost = p.feas.pathLength + (p.feas.turn || 0) * 4 + p.feas.orbits * 900 + c.pref * 25 - Math.min(c.stripLength, 900) * (c.kind === 'grass' ? 1 : 0.2);
+      if (straight && p.kind !== 'straight') continue;
+      let cost = p.feas.pathLength + (p.feas.turn || 0) * 4 + p.feas.orbits * 900 + c.pref * 25 - Math.min(c.stripLength, 900) * (c.kind === 'grass' ? 1 : 0.2);
+      if (low) cost = p.kind === 'straight' ? p.feas.pathLength + (c.kind === 'taxiway' || c.kind === 'apron' ? 3000 : rank * 150) + c.pref * 10 - Math.min(c.stripLength, 900) * 0.3 : cost + 5000;
       if (dbg) dbg.cands.push({ kind: c.kind, label: c.label, touchdown: c.touchdown, start: c.start, end: c.stripEnd, cost: Math.round(cost) });
       if (cost < bestCost) { bestCost = cost; best = { c, p }; }
     }
@@ -456,12 +493,19 @@ export function planLandAhead(o) {
   pavedCandidates(st, o.layout, inCone, (c) => raw.push(c));
   for (const c of raw) consider(c);
   choose();
-  if (!best) {
-    cands.length = 0;
+  if (!best || (low && best.p.kind !== 'straight')) {
+    if (!low) cands.length = 0;
     for (const l of grassLines(st, maxD)) {
       consider({ kind: 'grass', surface: 'grass', label: 'FIELD', heading: l.heading, origin: l.origin, s0: l.ray ? minD - 200 : l.s0, length: maxD + 700, aim: LAND.fieldAim, width: 20, pref: Math.abs(wrap180(l.heading - H)) });
     }
     choose();
+  }
+  // low: a tight line-up straight ahead still beats climbing into a circuit
+  if (low && (!best || best.p.kind !== 'straight')) {
+    const keep = best, kc = bestCost;
+    st.relax = true; best = null; bestCost = Infinity;
+    choose();
+    if (!best || best.p.kind !== 'straight') { best = keep; bestCost = kc; }
   }
   if (!best) {
     if (fails.tooHigh || fails.tooFast) return failOut(fails.tooFast > fails.tooHigh ? 'tooFast' : 'tooHigh', { candidates: cands.length });
@@ -482,12 +526,12 @@ function makePlan(c, p, st, dbg, t0) {
   // FLIGHT's approach leg wants a runway-end-shaped object; its "threshold" is 130 m before our touchdown point
   const thr = [c.touchdown[0] - ux * A, c.touchdown[1] - uz * A];
   const end = {
-    id: c.runway || 'LAND', virtual: !c.runway, label: c.label, hdg: c.heading, u: [ux, uz], thr, far: c.stripEnd,
+    id: c.runway || 'LAND', virtual: !c.runway || !!c.remain, label: c.label, hdg: c.heading, u: [ux, uz], thr, far: c.stripEnd,
     len: Math.hypot(c.stripEnd[0] - thr[0], c.stripEnd[1] - thr[1]), width: c.width, elev: c.elev,
   };
   const fly = p.approach.filter((w) => w.kind !== 'faf' && w.kind !== 'touchdown' && w.kind !== 'rollout');
   const legs = fly.map((w) => ({ kind: 'fly', to: [w.x, w.alt, w.z], speed: w.speed, flaps: w.flaps, clearance: LAND.clearance + 25, label: w.kind === 'orbit' ? 'LAND · DESCEND' : 'LAND · JOIN' }));
-  legs.push({ kind: 'approach', end: c.runway || end, fafDist: Math.round(p.Lf - A), label: 'LAND', land: true });
+  legs.push({ kind: 'approach', end: c.runway && !c.remain ? c.runway : end, fafDist: Math.round(p.Lf - A), label: 'LAND', land: true });
   const off = Math.round(Math.abs(wrap180(c.heading - st.H)));
   const why = c.kind === 'runway' ? `runway ${c.runway} ahead` : c.kind === 'grass' ? `${Math.round(c.stripLength)} m clear ${c.surface === 'grass' ? 'field' : c.surface}` : `${c.label.toLowerCase()} ahead`;
   const plan = {
@@ -505,4 +549,4 @@ function makePlan(c, p, st, dbg, t0) {
   return plan;
 }
 
-export { createLandButton } from './landbutton.js';
+export { createLandButton, armLandNow } from './landbutton.js';

@@ -201,6 +201,17 @@ export function createControls({ root, getSettings, getDifficulty, onView, onPau
     }
     return p / auth;
   }
+  // PLAYTEST_3 #4: a held bank turns, it does not spiral. Back-pressure for the bank plus a sink damper, faded out as
+  // the player pulls or pushes themselves; full on Easy/Medium, half on Hard; never near the stall.
+  function pitchAssist(ele, ac) {
+    if (!ac || ac.onGround || ac.stalled) return ele;
+    const b = Math.min(Math.abs(ac.bank || 0), 75 * DEG), P = ac.P || {};
+    if (b < 8 * DEG || (P.vs0 && ac.speed < P.vs0 * 1.2)) return ele;
+    const k = (getDifficulty?.() ?? getSettings?.().difficulty) === 'hard' ? 0.5 : 1;
+    const fade = clamp(1 - Math.abs(ele) / 0.5, 0, 1);
+    const need = (1 / Math.max(Math.cos(b), 0.35) - 1) * 0.4 + clamp(-(ac.vs || 0) * 0.08, -0.15, 0.5);
+    return ele + k * fade * clamp(need, -0.15, 0.75);
+  }
   let safeT = 0;
   addEventListener('resize', () => { safeT = 3; });
   const api = {
@@ -249,7 +260,7 @@ export function createControls({ root, getSettings, getDifficulty, onView, onPau
       // test injection wins
       if (st.inject && performance.now() < st.injectUntil) for (const a in st.inject) m[a] = st.inject[a];
       else st.inject = null;
-      if (m.aileron != null && !st.inject) m.aileron = rollAssist(m.aileron, ac, dt);
+      if (m.aileron != null && !st.inject) { m.aileron = rollAssist(m.aileron, ac, dt); m.elevator = pitchAssist(m.elevator ?? 0, ac); }
       for (const a of ['aileron', 'elevator', 'rudder']) if (m[a] != null) m[a] = clamp(m[a], -1, 1);
       return m;
     },
