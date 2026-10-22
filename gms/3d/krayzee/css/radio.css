@@ -40,7 +40,7 @@
 .krz-r-pill.is-tower[data-tier="4"] { box-shadow: inset 0 0 0 2px #ff3b30, 0 2px 10px rgba(0,0,0,.3); }
 .krz-r-pill.is-tower[data-tier="4"].on-air { animation: krz-shake2 .14s linear infinite; }
 .krz-r-who { text-shadow: 0 1px 2px rgba(0,0,0,.9); display: flex; align-items: center; gap: 5px; font-size: 11px; line-height: 1.25; white-space: nowrap; overflow: hidden; font-variant: small-caps; letter-spacing: .03em; }
-.krz-r-who b { color: var(--c); font-weight: 800; font-size: 12px; overflow: hidden; text-overflow: ellipsis; flex: none; max-width: 52%; }
+.krz-r-who b { color: var(--c); color: color-mix(in srgb, var(--c) 60%, #fff); font-weight: 800; font-size: 12px; overflow: hidden; text-overflow: ellipsis; flex: none; max-width: 52%; }
 .krz-r-pill.is-tower .krz-r-who b { color: #b9ccff; }
 .krz-r-arrow { color: var(--dim); flex: none; }
 .krz-r-to { color: var(--dim); font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
@@ -131,7 +131,7 @@
 .krz-r-chip-ico { width: 24px; height: 24px; flex: none; color: var(--gold); }
 .krz-r-chip-body { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .krz-r-lbl { font-size: 13px; font-weight: 800; line-height: 1.15; }
-.krz-r-tgt { font-size: 11px; font-weight: 600; color: var(--c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.krz-r-tgt { font-size: 11px; font-weight: 700; color: #f6f1e4; color: color-mix(in srgb, var(--c) 45%, #fff); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .krz-r-k { position: absolute; top: 3px; right: 6px; font-size: 10px; font-weight: 800; color: rgba(255,255,255,.3); }
 @media (hover: none) { .krz-r-k { display: none; } }
 

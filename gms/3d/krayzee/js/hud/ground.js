@@ -1,25 +1,37 @@
 // D21 DEMAND TAKEOFF + D22 Skip to runway: ground-only buttons in the bottom action slot.
-// D19: Free Flight difficulty chips, shown parked before the first take-off only. Locked aircraft show a padlock up front.
+// D19: Free Flight difficulty + aircraft chips, parked before the first take-off only, up in the top band out of the flight view.
+// Any chip tap (even the selected one) or any flight control touch/key fades the whole set for this flight (Aaron, HUD4).
 import { aircraftLockText } from '../ui/index.js';
+import { rects, slotX } from './place.js';
 
 const LOCK = '<svg viewBox="0 0 10 12" aria-hidden="true"><rect x="1" y="5" width="8" height="6.5" rx="1.3" fill="currentColor"/><path d="M3 5V3.4a2 2 0 0 1 4 0V5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
 const lockOf = (a) => { try { return aircraftLockText(a); } catch (e) { return ''; } };
+const FLIGHT = '.krz-stick-zone, .krz-thr-col, .krz-pad, .krz-gbtn, .krz-land';
+const FLIGHT_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'ShiftLeft', 'ShiftRight', 'KeyB', 'Equal', 'Minus', 'KeyF', 'KeyT']);
+const AVOID = ['.krz-score', '.krz-top-l', '.krz-top-r', '#krz-hud', '.krz-r-tower', '.krz-warp', '.krz-r-subs', '.krz-r-btn', '.krz-land', '.krz-stick-base',
+  '.krz-thr', '.krz-pad', '.krz-ground', '.krz-finish', '.krz-st-coach', '.krz-court', '.krz-net', '.krz-coach.in .krz-coach-bub'];
 
-export function createGroundButtons(root, { onTakeoff, onSkip, onDifficulty, onAircraft, lockText = lockOf } = {}) {
+export function createGroundButtons(root, { chipRoot = root, onTakeoff, onSkip, onDifficulty, onAircraft, lockText = lockOf } = {}) {
   const el = document.createElement('div');
   el.className = 'krz-ground';
   el.hidden = true;
-  el.innerHTML = `<div class="krz-diff" data-g="diff" hidden><span>DIFFICULTY</span><button type="button" data-d="easy">Easy</button><button type="button" data-d="medium">Medium</button><button type="button" data-d="hard">Hard</button></div>
-    <div class="krz-diff krz-plane" data-g="plane" hidden><span>AIRCRAFT</span><button type="button" data-a="c172">Runabout</button><button type="button" data-a="tiger">Moth</button><button type="button" data-a="bathtub">Bathtub</button></div>
-    <div class="krz-plane-why" data-g="why" hidden></div>
-    <div class="krz-ground-row"><button type="button" class="krz-gbtn krz-gbtn-to" data-g="takeoff"><b>DEMAND TAKEOFF</b><small>Queue? How quaint.</small></button>
+  el.innerHTML = `<div class="krz-ground-row"><button type="button" class="krz-gbtn krz-gbtn-to" data-g="takeoff"><b>DEMAND TAKEOFF</b><small>Queue? How quaint.</small></button>
     <button type="button" class="krz-gbtn krz-gbtn-skip" data-g="skip"><b>SKIP TO RUNWAY</b></button></div>`;
   root.append(el);
-  const to = el.querySelector('[data-g="takeoff"]'), skip = el.querySelector('[data-g="skip"]'), diff = el.querySelector('[data-g="diff"]');
-  el.addEventListener('pointerdown', (e) => e.stopPropagation());
+  const chips = document.createElement('div');
+  chips.className = 'krz-chips';
+  chips.hidden = true;
+  chips.innerHTML = `<div class="krz-diff" data-g="diff" hidden><span>DIFFICULTY</span><button type="button" data-d="easy">Easy</button><button type="button" data-d="medium">Medium</button><button type="button" data-d="hard">Hard</button></div>
+    <div class="krz-diff krz-plane" data-g="plane" hidden><span>AIRCRAFT</span><button type="button" data-a="c172">Runabout</button><button type="button" data-a="tiger">Moth</button><button type="button" data-a="bathtub">Bathtub</button></div>
+    <div class="krz-plane-why" data-g="why" hidden></div>`;
+  chipRoot.append(chips);
+  const to = el.querySelector('[data-g="takeoff"]'), skip = el.querySelector('[data-g="skip"]'), diff = chips.querySelector('[data-g="diff"]');
+  const stop = (e) => e.stopPropagation();
+  el.addEventListener('pointerdown', stop);
+  chips.addEventListener('pointerdown', stop);
   to.addEventListener('click', (e) => { e.stopPropagation(); onTakeoff?.(); });
   skip.addEventListener('click', (e) => { e.stopPropagation(); onSkip?.(); });
-  const plane = el.querySelector('[data-g="plane"]'), why = el.querySelector('[data-g="why"]');
+  const plane = chips.querySelector('[data-g="plane"]'), why = chips.querySelector('[data-g="why"]');
   let whyT = 0;
   function paintLocks() {
     for (const b of plane.querySelectorAll('button')) {
@@ -31,37 +43,88 @@ export function createGroundButtons(root, { onTakeoff, onSkip, onDifficulty, onA
   function explain(b) {
     why.textContent = `${b.dataset.name} · ${b.dataset.locked}`;
     why.hidden = false;
+    place();
     requestAnimationFrame(() => why.classList.add('in'));
     b.classList.remove('nope'); b.getBoundingClientRect(); b.classList.add('nope');
     clearTimeout(whyT);
     whyT = setTimeout(() => { why.classList.remove('in'); setTimeout(() => { if (!why.classList.contains('in')) why.hidden = true; }, 220); }, 2600);
   }
+
+  // dismissed: faded for this flight; held through the quit/replay an aircraft pick causes (carryUntil)
+  let dismissed = '', carryUntil = 0, fadeT = 0, placeAt = 0, last = '';
+  const chipsOn = () => !chips.hidden && !dismissed;
+  function dismiss(why) {
+    if (!chipsOn()) return;
+    dismissed = why;
+    chips.classList.add('gone');
+    clearTimeout(fadeT);
+    fadeT = setTimeout(() => { if (dismissed) chips.hidden = true; }, 360);
+  }
+  document.addEventListener('pointerdown', (e) => { if (chipsOn() && e.target?.closest?.(FLIGHT)) dismiss('control'); }, true);
+  addEventListener('keydown', (e) => {
+    if (!chipsOn() || e.repeat || !FLIGHT_KEYS.has(e.code) || e.target?.closest?.('input,textarea,select,[contenteditable]')) return;
+    dismiss('key');
+  }, true);
+
   plane.addEventListener('click', (e) => {
     const b = e.target.closest('button'), a = b?.dataset.a;
     if (!a) return;
     e.stopPropagation();
     paintLocks();
     if (b.dataset.locked) return explain(b);
-    onAircraft?.(a);
+    const change = b.getAttribute('aria-pressed') !== 'true';
+    dismiss('pick');
+    if (change) { carryUntil = performance.now() + 4000; onAircraft?.(a); }
   });
-  diff.addEventListener('click', (e) => { const d = e.target.closest('button')?.dataset.d; if (d) { e.stopPropagation(); onDifficulty?.(d); } });
-  let last = '';
+  diff.addEventListener('click', (e) => {
+    const b = e.target.closest('button'), d = b?.dataset.d;
+    if (!d) return;
+    e.stopPropagation();
+    const change = b.getAttribute('aria-pressed') !== 'true';
+    dismiss('pick');
+    if (change) onDifficulty?.(d);
+  });
+
+  // Top band, out of the flight view: portrait under the subtitles, landscape the top-left corner under the score.
+  function place() {
+    const W = innerWidth, H = innerHeight, port = H > W;
+    chips.classList.toggle('stack', !port);
+    const w = chips.offsetWidth, h = chips.offsetHeight;
+    if (!w) return;
+    const obs = rects(AVOID, 64);
+    const ys = [...new Set(obs.filter((r) => r.top < H * 0.45).map((r) => Math.round(r.bottom + 8)))].filter((y) => y + h < H - 8).sort((a, b) => a - b);
+    const lo = 8, hi = W - 8, want = port ? (W - w) / 2 : lo;
+    let x = null, y = 0;
+    for (y of ys) if ((x = slotX(obs, y, w, h, want, lo, hi)) !== null) break;
+    if (x === null) { x = (W - w) / 2; y = Math.max(...obs.filter((r) => r.top < H * 0.3).map((r) => r.bottom), 60) + 8; }
+    chips.style.left = `${Math.round(x)}px`; chips.style.top = `${Math.round(y)}px`;
+  }
+  addEventListener('resize', () => { placeAt = 0; });
+
   return {
-    el,
+    el, chips,
     set({ takeoff = false, skip: sk = false, difficulty = null, aircraft = null } = {}) {
-      const k = `${takeoff}|${sk}|${difficulty}|${aircraft}`;
-      if (k === last) return;
-      last = k;
-      to.hidden = !takeoff; skip.hidden = !sk; diff.hidden = !difficulty;
-      for (const b of diff.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.d === difficulty));
-      if (aircraft && plane.hidden) paintLocks();
-      plane.hidden = !aircraft;
-      if (!aircraft) { why.hidden = true; why.classList.remove('in'); }
-      for (const b of plane.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.a === aircraft));
-      el.hidden = !takeoff && !sk && !difficulty && !aircraft;
+      const offered = !!(difficulty || aircraft);
+      if (!offered && dismissed && performance.now() > carryUntil) { dismissed = ''; chips.classList.remove('gone'); }
+      const k = `${takeoff}|${sk}|${difficulty}|${aircraft}|${dismissed}`;
+      if (k !== last) {
+        last = k;
+        to.hidden = !takeoff; skip.hidden = !sk; diff.hidden = !difficulty;
+        for (const b of diff.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.d === difficulty));
+        if (aircraft && plane.hidden) paintLocks();
+        plane.hidden = !aircraft;
+        if (!aircraft) { why.hidden = true; why.classList.remove('in'); }
+        for (const b of plane.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.a === aircraft));
+        el.hidden = !takeoff && !sk;
+        if (!dismissed) { const was = chips.hidden; chips.hidden = !offered; if (was && offered) placeAt = 0; }
+      }
+      const now = performance.now();
+      if (chipsOn() && now > placeAt) { placeAt = now + 250; place(); }
     },
-    get state() { return { takeoff: !to.hidden && !el.hidden, skip: !skip.hidden && !el.hidden, difficulty: diff.hidden || el.hidden ? null : diff.querySelector('[aria-pressed="true"]')?.dataset.d, aircraft: plane.hidden || el.hidden ? null : plane.querySelector('[aria-pressed="true"]')?.dataset.a,
-      locked: [...plane.querySelectorAll('button[data-locked]')].map((b) => b.dataset.a), why: why.hidden ? '' : why.textContent }; },
+    get state() { const on = chipsOn(); return { takeoff: !to.hidden && !el.hidden, skip: !skip.hidden && !el.hidden, difficulty: diff.hidden || !on ? null : diff.querySelector('[aria-pressed="true"]')?.dataset.d, aircraft: plane.hidden || !on ? null : plane.querySelector('[aria-pressed="true"]')?.dataset.a,
+      locked: [...plane.querySelectorAll('button[data-locked]')].map((b) => b.dataset.a), why: why.hidden ? '' : why.textContent, dismissed }; },
+    get chipsOn() { return chipsOn(); },
+    rearm() { dismissed = ''; carryUntil = 0; chips.classList.remove('gone'); last = ''; },
     refreshLocks: paintLocks,
   };
 }

@@ -245,28 +245,35 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
 .krz-herald-h { font: 400 22px/1.08 var(--serif); margin: 8px 0 6px; text-transform: uppercase; }
 .krz-herald-foot { font: 600 10px/1.2 system-ui; color: #5a5040; }
 
-/* bottom action slot (prompt, DEMAND IT, DEMAND TAKEOFF, Skip): portrait above the bottom controls, landscape between them */
+/* bottom action slot (DEMAND IT, DEMAND TAKEOFF, Skip): portrait above the bottom controls, landscape between them */
 .krz-actions { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(var(--sb) + var(--krz-ctl-bottom, 200px) + 66px);
   width: min(92vw, 400px); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 7px; pointer-events: none; }
-.krz-prompt { position: relative; transform: translateY(8px);
-  width: max-content; max-width: 100%; display: flex; align-items: center; gap: 9px; padding: 7px 6px 7px 9px; border-radius: 14px;
-  background: rgba(14,18,28,.8); border: 1px solid rgba(255,215,94,.45); color: var(--krz-ink); opacity: 0; pointer-events: auto;
-  box-shadow: 0 6px 20px rgba(0,0,0,.35); transition: opacity .3s, transform .35s cubic-bezier(.2,1.4,.4,1);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+/* opportunity prompt: top band left of the warp chip / tower badge (js/hud/prompts.js places it), see-through over the AP pill */
+.krz-prompt { position: absolute; z-index: 2; top: 60px; right: 90px; transform: translateY(-6px);
+  width: max-content; max-width: 300px; display: flex; align-items: center; gap: 7px; padding: 4px 4px 4px 6px; border-radius: 12px;
+  background: rgba(14,18,28,.42); border: 1px solid rgba(255,215,94,.4); color: var(--krz-ink); opacity: 0; pointer-events: auto;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18); transition: opacity .3s, transform .35s cubic-bezier(.2,1.4,.4,1); overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0,0,0,.95), 0 0 6px rgba(0,0,0,.55); }
 .krz-prompt.in { opacity: 1; transform: none; }
 .krz-prompt[hidden] { display: none; }
+.krz-prompt.cramped { visibility: hidden; }
 .krz-prompt.done { border-color: var(--krz-auto); }
 .krz-prompt.done .krz-pr-t::after { content: ' ✓'; color: var(--krz-auto); }
-.krz-pr-arrow { width: 26px; height: 26px; flex: none; color: #ffd75e; display: grid; place-items: center; transition: transform .25s linear; }
-.krz-pr-arrow svg { width: 20px; height: 20px; }
+#krz-overlay:has(#krz-hud.krz-flash) .krz-prompt.in { opacity: .3; }
+#krz-ghud:has(> .krz-actions[hidden]) .krz-prompt, #krz-ghud:has(> .krz-actions[hidden]) .krz-chips { visibility: hidden; }
+.krz-pr-dir { flex: none; display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 30px; }
+.krz-pr-arrow { width: 22px; height: 22px; flex: none; color: #ffd75e; display: grid; place-items: center; transition: transform .25s linear; filter: drop-shadow(0 1px 2px rgba(0,0,0,.8)); }
+.krz-pr-arrow svg { width: 18px; height: 18px; }
 .krz-pr-arrow[hidden] { display: none; }
-.krz-pr-body { display: flex; flex-direction: column; min-width: 0; }
-.krz-pr-t { font: 700 13px/1.2 system-ui; }
-.krz-pr-s { font: 600 10px/1.25 system-ui; color: #ffd98a; margin-top: 2px; }
-.krz-pr-d { font: 700 10px/1 ui-monospace, Menlo, monospace; color: var(--krz-dim); flex: none; white-space: nowrap; }
+.krz-pr-body { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+.krz-pr-t { font: 700 12.5px/1.17 system-ui; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.krz-pr-s { font: 600 10.5px/1.22 system-ui; color: #ffd98a; margin-top: 1px; display: -webkit-box; -webkit-line-clamp: var(--pr-sub, 3); -webkit-box-orient: vertical; overflow: hidden; }
+.krz-prompt.nosub .krz-pr-s { display: none; }
+.krz-pr-d { font: 700 9.5px/1 ui-monospace, Menlo, monospace; color: var(--krz-ink); white-space: nowrap; }
 .krz-pr-d:empty { display: none; }
-.krz-pr-x { flex: none; width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(246,241,228,.1); color: var(--krz-dim);
+.krz-pr-x { flex: none; position: relative; width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(246,241,228,.16); color: var(--krz-ink);
   font: 400 18px/1 system-ui; cursor: pointer; display: grid; place-items: center; padding: 0; touch-action: manipulation; }
+.krz-pr-x::after { content: ''; position: absolute; inset: -7px -4px; }
 @media (orientation: landscape) {
   .krz-actions { bottom: calc(var(--sb) + 10px); width: min(400px, calc(100vw - var(--krz-ctl-left, 190px) - var(--krz-ctl-right, 190px) - 16px));
     left: calc(var(--krz-ctl-left, 190px) + (100vw - var(--krz-ctl-left, 190px) - var(--krz-ctl-right, 190px)) / 2); }
@@ -280,7 +287,7 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
   .krz-cer-title { font-size: 36px; }
 }
 
-/* landscape: LAND sits inboard of the stick zone, so the action slot (prompt card) moves clear of it while it shows */
+/* landscape: LAND sits inboard of the stick zone, so the action slot moves clear of it while it shows */
 @media (orientation: landscape) {
   html.krz-land-on[data-krz-hand="left"] .krz-actions { --l0: calc(var(--krz-ctl-left, 190px) + var(--krz-land-w, 100px) + 20px);
     width: min(400px, calc(100vw - var(--l0) - var(--krz-ctl-right, 190px) - 8px)); left: calc(var(--l0) + (100vw - var(--l0) - var(--krz-ctl-right, 190px)) / 2); }
@@ -307,7 +314,7 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
 .krz-coach-bub[data-dir="up"]::after { top: -5px; }
 .krz-coach-bub[data-dir=""]::after { display: none; }
 @keyframes krz-ring { 50% { box-shadow: 0 0 0 9px rgba(255,215,94,0); transform: scale(1.03); } }
-@media (prefers-reduced-motion: reduce) { .krz-pop, .krz-cer, .krz-herald, .krz-prompt { transition-duration: .01s; } .krz-coach-ring, .krz-sc-hint { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .krz-pop, .krz-cer, .krz-herald, .krz-prompt, .krz-chips { transition-duration: .01s; } .krz-coach-ring, .krz-sc-hint { animation: none !important; } }
 
 /* D19 LANDED — DEMAND IT */
 .krz-finish { pointer-events: auto; display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 8px 18px 8px 14px; border-radius: 16px;
@@ -330,11 +337,20 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
 /* D21 DEMAND TAKEOFF / D22 Skip to runway */
 .krz-ground { display: flex; flex-direction: column; align-items: center; gap: 7px; pointer-events: none; }
 .krz-ground-row { display: flex; gap: 8px; justify-content: center; }
-.krz-ground[hidden], .krz-gbtn[hidden], .krz-diff[hidden], .krz-actions[hidden] { display: none; }
-.krz-diff { pointer-events: auto; display: flex; align-items: center; gap: 4px; padding: 3px 4px 3px 9px; border-radius: 12px; background: rgba(14,18,28,.62);
+.krz-ground[hidden], .krz-gbtn[hidden], .krz-diff[hidden], .krz-actions[hidden], .krz-chips[hidden] { display: none; }
+/* D19 parked chips: placed by js/hud/ground.js in the top band; fade on any chip tap or flight control */
+.krz-chips { position: absolute; left: 8px; top: 230px; display: flex; flex-direction: column; align-items: center; gap: 5px; pointer-events: none;
+  transition: opacity .32s ease; }
+.krz-chips.gone { opacity: 0; transform: translateY(-8px); transition: opacity .32s ease, transform .32s ease; }
+.krz-chips.gone .krz-diff { pointer-events: none; }
+.krz-chips.stack { align-items: flex-start; }
+.krz-chips.stack .krz-diff { flex-wrap: wrap; max-width: 262px; padding: 3px 4px 4px; row-gap: 2px; }
+.krz-chips.stack .krz-diff span { flex: 1 0 100%; padding: 2px 5px 0; font-size: 8px; }
+.krz-chips.stack .krz-diff button { min-height: 30px; }
+.krz-diff { pointer-events: auto; display: flex; align-items: center; gap: 4px; padding: 3px 4px 3px 9px; border-radius: 12px; background: rgba(14,18,28,.5);
   border: 1px solid rgba(246,241,228,.22); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); }
 .krz-diff span { font: 800 9px/1 system-ui; letter-spacing: .14em; color: var(--krz-dim); margin-right: 3px; }
-.krz-diff button { min-height: 32px; min-width: 56px; padding: 0 10px; border-radius: 9px; border: 0; cursor: pointer; touch-action: manipulation;
+.krz-diff button { min-height: 34px; min-width: 56px; padding: 0 10px; border-radius: 9px; border: 0; cursor: pointer; touch-action: manipulation;
   font: 700 12.5px system-ui; background: transparent; color: var(--krz-ink); }
 .krz-diff button[aria-pressed="true"] { background: var(--krz-gold); color: #1d2b45; }
 .krz-gbtn { pointer-events: auto; min-height: 46px; padding: 6px 13px; border-radius: 14px; cursor: pointer; touch-action: manipulation; text-align: left;
@@ -379,3 +395,21 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
   font: 600 13px/1.2 system-ui, sans-serif; letter-spacing: .04em; color: rgba(246,241,228,.72); text-decoration: underline; text-underline-offset: 3px; }
 .krz-intro-link:hover { color: #f6f1e4; }
 
+
+/* PLAYTEST_3 #6: quit with pending PP — above the pause sheet (js/ui z 30) */
+.krz-quitc { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(6,8,14,.55); opacity: 0; transition: opacity .2s;
+  font-family: system-ui, sans-serif; pointer-events: auto; }
+.krz-quitc[hidden] { display: none; }
+.krz-quitc.in { opacity: 1; }
+.krz-quitc-card { width: min(340px, 100%); padding: 18px 16px 14px; border-radius: 16px; background: #1d2b45; border: 1px solid rgba(255,215,94,.55); color: #f6f1e4;
+  box-shadow: 0 16px 40px rgba(0,0,0,.5); text-align: center; }
+.krz-quitc-card b { display: block; font: 800 19px/1.2 system-ui; color: #ffd75e; }
+.krz-quitc-card p { margin: 8px 0 14px; font: 500 14px/1.35 system-ui; color: rgba(246,241,228,.85); }
+.krz-quitc-btns { display: flex; gap: 8px; }
+.krz-quitc-btns button { flex: 1; min-height: 46px; border-radius: 12px; font: 700 14px system-ui; cursor: pointer; touch-action: manipulation; }
+.krz-quitc-stay { border: 0; background: #e2b33c; color: #1d2b45; }
+.krz-quitc-go { border: 1px solid rgba(255,107,107,.7); background: transparent; color: #ff8a8a; }
+
+/* PLAYTEST_3 #10: "You took the controls" on the warp chip fades after a few seconds */
+.krz-warp[data-state="off"] small:not(:empty) { animation: krz-warp-why 7s ease forwards; }
+@keyframes krz-warp-why { 0%, 85% { opacity: 1; } 100% { opacity: 0; font-size: 0; line-height: 0; } }

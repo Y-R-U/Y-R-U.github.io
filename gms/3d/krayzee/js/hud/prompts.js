@@ -2,6 +2,7 @@
 // Reads ATC/traffic state only (never issues anything). Settings key `hints` (default on) hides them.
 import { RUNWAYS, TOWER, TERMINAL, TAXIWAYS, threshold, runwayHeadingFor } from '../world/layout.js';
 import * as sfx from './sound.js';
+import { rect, rects } from './place.js';
 
 const SHOW = 8, GAP = 9, KIND_CD = 45, DISMISS_CD = 150, DONE_CD = 70;
 // Which infraction ids satisfy which prompt.
@@ -16,15 +17,37 @@ const angDiff = (a, b) => { let d = ((a - b) % 360 + 540) % 360 - 180; return d;
 const hdgTo = (dx, dz) => (Math.atan2(dx, -dz) * 180 / Math.PI + 360) % 360;
 const fmtDist = (m) => (m >= 950 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m / 10) * 10} m`);
 
-export function createPrompts(root, { getSettings, onTarget } = {}) {
+export function createPrompts(root, { getSettings, onTarget, held } = {}) {
   const el = document.createElement('div');
   el.className = 'krz-prompt';
   el.hidden = true;
   el.setAttribute('role', 'status');
-  el.innerHTML = `<span class="krz-pr-arrow">${ARROW}</span><span class="krz-pr-body"><b class="krz-pr-t"></b><small class="krz-pr-s"></small></span><span class="krz-pr-d"></span><button type="button" class="krz-pr-x" aria-label="Dismiss hint">&times;</button>`;
+  el.innerHTML = `<span class="krz-pr-dir"><span class="krz-pr-arrow">${ARROW}</span><span class="krz-pr-d"></span></span><span class="krz-pr-body"><b class="krz-pr-t"></b><small class="krz-pr-s"></small></span><button type="button" class="krz-pr-x" aria-label="Dismiss hint">&times;</button>`;
   root.append(el);
   const tEl = el.querySelector('.krz-pr-t'), sEl = el.querySelector('.krz-pr-s'), dEl = el.querySelector('.krz-pr-d'), arrow = el.querySelector('.krz-pr-arrow');
   const S = { cur: null, t: 0, gap: 4, cd: {}, evalT: 0, clock: 0, invalidT: 0, blocked: false, history: [] };
+
+  // Top band left of the warp chip / tower badge, over the AP pill and axes row, above the subtitles (Aaron, HUD4).
+  let lay = '', layT = 0;
+  function layout(force) {
+    const W = innerWidth, strip = rect('.krz-hud-strip');
+    const T = Math.round((strip ? strip.bottom : 50) + 5);
+    const band = (r) => r.top < T + 40 && r.bottom > T;
+    let R = W - 10, L = 8, B = T + 92;
+    for (const r of rects(['.krz-warp', '.krz-r-tower', '.krz-net'])) if (band(r) && r.left > W * 0.5) R = Math.min(R, r.left - 6);
+    for (const r of rects(['.krz-score', '.krz-court', '.krz-net', '.krz-r-subs', '.krz-st-coach'], 1)) if (r.top < T + 12 && r.bottom > T && r.right < R - 160) L = Math.max(L, r.right + 6);
+    for (const r of rects(['.krz-r-subs', '.krz-st-coach', '.krz-court'])) if (r.top >= T - 2 && r.left < R && r.right > L) B = Math.min(B, r.top - 4);
+    const maxW = Math.min(R - L, 360), maxH = B - T;
+    const k = `${W}|${T}|${R}|${maxW}|${maxH}|${tEl.textContent}|${sEl.textContent}`;
+    if (!force && k === lay) return;
+    lay = k;
+    el.style.top = `${T}px`; el.style.right = `${Math.round(W - R)}px`; el.style.maxWidth = `${Math.floor(maxW)}px`;
+    const room = maxH >= 34 && maxW >= 170;
+    el.classList.toggle('cramped', !room);
+    if (!room) return;
+    for (const n of [3, 2, 1, 0]) { el.style.setProperty('--pr-sub', n); el.classList.toggle('nosub', !n); if (el.offsetHeight <= maxH) break; }
+  }
+  addEventListener('resize', () => { if (S.cur) layout(true); });
 
   const stop = (e) => e.stopPropagation();
   el.addEventListener('pointerdown', stop);
@@ -48,6 +71,7 @@ export function createPrompts(root, { getSettings, onTarget } = {}) {
     tEl.textContent = c.title; sEl.textContent = c.sub || '';
     el.dataset.kind = c.kind;
     el.hidden = false;
+    layout(true);
     requestAnimationFrame(() => el.classList.add('in'));
     sfx.playPrompt();
   }
@@ -130,7 +154,7 @@ export function createPrompts(root, { getSettings, onTarget } = {}) {
     update(dt, w) {
       S.clock += dt;
       const off = getSettings?.().hints === false;
-      if (off || !w || !w.player || w.blocked) {
+      if (off || !w || !w.player || w.blocked || held?.()) {
         if (S.cur) hide(off ? 'off' : 'blocked');
         S.gap = Math.max(S.gap, 2);
         return;
@@ -144,6 +168,7 @@ export function createPrompts(root, { getSettings, onTarget } = {}) {
           else S.invalidT += 0.5;
         }
         if (S.t > SHOW || S.invalidT > 1.5) { hide(S.t > SHOW ? 'timeout' : 'gone'); return; }
+        if ((layT -= dt) <= 0) { layT = 0.25; layout(); }
         const p = targetPos(S.cur.target, tp);
         if (p && w.camera) {
           const cam = w.camera.position, dx = p.x - cam.x, dz = p.z - cam.z;
@@ -172,7 +197,7 @@ export function createPrompts(root, { getSettings, onTarget } = {}) {
       if (S.cur?.kind === kind) hide('done');
     },
     reset() { if (S.cur) hide('reset'); S.cd = {}; S.gap = 6; S.clock = 0; },
-    get state() { return { current: S.cur && { kind: S.cur.kind, title: S.cur.title, sub: S.cur.sub, t: +S.t.toFixed(1) }, gap: +S.gap.toFixed(1), history: S.history.slice() }; },
+    get state() { return { current: S.cur && { kind: S.cur.kind, title: S.cur.title, sub: S.cur.sub, t: +S.t.toFixed(1), cramped: el.classList.contains('cramped') }, gap: +S.gap.toFixed(1), history: S.history.slice() }; },
   };
   return api;
 }

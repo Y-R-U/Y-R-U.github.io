@@ -224,8 +224,8 @@ async function scenario(W, H, mobile, tag) {
   await sleep(500);
   console.log('  shot', await shot(`${tag}-06-prompt`));
   const prR = await rectOf('.krz-prompt'), ctl2 = await ev('window.__game.controlsRects()');
-  const prOv = overlaps({ prompt: prR, stick: ctl2.stick, thr: ctl2.thr, pad: ctl2.pad, radio: await rectOf('.krz-r-btn'), score: await rectOf('.krz-score'), hud: await rectOf('#krz-hud') });
-  check(`${tag}: prompt clear of thumbs, radio and HUD`, prOv.filter((s) => s.startsWith('prompt')).length === 0, prOv.join(', '));
+  const prOv = overlaps({ prompt: prR, stick: ctl2.stick, thr: ctl2.thr, pad: ctl2.pad, radio: await rectOf('.krz-r-btn'), score: await rectOf('.krz-score'), hud: await rectOf('.krz-hud-strip'), tower: await rectOf('.krz-r-tower'), warp: await rectOf('.krz-warp') });
+  check(`${tag}: prompt clear of thumbs, radio, HUD strip, tower and warp (HUD4: it may cover the AP row)`, prOv.filter((s) => s.startsWith('prompt')).length === 0, prOv.join(', '));
   check(`${tag}: prompt points at its target`, await ev(`!!__game.hud.target && !document.querySelector('.krz-pr-arrow').hidden`));
   await tap('.krz-pr-x');
   check(`${tag}: prompt dismissed by real tap`, await until(`__game.hud.prompts.history.some((h) => h.why === 'dismissed') && !__game.hud.prompts.current`, 2));
@@ -339,8 +339,10 @@ async function finishFlow(W, H, mobile, tag) {
   console.log('  shot', await shot(`${tag}-09-diff-chips`));
   if (chips) {
     await tap('.krz-plane [data-a="tiger"]');
-    check(`${tag}: Tiger Moth picked by real ${mobile ? 'touch' : 'click'} (plane rebuilt)`, await until(`__game.S.type === 'tiger' && !!__game.S.player && __game.ghud.ground.state.aircraft === 'tiger'`, 8), JSON.stringify(await ev('[__game.S.type, __game.ghud.ground.state]')));
+    check(`${tag}: Tiger Moth picked by real ${mobile ? 'touch' : 'click'} (plane rebuilt)`, await until(`__game.S.type === 'tiger' && !!__game.S.player && __game.ghud.ground.state.dismissed === 'pick'`, 8), JSON.stringify(await ev('[__game.S.type, __game.ghud.ground.state]')));
     console.log('  shot', await shot(`${tag}-09b-tiger`));
+    // HUD4: any chip pick fades the whole set for the flight; bring it back for the difficulty tap
+    await ev('(__game.ghud.ground.rearm(), 1)');
     await until(`__game.ghud.ground.state.difficulty`, 4, 100);
     await tap('.krz-diff [data-d="hard"]');
     check(`${tag}: Hard chosen by real ${mobile ? 'touch' : 'click'} (game rebuilt, saved)`, await until(`__game.wiring.difficulty === 'hard' && JSON.parse(localStorage.getItem('krayzee.settings')).difficulty === 'hard'`, 2));

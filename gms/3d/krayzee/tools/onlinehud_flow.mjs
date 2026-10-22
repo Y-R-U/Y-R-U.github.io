@@ -212,6 +212,7 @@ async function run(view) {
     await ev(`(() => { try { __game.ghud.coach.complete(); } catch (e) {} return 1; })()`);
     const chips = await until(`__game.ghud.ground.state.aircraft && __game.ghud.ground.state`, 6);
     ok(chips && chips.locked.join() === 'tiger,bathtub', 'game: parked chips show Moth/Bathtub locked', JSON.stringify(chips));
+    await sleep(500); // HUD4: the chips re-place (≤250 ms) once the coach bubble has gone
     await tap('[data-a="tiger"]');
     ok(await until(`/Reach Earl/.test(__game.ghud.ground.state.why)`, 1.5), 'game: locked chip explains by real tap', await ev('__game.ghud.ground.state.why'));
     await sleep(400);
@@ -248,7 +249,7 @@ async function run(view) {
         const q = (s) => R(document.querySelector(s));
         const c = __game.controlsRects();
         const o = { court: q('.krz-court'), list: q('.krz-crt-list'), pill: q('.krz-net'), pause: c.topL, topR: c.topR, score: q('.krz-score'), strip: q('.krz-hud-strip'),
-          tower: q('.krz-r-tower'), radio: q('.krz-r-btn'), stick: q('.krz-stick-base'), thr: c.thr, pad: c.pad, land: q('.krz-land'), chips: q('.krz-ground'), actions: q('.krz-finish'), coach: q('.krz-coach-bub'), warp: q('.krz-warp'), subs: q('.krz-r-subs .krz-r-pill.in') };
+          tower: q('.krz-r-tower'), radio: q('.krz-r-btn'), stick: q('.krz-stick-base'), thr: c.thr, pad: c.pad, land: q('.krz-land'), chips: q('.krz-chips'), ground: q('.krz-ground'), prompt: q('.krz-prompt'), actions: q('.krz-finish'), coach: q('.krz-coach-bub'), warp: q('.krz-warp'), subs: q('.krz-r-subs .krz-r-pill.in') };
         return o; })()`);
       const mine = ['court', 'pill'], bad = [];
       for (const m of mine) for (const k of Object.keys(r)) if (!mine.includes(k) && k !== 'list' && hit(r[m], r[k])) bad.push(`${m}×${k}`);

@@ -35,7 +35,7 @@ function ensureRoot() {
     onChange: (s) => hooks.onSettings?.(s),
     onTitle: () => { refreshProfile(); hooks.onProfile?.(getProfile()); },
     onResume: () => settings.pop.close(),
-    onQuit: () => { quitting = true; settings.pop.close(); quitting = false; showMenu(); hooks.onQuit?.(); },
+    onQuit: () => { const go = () => { quitting = true; settings.pop.close(); quitting = false; showMenu(); hooks.onQuit?.(); }; hooks.confirmQuit ? hooks.confirmQuit(go) : go(); },
     onClose: () => { syncAccount(); if (state === 'game' && !quitting) hooks.onResume?.(); },
   });
   profile = createProfile(root, {

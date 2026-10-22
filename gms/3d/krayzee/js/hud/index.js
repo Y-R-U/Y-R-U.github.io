@@ -1,5 +1,6 @@
 // Game HUD layer above the flight HUD: score/rank (score.js), opportunity prompts (prompts.js), first-flight coach (coach.js),
-// and the bottom action slot (prompt, DEMAND IT, DEMAND TAKEOFF, Skip to runway) that keeps clear of both thumbs.
+// the bottom action slot (DEMAND IT, DEMAND TAKEOFF, Skip to runway) that keeps clear of both thumbs, and the top band
+// (prompt card left of the warp chip, parked difficulty/aircraft chips).
 import { createScoreHUD } from './score.js';
 import { createPrompts } from './prompts.js';
 import { createCoach } from './coach.js';
@@ -21,9 +22,10 @@ export function createGameHUD(root, { getSettings, onTarget, onFinish, onTakeoff
   const actions = document.createElement('div');
   actions.className = 'krz-actions';
   el.append(actions);
-  const prompts = createPrompts(actions, { getSettings, onTarget });
+  let ground = null;
+  const prompts = createPrompts(el, { getSettings, onTarget, held: () => !!ground?.chipsOn });
   const finish = createFinishButton(actions, { onPress: () => onFinish?.() });
-  const ground = createGroundButtons(actions, { onTakeoff: () => onTakeoff?.(), onSkip: () => onSkip?.(), onDifficulty: (d) => onDifficulty?.(d), onAircraft: (a) => onAircraft?.(a) });
+  ground = createGroundButtons(actions, { chipRoot: el, onTakeoff: () => onTakeoff?.(), onSkip: () => onSkip?.(), onDifficulty: (d) => onDifficulty?.(d), onAircraft: (a) => onAircraft?.(a) });
   const coach = createCoach(el, { force: coachForce });
   const online = createOnlineHUD(el);
   return {

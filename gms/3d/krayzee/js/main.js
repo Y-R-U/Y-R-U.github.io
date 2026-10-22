@@ -11,11 +11,11 @@ import { circuitRoute, runwayEnd, fromRunway } from './flight/routes.js';
 import * as layout from './world/layout.js';
 import { createMarkers } from './assist/markers.js';
 import { planLandAhead, createLandButton, collectTrees } from './assist/landahead.js';
-const { STANDS } = layout;
 import { createControls } from './flight/controls.js';
 import { createFlightCamera, fitFov } from './flight/cameras.js';
 import { createHUD } from './flight/hud.js';
 import { createGameHUD } from './hud/index.js';
+import { createQuitConfirm } from './hud/quit.js';
 import { createAttract } from './flight/attract.js';
 import { V3, Quat, KT, FT, clamp } from './flight/vmath.js';
 import { createWiring } from './core/wiring.js';
@@ -42,7 +42,7 @@ const nextPaint = () => new Promise((r) => { requestAnimationFrame(() => setTime
 
 async function boot() {
   try { career = loadCareer(); } catch (e) { career = undefined; }
-  ui.initUI({ onPlay, onSettings, onProfile, onResume, onQuit, onSound: (k) => audio.playUI(k), career, onOnline, onStory, onIntro: watchIntro });
+  ui.initUI({ onPlay, onSettings, onProfile, onResume, onQuit, confirmQuit, onSound: (k) => audio.playUI(k), career, onOnline, onStory, onIntro: watchIntro });
   try { ui.setOnlineAvailable?.(!!params.get('net')); } catch (e) { /* */ }
   ui.setLoading(0.05, 'Warming up the engines');
   try { audio.initAudio(); audio.setVolumes(ui.getSettings()); } catch (e) { console.warn('audio', e); }
@@ -365,6 +365,8 @@ function onResume() {
   try { audio.setVolumes(ui.getSettings()); } catch (e) { /* */ }
   if (S.player) wiring.radio?.setVisible(true);
 }
+let quitC = null;
+function confirmQuit(go) { const pp = S.player ? wiring?.game?.state?.()?.pending || 0 : 0; (quitC ||= createQuitConfirm()).ask(pp, go); }
 function onQuit() { session?.detach({ leave: true }); quitPlay(); try { audio.setVolumes(ui.getSettings()); } catch (e) { /* */ } }
 function onSettings(s) {
   wiring?.setMischief?.(s);
@@ -453,7 +455,7 @@ function updateFinish(P, g) {
 function demandIt() {
   const P = S.player, g = wiring.game;
   if (!P || !g) return;
-  const atStand = STANDS.some((s) => Math.hypot(P.ac.pos.x - s.position[0], P.ac.pos.z - s.position[2]) < 12);
+  const atStand = layout.STANDS.some((s) => Math.hypot(P.ac.pos.x - s.position[0], P.ac.pos.z - s.position[2]) < 12);
   const r = g.demand(finishZoneNow(P), { atStand });
   log('demand', r);
   if (r.ok) {
@@ -543,9 +545,23 @@ function autoThrottle() {
   hud.flash('THROTTLE · AUTOPILOT', 'info', 1.2);
 }
 // D21 / D22: TRAFFIC's autopilot calls (guarded until they exist)
+// PLAYTEST_3 #3: stopped in a field far from any runway, DEMAND TAKEOFF is a royal rolling start from right here
+// (a stopgap until the autopilot can do a grass takeoff; the 2 km taxi it would otherwise do took minutes)
+function fieldHop(P) {
+  const ac = P.ac, x = ac.pos.x, z = ac.pos.z;
+  const seg = (a, b) => { const dx = b[0] - a[0], dz = b[1] - a[1], t = Math.max(0, Math.min(1, ((x - a[0]) * dx + (z - a[1]) * dz) / (dx * dx + dz * dz || 1))); return Math.hypot(x - a[0] - t * dx, z - a[1] - t * dz); };
+  const d = Math.min(Infinity, ...(layout.RUNWAYS || []).map((rw) => seg(layout.threshold(rw, rw.ends[0]), layout.threshold(rw, rw.ends[1]))));
+  if (!(d > 500)) return false;
+  const gy = world.groundHeightAt(x, z), top = env?.treeTop?.(x, z, 30);
+  ac.place({ x, z, alt: Math.max(50, (top ?? gy) - gy + 25), heading: ac.heading, speed: 78 * KT, throttle: 1, flaps: 0 }, env);
+  P.ap.replan();
+  try { wiring.link?.placed(P, 8); } catch (e) { /* */ }
+  return true;
+}
 function demandTakeoff() {
   const P = S.player; if (!P?.ap?.demandTakeoff) return;
-  try { if (!(wiring.link?.demandTakeoff ? wiring.link.demandTakeoff(P) : P.ap.demandTakeoff())) { hud.flash('NO RUNWAY OPEN FOR YOUR GRACE', 'warn'); return; } } catch (e) { console.warn('demandTakeoff', e); return; }
+  if (S.everAir && P.ac.onGround && fieldHop(P)) { log('demandTakeoff', { field: true }); S.demandedT = true; ghud.score.announce('BY ROYAL PREROGATIVE', 'Airborne from the turnips. The farmer may watch.'); return; }
+  try { if (!(S.demandEnd = wiring.link?.demandTakeoff ? wiring.link.demandTakeoff(P) : P.ap.demandTakeoff())) { hud.flash('NO RUNWAY OPEN FOR YOUR GRACE', 'warn'); return; } } catch (e) { console.warn('demandTakeoff', e); return; }
   log('demandTakeoff', {});
   S.demandedT = true;
   ghud.score.announce('BY ROYAL PREROGATIVE', 'Taking off. The queue may watch.');
@@ -553,7 +569,12 @@ function demandTakeoff() {
 function skipToRunway() {
   const P = S.player; if (!P) return;
   if (!P.ap?.skipToRunway) return;
-  try { wiring.link?.skipToRunway ? wiring.link.skipToRunway(P) : P.ap.skipToRunway(wiring.activeEnd()); } catch (e) { console.warn('skipToRunway', e); return; }
+  // a live DEMAND TAKEOFF survives the skip: lined up on the demanded end and rolling at once (HUD4)
+  const dem = P.ap.demand && typeof S.demandEnd === 'string' ? S.demandEnd : null;
+  try {
+    wiring.link?.skipToRunway ? wiring.link.skipToRunway(P, dem || undefined) : P.ap.skipToRunway(dem || wiring.activeEnd());
+    if (dem) P.ap.demandTakeoff({ ends: [dem], prefer: dem });
+  } catch (e) { console.warn('skipToRunway', e); return; }
   log('skipToRunway', {});
 }
 function updateGround(P, g) {
@@ -563,8 +584,8 @@ function updateGround(P, g) {
   const taxiing = ['taxi', 'hold', 'park'].includes(ap?.leg?.kind) || (ap?.leg?.kind === 'takeoff' && ap.sub === 'taxi');
   if (!ac.onGround) S.everAir = true;
   ghud.ground.set({
-    takeoff: onG && !!ap?.demandTakeoff && !rolling && gsKt < 25 && !g?.finishReady,
-    skip: onG && !!ap?.skipToRunway && taxiing && !rolling,
+    takeoff: onG && !!ap?.demandTakeoff && !rolling && gsKt < 25 && !(g?.finishReady && finishZoneNow(P).ok),
+    skip: onG && !!ap?.skipToRunway && taxiing && !rolling && !S.everAir,
     difficulty: onG && S.playMode === 'free' && !S.everAir && !(g?.pending > 0) ? wiring.difficulty || 'easy' : null,
     aircraft: onG && S.playMode === 'free' && !S.everAir && !(g?.pending > 0) && !params.get('plane') ? S.type || 'c172' : null,
   });
@@ -728,9 +749,11 @@ window.__game = {
   treeTop: (x, z, pad = 0) => env?.treeTop?.(x, z, pad) ?? null,
   get traffic() { return traffic; }, get renderer() { return R; }, get camera() { return camera; },
   get hud() { return ghud && { score: ghud.score.state, prompts: ghud.prompts.state, coach: ghud.coach.state, takeoffCoach: toCoach?.state || null, target: S.oppTarget || null }; },
-  get wiring() { return wiring; }, get ghud() { return ghud; },
+  get wiring() { return wiring; }, get ghud() { return ghud; }, get world() { return world; },
   get quality() { return { tier: R?.quality, auto: gov?.auto, fps: gov ? +gov.fps.toFixed(1) : 0, history: gov?.history || [] }; },
 };
+
+if (new URLSearchParams(location.search).has('dbg')) import('./core/debuglog.js').then((m) => m.startDebugLog(window.__game)).catch(() => {});
 
 boot().catch((e) => {
   console.error(e);
