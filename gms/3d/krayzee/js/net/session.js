@@ -18,7 +18,7 @@ import { createCourt } from '../game/court.js';
 import { INFRACTIONS } from '../../data/rules.js';
 import { RANKS } from '../../data/ranks.js';
 
-const ATC_DELTA_MS = 200, ATC_KEY_MS = 1000, AI_MS = 100, ROSTER_MS = 1000, COURT_MS = 1000, META_MS = 10000;
+const ATC_DELTA_MS = 200, ATC_KEY_MS = 1000, AI_MS = 100, AI_NEAR_M = 3000, ROSTER_MS = 1000, COURT_MS = 1000, META_MS = 10000;
 const BARK_GAP_MS = 3000, FLOOR_QUEUE_MS = 1500, LINE_MS = 2500;
 // Host owns these fields of a follower's own ATC strip; the follower keeps its own detector memory for the rest.
 const AUTH_FIELDS = ['cmds', 'seqNo', 'follow', 'ext', 'issuedSeq', 'landEnd', 'rem', 'leg', 'stand'];
@@ -99,13 +99,13 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
   const humans = new Map();      // peerId → { hi, rig, ac, ent, pending }
   const ais = new Map();         // ai id → { info, rig, ac, ent, track, pending }
   const ledger = new Map();      // 'p:id' → { acc, infs:[{rule,pp,t}], air, landed, banked, lastBark }
-  const hiSent = new Set(), voices = new Map();
+  const hiSent = new Set(), voices = new Map(), savers = new Set();
   // Rule-breaks only the host's authority can see (it does the forced re-sequence / go-around), keyed 'cid|rule|victim'.
   const hostDet = new Map(), scolded = new Map();
   let seenCut = null, seenGA = null;
-  const T = { atcD: 0, atcK: 0, ai: 0, roster: 0, court: 0, meta: 0 };
+  const T = { atcD: 0, atcK: 0, ai: 0, aiN: 0, roster: 0, court: 0, meta: 0 };
   const dbg = { infs: [], acks: [], banks: [], barks: [], radioIn: [], crowns: [], ends: [], sentInf: [], hostDet: [],
-    ap: [], resumed: [], adopted: [], resent: [], hits: [], hitsIn: [], scandals: [] };
+    ap: [], apToasts: [], reconnects: [], aiTx: {}, resumed: [], adopted: [], resent: [], hits: [], hitsIn: [], scandals: [] };
   // O4 state. apHeld (host): peers whose plane our autopilot flies. heldPeers (follower): ditto, as the host announced.
   const apHeld = new Map(), heldPeers = new Set(), unacked = new Map(), rams = new Map();
   let hostLed = null, hostDetRep = null, meHeld = false, wantBack = false, heldSince = 0, lastUpd = 0, resendAt = 0, early = [];
@@ -269,7 +269,15 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
       push(dbg.resumed, { x: Math.round(st.pos.x), z: Math.round(st.pos.z), t: Math.round(net.roomTime()) });
     }
     meHeld = false;
+    setAp(false);
     net.toHost({ t: 'apAck' });
+  }
+  // The pill (net.status() / linkSummary().autopilot) and a toast follow the host's autopilot holding our plane.
+  function setAp(on) {
+    if (on === !!net.autopilot) return;
+    safe(() => net.setAutopilot?.(on));
+    if (attached) safe(() => hud?.flash?.(on ? 'CONNECTION HICCUP · THE TOWER AUTOPILOT HAS YOUR PLANE' : 'YOU HAVE CONTROL AGAIN', on ? 'info' : 'good', on ? 3 : 2));
+    push(dbg.apToasts, { on, t: Math.round(net.roomTime()) });
   }
   // Only a running game loop asks for the plane back: a hidden page that merely receives messages must not.
   function iAmAway(now) { if (meHeld) return; meHeld = true; heldSince = now; wantBack = true; }
@@ -438,7 +446,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
   function myHi() {
     const p = safe(() => ui?.getProfile?.(), {}) || {};
     const livery = safe(() => (ui?.getLivery ? ui.getLivery() : p), p);
-    return { t: 'hi', type: P?.ac.type || 'c172', livery, name: p.name, title: p.title, g: p.gender, voice: p.voice };
+    return { t: 'hi', type: P?.ac.type || 'c172', livery, name: p.name, title: p.title, g: p.gender, voice: p.voice, sv: !!net.saver };
   }
   function sayHi(to) { if (!P) return; const h = myHi(); if (to) net.send(to, h); else net.broadcast(h); }
 
@@ -598,7 +606,8 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     if (net.isHost && role !== 'host' && net.room) setRole('host');
     const fromHost = from === net.hostId;
     switch (m.t) {
-      case 'hi': if (m.livery && typeof m.livery === 'object') ensureHuman(from, m); if (!hiSent.has(from)) { hiSent.add(from); sayHi(from); } break;
+      case 'sv': if (m.on) savers.add(from); else savers.delete(from); break;
+      case 'hi': if ('sv' in m) { if (m.sv) savers.add(from); else savers.delete(from); } if (m.livery && typeof m.livery === 'object') ensureHuman(from, m); if (!hiSent.has(from)) { hiSent.add(from); sayHi(from); } break;
       case 'inf': if (role === 'host') onInf(from, m); break;
       case 'bank': if (role === 'host') onBank(from, m); break;
       case 'bark': if (role === 'host') onBark(from, m); break;
@@ -615,7 +624,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
         else if (m.t === 'ai') { const ids = new Set(m.list.map((a) => a.id)); for (const a of m.list) ensureAI(a); for (const id of [...ais.keys()]) if (!ids.has(id)) dropAI(id); }
         else if (m.t === 'court') { safe(() => court?.restore(m.s)); if (m.end !== undefined) roundEnd = m.end; if (m.led) hostLed = m.led; if (m.hd) hostDetRep = m.hd; syncRank(); }
         else if (m.t === 'ap') {
-          if (m.id === myCanon()) { if (m.on) iAmAway(lastUpd || performance.now()); else meHeld = false; }
+          if (m.id === myCanon()) { if (m.on) iAmAway(lastUpd || performance.now()); else meHeld = false; setAp(!!m.on); }
           else if (typeof m.id === 'string' && m.id.startsWith('p:')) { const id = m.id.slice(2); net.hold(id, !!m.on); if (m.on) heldPeers.add(id); else heldPeers.delete(id); }
         }
         else if (m.t === 'apBack') onApBack(m);
@@ -690,13 +699,32 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     }
   }
 
+  // AI states per follower (§3): 10 Hz within 3 km of its plane, 2 Hz beyond; data saver halves that (5 Hz, far 1 Hz).
+  // Planes the host's autopilot holds for a player always go at the near rate.
+  function sendTraffic(rt, n) {
+    const ai = (attract?.ai || []).filter((e) => e.ac).slice(0, 60).map((e) => ({ id: wiring.idOf(e), pos: e.ac.pos, bytes: e.ac.packState({ roomTimeMs: rt, hull: 100, overriding: false }) }));
+    const held = [];
+    for (const id of apHeld.keys()) { const ac = humans.get(id)?.ac; if (ac) held.push({ id: `p:${id}`, bytes: ac.packState({ roomTimeMs: rt, hull: 100, overriding: false }) }); }
+    if (!ai.length && !held.length) return;
+    for (const o of others()) {
+      const sv = savers.has(o.id);
+      if (sv && n % 2) continue;
+      const farDue = n % (sv ? 10 : 5) === 0;
+      const at = apHeld.has(o.id) ? humans.get(o.id)?.ac?.pos : net.track(o.id)?.latest()?.pos;
+      const list = at && !farDue ? ai.filter((a) => Math.hypot(a.pos.x - at.x, a.pos.z - at.z) < AI_NEAR_M) : ai.slice();
+      if (held.length) list.push(...held.filter((h) => h.id !== `p:${o.id}`));
+      if (!list.length) continue;
+      net.net.sendTo(o.id, 'u', packTraffic(list));
+      const c = (dbg.aiTx[`p:${o.id}`] ||= { pk: 0, planes: 0, sv });
+      c.pk++; c.planes += list.length; c.sv = sv;
+    }
+  }
+
   function hostTick(now, rt) {
     hostDetect(rt);
     if (now - T.ai >= AI_MS) {
       T.ai = now;
-      const list = (attract?.ai || []).filter((e) => e.ac).slice(0, 60).map((e) => ({ id: wiring.idOf(e), bytes: e.ac.packState({ roomTimeMs: rt, hull: 100, overriding: false }) }));
-      for (const id of apHeld.keys()) { const ac = humans.get(id)?.ac; if (ac) list.push({ id: `p:${id}`, bytes: ac.packState({ roomTimeMs: rt, hull: 100, overriding: false }) }); }
-      if (list.length) { const b = packTraffic(list); for (const o of others()) net.net.sendTo(o.id, 'u', b); }
+      sendTraffic(rt, ++T.aiN);
     }
     if (now - T.roster >= ROSTER_MS) {
       T.roster = now;
@@ -771,7 +799,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     if (attached) detach();
     attached = true; gen++; P = player; role = null; ended = false; myRank = -1; firstRestore = true;
     hostAtc = null; sentAtc = null; forceKey = true; courtDirty = true; floorFree = 0;
-    hiSent.clear(); ledger.clear(); voices.clear(); hostDet.clear(); scolded.clear();
+    hiSent.clear(); ledger.clear(); voices.clear(); hostDet.clear(); scolded.clear(); savers.clear();
     apHeld.clear(); heldPeers.clear(); unacked.clear(); rams.clear(); early = [];
     hostLed = hostDetRep = null; meHeld = wantBack = false; lastUpd = 0; resendAt = 0; seqN = Date.now() % 1e9;
     const set = normalise(net.room?.set || {});
@@ -787,6 +815,13 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
       // Removed from the room (idle in a public room, kicked, or the reconnect ran out): back to the lobby.
       net.on('kicked', (m) => { if (attached) safe(() => hud?.flash?.(String(m.msg || 'Removed from the room').toUpperCase(), 'warn', 3)); }),
       net.on('left', () => { if (attached) setTimeout(() => { if (attached && !net.room) onExit?.(); }, 1500); }),
+      net.on('saver', (on) => { if (attached) net.broadcast({ t: 'sv', on }); }),
+      net.on('reconnecting', (on) => {
+        if (!attached) return;
+        push(dbg.reconnects, { on, t: Math.round(performance.now()) });
+        if (on) safe(() => hud?.flash?.('RECONNECTING TO THE ROOM…', 'warn', 2.5));
+        else if (net.room) safe(() => hud?.flash?.('BACK IN THE ROOM', 'good', 1.5));
+      }),
       net.on('host', (h) => {
         if (!attached) return;
         setRole(h.me ? 'host' : 'follower');
@@ -847,6 +882,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     if (impactPatch) { delete impactPatch.ac._impact; impactPatch = null; }
     for (const id of heldPeers) net.hold?.(id, false);
     heldPeers.clear(); apHeld.clear(); unacked.clear();
+    safe(() => net.setAutopilot?.(false));
     for (const id of [...humans.keys()]) { const r = humans.get(id); if (r.ac) traffic.releaseStand(r.ac); removeRec(r); humans.delete(id); }
     for (const id of [...ais.keys()]) dropAI(id);
     patchAttract(false);

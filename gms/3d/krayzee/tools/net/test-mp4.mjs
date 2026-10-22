@@ -201,6 +201,9 @@ async function run(mode) {
     const [cme, ch] = [await C.ev(me), await A.ev(seen(c))];
     const released = await A.until(`!__krzNet.session.state().held.includes('p:${c}')`, 4000) && await D.until(`!__krzNet.session.state().heldPeers.includes('p:${c}')`, 4000);
     ok(back && released && near(cme, ch) < 80, 'C wakes: control comes back where the autopilot left the plane; host and D release it', `resumed ${back}, released ${released}, C vs host ${near(cme, ch).toFixed(0)} m`);
+    const toasts = JSON.parse(await C.ev('JSON.stringify(__krzNet.session.state().apToasts)'));
+    const apNow = await C.ev('JSON.stringify([__krzNet.net.autopilot, __krzNet.net.status(), !!__krzNet.net.linkSummary()?.autopilot])');
+    ok(toasts.some((t) => t.on) && toasts[toasts.length - 1]?.on === false && /^\[false,"(direct|mixed|relay)",false\]$/.test(apNow), "C is told: autopilot toast + net.status() 'autopilot' while held, cleared on hand-back", `${JSON.stringify(toasts)} now ${apNow}`);
     await A.shot(`mp4-away-${mode}.png`);
 
     // Reports across the migration. inf1: the host takes it but C never sees the ack. inf2: the host never sees it.
@@ -291,7 +294,7 @@ try {
   bad += (await run('real')).fails.length;
   if (!process.argv.includes('--real')) {
     const f = await run('falsify');
-    const must = ['network change on D', 'a Rubber pvp bump bounces both', "C's page frozen: the host's autopilot flies", 'new host keeps every clearance', 'no duplicate scoring'];
+    const must = ['network change on D', 'a Rubber pvp bump bounces both', "C's page frozen: the host's autopilot flies", 'C is told: autopilot toast', 'new host keeps every clearance', 'no duplicate scoring'];
     const still = ["C's unacknowledged report survives", 'A closes on final'];
     for (const m of must) {
       const caught = f.fails.some((x) => x.startsWith(m));

@@ -12,7 +12,9 @@ const short = (n) => (n >= 10000 ? `${Math.round(n / 1000)}k` : n >= 1000 ? `${(
 const store = { get() { try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; } }, set(v) { try { localStorage.setItem(KEY, v ? '1' : '0'); } catch (e) { /* */ } } };
 
 export function linkQuality(link, connected = true) {
-  if (!connected) return { kind: 'off', label: 'OFFLINE', bars: 0, text: 'Reconnecting…' };
+  if (link?.autopilot) return { kind: 'ap', label: 'AUTOPILOT', bars: 1, text: 'The tower autopilot has your plane' };
+  if (link?.reconnecting || (!connected && link)) return { kind: 'recon', label: 'RECONNECTING', bars: 0, text: 'Reconnecting to the room…' };
+  if (!connected) return { kind: 'off', label: 'OFFLINE', bars: 0, text: 'Offline' };
   if (!link) return null;
   if (link.alone) return { kind: 'solo', label: 'SOLO', bars: 4, text: 'Waiting for other royals' };
   const rtt = link.rtt || 0, bars = rtt < 90 ? 4 : rtt < 160 ? 3 : rtt < 260 ? 2 : 1;

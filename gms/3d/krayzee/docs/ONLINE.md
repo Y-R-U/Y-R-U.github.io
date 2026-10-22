@@ -1,13 +1,15 @@
 # Krayzee online rooms: architecture (lane ONLINE, 2026-10-21)
 
-Status (2026-10-22, lane NET): **O1–O4 done, local only**. Nothing is deployed. `js/main.js` carries the §15 wiring
-(O4 needed no new wiring; `tools/net/gen-main.mjs` skips patches already applied). O4 = §17.
+Status (2026-10-22, lane NET): **O1–O5 done, local only** (LAN mode deferred, D5). Nothing is deployed. `js/main.js`
+carries the §15 wiring (O4 and O5 needed none; `tools/net/gen-main.mjs` skips patches already applied, by marker). O4 = §17,
+O5 = §18.
 `server/` is the real `krayzeenet` (snakenet fork + RAGDOJO ID tokens + the Krayzee rules); `js/net/` is the browser
 client (links, clock, plane stream, lobby, `session.js` = the net game, `podium.js`). Tests: `go test ./...` (13 tests),
 `server/test.mjs` (39 protocol checks over real sockets, incl. a server restart), `tools/net/test-interp.mjs` (10),
 `tools/net/test-mp.mjs` (sandbox: two Chrome windows, direct + relay + falsification, 23 checks each; game: two real game
-pages, 33 checks + a falsification run), `tools/net/test-mp4.mjs` (O4: four real game pages, 26 checks + a falsification
-run that breaks five mechanisms). How to run: §16. GAMEPLAY wiring: §15. O4 details: §17.
+pages, 35 checks + a falsification run; O5: 29 checks incl. podium layout at 4 sizes + a falsification), `tools/net/test-mp4.mjs`
+(O4: four real game pages, 27 checks + a falsification run that breaks five mechanisms). How to run: §16. GAMEPLAY wiring:
+§15. O4 details: §17. O5: §18.
 
 Prior art this copies:
 - `gms/pwa/snake/MULTIPLAYER.md`: browser-hosted rooms, WebRTC full mesh, relay fallback, reconnect grace, host handoff
@@ -354,7 +356,7 @@ host, ranked rooms a Duke+ host (both on trust). Codes skip 0/O/1/I/L.
 | O2 ✅ | `js/net/`: links (Snake port: chunking, reconnect, relay fallback), room clock, plane stream + interpolation buffer, options from modes.js, lobby screen; two-window CDP test | done 2026-10-22 |
 | O3 ✅ | `js/net/session.js`: remote human rigs (type + livery) as remote Traffic entries (ATC, markers, collisions), own state at 15 Hz, host AI snapshots (10 Hz binary `TRAFFIC` + 1 Hz roster), ATC keyframe 1 Hz + delta 5 Hz, follower replica with own-plane detection → `inf`, authority-only crimes → `hinf`, `bank` validation, Court + crown, radio floor (`schedule(at, clips)`), account token, podium → `career.addOnlineWin`; two-real-page CDP test | done 2026-10-22 (main.js wiring left to GAMEPLAY, §15) |
 | O4 ✅ | host migration from the replica (AI adopted, ATC + ledger + Court kept, unacked reports resent and de-duplicated), host autopilot for silent players with hand-back, ICE restart, idle removal (5 min, public), pvp `hit` with room protection + Realistic ramming Scandal, `tools/net/test-mp4.mjs` 4-page gate with falsification | done 2026-10-22 (§17) |
-| O5 | polish: quick join, public list meta, data saver, ping bars, kick-vote UI, LAN mode (as RAGDOJO) if wanted | 1 session |
+| O5 ✅ | polish: podium layout, quick join, public list meta, data saver, kick-vote sheet, Reconnecting… / autopilot state for the HUD pill (ping bars: UI4's pill). LAN mode deferred (D5) | done 2026-10-22 (§18) |
 
 That is about 6 agent sessions, and online fits after P2 gameplay works in single player. The longest pole is O3,
 which depends on ATC being serialisable and clock-injected. Asking for that **now**, in P2, costs nothing.
@@ -397,11 +399,14 @@ lobby.show(true);                       // ?room=CODE in the URL joins straight 
 | `net.create({name, priv, set})` · `join(code \| {id})` · `quick()` · `list()` · `leave()` | membership |
 | `net.claim(voice)` · `setOptions(set)` · `setPhase('lobby'\|'flight'\|'podium')` · `ready(on)` · `kick(id)` · `vote(id)` · `meta(crownName, secondsLeft)` · `handoff(why)` | lobby / host |
 | getters | `id, room, members, me, isHost, hostId, phase, connected, voices, linkSummary()` |
+| `net.status()` | O5, one word for the HUD pill: `'off' \| 'reconnecting' \| 'autopilot' \| 'solo' \| 'relay' \| 'mixed' \| 'direct'` (null outside a room) |
+| `net.linkSummary()` | `{relayed, total, rtt}` or `{alone}`, plus (O5) `reconnecting`, `autopilot`, `saver` flags when true |
+| `net.reconnecting` · `net.autopilot` · `net.saver` · `setSaver(on)` | O5. `setAutopilot(on)` is session.js's (the host's autopilot holds our plane) |
 
 Events (`net.on(ev, fn)` returns an unsubscribe): `connected`, `rooms`, `joined(room)`, `room(room, prev)`, `host({host,
 prev, epoch, me})`, `phase(p, prev)`, `claim(m)`, `error(m)`, `kicked(m)`, `left({why})`, `peerLeft(id)`,
 `plane(peerId, state, track)`, `msg(from, obj)`, `link(peer, direct)`, `linkLost(peer)`, `reconnecting(bool)`, `auth(m)`,
-`disconnected`.
+`disconnected`; O5: `autopilot(bool)`, `saver(bool)`.
 
 Options: `js/net/options.js` (`defaultsFor(type)`, `normalise(set, hostRank)`, `fixedKeys`, `summary`) applies each
 room type's fixed values from `data/modes.js`; the host's game should read `net.room.set` through `normalise` too.
@@ -474,6 +479,14 @@ over (Court kept, own AI). Its falsification drops B's reports: "the cut-in by B
 still learns of it. `--trace` prints the cut-in approach every 3 s and skips the falsification run. Headless Chrome needs `--disable-features=WebRtcHideLocalIpsWithMdns` for two windows to connect
 directly (Snake's mpgate does the same).
 
+`node tools/net/test-mp.mjs --only=o5` (also part of the default run, first) is the O5 suite on sandbox pages: the podium at
+390×844, 844×390, 1280×800 and 667×300 (card on screen, button fully visible by hit-test and focused, SVG crown, serif
+heading, pop-in; the list scrolls at 667×300), Escape closes it once; falsified by removing the flex column (the 667×300
+button check must fail). Then quick join ×3 into one public court, the list's lobby meta line, the kick-vote sheet (Escape
+cancels; one vote shows "Voted 1/2" and "1 vote to remove you"; a second removes), the in-flight meta line with crown and a
+local countdown, the data-saver switch, and a socket drop (`net.status()` / `linkSummary().reconnecting` / the lobby pill say
+Reconnecting…, then clear). The game run also checks the saver halves the host's AI packets to B, and the in-game podium.
+
 `node tools/net/test-mp4.mjs` (O4) runs four real game pages on CDP 9561 with its own krayzeenet on 8740 (grace 30 s,
 idle removal off) and static server on 8741: ICE restart on D, a Rubber head-on bump C×D, C frozen with
 `Page.setWebLifecycleState` (host AP flies it; woken with focus emulation, control comes back where the AP left it),
@@ -542,3 +555,37 @@ with `kicked {code:'idle'}`. The session flashes the message and returns to the 
 
 **O5 (left):** quick join polish, public list meta, data saver, ping bars + the in-flight connection pill, kick-vote
 UI, LAN mode if wanted; a "Reconnecting…" pill and a toast when the host's autopilot has your plane.
+
+## 18. O5: polish (2026-10-22)
+
+- **Podium** (`podium.js`): the card is a flex column; heading and "Back to the lobby" stay fixed, the standings scroll
+  between them (compact under 460 px tall). Gold SVG crown (UI4's) on the crest and the winner's row, no ♛ glyph; heading in
+  Krayzee Serif italic (the module declares the font-face itself, so the sandbox gets it too); 0.34 s pop-in (none with
+  reduced motion); the button takes focus, Tab stays on it, Escape closes (= the button). A podium removed from the DOM by
+  someone else drops its key listener on the next key.
+- **Quick join**: the button shows "Finding a court…" until `joined` / `err` (8 s timeout message). Server behaviour unchanged
+  (busiest public room in your region with a seat, else a new public Court).
+- **Public list**: refreshes every 10 s while the lobby home is on screen; header shows "N online"; each room's meta line
+  is `roomMeta(r, age)` (exported): lobby "In the lobby · join now", flight with a holder "crown + Baroness Dirk · 4:12 left"
+  counted down locally between refreshes, "In flight · join mid-session", "Crowning the winner", and for closed rooms
+  "Full" / "Joust under way" / "Closed to you".
+- **Data saver**: a switch on the lobby home and room views (`krayzee.netSaver`; `?lite=1` / `?saver=1` force it on,
+  `?saver=0` off). The follower tells everyone (`hi.sv`, then `sv {on}` on change) so any future host knows. The host now
+  sends AI states **per follower**: 10 Hz for planes within 3 km of that follower's plane, 2 Hz beyond; saver halves it (5 Hz,
+  far 1 Hz). Planes the host's autopilot holds go at the near rate. `session.state().aiTx` counts packets per follower.
+- **Kick vote**: "Vote out" / "Remove" opens an in-lobby confirmation sheet (no browser dialog; Escape / backdrop / Cancel
+  close it) stating the majority needed and votes so far. After voting the button reads "Voted k/n" (disabled); the target
+  sees "k votes to remove you" on their own row. Server rules unchanged.
+- **Reconnecting / autopilot state** for the HUD pill, without new DOM: `net.status()`, `linkSummary().reconnecting /
+  .autopilot / .saver`, events `autopilot(on)`. The session flashes (via `hud.flash`) "RECONNECTING TO THE ROOM…" / "BACK IN
+  THE ROOM" on a socket drop, and "CONNECTION HICCUP · THE TOWER AUTOPILOT HAS YOUR PLANE" / "YOU HAVE CONTROL AGAIN" when
+  the host's autopilot takes and returns your plane (`session.state().apToasts`).
+- **main.js**: no new wiring. `ghud.online.sync(session, net)` (already in main.js) feeds UI4's pill from `net.linkSummary()`.
+
+**Ask for UI4 (`js/hud/online.js`, not this lane's file):** `linkQuality(link, connected)` shows "OFFLINE" whenever
+`connected` is false, but mid-room that is always a reconnect (the WebRTC game links keep running). Please read
+`link.reconnecting` → label "RECONNECTING" (amber, not red), and `link.autopilot` → label "AUTOPILOT" (the host is flying
+your plane); `net.status()` gives the same in one word.
+
+**Deferred:** LAN / home-wifi mode (D5).
+

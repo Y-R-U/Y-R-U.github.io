@@ -7,6 +7,13 @@ import { RANKS } from '../../data/ranks.js';
 const Q = new URLSearchParams(location.search);
 export const DEFAULT_SERVER = Q.get('net') || 'wss://games.br8t.com/gms/3d/krayzee/net';
 const STATE_MS = 1000 / 15;
+const SAVER_KEY = 'krayzee.netSaver';
+// Data saver (§3): ?lite=1, ?saver=1 or the lobby toggle (remembered). The host halves our AI rate, far planes 1 Hz.
+export function storedSaver() {
+  if (Q.get('lite') === '1' || Q.get('saver') === '1') return true;
+  if (Q.get('saver') === '0') return false;
+  try { return localStorage.getItem(SAVER_KEY) === '1'; } catch (e) { return false; }
+}
 
 // Profile (ui.getProfile()) → what the server needs. Favourites: profile.favourites (up to 3) else the saved voice.
 export function helloFromProfile(p = {}) {
@@ -31,7 +38,7 @@ export function createNet({ server = DEFAULT_SERVER, profile = () => ({}), getTo
   const net = new Net({ server, p2p, hello: () => helloFromProfile(profile()), token: getToken });
   const tracks = new Map();
   const held = new Set();   // peers whose plane the host's autopilot is flying: their own (stale) stream is ignored
-  let lastState = 0;
+  let lastState = 0, saver = storedSaver(), autopilot = false;
   const pushState = (peer, st) => {
     let tr = tracks.get(peer);
     if (!tr) tracks.set(peer, (tr = new RemoteTrack()));
@@ -43,7 +50,7 @@ export function createNet({ server = DEFAULT_SERVER, profile = () => ({}), getTo
     pushState(peer, unpackState(bytes.subarray(1, 33)));
   });
   net.on('peerLeft', (id) => { tracks.delete(id); held.delete(id); });
-  net.on('left', () => { tracks.clear(); held.clear(); });
+  net.on('left', () => { tracks.clear(); held.clear(); api.setAutopilot(false); });
 
   // A hidden tab hands the sky over at once (iOS freezes background tabs).
   const onVis = () => { if (document.visibilityState === 'hidden' && net.isHost) api.handoff('hidden'); };
@@ -82,7 +89,36 @@ export function createNet({ server = DEFAULT_SERVER, profile = () => ({}), getTo
     get connected() { return net.connected; },
     get voices() { return net.voices; },
     roomTime: () => net.roomTime(),
-    linkSummary: () => net.linkSummary(),
+    // HUD pill input (UI4 reads this + connected): adds reconnecting / autopilot / saver to the link picture.
+    linkSummary() {
+      const s = net.linkSummary();
+      if (!s) return s;
+      if (net.reconnect) s.reconnecting = true;
+      if (autopilot) s.autopilot = true;
+      if (saver) s.saver = true;
+      return s;
+    },
+    // One word for the pill: 'off' | 'reconnecting' | 'autopilot' | 'solo' | 'relay' | 'mixed' | 'direct' (null outside a room).
+    status() {
+      if (!net.room) return net.connected ? null : 'off';
+      if (net.reconnect) return 'reconnecting';
+      if (!net.connected) return 'off';
+      if (autopilot) return 'autopilot';
+      const s = net.linkSummary();
+      return s.alone ? 'solo' : !s.relayed ? 'direct' : s.relayed >= s.total ? 'relay' : 'mixed';
+    },
+    get reconnecting() { return !!net.reconnect; },
+    get autopilot() { return autopilot; },
+    // session.js: the host's autopilot has (or gave back) our plane. Emits 'autopilot'(on).
+    setAutopilot(on) { on = !!on; if (on === autopilot) return; autopilot = on; net._emit('autopilot', on); },
+    get saver() { return saver; },
+    setSaver(on) {
+      on = !!on;
+      try { localStorage.setItem(SAVER_KEY, on ? '1' : '0'); } catch (e) { /* */ }
+      if (on === saver) return;
+      saver = on;
+      net._emit('saver', on);
+    },
     link: (peer) => net.links.get(peer) || null,
 
     // lobby / membership (server)

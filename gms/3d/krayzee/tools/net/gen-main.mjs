@@ -7,7 +7,7 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const OUT = fileURLToPath(new URL('./gen/', import.meta.url));
 
 export const PATCHES = [
-  ['let net = null, lobby = null;', 'let net = null, lobby = null, session = null;'],
+  ['let net = null, lobby = null;', 'let net = null, lobby = null, session = null;', 'let net = null, lobby = null, session = null'],
   [
     `      const [{ createNet }, { createLobby }] = await Promise.all([import('./net/index.js'), import('./net/lobby.js')]);
       net = createNet({ profile: () => ui.getProfile(), getToken: null });
@@ -17,23 +17,27 @@ export const PATCHES = [
       session = createSession({ net, scene, traffic, wiring, attract, createPlane, applyEnv, env, career, ui, hud, fx, log,
         onExit: () => { quitPlay(); ui.showMenu(); lobby.show(true); } });
       lobby = createLobby({ net, profile: () => ui.getProfile(), onStart: async () => { lobby.show(false); ui.enterGameplay(); await onPlay('online'); if (S.player) session.attach(S.player); }, onClose: () => ui.showMenu() });`,
+    'session = createSession({ net,',
   ],
   [
     `  if (net) try { net.tick(performance.now(), { ready: gov.fps > 40, parked: !P || (P.ac.onGround && P.ac.gs < 1) }); } catch (e) { /* */ }`,
     `  if (net) try { net.tick(performance.now(), { ready: gov.fps > 40, parked: !P || (P.ac.onGround && P.ac.gs < 1) }); } catch (e) { /* */ }
   if (session) try { session.update(dt); } catch (e) { console.warn('[net]', e); }`,
+    'session.update(dt)',
   ],
   [`function quitPlay() {
   if (!S.player) return;`, `function quitPlay() {
   if (!S.player) return;
-  session?.detach();`],
-  ['function onQuit() { quitPlay();', 'function onQuit() { session?.detach({ leave: true }); quitPlay();'],
+  session?.detach();`, '  session?.detach();\n'],
+  ['function onQuit() { quitPlay();', 'function onQuit() { session?.detach({ leave: true }); quitPlay();', 'session?.detach({ leave: true })'],
+  // O5: none. The HUD pill already reads net.linkSummary()/net.connected via ghud.online.sync(session, net) in main.js.
 ];
 
 export function build() {
   let main = readFileSync(ROOT + 'js/main.js', 'utf8');
-  for (const [a, b] of PATCHES) {
-    if (main.includes(b)) continue;
+  // A patch is skipped when js/main.js already carries it (exactly, or by its marker: main.js may word it differently).
+  for (const [a, b, done] of PATCHES) {
+    if (main.includes(b) || (done && main.includes(done))) continue;
     if (!main.includes(a)) throw new Error(`gen-main: anchor not found in js/main.js:\n${a.slice(0, 160)}`);
     main = main.replace(a, b);
   }

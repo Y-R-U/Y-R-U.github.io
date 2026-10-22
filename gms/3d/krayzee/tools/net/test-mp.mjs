@@ -2,6 +2,8 @@
 //   node tools/net/test-mp.mjs                 sandbox runs (direct, relay, falsify) + the real-game run + its falsification
 //   node tools/net/test-mp.mjs --only=sandbox  tools/net/sandbox.html only (O2)
 //   node tools/net/test-mp.mjs --only=game     two real game pages (O3): tools/net/gen/ = js/main.js + the ONLINE §15 wiring
+//   node tools/net/test-mp.mjs --only=o5       O5 polish: podium layout (3 sizes + falsification), quick join, list meta,
+//                                              kick-vote sheet, data saver toggle, Reconnecting… state
 //   node tools/net/test-mp.mjs --keep          leave Chrome running
 // Serves the repo root itself on :8739. Screenshots: docs/shots/net/.
 import { spawn, execFileSync } from 'node:child_process';
@@ -207,6 +209,128 @@ async function phoneShots() {
   return wide || wide2 ? 1 : 0;
 }
 
+// ---------------------------------------------------------------- O5: podium layout, quick join, list meta, kick vote, saver, reconnect
+const PODIUM_SIZES = [[390, 844], [844, 390], [1280, 800], [667, 300]];   // 667×300: landscape SE with browser bars, the list must scroll
+async function podiumLayout(T, w, h, broken = false) {
+  await T.send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: w < 900 });
+  await sleep(200);
+  return T.ev(`(async () => {
+    document.querySelector('.kzp')?.remove(); document.getElementById('kzp-broken')?.remove();
+    const { showPodium } = await import('/gms/3d/krayzee/js/net/podium.js');
+    ${broken ? "{ const st = document.createElement('style'); st.id = 'kzp-broken'; st.textContent = '.kzp-card { display: block !important; overflow: auto !important; } .kzp ol { overflow: visible !important; }'; document.head.append(st); }" : ''}
+    const titles = ['King', 'Crown Prince', 'Prince', 'Archduke', 'Duke', 'Marquess', 'Earl', 'Baron'], names = ['Dirk', 'Mo', 'Alexandrina-Lou', 'Bea', 'Cy', 'Di', 'Ed', 'Flo'];
+    const standings = titles.map((t, i) => ({ id: 'p:' + i, title: t, name: names[i], roomPP: 9000 - i * 1100, crown: i === 0, you: i === 2 }));
+    window.__podClosed = 0;
+    const p = showPodium({ standings, winner: 'p:0', counted: true, onClose: () => { window.__podClosed++; } });
+    await new Promise((r) => setTimeout(r, 450));
+    await document.fonts.ready;
+    const btn = p.el.querySelector('button'), card = p.el.querySelector('.kzp-card'), ol = p.el.querySelector('ol');
+    const b = btn.getBoundingClientRect(), c = card.getBoundingClientRect();
+    const at = (x, y) => document.elementFromPoint(x, y);
+    return {
+      btnVisible: b.top >= 0 && b.bottom <= innerHeight && at(b.x + b.width / 2, b.y + b.height / 2) === btn && at(b.x + b.width / 2, b.bottom - 3) === btn,
+      cardIn: c.top >= -0.5 && c.bottom <= innerHeight + 0.5 && c.left >= -0.5 && c.right <= innerWidth + 0.5,
+      noHScroll: document.documentElement.scrollWidth <= innerWidth,
+      focused: document.activeElement === btn,
+      crown: !!p.el.querySelector('li.crown .kzp-place svg') && !!p.el.querySelector('.kzp-crest svg') && !p.el.textContent.includes('\u265B'),
+      serif: /Krayzee Serif/.test(getComputedStyle(p.el.querySelector('h2')).fontFamily) && [...document.fonts].some((f) => f.family.replace(/"/g, '') === 'Krayzee Serif' && f.style === 'italic' && f.status === 'loaded'),
+      rows: ol.children.length, olScrolls: ol.scrollHeight > ol.clientHeight + 1, olH: Math.round(ol.clientHeight),
+      anim: getComputedStyle(card).animationName,
+    };
+  })()`);
+}
+
+async function runO5() {
+  const fails = [], passes = [];
+  const ok = (cond, label, extra = '') => { (cond ? passes : fails).push(label + (cond || !extra ? '' : ` — ${extra}`)); console.log(`${cond ? 'ok  ' : 'FAIL'} [o5] ${label}${cond || !extra ? '' : ` — ${extra}`}`); };
+  const T = [];
+  try {
+    // Podium: heading + button fixed, standings scroll between them; gold SVG crown; serif heading; pop-in; focus; Escape.
+    const P = await tab(); T.push(P);
+    await P.go(`net=${encodeURIComponent(NETURL)}&name=Pod&uid=pod-o5`);
+    await P.until('window.__sb?.net.connected');
+    for (const [w, h] of PODIUM_SIZES) {
+      const r = await podiumLayout(P, w, h);
+      ok(r.btnVisible && r.cardIn && r.noHScroll, `podium ${w}×${h}: card on screen, "Back to the lobby" fully visible`, JSON.stringify(r));
+      ok(r.focused && r.crown && r.serif && r.rows === 8 && r.anim === 'kzp-pop', `podium ${w}×${h}: button focused, SVG crown, serif heading, pop-in`, JSON.stringify(r));
+      if (h === 300) ok(r.olScrolls && r.olH >= 44, 'podium 667×300: the standings scroll inside the card, between heading and button', JSON.stringify(r));
+      await P.shot(`podium-${w}x${h}.png`);
+    }
+    await P.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+    await P.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+    ok(await P.until('!document.querySelector(".kzp") && window.__podClosed === 1', 2000), 'Escape closes the podium (once) and returns to the lobby');
+    const broken = await podiumLayout(P, 667, 300, true);
+    const caught = !broken.btnVisible;
+    console.log(`${caught ? 'ok  ' : 'FAIL'} [o5] falsify: with the flex column removed, the 667×300 button check fails`, caught ? '' : JSON.stringify(broken));
+    if (!caught) fails.push('falsify: podium layout');
+    await P.ev('document.querySelector(".kzp")?.remove(); document.getElementById("kzp-broken")?.remove(); true');
+
+    // Quick join: the first creates a public court, the next ones join it.
+    const Q = []; for (const [n, g] of [['Dirk', 'm'], ['Mo', 'f'], ['Cy', 'm'], ['Flo', 'f']]) { const t = await tab(); T.push(t); Q.push(t); await t.go(`net=${encodeURIComponent(NETURL)}&name=${n}&g=${g}&rank=baron&uid=${n.toLowerCase()}-o5`); }
+    const [A, B, C, D] = Q;
+    ok((await Promise.all(Q.map((t) => t.until('window.__sb?.net.connected')))).every(Boolean), 'four lobby tabs reach the room server');
+    await A.tap('[data-a="quick"]');
+    ok(await A.until('__sb.net.room && document.querySelector(".kzn").dataset.view === "room"'), 'quick join with no public room: a new public court is created');
+    const ra = await A.ev('JSON.stringify({ id: __sb.net.room.id, priv: __sb.net.room.priv, name: __sb.net.room.name, host: __sb.net.isHost })');
+    const room = JSON.parse(ra);
+    ok(!room.priv && room.host && /Court #\d+/.test(room.name), 'the new court is public and hosted by its creator', ra);
+    await B.tap('[data-a="refresh"]');
+    ok(await B.until(`[...document.querySelectorAll('.kzn-room')].some((b) => b.dataset.room === ${JSON.stringify(room.id)} && /In the lobby/.test(b.querySelector('.kzn-room-meta').textContent))`, 4000), 'public list shows the court with a lobby meta line');
+    await B.tap('[data-a="quick"]');
+    ok(await B.until(`__sb.net.room?.id === ${JSON.stringify(room.id)}`) && await A.until('__sb.net.room.members.length === 2'), 'second quick join lands in the same court');
+    await C.tap('[data-a="quick"]');
+    ok(await C.until(`__sb.net.room?.id === ${JSON.stringify(room.id)}`) && await A.until('__sb.net.room.members.length === 3'), 'third quick join too (busiest court first)');
+
+    // Kick vote: a sheet (Escape cancels), then a majority of the others removes.
+    const cId = await C.ev('__sb.net.id');
+    await B.until(`!!document.querySelector('[data-kick="${cId}"]')`);
+    await B.tap(`[data-kick="${cId}"]`);
+    ok(await B.until('!!document.querySelector(".kzn-sheet") && /Vote to remove Cy/.test(document.querySelector(".kzn-sheet h2").textContent) && /2 votes, 0 so far/.test(document.querySelector(".kzn-sheet p").textContent)'), 'Vote out opens a confirmation sheet with the majority needed');
+    await B.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+    await sleep(300);
+    ok(await B.ev(`!document.querySelector(".kzn-sheet") && !(__sb.net.room.members.find((m) => m.id === "${cId}").kv)`), 'Escape cancels the sheet without voting');
+    await B.tap(`[data-kick="${cId}"]`); await B.shot('o5-kick-sheet.png'); await B.tap('.kzn-sheet [data-k="yes"]');
+    ok(await C.until(`__sb.net.room?.members.find((m) => m.id === "${cId}")?.kv === 1 && /1 vote to remove you/.test(document.querySelector('.kzn-players li.me').textContent)`, 4000), 'the vote counts: the target sees "1 vote to remove you"');
+    ok(await B.until(`(() => { const b = document.querySelector('[data-kick="${cId}"]'); return b && b.disabled && b.textContent.includes('Voted 1/2'); })()`), "the voter's button shows Voted 1/2");
+    await A.tap(`[data-kick="${cId}"]`); await A.tap('.kzn-sheet [data-k="yes"]');
+    ok(await C.until('!__sb.net.room && document.querySelector(".kzn").dataset.view === "home"', 4000) && await A.until('__sb.net.room.members.length === 2'), 'a majority of the others votes Cy out');
+
+    // In flight, the host's meta line reaches the public list with the crown and a counting clock.
+    await A.tap('[data-a="start"]');
+    await A.until('__sb.flying');
+    await A.ev('__sb.net.meta("Baroness Dirk", 252); true');
+    await sleep(300);
+    await D.tap('[data-a="refresh"]');
+    const metaSel = `[...document.querySelectorAll('.kzn-room')].find((b) => b.dataset.room === ${JSON.stringify(room.id)})?.querySelector('.kzn-room-meta')`;
+    ok(await D.until(`(() => { const m = ${metaSel}; return m && m.querySelector('svg') && /^Baroness Dirk · 4:1[0-9] left$/.test(m.textContent); })()`, 4000), 'public list meta line: crown + "Baroness Dirk · 4:1x left"', await D.ev(`${metaSel}?.textContent || 'none'`));
+    const t0 = await D.ev(`${metaSel}.textContent`);
+    await sleep(2300);
+    const t1 = await D.ev(`${metaSel}.textContent`);
+    ok(t0 !== t1, 'the list clock counts down between refreshes', `${t0} → ${t1}`);
+    await D.shot('o5-list-meta.png');
+
+    // Data saver toggle: remembered, readable by the game.
+    await D.tap('[data-a="saver"]');
+    ok(await D.ev('__sb.net.saver === true && localStorage.getItem("krayzee.netSaver") === "1" && document.querySelector("[data-a=saver]").getAttribute("aria-checked") === "true"'), 'data saver switch: on, remembered, net.saver true');
+    await D.tap('[data-a="saver"]');
+    ok(await D.ev('__sb.net.saver === false && localStorage.getItem("krayzee.netSaver") === "0"'), 'data saver switch: off again');
+
+    // Reconnecting state: the socket drops mid-room, the pill and net.status() say so, then recover.
+    await B.ev(`window.__rc = []; __sb.net.on('reconnecting', (on) => __rc.push([on, __sb.net.status(), !!__sb.net.linkSummary()?.reconnecting, document.querySelector('[data-s=conn]').textContent])); __sb.net.net._dropSocket(); true`);
+    ok(await B.until('__rc.length >= 2', 5000), 'socket drop → reconnecting → back', await B.ev('JSON.stringify(__rc)'));
+    const rc = JSON.parse(await B.ev('JSON.stringify(__rc)'));
+    ok(rc[0]?.[0] === true && rc[0][1] === 'reconnecting' && rc[0][2] && rc[0][3] === 'Reconnecting…' && rc[1]?.[0] === false, 'Reconnecting… state: net.status(), linkSummary().reconnecting and the lobby pill', JSON.stringify(rc));
+    ok(await B.until('__sb.net.connected && /direct|relay|mixed/.test(__sb.net.status()) && !__sb.net.linkSummary().reconnecting', 4000), 'status clears once the seat is back', await B.ev('__sb.net.status()'));
+    const errs = T.flatMap((t) => t.errors);
+    ok(!errs.length, 'no page errors', errs.join(' | '));
+  } catch (e) {
+    ok(false, 'o5 run threw', e.stack || e.message);
+  } finally {
+    for (const t of T) await t.close();
+  }
+  return { fails, passes };
+}
+
 // ---------------------------------------------------------------- O3: two real game pages
 const GAME = `${WEB}/gms/3d/krayzee/tools/net/gen/index.html`;
 const profileFor = (name, g, voice, reg, primary) => JSON.stringify({ name, gender: g, company: `${name} Air`, primary, secondary: '#f4efe6', accent: '#d4a017', voice, registration: reg, favourites: [voice] });
@@ -274,6 +398,14 @@ async function runGame(mode) {
     const match = hostAI.filter((h) => { const r = bAI.find((x) => x.id === h.id && x.entered); return r && near(r, h) < 60; }).length;
     ok(hostAI.length > 0 && match >= Math.max(1, hostAI.length - 1), "B's AI copies match the host's AI (id + position)", `${match}/${hostAI.length}`);
     ok(await B.ev('__game.traffic.list.filter((e) => !e.player && !e.remote).length === 0'), 'B runs no local AI (host-authoritative traffic)');
+    // Data saver (O5): B turns it on, the host halves B's AI rate.
+    const tx = async () => JSON.parse(await A.ev(`JSON.stringify(__krzNet.session.state().aiTx['p:${bId}'] || { pk: 0 })`));
+    const x0 = await tx(); await sleep(3000); const x1 = await tx();
+    await B.ev('__krzNet.net.setSaver(true); true'); await sleep(600);
+    const x2 = await tx(); await sleep(3000); const x3 = await tx();
+    await B.ev('__krzNet.net.setSaver(false); true');
+    const r0 = (x1.pk - x0.pk) / 3, r1 = (x3.pk - x2.pk) / 3;
+    ok(x3.sv === true && r0 > 6 && r1 > 2 && r1 < r0 * 0.62, 'data saver: the host halves its AI updates to B', `${r0.toFixed(1)} → ${r1.toFixed(1)} packets/s, sv ${x3.sv}`);
     ok(await A.until(`!!__game.wiring.atc.strip('p:${bId}')`, 5000) && await B.until(`!!__game.wiring.atc.strip('p:${aId}')`, 5000), 'host ATC tracks B; B\'s ATC replica (restored from the host) tracks A');
 
     // Cut-in: A on a 2.1 km final, B joins inside it from the side (atc-sim's flight cut-in geometry). The host's AI
@@ -323,6 +455,7 @@ async function runGame(mode) {
     const winsB = await B.ev('__game.wiring.game.career?.onlineWins ?? -1');
     await A.ev('__krzNet.session.endRound(); true');
     ok(await A.until('!!document.querySelector(".kzp")', 4000) && await B.until('!!document.querySelector(".kzp")', 4000), 'end of round shows the podium on both pages');
+    ok(await B.until('(() => { const b = document.querySelector(".kzp button"); const r = b?.getBoundingClientRect(); return b && document.activeElement === b && r.bottom <= innerHeight && document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2) === b; })()', 2000), 'in-game podium: "Back to the lobby" visible and focused');
     ok(await B.until(`(__game.wiring.game.career?.onlineWins ?? -1) === ${winsB + 1}`, 3000), 'B\'s career gets the online win (2 humans: counted, D2)', `${winsB} → ${await B.ev('__game.wiring.game.career?.onlineWins')}`);
     await A.shot('game-podium-a.png'); await B.shot('game-podium-b.png');
     await B.ev('document.querySelector(".kzp")?.remove(); true');
@@ -347,7 +480,8 @@ async function runGame(mode) {
 
 let bad = 0;
 try {
-  if (ONLY !== 'game') {
+  if (!ONLY || ONLY === 'o5') bad += (await runO5()).fails.length;
+  if (ONLY !== 'game' && ONLY !== 'o5') {
     bad += await phoneShots();
     for (const mode of ['direct', 'relay']) bad += (await run(mode)).fails.length;
     // Falsification: A sends a frozen plane. The movement check must fail, or it was never measuring anything.
@@ -356,7 +490,7 @@ try {
     console.log(`${caught ? 'ok  ' : 'FAIL'} falsify: a frozen plane fails "B sees A's plane move"`);
     if (!caught) bad++;
   }
-  if (ONLY !== 'sandbox') {
+  if (ONLY !== 'sandbox' && ONLY !== 'o5') {
     buildGame();
     bad += (await runGame('real')).fails.length;
     if (process.argv.includes('--trace')) throw new Error('trace run: falsification skipped');

@@ -18,6 +18,7 @@ const CSS = `/* parked AIRCRAFT chips: locked types (padlock, dimmed; the requir
 .krz-net[data-q="relay"], .krz-net[data-q="mixed"] { color: var(--krz-wait); }
 .krz-net[data-q="solo"] { color: var(--krz-dim); }
 .krz-net[data-q="off"] { color: var(--krz-bad); border-color: rgba(255,107,107,.55); animation: krz-hint 1.2s steps(2) infinite; }
+.krz-net[data-q="recon"], .krz-net[data-q="ap"] { color: var(--krz-wait); border-color: rgba(255,190,90,.55); animation: krz-hint 1.2s steps(2) infinite; }
 .krz-net.open { letter-spacing: .02em; font-size: 9.5px; }
 .krz-net-bars { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 10px; }
 .krz-net-bars b { width: 2.5px; border-radius: 1px; background: rgba(246,241,228,.22); }

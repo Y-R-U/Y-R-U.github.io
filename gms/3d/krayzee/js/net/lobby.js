@@ -9,6 +9,19 @@ import { helloFromProfile } from './index.js';
 const DIGITS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
 export const spokenCall = (n) => `${DIGITS[Math.floor(n / 10)]}-${DIGITS[n % 10]}`;
 const voiceName = (id) => VOICES.find((v) => v.id === id)?.name || id;
+const CROWN = '<svg viewBox="0 0 64 44" aria-hidden="true"><path d="M6 38 L2 10 L18 22 L32 4 L46 22 L62 10 L58 38 Z" fill="currentColor"/><circle cx="2" cy="10" r="3" fill="currentColor"/><circle cx="32" cy="4" r="3.4" fill="currentColor"/><circle cx="62" cy="10" r="3" fill="currentColor"/></svg>';
+const clock = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const LIST_MS = 10000, QUICK_MS = 8000;
+
+// Public list meta line (§7): "Baroness Dirk · 4:12 left" behind a crown, counted down from when the list arrived.
+export function roomMeta(r, ageS = 0) {
+  if (!r.open) return { text: r.phase === 'flight' && r.set?.type === 'joust' ? 'Joust under way' : r.n >= r.max ? 'Full' : 'Closed to you', crown: false };
+  const left = r.meta?.left ? Math.max(0, r.meta.left - ageS) : 0;
+  if (r.phase === 'flight' && r.meta?.crown) return { text: `${r.meta.crown}${left ? ` · ${clock(left)} left` : ''}`, crown: true };
+  if (r.phase === 'flight') return { text: left ? `In flight · ${clock(left)} left` : 'In flight · join mid-session', crown: false };
+  if (r.phase === 'podium') return { text: 'Crowning the winner', crown: false };
+  return { text: 'In the lobby · join now', crown: false };
+}
 
 export function createLobby({ net, profile = () => ({}), onStart, onClose, parent = document.body } = {}) {
   injectCss();
@@ -26,7 +39,8 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
   const body = node.querySelector('.kzn-body');
   const msgEl = node.querySelector('.kzn-msg');
   const pill = node.querySelector('[data-s="conn"]');
-  let view = 'home', editing = null, rooms = [], started = false, msgTimer = 0;
+  let view = 'home', editing = null, rooms = [], roomsAt = 0, stats = null, started = false, msgTimer = 0, quickT = 0, sheet = null;
+  const myVotes = new Set();
   const offs = [];
 
   const say = (text, ms = 3200) => {
@@ -49,7 +63,7 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
   // ------------------------------------------------------------------ home
   function renderHome() {
     body.innerHTML = `<div class="kzn-col">
-      <button class="kz-btn primary" data-a="quick">Quick join <small>busiest court nearby</small></button>
+      <button class="kz-btn primary" data-a="quick" ${quickT ? 'aria-busy="true" disabled' : ''}>${quickT ? 'Finding a court…' : 'Quick join'} <small>${quickT ? 'one moment' : 'busiest court nearby, or a new one'}</small></button>
       <div class="kzn-row">
         <button class="kz-btn" data-a="create">${ICON.crown}Create a room</button>
       </div>
@@ -59,28 +73,48 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
           <button class="kz-btn" data-a="join">Join</button></div>
       </div>
       <div class="kzn-card">
-        <div class="kzn-lbl">Public rooms <button class="kzn-link" data-a="refresh">Refresh</button></div>
+        <div class="kzn-lbl"><div>Public rooms <small data-s="online"></small></div><button class="kzn-link" data-a="refresh">Refresh</button></div>
         <ul class="kzn-list" data-s="rooms"></ul>
       </div>
+      ${saverRow()}
     </div>`;
     const code = body.querySelector('#kzn-code');
     code.addEventListener('input', () => { code.value = code.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
     code.addEventListener('keydown', (e) => { if (e.key === 'Enter') joinCode(); });
     const joinCode = () => { const c = code.value.trim(); if (c.length !== 6) { code.classList.add('bad'); say('Room codes have 6 letters and numbers.'); return; } code.classList.remove('bad'); net.join(c); };
-    bind({ quick: () => net.quick(), create: () => { editing = normalise(defaultsFor('court'), myRank()); go('create'); }, join: joinCode, refresh: () => net.list() });
+    bind({ quick: quickJoin, create: () => { editing = normalise(defaultsFor('court'), myRank()); go('create'); }, join: joinCode, refresh: () => net.list() });
+    bindSaver();
     renderRooms();
+  }
+
+  function quickJoin() {
+    if (quickT) return;
+    net.quick();
+    quickT = setTimeout(() => { quickT = 0; if (view === 'home') { renderHome(); say('No answer from the room server. Try again.'); } }, QUICK_MS);
+    if (view === 'home') renderHome();
+  }
+  const quickDone = () => { if (!quickT) return; clearTimeout(quickT); quickT = 0; if (view === 'home') renderHome(); };
+
+  const saverRow = () => `<div class="kzn-card kzn-saver"><div class="kz-row"><span>Data saver<small>Fewer traffic updates for slow or metered connections</small></span>
+    <button class="kz-switch" role="switch" data-a="saver" aria-checked="${!!net.saver}" aria-label="Data saver"></button></div></div>`;
+  function bindSaver() {
+    const sw = body.querySelector('[data-a="saver"]');
+    if (!sw) return;
+    onTap(sw, () => { net.setSaver?.(!net.saver); sw.setAttribute('aria-checked', String(!!net.saver)); say(net.saver ? 'Data saver on: the host sends you fewer traffic updates.' : 'Data saver off.', 2400); }, 'tick');
   }
 
   function renderRooms() {
     const ul = body.querySelector('[data-s="rooms"]');
     if (!ul) return;
+    const on = body.querySelector('[data-s="online"]');
+    if (on) on.textContent = stats?.online ? `${stats.online} online` : '';
     if (!rooms.length) { ul.innerHTML = '<li class="kzn-empty">No public rooms right now. Create one, or Quick join to open one.</li>'; return; }
+    const age = (performance.now() - roomsAt) / 1000;
     ul.innerHTML = rooms.map((r) => {
-      const s = summary(r.set);
-      const meta = r.meta?.crown ? `♛ ${esc(r.meta.crown)}${r.meta.left ? `, ${Math.floor(r.meta.left / 60)}:${String(r.meta.left % 60).padStart(2, '0')} left` : ''}` : (r.phase === 'flight' ? 'In flight' : 'In the lobby');
+      const s = summary(r.set), m = roomMeta(r, age);
       return `<li><button class="kzn-room" data-room="${esc(r.id)}" ${r.open ? '' : 'disabled'}>
         <span class="kzn-room-name">${esc(r.name)}</span><span class="kzn-room-n">${r.n}/${r.max}</span>
-        <span class="kzn-room-sub">${esc(s.name)} · ${esc(s.parts.slice(0, 2).join(' · '))}</span><span class="kzn-room-meta">${meta}</span></button></li>`;
+        <span class="kzn-room-sub">${esc(s.name)} · ${esc(s.parts.slice(0, 2).join(' · '))}</span><span class="kzn-room-meta" data-phase="${esc(r.phase)}">${m.crown ? `<i class="kzn-mc">${CROWN}</i>` : ''}${esc(m.text)}</span></button></li>`;
     }).join('');
     ul.querySelectorAll('[data-room]').forEach((b) => onTap(b, () => net.join({ id: b.dataset.room })));
   }
@@ -152,12 +186,12 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
           <div class="kzn-lbl">Pilots <span>${r.members.length}/${r.max}</span></div>
           <ul class="kzn-players">${r.members.map((m) => {
             const isHost = m.id === r.host, isMe = m.id === net.id;
-            const canKick = !isMe && (r.priv ? r.owner === net.id : true);
+            const canKick = !isMe && (r.priv ? r.owner === net.id : true), voted = myVotes.has(m.id);
             return `<li data-id="${esc(m.id)}" class="${isMe ? 'me' : ''} ${m.away ? 'away' : ''}">
               <span class="kzn-crown" title="${isHost ? 'Host' : ''}">${isHost ? ICON.crown : ''}</span>
-              <span class="kzn-pl"><b><i>${esc(m.title || '')}</i> ${esc(m.name)}</b><small>${esc(voiceName(m.voice))} · ${esc(spokenCall(m.call))}${m.away ? ' · reconnecting' : ''}${isHost ? ' · host' : ''}</small></span>
+              <span class="kzn-pl"><b><i>${esc(m.title || '')}</i> ${esc(m.name)}</b><small>${esc(voiceName(m.voice))} · ${esc(spokenCall(m.call))}${m.away ? ' · reconnecting' : ''}${isHost ? ' · host' : ''}${isMe && m.kv ? ` · <em class="kzn-against">${m.kv} vote${m.kv > 1 ? 's' : ''} to remove you</em>` : ''}</small></span>
               <span class="kzn-rdy" data-s="rdy">${m.rdy ? 'READY' : ''}</span>
-              ${canKick ? `<button class="kzn-link kzn-kick" data-kick="${esc(m.id)}">${r.priv ? 'Remove' : `Vote out${m.kv ? ` ${m.kv}/${need}` : ''}`}</button>` : ''}
+              ${canKick ? `<button class="kzn-link kzn-kick" data-kick="${esc(m.id)}" ${voted ? 'disabled aria-pressed="true"' : ''}>${r.priv ? 'Remove' : voted ? `Voted ${m.kv || 1}/${need}` : `Vote out${m.kv ? ` ${m.kv}/${need}` : ''}`}</button>` : ''}
             </li>`;
           }).join('')}</ul>
         </div>
@@ -172,6 +206,7 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
           }).join('')}</div>
         </div>
       </div>
+      ${saverRow()}
       <div class="kzn-foot">
         <button class="kz-btn ghost" data-a="leave">Leave</button>
         ${host && !airborne ? '<button class="kz-btn" data-a="options">Options</button>' : ''}
@@ -181,7 +216,8 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
       </div>
     </div>`;
     body.querySelectorAll('[data-v]').forEach((b) => onTap(b, () => { if (!b.disabled && b.getAttribute('aria-pressed') !== 'true') net.claim(b.dataset.v); }, 'tick'));
-    body.querySelectorAll('[data-kick]').forEach((b) => onTap(b, () => { r.priv ? net.kick(b.dataset.kick) : net.vote(b.dataset.kick); say(r.priv ? 'Removed.' : 'Vote counted.'); }));
+    body.querySelectorAll('[data-kick]').forEach((b) => onTap(b, () => { if (!b.disabled) kickSheet(b.dataset.kick); }));
+    bindSaver();
     bind({
       leave: () => { net.leave(); go('home'); net.list(); },
       options: () => { editing = normalise(r.set, myRank()); go('create'); },
@@ -194,6 +230,36 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
       },
     });
   }
+
+  // Kick / vote-out confirmation (§8): an in-lobby sheet, never a browser dialog.
+  function kickSheet(id) {
+    const r = net.room, m = r?.members.find((x) => x.id === id);
+    if (!m) return;
+    closeSheet();
+    const need = Math.floor((r.members.length - 1) / 2) + 1, have = m.kv || 0;
+    const s = el(`<div class="kzn-sheet" role="dialog" aria-modal="true" aria-labelledby="kzn-sheet-h"><div class="kzn-sheet-card">
+      <h2 id="kzn-sheet-h"></h2><p></p>
+      <div class="kzn-foot"><button class="kz-btn ghost" data-k="no">Cancel</button><button class="kz-btn primary danger" data-k="yes"></button></div></div></div>`);
+    s.querySelector('h2').textContent = r.priv ? `Remove ${m.name}?` : `Vote to remove ${m.name}?`;
+    s.querySelector('p').textContent = r.priv ? 'They leave at once and cannot rejoin this room.'
+      : `A majority of the other royals must agree: ${need} vote${need > 1 ? 's' : ''}, ${have} so far. If it passes they cannot rejoin this room.`;
+    s.querySelector('[data-k="yes"]').textContent = r.priv ? 'Remove' : 'Vote to remove';
+    node.append(s);
+    const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeSheet(); } };
+    document.addEventListener('keydown', onKey, true);
+    sheet = { el: s, id, off: () => document.removeEventListener('keydown', onKey, true) };
+    onTap(s.querySelector('[data-k="no"]'), closeSheet, 'back');
+    onTap(s.querySelector('[data-k="yes"]'), () => {
+      closeSheet();
+      if (!net.room?.members.some((x) => x.id === id)) return;
+      if (net.room.priv) { net.kick(id); say(`${m.name} was removed.`); }
+      else { net.vote(id); myVotes.add(id); say(have + 1 >= need ? `${m.name} was voted out.` : `Vote counted: ${have + 1} of ${need}.`); }
+      if (view === 'room') renderRoom();
+    });
+    s.addEventListener('click', (e) => { if (e.target === s) closeSheet(); });
+    s.querySelector('[data-k="no"]').focus({ preventScroll: true });
+  }
+  function closeSheet() { if (!sheet) return; sheet.off(); sheet.el.remove(); sheet = null; }
 
   function startNow() {
     if (started || !net.room) return;
@@ -214,15 +280,20 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
   };
   offs.push(
     net.on('connected', () => { setPill(); if (!net.room) net.list(); }),
-    net.on('rooms', (m) => { rooms = m.rooms || []; if (view === 'home') renderRooms(); }),
-    net.on('joined', (r) => { started = false; go('room'); if (r.phase === 'flight') startNow(); }),
-    net.on('room', () => { if (view === 'room') renderRoom(); setPill(); }),
+    net.on('rooms', (m) => { rooms = m.rooms || []; roomsAt = performance.now(); stats = { players: m.players, online: m.online, region: m.region }; if (view === 'home') renderRooms(); }),
+    net.on('joined', (r) => { started = false; myVotes.clear(); closeSheet(); quickDone(); go('room'); if (r.phase === 'flight') startNow(); }),
+    net.on('room', (r) => {
+      for (const id of myVotes) if (!r.members.some((m) => m.id === id)) myVotes.delete(id);
+      if (sheet && !r.members.some((m) => m.id === sheet.id)) closeSheet();
+      if (view === 'room') renderRoom();
+      setPill();
+    }),
     net.on('phase', (p) => { if (p === 'flight') startNow(); else started = false; }),
     net.on('host', (h) => { if (h.me) say('You are now the host: the sky runs on your device.'); }),
     net.on('claim', (m) => { if (!m.ok) say(m.why === 'airborne' ? 'Land and park first to change voice.' : `${voiceName(m.voice)} is taken${m.byName ? ` by ${m.byName}` : ''}.`); }),
-    net.on('error', (m) => say(m.msg || 'Something went wrong.')),
-    net.on('kicked', (m) => { say(m.msg || 'You left the room.', 5000); go('home'); }),
-    net.on('left', () => { if (view === 'room') go('home'); }),
+    net.on('error', (m) => { quickDone(); say(m.msg || 'Something went wrong.'); }),
+    net.on('kicked', (m) => { closeSheet(); say(m.msg || 'You left the room.', 5000); go('home'); }),
+    net.on('left', () => { closeSheet(); myVotes.clear(); if (view === 'room') go('home'); }),
     net.on('link', setPill),
     net.on('reconnecting', setPill),
     net.on('disconnected', () => { setPill(); say('Lost the room server. Check your connection.'); }),
@@ -231,7 +302,14 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
     if (view === 'create') { go(net.room ? 'room' : 'home'); return; }
     onClose?.();
   }, 'back');
-  const pillTimer = setInterval(setPill, 1000);
+  // Pill each second; the public list refreshes every 10 s while it is on screen, and its clocks count down between.
+  let listAt = 0;
+  const pillTimer = setInterval(() => {
+    setPill();
+    if (view !== 'home' || !node.classList.contains('on') || net.room) return;
+    if (performance.now() - listAt > LIST_MS && net.connected) { listAt = performance.now(); net.list(); }
+    else if (rooms.some((r) => r.meta?.left)) renderRooms();
+  }, 1000);
 
   render();
   net.connect().then(() => { setPill(); const code = new URLSearchParams(location.search).get('room'); if (code && !net.room) net.join(code); })
@@ -239,9 +317,9 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
 
   return {
     node,
-    show(on) { node.classList.toggle('on', on); if (on) render(); },
+    show(on) { node.classList.toggle('on', on); if (!on) closeSheet(); if (on) render(); },
     get view() { return view; },
-    destroy() { clearInterval(pillTimer); offs.forEach((f) => f()); node.remove(); },
+    destroy() { clearInterval(pillTimer); clearTimeout(quickT); closeSheet(); offs.forEach((f) => f()); node.remove(); },
   };
 }
 
@@ -288,7 +366,28 @@ function injectLobbyCss() {
 .kzn-room-name { font: 400 19px/1.1 var(--kz-serif, Georgia, serif); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kzn-room-n { font: 700 13px var(--kz-sans, sans-serif); color: var(--kz-gold2, #f7dc8f); }
 .kzn-room-sub, .kzn-room-meta { font: 12px/1.3 var(--kz-sans, sans-serif); color: var(--kz-dim, #cbc2ad); }
-.kzn-room-meta { text-align: right; color: var(--kz-gold2, #f7dc8f); }
+.kzn-room-meta { grid-column: 1 / -1; color: var(--kz-gold2, #f7dc8f); display: flex; align-items: center; gap: 5px; min-width: 0; }
+.kzn-room-n { justify-self: end; } .kzn-room-sub { grid-column: 1 / -1; }
+.kzn-lbl small { margin-left: 6px; font: 500 11px var(--kz-sans, sans-serif); letter-spacing: .04em; text-transform: none; color: var(--kz-faint, #978f7d); }
+.kzn-room-meta[data-phase="lobby"] { color: #a6f0b8; }
+.kzn-room:disabled .kzn-room-meta { color: var(--kz-dim, #cbc2ad); }
+.kzn-mc { display: grid; flex: none; } .kzn-mc svg { width: 15px; height: 11px; filter: drop-shadow(0 0 3px rgba(226,179,60,.6)); }
+.kzn [aria-busy="true"] { opacity: .75; cursor: progress; }
+.kzn-saver { padding: 4px 12px; }
+.kzn-against { font-style: normal; color: #ffb3bf; }
+.kzn-kick:disabled { color: var(--kz-faint, #978f7d); cursor: default; }
+.kzn-sheet { position: absolute; inset: 0; z-index: 2; display: flex; align-items: flex-end; justify-content: center; padding: 16px; background: rgba(6, 10, 30, .6);
+  animation: kzn-fade .18s ease-out; }
+.kzn-sheet-card { width: min(440px, 100%); border-radius: 18px; border: 1px solid var(--kz-gold, #e2b04a); background: linear-gradient(180deg, #16244f, #111a3c);
+  padding: 16px 16px 4px; box-shadow: 0 -8px 40px rgba(0,0,0,.5); animation: kzn-up .26s cubic-bezier(.2, 1.2, .4, 1); }
+.kzn-sheet h2 { margin: 0 0 6px; font: italic 400 26px/1.1 var(--kz-serif, Georgia, serif); color: var(--kz-gold2, #f7dc8f); overflow-wrap: anywhere; }
+.kzn-sheet p { margin: 0; font: 14px/1.4 var(--kz-sans, sans-serif); color: var(--kz-dim, #cbc2ad); }
+.kzn-sheet .kzn-foot { position: static; margin: 0; padding: 14px 0 12px; background: none; }
+.kzn-sheet .kz-btn.danger { background: linear-gradient(180deg, #e0566c, #b3243c); color: #fff; border-color: transparent; }
+@media (orientation: landscape) and (max-height: 520px) { .kzn-sheet { align-items: center; } }
+@keyframes kzn-fade { from { opacity: 0; } }
+@keyframes kzn-up { from { opacity: 0; transform: translateY(24px); } }
+@media (prefers-reduced-motion: reduce) { .kzn-sheet, .kzn-sheet-card { animation: none; } }
 .kzn-types { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
 .kzn-type { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 10px 12px; border-radius: 14px; cursor: pointer; min-height: 72px;
   border: 1px solid var(--kz-line2, rgba(255,255,255,.1)); background: rgba(0,0,0,.25); }
