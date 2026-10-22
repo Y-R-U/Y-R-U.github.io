@@ -199,7 +199,7 @@ async function main() {
     await load('?start=free&noaccount=1&view=chase' + TSQ, 1280, 800, false);
     await evaluate(`window.__modes = new Set(); setInterval(() => { const p = window.__game.state().player; if (p) window.__modes.add(p.apMode); }, 100)`);
     let injected = false, before = null, after = null, sawManual = false, sawResume = false;
-    const res = await waitFor((s) => s.player && (s.player.crashed || (injected && s.player.lastTouchdown && s.player.leg === 'taxi')), 480, async (s) => {
+    const res = await waitFor((s) => s.player && (s.player.crashed || (injected && s.player.lastTouchdown && s.player.leg === 'taxi')), 720, async (s) => {
       const p = s.player; if (!p) return;
       if (p.apMode === 'MANUAL') sawManual = true;
       if (p.apMode === 'RESUMING') sawResume = true;

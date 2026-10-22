@@ -14,10 +14,16 @@ const PALETTES = [
 ];
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
-export function randomLivery() {
+// Registrations are unique for the session (PLAYTEST B10: K-BIFF ×2). `taken` adds names in use elsewhere (the player).
+const usedRegs = new Set();
+export function randomLivery(taken = []) {
   const [primary, secondary, accent] = pick(PALETTES);
-  const name = pick(NAMES), company = Math.random() < 0.6 ? pick(COMPANIES) : '';
-  const reg = 'K-' + (name.slice(0, 4).toUpperCase());
+  const busy = (r) => usedRegs.has(r) || taken.includes(r);
+  const free = NAMES.filter((n) => !busy('K-' + n.slice(0, 4).toUpperCase()));
+  const name = free.length ? pick(free) : pick(NAMES), company = Math.random() < 0.6 ? pick(COMPANIES) : '';
+  let reg = 'K-' + name.slice(0, 4).toUpperCase();
+  for (let n = 2; busy(reg); n++) reg = 'K-' + name.slice(0, 3).toUpperCase() + n;
+  usedRegs.add(reg);
   return { name, company, primary, secondary, accent, registration: reg };
 }
 
@@ -30,7 +36,7 @@ export function createAttract({ scene, traffic, env, createPlane, quality, max =
 
   async function spawn(kind, opts = {}) {
     const type = opts.type || pick(types);
-    const rig = await createPlane({ type, livery: randomLivery(), quality: quality === 'high' ? 'high' : 'low', cockpit: false });
+    const rig = await createPlane({ type, livery: randomLivery(traffic.list.map((e) => e.name)), quality: quality === 'high' ? 'high' : 'low', cockpit: false });
     rig.setView('chase');
     rig.root.traverse((o) => { if (o.isMesh) { o.castShadow = true; } });
     onRig?.(rig);
@@ -85,9 +91,9 @@ export function createAttract({ scene, traffic, env, createPlane, quality, max =
     return out.filter(Boolean);
   }
 
-  // Remove AI that would sit on top of the player when play begins.
+  // Remove AI that would sit on top of the player when play begins (and, on a runway, that runway's users: B6).
   function clearAround(x, z, r) {
-    for (const e of [...ai]) if (Math.hypot(e.ac.pos.x - x, e.ac.pos.z - z) < r && e.ac.onGround) despawn(e);
+    for (const e of traffic.spawnConflicts(x, z, r)) if (ai.includes(e)) despawn(e);
   }
 
   // ---------- cinematic camera ----------

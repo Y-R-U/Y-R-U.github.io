@@ -60,3 +60,23 @@ If agents vanished (ListAgents), check each lane's docs/<LANE>.md and newest fil
 - 2026-10-22 DESIGN2 done: docs/AIRPORTS.md (one airport per load + Kingdom Map, ferry flights 2nd; 6 airports; A0 data-file refactor, A1 ATC layout-agnostic, farm strip first). Asked Aaron 3 Qs. 2 active (GAMEPLAY STORY).
 - 2026-10-22 STORY done (intro 72 s, Mission 1 11 steps, time warp) committed. Notes: Scandal can wipe tutorial PP (tune outrage), LAND final 3 km out = slow. Wiring left → GAMEPLAY (Watch intro menu entry; first-launch intro). 2 active (GAMEPLAY AIRPORTS).
 - 2026-10-22 Boot smoke clean (390x844 ?start=free / ?auto / menu); PUSHED 9 commits incl. GAMEPLAY WIP snapshot 9e720904. Live build now has HUD/markers/LAND/FX/story/Tiger+bathtub rigs (type picker pending).
+- 2026-10-22 GAMEPLAY done + pushed (plane chips, D19–D25, story wiring, perf). Open: online plane stream/token not wired; UI hangar picker + onStory hook; STORY coach over plane in portrait chase; radio JSON defer; scandal grace only ATC path. Next: PLAYTEST_2 + POLISH lanes. 1 active (AIRPORTS).
+- 2026-10-22 Launched PLAYTEST_2 (read-only, 9511) + POLISH (hangar aircraft picker, onStory hook, story coach position, radio defer; minimal main.js edits, 9601). 3 active (AIRPORTS PLAYTEST2 POLISH).
+- 2026-10-22 GAMEPLAY final note: test-flight 'override: AP still landed' 32/33 (AP/ATC, busier circuit after seedRivals) → next TRAFFIC round; online plane sync + token not wired (next NET round).
+- 2026-10-22 Launched NET O3 (session.js: remote planes, host ATC snapshots, Court, radio floor, token; no main.js edits). 4 active (AIRPORTS PLAYTEST2 POLISH NET3).
+- 2026-10-22 USAGE LIMIT #2 killed AIRPORTS/PLAYTEST2/POLISH/NET3; all 4 relaunched with resume briefs. AIRPORTS also asked to diagnose test-flight override-landing flake.
+- 2026-10-22 POLISH done + pushed 9a2d5936 (hangar picker w/ locks, onStory, coach position, radio defer). Hand-off: parked chips don't look locked until tapped (HUD). 3 active (AIRPORTS PLAYTEST2 NET3).
+- 2026-10-22 NET O3 done; manager applied the §15 wiring to main.js (gen-main now idempotent), boot smoke clean, test-mp all passed; pushed. Remaining O4/O5 + deploy (needs Aaron). 2 active (AIRPORTS PLAYTEST2).
+- 2026-10-22 Launched NET O4 (migration, AP for away players, pvp contact, 4-Chrome gate) + UI4 (locked chips, Court ladder, connection pill). 4 active (AIRPORTS PLAYTEST2 NET4 UI4).
+- 2026-10-22 NET O4 done (4-page gate + falsify) pushed. Notes: wiring.startPlay('online') lacks room mode/protection (Strict −500 not applied); Autopilot._taxi throws on 1-point taxi leg (FLIGHT). Q Aaron: ramming scandal only Realistic? 3 active (AIRPORTS PLAYTEST2 UI4).
+- 2026-10-22 PLAYTEST_2 done. Manager fixed B1 (iPhone-UA freeze: zero-sample silent WAV loop) + pushed. Next: FLIGHTFIX (B2 LAND never lands, B3 stick idles engine, B4 throttle springback, B5 bank cap, B6 parked start, B7 pacing, dup regs, _taxi guard) + HUDFIX (B8 overlaps, coach points DEMAND TAKEOFF, camera in tree, online room settings into startPlay). UI items → UI4.
+- 2026-10-22 Launched FLIGHTFIX (9621) + HUDFIX (9631); UI items sent to UI4. 4 active (AIRPORTS UI4 FLIGHTFIX HUDFIX).
+- 2026-10-22 UI4 done + committed (not pushed; wait for HUDFIX). Podium suggestions for NET later. 3 active (AIRPORTS FLIGHTFIX HUDFIX).
+- 2026-10-22 Launched NET O5 (podium polish, quick join, kick-vote, reconnecting state). 4 active (AIRPORTS FLIGHTFIX HUDFIX NET5).
+- 2026-10-22 NET O5 done + committed (not pushed). Manager added RECONNECTING/AUTOPILOT pill states. onlinehud_flow game half failing on working tree (court never shows) → HUDFIX asked to fix. 3 active (AIRPORTS FLIGHTFIX HUDFIX).
+- 2026-10-22 AIRPORTS A0/A1 done (identity kept; rot37 soak clean); ATC playstart fixes committed. Hold creep / U-turn / demandTakeoff ends / test budget → FLIGHTFIX. Remaining hard-coding list in AIRPORTS.md §7. 2 active (FLIGHTFIX HUDFIX).
+- 2026-10-22 HUDFIX done (test-gameplay 159/162) committed; fixed stale podium check (onlinehud 68/79/66). Boot smoke clean (C172, Tiger). PUSHED UI4, O5, ATC fixes, HUDFIX. 1 active (FLIGHTFIX).
+
+## 2026-10-22 — FLIGHTFIX landed
+Verified by manager: flight-sim 102/102, landahead 21/21, score-sim 143/143, atc-sim 97/98 (only the pre-existing mixed-soak holdMax 354 s — ATC X0 sequencing, AIRPORTS' item), boot smokes C172/bathtub clean. Committed + pushed. 0 lanes active.
+Open for AIRPORTS (from FLIGHTFIX): treat player with ap.landing as cleared to land; placed() queue lined-up player first; spawn-grace for forced go-arounds; immediate crossing of closed 04/22; A2/U-turn taxi graph; emit ignored_instruction on goaroundrefused if scored. story/host.js requestLand passes traffic().env (no trees) — STORY should pass world.

@@ -10,10 +10,11 @@ const blind = args.falsify ? { ...world, colliders: [], trees: [], groundHeightA
 let pass = 0, fail = 0;
 const ok = (cond, name, detail = '') => { if (cond) pass++; else { fail++; console.log(`  FAIL ${name} ${detail}`); } };
 const DEG = Math.PI / 180;
-const plan = (x, z, alt, hdg, kt = 80, w = blind) => {
+const plan = (x, z, alt, hdg, kt = 80, w = blind, lay = layout, extra = {}) => {
   const v = kt * 0.5144;
-  return planLandAhead({ pos: [x, alt, z], vel: [Math.sin(hdg * DEG) * v, 0, -Math.cos(hdg * DEG) * v], heading: hdg, altitude: alt, world: w, layout });
+  return planLandAhead({ pos: [x, alt, z], vel: [Math.sin(hdg * DEG) * v, 0, -Math.cos(hdg * DEG) * v], heading: hdg, altitude: alt, world: w, layout: lay, ...extra });
 };
+const opened = { ...layout, RUNWAYS: layout.RUNWAYS.map((r) => ({ ...r, closed: false })) };
 
 // Exact independent check of the chosen strip: no collider box, no tree, no water/building anywhere on it.
 function stripViolations(p) {
@@ -47,8 +48,15 @@ console.log('aligned runway preference');
   const c = plan(-1000, 1400, 200, 0);
   ok(c.kind === 'runway' && (c.runway === '09' || c.runway === '27'), 'crosswise runway ahead still preferred over grass', JSON.stringify({ k: c.kind, r: c.runway, f: c.fail }));
   ok(c.approach?.some((w) => w.kind === 'base'), 'crosswise runway uses a base turn', c.pattern);
-  const c4 = plan(-200, 1800, 200, 355);
-  ok(c4.runway === '04', 'heading 355 near 04/22 → RWY 04 (40°) beats 09/27 (90°)', JSON.stringify({ k: c4.kind, r: c4.runway }));
+  const c4 = plan(-200, 1800, 200, 355, 80, blind, opened);
+  ok(c4.runway === '04', 'heading 355 near an OPEN 04/22 → RWY 04 (40°) beats 09/27 (90°)', JSON.stringify({ k: c4.kind, r: c4.runway }));
+  const c5 = plan(-200, 1800, 200, 355);
+  ok(c5.kind === 'runway' && c5.runway !== '04' && c5.runway !== '22', 'the same with 04/22 CLOSED → an open runway (09/27)', JSON.stringify({ k: c5.kind, r: c5.runway }));
+  // PLAYTEST_2 B2(a): ~200 m north of 27's centreline, parallel, with traffic rolling on the runway → still RWY 27
+  for (const [s, alt] of [[2200, 175], [900, 150]]) {
+    const n = plan(700 + s, -200, alt, 270, 85, blind, layout, { avoid: [[300, 0, 20], [-200, 2, 20]] });
+    ok(n.kind === 'runway' && n.runway === '27', `parallel 200 m north of 27, ${s} m out, runway traffic → RWY 27 (not a field)`, JSON.stringify({ k: n.kind, r: n.runway, p: n.pattern, f: n.fail }));
+  }
   const d = plan(-700 - 2500, 0, 180, 90 + 30);
   ok(d.kind !== 'runway' || Math.abs(d.heading - 90) < 1, 'runway direction is the one closest to heading', `${d.kind} ${d.heading}`);
 }

@@ -236,6 +236,8 @@ export class Aircraft {
     else if (gearOver && this._vsWas < -4.5) this._impact('touchdown', 'gear collapsed', { n: groundNormal(env, this.pos.x, this.pos.z), pen: 0, onGear: false, speedKt: -this._vsWas / KT });
     if (!this.onGround) this._lastAirTime = this.airTime;
     else if (this.groundTime > 1.5) this._lastAirTime = 0;
+    // static friction: braked and (nearly) stopped at low power, the wheels hold — no creep across a hold line
+    if (this.onGround && c.brake > 0.5 && c.throttle < 0.3 && this.vel.x * this.vel.x + this.vel.z * this.vel.z < 0.0064) { this.vel.x = 0; this.vel.z = 0; }
     this._vsWas = this.vel.y;
 
     this._checkCrash(env, surf);
@@ -249,7 +251,11 @@ export class Aircraft {
     let grade = fpm < 250 ? 'butter' : fpm < 500 ? 'smooth' : fpm < 800 ? 'firm' : fpm < 1100 ? 'hard' : 'crash';
     this.lastTouchdown = { t: this.time, fpm, grade, x: this.pos.x, z: this.pos.z, surface: this.surface, speed: this.speed };
     if (bounce) this.bounces++; else this.bounces = 0;
-    this.emit('touchdown', { fpm: Math.round(fpm), grade, bounce: !!bounce, surface: this.surface });
+    // settling within 2.5 s of a smash is still the smash, not a landing (ATC reads _lastImpact; -0.36 s keeps the
+    // 0.35 s double-hit guard in _impact out of it)
+    const afterImpact = this.time - (this._lastImpact ?? -9) < 2.5;
+    if (afterImpact) this._lastImpact = this.time - 0.36;
+    this.emit('touchdown', { fpm: Math.round(fpm), grade, bounce: !!bounce, surface: this.surface, afterImpact });
     if (grade === 'crash' || (gearOver && fpm > 900)) this._impact('touchdown', 'hard landing', { n: groundNormal(env, this.pos.x, this.pos.z), pen: 0, onGear: false, speedKt: -vs / KT });
     else if (grade === 'hard') this.emit('hardlanding', { fpm: Math.round(fpm) });
   }

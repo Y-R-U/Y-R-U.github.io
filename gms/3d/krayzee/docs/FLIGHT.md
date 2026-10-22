@@ -151,6 +151,17 @@ Terrain: AP `fly` legs keep `leg.clearance ?? 120` m above terrain and collider 
 track and the commanded heading (`_terrainFloor`); aircraft ground contact/crash uses `env.groundHeightAt` and
 `env.colliders` (the castle box to 190 m).
 
+### FLIGHTFIX (PLAYTEST_2, 2026-10-22)
+| item | API / behaviour |
+|---|---|
+| B2 LAND | `ap.landAt(plan)` now owns the plan to a stop: fly legs keep 35 m terrain clearance (was 120 m: the "orbit that never descends"); any replan or go-around while landing goes back to the plan's touchdown (onto its final if set up, else `_landCircuit`: a tight circuit on the side the plane is on) — never a fly-away; the tower's go-around is refused while LAND is active (event `goaroundrefused`) unless the touchdown zone is physically occupied; the AP's own "runway occupied" check only looks at the first 700 m; flare sinks relative to the ground under it; a floating hold-off on a short strip is put down; rollout holds the strip heading to its end. |
+| B3 stick override | stick-only override no longer speed-holds on the throttle: the throttle stays where it was at the grab (power added only below 1.25 Vs). |
+| B4 throttle lever | a released throttle LATCHES in the air at any value until `traffic.autoThrottle(e)` (= `releaseThrottle(e)`, the lever's AUTO detent), `resume(e)`, `ap.landAt` / `demandTakeoff` / `skipToRunway`, or an upset recovery. On the ground a lever left at idle goes back to the AP. While latched the AP flies the path that power allows. `traffic.throttleState(e)` → `{ mode, player, value, auto }`: show `player` on the lever while `!auto`. |
+| B5 upset | release in an upset: 0.25 s blend (was 0.6) then `_upsetOut`: unload past 90° of bank, roll the short way at full rate, pull at ~0.8 α-stall, idle when nose-low and fast; low down it climbs away instead of settling. A touchdown < 2.5 s after an impact counts as part of the smash (`touchdown.afterImpact`, refreshes `_lastImpact` for ATC). Airborne on a ground leg (a Rubber bounce) → replan. |
+| B6 spawn | `traffic.spawnConflicts(x, z, r)` (used by `attract.clearAround`): placing the player on a runway also clears that runway's users (on it, final inside 3.2 km, going round). |
+| B7 pacing | the player's AP turns base at `ap.finalLen` (default 1300 m, set per difficulty if wanted; `null` = published 1.8 km) when no-one else is in that runway's pattern and ATC has not extended the downwind. `ap.stableFinal` (also in `status()`): on a lined-up final within 20 m / 10° / 20 m of the glide path, > 350 m out — STORY's warp may run 2× while it is true. Player taxi runs up to 10 m/s (narrow types 8) on long straights; DEMAND TAKEOFF rolls from the entry without a full stop. |
+| misc | `ap.isPlayer` (set by `traffic.add`); ATC `taxi` commands do not re-route the player's own taxi to a named stand; AI registrations unique per session (`randomLivery(taken)`); `_pursue` pads 1-point paths; braked + stopped at low power the wheels hold (no creep over hold lines); turning round from a stop pivots tight (≤ 0.8 m/s); `demandTakeoff()` defaults to the layout's open runway ends. |
+
 ### Status for HUD / ATC
 `ap.status()` → `{ engaged, overridden, phase, sub, leg, legIndex, label, route, recovering, done, target, speedKt, end }`;
 `ap.events` (`phase`, `override`, `replan`, `goaround`, `recovery`, `landed`, `takeoffroll`, `waypoint`) — drained by main
@@ -202,7 +213,7 @@ phones. `__game.quality` → `{ tier, auto, fps, history }`. The shadow box foll
 
 ## Tests
 ```
-node tools/flight-sim.mjs            # node, ~25 s, 81 checks: impact normals, fuel, landAt (runway + field plan to a stop),
+node tools/flight-sim.mjs            # node, ~3 min, 102 checks: landmany (LAND from 10 positions × 3 types + go-around return), feel (B3/B4/B5/B7, taxi guard, demand ends), spawn (B6, real ATC; --old falsifies), impact normals, fuel, landAt (runway + field plan to a stop),
                                      # ground override (hold/stand/rollout), handback, circuits 09/27, override, cut-in, stall, traffic,
                                      # types (Tiger + bathtub AP circuits 09/27: takeoff run ±25 % of book, no ground loop, 3-point
                                      # touchdown, centreline), typeoverride (hand-flown + release, low dive handback), typeground (rest

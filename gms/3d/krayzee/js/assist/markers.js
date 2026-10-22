@@ -193,6 +193,22 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
     ctx.fillStyle = color; ctx.fillText(str, x0 + pw / 2, y0 + 12.5);
   }
 
+  // traffic distance text: steps up clear of labels already placed this frame (two "1500 ft" no longer overprint)
+  function smallText(str, x, y) {
+    const w = ctx.measureText(str).width + 4, h = 12;
+    let y0 = y - 10;
+    for (let tries = 0; tries < 4; tries++) {
+      let hit = false;
+      for (let i = 0; i < nPlaced; i++) {
+        const j = i * 4;
+        if (x - w / 2 < placed[j + 2] && x + w / 2 > placed[j] && y0 < placed[j + 3] && y0 + h > placed[j + 1]) { hit = true; y0 = placed[j + 1] - h - 1; break; }
+      }
+      if (!hit) break;
+    }
+    if (nPlaced < 64) { const j = nPlaced++ * 4; placed[j] = x - w / 2; placed[j + 1] = y0; placed[j + 2] = x + w / 2; placed[j + 3] = y0 + h; }
+    ctx.fillText(str, x, y0 + 10);
+  }
+
   function glyph(s, x, y, ang, off) {
     const z = KIND[s.kind].size;
     ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
@@ -270,7 +286,7 @@ export function createMarkers({ container, camera, units = 'aviation', traffic =
         glyph(s, sx, gy, 0, false);
         s.sx = sx; s.sy = gy; s.off = false;
         if (s.kind === 'traffic') {
-          if (dist < TRAFFIC_TEXT_M) { ctx.font = SMALL; ctx.fillStyle = s.color; ctx.fillText(s.tag, sx, gy - k.size - 3); }
+          if (dist < TRAFFIC_TEXT_M) { ctx.font = SMALL; ctx.fillStyle = s.color; smallText(s.tag, sx, gy - k.size - 3); }
         } else {
           ctx.font = FONT;
           pill(s.tag, s.tagW, sx, s.kind === 'target' ? gy - k.size - 12 : gy - k.size - 11, 0, s.kind === 'target' ? s.color : '#fff', s.kind === 'target' ? null : s.color);

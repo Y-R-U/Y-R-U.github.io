@@ -131,6 +131,16 @@ Caching: obstacles are rasterised once per `world` (WeakMap); surface/height cel
 Call `resetLandCache(world)` if colliders change at runtime. Known limit: 48 m dry-block shortcut means a water body
 narrower than ~48 m could be missed (none exists today).
 
+## 3b. FLIGHTFIX changes (PLAYTEST_2 B2)
+- Ground traffic (`avoid`) no longer rules out a runway (it moves; the AP checks the touchdown zone on short final).
+- Closed runways rank below open ones (only used when no open runway works).
+- Straight-in accepts a sidestep (|l| < 50 + 0.22·d, ±30°) and a higher entry (`opts.sink`, m/s the type can sink on final, default 3).
+- Joins/bases get a straight final of ≥ 2.6 / 3.5 turn radii, base point 1.4 r out (the old 63° cut onto a 600 m final went round "not lined up").
+- Descending orbits are flown first, tangent to the current track 250 m ahead, then the planned path; `maxGrad` 0.12.
+- Fly legs carry `clearance: 35` (the AP's default 120 m floor held the old orbits at ~155 m).
+- `collectTrees(world)` reads AIRPORT's planted set `world.debug.trees {data, stride, count}` (the 'trees'/'conifers' meshes are gone: LAND saw no trees and landed in a wood).
+- markers.js: traffic distance text steps clear of labels already drawn ("1500 ft" twice no longer overprints).
+
 ## 4. Tests (2026-10-22, after WORLD r2)
 ```
 node js/assist/test/landahead.test.mjs            # node, fake world with r2-style rolling ground + castle hill
@@ -139,7 +149,7 @@ node js/assist/test/landahead.test.mjs --falsify  # planner gets a flat world wi
 node js/assist/test/cdp-bench.mjs                 # real buildWorld, 3 viewports × both hands × 3 views
 ~/.claude/bin/cdp stop 9481
 ```
-- Node: 18/18 — aligned final 09/27 picks that runway; crosswise picks a runway with a base turn; 04 beats 09/27
+- Node: 21/21 (FLIGHTFIX: + closed 04/22 → open runway, 200 m-north parallel with runway traffic → RWY 27) — aligned final 09/27 picks that runway; crosswise picks a runway with a base turn; 04 beats 09/27
   when it is closer to the heading; grass east of the field; built-up cone → `nothingAhead`; 1400 m over a field 1.2 km
   out → `tooHigh`/"GO LOWER"; a bit high → orbit; on ground → `onGround`; 300 random states: no strip crosses
   water/building/collider/tree or exceeds 2.5 % over 50 m (exact dense check, independent of the planner).

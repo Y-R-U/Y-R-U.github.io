@@ -27,7 +27,7 @@ export class Traffic {
       axis: Object.fromEntries(AXES.map((a) => [a, { mode: 'auto', t: 0, val: 0 }])),
       apOff: false,
     };
-    if (ap) ap.traffic = this;
+    if (ap) { ap.traffic = this; ap.isPlayer = !!player; if (player && ap.finalLen === undefined) ap.finalLen = 1300; }
     if (!player && !remote && this.aiProtection && !aircraft.impactHandler) aircraft.impactHandler = aiImpactHandler(this.aiProtection);
     this.list.push(ent);
     return ent;
@@ -89,12 +89,14 @@ export class Traffic {
   }
 
   // Player input → per-axis override; release → wait (AP holds attitude, wings level), blend back, replan.
-  // The throttle is a lever: released above idle it stays LATCHED where it was put — on the ground until resume()
-  // or idle; in the air until every other axis has been back on the autopilot for a full wait + blend.
+  // The throttle is a lever (PLAYTEST_2 B4): released it stays LATCHED where it was put until the player hands it back
+  // (releaseThrottle — the lever's AUTO detent), a full resume(), an AP command (LAND, DEMAND TAKEOFF, skip to runway)
+  // or an upset recovery. On the ground a lever left at idle goes back to the AP at once.
   // Releasing the stick low, sinking or banked hard skips the wait: the AP recovers at once.
   _mix(e, h) {
     const ac = e.ac, ap = e.ap, A = e.axis;
     if (ap?.wantResume) { ap.wantResume = false; this.resume(e); }
+    if (ap?.wantThrottleAuto) { ap.wantThrottleAuto = false; this.releaseThrottle(e); }
     const stickAxes = ['aileron', 'elevator', 'rudder'];
     const urgent = !ac.onGround && (ac.agl < 150 || ac.vs < -3.6 || Math.abs(ac.bank) > 1.05 || ac.stalled);
     let wait = false;
@@ -108,7 +110,6 @@ export class Traffic {
     }
     const apOut = ap && !e.apOff ? ap.update(h) : null;
     let anyManual = false, anyWait = false, replan = false, recover = false;
-    const othersAuto = AXES.every((k) => k === 'throttle' || A[k].mode === 'auto');
     for (const k of AXES) {
       const st = A[k];
       let m = e.manual[k];
@@ -119,15 +120,15 @@ export class Traffic {
         st.val = m; st.t = 0;
       } else if (st.mode === 'manual') {
         st.t = 0;
-        if (k === 'throttle' && st.val > 0.05) st.mode = 'latched';
-        else if (urgent && k !== 'throttle' && apOut) { st.mode = 'blend'; st.from = st.val; st.dur = 0.6; replan = true; recover = true; }
+        if (k === 'throttle' && (st.val > 0.05 || !ac.onGround)) st.mode = 'latched';
+        else if (urgent && k !== 'throttle' && apOut) { st.mode = 'blend'; st.from = st.val; st.dur = 0.25; replan = true; recover = true; }
         else { st.mode = 'wait'; st.dur = OVERRIDE.blend; if (k === 'elevator' || k === 'aileron' || k === 'rudder') st.val = 0; }
       } else if (st.mode === 'latched') {
-        if (!ac.onGround && othersAuto && apOut) { st.t += h; if (st.t >= OVERRIDE.wait + OVERRIDE.blend) { st.mode = 'blend'; st.from = st.val; st.t = 0; st.dur = OVERRIDE.blend; } }
-        else st.t = 0;
+        st.t = 0;
+        if (ac.onGround && st.val <= 0.05 && apOut) { st.mode = 'blend'; st.from = st.val; st.dur = OVERRIDE.blend; }
       } else if (st.mode === 'wait') {
         st.t += h;
-        if (st.t >= OVERRIDE.wait || (urgent && k !== 'throttle')) { st.mode = 'blend'; st.t = 0; st.from = k !== 'throttle' && apOut && !ac.onGround ? apOut[k] : st.val; st.dur = urgent ? 0.6 : OVERRIDE.blend; replan = true; }
+        if (st.t >= OVERRIDE.wait || (urgent && k !== 'throttle')) { st.mode = 'blend'; st.t = 0; st.from = k !== 'throttle' && apOut && !ac.onGround ? apOut[k] : st.val; st.dur = urgent ? 0.25 : OVERRIDE.blend; replan = true; }
       } else if (st.mode === 'blend') {
         st.t += h;
         if (st.t >= (st.dur || OVERRIDE.blend)) st.mode = 'auto';
@@ -149,6 +150,20 @@ export class Traffic {
       if (replan && !anyManual && !e.apOff) ap.replan();
       if (recover) ap.forceRecover = true;
     }
+  }
+
+  // The lever's AUTO detent: a latched (or held) throttle goes back to the autopilot. autoThrottle is the same call.
+  autoThrottle(e) { this.releaseThrottle(e); }
+  releaseThrottle(e) {
+    const st = e.axis.throttle;
+    e.manual.throttle = null;
+    if (st.mode !== 'auto' && st.mode !== 'blend') { st.mode = 'blend'; st.from = e.ac.ctl.throttle; st.t = 0; st.dur = 1; }
+  }
+
+  // For the HUD lever: show the PLAYER's value while they own the throttle, the autopilot's otherwise.
+  throttleState(e) {
+    const st = e.axis.throttle, mine = st.mode === 'manual' || st.mode === 'latched';
+    return { mode: st.mode, player: mine ? st.val : null, value: e.ac.ctl.throttle, auto: !mine };
   }
 
   // Deliberate hand-back (AP button, LAND assist): every axis, including a latched throttle, blends back now.
@@ -215,6 +230,22 @@ export class Traffic {
       if (ac.onGround && onRunway(ac.pos.x, ac.pos.z, 2) === rw) return false;
     }
     return true;
+  }
+
+  // Who has to go when the player is placed at (x, z): ground traffic within r, and if that is on a runway, everyone on
+  // it, on a final to it inside ~3.2 km or going round over it (PLAYTEST_2 B6: else the start parks for a minute+ and
+  // the victim's go-around is scored on a player who did nothing).
+  spawnConflicts(x, z, r = 160) {
+    const rw = onRunway(x, z, 10);
+    return this.list.filter((e) => {
+      const ac = e.ac, l = e.ap?.leg;
+      if (e.player || e.remote) return false;
+      if (ac.onGround && Math.hypot(ac.pos.x - x, ac.pos.z - z) < r) return true;
+      if (!rw) return false;
+      if (ac.onGround) return onRunway(ac.pos.x, ac.pos.z, 10) === rw;
+      const end = l?.kind === 'approach' ? (e.ap.cur?.e || (typeof l.end === 'object' ? l.end : runwayEnd(l.end))) : null;
+      return end?.rw === rw && (e.ap.sub === 'goaround' || AIM_DIST - toRunway(end, ac.pos.x, ac.pos.z).s < 3200);
+    });
   }
 
   // Polyline (xz) an on-ground plane is about to taxi along: its autopilot path, else a short line along its track.
