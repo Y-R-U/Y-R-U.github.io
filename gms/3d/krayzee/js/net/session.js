@@ -1,14 +1,18 @@
 // Online session (docs/ONLINE.md §2–§7, §15): remote planes in the world, host-authoritative ATC + AI traffic,
 // follower ATC replicas, inf/bank reports with host plausibility checks, the Court, radio floor control, podium.
 // main.js hands over its objects once (createSession) and calls attach(player) / update(dt) / detach().
+// O4: host migration from the replica (AI adopted, ATC + ledger kept, unacked reports resent and de-duplicated),
+// the host's autopilot flying silent players' planes, player-vs-player contact with the room's protection rules.
 // Ids: the local player is 'player' (ATC/RADIO/SCORE convention); on the wire every human is 'p:<netId>'.
-import { RemoteTrack } from './interp.js';
+import { RemoteTrack, AUTOPILOT_MS } from './interp.js';
 import { KIND } from './link.js';
 import { normalise } from './options.js';
 import { showPodium } from './podium.js';
 import { unpackState } from '../flight/netstate.js';
 import { Aircraft } from '../flight/aircraft.js';
-import { circuitRoute } from '../flight/routes.js';
+import { Autopilot } from '../flight/autopilot.js';
+import { aiImpactHandler } from '../flight/traffic.js';
+import { circuitRoute, arrivalRoute, departureRoute } from '../flight/routes.js';
 import { STANDS } from '../world/layout.js';
 import { createCourt } from '../game/court.js';
 import { INFRACTIONS } from '../../data/rules.js';
@@ -22,6 +26,9 @@ const ARRIVAL_RULES = new Set(['cut_in_final', 'forced_goaround']);
 const GROUND_RULES = new Set(['queue_jump', 'unauth_takeoff', 'runway_steal', 'taxi_speeding', 'stand_steal', 'taxiway_landing', 'grass_landing', 'apron_landing', 'wrong_way', 'closed_runway']);
 const AIR_RULES = new Set(['tower_buzz', 'terminal_buzz', 'low_pass', 'formation', 'near_miss']);
 const INF_PER_MIN = 8;
+const GAP_MS = 2500, BACK_WAIT_MS = 3000, AP_RESEND_MS = 2000, RESEND_DELAY_MS = 400, EARLY_MS = 3000;
+const SPAWN_PROTECT_MS = 5000, STAND_R = 18, RAM_N = 3, RAM_MS = 60000, HIT_GAP_MS = 1000;
+const HOST_MSGS = new Set(['atk', 'atd', 'ai', 'court', 'crown', 'radio', 'end', 'hinf', 'ap', 'apBack', 'scandal']);
 const ROUTE_OF = { circuits: 'circuits', depart: 'departure', fullStop: 'arrival', park: 'park' };
 const MINE = /(^|[|>])player($|[|>])/;
 
@@ -97,7 +104,14 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
   const hostDet = new Map(), scolded = new Map();
   let seenCut = null, seenGA = null;
   const T = { atcD: 0, atcK: 0, ai: 0, roster: 0, court: 0, meta: 0 };
-  const dbg = { infs: [], acks: [], banks: [], barks: [], radioIn: [], crowns: [], ends: [], sentInf: [], hostDet: [] };
+  const dbg = { infs: [], acks: [], banks: [], barks: [], radioIn: [], crowns: [], ends: [], sentInf: [], hostDet: [],
+    ap: [], resumed: [], adopted: [], resent: [], hits: [], hitsIn: [], scandals: [] };
+  // O4 state. apHeld (host): peers whose plane our autopilot flies. heldPeers (follower): ditto, as the host announced.
+  const apHeld = new Map(), heldPeers = new Set(), unacked = new Map(), rams = new Map();
+  let hostLed = null, hostDetRep = null, meHeld = false, wantBack = false, heldSince = 0, lastUpd = 0, resendAt = 0, early = [];
+  let seqN = 0, spawnRT = -1e9, impactPatch = null;
+  // Test switches (tools/net/test-mp4.mjs falsification runs only).
+  const debug = { noAdopt: false, noAp: false, noResend: false, noDedupe: false };
   const offs = [];
   let saved = null, atcPatch = null;
   // Other humans are players to ATC (spacing, cut-in memory, per-player outrage); the bridge only marks the local one.
@@ -119,7 +133,10 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
   const push = (arr, v) => { arr.push(v); if (arr.length > 40) arr.shift(); };
   const others = () => net.members.filter((m) => m.id !== net.id);
   const member = (id) => net.members.find((m) => m.id === id);
-  const led = (id) => { let L = ledger.get(id); if (!L) ledger.set(id, (L = { acc: 0, infs: [], air: false, landed: false, banked: 0, lastBark: -1e9 })); return L; };
+  const led = (id) => { let L = ledger.get(id); if (!L) ledger.set(id, (L = { acc: 0, infs: [], air: false, landed: false, banked: 0, lastBark: -1e9, ns: new Set(), bns: new Set() })); return L; };
+  const mark = (set, n) => { set.add(n); if (set.size > 128) set.delete(set.values().next().value); };
+  const ledJSON = () => Object.fromEntries([...ledger].map(([k, v]) => [k, { acc: v.acc, infs: v.infs, air: v.air, landed: v.landed, banked: v.banked, ns: [...v.ns], bns: [...v.bns] }]));
+  const prot = () => normalise(net.room?.set || {}).protection;
   const titleOf = (rankIndex, g) => { const r = RANKS[Math.max(0, Math.min(RANKS.length - 1, rankIndex | 0))]; return g === 'f' ? r.f : r.m; };
   const nameOf = (cid) => { if (cid === myCanon()) return 'You'; const m = member(String(cid).slice(2)); return m ? m.name : String(cid); };
 
@@ -143,13 +160,178 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     safe(() => atc()?.configure({ authority: r === 'host', detectRemote: false, outragePerPlayer: true }));
     safe(() => radio()?.setMode(r === 'host' ? 'host' : 'follower'));
     if (r === 'host') {
+      if (was === 'follower' && restorePending) safe(() => restoreAtc());
       patchAttract(false);
-      for (const id of [...ais.keys()]) dropAI(id);
+      if (was === 'follower') { adoptAI(); takeLedger(); }
+      for (const id of [...ais.keys()]) { dropAI(id); safe(() => atc()?.remove(id)); }
+      for (const id of heldPeers) net.hold(id, false);
+      heldPeers.clear(); unacked.clear(); meHeld = false; hostAtc = null; sentAtc = null;
       forceKey = true; courtDirty = true; seenCut = seenGA = null;
+      for (const k of Object.keys(T)) T[k] = 0;
       if (roundEnd == null) roundEnd = roundLength() ? net.roomTime() + roundLength() : null;
       for (const m of net.members) addCourtPlayer(m);
-      clearStands();
-    } else patchAttract(true);
+      if (was == null) clearStands();
+      safe(() => traffic.setAIProtection?.(prot() === 'realistic' ? null : prot()));
+    } else {
+      for (const id of [...apHeld.keys()]) release(id, false);
+      patchAttract(true);
+    }
+  }
+
+  // ---------------------------------------------------------------- local autopilot for a remote plane
+  function routeFor(intent, ac) {
+    const end = wiring.activeEnd(), o = { type: ac.type };
+    if (intent === 'depart') return departureRoute(end);
+    if (intent === 'fullStop' || intent === 'park') return arrivalRoute(end, { ...o, then: departureRoute(end), from: [ac.pos.x, ac.pos.z] });
+    return circuitRoute(end, o);
+  }
+  // A remote entry becomes a locally flown one (ATC sees it as local again and commands its autopilot), from where it is.
+  function flyLocal(ent, intent) {
+    const ac = ent.ac, ap = new Autopilot(ac);
+    ap.traffic = traffic;
+    ent.fakeAp = ent.ap; ent.ap = ap; ent.remote = false; ent.remotePose = false; ent.apOff = false;
+    for (const k in ent.axis) { ent.axis[k].mode = 'auto'; ent.manual[k] = null; }
+    ac.impactHandler = aiImpactHandler(prot());
+    // Parked at a stand: sit a moment, then depart (as attract's parked AI). Anywhere else the autopilot rejoins its route.
+    if (ac.onGround && ac.gs < 1 && inStand(ac.pos)) { const r = departureRoute(wiring.activeEnd()); ap.setRoute({ ...r, legs: [{ kind: 'park', seconds: 8, label: 'BOARDING' }, ...r.legs] }); }
+    else { ap.setRoute(routeFor(intent, ac)); ap.replan(); }
+    // A taxi leg that starts where it ends has a one-point path, which the autopilot's pursuit cannot follow.
+    if (ap.cur?.path?.length === 1) ap.cur.path.push({ ...ap.cur.path[0] });
+  }
+  function unfly(ent) {
+    traffic.releaseStand(ent.ac);
+    ent.ap = ent.fakeAp || fakeAp('circuits'); ent.fakeAp = null;
+    ent.remote = true; ent.remotePose = true; ent.ac.impactHandler = null;
+  }
+
+  // Host migration: the replica's AI planes keep their ids, strips and clearances and fly on from where they are.
+  function adoptAI() {
+    const ids = [];
+    for (const [id, rec] of [...ais]) {
+      if (debug.noAdopt || !attract || !rec.ent || !rec.ac || rec.ac.crashed) continue;
+      flyLocal(rec.ent, rec.info?.intent || 'circuits');
+      rec.ent.fakeAp = null; rec.ent.kind = rec.info?.intent || 'arrive'; rec.ent.type = rec.ac.type;
+      attract.ai.push(rec.ent);
+      if (!wiring.pilots?.has(id)) safe(() => wiring.addAI?.(rec.ent));
+      ais.delete(id); voices.delete(id);
+      ids.push(id);
+    }
+    // Aircraft ids come from a per-page counter: move ours past the adopted ones so a new AI never reuses an id.
+    const top = Math.max(0, ...ids.map((i) => +(/^ac(\d+)$/.exec(i)?.[1] || 0)));
+    for (let k = 0; k < 5000 && +(new Aircraft({}).id.slice(2)) <= top; k++);
+    push(dbg.adopted, { ids, t: Math.round(net.roomTime()) });
+  }
+  function takeLedger() {
+    if (hostLed) {
+      ledger.clear();
+      for (const [id, v] of Object.entries(hostLed)) {
+        const L = led(id);
+        Object.assign(L, { acc: v.acc || 0, infs: v.infs || [], air: !!v.air, landed: !!v.landed, banked: v.banked || 0 });
+        if (!debug.noDedupe) { for (const n of v.ns || []) mark(L.ns, n); for (const n of v.bns || []) mark(L.bns, n); }
+      }
+    }
+    for (const [k, t] of hostDetRep || []) hostDet.set(k, t);
+  }
+
+  // ---------------------------------------------------------------- host: autopilot for silent players (§9)
+  function takeOver(id, rec, rt) {
+    const intent = safe(() => atc()?.strip(`p:${id}`)?.intent, null) || 'circuits';
+    flyLocal(rec.ent, intent);
+    apHeld.set(id, { since: rt, sent: -1e9, back: false });
+    net.broadcast({ t: 'ap', id: `p:${id}`, on: true });
+    push(dbg.ap, { id: `p:${id}`, on: true, intent, t: Math.round(rt) });
+  }
+  function release(id, tell = true) {
+    const rec = humans.get(id);
+    if (rec?.ent) unfly(rec.ent);
+    if (rec) rec.backAt = net.roomTime();
+    apHeld.delete(id);
+    if (tell) net.broadcast({ t: 'ap', id: `p:${id}`, on: false });
+    push(dbg.ap, { id: `p:${id}`, on: false, t: Math.round(net.roomTime()) });
+  }
+  function apTick(rt) {
+    for (const [id, rec] of humans) {
+      if (!rec.ent || !rec.ac) continue;
+      const tr = net.track(id), h = apHeld.get(id);
+      if (!h) { if (!debug.noAp && tr?.samples.length && rt - Math.max(tr.lastRT, rec.backAt ?? -1e9) > AUTOPILOT_MS && !rec.ac.crashed) takeOver(id, rec, rt); }
+      else if ((h.back || (tr && tr.lastRT > h.since)) && rt - h.sent > AP_RESEND_MS) {
+        h.sent = rt;
+        net.send(id, { t: 'apBack', s: Array.from(rec.ac.packState({ roomTimeMs: rt, hull: 100 })) });
+      }
+    }
+  }
+  // Follower: our plane comes back from the host's autopilot exactly where it flew it.
+  function onApBack(m) {
+    if (Array.isArray(m.s) && m.s.length === 32 && P) {
+      const st = unpackState(Uint8Array.from(m.s));
+      st.t = 0;
+      safe(() => { P.ac.applyRemote([st], 0); P.ac.crashed = false; P.ap.replan(); atc()?.grace('player', 3); });
+      push(dbg.resumed, { x: Math.round(st.pos.x), z: Math.round(st.pos.z), t: Math.round(net.roomTime()) });
+    }
+    meHeld = false;
+    net.toHost({ t: 'apAck' });
+  }
+  // Only a running game loop asks for the plane back: a hidden page that merely receives messages must not.
+  function iAmAway(now) { if (meHeld) return; meHeld = true; heldSince = now; wantBack = true; }
+
+  // ---------------------------------------------------------------- player vs player contact (§2, §8)
+  const inStand = (p) => STANDS.some((s) => Math.hypot(p.x - s.position[0], p.z - s.position[2]) < STAND_R);
+  // Each victim judges its own contact against what it sees, with the room's protection; the host only keeps score.
+  function pvpImpact(ac, orig, kind, reason, o) {
+    const rt = net.roomTime(), oth = humans.get(String(o.other).slice(2));
+    if (rt - spawnRT < SPAWN_PROTECT_MS || inStand(ac.pos) || (oth?.ac && inStand(oth.ac.pos))) return undefined;
+    const t0 = ac._lastImpact;
+    const r = orig.call(ac, kind, reason, o);
+    if (ac._lastImpact === t0) return r;
+    const hit = { t: 'hit', other: o.other, kt: Math.round(o.speedKt || 0), ov: !!P && traffic.modeOf(P) !== 'AUTOPILOT', res: wiring.lastImpact?.result || null };
+    push(dbg.hits, { ...hit, at: Math.round(rt) });
+    if (role === 'host') onHit(myCanon(), hit); else net.toHost(hit);
+    return r;
+  }
+  // Blame goes to whoever was overriding; nobody when neither was. Realistic: 3 hits on the same player in 60 s = Royal Scandal.
+  function onHit(reporter, m) {
+    const rt = net.roomTime(), other = String(m.other || '');
+    if (!other.startsWith('p:') || other === reporter) return;
+    const oid = other.slice(2);
+    const otherOv = other === myCanon() ? !!P && traffic.modeOf(P) !== 'AUTOPILOT' : apHeld.has(oid) ? false : !!net.track(oid)?.latest()?.overriding;
+    const blame = otherOv ? other : null;
+    push(dbg.hitsIn, { from: reporter, other, kt: m.kt, ov: !!m.ov, otherOv, blame, res: m.res, t: Math.round(rt) });
+    if (!blame || prot() !== 'realistic') return;
+    const key = `${blame}>${reporter}`, list = (rams.get(key) || []).filter((t) => t > rt - RAM_MS);
+    if (list.length && rt - list[list.length - 1] < HIT_GAP_MS) return;
+    list.push(rt);
+    rams.set(key, list);
+    if (list.length < RAM_N) return;
+    rams.delete(key);
+    push(dbg.scandals, { id: blame, victim: reporter, t: Math.round(rt) });
+    const L = led(blame);
+    L.acc = Math.round(L.acc * 0.75); courtDirty = true;
+    net.broadcast({ t: 'radio', at: floor(rt, true) + 600, msg: { tower: true, line: 'scandal', about: blame, target: blame } });
+    if (blame === myCanon()) royalScandal(); else net.send(oid, { t: 'scandal', why: 'ramming', victim: reporter });
+  }
+  function royalScandal() {
+    safe(() => wiring.game?.handleEvent({ type: 'scandal', actor: 'player', t: Math.round(net.roomTime()), key: 'ramming' }));
+    safe(() => hud?.flash?.('ROYAL SCANDAL · RAMMING', 'warn', 3));
+  }
+  function patchImpact() {
+    const ac = P?.ac;
+    if (!ac || impactPatch) return;
+    const orig = ac._impact;
+    ac._impact = function (kind, reason, o = {}) {
+      if (kind === 'aircraft' && typeof o.other === 'string' && o.other.startsWith('p:')) return pvpImpact(this, orig, kind, reason, o);
+      return orig.call(this, kind, reason, o);
+    };
+    impactPatch = { ac };
+  }
+  // The room's protection mode, not Free Flight's difficulty (wiring creates the game before the session attaches).
+  function applyProtection() {
+    const s = normalise(net.room?.set || {}), g = wiring.game;
+    if (g?.serialize && g.restore) safe(() => {
+      const j = g.serialize();
+      j.protectionMode = s.protection;
+      j.protection = s.protection === 'partial' ? s.partialStart : s.protection === 'rubber' ? 100 : 0;
+      g.restore(j);
+    });
   }
   const roundLength = () => { const s = normalise(net.room?.set || {}); return s.type === 'coronation' || s.type === 'joust' ? 0 : (s.minutes || 0) * 60000; };
 
@@ -214,7 +396,12 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     else { rec.hi = hi; safe(() => rec.rig?.setLivery?.(hi.livery)); }
     registerHuman(id, rec);
   }
-  function dropHuman(id) { const rec = humans.get(id); if (rec) { removeRec(rec); humans.delete(id); } safe(() => court && role === 'host' && court.removePlayer(`p:${id}`, net.roomTime())); }
+  function dropHuman(id) {
+    const rec = humans.get(id);
+    if (rec) { if (rec.ac) traffic.releaseStand(rec.ac); removeRec(rec); humans.delete(id); }
+    apHeld.delete(id); heldPeers.delete(id); hiSent.delete(id); net.hold?.(id, false);
+    safe(() => court && role === 'host' && court.removePlayer(`p:${id}`, net.roomTime()));
+  }
 
   function ensureAI(info) {
     let rec = ais.get(info.id);
@@ -242,6 +429,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     if (!s || !P) return;
     safe(() => attract?.clearAround(s.position[0], s.position[2], 30));
     P.ac.place({ x: s.position[0], z: s.position[2], heading: s.heading }, env);
+    spawnRT = net.roomTime();
     safe(() => P.ap.setRoute(circuitRoute(wiring.activeEnd(), { type: P.ac.type || 'c172' })));
     safe(() => wiring.link?.placed(P, 8));
   }
@@ -282,7 +470,12 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
   // ---------------------------------------------------------------- host: reports from followers
   function onInf(from, m) {
     const id = `p:${from}`, rule = INFRACTIONS[m.rule], rt = net.roomTime(), L = led(id);
-    const verdict = (ok, why, pp = 0) => { push(dbg.infs, { id, rule: m.rule, ok, why, pp, t: Math.round(rt) }); net.send(from, { t: 'infAck', n: m.n, ok, why, pp }); return ok; };
+    if (m.n != null && L.ns.has(m.n)) { push(dbg.infs, { id, rule: m.rule, n: m.n, ok: true, dup: true, pp: 0, t: Math.round(rt) }); net.send(from, { t: 'infAck', n: m.n, ok: true, dup: true, pp: 0 }); return true; }
+    const verdict = (ok, why, pp = 0) => {
+      if (m.n != null) mark(L.ns, m.n);
+      courtDirty = true;
+      push(dbg.infs, { id, rule: m.rule, n: m.n, ok, why, pp, t: Math.round(rt) }); net.send(from, { t: 'infAck', n: m.n, ok, why, pp }); return ok;
+    };
     if (!rule || !(rule.pp > 0)) return verdict(false, 'rule');
     const strip = safe(() => atc()?.strip(id), null), lat = net.track(from)?.latest();
     if (!strip || !lat) return verdict(false, 'unknown plane');
@@ -307,12 +500,15 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
   function onBank(from, m) {
     const id = `p:${from}`, L = led(id), rt = net.roomTime();
     const amount = Math.max(0, Math.round(+m.amount || 0));
-    if (!L.landed) { push(dbg.banks, { id, ok: false, why: 'no landing', amount }); net.send(from, { t: 'bankAck', ok: false, why: 'no landing' }); return; }
+    if (m.n != null && L.bns.has(m.n)) { push(dbg.banks, { id, ok: true, dup: true, amount }); net.send(from, { t: 'bankAck', n: m.n, ok: true, dup: true }); return; }
+    if (m.n != null) mark(L.bns, m.n);
+    courtDirty = true;
+    if (!L.landed) { push(dbg.banks, { id, ok: false, why: 'no landing', amount }); net.send(from, { t: 'bankAck', n: m.n, ok: false, why: 'no landing' }); return; }
     const ok = Math.min(amount, Math.round(L.acc * 1.1 + 400));
     L.acc = 0; L.landed = false; L.banked += ok;
     push(dbg.banks, { id, ok: true, amount, credited: ok });
     safe(() => court.addPP(id, ok, rt));
-    net.send(from, { t: 'bankAck', ok: true, credited: ok });
+    net.send(from, { t: 'bankAck', n: m.n, ok: true, credited: ok });
   }
   // Floor control between humans: one bark at a time, a bark that would wait > 1.5 s is dropped. Tower and AI lines
   // already come out of the host's own radio director one at a time, and the director gives the tower priority.
@@ -399,19 +595,31 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
   // ---------------------------------------------------------------- messages
   function onMsg(from, m) {
     if (!attached || !m || typeof m.t !== 'string') return;
+    if (net.isHost && role !== 'host' && net.room) setRole('host');
     const fromHost = from === net.hostId;
     switch (m.t) {
       case 'hi': if (m.livery && typeof m.livery === 'object') ensureHuman(from, m); if (!hiSent.has(from)) { hiSent.add(from); sayHi(from); } break;
       case 'inf': if (role === 'host') onInf(from, m); break;
       case 'bank': if (role === 'host') onBank(from, m); break;
       case 'bark': if (role === 'host') onBark(from, m); break;
-      case 'infAck': push(dbg.acks, m); break;
-      case 'bankAck': push(dbg.acks, m); break;
+      case 'hit': if (role === 'host') onHit(`p:${from}`, m); break;
+      case 'back': if (role === 'host') { const h = apHeld.get(from); if (h) h.back = true; else net.send(from, { t: 'apBack', s: null }); } break;
+      case 'apAck': if (role === 'host' && apHeld.has(from)) release(from); break;
+      case 'infAck': push(dbg.acks, m); unacked.delete(`i${m.n}`); break;
+      case 'bankAck': push(dbg.acks, m); unacked.delete(`b${m.n}`); break;
       default:
-        if (!fromHost || role === 'host') return;
+        if (role === 'host') return;
+        // A new host's first messages can beat the server's room update here: keep them for the 'host' event.
+        if (!fromHost) { if (HOST_MSGS.has(m.t)) { early.push({ from, m, at: performance.now() }); if (early.length > 80) early.shift(); } return; }
         if (m.t === 'atk' || m.t === 'atd') onAtcMsg(m);
         else if (m.t === 'ai') { const ids = new Set(m.list.map((a) => a.id)); for (const a of m.list) ensureAI(a); for (const id of [...ais.keys()]) if (!ids.has(id)) dropAI(id); }
-        else if (m.t === 'court') { safe(() => court?.restore(m.s)); if (m.end !== undefined) roundEnd = m.end; syncRank(); }
+        else if (m.t === 'court') { safe(() => court?.restore(m.s)); if (m.end !== undefined) roundEnd = m.end; if (m.led) hostLed = m.led; if (m.hd) hostDetRep = m.hd; syncRank(); }
+        else if (m.t === 'ap') {
+          if (m.id === myCanon()) { if (m.on) iAmAway(lastUpd || performance.now()); else meHeld = false; }
+          else if (typeof m.id === 'string' && m.id.startsWith('p:')) { const id = m.id.slice(2); net.hold(id, !!m.on); if (m.on) heldPeers.add(id); else heldPeers.delete(id); }
+        }
+        else if (m.t === 'apBack') onApBack(m);
+        else if (m.t === 'scandal') royalScandal();
         else if (m.t === 'crown') onCrown(m.id, m.emperor);
         else if (m.t === 'radio') onRadioMsg(m);
         else if (m.t === 'end') onEnd(m.res);
@@ -422,6 +630,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     if (!attached || bytes[0] !== KIND.TRAFFIC || peer !== net.hostId || role === 'host') return;
     const rt = net.roomTime();
     for (const { id, state } of unpackTraffic(bytes)) {
+      if (id.startsWith('p:')) { const peer = id.slice(2); if (peer !== net.id && net.held(peer)) net.pushState(peer, state); continue; }
       let rec = ais.get(id);
       if (!rec) ais.set(id, (rec = { track: new RemoteTrack() }));
       rec.track.push(state, rt);
@@ -486,6 +695,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     if (now - T.ai >= AI_MS) {
       T.ai = now;
       const list = (attract?.ai || []).filter((e) => e.ac).slice(0, 60).map((e) => ({ id: wiring.idOf(e), bytes: e.ac.packState({ roomTimeMs: rt, hull: 100, overriding: false }) }));
+      for (const id of apHeld.keys()) { const ac = humans.get(id)?.ac; if (ac) list.push({ id: `p:${id}`, bytes: ac.packState({ roomTimeMs: rt, hull: 100, overriding: false }) }); }
       if (list.length) { const b = packTraffic(list); for (const o of others()) net.net.sendTo(o.id, 'u', b); }
     }
     if (now - T.roster >= ROSTER_MS) {
@@ -509,14 +719,15 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
       }
       sentAtc = s;
     }
-    if (courtDirty || now - T.court >= COURT_MS) { courtDirty = false; T.court = now; net.broadcast({ t: 'court', s: court.serialize(), end: roundEnd }); }
+    if (courtDirty || now - T.court >= COURT_MS) { courtDirty = false; T.court = now; net.broadcast({ t: 'court', s: court.serialize(), end: roundEnd, led: ledJSON(), hd: [...hostDet] }); }
     if (now - T.meta >= META_MS) {
       T.meta = now;
       const h = court.holder;
       safe(() => net.meta(h ? `${titleOf(court.rankIndexOf(h), court.standings().find((p) => p.id === h)?.gender)} ${nameOf(h) === 'You' ? safe(() => ui?.getProfile?.().name, '') : nameOf(h)}` : '', roundEnd ? Math.max(0, (roundEnd - rt) / 1000) : 0));
     }
-    for (const [id] of humans) {
-      const lat = net.track(id)?.latest();
+    apTick(rt);
+    for (const [id, rec] of humans) {
+      const lat = apHeld.has(id) ? rec.ac : net.track(id)?.latest();
       if (!lat) continue;
       const L = led(`p:${id}`);
       if (!lat.onGround) L.air = true;
@@ -530,11 +741,21 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     const now = performance.now(), rt = net.roomTime();
     const want = net.isHost ? 'host' : 'follower';
     if (net.room && want !== role) setRole(want);
-    if (P && net.room) safe(() => net.sendPlane(P.ac, { hull: P.ac.crashed ? 0 : 100, overriding: traffic.modeOf(P) !== 'AUTOPILOT' }, now));
+    // A frozen or backgrounded page (iOS) wakes up here: the host may have been flying us. Ask before sending a stale pose.
+    if (lastUpd && now - lastUpd > GAP_MS && role === 'follower') iAmAway(now);
+    lastUpd = now;
+    if (wantBack) { wantBack = false; heldSince = now; net.toHost({ t: 'back' }); }
+    if (meHeld && now - heldSince > BACK_WAIT_MS) meHeld = false;
+    if (resendAt && now >= resendAt && role === 'follower') {
+      resendAt = 0;
+      if (!debug.noResend) for (const m of unacked.values()) net.toHost(m);
+      push(dbg.resent, { n: unacked.size, to: net.hostId, skipped: debug.noResend });
+    }
+    if (P && net.room && !meHeld) safe(() => net.sendPlane(P.ac, { hull: P.ac.crashed ? 0 : 100, overriding: traffic.modeOf(P) !== 'AUTOPILOT' }, now));
     for (const [id, rec] of humans) {
       const tr = net.track(id);
       if (!rec.ent && rec.ac && tr?.samples.length) { enter(rec, `p:${id}`, { name: member(id)?.name || rec.hi?.name, kind: 'human', intent: 'circuits', color: rec.hi?.livery?.primary, label: '' }); registerHuman(id, rec); }
-      safe(() => drive(rec, tr, rt));
+      if (!apHeld.has(id)) safe(() => drive(rec, tr, rt));
     }
     if (role === 'follower') {
       for (const [id, rec] of ais) {
@@ -551,15 +772,30 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     attached = true; gen++; P = player; role = null; ended = false; myRank = -1; firstRestore = true;
     hostAtc = null; sentAtc = null; forceKey = true; courtDirty = true; floorFree = 0;
     hiSent.clear(); ledger.clear(); voices.clear(); hostDet.clear(); scolded.clear();
+    apHeld.clear(); heldPeers.clear(); unacked.clear(); rams.clear(); early = [];
+    hostLed = hostDetRep = null; meHeld = wantBack = false; lastUpd = 0; resendAt = 0; seqN = Date.now() % 1e9;
     const set = normalise(net.room?.set || {});
     court = createCourt({ roomType: set.type, target: set.target });
     roundEnd = null;
     if (net.me?.call) { wiring.flightNo = net.me.call; safe(() => wiring.refreshProfile()); }
     patchAtc();
+    applyProtection();
+    patchImpact();
     setRole(net.isHost ? 'host' : 'follower');
     placeAtStand();
     offs.push(net.on('msg', onMsg), net.on('data', onData), net.on('room', onRoom), net.on('peerLeft', dropHuman),
-      net.on('host', (h) => { if (attached) setRole(h.me ? 'host' : 'follower'); }));
+      // Removed from the room (idle in a public room, kicked, or the reconnect ran out): back to the lobby.
+      net.on('kicked', (m) => { if (attached) safe(() => hud?.flash?.(String(m.msg || 'Removed from the room').toUpperCase(), 'warn', 3)); }),
+      net.on('left', () => { if (attached) setTimeout(() => { if (attached && !net.room) onExit?.(); }, 1500); }),
+      net.on('host', (h) => {
+        if (!attached) return;
+        setRole(h.me ? 'host' : 'follower');
+        if (h.me) return;
+        resendAt = performance.now() + RESEND_DELAY_MS;
+        const now = performance.now(), keep = early.filter((e) => e.from === h.host && now - e.at < EARLY_MS);
+        early = [];
+        for (const e of keep) onMsg(e.from, e.m);
+      }));
     offs.push(court.on('standings', () => { courtDirty = true; syncRank(); }));
     offs.push(court.on('crownChange', (c) => { if (role !== 'host') return; net.broadcast({ t: 'crown', id: c.to, emperor: c.emperor }); onCrown(c.to, c.emperor); }));
     offs.push(court.on('winner', () => { if (role === 'host') endRound(); }));
@@ -568,15 +804,15 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
       offs.push(g.on('pp', (e) => { lastPP = e; }));
       offs.push(g.on('banked', (e) => {
         if (role === 'host') { const L = led(myCanon()); L.banked += e.amount; safe(() => court.addPP(myCanon(), e.amount, net.roomTime())); }
-        else net.toHost({ t: 'bank', amount: e.amount });
+        else { const m = { t: 'bank', n: ++seqN, amount: e.amount }; unacked.set(`b${m.n}`, m); net.toHost(m); }
       }));
     }
-    let n = 0;
     if (atc()) offs.push(atc().on('event', (ev) => {
       if (role === 'host' || ev.actor !== 'player' || !INFRACTIONS[ev.type] || !(ev.pp > 0)) return;
       const pp = lastPP && lastPP.id === ev.type ? lastPP.amount : ev.pp;
-      const m = { t: 'inf', n: ++n, rule: ev.type, victim: ev.victim ? canon(ev.victim) : null, severity: ev.severity, pp, data: ev.data, rt: Math.round(net.roomTime()) };
+      const m = { t: 'inf', n: ++seqN, rule: ev.type, victim: ev.victim ? canon(ev.victim) : null, severity: ev.severity, pp, data: ev.data, rt: Math.round(net.roomTime()) };
       push(dbg.sentInf, m);
+      unacked.set(`i${m.n}`, m);
       net.toHost(m);
     }));
     if (radio()) {
@@ -608,7 +844,10 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     if (!attached) return;
     attached = false; gen++;
     for (const f of offs.splice(0)) safe(() => f?.());
-    for (const id of [...humans.keys()]) { removeRec(humans.get(id)); humans.delete(id); }
+    if (impactPatch) { delete impactPatch.ac._impact; impactPatch = null; }
+    for (const id of heldPeers) net.hold?.(id, false);
+    heldPeers.clear(); apHeld.clear(); unacked.clear();
+    for (const id of [...humans.keys()]) { const r = humans.get(id); if (r.ac) traffic.releaseStand(r.ac); removeRec(r); humans.delete(id); }
     for (const id of [...ais.keys()]) dropAI(id);
     patchAttract(false);
     safe(() => atc()?.configure({ authority: true, detectRemote: true, outragePerPlayer: false }));
@@ -620,7 +859,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
   }
 
   return {
-    attach, detach, update, endRound,
+    attach, detach, update, endRound, debug,
     get role() { return role; },
     get attached() { return attached; },
     get court() { return court; },
@@ -629,7 +868,8 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
       role, attached, me: myCanon(), roundEnd, ended,
       humans: [...humans].map(([id, r]) => ({ id: `p:${id}`, entered: !!r.ent, st: r.st || null, x: r.ac ? +r.ac.pos.x.toFixed(1) : null, z: r.ac ? +r.ac.pos.z.toFixed(1) : null, y: r.ac ? +r.ac.pos.y.toFixed(1) : null, inScene: !!r.rig?.root.parent && r.rig.root.visible })),
       ai: [...ais].map(([id, r]) => ({ id, entered: !!r.ent, st: r.st || null, x: r.ac ? +r.ac.pos.x.toFixed(1) : null, z: r.ac ? +r.ac.pos.z.toFixed(1) : null })),
-      ledger: Object.fromEntries([...ledger].map(([k, v]) => [k, { acc: v.acc, banked: v.banked, landed: v.landed, infs: v.infs.length }])),
+      ledger: Object.fromEntries([...ledger].map(([k, v]) => [k, { acc: v.acc, banked: v.banked, landed: v.landed, infs: v.infs.length, ns: [...v.ns] }])),
+      held: [...apHeld.keys()].map((id) => `p:${id}`), heldPeers: [...heldPeers].map((id) => `p:${id}`), meHeld, unacked: [...unacked.keys()],
       court: court ? court.standings().map((p) => ({ id: p.id, pp: p.roomPP, rank: p.rank?.id, crown: p.crown })) : [], holder: court?.holder ?? null,
       ...JSON.parse(JSON.stringify(dbg)),
     }),

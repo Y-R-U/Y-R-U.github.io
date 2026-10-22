@@ -31,6 +31,7 @@ const (
 	ctlBurst      = 40
 	defaultPerIP  = 64
 	defaultGrace  = 10 * time.Second
+	defaultIdle   = 5 * time.Minute // public rooms: no input this long and you are removed (ONLINE §8)
 )
 
 type verifier func(context.Context, string) (identity, error)
@@ -44,6 +45,7 @@ type hub struct {
 	rooms   map[string]*room
 	codes   map[string]*room
 	grace   time.Duration
+	idle    time.Duration
 	now     func() time.Time
 	started time.Time
 	ice     *iceSource
@@ -76,9 +78,10 @@ type client struct {
 	send                chan []byte
 	room                *room
 	seen                time.Time
-	ready               bool // holds the shared world (in sync, stable frame rate): fit to host
-	parked              bool // landed or parked: may change voice mid-session (D5)
-	rdy                 bool // lobby "ready" tick
+	input               time.Time // last player input (beat i=1, or any control message)
+	ready               bool      // holds the shared world (in sync, stable frame rate): fit to host
+	parked              bool      // landed or parked: may change voice mid-session (D5)
+	rdy                 bool      // lobby "ready" tick
 	away                bool
 	awayUntil           time.Time
 	gen                 int
@@ -140,7 +143,7 @@ const (
 func newHub(ice *iceSource, verify verifier) *hub {
 	now := time.Now()
 	return &hub{in: make(chan event, 1024), clients: map[string]*client{}, rooms: map[string]*room{},
-		codes: map[string]*room{}, grace: defaultGrace, now: time.Now, started: now, ice: ice, verify: verify,
+		codes: map[string]*room{}, grace: defaultGrace, idle: defaultIdle, now: time.Now, started: now, ice: ice, verify: verify,
 		perIP: defaultPerIP, ipN: map[string]int{}, pubSeq: map[string]int{}}
 }
 
@@ -183,6 +186,7 @@ func (h *hub) handle(e event) {
 		}
 	case evTick:
 		h.expireAway()
+		h.expireIdle()
 		h.checkHosts()
 	case evFn:
 		e.fn()
@@ -216,6 +220,7 @@ type inMsg struct {
 	On     bool            `json:"on"`
 	R      int             `json:"r"`
 	Pk     int             `json:"pk"`
+	I      int             `json:"i"`
 	Crown  string          `json:"crown"`
 	Left   int             `json:"left"`
 	To     string          `json:"to"`
@@ -231,11 +236,15 @@ func (h *hub) message(c *client, raw []byte) {
 	switch m.T {
 	case "b": // heartbeat from the game loop: a hidden tab stops beating
 		c.ready, c.parked = m.R == 1, m.Pk == 1
+		if m.I == 1 {
+			c.input = c.seen
+		}
 		return
 	case "sig", "rl":
 		h.forwardText(c, m)
 		return
 	}
+	c.input = c.seen
 	if !h.ctlAllow(c) {
 		h.send(c, map[string]any{"t": "err", "code": "slow", "msg": "Slow down a moment."})
 		return
@@ -464,7 +473,7 @@ func (h *hub) join(c *client, m inMsg) {
 }
 
 func (h *hub) enter(c *client, r *room) {
-	c.room, c.rdy = r, false
+	c.room, c.rdy, c.input = r, false, h.now()
 	c.voice = h.pickVoice(r, c.voices)
 	c.call = pickCallsign(r)
 	r.members = append(r.members, c)
@@ -489,7 +498,7 @@ func (h *hub) oneSeatPerUID(r *room, c *client) {
 
 func (h *hub) removeFromRoom(c *client, why string) {
 	msgs := map[string]string{"replaced": "You joined this room from another tab.", "banned": "You were removed from that room.",
-		"kicked": "You were removed from the room."}
+		"kicked": "You were removed from the room.", "idle": "No input for a while, so the room let you go."}
 	h.leaveRoom(c)
 	h.send(c, map[string]any{"t": "kicked", "code": why, "msg": msgs[why]})
 }
@@ -986,6 +995,25 @@ func (h *hub) expireAway() {
 	for _, c := range h.clients {
 		if c.away && now.After(c.awayUntil) {
 			h.drop(c)
+		}
+	}
+}
+
+// Public rooms only: a player who has not touched anything for h.idle is removed. Away players expire on their own.
+func (h *hub) expireIdle() {
+	if h.idle <= 0 {
+		return
+	}
+	now := h.now()
+	for _, r := range h.rooms {
+		if r.private {
+			continue
+		}
+		for _, m := range append([]*client(nil), r.members...) {
+			if !m.away && !m.input.IsZero() && now.Sub(m.input) > h.idle {
+				log.Printf("room %s: %s idle, removed", r.id, m.id)
+				h.removeFromRoom(m, "idle")
+			}
 		}
 	}
 }

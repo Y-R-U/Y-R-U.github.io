@@ -38,7 +38,7 @@ const web = createServer((req, res) => {
 
 const bin = join(tmpdir(), 'krayzeenet-mp');
 execFileSync('go', ['build', '-o', bin, '.'], { cwd: SERVER, stdio: 'inherit' });
-const srv = spawn(bin, [], { env: { ...process.env, KRAYZEE_ADDR: `127.0.0.1:${NET_PORT}`, KRAYZEE_DEV_AUTH: '1', KRAYZEE_ICE_URL: 'off', KRAYZEE_GRACE_MS: '3000' }, stdio: 'ignore' });
+const srv = spawn(bin, [], { env: { ...process.env, KRAYZEE_ADDR: `127.0.0.1:${NET_PORT}`, KRAYZEE_DEV_AUTH: '1', KRAYZEE_ICE_URL: 'off', KRAYZEE_GRACE_MS: '3000', KRAYZEE_IDLE_MS: '0' }, stdio: 'ignore' });
 execFileSync(CDP, ['start', '--port', String(CDP_PORT), '--idle', '120', '--max', '900', '--', '--disable-background-timer-throttling',
   '--disable-renderer-backgrounding', '--disable-backgrounding-occluded-windows', '--disable-features=WebRtcHideLocalIpsWithMdns', '--use-angle=metal'], { stdio: 'inherit' });
 const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7);

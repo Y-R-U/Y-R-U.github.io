@@ -30,21 +30,33 @@ export async function accountToken() {
 export function createNet({ server = DEFAULT_SERVER, profile = () => ({}), getToken = null, p2p = Q.get('p2p') !== '0' } = {}) {
   const net = new Net({ server, p2p, hello: () => helloFromProfile(profile()), token: getToken });
   const tracks = new Map();
+  const held = new Set();   // peers whose plane the host's autopilot is flying: their own (stale) stream is ignored
   let lastState = 0;
-
-  net.on('data', (peer, bytes) => {
-    if (bytes[0] !== KIND.STATE || bytes.length < 33) return;
+  const pushState = (peer, st) => {
     let tr = tracks.get(peer);
     if (!tr) tracks.set(peer, (tr = new RemoteTrack()));
-    const st = unpackState(bytes.subarray(1, 33));
     if (tr.push(st, net.roomTime())) net._emit('plane', peer, st, tr);
+  };
+
+  net.on('data', (peer, bytes) => {
+    if (bytes[0] !== KIND.STATE || bytes.length < 33 || held.has(peer)) return;
+    pushState(peer, unpackState(bytes.subarray(1, 33)));
   });
-  net.on('peerLeft', (id) => tracks.delete(id));
-  net.on('left', () => tracks.clear());
+  net.on('peerLeft', (id) => { tracks.delete(id); held.delete(id); });
+  net.on('left', () => { tracks.clear(); held.clear(); });
 
   // A hidden tab hands the sky over at once (iOS freezes background tabs).
   const onVis = () => { if (document.visibilityState === 'hidden' && net.isHost) api.handoff('hidden'); };
-  if (typeof document !== 'undefined') document.addEventListener('visibilitychange', onVis);
+  // Any touch or key counts as input: public rooms remove a player with none for 5 minutes (server, ONLINE §8).
+  const onInput = () => { net.input = true; };
+  // Wi-Fi ↔ 4G changes the address: renegotiate ICE on every link (relay carries traffic meanwhile).
+  const onNet = () => { if (net.room) net.restartIce('network'); };
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', onVis);
+    for (const ev of ['pointerdown', 'keydown', 'touchstart', 'wheel']) document.addEventListener(ev, onInput, { passive: true, capture: true });
+    window.addEventListener('online', onNet);
+    navigator.connection?.addEventListener?.('change', onNet);
+  }
 
   const others = () => (net.room ? net.room.members.filter((m) => m.id !== net.id) : []);
 
@@ -52,7 +64,13 @@ export function createNet({ server = DEFAULT_SERVER, profile = () => ({}), getTo
     net,
     on: (ev, fn) => net.on(ev, fn),
     connect: () => net.connect(),
-    close() { document.removeEventListener('visibilitychange', onVis); net.close(); },
+    close() {
+      document.removeEventListener('visibilitychange', onVis);
+      for (const ev of ['pointerdown', 'keydown', 'touchstart', 'wheel']) document.removeEventListener(ev, onInput, { capture: true });
+      window.removeEventListener('online', onNet);
+      navigator.connection?.removeEventListener?.('change', onNet);
+      net.close();
+    },
 
     get id() { return net.id; },
     get room() { return net.room; },
@@ -104,6 +122,11 @@ export function createNet({ server = DEFAULT_SERVER, profile = () => ({}), getTo
       return true;
     },
     track: (peer) => tracks.get(peer) || null,
+    // Host autopilot flying `peer`'s plane (O4): drop the peer's own packets, take the host's relayed states instead.
+    hold(peer, on) { if (on) held.add(peer); else held.delete(peer); },
+    held: (peer) => held.has(peer),
+    pushState,
+    restartIce: (why) => net.restartIce(why),
     tracks: () => tracks,
     // Interpolates a peer's plane into `ac` (an Aircraft): 'interp' | 'reckon' | 'lost' | 'empty'.
     applyRemote(peer, ac) {

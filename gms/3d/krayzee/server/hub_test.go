@@ -407,3 +407,40 @@ func TestPerIPCap(t *testing.T) {
 		t.Fatal("third socket from one address accepted")
 	}
 }
+
+func TestIdleRemoval(t *testing.T) {
+	r := newRig()
+	a := r.player("A", nil)
+	r.msg(a, map[string]any{"t": "create"})
+	b := r.player("B", nil)
+	r.msg(b, map[string]any{"t": "join", "code": a.room.code})
+	p := r.player("P", nil)
+	r.msg(p, map[string]any{"t": "create", "priv": true})
+	q := r.player("Q", nil)
+	r.msg(q, map[string]any{"t": "join", "code": p.room.code})
+	rm := a.room
+	for i := 0; i < 70; i++ { // 4m40s of beats; A touches the screen now and then, B never does
+		r.msg(a, map[string]any{"t": "b", "r": 1, "i": map[bool]int{true: 1, false: 0}[i%20 == 0]})
+		r.beat(b, true)
+		r.beat(q, true)
+		r.advance(4 * time.Second)
+	}
+	if b.room != rm {
+		t.Fatal("removed before 5 minutes")
+	}
+	for i := 0; i < 10; i++ {
+		r.msg(a, map[string]any{"t": "b", "r": 1, "i": 1})
+		r.beat(b, true)
+		r.beat(q, true)
+		r.advance(4 * time.Second)
+	}
+	if b.room != nil || a.room != rm || len(rm.members) != 1 {
+		t.Fatal("idle player in a public room was not removed, or an active one was")
+	}
+	if m := last(b, "kicked"); m == nil || m["code"] != "idle" {
+		t.Fatal("idle player not told why", m)
+	}
+	if q.room == nil {
+		t.Fatal("private rooms never remove idle players")
+	}
+}

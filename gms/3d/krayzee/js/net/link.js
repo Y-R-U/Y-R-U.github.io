@@ -10,6 +10,8 @@ const P2P_TIMEOUT = 8000;
 const P2P_RETRY = 15000;
 const BEAT_MS = 500;
 const RECONNECT_MS = 9000;
+const ICE_WAIT = 1500;           // 'disconnected' this long → ICE restart
+const ICE_RESTARTS = 3;
 
 const enc = new TextEncoder();
 const dec = new TextDecoder();
@@ -19,7 +21,7 @@ class Link {
   constructor(net, peer) {
     Object.assign(this, { net, peer, pc: null, dcU: null, dcR: null, direct: false, attempts: 0, failed: false, rtt: 0,
       sendSeq: 0, recvSeq: 0, pending: new Map(), chunks: new Map(), chunkId: 0, queuedIce: [], timer: 0, lastPing: 0,
-      pings: 0, offerer: net.id < peer, closed: false });
+      pings: 0, offerer: net.id < peer, closed: false, restarting: false, restarts: 0, iceTimer: 0 });
     if (net.p2p) this._start();
   }
 
@@ -38,7 +40,14 @@ class Link {
       dc.onmessage = (e) => this._onData(dc === this.dcU ? 'u' : 'r', new Uint8Array(e.data));
     }
     pc.onicecandidate = (e) => { if (e.candidate) this.net._signal(this.peer, { c: e.candidate.toJSON() }); };
-    pc.onconnectionstatechange = () => { if (pc.connectionState === 'failed') this._lostDirect(); };
+    pc.onconnectionstatechange = () => { if (pc.connectionState === 'failed' && !this.restarting) this._lostDirect(); };
+    pc.oniceconnectionstatechange = () => {
+      const s = pc.iceConnectionState;
+      clearTimeout(this.iceTimer);
+      if (s === 'connected' || s === 'completed') this._settle();
+      else if (s === 'disconnected') this.iceTimer = setTimeout(() => this.iceRestart('disconnected'), ICE_WAIT);
+      else if (s === 'failed') this.iceRestart('failed');
+    };
     if (this.offerer) {
       pc.createOffer().then((o) => pc.setLocalDescription(o))
         .then(() => this.net._signal(this.peer, { sdp: pc.localDescription.toJSON() }))
@@ -50,8 +59,10 @@ class Link {
 
   async onSignal(d) {
     if (!this.net.p2p || this.closed) return;
+    if (d.ir) { if (this.offerer) this.iceRestart('peer'); return; }
     if (d.restart) { if (this.offerer) this._start(); return; }
-    if (d.sdp && d.sdp.type === 'offer' && (!this.pc || this.pc.remoteDescription)) this._start();
+    if (d.sdp && d.sdp.type === 'offer' && d.ir2 && this.pc) this._goRelay();
+    else if (d.sdp && d.sdp.type === 'offer' && (!this.pc || this.pc.remoteDescription)) this._start();
     const pc = this.pc;
     if (!pc) return;
     try {
@@ -63,6 +74,7 @@ class Link {
           await pc.setLocalDescription(await pc.createAnswer());
           this.net._signal(this.peer, { sdp: pc.localDescription.toJSON() });
         }
+        if (this.restarting) this._settleSoon();
       } else if (d.c) {
         if (pc.remoteDescription) await pc.addIceCandidate(d.c).catch(() => {});
         else this.queuedIce.push(d.c);
@@ -78,7 +90,46 @@ class Link {
     }
   }
 
+  // Network change (Wi-Fi → 4G) or a stalled path: keep the peer connection and its channels, renegotiate ICE.
+  // Traffic goes through the relay until ICE reconnects. The offerer drives it; the other side asks.
+  iceRestart(why) {
+    if (!this.pc || this.closed || !this.net.p2p) return false;
+    if (this.restarts >= ICE_RESTARTS) { if (this.pc.iceConnectionState === 'failed') this._lostDirect(); return false; }
+    this._goRelay();
+    if (!this.offerer) { this.net._signal(this.peer, { ir: true }); return true; }
+    this.restarts++;
+    const pc = this.pc;
+    this.net._emit('iceRestart', this.peer, why);
+    pc.restartIce?.();
+    pc.createOffer({ iceRestart: true }).then((o) => pc.setLocalDescription(o))
+      .then(() => this.net._signal(this.peer, { sdp: pc.localDescription.toJSON(), ir2: true }))
+      .catch(() => this._lostDirect());
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => { if (this.restarting) this._lostDirect(); }, P2P_TIMEOUT);
+    return true;
+  }
+
+  _settle() {
+    const pc = this.pc;
+    if (!this.restarting || !pc || !['connected', 'completed'].includes(pc.iceConnectionState) || !pc.remoteDescription || pc.signalingState !== 'stable') return false;
+    if (this.dcU.readyState !== 'open' || this.dcR.readyState !== 'open') return false;
+    this.restarting = false;
+    clearTimeout(this.timer);
+    this.direct = true;
+    this.net._linkChanged(this);
+    this.net._emit('iceRestarted', this.peer);
+    return true;
+  }
+  // A restart on a healthy path may never leave 'connected', so no state event fires: poll after the answer.
+  _settleSoon(n = 0) { setTimeout(() => { if (this.restarting && !this._settle() && n < 30) this._settleSoon(n + 1); }, 250); }
+
+  _goRelay() {
+    this.restarting = true;
+    if (this.direct) { this.direct = false; this.net._linkChanged(this); }
+  }
+
   _lostDirect() {
+    this.restarting = false;
     const was = this.direct;
     this.direct = false;
     clearTimeout(this.timer);
@@ -103,7 +154,7 @@ class Link {
     try { pc.close(); } catch (e) { /* closed */ }
   }
 
-  close() { this.closed = true; clearTimeout(this.timer); this._closePc(); }
+  close() { this.closed = true; clearTimeout(this.timer); clearTimeout(this.iceTimer); this._closePc(); }
 
   send(lane, payload) {
     if (lane === 'r') {
@@ -218,6 +269,9 @@ export class Net {
     Object.assign(this, { server, p2p, helloFn: hello, tokenFn: token, ws: null, id: null, tok: null, ice: null, grace: 0,
       room: null, links: new Map(), handlers: {}, lastBeat: 0, queue: [], wantOpen: false, reconnect: null,
       clockOffset: 0, clockBest: [], voices: [] });
+    // Page Lifecycle 'freeze' (Chrome backgrounding): drop the socket as "away" (4001) before the browser closes it
+    // as "going away", which the server reads as a goodbye. The seat is held for the grace and we resume on wake.
+    if (typeof document !== 'undefined') document.addEventListener('freeze', () => { if (this.ws && this.room) try { this.ws.close(4001, 'frozen'); } catch (e) { /* closed */ } });
   }
 
   on(ev, fn) { (this.handlers[ev] ||= []).push(fn); return () => { this.handlers[ev] = this.handlers[ev].filter((f) => f !== fn); }; }
@@ -308,8 +362,10 @@ export class Net {
   // The socket dropped mid-room. The WebRTC links carry the game, so keep them and quietly get the
   // signalling line back; only if that fails inside the grace do we leave.
   _startReconnect() {
-    const rc = { id: this.id, tok: this.tok, tries: 0, timer: 0 };
-    rc.deadline = setTimeout(() => { if (this.reconnect === rc) this._giveUp('timeout'); }, Math.min(this.grace, RECONNECT_MS));
+    const rc = { id: this.id, tok: this.tok, tries: 0, timer: 0 }, wait = Math.min(this.grace, RECONNECT_MS), due = Date.now() + wait;
+    // A frozen page's timers all fire late at once: give the overdue retry one more chance before giving up.
+    const end = (late) => { if (this.reconnect !== rc) return; if (late && Date.now() - due > 1000) { rc.deadline = setTimeout(() => end(false), 4000); return; } this._giveUp('timeout'); };
+    rc.deadline = setTimeout(() => end(true), wait);
     this.reconnect = rc;
     this._emit('reconnecting', true);
     this._retry();
@@ -368,7 +424,8 @@ export class Net {
     if (!this.connected) return;
     if (now - this.lastBeat >= BEAT_MS) {
       this.lastBeat = now;
-      this.ws.send(JSON.stringify({ t: 'b', r: ready ? 1 : 0, pk: parked ? 1 : 0 }));
+      this.ws.send(JSON.stringify({ t: 'b', r: ready ? 1 : 0, pk: parked ? 1 : 0, i: this.input ? 1 : 0 }));
+      this.input = false;
     }
     const fast = !this.clockSynced;
     for (const l of this.links.values()) l.ping(now, fast && l.peer === this.hostId);
@@ -432,6 +489,8 @@ export class Net {
   }
 
   _signal(to, d) { this._raw({ t: 'sig', to, d }); }
+
+  restartIce(why = 'network') { let n = 0; for (const l of this.links.values()) if (l.iceRestart(why)) n++; return n; }
 
   _relay(to, lane, payload) {
     if (!this.ws || this.ws.readyState !== 1) return;

@@ -1,12 +1,13 @@
 # Krayzee online rooms: architecture (lane ONLINE, 2026-10-21)
 
-Status (2026-10-22, lane NET): **O1, O2, O3 done, local only**. Nothing is deployed. `js/main.js` is **not** wired yet:
-the exact block for GAMEPLAY is in §15, and `tools/net/gen-main.mjs` applies it to a generated copy for the tests.
+Status (2026-10-22, lane NET): **O1–O4 done, local only**. Nothing is deployed. `js/main.js` carries the §15 wiring
+(O4 needed no new wiring; `tools/net/gen-main.mjs` skips patches already applied). O4 = §17.
 `server/` is the real `krayzeenet` (snakenet fork + RAGDOJO ID tokens + the Krayzee rules); `js/net/` is the browser
 client (links, clock, plane stream, lobby, `session.js` = the net game, `podium.js`). Tests: `go test ./...` (13 tests),
 `server/test.mjs` (39 protocol checks over real sockets, incl. a server restart), `tools/net/test-interp.mjs` (10),
 `tools/net/test-mp.mjs` (sandbox: two Chrome windows, direct + relay + falsification, 23 checks each; game: two real game
-pages, 33 checks + a falsification run). How to run: §16. GAMEPLAY wiring: §15.
+pages, 33 checks + a falsification run), `tools/net/test-mp4.mjs` (O4: four real game pages, 26 checks + a falsification
+run that breaks five mechanisms). How to run: §16. GAMEPLAY wiring: §15. O4 details: §17.
 
 Prior art this copies:
 - `gms/pwa/snake/MULTIPLAYER.md`: browser-hosted rooms, WebRTC full mesh, relay fallback, reconnect grace, host handoff
@@ -352,7 +353,7 @@ host, ranked rooms a Duke+ host (both on trust). Codes skip 0/O/1/I/L.
 | O1 ✅ | krayzeenet: snakenet fork + prototype pieces, ID token (dev bypass), kick/vote, meta, phase, rank gates, rebuild window, per-IP cap; go tests; deploy scripts **written, not run** | done 2026-10-22 |
 | O2 ✅ | `js/net/`: links (Snake port: chunking, reconnect, relay fallback), room clock, plane stream + interpolation buffer, options from modes.js, lobby screen; two-window CDP test | done 2026-10-22 |
 | O3 ✅ | `js/net/session.js`: remote human rigs (type + livery) as remote Traffic entries (ATC, markers, collisions), own state at 15 Hz, host AI snapshots (10 Hz binary `TRAFFIC` + 1 Hz roster), ATC keyframe 1 Hz + delta 5 Hz, follower replica with own-plane detection → `inf`, authority-only crimes → `hinf`, `bank` validation, Court + crown, radio floor (`schedule(at, clips)`), account token, podium → `career.addOnlineWin`; two-real-page CDP test | done 2026-10-22 (main.js wiring left to GAMEPLAY, §15) |
-| O4 | robustness: host migration from the replica, autopilot for away players, ICE restart, inactive-player removal (5 min, public), the mpgate 4-Chrome gate with falsified checks (hidden-tab handoff is already in O2) | 1 session |
+| O4 ✅ | host migration from the replica (AI adopted, ATC + ledger + Court kept, unacked reports resent and de-duplicated), host autopilot for silent players with hand-back, ICE restart, idle removal (5 min, public), pvp `hit` with room protection + Realistic ramming Scandal, `tools/net/test-mp4.mjs` 4-page gate with falsification | done 2026-10-22 (§17) |
 | O5 | polish: quick join, public list meta, data saver, ping bars, kick-vote UI, LAN mode (as RAGDOJO) if wanted | 1 session |
 
 That is about 6 agent sessions, and online fits after P2 gameplay works in single player. The longest pole is O3,
@@ -389,6 +390,8 @@ lobby.show(true);                       // ?room=CODE in the URL joins straight 
 | `net.sendPlane(ac, {hull, overriding, parachute})` | own plane to every peer, unreliable, self-limited to 15 Hz; uses `ac.packState` with room time |
 | `net.applyRemote(peerId, ac)` | draws a peer's plane into an `Aircraft` 100–300 ms in the past (Hermite/slerp, dead-reckons ≤ 600 ms): `'interp' \| 'reckon' \| 'lost' \| 'empty'` |
 | `net.track(peerId).health(net.roomTime())` | `'live' \| 'lost'` (> 600 ms, ghost) `\| 'autopilot'` (> 2.5 s: host flies it, O4) |
+| `net.hold(peer, on)` · `net.held(peer)` · `net.pushState(peer, st)` | O4: while the host's autopilot flies `peer`, drop its own packets and take the host's relayed states |
+| `net.restartIce(why)` | O4: ICE restart on every link (also fired by `online` / `navigator.connection` change); events `iceRestart(peer, why)`, `iceRestarted(peer)` |
 | `net.roomTime()` | host milliseconds (ping/pong clock to the host; continuous across host handoff) |
 | `net.send(to, obj)` · `net.broadcast(obj)` · `net.toHost(obj)` | reliable ordered JSON (`atc`, `inf`, `bank`, `radio`, `crown`… in O3) |
 | `net.create({name, priv, set})` · `join(code \| {id})` · `quick()` · `list()` · `leave()` | membership |
@@ -444,7 +447,11 @@ the player's stand (spawned at a per-member stand). `detach()` gives all of it b
 `standings()`, `state()` (test/debug snapshot: humans, ai, ledger, court, infs, acks, banks, barks, radioIn, crowns,
 hostDet, sentInf). Messages it adds on the reliable lane: `hi` (type + livery + name/title/voice), `atk`/`atd` (ATC
 keyframe/delta), `ai` (roster), `court {s, end}`, `crown {id, emperor}`, `radio {at, msg}`, `inf`/`infAck`,
-`hinf`, `bank`/`bankAck`, `bark`, `end {res}`; binary `KIND.TRAFFIC` for AI states.
+`hinf`, `bank`/`bankAck`, `bark`, `end {res}`; binary `KIND.TRAFFIC` for AI states. O4 adds: `inf`/`bank` carry `n`
+(acks echo it), `court` carries `led` (ledger incl. seen `n`s) and `hd` (host detections), `ap {id, on}`, `back`,
+`apBack {s: 32-byte pose | null}`, `apAck`, `hit {other, kt, ov, res}`, `scandal {why, victim}`; `KIND.TRAFFIC` also
+carries `p:<id>` entries for planes the host's autopilot holds. `session.debug = {noAdopt, noAp, noResend, noDedupe}`
+are test switches for the falsification run only.
 
 ## 16. Running it locally
 
@@ -467,6 +474,71 @@ over (Court kept, own AI). Its falsification drops B's reports: "the cut-in by B
 still learns of it. `--trace` prints the cut-in approach every 3 s and skips the falsification run. Headless Chrome needs `--disable-features=WebRtcHideLocalIpsWithMdns` for two windows to connect
 directly (Snake's mpgate does the same).
 
+`node tools/net/test-mp4.mjs` (O4) runs four real game pages on CDP 9561 with its own krayzeenet on 8740 (grace 30 s,
+idle removal off) and static server on 8741: ICE restart on D, a Rubber head-on bump C×D, C frozen with
+`Page.setWebLifecycleState` (host AP flies it; woken with focus emulation, control comes back where the AP left it),
+C's two reports (ack lost / never seen), then A closes on final and B takes over. The falsification run breaks ICE
+restart, D's impact handler, the host's AP, B's ATC replica and B's dedupe, and requires exactly those checks to fail
+while the resend and handoff checks still pass. `--real` skips it, `--trace` prints detail. Screenshots `docs/shots/net/mp4-*`.
+
 Deploy (**not done; needs Aaron**): `server/deploy.sh` refuses without `CONFIRM=1` and refuses if port 8018 is taken on the
 box; `server/krayzeenet.service` (MemoryMax 64M), `server/caddy_route.py` adds `handle /gms/3d/krayzee/net/*`. TURN comes
 from snakenet's loopback `:8014/ice` (shared 800 GB cap).
+
+## 17. O4: robustness (2026-10-22)
+
+**Host migration from the replica.** A follower that becomes host (`session.js` `setRole('host')`):
+- applies the newest pending ATC keyframe/delta, then switches ATC to authority. Strips, sequences, clearances (with
+  their `cmdSeq` numbers), cooldowns and per-player outrage are the old host's; the counter continues.
+- **adopts the replica's AI planes**: each remote AI entry becomes a local one with a new `Autopilot` on a route for
+  its ATC intent (circuits / arrival / departure; parked at a stand → board 8 s, then depart), keeps its id, strip,
+  rig, radio voice and marker, and joins `attract.ai`. The page's Aircraft id counter is moved past the adopted ids so
+  a new AI never reuses one.
+- **takes the ledger** from the 1 Hz `court` replication (`led`: acc, infs, landed, banked and the report numbers it
+  has seen) and the host-detection list (`hd`). The Court was already replicated.
+- Followers keep every `inf`/`bank` until acked; on a host change they resend them to the new host 400 ms later. The
+  host drops a report whose `n` it (or the old host, via `led`) already saw, and acks it as `dup`: a report is
+  credited exactly once whether the old host took it, never saw it, or took it and lost the ack.
+- A new host's first messages can beat the server's room update; followers keep them for the `host` event.
+- `hostDetect` starts fresh (first pass only records), so old cut-ins are never scored again.
+
+**Autopilot for silent players (§9).** On the host, a human plane with no packets for 2.5 s (`AUTOPILOT_MS`) becomes
+local: an `Autopilot` on its ATC intent's route, ATC commands it, `aiImpactHandler(room protection)`. The host
+broadcasts `ap {id, on:true}` and relays its pose in `KIND.TRAFFIC` as `p:<id>`; followers `net.hold` that peer.
+When the player's own game loop runs again (a frame gap > 2.5 s, or the `ap on` message) it stops sending, asks
+`back`, gets `apBack` with the pose, puts its plane there, replans and acks; the host releases and gives the stream
+2.5 s before it could take over again. A page that is hidden (no loop) never asks, so control is not flapped back
+and forth. Chrome's `freeze` event closes the socket as "away" (4001), not "going away" (a goodbye), so the seat is
+held for the grace; a reconnect deadline that fires late after a freeze gets one more 4 s chance.
+
+**ICE restart.** `Link.iceRestart`: on `online`, `navigator.connection` change, ICE `disconnected` for 1.5 s or
+`failed`, the offerer restarts ICE on the same `RTCPeerConnection` (`restartIce` + `createOffer({iceRestart:true})`,
+signalled with `ir2`); the other side asks with `{ir:true}`. Traffic goes through the relay until ICE is back
+(`direct` false while `restarting`), at most 3 restarts per link, then the old fallback.
+
+**Idle removal (§8).** Beats carry `i: 1` after any pointer/key/touch/wheel input; every control message counts too.
+`expireIdle` removes a non-away member of a **public** room after `KRAYZEE_IDLE_MS` (default 5 min) without input,
+with `kicked {code:'idle'}`. The session flashes the message and returns to the lobby. Go test `TestIdleRemoval`.
+
+**Player vs player contact.** The session wraps the local plane's `_impact` for contacts with `p:` planes:
+- no contact in the first 5 s after spawning or within 18 m of a stand (either plane);
+- otherwise the game's own impact handler decides, with the **room's** protection: the session restores the game
+  state with the room's `protectionMode` / partial start (wiring creates the game with Free Flight's), and the host
+  sets the AI protection to match;
+- each real contact goes to the host as `hit {other, kt, ov, res}`. Blame goes to the other plane if it was
+  overriding (each side's report blames the other, so both are blamed only if both were overriding; nobody if neither
+  was). In **Realistic** rooms, 3 blamed hits on the same victim within 60 s = Royal Scandal for the rammer
+  (`scandal` → the game's scandal: 25 % pending forfeited, 60 s frozen; host ledger acc ×0.75; tower `scandal` line).
+
+**For other lanes / open points**
+- GAMEPLAY (`js/core/wiring.js`, optional): `startPlay('online')` creates the game with Free Flight's protection and
+  no room type, so Strict Tower's −500 room PP crash penalty is not applied. Passing the room type and protection
+  (`createGame({ mode: set.type, protection: set.protection, partialStartPct: set.partialStart })`) would let the
+  session drop its protection override. No main.js change is needed for O4.
+- FLIGHT: `Autopilot._taxi` throws when a taxi leg's path has one point (the plane is already at the leg's end, e.g. a
+  plane adopted at the hold). `session.flyLocal` pads the path; the autopilot should guard it itself.
+- Aaron: ramming → Royal Scandal is applied in **Realistic rooms only** (§8 lists it under "Ramming in Realistic";
+  DESIGN.md has no ramming rule). Say if Partial/Rubber rooms should count rams too.
+
+**O5 (left):** quick join polish, public list meta, data saver, ping bars + the in-flight connection pill, kick-vote
+UI, LAN mode if wanted; a "Reconnecting…" pill and a toast when the host's autopilot has your plane.

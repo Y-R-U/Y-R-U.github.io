@@ -13,6 +13,7 @@
 //	KRAYZEE_FIREBASE_PROJECT                     (default br8t-games)
 //	KRAYZEE_ORIGINS    extra allowed origins, comma separated host patterns
 //	KRAYZEE_PER_IP     sockets per address       (default 64, IPv6 per /64)
+//	KRAYZEE_IDLE_MS    public-room idle removal  (default 300000; 0 = off)
 //	KRAYZEE_DEV_AUTH=1 tests only: accept "dev:<uid>" and "anon:<uid>" tokens
 package main
 
@@ -63,6 +64,9 @@ func main() {
 	h := newHub(ice, verify)
 	if ms, err := strconv.Atoi(os.Getenv("KRAYZEE_GRACE_MS")); err == nil && ms >= 0 {
 		h.grace = time.Duration(ms) * time.Millisecond
+	}
+	if ms, err := strconv.Atoi(os.Getenv("KRAYZEE_IDLE_MS")); err == nil && ms >= 0 {
+		h.idle = time.Duration(ms) * time.Millisecond
 	}
 	if n, err := strconv.Atoi(os.Getenv("KRAYZEE_PER_IP")); err == nil && n > 0 {
 		h.perIP = n
