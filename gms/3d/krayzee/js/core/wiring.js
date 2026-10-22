@@ -6,7 +6,7 @@ import { createRadio, PILOT_VOICES } from '../radio/index.js';
 import { createGame, difficultyFor } from '../game/index.js';
 import { DIFFICULTY } from '../../data/rules.js';
 import { RANKS } from '../../data/ranks.js';
-import { STANDS } from '../world/layout.js';
+import { STANDS, defaultEnd } from '../world/layout.js';
 import { KT } from '../flight/vmath.js';
 
 const safe = (f, fallback) => { try { return f(); } catch (e) { console.warn('[krayzee]', e); return fallback; } };
@@ -37,7 +37,7 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
       const d = Math.hypot(e.ac.pos.x - ac.pos.x, e.ac.pos.z - ac.pos.z);
       if (d < nd) { nd = d; nearest = idOf(e); }
     }
-    return { phase, nearest, runway: safe(() => p.ap?.status().end, null) || W.activeEnd?.() || '09' };
+    return { phase, nearest, runway: safe(() => p.ap?.status().end, null) || W.activeEnd?.() || defaultEnd() };
   };
   const idOf = (e) => (W.link ? W.link.idOf(e) : e.player ? 'player' : e.ac.id);
 
@@ -153,7 +153,7 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
       W.game.update(dt, { gsKt: ac.gs / KT, onGround: ac.onGround, surface: ac.surface, atStand, calm: P.ap && !P.ap.overridden });
     });
   };
-  W.activeEnd = () => safe(() => W.atc?.activeRunway().end, null) || '09';
+  W.activeEnd = () => safe(() => W.atc?.activeRunway().end, null) || defaultEnd();
   W.state = () => ({ atc: !!W.atc, radio: !!W.radio, game: W.game ? safe(() => W.game.state(), null) : null });
   return W;
 }

@@ -655,7 +655,10 @@ async function flightWorld(o = {}) {
   atc.on('runwayChange', (e) => W.runwayChanges.push(e));
   const spawn = (kind, opts = {}) => {
     const type = o.types ? o.types[Math.floor(rnd() * o.types.length)] : null;
-    const ac = new Aircraft(type ? { type } : { dims: { gearHeight: 1.2 } });
+    // ids per world (not the global Aircraft counter): see-and-avoid tie-breaks compare ids, so a soak must not depend
+    // on how many planes earlier scenarios built (`--run=x` alone == x inside the full run)
+    const id = `ac${W.stats.spawned + 1}`;
+    const ac = new Aircraft(type ? { type, id } : { dims: { gearHeight: 1.2 }, id });
     const plan = R.aiSpawn(kind, atc.activeRunway().end, { ...opts, rnd, claimStand: () => tr.claimStand(ac), type });
     if (!plan) return null;
     ac.place(plan.place, env);
@@ -694,7 +697,7 @@ async function flightWorld(o = {}) {
           if (ev.type === 'takeoffroll' && e.holdAt != null) { W.stats.holdWaitMax = Math.max(W.stats.holdWaitMax, W.t - e.holdAt); e.holdAt = null; }
         }
         for (const ev of ac.events.splice(0)) { if (ev.type === 'crash') { W.stats.crashes++; if (!args.quiet) console.log(`  CRASH t=${W.t.toFixed(0)} ${e.name} ${ev.reason} ${e.ap.phase} ${ac.pos.x.toFixed(0)},${ac.pos.z.toFixed(0)} hdg ${ac.heading.toFixed(0)} gs ${ac.gs.toFixed(1)} wait ${e.ap.waitAhead?.toFixed(1)}`); } if (ev.type === 'impact') W.stats.bounces++; }
-        if (args.trace && (e.name === args.trace || link.idOf(e) === args.trace) && Math.floor(W.t / 10) !== Math.floor((W.t - dt) / 10)) { const st = e.ap.status(); console.log(`  TS t=${W.t.toFixed(0)} ${st.phase}/${st.sub} leg ${st.legIndex} ${ac.pos.x.toFixed(0)},${ac.alt.toFixed(0)},${ac.pos.z.toFixed(0)} ${(ac.speed / 0.5144).toFixed(0)}kt hdg ${ac.heading.toFixed(0)} thr ${ac.ctl.throttle.toFixed(2)} tgt ${JSON.stringify(st.target)} path ${JSON.stringify(e.ap.cur?.path?.map((p) => [p.x | 0, p.z | 0, p.a | 0]))}`); }
+        if (args.trace && (e.name === args.trace || link.idOf(e) === args.trace) && Math.floor(W.t / 10) !== Math.floor((W.t - dt) / 10)) { const st = e.ap.status(); console.log(`  TS t=${W.t.toFixed(0)} ${st.phase}/${st.sub} leg ${st.legIndex} ${ac.pos.x.toFixed(0)},${ac.alt.toFixed(0)},${ac.pos.z.toFixed(0)} ${(ac.speed / 0.5144).toFixed(0)}kt hdg ${ac.heading.toFixed(0)} thr ${ac.ctl.throttle.toFixed(2)} tgt ${JSON.stringify(st.target)} path ${JSON.stringify(e.ap.cur?.path?.map((p) => [p.x | 0, p.z | 0, p.a | 0]))} cx=${JSON.stringify(e.ap.cur?.crossings)} yield=${e.ap.yieldTo} hl=${e.ap._holdLbl} gl=${W.tr.groundLimit(e.ap, 5).toFixed(2)} near=${W.ai.filter((o) => o !== e && o.ac.onGround && Math.hypot(o.ac.pos.x - ac.pos.x, o.ac.pos.z - ac.pos.z) < 450).map((o) => o.name + "@" + o.ac.pos.x.toFixed(0) + "," + o.ac.pos.z.toFixed(0) + "/" + o.ac.gs.toFixed(1))}`); }
         if (/HOLD/.test(e.ap.phase) && ac.onGround && e.holdAt == null) e.holdAt = W.t;
         const lk = e.ap.leg?.kind, lb = e.ap.leg?.label || '';
         if (!ac.onGround && lk === 'fly' && !/UPWIND|CLIMB OUT/.test(lb) && Math.hypot(ac.pos.x, ac.pos.z) > 1500) {
@@ -939,12 +942,13 @@ async function playStart() {
   const N = +(args.starts || 16), TYPES = ['c172', 'c172', 'tiger', 'bathtub'];
   const res = [];
   const realRandom = Math.random;
-  for (let seed = 1; seed <= N; seed++) {
+  for (let seed = +(args.pseed || 1); seed <= (args.pseed ? +args.pseed : N); seed++) {
     const rnd = seeded(seed); Math.random = rnd;
     const env = { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
     const tr = new Traffic(env, {});
     const atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false });
     const link = linkTraffic(atc, tr, { rnd });
+    if (args.dbg) atc.on('instruction', (e) => { if (args.dbg === true || args.dbg.split(',').includes(e.cmd.type)) console.log(`  t=${(e.t - 5).toFixed(1)} ${e.to} ${JSON.stringify(e.cmd).slice(0, 140)} ${JSON.stringify(atc.strip(e.to)).slice(0, 160)}`); });
     const ai = [];
     const spawn = (kind, o = {}) => {
       const type = TYPES[Math.floor(rnd() * TYPES.length)], ac = new Aircraft({ type });
@@ -985,11 +989,151 @@ async function playStart() {
   check(`play start: the player lands on the first circuit without a go-around (${N} starts)`, !bad.length, bad.length ? bad.map((r) => `seed ${r.seed}: ${r.ga.join(',') || 'no touchdown'}`).join('; ') : `touchdown ${Math.min(...res.map((r) => r.td))}-${Math.max(...res.map((r) => r.td))} s`);
 }
 
+const R0 = () => FL.R;
+// ATCSEQ (2026-10-22): the player on LAND, a lined-up placement, a closed-runway crossing, a U-turn off the runway.
+async function seqWorld(seed = 3) {
+  const { Aircraft, Autopilot, Traffic, R, linkTraffic } = await flightLib();
+  const env = { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
+  const tr = new Traffic(env, {});
+  const atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false });
+  const link = linkTraffic(atc, tr, { rnd: seeded(seed) });
+  const W = { env, tr, atc, link, t: 0, evs: [], instr: [], refused: [], ai: [] };
+  atc.on('event', (e) => W.evs.push(e));
+  atc.on('instruction', (e) => { W.instr.push({ ...e, at: W.t }); if (args.dbg && (args.dbg === true || args.dbg.split(',').includes(e.cmd.type))) console.log(`  t=${W.t.toFixed(1)} ${e.to} ${JSON.stringify(e.cmd).slice(0, 140)}`); });
+  atc.on('refused', (e) => W.refused.push(e));
+  W.spawn = (kind, o = {}) => {
+    const type = o.type || 'c172', ac = new Aircraft({ type });
+    const plan = R.aiSpawn(kind, '27', { rnd: seeded(seed + W.ai.length), type, claimStand: () => tr.claimStand(ac), ...o });
+    ac.place(plan.place, env);
+    if (plan.stand) tr.standOwner.set(plan.stand, ac);
+    const e = tr.add({ aircraft: ac, ap: new Autopilot(ac), name: `${kind}-${type}` });
+    e.ap.setRoute(plan.route); W.ai.push(e); return e;
+  };
+  W.player = (place, route) => {
+    const ac = new Aircraft({ type: 'c172' });
+    ac.place(place, env);
+    const P = tr.add({ aircraft: ac, ap: new Autopilot(ac), player: true, name: 'player' });
+    if (route) P.ap.setRoute(route);
+    return P;
+  };
+  W.step = (secs, until) => { for (const t1 = W.t + secs; W.t < t1; W.t += 1 / 60) { tr.update(1 / 60); link.update(1 / 60); if (until?.()) return true; } return false; };
+  return W;
+}
+
+// The player presses LAND from a crosswise position (not on any circuit leg). ATC must treat it as a committed arrival:
+// sequenced, cleared to land, and no departure lined up or rolled in front of it.
+async function landSeq() {
+  const { planLandAhead } = await import('../js/assist/landahead.js');
+  const layout = await import('../js/world/layout.js');
+  const rows = [];
+  const STARTS = args.lpos ? JSON.parse(args.lpos) : [['SE crosswise', 2600, 1300, 260, 315], ['SE wide base', 3200, 1700, 260, 330], ['N crosswise', 2300, -1200, 250, 220], ['N close', 1500, -900, 200, 250], ['N close 2', 1200, -700, 180, 200], ['N abeam', 900, -1200, 220, 180], ['S close', 1500, 700, 180, 300], ['E straight-in', 2000, -300, 150, 240], ['S over the field', 300, 1300, 220, 0]];
+  for (const [label, x, z, alt, hdg] of STARTS) {
+    const W = await seqWorld();
+    const P = W.player({ x, z, alt, heading: hdg, speed: 85 * 0.5144, throttle: 0.6 }, R0().circuitRoute('27'));
+    W.link.placed(P, 1);
+    W.step(1);
+    const ac = P.ac;
+    const plan = planLandAhead({ pos: ac.pos, vel: ac.vel, heading: ac.heading, altitude: ac.alt, onGround: false, world: W.env, layout });
+    if (plan.fail || plan.runway !== '27') { rows.push({ label, skip: plan.fail || plan.runway }); continue; }
+    P.ap.landAt(plan);
+    const dep = W.spawn('holding', { type: 'bathtub' });   // ready at the hold the moment LAND is pressed
+    let inSeq = false, cleared = false, depOnRwyAtTd = null, td = false;
+    const depId = W.link.idOf(dep), t0 = W.t, thr = Gm.endInfo('27').T;
+    const near = () => W.link.states().find((x) => x.id === 'player')?.landing?.remaining ?? Math.round(Gm.dist2([ac.pos.x, ac.pos.z], thr));
+    W.atc.on('instruction', (e) => { if (e.to === depId && ['lineUpWait', 'clearedTakeoff'].includes(e.cmd.type)) W.instr[W.instr.length - 1].near = near(); });
+    W.step(420, () => {
+      if (W.atc.sequence('27').includes('player')) inSeq = true;
+      if (W.atc.command('player', 'clearedLand')) cleared = true;
+      if (ac.onGround && !td) { td = true; const { D } = W.atc._debug(); depOnRwyAtTd = !!D[depId]?.occ.includes('09/27'); }
+      return td;
+    });
+    const depCmds = W.instr.filter((e) => e.to === depId && ['lineUpWait', 'clearedTakeoff'].includes(e.cmd.type));
+    const pGA = W.instr.filter((e) => e.to === 'player' && e.cmd.type === 'goAround');
+    rows.push({ label, td, inSeq, cleared, depOnRwyAtTd, depIn: depCmds.map((e) => `${e.cmd.type}@${(e.at - t0).toFixed(0)}s/${e.near}m`).join(','), inFront: depCmds.some((e) => e.near < (e.cmd.type === 'clearedTakeoff' ? 2200 : 3000)), pGA: pGA.length, secs: Math.round(W.t - t0) });
+  }
+  const done = rows.filter((r) => !r.skip);
+  check(`LAND: the player on LAND is sequenced and cleared to land; nothing lines up in front (${STARTS.length} crosswise starts)`, done.length === STARTS.length && done.every((r) => r.td && r.inSeq && r.cleared && !r.depOnRwyAtTd && !r.inFront && !r.pGA),
+    rows.map((r) => r.skip ? `${r.label}: plan ${r.skip}` : `${r.label}: td ${r.td}@${r.secs}s seq ${r.inSeq} clr ${r.cleared} depOnRwy ${r.depOnRwyAtTd} dep[${r.depIn}] GA ${r.pGA}`).join('; '));
+}
+
+// A just-placed lined-up player is first in line (lineUpWait) and never the cause of the go-around its placement forces.
+async function placedLineUp() {
+  const W = await seqWorld(5);
+  const fin = W.spawn('final', { dist: 1700 });
+  W.spawn('holding');
+  W.step(3);
+  const e27 = R0().runwayEnd('27'), [px, pz] = R0().fromRunway(e27, 12, 0);
+  const P = W.player({ x: px, z: pz, heading: e27.hdg }, R0().circuitRoute('27'));
+  const lu = W.link.placed(P, 8);
+  W.step(0.5);
+  const first = W.atc.departureQueue()[0], luw = W.instr.some((e) => e.to === 'player' && e.cmd.type === 'lineUpWait');
+  W.step(120);
+  const forced = W.evs.filter((e) => e.type === 'forced_goaround' && e.actor === 'player');
+  const ga = W.instr.filter((e) => e.to === W.link.idOf(fin) && e.cmd.type === 'goAround');
+  check('placed: a lined-up player is queued first with line-up-and-wait; the go-around it forces is not scored against it', lu === '27' && first === 'player' && luw && ga.length && !forced.length,
+    `placed ${lu} first ${first} lineUpWait ${luw} final GA ${ga.map((e) => e.cmd.reason + '/' + e.cmd.cause).join(',') || 'none'} forced_goaround(player) ${forced.length}`);
+}
+
+// Taxiway A crosses 04/22, closed by default: the crossing clearance comes with the taxi, nobody stops at it.
+async function closedCrossing() {
+  const W = await seqWorld(7);
+  const a = W.spawn('parked', { stand: 'S1', wait: 2 });
+  const id = W.link.idOf(a), hold = Gm.TAXI_CROSSINGS[0].sides;
+  let stopped = 0, crossAt = null, taxiAt = null;
+  W.step(300, () => {
+    const p = [a.ac.pos.x, a.ac.pos.z];
+    if (!taxiAt && W.atc.command(id, 'taxi')) taxiAt = W.t;
+    if (!crossAt && W.atc.command(id, 'crossRunway')) crossAt = { t: W.t, d: Math.min(...hold.map((h) => Gm.dist2(p, h))) };
+    if (a.ac.gs < 0.5 && hold.some((h) => Gm.dist2(p, h) < 30)) stopped += 1 / 60;
+    return a.ac.pos.x > 450;
+  });
+  check('closed 04/22: crossing cleared with the taxi, no stop at the hold', crossAt && taxiAt != null && crossAt.t - taxiAt < 1 && stopped < 1,
+    `taxi@${taxiAt?.toFixed(1)} cross@${crossAt?.t.toFixed(1)} (${crossAt?.d.toFixed(0)} m from the hold) stopped ${stopped.toFixed(1)} s`);
+}
+
+// A plane stopped on 27 just past A3 turns round to A3 (U-turn) instead of taxiing on to A2 and back.
+async function uturn() {
+  await flightLib();
+  const R = R0();
+  const len = (p) => p.reduce((s, q, i) => (i ? s + Math.hypot(q[0] - p[i - 1][0], q[1] - p[i - 1][1]) : 0), 0);
+  const res = ['S1', 'S4', 'S8'].map((st) => ({ st, m: Math.round(len(R.taxiPath(140, 0, 270, { stand: st }))) }));
+  const atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false });
+  for (let i = 0; i < 60; i++) atc.update(0.1, [{ id: 'player', isPlayer: true, pos: [140, 0, 0], vel: [0, 0, 0], heading: 270, onGround: true, intent: 'fullStop' }]);
+  const ex = atc.command('player', 'vacate');
+  check('U-turn: stopped 10 m past A3 → back to A3, not on to A2 (taxi to stands)', res.every((r) => r.m < 800) && ex?.via === 'A3', res.map((r) => `${r.st} ${r.m} m`).join(', ') + ` · ATC exit ${ex?.via}`);
+}
+
+// LAND refuses a tower go-around: ATC hears about it ('refused', ordered) and does not ALSO call it ignored_instruction
+// (SCORE scores the refusal from the autopilot's 'goaroundrefused').
+async function refusedGA() {
+  const { planLandAhead } = await import('../js/assist/landahead.js');
+  const layout = await import('../js/world/layout.js');
+  const W = await seqWorld(9);
+  const e27 = R0().runwayEnd('27'), [x, z] = R0().fromRunway(e27, -2600, 0);
+  const P = W.player({ x, z, alt: 190, heading: 270, speed: 80 * 0.5144, throttle: 0.5 }, R0().circuitRoute('27'));
+  W.link.placed(P, 0);
+  W.step(1);
+  P.ap.landAt(planLandAhead({ pos: P.ac.pos, vel: P.ac.vel, heading: P.ac.heading, altitude: P.ac.alt, onGround: false, world: W.env, layout }));
+  W.step(8);
+  // the tower orders a go-around for traffic (nothing on the runway, so LAND keeps landing)
+  const { S } = W.atc._debug();
+  const s = S.strips.player;
+  delete s.cmds.clearedLand;
+  s.cmds.goAround = { type: 'goAround', reason: 'traffic', cause: null, runwayEnd: '27', climbTo: 300, seq: ++S.cmdSeq, t: S.t };
+  s.gaT = S.t;
+  W.step(120, () => P.ac.onGround);
+  const ig = W.evs.filter((e) => e.type === 'ignored_instruction' && e.actor === 'player');
+  check('LAND refuses a tower go-around: refused event (ordered), no second ignored_instruction', W.refused.length >= 1 && W.refused[0].ordered && !ig.length && P.ac.onGround,
+    `refused ${JSON.stringify(W.refused.map((e) => ({ seq: e.seq, reason: e.reason, ap: e.apReason })))} ignored ${JSON.stringify(ig.map((e) => e.data))} td ${P.ac.onGround}`);
+}
+
 const SCEN = { circuits: () => aiCircuits(), cutin: cutIn, corner: cutInCorner, blocked: blockedRunway, overtake, outofturn: outOfTurn, buzz: towerBuzz, crossing, crimes, online: serialization };
 if (XF) SCEN.circuits09 = () => aiCircuits('09');
 // royal-frame scripts flown by the real autopilot: not translated for test airports (their soaks fly natively)
 if (!XF) { SCEN.flightcut = flightCutIn; SCEN.gameplay = gameplay; SCEN.avoid = seeAvoid; SCEN.playstart = playStart; }
 SCEN.flight = flightSoak;
+// after the soaks: aircraft ids are global, and the soaks' see-and-avoid tie-breaks (higher id gives way) depend on them
+if (!XF) Object.assign(SCEN, { landseq: landSeq, placed: placedLineUp, closedx: closedCrossing, uturn, refusedga: refusedGA });
 for (const [name, fn] of Object.entries(SCEN)) {
   if (args.only && args.only !== name) continue;
   const t0 = Date.now();
@@ -1014,7 +1158,7 @@ function falsify() {
     ['intersection_dash', 'js/atc/index.js', "if (other) emitEvent('intersection_dash'", "if (false) emitEvent('intersection_dash'", 'crossing', 'player intersection dash'],
     ['cancel takeoff for intruder', 'js/atc/index.js', 'if (blk.length || intr) {', 'if (false) {', 'crossing', 'AI takeoff cancelled'],
     ['downwind spacing', 'js/atc/index.js', 'if (secs <= 2 || s.ext >= T.maxExtend) return;', 'return;', 'circuits', 'circuits: '],
-    ['landing needs a clear runway', 'js/atc/index.js', 'const clear = want && s.penaltyUntil <= S.t && !s.cutPending && !blockers.length', 'const clear = want && s.penaltyUntil <= S.t && !s.cutPending', 'blocked', 'no landing clearance'],
+    ['landing needs a clear runway', 'js/atc/index.js', 'const clear = want && !(s.landing && s.cmds.goAround) && s.penaltyUntil <= S.t && !s.cutPending && !blockers.length', 'const clear = want && !(s.landing && s.cmds.goAround) && s.penaltyUntil <= S.t && !s.cutPending', 'blocked', 'no landing clearance'],
     ['off-runway touchdown', 'js/atc/index.js', "const type = { taxiway: 'taxiway_landing', grass: 'grass_landing', apron: 'apron_landing' }[surf];", 'const type = null;', 'crimes', 'taxiway landing'],
     ['wrong_way', 'js/atc/rules.js', 'wrongWayDeg: 120,', 'wrongWayDeg: 400,', 'crimes', 'wrong-way landing'],
     ['closed_runway', 'js/atc/index.js', "if (!S.open[rw.id]) emitEvent('closed_runway'", "if (false) emitEvent('closed_runway'", 'crimes', 'closed 04/22'],
@@ -1031,17 +1175,27 @@ function falsify() {
     ['unauth_landing', 'js/atc/index.js', "if (!clr || cmdRw(clr) !== rw.id) emitEvent('unauth_landing'", "if (false) emitEvent('unauth_landing'", 'cutin', 'player landing without clearance'],
     ['outrage meter', 'js/atc/outrage.js', 'm.v = Math.max(0, Math.min(C.max, m.v + amount * (amount > 0 ? gain : 1)));', '', 'cutin', 'composure rose'],
     ['serialize', 'js/atc/index.js', 'serialize() { return clone(S); },', 'serialize() { const c = clone(S); delete c.seqs; return c; },', 'online', 'round-trips'],
+    // ATCSEQ
+    // either half alone keeps the default mixed seed under 300 s at the hold; both reverted = the 354 s failure
+    ['mixed flow (busy projection + line-up mutex)', 'js/atc/index.js', ['Math.min(Math.max(d.gs, 4), T.vacateSpeed * (d.s.spd || 1)) + T.vacateTurn', '&& !traffic && !s.cmds.lineUpWait'], ['Math.max(d.gs, 6) + 5', '&& !traffic && mutexFree(first, keys) && !s.cmds.lineUpWait'], 'flight', 'mixed types]: steady flow', '--run=mixed'],
+    ['LAND sequenced', 'js/atc/index.js', 'const land = s.landing && s.landing.end === end;', 'const land = false;', 'landseq', 'LAND: the player'],
+    ['placed line-up', 'js/atc/bridge.js', 'atc.resetStrip(idOf(e), { grace: secs, lineUp });', 'atc.resetStrip(idOf(e), { grace: secs });', 'placed', 'placed:'],
+    ['closed crossing at once', 'js/atc/index.js', '        if (!S.open[h.runway]) {', '        if (false) {', 'closedx', 'closed 04/22'],
+    ['U-turn exit', 'js/atc/index.js', 'a - 60), towardHold()); // an exit just behind: U-turn', 'a + 60), towardHold());', 'uturn', 'U-turn'],
+    ['refused go-around noted', 'js/atc/bridge.js', "if (last?.type === 'goaroundrefused') atc.noteGoAroundRefused?.(id, last.reason);", '', 'refusedga', 'LAND refuses'],
   ];
-  const files = ['js/atc/index.js', 'js/atc/geometry.js', 'js/atc/rules.js', 'js/atc/outrage.js', 'js/world/layout.js', 'js/flight/routes.js', 'data/aircraft.js', 'data/rules.js', ...fs.readdirSync(path.join(ROOT, 'data/airports')).map((f) => `data/airports/${f}`)];
+  const files = ['js/atc/index.js', 'js/atc/geometry.js', 'js/atc/rules.js', 'js/atc/outrage.js', 'js/atc/bridge.js', 'js/world/layout.js', 'js/flight/routes.js', 'data/aircraft.js', 'data/rules.js', ...fs.readdirSync(path.join(ROOT, 'data/airports')).map((f) => `data/airports/${f}`)];
   let ok = 0;
-  for (const [label, file, orig, broken, scen, expect] of B) {
+  for (const [label, file, orig, broken, scen, expect, extra] of B) {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'atc-falsify-'));
     for (const f of files) { fs.mkdirSync(path.join(tmp, path.dirname(f)), { recursive: true }); fs.copyFileSync(path.join(ROOT, f), path.join(tmp, f)); }
-    const src = fs.readFileSync(path.join(tmp, file), 'utf8');
-    const count = src.split(orig).length - 1;
-    if (count !== 1) { console.log(`SKIP  ${label}: pattern found ${count}x`); continue; }
-    fs.writeFileSync(path.join(tmp, file), src.replace(orig, broken));
-    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), `--only=${scen}`, `--atc=${tmp}`, '--quiet'], { encoding: 'utf8' });
+    let src = fs.readFileSync(path.join(tmp, file), 'utf8');
+    const origs = [orig].flat(), brokens = [broken].flat();
+    const counts = origs.map((o) => src.split(o).length - 1);
+    if (counts.some((c) => c !== 1)) { console.log(`SKIP  ${label}: pattern found ${counts}x`); continue; }
+    origs.forEach((o, i) => { src = src.replace(o, brokens[i]); });
+    fs.writeFileSync(path.join(tmp, file), src);
+    const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), `--only=${scen}`, `--atc=${tmp}`, '--quiet', ...(extra ? [extra] : [])], { encoding: 'utf8' });
     fs.rmSync(tmp, { recursive: true, force: true });
     const caught = (r.stdout || '').split('\n').some((l) => l.startsWith('FAIL') && (l.includes(expect) || l.includes(`${scen}: crashed`)));
     if (caught) ok++;

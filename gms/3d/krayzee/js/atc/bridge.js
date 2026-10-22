@@ -51,9 +51,24 @@ export function linkTraffic(atc, traffic, { playerId = 'player', intentOf = null
         intent: intentFor(e), runwayIntent: runwayIntentOf ? runwayIntentOf(e) : null,
         touchdownFpm: ac.lastTouchdown && ac.time - ac.lastTouchdown.t < 0.05 ? ac.lastTouchdown.fpm : undefined,
         impact: ac._lastImpact != null && ac.time - ac._lastImpact < 1.5,
+        landing: e.ap?.landing?.runway ? { end: e.ap.landing.runway, remaining: landRemaining(e) } : null,
         type: ac.type, vrKt: ac.P?.vr ? ac.P.vr / 0.514444 : undefined, speedScale: ac.P?.vcruise ? ac.P.vcruise / (95 * 0.514444) : undefined,
       };
     });
+  }
+
+  // LAND plan: metres still to fly along the plan (remaining fly legs, the final approach fix) to the threshold
+  function landRemaining(e) {
+    const ap = e.ap, P = ap.landing, legs = ap.route?.legs || [];
+    let x = e.ac.pos.x, z = e.ac.pos.z, d = 0;
+    const go = (px, pz) => { d += Math.hypot(px - x, pz - z); x = px; z = pz; };
+    if (ap.route === P.route) for (let k = Math.max(0, ap.i); k < legs.length; k++) {
+      const l = legs[k];
+      if (l.kind === 'fly' && l.to) go(l.to[0], l.to[2]);
+      else if (l.kind === 'approach' && k > ap.i && l.fafDist && P.end?.u) go(P.end.thr[0] - P.end.u[0] * l.fafDist, P.end.thr[1] - P.end.u[1] * l.fafDist);
+    }
+    if (P.end?.thr) go(P.end.thr[0], P.end.thr[1]);
+    return Math.round(d);
   }
 
   function attach(e) {
@@ -93,7 +108,11 @@ export function linkTraffic(atc, traffic, { playerId = 'player', intentOf = null
       if (!ga || ga.seq !== pendingGA.get(id)) pendingGA.delete(id);
       else if (e.player && ap.lastOverride != null && e.ac.time - ap.lastOverride < REFUSE_GA_SECS) pendingGA.delete(id); // a royal who just took the controls lands anyway
       else if (ap.leg?.kind === 'approach' && !e.ac.onGround) {
-        if (ap.sub !== 'goaround') ap._goAround(`Tower: ${GA_TEXT[ga.reason] || 'go around'}`);
+        if (ap.sub !== 'goaround') {
+          ap._goAround(`Tower: ${GA_TEXT[ga.reason] || 'go around'}`);
+          const last = ap.events?.[ap.events.length - 1];
+          if (last?.type === 'goaroundrefused') atc.noteGoAroundRefused?.(id, last.reason);
+        }
         pendingGA.delete(id);
       }
     }
@@ -142,7 +161,17 @@ export function linkTraffic(atc, traffic, { playerId = 'player', intentOf = null
       const ends = Object.entries(a.open).filter(([, o]) => o).flatMap(([rw]) => atc.geo?.runwayById(rw)?.ends ?? rw.split('/'));
       return e.ap?.demandTakeoff({ ends, prefer: a.end });
     },
-    // spawn/respawn/teleport: no crimes for a few seconds, ATC state reset
-    placed(e, secs = 8) { atc.resetStrip(idOf(e), { grace: secs }); },
+    // spawn/respawn/teleport: no crimes for a few seconds, ATC state reset; lined up on a departure end = first in line
+    placed(e, secs = 8) {
+      const ac = e.ac, G = atc.geo, p = [ac.pos.x, ac.pos.z];
+      let lineUp = null;
+      const rw = ac.onGround && G ? G.runwayAt(p, 0) : null;
+      if (rw) for (const end of rw.ends) {
+        const inf = G.endInfo(end), a = G.toEnd(inf, p).a;
+        if (Math.abs(G.angDiff(ac.heading, inf.heading)) < 20 && a > -20 && a < 250 && G.departurePoint(end)) lineUp = end;
+      }
+      atc.resetStrip(idOf(e), { grace: secs, lineUp });
+      return lineUp;
+    },
   };
 }

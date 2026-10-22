@@ -260,7 +260,7 @@ function taxiPath(x, z, heading, dest) {
   const [hx, hz] = heading != null ? headingToVec(heading) : [0, 0];
   const backPen = (n) => {
     const fwd = (n.x - ep.p[0]) * hx + (n.z - ep.p[1]) * hz;
-    return fwd < -1 ? (ep.runway ? 2000 : 25) : 0;
+    return fwd < -1 ? (ep.runway ? (fwd > -60 ? 150 : 2000) : 25) : 0; // on a runway only a short U-turn back to an exit
   };
   const dA = Math.hypot(ep.a.x - ep.p[0], ep.a.z - ep.p[1]), dB = Math.hypot(ep.b.x - ep.p[0], ep.b.z - ep.p[1]);
   const m = ep.runway ? 4 : 1;

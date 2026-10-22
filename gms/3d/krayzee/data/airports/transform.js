@@ -29,6 +29,7 @@ export function transformAirport(src, { id, name = id, rotate = 0, mirror = fals
     wind: src.wind && { ...src.wind, from: H(src.wind.from) },
     runways,
     taxiways: src.taxiways.map((t) => ({ ...t, id: N(t.id), points: t.points.map(P2) })),
+    parallel: src.parallel && N(src.parallel),
     aprons: (src.aprons || []).map(footprint),
     terminal: footprint(src.terminal),
     tower: src.tower && { ...src.tower, position: P3(src.tower.position) },

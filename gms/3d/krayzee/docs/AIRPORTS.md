@@ -307,19 +307,35 @@ Rotated soak results. There are 5 thirty-minute soaks per airport, and each was 
   stop point a few metres behind the painted line. The `steady flow` check and the kinematic `circuits 09` check fail on
   the identity control too. Their thresholds are tuned for 27-active royal traffic.
 
-**Hard-coding left (outside A0/A1 scope):**
-- `js/flight/autopilot.js:392`: `demandTakeoff({ ends = ['09','27'] })`.
-- `js/flight/attract.js:26`: `activeEnd = () => '09'`. `js/core/wiring.js:40,151`: `'09'` fallback.
-  `js/story/host.js:19`: `'27'` fallback. `js/radio/index.js:128-129`: `'27'` fallback. All of these should read the
-  def's first departure end.
-- `data/modes.js:28`: `HOST_OPTIONS.runway = ['wind','27','09','04','22']`.
-- `js/hud/prompts.js:111` and `js/world/pavement.js:132,208` / `props.js:37`: taxiway id `'A'` as *the* parallel.
-- `js/world/textures.js:296,321-323`: sign and number textures for 09/27/04/22 and A–A4 only.
-- `js/world/terrain.js:119,240`: mown-strip mask uses `RUNWAYS[0]`, and LAKE/CASTLE/TOWN constants (A2: from
-  `def.scenery`).
-- `js/game/finish.js:17`: `onApron` assumes an axis-aligned apron (ignores `heading`). `js/main.js:14`: `const { STANDS }`
-  snapshot at import.
-- `js/assist/test/landahead.test.mjs`: royal-only expectations. That is fine for a test.
+**Hard-coding left (status 2026-10-22, lane ATCSEQ).** `js/world/layout.js` now exports literal-free defaults, all
+live and def-driven: `defaultEnd()` (the departure end the def's wind favours = what ATC picks before any `setWind`;
+royal 27, rot37 31, rot37m 13), `departureEnds()`, `runwayOptions()` (`['wind', …every end]`), `PARALLEL` (def
+`parallel`, royal `'A'`, renamed by `transform.js`, rot37 `'K'`) and `inApron(x, z, m)` (rotation-aware). Each item
+below is now a one-line swap in its owner's file:
+- DONE `js/flight/autopilot.js` `demandTakeoff()` ends: the layout's open runway ends (FLIGHTFIX).
+- `js/flight/attract.js:32` `activeEnd = () => '09'`, `js/core/wiring.js:40,156` `'09'`, `js/story/host.js:19` `'27'`,
+  `js/radio/index.js:128-129` `'27'` → `layout.defaultEnd()` (TRAFFIC / GAMEPLAY / STORY / RADIO).
+- `data/modes.js:28` `HOST_OPTIONS.runway` → `runwayOptions()` (needs the room's airport; DESIGN/NET).
+- `js/hud/prompts.js:111`, `js/world/pavement.js:132,135,208`, `js/world/props.js:37`: `'A'` → `PARALLEL` (HUD / ART).
+- `js/game/finish.js:17` `onApron` (axis-aligned) → `inApron` (SCORE).
+- `js/main.js:14` `const { STANDS } = layout` snapshot → `layout.STANDS` at use (GAMEPLAY).
+- Still A2 work: `js/world/textures.js:296,321-323` sign/number textures for 09/27/04/22 and A–A4 only;
+  `js/world/terrain.js:119,240` mown strip from `RUNWAYS[0]`, LAKE/CASTLE/TOWN constants (→ `def.scenery`).
+- `js/assist/test/landahead.test.mjs`: royal-only expectations (fine for a test).
+
+**ATCSEQ round (2026-10-22): sequencing fixes for FLIGHTFIX's list.** All in js/atc + one line each in
+`js/flight/routes.js` and `js/story/host.js` (details in docs/ATC.md §Sequencing model):
+
+| item | before | after |
+|---|---|---|
+| mixed-types soak (default seed) | holdMax 354 s, atc-sim 97/98 | 216 s, atc-sim 103/103 (+5 new checks) |
+| 30-min soak sweep (6 mixed seeds + 4 seed sets × 6 soaks, HEAD autopilot) | mixed holdMax > 300 s in 6/10 runs (worst 594), 0 sep losses | 4/10 (worst 390), 2 sep losses on non-default seeds (101, 77); runway change set 1: 142 → 354 s |
+| LAND player off the circuit (9 starts) | departure cleared with it 865 m out (N close 2) | sequenced + cleared every time, nothing lines up in front |
+| `link.placed()` lined up | no line-up-and-wait, not first | `lineUpWait`, first in queue; never the cause of a go-around for 60 s |
+| closed 04/22 crossing | `crossRunway` 150 m before the hold, waits for 09/27 intersection traffic | with the taxi (518 m out), 0 s stopped |
+| stopped 10 m past A3 (to S4) | 1395 m via A2 | 615 m (U-turn to A3); ATC vacate exit A3 |
+| LAND refuses a tower go-around | ATC also scored `ignored_instruction` 8 s later | `noteGoAroundRefused` (bridge): one `refused` event, no ATC repeat; SCORE3 scores it |
+| test-flight (CDP) | 32/33 | 33/33 |
 
 **Notes for GAMEPLAY (`setAirport`):**
 - Call `setAirport(id)` **before** `buildWorld` and before creating ATC, traffic and autopilots. ATC/geometry and routes

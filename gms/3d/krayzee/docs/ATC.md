@@ -41,6 +41,11 @@ atc.sequence(end?) / atc.departureQueue() / atc.activeRunway() / atc.composure(k
 atc.setWind(from, kt) / atc.setRunwayOpen('04/22', true) / atc.report(type, actor, {victim, severity, data})
 atc.addOutrage(n, actorId?) / atc.setLocal(id, bool) / atc.configure({...}) / atc.remove(id)
 atc.serialize() / atc.restore(json)   // plain JSON, ~2–5 KB
+atc.resetStrip(id, {lineUp, grace}) / atc.grace(id, secs)   // the game moved a plane (link.placed / skipToRunway)
+atc.noteGoAroundRefused(id, apReason)  // LAND refused the standing go-around: marks it ignored (no ignored_instruction /
+                                      // outrage from ATC; SCORE scores the refusal) + emits on('refused') {type:'refused',
+                                      // instruction:'goAround', actor, ordered:true, seq, orderedAt, reason, cause, apReason, t}.
+                                      // Idempotent; false if the tower never ordered one. bridge.js calls it itself.
 ```
 
 ### Aircraft state (input, every tick, every plane)
@@ -53,7 +58,8 @@ atc.serialize() / atc.restore(json)   // plain JSON, ~2–5 KB
   runwayIntent,                       // optional end, e.g. '22' (only honoured if that runway is open)
   apOverridden,                       // player hands on the controls (blame + outrage decay)
   remote, crashed, stand, vrKt, touchdownFpm,
-  speedScale }                        // type's cruise vs the C172 (Tiger 0.84, bathtub 0.63); bridge sends it. All optional
+  speedScale,                         // type's cruise vs the C172 (Tiger 0.84, bathtub 0.63); bridge sends it. All optional
+  landing }                           // LAND assist on a runway: { end, remaining } (metres along the plan); bridge sends it
 ```
 Intents: `circuits` = touch-and-goes forever; `fullStop` = next landing is a full stop, taxi to a stand, then done;
 `depart` = take off and leave; `park` = stay put. ATC never changes intent; the game does. A plane missing for 5 s is
@@ -115,6 +121,23 @@ No landing clearance by 500 m from the threshold → ATC sends you around. Takeo
   rolling/vacating along the runway, so it lands `T.depAfterFree` (85 s) after the runway is projected free. Found by the
   first 09-active soaks: at C-Tower 1 a 09 lander's first reachable exit is A3, 850 m in, and the slot used to expire
   before it was off.
+- **LAND assist** (`state.landing`): the plane is a committed full-stop arrival on `landing.end`, sequenced by
+  `landing.remaining` (the plan's path, not the circuit), always wanted in the sequence (whatever its leg, region or
+  go-around), cleared to land like any number 1. A LAND plane that refused a go-around gets no fresh clearance over it.
+  Before: a LAND player off the circuit was invisible to departures (a departure was cleared with it 865 m out).
+- **Placement** (`link.placed(e)`): a plane placed lined up on a departure end (≤ 250 m in, ±20°) is reset with
+  `lineUp` → line-up-and-wait, first in the queue. For `T.placeGrace` (60 s) after any placement a plane on the ground is
+  never the `cause` of a go-around (no `forced_goaround` against a spawn).
+- **Line-up** does not need the intersection mutex (the line-up point is not at the intersection; only the takeoff roll
+  crosses it). `runwayBusyFor` projects a rolling lander at no more than `T.vacateSpeed` (7 m/s × speedScale) + 
+  `T.vacateTurn` (8 s): at its rollout speed it read 33 s for a Tiger that took 70 s to clear, and a departure lined up
+  in front of the next arrival. Default mixed soak: holdMax 354 → 216 s.
+- **Closed runway crossings** (04/22 at C-Tower 1): `crossRunway` comes with the taxi (no distance or occupancy check
+  except someone actually on that runway's pavement): the 09/27 traffic through the intersection used to make planes
+  wait at the taxiway A crossing.
+- **Stopped on the runway**: the vacate exit may be up to 60 m behind (U-turn), e.g. 10 m past A3 → A3, not A2. The
+  autopilot's taxi graph does the same (routes.js: a runway node < 60 m behind costs 150, not 2000): 140,0 → S4
+  1395 → 615 m.
 - **Runway change** (`setWind` picks a new end): the change is *pending* (`atc.pendingRunway`) until the old runway is
   quiet — nobody cleared/lined up on it, nobody on it, nobody on final inside 1.5 km — or `T.rwChangeMax` (180 s) passes
   (then cleared finals go around, `reason:'runwayChange'`, and lined-up planes get `cancelTakeoff`). No new departures
@@ -219,7 +242,7 @@ rule-break detectors for its own plane only and issues nothing. `setLocal(id, bo
 
 ## Tests
 ```
-node tools/atc-sim.mjs                 # 98 checks, ~3.5 min: kinematic ATC scenarios (circuits, cut-ins, out-of-turn, buzz,
+node tools/atc-sim.mjs                 # 103 checks, ~3.5 min (+ landseq/placed/closedx/uturn/refusedga after the soaks): kinematic ATC scenarios (circuits, cut-ins, out-of-turn, buzz,
                                        # crossing, crimes, online), then the real Aircraft/Autopilot through bridge.js:
                                        # flight cut-in, gameplay (spawn rivals, demand takeoff, skip, rubber/partial/none
                                        # protection), see-and-avoid, play start (16 ?start=free starts, attract +
@@ -227,7 +250,7 @@ node tools/atc-sim.mjs                 # 98 checks, ~3.5 min: kinematic ATC scen
                                        # attract 6 / runway change ×2 / mischief high / mixed types
                                        # C172+Tiger+bathtub) on the rolling terrain + castle
 node tools/atc-sim.mjs --only=flight --run=mixed [--seed=61] [--control]   # --control adds a C172-only run, same seed
-node tools/atc-sim.mjs --falsify       # breaks each detector in a temp copy of js/atc; all 26 must be CAUGHT
+node tools/atc-sim.mjs --falsify       # breaks each detector/fix in a temp copy of js/atc; all 32 must be CAUGHT
 node tools/atc-sim.mjs --only=flight "--run=attract 6" [--minutes=30] [--watch=ac3,ac7 --from=600 --to=700] [--trace=name] [--dbgap]
 node tools/atc-sim.mjs --only=circuits --dbg=goAround,clearedLand --dbgev --peek=600
 node tools/atc-sim.mjs --airport=royal_rot37    # test airport (data/airports/tests.js): C-Tower 1 rotated 37° (13/31, 08/26,
@@ -239,6 +262,8 @@ airport's geometry through a frame adapter that maps positions, headings, end/ru
 `circuits 09`; then it switches the whole flight stack (`setAirport`) and flies five 30-min autopilot soaks natively
 there (4 + 2 circuits on each end of the departure runway, attract 6, runway change ×2, mixed types). flightcut /
 gameplay / avoid stay royal-only (royal-frame scripts for the real autopilot).
+Soak AI ids are per world (`ac1…`), so `--run=x` alone flies exactly what x flies inside the full run (see-and-avoid
+tie-breaks compare ids; a soak used to depend on how many planes earlier scenarios built).
 Soak gates per run: zero AI infractions and separation losses; ≤ 1 go-around / 15 min (ATC + autopilot); nobody held at
 the runway > 5 min or > 10 min from spawn to touchdown, nobody stopped on a taxiway 4 min; ≥ 1 movement / 2 min with
 arrivals and departures both served; no crashes; ≥ 100 m terrain/castle clearance on fly legs > 1.5 km from the field.

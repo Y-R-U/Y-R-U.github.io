@@ -67,7 +67,7 @@ export function createHost(G, o = {}) {
     const P = ent(); if (!P?.ap) return { fail: 'noPlayer' };
     if (o.requestLand) return o.requestLand();
     const ac = P.ac;
-    const plan = planLandAhead({ pos: ac.pos, vel: ac.vel, heading: ac.heading, altitude: ac.pos.y, world: traffic().env, layout, onGround: ac.onGround });
+    const plan = planLandAhead({ pos: ac.pos, vel: ac.vel, heading: ac.heading, altitude: ac.pos.y, world: G.world || traffic().env, layout, onGround: ac.onGround });
     if (plan.fail) return plan;
     P.ap.landAt(plan);
     return plan;

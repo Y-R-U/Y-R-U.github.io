@@ -134,7 +134,8 @@ export function createATC(opts = {}) {
       let s = S.strips[id];
       if (!s) {
         s = S.strips[id] = newStrip(id, raw);
-        if (S.pendingGrace?.[id]) { s.graceUntil = S.pendingGrace[id]; delete S.pendingGrace[id]; }
+        if (S.pendingGrace?.[id]) { s.graceUntil = S.pendingGrace[id]; s.placedT = S.t; delete S.pendingGrace[id]; }
+        if (S.pendingLineUp?.[id]) { const e = S.pendingLineUp[id]; delete S.pendingLineUp[id]; lineUpStrip(s, e); }
         const st = Gm.STANDS.find((x) => x.id === raw.stand);
         if (st && raw.onGround && hyp(v3(raw.pos)[0] - st.position[0], v3(raw.pos)[2] - st.position[2]) < T.standReached && !S.standOwner[st.id]) S.standOwner[st.id] = id;
       }
@@ -142,8 +143,11 @@ export function createATC(opts = {}) {
       s.callsign = raw.callsign ?? s.callsign;
       s.isPlayer = !!raw.isPlayer;
       if (raw.remote != null) s.local = !raw.remote;
-      if (raw.intent && raw.intent !== s.intent) { s.intent = raw.intent; s.done = false; }
-      s.runwayIntent = raw.runwayIntent ?? null;
+      // LAND assist (ap.landing): a committed full-stop arrival on that runway end, sequenced from its own path
+      s.landing = raw.landing?.end && Gm.ALL_ENDS.includes(raw.landing.end) && !raw.onGround ? { end: raw.landing.end, remaining: raw.landing.remaining ?? null } : null;
+      const intent = s.landing ? 'fullStop' : raw.intent;
+      if (intent && intent !== s.intent) { s.intent = intent; s.done = false; }
+      s.runwayIntent = s.landing?.end ?? raw.runwayIntent ?? null;
       s.spd = raw.speedScale || 1;   // slower types (Tiger, bathtub) fly the same circuit slower
       s.type = raw.type ?? s.type ?? null;
       const pos = v3(raw.pos), vel = v3(raw.vel);
@@ -303,6 +307,8 @@ export function createATC(opts = {}) {
       const c = circ(end, s.ext);
       d.prog = Gm.circuitProgress(c, d.p2, d.track, s.leg, d.agl);
       s.leg = d.prog.leg; s.rem = Math.round(d.prog.remaining); s.s = d.prog.s;
+      const land = s.landing && s.landing.end === end;
+      if (land) { s.leg = d.prog.onFinal ? 'final' : 'base'; s.rem = Math.round(s.landing.remaining ?? Gm.dist2(d.p2, info(end).T)); }
       const fromField = Gm.dist2(d.p2, Gm.CENTER);
       const inRegion = fromField < T.regionRadius && d.agl < T.regionAlt && (d.prog.xte < 700 || d.prog.onFinal);
       if (s.cmds.goAround) {
@@ -311,7 +317,7 @@ export function createATC(opts = {}) {
       }
       const landingNow = d.agl < 40 && !s.cmds.goAround && Gm.onRunway(rwOfEnd(end), d.p2, 80);
       const ignoringGA = s.cmds.goAround && S.t - s.gaT > 5 && d.vy <= 0.5 && inCone(d, end);
-      const wants = inRegion && !landingNow && (!s.cmds.goAround || ignoringGA) && s.intent !== 'depart' && !(d.g);
+      const wants = land ? !landingNow : inRegion && !landingNow && (!s.cmds.goAround || ignoringGA) && s.intent !== 'depart' && !(d.g);
       const list = (S.seqs[end] ||= []);
       const at = list.indexOf(id);
       if (!wants) { if (at >= 0) list.splice(at, 1); continue; }
@@ -379,6 +385,7 @@ export function createATC(opts = {}) {
 
   function goAround(s, reason, actor) {
     if (s.cmds.goAround) return;
+    if (actor && S.strips[actor]?.placedT != null && S.t - S.strips[actor].placedT < T.placeGrace && D[actor]?.g) actor = null; // just placed there by the game
     issue(s, { type: 'goAround', reason, cause: actor ?? null, runwayEnd: s.landEnd, climbTo: Gm.circuitFor(s.landEnd || S.activeEnd).alt });
     s.gaT = S.t; s.ext = 0;
     removeFromSeqs(s.id);
@@ -466,7 +473,8 @@ export function createATC(opts = {}) {
     for (const id in D) {
       const d = D[id], v = d.s.cmds.vacate;
       if (!d.g || !d.occ.includes(rwId) || !v || v.runway !== rwId) continue;
-      busy = Math.max(busy, Gm.dist2(d.p2, v.clearAt || v.at) / Math.max(d.gs, 6) + 5);
+      // a lander still rolling fast will slow to taxi speed (slow types crawl along the runway to a far exit)
+      busy = Math.max(busy, Gm.dist2(d.p2, v.clearAt || v.at) / Math.min(Math.max(d.gs, 4), T.vacateSpeed * (d.s.spd || 1)) + T.vacateTurn);
     }
     return busy;
   }
@@ -505,7 +513,7 @@ export function createATC(opts = {}) {
     const needM = mutexKeys(rwId);
     // only queue for the intersection when nothing else stops us: a lander blocked by a lined-up departure must not
     // hold the queue head that departure needs to roll (deadlock: both wait, the lander goes around)
-    const clear = want && s.penaltyUntil <= S.t && !s.cutPending && !blockers.length && !intruder && !reservations(rwId, s.id).length && S.open[rwId];
+    const clear = want && !(s.landing && s.cmds.goAround) && s.penaltyUntil <= S.t && !s.cutPending && !blockers.length && !intruder && !reservations(rwId, s.id).length && S.open[rwId];
     if (clear && needM.length && !S.mutexWait.includes(s.id)) S.mutexWait.push(s.id);
     else if (!clear) S.mutexWait = S.mutexWait.filter((x) => x !== s.id);
     const ok = clear && mutexFree(s.id, needM);
@@ -639,7 +647,7 @@ export function createATC(opts = {}) {
     if (goOk && mutexFree(first, keys)) {
       issue(s, { type: 'clearedTakeoff', runwayEnd: end, at: dp.lineUp, heading: inf.heading, then: s.intent === 'depart' ? 'depart' : 'circuit', circuit: s.intent === 'depart' ? null : { runwayEnd: end, side: circ(end).side, alt: circ(end).alt } });
       takeMutex(first, keys); s.opEnd = end; s.holdT = null;
-    } else if ((runwayClear || (behindLander && !resv.length && !intr)) && !traffic && mutexFree(first, keys) && !s.cmds.lineUpWait && !d.linedUp && lineUpOk()) {
+    } else if ((runwayClear || (behindLander && !resv.length && !intr)) && !traffic && !s.cmds.lineUpWait && !d.linedUp && lineUpOk()) {
       issue(s, { type: 'lineUpWait', runwayEnd: end, at: dp.lineUp, heading: inf.heading });
     }
   }
@@ -662,6 +670,11 @@ export function createATC(opts = {}) {
       for (const h of holds) {
         if (h.departure || (c.crossRunway && c.crossRunway.runway === h.runway)) continue;
         if (s.crossed?.includes(crossKey(h.runway, h.at))) continue;
+        if (!S.open[h.runway]) {
+          // closed: nobody lands or departs on it, so cross at once unless someone is actually on that runway's pavement
+          if (!Object.values(D).some((o) => o !== d && o.paved?.id === h.runway && !o.crashed)) issue(s, { type: 'crossRunway', runway: h.runway, at: h.at, beyond: h.beyond });
+          break;
+        }
         if (Gm.dist2(d.p2, h.at) > T.crossApproach) continue;
         const free = !occupants(h.runway, id).filter((o) => !S.strips[o].cmds.crossRunway).length && !reservations(h.runway, id, [...LAND_CMDS, 'clearedTakeoff', 'lineUpWait']).length && !Gm.runwayById(h.runway).ends.some((e) => coneIntruder(e, id));
         if (free) issue(s, { type: 'crossRunway', runway: h.runway, at: h.at, beyond: h.beyond });
@@ -687,7 +700,7 @@ export function createATC(opts = {}) {
       }
       // player stopped on the runway with nothing to do
       if (!c.vacate && !c.taxi && !c.lineUpWait && !c.clearedTakeoff && !c.cancelTakeoff && !c.holdPosition && d.paved && d.gs < 2 && !d.linedUp && S.t - (s.touchT ?? -1e9) > 3) {
-        const ex = Gm.exitFor(d.alignedEnd || end, Math.max(0, Gm.toEnd(info(d.alignedEnd || end), d.p2).a + 60), towardHold());
+        const ex = Gm.exitFor(d.alignedEnd || end, Math.max(0, Gm.toEnd(info(d.alignedEnd || end), d.p2).a - 60), towardHold()); // an exit just behind: U-turn
         if (ex) issue(s, { type: 'vacate', runway: d.paved.id, via: ex.via, at: ex.at, route: ex.route, clearAt: ex.clearAt, ...(ex.thenRunway ? { thenRunway: true } : {}) });
       }
       if (c.holdPosition && (S.t - c.holdPosition.t > 20 || (!d.occ.length && d.gs < 1))) drop(s, 'holdPosition');
@@ -973,6 +986,14 @@ export function createATC(opts = {}) {
     emitRaw('runwayChange', { type: 'runwayChange', from: prev, to: end, t: S.t });
   }
 
+  function lineUpStrip(s, end) {
+    if (!cfg.authority) return;
+    const dp = Gm.departurePoint(end) || { lineUp: info(end).T };
+    issue(s, { type: 'lineUpWait', runwayEnd: end, at: dp.lineUp, heading: info(end).heading });
+    for (const k of Object.keys(S.deps)) S.deps[k] = S.deps[k].filter((x) => x !== s.id);
+    (S.deps[end] ||= []).unshift(s.id);
+  }
+
   // ---------- public API ----------
   function step(dt, roomTime, states) {
     if (Array.isArray(roomTime)) { states = roomTime; roomTime = undefined; }
@@ -1019,14 +1040,29 @@ export function createATC(opts = {}) {
     resetStrip(id, { lineUp = null, grace = 10 } = {}) {
       id = String(id);
       const s = S.strips[id];
-      if (!s) { (S.pendingGrace ||= {})[id] = S.t + grace; return; }
+      if (!s) { (S.pendingGrace ||= {})[id] = S.t + grace; if (lineUp) (S.pendingLineUp ||= {})[id] = lineUp; return; }
       s.cmds = {}; s.rollRw = null; s.holdT = null; s.cutPending = null; s.penaltyUntil = -1e9; s.touchT = null; s.liftT = null;
       s.ext = 0; s.leg = null; s.issuedSeq = null; s.air = null; s.pv = null; s.done = false;
       removeFromSeqs(id); releaseMutex(id);
       S.mutexWait = S.mutexWait.filter((x) => x !== id);
       for (const k of Object.keys(S.deps)) S.deps[k] = S.deps[k].filter((x) => x !== id);
       s.graceUntil = S.t + grace;
-      if (lineUp && cfg.authority) { const dp = Gm.departurePoint(lineUp) || { lineUp: info(lineUp).T }; issue(s, { type: 'lineUpWait', runwayEnd: lineUp, at: dp.lineUp, heading: info(lineUp).heading }); (S.deps[lineUp] ||= []).unshift(id); }
+      s.placedT = S.t;
+      if (lineUp) lineUpStrip(s, lineUp);
+    },
+    // The autopilot refused a standing go-around (LAND assist). SCORE scores the refusal (main.js forwards the AP's
+    // 'goaroundrefused'), so ATC marks that go-around as already ignored (no second ignored_instruction / outrage) and
+    // emits {type:'refused', ordered:true, ...} on the 'refused' channel. Idempotent; false if the tower never ordered one.
+    noteGoAroundRefused(id, reason = null) { return api.refused(id, 'goAround', reason); },
+    refused(id, type = 'goAround', reason = null) {
+      const s = S.strips[String(id)], c = s?.cmds[type];
+      if (!c) return false;
+      s.ignored[c.seq] = 1;
+      if ((s.refused ||= {})[c.seq]) return true;
+      s.refused[c.seq] = S.t;
+      const ev = { type: 'refused', instruction: type, actor: s.id, callsign: s.callsign, isPlayer: s.isPlayer, ordered: true, seq: c.seq, orderedAt: c.t, reason: c.reason ?? null, cause: c.cause ?? null, apReason: reason, t: S.t };
+      emitRaw('refused', ev);
+      return true;
     },
     serialize() { return clone(S); },
     restore(json) { S = clone(typeof json === 'string' ? JSON.parse(json) : json); circCache.clear(); },

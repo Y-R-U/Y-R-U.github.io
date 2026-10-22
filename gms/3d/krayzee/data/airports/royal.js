@@ -15,6 +15,7 @@ export default {
     { id: '04/22', ends: ['04', '22'], center: [260, 0, -40], heading: 40, length: 950, width: 23, surface: 'asphalt', departures: false, closed: true, markings: 'icao' },
   ],
   taxiwayWidth: 15,
+  parallel: 'A',                       // the main parallel taxiway (layout.PARALLEL)
   // Parallel taxiway north of 09/27, joined to it by stub connectors.
   taxiways: [
     { id: 'A', points: [[-700, -110], [700, -110]] },
