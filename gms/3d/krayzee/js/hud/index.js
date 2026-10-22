@@ -6,8 +6,11 @@ import { createCoach } from './coach.js';
 import { createFinishButton } from './finish.js';
 import { createGroundButtons } from './ground.js';
 import { createHeadlines } from './headlines.js';
+import { createOnlineHUD } from './online.js';
+import { injectHudCss } from './style.js';
 
 export function createGameHUD(root, { getSettings, onTarget, onFinish, onTakeoff, onSkip, onReel, onDifficulty, onAircraft, coachForce = false } = {}) {
+  injectHudCss();
   const el = document.createElement('div');
   el.id = 'krz-ghud';
   el.hidden = true;
@@ -22,8 +25,9 @@ export function createGameHUD(root, { getSettings, onTarget, onFinish, onTakeoff
   const finish = createFinishButton(actions, { onPress: () => onFinish?.() });
   const ground = createGroundButtons(actions, { onTakeoff: () => onTakeoff?.(), onSkip: () => onSkip?.(), onDifficulty: (d) => onDifficulty?.(d), onAircraft: (a) => onAircraft?.(a) });
   const coach = createCoach(el, { force: coachForce });
+  const online = createOnlineHUD(el);
   return {
-    el, score, prompts, coach, finish, ground, actions, headlines,
-    setVisible(v) { el.hidden = !v; score.setVisible(v); if (!v) { coach.end(); prompts.reset(); finish.set('hidden'); ground.set({}); headlines.reset(); } },
+    el, score, prompts, coach, finish, ground, actions, headlines, online,
+    setVisible(v) { el.hidden = !v; score.setVisible(v); if (!v) { coach.end(); prompts.reset(); finish.set('hidden'); ground.set({}); headlines.reset(); online.setVisible(false); } },
   };
 }

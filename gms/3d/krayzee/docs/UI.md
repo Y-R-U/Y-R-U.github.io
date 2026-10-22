@@ -141,3 +141,46 @@ unchanged, 4th refused with error, unstar/restar order, saved order, `getProfile
 Falsified: dropping favourites from `saveProfile`, the stallHorn normalisation and the SOON toggle turn 6 checks red per
 viewport. `tools/ui.html?online=1` makes Online live (hook logs `online`). Gotcha: the roster (`data/voices.json`) re-flows
 the voice cards when it lands, so tests wait for it before tapping stars.
+
+### Round 4 (2026-10-22): online HUD, locked aircraft chips, podium check
+UI round 4 also owns `js/hud/**` (the parked chips plus `js/hud/online.js`) and `css/game.css`. The `main.js` wiring line is in
+docs/GAMEPLAY.md under "Online HUD".
+- **Parked AIRCRAFT chips** (`js/hud/ground.js`): locked types show a padlock and a dimmed label as soon as the row
+  appears (`aircraftLockText` from `js/ui/index.js`, re-read on every tap). Tapping a locked chip shakes it and shows
+  "Moth · Reach Earl · 6,000 PP" (or "Bathtub · Finish the Story to unlock") for 2.6 s under the chips. It does **not** call
+  `onAircraft`. `ground.state.locked` / `.why` are there for tests, and `createGroundButtons(..., { lockText })` can be overridden.
+- **Court ladder + connection pill** (`js/hud/online.js`, made by `createGameHUD` as `ghud.online`): see GAMEPLAY.md.
+- **Bench**: `tools/onlinehud.html` uses the real `js/game/court.js` with a fake session and net. Params: `n` (players), `me`
+  (index), `link=direct|relay|mixed|solo|off`, `rtt`, `emp=1` (the leader has earned Emperor), `g=f`, `collapsed=0|1`,
+  `chips=<careerPP>` (parked chips; `story` = story complete), `podium=1`, `shot=1`. `window.__bench` has `bank(id, pp)`,
+  `crownTo(id)`, `join(name)`, `leave(id)`, `link(kind, ms)`, `setLive(bool)` and `podium()`.
+- **Test**: `node tools/onlinehud_flow.mjs [--only=bench|game]` on port 9441 (metal, cache off, real touch at 390×844 and
+  844×390, mouse at 1280×800).
+  - Bench checks: D4 titles (Queen, Crown Prince…; an Emperor-earned leader is Empress and 2nd is King; 0 PP is Baron),
+    your row pinned last with a gap when you are outside the top rows, a single crown, the header place ("6th/7", "YOURS"),
+    names stay text, the crown-change news line, the row/panel animation and FLIP slide, collapse by real tap that
+    survives a reload, a crown change peeking a collapsed ladder open and folding back, the pill's states, its bars and
+    tap-for-detail, hidden when there is no session, the locked chips and their requirement text, and the podium.
+  - Real-game checks (Free Flight with `S.playMode` set to 'online' and `ghud.online` fed a fake session): the ladder and pill
+    stay clear of pause, score, HUD strip, view/fullscreen, tower, radio, stick, throttle, pad, LAND, chips, warp and
+    subtitles. The portrait ladder stays inside the subtitle-free column. Stick-right landscape is checked too. A header tap
+    collapses without pausing, and the crown change animates in flight.
+  - Result 2026-10-22: 68/68, 79/79, 66/66 (this includes the PLAYTEST_2 B9 toast and popup checks). Falsified: dropping `paintLocks`, the FLIP transform, and widening the portrait
+    ladder to 120 px each turn checks red (court×subs, FLIP, locked chips).
+  - Shots are in `docs/shots/ui4/` (`bench-*`, `collapsed-*`, `crown-change-*`, `pill-detail-*`, `chips-locked-*`, `podium-*`,
+    `game-*`, `game-chips-*`, `game-crown-*`, `game-stickright-844x390`).
+
+#### PLAYTEST_2 items (round 4)
+- **The menu is `inert`** while Settings, the creator/Hangar or the online lobby is open. This is set in `syncAccount()`,
+  which runs on every open and close.
+- **No placeholder pilot.** With no saved profile, the menu card shows a neutral "New pilot / Tap to create your royal" with a
+  "+" roundel and no progress line (`menu.setProfile(p, fresh)`). The real card appears once a profile is saved.
+- **Hangar and the in-flight chips use the same rule:** both go through `aircraftLock()` in `js/ui/aircraft.js`, and main.js's
+  `aircraftType()` uses `ui.aircraftUnlocked` too.
+- ui_flow r4 checks: the New pilot card, the menu live with no popup, inert under the creator, the lobby and Settings, live
+  again after close or save. Result: 126/126, 126/126, 127/127. Falsified: removing the inert line and the fresh flag turns
+  4 checks red per viewport. Two timing checks ("creator saved → onOnline / onStory") now poll for up to 2 s; they flaked
+  before.
+- **CSS location:** UI round 4's `js/hud` styles (locked chips, online HUD, the B9 toast/popup moves) live in
+  `js/hud/style.js`, which `createGameHUD` injects as `<style id="krz-hud-ui4">`. They are not in css/game.css, which
+  HUDFIX is editing.

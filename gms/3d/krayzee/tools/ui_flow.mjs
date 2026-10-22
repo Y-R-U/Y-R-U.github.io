@@ -59,6 +59,7 @@ async function run(view) {
     if (r.exceptionDetails) throw new Error(`${expr}: ${r.exceptionDetails.exception?.description || r.exceptionDetails.text}`);
     return r.result.value;
   };
+  const until = async (expr, secs = 2) => { const t0 = Date.now(); while (Date.now() - t0 < secs * 1000) { if (await ev(expr).catch(() => false)) return true; await sleep(100); } return false; };
   const go = async (q, settle = 900) => {
     await ev('window.__flowStale = 1').catch(() => {}); // the old page answers the readiness poll until the new one commits
     await send('Page.navigate', { url: `${BASE}?${q}` });
@@ -300,11 +301,21 @@ async function run(view) {
   ok(await ev(`!!document.querySelector('.kz-menu [data-a="online"] .kz-soon')`), 'setOnlineAvailable(false) restores SOON');
   await go('state=loading&reset&nocloud=1', 300);
   await go('state=menu&online=1&nocloud=1', 200);
+  ok((await text('.kz-pilot-name')) === 'New pilot' && (await ev(`document.querySelector('.kz-pilot-next').hidden && document.querySelector('.kz-pilot').classList.contains('fresh')`)), 'r4: no profile → neutral "New pilot" card, no placeholder Baron', await text('.kz-pilot-name'));
+  ok(await ev('!document.querySelector(".kz-menu").inert'), 'r4: menu live with no popup');
   await tap('.kz-menu [data-a="online"]');
   ok(await ev(`document.querySelector('.kz-creator').classList.contains('on') && !(window.__uiLog || []).some((l) => l[0] === 'online')`), 'no profile: Online opens the creator first');
+  ok(await ev('document.querySelector(".kz-menu").inert'), 'r4: menu inert under the first-run creator');
   await tap('.kz-creator [data-act="random"]');
   await tap('.kz-creator [data-act="save"]');
-  ok(await ev(`(window.__uiLog || []).filter((l) => l[0] === 'online').length === 1 && __ui.getUIState().lobby`), 'creator saved → onOnline fires');
+  ok(await until(`(window.__uiLog || []).filter((l) => l[0] === 'online').length === 1 && __ui.getUIState().lobby`), 'creator saved → onOnline fires', JSON.stringify(await ev(`({ log: (window.__uiLog || []).map((l) => l[0]), st: __ui.getUIState(), open: document.querySelector('.kz-creator')?.classList.contains('on'), err: document.querySelector('.kz-creator .kz-err, .kz-creator [aria-invalid="true"]')?.outerHTML?.slice(0, 160), name: document.querySelector('.kz-creator input')?.value })`)));
+  ok(await ev('document.querySelector(".kz-menu").inert'), 'r4: menu inert under the lobby');
+  await ev('__ui.showMenu()');
+  ok(await ev('!document.querySelector(".kz-menu").inert') && (await text('.kz-pilot-name')) !== 'New pilot' && !(await ev(`document.querySelector('.kz-pilot').classList.contains('fresh')`)), 'r4: after save the card shows the pilot, menu live', await text('.kz-pilot-name'));
+  await tap('.kz-menu [data-a="settings"]');
+  ok(await ev('document.querySelector(".kz-menu").inert'), 'r4: menu inert under Settings');
+  await ev(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); 1`);
+  ok(await until('!document.querySelector(".kz-menu").inert'), 'r4: closing Settings makes the menu live again');
 
   // 15. Story + intro hooks (GAMEPLAY no longer patches the menu at runtime).
   await go('state=menu&seed&nocloud=1');
@@ -328,7 +339,7 @@ async function run(view) {
   ok(await ev(`document.querySelector('.kz-hangar').hidden`), 'first-run creator hides the aircraft picker');
   await tap('.kz-creator [data-act="random"]');
   await tap('.kz-creator [data-act="save"]');
-  ok(await ev(`__uiLog.filter((l) => l[0] === 'story').length === 1 && __ui.getUIState().state === 'game'`), 'creator saved → onStory');
+  ok(await until(`__uiLog.filter((l) => l[0] === 'story').length === 1 && __ui.getUIState().state === 'game'`), 'creator saved → onStory');
   ok((await store('krayzee.settings')) === null, 'first-run save writes no settings');
 
   // 16. Hangar aircraft picker: cards, unlocks (Moth = Earl, Bathtub = story), preview, saved as settings.aircraft.

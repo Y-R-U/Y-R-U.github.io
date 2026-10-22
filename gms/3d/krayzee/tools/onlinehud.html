@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Krayzee online HUD bench</title>
+<link rel="stylesheet" href="../css/game.css">
+<style>
+  body { background: linear-gradient(#8fbbe6 0%, #c9def0 46%, #7a9c5a 47%, #5e7f44 100%); }
+  .road { position: fixed; left: 50%; bottom: 0; width: 46vw; height: 53vh; transform: translateX(-50%) perspective(300px) rotateX(55deg); transform-origin: bottom;
+    background: repeating-linear-gradient(#3a3d42 0 40px, #3a3d42 40px 70px), #3a3d42; box-shadow: inset 0 0 0 6px #ddd; }
+  .plane { position: fixed; left: 50%; top: 46%; width: 300px; max-width: 76vw; transform: translate(-50%, -50%); opacity: .9; }
+  #bench { position: fixed; right: 8px; bottom: 8px; z-index: 50; display: flex; flex-wrap: wrap; gap: 4px; max-width: 220px; justify-content: flex-end; }
+  #bench button { font: 600 11px system-ui; padding: 6px 8px; border-radius: 8px; border: 0; background: #fff; }
+  html.shot #bench { display: none; }
+</style>
+</head>
+<body>
+<div class="road"></div>
+<svg class="plane" viewBox="0 0 300 80" aria-hidden="true"><rect x="0" y="30" width="300" height="12" rx="4" fill="#b3122e"/><rect x="135" y="10" width="30" height="62" rx="12" fill="#f4efe6"/><rect x="110" y="62" width="80" height="8" rx="3" fill="#b3122e"/></svg>
+<div id="krz-overlay">
+  <div id="krz-controls" data-hand="left"><div class="krz-top krz-top-l"><button class="krz-btn krz-round" data-act="pause" aria-label="Pause">II</button></div>
+    <div class="krz-stick-zone" style="left:4px"><div class="krz-stick-base"><div class="krz-stick-knob"></div></div></div></div>
+</div>
+<div id="bench"><button data-b="bank">bank rival</button><button data-b="me">bank me</button><button data-b="crown">crown flip</button><button data-b="join">join</button><button data-b="leave">leave</button><button data-b="link">link</button><button data-b="podium">podium</button></div>
+<script type="module">
+import { createGameHUD } from '../js/hud/index.js';
+import { createCourt } from '../js/game/court.js';
+import { showPodium } from '../js/net/podium.js';
+
+// n=players (5) me=my index (2) link=direct|relay|mixed|solo|off rtt=ms emp=1 (leader earned Emperor) g=f collapsed=1|0
+// chips=<careerPP> (parked aircraft chips with that career) podium=1 shot=1
+const Q = new URLSearchParams(location.search);
+if (Q.has('shot')) document.documentElement.classList.add('shot');
+if (Q.has('collapsed')) try { localStorage.setItem('krayzee.courtCollapsed', Q.get('collapsed') === '1' ? '1' : '0'); } catch (e) { /* */ }
+if (Q.has('chips')) try {
+  localStorage.setItem('krayzee.profile', JSON.stringify({ name: 'Dirk', gender: Q.get('g') === 'f' ? 'f' : 'm', company: 'Dirk Air', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017', voice: 'toff', registration: 'K-DIRK' }));
+  localStorage.setItem('krayzee.career', JSON.stringify({ v: 1, lifetimePP: +Q.get('chips') || 0, onlineWins: 0, storyComplete: Q.has('story'), rankFloor: 0, unlockedTitles: ['baron'], selectedTitle: null, savedAt: 1 }));
+} catch (e) { /* */ }
+
+const NAMES = [['Mo', 'f'], ['Bertie', 'm'], ['Dirk', 'm'], ['Lady Penelope-Smythe', 'f'], ['Hamish', 'm'], ['Tex', 'm'], ['Gigi', 'f'], ['Ron', 'm']];
+const n = Math.max(1, Math.min(8, +(Q.get('n') || 5))), meIdx = Math.min(n - 1, +(Q.get('me') ?? 2));
+const court = createCourt({ roomType: 'court' });
+let t = 0;
+const ids = [];
+for (let i = 0; i < n; i++) {
+  const id = `p:${i}`;
+  ids.push(id);
+  court.addPlayer(id, { name: NAMES[i][0], gender: i === meIdx && Q.get('g') ? Q.get('g') : NAMES[i][1], emperorEarned: Q.get('emp') === '1' && i === 0 }, t++);
+}
+const pp = [4200, 3100, 2500, 1800, 900, 400, 120, 0];
+for (let i = 0; i < n; i++) if (pp[i]) court.addPP(ids[i], pp[i], t++);
+const me = ids[meIdx];
+const kinds = { direct: { relayed: 0, total: 3 }, relay: { relayed: 3, total: 3 }, mixed: { relayed: 1, total: 3 }, solo: { alone: true } };
+let linkKind = Q.get('link') || 'direct', rtt = +(Q.get('rtt') || 48);
+const session = { attached: true, standings: () => court.standings() };
+const net = { get id() { return meIdx; }, get connected() { return linkKind !== 'off'; }, linkSummary: () => (linkKind === 'off' ? null : { ...kinds[linkKind], rtt }) };
+
+const ghud = createGameHUD(document.getElementById('krz-overlay'), { getSettings: () => ({}), onAircraft: (a) => (window.__benchLog ||= []).push(['aircraft', a]) });
+ghud.el.hidden = false;
+ghud.score.setVisible(true);
+if (Q.has('chips')) ghud.ground.set({ aircraft: 'c172', difficulty: 'easy' });
+let live = true;
+function frame() { if (live) ghud.online.sync(session, net); requestAnimationFrame(frame); }
+frame();
+
+const bench = {
+  court, session, net, ghud, me, ids,
+  bank(id, amount) { court.addPP(id, amount, t++); },
+  crownTo(id) { const top = court.standings()[0]; court.addPP(id, Math.max(1, top.roomPP - court.standings().find((p) => p.id === id).roomPP + 150), t++); },
+  join(name = 'Newbie', g = 'm') { const id = `p:${ids.length}`; ids.push(id); court.addPlayer(id, { name, gender: g }, t++); return id; },
+  leave(id) { court.removePlayer(id, t++); },
+  link(kind, ms = rtt) { linkKind = kind; rtt = ms; },
+  setLive(v) { live = v; if (!v) ghud.online.sync(null, null); },
+  podium() {
+    const res = court.finish(t++);
+    return showPodium({ standings: res.standings.map((s) => ({ ...s, you: s.id === me, name: s.id === me ? 'Dirk' : s.name, title: ghud.online && s.rank ? (s.gender === 'f' ? s.rank.f : s.rank.m) : '' })),
+      winner: res.winner, counted: res.countsAsWin, won: res.winner === me && res.countsAsWin, onClose: () => (window.__benchLog ||= []).push(['podiumClose']) });
+  },
+};
+window.__bench = bench;
+if (Q.get('podium') === '1') setTimeout(() => bench.podium(), 300);
+const order = ['direct', 'relay', 'mixed', 'solo', 'off'];
+document.getElementById('bench').addEventListener('click', (e) => {
+  const b = e.target.closest('button')?.dataset.b;
+  if (b === 'bank') bench.bank(ids[(Math.random() * ids.length) | 0], 300 + ((Math.random() * 900) | 0));
+  if (b === 'me') bench.bank(me, 600);
+  if (b === 'crown') bench.crownTo(ids.find((id) => id !== court.holder));
+  if (b === 'join') bench.join();
+  if (b === 'leave') bench.leave(ids.filter((id) => id !== me).pop());
+  if (b === 'link') bench.link(order[(order.indexOf(linkKind) + 1) % order.length], 40 + ((Math.random() * 300) | 0));
+  if (b === 'podium') bench.podium();
+});
+window.__benchReady = true;
+</script>
+</body>
+</html>

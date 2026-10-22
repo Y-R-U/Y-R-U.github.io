@@ -27,7 +27,19 @@ export function createMenu(root, act) {
   node.querySelectorAll('[data-a]').forEach((b) => onTap(b, () => act(b.dataset.a)));
   return {
     node,
-    setProfile(p) {
+    setProfile(p, fresh = false) {
+      const card = node.querySelector('.kz-pilot');
+      card.classList.toggle('fresh', fresh);
+      node.querySelector('.kz-pilot-edit').textContent = fresh ? 'Create' : 'Edit';
+      card.setAttribute('aria-label', fresh ? 'Create your pilot' : 'Edit pilot profile');
+      if (fresh) {
+        node.querySelector('.kz-roundel').style.background = '';
+        node.querySelector('.kz-pilot-name').textContent = 'New pilot';
+        node.querySelector('.kz-pilot-sub').textContent = 'Tap to create your royal';
+        node.querySelector('.kz-pilot-next').hidden = true;
+        return;
+      }
+      node.querySelector('.kz-pilot-next').hidden = false;
       node.querySelector('.kz-roundel').style.background =
         `conic-gradient(${p.primary} 0 50%, ${p.secondary} 0 75%, ${p.accent} 0)`;
       node.querySelector('.kz-pilot-name').innerHTML = `<i>${esc(p.title)}</i> ${esc(p.name)}`;

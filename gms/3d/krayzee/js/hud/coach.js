@@ -78,6 +78,7 @@ export function createCoach(root, { force = false } = {}) {
       S.w = w;
       if (w.manual) w.seenManual = S.seenManual = true; else w.seenManual = S.seenManual;
       if (S.cur) {
+        if (w.stable === false && S.cur.id !== 'stick') { el.hidden = true; return; } // a dive started: hold the mark, don't burn its time
         S.t += dt;
         if (S.cur.done(w)) return finish('done');
         if (S.t > S.cur.secs) return finish('timeout');

@@ -379,3 +379,8 @@ html.kz-acct-off #br8t-account { opacity: 0; visibility: hidden; pointer-events:
   .kz-stats { grid-column: 2; grid-row: 1 / span 4; align-self: center; }
   .kz-plane.locked .kz-lock { grid-column: 1 / -1; }
 }
+
+/* no saved profile yet: neutral "New pilot" card (PLAYTEST_2 B10) */
+.kz-pilot-next[hidden] { display: none; }
+.kz-pilot.fresh .kz-roundel { background: rgba(247, 220, 143, .08); box-shadow: inset 0 0 0 2px rgba(247, 220, 143, .55); position: relative; }
+.kz-pilot.fresh .kz-roundel::after { content: '+'; position: absolute; inset: 0; display: grid; place-items: center; font: 300 26px/1 system-ui; color: rgba(247, 220, 143, .85); }

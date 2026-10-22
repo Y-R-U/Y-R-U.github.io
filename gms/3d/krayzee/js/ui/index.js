@@ -19,6 +19,7 @@ const SOON = {
 
 function syncAccount() {
   const popup = settings?.pop.isOpen ? 'settings' : profile?.pop.isOpen ? 'profile' : null;
+  if (menu) menu.node.inert = !!popup || lobbyOpen; // PLAYTEST_2 B10: nothing under a popup or the lobby takes taps or focus
   setAccountVisible(popup === 'settings' || (state !== 'game' && !lobbyOpen && popup !== 'profile'));
 }
 
@@ -39,7 +40,7 @@ function ensureRoot() {
   });
   profile = createProfile(root, {
     onSave: (p) => {
-      menu.setProfile(p);
+      paintPilot();
       hooks.onProfile?.(getProfile());
       const go = pendingPlay;
       pendingPlay = null;
@@ -49,7 +50,7 @@ function ensureRoot() {
     onClose: (saved) => { if (!saved) pendingPlay = null; syncAccount(); },
     onAircraft: () => hooks.onSettings?.(loadSettings()),
   });
-  menu.setProfile(loadProfile());
+  paintPilot();
   addEventListener('keydown', (e) => {
     if (e.key !== 'Escape' || e.defaultPrevented) return;
     if (settings.pop.isOpen) settings.pop.close();
@@ -113,7 +114,7 @@ export function showMenu() {
   lobbyOpen = false;
   if (loading) { loading.set(1); loading.hide(); loading = null; }
   if (settings.pop.isOpen) settings.pop.close();
-  menu.setProfile(loadProfile());
+  paintPilot();
   menu.show(true);
   syncAccount();
   if (fromLoading && !hasProfile()) setTimeout(() => { if (state === 'menu' && !profile.pop.isOpen) openProfile({ first: true }); }, 1100);
@@ -151,7 +152,9 @@ export function getProfile() {
 }
 
 export function setCareer(c) { useCareer(c); refreshProfile(); }
-export function refreshProfile() { if (menu) menu.setProfile(loadProfile()); }
+export function refreshProfile() { if (menu) paintPilot(); }
+// No saved profile yet: a neutral "New pilot" card, never the default Baron Dirk (PLAYTEST_2 B10).
+function paintPilot() { menu.setProfile(loadProfile(), !hasProfile()); }
 export function getRankProgress() { return rankProgress(loadProfile().gender); }
 
 // DESIGN §2: the Royal Bathtub's taps turn gold at Emperor.
