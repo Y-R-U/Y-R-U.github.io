@@ -18,6 +18,8 @@ export const T = {
   finalFastSpeed: 38.6, finalSlowFrom: 2400, // a long final is flown at 75 kt until 2.4 km out
   spacingTG: 45,                   // seconds at the threshold behind a touch-and-go
   spacingFull: 60,                 // behind a full-stop lander (rollout + vacate)
+  // slow types float and roll past the first exit: touchdown-to-clear measured 30 s C172, 72 s Tiger, 62 s bathtub
+  spacingFullType: { tiger: 85, bathtub: 75 },
   spacingPlayer: 65,               // behind a human (who knows)
   minFinalGap: 22,                 // seconds; on final with less than this behind the leader = go around
   maxExtend: 5000,
@@ -30,6 +32,7 @@ export const T = {
   arrivalBlockLinedUp: 1800,       // already lined up: it rolls at once
   lineUpArrivalClear: 3000,        // line up and wait only if the next arrival is at least this far out
   lineUpBehind: 250,               // ...or behind a lander already this far down the runway
+  lineUpSlack: 20,                 // s spare between the runway projected free and the arrival reaching arrivalBlockLinedUp
   depSlotWait: 0,                  // s at the hold before ATC stretches an arrival to make a gap
   depSlotNear: 450,                // ...or already this close to the hold while taxiing out
   depSlot: 130,                    // seconds opened behind the leader for a waiting departure

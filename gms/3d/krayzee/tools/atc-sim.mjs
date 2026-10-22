@@ -930,10 +930,65 @@ async function flightSoak() {
   }
 }
 
+// ?start=free as the game does it (main.js placePlayer + attract.seedRivals): 4 mixed-type attract AI, the player lined up
+// on 27 flying circuits, a rival on a 3.6 km final and one at the hold. The player must land on the first circuit without
+// being sent round. Found by test-flight 'override': a departure lined up behind a slow lander deadlocked with the
+// arrival on the intersection queue, and slow types roll past the first exit.
+async function playStart() {
+  const { Aircraft, Autopilot, Traffic, R, linkTraffic } = await flightLib();
+  const N = +(args.starts || 16), TYPES = ['c172', 'c172', 'tiger', 'bathtub'];
+  const res = [];
+  const realRandom = Math.random;
+  for (let seed = 1; seed <= N; seed++) {
+    const rnd = seeded(seed); Math.random = rnd;
+    const env = { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
+    const tr = new Traffic(env, {});
+    const atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false });
+    const link = linkTraffic(atc, tr, { rnd });
+    const ai = [];
+    const spawn = (kind, o = {}) => {
+      const type = TYPES[Math.floor(rnd() * TYPES.length)], ac = new Aircraft({ type });
+      const plan = R.aiSpawn(kind, atc.activeRunway().end, { ...o, rnd, type, claimStand: () => tr.claimStand(ac) });
+      if (!plan) return null;
+      ac.place(plan.place, env);
+      if (plan.stand) tr.standOwner.set(plan.stand, ac);
+      const e = tr.add({ aircraft: ac, ap: new Autopilot(ac), name: `${kind}-${type}` });
+      e.ap.setRoute(plan.route); ai.push(e); return e;
+    };
+    const despawn = (e) => { atc.remove(link.idOf(e)); tr.remove(e); ai.splice(ai.indexOf(e), 1); };
+    ['downwind', 'final', 'parked', 'parked'].forEach((k, i) => spawn(k, { wait: i === 2 ? 3 : 35 }));
+    let t = 0, respawnT = 0;
+    const step = () => {
+      tr.update(1 / 60); link.update(1 / 60); t += 1 / 60;
+      for (const e of [...ai]) if (e.ap.done && e.ap.phase === 'GONE') despawn(e);
+      if (ai.length < 4 && (respawnT -= 1 / 60) <= 0) { respawnT = 12 + rnd() * 15; spawn(rnd() < 0.55 ? 'arrive' : 'depart', { wait: 2 }); }
+    };
+    while (t < 5) step();
+    const e27 = R.runwayEnd('27'), [px, pz] = R.fromRunway(e27, 12, 0);
+    for (const a of [...ai]) if (a.ac.onGround && Math.hypot(a.ac.pos.x - px, a.ac.pos.z - pz) < 160) despawn(a);
+    for (const a of [...ai]) if (a.ap.leg?.kind === 'takeoff' && a.ap.sub !== 'climb' && a.ap.sub !== 'taxi') despawn(a);
+    const pac = new Aircraft({ type: 'c172' });
+    pac.place({ x: px, z: pz, heading: e27.hdg }, env);
+    const P = tr.add({ aircraft: pac, ap: new Autopilot(pac), player: true, name: 'player' });
+    P.ap.setRoute(R.circuitRoute('27', { type: 'c172' }));
+    link.placed(P, 8);
+    if (!ai.some((e) => e.ap.leg?.kind === 'approach' && !e.ac.onGround)) spawn('final', { dist: 3600 });
+    if (!ai.some((e) => e.ac.onGround && /HOLD|LINE/.test(e.ap.phase))) spawn('holding');
+    const ga = [];
+    atc.on('instruction', (ev) => { if (ev.to === link.idOf(P) && ev.cmd.type === 'goAround') ga.push(`${ev.cmd.reason}@${(t - 5).toFixed(0)}`); });
+    const t0 = t;
+    while (t - t0 < 470 && !pac.lastTouchdown) step();
+    res.push({ seed, td: pac.lastTouchdown ? Math.round(t - t0) : null, ga });
+  }
+  Math.random = realRandom;
+  const bad = res.filter((r) => r.td == null || r.ga.length);
+  check(`play start: the player lands on the first circuit without a go-around (${N} starts)`, !bad.length, bad.length ? bad.map((r) => `seed ${r.seed}: ${r.ga.join(',') || 'no touchdown'}`).join('; ') : `touchdown ${Math.min(...res.map((r) => r.td))}-${Math.max(...res.map((r) => r.td))} s`);
+}
+
 const SCEN = { circuits: () => aiCircuits(), cutin: cutIn, corner: cutInCorner, blocked: blockedRunway, overtake, outofturn: outOfTurn, buzz: towerBuzz, crossing, crimes, online: serialization };
 if (XF) SCEN.circuits09 = () => aiCircuits('09');
 // royal-frame scripts flown by the real autopilot: not translated for test airports (their soaks fly natively)
-if (!XF) { SCEN.flightcut = flightCutIn; SCEN.gameplay = gameplay; SCEN.avoid = seeAvoid; }
+if (!XF) { SCEN.flightcut = flightCutIn; SCEN.gameplay = gameplay; SCEN.avoid = seeAvoid; SCEN.playstart = playStart; }
 SCEN.flight = flightSoak;
 for (const [name, fn] of Object.entries(SCEN)) {
   if (args.only && args.only !== name) continue;
@@ -959,7 +1014,7 @@ function falsify() {
     ['intersection_dash', 'js/atc/index.js', "if (other) emitEvent('intersection_dash'", "if (false) emitEvent('intersection_dash'", 'crossing', 'player intersection dash'],
     ['cancel takeoff for intruder', 'js/atc/index.js', 'if (blk.length || intr) {', 'if (false) {', 'crossing', 'AI takeoff cancelled'],
     ['downwind spacing', 'js/atc/index.js', 'if (secs <= 2 || s.ext >= T.maxExtend) return;', 'return;', 'circuits', 'circuits: '],
-    ['landing needs a clear runway', 'js/atc/index.js', 'const ok = want && s.penaltyUntil <= S.t && !s.cutPending && !blockers.length', 'const ok = want && s.penaltyUntil <= S.t && !s.cutPending', 'blocked', 'no landing clearance'],
+    ['landing needs a clear runway', 'js/atc/index.js', 'const clear = want && s.penaltyUntil <= S.t && !s.cutPending && !blockers.length', 'const clear = want && s.penaltyUntil <= S.t && !s.cutPending', 'blocked', 'no landing clearance'],
     ['off-runway touchdown', 'js/atc/index.js', "const type = { taxiway: 'taxiway_landing', grass: 'grass_landing', apron: 'apron_landing' }[surf];", 'const type = null;', 'crimes', 'taxiway landing'],
     ['wrong_way', 'js/atc/rules.js', 'wrongWayDeg: 120,', 'wrongWayDeg: 400,', 'crimes', 'wrong-way landing'],
     ['closed_runway', 'js/atc/index.js', "if (!S.open[rw.id]) emitEvent('closed_runway'", "if (false) emitEvent('closed_runway'", 'crimes', 'closed 04/22'],

@@ -3,7 +3,7 @@
 Answer to Aaron's "there will be more airports to go to, right?" (D14). Yes. This is the plan: which airports, how the
 game moves between them on a phone, the data schema, what code must change, and the build order. Docs only; nothing
 here is built yet. Inputs: BRIEF, DECISIONS D7/D8/D14/D18/D19/D22, DESIGN §1–§5, AIRPORT.md, ATC.md, ONLINE.md, PERF.md,
-`js/world/layout.js`, `data/story.js`, `data/barks/build_script.py`.
+`js/world/layout.js`, `data/story.js`, `data/barks/build_script.py`. **A0 and A1 are built: see §7 Status.**
 
 **Recommendation in one line:** load **one airport world at a time**, pick it from an illustrated **Kingdom Map**, and add
 optional **ferry flights** later that hide the swap behind a cloud bank. Never stream two airports on a phone.
@@ -235,6 +235,101 @@ early. KRZ comes last because it depends on new plane models.
 
 D8 (weapons later): `hazards[]` is a generic entity list (sheep today). Weapons-era targets and ranges can be added as hazard
 types, and nothing here assumes they won't exist.
+
+## 7. Status (lane AIRPORTS, 2026-10-22)
+
+**A0 done.** `data/airports/royal.js` holds C-Tower 1. `js/world/layout.js` is a facade: same exports, now live `export let`
+bindings, plus `AIRPORT`, `AIRPORT_DEFS`, `LAYOUT_REV`, `useAirport(def)`, `registerAirport(def)`, `setAirport(id)` and
+`onLayoutChange(fn)`. `js/atc/geometry.js` (`makeGeometry(def)`) and `js/flight/routes.js` (`makeRoutes(def)`) rebuild on
+a switch. Their module exports always mean the active airport. `world.dispose()` is **not** done. It moves to A2 with
+`buildWorld({ airport })`.
+
+Regression gate on the royal airport (final code, 2026-10-22 15:30):
+
+| gate | before (reference) | after |
+|---|---|---|
+| `atc-sim` | 97/97 | 97/97 at A0/A1. After the test-flight ATC fix below: 96/98 (+1 `play start` check, which passes; the default `mixed types` seed now fails, see below) |
+| `atc-sim --falsify` | 26/26 | 26/26 |
+| `flight-sim` | 81/81 | 81/81 |
+| `score-sim` | 143/143 | 143/143, byte-identical output |
+| assist tests | 18/18 | 18/18 |
+| `perf.mjs --quick` draw calls + tris by owner (static world, all 5 owner tables, 161 rows) | — | **identical** |
+| boot `?start=free` in headless Chrome | — | no console errors, AP takeoff + circuit |
+
+Per-moment totals in perf drift by ±1–3 calls / ±3k tris between any two runs, including two runs of the same build,
+because AI traffic is in different places. The owner tables with `plane/*` and `fx-particles` rows removed are the
+identity check.
+
+**test-flight `override: AP still landed on the runway` (failed about 1 run in 4 once seedRivals was added). The cause
+was in ATC, and it is fixed.** A node repro (`atc-sim --only=playstart`) reproduces the game's `?start=free` start: 4
+attract AI of mixed types, the player lined up on 27, a seedRivals final at 3.6 km and one at the hold. In 10 of 16 starts
+the player was sent round with `runwayOccupied`. There were three causes, and each was fixed in js/atc:
+1. **Intersection-queue deadlock.** A departure was lined up behind a slow lander. The next arrival then joined the 09/27×04/22
+   mutex queue while that departure was blocking it, and so took the head of the queue the departure needed to roll.
+   Neither could move, and the arrival and the player behind it went around. Fix: a lander joins the queue only when
+   nothing else stops its clearance.
+2. **Line-up timing.** `lineUpWait` was given while a lander was still taxiing along the runway to a far exit. Fix: line
+   up only if the next arrival will still be outside `arrivalBlockLinedUp` once the runway is projected free
+   (`T.lineUpSlack`).
+3. **Slow types occupy the runway longer.** Touchdown to clear measured 30 s for a C172, 72 s for a Tiger and 62 s for the
+   bathtub, against 60 s threshold spacing. Fix: `T.spacingFullType` (Tiger 85 s, bathtub 75 s), with the strip `type`
+   passed from bridge.js.
+
+After the fixes, all 72 starts land on the first circuit with no go-around (seeds 1–48 at a 5 s menu, 1–24 at 20 s). The
+check is falsified: against the pre-fix js/atc it fails 10/16. In the browser (`test-flight --only=override`, 8 runs after the fix), there were no go-arounds. 5 runs passed with touchdown at 382–387 s. **3 still failed** in a
+different way: the player was number 3 or later behind the attract final, the seedRivals final and an arrival,
+was extended to 4.1–4.8 km downwind, and was still on final when the test's 480 s `waitFor` ran out. That is
+sequencing working as designed. The test's budget is too tight for the busier circuit, and test-flight.mjs is not
+this lane's file. Options: raise the budget to about 720 s, or start the test with `?lite=1` / without seedRivals.
+Cost: the default `mixed types` soak seed now holds one departure 366 s. During that hold, idle creep in
+aircraft.js carries the plane to 45 m, and the run fails with `runway_steal` at 1262 s (bug (b) below). Across the seed
+sweep, the hold times and infraction rates of that soak are the same before and after the fix (holdMax 330–440 s on
+most seeds both ways).
+
+**A1 done.** ATC and routes are layout-agnostic. They read no runway or taxiway names, and they do not assume a
+`RUNWAYS[0]`-only departure runway or a terminal to the north. Holds, entries, crossings and exits come from the taxi
+graph (docs/ATC.md). `data/airports/tests.js` has `royal_rot37` (rotated 37° → 13/31 + 08/26, taxiway K, stands G1–G8),
+`royal_rot37m` (mirrored first) and `royal_rot0` (identity control). Run them with `node tools/atc-sim.mjs --airport=<id>`.
+Flight soaks run natively at the test airport through `setAirport`.
+
+Rotated soak results. There are 5 thirty-minute soaks per airport, and each was run on 4 seed sets (`--seedOffset=0..3`):
+- **attract 6 (the A1 gate): `royal_rot37` has 0 infractions and 0 separation losses on all 4 seeds**, with ≤ 1
+  go-around and no crashes. `royal_rot37m` and `royal_rot0` are also clean.
+- Full circuits on both ends of the departure runway (`attract 4 + 2 circuits`, 31 active and 13 active): 8–10
+  touch-and-goes per soak, and every end was flown. Runway change ×2: wrong-end landings 0 every time.
+- Residual AI infractions across all 20 soaks: **rot37 3/20, identity 4/20**, the same rate. They also reproduce on
+  the royal airport itself, e.g. `atc-sim --only=flight "--run=runway change" --seedOffset=2` → `runway_incursion` at
+  1194 s. So they are C-Tower 1 behaviour, not leftover axis assumptions. Cause: AI hold-short precision. The hold node
+  is 50 m from the centreline. ATC counts a plane as occupying the runway at 15 + 30 = 45 m. That leaves a 5 m buffer,
+  and the autopilot uses it up in two ways: (a) when a runway change re-routes a holding plane, its U-turn at the hold
+  swings about 5 m forward; (b) a plane holding under full brake at idle creeps forward: 1.3 m (C172), 1.9 m (Tiger) and 3.0 m (bathtub)
+  per 150 s in aircraft.js on flat ground. The fix belongs in autopilot.js: brake to zero at the hold and turn away without moving forward. Or move the
+  stop point a few metres behind the painted line. The `steady flow` check and the kinematic `circuits 09` check fail on
+  the identity control too. Their thresholds are tuned for 27-active royal traffic.
+
+**Hard-coding left (outside A0/A1 scope):**
+- `js/flight/autopilot.js:392`: `demandTakeoff({ ends = ['09','27'] })`.
+- `js/flight/attract.js:26`: `activeEnd = () => '09'`. `js/core/wiring.js:40,151`: `'09'` fallback.
+  `js/story/host.js:19`: `'27'` fallback. `js/radio/index.js:128-129`: `'27'` fallback. All of these should read the
+  def's first departure end.
+- `data/modes.js:28`: `HOST_OPTIONS.runway = ['wind','27','09','04','22']`.
+- `js/hud/prompts.js:111` and `js/world/pavement.js:132,208` / `props.js:37`: taxiway id `'A'` as *the* parallel.
+- `js/world/textures.js:296,321-323`: sign and number textures for 09/27/04/22 and A–A4 only.
+- `js/world/terrain.js:119,240`: mown-strip mask uses `RUNWAYS[0]`, and LAKE/CASTLE/TOWN constants (A2: from
+  `def.scenery`).
+- `js/game/finish.js:17`: `onApron` assumes an axis-aligned apron (ignores `heading`). `js/main.js:14`: `const { STANDS }`
+  snapshot at import.
+- `js/assist/test/landahead.test.mjs`: royal-only expectations. That is fine for a test.
+
+**Notes for GAMEPLAY (`setAirport`):**
+- Call `setAirport(id)` **before** `buildWorld` and before creating ATC, traffic and autopilots. ATC/geometry and routes
+  follow at once (`onLayoutChange`). Anything already built (world meshes, an ATC instance's runway state, AP routes in
+  flight) does not migrate. Rebuild them, or for a second tower in one world use `createATC({ geo: makeGeometry(def) })`.
+- Any def must be registered first: `registerAirport(def)`. Only `royal` is registered by default. The test airports are
+  in `data/airports/tests.js` and are not for players.
+- Default runway ends come from the def (`runways[].departures`, `closed`, `oneWay`, `wind`). Use
+  `atc.activeRunway().end` and never a literal `'09'`/`'27'`. That fixes the list above.
+- `setAirport` with the current id is a no-op. `LAYOUT_REV` increments on every real switch, so cache code can key on it.
 
 ## Questions for Aaron
 1. Is **one airport per load + Kingdom Map** OK, with ferry flights as the "fly there" option? (A seamless streamed kingdom

@@ -145,6 +145,7 @@ export function createATC(opts = {}) {
       if (raw.intent && raw.intent !== s.intent) { s.intent = raw.intent; s.done = false; }
       s.runwayIntent = raw.runwayIntent ?? null;
       s.spd = raw.speedScale || 1;   // slower types (Tiger, bathtub) fly the same circuit slower
+      s.type = raw.type ?? s.type ?? null;
       const pos = v3(raw.pos), vel = v3(raw.vel);
       const g = !!raw.onGround;
       const agl = raw.agl != null ? Math.max(0, raw.agl) : g ? 0 : Math.max(0, pos[1]);
@@ -386,7 +387,7 @@ export function createATC(opts = {}) {
     if (actor && actor !== s.id && S.strips[actor] && detecting(S.strips[actor])) emitEvent('forced_goaround', actor, { victim: s.id, severity: 2, data: { reason } });
   }
 
-  const spacingBehind = (lead) => (lead.isPlayer ? T.spacingPlayer : lead.intent === 'circuits' ? T.spacingTG : T.spacingFull);
+  const spacingBehind = (lead) => (lead.isPlayer ? T.spacingPlayer : lead.intent === 'circuits' ? T.spacingTG : T.spacingFullType[lead.type] ?? T.spacingFull);
   // Seconds to the threshold: finals are flown slower than the rest of the circuit.
   const eta = (s, rem = s.rem, ext = s.ext) => {
     const fin = Math.min(rem, Gm.G.FINAL_LEN + ext), slow = Math.min(fin, T.finalSlowFrom);
@@ -502,8 +503,12 @@ export function createATC(opts = {}) {
     }
     const want = s.rem < T.clearLandDist && (s.leg === 'base' || (s.leg === 'final' && d.prog?.onFinal));
     const needM = mutexKeys(rwId);
-    if (want && needM.length && !S.mutexWait.includes(s.id)) S.mutexWait.push(s.id);
-    const ok = want && s.penaltyUntil <= S.t && !s.cutPending && !blockers.length && !intruder && !reservations(rwId, s.id).length && mutexFree(s.id, needM) && S.open[rwId];
+    // only queue for the intersection when nothing else stops us: a lander blocked by a lined-up departure must not
+    // hold the queue head that departure needs to roll (deadlock: both wait, the lander goes around)
+    const clear = want && s.penaltyUntil <= S.t && !s.cutPending && !blockers.length && !intruder && !reservations(rwId, s.id).length && S.open[rwId];
+    if (clear && needM.length && !S.mutexWait.includes(s.id)) S.mutexWait.push(s.id);
+    else if (!clear) S.mutexWait = S.mutexWait.filter((x) => x !== s.id);
+    const ok = clear && mutexFree(s.id, needM);
     if (ok) {
       const tg = s.intent === 'circuits';
       issue(s, { type: tg ? 'clearedTouchAndGo' : 'clearedLand', runwayEnd: end, threshold: info(end).T, heading: info(end).heading });
@@ -607,8 +612,13 @@ export function createATC(opts = {}) {
     if (!ready) return;
     const blk = blockersFor(rw.id, first);
     const resv = reservations(rw.id, first);
-    let minRem = 1e9;
-    for (const e of rw.ends) for (const o of S.seqs[e] || []) if (o !== first) minRem = Math.min(minRem, S.strips[o]?.rem ?? 1e9);
+    let minRem = 1e9, minEta = 1e9;
+    for (const e of rw.ends) for (const o of S.seqs[e] || []) {
+      const so = S.strips[o];
+      if (o === first || !so) continue;
+      minRem = Math.min(minRem, so.rem ?? 1e9);
+      if (so.rem != null) minEta = Math.min(minEta, eta(so));
+    }
     const intr = rw.ends.map((e) => coneIntruder(e, first)).find(Boolean);
     let traffic = false;
     for (const id in D) {
@@ -621,12 +631,15 @@ export function createATC(opts = {}) {
     const runwayClear = !blk.length && !resv.length && !intr;
     const goOk = runwayClear && minRem > (d.linedUp ? T.arrivalBlockLinedUp : T.arrivalBlockDep) && !traffic;
     // line up behind a lander that is already rolling away down the runway
+    // line up only if it can still roll before the next arrival: once landers rolling/vacating along the runway are
+    // off it, that arrival must be outside arrivalBlockLinedUp (else both wait and the arrival is sent round)
+    const lineUpOk = () => minRem > T.lineUpArrivalClear && minEta - runwayBusyFor(rw.id) > T.arrivalBlockLinedUp / T.finalSpeed + T.lineUpSlack;
     const behindLander = blk.length && blk.every((o) => D[o].g && Gm.toEnd(inf, D[o].p2).a > T.lineUpBehind && Math.abs(Gm.angDiff(D[o].track, inf.heading)) < 60 && !legitTakeoff(o));
     if (goOk && keys.length && !S.mutexWait.includes(first)) S.mutexWait.push(first);
     if (goOk && mutexFree(first, keys)) {
       issue(s, { type: 'clearedTakeoff', runwayEnd: end, at: dp.lineUp, heading: inf.heading, then: s.intent === 'depart' ? 'depart' : 'circuit', circuit: s.intent === 'depart' ? null : { runwayEnd: end, side: circ(end).side, alt: circ(end).alt } });
       takeMutex(first, keys); s.opEnd = end; s.holdT = null;
-    } else if ((runwayClear || (behindLander && !resv.length && !intr)) && !traffic && mutexFree(first, keys) && !s.cmds.lineUpWait && !d.linedUp && minRem > T.lineUpArrivalClear) {
+    } else if ((runwayClear || (behindLander && !resv.length && !intr)) && !traffic && mutexFree(first, keys) && !s.cmds.lineUpWait && !d.linedUp && lineUpOk()) {
       issue(s, { type: 'lineUpWait', runwayEnd: end, at: dp.lineUp, heading: inf.heading });
     }
   }

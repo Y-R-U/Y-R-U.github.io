@@ -1,13 +1,17 @@
 # ATC (lane ATC)
 
 Pure, renderer-free, deterministic air-traffic control for Krayzee. No three.js, no `Date.now`, no `Math.random`.
-World frame and airfield come from `js/world/layout.js` (incl. `HOLD_OFFSET`, `CIRCUIT`); infraction ids, PP and outrage
-from DESIGN's `data/rules.js`.
+Layout-agnostic: the airfield is an airport def (`data/airports/<id>.js`, docs/AIRPORTS.md §3). By default ATC uses the
+active airport (`js/world/layout.js`, switched by `setAirport(id)`); `createATC({ geo: makeGeometry(def) })` pins one
+(two towers in one world, test harnesses). Infraction ids, PP and outrage from DESIGN's `data/rules.js`.
+Nothing in the logic knows runway or taxiway names: departure-capable ends are `runway.departures !== false` (and
+`oneWay.depart`), runways start open unless `closed`, holds/entries/crossings/exits come from the taxi graph that
+`js/flight/routes.js` builds (the same one the autopilots taxi on), and the field centre is `def.center`.
 
 | file | what |
 |---|---|
 | `js/atc/index.js` | `createATC(opts)`: sequencing, clearances, detectors, outrage, event bus, serialise |
-| `js/atc/geometry.js` | runway frames, surfaces, intersections, hold points, taxi routes, `circuitFor(end)`, `circuitProgress` |
+| `js/atc/geometry.js` | `makeGeometry(def)`: runway frames, surfaces, intersections, `JUNCTIONS` (every taxiway×runway node with its hold per side; entries vs crossings), `departurePoint`, `exitFor(end, fromA, toward)`, graph taxi routes + their `holdShort` crossings, `circuitFor(end)`, `circuitProgress`. Module exports = the active airport |
 | `js/atc/rules.js` | every ATC threshold (`T`), infraction table (DESIGN's + ATC extras), routine line ids |
 | `js/atc/outrage.js` | Outrage meter (DESIGN §1.3): tiers, hysteresis, decay, Royal Scandal |
 | `js/atc/bridge.js` | `linkTraffic(atc, traffic)`: reference wiring to FLIGHT's `Traffic`/`Autopilot` |
@@ -17,8 +21,9 @@ from DESIGN's `data/rules.js`.
 ```js
 import { createATC } from './atc/index.js';
 const atc = createATC({
-  wind: { from: 270, kt: 8 },     // picks the active end by headwind (27 by default); or activeEnd: '27'
-  open: { '04/22': false },       // 04/22 is closed unless a mission opens it (DESIGN §1.1)
+  wind: { from: 270, kt: 8 },     // picks the active end by headwind (default def.wind); or activeEnd: '27'
+  open: { '04/22': false },       // default: every runway not `closed` in the def (C-Tower 1: 04/22 closed, DESIGN §1.1)
+  geo: makeGeometry(def),         // optional: a specific airport (default: the active one); atc.geo exposes it
   surfaceAt: world.surfaceAt,     // optional (x, z) => 'runway'|'taxiway'|'apron'|'grass'|…; else ATC's own from layout
   detectCollisions: false,        // FLIGHT owns contact; report it with atc.report('collision', id, {victim})
   outrageGain: 1,                 // DIFFICULTY[...].outrageGain
@@ -83,13 +88,19 @@ No landing clearance by 500 m from the threshold → ATC sends you around. Takeo
   (cascades to followers); on final with < 22 s → `goAround`. Number 1 inside 2.6 km on base/final gets a landing
   clearance if the runway is empty, nobody is lined up/crossing/cleared on it, no uncleared plane is ahead in the cone, and
   the intersection is free.
+  Spacing behind a full-stop lander is `T.spacingFull` (60 s), or `T.spacingFullType[type]` for slow types (Tiger 85 s,
+  bathtub 75 s). At C-Tower 1, touchdown to clear of the runway measured 30 s for a C172, 72 s for a Tiger (it floats
+  350 m, rolls past A3 and taxis to A2) and 62 s for the bathtub. The strip's `type` comes from bridge.js.
 - **Departures**: one queue per active end, ordered lined-up → at the hold (by arrival time) → approaching. First in
   queue is cleared when the runway and its reservations are clear, no arrival is inside 2.2 km, the previous
-  departure/touch-and-go is 700 m down the runway, and the intersection is free; otherwise `lineUpWait` when arrivals are
-  > 4.2 km out. A departure waiting > 20 s gets a **slot**: the first arrival still before base is stretched 115 s.
+  departure/touch-and-go is 700 m down the runway, and the intersection is free; otherwise `lineUpWait` when the next
+  arrival is > `T.lineUpArrivalClear` out **and** will still be outside `arrivalBlockLinedUp` (+ `T.lineUpSlack` s) once
+  landers rolling/vacating along the runway are projected off it. Without that projection, a departure lined up behind a
+  slow lander that taxis to a far exit sat on the runway until the next arrival was sent round. A departure waiting > 20 s gets a **slot**: the first arrival still before base is stretched 115 s.
 - **Crossing runways** (09/27 × 04/22): one mutex per intersection. Any landing/touch-and-go/takeoff clearance on either
   runway takes it; it is released once that plane is 60 m past the intersection, above 150 m past the threshold, or off
-  the runway. Requests queue first-come. Taxiway crossings of 04/22 also need it free.
+  the runway. Requests queue first-come, but a lander joins the queue only when nothing else stops its clearance (a lander
+  blocked by a lined-up departure used to hold the head of the queue that departure needed: deadlock, go-around). Taxiway crossings of 04/22 also need it free.
 - **Re-plan on crimes**: an aircraft that gets closer to the threshold than one sequenced ahead (by 120 m) is
   re-sequenced ahead; in the final cone that is `cut_in_final` (a pass outside the cone is remembered for 90 s and
   confirmed when both are in the cone or when the victim must go around). The victim loses its landing clearance and is
@@ -97,8 +108,13 @@ No landing clearance by 500 m from the threshold → ATC sends you around. Takeo
   A blocked runway or an uncleared plane ahead on short final sends the cleared lander around inside 1.5 km (else the
   clearance is revoked and re-issued later); a cleared departure still under 20 m/s gets `cancelTakeoff`. A plane that
   ignores a go-around and keeps descending in the cone stays sequenced (so cutting in after being sent round still counts).
-- Active runway: headwind end among departure-capable ends (09/27), 3 kt hysteresis. 04/22 is arrivals-only when opened
-  (land, vacate east onto taxiway A, taxi to the active hold).
+- Active runway: headwind end among departure-capable ends (C-Tower 1: 09/27), 3 kt hysteresis. An arrivals-only runway
+  (`departures: false`, C-Tower 1's 04/22 when opened): land, vacate at its taxiway crossing on the side nearer the active
+  hold (`vacate.thenRunway`), taxi to the active hold.
+- Departure slot and a busy runway: the slotted arrival (still before base) is stretched again while a lander is still
+  rolling/vacating along the runway, so it lands `T.depAfterFree` (85 s) after the runway is projected free. Found by the
+  first 09-active soaks: at C-Tower 1 a 09 lander's first reachable exit is A3, 850 m in, and the slot used to expire
+  before it was off.
 - **Runway change** (`setWind` picks a new end): the change is *pending* (`atc.pendingRunway`) until the old runway is
   quiet — nobody cleared/lined up on it, nobody on it, nobody on final inside 1.5 km — or `T.rwChangeMax` (180 s) passes
   (then cleared finals go around, `reason:'runwayChange'`, and lined-up planes get `cancelTakeoff`). No new departures
@@ -203,20 +219,36 @@ rule-break detectors for its own plane only and issues nothing. `setLocal(id, bo
 
 ## Tests
 ```
-node tools/atc-sim.mjs                 # 97 checks, ~3.5 min: kinematic ATC scenarios (circuits, cut-ins, out-of-turn, buzz,
+node tools/atc-sim.mjs                 # 98 checks, ~3.5 min: kinematic ATC scenarios (circuits, cut-ins, out-of-turn, buzz,
                                        # crossing, crimes, online), then the real Aircraft/Autopilot through bridge.js:
                                        # flight cut-in, gameplay (spawn rivals, demand takeoff, skip, rubber/partial/none
-                                       # protection), see-and-avoid, and five 30-min AI soaks (attract 5 / 4 + 2 circuits /
+                                       # protection), see-and-avoid, play start (16 ?start=free starts, attract +
+                                       # seedRivals: the player lands first circuit, no go-around), and five 30-min AI soaks (attract 5 / 4 + 2 circuits /
                                        # attract 6 / runway change ×2 / mischief high / mixed types
                                        # C172+Tiger+bathtub) on the rolling terrain + castle
 node tools/atc-sim.mjs --only=flight --run=mixed [--seed=61] [--control]   # --control adds a C172-only run, same seed
 node tools/atc-sim.mjs --falsify       # breaks each detector in a temp copy of js/atc; all 26 must be CAUGHT
 node tools/atc-sim.mjs --only=flight "--run=attract 6" [--minutes=30] [--watch=ac3,ac7 --from=600 --to=700] [--trace=name] [--dbgap]
 node tools/atc-sim.mjs --only=circuits --dbg=goAround,clearedLand --dbgev --peek=600
+node tools/atc-sim.mjs --airport=royal_rot37    # test airport (data/airports/tests.js): C-Tower 1 rotated 37° (13/31, 08/26,
+                                               # taxiway K, stands G1–G8); royal_rot37m = mirrored first; royal_rot0 = control
+node tools/atc-sim.mjs --airport=royal_rot37 --only=flight --seedOffset=3   # every soak seed + 3000
 ```
+`--airport` runs the kinematic scenarios (still scripted in C-Tower 1's frame) against an ATC built on the test
+airport's geometry through a frame adapter that maps positions, headings, end/runway/taxiway/stand names in and out, plus
+`circuits 09`; then it switches the whole flight stack (`setAirport`) and flies five 30-min autopilot soaks natively
+there (4 + 2 circuits on each end of the departure runway, attract 6, runway change ×2, mixed types). flightcut /
+gameplay / avoid stay royal-only (royal-frame scripts for the real autopilot).
 Soak gates per run: zero AI infractions and separation losses; ≤ 1 go-around / 15 min (ATC + autopilot); nobody held at
 the runway > 5 min or > 10 min from spawn to touchdown, nobody stopped on a taxiway 4 min; ≥ 1 movement / 2 min with
 arrivals and departures both served; no crashes; ≥ 100 m terrain/castle clearance on fly legs > 1.5 km from the field.
+**Known AI hold-short imprecision (autopilot/aircraft, not ATC).** The hold node is 50 m from the centreline, and ATC
+counts the runway as occupied from 45 m (half-width 15 + `runwayMargin` 30). (a) A plane holding under full brake at
+idle creeps forward: 1.3 m (C172), 1.9 m (Tiger) and 3.0 m (bathtub) per 150 s on flat ground in aircraft.js. After a
+long hold it reaches 45 m and is scored `runway_incursion`/`runway_steal`, and an arrival is sent round. (b) When a
+runway change re-routes a holding plane, its U-turn at the hold swings about 5 m forward. These cause the residual soak
+infractions on some seeds. They happen at the same rate on `royal_rot37` and on the identity control, and the default
+`mixed types` seed hits (a) at 1262 s.
 The mixed-types run allows 2.5 go-arounds / 15 min: slow types cost runway capacity (seeds 53/61/77/89: 0 separation
 losses everywhere, 2–5 go-arounds per 30 min vs 0–2 for the same seed C172-only, mostly `runwayOccupied` behind a slow
 departure or lander; seed 61 holds one departure 582 s). Slow types fly a lower, tighter circuit inside the C172's
