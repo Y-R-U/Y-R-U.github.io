@@ -187,7 +187,7 @@ async function run(view) {
     await until(`!!document.querySelector('.kzp-card')`, 2);
     const card = await rect('.kzp-card');
     ok(card && card.y >= 0 && card.y + card.h <= view.h + 1 && card.x >= 0 && card.x + card.w <= view.w + 1, 'podium card fits the screen', JSON.stringify(card));
-    ok(await ev(`document.querySelectorAll('.kzp li').length === 6 && document.querySelector('.kzp li.you') && document.querySelector('.kzp li .kzp-place').textContent === '♛'`), 'podium rows, crown, you');
+    ok(await ev(`document.querySelectorAll('.kzp li').length === 6 && document.querySelector('.kzp li.you') && !!document.querySelector('.kzp li .kzp-place svg')`), 'podium rows, crown, you');
     const btnR = await rect('.kzp button');
     if (!(btnR && btnR.y + btnR.h <= Math.min(view.h, card.y + card.h))) console.log(`  NOTE (NET, js/net/podium.js): podium button below the fold at ${view.name} — card scrolls`);
     await shot('podium');
