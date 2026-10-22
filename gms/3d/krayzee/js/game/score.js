@@ -2,7 +2,7 @@
 import { INFRACTIONS, BANK, CLEAN, BANTER, MULTIPLIERS as M, OUTRAGE, PROTECTION as P, DIFFICULTY } from '../../data/rules.js';
 import { AIRCRAFT } from '../../data/aircraft.js';
 import { FREE_FLIGHT, ROOM_TYPES } from '../../data/modes.js';
-import { FINISH } from './finish.js';
+import { FINISH, difficultyFor } from './finish.js';
 
 export const PAVED = ['runway', 'taxiway', 'apron'];
 const round10 = (x) => Math.round(x / M.roundTo) * M.roundTo;
@@ -72,11 +72,13 @@ export function createScore(opts = {}) {
     comboStep: -1, comboLeft: 0, frozen: 0,
     protectionMode: mode.protection, protection: mode.protection === 'partial' ? mode.partialStart : mode.protection === 'rubber' ? 100 : 0,
     rankIndex: opts.rankIndex ?? 0, aircraft: opts.aircraft || 'c172', ppScale: 1,
-    airborne: false, landed: false, stopT: 0, gsKt: 0, impeccableDone: false, gag: 0,
+    airborne: false, landed: false, stopT: 0, gsKt: 0, impeccableDone: false, gag: 0, t: 0, touchAt: {}, gaIgnoredAt: -1e9,
     stats: { infractions: 0, bestCombo: 1, bounces: 0, crashes: 0, scandals: 0, sorties: 0, ripostes: 0 },
   };
 
   const effective = () => (S.protectionMode === 'partial' && S.protection <= 0 ? 'realistic' : S.protectionMode);
+  // D28. Online sessions swap protectionMode after createGame, so this reads it live.
+  const difficulty = () => difficultyFor({ difficulty: opts.difficulty, protection: S.protectionMode });
   const mine = (ev) => ev.actor === me || (ev.isPlayer === true);
   const tierOf = (v) => OUTRAGE.tiers.reduce((t, x) => (v >= x.min ? x.tier : t), 1);
 
@@ -117,12 +119,12 @@ export function createScore(opts = {}) {
     emit('scandal', { forfeit, frozenFor: S.frozen, headline: `THE KRAYZEE HERALD: ${h}`, headlineSecs: OUTRAGE.scandal.headlineSecs, pending: S.pending, source: ev.type ? 'atc' : 'score' });
   }
 
-  function infraction(id, ev) {
+  function infraction(id, ev, forwardOutrage = false) {
     const base = basePP(id, ev, effective() === 'realistic');
     if (base == null) return null;
     const frozen = typeof ev.frozen === 'boolean' ? ev.frozen : S.frozen > 0;
     const heatBefore = S.outrage;
-    if (typeof ev.outrage !== 'number') addOutrage(INFRACTIONS[id].outrage, id, false);
+    if (typeof ev.outrage !== 'number') addOutrage(INFRACTIONS[id].outrage, id, forwardOutrage);
     if (!frozen) {
       S.comboStep = S.comboLeft > 0 ? Math.min(S.comboStep + 1, M.combo.length - 1) : 0;
       S.comboLeft = M.comboWindow;
@@ -201,12 +203,31 @@ export function createScore(opts = {}) {
     if (ev.type === 'barked') banter(ev);
     else if (id === 'impeccable' && mine(ev)) impeccable();
     else if (ev.type === 'landed' && mine(ev)) { S.landed = true; if (ev.impeccable) impeccable(); }
+    else if (ev.type === 'goaroundrefused' && (ev.actor == null || mine(ev))) ignoredGoAround(ev, true);
+    else if (id === 'ignored_instruction' && ev.data?.instruction === 'goAround' && mine(ev)) ignoredGoAround(ev, false);
     else if (typeof id === 'string' && INFRACTIONS[id] && mine(ev)) infraction(id, ev);
 
     if (outr != null && meterIsMine && S.outrageSource !== 'internal') {
       S.outrageSource = 'events';
       setOutrage(outr, ev.type);
     }
+  }
+
+  // The LAND refusal (autopilot) and ATC's own go-around Selective Hearing describe the same crime: pay it once.
+  function ignoredGoAround(ev, refused) {
+    if (S.t - S.gaIgnoredAt < INFRACTIONS.ignored_instruction.refusedWindow) return;
+    S.gaIgnoredAt = S.t;
+    infraction('ignored_instruction', refused ? { ...ev, type: 'ignored_instruction', data: { instruction: 'goAround', refused: true, reason: ev.reason } } : ev, refused);
+  }
+
+  // D28 light touch: free of the bounce penalty; pays once per pair per pairCooldown. false = an ordinary bump.
+  function lightTouch(kt, other) {
+    const r = INFRACTIONS.light_touch;
+    if (other == null || DIFFICULTY[difficulty()]?.contact !== 'light' || kt > r.maxRelKt || S.gsKt < r.minOwnKt) return false;
+    if (S.t - (S.touchAt[other] ?? -1e9) < r.pairCooldown) return 'cooldown';
+    S.touchAt[other] = S.t;
+    infraction('light_touch', { type: 'light_touch', actor: me, victim: other, data: { kt: Math.round(kt) } });
+    return 'scored';
   }
 
   // FLIGHT collisions. onGear:false = ground contact outside the gear envelope (or water/building touchdown).
@@ -218,9 +239,10 @@ export function createScore(opts = {}) {
       let restitution = P.rubber.restitution;
       if (eff === 'partial') { restitution = partialRestitution(before); S.protection = Math.max(0, before - partialLoss(kt)); }
       S.stats.bounces++;
-      const pendingLost = lose(P.rubber.pendingLoss, 'bounce', 'DIGNITY LOST');
-      addOutrage(P.rubber.outrage, 'bounce');
-      const out = { result: 'bounce', protectionLeft: S.protection, restitution, spinDegPerS: (rng() * 2 - 1) * P.rubber.spinMaxDegPerS, apResumeAfter: P.rubber.apResumeAfter, pendingLost, other };
+      const tap = lightTouch(kt, other);
+      const pendingLost = tap ? 0 : lose(P.rubber.pendingLoss, 'bounce', 'DIGNITY LOST');
+      if (!tap) addOutrage(P.rubber.outrage, 'bounce');
+      const out = { result: 'bounce', protectionLeft: S.protection, restitution, spinDegPerS: (rng() * 2 - 1) * P.rubber.spinMaxDegPerS, apResumeAfter: P.rubber.apResumeAfter, pendingLost, other, lightTouch: tap };
       if (eff === 'partial') emit('protection', { mode: 'partial', pct: S.protection, effective: effective(), hit: before - S.protection });
       return out;
     }
@@ -240,6 +262,7 @@ export function createScore(opts = {}) {
 
   // f: { gsKt, onGround, surface, atStand, calm } from FLIGHT; all optional.
   function update(dt, f) {
+    S.t += dt;
     if (S.comboLeft > 0) { S.comboLeft = Math.max(0, S.comboLeft - dt); if (!S.comboLeft) { S.comboStep = -1; emit('combo', { mult: 1, step: -1, left: 0 }); } }
     if (S.frozen > 0) { S.frozen = Math.max(0, S.frozen - dt); if (!S.frozen) emit('unfrozen', {}); }
     if (S.gag > 0) S.gag = Math.max(0, S.gag - dt);
@@ -278,11 +301,12 @@ export function createScore(opts = {}) {
     setPPScale(x) { S.ppScale = x; },
     respawn() { S.landed = false; S.airborne = false; S.stopT = 0; S.gag = 0; if (S.protectionMode === 'partial') S.protection = mode.partialStart; },
     get mode() { return mode; },
+    get difficulty() { return difficulty(); },
     state() {
       return {
         pending: S.pending, banked: S.banked, outrage: Math.round(S.outrage), tier: S.tier, outrageSource: S.outrageSource,
         combo: S.comboStep >= 0 ? comboMult(S.comboStep) : 1, comboLeft: S.comboLeft, comboFrac: S.comboLeft / M.comboWindow,
-        frozen: S.frozen, protectionMode: S.protectionMode, protection: S.protection, effectiveProtection: effective(),
+        frozen: S.frozen, difficulty: difficulty(), protectionMode: S.protectionMode, protection: S.protection, effectiveProtection: effective(),
         rankIndex: S.rankIndex, aircraft: S.aircraft, landed: S.landed, finishReady: S.landed && S.gsKt < FINISH.stopKt, airborne: S.airborne, gag: S.gag, stats: { ...S.stats },
       };
     },

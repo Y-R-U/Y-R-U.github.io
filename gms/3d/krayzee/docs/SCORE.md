@@ -6,8 +6,8 @@ Pure ES modules: no DOM, no clock (time only moves through `update(dt)`), all nu
 `data/ranks.js`, `data/modes.js`, `data/aircraft.js`.
 
 ```
-node tools/score-sim.mjs            # 128 assertions + 30 h pacing sim
-node tools/score-sim.mjs --falsify  # breaks 4 rules in scratch copies; every break must make the suite fail
+node tools/score-sim.mjs            # 174 assertions + 30 h pacing sim
+node tools/score-sim.mjs --falsify  # breaks 14 rules in scratch copies; every break must make the suite fail
 ```
 
 ## API
@@ -26,7 +26,7 @@ const game = createGame({
   partialStartPct,         // host option 50/75/100
 });
 game.handleEvent(ev);                         // ATC / RADIO events, see below
-game.reportImpact({ speedKt, onGear });       // FLIGHT collisions → { result:'bounce'|'damage'|'destroyed', protectionLeft, restitution, spinDegPerS?, apResumeAfter?, shake?, gagSecs?, pendingLost }
+game.reportImpact({ speedKt, onGear, other }); // FLIGHT collisions (other = the other plane's id, null for ground/buildings) → { result:'bounce'|'damage'|'destroyed', protectionLeft, restitution, spinDegPerS?, apResumeAfter?, shake?, gagSecs?, pendingLost, lightTouch: false|'scored'|'cooldown' }
 game.update(dt, { gsKt, onGround, surface, atStand, calm }); // every sim frame; banking needs the flight fields
 game.state();   // { pending, banked (session/room PP), outrage, tier, combo, comboLeft, comboFrac, frozen, protection, protectionMode, effectiveProtection, rankIndex, lifetimePP, careerRankIndex, nextGoal, stats, ... }
 game.on(evt, fn);                             // returns an unsubscribe
@@ -59,6 +59,8 @@ game.bank();                                  // force a bank (mission end)
 - `impeccable` (ATC) or `{type:'landed', actor, impeccable:true}` → +50 once per landing.
 - `{type:'scandal', key, actor, t}` (ATC) → forfeit 25 % pending, freeze 60 s, outrage 60.
 - `{type:'composure'|'outrage', outrage|value}` → meter value.
+- `{type:'goaroundrefused', actor?:'player', reason}` (autopilot LAND refusing a tower go-around; no actor = the player) →
+  `ignored_instruction` (Selective Hearing 120), once per go-around: see D28 section below.
 - `{type:'barked', ...radioPayload}` → banter: response window +40, ≤ 2 s +80, `priority` to the tower +60 / +5 outrage.
 
 ## Rules as implemented
@@ -80,6 +82,44 @@ game.bank();                                  // force a bank (mission end)
   start % on `respawn()`. Realistic: `!onGear` or > 15 kt = destroyed (pending 0, gag 4 s, Strict Tower −500 room PP);
   ≤ 15 kt = prang (−10 %, +10 outrage, shake 1.5 s). `withinGearLimits({sinkFpm, bankDeg, pitchDeg})` helps FLIGHT
   decide `onGear`.
+
+## D28 — contact by difficulty (light touches, close calls)
+Difficulty for contact scoring = the story difficulty when `difficulty` is passed, otherwise the protection mode
+(`difficultyFor`, the same table as D19): **Rubber = Easy, Partial = Medium, Realistic = Hard**. So Royal Rumble /
+Garden Party / Joust (and any room set to Rubber) play Easy, Court Session / Coronation / Open Court (Partial) Medium,
+Strict Tower (Realistic) Hard; Free Flight follows its difficulty setting. It is read live, so a room whose protection
+is swapped in after `createGame` (net/session.js `applyProtection`) gets the right rule. `game.difficulty` /
+`state().difficulty` expose it.
+
+**Love Tap** (`light_touch`, base 150 PP, +8 outrage, scold `scold_bump`) — a plane-to-plane contact that:
+- is between aircraft (`reportImpact` got an `other` id; ground, buildings and water never count);
+- has relative speed ≤ **12 kt** (`maxRelKt`; ≈ 6 m/s, traffic.js's own "gentle" bump line, and under Realistic's
+  15 kt survivable-prang line);
+- happens while the player is moving, ground speed ≥ **5 kt** (`minOwnKt`), so being nudged while parked pays nothing;
+- was absorbed by protection (result `bounce`) on an Easy/Medium difficulty (`DIFFICULTY[d].contact === 'light'`).
+
+A light contact never costs dignity: no −15 % pending, no Rubber +8 bounce outrage (ATC already adds its own +8 for
+the `collision` it is told about, and scolds with `scold_bump`). Partial still scuffs the rubber (−5…−10 % at ≤ 12 kt).
+It pays **once per pair per 30 s** (`pairCooldown`, same as ATC's per-victim collision cooldown); a repeat touch inside
+the window is free but worthless (`lightTouch:'cooldown'`). It is an ordinary infraction otherwise: combo, Audacity
+(victim rank), heat, aircraft, scale; 0 while frozen.
+
+**Big hits** (> 12 kt) never score: Rubber/Partial bounce with −15 % pending and +8 outrage as before; Realistic
+prang/destroy as before; online Realistic ramming scandal (3 overriding hits in 60 s, net/session.js) unchanged.
+
+**Hard** (`contact:'none'`): no contact earns anything, even if a Rubber override would have bounced it; penalties stand.
+Partial emptied to 0 % is real metal (effective Realistic), so a touch there is a prang and pays nothing.
+
+**Close calls** score on every difficulty as before: `near_miss` 200 (×1.5 when effectively Realistic), `formation`.
+
+### goaroundrefused
+The autopilot emits `goaroundrefused` when LAND ignores a tower go-around. Score pays it as `ignored_instruction`
+(Selective Hearing, 120 PP, +10 outrage, forwarded through `outrageDelta` because ATC never saw it). ATC's own
+go-around Selective Hearing (8 s later, or at touchdown) and the refusal are the same crime: whichever arrives first
+pays, the other is ignored for PP within **90 s** (`ignored_instruction.refusedWindow`). ATC outrage on its event still
+mirrors. Hold-position Selective Hearing is a separate crime and always pays.
+
+Wiring (main.js, GAMEPLAY): in the `P.ap.events` loop, `if (ev.type === 'goaroundrefused') wiring.game?.handleEvent({ type: 'goaroundrefused', actor: 'player', reason: ev.reason })`.
 
 ## Career (D2, D3)
 `careerRankIndex(pp, wins, floor)`: points ladder (`rankFor`), floor (story completion = Prince), and Emperor only with

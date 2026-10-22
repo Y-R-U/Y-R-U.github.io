@@ -50,6 +50,7 @@ export function createGame(opts = {}) {
     restore: score.restore,
     career,
     title,
+    get difficulty() { return score.difficulty; },
     state: () => ({ ...score.state(), lifetimePP: career?.lifetimePP ?? null, careerRankIndex: career?.rankIndex ?? null, nextGoal: career?.nextGoal() ?? null }),
     on(t, fn) {
       if (t === 'rankUp') { (extra[t] ||= []).push(fn); return () => { extra[t] = extra[t].filter((x) => x !== fn); }; }

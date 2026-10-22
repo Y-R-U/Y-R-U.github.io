@@ -32,3 +32,7 @@
 - D24 (2026-10-22) Newspaper headlines never cover the screen in flight. In flight: a small newspaper icon/counter ("+1 headline — this will hit the papers"). After landing (DEMAND IT / mission complete) show the collected headlines as a reel, with Skip and Skip all.
 - D25 (2026-10-22) Stall horn OFF by default; Settings toggle 'Stall warning' to turn it on (and quiet when on).
 - (2026-10-22) Aaron soundboard verdict: ONLY the stall horn is bad; every other sound is fine — keep them.
+- D26 (2026-10-22) Farm strip (Muckle Bottom, C-Tower 2) is the first new airport. Airport-loading model (one-at-a-time + Kingdom Map vs one world) re-explained to Aaron; awaiting his pick.
+- D27 (2026-10-22) Aaron left it to the manager: the Palace Lawn (C-Tower 3) lives INSIDE the C-Tower 1 world (no extra load; the castle hill is already there).
+- D28 (2026-10-22) Ramming/contact scoring by difficulty: Easy and Medium score light touches (glancing contact) and close calls only — big hits never score; Hard scores close calls only (no contact rewarded at all).
+- (2026-10-22) Online deploy: Aaron says ask again at the next update.

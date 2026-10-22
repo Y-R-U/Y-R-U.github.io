@@ -93,7 +93,7 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
     safe(() => traffic.setAIProtection?.(protection === 'realistic' ? null : protection));
     const roomOpts = room ? { mode: room.type || mode, partialStartPct: room.partialStart, ...(room.outrageGain ? { outrageGain: room.outrageGain } : {}) } : {};
     W.room = room;
-    W.game = createGame({ mode, career, playerId: 'player', name: p.name, gender: p.gender, protection, autoBank: mode === 'free' ? 15 : false, ...roomOpts });
+    W.game = createGame({ mode, career, playerId: 'player', name: p.name, gender: p.gender, protection, difficulty: W.difficulty, autoBank: mode === 'free' ? 15 : false, ...roomOpts });
     const g = W.game;
     for (const e of traffic.list) if (!e.player && e.rankIndex != null) g.setPilotRank?.(idOf(e), e.rankIndex);
     if (W.atc) {
@@ -124,7 +124,8 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
       safe(() => ghud?.score.setContext({ gender: ui.getProfile().gender }));
     });
     ent.ac.impactHandler = (i) => {
-      const r = g.reportImpact({ speedKt: i.speedKt, onGear: i.onGear, other: i.other });
+      const o = i.other != null ? traffic.list.find((e) => e.ac.id === i.other) : null;
+      const r = g.reportImpact({ speedKt: i.speedKt, onGear: i.onGear, other: o ? idOf(o) : i.other });
       if (r?.shake) hud.shake?.(r.shake);
       if (r?.result === 'bounce') safe(() => audio.playBoing(Math.min(1, i.speedKt / 60)));
       W.lastImpact = r;

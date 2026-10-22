@@ -256,6 +256,77 @@ section('protection: Realistic');
   s.reportImpact({ speedKt: 40 }); eq(s.state().banked, 100, 'Strict Tower crash −500 room PP (600 → 100)');
 }
 
+section('D28 light touches (Easy/Medium) and big hits');
+{
+  const fly = (g, kt = 90) => g.update(0.1, { onGround: false, gsKt: kt });
+  const lt = (o) => { const g = game({ outrageSource: 'internal', ...o }); const pp = []; g.on('pp', (e) => pp.push(e)); g.handleEvent(inf('apron_landing')); fly(g); return { g, pp }; };
+  let { g, pp } = lt({ protection: 'rubber' });
+  let r = g.reportImpact({ speedKt: 8, other: 'ai3' });
+  ok(r.result === 'bounce' && r.lightTouch === 'scored', 'easy (rubber): 8 kt plane contact is a light touch');
+  ok(pp.at(-1)?.id === 'light_touch' && pp.at(-1).name === 'Love Tap', "light touch scores as 'Love Tap'");
+  eq(pp.at(-1).parts.base, 150, 'light touch base 150');
+  eq(r.pendingLost, 0, 'light touch: no dignity lost');
+  eq(g.state().outrage, 33, 'light touch +8 outrage, no extra bounce outrage (25 from the landing)');
+  r = g.reportImpact({ speedKt: 12, other: 'ai4' }); ok(r.lightTouch === 'scored', '12 kt exactly is still light (other pair)');
+  ({ g, pp } = lt({ protection: 'rubber' }));
+  const before = g.state().pending;
+  r = g.reportImpact({ speedKt: 12.5, other: 'ai3' });
+  ok(!r.lightTouch && !pp.some((e) => e.id === 'light_touch'), 'big hit (> 12 kt) never scores');
+  eq(r.pendingLost, Math.round(before * 0.15), 'big hit keeps the −15 % bounce penalty');
+  ({ g, pp } = lt({ protection: 'rubber' }));
+  r = g.reportImpact({ speedKt: 5 }); ok(!r.lightTouch, 'no other plane (ground/building) is never a light touch');
+  ({ g, pp } = lt({ protection: 'rubber' })); g.update(0.1, { onGround: true, gsKt: 2, surface: 'apron' });
+  r = g.reportImpact({ speedKt: 6, other: 'ai3' }); ok(!r.lightTouch, 'parked (< 5 kt): being nudged earns nothing');
+  ({ g, pp } = lt({ protection: 'rubber' }));
+  g.reportImpact({ speedKt: 6, other: 'ai3' }); for (let i = 0; i < 100; i++) fly(g);
+  r = g.reportImpact({ speedKt: 6, other: 'ai3' });
+  ok(r.lightTouch === 'cooldown' && pp.filter((e) => e.id === 'light_touch').length === 1, 'same pair inside 30 s: no second Love Tap');
+  eq(r.pendingLost, 0, 'cooldown repeat is still penalty-free');
+  r = g.reportImpact({ speedKt: 6, other: 'ai5' }); ok(r.lightTouch === 'scored', 'cooldown is per pair: another plane pays');
+  for (let i = 0; i < 201; i++) fly(g);
+  r = g.reportImpact({ speedKt: 6, other: 'ai3' }); ok(r.lightTouch === 'scored', 'same pair pays again after 30 s');
+  ({ g, pp } = lt({ protection: 'partial' }));
+  r = g.reportImpact({ speedKt: 10, other: 'p:bob' });
+  ok(r.lightTouch === 'scored' && r.protectionLeft === 92 && r.pendingLost === 0, 'medium (partial): scores, rubber still scuffed −8 %, no dignity lost');
+  ({ g, pp } = lt({ protection: 'partial', partialStartPct: 50 }));
+  g.reportImpact({ speedKt: 200 }); ok(g.state().effectiveProtection === 'realistic', 'partial emptied');
+  r = g.reportImpact({ speedKt: 5, other: 'ai3' });
+  ok(r.result === 'damage' && !pp.some((e) => e.id === 'light_touch'), 'partial at 0 %: real metal, a touch is a prang, no Love Tap');
+  ({ g, pp } = lt({ protection: 'realistic' }));
+  r = g.reportImpact({ speedKt: 5, other: 'ai3' }); ok(r.result === 'damage' && !pp.some((e) => e.id === 'light_touch'), 'hard (realistic): contact never scores');
+  ({ g, pp } = lt({ mode: 'story', difficulty: 'hard', protection: 'rubber' }));
+  r = g.reportImpact({ speedKt: 5, other: 'ai3' });
+  ok(r.result === 'bounce' && !r.lightTouch && !pp.some((e) => e.id === 'light_touch') && r.pendingLost > 0, 'story Hard: even a bounced touch earns nothing, penalty stands');
+  eq(G.basePP('near_miss', {}, true), 300, 'hard still scores close calls (near miss ×1.5)');
+  ok(lt({ mode: 'story', difficulty: 'easy' }).g.difficulty === 'easy' && lt({ mode: 'strict' }).g.difficulty === 'hard' && lt({ mode: 'court' }).g.difficulty === 'medium' && lt({ mode: 'rumble' }).g.difficulty === 'easy', 'room difficulty from protection: rumble easy, court medium, strict hard');
+  ({ g, pp } = lt({ mode: 'court' }));
+  const j = g.serialize(); j.protectionMode = 'realistic'; j.protection = 0; g.restore(j);
+  r = g.reportImpact({ speedKt: 5, other: 'p:bob' }); ok(g.difficulty === 'hard' && !pp.some((e) => e.id === 'light_touch'), 'online room switched to Realistic after create: Hard rules');
+  ({ g, pp } = lt({ protection: 'rubber' })); g.handleEvent({ type: 'scandal', actor: 'player' });
+  r = g.reportImpact({ speedKt: 6, other: 'ai3' }); ok(pp.at(-1)?.id === 'light_touch' && pp.at(-1).amount === 0, 'frozen by scandal: Love Tap pays 0');
+}
+
+section("goaroundrefused → Selective Hearing (once per go-around)");
+{
+  const mk = () => { const g = game({ outrageSource: 'internal' }); const pp = [], fwd = []; g.on('pp', (e) => pp.push(e)); g.on('outrageDelta', (d) => fwd.push(d)); return { g, pp, fwd }; };
+  let { g, pp, fwd } = mk();
+  g.handleEvent({ type: 'goaroundrefused', reason: 'Tower: go around' });
+  ok(pp.length === 1 && pp[0].id === 'ignored_instruction' && pp[0].amount === 120, 'refused go-around scores ignored_instruction 120');
+  eq(g.state().outrage, 10, 'refusal +10 outrage');
+  ok(fwd.some((d) => d.amount === 10 && d.why === 'ignored_instruction'), 'refusal outrage forwarded to ATC (it never saw the crime)');
+  g.handleEvent({ type: 'ignored_instruction', id: 501, actor: 'player', outrage: 40, data: { instruction: 'goAround', landed: true } });
+  ok(pp.length === 1 && g.state().outrage === 10, "ATC's later go-around Selective Hearing is not paid twice");
+  g.handleEvent({ type: 'ignored_instruction', id: 502, actor: 'player', data: { instruction: 'holdPosition' } });
+  ok(pp.length === 2, 'a hold-position Selective Hearing is a separate crime');
+  g.handleEvent({ type: 'goaroundrefused', actor: 'ai7' }); ok(pp.length === 2, "an AI's refusal never scores");
+  for (let i = 0; i < 910; i++) g.update(0.1, { onGround: false, gsKt: 90 });
+  g.handleEvent({ type: 'goaroundrefused', actor: 'player' }); ok(pp.length === 3, 'a new go-around 90 s later scores again');
+  ({ g, pp } = mk());
+  g.handleEvent({ type: 'ignored_instruction', id: 9, actor: 'player', outrage: 12, data: { instruction: 'goAround' } });
+  g.handleEvent({ type: 'goaroundrefused' });
+  ok(pp.length === 1 && pp[0].amount === 120, 'ATC first, refusal second: still once');
+}
+
 section('career: D2 / D3');
 {
   const st = memStore(); let t = 1000;
@@ -406,6 +477,13 @@ function falsify() {
     { name: 'D4 broken (Emperor ignores career flag)', file: 'js/game/court.js', from: "sorted[0].emperorEarned ? EMPEROR : KING", to: 'true ? KING : EMPEROR' },
     { name: 'partial loss clamp dropped', file: 'js/game/score.js', from: 'return clamp(kt * P.partial.lossPerKt, P.partial.lossMin, P.partial.lossMax);', to: 'return kt * P.partial.lossPerKt;' },
     { name: 'D19 zone ignored (demand anywhere)', file: 'js/game/score.js', from: "if (!zone.ok) return { ok: false, reason: zone.reason || 'Not here' };", to: '' },
+    { name: 'D28 light touch never pays', file: 'js/game/score.js', from: "infraction('light_touch', { type: 'light_touch', actor: me, victim: other, data: { kt: Math.round(kt) } });", to: '' },
+    { name: 'D28 parked guard dropped', file: 'js/game/score.js', from: ' || S.gsKt < r.minOwnKt', to: '' },
+    { name: 'D28 light-touch speed cap ignored (big hits score)', file: 'js/game/score.js', from: '|| kt > r.maxRelKt ', to: '' },
+    { name: 'D28 per-pair cooldown ignored', file: 'js/game/score.js', from: "if (S.t - (S.touchAt[other] ?? -1e9) < r.pairCooldown) return 'cooldown';", to: '' },
+    { name: 'D28 Hard rewards contact', file: 'data/rules.js', from: "targetMult: 1.3, contact: 'none'", to: "targetMult: 1.3, contact: 'light'" },
+    { name: 'goaroundrefused not scored', file: 'js/game/score.js', from: "else if (ev.type === 'goaroundrefused' && (ev.actor == null || mine(ev))) ignoredGoAround(ev, true);", to: '' },
+    { name: 'go-around paid twice (no dedupe)', file: 'js/game/score.js', from: 'if (S.t - S.gaIgnoredAt < INFRACTIONS.ignored_instruction.refusedWindow) return;', to: '' },
     { name: 'D19 hard accepts runways', file: 'js/game/finish.js', from: 'const ok = atSpot || (onApron(x, z) && nearStand(x, z));', to: 'const ok = true;' },
   ];
   let allCaught = true;

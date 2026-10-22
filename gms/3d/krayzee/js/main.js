@@ -652,6 +652,7 @@ function handleEvents(P, dt) {
     if (ev.type === 'goaround') hud.flash(`GO AROUND · ${friendlyReason(ev.reason)}`, 'warn');
     else if (ev.type === 'replan' && ev.to === 'approach') hud.flash(`AUTOPILOT · LANDING RUNWAY ${ev.end}`, 'info');
     else if (ev.type === 'recovery') hud.flash('AUTOPILOT · RECOVERING', 'warn');
+    else if (ev.type === 'goaroundrefused') { try { wiring.game?.handleEvent({ type: 'goaroundrefused', actor: 'player', reason: ev.reason }); } catch (e) { /* */ } }
   }
   if (ac.crashed && S.respawnT > 0 && (S.respawnT -= dt) <= 0) { placePlayer(); try { wiring.game?.respawn(); } catch (e) { /* */ } }
 }
