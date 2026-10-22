@@ -31,7 +31,9 @@ export function createCoach(root, { force = false } = {}) {
   document.body.append(el);
   const ring = el.querySelector('.krz-coach-ring'), bub = el.querySelector('.krz-coach-bub'), p = el.querySelector('p');
   const S = { done: force ? {} : read(), cur: null, t: 0, gap: 0, w: {}, log: [] };
-  const touch = matchMedia?.('(pointer: coarse)').matches || 'ontouchstart' in window;
+  let touchSeen = false;
+  addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') touchSeen = true; }, { capture: true, passive: true });
+  const isTouch = () => touchSeen || navigator.maxTouchPoints > 0 || !!matchMedia?.('(pointer: coarse)').matches || 'ontouchstart' in window;
   const stop = (e) => e.stopPropagation();
   bub.addEventListener('pointerdown', stop);
   el.querySelector('.krz-coach-ok').addEventListener('click', (e) => { e.stopPropagation(); finish('ok'); });
@@ -46,7 +48,7 @@ export function createCoach(root, { force = false } = {}) {
   }
 
   function place() {
-    const target = document.querySelector(S.cur.sel(touch));
+    const target = document.querySelector(S.cur.sel(isTouch()));
     const r = target && !target.closest('[hidden]') ? target.getBoundingClientRect() : null;
     if (!r || !r.width) { ring.hidden = true; bub.style.left = '50%'; bub.style.top = '40%'; bub.dataset.dir = ''; return; }
     ring.hidden = false;
@@ -89,7 +91,7 @@ export function createCoach(root, { force = false } = {}) {
       if (!step || !step.when(w)) return;
       if (step.done(w)) { S.done[step.id] = 1; write(S.done); return; }
       S.cur = step; S.t = 0;
-      p.innerHTML = step.text(touch);
+      p.innerHTML = step.text(isTouch());
       el.dataset.step = step.id;
       el.hidden = false;
       place();

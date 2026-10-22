@@ -139,7 +139,7 @@ export function linkTraffic(atc, traffic, { playerId = 'player', intentOf = null
     // D21: taxi straight to the nearest open runway start and go. ATC is NOT told: it sees the crimes as they happen.
     demandTakeoff(e) {
       const a = atc.activeRunway();
-      const ends = Object.entries(a.open).filter(([, o]) => o).flatMap(([rw]) => rw.split('/'));
+      const ends = Object.entries(a.open).filter(([, o]) => o).flatMap(([rw]) => atc.geo?.runwayById(rw)?.ends ?? rw.split('/'));
       return e.ap?.demandTakeoff({ ends, prefer: a.end });
     },
     // spawn/respawn/teleport: no crimes for a few seconds, ATC state reset

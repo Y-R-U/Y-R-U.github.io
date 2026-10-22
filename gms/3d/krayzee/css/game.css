@@ -353,3 +353,8 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
   border: 1px solid rgba(246,241,228,.5); background: rgba(14,18,28,.82); color: var(--krz-ink); }
 .krz-reel-btns .krz-reel-next { background: var(--krz-gold); color: #1d2b45; border-color: transparent; }
 .krz-reel-btns button[hidden] { display: none; }
+
+/* D16 "Watch the intro" (injected under the menu grid by main.js) */
+.krz-intro-link { display: block; margin: 8px auto 0; padding: 6px 12px; border: 0; background: none; cursor: pointer; pointer-events: auto;
+  font: 600 13px/1.2 system-ui, sans-serif; letter-spacing: .04em; color: rgba(246,241,228,.72); text-decoration: underline; text-underline-offset: 3px; }
+.krz-intro-link:hover { color: #f6f1e4; }

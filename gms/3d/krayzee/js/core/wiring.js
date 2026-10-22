@@ -94,7 +94,14 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
     for (const e of traffic.list) if (!e.player && e.rankIndex != null) g.setPilotRank?.(idOf(e), e.rankIndex);
     if (W.atc) {
       off.push(W.atc.on('event', (e) => safe(() => g.handleEvent(e))));
-      off.push(W.atc.on('scandal', (e) => safe(() => g.handleEvent(e))));
+      // STORY tuning: a Royal Scandal in the tutorial / a beginner's first flights wiped their PP. Easy+Medium story and
+      // careers under 1,500 PP get a warning instead: the tower calms down a little and nothing is forfeited.
+      W.scandalGrace = mode === 'story' ? W.difficulty !== 'hard' : mode === 'free' && (career?.lifetimePP ?? 0) < 1500;
+      off.push(W.atc.on('scandal', (e) => safe(() => {
+        if (!W.scandalGrace) return g.handleEvent(e);
+        W.atc.addOutrage?.(-35, 'player');
+        hud.flash?.('THE PRESS ARE SNIFFING ABOUT · STEADY ON', 'warn', 3);
+      })));
       off.push(W.atc.on('composure', (e) => safe(() => g.handleEvent(e))));
       g.on('outrageDelta', (d) => safe(() => W.atc.addOutrage(d.amount, 'player')));
     }

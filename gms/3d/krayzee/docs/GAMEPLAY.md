@@ -25,6 +25,13 @@ Test: `~/.claude/bin/cdp start --port 9491 -- --use-angle=metal` then `node tool
 | FX | `main.js` per docs/FX.md | player + AI tracked; AI events forwarded; `setQuality` through the R.setQuality wrapper (also world.setQuality) |
 | STORY | `main.js` per docs/STORY.md | Story menu button is taken over in capture phase (UI's SOON badge removed at runtime), `?mission=1`, `?intro=1`; warp chip (D18) placed under the tower badge (portrait) / beside it (landscape); sim scale = TIMESCALE × story.simScale (held at 1× while paused or the reel is open) |
 
+## STORY follow-ups
+Intro plays by itself on the very first launch (no saved pilot, intro unseen; skipped headless and with `?intro=0`), then the menu
+(and the creator). A "▶ Watch the intro" link is injected under the menu grid. Scandal grace: Easy/Medium story and careers under
+1,500 PP get a HUD warning and −35 tower outrage instead of a Royal Scandal (Hard story and seasoned careers get the real thing).
+LAND assist final is now 600–1200 m (dist × 0.3; was 600–1400 m, dist × 0.4); 500 m minimum failed ASSIST's terrain-clearance test.
+Coach marks decide touch vs keyboard when shown (touch seen, `maxTouchPoints`, coarse pointer), not once at boot.
+
 ## Aircraft types + Online
 Free Flight aircraft: `?plane=c172|tiger|bathtub`, else `settings.aircraft`, picked with the AIRCRAFT chips (Runabout / Moth /
 Bathtub) parked before the first lift-off (rebuilds the player). The type goes to `createPlane`, `new Aircraft({type})`,

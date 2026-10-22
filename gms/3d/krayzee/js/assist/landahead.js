@@ -191,7 +191,8 @@ function buildPath(c, st, F) {
   const hRel = wrap180(H - c.heading);
   const r = Math.max(300, (LAND.vApp * LAND.vApp) / (G * Math.tan(LAND.bankDeg * DEG)));
   const dist = Math.hypot(dx, dz);
-  const Lf = Math.max(Math.min(1400, Math.max(600, dist * 0.4)), LAND.flightAim + 300);
+  // STORY tuning: a shorter final when already close (was 600–1400 m, ≈2.5 min at 1× from a few km out)
+  const Lf = Math.max(Math.min(1200, Math.max(600, dist * 0.3)), LAND.flightAim + 300);
   const decel = Math.max(0, V * V - LAND.vApp * LAND.vApp) / (2 * 0.8);
   let pts = [], kind;
 

@@ -18,7 +18,8 @@ export const LONG_ROAD_Z = -1240;
 const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const rectDist = (r, x, z) => Math.hypot(Math.max(r.x0 - x, 0, x - r.x1), Math.max(r.z0 - z, 0, z - r.z1));
 
-const RWV = new Map(RUNWAYS.map((rw) => [rw, headingToVec(rw.heading)]));
+const RWV = new Map();
+const rwv = (rw) => RWV.get(rw) || RWV.set(rw, headingToVec(rw.heading)).get(rw);
 export function lakeR(a) { return 1 + 0.16 * Math.sin(2 * a + 1.1) + 0.09 * Math.sin(3 * a + 0.4) + 0.05 * Math.sin(5 * a + 2.3); }
 export function lakeDist(x, z) {
   const u = (x - LAKE.x) / LAKE.rx, v = (z - LAKE.z) / LAKE.rz;
@@ -36,7 +37,7 @@ function openness(x, z) {
   let d = Math.min(rectDist(AIRFIELD_FLAT, x, z), rectDist(TOWN, x, z) + 40, Math.max(0, (lakeDist(x, z) - 1.35) * 300));
   if (Math.abs(x) < 3700) d = Math.min(d, Math.max(0, Math.abs(z - LONG_ROAD_Z) - 25));
   for (const rw of RUNWAYS) {
-    const [dx, dz] = RWV.get(rw);
+    const [dx, dz] = rwv(rw);
     const rx = x - rw.center[0], rz = z - rw.center[2];
     const a = Math.abs(rx * dx + rz * dz) - rw.length / 2, b = Math.abs(-rx * dz + rz * dx);
     if (a > 0 && a < 3400) d = Math.min(d, Math.max(0, b - 160 - a * 0.15) + Math.max(0, a - 2600));
@@ -66,7 +67,7 @@ export function airfieldMask(x, z) {
 }
 
 export function stripMaskFor(rw, x, z) {
-  const [dx, dz] = RWV.get(rw);
+  const [dx, dz] = rwv(rw);
   const rx = x - rw.center[0], rz = z - rw.center[2];
   const a = Math.abs(rx * dx + rz * dz) - rw.length / 2 - 60;
   const b = Math.abs(-rx * dz + rz * dx) - (rw.width >= 30 ? 75 : 40);
@@ -115,13 +116,14 @@ export function createTerrain(renderer, quality) {
   g.computeBoundingSphere();
 
   const mask = maskTexture(MAP_EXTENT, low ? 512 : 1024, (x, z) => [
-    airfieldMask(x, z), Math.max(0, Math.min(1, (1.3 - lakeDist(x, z)) / 0.3)), stripMaskFor(RUNWAYS[0], x, z), stripMaskFor(RUNWAYS[1], x, z),
+    airfieldMask(x, z), Math.max(0, Math.min(1, (1.3 - lakeDist(x, z)) / 0.3)), stripMaskFor(RUNWAYS[0], x, z), RUNWAYS.length > 1 ? Math.max(...RUNWAYS.slice(1).map((rw) => stripMaskFor(rw, x, z))) : 0,
   ]);
   const detail = detailTexture(renderer);
   const blank = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1);
   blank.needsUpdate = true;
   const uniforms = { uDetail: { value: detail }, uMask: { value: mask }, uShade: { value: blank }, uBump: { value: low ? 0 : 1 } };
-  const r22 = RUNWAYS[1], [d22x, d22z] = headingToVec(r22.heading);
+  // mown stripes along each runway strip: mask .b = RUNWAYS[0], .a = the others
+  const mow = (rw) => { const [dx, dz] = headingToVec(rw.heading); return `dot(w - vec2(${rw.center[0].toFixed(1)}, ${rw.center[2].toFixed(1)}), vec2(${(-dz).toFixed(4)}, ${dx.toFixed(4)}))`; };
 
   const m = new THREE.MeshStandardMaterial({ roughness: 1, metalness: 0 });
   m.onBeforeCompile = (sh) => {
@@ -235,8 +237,8 @@ export function createTerrain(renderer, quality) {
           float strip = max(mk.b, mk.a);
           gr = mix(gr * vec3(0.9, 0.93, 0.85) * (0.9 + 0.2 * texture(uDetail, w / 29.0 + 0.4).b), gr * vec3(1.06, 1.08, 1.0), strip);
           gr *= 1.0 + 0.03 * stripes(w.x, 9.0) * (1.0 - strip);
-          gr *= 1.0 + 0.065 * stripes(w.y, 6.0) * mk.b;
-          gr *= 1.0 + 0.065 * stripes(dot(w - vec2(${r22.center[0].toFixed(1)}, ${r22.center[2].toFixed(1)}), vec2(${(-d22z).toFixed(4)}, ${d22x.toFixed(4)})), 5.0) * mk.a * (1.0 - mk.b);
+          gr *= 1.0 + 0.065 * stripes(${mow(RUNWAYS[0])}, 6.0) * mk.b;
+          ${RUNWAYS.slice(1).map((rw) => `gr *= 1.0 + 0.065 * stripes(${mow(rw)}, 5.0) * mk.a * (1.0 - mk.b);`).join('\n          ')}
           col = mix(col, gr, mk.r);
         }
 

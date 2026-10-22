@@ -22,7 +22,7 @@ import { createWiring } from './core/wiring.js';
 import { loadCareer, finishZone, DEFAULT_SPOT } from './game/index.js';
 import { createFX } from './fx/index.js';
 import { createStory } from './story/index.js';
-import { saveSettings } from './ui/store.js';
+import { saveSettings, hasProfile } from './ui/store.js';
 
 const AUTO = params.get('auto') === '1';
 const SHOT = params.get('shot') === '1';
@@ -132,7 +132,7 @@ async function boot() {
   ui.setLoading(1, 'Cleared for take-off');
   if (AUTO || params.get('start') === 'free') { ui.enterGameplay(); onPlay('free'); }
   else if (story && params.get('mission')) { ui.enterGameplay(); startMission(+params.get('mission') || 1); }
-  else if (story && params.get('intro') === '1') { ui.enterGameplay(); story.playIntro({ onDone: () => ui.showMenu() }); }
+  else if (story && (params.get('intro') === '1' || firstLaunch())) { ui.enterGameplay(); story.playIntro({ onDone: () => ui.showMenu() }); }
   else ui.showMenu();
 }
 
@@ -249,24 +249,37 @@ function startMission(id = 1) {
     });
   });
 }
+// D16: the intro plays by itself on the very first launch (no pilot yet, never seen); ?intro=0 and headless runs skip it.
+function firstLaunch() {
+  try { return params.get('intro') !== '0' && !/HeadlessChrome/.test(navigator.userAgent) && !hasProfile() && !story.introSeen(); } catch (e) { return false; }
+}
+function watchIntro() {
+  if (!story || S.player || S.starting || story.intro) return;
+  ui.enterGameplay();
+  story.playIntro({ onDone: () => ui.showMenu() });
+}
 function hookStoryMenu() {
   if (!story) return;
   const bind = () => {
     const b = document.querySelector('.kz-btn[data-a="story"]');
     if (!b || b.dataset.krzStory) return !!b;
     b.dataset.krzStory = '1';
+    const w = document.createElement('button');
+    w.type = 'button'; w.className = 'krz-intro-link'; w.textContent = '▶ Watch the intro';
+    w.addEventListener('click', (e) => { e.stopPropagation(); watchIntro(); });
+    b.closest('.kz-grid')?.after(w);
     b.classList.remove('soon');
     b.querySelector('.kz-soon')?.remove();
     // capture phase: the menu's own handler would show its "coming soon" toast
     const go = (e) => {
       e.stopImmediatePropagation(); e.preventDefault();
-      if (e.type !== 'click' || S.player || S.starting || story.intro) return;
+      if (S.player || S.starting || story.intro) return;
       try { audio.playUI?.('confirm'); } catch (er) { /* */ }
       ui.enterGameplay();
       if (!story.introSeen()) story.playIntro({ onDone: () => startMission(1) });
       else startMission(1);
     };
-    for (const t of ['pointerdown', 'pointerup', 'touchend', 'click']) b.addEventListener(t, go, true);
+    b.addEventListener('click', go, true); // click only: preventDefault on touchend would swallow the click itself
     return true;
   };
   if (!bind()) { const mo = new MutationObserver(() => { if (bind()) mo.disconnect(); }); mo.observe(document.body, { childList: true, subtree: true }); }

@@ -2,6 +2,8 @@
 // Node harness for js/atc: point-mass aircraft that obey ATC commands, plus scripted "player" crimes.
 // node tools/atc-sim.mjs [--only=name] [--quiet]
 // node tools/atc-sim.mjs --falsify   breaks each detector in a temp copy of js/atc and checks its scenario fails
+// node tools/atc-sim.mjs --airport=royal_rot37[m]   the same kinematic scenarios against a synthetic test airport
+//   (data/airports/tests.js) through a frame adapter, then 30-min autopilot soaks flown natively at that airport
 import { STANDS } from '../js/world/layout.js';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import fs from 'node:fs';
@@ -14,6 +16,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 if (args.falsify) { falsify(); process.exit(0); }
 const { createATC, geometry: Gm } = await import(args.atc ? pathToFileURL(path.join(args.atc, 'js/atc/index.js')).href : '../js/atc/index.js');
 const DT = 0.1;
+const AIRPORT = typeof args.airport === 'string' && args.airport !== 'royal' ? args.airport : null;
+const XF = AIRPORT ? await airportXform(AIRPORT) : null;
+const mkATC = (o) => (XF ? XF.atc(o) : createATC(o));
 const TAXI = 8, AIR = 44, FINAL_SPD = 34, ROT = 28;
 
 // ---------- kinematic AI pilot (reference consumer of the command vocabulary) ----------
@@ -230,7 +235,7 @@ function groundBlocked(me, all) {
 
 // ---------- world runner ----------
 function makeWorld(atcOpts = {}) {
-  const atc = createATC(atcOpts);
+  const atc = mkATC(atcOpts);
   const planes = [];
   const events = [];
   const instr = [];
@@ -297,11 +302,11 @@ const results = [];
 function check(name, cond, detail = '') { results.push({ name, ok: !!cond, detail }); return !!cond; }
 const AI_BAD = ['cut_in_final', 'forced_goaround', 'runway_steal', 'queue_jump', 'unauth_takeoff', 'unauth_landing', 'runway_incursion', 'taxiway_landing', 'grass_landing', 'apron_landing', 'wrong_way', 'closed_runway', 'tower_buzz', 'terminal_buzz', 'low_pass', 'formation', 'near_miss', 'collision', 'separation_loss', 'double_occupancy', 'intersection_dash', 'hard_landing', 'ignored_instruction', 'stand_steal', 'taxi_speeding'];
 
-function aiCircuits() {
-  const W = makeWorld({ wind: { from: 270, kt: 10 } });
-  circuitPlane(W, 'AI1', 2600);
-  circuitPlane(W, 'AI2', 5000);
-  circuitPlane(W, 'AI3', 7500);
+function aiCircuits(end = '27') {
+  const W = makeWorld({ wind: { from: end === '27' ? 270 : 90, kt: 10 } });
+  circuitPlane(W, 'AI1', 2600, 'circuits', end);
+  circuitPlane(W, 'AI2', 5000, 'circuits', end);
+  circuitPlane(W, 'AI3', 7500, 'circuits', end);
   const ground = ['AI4', 'AI5', 'AI6'].map((id, i) => W.add({ id, p: [STANDS[1 + i * 2].position[0], STANDS[1 + i * 2].position[2]], stand: STANDS[1 + i * 2].id, heading: 180 }));
   const sched = new Map(ground.map((p, i) => [p.id, { wake: 5 + i * 50 }]));
   for (const p of W.planes) if (!sched.has(p.id)) sched.set(p.id, { laps: 4 + W.planes.indexOf(p) });
@@ -324,12 +329,12 @@ function aiCircuits() {
   const total = W.planes.reduce((a, p) => a + p.landings, 0);
   const selfGA = W.planes.reduce((a, p) => a + p.selfGA, 0);
   const counts = W.atc.counts;
-  check('circuits: 0 AI conflicts/infractions in 30 min', bad.length === 0, bad.slice(0, 5).map((e) => `${e.type}:${e.actor}>${e.victim}@${e.t}`).join(', ') || `events=${W.events.length}`);
-  check('circuits: min airborne separation >= 150 m', W.minSep >= 150, `min ${W.minSep.toFixed(0)} m`);
-  check('circuits: every plane flew and landed', W.planes.every((p) => p.landings >= 2) && total >= 25, `${landings} (total ${total})`);
-  check('circuits: nobody reached the threshold uncleared', selfGA === 0, `selfGA=${selfGA}, ATC go-arounds=${counts.goArounds || 0}`);
-  check('circuits: nobody stuck > 5 min', stuck === 0, `stuck=${stuck}`);
-  check('circuits: go-arounds rare (<= 3)', (counts.goArounds || 0) <= 3, `goArounds=${counts.goArounds || 0}`);
+  check(`circuits${end === '27' ? '' : ' ' + end}: 0 AI conflicts/infractions in 30 min`, bad.length === 0, bad.slice(0, 5).map((e) => `${e.type}:${e.actor}>${e.victim}@${e.t}`).join(', ') || `events=${W.events.length}`);
+  check(`circuits${end === '27' ? '' : ' ' + end}: min airborne separation >= 150 m`, W.minSep >= 150, `min ${W.minSep.toFixed(0)} m`);
+  check(`circuits${end === '27' ? '' : ' ' + end}: every plane flew and landed`, W.planes.every((p) => p.landings >= 2) && total >= 25, `${landings} (total ${total})`);
+  check(`circuits${end === '27' ? '' : ' ' + end}: nobody reached the threshold uncleared`, selfGA === 0, `selfGA=${selfGA}, ATC go-arounds=${counts.goArounds || 0}`);
+  check(`circuits${end === '27' ? '' : ' ' + end}: nobody stuck > 5 min`, stuck === 0, `stuck=${stuck}`);
+  check(`circuits${end === '27' ? '' : ' ' + end}: go-arounds rare (<= 3)`, (counts.goArounds || 0) <= 3, `goArounds=${counts.goArounds || 0}`);
   return W;
 }
 
@@ -516,7 +521,7 @@ function serialization() {
   W.run(60);
   const snap = W.atc.serialize();
   const json = JSON.stringify(snap);
-  const B = createATC({ wind: { from: 270, kt: 10 } });
+  const B = mkATC({ wind: { from: 270, kt: 10 } });
   B.restore(JSON.parse(json));
   const states = W.planes.map((p) => p.state());
   const A1 = W.atc.step(0.1, snap.t + 0.1, states).length;
@@ -524,7 +529,7 @@ function serialization() {
   const same = JSON.stringify(W.atc.serialize()) === JSON.stringify(B.serialize());
   check('online: serialize/restore round-trips and steps identically', same && A1 === B1, `${(json.length / 1024).toFixed(1)} KB`);
   // Follower replica: restored from the host, non-authoritative, detects only its own (local) plane.
-  const F = createATC({ authority: false, detectRemote: false });
+  const F = mkATC({ authority: false, detectRemote: false });
   F.restore(W.atc.serialize());
   const fev = [];
   F.on('event', (e) => fev.push(e));
@@ -641,7 +646,8 @@ async function flightWorld(o = {}) {
     ? { groundHeightAt: terrain.heightAt, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [{ min: [C.x - 70, 0, C.z - 70], max: [C.x + 70, 190, C.z + 70], kind: 'castle' }] }
     : { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
   const tr = new Traffic(env, { aiProtection: o.protection });
-  const atc = createATC({ wind: o.wind || { from: 270, kt: 8 }, detectCollisions: false });
+  const wind = o.wind || { from: 270, kt: 8 };
+  const atc = createATC({ wind: XF ? { ...wind, from: XF.H(wind.from) } : wind, detectCollisions: false });
   const link = linkTraffic(atc, tr, { mischief: o.mischief ?? 0, rnd });
   const W = { atc, tr, link, t: 0, ai: [], evs: [], instr: [], ap: {}, stats: { arrivals: 0, departures: 0, tgs: 0, crashes: 0, spawned: 0, apGA: 0, holdWaitMax: 0, patternMax: 0, stuck: 0, ext: 0, slow: 0, bounces: 0, minClear: 1e9, minClearAt: '' }, runwayChanges: [] };
   atc.on('event', (e) => W.evs.push(e));
@@ -670,7 +676,7 @@ async function flightWorld(o = {}) {
   W.run = (secs = H) => {
     const until = W.t + secs;
     for (; W.t < until; W.t += dt) {
-      for (const w of o.windAt || []) if (!w.done && W.t >= w[0]) { w.done = true; atc.setWind(w[1], w[2]); }
+      for (const w of o.windAt || []) if (!w.done && W.t >= w[0]) { w.done = true; atc.setWind(XF ? XF.H(w[1]) : w[1], w[2]); }
       tr.update(dt); link.update(dt);
       if (args.watch && W.t >= +(args.from || 0) && W.t <= +(args.to || 1e9) && Math.floor(W.t) !== Math.floor(W.t - dt)) {
         const { S, D } = atc._debug();
@@ -879,7 +885,15 @@ async function seeAvoid() {
 
 async function flightSoak() {
   const mins = +(args.minutes || 30);
-  const runs = [
+  if (XF) await XF.useNatively();
+  const E = (e) => (XF ? XF.N(e) : e);
+  const runs = XF ? [
+    { label: `${AIRPORT} attract 4 + 2 circuits, ${E('27')} active`, max: 4, circuits: 2, seed: 23, tgMin: 6 },
+    { label: `${AIRPORT} attract 4 + 2 circuits, ${E('09')} active`, max: 4, circuits: 2, seed: 23, wind: { from: 90, kt: 8 }, tgMin: 6 },
+    { label: `${AIRPORT} attract 6`, max: 6, seed: 5 },
+    { label: `${AIRPORT} runway change`, max: 5, seed: 31, windAt: [[500, 90, 12], [1150, 270, 12]] },
+    { label: `${AIRPORT} mixed types`, max: 5, circuits: 1, seed: +(args.seed || 53), types: ['c172', 'tiger', 'bathtub'], gaPer15: 2.5 },
+  ] : [
     { label: 'attract 5', max: 5, seed: 11 },
     { label: 'attract 4 + 2 circuits', max: 4, circuits: 2, seed: 23 },
     { label: 'attract 6', max: 6, seed: 5 },
@@ -892,7 +906,7 @@ async function flightSoak() {
   const MILD = ['taxi_speeding', 'low_pass'];
   for (const r of runs) {
     if (args.run && !r.label.includes(args.run)) continue;
-    const W = await flightWorld({ ...r, minutes: mins });
+    const W = await flightWorld({ ...r, minutes: mins, seed: r.seed + 1000 * +(args.seedOffset || 0) });
     W.run(); W.done();
     const all = W.aiBad(), mild = r.mischief ? all.filter((e) => MILD.includes(e.type)) : [];
     const bad = all.filter((e) => !mild.includes(e));
@@ -910,15 +924,16 @@ async function flightSoak() {
     const moves = W.stats.arrivals + W.stats.departures + W.stats.tgs;
     check(`${tag}: steady flow (arrivals and departures, nobody stuck or starved)`, moves >= mins * (r.mischief ? 0.4 : 0.5) && W.stats.arrivals >= mins * 0.15 && W.stats.departures >= mins * 0.2 && !W.stats.stuck && W.stats.holdWaitMax < 300 && W.stats.patternMax < 600, `moves ${moves} (arr ${W.stats.arrivals} dep ${W.stats.departures} t&g ${W.stats.tgs}) stuck ${W.stats.stuck} holdMax ${W.stats.holdWaitMax.toFixed(0)}s patternMax ${W.stats.patternMax.toFixed(0)}s`);
     check(`${tag}: no crashes`, W.stats.crashes === 0, `crashes=${W.stats.crashes}`);
+    if (r.tgMin) check(`${tag}: full circuits flown on ${W.atc.activeRunway().end} (>= ${r.tgMin} touch-and-goes)`, W.stats.tgs >= r.tgMin, `t&g ${W.stats.tgs}`);
     if (r.windAt) check(`${tag}: active runway switched ${r.windAt.length}x mid-session, every landing on the active end`, W.runwayChanges.length === r.windAt.length && !W.stats.wrongEnd, `${W.runwayChanges.map((c) => `${c.from}->${c.to}@${c.t.toFixed(0)}`).join(' ')} wrong-end landings ${W.stats.wrongEnd || 0}`);
     check(`${tag}: terrain/castle clearance >= 100 m away from the field (except approach/climb-out)`, W.stats.minClear >= 100, `min ${W.stats.minClear.toFixed(0)} m (${W.stats.minClearAt})${FL.terrain ? '' : ' FLAT GROUND'}`);
   }
 }
 
-const SCEN = { circuits: aiCircuits, cutin: cutIn, corner: cutInCorner, blocked: blockedRunway, overtake, outofturn: outOfTurn, buzz: towerBuzz, crossing, crimes, online: serialization };
-SCEN.flightcut = flightCutIn;
-SCEN.gameplay = gameplay;
-SCEN.avoid = seeAvoid;
+const SCEN = { circuits: () => aiCircuits(), cutin: cutIn, corner: cutInCorner, blocked: blockedRunway, overtake, outofturn: outOfTurn, buzz: towerBuzz, crossing, crimes, online: serialization };
+if (XF) SCEN.circuits09 = () => aiCircuits('09');
+// royal-frame scripts flown by the real autopilot: not translated for test airports (their soaks fly natively)
+if (!XF) { SCEN.flightcut = flightCutIn; SCEN.gameplay = gameplay; SCEN.avoid = seeAvoid; }
 SCEN.flight = flightSoak;
 for (const [name, fn] of Object.entries(SCEN)) {
   if (args.only && args.only !== name) continue;
@@ -927,6 +942,7 @@ for (const [name, fn] of Object.entries(SCEN)) {
   if (!args.quiet) console.log(`# ${name} (${Date.now() - t0} ms)`);
 }
 let fail = 0;
+if (XF) console.log(`airport ${AIRPORT}: ends ${JSON.stringify(XF.names)}`);
 for (const r of results) { if (!r.ok) fail++; console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.detail ? '  — ' + r.detail : ''}`); }
 console.log(`\n${results.length - fail}/${results.length} passed`);
 process.exit(fail ? 1 : 0);
@@ -961,7 +977,7 @@ function falsify() {
     ['outrage meter', 'js/atc/outrage.js', 'm.v = Math.max(0, Math.min(C.max, m.v + amount * (amount > 0 ? gain : 1)));', '', 'cutin', 'composure rose'],
     ['serialize', 'js/atc/index.js', 'serialize() { return clone(S); },', 'serialize() { const c = clone(S); delete c.seqs; return c; },', 'online', 'round-trips'],
   ];
-  const files = ['js/atc/index.js', 'js/atc/geometry.js', 'js/atc/rules.js', 'js/atc/outrage.js', 'js/world/layout.js', 'data/rules.js'];
+  const files = ['js/atc/index.js', 'js/atc/geometry.js', 'js/atc/rules.js', 'js/atc/outrage.js', 'js/world/layout.js', 'js/flight/routes.js', 'data/aircraft.js', 'data/rules.js', ...fs.readdirSync(path.join(ROOT, 'data/airports')).map((f) => `data/airports/${f}`)];
   let ok = 0;
   for (const [label, file, orig, broken, scen, expect] of B) {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'atc-falsify-'));
@@ -978,3 +994,78 @@ function falsify() {
   }
   console.log(`\n${ok}/${B.length} broken builds caught`);
 }
+
+// Scenarios are scripted in C-Tower 1's frame. For a test airport (data/airports/tests.js, derived by transform.js) the
+// ATC runs on that airport's geometry and this adapter maps positions, headings and names in and out, so every check
+// keeps its meaning. useNatively() then switches the whole flight stack (layout, routes, terrain) to it.
+async function airportXform(id) {
+  const { TEST_AIRPORTS } = await import('../data/airports/tests.js');
+  const def = TEST_AIRPORTS[id];
+  if (!def) throw new Error(`no test airport ${id} (${Object.keys(TEST_AIRPORTS)})`);
+  const { rotate, mirror, offset, names } = def.derived;
+  const r = rotate * Math.PI / 180, c = Math.cos(r), sn = Math.sin(r);
+  const norm = (h) => ((h % 360) + 360) % 360;
+  const P = ([x, z]) => { if (mirror) x = -x; return [x * c - z * sn + offset[0], x * sn + z * c + offset[1]]; };
+  const Pi = ([x, z]) => { x -= offset[0]; z -= offset[1]; const a = x * c + z * sn; return [mirror ? -a : a, -x * sn + z * c]; };
+  const V = ([x, z]) => { if (mirror) x = -x; return [x * c - z * sn, x * sn + z * c]; };
+  const H = (h) => norm((mirror ? 360 - h : h) + rotate);
+  const Hi = (h) => { const k = norm(h - rotate); return mirror ? norm(360 - k) : k; };
+  const back = Object.fromEntries(Object.entries(names).map(([a, b]) => [b, a]));
+  const N = (k) => names[k] ?? k, Ni = (k) => back[k] ?? k;
+  const SIDE = { left: 'right', right: 'left' };
+  const isNum = (v) => typeof v === 'number';
+  const out = (o, key) => {
+    if (typeof o === 'string') return key === 'side' && mirror ? SIDE[o] ?? o : Ni(o);
+    if (isNum(o)) return key === 'heading' || key === 'track' || key === 'from' ? Hi(o) : o;
+    if (Array.isArray(o)) {
+      if (o.length === 2 && o.every(isNum)) return Pi(o);
+      if (o.length === 3 && o.every(isNum)) { const [x, z] = Pi([o[0], o[2]]); return [x, o[1], z]; }
+      return o.map((v) => out(v, key));
+    }
+    if (o && typeof o === 'object') return Object.fromEntries(Object.entries(o).map(([k, v]) => [Ni(k), out(v, k)]));
+    return o;
+  };
+  const inState = (st) => {
+    const [x, z] = P([st.pos[0], st.pos[2]]), [vx, vz] = V([st.vel[0], st.vel[2]]);
+    return { ...st, pos: [x, st.pos[1], z], vel: [vx, st.vel[1], vz], heading: H(st.heading), runwayIntent: st.runwayIntent && N(st.runwayIntent), stand: st.stand && N(st.stand) };
+  };
+  const geo = Gm.makeGeometry(def);
+  return {
+    names, N, H, def,
+    atc(o = {}) {
+      const real = createATC({ ...o, geo, wind: o.wind && { ...o.wind, from: H(o.wind.from) }, open: o.open && Object.fromEntries(Object.entries(o.open).map(([k, v]) => [N(k), v])), activeEnd: o.activeEnd && N(o.activeEnd) });
+      return {
+        update: (dt, states) => out(real.update(dt, states.map(inState))),
+        step: (dt, t, states) => { if (Array.isArray(t)) { states = t; t = undefined; } return out(real.step(dt, t, states.map(inState))); },
+        on: (type, fn) => real.on(type, (ev) => fn(out(ev))),
+        off: (type, fn) => real.off(type, fn),
+        instructionsFor: (pid) => out(real.instructionsFor(pid)),
+        command: (pid, t) => out(real.command(pid, t)),
+        strip: (pid) => out(real.strip(pid)),
+        sequence: (end) => real.sequence(end && N(end)),
+        departureQueue: () => real.departureQueue(),
+        activeRunway: () => out(real.activeRunway()),
+        setWind: (from, kt) => real.setWind(H(from), kt),
+        get pendingRunway() { const pr = real.pendingRunway; return pr && Ni(pr); },
+        setRunwayOpen: (rw, op) => real.setRunwayOpen(N(rw), op),
+        composure: (k) => real.composure(k),
+        report: (...a) => out(real.report(...a)),
+        addOutrage: (...a) => real.addOutrage(...a),
+        setLocal: (...a) => real.setLocal(...a),
+        configure: (x) => real.configure(x),
+        remove: (pid) => real.remove(pid),
+        grace: (...a) => real.grace(...a),
+        resetStrip: (pid, x = {}) => real.resetStrip(pid, { ...x, lineUp: x.lineUp && N(x.lineUp) }),
+        serialize: () => real.serialize(),
+        restore: (j) => real.restore(j),
+        get time() { return real.time; }, get log() { return out(real.log); }, get counts() { return real.counts; }, get mutex() { return real.mutex; },
+        _debug: () => real._debug(), geo,
+      };
+    },
+    async useNatively() {
+      const Lm = await import('../js/world/layout.js');
+      Lm.registerAirport(def); Lm.setAirport(id);
+    },
+  };
+}
+

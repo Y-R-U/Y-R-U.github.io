@@ -59,3 +59,4 @@ If agents vanished (ListAgents), check each lane's docs/<LANE>.md and newest fil
 - 2026-10-22 TRAFFIC3 done (tiger/bathtub fly; flight-sim 81/81, atc-sim 97/97) committed. Wiring list (type passthrough, attract types, parked rig pose) → GAMEPLAY. 2 active (GAMEPLAY STORY).
 - 2026-10-22 DESIGN2 done: docs/AIRPORTS.md (one airport per load + Kingdom Map, ferry flights 2nd; 6 airports; A0 data-file refactor, A1 ATC layout-agnostic, farm strip first). Asked Aaron 3 Qs. 2 active (GAMEPLAY STORY).
 - 2026-10-22 STORY done (intro 72 s, Mission 1 11 steps, time warp) committed. Notes: Scandal can wipe tutorial PP (tune outrage), LAND final 3 km out = slow. Wiring left → GAMEPLAY (Watch intro menu entry; first-launch intro). 2 active (GAMEPLAY AIRPORTS).
+- 2026-10-22 Boot smoke clean (390x844 ?start=free / ?auto / menu); PUSHED 9 commits incl. GAMEPLAY WIP snapshot 9e720904. Live build now has HUD/markers/LAND/FX/story/Tiger+bathtub rigs (type picker pending).

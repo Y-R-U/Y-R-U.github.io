@@ -33,6 +33,7 @@ export const T = {
   depSlotWait: 0,                  // s at the hold before ATC stretches an arrival to make a gap
   depSlotNear: 450,                // ...or already this close to the hold while taxiing out
   depSlot: 130,                    // seconds opened behind the leader for a waiting departure
+  depAfterFree: 85,                // ...and at least this long after the runway is projected free of rolling/vacating landers
   depSpacing: 1500,                // previous departure/touch-and-go this far down the runway before the next roll
   mutexRelease: 60,                // past the intersection by this many metres (or above mutexAlt)
   mutexAlt: 150,
