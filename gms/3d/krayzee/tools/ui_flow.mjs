@@ -1,15 +1,16 @@
 // UI lane flow test: real taps/clicks over raw CDP against tools/ui.html.
-//   node tools/ui_flow.mjs            starts Chrome on :9441 (metal), runs 3 viewports, stops it
-//   node tools/ui_flow.mjs --keep     leave Chrome running
-// Screenshots: docs/shots/ui/flow-*.png
+//   node tools/ui_flow.mjs [--port=9601] [--shots=ui]   starts Chrome (metal), runs 3 viewports, stops it
+//   node tools/ui_flow.mjs --keep                       leave Chrome running
+// Screenshots: docs/shots/<shots>/flow-*.png
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const PORT = 9441;
+const arg = (k, d) => process.argv.find((a) => a.startsWith(`--${k}=`))?.split('=')[1] ?? d;
+const PORT = +arg('port', 9601);
 const BASE = 'http://localhost:8888/gms/3d/krayzee/tools/ui.html';
 const CDP = `${process.env.HOME}/.claude/bin/cdp`;
-const SHOTS = fileURLToPath(new URL('../docs/shots/ui/', import.meta.url));
+const SHOTS = fileURLToPath(new URL(`../docs/shots/${arg('shots', 'ui')}/`, import.meta.url));
 mkdirSync(SHOTS, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -59,8 +60,9 @@ async function run(view) {
     return r.result.value;
   };
   const go = async (q, settle = 900) => {
+    await ev('window.__flowStale = 1').catch(() => {}); // the old page answers the readiness poll until the new one commits
     await send('Page.navigate', { url: `${BASE}?${q}` });
-    for (let i = 0; i < 60; i++) { await sleep(150); if (await ev('!!(window.__ui && document.querySelector("#kz-ui"))').catch(() => false)) break; }
+    for (let i = 0; i < 60; i++) { await sleep(150); if (await ev('!window.__flowStale && !!(window.__ui && document.querySelector("#kz-ui"))').catch(() => false)) break; }
     await sleep(settle);
   };
   const tap = async (sel) => {
@@ -273,7 +275,7 @@ async function run(view) {
   await tap('.kz-creator [data-act="save"]');
   ok((await store('krayzee.profile')).favourites?.join() === 'bubba,comte,tex', 'favourites saved in order', JSON.stringify((await store('krayzee.profile')).favourites));
   ok((await ev('__ui.getProfile().favourites.join()')) === 'bubba,comte,tex' && await ev(`__uiLog.filter((l) => l[0] === 'profile').pop()[1].favourites.join() === 'bubba,comte,tex'`), 'getProfile + onProfile carry favourites');
-  ok((await ev(`import('../js/net/index.js').then((m) => m.helloFromProfile(__ui.getProfile()).voices.join())`)) === 'bubba,comte,tex', 'net hello sends the favourites');
+  ok((await ev(`import('../js/net/index.js').then((m) => m.helloFromProfile(__ui.getProfile()).voices.join())`)) === 'toff,bubba,comte', 'net hello sends voice + favourites (NET: chosen voice first, 3 max)');
   await tap('.kz-menu [data-a="hangar"]');
   await tap('.kz-star[data-star="bubba"]');
   await tap('.kz-creator [data-act="cancel"]');
@@ -303,6 +305,93 @@ async function run(view) {
   await tap('.kz-creator [data-act="random"]');
   await tap('.kz-creator [data-act="save"]');
   ok(await ev(`(window.__uiLog || []).filter((l) => l[0] === 'online').length === 1 && __ui.getUIState().lobby`), 'creator saved → onOnline fires');
+
+  // 15. Story + intro hooks (GAMEPLAY no longer patches the menu at runtime).
+  await go('state=menu&seed&nocloud=1');
+  ok(await ev(`!!document.querySelector('.kz-menu [data-a="story"] .kz-soon') && document.querySelector('.kz-intro-link').hidden`), 'no onStory: Story SOON, no intro link');
+  await tap('.kz-menu [data-a="story"]');
+  ok((await text('.kz-toast b')) === 'Story mode' && (await ev('__ui.getUIState()')).state === 'menu', 'SOON Story → toast');
+  await go('state=menu&seed&story=1&nocloud=1');
+  ok(await ev(`!document.querySelector('.kz-menu [data-a="story"] .kz-soon') && !document.querySelector('.kz-menu [data-a="story"]').classList.contains('soon')`), 'onStory: Story live');
+  ok(await ev(`(() => { const l = document.querySelector('.kz-intro-link'); const r = l.getBoundingClientRect(); return !l.hidden && r.height > 0 && r.bottom <= innerHeight; })()`), 'onIntro: intro link visible on screen');
+  await shot('menu-story');
+  await tap('.kz-menu [data-a="story"]');
+  ok((await ev('__ui.getUIState()')).state === 'game' && await ev(`__uiLog.filter((l) => l[0] === 'story').length === 1 && !__uiLog.some((l) => l[0] === 'play')`), 'Story → enterGameplay + onStory (not onPlay)');
+  ok(!(await ev(`document.querySelector('.kz-toast')?.classList.contains('on') && document.querySelector('.kz-toast b').textContent === 'Story mode'`)), 'no coming-soon toast');
+  await ev('__ui.showMenu()');
+  await tap('.kz-intro-link');
+  ok((await ev('__ui.getUIState()')).state === 'game' && await ev(`__uiLog.filter((l) => l[0] === 'intro').length === 1`), 'Watch the intro → enterGameplay + onIntro');
+  await go('state=loading&reset&nocloud=1', 300);
+  await go('state=menu&story=1&nocloud=1', 200);
+  await tap('.kz-menu [data-a="story"]');
+  ok(await ev(`document.querySelector('.kz-creator').classList.contains('on') && !(window.__uiLog || []).some((l) => l[0] === "story")`), 'no profile: Story opens the creator first');
+  ok(await ev(`document.querySelector('.kz-hangar').hidden`), 'first-run creator hides the aircraft picker');
+  await tap('.kz-creator [data-act="random"]');
+  await tap('.kz-creator [data-act="save"]');
+  ok(await ev(`__uiLog.filter((l) => l[0] === 'story').length === 1 && __ui.getUIState().state === 'game'`), 'creator saved → onStory');
+  ok((await store('krayzee.settings')) === null, 'first-run save writes no settings');
+
+  // 16. Hangar aircraft picker: cards, unlocks (Moth = Earl, Bathtub = story), preview, saved as settings.aircraft.
+  const cardState = () => ev(`[...document.querySelectorAll('.kz-plane')].map((c) => c.dataset.p + (c.classList.contains('locked') ? 'L' : '') + (c.getAttribute('aria-checked') === 'true' ? '*' : '')).join()`);
+  const stageType = () => text('.kz-stage-type');
+  await go('state=menu&seed&career=0&nocloud=1');
+  ok((await ev('__ui.getSettings()')).aircraft === 'c172', 'default aircraft c172');
+  await tap('.kz-menu [data-a="hangar"]');
+  ok(!(await ev(`document.querySelector('.kz-hangar').hidden`)) && (await cardState()) === 'c172*,tigerL,bathtubL', 'Baron: Runabout picked, Moth + Bathtub locked', await cardState());
+  ok((await text('.kz-plane[data-p="tiger"] .kz-lock'))?.includes('Reach Earl · 6,000 PP') && (await text('.kz-plane[data-p="bathtub"] .kz-lock'))?.includes('Finish the Story'), 'lock requirements shown');
+  ok((await text('.kz-plane[data-p="tiger"] .kz-stats'))?.includes('80') && (await text('.kz-plane[data-p="c172"] .kz-ppx')) === 'PP ×1', 'stats + PP multiplier from data/aircraft.js', await text('.kz-plane[data-p="tiger"] .kz-stats'));
+  for (let i = 0; i < 40 && !(await ev(`!!document.querySelector('.kz-stage canvas') && !document.querySelector('.kz-stage-msg')`)); i++) await sleep(200);
+  ok(await ev(`!!document.querySelector('.kz-stage canvas')`), 'live 3D preview mounted');
+  await tap('.kz-plane[data-p="bathtub"]');
+  ok((await cardState()) === 'c172*,tigerL,bathtubL' && await ev(`(__sounds || []).at(-1) === 'error'`), 'locked tap: selection kept, error sound');
+  ok((await stageType())?.includes('Royal Flying Bathtub') && (await stageType())?.includes('Locked'), 'locked tap previews it, marked Locked', await stageType());
+  ok((await text('[data-hint="plane"]'))?.startsWith('Just looking'), 'hint explains the lock', await text('[data-hint="plane"]'));
+  await sleep(1500);
+  await shot('hangar-locked');
+  await noOverflow('hangar planes');
+  await tap('.kz-creator [data-act="save"]');
+  ok((await store('krayzee.settings')) === null || (await store('krayzee.settings')).aircraft !== 'bathtub', 'locked plane never saved');
+  ok(!(await ev(`__ui.aircraftUnlocked('tiger')`)) && await ev(`__ui.aircraftUnlocked('c172')`), 'aircraftUnlocked API (Baron)');
+
+  await go('state=menu&seed&career=6000&nocloud=1');
+  await tap('.kz-menu [data-a="hangar"]');
+  ok((await cardState()) === 'c172*,tiger,bathtubL', 'Earl: Moth unlocked', await cardState());
+  await tap('.kz-plane[data-p="tiger"]');
+  ok((await cardState()) === 'c172,tiger*,bathtubL' && (await stageType()) === "Grandfather's Moth", 'pick Moth', await cardState());
+  for (let i = 0; i < 30 && !(await ev(`!!window.__ui`)); i++) await sleep(100);
+  await sleep(1500);
+  await shot('hangar-moth');
+  await tap('.kz-creator [data-act="cancel"]');
+  ok(((await store('krayzee.settings'))?.aircraft ?? 'c172') === 'c172', 'Cancel does not save the aircraft');
+  await tap('.kz-menu [data-a="hangar"]');
+  ok((await cardState()) === 'c172*,tiger,bathtubL', 'reopen after Cancel: Runabout again', await cardState());
+  await tap('.kz-plane[data-p="tiger"]');
+  await tap('.kz-creator [data-act="save"]');
+  s = await store('krayzee.settings');
+  ok(s?.aircraft === 'tiger' && (await ev('__ui.getSettings()')).aircraft === 'tiger', 'Save stores settings.aircraft = tiger', JSON.stringify(s));
+  ok(await ev(`__uiLog.filter((l) => l[0] === 'settings').pop()?.[1].aircraft === 'tiger'`), 'onSettings fires with the aircraft');
+  await go('state=menu&nocloud=1&career=6000');
+  await tap('.kz-menu [data-a="hangar"]');
+  ok((await cardState()) === 'c172,tiger*,bathtubL', 'saved Moth reopens selected', await cardState());
+  await tap('.kz-creator [data-act="cancel"]');
+
+  await go('state=menu&nocloud=1&career=6000,0,story');
+  ok(await ev(`__ui.aircraftUnlocked('bathtub')`), 'story complete unlocks the Bathtub');
+  await tap('.kz-menu [data-a="hangar"]');
+  await tap('.kz-plane[data-p="bathtub"]');
+  ok((await cardState()) === 'c172,tiger,bathtub*', 'pick Bathtub after the story', await cardState());
+  await sleep(1500);
+  await shot('hangar-bathtub');
+  await tap('.kz-creator [data-act="save"]');
+  ok((await ev('__ui.getSettings()')).aircraft === 'bathtub', 'Bathtub saved');
+  await go('state=menu&nocloud=1&career=6000');
+  ok(!(await ev(`__ui.aircraftUnlocked('bathtub')`)) && (await ev('__ui.getSettings()')).aircraft === 'bathtub', 'stored but locked type is reported (main falls back via aircraftUnlocked)');
+  await tap('.kz-menu [data-a="hangar"]');
+  ok((await cardState()) === 'c172*,tiger,bathtubL', 'locked stored type shows Runabout picked', await cardState());
+  await tap('.kz-creator [data-act="cancel"]');
+  await ev(`localStorage.setItem('krayzee.settings', JSON.stringify({ ...JSON.parse(localStorage.getItem('krayzee.settings')), aircraft: 'jumbo' }))`);
+  ok((await ev('__ui.getSettings()')).aircraft === 'c172', 'unknown stored aircraft repaired to c172');
+  ok((await ev('__ui.getLivery()')).goldTaps === false, 'getLivery carries goldTaps (false below Emperor)');
 
   // 11. Cloud sync watches krayzee.career (desktop only; needs the account layer).
   if (!view.touch) {

@@ -44,8 +44,12 @@ export const EVENT_ALIASES = {
   clearedToLand: 'clearance', clearedForTakeoff: 'clearance', composure: 'outrage', crown: 'crownChange',
 };
 
+// Defaults for every createRadio() call (main.js sets { deferLoad: true } before core/wiring.js builds the radio).
+const DEFAULTS = {};
+export function configureRadio(o = {}) { Object.assign(DEFAULTS, o); }
+
 export function createRadio(opts = {}) {
-  const o = { parent: document.body, base: '', rng: Math.random, keys: true, chatter: 'normal', getContext: () => ({}), roomTime: null, mode: 'local', ...opts };
+  const o = { parent: document.body, base: '', rng: Math.random, keys: true, chatter: 'normal', getContext: () => ({}), roomTime: null, mode: 'local', deferLoad: false, ...DEFAULTS, ...opts };
   const bank = new LineBank();
   const fallback = createFallbackPlayer();
   const listeners = new Map();
@@ -269,6 +273,7 @@ export function createRadio(opts = {}) {
   }
 
   function openMenu() {
+    load();
     if (!player || !enabled || t < playerFree) return false;
     const chips = buildChips(contextChips(), null);
     if (!chips.length) return false;
@@ -475,19 +480,28 @@ export function createRadio(opts = {}) {
   if (o.keys) window.addEventListener('keydown', onKey);
 
   if (o.profile) setPlayer(o.profile);
-  const ready = bank.fetchAll({
-    scriptUrl: o.scriptUrl ?? `${o.base}data/barks/script.json`,
-    manifestUrl: o.manifestUrl ?? `${o.base}audio/voices/barks.json`,
-    voicesUrl: o.voicesUrl ?? `${o.base}data/voices.json`,
-  }).then((r) => {
-    voicesData = r.voices;
-    nameTower();
-    if (player) o.audio?.preload?.(bank.urlsForVoice(player.voice));
-    return r;
-  });
+  // deferLoad: the script + clip manifest wait for load() (or the radio being shown / opened); fallback lines cover the gap.
+  let loading = null, release;
+  const ready = new Promise((r) => { release = r; });
+  function load() {
+    if (loading) return ready;
+    loading = bank.fetchAll({
+      scriptUrl: o.scriptUrl ?? `${o.base}data/barks/script.json`,
+      manifestUrl: o.manifestUrl ?? `${o.base}audio/voices/barks.json`,
+      voicesUrl: o.voicesUrl ?? `${o.base}data/voices.json`,
+    }).then((r) => {
+      voicesData = r.voices;
+      nameTower();
+      if (player) o.audio?.preload?.(bank.urlsForVoice(player.voice));
+      return r;
+    });
+    release(loading);
+    return ready;
+  }
+  if (!o.deferLoad) load();
 
   return {
-    ready, bank, rules, handleEvent, update, schedule,
+    ready, load, get loaded() { return !!loading; }, bank, rules, handleEvent, update, schedule,
     say(who, intent, opt = {}) { return who === 'tower' ? towerSay(intent, opt) : enqueue(makeItem(who, intent, opt)); },
     setPlayer, registerPilot, removePilot: (id) => pilots.delete(id),
     setTower(tw) { tower = { ...tower, ...tw, fixedName: tw.name ? true : tower.fixedName }; nameTower(); o.audio?.preload?.(bank.urlsForVoice(tower.voice)); },
@@ -500,7 +514,7 @@ export function createRadio(opts = {}) {
     setSubtitles: (on) => hud.setSubtitles(on),
     setMode(m) { o.mode = m; },
     setEnabled(on) { enabled = !!on; if (!on) { queue = []; pendingScold = null; closeWindow('disabled'); } hud.setVisible(on); },
-    setVisible: (on) => hud.setVisible(on),
+    setVisible: (on) => { if (on) load(); hud.setVisible(on); },
     on(type, fn) { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(fn); return () => listeners.get(type).delete(fn); },
     get state() {
       return { t: +t.toFixed(2), outrage, tier, scandal, queue: queue.map((q) => `${q.speakerId}:${q.intent}`), pending: pendingScold && pendingScold.item.intent, current: current && `${current.speakerId}:${current.intent}`, window: win && { kind: win.kind, intents: win.chips.map((c) => c.intent), left: +(win.dur - (t - win.t0)).toFixed(2) } };

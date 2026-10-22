@@ -24,7 +24,7 @@ import * as UI from '../js/ui/index.js';
 const Q = new URLSearchParams(location.search);
 if (Q.has('seed')) { try { localStorage.setItem('krayzee.profile', JSON.stringify({ name: 'Dirk', gender: 'm', company: 'Dirk Air', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017', voice: 'toff', registration: 'K-DIRK', rank: 0 })); } catch (e) {} }
 if (Q.has('reset')) { try { ['krayzee.profile', 'krayzee.settings', 'krayzee.career'].forEach((k) => localStorage.removeItem(k)); } catch (e) {} }
-// career=<lifetimePP>[,<onlineWins>[,story]] e.g. career=60000 (Archduke), career=200000,7 (King, 7/10 wins)
+// career=<lifetimePP>[,<onlineWins>[,story]] e.g. career=60000 (Archduke), career=200000,7 (King, 7/10 wins); story=1 passes onStory/onIntro
 if (Q.has('career')) { const [pp, wins, story] = Q.get('career').split(','); try { localStorage.setItem('krayzee.career', JSON.stringify({ v: 1, lifetimePP: +pp || 0, onlineWins: +wins || 0, storyComplete: story === 'story', rankFloor: 0, unlockedTitles: ['baron'], selectedTitle: null, savedAt: 1 })); } catch (e) {} }
 
 // Stand-in attract scene so the translucent menu has something behind it.
@@ -57,6 +57,7 @@ UI.initUI({
   onResume: () => log('resume'),
   onSound: (k) => (window.__sounds ||= []).push(k),
   onOnline: () => log('online'),
+  ...(Q.has('story') ? { onStory: () => log('story'), onIntro: () => log('intro') } : {}),
   onQuit: () => { log('quit'); document.getElementById('hud').style.display = 'none'; },
 });
 document.getElementById('pause').addEventListener('click', () => UI.openSettings());

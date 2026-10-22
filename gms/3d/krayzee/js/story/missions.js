@@ -54,20 +54,41 @@ export function createMission(def, o) {
   let placeT = 0, lastTop = -1;
   const onResize = () => { placeT = 0; };
   addEventListener('resize', onResize);
+  // Portrait: the coach takes the band right under the HUD strip (left of the tower column) and the radio subtitles
+  // drop below it (--krz-subs-top), so the chase-framed plane further down stays clear.
+  let lastSubs = '';
+  function setSubsTop(v) {
+    if (v === lastSubs) return;
+    lastSubs = v;
+    const r = document.documentElement;
+    if (v) { r.style.setProperty('--krz-subs-top', v); r.classList.add('krz-coach-on'); }
+    else { r.style.removeProperty('--krz-subs-top'); r.classList.remove('krz-coach-on'); }
+  }
   function placeCoach(force) {
     if (!force && --placeT > 0) return;
     placeT = 90;
-    if (coach.hidden) return;
-    const W = innerWidth, H = innerHeight, cw = coach.offsetWidth || Math.min(W * 0.86, 520), x0 = W / 2 - cw / 2, x1 = W / 2 + cw / 2;
+    if (coach.hidden) { setSubsTop(''); return; }
+    const W = innerWidth, H = innerHeight, port = H > W;
+    // Landscape: the top-left corner beside the HUD strip when it is wide enough (centre-top sits on the plane's wing).
+    const hud = document.querySelector('#krz-hud .krz-hud-strip') || document.getElementById('krz-hud');
+    const room = !port && hud ? Math.floor(hud.getBoundingClientRect().left - 20) : 0;
+    const side = room >= 220;
+    coach.classList.toggle('port', port);
+    coach.classList.toggle('side', side);
+    const mw = side ? `${Math.min(room, 360)}px` : '';
+    if (coach.style.maxWidth !== mw) coach.style.maxWidth = mw;
+    const cw = coach.offsetWidth || Math.min(W * 0.86, 520);
+    const x0 = port || side ? coach.getBoundingClientRect().left : W / 2 - cw / 2, x1 = x0 + cw;
     let top = 12;
-    for (const sel of COACH_AVOID) for (const e of document.querySelectorAll(sel)) {
+    for (const sel of port ? COACH_AVOID.filter((s) => s !== '.krz-r-subs') : COACH_AVOID) for (const e of document.querySelectorAll(sel)) {
       if (e.hidden || e.closest('[hidden]')) continue;
       const r = e.getBoundingClientRect();
       if (!r.height || r.right < x0 || r.left > x1 || r.top > H * 0.45) continue;
-      top = Math.max(top, r.bottom + 8);
+      top = Math.max(top, r.bottom + (port ? 6 : 8));
     }
     top = Math.round(top);
     if (top !== lastTop) { lastTop = top; coach.style.top = `${top}px`; }
+    setSubsTop(port ? `${top + coach.offsetHeight + 6}px` : '');
   }
 
   // ---- fallback buttons, only when the host has none of its own ----
@@ -270,7 +291,7 @@ export function createMission(def, o) {
   function teardownHud() {
     removeEventListener('resize', onResize);
     for (const f of off.splice(0)) { try { f(); } catch (e) { /* */ } }
-    coach.classList.remove('in'); coach.hidden = true;
+    coach.classList.remove('in'); coach.hidden = true; setSubsTop('');
     if (markers) { markers.dispose(); markers = null; }
     if (o.setTarget) o.setTarget(null);
     if (landBtn) { landBtn.dispose(); landBtn = null; }

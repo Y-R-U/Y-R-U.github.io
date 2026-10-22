@@ -37,6 +37,11 @@
   backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 .krz-st-coach.in { opacity: 1; transform: translate(-50%, 0); }
 .krz-st-coach[hidden] { display: none; }
+.krz-st-coach.port { left: calc(env(safe-area-inset-left, 0px) + 8px); right: calc(env(safe-area-inset-right, 0px) + var(--krz-tr-w, 78px) + 8px); width: auto; max-width: none;
+  transform: translateY(-4px); font-size: 13.5px; padding: 6px 10px 7px 8px; gap: 8px; }
+.krz-st-coach.port.in { transform: none; }
+.krz-st-coach.side { left: calc(env(safe-area-inset-left, 0px) + 8px); transform: translateY(-4px); }
+.krz-st-coach.side.in { transform: none; }
 @media (orientation: landscape) and (max-height: 500px) { .krz-st-coach { max-width: min(36vw, 340px); font-size: 13px; padding: 6px 10px 7px 8px; } }
 .krz-st-coach .krz-st-n { flex: none; font: 600 10px/1 system-ui, sans-serif; letter-spacing: .08em; color: var(--krz-st-gold); border: 1px solid rgba(255,210,94,.5); border-radius: 8px; padding: 4px 5px; }
 .krz-st-coach b { color: var(--krz-st-gold); font-weight: 650; }

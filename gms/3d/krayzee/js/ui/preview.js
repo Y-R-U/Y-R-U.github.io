@@ -1,5 +1,5 @@
 // Livery turntable for the profile creator: its own small renderer, independent of FLIGHT's.
-export async function createPreview(stage, livery) {
+export async function createPreview(stage, livery, type = 'c172') {
   const [THREE, { createPlane }] = await Promise.all([import('three'), import('../plane/index.js')]);
   const canvas = document.createElement('canvas');
   stage.prepend(canvas);
@@ -48,22 +48,34 @@ export async function createPreview(stage, livery) {
   shadow.receiveShadow = true;
   scene.add(shadow);
 
-  const rig = await createPlane({ type: 'c172', livery, quality: 'high', cockpit: false });
-  rig.setView?.('chase');
-  rig.setControls?.({ aileron: 0, elevator: 0, rudder: 0, throttle: 0.12, flaps: 0, brake: 1 });
-  rig.root.traverse((o) => { if (o.isMesh) { o.castShadow = true; } });
   const pivot = new THREE.Group();
-  pivot.add(rig.root);
-  rig.root.position.y = rig.dims?.gearHeight ?? 1;
   scene.add(pivot);
-
-  const dims = rig.dims || { length: 8, span: 11, height: 2.7 };
-  const target = new THREE.Vector3(0, (dims.height || 2.7) * 0.45, 0);
+  let rig = null, dims = null, want = type, cur = null, lastLivery = livery;
+  const target = new THREE.Vector3();
+  async function build(t) {
+    const r = await createPlane({ type: t, livery: lastLivery, quality: 'high', cockpit: false });
+    if (t !== want) { r.dispose?.(); return; }
+    r.setView?.('chase');
+    r.setControls?.({ aileron: 0, elevator: 0, rudder: 0, throttle: 0.12, flaps: 0, brake: 1 });
+    r.root.traverse((o) => { if (o.isMesh) { o.castShadow = true; } });
+    const d = r.dims || {};
+    // taildraggers sit nose-up on their tailwheel (docs/PLANES.md)
+    if (d.groundPitch) { r.root.position.y = d.restHeight ?? d.gearHeight ?? 1; r.root.rotation.x = d.groundPitch; }
+    else r.root.position.y = d.gearHeight ?? 1;
+    if (rig) { pivot.remove(rig.root); rig.dispose?.(); }
+    rig = r; cur = t;
+    dims = { length: d.length || 8, span: d.span || 11, height: d.height || 2.7 };
+    pivot.add(r.root);
+    r.setLivery?.(lastLivery);
+    fit();
+  }
   function fit() {
+    if (!dims) return;
     const w = stage.clientWidth || 1, h = stage.clientHeight || 1;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    const radius = Math.max(dims.span || 11, dims.length || 8) * 0.56;
+    target.set(0, dims.height * 0.45, 0);
+    const radius = Math.max(dims.span, dims.length) * 0.56;
     const vfov = THREE.MathUtils.degToRad(camera.fov);
     const hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
     const dist = radius / Math.sin(Math.min(vfov, hfov) / 2);
@@ -72,6 +84,7 @@ export async function createPreview(stage, livery) {
     camera.lookAt(target);
     camera.updateProjectionMatrix();
   }
+  await build(type);
   const ro = new ResizeObserver(fit);
   ro.observe(stage);
   fit();
@@ -90,14 +103,20 @@ export async function createPreview(stage, livery) {
     last = now;
     if (!drag) yaw += spin * dt;
     pivot.rotation.y = yaw;
-    rig.update?.(dt);
+    rig?.update?.(dt);
     renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);
 
   return {
-    setLivery(l) { rig.setLivery?.(l); },
+    setLivery(l) { lastLivery = l; rig?.setLivery?.(l); },
+    setType(t) {
+      want = t;
+      if (t === cur) return Promise.resolve();
+      return build(t).catch((e) => console.warn('[krayzee] preview', t, e));
+    },
+    get type() { return cur; },
     setActive(on) {
       active = on;
       if (on && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
@@ -106,7 +125,7 @@ export async function createPreview(stage, livery) {
       active = false;
       cancelAnimationFrame(raf);
       ro.disconnect();
-      rig.dispose?.();
+      rig?.dispose?.();
       floorTex.dispose();
       renderer.dispose();
       renderer.forceContextLoss?.();

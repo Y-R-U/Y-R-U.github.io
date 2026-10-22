@@ -20,6 +20,7 @@ export function createMenu(root, act) {
         <button class="kz-btn" data-a="hangar">${ICON.hangar}Hangar</button>
         <button class="kz-btn" data-a="settings">${ICON.gear}Settings</button>
       </div>
+      <button class="kz-intro-link" data-a="intro" hidden>▶ Watch the intro</button>
     </div>
   </section>`);
   root.append(node);
@@ -37,6 +38,7 @@ export function createMenu(root, act) {
       nx.title = g.next?.emperor ? `${g.next.title} needs ${g.next.winsMax} online wins (${g.next.wins}/${g.next.winsMax})` : '';
     },
     show(on) { node.classList.toggle('on', on); },
+    setIntro(on) { node.querySelector('.kz-intro-link').hidden = !on; },
     setSoon(a, soon) {
       const b = node.querySelector(`[data-a="${a}"]`);
       if (!b) return;

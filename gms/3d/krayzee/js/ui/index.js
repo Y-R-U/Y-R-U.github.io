@@ -4,8 +4,9 @@ import { createMenu } from './menu.js';
 import { createSettings } from './settings.js';
 import { createProfile } from './profile.js';
 import { mountKrayzeeAccount, setAccountVisible } from './account.js';
-import { setCareer as useCareer, rankProgress } from './career.js';
+import { setCareer as useCareer, rankProgress, career } from './career.js';
 import { hasProfile, loadProfile, loadSettings, liveryOf } from './store.js';
+import { aircraftLock, HANGAR } from './aircraft.js';
 
 let hooks = {};
 let root = null, loading = null, menu = null, settings = null, profile = null;
@@ -46,6 +47,7 @@ function ensureRoot() {
       else if (go) play(go);
     },
     onClose: (saved) => { if (!saved) pendingPlay = null; syncAccount(); },
+    onAircraft: () => hooks.onSettings?.(loadSettings()),
   });
   menu.setProfile(loadProfile());
   addEventListener('keydown', (e) => {
@@ -61,7 +63,8 @@ function ensureRoot() {
 function play(mode) {
   if (!hasProfile()) { pendingPlay = mode; openProfile({ first: true }); return; }
   enterGameplay();
-  hooks.onPlay?.(mode);
+  if (mode === 'story') hooks.onStory();
+  else hooks.onPlay?.(mode);
 }
 
 // Online stays on the menu: GAMEPLAY's lobby overlay (z 40) covers it and calls showMenu() when it closes.
@@ -75,6 +78,8 @@ function goOnline() {
 
 function menuAction(a) {
   if (a === 'free') play('free');
+  else if (a === 'story' && hooks.onStory) play('story');
+  else if (a === 'intro' && hooks.onIntro) { enterGameplay(); hooks.onIntro(); }
   else if (a === 'online') goOnline();
   else if (SOON[a]) showToast(root, ...SOON[a]);
   else if (a === 'profile' || a === 'hangar') openProfile();
@@ -86,6 +91,8 @@ export function initUI(h) {
   if (hooks.career) useCareer(hooks.career);
   setSoundSink((kind) => hooks.onSound?.(kind));
   ensureRoot();
+  menu.setSoon('story', !hooks.onStory);
+  menu.setIntro(!!hooks.onIntro);
 }
 
 export function setOnlineAvailable(on) {
@@ -147,7 +154,12 @@ export function setCareer(c) { useCareer(c); refreshProfile(); }
 export function refreshProfile() { if (menu) menu.setProfile(loadProfile()); }
 export function getRankProgress() { return rankProgress(loadProfile().gender); }
 
-export function getLivery() { return liveryOf(loadProfile()); }
+// DESIGN §2: the Royal Bathtub's taps turn gold at Emperor.
+export function getLivery() { return { ...liveryOf(loadProfile()), goldTaps: career().emperorEarned }; }
+
+// Hangar unlocks (data/aircraft.js unlockRank; 'story' = campaign finished). Free Flight should only fly unlocked types.
+export function aircraftUnlocked(type) { return HANGAR.includes(type) && !aircraftLock(type, loadProfile().gender); }
+export function aircraftLockText(type) { return aircraftLock(type, loadProfile().gender)?.text || ''; }
 
 export function getSettings() { return loadSettings(); }
 

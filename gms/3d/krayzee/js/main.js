@@ -22,6 +22,7 @@ import { createWiring } from './core/wiring.js';
 import { loadCareer, finishZone, DEFAULT_SPOT } from './game/index.js';
 import { createFX } from './fx/index.js';
 import { createStory } from './story/index.js';
+import { configureRadio } from './radio/index.js';
 import { saveSettings, hasProfile } from './ui/store.js';
 
 const AUTO = params.get('auto') === '1';
@@ -40,7 +41,7 @@ const nextPaint = () => new Promise((r) => { requestAnimationFrame(() => setTime
 
 async function boot() {
   try { career = loadCareer(); } catch (e) { career = undefined; }
-  ui.initUI({ onPlay, onSettings, onProfile, onResume, onQuit, onSound: (k) => audio.playUI(k), career, onOnline });
+  ui.initUI({ onPlay, onSettings, onProfile, onResume, onQuit, onSound: (k) => audio.playUI(k), career, onOnline, onStory, onIntro: watchIntro });
   try { ui.setOnlineAvailable?.(!!params.get('net')); } catch (e) { /* */ }
   ui.setLoading(0.05, 'Warming up the engines');
   try { audio.initAudio(); audio.setVolumes(ui.getSettings()); } catch (e) { console.warn('audio', e); }
@@ -80,6 +81,7 @@ async function boot() {
   hud.setVisible(false);
   ghud = createGameHUD(overlayEl, { getSettings: ui.getSettings, coachForce: params.get('coach') === '1', onTarget: (t) => { S.oppTarget = t; }, onFinish: demandIt, onTakeoff: demandTakeoff, onSkip: skipToRunway,
     onReel: (on) => { S.reelOpen = on; }, onDifficulty: setDifficulty, onAircraft: setAircraft });
+  configureRadio({ deferLoad: true }); // barks + clip manifest load after the first menu frame (or on first use)
   wiring = createWiring({ ui, audio, world, traffic, hud, ghud, career, log });
   attract = createAttract({ scene, traffic, env, createPlane, quality: contentQ, max: params.get('lite') === '1' ? 3 : 4,
     onRig: (rig) => applyEnv(rig), onSpawn: (e) => { wiring.addAI(e); fx?.track(e.ac.id, { rig: e.rig, ac: e.ac }); }, onDespawn: (e) => { wiring.removeAI(e); fx?.untrack(e.ac.id); }, activeEnd: () => wiring.activeEnd(), types: ['c172', 'c172', 'tiger', 'bathtub'] });
@@ -115,7 +117,6 @@ async function boot() {
       quality: S.contentQ, parent: document.body, isOnline: () => S.playMode === 'online', log: (t, d) => log(t, d),
     });
   } catch (e) { console.warn('story', e); story = null; }
-  hookStoryMenu();
 
   S.mode = 'attract';
   let last = performance.now();
@@ -134,6 +135,7 @@ async function boot() {
   else if (story && params.get('mission')) { ui.enterGameplay(); startMission(+params.get('mission') || 1); }
   else if (story && (params.get('intro') === '1' || firstLaunch())) { ui.enterGameplay(); story.playIntro({ onDone: () => ui.showMenu() }); }
   else ui.showMenu();
+  requestAnimationFrame(() => setTimeout(() => wiring.radio?.load?.(), 400));
 }
 
 export function applyEnv(rig) {
@@ -192,10 +194,12 @@ const FLYABLE = ['c172', 'tiger', 'bathtub'];
 function aircraftType() {
   const q = params.get('plane');
   if (FLYABLE.includes(q)) return q;
-  return S.playMode !== 'story' && FLYABLE.includes(settings().aircraft) ? settings().aircraft : 'c172';
+  const a = settings().aircraft;
+  return S.playMode !== 'story' && FLYABLE.includes(a) && ui.aircraftUnlocked(a) ? a : 'c172';
 }
 async function setAircraft(t) {
   if (!FLYABLE.includes(t) || !S.player || S.playMode !== 'free' || S.everAir || t === S.type) return;
+  if (!ui.aircraftUnlocked(t)) { hud.flash(`LOCKED · ${ui.aircraftLockText(t).toUpperCase()}`, 'warn'); return; }
   SET = saveSettings({ ...settings(), aircraft: t });
   const mode = S.playMode;
   quitPlay();
@@ -254,35 +258,15 @@ function firstLaunch() {
   try { return params.get('intro') !== '0' && !/HeadlessChrome/.test(navigator.userAgent) && !hasProfile() && !story.introSeen(); } catch (e) { return false; }
 }
 function watchIntro() {
-  if (!story || S.player || S.starting || story.intro) return;
-  ui.enterGameplay();
+  if (!story || S.player || S.starting || story.intro) { if (!S.player && !S.starting && !story?.intro) ui.showMenu(); return; }
   story.playIntro({ onDone: () => ui.showMenu() });
 }
-function hookStoryMenu() {
-  if (!story) return;
-  const bind = () => {
-    const b = document.querySelector('.kz-btn[data-a="story"]');
-    if (!b || b.dataset.krzStory) return !!b;
-    b.dataset.krzStory = '1';
-    const w = document.createElement('button');
-    w.type = 'button'; w.className = 'krz-intro-link'; w.textContent = '▶ Watch the intro';
-    w.addEventListener('click', (e) => { e.stopPropagation(); watchIntro(); });
-    b.closest('.kz-grid')?.after(w);
-    b.classList.remove('soon');
-    b.querySelector('.kz-soon')?.remove();
-    // capture phase: the menu's own handler would show its "coming soon" toast
-    const go = (e) => {
-      e.stopImmediatePropagation(); e.preventDefault();
-      if (S.player || S.starting || story.intro) return;
-      try { audio.playUI?.('confirm'); } catch (er) { /* */ }
-      ui.enterGameplay();
-      if (!story.introSeen()) story.playIntro({ onDone: () => startMission(1) });
-      else startMission(1);
-    };
-    b.addEventListener('click', go, true); // click only: preventDefault on touchend would swallow the click itself
-    return true;
-  };
-  if (!bind()) { const mo = new MutationObserver(() => { if (bind()) mo.disconnect(); }); mo.observe(document.body, { childList: true, subtree: true }); }
+// ui calls enterGameplay() first: intro on the first visit, then Mission 1
+function onStory() {
+  if (!story) { ui.showMenu(); ui.toast('Story mode', 'The storyteller has lost his place. Try again shortly.'); return; }
+  if (S.player || S.starting || story.intro) return;
+  if (!story.introSeen()) story.playIntro({ onDone: () => startMission(1) });
+  else startMission(1);
 }
 
 function placePlayer(from = null) {

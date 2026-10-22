@@ -3,7 +3,8 @@ import { createPopup } from './popup.js';
 import { titleFor } from './ranks.js';
 import { career } from './career.js';
 import { VOICES, sampleUrl, loadRoster } from './voices.js';
-import { loadSettings, loadProfile, saveProfile, liveryOf, cleanText, checkName, checkCompany, checkReg, suggestReg, LIMITS, MAX_FAVOURITES } from './store.js';
+import { HANGAR, aircraftCard, aircraftLock } from './aircraft.js';
+import { loadSettings, saveSettings, loadProfile, saveProfile, liveryOf, cleanText, checkName, checkCompany, checkReg, suggestReg, LIMITS, MAX_FAVOURITES } from './store.js';
 
 export const PRESETS = [
   { name: 'Royal Crimson', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017' },
@@ -24,13 +25,14 @@ const names = {};
 const voiceName = (id) => names[id] || VOICES.find((v) => v.id === id)?.name || id;
 const hex = (c) => (/^#[0-9a-f]{6}$/i.test(c) ? c.toLowerCase() : null);
 
-export function createProfile(root, { onSave, onClose }) {
+export function createProfile(root, { onSave, onClose, onAircraft }) {
   const pop = createPopup(root, { title: 'Your Pilot', sub: 'Letters patent', cls: 'kz-creator', onClose: () => { preview?.setActive(false); stopSample(); onClose?.(saved); saved = false; } });
   let saved = false;
   const main = el(`<div class="kz-cr-main">
     <div class="kz-stage">
       <div class="kz-stage-msg">Rolling out your aeroplane…</div>
       <span class="kz-spinhint">Drag to turn</span>
+      <span class="kz-stage-type"></span>
       <div class="kz-plate"><div class="kz-plate-name"></div><span class="kz-reg"></span></div>
     </div>
     <div class="kz-form kz-body"></div>
@@ -40,7 +42,16 @@ export function createProfile(root, { onSave, onClose }) {
   const stage = main.querySelector('.kz-stage');
   const stageMsg = main.querySelector('.kz-stage-msg');
 
+  const cards = HANGAR.map(aircraftCard);
   pop.body.innerHTML = `
+    <div class="kz-sec kz-hangar"><h3>Your aircraft</h3>
+      <div class="kz-planes" role="radiogroup" aria-label="Aircraft">${cards.map((a) => `<div class="kz-plane" role="radio" tabindex="0" data-p="${a.id}" aria-checked="false">
+        <b>${esc(a.name)}</b>
+        <small>${esc(a.type)}</small><span class="kz-ppx" title="Points multiplier: awkward aircraft earn more">PP ×${a.ppMult}</span><p>${esc(a.blurb)}</p>
+        <div class="kz-stats">${a.stats.map((x) => `<span><em>${x.k}</em><b>${x.v}</b> ${x.u}${x.low ? '' : `<i style="--f:${Math.min(1, x.f).toFixed(2)}"></i>`}</span>`).join('')}</div>
+        <div class="kz-lock">${ICON.lock}<span></span></div></div>`).join('')}</div>
+      <div class="kz-hint" data-hint="plane"></div>
+    </div>
     <div class="kz-sec"><h3>The pilot</h3>
       <div class="kz-field"><label for="kz-name">Pilot name <span class="kz-cnt" data-for="name"></span></label>
         <div class="kz-input"><input id="kz-name" data-k="name" maxlength="${LIMITS.name}" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="e.g. Dirk"><button class="kz-btn ghost" data-act="random">Random</button></div>
@@ -77,7 +88,7 @@ export function createProfile(root, { onSave, onClose }) {
   const cancel = el('<button class="kz-btn ghost" data-act="cancel">Cancel</button>');
   pop.foot.append(cancel, save);
 
-  let draft = loadProfile(), regTouched = false, preview = null, previewing = null, firstRun = false;
+  let draft = loadProfile(), regTouched = false, preview = null, previewing = null, firstRun = false, plane = 'c172', viewing = 'c172';
 
   function errors() {
     return { name: checkName(draft.name), company: checkCompany(draft.company), registration: checkReg(draft.registration) };
@@ -128,6 +139,25 @@ export function createProfile(root, { onSave, onClose }) {
     $('[data-hint="rank"]').textContent = g.lifetimePP > 0 ? `Your rank follows your career: ${g.lifetimePP.toLocaleString('en-GB')} PP banked so far.` : 'Everyone starts at the bottom of the peerage. Fly badly, rise quickly.';
     const ok = !err.name && !err.company && !err.registration;
     save.classList.toggle('dim', !ok);
+    paintPlanes();
+  }
+
+  function paintPlanes() {
+    const g = draft.gender;
+    pop.body.querySelectorAll('.kz-plane').forEach((c) => {
+      const lock = aircraftLock(c.dataset.p, g);
+      c.classList.toggle('locked', !!lock);
+      c.classList.toggle('viewing', c.dataset.p === viewing);
+      c.setAttribute('aria-checked', String(c.dataset.p === plane));
+      c.setAttribute('aria-disabled', String(!!lock));
+      c.querySelector('.kz-lock span').textContent = lock ? lock.text : '';
+    });
+    const lock = aircraftLock(viewing, g);
+    const a = cards.find((x) => x.id === viewing);
+    main.querySelector('.kz-stage-type').innerHTML = `${esc(a.name)}${lock ? `<em>${ICON.lock}Locked</em>` : ''}`;
+    const h = $('[data-hint="plane"]');
+    h.textContent = lock ? `Just looking: ${lock.text.replace(/ to unlock$/, '')} to fly it. You keep the ${cards.find((x) => x.id === plane).short}.`
+      : 'Free Flight takes off in this one. Story missions always fly the Runabout.';
   }
 
   let liveryTimer = 0;
@@ -135,7 +165,7 @@ export function createProfile(root, { onSave, onClose }) {
     if (liveryTimer) return;
     liveryTimer = requestAnimationFrame(() => {
       liveryTimer = 0;
-      const l = liveryOf({ ...draft, name: draft.name.trim() || 'Nobody', company: draft.company.trim() });
+      const l = { ...liveryOf({ ...draft, name: draft.name.trim() || 'Nobody', company: draft.company.trim() }), goldTaps: career().emperorEarned };
       preview?.setLivery(l);
     });
   }
@@ -174,6 +204,21 @@ export function createProfile(root, { onSave, onClose }) {
     const pick = () => { if (draft.voice !== c.dataset.v) sound('toggle'); draft.voice = c.dataset.v; change(); };
     c.addEventListener('click', pick);
     c.addEventListener('keydown', (e) => { if (e.target !== c) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+  });
+
+  pop.body.querySelectorAll('.kz-plane').forEach((c) => {
+    const pick = () => {
+      const id = c.dataset.p;
+      const locked = !!aircraftLock(id, draft.gender);
+      if (id === viewing && (locked || id === plane)) return;
+      sound(locked ? 'error' : 'toggle');
+      viewing = id;
+      if (!locked) plane = id;
+      preview?.setType(id);
+      paint();
+    };
+    c.addEventListener('click', pick);
+    c.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
   });
 
   let favTimer = 0;
@@ -241,7 +286,7 @@ export function createProfile(root, { onSave, onClose }) {
   function ensurePreview() {
     if (previewing) return previewing;
     previewing = import('./preview.js')
-      .then((m) => m.createPreview(stage, liveryOf(draft)))
+      .then((m) => m.createPreview(stage, liveryOf(draft), viewing))
       .then((p) => { preview = p; stageMsg.remove(); pushLivery(); return p; })
       .catch((e) => { console.warn('[krayzee] livery preview unavailable', e); stageMsg.textContent = 'Preview unavailable'; });
     return previewing;
@@ -253,6 +298,7 @@ export function createProfile(root, { onSave, onClose }) {
     paint();
     if (err.name || err.company || err.registration) { sound('error'); (err.name ? inputs.name : err.company ? inputs.company : inputs.registration).focus(); return; }
     const p = saveProfile(draft);
+    if (!firstRun && plane !== loadSettings().aircraft) { saveSettings({ ...loadSettings(), aircraft: plane }); onAircraft?.(plane); }
     firstRun = false;
     pop.closable = true;
     saved = true;
@@ -267,6 +313,10 @@ export function createProfile(root, { onSave, onClose }) {
     open({ first = false } = {}) {
       firstRun = first;
       draft = loadProfile();
+      plane = loadSettings().aircraft;
+      if (aircraftLock(plane, draft.gender)) plane = 'c172';
+      viewing = plane;
+      pop.body.querySelector('.kz-hangar').hidden = first;
       if (first) { draft.name = ''; draft.company = ''; draft.registration = suggestReg(''); }
       regTouched = draft.registration !== suggestReg(draft.name);
       Object.values(inputs).forEach((i) => { delete i.dataset.dirty; i.value = ''; });
@@ -278,7 +328,7 @@ export function createProfile(root, { onSave, onClose }) {
       paint();
       pop.open();
       probeSamples();
-      ensurePreview().then(() => { preview?.setActive(true); pushLivery(); });
+      ensurePreview().then(() => { preview?.setType(viewing); preview?.setActive(true); pushLivery(); });
       if (first && matchMedia('(pointer: fine)').matches) setTimeout(() => inputs.name.focus(), 350);
     },
     get firstRun() { return firstRun; },
