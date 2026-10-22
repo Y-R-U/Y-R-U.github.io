@@ -4,7 +4,7 @@
 // Messages are Uint8Arrays whose first byte is a KIND. Lanes: 'u' unordered/no retransmit (plane states),
 // 'r' reliable+ordered with a sequence number so a relay→direct switch can't reorder.
 
-export const KIND = { JSON: 0, PING: 3, PONG: 4, CHUNK: 5, STATE: 6 };
+export const KIND = { JSON: 0, PING: 3, PONG: 4, CHUNK: 5, STATE: 6, TRAFFIC: 7 };
 const CHUNK = 15000;           // under Safari's SCTP limit
 const P2P_TIMEOUT = 8000;
 const P2P_RETRY = 15000;

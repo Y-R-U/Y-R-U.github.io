@@ -1,10 +1,12 @@
 # Krayzee online rooms: architecture (lane ONLINE, 2026-10-21)
 
-Status (2026-10-22, lane NET): **O1 done, O2 done, local only**. Nothing is deployed and nothing is wired into the game
-yet. `server/` is the real `krayzeenet` (snakenet fork + RAGDOJO ID tokens + the Krayzee rules); `js/net/` is the browser
-client (links, clock, plane stream, lobby screen). Tests: `go test ./...` (13 tests), `server/test.mjs` (39 protocol checks
-over real sockets, incl. a server restart), `tools/net/test-interp.mjs` (10), `tools/net/test-mp.mjs` (two Chrome
-windows, direct + relay + a falsification run, 23 checks each). How to run: §16. GAMEPLAY wiring API: §15.
+Status (2026-10-22, lane NET): **O1, O2, O3 done, local only**. Nothing is deployed. `js/main.js` is **not** wired yet:
+the exact block for GAMEPLAY is in §15, and `tools/net/gen-main.mjs` applies it to a generated copy for the tests.
+`server/` is the real `krayzeenet` (snakenet fork + RAGDOJO ID tokens + the Krayzee rules); `js/net/` is the browser
+client (links, clock, plane stream, lobby, `session.js` = the net game, `podium.js`). Tests: `go test ./...` (13 tests),
+`server/test.mjs` (39 protocol checks over real sockets, incl. a server restart), `tools/net/test-interp.mjs` (10),
+`tools/net/test-mp.mjs` (sandbox: two Chrome windows, direct + relay + falsification, 23 checks each; game: two real game
+pages, 33 checks + a falsification run). How to run: §16. GAMEPLAY wiring: §15.
 
 Prior art this copies:
 - `gms/pwa/snake/MULTIPLAYER.md`: browser-hosted rooms, WebRTC full mesh, relay fallback, reconnect grace, host handoff
@@ -112,6 +114,16 @@ is accepted.
 - Infractions: your browser raises them (`inf {rule, victim, pp, t}`). The host applies the outrage, picks the tower's
   scold and schedules it on the radio. The host may reject an `inf` (§8). Scolds land 0.6–1.2 s later anyway, so the
   round trip is hidden.
+- **Authority-only crimes.** A cut-in that forces a spacing go-around, and the go-around itself, only happen inside the
+  host's sequencing (a follower's replica issues nothing, and the victim is already gone from its sequence after the next
+  snapshot). The host's `session.js` spots them for remote humans (new `cutDone` keys, new `goAround` commands whose
+  `cause` is a human), logs them on its ATC, sends the culprit `hinf {rule, victim, severity, data}` and the tower scold.
+  The culprit's replica `report()`s it, its own game scores it, and it comes back as an ordinary `inf`, which the host
+  accepts without the geometry checks (it saw it itself) but with the rate and PP caps. A crime both sides detect is
+  counted once (ATC's per-pair cooldown on the follower, `hostDet` on the host).
+- Remote humans are players to ATC: `session.js` wraps `atc.update` so `remote` states with `p:` ids carry
+  `isPlayer: true` (player spacing, cut-in memory, taxi release), and turns on `outragePerPlayer`. (ATC lane: the bridge
+  could do this itself; then the wrap can go.)
 - AI density comes from the room's `traffic` option. AI voices are only voices no human holds (DESIGN §3.3). If a human
   claims a voice an AI is using, the host re-voices that AI from its next transmission.
 
@@ -339,7 +351,7 @@ host, ranked rooms a Duke+ host (both on trust). Codes skip 0/O/1/I/L.
 | O0 ✅ | this design, prototype broker, protocol test (26 checks, 2 falsified) | done |
 | O1 ✅ | krayzeenet: snakenet fork + prototype pieces, ID token (dev bypass), kick/vote, meta, phase, rank gates, rebuild window, per-IP cap; go tests; deploy scripts **written, not run** | done 2026-10-22 |
 | O2 ✅ | `js/net/`: links (Snake port: chunking, reconnect, relay fallback), room clock, plane stream + interpolation buffer, options from modes.js, lobby screen; two-window CDP test | done 2026-10-22 |
-| O3 | net game: own-state broadcast, interpolator and dead reckoning, clock sync, AI and ATC snapshots, follower ATC replica, `inf`/`hit`/`bank`, radio floor control, Court ledger and crown | 2 sessions; **needs ATC and RADIO P2 APIs (§10) first** |
+| O3 ✅ | `js/net/session.js`: remote human rigs (type + livery) as remote Traffic entries (ATC, markers, collisions), own state at 15 Hz, host AI snapshots (10 Hz binary `TRAFFIC` + 1 Hz roster), ATC keyframe 1 Hz + delta 5 Hz, follower replica with own-plane detection → `inf`, authority-only crimes → `hinf`, `bank` validation, Court + crown, radio floor (`schedule(at, clips)`), account token, podium → `career.addOnlineWin`; two-real-page CDP test | done 2026-10-22 (main.js wiring left to GAMEPLAY, §15) |
 | O4 | robustness: host migration from the replica, autopilot for away players, ICE restart, inactive-player removal (5 min, public), the mpgate 4-Chrome gate with falsified checks (hidden-tab handoff is already in O2) | 1 session |
 | O5 | polish: quick join, public list meta, data saver, ping bars, kick-vote UI, LAN mode (as RAGDOJO) if wanted | 1 session |
 
@@ -395,6 +407,45 @@ UI asks (not built, UI lane): up to 3 starred favourite voices in the profile (`
 sends them), an Online button on the menu (currently SOON) that opens `createLobby`, the in-flight connection pill and
 Court ladder.
 
+### main.js wiring for the net game (O3, for GAMEPLAY to apply)
+
+Five edits to `js/main.js`, exactly what `tools/net/gen-main.mjs` applies to its generated copy (the test fails loudly if
+an anchor stops matching, so keep them in step):
+
+```js
+// 1. module state
+let net = null, lobby = null, session = null;
+
+// 2. inside onOnline(), replacing the createNet/createLobby lines
+const [{ createNet, accountToken }, { createLobby }, { createSession }] = await Promise.all([import('./net/index.js'), import('./net/lobby.js'), import('./net/session.js')]);
+net = createNet({ profile: () => ui.getProfile(), getToken: accountToken });
+session = createSession({ net, scene, traffic, wiring, attract, createPlane, applyEnv, env, career, ui, hud, fx, log,
+  onExit: () => { quitPlay(); ui.showMenu(); lobby.show(true); } });
+lobby = createLobby({ net, profile: () => ui.getProfile(), onStart: async () => { lobby.show(false); ui.enterGameplay(); await onPlay('online'); if (S.player) session.attach(S.player); }, onClose: () => ui.showMenu() });
+
+// 3. in the frame loop, right after net.tick(...)
+if (session) try { session.update(dt); } catch (e) { console.warn('[net]', e); }
+
+// 4. first line of quitPlay(), after `if (!S.player) return;`
+session?.detach();
+
+// 5. onQuit()
+function onQuit() { session?.detach({ leave: true }); quitPlay(); /* … */ }
+```
+
+What `session` needs from the objects it is handed: `wiring.{atc, radio, game, link, pilots, idOf, removeAI, activeEnd,
+refreshProfile, flightNo}`, `attract.{ai, update, seedRivals, despawn, clearAround}`, `traffic.{add, remove, modeOf, list}`,
+`createPlane({type, livery, quality, cockpit})`, `env.groundHeightAt`, `career.addOnlineWin/addOnlineRoom`,
+`ui.getProfile/getLivery`, `hud.flash`, `fx.track/untrack`. It owns, while attached: the follower's `attract` (no local
+AI), ATC `configure({authority, detectRemote:false, outragePerPlayer:true})`, `radio.setMode('host'|'follower')`, and
+the player's stand (spawned at a per-member stand). `detach()` gives all of it back.
+
+`session` API: `attach(player)`, `update(dt)`, `detach({leave})`, `endRound()` (host), `role`, `attached`, `court`,
+`standings()`, `state()` (test/debug snapshot: humans, ai, ledger, court, infs, acks, banks, barks, radioIn, crowns,
+hostDet, sentInf). Messages it adds on the reliable lane: `hi` (type + livery + name/title/voice), `atk`/`atd` (ATC
+keyframe/delta), `ai` (roster), `court {s, end}`, `crown {id, emperor}`, `radio {at, msg}`, `inf`/`infAck`,
+`hinf`, `bank`/`bankAck`, `bark`, `end {res}`; binary `KIND.TRAFFIC` for AI states.
+
 ## 16. Running it locally
 
 ```sh
@@ -407,8 +458,13 @@ KRAYZEE_DEV_AUTH=1 KRAYZEE_ICE_URL=off go run . # serves ws://127.0.0.1:8018/gms
 With the site on `http://localhost:8888` (repo root), open two windows of
 `/gms/3d/krayzee/tools/net/sandbox.html?net=ws://127.0.0.1:8018/gms/3d/krayzee/net&name=Dirk&uid=a` (second: `&name=Mo&uid=b`;
 also `&voices=toff,bubba&rank=king&g=f&p2p=0`). Each member flies a fake circle once the host taps Start.
-`node tools/net/test-mp.mjs` does all of that headless on CDP port 9561 (own server on 8738), with screenshots in
-`docs/shots/net/`. Headless Chrome needs `--disable-features=WebRtcHideLocalIpsWithMdns` for two windows to connect
+`node tools/net/test-mp.mjs` does all of that headless on CDP port 9561 (own krayzeenet on 8738, and its own static
+server for the repo on 8739: the shared python one on 8888 stalled module loads for 30 s with two pages open), with
+screenshots in `docs/shots/net/`. `--only=game` runs the two real game pages from `tools/net/gen/` (A creates and hosts, B
+joins by code): each sees the other's plane rig in-world, B gets the host's AI and ATC, B's cut-in on A scores on the
+host, B banks and takes the Crown, B's bark goes through the floor, podium + `addOnlineWin`, then A closes and B takes
+over (Court kept, own AI). Its falsification drops B's reports: "the cut-in by B scores on the host" must fail while B
+still learns of it. `--trace` prints the cut-in approach every 3 s and skips the falsification run. Headless Chrome needs `--disable-features=WebRtcHideLocalIpsWithMdns` for two windows to connect
 directly (Snake's mpgate does the same).
 
 Deploy (**not done; needs Aaron**): `server/deploy.sh` refuses without `CONFIRM=1` and refuses if port 8018 is taken on the

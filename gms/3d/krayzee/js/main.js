@@ -218,15 +218,16 @@ function setDifficulty(d, fromSettings = false) {
   showSpot(wiring.difficulty === 'hard');
   hud.flash(`${wiring.difficulty.toUpperCase()} · ${{ easy: 'FINISH NEAR ANY RUNWAY', medium: 'FINISH ON A RUNWAY OR THE APRON', hard: 'FINISH AT THE TERMINAL' }[wiring.difficulty]}`, 'info');
 }
-// Online (docs/ONLINE.md §15, docs/UI.md): live only with ?net= until the server is deployed. Flight sync (sendPlane/applyRemote)
-// is not wired yet: a started room drops you into an 'online' session (no warp) — remote planes are the next step.
-let net = null, lobby = null;
+// Online (docs/ONLINE.md §15): live only with ?net= until the server is deployed.
+let net = null, lobby = null, session = null;
 async function onOnline() {
   try {
     if (!lobby) {
-      const [{ createNet }, { createLobby }] = await Promise.all([import('./net/index.js'), import('./net/lobby.js')]);
-      net = createNet({ profile: () => ui.getProfile(), getToken: null });
-      lobby = createLobby({ net, profile: () => ui.getProfile(), onStart: () => { lobby.show(false); ui.enterGameplay(); onPlay('online'); }, onClose: () => ui.showMenu() });
+      const [{ createNet, accountToken }, { createLobby }, { createSession }] = await Promise.all([import('./net/index.js'), import('./net/lobby.js'), import('./net/session.js')]);
+      net = createNet({ profile: () => ui.getProfile(), getToken: accountToken });
+      session = createSession({ net, scene, traffic, wiring, attract, createPlane, applyEnv, env, career, ui, hud, fx, log,
+        onExit: () => { quitPlay(); ui.showMenu(); lobby.show(true); } });
+      lobby = createLobby({ net, profile: () => ui.getProfile(), onStart: async () => { lobby.show(false); ui.enterGameplay(); await onPlay('online'); if (S.player) session.attach(S.player); }, onClose: () => ui.showMenu() });
     }
     lobby.show(true);
   } catch (e) { console.warn('online', e); ui.toast?.('Online rooms', 'The radio mast is down. Try again later.'); ui.showMenu(); }
@@ -291,6 +292,7 @@ function placePlayer(from = null) {
 
 function quitPlay() {
   if (!S.player) return;
+  session?.detach();
   if (story?.mission) story.endMission(); else story?.showWarp(false);
   fx?.untrack('player');
   S.missionTarget = null; S.reelT = 0;
@@ -332,7 +334,7 @@ function onResume() {
   try { audio.setVolumes(ui.getSettings()); } catch (e) { /* */ }
   if (S.player) wiring.radio?.setVisible(true);
 }
-function onQuit() { quitPlay(); try { audio.setVolumes(ui.getSettings()); } catch (e) { /* */ } }
+function onQuit() { session?.detach({ leave: true }); quitPlay(); try { audio.setVolumes(ui.getSettings()); } catch (e) { /* */ } }
 function onSettings(s) {
   wiring?.setMischief?.(s);
   const prevDiff = settings().difficulty;
@@ -391,6 +393,7 @@ function frame(dt) {
   try { fx?.update(S.paused ? 0 : dt * (S.simK || 1)); } catch (e) { /* effects never break the frame */ }
   try { story?.update(dt); } catch (e) { /* */ }
   if (net) try { net.tick(performance.now(), { ready: gov.fps > 40, parked: !P || (P.ac.onGround && P.ac.gs < 1) }); } catch (e) { /* */ }
+  if (session) try { session.update(dt); } catch (e) { console.warn('[net]', e); }
 
   world.update?.(dt, camera);
   const focus = P ? P.rig.root.position : camera.position.clone().add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(60));

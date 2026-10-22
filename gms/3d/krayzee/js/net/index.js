@@ -16,6 +16,17 @@ export function helloFromProfile(p = {}) {
     emp: r.id === 'emperor', voices: favs };
 }
 
+// Account token for hello/auth (§11). A local ws:// server with ?uid= gets a dev token (KRAYZEE_DEV_AUTH only);
+// otherwise /lib/auth's Firebase ID token, or null for anonymous players.
+export async function accountToken() {
+  if (Q.get('uid') && /^ws:\/\/(127\.0\.0\.1|localhost)[:/]/.test(DEFAULT_SERVER)) return `dev:${Q.get('uid')}`;
+  if (Q.has('noaccount')) return null;
+  try {
+    const { auth } = await import('/lib/auth/auth.js');
+    return await Promise.race([auth.getIdToken(), new Promise((r) => setTimeout(() => r(null), 4000))]);
+  } catch (e) { return null; }
+}
+
 export function createNet({ server = DEFAULT_SERVER, profile = () => ({}), getToken = null, p2p = Q.get('p2p') !== '0' } = {}) {
   const net = new Net({ server, p2p, hello: () => helloFromProfile(profile()), token: getToken });
   const tracks = new Map();
