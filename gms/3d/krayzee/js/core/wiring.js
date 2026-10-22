@@ -81,15 +81,19 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
   });
 
   // ----- play session -----
-  W.startPlay = (mode, ent) => safe(() => {
+  // room = the online room's normalised settings (net/options.js): its type, protection and partial start drive the game.
+  W.startPlay = (mode, ent, { room = null } = {}) => safe(() => {
     const p = ui.getProfile();
     W.radio?.setPlayer(radioProfile());
     W.radio?.setVisible(true);
     // D19: Free Flight difficulty (settings) → protection; DEMAND IT is the finish, a 15 s stop is only the fallback.
-    W.difficulty = difficultyFor({ difficulty: ui.getSettings().difficulty });
-    const protection = DIFFICULTY[W.difficulty]?.protection || 'rubber';
+    const roomProt = room && ['rubber', 'partial', 'realistic'].includes(room.protection) ? room.protection : null;
+    W.difficulty = roomProt ? difficultyFor({ protection: roomProt }) : difficultyFor({ difficulty: ui.getSettings().difficulty });
+    const protection = roomProt || DIFFICULTY[W.difficulty]?.protection || 'rubber';
     safe(() => traffic.setAIProtection?.(protection === 'realistic' ? null : protection));
-    W.game = createGame({ mode, career, playerId: 'player', name: p.name, gender: p.gender, protection, autoBank: mode === 'free' ? 15 : false });
+    const roomOpts = room ? { mode: room.type || mode, partialStartPct: room.partialStart, ...(room.outrageGain ? { outrageGain: room.outrageGain } : {}) } : {};
+    W.room = room;
+    W.game = createGame({ mode, career, playerId: 'player', name: p.name, gender: p.gender, protection, autoBank: mode === 'free' ? 15 : false, ...roomOpts });
     const g = W.game;
     for (const e of traffic.list) if (!e.player && e.rankIndex != null) g.setPilotRank?.(idOf(e), e.rankIndex);
     if (W.atc) {

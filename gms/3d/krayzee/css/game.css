@@ -64,6 +64,13 @@ html.krz-shot #krz-controls, html.krz-shot #krz-hud, html.krz-shot #krz-ghud, ht
 .krz-thr-v { font: 800 12px/1 ui-monospace, Menlo, monospace; color: #16233a; }
 .krz-thr-l { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%) rotate(-90deg); text-align: center;
   font: 700 10px/1 system-ui; letter-spacing: .3em; color: var(--krz-dim); text-shadow: 0 1px 2px #000; }
+/* B3/B4: the lever latches where it is left; AUTO above it hands the throttle back (shown while the player owns it) */
+.krz-thr-col { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+.krz-thr-auto { height: 28px; border-radius: 10px; font: 800 10px/1 system-ui; letter-spacing: .12em; color: var(--krz-auto);
+  border-color: rgba(94,224,143,.6); visibility: hidden; touch-action: manipulation; }
+.krz-thr-auto[data-on="1"] { visibility: visible; }
+.krz-thr[data-mode="latched"] { border-color: var(--krz-man); }
+.krz-thr[data-mode="latched"] .krz-thr-fill { background: linear-gradient(to top, rgba(255,181,71,.45), rgba(255,181,71,.1)); }
 .krz-pad { display: grid; grid-template-columns: repeat(2, var(--btn)); gap: 8px; }
 .krz-sq { width: var(--btn); height: var(--btn); grid-auto-flow: row; gap: 3px; align-content: center; }
 .krz-sq b { font-size: 12px; } .krz-sq span { font-size: 9px; color: var(--krz-dim); }
@@ -106,10 +113,11 @@ html.krz-shot #krz-controls, html.krz-shot #krz-hud, html.krz-shot #krz-ghud, ht
   color: var(--krz-auto); border: 1px solid rgba(94,224,143,.4); }
 .krz-axes span[data-m="manual"] { color: var(--krz-man); border-color: var(--krz-man); }
 .krz-axes span[data-m="wait"], .krz-axes span[data-m="blend"] { color: var(--krz-wait); border-color: var(--krz-wait); }
-.krz-banner { margin-top: 6px; padding: 7px 14px; border-radius: 10px; background: var(--krz-glass-hi); font: 800 13px/1.2 system-ui;
+.krz-banner { position: absolute; left: 50%; top: var(--krz-banner-top, 46px); transform: translateX(-50%); width: max-content; max-width: min(92vw, 440px); padding: 7px 14px; border-radius: 10px; background: var(--krz-glass-hi); font: 800 13px/1.2 system-ui;
   letter-spacing: .08em; text-align: center; border: 1px solid var(--krz-line); }
 .krz-banner[data-kind="good"] { color: var(--krz-auto); } .krz-banner[data-kind="warn"] { color: var(--krz-man); }
 .krz-banner[data-kind="bad"] { color: var(--krz-bad); border-color: var(--krz-bad); }
+#krz-hud.krz-flash .krz-ap, #krz-hud.krz-flash .krz-axes { visibility: hidden; }
 @media (orientation: portrait) {
   #krz-hud { top: calc(var(--st) + 66px); max-width: calc(100vw - 2 * var(--gut)); }
   /* five cells with fuel must stay clear of the tower badge (≈80 px each side) */
@@ -272,6 +280,18 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
   .krz-cer-title { font-size: 36px; }
 }
 
+/* landscape: LAND sits inboard of the stick zone, so the action slot (prompt card) moves clear of it while it shows */
+@media (orientation: landscape) {
+  html.krz-land-on[data-krz-hand="left"] .krz-actions { --l0: calc(var(--krz-ctl-left, 190px) + var(--krz-land-w, 100px) + 20px);
+    width: min(400px, calc(100vw - var(--l0) - var(--krz-ctl-right, 190px) - 8px)); left: calc(var(--l0) + (100vw - var(--l0) - var(--krz-ctl-right, 190px)) / 2); }
+  html.krz-land-on[data-krz-hand="right"] .krz-actions { --r0: calc(var(--krz-ctl-right, 190px) + var(--krz-land-w, 100px) + 20px);
+    width: min(400px, calc(100vw - var(--krz-ctl-left, 190px) - var(--r0) - 8px)); left: calc(var(--krz-ctl-left, 190px) + (100vw - var(--krz-ctl-left, 190px) - var(--r0)) / 2); }
+}
+/* portrait inside views: LAND drops onto the top of the stick zone, off the instrument panel's gauge row */
+@media (orientation: portrait) {
+  html[data-krz-view="center"] .krz-land, html[data-krz-view="cockpit"] .krz-land { bottom: calc(var(--sb, 0px) + var(--krz-ctl-bottom, 200px) - 60px); }
+}
+
 /* coach marks */
 .krz-coach { position: fixed; inset: 0; z-index: 25; pointer-events: none; font-family: system-ui, sans-serif; opacity: 0; transition: opacity .3s; }
 .krz-coach.in { opacity: 1; }
@@ -358,3 +378,4 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
 .krz-intro-link { display: block; margin: 8px auto 0; padding: 6px 12px; border: 0; background: none; cursor: pointer; pointer-events: auto;
   font: 600 13px/1.2 system-ui, sans-serif; letter-spacing: .04em; color: rgba(246,241,228,.72); text-decoration: underline; text-underline-offset: 3px; }
 .krz-intro-link:hover { color: #f6f1e4; }
+

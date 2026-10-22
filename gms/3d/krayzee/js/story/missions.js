@@ -54,6 +54,8 @@ export function createMission(def, o) {
   let placeT = 0, lastTop = -1;
   const onResize = () => { placeT = 0; };
   addEventListener('resize', onResize);
+  // the coach's height settles after its text/fonts lay out: re-place so the subtitles never start under it
+  try { new ResizeObserver(() => { if (!coach.hidden) placeCoach(true); }).observe(coach); } catch (e) { /* */ }
   // Portrait: the coach takes the band right under the HUD strip (left of the tower column) and the radio subtitles
   // drop below it (--krz-subs-top), so the chase-framed plane further down stays clear.
   let lastSubs = '';

@@ -71,3 +71,76 @@ Headless Chrome intermittently swallows the first touchStart after the LAND tap 
 - UI lane: the Story button still says SOON in `js/ui/menu.js`; main.js strips it at runtime. Proper fix: route `story` through `hooks.onPlay`.
 - Difficulty in Free Flight comes from `settings.difficulty`, mapped to protection (Easy=Rubber, Medium=Partial, Hard=Realistic) in `core/wiring.js`.
 - Headlines only come from big infractions + scandals (HUD-side table in `headlines.js`); SCORE/DESIGN may want to own the copy.
+
+## Last test runs (2026-10-22)
+- `tools/test-gameplay.mjs` (portrait, landscape, desktop, finish ×2, ground ×2): 136/139 — the 3 misses are the ground-landscape
+  multi-touch harness flake above (passes when run alone); everything else green incl. D19/D20/D24/aircraft picker by real input.
+- `--falsify`: the overlap check catches the score widget dragged over pause (score×pause).
+- `tools/test-flight.mjs`: 33/33 earlier today; latest 32/33 — "override: AP still landed" timed out without a touchdown
+  (AP/ATC side, intermittent; seeded rivals + mischief make the circuit busier — for TRAFFIC to look at).
+- Story smoke (scratchpad script): menu Story by real touch → intro → Mission 1 running, warp chip, `?mission=1`, no errors.
+
+## Online HUD (UI round 4, `js/hud/online.js`)
+`createGameHUD` now also makes `ghud.online`. It polls, so GAMEPLAY only needs one line.
+
+**main.js wiring (one line, GAMEPLAY to apply):** in the frame loop, right after
+`if (session) try { session.update(dt); } catch (e) { console.warn('[net]', e); }`, add:
+```js
+try { ghud.online.sync(session, net); } catch (e) { /* */ }
+```
+- `sync(session, net)` shows the HUD only while `session?.attached`. Otherwise it hides and resets. It reads
+  `session.standings()` at about 5 Hz, plus `net.linkSummary()` and `net.connected` at about 1 Hz. You are `p:${net.id}`.
+  `ghud.setVisible(false)` hides it too, so quit and the menu need nothing extra.
+- Crown changes are detected from the standings (`crown` flag). This means the host's `crownChange` and a follower's
+  `court` restore both animate. Joining a room that already has a monarch is silent.
+- For a bench, `ghud.online.set({ standings, me, link, connected })` replaces `sync`. `state` is the test snapshot.
+
+Layout (all of it is checked by `tools/onlinehud_flow.mjs` against the live HUD and controls):
+| piece | portrait | landscape / desktop |
+|---|---|---|
+| connection pill: bars + DIRECT / RELAY / MIXED / SOLO / OFFLINE; tap shows "Relayed · 84 ms" for 3 s | under the pause button (top 66) | same. With the stick on the right it moves beside the tower badge, because the subtitles take the left column |
+| Court ladder: header (crown, COURT, your place or YOURS, chevron) + top 3–5 rows (place or crown, D4 title, name, PP) | the right column under the tower badge (`--krz-tr-w`, which the subtitles already keep clear; no warp chip online). Two-line rows (name / title), no PP | left column under the score (top 100), 196 px (220 desktop). Stick right: right column under the tower |
+- Row count = whatever fits above the next thing in the same column (radio, stick base, LAND, chips, coach), clamped 3–5.
+  It is re-measured every 2 s and after a resize. If you are outside the top rows, the last row is yours, after a dashed gap.
+- Only the header is tappable. The rows are `pointer-events: none`, so a thumb on the stick zone below goes through. The
+  header tap collapses or expands the ladder (`krayzee.courtCollapsed`). A crown change while collapsed peeks it open for 4 s.
+- Crown change: the crown drops onto the new leader's row, the row glows gold, the panel flashes and a serif news line says
+  "You take the Crown!" or "Mo takes the Crown" (3.2 s). Rows slide to their new places (FLIP). Reduced motion turns this off.
+- Locked AIRCRAFT chips (padlock, requirement on tap) never call `onAircraft`. `setAircraft`'s LOCKED flash is now only a
+  safety net.
+- **For GAMEPLAY's `tools/test-gameplay.mjs`**: `finishFlow` taps the Tiger Moth with a fresh career (0 PP), and the Moth
+  needs Earl (6,000 PP). Seed `krayzee.career` with `lifetimePP ≥ 6000` in its `freshStorage`, or that check stays red. It
+  was already refused by `setAircraft` before this round.
+
+### PLAYTEST_2 B9 items fixed in js/hud (UI round 4)
+- The "That'll hit the papers!" toast is portrait-only: it now sits on the score widget's hint line (bottom-left, wraps at
+  140 px) instead of below the widget over the KT/FT strip.
+- PP popups in portrait moved from 40 % to 54 %, below the plane band and above the action slot. Checked against the stick.
+- Coach marks: if the plane goes unstable while a mark is showing (the "Points stay pending…" mid-dive case), the mark is hidden
+  and its timer paused until the plane is stable again. Starting a mark was already gated on `stable`.
+- Not js/hud, for other lanes: LAND over the prompt card (ASSIST's `css/assist.css`), the target label prefix (ASSIST),
+  the Mission 1 coach card and the Letters Patent card (STORY's `.krz-st-*`), "AUTOPILOT · RECOVERING" through the subtitles
+  (flight hud.js / radio.css), marker label overprint (ASSIST), and the response-window size (RADIO).
+- js/hud styles from UI round 4 are injected from `js/hud/style.js`, not css/game.css.
+
+## HUDFIX (PLAYTEST_2, 2026-10-22)
+- **Bank / roll (B5)** `controls.js rollAssist`: full-stick roll rate capped per type (C172 45°/s, Moth 50, Bathtub 35); Easy/Medium
+  soft-limit 60° as a rate command (`2.6 × (60° − bank)`), stick tag shows `BANK 60°`. Detent: at the limit ease off (< 0.75) and push full
+  again within 1 s to roll past; it re-arms below 40° or on release. Hard: no limit. Difficulty = `wiring.difficulty` (room protection online).
+  Small deflections unchanged (40 px ≈ 7–15°/s).
+- **Throttle (B3/B4)**: the lever paints the player's axis value while `manual`/`latched`; an **AUTO** detent above the lever (and key T)
+  hands it back. main `autoThrottle()` calls FLIGHTFIX's `traffic.autoThrottle(entry)` (or `releaseThrottle`) when present, else blends the
+  axis. Until `traffic.autoThrottle` exists, main keeps an airborne latch from timing out (shim in `frame`).
+- **DEMAND TAKEOFF coach (B6)** `js/core/takeoffcoach.js`: on the ground, stopped ≥ 4 s with DEMAND TAKEOFF offered → a coach mark rings it
+  (the generic coach is held back meanwhile; `goal` goes first). Once per device (`krayzee.coachTakeoff`), not in Story.
+- **Overlaps (B9)**: landscape `html.krz-land-on` + `--krz-land-w` move the action slot clear of LAND; portrait inside views drop LAND onto
+  the stick band; the banner (`hud.flash`) takes the AP pill/axes row (`#krz-hud.krz-flash`) instead of growing into the subtitles; coach
+  marks need |bank| < 45°, sink < 1500 fpm and AGL ≥ 150 m (`stable`); the target marker label is re-set when it changes (markers copy
+  labels in `set()`), and markers also avoid the prompt/finish/ground buttons. Story: Mission title card sits at 67 % in portrait; the
+  coach re-places on resize so the subtitles never start under it.
+- **Chase camera vs trees**: `env.treeTop(x, z, pad)` (grid over `world.debug.trees`) — the camera climbs over canopies, also along the
+  line of sight to the plane.
+- **Online**: `wiring.startPlay('online', ent, { room })` with the room's normalised settings → game mode = room type (Strict Tower −500),
+  protection + partial start, AI protection, `wiring.difficulty` from protection.
+- Test: `node tools/test-gameplay.mjs --only=hudfix` (bank cap ×3 types + Hard + detent, latched lever + AUTO by touch, banner vs subtitles,
+  coach not in a dive, DEMAND TAKEOFF coach, camera over trees, room protection, LAND vs prompt in landscape, centre-view LAND).

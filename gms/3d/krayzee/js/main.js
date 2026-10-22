@@ -19,6 +19,7 @@ import { createGameHUD } from './hud/index.js';
 import { createAttract } from './flight/attract.js';
 import { V3, Quat, KT, FT, clamp } from './flight/vmath.js';
 import { createWiring } from './core/wiring.js';
+import { createTakeoffCoach } from './core/takeoffcoach.js';
 import { loadCareer, finishZone, DEFAULT_SPOT } from './game/index.js';
 import { createFX } from './fx/index.js';
 import { createStory } from './story/index.js';
@@ -29,7 +30,7 @@ const AUTO = params.get('auto') === '1';
 const SHOT = params.get('shot') === '1';
 const TIMESCALE = Math.min(8, Math.max(0.1, +params.get('timescale') || 1));
 const S = { mode: 'boot', paused: false, view: 'chase', player: null, log: [], respawnT: 0, startT: 0 };
-let R, scene, camera, world, env, traffic, attract, controls, hud, ghud, markers, land, fcam, sunFollow, gov, wiring, career, engine = null, fx = null, story = null, SET = null;
+let R, scene, camera, world, env, traffic, attract, controls, hud, ghud, markers, land, fcam, sunFollow, gov, wiring, career, engine = null, fx = null, story = null, SET = null, toCoach = null;
 // settings are read every frame; ui.getSettings() parses localStorage, so keep a copy (refreshed in onSettings)
 const settings = () => (SET ||= ui.getSettings());
 const aiVoices = new Map(), errSeen = new Set();
@@ -67,6 +68,7 @@ async function boot() {
   world = await buildWorld(scene, R.renderer, { quality: contentQ, onProgress: (f, label) => ui.setLoading(0.15 + 0.35 * f, label) });
   env = { groundHeightAt: world.groundHeightAt, surfaceAt: world.surfaceAt, colliders: world.colliders || [] };
   try { world.trees = collectTrees(world); } catch (e) { console.warn('collectTrees', e); }
+  try { env.treeTop = treeTopFn(world.debug?.trees); } catch (e) { console.warn('treeTop', e); }
   if (world.setQuality) {
     const setQ = R.setQuality;
     R.setQuality = (q) => { setQ(q); try { world.setQuality(q); } catch (e) { console.warn('world.setQuality', e); } try { fx?.setQuality(q); } catch (e) { /* */ } };
@@ -81,6 +83,7 @@ async function boot() {
   hud.setVisible(false);
   ghud = createGameHUD(overlayEl, { getSettings: ui.getSettings, coachForce: params.get('coach') === '1', onTarget: (t) => { S.oppTarget = t; }, onFinish: demandIt, onTakeoff: demandTakeoff, onSkip: skipToRunway,
     onReel: (on) => { S.reelOpen = on; }, onDifficulty: setDifficulty, onAircraft: setAircraft });
+  try { toCoach = createTakeoffCoach({ force: params.get('coach') === '1' }); } catch (e) { toCoach = null; }
   configureRadio({ deferLoad: true }); // barks + clip manifest load after the first menu frame (or on first use)
   wiring = createWiring({ ui, audio, world, traffic, hud, ghud, career, log });
   attract = createAttract({ scene, traffic, env, createPlane, quality: contentQ, max: params.get('lite') === '1' ? 3 : 4,
@@ -90,16 +93,18 @@ async function boot() {
   await nextPaint();
 
   controls = createControls({
-    root: overlay, getSettings: settings,
+    root: overlay, getSettings: settings, getDifficulty: () => (S.player ? wiring.difficulty : null),
     onView: () => { const v = viewList(); setView(v[(v.indexOf(S.view) + 1) % v.length]); },
     onPause: pause,
     onFullscreen: toggleFullscreen,
+    onThrottleAuto: autoThrottle,
   });
   if (!document.fullscreenEnabled) controls.el.querySelector('[data-act="fs"]').hidden = true;
   controls.setVisible(false);
   // ASSIST (D12 markers, D13 LAND): docs/ASSIST.md §1
   const st0 = ui.getSettings();
-  markers = createMarkers({ container: overlay, camera, units: st0.units, traffic: st0.trafficMarkers !== false, getOrigin: () => S.player?.ac.pos ?? camera.position });
+  markers = createMarkers({ container: overlay, camera, units: st0.units, traffic: st0.trafficMarkers !== false, getOrigin: () => S.player?.ac.pos ?? camera.position,
+    avoid: ['.krz-r-btn', '.krz-r-tower', '.krz-land', '.krz-top-l', '.krz-top-r', '.krz-prompt', '.krz-finish', '.krz-gbtn'] });
   land = createLandButton({ container: overlay, stickRight: st0.stickRight, onPress: onLandPress });
   markers.setVisible(false); land.setVisible(false);
   fcam = createFlightCamera(camera, env);
@@ -138,6 +143,29 @@ async function boot() {
   requestAnimationFrame(() => setTimeout(() => wiring.radio?.load?.(), 400));
 }
 
+// Canopy height under (x, z) from the world's tree table (x, y, z, height, widthScale, …), for the chase camera.
+function treeTopFn(T) {
+  if (!T?.data) return null;
+  const d = T.data, st = T.stride || 10, n = T.count ?? Math.floor(d.length / st), C = 24, grid = new Map();
+  const key = (ix, iz) => (ix + 4096) * 8192 + (iz + 4096);
+  for (let i = 0; i < n; i++) {
+    const o = i * st, k = key(Math.floor(d[o] / C), Math.floor(d[o + 2] / C));
+    let a = grid.get(k); if (!a) grid.set(k, (a = [])); a.push(o);
+  }
+  return (x, z, pad = 0) => {
+    let top = -Infinity;
+    const ix = Math.floor(x / C), iz = Math.floor(z / C);
+    for (let gz = iz - 1; gz <= iz + 1; gz++) for (let gx = ix - 1; gx <= ix + 1; gx++) {
+      const a = grid.get(key(gx, gz)); if (!a) continue;
+      for (const o of a) {
+        const h = d[o + 3], r = 0.55 * h * (d[o + 4] || 1) + pad, dx = d[o] - x, dz = d[o + 2] - z;
+        if (dx * dx + dz * dz < r * r) top = Math.max(top, d[o + 1] + h * 1.15);
+      }
+    }
+    return top;
+  };
+}
+
 export function applyEnv(rig) {
   if (!world?.envMap) return;
   rig.root.traverse((o) => {
@@ -165,7 +193,7 @@ async function onPlay(mode) {
     S.player = traffic.add({ aircraft: ac, ap, rig, player: true, name: livery.registration || 'PLAYER' });
     S.mode = 'play'; S.playMode = mode;
     placePlayer(S.lastStop);
-    wiring.startPlay(mode, S.player);
+    wiring.startPlay(mode, S.player, mode === 'online' ? { room: onlineRoom() } : {});
     attachGame();
     S.everAir = false; S.reelT = 0;
     fx?.track('player', { rig, ac, player: true });
@@ -219,11 +247,13 @@ function setDifficulty(d, fromSettings = false) {
   hud.flash(`${wiring.difficulty.toUpperCase()} · ${{ easy: 'FINISH NEAR ANY RUNWAY', medium: 'FINISH ON A RUNWAY OR THE APRON', hard: 'FINISH AT THE TERMINAL' }[wiring.difficulty]}`, 'info');
 }
 // Online (docs/ONLINE.md §15): live only with ?net= until the server is deployed.
-let net = null, lobby = null, session = null;
+let net = null, lobby = null, session = null, netOptions = null;
+const onlineRoom = () => { try { return net?.room?.set && netOptions ? netOptions.normalise(net.room.set) : null; } catch (e) { return null; } };
 async function onOnline() {
   try {
     if (!lobby) {
-      const [{ createNet, accountToken }, { createLobby }, { createSession }] = await Promise.all([import('./net/index.js'), import('./net/lobby.js'), import('./net/session.js')]);
+      const [{ createNet, accountToken }, { createLobby }, { createSession }, opts] = await Promise.all([import('./net/index.js'), import('./net/lobby.js'), import('./net/session.js'), import('./net/options.js')]);
+      netOptions = opts;
       net = createNet({ profile: () => ui.getProfile(), getToken: accountToken });
       session = createSession({ net, scene, traffic, wiring, attract, createPlane, applyEnv, env, career, ui, hud, fx, log,
         onExit: () => { quitPlay(); ui.showMenu(); lobby.show(true); } });
@@ -301,8 +331,8 @@ function quitPlay() {
   S.player = null;
   wiring.endPlay();
   engine?.dispose(); engine = null;
-  controls.setVisible(false); hud.setVisible(false); ghud.setVisible(false); showSpot(false);
-  markers.setVisible(false); land.setVisible(false);
+  controls.setVisible(false); hud.setVisible(false); ghud.setVisible(false); showSpot(false); toCoach?.hide();
+  markers.setVisible(false); land.setVisible(false); S.landOn = false; document.documentElement.classList.remove('krz-land-on');
   S.mode = 'attract'; S.paused = false;
   fitFov(camera, 70, 45, 85);
 }
@@ -314,6 +344,7 @@ function viewList() {
 }
 function setView(v) {
   S.view = VIEWS.includes(v) ? v : 'chase';
+  document.documentElement.dataset.krzView = S.view;
   if (S.player) S.player.rig.setView(S.view);
   fcam?.setView(S.view);
   fx?.setView(S.view);
@@ -368,6 +399,8 @@ function frame(dt) {
     const m = controls.update(dt, P.ac);
     if (AUTO && !controls.state.inject) for (const k of AXES) m[k] = null;
     Object.assign(P.manual, m);
+    // B4 shim until FLIGHTFIX's traffic.autoThrottle lands: a latched lever stays put in the air until AUTO is tapped
+    if (!traffic.autoThrottle && P.axis.throttle.mode === 'latched') P.axis.throttle.t = 0;
   }
   let k = TIMESCALE;
   try { if (story) k *= story.simScale(S.paused || !!S.reelOpen); } catch (e) { /* warp is optional */ }
@@ -383,7 +416,7 @@ function frame(dt) {
     const status = P.ap.status();
     const modes = modesOf(P);
     hud.update(dt, P.ac, status, traffic.modeOf(P), modes, settings().units);
-    controls.paint(P.ac, modes, S.view, viewList().length > 1);
+    controls.paint(P.ac, modes, S.view, viewList().length > 1, P.axis.throttle);
     updateGameHUD(dt, P, modes);
   } else if (!story?.cameraOwned) attract.updateCamera(dt, camera);
   for (const e of traffic.list) if (!e.player) {
@@ -394,6 +427,7 @@ function frame(dt) {
   try { story?.update(dt); } catch (e) { /* */ }
   if (net) try { net.tick(performance.now(), { ready: gov.fps > 40, parked: !P || (P.ac.onGround && P.ac.gs < 1) }); } catch (e) { /* */ }
   if (session) try { session.update(dt); } catch (e) { console.warn('[net]', e); }
+  if (session) try { ghud.online.sync(session, net); } catch (e) { /* */ }
 
   world.update?.(dt, camera);
   const focus = P ? P.rig.root.position : camera.position.clone().add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(60));
@@ -451,6 +485,14 @@ function cancelLand() { try { S.player?.ap.cancelLand?.(); } catch (e) { /* */ }
 function updateLand(dt, P) {
   const air = !P.ac.onGround && !P.ac.crashed;
   land.setVisible(!SHOT && !AUTO && (air || land.state === 'active'));
+  // landscape: the action slot (prompt card) steps clear of LAND (css/game.css html.krz-land-on)
+  const lon = !land.el.hidden, de = document.documentElement;
+  if (S.landOn !== lon) { S.landOn = lon; de.classList.toggle('krz-land-on', lon); }
+  if (lon && (S.landWT = (S.landWT || 0) - dt) <= 0) {
+    S.landWT = 0.5;
+    const w = land.el.offsetWidth;
+    if (w && w !== S.landW) { S.landW = w; de.style.setProperty('--krz-land-w', w + 'px'); }
+  }
   if (land.state === 'active') {
     if (traffic.modeOf(P) === 'MANUAL') cancelLand();
     else if (P.ac.onGround && P.ac.gs < 2) land.setState('idle');
@@ -466,12 +508,14 @@ function updateMarkers(P) {
   let t = S.oppTarget, label, pos;
   const mt = S.missionTarget;
   if (mt?.pos) { label = mt.label || 'TARGET'; pos = mt.pos; }
-  else if (t) { label = t.label; pos = t.worldPos; }
+  else if (t) { label = t.label || 'TARGET'; pos = t.worldPos; }
   else if (wiring.difficulty === 'hard') { label = 'FINISH HERE'; pos = [DEFAULT_SPOT.x, 2, DEFAULT_SPOT.z]; }
   else { const e = runwayEnd(wiring.activeEnd()), pend = wiring.atc?.pendingRunway; label = pend && pend !== e.id ? `RWY ${e.id} → ${pend} SOON` : `RWY ${e.id}`; pos = [e.thr[0], 2, e.thr[1]]; }
-  const sig = traffic.list.length + '|' + traffic.list.map((e) => e.ac.id).join(',');
+  // markers copy labels in set(), so a label change must re-set (the target label was stuck on its first value)
+  const sig = traffic.list.length + '|' + traffic.list.map((e) => e.ac.id).join(',') + '|' + label;
   if (sig !== S.mkSig) {
     S.mkSig = sig;
+    mkTarget.label = label;
     markers.set([
       ...traffic.list.filter((e) => e !== P).map((e) => (e.marker ??= { id: e.ac.id || wiring.idOf(e), kind: e.rival ? 'rival' : e.remote ? 'player' : 'traffic',
         label: wiring.nameOf(wiring.idOf(e)), color: e.rig?.livery?.().primary, worldPos: [0, 0, 0] })),
@@ -483,11 +527,27 @@ function updateMarkers(P) {
   markers.setVisible(!SHOT && !S.paused);
   markers.update();
 }
+// B3/B4: the throttle lever latches where the player leaves it; AUTO hands it back. FLIGHTFIX's traffic API when present.
+function autoThrottle() {
+  const P = S.player; if (!P) return;
+  const T = traffic, fn = T.autoThrottle || T.releaseThrottle;
+  try {
+    if (typeof fn === 'function') fn.call(T, P);
+    else {
+      const st = P.axis.throttle;
+      P.manual.throttle = null;
+      if (st.mode !== 'auto') { st.mode = 'blend'; st.from = P.ac.ctl.throttle; st.t = 0; st.dur = 1; }
+    }
+  } catch (e) { console.warn('autoThrottle', e); }
+  log('thrAuto', {});
+  hud.flash('THROTTLE · AUTOPILOT', 'info', 1.2);
+}
 // D21 / D22: TRAFFIC's autopilot calls (guarded until they exist)
 function demandTakeoff() {
   const P = S.player; if (!P?.ap?.demandTakeoff) return;
   try { if (!(wiring.link?.demandTakeoff ? wiring.link.demandTakeoff(P) : P.ap.demandTakeoff())) { hud.flash('NO RUNWAY OPEN FOR YOUR GRACE', 'warn'); return; } } catch (e) { console.warn('demandTakeoff', e); return; }
   log('demandTakeoff', {});
+  S.demandedT = true;
   ghud.score.announce('BY ROYAL PREROGATIVE', 'Taking off. The queue may watch.');
 }
 function skipToRunway() {
@@ -544,10 +604,17 @@ function updateGameHUD(dt, P, modes) {
   updateFinish(P, g);
   updateGround(P, g);
   updateLand(dt, P);
+  // PLAYTEST_2: no coach marks mid-upset (|bank| > 45°, sinking > 1500 fpm, or low); a waiting plane gets DEMAND TAKEOFF
+  const calm = ac.onGround || (Math.abs(ac.bank) < 0.785 && ac.vs > -7.62 && ac.agl >= 150);
+  const waiting = ac.onGround && !ac.crashed && ac.gs < 1 && !!ghud.ground.state.takeoff && S.playMode !== 'story';
+  try {
+    toCoach?.update(dt, { waiting, blocked: AUTO || SHOT || radioOpen || ghud.coach.active === 'goal' || !!S.reelOpen, pressed: !!S.demandedT, airborne: !ac.onGround });
+  } catch (e) { /* */ }
   ghud.coach.update(dt, {
     t: S.playT, manual: modes.elevator === 'manual' || modes.aileron === 'manual', mode: traffic.modeOf(P),
-    pending: g?.pending || 0, barked: wiring.barked, banked: wiring.banked, blocked: AUTO || SHOT || radioOpen,
-    stable: ac.onGround || (Math.abs(ac.bank) < 0.6 && Math.abs(ac.vs) < 6 && ac.agl > 40),
+    pending: g?.pending || 0, barked: wiring.barked, banked: wiring.banked,
+    blocked: AUTO || SHOT || radioOpen || (!!toCoach?.wants && waiting && ghud.coach.active !== 'goal'),
+    stable: calm && (ac.onGround || (Math.abs(ac.bank) < 0.6 && Math.abs(ac.vs) < 6)),
   });
 }
 
@@ -654,11 +721,12 @@ window.__game = {
   controlsRects: () => {
     const r = controls.rects();
     const o = {};
-    for (const k in r) if (r[k] && k !== 'brake') o[k] = { x: r[k].x, y: r[k].y, w: r[k].width, h: r[k].height };
+    for (const k in r) if (r[k] && k !== 'brake' && k !== 'thrCol') o[k] = { x: r[k].x, y: r[k].y, w: r[k].width, h: r[k].height };
     return o;
   },
+  treeTop: (x, z, pad = 0) => env?.treeTop?.(x, z, pad) ?? null,
   get traffic() { return traffic; }, get renderer() { return R; }, get camera() { return camera; },
-  get hud() { return ghud && { score: ghud.score.state, prompts: ghud.prompts.state, coach: ghud.coach.state, target: S.oppTarget || null }; },
+  get hud() { return ghud && { score: ghud.score.state, prompts: ghud.prompts.state, coach: ghud.coach.state, takeoffCoach: toCoach?.state || null, target: S.oppTarget || null }; },
   get wiring() { return wiring; }, get ghud() { return ghud; },
   get quality() { return { tier: R?.quality, auto: gov?.auto, fps: gov ? +gov.fps.toFixed(1) : 0, history: gov?.history || [] }; },
 };

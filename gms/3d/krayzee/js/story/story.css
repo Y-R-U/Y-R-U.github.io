@@ -50,6 +50,8 @@
 @keyframes krz-st-nudge { 50% { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,210,94,.35); } }
 .krz-st-title { position: fixed; left: 50%; top: 38%; z-index: 22; transform: translate(-50%, -50%); text-align: center; pointer-events: none; color: var(--krz-st-ink); font-family: var(--krz-st-serif); opacity: 0; transition: opacity .8s ease; width: min(90vw, 600px); }
 .krz-st-title.in { opacity: 1; }
+/* portrait: below the chase-framed plane, clear of the subtitles and the target label (PLAYTEST_2 B9) */
+@media (orientation: portrait) { .krz-st-title { top: 67%; } .krz-st-title b { font-size: 40px; } }
 .krz-st-title small { display: block; font: 600 11px/1 system-ui, sans-serif; letter-spacing: .3em; text-transform: uppercase; color: var(--krz-st-gold); margin-bottom: 8px; }
 .krz-st-title b { display: block; font-weight: 400; font-size: clamp(36px, 5vw + 14px, 60px); line-height: 1; text-shadow: 0 2px 16px rgba(0,0,0,.65); }
 .krz-st-title i { display: block; margin-top: 8px; font-size: 19px; text-shadow: 0 1px 8px rgba(0,0,0,.7); }

@@ -64,6 +64,15 @@ export function createFlightCamera(camera, env) {
         for (const b of env.colliders || []) {
           if (want.x > b.min[0] - 1 && want.x < b.max[0] + 1 && want.z > b.min[2] - 1 && want.z < b.max[2] + 1 && want.y < b.max[1] + 1) want.y = b.max[1] + 1.5;
         }
+        // never inside a canopy (PLAYTEST_2: after a field landing the camera sat in a tree): climb over it
+        if (env.treeTop) {
+          const tt = env.treeTop(want.x, want.z, 2.5);
+          if (want.y < tt + 1.5) want.y = tt + 1.5;
+          for (const f of [0.5, 0.75]) {
+            const x = p.x + (want.x - p.x) * f, z = p.z + (want.z - p.z) * f, t = env.treeTop(x, z, 1) + 1;
+            if (p.y + (want.y - p.y) * f < t) want.y = p.y + (t - p.y) / f;
+          }
+        }
         if (!S.inited) S.pos.copy(want);
         else S.pos.lerp(want, 1 - Math.exp(-dt * 6));
         const lk = new THREE.Vector3().copy(p).addScaledVector(S.fwd, 7);

@@ -11,7 +11,7 @@ export function flightPrefs(s = {}) {
 }
 
 // Player input → per-axis "manual" values (null = released, autopilot has it).
-export function createControls({ root, getSettings, onView, onPause, onFullscreen }) {
+export function createControls({ root, getSettings, getDifficulty, onView, onPause, onFullscreen, onThrottleAuto }) {
   const el = document.createElement('div');
   el.id = 'krz-controls';
   el.innerHTML = `
@@ -24,8 +24,11 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
       <div class="krz-stick-base"><div class="krz-stick-knob"></div><span class="krz-stick-tag">AUTO</span></div>
     </div>
     <div class="krz-cluster">
-      <div class="krz-thr" data-zone="thr" aria-label="Throttle">
-        <div class="krz-thr-fill"></div><span class="krz-thr-l">THR</span><div class="krz-thr-thumb"><span class="krz-thr-v">0</span></div>
+      <div class="krz-thr-col">
+        <button class="krz-btn krz-thr-auto" data-act="thrauto" aria-label="Hand the throttle back to the autopilot">AUTO</button>
+        <div class="krz-thr" data-zone="thr" aria-label="Throttle">
+          <div class="krz-thr-fill"></div><span class="krz-thr-l">THR</span><div class="krz-thr-thumb"><span class="krz-thr-v">0</span></div>
+        </div>
       </div>
       <div class="krz-pad">
         <button class="krz-btn krz-sq" data-act="flaps"><b>FLAPS</b><span class="krz-flaps-v">0°</span></button>
@@ -38,7 +41,7 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
   el.dataset.hand = flightPrefs(getSettings?.()).side;
   const $ = (s) => el.querySelector(s);
   const zone = $('.krz-stick-zone'), base = $('.krz-stick-base'), knob = $('.krz-stick-knob'), stickTag = $('.krz-stick-tag');
-  const thr = $('.krz-thr'), thrThumb = $('.krz-thr-thumb'), thrFill = $('.krz-thr-fill'), thrV = $('.krz-thr-v');
+  const thr = $('.krz-thr'), thrThumb = $('.krz-thr-thumb'), thrFill = $('.krz-thr-fill'), thrV = $('.krz-thr-v'), thrAuto = $('.krz-thr-auto');
 
   const st = {
     stick: null, stickX: 0, stickY: 0, stickLive: false,
@@ -123,6 +126,7 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
     else if (a === 'view') onView?.();
     else if (a === 'pause') onPause?.();
     else if (a === 'fs') onFullscreen?.();
+    else if (a === 'thrauto') { api.releaseThrottle(); onThrottleAuto?.(); }
   });
   el.addEventListener('contextmenu', (e) => e.preventDefault());
 
@@ -152,6 +156,7 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
     if (e.code === 'KeyF') cycleFlaps();
     else if (e.code === 'KeyC' || e.code === 'KeyV') onView?.();
     else if (e.code === 'KeyP') onPause?.();
+    else if (e.code === 'KeyT') { api.releaseThrottle(); onThrottleAuto?.(); }
   });
   addEventListener('keyup', (e) => st.keys.delete(e.code));
   addEventListener('blur', () => st.keys.clear());
@@ -172,19 +177,29 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
     return out;
   }
 
-  // Bank soft limit (~60°, Easy/Medium) unless the stick is held hard over for a second; plus roll-rate damping.
-  const BANK_LIM = 60 * Math.PI / 180, BANK_SOFT = 12 * Math.PI / 180;
+  // Full-stick roll rate per type (deg/s) and the D-spec bank soft-limit: ~60° on Easy/Medium, none on Hard. The limit
+  // is a detent: at the limit, ease off and push full again within a second to roll past it (until back under 40°).
+  const RATE = { c172: 45, tiger: 50, bathtub: 35 }, DEG = Math.PI / 180;
+  const BANK_LIM = 60 * DEG, BANK_K = 2.6;
   function rollAssist(ail, ac, dt) {
-    if (!ac || ac.onGround) return ail;
-    st.hardT = Math.abs(ail) > 0.9 ? (st.hardT || 0) + dt : 0;
-    const rr = -(ac.w?.z || 0);
+    st.bankLimited = false;
+    if (!ac || ac.onGround) { st.detent = null; return ail; }
+    const rr = -(ac.w?.z || 0), b = ac.bank || 0, s = Math.sign(ail) || 1, sb = b * s;
     let a = ail - 0.22 * clamp(rr / 1.4, -1, 1) * (1 - Math.abs(ail) * 0.6);
-    const hard = getSettings?.().difficulty === 'hard';
-    if (!hard && st.hardT < 1) {
-      const s = Math.sign(ail) || 1, b = (ac.bank || 0) * s;
-      if (b > BANK_LIM - BANK_SOFT) a = a * clamp((BANK_LIM - b) / BANK_SOFT, 0, 1) - s * clamp((b - BANK_LIM) / BANK_SOFT, 0, 0.6);
+    const P = ac.P || {}, auth = (P.maxRollRate || 1) * clamp((ac.speed || 0) / (P.vRef || 45), 0, 1.4);
+    if (auth < 0.05) return a;
+    let p = clamp(a * auth, -(RATE[ac.type] ?? 45) * DEG, (RATE[ac.type] ?? 45) * DEG);
+    const d = st.detent ||= { side: 0, armed: 0, eased: 0, past: 0 };
+    if (Math.abs(b) < 40 * DEG || Math.abs(ail) < 0.15) d.past = d.armed = 0;
+    if ((getDifficulty?.() ?? getSettings?.().difficulty) !== 'hard' && d.past !== s) {
+      const pmax = BANK_K * (BANK_LIM - sb);
+      if (s * p > pmax) { p = s * pmax; st.bankLimited = sb > BANK_LIM - 6 * DEG; }
+      const full = Math.abs(ail) > 0.9;
+      if (d.armed === s && d.eased > 0 && full) { d.past = s; d.armed = 0; d.eased = 0; }
+      else if (st.bankLimited && full) { d.armed = s; d.eased = 0; }
+      else if (d.armed === s && Math.abs(ail) < 0.75) { d.eased += dt; if (d.eased > 1) d.armed = 0; }
     }
-    return a;
+    return p / auth;
   }
   let safeT = 0;
   addEventListener('resize', () => { safeT = 3; });
@@ -238,13 +253,17 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
       for (const a of ['aileron', 'elevator', 'rudder']) if (m[a] != null) m[a] = clamp(m[a], -1, 1);
       return m;
     },
-    paint(ac, modes, view, multiView = true) {
-      const t = Math.round(ac.ctl.throttle * 200) / 200, P = st.paint ||= {};
+    // thrAxis = the player's traffic axis: a manual or latched lever shows the PLAYER's setting, not the engine's
+    paint(ac, modes, view, multiView = true, thrAxis = null) {
+      const mine = modes.throttle === 'manual' || modes.throttle === 'latched';
+      const lv = st.thr != null ? st.thrVal : mine && thrAxis ? thrAxis.val : ac.ctl.throttle;
+      const t = Math.round(clamp(lv, 0, 1) * 200) / 200, P = st.paint ||= {};
       const set = (k, v, f) => { if (P[k] !== v) { P[k] = v; f(v); } };
       set('t', t, () => { thrThumb.style.bottom = `calc(${t * 100}% - ${t * 28}px)`; thrFill.style.height = `${t * 100}%`; thrV.textContent = Math.round(t * 100); });
       set('tm', modes.throttle, (v) => { thr.dataset.mode = v; });
+      set('ta', mine, (v) => { thrAuto.dataset.on = v ? '1' : ''; });
       const man = modes.elevator === 'manual' || modes.aileron === 'manual';
-      set('stag', man ? 'MANUAL' : modes.elevator === 'auto' && modes.aileron === 'auto' ? 'AUTO' : 'RESUMING', (v) => { stickTag.textContent = v; });
+      set('stag', man ? (st.bankLimited ? 'BANK 60°' : 'MANUAL') : modes.elevator === 'auto' && modes.aileron === 'auto' ? 'AUTO' : 'RESUMING', (v) => { stickTag.textContent = v; });
       set('bm', man ? 'manual' : modes.elevator === 'auto' ? 'auto' : 'wait', (v) => { base.dataset.mode = v; });
       const prefs = flightPrefs(getSettings?.());
       if (st.stick == null) {
@@ -268,7 +287,7 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
       if (hud && hud.height) rs.setProperty('--krz-hud-top', Math.round(hud.bottom) + 'px');
       if (r.topR) rs.setProperty('--krz-tr-top', Math.round(r.topR.bottom + 6) + 'px');
       if (!vis) return;
-      const zones = [r.stick, r.thr, r.pad].filter(Boolean);
+      const zones = [r.stick, r.thrCol || r.thr, r.pad].filter(Boolean);
       const top = Math.min(...zones.map((z) => z.top));
       const leftZ = zones.filter((z) => z.left + z.width / 2 < W / 2), rightZ = zones.filter((z) => z.left + z.width / 2 >= W / 2);
       const lw = leftZ.length ? Math.max(...leftZ.map((z) => z.right)) : 0;
@@ -288,11 +307,12 @@ export function createControls({ root, getSettings, onView, onPause, onFullscree
     },
     inject(c, ms = 1000) { st.inject = c; st.injectUntil = performance.now() + ms; },
     release() { st.inject = null; st.flapsManual = null; st.kThr = null; },
+    releaseThrottle() { st.kThr = null; if (st.thr != null) { st.thr = null; thr.classList.remove('krz-active'); } },
     setVisible(v) { st.visible = v; el.hidden = !v; },
     look: st.look,
     rects() {
       const q = (s) => el.querySelector(s)?.getBoundingClientRect();
-      return { stick: q('.krz-stick-zone'), thr: q('.krz-thr'), pad: q('.krz-pad'), brake: q('[data-hold="brake"]'), topL: q('.krz-top-l'), topR: q('.krz-top-r') };
+      return { stick: q('.krz-stick-zone'), thr: q('.krz-thr'), thrCol: q('.krz-thr-col'), thrAuto: q('.krz-thr-auto'), pad: q('.krz-pad'), brake: q('[data-hold="brake"]'), topL: q('.krz-top-l'), topR: q('.krz-top-r') };
     },
   };
   return api;

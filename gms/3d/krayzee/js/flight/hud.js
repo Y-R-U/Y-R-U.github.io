@@ -59,10 +59,13 @@ export function createHUD(root) {
           if (pct > 30) lowWarned = false;
         }
       } else if (!fuelCell.hidden) fuelCell.hidden = true;
-      if (bannerT > 0 && (bannerT -= dt) <= 0) banner.hidden = true;
+      if (bannerT > 0 && (bannerT -= dt) <= 0) { banner.hidden = true; el.classList.remove('krz-flash'); }
     },
+    // PLAYTEST_2 B9: the banner takes the AP pill + axis chips' place instead of growing the HUD into the subtitles
     flash(text, kind = 'info', secs = 2.5) {
       banner.textContent = text; banner.dataset.kind = kind; banner.hidden = false; bannerT = secs;
+      el.style.setProperty('--krz-banner-top', `${(el.querySelector('.krz-hud-strip').offsetHeight || 40) + 6}px`);
+      el.classList.add('krz-flash');
     },
   };
 }

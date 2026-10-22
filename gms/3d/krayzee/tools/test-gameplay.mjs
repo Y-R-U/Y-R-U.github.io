@@ -14,7 +14,7 @@ mkdirSync(SHOTS, { recursive: true });
 const arg = (k, d) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').split('=')[1] || d;
 const PORT = +arg('port', 9491);
 const BASE = arg('url', 'http://localhost:8888/gms/3d/krayzee/');
-const ONLY = arg('only', 'portrait,landscape,desktop,finish,ground').split(',');
+const ONLY = arg('only', 'portrait,landscape,desktop,finish,ground,hudfix').split(',');
 const FALSIFY = process.argv.includes('--falsify');
 
 let ws, seq = 0;
@@ -330,7 +330,8 @@ async function finishFlow(W, H, mobile, tag) {
   await viewport(W, H, mobile);
   errors.length = 0;
   await send('Page.navigate', { url: BASE + 'docs/' }); await sleep(500);
-  await freshStorage({ 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 } });
+  // the Moth needs Earl (6,000 PP) since UI round 4
+  await freshStorage({ 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 }, 'krayzee.coachTakeoff': 1, 'krayzee.career': { lifetimePP: 6000 } });
   await load('?start=free&noaccount=1');
   const chips = await until(`__game.ghud.ground.state.difficulty`, 4, 100);
   if (!chips) console.log('  DIAG', JSON.stringify(await ev(`({ p: __game.state().player && [__game.state().player.onGround, __game.state().player.speedKt, __game.state().player.leg, __game.state().player.sub], S: [__game.S.everAir, __game.S.playMode], g: __game.state().game.game?.pending, log: __game.log().slice(-6) })`)));
@@ -384,6 +385,158 @@ async function finishFlow(W, H, mobile, tag) {
   check(`${tag}: no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '));
 }
 
+// PLAYTEST_2 (lane HUDFIX): bank soft-limit + roll rate, latched throttle lever + AUTO, overlaps, coach suppression,
+// DEMAND TAKEOFF coach, chase camera vs trees, online room protection. Real CDP touch.
+const NOCOACH = { 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 }, 'krayzee.coachTakeoff': 1 };
+let gid = 0;
+async function fullStick(secs, dx = 150, rePush = false) {
+  const z = await rectOf('.krz-stick-zone'), x = z.x + z.w / 2, y = z.y + z.h / 2, id = 10 + (++gid % 50);
+  // headless Chrome now and then swallows a touchStart (see Test notes): retry until the stick really has it
+  for (let tries = 0; tries < 5; tries++) {
+    await send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] }).catch(() => {});
+    await tsend({ type: 'touchStart', touchPoints: [{ x, y, id }] });
+    for (let i = 1; i <= 5; i++) { await tsend({ type: 'touchMove', touchPoints: [{ x: x + i * dx / 5, y, id }] }); await sleep(16); }
+    await sleep(80);
+    if (await ev(`__game.state().player.modes.aileron === 'manual'`)) break;
+    console.log('  DIAG stick retry', JSON.stringify({ x, y, vw: await ev('[innerWidth, innerHeight]') }));
+    await tsend({ type: 'touchCancel', touchPoints: [] }); await sleep(300);
+  }
+  const t0 = Date.now(); let max = 0, tag = '', b0 = await ev('__game.state().player.bank');
+  while (Date.now() - t0 < secs * 1000) {
+    await tsend({ type: 'touchMove', touchPoints: [{ x: x + dx, y, id }] });
+    const s = await ev(`[__game.state().player.bank, document.querySelector('.krz-stick-tag').textContent]`);
+    max = Math.max(max, Math.abs(s[0])); if (/BANK/.test(s[1])) tag = s[1];
+    await sleep(120);
+  }
+  let after = max;
+  if (rePush) {
+    await tsend({ type: 'touchMove', touchPoints: [{ x: x + dx * 0.3, y, id }] }); await sleep(300);
+    const t1 = Date.now();
+    while (Date.now() - t1 < 1800) { await tsend({ type: 'touchMove', touchPoints: [{ x: x + dx, y, id }] }); after = Math.max(after, Math.abs(await ev('__game.state().player.bank'))); await sleep(120); }
+  }
+  await tsend({ type: 'touchEnd', touchPoints: [] });
+  return { max, tag, after, b0 };
+}
+async function hudFix() {
+  console.log('\n== hudfix 390×844 + 844×390 touch');
+  await viewport(390, 844, true);
+  errors.length = 0;
+  const up = async (q = '', extra = {}) => { await send('Page.navigate', { url: BASE + 'docs/' }); await sleep(400); await freshStorage({ ...NOCOACH, ...extra }); await load('?start=free&noaccount=1' + q); await sleep(2500); };
+  const cruise = (kt = 95) => ev(`__game.teleport({ x: -1500, z: 2500, alt: 450, heading: 90, speedKt: ${kt}, throttle: 0.7 })`).then(() => sleep(2500));
+
+  // B5: full stick on Easy holds ~60°; Hard has no limit (so the limiter is what stops it); the detent re-push goes past
+  for (const [plane, kt] of [['c172', 95], ['tiger', 75], ['bathtub', 58]]) {
+    await up(`&plane=${plane}`, { 'krayzee.settings': { difficulty: 'easy', v: 3 } });
+    await cruise(kt);
+    const r = await fullStick(4);
+    check(`hudfix: ${plane} Easy full stick 4 s holds at the soft-limit`, r.max > 45 && r.max < 68, `max ${r.max}° tag ${r.tag}`);
+    if (plane === 'c172') {
+      check('hudfix: stick tag says BANK 60° at the limit', /BANK 60/.test(r.tag), r.tag);
+      await cruise(kt);
+      const d = await fullStick(2.5, 150, true);
+      check('hudfix: ease off + push again rolls past the 60° detent', d.after > 75, `held ${d.max.toFixed(1)}° → re-push ${d.after.toFixed(1)}°`);
+      await cruise(kt);
+      const small = await fullStick(2.5, 40);
+      const rate = Math.abs(small.max - Math.abs(small.b0)) / 2.5;
+      check('hudfix: 40 px deflection still a gentle roll', small.max < 45 && small.max > 5, `max ${small.max}° (≈${rate.toFixed(0)}°/s)`);
+    }
+  }
+  await up('', { 'krayzee.settings': { difficulty: 'hard', v: 3 } });
+  await cruise();
+  const hard = await fullStick(4);
+  check('hudfix: Hard has no bank limit (rate-capped roll)', hard.max > 90 && hard.max < 200, `max ${hard.max}°`);
+
+  // B3/B4: the lever shows and keeps the player's setting; AUTO hands it back
+  await up();
+  await cruise();
+  const t = await rectOf('.krz-thr'), tx = t.x + t.w / 2, ty = (v) => t.y + 14 + (1 - v) * (t.h - 28);
+  await tsend({ type: 'touchStart', touchPoints: [{ x: tx, y: ty(0.9), id: 5 }] });
+  for (let i = 0; i <= 6; i++) { await tsend({ type: 'touchMove', touchPoints: [{ x: tx, y: ty(0.9 - i * 0.4 / 6), id: 5 }] }); await sleep(40); }
+  await sleep(300);
+  await tsend({ type: 'touchEnd', touchPoints: [] });
+  await sleep(6000);
+  const lat = await ev(`({ lever: +document.querySelector('.krz-thr-v').textContent, mode: __game.state().player.modes.throttle, ctl: __game.state().player.ctl.throttle, auto: getComputedStyle(document.querySelector('.krz-thr-auto')).visibility })`);
+  check('hudfix: throttle latched where the player left it (6 s later)', lat.mode === 'latched' && Math.abs(lat.lever - 50) <= 3 && Math.abs(lat.ctl - 0.5) < 0.04, JSON.stringify(lat));
+  check('hudfix: AUTO detent shown while the player owns the throttle', lat.auto === 'visible');
+  const ov1 = overlaps({ auto: await rectOf('.krz-thr-auto'), radio: await rectOf('.krz-r-btn'), stick: await rectOf('.krz-stick-zone'), pad: await rectOf('.krz-pad'), land: await rectOf('.krz-land') });
+  check('hudfix: AUTO detent clear of radio, stick, pad, LAND', ov1.length === 0, ov1.join(', '));
+  console.log('  shot', await shot('hudfix-01-thr-latched'));
+  await tap('.krz-thr-auto');
+  await sleep(1500);
+  const back = await ev(`({ lever: +document.querySelector('.krz-thr-v').textContent, mode: __game.state().player.modes.throttle, ctl: __game.state().player.ctl.throttle, auto: getComputedStyle(document.querySelector('.krz-thr-auto')).visibility })`);
+  check('hudfix: AUTO by real tap hands the throttle back', back.mode !== 'latched' && back.mode !== 'manual' && back.auto === 'hidden' && Math.abs(back.lever - Math.round(back.ctl * 100)) <= 2, JSON.stringify(back));
+
+  // B9: RECOVERING banner replaces the AP pill row instead of growing into the subtitles
+  await ev(`(() => { __game.wiring.radio.setVisible(true); __game.S.player.ap.events.push({ type: 'recovery', low: false }); return 1; })()`);
+  await sleep(400);
+  const bn = await rectOf('.krz-banner'), subs = await ev(`[...document.querySelectorAll('.krz-r-subs, .krz-r-pill')].map((e) => e.getBoundingClientRect()).filter((r) => r.width && r.height).map((r) => ({ x: r.x, y: r.y, w: r.width, h: r.height }))`);
+  const hudR = await rectOf('#krz-hud');
+  check('hudfix: RECOVERING banner clear of the subtitles', bn && subs.every((r) => !hit(bn, r)) && bn.y + bn.h <= hudR.y + hudR.h + 2, JSON.stringify({ bn, hudR, subs: subs.slice(0, 2) }));
+
+  // B9: no coach mark mid-dive; it waits for level flight
+  await up('', { 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1 } });
+  await ev(`__game.teleport({ x: -1500, z: 2500, alt: 900, heading: 90, speedKt: 100, throttle: 1 })`);
+  await ev(`__game.setControls({ elevator: -0.7, aileron: 0.5, throttle: 1 }, 5000)`);
+  await sleep(1200);
+  await ev(`__game.wiring.game.handleEvent({ type: 'tower_buzz', id: 9301, actor: 'player', data: { dist: 20 } })`);
+  let dive = 0, shownInDive = false;
+  for (let i = 0; i < 14; i++) {
+    const s = await ev(`[__game.state().player.vsFpm, __game.state().player.bank, !!document.querySelector('.krz-coach:not([hidden])') && !!__game.hud.coach.active]`);
+    if (s[0] < -1500 || Math.abs(s[1]) > 45) { dive++; if (s[2]) shownInDive = true; }
+    await sleep(250);
+  }
+  check('hudfix: no coach mark during a dive', dive > 3 && !shownInDive, `dive samples ${dive}`);
+  await ev('__game.release()');
+  check('hudfix: the bank coach mark shows once level again', await until(`__game.hud.coach.active === 'bank' && !document.querySelector('.krz-coach').hidden`, 30), JSON.stringify(await ev('__game.hud.coach')));
+
+  // B6: waiting on the runway → coach points at DEMAND TAKEOFF, not RADIO
+  await up('', { 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 0, bank: 1 }, 'krayzee.coachTakeoff': null });
+  await ev(`(() => { const ap = __game.S.player.ap; ap.gate = () => false; return 1; })()`);
+  const tc = await until(`__game.hud.takeoffCoach?.active && __game.hud.coach.active == null`, 12);
+  check('hudfix: waiting plane gets the DEMAND TAKEOFF coach mark (not RADIO)', tc, JSON.stringify(await ev('[__game.hud.takeoffCoach, __game.hud.coach.active]')));
+  const ring = await rectOf('.krz-coach[data-step="takeoff"] .krz-coach-ring'), to = await rectOf('.krz-gbtn-to');
+  check('hudfix: the mark rings the DEMAND TAKEOFF button', ring && to && ring.x <= to.x && ring.y <= to.y && ring.x + ring.w >= to.x + to.w && ring.y + ring.h >= to.y + to.h, JSON.stringify({ ring, to }));
+  console.log('  shot', await shot('hudfix-02-takeoff-coach'));
+  await tap('.krz-gbtn-to');
+  check('hudfix: DEMAND TAKEOFF by real tap ends the mark', await until(`__game.hud.takeoffCoach.done && __game.hud.takeoffCoach.why === 'pressed'`, 3));
+
+  // chase camera never inside a canopy (PLAYTEST_2 §6)
+  const spot = await ev(`(() => { for (let x = -1400; x < -400; x += 3) for (let z = 900; z < 2500; z += 3) if (__game.treeTop(x, z, -3) > -1e9) return { x, z }; return null; })()`);
+  if (spot) {
+    await ev(`__game.teleport({ x: ${spot.x + 14}, z: ${spot.z}, alt: 0.3, heading: 90, speedKt: 0, throttle: 0 })`);
+    await ev(`__game.setControls({ throttle: 0, brake: 1 }, 6000)`);
+    await sleep(3000);
+    const c = await ev(`(() => { const p = __game.camera.position; return { y: p.y, top: __game.treeTop(p.x, p.z, 0) }; })()`);
+    check('hudfix: chase camera above the canopy next to trees', c.y > c.top, JSON.stringify(c));
+    await ev('__game.release()');
+  } else check('hudfix: tree data for the camera', false, 'no tree found');
+
+  // ONLINE §17: the room's type + protection reach the game (Strict Tower: realistic, −500 crash penalty)
+  const on = await ev(`(() => { const W = __game.wiring, P = __game.S.player; W.endPlay(); W.startPlay('online', P, { room: { type: 'strict', protection: 'realistic', partialStart: 100 } });
+    const g = W.game, s = g.state(); const r = g.reportImpact({ speedKt: 60, onGear: false }); const out = { prot: s.protectionMode, pen: r?.crashPenalty, res: r?.result, diff: W.difficulty }; W.endPlay(); W.startPlay('free', P); return out; })()`);
+  check('hudfix: online room protection + Strict Tower penalty reach the game', on.prot === 'realistic' && on.pen === 500 && on.diff === 'hard', JSON.stringify(on));
+
+  // landscape: LAND vs the prompt card, the target label, portrait centre view LAND off the gauge row
+  await viewport(844, 390, true);
+  await up();
+  await ev(`__game.ghud.prompts.reset()`);
+  await ev(`__game.teleport({ x: 900, z: -300, alt: 140, heading: 270, speedKt: 95, throttle: 0.75 })`);
+  const pr = await until(`__game.hud.prompts.current && !document.querySelector('.krz-land').hidden`, 14);
+  await sleep(600);
+  const lr = await rectOf('.krz-land'), prr = await rectOf('.krz-prompt');
+  check('hudfix: landscape LAND clear of the prompt card', pr && lr && prr && !hit(lr, prr), JSON.stringify({ lr, prr }));
+  const mk = await ev(`({ sig: __game.S.mkSig, label: __game.hud.target?.label })`);
+  check('hudfix: target marker label follows the live target', !!mk.label && mk.sig.endsWith('|' + mk.label), JSON.stringify(mk));
+  console.log('  shot', await shot('hudfix-03-land-prompt-landscape'));
+  await viewport(390, 844, true);
+  await up('&view=center');
+  await cruise();
+  const lc = await rectOf('.krz-land'), sz = await rectOf('.krz-stick-zone'), ac = await rectOf('.krz-actions');
+  check('hudfix: portrait centre view LAND sits on the stick band, off the gauge row', lc && sz && lc.y >= sz.y - 4 && lc.y + lc.h <= sz.y + 70, JSON.stringify({ lc, sz }));
+  console.log('  shot', await shot('hudfix-04-center-land'));
+  check('hudfix: no console errors', errors.length === 0, errors.slice(0, 3).join(' | '));
+}
+
 async function falsify() {
   console.log('\n== falsify: drag the score widget over the pause button; the overlap check must FAIL');
   await viewport(390, 844, true);
@@ -415,6 +568,8 @@ async function main() {
     if (ONLY.includes('landscape')) await scenario(844, 390, true, 'landscape');
     if (ONLY.includes('desktop')) await scenario(1280, 800, false, 'desktop');
     if (ONLY.includes('finish')) { await finishFlow(390, 844, true, 'finish-portrait'); await finishFlow(1280, 800, false, 'finish-desktop'); }
+    // before ground: after the two-thumb ground-landscape run headless Chrome drops later single-touch gestures
+    if (ONLY.includes('hudfix')) await hudFix();
     if (ONLY.includes('ground')) { await groundOverride(390, 844, 'ground-portrait'); await groundOverride(844, 390, 'ground-landscape'); }
     if (ONLY.includes('groundl')) await groundOverride(844, 390, 'ground-landscape');
     if (ONLY.includes('finishd')) await finishFlow(1280, 800, false, 'finish-desktop');
