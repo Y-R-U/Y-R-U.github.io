@@ -1,0 +1,388 @@
+{
+ "timescale": 1,
+ "results": [
+  {
+   "id": "c172-easy-portrait",
+   "plane": "c172",
+   "diff": "easy",
+   "orient": "portrait",
+   "steps": [
+    {
+     "step": "boot",
+     "ok": true,
+     "simS": 0.1,
+     "realS": 1,
+     "budget": 0,
+     "pp0": null,
+     "pp1": null,
+     "banked1": null,
+     "detail": "ready 1s real",
+     "errors": 0,
+     "stall": 0,
+     "bootReal": 1
+    },
+    {
+     "step": "menu→free",
+     "ok": true,
+     "simS": 0.4,
+     "realS": 0.8,
+     "budget": 0,
+     "pp0": null,
+     "pp1": 0,
+     "banked1": 0,
+     "detail": "playing c172 after 0.8s real",
+     "errors": 0,
+     "stall": 0
+    },
+    {
+     "step": "difficulty chip",
+     "ok": true,
+     "simS": 7.4,
+     "realS": 7.4,
+     "budget": 0,
+     "pp0": 0,
+     "pp1": 0,
+     "banked1": 0,
+     "detail": "difficulty easy by chip | WARN .krz-diff [data-d=\"easy\"] was covered by .krz-r-who for 3.8 s real",
+     "errors": 0,
+     "stall": 7.4,
+     "warn": [
+      ".krz-diff [data-d=\"easy\"] was covered by .krz-r-who for 3.8 s real"
+     ],
+     "retries": 1
+    },
+    {
+     "step": "takeoff",
+     "ok": true,
+     "simS": 31.2,
+     "realS": 31.2,
+     "budget": 150,
+     "pp0": 0,
+     "pp1": 0,
+     "banked1": 0,
+     "detail": "liftoff 8.9s sim",
+     "errors": 0,
+     "stall": 16.7,
+     "liftoffSim": 8.9
+    },
+    {
+     "step": "time warp",
+     "ok": true,
+     "simS": 18.5,
+     "realS": 6.3,
+     "budget": 0,
+     "pp0": 0,
+     "pp1": 0,
+     "banked1": 0,
+     "detail": "sim rate 1 → 5 s/s (×5)",
+     "errors": 0,
+     "stall": 4.1,
+     "warp": {
+      "base": 1,
+      "at5": 5,
+      "ratio": 5,
+      "chip": "on",
+      "why": ""
+     }
+    },
+    {
+     "step": "stick+release",
+     "ok": true,
+     "simS": 4.2,
+     "realS": 4.2,
+     "budget": 33,
+     "pp0": 0,
+     "pp1": 0,
+     "banked1": 0,
+     "detail": "manual 3.6s sim, bank 1.8°, AP back in 0.5s sim",
+     "errors": 0,
+     "stall": 3,
+     "manualSim": 3.6,
+     "apBackSim": 0.5,
+     "recoverSim": 0
+    },
+    {
+     "step": "throttle latch+AUTO",
+     "ok": true,
+     "simS": 7.9,
+     "realS": 7.9,
+     "budget": 40,
+     "pp0": 0,
+     "pp1": 0,
+     "banked1": 0,
+     "detail": "latched 0.49 (drift 0), AUTO ok",
+     "errors": 0,
+     "stall": 7.3
+    },
+    {
+     "step": "view toggle",
+     "ok": true,
+     "simS": 1.2,
+     "realS": 1.2,
+     "budget": 0,
+     "pp0": 0,
+     "pp1": 0,
+     "banked1": 0,
+     "detail": "chase>center>cockpit>chase",
+     "errors": 0,
+     "stall": 1.2
+    },
+    {
+     "step": "LAND probe downwind",
+     "ok": false,
+     "simS": 19.5,
+     "realS": 19.5,
+     "budget": 30,
+     "pp0": 0,
+     "pp1": 0,
+     "banked1": 0,
+     "detail": "LAND on the home downwind picked FIELD/base (\"LANDING… FIELD LAND NOW straight ahead\")",
+     "errors": 0,
+     "stall": 14.2,
+     "pick": "LANDING… FIELD LAND NOW straight ahead",
+     "landing": "FIELD/base",
+     "shot": "/Users/aaronair/cc/yru/site/gms/3d/krayzee/docs/review/loop/c172-easy-portrait-LAND_probe_downwind.png",
+     "log": [
+      "{\"t\":51.4,\"type\":\"ap.phase\",\"phase\":\"CROSSWIND\"}",
+      "{\"t\":57.7,\"type\":\"thrAuto\"}",
+      "{\"t\":74.3,\"type\":\"ap.waypoint\",\"leg\":3}",
+      "{\"t\":74.3,\"type\":\"ap.phase\",\"phase\":\"DOWNWIND\"}",
+      "{\"t\":74.7,\"label\":\"FIELD\",\"kind\":\"grass\",\"type\":\"landAt\"}",
+      "{\"t\":74.7,\"type\":\"ap.replan\",\"to\":\"land\",\"label\":\"FIELD\"}",
+      "{\"t\":74.7,\"type\":\"ap.phase\",\"phase\":\"LAND · JOIN\"}",
+      "{\"t\":75,\"type\":\"ap.phase\",\"phase\":\"MANUAL\"}",
+      "{\"t\":75,\"type\":\"ap.override\",\"axis\":\"aileron\"}",
+      "{\"t\":75,\"type\":\"ap.override\",\"axis\":\"elevator\"}",
+      "{\"t\":75,\"type\":\"ap.replan\",\"to\":\"fly\",\"leg\":3}",
+      "{\"t\":75,\"type\":\"ap.landcancel\"}",
+      "{\"t\":75.9,\"type\":\"ap.phase\",\"phase\":\"DOWNWIND\"}",
+      "{\"t\":77.4,\"type\":\"ap.replan\",\"to\":\"fly\",\"leg\":3}"
+     ],
+     "state": {
+      "phase": "DOWNWIND",
+      "leg": "fly",
+      "sub": "",
+      "agl": 194.6,
+      "kt": 76.2,
+      "gnd": false,
+      "x": -1278,
+      "z": 980,
+      "land": "LAND",
+      "finish": {
+       "state": "hidden",
+       "reason": ""
+      },
+      "ground": {
+       "takeoff": false,
+       "skip": false
+      },
+      "apMode": "AUTOPILOT",
+      "thrMode": "auto"
+     }
+    },
+    {
+     "step": "LAND",
+     "ok": true,
+     "simS": 297.1,
+     "realS": 297.1,
+     "budget": 0,
+     "pp0": 0,
+     "pp1": 50,
+     "banked1": 0,
+     "detail": "final reached 191.9s after the probe; tapped 3495 m from RWY 27 (FINAL, 242 m AGL): RWY 27/straight; LAND NOW absent; touchdown 100.7s sim on runway",
+     "errors": 0,
+     "stall": 146.8,
+     "waitFinalSim": 191.9,
+     "at": {
+      "dist": 3495,
+      "off": 5,
+      "agl": 242,
+      "phase": "FINAL",
+      "rwy": "27"
+     },
+     "pick": "LANDING… RWY 27",
+     "landing": "RWY 27/straight",
+     "landNowShown": false,
+     "touchdownSim": 100.7,
+     "surface": "runway",
+     "ppLog": [
+      "pp:impeccable:50"
+     ]
+    },
+    {
+     "step": "stop",
+     "ok": true,
+     "simS": 14.2,
+     "realS": 14.2,
+     "budget": 90,
+     "pp0": 50,
+     "pp1": 50,
+     "banked1": 0,
+     "detail": "DEMAND IT lit at 4.5 kt on runway at (297,0)",
+     "errors": 0,
+     "stall": 9.4
+    },
+    {
+     "step": "DEMAND IT",
+     "ok": true,
+     "simS": 0.4,
+     "realS": 0.4,
+     "budget": 245,
+     "pp0": 50,
+     "pp1": 0,
+     "banked1": 50,
+     "detail": "ready after 0s sim; banked 50 PP (0→50); fuel 0.982→1.000",
+     "errors": 0,
+     "stall": 0.4,
+     "readySim": 0,
+     "greyedWhy": "",
+     "fuel": [
+      1,
+      1
+     ],
+     "ppLog": [
+      "banked::50"
+     ]
+    },
+    {
+     "step": "DEMAND TAKEOFF",
+     "ok": true,
+     "simS": 25.4,
+     "realS": 25.4,
+     "budget": 150,
+     "pp0": 0,
+     "pp1": 200,
+     "banked1": 50,
+     "detail": "offered after 0s, airborne 25.1s sim after the tap; PP 200 pending",
+     "errors": 0,
+     "stall": 14.4,
+     "offeredSim": 0,
+     "airborneSim": 25.1,
+     "ppLog": [
+      "pp:unauth_takeoff:200"
+     ]
+    },
+    {
+     "step": "route after takeoff",
+     "ok": false,
+     "simS": 0,
+     "realS": 0,
+     "budget": 0,
+     "pp0": 200,
+     "pp1": 200,
+     "banked1": 50,
+     "detail": "player's AP route is \"departure 27\" ending in a despawn leg: taxi>hold>takeoff>fly>fly>fly>despawn",
+     "errors": 0,
+     "stall": 0,
+     "route": {
+      "name": "departure 27",
+      "legs": [
+       "taxi",
+       "hold",
+       "takeoff",
+       "fly",
+       "fly",
+       "fly",
+       "despawn"
+      ],
+      "loop": null
+     },
+     "shot": "/Users/aaronair/cc/yru/site/gms/3d/krayzee/docs/review/loop/c172-easy-portrait-route_after_takeoff.png",
+     "log": [
+      "{\"t\":376.7,\"amount\":50,\"pending\":50,\"id\":\"impeccable\",\"name\":\"Impeccable\",\"text\":\"IMPECCABLE +50\",\"mult\":1,\"type\":\"pp\"}",
+      "{\"t\":387.09166666647894,\"type\":\"touchdown\",\"fpm\":135,\"grade\":\"butter\",\"bounce\":false,\"surface\":\"runway\",\"afterImpact\":false}",
+      "{\"t\":376.7,\"type\":\"ap.phase\",\"phase\":\"ROLLOUT\"}",
+      "{\"t\":386.4,\"type\":\"ap.landed\",\"end\":\"27\"}",
+      "{\"t\":391.4,\"amount\":50,\"sessionBanked\":50,\"atStand\":false,\"text\":\"BANKED 50\",\"type\":\"banked\"}",
+      "{\"t\":391.4,\"amount\":50,\"sessionBanked\":50,\"sorties\":1,\"type\":\"finished\"}",
+      "{\"t\":391.4,\"ok\":true,\"amount\":50,\"type\":\"demand\"}",
+      "{\"t\":401.7999999997989,\"type\":\"refuel\",\"fraction\":1}",
+      "{\"t\":395.3,\"type\":\"demandTakeoff\"}",
+      "{\"t\":395.3,\"type\":\"ap.demand\",\"end\":\"27\",\"entry\":null}",
+      "{\"t\":395.3,\"type\":\"ap.phase\",\"phase\":\"TAKEOFF ROLL\"}",
+      "{\"t\":404.1,\"amount\":200,\"pending\":200,\"id\":\"unauth_takeoff\",\"name\":\"Didn't Ask\",\"text\":\"DIDN'T ASK! +200\",\"mult\":1,\"parts\":{\"base\":200,\"combo\":1,\"audacity\":1,\"h",
+      "{\"t\":410.2,\"type\":\"ap.phase\",\"phase\":\"ROTATE\"}",
+      "{\"t\":417.1,\"type\":\"ap.phase\",\"phase\":\"CLIMB\"}"
+     ],
+     "state": {
+      "phase": "CLIMB",
+      "leg": "takeoff",
+      "sub": "climb",
+      "agl": 10.5,
+      "kt": 71.9,
+      "gnd": false,
+      "x": -266,
+      "z": 0,
+      "land": "LAND",
+      "finish": {
+       "state": "hidden",
+       "reason": ""
+      },
+      "ground": {
+       "takeoff": false,
+       "skip": false
+      },
+      "apMode": "AUTOPILOT",
+      "thrMode": "auto"
+     }
+    },
+    {
+     "step": "field: LAND",
+     "ok": true,
+     "simS": 57.5,
+     "realS": 57.5,
+     "budget": 270,
+     "pp0": 200,
+     "pp1": 470,
+     "banked1": 50,
+     "detail": "LANDING… FIELD [FIELD/straight]; touchdown on grass after 22.8s sim",
+     "errors": 0,
+     "stall": 19.8,
+     "pick": "LANDING… FIELD",
+     "landing": "FIELD/straight",
+     "surface": "grass",
+     "ppLog": [
+      "pp:grass_landing:270"
+     ]
+    },
+    {
+     "step": "field: DEMAND TAKEOFF",
+     "ok": true,
+     "simS": 0.4,
+     "realS": 0.4,
+     "budget": 80,
+     "pp0": 470,
+     "pp1": 470,
+     "banked1": 50,
+     "detail": "offered 0s after stop (DEMAND IT greyed: Land nearer a runway); airborne 0s sim",
+     "errors": 0,
+     "stall": 0,
+     "finish": {
+      "state": "greyed",
+      "reason": "Land nearer a runway"
+     }
+    },
+    {
+     "step": "quit confirm",
+     "ok": true,
+     "simS": 0.4,
+     "realS": 3.2,
+     "budget": 0,
+     "pp0": 470,
+     "pp1": null,
+     "banked1": null,
+     "detail": "confirm \"Abandon 470 PP?\" → Keep flying ok → Quit → menu",
+     "errors": 0,
+     "stall": 0
+    }
+   ],
+   "blocked": null,
+   "events": [],
+   "falsified": [],
+   "t0": 1792715472297,
+   "realS": 482.1,
+   "errors": [],
+   "ok": false
+  }
+ ]
+}
