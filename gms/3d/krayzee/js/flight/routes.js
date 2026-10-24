@@ -40,6 +40,7 @@ const circuitSide = (endId) => ((CIRCUIT && CIRCUIT[endId]) === 'R' ? 'right' : 
 // ---------- runway ends ----------
 const END_CACHE = new Map();
 function runwayEnd(endId) {
+  if (endId && typeof endId === 'object') return endId;   // a virtual end object (LAND / FIELD) is already an end
   if (END_CACHE.has(endId)) return END_CACHE.get(endId);
   const rw = RUNWAYS.find((r) => r.ends.includes(endId));
   if (!rw) throw new Error(`no runway end ${endId}`);

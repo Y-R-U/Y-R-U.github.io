@@ -275,7 +275,7 @@ export function createScore(opts = {}) {
     return { result: 'damage', protectionLeft: 0, restitution: 0.1, shake: R.prang.shake, pendingLost, other, lightTouch: survivedTouch(kt, other) };
   }
 
-  // f: { gsKt, onGround, surface, atStand, calm } from FLIGHT; all optional.
+  // f: { gsKt, onGround, surface, atStand, calm, finishOk } from FLIGHT; all optional.
   function update(dt, f) {
     S.t += dt;
     if (S.comboLeft > 0) { S.comboLeft = Math.max(0, S.comboLeft - dt); if (!S.comboLeft) { S.comboStep = -1; emit('combo', { mult: 1, step: -1, left: 0 }); } }
@@ -291,8 +291,10 @@ export function createScore(opts = {}) {
     const where = f.atStand || (S.landed && PAVED.includes(f.surface));
     S.stopT = stopped && where ? S.stopT + dt : 0;
     // D19: the DEMAND IT button is the main finish; this silent bank is a fallback (opts.autoBank seconds, false = off).
+    // It never banks outside the difficulty's finish zone (f.finishOk from finishZone; without it Hard needs a stand).
     const auto = opts.autoBank === undefined ? BANK.stopTime : opts.autoBank;
-    if (auto !== false && S.stopT >= auto) {
+    const zoneOk = f.finishOk ?? (difficulty() !== 'hard' || !!f.atStand);
+    if (auto !== false && zoneOk && S.stopT >= auto) {
       const refill = S.protectionMode === 'partial' && S.protection < 100 && (S.landed || f.atStand);
       if (S.pending > 0 || refill) bank(!!f.atStand);
     }

@@ -195,7 +195,7 @@ async function onPlay(mode) {
     placePlayer(S.lastStop);
     wiring.startPlay(mode, S.player, mode === 'online' ? { room: onlineRoom() } : {});
     attachGame();
-    S.everAir = false; S.reelT = 0;
+    S.everAir = false; S.reelT = 0; S.taxiIn = 0; S.taxiInStop = 0; S.demandLive = false;
     fx?.track('player', { rig, ac, player: true });
     story?.showWarp(mode !== 'online');
     controls.setVisible(!SHOT && !AUTO); hud.setVisible(!SHOT); ghud.setVisible(!SHOT);
@@ -215,7 +215,13 @@ function attachGame() {
   if (fx) for (const k of ['combo', 'rankUp', 'protection']) g.on(k, (d) => { try { fx.onGameEvent(k, d, 'player'); } catch (e) { /* */ } });
   const later = () => { S.reelT = 1.6; };
   g.on('finished', later);
-  g.on('banked', () => { if (S.player?.ac.onGround && S.everAir) later(); });
+  g.on('banked', () => {
+    const ac = S.player?.ac;
+    if (!ac?.onGround) return;
+    // D20: every bank on the ground refuels, the fallback auto-bank included (not only DEMAND IT)
+    if (!(ac.fuelFraction >= 0.999)) try { ac.refuel?.(); } catch (e) { console.warn('refuel', e); }
+    if (S.everAir) later();
+  });
 }
 // Free Flight aircraft (TRAFFIC r3): C172, Tiger Moth, Royal Flying Bathtub. ?plane= wins, then settings.aircraft.
 const FLYABLE = ['c172', 'tiger', 'bathtub'];
@@ -332,7 +338,7 @@ function quitPlay() {
   wiring.endPlay();
   engine?.dispose(); engine = null;
   controls.setVisible(false); hud.setVisible(false); ghud.setVisible(false); showSpot(false); toCoach?.hide();
-  markers.setVisible(false); land.setVisible(false); S.landOn = false; document.documentElement.classList.remove('krz-land-on');
+  markers.setVisible(false); land.setVisible(false); S.landOn = false; document.documentElement.classList.remove('krz-land-on'); delete document.documentElement.dataset.krzAct;
   S.mode = 'attract'; S.paused = false;
   fitFov(camera, 70, 45, 85);
 }
@@ -448,9 +454,47 @@ function finishZoneNow(P) {
   return finishZone(wiring.difficulty, { x: ac.pos.x, z: ac.pos.z, surface: ac.surface }, DEFAULT_SPOT);
 }
 function updateFinish(P, g) {
-  if (!g || !g.finishReady || P.ac.crashed || AUTO) { ghud.finish.set('hidden'); return; }
-  const z = finishZoneNow(P);
+  if (!g || P.ac.crashed || AUTO || departing(P)) { ghud.finish.set('hidden'); return; }
+  const z = finishZoneNow(P), inbound = g.landed && P.ac.onGround && taxiingIn(P.ap);
+  if (inbound && !(z.ok && g.finishReady)) { ghud.finish.set('greyed', 'Taxiing to the terminal…'); return; }
+  if (!g.finishReady) { ghud.finish.set('hidden'); return; }
   ghud.finish.set(z.ok ? 'ready' : 'greyed', z.ok ? (g.pending > 0 ? `Bank ${fmtPP(g.pending)} PP and finish` : 'Finish the flight') : z.reason);
+}
+// The AP is taxiing for a DEMAND TAKEOFF (D21): DEMAND IT stays out of the way and DEMAND TAKEOFF stays offered.
+function departing(P) {
+  const ap = P.ap, k = ap?.leg?.kind;
+  return !!(S.demandLive && P.ac.onGround && ap?.demand && !ap.done && (k === 'takeoff' || (k === 'taxi' && !ap.leg.dest?.stand)));
+}
+// The AP is taxiing in to a stand (ours below, STORY's taxiTo, or FLIGHTFIX's ap.taxiIn).
+function taxiingIn(ap) {
+  if (!ap || ap.done) return false;
+  if (ap.taxiingIn != null) return !!ap.taxiingIn;
+  const k = ap.leg?.kind;
+  return (k === 'taxi' && !!ap.leg.dest?.stand) || k === 'park';
+}
+// D19 Hard: the AP stopped on the airfield (DONE) outside the finish zone, so it taxis on to the terminal spot by itself.
+// Not in story (missions script their own taxi-in), not after a field landing (DEMAND TAKEOFF is the way out there).
+function updateTaxiIn(dt, P, g) {
+  const ac = P.ac, ap = P.ap;
+  if (!ac.onGround) { S.taxiIn = 0; S.taxiInStop = 0; S.demandLive = false; return; }
+  if (S.taxiIn || S.playMode === 'story' || wiring.difficulty !== 'hard' || AUTO || !ap || ac.crashed) return;
+  const stopped = g?.landed && ap.done && ap.phase !== 'GONE' && ac.gs < 1 && traffic.modeOf(P) !== 'MANUAL';
+  S.taxiInStop = stopped ? (S.taxiInStop || 0) + dt : 0;
+  if (S.taxiInStop < 1.2) return;
+  const here = { x: ac.pos.x, z: ac.pos.z, surface: ac.surface };
+  if (finishZone('hard', here, DEFAULT_SPOT).ok || !finishZone('easy', here, DEFAULT_SPOT).ok) return;
+  S.taxiIn = 1;
+  try {
+    if (typeof ap.taxiIn === 'function') { if (ap.taxiIn({ stand: DEFAULT_SPOT.id }) === false) return; }
+    else {
+      const stand = traffic.claimStand?.(ac, DEFAULT_SPOT.id) || DEFAULT_SPOT.id;
+      ap.landing = null; ap._landPrev = null; ap.demand = false;
+      ap.setRoute({ name: 'taxi in', legs: [{ kind: 'taxi', dest: { stand }, label: 'TAXI IN' }, { kind: 'park', seconds: 9999, label: 'PARKED' }], loop: null });
+    }
+  } catch (e) { console.warn('taxiIn', e); return; }
+  land.setState('idle');
+  hud.flash('TAXIING TO THE TERMINAL', 'info', 2.5);
+  log('taxiIn', { api: typeof ap.taxiIn === 'function' });
 }
 function demandIt() {
   const P = S.player, g = wiring.game;
@@ -460,7 +504,8 @@ function demandIt() {
   log('demand', r);
   if (r.ok) {
     ghud.finish.set('hidden');
-    try { P.ac.refuel?.(); } catch (e) { console.warn('refuel', e); }
+    // D20: the 'banked' listener already refuelled when there was PP to bank; a 0 PP finish refuels here
+    if (!(P.ac.fuelFraction >= 0.999)) try { P.ac.refuel?.(); } catch (e) { console.warn('refuel', e); }
     // D22: the next flight starts where this one stopped
     S.lastStop = { x: P.ac.pos.x, z: P.ac.pos.z, heading: P.ac.heading };
   }
@@ -549,21 +594,25 @@ function autoThrottle() {
 // (a stopgap until the autopilot can do a grass takeoff; the 2 km taxi it would otherwise do took minutes)
 function fieldHop(P) {
   const ac = P.ac, x = ac.pos.x, z = ac.pos.z;
+  // FLIGHTFIX3: on grass the AP turns onto a clear run where it stands and takes off (ap.fieldTakeoff); the teleport is the last resort
+  if (ac.surface === 'grass' && P.ap.fieldTakeoff?.({ world, end: wiring.activeEnd() })) return 'run';
   const seg = (a, b) => { const dx = b[0] - a[0], dz = b[1] - a[1], t = Math.max(0, Math.min(1, ((x - a[0]) * dx + (z - a[1]) * dz) / (dx * dx + dz * dz || 1))); return Math.hypot(x - a[0] - t * dx, z - a[1] - t * dz); };
   const d = Math.min(Infinity, ...(layout.RUNWAYS || []).map((rw) => seg(layout.threshold(rw, rw.ends[0]), layout.threshold(rw, rw.ends[1]))));
   if (!(d > 500)) return false;
   const gy = world.groundHeightAt(x, z), top = env?.treeTop?.(x, z, 30);
   ac.place({ x, z, alt: Math.max(50, (top ?? gy) - gy + 25), heading: ac.heading, speed: 78 * KT, throttle: 1, flaps: 0 }, env);
-  P.ap.replan();
+  if (P.ap.resumeCircuit) P.ap.resumeCircuit(wiring.activeEnd()); else P.ap.replan();
   try { wiring.link?.placed(P, 8); } catch (e) { /* */ }
-  return true;
+  return 'hop';
 }
 function demandTakeoff() {
   const P = S.player; if (!P?.ap?.demandTakeoff) return;
-  if (S.everAir && P.ac.onGround && fieldHop(P)) { log('demandTakeoff', { field: true }); S.demandedT = true; ghud.score.announce('BY ROYAL PREROGATIVE', 'Airborne from the turnips. The farmer may watch.'); return; }
+  if (S.reelOpen) ghud.headlines.closeReel(false);
+  const fh = S.everAir && P.ac.onGround && fieldHop(P);
+  if (fh) { log('demandTakeoff', { field: fh }); S.demandedT = true; S.demandLive = fh === 'run'; ghud.score.announce('BY ROYAL PREROGATIVE', fh === 'run' ? 'Off across the turnips. The farmer may watch.' : 'Airborne from the turnips. The farmer may watch.'); return; }
   try { if (!(S.demandEnd = wiring.link?.demandTakeoff ? wiring.link.demandTakeoff(P) : P.ap.demandTakeoff())) { hud.flash('NO RUNWAY OPEN FOR YOUR GRACE', 'warn'); return; } } catch (e) { console.warn('demandTakeoff', e); return; }
   log('demandTakeoff', {});
-  S.demandedT = true;
+  S.demandedT = true; S.demandLive = true;
   ghud.score.announce('BY ROYAL PREROGATIVE', 'Taking off. The queue may watch.');
 }
 function skipToRunway() {
@@ -581,11 +630,12 @@ function updateGround(P, g) {
   const ac = P.ac, ap = P.ap, gsKt = ac.gs / KT;
   const onG = ac.onGround && !ac.crashed && !AUTO;
   const rolling = ap?.leg?.kind === 'takeoff' && (ap.sub === 'roll' || ap.sub === 'rotate' || gsKt > 30);
-  const taxiing = ['taxi', 'hold', 'park'].includes(ap?.leg?.kind) || (ap?.leg?.kind === 'takeoff' && ap.sub === 'taxi');
+  // Skip to runway is for the way OUT: never on a taxi-in to a stand or while parked (GAMEFIX #5)
+  const k = ap?.leg?.kind, taxiOut = !ap?.done && ((k === 'taxi' && !ap.leg.dest?.stand) || k === 'hold' || (k === 'takeoff' && ap.sub === 'taxi'));
   if (!ac.onGround) S.everAir = true;
   ghud.ground.set({
-    takeoff: onG && !!ap?.demandTakeoff && !rolling && gsKt < 25 && !(g?.finishReady && finishZoneNow(P).ok),
-    skip: onG && !!ap?.skipToRunway && taxiing && !rolling && !S.everAir,
+    takeoff: onG && !!ap?.demandTakeoff && !rolling && gsKt < 25 && (departing(P) || !(g?.finishReady && finishZoneNow(P).ok)),
+    skip: onG && !!ap?.skipToRunway && taxiOut && !taxiingIn(ap) && !rolling && !S.everAir,
     difficulty: onG && S.playMode === 'free' && !S.everAir && !(g?.pending > 0) ? wiring.difficulty || 'easy' : null,
     aircraft: onG && S.playMode === 'free' && !S.everAir && !(g?.pending > 0) && !params.get('plane') ? S.type || 'c172' : null,
   });
@@ -611,7 +661,7 @@ function updateGameHUD(dt, P, modes) {
   if (S.paused) return;
   S.playT += dt;
   const radioOpen = !!document.querySelector('.krz-r-panel:not([hidden])');
-  const blocked = AUTO || SHOT || radioOpen || ['goal', 'stick'].includes(ghud.coach.active);
+  const blocked = AUTO || SHOT || radioOpen || ['goal', 'stick', 'release'].includes(ghud.coach.active);
   camera.getWorldDirection(_fwd);
   const camHeading = (Math.atan2(_fwd.x, -_fwd.z) * 180 / Math.PI + 360) % 360;
   ghud.prompts.update(dt, {
@@ -620,10 +670,19 @@ function updateGameHUD(dt, P, modes) {
   });
   const g = wiring.game?.state?.();
   if ((S.warpT = (S.warpT || 0) - dt) <= 0) { S.warpT = 0.5; placeWarp(); }
-  ghud.actions.hidden = !!S.reelOpen;
-  if (S.reelT > 0 && (S.reelT -= dt) <= 0) { if (ghud.score.state.ceremony) S.reelT = 0.5; else ghud.headlines.reel(); }
+  // the Herald reel never hides the action slot (DEMAND TAKEOFF stays tappable under it), and a late reel is dropped once
+  // the plane is rolling again: the headlines wait for the next stop (GAMEFIX #3)
+  ghud.el.classList.toggle('reel-on', !!S.reelOpen);
+  if (S.reelT > 0 && (S.reelT -= dt) <= 0) {
+    if (ghud.score.state.ceremony) S.reelT = 0.5;
+    else if (ac.onGround && ac.gs < 2.6 && !departing(P)) ghud.headlines.reel();
+  }
+  updateTaxiIn(dt, P, g);
   updateFinish(P, g);
   updateGround(P, g);
+  // rows in the bottom action slot: radio sheets and the Herald reel stop above them (css: html[data-krz-act])
+  const rows = String((ghud.finish.state !== 'hidden' ? 1 : 0) + (ghud.ground.el.hidden ? 0 : 1));
+  if (document.documentElement.dataset.krzAct !== rows) document.documentElement.dataset.krzAct = rows;
   updateLand(dt, P);
   // PLAYTEST_2: no coach marks mid-upset (|bank| > 45°, sinking > 1500 fpm, or low); a waiting plane gets DEMAND TAKEOFF
   const calm = ac.onGround || (Math.abs(ac.bank) < 0.785 && ac.vs > -7.62 && ac.agl >= 150);

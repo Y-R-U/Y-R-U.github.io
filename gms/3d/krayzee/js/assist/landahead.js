@@ -301,14 +301,18 @@ function runwayCandidates(st, layout, inCone, push) {
     const [hx, hz] = hvec(rw.heading);
     let hit = false;
     for (let k = -2; k <= 2 && !hit; k++) hit = inCone(rw.center[0] + hx * rw.length * k / 5, rw.center[2] + hz * rw.length * k / 5);
-    if (!hit) continue;
+    const home = !hit && st.home?.includes(rw);
+    if (!hit && !home) continue;
     const ends = rw.ends.map((id, i) => ({ id, hdg: i === 0 ? rw.heading : (rw.heading + 180) % 360 }));
     ends.sort((a, b) => Math.abs(wrap180(a.hdg - st.H)) - Math.abs(wrap180(b.hdg - st.H)));
     for (const e of ends) {
-      if (e !== ends[0] && Math.abs(wrap180(e.hdg - st.H)) > Math.abs(wrap180(ends[0].hdg - st.H)) + 5) continue;
+      if (!home && e !== ends[0] && Math.abs(wrap180(e.hdg - st.H)) > Math.abs(wrap180(ends[0].hdg - st.H)) + 5) continue;
       const [ux, uz] = hvec(e.hdg);
       const thr = [rw.center[0] - ux * rw.length / 2, rw.center[2] - uz * rw.length / 2];
-      const base = { kind: 'runway', surface: 'runway', label: `RWY ${e.id}`, runway: e.id, heading: e.hdg, aim: LAND.runwayAim, width: rw.width, pref: Math.abs(wrap180(e.hdg - st.H)), closed: !!rw.closed };
+      // on this end's own downwind (its circuit side, flying the reciprocal): that is the end the circuit is for
+      const side = ((st.x - rw.center[0]) * -uz + (st.z - rw.center[2]) * ux) < 0 ? 'L' : 'R';
+      const onDw = home && (layout.CIRCUIT?.[e.id] ?? 'L') === side && Math.abs(wrap180(st.H - e.hdg - 180)) < 60;
+      const base = { kind: 'runway', surface: 'runway', label: `RWY ${e.id}`, runway: e.id, heading: e.hdg, aim: LAND.runwayAim, width: rw.width, pref: home ? 0 : Math.abs(wrap180(e.hdg - st.H)), closed: !!rw.closed, home, prefer: st.prefer === e.id || onDw };
       push({ ...base, origin: thr, length: rw.length });
       // already over (or just short of) it and low: the rest of the runway ahead, straight down onto it
       const lat = Math.abs((st.x - thr[0]) * -uz + (st.z - thr[1]) * ux), herr = Math.abs(wrap180(e.hdg - st.H));
@@ -371,6 +375,9 @@ export function planLandAhead(o) {
   if (takeLandNow() && !o.straight) {
     const p = planLandAhead({ ...o, straight: true });
     if (!p.fail) return p;
+    // FLIGHTFIX3: nothing straight — "now" still means here, not the home runway's circuit: a field if one works
+    const f = planCore({ ...o, noHome: true });
+    if (!f.fail && f.kind !== 'runway') { f.nowFallback = true; noteLandPlan(f); return f; }
     const q = planLandAhead(o);
     if (!q.fail) q.nowFallback = true;
     return q;
@@ -396,7 +403,7 @@ function planCore(o) {
   // low (or LAND NOW, opts.straight): straight ahead and down beats any circuit; touchdown may be closer than 300 m
   const straight = !!o.straight, low = straight || agl < LAND.lowAgl;
   const minD = low ? 200 : LAND.minD;
-  const st = { x, z, alt, agl, H, V, sink: o.sink ?? 3, low, straight, minD };
+  const st = { x, z, alt, agl, H, V, sink: o.sink ?? 3, low, straight, minD, prefer: o.prefer || null, home: straight || o.noHome ? [] : homeRunways(o.layout, x, z, H, agl) };
   const maxD = Math.max(1800, Math.min(LAND.maxD + (straight ? 1500 : 0), 1500 + agl * 9 + Math.max(0, V - 40) * 20));
   if (dbg) dbg.cone = { x, z, heading: H, half: LAND.cone, minD, maxD };
   const inCone = (px, pz) => {
@@ -483,7 +490,11 @@ function planCore(o) {
       if (p.fail) { fails[p.fail]++; if (dbg) dbg.rejects.push({ kind: c.kind, label: c.label, why: p.fail, at: c.touchdown, heading: c.heading }); continue; }
       if (straight && p.kind !== 'straight') continue;
       let cost = p.feas.pathLength + (p.feas.turn || 0) * 4 + p.feas.orbits * 900 + c.pref * 25 - Math.min(c.stripLength, 900) * (c.kind === 'grass' ? 1 : 0.2);
-      if (low) cost = p.kind === 'straight' ? p.feas.pathLength + (c.kind === 'taxiway' || c.kind === 'apron' ? 3000 : rank * 150) + c.pref * 10 - Math.min(c.stripLength, 900) * 0.3 : cost + 5000;
+      // FLIGHTFIX3: low, a straight-in runway beats a field short of it (grass +1200, was +300); on the home circuit
+      // (st.home: ≥ 50 m AGL, not flying away down the axis) the runway's circuit beats a field too
+      if (low) cost = p.kind === 'straight' ? p.feas.pathLength + (c.kind === 'taxiway' || c.kind === 'apron' ? 3000 : c.kind === 'grass' ? 1200 : rank * 150) + c.pref * 10 - Math.min(c.stripLength, 900) * 0.3
+        : c.home ? cost - 4000 : cost + 5000;
+      if (c.prefer) cost -= 800;
       if (dbg) dbg.cands.push({ kind: c.kind, label: c.label, touchdown: c.touchdown, start: c.start, end: c.stripEnd, cost: Math.round(cost) });
       if (cost < bestCost) { bestCost = cost; best = { c, p }; }
     }
@@ -512,6 +523,22 @@ function planCore(o) {
     return failOut('nothingAhead', { candidates: cands.length });
   }
   return makePlan(best.c, best.p, st, dbg, t0);
+}
+
+// FLIGHTFIX3 (PLAYTEST_3 #3): runways LAND may use outside the cone because the plane is on or near their circuit —
+// within 2.3 km of the strip, at least 50 m up, and not climbing out / flying away along the runway's axis.
+function homeRunways(layout, x, z, H, agl) {
+  if (agl < 50) return [];
+  const out = [], [hx, hz] = hvec(H);
+  for (const rw of layout.RUNWAYS || []) {
+    const [ux, uz] = hvec(rw.heading), dx = x - rw.center[0], dz = z - rw.center[2];
+    const along = dx * ux + dz * uz, lat = Math.abs(dx * -uz + dz * ux), past = Math.abs(along) - rw.length / 2;
+    if (Math.hypot(Math.max(0, past), lat) > 2300) continue;   // the circuit: downwind 0.8–1.15 km out, base ≤ 1.8 km past
+    const away = (dx * hx + dz * hz) / (Math.hypot(dx, dz) || 1);
+    if (past > 0 && lat < 700 && away > 0.7) continue;   // upwind / climb-out: the runway is behind
+    out.push(rw);
+  }
+  return out;
 }
 
 function segDist(px, pz, ax, az, bx, bz) {
@@ -547,6 +574,37 @@ function makePlan(c, p, st, dbg, t0) {
   if (dbg) plan.debug = dbg;
   plan.ms = (typeof performance !== 'undefined' ? performance.now() : 0) - t0;
   return plan;
+}
+
+// FLIGHTFIX3 field takeoff (ap.fieldTakeoff): a clear, flat run starting where the plane sits, every 10° round the
+// compass (the smallest turn wins among runs that are long enough), with the climb-out beyond it clear of trees and
+// buildings at `climb` (gradient). Same Field cache and run rules as the LAND strip scan.
+// → { heading, length, start:[x,z], end:[x,z], elev, turn } or null.
+export function takeoffRun(world, { x, z, heading = 0, need = 400, climb = 0.06, maxLen = 1200 } = {}) {
+  const F = field(world), runs = [];
+  let best = null;
+  for (let k = 0; k < 36; k++) {
+    const h = (Math.round(heading / 10) * 10 + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 10 + 720) % 360;
+    const [ux, uz] = hvec(h);
+    runs.length = 0;
+    scanLine(F, x, z, ux, uz, 0, maxLen, runs);
+    const r = runs[0];
+    if (!r || r[0] > LAND.step * 1.5 || r[1] - r[0] < need) continue;
+    // climb-out: from the liftoff point (`need` along) the path rising at `climb` must clear every obstacle top
+    const elev = F.height(x, z);
+    let clear = true;
+    for (let d = need * 0.75; d <= need + 900 && clear; d += 16) {
+      const px = x + ux * d, pz = z + uz * d, a = elev + Math.max(0, d - need * 0.75) * climb;
+      for (const l of [0, -18, 18]) if (F.top(px - uz * l, pz + ux * l) > a - 3 || F.height(px - uz * l, pz + ux * l) > a + 1) { clear = false; break; }
+    }
+    if (!clear) continue;
+    const turn = Math.abs(wrap180(h - heading)), len = Math.min(r[1], maxLen);
+    // turning round onto it swings ~25 m out: that circle must be clear too
+    if (turn > 45) { let ok = true; for (let a = 0; a < 360 && ok; a += 30) for (const rr of [12, 24]) { const qx = x + Math.sin(a * DEG) * rr, qz = z - Math.cos(a * DEG) * rr, g = F.ground(qx, qz); if (g !== g || F.top(qx, qz) > -1e8) ok = false; } if (!ok) continue; }
+    const cost = turn * 2 - Math.min(len, need * 1.6) * 0.1;
+    if (!best || cost < best.cost) best = { heading: h, length: len, start: [x, z], end: [x + ux * len, z + uz * len], elev, turn, cost };
+  }
+  return best;
 }
 
 export { createLandButton, armLandNow } from './landbutton.js';

@@ -459,12 +459,17 @@ async function runCase([plane, diff, orient]) {
   await step('field: DEMAND TAKEOFF', B.fieldTakeoffBtn + B.fieldAirborne, async (rec) => {
     const s0 = M.last;
     rec.finish = s0.finish;
+    // a field inside the finish zone (Easy, < 300 m from the runway) offers DEMAND IT first; DEMAND TAKEOFF follows the bank
+    if (s0.finish?.state === 'ready') {
+      await tapUntil('.krz-finish', () => D.evSafe('document.querySelector(".krz-finish")?.dataset.state !== "ready"'), { rec, ms: 2500 });
+      rec.bankedFirst = true;
+    }
     const b = await until((s) => s.ground?.takeoff, B.fieldTakeoffBtn, { label: `DEMAND TAKEOFF offered on ${s0.p?.surf} (DEMAND IT ${s0.finish?.state} "${s0.finish?.reason}")` });
     const nDT = () => D.evSafe('__game.log().filter((l) => l.type === "demandTakeoff").length', 0);
     const n0 = await nDT();
     await tapUntil('.krz-gbtn-to', async (s) => !s.p.gnd || (await nDT()) > n0, { rec, ms: 2500 });
     const a = await until((s) => s.p && !s.p.gnd && s.p.agl > 10, B.fieldAirborne, { label: 'airborne from the field' });
-    return `offered ${r1(b.simS)}s after stop (DEMAND IT ${s0.finish?.state}${s0.finish?.reason ? ': ' + s0.finish.reason : ''}); airborne ${r1(a.simS)}s sim`;
+    return `${rec.bankedFirst ? "banked first (in zone); " : ""}offered ${r1(b.simS)}s after stop (DEMAND IT ${s0.finish?.state}${s0.finish?.reason ? ': ' + s0.finish.reason : ''}); airborne ${r1(a.simS)}s sim`;
   });
 
   // quit with pending PP: the confirm must appear and show the number; Keep flying keeps the game; Quit ends it

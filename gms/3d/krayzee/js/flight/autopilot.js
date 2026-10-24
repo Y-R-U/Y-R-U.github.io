@@ -1,7 +1,8 @@
 import { clamp, lerp, DEG, KT, wrap180, bearing, moveTo } from './vmath.js';
-import { runwayEnd, allRunwayEnds, toRunway, fromRunway, taxiPath, GLIDE_DEG, AIM_DIST, FAF_DIST, onRunway, circuitLegs, segInter, departureRoute, runwayEntries, rerouteRunway } from './routes.js';
+import { runwayEnd, allRunwayEnds, toRunway, fromRunway, taxiPath, GLIDE_DEG, AIM_DIST, FAF_DIST, onRunway, circuitLegs, circuitRoute, segInter, departureRoute, runwayEntries, rerouteRunway } from './routes.js';
 import { RUNWAYS, HOLD_OFFSET, threshold } from '../world/layout.js';
 import { TYPES, typeInfo } from './aircraft.js';
+import { takeoffRun } from '../assist/landahead.js';
 
 const G = 9.81, RHO = 1.225, TANG = Math.tan(GLIDE_DEG * DEG);
 const endOf = (x) => (typeof x === 'object' && x ? x : runwayEnd(x)); // ASSIST plans pass virtual runway-end objects
@@ -86,16 +87,18 @@ export class Autopilot {
     } else if (leg.kind === 'fly') {
       this._buildFlyPath(fromCurrent);
     } else if (leg.kind === 'takeoff') {
-      const e = (cur.e = runwayEnd(leg.end));
+      const e = (cur.e = endOf(leg.end));
       const p = toRunway(e, ac.pos.x, ac.pos.z);
       const herr = Math.abs(wrap180(e.hdg - ac.heading));
       if (!ac.onGround) this.sub = 'climb';
+      else if (e.virtual) { if (Math.abs(p.l) < 5 && herr < 12) this.sub = 'roll'; else this._lineup(e); }   // a field run: turn onto it here
       else if (Math.abs(p.l) < 5 && p.s > -30 && p.s < e.len * 0.45 && herr < 12) this.sub = ac.speed > 10 || this._mayEnterRunway(e, true) ? 'roll' : 'ready';
-      else if (onRunway(ac.pos.x, ac.pos.z) && p.s < e.len * 0.45) this._lineup(e);
+      else if (onRunway(ac.pos.x, ac.pos.z) === e.rw && p.s < e.len * 0.45) this._lineup(e);   // on THIS runway (a stop on 04 used to "line up" on 27 from 150 m away at line-up speed)
       else if (Math.hypot(...this._d(this._holdOrThr(e))) < 90 && this._mayEnterRunway(e)) this._lineup(e);
       else {
         this.sub = 'taxi';
-        cur.path = taxiPath(ac.pos.x, ac.pos.z, ac.heading, this.demand ? (this.demandEntry ? { xz: this.demandEntry } : { threshold: leg.end }) : { hold: leg.end }).map(([x, z]) => ({ x, z, a: 0 }));
+        cur.path = (this.demand && this.demandDirect && this.demandEntry ? [[ac.pos.x, ac.pos.z], this.demandEntry]
+          : taxiPath(ac.pos.x, ac.pos.z, ac.heading, this.demand ? (this.demandEntry ? { xz: this.demandEntry } : { threshold: leg.end }) : { hold: leg.end })).map(([x, z]) => ({ x, z, a: 0 }));
         cur.k = 0;
         this._prepCrossings();
       }
@@ -120,7 +123,7 @@ export class Autopilot {
   _lineup(e) {
     const ac = this.ac, p = toRunway(e, ac.pos.x, ac.pos.z);
     const [lx, lz] = fromRunway(e, Math.max(p.s, 0) + 22, 0);
-    this.sub = 'lineup';
+    this.sub = 'lineup'; this._luT = ac.time;
     this.cur.path = [{ x: ac.pos.x, z: ac.pos.z, a: 0 }, { x: lx, z: lz, a: 0 }, { x: e.far[0], z: e.far[1], a: 0 }];
     this.cur.k = 0;
   }
@@ -272,6 +275,8 @@ export class Autopilot {
         this.recovering = false; this.replan();
       } else {
         this.phase = 'RECOVERY';
+        // STORY2: a latched lever too low to climb away on kept it in RECOVERY at ~30 m for minutes: take it back
+        if (low && ac.vs < 0.5 && this.playerThrottle != null && (this._recLow = (this._recLow || 0) + dt) > 2) { this.wantThrottleAuto = true; this._recLow = 0; }
         if (Math.abs(ac.bank) > 0.5 || ac.pitch < -0.12) return this._upsetOut(dt);
         t.air = true; t.bank = 0; t.thr = 1; t.flaps = Math.min(this.out.flaps, 1 / 3);
         // low down: climb away at once (full power climbs from ~1.15 Vs); never settle back onto the ground
@@ -450,29 +455,45 @@ export class Autopilot {
   landAt(plan) {
     if (!plan?.route) return false;
     if (!this._landPrev) this._landPrev = { route: this.route, i: this.i };
-    this.landing = plan; this.tgo = false; this.wantThrottleAuto = true; this._landDown = false;
+    this.landing = plan; this.tgo = false; this.wantThrottleAuto = true; this._landDown = false; this._landGAs = 0;
     this.setRoute(plan.route);
     this._emit('replan', { to: 'land', label: plan.label });
     return true;
   }
   cancelLand() {
-    const prev = this._landPrev;
+    let prev = this._landPrev;
     this.landing = null; this._landPrev = null;
     if (!prev?.route) return false;
+    // the player never flies back onto an AI departure (it ends in despawn): circuits on that runway instead
+    if (this.isPlayer && prev.route.legs.some((l) => l.kind === 'despawn')) {
+      const end = prev.route.legs.find((l) => l.kind === 'takeoff')?.end ?? allRunwayEnds().find((e) => !e.rw.closed)?.id;
+      prev = { route: circuitRoute(end, this._circOpts()), i: 1 };
+    }
     this.route = prev.route; this.i = prev.i; this.done = false; this.override = null;
     this._begin(true); this.replan();
     this._emit('landcancel', {});
     return true;
   }
 
-  // The route to carry on with from a takeoff on `end`: this route's takeoff leg if it has one, else a departure.
+  // The route to carry on with from a takeoff on `end`: this route's (or, after LAND, the pre-LAND route's) takeoff leg,
+  // else a departure for AI. FLIGHTFIX3: the player never gets an AI departure (it ends in `despawn` = GONE ~10 km
+  // out): a LAND plan has no takeoff leg, so DEMAND TAKEOFF used to fall through to one. The player flies circuits.
   _takeoffRoute(end) {
-    const legs = this.route?.legs || [];
-    const ti = legs.findIndex((l) => l.kind === 'takeoff');
-    if (ti >= 0) return { route: this.route, i: ti, override: legs[ti].end === end ? null : { end } };
+    const usable = (r) => r && r.legs.some((l) => l.kind === 'takeoff') && !(this.isPlayer && r.legs.some((l) => l.kind === 'despawn'));
+    const r0 = [this.route, this._landPrev?.route].find(usable);
+    if (r0) {
+      const ti = r0.legs.findIndex((l) => l.kind === 'takeoff');
+      if (r0.legs[ti].end === end) return { route: r0, i: ti, override: null };
+      if (!r0.name?.startsWith('circuits')) return { route: r0, i: ti, override: { end } };   // a story route: just this end
+    }
+    if (this.isPlayer || r0) {
+      const r = circuitRoute(end, this._circOpts());
+      return { route: r, i: r.legs.findIndex((l) => l.kind === 'takeoff'), override: null };
+    }
     const r = departureRoute(end);
     return { route: r, i: r.legs.findIndex((l) => l.kind === 'takeoff'), override: null };
   }
+  _circOpts() { return this.route?.circ || this._landPrev?.route?.circ || { type: this.ac.type }; }
 
   // D21 DEMAND TAKEOFF: taxi straight to the nearest usable runway start and go — no queue, no clearance.
   // ends: candidate runway ends (default 09/27's); prefer: the active end (others cost 25 % more).
@@ -495,14 +516,40 @@ export class Autopilot {
         if (!best || L < best.L) best = { id, L, entry: [en.x, en.z] };
       }
     }
+    // FLIGHTFIX3: a royal shortcut — straight across the grass onto the runway (≤ 450 m, clear of buildings/water,
+    // runway left ≥ minRun) when that beats the taxiways (from the terminal stands it is ~230 m straight ahead)
+    for (const id of ends) {
+      const e = runwayEnd(id), p = toRunway(e, ac.pos.x, ac.pos.z);
+      if (Math.abs(p.l) < e.width) continue;   // already on it: handled above
+      const sIn = clamp(p.s + Math.min(60, Math.abs(p.l) * 0.4), 0, e.len);   // meet the centreline at an angle: a smaller line-up turn
+      const [ex, ez] = fromRunway(e, sIn, 0), d = Math.hypot(ex - ac.pos.x, ez - ac.pos.z);
+      if (e.len - sIn < Math.min(minRun, Math.max(350, (typeInfo(ac.type).performance?.takeoffRollM ?? 290) * 1.8)) || d > 450 || !this._directClear(ac.pos.x, ac.pos.z, ex, ez)) continue;
+      let L = d * 1.1 + 60 + (Math.abs(wrap180(bearing(ac.pos.x, ac.pos.z, ex, ez) - ac.heading)) > 100 ? 80 : 0);
+      if (busy(ex, ez)) L += 500;
+      if (prefer && id !== prefer) L = L * 1.25 + 50;
+      if (!best || L < best.L) best = { id, L, entry: [ex, ez], direct: true };
+    }
     if (!best) return false;
     const T = this._takeoffRoute(best.id);
     this.landing = null; this._landPrev = null;
     this.route = T.route; this.i = T.i; this.done = false; this.override = T.override;
-    this.demand = true; this.demandEntry = best.entry; this.wantThrottleAuto = true;
+    this.demand = true; this.demandEntry = best.entry; this.demandDirect = !!best.direct; this.wantThrottleAuto = true;
     this._begin(true);
-    this._emit('demand', { end: best.id, entry: best.entry });
+    this._emit('demand', { end: best.id, entry: best.entry, direct: !!best.direct });
     return best.id;
+  }
+
+  // a straight ground run from (x0,z0) to (x1,z1): no building/collider (8 m margin) or water on the way
+  _directClear(x0, z0, x1, z1) {
+    const env = this.traffic?.env, d = Math.hypot(x1 - x0, z1 - z0);
+    if (!env) return false;
+    for (let k = 0; k <= d; k += 4) {
+      const x = x0 + (x1 - x0) * k / d, z = z0 + (z1 - z0) * k / d, sf = env.surfaceAt?.(x, z);
+      if (sf === 'water' || sf === 'building') return false;
+      for (const b of env.colliders || []) if (x > b.min[0] - 8 && x < b.max[0] + 8 && z > b.min[2] - 8 && z < b.max[2] + 8) return false;
+      if (env.treeTop && env.treeTop(x, z, 6) > -1e8) return false;   // main.js treeTop: -Infinity = no tree
+    }
+    return true;
   }
 
   // D22 skip to runway: lined up on `end` at once, waiting for the takeoff clearance as if we had taxied there.
@@ -517,6 +564,51 @@ export class Autopilot {
     this._emit('skiptorunway', { end });
     return true;
   }
+
+  // FLIGHTFIX3: DEMAND TAKEOFF from a field — turn onto a clear run right here and go, then fly `end`'s circuit
+  // (no 2 km grass taxi, no teleport). world: the planner world (trees!). false = no clear run: the caller decides.
+  fieldTakeoff({ world = null, end = null, need = null } = {}) {
+    const ac = this.ac;
+    if (!ac.onGround || !world) return false;
+    const book = typeInfo(ac.type).performance?.takeoffRollM ?? 290;
+    const run = takeoffRun(world, { x: ac.pos.x, z: ac.pos.z, heading: ac.heading, need: need ?? Math.round(book * 1.35 + 40) });
+    if (!run) return false;
+    const ends = allRunwayEnds().filter((x) => !x.rw.closed);
+    end = end || ends[0]?.id;
+    const [ux, uz] = [Math.sin(run.heading * DEG), -Math.cos(run.heading * DEG)];
+    const e = { id: 'FIELD', virtual: true, label: 'FIELD', hdg: run.heading, u: [ux, uz], thr: run.start, far: run.end, len: run.length, width: 24, elev: run.elev };
+    const circ = this._circOpts(), c = circuitRoute(end, circ);
+    this.landing = null; this._landPrev = null;
+    this.route = { ...c, name: c.name, legs: [{ kind: 'takeoff', end: e, alt: 60, label: 'TAKEOFF' }, ...c.legs], loop: 1 };
+    this.i = 0; this.done = false; this.override = null;
+    this.demand = true; this.demandEntry = null; this.wantThrottleAuto = true;
+    this._begin(true);
+    this._emit('demand', { end: 'FIELD', heading: run.heading, run: Math.round(run.length) });
+    return run;
+  }
+
+  // FLIGHTFIX3: airborne after a teleport (main's last-resort field hop): drop LAND and fly `end`'s circuit from here.
+  resumeCircuit(end = null) {
+    end = end || allRunwayEnds().find((x) => !x.rw.closed)?.id;
+    const c = circuitRoute(end, this._circOpts());
+    this.landing = null; this._landPrev = null; this.demand = false;
+    this.route = c; this.i = 1; this.done = false; this.override = null;
+    this._begin(true); this.replan({ noLand: true });
+    return true;
+  }
+
+  // FLIGHTFIX3: taxi to a stand (Hard's terminal finish) from wherever we stopped, then park. GAMEFIX calls it.
+  taxiIn({ stand = 'auto' } = {}) {
+    const ac = this.ac;
+    if (!ac.onGround || ac.crashed) return false;
+    const sid = stand === 'auto' ? this.traffic?.claimStand?.(ac) || 'S1' : (this.traffic?.claimStand?.(ac, stand) || stand);
+    const circ = this._circOpts();
+    this.landing = null; this._landPrev = null; this.demand = false; this.demandEntry = null;
+    this.setRoute({ name: 'taxi in', legs: [{ kind: 'taxi', dest: { stand: sid }, label: 'TAXI IN' }, { kind: 'park', seconds: 1e9, label: 'PARKED' }], loop: null, circ });
+    this._emit('taxiin', { stand: sid });
+    return sid;
+  }
+  get taxiingIn() { return this.route?.name === 'taxi in' && this.leg?.kind === 'taxi' && !this.done; }
 
   // The active runway changed: same kind of route for `end`, rejoined from here. Rolling/landing planes are left alone.
   changeRunway(end, oldEnd = null) {
@@ -539,7 +631,7 @@ export class Autopilot {
   // ATC: the next landing is a touch-and-go (true) or a full stop (false).
   touchAndGo(on = true) { this.tgo = !!on; }
   rejectTakeoff(reason = 'rejected') {
-    if (this.demand || this.leg?.kind !== 'takeoff' || !this.ac.onGround || !['lineup', 'roll', 'rotate', 'ready'].includes(this.sub)) return false;
+    if (this.demand || this.cur?.e?.virtual || this.leg?.kind !== 'takeoff' || !this.ac.onGround || !['lineup', 'roll', 'rotate', 'ready'].includes(this.sub)) return false;
     this.sub = 'reject'; this._emit('reject', { reason });
     return true;
   }
@@ -560,7 +652,7 @@ export class Autopilot {
   }
 
   _mayEnterRunway(e, roll = false) {
-    if (this.overridden || this.demand) return true;
+    if (this.overridden || this.demand || e.virtual) return true;
     if (this.gate) return this.gate({ kind: 'hold', end: e.id, takeoff: true, roll }, this);
     return !this.traffic || this.traffic.runwayClear(e.id, this.ac);
   }
@@ -600,7 +692,8 @@ export class Autopilot {
       else if (Math.abs(wrap180(pr.hdg - ac.heading)) > 60 && ac.speed < 2) vt = Math.min(vt, 0.8);
       if (this.mischief === 'speed') vt = Math.max(vt, this._naughtyTaxi(pr));
       else if (this.isPlayer) vt = Math.max(vt, Math.min(this._gnd.turn < 1 ? 8 : 10, this._naughtyTaxi(pr)));
-      if (this.demand && pr.toEnd < 30) vt = Math.max(vt, 4);
+      if (this.demand && pr.toEnd < 30) vt = Math.max(vt, 4 * Math.min(1, this._gnd.turn * 1.25));   // rolling start
+      if (this.demand && this._gnd.turn < 0.5) vt = Math.min(vt, 1.4 + Math.sqrt(2 * 0.7 * Math.max(0, pr.toEnd - 25)));   // FLIGHTFIX3: a narrow track (bathtub) arrives slow: the line-up turn tips it past ~1.6 m/s
       this._holdLbl = null;
       vt = this._groundLimit(this._crossingLimit(pr, vt));
       t.gHeading = pr.hdg; t.gSpeed = this._holdingPos() ? 0 : vt;
@@ -630,7 +723,10 @@ export class Autopilot {
       this._setPhase('LINE UP');
       const pr = this._pursue(this.cur.path, 13);
       t.gHeading = pr.hdg; t.gSpeed = (this.demand ? 6 : 4.5) * this._gnd.turn; t.flaps = 0;
-      const p = toRunway(e, ac.pos.x, ac.pos.z), k = this.demand ? 2.5 : 1;   // DEMAND: a rolling start
+      const herrL0 = Math.abs(wrap180(pr.hdg - ac.heading)), tip = this._gnd.turn < 0.5 ? (herrL0 > 45 ? 1.4 : 2) : 9, herrL = Math.abs(wrap180(pr.hdg - ac.heading));   // FLIGHTFIX3: the bathtub tips past ~1.6 m/s in a turn
+      if ((this.demand || e.virtual) && herrL > 20 && ac.speed > tip + 0.5) { t.gHeading = ac.heading; t.thr = 0; t.brakeOverride = 0.8; }   // brake straight (firmly: it once rolled on at 3 m/s for a minute), then turn
+      if ((this.demand || e.virtual) && herrL > 20) t.gSpeed = Math.min(t.gSpeed, tip, e.virtual && herrL > 25 ? 4 * this._gnd.turn : 3.5 * Math.max(this._gnd.turn, 0.6));   // field: turn round tight onto the run
+      const p = toRunway(e, ac.pos.x, ac.pos.z), k = this.demand ? (ac.time - (this._luT ?? ac.time) > 20 ? 4 : 2.5) : 1;   // DEMAND: a rolling start (looser after 20 s: never fiddle for a minute)
       if (Math.abs(p.l) < 2.5 * k && Math.abs(wrap180(e.hdg - ac.heading)) < 6 * k) { this.sub = this._mayEnterRunway(e, true) ? 'roll' : 'ready'; this.cur.k = 0; if (this.sub === 'roll') this._emit('takeoffroll', { end: e.id }); }
       return;
     }
@@ -641,13 +737,14 @@ export class Autopilot {
       t.gHeading = pr.hdg; t.gSpeed = 99; t.thr = 1; t.flaps = 0; t.elev = -0.05;
       // taildragger: stick back to keep the tail wheel planted, then forward to fly the tail up at ~0.8 Vr
       if (ac.taildragger) t.elev = ac.speed > 0.8 * P.vr ? clamp((0.035 - ac.pitch) * 5 - ac.w.x * 1.5, -0.7, 0.3) : 0.25;
-      if (ac.speed >= P.vr) this.sub = 'rotate';
+      if (ac.speed >= P.vr * (e.virtual ? 0.9 : 1)) this.sub = 'rotate';   // grass: soft-field, off a little early
       return;
     }
     if (this.sub === 'rotate') {
       this._setPhase('ROTATE');
       t.air = true; t.pitch = 0.14; t.bank = 0; t.thr = 1; t.flaps = 0; t.rudHeading = pr.hdg; t.elevMin = ac.onGround && ac.pitch < 0.1 ? 0.8 : null;
       if (ac.taildragger) { t.pitch = 0.11; t.elevMin = ac.onGround && ac.pitch < 0.07 ? 0.3 : null; }
+      if (e.virtual && !ac.onGround) t.pitch = 0.17;   // grass: climb straight out of ground effect
       if (!ac.onGround && ac.agl > 4) this.sub = 'climb';
       return;
     }
@@ -655,7 +752,14 @@ export class Autopilot {
     this.demand = false; this.demandEntry = null;
     t.air = true; t.thr = 1; t.flaps = 0; t.speed = P.vy; t.vs = 6;
     t.bank = this._bankFor(pr.hdg, ac.agl < 60 ? 8 : 20);
-    if (ac.agl > (leg.alt ?? 110)) this._next();
+    if (ac.agl > (leg.alt ?? 110)) {
+      if (!e.virtual) return this._next();
+      // off a field: straight into the circuit, from wherever we are. The virtual FIELD end goes with the leg (it must
+      // never reach ATC / traffic / a later replan — tiger-hard: traffic.runwayFree threw on it and froze the sim)
+      const r = this.route;
+      this.route = { ...r, legs: r.legs.slice(1), loop: 0 }; this.i = 0; this.override = null;
+      this._begin(true); this.replan({ noLand: true });
+    }
   }
 
   _fly(t, leg) {
@@ -691,6 +795,9 @@ export class Autopilot {
       t.vs = clamp((sep.alt - ac.alt) * 0.15, -4, 5);
       if (sep.slow) t.speed = Math.min(t.speed, Math.max(this._vstall() * 1.35, this._kt(64)));
     }
+    // a latched lever that cannot hold the path near the ground (slow, or sinking while the path is level) goes back
+    // to the AP before the field arrives (the lever would fly it into the ground — FLIGHTFIX3 #6 lets the speed float)
+    if (this.playerThrottle != null && !this.manualNow && ac.agl < 60 && t.vs > -1 && (ac.speed < this._vstall() * 1.3 || ac.vs < -2)) this.wantThrottleAuto = true;
     if (!(this._floorT > ac.time - 0.5)) { this._floorT = ac.time; this._floor = this._terrainFloor(pr.hdg, leg.clearance ?? (this.landing ? 35 : 120)); }
     const floor = this._floor;
     if (floor != null && ac.alt < floor + 40) {
@@ -747,7 +854,13 @@ export class Autopilot {
       if (this.landing && ac.groundTime > 0.3) t.flaps = 0;
       t.gSpeed = 7;
       t.brakeOverride = ac.noseDown && ac.speed > 9 ? clamp(0.25 + (ac.speed - 9) * 0.03, 0, 0.75) : null;
-      if (ac.taildragger) { t.elev = ac.tailDown ? 0.7 : ac.speed < P.vr ? 0.35 : this.landing ? clamp((0.03 - ac.pitch) * 6, -0.4, 0) : 0; t.brakeOverride = ac.tailDown && ac.speed > 9 ? clamp(0.15 + (ac.speed - 9) * 0.02, 0, 0.4) : ac.tailDown ? null : 0; }
+      if (ac.taildragger) {
+        t.elev = ac.tailDown ? 0.7 : ac.speed < P.vr ? 0.35 : this.landing ? clamp((0.03 - ac.pitch) * 6, -0.4, 0) : 0;
+        // FLIGHTFIX3 (LAND): a fast wheel landing keeps the tail flying (no lift) until the wing can no longer fly at
+        // the 3-point attitude; then the tail comes down, never pulled past it (a 44 kt tail-down pull hopped 0.9 m / 2.4 s)
+        if (this.landing) t.elev = !ac.tailDown && ac.speed > P.vs0 ? clamp((0.01 - ac.pitch) * 6, -0.5, 0) : ac.speed < P.vs0 * 0.85 ? 0.7 : clamp((P.groundPitch - 0.01 - ac.pitch) * 25, -0.4, 0.5);
+        t.brakeOverride = ac.tailDown && ac.speed > 9 ? clamp(0.15 + (ac.speed - 9) * 0.02, 0, 0.4) : ac.tailDown ? null : 0;
+      }
       if (pr.toEnd < 40) t.gHeading = e.hdg;   // past the end of the path the pursuit point swings round
       if (this.landing && ac.speed > 3) t.brakeOverride = Math.max(t.brakeOverride ?? 0, ac.taildragger ? (ac.tailDown ? 0.4 : 0) : ac.noseDown ? 0.6 : 0);   // LAND: stop briskly
       if (this.landing && ac.speed > 3 && pr.toEnd < (ac.speed * ac.speed) / 3 + 30) t.brakeOverride = Math.max(t.brakeOverride ?? 0, ac.taildragger ? (ac.tailDown ? 0.45 : 0.1) : 0.7);
@@ -843,6 +956,7 @@ export class Autopilot {
   _goAround(reason) {
     // LAND is a royal command: the tower's go-around is noted and ignored (ATC sees the landing for what it is)
     if (this.landing && /^Tower/.test(reason) && this.cur?.e && !this._touchdownZoneBusy(this.cur.e)) { this._emit('goaroundrefused', { reason }); return; }
+    if (this.landing) this._landGAs = (this._landGAs || 0) + (/occupied/.test(reason) ? 2 : 1);   // occupied: land long next time round
     this.tgo = false;
     this.sub = 'goaround';
     this._emit('goaround', { reason });
@@ -857,7 +971,7 @@ export class Autopilot {
 
   // ---------- replanning ----------
   // Called when the player lets go (or after a go-around / recovery). Works from wherever the aircraft is now.
-  replan() {
+  replan({ noLand = false } = {}) {
     const ac = this.ac;
     if (!this.route) return;
     this.recovering = false;
@@ -880,7 +994,7 @@ export class Autopilot {
     }
     if (this.landing) return this._landReplan();
     // airborne: are we set up to land somewhere? ("cut in on final and the autopilot lands you there")
-    const land = this._landableEnd();
+    const land = !noLand && this._landableEnd();
     if (land) {
       let ai = legs.findIndex((l) => l.kind === 'approach' && l.end === land.id);
       if (ai < 0) ai = legs.findIndex((l) => l.kind === 'approach');
@@ -944,6 +1058,24 @@ export class Autopilot {
   }
   // A short circuit back onto the plan's final, on the side the plane is already on.
   _landCircuit(e) {
+    // FLIGHTFIX3: gone round for an occupied runway (or twice for anything): a plane parked in the touchdown zone kept a
+    // LAND circling for 5 min. Land long,
+    // past whoever is sitting on the runway, when enough of it is left; the virtual end keeps the runway's id
+    if ((this._landGAs || 0) >= 2 && e.rw) {
+      if (e.virtual) e = runwayEnd(e.id);   // always measured on the real runway
+      let sMax = -1e9;
+      for (const o of this.traffic?.list || []) {
+        if (o.ac === this.ac || !o.ac.onGround || o.ac.crashed) continue;
+        const q = toRunway(e, o.ac.pos.x, o.ac.pos.z);
+        if (q.s > -30 && q.s < e.len && Math.abs(q.l) < (e.width || 30) / 2 + 8) sMax = Math.max(sMax, q.s);
+      }
+      const s0 = sMax + AIM_DIST + 90, left = e.len - s0;   // the busy check looks from 30 m before the (virtual) threshold
+      if (sMax > -1e9 && left >= 450) {
+        const [tx, tz] = fromRunway(e, s0 - AIM_DIST, 0);
+        e = { ...e, virtual: true, thr: [tx, tz], len: left + AIM_DIST };
+        this._emit('landlong', { end: e.id, at: Math.round(s0) });
+      }
+    }
     const ac = this.ac, k = typeInfo(ac.type).circuitScale ?? 1;
     const p = toRunway(e, ac.pos.x, ac.pos.z), sg = Math.abs(p.l) > 40 ? Math.sign(p.l) : -1;
     const W = 750 * k, F = 1100 * Math.max(k, 0.8), A = e.elev + Math.max(110, 190 * k * k);
@@ -1037,7 +1169,12 @@ export class Autopilot {
       const gMax = Math.asin(clamp((thrMax - D) / W, -0.5, 0.5)) + sp;
       const gMin = Math.asin(clamp((thrMin - D) / W, -0.5, 0.5)) - 0.05 + sp;
       let gamma = Math.asin(clamp(t.vs / V, -0.4, 0.4));
-      if (!t.free) gamma = clamp(gamma, Math.min(gMin, gMax), Math.max(gMin, gMax));
+      // FLIGHTFIX3 (STORY2): a latched lever flies the path and lets the speed float (it used to zoom-climb to hold the
+      // leg speed); only near the stall or well over cruise does the path give way
+      if (!t.free && t.thr == null && this.playerThrottle != null) {
+        if (V < this._vstall() * 1.3) gamma = Math.min(gamma, gMax);
+        else if (V > P.vcruise * 1.2) gamma = Math.max(gamma, gMin);
+      } else if (!t.free) gamma = clamp(gamma, Math.min(gMin, gMax), Math.max(gMin, gMax));
       pitchT = gamma + alphaReq * Math.cos(bank);
       this.iPitch = clamp(this.iPitch + (t.vs - ac.vs) * dt * 0.004, -0.05, 0.05);
       pitchT += this.iPitch;

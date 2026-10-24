@@ -155,6 +155,25 @@ narrower than ~48 m could be missed (none exists today).
   itself still toggles (second tap cancels). `land.nowShown`.
 - Plans for a remaining-runway or slid touchdown use a virtual end object with the runway id (`virtual: true`).
 
+## 3d. FLIGHTFIX3 (2026-10-23)
+- **Home circuit = runway (PLAYTEST_3 #3).** `homeRunways()`: a runway within 2.3 km of the plane (downwind 0.8–1.15 km
+  out, base ≤ 1.8 km past the threshold), ≥ 50 m AGL and not climbing out along its axis, is a candidate outside the
+  ±35° cone, both ends. Low (< 120 m) such a runway's circuit beats a straight field (−4000 instead of +5000), and a
+  straight field ranks +1200 behind a straight runway (was +300). The end whose own downwind the plane is on (its
+  `layout.CIRCUIT` side, flying the reciprocal) gets −800, as does `opts.prefer` (an end id: main may pass the active
+  end; not wired). Aaron's 5–15 m straight-ahead cases (flight-sim `aaron`) are unchanged (< 50 m: no home runways).
+- **`takeoffRun(world, { x, z, heading, need, climb })`** → `{ heading, length, start, end, elev, turn }` or null: the
+  field-takeoff scan for `ap.fieldTakeoff` (FLIGHT.md FLIGHTFIX3), same Field cache and run rules as the strip scan.
+- **LAND NOW with nothing straight ahead**: a field plan (any pattern, home runways off) before the ordinary plan;
+  either way the plan is marked `nowFallback` and LAND NOW is not offered again for it (it used to stay lit and do
+  nothing — the loop suite's "no effect after 3 tries").
+- **landbutton.js**: a LAND tap within 0.7 s of LAND going active, or of LAND moving (LAND NOW shows/hides and slides it
+  58 px), is ignored — it was cancelling the plan (the finger that hit LAND NOW lands on LAND).
+- For GAMEFIX: `ap.taxiIn({ stand })` / `ap.taxiingIn` (Hard taxi-in), `ap.fieldTakeoff({ world, end })` (main's
+  `fieldHop` now calls it), `ap.resumeCircuit(end)`.
+- Tests: landahead.test.mjs 36 (+15: circuit picks for 3 types × 4 legs, low short final, climb-out, takeoffRun runs
+  clear); 13 of the new ones fail on the HEAD planner; `--falsify` still fails 5.
+
 ## 4. Tests (2026-10-22, after WORLD r2)
 ```
 node js/assist/test/landahead.test.mjs            # node, fake world with r2-style rolling ground + castle hill

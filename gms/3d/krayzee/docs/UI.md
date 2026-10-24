@@ -60,7 +60,7 @@ setCareer(career)   refreshProfile()   getRankProgress()  // { rankIndex, rankTi
 | `hand` | `'left'\|'right'` | `'left'` | derived from `stickRight` (= the stick's side) for round-1 code; never stored |
 | `views` | ordered subset of `['chase','center','cockpit']`, ≥ 1 | all three | D11: views the in-game button cycles (always in that order). One view = fixed view, hide the button |
 | `view` | one of `views` | `'chase'` | current view; always a member of `views` (else `views[0]`) |
-| `difficulty` | `'easy'\|'medium'\|'hard'` | `'easy'` | Free Flight difficulty (D19) = protection Rubber / Partial / Realistic (`core/wiring.js`). GAMEPLAY's chips save it too |
+| `difficulty` | `'easy'\|'medium'\|'hard'` | `'easy'` | Difficulty for Free Flight and Story (D19; Settings label "Difficulty") = protection Rubber / Partial / Realistic (`core/wiring.js`). GAMEPLAY's chips save it too |
 | `hints` | bool | `true` | "Opportunity hints": `js/hud/prompts.js` rule-break prompts |
 | `trafficMarkers` | bool | `true` | D12 tags/edge arrows for other aircraft |
 | `aiMischief` | `'off'\|'low'\|'high'` | `'low'` | AI rule-breaking; same ids as ATC `MISCHIEF` (`linkTraffic(..., { mischief })`, `link.setMischief(v)`) |

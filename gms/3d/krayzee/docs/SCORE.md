@@ -6,8 +6,8 @@ Pure ES modules: no DOM, no clock (time only moves through `update(dt)`), all nu
 `data/ranks.js`, `data/modes.js`, `data/aircraft.js`.
 
 ```
-node tools/score-sim.mjs            # 187 assertions + 30 h pacing sim
-node tools/score-sim.mjs --falsify  # breaks 18 rules in scratch copies; every break must make the suite fail
+node tools/score-sim.mjs            # 194 assertions + 30 h pacing sim
+node tools/score-sim.mjs --falsify  # breaks 21 rules in scratch copies; every break must make the suite fail
 ```
 
 ## API
@@ -75,6 +75,9 @@ game.bank();                                  // force a bank (mission end)
   is taken before it is added.
 - Banking: pending → banked when stopped < 2 kt for 2 s on runway/taxiway/apron after a landing, or at a stand.
   Landing = `onGround` true after `onGround:false` (or a `landed` event). Grass stop does not bank.
+  The fallback auto-bank (`autoBank`, Free Flight 15 s) also needs the D19 finish zone: `update(dt, { finishOk })`
+  (wiring passes `finishZone(difficulty, pos).ok`); without `finishOk`, Hard needs `atStand`. So Hard never banks
+  silently on a runway (GAMEFIX). Every bank on the ground refuels (main.js `banked` listener), not only DEMAND IT.
 - Rubber: every contact bounces, restitution 0.55, spin ±120°/s, AP after 2 s, −15 % pending, +8 outrage.
   Partial: same bounce with restitution scaled by protection *before* the hit (100 → 0.55, 10 → 0.1, linear, → 0 below
   10), then protection −clamp(kt × 0.8, 5, 60) %. I also apply Rubber's −15 % pending/+8 outrage per Partial bounce

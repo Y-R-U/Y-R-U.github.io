@@ -71,6 +71,26 @@ section('D19 LANDED — DEMAND IT (finish zones, demand(), autoBank fallback)');
   landAndStop(h, 'runway'); eq(h.state().banked, 0, 'Free Flight fallback: not after 2.5 s');
   for (let i = 0; i < 130; i++) h.update(0.1, { onGround: true, gsKt: 0, surface: 'runway' });
   eq(h.state().banked, 250, 'Free Flight fallback: banks after a 15 s stop');
+  // GAMEFIX #1: the fallback respects the difficulty's finish zone — no silent runway bank on Hard
+  const stop = (x, secs, f) => { for (let i = 0; i < secs * 10; i++) x.update(0.1, { onGround: true, gsKt: 0, ...f }); };
+  const hard = game({ autoBank: 15, difficulty: 'hard' }); hard.handleEvent(inf('low_pass', { outrage: 0 }));
+  landAndStop(hard, 'runway'); stop(hard, 60, { surface: 'runway' });
+  ok(hard.state().banked === 0 && hard.state().pending === 250, 'Hard fallback: 60 s stopped on the runway never banks');
+  stop(hard, 60, { surface: 'runway', finishOk: false });
+  eq(hard.state().banked, 0, 'Hard fallback: finishOk false (wiring) never banks');
+  stop(hard, 16, { surface: 'apron', atStand: true });
+  eq(hard.state().banked, 250, 'Hard fallback: banks after 15 s at a stand');
+  const hz = game({ autoBank: 15, protection: 'realistic' }); hz.handleEvent(inf('low_pass', { outrage: 0 }));
+  landAndStop(hz, 'apron'); stop(hz, 16, { surface: 'apron', finishOk: true });
+  eq(hz.state().banked, 250, 'Hard (realistic room) fallback: banks inside the finish zone (finishOk)');
+  const med = game({ autoBank: 15, difficulty: 'medium' }); med.handleEvent(inf('low_pass', { outrage: 0 }));
+  landAndStop(med, 'taxiway'); stop(med, 30, { surface: 'taxiway', finishOk: false });
+  eq(med.state().banked, 0, 'Medium fallback: a taxiway stop outside the zone does not bank');
+  stop(med, 16, { surface: 'runway', finishOk: true });
+  eq(med.state().banked, 250, 'Medium fallback: banks on a runway (zone ok)');
+  const ez = game({ autoBank: 15, difficulty: 'easy' }); ez.handleEvent(inf('low_pass', { outrage: 0 }));
+  landAndStop(ez, 'runway'); stop(ez, 16, { surface: 'runway' });
+  eq(ez.state().banked, 250, 'Easy fallback without finishOk: runway stop banks as before');
   const m = game({ autoBank: false }); m.handleEvent(inf('low_pass', { outrage: 0 }));
   m.update(0.1, { onGround: false, gsKt: 60 }); m.update(0.1, { onGround: true, gsKt: 30, surface: 'runway' });
   ok(m.demand().reason === 'Come to a stop', 'rolling fast: come to a stop');
@@ -252,7 +272,7 @@ section('protection: Realistic');
   r = g.reportImpact({ speedKt: 3, onGear: false }); ok(r.result === 'destroyed', 'ground hit outside gear limits = destroyed at any speed');
   ok(G.withinGearLimits({ sinkFpm: 500, bankDeg: 10, pitchDeg: 5 }) && !G.withinGearLimits({ sinkFpm: 950 }) && !G.withinGearLimits({ bankDeg: 30 }) && !G.withinGearLimits({ pitchDeg: -7 }) && !G.withinGearLimits({ pitchDeg: 20 }), 'gear limits 900 fpm / 25° / −5..18°');
   const s = G.createGame({ mode: 'strict', career: false });
-  s.handleEvent(inf('apron_landing', { outrage: 0 })); landAndStop(s);
+  s.handleEvent(inf('apron_landing', { outrage: 0 })); landAndStop(s, 'apron', true);   // Hard banks only in the finish zone (GAMEFIX #1)
   s.reportImpact({ speedKt: 40 }); eq(s.state().banked, 100, 'Strict Tower crash −500 room PP (600 → 100)');
 }
 
@@ -524,6 +544,9 @@ function falsify() {
     { name: 'D30 still shown as Love Tap', file: 'data/rules.js', from: "name: 'Close Call',", to: "name: 'Love Tap'," },
     { name: 'goaroundrefused not scored', file: 'js/game/score.js', from: "else if (ev.type === 'goaroundrefused' && (ev.actor == null || mine(ev))) ignoredGoAround(ev, true);", to: '' },
     { name: 'go-around paid twice (no dedupe)', file: 'js/game/score.js', from: 'if (S.t - S.gaIgnoredAt < INFRACTIONS.ignored_instruction.refusedWindow) return;', to: '' },
+    { name: 'GAMEFIX auto-bank ignores the finish zone', file: 'js/game/score.js', from: "const zoneOk = f.finishOk ?? (difficulty() !== 'hard' || !!f.atStand);", to: 'const zoneOk = true;' },
+    { name: 'GAMEFIX auto-bank Hard default allows runways', file: 'js/game/score.js', from: "(difficulty() !== 'hard' || !!f.atStand)", to: 'true' },
+    { name: 'GAMEFIX auto-bank ignores finishOk from wiring', file: 'js/game/score.js', from: "f.finishOk ?? (", to: '(' },
     { name: 'D19 hard accepts runways', file: 'js/game/finish.js', from: 'const ok = atSpot || (onApron(x, z) && nearStand(x, z));', to: 'const ok = true;' },
   ];
   let allCaught = true;

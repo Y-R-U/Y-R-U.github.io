@@ -3,7 +3,7 @@
 import { createATC } from '../atc/index.js';
 import { linkTraffic } from '../atc/bridge.js';
 import { createRadio, PILOT_VOICES } from '../radio/index.js';
-import { createGame, difficultyFor } from '../game/index.js';
+import { createGame, difficultyFor, finishZone } from '../game/index.js';
 import { DIFFICULTY } from '../../data/rules.js';
 import { RANKS } from '../../data/ranks.js';
 import { STANDS, defaultEnd } from '../world/layout.js';
@@ -86,7 +86,7 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
     const p = ui.getProfile();
     W.radio?.setPlayer(radioProfile());
     W.radio?.setVisible(true);
-    // D19: Free Flight difficulty (settings) → protection; DEMAND IT is the finish, a 15 s stop is only the fallback.
+    // D19: Free Flight difficulty (settings) → protection; DEMAND IT is the finish, a 15 s stop inside the finish zone is only the fallback.
     const roomProt = room && ['rubber', 'partial', 'realistic'].includes(room.protection) ? room.protection : null;
     W.difficulty = roomProt ? difficultyFor({ protection: roomProt }) : difficultyFor({ difficulty: ui.getSettings().difficulty });
     const protection = roomProt || DIFFICULTY[W.difficulty]?.protection || 'rubber';
@@ -150,7 +150,9 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
     if (W.game && P) safe(() => {
       const ac = P.ac;
       const atStand = ac.onGround && STANDS.some((s) => Math.hypot(ac.pos.x - s.position[0], ac.pos.z - s.position[2]) < 12);
-      W.game.update(dt, { gsKt: ac.gs / KT, onGround: ac.onGround, surface: ac.surface, atStand, calm: P.ap && !P.ap.overridden });
+      // the fallback auto-bank only inside this difficulty's D19 finish zone (no silent runway bank on Hard)
+      const finishOk = ac.onGround ? !!finishZone(W.difficulty, { x: ac.pos.x, z: ac.pos.z, surface: ac.surface }).ok : false;
+      W.game.update(dt, { gsKt: ac.gs / KT, onGround: ac.onGround, surface: ac.surface, atStand, finishOk, calm: P.ap && !P.ap.overridden });
     });
   };
   W.activeEnd = () => safe(() => W.atc?.activeRunway().end, null) || defaultEnd();

@@ -162,6 +162,23 @@
   .krz-r-head { padding-bottom: 4px; }
   .krz-r-x { width: 40px; height: 40px; }
 }
+/* GAMEFIX #2: no radio sheet over an action button. main.js sets html[data-krz-act] = rows in the bottom action slot
+   (DEMAND IT, DEMAND TAKEOFF / Skip; about 62 px each, the slot itself sits --krz-act-b0 above the bottom) */
+html[data-krz-act="1"] { --krz-act-h: 70px; }
+html[data-krz-act="2"] { --krz-act-h: 132px; }
+@media (orientation: portrait) {
+  html[data-krz-act="1"] .krz-r-panel, html[data-krz-act="2"] .krz-r-panel {
+    bottom: max(calc(var(--sb) + var(--krz-ctl-bottom, 200px) + 8px), calc(var(--krz-brake-b, 200px) + 84px), calc(var(--sb) + var(--krz-ctl-bottom, 200px) + 66px + var(--krz-act-h)));
+  }
+}
+@media (orientation: landscape) {
+  html[data-krz-act="1"] .krz-r-panel, html[data-krz-act="2"] .krz-r-panel {
+    bottom: calc(var(--sb) + 10px + var(--krz-act-h)); width: min(320px, calc(100% - var(--krz-ctl-left, 190px) - var(--krz-ctl-right, 190px) - 24px));
+    max-height: calc(100% - var(--st) - 20px - var(--krz-act-h));   /* may sit over the AP pill for its few seconds, never over a button */
+  }
+  html[data-krz-act="1"] .krz-r-chips, html[data-krz-act="2"] .krz-r-chips { grid-template-columns: 1fr 1fr; }
+  html[data-krz-act="1"] .krz-r-chip, html[data-krz-act="2"] .krz-r-chip { min-height: 44px; }
+}
 @media (orientation: landscape) and (max-height: 430px) {
   .krz-r-text { font-size: 13px; }
   .krz-r-pill { padding: 4px 9px 5px; }

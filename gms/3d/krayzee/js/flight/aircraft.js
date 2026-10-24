@@ -209,8 +209,10 @@ export class Aircraft {
     if (P.rollWobble && !this.onGround) tz += P.rollWobble.amp * Math.sin(2 * Math.PI * P.rollWobble.hz * this.time) * eff;
     const kt = P.kTrack * (this.onGround ? 0.35 + eff : Math.max(0.4, eff));
     // taildragger on its wheels: weak aerodynamic yaw tracking, so the mains-ahead-of-CG instability shows (it will
-    // ground-loop if you let it) but some damping keeps it catchable with the rudder
-    const td = this.taildragger && this.onGround;
+    // ground-loop if you let it) but some damping keeps it catchable with the rudder. FLIGHTFIX3: only while the tail
+    // wheel is down — tail flying (a wheel landing, the takeoff roll) the fin and rudder work as in the air (a tail-up
+    // rollout at 40–60 kt used to diverge with full opposite rudder and put a wingtip in)
+    const td = this.taildragger && this.tailDown;
     let ay = (ty - this.w.y) * kt * (td ? GL.track : 1);
     if (td) ay -= this.w.y * GL.damp;
     const ax = (tq - this.w.x) * kt, az = (tz - this.w.z) * kt;

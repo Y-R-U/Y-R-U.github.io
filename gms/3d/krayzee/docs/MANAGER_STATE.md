@@ -87,3 +87,15 @@ Open for AIRPORTS (from FLIGHTFIX): treat player with ap.landing as cleared to l
 - HUD4 done + committed: prompt cards top band (0.42 bg) left of warp; difficulty/aircraft chips moved up + fade on any control/chip tap; field-stranded DEMAND TAKEOFF (fieldHop stopgap → wants ap.fieldTakeoff); quit confirm with PP; radio name contrast; SKIP only before first liftoff; skip keeps demand. test-hud4 56/56 (manager re-ran). Open: real grass takeoff in AP; HUD4 picked 'any chip fades whole set' (aircraft pick hides difficulty too).
 - 2026-10-23: usage limit hit; LANDFIX2 + STORY2 resumed. Aaron: after current work → testing round; after some testing/fixing, PAUSE and wait for Aaron to test before continuing. Launched LOOPTEST (9636) to build tools/test-loop.mjs end-to-end suite.
 - 2026-10-23: LANDFIX2 committed (verified: flight-sim 127/127, falsified vs HEAD 15 FAIL+crash; landahead 21/21; score 187/187; atc 103/103; boot smoke clean). fieldTakeoff() not done — fieldHop stays. Waiting on STORY2 + LOOPTEST.
+- 2026-10-23: TESTING ROUND (D31). LOOPTEST committed (8369b0f1). Quick rerun on LANDFIX2 HEAD still red:
+  - player gets an AI departure ending in despawn after DEMAND TAKEOFF;
+  - LAND on downwind picks a FIELD;
+  - Hard has no finish (silent runway auto-bank);
+  - Bathtub field takeoff 62 s.
+  Launched:
+  - FLIGHTFIX3 (9655): route, LAND runway choice, Tiger grass wingtip, ap.fieldTakeoff replacing fieldHop, Hard taxi-in.
+  - GAMEFIX (9657): Hard auto-bank, radio chips covering buttons, herald over DEMAND TAKEOFF, prompt card vs AP pill overlap, skip-on-Hard-taxi, settings label.
+  STORY2 resumed: M4 7/10 on my verify, plus M3 --falsify=crime passed (hole), plus warp-refused feedback. STORY2 still uncommitted.
+  After these: full matrix, then PAUSE for Aaron's testing.
+- 2026-10-25: STORY2 committed after manager verify (M1 17/17, M2 16/16, M3 16/16, M4 16/16 portrait+landscape, M3 --falsify=crime goes red 15/16, picker 8/8, warp 6/6). GAMEFIX done, verified score-sim 194/194; held for a joint commit with FLIGHTFIX3 (shared main.js). FLIGHTFIX3 still running.
+- 2026-10-25: FLIGHTFIX3 + GAMEFIX combined verify: flight 153/153, landahead 36/36, score 194/194 (+falsify), atc 103/103, hud4 gamefix 18/18 (manager edit to demandTaxiOut forcing taxi fallback; falsify red). Full matrix 15/18. Tiger-hard field DEMAND TAKEOFF threw routes.js runwayEnd 'no runway end' → FREEZE. Also tiger-medium-landscape LAND no touchdown 300 s, bathtub-hard-landscape field takeoff 62 s. Sent back to FLIGHTFIX3; nothing committed until green.

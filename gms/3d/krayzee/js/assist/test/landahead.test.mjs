@@ -1,6 +1,7 @@
 // node js/assist/test/landahead.test.mjs [--falsify] [--n=400]
 // --falsify hands the planner a flat world with no colliders, trees or water: the safety check MUST then fail.
-import { planLandAhead, LAND } from '../landahead.js';
+import { planLandAhead, LAND, takeoffRun } from '../landahead.js';
+import { circuitLegs } from '../../flight/routes.js';
 import { fakeWorld, layout } from './fakeworld.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
@@ -82,6 +83,35 @@ console.log('nothing suitable / too high');
   ok(!o.fail && o.feasibility.orbits >= 1, 'a bit high → descending orbit planned', JSON.stringify({ f: o.fail, orb: o.feasibility?.orbits }));
   const g = planLandAhead({ pos: [0, 1, 0], vel: [0, 0, -10], heading: 0, world: blind, layout, onGround: true });
   ok(g.fail === 'onGround', 'on the ground → onGround');
+}
+
+console.log('FLIGHTFIX3: the home circuit picks the runway');
+for (const type of ['c172', 'tiger', 'bathtub']) {
+  const L = circuitLegs('27', { type }), mid = (a, b, f) => [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+  for (const [n, q, h] of [['crosswind', mid(L[1].to, L[2].to, 0.9), 90], ['downwind', mid(L[2].to, L[3].to, 0.3), 90], ['late downwind', mid(L[2].to, L[3].to, 0.9), 90], ['base', mid(L[3].to, L[4].to, 0.5), 0]]) {
+    const p = plan(q[0], q[2], q[1], h, 75, world);
+    ok(!p.fail && p.label === 'RWY 27', `${type} ${n} (${q[1].toFixed(0)} m) → RWY 27`, p.fail || `${p.label}/${p.pattern}`);
+  }
+}
+{
+  const p = plan(820, 0, 55, 270, 65, world);   // lined up, 0.8 km out, low: not the field short of it
+  ok(!p.fail && p.label === 'RWY 27' && p.pattern === 'straight', 'low lined-up short final → RWY 27 straight', p.fail || `${p.label}/${p.pattern}`);
+  const c = plan(-1500, 0, 150, 270, 75, world);   // climbing out past the far end: the runway behind is not "home"
+  ok(!c.fail && !(c.kind === 'runway' && c.label === 'RWY 27' && c.pattern !== 'straight'), 'climb-out 150 m → not a circuit back to RWY 27', c.fail || `${c.label}/${c.pattern}`);
+}
+console.log('FLIGHTFIX3: takeoffRun (field takeoff) runs are clear');
+{
+  let found = 0, bad = 0;
+  for (let i = 0; i < 40; i++) {
+    const a = i * 2.4, d = 1300 + (i % 7) * 380, x = Math.cos(a) * d * 1.3, z = Math.sin(a) * d;
+    if (world.surfaceAt(x, z) !== 'grass') continue;
+    const r = takeoffRun(blind, { x, z, heading: (i * 47) % 360, need: 300 });
+    if (!r) continue;
+    found++;
+    const v = stripViolations({ strip: { start: r.start, end: [r.start[0] + (r.end[0] - r.start[0]) * 300 / r.length, r.start[1] + (r.end[1] - r.start[1]) * 300 / r.length] } });
+    if (v.length) { bad++; if (bad < 4) console.log('   run', r.heading, v[0]); }
+  }
+  ok(found >= 5 && bad === 0, `takeoffRun: ${found} runs found from 40 field points, none crosses an obstacle/water or a > 2.5 % grade`, `${bad} bad`);
 }
 
 console.log(`random sweep ×${N}`);

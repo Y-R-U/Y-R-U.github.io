@@ -24,7 +24,7 @@ export function createSettings(root, { onChange, onTitle, onResume, onQuit, onCl
       <div class="kz-row"><span>Invert pitch<small data-say="invertPitch"></small></span><button class="kz-switch" role="switch" data-k="invertPitch" aria-label="Invert pitch"></button></div>
       <div class="kz-row"><span>Stick on right<small data-say="stickRight"></small></span><button class="kz-switch" role="switch" data-k="stickRight" aria-label="Stick on right"></button></div>
       <div class="kz-row"><span>Units</span>${seg('units', [['aviation', 'kt · ft'], ['metric', 'km/h · m']])}</div>
-      <div class="kz-row stack"><span>Free Flight difficulty<small data-say="difficulty"></small></span>${seg('difficulty', [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard']]).replace('kz-seg"', 'kz-seg wide"')}</div>
+      <div class="kz-row stack"><span>Difficulty<small data-say="difficulty"></small></span>${seg('difficulty', [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard']]).replace('kz-seg"', 'kz-seg wide"')}</div>
       <div class="kz-row"><span>Opportunity hints<small>Prompts suggesting the next rule to break</small></span><button class="kz-switch" role="switch" data-k="hints" aria-label="Opportunity hints"></button></div>
       <div class="kz-row"><span>Traffic markers<small>Tags and edge arrows for other aircraft</small></span><button class="kz-switch" role="switch" data-k="trafficMarkers" aria-label="Traffic markers"></button></div>
       <div class="kz-row stack"><span>AI mischief<small data-say="aiMischief"></small></span>${seg('aiMischief', [['off', 'Off'], ['low', 'Low'], ['high', 'High']]).replace('kz-seg"', 'kz-seg wide"')}</div>

@@ -31,7 +31,8 @@ export function createLandButton({ container, onPress, stickRight = false } = {}
   el.innerHTML = `<span class="krz-land-ico">${ICON}</span><span class="krz-land-txt"><b>LAND</b><small></small></span><span class="krz-land-now" role="button" aria-label="Land now, straight ahead">LAND NOW <small>straight ahead</small></span>`;
   const b = el.querySelector('b'), small = el.querySelector('.krz-land-txt small'), now = el.querySelector('.krz-land-now');
   container.appendChild(el);
-  let state = 'idle', reason = '';
+  let state = 'idle', reason = '', guardAt = -1e9;
+  const clock = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
 
   const stop = (e) => e.stopPropagation();
   el.addEventListener('pointerdown', stop);
@@ -43,6 +44,9 @@ export function createLandButton({ container, onPress, stickRight = false } = {}
       armLandNow(); onPress?.('now', reason); nowArmed = false; showNow();
       return;
     }
+    // FLIGHTFIX3: a second tap within 0.7 s of LAND going active, or of LAND moving (LAND NOW showing/hiding slides it
+    // 58 px, so LAND lands under the finger that just hit LAND NOW), is a double tap, not a cancel
+    if (state === 'active' && clock() - guardAt < 700) return;
     if (state === 'unavailable') { el.classList.remove('krz-land-nope'); void el.offsetWidth; el.classList.add('krz-land-nope'); }
     onPress?.(state, reason);
   });
@@ -50,13 +54,14 @@ export function createLandButton({ container, onPress, stickRight = false } = {}
   // shown only while LAND is flying a non-straight pattern (the autopilot marks plan.leg as it goes)
   let nowTimer = 0;
   function showNow() {
-    const on = state === 'active' && !el.hidden && lastPlan && lastPlan.pattern !== 'straight' && lastPlan.leg !== 'approach';
-    if ((el.dataset.now === '1') !== !!on) el.dataset.now = on ? '1' : '0';
+    const on = state === 'active' && !el.hidden && lastPlan && lastPlan.pattern !== 'straight' && !lastPlan.nowFallback && lastPlan.leg !== 'approach';   // a LAND NOW that found nothing straight is not offered again for that plan
+    if ((el.dataset.now === '1') !== !!on) { el.dataset.now = on ? '1' : '0'; guardAt = clock(); }
   }
   function setState(s, why = '') {
     if (s === 'active' && !nowTimer) nowTimer = setInterval(showNow, 400);
     if (s !== 'active' && nowTimer) { clearInterval(nowTimer); nowTimer = 0; }
     if (s === state && why === reason) return showNow();
+    if (s === 'active' && state !== 'active') guardAt = clock();
     state = s; reason = why;
     el.dataset.state = s;
     if (s === 'active') { b.textContent = 'LANDING…'; small.textContent = why || 'touch controls to cancel'; }

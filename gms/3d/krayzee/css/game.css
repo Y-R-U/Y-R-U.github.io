@@ -259,8 +259,13 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
 .krz-prompt.cramped { visibility: hidden; }
 .krz-prompt.done { border-color: var(--krz-auto); }
 .krz-prompt.done .krz-pr-t::after { content: ' ✓'; color: var(--krz-auto); }
-#krz-overlay:has(#krz-hud.krz-flash) .krz-prompt.in { opacity: .3; }
-#krz-ghud:has(> .krz-actions[hidden]) .krz-prompt, #krz-ghud:has(> .krz-actions[hidden]) .krz-chips { visibility: hidden; }
+/* GAMEFIX #4: the card and the AP pill + axes row share the band, so one always wins: a flash banner hides the card,
+   a shown card hides the pill and the axes (Aaron: the card may cover the pills, but must be readable) */
+#krz-overlay:has(#krz-hud.krz-flash) .krz-prompt.in { visibility: hidden; }
+#krz-overlay:has(.krz-prompt.in:not(.cramped)):not(:has(#krz-hud.krz-flash)) #krz-hud .krz-ap,
+#krz-overlay:has(.krz-prompt.in:not(.cramped)):not(:has(#krz-hud.krz-flash)) #krz-hud .krz-axes { visibility: hidden; }
+#krz-ghud:has(> .krz-actions[hidden]) .krz-prompt, #krz-ghud:has(> .krz-actions[hidden]) .krz-chips,
+#krz-ghud.reel-on .krz-prompt, #krz-ghud.reel-on .krz-chips { visibility: hidden; }
 .krz-pr-dir { flex: none; display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 30px; }
 .krz-pr-arrow { width: 22px; height: 22px; flex: none; color: #ffd75e; display: grid; place-items: center; transition: transform .25s linear; filter: drop-shadow(0 1px 2px rgba(0,0,0,.8)); }
 .krz-pr-arrow svg { width: 18px; height: 18px; }
@@ -382,6 +387,12 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
 .krz-reel { position: fixed; inset: 0; z-index: 29; --serif: 'Krayzee Serif', 'Instrument Serif', Didot, 'Bodoni 72', Baskerville, Georgia, serif; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
   pointer-events: none; background: rgba(6,8,14,.5); transition: opacity .35s; }
 .krz-reel.out { opacity: 0; }
+/* GAMEFIX #3: the reel stops above the bottom action slot, so DEMAND TAKEOFF is never under it */
+@media (orientation: portrait) { html[data-krz-act="1"] .krz-reel, html[data-krz-act="2"] .krz-reel { bottom: calc(var(--sb, 0px) + var(--krz-ctl-bottom, 200px) + 66px + var(--krz-act-h, 70px)); } }
+@media (orientation: landscape) {
+  html[data-krz-act="1"] .krz-reel, html[data-krz-act="2"] .krz-reel { bottom: calc(var(--sb, 0px) + 10px + var(--krz-act-h, 70px)); gap: 8px; }
+  html[data-krz-act="2"] .krz-reel .krz-herald-foot { display: none; }
+}
 .krz-reel .krz-herald { position: relative; left: auto; top: auto; transform: rotate(-8deg) scale(.6); }
 .krz-reel .krz-herald.in { transform: rotate(-2deg) scale(1); opacity: 1; }
 .krz-reel-btns { display: flex; gap: 10px; pointer-events: auto; }

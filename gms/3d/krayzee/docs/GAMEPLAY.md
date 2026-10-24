@@ -144,3 +144,21 @@ Layout (all of it is checked by `tools/onlinehud_flow.mjs` against the live HUD 
   protection + partial start, AI protection, `wiring.difficulty` from protection.
 - Test: `node tools/test-gameplay.mjs --only=hudfix` (bank cap ×3 types + Hard + detent, latched lever + AUTO by touch, banner vs subtitles,
   coach not in a dive, DEMAND TAKEOFF coach, camera over trees, room protection, LAND vs prompt in landscape, centre-view LAND).
+
+## GAMEFIX (2026-10-25)
+- **Hard finish (D19).** Free Flight / online on Hard: once the AP has stopped on the airfield (DONE, within 300 m of a
+  runway) outside the finish zone, main.js `updateTaxiIn` taxis it to the terminal spot by itself: `ap.taxiIn({stand})`
+  when FLIGHTFIX's API exists, else a `taxi → park` route to `DEFAULT_SPOT`. DEMAND IT shows greyed "Taxiing to the
+  terminal…" on the way and lights gold at the stand. Not in story (missions script their own taxi-in), not after a field
+  landing (DEMAND TAKEOFF is the way out). The 15 s auto-bank only fires inside the finish zone (SCORE.md).
+- **DEMAND TAKEOFF taxi (`departing()`).** While the AP taxis for a live DEMAND TAKEOFF, DEMAND IT stays hidden and
+  DEMAND TAKEOFF stays offered, even when the taxi slows below 5 kt inside an Easy/Medium finish zone.
+- **SKIP TO RUNWAY** only on the way out (taxi to a hold/runway), never on a taxi-in to a stand or while parked.
+- **Action slot is never covered.** main.js sets `html[data-krz-act]` = rows in the bottom slot (0–2); css/radio.css lifts
+  the radio sheet above them (landscape: wider 2-column sheet), css/game.css stops the Herald reel above them. A late reel
+  (after a rank-up ceremony) is dropped if the plane is already rolling; the headlines wait for the next stop. Tapping
+  DEMAND TAKEOFF while a reel is open closes it.
+- **Prompt card vs AP pill.** While a prompt card shows, the AP pill and axes row under it are hidden; a flash banner
+  ("LANDING · RWY 27") hides the card for its 2.5 s.
+- Tests: `node tools/test-hud4.mjs --only=gamefix` (radio sheet / reel vs buttons both orientations, Hard taxi-in →
+  DEMAND IT → refuel, taxi-out through the zone). Shots in docs/shots/gamefix/.
