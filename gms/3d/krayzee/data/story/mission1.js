@@ -1,6 +1,6 @@
 // D17 guided first mission. Steps run in order; each shows one short coach line. Spec + framework: docs/STORY.md.
 // c = mission context: c.s (snapshot), c.diff ('easy'|'medium'|'hard'), c.touch, c.stepT, c.since(type, pred?), c.host, c.flag.
-import { runwayEnd, fromRunway } from '../../js/flight/routes.js';
+import { runwayEnd, fromRunway, holdPoint } from '../../js/flight/routes.js';
 import { TOWER, STANDS } from '../../js/world/layout.js';
 import { CASTLE } from '../../js/world/terrain.js';
 import { DEFAULT_SPOT } from '../../js/game/finish.js';
@@ -25,8 +25,9 @@ export function mission1Route(end = '27', diff = 'medium') {
   const px = tx + dz * tp.off, pz = tz - dx * tp.off;
   const south = (s, l) => { const a = fromRunway(e, s, l), b = fromRunway(e, s, -l); return a[1] > b[1] ? a : b; };
   // landing setup: line up on `end` from the far side, then a racetrack until LAND is pressed
-  const [p0x, p0z] = south(-3500, 800), [p1x, p1z] = fromRunway(e, -2600, 0), [p2x, p2z] = fromRunway(e, -1500, 0);
-  const [p3x, p3z] = south(-1100, 1000), [p4x, p4z] = south(-3300, 1000);
+  // PLAYTEST_3 #7: a tighter landing setup (was 3.5 km out and back)
+  const [p0x, p0z] = south(-2600, 650), [p1x, p1z] = fromRunway(e, -2000, 0), [p2x, p2z] = fromRunway(e, -1200, 0);
+  const [p3x, p3z] = south(-900, 900), [p4x, p4z] = south(-2500, 900);
   const legs = [
     { kind: 'taxi', dest: { hold: end }, label: 'TAXI' },
     { kind: 'hold', end, seconds: 3, untilClear: true, label: 'HOLD SHORT' },
@@ -40,8 +41,8 @@ export function mission1Route(end = '27', diff = 'medium') {
     { kind: 'fly', to: [px, tp.alt - 8, pz], speed: 85, flaps: 0, clearance: 25, label: 'TOWER' },
     { kind: 'fly', to: [px + dx * 700, tp.alt + 60, pz + dz * 700], speed: 90, flaps: 0, label: 'CLIMB AWAY' },
     { kind: 'fly', to: [p0x, 230, p0z], speed: 95, flaps: 0, label: 'POSITIONING' },
-    { kind: 'fly', to: [p1x, 210, p1z], speed: 88, flaps: 0, label: 'LINE UP' },
-    { kind: 'fly', to: [p2x, 170, p2z], speed: 80, flaps: 0, label: 'PRESS LAND' },
+    { kind: 'fly', to: [p1x, 180, p1z], speed: 85, flaps: 0, label: 'LINE UP' },
+    { kind: 'fly', to: [p2x, 140, p2z], speed: 80, flaps: 0, label: 'PRESS LAND' },
     { kind: 'fly', to: [p3x, 220, p3z], speed: 88, flaps: 0, label: 'GO ROUND' },
     { kind: 'fly', to: [p4x, 230, p4z], speed: 92, flaps: 0, label: 'GO ROUND' },
   ];
@@ -53,7 +54,19 @@ export const MISSION_1 = {
   title: 'Letters Patent',
   subtitle: 'Your first flight as a peer of the realm',
   tower: 'toby',
-  start: { stand: 'S6', heading: 180 },
+  brief: 'The autopilot flies the aeroplane. Touch the controls and you fly it; let go and it takes over again.',
+  objectives: [
+    { id: 'fly', text: 'Take off, take the controls, fly to the castle', done: 'Flew to the castle' },
+    { id: 'buzz', text: 'Buzz the control tower', done: 'Buzzed the tower' },
+    { id: 'land', text: 'Land, stop and DEMAND IT', done: 'Landed and demanded it' },
+  ],
+  diffNote: { easy: 'the autopilot does the tower pass for you.', medium: 'you get low over the tower yourself.', hard: 'you get low over the tower yourself, and real metal: no bouncing.' },
+  // PLAYTEST_3 #7: start at the hold, not the stand: hands on the stick within about a minute
+  start: (c) => {
+    const e = runwayEnd(c.route.end), h = holdPoint(c.route.end);
+    const hd = Math.atan2(e.thr[0] - h[0], -(e.thr[1] - h[1])) * 180 / Math.PI;
+    return { ground: { x: h[0], z: h[1], heading: (hd + 360) % 360 } };
+  },
   route: mission1Route,
   reward: { pp: 400, label: 'Letters Patent sealed' },
   steps: [
@@ -69,7 +82,7 @@ export const MISSION_1 = {
     {
       id: 'takeoff',
       coach: () => 'Full power. The autopilot does the takeoff for you.',
-      done: (c) => !c.s.onGround && c.s.agl > 120,
+      done: (c) => !c.s.onGround && c.s.agl > 80,
     },
     {
       id: 'turn',
@@ -102,15 +115,19 @@ export const MISSION_1 = {
         if (!c.flag.win && c.flag.tries < 3 && c.stepT >= c.flag.next) { c.host.rivalBark('insult'); c.flag.tries++; c.flag.next = c.stepT + 9; }
         if (!c.flag.again && !c.s.radioWindow && c.stepT > 9 && (c.flag.win || c.flag.tries >= 3)) { c.flag.again = 1; c.setCoach('Tap <b>RADIO</b> and say something to him. Anything.'); }
       },
-      done: (c) => c.since('barked') > 0,
-      warpHold: 'Radio',
+      // PLAYTEST_3 #1: never wait for ever on a missed 5 s window
+      done: (c) => c.since('barked') > 0 || c.stepT > 40,
+      warpHold: (c) => c.stepT < 40 && 'Radio',
     },
     {
       id: 'castle',
       resumeLeg: (c) => c.route.marks.castle,
       coach: () => 'Follow the <b>gold marker</b> to the castle. Wave at Mother.',
       target: () => ({ pos: CASTLE_PT, label: 'CASTLE' }),
-      done: (c) => d2(c.s, CASTLE_PT) < 650,
+      // PLAYTEST_3 #1: the AP may have flown on past the castle while the radio step ran: send it back
+      enter: (c) => { if (c.s.legIndex < c.route.marks.castle || c.s.legIndex >= c.route.marks.towerIn) c.host.setRoute(c.route, c.route.marks.castle); },
+      done: (c) => d2(c.s, CASTLE_PT) < 650 || (c.stepT > 3 && c.s.legIndex >= c.route.marks.towerIn) || c.stepT > 150,
+      tick: 'fly',
     },
     {
       id: 'crime',
@@ -127,6 +144,7 @@ export const MISSION_1 = {
         }
       },
       done: (c) => c.since('pp', (e) => CRIMES.has(e.id)) > 0,
+      tick: 'buzz',
       warpHold: (c) => d2(c.s, TOWER_PT) < 1200 && 'Tower ahead',
     },
     {
@@ -159,7 +177,8 @@ export const MISSION_1 = {
       noRelaunch: true,
       coach: () => 'Now press <b>LANDED — DEMAND IT</b>. It banks your Privilege, and they refuel you. Naturally.',
       update: (c) => { c.showDemandButton(c.s.finishState == null); },
-      done: (c) => c.since('finished') > 0,
+      done: (c) => c.count('finished') > 0,
+      tick: 'land',
     },
   ],
 };

@@ -5,10 +5,12 @@ import { ensureStoryCss } from './dom.js';
 
 export const WARP_LEVELS = [1, 2, 5];
 const DROP = { stick: 'You took the controls', final: 'Final approach', conflict: 'Traffic nearby', crash: 'Crashed' };
+// short chip text when a tap is refused (LOOPTEST: a tap that silently snapped back to 1× looked broken)
+const NO = { stick: 'hands on', final: 'on final', conflict: 'traffic', crash: 'crashed' };
 const HOLD = { online: 'Not online', radio: 'Radio', imminent: 'Hold on…', paused: 'Paused', manual: 'Autopilot not flying' };
 
 export function createTimeWarp({ level = 1, onChange } = {}) {
-  const W = { level: 1, scale: 1, reason: '', dropped: '' };
+  const W = { level: 1, scale: 1, reason: '', dropped: '', blocked: '', refused: null };
   const emit = () => { try { onChange?.(W); } catch (e) { /* */ } };
   function set(n) {
     const v = WARP_LEVELS.includes(+n) ? +n : 1;
@@ -19,9 +21,12 @@ export function createTimeWarp({ level = 1, onChange } = {}) {
   // s = { online, apFlying, stick, radioWindow, finalApproach, conflict, imminent, paused, crashed }
   function update(s = {}) {
     let reason = '';
+    // PLAYTEST_3 #10: why it dropped to 1× shows for a few seconds, not for minutes
+    if (W.dropped && Date.now() - (W.droppedAt || 0) > 6000) { W.dropped = ''; emit(); }
+    W.blocked = '';
     for (const k of ['stick', 'final', 'conflict', 'crash']) {
       const on = k === 'stick' ? s.stick : k === 'final' ? s.finalApproach : k === 'conflict' ? s.conflict : s.crashed;
-      if (on) { reason = DROP[k]; if (W.level !== 1) { W.level = 1; W.dropped = reason; } break; }
+      if (on) { reason = DROP[k]; W.blocked = k; if (W.level !== 1) { W.level = 1; W.dropped = reason; W.droppedAt = Date.now(); } break; }
     }
     if (!reason) {
       if (s.online) reason = HOLD.online;
@@ -39,8 +44,14 @@ export function createTimeWarp({ level = 1, onChange } = {}) {
     get scale() { return W.scale; },
     get reason() { return W.reason; },
     get dropped() { return W.dropped; },
+    // { why, text, at } of the last refused tap (a cancelling condition was active), else null
+    get refused() { return W.refused; },
     set, update,
-    cycle() { return set(WARP_LEVELS[(WARP_LEVELS.indexOf(W.level) + 1) % WARP_LEVELS.length]); },
+    cycle() {
+      if (W.blocked && W.level === 1) { W.refused = { why: W.blocked, text: NO[W.blocked], at: Date.now() }; emit(); return W.level; }
+      W.refused = null;
+      return set(WARP_LEVELS[(WARP_LEVELS.indexOf(W.level) + 1) % WARP_LEVELS.length]);
+    },
     reset() { W.level = 1; W.scale = 1; W.reason = ''; W.dropped = ''; emit(); },
   };
 }
@@ -84,17 +95,23 @@ export function createWarpToggle({ container = document.body, warp, className = 
   const stop = (e) => e.stopPropagation();
   el.addEventListener('pointerdown', stop);
   el.addEventListener('touchstart', stop, { passive: true });
-  el.addEventListener('click', (e) => { e.stopPropagation(); warp.cycle(); paint(); });
+  el.addEventListener('click', (e) => {
+    e.stopPropagation(); warp.cycle();
+    if (warp.refused && Date.now() - warp.refused.at < 100) { el.classList.remove('no'); void el.offsetWidth; el.classList.add('no'); }
+    paint();
+  });
   let last = '';
   function paint() {
     const held = warp.level > 1 && warp.scale === 1;
-    const k = `${warp.level}|${warp.scale}|${warp.reason}|${warp.dropped}`;
+    const no = warp.refused && Date.now() - warp.refused.at < 2500 ? warp.refused.text : '';
+    const k = `${warp.level}|${warp.scale}|${warp.reason}|${warp.dropped}|${no}`;
     if (k === last) return;
     last = k;
+    if (!no) el.classList.remove('no');
     b.textContent = `${warp.level}×`;
     el.dataset.level = warp.level;
-    el.dataset.state = warp.level === 1 ? 'off' : held ? 'held' : 'on';
-    small.textContent = held ? warp.reason : warp.level === 1 && warp.dropped ? warp.dropped : '';
+    el.dataset.state = no ? 'refused' : warp.level === 1 ? 'off' : held ? 'held' : 'on';
+    small.textContent = no ? `Not now · ${no}` : held ? warp.reason : warp.level === 1 && warp.dropped ? warp.dropped : '';
   }
   paint();
   return { el, paint, setVisible(v) { el.hidden = !v; }, dispose() { el.remove(); } };

@@ -3,6 +3,8 @@
   design            3 design seeds on NARRATOR.audition, scored (WER + pitch), best saved as "Krayzee · narrator"
   render [ids..]    render INTRO lines -> audio/story/<id>.mp3, metadata -> audio/story/narration.json (resumable)
   render --redo id  force a line
+  lines [ids..]     missions 2+: data/story/lines.js (narrator briefings + radio lines in the saved bark voices;
+                    radio voices use audio/voices/manifest.json clones, 48 kbps like the barks). Also takes --redo.
 
 Script source: data/story/intro.js (read through node). Python: ~/.cache/krayzee-asr/bin/python.
 GPU is shared: one take at a time; we only submit when the studio reports no active job."""
@@ -18,6 +20,11 @@ SEEDS = [11, 23, 37]
 
 def script():
     js = "import('./data/story/intro.js').then(m=>console.log(JSON.stringify({N:m.NARRATOR,I:m.INTRO})))"
+    return json.loads(subprocess.run(['node', '--input-type=module', '-e', js], cwd=ROOT, capture_output=True, text=True, check=True).stdout)
+
+
+def story_lines():
+    js = "import('./data/story/lines.js').then(m=>console.log(JSON.stringify([...m.BRIEF_LINES,...m.RADIO_LINES])))"
     return json.loads(subprocess.run(['node', '--input-type=module', '-e', js], cwd=ROOT, capture_output=True, text=True, check=True).stdout)
 
 
@@ -106,9 +113,47 @@ def render(ids, redo=False):
         jsave(META, M)
 
 
+def render_lines(ids, redo=False):
+    M = jload(META, {})
+    voices = jload(os.path.join(ROOT, 'audio/voices/manifest.json'), {})
+    lines = M.setdefault('lines', {})
+    os.makedirs(f'{SCR}/story', exist_ok=True)
+    for ln in story_lines():
+        k = ln['id']
+        if ids and k not in ids: continue
+        if k in lines and not redo and os.path.exists(f'{OUT}/{k}.mp3'):
+            continue
+        v = ln['voice']
+        clone = M['voice']['clone'] if v == 'narrator' else voices[v]['clone']
+        kbps = 64 if v == 'narrator' else 48
+        spoken = ln.get('say') or ln['text']
+        spoken = spoken.replace('Krayzee', 'Crazy')
+        spoken = spoken[:1].upper() + spoken[1:]
+        takes = []
+        for seed in [1, 2, 3, 4]:
+            wav = f'{SCR}/story/{k}_{seed}.wav'
+            jid, wall = take(dict(clone, seed=seed), spoken, wav)
+            tmp = f'{SCR}/story/{k}_{seed}.mp3'
+            d = post(wav, tmp, kbps=kbps)
+            hyp = asr(tmp); w = wer(spoken, hyp); f0, _ = f0_stats(load_pcm(tmp))
+            takes.append(dict(seed=seed, dur=round(d, 2), wer=round(w, 3), f0=round(f0), asr=hyp, file=tmp))
+            print(k, v, seed, f'{d:.2f}s wer={w:.2f} f0={f0:.0f} wall={wall:.0f}s | {hyp}', flush=True)
+            if w <= 0.08:
+                break
+        best = min(takes, key=lambda t: (t['wer'], t['dur']))
+        out = f'{OUT}/{k}.mp3'
+        os.replace(best['file'], out)
+        lu, pk = loudness(out)
+        lines[k] = dict(file=f'{k}.mp3', voice=v, text=ln['text'], dur=round(dur(out), 2), wer=best['wer'], asr=best['asr'], seed=best['seed'],
+                        lufs=round(lu, 1), bytes=os.path.getsize(out), flags=(['wer'] if best['wer'] > 0.12 else []))
+        jsave(META, M)
+
+
 if __name__ == '__main__':
     cmd, args = sys.argv[1], sys.argv[2:]
     if cmd == 'design': design()
     elif cmd == 'render':
         redo = '--redo' in args
         render([a for a in args if a != '--redo'], redo)
+    elif cmd == 'lines':
+        render_lines([a for a in args if a != '--redo'], '--redo' in args)
