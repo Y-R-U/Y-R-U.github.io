@@ -39,3 +39,11 @@
 - D29 (2026-10-22) Airports: Kingdom MAP (one airport loaded at a time), with flights between airports. Transitions use "magic clouds" that can cover part or all of the land while the next airport swaps in; the destination must be clearly identified (marker/heading). Missions between airports come later. Keep the architecture open to a fake "one world" later (airports placed in kingdom km coords, so any airport can be flown to through a cloud swap).
 - D30 (2026-10-22) Contact naming/scoring (refines D28): a scored light touch is presented to the player as a CLOSE CALL (Easy/Medium are just more generous: a glancing contact counts as a close call). Hard: genuine close calls, plus — manager's call, Aaron fine either way — contact you SURVIVE (not destroyed) also scores as a close call. All close calls (touch or miss) pay once per pair per cooldown window.
 - D31 (2026-10-22) FOCUS: after the current lanes (LANDFIX2, HUD4, STORY2) finish, the next phase is gameplay hardening only — testing and fixing the core loop (takeoff → fly/override → LAND/LAND NOW → DEMAND IT → refuel → DEMAND TAKEOFF, missions, radio/tower, scoring) until it is solid. New airports (farm strip, map) and new plane models wait until then.
+- D32 (2026-10-27) Aaron: core gameplay is good ("having fun landing and taking off on phone"). Hardening phase closed; continue. Messages still block the screen too much on a phone at times: keep improving as we go.
+- D33 (2026-10-27) Aaron: add a big jumbo, a big military plane, and an F-35 or other fast jet. Manager owns the priority list.
+  Manager's calls:
+  - Royal Jumbo = the roster's 747-ish.
+  - Big military = a C-130 Hercules-ish four-turboprop. It works off the existing 1400 m runway, and big jets can come later with the long-runway airbase.
+  - Fast jet = an F-35B-ish. Conventional take-off and landing first; STOVL hover / vertical landing is a follow-up (P2).
+  - All three fly from C-Tower 1 first; a long-runway military/international airport comes with the D29 map.
+  - Ranks: Hercules duke, F-35 prince, Jumbo king (changeable). `?allplanes` unlocks everything for testing.

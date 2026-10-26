@@ -99,3 +99,19 @@ Open for AIRPORTS (from FLIGHTFIX): treat player with ap.landing as cleared to l
   After these: full matrix, then PAUSE for Aaron's testing.
 - 2026-10-25: STORY2 committed after manager verify (M1 17/17, M2 16/16, M3 16/16, M4 16/16 portrait+landscape, M3 --falsify=crime goes red 15/16, picker 8/8, warp 6/6). GAMEFIX done, verified score-sim 194/194; held for a joint commit with FLIGHTFIX3 (shared main.js). FLIGHTFIX3 still running.
 - 2026-10-25: FLIGHTFIX3 + GAMEFIX combined verify: flight 153/153, landahead 36/36, score 194/194 (+falsify), atc 103/103, hud4 gamefix 18/18 (manager edit to demandTaxiOut forcing taxi fallback; falsify red). Full matrix 15/18. Tiger-hard field DEMAND TAKEOFF threw routes.js runwayEnd 'no runway end' → FREEZE. Also tiger-medium-landscape LAND no touchdown 300 s, bathtub-hard-landscape field takeoff 62 s. Sent back to FLIGHTFIX3; nothing committed until green.
+- 2026-10-25: 9c53db6f pushed (FLIGHTFIX3+GAMEFIX; final: flight 156, landahead 36, score 194, atc 103, loop quick 2/2 + 3 former reds green; agent full matrix 17/18 with last red = test expectation, fixed in test-loop). Testing round done → PAUSED for Aaron's testing (?dbg link, sink :8897 up). No agents running. Next after Aaron: his findings, then D26/D29 farm strip + map. Re-ask online deploy.
+
+## PRIORITY LIST (manager-owned, per D33) — 2026-10-27
+1. NOW:
+   - JETCORE: flight model, AP, LAND, ATC and world support for heavies and fast jets.
+   - JETMODELS-A: Jumbo + Hercules 3D models.
+   - JETMODELS-B: F-35 3D model.
+   - JETSOUND: turbofan, turboprop and fighter (afterburner) engine audio.
+   - MSGFIX: phone message clutter, measured; plus `?allplanes` and picker support for the new planes.
+2. NEXT: jets integration testing (loop suite with the new types); Aaron flies them.
+3. F-35B STOVL hover / vertical landing mode.
+4. D26 farm strip (C-Tower 2) + D29 Kingdom Map / magic-cloud transfers; long-runway airbase for heavies.
+5. Online deploy (Aaron to answer; port 8018).
+6. More roster planes (cub, pitts, bizjet, a320 …); story missions for the new planes.
+7. Later: D8 weapons (story extension + room option).
+- 2026-10-27: Aaron: gameplay good, having fun on phone; messages still sometimes block; add jumbo, big military, F-35/fast jet; manager owns priorities. D32/D33 + PRIORITY LIST written. Launched 5: JETCORE (9661, flight/AP/ATC/data/aircraft.js), JETMODELS-A (9663, jumbo+herc models), JETMODELS-B (9665, f35 model + nozzle/liftfan/AB hooks), JETSOUND (9667, turbofan/turboprop/fighter voices), MSGFIX (9669, measured message cover + ?allplanes picker). Shared-file watch: js/plane/index.js (A+B additive), main.js (MSGFIX message plumbing; jet wiring at integration).
