@@ -66,6 +66,7 @@ html.kz-acct-off #br8t-account { opacity: 0; visibility: hidden; pointer-events:
 .kz-cloud.c3 { width: 60vmax; height: 10vmax; bottom: 4%; left: 10%; animation-duration: 45s; opacity: .9; }
 @keyframes kz-drift { from { transform: translateX(-10vw); } 50% { transform: translateX(10vw); } to { transform: translateX(-10vw); } }
 .kz-flyby { position: absolute; top: 22%; left: -60px; width: 46px; opacity: .85; animation: kz-flyby 14s linear infinite 1.2s; pointer-events: none; }
+.kz-flyby svg, .kz-fill svg { scale: -1 1; } /* the plane icon is drawn nose-left; both fly right */
 @keyframes kz-flyby { 0% { transform: translate(0, 0) rotate(-4deg); } 45% { transform: translate(60vw, -4vh) rotate(-8deg); }
   55% { transform: translate(72vw, -2vh) rotate(16deg) } 100% { transform: translate(calc(100vw + 120px), 6vh) rotate(-3deg); } }
 .kz-crest { width: min(40vw, 30vh, 190px); height: auto; display: block; filter: drop-shadow(0 12px 28px rgba(0, 0, 0, .5)); position: relative; }
