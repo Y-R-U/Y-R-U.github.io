@@ -51,6 +51,7 @@ function ensureRoot() {
     onAircraft: () => hooks.onSettings?.(loadSettings()),
   });
   paintPilot();
+  import('./tasks.js').then((m) => m.mountTasks(root)).catch((e) => console.warn('[krayzee] tasks', e)); // TASKS (D34)
   addEventListener('keydown', (e) => {
     if (e.key !== 'Escape' || e.defaultPrevented) return;
     if (settings.pop.isOpen) settings.pop.close();

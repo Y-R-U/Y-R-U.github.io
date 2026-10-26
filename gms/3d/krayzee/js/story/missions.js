@@ -324,7 +324,7 @@ export function createMission(def, o) {
     const bonus = Math.round((def.reward?.pp || 0) * mult / 10) * 10;
     const c = host.career();
     const before = c ? c.rankIndex : null;
-    try { c?.addPP(bonus, {}); } catch (e) { console.warn('[story] reward', e); }
+    try { if (c?.addBonus) c.addBonus(bonus); else c?.addPP(bonus, {}); } catch (e) { console.warn('[story] reward', e); }
     const crimes = M.events.filter((e) => e.type === 'pp' && e.data.id && !['banter', 'impeccable'].includes(e.data.id)).length;
     const P = loadProgress();
     const prev = P.missions[def.id] || {};

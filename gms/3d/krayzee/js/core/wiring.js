@@ -8,11 +8,13 @@ import { DIFFICULTY } from '../../data/rules.js';
 import { RANKS } from '../../data/ranks.js';
 import { STANDS, defaultEnd } from '../world/layout.js';
 import { KT } from '../flight/vmath.js';
+import { getTasks } from '../game/tasks.js'; // TASKS
 
 const safe = (f, fallback) => { try { return f(); } catch (e) { console.warn('[krayzee]', e); return fallback; } };
 
 export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log }) {
   const W = { atc: null, link: null, radio: null, game: null, pilots: new Map(), barked: false };
+  W.tasks = safe(() => getTasks({ career }), null); // TASKS (D34)
   // The player's two-digit radio number (D1): never ends in 0, kept for the whole visit so the ceremony can quote it.
   W.flightNo = (() => { let n; do n = 11 + Math.floor(Math.random() * 89); while (!(n % 10)); return n; })();
   const off = [];
@@ -131,9 +133,11 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
       W.lastImpact = r;
       return r;
     };
+    safe(() => W.tasks?.attach({ game: g, atc: W.atc, radio: W.radio, mode, difficulty: W.difficulty, plane: ent.ac.type })); // TASKS
   });
 
   W.endPlay = () => {
+    safe(() => W.tasks?.detach()); // TASKS
     for (const f of off.splice(0)) safe(() => f?.());
     safe(() => ghud?.score.detach());
     W.game = null;
@@ -145,6 +149,7 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
 
   // per frame, game time
   W.update = (dt, P) => {
+    if (W.tasks && W.game && P) safe(() => W.tasks.sample(dt, P, traffic, W.simK || 1)); // TASKS (W.simK: main's warp × timescale)
     if (W.link) safe(() => W.link.update(dt));
     if (W.radio) safe(() => W.radio.update(dt));
     if (W.game && P) safe(() => {

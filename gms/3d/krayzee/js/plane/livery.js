@@ -280,3 +280,11 @@ export function normalizeLivery(l = {}) {
     accent: l.accent || '#e8b21c',
   };
 }
+
+// JETMODELS-A: fixed royal palette for the big types (jumbo, herc). Their liveries paint these over the player's own
+// primary/secondary/accent, so a Royal Jumbo always reads purple-and-gold whatever the player picked.
+export const ROYAL = {
+  purple: '#4a1d78', purpleDark: '#2c0f4c', purpleLight: '#7448a8', gold: '#d6a740', goldLight: '#f3d47c', goldDark: '#94691e',
+  cream: '#f4efe3', wingGrey: '#b9bdc3', belly: '#c9ccd0', crimson: '#a3162a',
+  military: '#5e6a58', militaryDark: '#414a3d', militaryLight: '#7d8a73', militaryGrey: '#8c9191',
+};

@@ -20,7 +20,7 @@ export function mountKrayzeeAccount(canPester) {
   const opts = { gameId: 'krayzee', accent: '#e2b04a', nudge: 'callout', canPester, pesterHoldMs: 6000 };
   const go = NO_CLOUD.some(flag)
     ? import('/lib/auth/ui.js').then((m) => m.mountAccount(opts))
-    : import('/lib/auth/localsync.js').then((m) => m.syncLocalKeys({ ...opts, keys: [PROFILE_KEY, SETTINGS_KEY, CAREER_KEY], describe }));
+    : import('/lib/auth/localsync.js').then((m) => m.syncLocalKeys({ ...opts, keys: [PROFILE_KEY, SETTINGS_KEY, CAREER_KEY, 'krayzee.tasks' /* TASKS */], describe }));
   return go.then(() => true).catch((e) => { console.warn('[krayzee] account layer unavailable', e); return false; });
 }
 

@@ -100,6 +100,12 @@ export function loadCareer({ storage = defaultStorage(), now = () => Date.now(),
       for (const k of ['scandals', 'crashes', 'infractions']) if (stats[k]) C.stats[k] += stats[k];
       return changed(before);
     },
+    // PP that is not a flight (task rewards, story bonus): no sortie / bestSortie side effects
+    addBonus(pp) {
+      const before = rankIndex();
+      C.lifetimePP += Math.max(0, Math.round(pp));
+      return changed(before);
+    },
     addOnlineWin() { const b = rankIndex(); C.onlineWins++; return changed(b); },
     addOnlineRoom() { C.onlineRooms++; if (autosave) save(); },
     setStoryComplete() { const b = rankIndex(); C.storyComplete = true; C.rankFloor = Math.max(C.rankFloor, IDX[STORY_FLOOR]); return changed(b); },

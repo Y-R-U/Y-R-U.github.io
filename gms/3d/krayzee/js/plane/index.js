@@ -15,6 +15,9 @@ const MAX = { aileron: 20 * D2R, elevUp: 28 * D2R, elevDown: 23 * D2R, rudder: 2
 const TYPE_BUILDERS = {
   tiger: () => import('./types/tiger.js').then((m) => m.createTiger),
   bathtub: () => import('./types/bathtub.js').then((m) => m.createBathtub),
+  f35: () => import('./types/f35.js').then((m) => m.createF35),
+  jumbo: () => import('./types/jumbo.js').then((m) => m.createJumbo),
+  herc: () => import('./types/herc.js').then((m) => m.createHerc),
 };
 export const PLANE_TYPES = ['c172', ...Object.keys(TYPE_BUILDERS)];
 

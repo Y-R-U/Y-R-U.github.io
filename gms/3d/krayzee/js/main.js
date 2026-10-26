@@ -286,6 +286,7 @@ function startMission(id = 1) {
       difficulty: settings().difficulty || 'easy',
       setTarget: (t) => { S.missionTarget = t; },
       onFail: () => { S.reelT = 0.4; },
+      onComplete: (r) => { try { wiring.tasks?.story(r); } catch (e) { /* */ } }, // TASKS
       onExit: () => { story.endMission(); quitPlay(); ui.showMenu(); },
     });
   });
@@ -413,6 +414,7 @@ function frame(dt) {
   let k = TIMESCALE;
   try { if (story) k *= story.simScale(S.paused || !!S.reelOpen); } catch (e) { /* warp is optional */ }
   S.simK = k;
+  if (wiring) wiring.simK = k; // TASKS: real play time for the flight-time tasks
   const alpha = S.paused ? traffic.acc / traffic.h : traffic.update(dt * k);
   if (!S.paused) { attract.update(dt * k); wiring.update(dt * k, P); }
   traffic.sync(alpha, S.paused ? 0 : dt, tmpP, tmpQ);
