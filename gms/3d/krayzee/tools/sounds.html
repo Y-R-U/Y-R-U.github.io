@@ -25,7 +25,7 @@
 </head>
 <body>
 <h1>Krayzee sounds</h1>
-<p>Tap ▶ to hear each sound (about 3 seconds). Tap ✕ on any you don't like, then Copy and paste the list back to Claude.</p>
+<p>Tap ▶ to hear each sound (3 to 9 seconds). Tap ✕ on any you don't like, then Copy and paste the list back to Claude.</p>
 <div class="bar"><button id="stop">■ Stop all</button><button id="copy" class="flag">Copy flagged list</button></div>
 <div class="grid" id="grid"></div>
 <textarea id="out" rows="2" readonly placeholder="Flagged sounds appear here"></textarea>
@@ -47,6 +47,30 @@ function engine(throttle, interior) {
   later(3000, () => { clearInterval(tick); v.dispose(); });
 }
 const hold = (on, off, ms = 3000) => { on(); later(ms, off); };
+
+// Jets (D33). Listener at the origin facing -Z; the aircraft sits 25 m away with its nose toward us (front) or away (rear).
+// script(v, t): optional per-tick changes (t in s) for spool-ups and burner lights.
+function jet(kind, { n1, thr, ab = 0, lift = 0, inside = false, rear = false, ms = 4000, script, move } = {}) {
+  A.setListener({ position: [0, 0, 0], velocity: [0, 0, 0], forward: [0, 0, -1], up: [0, 1, 0] });
+  const v = A.createEngineVoice({ kind });
+  v.setForward(rear ? [0, 0, -1] : [0, 0, 1]);
+  if (n1 != null) v.setN1(n1, thr); else v.setThrottle(thr ?? 0);
+  v.setAfterburner(ab); if (lift) v.setLiftFan(lift);
+  v.setInterior(inside);
+  let pos = [6, 3, -25], vel = [0, 0, 0];
+  const t0 = performance.now();
+  const step = () => {
+    const t = (performance.now() - t0) / 1000;
+    script?.(v, t);
+    if (move) ({ pos, vel } = move(t));
+    if (!inside) v.update(null, null, pos, vel);
+  };
+  step();
+  const tick = setInterval(step, 50);
+  const end = () => { clearInterval(tick); v.dispose(); };
+  stopFns.push(end);
+  later(ms, end);
+}
 
 const SOUNDS = [
   ['Engine idle (cockpit)', 'piston engine, inside', () => engine(0, true)],
@@ -70,6 +94,25 @@ const SOUNDS = [
     A.playRadio('../audio/voices/bubba/sample.mp3', { speaker: 'pilot', voiceId: 'bubba', priority: 1 });
     later(700, () => A.playRadio('../audio/voices/tower_f/sample.mp3', { speaker: 'tower', voiceId: 'tower_f', priority: 3 }));
   }],
+  ['Jumbo idle (outside, in front)', 'Royal Jumbo, 4 turbofans, fan whine', () => jet('turbofan', { n1: 22 })],
+  ['Jumbo take-off power (in front)', 'listen for the "buzzsaw"', () => jet('turbofan', { n1: 100 })],
+  ['Jumbo take-off power (behind)', 'deep jet roar from the tail', () => jet('turbofan', { n1: 100, rear: true })],
+  ['Jumbo spool-up (in front)', 'idle → take-off power, slow spool', () => jet('turbofan', { thr: 0, ms: 9000, script: (v, t) => t > 1 && v.setThrottle(1) })],
+  ['Jumbo take-off power (cockpit)', 'inside: quiet and muffled', () => jet('turbofan', { n1: 100, inside: true })],
+  ['Jumbo idle (cockpit)', 'inside at the gate', () => jet('turbofan', { n1: 22, inside: true })],
+  ['Hercules idle (outside)', '4 turboprops, ground idle', () => jet('turboprop', { n1: 30, thr: 0 })],
+  ['Hercules full power (outside)', 'turbine whine + prop throb, engines beating', () => jet('turboprop', { n1: 100, thr: 1, ms: 5000 })],
+  ['Hercules full power (inside the hold)', 'inside: loud throb', () => jet('turboprop', { n1: 100, thr: 1, inside: true, ms: 5000 })],
+  ['F-35 idle (outside, in front)', 'the idle howl', () => jet('fighter', { n1: 30 })],
+  ['F-35 military power (behind)', 'full dry thrust, roar', () => jet('fighter', { n1: 100, rear: true })],
+  ['F-35 afterburner (behind)', 'crackle and boom', () => jet('fighter', { n1: 100, ab: 1, rear: true })],
+  ['F-35 afterburner (cockpit)', 'inside the helmet', () => jet('fighter', { n1: 100, ab: 1, inside: true })],
+  ['F-35 lighting the burner', 'mil → burner → mil (behind)', () => jet('fighter', { n1: 100, rear: true, ms: 6000, script: (v, t) => v.setAfterburner(t > 1.5 && t < 4.5 ? 1 : 0) })],
+  ['F-35 lift fan (prototype)', 'STOVL hover roar, for later', () => jet('fighter', { n1: 90, lift: 1 })],
+  ['F-35 fast flyby', 'passing the tower, no boom', () => A.playFlyby(0.8, { position: [0, 20, -60] })],
+  ['F-35 supersonic flyby', 'with sonic boom', () => A.playFlyby(1, { position: [0, 20, -60] })],
+  ['AI F-35 passing (doppler)', '150 m/s, 60 m away', () => jet('fighter', { n1: 85, ms: 6000, move: (t) => ({ pos: [-450 + 150 * t, 30, -60], vel: [150, 0, 0] }) })],
+  ['AI Jumbo passing (doppler)', 'climbing out, 80 m/s, 120 m away', () => jet('turbofan', { n1: 95, ms: 8000, move: (t) => ({ pos: [-320 + 80 * t, 60, -120], vel: [80, 0, 0] }) })],
   ['Button click', 'menus', () => A.playUI('click')],
   ['Button confirm', 'menus', () => A.playUI('confirm')],
   ['Button back', 'menus', () => A.playUI('back')],
@@ -98,6 +141,11 @@ document.getElementById('copy').onclick = async () => {
   try { await navigator.clipboard.writeText(out.value || '(none flagged)'); } catch { out.select(); }
 };
 A.setVolumes({ sfx: 1, voice: 1, music: 0.6, master: 1 });
+
+// ?test=1 → offline jet checks into window.__jetTest (&falsify=loud|flat|nodoppler)
+const q = new URLSearchParams(location.search);
+if (q.has('test')) import('../js/audio/jettest.js').then((m) => m.runJetTest(q.get('falsify') || ''))
+  .then((r) => { window.__jetTest = r; }).catch((e) => { window.__jetTest = { error: String(e && e.stack || e) }; });
 </script>
 </body>
 </html>

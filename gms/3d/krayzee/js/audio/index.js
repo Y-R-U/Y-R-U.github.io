@@ -1,5 +1,7 @@
 // Krayzee audio: one AudioContext, four buses, procedural aircraft sounds and the radio voice chain.
 import { ENGINE_BASE_RPM, noiseBuffer, engineExhaustBuffer, propBuffer, bumpBuffer, softClipCurve } from './synth.js';
+import { createJetVoice, playFlyby as jetFlyby, JET_KINDS } from './jets.js';
+export { JET_KINDS };
 
 export const IDLE_RPM = 700, MAX_RPM = 2700;
 export const rpmFromThrottle = (t) => IDLE_RPM + clamp01(t) * (MAX_RPM - IDLE_RPM);
@@ -17,10 +19,13 @@ export function createAudioSystem(ctx, opts = {}) {
   const S = { ctx, voiceCap: opts.voiceCap || 6, engines: new Set(), listener: { pos: [0, 0, 0], vel: [0, 0, 0] } };
   const g = (v = 1) => { const n = ctx.createGain(); n.gain.value = v; return n; };
   const now = () => ctx.currentTime;
+  // An OfflineAudioContext (tests) is 'suspended' until it renders and has no pile-up problem, so it counts as live.
+  const offline = typeof OfflineAudioContext !== 'undefined' && ctx instanceof OfflineAudioContext;
+  const live = () => offline || ctx.state === 'running';
   // PERF #6: while the context is suspended currentTime is frozen and every setTargetAtTime piles up; also skip re-sends
   // of (nearly) the same target, which most per-frame calls are.
   const ramp = (p, v, tau = 0.05) => {
-    if (ctx.state !== 'running') return;
+    if (!live()) return;
     const last = p._kz;
     if (last !== undefined && Math.abs(v - last) <= Math.abs(last) * 0.005 + 1e-5) return;
     p._kz = v;
@@ -70,7 +75,7 @@ export function createAudioSystem(ctx, opts = {}) {
   }
   // Sources are placed relative to the listener, so ctx.listener stays at the origin and only its orientation changes.
   S.setListener = ({ position, velocity, forward, up } = {}) => {
-    if (ctx.state !== 'running') return;
+    if (!live()) return;
     if (position) S.listener.pos = v3(position);
     if (velocity) S.listener.vel = v3(velocity);
     if (forward) {
@@ -83,7 +88,9 @@ export function createAudioSystem(ctx, opts = {}) {
   };
 
   // ---------- engine voices ----------
+  // o.kind: 'piston' (default) | 'turbofan' | 'turboprop' | 'fighter' (see jets.js; AIRCRAFT[id].engine.kind)
   S.createEngineVoice = (o = {}) => {
+    if (o.kind && o.kind !== 'piston' && JET_KINDS[o.kind]) return createJetVoice(S, H, o);
     const out = g(0), panner = makePanner();
     const load = filt('lowpass', 1400, 0.9);
     const cabin = filt('peaking', 115, 1.2, 0);
@@ -173,11 +180,14 @@ export function createAudioSystem(ctx, opts = {}) {
     queueMicrotask(() => {
       capQueued = false;
       const list = [...S.engines].sort((a, b) => score(a) - score(b));
-      list.forEach((v, i) => (i < S.voiceCap && v._st.dist < 4000 ? v._start() : v._stop()));
+      list.forEach((v, i) => (i < S.voiceCap && v._st.dist < (v._st.cull || 4000) ? v._start() : v._stop()));
     });
   }
   const score = (v) => (v._st.interior ? -1e9 : v._st.dist - v._st.priority * 1e6);
   S.setVoiceCap = (n) => { S.voiceCap = Math.max(1, n | 0); scheduleCap(); };
+
+  const H = { g, filt, loop, chain, ramp, now, makePanner, setPannerPos, scheduleCap, v3 };
+  S.playFlyby = (intensity, o) => jetFlyby(S, H, intensity, o);
 
   // ---------- continuous beds ----------
   const wind = (() => {
@@ -546,6 +556,7 @@ export const setStallHorn = call('setStallHorn');
 export const setRolling = call('setRolling');
 export const setFlapsMotor = call('setFlapsMotor');
 export const playTouchdown = call('playTouchdown');
+export const playFlyby = call('playFlyby');
 export const playGearThump = call('playGearThump');
 export const playCrash = call('playCrash');
 export const playBoing = call('playBoing');

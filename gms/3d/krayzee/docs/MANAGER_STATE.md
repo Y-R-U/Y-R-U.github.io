@@ -115,3 +115,4 @@ Open for AIRPORTS (from FLIGHTFIX): treat player with ap.landing as cleared to l
 6. More roster planes (cub, pitts, bizjet, a320 …); story missions for the new planes.
 7. Later: D8 weapons (story extension + room option).
 - 2026-10-27: Aaron: gameplay good, having fun on phone; messages still sometimes block; add jumbo, big military, F-35/fast jet; manager owns priorities. D32/D33 + PRIORITY LIST written. Launched 5: JETCORE (9661, flight/AP/ATC/data/aircraft.js), JETMODELS-A (9663, jumbo+herc models), JETMODELS-B (9665, f35 model + nozzle/liftfan/AB hooks), JETSOUND (9667, turbofan/turboprop/fighter voices), MSGFIX (9669, measured message cover + ?allplanes picker). Shared-file watch: js/plane/index.js (A+B additive), main.js (MSGFIX message plumbing; jet wiring at integration).
+- 2026-10-27: Aaron asked for a task grid (D34). Launched TASKS lane (9671) = 6 active.

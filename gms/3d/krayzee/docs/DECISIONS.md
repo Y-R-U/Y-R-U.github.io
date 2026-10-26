@@ -47,3 +47,11 @@
   - Fast jet = an F-35B-ish. Conventional take-off and landing first; STOVL hover / vertical landing is a follow-up (P2).
   - All three fly from C-Tower 1 first; a long-runway military/international airport comes with the D29 map.
   - Ranks: Hercules duke, F-35 prince, Jumbo king (changeable). `?allplanes` unlocks everything for testing.
+- D34 (2026-10-27) Aaron: a TASK GRID alongside the missions. It is an easy-to-follow grid of tasks to tick off, with lots of them, grouped into sets.
+  - Completing a set gives an extra reward.
+  - Some tasks are hard, and some need flight time (you have to play a lot to finish them all).
+  - Manager's calls:
+    - Each task pays PP; a finished set pays a bigger PP bonus plus a cosmetic (livery, badge or title).
+    - Tasks never gate ranks or planes.
+    - 120+ tasks, tiered (bronze/silver/gold), with progress bars for counted ones.
+    - Tasks for the new planes appear as those planes ship.
