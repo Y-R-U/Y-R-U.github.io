@@ -795,6 +795,16 @@
 .vp-topbar > .tb-fs .ic { width: 20px; height: 20px; }
 .tb-acct { display: none; flex: none; width: calc(var(--vp-acct-w, 46px) - 6px); height: 40px; }
 .vp-topbar.acct .tb-acct { display: block; }
+/* ui-8: br8t "Login now!" pill (js/app/account.js watchPill). .pill = the badge slot tracks the pill's live width;
+   .pill-wrap = no room beside it (portrait), so the currencies + fullscreen drop to a second row under the emblem */
+html[data-orient] .vp-topbar.acct.pill .tb-acct { width: var(--vp-pill-slot, 46px); }
+.vp-topbar:not(.pill) > .tb-acct { transition: width .3s cubic-bezier(.2, .8, .2, 1); }   /* room is made at once, given back gently */
+.vp-topbar.pill .tb-co { max-width: var(--vp-pill-room, 100%); }
+html[data-orient] .vp-topbar.pill-wrap { flex-wrap: wrap; row-gap: 4px; height: auto; }
+html[data-orient] .vp-topbar.acct.pill-wrap > .tb-acct { order: 1; flex: 1 0 calc(100% - 60px); width: auto; }
+.vp-topbar.pill-wrap > :not(.tb-co-slot, .tb-acct) { order: 2; animation: tb-drop .28s cubic-bezier(.2, .8, .2, 1) both; }
+html[data-orient] .vp-topbar.pill-wrap > .tb-cur { margin: 0; }
+@keyframes tb-drop { from { opacity: 0; transform: translateY(-10px); } }
 .hud-left .hud-fs .ic { width: 22px; height: 22px; }
 /* QA Q1: board hexes own the touch (drag a unit); the body scrolls from everywhere else */
 .fm-hex[data-side="mine"] { touch-action: none; }

@@ -334,3 +334,30 @@
   consider moving the `workshop` unlock to m2_l3 alongside `buffs`.
 - hub: `js/hub/features.js` default subs ("Squad & formation", "Upgrade units") are overridden by ui; update them to match if you like.
 - sim/design: gear chips (D9 optional) have no API or data; the Workshop shows a locked "Coming soon" bay until they exist.
+
+# ui-8 (br8t "Login now!" pill vs the top bar)
+## Checkpoint 1 (ui-8 hand-back) - tested on CDP 9406 (touch), zero console errors
+- The badge: `/lib/auth/ui.js` (shared, not edited) mounts `<div id="br8t-account">` with an **open** shadow root holding
+  `.fab` (40 px avatar, fixed top/right max(10px, safe-area)) and, for `nudge:'callout'`, a `.pester` pill (fixed, right =
+  inset + 48 px, ~174 x 40: "x" button + 146 px body that ticks "Save your progress" -> "Login now!"). It is added by a 2.5 s
+  watcher (first visit, then after 3 games, every 5, or after 1 h away) whenever `canPester()` says yes, stays `pesterHoldMs`
+  (ours 6 s), then gets class `.out` and is removed 300 ms later; also hidden when `canPester` turns false. **No event, no class
+  on the host or page**: the only signal is the node appearing/disappearing in the shadow root. `--br8t-account-space` stays 52px.
+- Cause: `--badge-w` / `.tb-acct` reserved only the avatar, so at 412 px the pill (x 180-354) covered the gem chip and fullscreen.
+- Fix (`js/app/account.js` watchPill + `css/screens.css` ui-8 block): MutationObserver on the shadow root + ResizeObserver on
+  the pill. While it is up the visible top bar gets `.pill` and `--vp-pill-slot` (live px from the bar's right edge to the pill's
+  left, from its computed `right` + offsetWidth so the slide-in transform doesn't matter) - landscape just grows the badge slot
+  (currencies/gear/fullscreen slide left, given back with a .3 s ease). Where the bar's natural width (measured at rest) doesn't
+  fit beside the pill (portrait phones) it also gets `.pill-wrap`: currencies + fullscreen drop to a second row under the
+  emblem (left-aligned, clear of the hub gear). The company drawer is clamped to `--vp-pill-room`.
+  `canPester` is now hub-only (the hub bar is an overlay, so the wrap moves nothing; on Settings it would push the list down for
+  6 s). Leaving for a non-account screen hides the host at once (hashchange + the router's synthetic popstate), not on the
+  250 ms tick. Battle: host is hidden, pill never shows; the landscape `.hud-top` 120 px reserve is unchanged and clear.
+- Verified (scratch ui8/t_pill.mjs: overlap probe of every bar/HUD control vs the pill + avatar, 30 ms after it appears, at 4 s,
+  and after it's gone): zero hits at 412x915, 390x844, 915x412, 844x340 (and 1280x800 probe). t_nav.mjs: pill up on the hub ->
+  #/squad: host hidden immediately, bar unwrapped; -> battle: no badge.
+- Shots (scratch ui8/): hub_{412x915,390x844,915x412,844x340}_{exp,col}.png, nav_{412x915,915x412}_{squad,battle}.png,
+  before: base_{412x915,915x412,844x340}_exp.png.
+## Requests (ui-8)
+- shared auth layer (whoever owns /lib/auth/ui.js): a `br8t-pester` event (show/hide) or a class on the host would replace the
+  MutationObserver; the pill's ticker also leaves a stray "s" of "progress" visible left of "Login now!" at the end of the scroll.
