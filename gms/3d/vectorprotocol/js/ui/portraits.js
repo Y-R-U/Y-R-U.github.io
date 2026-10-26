@@ -3,7 +3,7 @@
 // Now: the card shows its role-icon placeholder at once; renders run one at a time with a real yield (paint) between
 // them, cards on screen first (IntersectionObserver); every result is kept as a PNG blob in IndexedDB, so later visits
 // and sessions only decode images. Bump PORTRAIT_VERSION when robots change how portraits look.
-export const PORTRAIT_VERSION = 1;
+export const PORTRAIT_VERSION = 2;   // 2: robots-6 (units.PORTRAIT_STYLE 2, new ARBITER)
 const BUDGET_MS = 8;
 
 const DB = 'vectorprotocol-portraits', ST = 'p';

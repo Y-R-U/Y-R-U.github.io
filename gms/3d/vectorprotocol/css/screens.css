@@ -359,8 +359,6 @@
 .scr-unit { padding-bottom: 0; }
 .up-stage { flex: 0 0 38%; position: relative; touch-action: none; }
 /* the turntable renders on black: a navy halo around (not on) the model, blended 'lighten' so it only lifts the empty stage (QA QL10) */
-.up-stage::before { content: ""; position: absolute; inset: -40px 0 0; pointer-events: none; mix-blend-mode: lighten;
-  background: radial-gradient(ellipse 50% 50% at 50% 55%, transparent 30%, #0b2148 56%, #06122a 80%, transparent 100%); }
 .up-fallback { position: absolute; inset: 0 18%; display: grid; place-items: center; }
 .up-fallback .ph { width: 40%; color: var(--cyan); opacity: .6; }
 .up-fallback .portrait { width: 100%; height: 100%; object-fit: contain; }

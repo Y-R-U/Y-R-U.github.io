@@ -9,7 +9,7 @@ import { NCH, PX, evalLoop, evalAction, actionDef, LOOPS, powerCurve, smooth, le
 import { MODELS, modelDef, LAUNCH_IDS, register } from './models/index.js';
 export { LAUNCH_IDS, register as registerModel };
 export { MODELS, FACTIONS };
-export { renderPortrait, createTurntable } from './portrait.js';
+export { renderPortrait, createTurntable, PORTRAIT_STYLE } from './portrait.js';
 
 export const ANIMS = ['idle', 'advance', 'attack', 'attack_alt', 'cast', 'overdrive', 'hit', 'die', 'victory', 'deploy'];
 // 'skin' exists only in the organic (fantasy) set; a model that uses it should drop another slot to stay at 6 draw calls

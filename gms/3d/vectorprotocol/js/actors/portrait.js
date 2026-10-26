@@ -1,7 +1,7 @@
 // Card portraits (cached, transparent) + the 3D profile turntable scene object.
 import * as THREE from 'three';
 import { createUnit, MODELS } from './units.js';
-import { FACTIONS } from './materials.js';
+import { FACTIONS, createHoverBeam } from './materials.js';
 
 const cache = new Map();
 let fallback = null;
@@ -72,27 +72,73 @@ const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), GRADE);
 const quadScene = new THREE.Scene(); quadScene.add(quad);
 const quadCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
+// Bump when card portraits change look; ui folds it into its PORTRAIT_VERSION cache key.
+export const PORTRAIT_STYLE = 2;   // 2: ARBITER re-sculpt (round 6)
+
+// Per-renderer portrait state, reused across calls: render targets, one studio scene, and one live material per shader program.
+// Disposing a unit's materials released their programs, so every portrait recompiled ~6 shaders (~30 ms of the 55 ms).
+const shared = new WeakMap();
+function portraitState(R, w, h) {
+  let st = shared.get(R);
+  if (!st) {
+    const scene = new THREE.Scene();
+    st = { scene, lights: studio(scene, { glow: 0xffffff }), keep: new Map(), rtA: null, rtB: null };
+    shared.set(R, st);
+  }
+  if (!st.rtA || st.rtB.width !== w || st.rtB.height !== h) {
+    st.rtA?.dispose(); st.rtB?.dispose();
+    st.rtA = new THREE.WebGLRenderTarget(w * 2, h * 2, { type: THREE.HalfFloatType, samples: 4 });
+    st.rtB = new THREE.WebGLRenderTarget(w, h, { type: THREE.UnsignedByteType });
+  }
+  return st;
+}
+// keep one material alive per compiled program so the next unit's identical materials reuse it
+function keepPrograms(R, st, unit) {
+  unit.root.traverse((m) => {
+    if (!m.material) return;
+    for (const mm of Array.isArray(m.material) ? m.material : [m.material]) {
+      const prog = R.properties.get(mm).currentProgram;
+      if (prog && !st.keep.has(prog)) { st.keep.set(prog, mm); mm.dispose = () => {}; }
+    }
+  });
+}
+// exact world box of a rigid-skinned unit mesh (one bone per vertex): one matrix per bone instead of three's per-vertex skinning
+const _bm = [], _v3 = new THREE.Vector3();
+function unitBox(mesh) {
+  const box = new THREE.Box3(), sk = mesh.skeleton, g = mesh.geometry;
+  const P = g.attributes.position.array, SI = g.attributes.skinIndex.array, n = g.attributes.position.count;
+  for (let i = 0; i < sk.bones.length; i++) (_bm[i] ||= new THREE.Matrix4()).multiplyMatrices(sk.bones[i].matrixWorld, sk.boneInverses[i]);
+  let x0 = Infinity, y0 = Infinity, z0 = Infinity, x1 = -Infinity, y1 = -Infinity, z1 = -Infinity;
+  for (let i = 0; i < n; i++) {
+    const e = _bm[SI[i * 4]].elements, x = P[i * 3], y = P[i * 3 + 1], z = P[i * 3 + 2];
+    const wx = e[0] * x + e[4] * y + e[8] * z + e[12], wy = e[1] * x + e[5] * y + e[9] * z + e[13], wz = e[2] * x + e[6] * y + e[10] * z + e[14];
+    if (wx < x0) x0 = wx; if (wx > x1) x1 = wx; if (wy < y0) y0 = wy; if (wy > y1) y1 = wy; if (wz < z0) z0 = wz; if (wz > z1) z1 = wz;
+  }
+  box.set(_v3.set(x0, y0, z0), new THREE.Vector3(x1, y1, z1));
+  // extra meshes a model hangs on its bones (ghosts etc.): exact, the slow way
+  mesh.traverse((m) => { if (m !== mesh && m.isMesh) box.expandByObject(m, true); });
+  return box;
+}
+const yieldTask = () => new Promise((r) => setTimeout(r, 0));
+
 // opts: { engine | renderer, env, rarity, faction, w=256, h=320, framing 'bust'|'full', yaw, anim, t, format 'dataURL'|'bitmap'|'canvas' }
+// Split across tasks: build + pose the unit, yield, then render + async readback (the GPU fence is polled, not waited on).
 export async function renderPortrait(model, opts = {}) {
   const def = MODELS[model] || {};
   const o = { w: 256, h: 320, framing: 'bust', yaw: 0.55, anim: 'idle', t: 0.6, rarity: def.rarity || 'common', faction: def.faction, format: 'dataURL', ...opts };
   const key = [model, o.rarity, o.faction, o.w, o.h, o.framing, o.yaw, o.anim, o.t, o.format].join('|');
   if (cache.has(key)) return cache.get(key);
   const job = (async () => {
+    const t0 = performance.now();
     const R = o.engine?.renderer || o.renderer || fallbackRenderer().renderer;
     const env = o.env || o.engine?.env || (R === fallback?.renderer ? fallback.env : fallbackRenderer().env);
     const unit = createUnit({ model, rarity: o.rarity, faction: o.faction, quality: 'high' });
-    const scene = new THREE.Scene();
-    scene.environment = env;
-    scene.environmentIntensity = 0.9;
-    studio(scene, unit.palette);
-    scene.add(unit.root);
     unit.play(o.anim);
     for (let i = 0; i < Math.round(o.t * 30); i++) unit.update(1 / 30);
     unit.root.rotation.y = o.yaw;
     unit.root.updateMatrixWorld(true);
     const H = unit.height, cam = new THREE.PerspectiveCamera(o.framing === 'bust' ? 24 : 28, o.w / o.h, 0.1, 50);
-    const box = new THREE.Box3().setFromObject(unit.mesh, true);
+    const box = unitBox(unit.mesh);
     // frame on the bounding box: bust = upper ~60% (wide units like quads fall back to full); always fit the width too
     const bh = box.max.y - box.min.y, bw = Math.max(box.max.x - box.min.x, 0.1);
     // bust only for upright bipeds; quads, hovers and tracked units (and anything squat) frame whole
@@ -104,21 +150,39 @@ export async function renderPortrait(model, opts = {}) {
     const dist = span / 2 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
     cam.position.set(cx, cy + H * 0.08, box.max.z + Math.max(dist, 1));
     cam.lookAt(cx, cy, cz);
-    const rtA = new THREE.WebGLRenderTarget(o.w * 2, o.h * 2, { type: THREE.HalfFloatType, samples: 4 });
-    const rtB = new THREE.WebGLRenderTarget(o.w, o.h, { type: THREE.UnsignedByteType });
+    const tBuild = performance.now() - t0;
+    if (o.split !== false) await yieldTask();
+
+    const t1 = performance.now();
+    const st = portraitState(R, o.w, o.h);
+    const { scene, lights } = st;
+    scene.environment = env;
+    scene.environmentIntensity = 0.9;
+    lights[1].color.set(unit.palette.glow);
+    scene.add(unit.root);
     const prev = { rt: R.getRenderTarget(), cc: R.getClearColor(new THREE.Color()), ca: R.getClearAlpha() };
-    R.setRenderTarget(rtA); R.setClearColor(0x000000, 0); R.clear();
+    R.setRenderTarget(st.rtA); R.setClearColor(0x000000, 0); R.clear();
     R.render(scene, cam);
-    GRADE.uniforms.tSrc.value = rtA.texture;
-    R.setRenderTarget(rtB); R.clear(); R.render(quadScene, quadCam);
+    GRADE.uniforms.tSrc.value = st.rtA.texture;
+    R.setRenderTarget(st.rtB); R.clear(); R.render(quadScene, quadCam);
     const px = new Uint8Array(o.w * o.h * 4);
-    R.readRenderTargetPixels(rtB, 0, 0, o.w, o.h, px);
+    let read = null;
+    if (R.readRenderTargetPixelsAsync && o.asyncRead !== false) {
+      try { read = R.readRenderTargetPixelsAsync(st.rtB, 0, 0, o.w, o.h, px); } catch (e) { read = null; }
+    }
+    if (!read) R.readRenderTargetPixels(st.rtB, 0, 0, o.w, o.h, px);
     R.setRenderTarget(prev.rt); R.setClearColor(prev.cc, prev.ca);
-    rtA.dispose(); rtB.dispose(); unit.dispose();
+    keepPrograms(R, st, unit);
+    unit.dispose();
+    const tRender = performance.now() - t1;
+    if (read) await read.catch(() => R.readRenderTargetPixels(st.rtB, 0, 0, o.w, o.h, px));
+
+    const t2 = performance.now();
     const c = document.createElement('canvas'); c.width = o.w; c.height = o.h;
     const g = c.getContext('2d'), img = g.createImageData(o.w, o.h);
     for (let y = 0; y < o.h; y++) img.data.set(px.subarray((o.h - 1 - y) * o.w * 4, (o.h - y) * o.w * 4), y * o.w * 4);
     g.putImageData(img, 0, 0);
+    portraitStats.last = { model, build: +tBuild.toFixed(1), render: +tRender.toFixed(1), canvas: +(performance.now() - t2).toFixed(1), wall: +(performance.now() - t0).toFixed(1) };
     if (o.format === 'canvas') return c;
     if (o.format === 'bitmap' && typeof createImageBitmap === 'function') return createImageBitmap(c);
     return c.toDataURL('image/png');
@@ -127,6 +191,8 @@ export async function renderPortrait(model, opts = {}) {
   job.catch(() => cache.delete(key));
   return job;
 }
+// main-thread ms of the last renderPortrait, per task: { build, render, canvas, wall }
+export const portraitStats = { last: null };
 
 // Real silhouette of a posed unit as height bands: [{y0, y1, r}] (r = max distance from the spin axis, so any yaw fits).
 export function unitBands(unit, n = 10) {
@@ -182,9 +248,78 @@ export function fitCamera(camera, bands, { halfH = 0.3, halfW = 0.34, cy = 0, cx
   return { D, tX, tY };
 }
 
+// Turntable stage backdrop: a camera-independent sky dome (lit gradient + a soft glow behind the subject + vignette) and a
+// floor disc (faction glow pooled under the plate, hex lines for sci-fi, flagstones for fantasy) that fades into the dome.
+// Dim on purpose (stays under the bloom threshold). 2 draw calls.
+const BD_VERT = 'varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }';
+const BD_COMMON = /* glsl */`
+  uniform vec3 uTint, uTop, uLow, uFocus; uniform float uSize, uFantasy;
+  varying vec3 vW;
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }`;
+const DOME_FRAG = BD_COMMON + /* glsl */`
+  void main() {
+    vec3 d = normalize(vW - cameraPosition), c = normalize(uFocus - cameraPosition);
+    float ang = acos(clamp(dot(d, c), -1.0, 1.0)) / uSize;          // 1 = the subject's angular half-height
+    vec3 col = mix(uLow, uTop, smoothstep(-0.25, 0.55, d.y));
+    col += uTint * (0.075 * exp(-ang * ang * 0.7) + 0.018 * exp(-ang * 0.45));   // halo behind the unit + wide wash
+    // fantasy: faint drifting canopy / dusk mottling up high; sci-fi: faint horizontal scan bands
+    float n = hash(floor(d.xz / max(d.y + 1.2, 0.2) * 9.0));
+    col *= mix(1.0 + 0.05 * sin(d.y * 140.0) * smoothstep(0.0, 0.4, d.y), 0.92 + 0.12 * n * smoothstep(0.05, 0.6, d.y), uFantasy);
+    col *= 1.0 - 0.45 * smoothstep(1.2, 4.0, ang);                    // vignette
+    gl_FragColor = vec4(col, 1.0);
+  }`;
+const FLOOR_FRAG = BD_COMMON + /* glsl */`
+  uniform float uPed;
+  void main() {
+    vec2 p = vW.xz; float r = length(p) / uPed;
+    // pattern: hex lines (sci-fi) or offset flagstones with mortar (fantasy)
+    vec2 h = p * 1.6; h.y *= 1.1547; h.x += 0.5 * mod(floor(h.y), 2.0);
+    vec2 f = abs(fract(h) - 0.5);
+    float hex = smoothstep(0.035, 0.0, abs(max(f.x * 1.5 + f.y * 0.5, f.y) - 0.5) * 0.5);
+    vec2 s = p * vec2(1.4, 2.0); s.x += 0.5 * mod(floor(s.y), 2.0);
+    vec2 fs = abs(fract(s) - 0.5); float mortar = smoothstep(0.43, 0.48, max(fs.x * 0.92, fs.y));
+    float stone = 0.85 + 0.3 * hash(floor(s));
+    vec3 base = uLow * mix(1.0, stone, uFantasy) * 1.25;
+    vec3 col = base + uTint * mix(hex * 0.045, 0.0, uFantasy) - base * mortar * 0.7 * uFantasy;
+    col += uTint * 0.16 * exp(-r * r * 1.6);                         // glow pooled under the plate
+    float a = 1.0 - smoothstep(1.4, 4.2, r);                          // fades into the dome
+    gl_FragColor = vec4(col, a);
+  }`;
+function createBackdrop() {
+  const uniforms = {
+    uTint: { value: new THREE.Color() }, uTop: { value: new THREE.Color() }, uLow: { value: new THREE.Color() },
+    uFocus: { value: new THREE.Vector3(0, 1, 0) }, uSize: { value: 0.2 }, uFantasy: { value: 0 }, uPed: { value: 1 },
+  };
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(30, 32, 16), new THREE.ShaderMaterial({ uniforms, vertexShader: BD_VERT, fragmentShader: DOME_FRAG, side: THREE.BackSide, depthWrite: false }));
+  dome.renderOrder = -2; dome.frustumCulled = false;
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(1, 48), new THREE.ShaderMaterial({ uniforms, vertexShader: BD_VERT, fragmentShader: FLOOR_FRAG, transparent: true, depthWrite: false }));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -0.121; floor.renderOrder = -1;
+  const g = new THREE.Group(); g.add(dome, floor); g.name = 'tt-backdrop';
+  return {
+    group: g,
+    // tint = plate colour; fantasy = stone / forest tones
+    set({ tint, fantasy, focus, size, ped }) {
+      const T = new THREE.Color(tint);
+      if (fantasy) {
+        uniforms.uTint.value.copy(T).lerp(new THREE.Color(0xd8b878), 0.6).multiplyScalar(0.75);   // torch-warm, faction-leaning
+        uniforms.uTop.value.setRGB(0.03, 0.036, 0.028); uniforms.uLow.value.setRGB(0.03, 0.028, 0.024);   // mossy dusk / grey stone
+      } else {
+        uniforms.uTint.value.copy(T).lerp(new THREE.Color(0xffe0b0), 0.18);   // a little warm white keeps orange from going red at low light
+        uniforms.uTop.value.copy(T).multiplyScalar(0.012).add(new THREE.Color(0.01, 0.014, 0.03)); uniforms.uLow.value.setRGB(0.008, 0.01, 0.018);
+      }
+      uniforms.uFantasy.value = fantasy ? 1 : 0;
+      uniforms.uFocus.value.copy(focus); uniforms.uSize.value = size; uniforms.uPed.value = ped;
+      floor.scale.setScalar(ped * 4.4);
+    },
+    dispose() { dome.geometry.dispose(); dome.material.dispose(); floor.geometry.dispose(); floor.material.dispose(); },
+  };
+}
+
 // Scene object for the 3D profile view (engine.setScene(tt)). Drag with tt.rotate(dxPixels).
 // view (optional): fitCamera options. Defaults suit scr_unit's portrait layout (zoom 0.6 + setViewOffset: subject in the top stage);
-// view.offsetX shifts the subject sideways (frame-height units).
+// view.offsetX shifts the subject sideways (frame-height units). view.backdrop (default true): built-in lit stage backdrop; false =
+// the old plain clear colour. view.hoverMax (default 0.24 m): high hover units are lowered to this gap above the plate on the
+// turntable only, and get a hover beam (the battle look is unchanged).
 export function createTurntable(engine, unitOpts = {}, view = {}) {
   const scene = new THREE.Scene();
   scene.environment = engine?.env || null;
@@ -192,6 +327,9 @@ export function createTurntable(engine, unitOpts = {}, view = {}) {
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
   let unit = null, lights = [], yaw = 0.5, spin = 0.35, idleFor = 0, pedestal = null, pedR = 1.2;
   const group = new THREE.Group(); scene.add(group);
+  const backdrop = view.backdrop === false ? null : createBackdrop();
+  if (backdrop) scene.add(backdrop.group);
+  let beam = null, fit = null;
 
   function buildPedestal(color, R) {
     if (pedestal) { group.remove(pedestal); pedestal.traverse((m) => { m.geometry?.dispose(); m.material?.dispose(); }); }
@@ -213,20 +351,43 @@ export function createTurntable(engine, unitOpts = {}, view = {}) {
     unit.play('idle');
     for (let i = 0; i < 12; i++) unit.update(1 / 30);
     group.rotation.y = 0; group.updateMatrixWorld(true);
-    const bands = unitBands(unit);
+    let bands = unitBands(unit);
+    // hover units: lower the mesh (not the root, so aura ring / motes stay put) to a modest gap and add a beam under it
+    const gap = unitBox(unit.mesh).min.y, hmax = view.hoverMax ?? 0.24;
+    obj.hoverDrop = 0;
+    if (unit.def.rig === 'hover' && gap > hmax + 0.04) {
+      obj.hoverDrop = gap - hmax;
+      unit.mesh.position.y = -obj.hoverDrop / (unit.body.scale.y || 1);
+      group.updateMatrixWorld(true);
+      bands = unitBands(unit);
+    }
+    const gapNow = gap - obj.hoverDrop;
+    if (unit.def.rig === 'hover' && !unit.def.hoverBeam && gapNow > 0.12 && view.hoverBeam !== false) {
+      beam = createHoverBeam(unit.palette.glow, { height: gapNow + 0.12, radius: Math.min(unit.radius * 0.6, 0.4) });
+      unit.root.add(beam);
+    }
     const ground = bands.filter((b) => b.y0 < 0.3).reduce((m, b) => Math.max(m, b.r), 0);
     pedR = Math.min(Math.max(unit.radius * 1.45, Math.min(ground * 1.08, unit.radius * 1.6), 0.7), 1.6);
     bands.push({ y0: -0.12, y1: 0, r: pedR });
-    fitCamera(camera, bands, { halfH: 0.29, halfW: 0.37, cy: -0.045, pitch: 0.1, margin: 1.03, ...view, cx: view.cx ?? view.offsetX ?? 0 });
+    fit = fitCamera(camera, bands, { halfH: 0.29, halfW: 0.37, cy: -0.045, pitch: 0.1, margin: 1.03, ...view, cx: view.cx ?? view.offsetX ?? 0 });
+    fit.bands = bands;
   }
+  function disposeBeam() { if (beam) { beam.removeFromParent(); beam.traverse((m) => { m.geometry?.dispose(); m.material?.dispose(); }); beam = null; } }
   function setUnit(opts) {
+    disposeBeam();
     if (unit) unit.dispose();
     for (const l of lights) scene.remove(l);
     unit = createUnit({ quality: engine?.quality?.name === 'low' ? 'med' : 'high', ...opts });
     lights = studio(scene, unit.palette, 0.9);
     group.add(unit.root);
     frame();
-    buildPedestal(unit.rarity === 'legendary' || unit.faction === 'legendary' ? 0xffc23a : unit.palette.plate, pedR);
+    const plateC = unit.rarity === 'legendary' || unit.faction === 'legendary' ? 0xffc23a : unit.palette.plate;
+    buildPedestal(plateC, pedR);
+    if (backdrop) {
+      let y0 = 1e9, y1 = -1e9; for (const b of fit.bands) { y0 = Math.min(y0, b.y0); y1 = Math.max(y1, b.y1); }
+      const focus = new THREE.Vector3(fit.tX, (y0 + y1) / 2, 0);
+      backdrop.set({ tint: plateC, fantasy: unit.realm === 'fantasy', focus, size: Math.atan((y1 - y0) / 2 / fit.D), ped: pedR });
+    }
     unit.play('deploy');
     obj.unit = unit;
     return unit;
@@ -241,10 +402,11 @@ export function createTurntable(engine, unitOpts = {}, view = {}) {
       if (idleFor > 2) yaw += dt * spin;
       group.rotation.y = yaw;
       unit?.update(dt);
+      if (beam) { const cu = beam.userData.cone.material.uniforms; cu.uTime.value += dt; cu.uLife.value = unit.state.dead ? 0 : 1; beam.visible = unit.body.position.y < 0.5; }
       if (unit && !unit.state.action && unit.state.loop !== 'idle') unit.play('idle');
     },
     resize(w, h) { camera.aspect = w / h; camera.updateProjectionMatrix(); },
-    dispose() { unit?.dispose(); if (pedestal) pedestal.traverse((m) => { m.geometry?.dispose(); m.material?.dispose(); }); },
+    dispose() { disposeBeam(); backdrop?.dispose(); unit?.dispose(); if (pedestal) pedestal.traverse((m) => { m.geometry?.dispose(); m.material?.dispose(); }); },
   };
   setUnit(unitOpts);
   return obj;

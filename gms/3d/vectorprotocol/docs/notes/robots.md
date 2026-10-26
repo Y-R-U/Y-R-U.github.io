@@ -206,3 +206,40 @@ M.save(sys.argv[1])" $out $n "${files[@]}"
 - OPEN: oracle faceplate, halo face/R0, elf cloak lining not touched. Specter is small on the turntable (rifle radius 2.17 m forces
   the fit); Halo's aura bubble pokes past the card-portrait edge (shield not in the bust box). Paladin's sword glare blooms on the plate.
   Request (ui): none needed; scr_unit's resize wrapper keeps working (fit is aspect-independent, computed in setUnit).
+
+## Round 6 (robots) — checkpoint 1
+- DONE 2 (renderPortrait perf): cause was not the render itself but shader **recompiles**: `unit.dispose()` disposed the materials,
+  three released their programs (usedTimes 0), so every portrait recompiled ~6 programs (getProgramInfoLog = ~28 ms of each call).
+  portrait.js now keeps one live material per compiled program per renderer (`keepPrograms`), reuses one studio scene + the two
+  render targets, computes the framing box with one matrix per bone (rigid skin) instead of three's per-vertex skinning (`unitBox`,
+  exact), splits build | render into two tasks (`setTimeout(0)` between, `opts.split:false` to disable) and reads back with
+  `readRenderTargetPixelsAsync` (fence polled; sync fallback). Output pixel-identical (cmp vs the old module: 0 diff, except
+  motes/time noise that the old module also has run to run). `portraitStats.last` = {build, render, canvas, wall} ms.
+  M5, 44 models cold, wall per call: before median 52 / p90 60-65 / max 74-77; after median 22 / p90 35 / max 52 (first call only:
+  compiles the shared programs once); longest single task now ~22 ms (build of a cold template), warm calls 12-18 ms.
+  `PORTRAIT_STYLE` exported from portrait.js + units.js (= 2: ARBITER re-sculpt).
+- DONE 1 (turntable backdrop): `createBackdrop()` in portrait.js, on by default (`view.backdrop:false` = old black). Dome (lit
+  gradient + halo behind the subject sized to its angular height + vignette, sci-fi scan bands / fantasy dusk mottling) + floor disc
+  (plate-colour glow pooled under the plate, hex lines sci-fi, flagstones fantasy) fading into the dome. 2 dc, dim (under bloom).
+  Fantasy (`realm:'fantasy'`): torch-warm faction-leaning tint, grey stone / mossy dusk. Shots robots6/shots/a2_sheet.png (b0_tt_sheet = before).
+- DONE 3 (hover on turntable): hover-rig units whose mesh floats > 0.28 m above the plate are lowered (mesh.position, not root, so
+  aura ring/motes stay) to `view.hoverMax` 0.24 m, and get a kit hover beam (createHoverBeam) when the def has none. Battle untouched.
+  Needle drop 0.26, Wisp 0.35 (`tt.hoverDrop`).
+- DONE 4 (ARBITER sculpt): flared navy frock-coat lathe skirt (open front, white piping, gold hem R2, glow hem R3), bigger coat
+  block, navy mantle + navy shoulder boards (white only as piping; the old gold/white board tops were what read as beige slabs
+  from above), knees metal, corporate navy darker (0x1c2f66); drones 2/3/4 (R0 / R1-4 / R5) at 1.85-2.05x, navy shells + white
+  equator band, rotors dark (glow R4+); d0..d5 sockets re-placed per rank onto the real drones (FX relay unchanged). 14.6k tris epic,
+  dc 6+motes. Shots robots6/shots/arb_battle_ba.png (before | after, battle 412x915), a_arb_r025.png, a_arb_sheet.png.
+- Gate: testAll 0 fails.
+- Checked: hover drops for all hover models (drone 0.49, wisp 0.35, needle 0.26, meridian 0.18, phase 0.16, prism 0.15, husk 0.13;
+  units with auras/low hovers 0); shots a3_sheet.png (15 units incl. fantasy elf_sage, rogue scrapper), landscape a4_land_game.png,
+  in-game profile ?dev=1&fresh g2_profile.png (backdrop under ui's halo). Rogue dome tint gets 18% warm white (orange went red).
+- NEXT (open): oracle faceplate, halo face/R0, elf cloak lining (carried from round 5).
+
+## Requests (round 6)
+- ui: the turntable now has its own lit backdrop (createTurntable view.backdrop, default on). Remove `.up-stage::before` (the navy
+  halo, css/screens.css) — with both, the top of the stage is double-lit.
+- ui: fold `units.PORTRAIT_STYLE` (now 2, ARBITER re-sculpt) into portraits.js's IndexedDB key (e.g. `v${PORTRAIT_VERSION}.${units.PORTRAIT_STYLE ?? 0}`)
+  so cached arbiter cards refresh; I bump it whenever card art changes.
+- ui (optional): renderPortrait is now two tasks per call (build | render, ~22 ms max each on the M5) plus an async readback; no
+  API change. The ~8 ms per-job budget in portraits.js can stay.

@@ -7,10 +7,12 @@
 // VALUE: `accent` = navy (coat, trousers, faceplate, drone bellies), `paint` = white (lapels, shoulders, shins, head, drones),
 // `metal` = dark gunmetal joints + shaft, `trim` = amber-gold markers (tie clip, rings, staff bands), `glow` = cyan (tie, lamps,
 // drone halos, holo panels), `eye` = cyan visor + drone lenses.
-// Rank tiers (epic default R2): R0 battered: snapped antenna, three drones, bare staff top · R1 four plain drones, plain coat
-//   · R2 (base) staff relay dishes, layered shoulder boards, coat-tail trims, lapel pins · R3 drones gain light trails + a hardlight orbit ring, glowing coat hems, staff light
-//   segments, ear rings glow · R4 holo org-chart panels flanking the head + head fins (silhouette) · R5 six drones, gold staff
-//   crown ring, a second outer drone halo.
+// Rank tiers (epic default R2): R0 battered: snapped antenna, two drones, short coat, no mantle, bare staff top · R1 three plain
+//   drones, navy mantle · R2 (base) staff relay dishes, layered shoulder boards, gold hem + board edges, lapel pins · R3 drones gain
+//   light trails + a hardlight orbit ring, glowing coat hem, staff light segments, ear rings glow · R4 holo org-chart panels flanking
+//   the head + head fins (silhouette), glowing rotors · R5 four drones, gold staff crown ring, a second outer drone halo.
+// Round 6 (robots) sculpt pass: a bigger, darker coat (flared frock skirt, navy mantle + shoulder boards, white only as piping)
+// and fewer, larger drones (R0 2 · R1-R4 3 · R5 4) with navy shells and a white equator band, so it reads from the battle camera.
 // Rig: biped. aux2 (chest) = the drone ring (spins in tick; rises overhead in the overdrive, falls on death), aux0 (chest) = R4 holo
 // panels (bob in tick). The staff is authored in the right hand's idle hold frame (HOLD_FRAME, computed at load).
 import { THREE, P, PS, plate, fin, discX, legs, makeRig, poseFrame, LIB, PI, BI } from '../kit.js';
@@ -23,7 +25,9 @@ const DIMS = {
   parents: { aux2: 'chest' },
   aux0: [0, 0.3, -0.12], aux2: [0, 0.2, 0],
 };
-const DR = 0.5;             // drone orbit radius
+const DR = 0.56;            // drone orbit radius
+const droneCount = (rk) => (rk >= 5 ? 4 : rk === 0 ? 2 : 3);
+const droneAngle = (i, n) => (i / n) * PI * 2 + 0.3;
 const OD_REL = 0.167;
 const STAFF_UP = 0.98, STAFF_DN = 0.9;   // staff extent above / below the grip
 
@@ -94,12 +98,12 @@ function head0(b, o) {
 function torso(b, o) {
   const rk = o.rank, far = b.far;
   P(b, 'chest', 'metal', [0.22, 0.24, 0.16], [0, 0.09, -0.01], [0, 0, 0], { c: 0.025 });
-  P(b, 'chest', 'accent', [0.36, 0.27, 0.22], [0, 0.1, 0.0], [0.04, 0, 0], { c: 0.04, tx: 1.22, bx: 0.7, bz: 0.85 });
+  P(b, 'chest', 'accent', [0.42, 0.3, 0.25], [0, 0.1, -0.005], [0.04, 0, 0], { c: 0.04, tx: 1.22, bx: 0.72, bz: 0.85 });
   // white lapel plates forming a V
-  PS(b, 'chest', 'paint', [0.13, 0.25, 0.04], [0.08, 0.11, 0.11], [0.06, -0.15, -0.32], { c: 0.012, tx: 1.25, bx: 0.6 });
+  PS(b, 'chest', 'paint', [0.13, 0.25, 0.04], [0.08, 0.11, 0.122], [0.06, -0.15, -0.32], { c: 0.012, tx: 1.25, bx: 0.6 });
   // the tie: cyan light, gold clip
-  b.add(b.ext([[-0.011, 0], [0.011, 0], [0.017, -0.16], [0, -0.2], [-0.017, -0.16]], 0.02, 0.004), 'chest', 'glow', [0, 0.205, 0.114], [0.1, 0, 0]);
-  b.add(b.cbox(0.05, 0.03, 0.022, 0.005), 'chest', 'trim', [0, 0.215, 0.114], [0.1, 0, 0]);
+  b.add(b.ext([[-0.011, 0], [0.011, 0], [0.017, -0.16], [0, -0.2], [-0.017, -0.16]], 0.02, 0.004), 'chest', 'glow', [0, 0.205, 0.126], [0.1, 0, 0]);
+  b.add(b.cbox(0.05, 0.03, 0.022, 0.005), 'chest', 'trim', [0, 0.215, 0.126], [0.1, 0, 0]);
   b.add(b.cbox(0.045, 0.01, 0.024, 0.003), 'chest', 'trim', [0, 0.11, 0.124], [0.12, 0, 0]);
   // collar: tall white stand-up collar behind the neck
   b.add(b.tor(0.075, 0.018, 20, 5, PI * 1.25), 'chest', 'paint', [0, 0.235, -0.0], [PI / 2 + 0.25, 0, PI * 0.5 - PI * 0.625]);
@@ -144,14 +148,26 @@ function torso(b, o) {
   P(b, 'pelvis', 'accent', [0.26, 0.12, 0.2], [0, -0.01, 0], [0, 0, 0], { c: 0.03, bx: 0.9 });
   PS(b, 'pelvis', 'accent', [0.11, 0.26, 0.03], [0.08, -0.12, 0.11], [-0.12, 0.1, 0.06], { c: 0.01, bx: 1.1 });
   PS(b, 'pelvis', 'paint', [0.014, 0.24, 0.032], [0.028, -0.12, 0.125], [-0.12, 0.1, 0.06], { c: 0.003 });
-  const tl = rk === 0 ? 0.36 : 0.5;
-  PS(b, 'pelvis', 'accent', [0.15, tl, 0.026], [0.08, -0.02 - tl / 2, -0.115], [0.16, -0.1, 0.05], { c: 0.01, tx: 1.05, bx: 0.8 });
-  if (rk >= 2) PS(b, 'pelvis', 'paint', [0.012, tl * 0.9, 0.03], [0.128, -0.03 - tl / 2, -0.11], [0.16, -0.1, 0.05], { c: 0.003 });
-  PS(b, 'pelvis', 'trim', [0.12, 0.016, 0.03], [0.072, -0.04 - tl, -0.17], [0.16, -0.1, 0.05], { c: 0.004 });
+  // the frock coat: a flared lathe skirt from the waist to below the knee, open at the front (R0 ragged-short)
+  const hemY = rk === 0 ? -0.4 : -0.52, gap = 1.25;
+  const outer = [[0.17, 0.08], [0.195, -0.02], [0.22, -0.18], [0.245, -0.36], [0.27, hemY]];
+  const shellPts = [...outer, [0.255, hemY], ...outer.slice(0, -1).reverse().map(([r, y]) => [r - 0.016, y])];
+  b.add(b.lathe(shellPts.reverse(), 28, gap / 2, PI * 2 - gap), 'pelvis', 'accent', [0, 0, -0.01], [0, 0, 0], [1, 1, 0.92]);
+  // white piping down both front edges + a hem band (gold R2+, light strip R3+)
+  for (const s of [1, -1]) {
+    const a = s * gap / 2;
+    b.add(b.tube(outer.map(([r, y]) => [Math.sin(a) * (r + 0.004), y, Math.cos(a) * (r + 0.004) * 0.92 - 0.01]), 0.009, 12, 5), 'pelvis', 'paint');
+  }
+  b.add(b.tor(0.272, 0.011, 28, 4, PI * 2 - gap), 'pelvis', rk >= 2 ? 'trim' : 'metal', [0, hemY + 0.012, -0.01], [PI / 2, 0, PI / 2 - (PI - gap / 2) + PI], [1, 0.92, 1]);
+  if (rk >= 3) b.add(b.tor(0.274, 0.006, 28, 3, PI * 2 - gap), 'pelvis', 'glow', [0, hemY + 0.035, -0.01], [PI / 2, 0, PI / 2 - (PI - gap / 2) + PI], [1, 0.92, 1]);
+  // back vent seam + two tail buttons
+  if (!far) {
+    b.add(b.cbox(0.012, 0.3, 0.02, 0.004), 'pelvis', 'metal', [0, hemY + 0.16, -0.26]);
+    for (const s of [1, -1]) b.add(b.cyl(0.014, 0.014, 0.012, 10), 'pelvis', 'trim', [s * 0.05, 0.0, -0.215], [PI / 2, 0, 0]);
+  }
   if (rk >= 3) {
-    PS(b, 'pelvis', 'glow', [0.124, 0.012, 0.034], [0.072, -0.015 - tl, -0.165], [0.16, -0.1, 0.05], { c: 0.003 });
     PS(b, 'pelvis', 'glow', [0.092, 0.01, 0.034], [0.075, -0.205, 0.11], [-0.12, 0.1, 0.06], { c: 0.003 });
-    b.add(b.cyl(0.03, 0.03, 0.012, 6), 'chest', 'glow', [-0.09, 0.07, 0.125], [PI / 2 + 0.06, 0, 0]);
+    b.add(b.cyl(0.03, 0.03, 0.012, 6), 'chest', 'glow', [-0.09, 0.07, 0.137], [PI / 2 + 0.06, 0, 0]);
   }
   PS(b, 'pelvis', 'accent', [0.05, 0.2, 0.15], [0.13, -0.08, -0.01], [0, 0, 0.12], { c: 0.01 });
 }
@@ -163,16 +179,21 @@ function arms(b, o) {
   b.sym(b.sph(12, 8), 'upArm', 'metal', [0, 0, 0], [0, 0, 0], 0.05);
   // squared shoulder boards (white) over a navy cap; R2 adds the layered board + gold edge
   const S = D.shoulder;
-  PS(b, 'clav', 'accent', [0.18, 0.1, 0.19], [S + 0.01, 0.03, 0], [0, 0, -0.15], { c: 0.02, tx: 0.85 });
-  PS(b, 'clav', 'paint', [0.21, 0.04, 0.21], [S + 0.02, 0.09, 0], [0, 0, -0.2], { c: 0.012 });
-  lamp(b, 'clav', [S + 0.08, 0.1, 0.09], [0, 0, -0.2 - PI / 2], 0.012, 'glow');
+  PS(b, 'clav', 'accent', [0.2, 0.11, 0.21], [S + 0.01, 0.03, 0], [0, 0, -0.15], { c: 0.02, tx: 0.85 });
+  // squared navy shoulder boards, white piping on the outer edge (R2: layered board + gold edge)
+  PS(b, 'clav', 'accent', [0.25, 0.05, 0.25], [S + 0.03, 0.095, 0], [0, 0, -0.2], { c: 0.014 });
+  PS(b, 'clav', 'paint', [0.02, 0.055, 0.255], [S + 0.155, 0.07, 0], [0, 0, -0.2], { c: 0.006 });
+  lamp(b, 'clav', [S + 0.09, 0.115, 0.1], [0, 0, -0.2 - PI / 2], 0.013, 'glow');
   if (rk >= 2) {
-    PS(b, 'clav', 'paint', [0.035, 0.12, 0.2], [S + 0.12, 0.02, 0], [0, 0, -0.25], { c: 0.008 });
-    PS(b, 'clav', 'trim', [0.212, 0.01, 0.212], [S + 0.02, 0.113, 0], [0, 0, -0.2], { c: 0.003 });
-    // R2: white mantle capelet over the shoulders and upper back (silhouette + value from the battle camera)
-    P(b, 'chest', 'paint', [0.46, 0.05, 0.26], [0, 0.27, -0.03], [-0.12, 0, 0], { c: 0.02, tx: 0.7, bx: 1.0, tz: 0.8 });
-    P(b, 'chest', 'paint', [0.44, 0.2, 0.04], [0, 0.17, -0.165], [0.18, 0, 0], { c: 0.012, tx: 1.05, bx: 0.75 });
-    P(b, 'chest', 'trim', [0.4, 0.014, 0.05], [0, 0.07, -0.19], [0.18, 0, 0], { c: 0.004 });
+    PS(b, 'clav', 'accent', [0.04, 0.14, 0.24], [S + 0.15, 0.0, 0], [0, 0, -0.25], { c: 0.008 });
+    PS(b, 'clav', 'trim', [0.24, 0.014, 0.022], [S + 0.03, 0.115, 0.118], [0, 0, -0.2], { c: 0.004 });
+  }
+  if (rk >= 1) {
+    // navy mantle capelet over the shoulders and upper back (the big read-shape from the battle camera), white collar piping
+    P(b, 'chest', 'accent', [0.56, 0.06, 0.32], [0, 0.275, -0.03], [-0.12, 0, 0], { c: 0.024, tx: 0.72, bx: 1.0, tz: 0.8 });
+    P(b, 'chest', 'accent', [0.52, 0.24, 0.045], [0, 0.16, -0.175], [0.18, 0, 0], { c: 0.014, tx: 1.05, bx: 0.78 });
+    P(b, 'chest', 'paint', [0.5, 0.016, 0.05], [0, 0.045, -0.2], [0.18, 0, 0], { c: 0.005 });
+    if (rk >= 2) P(b, 'chest', 'trim', [0.4, 0.012, 0.05], [0, 0.03, -0.205], [0.18, 0, 0], { c: 0.004 });
   }
   b.sym(b.cyl(0.046, 0.052, ua * 0.92, 12), 'upArm', 'accent', [0, -ua * 0.5, 0]);
   piston(b, 'upArm', [0.0, -ua * 0.25, -0.045], [0.0, -ua * 0.95, -0.04], 0.009);
@@ -231,36 +252,35 @@ function droneAt(b, o, a, k = 1, outer = false) {
   const d = [Math.cos(a), 0, Math.sin(a)];
   // face along the orbit tangent of travel (decreasing angle) so the lens leads
   const yaw = Math.atan2(Math.sin(a), -Math.cos(a));
-  b.scope([d[0] * R, outer ? 0.12 : 0, d[2] * R], [0, yaw, 0], k * (o.rank >= 3 ? 1.5 : o.rank >= 2 ? 1.4 : 1.3), () => {
-    b.add(b.sph(16, 12), H, 'paint', [0, 0, 0], [0, 0, 0], [0.06, 0.045, 0.075]);
-    b.add(b.sph(14, 8, 0, PI * 2, PI * 0.5, PI * 0.5), H, 'accent', [0, -0.004, 0], [0, 0, 0], [0.064, 0.042, 0.079]);
-    b.add(b.cyl(0.022, 0.022, 0.02, 12), H, 'eye', [0, 0.004, 0.068], [PI / 2, 0, 0]);
-    b.add(b.tor(0.026, 0.005, 12, 3), H, 'trim', [0, 0.004, 0.076]);
-    // outrigger rotors
+  b.scope([d[0] * R, outer ? 0.12 : 0, d[2] * R], [0, yaw, 0], k * (rk >= 3 ? 2.05 : rk >= 2 ? 1.95 : 1.85), () => {
+    // navy shell (top), white equator band, dark belly; one cyan lamp on top + the lens in front
+    b.add(b.sph(18, 12, 0, PI * 2, 0, PI * 0.5), H, 'accent', [0, 0, 0], [0, 0, 0], [0.062, 0.05, 0.077]);
+    b.add(b.sph(16, 8, 0, PI * 2, PI * 0.5, PI * 0.5), H, 'metal', [0, 0.0, 0], [0, 0, 0], [0.062, 0.036, 0.077]);
+    b.add(b.tor(1, 0.13, 24, 4), H, 'paint', [0, 0.0, 0], [PI / 2, 0, 0], [0.064, 0.077, 0.075]);
+    b.add(b.cyl(0.024, 0.024, 0.022, 12), H, 'eye', [0, 0.008, 0.07], [PI / 2, 0, 0]);
+    b.add(b.tor(0.028, 0.005, 12, 3), H, 'trim', [0, 0.008, 0.079]);
+    b.add(b.cyl(0.01, 0.013, 0.012, 10), H, 'glow', [0, 0.05, -0.005]);
+    // stub rotors (dark; glowing only at R4+)
     for (const s of [1, -1]) {
-      b.add(b.cbox(0.05, 0.01, 0.014, 0.003), H, 'metal', [s * 0.075, 0.012, -0.01]);
-      b.add(b.tor(0.032, 0.006, 14, 3), H, rk >= 4 ? 'glow' : 'trim', [s * 0.11, 0.016, -0.01], [PI / 2, 0, 0]);
-      if (!far) b.add(b.cbox(0.06, 0.003, 0.008, 0.001), H, 'metal', [s * 0.11, 0.018, -0.01], [0, s * 0.6, 0]);
+      b.add(b.cbox(0.045, 0.012, 0.016, 0.003), H, 'metal', [s * 0.078, 0.008, -0.012]);
+      b.add(b.cyl(0.03, 0.03, 0.008, 12), H, rk >= 4 ? 'glow' : 'metal', [s * 0.108, 0.014, -0.012]);
     }
-    if (!far) b.add(b.cyl(0.003, 0.003, 0.05, 4), H, 'metal', [0, 0.065, -0.02]);
-    if (!far) b.add(b.sph(6, 5), H, 'glow', [0, 0.092, -0.02], [0, 0, 0], 0.008);
-    b.add(b.cyl(0.018, 0.024, 0.016, 10), H, 'metal', [0, -0.045, 0]);
-    b.add(b.cyl(0.014, 0.014, 0.006, 10), H, 'glow', [0, -0.054, 0]);
-    if (!far) for (const s of [1, -1]) b.add(fin(b, [[0, 0], [0.03, 0.0], [0.0, 0.035]], 0.006, 0.002), H, 'paint', [s * 0.03, 0.02, -0.07], [0, s * 0.3, 0]);
+    if (!far) for (const s of [1, -1]) b.add(fin(b, [[0, 0], [0.035, 0.0], [0.0, 0.04]], 0.007, 0.002), H, 'accent', [s * 0.028, 0.02, -0.074], [0, s * 0.3, 0]);
+    b.add(b.cyl(0.018, 0.024, 0.016, 10), H, 'metal', [0, -0.04, 0]);
+    b.add(b.cyl(0.014, 0.014, 0.006, 10), H, 'glow', [0, -0.049, 0]);
   });
   // R3+: light trail behind (arcs at larger angles; the ring spins toward decreasing angle)
   if (rk >= 3) {
     const segs = far ? 2 : 3;
     for (let j = 0; j < segs; j++) {
-      const st = a + 0.14 + j * 0.12;
-      b.scope([0, outer ? 0.12 : 0, 0], [0, -st, 0], 1, () => b.add(b.tor(R, 0.014 - j * 0.0035, 5, 3, 0.12), H, 'glow', [0, 0, 0], [PI / 2, 0, 0]));
+      const st = a + 0.2 + j * 0.15;
+      b.scope([0, outer ? 0.12 : 0, 0], [0, -st, 0], 1, () => b.add(b.tor(R, 0.016 - j * 0.004, 5, 3, 0.15), H, 'glow', [0, 0, 0], [PI / 2, 0, 0]));
     }
   }
 }
 function drones(b, o) {
-  const rk = o.rank;
-  const n = rk >= 5 ? 6 : rk === 0 ? 3 : 4;
-  for (let i = 0; i < n; i++) droneAt(b, o, (i / (rk === 0 ? 4 : n)) * PI * 2 + 0.3);
+  const rk = o.rank, n = droneCount(rk);
+  for (let i = 0; i < n; i++) droneAt(b, o, droneAngle(i, n));
   // R3+: a hardlight orbit ring the drones ride on (reads as an ellipse from the battle camera)
   if (rk >= 3) b.add(b.tor(DR, 0.007, 64, 3), 'aux2', 'glow', [0, -0.01, 0], [PI / 2, 0, 0]);
   if (rk >= 5) b.add(b.tor(DR + 0.2, 0.005, 64, 3), 'aux2', 'glow', [0, 0.11, 0], [PI / 2, 0, 0]);
@@ -290,7 +310,7 @@ function orgChart(b, o) {
 
 function build(b, o) {
   head(b, o); torso(b, o); arms(b, o);
-  legs(b, o, { w: 0.9, knee: 'cap', shin: 'slim', foot: 'point', thighSlot: 'accent', shellSlot: 'accent', shinPlateSlot: 'accent', kneeSlot: 'paint', footSlot: 'accent', outerSlot: 'metal', heelSlot: 'metal' });
+  legs(b, o, { w: 0.9, knee: 'cap', shin: 'slim', foot: 'point', thighSlot: 'accent', shellSlot: 'accent', shinPlateSlot: 'accent', kneeSlot: 'metal', footSlot: 'accent', outerSlot: 'metal', heelSlot: 'metal' });
   const D = b.rig.D;
   piston(b, 'thigh', [0.0, -D.thigh * 0.25, -0.07], [0.0, -D.thigh * 0.95, -0.06], 0.01);
   if (!b.far) {
@@ -439,7 +459,7 @@ export default {
   bodyScale: [1.3, 1.04, 1.24],
   style: { weapon: 'none', heavy: 0, stance: 1.0 },
   paint: {
-    corporate: { paint: 0xeef2f8, accent: 0x2b4d96, trim: 0xf2b636 },
+    corporate: { paint: 0xeef2f8, accent: 0x1c2f66, trim: 0xf2b636 },
     rogue: { paint: 0xe6dfd6, accent: 0x3a1517, trim: 0xff8a2a },
     experimental: { paint: 0xe6e1f3, accent: 0x261a50, trim: 0xd7a2ff },
   },
@@ -454,7 +474,7 @@ export default {
   sockets: {
     muzzle: ['handR', TIP], hand: ['handR', [0, -0.08, 0.02]], handL: ['handL', [0, -0.11, 0.02]], core: [0, 0.13, 0.13], head: [0, 0.14, 0.09],
     beacon: ['handR', TIP],
-    ...Object.fromEntries([0, 1, 2, 3, 4, 5].map((i) => { const a = (i / 6) * PI * 2 + 0.3; return ['d' + i, ['aux2', [Math.cos(a) * DR, 0, Math.sin(a) * DR]]]; })),
+    ...Object.fromEntries([0, 1, 2, 3, 4, 5].map((i) => { const a = droneAngle(i % 3, 3); return ['d' + i, ['aux2', [Math.cos(a) * DR, 0, Math.sin(a) * DR]]]; })),
   },
   events: {
     cast: [['fire', 0.42]], attack: [['fire', 0.4]], attack_alt: [['fire', 0.45]],
@@ -472,6 +492,11 @@ export default {
     const t = ctx.t;
     ctx.spin = (ctx.spin || 0) + dt * spinRate(a, u);
     const ring = bones[BI.aux2];
+    if (!ctx.dSock) {
+      ctx.dSock = true;
+      const n = droneCount(unit.rank);
+      for (let i = 0; i < 6; i++) { const so = unit.sockets['d' + i], a = droneAngle(i % n, n); so?.position.set(Math.cos(a) * DR, 0, Math.sin(a) * DR); }
+    }
     // rest: shoulder height, a slight wobble; driven targets are authored in body (pelvis-parent) space and mapped into the chest
     let y = 0, fwd = 0, tilt = 0.08 * Math.sin(t * 0.7), sc = 1, flat = 0;
     if (a === 'overdrive') {
