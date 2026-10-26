@@ -589,3 +589,78 @@ dpr 2 costs the same as 1.5 on M5, so the frame is submit/CPU-bound, not fill-bo
   - manager: no new files, no vendored addons. New public bits: post look `vignetteAspect`, overlay `obstacles` / `setBottom`,
     scene `_wideFit()` (debug), theme `forest.trim(level)` / `forestTrim`, battle_test-independent `?forestTrim=N`.
   - ui: none.
+
+# battle-10 (tenth round: TOP PRIORITY load / drop-in hitches; then m8_l15 boss cluster, SERAPH wings vs top HUD, OD callout in game, navy units on fantasy floor)
+## Checkpoint 1 (hitch work)
+- Measured first (in game, PerformanceObserver longtask + per-frame rAF times + renderer.info.programs, CPU profiles; harness in
+  scratch battle10/perf.mjs, attr.mjs, summ.mjs). Before, M5 nointro x1: m1_l3 load LT 212 ms; m3_l14 load 365 ms, wave 2/3 spawns
+  242 / 250 ms; m6_l16 load 613 ms (worst frame 733), wave 2/3 392 / 290 ms. Attribution:
+  - unit spawn: precise bboxes (overdriveReach 16 + fitBossFootprint 5 + misc) via three's expandByObject(precise): applyBoneTransform
+    rebuilds bone x boneInverse per weight per vertex -> ~70% of spawn cost; every wave's units built in one task at the wave event.
+  - fantasy flagstone textures ~350 ms in createTheme (sync, in the mount task).
+  - compileAsync compiled the WRONG variants (canvas target: sRGB + tone mapping) while the post chain renders to a linear target, so
+    all real programs (36-93) compiled synchronously in the first frames; unit programs again at drop-in.
+  - first visible frame of each unit: SkinnedMesh.computeBoundingSphere (frustum culling) skins every vertex the slow way (x4: 70-80 ms
+    per wave start).
+- DONE (all syntax-checked, in-game smoke-tested both themes)
+  - geo.js `expandPrecise(bb, o)`: inlined precise box (same objects + maths as expandByObject(o, true); verified max diff < 1e-4 on
+    all units at several anim times, battle.js `_boxCheck`). `primeSkinnedBounds(root)`: sets SkinnedMesh boundingSphere/Box from the
+    current pose at build time (box-derived sphere).
+  - battle.js: spawn is a generator (`spawnSteps`, yields between createUnit / fits / every 4 overdrive samples / proxy); `spawn()` runs
+    it in one go, `runSliced(gen, {budget, idle})` spreads it. Initial squad + wave 1: sliced at 10 ms/frame inside `ready`.
+    Later waves are PREBUILT during wave 1 (`predictWaves` = sim's autoSlots + id scheme `e{w}_{slot}`; idle-callback slices of 8 ms;
+    signature check on adoption, else rebuilt; discarded on mismatch / dispose), then precompiled. `opts.prebuild:false` disables.
+  - Render hold: scene `holdRender` (engine.js skips update+render and clears once while true). Held until: arena precompiled, theme
+    `ready` (sliced textures) landed, wave 1 built + precompiled, and `warmRender()` (one offscreen render with every unit visible:
+    shadow-depth + mirror variants, geometry/texture uploads). HOLD_MAX 6 s safety. `opts.hold:false` disables. Sim/intro don't tick
+    while held (engine skips update), so nothing is lost.
+  - `precompile()` compiles against a 1x1 render target (linear, no tone mapping) = the variants the post chain really uses.
+  - fantasy flagstones: `flagstoneTexturesAsync` (generator, frame-sliced) + placeholder 1x1 textures of the same kind (same program)
+    swapped when ready; FT_CACHE holds result or in-flight promise.
+  - memoTex (fx/textures.js): floor / crowd / window / banner and fantasy stone / pedestal / foliage / treeline textures cached per
+    module (retries and prewarmed battles skip the canvas work). Fantasy backdrop giant-tree geometry cached per module (rng advanced
+    by the same count, so the rest of the backdrop is unchanged).
+  - `prewarmBattle(engine, {theme})` (battle.js export) -> theme `prewarm()` builds those textures in idle callbacks.
+- Requests
+  - ui (please): in `scr_formation` mount, once the level's theme is known:
+    `load('battle').then((m) => m.prewarmBattle?.(engine, { theme: B.theme || level.realm || map.realm }))` (fire and forget; idle-time
+    only, safe to call repeatedly, safe if the battle starts before it finishes). Saves ~0.3-1 s of black hold on a fantasy battle's
+    first load and ~40 ms (x4: ~150 ms) from the ENGAGE tap task.
+  - manager: no new files.
+## Checkpoint 2 (battle-10 hand-back)
+- ui landed the prewarm (scr_formation -> `prewarmBattle`). The matrix below goes through formation -> ENGAGE (1.5 s on formation
+  unless noted), M5 metal, 412x915, speed 4. "visible" = from the first shown frame to 3 s after the last drop-in.
+  | run | tap->first frame | pre-show worst LT | visible worst frame | visible max LT | progs compiled while visible | waves 2/3 worst frame / LT |
+  |---|---|---|---|---|---|---|
+  | m1_l3 nointro x1 (before: frame 200, LT 212, 66 progs) | 209 ms | 0 | 17 | 0 | 0 | - |
+  | m1_l3 intro x1 (before: 183 / 191) | 162 | 0 | 17 | 0 | 0 | - |
+  | m3_l14 nointro x1 (before: 350 / 365, waves 250 / 242-250) | 271 | 0 | 17 | 0 | 1 | 17 / 0 |
+  | m3_l14 intro x1 | 219 | 0 | 17 | 0 | 1 | 17 / 0 |
+  | m6_l16 nointro x1 (before: 733 / 613, waves 383 / 392) | 964 (361 with 5 s on formation) | 113 (81) | 17 | 0 | 0 | 17 / 0 |
+  | m6_l16 intro x1 | 471 | 152 | 33 | 0 | 0 | 17 / 0 |
+  | m1_l3 nointro / intro x4 throttle | 360 / 348 | 53 / 52 | 33 / 33 | 0 / 0 | 0 | - |
+  | m3_l14 nointro / intro x4 | 567 / 568 | 52 / 0 | 50 / 50 | 52 / 0 | 1 | 17 / 0 |
+  | m6_l16 nointro / intro x4 | 1079 / 1146 | 230 / 226 | 67 / 67 | 71 / 76 | 0 | 17-33 / 0 |
+  "pre-show worst LT" is the ENGAGE tap task (createBattleScene arena geometry, sync, before the battle screen paints) — the formation
+  screen freezes that long after the tap, nothing animates. Before numbers exist only for x1 (old code was not kept).
+- Other battle-10 work (all syntax-checked, in game both themes, battle_test boots, no console errors)
+  - QL m8_l15 boss: WIDE_BOSS 1.25 -> 1.1 (VECTOR PRIME 2.5 -> 2.2 scale in wide) + new WIDE_FRONT 0.82: a non-boss unit standing in a
+    nearer lane right in front of a boss (|dx| < 1 m, dz < 5.4) shrinks a further step (LEVIATHAN 1.56 -> 1.28). Boss now reads as the
+    centrepiece. Portrait unchanged (wideFit is wide-only; verified wk = 1 at 412x915 / 390x844). Dev overrides `?wideBoss=` `?wideFront=`.
+  - Push guard (camera.js `setPushGuard(fn)`, `pushK`): during the Overdrive push the push amount is bisected down so every deployed
+    unit's idle top (+10%, foot box `y1`) stays under the top margin (or no higher than unpushed). Far-lane SERAPH wings no longer go
+    up with the push; at idle/attack they touch the bar's lower edge by ~2-3 px at 915x412 (not push-related).
+  - OD callout in game (915x412, m8_l15): placed at the caster's edge under the top bar, clear of heads and HP bars in 3 of 3 callouts.
+  - Fantasy navy units: fill light 1.0 -> 1.7 (low front light: lifts unit faces, floor only +4/255). GUNNER reads blue instead of black.
+- Perf (in game): m6_l16 915x412 125 calls / 2.5 ms cpu, 412x915 115 calls / 2.4 ms; battle_test 6v6 160 calls / 3.1 ms. m8_l15
+  915x412 peaks 179 (w2) / 190-194 (w3) during VFX bursts — over the 180 budget, but the pre-change run peaked at 180 / 204 (not from
+  battle-10; hidden prebuilt units cost no calls).
+- Shots (scratch battle10/): before_after.png (boss wave before/after, 844x390 + portrait, fantasy fill A/B, OD callout, m6 landscape),
+  navy_ab.png, od_sheet.png, w3_*.png, g_915_gap_w*.png. Perf JSON: before/, after/ (summ.mjs prints the table).
+- Open issues
+  - ENGAGE-tap task still 50-150 ms on M5 (x4: 160-230) on a first battle: arena geometry is built synchronously in createBattleScene.
+    Retries hit the texture / tree caches. Next step if needed: make theme builders generators and build inside the hold.
+  - x4 visible frames up to 67-83 ms: post-processing programs compile on the first shown frame when the hub was never rendered
+    (dev deep link); and prebuild steps on slow CPUs are one createUnit each (robots' build, ~45-60 ms at x4) in idle time.
+  - Boss pylons at 915x412 reach the top bar's lower edge at drop-in (boss top y 40 vs margin 50 by bbox).
+  - m8_l15 call peaks over 180 in VFX-heavy moments (see Perf).

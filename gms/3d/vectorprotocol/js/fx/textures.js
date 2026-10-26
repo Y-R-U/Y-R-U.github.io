@@ -19,7 +19,7 @@ function tex(c, { srgb = true, repeat = false, aniso = 4 } = {}) {
 // Floor: dark slate-metal panels (map), a hex lattice + circuit traces (emissive), seams/scuffs (roughness).
 // The canvas covers the floor rect: u = x across [-W/2, W/2], v = z from far (top) to near (bottom).
 // hexR = lattice hex circumradius (world m), hexOrigin = world (x, z) of a lattice centre, zFar = world z of v = 0.
-export function floorTextures({ W = 16, L = 20, px = 64, seed = 7, hexR = 1.5, hexOrigin = [0, 0], zFar = -14, traces: nTr = 1 } = {}) {
+function floorTexturesRaw({ W = 16, L = 20, px = 64, seed = 7, hexR = 1.5, hexOrigin = [0, 0], zFar = -14, traces: nTr = 1 } = {}) {
   const w = Math.round(W * px), h = Math.round(L * px);
   const r = rng(seed);
   const [cm, m] = canvas(w, h);
@@ -199,7 +199,7 @@ export function sloganScreen(lines, w = 512, h = 320) {
 }
 
 // Tall pink/purple banner with a diamond emblem.
-export function bannerTex(w = 128, h = 384, hue = '#ff4fd8') {
+function bannerTexRaw(w = 128, h = 384, hue = '#ff4fd8') {
   const [cv, c] = canvas(w, h);
   const g = c.createLinearGradient(0, 0, 0, h);
   g.addColorStop(0, '#3a0a5a'); g.addColorStop(0.5, '#6a1a9a'); g.addColorStop(1, '#2a0a4a');
@@ -229,7 +229,7 @@ export function dataPanelTex(seed = 3, w = 256, h = 160, tint = '#5cd0ff') {
 // Crowd strip atlas: 4 rows of silhouette strips (heads + shoulders), alpha in .a; tinted by vertex/instance colour.
 // Crowd atlas, 4 rows of spectators. r = silhouette mask, g = light sticks / phone lights (tips), b = clothing value.
 // Varied silhouettes: broad / slim / kids, hats and hoods, one or two raised arms, flags and boards on poles.
-export function crowdTex(w = 1024, h = 256, seed = 11) {
+function crowdTexRaw(w = 1024, h = 256, seed = 11) {
   const r = rng(seed);
   const [cv, c] = canvas(w, h);
   c.fillStyle = '#000'; c.fillRect(0, 0, w, h);
@@ -291,7 +291,7 @@ export function crowdTex(w = 1024, h = 256, seed = 11) {
 }
 
 // Building window atlas for the skyline (r = window mask, g = lit variation, b = vertical stripe accents).
-export function windowTex(w = 256, h = 512, seed = 5) {
+function windowTexRaw(w = 256, h = 512, seed = 5) {
   const r = rng(seed);
   const [cv, c] = canvas(w, h);
   c.fillStyle = '#000'; c.fillRect(0, 0, w, h);
@@ -315,3 +315,28 @@ export function glowTex(size = 64) {
   c.fillStyle = g; c.fillRect(0, 0, size, size);
   return tex(cv, { srgb: false });
 }
+
+// battle-10: static procedural textures are cached per module (same args -> same texture objects), so a battle's arena build after
+// the first, or after prewarm, skips the canvas work. A battle's dispose() frees only the GPU copy; three re-uploads on next use.
+const TEX_CACHE = new Map();
+export function memoTex(name, fn) {
+  return (...args) => {
+    const k = name + JSON.stringify(args);
+    let v = TEX_CACHE.get(k);
+    if (!v) TEX_CACHE.set(k, (v = fn(...args)));
+    return v;
+  };
+}
+// run thunks one per idle period (prewarm); resolves when all ran
+export function idleRun(list) {
+  const ric = typeof requestIdleCallback === 'function' ? (f) => requestIdleCallback(f, { timeout: 1000 }) : (f) => setTimeout(f, 30);
+  return new Promise((resolve) => {
+    let i = 0;
+    const step = () => { if (i >= list.length) { resolve(); return; } try { list[i++](); } catch (e) { console.warn('[textures] prewarm step failed', e); } ric(step); };
+    ric(step);
+  });
+}
+export const floorTextures = memoTex('floor', floorTexturesRaw);
+export const crowdTex = memoTex('crowd', crowdTexRaw);
+export const windowTex = memoTex('window', windowTexRaw);
+export const bannerTex = memoTex('banner', bannerTexRaw);

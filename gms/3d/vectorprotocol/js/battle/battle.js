@@ -1,17 +1,20 @@
 import * as THREE from 'three';
-import { createBattle, TICKS_PER_SEC } from '../sim/battle.js';
+import { createBattle, TICKS_PER_SEC, autoSlots } from '../sim/battle.js';
+import { lookupUnit } from '../sim/stats.js';
 import { loadData } from '../sim/data.js';
 import { BOARD, slotPos, plateColor, RARITY_INDEX, RARITY_COLORS, LANE_PROFILES, applyLaneProfile } from './layout.js';
-import { buildArena } from './arena.js';
+import { buildArena, prewarmArena, themeFor } from './arena.js';
 import { createBattleCamera } from './camera.js';
 import { createVFX } from '../fx/vfx.js';
 import { createEffects, PAL } from '../fx/toolkit.js';
 import { createOverlay } from './overlay.js';
 import { REFLECT_LAYER, MIRROR_ONLY_LAYER } from '../fx/reflection.js';
 const qsNoProxy = typeof location !== 'undefined' && /[?&]proxy=0/.test(location.search);
+const qsNum = (k) => { const m = typeof location !== 'undefined' && location.search.match(new RegExp('[?&]' + k + '=([0-9.]+)')); return m ? +m[1] : null; };
 import { UNIT_FX } from '../fx/units/index.js';
 import { setStealth, tickStealth, disposeStealth } from '../fx/stealth.js';
 import * as placeholder from './placeholder_unit.js';
+import { expandPrecise, primeSkinnedBounds } from './geo.js';
 
 // Battle playback (TEAM_BRIEF "Battle"): owns the sim stepper, drives units + VFX from sim events.
 // createBattleScene(engine, { playerSquad, enemyWaves, seed, arena, data?, overlay?, auto?, speed?, bars?, audio?, goals? })
@@ -66,6 +69,12 @@ function realmFromWaves(waves, data) {
   return n && f / n > 0.5 ? 'fantasy' : null;
 }
 
+// battle-10: start the slow, cacheable parts of a battle ahead (idle time), e.g. while the formation screen is open. Safe to call
+// repeatedly; createBattleScene picks up whatever has finished (or is still in flight).
+export function prewarmBattle(engine, { theme = 'scifi' } = {}) {
+  try { return prewarmArena(engine, themeFor(theme)); } catch (e) { console.warn('[battle] prewarm failed', e); return Promise.resolve(); }
+}
+
 export function createBattleScene(engine, opts = {}) {
   const {
     playerSquad = { units: [] }, enemyWaves = [], seed = 1,
@@ -92,6 +101,18 @@ export function createBattleScene(engine, opts = {}) {
   const rig = createBattleCamera({ nearRim: arena.theme.nearRim, ...(arena.theme.frameWide || {}), ...(opts.frame || {}), backdrop: arena.theme.backdrop });
   if (opts.margins) rig.setMargins(opts.margins);
   const camera = rig.camera;
+  // battle-10: the Overdrive push keeps every unit's idle top (+10% for wings / raised arms) under the top HUD margin
+  const guardPts = [];
+  rig.setPushGuard?.(() => {
+    let n = 0;
+    for (const a of U.values()) {
+      if (!a.alive || a.removed || !a.deployed || !a.foot) continue;
+      const f = a.foot, S = a.scale, r = a.unit.root.position, y = arena.plateH + f.y1 * S * 1.1;
+      for (const x of [f.x0, f.x1]) (guardPts[n++] ||= new THREE.Vector3()).set(r.x + x * S, y, r.z + f.z0 * S);
+    }
+    guardPts.length = n;
+    return guardPts;
+  });
   const vfx = createVFX(scene, tier);
   const fx = createEffects(vfx, {
     shake: (a) => rig.shake(a),
@@ -154,14 +175,26 @@ export function createBattleScene(engine, opts = {}) {
   const listeners = { state: new Set(), end: new Set(), event: new Set() };
   const emit = (k, v) => { for (const f of listeners[k]) { try { f(v); } catch (e) { console.error(e); } } };
   const U = new Map(); // sim id -> actor record
+  const spawnT = []; // battle-10: per-unit build times (debug, api._spawnT)
   let sim = null, data = null, mod = null, started = false, ended = false;
-  let paused = false, forfeited = false, odSrc = null;
+  let paused = false, forfeited = false, odSrc = null, disposed = false;
   const procSeen = new Set();
   let simT = 0, speed = speedInit, slow = 1, slowT = 0, odPush = 0, odK = 0.6, odTarget = new THREE.Vector3(), stateDirty = true, stateAcc = 0;
   const queue = [];
   const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
   const leanQ = new THREE.Quaternion(), leanE = new THREE.Euler();
 
+  // battle-10: no frames (the engine shows a clear) until the arena's programs are compiled (async), its sliced textures have landed and
+  // wave 1 is built, compiled and warmed (api.ready); then the first visible frame has nothing left to compile or upload.
+  // HOLD_MAX is a safety net: show whatever there is by then.
+  const compileRT = new THREE.WebGLRenderTarget(1, 1);
+  let hold = opts.hold !== false;
+  const holdT0 = performance.now();
+  const arenaReady = (async () => {
+    await nextFrame(); // not inside the creating task (that one already carries the arena build)
+    if (arena.ready) await Promise.race([arena.ready, new Promise((r) => setTimeout(r, 3000))]).catch(() => {});
+    await precompile([]);
+  })();
   const api = {
     scene, camera, backdropCamera: rig.bgCamera, arena, rig, vfx, fx, overlay, units: U,
     look: arena.theme.look,
@@ -184,6 +217,9 @@ export function createBattleScene(engine, opts = {}) {
       }
       return { units, calls, extra, tris };
     },
+    get _spawnT() { return spawnT; },
+    get holdRender() { return hold && performance.now() - holdT0 < HOLD_MAX; },
+    get arenaReady() { return arenaReady; },
     _dbg() { return { paused, speed, slow, slowT, simT, forfeited }; },
     // test helper: each live unit's screen rect in CSS px (projected world bbox) + its HP-bar anchor y
     _bounds() {
@@ -258,8 +294,10 @@ export function createBattleScene(engine, opts = {}) {
     },
     update(dt, t) { tick(dt, t); },
     dispose() {
+      disposed = true;
       for (const a of U.values()) { disposeStealth(a.unit); a.unit.dispose?.(); }
-      U.clear();
+      for (const P of PRE.values()) discard(P.a);
+      U.clear(); PRE.clear(); compileRT.dispose();
       audio.sfx('ambience', { theme: null });
       arena.dispose(); overlay.dispose(); engine.post.tint?.(1, 1, 1, 0); engine.post.dim?.(0);
       scene.traverse((o) => { if (o.isMesh && o.material?.isShaderMaterial) { o.geometry.dispose(); o.material.dispose(); } });
@@ -269,26 +307,55 @@ export function createBattleScene(engine, opts = {}) {
   api.ready = (async () => {
     [data, mod] = await Promise.all([opts.data ? Promise.resolve(opts.data) : loadData(), unitsModule()]);
     sim = createBattle({ data, player: playerSquad, enemyWaves, seed, auto: autoInit, inputs: opts.inputs, goals: opts.goals });
-    // player units exist from the start; deploy them before the first wave arrives
-    sim.state.player.units.forEach((v, i) => spawn(v, 0.1 + i * 0.11));
+    // player units exist from the start; deploy them before the first wave arrives. BATTLE-L: wave 1 is built now too (same deploy
+    // delays as the wave handler, which then finds them spawned). battle-10: one frame's budget at a time, not one long task
+    const first = [];
+    sim.state.player.units.forEach((v, i) => first.push([v, 0.1 + i * 0.11]));
+    for (const e of sim.events) if (e.type === 'wave' && e.phase === 'start') (e.units || []).forEach((id, i) => { const v = sim.state.units[id]; if (v) first.push([v, 0.2 + i * 0.11]); });
+    await runSliced((function* () { for (const [v, d] of first) { if (disposed) return; yield* spawnSteps(v, d); } })());
+    if (disposed) return api;
     for (const e of sim.events) queue.push(e); // events emitted while the sim was created (wave 1 start)
-    // BATTLE-L: build wave 1 now (same deploy delays as the wave handler, which then finds them spawned): its precise-bbox fits cost
-    // ~400 ms, which used to land on the first frame (or on the last frames of the intro)
-    for (const e of sim.events) if (e.type === 'wave' && e.phase === 'start') (e.units || []).forEach((id, i) => { const v = sim.state.units[id]; if (v) spawn(v, 0.2 + i * 0.11); });
     refitWide();
     stateDirty = true;
     // the units are hidden until their drop-in, so their shaders compiled on that frame (a ~400 ms hitch on M5). Compile them now
     // (compile() gathers the visible scene synchronously, so the roots are only shown for the duration of that call)
-    try {
-      const R = engine.renderer, roots = [...U.values()].map((a) => a.unit.root);
-      roots.forEach((r) => { r.visible = true; });
-      const p = R.compileAsync ? R.compileAsync(scene, camera) : (R.compile(scene, camera), null);
-      roots.forEach((r) => { r.visible = false; });
-      if (p) await Promise.race([p, new Promise((r) => setTimeout(r, 1500))]);
-    } catch (e) { console.warn('[battle] precompile failed', e); }
+    await precompile([...U.values()].map((a) => a.unit.root));
+    await arenaReady;
+    if (!disposed) await warmRender();
+    hold = false;
+    prebuildWaves();
     return api;
   })();
 
+  // hidden units compile their shaders on their first visible frame (a ~400 ms hitch on M5): compile them ahead. compileAsync gathers
+  // the scene synchronously, so the roots are only shown for the duration of that call
+  // battle-10: one offscreen render of the whole board with every unit shown, before the first visible frame: compiles the shadow-depth
+  // and mirror variants (compile() only builds each material's main program) and uploads every geometry and texture
+  async function warmRender() {
+    const R = engine.renderer, roots = [...U.values()].map((a) => a.unit.root), vis = roots.map((r) => r.visible);
+    const prevRT = R.getRenderTarget();
+    try {
+      roots.forEach((r) => { r.visible = true; });
+      if (arena.reflection?.enabled) arena.reflection.update(scene, camera);
+      R.setRenderTarget(compileRT);
+      R.render(scene, camera);
+    } catch (e) { console.warn('[battle] warm render failed', e); }
+    finally { R.setRenderTarget(prevRT); roots.forEach((r, i) => { r.visible = vis[i]; }); }
+    await nextFrame();
+  }
+  // battle-10: compile against a render target: the post chain draws the scene into one (linear output, no tone mapping), so a
+  // canvas-target compile built the wrong variants and every real program still compiled synchronously on the first frames
+  async function precompile(roots) {
+    try {
+      const R = engine.renderer, vis = roots.map((r) => r.visible), prevRT = R.getRenderTarget();
+      roots.forEach((r) => { r.visible = true; });
+      R.setRenderTarget(compileRT);
+      let p;
+      try { p = R.compileAsync ? R.compileAsync(scene, camera) : (R.compile(scene, camera), null); } finally { R.setRenderTarget(prevRT); }
+      roots.forEach((r, i) => { r.visible = vis[i]; });
+      if (p) await Promise.race([p, new Promise((r) => setTimeout(r, 1500))]);
+    } catch (e) { console.warn('[battle] precompile failed', e); }
+  }
   // ---------- actors ----------
   function modelFor(v) {
     const M = mod.MODELS || {};
@@ -298,8 +365,19 @@ export function createBattleScene(engine, opts = {}) {
     const exact = byRole.find((k) => M[k].faction === v.faction);
     return exact || byRole[0] || Object.keys(M)[0];
   }
-  function spawn(v, delay = 0) {
+  // battle-10: later waves are built ahead (prebuildWaves, during wave 1) from the predicted sim view; the wave handler adopts them
+  const PRE = new Map(); // predicted sim id -> { a, sig, prof }
+  const preSig = (v) => [v.def, v.slotIndex, v.model, v.rarity, v.faction, v.rank ?? 0].join('|');
+  // battle-10: spawnSteps is a generator so a unit's build can be spread over frames (runSliced); spawn() runs it in one go
+  function spawn(v, delay = 0, pre = false) { return runAll(spawnSteps(v, delay, pre)); }
+  function* spawnSteps(v, delay = 0, pre = false) {
     if (U.has(v.id)) return U.get(v.id);
+    if (!pre && PRE.has(v.id)) {
+      const P = PRE.get(v.id); PRE.delete(v.id);
+      if (P.sig === preSig(v) && P.prof === laneProfile) return adopt(P.a, v, delay);
+      discard(P.a);
+    }
+    const _t0 = performance.now();
     const isBoss = String(v.def || '').startsWith('boss_');
     const uo = { model: modelFor(v), rarity: v.rarity, faction: v.faction, role: v.role, rank: isBoss ? 5 : v.rank, boss: isBoss, unitId: v.def, seed: hash(v.id), quality: tier.name };   // robots kit round 4: boss + unitId
     let unit;
@@ -308,6 +386,8 @@ export function createBattleScene(engine, opts = {}) {
       console.warn('[battle] createUnit failed for ' + uo.model + ', using placeholder', err);
       unit = placeholder.createUnit(uo);
     }
+    const _t1 = performance.now();
+    yield;
     const p = slotPos(v.side, v.slotIndex);
     const hRaw = unit.height || 2;
     const def = data.units?.[v.def] || data.enemies?.[v.def] || {};
@@ -330,16 +410,18 @@ export function createBattleScene(engine, opts = {}) {
       // Turn those less so the barrel runs across the board instead.
       const bb = unitBox(unit.root), reach = v.side === 'enemy' ? p.x - bb.min.x : bb.max.x - p.x;
       if (reach > 2.6 * s / BOARD.unitScale) { yaw = v.side === 'enemy' ? -Math.PI / 2 + 0.18 : Math.PI / 2 - 0.18; unit.setFacing(yaw); }
+      yield;
     }
     if (unit.mirrorSide && unit.mirrorSide === v.side) unit.setMirror?.(true); // e.g. WARDEN: buckler arm toward the camera
     // big bosses always get a fitted footprint; any other unit only when its idle pose reaches over the centre line (CITADEL, JUGGERNAUT)
-    if (p.col === 0 || def.boss) ({ s, x: p.x } = fitBossFootprint(unit, p, v.side, s, !((def.scale || 1) > 1 || def.boss)));
+    if (p.col === 0 || def.boss) ({ s, x: p.x } = yield* fitBossFootprint(unit, p, v.side, s, !((def.scale || 1) > 1 || def.boss)));
     // battle-6: front-liners / bosses whose overdrive anim reaches over the centre line (REDLINE's whirlwind) step back for it
-    const odFit = p.col === 0 || def.boss ? overdriveReach(unit, p, v.side) : null;
+    const odFit = p.col === 0 || def.boss ? yield* overdriveReach(unit, p, v.side) : null;
     // battle-6: hovering models (MERIDIAN floats ~1 m up) left their plate looking empty: a contact shadow + faint lift beam ties them to it
     let hoverPad = null;
     { const hb = unitBox(unit.root); const lift = hb.isEmpty() ? 0 : hb.min.y - arena.plateH;
       if (lift > 0.45) { hoverPad = makeHoverPad(lift, Math.max(0.55, Math.min(1.1, (unit.radius || 0.6) * s * 0.75)), plateColor(v.faction, v.rarity)); hoverPad.position.set(p.x, arena.plateH + 0.012, p.z); hoverPad.visible = false; scene.add(hoverPad); } }
+    yield;
     if (p.lane === 0) {
       // near lane: a wide model (tarantula legs, scaled bosses) must not hang over the near floor edge; nudge it back
       unit.root.updateMatrixWorld(true);
@@ -349,11 +431,14 @@ export function createBattleScene(engine, opts = {}) {
     // battle-9 (QL5): idle footprint on the floor relative to the root, per unit of scale (wide-profile spacing, fitWide)
     let foot = null;
     { const fb = fastBox(unit.root, new THREE.Box3());
-      if (!fb.isEmpty()) foot = { x0: (fb.min.x - p.x) / s, x1: (fb.max.x - p.x) / s, z0: (fb.min.z - p.z) / s, z1: (fb.max.z - p.z) / s }; }
+      if (!fb.isEmpty()) foot = { x0: (fb.min.x - p.x) / s, x1: (fb.max.x - p.x) / s, z0: (fb.min.z - p.z) / s, z1: (fb.max.z - p.z) / s, y1: (fb.max.y - arena.plateH) / s }; }
     // robots' single-draw skinned proxy renders the mirror + shadow passes (257 -> ~125 calls); else the full mesh does
     let proxy = null;
     if (typeof unit.useProxy === 'function' && !qsNoProxy) proxy = unit.useProxy(MIRROR_ONLY_LAYER);
     else unit.root.traverse((o) => { if (o.isMesh) { o.layers.enable(REFLECT_LAYER); o.castShadow = true; } });
+    yield;
+    primeSkinnedBounds(unit.root);
+    yield;
     unit.root.visible = false;
     scene.add(unit.root);
     const barAnchor = new THREE.Object3D();
@@ -372,12 +457,58 @@ export function createBattleScene(engine, opts = {}) {
     if (auraK) a.aura = { k: Math.min(0.6, auraK * 0.7), color: new THREE.Color(unit.def.auraColor ?? unit.palette?.glow ?? 0xb05cff).multiplyScalar(2.2) };
     a.shieldK = 0;
     unit.onEvent((type, info) => onUnitEvent(a, type, info));
+    spawnT.push({ id: v.id, model: uo.model, pre, create: +(_t1 - _t0).toFixed(1), total: +(performance.now() - _t0).toFixed(1) });
+    if (pre) {
+      // the wave arrived while this was still building (the handler built its own): drop it
+      if (U.has(v.id) || disposed) { discard(a); return U.get(v.id) || null; }
+      PRE.set(v.id, { a, sig: preSig(v), prof: laneProfile }); return a;
+    }
+    return adopt(a, v, delay);
+  }
+  function adopt(a, v, delay) {
+    a.v = v; a.deployT = -delay;
+    const color = a.plate;
     U.set(v.id, a);
     overlay.addBar(v.id, { role: v.role, color: '#' + new THREE.Color(color).getHexString(), side: v.side });
-    overlay.barAnchor(v.id, barAnchor);
+    overlay.barAnchor(v.id, a.barAnchor);
     overlay.setBar(v.id, v.hpPct ?? 1, 0);
     overlay.showBar(v.id, false);
     return a;
+  }
+  function discard(a) {
+    scene.remove(a.unit.root); if (a.hoverPad) scene.remove(a.hoverPad);
+    disposeStealth(a.unit); a.unit.dispose?.();
+  }
+  // predicted views of waves 2.. (the sim builds them only at the wave start): same slotting (autoSlots) and ids as js/sim/battle.js
+  function predictWaves() {
+    const out = [];
+    enemyWaves.forEach((sq, w) => {
+      if (w === 0) return;
+      const units = Array.isArray(sq) ? sq : sq?.units || [];
+      let list; try { list = autoSlots(data, units); } catch { return; }
+      for (const inst of list) {
+        const def = lookupUnit(data, inst.def); if (!def) continue;
+        const si = inst.slot.col * 3 + inst.slot.lane;
+        out.push({ id: `e${w + 1}_${si}`, side: 'enemy', wave: w + 1, def: def.id, name: def.name, role: def.role, faction: def.faction,
+          rarity: def.rarity, model: def.model, level: inst.level || 1, rank: inst.rank ?? 0, slot: { ...inst.slot }, slotIndex: si, hpPct: 1 });
+      }
+    });
+    return out;
+  }
+  // one unit per idle slot (requestIdleCallback when there is one), so the build never lands in a frame as a long task
+  let preQ = null;
+  function prebuildWaves() {
+    if (preQ || opts.prebuild === false) return;
+    try { preQ = predictWaves(); } catch (e) { console.warn('[battle] wave prebuild skipped', e); preQ = []; return; }
+    runSliced((function* () {
+      for (const v of preQ) {
+        while (intro.on && !disposed) yield WAIT;
+        if (disposed) return;
+        if (!U.has(v.id) && !PRE.has(v.id) && sim && sim.state.wave < v.wave) {
+          try { yield* spawnSteps(v, 0, true); } catch (e) { console.warn('[battle] prebuild failed for ' + v.id, e); }
+        }
+      }
+    })(), { idle: true, budget: 8 }).then(() => { if (!disposed) return precompile([...PRE.values()].map((P) => P.a.unit.root)); });
   }
   // ---------- lane profiles (BATTLE-L) ----------
   // theme realm scale per profile: the wide board has horizontal room, so the fantasy theme may use a bigger factor there (wideUnitK)
@@ -427,7 +558,13 @@ export function createBattleScene(engine, opts = {}) {
       // size class first: XL hulls and bosses always come down in wide; an L unit only when an XL or boss neighbour shares its corner
       for (const r of R) {
         const bigNb = R.some((o) => o !== r && (o.cls === 'XL' || o.cls === 'boss') && Math.abs(o.z - r.z) < 5.4);
-        r.k = r.cls === 'boss' ? Math.min(1, WIDE_BOSS / Math.min(BOSS_SCALE_MAX, r.sc)) : r.cls === 'XL' ? WIDE_XL * (bigNb ? WIDE_L : 1) : r.cls === 'L' && bigNb ? WIDE_L : 1;
+        r.k = r.cls === 'boss' ? Math.min(1, (qsNum('wideBoss') ?? WIDE_BOSS) / Math.min(BOSS_SCALE_MAX, r.sc)) : r.cls === 'XL' ? WIDE_XL * (bigNb ? WIDE_L : 1) : r.cls === 'L' && bigNb ? WIDE_L : 1;
+      }
+      // battle-10: a unit standing right in front of a boss (nearer lane, same column) hid its lower half (m8_l15: LEVIATHAN in front
+      // of VECTOR PRIME): it comes down a further step so the boss reads as the centrepiece
+      for (const r of R) {
+        if (r.cls === 'boss') continue;
+        if (R.some((o) => o.cls === 'boss' && r.z > o.z && r.z - o.z < 5.4 && Math.abs(o.x - r.x) < 1.0)) r.k *= qsNum('wideFront') ?? WIDE_FRONT;
       }
       const rect = (r) => { const S = r.base * r.k; return [r.x + r.f.x0 * S, r.x + r.f.x1 * S, r.z + r.f.z0 * S, r.z + r.f.z1 * S]; };
       for (let it = 0; it < 40; it++) {
@@ -1014,13 +1151,37 @@ export function createBattleScene(engine, opts = {}) {
 // units: stop 0.35 short of it) and BOSS_OUTER out to the side (the HUD side buttons sit over the outer edge). First the boss steps back from
 // its front slot, then it shrinks until the box fits. Returns the final scale + root x.
 const BOSS_SCALE_MAX = 1.6, BOSS_OUTER = 6.2;
-const WIDE_OVERLAP = 0.3, WIDE_MIN = 0.62, WIDE_XL = 0.85, WIDE_L = 0.92, WIDE_BOSS = 1.25; // battle-9 wideFit
+const SLICE_MS = 10, HOLD_MAX = 6000; // battle-10: main-thread budget per frame for unit builds at load
+const WAIT = Symbol('wait'); // runSliced: stop this slice now
+const runAll = (g) => { let r; while (!(r = g.next()).done); return r.value; };
+// step a generator on the main thread at most `budget` ms per frame (or per idle period with idle: true); resolves its return value
+function runSliced(g, { budget = SLICE_MS, idle = false } = {}) {
+  const ric = idle && typeof requestIdleCallback === 'function';
+  return new Promise((resolve, reject) => {
+    const step = (dl) => {
+      const t0 = performance.now(), b = ric && dl ? Math.max(3, Math.min(budget, dl.timeRemaining() - 1)) : budget;
+      try {
+        for (;;) { const r = g.next(); if (r.done) { resolve(r.value); return; } if (r.value === WAIT || performance.now() - t0 >= b) break; }
+      } catch (e) { reject(e); return; }
+      if (ric) requestIdleCallback(step, { timeout: 300 }); else nextFrame().then(() => step());
+    };
+    if (ric) requestIdleCallback(step, { timeout: 300 }); else step();
+  });
+}
+const nextFrame = () => new Promise((r) => { if (typeof requestAnimationFrame === 'function' && !document.hidden) requestAnimationFrame(() => r()); else setTimeout(r, 16); });
+const WIDE_OVERLAP = 0.3, WIDE_MIN = 0.62, WIDE_XL = 0.85, WIDE_L = 0.92, WIDE_BOSS = 1.1, WIDE_FRONT = 0.82; // battle-9 wideFit (battle-10: boss cap 1.25 -> 1.1)
 const _odBox = new THREE.Box3();
 export const _fastBox = (root) => fastBox(root, new THREE.Box3()); // tests
 function unitBox(root, bb = new THREE.Box3()) {
   bb.makeEmpty(); root.updateMatrixWorld(true);
-  root.traverseVisible((o) => { if (o.isMesh && o.layers.isEnabled(0) && o.material?.blending !== THREE.AdditiveBlending) bb.expandByObject(o, true); });
+  root.traverseVisible((o) => { if (o.isMesh && o.layers.isEnabled(0) && o.material?.blending !== THREE.AdditiveBlending) expandPrecise(bb, o); });
   return bb;
+}
+// test: the inlined box vs three's expandByObject(o, true)
+export function _boxCheck(root) {
+  const a = unitBox(root), b = new THREE.Box3(); root.updateMatrixWorld(true);
+  root.traverseVisible((o) => { if (o.isMesh && o.layers.isEnabled(0) && o.material?.blending !== THREE.AdditiveBlending) b.expandByObject(o, true); });
+  return Math.max(a.min.distanceTo(b.min), a.max.distanceTo(b.max));
 }
 // battle-7: cheap per-frame box for the reach guard (a precise box skins every vertex: ~1-10 ms a unit). Rigid parts use their cached
 // geometry box; skinned meshes skin a strided sample of ~400 vertices (bones alone miss blades: REDLINE's chainblade has no tip bone).
@@ -1065,7 +1226,7 @@ function makeHoverPad(lift, r, color) {
   return g;
 }
 
-function overdriveReach(unit, p, side) {
+function* overdriveReach(unit, p, side) {
   let dur = 0;
   try { dur = unit.play('overdrive', { loop: false, fade: 0 }) || 0; } catch { return null; }
   if (!(dur > 0.2)) { try { unit.play('idle', { fade: 0 }); } catch { /* ignore */ } return null; }
@@ -1075,7 +1236,9 @@ function overdriveReach(unit, p, side) {
   let fwd = -Infinity;
   for (let i = 0; i < N; i++) {
     try { unit.update(dur / N); } catch { /* pose only */ }
-    unitBox(unit.root, tmp); if (tmp.isEmpty()) continue;
+    unitBox(unit.root, tmp);
+    if (i % 4 === 3) yield;
+    if (tmp.isEmpty()) continue;
     fwd = Math.max(fwd, sx > 0 ? x - tmp.min.x : tmp.max.x - x);
   }
   try { unit.play('idle', { fade: 0 }); unit.update(0.01); } catch { /* ignore */ }
@@ -1085,12 +1248,13 @@ function overdriveReach(unit, p, side) {
   return { push: Math.min(over, Math.max(0, 6.4 - Math.abs(x))), dur, over };
 }
 
-function fitBossFootprint(unit, p, side, s, onlyIfCrossing = false) {
+function* fitBossFootprint(unit, p, side, s, onlyIfCrossing = false) {
   const BOSS_INNER = onlyIfCrossing ? 0.35 : 0; // regular units keep a clear gap; a boss may touch the line
   const sx = side === 'enemy' ? 1 : -1;
   // union of a few idle poses, so a held weapon that sways (REDLINE's chainblade) counts at its widest
   const bb = new THREE.Box3(), tmp = new THREE.Box3();
-  for (let i = 0; i < 5; i++) { try { unit.update(0.25); } catch { /* pose only */ } bb.union(unitBox(unit.root, tmp)); }
+  for (let i = 0; i < 5; i++) { try { unit.update(0.25); } catch { /* pose only */ } bb.union(unitBox(unit.root, tmp)); if (i === 2) yield; }
+  yield;
   if (bb.isEmpty()) return { s, x: p.x };
   // distances along the side's outward axis, relative to the root
   const fwd = sx > 0 ? p.x - bb.min.x : bb.max.x - p.x; // reach toward the centre line

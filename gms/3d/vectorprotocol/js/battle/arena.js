@@ -10,6 +10,9 @@ export const THEMES = { scifi, fantasy };
 const ALIAS = { forest: 'fantasy', verdance: 'fantasy', rift: 'fantasy', ruins: 'fantasy' };
 export function themeFor(id) { return THEMES[id] ? id : ALIAS[id] || 'scifi'; }
 
+// battle-10: start a theme's slow procedural builds ahead (idle time), e.g. while the formation screen is open
+export function prewarmArena(engine, theme = 'scifi') { return THEMES[themeFor(theme)].prewarm?.(engine) || Promise.resolve(); }
+
 export function buildArena(engine, { theme = 'scifi', seed = 7 } = {}) {
   const mod = THEMES[themeFor(theme)];
   const env = mod.createTheme(engine, { seed });
@@ -17,7 +20,7 @@ export function buildArena(engine, { theme = 'scifi', seed = 7 } = {}) {
   const group = new THREE.Group();
   group.add(env.group, board.group);
   return {
-    group, theme: env, board, reflection: env.reflection, lights: env.lights,
+    group, theme: env, board, ready: env.ready || null, reflection: env.reflection, lights: env.lights,
     setSlot: board.setSlot, nodePulse: board.nodePulse, dimSlot: board.dimSlot, setPlace: board.setPlace, setHome: board.setHome, setRarity: board.setRarity, plateH: board.plateH,
     update(dt, t) { env.update(dt, t); board.update(dt, t); },
     dispose() {

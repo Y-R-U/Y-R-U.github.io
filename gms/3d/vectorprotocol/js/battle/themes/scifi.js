@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { BOARD, LANE_PROFILES } from '../layout.js';
 import { box, merge, onLayers, BACKDROP_LAYER } from '../geo.js';
-import { floorTextures } from '../../fx/textures.js';
+import { floorTextures, crowdTex, windowTex, bannerTex, idleRun } from '../../fx/textures.js';
 import { createPlanarReflection, addPlanarReflection, REFLECT_LAYER, MIRROR_ONLY_LAYER } from '../../fx/reflection.js';
 import { buildBackdrop } from './scifi_backdrop.js';
 
@@ -9,6 +9,13 @@ import { buildBackdrop } from './scifi_backdrop.js';
 // board furniture (nodes, plates, centre line, camera) and returns
 // { group, update(dt,t), reflection, lights, look (post overrides), fog, board: buildBoard options, dispose }.
 export const id = 'scifi';
+
+const floorArgs = (tier, seed) => ({ W: BOARD.W, L: BOARD.L, px: tier.name === 'low' ? 40 : 60, seed, hexR: BOARD.gridR,
+  hexOrigin: [0, LANE_PROFILES.tall.laneZ[0] + LANE_PROFILES.tall.backShift], zFar: BOARD.zFar, traces: 0.45 });
+// battle-10: build the cached procedural textures in idle time ahead of the battle (same args as createTheme / buildBackdrop)
+export function prewarm(engine, { seed = 7 } = {}) {
+  return idleRun([() => floorTextures(floorArgs(engine.quality, seed)), () => crowdTex(), () => windowTex(), () => bannerTex(), () => bannerTex(128, 256, '#4fd0ff')]);
+}
 
 export function createTheme(engine, { seed = 7 } = {}) {
   const tier = engine.quality;
@@ -21,8 +28,7 @@ export function createTheme(engine, { seed = 7 } = {}) {
   const reflection = createPlanarReflection(engine.renderer, { scale: tier.reflect || 0, planeY: 0 });
 
   // --- board floor: hex lattice + circuits, glossy, mirrored ---
-  const ft = floorTextures({ W: BOARD.W, L: BOARD.L, px: tier.name === 'low' ? 40 : 60, seed, hexR: BOARD.gridR,
-    hexOrigin: [0, LANE_PROFILES.tall.laneZ[0] + LANE_PROFILES.tall.backShift], zFar: bz1, traces: 0.45 });
+  const ft = floorTextures(floorArgs(tier, seed));
   const floorMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color(1.28, 1.12, 0.9), // battle-5: warm the blue-grey albedo under the cool lights -> ref_02's slate (measured avg 63,78,119)
     map: ft.map, emissiveMap: ft.emissive, emissive: new THREE.Color(1.0, 1.2, 1.75),

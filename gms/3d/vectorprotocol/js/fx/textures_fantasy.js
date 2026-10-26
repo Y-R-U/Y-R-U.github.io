@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { rng, normalFromHeight } from './textures.js';
+import { rng, normalFromHeight, memoTex } from './textures.js';
 
 // Procedural canvas textures for the fantasy ruins arena (D21, refs/ref_fantasy_01.jpg). Deterministic per seed.
 function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d')]; }
@@ -25,7 +25,23 @@ const sst = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a)))
 // grass spilling over, worn / chipped slab edges, and a network of fine cracks inside each slab (sub-voronoi edges, about half of them drawn)
 // so the slabs read as big cracked stones rather than crazy paving. A worn lighter pool in the middle, darker wild margins.
 // rect = world { x0, x1, zFar, zNear }; board = the playable rect (kept cleaner); returns { map, normal }.
-export function flagstoneTextures({ rect, board, px = 40, seed = 7, cell = 2.05 }) {
+export function flagstoneTextures(o) { const g = flagstoneGen(o); let r; while (!(r = g.next()).done); return r.value; }
+// battle-10: the same work in frame-budgeted slices (~200-500 ms in one go was the fantasy battle's load hitch). Resolves { map, normal }.
+export function flagstoneTexturesAsync(o, { budget = 8, idle = false } = {}) {
+  const g = flagstoneGen(o);
+  const wait = (f) => (idle && window.requestIdleCallback ? requestIdleCallback(f, { timeout: 500 }) : !document.hidden && window.requestAnimationFrame ? requestAnimationFrame(() => f()) : setTimeout(f, 16));
+  return new Promise((resolve, reject) => {
+    const step = () => {
+      try {
+        const t0 = performance.now();
+        for (;;) { const r = g.next(); if (r.done) { resolve(r.value); return; } if (performance.now() - t0 > budget) break; }
+      } catch (e) { reject(e); return; }
+      wait(step);
+    };
+    step();
+  });
+}
+function* flagstoneGen({ rect, board, px = 40, seed = 7, cell = 2.05 }) {
   const Wm = rect.x1 - rect.x0, Lm = rect.zNear - rect.zFar;
   const w = Math.round(Wm * px), h = Math.round(Lm * px);
   const [cm, m] = canvas(w, h), [ch, hh] = canvas(w, h);
@@ -111,8 +127,10 @@ export function flagstoneTextures({ rect, board, px = 40, seed = 7, cell = 2.05 
       D[i4] = Math.min(255, r * lum); D[i4 + 1] = Math.min(255, g * lum); D[i4 + 2] = Math.min(255, b * lum); D[i4 + 3] = 255;
       H[i4] = H[i4 + 1] = H[i4 + 2] = Math.max(0, Math.min(255, ht)); H[i4 + 3] = 255;
     }
+    if ((y & 7) === 7) yield;
   }
   m.putImageData(img, 0, 0); hh.putImageData(hgt, 0, 0);
+  yield;
   // a few long jagged cracks that run across slabs (dark line + faint lit lip + groove)
   const r = rng(seed * 7 + 3);
   const X = (wx) => (wx - rect.x0) * px, Z = (wz) => (wz - rect.zFar) * px;
@@ -134,11 +152,14 @@ export function flagstoneTextures({ rect, board, px = 40, seed = 7, cell = 2.05 
     m.fillStyle = r() < 0.5 ? `rgba(${110 + r() * 60 | 0},${80 + r() * 40 | 0},30,0.5)` : 'rgba(20,18,12,0.3)';
     m.fillRect(x, y, s, s * (0.5 + r()));
   }
-  return { map: tex(cm, { aniso: 8 }), normal: tex(normalFromHeight(ch, 3.0), { srgb: false, aniso: 8 }) };
+  yield;
+  const nm = normalFromHeight(ch, 3.0);
+  yield;
+  return { map: tex(cm, { aniso: 8 }), normal: tex(nm, { srgb: false, aniso: 8 }) };
 }
 
 // One dressed stone block (box faces map 0..1 each): mottled grey, chipped dark edges, a few cracks. Plus its normal map.
-export function stoneBlockTextures(seed = 3, size = 256) {
+function stoneBlockTexturesRaw(seed = 3, size = 256) {
   const [c, x] = canvas(size, size), [ch, hx] = canvas(size, size);
   const img = x.createImageData(size, size), hi = hx.createImageData(size, size);
   const S = seed * 31 + 7;
@@ -167,7 +188,7 @@ export function stoneBlockTextures(seed = 3, size = 256) {
 
 // Pedestal top + sides: carved octagon slab. u,v planar on the top (0..1 across), the sides use v near 0.
 // Grey with a chiselled inner border and a cracked tile pattern; the battle tints it per faction (instance colour).
-export function pedestalTextures(seed = 5, size = 256) {
+function pedestalTexturesRaw(seed = 5, size = 256) {
   const [c, x] = canvas(size, size), [ch, hx] = canvas(size, size);
   const img = x.createImageData(size, size), hi = hx.createImageData(size, size);
   const S = seed * 17 + 3;
@@ -200,7 +221,7 @@ export function pedestalTextures(seed = 5, size = 256) {
 }
 
 // Foliage atlas (alpha): [0] ivy/leaf cluster, [1] grass tuft, [2] fern; 3 columns of 128 x 128.
-export function foliageTexture(seed = 9) {
+function foliageTextureRaw(seed = 9) {
   const [c, x] = canvas(384, 128);
   const r = rng(seed);
   const leaf = (cx, cy, s, a, col) => {
@@ -258,7 +279,7 @@ function dilatedTexture(c) {
 }
 
 // Distant tree-line silhouettes for the backdrop: rows of canopies + trunks, alpha. Tiles horizontally.
-export function treelineTexture(seed = 4, w = 1024, h = 256) {
+function treelineTextureRaw(seed = 4, w = 1024, h = 256) {
   const [c, x] = canvas(w, h);
   const r = rng(seed);
   x.fillStyle = '#fff';
@@ -273,3 +294,9 @@ export function treelineTexture(seed = 4, w = 1024, h = 256) {
   x.fillRect(0, h * 0.75, w, h * 0.25);
   return tex(c, { repeat: true });
 }
+
+// battle-10: cached per module (see memoTex in textures.js)
+export const stoneBlockTextures = memoTex('stone', stoneBlockTexturesRaw);
+export const pedestalTextures = memoTex('pedestal', pedestalTexturesRaw);
+export const foliageTexture = memoTex('foliage', foliageTextureRaw);
+export const treelineTexture = memoTex('treeline', treelineTextureRaw);

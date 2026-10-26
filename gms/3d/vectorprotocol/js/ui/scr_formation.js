@@ -6,6 +6,7 @@ import { btn, header, unitCard } from './components.js';
 import { hint } from './tutorial.js';
 import { orient } from '../app/orient.js';
 import { featureOpen } from './scr_hub.js';
+import { load } from '../app/modules.js';
 
 const SLOT_NAMES = ['Front · Near', 'Front · Mid', 'Front · Far', 'Back · Near', 'Back · Mid', 'Back · Far'];
 const idx = (s) => s.col * 3 + s.lane;
@@ -29,6 +30,8 @@ export async function mount(root, ctx, route) {
   const { store, router, portraits } = ctx;
   const T = target(ctx, route);
   if (!T) { router.go('/hub', { replace: true }); return {}; }
+  // battle-10: build the arena's procedural textures in idle time while the player arranges the squad (fire and forget)
+  if (ctx.engine) load('battle').then((m) => m.prewarmBattle?.(ctx.engine, { theme: T.session?.theme || 'scifi' })).catch(() => {});
   const level = { waves: T.waves };
   const maxUnits = store.state.slots;
 

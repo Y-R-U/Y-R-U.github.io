@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { BOARD } from '../layout.js';
 import { box, merge, onLayers } from '../geo.js';
-import { rng } from '../../fx/textures.js';
-import { flagstoneTextures, stoneBlockTextures, pedestalTextures, foliageTexture, } from '../../fx/textures_fantasy.js';
+import { rng, idleRun } from '../../fx/textures.js';
+import { flagstoneTexturesAsync, stoneBlockTextures, pedestalTextures, foliageTexture, treelineTexture } from '../../fx/textures_fantasy.js';
 import { createPlanarReflection, REFLECT_LAYER } from '../../fx/reflection.js';
 import { buildForestEnv } from '../../engine/env.js';
 import { buildFantasyBackdrop } from './fantasy_backdrop.js';
@@ -14,6 +14,36 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 // and pillars, octagonal stone pedestals tinted per faction, warm forest light, fireflies. Same contract as scifi.js.
 export const id = 'fantasy';
 const FT_CACHE = new Map();
+function groundSpec(tier, seed = 7) {
+  const hw = BOARD.W / 2, fz0 = BOARD.zNear + 6, fz1 = BOARD.zFar - 2.2, lowT = tier.name === 'low';
+  const rect = { x0: -hw - 7, x1: hw + 7, zNear: fz0, zFar: fz1 - 1.5 };
+  const px = lowT ? 22 : tier.name === 'med' ? 30 : 36;
+  return { key: [px, seed, BOARD.W, BOARD.zNear, BOARD.zFar].join(), opts: { rect, board: BOARD, px, seed } };
+}
+// cached result, or the in-flight promise (prewarm / an earlier battle)
+function flagstoneFor(gs, o) {
+  let ft = FT_CACHE.get(gs.key);
+  if (!ft) {
+    ft = flagstoneTexturesAsync(gs.opts, o);
+    FT_CACHE.set(gs.key, ft);
+    ft.then((r) => FT_CACHE.set(gs.key, r), () => FT_CACHE.delete(gs.key));
+  }
+  return ft;
+}
+function flatTex(rgb, srgb) {
+  const t = new THREE.DataTexture(new Uint8Array([...rgb, 255]), 1, 1);
+  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  t.needsUpdate = true;
+  return t;
+}
+// battle-10: build the slow procedural textures ahead in idle time (ui calls this while the formation screen is open)
+export function prewarm(engine, { seed = 7 } = {}) {
+  const ft = flagstoneFor(groundSpec(engine.quality, seed), { idle: true, budget: 6 });
+  // same args as createTheme / buildFantasyBackdrop
+  const rest = idleRun([() => stoneBlockTextures(seed), () => foliageTexture(seed), () => pedestalTextures(seed + 2),
+    () => treelineTexture(seed + 1), () => stoneBlockTextures(seed + 5, 128), () => foliageTexture(seed + 3)]);
+  return Promise.all([typeof ft.then === 'function' ? ft : null, rest]).then(() => {});
+}
 const FANTASY_UNIT_K = 1;
 // BATTLE-L: the wide (landscape) board has horizontal room for bigger fantasy units (battle-7 open issue); portrait stays 1
 const FANTASY_UNIT_K_WIDE = 1.12;
@@ -62,10 +92,19 @@ export function createTheme(engine, { seed = 7 } = {}) {
   const reflection = createPlanarReflection(engine.renderer, { scale: 0, planeY: 0 });
 
   // --- ground: one flagstone plane under the board and its wild margin ---
-  const rect = { x0: -hw - 7, x1: hw + 7, zNear: fz0, zFar: fz1 - 1.5 };
-  // ~190 ms on an M5 at high: cached per module (dispose() frees the GPU copy; three re-uploads it on the next battle)
-  const ftKey = [lowT ? 22 : tier.name === 'med' ? 30 : 36, seed, BOARD.W, BOARD.zNear, BOARD.zFar].join();
-  const ft = FT_CACHE.get(ftKey) || FT_CACHE.set(ftKey, flagstoneTextures({ rect, board: BOARD, px: +ftKey.split(',')[0], seed })).get(ftKey);
+  // battle-10: the flagstones cost ~200-500 ms of main thread: built in frame slices (or ahead by prewarm()) and cached per module;
+  // until they land the ground carries flat placeholders of the same kind (same shader), and `ready` holds the battle's first frame
+  const gs = groundSpec(tier, seed), rect = gs.opts.rect;
+  let ft = flagstoneFor(gs), groundReady = null;
+  if (typeof ft.then === 'function') {
+    const pend = ft;
+    ft = { map: flatTex([84, 81, 74], true), normal: flatTex([128, 128, 255], false) };
+    groundReady = pend.then((r) => {
+      const old = [groundMat.map, groundMat.normalMap];
+      groundMat.map = r.map; groundMat.normalMap = r.normal;
+      old.forEach((t) => t.dispose());
+    }, (e) => console.warn('[fantasy] ground textures failed', e));
+  }
   // battle-9: the slab texture is lifted and pulled off the forest's yellow-green toward the ref's warm neutral grey (colour > 1 on purpose)
   const groundMat = new THREE.MeshStandardMaterial({ map: ft.map, normalMap: ft.normal, normalScale: new THREE.Vector2(1.1, 1.1),
     color: new THREE.Color(1.1, 1.06, 1.3), roughness: 0.88, metalness: 0.0, envMapIntensity: 0.55 });
@@ -363,7 +402,7 @@ export function createTheme(engine, { seed = 7 } = {}) {
     key.shadow.camera.layers.enable(2); // unit shadow proxies live on the mirror-only layer
   }
   const rim = new THREE.DirectionalLight(0xe6dcb0, 2.4); rim.position.set(4, 9, -30);
-  const fill = new THREE.DirectionalLight(0xc8d4ff, 1.0); fill.position.set(10, 4, 22);
+  const fill = new THREE.DirectionalLight(0xc8d4ff, 1.7); fill.position.set(10, 4, 22); // battle-10: 1.0 -> 1.7, a low front fill lifts unit faces (navy paint) far more than the floor
   group.add(hemi, key, key.target, rim, fill);
   for (const l of [hemi, key, rim, fill]) l.layers.enableAll();
 
@@ -415,6 +454,7 @@ export function createTheme(engine, { seed = 7 } = {}) {
     setIntro(on) { forestOn.intro = !!on; forest.group.visible = forestOn.wide || forestOn.intro; },
     forest, get forestTrim() { return guard.level; },
     id, group, reflection, lights: { hemi, key, rim, fill }, environment, envIntensity: 1.05,
+    ready: groundReady,
     fog: new THREE.Fog(0x5f6b4a, 48, 240),
     look,
     board: { plate, lineColor: new THREE.Color(0.55, 0.38, 0.12), ringShape: 'oct', ringK: { floor: 0, top: 0.45 }, pipFace: { y: plateH * 0.5, z: 1.065, s: 0.62 } },

@@ -40,7 +40,7 @@ export function createBattleCamera(opts = {}) {
   if (bgCamera) bgCamera.layers.set(BD.layer ?? 3);
   const bg = { pos: new THREE.Vector3(), shift: 0, shiftX: 0 };
   const base = { pos: new THREE.Vector3(), target: new THREE.Vector3(), shiftY: 0, shiftX: 0, wide: false };
-  const shake = { a: 0, t: 0 }, push = { k: 0, to: new THREE.Vector3() };
+  const shake = { a: 0, t: 0 }, push = { k: 0, to: new THREE.Vector3(), guard: null };
   const v = new THREE.Vector3();
   const margins = { top: null, bottom: null, left: null, right: null };
   let lastW = 412, lastH = 915;
@@ -180,6 +180,33 @@ export function createBattleCamera(opts = {}) {
 
   function refit() { if (lastW / lastH >= 1) fitWide(lastW, lastH); else fit(lastW / lastH, lastH); }
   const cur = { pos: new THREE.Vector3(), target: new THREE.Vector3() };
+  const _gp = new THREE.Vector3(), _gt = new THREE.Vector3(), _gv = new THREE.Vector3();
+  function pushPose(pos, target, pk) {
+    const k = pk * pk * (3 - 2 * pk);
+    target.lerp(push.to, k * 0.35);
+    pos.lerp(_gv.copy(push.to).add(v.copy(base.pos).sub(base.target).multiplyScalar(0.72)), k * 0.5);
+  }
+  // highest NDC y of the guard points (unit heads / wing tips) with the push at pk
+  function guardTop(pk, iy, pts) {
+    _gp.copy(cur.pos); _gt.copy(cur.target);
+    if (pk > 0) pushPose(_gp, _gt, pk);
+    apply(_gp, _gt, base.shiftY * (1 - pk * 0.4) * iy, base.shiftX);
+    let y = -Infinity;
+    for (const p of pts) y = Math.max(y, v.copy(p).project(camera).y);
+    return y;
+  }
+  // battle-10: the Overdrive push zooms toward the caster, which lifted far-lane heads / wings (SERAPH) into the top HUD in landscape.
+  // Scale the push down (bisection) until the guard points stay under the top margin (or no higher than without the push).
+  function guardPush(pk, iy) {
+    const pts = push.guard();
+    if (!pts?.length || margins.top == null) return pk;
+    const lim = 1 - 2 * (margins.top + 2) / lastH;
+    if (guardTop(pk, iy, pts) <= lim) return pk;
+    const allow = Math.max(lim, guardTop(0, iy, pts));
+    let lo = 0, hi = pk;
+    for (let i = 0; i < 6; i++) { const m = (lo + hi) / 2; if (guardTop(m, iy, pts) <= allow) lo = m; else hi = m; }
+    return lo;
+  }
   const intro = { k: 1, s: 1 };
   return {
     camera, bgCamera, frame: F, base,
@@ -196,6 +223,9 @@ export function createBattleCamera(opts = {}) {
     shake(a = 0.3) { shake.a = Math.min(1, Math.max(shake.a, a)); },
     // Overdrive push: k 0..1 eases the camera toward a world point
     push(k, to) { push.k = k; if (to) push.to.copy(to); },
+    // battle-10: fn() -> world points that must stay below the top HUD margin while the push is on (null = no guard)
+    setPushGuard(fn) { push.guard = fn || null; },
+    get pushK() { return push.k; },
     // D26 battle intro: k 0..1 (0 = zoomed out + panned up toward the backdrop, 1 = the fitted framing), strength 0..1.
     // The pose is an offset from `base`, so a refit (rotation) mid-intro just carries on. k >= 1 = off (the exact old path).
     setIntro(k, strength = 1) { intro.k = Math.max(0, Math.min(1, k)); intro.s = strength; },
@@ -216,18 +246,16 @@ export function createBattleCamera(opts = {}) {
       const ds = (base.dist || 27) / 27; // breathing / shake were tuned at 27 m; keep the same on-screen amount
       cur.pos.x += Math.sin(t * 0.21) * 0.18 * ds; cur.pos.y += Math.sin(t * 0.33) * 0.12 * ds;
       cur.target.x += Math.sin(t * 0.17 + 1) * 0.05;
-      if (push.k > 0.001) {
-        const k = push.k * push.k * (3 - 2 * push.k);
-        cur.target.lerp(push.to, k * 0.35);
-        cur.pos.lerp(push.to.clone().add(v.copy(base.pos).sub(base.target).multiplyScalar(0.72)), k * 0.5);
-      }
+      let pk = push.k;
+      if (pk > 0.001 && push.guard) pk = guardPush(pk, iy);
+      if (pk > 0.001) pushPose(cur.pos, cur.target, pk);
       if (shake.a > 0.001) {
         shake.t += dt;
         const a = shake.a * shake.a * 0.35 * ds;
         cur.pos.x += Math.sin(shake.t * 61) * a; cur.pos.y += Math.sin(shake.t * 47 + 2) * a * 0.7;
         shake.a = Math.max(0, shake.a - dt * 2.4);
       }
-      apply(cur.pos, cur.target, base.shiftY * (1 - push.k * 0.4) * iy, base.shiftX);
+      apply(cur.pos, cur.target, base.shiftY * (1 - pk * 0.4) * iy, base.shiftX);
       // intro: the backdrop horizon follows the barrier top as the board camera tilts, so the join stays hidden
       // battle-8: wide drops its horizon below the seam (bgHorizon); at the intro start it sits on the seam (as portrait), so the
       // backdrop's ruins / arch / Rift show above the back wall instead of hiding behind it, then eases to the wide offset

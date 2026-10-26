@@ -25,7 +25,7 @@ export function createEngine(canvas, { quality, toneMapping = 'aces', autoStart 
   const size = { w: 1, h: 1 };
   const post = createPost(renderer, tier);
   const env = buildNeonEnv(renderer, tier.envSize);
-  let active = null, raf = 0, running = false, last = 0, time = 0;
+  let active = null, raf = 0, running = false, last = 0, time = 0, held = false;
   const frameFns = new Set();
   const st = { fps: 0, ms: 0, cpu: 0, calls: 0, tris: 0, frames: 0, acc: 0, accN: 0, cpuAcc: 0 };
 
@@ -33,7 +33,7 @@ export function createEngine(canvas, { quality, toneMapping = 'aces', autoStart 
     THREE, renderer, quality: tier, tier, env, post, canvas, size,
     get scene() { return active; },
     setScene(obj) {
-      active = obj || null;
+      active = obj || null; held = false;
       post.set(obj?.look || {});
       if (active) active.resize?.(size.w, size.h);
       return active;
@@ -69,7 +69,11 @@ export function createEngine(canvas, { quality, toneMapping = 'aces', autoStart 
     time += dt;
     renderer.info.reset();
     for (const f of frameFns) f(dt, time);
-    if (active) {
+    if (active?.holdRender) {
+      // battle-10: a scene still preparing (async shader compiles, sliced texture builds) asks for no frames yet; show a plain clear
+      if (!held) { renderer.setRenderTarget(null); renderer.clear(); held = true; }
+    } else if (active) {
+      held = false;
       active.update?.(dt, time);
       active.preRender?.(renderer);
       post.render(active.scene, active.camera, dt, active.backdropCamera || null);

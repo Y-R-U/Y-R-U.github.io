@@ -8,10 +8,13 @@ import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 // Everything beyond the back wall of the fantasy arena, seen by the near-level backdrop camera (BACKDROP_LAYER):
 // misty sky with a violet Rift tear (the sci-fi world bleeding through), layered forest silhouettes, giant ancient trees,
 // ruined towers and an archway, god rays, ground mist and fireflies.
+const TREE_CACHE = new Map();
 export function buildFantasyBackdrop(engine, { iW, fz0, fz1, seed = 7 }) {
   const tier = engine.quality;
   const lowT = tier.name === 'low';
-  const r = rng(seed * 37 + 11);
+  const r0 = rng(seed * 37 + 11);
+  let rN = 0;
+  const r = () => { rN++; return r0(); };
   const group = new THREE.Group();
   const updaters = [];
   const camZ = 15; // the backdrop camera sits ~10 m behind the near edge (themes' backdrop.back)
@@ -243,12 +246,22 @@ export function buildFantasyBackdrop(engine, { iW, fz0, fz1, seed = 7 }) {
       cards.push([x + Math.cos(a) * d, canopyY - canopyR * 0.45 + r() * canopyR * 0.8, z + Math.sin(a) * d * 0.6 + canopyR * 0.3, canopyR * (0.3 + r() * 0.3), r() * 6.28]);
     }
   };
-  tree(-19, fz1 - 14, 2.6, 22, 24, 13);
-  tree(21, fz1 - 18, 2.9, 24, 25, 14);
-  tree(-36, fz1 - 40, 3.2, 26, 28, 15);
-  tree(40, fz1 - 46, 3.4, 28, 29, 16);
-  tree(-26, fz1 - 75, 3.6, 30, 30, 15);
-  group.add(new THREE.Mesh(merge(TG), barkMat), new THREE.Mesh(merge(LG), leafMat));
+  // battle-10: the giant trees are ~25 ms of geometry on M5 (x4 on a phone): built once per module, then reused; the cached path
+  // still advances the rng by the same count, so everything after them is unchanged
+  const tKey = [seed, lowT, fz1].join();
+  let TC = TREE_CACHE.get(tKey);
+  if (TC) { for (let i = 0; i < TC.n; i++) r0(); cards.push(...TC.cards); }
+  else {
+    const n0 = rN;
+    tree(-19, fz1 - 14, 2.6, 22, 24, 13);
+    tree(21, fz1 - 18, 2.9, 24, 25, 14);
+    tree(-36, fz1 - 40, 3.2, 26, 28, 15);
+    tree(40, fz1 - 46, 3.4, 28, 29, 16);
+    tree(-26, fz1 - 75, 3.6, 30, 30, 15);
+    TC = { n: rN - n0, cards: cards.slice(), bark: merge(TG), leaf: merge(LG) };
+    TREE_CACHE.set(tKey, TC);
+  }
+  group.add(new THREE.Mesh(TC.bark, barkMat), new THREE.Mesh(TC.leaf, leafMat));
   {
     const im = new THREE.InstancedMesh(cardGeo, cardMat, cards.length);
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), sc = new THREE.Vector3(), pv = new THREE.Vector3();
