@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Builder, inRect } from './util.js';
 import { createSky, createLights, bakeEnvironment, setShadowFocus, SUN_DIR } from './env.js';
-import { createTerrain, createLake, inLake, lakeDist, airfieldMask, SHADE_EXTENT, CASTLE } from './terrain.js';
+import { createTerrain, createLake, inLake, lakeDist, airfieldMask, SHADE_EXTENT, CASTLE, setTerrainSite } from './terrain.js';
 import { buildTown } from './town.js';
 import { buildTrees, shadeTexture } from './trees.js';
 import { buildAirfieldEdge, BlockGrid } from './land.js';
@@ -12,10 +12,17 @@ import { buildTerminal, buildHangars } from './terminal.js';
 import { buildTower } from './tower.js';
 import { buildSigns, buildWindsocks, buildVehicles, buildFlagpoles, buildFlags, buildScenery } from './props.js';
 import { FRAMES, SEGMENTS } from './geom.js';
+import { AIRPORT } from './layout.js';
+import { buildSite } from './site.js';
+import { disposeWorld } from './dispose.js';
 
 const aa = (r, x, z, pad = 0) => x >= r.x0 - pad && x <= r.x1 + pad && z >= r.z0 - pad && z <= r.z1 + pad;
 
+// MAP: opts.airport (default: the active layout airport). C-Tower 1 is built here; every other airport by js/world/site.js.
 export async function buildWorld(scene, renderer, opts = {}) {
+  const def = opts.airport || AIRPORT;
+  if (def && def.scenery?.biome !== 'royal') return buildSite(scene, renderer, def, opts);
+  setTerrainSite(null);
   let quality = ['low', 'medium', 'high'].includes(opts.quality) ? opts.quality : 'high';
   const timings = {};
   let tm = performance.now();
@@ -227,6 +234,8 @@ export async function buildWorld(scene, renderer, opts = {}) {
     tower: { cab: tower.cab, crew: tower.crew },
     papi: lights.papi,
     root,
+    airport: def?.id || 'royal',
+    dispose: () => { trees.dispose(); disposeWorld(scene, root, { lights: [hemi, sun], uniformSets: [terrain.uniforms, lake.uniforms, flags.uniforms], textures: [env] }); },
     debug: { terrain, trees, lake, timings },
   };
 }

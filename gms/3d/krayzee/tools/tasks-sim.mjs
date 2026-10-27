@@ -173,6 +173,9 @@ const R = {
   fly_f35: (h) => { h.play({ plane: 'f35' }); h.takeoff(); },
   f35_fast: (h) => { h.play({ plane: 'f35' }); h.fly(1, { speed: 480 * KT, gs: 480 * KT }); },
   f35_flypast: (h) => { h.play({ plane: 'f35' }); h.inf('low_pass'); },
+  f35_hover: (h) => { h.play({ plane: 'f35' }); h.fly(31, { vtol: 1, speed: 1, gs: 1, agl: 30, alt: 30 }); h.ac.vtol = 0; },
+  f35_vfield: (h) => { h.play({ plane: 'f35' }); h.ac.vtol = 1; h.touchdown(250, { surface: 'grass', z: 400 }); h.ac.vtol = 0; },
+  f35_vhard: (h) => { h.play({ plane: 'f35', diff: 'hard' }); h.ac.vtol = 1; h.touchdown(350); h.ac.vtol = 0; },
   finish_easy: (h) => { h.play({ diff: 'easy' }); h.demand(); },
   finish_medium: (h) => { h.play({ diff: 'medium' }); h.demand(); },
   finish_hard: (h) => { h.play({ diff: 'hard' }); h.demand(); },
@@ -253,6 +256,12 @@ section('negative controls: near-misses of each detector do not complete');
   const h4 = harness(); h4.tasks.story({ ok: true, mission: 4, diff: 'easy', objectives: ['steal', 'race', 'land'] }); ok(h4.done('story_4') && !h4.done('story_4_all'), 'mission 4 with an objective missed: done, not full marks');
   const h5 = harness(); h5.fly(1, { speed: 150 * KT }); ok(!h5.done('vne'), 'c172 at 150 kt is under Vne 163');
   const h6 = harness(); h6.play({ plane: 'bathtub' }); h6.touchdown(80); ok(h6.done('tub_butter') && h6.done('butter'), 'bathtub butter counts for both');
+  // D35: STOVL tasks need a real vertical landing / an unbroken 30 s hover
+  const h7 = harness(); h7.play({ plane: 'f35', diff: 'hard' }); h7.touchdown(250, { surface: 'grass', z: 400 });
+  ok(!h7.done('f35_vfield') && !h7.done('f35_vhard'), 'a conventional F-35 landing on grass is not a vertical landing');
+  h7.fly(20, { vtol: 1, speed: 1, gs: 1, agl: 30 }); h7.fly(2, { vtol: 1, speed: 60, gs: 60 }); h7.fly(20, { vtol: 1, speed: 1, gs: 1, agl: 30 });
+  ok(!h7.done('f35_hover'), 'two 20 s hovers are not a 30 s hover');
+  h7.fly(11, { vtol: 1, speed: 1, gs: 1, agl: 30 }); ok(h7.done('f35_hover'), '…a 31 s one is');
 }
 
 section('unready planes stay locked ("coming soon")');

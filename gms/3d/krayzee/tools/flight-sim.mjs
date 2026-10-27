@@ -1044,7 +1044,9 @@ async function scJets() {
       // a jet never takes off from a field: fieldTakeoff refuses (main falls back)
       const F = setup(type, { x: 2600, z: 1500, heading: 90 }, circuitRoute('27', { type }));
       const ft = F.ap.fieldTakeoff({ world: W, end: '27' }), q = F.ap.events.find((x) => x.type === 'refused');
-      check(`${type} fieldTakeoff refuses (no turnip-field departures), with a quip`, ft === false && !!q?.quip, q?.quip);
+      // D35: the F-35B goes up vertically instead (tools/stovl-sim.mjs flies it)
+      if (TYPES[type].stovl) check(`${type} fieldTakeoff is a vertical takeoff (D35 STOVL)`, !!ft?.vto && F.ap.stovlMode === 'vto', JSON.stringify(ft));
+      else check(`${type} fieldTakeoff refuses (no turnip-field departures), with a quip`, ft === false && !!q?.quip, q?.quip);
     }
     // F. hand-flown upset at 400 m: rolled past 100° and pushed nose-down, released: the AP recovers
     {
@@ -1102,9 +1104,23 @@ async function scJets() {
   for (const t of types) console.log(`  ${t}: ${JSON.stringify(JET_NUMBERS[t])}`);
 }
 
+// MAP: the runway a light plane needs scales with its book takeoff roll (farm strip 620 m, Palace Lawn 240 m)
+function scMinRun() {
+  const mr = (type) => new Autopilot(new Aircraft({ type }))._minRun();
+  const m = Object.fromEntries(['c172', 'tiger', 'bathtub', 'jumbo', 'herc', 'f35'].map((t) => [t, Math.round(mr(t))]));
+  check('minimum takeoff run by type: light planes roll × 1.4 (C172 fits the 620 m farm strip, Moth and Bathtub a 240 m lawn from 12 m in), jets unchanged',
+    m.c172 <= 608 && m.c172 >= 290 && m.tiger <= 228 && m.bathtub <= 228 && m.tiger >= 160 && m.bathtub >= 150 && m.jumbo >= 1375 && m.herc >= 616 && m.f35 >= 600, JSON.stringify(m));
+  // a Moth lined up with 450 m of runway 27 left rolls at once (it used to taxi 1.5 km back to the threshold: 600 m rule)
+  const e = runwayEnd('27'), [x, z] = fromRunway(e, e.len * 0.44, 0);
+  const tr = new Traffic(env), ac = new Aircraft({ type: 'tiger' }), ap = new Autopilot(ac);
+  ac.place({ x, z, heading: e.hdg }, env); tr.add({ aircraft: ac, ap, player: true, name: 'P' }); ap.setRoute(circuitRoute('27', { type: 'tiger' }));
+  let up = null; for (let t = 0; t < 90 && up == null; t += 1 / 60) { tr.update(1 / 60); if (!ac.onGround && ac.agl > 10) up = t; }
+  check('a Moth lined up with ~780 m of runway left takes off from there (no taxi back)', ap.leg.kind === 'takeoff' && up != null && up < 40 && !ac.crashed, `airborne > 10 m after ${up?.toFixed(1)} s`);
+}
+
 function R1speed(type) { return Math.min(80 * KT, (TYPES[type]?.vcruise ?? 95 * KT) * 0.8); }
 
-const S = { fix3: scFix3, aaron: scAaron, loopext: scLoopExtend, throttle: scThrottleTakeback, landmany: scLandMany, feel: scPlayerFeel, spawn: scSpawn, impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed, jets: scJets };
+const S = { minrun: scMinRun, fix3: scFix3, aaron: scAaron, loopext: scLoopExtend, throttle: scThrottleTakeback, landmany: scLandMany, feel: scPlayerFeel, spawn: scSpawn, impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed, jets: scJets };
 for (const [k, f] of Object.entries(S)) if ((scen === 'all' && k !== 'mixed') || scen === k) { console.log(`\n== ${k}`); await f(); }
 const fails = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - fails}/${results.length} passed`);

@@ -14,6 +14,13 @@ export const TOWN = { x0: -660, x1: 400, z0: -1900, z1: -1170 };
 export const CASTLE = { x: 780, z: -2300, top: 70, r0: 125, r1: 640 };
 const AIRFIELD_FLAT = { x0: -1050, x1: 1050, z0: -640, z1: 620 };
 export const LONG_ROAD_Z = -1240;
+// MAP: the scenery terms of the airport being built. C-Tower 1 (null) = the constants above; other airports pass
+// { flat: [{x0,x1,z0,z1}], lake, castle, town, longRoadZ, mask(x, z) } (js/world/site.js).
+let SITE = null;
+export function setTerrainSite(s) { SITE = s; }
+const site = () => SITE || ROYAL_SITE;
+
+const ROYAL_SITE = { flat: [AIRFIELD_FLAT], town: TOWN, lake: LAKE, castle: CASTLE, longRoadZ: LONG_ROAD_Z };
 
 const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const rectDist = (r, x, z) => Math.hypot(Math.max(r.x0 - x, 0, x - r.x1), Math.max(r.z0 - z, 0, z - r.z1));
@@ -22,27 +29,35 @@ const RWV = new Map();
 const rwv = (rw) => RWV.get(rw) || RWV.set(rw, headingToVec(rw.heading)).get(rw);
 export function lakeR(a) { return 1 + 0.16 * Math.sin(2 * a + 1.1) + 0.09 * Math.sin(3 * a + 0.4) + 0.05 * Math.sin(5 * a + 2.3); }
 export function lakeDist(x, z) {
-  const u = (x - LAKE.x) / LAKE.rx, v = (z - LAKE.z) / LAKE.rz;
+  const L = site().lake;
+  if (!L) return 99;
+  const u = (x - L.x) / L.rx, v = (z - L.z) / L.rz;
   return Math.hypot(u, v) / lakeR(Math.atan2(v, u));
 }
 export function inLake(x, z) { return lakeDist(x, z) < 1; }
 
 export function castleMound(x, z) {
-  const d = Math.hypot(x - CASTLE.x, z - CASTLE.z);
-  return CASTLE.top * (1 - sstep(CASTLE.r0, CASTLE.r1, d));
+  const C = site().castle;
+  if (!C) return 0;
+  const d = Math.hypot(x - C.x, z - C.z);
+  return C.top * (1 - sstep(C.r0, C.r1, d));
 }
 
 // 0 where the ground must be dead flat (airfield, town, lake, the long road), 1 in open country.
 function openness(x, z) {
-  let d = Math.min(rectDist(AIRFIELD_FLAT, x, z), rectDist(TOWN, x, z) + 40, Math.max(0, (lakeDist(x, z) - 1.35) * 300));
-  if (Math.abs(x) < 3700) d = Math.min(d, Math.max(0, Math.abs(z - LONG_ROAD_Z) - 25));
+  const st = site();
+  let d = Math.max(0, (lakeDist(x, z) - 1.35) * 300);
+  for (const r of st.flat) d = Math.min(d, rectDist(r, x, z));
+  if (st.town) d = Math.min(d, rectDist(st.town, x, z) + 40);
+  if (st.longRoadZ != null && Math.abs(x) < 3700) d = Math.min(d, Math.max(0, Math.abs(z - st.longRoadZ) - 25));
   for (const rw of RUNWAYS) {
     const [dx, dz] = rwv(rw);
     const rx = x - rw.center[0], rz = z - rw.center[2];
     const a = Math.abs(rx * dx + rz * dz) - rw.length / 2, b = Math.abs(-rx * dz + rz * dx);
     if (a > 0 && a < 3400) d = Math.min(d, Math.max(0, b - 160 - a * 0.15) + Math.max(0, a - 2600));
   }
-  return sstep(0, 650, d) * sstep(CASTLE.r0, CASTLE.r1 * 0.8, Math.hypot(x - CASTLE.x, z - CASTLE.z));
+  const C = st.castle;
+  return sstep(0, 650, d) * (C ? sstep(C.r0, C.r1 * 0.8, Math.hypot(x - C.x, z - C.z)) : 1);
 }
 
 export function terrainHeight(x, z) {
@@ -61,6 +76,7 @@ export function terrainHeight(x, z) {
 }
 
 export function airfieldMask(x, z) {
+  if (SITE) return SITE.mask(x, z);
   const ex = Math.max(Math.abs(x) - 820, 0), ez = Math.max(Math.abs(z + 5) - 455, 0);
   const d = Math.hypot(ex, ez) - 40;
   return 1 - Math.min(1, Math.max(0, d / 10));
@@ -93,8 +109,9 @@ const hex = (h) => { const c = new THREE.Color(h); return `vec3(${c.r.toFixed(4)
 export function createTerrain(renderer, quality) {
   const low = quality === 'low';
   const N = low ? 96 : 176;
-  const xs = gridLines(N, CASTLE.x - 560, CASTLE.x + 560, low ? 70 : 35);
-  const zs = gridLines(N, CASTLE.z - 560, CASTLE.z + 560, low ? 70 : 35);
+  const RC = site().castle || { x: 0, z: 0 };
+  const xs = gridLines(N, RC.x - 560, RC.x + 560, low ? 70 : 35);
+  const zs = gridLines(N, RC.z - 560, RC.z + 560, low ? 70 : 35);
   const NX = xs.length, NZ = zs.length;
   const H = new Float32Array(NX * NZ);
   const pos = new Float32Array(NX * NZ * 3);
@@ -295,7 +312,7 @@ function gridIndex(xs, x) {
 
 // Lake: PBR water (sky reflection from the env map, fresnel from the BRDF), two scrolling ripple normals,
 // shallow-water tint toward the shore.
-export function createLake(renderer, env) {
+export function createLake(renderer, env, LAKE = site().lake) {
   const n = 96, rings = 6;
   const pos = [LAKE.x, 0.12, LAKE.z], nor = [0, 1, 0], shore = [0], idx = [];
   for (let r = 1; r <= rings; r++) {

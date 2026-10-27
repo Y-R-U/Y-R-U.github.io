@@ -103,6 +103,8 @@ function watch(s) {
 }
 
 // ---------------------------------------------------------------- steps
+// LAND offered: the button idle and reading LAND (D35: the F-35's slot may read HOVER / VERTICAL TAKEOFF instead; tools/test-stovl.mjs)
+const landOffered = (s) => s.land && !s.land.hidden && s.land.state === 'idle' && /^LAND\b(?! HERE)/.test(s.land.txt || 'LAND');
 class StepFail extends Error {}
 const fail = (msg) => { throw new StepFail(msg); };
 let CASE = null;
@@ -381,7 +383,7 @@ async function runCase([plane, diff, orient]) {
     // jets fly the circuit fast and ATC may stretch the downwind out of LAND's reach: any circuit leg before base will do
     // (the herc's short circuit is often on base by the time this step starts: base is still the home circuit)
     const legs = JETS.includes(CASE.plane) ? /^(CROSSWIND|DOWNWIND|UPWIND|BASE)$/ : /^DOWNWIND$/;
-    await until((s) => legs.test(s.p?.phase || '') && (!JETS.includes(CASE.plane) || s.p.agl > 100) && s.land && !s.land.hidden && s.land.state === 'idle', 240, { label: 'downwind with LAND available' });
+    await until((s) => legs.test(s.p?.phase || '') && (!JETS.includes(CASE.plane) || s.p.agl > 100) && landOffered(s), 240, { label: 'downwind with LAND available' });
     await tapUntil('.krz-land', (s) => s.land?.state === 'active', { rec, ms: 2000 });
     rec.pick = M.last.land.txt; rec.landing = M.last.p.landing;
     // LAND NOW (shown while LAND flies a circuit/join) must switch the plan to straight ahead and keep LAND active
@@ -404,7 +406,7 @@ async function runCase([plane, diff, orient]) {
   await step('LAND', 0, async (rec) => {
     await relaunch(rec);
     await D.evSafe(LOAD_ROUTES);
-    const w = await until((s) => { const g = rwyGeom(s); return s.land && !s.land.hidden && s.land.state === 'idle' && g && g.dist < 3500 && g.off < 25 && g.align < 30; }, B.waitFinal, { label: 'runway ahead within 3.5 km with LAND available' });
+    const w = await until((s) => { const g = rwyGeom(s); return landOffered(s) && g && g.dist < 3500 && g.off < 25 && g.align < 30; }, B.waitFinal, { label: 'runway ahead within 3.5 km with LAND available' });
     rec.waitFinalSim = r1(w.simS);
     const g0 = rwyGeom(M.last);
     rec.at = { dist: Math.round(g0.dist), off: Math.round(g0.off), agl: Math.round(M.last.p.agl), phase: M.last.p.phase, rwy: g0.id };
@@ -484,7 +486,7 @@ async function runCase([plane, diff, orient]) {
 
   // field branch: LAND during the climb-out (runway behind) → a field; DEMAND TAKEOFF must be offered there
   await step('field: LAND', B.fieldTouchdown + 30, async (rec) => {
-    await until((s) => s.p && s.p.agl >= 80 && s.land && !s.land.hidden && s.land.state === 'idle', 90, { label: 'climb-out, LAND available' });
+    await until((s) => s.p && s.p.agl >= 80 && landOffered(s), 90, { label: 'climb-out, LAND available' });
     await tapUntil('.krz-land', (s) => s.land?.state === 'active', { rec, ms: 2000 });
     rec.pick = M.last.land.txt; rec.landing = M.last.p.landing;
     const now = await waitReal(() => D.evSafe('document.querySelector(".krz-land")?.dataset.now === "1"'), 2500);

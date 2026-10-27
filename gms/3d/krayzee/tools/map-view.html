@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Krayzee — kingdom airport viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; overflow: hidden; font: 12px ui-monospace, monospace; color: #fff; }
+  canvas { display: block; }
+  #stats { position: fixed; left: 8px; bottom: 8px; background: rgba(0, 0, 0, 0.55); padding: 6px 8px; border-radius: 6px; white-space: pre; }
+  body.shot #stats { display: none; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../../../lib/three/0.180.0/three.module.js", "three/addons/": "../../../lib/three/0.180.0/addons/" } }
+</script>
+</head>
+<body>
+<div id="stats"></div>
+<script type="module">
+// MAP viewer: ?airport=farm|airbase|royal&pos=x,y,z&look=x,y,z&q=low|high  ·  ?swaps=N cycles royal→farm→airbase N times,
+// disposing each world, and reports renderer.info.memory after every build (window.__swap holds the rows).
+import * as THREE from 'three';
+import { buildWorld } from '../js/world/airport.js';
+import * as L from '../js/world/layout.js';
+import { KINGDOM } from '../data/airports/kingdom.js';
+
+const q = new URLSearchParams(location.search);
+const quality = ['low', 'medium', 'high'].includes(q.get('q')) ? q.get('q') : 'high';
+if (q.has('shot')) document.body.classList.add('shot');
+for (const d of Object.values(KINGDOM)) L.registerAirport(d);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(+(q.get('fov') || 60), innerWidth / innerHeight, 0.3, 30000);
+const v3 = (s, d) => (s ? s.split(',').map(Number) : d);
+const mem = () => ({ ...renderer.info.memory, programs: renderer.info.programs?.length ?? 0 });
+let world = null;
+async function load(id) {
+  if (world) world.dispose();
+  L.setAirport(id);
+  world = await buildWorld(scene, renderer, { quality });
+  camera.position.set(...v3(q.get('pos'), [-900, 120, 300]));
+  camera.lookAt(...v3(q.get('look'), [0, 0, -100]));
+  world.update(0, camera);
+  world.setShadowFocus(camera.position.x, camera.position.z, 400);
+  renderer.render(scene, camera);
+  return mem();
+}
+const stats = document.getElementById('stats');
+if (q.get('swaps')) {
+  const rows = [];
+  rows.push({ step: 'royal (boot)', ...(await load('royal')) });
+  for (let i = 0; i < +q.get('swaps'); i++) for (const id of ['farm', 'airbase', 'royal']) rows.push({ step: `${i + 1}:${id}`, ...(await load(id)) });
+  window.__swap = rows;
+  stats.textContent = rows.map((r) => `${r.step.padEnd(14)} geo ${r.geometries} tex ${r.textures} prog ${r.programs}`).join('\n');
+} else {
+  await load(q.get('airport') || 'farm');
+  stats.textContent = `${world.airport} calls/tris after render`;
+}
+let last = performance.now(), frames = 0, fpsT = 0;
+renderer.setAnimationLoop((now) => {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  world.update(dt, camera);
+  renderer.render(scene, camera);
+  frames++; fpsT += dt;
+  if (fpsT > 1 && !q.get('swaps')) { stats.textContent = `${world.airport} ${quality} ${(frames / fpsT).toFixed(0)} fps · calls ${renderer.info.render.calls} · tris ${(renderer.info.render.triangles / 1000).toFixed(0)}k`; frames = 0; fpsT = 0; }
+});
+window.__ready = true;
+</script>
+</body>
+</html>

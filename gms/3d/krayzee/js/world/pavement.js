@@ -36,8 +36,8 @@ function fillet(b, k, a, c, R, y, color) {
   b.fan(pts, y, color);
 }
 
-// Subdivided runway surface with rubber build-up and paving-lane banding baked into vertex colour.
-function runwaySurface(b, F) {
+// Subdivided runway surface with rubber build-up (also used by js/world/site.js) and paving-lane banding baked into vertex colour.
+export function runwaySurface(b, F) {
   const W = F.W, L = F.L;
   const tcols = [-W / 2, -W / 2 + 1.5, -0.33 * W, -0.2 * W, -0.1 * W, -0.03 * W, 0.03 * W, 0.1 * W, 0.2 * W, 0.33 * W, W / 2 - 1.5, W / 2];
   const ds = 8;
@@ -342,7 +342,7 @@ function clipRibbon(b, p0, p1, width, y, color, rects) {
   }
 }
 
-function clipPolyline(b, pts, width, y, color, rects) {
+export function clipPolyline(b, pts, width, y, color, rects) {
   if (!rects.length) { ribbon(b, pts, width, y, color); return; }
   const grown = rects.map((R) => ({ ...R, wid: R.wid + 2 }));
   for (let k = 0; k < pts.length - 1; k++) clipRibbon(b, pts[k], pts[k + 1], width, y, color, grown);
@@ -350,13 +350,13 @@ function clipPolyline(b, pts, width, y, color, rects) {
 
 function lerp2(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; }
 
-function dashed(b, [p0, p1], width, y, color, on, off) {
+export function dashed(b, [p0, p1], width, y, color, on, off) {
   const L = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
   for (let s = 0; s < L; s += on + off) ribbon(b, [lerp2(p0, p1, s / L), lerp2(p0, p1, Math.min(L, s + on) / L)], width, y, color);
 }
 
 // ICAO pattern A: two solid lines on the holding side, two dashed toward the runway.
-function holdLines(b, h, tw) {
+export function holdLines(b, h, tw) {
   const lx = h.hz, lz = -h.hx;
   const w = tw / 2 + 0.5;
   const lw = 0.3, gap = 0.3;

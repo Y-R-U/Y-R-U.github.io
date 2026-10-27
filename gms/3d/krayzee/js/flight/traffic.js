@@ -124,6 +124,7 @@ export class Traffic {
       ap.stickManual = stickAxes.some((k) => e.manual[k] != null);
       ap.attHold = wait && !ac.onGround;
       ap.playerThrottle = A.throttle.mode === 'manual' || A.throttle.mode === 'latched' ? A.throttle.val : null;
+      ap.throttleLatched = A.throttle.mode === 'latched';
       ap.playerBrake = e.manual.brake;
     }
     const apOut = ap && !e.apOff ? ap.update(h) : null;
@@ -220,6 +221,8 @@ export class Traffic {
         const gw = e.ac.gearWant ?? 1;
         if (e.rig.setGear && e._gearShown !== gw) { e.rig.setGear(gw, e._gearShown == null); e._gearShown = gw; }
         if (e.rig.setAfterburner && e._abShown !== e.ac.ab) { e._abShown = e.ac.ab; e.rig.setAfterburner(e.ac.ab); }
+        // D35 STOVL: swivel nozzle + lift-fan doors follow the flight model (the rig eases them)
+        if (e.rig.setNozzle && e.ac.P.stovl && (e._nzShown !== e.ac.nozzle || e._lfShown !== e.ac.liftFan)) { e._nzShown = e.ac.nozzle; e._lfShown = e.ac.liftFan; e.rig.setNozzle(e.ac.nozzle); e.rig.setLiftFan?.(e.ac.liftFan); }
       }
       if (e.player) e.rig.updateInstruments(e.ac.instruments());
       e.rig.update(dt);

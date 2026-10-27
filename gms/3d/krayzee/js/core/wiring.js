@@ -19,12 +19,19 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
   W.flightNo = (() => { let n; do n = 11 + Math.floor(Math.random() * 89); while (!(n % 10)); return n; })();
   const off = [];
 
-  W.atc = safe(() => createATC({ wind: world.wind, surfaceAt: world.surfaceAt, detectCollisions: false }), null);
   const mischiefOf = (s) => (['off', 'low', 'high'].includes(s?.aiMischief) ? s.aiMischief : 'low');
-  if (W.atc) W.link = safe(() => linkTraffic(W.atc, traffic, { playerId: 'player', mischief: mischiefOf(ui.getSettings()) }), null);
+  // MAP (D29): one ATC per loaded airport; setWorld() builds the next one and moves every listener across
+  const atcOff = [], gameOff = [];
+  function bindATC() {
+    for (const f of atcOff.splice(0)) safe(() => f?.());
+    W.atc = safe(() => createATC({ wind: world.wind, surfaceAt: world.surfaceAt, detectCollisions: false }), null);
+    W.link = W.atc ? safe(() => linkTraffic(W.atc, traffic, { playerId: 'player', mischief: mischiefOf(ui.getSettings()) }), null) : null;
+    if (W.atc) atcOff.push(W.atc.on('runwayChange', (e) => safe(() => hud.flash?.(`RUNWAY CHANGE · NOW ${e.to}`, 'info', 3))));
+    if (W.atc && W.radio) atcOff.push(W.atc.on('radio', (ev) => safe(() => W.radio.handleEvent(ev))));
+  }
+  bindATC();
   W.setMischief = (s) => safe(() => W.link?.setMischief(mischiefOf(s)));
   safe(() => traffic.setAIProtection?.('rubber'));
-  if (W.atc) W.atc.on('runwayChange', (e) => safe(() => hud.flash?.(`RUNWAY CHANGE · NOW ${e.to}`, 'info', 3)));
 
   const playerEnt = () => traffic.list.find((e) => e.player);
   const contextOf = () => {
@@ -47,7 +54,7 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
   if (W.radio) {
     safe(() => W.radio.setTower({ voice: 'tower_m' }));
     safe(() => W.radio.setVisible(false));
-    if (W.atc) W.atc.on('radio', (ev) => safe(() => W.radio.handleEvent(ev)));
+    if (W.atc) atcOff.push(W.atc.on('radio', (ev) => safe(() => W.radio.handleEvent(ev))));
   }
 
   function radioProfile() {
@@ -98,19 +105,11 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
     W.game = createGame({ mode, career, playerId: 'player', name: p.name, gender: p.gender, protection, difficulty: W.difficulty, autoBank: mode === 'free' ? 15 : false, ...roomOpts });
     const g = W.game;
     for (const e of traffic.list) if (!e.player && e.rankIndex != null) g.setPilotRank?.(idOf(e), e.rankIndex);
-    if (W.atc) {
-      off.push(W.atc.on('event', (e) => safe(() => g.handleEvent(e))));
-      // STORY tuning: a Royal Scandal in the tutorial / a beginner's first flights wiped their PP. Easy+Medium story and
-      // careers under 1,500 PP get a warning instead: the tower calms down a little and nothing is forfeited.
-      W.scandalGrace = mode === 'story' ? W.difficulty !== 'hard' : mode === 'free' && (career?.lifetimePP ?? 0) < 1500;
-      off.push(W.atc.on('scandal', (e) => safe(() => {
-        if (!W.scandalGrace) return g.handleEvent(e);
-        W.atc.addOutrage?.(-35, 'player');
-        hud.flash?.('THE PRESS ARE SNIFFING ABOUT · STEADY ON', 'warn', 3);
-      })));
-      off.push(W.atc.on('composure', (e) => safe(() => g.handleEvent(e))));
-      g.on('outrageDelta', (d) => safe(() => W.atc.addOutrage(d.amount, 'player')));
-    }
+    // STORY tuning: a Royal Scandal in the tutorial / a beginner's first flights wiped their PP. Easy+Medium story and
+    // careers under 1,500 PP get a warning instead: the tower calms down a little and nothing is forfeited.
+    W.scandalGrace = mode === 'story' ? W.difficulty !== 'hard' : mode === 'free' && (career?.lifetimePP ?? 0) < 1500;
+    hookGame(g);
+    if (W.atc) g.on('outrageDelta', (d) => safe(() => W.atc.addOutrage(d.amount, 'player')));
     W.barked = false; W.banked = false;
     if (W.radio) off.push(W.radio.on?.('barked', (b) => { W.barked = true; safe(() => g.handleEvent({ type: 'barked', ...b })); }));
     safe(() => ghud?.score.attach(g, { flightNo: W.flightNo, gender: p.gender, name: p.name }));
@@ -133,12 +132,40 @@ export function createWiring({ ui, audio, world, traffic, hud, ghud, career, log
       W.lastImpact = r;
       return r;
     };
-    safe(() => W.tasks?.attach({ game: g, atc: W.atc, radio: W.radio, mode, difficulty: W.difficulty, plane: ent.ac.type })); // TASKS
+    W.taskArgs = { game: g, radio: W.radio, mode, difficulty: W.difficulty, plane: ent.ac.type };
+    safe(() => W.tasks?.attach({ ...W.taskArgs, atc: W.atc })); // TASKS
+  });
+  function hookGame(g) {
+    for (const f of gameOff.splice(0)) safe(() => f?.());
+    if (!W.atc) return;
+    gameOff.push(W.atc.on('event', (e) => safe(() => g.handleEvent(e))));
+    gameOff.push(W.atc.on('scandal', (e) => safe(() => {
+      if (!W.scandalGrace) return g.handleEvent(e);
+      W.atc.addOutrage?.(-35, 'player');
+      hud.flash?.('THE PRESS ARE SNIFFING ABOUT · STEADY ON', 'warn', 3);
+    })));
+    gameOff.push(W.atc.on('composure', (e) => safe(() => g.handleEvent(e))));
+  }
+  // MAP: the world of the airport just loaded (js/map/travel.js). def.towerName / towerVoice / towerLines name the tower.
+  W.setWorld = (w, def) => safe(() => {
+    world = w;
+    // the old tower's queued lines go with it (a line already on air finishes)
+    if (W.radio) { W.radio.setEnabled(false); W.radio.setEnabled(true); if (!W.game) W.radio.setVisible(false); }
+    bindATC();
+    if (W.game) hookGame(W.game);
+    if (W.game && W.tasks && W.taskArgs) safe(() => W.tasks.attach({ ...W.taskArgs, atc: W.atc }));
+    W.setTower(def);
+  });
+  W.setTower = (def) => safe(() => {
+    if (!W.radio) return;
+    if (def?.towerLines && !(W.towerLines ||= new Set()).has(def.id)) { W.towerLines.add(def.id); W.radio.bank.load(def.towerLines); }
+    const voice = def?.towerLines?.[0]?.voice || def?.towerVoice || 'tower_m';
+    W.radio.setTower({ voice, name: def?.towerName || 'Tower · Gerald' });   // C-Tower 1: the name its radio gives tower_m
   });
 
   W.endPlay = () => {
     safe(() => W.tasks?.detach()); // TASKS
-    for (const f of off.splice(0)) safe(() => f?.());
+    for (const f of [...off.splice(0), ...gameOff.splice(0)]) safe(() => f?.());
     safe(() => ghud?.score.detach());
     W.game = null;
     safe(() => W.radio?.setVisible(false));

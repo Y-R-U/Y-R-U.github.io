@@ -260,7 +260,8 @@ export function createControls({ root, getSettings, getDifficulty, onView, onPau
       // test injection wins
       if (st.inject && performance.now() < st.injectUntil) for (const a in st.inject) m[a] = st.inject[a];
       else st.inject = null;
-      if (m.aileron != null && !st.inject) { m.aileron = rollAssist(m.aileron, ac, dt); m.elevator = pitchAssist(m.elevator ?? 0, ac); }
+      // D35: in a hover the stick is a speed/turn command (STOVL flight computer), no bank or pitch assists
+      if (m.aileron != null && !st.inject && !(ac?.vtol > 0.5)) { m.aileron = rollAssist(m.aileron, ac, dt); m.elevator = pitchAssist(m.elevator ?? 0, ac); }
       for (const a of ['aileron', 'elevator', 'rudder']) if (m[a] != null) m[a] = clamp(m[a], -1, 1);
       return m;
     },

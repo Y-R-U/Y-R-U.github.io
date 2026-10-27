@@ -1,5 +1,5 @@
 // D19 "LANDED — DEMAND IT": where a stopped plane may finish the flight, by difficulty. Pure, layout-driven.
-import { RUNWAYS, APRON, STANDS } from '../world/layout.js';
+import { RUNWAYS, STANDS, inApron, onLayoutChange } from '../world/layout.js';
 
 export const FINISH = { stopKt: 5, nearRunwayM: 300, standRadiusM: 45, spotRadiusM: 25 };
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
@@ -14,11 +14,13 @@ function runwayDist(rw, x, z) {
   const oa = Math.max(0, Math.abs(along) - rw.length / 2), oc = Math.max(0, Math.abs(across) - rw.width / 2);
   return Math.hypot(oa, oc);
 }
-const onApron = (x, z, m = 0) => Math.abs(x - APRON.center[0]) <= APRON.size[0] / 2 + m && Math.abs(z - APRON.center[2]) <= APRON.size[1] / 2 + m;
+const onApron = (x, z, m = 0) => inApron(x, z, m);
 const nearStand = (x, z) => STANDS.some((s) => Math.hypot(x - s.position[0], z - s.position[2]) <= FINISH.standRadiusM);
 
-// The default designated spot for Hard: the middle stand, right in front of the terminal.
-export const DEFAULT_SPOT = { x: STANDS[3].position[0], z: STANDS[3].position[2], r: FINISH.spotRadiusM, id: STANDS[3].id };
+// The default designated spot for Hard: the middle stand, right in front of the terminal (MAP: follows the loaded airport).
+const spotOf = () => { const s = STANDS[Math.min(3, Math.floor(STANDS.length / 2))]; return { x: s.position[0], z: s.position[2], r: FINISH.spotRadiusM, id: s.id }; };
+export let DEFAULT_SPOT = spotOf();
+onLayoutChange(() => { DEFAULT_SPOT = spotOf(); });
 
 // p = { x, z, surface }; spot = { x, z, r } (Hard's designated spot). Returns { ok, reason }.
 export function finishZone(difficulty, p, spot = DEFAULT_SPOT) {

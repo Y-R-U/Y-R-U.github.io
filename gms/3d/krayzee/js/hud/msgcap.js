@@ -2,7 +2,7 @@
 // extras are shed (html[data-krz-shed] → visibility hidden in style.js) and come back when room frees up. The response
 // sheet, the Herald reel, the rank-up ceremony and the TASKS set celebration are never shed; neither is a coach mark pointing at a control.
 const PRIORITY = [
-  ['sheet', '.krz-r-panel'],
+  ['sheet', '.krz-r-panel, .krz-map:not([hidden])'],
   ['reel', '.krz-reel, .krz-cer, .kz-tk-cele.on'],
   ['banner', '#krz-hud.krz-flash .krz-banner'],
   ['story', '.krz-st-coach'],

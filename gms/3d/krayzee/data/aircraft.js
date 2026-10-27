@@ -139,10 +139,10 @@ export const AIRCRAFT = {
     },
   },
   f35: {
-    name: 'Royal Tantrum', type: 'F-35B-ish (conventional mode)', class: 'fighter', status: 'ready', model: 'f35', ppMult: 0.85, unlockRank: 'prince',
+    name: 'Royal Tantrum', type: 'F-35B-ish (STOVL)', class: 'fighter', status: 'ready', model: 'f35', ppMult: 0.85, unlockRank: 'prince',
     dims: { length: 15.6, span: 10.7, height: 4.25, wingArea: 42.7 },
     mass: { empty: 14600, mtow: 27200, typical: 16500 },
-    engine: { hp: null, kind: 'fighter', engines: 1, props: 0, thrustKN: 125, abThrustKN: 191, idleN1: 30, maxN1: 100, idleRpm: 30, maxRpm: 100, note: 'one afterburning turbofan, rpm = N1 %; STOVL lift fan is a later lane' },
+    engine: { hp: null, kind: 'fighter', engines: 1, props: 0, thrustKN: 125, abThrustKN: 191, idleN1: 30, maxN1: 100, idleRpm: 30, maxRpm: 100, note: 'one afterburning turbofan, rpm = N1 %; swivel nozzle + lift fan for the hover (D35)' },
     speeds: { vs0: 110, vs1: 126, vr: 145, vx: 200, vy: 250, approach: 140, cruise: 200, vfe: 250, vno: 550, vne: 600, taxi: 18 },
     performance: { climbFpm: 30000, ceilingFt: 50000, takeoffRollM: 330, landingRollM: 700, glideRatio: 8 },   // takeoff in afterburner
     flaps: [0, 1],
@@ -150,7 +150,7 @@ export const AIRCRAFT = {
     gear: 'tricycle', water: false, wake: 'medium',
     cockpit: 'glass_generic',
     patternAltM: 450, circuitScale: 1.6,
-    notes: 'twitchy but the computer holds your hand; afterburner above 95 % throttle; hover mode comes later',
+    notes: 'twitchy but the computer holds your hand; afterburner above 95 % throttle; hovers, takes off and lands vertically (D35)',
     flight: {
       engineKind: 'fighter', jet: true, noField: true,
       mass: 16500, wingArea: 42.7, span: 10.7, length: 15.6, height: 4.25,
@@ -169,6 +169,8 @@ export const AIRCRAFT = {
       eye: [0, 1.09, -3.9], eyeCenter: [0, 1.14, -3.84],
       tailSkid: [0, -0.48, 7.0],   // nozzle: tail strike ≈ 14° on the mains (JETMODELS-B)
       hardPoints: { nose: [0, 0.01, -8.6], finL: [-1.85, 2.24, 5.3], finR: [1.85, 2.24, 5.3], wingL: [-5.35, 0.09, 1.98], wingR: [5.35, 0.09, 1.98], stabL: [-3.35, 0, 7.0], stabR: [3.35, 0, 7.0], belly: [0, -0.8, 0.2] },
+      // D35 STOVL (docs/STOVL.md): jet-borne thrust/weight, conversion time (s), hover command limits (m/s, rad/s, m/s²)
+      stovl: { tw: 1.22, convert: 1.4, vfMax: 14, vlMax: 6, yawMax: 0.45, vsUp: 6, vsDown: 4.5, accH: 3.4, hoverAgl: 30, maxHoverAgl: 90 },
     },
   },
   autogyro:  { name: 'Spinning Jenny', type: 'autogyro', class: 'silly', status: 'planned', ppMult: 1.4, unlockRank: 'prince',                             speeds: { vr: 30, approach: 35, cruise: 70 }, notes: 'near-vertical landings; cannot hover', cockpit: 'open_trike' },

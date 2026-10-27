@@ -1,6 +1,7 @@
 import { V3, Quat, clamp, moveTo, DEG, KT, FT } from './vmath.js';
 import { packState, applyRemote } from './netstate.js';
 import { AIRCRAFT } from '../../data/aircraft.js';
+import { level as stovlLevel, leverToVs, gustAt } from './stovl.js';
 
 const RHO = 1.225, G = 9.81;
 
@@ -109,6 +110,7 @@ export class Aircraft {
     this.crashed = false; this.crashReason = ''; this.onGround = false; this.mainsDown = false; this.noseDown = false; this.tailDown = false;
     this.airTime = 0; this.groundTime = 0; this.lastTouchdown = null; this.bounces = 0;
     this.stalled = false; this.surface = 'grass'; this.groundY = 0; this.time = 0;
+    this.vtol = 0; this.vtolWant = 0; this.hoverHeat = 0; this.hot = false; this.nozzle = 0; this.liftFan = 0; this._J = null;
     this.w.set(0, 0, 0);
   }
 
@@ -150,7 +152,7 @@ export class Aircraft {
     const wantE = this.engineOut ? 0 : clamp(c.throttle, 0, 1);
     // spool lag: pistons ~1 s; jets slow from idle (rate grows with N1), quicker winding down
     this.eng = moveTo(this.eng, wantE, dt * (P.spool == null ? 1.2 : P.spool * (wantE < this.eng ? 1.5 : 0.35 + 0.65 * this.eng)));
-    if (P.abThrust) this.ab = moveTo(this.ab, !this.engineOut && c.throttle > (P.abFrom ?? 0.95) && this.eng > 0.9 ? 1 : 0, dt * (this.ab > 0 && c.throttle > (P.abFrom ?? 0.95) ? 3 : 5));
+    if (P.abThrust) this.ab = moveTo(this.ab, !this.engineOut && !(this.vtol > 0) && c.throttle > (P.abFrom ?? 0.95) && this.eng > 0.9 ? 1 : 0, dt * (this.ab > 0 && c.throttle > (P.abFrom ?? 0.95) ? 3 : 5));
     this.flapsPos = moveTo(this.flapsPos, clamp(c.flaps, 0, 1), dt * (P.flapRate ?? 0.35));
 
     const F = _f.set(0, 0, -1).applyQuat(this.q), U = _u.set(0, 1, 0).applyQuat(this.q), R = _r.set(1, 0, 0).applyQuat(this.q);
@@ -182,8 +184,16 @@ export class Aircraft {
     const tf = thrustFactor(P, V);
     let thrust = this.engineOut ? 0 : (P.thrustMax * (P.idle + (1 - P.idle) * this.eng) + (P.abThrust ?? 0) * this.ab) * tf;
     if (this.rev > 0) thrust = thrust * (1 - this.rev) - (P.reverse ?? 0) * P.thrustMax * this.rev * clamp(V / 15, 0, 1);
-    this.thrust = thrust;
-    force.addScaled(F, thrust);
+    // D35 STOVL: jet-borne share u blends the swivel nozzle + lift fan in (they hold the commanded velocity)
+    const ucl = P.stovl ? this._stovl(dt, force, V, agl) : null;
+    if (ucl) {
+      const u = ucl.u, J = this._J;
+      force.addScaled(F, thrust * (1 - u)).addScaled(J, u);
+      this.thrust = thrust * (1 - u) + J.len() * u;
+    } else {
+      this.thrust = thrust;
+      force.addScaled(F, thrust);
+    }
 
     // Wheels: spring/damper normal force, rolling+brake friction, lateral grip, nosewheel steering.
     const surf = env.surfaceAt(this.pos.x, this.pos.z);
@@ -255,7 +265,12 @@ export class Aircraft {
       if (bank > P.bankLimit && tz < 0) tz = (bank - P.bankLimit) * 3;
       else if (bank < -P.bankLimit && tz > 0) tz = (bank + P.bankLimit) * 3;
     }
-    const kt = P.kTrack * (this.onGround ? 0.35 + eff : Math.max(0.4, eff));
+    let kt = P.kTrack * (this.onGround ? 0.35 + eff : Math.max(0.4, eff));
+    if (ucl && !this.onGround) {
+      const u = ucl.u;
+      tq += (ucl.wx - tq) * u; ty += (ucl.wy - ty) * u; tz += (ucl.wz - tz) * u; kt += (P.kTrack - kt) * u;
+      if (u > 0.5) this.stalled = false;
+    }
     // taildragger on its wheels: weak aerodynamic yaw tracking, so the mains-ahead-of-CG instability shows (it will
     // ground-loop if you let it) but some damping keeps it catchable with the rudder. FLIGHTFIX3: only while the tail
     // wheel is down — tail flying (a wheel landing, the takeoff roll) the fin and rudder work as in the air (a tail-up
@@ -292,6 +307,71 @@ export class Aircraft {
 
     this._checkCrash(env, surf);
     this._derive(env, alpha, beta, V, bank);
+  }
+
+  // Jet-borne flight (F-35B, docs/STOVL.md). The flight computer turns the controls into commands: stick fore/aft =
+  // forward speed, stick sideways = turn, rudder = sidestep, throttle lever = climb/sink (middle holds), all on top of
+  // the autopilot's own base command (this.hov). It works out the nozzle + lift-fan force that gives them, within what
+  // the engine can lift, and leans the airframe the way a real one would. Returns the attitude-rate targets.
+  _stovl(dt, force, V, agl) {
+    const P = this.P, S = P.stovl, lv = stovlLevel(this.stovlLevel), m = P.mass, W = m * G;
+    this.vtol = moveTo(this.vtol, this.vtolWant ? 1 : 0, dt / S.convert);
+    const jetBorne = this.vtol > 0.5 && V < 30 && !this.onGround;
+    if (lv.heat) {
+      this.hoverHeat = clamp(this.hoverHeat + (jetBorne ? dt / lv.heat : -dt / (lv.heat * (this.onGround ? 0.5 : 1.5))), 0, 1);
+      if (this.hoverHeat >= 1 && !this.hot) { this.hot = true; this.emit('overheat', {}); }
+      else if (this.hot && this.hoverHeat < 0.6) { this.hot = false; this.emit('cooled', {}); }
+      if (this.hoverHeat > 0.75 && !this._hotWarn) { this._hotWarn = true; this.emit('hoverhot', { heat: +this.hoverHeat.toFixed(2) }); }
+      else if (this.hoverHeat < 0.5) this._hotWarn = false;
+    } else { this.hoverHeat = 0; this.hot = false; }
+    if (this.vtol <= 0) { this.nozzle = moveTo(this.nozzle, 0, dt); this.liftFan = moveTo(this.liftFan, 0, dt); this._J = null; return null; }
+    const u = this.vtol, c = this.ctl, hv = this.hov || {}, h = this.heading * DEG;
+    const fx = Math.sin(h), fz = -Math.cos(h), rx = Math.cos(h), rz = Math.sin(h);
+    const share = clamp((V - 25) / (P.vapp - 25), 0, 1);
+    const yaw = (hv.yaw ?? 0) + c.aileron * S.yawMax * (1 - 0.6 * share);
+    const vf = (hv.vf ?? 0) - c.elevator * S.vfMax, vl = (hv.vl ?? 0) + (this.onGround ? 0 : c.rudder * S.vlMax);
+    const g = gustAt(this.time, lv.gust, this._gseed ??= (String(this.id).length % 5) * 0.7);
+    const vx = fx * vf + rx * vl + g[0] * (1 - lv.comp), vz = fz * vf + rz * vl + g[1] * (1 - lv.comp);
+    let ax = (vx - this.vel.x) * 0.9, az = (vz - this.vel.z) * 0.9;
+    const ah = Math.hypot(ax, az); if (ah > S.accH) { ax *= S.accH / ah; az *= S.accH / ah; }
+    let vsCmd = this.hot ? Math.min(leverToVs(c.throttle, S, lv), -1.8) : leverToVs(c.throttle, S, lv);   // too hot to hover: the computer lets it down
+    if (lv.cushion && !this.onGround) vsCmd = Math.max(vsCmd, -Math.max(lv.sink, agl * 0.45));
+    const ay = clamp((vsCmd - this.vel.y) * 1.6, -3.5, 4);
+    let jf = 0, jl = 0, jy;
+    const idleT = P.thrustMax * P.idle;
+    if (this.onGround && vsCmd <= 0.05) jy = idleT;
+    else {
+      const jx = m * ax - force.x, jz = m * az - force.z;
+      jy = Math.max(0, m * ay - force.y);
+      if (!this.onGround) { jf = Math.max(jx * fx + jz * fz, -0.15 * W); jl = jx * rx + jz * rz; }
+      const lat = W * (0.2 + 0.6 * Math.abs(Math.sin(this.bank || 0)));
+      jl = clamp(jl, -lat, lat);
+      const Jmax = this.engineOut ? 0 : S.tw * W;
+      jy = Math.min(jy, Jmax);
+      const hm = Math.sqrt(Math.max(0, Jmax * Jmax - jy * jy)), hl = Math.hypot(jf, jl);
+      if (hl > hm) { jf *= hm / hl; jl *= hm / hl; }
+      if (!this.engineOut && Math.hypot(jf, jl, jy) < idleT) jy = Math.sqrt(Math.max(0, idleT * idleT - jf * jf - jl * jl));
+    }
+    const J = (this._J ||= F_.set(0, 0, -1).applyQuat(this.q).clone().scale(this.thrust || 0));
+    const k = Math.min(1, dt * 4);
+    J.x += (jf * fx + jl * rx - J.x) * k; J.y += (jy - J.y) * k; J.z += (jf * fz + jl * rz - J.z) * k;
+    const pf = J.len() / (S.tw * W);
+    this.eng += (pf - this.eng) * u;
+    // nozzle angle from the force it is making (0 aft … 1 = 95° down), fan doors with the conversion
+    const jb = B_.copy(J).applyQuatInv(this.q);
+    this.nozzle = u * clamp(Math.atan2(jb.y, -jb.z) / (95 * DEG), 0, 1);
+    this.liftFan = u;
+    // attitude: a hover sits 3° nose up, leans into its accelerations; at speed the wing takes its share of the weight
+    const qd = 0.5 * RHO * V * V, fl = this.flapsPos;
+    const aW = clamp((share * W / Math.max(qd * P.wingArea, 1) - P.CL0 - fl * P.flapCL) / P.CLa, -0.03, (P.aoaLimit ?? 0.3) - 0.06);
+    const pW = aW + Math.asin(clamp(vsCmd / Math.max(V, 1), -0.3, 0.3));
+    const afw = ax * fx + az * fz, alt = ax * rx + az * rz;
+    const pH = 0.05 + clamp(-afw / G * 0.4, -0.06, 0.1);
+    const pitchT = pH + (pW - pH) * share;
+    const bankT = clamp(alt / G * 0.5, -0.12, 0.12) * (1 - share) + clamp(Math.atan(V * yaw / G), -0.6, 0.6) * share;
+    const bank = this.bank || 0;
+    const qT = clamp((pitchT - (this.pitch || 0)) * 2, -0.4, 0.4), pT = clamp((bankT - bank) * 2.5, -0.8, 0.8);
+    return { u, wx: qT * Math.cos(bank) + yaw * Math.sin(bank), wy: -yaw * Math.cos(bank), wz: -pT };
   }
 
   _touchdown(gearOver, env) {
@@ -439,7 +519,7 @@ export class Aircraft {
 
 const _f = new V3(), _u = new V3(), _r = new V3(), _va = new V3(), _vb = new V3(), _force = new V3(), _torque = new V3();
 const _vd = new V3(), _ld = new V3(), _ww = new V3(), _rw = new V3(), _pv = new V3(), _wf = new V3(), _ws = new V3();
-const _wfo = new V3(), _tq = new V3(), _n = new V3();
+const _wfo = new V3(), _tq = new V3(), _n = new V3(), F_ = new V3(), B_ = new V3();
 
 // Terrain surface normal (unit [x, y, z]) for impact FX; flat [0, 1, 0] without a height function.
 export function groundNormal(env, x, z) {

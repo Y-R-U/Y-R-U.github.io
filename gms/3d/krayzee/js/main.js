@@ -12,6 +12,7 @@ import * as layout from './world/layout.js';
 import { createMarkers } from './assist/markers.js';
 import { planLandAhead, createLandButton, collectTrees } from './assist/landahead.js';
 import { createControls } from './flight/controls.js';
+import { contextButton, findPad, CONVERT as STOVL } from './flight/stovl.js';
 import { createFlightCamera, fitFov } from './flight/cameras.js';
 import { createHUD } from './flight/hud.js';
 import { createGameHUD } from './hud/index.js';
@@ -25,12 +26,14 @@ import { createFX } from './fx/index.js';
 import { createStory } from './story/index.js';
 import { configureRadio } from './radio/index.js';
 import { saveSettings, hasProfile } from './ui/store.js';
+import { createKingdom, bootAirport } from './map/index.js'; // MAP (D29 Kingdom Map, docs/MAP.md)
 
 const AUTO = params.get('auto') === '1';
 const SHOT = params.get('shot') === '1';
 const TIMESCALE = Math.min(8, Math.max(0.1, +params.get('timescale') || 1));
 const S = { mode: 'boot', paused: false, view: 'chase', player: null, log: [], respawnT: 0, startT: 0 };
 let R, scene, camera, world, env, traffic, attract, controls, hud, ghud, markers, land, fcam, sunFollow, gov, wiring, career, engine = null, fx = null, story = null, SET = null, toCoach = null;
+let kingdom = null; // MAP
 // settings are read every frame; ui.getSettings() parses localStorage, so keep a copy (refreshed in onSettings)
 const settings = () => (SET ||= ui.getSettings());
 const aiVoices = new Map(), errSeen = new Set();
@@ -65,6 +68,7 @@ async function boot() {
 
   ui.setLoading(0.15, 'Painting the runway');
   await nextPaint();
+  bootAirport(params.get('airport'), aircraftType()); // MAP: ?airport=<id> starts there (C-Tower 1 otherwise)
   world = await buildWorld(scene, R.renderer, { quality: contentQ, onProgress: (f, label) => ui.setLoading(0.15 + 0.35 * f, label) });
   env = { groundHeightAt: world.groundHeightAt, surfaceAt: world.surfaceAt, colliders: world.colliders || [] };
   try { world.trees = collectTrees(world); } catch (e) { console.warn('collectTrees', e); }
@@ -105,7 +109,7 @@ async function boot() {
   const st0 = ui.getSettings();
   markers = createMarkers({ container: overlay, camera, units: st0.units, traffic: st0.trafficMarkers !== false, getOrigin: () => S.player?.ac.pos ?? camera.position,
     avoid: ['.krz-r-btn', '.krz-r-tower', '.krz-land', '.krz-top-l', '.krz-top-r', '.krz-prompt', '.krz-finish', '.krz-gbtn'] });
-  land = createLandButton({ container: overlay, stickRight: st0.stickRight, onPress: onLandPress });
+  land = createLandButton({ container: overlay, stickRight: st0.stickRight, onPress: onLandPress, onContext: onStovlPress });
   markers.setVisible(false); land.setVisible(false);
   fcam = createFlightCamera(camera, env);
   sunFollow = world.setShadowFocus ? (p) => world.setShadowFocus(p.x, p.z, S.player ? R.tier.shadowBox : 160) : followSun(world.sun, R);
@@ -122,6 +126,12 @@ async function boot() {
       quality: S.contentQ, parent: document.body, isOnline: () => S.playMode === 'online', log: (t, d) => log(t, d),
     });
   } catch (e) { console.warn('story', e); story = null; }
+  // MAP (D29): Kingdom Map, destinations and magic-cloud airport swaps (js/map/index.js)
+  try {
+    kingdom = createKingdom({ S, overlay, scene, renderer: R.renderer, camera, env, attract, traffic, wiring, hud, log, getWorld: () => world, adoptWorld,
+      buildWorld: (o) => buildWorld(scene, R.renderer, { quality: S.contentQ, ...o }), placePlayer: () => placePlayer(null), anchor: () => story?.toggle?.el });
+    kingdom.afterBoot();
+  } catch (e) { console.warn('kingdom', e); kingdom = null; }
 
   S.mode = 'attract';
   let last = performance.now();
@@ -164,6 +174,21 @@ function treeTopFn(T) {
     }
     return top;
   };
+}
+
+// MAP: a swapped-in airport's world replaces the old one everywhere main holds it (the old one is already disposed)
+function adoptWorld(w) {
+  world = w;
+  env.groundHeightAt = w.groundHeightAt; env.surfaceAt = w.surfaceAt; env.colliders = w.colliders || [];
+  try { world.trees = collectTrees(world); } catch (e) { console.warn('collectTrees', e); }
+  try { env.treeTop = treeTopFn(world.debug?.trees); } catch (e) { env.treeTop = null; }
+  try { world.setQuality(R.quality); } catch (e) { /* */ }
+  try { fx?.dispose(); fx = createFX({ scene, camera, renderer: R.renderer, quality: R.quality, world }); fx.setView?.(S.view); } catch (e) { console.warn('fx', e); fx = null; }
+  for (const e of traffic.list) {
+    e.rig?.root.traverse((o) => { for (const m of [].concat(o.material || [])) if (m?.isMeshStandardMaterial && m.envMap) { m.envMap = world.envMap; m.needsUpdate = true; } });
+    if (fx && e.rig) fx.track(e.player ? 'player' : e.ac.id, { rig: e.rig, ac: e.ac, player: !!e.player });
+  }
+  if (spotMark) spotMark.position.set(DEFAULT_SPOT.x, world.groundHeightAt(DEFAULT_SPOT.x, DEFAULT_SPOT.z), DEFAULT_SPOT.z);
 }
 
 export function applyEnv(rig) {
@@ -234,6 +259,7 @@ function aircraftType() {
 async function setAircraft(t) {
   if (!FLYABLE.includes(t) || !S.player || S.playMode !== 'free' || S.everAir || t === S.type) return;
   if (!ui.aircraftUnlocked(t)) { hud.flash(`LOCKED · ${ui.aircraftLockText(t).toUpperCase()}`, 'warn'); return; }
+  if (kingdom && !kingdom.allows(t)) return; // MAP: too big for this airport's runway (the quip says so)
   SET = saveSettings({ ...settings(), aircraft: t });
   const mode = S.playMode;
   quitPlay();
@@ -263,7 +289,7 @@ async function onOnline() {
       net = createNet({ profile: () => ui.getProfile(), getToken: accountToken });
       session = createSession({ net, scene, traffic, wiring, attract, createPlane, applyEnv, env, career, ui, hud, fx, log,
         onExit: () => { quitPlay(); ui.showMenu(); lobby.show(true); } });
-      lobby = createLobby({ net, profile: () => ui.getProfile(), onStart: async () => { lobby.show(false); ui.enterGameplay(); await onPlay('online'); if (S.player) session.attach(S.player); }, onClose: () => ui.showMenu() });
+      lobby = createLobby({ net, profile: () => ui.getProfile(), onStart: async () => { lobby.show(false); ui.enterGameplay(); await kingdom?.ensure('royal'); /* MAP */ await onPlay('online'); if (S.player) session.attach(S.player); }, onClose: () => ui.showMenu() });
     }
     lobby.show(true);
   } catch (e) { console.warn('online', e); ui.toast?.('Online rooms', 'The radio mast is down. Try again later.'); ui.showMenu(); }
@@ -280,7 +306,7 @@ function placeWarp() {
 }
 // STORY (docs/STORY.md): the menu's Story button, ?mission=N, ?intro=1.
 function startMission(id = 1) {
-  return onPlay('story').then(() => {
+  return Promise.resolve(kingdom?.ensure('royal')).then(() => onPlay('story')).then(() => { // MAP: missions fly from C-Tower 1
     if (!story || !S.player) return;
     story.startMission(id, {
       difficulty: settings().difficulty || 'easy',
@@ -296,11 +322,13 @@ function firstLaunch() {
   try { return params.get('intro') !== '0' && !/HeadlessChrome/.test(navigator.userAgent) && !hasProfile() && !story.introSeen(); } catch (e) { return false; }
 }
 function watchIntro() {
+  if (kingdom && layout.AIRPORT.id !== 'royal' && !S.player) { kingdom.ensure('royal').then(watchIntro); return; } // MAP
   if (!story || S.player || S.starting || story.intro) { if (!S.player && !S.starting && !story?.intro) ui.showMenu(); return; }
   story.playIntro({ onDone: () => ui.showMenu() });
 }
 // ui calls enterGameplay() first: intro on the first visit, then Mission 1
 function onStory() {
+  if (kingdom && layout.AIRPORT.id !== 'royal' && !S.player && !S.starting) { kingdom.ensure('royal').then(onStory); return; } // MAP
   if (!story) { ui.showMenu(); ui.toast('Story mode', 'The storyteller has lost his place. Try again shortly.'); return; }
   if (S.player || S.starting || story.intro) return;
   if (!story.introSeen()) story.playIntro({ onDone: () => startMission(1) });
@@ -329,6 +357,7 @@ function placePlayer(from = null) {
 
 function quitPlay() {
   if (!S.player) return;
+  kingdom?.reset(); // MAP
   session?.detach();
   if (story?.mission) story.endMission(); else story?.showWarp(false);
   fx?.untrack('player');
@@ -403,6 +432,7 @@ function toggleFullscreen() {
 function modesOf(ent) { return Object.fromEntries(AXES.map((k) => [k, ent.axis[k].mode])); }
 
 function frame(dt) {
+  if (kingdom?.frame(dt)) return; // MAP: frozen behind the magic clouds while the next airport is built
   const P = S.player;
   if (P && !S.paused) {
     const m = controls.update(dt, P.ac);
@@ -433,6 +463,7 @@ function frame(dt) {
     if (fx) for (const ev of e.ac.events) try { fx.onAircraftEvent(e.ac.id, ev); } catch (er) { /* */ }
     e.ac.events.length = 0; e.ap?.events.splice(0);
   }
+  if (P && fx && !S.paused && P.ac.vtol > 0.3 && P.ac.agl < 18 && !P.ac.crashed) try { downwash(P.ac); } catch (e) { /* */ }
   try { fx?.update(S.paused ? 0 : dt * (S.simK || 1)); } catch (e) { /* effects never break the frame */ }
   try { story?.update(dt); } catch (e) { /* */ }
   if (net) try { net.tick(performance.now(), { ready: gov.fps > 40, parked: !P || (P.ac.onGround && P.ac.gs < 1) }); } catch (e) { /* */ }
@@ -448,6 +479,15 @@ function frame(dt) {
   gov.tick(dt, S.cpuMs || 0);
 }
 
+// D35: the hover's jets kick up the ground under it (FX's prop-wash dust, sprayed round the downwash)
+const _dw = { pos: { x: 0, y: 0, z: 0 }, dir: { x: 0, z: 1 }, power: 1, surface: 'grass' };
+function downwash(ac) {
+  const a = Math.random() * Math.PI * 2;
+  _dw.pos.x = ac.pos.x; _dw.pos.z = ac.pos.z; _dw.pos.y = ac.groundY;
+  _dw.dir.x = Math.sin(a); _dw.dir.z = Math.cos(a);
+  _dw.power = clamp(ac.vtol * ac.eng * (1.2 - ac.agl / 18), 0, 1.2); _dw.surface = ac.surface;
+  fx.wash(_dw);
+}
 const _fwd = new THREE.Vector3();
 const fmtPP = (n) => Math.round(n).toLocaleString('en-GB');
 // D19: LANDED — DEMAND IT. Visible once landed and nearly stopped; greyed with a one-line reason outside the allowed area.
@@ -533,7 +573,9 @@ function onLandPress(state) {
 function cancelLand() { try { S.player?.ap.cancelLand?.(); } catch (e) { /* */ } land.setState('idle'); }
 function updateLand(dt, P) {
   const air = !P.ac.onGround && !P.ac.crashed;
-  land.setVisible(!SHOT && !AUTO && (air || land.state === 'active'));
+  P.ac.stovlLevel = wiring.difficulty;
+  const stovl = !!P.ac.P.stovl && updateStovl(dt, P);
+  land.setVisible(!SHOT && !AUTO && (air || land.state === 'active' || stovl));
   // landscape: the action slot (prompt card) steps clear of LAND (css/game.css html.krz-land-on)
   const lon = !land.el.hidden, de = document.documentElement;
   if (S.landOn !== lon) { S.landOn = lon; de.classList.toggle('krz-land-on', lon); }
@@ -549,14 +591,56 @@ function updateLand(dt, P) {
   }
   if (!air || (S.landT -= dt) > 0) return;
   S.landT = 2;
-  try { const p = planNow(); land.setState(p.fail ? 'unavailable' : 'idle', p.fail ? p.hint : ''); } catch (e) { land.setState('unavailable', ''); }
+  try { const p = (S.landPlan = planNow()); land.setState(p.fail ? 'unavailable' : 'idle', p.fail ? p.hint : ''); } catch (e) { S.landPlan = null; land.setState('unavailable', ''); }
+}
+// ---- D35 F-35B STOVL: the LAND slot becomes a context button (js/flight/stovl.js contextButton, docs/STOVL.md) ----
+function updateStovl(dt, P) {
+  const ac = P.ac, ap = P.ap, mode = ap.stovlMode;
+  if (ac.onGround && !mode && ac.gs > STOVL.vtoKt * KT) { land.setContext(null); return false; }
+  if ((S.stovlT = (S.stovlT || 0) - dt) > 0) return !!land.context;
+  S.stovlT = 0.25;
+  if ((mode === 'hover' || mode === 'vto') && !ac.onGround && ((S.padT = (S.padT || 0) - 0.25) <= 0 || !S.pad)) {
+    S.padT = 0.5;
+    try { S.pad = findPad(env, ac.pos.x, ac.pos.z, { avoid: traffic.list.filter((e) => e.ac !== ac && e.ac.onGround).map((e) => [e.ac.pos.x, e.ac.pos.z, e.ac.dims.span * 0.6 + 4]) }); } catch (e) { S.pad = { fail: 'not clear' }; }
+  } else if (mode !== 'hover' && mode !== 'vto') S.pad = null;
+  const base = { stovl: true, crashed: ac.crashed, onGround: ac.onGround, gsKt: ac.gs / KT, speedKt: ac.speed / KT, agl: ac.agl, mode, pad: S.pad,
+    landPlan: S.landPlan, landActive: land.state === 'active' && !mode };
+  // HOVER / LAND as the first choice swap only once the new order has held 1.5 s (never under a thumb mid-tap)
+  const first = (x) => (x && !mode && !ac.onGround && x.state === 'idle' && (x.key === 'hover' || x.key === 'landrw') ? x.key : null);
+  let c = contextButton(base);
+  const nat = first(c);
+  if (nat && S.ctxFirst && nat !== S.ctxFirst && (S.swapT = (S.swapT || 0) + 0.25) < 1.5) c = contextButton({ ...base, prefer: S.ctxFirst });
+  else S.swapT = 0;
+  S.ctxFirst = first(c) ?? (c && !mode && !ac.onGround ? S.ctxFirst : null);
+  land.setContext(c);
+  return !!c;
+}
+function onStovlPress(key, state) {
+  const P = S.player; if (!P) return;
+  const ap = P.ap, ac = P.ac;
+  log('stovl', { key, state });
+  S.stovlT = 0;
+  if (state === 'unavailable') { const why = land.context?.sub; if (why) hud.flash(why.replace(/^no: /, 'CAN\'T LAND · ').toUpperCase(), 'warn', 2); return; }
+  if (key === 'landrw') return onLandPress('idle');
+  if (key === 'vto') {
+    if (!ap.verticalTakeoff({ end: wiring.activeEnd() })) return;
+    S.demandedT = true; toCoach?.hide();
+  } else if (key === 'hover' || key === 'cancel') {
+    if (land.state === 'active' && !ap.stovlMode) cancelLand();
+    ap.hover();
+  } else if (key === 'land') {
+    if (S.pad && !S.pad.fail) ap.landHere(S.pad);
+  } else if (key === 'flyon') ap.flyOn();
+  // (no flash: the button itself now says what is happening; D32 keeps the screen clear)
+  updateStovl(0, P);
 }
 // ---- ASSIST: markers (D12); the target is the live opportunity, else Hard's finishing spot, else the active runway ----
 const mkTarget = { id: 'target', kind: 'target', label: '', worldPos: [0, 0, 0] };
 function updateMarkers(P) {
   let t = S.oppTarget, label, pos;
-  const mt = S.missionTarget;
+  const mt = S.missionTarget, kt = kingdom?.target(P); // MAP: a trip's destination
   if (mt?.pos) { label = mt.label || 'TARGET'; pos = mt.pos; }
+  else if (kt) { label = kt.label; pos = kt.pos; }
   else if (t) { label = t.label || 'TARGET'; pos = t.worldPos; }
   else if (wiring.difficulty === 'hard') { label = 'FINISH HERE'; pos = [DEFAULT_SPOT.x, 2, DEFAULT_SPOT.z]; }
   else { const e = runwayEnd(wiring.activeEnd()), pend = wiring.atc?.pendingRunway; label = pend && pend !== e.id ? `RWY ${e.id} → ${pend} SOON` : `RWY ${e.id}`; pos = [e.thr[0], 2, e.thr[1]]; }
@@ -597,7 +681,9 @@ function autoThrottle() {
 function fieldHop(P) {
   const ac = P.ac, x = ac.pos.x, z = ac.pos.z;
   // FLIGHTFIX3: on grass the AP turns onto a clear run where it stands and takes off (ap.fieldTakeoff); the teleport is the last resort
-  if (ac.surface === 'grass' && P.ap.fieldTakeoff?.({ world, end: wiring.activeEnd() })) return 'run';
+  // D35: the F-35B goes straight up from wherever it sits (fieldTakeoff is its vertical takeoff on grass)
+  const ft = ac.surface === 'grass' && P.ap.fieldTakeoff?.({ world, end: wiring.activeEnd() });
+  if (ft) return ft.vto ? 'vto' : 'run';
   const seg = (a, b) => { const dx = b[0] - a[0], dz = b[1] - a[1], t = Math.max(0, Math.min(1, ((x - a[0]) * dx + (z - a[1]) * dz) / (dx * dx + dz * dz || 1))); return Math.hypot(x - a[0] - t * dx, z - a[1] - t * dz); };
   const d = Math.min(Infinity, ...(layout.RUNWAYS || []).map((rw) => seg(layout.threshold(rw, rw.ends[0]), layout.threshold(rw, rw.ends[1]))));
   if (!(d > 500)) return false;
@@ -611,7 +697,7 @@ function demandTakeoff() {
   const P = S.player; if (!P?.ap?.demandTakeoff) return;
   if (S.reelOpen) ghud.headlines.closeReel(false);
   const fh = S.everAir && P.ac.onGround && fieldHop(P);
-  if (fh) { log('demandTakeoff', { field: fh }); S.demandedT = true; S.demandLive = fh === 'run'; ghud.score.announce('BY ROYAL PREROGATIVE', fh === 'run' ? 'Off across the turnips. The farmer may watch.' : 'Airborne from the turnips. The farmer may watch.'); return; }
+  if (fh) { log('demandTakeoff', { field: fh }); S.demandedT = true; S.demandLive = fh === 'run'; ghud.score.announce('BY ROYAL PREROGATIVE', fh === 'vto' ? 'Straight up from the turnips. The farmer may duck.' : fh === 'run' ? 'Off across the turnips. The farmer may watch.' : 'Airborne from the turnips. The farmer may watch.'); return; }
   try { if (!(S.demandEnd = wiring.link?.demandTakeoff ? wiring.link.demandTakeoff(P) : P.ap.demandTakeoff())) { hud.flash('NO RUNWAY OPEN FOR YOUR GRACE', 'warn'); return; } } catch (e) { console.warn('demandTakeoff', e); return; }
   log('demandTakeoff', {});
   S.demandedT = true; S.demandLive = true;
@@ -736,6 +822,9 @@ function handleEvents(P, dt) {
       hud.flash(`CRASHED · ${ev.reason.toUpperCase()}`, 'bad', 3.5);
       S.respawnT = wiring.lastImpact?.gagSecs ?? 3.5;
     } else if (ev.type === 'tailstrike') hud.flash('TAIL STRIKE!', 'warn');
+    else if (ev.type === 'hoverhot') hud.flash('HOVER HOT · LAND OR FLY ON SOON', 'warn', 3);
+    else if (ev.type === 'overheat') hud.flash('TOO HOT TO HOVER · COMING DOWN', 'bad', 3.5);
+    else if (ev.type === 'cooled') hud.flash('ENGINE COOL · HOVER READY', 'good', 2);
     else if (ev.type === 'impact' && ev.result === 'bounce') { fcam.kick(1.2); hud.flash('BOING!', 'warn', 1.2); }
     else if (ev.type === 'impact') fcam.kick(1.5);
   }
@@ -765,12 +854,13 @@ function updateAudio(dt) {
       const jet = ac.engineKind && ac.engineKind !== 'piston';
       engine.setRPM(ac.crashed ? 0 : (jet ? ac.n1 * 100 : ac.instruments().rpm), ac.eng);
       engine.setAfterburner?.(ac.ab || 0);
+      if (ac.liftFan > 0 || S.fanOn) { S.fanOn = ac.liftFan > 0; engine.setLiftFan?.(ac.liftFan * (0.35 + 0.65 * ac.eng)); }
       engine.setInterior(interior);
       engine.update(null, null, P.rig.root.position, ac.vel);
       audio.setWind(S.paused ? 0 : ac.speed / KT, { interior });
       const vs = P.ap._vstall();
       // D25: off by default; when on, only right at the stall (soft hum, see audio)
-      audio.setStallHorn(settings().stallHorn && !ac.onGround && !S.paused && ac.agl > 3 ? clamp((vs * 1.03 + 3 * KT - ac.speed) / (3 * KT), 0, 1) : 0);
+      audio.setStallHorn(settings().stallHorn && !ac.onGround && !S.paused && ac.agl > 3 && !(ac.vtol > 0.2) ? clamp((vs * 1.03 + 3 * KT - ac.speed) / (3 * KT), 0, 1) : 0);
       audio.setRolling(ac.onGround && !S.paused ? ac.gs : 0, ac.surface, { interior });
       audio.setFlapsMotor(Math.abs(ac.flapsPos - ac.ctl.flaps) > 0.01);
     } else { audio.setWind(0); audio.setStallHorn(0); audio.setRolling(0, 'runway'); audio.setFlapsMotor(false); }
@@ -781,6 +871,7 @@ function updateAudio(dt) {
       const ej = e.ac.engineKind && e.ac.engineKind !== 'piston';
       v.setRPM(e.ac.crashed ? 0 : (ej ? e.ac.n1 * 100 : e.ac.instruments().rpm), e.ac.eng);
       v.setAfterburner?.(e.ac.ab || 0);
+      if (e.ac.liftFan > 0) v.setLiftFan?.(e.ac.liftFan * (0.35 + 0.65 * e.ac.eng));
       v.update(null, null, e.rig.root.position, e.ac.vel);
     }
     for (const [e, v] of aiVoices) if (!traffic.list.includes(e)) { v.dispose(); aiVoices.delete(e); }
@@ -796,6 +887,7 @@ const summary = (e) => {
     vsFpm: Math.round(ac.vs / FT * 60), onGround: ac.onGround, crashed: ac.crashed, crashReason: ac.crashReason, surface: ac.surface,
     phase: e.ap?.phase, leg: e.ap?.leg?.kind, sub: e.ap?.sub, legIndex: e.ap?.i, apMode: traffic.modeOf(e), modes: modesOf(e), ctl: { ...ac.ctl },
     lastTouchdown: ac.lastTouchdown,
+    stovl: ac.P.stovl ? { mode: e.ap?.stovlMode ?? null, vtol: +ac.vtol.toFixed(2), nozzle: +ac.nozzle.toFixed(2), fan: +ac.liftFan.toFixed(2), heat: +ac.hoverHeat.toFixed(2), level: ac.stovlLevel ?? null } : null,
   };
 };
 window.__game = {
@@ -809,12 +901,15 @@ window.__game = {
   teleport(o) {
     const P = S.player; if (!P) return false;
     P.ac.place({ x: o.x, z: o.z, alt: o.alt, heading: o.heading ?? 90, speed: (o.speedKt ?? 0) * KT, throttle: o.throttle, flaps: o.flaps }, env);
+    P.ap._endStovl?.();
     P.ap.replan();
     try { wiring.link?.placed(P, 8); } catch (e) { /* */ }
     return true;
   },
   setView, start: (m = 'free') => { ui.enterGameplay(); return onPlay(m); }, quit: () => { quitPlay(); ui.showMenu(); },
   phase: () => S.player?.ap.phase,
+  landButton: () => land && { hidden: land.el.hidden, state: land.el.dataset.state, ctx: land.context ? { key: land.context.key, label: land.context.label, sub: land.context.sub, state: land.context.state, alt: land.context.alt?.key ?? null } : null,
+    label: land.el.querySelector('b')?.textContent, alt: land.el.dataset.now === '1' ? land.el.querySelector('.krz-land-now')?.textContent : null },
   get aircraft() { return traffic ? traffic.list.map(summary) : []; },
   log: () => S.log.slice(),
   controlsRects: () => {

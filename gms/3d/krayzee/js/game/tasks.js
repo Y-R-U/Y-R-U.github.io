@@ -193,7 +193,7 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
       L.seen.add(ev);
       if (ev.type === 'touchdown') {
         const crash = ev.grade === 'crash';
-        const e = { type: 'touchdown', fpm: ev.fpm, grade: ev.grade, bounce: !!ev.bounce, surface: ev.surface, runway: runwayAt(ac.pos.x, ac.pos.z), crash, fuel: ac.fuelFraction ?? 1 };
+        const e = { type: 'touchdown', fpm: ev.fpm, grade: ev.grade, bounce: !!ev.bounce, surface: ev.surface, runway: runwayAt(ac.pos.x, ac.pos.z), crash, fuel: ac.fuelFraction ?? 1, vertical: (ac.vtol || 0) > 0.5 };
         L.lastTouch = { surface: ev.surface, field: !PAVED.includes(ev.surface) && !nearRunway(ac.pos.x, ac.pos.z, 150) };
         handle(e);
       } else if (ev.type === 'crash') { handle({ type: 'crash', reason: ev.reason }); L.lastTouch = null; }
@@ -211,10 +211,12 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
     }
     L.wasGround = ground;
     L.parked = ground && ac.gs < 1;
-    if (ground) { L.inv = 0; L.stall = 0; return; }
+    if (ground) { L.inv = 0; L.stall = 0; L.hov = 0; return; }
     const rdt = dt / Math.max(1, +warp || 1);
     const speedKt = ac.speed / KT, vne = AIRCRAFT[ctx.plane]?.speeds?.vne || 0;
     handle({ type: 'air', dt: rdt, dist: (ac.gs || 0) * dt, alt: ac.alt ?? ac.pos.y, speedKt, vne });
+    // D35: jet-borne and nearly still (F-35B hover)
+    if ((ac.vtol || 0) > 0.5 && ac.speed < 15 * KT) { L.hov = (L.hov || 0) + rdt; handle({ type: 'hover', dt: rdt, run: L.hov }); } else L.hov = 0;
     if (Math.abs(ac.bank) > INVERTED_RAD) { L.inv += rdt; handle({ type: 'inverted', dt: rdt, run: L.inv }); } else L.inv = 0;
     let vs = 0;
     try { vs = ent.ap?._vstall?.() || 0; } catch (e) { vs = 0; }

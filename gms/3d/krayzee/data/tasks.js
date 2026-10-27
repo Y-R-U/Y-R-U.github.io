@@ -226,6 +226,10 @@ export const SETS = [
     T('fly_f35', '⚡', 'Royal Tantrum', 'Take off in the Royal Tantrum, the F-35.', 'silver', { on: 'takeoff', when: plane('f35'), plane: 'f35' }),
     T('f35_fast', '💨', 'Sound Barrier-ish', 'Exceed 450 kt in the Tantrum.', 'gold', { on: 'air', when: plane('f35', (e) => e.speedKt > 450), plane: 'f35' }),
     T('f35_flypast', '🎆', 'Afterburner Flypast', 'A royal flypast down the runway in the Tantrum.', 'gold', { on: 'infraction', when: rule('low_pass', plane('f35')), plane: 'f35' }),
+    // D35 STOVL (docs/STOVL.md)
+    T('f35_hover', '🐝', 'Hummingbird', 'Hover the Tantrum for 30 seconds in one go.', 'silver', { on: 'hover', when: plane('f35', (e) => e.run >= 30), plane: 'f35' }),
+    T('f35_vfield', '🥕', 'Turnip Pad', 'Land the Tantrum vertically in a field.', 'gold', { on: 'touchdown', when: plane('f35', (e) => ok(e) && e.vertical && e.surface === 'grass'), plane: 'f35' }),
+    T('f35_vhard', '🎯', 'Straight Down, Real Metal', 'Land the Tantrum vertically on Hard.', 'gold', { on: 'touchdown', when: plane('f35', (e) => ok(e) && e.vertical && e.diff === 'hard'), plane: 'f35' }),
   ] },
   { id: 'trial', name: 'Trial by Difficulty', blurb: 'Rubber, partial, real metal', badge: '🛡️', epithet: 'the Hardened', tasks: [
     T('finish_easy', '🐣', 'Easy Does It', 'DEMAND IT to finish a flight on Easy.', 'bronze', { on: 'finished', when: (e) => e.diff === 'easy' }),

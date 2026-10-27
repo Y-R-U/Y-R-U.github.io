@@ -1,6 +1,6 @@
 // Opportunity prompts: one small, rate-limited, dismissible suggestion of a rule the player could break right now.
 // Reads ATC/traffic state only (never issues anything). Settings key `hints` (default on) hides them.
-import { RUNWAYS, TOWER, TERMINAL, TAXIWAYS, threshold, runwayHeadingFor } from '../world/layout.js';
+import { RUNWAYS, TOWER, TERMINAL, TAXIWAYS, PARALLEL, threshold, runwayHeadingFor } from '../world/layout.js';
 import * as sfx from './sound.js';
 import { rect, rects } from './place.js';
 
@@ -132,8 +132,13 @@ export function createPrompts(root, { getSettings, onTarget, held } = {}) {
         }
       }
       if (player.ap?.leg?.kind === 'approach' && ac.agl < 320 && ac.agl > 40) {
-        const zA = TAXIWAYS.find((t) => t.id === 'A').points[0][1];
-        out.push({ kind: 'oddland', title: 'Feeling naughty? Land on the taxiway', sub: 'Touch down on taxiway A beside the runway · 400 PP', target: { xz: [Math.max(-600, Math.min(600, ac.pos.x)), zA], label: 'TAXIWAY A' } });
+        // MAP: the airport's parallel taxiway (C-Tower 1: A), the point on it abeam the plane, 100 m in from either end
+        const tw = TAXIWAYS.find((t) => t.id === PARALLEL);
+        if (tw) {
+          const [a, b] = tw.points, L = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / L, uz = (b[1] - a[1]) / L;
+          const s = Math.max(100, Math.min(L - 100, (ac.pos.x - a[0]) * ux + (ac.pos.z - a[1]) * uz));
+          out.push({ kind: 'oddland', title: 'Feeling naughty? Land on the taxiway', sub: `Touch down on taxiway ${PARALLEL} beside the runway · 400 PP`, target: { xz: [a[0] + ux * s, a[1] + uz * s], label: `TAXIWAY ${PARALLEL}` } });
+        }
       }
     }
     const seen = new Set();

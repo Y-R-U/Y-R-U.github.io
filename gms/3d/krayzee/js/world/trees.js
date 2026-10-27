@@ -250,7 +250,8 @@ export async function buildTrees(renderer, quality, ctx) {
 
   const geoHi = [speciesGeometry(0, false, 3), speciesGeometry(1, false, 5), speciesGeometry(2, false, 9)];
   const geoLo = [speciesGeometry(0, true, 3), speciesGeometry(1, true, 5), speciesGeometry(2, true, 9)];
-  const atlas = bakeAtlas(renderer, [geoHi[0], speciesGeometry(0, false, 4), geoHi[1], geoHi[2]]);
+  const geoBake = speciesGeometry(0, false, 4);
+  const atlas = bakeAtlas(renderer, [geoHi[0], geoBake, geoHi[1], geoHi[2]]);
   const tileOf = (sp, rnd) => (sp === 0 ? (rnd < 0.5 ? 0 : 1) : sp + 1);
 
   const group = new THREE.Group();
@@ -437,7 +438,9 @@ export async function buildTrees(renderer, quality, ctx) {
     dirty = true;
   }
 
-  return { group, update, setQuality, data: T, stride: S, count, stats: () => ({ total: count, near: nearN.slice(), far: quad.instanceCount }) };
+  // MAP: a world swap frees both near sets, the bake-only geometry and the impostor atlas (js/world/dispose.js does the rest)
+  const dispose = () => { for (const g of [...geoHi, ...geoLo, geoBake]) g.dispose(); };
+  return { group, update, setQuality, dispose, data: T, stride: S, count, stats: () => ({ total: count, near: nearN.slice(), far: quad.instanceCount }) };
 }
 
 // Soft ground shade under trees and buildings, baked once: R channel over [-extent, extent]^2.

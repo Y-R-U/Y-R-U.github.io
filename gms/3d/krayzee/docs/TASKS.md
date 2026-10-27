@@ -49,6 +49,7 @@ The adapter turns the game's existing events into one vocabulary; every event ca
 | `composure {tier, controller}` / `towerScandal {controller}` | `atc.on('composure' / 'scandal')` for the player's meter; controller from the tower voice (`radio.setTower` is wrapped: tower_m Gerald, tower_f Imogen, tower_trainee Toby) |
 | `bark` | `radio.on('barked')` |
 | `touchdown {fpm, grade, surface, runway, crash, fuel}`, `crash`, `tailstrike`, `fuelempty`, `bounce` | the player's `ac.events`, **read only** (main.js still consumes them); `runway` from `RUNWAYS` rects |
+| `hover {dt, run}` | D35: the F-35B jet-borne (`ac.vtol > 0.5`) and under 15 kt; `run` = seconds of this unbroken hover (real time). `touchdown.vertical` = the landing was jet-borne (LAND HERE / let down) |
 | `takeoff {surface, fromField}` | ground → air transition; `fromField` = the last touchdown was off pavement > 150 m from any runway and the take-off left from off pavement (covers DEMAND TAKEOFF's field run and its hop) |
 | `air {dt, dist, alt, speedKt, vne}`, `inverted {dt, run}` (|bank| > 120°), `stall {dt, run}` (speed < 1.03·Vs + 3 kt, > 30 m AGL — the stall-hum condition), `formation {dt}` (another airborne plane < 50 m), `visit {place, low}` | sampled each frame. **Time counters (`air.dt`, inverted, stall, formation) are REAL play time**: sim dt ÷ main's `simK` (D18 warp × `?timescale`), so ×5 warp never shortcuts the hours ladder. Distance is as flown (sim). |
 | `story {ok, mission, diff, ticks}` | `startMission`'s `onComplete` + retro from `krayzee.story` |
@@ -210,7 +211,7 @@ A "flight" (per-flight counters) starts at play start, after DEMAND IT, and afte
 | `moth_30` | 🧣 Grandfather Approves | silver | 250 | 30 minutes airborne in the Moth. | stat `mothSecs` ≥ 1800 |
 | `c172_25` | 🔑 Runabout Regular | silver | 250 | Land the Runabout 25 times. | stat `c172Landings` ≥ 25 |
 
-### ✈️ Hangar: Heavy Metal (9) · set bonus +2,900 PP · badge "the Heavy"
+### ✈️ Hangar: Heavy Metal (12) · set bonus +3,900 PP · badge "the Heavy"
 
 | id | task | tier | PP | what | detector |
 |---|---|---|---|---|---|
@@ -223,6 +224,9 @@ A "flight" (per-flight counters) starts at play start, after DEMAND IT, and afte
 | `fly_f35` | ⚡ Royal Tantrum | silver | 250 | Take off in the Royal Tantrum, the F-35. | `takeoff` + condition (locked until `f35` is ready) |
 | `f35_fast` | 💨 Sound Barrier-ish | gold | 750 | Exceed 450 kt in the Tantrum. | `air` + condition (locked until `f35` is ready) |
 | `f35_flypast` | 🎆 Afterburner Flypast | gold | 750 | A royal flypast down the runway in the Tantrum. | `infraction` + condition (locked until `f35` is ready) |
+| `f35_hover` | 🐝 Hummingbird | silver | 250 | Hover the Tantrum for 30 seconds in one go. | `hover` run ≥ 30 s (D35) |
+| `f35_vfield` | 🥕 Turnip Pad | gold | 750 | Land the Tantrum vertically in a field. | `touchdown` + `vertical` on grass (D35) |
+| `f35_vhard` | 🎯 Straight Down, Real Metal | gold | 750 | Land the Tantrum vertically on Hard. | `touchdown` + `vertical`, diff hard (D35) |
 
 ### 🛡️ Trial by Difficulty (8) · set bonus +2,200 PP · badge "the Hardened"
 

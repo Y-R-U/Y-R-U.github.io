@@ -3,6 +3,7 @@ import { runwayEnd, allRunwayEnds, toRunway, fromRunway, taxiPath, GLIDE_DEG, AI
 import { RUNWAYS, HOLD_OFFSET, threshold } from '../world/layout.js';
 import { TYPES, typeInfo, stallSpeed, thrustFactor } from './aircraft.js';
 import { takeoffRun } from '../assist/landahead.js';
+import { level as stovlLevel, vsToLever, CONVERT } from './stovl.js';
 
 const G = 9.81, RHO = 1.225, TANG = Math.tan(GLIDE_DEG * DEG);
 const endOf = (x) => (typeof x === 'object' && x ? x : runwayEnd(x)); // ASSIST plans pass virtual runway-end objects
@@ -24,6 +25,7 @@ export class Autopilot {
   }
 
   setRoute(route, { start = 0 } = {}) {
+    this._endStovl();
     this.route = route; this.i = start; this.done = false; this.override = null;
     this._begin(true);
   }
@@ -39,8 +41,13 @@ export class Autopilot {
     return s === 1 ? kt * KT : Math.max(kt * KT * s, P.vapp, P.vs0 * 1.22);
   }
 
-  // runway a takeoff needs from where it starts rolling: jets their book roll + 10 % (the jumbo: all 1400 m); others 600
-  _minRun() { const P = this.ac.P; return P.jet ? Math.max(600, (typeInfo(this.ac.type).performance?.takeoffRollM ?? 600) * 1.1) : 600; }
+  // runway a takeoff needs from where it starts rolling: jets their book roll + 10 % (the jumbo: all 1400 m); light
+  // planes their book roll × 1.4 (C172 406 m, Moth 224 m, Bathtub 210 m), so the 620 m farm strip takes the C172 and a
+  // 240 m lawn the Moth and the Bathtub from a line-up 12 m in
+  _minRun() {
+    const P = this.ac.P, roll = typeInfo(this.ac.type).performance?.takeoffRollM;
+    return P.jet ? Math.max(600, (roll ?? 600) * 1.1) : roll ? Math.max(150, roll * 1.4) : 600;
+  }
 
   // JETCORE: the type's circuit options (routes.circuitOpts) and the lowest flap notch that keeps 1.25 Vs at this speed
   _circ() { return (this.route?.circ?.fin ? this.route.circ : null) || circuitOpts(this.ac.type) || {}; }
@@ -251,6 +258,10 @@ export class Autopilot {
   update(dt) {
     const ac = this.ac, t = (this.t = {});
     this.legT += dt;
+    if (this.stovl) {
+      if (ac.crashed) this._endStovl();
+      else { this.forceRecover = false; this.recovering = false; return this._stovlStep(dt); }
+    }
     if (!this.route || ac.crashed) { this._idle(); return this.out; }
     if (this.landing) {
       this.landing.leg = this.leg?.kind;   // LAND NOW shows only while a plan is still on its circuit/join legs
@@ -258,6 +269,8 @@ export class Autopilot {
       if (this._lovT > 0.5) this.cancelLand();
     }
     if (!this.done) this._doneHdg = null;
+    // airborne again after a vertical landing without a STOVL departure (a bounce, a teleport): fly the circuit
+    if (this.done && this.route?.name === 'vland' && !ac.onGround && ac.agl > 8) this.resumeCircuit();
     if (this.done) {
       if (this.phase === 'GONE' && !ac.onGround) { t.air = true; t.bank = 0; t.vs = 0; t.speed = this._kt(95); t.flaps = 0; return this._finish(dt); }
       this._groundStop(t);
@@ -532,9 +545,9 @@ export class Autopilot {
       const e = runwayEnd(id);
       const here = toRunway(e, ac.pos.x, ac.pos.z);
       // already on this runway pointing the right way with room to go: just roll
-      if (onRunway(ac.pos.x, ac.pos.z, 2) === e.rw && Math.abs(wrap180(e.hdg - ac.heading)) < 60 && e.len - here.s > minRun) { best = { id, L: -1, entry: null }; break; }
+      if (onRunway(ac.pos.x, ac.pos.z, 2) === e.rw && Math.abs(wrap180(e.hdg - ac.heading)) < 60 && e.len - here.s > minRun && here.s < e.len * 0.45) { best = { id, L: -1, entry: null }; break; }
       for (const en of runwayEntries(id)) {
-        if (en.left < minRun) continue;
+        if (en.left < minRun || (en.left < e.len - 50 && en.left < 600)) continue;   // short strips from the threshold; intersections keep 600 m (a mid-runway line-up there stalls)
         let L = pathLen(taxiPath(ac.pos.x, ac.pos.z, ac.heading, { xz: [en.x, en.z] }));
         if (busy(en.x, en.z)) L += ac.P.jet ? 3000 : 500;   // a jet cannot squeeze past whoever waits at that hold: the other end
         if (prefer && id !== prefer) L = L * 1.25 + 50;
@@ -555,6 +568,7 @@ export class Autopilot {
       if (!best || L < best.L) best = { id, L, entry: [ex, ez], direct: true };
     }
     if (!best) return false;
+    this._endStovl();
     const T = this._takeoffRoute(best.id);
     this.landing = null; this._landPrev = null;
     this.route = T.route; this.i = T.i; this.done = false; this.override = T.override;
@@ -580,6 +594,7 @@ export class Autopilot {
   // D22 skip to runway: lined up on `end` at once, waiting for the takeoff clearance as if we had taxied there.
   skipToRunway(end, env = this.traffic?.env) {
     const e = runwayEnd(end), [x, z] = fromRunway(e, 12, 0), ac = this.ac;
+    this._endStovl();
     ac.place({ x, z, heading: e.hdg }, env);
     const T = this._takeoffRoute(end);
     this.route = T.route; this.i = T.i; this.done = false; this.override = T.override; this.demand = false; this.landing = null; this._landPrev = null;
@@ -595,6 +610,7 @@ export class Autopilot {
   fieldTakeoff({ world = null, end = null, need = null } = {}) {
     const ac = this.ac;
     if (!ac.onGround || !world) return false;
+    if (ac.P.stovl) return this.verticalTakeoff({ flyOn: true, end }) ? { vto: true } : false;
     // JETCORE: jets do not take off from turnip fields. false = main falls back (DEMAND TAKEOFF / its hop)
     if (ac.P.noField) { this._emit('refused', { what: 'fieldTakeoff', quip: FIELD_QUIPS[(this._fq = (this._fq || 0) + 1) % FIELD_QUIPS.length] }); return false; }
     const book = typeInfo(ac.type).performance?.takeoffRollM ?? 290;
@@ -1054,6 +1070,7 @@ export class Autopilot {
   // Called when the player lets go (or after a go-around / recovery). Works from wherever the aircraft is now.
   replan({ noLand = false } = {}) {
     const ac = this.ac;
+    if (this.stovl) { this.stovl.hold = null; return; }
     if (!this.route) return;
     this.recovering = false;
     const legs = this.route.legs;
@@ -1328,13 +1345,128 @@ export class Autopilot {
     return { aileron: clamp(-ac.bank * 2, -1, 1), elevator: t.elev ?? 0, rudder: clamp(rudder, -1, 1), throttle, brake };
   }
 
+  // ---- D35 STOVL (F-35B): HOVER, VERTICAL TAKEOFF, LAND HERE, FLY ON (docs/STOVL.md) ----
+  get stovlMode() { return this.stovl?.mode ?? null; }
+  _endStovl() { if (this.stovl) this.stovl = null; this.ac.vtolWant = 0; }
+  _fwdSpeed() { const h = this.ac.heading * DEG; return this.ac.vel.x * Math.sin(h) - this.ac.vel.z * Math.cos(h); }
+  _stovlStart(st) {
+    if (!this.stovl) this._stovlPrev = this._landPrev?.route ? this._landPrev : { route: this.route, i: this.i };
+    this.landing = null; this._landPrev = null; this.demand = false;
+    this.stovl = { t: 0, hold: null, ...st };
+    this.ac.vtolWant = 1; this.wantThrottleAuto = true;
+    this._emit('stovl', { mode: st.mode });
+    return true;
+  }
+  // wing-borne (or flying on): slow to a hover straight ahead; jet-borne: stop and hold here
+  hover() {
+    const ac = this.ac, S = ac.P.stovl;
+    if (!S || ac.crashed || ac.onGround) return false;
+    const m = this.stovl?.mode, still = m === 'hover' || m === 'vto' || m === 'land';
+    return this._stovlStart({ mode: still ? 'hover' : 'convert', vf: Math.max(0, this._fwdSpeed()), agl: clamp(ac.agl, still ? 4 : S.hoverAgl * 0.7, S.maxHoverAgl), end: this.stovl?.end });
+  }
+  verticalTakeoff({ flyOn = false, end = null } = {}) {
+    const ac = this.ac, S = ac.P.stovl;
+    if (!S || ac.crashed || !ac.onGround || ac.gs > CONVERT.vtoKt * KT) return false;   // rolling: brake to a stop first
+    return this._stovlStart({ mode: 'vto', agl: S.hoverAgl, flyOn, end, hold: { x: ac.pos.x, z: ac.pos.z } });
+  }
+  landHere(pad) {
+    const ac = this.ac, m = this.stovl?.mode;
+    if (ac.onGround || !(m === 'hover' || m === 'vto')) return false;
+    Object.assign(this.stovl, { mode: 'land', pad: { x: pad?.x ?? ac.pos.x, z: pad?.z ?? ac.pos.z }, t: 0 });
+    this._emit('stovl', { mode: 'land' });
+    return true;
+  }
+  flyOn() {
+    const ac = this.ac;
+    if (!this.stovl || ac.onGround) return false;
+    Object.assign(this.stovl, { mode: 'flyon', vf: Math.max(0, this._fwdSpeed()), t: 0, agl: Math.max(ac.agl, 40) });
+    this._emit('stovl', { mode: 'flyon' });
+    return true;
+  }
+  // back to wing-borne flight: the circuit we were flying (or end's), from here
+  _stovlExit() {
+    const prev = this._stovlPrev?.route, end = this.stovl?.end || prev?.legs.find((l) => l.kind === 'takeoff' && typeof l.end === 'string')?.end || prev?.legs.find((l) => l.kind === 'approach' && typeof l.end === 'string')?.end;
+    this.ac.hov = { vf: this.ac.P.vapp * 1.25, vl: 0, yaw: 0 };
+    this._endStovl(); this._stovlPrev = null;
+    this.resumeCircuit(end || null);
+    this._emit('stovl', { mode: 'wingborne' });
+  }
+  // a velocity (heading frame) that flies toward p with gain k, capped
+  _posHold(p, k, cap = 6) {
+    if (!p || !k) return [0, 0];
+    const ac = this.ac, h = ac.heading * DEG, dx = p.x - ac.pos.x, dz = p.z - ac.pos.z;
+    let f = (dx * Math.sin(h) - dz * Math.cos(h)) * k, l = (dx * Math.cos(h) + dz * Math.sin(h)) * k;
+    const n = Math.hypot(f, l); if (n > cap) { f *= cap / n; l *= cap / n; }
+    return [f, l];
+  }
+  _stovlStep(dt) {
+    const ac = this.ac, P = ac.P, S = P.stovl, lv = stovlLevel(ac.stovlLevel), st = this.stovl;
+    st.t += dt;
+    if (st.mode !== 'landed') ac.vtolWant = 1;
+    let vf = 0, vl = 0, vs = 0, brake = 0;
+    const manual = this.stickManual || this.overridden, holdAgl = (k = 0.6) => clamp((st.agl - ac.agl) * k, -S.vsDown * 0.8, 3);
+    if (this.playerThrottle != null) { if (lv.autoLever && this.throttleLatched && !ac.onGround) this.wantThrottleAuto = true; st.agl = clamp(ac.agl, 3, 900); }
+    switch (st.mode) {
+      case 'vto':
+        if (ac.onGround && (ac.vtol < 0.9 || ac.gs > 0.8)) { brake = 1; if (ac.gs > 0.8) st.hold = { x: ac.pos.x, z: ac.pos.z }; break; }
+        vs = clamp((st.agl - ac.agl) * 0.5, 1.2, 4);
+        [vf, vl] = this._posHold(st.hold, 0.5);
+        if (ac.agl > st.agl - 1.5) { st.mode = st.flyOn ? 'flyon' : 'hover'; st.vf = 0; st.t = 0; this._emit('stovl', { mode: st.mode }); }
+        break;
+      case 'convert': {
+        st.vf = Math.min(moveTo(st.vf, 0, 2.8 * dt), Math.max(0, this._fwdSpeed()) + 4);
+        vf = st.vf; vs = holdAgl(0.15);
+        if (st.vf < 0.5 && ac.gs < 2) { st.mode = 'hover'; st.hold = null; st.t = 0; this._emit('stovl', { mode: 'hover' }); }
+        break;
+      }
+      case 'hover':
+        if (manual) st.hold = null;
+        else if (!st.hold && ac.gs < 1.5) st.hold = { x: ac.pos.x, z: ac.pos.z };
+        [vf, vl] = this._posHold(st.hold, lv.hold);
+        vs = holdAgl();
+        if (ac.mainsDown) { st.mode = 'landed'; st.t = 0; }   // let down (too hot, or the lever) onto the ground: settle
+        break;
+      case 'land': {
+        if (this.stickManual) { st.mode = 'hover'; st.hold = null; st.agl = Math.max(ac.agl, 4); this._emit('stovl', { mode: 'hover', cancelled: true }); break; }
+        [vf, vl] = this._posHold(st.pad, lv.land);
+        const d = Math.hypot(st.pad.x - ac.pos.x, st.pad.z - ac.pos.z);
+        if (d < 10 || st.t > 15) vs = ac.agl < 4 ? -lv.sink : -clamp(ac.agl * 0.3, lv.sink, S.vsDown * 0.9);
+        else vs = holdAgl();
+        if (ac.mainsDown) { st.mode = 'landed'; st.t = 0; }
+        break;
+      }
+      case 'landed':
+        vs = -S.vsDown; brake = 1;
+        if (st.t > 0.6) ac.vtolWant = 0;
+        if (ac.vtol <= 0) {
+          this._endStovl(); this._stovlPrev = null;
+          this.route = { name: 'vland', legs: [{ kind: 'park', seconds: 1e9, label: 'LANDED' }], loop: null, circ: this._circOpts() };
+          this.i = 0; this.done = true; this.override = null; this.phase = 'DONE';
+          this._emit('stovl', { mode: 'down' });
+          this._emit('landed', { vertical: true, x: ac.pos.x, z: ac.pos.z });
+          return this.out;
+        }
+        break;
+      case 'flyon':
+        st.vf = moveTo(Math.max(st.vf, this._fwdSpeed() - 2), P.vapp * 1.3, 3.2 * dt);
+        vf = st.vf; vs = clamp((st.agl - ac.agl) * 0.3, 0.6, 3);
+        if (ac.speed > P.vapp * 1.12 && ac.agl > 20) { this._stovlExit(); return this.update(0); }
+        break;
+    }
+    ac.hov = { vf, vl, yaw: 0 };
+    this._setPhase({ vto: 'VERTICAL TAKEOFF', convert: 'HOVER', hover: 'HOVER', land: 'LAND HERE', landed: 'LAND HERE', flyon: 'FLY ON' }[st.mode] || 'HOVER');
+    if (this.manualNow) this._setPhase('MANUAL', true);
+    Object.assign(this.out, { aileron: 0, elevator: 0, rudder: 0, throttle: vsToLever(vs, S, lv), flaps: P.toFlaps ?? 0, brake });
+    return this.out;
+  }
+
   status() {
     const l = this.leg;
     return {
       engaged: this.engaged, overridden: this.overridden, phase: this.phase, sub: this.sub, leg: l?.kind, legIndex: this.i,
       label: l?.label, route: this.route?.name, recovering: this.recovering, done: this.done,
       target: this.t.target || null, speedKt: this.t.speed ? this.t.speed / KT : null, end: typeof l?.end === "object" ? l.end?.id : l?.end,
-      stableFinal: this.stableFinal,
+      stableFinal: this.stableFinal, stovl: this.stovl?.mode ?? null,
     };
   }
 }

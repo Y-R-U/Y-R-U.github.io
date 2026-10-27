@@ -478,6 +478,7 @@ How `jumbo`, `herc` and `f35` fly; the full write-up is docs/FLIGHT.md "Jets". S
   engine voice `setRPM(ac.n1 * 100)` + `setAfterburner(ac.ab)` with `ac.engineKind` (docs/AUDIO.md). The herc's props:
   `instruments().rpm` is prop rpm (735–1020).
 - Roster: Royal Jumbo (king, ppMult 0.8, wake super), **The Royal Wardrobe** (Hercules, duke, 0.9: "carries the King's
-  spare crowns"), **Royal Tantrum** (F-35, prince, 0.85). STOVL is not modelled (conventional only); nothing blocks it:
-  `setNozzle/setLiftFan` are untouched by the flight core.
+  spare crowns"), **Royal Tantrum** (F-35, prince, 0.85). STOVL (D35) is modelled now: hover, vertical
+  takeoff and vertical landing from the LAND slot's context button; the flight core drives `setNozzle/setLiftFan`.
+  Controls, thresholds and difficulty: docs/STOVL.md.
 

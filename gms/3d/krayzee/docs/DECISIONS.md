@@ -55,3 +55,6 @@
     - Tasks never gate ranks or planes.
     - 120+ tasks, tiered (bronze/silver/gold), with progress bars for counted ones.
     - Tasks for the new planes appear as those planes ship.
+- D35 (2026-10-27) Aaron tried the jumbo and the jet: "very cool". NEXT is F-35 STOVL: hover, vertical takeoff and vertical landing. Aaron: vertical landing is "just via a button on the lower left hand side", showing "the most appropriate button for the situation".
+  - Manager's call: it is ONE context button in the existing LAND button slot, never a second row of buttons. It reads, by situation, e.g. VERTICAL TAKEOFF (on the ground), HOVER (slow enough in the air), LAND HERE (in a hover over flat ground), FLY ON (in a hover, back to wing-borne flight). Normal LAND / LAND NOW still appear when they are the better choice.
+  - The F-35 can land vertically anywhere flat and clear (fields, pads), which lifts the jets' runway-only rule for the F-35 only.
