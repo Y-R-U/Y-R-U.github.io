@@ -1,13 +1,16 @@
 // STORY: missions end-to-end in the real game (?mission=N) with real CDP touch (mouse/keys on desktop).
 //   ~/.claude/bin/cdp start --port 9632 -- --use-angle=metal
 //   node tools/story/test-mission.mjs [--mission=1..4] [--view=portrait|landscape|desktop] [--diff=easy|medium|hard]
-//        [--port=9632] [--base=http://localhost:8790/gms/3d/krayzee/] [--falsify=<name>]
+//        [--port=9632] [--base=http://localhost:8790/gms/3d/krayzee/] [--falsify=<name>] [--cover[=<shot tag>]]
+// --cover (MSGFIX): sample the screen cover by message UI (tools/loop/cover.mjs), print it, save docs/review/loop/cover-*.json
 // Scripted help is limited to: Mission 1 medium/hard tower pass (teleport onto a low line at the tower, wings level) and
 // Mission 2 medium/hard turn-in (teleport onto the centreline 1.6 km out, ahead of Rupert).
 // --falsify breaks one thing in the page so the check that guards it must fail (see FALSIFY below).
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { connect } from './cdp.mjs';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { COVER_INSTALL, summarize, fmtCover, coverTake, coverShots } from '../loop/cover.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SHOTS = join(HERE, '..', '..', 'docs', 'shots', 'story');
@@ -18,6 +21,7 @@ const VIEW = arg('view', 'portrait'), DIFF = arg('diff', 'easy'), MISSION = +arg
 //   demandfast (all) DEMAND IT tapped the instant it lights, still in the "stop" step · church (M3) AP sent past the church
 //   gate (M4) AP sent past gate 1 without passing it · polite (M2) LAND at once from the downwind: lands without a cut-in
 const FORCE = arg('force', '');
+const COVER = process.argv.find((a) => a === '--cover' || a.startsWith('--cover=')) ? (arg('cover', '') || 'mission') : '';
 const BASE = arg('base', 'http://localhost:8790/gms/3d/krayzee/');
 const PROFILE = { name: 'Dirk', gender: 'm', company: 'Dirk Air', primary: '#1d3f8f', secondary: '#f4f1ea', accent: '#d4af37', voice: 'toff', registration: 'K-DIRK' };
 const [W, H, MOBILE] = { portrait: [390, 844, true], landscape: [844, 390, true], desktop: [1280, 800, false] }[VIEW];
@@ -52,6 +56,8 @@ check('game boots', await C.load(BASE + `?mission=${MISSION}`));
 for (let i = 0; i < 60 && !(await C.ev(`!!window.__krzStory?.mission`)); i++) await C.sleep(250);
 await C.ev(`window.__story = { story: window.__krzStory }; window.__lp0 = window.__game.wiring?.game?.career?.lifetimePP ?? 0; true`);
 C.errors.length = 0;
+let coverCam = null;
+if (COVER) { await C.ev(COVER_INSTALL); coverCam = coverShots({ evSafe: (e) => C.ev(e).catch(() => null), shot: C.shot }, join(HERE, '..', '..', 'docs', 'shots', 'msgfix'), `${COVER}-${tag}`, { guard: [C, ['tap', 'drag', 'shot']] }); }
 if (FALSIFY && FALSIFY_JS[FALSIFY]) { console.log('FALSIFY', FALSIFY, await C.ev(FALSIFY_JS[FALSIFY])); }
 const M = () => C.ev(`(() => { const m = window.__story.story.mission; const w = window.__story.story.warp; const g = window.__game.state().player; return { ...m.state, log: undefined, warp: { level: w.level, scale: w.scale, reason: w.reason, dropped: w.dropped }, p: g && { x: g.x, z: g.z, alt: g.alt, agl: g.agl, kt: g.speedKt, hdg: g.heading, ground: g.onGround, leg: g.leg, li: g.legIndex, ap: g.apMode, phase: g.phase } }; })()`);
 const rectOf = (sel) => C.ev(`(() => { const e = [...document.querySelectorAll(${JSON.stringify(sel)})].find((x) => !x.hidden && !x.closest('[hidden]') && x.getClientRects().length); if (!e) return null; const r = e.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; })()`);
@@ -252,6 +258,15 @@ if (fin.status === 'complete') {
   await C.sleep(600);
   check('Continue closes the card', !(await C.ev(`!!document.querySelector('.krz-st-done')`)));
   if (MISSION === 1) check('progress saved', await C.ev(`JSON.parse(localStorage.getItem('krayzee.story')).missions[1]?.done === true`));
+}
+if (COVER) {
+  coverCam.stop();
+  const samples = await coverTake(C.ev);
+  const cover = { air: summarize(samples, 'air'), play: summarize(samples, 'play') };
+  console.log(`cover (airborne) ${fmtCover(cover.air)}\ncover (in play)  ${fmtCover(cover.play)}`);
+  const dir = join(HERE, '..', '..', 'docs', 'review', 'loop');
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, `cover-${COVER}-${tag}-${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}.json`), JSON.stringify({ tag, cover, samples }, null, 0));
 }
 check('coach/warp never cover HUD or controls', overlapIssues.length === 0, overlapIssues.join('; '));
 check('no console errors', C.errors.length === 0, C.errors.slice(0, 3).join(' / '));

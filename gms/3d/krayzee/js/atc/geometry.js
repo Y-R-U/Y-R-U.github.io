@@ -199,14 +199,15 @@ export function makeGeometry(def, routes = makeRoutes(def)) {
   }
 
   // Circuit polyline for `end`: [T, upwindEnd, crosswindEnd, baseTurn, finalTurn, T]. extend pushes the base turn out.
-  function circuitFor(end, { extend = 0, alt } = {}) {
+  // { off, up, fin }: a stretched circuit (jets, routes.circuitOpts) instead of the airport's
+  function circuitFor(end, { extend = 0, alt, off: offM = G.DOWNWIND_OFF, up = G.UPWIND_EXT, fin = G.FINAL_LEN } = {}) {
     const info = endInfo(end);
     const side = patternSide(end);
     const pAlt = alt ?? (departs(info.rw, end) || departs(info.rw, info.opposite) ? PATTERN_ALT : PATTERN_ALT + G.SECONDARY_ALT_STEP);
-    const off = info.r.map((v) => v * side * G.DOWNWIND_OFF);
-    const C1 = add(info.T, info.u, info.length + G.UPWIND_EXT);
+    const off = info.r.map((v) => v * side * offM);
+    const C1 = add(info.T, info.u, info.length + up);
     const C2 = add(C1, off);
-    const C4 = add(info.T, info.u, -(G.FINAL_LEN + extend));
+    const C4 = add(info.T, info.u, -(fin + extend));
     const C3 = add(C4, off);
     const pts = [
       { p: info.T, alt: 0, leg: 'upwind' },

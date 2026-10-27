@@ -4,7 +4,7 @@ import { RUNWAYS, TOWER, TERMINAL, TAXIWAYS, threshold, runwayHeadingFor } from 
 import * as sfx from './sound.js';
 import { rect, rects } from './place.js';
 
-const SHOW = 8, GAP = 9, KIND_CD = 45, DISMISS_CD = 150, DONE_CD = 70;
+const SHOW = 6, GAP = 9, KIND_CD = 45, DISMISS_CD = 150, DONE_CD = 70;
 // Which infraction ids satisfy which prompt.
 const SATISFIES = {
   cut_in_final: 'cut_in', runway_steal: 'cut_in', forced_goaround: 'cut_in',

@@ -1,6 +1,11 @@
 // Radio HUD (DESIGN §6): subtitle pills + log drawer, tower outrage badge, radio button with countdown ring, bark chips.
 
 const RING_R = 33;
+// MSGFIX: a finished line lingers 2.2 s (0.6 s while the player is busy: hand-flying, low, or a sheet is open; main.js
+// sets html.krz-msg-busy). Only the newest card shows; older ones fold into its "+n" transcript badge (tap = log).
+const HOLD = 2.2, HOLD_BUSY = 0.6;
+const busy = () => document.documentElement.classList.contains('krz-msg-busy');
+const holdFor = (h) => Math.min(h, busy() ? HOLD_BUSY : HOLD);
 const RING_C = 2 * Math.PI * RING_R;
 const LOG_MAX = 20;
 
@@ -94,7 +99,7 @@ export function createRadioHud(parent, { onChoose, onOpenMenu, onClose } = {}) {
   subs.addEventListener('pointerdown', (e) => (swipeY = e.clientY));
   subs.addEventListener('pointerup', (e) => { if (swipeY != null && e.clientY - swipeY > 30) setLog(true); swipeY = null; });
 
-  let lastPill = null;
+  let lastPill = null, recent = [];
   const header = (speaker, to) => `<b>${esc(speaker)}</b>${to ? `<span class="krz-r-arrow">&rarr;</span><span class="krz-r-to">${esc(to)}</span>` : ''}`;
 
   return {
@@ -106,16 +111,21 @@ export function createRadioHud(parent, { onChoose, onOpenMenu, onClose } = {}) {
         lastPill.t = nowMs;
         const p0 = lastPill.pill;
         p0.classList.remove('out'); p0.classList.add('on-air', 'in');
-        return { end(hold = 3.2) { p0.classList.remove('on-air'); setTimeout(() => { if (lastPill?.pill !== p0 || performance.now() - lastPill.t >= hold * 1000 - 50) { p0.classList.add('out'); setTimeout(() => p0.remove(), 500); } }, hold * 1000); } };
+        return { end(hold = 3.2) { hold = holdFor(hold); p0.classList.remove('on-air'); setTimeout(() => { if (lastPill?.pill !== p0 || performance.now() - lastPill.t >= hold * 1000 - 50) { p0.classList.add('out'); setTimeout(() => p0.remove(), 500); } }, hold * 1000); } };
       }
       const pill = el('div', `krz-r-pill${isTower ? ' is-tower' : ''}${isPlayer ? ' is-player' : ''} on-air`);
       pill.style.setProperty('--c', color || '#ffd75e');
       if (isTower) pill.dataset.tier = tier;
-      pill.innerHTML = `<div class="krz-r-who">${isTower ? icon('tower', 'krz-r-tw') : '<i class="krz-r-dot"></i>'}${header(speaker, to)}</div><div class="krz-r-text">${esc(text)}</div>`;
+      pill.innerHTML = `<div class="krz-r-who">${isTower ? icon('tower', 'krz-r-tw') : '<i class="krz-r-dot"></i>'}${header(speaker, to)}<i class="krz-r-more" hidden></i></div><div class="krz-r-text">${esc(text)}</div>`;
+      // older cards fold away; the newest counts the lines folded in the last few seconds
+      const folded = [...subs.querySelectorAll('.krz-r-pill:not(.out)')];
+      for (const o of folded) { o.classList.add('out'); setTimeout(() => o.remove(), 500); }
+      const now = performance.now();
+      recent = recent.filter((t) => now - t < 12000);
+      recent.push(now);
+      if (recent.length > 1) { const m = pill.querySelector('.krz-r-more'); m.textContent = `+${recent.length - 1}`; m.hidden = false; }
       subs.appendChild(pill);
       lastPill = { key, t: nowMs, pill };
-      const live = subs.querySelectorAll('.krz-r-pill:not(.out)');
-      if (live.length > 2) live[0].classList.add('out');
       requestAnimationFrame(() => pill.classList.add('in'));
       const row = el('div', 'krz-r-row', `<div class="krz-r-who" style="--c:${esc(color || '#ffd75e')}">${header(speaker, to)}</div><div class="krz-r-text">${esc(text)}</div>`);
       drawerList.appendChild(row);
@@ -123,6 +133,7 @@ export function createRadioHud(parent, { onChoose, onOpenMenu, onClose } = {}) {
       if (logOpen) drawerList.scrollTop = drawerList.scrollHeight;
       return {
         end(hold = 3.2) {
+          hold = holdFor(hold);
           pill.classList.remove('on-air');
           setTimeout(() => { pill.classList.add('out'); setTimeout(() => pill.remove(), 500); }, hold * 1000);
         },

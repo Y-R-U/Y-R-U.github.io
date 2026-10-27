@@ -1,5 +1,6 @@
 // Krayzee ATC: pure, renderer-free, deterministic. See docs/ATC.md.
 import * as GEO from './geometry.js';
+import { circuitOpts } from '../flight/routes.js';
 import { T, INFRACTIONS, COOLDOWN, LINE, KT } from './rules.js';
 import { newMeter, addOutrage, decayOutrage, tierName } from './outrage.js';
 
@@ -32,10 +33,12 @@ export function createATC(opts = {}) {
   const circCache = new Map();
 
   // ---------- helpers ----------
-  const circ = (end, ext = 0) => {
-    const k = `${end}|${Math.round(ext / 25) * 25}`;
+  // JETCORE: a stretched (jet) circuit is tracked on its own geometry (routes.circuitOpts: wider downwind, longer final)
+  const circ = (end, ext = 0, type = null) => {
+    const o = type ? circuitOpts(type) : null, big = o?.fin ? o : null;
+    const k = `${end}|${Math.round(ext / 25) * 25}${big ? '|' + type : ''}`;
     let c = circCache.get(k);
-    if (!c) { c = Gm.circuitFor(end, { extend: Math.round(ext / 25) * 25 }); circCache.set(k, c); if (circCache.size > 400) circCache.clear(); }
+    if (!c) { c = Gm.circuitFor(end, { extend: Math.round(ext / 25) * 25, ...(big ? { off: big.width, up: big.up, fin: big.fin } : {}) }); circCache.set(k, c); if (circCache.size > 400) circCache.clear(); }
     return c;
   };
   const info = (end) => Gm.endInfo(end);
@@ -304,7 +307,7 @@ export function createATC(opts = {}) {
       const end = landEndFor(s);
       if (s.landEnd && s.landEnd !== end) { removeFromSeqs(id); s.ext = 0; }
       s.landEnd = end;
-      const c = circ(end, s.ext);
+      const c = circ(end, s.ext, s.type);
       d.prog = Gm.circuitProgress(c, d.p2, d.track, s.leg, d.agl);
       s.leg = d.prog.leg; s.rem = Math.round(d.prog.remaining); s.s = d.prog.s;
       const land = s.landing && s.landing.end === end;
@@ -394,7 +397,9 @@ export function createATC(opts = {}) {
     if (actor && actor !== s.id && S.strips[actor] && detecting(S.strips[actor])) emitEvent('forced_goaround', actor, { victim: s.id, severity: 2, data: { reason } });
   }
 
-  const spacingBehind = (lead) => (lead.isPlayer ? T.spacingPlayer : lead.intent === 'circuits' ? T.spacingTG : T.spacingFullType[lead.type] ?? T.spacingFull);
+  // + wake spacing behind a heavy for anything lighter (JETCORE)
+  const spacingBehind = (lead, s) => (lead.isPlayer ? T.spacingPlayer : lead.intent === 'circuits' ? T.spacingTG : T.spacingFullType[lead.type] ?? T.spacingFull)
+    + (T.wakeSpacing[lead.type] && lead.type !== s?.type ? T.wakeSpacing[lead.type] : 0);
   // Seconds to the threshold: finals are flown slower than the rest of the circuit.
   const eta = (s, rem = s.rem, ext = s.ext) => {
     const fin = Math.min(rem, Gm.G.FINAL_LEN + ext), slow = Math.min(fin, T.finalSlowFrom);
@@ -404,7 +409,7 @@ export function createATC(opts = {}) {
   function stretch(s, d, end, secs, follow, reason) {
     if (secs <= 2 || s.ext >= T.maxExtend) return;
     s.ext = Math.min(T.maxExtend, s.ext + secs / (EXT_SECS / (s.spd || 1)) + 50);
-    s.rem = Math.round(Gm.circuitProgress(circ(end, s.ext), d.p2, d.track, s.leg, d.agl).remaining);
+    s.rem = Math.round(Gm.circuitProgress(circ(end, s.ext, s.type), d.p2, d.track, s.leg, d.agl).remaining);
     issue(s, { type: 'extendDownwind', metres: Math.round(s.ext / 25) * 25, runwayEnd: end, follow, ...(reason ? { reason } : {}) });
   }
 
@@ -445,7 +450,7 @@ export function createATC(opts = {}) {
         }
         if (lead) {
           const gap = eta(s) - eta(lead);
-          const need = spacingBehind(lead);
+          const need = spacingBehind(lead, s);
           if (preBase && gap < need - 3) stretch(s, d, end, need - gap, follow);
           else if (!preBase && d.prog?.leg === 'final' && gap < T.minFinalGap) {
             if (lead.cutPending?.victim === s.id) checkCut(lead.id, s.id, end, true);
@@ -603,7 +608,7 @@ export function createATC(opts = {}) {
     // cancel a takeoff clearance if someone barged on
     for (const id of q) {
       const s = S.strips[id], d = D[id];
-      if (!s.cmds.clearedTakeoff || d.gs > 20) continue;
+      if (!s.cmds.clearedTakeoff || d.gs > (T.committedGs[s.type] ?? 20)) continue;   // a rolling heavy is committed long before 20 m/s
       const blk = blockersFor(rw.id, id).filter((o) => !(D[o].g && Gm.toEnd(inf, D[o].p2).a < Gm.toEnd(inf, d.p2).a - 30));
       const intr = rw.ends.map((e) => coneIntruder(e, id)).find(Boolean);
       if (blk.length || intr) {

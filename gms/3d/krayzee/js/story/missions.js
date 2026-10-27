@@ -67,7 +67,8 @@ export function createMission(def, o) {
     coachN.textContent = `${M.i + 1}/${def.steps.length}`;
     paintGoal();
     coach.hidden = false;
-    coach.classList.remove('done', 'nudge');
+    coach.classList.remove('done', 'nudge', 'brief');
+    coachAt = performance.now();
     void coach.offsetWidth;
     coach.classList.add('in');
     if (nudge) coach.classList.add('nudge');
@@ -75,7 +76,12 @@ export function createMission(def, o) {
   }
 
   // Layout reads are rare (step change, resize, ~1.5 s) and batched before the one write, which only happens on change.
-  let placeT = 0, lastTop = -1;
+  let placeT = 0, lastTop = -1, coachAt = 0;
+  // MSGFIX: after COACH_FULL ms (real time, so the 5× warp does not rush it) the card folds to one line with no goal row;
+  // a tap on the folded card opens it again for another COACH_FULL
+  const COACH_FULL = 6000;
+  coach.addEventListener('pointerdown', (e) => e.stopPropagation());
+  coach.addEventListener('click', (e) => { e.stopPropagation(); if (coach.classList.contains('brief')) { coach.classList.remove('brief'); coachAt = performance.now(); placeCoach(true); } });
   const onResize = () => { placeT = 0; };
   try { new ResizeObserver(() => { if (!coach.hidden) placeCoach(true); }).observe(coach); } catch (e) { /* */ }
   // Portrait: the coach takes the band right under the HUD strip (left of the tower column) and the radio subtitles
@@ -89,6 +95,7 @@ export function createMission(def, o) {
     else { r.style.removeProperty('--krz-subs-top'); r.classList.remove('krz-coach-on'); }
   }
   function placeCoach(force) {
+    if (!coach.hidden && !coach.classList.contains('brief') && coachAt && performance.now() - coachAt > COACH_FULL) { coach.classList.add('brief'); force = true; }
     if (!force && --placeT > 0) return;
     placeT = 90;
     if (coach.hidden) { setSubsTop(''); return; }

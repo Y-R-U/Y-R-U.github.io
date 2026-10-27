@@ -162,3 +162,40 @@ Layout (all of it is checked by `tools/onlinehud_flow.mjs` against the live HUD 
   ("LANDING · RWY 27") hides the card for its 2.5 s.
 - Tests: `node tools/test-hud4.mjs --only=gamefix` (radio sheet / reel vs buttons both orientations, Hard taxi-in →
   DEMAND IT → refuel, taxi-out through the zone). Shots in docs/shots/gamefix/.
+
+## MSGFIX (2026-10-27): less message clutter on a phone, measured
+Aaron (D32): "sometimes messages still block the screen too much on phone". Measured with the screen-cover sampler
+(docs/TESTING.md "Screen cover"); numbers there. What changed:
+- **Busy flag.** main.js `msgFocus()` sets `html.krz-msg-busy` while the player's hands and eyes are busy: any axis in
+  `manual`, a radio sheet open, airborne below 120 m AGL, or rolling faster than 15 kt. Busy means: radio cards one line
+  and fade 0.6 s after the line ends (else 2.2 s; was 3.2 s), prompt cards lose their sub line, PP popups lose the
+  multiplier chips and the italic line, and the story coach drops its goal row and clamps to two lines.
+- **Radio cards** (`js/radio/hud.js`, `css/radio.css`): only the newest card shows; older ones fold away at once and the
+  new card carries a "+n" transcript badge (lines in the last 12 s). Tapping a card still opens the full log. Phones get
+  two-line cards (13.5 px) with slimmer padding; in portrait under a story coach card (`html.krz-coach-on`) one line.
+- Radio chip target names mix 35 % pilot colour into white (was 45 %): a dark rival colour measured 0.31 luminance, under
+  test-hud4's 0.35 floor.
+- **Radio sheet** (portrait phones): one header line (title + subtitle + seconds, 36 px ✕), 44 px chips with one-line
+  labels, and three chips sit in one row (icons dropped). Chips stay above the action slot (GAMEFIX) and keep their 5 s
+  response window.
+- **Story coach** (`js/story/missions.js` display code, `story.css`): after 6 s real time (not warped time) the card
+  folds to one line with no goal row; a tap on the folded card opens it again for another 6 s. Mission logic untouched.
+- **No opportunity prompt cards during a story mission** (main.js `ghud.prompts.update(... blocked ... || story.mission)`):
+  the coach card already says what to do, and the two used to stack. test-hud4's story check now expects them held.
+- **Prompt cards**: shown 6 s (was 8); in portrait at most `100vw − 110 px` wide, 12 px title, one-line sub.
+- **PP popups**: slimmer on phones (both orientations, `max-width: 600px` or `max-height: 500px`). In portrait, while the
+  action slot holds DEMAND IT / DEMAND TAKEOFF (`html[data-krz-act]`), they sit just above it instead of under it (the
+  "FLIGHT COMPLETE" popup used to slide under DEMAND TAKEOFF after a mission).
+- **One budget for everything** (`js/hud/msgcap.js`, made by `createGameHUD` as `ghud.msgcap`, ticked from
+  `updateGameHUD`): at most 3 message elements on a phone (4 on a big screen). Priority: radio sheet, Herald reel /
+  rank-up ceremony / TASKS set celebration, banner, story coach, coach mark, PP popup, TASKS tick toast, radio card,
+  prompt card, "That'll hit the papers!" toast. The TASKS toast (`js/ui/tasks.js`) also steers clear of the story coach
+  now (`.krz-st-coach` added to its `AVOID` list); its queue and timing are unchanged.
+  Extras are shed lowest first (`html[data-krz-shed]` → `visibility: hidden`, rules in `js/hud/style.js`) and come back
+  when room frees. The radio sheet, the reel/ceremony/set celebration and coach marks are never shed.
+- The Herald reel already opened only when stopped on the ground (`S.reelT` → `ac.gs < 2.6`); unchanged.
+- **AIRCRAFT chips** (`js/hud/ground.js`): built from `HANGAR`/`SHORT` in `js/ui/aircraft.js` (now six planes); with more
+  than three, chips are slimmer and the landscape row scrolls sideways inside the top-left corner (`js/hud/style.js`).
+- The JETCORE `boundary` / `refused` quips go through `hud.flash`, so they are banners: one at a time, in the budget.
+- **main.js edits (all message plumbing):** the `msgFocus()` function and its call, `ghud.msgcap.update(dt)`, the prompts `blocked` term, and `krz-msg-busy` cleared in
+  `quitPlay()`.

@@ -185,8 +185,9 @@ async function storyFlow() {
   await sleep(900);
   const p = await rectOf('.krz-prompt'), r = await layoutRects();
   console.log('  DIAG', JSON.stringify({ coach: !!coach, pr: !!pr, p, stcoach: r.stcoach }));
+  // MSGFIX: no opportunity cards during a mission (the coach card says what to do); if one ever shows it must be clear
   const bad = p ? clashes(p, r, ['ap', 'axes']) : [];
-  check('story: card clear of the mission coach card, title card and subtitles', !!pr && (!p || !bad.length), bad.join(', ') + ' ' + JSON.stringify({ p, stcoach: r.stcoach }));
+  check('story: opportunity cards held during the mission (and clear of the coach, title card and subtitles if shown)', !pr && (!p || !bad.length), bad.join(', ') + ' ' + JSON.stringify({ pr, p, stcoach: r.stcoach }));
   await shot('after-prompt-story-portrait');
 }
 

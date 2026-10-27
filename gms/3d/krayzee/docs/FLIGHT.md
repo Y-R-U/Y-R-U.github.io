@@ -196,6 +196,99 @@ Tests: `node tools/flight-sim.mjs aaron|loopext|throttle` (25 checks; all fail o
 
 Tests: `node tools/flight-sim.mjs fix3` (29 checks, + #2b LAND with a plane parked in the touchdown zone ≤ 300 s, + #4 runwayFree polled through a field takeoff; + #7 low slow hand-back with a latched lever × 18 and LAND from the story's PRESS LAND line-up × 3; + #5b DEMAND TAKEOFF from the terminal with no impact handler, ≤ 70 s; #1 route after DEMAND TAKEOFF / after a LAND cancel, #2 downwind/late downwind/base → RWY 27 flown to a stop, #3 field rollout no impact / no ≥ 0.4 s hop / ≤ 10° heading, #4 fieldTakeoff ≤ 34 s (50 s when it must turn > 45°) then circuits, #5 taxiIn to the Hard spot, #6 latched lever). 17/19 fail on HEAD 8369b0f1 (#3 C172/bathtub pass there: the bug is Tiger-only). Not changed: the circuit's size (C172 downwind ~156 s) — `circuitLegs` is shared with ATC's `circuitFor` and AI sequencing.
 
+### Jets (JETCORE, D33, 2026-10-27): `jumbo`, `herc`, `f35`
+Roster: `data/aircraft.js` (`flight` blocks; geometry from JETMODELS-A/B, docs/PLANES.md "Jets geometry").
+`TYPES.jumbo/herc/f35` are the blocks as-is; `isJet(type)`, `JET_TYPES`, `thrustFactor(P, V)`, `stallSpeed(P, flaps)` are
+exported from `js/flight/aircraft.js`. Light types are untouched (every new field is optional).
+
+| | Royal Jumbo (747-ish) | The Royal Wardrobe (C-130-ish) | Royal Tantrum (F-35B-ish, CTOL) |
+|---|---|---|---|
+| engine kind | `turbofan` ×4, spool 0→100 % ≈ 5 s | `turboprop` ×4, ≈ 1.8 s | `fighter`, ≈ 2.3 s, afterburner > 95 % throttle |
+| mass / wing | 230 t / 525 m² | 42 t / 162 m² | 16.5 t / 42.7 m² |
+| Vs0 / Vs1 / Vr / Vapp | 113 / 137 / 150 / 138 kt | 82 / 101 / 100 / 108 kt | 110 / 126 / 145 / 140 kt |
+| AP takeoff roll (book) | 1142 m @ 155 kt of 1400 (1250) — "barely" | 514 m @ 105 kt (560) | 311 m @ 154 kt in AB (330) |
+| circuit (scale / alt / downwind / final) | ×2.3 / 450 m / 2.6 km / 4.1 km | ×1.3 / 350 m / 1.5 km / 2.3 km | ×1.6 / 450 m / 1.8 km / 2.9 km |
+| AP circuit touchdown | ~60 fpm, 225 m in, slowed to 9 m/s 950 m in | ~135 fpm, 180 m in, 580 m | ~265 fpm, 205 m in, 900 m |
+| LAND from 6 km / downwind / 4 km out | 191 / 142 / 175 s | 190 / 121 / 170 s | 184 / 145 / 171 s |
+| stand | **heavy spot** (two stands, see below) | ordinary stand (hook clears the terminal) | ordinary stand |
+| wake | `super` | `heavy` | `medium` |
+
+**Flight model additions** (`Aircraft`, all opt-in by field):
+- `engineKind` + `thrustLapse`: jets hold thrust with speed (`thrustFactor`: `1 − lapse·V/thrustV0`, ≥ 0.05; props keep
+  `1 − V/thrustV0`). `spool` (1/s): `eng` follows the throttle slowly from idle (rate × (0.35 + 0.65·eng)), 1.5× faster down.
+- `abThrust` / `abFrom`: afterburner state `ac.ab` 0..1 (lights in ~0.3 s above `abFrom` with `eng` > 0.9, out in 0.2 s),
+  adds `abThrust`·tf; fuel `burnLph[2]` per hour on top. `burnLph: [idle, full(, ab)]` replaces the hp-scaled burn.
+- `reverse`: reversers deploy (`ac.rev`, ~1 s) on the ground, mains down, throttle < 0.08, brake > 0.25, rolling: the
+  brake button reverses for the player too. `spoilers`: lift dump (`ac.spoil`, CL × 0.25, +0.08 CD) on the rollout at idle.
+  `speedbrake`: auto in the air at idle throttle (+CD). `vWall`/`CDwall`: a drag wall (≈ 500 kt jumbo, 590 kt F-35 in AB).
+- `aoaLimit` / `bankLimit` (F-35): fly-by-wire — the pitch command never takes alpha past 19.5°, and full stick holds 75° of
+  bank instead of rolling inverted (the loop suite's 3–10 s stick hold rolled it into the ground on Hard). Twitchy (150°/s
+  roll) but it won't stall or roll over.
+- `flapRate` (jumbo 0.15/s), `gear.mainY/noseY`, geometric nose-load split for jets, engine/prop/tailplane hardPoints
+  (`left outboard engine hit the ground` …). Jets ignore a rig's `dims` (a missing model falls back to a C172 rig).
+- `place()` in the air: a jet is never placed below 1.1 Vapp (main's 78 kt field hop would stall it) and gets takeoff flap.
+
+**Engine state for AUDIO / FX** (`ac.engineState()`; also `instruments().n1/ab/reverse/engineKind`):
+`{ kind, spool (eng 0..1), n1 (0..1: N1 for turbofan/fighter, power for the turboprop, idle 0.22/0.30/0.30),
+rpm (turbofan/fighter = N1 %, turboprop = prop rpm 735–1020), ab (0..1), afterburner (bool), reverse (0..1),
+spoilers, speedbrake, thrust (N, negative in reverse), thrustFrac (of max dry), engineOut }`. JETSOUND takes `ac.n1 × 100`
+and `ac.ab` (docs/AUDIO.md). In reverse `n1` reads ≥ 0.75 (the engines spool up).
+
+**Autopilot** (per type, from the block): `rotPitch`, `toFlaps` (rolled and climbed with; `_minFlaps()` never lets flap
+come in below 1.25 Vs of the next notch), `flareAgl` (flare starts at −vs × 3.2 s, capped), `brakeAP`, `apBankScale`
+(F-35 45°), `maxPitchAP`. Climb and go-around accelerate on excess thrust, never by diving (a spooling jumbo used to dive
+into the ground on a go-around). On final jets fly the glide path with the throttle only (`t.free`), flap 2/3 until
+< 1.12 Vapp then full, never retracted on final. Fly-leg lookahead ≈ one turn radius; ground lookahead + 0.6 wheelbase;
+speed-hold gain × spool/1.2 (no hunting). The player's short-final (B7) is off for jets.
+Jets low down (< 400 m AGL) never ask for more than +3 m/s over their current speed (the path's speed-for-height trade
+dived a spooling jumbo at the ground after a go-around). A jet's go-around sidesteps 300 m to the circuit side and
+replans only above 220 m; its replan never rejoins legs that lie beyond a later takeoff (an arrival's appended departure).
+A LAND that goes round (busy runway, not lined up) flies the type's own stretched circuit back (`_landCircuit` for jets;
+the light-plane LAND circuit left a jumbo turning onto final at 50 m), landing long past a parked plane as before. Low on
+final a wide jet banks ≤ 12° (≤ 5° below 12 m: the outboard pods touch at ~9°), and ≤ 4° in a go-around below 40 m.
+AI see-and-avoid on final when a jet is involved (`_jetTrafficAhead`): closing on traffic ahead within 900 m / 90 m
+vertical / 300 m lateral → go-around "traffic ahead" (once per 90 s). A jet past 0.35 Vr refuses `rejectTakeoff`.
+`fieldTakeoff()` refuses for `noField` types (event `refused { what: 'fieldTakeoff', quip }`, returns false; main then
+uses DEMAND TAKEOFF / its hop). `demandTakeoff()` default `minRun` (`ap._minRun()`) = max(600, book roll × 1.1): the jumbo
+only goes from a threshold, and a takeoff leg begun lined up mid-runway with less than that left lines up at a threshold
+first. An entry with someone waiting at its hold costs a jet +3000 (it cannot squeeze past: it takes the other end).
+
+**Circuits** (`routes.circuitOpts(type)`, circuitScale > 1): downwind × k, upwind extension × k, final (`fin`) × k, base
+leg out at 0.4 × the downwind offset (≈ one turn radius), approach `fafDist` = `faf` (where that turn rolls out). The FAF
+altitude cap grows with it. `route.circ` keeps `up/fin/faf`. ATC tracks such a circuit on its own geometry (docs/ATC.md).
+
+**Heavy stands** (span > 45 m: the jumbo; `routes.heavySpot(sid)`, `isHeavy(type)`): the stand hook would put a 70 m
+jumbo's tail into the terminal, and its 64 m span covers three 48 m stands. A heavy claims stand k **and** k−1
+(`traffic.claimStand` → `_claimHeavy`, east first) and parks on the apron in front of them, CG 40 m south of the stand row
+(z −190), nose west; it leaves the inbound lane at stand k+1's node. Stands S2…S7 can take it (S1 would put the nose off the
+apron; S8 has no k+1). Hard's finish zone is satisfied (on the apron, ≤ 45 m from stand k−1). `taxiIn({stand})`, ATC's
+`setTaxiRoute` and AI `aiSpawn('parked')` all go through it. The Herc (40 m) and F-35 use ordinary stands.
+
+**Wake turbulence** (`Traffic._wake`, 20 Hz, `WAKE` in traffic.js): a `super`/`heavy`/`medium` source drops a vortex
+point every 0.5 s while airborne (life 70/50/30 s, sinking 0.6 m/s). A plane under half the source's mass within the core
+radius (45/32/18 m) and −30…+30 m of it is rolled (up to 7 / 4 / 1.8 rad/s² at the core, fading with age and distance; the side of
+the trail picks the direction) and pushed down. Event `wake { from, strength, cls }` on the victim (≤ 1 per 6 s). Arcade:
+a C172 0.8 km behind a jumbo on final gets ~35° of bank and lands (1.6 km behind: ~15°; 2.6 km: the vortices have sunk away).
+
+**Contacts**: the vertical test compares airframe middles (`height/2 − gearHeight`) with a tolerance of
+max(2.6, 0.3 × both heights): a jumbo (CG 4.8 m up) no longer drives through a C172. Taxi spacing behind traffic is
+measured nose to tail for long types.
+
+**World boundary** (`routes.BOUNDARY`, `Traffic._boundary`, player only): terrain exists to ±14 km (`world/terrain.js`
+EXTENT; hills to ~400 m beyond 7 km); a jet in afterburner covers 10 km in 35 s. Predicted position = now + 15 s of
+outward speed + one turn radius. Past `warn` (8.5 km) → AP event `boundary { stage: 'warn', dist, quip }` (re-armed back
+inside 7.5 km). Past `turn` (10 km) while heading out → `stage: 'turnback'` (quip at most every 30 s): the player's stick,
+rudder and throttle are ignored ("the royal escort has the stick"), the AP resumes and `ap.homing` turns it for home at
+its best bank. Released (`stage: 'clear'`) once inside 7.5 km or pointing home with wings level. Tests: max 12.8 km
+(jumbo at 260 kt, full power, stick held), 9.6 km (herc), 9.4 km (F-35). **main.js needs to show the quips** (one line,
+see the report): `for (const ev of P.ap.events) if (ev.type === 'boundary' && ev.quip) hud.flash(ev.quip, 'warn', 4)`.
+
+**Cameras**: `chaseScale(ac)` = max(length, 0.8·span) / 9.5 (1 for the light types, ~7.4 jumbo, 1.6 F-35): chase distance,
+height and look-ahead scale with it, + up to 25 m with speed above 70 m/s; the chase FOV widens up to 12° at jet speeds.
+
+**AI**: `createAttract` draws a jet now and then (`AI_JETS`: 7 % of spawns, one at a time, herc 2 : f35 2 : jumbo 1)
+only once `PLANE_TYPES` has its model. Never as the 'holding' rival.
+
 ### Status for HUD / ATC
 `ap.status()` → `{ engaged, overridden, phase, sub, leg, legIndex, label, route, recovering, done, target, speedKt, end }`;
 `ap.events` (`phase`, `override`, `replan`, `goaround`, `recovery`, `landed`, `takeoffroll`, `waypoint`) — drained by main
@@ -252,6 +345,8 @@ node tools/flight-sim.mjs            # node, ~3 min, 102 checks: landmany (LAND 
                                      # types (Tiger + bathtub AP circuits 09/27: takeoff run ±25 % of book, no ground loop, 3-point
                                      # touchdown, centreline), typeoverride (hand-flown + release, low dive handback), typeground (rest
                                      # attitude, tail-wheel steering sign, ground loop lively/survivable, wobble, rpm, fuel)
+node tools/flight-sim.mjs jets       # JETCORE: jumbo/herc/f35 × circuit, LAND ×3, LAND NOW, go-around, taxi-in + DEMAND
+                                     # TAKEOFF, fieldTakeoff refusal, hand-flown upset, world edge; F-35 afterburner; wake (--only=f35)
 node tools/flight-sim.mjs mixed      # opt-in: atc-sim's 30-min C172 + Tiger + bathtub soak through real ATC (~30 s)
 node tools/flight-sim.mjs landat     # one scenario
 ~/.claude/bin/cdp start --port 9431 -- --use-angle=metal

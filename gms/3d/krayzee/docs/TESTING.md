@@ -29,9 +29,12 @@ node tools/test-loop.mjs --falsify=stuck --stuck=40                 # STUCK sepa
 | `--quick` | | the two-case subset |
 | `--cases` | | `plane:difficulty:orientation`, comma-separated |
 | `--soak[=min]` | 30 | soak mode (sim minutes) |
-| `--falsify=` | | `freeze`, `stuck`, `error`, `cover`, `deadbutton` or `all` |
+| `--falsify=` | | `freeze`, `stuck`, `error`, `cover`, `deadbutton`, `msgcover` or `all` |
 | `--main-landnow` | off | also tap LAND NOW in the main loop (see "LAND NOW" below) |
 | `--shots` | off | also screenshot passing steps and each view |
+| `--cover-gate=m,p` | off | fail a portrait case whose airborne screen cover is over mean m % or p90 p % (see "Screen cover") |
+| `--cover-shots[=tag]` | off | save heavy message-cover frames to `docs/shots/msgfix/` |
+| `--cover-raw` | off | keep every cover sample in the results JSON |
 
 The exit code is 0 only when every case is green (or, with `--falsify`, when every injected fault was caught).
 Each case starts from fresh storage: a seeded pilot (Baron Loop, K-LOOP), coach marks marked as seen, and a career at 0 PP.
@@ -103,10 +106,61 @@ fault must then be reported by its own detector:
 | error | throttle | throws an uncaught Error | page errors |
 | cover | DEMAND IT | an invisible full-width sheet over the lower 60 % of the screen | covered |
 | deadbutton | DEMAND IT | DEMAND TAKEOFF accepts the tap and does nothing | airborne again (budget) |
+| msgcover | stick | a giant radio card pinned over the middle of the view (gate 12 / 25) | screen cover |
 
 Run `stuck` on its own with `--stuck=40`, so it fires before the touchdown budget does. Do not pass `--stuck=40` to the other faults: the C172's own downwind leg lasts about 156 s sim, so it would trip first and block the steps where those faults are injected.
 
 Last run (2026-10-23, current tree): **5/5 caught.** freeze → FREEZE (player and airborne AI static over 8.8 s sim); stuck → STUCK at 40.5 s; error → page errors; cover → `.krz-finish` covered for 8 s; deadbutton → "airborne again: not within 120 s sim".
+
+## Screen cover (MSGFIX, D32)
+
+How much of the flight view is under message UI, sampled in the page about twice a second (real time) by
+`tools/loop/cover.mjs`. Every `test-loop` case runs it (step **screen cover**, informational unless gated), and
+`tools/story/test-mission.mjs --cover[=<tag>]` runs it through a mission.
+
+- **View** = the viewport minus the fixed control and HUD zones (`CONTROLS`: stick zone, throttle column, pad, RADIO,
+  LAND, DEMAND IT, ground buttons, top-left/top-right buttons, warp chip, tower badge, HUD strip, score widget, parked
+  chips), on a 10 px grid.
+- **Covered** = inside a visible message element (`MESSAGES`, by category): radio cards (`radio`), the bark/response
+  sheet (`chips`), the radio log (`log`), prompt cards (`prompt`), flash banners (`banner`), the Herald reel and the
+  papers toast (`herald`), PP popups and the rank-up ceremony (`score`), coach marks and the story coach (`coach`), the
+  briefing / mission-complete cards (`story`), toasts (`toast`), the TASKS tick toast and set celebration (`tasks`). Visible = not hidden and effective opacity ≥ 0.15.
+- **Reported** for airborne samples (in play, not paused, no briefing/complete card up) and for all in-play samples:
+  mean %, p90 %, max %, the share of samples over 25 %, the **longest continuous stretch over 25 %** (real seconds), the
+  most message elements at once, and the mean % per category.
+- Flags: `--cover-gate=<mean>,<p90>` fails a portrait case over the gate (airborne); `--cover-shots[=tag]` saves heavy
+  frames to `docs/shots/msgfix/<tag>-<case>-cover-NN-<pct>pct-<categories>.png` (a new peak, or anything over 18 % after
+  24 s; at most 8 per case); `--cover-raw` keeps every sample in the results JSON. test-mission `--cover=<tag>` saves
+  `docs/review/loop/cover-<tag>-m<N>_<view>_<diff>-<stamp>.json` (summary + samples) and shots under the same tag.
+- Cover shots never overlap a harness tap, drag or screenshot (`guard`): a capture during a touch swallowed the briefing's
+  "Fly" tap, and a capture racing the harness's own screenshot is the suspect for taps landing at half scale.
+- **Falsify:** `node tools/test-loop.mjs --falsify=msgcover` pins a giant radio card (`[data-cover-test]`, 80 % × 40 % of
+  the screen) before the stick step and gates the case at 12 / 25: it must fail with "screen cover".
+  2026-10-27: **CAUGHT**, airborne mean 47.4 %, p90 56.6 % (`results-2026-10-27T04-27-13-falsify.json`).
+
+### Before / after (2026-10-27, C172 Easy, timescale 1, airborne samples)
+
+Free Flight = the real-tap loop (`--cases=c172:easy:portrait,c172:easy:landscape --timescale=1`); M1/M2 = test-mission
+`--mission=1|2 --cover`. Before = HEAD 8a685d57; after = MSGFIX on HEAD 4ecf580e (TASKS toast included). Files in
+`docs/review/loop/` (`results-2026-10-26T14-31-35` before, `results-2026-10-27T04-11-55` after, `cover-before-*` / `cover-after-*`). Shots in `docs/shots/msgfix/before-*` and
+`after-*` (the tool writes PNG; the kept ones, the three heaviest per run, were converted to JPEG). Target (portrait, in
+flight): mean < 12 %, p90 < 25 %.
+
+| run | portrait mean / p90 / longest > 25 % | landscape mean / p90 / longest > 25 % |
+|---|---|---|
+| Free Flight loop, before | 6.5 % / 13.5 % / 4 s | 6.2 % / 18.3 % / 3 s |
+| Free Flight loop, after | **3.6 % / 8.8 % / 0 s** | **4.4 % / 10.9 % / 0 s** |
+| Mission 1, before | 15.9 % / 24.2 % / 7 s | 11.6 % / 15.8 % / 5.5 s |
+| Mission 1, after | **8.1 % / 13.4 % / 1 s** | **9.5 % / 15.8 % / 5.5 s** |
+| Mission 2, before | 20.9 % / 28.8 % / 8.5 s | 15.5 % / 36.4 % / 10.5 s |
+| Mission 2, after | **11.7 % / 21.3 % / 5 s** | **13.9 % / 29.1 % / 5.5 s** |
+
+Most message elements at once: 5 → 4 (3 plus a never-shed one). Run-to-run spread is about ±1.5 points (Mission 2
+portrait measured 10.5–13.0 % over four runs while tuning). The story coach was the biggest single cover in missions
+(9.5–10.3 % portrait before, 5.9–6.4 % after); radio cards next (3.5–5.8 % → 1.7–3.5 %). Landscape Mission 2 is still the
+heaviest (coach 7.1, radio 4.3, sheet 2.2): the landscape view is smaller once the side controls are taken out, so the same card is a bigger
+share. The machine was heavily loaded during these runs (other lanes' Chrome, load average 30–90), so step timings were
+slow; the cover numbers are per real second and do not depend on fps.
 
 ## Soak (`--soak`)
 

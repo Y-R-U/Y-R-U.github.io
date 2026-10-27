@@ -1,10 +1,19 @@
-import { runwayEnd, toRunway, onRunway, AIM_DIST } from './routes.js';
+import { runwayEnd, toRunway, onRunway, AIM_DIST, heavySpot, isHeavy, BOUNDARY, homeCenter } from './routes.js';
+import { typeInfo } from './aircraft.js';
+import { setLandAircraft } from '../assist/landahead.js';
 import { STANDS } from '../world/layout.js';
 import { clamp, lerp } from './vmath.js';
 import { PROTECTION } from '../../data/rules.js';
 
 export const AXES = ['aileron', 'elevator', 'rudder', 'throttle', 'flaps', 'brake'];
 export const OVERRIDE = { deadzone: 0.08, wait: 1.5, blend: 2.0 };
+// Wake turbulence (arcade, survivable): per roster `wake` class. str = peak roll acceleration (rad/s²) at the core,
+// r = core radius (m), life = seconds a vortex lasts (sinking SINK m/s). Only planes under half the source's mass feel it.
+export const WAKE = { super: { str: 7, r: 45, life: 70 }, heavy: { str: 4, r: 32, life: 50 }, medium: { str: 1.8, r: 18, life: 30 }, SINK: 0.6, band: [-30, 30], every: 0.5 };
+const QUIPS = {
+  warn: ['Your Majesty, that way lies Abroad. We do not do Abroad.', 'Sire, the map ends rather soon. The cartographer is on holiday.', 'Your Grace, beyond those hills there be foreigners. Turn back?'],
+  turnback: ['Turning you home, Sire. Abroad has been informed you are not coming.', 'Royal escort engaged: home we go, Your Majesty. Mind the hedge.', 'The Kingdom ends here, Your Grace. The autopilot insists.'],
+};
 
 // Owns every aircraft in the world: fixed-step simulation, the player-vs-autopilot mixer, and the
 // little bits of shared knowledge the autopilots need (runway occupancy, stands, taxi spacing).
@@ -26,8 +35,10 @@ export class Traffic {
       manual: Object.fromEntries(AXES.map((a) => [a, null])),
       axis: Object.fromEntries(AXES.map((a) => [a, { mode: 'auto', t: 0, val: 0 }])),
       apOff: false,
+      bnd: { warned: false, lock: false, n: 0 },
     };
     if (ap) { ap.traffic = this; ap.isPlayer = !!player; if (player && ap.finalLen === undefined) ap.finalLen = 1300; }
+    if (player) setLandAircraft(aircraft.type);   // LAND plans for the player's type (jets: runways only)
     if (!player && !remote && this.aiProtection && !aircraft.impactHandler) aircraft.impactHandler = aiImpactHandler(this.aiProtection);
     this.list.push(ent);
     return ent;
@@ -50,6 +61,7 @@ export class Traffic {
         this._mix(e, this.h);
         e.ac.step(this.h, this.env);
       }
+      if ((this._wk = (this._wk || 0) + 1) >= 6) { this._wake(this._wk * this.h); this._wk = 0; }
     }
     this._contacts();
     return this.acc / this.h;
@@ -66,7 +78,9 @@ export class Traffic {
       const r = (a.dims.span + b.dims.span) * 0.3;
       const d = Math.hypot(dx, dz);
       const key = a.id + '|' + b.id;
-      if (d > r || Math.abs(dy) > 2.6) { this._touching?.delete(key); continue; }
+      // vertical: compare the airframes' middles (a jumbo's CG is 4.8 m up, a C172's 1.2 m: both sit on the ground)
+      const dyc = dy - (b.dims.height / 2 - b.dims.gearHeight) + (a.dims.height / 2 - a.dims.gearHeight);
+      if (d > r || Math.abs(dyc) > Math.max(2.6, (a.dims.height + b.dims.height) * 0.3)) { this._touching?.delete(key); continue; }
       (this._touching ||= new Set());
       const fresh = !this._touching.has(key);
       this._touching.add(key);
@@ -95,6 +109,7 @@ export class Traffic {
   // Releasing the stick low, sinking or banked hard skips the wait: the AP recovers at once.
   _mix(e, h) {
     const ac = e.ac, ap = e.ap, A = e.axis;
+    if (e.player && ap) this._boundary(e);
     if (ap?.wantResume) { ap.wantResume = false; this.resume(e); }
     if (ap?.wantThrottleAuto) { ap.wantThrottleAuto = false; this.releaseThrottle(e); }
     const stickAxes = ['aileron', 'elevator', 'rudder'];
@@ -112,7 +127,7 @@ export class Traffic {
     let anyManual = false, anyWait = false, replan = false, recover = false;
     for (const k of AXES) {
       const st = A[k];
-      let m = e.manual[k];
+      let m = e.bnd?.lock && k !== 'brake' ? null : e.manual[k];   // the royal escort has the stick (and the throttle)
       // stick X steers the nosewheel on the ground when the rudder buttons are not in use
       if (k === 'rudder' && m == null && ac.onGround && e.manual.aileron != null) m = e.manual.aileron;
       if (m != null) {
@@ -197,6 +212,12 @@ export class Traffic {
         e.rig.root.quaternion.set(quatTmp.x, quatTmp.y, quatTmp.z, quatTmp.w);
       }
       e.rig.setControls(e.ac.ctl);
+      // JETCORE: jet rigs show the flight model's automatic gear and afterburner (rig hooks from JETMODELS-A/B)
+      if (e.ac.P.jet) {
+        const gw = e.ac.gearWant ?? 1;
+        if (e.rig.setGear && e._gearShown !== gw) { e.rig.setGear(gw, e._gearShown == null); e._gearShown = gw; }
+        if (e.rig.setAfterburner && e._abShown !== e.ac.ab) { e._abShown = e.ac.ab; e.rig.setAfterburner(e.ac.ab); }
+      }
       if (e.player) e.rig.updateInstruments(e.ac.instruments());
       e.rig.update(dt);
     }
@@ -285,7 +306,7 @@ export class Traffic {
       if (!meRw && onRunway(oa.pos.x, oa.pos.z, 0) && oa.gs > 9) continue; // runway traffic is ATC's (hold lines)
       const pr = projectPoly(mine, oa.pos.x, oa.pos.z);
       if (pr.d < 9 && pr.s > 0) {
-        if (pr.s < 220) lim = Math.min(lim, stopAt(pr.s - 45));
+        if (pr.s < 220) lim = Math.min(lim, stopAt(pr.s - 45 - Math.max(0, (ac.dims.length + oa.dims.length) / 2 - 9)));   // nose to tail, not CG to CG
         const oh = (oa.gs > 0.5 ? oa.track : oa.heading) * Math.PI / 180;
         const opp = Math.sin(oh) * pr.dir[0] - Math.cos(oh) * pr.dir[1] < -0.5;
         const theirs = this.groundAhead(o, 420);
@@ -356,6 +377,7 @@ export class Traffic {
   }
 
   claimStand(ac, prefer) {
+    if (isHeavy(ac.type)) return this._claimHeavy(ac, prefer);
     for (const [s, owner] of this.standOwner) if (owner === ac) return s;
     const occupied = new Set(this.standOwner.keys());
     for (const e of this.list) for (const s of STANDS) {
@@ -369,6 +391,82 @@ export class Traffic {
   }
 
   releaseStand(ac) { for (const [s, owner] of this.standOwner) if (owner === ac) this.standOwner.delete(s); }
+
+  // A heavy takes two stands (routes.heavySpot: it parks in front of k-1/k) and needs its spot clear of other planes.
+  _claimHeavy(ac, prefer) {
+    const mine = [...this.standOwner].filter(([, o]) => o === ac).map(([s]) => s);
+    const own = [prefer, ...mine].find((s) => s && heavySpot(s)?.stands.every((x) => this.standOwner.get(x) === ac));
+    if (own) { this.releaseStand(ac); for (const x of heavySpot(own).stands) this.standOwner.set(x, ac); return own; }
+    const ok = (sid) => {
+      const h = heavySpot(sid);
+      if (!h || h.stands.some((x) => this.standOwner.has(x) && this.standOwner.get(x) !== ac)) return false;
+      return !this.list.some((e) => e.ac !== ac && (Math.hypot(e.ac.pos.x - h.x, e.ac.pos.z - h.z) < 45 ||
+        h.stands.some((x) => { const st = STANDS.find((q) => q.id === x); return Math.hypot(e.ac.pos.x - st.position[0], e.ac.pos.z - st.position[2]) < 12; })));
+    };
+    const pick = (prefer && ok(prefer) && prefer) || [...STANDS].map((s) => s.id).reverse().find(ok);   // east first: nearest the inbound lane's feed
+    if (!pick) return null;
+    this.releaseStand(ac);
+    for (const x of heavySpot(pick).stands) this.standOwner.set(x, ac);
+    return pick;
+  }
+
+  // Wake turbulence (WAKE): sources drop vortex points behind them; lighter planes passing through get rolled and pushed down.
+  _wake(dt) {
+    const T = this.time;
+    for (const e of this.list) {
+      const ac = e.ac, cls = !e.remote && WAKE[typeInfo(ac.type).wake];
+      if (!cls) continue;
+      const W = (e.wake ||= { pts: [], last: -9 });
+      while (W.pts.length && T - W.pts[0].t > cls.life) W.pts.shift();
+      if (!ac.onGround && !ac.crashed && T - W.last >= WAKE.every) { W.last = T; W.pts.push({ x: ac.pos.x, y: ac.pos.y, z: ac.pos.z, t: T, fx: ac.vel.x / (ac.gs || 1), fz: ac.vel.z / (ac.gs || 1) }); }
+    }
+    for (const v of this.list) {
+      const a = v.ac;
+      if (v.remote || a.onGround || a.crashed) continue;
+      let best = null;
+      for (const e of this.list) {
+        if (e === v || !e.wake?.pts.length || a.P.mass > e.ac.P.mass * 0.5) continue;
+        const cls = WAKE[typeInfo(e.ac.type).wake];
+        if (Math.abs(a.pos.x - e.ac.pos.x) > 6000 || Math.abs(a.pos.z - e.ac.pos.z) > 6000) continue;
+        for (const p of e.wake.pts) {
+          const age = T - p.t, dx = a.pos.x - p.x, dz = a.pos.z - p.z;
+          if (Math.abs(dx) > cls.r || Math.abs(dz) > cls.r) continue;
+          const y = p.y - WAKE.SINK * age, dy = a.pos.y - y;
+          if (dy < WAKE.band[0] || dy > WAKE.band[1]) continue;
+          const lat = dx * -p.fz + dz * p.fx, d = Math.hypot(dx, dz);
+          if (d > cls.r) continue;
+          const s = cls.str * (1 - age / cls.life) * (1 - d / cls.r) * Math.min(1, 1 - a.P.mass / (e.ac.P.mass * 0.5));
+          if (!best || s > best.s) best = { s, side: lat >= 0 ? 1 : -1, src: e };
+        }
+      }
+      if (!best || best.s < 0.05) continue;
+      a.w.z += best.side * best.s * dt;           // the vortex on that side rolls you
+      a.vel.y -= best.s * 1.2 * dt;               // and the downwash pushes you down
+      if (a.time - (a._wakeT ?? -99) > 6) { a._wakeT = a.time; a.emit('wake', { from: best.src.ac.id, strength: +best.s.toFixed(2), cls: typeInfo(best.src.ac.type).wake }); }
+    }
+  }
+
+  // Soft world boundary for the player (BOUNDARY): a warning, then the AP takes the stick and turns home while the
+  // plane is (predicted to be) beyond `turn` and heading out. Events on the AP: 'boundary' { stage, dist, quip }.
+  _boundary(e) {
+    const ac = e.ac, B = e.bnd, [cx, cz] = homeCenter();
+    if (ac.onGround || ac.crashed) { B.lock = false; return; }
+    const dx = ac.pos.x - cx, dz = ac.pos.z - cz, r = Math.hypot(dx, dz), vr = (ac.vel.x * dx + ac.vel.z * dz) / (r || 1);
+    // look ahead by reaction time + half a turn at the AP's bank (a jumbo at 260 kt needs ~3 km to turn round)
+    const V = Math.max(ac.speed, 1), turnR = V * V / (9.81 * Math.tan(30 * (ac.P.apBankScale ?? 1) * Math.PI / 180));
+    const ahead = r + Math.max(0, vr) * BOUNDARY.lookahead + (vr > 0 ? turnR * Math.min(1, vr / V) : 0);
+    const q = (k) => QUIPS[k][B.n++ % QUIPS[k].length];
+    if (!B.warned && ahead > BOUNDARY.warn) { B.warned = true; e.ap._emit('boundary', { stage: 'warn', dist: Math.round(r), quip: q('warn') }); }
+    else if (B.warned && ahead < BOUNDARY.rearm) B.warned = false;
+    if (!B.lock && ahead > BOUNDARY.turn && vr > 2) {
+      B.lock = true; e.ap.wantResume = true; e.ap.homing = true;
+      const quiet = ac.time - (B.quipT ?? -1e9) < 30; if (!quiet) B.quipT = ac.time;   // one quip per 30 s, however often it bounces off
+      e.ap._emit('boundary', { stage: 'turnback', dist: Math.round(r), quip: quiet ? null : q('turnback') });
+    } else if (B.lock && (r < BOUNDARY.rearm || (vr < -0.7 * ac.gs && Math.abs(ac.bank) < 0.25))) {   // pointing home, wings level: yours again
+      B.lock = false; e.ap.homing = false;
+      e.ap._emit('boundary', { stage: 'clear', dist: Math.round(r) });
+    }
+  }
 }
 
 // Distance along a polyline to the projection of (x, z), lateral distance and the segment direction there.

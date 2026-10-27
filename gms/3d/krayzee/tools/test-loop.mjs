@@ -10,6 +10,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { connect, sleep, SNAP, LOAD_ROUTES, rwyGeom } from './loop/driver.mjs';
+import { COVER_INSTALL, COVER_FALSIFY, summarize, fmtCover, coverTake, coverShots, coverDir } from './loop/cover.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = join(HERE, '..', 'docs', 'review', 'loop');
@@ -24,7 +25,12 @@ const SOAK = arg('soak', false);
 // falsify runs default to the first quick case
 const FALSIFY = arg('falsify', '');
 const SHOTS = !!arg('shots', false);
-const PLANES = ['c172', 'tiger', 'bathtub'], DIFFS = ['easy', 'medium', 'hard'];
+// MSGFIX screen cover: sampled every case; --cover-gate=<mean>,<p90> (airborne %, portrait only) turns it into a failing step
+const COVER_GATE = arg('cover-gate', '') ? String(arg('cover-gate')).split(',').map(Number) : null;
+const COVER_SHOTS = arg('cover-shots', false);   // --cover-shots[=tag] saves heavy-cover frames to docs/shots/msgfix/
+// JETCORE: the jets run with --jets (their own matrix) or --cases=jumbo:easy:portrait; they need ?plane= support in main.js
+const JETS = ['jumbo', 'herc', 'f35'];
+const PLANES = arg('jets') ? JETS : ['c172', 'tiger', 'bathtub'], DIFFS = ['easy', 'medium', 'hard'];
 const ORIENT = { portrait: [390, 844], landscape: [844, 390] };
 
 let CASES;
@@ -34,7 +40,7 @@ else if (FALSIFY) CASES = [['c172', 'easy', 'portrait']];
 else CASES = PLANES.flatMap((p) => DIFFS.flatMap((d) => Object.keys(ORIENT).map((o) => [p, d, o])));
 
 // Budgets in SIM seconds unless the name says real. docs/TESTING.md mirrors this table.
-const B = {
+const B0 = {
   bootReal: 40, menuToPlayReal: 15,
   liftoff: 60, climb60: 90,
   stickHold: 3, apBack: 10, minAglManual: 15,
@@ -45,7 +51,10 @@ const B = {
   takeoffBtn: 30, airborne2: 120,
   fieldTouchdown: 240, fieldStop: 90, fieldTakeoffBtn: 20, fieldAirborne: 60,
 };
-const FALSIFY_ALL = ['freeze', 'stuck', 'error', 'cover', 'deadbutton'];
+// jets: a 4-5 min circuit, a long taxi to the threshold; LAND never picks a field (the field branch lands on the runway)
+const BJ = { ...B0, liftoff: 90, waitFinal: 700, touchdown: 450, stop: 150, demandReady: 420, airborne2: 300, fieldTouchdown: 600, fieldStop: 150, fieldTakeoffBtn: 30, fieldAirborne: 300 };
+let B = B0;
+const FALSIFY_ALL = ['freeze', 'stuck', 'error', 'cover', 'deadbutton', 'msgcover'];
 let FALSIFY_SET = FALSIFY === 'all' ? FALSIFY_ALL : FALSIFY ? String(FALSIFY).split(',') : [];
 
 const PROFILE = { name: 'Loop', gender: 'm', company: 'Loop Air', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017', voice: 'toff', registration: 'K-LOOP' };
@@ -199,12 +208,14 @@ const FALSIFY_JS = {
   error: `(() => { setTimeout(() => { throw new Error('LOOPTEST falsify: injected page error'); }, 50); return 1; })()`,
   // an invisible sheet over the lower screen: a hook-driven test would still pass, a real thumb cannot
   cover: `(() => { const d = document.createElement('div'); d.id = 'looptest-cover'; d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:60%;z-index:99999;background:transparent'; document.body.append(d); return 1; })()`,
+  // MSGFIX: a giant radio card pinned over the middle of the view; the screen-cover sampler must report it
+  msgcover: COVER_FALSIFY,
   // DEMAND TAKEOFF accepts the tap and does nothing: the plane just sits there
   deadbutton: `(() => { const ap = __game.S.player.ap; ap.demandTakeoff = () => 'dead'; window.__game.wiring.link && (window.__game.wiring.link.demandTakeoff = () => 'dead'); return 1; })()`,
 };
-const FALSIFY_AT = { freeze: 'stick', stuck: 'land', error: 'throttle', cover: 'bank', deadbutton: 'bank' };
+const FALSIFY_AT = { freeze: 'stick', stuck: 'land', error: 'throttle', cover: 'bank', deadbutton: 'bank', msgcover: 'stick' };
 // what the suite must report for each fault
-const FALSIFY_EXPECT = { freeze: /FREEZE|froze/, stuck: /STUCK/, error: /page errors/, cover: /covered/, deadbutton: /airborne again/ };
+const FALSIFY_EXPECT = { freeze: /FREEZE|froze/, stuck: /STUCK/, error: /page errors/, cover: /covered/, deadbutton: /airborne again/, msgcover: /screen cover/ };
 async function maybeFalsify(at) {
   for (const f of FALSIFY_SET) if (FALSIFY_AT[f] === at) { log(`  !! falsify '${f}' injected before ${at}`); await D.ev(FALSIFY_JS[f]); CASE.falsified.push(f); }
 }
@@ -212,6 +223,7 @@ async function maybeFalsify(at) {
 async function runCase([plane, diff, orient]) {
   const [w, h] = ORIENT[orient];
   CASE = { id: `${plane}-${diff}-${orient}`, plane, diff, orient, steps: [], blocked: null, events: [], falsified: [], t0: Date.now() };
+  B = JETS.includes(plane) ? BJ : B0;
   M = newMon();
   log(`\n== ${CASE.id} (${w}×${h}, timescale ${TS})`);
   await fresh(plane, w, h, diff);
@@ -224,8 +236,10 @@ async function runCase([plane, diff, orient]) {
     rec.bootReal = r1((Date.now() - t0) / 1000);
     const btn = await waitReal(() => D.rect('.kz-btn[data-a="free"]'), 8000);
     if (!btn) fail('menu Free Flight button never visible');
+    await D.ev(COVER_INSTALL);
     return `ready ${rec.bootReal}s real`;
   });
+  const shots = COVER_SHOTS ? coverShots(D, coverDir(HERE), `${COVER_SHOTS === true ? 'loop' : COVER_SHOTS}-${CASE.id}`, { guard: [D, ['tapAt', 'hold', 'touchStart', 'touchMove', 'touchEnd', 'shot']] }) : null;
   await step('menu→free', 0, async (rec) => {
     const t0 = Date.now();
     await tapUntil('.kz-btn[data-a="free"]', (s) => s.mode === 'play' && s.p, { ms: B.menuToPlayReal * 1000, rec });
@@ -243,7 +257,17 @@ async function runCase([plane, diff, orient]) {
       return `difficulty ${s.diff} (seeded)`;
     }
     // the selected chip confirms and fades the set (HUD4); another chip applies and fades it
-    await tapUntil(sel, async (s) => s.diff === diff && (await D.evSafe('!!document.querySelector(".krz-chips")?.classList.contains("gone")')), { rec, ms: 2500 });
+    try {
+      await tapUntil(sel, async (s) => s.diff === diff && (await D.evSafe('!!document.querySelector(".krz-chips")?.classList.contains("gone")')), { rec, ms: 2500 });
+    } catch (e) {
+      // the chips fade the moment the plane lifts off: an F-35 in afterburner is airborne ~5 s sim after spawn (1.3 s real at
+      // 4×), so the chip can vanish between finding it and tapping it. Same rule as above: gone = WARN, seeded difficulty counts
+      if (await D.rect(sel)) throw e;
+      const s = await snap();
+      (rec.warn ||= []).push(`chips went while tapping (${s.p?.gnd ? 'on the ground' : 'airborne'}, ${r1(s.simT)} s sim after spawn)`);
+      if (s.diff !== diff) fail(`difficulty ${s.diff}, wanted ${diff}`);
+      return `difficulty ${s.diff} (seeded)`;
+    }
     return `difficulty ${M.last.diff} by chip`;
   });
 
@@ -341,8 +365,23 @@ async function runCase([plane, diff, orient]) {
   }, { needs: false });
 
   // probe: LAND pressed on our own downwind (PLAYTEST_3 #3 picked a field 2-4 km away); cancelled by a stick touch
-  await step('LAND probe downwind', 30, async (rec) => {
-    await until((s) => s.p?.phase === 'DOWNWIND' && s.land && !s.land.hidden && s.land.state === 'idle', 240, { label: 'downwind with LAND available' });
+  // jets: a fast circuit can be flown and landed (and the plane parked: "the tower is making you wait") while the steps above
+  // run; a player would DEMAND TAKEOFF and go round again, so the suite does that before the LAND steps
+  const relaunch = async (rec) => {
+    if (!JETS.includes(CASE.plane)) return;
+    const s0 = await snap();
+    if (!s0.p?.gnd) return;
+    await until((s) => s.ground?.takeoff, 90, { label: 'DEMAND TAKEOFF offered (jet already landed)' });
+    await tapUntil('.krz-gbtn-to', (s) => !s.p.gnd || s.p.kt > 3, { rec, ms: 2500 });
+    await until((s) => s.p && !s.p.gnd && s.p.agl > 30, 300, { label: 'airborne again' });
+    rec.relaunched = true;
+  };
+  await step('LAND probe downwind', JETS.includes(CASE.plane) ? 600 : 30, async (rec) => {
+    await relaunch(rec);
+    // jets fly the circuit fast and ATC may stretch the downwind out of LAND's reach: any circuit leg before base will do
+    // (the herc's short circuit is often on base by the time this step starts: base is still the home circuit)
+    const legs = JETS.includes(CASE.plane) ? /^(CROSSWIND|DOWNWIND|UPWIND|BASE)$/ : /^DOWNWIND$/;
+    await until((s) => legs.test(s.p?.phase || '') && (!JETS.includes(CASE.plane) || s.p.agl > 100) && s.land && !s.land.hidden && s.land.state === 'idle', 240, { label: 'downwind with LAND available' });
     await tapUntil('.krz-land', (s) => s.land?.state === 'active', { rec, ms: 2000 });
     rec.pick = M.last.land.txt; rec.landing = M.last.p.landing;
     // LAND NOW (shown while LAND flies a circuit/join) must switch the plan to straight ahead and keep LAND active
@@ -363,6 +402,7 @@ async function runCase([plane, diff, orient]) {
   // 5. LAND (+ LAND NOW when shown) → touchdown → 6. stop. Pressed on final, runway ahead, as D13 expects.
   await maybeFalsify('land');
   await step('LAND', 0, async (rec) => {
+    await relaunch(rec);
     await D.evSafe(LOAD_ROUTES);
     const w = await until((s) => { const g = rwyGeom(s); return s.land && !s.land.hidden && s.land.state === 'idle' && g && g.dist < 3500 && g.off < 25 && g.align < 30; }, B.waitFinal, { label: 'runway ahead within 3.5 km with LAND available' });
     rec.waitFinalSim = r1(w.simS);
@@ -452,6 +492,7 @@ async function runCase([plane, diff, orient]) {
     const td = await until((s) => s.p && s.p.gnd, B.fieldTouchdown, { label: 'field touchdown' });
     if (M.crashes) fail('crashed landing in the field');
     rec.surface = td.s.p.surf;
+    if (JETS.includes(CASE.plane) && rec.surface !== 'runway') fail(`a jet (${CASE.plane}) landed on ${rec.surface}: LAND must only pick runways`);
     await until((s) => s.p.gnd && s.p.kt < 1, B.fieldStop, { label: 'stopped in the field' });
     if (M.crashes) fail(`crashed in the field: ${JSON.stringify(M.events.filter((e) => e.type === 'crash'))}`);
     return `${rec.pick} [${rec.landing}]${now ? ' + LAND NOW' : ''}; touchdown on ${rec.surface} after ${r1(td.simS)}s sim`;
@@ -494,6 +535,9 @@ async function runCase([plane, diff, orient]) {
     return `confirm "Abandon ${shown} PP?" → Keep flying ok → Quit → menu`;
   }, { needs: false });
 
+  shots?.stop();
+  await coverStep(orient);
+
   CASE.events = M.events;
   CASE.realS = r1((Date.now() - CASE.t0) / 1000);
   CASE.errors = [...new Set(D.errors)].slice(0, 10);
@@ -501,6 +545,24 @@ async function runCase([plane, diff, orient]) {
   return CASE;
 }
 const MAIN_LANDNOW = !!arg('main-landnow', false);
+
+// MSGFIX: how much of the flight view message UI covered over the whole case (airborne samples; all in-play samples too)
+async function coverStep(orient) {
+  await step('screen cover', 0, async (rec) => {
+    const samples = await coverTake(D.ev);
+    CASE.cover = { air: summarize(samples, 'air'), play: summarize(samples, 'play'), timescale: TS };
+    if (arg('cover-raw', false)) CASE.coverSamples = samples;
+    log(`  cover (airborne) ${fmtCover(CASE.cover.air)}`);
+    log(`  cover (in play)  ${fmtCover(CASE.cover.play)}`);
+    const gate = COVER_GATE || (CASE.falsified.includes('msgcover') ? [12, 25] : null);
+    const a = CASE.cover.air;
+    if (gate && orient === 'portrait' || gate && CASE.falsified.includes('msgcover')) {
+      if (!a.n) fail('screen cover: no airborne samples');
+      if (a.mean > gate[0] || a.p90 > gate[1]) fail(`screen cover over the gate: airborne mean ${a.mean}% (≤ ${gate[0]}), p90 ${a.p90}% (≤ ${gate[1]})`);
+    }
+    return `airborne mean ${a.mean}% p90 ${a.p90}% longest>25% ${a.longest25}s`;
+  }, { needs: false });
+}
 
 // ---------------------------------------------------------------- soak
 // Free Flight left to the AP for N sim minutes; a player thumb grabs the stick every ~3 sim min, DEMAND IT / DEMAND

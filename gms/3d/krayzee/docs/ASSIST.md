@@ -174,6 +174,19 @@ narrower than ~48 m could be missed (none exists today).
 - Tests: landahead.test.mjs 36 (+15: circuit picks for 3 types × 4 legs, low short final, climb-out, takeoffRun runs
   clear); 13 of the new ones fail on the HEAD planner; `--falsify` still fails 5.
 
+## 3e. JETCORE (2026-10-27): LAND for jets
+- `landProfile(type)`: light types get `LAND` unchanged. Jets (`flight.jet`): **open runways long enough only** (no
+  closed 04/22, no taxiway, apron or field candidates), turn radii from their own Vapp, `maxGrad` 0.075, `sink` 5.5 m/s, reach 9 km (×1.6 the light
+  formula), every open runway within 12 km is a home runway (climbing away from it included: a jet's circuit is 2–3×
+  wider and ATC stretches it; integration found LAND greyed on a herc's own downwind), a failure reads "NO RUNWAY IN REACH"
+  (never "NO FIELD AHEAD"), `minLen` = book landing roll × 1.15 + 150 m.
+- The type: `planLandAhead({ type })`, else the player's, set by `Traffic.add(player)` → `setLandAircraft(type)` (main.js
+  needs no change).
+- **LAND NOW** for a jet: straight onto a runway if it can; otherwise the runway's ordinary plan with `nowFallback` and
+  `plan.quip` ("A field, Sire? Not in a Royal Jumbo. The runway it is."), which the LAND button shows for 6 s; nothing at
+  all → `{ fail, hint: 'RUNWAY ONLY, SIRE', quip }`.
+- `ap.fieldTakeoff()` refuses for jets (docs/FLIGHT.md). Tests: `node tools/flight-sim.mjs jets` (LAND ×3 per jet, LAND NOW).
+
 ## 4. Tests (2026-10-22, after WORLD r2)
 ```
 node js/assist/test/landahead.test.mjs            # node, fake world with r2-style rolling ground + castle hill

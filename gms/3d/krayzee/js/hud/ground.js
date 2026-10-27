@@ -2,6 +2,7 @@
 // D19: Free Flight difficulty + aircraft chips, parked before the first take-off only, up in the top band out of the flight view.
 // Any chip tap (even the selected one) or any flight control touch/key fades the whole set for this flight (Aaron, HUD4).
 import { aircraftLockText } from '../ui/index.js';
+import { HANGAR, SHORT } from '../ui/aircraft.js';
 import { rects, slotX } from './place.js';
 
 const LOCK = '<svg viewBox="0 0 10 12" aria-hidden="true"><rect x="1" y="5" width="8" height="6.5" rx="1.3" fill="currentColor"/><path d="M3 5V3.4a2 2 0 0 1 4 0V5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
@@ -22,7 +23,7 @@ export function createGroundButtons(root, { chipRoot = root, onTakeoff, onSkip, 
   chips.className = 'krz-chips';
   chips.hidden = true;
   chips.innerHTML = `<div class="krz-diff" data-g="diff" hidden><span>DIFFICULTY</span><button type="button" data-d="easy">Easy</button><button type="button" data-d="medium">Medium</button><button type="button" data-d="hard">Hard</button></div>
-    <div class="krz-diff krz-plane" data-g="plane" hidden><span>AIRCRAFT</span><button type="button" data-a="c172">Runabout</button><button type="button" data-a="tiger">Moth</button><button type="button" data-a="bathtub">Bathtub</button></div>
+    <div class="krz-diff krz-plane" data-g="plane" hidden><span>AIRCRAFT</span>${HANGAR.map((a) => `<button type="button" data-a="${a}">${SHORT[a]}</button>`).join('')}</div>
     <div class="krz-plane-why" data-g="why" hidden></div>`;
   chipRoot.append(chips);
   const to = el.querySelector('[data-g="takeoff"]'), skip = el.querySelector('[data-g="skip"]'), diff = chips.querySelector('[data-g="diff"]');

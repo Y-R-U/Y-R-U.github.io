@@ -654,7 +654,9 @@ async function flightWorld(o = {}) {
   atc.on('instruction', (e) => { W.instr.push(e); if (args.dbg && (args.dbg === true || args.dbg.split(',').includes(e.cmd.type))) console.log(`  t=${e.t} ${e.to} ${JSON.stringify(e.cmd).slice(0, 150)} ${JSON.stringify(atc.strip(e.to))}`); });
   atc.on('runwayChange', (e) => W.runwayChanges.push(e));
   const spawn = (kind, opts = {}) => {
-    const type = o.types ? o.types[Math.floor(rnd() * o.types.length)] : null;
+    let type = o.types ? o.types[Math.floor(rnd() * o.types.length)] : null;
+    // as the game's attract.js (AI_JETS): one jet at a time
+    if (o.oneJet && ['jumbo', 'herc', 'f35'].includes(type) && W.ai.some((e) => ['jumbo', 'herc', 'f35'].includes(e.ac.type))) type = 'c172';
     // ids per world (not the global Aircraft counter): see-and-avoid tie-breaks compare ids, so a soak must not depend
     // on how many planes earlier scenarios built (`--run=x` alone == x inside the full run)
     const id = `ac${W.stats.spawned + 1}`;
@@ -905,6 +907,10 @@ async function flightSoak() {
     // slow types cost runway capacity: the C172-only control of this seed makes 2 go-arounds, mixed makes 2-5 (seeds 53/61/77/89)
     { label: 'mixed types', max: 5, circuits: 1, seed: +(args.seed || 53), types: ['c172', 'tiger', 'bathtub'], gaPer15: 2.5 },
     ...(args.control ? [{ label: 'control c172', max: 5, circuits: 1, seed: +(args.seed || 53), types: ['c172', 'c172', 'c172'] }] : []),
+    // JETCORE: jumbo / herc / f35 among the light traffic (3 in 11 spawns: far more than the game's ~7 %)
+    // heavies cost runway capacity (a jumbo needs 95 s + 40 s wake behind it, fast jets catch light planes on final): up to 4 GA/15 min
+    { label: 'jets among light traffic', max: 5, circuits: 1, seed: +(args.seed || 53), types: ['c172', 'c172', 'c172', 'c172', 'c172', 'c172', 'tiger', 'bathtub', 'herc', 'f35', 'jumbo'], oneJet: true, gaPer15: 4 },
+    { label: 'herc + f35 among light traffic', max: 5, circuits: 1, seed: +(args.seed || 61), types: ['c172', 'c172', 'c172', 'tiger', 'herc', 'f35'], oneJet: true, gaPer15: 4 },
   ];
   const MILD = ['taxi_speeding', 'low_pass'];
   for (const r of runs) {

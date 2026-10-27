@@ -250,7 +250,12 @@ function taxiPath(x, z, heading, dest) {
   let goal, tail = [];
   if (dest.hold) goal = g.holds[dest.hold];
   else if (dest.threshold) goal = runwayEnd(dest.threshold).thr;
-  else if (dest.stand) {
+  else if (dest.stand && dest.heavy && heavySpot(dest.stand)) {
+    // JETCORE: a 64 m jumbo cannot do the stand hook (it would put its tail in the terminal): it leaves the inbound lane
+    // one stand further east and pulls up on the apron in front of stands k-1/k, facing west (heavySpot)
+    const h = heavySpot(dest.stand), nb = g.stands[h.via];
+    goal = nb.laneBot; tail = [[goal[0] - 22, goal[1] - 20], [h.x + 30, h.z], [h.x, h.z]];
+  } else if (dest.stand) {
     const s = g.stands[dest.stand];
     goal = s.laneBot; tail = [s.laneTop, ...s.loop];
   } else goal = dest.xz;
@@ -275,6 +280,20 @@ function taxiPath(x, z, heading, dest) {
 
 function holdPoint(endId) { return taxiGraph().holds[endId]; }
 
+// Heavy parking (span > 45 m): in front of stand `sid` and the stand to its west, CG on the apron 40 m out from the stand
+// row, nose west. Needs stand k-1 (its exit runs under the nose) and k+1 (whose lane node the path leaves from).
+// null when the stand cannot take a heavy. { x, z, heading, stands: [k-1, k], via: k+1 }
+const HEAVY_SPAN = 45;
+function heavySpot(sid) {
+  const order = [...STANDS].sort((a, b) => a.position[0] - b.position[0]), k = order.findIndex((s) => s.id === sid);
+  const W = order[k - 1], E = order[k + 1], g = taxiGraph();
+  if (k < 1 || !W || !E || !g.stands[E.id]?.laneBot || Math.abs(order[k].heading - 180) > 1) return null;
+  const x = W.position[0] + 2, z = order[k].position[2] + 40;
+  if (APRON && !(Math.abs(x - 35 - APRON.center[0]) < APRON.size[0] / 2 && Math.abs(z - APRON.center[2]) < APRON.size[1] / 2)) return null;
+  return { x, z, heading: 270, stands: [W.id, sid], via: E.id };
+}
+const isHeavy = (type) => (AIRCRAFT[type]?.flight?.span ?? 0) > HEAVY_SPAN;
+
 // Where a taxiway meets the runway of `endId` (incl. its threshold), with the runway left ahead: [{ x, z, s, left }].
 function runwayEntries(endId) {
   const e = runwayEnd(endId), out = [];
@@ -294,17 +313,24 @@ function standInfo(id) { return taxiGraph().stands[id]; }
 //   approach { end }  park { seconds }  despawn {}
 
 // Slower types fly a lower, tighter circuit (roster patternAltM / circuitScale) inside the C172's: pass { type }.
+// JETCORE: bigger/faster types (circuitScale > 1) also stretch the upwind and the final (base turn + FAF further out).
 function circuitOpts(type) {
   const a = type && type !== 'c172' ? AIRCRAFT[type] : null;
   const k = a?.circuitScale ?? 1;   // alt ~ scale²: tiger ~217 m, bathtub ~147 m, vertically clear of each other's downwinds
-  return a?.flight ? { alt: Math.min(a.patternAltM ?? PATTERN_ALT, Math.round(PATTERN_ALT * k * k)), width: Math.round(CIRC.downwindOff * k) } : {};
+  if (!a?.flight) return {};
+  const o = { alt: Math.min(a.patternAltM ?? PATTERN_ALT, Math.round(PATTERN_ALT * k * k)), width: Math.round(CIRC.downwindOff * k) };
+  // base leg ~one turn radius out (0.4 × the downwind offset), the FAF where that turn rolls out onto the centreline
+  if (k > 1) { o.up = Math.round(CIRC.upwindExt * k); o.fin = Math.round(CIRC.finalLen * k); o.faf = Math.round(o.fin - o.width * 0.4 * 1.05); }
+  return o;
 }
 const withType = (o = {}) => (o.type ? { ...circuitOpts(o.type), ...o } : o);
-const circOf = (o = {}) => { const c = {}; for (const k of ['type', 'alt', 'width', 'side']) if (o[k] != null) c[k] = o[k]; return Object.keys(c).length ? c : undefined; };
+const circOf = (o = {}) => { const c = {}; for (const k of ['type', 'alt', 'width', 'side', 'up', 'fin', 'faf']) if (o[k] != null) c[k] = o[k]; return Object.keys(c).length ? c : undefined; };
+// the approach leg of a stretched circuit: its FAF is where the base turn rolls out
+const apprLeg = (endId, o, label = 'FINAL') => ({ kind: 'approach', end: endId, label, ...(o.faf ? { fafDist: o.faf } : {}) });
 
 function circuitLegs(endId, opts = {}) {
-  const { alt = PATTERN_ALT, side = circuitSide(endId), width = CIRC.downwindOff, speed = 85 } = withType(opts);
-  const e = runwayEnd(endId), sg = side === 'left' ? -1 : 1, L = e.len, up = CIRC.upwindExt, fin = CIRC.finalLen;
+  const { alt = PATTERN_ALT, side = circuitSide(endId), width = CIRC.downwindOff, speed = 85, up = CIRC.upwindExt, fin = CIRC.finalLen, faf = null } = withType(opts);
+  const e = runwayEnd(endId), sg = side === 'left' ? -1 : 1, L = e.len;
   const p = (s, l, a) => { const [x, z] = fromRunway(e, s, l * sg); return [x, a, z]; };
   const gp = (s) => (alt < PATTERN_ALT ? Math.max(e.elev + (AIM_DIST - s) * Math.tan(GLIDE_DEG * Math.PI / 180), 0) : 0); // low circuits: base not below the glide path
   return [
@@ -312,7 +338,7 @@ function circuitLegs(endId, opts = {}) {
     { kind: 'fly', to: p(L + up, width * 0.75, alt), speed, flaps: 0, label: 'CROSSWIND' },
     { kind: 'fly', to: p(L * 0.5, width, alt), speed, flaps: 0, label: 'DOWNWIND' },
     { kind: 'fly', to: p(300 - fin, width, Math.max(alt * 0.78, gp(300 - fin))), speed: 75, flaps: 1 / 3, label: 'DOWNWIND', end: endId, ext: true },
-    { kind: 'fly', to: p(-fin, width * 0.35, Math.max(alt * 0.55, gp(-fin))), speed: 72, flaps: 1 / 3, label: 'BASE', end: endId, ext: true },
+    { kind: 'fly', to: p(-fin, width * (faf ? 0.4 : 0.35), Math.max(alt * 0.55, gp(-fin))), speed: 72, flaps: 1 / 3, label: 'BASE', end: endId, ext: true },
   ];
 }
 
@@ -320,9 +346,9 @@ function circuitRoute(endId = DEFAULT_END, opts = {}) {
   return {
     name: `circuits ${endId}`,
     legs: [
-      { kind: 'takeoff', end: endId, label: 'TAKEOFF' },
+      { kind: 'takeoff', end: endId, label: 'TAKEOFF', ...(withType(opts).up ? { alt: 160 } : {}) },
       ...circuitLegs(endId, opts),
-      { kind: 'approach', end: endId, label: 'FINAL' },
+      apprLeg(endId, withType(opts)),
       { kind: 'taxi', dest: { hold: endId }, label: 'TAXI' },
       { kind: 'hold', end: endId, seconds: opts.holdSeconds ?? 4, untilClear: true, label: 'HOLD SHORT' },
     ],
@@ -368,7 +394,7 @@ function arrivalRoute(endId = DEFAULT_END, { stand = 'auto', parkSeconds = 25, t
       ...(far ? [{ kind: 'fly', to: [cx, alt + 150, cz], speed: 95, flaps: 0, label: 'INBOUND' }] : []),
       { kind: 'fly', to: [jx, alt + 60, jz], speed: 95, flaps: 0, label: 'INBOUND' },
       ...c.slice(2),
-      { kind: 'approach', end: endId, label: 'FINAL' },
+      apprLeg(endId, o),
       { kind: 'taxi', dest: { stand }, label: 'TAXI IN' },
       { kind: 'park', seconds: parkSeconds, label: 'PARKED' },
       ...(then ? then.legs : []),
@@ -418,9 +444,9 @@ function aiSpawn(kind, endId, { rnd = Math.random, claimStand = () => null, stan
   if (kind === 'parked' || kind === 'depart') {
     const sid = stand || claimStand();
     if (!sid) return null;
-    const s = standInfo(sid);
+    const s = standInfo(sid), hv = isHeavy(type) && heavySpot(sid);
     const r = departureRoute(endId, { outHeading: e.hdg + (rnd() < 0.5 ? -50 : 40) });
-    return { stand: sid, place: { x: s.pos[0], z: s.pos[1], heading: s.heading }, route: { ...r, legs: [{ kind: 'park', seconds: wait ?? 4 + rnd() * 20, label: 'BOARDING' }, ...r.legs] } };
+    return { stand: sid, place: hv ? { x: hv.x, z: hv.z, heading: hv.heading } : { x: s.pos[0], z: s.pos[1], heading: s.heading }, route: { ...r, legs: [{ kind: 'park', seconds: wait ?? 4 + rnd() * 20, label: 'BOARDING' }, ...r.legs] } };
   }
   const then = departureRoute(endId, { outHeading: e.hdg + (rnd() < 0.5 ? -50 : 40) });
   if (kind === 'downwind') {
@@ -450,7 +476,7 @@ function aiSpawn(kind, endId, { rnd = Math.random, claimStand = () => null, stan
 }
 
 return {
-  def, circuitSide, runwayEnd, allRunwayEnds, onRunway, taxiGraph, taxiPath, holdPoint, runwayEntries, standInfo,
+  def, circuitSide, runwayEnd, allRunwayEnds, onRunway, taxiGraph, taxiPath, holdPoint, runwayEntries, standInfo, heavySpot, isHeavy,
   circuitOpts, circuitLegs, circuitRoute, departureRoute, arrivalRoute, rerouteRunway, turnaroundRoute, aiSpawn,
 };
 }
@@ -459,6 +485,12 @@ function nearNode(nodes, x, z) {
   for (const n of nodes.values()) if (Math.abs(n.x - x) < 0.6 && Math.abs(n.z - z) < 0.6) return n;
   return null;
 }
+
+// Soft world boundary (JETCORE): radii (m) from the airport centre. A fast jet crosses the 14 km terrain in under a
+// minute. warn = the player is told; turn = the AP takes the stick and turns home (predicted 15 s ahead, so a fast jet
+// starts its turn early). docs/FLIGHT.md "World boundary".
+export const BOUNDARY = { warn: 8500, turn: 10000, rearm: 7500, lookahead: 15 };
+export const homeCenter = () => currentRoutes().def.center || [0, 0];
 
 // ---------- the active airport ----------
 let CUR = null;
@@ -474,6 +506,8 @@ export const taxiPath = (x, z, heading, dest) => currentRoutes().taxiPath(x, z, 
 export const holdPoint = (endId) => currentRoutes().holdPoint(endId);
 export const runwayEntries = (endId) => currentRoutes().runwayEntries(endId);
 export const standInfo = (id) => currentRoutes().standInfo(id);
+export const heavySpot = (id) => currentRoutes().heavySpot(id);
+export const isHeavy = (type) => currentRoutes().isHeavy(type);
 export const circuitOpts = (type) => currentRoutes().circuitOpts(type);
 export const circuitLegs = (endId, opts) => currentRoutes().circuitLegs(endId, opts);
 export const circuitRoute = (endId, opts) => currentRoutes().circuitRoute(endId, opts);

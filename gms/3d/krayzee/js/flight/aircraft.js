@@ -23,11 +23,27 @@ export const TYPES = {
 TYPES.tiger = { gearHeight: 1.25, ...AIRCRAFT.tiger.flight };
 // rubber-ball feet: lots of rolling drag (the roster's 150 m takeoff run)
 TYPES.bathtub = { gearHeight: 1.05, ...AIRCRAFT.bathtub.flight, gear: { rollDrag: 0.06, ...AIRCRAFT.bathtub.flight.gear } };
+// JETCORE (D33): jumbo, herc, f35. Their flight blocks carry gearHeight and the jet fields (engineKind, spool, ...).
+for (const id of ['jumbo', 'herc', 'f35']) if (AIRCRAFT[id]?.flight) TYPES[id] = { ...AIRCRAFT[id].flight };
+export const JET_TYPES = ['jumbo', 'herc', 'f35'];
+export const isJet = (type) => !!TYPES[type]?.jet;
+
+// Thrust fraction at airspeed V: a propeller fades linearly to thrustV0; a jet (thrustLapse) holds most of it.
+export function thrustFactor(P, V) {
+  return P.thrustLapse != null ? clamp(1 - P.thrustLapse * V / P.thrustV0, 0.05, 1) : clamp(1 - V / P.thrustV0, -0.15, 1);
+}
+// Clean / with-flaps stall speed (m/s) at the type's mass (1 g, level).
+export function stallSpeed(P, flaps = 0) {
+  return Math.sqrt((2 * P.mass * G) / (RHO * P.wingArea * (P.CL0 + P.CLa * (P.alphaStall - flaps * 0.025) + flaps * P.flapCL)));
+}
 
 // Leg/route speeds are written for the C172 (kt); other types fly them scaled by cruise speed.
 export function typeSpeedScale(type) { const P = TYPES[type] || TYPES.c172; return P.vcruise / TYPES.c172.vcruise; }
 export function typeInfo(type) { return AIRCRAFT[type] || AIRCRAFT.c172; }
-const HP_NAMES = { nose: 'nose', tail: 'tail', wingL: 'left wingtip', wingR: 'right wingtip', lowerWingL: 'left lower wingtip', lowerWingR: 'right lower wingtip', belly: 'belly', propTip: 'propeller' };
+const HP_NAMES = { nose: 'nose', tail: 'tail', wingL: 'left wingtip', wingR: 'right wingtip', lowerWingL: 'left lower wingtip', lowerWingR: 'right lower wingtip', belly: 'belly', propTip: 'propeller',
+  engL1: 'left inboard engine', engR1: 'right inboard engine', engL2: 'left outboard engine', engR2: 'right outboard engine',
+  propL1: 'left inboard propeller', propR1: 'right inboard propeller', propL2: 'left outboard propeller', propR2: 'right outboard propeller',
+  stabL: 'left tailplane', stabR: 'right tailplane', finL: 'left fin', finR: 'right fin', tankL: 'left drop tank', tankR: 'right drop tank' };
 
 export const GL = { track: 0.2, damp: 0.5 };
 const ROLL_MU = { runway: 0.02, taxiway: 0.022, apron: 0.022, grass: 0.075, building: 0.3, water: 0.6 };
@@ -39,8 +55,9 @@ export class Aircraft {
     this.id = opts.id || `ac${nextId++}`;
     this.type = opts.type || 'c172';
     this.P = TYPES[this.type] || TYPES.c172;
-    const d = opts.dims || {};
-    this.dims = { length: d.length || this.P.length, span: d.span || this.P.span, height: d.height || 2.7, gearHeight: d.gearHeight || this.P.gearHeight || 1.2 };
+    // jets: the flight block's geometry wins over a rig's dims (a missing jet model falls back to a C172 rig)
+    const d = this.P.jet ? {} : opts.dims || {};
+    this.dims = { length: d.length || this.P.length, span: d.span || this.P.span, height: d.height || this.P.height || 2.7, gearHeight: d.gearHeight || this.P.gearHeight || 1.2 };
     if (this.P.groundPitch != null) Object.assign(this.dims, { groundPitch: this.P.groundPitch, restHeight: this.P.restHeight });
     this.taildragger = !!this.P.gear.tailwheel;
     const E = typeInfo(this.type).engine || {};
@@ -50,7 +67,10 @@ export class Aircraft {
     this.prevPos = new V3(); this.prevQ = new Quat();
     this.ctl = { aileron: 0, elevator: 0, rudder: 0, throttle: 0, flaps: 0, brake: 0 };
     this.eng = 0; this.flapsPos = 0;
-    this.fuel = { cap: this.P.fuelCap ?? 100, L: this.P.fuelCap ?? 100, R: this.P.fuelCap ?? 100, idleLph: 6 * burn, fullLph: 50 * burn, lowFrac: 0.15, lowSent: false };
+    const B = this.P.burnLph;
+    this.fuel = { cap: this.P.fuelCap ?? 100, L: this.P.fuelCap ?? 100, R: this.P.fuelCap ?? 100, idleLph: B ? B[0] : 6 * burn, fullLph: B ? B[1] : 50 * burn, abLph: B?.[2] ?? 0, lowFrac: 0.15, lowSent: false };
+    this.engineKind = this.P.engineKind || E.kind || 'piston';
+    this.ab = 0; this.rev = 0; this.spoil = 0; this.sbrake = 0; this.gear = 1;
     this.engineOut = false;
     this.events = [];
     this.wind = new V3();
@@ -63,7 +83,7 @@ export class Aircraft {
   _buildPoints() {
     const P = this.P, gh = this.dims.gearHeight, g = P.gear, L = this.dims.length, S = this.dims.span, W = P.mass * G;
     const tw = this.taildragger, z3 = tw ? g.tail : g.nose, pair = !tw && g.noseTrack != null;
-    const share3 = tw || pair ? Math.abs(g.main[1]) / Math.abs(z3 - g.main[1]) : 0.2;
+    const share3 = tw || pair || P.jet ? Math.abs(g.main[1]) / Math.abs(z3 - g.main[1]) : 0.2;
     const k3 = tw ? g.kTail : g.kNose, c3 = tw ? g.cTail : g.cNose;
     const yM = g.mainY ?? -gh, y3 = tw ? g.tailY : (g.noseY ?? -gh);
     const sMain = (1 - share3) * W / 2 / g.kMain, s3 = share3 * W / (pair ? 2 : 1) / k3;
@@ -101,10 +121,14 @@ export class Aircraft {
     const y = o.y != null ? o.y : air ? gy + o.alt : gy + (sit ? this.P.restHeight : this.dims.gearHeight);
     this.pos.set(o.x, y, o.z);
     this.q.setFromHPR(o.heading || 0, o.pitch ?? (sit ? this.P.groundPitch : 0), o.roll || 0);
-    const sp = o.speed || 0;
+    let sp = o.speed || 0, fl = o.flaps || 0;
+    // jets placed in the air (a teleport written for light planes: main's 78 kt field hop) get a flying speed + flap
+    if (air && this.P.jet && sp < this.P.vapp * 1.1) { sp = this.P.vapp * 1.15; fl = Math.max(fl, this.P.toFlaps ?? 0); }
     this.vel.set(0, 0, -sp).applyQuat(this.q);
     this.eng = this.ctl.throttle = o.throttle != null ? o.throttle : air ? 0.6 : 0;
-    this.flapsPos = this.ctl.flaps = o.flaps || 0;
+    this.flapsPos = this.ctl.flaps = fl;
+    this.gearWant = this.gear = air && this.P.jet && o.alt > 150 ? 0 : 1;
+    this.ab = 0; this.rev = 0; this.spoil = 0; this.sbrake = 0; this.gear = 1;
     this.onGround = this.mainsDown = !air;
     this.prevPos.copy(this.pos); this.prevQ.copy(this.q);
     this._derive(env);
@@ -123,8 +147,11 @@ export class Aircraft {
     this.time += dt;
     const P = this.P, c = this.ctl;
     this._burn(dt);
-    this.eng = moveTo(this.eng, this.engineOut ? 0 : clamp(c.throttle, 0, 1), dt * 1.2);
-    this.flapsPos = moveTo(this.flapsPos, clamp(c.flaps, 0, 1), dt * 0.35);
+    const wantE = this.engineOut ? 0 : clamp(c.throttle, 0, 1);
+    // spool lag: pistons ~1 s; jets slow from idle (rate grows with N1), quicker winding down
+    this.eng = moveTo(this.eng, wantE, dt * (P.spool == null ? 1.2 : P.spool * (wantE < this.eng ? 1.5 : 0.35 + 0.65 * this.eng)));
+    if (P.abThrust) this.ab = moveTo(this.ab, !this.engineOut && c.throttle > (P.abFrom ?? 0.95) && this.eng > 0.9 ? 1 : 0, dt * (this.ab > 0 && c.throttle > (P.abFrom ?? 0.95) ? 3 : 5));
+    this.flapsPos = moveTo(this.flapsPos, clamp(c.flaps, 0, 1), dt * (P.flapRate ?? 0.35));
 
     const F = _f.set(0, 0, -1).applyQuat(this.q), U = _u.set(0, 1, 0).applyQuat(this.q), R = _r.set(1, 0, 0).applyQuat(this.q);
     const va = _va.copy(this.vel).sub(this.wind), V = va.len();
@@ -143,14 +170,19 @@ export class Aircraft {
     this.stalled = stalled && !this.mainsDown;
     if (V > 1) {
       const ge = agl < this.dims.span ? 0.55 + 0.45 * Math.max(0, agl) / this.dims.span : 1;
-      const CD = P.CD0 + this.flapsPos * P.flapCD + P.K * ge * CL * CL + (Math.abs(alpha) > aS ? 1.4 * Math.sin(alpha) ** 2 : 0);
+      if (this.spoil > 0) CL *= 1 - 0.75 * this.spoil;   // lift dump on the runway
+      const CD = P.CD0 + this.flapsPos * P.flapCD + P.K * ge * CL * CL + (Math.abs(alpha) > aS ? 1.4 * Math.sin(alpha) ** 2 : 0)
+        + 0.08 * this.spoil + (P.speedbrake ?? 0) * this.sbrake + (P.jet ? 0.015 * this.gear : 0) + (P.vWall && V > P.vWall ? P.CDwall * ((V - P.vWall) / 50) ** 2 : 0);
       const vdir = _vd.copy(va).scale(1 / V);
       const ldir = _ld.crossVectors(R, vdir).normalize();
       force.addScaled(ldir, qd * P.wingArea * CL);
       force.addScaled(vdir, -qd * P.wingArea * CD);
       force.addScaled(R, -qd * P.wingArea * P.CY * beta * 0.25);
     }
-    const thrust = this.engineOut ? 0 : P.thrustMax * (P.idle + (1 - P.idle) * this.eng) * clamp(1 - V / P.thrustV0, -0.15, 1);
+    const tf = thrustFactor(P, V);
+    let thrust = this.engineOut ? 0 : (P.thrustMax * (P.idle + (1 - P.idle) * this.eng) + (P.abThrust ?? 0) * this.ab) * tf;
+    if (this.rev > 0) thrust = thrust * (1 - this.rev) - (P.reverse ?? 0) * P.thrustMax * this.rev * clamp(V / 15, 0, 1);
+    this.thrust = thrust;
     force.addScaled(F, thrust);
 
     // Wheels: spring/damper normal force, rolling+brake friction, lateral grip, nosewheel steering.
@@ -196,17 +228,33 @@ export class Aircraft {
     this.noseDown = nose && !this.taildragger;
     this.tailDown = nose && this.taildragger;
     this.onGround = mains > 0 || nose;
+    // jets: reversers + lift dump with the brakes on the rollout (idle power, mains down); auto speed brake at idle aloft
+    const rolling = this.mainsDown && wasDown && c.throttle < 0.08 && V > 6;
+    if (P.reverse) this.rev = moveTo(this.rev, rolling && c.brake > 0.25 && !this.engineOut ? 1 : 0, dt * 0.9);
+    if (P.spoilers) this.spoil = moveTo(this.spoil, rolling ? 1 : 0, dt * 2.5);
+    if (P.speedbrake) this.sbrake = moveTo(this.sbrake, !this.onGround && c.throttle < 0.03 ? 1 : 0, dt * 1.5);
+    // jets: automatic gear (rig.setGear(ac.gear)): up once climbing away, down low and slowish or descending low
+    if (P.jet) {
+      const want = this.onGround || agl < 35 || (agl < 250 && this.vel.y < 1 && V < P.vapp * 1.5) ? 1 : agl > 40 && this.vel.y > 1 ? 0 : this.gear > 0.5 ? 1 : 0;
+      this.gearWant = want; this.gear = moveTo(this.gear, want, dt / (P.gearTime ?? 7));
+    }
 
     // Aerodynamic rotation: rate tracking toward what the surfaces + stability ask for.
     const eff = clamp(V / P.vRef, 0, 1.4);
     const effE = Math.max(eff, this.eng * 0.45 * (this.onGround ? 1 : 0.4));
     const bank = Math.atan2(-R.y, U.y);
     let tq = c.elevator * P.maxPitchRate * effE - P.kAlpha * (alpha - P.alphaTrim) * eff;
+    if (P.aoaLimit && !this.onGround) tq = Math.min(tq, (P.aoaLimit - alpha) * 4 * eff);   // fly-by-wire: the stick asks, the computer refuses the stall
     if (this.stalled) tq -= 0.35 * eff;
     let ty = -(c.rudder * P.maxYawRate * effE + P.kBeta * beta * eff);
     let tz = -(c.aileron * P.maxRollRate * eff) + (this.onGround ? 0 : P.kBank * bank * eff * (Math.abs(bank) < 1.2 ? 1 : 0));
     if (this.stalled) tz += Math.sin(this.time * 1.7 + this.pos.x) * 0.5 * eff;
     if (P.rollWobble && !this.onGround) tz += P.rollWobble.amp * Math.sin(2 * Math.PI * P.rollWobble.hz * this.time) * eff;
+    // fly-by-wire bank limit (F-35): full stick holds the limit instead of rolling it inverted into the ground
+    if (P.bankLimit && !this.onGround) {
+      if (bank > P.bankLimit && tz < 0) tz = (bank - P.bankLimit) * 3;
+      else if (bank < -P.bankLimit && tz > 0) tz = (bank + P.bankLimit) * 3;
+    }
     const kt = P.kTrack * (this.onGround ? 0.35 + eff : Math.max(0.4, eff));
     // taildragger on its wheels: weak aerodynamic yaw tracking, so the mains-ahead-of-CG instability shows (it will
     // ground-loop if you let it) but some damping keeps it catchable with the rudder. FLIGHTFIX3: only while the tail
@@ -266,7 +314,7 @@ export class Aircraft {
   _burn(dt) {
     const F = this.fuel;
     if (!F || this.engineOut) return;
-    const lps = (F.idleLph + (F.fullLph - F.idleLph) * this.eng) / 3600 * (this.fuelBurnScale ?? 1) * dt;
+    const lps = (F.idleLph + (F.fullLph - F.idleLph) * this.eng + (F.abLph || 0) * (this.ab || 0)) / 3600 * (this.fuelBurnScale ?? 1) * dt;
     F.L = Math.max(0, F.L - lps / 2); F.R = Math.max(0, F.R - lps / 2);
     const frac = (F.L + F.R) / (2 * F.cap);
     if (frac < F.lowFrac && !F.lowSent) { F.lowSent = true; this.emit('lowfuel', { litres: Math.round(F.L + F.R), fraction: +frac.toFixed(3) }); }
@@ -354,11 +402,26 @@ export class Aircraft {
       pitch: this.pitch, roll: this.bank, rpm: this._rpm(),
       slip: clamp(this.beta * 4, -1, 1), flaps: this.flapsPos,
       fuelL: this.fuel.L / this.fuel.cap, fuelR: this.fuel.R / this.fuel.cap, fuel: this.fuel.L + this.fuel.R, lowFuel: this.fuelFraction < this.fuel.lowFrac, engineOut: this.engineOut,
+      n1: this.n1, ab: this.ab, reverse: this.rev, engineKind: this.engineKind, gear: this.gear,
     };
+  }
+
+  // For AUDIO / FX (docs/FLIGHT.md "Engine state"): spool 0..1 (N1 for jets, power for props), afterburner 0..1,
+  // reverse 0..1, rpm (tach / N1 %), thrust N and its fraction of max dry thrust.
+  get n1() {
+    const P = this.P, i = (typeInfo(this.type).engine?.idleN1 ?? (this.engineKind === 'turboprop' ? 30 : 0)) / 100;
+    if (this.engineOut) return Math.max(0, Math.min(0.15, this.speed / 400));
+    return Math.max(i + (1 - i) * Math.pow(this.eng, 0.6), 0.75 * this.rev);
+  }
+  engineState() {
+    return { kind: this.engineKind, spool: this.eng, n1: this.n1, rpm: this._rpm(), ab: this.ab, afterburner: this.ab > 0.5, reverse: this.rev,
+      spoilers: this.spoil, speedbrake: this.sbrake, gear: this.gear, thrust: this.thrust ?? 0, thrustFrac: (this.thrust ?? 0) / this.P.thrustMax, engineOut: this.engineOut };
   }
 
   _rpm() {
     const [lo, hi] = this.rpmRange, span = hi - lo;
+    if (this.engineKind === 'turbofan' || this.engineKind === 'fighter') return this.n1 * 100;   // N1 %
+    if (this.engineKind === 'turboprop') return this.engineOut ? Math.min(lo, this.speed * 4) : lo + span * Math.min(1, 0.3 + this.eng);   // constant-speed props
     if (this.engineOut) return Math.min(lo * 1.4, this.speed * 12 * hi / 2700);
     return lo + this.eng * span * 0.86 + Math.min(span * 0.14, this.speed * 4);
   }

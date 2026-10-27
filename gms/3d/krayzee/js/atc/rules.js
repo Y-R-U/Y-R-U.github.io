@@ -19,7 +19,10 @@ export const T = {
   spacingTG: 45,                   // seconds at the threshold behind a touch-and-go
   spacingFull: 60,                 // behind a full-stop lander (rollout + vacate)
   // slow types float and roll past the first exit: touchdown-to-clear measured 30 s C172, 72 s Tiger, 62 s bathtub
-  spacingFullType: { tiger: 85, bathtub: 75 },
+  spacingFullType: { tiger: 85, bathtub: 75, jumbo: 95, herc: 70, f35: 65 },
+  // JETCORE: extra seconds behind a heavy's wake for anything of another type (arcade: the jumbo's wake is 'super')
+  wakeSpacing: { jumbo: 40, herc: 15 },
+  committedGs: { jumbo: 5, herc: 8, f35: 8 },   // m/s: past this on the takeoff roll a cleared jet is not cancelled
   spacingPlayer: 65,               // behind a human (who knows)
   minFinalGap: 22,                 // seconds; on final with less than this behind the leader = go around
   maxExtend: 5000,

@@ -97,6 +97,12 @@ No landing clearance by 500 m from the threshold → ATC sends you around. Takeo
   Spacing behind a full-stop lander is `T.spacingFull` (60 s), or `T.spacingFullType[type]` for slow types (Tiger 85 s,
   bathtub 75 s). At C-Tower 1, touchdown to clear of the runway measured 30 s for a C172, 72 s for a Tiger (it floats
   350 m, rolls past A3 and taxis to A2) and 62 s for the bathtub. The strip's `type` comes from bridge.js.
+- **Jets (JETCORE)**: a strip whose type has `circuitScale` > 1 (jumbo ×2.3, herc ×1.3, f35 ×1.6) is tracked on its
+  own stretched circuit (`circ(end, ext, type)` → `circuitFor(end, { off, up, fin })` from `routes.circuitOpts`), so
+  its leg/remaining distance are right on a 2.6 km downwind. `spacingFullType` jumbo 95 / herc 70 / f35 65 s, plus
+  `T.wakeSpacing` behind a heavy for anything of another type (jumbo +40 s, herc +15 s). A cleared jet already rolling
+  faster than `T.committedGs` (jumbo 5, herc/f35 8 m/s) is never cancelled (a spooling jumbo spends 10 s under 20 m/s),
+  and the AP refuses a reject above 0.35 Vr. Wake upsets themselves are physics (`traffic.js` WAKE, docs/FLIGHT.md).
 - **Departures**: one queue per active end, ordered lined-up → at the hold (by arrival time) → approaching. First in
   queue is cleared when the runway and its reservations are clear, no arrival is inside 2.2 km, the previous
   departure/touch-and-go is 700 m down the runway, and the intersection is free; otherwise `lineUpWait` when the next
@@ -249,6 +255,8 @@ node tools/atc-sim.mjs                 # 103 checks, ~3.5 min (+ landseq/placed/
                                        # seedRivals: the player lands first circuit, no go-around), and five 30-min AI soaks (attract 5 / 4 + 2 circuits /
                                        # attract 6 / runway change ×2 / mischief high / mixed types
                                        # C172+Tiger+bathtub) on the rolling terrain + castle
+node tools/atc-sim.mjs --only=flight "--run=jets among light traffic"   # JETCORE: 30 min, 3 in 11 spawns a jet, one at a time
+node tools/atc-sim.mjs --only=flight "--run=herc + f35"            # JETCORE: the fast/short-field pair (seed 61)
 node tools/atc-sim.mjs --only=flight --run=mixed [--seed=61] [--control]   # --control adds a C172-only run, same seed
 node tools/atc-sim.mjs --falsify       # breaks each detector/fix in a temp copy of js/atc; all 32 must be CAUGHT
 node tools/atc-sim.mjs --only=flight "--run=attract 6" [--minutes=30] [--watch=ac3,ac7 --from=600 --to=700] [--trace=name] [--dbgap]

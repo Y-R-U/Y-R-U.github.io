@@ -11,6 +11,12 @@ export function fitFov(camera, hfov, vMin = 45, vMax = 100) {
   camera.updateProjectionMatrix();
 }
 
+// Chase-camera size factor: ~1 for the light types (≤ 9.5 m), ~7.4 for the jumbo, ~1.6 for the F-35.
+export function chaseScale(ac) {
+  const d = ac?.dims;
+  return d ? Math.min(8, Math.max(1, Math.max(d.length || 0, (d.span || 0) * 0.8) / 9.5)) : 1;
+}
+
 export function createFlightCamera(camera, env) {
   const S = {
     view: 'chase', pos: new THREE.Vector3(), look: new THREE.Vector3(), fwd: new THREE.Vector3(0, 0, -1),
@@ -27,7 +33,7 @@ export function createFlightCamera(camera, env) {
         if (camera.aspect >= 1) fitFov(camera, 92, 44, 66); else { camera.fov = 80; camera.updateProjectionMatrix(); }
         S.pitchBias = camera.aspect > 1.8 ? -0.05 : 0;
       }
-      else { camera.near = 0.4; fitFov(camera, 78, 45, 90); }
+      else { camera.near = 0.4; fitFov(camera, 78, 45, 90); S.baseFov = camera.fov; }
     },
     kick(a) { S.shake = Math.max(S.shake, a); },
     // look = controls' look-around state { x (yaw rad), y (pitch rad), active }
@@ -55,7 +61,9 @@ export function createFlightCamera(camera, env) {
         fwd.y = Math.max(-0.5, Math.min(0.5, fwd.y));
         fwd.normalize();
         S.fwd.lerp(fwd, S.inited ? 1 - Math.exp(-dt * 3) : 1).normalize();
-        const dist = 15 + Math.min(6, ac.speed * 0.05), h = 3.6;
+        // JETCORE: the chase sits back by the airframe's size (a jumbo is 8.5 C172s long) and a little more with speed
+        const k = chaseScale(ac), fast = Math.max(0, ac.speed - 70);
+        const dist = (15 + Math.min(6, ac.speed * 0.05)) * k + Math.min(25, fast * 0.12), h = 3.6 * Math.pow(k, 0.85);
         const back = _v.copy(S.fwd).applyAxisAngle(UP, look.x);
         const want = new THREE.Vector3().copy(p).addScaledVector(back, -dist * Math.cos(look.y * 0.8));
         want.y += h + dist * Math.sin(look.y * 0.8) * -1;
@@ -75,8 +83,11 @@ export function createFlightCamera(camera, env) {
         }
         if (!S.inited) S.pos.copy(want);
         else S.pos.lerp(want, 1 - Math.exp(-dt * 6));
-        const lk = new THREE.Vector3().copy(p).addScaledVector(S.fwd, 7);
-        lk.y += 1;
+        const lk = new THREE.Vector3().copy(p).addScaledVector(S.fwd, 7 * k);
+        lk.y += k;
+        // and widens the view a touch at jet speeds (sense of speed; never on the ground)
+        const fov = (S.baseFov ??= camera.fov) + Math.min(12, fast * 0.06);
+        if (Math.abs(camera.fov - fov) > 0.05) { camera.fov += (fov - camera.fov) * (1 - Math.exp(-dt * 2)); camera.updateProjectionMatrix(); }
         if (!S.inited) S.look.copy(lk); else S.look.lerp(lk, 1 - Math.exp(-dt * 10));
         camera.position.copy(S.pos);
         camera.lookAt(S.look);

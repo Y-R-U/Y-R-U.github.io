@@ -203,7 +203,7 @@ async function onPlay(mode) {
     markers.setVisible(!SHOT); land.setState('idle');
     showSpot(wiring.difficulty === 'hard');
     setView(S.view);
-    try { engine?.dispose(); engine = audio.createEngineVoice({ gain: 1, priority: 1 }); } catch (e) { engine = null; }
+    try { engine?.dispose(); engine = audio.createEngineVoice({ gain: 1, priority: 1, kind: S.player?.ac.engineKind }); } catch (e) { engine = null; }
     log('play', { mode });
   } finally { S.starting = false; }
 }
@@ -224,7 +224,7 @@ function attachGame() {
   });
 }
 // Free Flight aircraft (TRAFFIC r3): C172, Tiger Moth, Royal Flying Bathtub. ?plane= wins, then settings.aircraft.
-const FLYABLE = ['c172', 'tiger', 'bathtub'];
+const FLYABLE = ['c172', 'tiger', 'bathtub', 'jumbo', 'herc', 'f35'];
 function aircraftType() {
   const q = params.get('plane');
   if (FLYABLE.includes(q)) return q;
@@ -339,7 +339,7 @@ function quitPlay() {
   wiring.endPlay();
   engine?.dispose(); engine = null;
   controls.setVisible(false); hud.setVisible(false); ghud.setVisible(false); showSpot(false); toCoach?.hide();
-  markers.setVisible(false); land.setVisible(false); S.landOn = false; document.documentElement.classList.remove('krz-land-on'); delete document.documentElement.dataset.krzAct;
+  markers.setVisible(false); land.setVisible(false); S.landOn = false; document.documentElement.classList.remove('krz-land-on', 'krz-msg-busy'); S.msgBusy = false; delete document.documentElement.dataset.krzAct;
   S.mode = 'attract'; S.paused = false;
   fitFov(camera, 70, 45, 85);
 }
@@ -657,18 +657,28 @@ function showSpot(on) {
   }
   if (spotMark) spotMark.visible = !!on;
 }
+// MSGFIX: html.krz-msg-busy while the player's hands and eyes are busy (hand-flying, low, rolling fast, a radio sheet open):
+// radio cards drop to one line and fade at once, prompt cards lose their sub line, PP popups shrink (radio.css / game.css).
+function msgFocus(P, modes, radioOpen) {
+  const ac = P.ac, manual = Object.values(modes || {}).some((m) => m === 'manual');
+  const busy = !ac.crashed && (manual || radioOpen || (!ac.onGround && ac.agl < 120) || (ac.onGround && ac.gs > 15 * KT));
+  if (busy !== S.msgBusy) { S.msgBusy = busy; document.documentElement.classList.toggle('krz-msg-busy', busy); }
+}
 function updateGameHUD(dt, P, modes) {
   const ac = P.ac;
   ghud.score.update(dt, { airborne: !ac.onGround, gsKt: ac.gs / KT });
   if (S.paused) return;
   S.playT += dt;
   const radioOpen = !!document.querySelector('.krz-r-panel:not([hidden])');
+  msgFocus(P, modes, radioOpen);
+  ghud.msgcap.update(dt);
   const blocked = AUTO || SHOT || radioOpen || ['goal', 'stick', 'release'].includes(ghud.coach.active);
   camera.getWorldDirection(_fwd);
   const camHeading = (Math.atan2(_fwd.x, -_fwd.z) * 180 / Math.PI + 360) % 360;
   ghud.prompts.update(dt, {
     atc: wiring.atc, traffic, player: P, ac, end: wiring.activeEnd(), idOf: wiring.idOf, entOf: wiring.entOf, nameOf: wiring.nameOf,
-    camera, camHeading, blocked: blocked || ghud.score.state.ceremony,
+    // MSGFIX: no opportunity cards during a story mission: its coach card already says what to do next
+    camera, camHeading, blocked: blocked || ghud.score.state.ceremony || !!story?.mission,
   });
   const g = wiring.game?.state?.();
   if ((S.warpT = (S.warpT || 0) - dt) <= 0) { S.warpT = 0.5; placeWarp(); }
@@ -734,6 +744,8 @@ function handleEvents(P, dt) {
     if (ev.type === 'goaround') hud.flash(`GO AROUND · ${friendlyReason(ev.reason)}`, 'warn');
     else if (ev.type === 'replan' && ev.to === 'approach') hud.flash(`AUTOPILOT · LANDING RUNWAY ${ev.end}`, 'info');
     else if (ev.type === 'recovery') hud.flash('AUTOPILOT · RECOVERING', 'warn');
+    else if (ev.type === 'boundary' && ev.quip) hud.flash(ev.quip, 'warn', 4);
+    else if (ev.type === 'refused' && ev.quip) hud.flash(ev.quip, 'warn', 3);
     else if (ev.type === 'goaroundrefused') { try { wiring.game?.handleEvent({ type: 'goaroundrefused', actor: 'player', reason: ev.reason }); } catch (e) { /* */ } }
   }
   if (ac.crashed && S.respawnT > 0 && (S.respawnT -= dt) <= 0) { placePlayer(); try { wiring.game?.respawn(); } catch (e) { /* */ } }
@@ -750,7 +762,9 @@ function updateAudio(dt) {
     const interior = S.view !== 'chase' && !!P;
     if (P && engine) {
       const ac = P.ac;
-      engine.setRPM(ac.crashed ? 0 : ac.instruments().rpm, ac.eng);
+      const jet = ac.engineKind && ac.engineKind !== 'piston';
+      engine.setRPM(ac.crashed ? 0 : (jet ? ac.n1 * 100 : ac.instruments().rpm), ac.eng);
+      engine.setAfterburner?.(ac.ab || 0);
       engine.setInterior(interior);
       engine.update(null, null, P.rig.root.position, ac.vel);
       audio.setWind(S.paused ? 0 : ac.speed / KT, { interior });
@@ -763,8 +777,10 @@ function updateAudio(dt) {
     for (const e of traffic.list) {
       if (e.player) continue;
       let v = aiVoices.get(e);
-      if (!v) { v = audio.createEngineVoice({ gain: 0.8 }); if (!v) continue; aiVoices.set(e, v); }
-      v.setRPM(e.ac.crashed ? 0 : e.ac.instruments().rpm, e.ac.eng);
+      if (!v) { v = audio.createEngineVoice({ gain: 0.8, kind: e.ac.engineKind }); if (!v) continue; aiVoices.set(e, v); }
+      const ej = e.ac.engineKind && e.ac.engineKind !== 'piston';
+      v.setRPM(e.ac.crashed ? 0 : (ej ? e.ac.n1 * 100 : e.ac.instruments().rpm), e.ac.eng);
+      v.setAfterburner?.(e.ac.ab || 0);
       v.update(null, null, e.rig.root.position, e.ac.vel);
     }
     for (const [e, v] of aiVoices) if (!traffic.list.includes(e)) { v.dispose(); aiVoices.delete(e); }

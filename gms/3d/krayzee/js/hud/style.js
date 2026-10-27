@@ -1,5 +1,12 @@
 // js/hud styles owned by UI round 4: kept out of css/game.css (another lane edits it), injected once by createGameHUD.
 const CSS = `/* parked AIRCRAFT chips: locked types (padlock, dimmed; the requirement shows on tap) */
+.krz-diff.krz-plane { flex-wrap: wrap; max-width: calc(100vw - 16px); row-gap: 3px; }
+/* D33: more than three planes in the AIRCRAFT row: slimmer chips in one row that scrolls sideways (stays in the top band) */
+.krz-diff.krz-plane:has(> button:nth-of-type(4)) button { min-width: 0; padding: 0 9px; flex: none; }
+.krz-diff.krz-plane:has(> button:nth-of-type(4)) { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; overscroll-behavior: contain; touch-action: pan-x; }
+.krz-diff.krz-plane:has(> button:nth-of-type(4))::-webkit-scrollbar { display: none; }
+.krz-diff.krz-plane:has(> button:nth-of-type(4)) span { flex: none; }
+.krz-chips.stack .krz-diff.krz-plane:has(> button:nth-of-type(4)) span { flex: none; padding: 0 2px 0 0; }
 .krz-diff button[data-locked] { color: rgba(246,241,228,.5); display: inline-flex; align-items: center; gap: 4px; }
 .krz-diff button[data-locked] svg { width: 10px; height: 12px; flex: none; opacity: .85; }
 .krz-diff button[data-locked].nope { animation: krz-shake .35s linear; }
@@ -89,6 +96,9 @@ const CSS = `/* parked AIRCRAFT chips: locked types (padlock, dimmed; the requir
   .krz-paper-toast:not(.in) { transform: translateY(4px); }
   .krz-pops { top: 54%; }
 }
+/* MSGFIX msgcap.js: messages over the on-screen budget wait, hidden, lowest priority first */
+html[data-krz-shed~="banner"] #krz-hud .krz-banner, html[data-krz-shed~="story"] .krz-st-coach, html[data-krz-shed~="score"] .krz-pop,
+html[data-krz-shed~="radio"] .krz-r-pill, html[data-krz-shed~="tasks"] .kz-tk-toast, html[data-krz-shed~="prompt"] .krz-prompt, html[data-krz-shed~="paper"] .krz-paper-toast { visibility: hidden !important; }
 `;
 
 export function injectHudCss() {

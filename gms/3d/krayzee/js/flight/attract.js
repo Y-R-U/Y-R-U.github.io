@@ -4,6 +4,11 @@ import { Autopilot } from './autopilot.js';
 import { aiSpawn } from './routes.js';
 import { TOWER } from '../world/layout.js';
 import { fitFov } from './cameras.js';
+import { PLANE_TYPES } from '../plane/index.js';
+
+// JETCORE (D33): AI is mostly light planes; now and then (one at a time) a heavy or the fast jet drops by, once its model
+// exists (until then createPlane would draw a C172 for it). Weights: herc 2, f35 2, jumbo 1.
+export const AI_JETS = { chance: 0.07, pool: ['herc', 'herc', 'f35', 'f35', 'jumbo'] };
 
 const NAMES = ['Wobble', 'Fizz', 'Crumpet', 'Toff', 'Bunty', 'Pip', 'Monty', 'Gussie', 'Plum', 'Biffy', 'Tuppence', 'Hector', 'Dottie', 'Jasper', 'Clarice'];
 const COMPANIES = ['Fizz Air', 'Posh Wings', 'Crumpet Air', 'Monocle Jet', 'Royal Wobble', 'Tiara Air', 'Scone Air', 'Gin & Wings', 'Duke Air', 'Corgi Air'];
@@ -35,7 +40,11 @@ export function createAttract({ scene, traffic, env, createPlane, quality, max =
   let respawnT = 0;
 
   async function spawn(kind, opts = {}) {
-    const type = opts.type || pick(types);
+    let type = opts.type || pick(types);
+    if (!opts.type && kind !== 'holding' && Math.random() < AI_JETS.chance && !ai.some((e) => AI_JETS.pool.includes(e.type))) {
+      const j = pick(AI_JETS.pool);
+      if (PLANE_TYPES.includes(j)) type = j;
+    }
     const rig = await createPlane({ type, livery: randomLivery(traffic.list.map((e) => e.name)), quality: quality === 'high' ? 'high' : 'low', cockpit: false });
     rig.setView('chase');
     rig.root.traverse((o) => { if (o.isMesh) { o.castShadow = true; } });

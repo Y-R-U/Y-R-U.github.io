@@ -1,5 +1,5 @@
 // Headless flight-core harness (no browser): node tools/flight-sim.mjs [scenario] [--trace]
-// Scenarios: landmany | feel | circuit | override | cutin | stall | taxi | traffic | types | typeoverride | typeground | all
+// Scenarios: jets (jumbo/herc/f35, --only=jumbo) | landmany | feel | circuit | override | cutin | stall | taxi | traffic | types | typeoverride | typeground | all
 import { Aircraft, TYPES, GL } from '../js/flight/aircraft.js';
 import { AIRCRAFT } from '../data/aircraft.js';
 import { Autopilot } from '../js/flight/autopilot.js';
@@ -874,9 +874,237 @@ async function scFix3() {
     check(`FIX3 #7 ${type}: LAND from the story's PRESS LAND line-up (${agl0.toFixed(0)} m) lands on RWY 27 and stops`, !p.fail && p.label === 'RWY 27' && t != null && R.ev.td[0]?.surface === 'runway' && !R.ev.imp.length, `${p.label || p.fail}/${p.pattern}, stopped after ${t?.toFixed(0)} s on ${R.ev.td[0]?.surface}`);
   }
 }
+// JETCORE (D33): jumbo / herc / f35 through the whole loop. node tools/flight-sim.mjs jets [--only=jumbo]
+const JETS = ['jumbo', 'herc', 'f35'];
+export const JET_NUMBERS = {};
+async function scJets() {
+  const { planLandAhead, armLandNow } = await import('../js/assist/landahead.js');
+  const { fakeWorld, layout } = await import('../js/assist/test/fakeworld.mjs');
+  const { finishZone, DEFAULT_SPOT } = await import('../js/game/finish.js');
+  const { BOUNDARY, homeCenter, heavySpot, isHeavy } = await import('../js/flight/routes.js');
+  const { WAKE } = await import('../js/flight/traffic.js');
+  const W = fakeWorld(), wenv = { groundHeightAt: W.groundHeightAt, surfaceAt: W.surfaceAt, colliders: W.colliders };
+  const only = (args.find((a) => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
+  const types = only.length ? JETS.filter((t) => only.includes(t)) : JETS;
+  const e27 = runwayEnd('27');
+  const sOf = (ac) => toRunwayS(e27, ac);
+  const setup = (type, place, route, { world = true, rubber = true } = {}) => {
+    const E = world ? wenv : env, tr = new Traffic(E), ac = new Aircraft({ type }), ap = new Autopilot(ac);
+    ac.place(place, E); if (rubber) ac.impactHandler = () => ({ result: 'bounce', restitution: 0.35 });
+    const ent = tr.add({ aircraft: ac, ap, player: true, name: 'P' });
+    ap.setRoute(route); if (place.alt) ap.replan();
+    const ev = { imp: [], td: [], ap: [], ac: [] };
+    const step = (secs, stop) => { for (let t = 0; t < secs; t += 1 / 60) { tr.update(1 / 60); for (const e of ac.events.splice(0)) { ev.ac.push(e); if (e.type === 'impact' || e.type === 'crash') ev.imp.push(e.reason); if (e.type === 'touchdown') ev.td.push({ ...e, s: sOf(ac) }); } for (const e of ap.events.splice(0)) ev.ap.push(e); if (stop && stop(t)) return t; if (ac.crashed) return null; } return null; };
+    const plan = (now) => { if (now) armLandNow(); return planLandAhead({ pos: ac.pos, vel: ac.vel, heading: ac.heading, altitude: ac.alt, onGround: ac.onGround, world: W, layout }); };
+    const stopped = () => ap.done && ac.onGround && ac.speed < 0.5;
+    return { tr, ac, ap, ent, ev, step, plan, stopped, E };
+  };
+  for (const type of types) {
+    const N = (JET_NUMBERS[type] = {}), book = AIRCRAFT[type].performance.takeoffRollM, P = TYPES[type];
+    // A. circuit 27 on the real-ish world: takeoff inside the runway, circuit, landing, stop on the runway, back to the hold
+    {
+      const [x, z] = fromRunway(e27, 10, 0);
+      const R = setup(type, { x, z, heading: e27.hdg }, circuitRoute('27', { type }), { rubber: false });
+      let lift = null, maxXtk = 0, vApp = null, stopS = null, tdT = null, rollT0 = null, gearUp = false, gearTd = null;
+      R.step(1200, (t) => {
+        const ac = R.ac, s = sOf(ac), l = Math.abs((ac.pos.z - e27.thr[1]) * e27.u[0] - (ac.pos.x - e27.thr[0]) * e27.u[1]);
+        if (rollT0 == null && ac.speed > 1) rollT0 = { s, t };
+        if (!lift && !ac.onGround && ac.agl > 0.3) lift = { s, kt: ac.speed / KT, d: s - rollT0.s };
+        if (R.ap.phase === 'FINAL' && s > -1200 && s < 0) maxXtk = Math.max(maxXtk, l);
+        if (R.ap.phase === 'FINAL' && vApp == null && s > -300) vApp = ac.speed / KT;
+        if (R.ev.td.length && tdT == null) { tdT = t; gearTd = ac.gear; }
+        if (!ac.onGround && ac.gear < 0.01) gearUp = true;
+        if (R.ev.ap.some((e) => e.type === 'landed') && stopS == null) stopS = s;
+        return lift && R.ap.leg.kind === 'hold';
+      });
+      const td = R.ev.td[0], bad = R.ev.ac.filter((e) => ['crash', 'impact', 'tailstrike', 'hardlanding'].includes(e.type));
+      Object.assign(N, { takeoffRollM: Math.round(lift?.d), liftKt: Math.round(lift?.kt), approachKt: Math.round(vApp), touchdownFpm: td?.fpm, touchdownS: Math.round(td?.s), landedAtS: Math.round(stopS) });
+      check(`${type} circuit 27: airborne inside the runway (${Math.round(lift?.d)} m of ${1400 - 10}; book ${book} m ±25 %)`, lift && lift.s < e27.len - 60 && Math.abs(lift.d - book) <= book * 0.25, lift && `${lift.d.toFixed(0)} m, ${lift.kt.toFixed(0)} kt`);
+      check(`${type} circuit 27: no crash / impact / tail strike / hard landing`, !bad.length && !R.ac.crashed, bad.map((b) => b.type + ' ' + (b.reason || '')).join() || 'clean');
+      check(`${type} circuit 27: final within 15 m of the centreline inside 1.2 km`, maxXtk < 15, `${maxXtk.toFixed(1)} m`);
+      check(`${type} circuit 27: one touchdown on the runway < 500 fpm, rolled out to 9 m/s before the far end`, td && td.surface === 'runway' && td.fpm < 500 && R.ev.td.length === 1 && stopS != null && stopS < e27.len - 20, td && `${td.fpm} fpm at s=${td.s.toFixed(0)}, slowed at s=${stopS?.toFixed(0)} (approach ${vApp?.toFixed(0)} kt)`);
+      check(`${type} circuit 27: gear retracted in the circuit, down and locked at touchdown`, gearUp && gearTd > 0.99, `up ${gearUp}, at touchdown ${gearTd?.toFixed(2)}`);
+      check(`${type} circuit 27: taxied back to the hold`, R.ap.leg.kind === 'hold', R.ap.phase);
+    }
+    // B. LAND from three places: always the runway (never a field), touchdown + stop
+    {
+      const c = circuitLegs('27', { type }), dw = c[2].to;
+      const cases = [['straight in, 6 km', (() => { const [x, z] = fromRunway(e27, -6000, 0); return { x, z, alt: 430, heading: 270 }; })()],
+        ['circuit downwind', { x: dw[0], z: dw[2], alt: dw[1], heading: 90 }],
+        ['open country, 4 km south', { x: 600, z: 4200, alt: 500, heading: 0 }]];
+      const res = [];
+      for (const [name, pl] of cases) {
+        const R = setup(type, { ...pl, speed: P.vcruise * 0.95, throttle: 0.6 }, circuitRoute('27', { type }));
+        R.step(1);
+        const p = R.plan(); if (!p.fail) R.ap.landAt(p);
+        const t = R.step(600, R.stopped);
+        const td = R.ev.td[0];
+        res.push({ ok: !p.fail && p.kind === 'runway' && t != null && td?.surface === 'runway' && !R.ev.imp.length, t, d: `${name}: ${p.label || p.fail}/${p.pattern} ${t != null ? 'stopped ' + t.toFixed(0) + ' s' : 'NOT stopped ' + R.ap.phase} td ${td?.fpm} fpm ${td?.surface} ${R.ev.imp.join()}` });
+      }
+      // LAND gone round low (busy runway / not lined up): its own short circuit back to the same runway, then down
+      {
+        const R = setup(type, { ...cases[0][1], speed: P.vcruise * 0.95, throttle: 0.6 }, circuitRoute('27', { type }));
+        R.step(1); const p = R.plan(); R.ap.landAt(p);
+        let forced = null;
+        const t = R.step(700, (tt) => { if (!forced && R.ap.leg?.kind === 'approach' && !R.ac.onGround && R.ac.agl < 60) { R.ap._goAround('not lined up'); forced = tt; } return R.stopped(); });
+        const gas = R.ev.ap.filter((x) => x.type === 'goaround').length;
+        res.push({ ok: forced != null && t != null && R.ev.td[0]?.surface === 'runway' && gas <= 2 && !R.ev.imp.length, t, d: `LAND go-around: forced at ${forced?.toFixed(0)} s, stopped ${t?.toFixed(0)} s, ${gas} go-arounds, td ${R.ev.td.map((x) => x.surface + '@' + Math.round(x.s) + '/' + x.fpm).join(' ')} ${R.ev.imp.join()}` });
+      }
+      // LAND on Realistic with a plane parked in the touchdown zone (loop suite jumbo-hard: the tower sends it round, it must
+      // come back round and land long, past it, with no engine pod in the grass)
+      {
+        const R = setup(type, { ...cases[0][1], speed: P.vcruise * 0.95, throttle: 0.6 }, circuitRoute('27', { type }), { rubber: false });
+        const [px, pz] = fromRunway(e27, 180, 0), blk = new Aircraft({ type: 'c172' });
+        blk.place({ x: px, z: pz, heading: 270 }, R.E);
+        const bap = new Autopilot(blk); R.tr.add({ aircraft: blk, ap: bap, name: 'PARKED' }); bap.setRoute({ name: 'parked', legs: [{ kind: 'park', seconds: 1e9 }], loop: null });
+        R.step(1); const p = R.plan(); R.ap.landAt(p);
+        const t = R.step(900, R.stopped);
+        res.push({ ok: t != null && R.ev.td[0]?.surface === 'runway' && !R.ac.crashed && !blk.crashed, t, d: `occupied (td ${R.ev.td.map((x) => x.surface + '@' + Math.round(x.s)).join('/')}, blocker ${blk.crashed ? 'HIT' : 'ok'}, ${R.ev.imp.join() || 'no impacts'}): ${t != null ? 'stopped ' + t.toFixed(0) + ' s at s=' + Math.round(sOf(R.ac)) : 'NOT stopped ' + R.ap.phase} ${R.ac.crashed ? 'CRASH ' + R.ac.crashReason : ''}` });
+      }
+      N.landSecs = res.map((r) => Math.round(r.t ?? -1));
+      check(`${type} LAND ×3 (straight-in / downwind / open country) + a LAND go-around + touchdown zone occupied (Realistic): runway, touchdown on the runway, stopped`, res.every((r) => r.ok), res.map((r) => (r.ok ? "" : "✗ ") + r.d).join('; '));
+    }
+    // C. LAND NOW off a downwind: the runway (straight if it can, else its circuit + a quip), never a field
+    {
+      const c = circuitLegs('27', { type }), dw = c[2].to;
+      const R = setup(type, { x: dw[0], z: dw[2], alt: dw[1], heading: 90, speed: P.vcruise * 0.95, throttle: 0.6 }, circuitRoute('27', { type }));
+      R.step(1);
+      const p1 = R.plan(); if (!p1.fail) R.ap.landAt(p1);
+      R.step(5);
+      const p2 = R.plan(true); if (!p2.fail) R.ap.landAt(p2);
+      const t = R.step(600, R.stopped);
+      check(`${type} LAND NOW from the downwind: still the runway (no field), ${p2.pattern === 'straight' ? 'straight in' : 'with a quip'}, lands and stops`, !p2.fail && p2.kind === 'runway' && (p2.pattern === 'straight' || !!p2.quip) && t != null && R.ev.td[0]?.surface === 'runway', `${p1.label}/${p1.pattern} → NOW ${p2.label || p2.fail}/${p2.pattern} "${p2.quip || ''}" stopped ${t?.toFixed(0)} s`);
+    }
+    // C1. LAND is offered anywhere on the jet's own (stretched, possibly ATC-extended) circuit: a runway plan, never
+    // "NO FIELD AHEAD" (integration verify: herc downwind 2.5 nm out and f35 upwind 1.2 nm out had LAND greyed)
+    {
+      const L = circuitLegs('27', { type }), up = fromRunway(e27, 1400 + 900, 0), ext = L[3].to, base = L[4].to;
+      const spots = [['upwind 1.2 nm', { x: up[0], z: up[1], alt: 160, h: 270 }], ['crosswind', { x: L[1].to[0], z: L[1].to[2] * 0.6, alt: L[1].to[1], h: 180 }],
+        ['downwind', { x: L[2].to[0], z: L[2].to[2], alt: L[2].to[1], h: 90 }], ['downwind extended +2.5 km', { x: ext[0] + 2500, z: ext[2], alt: ext[1], h: 90 }],
+        ['base', { x: base[0], z: (base[2] + ext[2]) / 2, alt: base[1], h: 0 }]];
+      const out = spots.map(([n, q]) => {
+        const h = q.h * Math.PI / 180, V = P.vcruise;
+        const p = planLandAhead({ pos: { x: q.x, y: q.alt, z: q.z }, vel: { x: Math.sin(h) * V, y: 0, z: -Math.cos(h) * V }, heading: q.h, altitude: q.alt, onGround: false, world: W, layout, type });
+        return { ok: !p.fail && p.kind === 'runway' && !/FIELD/.test(p.hint || ''), d: `${n}: ${p.fail ? 'FAIL ' + p.hint : p.label + '/' + p.pattern}` };
+      });
+      check(`${type} LAND offered on its own circuit (upwind, crosswind, downwind, extended downwind, base): a runway plan`, out.every((o) => o.ok), out.map((o) => o.d).join('; '));
+    }
+    // C2. LAND pressed in the climb-out (the loop suite's field branch): an open runway, never closed 04/22 or a field
+    {
+      const [x, z] = fromRunway(e27, 10, 0);
+      const R = setup(type, { x, z, heading: e27.hdg }, circuitRoute('27', { type }), { rubber: false });
+      R.step(200, () => !R.ac.onGround && R.ac.agl > 80);
+      let p = R.plan();
+      for (let k = 0; k < 60 && p.fail; k++) { R.step(2); p = R.plan(); }   // as the button: tapped once LAND is offered (a jumbo climbing away has nothing ahead at first)
+      if (!p.fail) R.ap.landAt(p);
+      if (p.pattern !== 'straight') { const q = R.plan(true); if (!q.fail) R.ap.landAt(q); }
+      const t = R.step(700, R.stopped), rw = p.runway && layout.RUNWAYS.find((r) => r.ends.includes(p.runway));
+      check(`${type} LAND in the climb-out: an open runway (not closed 04/22, not a field), landed and stopped without hitting anyone`, !p.fail && p.kind === 'runway' && rw && !rw.closed && t != null && !R.ac.crashed, `${p.label || p.fail}/${p.pattern}, stopped ${t?.toFixed(0)} s ${R.ac.crashed ? 'CRASH ' + R.ac.crashReason : ''}`);
+    }
+    // D. go-around on final (tower or AP): climbs away (never below 15 m after), comes round and lands
+    {
+      const e = runwayEnd('27'), [x, z] = fromRunway(e, -2600, 0);
+      const R = setup(type, { x, z, alt: 2730 * Math.tan(4 * Math.PI / 180) + 5, heading: 270, speed: P.vapp * 1.05, throttle: 0.4, flaps: 2 / 3 }, circuitRoute('27', { type }), { rubber: false });
+      let ga = null, minAfter = 1e9;
+      const t = R.step(900, (tt) => { if (!ga && R.ap.leg?.kind === 'approach' && !R.ac.onGround && R.ac.agl < 60) { R.ap.goAround('test'); ga = tt; } if (ga && tt - ga < 30) minAfter = Math.min(minAfter, R.ac.agl); return ga && R.ap.leg?.kind === 'hold'; });
+      check(`${type} go-around at 60 m: climbs away (min ${minAfter.toFixed(0)} m), comes round, lands, back at the hold`, ga != null && minAfter > 15 && t != null && R.ev.td.length >= 1 && R.ev.td.every((d) => d.surface === 'runway') && !R.ac.crashed, `GA at ${ga?.toFixed(0)} s, at the hold after ${t?.toFixed(0)} s, td ${R.ev.td.map((d) => d.fpm).join('/')} ${R.ac.crashed ? 'CRASH ' + R.ac.crashReason : ''}`);
+    }
+    // E. land → Hard taxi to the terminal (heavies: their own pull-in spot) → DEMAND TAKEOFF: airborne inside the runway
+    {
+      const e = runwayEnd('27'), [x, z] = fromRunway(e, -3500, 0);
+      const R = setup(type, { x, z, alt: 3630 * Math.tan(4 * Math.PI / 180), heading: 270, speed: P.vapp * 1.05, throttle: 0.4, flaps: 2 / 3 }, circuitRoute('27', { type }), { rubber: false });
+      const p = R.plan(); R.ap.landAt(p);
+      R.step(400, R.stopped);
+      const sid = R.ap.taxiIn({ stand: DEFAULT_SPOT.id });
+      const tt = R.step(600, () => R.ap.leg?.kind === 'park' && R.ac.speed < 0.3);
+      const zone = finishZone('hard', { x: R.ac.pos.x, z: R.ac.pos.z, surface: R.ac.surface }, DEFAULT_SPOT), hv = isHeavy(type) ? heavySpot(sid) : null;
+      check(`${type} taxi in (Hard): parks ${hv ? 'on the heavy spot in front of ' + hv.stands.join('+') : 'at ' + sid}, Hard finish zone OK, nothing hit`, tt != null && zone.ok && !R.ev.imp.length && !R.ac.crashed && (!hv || Math.hypot(R.ac.pos.x - hv.x, R.ac.pos.z - hv.z) < 12), `stand ${sid} after ${tt?.toFixed(0)} s at ${R.ac.pos.x.toFixed(0)},${R.ac.pos.z.toFixed(0)} zone ${zone.ok ? 'ok' : zone.reason} ${R.ev.imp.join()}`);
+      const end = R.ap.demandTakeoff({ ends: ['27', '09'], prefer: '27' });
+      let lift = null;
+      const ta = R.step(400, () => { if (!lift && !R.ac.onGround && R.ac.agl > 0.3) lift = { s: toRunwayS(runwayEnd(end), R.ac) }; return lift && R.ac.agl > 30; });
+      N.demandToAir = Math.round(ta ?? -1);
+      check(`${type} DEMAND TAKEOFF from the terminal: airborne inside the runway (${runwayEnd(end).len} m), circuits`, !!end && ta != null && lift.s < runwayEnd(end).len - 40 && !R.ev.imp.length && R.ap.route.name.startsWith('circuits'), `RWY ${end}${R.ap.demandDirect ? ' (direct)' : ''}: > 30 m after ${ta?.toFixed(0)} s, lift at s=${lift?.s.toFixed(0)} ${R.ev.imp.join()}`);
+      // DEMAND TAKEOFF with an AI waiting at the near end's hold (loop suite jumbo-easy: it parked 75 m behind it for 300 s):
+      // a jet cannot squeeze past, so it goes to the other end; and it never rolls from mid-runway with too little left
+      {
+        const Q = setup(type, { x: 362, z: -110, heading: 90 }, circuitRoute('27', { type }), { rubber: false });
+        Q.ap.done = true;
+        const h = holdPoint('27'), ai = new Aircraft({ type: 'c172' }), aap = new Autopilot(ai);
+        ai.place({ x: h[0], z: h[1], heading: 180 }, Q.E); Q.tr.add({ aircraft: ai, ap: aap, name: 'AI' });
+        aap.setRoute({ name: 'circuits 27', legs: [{ kind: 'hold', end: '27', seconds: 999, untilClear: true }, ...circuitRoute('27').legs], loop: 1 });
+        const end2 = Q.ap.demandTakeoff({ ends: ['27', '09'], prefer: '27' });
+        let lift2 = null;
+        const t2 = Q.step(500, () => { if (!lift2 && !Q.ac.onGround) lift2 = toRunwayS(runwayEnd(end2), Q.ac); return lift2 != null && Q.ac.agl > 30; });
+        const M = setup(type, (() => { const [x, z] = fromRunway(runwayEnd('09'), 700, 0); return { x, z, heading: 90 }; })(), circuitRoute('09', { type }), { rubber: false });
+        M.ap.done = true; M.ap.demandTakeoff({ ends: ['09', '27'], prefer: '09' });
+        let liftM = null;
+        M.step(400, () => { if (!liftM && !M.ac.onGround) liftM = toRunwayS(runwayEnd(M.ap.route.legs.find((l) => l.kind === 'takeoff')?.end ?? '09'), M.ac); return liftM != null && M.ac.agl > 30; });
+        check(`${type} DEMAND TAKEOFF: not stuck behind an AI at the near hold (heavy: the other end), airborne; from mid-runway (700 m left) it lines up at a threshold first`, end2 === (isHeavy(type) || book * 1.1 > 850 ? '09' : end2) && t2 != null && lift2 < 1360 && liftM != null && liftM < 1360 && !Q.ev.imp.length && !M.ev.imp.length, `→ RWY ${end2}, airborne ${t2?.toFixed(0)} s, lift at s=${lift2?.toFixed(0)}; mid-runway start lifted at s=${liftM?.toFixed(0)}`);
+      }
+      // a jet never takes off from a field: fieldTakeoff refuses (main falls back)
+      const F = setup(type, { x: 2600, z: 1500, heading: 90 }, circuitRoute('27', { type }));
+      const ft = F.ap.fieldTakeoff({ world: W, end: '27' }), q = F.ap.events.find((x) => x.type === 'refused');
+      check(`${type} fieldTakeoff refuses (no turnip-field departures), with a quip`, ft === false && !!q?.quip, q?.quip);
+    }
+    // F. hand-flown upset at 400 m: rolled past 100° and pushed nose-down, released: the AP recovers
+    {
+      const R = setup(type, { x: 0, z: 2500, alt: 400, heading: 90, speed: P.vcruise, throttle: 0.6 }, circuitRoute('27', { type }), { rubber: false });
+      for (let t = 0; t < 8 && Math.abs(R.ac.bank) < Math.min(1.8, (P.bankLimit ?? 9) - 0.05); t += 1 / 60) { R.ent.manual.aileron = 1; R.ent.manual.elevator = -0.4; R.step(1 / 60); }
+      const bank0 = R.ac.bank;
+      R.ent.manual.aileron = null; R.ent.manual.elevator = null;
+      let minA = R.ac.agl, lv = null;
+      let worse = 0;
+      R.step(40, (t) => { minA = Math.min(minA, R.ac.agl); if (lv == null && R.ap.phase !== 'RECOVERY' && Math.abs(R.ac.bank) < 0.55 && R.ac.pitch > -0.1) lv = t; if (lv != null && (Math.abs(R.ac.bank) > 0.8 || R.ac.pitch < -0.3)) worse++; return lv != null && t > lv + 10; });
+      check(`${type} hand-flown upset (${(bank0 * 57.3).toFixed(0)}° bank${P.bankLimit ? ', held at the FBW limit' : ''}, nose down) released: recovered < 25 s (back in an AP bank, nose up), stays recovered, never below 80 m`, Math.abs(bank0) > (P.bankLimit ? P.bankLimit - 0.15 : 1.5) && Math.abs(bank0) < (P.bankLimit ?? 9) + 0.25 && lv != null && lv < 25 && !worse && minA > 80 && !R.ac.crashed, `recovered after ${lv?.toFixed(1)} s, min ${minA.toFixed(0)} m AGL`);
+    }
+    // G. the world edge: flown by hand straight out at cruise; warned, then the AP takes it home
+    {
+      const [cx, cz] = homeCenter();
+      const R = setup(type, { x: cx + 7000, z: cz, alt: 600, heading: 90, speed: P.vcruise * 1.3, throttle: 1 }, circuitRoute('27', { type }), { world: false, rubber: false });
+      let maxR = 0, inbound = null, tLock = null;
+      R.step(240, (t) => {
+        R.ent.manual.elevator = 0.02; R.ent.manual.aileron = 0; R.ent.manual.throttle = 1;   // keeps flying out, full power
+        const r = Math.hypot(R.ac.pos.x - cx, R.ac.pos.z - cz); maxR = Math.max(maxR, r);
+        if (tLock == null && R.ent.bnd.lock) tLock = t;
+        if (tLock != null && inbound == null && (R.ac.vel.x * (cx - R.ac.pos.x) + R.ac.vel.z * (cz - R.ac.pos.z)) / r > 0.5 * R.ac.gs) inbound = t;
+        return inbound != null && t > inbound + 10;
+      });
+      const st = R.ev.ap.filter((e) => e.type === 'boundary').map((e) => e.stage);
+      N.boundaryMaxKm = +(maxR / 1000).toFixed(1);
+      check(`${type} world edge: warned, AP takes the stick and turns home (inbound ${inbound != null ? (inbound - tLock).toFixed(0) + ' s after' : 'never'}), max ${(maxR / 1000).toFixed(1)} km (< 13.5 km terrain)`, st[0] === 'warn' && st.includes('turnback') && inbound != null && maxR < 13500 && !R.ac.crashed, `${st.join(' → ')}; quip "${R.ev.ap.find((e) => e.stage === 'turnback')?.quip}"`);
+    }
+  }
+  if (!only.length || only.includes('f35')) {
+    // H. F-35 afterburner: lights above 95 % throttle, out below; more thrust; more fuel
+    const ac = new Aircraft({ type: 'f35' }), flat = { groundHeightAt: () => 0, surfaceAt: () => 'runway', colliders: [] };
+    ac.place({ x: 0, z: 0, alt: 1000, heading: 90, speed: 150, throttle: 0.9 }, flat);
+    const run = (thr, secs) => { for (let t = 0; t < secs; t += 1 / 120) { ac.ctl.throttle = thr; ac.step(1 / 120, flat); } return { ...ac.engineState(), fuel: ac.fuel.L + ac.fuel.R }; };
+    const dry = run(0.94, 6), f0 = dry.fuel, wet = run(1, 2), wetFuel = run(1, 6).fuel, off = run(0.9, 2);
+    check('f35 afterburner: lights above 95 % throttle (ab > 0.9, afterburner flag), more thrust than dry, goes out below', dry.ab === 0 && !dry.afterburner && wet.ab > 0.9 && wet.afterburner && wet.thrust > dry.thrust * 1.3 && off.ab < 0.1, `dry ${(dry.thrust / 1000).toFixed(0)} kN n1 ${dry.n1.toFixed(2)} | AB ${(wet.thrust / 1000).toFixed(0)} kN ab ${wet.ab.toFixed(2)} | back to 90 %: ab ${off.ab.toFixed(2)}`);
+    check('f35 afterburner: burns fuel ~3× faster', (f0 - wetFuel) / 8 > 0, `${(f0 - wetFuel).toFixed(1)} L in 8 s of AB`);
+  }
+  if (!only.length || only.includes('jumbo')) {
+    // I. wake: a C172 on final 2.5 km behind a jumbo is rolled about (an upset) but survives and lands
+    const tr = new Traffic(env), e = runwayEnd('27');
+    const J = new Aircraft({ type: 'jumbo' }), [jx, jz] = fromRunway(e, -3000, 0); J.place({ x: jx, z: jz, alt: 3130 * Math.tan(4 * Math.PI / 180), heading: 270, speed: TYPES.jumbo.vapp, throttle: 0.4, flaps: 1 }, env);
+    const ja = new Autopilot(J); tr.add({ aircraft: J, ap: ja, name: 'JUMBO' }); ja.setRoute(arrivalRoute('27', { type: 'jumbo', stand: 'auto' })); ja.replan();
+    const C = new Aircraft({ type: 'c172' }), [cx, cz] = fromRunway(e, -3800, 0); C.place({ x: cx, z: cz, alt: 3930 * Math.tan(4 * Math.PI / 180) - 4, heading: 270, speed: 65 * KT, throttle: 0.4, flaps: 1 }, env);
+    const ca = new Autopilot(C); tr.add({ aircraft: C, ap: ca, name: 'C172', player: true }); ca.setRoute(circuitRoute('27')); ca.replan(); ca.noAvoid = true;
+    let wake = 0, maxBank = 0, td = null;
+    let lastWake = -99, bank0 = 0;
+    for (let t = 0; t < 600 && !(td && C.speed < 5); t += 1 / 60) {
+      tr.update(1 / 60);
+      for (const ev of C.events.splice(0)) { if (ev.type === 'wake') { wake++; if (t - lastWake > 4) bank0 = C.bank; lastWake = t; } if (ev.type === 'touchdown' && !td) td = ev; }
+      if (!C.onGround && t - lastWake < 4) maxBank = Math.max(maxBank, Math.abs(C.bank - bank0));   // bank the wake put in (not the AP's own turns)
+    }
+    check(`wake: a C172 0.8 km behind a jumbo down the final meets its wake (${wake}×), gets rolled (${(maxBank * 57.3).toFixed(0)}° within 4 s of an encounter) and survives to land`, wake > 0 && maxBank > 0.35 && !C.crashed && !!td, `td ${td?.fpm} fpm ${td?.surface}, crash ${C.crashed ? C.crashReason : 'no'}`);
+  }
+  for (const t of types) console.log(`  ${t}: ${JSON.stringify(JET_NUMBERS[t])}`);
+}
+
 function R1speed(type) { return Math.min(80 * KT, (TYPES[type]?.vcruise ?? 95 * KT) * 0.8); }
 
-const S = { fix3: scFix3, aaron: scAaron, loopext: scLoopExtend, throttle: scThrottleTakeback, landmany: scLandMany, feel: scPlayerFeel, spawn: scSpawn, impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed };
+const S = { fix3: scFix3, aaron: scAaron, loopext: scLoopExtend, throttle: scThrottleTakeback, landmany: scLandMany, feel: scPlayerFeel, spawn: scSpawn, impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed, jets: scJets };
 for (const [k, f] of Object.entries(S)) if ((scen === 'all' && k !== 'mixed') || scen === k) { console.log(`\n== ${k}`); await f(); }
 const fails = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - fails}/${results.length} passed`);

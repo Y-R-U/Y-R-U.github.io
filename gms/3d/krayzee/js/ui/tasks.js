@@ -148,7 +148,7 @@ function onGridTap(e) {
 
 // ---------------------------------------------------------------- in flight: a small queued tick, top-left under the score
 // It slides down the left edge from under the score until it clears the HUD strip, banner, subtitles and buttons.
-const AVOID = ['.krz-score', '.krz-top-l', '.krz-top-r', '#krz-hud .krz-hud-strip', '#krz-hud .krz-ap', '#krz-hud .krz-axes', '#krz-hud .krz-banner', '.krz-r-subs', '.krz-r-tower', '.krz-warp', '.krz-prompt', '.krz-r-panel'];
+const AVOID = ['.krz-score', '.krz-top-l', '.krz-top-r', '#krz-hud .krz-hud-strip', '#krz-hud .krz-ap', '#krz-hud .krz-axes', '#krz-hud .krz-banner', '.krz-r-subs', '.krz-r-tower', '.krz-warp', '.krz-prompt', '.krz-r-panel', '.krz-st-coach']; // MSGFIX: and the story coach card
 function visibleRects() {
   const out = [];
   for (const s of AVOID) for (const n of document.querySelectorAll(s)) {

@@ -49,6 +49,19 @@
 .krz-r-pill.on-air .krz-r-dot { box-shadow: 0 0 0 2px rgba(255,255,255,.25), 0 0 8px var(--c); }
 .krz-r-text { font-size: 14px; line-height: 1.3; margin-top: 1px; text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 0 6px rgba(0,0,0,.6); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .krz-r-pill.is-player .krz-r-text { font-style: italic; }
+/* MSGFIX: the transcript badge on the newest card ("+2" = two lines folded away; tap the card for the log) */
+.krz-r-more { margin-left: auto; flex: none; padding: 0 6px; border-radius: 8px; background: rgba(255,255,255,.16); color: var(--ink);
+  font: 800 10px/15px system-ui, sans-serif; font-style: normal; letter-spacing: .02em; font-variant: normal; }
+.krz-r-more[hidden] { display: none; }
+/* MSGFIX: phones get two-line cards; one line while the player is busy (hand-flying, low, a radio sheet open) */
+@media (max-width: 600px), (max-height: 500px) {
+  .krz-r-text { -webkit-line-clamp: 2; font-size: 13.5px; line-height: 1.25; }
+  .krz-r-pill { padding: 4px 9px 5px; border-radius: 11px; }
+}
+html.krz-msg-busy .krz-r-text { -webkit-line-clamp: 1; }
+/* a story mission's coach card already takes the band above: radio cards under it keep to one line (tap = full log) */
+@media (orientation: portrait) { html.krz-coach-on .krz-r-text { -webkit-line-clamp: 1; } }
+html.krz-msg-busy .krz-r-pill:not(.on-air) { opacity: .45; }
 
 .krz-r-drawer {
   position: absolute; top: var(--top); left: calc(var(--sl) + 8px); right: calc(var(--sr) + var(--krz-tr-w, 78px) + 8px);
@@ -131,9 +144,27 @@
 .krz-r-chip-ico { width: 24px; height: 24px; flex: none; color: var(--gold); }
 .krz-r-chip-body { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .krz-r-lbl { font-size: 13px; font-weight: 800; line-height: 1.15; }
-.krz-r-tgt { font-size: 11px; font-weight: 700; color: #f6f1e4; color: color-mix(in srgb, var(--c) 45%, #fff); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.krz-r-tgt { font-size: 11px; font-weight: 700; color: #f6f1e4; color: color-mix(in srgb, var(--c) 35%, #fff); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .krz-r-k { position: absolute; top: 3px; right: 6px; font-size: 10px; font-weight: 800; color: rgba(255,255,255,.3); }
 @media (hover: none) { .krz-r-k { display: none; } }
+
+/* MSGFIX: a slimmer sheet in portrait: one header line, 44 px chips (still a thumb's worth) */
+@media (orientation: portrait) and (max-width: 600px) {
+  .krz-r-panel { padding: 4px 6px 6px; border-radius: 14px; max-width: 400px; }
+  .krz-r-head { padding: 0 0 4px 4px; gap: 6px; }
+  .krz-r-title { flex-direction: row; align-items: baseline; gap: 7px; }
+  .krz-r-title b { font-size: 13px; flex: none; }
+  .krz-r-title span { font-size: 11.5px; }
+  .krz-r-secs { font-size: 13px; }
+  .krz-r-x { width: 36px; height: 32px; border-radius: 10px; font-size: 22px; }
+  .krz-r-chips { gap: 5px; }
+  .krz-r-chips[data-n="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .krz-r-chips[data-n="3"] .krz-r-chip-ico { display: none; }
+  .krz-r-chip { min-height: 44px; padding: 3px 7px; gap: 6px; border-radius: 11px; }
+  .krz-r-chip-ico { width: 20px; height: 20px; }
+  .krz-r-lbl { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .krz-r-tgt { font-size: 10.5px; }
+}
 
 /* ---- landscape: button on the right edge above the right control zone; chips a column to its left ---- */
 @media (orientation: landscape) {

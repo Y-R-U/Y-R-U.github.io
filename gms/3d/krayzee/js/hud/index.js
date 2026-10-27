@@ -9,6 +9,7 @@ import { createGroundButtons } from './ground.js';
 import { createHeadlines } from './headlines.js';
 import { createOnlineHUD } from './online.js';
 import { injectHudCss } from './style.js';
+import { createMsgCap } from './msgcap.js';
 
 export function createGameHUD(root, { getSettings, onTarget, onFinish, onTakeoff, onSkip, onReel, onDifficulty, onAircraft, coachForce = false } = {}) {
   injectHudCss();
@@ -28,8 +29,9 @@ export function createGameHUD(root, { getSettings, onTarget, onFinish, onTakeoff
   ground = createGroundButtons(actions, { chipRoot: el, onTakeoff: () => onTakeoff?.(), onSkip: () => onSkip?.(), onDifficulty: (d) => onDifficulty?.(d), onAircraft: (a) => onAircraft?.(a) });
   const coach = createCoach(el, { force: coachForce });
   const online = createOnlineHUD(el);
+  const msgcap = createMsgCap();
   return {
-    el, score, prompts, coach, finish, ground, actions, headlines, online,
-    setVisible(v) { el.hidden = !v; score.setVisible(v); if (!v) { coach.end(); prompts.reset(); finish.set('hidden'); ground.set({}); headlines.reset(); online.setVisible(false); } },
+    el, score, prompts, coach, finish, ground, actions, headlines, online, msgcap,
+    setVisible(v) { el.hidden = !v; score.setVisible(v); if (!v) { coach.end(); prompts.reset(); finish.set('hidden'); ground.set({}); headlines.reset(); online.setVisible(false); msgcap.reset(); } },
   };
 }

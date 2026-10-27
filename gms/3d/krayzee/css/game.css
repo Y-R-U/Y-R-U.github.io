@@ -203,6 +203,25 @@ html.krz-shot #krz-controls, html.krz-shot #krz-hud, html.krz-shot #krz-ghud, ht
 .krz-pop-bank .krz-pop-amt { font-size: 30px; }
 .krz-pop-k { flex-basis: 100%; font: 800 11px/1 system-ui; letter-spacing: .4em; color: #fff1c4; margin-left: .4em; }
 @keyframes krz-sheen { to { transform: translateX(100%); } }
+/* MSGFIX: phones in portrait get a slimmer PP popup and a one-line prompt sub; busy flying drops the sub altogether */
+@media (max-width: 600px), (max-height: 500px) {
+  .krz-pop { padding: 5px 12px 6px; border-radius: 12px; }
+  .krz-pop-amt { font-size: 20px; }
+  .krz-pop-bank { padding: 7px 16px 8px; }
+  .krz-pop-bank .krz-pop-amt { font-size: 24px; }
+  .krz-pop-k { letter-spacing: .28em; }
+  .krz-pop em { font-size: 13.5px; }
+}
+@media (orientation: portrait) and (max-width: 600px) {
+  .krz-prompt { max-width: min(300px, calc(100vw - 110px)); }
+  .krz-pr-t { font-size: 12px; }
+  .krz-prompt .krz-pr-s { -webkit-line-clamp: 1; }
+}
+/* MSGFIX: with DEMAND IT / DEMAND TAKEOFF in the action slot, portrait PP popups sit just above it instead of under it */
+@media (orientation: portrait) {
+  html[data-krz-act="1"] #krz-ghud .krz-pops, html[data-krz-act="2"] #krz-ghud .krz-pops { top: auto; bottom: calc(var(--sb, 0px) + var(--krz-ctl-bottom, 200px) + 74px + var(--krz-act-h, 70px)); }
+}
+html.krz-msg-busy .krz-prompt .krz-pr-s, html.krz-msg-busy .krz-pop-chips, html.krz-msg-busy .krz-pop em { display: none; }
 
 /* rank-up ceremony + Herald card */
 #krz-ghud.has-cer .krz-pops { top: 60%; }

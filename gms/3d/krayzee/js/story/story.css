@@ -48,6 +48,11 @@
 .krz-st-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .krz-st-goal { font: 650 10.5px/1.25 system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--krz-st-gold); opacity: .92; }
 .krz-st-goal[hidden], .krz-st-goal:empty { display: none; }
+/* MSGFIX: a coach line that has been read folds to two lines (the goal is on the briefing and the step counter) */
+.krz-st-coach.brief .krz-st-goal, html.krz-msg-busy .krz-st-coach .krz-st-goal { display: none; }
+.krz-st-coach.brief .krz-st-txt, html.krz-msg-busy .krz-st-coach .krz-st-txt { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.krz-st-coach.brief .krz-st-txt { -webkit-line-clamp: 1; }
+.krz-st-coach.brief { pointer-events: auto; cursor: pointer; }
 .krz-st-coach.goal .krz-st-goal { animation: krz-st-goal 1.4s ease-out 1; }
 @keyframes krz-st-goal { 0% { color: #6fe3a0; } 100% { color: var(--krz-st-gold); } }
 .krz-st-coach.done { border-color: #6fe3a0; }

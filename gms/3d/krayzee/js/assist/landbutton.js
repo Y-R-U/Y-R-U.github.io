@@ -8,6 +8,8 @@ let nowArmed = false, lastPlan = null;
 export function armLandNow() { nowArmed = true; }
 export function takeLandNow() { const v = nowArmed; nowArmed = false; return v; }
 export function noteLandPlan(p) { if (p && !p.fail) lastPlan = p; }
+// JETCORE: a jet's LAND NOW that went for the runway instead of a field carries plan.quip; the button shows it a while
+const quipShown = (p) => p?.quip && (p.quipAt ??= Date.now()) > Date.now() - 6000 ? p.quip : null;
 
 const CSS = `
 .krz-land[data-now="1"] { translate: 0 -58px; }
@@ -64,7 +66,7 @@ export function createLandButton({ container, onPress, stickRight = false } = {}
     if (s === 'active' && state !== 'active') guardAt = clock();
     state = s; reason = why;
     el.dataset.state = s;
-    if (s === 'active') { b.textContent = 'LANDING…'; small.textContent = why || 'touch controls to cancel'; }
+    if (s === 'active') { b.textContent = 'LANDING…'; small.textContent = quipShown(lastPlan) || why || 'touch controls to cancel'; }
     else if (s === 'unavailable') { b.textContent = 'LAND'; small.textContent = why; }
     else { b.textContent = 'LAND'; small.textContent = why; }
     el.setAttribute('aria-disabled', s === 'unavailable' ? 'true' : 'false');
