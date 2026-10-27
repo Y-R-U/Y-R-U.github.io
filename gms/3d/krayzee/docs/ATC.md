@@ -257,6 +257,7 @@ node tools/atc-sim.mjs                 # 103 checks, ~3.5 min (+ landseq/placed/
                                        # C172+Tiger+bathtub) on the rolling terrain + castle
 node tools/atc-sim.mjs --only=flight "--run=jets among light traffic"   # JETCORE: 30 min, 3 in 11 spawns a jet, one at a time
 node tools/atc-sim.mjs --only=flight "--run=herc + f35"            # JETCORE: the fast/short-field pair (seed 61)
+node tools/atc-sim.mjs --only=jetland [--starts=6] [--dbgjet]     # JETCORE: the player's jet LAND + DEMAND TAKEOFF amid AI, Realistic
 node tools/atc-sim.mjs --only=flight --run=mixed [--seed=61] [--control]   # --control adds a C172-only run, same seed
 node tools/atc-sim.mjs --falsify       # breaks each detector/fix in a temp copy of js/atc; all 32 must be CAUGHT
 node tools/atc-sim.mjs --only=flight "--run=attract 6" [--minutes=30] [--watch=ac3,ac7 --from=600 --to=700] [--trace=name] [--dbgap]

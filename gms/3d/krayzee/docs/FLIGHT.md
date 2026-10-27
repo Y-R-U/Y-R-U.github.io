@@ -270,8 +270,15 @@ radius (45/32/18 m) and −30…+30 m of it is rolled (up to 7 / 4 / 1.8 rad/s²
 the trail picks the direction) and pushed down. Event `wake { from, strength, cls }` on the victim (≤ 1 per 6 s). Arcade:
 a C172 0.8 km behind a jumbo on final gets ~35° of bank and lands (1.6 km behind: ~15°; 2.6 km: the vortices have sunk away).
 
-**Contacts**: the vertical test compares airframe middles (`height/2 − gearHeight`) with a tolerance of
-max(2.6, 0.3 × both heights): a jumbo (CG 4.8 m up) no longer drives through a C172. Taxi spacing behind traffic is
+**Contacts**: light pairs keep ±2.6 m; with a jet the airframes' real height bands (wheels to fin top) must overlap: a
+jumbo (CG 4.8 m up) cannot drive through a C172, and one climbing out 10 m over a plane lined up at the far threshold no
+longer "collides" with it (integration's jumbo-hard "bumped into K-BUNT").
+**A jet's DEMAND TAKEOFF waits at the hold line** (nose behind it, measured square off the centreline) while someone is
+on the runway pavement ahead of its entry (or within 80 m behind it); its nose used to creep onto the runway, ATC then
+held the lined-up plane for ever. After 40 s it goes past a stationary one sitting beyond its lift-off point
+(roll + 100 m). Phase `HOLD SHORT · RUNWAY BUSY`. Test: atc-sim `jetland` (18 starts: LAND in the climb-out amid light
+traffic under ATC, Realistic, then taxi in and DEMAND TAKEOFF with a rival at the hold) — 4 jumbo collisions on HEAD
+7ab895e6's autopilot. Taxi spacing behind traffic is
 measured nose to tail for long types.
 
 **World boundary** (`routes.BOUNDARY`, `Traffic._boundary`, player only): terrain exists to ±14 km (`world/terrain.js`

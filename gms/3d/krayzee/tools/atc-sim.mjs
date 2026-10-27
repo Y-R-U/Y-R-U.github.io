@@ -995,6 +995,68 @@ async function playStart() {
   check(`play start: the player lands on the first circuit without a go-around (${N} starts)`, !bad.length, bad.length ? bad.map((r) => `seed ${r.seed}: ${r.ga.join(',') || 'no touchdown'}`).join('; ') : `touchdown ${Math.min(...res.map((r) => r.td))}-${Math.max(...res.map((r) => r.td))} s`);
 }
 
+// JETCORE (integration: jumbo-hard-portrait "field: LAND" bumped into an AI): the player's jet, lined up on the active
+// end amid attract-style light traffic under real ATC, presses LAND in the climb-out (and LAND NOW when offered), as the
+// loop suite's field branch does. Realistic (no impact handler): it must land and stop without touching anyone.
+async function jetLand() {
+  const { Aircraft, Autopilot, Traffic, R, linkTraffic } = await flightLib();
+  const { planLandAhead, armLandNow } = await import('../js/assist/landahead.js');
+  const layout = await import('../js/world/layout.js');
+  const N = +(args.starts || 6), TYPES = ['c172', 'c172', 'tiger', 'bathtub'], res = [];
+  const realRandom = Math.random;
+  for (const jet of ['jumbo', 'herc', 'f35']) for (let seed = 1; seed <= N; seed++) {
+    const rnd = seeded(seed * 7 + jet.length); Math.random = rnd;
+    const env = { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
+    const tr = new Traffic(env, {}), atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false }), link = linkTraffic(atc, tr, { rnd });
+    const ai = [];
+    const spawn = (kind, o = {}) => {
+      const type = TYPES[Math.floor(rnd() * TYPES.length)], ac = new Aircraft({ type });
+      const plan = R.aiSpawn(kind, atc.activeRunway().end, { ...o, rnd, type, claimStand: () => tr.claimStand(ac) });
+      if (!plan) return null;
+      ac.place(plan.place, env); if (plan.stand) tr.standOwner.set(plan.stand, ac);
+      const e = tr.add({ aircraft: ac, ap: new Autopilot(ac), name: `${kind}-${type}` }); e.ap.setRoute(plan.route); ai.push(e); return e;
+    };
+    ['downwind', 'final', 'parked', 'parked'].forEach((k, i) => spawn(k, { wait: i === 2 ? 3 : 35 }));
+    let t = 0, respawnT = 0;
+    const step = () => {
+      tr.update(1 / 60); link.update(1 / 60); t += 1 / 60;
+      for (const e of [...ai]) if (e.ap.done && e.ap.phase === 'GONE') { atc.remove(link.idOf(e)); tr.remove(e); ai.splice(ai.indexOf(e), 1); }
+      if (ai.length < 4 && (respawnT -= 1 / 60) <= 0) { respawnT = 12 + rnd() * 15; spawn(rnd() < 0.55 ? 'arrive' : 'depart', { wait: 2 }); }
+    };
+    while (t < 5) step();
+    const end = atc.activeRunway().end, e0 = R.runwayEnd(end), [px, pz] = R.fromRunway(e0, 12, 0);
+    for (const a of [...ai]) if (a.ac.onGround && Math.hypot(a.ac.pos.x - px, a.ac.pos.z - pz) < 160) { atc.remove(link.idOf(a)); tr.remove(a); ai.splice(ai.indexOf(a), 1); }
+    const pac = new Aircraft({ type: jet }), P = tr.add({ aircraft: pac, ap: new Autopilot(pac), player: true, name: 'player' });
+    pac.place({ x: px, z: pz, heading: e0.hdg }, env); P.ap.setRoute(R.circuitRoute(end, { type: jet })); link.placed(P, 8);
+    const hits = [], t0 = t;
+    const watch = () => { for (const ev of pac.events.splice(0)) if (ev.type === 'collision' || ev.type === 'crash' || ev.type === 'impact') hits.push(`${ev.type}${ev.reason ? ' ' + ev.reason : ''} @${(t - t0).toFixed(0)}s ${P.ap.phase}/${P.ap.sub} ${pac.pos.x.toFixed(0)},${pac.pos.z.toFixed(0)}`); };
+    while (t - t0 < 240 && !(!pac.onGround && pac.agl > 80)) { step(); watch(); }
+    let plan = null;
+    const tryPlan = (now) => { if (now) armLandNow(); return planLandAhead({ pos: pac.pos, vel: pac.vel, heading: pac.heading, altitude: pac.alt, onGround: pac.onGround, world: env, layout, type: jet }); };
+    for (let k = 0; k < 240 && !pac.crashed; k++) { plan = tryPlan(); if (!plan.fail) break; for (let j = 0; j < 60; j++) { step(); watch(); } }
+    if (plan && !plan.fail) { P.ap.landAt(plan); if (plan.pattern !== 'straight') { const q = tryPlan(true); if (!q.fail) { P.ap.landAt(q); plan = q; } } }
+    const t1 = t;
+    while (t - t1 < 700 && !pac.crashed && !(P.ap.done && pac.onGround && pac.speed < 0.5)) { step(); watch(); }
+    // then DEMAND TAKEOFF from where it stopped with a rival at the hold (who ATC lines up): never touch it, get airborne
+    let up = null;
+    if (!hits.length && !pac.crashed && P.ap.done) {
+      P.ap.taxiIn({ stand: 'S4' });   // Hard: to the terminal first (the loop case)
+      const tq = t; while (t - tq < 400 && !pac.crashed && !(P.ap.leg?.kind === 'park' && pac.speed < 0.3)) { step(); watch(); }
+      spawn('holding');
+      link.demandTakeoff(P);
+      const t2 = t;
+      while (t - t2 < 420 && !pac.crashed && !(up = !pac.onGround && pac.agl > 30 ? t - t2 : null)) {
+        step(); watch();
+        if (args.dbgjet && Math.round((t - t2) * 60) % 1800 === 0) console.log(`  JL ${jet}#${seed} t=${(t - t2).toFixed(0)} P ${P.ap.phase} end ${P.ap.cur?.e?.id} cmds ${atc.instructionsFor(link.idOf(P)).map((c) => c.type)} ${whyHeld(atc).replace(/\n/g, " ")} ${pac.pos.x.toFixed(0)},${pac.pos.z.toFixed(0)} | ` + tr.list.filter((o) => o !== P && o.ac.onGround && R.onRunway(o.ac.pos.x, o.ac.pos.z, 0)).map((o) => `${o.name} ${o.ap?.phase} ${o.ac.pos.x.toFixed(0)},${o.ac.pos.z.toFixed(0)} ${JSON.stringify(atc.strip(link.idOf(o)))?.slice(0, 120)}`).join(' ; '));
+      }
+    }
+    res.push({ jet, seed, ok: !hits.length && !pac.crashed && up != null, d: `${up != null ? 'demand→air ' + up.toFixed(0) + ' s ' : 'DEMAND TAKEOFF not airborne (' + P.ap.phase + ') '}` + `${jet}#${seed} ${plan?.label || plan?.fail}/${plan?.pattern} ${hits.join('; ') || (P.ap.done && pac.onGround ? 'stopped ' + (t - t1).toFixed(0) + ' s' : 'not stopped ' + P.ap.phase)}` });
+  }
+  Math.random = realRandom;
+  const bad = res.filter((r) => !r.ok);
+  check(`jet LAND in the climb-out amid light traffic (${res.length} starts, Realistic): lands and stops without touching anyone, then DEMAND TAKEOFF past a rival at the hold`, !bad.length, bad.length ? bad.map((r) => r.d).join(' | ') : res.map((r) => r.d.split(' ').slice(0, 2).join(' ')).join(', '));
+}
+
 const R0 = () => FL.R;
 // ATCSEQ (2026-10-22): the player on LAND, a lined-up placement, a closed-runway crossing, a U-turn off the runway.
 async function seqWorld(seed = 3) {
@@ -1139,7 +1201,7 @@ if (XF) SCEN.circuits09 = () => aiCircuits('09');
 if (!XF) { SCEN.flightcut = flightCutIn; SCEN.gameplay = gameplay; SCEN.avoid = seeAvoid; SCEN.playstart = playStart; }
 SCEN.flight = flightSoak;
 // after the soaks: aircraft ids are global, and the soaks' see-and-avoid tie-breaks (higher id gives way) depend on them
-if (!XF) Object.assign(SCEN, { landseq: landSeq, placed: placedLineUp, closedx: closedCrossing, uturn, refusedga: refusedGA });
+if (!XF) Object.assign(SCEN, { landseq: landSeq, placed: placedLineUp, closedx: closedCrossing, uturn, refusedga: refusedGA, jetland: jetLand });   // jetland last: it adds planes (global ids)
 for (const [name, fn] of Object.entries(SCEN)) {
   if (args.only && args.only !== name) continue;
   const t0 = Date.now();

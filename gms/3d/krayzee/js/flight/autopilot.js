@@ -86,7 +86,7 @@ export class Autopilot {
 
   _begin(fromCurrent) {
     const ac = this.ac, leg = this.leg;
-    this.legT = 0; this.sub = ''; this.iGround = 0; this.waitAhead = 0;
+    this.legT = 0; this.sub = ''; this.iGround = 0; this.waitAhead = 0; this._jetWaitT = 0; this._jetGo = false;
     const cur = (this.cur = { fromCurrent });
     if (!leg) return;
     if (leg.kind === 'despawn') { this.done = true; this.phase = 'GONE'; return; }
@@ -722,9 +722,26 @@ export class Autopilot {
       else if (this.isPlayer) vt = Math.max(vt, Math.min(this._gnd.turn < 1 ? 8 : 10, this._naughtyTaxi(pr)));
       if (this.demand && pr.toEnd < 30) vt = Math.max(vt, 4 * Math.min(1, this._gnd.turn * 1.25));   // rolling start
       if (this.demand && this._gnd.turn < 0.5) vt = Math.min(vt, 1.4 + Math.sqrt(2 * 0.7 * Math.max(0, pr.toEnd - 25)));   // FLIGHTFIX3: a narrow track (bathtub) arrives slow: the line-up turn tips it past ~1.6 m/s
+      // JETCORE (loop jumbo-hard): a jet's DEMAND still waits at the hold line while someone is ON the runway (lined up,
+      // rolling, landed): its nose 35 m ahead of the CG crept onto the runway, ATC then held the lined-up plane for ever
+      // (or the jumbo bumped into it). Nose behind the hold line; it goes the moment the runway is physically clear.
+      // (only someone on the pavement AHEAD of where we join it, or just behind: a plane lined up at the far threshold behind
+      // our intersection departure is not in the way)
+      const end0 = this.cur.path[this.cur.path.length - 1], sIn = end0 ? toRunway(e, end0.x, end0.z).s : 0;
+      const onRw = P.jet && !e.virtual && (this.traffic?.list || []).some((o) => o.ac !== ac && o.ac.onGround && !o.ac.crashed && onRunway(o.ac.pos.x, o.ac.pos.z, 0) === e.rw && toRunway(e, o.ac.pos.x, o.ac.pos.z).s > sIn - 80
+        // one that has sat still well beyond our lift-off point is waited for 40 s at most (it waits for us, ATC-wise)
+        && (!this._jetGo || o.ac.gs > 1 || toRunway(e, o.ac.pos.x, o.ac.pos.z).s - sIn < (typeInfo(ac.type).performance?.takeoffRollM ?? 600) + 100));
+      this._jetWait = false;
+      if (this.demand && onRw && !onRunway(ac.pos.x, ac.pos.z, 2)) {
+        // measured square off the centreline (a direct path comes in at an angle): nose behind the hold line, clear of ATC's 30 m
+        const d = Math.min(pr.toEnd, Math.abs(toRunway(e, ac.pos.x, ac.pos.z).l)) - (HOLD_OFFSET ?? 50) - ac.dims.length * 0.5;
+        if (d < 40) { vt = Math.min(vt, Math.sqrt(2 * 0.7 * Math.max(0, d))); this._jetWait = d < 3; }
+      }
+      if (this._jetWait && (this._jetWaitT = (this._jetWaitT ?? 0) + 1 / 120) > 40) this._jetGo = true;   // waited 40 s: a still one far beyond lift-off is passed
       this._holdLbl = null;
       vt = this._groundLimit(this._crossingLimit(pr, vt));
       t.gHeading = pr.hdg; t.gSpeed = this._holdingPos() ? 0 : vt;
+      if (this._jetWait) { this._setPhase('HOLD SHORT · RUNWAY BUSY'); return; }
       if (pr.toEnd < (this.demand ? 25 : 4) && (ac.speed < 1 || this.demand)) {
         if (this._mayEnterRunway(e)) this._lineup(e); else this._setPhase('HOLD SHORT');
       } else this._setPhase(this._holdLbl || 'TAXI');

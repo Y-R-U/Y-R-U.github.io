@@ -74,10 +74,12 @@ for (const [w, h, tag] of [[390, 844, 'portrait'], [844, 390, 'landscape']]) {
   const det = await waitReal(() => D.evSafe(`document.querySelector('.kz-tk-detail')?.innerText || ''`).then((t) => /Butter Fingers/.test(t) && t), 2000);
   ok(!!det, `tap a tile → one-line description (${String(det).replace(/\s+/g, ' ').slice(0, 90)})`);
   await D.shot(OUT, `grid-detail-${tag}`);
-  // the Heavy Metal set (coming soon) scrolled into view
+  // the Heavy Metal set: a tile is locked ("coming soon") exactly when its plane is not status 'ready'
   await D.ev(`document.querySelector('.kz-tk-set[data-set="heavy"]')?.scrollIntoView({ block: 'start' })`); await sleep(300);
   const lock = await D.evSafe(`document.querySelectorAll('.kz-tk-set[data-set="heavy"] .kz-tk-tile.lock').length`);
-  ok(lock > 0, `Heavy Metal tiles show as coming soon (${lock} locked; depends on data/aircraft.js status)`);
+  const notReady = (await import('../data/aircraft.js')).AIRCRAFT;
+  const want = ['jumbo', 'herc', 'f35'].some((k) => notReady[k]?.status !== 'ready');
+  ok(want ? lock > 0 : lock === 0, `Heavy Metal tiles locked only while a jet is not ready (${lock} locked; jets ${want ? 'not all ready' : 'ready'})`);
   await D.shot(OUT, `grid-heavy-${tag}`);
   await D.tap('.kz-tasks .kz-x');
   ok(await waitReal(() => D.evSafe(`!document.querySelector('.kz-tasks.on')`), 2000), 'close button closes it');

@@ -78,9 +78,12 @@ export class Traffic {
       const r = (a.dims.span + b.dims.span) * 0.3;
       const d = Math.hypot(dx, dz);
       const key = a.id + '|' + b.id;
-      // vertical: compare the airframes' middles (a jumbo's CG is 4.8 m up, a C172's 1.2 m: both sit on the ground)
-      const dyc = dy - (b.dims.height / 2 - b.dims.gearHeight) + (a.dims.height / 2 - a.dims.gearHeight);
-      if (d > r || Math.abs(dyc) > Math.max(2.6, (a.dims.height + b.dims.height) * 0.3)) { this._touching?.delete(key); continue; }
+      // vertical: light pairs as ever (±2.6 m); with a jet, the airframes' real height bands (wheels to fin) must overlap:
+      // a jumbo on the ground meets a C172 (CG 4.8 m vs 1.2 m up), a jumbo climbing out 10 m over one does not
+      const jetPair = a.P.jet || b.P.jet;
+      const aBot = a.pos.y - a.dims.gearHeight, bBot = b.pos.y - b.dims.gearHeight;
+      const apart = jetPair ? aBot > bBot + b.dims.height - 0.3 || bBot > aBot + a.dims.height - 0.3 : Math.abs(dy) > 2.6;
+      if (d > r || apart) { this._touching?.delete(key); continue; }
       (this._touching ||= new Set());
       const fresh = !this._touching.has(key);
       this._touching.add(key);
