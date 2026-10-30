@@ -40,7 +40,11 @@ controls + clock · `glicko.go` Glicko-2 · `game.go` game model, PGN, client vi
   subtracting their started-but-uncounted games.
 - **Clocks** don't run until both sides have moved (first-move timer 30 s each, then abort).
   From then the side to move's clock runs from the server's accept time of the previous move;
-  increment after each timed move. No lag compensation yet (see notes, open issues).
+  increment after each timed move. **Lag credit (D24)**: each timed move is forgiven up to
+  min(round-trip lag, 1000 ms), paid from a per-side quota (gain 140–300 ms per move by time
+  control, starts at 3×, capped at 5× gain); lag is the full websocket ping RTT measured
+  by the server (every 4 s in a timed game). A flag waits for the same credit. Method and abuse
+  bound: `clock.go` "lag credit".
 - **Unlimited** = correspondence-lite: no clock, each move within **3 days** or the side to
   move loses on time (abort if before ply 2). Games are persisted, survive restarts, players
   can leave and come back; up to 10 Unlimited games per player alongside 1 timed game.
@@ -48,7 +52,7 @@ controls + clock · `glicko.go` Glicko-2 · `game.go` game model, PGN, client vi
   `claim` a win (or draw) — reason `abandoned` (aborted if before ply 2). Reconnecting
   restores everything from the `welcome`.
 - **Restarts**: live games are written to `live_games` on every change; a restart credits
-  the downtime back to timed games (heartbeat in `settings.stopped_at` every 15 s).
+  the downtime back to timed games (heartbeat in `settings.stopped_at` every 5 s).
 
 ## Identity
 Every client sends its Firebase ID token (anonymous users included) in `hello`. Verified
@@ -69,6 +73,8 @@ email in `GAMBIT_ADMINS`, default aaron@itmatters.mobi) are unlimited.
 `GAMBIT_SIGNED_PER_DAY`=5, dev uids starting `pass` have a Pass) · `off` (signed-in
 unlimited). Payments unreachable or answering anything but 200/429 → the game goes ahead
 (fail open, as Clued). A 429 at count time (raced elsewhere) is logged, the game goes on.
+A spend still in flight counts as `pending` (reserved), and a payments refresh that
+overlapped a spend is discarded, so a last game cannot be started twice.
 
 Allowance object (in `welcome`, `allowance` events and replies):
 ```json
@@ -106,7 +112,7 @@ else is a server push (`t` = event name). Times are server epoch ms (`now` in we
 | `closeRoom` | `code` | |
 | `joinRoom` | `code` (case-insensitive) | `{game: id}`; both get `start` |
 | `peekRoom` | `code` | `{room}` |
-| `move` | `game`, `uci` (`e2e4`, `e7e8q`; `e1h1` castling accepted), `ply` (= moves so far) | `{san}`; both get `move`. Resend of an accepted move → `{dup:true}` |
+| `move` | `game`, `uci` (`e2e4`, `e7e8q`; `e1h1` castling accepted), `ply` (= moves so far) | `{san, lag}` (`lag` = ms credited, D24); both get `move`. Resend of an accepted move → `{dup:true}` |
 | `resign` / `abort` | `game` | resign before ply 2 = abort; abort only before ply 2 |
 | `draw` | `game`, `action` offer\|accept\|decline | one offer per side per move, only after ply 2; offering when the opponent already offered = accept; moving declines an offer to you |
 | `claim` | `game`, `kind` win\|draw | timed games, opponent away ≥ 30 s |
@@ -137,7 +143,8 @@ rematch?:{you,them}, next?}`.
 **clock**: `{at, turn, running, w, b, deadline, deadlineAborts}` — `w`/`b` ms left as of `at`
 (server ms; null for Unlimited); the side to move's time runs if `running`. `deadline` = when
 the side to move flags (or the game aborts if `deadlineAborts`: first moves / Unlimited first moves).
-**ratings** (end): `{w:{before,after,delta}, b:{…}}`.
+**ratings** (end): `{w:{before,after,delta,rd,prov}, b:{…}}` (`rd`/`prov` after the game; net.js
+updates `net.ratings[cat]` from it, no `ratings` call needed).
 **room**: `{code, public, name, tc, rated, color, created, host:{pid,name,rating,prov}}`.
 **tc ids**: `1+0 2+1 3+0 3+2 5+0 5+3 10+0 10+5 15+10 30+0 unlimited`.
 

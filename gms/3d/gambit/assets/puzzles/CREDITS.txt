@@ -1,0 +1,9 @@
+GAMBIT puzzle data
+
+600 puzzles are from the Lichess.org open puzzle database
+(https://database.lichess.org/#puzzles), released under CC0 (public domain dedication).
+Each puzzle keeps its Lichess id and a link to the source game.
+
+18 classic positions (famous games from 1750-1912, traditional mating patterns, and the
+studies of Saavedra 1895 and Réti 1921) are public domain; move lists were re-verified with
+the GAMBIT rules core.

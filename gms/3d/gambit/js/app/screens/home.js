@@ -4,14 +4,27 @@ import { getResume, getStats, getLadder, clearResume } from '../store.js';
 import { playerRank } from '../ladder.js';
 import { parseTc } from '../clock.js';
 import { knightMark } from '../main.js';
+import { net, readHint } from '../net.js';
+import { playerAvatar, tcFull, ratingTxt } from './online_common.js';
 
 export const ROUTE = 'home';
+
+function puzzleLine() {
+  try {
+    const p = JSON.parse(localStorage.getItem('gambit.puzzles') || 'null');
+    const n = p && p.s ? Object.keys(p.s).length : 0;
+    if (n) return `${n} solved · puzzle rating <b class="hl">${p.r || 800}</b>`;
+  } catch { /* ignore */ }
+  return 'Mates and tactics, easy to fiendish';
+}
 
 export function render(app) {
   const resume = getResume();
   const st = getStats(), lad = getLadder();
   const { rank, of } = playerRank();
   const bot = resume && app.deps.bots.BOTS.find(b => b.id === resume.botId);
+  // online games in progress, from net.js's local hint (no server connection at boot)
+  const online = net.configured ? readHint().slice(0, 2) : [];
   const el = h(`<section class="screen home">
     <div class="hero">
       <div class="hero-mark">${knightMark()}</div>
@@ -27,6 +40,12 @@ export function render(app) {
         <button class="btn btn-ghost btn-sm" data-act="discard">Discard</button>
       </div>
     </div>` : ''}
+    ${online.map(g => `<div class="continue card card-accent ol-home-card">
+      ${playerAvatar(g.opp, { size: 'lg' })}
+      <div class="continue-txt"><small>Online game in progress</small><b>vs ${esc(g.opp.name)} <span class="elo">${ratingTxt(g.opp.rating, g.opp.prov)}</span></b>
+        <span>${esc(tcFull(g.tc))} · ${g.rated ? 'Rated' : 'Casual'} · move ${Math.floor((g.plies || 0) / 2) + 1}</span></div>
+      <div class="continue-btns"><a class="btn btn-primary" href="#/online/game/${esc(g.id)}">${icon('globe')} Return to game</a></div>
+    </div>`).join('')}
     <nav class="home-menu">
       <a class="menu-item primary" href="#/play/bot">
         <span class="mi-ic">${icon('robot')}</span>
@@ -38,7 +57,7 @@ export function render(app) {
         <span class="mi-go">${icon('chevron')}</span></a>
       <a class="menu-item" href="#/puzzles">
         <span class="mi-ic">${icon('puzzle')}</span>
-        <span class="mi-txt"><b>Puzzles</b><small>Mates and tactics, easy to fiendish</small></span>
+        <span class="mi-txt"><b>Puzzles</b><small>${puzzleLine()}</small></span>
         <span class="mi-go">${icon('chevron')}</span></a>
       <a class="menu-item" href="#/ladder">
         <span class="mi-ic">${icon('trophy')}</span>

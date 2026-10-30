@@ -20,17 +20,38 @@ export const FRIENDS_TIP = 'Online is most fun with people you know: make a priv
 
 const hasLoc = typeof location !== 'undefined';
 
+// Is the public online server deployed? (D19: not until Aaron okays it.) While false, a page
+// served from anywhere but localhost / the LAN (GitHub Pages, games.br8t.com) never touches the
+// network for online play: net.available() is false and the Online screen says "coming soon".
+// Flip to true in the deploy that ships server/ (or pass ?server=<base> to test a server).
+export const ONLINE_PUBLIC = false;
+
+// Local-only hint for the Home screen's "online game in progress" card (no connection at boot).
+// `gambit.local.` keys are never cloud-synced (store.js isLocalOnly).
+export const HINT_KEY = 'gambit.local.online';
+export function readHint() {
+  try {
+    const v = JSON.parse(localStorage.getItem(HINT_KEY) || 'null');
+    if (!v || !Array.isArray(v.games)) return [];
+    const now = Date.now();
+    // a timed game cannot outlive ~2x its base time after our last sighting; Unlimited: 3 days a move
+    return v.games.filter(g => g && g.id && now - (g.at || 0) < (g.tc && g.tc.base > 0 ? 2 * g.tc.base + 5 * 60000 : 4 * 86400000));
+  } catch (e) { return []; }
+}
+
 function defaultBase() {
   if (!hasLoc) return 'http://127.0.0.1:8094/gms/3d/gambit';
   const q = new URLSearchParams(location.search).get('server');
+  if (q === 'none') return null;                  // test: behave like a host without a server
   if (q) return q.replace(/\/$/, '');
   try { const s = localStorage.getItem('gambitdev.server'); if (s) return s.replace(/\/$/, ''); } catch (e) { /* ignore */ }
   const h = location.hostname;
-  if (h === 'games.br8t.com') return location.origin + '/gms/3d/gambit';
   if (h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') ||
       /^(192\.168|10)\./.test(h) || /^172\.(1[6-9]|2\d|3[01])\./.test(h)) {
     return `http://${h}:8094/gms/3d/gambit`; // tools/server_run.sh
   }
+  if (!ONLINE_PUBLIC) return null;                // not deployed yet: no network at all
+  if (h === 'games.br8t.com') return location.origin + '/gms/3d/gambit';
   return 'https://games.br8t.com/gms/3d/gambit'; // GitHub Pages mirror etc.
 }
 
@@ -105,6 +126,7 @@ class GambitNet {
     this._openWaiters = [];
     this._lobbyOn = false;
     this._bestRtt = Infinity;
+    this.timeoutMs = 10000;       // request timeout (moves waiting for a reconnect are exempt)
   }
 
   // ------------------------------------------------------------- events
@@ -122,9 +144,31 @@ class GambitNet {
 
   // ------------------------------------------------------------- connection
   /** connect({base?, name?, devUser?: {uid, name, signed}}) -> Promise<welcome> */
+  /** Is there an online server to talk to? false (no request at all) when none is configured for
+   *  this host (ONLINE_PUBLIC); otherwise one /api/health probe (4 s), cached once it answered. */
+  async available() {
+    const base = this._opts.base || this.base || defaultBase();
+    if (!base) return false;
+    if (this._avail) return true;
+    try {
+      const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const t = setTimeout(() => ctl && ctl.abort(), 4000);
+      const res = await fetch(base.replace(/\/$/, '') + '/api/health', { cache: 'no-store', signal: ctl && ctl.signal });
+      clearTimeout(t);
+      const j = res.ok ? await res.json().catch(() => null) : null;
+      this._avail = !!(j && j.ok);
+      if (j) this._dev = !!j.devAuth;
+    } catch (e) { this._avail = false; }
+    return this._avail;
+  }
+  /** true when this host has no online server configured (show "coming soon", not an error). */
+  get configured() { return !!(this._opts.base || this.base || defaultBase()); }
+
   connect(opts = {}) {
     this._opts = { ...this._opts, ...opts };
-    this.base = (this._opts.base || this.base || defaultBase()).replace(/\/$/, '');
+    const base = this._opts.base || this.base || defaultBase();
+    if (!base) return Promise.reject(Object.assign(new Error('online play is not available here yet'), { code: 'unavailable' }));
+    this.base = base.replace(/\/$/, '');
     if (this.state === 'open') return Promise.resolve(this._welcome);
     if (this._connecting) return this._connecting;
     this._closedByUser = false;
@@ -218,22 +262,58 @@ class GambitNet {
 
   _send(m) { if (this._ws && this._ws.readyState === 1) { this._ws.send(JSON.stringify(m)); return true; } return false; }
 
-  /** Low-level request. Waits up to 10 s for the connection if it is (re)connecting. */
-  request(t, body = {}, timeoutMs = 10000) {
+  /** Low-level request. Waits up to 10 s for the connection if it is (re)connecting.
+   *  A move queued while (re)connecting never times out while it waits: it is checked against
+   *  the next welcome's game state, then resent, settled as already played, or rejected
+   *  (stale_ply / game_over, with a 'sync'). net.close() still rejects it on the timer. */
+  request(t, body = {}, timeoutMs = this.timeoutMs) {
     const id = ++this._id;
     const msg = { t, id, ...body };
     return new Promise((resolve, reject) => {
-      const p = { resolve, reject, msg, queued: false };
-      p.timer = setTimeout(() => { this._pending.delete(id); reject(Object.assign(new Error('timed out'), { code: 'timeout' })); }, timeoutMs);
+      const p = { resolve, reject, msg, queued: false, timeoutMs };
       this._pending.set(id, p);
+      this._arm(id, p);
       if (this.state !== 'open' || !this._send(msg)) p.queued = true; // flushed after the next welcome
     });
   }
 
+  _arm(id, p) {
+    clearTimeout(p.timer);
+    p.timer = setTimeout(() => {
+      p.timer = null;
+      if (p.msg.t === 'move' && p.queued && !this._closedByUser) return; // waits for the welcome
+      this._pending.delete(id);
+      p.reject(Object.assign(new Error('timed out'), { code: 'timeout' }));
+    }, p.timeoutMs);
+  }
+
   _flushQueued() {
-    for (const [, p] of this._pending) {
-      if (p.queued) { p.queued = false; this._send(p.msg); }
+    for (const [id, p] of this._pending) {
+      if (!p.queued) continue;
+      p.queued = false;
+      if (p.msg.t === 'move' && !this._queuedMoveStillValid(id, p)) continue;
+      this._send(p.msg);
+      this._arm(id, p); // a fresh timeout from the resend
     }
+  }
+
+  // A queued move vs the game state the welcome just delivered.
+  _queuedMoveStillValid(id, p) {
+    const { game: gid, uci, ply } = p.msg;
+    const g = this.games.get(gid);
+    const settle = () => { clearTimeout(p.timer); this._pending.delete(id); };
+    if (g && g.moves[ply] === uci) { // the server took it before the connection dropped
+      settle();
+      p.resolve({ t: 'ok', id, san: g.sans[ply], dup: true });
+      return false;
+    }
+    if (g && g.status === 'playing' && g.moves.length === ply) return true; // still our turn: resend
+    const code = g && g.status === 'playing' ? 'stale_ply' : 'game_over';
+    settle();
+    if (g) this._emit('sync', { game: g });
+    p.reject(Object.assign(new Error(code === 'stale_ply' ? 'out of sync, refreshing the game' : 'the game is over'),
+      { code, data: { t: 'error', id, code, game: g || null } }));
+    return false;
   }
 
   serverNow() { return Date.now() + this.offset; }
@@ -288,15 +368,18 @@ class GambitNet {
           this.request('game', { game: m.game }).catch(() => {}); // gap: resync (reply stores + emits 'sync')
           return;
         }
+        if (g) this._writeHint(); // keep the home card's move number + timestamp fresh
         const mine = !!g && (m.ply % 2 === 0 ? 'w' : 'b') === g.you; // echo of our own move
         return this._emit('move', { gameId: m.game, ply: m.ply, uci: m.uci, san: m.san, fen: m.fen, clock: m.clock, mine, game: g });
       }
       case 'end': {
         const g = this.games.get(m.game);
         if (g) Object.assign(g, { status: 'ended', result: m.result, reason: m.reason, pgn: m.pgn, ratings: m.ratings || null, clock: m.clock, drawOffer: '', opponentGone: null });
+        this._writeHint();
         if (m.ratings && g && this.ratings?.[g.cat]) {
           const mine = m.ratings[g.you];
-          if (mine) this.ratings[g.cat] = { ...this.ratings[g.cat], r: mine.after, games: (this.ratings[g.cat].games || 0) + 1 };
+          if (mine) this.ratings[g.cat] = { ...this.ratings[g.cat], r: mine.after, games: (this.ratings[g.cat].games || 0) + 1,
+            ...(mine.rd != null ? { rd: mine.rd } : {}), ...(mine.prov != null ? { prov: mine.prov } : {}) };
         }
         return this._emit('end', { gameId: m.game, result: m.result, reason: m.reason, pgn: m.pgn, ratings: m.ratings || null, game: g });
       }
@@ -332,6 +415,7 @@ class GambitNet {
     const live = new Set();
     for (const g of m.games || []) { this._storeGame(g); live.add(g.id); }
     for (const [id, g] of this.games) if (!live.has(id) && g.status === 'playing') { g.status = 'unknown'; }
+    this._writeHint();
     this._setAllowance(m.allowance);
     this._setState('open');
     this._timers.forEach(clearInterval);
@@ -359,8 +443,23 @@ class GambitNet {
     const cur = this.games.get(g.id);
     if (cur) Object.assign(cur, g); else this.games.set(g.id, g);
     const out = this.games.get(g.id);
+    this._writeHint();
     if (why === 'sync') this._emit('sync', { game: out });
     return out;
+  }
+
+  // Home's "online game in progress" card reads this (readHint) without connecting.
+  _writeHint() {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const live = [...this.games.values()].filter(g => g.status === 'playing').slice(0, 4).map(g => {
+        const o = (g.you === 'w' ? g.black : g.white) || {};
+        return { id: g.id, you: g.you, opp: { name: o.name || 'Player', rating: o.rating, prov: !!o.prov },
+          tc: g.tc ? { id: g.tc.id, name: g.tc.name, base: g.tc.base } : null, rated: !!g.rated, plies: (g.moves || []).length, at: Date.now() };
+      });
+      if (live.length) localStorage.setItem(HINT_KEY, JSON.stringify({ games: live, savedAt: Date.now() }));
+      else localStorage.removeItem(HINT_KEY);
+    } catch (e) { /* storage blocked */ }
   }
 
   _setAllowance(a) { if (a) { this.allowance = a; this._emit('allowance', a); } }
@@ -431,7 +530,9 @@ class GambitNet {
 
   // ------------------------------------------------------------- HTTP (no connection needed)
   async _get(path) {
-    this.base = this.base || (this._opts.base || defaultBase()).replace(/\/$/, '');
+    const base = this.base || this._opts.base || defaultBase();
+    if (!base) throw Object.assign(new Error('online play is not available here yet'), { code: 'unavailable' });
+    this.base = base.replace(/\/$/, '');
     const res = await fetch(this.base + path);
     const body = await res.json().catch(() => ({}));
     if (!res.ok) throw Object.assign(new Error(body.error || res.statusText), { code: body.code || 'http_' + res.status, data: body });

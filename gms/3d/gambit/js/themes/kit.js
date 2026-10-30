@@ -727,12 +727,52 @@ function scorchTexture() {
     }
   }));
 }
+// ---------------------------------------------------------------------------
+// battle-1: FX shader warm-up (additive helper, no change to existing FX behaviour).
+// createFX parks one culled, off-screen mesh per kit FX material variant (flash sprite,
+// ring/bolt/tint, scorch decal) in the fx group, and runs every hook registered with
+// addFxWarmup(fn(group, scene)). The board calls renderer.compile(scene) right after
+// createFX on theme load, so those programs are built then instead of mid-battle.
+// Parked objects sit far outside the camera frustum (frustumCulled) or are InstancedMeshes
+// with count 0, so they cost no draw calls. Warm materials live for the page (tiny).
+// ---------------------------------------------------------------------------
+const fxWarmups = [];
+/** Register fn(group, scene) to run whenever the board creates its FX group (theme load). */
+export function addFxWarmup(fn) { if (!fxWarmups.includes(fn)) fxWarmups.push(fn); }
+export const PARK = new THREE.Vector3(1000, 0, 1000);
+/** Move obj far outside the frustum (keeps it visible so renderer.compile still sees it). */
+export function parkFX(obj) {
+  obj.position.copy(PARK); obj.visible = true;
+  if (obj.isInstancedMesh) obj.count = 0;
+  return obj;
+}
+let _warmMats = null;
+function warmFX(group, scene) {
+  if (!_warmMats) {
+    const add = { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false };
+    _warmMats = {
+      geo: new THREE.PlaneGeometry(0.01, 0.01),
+      mesh: [
+        new THREE.MeshBasicMaterial({ ...add }),                                    // tint
+        new THREE.MeshBasicMaterial({ ...add, side: THREE.DoubleSide }),            // ring, lightning
+        new THREE.MeshBasicMaterial({ map: scorchTexture(), transparent: true, depthWrite: false }), // scorch
+      ],
+      sprite: new THREE.SpriteMaterial({ map: glowTexture(), ...add, depthTest: false }), // flash
+    };
+  }
+  const w = new THREE.Group(); w.name = 'fx-warm';
+  for (const m of _warmMats.mesh) w.add(new THREE.Mesh(_warmMats.geo, m));
+  w.add(new THREE.Sprite(_warmMats.sprite));
+  parkFX(w); group.add(w);
+  for (const fn of fxWarmups) { try { fn(group, scene); } catch (e) { console.error('[kit] fx warmup failed', e); } }
+}
 export function createFX(scene, { overlayEl = null, flashLight = null } = {}) {
   const add = new ParticleSystem(1600, THREE.AdditiveBlending);
   const norm = new ParticleSystem(900, THREE.NormalBlending);
   const group = new THREE.Group(); group.name = 'fx';
   group.add(norm.points, add.points);
   scene.add(group);
+  warmFX(group, scene);   // battle-1
   const flashes = [], rings = [], bolts = [], scorches = [], lightPulses = [];
   // debris: one InstancedMesh of chunky bevelled bits, simple physics
   const DEB = 96;

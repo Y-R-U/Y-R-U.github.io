@@ -33,6 +33,8 @@ type User struct {
 	sess             map[*Sess]bool
 	goneAt           int64
 	allow            Allow // payments mode cache
+	spending         int   // payments spends sent but not answered yet (reserved games)
+	allowGen         int   // bumped at every spend; a refresh that raced one is discarded
 	seek             *Seek
 	rooms            map[string]*Room
 	games            map[string]*Game
@@ -156,7 +158,10 @@ func (h *Hub) allowView(u *User) Allow {
 	case u.allow.Unlimited:
 		return unlimited("pass")
 	default:
+		// Spends in flight are reserved like pending games, so the cache (which does not
+		// include them yet) can never let a last game be started twice.
 		a.Tier, a.PerDay, a.Used = u.allow.Tier, u.allow.PerDay, u.allow.Used
+		a.Pending += u.spending
 		a.Remaining = max(0, u.allow.Remaining-a.Pending)
 		a.ResetsAt = u.allow.ResetsAt
 		return a
@@ -179,17 +184,22 @@ func (h *Hub) canStart(u *User) string {
 }
 
 // refreshAllowance re-reads payments for a signed-in user before a gate (off the lock).
+// The answer is dropped if a spend started or is still in flight meanwhile: payments may
+// have read its counter before that spend landed, and applying it would hand back the
+// game the spend just used (the "last game twice" race).
 func (h *Hub) refreshAllowance(u *User) {
 	h.mu.Lock()
-	need := cfg.AllowanceMode == "on" && !u.Anon && !u.Admin && !u.Dev && u.Tok != "" && nowMs()-u.allow.Fetched > 10_000
-	tok := u.Tok
+	need := cfg.AllowanceMode == "on" && !u.Anon && !u.Admin && !u.Dev && u.Tok != "" && nowMs()-u.allow.Fetched > 10_000 && u.spending == 0
+	tok, gen := u.Tok, u.allowGen
 	h.mu.Unlock()
 	if !need {
 		return
 	}
 	if a, ok := fetchAllowance(tok); ok {
 		h.mu.Lock()
-		u.allow = a
+		if u.allowGen == gen && u.spending == 0 {
+			u.allow = a
+		}
 		h.mu.Unlock()
 	}
 }
@@ -212,12 +222,20 @@ func (h *Hub) countGame(g *Game) {
 			}
 		case cfg.AllowanceMode == "on" && u.Tok != "" && !u.Dev:
 			tok, id := u.Tok, payUUID("gambit", g.ID, u.UID)
+			u.spending++ // reserved until payments answers (allowView subtracts it)
+			u.allowGen++
 			go func() {
 				res, a := spendAllowance(tok, id)
 				h.mu.Lock()
 				defer h.mu.Unlock()
-				if a != nil {
+				u.spending--
+				switch {
+				case a != nil:
 					u.allow = *a
+					u.allow.Fetched = nowMs()
+				case res == spendOK && !u.allow.Unlimited && u.allow.Remaining > 0:
+					u.allow.Used++
+					u.allow.Remaining--
 				}
 				if res == spendDenied {
 					log.Printf("allowance: %s had no games left at count time (game %s goes on)", u.PID, g.ID)
@@ -515,6 +533,8 @@ func (h *Hub) store(g *Game) {
 			br.Draws++
 		}
 		g.After = [2]int{int(nw.R + 0.5), int(nb.R + 0.5)}
+		g.AfterRD = [2]int{int(nw.RD + 0.5), int(nb.RD + 0.5)}
+		g.AfterPr = [2]bool{nw.Provisional(), nb.Provisional()}
 		g.Deltas = [2]int{g.After[0] - g.Seats[0].Rating, g.After[1] - g.Seats[1].Rating}
 		if err := saveRating(tx, g.Seats[0].UID, g.tc.Cat, wr); err != nil {
 			log.Printf("rating: %v", err)
@@ -621,6 +641,24 @@ func (h *Hub) loadLive() {
 	}
 	if n > 0 {
 		log.Printf("restored %d live games (downtime %ds credited to timed games)", n, (now-stopped)/1000)
+	}
+}
+
+// noteLag copies a session's fresh lag estimate onto the user's live timed games, so a
+// flag waits for the credit that player's next move could get (D24).
+func (h *Hub) noteLag(s *Sess) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if s.u == nil {
+		return
+	}
+	lag := s.lagMs()
+	for _, g := range s.u.games {
+		if !g.Ended && !g.tc.Unlimited() {
+			if side := g.seatOf(s.u.UID); side >= 0 {
+				g.Lag[side] = lag
+			}
+		}
 	}
 }
 

@@ -8,12 +8,14 @@
 //    (D24) and default to 2x (D6), a tap skips. Clocks come from the server (net.clock()).
 //  - resign / abort / draw offer+accept+decline / claim after the opponent left / rematch.
 //  - no undo or hints online.
-import { h, esc, icon, toast, confirmDialog, openSheet } from '../ui.js';
+import { promotionPicker, h, esc, icon, toast, confirmDialog, openSheet } from '../ui.js';
 import { getSettings, setSettings, onSettings } from '../store.js';
 import { fmtClock } from '../clock.js';
-import { play } from '../sound.js';
+import { play, playMove } from '../sound.js';
 import { settingsPanel } from './settings.js';
 import { installedThemes } from '../themes-meta.js';
+import { acquire } from '../boardhost.js';
+import { createReview, reviewNavHtml, movesHtml } from '../review.js';
 import { CHEAT_WARNING } from '../net.js';
 import { net, tcLabel, tcFull, ratingTxt, playerAvatar, handleError, nameOf, catName } from './online_common.js';
 
@@ -21,7 +23,8 @@ const GLYPH = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
 const VAL = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 const START_COUNT = { p: 8, n: 2, b: 2, r: 2, q: 1 };
 const SPEEDS = ['off', 1, 2, 5];
-const BATTLE_CAP_MS = 1200;   // D24
+const BATTLE_CAP_MS = 1200;   // D24: passed to applyMove as capMs (battles compress to fit)
+const BATTLE_SKIP_MS = 1600;  // safety net: wall-clock skip if a battle overruns the cap
 const REASON = {
   checkmate: 'by checkmate', stalemate: 'by stalemate', repetition: 'by threefold repetition',
   fifty: 'by the 50-move rule', material: 'by insufficient material', timeout: 'on time',
@@ -30,47 +33,44 @@ const REASON = {
 
 let app = null;
 let O = null;                 // the shown game {id, g, chess, you, over, ...}
-let boardHost = null, board = null, boardPromise = null, offSettings = null;
+let lease = null, board = null;
 let view = null;
+const review = createReview({
+  chess: () => O && O.chess, board: () => board,
+  onExit: () => { syncBoard(); setInteractive(); },
+  onChange: () => setInteractive(),
+});
 
 const otherC = c => (c === 'w' ? 'b' : 'w');
+const battleOpts = v => ({ battle: !!v.captured, capMs: isTimed() ? BATTLE_CAP_MS : 0 });
 const onlineSpeed = () => { const s = getSettings().onlineBattleSpeed; return s === undefined ? 2 : s; };
 const isTimed = () => O && O.g && O.g.tc && O.g.tc.base > 0;
 const uciOf = v => v.lan || (v.from + v.to + (v.promotion || ''));
 const histUci = () => O.chess.history({ verbose: true }).map(uciOf);
 
-// ---------- board (one persistent instance for online games) ----------
-function ensureBoard() {
-  if (!boardHost) boardHost = h('<div class="board-host"></div>');
-  if (!boardPromise) {
-    const s = getSettings();
-    boardPromise = app.deps.board.createBoard(boardHost, {
-      fen: O ? O.chess.fen() : undefined, orientation: O ? O.you : 'w',
-      theme: s.theme, coords: s.coords, animSpeed: onlineSpeed(), view: s.view,
-      legalMoves: sq => (myTurn() ? O.chess.moves({ square: sq, verbose: true }).map(m => m.to) : []),
-    }).then(b => {
-      board = b;
-      board.onMoveAttempt = onMoveAttempt;
-      board.onPromotion = ({ color }) => pickPromotion(color);
-      if (board.on) {
-        board.on('view', ({ view: v }) => {
-          if (getSettings().view !== v) { setSettings({ view: v }); toast(v === 'free' ? 'Free view: drag or pinch to look around' : `${viewLabel(v)} view`, { ms: 1200 }); }
-          syncViewBtn();
-        });
-        // D24: in timed online games a battle never runs longer than ~1.2 s
-        board.on('battlestart', () => {
-          if (!isTimed()) return;
-          clearTimeout(O && O.capT);
-          const t = setTimeout(() => board.skip && board.skip(), BATTLE_CAP_MS);
-          if (O) O.capT = t;
-        });
-      }
-      applySettings(getSettings(), null);
-      offSettings = onSettings(applySettings);
-      return b;
-    });
-  }
-  return boardPromise;
+// ---------- board (the shared board host: same WebGL board as the bot game / puzzles) ----------
+function acquireBoard(container) {
+  lease = acquire(container, {
+    fen: O ? O.chess.fen() : undefined, orientation: O ? (O.flipped ? otherC(O.you) : O.you) : 'w',
+    animSpeed: onlineSpeed(),
+    legalMoves: sq => (myTurn() ? O.chess.moves({ square: sq, verbose: true }).map(m => m.to) : []),
+    onMoveAttempt,
+    onPromotion: ({ to, color }) => pickPromotion(color, to),
+    onRevoke: () => { board = null; },
+  });
+  lease.on('view', ({ view: v }) => {
+    if (getSettings().view !== v) { setSettings({ view: v }); toast(v === 'free' ? 'Free view: drag or pinch to look around' : `${viewLabel(v)} view`, { ms: 1200 }); }
+    syncViewBtn();
+  });
+  // D24: timed online battles are compressed to 1.2 s via capMs; skip() is only a safety net
+  lease.on('battlestart', () => {
+    if (!isTimed()) return;
+    clearTimeout(O && O.capT);
+    const t = setTimeout(() => board && board.skip && board.skip(), BATTLE_SKIP_MS);
+    if (O) O.capT = t;
+  });
+  lease.track(onSettings(applySettings));
+  return lease.ready.then(b => { if (!b) return null; board = b; applySettings(getSettings(), null); return b; });
 }
 function applySettings(s, patch) {
   if (!board) return;
@@ -83,13 +83,6 @@ function applySettings(s, patch) {
   if (all || 'coords' in patch) board.setCoords && board.setCoords(s.coords);
   syncSpeedBtn();
 }
-function disposeBoard() {
-  try { offSettings && offSettings(); } catch { /* ignore */ }
-  offSettings = null;
-  if (board) { try { board.dispose(); } catch (e) { console.warn(e); } }
-  board = null; boardPromise = null; boardHost = null;
-}
-
 // ---------- state ----------
 function makeState(g) {
   const { Chess } = app.deps.chess;
@@ -99,9 +92,9 @@ function makeState(g) {
     pending: false, lowWarned: false, capT: 0, result: null, shownResults: false, drawSent: -1 };
 }
 function myTurn() {
-  return !!O && !O.over && !O.pending && !O.inflight && O.chess.turn() === O.you && net.state === 'open';
+  return !!O && !O.over && !O.pending && !O.inflight && !review.on && O.chess.turn() === O.you && net.state === 'open';
 }
-function setInteractive() { if (board && O) board.setInteractive(!O.over && O.chess.turn() === O.you && !O.pending ? O.you : null); }
+function setInteractive() { if (board && O) board.setInteractive(!O.over && O.chess.turn() === O.you && !O.pending && !review.on ? O.you : null); }
 
 // rebuild from the server snapshot when our view disagrees with it (rollback / missed moves)
 function syncFrom(g, { animate = true } = {}) {
@@ -109,8 +102,9 @@ function syncFrom(g, { animate = true } = {}) {
   O.g = g;
   const local = histUci(), srv = g.moves || [];
   const prefix = local.length <= srv.length && local.every((u, i) => u === srv[i]);
+  if (review.on) review.exit();
   if (prefix && local.length < srv.length) {
-    for (const u of srv.slice(local.length)) { const v = O.chess.move(u); if (!v) { hardReset(g); break; } if (board) board.applyMove(v, { battle: !!v.captured }); }
+    for (const u of srv.slice(local.length)) { const v = O.chess.move(u); if (!v) { hardReset(g); break; } if (board) board.applyMove(v, battleOpts(v)); }
   } else if (!prefix || local.length !== srv.length) {
     const rolledBack = local.length > srv.length;
     hardReset(g, animate);
@@ -127,7 +121,7 @@ function hardReset(g, animate = true) {
   if (board) { board.setPosition(O.chess.fen(), { animate }); highlightLast(); }
 }
 function highlightLast() {
-  if (!board || !O) return;
+  if (!board || !O || review.on) return;
   const hist = O.chess.history({ verbose: true });
   const last = hist[hist.length - 1];
   let check = null;
@@ -157,7 +151,7 @@ function commitUserMove(m, sendAs = null) {
   const o = O, uci = sendAs || uciOf(v);
   O.inflight = uci;
   sfx(v);
-  if (board) board.applyMove(v, { battle: !!v.captured }).catch(() => {});
+  if (board) board.applyMove(v, battleOpts(v)).catch(() => {});
   renderAll(); setInteractive();
   net.move(o.id, uci).then(() => {
     if (O !== o) return;
@@ -175,7 +169,7 @@ function commitUserMove(m, sendAs = null) {
   return true;
 }
 function sfx(v) {
-  play(v.san && v.san.includes('#') ? 'check' : v.captured ? 'capture' : v.san && v.san.includes('+') ? 'check' : v.flags && /[kq]/.test(v.flags) ? 'castle' : 'move');
+  playMove(v);   // audio agent
 }
 function onNetMove(ev) {
   if (!O || ev.gameId !== O.id) return;
@@ -191,8 +185,9 @@ function onNetMove(ev) {
   if (local.length !== ev.ply) { syncFrom(O.g); return; }
   const v = O.chess.move(ev.uci);
   if (!v) { syncFrom(O.g); return; }
+  if (review.on) review.exit({ beforeLast: true });   // opponent moved: back to live, then animate it
   sfx(v);
-  if (board) board.applyMove(v, { battle: !!v.captured }).catch(() => {});
+  if (board) board.applyMove(v, battleOpts(v)).catch(() => {});
   if (O.drawOfferBanner) O.drawOfferBanner = false;
   renderAll(); setInteractive();
   if (navigator.vibrate && navigator.userActivation?.hasBeenActive && document.visibilityState === 'visible') { try { navigator.vibrate(15); } catch { /* ignore */ } }
@@ -312,21 +307,13 @@ function syncSpeedBtn() { const b = view && view.querySelector('[data-act="speed
 function syncBoard() { if (board && O) { board.setPosition(O.chess.fen(), { animate: false }); highlightLast(); } }
 
 // ---------- promotion / confirm (same look as the bot game) ----------
-function pickPromotion(color) {
-  return new Promise(resolve => {
-    const stage = view && view.querySelector('.board-square');
-    if (!stage || !O) { resolve('q'); return; }
-    O.pending = true; setInteractive();
-    const o = h(`<div class="promo" role="dialog" aria-label="Promote to"><div class="promo-card"><small>Promote to</small><div class="promo-row">
-      ${['q', 'r', 'b', 'n'].map(p => `<button data-p="${p}" class="pc-${color}" aria-label="${{ q: 'Queen', r: 'Rook', b: 'Bishop', n: 'Knight' }[p]}">${GLYPH[p]}</button>`).join('')}
-      </div><button class="link" data-p="">Cancel</button></div></div>`);
-    o.addEventListener('click', e => {
-      const b = e.target.closest('[data-p]'); if (!b) return;
-      o.remove(); if (O) { O.pending = false; setInteractive(); } resolve(b.dataset.p || null);
-    });
-    stage.appendChild(o);
-  });
+function pickPromotion(color, to = null) {
+  const stage = view && view.querySelector('.board-square');
+  if (!stage || !O) return Promise.resolve('q');
+  O.pending = true; setInteractive();
+  return promotionPicker(stage, { color, to, board }).then(p => { if (O) { O.pending = false; setInteractive(); } return p; });
 }
+
 function askConfirm(m) {
   return new Promise(resolve => {
     const stage = view && view.querySelector('.board-square');
@@ -399,15 +386,13 @@ function renderBars() {
 function renderMoves() {
   if (!view || !O) return;
   const hist = O.chess.history();
-  let html = '';
-  for (let i = 0; i < hist.length; i += 2) {
-    html += `<li><span class="n">${i / 2 + 1}.</span><span class="m${i === hist.length - 1 ? ' cur' : ''}">${esc(hist[i])}</span>${hist[i + 1] ? `<span class="m${i + 1 === hist.length - 1 ? ' cur' : ''}">${esc(hist[i + 1])}</span>` : ''}</li>`;
-  }
+  let html = movesHtml(hist);
   if (O.over && O.result && O.result.outcome !== 'aborted') html += `<li class="res"><span>${String(O.result.result).replace('1/2-1/2', '½–½')}</span></li>`;
   const ol = view.querySelector('.moves');
   ol.innerHTML = html || `<li class="empty">${O.you === 'w' ? 'You play white — your move!' : `${nameOf(side('w'))} plays white…`}</li>`;
   const wrap = view.querySelector('.moves-wrap');
-  requestAnimationFrame(() => { wrap.scrollLeft = wrap.scrollWidth; wrap.scrollTop = wrap.scrollHeight; });
+  if (review.on) review.sync();
+  else requestAnimationFrame(() => { wrap.scrollLeft = wrap.scrollWidth; wrap.scrollTop = wrap.scrollHeight; review.sync(); });
 }
 function renderActions() {
   if (!view || !O) return;
@@ -510,18 +495,19 @@ export function mountGame(root, ctx, id) {
       <div class="board-square"><div class="board-loading">Setting up the board…</div><div class="ol-banners"></div></div>
       <div class="bar-bottom"></div>
     </div></div>
-    <aside class="g-panel"><div class="moves-wrap"><ol class="moves"></ol></div><div class="actions"></div></aside>
+    <aside class="g-panel"><div class="moves-box"><div class="moves-wrap"><ol class="moves"></ol></div>${reviewNavHtml()}</div><div class="actions"></div></aside>
   </section>`);
   root.replaceChildren(el);
   view = el;
   const o = O;
-  ensureBoard();
-  el.querySelector('.board-square').appendChild(boardHost);
+  const boardReady = acquireBoard(el.querySelector('.board-square'));
+  const unbindReview = review.bind(el);
   renderAll();
 
   const opp = side(otherC(O.you));
   ctx.setTop({ title: `vs ${nameOf(opp)}`, sub: `Online · ${esc(tcFull(g.tc))} · ${g.rated ? 'Rated' : 'Casual'}`, back: '#/online' });
   ctx.canPester(() => !O || O.over);
+  if (!getSettings().onlineWarnSeen) setSettings({ onlineWarnSeen: true });   // the Online home's cheat warning can collapse now
   app.openSettingsHere = () => {
     const sh = openSheet(`<div class="sheet-head"><h3>Settings</h3><button class="tb-btn" data-close aria-label="Close">${icon('x')}</button></div><div class="sheet-body"></div>`, { cls: 'sheet-tall' });
     sh.el.querySelector('.sheet-body').appendChild(settingsPanel(app, { compact: true }));
@@ -536,8 +522,8 @@ export function mountGame(root, ctx, id) {
     })[a.dataset.act]?.();
   });
 
-  boardPromise.then(() => {
-    if (O !== o || view !== el) return;
+  boardReady.then(b => {
+    if (!b || O !== o || view !== el) return;
     el.querySelector('.board-loading')?.remove();
     board.setOrientation(O.flipped ? otherC(O.you) : O.you);
     board.setPosition(O.chess.fen(), { animate: false });
@@ -587,12 +573,14 @@ export function mountGame(root, ctx, id) {
       document.removeEventListener('visibilitychange', onVis);
       wake(false);
       app.openSettingsHere = null;
-      if (board) board.setInteractive(null);
-      boardHost && boardHost.remove();
+      unbindReview();
+      clearTimeout(O && O.capT);
+      if (lease) lease.release();
+      lease = null; board = null;
       view = null;
       O && O.sheet && O.sheet.close();
-      // keep the board alive only for the next online game screen (rematch); free the GPU otherwise
-      setTimeout(() => { if (!location.hash.startsWith('#/online/game/')) { disposeBoard(); O = null; } }, 0);
+      // the shared board stays alive (boardhost.js); only forget this game's view state
+      setTimeout(() => { if (!location.hash.startsWith('#/online/game/')) O = null; }, 0);
     },
   };
 }

@@ -31,7 +31,7 @@ window.__gambit = app;   // handy for tests / debugging
 // A plug-in route overrides the built-in placeholder for the same route.
 // The loader is only called when the route is opened, so a missing module never 404s at boot.
 export const PLUGINS = {
-  // puzzles: () => import('../puzzles/screen.js'),
+  puzzles: () => import('../puzzles/screen.js'),
   online: () => import('./screens/online.js'),   // online agent
 };
 

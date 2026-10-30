@@ -147,7 +147,7 @@ func main() {
 		n := 0
 		for range t.C {
 			hub.tick()
-			if n++; n%60 == 0 {
+			if n++; n%20 == 0 { // stopped_at heartbeat every 5 s (crash downtime charged ≤ 5 s)
 				hub.mu.Lock()
 				hub.heartbeat()
 				hub.mu.Unlock()

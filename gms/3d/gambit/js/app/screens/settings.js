@@ -1,6 +1,7 @@
 import { h, esc, icon, segmented, bindSegmented, toggle, toast, confirmDialog } from '../ui.js';
 import { getSettings, setSettings } from '../store.js';
 import { THEME_META, installedThemes } from '../themes-meta.js';
+import { play } from '../sound.js';
 
 export const ROUTE = 'settings';
 const GL = { k: '♚', q: '♛', r: '♜', n: '♞', b: '♝', p: '♟' };
@@ -39,17 +40,25 @@ export function settingsPanel(app, { compact = false } = {}) {
     <h3 class="sect">Gameplay</h3>
     <div class="rows">
       <label class="row"><span><b>Sound</b><small>Moves, captures and clocks</small></span>${toggle('sound', s.sound)}</label>
+      <div class="row"><span><b>Effects volume</b></span><input type="range" min="0" max="100" step="5" value="${Math.round((s.volume ?? 0.8) * 100)}" data-vol="volume" aria-label="Effects volume" style="width:46%;max-width:200px;accent-color:var(--accent)"></div>
+      <label class="row"><span><b>Music</b><small>Calm theme music, loops quietly</small></span>${toggle('music', !!s.music)}</label>
+      <div class="row"><span><b>Music volume</b></span><input type="range" min="0" max="100" step="5" value="${Math.round((s.musicVolume ?? 0.5) * 100)}" data-vol="musicVolume" aria-label="Music volume" style="width:46%;max-width:200px;accent-color:var(--accent)"></div>
       <label class="row"><span><b>Confirm moves</b><small>Tap ✓ before a move is played</small></span>${toggle('moveConfirm', s.moveConfirm)}</label>
       <label class="row"><span><b>Show coordinates</b><small>a–h and 1–8 on the board edge</small></span>${toggle('coords', s.coords)}</label>
     </div>
     ${compact ? '' : `<h3 class="sect">Data</h3>
     <div class="rows"><button class="row danger" data-act="reset"><span><b>Reset ladder &amp; stats</b><small>Starts your bot ladder from zero</small></span>${icon('chevron')}</button></div>
-    <p class="fine">Progress is saved on this device${app.cloud ? ' and to your account when signed in' : ''}.</p>`}
+    <p class="fine">Progress is saved on this device${app.cloud ? ' and to your account when signed in' : ''}.</p>
+    <h3 class="sect">About</h3>
+    <p class="fine about">Puzzles from the <a href="https://database.lichess.org/#puzzles" target="_blank" rel="noopener">Lichess.org open database</a> (CC0), plus classic games and studies.<br>Pieces, boards and animations are drawn in code with Three.js.</p>`}
   </div>`);
   bindSegmented(el, (name, v) => {
     const val = name === 'battleSpeed' ? (v === 'off' ? 'off' : +v) : v;
     setSettings({ [name]: val });
   });
+  // audio agent: volume sliders (live), a tap on release previews the effects level
+  el.addEventListener('input', e => { const r = e.target.closest('[data-vol]'); if (r) setSettings({ [r.dataset.vol]: +r.value / 100 }); });
+  el.addEventListener('change', e => { const r = e.target.closest('[data-vol="volume"]'); if (r) play('move'); });
   el.addEventListener('click', async e => {
     const t = e.target.closest('[data-theme]');
     if (t) {

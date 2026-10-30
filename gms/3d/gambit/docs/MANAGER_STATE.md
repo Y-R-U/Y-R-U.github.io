@@ -18,16 +18,24 @@ Read this first when resuming, then DECISIONS.md, TEAM_BRIEF.md, docs/notes/*.md
 ## Agents
 | Agent | id | Status |
 |---|---|---|
-| core (rules + bots) | a67e3f75f9bd1d260 | running (9501) |
+| core (rules + bots) | a67e3f75f9bd1d260 | DONE (perft all match; 20 bots 125→3300, SF-anchored; SF19 lite for The Machine only; top-3 labels rough) |
 | board (three.js + anim system + classic) | a9a1a987c503eb9a8 | DONE (D26 views, D27 tags, D28 contrast; board_test 18/18 + game_test 14/14; reviewed) |
 | ui (shell, ladder, auth) | ad381026021f8a456 | DONE (full game vs real bot, 0 errors; screenshots reviewed) |
 | sculptor-fantasy-1 (knight + bishop) | a4583ec890eee44d0 | DONE (Warhorse 7, Wizard 6.5; 1 draw call/kind via per-vertex metal/glow; sdf.js mesher) |
 | sculptor-halloween-1 (pawn + rook, cast proposal) | ae1a9e1bfc79d745d | DONE (Pumpkin Imp 7.5, Crypt Tower 7; reviewed, good) |
 | sculptor-halloween-2 (n Nightmare + b Witch) | a10a062377d08ef31 | DONE (7 / 7.5) |
-| sculptor-fantasy-2 (p Squire + r Watchtower) | a5ed080f8e9319654 | running (9516) |
-| sculptor-halloween-3 (q Countess + k Pumpkin King + board) | a7fb25a00cc9ad998 | running (9517) |
+| sculptor-fantasy-2 (p Squire + r Watchtower) | a5ed080f8e9319654 | DONE (7 / 8; reviewed, good; squire has baked 3/4 yaw — accepted) |
+| sculptor-halloween-3 (q Countess + k Pumpkin King + board) | a7fb25a00cc9ad998 | DONE (q 7, k 7.5, board 6.5–7; HALLOWEEN SET COMPLETE; reviewed) |
 | online (lobby/rooms/online game UI) | a9d1a88e113f7c5f8 | DONE (2-browser e2e ALL PASS 360+1440; reviewed) |
-| puzzles (Lichess CC0 + classics, map, play) | a53142481a3bac366 | running (9510) |
+| ui-2 (shared board, portrait layout, online offline-state, move review) | abd147e4f6019db1a | running (9518) |
+| battle-1 (fantasy + halloween battles, 4 each) | a7576b524d1e83742 | DONE (8 battles, no leaks, warm shaders; reviewed: works but too SMALL from Top view vs ref) |
+| sculptor-scifi-1 (concept + p + r) | a10763d1cd754a3ff | DONE ("Aegis vs Nova"; Drone 7.5, Bastion 7; reviewed, good) |
+| audio (sfx, theme battle sfx API, ambient loops) | a6b881a23e46068d6 | running (9524) |
+| battle-2 (BIG battles from Top, classic battles, kit FX housekeeping) | ac63a47fb05a1fe85 | running (9525) |
+| board-2 (facing, glow flicker, kit adoption, halloween env, perf pass) | ae9ab876383b1ff7f | running (9526) |
+| puzzles (Lichess CC0 + classics, map, play) | a53142481a3bac366 | DONE (618 puzzles, 4760 checks pass; map+play reviewed, great; hook → ui-2) |
+| sculptor-fantasy-3 (q Sorceress + k High King + island env) | a18ad162b144a5b7e | running (9520) |
+| server-2 (lag credit, queued moves, prov, allowance race) | a7456397fcdd35eae | DONE (all tests pass; told to switch credit to full RTT) |
 | server (Go lobby/relay/ratings, net.js) | abc9067d1e0062fbb | DONE (test.sh ALL PASS + net 24/24 verified; local :8094 via tools/server_run.sh; deploy steps in notes/server.md) |
 
 ## Queue (as slots free)
@@ -59,3 +67,12 @@ Read this first when resuming, then DECISIONS.md, TEAM_BRIEF.md, docs/notes/*.md
 - server-2 queue: keep queued moves until next welcome (no drop after 10 s), `end` should update prov, gambit return page in payments checkout, lag credit D24.
 - Hold milestone-2 commit until board agent hands back (it is mid-edit in game.js/camera).
 - 2026-10-31: board DONE, contrast + tags reviewed (good). MILESTONE 2 commit: views/tags/contrast, online UI, halloween p/r/n/b, fantasy n/b (puzzles + in-progress sculptor files excluded until handed back).
+- 2026-10-31: refilled to 6: ui-2 and battle-1. Queue next: server-2 (queued moves, prov, lag credit), sci-fi sculptor (concept + p/r), fantasy q/k + island board, fantasy touch-up (wizard robe), classic battle polish, audio, QA, learn (last).
+- 2026-10-31: fantasy-2 DONE (reviewed: tower excellent, squire good). Running 5 → wait. Next fantasy: q Sorceress + k High King, then island diorama board. Gallery request: ?anim=<name> to force a move anim.
+- 2026-10-31: puzzles DONE (reviewed). ui-2 told to enable PLUGINS hook + shared board for puzzles. core told to cap tourney parallelism (load ~47 slowed everyone). Refilled to 6: fantasy-3, server-2.
+- 2026-10-31: halloween-3 DONE → Halloween has all 6 pieces + graveyard board + env. Env reads murky/plain (brown-green hill) → later env polish (moonlit sky gradient, more silhouettes). Running 5 → wait. Board-2 queue: per-type facing, idle glow flicker, kit.boardLooks.graveyard, instanced fog cards, ?anim= in gallery, kit adoption of loft/flameTongue/per-vertex metal-glow material.
+- 2026-10-31: core status: killed 10-thread tourney, now ≤3 workers; 20 bots, Stockfish-anchored calibration up to 2700; ETA hand-back ~30–40 min.
+- 2026-10-31: server-2 DONE. Decision: lag credit = full RTT (bounded by 1000 ms + quota). Also fixed ping blocking writer goroutine. Running 4 → refill: sci-fi sculptor-1, audio.
+- 2026-10-31: battle-1 DONE. My review of Top-view strips: correct and clean but underwhelming vs ref_battle (FX tiny at overhead scale, fire stream thin). → battle-2: make them BIG from Top (camera push-in/zoom on the fight even when locked, then return; FX 2–3× scale, screen-wide flash/vignette, debris flying past camera, victim reactions larger, slow-mo beat at impact), classic battles to match, sci-fi battles later. capMs request sent to ui-2. Kit requests for board-2: adopt addFxWarmup/parkFX, fadeOut transparent-shader compile, pool flash/ring/lightning/scorch.
+- 2026-10-31: core DONE. Refilled to 6: battle-2 (owns kit FX section) + board-2 (owns board/*.js + kit materials/looks). ui-3 queue: show expectedMoveMs on bot cards, "re-test this device" setting, humanDelay, dispose bots; ambientAnim setting UI.
+- 2026-10-31: scifi-1 DONE. Next sci-fi: n Strider + b Psi Oracle, then q AI Core + k Commander + station board, then battles. Running 5 → wait.

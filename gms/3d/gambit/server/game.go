@@ -32,17 +32,22 @@ type Game struct {
 	Spent    [2]bool  `json:"spent"`   // allowance counted for this seat
 	Draw     int      `json:"draw"`    // colour with a standing draw offer, -1 none
 	DrawPly  [2]int   `json:"drawPly"` // len(Moves) when each side last offered (one offer per move)
+	Quota    [2]int64 `json:"quota"`   // lag-credit quota per side, ms (clock.go)
 	Rematch  [2]bool  `json:"-"`
 	Gone     [2]int64 `json:"-"` // ms since the seat's last connection closed (0 = connected)
+	Lag      [2]int64 `json:"-"` // latest round-trip lag estimate per seat, ms (from pings)
+	Credit   int64    `json:"-"` // lag credit given to the last move, ms
 
-	Ended   bool   `json:"-"`
-	Result  string `json:"-"` // 1-0 | 0-1 | 1/2-1/2 | * (aborted)
-	Reason  string `json:"-"`
-	EndedAt int64  `json:"-"`
-	Deltas  [2]int `json:"-"` // rating change, rated games
-	After   [2]int `json:"-"`
-	PGN     string `json:"-"`
-	Next    string `json:"-"` // rematch game id once started
+	Ended   bool    `json:"-"`
+	Result  string  `json:"-"` // 1-0 | 0-1 | 1/2-1/2 | * (aborted)
+	Reason  string  `json:"-"`
+	EndedAt int64   `json:"-"`
+	Deltas  [2]int  `json:"-"` // rating change, rated games
+	After   [2]int  `json:"-"`
+	AfterRD [2]int  `json:"-"`
+	AfterPr [2]bool `json:"-"` // provisional after the game
+	PGN     string  `json:"-"`
+	Next    string  `json:"-"` // rematch game id once started
 
 	tc   TimeControl
 	pos  Pos
@@ -60,6 +65,7 @@ var (
 func newGame(id string, tc TimeControl, rated bool, w, b Seat, now int64) *Game {
 	g := &Game{ID: id, TCID: tc.ID, Rated: rated, Seats: [2]Seat{w, b}, Moves: []string{},
 		Clock: newClock(tc, now), Created: now, LastMove: now, Draw: -1, DrawPly: [2]int{-1, -1}}
+	g.Quota = [2]int64{initialLagQuota(tc), initialLagQuota(tc)}
 	g.rebuild()
 	return g
 }
@@ -110,8 +116,9 @@ func colorName(c int) string {
 
 // move validates and plays a move by side at now. ply is the index the client thinks
 // this move has (len(Moves) before it), so a resend after a reconnect is harmless.
+// lag is the mover's round-trip lag estimate (ms) for the D24 credit (g.Credit after).
 // Returns the SAN. On a flag the game ends on time and errOver is returned.
-func (g *Game) move(side int, uci string, ply int, now int64) (Move, string, error) {
+func (g *Game) move(side int, uci string, ply int, now, lag int64) (Move, string, error) {
 	if g.Ended {
 		return Move{}, "", errOver
 	}
@@ -125,14 +132,20 @@ func (g *Game) move(side int, uci string, ply int, now int64) (Move, string, err
 	if !ok {
 		return Move{}, "", errIllegal
 	}
-	if at, abort := deadline(g.tc, &g.Clock, side, ply); now >= at {
+	credit := lagCredit(g.tc, &g.Clock, g.Quota[side], lag, now)
+	if at, abort := deadline(g.tc, &g.Clock, side, ply); now-credit >= at {
 		g.timeout(side, abort, now)
 		return Move{}, "", errOver
 	}
-	if !g.Clock.press(g.tc, side, ply, now) {
+	wasRunning := g.Clock.Running
+	if !g.Clock.press(g.tc, side, ply, now, credit) {
 		g.timeout(side, false, now)
 		return Move{}, "", errOver
 	}
+	if wasRunning && !g.tc.Unlimited() {
+		g.Quota[side] = spendLagQuota(g.tc, g.Quota[side], credit)
+	}
+	g.Credit = credit
 	san := g.pos.SAN(m)
 	g.Moves = append(g.Moves, m.UCI())
 	g.sans = append(g.sans, san)
@@ -190,13 +203,15 @@ func winFor(c int) string {
 	return "0-1"
 }
 
-// checkTime ends the game if the side to move is past its deadline.
+// checkTime ends the game if the side to move is past its deadline. A running clock
+// is flagged only once the lag credit its move could still get has passed too (D24).
 func (g *Game) checkTime(now int64) bool {
 	if g.Ended {
 		return false
 	}
 	side := g.toMove()
-	if at, abort := deadline(g.tc, &g.Clock, side, len(g.Moves)); now >= at {
+	grace := lagCredit(g.tc, &g.Clock, g.Quota[side], g.Lag[side], now)
+	if at, abort := deadline(g.tc, &g.Clock, side, len(g.Moves)); now-grace >= at {
 		g.timeout(side, abort, now)
 		return true
 	}
@@ -320,8 +335,8 @@ func (g *Game) view(you int, now int64) map[string]any {
 
 func (g *Game) ratingsView() map[string]any {
 	return map[string]any{
-		"w": map[string]any{"before": g.Seats[0].Rating, "after": g.After[0], "delta": g.Deltas[0]},
-		"b": map[string]any{"before": g.Seats[1].Rating, "after": g.After[1], "delta": g.Deltas[1]},
+		"w": map[string]any{"before": g.Seats[0].Rating, "after": g.After[0], "delta": g.Deltas[0], "rd": g.AfterRD[0], "prov": g.AfterPr[0]},
+		"b": map[string]any{"before": g.Seats[1].Rating, "after": g.After[1], "delta": g.Deltas[1], "rd": g.AfterRD[1], "prov": g.AfterPr[1]},
 	}
 }
 
@@ -343,5 +358,11 @@ func unmarshalGame(data []byte) (*Game, error) {
 	if g.Moves == nil {
 		g.Moves = []string{}
 	}
-	return g, g.rebuild()
+	if err := g.rebuild(); err != nil {
+		return g, err
+	}
+	if g.Quota == [2]int64{} && !g.tc.Unlimited() { // saved before lag credit existed
+		g.Quota = [2]int64{initialLagQuota(g.tc), initialLagQuota(g.tc)}
+	}
+	return g, nil
 }

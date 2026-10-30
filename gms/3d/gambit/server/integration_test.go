@@ -632,3 +632,127 @@ func TestProtocolAbuse(t *testing.T) {
 	cl2.fails(map[string]any{"t": "seek", "tc": "7+0"}, "bad_tc")
 	cl2.fails(map[string]any{"t": "move", "game": "nope", "uci": "e2e4"}, "no_game")
 }
+
+// Pings run off the writer, measure every session, the lag reaches the game and the move
+// reply carries the credit; a rated end carries rd/prov so clients need no ratings call.
+func TestLagPingsAndEndProv(t *testing.T) {
+	resetWorld(t)
+	a := dial(t, "dev:lag-a:Ann:anon", "")
+	b := dial(t, "dev:lag-b:Ben:anon", "")
+	w, bl, game := pair(t, a, b, "1+0", true)
+	deadline := time.Now().Add(3 * time.Second)
+	for {
+		hub.mu.Lock()
+		n := 0
+		for _, uid := range []string{"dev-lag-a", "dev-lag-b"} {
+			for s := range hub.users[uid].sess {
+				if s.pings.Load() > 0 {
+					n++
+				}
+			}
+		}
+		hub.mu.Unlock()
+		if n == 2 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("sessions never measured a ping")
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	playWire(t, w, bl, game, "e2e4", "e7e5")
+	r := w.ok(map[string]any{"t": "move", "game": game, "uci": "g1f3", "ply": 2})
+	if c, ok := r["lag"].(float64); !ok || c < 0 || c > maxLagCredit {
+		t.Fatalf("move reply lag credit: %v", r)
+	}
+	hub.mu.Lock()
+	q := hub.games[game].Quota
+	hub.mu.Unlock()
+	if q[0] <= 0 || q[0] > maxLagQuota(timeControls["1+0"]) {
+		t.Fatalf("quota %v", q)
+	}
+	w.ok(map[string]any{"t": "resign", "game": game})
+	end := bl.wait("end")
+	rt := end["ratings"].(map[string]any)
+	for _, side := range []string{"w", "b"} {
+		x := rt[side].(map[string]any)
+		if x["prov"] != true || x["rd"].(float64) <= 0 || x["rd"].(float64) >= 350 {
+			t.Fatalf("end ratings %s: %v", side, x)
+		}
+	}
+	rs := bl.ok(map[string]any{"t": "ratings"})["ratings"].(map[string]any)["bullet"].(map[string]any)
+	x := rt["b"].(map[string]any)
+	if rs["r"] != x["after"] || rs["rd"] != x["rd"] || rs["prov"] != x["prov"] {
+		t.Fatalf("end ratings %v differ from stored %v", x, rs)
+	}
+}
+
+// A signed-in player with one game left must not start a second game while the payments
+// spend for the first is still in flight, nor get the game back from a refresh that read
+// payments before the spend landed.
+func TestAllowanceSpendRace(t *testing.T) {
+	resetWorld(t)
+	var mu sync.Mutex
+	used, per := 0, 1
+	release := make(chan struct{})
+	inSpend := make(chan struct{}, 4)
+	view := func() map[string]any {
+		return map[string]any{"tier": "free", "perDay": per, "usedToday": used, "remaining": per - used}
+	}
+	pay := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			mu.Lock()
+			defer mu.Unlock()
+			json.NewEncoder(w).Encode(view())
+			return
+		}
+		inSpend <- struct{}{}
+		<-release // the spend is slow: the race window
+		mu.Lock()
+		defer mu.Unlock()
+		used++
+		json.NewEncoder(w).Encode(map[string]any{"ok": true, "allowance": view()})
+	}))
+	defer pay.Close()
+	var once sync.Once
+	unblock := func() { once.Do(func() { close(release) }) }
+	defer unblock() // runs before pay.Close, so a failing test never leaves the handler stuck
+	cfg.AllowanceMode, cfg.AllowanceURL = "on", pay.URL+"/api/br8t/"
+	defer func() { cfg.AllowanceMode = "fake" }()
+
+	me := dial(t, mint("u-race", "google.com", "race@example.com"), "")
+	opp := dial(t, "dev:race-opp:Opp:signed", "")
+	room := me.ok(map[string]any{"t": "createRoom", "tc": "unlimited", "color": "w"})["room"].(map[string]any)
+	game := opp.ok(map[string]any{"t": "joinRoom", "code": room["code"]})["game"].(string)
+	me.wait("start")
+	opp.wait("start")
+	// While the game is started but uncounted, it is pending: no second game.
+	me.fails(map[string]any{"t": "createRoom", "tc": "unlimited"}, "no_games_left")
+	playWire(t, me, opp, game, "e2e4", "e7e5")
+	select {
+	case <-inSpend:
+	case <-time.After(3 * time.Second):
+		t.Fatal("no spend")
+	}
+	// Spend in flight: the cache still says 1 left; the reservation must hold, also
+	// after a refresh (cache older than 10 s) that reads payments' pre-spend counter.
+	advance(11 * time.Second)
+	r := me.fails(map[string]any{"t": "createRoom", "tc": "unlimited"}, "no_games_left")
+	if a := r["allowance"].(map[string]any); a["remaining"].(float64) != 0 || a["pending"].(float64) != 1 {
+		t.Fatalf("allowance during spend: %v", a)
+	}
+	unblock()
+	me.take("allowance after spend", func(m map[string]any) bool {
+		return m["t"] == "allowance" && m["allowance"].(map[string]any)["used"].(float64) == 1
+	})
+	advance(11 * time.Second)
+	r = me.fails(map[string]any{"t": "createRoom", "tc": "unlimited"}, "no_games_left")
+	if a := r["allowance"].(map[string]any); a["used"].(float64) != 1 || a["pending"].(float64) != 0 {
+		t.Fatalf("allowance after spend: %v", a)
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if used != 1 {
+		t.Fatalf("payments used %d", used)
+	}
+}

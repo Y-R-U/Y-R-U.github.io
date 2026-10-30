@@ -66,15 +66,23 @@ export function resetTime(a) {
 export const outOfGames = a => !!a && !a.unlimited && a.remaining <= 0;
 
 // The allowance chip text (D12).
-export function allowanceChip(a) {
+export function allowanceChip(a, { compact = false } = {}) {
   if (!a) return '';
   if (a.unlimited) {
     const why = a.tier === 'pass' ? 'BR8T Pass' : a.tier === 'admin' ? 'admin' : '';
-    return `<div class="ol-allow unl">${icon('check')}<span><b>Unlimited</b> online games${why ? ` · ${why}` : ''}</span></div>`;
+    return `<div class="ol-allow unl${compact ? ' mini' : ''}">${icon('check')}<span><b>Unlimited</b> online games${why ? ` · ${why}` : ''}</span></div>`;
   }
   const left = Math.max(0, a.remaining);
   const out = left <= 0;
   const reset = resetTime(a);
+  if (compact) {
+    return `<div class="ol-allow mini${out ? ' out' : ''}" title="${reset ? `Resets at ${esc(reset)}` : ''}">
+    <span class="ol-pips" aria-hidden="true">${Array.from({ length: Math.max(0, a.perDay) }, (_, i) => `<i class="${i < left ? 'on' : ''}"></i>`).join('')}</span>
+    <span class="ol-allow-txt"><b>${left} of ${a.perDay}</b> games left today</span>
+    ${a.tier === 'anon' ? `<button class="link" data-act="signin">Sign in: ${a.signedPerDay || 5}/day</button>`
+      : out ? '<button class="link" data-act="pass">Go unlimited</button>' : ''}
+  </div>`;
+  }
   return `<div class="ol-allow${out ? ' out' : ''}">
     <span class="ol-pips" aria-hidden="true">${Array.from({ length: Math.max(0, a.perDay) }, (_, i) => `<i class="${i < left ? 'on' : ''}"></i>`).join('')}</span>
     <span class="ol-allow-txt"><b>${left} of ${a.perDay}</b> online games left today${reset ? `<small>Resets at ${esc(reset)}</small>` : ''}</span>

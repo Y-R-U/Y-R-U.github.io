@@ -67,7 +67,7 @@ The manager owns this file; agents propose changes in their notes.
   provisional while RD>110; a game counts against the allowance once both sides have moved;
   Go rules in-house (perft-verified); loopback :8019 on the VPS, local dev :8094.
 - D24 Online lag + animations (manager): server gives a lichess-style lag credit per move
-  (up to min(estimated one-way lag, 1000 ms)); in **online timed** games battle animations are
+  (up to min(measured round-trip lag, 1000 ms, quota); quota = 3×gain refilled by gain/move, gain 140–300 ms); in **online timed** games battle animations are
   capped to ~1.2 s total regardless of the speed setting (Off still allowed), so the receiving
   player's clock cost is small and equal for both. Bots/offline keep D6 (clock waits for anims).
 - D25 Ladder loss points (ui, accepted by manager; amends D20): loss vs stronger bot =

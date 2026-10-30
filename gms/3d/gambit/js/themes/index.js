@@ -5,6 +5,7 @@ export const themes = {
   classic: () => import('./classic/index.js'),
   fantasy: () => import('./fantasy/index.js'),
   halloween: () => import('./halloween/index.js'),
+  scifi: () => import('./scifi/index.js'),
 };
 export default themes;
 

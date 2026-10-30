@@ -15,4 +15,5 @@ export default {
   pieces: { ...pieces },   // p n b r q k : (THREE, kit, {color}) -> Object3D
   moveAnims,
   battleAnims,
+  sounds: () => import('./sounds.js'),   // audio agent: lazy theme sounds + music (js/audio/)
 };

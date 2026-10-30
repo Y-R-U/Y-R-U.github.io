@@ -48,3 +48,56 @@
   edge, chanfron lip) — invisible at board scale, visible in extreme close-ups.
 - Bishop's arms/face mostly hide under the brim at the default angle; the robe is a simple cone.
 - Slot on the bishop hat is a lathe wedge, so it widens toward the brim edge.
+
+---
+
+# sculptor-fantasy-2 — round 2: Pawn + Rook
+
+## Done
+- **Pawn "Squire"** (`pawn.js`) — young foot-soldier: SDF body (marching stance, booted legs with
+  plate greaves + knee cops, mail hauberk skirt, raised tabard panel front/back in the side colour
+  with a gold hem, gold belt, short cape, steel/gold pauldrons, gorget, vambrace) + crisp plain
+  geometry for the pointed spangenhelm (gold brow band, side-colour ring, ribs, nasal, finial),
+  a curved kite shield (gold rim, side-colour field, gold cross + boss) and a spear (leaf blade,
+  gold socket, swallow-tailed pennant). Smallest plinth (R 0.30, top 0.12). Helm top ≈ 0.83,
+  spear tip ≈ 0.90. **5,992 tris, 1 mesh/material.**
+  - It is turned 3/4 toward its owner (`YAW = 0.5`, baked into the geometry). Deliberate break
+    of MODEL_GUIDE §2's "no baked yaw": after the board's ±90° side yaw it faces screen-left/right
+    like the other figures, but the shield comes round toward the owning player's camera.
+- **Rook "Watchtower"** (`rook.js`) — 8 staggered courses of individually cut, bevelled stone
+  blocks (open lathe faces; the dark mortar core shows through the joints), gold-banded footing,
+  arched door in a gold frame (planked leaf, iron bands, ring pull), 4 glowing arrow slits with
+  gold lintels, 14 corbels under an overhanging parapet with a gold band, 6 merlons with coping
+  slabs (gold on white, light steel on black) around a dark well, two heraldic banners (gold
+  border, side-colour field fading darker, gold tower badge, rod + knobs). Door faces -x, so
+  after the side yaw it faces the owner's camera. Top ≈ 0.95. **5,946 tris, 1 mesh/material.**
+- Black side on dark squares: black squire = steel helm + steel pauldrons + red cape inside the
+  gold ring; black rook = light-steel coping blocks alternating with dark crenels around a black
+  well (coping is metal 0.4, not 1 — full metal reflected the dark env and vanished from above).
+- **Move anims** (`anims.js`): `march` (pawns, weight 5): 2 swaying marching hops (3 for a double
+  step), leaning in, dust at each footfall, stamp — 280 + 45 ms. `grind` (rooks, weight 5): rocks
+  back to break loose (55 ms), shuddering heavy slide with a dust trail (235 ms), thud squash with
+  a dust puff + faint ground ring (55 ms). Measured end-to-end through `board.applyMove` they take
+  the same time as Classic's hop (~400–430 ms incl. board overhead in headless Chrome).
+- Draw calls unchanged: 1 per kind per side (lineup 18, full army 12 + board).
+- Viewer: `tools/sculpt_fantasy_view.html` gained `&az=<deg>` to orbit the camera (e.g.
+  `?piece=p&view=side&noyaw=1&az=200` = the squire from the front).
+
+## How to test
+- Close-ups: `tools/sculpt_fantasy_view.html?piece=p,r&view=angle|top`, front `&view=side&noyaw=1&az=200`.
+- Gallery: `tools/board_gallery.html?theme=fantasy&view=top|tilt|angle`, contrast FEN from MODEL_GUIDE §5.
+- Anims: playground, then in the console `Math.random=()=>0.999` makes the board pick the last
+  eligible anim (march for pawns, grind for rooks).
+
+## Open issues / honest score
+- Squire ~7/10: reads as a real armoured figurine with layered kit, but the face is mostly hidden
+  under the helm, the SDF body is soft (cell 0.0168 to stay < 6k), cape/pauldron borders are a bit
+  blotchy in close-ups, and at phone size from overhead it is a small helm + colour on a ring.
+- Watchtower ~8/10: the stonework, door and banners are the best detail in the set so far; the
+  parapet wall above the gold band is plain, and the black tower picks up a reddish cast from the
+  kit's warm rim glow (reads as dark iron/red, which suits the side).
+- Both sit right at the 6k budget; anything more needs a coarser plinth (shared, 24 seg here).
+
+## Requests
+- Board/manager: none blocking. If the board ever exposes a way to force a move anim by label in
+  the gallery playground (`?anim=march`), anim review would be easier than stubbing Math.random.

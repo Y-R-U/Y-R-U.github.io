@@ -105,3 +105,78 @@ exception, failed resource, or `[gambit]` warning (that is how a silent shim fal
 - Move list is not clickable for reviewing earlier positions yet.
 - No premoves.
 - Lion crest is a simple procedural SVG; a proper heraldic lion would be nicer.
+
+## ui-2 (2026-10-31)
+Owner now also of `js/app/screens/online*.js`, `css/online.css`, `js/puzzles/` (puzzles agent done), fixes in `net.js`.
+
+### Done
+- **One shared WebGL board** — `js/app/boardhost.js`. Bot game, online game and puzzles all borrow the
+  same `createBoard` instance (created on first use with the current settings). API:
+  ```js
+  import { acquire } from '../app/boardhost.js';
+  const lease = acquire(container, { fen, orientation, animSpeed, labels, keyboard, legalMoves, onMoveAttempt,
+                                     onPromotion, onRevoke() { board = null; } });
+  lease.ready.then(b => { if (b) board = b; });   // null if another screen took the board first
+  lease.on('view', fn);                            // board events, unsubscribed on release
+  lease.track(onSettings(fn));                     // any cleanup fn, run on release
+  lease.release();                                 // in leave(): detaches, keeps the board alive
+  ```
+  `acquire` moves the one `.board-host` div (canvas inside) into `container` and resets interactivity,
+  handlers, highlights, arrows, name tag, orientation, position (no animation), labels/keyboard
+  options and any running battle. `release` makes it inert (keyboard off so V / arrows don't act on a
+  hidden board). Only one lease is live; a new acquire revokes the old one. The container must be
+  `position: relative` with a size (`.board-square` / `.pz-board`). Verified: bot game → puzzle →
+  online game → home → bot game → online game = **1 WebGL context** (`tools/ui2_cdp.mjs ctx`).
+- **Portrait game layout**: `.screen.game` is the size container. Column = move box (flex, takes every
+  spare pixel) / opponent bar / board (full width) / your bar / toolbar (anchored). Bars grow 50→64 px
+  (`--bar-h`). Move box is a container (`moves`): short = one-line strip, ≥ 84 px = wrapped scoresheet
+  with ◀ ▶ bottom-right; empty state shows the bot's blurb when ≥ 150 px. 360×740: moves 133 / bars 64 /
+  board 360; 390×844: 207/64/390; 412×915: 256/64/412; zero gaps. Board sits low, near the thumb.
+  Landscape unchanged (+ a short-landscape-phone rule: 44 px bars, narrower panel).
+- **Move review** (`js/app/review.js`, used by game.js + online_game.js): tap any move → that position
+  (setPosition, no animation, last-move + check highlight), gold frame round the board, ◀ ▶ and ← →
+  (not in Free view, where arrows orbit) step, gold "Move N · Live ▸" chip returns. Board is
+  non-interactive while reviewing. A new move (bot / opponent / server resync / undo) ends review and
+  animates from the right position. Premoves: skipped.
+- **Promotion**: shared `promotionPicker(stage, {color, to, board})` in ui.js, used by all three screens
+  via `board.onPromotion`; anchored next to the target square (`squareToScreen`), so the dragged pawn
+  stays visible hovering on it; tap outside cancels.
+- **Online home on phones**: compact me card (small crest, one-row ratings, one-line allowance chip with
+  "Sign in: 5/day"), Quick match as a 4-column chip grid (time + category) with Rated/Casual beside the
+  heading: all chips above the fold at 360×740 (bottom 527 px). The D10/D11 warning sits right under the
+  chips, full text (+ friends tip) until the first online game, then a one-line expandable summary
+  (`onlineWarnSeen` setting / any rated games). Leaderboard warning unchanged.
+- **No server → "Online play is coming soon"**: `net.js` `ONLINE_PUBLIC = false` (flip on deploy). Hosts
+  other than localhost/LAN then have no server base at all: `net.available()` is false with **zero
+  requests**, the Online screen shows a friendly coming-soon page (Play a bot / Puzzles), no websocket,
+  no console errors. LAN with the dev server down: one /api/health probe → "Can't reach the online
+  server" + Try again (no reconnect loop). Test hooks: `?server=none`, `?server=<base>`.
+- **Home "online game in progress" card** from `gambit.local.online` (local-only key, net.js writes it on
+  welcome / start / move / end; stale after 2×base+5 min for timed, 4 days for Unlimited). No
+  connection at boot; hidden when no server is configured. Home Puzzles item shows "N solved · rating".
+- **Puzzles**: PLUGINS line enabled; `play.js` on the shared board host; wrong move = `board.shake()`
+  (new one-liner in board.js public API, camera shake via the rig) instead of the CSS shake.
+  Cloud-sync `describe` line "N puzzles solved · rating R"; Settings → About credits the Lichess CC0 DB.
+- **D24 battle cap (from battle agent)**: `board.applyMove(m, {battle, capMs})` — new option, board.js
+  forwards `capMs` into the battle ctx (surgical edit in `doApplyMove`); `js/themes/battle_util.js` `prep()`
+  compresses themed battles to fit. online_game.js passes `capMs: 1200` in timed games; the wall-clock
+  `board.skip()` stays only as a safety net at 1.6 s.
+- **Lion crest**: new heraldic lion (two-layer swirling mane, ears, gold face with dark detailing) in
+  `ui.js` `LION`.
+
+### How to test
+```
+tools/server_run.sh --bg
+~/.claude/bin/cdp start --port 9518 -- --use-angle=metal --use-gl=angle --ignore-gpu-blocklist
+node tools/ui2_cdp.mjs shots   # 360/390/412 portrait + 1440: layout gaps, review, online home above-the-fold
+node tools/ui2_cdp.mjs ctx     # 2 tabs: bot → puzzle → online game → home card → bot: 1 WebGL context; online review
+node tools/ui2_cdp.mjs soon    # ?server=none: coming soon, zero server requests; unreachable server card
+```
+Gotcha: a background tab gets no rAF in headless Chrome, so board animations never finish there —
+`Page.bringToFront` the tab that plays. Last run: all three ALL PASS, plus ui_cdp shots/play,
+board_game_test 14/14, online_cdp all, puzzles_cdp — zero console errors.
+
+### Open
+- The online server restarts now and then (another agent); a test running across a restart logs a
+  websocket error — rerun.
+- Online hint is per browser, so two tabs as two dev players share it (test artefact only).

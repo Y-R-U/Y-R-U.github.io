@@ -90,19 +90,29 @@ export function mount(el, ctx) {
   };
   if (sub !== 'game') ctx.setTop({ title: 'Play Online', back: '#/home' });
 
-  let slow = setTimeout(() => {
-    if (left || net.state === 'open') return;
-    const l = ui.querySelector('.ol-loading');
-    if (l) l.innerHTML = `<div class="ol-offline">${icon('globe')}<h3>Can’t reach the online server</h3>
-      <p>Still trying… Check your connection. Bots and puzzles work offline.</p>
-      <div class="ol-row"><a class="btn btn-ghost" href="#/play/bot">${icon('robot')} Play a bot</a></div></div>`;
-  }, 8000);
-  Promise.all([ensureCss(), connectOnce()]).then(() => { clearTimeout(slow); start(); })
-    .catch(e => { clearTimeout(slow); if (left) return; console.warn('[gambit] online connect', e && e.code);
-      const off = net.on('welcome', () => { off(); start(); }); cleanups.push(off);
+  let slow = 0;
+  const connect = () => {
+    slow = setTimeout(() => {
+      if (left || net.state === 'open') return;
       const l = ui.querySelector('.ol-loading');
-      if (l) l.innerHTML = `<div class="ol-offline">${icon('globe')}<h3>Can’t reach the online server</h3><p>Retrying in the background. Bots and puzzles work offline.</p></div>`;
-    });
+      if (l) l.innerHTML = `<div class="ol-offline">${icon('globe')}<h3>Can’t reach the online server</h3>
+        <p>Still trying… Check your connection. Bots and puzzles work offline.</p>
+        <div class="ol-row"><a class="btn btn-ghost" href="#/play/bot">${icon('robot')} Play a bot</a></div></div>`;
+    }, 8000);
+    Promise.all([ensureCss(), connectOnce()]).then(() => { clearTimeout(slow); start(); })
+      .catch(e => { clearTimeout(slow); if (left) return; console.warn('[gambit] online connect', e && e.code);
+        const off = net.on('welcome', () => { off(); start(); }); cleanups.push(off);
+        const l = ui.querySelector('.ol-loading');
+        if (l) l.innerHTML = `<div class="ol-offline">${icon('globe')}<h3>Can’t reach the online server</h3><p>Retrying in the background. Bots and puzzles work offline.</p></div>`;
+      });
+  };
+  // No server for this host (e.g. GitHub Pages before the deploy) or it doesn't answer:
+  // a friendly screen, no websocket, no reconnect loop, no console errors.
+  if (net.state === 'open' || net.state === 'reconnecting') connect();
+  else Promise.all([ensureCss(), net.available()]).then(([, ok]) => {
+    if (left) return;
+    if (ok) connect(); else unavailable(ui, ctx);
+  });
 
   return {
     leave() {
@@ -111,6 +121,34 @@ export function mount(el, ctx) {
       try { inner && inner.leave && inner.leave(); } catch (e) { console.warn(e); }
     },
   };
+}
+
+// ---------- no server: "coming soon" (not configured) / "can't reach" (configured, no answer) ----------
+function unavailable(root, ctx) {
+  const soon = !net.configured;
+  ctx.setTop({ title: 'Play Online', back: '#/home' });
+  root.innerHTML = `<div class="ol-soon">
+    <div class="ol-soon-art">${icon('globe')}<span></span><span></span></div>
+    <small class="ol-kicker">${soon ? 'Coming soon' : 'Offline'}</small>
+    <h2>${soon ? 'Online play is coming soon' : 'Can’t reach the online server'}</h2>
+    <p>${soon ? 'Rated quick matches, a live lobby and private rooms to play your friends are being set up. Check back soon!'
+      : 'The online server isn’t answering right now. Your connection may be down, or the server is taking a break.'}</p>
+    <ul class="ol-soon-list">
+      <li>${icon('clock')}<span>Quick match from bullet to unlimited</span></li>
+      <li>${icon('user')}<span>Private room codes for friends</span></li>
+      <li>${icon('trophy')}<span>Ratings and a leaderboard</span></li>
+    </ul>
+    <div class="ol-soon-btns">
+      ${soon ? '' : `<button class="btn btn-ghost" data-act="retry">${icon('rematch')} Try again</button>`}
+      <a class="btn btn-primary" href="#/play/bot">${icon('robot')} Play a bot</a>
+      <a class="btn btn-ghost" href="#/puzzles">${icon('puzzle')} Puzzles</a>
+    </div>
+    <p class="fine">Bots and puzzles are unlimited and work offline.</p>
+  </div>`;
+  root.addEventListener('click', e => {
+    if (!e.target.closest('[data-act="retry"]')) return;
+    play('tap'); net._avail = false; ctx.app.go(location.hash);
+  });
 }
 
 // ---------- home ----------
@@ -123,7 +161,6 @@ function homeScreen(root, ctx) {
     <div class="ol-connbar"></div>
     <div class="ol-me card card-accent"></div>
     <div class="ol-live"></div>
-    <div class="warn ol-warn">${icon('info')}<span>${esc(CHEAT_WARNING)}</span></div>
     <div class="tabs ol-tabs" role="tablist">
       <a role="tab" data-tab="play">Play</a><a role="tab" data-tab="lobby">Lobby</a><a role="tab" data-tab="leaders">Leaderboard</a>
     </div>
@@ -134,15 +171,14 @@ function homeScreen(root, ctx) {
   function renderMe() {
     const me = net.me || {}, r = net.ratings || {};
     el.querySelector('.ol-me').innerHTML = `
-      <div class="ol-me-top">${playerAvatar(me, { size: 'md', me: true })}
+      <div class="ol-me-top">${playerAvatar(me, { size: 'sm', me: true })}
         <div class="ol-me-id"><small>${me.anon ? 'Playing as a guest' : 'Signed in'}</small>
           <b>${esc(me.name || 'Player')}</b></div>
         <button class="tb-btn" data-act="rename" aria-label="Change your online name" title="Change name">${icon('settings')}</button>
       </div>
-      <div class="ol-ratings">${CATS.map(c => { const x = r[c.id] || {}; return `<div title="${x.prov ? 'Provisional: settles after a few more games' : ''}">
-        <small>${c.short || c.name}</small><b>${ratingTxt(x.r ? Math.round(x.r) : 1500, x.prov !== false)}</b><em>${x.games ? `${x.games} game${x.games === 1 ? '' : 's'}` : 'new'}</em></div>`; }).join('')}</div>
-      <p class="ol-prov-note">? = provisional rating: it settles after a few games.</p>
-      ${allowanceChip(net.allowance)}`;
+      <div class="ol-ratings" title="? = provisional: your rating settles after a few games">${CATS.map(c => { const x = r[c.id] || {}; return `<div title="${c.name}: ${x.games ? `${x.games} game${x.games === 1 ? '' : 's'}` : 'no games yet'}${x.prov !== false ? ' · provisional' : ''}">
+        <small>${c.short || c.name}</small><b>${ratingTxt(x.r ? Math.round(x.r) : 1500, x.prov !== false)}</b></div>`; }).join('')}</div>
+      ${allowanceChip(net.allowance, { compact: true })}`;
   }
   function renderLive() {
     const live = [...net.games.values()].filter(g => g.status === 'playing');
@@ -164,10 +200,9 @@ function homeScreen(root, ctx) {
   }
   function seekingCount(tc) { return (net.lobby && net.lobby.seeking && net.lobby.seeking[tc]) || 0; }
   function playTab() {
-    return `<h3 class="sect">Quick match</h3>
-      <div class="ol-ratedrow">${segmented('rated', [{ value: 'true', label: 'Rated' }, { value: 'false', label: 'Casual' }], String(rated()))}</div>
-      <div class="tc-groups">${TC_GROUPS.map(g => `<div class="tc-group"><small>${icon('clock')} ${g.group}</small>
-        <div class="tc-chips">${g.items.map(tc => { const n = seekingCount(tc); return `<button class="chip ol-tc" data-tc="${tc}">${tcLabel(tc)}${n ? `<i class="ol-seekn" title="${n} waiting">${n}</i>` : ''}</button>`; }).join('')}</div></div>`).join('')}</div>
+    return `<div class="ol-qm-head"><h3 class="sect">Quick match</h3>${segmented('rated', [{ value: 'true', label: 'Rated' }, { value: 'false', label: 'Casual' }], String(rated()))}</div>
+      <div class="ol-qm">${TC_GROUPS.flatMap(g => g.items.map(tc => { const n = seekingCount(tc); return `<button class="chip ol-tc${tc === 'unlimited' ? ' unl' : ''}" data-tc="${tc}"><b>${tcLabel(tc)}</b><small>${tc === 'unlimited' ? '3 days a move' : g.group}</small>${n ? `<i class="ol-seekn" title="${n} waiting">${n}</i>` : ''}</button>`; })).join('')}</div>
+      ${warnHtml()}
       <h3 class="sect">Play a friend</h3>
       <div class="card ol-friend">
         <p>${icon('user')}<span>${esc(FRIENDS_TIP)}</span></p>
@@ -175,6 +210,14 @@ function homeScreen(root, ctx) {
         <form class="ol-code" autocomplete="off"><input name="code" maxlength="8" placeholder="Have a code?" aria-label="Room code" autocapitalize="characters" spellcheck="false"><button class="btn btn-ghost" type="submit">Join</button></form>
       </div>
       ${lobbyStats()}`;
+  }
+  // D10/D11 warning: always shown under Quick match; full until the first online game, then a
+  // one-line summary that opens on tap.
+  function warnHtml() {
+    const played = Object.values(net.ratings || {}).some(x => x && x.games > 0) || getSettings().onlineWarnSeen;
+    return played
+      ? `<details class="warn ol-warn"><summary>${icon('info')}<span>No cheat detection yet: play people you know.</span></summary><p>${esc(CHEAT_WARNING)}</p></details>`
+      : `<div class="warn ol-warn">${icon('info')}<span>${esc(CHEAT_WARNING)} ${esc(FRIENDS_TIP)}</span></div>`;
   }
   function lobbyStats() {
     const l = net.lobby;

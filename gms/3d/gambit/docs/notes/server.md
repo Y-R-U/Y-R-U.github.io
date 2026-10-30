@@ -107,14 +107,53 @@ await net.connect({ name: settings.displayName });   // once, when the Online sc
   `server/README.md` "Deploy".
 
 ## Open issues / later
-- No lag compensation: network latency and the receiving player's battle animation run on
-  their clock. Options: lichess-style per-move lag credit (client reports its own think time,
-  server credits up to ~300 ms + a lag quota), or a fixed per-move grace. Not done yet.
+- ~~No lag compensation~~ done by server-2 (D24 lag credit, see below).
 - No spectating, no takebacks, no chat (deliberate: less moderation).
 - Rating is anonymous-playable; an abuser could farm rated games with throwaway anon uids
   (2/day each, 30/day per IP). Leaderboard excludes anon, so it only affects their own number.
-- Allowance gate for signed-in users reads payments at seek/create/join time; a player with 1
-  game left could still start two at once from two rooms in the same second (both count; the
-  second 429s and goes ahead). Accepted (fail open).
-- `stopped_at` heartbeat every 15 s: after a crash (not a clean stop) up to 15 s of downtime is
+- ~~Allowance race (last game started twice)~~ fixed by server-2 (reserve-then-spend).
+- `stopped_at` heartbeat now every 5 s (was 15): after a crash up to 5 s of downtime is
   charged to the side to move.
+
+## server-2 (2026-10-31)
+- **D24 lag credit** (`clock.go` "lag credit", `game.go`, `session.go`): the server measures
+  each socket's RTT itself with websocket pings (every 4 s while the player has a live timed
+  game, else 25 s; pings now run on their own goroutine — before, `Ping` sat on the writer and
+  held every outgoing message back by one round trip). Lag = EWMA of the full RTT (samples
+  capped at 2 s). Each timed move from ply 2 gets `credit = min(lag, 1000, quota, time the
+  move took)`; `quota = min(quota − credit + gain, 5 × gain)`, `gain = min(300, 100 +
+  (base + 40·inc)/1500)` ms (1+0: 140, 3+0: 220, 5+0+: 300), starting at 3 × gain, persisted
+  in `live_games` (`quota`). Honest RTT < gain is always fully credited; a faked lag gains at
+  most ~gain per move (≈9 s over 40 moves of 3+0). The tick flags only after the credit the
+  mover's next move could get (so a move landing just past the visible deadline counts).
+  The `move` reply carries `lag` (ms credited). Credits the **full round trip** (manager
+  decision, amends D24's "one-way"): the mover is charged both legs (opponent's move out + own
+  move back); still bounded by the 1000 ms cap and the quota.
+- **net.js queued moves**: a move made while (re)connecting is exempt from the 10 s timeout and
+  waits for the next `welcome`, which decides it: already in the game at that ply → resolves
+  `{dup:true, san}`; still our turn at that ply → resent (fresh timeout); otherwise rejected
+  `stale_ply` / `game_over` with a `sync`. `net.close()` still rejects on the timer.
+  `net.timeoutMs` (default 10000) is the request timeout.
+- **`end` ratings** carry `rd` and `prov` per side; net.js updates `net.ratings[cat]`
+  `{r, rd, prov, games}` from it. The online screens can drop their `net.myRatings()` call after
+  each game (online agent's files; not touched).
+- **Allowance race**: a payments spend in flight counts as a reserved (`pending`) game until
+  payments answers, and a refresh GET that overlapped a spend is discarded (it may have read the
+  pre-spend counter). Test `TestAllowanceSpendRace` fails without the fix.
+- Heartbeat 15 s → 5 s.
+- Tests: `go test -race ./...` (25 funcs incl. `TestLagCredit`, `TestLagGraceAtFlag`,
+  `TestLagPingsAndEndProv`, `TestAllowanceSpendRace`), `server/test.sh` ALL PASS;
+  `node tools/server_net_test.mjs` 29 checks ALL PASS (3 new outage cases: queued move outlives
+  the timeout and is resent; lost reply settles from the welcome as dup; stale queued move
+  dropped with game_over + sync); `tools/online_cdp.mjs all` ALL PASS, 0 console errors.
+- **Deploy notes**: nothing new on the box beyond README "Deploy". Protocol stays v1 (only added
+  fields: `lag` in the move reply, `rd`/`prov` in end ratings, `quota` in persisted live games;
+  games saved by the old build get a fresh quota on load). Old clients keep working.
+
+## ui-2 changes to net.js (2026-10-31)
+- `ONLINE_PUBLIC = false`: off localhost/LAN there is no server base until the deploy flips it; then
+  `connect()` / `_get()` reject with code `unavailable` without any request. `net.available()` (one
+  /api/health probe, cached) and `net.configured` for the Online screen's coming-soon state.
+  `?server=none` simulates a host without a server.
+- Local hint `gambit.local.online` (`HINT_KEY`, `readHint()`) for Home's "online game in progress" card,
+  written on welcome / start / move / end. server_net_test is unaffected (Node has no localStorage).

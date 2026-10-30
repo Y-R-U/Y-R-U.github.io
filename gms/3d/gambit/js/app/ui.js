@@ -8,7 +8,8 @@ export function h(html) { const t = document.createElement('template'); t.innerH
 export const fmtInt = n => Math.round(n).toLocaleString('en-US');
 
 // Avatar: emoji / short text, or an image URL.
-export const LION = '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon fill="currentColor" points="12.00,0.80 13.91,3.62 16.86,1.91 17.36,5.28 20.76,5.02 19.75,8.27 22.92,9.51 20.60,12.00 22.92,14.49 19.75,15.73 20.76,18.98 17.36,18.72 16.86,22.09 13.91,20.38 12.00,23.20 10.09,20.38 7.14,22.09 6.64,18.72 3.24,18.98 4.25,15.73 1.08,14.49 3.40,12.00 1.08,9.51 4.25,8.27 3.24,5.02 6.64,5.28 7.14,1.91 10.09,3.62"/><path fill="#0c162b" d="M12 5.6c3.4 0 5.6 2.6 5.6 5.7 0 3.6-2.6 6.9-5.6 6.9s-5.6-3.3-5.6-6.9c0-3.1 2.2-5.7 5.6-5.7z"/><circle cx="9.7" cy="10.6" r=".95" fill="currentColor"/><circle cx="14.3" cy="10.6" r=".95" fill="currentColor"/><path fill="currentColor" d="M10.4 13.1h3.2L12 15.2z"/><path d="M10.2 16.3q1.8 1.1 3.6 0" stroke="currentColor" stroke-width=".9" fill="none" stroke-linecap="round"/></svg>';
+// Heraldic lion crest (ui-2): swirling two-layer mane, ears, gold face with dark detailing.
+export const LION = '<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" stroke="#0c162b" stroke-width=".45" stroke-linejoin="round"><path d="M9.72 7.19Q11.49 2.19 15.67 1.93Q16.27 5.18 14.28 7.19ZM12.58 6.73Q16.62 3.29 20.36 5.15Q19.26 8.27 16.53 9.01ZM15.29 7.77Q20.50 6.81 22.82 10.29Q20.30 12.44 17.57 11.72ZM17.11 10.02Q22.11 11.79 22.37 15.97Q19.12 16.57 17.11 14.58ZM17.57 12.88Q21.01 16.92 19.15 20.66Q16.03 19.56 15.29 16.83ZM16.53 15.59Q17.49 20.80 14.01 23.12Q11.86 20.60 12.58 17.87ZM14.28 17.41Q12.51 22.41 8.33 22.67Q7.73 19.42 9.72 17.41ZM11.42 17.87Q7.38 21.31 3.64 19.45Q4.74 16.33 7.47 15.59ZM8.71 16.83Q3.50 17.79 1.18 14.31Q3.70 12.16 6.43 12.88ZM6.89 14.58Q1.89 12.81 1.63 8.63Q4.88 8.03 6.89 10.02ZM6.43 11.72Q2.99 7.68 4.85 3.94Q7.97 5.04 8.71 7.77ZM7.47 9.01Q6.51 3.80 9.99 1.48Q12.14 4.00 11.42 6.73Z"/><path d="M11.31 7.35Q13.72 4.29 16.74 4.77Q16.90 7.37 15.07 8.36ZM13.88 7.67Q17.49 6.23 19.87 8.15Q18.71 10.48 16.63 10.42ZM15.94 9.23Q19.79 9.79 20.89 12.64Q18.72 14.07 16.95 12.99ZM16.95 11.61Q20.01 14.02 19.53 17.04Q16.93 17.20 15.94 15.37ZM16.63 14.18Q18.07 17.79 16.15 20.17Q13.82 19.01 13.88 16.93ZM15.07 16.24Q14.51 20.09 11.66 21.19Q10.23 19.02 11.31 17.25ZM12.69 17.25Q10.28 20.31 7.26 19.83Q7.10 17.23 8.93 16.24ZM10.12 16.93Q6.51 18.37 4.13 16.45Q5.29 14.12 7.37 14.18ZM8.06 15.37Q4.21 14.81 3.11 11.96Q5.28 10.53 7.05 11.61ZM7.05 12.99Q3.99 10.58 4.47 7.56Q7.07 7.40 8.06 9.23ZM7.37 10.42Q5.93 6.81 7.85 4.43Q10.18 5.59 10.12 7.67ZM8.93 8.36Q9.49 4.51 12.34 3.41Q13.77 5.58 12.69 7.35Z"/></g><circle cx="12" cy="12.3" r="6.1" fill="currentColor"/><path fill="currentColor" stroke="#0c162b" stroke-width=".35" d="M8.3 8.1c-.7-.9-.6-2 .4-2.3.8-.2 1.4.4 1.6 1.1M15.7 8.1c.7-.9.6-2-.4-2.3-.8-.2-1.4.4-1.6 1.1"/><path fill="currentColor" stroke="#0c162b" stroke-width=".4" d="M12 6.6c2.5 0 4.3 1.8 4.3 4.2 0 1.3-.4 2.3-1 3.2l-.8 2.4c-.4 1-1.3 1.6-2.5 1.6s-2.1-.6-2.5-1.6l-.8-2.4c-.6-.9-1-1.9-1-3.2 0-2.4 1.8-4.2 4.3-4.2z"/><g fill="#0c162b"><path d="M9 10.1q1.2-.5 2.2.4-1.2.5-2.2-.4zM15 10.1q-1.2-.5-2.2.4 1.2.5 2.2-.4z"/><path d="M10.6 13.4h2.8l-1.4 1.5z"/></g><g fill="none" stroke="#0c162b" stroke-width=".42" stroke-linecap="round"><path d="M8.7 9.1q1.3-.8 2.6.1M15.3 9.1q-1.3-.8-2.6.1M11.3 10.9l-.5 2.4M12.7 10.9l.5 2.4M12 14.9v.9M10.5 15.9q1.5 1.1 3 0"/></g><g fill="#0c162b"><circle cx="10.2" cy="14.9" r=".22"/><circle cx="13.8" cy="14.9" r=".22"/></g></svg>';
 export function avatar(av, { hue = 30, size = 'md', label = '' } = {}) {
   if (av === 'lion') return `<span class="av av-${size} av-lion" title="${esc(label)}">${LION}</span>`;
   const isImg = typeof av === 'string' && /\.(png|jpe?g|webp|svg)$|^data:/.test(av);
@@ -88,3 +89,39 @@ export function toggle(name, on) {
 }
 
 export { icon };
+
+// ---------- promotion picker (shared by bot game, online game, puzzles) ----------
+// Drawn over the board stage; anchored next to the promotion square when the board can
+// project it (board.squareToScreen), so the dragged pawn stays visible on its target.
+// Resolves 'q'|'r'|'b'|'n', or null on cancel / tap outside.
+const PROMO_GLYPH = { q: '♛', r: '♜', b: '♝', n: '♞' };
+const PROMO_NAME = { q: 'Queen', r: 'Rook', b: 'Bishop', n: 'Knight' };
+export function promotionPicker(stage, { color = 'w', to = null, board = null } = {}) {
+  return new Promise(resolve => {
+    if (!stage) { resolve('q'); return; }
+    const o = h(`<div class="promo" role="dialog" aria-label="Promote to">
+      <div class="promo-card"><small>Promote to</small><div class="promo-row">
+      ${['q', 'r', 'b', 'n'].map(p => `<button data-p="${p}" class="pc-${color}" aria-label="${PROMO_NAME[p]}">${PROMO_GLYPH[p]}</button>`).join('')}
+      </div><button class="link" data-p="">Cancel</button></div></div>`);
+    let pt = null;
+    try { if (to && board && board.squareToScreen) pt = board.squareToScreen(to); } catch { pt = null; }
+    const done = v => { o.remove(); resolve(v); };
+    o.addEventListener('click', e => {
+      const b = e.target.closest('[data-p]');
+      if (b) done(b.dataset.p || null);
+      else if (e.target === o) done(null);
+    });
+    stage.appendChild(o);
+    if (pt) {
+      o.classList.add('anchored');
+      const card = o.querySelector('.promo-card');
+      const W = stage.clientWidth, H = stage.clientHeight, cw = card.offsetWidth, ch = card.offsetHeight;
+      const sq = W / 8;
+      // sit on the board side of the square (below a top-edge square, above a bottom-edge one)
+      let y = pt.y < H / 2 ? pt.y + sq * 0.7 : pt.y - sq * 0.7 - ch;
+      let x = pt.x - cw / 2;
+      x = Math.max(6, Math.min(W - cw - 6, x)); y = Math.max(6, Math.min(H - ch - 6, y));
+      card.style.left = `${Math.round(x)}px`; card.style.top = `${Math.round(y)}px`;
+    }
+  });
+}

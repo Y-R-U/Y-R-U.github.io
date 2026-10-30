@@ -610,7 +610,7 @@ export async function createBoard(container, opts = {}) {
     nu.rotation.y = 0; nu.scale.setScalar(1);
   }
 
-  async function doApplyMove(m, { battle = true } = {}) {
+  async function doApplyMove(m, { battle = true, capMs = 0 } = {}) {
     const my = gen;
     const from = m.from, to = m.to;
     if (!isSq(from) || !isSq(to)) return;
@@ -656,6 +656,7 @@ export async function createBoard(container, opts = {}) {
         const ctx = animCtx(tl, rec, from, to, { move: m, attacker, victim, victimPos: sqVec(victimSq), victimSq,
           victimType: vrec.type, victimColor: vrec.color });
         ctx.dir = kit.flatDir(sqVec(from), sqVec(victimSq));
+        if (capMs > 0) ctx.capMs = capMs;   // D24: themed battles compress to fit (battle_util prep)
         const fn = pickAnim(themeList('battleAnims'), rec.type);
         const guard = new Promise(res => setTimeout(res, 9000 / tl.rate + 1000));   // never hang the game
         try { await Promise.race([fn ? fn(ctx) : Promise.resolve(), guard]); } catch (e) { console.error('[board] battle anim failed', e); }
@@ -710,9 +711,10 @@ export async function createBoard(container, opts = {}) {
       if (animate && pieces) { const p = setPositionAnimated(fen); queue = p.catch(() => {}); return p; }
       setPositionNow(fen); queue = Promise.resolve(); return Promise.resolve();
     },
-    applyMove(m, { battle = true } = {}) {
+    /** opts: battle (default true); capMs = D24 cap, forwarded to the battle ctx (themes compress to fit). */
+    applyMove(m, { battle = true, capMs = 0 } = {}) {
       if (typeof m === 'string') m = { from: m.slice(0, 2), to: m.slice(2, 4), promotion: m[4] };
-      const p = queue.then(() => doApplyMove(m, { battle }));
+      const p = queue.then(() => doApplyMove(m, { battle, capMs }));
       queue = p.catch(e => console.error(e));
       return p;
     },
@@ -749,6 +751,8 @@ export async function createBoard(container, opts = {}) {
     },
     select(sq) { select(isSq(sq) ? sq : null); },
     skip,
+    /** Camera shake (e.g. a wrong puzzle move). amp in world units, ~0.08 is a nudge. */
+    shake(amp = 0.08, ms = 380) { rig.shake(amp, ms); wake(); },
     isAnimating() { return animCount > 0; },
     whenIdle() { return queue; },
     /** Show / hide a piece name tag programmatically (e.g. learn mode). */

@@ -75,7 +75,7 @@ func seatsAB() (Seat, Seat) {
 
 func mustMove(t *testing.T, g *Game, side int, uci string, now int64) {
 	t.Helper()
-	if _, _, err := g.move(side, uci, len(g.Moves), now); err != nil {
+	if _, _, err := g.move(side, uci, len(g.Moves), now, 0); err != nil {
 		t.Fatalf("move %s: %v", uci, err)
 	}
 }
@@ -101,7 +101,7 @@ func TestClockRules(t *testing.T) {
 		t.Errorf("clock view %+v", v)
 	}
 	// Black flags: the move arrives after 181 s and is refused, white wins on time.
-	if _, _, err := g.move(black, "b8c6", 3, t0+55_000+181_000); err != errOver {
+	if _, _, err := g.move(black, "b8c6", 3, t0+55_000+181_000, 0); err != errOver {
 		t.Fatalf("late move err %v", err)
 	}
 	if g.Result != "1-0" || g.Reason != "timeout" {
@@ -192,4 +192,105 @@ func TestDrawRules(t *testing.T) {
 		t.Errorf("round trip: %v", err)
 	}
 	_ = time.Second
+}
+
+func TestLagCredit(t *testing.T) {
+	tc := timeControls["3+0"]
+	if g := lagQuotaGain(tc); g != 220 {
+		t.Fatalf("3+0 gain %d", g)
+	}
+	for id, want := range map[string]int64{"1+0": 140, "2+1": 206, "5+0": 300, "15+10": 300, "unlimited": 0} {
+		if g := lagQuotaGain(timeControls[id]); g != want {
+			t.Errorf("%s gain %d want %d", id, g, want)
+		}
+	}
+	w, b := seatsAB()
+	g := newGame("lag1", tc, true, w, b, 0)
+	if g.Quota != [2]int64{660, 660} {
+		t.Fatalf("initial quota %v", g.Quota)
+	}
+	move := func(side int, uci string, now, lag int64) {
+		t.Helper()
+		if _, _, err := g.move(side, uci, len(g.Moves), now, lag); err != nil {
+			t.Fatalf("move %s: %v", uci, err)
+		}
+	}
+	// First moves: no clock, no credit, quota untouched.
+	move(white, "e2e4", 1000, 500)
+	move(black, "e7e5", 2000, 500)
+	if g.Credit != 0 || g.Quota != [2]int64{660, 660} {
+		t.Fatalf("first moves credited: %d %v", g.Credit, g.Quota)
+	}
+	// Honest 150 ms lag: fully credited, quota refills.
+	move(white, "g1f3", 7000, 150)
+	if g.Credit != 150 || g.Clock.Rem[white] != 180000-5000+150 || g.Quota[white] != 660-150+220 {
+		t.Fatalf("honest credit %d rem %d quota %d", g.Credit, g.Clock.Rem[white], g.Quota[white])
+	}
+	// Credit never exceeds the time the move took.
+	move(black, "b8c6", 7100, 500)
+	if g.Credit != 100 || g.Clock.Rem[black] != 180000 {
+		t.Fatalf("credit beyond elapsed: %d rem %d", g.Credit, g.Clock.Rem[black])
+	}
+	// A client faking 1000 ms of lag every move is held to the quota: after the banked
+	// quota is gone it gets at most gain (220 ms) per move.
+	now, total, quota0 := int64(7100), int64(0), g.Quota[white]
+	ucis := []string{"f1c4", "g8f6", "b1c3", "f8c5", "d2d3", "d7d6", "c1g5", "c8g4", "h2h3", "g4h5"}
+	for i, u := range ucis {
+		now += 2000
+		side := white
+		if i%2 == 1 {
+			side = black
+		}
+		move(side, u, now, 1000)
+		if side == white {
+			total += g.Credit
+		}
+	}
+	if max := quota0 + 4*220; total > max || total < 5*220 {
+		t.Fatalf("white faked-lag credit %d over 5 moves, want between %d and %d", total, 5*220, max)
+	}
+	if g.Credit > maxLagCredit {
+		t.Fatalf("credit %d over the cap", g.Credit)
+	}
+	// Quota is capped at 5 × gain however long the player goes without lag.
+	for i, q := 0, int64(0); i < 10; i++ {
+		q = spendLagQuota(tc, q, 0)
+		if i == 9 && q != 1100 {
+			t.Fatalf("quota cap %d", q)
+		}
+	}
+	// Unlimited: no lag credit.
+	if c := lagCredit(timeControls["unlimited"], &Clock{Running: true}, 1000, 500, 10_000); c != 0 {
+		t.Fatalf("unlimited credit %d", c)
+	}
+}
+
+func TestLagGraceAtFlag(t *testing.T) {
+	w, b := seatsAB()
+	g := newGame("lag2", timeControls["1+0"], true, w, b, 0)
+	mustMove(t, g, white, "e2e4", 1000)
+	mustMove(t, g, black, "e7e5", 2000)
+	// White's clock: 60 s from t=2000. With a 120 ms lag estimate the flag waits 120 ms
+	// (quota 420 ≥ 120), and a move landing inside that window is accepted.
+	g.Lag[white] = 120
+	if g.checkTime(62_000) || g.checkTime(62_119) {
+		t.Fatal("flagged inside the lag grace")
+	}
+	if _, _, err := g.move(white, "g1f3", 2, 62_100, 120); err != nil {
+		t.Fatalf("move inside grace refused: %v", err)
+	}
+	if g.Clock.Rem[white] != 20 || g.Credit != 120 {
+		t.Fatalf("rem %d credit %d", g.Clock.Rem[white], g.Credit)
+	}
+	// Black: no lag measured → flagged exactly at the deadline, as before.
+	if !g.checkTime(62_100+60_000) || g.Result != "1-0" {
+		t.Fatalf("black should flag at the deadline: %v %s", g.Ended, g.Result)
+	}
+	// A move after deadline + credit is refused on time.
+	g2 := newGame("lag3", timeControls["1+0"], true, w, b, 0)
+	mustMove(t, g2, white, "e2e4", 1000)
+	mustMove(t, g2, black, "e7e5", 2000)
+	if _, _, err := g2.move(white, "g1f3", 2, 62_000+120, 120); err != errOver || g2.Reason != "timeout" {
+		t.Fatalf("late move: %v %s", err, g2.Reason)
+	}
 }

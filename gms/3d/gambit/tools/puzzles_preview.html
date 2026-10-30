@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>GAMBIT · Puzzles preview</title>
+  <!-- Dev harness for the puzzles screen until the shell routes #/puzzles to js/puzzles/screen.js.
+       Mirrors index.html's shell markup so the screen renders exactly as it will in the app. -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&display=swap" />
+  <link rel="stylesheet" href="../css/app.css" />
+  <script type="importmap">
+  { "imports": { "three": "/gms/lib/three/0.180.0/three.module.js", "three/addons/": "/gms/lib/three/0.180.0/addons/" } }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <header id="topbar"><div class="tb-left"></div><div class="tb-right"></div></header>
+    <main id="view"></main>
+  </div>
+  <script type="module">
+    import { loadDeps, deps } from '../js/app/deps.js';
+    import { icon } from '../js/app/ui.js';
+    import * as puzzles from '../js/puzzles/screen.js';
+    const view = document.getElementById('view');
+    const app = { deps, go(hash) { if (location.hash === hash) render(); else location.hash = hash; } };
+    window.__gambit = app;
+    let cur = null;
+    function render() {
+      const m = (location.hash || '#/puzzles').match(/^#\/puzzles(?:\/(.+))?$/);
+      if (!m) { location.replace('#/puzzles'); return; }
+      cur?.leave?.();
+      const res = puzzles.render(app, { rest: m[1] || '' });
+      view.replaceChildren(res.el); view.scrollTop = 0; cur = res;
+      document.body.dataset.route = res.route;
+      const t = res.top || {};
+      document.querySelector('.tb-left').innerHTML = `${t.back ? `<a class="tb-btn" href="${t.back}">${icon('back')}</a>` : ''}<div class="tb-title"><div>${t.title || ''}</div>${t.sub ? `<small>${t.sub}</small>` : ''}</div>`;
+    }
+    await loadDeps();
+    addEventListener('hashchange', render);
+    render();
+    window.__booted = true;
+  </script>
+</body>
+</html>

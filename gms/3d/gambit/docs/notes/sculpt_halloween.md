@@ -172,3 +172,99 @@ legal-move dots fit.
 ## Open issues
 - The knight's flames have no glow. A glow-material inner core on 3–4 tongues would cost about 600 tris and
   read more "ghost fire", but would add a lot of emissive area. I left it to keep the glow sparing.
+
+---
+
+# Round 3: sculptor-halloween-3 (queen + king, first board)
+
+## Done
+- **Queen: Vampire Countess** (`royals.js` `queen`). A pale little countess (big glinting eyes,
+  flicked lashes, rosy cheeks, a tiny smile with two fangs) with a widow's-peak updo and bun. She wears
+  a long gown with a scalloped hem, a darker V bodice and a trim sash, under a floor-length cape that is
+  open at the front with a bat-wing scalloped hem. A **towering collar** fans up behind her head: five
+  bat-wing points, the lining facing the head and a trim rim. On her head is a **coronet of eight bat-wing
+  points** leaning outward, each tipped with a bright bead, around a centre post with a **glowing gem**
+  finial. Sleeves are in the cape colour and her hands are clasped at the waist; there is a brooch at the throat.
+  **5,960 tris, 2 mats (body + glow), height 1.19.**
+  - Overhead: a ring of light beads (the dotted circle) around a glowing centre dot, framed by the
+    collar crescent (orange on white, green on black).
+  - Colours: white = orange gown, bone cape, orange lining, gold coronet, auburn hair. Black = violet-black
+    gown, purple cape, green lining, pale-green coronet, lavender skin. New `SIDES` keys:
+    `gown gownShade cape capeShade lining pale lips vampHair crown crownShade crownTip`.
+- **King: Pumpkin King** (`royals.js` `king`). A big squat jack-o'-lantern head (8 lobes; the ribs
+  soften across the face so the carved decals sit flush) with a proud carved face that glows: slanted eyes,
+  a nose and a wide grin with three teeth. It sits on a stout robe with buttons and an ermine placket, under a
+  royal mantle that is open at the front with ermine edging and hem. He has a fat ermine collar with black ermine
+  tails, sleeves with ermine cuffs and dark mitts, and a short orb sceptre in one hand. The flared crown has
+  six bead-tipped points and a glowing gem at the front. A **cross of bones** sits on top: an upright bone plus two
+  crossing bars, with a green vine curl and leaf at its foot. **7,880 tris, 2 mats, height 1.32 (tallest).**
+  - Overhead: a big orange or purple pumpkin disc, a gold or pale-green crown ring, and a clear bone **"+"**
+    with knobbly ends. The black king's bones are lavender (`boneTop`) and its ermine is lavender, so
+    it reads on dark squares.
+  - New `SIDES` keys: `royal royalShade ermine ermineSpot bat`. The white mantle is brick (`#a8420e`), so the
+    pumpkin head still stands out against it.
+- Heights are now: pawn 0.64, rook 0.77, bishop 1.00, knight 1.14 (the flames), **queen 1.19, king 1.32**.
+  `lift()` stretches the body (not the head) to reach these heights, and it transforms normals analytically.
+- `pieces.js` now exports `H` (helpers: `mats col mix … wrap refine loft plinth`, plus `setThree`) so
+  that `royals.js` doesn't copy them. The queen and king live in `royals.js`, which `index.js` merges into `pieces`.
+- Gotcha (fixed in `shell()`): `kit.latheSegment`/`kit.merge` return **non-indexed** geometry, so a
+  later `computeVertexNormals()` (inside `deform`) gives **flat, faceted** shading. `shell()` welds it with
+  `mergeVertices` first. Colour shells *before* deforming them, while inner/outer is still a clean
+  radius test.
+- **Move anims** (`anims.js`; measured with `kit.Timeline` at 1×, 16 ms steps; all end exactly on `ctx.to`, scale 1):
+  - `countessBats` (q, weight 5, "bat swarm"): she twists and shrinks while 5 bats burst out (one
+    `InstancedMesh` added to `ctx.scene` and removed in a `finally`, flapping by wing-span scale). The swarm
+    swirls along an arc with additive wisps, then folds in and she pops back with a back-out overshoot,
+    with side-coloured mist at both ends. **~300 ms (1 sq) / ~340 ms (7 sq).**
+  - `countessGlide` (q, weight 2, "vampire glide"): a hover-glide leaning back, with a little twist and mist puffs. ~300–350 ms.
+  - `royalHop` (k, weight 5, "royal hop"): a crouch, then a stately arc with a regal sway and a short mantle
+    "flutter" wobble on the descent, landing with a stomp ring (amber or green), sparks and dust. **~300–335 ms.**
+- **Board, first pass** (`board.js`, wired in `index.js` as `board: {build, environment, overlayStyle}`):
+  - Surface: one 1024² canvas texture of irregular, chipped flagstones. Light squares are limestone `#d8d1bf` with
+    lichen rosettes and hairline cracks. Dark squares are violet-grey slate `#6a7182`; that value is
+    deliberately close to Classic's `#69717f` (D28). Moss creeps in from the dark mossy grout, and a small
+    512² emissive map draws a broken, faint glowing-moss line in the joints. Coordinates match Classic.
+  - Frame: 32 stone kerb blocks (jittered heights and tones, mossy patches), corner pillars, each
+    with a leaning tombstone (one is a cross) and three candles (glowing flames), a tiny pumpkin on two corners,
+    and a low spiked iron railing (17 posts a side, two rails). **3 draw calls** in total (surface, props, flames).
+  - Environment (tilted views only, `minPhi` 0.12): a rolling ground with a hill behind, about 17 big tombstones
+    and pumpkins, four crooked bare trees, nine soft fog cards and a big moon sprite. It sets an indigo
+    `background` (`#120f20`) and a far `Fog` (22–60, so the board never fogs). Lights: the warm key is kept
+    as default (so piece colours stay true), plus a cool moon rim light and an indigo hemi. It uses a dim studio env
+    for reflections. About 12 draw calls (1 merged mesh + 9 sprites + moon), ~9k tris.
+  - `overlayStyle`: orange last-move, amber select, green hint.
+- Numbers: Playground start position **40 draw calls** at 3D (24 pieces + 3 board + 11 env + FX), **22 at Top**
+  with the D28 FEN, lineup Top 30. Autoplay ran 25 s at 1440×900 at 60 fps (headless Metal), console clean.
+
+## How to test (additions)
+- Close-up: `tools/sculpt_halloween_closeup.html?theme=halloween&types=qk&view=angle&theta=-1.3&dist=3`
+  (negative theta sees the faces: the board turns white +90°).
+- Slow-motion anim frames: in the gallery Playground, filter `theme.moveAnims` to one label and wrap
+  `ctx.tween` with `ms * 14`, then `G.boards[0].applyMove({...})` and screenshot. That is how the bat swarm was checked.
+
+## Self-score (honest)
+- Queen **7/10**. The face is the most charming of the set, and the bat-wing coronet and fanned collar
+  say "vampire countess" at an angle. From above, the dotted ring and glowing gem read as a queen. Held back by:
+  the arms are stiff sticks, the hair is a plain cap (the widow's peak is subtle), the collar is a flat
+  shell (no thickness detail), and at 360 px the coronet ring is only ~10 px across.
+- King **7.5/10**. Unmistakable everywhere: the bone "+" is the clearest king read in any theme so far, the carved
+  grin glows nicely, and the ermine tails add charm. Held back by: the crown is a plain flared band, the
+  mantle and robe are simple lathes, and the arms hang stiffly.
+- Board **6.5–7/10** (first pass). The flagstones and mossy joints look good, it is cheap (3 draw calls) and
+  D28 contrast holds. Held back by: the grout is a little wide, the corner props are small at the default
+  camera, the environment ground is a plain murky surface (no grass detail) and the trees sit mostly out of frame.
+
+## Requests
+- kit: `kit.boardLooks.graveyard` (the `LOOK` object in `halloween/board.js`), so that D28 square contrast is
+  tuned in one place.
+- board: a shared idle-flicker uniform for glow materials (repeat). The candles, lantern faces and the
+  countess's gem would all use it.
+- board: per-type `pieces.facing` (repeat). The countess and king faces would look better toward the
+  player.
+- Halloween **battle anims** are not built yet (they fall back to Classic). This is a good next task: the
+  countess bites, the king's pumpkin chomps, the witch zaps, and so on.
+
+## Open issues
+- Environment: the fog sprites are 9 separate draw calls. They could become one instanced billboard if the env budget gets tight.
+- `kit.merge` un-indexing makes every `deform` after a merge faceted. Round 1–2 pieces have a few such
+  parts (the witch's hair, for example). They are minor and left alone.

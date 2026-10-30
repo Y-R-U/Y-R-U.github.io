@@ -5,13 +5,15 @@
 // mover's clock, awaits the board animation (incl. battle), THEN starts the
 // next player's clock (D6). Leaving the screen suspends the game into the
 // local-only resume slot; coming back rebuilds it from there.
-import { h, $, $$, esc, icon, avatar, toast, confirmDialog, openSheet, fmtInt } from '../ui.js';
+import { promotionPicker, h, $, $$, esc, icon, avatar, toast, confirmDialog, openSheet, fmtInt } from '../ui.js';
 import { getSettings, setSettings, onSettings, getResume, setResume, clearResume, getLadder } from '../store.js';
 import { GameClock, fmtClock, parseTc } from '../clock.js';
 import { recordGame, playerRank } from '../ladder.js';
-import { play } from '../sound.js';
+import { play, playMove } from '../sound.js';
 import { settingsPanel } from './settings.js';
 import { installedThemes } from '../themes-meta.js';
+import { acquire } from '../boardhost.js';
+import { createReview, reviewNavHtml, movesHtml } from '../review.js';
 
 export const ROUTE = 'game';
 const GLYPH = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
@@ -27,8 +29,14 @@ const REASON = {
 
 let app = null;
 let G = null;               // the live game (null when none is loaded)
-let boardHost = null, board = null, boardPromise = null;
+let lease = null, board = null;
 let view = null;            // the mounted screen element (null when off-screen)
+// move-list review: tap a move / ◀ ▶ to look back; leaving review restores the live board
+const review = createReview({
+  chess: () => G && G.chess, board: () => board,
+  onExit: () => { syncBoard(); setInteractive(); },
+  onChange: () => setInteractive(),
+});
 let ticker = null;
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -82,36 +90,35 @@ function suspend(keep = true) {
   G = null;
 }
 
-// ---------- board ----------
-function ensureBoard() {
-  if (!boardHost) boardHost = h('<div class="board-host"></div>');
-  if (!boardPromise) {
-    const s = getSettings();
-    boardPromise = app.deps.board.createBoard(boardHost, {
-      fen: G ? G.chess.fen() : undefined,
-      orientation: G ? G.color : 'w',
-      theme: s.theme, coords: s.coords, animSpeed: s.battleSpeed, view: s.view,
-      legalMoves: sq => (G && !G.over && G.chess.turn() === G.color && !G.animating)
-        ? G.chess.moves({ square: sq, verbose: true }).map(m => m.to) : [],
-    }).then(b => {
-      board = b;
-      board.onMoveAttempt = onMoveAttempt;
-      // camera view changes (View button, V key) persist to settings
-      if (board.on) board.on('view', ({ view: v }) => {
-        if (getSettings().view !== v) {   // came from the View button or the V key
-          setSettings({ view: v });
-          toast(v === 'free' ? 'Free view: drag or pinch to look around' : `${viewLabel(v)} view`, { ms: 1200 });
-        }
-        syncViewBtn();
-      });
-      // the board asks for the piece before calling onMoveAttempt (picker drawn over the board)
-      board.onPromotion = ({ color }) => pickPromotion(color);
-      applySettingsToBoard(getSettings(), null);
-      onSettings(applySettingsToBoard);
-      return b;
-    });
-  }
-  return boardPromise;
+// ---------- board (the shared board host: one WebGL board for every screen) ----------
+function acquireBoard(container) {
+  const s = getSettings();
+  lease = acquire(container, {
+    fen: G ? G.chess.fen() : undefined,
+    orientation: G ? (G.flipped ? G.botColor : G.color) : 'w',
+    animSpeed: s.battleSpeed,
+    legalMoves: sq => (G && !G.over && !review.on && G.chess.turn() === G.color && !G.animating)
+      ? G.chess.moves({ square: sq, verbose: true }).map(m => m.to) : [],
+    onMoveAttempt,
+    // the board asks for the piece before calling onMoveAttempt (dragged pawn hovers on the target)
+    onPromotion: ({ to, color }) => pickPromotion(color, to),
+    onRevoke: () => { board = null; },
+  });
+  // camera view changes (View button, V key) persist to settings
+  lease.on('view', ({ view: v }) => {
+    if (getSettings().view !== v) {   // came from the View button or the V key
+      setSettings({ view: v });
+      toast(v === 'free' ? 'Free view: drag or pinch to look around' : `${viewLabel(v)} view`, { ms: 1200 });
+    }
+    syncViewBtn();
+  });
+  lease.track(onSettings(applySettingsToBoard));
+  return lease.ready.then(b => {
+    if (!b) return null;
+    board = b;
+    applySettingsToBoard(getSettings(), null);
+    return b;
+  });
 }
 
 function applySettingsToBoard(s, patch) {
@@ -138,7 +145,7 @@ function syncBoard() {
 }
 
 function syncHighlights(extra = {}) {
-  if (!board || !G) return;
+  if (!board || !G || review.on) return;
   const hist = G.chess.history({ verbose: true });
   const last = hist[hist.length - 1];
   let check = null;
@@ -163,15 +170,15 @@ function findKing(color) {
 
 function setInteractive() {
   if (!board || !G) return;
-  const mine = !G.over && !G.animating && !G.thinking && G.chess.turn() === G.color && !G.pending;
+  const mine = !G.over && !G.animating && !G.thinking && G.chess.turn() === G.color && !G.pending && !review.on;
   board.setInteractive(mine ? G.color : null);
 }
 
 // ---------- moves ----------
 function onMoveAttempt({ from, to, promotion }) {
-  if (!G || G.over || G.animating || G.chess.turn() !== G.color || G.pending) return false;
+  if (!G || G.over || G.animating || G.chess.turn() !== G.color || G.pending || review.on) return false;
   const legal = G.chess.moves({ square: from, verbose: true }).filter(m => m.to === to);
-  if (!legal.length) return false;
+  if (!legal.length) { play('illegal'); return false; }
   if (legal.some(m => m.promotion) && !promotion) {
     // shim board (no onPromotion support): pick, then apply ourselves
     pickPromotion(G.color).then(pr => { if (pr && G) commitUserMove({ from, to, promotion: pr }); else syncBoard(); });
@@ -199,7 +206,8 @@ async function doMove(v, mover, { user = false } = {}) {
   g.clock.press(mover);
   g.animating = true;
   setInteractive();
-  play(v.san && v.san.includes('#') ? 'check' : v.captured ? 'capture' : v.san && v.san.includes('+') ? 'check' : v.flags && /[kq]/.test(v.flags) ? 'castle' : 'move');
+  playMove(v);   // audio: move/capture/castle/promote + check, lands with the board anim
+  if (review.on) review.exit({ beforeLast: true });   // a new move arrived: back to live, then animate it
   renderAll();
   saveResume();
   try {
@@ -396,6 +404,7 @@ async function undo() {
   }
   G.undoWarned = true;
   G.assisted = true;
+  review.exit({ beforeLast: true });
   G.gen++; G.thinking = false;
   try { G.botImpl && G.botImpl.stop(); } catch { /* ignore */ }
   G.clock.stop();
@@ -462,21 +471,11 @@ function syncSpeedBtn() {
 }
 
 // ---------- promotion / confirm ----------
-function pickPromotion(color) {
-  return new Promise(resolve => {
-    const stage = view && view.querySelector('.board-square');
-    if (!stage) { resolve('q'); return; }
-    G.pending = true; setInteractive();
-    const o = h(`<div class="promo" role="dialog" aria-label="Promote to">
-      <div class="promo-card"><small>Promote to</small><div class="promo-row">
-      ${['q', 'r', 'b', 'n'].map(p => `<button data-p="${p}" class="pc-${color}" aria-label="${{ q: 'Queen', r: 'Rook', b: 'Bishop', n: 'Knight' }[p]}">${GLYPH[p]}</button>`).join('')}
-      </div><button class="link" data-p="">Cancel</button></div></div>`);
-    o.addEventListener('click', e => {
-      const b = e.target.closest('[data-p]'); if (!b) return;
-      o.remove(); if (G) G.pending = false; resolve(b.dataset.p || null);
-    });
-    stage.appendChild(o);
-  });
+function pickPromotion(color, to = null) {
+  const stage = view && view.querySelector('.board-square');
+  if (!stage || !G) return Promise.resolve('q');
+  G.pending = true; setInteractive();
+  return promotionPicker(stage, { color, to, board }).then(p => { if (G) G.pending = false; return p; });
 }
 
 function askConfirm(m) {
@@ -548,15 +547,12 @@ function renderMoves() {
   if (!view || !G) return;
   const hist = G.chess.history();
   const ol = view.querySelector('.moves');
-  let html = '';
-  for (let i = 0; i < hist.length; i += 2) {
-    html += `<li><span class="n">${i / 2 + 1}.</span><span class="m${i === hist.length - 1 ? ' cur' : ''}">${esc(hist[i])}</span>${hist[i + 1] ? `<span class="m${i + 1 === hist.length - 1 ? ' cur' : ''}">${esc(hist[i + 1])}</span>` : ''}</li>`;
-  }
+  let html = movesHtml(hist);
   if (G.over && G.result) html += `<li class="res"><span>${G.result.result.replace('1/2-1/2', '½–½')}</span></li>`;
-  ol.innerHTML = html || '<li class="empty">Your move — good luck!</li>';
-  if (G.color === 'b' && !hist.length) ol.innerHTML = `<li class="empty">${esc(G.bot.name)} plays white…</li>`;
+  ol.innerHTML = html || `<li class="empty">${G.color === 'b' ? `${esc(G.bot.name)} plays white…` : 'Your move — good luck!'}${G.bot.blurb ? `<q>${esc(G.bot.blurb)}</q>` : ''}</li>`;
   const wrap = view.querySelector('.moves-wrap');
-  requestAnimationFrame(() => { wrap.scrollLeft = wrap.scrollWidth; wrap.scrollTop = wrap.scrollHeight; });
+  if (review.on) review.sync();
+  else requestAnimationFrame(() => { wrap.scrollLeft = wrap.scrollWidth; wrap.scrollTop = wrap.scrollHeight; review.sync(); });
 }
 
 function renderActions() {
@@ -606,13 +602,13 @@ export function render(appRef) {
       </div>
     </div>
     <aside class="g-panel">
-      <div class="moves-wrap"><ol class="moves"></ol></div>
+      <div class="moves-box"><div class="moves-wrap"><ol class="moves"></ol></div>${reviewNavHtml()}</div>
       <div class="actions"></div>
     </aside>
   </section>`);
   view = el;
-  ensureBoard();
-  el.querySelector('.board-square').appendChild(boardHost);
+  const boardReady = acquireBoard(el.querySelector('.board-square'));
+  const unbindReview = review.bind(el);
   renderAll();
 
   el.addEventListener('click', e => {
@@ -626,8 +622,8 @@ export function render(appRef) {
   });
 
   const g = G;
-  boardPromise.then(() => {
-    if (G !== g || view !== el) return;
+  boardReady.then(b => {
+    if (!b || G !== g || view !== el) return;
     el.querySelector('.board-loading')?.remove();
     syncBoard();
     board.resize && board.resize();
@@ -660,8 +656,9 @@ export function render(appRef) {
       clearInterval(ticker); ro.disconnect();
       document.removeEventListener('visibilitychange', onVis);
       window.removeEventListener('pagehide', onHide);
-      if (board) board.setInteractive(null);
-      boardHost.remove();
+      unbindReview();
+      if (lease) lease.release();
+      lease = null; board = null;
       view = null;
       suspend(true);
     },
@@ -671,7 +668,8 @@ export function render(appRef) {
 // ---------- test hook (used by tools/ui_cdp.mjs; harmless in production) ----------
 window.__gambitTest = () => G && {
   ready: !!board && !!view,
-  myTurn: !G.over && !G.animating && !G.thinking && !G.pending && G.chess.turn() === G.color,
+  myTurn: !G.over && !G.animating && !G.thinking && !G.pending && !review.on && G.chess.turn() === G.color,
+  reviewing: review.on,
   over: G.over, plies: G.chess.history().length, result: G.result || null,
   state: { animating: G.animating, thinking: G.thinking, pending: !!G.pending, boardAnimating: board && board.isAnimating && board.isAnimating(), turn: G.chess.turn(), color: G.color },
   // goes through the same entry point the board uses

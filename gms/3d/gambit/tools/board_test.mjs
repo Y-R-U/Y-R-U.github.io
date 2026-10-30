@@ -2,7 +2,7 @@
 // and special moves (castling, en passant, promotion). Small dpr-1 viewport because
 // headless swiftshader is slow. Usage: node tools/board_test.mjs [outDir]
 import { writeFileSync, mkdirSync } from 'fs';
-const PORT = 9502, out = process.argv[2] || '.';
+const PORT = +(process.env.CDP_PORT || 9502), out = process.argv[2] || '.';
 mkdirSync(out, { recursive: true });
 const URL = 'http://192.168.0.236:8888/gms/3d/gambit/tools/board_gallery.html?mode=play&view=top';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -24,7 +24,7 @@ const shot = async n => { const r = await send('Page.captureScreenshot', { forma
 let pass = 0, fail = 0;
 const check = (name, ok, info = '') => { console.log(ok ? 'PASS' : 'FAIL', name, info); ok ? pass++ : fail++; };
 
-await send('Runtime.enable'); await send('Page.enable'); await send('Network.setCacheDisabled', { cacheDisabled: true });
+await send('Runtime.enable'); await send('Page.enable'); await send('Network.enable'); await send('Network.clearBrowserCache'); await send('Network.setCacheDisabled', { cacheDisabled: true });
 await send('Emulation.setDeviceMetricsOverride', { width: 420, height: 760, deviceScaleFactor: 1, mobile: false });
 await send('Page.navigate', { url: URL });
 await until('window.G && G.boards.length === 1 && G.chess');

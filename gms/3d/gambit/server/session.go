@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/coder/websocket"
@@ -25,12 +26,15 @@ type Sess struct {
 	done   chan struct{}
 	tokens float64
 	last   time.Time
+	lagUs  atomic.Int64 // lag estimate, µs (EWMA of ping RTT); 0 = no sample yet
+	pings  atomic.Int64 // samples taken
 }
 
 const (
 	sendBuf      = 64
 	helloTimeout = 10 * time.Second
 	pingEvery    = 25 * time.Second
+	pingInGame   = 4 * time.Second // while the player has a live timed game (lag credit, D24)
 	writeTimeout = 10 * time.Second
 	msgBurst     = 30
 	msgPerSec    = 10
@@ -82,8 +86,6 @@ func (s *Sess) allowMsg() bool {
 }
 
 func (s *Sess) writer() {
-	ping := time.NewTicker(pingEvery)
-	defer ping.Stop()
 	for {
 		select {
 		case <-s.done:
@@ -96,7 +98,23 @@ func (s *Sess) writer() {
 				s.close(websocket.StatusGoingAway, "write failed")
 				return
 			}
-		case <-ping.C:
+		}
+	}
+}
+
+// pinger keeps the connection alive and measures its round trip for the lag credit.
+// It runs on its own goroutine: Ping blocks until the pong, and on the writer that
+// would hold every outgoing move back by one round trip.
+func (s *Sess) pinger() {
+	t := time.NewTicker(pingInGame)
+	defer t.Stop()
+	var last time.Time
+	for {
+		hub.mu.Lock()
+		timed := s.u != nil && hub.liveTimed(s.u)
+		hub.mu.Unlock()
+		if timed || time.Since(last) >= pingEvery {
+			last = time.Now()
 			ctx, cancel := context.WithTimeout(context.Background(), writeTimeout)
 			err := s.c.Ping(ctx)
 			cancel()
@@ -104,9 +122,29 @@ func (s *Sess) writer() {
 				s.close(websocket.StatusGoingAway, "ping failed")
 				return
 			}
+			s.addRTT(time.Since(last))
+			hub.noteLag(s)
+		}
+		select {
+		case <-s.done:
+			return
+		case <-t.C:
 		}
 	}
 }
+
+// addRTT folds one ping round trip into the lag estimate.
+func (s *Sess) addRTT(rtt time.Duration) {
+	one := min(rtt, maxLagSample*time.Millisecond).Microseconds() // full RTT: the mover is charged both legs (manager, D24)
+	if s.pings.Add(1) == 1 {
+		s.lagUs.Store(one)
+		return
+	}
+	s.lagUs.Store((3*s.lagUs.Load() + one) / 4)
+}
+
+// lagMs is the session's lag (round-trip) estimate in whole ms (rounded up: any measured lag counts).
+func (s *Sess) lagMs() int64 { return (s.lagUs.Load() + 999) / 1000 }
 
 type inMsg struct {
 	T      string `json:"t"`
@@ -183,6 +221,7 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 	}
 	hub.attach(s, id, m, m.Token)
 	defer hub.detach(s)
+	go s.pinger()
 
 	for {
 		m, err := readMsg(ctx, c)
@@ -609,7 +648,9 @@ func (h *Hub) doGameAction(s *Sess, g *Game, m inMsg, now int64) {
 			return
 		}
 		wasEnded := g.Ended
-		mv, san, err := g.move(side, m.UCI, ply, now)
+		lag := s.lagMs()
+		g.Lag[side] = lag
+		mv, san, err := g.move(side, m.UCI, ply, now, lag)
 		if err != nil {
 			if g.Ended && !wasEnded {
 				h.finish(g)
@@ -618,7 +659,7 @@ func (h *Hub) doGameAction(s *Sess, g *Game, m inMsg, now int64) {
 			return
 		}
 		h.persist(g)
-		s.reply(m.ID, "san", san)
+		s.reply(m.ID, "san", san, "lag", g.Credit)
 		ply = len(g.Moves) - 1
 		h.pushGame(g, func(int) any {
 			return ev("move", "game", g.ID, "ply", ply, "uci", mv.UCI(), "san", san, "fen", g.pos.FEN(),

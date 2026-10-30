@@ -32,7 +32,7 @@ const ev = async (expr) => {
   return r.result?.result?.value;
 };
 await send('Runtime.enable'); await send('Page.enable'); await send('Log.enable');
-await send('Network.setCacheDisabled', { cacheDisabled: true });
+await send('Network.enable'); await send('Network.clearBrowserCache'); await send('Network.setCacheDisabled', { cacheDisabled: true });
 
 for (const s of spec) {
   await send('Emulation.setDeviceMetricsOverride', { width: s.w, height: s.h, deviceScaleFactor: s.dpr || (s.mobile ? 2 : 1), mobile: !!s.mobile });

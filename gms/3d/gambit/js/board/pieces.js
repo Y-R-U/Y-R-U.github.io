@@ -11,6 +11,25 @@ const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quatern
 const UP = new THREE.Vector3(0, 1, 0);
 
 export function defaultYaw(color) { return color === 'w' ? Math.PI / 2 : -Math.PI / 2; }
+/** Yaw that turns a model authored looking -z toward the side's owner ('player') or the other side. */
+const TOWARD = { player: { w: Math.PI, b: 0 }, opponent: { w: 0, b: Math.PI } };
+/**
+ * Resting yaw for a piece. `facing` = theme.pieces.facing:
+ *   { w?, b?,                       // theme-wide yaw per side (radians; default = sideways, knights' look)
+ *     byType?: { p|n|b|r|q|k: spec } }   // per type (a separate key because 'b' already means black)
+ * spec: 'side' (the theme-wide yaw) | 'player' (face the owning player) | 'opponent' |
+ *       number (extra yaw added to the side yaw; positive turns toward the owner, 0.55 ≈ 3/4 view) |
+ *       { w, b } (absolute yaw per side).
+ */
+export function facingYaw(facing, color, type) {
+  const side = facing?.[color] ?? defaultYaw(color);
+  const spec = facing?.byType?.[type];
+  if (spec == null || spec === 'side') return side;
+  if (typeof spec === 'number') return side + spec;
+  if (typeof spec === 'string') return TOWARD[spec]?.[color] ?? side;
+  if (typeof spec === 'object') return spec[color] ?? side;
+  return side;
+}
 
 export class PieceSet {
   constructor(scene) {
@@ -38,7 +57,7 @@ export class PieceSet {
       if (typeof fn !== 'function') { fn = fallback?.pieces?.[t]; src = fallback; }
       let obj;
       try { obj = fn(THREE, kit, { color, type: t }); } catch (e) { console.error(`[board] piece ${color}${t} failed`, e); obj = fallback.pieces[t](THREE, kit, { color, type: t }); src = fallback; }
-      const yaw = src.pieces?.facing?.[color] ?? defaultYaw(color);
+      const yaw = facingYaw(src.pieces?.facing, color, t);
       this.protos.set(color + t, this._bake(obj, yaw));
     }
   }

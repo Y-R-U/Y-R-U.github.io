@@ -56,7 +56,8 @@ const dist = +(Q.get('dist') || (W * 1.25 + 1.2));
 const views = { angle: [0, 0.75, 1], top: [0, 1, 0.0001], side: [0, 0.2, 1], front: [1, 0.25, 0.0001], back: [-1, 0.25, 0.0001], high: [0, 1, 0.45] };
 const v = new THREE.Vector3(...(views[view] || views.angle)).normalize().multiplyScalar(dist);
 v.applyAxisAngle(new THREE.Vector3(0, 1, 0), (+(Q.get('az') || 0)) * Math.PI / 180);   // &az=deg orbits the camera
-cam.position.copy(v).add(new THREE.Vector3(0, 0.45, 0)); cam.lookAt(0, 0.45, 0);
+const ty = +(Q.get('ty') || 0.45);                                       // &ty= look-at height
+cam.position.copy(v).add(new THREE.Vector3(0, ty, 0)); cam.lookAt(0, ty, 0);
 renderer.render(scene, cam);
 window.DONE = true;
 </script>

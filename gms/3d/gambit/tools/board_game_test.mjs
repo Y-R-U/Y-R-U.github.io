@@ -4,7 +4,7 @@ import { writeFileSync, mkdirSync } from 'fs';
 const out = process.argv[2] || '.'; mkdirSync(out, { recursive: true });
 const BASE = 'http://192.168.0.236:8888/gms/3d/gambit/';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const list = await (await fetch('http://127.0.0.1:9502/json/list')).json();
+const list = await (await fetch(`http://127.0.0.1:${process.env.CDP_PORT || 9502}/json/list`)).json();
 const ws = new WebSocket(list.find(t => t.type === 'page').webSocketDebuggerUrl);
 await new Promise(r => ws.addEventListener('open', r, { once: true }));
 let id = 0; const pend = new Map(), errors = [];
@@ -22,7 +22,7 @@ const sp = sq => ev(`(()=>{const b=${B},r=document.querySelector('.board-host ca
 const tag = () => ev(`(()=>{const t=document.querySelector('.gb-tag.on');return t?t.textContent:null})()`);
 let pass = 0, fail = 0; const check = (n, ok, i = '') => { console.log(ok ? 'PASS' : 'FAIL', n, i); ok ? pass++ : fail++; };
 
-await send('Runtime.enable'); await send('Page.enable'); await send('Network.setCacheDisabled', { cacheDisabled: true });
+await send('Runtime.enable'); await send('Page.enable'); await send('Network.enable'); await send('Network.clearBrowserCache'); await send('Network.setCacheDisabled', { cacheDisabled: true });
 async function openGame(w, h, mobile) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: mobile ? 2 : 1, mobile });
   await send('Page.navigate', { url: BASE + '#/home' }); await sleep(2500);

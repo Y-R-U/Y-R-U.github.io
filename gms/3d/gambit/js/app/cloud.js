@@ -23,6 +23,8 @@ function describe(k) {
   out.push(`${(lad.points || 0).toLocaleString('en-US')} ladder points`);
   out.push(st.games ? `${st.games} bot games (${st.w || 0}W ${st.d || 0}D ${st.l || 0}L)` : 'No bot games yet');
   if (st.bestWin) out.push(`Best win: ${st.bestWin.name} (${st.bestWin.elo})`);
+  const pz = k['gambit.puzzles'];
+  if (pz && pz.s && Object.keys(pz.s).length) out.push(`${Object.keys(pz.s).length} puzzles solved · rating ${pz.r || 800}`);
   return out;
 }
 

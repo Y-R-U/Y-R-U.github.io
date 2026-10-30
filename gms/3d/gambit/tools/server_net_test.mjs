@@ -79,6 +79,8 @@ for (const [n, u] of [[a, 'f1c4'], [b2, 'b8c6'], [a, 'd1h5'], [b2, 'g8f6'], [a, 
 const [ea] = await Promise.all([endA, endB]);
 ok(ea.result === '1-0' && ea.reason === 'checkmate' && ea.pgn.includes('Qxf7#'), `checkmate end ${ea.result} ${ea.reason}`);
 ok(ea.ratings && ea.ratings.w.delta > 0 && ea.ratings.b.delta < 0, 'rated: deltas');
+ok(a.ratings.blitz.r === ea.ratings.w.after && a.ratings.blitz.prov === ea.ratings.w.prov && ea.ratings.w.prov === true &&
+  a.ratings.blitz.rd === ea.ratings.w.rd, `end updates r/rd/prov without a ratings call ${JSON.stringify(a.ratings.blitz)}`);
 const rec = await a.gameRecord(gid);
 ok(rec.pgn.includes('[Result "1-0"]') && rec.cat === 'blitz', 'stored game + PGN');
 
@@ -106,6 +108,55 @@ ok(qa.game.tc.id === '1+0' && a.seek === null, 'quick match paired');
 const qe = once(a, 'end', e => e.gameId === qa.game.id);
 await (qa.game.you === 'w' ? a : b2).resign(qa.game.id);
 await qe;
+
+// Moves queued through an outage longer than the request timeout (server-2): the dev
+// server stays up; the client is pointed at a dead port for a while, then back.
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function outage(n, ms, during) {
+  const real = n.base;
+  n.base = 'http://127.0.0.1:9/gms/3d/gambit';
+  const rc = once(n, 'state', s => s === 'reconnecting', 3000);
+  n._ws.close();
+  await rc;
+  const out = during ? during() : null;
+  await sleep(ms);
+  n.base = real;
+  await once(n, 'welcome', () => true, 20000);
+  return out;
+}
+const track = p => { const t = { done: false, p }; p.then(() => { t.done = true; }, () => { t.done = true; }); return t; };
+a.timeoutMs = b2.timeoutMs = 600;
+const qroom = await a.createRoom({ tc: 'unlimited', rated: false, color: 'w' });
+const qst = once(a, 'start');
+const qid = await b2.joinRoom(qroom.code);
+await qst;
+// 1. queued while reconnecting, outlives the 600 ms timeout, resent after the welcome
+let seenQ = once(b2, 'move', m => m.uci === 'e2e4', 25000);
+let q1;
+await outage(a, 1500, () => { q1 = track(a.move(qid, 'e2e4')); });
+ok(true, 'reconnected after a 1.5 s outage');
+const r1 = await q1.p.catch(e => e);
+await seenQ;
+ok(r1.san === 'e4', `queued move survived the timeout and was resent ${JSON.stringify(r1.code || r1.san)}`);
+// 2. sent, reply lost, connection drops: the welcome shows it was played -> resolves as dup
+const orig = b2._onMessage.bind(b2);
+b2._onMessage = m => { if (m.t === 'ok' || m.t === 'move') return; orig(m); };
+const seenA = once(a, 'move', m => m.uci === 'e7e5');
+const q2 = track(b2.move(qid, 'e7e5'));
+await seenA;
+b2._onMessage = orig;
+await outage(b2, 900);
+const r2 = await q2.p.catch(e => e);
+ok(r2.dup === true && r2.san === 'e5' && b2.game(qid).moves.length === 2, `move whose reply was lost settles from the welcome ${JSON.stringify(r2.code || r2)}`);
+// 3. queued, but the game ended meanwhile (opponent resigned): rejected game_over + sync
+let synced = false;
+const offSync = a.on('sync', ({ game }) => { if (game.id === qid) synced = true; });
+let q3;
+await outage(a, 1200, () => { q3 = track(a.move(qid, 'g1f3')); b2.resign(qid).catch(() => {}); });
+const r3 = await q3.p.then(() => ({ code: 'resolved' }), e => e);
+offSync();
+ok(r3.code === 'game_over' && synced && a.game(qid).status === 'ended', `stale queued move dropped cleanly (${r3.code}, sync ${synced})`);
+a.timeoutMs = b2.timeoutMs = 10000;
 
 const lb = await a.leaderboard('blitz');
 ok(Array.isArray(lb.rows), 'leaderboard');

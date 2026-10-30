@@ -5,7 +5,9 @@
 //            in a second burst (side-coloured).                  (bishops)
 //  - march:  the squire marches in 2–3 swaying hops with dust at each footfall (pawns)
 //  - grind:  the watchtower rocks loose, grinds across with a shudder and dust, lands with a thud (rooks)
-// Other piece types use Classic's hop / slide until their fantasy models land.
+//  - glide:  the sorceress lifts, twirls across with a mantle flare and a sparkle trail (queens)
+//  - stride: the high king strides heavily with a cloak swish and a royal stamp (kings)
+// Classic's hop / slide still turn up now and then for every piece.
 import { hop, slide } from '../classic/anims.js';
 
 const { PI, sin } = Math;
@@ -126,5 +128,76 @@ export async function grind(ctx) {
 }
 grind.only = ['r']; grind.weight = 5; grind.label = 'tower grind';
 
+/**
+ * Sorceress glide: she lifts off her plinth, glides across in a full twirl (the spin flares the
+ * mantle out — a quick x/z swell), trailing side-coloured sparkles, and alights with a ring.
+ * 40 + 210 + 55 + 35 ms.
+ */
+export async function glide(ctx) {
+  const { kit, piece, from, to, fx, color } = ctx;
+  const dir = kit.flatDir(from, to), colors = SPARK[color] || SPARK.w;
+  const p = piece.position, lift = 0.11;
+  fx?.sparkles(from.clone().setY(0.25), { count: 10, colors, speed: [0.2, 0.8], life: [220, 380], size: [0.04, 0.09] });
+  await ctx.tween(40, e => {
+    p.y = from.y + lift * e;
+    piece.scale.set(1 - 0.05 * e, 1 + 0.06 * e, 1 - 0.05 * e);
+  }, kit.ease.quadOut);
+  let trail = 0;
+  await ctx.tween(210, (e, k) => {
+    p.lerpVectors(from, to, e);
+    p.y = from.y + lift + 0.045 * sin(k * PI);
+    const flare = sin(k * PI);
+    piece.scale.set(0.95 + 0.13 * flare, 1.06 - 0.08 * flare, 0.95 + 0.13 * flare);   // the mantle swings out
+    kit.setLean(piece, dir, 0.14 * flare, e * PI * 2);                                 // lean in + one twirl
+    if (k > (trail + 1) * 0.24 && trail < 3) {
+      trail++;
+      fx?.sparkles(p.clone().setY(0.3), { count: 6, colors, speed: [0.1, 0.5], life: [200, 360], size: [0.03, 0.07] });
+    }
+  }, kit.ease.sineInOut);
+  piece.quaternion.identity();
+  fx?.sparkles(to.clone().setY(0.35), { count: 14, colors, speed: [0.3, 1.1], life: [260, 460], size: [0.04, 0.1] });
+  fx?.ring?.(to, { radius: 0.5, color: colors[2], ms: 300 });
+  await ctx.tween(55, e => {
+    p.copy(to); p.y = to.y + lift * (1 - e);
+    const s = 1.06 - 0.06 * e;
+    piece.scale.set(2 - s, s, 2 - s);
+  }, kit.ease.quadIn);
+  piece.scale.set(1, 1, 1); p.copy(to);
+  await kit.squash(ctx, piece, 0.08, 35);
+}
+glide.only = ['q']; glide.weight = 5; glide.label = 'sorceress glide';
+
+/**
+ * High King stride: two heavy, deliberate strides (three for castling), leaning into each step,
+ * the cloak swishing side to side (a yaw sway that reverses each stride), a scuff of dust per
+ * footfall, and a royal stamp on arrival (dust + a faint gold ring). 2 × 130 (3 × 95) + 50 ms.
+ */
+export async function stride(ctx) {
+  const { kit, piece, from, to, fx, THREE, dist, color } = ctx;
+  const dir = kit.flatDir(from, to), lean = kit.tiltAxis(dir);
+  const n = (dist ?? from.distanceTo(to)) > 1.5 ? 3 : 2;
+  const p = piece.position, q1 = new THREE.Quaternion(), q2 = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
+  const dust = DUST[color] || DUST.w;
+  let step = 0;
+  await ctx.tween(n === 3 ? 285 : 260, (e, k) => {
+    const s = Math.min(n - 1e-6, k * n), i = Math.floor(s), f = s - i;
+    p.lerpVectors(from, to, (i + kit.ease.cubicInOut(f)) / n);
+    p.y = from.y + 0.06 * sin(f * PI);
+    q1.setFromAxisAngle(lean, 0.1 * sin(f * PI) + 0.05 * sin(k * PI));        // lean into each step
+    q2.setFromAxisAngle(up, (i % 2 ? -1 : 1) * 0.26 * sin(f * PI));           // cloak swish
+    piece.quaternion.multiplyQuaternions(q1, q2);
+    piece.scale.set(1, 1 - 0.04 * sin(f * PI) * (1 - f), 1);
+    if (i > step) {
+      step = i;
+      fx?.dust(p.clone().setY(0.04), { count: 5, colors: dust, speed: [0.3, 0.9], up: 0.35, size: [0.035, 0.06], life: [200, 340] });
+    }
+  }, kit.ease.linear);
+  piece.quaternion.identity(); piece.scale.set(1, 1, 1); p.copy(to);
+  fx?.dust(to.clone().setY(0.04), { count: 10, colors: dust, speed: [0.5, 1.3], up: 0.45, size: [0.04, 0.08], life: [240, 420] });
+  fx?.ring?.(to, { radius: 0.55, color: color === 'b' ? '#ff8a5a' : '#ffe2a0', ms: 280 });
+  await kit.squash(ctx, piece, 0.1, 50);
+}
+stride.only = ['k']; stride.weight = 5; stride.label = 'royal stride';
+
 // generic moves for every piece (the fantasy pieces still get them now and then)
-export const moveAnims = [hop, slide, gallop, blink, march, grind];
+export const moveAnims = [hop, slide, gallop, blink, march, grind, glide, stride];

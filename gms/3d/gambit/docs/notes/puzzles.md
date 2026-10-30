@@ -78,6 +78,25 @@ node tools/puzzles_test.mjs                 # validates every shipped puzzle + m
 ~/.claude/bin/cdp start --port 9510
 node tools/puzzles_cdp.mjs --out=DIR        # via index.html once the PLUGINS line is in
 node tools/puzzles_cdp.mjs --page=tools/puzzles_preview.html --out=DIR   # standalone harness
+#   --only=phone | desktop | quick   (quick = map, a classic, the celebration overlay)
+```
+Last run (2026-10-31, preview harness): phone pass (fresh map → Fool's mate with a miss = 2★
+and rating drop → 6 clean solves via Next = 3★ each → Légal with hints = 2★ → Opera reveal = 0★
+→ rating unlock at 1610 opens chapters 1–6 only), desktop pass (Immortal Game with a miss),
+quick pass: all checks pass, **no console errors**. Screenshots were in the agent's scratch dir.
+
+Counts per region (from `node tools/puzzles_test.mjs`):
+```
+region             count  rating      m1  m2  m3  m4+ tactic classic
+First Steps           63  400-898      56   0   0    0      7       3
+Forks & Pins          82  852-1346      0   0   0    0     82       2
+Mating Nets           83  929-1493      0  82   1    0      0       3
+Hidden Blades         72  1162-1596     0  17  13    0     42       2
+Sacrifice Cliffs      84  1356-1799     0  31  25    8     20       4
+Endgame Vale          71  1300-1895     0   8   8    7     48       1
+Storm Keep            82  1650-2096     0   0  36   20     26       2
+Grandmaster Peaks     81  2000-2833     0   5   3   22     51       1
+total 618 (18 classics), 286 mates proved by the solver
 ```
 `tools/puzzles_preview.html` is a minimal copy of the shell that routes `#/puzzles…` to the
 screen, so the screen can be tested before the ui hook lands.
@@ -105,3 +124,10 @@ Bump `V` in `js/puzzles/data.js` when chunks change.
 ## Open issues
 - Headless testing on this machine is slow while core's tourney runs (load ~47): board
   creation can take 20–40 s; the CDP script uses long timeouts.
+
+## Requests from ui-2
+- **Done by ui-2 (now owner of js/puzzles/)**: `play.js` uses the shared board host
+  (`js/app/boardhost.js`, see docs/notes/ui.md "ui-2"): `acquire(container, {legalMoves, onMoveAttempt,
+  onPromotion, onRevoke})` on mount, `lease.release()` on leave — never `createBoard` directly, so the bot
+  game / online game / puzzles share one WebGL context. Wrong moves use the new `board.shake()`. PLUGINS
+  line enabled; describe() line and Lichess CC0 credit (Settings → About) added.

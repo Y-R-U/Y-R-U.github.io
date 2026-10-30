@@ -51,6 +51,7 @@ export const DEFAULT_SETTINGS = {
   theme: 'classic',
   battleSpeed: 1,          // 'off' | 1 | 2 | 5
   sound: true,
+  volume: 0.8, music: false, musicVolume: 0.5,   // audio agent: effects volume, ambient music (off by default)
   moveConfirm: false,
   coords: true,
   view: 'top',             // 'top' | 'tilt' | 'angle' | 'free' (legacy 'default' = 'tilt'); board agent 2026-10-31

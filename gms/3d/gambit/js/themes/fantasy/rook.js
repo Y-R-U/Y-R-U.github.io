@@ -28,7 +28,7 @@ function look(THREE, color) {
     trim: C(p.trim), cloth: C(p.cloth), deep: C(p.clothDeep),
     well: C(w ? '#24190f' : '#060507'),
     wood: C(w ? '#5a3b22' : '#1c1214'),
-    coping: C(w ? p.trim : '#b4b8c4'),                // gold vs steel: a light ring from above on dark squares
+    coping: C(w ? p.trim : '#c8ccd6'), copingMetal: w ? 1 : 0.4,                // gold vs steel: a light ring from above on dark squares
     slit: C(p.rune),
   };
 }
@@ -161,7 +161,7 @@ function top(THREE, kit, K) {
     const m = prep(THREE, wedge(THREE, kit, sec, a - wA / 2, a + wA / 2, 3), mixRGB(K.stoneA, K.stoneB, hash(k, 9)));
     // gold coping slab, a touch wider than the merlon
     const cap = [[0.18, 0.933], [0.295, 0.933], [0.295, 0.942], [0.289, 0.949], [0.186, 0.949], [0.18, 0.943]];
-    const c = prep(THREE, wedge(THREE, kit, cap, a - wA / 2 - 0.02, a + wA / 2 + 0.02, 3), K.coping, { metal: 1 });
+    const c = prep(THREE, wedge(THREE, kit, cap, a - wA / 2 - 0.02, a + wA / 2 + 0.02, 3), K.coping, { metal: K.copingMetal });
     parts.push(m, c);
   }
   return parts;
