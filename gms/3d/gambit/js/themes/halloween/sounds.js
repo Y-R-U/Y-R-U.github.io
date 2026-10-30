@@ -32,5 +32,5 @@ export default {
     const r = s.verb(1.0, { mix: 0.3 });
     [69, 72, 76, 81].forEach((n, i) => s.bell({ t: i * 0.07, f: NOTE(n + 12), ratio: 3.01, index: 0.8, dur: 0.5, g: 0.18, pan: -0.3 + i * 0.2, to: r }));
   } },
-  music: { file: 'halloween', loop: 60, xfade: 2.5 },
+  music: { file: 'halloween', loop: 45, xfade: 5 },   // 18 bars @ 96 bpm + 2-bar crossfade
 };

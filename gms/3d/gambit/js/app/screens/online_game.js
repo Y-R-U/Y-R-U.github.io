@@ -228,7 +228,7 @@ function showResults() {
       <h2>${title}</h2><p>${esc(why)}</p></div>
     <div class="res-vs">
       <div>${playerAvatar(me, { size: 'md', me: true })}<b>You</b></div>
-      <span class="score">${outcome === 'aborted' ? '–' : String(g.result).replace('1/2-1/2', '½–½').replace('-', '–')}</span>
+      <span class="score">${outcome === 'aborted' ? '–' : outcome === 'win' ? '1–0' : outcome === 'loss' ? '0–1' : '½–½'}</span>
       <div>${playerAvatar(them, { size: 'md' })}<b>${nameOf(them)}</b></div>
     </div>
     ${rc ? `<div class="res-pts ol-res-pts">
@@ -323,8 +323,11 @@ function askConfirm(m) {
     const o = h(`<div class="confirm-bar"><span>Play <b>${esc(m.san)}</b>?</span>
       <button class="btn btn-ghost btn-sm" data-c="0" aria-label="Cancel">${icon('x')}</button>
       <button class="btn btn-primary btn-sm" data-c="1" aria-label="Confirm">${icon('check')} Play</button></div>`);
+    // ignore the click synthesized from the tap that opened the bar (touch: it lands on ✕ / Play) (qa)
+    let downIn = false;
+    o.addEventListener('pointerdown', () => { downIn = true; });
     o.addEventListener('click', e => {
-      const b = e.target.closest('[data-c]'); if (!b) return;
+      const b = downIn && e.target.closest('[data-c]'); if (!b) return;
       o.remove();
       if (O) { O.pending = false; board && board.highlight({ hint: null }); setInteractive(); }
       resolve(b.dataset.c === '1');

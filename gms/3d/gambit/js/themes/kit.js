@@ -3,7 +3,7 @@
 // Read js/themes/MODEL_GUIDE.md first. Everything here is plain functions; nothing
 // needs `new` except Timeline (the board makes those for you, see ctx.tween).
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 
 export { THREE };
 
@@ -141,6 +141,12 @@ export const boardLooks = {
     light: '#d8d4cb', lightCloud: 'rgba(140,140,150,0.12)', lightVein: 'rgba(105,108,120,0.42)', lightVein2: 'rgba(185,155,95,0.35)', lightLabel: '#4b5262',
     dark: '#69717f', darkCloud: 'rgba(30,36,52,0.16)', darkVein: 'rgba(210,216,232,0.30)', darkVein2: 'rgba(222,184,104,0.40)', darkLabel: '#ece0bf',
   },
+  // Halloween flagstones (was halloween/board.js LOOK): limestone vs violet-grey slate, mossy grout
+  graveyard: {
+    light: '#d8d1bf', lightShade: '#bdb39c', lichen: ['#cfc77e', '#d9a95c', '#b9c08a'], lightLabel: '#4d465c',
+    dark: '#6a7182', darkShade: '#565b6c', moss: ['#4f6a3a', '#5f7c40', '#3e5a34'], darkLabel: '#ece3c9',
+    grout: '#2b3226', glow: '#7dff6a',
+  },
 };
 /** Accent material for a side (blue for white, red for black), optionally glowing. */
 export function accentMaterial(color, { glow = 0, roughness = 0.5, metalness = 0 } = {}) {
@@ -172,6 +178,8 @@ export function material(o = {}) {
   if (o.emissive) { m.emissive = new THREE.Color(o.emissive); m.emissiveIntensity = o.emissiveIntensity ?? 1; }
   if (o.envMapIntensity != null) m.envMapIntensity = o.envMapIntensity;
   if (o.rim) addRim(m, o.rim);
+  if (o.vertexFX) addVertexFX(m, o.vertexFX);   // kit.vertexMaterial (per-vertex glow/metal)
+  if (o.flicker) addFlicker(m, o.flicker);      // shared ambient clock (idle glow flicker)
   m.userData.kitCached = true;
   matCache.set(key, m);
   return m;
@@ -228,6 +236,146 @@ function cloneMat(m) {
 function forMats(obj, fn) {
   obj.traverse(o => { if (o.isMesh) (Array.isArray(o.material) ? o.material : [o.material]).forEach(fn); });
 }
+
+// ---------------------------------------------------------------------------
+// Ambient animation (board-2): ONE shared time uniform that glow materials opt into, so
+// candles flicker and light-lines pulse without breaking instancing. The board advances
+// `ambient.time` and renders at a capped rate (only while the `ambientAnim` option is on, the
+// tab is visible and something in the scene uses it). Each object gets its own phase (from its
+// instance/model origin), so a row of identical lanterns doesn't flicker in lockstep.
+//   kit.material({..., emissive, flicker: 'candle' | 'pulse' | {mode, amount, speed, spread}})
+//   kit.addFlicker(existingMaterial, opts)          // same, for a material you built yourself
+// spread > 0 also varies the phase per vertex position (many flames merged into one mesh).
+// ---------------------------------------------------------------------------
+export const ambient = { time: { value: 0 } };
+const FLICKER_PRESETS = {
+  candle: { mode: 'candle', amount: 0.32, speed: 1, spread: 0 },
+  pulse: { mode: 'pulse', amount: 0.35, speed: 1, spread: 0 },
+  slow: { mode: 'pulse', amount: 0.22, speed: 0.45, spread: 0 },
+};
+function flickerOpts(f) {
+  const base = FLICKER_PRESETS[typeof f === 'string' ? f : f?.mode || 'candle'] || FLICKER_PRESETS.candle;
+  return typeof f === 'object' ? { ...base, ...f } : { ...base };
+}
+const AMB_VERT_HEAD = 'uniform vec4 uAmbF;\nvarying vec3 vAmbO;\nvarying vec3 vAmbW;';
+const AMB_VERT_BODY = `
+  {
+    vec4 ambP = vec4(transformed, 1.0); vec3 ambO = vec3(0.0);
+    #ifdef USE_INSTANCING
+      ambP = instanceMatrix * ambP; ambO = instanceMatrix[3].xyz;
+    #endif
+    vAmbW = (modelMatrix * ambP).xyz; vAmbO = (modelMatrix * vec4(ambO, 1.0)).xyz;
+  }`;
+const AMB_FRAG_HEAD = `uniform float uAmbT; uniform vec4 uAmbF; varying vec3 vAmbO; varying vec3 vAmbW;
+float ambK() {
+  float ph = fract(sin(dot(floor(vAmbO * 8.0 + 0.5), vec3(12.9898, 78.233, 37.719))) * 43758.5453) * 6.2832
+           + uAmbF.w * dot(vAmbW, vec3(7.1, 3.3, 5.9));
+  float t = uAmbT * uAmbF.z;
+  float w = uAmbF.x < 0.5
+    ? 0.55 * sin(t * 6.1 + ph) + 0.3 * sin(t * 13.7 + ph * 1.7 + 1.3) + 0.15 * sin(t * 29.3 + ph * 2.9 + 2.1)
+    : sin(t * 2.4 + ph);
+  return max(0.0, 1.0 + uAmbF.y * w);
+}`;
+function ambientChunks(sh, f) {
+  sh.uniforms.uAmbT = ambient.time;
+  sh.uniforms.uAmbF = { value: new THREE.Vector4(f.mode === 'pulse' ? 1 : 0, f.amount, f.speed, f.spread) };
+  sh.vertexShader = sh.vertexShader
+    .replace('#include <common>', '#include <common>\n' + AMB_VERT_HEAD)
+    .replace('#include <project_vertex>', '#include <project_vertex>' + AMB_VERT_BODY);
+  sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + AMB_FRAG_HEAD);
+}
+function chainCompile(m, tag, fn) {
+  const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey;
+  const hasPrev = prev && prev !== THREE.Material.prototype.onBeforeCompile;
+  m.onBeforeCompile = (sh, r) => { if (hasPrev) prev.call(m, sh, r); fn(sh, r); };
+  m.customProgramCacheKey = () => (hasPrev && prevKey ? prevKey.call(m) : '') + tag;
+  return m;
+}
+/** Make a material's emissive (emissive colour / emissiveMap) flicker or pulse with the shared clock. */
+export function addFlicker(m, opts = 'candle') {
+  if (m.userData.ambient) return m;
+  const f = flickerOpts(opts);
+  m.userData.ambient = true;
+  return chainCompile(m, '_amb', sh => {
+    ambientChunks(sh, f);
+    // after the emissive colour/map, before the kit rim glow is added on top
+    sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance *= ambK();');
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Per-vertex metal / glow (board-2, lifted from fantasy/common.js + scifi/common.js): ONE material
+// per side, everything else is vertex data, so a whole piece is 1 draw call per kind.
+//   color = albedo,  uv.x = glow amount (emissive = colour * glow * glow-gain),
+//   uv.y  = metal amount (metalness = uv.y, roughness lerps toward metalRough).
+// Gold trim blends into ivory across one triangle instead of stair-stepping along a material
+// split. Use kit.vertexFinish(g, rgb, {glow, metal}) / kit.paintFinish(g, fn) to fill the uv channel
+// (Three's primitives ship real UVs that would otherwise read as glow/metal). Options:
+//   glow       emissive gain for uv.x (default 2.0)
+//   dimGlow    0..1, darken the lit albedo of glowing parts so neon stays saturated (default 0.8)
+//   sheenMask  true: the rim's overhead "top sheen" only lights bright, non-glowing surfaces
+//              (wells and grooves stay dark from above)  (default true)
+//   flicker    'candle' | 'pulse' | {...}: animate the glow channel with the shared ambient clock
+// ---------------------------------------------------------------------------
+/**
+ * kit.vertexMaterial({roughness, metalRough, rim, glow, dimGlow, sheenMask, flicker, envMapIntensity})
+ * or kit.vertexMaterial(color) for the palette's side defaults. Cached like kit.material.
+ */
+export function vertexMaterial(o = {}) {
+  if (typeof o === 'string') o = { roughness: palette[o]?.roughness ?? 0.35, rim: palette[o]?.rim };
+  const { roughness = 0.35, metalRough = 0.24, rim, glow = 2.0, dimGlow = 0.8, sheenMask = true, flicker = null, envMapIntensity } = o;
+  return material({ color: '#ffffff', roughness, metalness: 1, rim, envMapIntensity,
+    vertexFX: { metalRough, glow, dimGlow, sheenMask, flicker: flicker ? flickerOpts(flicker) : null } });
+}
+function addVertexFX(m, v) {
+  if (v.flicker) m.userData.ambient = true;
+  return chainCompile(m, `_vfx${v.metalRough}_${v.glow}_${v.dimGlow}_${+v.sheenMask}_${v.flicker ? 'a' : ''}`, sh => {
+    if (v.flicker) ambientChunks(sh, v.flicker);
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec2 vFX;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvFX = uv;');
+    let fs = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec2 vFX;')
+      .replace('#include <color_fragment>', `#include <color_fragment>\ndiffuseColor.rgb *= 1.0 - ${v.dimGlow.toFixed(3)} * clamp(vFX.x, 0.0, 1.0);`)
+      .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, ${v.metalRough.toFixed(3)}, vFX.y);`)
+      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor = vFX.y;')
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>\ntotalEmissiveRadiance += vColor.rgb * vFX.x * ${v.glow.toFixed(3)}${v.flicker ? ' * ambK()' : ''};`);
+    if (v.sheenMask) fs = fs.replace('totalEmissiveRadiance += uTopColor *', 'totalEmissiveRadiance += clamp(dot(vColor.rgb, vec3(0.3, 0.59, 0.11)) * 12.0, 0.0, 1.0) * (1.0 - clamp(vFX.x, 0.0, 1.0)) * uTopColor *');
+    sh.fragmentShader = fs;
+  });
+}
+/** Flat finish for a vertexMaterial part: sets color (linear [r,g,b] or hex) + uv (glow, metal). */
+export function vertexFinish(g, col, { glow = 0, metal = 0 } = {}) {
+  const c3 = toRGB(col), n = g.attributes.position.count;
+  const c = new Float32Array(n * 3), u = new Float32Array(n * 2);
+  for (let i = 0; i < n; i++) { c[i * 3] = c3[0]; c[i * 3 + 1] = c3[1]; c[i * 3 + 2] = c3[2]; u[i * 2] = glow; u[i * 2 + 1] = metal; }
+  g.setAttribute('color', new THREE.BufferAttribute(c, 3));
+  g.setAttribute('uv', new THREE.BufferAttribute(u, 2));
+  return g;
+}
+/** Re-finish per vertex: fn(x,y,z) -> [r,g,b] | {c?, glow?, metal?} | null (keep). */
+export function paintFinish(g, fn) {
+  if (!g.attributes.color || !g.attributes.uv) vertexFinish(g, [1, 1, 1]);
+  const p = g.attributes.position, c = g.attributes.color, u = g.attributes.uv;
+  for (let i = 0; i < p.count; i++) {
+    const v = fn(p.getX(i), p.getY(i), p.getZ(i));
+    if (!v) continue;
+    const col = Array.isArray(v) ? v : v.c;
+    if (col) { const k = toRGB(col); c.setXYZ(i, k[0], k[1], k[2]); }
+    if (!Array.isArray(v)) { if (v.glow != null) u.setX(i, v.glow); if (v.metal != null) u.setY(i, v.metal); }
+  }
+  c.needsUpdate = true; u.needsUpdate = true;
+  return g;
+}
+const rgbCache = new Map();
+/** sRGB hex (or THREE.Color, or linear [r,g,b]) -> linear [r,g,b] (what vertex colours want). */
+export function rgb(hex) {
+  if (Array.isArray(hex)) return hex;
+  if (hex?.isColor) return [hex.r, hex.g, hex.b];
+  if (!rgbCache.has(hex)) { const c = new THREE.Color(hex); rgbCache.set(hex, [c.r, c.g, c.b]); }
+  return rgbCache.get(hex);
+}
+const toRGB = rgb;
 
 // ---------------------------------------------------------------------------
 // Geometry helpers. Units: 1 square = 1 unit, piece base at y=0, Y up.
@@ -434,6 +582,219 @@ export function dispose(obj) {
 }
 
 // ---------------------------------------------------------------------------
+// More geometry helpers (board-2, adopted from the sculptors' local copies; their copies may
+// stay, these are the shared versions for new work).
+// ---------------------------------------------------------------------------
+function hash3(x, y, z) { let h = 2166136261; for (const v of [x, y, z]) { h ^= Math.floor(v * 1000) | 0; h = Math.imul(h, 16777619); } return ((h >>> 0) % 10007) / 10007; }
+/** Smooth 3D value noise in [0,1] (deterministic). Good for mottling, moss, bark. */
+export function noise3(x, y = 0, z = 0) {
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+  const f = t => t * t * (3 - 2 * t), xf = f(x - xi), yf = f(y - yi), zf = f(z - zi);
+  let s = 0;
+  for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) for (let c = 0; c < 2; c++)
+    s += (a ? xf : 1 - xf) * (b ? yf : 1 - yf) * (c ? zf : 1 - zf) * hash3(xi + a, yi + b, zi + c);
+  return s;
+}
+/** Set vertex colours absolutely (paint() multiplies): fn(x,y,z) -> [r,g,b] | hex | null (keep). */
+export function colorize(g, fn) {
+  ensureColor(g);
+  const p = g.attributes.position, c = g.attributes.color;
+  for (let i = 0; i < p.count; i++) {
+    const v = fn(p.getX(i), p.getY(i), p.getZ(i));
+    if (v != null) { const k = rgb(v); c.setXYZ(i, k[0], k[1], k[2]); }
+  }
+  c.needsUpdate = true;
+  return g;
+}
+/**
+ * Move vertices: fn(x,y,z) -> [x,y,z]; recomputes normals. Welds a non-indexed geometry first
+ * (kit.merge / latheSegment output) unless {weld:false}, so the result shades smooth, not faceted.
+ */
+export function deform(g, fn, { weld = true } = {}) {
+  if (weld && !g.index) { const w = mergeVertices(g, 1e-5); if (w !== g) { g.dispose(); g = w; } }
+  const p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) { const v = fn(p.getX(i), p.getY(i), p.getZ(i)); p.setXYZ(i, v[0], v[1], v[2]); }
+  p.needsUpdate = true;
+  g.computeVertexNormals();
+  return g;
+}
+/**
+ * Loft an elliptical tube along a spine in the y-z plane (mirror-symmetric in x): necks, tails,
+ * tentacles, horse skulls. spine(u) -> [y, z] for u in 0..1; sec(u, phi) -> [a, b] = half-width
+ * along x and half-height along the in-plane normal (phi 0 = +x, PI/2 = the "top" side).
+ * Ends get a fan cap. Run the spine toward -z so the normal points up. color(u, phi) -> rgb.
+ * The result has g.userData.frame(u) -> {y, z, ny, nz} for attaching parts along the spine.
+ */
+export function loft(spine, sec, { rings = 32, segs = 24, color } = {}) {
+  const pos = [], cols = [], idx = [];
+  const frame = u => {
+    const [y, z] = spine(u), e = 1e-3, a = spine(Math.max(0, u - e)), b = spine(Math.min(1, u + e));
+    let ty = b[0] - a[0], tz = b[1] - a[1]; const L = Math.hypot(ty, tz) || 1; ty /= L; tz /= L;
+    return { y, z, ny: -tz, nz: ty };
+  };
+  const C = (u, ph) => (color ? rgb(color(u, ph)) : [1, 1, 1]);
+  for (let i = 0; i <= rings; i++) {
+    const u = i / rings, f = frame(u);
+    for (let j = 0; j < segs; j++) {
+      const ph = (j / segs) * Math.PI * 2, [a, b] = sec(u, ph), o = b * Math.sin(ph);
+      pos.push(a * Math.cos(ph), f.y + f.ny * o, f.z + f.nz * o);
+      cols.push(...C(u, ph));
+    }
+  }
+  for (let i = 0; i < rings; i++) for (let j = 0; j < segs; j++) {
+    const a = i * segs + j, b = (i + 1) * segs + j, c = i * segs + (j + 1) % segs, d = (i + 1) * segs + (j + 1) % segs;
+    idx.push(a, b, c, c, b, d);
+  }
+  for (const [ring, u, flip] of [[0, 0, false], [rings, 1, true]]) {
+    const f = frame(u), ci = pos.length / 3;
+    pos.push(0, f.y, f.z); cols.push(...C(u, Math.PI / 2));
+    for (let j = 0; j < segs; j++) {
+      const a = ring * segs + j, b = ring * segs + (j + 1) % segs;
+      if (flip) idx.push(ci, b, a); else idx.push(ci, a, b);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+  g.setIndex(idx); g.computeVertexNormals();
+  g.userData.frame = frame;
+  return g;
+}
+/**
+ * A flame / wisp tongue authored along +y from the origin, tip curling toward -z. Vertex colours
+ * ramp base -> mid -> tip through colors (3 hex or rgb). Merge several (rotated) for a mane or a fire.
+ */
+export function flameTongue({ len = 0.16, rad = 0.035, curl = 0.35, flat = 0.6, wob = 0, segs = 7, rings = 9, colors = ['#d4440a', '#f47a10', '#ffc24a'] } = {}) {
+  const p = profile().pt(0, -rad * 0.4);
+  for (let i = 1; i <= rings; i++) {
+    const t = i / rings;
+    const r = t < 0.22 ? rad * Math.sin((t / 0.22) * Math.PI / 2 + 0.25) : rad * Math.pow(1 - (t - 0.22) / 0.78, 1.25);
+    p.pt(Math.max(i === rings ? 0 : 0.002, r), t * len);
+  }
+  const g = deform(lathe(p.points(), { segments: segs }), (x, y, z) => {
+    const t = clamp(y / len, 0, 1);
+    return [x + Math.sin(t * Math.PI * 2.2 + wob) * rad * 0.7 * t, y, z * flat - curl * len * t * t * t * 1.4 + Math.sin(t * Math.PI) * rad * 0.4];
+  });
+  const [f0, f1, f2] = colors.map(rgb), mix3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  return colorize(g, (x, y) => { const t = clamp(y / len, 0, 1); return t < 0.5 ? mix3(f0, f1, t / 0.5) : mix3(f1, f2, (t - 0.5) / 0.5); });
+}
+/**
+ * Longest-edge bisection until every edge is shorter than L, so a flat decal can be bent onto a
+ * curved surface (wrapDecal) without its middle sinking in. Returns a new position-only geometry.
+ */
+export function refine(g, L) {
+  const src = (g.index ? g.toNonIndexed() : g).attributes.position, out = [];
+  const V = i => [src.getX(i), src.getY(i), src.getZ(i)];
+  const d2 = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+  const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
+  const split = (a, b, c, depth) => {
+    const ab = d2(a, b), bc = d2(b, c), ca = d2(c, a), m = Math.max(ab, bc, ca);
+    if (m < L * L || depth > 8) { out.push(...a, ...b, ...c); return; }
+    if (m === ab) { const p = mid(a, b); split(a, p, c, depth + 1); split(p, b, c, depth + 1); }
+    else if (m === bc) { const p = mid(b, c); split(a, b, p, depth + 1); split(a, p, c, depth + 1); }
+    else { const p = mid(c, a); split(a, b, p, depth + 1); split(p, b, c, depth + 1); }
+  };
+  for (let i = 0; i < src.count; i += 3) split(V(i), V(i + 1), V(i + 2), 0);
+  const r = new THREE.BufferGeometry();
+  r.setAttribute('position', new THREE.Float32BufferAttribute(out, 3));
+  return r;
+}
+/**
+ * Bend a thin extruded decal (local u = x right, v = y up, depth d along z, front cap +z) onto a
+ * surface of revolution r = R(theta, y), centred at angle theta (lathe convention x = r sin,
+ * z = r cos). lift = how proud the front sits (the back is buried). refine() it first.
+ */
+export function wrapDecal(g, { theta = 0, y0 = 0, R, lift = 0.003, d }) {
+  return deform(g, (u, v, zl) => {
+    const y = y0 + v;
+    let a = theta + u / R(theta, y);
+    a = theta + u / R(a, y);
+    const r = R(a, y) + lift - (d / 2 - zl) * 1.2;
+    return [r * Math.sin(a), y, r * Math.cos(a)];
+  }, { weld: false });
+}
+/**
+ * Hard-surface lathe (from scifi/common.js): crisp creases, chamfers, grooves, faceted or partial.
+ * pts = [[r, y, finish, smooth?], ...]; finish = {c: hex|rgb, glow?, metal?} or a key resolved by
+ * opts.finish(key) (default white). The finish colours the segment ENDING at that point. Creases stay
+ * sharp unless the point is marked smooth. Walk the outer surface bottom -> top (closed sections
+ * counter-clockwise, r right / y up) and normals face out.
+ * opts: seg, phiStart, phiLength, flat (faceted: octagons...), closed, caps, finish.
+ * Returns non-indexed geometry with position, normal, color, uv (uv = glow, metal: vertexMaterial).
+ */
+export function hsLathe(pts, { seg = 40, phiStart = 0, phiLength = Math.PI * 2, flat = false, closed = false, caps = false, finish } = {}) {
+  const fin = k => {
+    const f = (typeof k === 'string' || k == null) ? (finish ? finish(k) : { c: [1, 1, 1] }) : k;
+    return { c: rgb(f.c ?? [1, 1, 1]), glow: f.glow || 0, metal: f.metal || 0 };
+  };
+  const P = pts.map(p => ({ r: p[0], y: p[1], f: fin(p[2]), s: !!p[3] }));
+  const n = P.length, nSeg = closed ? n : n - 1, segN = [];
+  const cf = flat ? Math.cos(phiLength / seg / 2) : 1;
+  for (let i = 0; i < nSeg; i++) {
+    const a = P[i], b = P[(i + 1) % n], dr = (b.r - a.r) * cf, dy = b.y - a.y, L = Math.hypot(dr, dy) || 1;
+    segN.push([dy / L, -dr / L]);
+  }
+  const nrmAt = (i, j) => {
+    if (!P[j].s) return segN[i];
+    const other = j === i ? i - 1 : i + 1, o = closed ? segN[(other + nSeg) % nSeg] : segN[other];
+    if (!o) return segN[i];
+    const x = segN[i][0] + o[0], y = segN[i][1] + o[1], L = Math.hypot(x, y) || 1;
+    return [x / L, y / L];
+  };
+  const pos = [], nor = [], col = [], uv = [];
+  const push = (r, y, phi, nr, ny, f, phiN = phi) => {
+    pos.push(r * Math.sin(phi), y, r * Math.cos(phi)); nor.push(nr * Math.sin(phiN), ny, nr * Math.cos(phiN));
+    col.push(f.c[0], f.c[1], f.c[2]); uv.push(f.glow, f.metal);
+  };
+  for (let i = 0; i < nSeg; i++) {
+    const j0 = i, j1 = (i + 1) % n, A = P[j0], B = P[j1];
+    if (Math.hypot(B.r - A.r, B.y - A.y) < 1e-7) continue;
+    const nA = nrmAt(i, j0), nB = nrmAt(i, j1), f = B.f;
+    for (let k = 0; k < seg; k++) {
+      const p0 = phiStart + (k / seg) * phiLength, p1 = phiStart + ((k + 1) / seg) * phiLength, pc = (p0 + p1) / 2;
+      const q0 = flat ? pc : p0, q1 = flat ? pc : p1;
+      const tri = v => { for (const [r, y, ph, nn, phN] of v) push(r, y, ph, nn[0], nn[1], f, phN); };
+      tri([[A.r, A.y, p0, nA, q0], [B.r, B.y, p1, nB, q1], [B.r, B.y, p0, nB, q0]]);
+      tri([[A.r, A.y, p0, nA, q0], [A.r, A.y, p1, nA, q1], [B.r, B.y, p1, nB, q1]]);
+    }
+  }
+  if (caps && phiLength < Math.PI * 2 - 1e-6) {
+    const tris = THREE.ShapeUtils.triangulateShape(P.map(p => new THREE.Vector2(p.r, p.y)), []);
+    for (const [phi, sgn] of [[phiStart, -1], [phiStart + phiLength, 1]]) {
+      const nx = Math.cos(phi) * sgn, nz = -Math.sin(phi) * sgn;
+      for (const t of tris) for (const j of t) {
+        const p = P[j], f = P[0].f;
+        pos.push(p.r * Math.sin(phi), p.y, p.r * Math.cos(phi)); nor.push(nx, 0, nz);
+        col.push(f.c[0], f.c[1], f.c[2]); uv.push(f.glow, f.metal);
+      }
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  return fixWinding(g);
+}
+/** Make every triangle's winding agree with its vertex normals (non-indexed geometry). */
+export function fixWinding(g) {
+  if (g.index) g = g.toNonIndexed();
+  const p = g.attributes.position.array, nrm = g.attributes.normal.array, attrs = Object.values(g.attributes);
+  for (let t = 0; t < p.length / 9; t++) {
+    const o = t * 9;
+    const ux = p[o + 3] - p[o], uy = p[o + 4] - p[o + 1], uz = p[o + 5] - p[o + 2];
+    const vx = p[o + 6] - p[o], vy = p[o + 7] - p[o + 1], vz = p[o + 8] - p[o + 2];
+    const cx = uy * vz - uz * vy, cy = uz * vx - ux * vz, cz = ux * vy - uy * vx;
+    const d = cx * (nrm[o] + nrm[o + 3] + nrm[o + 6]) + cy * (nrm[o + 1] + nrm[o + 4] + nrm[o + 7]) + cz * (nrm[o + 2] + nrm[o + 5] + nrm[o + 8]);
+    if (d < 0) for (const a of attrs) {
+      const s = a.itemSize, arr = a.array, i1 = (t * 3 + 1) * s, i2 = (t * 3 + 2) * s;
+      for (let k = 0; k < s; k++) { const tmp = arr[i1 + k]; arr[i1 + k] = arr[i2 + k]; arr[i2 + k] = tmp; }
+    }
+  }
+  return g;
+}
+
+// ---------------------------------------------------------------------------
 // Canvas textures (boards)
 // ---------------------------------------------------------------------------
 export function canvasTexture(w, h, draw, { srgb = true, repeat = false } = {}) {
@@ -569,9 +930,15 @@ export function sinkOut(ctx, obj, ms = 260) {
 }
 /** Fade out (clones materials first so other pieces are unaffected). */
 export function fadeOut(ctx, obj, ms = 250) {
-  ownMaterials(obj);
-  const mats = []; forMats(obj, m => { m.transparent = true; mats.push([m, m.opacity]); });
-  return ctx.tween(ms, e => { for (const [m, o] of mats) m.opacity = o * (1 - e); }).then(() => { obj.visible = false; });
+  // battle-2: a dissolve that keeps the material (flipping `transparent` would compile a new
+  // shader variant mid-animation): the piece thins, stretches and flickers out.
+  const s0 = obj.scale.clone(), y0 = obj.position.y;
+  return ctx.tween(ms, (e, k) => {
+    const w = Math.max(0.02, 1 - e);
+    obj.scale.set(s0.x * w, s0.y * (1 + 0.35 * e), s0.z * w);
+    obj.position.y = y0 + 0.15 * e;
+    obj.visible = k < 0.55 || ((k * 40) | 0) % 2 === 0;
+  }, ease.quadIn).then(() => { obj.visible = false; });
 }
 /** Flash obj with an emissive colour (hit flash). */
 export function flashObject(ctx, obj, color = '#ffffff', ms = 160, strength = 1.6) {
@@ -676,33 +1043,54 @@ class ParticleSystem {
   }
   clear() { this.n = 0; this.geom.setDrawRange(0, 0); }
 }
-/** Rebuild a lightning bolt's ribbon geometry (crossed quads along a jagged path + branches). */
+// battle-2: every mesh FX (flash sprites, rings, bolts, scorches, the fight spotlight) is POOLED.
+// The pools are filled when createFX runs and parked off-frustum (kit.parkFX), so the board's
+// compile on theme load builds every program they need; a battle only re-uses them (no new
+// materials, geometries or shader programs mid-battle, nothing for the GC but tiny vectors).
+// Lightning writes into a preallocated buffer: a dark under-ribbon (normal blend, wide) plus a
+// bright additive core, so bolts read on cream squares too.
+const BOLT_MAX = 3000;                                   // vertices per layer
+const _bA = new THREE.Vector3(), _bB = new THREE.Vector3(), _bD = new THREE.Vector3(), _bP = new THREE.Vector3(), _bQ = new THREE.Vector3();
 function buildBolt(b) {
-  const pos = [];
+  const P = b.pos, half = BOLT_MAX * 3;
+  let nd = 0, nb = 0;                                    // vertex counts (dark, bright)
+  const put = (layer, v) => {
+    if (layer) { if (nb >= BOLT_MAX) return; P[half + nb * 3] = v.x; P[half + nb * 3 + 1] = v.y; P[half + nb * 3 + 2] = v.z; nb++; }
+    else { if (nd >= BOLT_MAX) return; P[nd * 3] = v.x; P[nd * 3 + 1] = v.y; P[nd * 3 + 2] = v.z; nd++; }
+  };
   const quad = (a, c, w) => {
-    // two crossed ribbons so it reads from overhead and from the side
-    for (const off of [new THREE.Vector3(w, 0, 0), new THREE.Vector3(0, w, w).normalize().multiplyScalar(w)]) {
-      const a1 = a.clone().sub(off), a2 = a.clone().add(off), c1 = c.clone().sub(off), c2 = c.clone().add(off);
-      pos.push(...a1.toArray(), ...a2.toArray(), ...c2.toArray(), ...a1.toArray(), ...c2.toArray(), ...c1.toArray());
+    _bD.subVectors(c, a).normalize();
+    _bP.crossVectors(_bD, UP); if (_bP.lengthSq() < 1e-6) _bP.set(1, 0, 0); _bP.normalize();   // horizontal side: reads from Top
+    _bQ.crossVectors(_bD, _bP).normalize();                                                   // the crossed ribbon: reads from the side
+    for (const off of [_bP, _bQ]) for (let layer = 0; layer < 2; layer++) {
+      if (!layer && !b.dark) continue;
+      const ww = layer ? w : w * 2.6;
+      if ((layer ? nb : nd) + 6 > BOLT_MAX) continue;
+      const a1 = _bA.copy(a).addScaledVector(off, -ww), a2 = a.clone().addScaledVector(off, ww);
+      const c1 = _bB.copy(c).addScaledVector(off, -ww), c2 = c.clone().addScaledVector(off, ww);
+      put(layer, a1); put(layer, a2); put(layer, c2); put(layer, a1); put(layer, c2); put(layer, c1);
     }
   };
   const path = (from, to, n, jit, w, depth) => {
     let prev = from.clone();
     for (let i = 1; i <= n; i++) {
       const p = from.clone().lerp(to, i / n);
-      if (i < n) p.add(new THREE.Vector3(rand(-1, 1), rand(-1, 1), rand(-1, 1)).multiplyScalar(jit));
+      if (i < n) p.add(new THREE.Vector3(rand(-1, 1), rand(-1, 1) * 0.6, rand(-1, 1)).multiplyScalar(jit));
       quad(prev, p, w * (1 - i / (n * 1.6)));
-      if (depth < b.branches && Math.random() < 0.18) {
-        const end = p.clone().add(new THREE.Vector3(rand(-1, 1), rand(-0.6, 0.3), rand(-1, 1)).multiplyScalar(from.distanceTo(to) * 0.35));
-        path(p, end, 4, jit * 0.6, w * 0.5, depth + 1);
+      if (depth < b.branches && Math.random() < b.branchP) {
+        const L = from.distanceTo(to);
+        const end = p.clone().add(new THREE.Vector3(rand(-1, 1), rand(-0.8, 0.2), rand(-1, 1)).multiplyScalar(L * 0.4));
+        if (end.y < 0.02) end.y = 0.02;                   // branches crawl over the board
+        path(p, end, 5, jit * 0.6, w * 0.55, depth + 1);
       }
       prev = p;
     }
   };
   const L = b.from.distanceTo(b.to);
-  path(b.from, b.to, Math.max(6, Math.round(L * 8)), L * 0.07, b.w, 0);
-  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  b.mesh.geometry.dispose(); b.mesh.geometry = g;
+  path(b.from, b.to, Math.max(7, Math.round(L * 8)), L * 0.08, b.w, 0);
+  const g = b.mesh.geometry;
+  g.clearGroups(); g.addGroup(0, nd, 0); g.addGroup(BOLT_MAX, nb, 1);
+  const attr = g.attributes.position; attr.needsUpdate = true;
 }
 let _glowTex = null;
 function glowTexture() {
@@ -712,7 +1100,6 @@ function glowTexture() {
     c.fillStyle = g; c.fillRect(0, 0, w, w);
   }));
 }
-/** Created by the board. Theme code uses ctx.fx.* — see the methods below. */
 let _scorchTex = null;
 function scorchTexture() {
   return _scorchTex || (_scorchTex = canvasTexture(128, 128, (c, w) => {
@@ -727,14 +1114,23 @@ function scorchTexture() {
     }
   }));
 }
+/** battle-2: fight spotlight — black, clear in a small centre disc, dark everywhere else. */
+const SPOT_IN = 0.07;                                    // clear radius as a fraction of the plane half-size
+let _spotTex = null;
+function spotTexture() {
+  return _spotTex || (_spotTex = canvasTexture(256, 256, (c, w) => {
+    const g = c.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+    g.addColorStop(0, 'rgba(0,0,0,0.42)'); g.addColorStop(SPOT_IN, 'rgba(0,0,0,0.5)');
+    g.addColorStop(SPOT_IN * 3.2, 'rgba(0,0,0,0.92)'); g.addColorStop(1, 'rgba(0,0,0,1)');
+    c.fillStyle = g; c.fillRect(0, 0, w, w);
+  }));
+}
 // ---------------------------------------------------------------------------
-// battle-1: FX shader warm-up (additive helper, no change to existing FX behaviour).
-// createFX parks one culled, off-screen mesh per kit FX material variant (flash sprite,
-// ring/bolt/tint, scorch decal) in the fx group, and runs every hook registered with
-// addFxWarmup(fn(group, scene)). The board calls renderer.compile(scene) right after
-// createFX on theme load, so those programs are built then instead of mid-battle.
+// battle-1: FX shader warm-up. createFX runs every hook registered with
+// addFxWarmup(fn(group, scene)) after filling its own pools. The board calls
+// renderer.compile(scene) right after createFX on theme load, so every program is built then.
 // Parked objects sit far outside the camera frustum (frustumCulled) or are InstancedMeshes
-// with count 0, so they cost no draw calls. Warm materials live for the page (tiny).
+// with count 0, so they cost no draw calls.
 // ---------------------------------------------------------------------------
 const fxWarmups = [];
 /** Register fn(group, scene) to run whenever the board creates its FX group (theme load). */
@@ -746,65 +1142,96 @@ export function parkFX(obj) {
   if (obj.isInstancedMesh) obj.count = 0;
   return obj;
 }
-let _warmMats = null;
 function warmFX(group, scene) {
-  if (!_warmMats) {
-    const add = { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false };
-    _warmMats = {
-      geo: new THREE.PlaneGeometry(0.01, 0.01),
-      mesh: [
-        new THREE.MeshBasicMaterial({ ...add }),                                    // tint
-        new THREE.MeshBasicMaterial({ ...add, side: THREE.DoubleSide }),            // ring, lightning
-        new THREE.MeshBasicMaterial({ map: scorchTexture(), transparent: true, depthWrite: false }), // scorch
-      ],
-      sprite: new THREE.SpriteMaterial({ map: glowTexture(), ...add, depthTest: false }), // flash
-    };
-  }
-  const w = new THREE.Group(); w.name = 'fx-warm';
-  for (const m of _warmMats.mesh) w.add(new THREE.Mesh(_warmMats.geo, m));
-  w.add(new THREE.Sprite(_warmMats.sprite));
-  parkFX(w); group.add(w);
   for (const fn of fxWarmups) { try { fn(group, scene); } catch (e) { console.error('[kit] fx warmup failed', e); } }
 }
+const ADD_MAT = { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false };
+let _fxGeo = null;
+const fxGeo = () => _fxGeo || (_fxGeo = {
+  ringThin: new THREE.RingGeometry(0.85, 1, 64).rotateX(-Math.PI / 2),
+  ringThick: new THREE.RingGeometry(0.62, 1, 64).rotateX(-Math.PI / 2),
+  plane: new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2),
+});
+/** A tiny object pool: get() reuses a parked object or makes one; put() parks it again. */
+function fxPool(group, make, n) {
+  const free = [];
+  const p = {
+    get() { const o = free.pop() || (() => { const m = make(); m.userData.fxPooled = true; group.add(m); return m; })(); o.visible = true; return o; },
+    put(o) { parkFX(o); free.push(o); },
+  };
+  for (let i = 0; i < n; i++) { const o = make(); o.userData.fxPooled = true; group.add(o); p.put(o); }
+  return p;
+}
+
 export function createFX(scene, { overlayEl = null, flashLight = null } = {}) {
-  const add = new ParticleSystem(1600, THREE.AdditiveBlending);
-  const norm = new ParticleSystem(900, THREE.NormalBlending);
+  const add = new ParticleSystem(3200, THREE.AdditiveBlending);
+  const norm = new ParticleSystem(2000, THREE.NormalBlending);
   const group = new THREE.Group(); group.name = 'fx';
   group.add(norm.points, add.points);
   scene.add(group);
-  warmFX(group, scene);   // battle-1
+  const G = fxGeo();
   const flashes = [], rings = [], bolts = [], scorches = [], lightPulses = [];
+  // pools (battle-2)
+  const flashPool = fxPool(group, () => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), ...ADD_MAT, depthTest: false })); s.renderOrder = 6; return s; }, 10);
+  const ringPool = fxPool(group, () => { const r = new THREE.Mesh(G.ringThin, new THREE.MeshBasicMaterial({ ...ADD_MAT, side: THREE.DoubleSide })); r.renderOrder = 4; return r; }, 10);
+  const boltPool = fxPool(group, () => {
+    const g = new THREE.BufferGeometry();
+    const pos = new Float32Array(BOLT_MAX * 2 * 3);
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage));
+    g.addGroup(0, 0, 0); g.addGroup(BOLT_MAX, 0, 1);
+    const dark = new THREE.MeshBasicMaterial({ color: '#05060c', transparent: true, opacity: 0.5, depthWrite: false, side: THREE.DoubleSide });
+    const bright = new THREE.MeshBasicMaterial({ ...ADD_MAT, side: THREE.DoubleSide });
+    g.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 0.01);   // culled while parked; frustumCulled=false while live
+    const m = new THREE.Mesh(g, [dark, bright]); m.renderOrder = 7; m.userData.pos = pos;
+    return m;
+  }, 4);
+  const scorchPool = fxPool(group, () => {
+    const d = new THREE.Mesh(G.plane, new THREE.MeshBasicMaterial({ map: scorchTexture(), transparent: true, depthWrite: false, opacity: 0.9,
+      polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 }));
+    d.renderOrder = 1; return d;
+  }, 6);
   // debris: one InstancedMesh of chunky bevelled bits, simple physics
-  const DEB = 96;
+  const DEB = 180;
   const debMat = new THREE.MeshStandardMaterial({ roughness: 0.6, metalness: 0.1 });
   const debris = new THREE.InstancedMesh(bevelBox(0.09, 0.07, 0.08, 0.015, 1), debMat, DEB);
   debris.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(DEB * 3).fill(1), 3);
   debris.count = 0; debris.frustumCulled = false; debris.castShadow = true; group.add(debris);
   const deb = []; // {p, v, r(axis), a, av, s, life, max, rgb}
-  const _dm = new THREE.Matrix4(), _dq = new THREE.Quaternion(), _ds = new THREE.Vector3(), _dc = new THREE.Color();
+  const _dm = new THREE.Matrix4(), _dq = new THREE.Quaternion(), _ds = new THREE.Vector3();
   // board-wide tint plane for coloured flashes (additive, under the pieces)
-  const tintMat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+  const tintMat = new THREE.MeshBasicMaterial({ color: '#ffffff', ...ADD_MAT, opacity: 0 });
   const tint = new THREE.Mesh(new THREE.PlaneGeometry(9, 9).rotateX(-Math.PI / 2), tintMat);
-  tint.position.y = 0.012; tint.visible = false; tint.renderOrder = 3; group.add(tint);
+  tint.position.y = 0.012; tint.renderOrder = 3; parkFX(tint); group.add(tint);
+  // fight spotlight (battle-2): dims the board around the fight so bright FX read on cream squares
+  const spotMat = new THREE.MeshBasicMaterial({ map: spotTexture(), transparent: true, depthWrite: false, opacity: 0 });
+  const spot = new THREE.Mesh(G.plane, spotMat); spot.renderOrder = 2; parkFX(spot); group.add(spot);
+  const spotS = { cur: 0, target: 0, rate: 8, p: new THREE.Vector3(), r: 1.6 };
+  warmFX(group, scene);   // battle-1
   const lightBase = flashLight ? { color: flashLight.color.clone(), intensity: flashLight.intensity } : null;
   const tmpC = new THREE.Color();
   const rgb = c => { tmpC.set(c); return [tmpC.r, tmpC.g, tmpC.b]; };
   const range = (v, d) => (Array.isArray(v) ? rand(v[0], v[1]) : v ?? d);
+  const endFlash = f => { flashPool.put(f.s); };
+  const endRing = r => { ringPool.put(r.r); };
+  const endBolt = b => { b.mesh.frustumCulled = true; boltPool.put(b.mesh); };
+  const endScorch = s => { scorchPool.put(s.d); };
 
   const fx = {
     rate: 1,
     group,
-    get active() { return add.n + norm.n + flashes.length + rings.length + bolts.length + scorches.length + lightPulses.length + deb.length > 0; },
+    get active() { return add.n + norm.n + flashes.length + rings.length + bolts.length + scorches.length + lightPulses.length + deb.length > 0 || spotS.cur > 0.001 || spotS.target > 0; },
     /** Generic burst. o: {pos, count, color|colors, speed:[a,b], dir, spread(0..1), up, life:[ms,ms],
-     *  size:[a,b], sizeEnd (multiplier), gravity, drag, shape:0 puff|1 spark|2 sparkle, blend:'add'|'normal', alpha} */
+     *  size:[a,b], sizeEnd (multiplier), gravity, drag, shape:0 puff|1 spark|2 sparkle, blend:'add'|'normal', alpha,
+     *  jitter, flat (0..1: squash vertical velocity, for ground-hugging dust)} */
     burst(o) {
       const sys = o.blend === 'normal' ? norm : add;
       const cols = (o.colors || [o.color || '#ffffff']).map(rgb);
-      const dir = o.dir ? o.dir.clone().normalize() : null, spread = o.spread ?? 1;
+      const dir = o.dir ? o.dir.clone().normalize() : null, spread = o.spread ?? 1, flat = o.flat ?? 0;
       for (let i = 0; i < (o.count ?? 20); i++) {
         let vx = rand(-1, 1), vy = rand(-1, 1), vz = rand(-1, 1);
         const l = Math.hypot(vx, vy, vz) || 1; vx /= l; vy /= l; vz /= l;
         if (dir) { vx = dir.x + vx * spread; vy = dir.y + vy * spread; vz = dir.z + vz * spread; const m = Math.hypot(vx, vy, vz) || 1; vx /= m; vy /= m; vz /= m; }
+        if (flat) { vy *= 1 - flat; const m = Math.hypot(vx, vz) || 1, t = Math.hypot(vx, vy, vz) || 1; vx *= t / m; vz *= t / m; }
         vy += o.up ?? 0;
         const sp = range(o.speed, 2), size = range(o.size, 0.08);
         sys.spawn({ x: o.pos.x + rand(-1, 1) * (o.jitter ?? 0), y: o.pos.y, z: o.pos.z + rand(-1, 1) * (o.jitter ?? 0),
@@ -815,12 +1242,12 @@ export function createFX(scene, { overlayEl = null, flashLight = null } = {}) {
     /** Hot sparks (impact). */
     sparks(pos, o = {}) {
       fx.burst({ pos, count: o.count ?? 36, colors: o.colors || ['#fff4c0', '#ffc34d', '#ff8a1f'], speed: o.speed || [2.5, 6], dir: o.dir,
-        spread: o.spread ?? 0.9, life: o.life || [220, 520], size: o.size || [0.05, 0.11], sizeEnd: 0.2, gravity: o.gravity ?? 9, drag: 2.2, shape: 1 });
+        spread: o.spread ?? 0.9, life: o.life || [220, 520], size: o.size || [0.05, 0.11], sizeEnd: 0.2, gravity: o.gravity ?? 9, drag: 2.2, shape: 1, up: o.up });
     },
     /** Soft smoke puffs (dust, poofs). */
     smoke(pos, o = {}) {
       fx.burst({ pos, count: o.count ?? 14, colors: o.colors || [o.color || '#d9d2c5'], speed: o.speed || [0.4, 1.4], up: o.up ?? 0.6,
-        spread: 1, life: o.life || [500, 900], size: o.size || [0.3, 0.55], sizeEnd: 2.1, gravity: -0.4, drag: 2.5, shape: 0,
+        spread: 1, life: o.life || [500, 900], size: o.size || [0.3, 0.55], sizeEnd: o.sizeEnd ?? 2.1, gravity: -0.4, drag: 2.5, shape: 0,
         blend: 'normal', alpha: o.alpha ?? 0.55, jitter: o.jitter ?? 0.12 });
     },
     /** Magic sparkles (promotion, spells). */
@@ -835,24 +1262,39 @@ export function createFX(scene, { overlayEl = null, flashLight = null } = {}) {
     },
     /** Additive billboard flash. */
     flash(pos, o = {}) {
-      const m = new THREE.SpriteMaterial({ map: glowTexture(), color: o.color || '#fff2c8', blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false, transparent: true });
-      const s = new THREE.Sprite(m); s.position.copy(pos); s.renderOrder = 6;
-      group.add(s);
+      const s = flashPool.get(); s.material.color.set(o.color || '#fff2c8'); s.material.opacity = 1;
+      s.position.copy(pos); s.scale.setScalar(0.01);
       flashes.push({ s, t: 0, ms: o.ms ?? 220, r: o.radius ?? 1.2 });
     },
-    /** Expanding ground ring (shockwave). */
+    /** Expanding ground ring (shockwave). o: {color, radius, ms, thick, dark (normal-blended dark ring), alpha, y} */
     ring(pos, o = {}) {
-      const g = new THREE.RingGeometry(0.85, 1, 48); g.rotateX(-Math.PI / 2);
-      const m = new THREE.MeshBasicMaterial({ color: o.color || '#fff0c0', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
-      const r = new THREE.Mesh(g, m); r.position.set(pos.x, (pos.y || 0) + 0.02, pos.z); r.renderOrder = 4;
-      group.add(r);
-      rings.push({ r, t: 0, ms: o.ms ?? 380, R: o.radius ?? 1.1 });
+      const r = ringPool.get();
+      r.geometry = o.thick ? G.ringThick : G.ringThin;
+      r.material.color.set(o.color || (o.dark ? '#000000' : '#fff0c0'));
+      r.material.blending = o.dark ? THREE.NormalBlending : THREE.AdditiveBlending;
+      r.renderOrder = o.dark ? 3 : 4;
+      r.position.set(pos.x, (o.y ?? pos.y ?? 0) + (o.dark ? 0.016 : 0.02), pos.z); r.scale.set(0.01, 1, 0.01);
+      rings.push({ r, t: 0, ms: o.ms ?? 380, R: o.radius ?? 1.1, a: o.alpha ?? (o.dark ? 0.5 : 1) });
     },
-    /** Full-screen colour flash over the canvas (cheap DOM overlay). */
+    /** battle-2: a big shockwave across several squares: dark outer ring (reads on cream), bright
+     *  thick ring, a fast thin ring and ground dust blown outward. o: {radius, color, ms, dust, dustColors} */
+    shockwave(pos, o = {}) {
+      const R = o.radius ?? 2.6, ms = o.ms ?? 560, p = { x: pos.x, y: 0, z: pos.z };
+      fx.ring(p, { radius: R * 1.06, dark: true, thick: true, ms, alpha: o.darkAlpha ?? 0.42 });
+      fx.ring(p, { radius: R, color: o.color || '#fff0c0', thick: true, ms, alpha: o.alpha ?? 0.7 });
+      fx.ring(p, { radius: R * 1.45, color: o.color2 || '#ffffff', ms: ms * 0.75, alpha: 0.8 });
+      if (o.dust !== false) fx.burst({ pos: new THREE.Vector3(pos.x, 0.06, pos.z), count: o.dustCount ?? 46, colors: o.dustColors || ['#5a524a', '#7a7066', '#3a3430'],
+        speed: [R * 1.6, R * 2.6], flat: 0.92, up: 0.25, spread: 1, life: [500, 850], size: [0.22, 0.4], sizeEnd: 2.2, gravity: -0.2, drag: 3.2, shape: 0, blend: 'normal', alpha: 0.55, jitter: 0.2 });
+    },
+    /** Full-screen colour flash over the canvas (cheap DOM overlay). color may be any CSS background. */
     screenFlash(color = '#ffffff', ms = 160, alpha = 0.5) {
       if (!overlayEl) return;
       overlayEl.style.transition = 'none'; overlayEl.style.background = color; overlayEl.style.opacity = String(alpha);
-      requestAnimationFrame(() => { overlayEl.style.transition = `opacity ${Math.round(ms / fx.rate)}ms ease-out`; overlayEl.style.opacity = '0'; });
+      requestAnimationFrame(() => { overlayEl.style.transition = `opacity ${Math.round(ms / Math.max(0.2, fx.rate))}ms ease-out`; overlayEl.style.opacity = '0'; });
+    },
+    /** battle-2: coloured vignette pulse (screen edges) — the board-wide "impact" colour. */
+    vignette(color = '#ff5a1a', ms = 420, alpha = 0.75) {
+      fx.screenFlash(`radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, ${color} 130%)`, ms, alpha);
     },
     /** Rising fire burst (fireball / brazier puff). o: {scale, count, colors} */
     fire(pos, o = {}) {
@@ -862,55 +1304,75 @@ export function createFX(scene, { overlayEl = null, flashLight = null } = {}) {
       fx.burst({ pos, count: (o.count ?? 40) / 3, colors: ['#fff6d0'], speed: [0.2, 0.8], up: 0.8, spread: 1, life: [150, 300],
         size: [0.3 * sc, 0.5 * sc], sizeEnd: 0.4, gravity: -1, drag: 2, shape: 0 });
     },
+    /** battle-2: layered fire — dark smoke under-layer (normal blend: keeps the flames readable on
+     *  light squares), flames, a white-hot core and embers. o: {scale, colors, smoke, count} */
+    inferno(pos, o = {}) {
+      const sc = o.scale ?? 1, n = o.count ?? 40, cols = o.colors || ['#fff3b0', '#ffb43a', '#ff6a1a', '#e8361a'];
+      fx.burst({ pos, count: n * 0.45, colors: o.smoke || ['#1a1412', '#2a2220', '#3a302a'], speed: [0.3 * sc, 1.2 * sc], up: 1.0, spread: 1,
+        life: [700, 1300], size: [0.4 * sc, 0.7 * sc], sizeEnd: 2.0, gravity: -1.4, drag: 2, shape: 0, blend: 'normal', alpha: 0.62, jitter: 0.2 * sc });
+      fx.burst({ pos, count: n, colors: cols, speed: [0.6 * sc, 2.2 * sc], up: 1.3, spread: 1, life: [320, 720],
+        size: [0.3 * sc, 0.55 * sc], sizeEnd: 0.2, gravity: -2.8, drag: 2, shape: 0, jitter: 0.16 * sc });
+      fx.burst({ pos, count: n * 0.3, colors: [cols[0], '#ffffff'], speed: [0.2, 0.9], up: 0.6, spread: 1, life: [160, 320],
+        size: [0.45 * sc, 0.75 * sc], sizeEnd: 0.4, gravity: -1, drag: 2, shape: 0 });
+      fx.burst({ pos, count: n * 0.5, colors: cols.slice(1, 3), speed: [1.5 * sc, 4 * sc], up: 2.2, spread: 1, life: [700, 1400],
+        size: [0.05, 0.09], sizeEnd: 0.3, gravity: 1.5, drag: 1.2, shape: 1, jitter: 0.2 * sc });
+    },
     /** Slow glowing embers drifting up. */
     embers(pos, o = {}) {
       fx.burst({ pos, count: o.count ?? 24, colors: o.colors || ['#ffcf6a', '#ff7a2a', '#ff4a1a'], speed: [0.2, 1.0], up: 1.4, spread: 1,
-        life: [900, 1800], size: [0.035, 0.06], sizeEnd: 0.3, gravity: -0.6, drag: 0.8, shape: 1, jitter: o.radius ?? 0.3 });
+        life: [900, 1800], size: o.size || [0.035, 0.06], sizeEnd: 0.3, gravity: -0.6, drag: 0.8, shape: 1, jitter: o.radius ?? 0.3 });
     },
-    /** Chunky debris pieces that bounce on the board. o: {count, colors, speed, up} */
+    /** Chunky debris pieces that bounce on the board. o: {count, colors, speed, up, size} — a big `up`
+     *  throws them toward an overhead camera (perspective makes them grow: sells depth from Top). */
     debris(pos, o = {}) {
       const cols = (o.colors || [o.color || '#8a8580']).map(c => new THREE.Color(c));
+      const sz = o.size ?? 1;
       for (let i = 0; i < (o.count ?? 14) && deb.length < DEB; i++) {
         const a = Math.random() * Math.PI * 2, sp = range(o.speed, rand(1.5, 3.5));
-        deb.push({ p: new THREE.Vector3(pos.x, pos.y, pos.z), v: new THREE.Vector3(Math.cos(a) * sp, (o.up ?? 3) + Math.random() * 2, Math.sin(a) * sp),
-          ax: new THREE.Vector3(rand(-1, 1), rand(-1, 1), rand(-1, 1)).normalize(), a: 0, av: rand(6, 16), s: rand(0.6, 1.4),
-          life: 0, max: rand(900, 1500), c: pick(cols) });
+        deb.push({ p: new THREE.Vector3(pos.x, pos.y, pos.z), v: new THREE.Vector3(Math.cos(a) * sp, (o.up ?? 3) + Math.random() * 2 * (o.upVar ?? 1), Math.sin(a) * sp),
+          ax: new THREE.Vector3(rand(-1, 1), rand(-1, 1), rand(-1, 1)).normalize(), a: 0, av: rand(6, 16), s: rand(0.6, 1.4) * sz,
+          life: 0, max: range(o.life, rand(900, 1500)), c: pick(cols) });
       }
     },
-    /** The full works: flash + fireball + sparks + smoke + debris + ring (+ optional scorch). */
+    /** The full works: flash + layered fireball + sparks + shockwave + debris (+ scorch, board flash). */
     explosion(pos, o = {}) {
       const sc = o.scale ?? 1;
-      fx.flash(pos, { color: o.flashColor || '#ffd28a', radius: 2.2 * sc, ms: 260 });
-      fx.fire(pos, { scale: sc, count: 50 * sc });
-      fx.sparks(pos, { count: 50 * sc, speed: [3, 8] });
-      fx.ring({ x: pos.x, y: 0, z: pos.z }, { radius: 1.6 * sc, color: '#ffb35a' });
-      fx.debris(pos, { count: 14 * sc, colors: o.debrisColors || ['#6f6a64', '#3d3a36', '#a39b8f'] });
-      fx.smoke(pos, { count: 16 * sc, colors: ['#4a4440', '#6d6660', '#2c2826'], alpha: 0.6, size: [0.4 * sc, 0.7 * sc], life: [700, 1300] });
-      if (o.scorch !== false) fx.scorch(pos, { radius: 0.7 * sc });
-      if (o.boardFlash !== false) fx.boardFlash(o.flashColor || '#ff9a3a', 260, 0.35);
+      fx.flash(pos, { color: o.flashColor || '#ffd28a', radius: 3.2 * sc, ms: 320 });
+      fx.inferno(pos, { scale: 1.5 * sc, count: 60 * sc, colors: o.fireColors });
+      fx.sparks(pos, { count: 70 * sc, speed: [4, 10], size: [0.07, 0.14], colors: o.sparkColors });
+      fx.shockwave(pos, { radius: 2.6 * sc, color: o.ringColor || '#ffb35a' });
+      fx.debris(pos, { count: 22 * sc, colors: o.debrisColors || ['#6f6a64', '#3d3a36', '#a39b8f'], speed: [2, 5], up: 5, size: 1.5 });
+      if (o.scorch !== false) fx.scorch(pos, { radius: 1.0 * sc });
+      if (o.boardFlash !== false) fx.boardFlash(o.flashColor || '#ff9a3a', 320, 0.45);
     },
-    /** Jagged lightning between two points, flickering for ms. o: {color, width, branches, ms} */
+    /** Jagged branching lightning between two points, flickering for ms. Lights the board.
+     *  o: {color, width, branches, branchP, ms, dark (under-ribbon, default true), light (board flash, default true)} */
     lightning(from, to, o = {}) {
-      const mat = new THREE.MeshBasicMaterial({ color: o.color || '#bfe6ff', transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
-      const mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat); mesh.renderOrder = 7; mesh.frustumCulled = false;
-      group.add(mesh);
-      const b = { mesh, from: from.clone(), to: to.clone(), t: 0, ms: o.ms ?? 380, next: 0, w: o.width ?? 0.05, branches: o.branches ?? 2 };
+      const mesh = boltPool.get();
+      mesh.position.set(0, 0, 0); mesh.frustumCulled = false;
+      mesh.material[1].color.set(o.color || '#bfe6ff');
+      const b = { mesh, pos: mesh.userData.pos, from: from.clone(), to: to.clone(), t: 0, ms: o.ms ?? 380, next: 0, w: o.width ?? 0.05,
+        branches: o.branches ?? 2, branchP: o.branchP ?? 0.18, dark: o.dark !== false };
       buildBolt(b); bolts.push(b);
-      fx.flash(to, { color: o.color || '#bfe6ff', radius: 1.2, ms: 180 });
+      fx.flash(to, { color: o.color || '#bfe6ff', radius: o.flashRadius ?? 1.2, ms: 180 });
+      if (o.light !== false) fx.boardFlash(o.color || '#bfe6ff', b.ms, o.lightStrength ?? 0.3);
     },
     /** Tint the whole board (and the scene light) with a colour for a moment. */
     boardFlash(color = '#ff7a2a', ms = 300, strength = 0.4) {
       lightPulses.push({ t: 0, ms, c: new THREE.Color(color), s: strength });
-      tintMat.color.set(color); tint.visible = true;
+      tintMat.color.set(color); tint.position.set(0, 0.012, 0); tint.visible = true;
     },
     /** Dark scorch/crack decal on the board that fades out. o: {radius, ms} */
     scorch(pos, o = {}) {
-      const m = new THREE.MeshBasicMaterial({ map: scorchTexture(), transparent: true, depthWrite: false, opacity: 0.9,
-        polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
-      const r = o.radius ?? 0.6;
-      const d = new THREE.Mesh(new THREE.PlaneGeometry(r * 2, r * 2).rotateX(-Math.PI / 2), m);
-      d.rotation.y = Math.random() * 6.28; d.position.set(pos.x, 0.006, pos.z); d.renderOrder = 1;
-      group.add(d); scorches.push({ d, t: 0, ms: o.ms ?? 2600 });
+      const d = scorchPool.get(), r = o.radius ?? 0.6;
+      d.material.opacity = 0.9; d.scale.set(r * 2, 1, r * 2);
+      d.rotation.y = Math.random() * 6.28; d.position.set(pos.x, 0.006, pos.z);
+      scorches.push({ d, t: 0, ms: o.ms ?? 2600 });
+    },
+    /** battle-2: dim the board around a fight (point, clear radius in world units). spotlight(null) lifts it. */
+    spotlight(point, o = {}) {
+      if (!point) { spotS.target = 0; spotS.rate = o.rate ?? 6; return; }
+      spotS.p.set(point.x, 0, point.z); spotS.r = o.radius ?? 1.6; spotS.target = o.dim ?? 0.55; spotS.rate = o.rate ?? 7;
     },
     update(dtReal) {
       const dt = dtReal * fx.rate;
@@ -922,7 +1384,7 @@ export function createFX(scene, { overlayEl = null, flashLight = null } = {}) {
           const d = deb[i]; d.life += dt;
           if (d.life >= d.max) { deb.splice(i, 1); continue; }
           d.v.y -= 9.8 * s; d.p.addScaledVector(d.v, s); d.a += d.av * s;
-          if (d.p.y < 0.03) { d.p.y = 0.03; d.v.y *= -0.35; d.v.x *= 0.6; d.v.z *= 0.6; d.av *= 0.6; }
+          if (d.p.y < 0.03 && Math.abs(d.p.x) < 4.6 && Math.abs(d.p.z) < 4.6) { d.p.y = 0.03; d.v.y *= -0.35; d.v.x *= 0.6; d.v.z *= 0.6; d.av *= 0.6; }
         }
         deb.forEach((d, i) => {
           const k = d.life / d.max, sc = d.s * (k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1);
@@ -933,14 +1395,22 @@ export function createFX(scene, { overlayEl = null, flashLight = null } = {}) {
       } else if (debris.count) debris.count = 0;
       for (let i = bolts.length - 1; i >= 0; i--) {
         const b = bolts[i]; b.t += dt;
-        if (b.t >= b.ms) { group.remove(b.mesh); b.mesh.geometry.dispose(); b.mesh.material.dispose(); bolts.splice(i, 1); continue; }
+        if (b.t >= b.ms) { endBolt(b); bolts.splice(i, 1); continue; }
         if (b.t >= b.next) { buildBolt(b); b.next = b.t + 45; }
-        b.mesh.material.opacity = (1 - b.t / b.ms) * (0.6 + Math.random() * 0.4);
+        const f = (1 - b.t / b.ms) * (0.6 + Math.random() * 0.4);
+        b.mesh.material[1].opacity = f; b.mesh.material[0].opacity = 0.5 * f;
       }
       for (let i = scorches.length - 1; i >= 0; i--) {
         const s = scorches[i]; s.t += dtReal; // scorches fade in real time
-        if (s.t >= s.ms) { group.remove(s.d); s.d.geometry.dispose(); s.d.material.dispose(); scorches.splice(i, 1); continue; }
+        if (s.t >= s.ms) { endScorch(s); scorches.splice(i, 1); continue; }
         const k = s.t / s.ms; s.d.material.opacity = 0.9 * (k < 0.6 ? 1 : 1 - (k - 0.6) / 0.4);
+      }
+      // spotlight
+      if (spotS.cur > 0.001 || spotS.target > 0) {
+        spotS.cur += (spotS.target - spotS.cur) * (1 - Math.exp(-spotS.rate * dt / 1000));
+        if (spotS.target === 0 && spotS.cur < 0.004) { spotS.cur = 0; parkFX(spot); }
+        else { const S = (2 * spotS.r) / SPOT_IN; spot.position.set(spotS.p.x, 0.011, spotS.p.z); spot.scale.set(S, 1, S); }
+        spotMat.opacity = spotS.cur;
       }
       if (lightPulses.length) {
         let best = 0, col = null;
@@ -949,24 +1419,24 @@ export function createFX(scene, { overlayEl = null, flashLight = null } = {}) {
           if (p.t >= p.ms) { lightPulses.splice(i, 1); continue; }
           const f = p.s * (1 - p.t / p.ms) ** 2; if (f > best) { best = f; col = p.c; }
         }
-        tintMat.opacity = best * 0.5; tint.visible = best > 0.001;
+        tintMat.opacity = best * 0.5; if (best <= 0.001) parkFX(tint);
         if (col) tintMat.color.copy(col);
         if (flashLight && lightBase) {
           flashLight.color.copy(lightBase.color); if (col) flashLight.color.lerp(col, Math.min(1, best * 1.5));
           flashLight.intensity = lightBase.intensity * (1 + best * 3);
         }
-      } else if (tint.visible || (flashLight && lightBase && flashLight.intensity !== lightBase.intensity)) {
-        tint.visible = false; if (flashLight && lightBase) { flashLight.color.copy(lightBase.color); flashLight.intensity = lightBase.intensity; }
+      } else if (tint.position.x !== PARK.x || (flashLight && lightBase && flashLight.intensity !== lightBase.intensity)) {
+        parkFX(tint); if (flashLight && lightBase) { flashLight.color.copy(lightBase.color); flashLight.intensity = lightBase.intensity; }
       }
       for (let i = flashes.length - 1; i >= 0; i--) {
         const f = flashes[i]; f.t += dt; const k = f.t / f.ms;
-        if (k >= 1) { group.remove(f.s); f.s.material.dispose(); flashes.splice(i, 1); continue; }
+        if (k >= 1) { endFlash(f); flashes.splice(i, 1); continue; }
         const sc = f.r * (0.5 + ease.cubicOut(k)); f.s.scale.set(sc, sc, sc); f.s.material.opacity = 1 - k;
       }
       for (let i = rings.length - 1; i >= 0; i--) {
         const r = rings[i]; r.t += dt; const k = r.t / r.ms;
-        if (k >= 1) { group.remove(r.r); r.r.geometry.dispose(); r.r.material.dispose(); rings.splice(i, 1); continue; }
-        const sc = 0.1 + r.R * ease.cubicOut(k); r.r.scale.set(sc, 1, sc); r.r.material.opacity = 1 - k;
+        if (k >= 1) { endRing(r); rings.splice(i, 1); continue; }
+        const sc = 0.1 + r.R * ease.cubicOut(k); r.r.scale.set(sc, 1, sc); r.r.material.opacity = r.a * (1 - k) ** 1.3;
       }
     },
     setViewport(heightPx, fovDeg) {
@@ -974,14 +1444,22 @@ export function createFX(scene, { overlayEl = null, flashLight = null } = {}) {
       add.uniforms.uScale.value = s; norm.uniforms.uScale.value = s;
     },
     clear() {
-      add.clear(); norm.clear(); deb.length = 0; debris.count = 0; lightPulses.length = 0; tint.visible = false;
+      add.clear(); norm.clear(); deb.length = 0; debris.count = 0; lightPulses.length = 0; parkFX(tint);
+      spotS.cur = 0; spotS.target = 0; spotMat.opacity = 0; parkFX(spot);
       if (flashLight && lightBase) { flashLight.color.copy(lightBase.color); flashLight.intensity = lightBase.intensity; }
-      for (const b of bolts) { group.remove(b.mesh); b.mesh.geometry.dispose(); b.mesh.material.dispose(); } bolts.length = 0;
-      for (const s of scorches) { group.remove(s.d); s.d.geometry.dispose(); s.d.material.dispose(); } scorches.length = 0;
-      for (const f of flashes) { group.remove(f.s); f.s.material.dispose(); } flashes.length = 0;
-      for (const r of rings) { group.remove(r.r); r.r.geometry.dispose(); r.r.material.dispose(); } rings.length = 0;
+      for (const b of bolts) endBolt(b); bolts.length = 0;
+      for (const s of scorches) endScorch(s); scorches.length = 0;
+      for (const f of flashes) endFlash(f); flashes.length = 0;
+      for (const r of rings) endRing(r); rings.length = 0;
     },
-    dispose() { fx.clear(); scene.remove(group); add.geom.dispose(); add.mat.dispose(); norm.geom.dispose(); norm.mat.dispose(); },
+    dispose() {
+      fx.clear(); scene.remove(group); add.geom.dispose(); add.mat.dispose(); norm.geom.dispose(); norm.mat.dispose();
+      group.traverse(o => {
+        if (!o.userData.fxPooled && o !== spot && o !== tint && o !== debris) return;
+        if (o.geometry && o.geometry !== G.ringThin && o.geometry !== G.ringThick && o.geometry !== G.plane) o.geometry.dispose();
+        (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m?.dispose());
+      });
+    },
   };
   return fx;
 }

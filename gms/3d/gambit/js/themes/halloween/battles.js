@@ -1,4 +1,5 @@
-// Halloween battle (capture) animations — owner: battle-1. See docs/notes/battle.md.
+// Halloween battle (capture) animations — owner: battle-1, made BIG by battle-2 (staged camera,
+// slow-mo impacts, shockwaves, fling/shatter; see battle_util.js). See docs/notes/battle.md.
 // Four battles, picked at random (type-biased variants: crypt towers favour the grave, the
 // Vampire Countess the bats, the Witch the possession, imps and the Pumpkin King the bomb):
 //  - grave:      a glowing grave cracks open under the victim, bony hands grab it and drag it
@@ -141,7 +142,7 @@ const pumpkinAssets = U.once(() => {
 });
 const glowSpriteMat = U.once(() => new THREE.SpriteMaterial({ map: glowTex(), ...ADD, color: '#ffb02a' }));
 
-const BATS = 22, HANDS = 4;
+const BATS = 40, HANDS = 6;
 U.definePool({
   'h.grave': () => {
     const a = graveAssets(), grp = new THREE.Group();
@@ -177,7 +178,7 @@ function shudder(c, obj, ms, amp = 0.04) {
 // ===================================================================== battles
 /** The grave: hands drag the victim down into a glowing grave; a tombstone gets stomped flat. */
 export async function grave(ctx) {
-  const c = U.prep(ctx, 3530);
+  const c = U.prep(ctx, 3970);
   const { kit, attacker: A, victim: V, victimPos, fx } = c;
   const S = side(c.color), hV = U.vh(V);
   const gr = U.take(c, 'h.grave'), hands = U.take(c, 'h.hands'), tomb = U.take(c, 'h.tomb');
@@ -187,32 +188,35 @@ export async function grave(ctx) {
   tomb.visible = false;
   const dirt = ['#3b2c20', '#5a4532', '#2a1e16'];
   try {
-    await U.focus(c, async () => {
+    await U.stage(c, async () => {
       // the attacker beckons: a stretch and a side-coloured puff under the victim
       await c.tween(200, (e, k) => { const s = sin(k * PI) * 0.15; A.scale.set(1 - s * 0.4, 1 + s, 1 - s * 0.4); });
-      fx.smoke(victimPos.clone().setY(0.05), { count: c.n(8), colors: S.wisp, alpha: 0.4, size: [0.2, 0.35], up: 0.1 });
-      // the grave cracks open
-      fx.debris(victimPos.clone().setY(0.05), { count: c.n(12), colors: dirt, speed: [1, 2.5], up: 2 });
-      fx.dust(victimPos.clone().setY(0.05), { count: c.n(22), colors: dirt, speed: [0.8, 2], up: 0.6 });
-      kit.shake(c, 0.05, 260);
+      fx.smoke(victimPos.clone().setY(0.05), { count: c.n(14), colors: S.wisp, alpha: 0.45, size: [0.3, 0.5], up: 0.1 });
+      // the grave cracks open: earth erupts toward the camera, cracks race outward
+      U.sound(c, 'creak', { at: victimPos });
+      fx.debris(victimPos.clone().setY(0.05), { count: c.n(26), colors: dirt, speed: [1.5, 3.5], up: 5, size: 1.5 });
+      fx.dust(victimPos.clone().setY(0.05), { count: c.n(40), colors: dirt, speed: [1, 3], up: 0.8 });
+      fx.shockwave(victimPos, { radius: 2.2, color: S.main, dustColors: dirt, ms: 480 });
+      fx.scorch(victimPos, { radius: 1.3, ms: 3200 });
+      kit.shake(c, 0.08, 300);
       await Promise.all([
-        c.tween(340, (e, k) => { gr.scale.setScalar(0.01 + e); rim.material.opacity = 0.6 + 0.4 * sin(k * 20) ** 2; }, kit.ease.backOut),
+        c.tween(340, (e, k) => { gr.scale.setScalar(0.01 + 1.7 * e); rim.material.opacity = 0.6 + 0.4 * sin(k * 20) ** 2; }, kit.ease.backOut),
         shudder(c, V, 340, 0.03),
       ]);
       // hands rise around the rim and clench inward
       const items = [];
       for (let i = 0; i < HANDS; i++) {
-        const a = i * PI / 2 + PI / 4 + R(-0.2, 0.2);
-        items.push({ a, p: new THREE.Vector3(), ax: new THREE.Vector3(), s: R(0.9, 1.15), q: new THREE.Quaternion() });
+        const a = i * PI * 2 / HANDS + PI / 4 + R(-0.2, 0.2);
+        items.push({ a, p: new THREE.Vector3(), ax: new THREE.Vector3(), s: R(0.95, 1.2), q: new THREE.Quaternion() });
       }
       const placeHands = (rise, lean, sink = 0) => {
         for (let i = 0; i < items.length; i++) {
-          const it = items[i], r = 0.42 - 0.1 * lean;
-          it.p.set(victimPos.x + cos(it.a) * r, -0.3 + 0.62 * rise - sink, victimPos.z + sin(it.a) * r);
+          const it = items[i], r = 0.62 - 0.2 * lean;
+          it.p.set(victimPos.x + cos(it.a) * r, -0.45 + 0.95 * rise - sink, victimPos.z + sin(it.a) * r);
           // face the centre, lean in
           const yaw = Math.atan2(-cos(it.a), -sin(it.a));
           it.q.setFromEuler(new THREE.Euler(0.15 + 0.7 * lean, yaw, 0, 'YXZ'));
-          U._m4.compose(it.p, it.q, U._s.setScalar(it.s * 1.5));
+          U._m4.compose(it.p, it.q, U._s.setScalar(it.s * 2.3));
           hands.setMatrixAt(i, U._m4);
         }
         hands.count = items.length; hands.instanceMatrix.needsUpdate = true;
@@ -220,38 +224,37 @@ export async function grave(ctx) {
       await c.tween(280, e => placeHands(e, 0), kit.ease.backOut);
       await c.tween(140, e => placeHands(1, e), kit.ease.quadIn);
       kit.flashObject(c, V, S.main, 300, 1.4);
-      // yank down: spinning, shrinking, wisps erupt
-      fx.burst({ pos: victimPos.clone().setY(0.1), count: c.n(30), colors: S.wisp, speed: [0.4, 1.4], up: 1.6, spread: 0.6, life: [500, 900],
-        size: [0.18, 0.32], sizeEnd: 1.6, gravity: -1.2, drag: 2, shape: 0, alpha: 0.7, jitter: 0.25 });
-      fx.boardFlash(S.main, 400, 0.25);
+      // yank down: spinning, shrinking, a geyser of wisps
+      fx.burst({ pos: victimPos.clone().setY(0.1), count: c.n(60), colors: S.wisp, speed: [0.6, 2.2], up: 2.6, spread: 0.6, life: [600, 1100],
+        size: [0.28, 0.5], sizeEnd: 1.8, gravity: -1.2, drag: 2, shape: 0, alpha: 0.75, jitter: 0.35 });
+      U.impact(c, victimPos.clone().setY(0.4), { color: S.main, power: 0.9, ring: 2.4, dust: dirt, sfx: 'wail', white: false });
       const v0 = V.position.clone();
       let lastP = 0;
       await c.tween(460, (e, k) => {
-        V.position.set(v0.x, -hV * 0.9 * e, v0.z); V.rotation.y = e * PI * 3;
+        V.position.set(v0.x, -hV * 0.9 * e, v0.z); V.rotation.y = e * PI * 5;
         const s = max(0.05, 1 - 0.75 * e); V.scale.set(s, 1, s);
         placeHands(1, 1, 0.9 * e);
         if (k - lastP > 0.15 && k < 1) { lastP = k; fx.dust(victimPos.clone().setY(0.03), { count: c.n(6), colors: dirt, speed: [0.5, 1.5], up: 0.8 }); }
       }, kit.ease.quadIn);
       V.visible = false; U.park(hands);
       // grave closes, a tombstone pops up
+      U.sound(c, 'thud', { at: victimPos });
       fx.smoke(victimPos.clone().setY(0.1), { count: c.n(10), colors: ['#3a3040', '#5a5060'], alpha: 0.5 });
       tomb.visible = true; tomb.position.copy(victimPos); facing(tomb, c.color === 'w' ? new THREE.Vector3(0, 0, 1) : new THREE.Vector3(0, 0, -1));
       await Promise.all([
         c.tween(220, e => gr.scale.setScalar(max(0.01, 1 - e)), kit.ease.quadIn),
-        c.tween(260, (e, k) => { tomb.scale.set(1, max(0.01, e), 1); tomb.rotation.z = 0.25 * sin(k * PI * 2) * (1 - k); }, kit.ease.backOut),
+        c.tween(260, (e, k) => { tomb.scale.set(1.7, max(0.01, 1.7 * e), 1.7); tomb.rotation.z = 0.25 * sin(k * PI * 2) * (1 - k); }, kit.ease.backOut),
       ]);
       gr.visible = false;
       // attacker hops on top and stomps it into the ground
-      const a0 = A.position.clone(), top = victimPos.clone(); top.y = 0.62;
-      await c.tween(300, (e, k) => { kit.arc(A.position, a0, top, 0.5, e); }, kit.ease.sineInOut);
-      fx.dust(victimPos.clone().setY(0.05), { count: c.n(26), colors: ['#8a8070', '#6c6458', '#a59b88'], speed: [1, 2.6], up: 0.4 });
-      fx.ring(victimPos, { radius: 1.0, color: S.light });
-      kit.shake(c, 0.08, 200);
-      await c.tween(160, e => { tomb.scale.set(1 + 0.2 * e, max(0.01, 1 - e), 1 + 0.2 * e); A.position.y = 0.62 * (1 - e); }, kit.ease.quadIn);
+      const a0 = A.position.clone(), top = victimPos.clone(); top.y = 1.05;
+      await c.tween(320, (e, k) => { kit.arc(A.position, a0, top, 0.9, e); }, kit.ease.sineInOut);
+      U.impact(c, victimPos.clone().setY(0.2), { color: S.light, power: 0.95, ring: 2.4, debris: ['#8d877c', '#6c6458', '#a59b88', ...dirt], dust: ['#8a8070', '#6c6458', '#a59b88'], sfx: 'stone', slow: { factor: 0.25, ms: 160 } });
+      await c.tween(160, e => { tomb.scale.set(1.7 + 0.4 * e, max(0.01, 1.7 * (1 - e)), 1.7 + 0.4 * e); A.position.y = 1.05 * (1 - e); }, kit.ease.quadIn);
       tomb.visible = false;
       A.position.copy(c.to);
       await kit.squash(c, A, 0.25, 90);
-    }, { zoom: 0.8, tilt: 0.2 });
+    }, {});
   } finally { U.park(gr, hands, tomb); U.finish(c); }
 }
 grave.label = 'grave snatch';
@@ -259,7 +262,7 @@ const graveCrypt = Object.assign(c => grave(c), { only: ['r', 'k'], weight: 2, l
 
 /** Bat swarm: bats burst out, circle the victim, lift it and carry it off the board. */
 export async function bats(ctx) {
-  const c = U.prep(ctx, 2950);
+  const c = U.prep(ctx, 3010);
   const { kit, attacker: A, victim: V, victimPos, fx } = c;
   const S = side(c.color), hA = U.vh(A), hV = U.vh(V);
   const dir = kit.flatDir(A.position, victimPos, c.dir);
@@ -267,7 +270,7 @@ export async function bats(ctx) {
   const n = c.lite ? 14 : BATS;
   const src = A.position.clone().setY(hA * 0.8);
   const bs = [];
-  for (let i = 0; i < n; i++) bs.push({ ph: R(0, PI * 2), r: R(0.35, 0.75), h: R(0.25, hV + 0.35), sp: R(5, 8) * (i % 2 ? 1 : -1), flap: R(20, 30),
+  for (let i = 0; i < n; i++) bs.push({ ph: R(0, PI * 2), r: R(0.45, 1.25), h: R(0.25, hV + 0.7), sp: R(5, 8) * (i % 2 ? 1 : -1), flap: R(20, 30),
     s: R(0.8, 1.25), p: src.clone(), q: new THREE.Quaternion(), prev: src.clone(), ox: R(-1, 1), oz: R(-1, 1) });
   const _d = new THREE.Vector3(), _e = new THREE.Euler();
   let T = 0;
@@ -279,17 +282,19 @@ export async function bats(ctx) {
       _e.set(0.0, b.yaw || 0, sin(T * b.sp) * 0.3);
       b.q.setFromEuler(_e);
       const f = 0.35 + 0.65 * Math.abs(sin(T * b.flap + b.ph));      // wing beat = span squash
-      U._m4.compose(b.p, b.q, U._s.set(b.s * 1.6 * f, b.s * 1.6, b.s * 1.6));
+      U._m4.compose(b.p, b.q, U._s.set(b.s * 1.75 * f, b.s * 1.75, b.s * 1.75));
       im.setMatrixAt(i, U._m4);
     }
     im.count = bs.length; im.instanceMatrix.needsUpdate = true;
   };
   try {
-    await U.focus(c, async () => {
+    await U.stage(c, async () => {
       // the attacker shudders, the swarm bursts out of it
       await c.tween(150, (e, k) => { const s = sin(k * PI) * 0.18; A.scale.set(1 + s * 0.5, 1 - s, 1 + s * 0.5); });
-      fx.smoke(src, { count: c.n(10), colors: ['#2a1838', '#3a2050'], alpha: 0.6, size: [0.25, 0.4] });
-      fx.sparkles(src, { count: c.n(12), colors: S.wisp, speed: [0.8, 2] });
+      fx.smoke(src, { count: c.n(22), colors: ['#2a1838', '#3a2050', '#120a1a'], alpha: 0.7, size: [0.35, 0.6] });
+      fx.sparkles(src, { count: c.n(24), colors: S.wisp, speed: [1, 2.6] });
+      fx.ring(A.position, { radius: 1.6, color: S.main, thick: true, ms: 420 });
+      U.sound(c, 'bats', { at: src });
       await U.sim(c, 300, (dt, k) => {
         T += dt / 1000;
         for (const b of bs) b.p.set(src.x + b.ox * 0.9 * k + cos(b.ph + T * b.sp) * 0.25 * k, src.y + 0.3 * k + 0.2 * sin(b.ph), src.z + b.oz * 0.9 * k + sin(b.ph + T * b.sp) * 0.25 * k);
@@ -307,32 +312,35 @@ export async function bats(ctx) {
         draw();
       });
       kit.flashObject(c, V, S.main, 300, 1.2);
-      // vortex lifts the victim
+      U.impact(c, victimPos.clone().setY(0.5), { color: S.main, power: 0.8, ring: 2.2, white: false, dust: ['#2a1838', '#3a2050', '#4a3060'], slow: { factor: 0.3, ms: 180 } });
+      // vortex lifts the victim (a tornado of wisps)
       let lastW = 0;
       await U.sim(c, 460, (dt, k) => {
         T += dt / 1000;
-        V.position.y = 0.45 * kit.ease.quadOut(k); V.rotation.y += dt / 1000 * 9;
+        V.position.y = 0.9 * kit.ease.quadOut(k); V.rotation.y += dt / 1000 * 14;
         kit.setLean(V, dir, 0.15 * sin(k * PI * 4), V.rotation.y);
         bs.forEach(b => { const a = b.ph + T * b.sp, r = b.r * (1 - 0.35 * k); b.p.set(victimPos.x + cos(a) * r, b.h + 0.45 * k, victimPos.z + sin(a) * r); });
-        if (k - lastW > 0.1 && k < 1) { lastW = k; fx.burst({ pos: victimPos.clone().setY(0.4 + 0.5 * k), count: c.n(4), colors: S.wisp, speed: [0.6, 1.4], up: 0.4, life: [300, 500], size: [0.05, 0.09], shape: 1 }); }
+        if (k - lastW > 0.06 && k < 1) { lastW = k; fx.burst({ pos: victimPos.clone().setY(0.2 + 0.8 * k), count: c.n(10), colors: S.wisp, speed: [1, 2.2], up: 0.6, flat: 0.7, life: [300, 600], size: [0.07, 0.12], shape: 1 }); fx.smoke(victimPos.clone().setY(0.1), { count: c.n(3), colors: ['#2a1838', '#3a2050'], alpha: 0.4, size: [0.3, 0.45] }); }
         draw();
       });
       // carry it off over the board edge (continuing in the attack direction)
+      U.sound(c, 'whoosh', { at: victimPos });
       const v0 = V.position.clone();
       const tEdge = min(...['x', 'z'].map(ax => (dir[ax] ? (Math.sign(dir[ax]) * 5.8 - v0[ax]) / dir[ax] : Infinity)));
-      const end = v0.clone().addScaledVector(dir, max(2.5, tEdge)); end.y = 2.6;
+      const end = v0.clone().addScaledVector(dir, max(2.5, tEdge)); end.y = 3.4;
       const q0 = V.quaternion.clone();
       await Promise.all([
         U.sim(c, 640, (dt, k) => {
           T += dt / 1000; const e = kit.ease.quadIn(k);
           V.position.lerpVectors(v0, end, e); V.quaternion.copy(q0);
-          const s = max(0.01, 1 - 0.5 * k); V.scale.setScalar(s);
+          const s = max(0.01, 1 - 0.3 * k); V.scale.setScalar(s); V.rotation.y += dt / 1000 * 10;
           bs.forEach(b => { const a = b.ph + T * b.sp, r = b.r * 0.65; b.p.set(V.position.x + cos(a) * r, V.position.y + b.h * 0.6, V.position.z + sin(a) * r); });
           draw();
         }).then(() => { V.visible = false; }),
+        U.camTo(c, { point: v0.clone().lerp(end, 0.35) }, 500),
         c.wait(180).then(() => kit.hopTo(c, A, c.to, { ms: 300, height: 0.3, squash: 0.2 })),
       ]);
-    }, { zoom: 0.85, tilt: 0.2 });
+    }, {});
   } finally { U.park(im); U.finish(c); }
 }
 bats.label = 'bat swarm';
@@ -340,7 +348,7 @@ const batsQueen = Object.assign(c => bats(c), { only: ['q', 'n'], weight: 2, lab
 
 /** Possession: a ghost loops into the victim, which shudders, glows and dissolves into wisps. */
 export async function possession(ctx) {
-  const c = U.prep(ctx, 2930);
+  const c = U.prep(ctx, 3560);
   const { kit, attacker: A, victim: V, victimPos, fx } = c;
   const S = side(c.color), hA = U.vh(A), hV = U.vh(V);
   const dir = kit.flatDir(A.position, victimPos, c.dir);
@@ -351,13 +359,15 @@ export async function possession(ctx) {
   const start = A.position.clone().setY(hA * 0.6);
   g.position.copy(start); g.scale.setScalar(0.01); facing(g, dir);
   try {
-    await U.focus(c, async () => {
+    await U.stage(c, async () => {
       // rise out of the attacker
       kit.flashObject(c, A, S.main, 400, 1.0);
-      await c.tween(260, (e, k) => { g.scale.setScalar(0.01 + 1.59 * e); g.position.y = start.y + 0.45 * e; }, kit.ease.backOut);
+      U.sound(c, 'wail', { at: A.position });
+      await c.tween(280, (e, k) => { g.scale.setScalar(0.01 + 2.59 * e); g.position.y = start.y + 0.7 * e; }, kit.ease.backOut);
       // loop over to the victim: a sideways bezier (reads as a swoop from Top)
+      U.sound(c, 'whoosh', { at: victimPos });
       const p0 = g.position.clone(), p3 = victimPos.clone().setY(hV * 0.55);
-      const perp = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(R(0.9, 1.4) * (Math.random() < 0.5 ? 1 : -1));
+      const perp = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(R(1.3, 1.9) * (Math.random() < 0.5 ? 1 : -1));
       const p1 = p0.clone().add(perp).setY(p0.y + 0.8), p2 = p3.clone().add(perp.clone().multiplyScalar(-0.6)).setY(p3.y + 0.9);
       const bez = (t, o) => o.set(0, 0, 0).addScaledVector(p0, (1 - t) ** 3).addScaledVector(p1, 3 * (1 - t) ** 2 * t).addScaledVector(p2, 3 * (1 - t) * t * t).addScaledVector(p3, t ** 3);
       const prev = p0.clone(); let lastW = 0;
@@ -367,39 +377,37 @@ export async function possession(ctx) {
         prev.copy(g.position);
         if (k - lastW > 0.06 && k < 1) {
           lastW = k;
-          fx.burst({ pos: g.position.clone().setY(g.position.y + 0.1), count: c.n(4), colors: S.wisp, speed: [0.05, 0.3], up: 0.2, life: [300, 600],
-            size: [0.14, 0.24], sizeEnd: 0.2, gravity: -0.4, drag: 2, shape: 0, alpha: 0.7 });
+          fx.burst({ pos: g.position.clone().setY(g.position.y + 0.1), count: c.n(7), colors: S.wisp, speed: [0.05, 0.4], up: 0.2, life: [400, 800],
+            size: [0.22, 0.38], sizeEnd: 0.2, gravity: -0.4, drag: 2, shape: 0, alpha: 0.75 });
+          fx.burst({ pos: g.position.clone().setY(0.03), count: c.n(2), colors: ['#120a1a', '#1a1024'], speed: [0.05, 0.2], up: 0, life: [400, 700],
+            size: [0.35, 0.5], sizeEnd: 1.4, drag: 2, shape: 0, blend: 'normal', alpha: 0.35 });
         }
       }, kit.ease.sineInOut);
       // dive in
-      await c.tween(140, e => { g.scale.setScalar(max(0.01, 1.6 * (1 - e))); g.position.y = p3.y - 0.3 * e; }, kit.ease.quadIn);
+      await c.tween(140, e => { g.scale.setScalar(max(0.01, 2.6 * (1 - e))); g.position.y = p3.y - 0.3 * e; }, kit.ease.quadIn);
       g.visible = false;
-      fx.flash(p3, { color: S.light, radius: 1.3 });
-      fx.ring(victimPos, { radius: 0.9, color: S.main });
+      U.impact(c, p3, { color: S.main, power: 0.85, ring: 2.2, dust: ['#2a1838', '#3a2050', '#120a1a'], sfx: 'hex', slow: { factor: 0.25, ms: 180 } });
       kit.flashObject(c, V, S.main, 900, 2.0);
-      fx.boardFlash(S.main, 700, 0.3);
       // possessed: violent shudder, lifts and spins
       const v0 = V.position.clone(); let lastS = 0;
       await c.tween(440, (e, k) => {
         const a = 0.06 * (k < 1 ? 1 : 0);
-        V.position.set(v0.x + R(-a, a), 0.3 * e, v0.z + R(-a, a));
+        V.position.set(v0.x + R(-a, a), 0.6 * e, v0.z + R(-a, a));
         kit.setLean(V, dir, 0.25 * sin(k * PI * 9), e * PI * 2);
         if (k - lastS > 0.12 && k < 1) { lastS = k; fx.sparkles(V.position.clone().setY(hV * 0.7), { count: c.n(6), colors: S.wisp, speed: [0.5, 1.4], life: [300, 500] }); }
       }, kit.ease.quadOut);
       // dissolve upward into wisps
-      fx.burst({ pos: V.position.clone().setY(hV * 0.5), count: c.n(40), colors: S.wisp, speed: [0.3, 1.2], up: 2.2, spread: 0.5, life: [600, 1100],
-        size: [0.2, 0.36], sizeEnd: 1.8, gravity: -1.5, drag: 1.8, shape: 0, alpha: 0.75, jitter: 0.2 });
-      fx.sparkles(V.position.clone().setY(hV * 0.6), { count: c.n(24), colors: S.wisp, speed: [0.8, 2.2] });
-      fx.ring(victimPos, { radius: 1.4, color: S.light, ms: 450 });
-      const y0 = V.position.y;
+      // ...and bursts: wisps, soul sparkles and shards of the body
+      const bp = V.position.clone().setY(V.position.y + hV * 0.5);
+      fx.burst({ pos: bp, count: c.n(70), colors: S.wisp, speed: [0.8, 2.6], up: 2.2, spread: 0.7, life: [600, 1200],
+        size: [0.3, 0.5], sizeEnd: 1.8, gravity: -1.5, drag: 1.8, shape: 0, alpha: 0.8, jitter: 0.3 });
+      fx.sparkles(bp, { count: c.n(50), colors: S.wisp, speed: [1.5, 4], size: [0.1, 0.2] });
+      U.impact(c, bp, { color: S.light, power: 1.0, ring: 2.6, dust: ['#2a1838', '#3a2050', '#120a1a'], sfx: 'poof', slow: false });
       await Promise.all([
-        c.tween(440, (e, k) => {
-          const s = max(0.02, 1 - e); V.scale.set(s, 1 + 0.9 * e, s); V.position.y = y0 + 0.6 * e;
-          kit.setLean(V, dir, 0, PI * 2 + e * PI * 4);
-        }, kit.ease.quadIn).then(() => { V.visible = false; }),
+        U.shards(c, V, [...body(c.victimColor), ...S.wisp.slice(0, 2)], { count: 90, ms: 950 }),
         c.wait(160).then(() => kit.hopTo(c, A, c.to, { ms: 300, height: 0.3, squash: 0.2 })),
       ]);
-    }, { zoom: 0.82, tilt: 0.2 });
+    }, {});
   } finally { U.park(g); U.finish(c); }
 }
 possession.label = 'ghostly possession';
@@ -407,7 +415,7 @@ const possessionWitch = Object.assign(c => possession(c), { only: ['b', 'q'], we
 
 /** Pumpkin bomb: lobbed with a sparking fuse, bounces, BOOM — seeds and goo everywhere. */
 export async function pumpkin(ctx) {
-  const c = U.prep(ctx, 2670);
+  const c = U.prep(ctx, 3390);
   const { kit, attacker: A, victim: V, victimPos, fx } = c;
   const S = side(c.color), hA = U.vh(A), hV = U.vh(V);
   const dir = kit.flatDir(A.position, victimPos, c.dir);
@@ -416,28 +424,30 @@ export async function pumpkin(ctx) {
   pk.scale.setScalar(0.01); facing(pk, dir.clone().negate());
   const fuse = () => pk.localToWorld(new THREE.Vector3(0.08, 0.27, 0));
   try {
-    await U.focus(c, async () => {
+    await U.stage(c, async () => {
       // crouch and conjure the pumpkin over the attacker's head
-      const top = A.position.clone().setY(hA + 0.25);
+      const top = A.position.clone().setY(hA + 0.4);
       pk.position.copy(top);
-      await c.tween(200, (e, k) => { A.scale.set(1 + 0.12 * e, 1 - 0.16 * e, 1 + 0.12 * e); pk.scale.setScalar(0.01 + 1.29 * e); }, kit.ease.backOut);
+      await c.tween(220, (e, k) => { A.scale.set(1 + 0.12 * e, 1 - 0.16 * e, 1 + 0.12 * e); pk.scale.setScalar(0.01 + 2.1 * e); }, kit.ease.backOut);
       fx.sparkles(top, { count: c.n(10), colors: S.wisp, speed: [0.5, 1.4] });
       // lob it: high arc, tumbling, fuse spitting sparks
-      const land = victimPos.clone().addScaledVector(dir, -0.45).setY(0.16);
+      U.sound(c, 'whoosh', { at: A.position });
+      const land = victimPos.clone().addScaledVector(dir, -0.55).setY(0.26);
       let lastF = 0;
       await c.tween(440, (e, k) => {
         if (k < 0.3) A.scale.set(1.12 - 0.12 * (k / 0.3), 0.84 + 0.16 * (k / 0.3), 1.12 - 0.12 * (k / 0.3));
-        kit.arc(pk.position, top, land, 1.1, e); pk.rotation.x = -k * PI * 2;
+        kit.arc(pk.position, top, land, 2.0, e); pk.rotation.x = -k * PI * 2;
         if (k - lastF > 0.06 && k < 1) { lastF = k; fx.sparks(fuse(), { count: c.n(4), speed: [0.5, 1.5], life: [150, 300], gravity: 2 }); }
       }, kit.ease.linear);
       A.scale.set(1, 1, 1); pk.rotation.x = 0;
       // bounce twice toward the victim; the victim leans away in fear
-      const l0 = land.clone(), l1 = victimPos.clone().addScaledVector(dir, -0.25).setY(0.16);
+      const l0 = land.clone().setY(0.26), l1 = victimPos.clone().addScaledVector(dir, -0.25).setY(0.26);
       fx.dust(l0.clone().setY(0.03), { count: c.n(8), colors: ['#8a8070', '#6c6458'], speed: [0.4, 1], up: 0.3 });
+      U.sound(c, 'pop', { at: l0, gain: 0.7 });
       let lastF2 = 0;
       await c.tween(330, (e, k) => {
         kit.arc(pk.position, l0, l1, k < 0.6 ? 0.25 : 0.1, e);
-        const pulse = 1.3 * (1 + 0.15 * Math.abs(sin(k * PI * 6)) * k);
+        const pulse = 2.1 * (1 + 0.18 * Math.abs(sin(k * PI * 6)) * k);
         pk.scale.setScalar(pulse);
         glow.scale.setScalar(0.9 + 0.8 * k * Math.abs(sin(k * 30)));
         kit.setLean(V, dir, 0.25 * kit.ease.quadOut(k));
@@ -446,27 +456,21 @@ export async function pumpkin(ctx) {
       // BOOM
       pk.visible = false;
       const boom = victimPos.clone().addScaledVector(dir, -0.2).setY(0.3);
-      fx.explosion(boom, { scale: 1.15, flashColor: c.color === 'w' ? '#ffb347' : '#a6ff6a', debrisColors: ['#e8781a', '#c85a0a', '#3d6a1e', ...body(c.victimColor).slice(0, 2)] });
+      U.impact(c, boom, { color: S.main, power: 1.2, ring: 2.8, debris: ['#e8781a', '#c85a0a', '#3d6a1e'], sfx: 'explosion', shake: 0.13 });
+      fx.explosion(boom, { scale: 1.5, boardFlash: false, flashColor: c.color === 'w' ? '#ffb347' : '#a6ff6a', debrisColors: ['#e8781a', '#c85a0a', '#3d6a1e', ...body(c.victimColor).slice(0, 2)] });
       // seeds (cream, tumbling) and goo splats (side colour)
-      fx.burst({ pos: boom, count: c.n(40), colors: ['#f6ead0', '#e8d8b0', '#fff8e6'], speed: [2, 5], up: 1.5, spread: 1, life: [500, 900],
-        size: [0.04, 0.06], sizeEnd: 0.8, gravity: 9, drag: 1, shape: 1, blend: 'normal' });
-      fx.burst({ pos: boom, count: c.n(26), colors: S.goo, speed: [1.5, 4], up: 1.2, spread: 1, life: [500, 900],
-        size: [0.1, 0.2], sizeEnd: 1.3, gravity: 9, drag: 1.2, shape: 0, blend: 'normal', alpha: 0.95 });
-      fx.burst({ pos: boom, count: c.n(20), colors: S.goo, speed: [2, 5], up: 1, spread: 1, life: [250, 500], size: [0.08, 0.14], sizeEnd: 0.3, gravity: 6, shape: 1 });
-      fx.boardFlash(S.main, 340, 0.28);
-      kit.shake(c, 0.17, 360);
+      fx.burst({ pos: boom, count: c.n(80), colors: ['#f6ead0', '#e8d8b0', '#fff8e6'], speed: [3, 7.5], up: 3, spread: 1, life: [600, 1100],
+        size: [0.06, 0.1], sizeEnd: 0.8, gravity: 9, drag: 1, shape: 1, blend: 'normal' });
+      fx.burst({ pos: boom, count: c.n(50), colors: S.goo, speed: [2, 6], up: 2.5, spread: 1, life: [600, 1000],
+        size: [0.16, 0.32], sizeEnd: 1.3, gravity: 9, drag: 1.2, shape: 0, blend: 'normal', alpha: 0.95 });
+      fx.burst({ pos: boom, count: c.n(40), colors: S.goo, speed: [3, 7], up: 1.5, spread: 1, life: [300, 600], size: [0.1, 0.18], sizeEnd: 0.3, gravity: 6, shape: 1 });
       kit.flashObject(c, V, '#ffffff', 160);
       // victim blown sky-high, tumbling, and gone
-      const v0 = V.position.clone(), axis = kit.tiltAxis(dir), drift = dir.clone().multiplyScalar(1.2);
       await Promise.all([
-        c.tween(620, (e, k) => {
-          V.position.set(v0.x + drift.x * k, 3.4 * sin(k * PI * 0.6), v0.z + drift.z * k);
-          V.quaternion.setFromAxisAngle(axis, k * PI * 3.5);
-          const s = max(0.01, 1 - 0.8 * k * k); V.scale.setScalar(s);
-        }).then(() => { V.visible = false; fx.smoke(V.position.clone(), { count: c.n(6), colors: ['#3a3040', '#5a5060'], alpha: 0.5 }); }),
+        U.fling(c, V, dir, { ms: 1050, up: 10, speed: 3.6, spin: 20, bounce: 0.5, trail: '#5a5060' }),
         c.wait(300).then(() => kit.hopTo(c, A, c.to, { ms: 300, height: 0.35, squash: 0.25 })),
       ]);
-    }, { zoom: 0.82, tilt: 0.2 });
+    }, {});
   } finally { U.park(pk); U.finish(c); }
 }
 pumpkin.label = 'pumpkin bomb';

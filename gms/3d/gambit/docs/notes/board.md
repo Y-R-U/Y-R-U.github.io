@@ -95,3 +95,89 @@
 ## Open issues / ideas
 - No planar reflections (by design, phones). Glossy board uses the studio env map only.
 - Per-piece idle animation (flickering candles etc.) isn't supported by instancing yet.
+
+---
+
+# board-2 (2026-10-31)
+
+## Done
+- **Per-type facing** (`js/board/pieces.js` `facingYaw`): `pieces.facing = { w?, b?, byType?: { p|n|b|r|q|k: spec } }`,
+  spec = `'side'` (default) | `'player'` | `'opponent'` | number (offset on the side yaw, + turns toward
+  the owner) | `{w, b}`. `byType` is separate because `facing.b` already means black. Old `{w, b}` facing works
+  unchanged. Halloween now turns imp/witch/countess/king toward their own player (knight stays sideways).
+  MODEL_GUIDE §2 documents it, including how sci-fi's baked `YAW = 0.55` pawn would switch over (`byType: {p: 0.55}`).
+- **Shared idle flicker**: `kit.ambient.time` (one uniform object). `kit.material({..., flicker})` /
+  `kit.addFlicker(mat, opts)` modulate the emissive term; presets `candle`, `pulse`, `slow`, or
+  `{mode, amount, speed, spread}`. Phase comes from the instance/model origin (works on InstancedMesh and
+  live clones alike, no lockstep); `spread` adds per-vertex phase for merged meshes (board candles).
+  Board: materials with `userData.ambient` make it re-render at a capped rate (`ambientFps` 24 → ≈20 fps
+  after vsync) only when nothing else moves, the option `ambientAnim` is on (default; ui-2 already wired the
+  setting, store key and settings toggle), the tab is visible (visibilitychange) and something visible uses
+  it (env users only count while the env is shown). Ambient frames never update the shadow map.
+  Classic/Fantasy (no opt-in) still render 0 frames at rest. Halloween opts in: candle flames (board),
+  piece glow (amber candle flicker for white, slow ghost-green pulse for black).
+- **`env.update(dt, t)` hook** (fantasy request, manager-approved): called per rendered frame only while
+  the environment object is visible, only with `ambientAnim` on, never with the tab hidden; runs at the ambient
+  cap at rest. A throwing hook is logged once and dropped.
+- **Kit adoption** (kit.js, new sections only; FX untouched): `kit.vertexMaterial` (per-vertex metal = uv.y,
+  glow = uv.x; folds in sci-fi's improvements: `dimGlow` keeps neon saturated, `sheenMask` limits the top sheen
+  to bright non-glowing surfaces; optional `flicker` on the glow channel), `kit.vertexFinish`, `kit.paintFinish`,
+  `kit.rgb`, `kit.colorize`, `kit.noise3`, `kit.deform` (welds first: fixes faceting after merge),
+  `kit.loft`, `kit.flameTongue`, `kit.refine`, `kit.wrapDecal`, `kit.hsLathe`, `kit.fixWinding`,
+  `kit.boardLooks.graveyard`. Theme files keep their local copies (fantasy/scifi common.js untouched,
+  sculptors may be working there). Verified by building every helper into one vertexMaterial mesh
+  (instanced + plain) in a live board: compiles, renders, console clean (`scratchpad/b2/kit/kitdemo_1440.png`).
+- **Halloween environment** rebuilt (`halloween/board.js`, `build` now reads `kit.boardLooks.graveyard`):
+  the 3D views look steeply down (even "3D" shows only a 2–5° strip above the board), so the sky is a
+  skybox-style pass (`skyBackdrop`): drawn after the opaque scene at the far plane (only uncovered pixels shade),
+  indigo→violet gradient, twinkling stars, a big moon with craters and a lavender halo, a tileable skyline strip
+  (far hills, a manor with lit windows, a church spire in front of the moon, bare trees, crosses), a haze band.
+  Its horizon is pinned each frame to the projected far rim of the ground plot and the composition scales with
+  the visible strip, so it works in 3D, Free and both orientations. The ground shader cuts its far edge as a
+  straight line across the screen (camera-relative) and fades into the horizon colour, so the seam disappears.
+  Plus moonlit plot colours, headstones/pumpkins, near-black dead trees on the flanks only (never between the
+  locked cameras and the board), GPU bats (camera-relative loop behind the board), fireflies (additive points)
+  and instanced low mist (1 draw call). No scene fog any more. Env = 5 draw calls (was ~11), ~10k tris.
+- **Gallery**: `?anim=<label|fn name>` (board option `forceAnim`) and `?ambient=0`; anim labels listed under the board.
+- **Perf pass** (`tools/board_perf.mjs`, CDP CPU throttle 4×, 360×740 dpr 2, headless Metal):
+  every scenario holds 60 fps (gap p95 ≤ 18.6 ms). renderer.render CPU avg / p95 ms, after:
+  | theme | view | rest | animating | battle | draw calls |
+  |---|---|---|---|---|---|
+  | classic | top | 0 frames | 0.51 / 1.3 | 0.92 / 1.8 | 18–21 |
+  | classic | 3D | 0 frames | 0.73 / 1.4 | 1.02 / 2.2 | 19–24 |
+  | fantasy | top | 0 frames | 0.81 / 1.6 | 1.25 / 2.2 | 18–23 |
+  | fantasy | 3D | 0 frames | 1.01 / 2.0 | 1.11 / 2.1 | 30–35 |
+  | halloween | top | 20 fps, 0.47 / 1.2 | 0.89 / 1.8 | 1.15 / 1.9 | 30–40 |
+  | halloween | 3D | 20 fps, 0.71 / 1.4 | 1.09 / 2.0 | 1.28 / 2.1 | 35–39 |
+  GPU (timer query, 680² buffer): 1.5–4 ms per frame, shadow pass 0.2–1.9 ms; nothing over budget on this GPU.
+  Fix applied: the shadow map re-rendered every frame while any piece moved; now refreshed at most ~30 Hz
+  during animation, exact on every settle (animating render CPU −10–25%). Before/after logs:
+  `scratchpad/b2/perf_before.txt`, `perf_after.txt`.
+
+## How to test
+- `CDP_PORT=9526 node tools/board_test.mjs <dir>` (18/18), `CDP_PORT=9526 node tools/board_game_test.mjs <dir>` (14/14),
+  `CDP_PORT=9526 node tools/board_ambient_test.mjs` (13/13: ambient frame cap, off, hidden tab, resume, env.update
+  visibility/off, classic idle 0 frames, `?anim=` forcing, facingYaw cases), `CDP_PORT=9526 node tools/board_perf.mjs`.
+  All harnesses now clear the browser cache per run and take `CDP_PORT`.
+- board_test "battle skippable" waited a fixed 2.5 s (tuned for swiftshader); with a real GPU the battle had
+  already ended. It now waits for `isAnimating()`.
+- Screens (scratchpad `b2/`): `env2/angle_360.png`, `env2/angle_1440.png`, `env2/angle_1440_black.png`,
+  `env2/free_low_1440.png` (before: `before/hw_angle_*.png`); `final/facing_hw_lineup_angle_{360,1440}.png`,
+  `final/graveyard_top_{360,1440}.png`, `final/anim_forced_{360,1440}.png`, `final/kitdemo_360.png`,
+  `kit/kitdemo_1440.png`, `final/fantasy_angle_1440.png`, `final/scifi_lineup_angle_1440.png`, `final/hw_tilt_360.png`.
+
+## Requests
+- sculptors (fantasy/scifi): switch `common.js` `patch()` to `kit.vertexMaterial` when convenient (same vertex
+  layout; pass your GLOW as `glow`, `dimGlow: 0` for fantasy's old look) and add `flicker` to the glow you
+  want alive (gems, runes, light-lines). Sci-fi pawn: see MODEL_GUIDE §2 to replace the baked YAW.
+- `tools/sculpt_halloween_closeup.html` (sculptor tool) still reads only `facing[color]`; use `facingYaw` from
+  `js/board/pieces.js` if it should show the per-type facing.
+
+## Open issues
+- In the wide 3D view (1440×900) the sky strip is only ~2° tall, so the moon/skyline is small there; it opens up
+  at 360 portrait, in Free, and when orbiting low.
+- The moon and skyline follow the camera's yaw (they are painted relative to the view), so in Free orbit the
+  moon stays put on screen while the 3D trees and stones rotate. Reads fine; a world-anchored panorama would need
+  the moon to be behind the camera for black.
+- Ambient frames are full-scene re-renders (~0.5–0.7 ms CPU here at 4× throttle); a phone with glow themes idles at
+  20 fps instead of 0 unless the user turns Ambient animation off.

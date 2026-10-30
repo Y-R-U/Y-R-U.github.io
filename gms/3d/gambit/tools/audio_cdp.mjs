@@ -130,10 +130,7 @@ const saved = await c.eval(`JSON.parse(localStorage.getItem('gambit.settings')).
 ok(Math.abs(saved - 0.4) < 1e-6, `volume slider saves (volume=${saved})`);
 
 // music: on -> loads current theme loop; theme switch swaps; off stops
-const tgl = await c.eval(`(() => { const r = document.querySelector('.tgl[data-name="music"]').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
-await c.eval(`document.querySelector('.tgl[data-name="music"]').scrollIntoView({block:'center'})`); await sleep(200);
-const tgl2 = await c.eval(`(() => { const r = document.querySelector('.tgl[data-name="music"]').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
-await c.click(tgl2[0], tgl2[1]);
+await c.eval(`document.querySelector('.tgl[data-name="music"]').click()`);
 await sleep(2500);
 let ms = await c.eval(`(async () => ${A}.music.state())()`);
 ok(ms.playing && ms.theme === 'classic', `music on -> classic loop playing (${JSON.stringify(ms)})`);

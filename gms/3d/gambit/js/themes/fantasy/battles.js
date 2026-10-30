@@ -1,4 +1,5 @@
-// Fantasy battle (capture) animations — owner: battle-1. See docs/notes/battle.md.
+// Fantasy battle (capture) animations — owner: battle-1, made BIG by battle-2 (staged camera,
+// slow-mo impacts, shockwaves, fling/shatter; see battle_util.js). See docs/notes/battle.md.
 // Four battles, picked at random (with type-biased variants: casters favour the arcane bolt,
 // knights/rooks/pawns the sword clash, royals the sky strike):
 //  - arcane:  the attacker levitates and charges an orb, lightning arcs into the victim, which
@@ -66,11 +67,6 @@ function makeCanvasTex(size, draw) {
 }
 const ADD = { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false };
 
-const shardAssets = U.once(() => {
-  const g = new THREE.OctahedronGeometry(0.075, 0); g.scale(1, 2.1, 0.8);
-  const m = new THREE.MeshStandardMaterial({ roughness: 0.12, metalness: 0.35, flatShading: true, emissive: '#202838', emissiveIntensity: 1 });
-  return { g, m };
-});
 const slashAssets = U.once(() => {
   const g = new THREE.RingGeometry(0.5, 0.86, 40, 1, 0, PI * 1.15); g.rotateX(-PI / 2);
   const pos = g.attributes.position, col = new Float32Array(pos.count * 3);
@@ -112,14 +108,7 @@ const glowMat2 = U.once(() => new THREE.SpriteMaterial({ map: radialTex(), ...AD
 const runeMat = U.once(() => new THREE.MeshBasicMaterial({ map: runeTex(), ...ADD, color: '#4f9dff', side: THREE.DoubleSide }));
 const runeGeo = U.once(() => new THREE.PlaneGeometry(1, 1).rotateX(-PI / 2));
 
-const SHARDS = 36;
 U.definePool({
-  'f.shards': () => {
-    const { g, m } = shardAssets();
-    const im = new THREE.InstancedMesh(g, m, SHARDS);
-    im.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(SHARDS * 3).fill(1), 3);
-    im.frustumCulled = false; return im;
-  },
   'f.orb': () => { const s = new THREE.Sprite(glowMat()); s.renderOrder = 6; return s; },
   'f.slash': () => { const { g, m } = slashAssets(); const o = new THREE.Mesh(g, m); o.renderOrder = 6; return o; },
   'f.rune': () => { const o = new THREE.Mesh(runeGeo(), runeMat()); o.renderOrder = 4; return o; },
@@ -141,259 +130,252 @@ function jitter(c, obj, ms, amp = 0.04) {
     obj.position.set(p0.x + (k < 1 ? R(-a, a) : 0), p0.y, p0.z + (k < 1 ? R(-a, a) : 0));
   });
 }
-
-/** Shatter V into crystal shards in its colours, flying outward (mostly horizontal: reads from Top). */
-async function shatter(c, V, { ms = 650, speed = [1.6, 3.6], away = null } = {}) {
-  const im = U.take(c, 'f.shards');
-  const cols = body(c.victimColor).map(h => new THREE.Color(h));
-  const h = U.vh(V), n = c.lite ? 22 : SHARDS, base = V.position.clone();
-  const items = [];
-  for (let i = 0; i < n; i++) {
-    const a = R(0, PI * 2), sp = R(speed[0], speed[1]);
-    const v = new THREE.Vector3(cos(a) * sp, R(1.2, 3.6), sin(a) * sp);
-    if (away) v.addScaledVector(away, R(0.6, 1.6));
-    items.push({ p: base.clone().add(new THREE.Vector3(R(-0.15, 0.15), R(0.1, h * 0.95), R(-0.15, 0.15))), v,
-      ax: new THREE.Vector3(R(-1, 1), R(-1, 1), R(-1, 1)).normalize(), a: R(0, 6), av: R(8, 18), s: R(0.7, 1.5) });
-    im.setColorAt(i, cols[i % cols.length]);
-  }
-  im.instanceColor.needsUpdate = true;
-  V.visible = false;
-  try {
-    await U.sim(c, ms, (dt, k) => {
-      const s = dt / 1000;
-      for (const it of items) {
-        it.v.y -= 9.8 * s; it.p.addScaledVector(it.v, s); it.a += it.av * s;
-        if (it.p.y < 0.04) { it.p.y = 0.04; it.v.y *= -0.35; it.v.x *= 0.55; it.v.z *= 0.55; it.av *= 0.5; }
-      }
-      U.writeInstances(im, items, it => it.s * (k > 0.65 ? max(0.01, 1 - (k - 0.65) / 0.35) : 1));
-    });
-  } finally { U.park(im); }
-}
+const SHARD_COLS = c => [...body(c.victimColor), ...side(c.victimColor).spark.slice(1, 3)];
 
 // ===================================================================== battles
-/** Arcane bolt: levitate, charge an orb, lightning, the victim shatters into crystal. */
+/** Arcane storm: levitate under a rune circle, charge a big orb, a branching lightning barrage
+ *  lights the board, the victim is lifted and shatters into crystal shards. */
 export async function arcane(ctx) {
-  const c = U.prep(ctx, 2520);
+  const c = U.prep(ctx, 3190);
   const { kit, attacker: A, victim: V, victimPos, fx } = c;
   const S = side(c.color), hA = U.vh(A), hV = U.vh(V);
   const orb = U.take(c, 'f.orb'); orb.material.color.set(S.main); orb.scale.setScalar(0.01);
+  const rune = U.take(c, 'f.rune'); rune.material.color.set(S.main); rune.material.opacity = 1; rune.scale.set(0.01, 1, 0.01);
   try {
-    await U.focus(c, async () => {
+    await U.stage(c, async () => {
       const a0 = A.position.clone();
-      fx.ring(a0, { radius: 0.7, color: S.main });
-      // charge: levitate + one slow turn; orb grows over the head with in-falling sparkles
+      rune.position.set(a0.x, 0.02, a0.z);
+      fx.ring(a0, { radius: 1.2, color: S.main, thick: true, ms: 420 });
+      U.sound(c, 'spell', { at: a0 });
+      // charge: levitate, spin, orb swells with sparkles sucked in from all round
       let last = 0;
-      await c.tween(430, (e, k) => {
-        A.position.y = a0.y + 0.28 * e; A.rotation.y = e * PI * 2;
-        const op = head(A, hA, 1.0); op.y += 0.18; orb.position.copy(op);
-        orb.scale.setScalar(0.05 + 0.85 * e * (1 + 0.12 * sin(k * 40)));
-        if (k - last > 0.12 && k < 1) { last = k; fx.sparkles(op, { count: c.n(6), colors: S.spark, speed: [0.2, 0.7], up: 0, life: [200, 380], size: [0.05, 0.1] }); }
+      await c.tween(520, (e, k) => {
+        A.position.y = a0.y + 0.45 * e; A.rotation.y = e * PI * 2;
+        const s = 0.2 + 1.6 * e; rune.scale.set(s, 1, s); rune.rotation.y = k * 2;
+        const op = head(A, hA, 1.0); op.y += 0.3; orb.position.copy(op);
+        orb.scale.setScalar(0.08 + 1.7 * e * (1 + 0.14 * sin(k * 44)));
+        if (k - last > 0.08 && k < 1) {
+          last = k;
+          const a = R(0, PI * 2), from = op.clone().add(new THREE.Vector3(cos(a) * 1.4, R(-0.3, 0.6), sin(a) * 1.4));
+          fx.burst({ pos: from, count: c.n(8), colors: S.spark, speed: [2.5, 3.5], dir: op.clone().sub(from), spread: 0.15, life: [260, 380], size: [0.07, 0.13], shape: 2 });
+        }
       }, kit.ease.quadOut);
       A.rotation.y = 0;
-      // bolt(s)
       const from = orb.position.clone(), to = victimPos.clone().setY(hV * 0.6);
-      fx.lightning(from, to, { color: S.bolt, width: 0.09, branches: 2, ms: 340 });
-      fx.boardFlash(S.main, 380, 0.35);
-      kit.flashObject(c, V, S.light, 380, 2.2);
-      fx.sparkles(to, { count: c.n(20), colors: S.spark, speed: [1, 2.6] });
-      await jitter(c, V, 140, 0.05);
-      fx.lightning(from, to.clone().setY(hV * 0.35), { color: S.light, width: 0.05, branches: 1, ms: 220 });
-      await c.tween(160, e => { V.position.y = 0.12 * e; orb.scale.setScalar(0.9 * (1 - 0.6 * e)); });
+      // barrage: three branching bolts, each one lights the board, forks crawl over the squares
+      for (let i = 0; i < 3; i++) {
+        fx.lightning(from, to.clone().add(new THREE.Vector3(R(-0.15, 0.15), R(-0.2, 0.25), R(-0.15, 0.15))),
+          { color: i === 1 ? S.light : S.bolt, width: 0.15 - i * 0.025, branches: 3, branchP: 0.32, ms: 300, lightStrength: 0.45, flashRadius: 2.2 });
+        fx.lightning(to.clone().setY(0.4), victimPos.clone().add(new THREE.Vector3(R(-1.6, 1.6), 0.03, R(-1.6, 1.6))), { color: S.bolt, width: 0.06, branches: 2, branchP: 0.3, ms: 260, light: false });
+        fx.sparkles(to, { count: c.n(26), colors: S.spark, speed: [1.5, 3.5] });
+        kit.flashObject(c, V, i % 2 ? '#ffffff' : S.light, 200, 2.4);
+        kit.shake(c, 0.05, 140);
+        if (!i) U.sound(c, 'zap', { at: victimPos });
+        await Promise.all([jitter(c, V, 150, 0.07), c.tween(150, e => { V.position.y = 0.15 * (i + e); })]);
+      }
+      U.sound(c, 'thunder', { at: victimPos });
       // shatter
-      fx.flash(to, { color: '#ffffff', radius: 1.6, ms: 240 });
-      fx.ring(victimPos, { radius: 1.3, color: S.main });
-      fx.sparkles(to, { count: c.n(26), colors: [...S.spark, ...body(c.victimColor).slice(0, 2)], speed: [1.5, 3.5], life: [400, 800] });
-      kit.shake(c, 0.08, 240);
+      U.impact(c, to, { color: S.main, power: 1.15, sparks: S.spark, debris: null, dust: ['#2a2f48', '#3a4060', '#1c2030'] });
+      fx.sparkles(to, { count: c.n(60), colors: [...S.spark, ...body(c.victimColor).slice(0, 2)], speed: [2, 5.5], life: [500, 1000], size: [0.1, 0.2] });
       await Promise.all([
-        shatter(c, V, { ms: 660 }),
-        c.tween(160, e => orb.scale.setScalar(0.36 * (1 - e) + 0.01)),
-        c.wait(160).then(() => kit.hopTo(c, A, c.to, { ms: 300, height: 0.35, squash: 0.2 })),
+        U.shards(c, V, SHARD_COLS(c), { count: 100, ms: 950 }),
+        c.tween(220, e => { orb.scale.setScalar(1.8 * (1 - e) + 0.01); rune.material.opacity = 1 - e; }),
+        c.wait(220).then(() => kit.hopTo(c, A, c.to, { ms: 320, height: 0.45, squash: 0.2 })),
       ]);
-    }, { zoom: 0.8, tilt: 0.18 });
-  } finally { U.park(orb); U.finish(c); }
+    });
+  } finally { rune.material.opacity = 1; U.park(orb, rune); U.finish(c); }
 }
-arcane.label = 'arcane bolt & crystal shatter';
-const arcaneCaster = Object.assign(c => arcane(c), { only: ['b', 'q'], weight: 2, label: 'arcane bolt (caster)' });
+arcane.label = 'arcane storm & crystal shatter';
+const arcaneCaster = Object.assign(c => arcane(c), { only: ['b', 'q'], weight: 2, label: 'arcane storm (caster)' });
 
-/** Sword clash: two exchanges with sparks, a sweeping slash arc, the victim tumbles off the board. */
+/** Sword clash: two ringing exchanges, a huge slash arc, the victim is flung bouncing off the board. */
 export async function clash(ctx) {
-  const c = U.prep(ctx, 3160);
+  const c = U.prep(ctx, 3600);
   const { kit, attacker: A, victim: V, victimPos, fx } = c;
   const S = side(c.color), hV = U.vh(V);
   const dir = kit.flatDir(A.position, victimPos, c.dir);
   const slash = U.take(c, 'f.slash'); slash.visible = false;
   try {
-    await U.focus(c, async () => {
+    await U.stage(c, async () => {
       const stand = victimPos.clone().addScaledVector(dir, -0.88);
-      if (c.type === 'n') await kit.hopTo(c, A, stand, { ms: 280, height: 0.6, squash: 0.15 });   // knight charges in
+      U.sound(c, 'swing', { at: A.position });
+      if (c.type === 'n') await kit.hopTo(c, A, stand, { ms: 280, height: 0.7, squash: 0.15 });
       else await kit.slideTo(c, A, stand, { ms: 230 });
       const a0 = A.position.clone(), v0 = V.position.clone();
       for (let i = 0; i < 2; i++) {
-        // both rear back, then meet in the middle
-        await c.tween(110, e => { kit.setLean(A, dir, -0.3 * e); kit.setLean(V, dir, 0.3 * e); }, kit.ease.quadOut);
+        await c.tween(110, e => { kit.setLean(A, dir, -0.35 * e); kit.setLean(V, dir, 0.35 * e); }, kit.ease.quadOut);
         await c.tween(70, e => {
-          A.position.lerpVectors(a0, a0.clone().addScaledVector(dir, 0.2), e); V.position.lerpVectors(v0, v0.clone().addScaledVector(dir, -0.12), e);
-          kit.setLean(A, dir, -0.3 + 0.6 * e); kit.setLean(V, dir, 0.3 - 0.55 * e);
+          A.position.lerpVectors(a0, a0.clone().addScaledVector(dir, 0.22), e); V.position.lerpVectors(v0, v0.clone().addScaledVector(dir, -0.14), e);
+          kit.setLean(A, dir, -0.35 + 0.7 * e); kit.setLean(V, dir, 0.35 - 0.6 * e);
         }, kit.ease.quadIn);
         const hit = a0.clone().lerp(v0, 0.5); hit.y = 0.55 + 0.15 * i;
-        fx.sparks(hit, { count: c.n(50), colors: [...S.spark, '#ffd36a', S.main], dir: new THREE.Vector3(-dir.z, 0.6, dir.x).multiplyScalar(i ? -1 : 1), spread: 1.1, speed: [2.5, 6], size: [0.08, 0.15] });
-        fx.flash(hit, { color: i ? S.main : '#ffd36a', radius: 1.4, ms: 200 });
-        fx.ring(hit.clone().setY(0), { radius: 0.8, color: i ? S.main : '#ffd36a', ms: 300 });
-        kit.shake(c, 0.05, 160);
+        fx.sparks(hit, { count: c.n(110), colors: [...S.spark, '#ffd36a', S.main], dir: new THREE.Vector3(-dir.z, 0.7, dir.x).multiplyScalar(i ? -1 : 1), spread: 1.2, speed: [3.5, 9], size: [0.09, 0.18], life: [300, 650] });
+        fx.flash(hit, { color: i ? S.main : '#ffd36a', radius: 2.6, ms: 220 });
+        fx.ring(hit.clone().setY(0), { radius: 1.5, color: i ? S.main : '#ffd36a', ms: 340, thick: true });
+        fx.ring(hit.clone().setY(0), { radius: 1.6, dark: true, ms: 340, alpha: 0.35 });
+        fx.boardFlash(i ? S.main : '#ffd36a', 200, 0.25);
+        U.sound(c, 'clash', { at: hit });
+        kit.shake(c, 0.06, 160);
         await c.tween(100, e => {
-          A.position.lerpVectors(a0.clone().addScaledVector(dir, 0.2), a0, e); V.position.lerpVectors(v0.clone().addScaledVector(dir, -0.12), v0, e);
-          kit.setLean(A, dir, 0.3 * (1 - e)); kit.setLean(V, dir, -0.25 * (1 - e));
+          A.position.lerpVectors(a0.clone().addScaledVector(dir, 0.22), a0, e); V.position.lerpVectors(v0.clone().addScaledVector(dir, -0.14), v0, e);
+          kit.setLean(A, dir, 0.35 * (1 - e)); kit.setLean(V, dir, -0.25 * (1 - e));
         }, kit.ease.quadOut);
       }
       A.quaternion.identity(); V.quaternion.identity();
-      // final strike: wind up, then a slash arc sweeps through the victim (pawns shoulder-shove)
-      await c.tween(150, e => { kit.setLean(A, dir, -0.4 * e); A.scale.set(1 + 0.1 * e, 1 - 0.12 * e, 1 + 0.1 * e); }, kit.ease.quadOut);
+      // final strike: big wind up, a huge slash arc sweeps through the victim (pawns shoulder-charge)
+      U.camTo(c, { point: victimPos, zoom: c._cam ? c._cam.zoom * 0.9 : 1 }, 260);
+      await c.tween(190, e => { kit.setLean(A, dir, -0.5 * e); A.scale.set(1 + 0.14 * e, 1 - 0.16 * e, 1 + 0.14 * e); }, kit.ease.quadOut);
       const hitPos = victimPos.clone(); hitPos.y = min(0.9, hV * 0.55);
       const yaw = Math.atan2(dir.x, dir.z);
       if (c.type !== 'p') {
         slash.visible = true; slash.material.color.set(S.main); slash.material.opacity = 1;
         slash.position.set(victimPos.x, hitPos.y, victimPos.z);
       }
+      U.sound(c, 'swing', { at: victimPos });
       await c.tween(170, e => {
-        kit.setLean(A, dir, -0.4 + 0.75 * e); A.scale.set(1.1 - 0.1 * e, 0.88 + 0.12 * e, 1.1 - 0.1 * e);
-        A.position.lerpVectors(a0, a0.clone().addScaledVector(dir, 0.35), e);
-        slash.rotation.set(0, yaw + PI * 0.4 - e * PI * 1.1, 0.18);
-        slash.scale.setScalar(1.0 + 0.7 * e);
+        kit.setLean(A, dir, -0.5 + 0.9 * e); A.scale.set(1.14 - 0.14 * e, 0.84 + 0.16 * e, 1.14 - 0.14 * e);
+        A.position.lerpVectors(a0, a0.clone().addScaledVector(dir, 0.4), e);
+        slash.rotation.set(0, yaw + PI * 0.4 - e * PI * 1.15, 0.18);
+        slash.scale.setScalar(1.6 + 1.4 * e);
       }, kit.ease.cubicOut);
-      fx.sparks(hitPos, { count: c.n(80), colors: [...S.spark, '#ffd36a', S.main], dir: dir.clone().setY(0.5), speed: [3, 7.5], size: [0.08, 0.16] });
-      fx.flash(hitPos, { color: S.light, radius: 1.5, ms: 220 });
-      fx.ring(victimPos, { radius: 1.1, color: S.main });
-      fx.boardFlash(S.main, 300, 0.3);
-      kit.flashObject(c, V, '#ffffff', 160);
-      kit.shake(c, 0.12, 280);
+      U.impact(c, hitPos, { color: S.main, power: 1.1, sparks: [...S.spark, '#ffd36a', S.main], debris: body(c.victimColor), sfx: 'hit' });
+      kit.flashObject(c, V, '#ffffff', 200);
       await Promise.all([
-        c.tween(240, e => { slash.material.opacity = 1 - e; slash.scale.setScalar(1.7 + 0.4 * e); }).then(() => { slash.visible = false; }),
-        U.tumbleOff(c, V, dir, { ms: 720, lift: 1.9 }),
-        c.tween(120, e => { kit.setLean(A, dir, 0.35 * (1 - e)); }).then(() => kit.hopTo(c, A, c.to, { ms: 260, height: 0.3, squash: 0.2 })),
+        c.tween(300, e => { slash.material.opacity = 1 - e; slash.scale.setScalar(3 + 0.8 * e); }).then(() => { slash.visible = false; }),
+        U.fling(c, V, dir, { ms: 1050, up: 6.5, speed: 5.5, spin: 15 }),
+        c.tween(140, e => { kit.setLean(A, dir, 0.4 * (1 - e)); }).then(() => c.wait(260)).then(() => kit.hopTo(c, A, c.to, { ms: 280, height: 0.35, squash: 0.2 })),
       ]);
-    }, { zoom: 0.85, tilt: 0.2 });
+    });
   } finally { U.park(slash); U.finish(c); }
 }
-clash.label = 'sword clash & knock-back';
+clash.label = 'sword clash & fling';
 const clashMelee = Object.assign(c => clash(c), { only: ['n', 'r', 'p', 'k'], weight: 1, label: 'sword clash (melee)' });
 
-/** Dragon-fire breath: a flame stream chars the victim, which crumbles into ash and embers. */
+/** Dragon-fire: a roaring layered flame stream (core + flames + smoke + embers) engulfs the
+ *  victim, which chars black and bursts into ash, embers and burning shards. */
 export async function dragon(ctx) {
-  const c = U.prep(ctx, 2910);
+  const c = U.prep(ctx, 3620);
   const { kit, attacker: A, victim: V, victimPos, fx } = c;
   const S = side(c.color), hA = U.vh(A), hV = U.vh(V);
   const dir = kit.flatDir(A.position, victimPos, c.dir);
   try {
-    await U.focus(c, async () => {
+    await U.stage(c, async () => {
       const d = kit.flatDist(A.position, victimPos);
-      if (d > 1.6) await kit.slideTo(c, A, victimPos.clone().addScaledVector(dir, -1.5), { ms: 240 });
-      // rear back and inhale (embers sucked toward the mouth)
+      if (d > 1.9) await kit.slideTo(c, A, victimPos.clone().addScaledVector(dir, -1.8), { ms: 240 });
       const mouth = () => A.position.clone().addScaledVector(dir, 0.28).setY(A.position.y + hA * 0.8);
-      await c.tween(200, e => kit.setLean(A, dir, -0.35 * e), kit.ease.quadOut);
-      fx.burst({ pos: mouth().addScaledVector(dir, 0.6), count: c.n(14), colors: S.fire.slice(1, 3), speed: [0.3, 0.8], dir: dir.clone().negate(), spread: 0.6, life: [200, 300], size: [0.04, 0.07], shape: 1 });
-      // breath: stream of flame particles along dir, victim engulfed and charring
-      fx.boardFlash(S.fire[3], 600, 0.3);
-      const target = victimPos.clone().setY(hV * 0.5);
+      // rear back and inhale: embers and smoke sucked into the mouth
+      U.sound(c, 'roar', { at: A.position });
+      await c.tween(260, (e, k) => {
+        kit.setLean(A, dir, -0.45 * e);
+        if (k < 1 && ((k * 10) | 0) !== (((k - 0.1) * 10) | 0)) {
+          const m = mouth(), a = R(0, PI * 2), from = m.clone().add(new THREE.Vector3(cos(a) * 1.1, R(-0.2, 0.5), sin(a) * 1.1));
+          fx.burst({ pos: from, count: c.n(6), colors: S.fire.slice(1, 4), speed: [2.8, 3.6], dir: m.clone().sub(from), spread: 0.12, life: [260, 340], size: [0.06, 0.1], shape: 1 });
+        }
+      }, kit.ease.quadOut);
+      // breath: smoke under-layer + flames + white-hot core along the stream
+      fx.boardFlash(S.fire[3], 900, 0.3);
+      U.sound(c, 'fire', { at: victimPos });
+      const target = victimPos.clone().setY(hV * 0.45);
       let lastE = 0, lastF = 0;
-      const char = U.darken(c, V, '#140c08', 650, 0.88);
-      kit.flashObject(c, V, S.fire[2], 650, 1.3);
-      await Promise.all([char, c.tween(720, (e, k) => {
-        kit.setLean(A, dir, -0.35 + 0.5 * min(1, k * 4) + 0.03 * sin(k * 60));
-        if (k - lastE > 0.035 && k < 1) {
+      const char = U.darken(c, V, '#120a06', 760, 0.9);
+      kit.flashObject(c, V, S.fire[2], 760, 1.6);
+      await Promise.all([char, c.tween(860, (e, k) => {
+        kit.setLean(A, dir, -0.45 + 0.6 * min(1, k * 4) + 0.04 * sin(k * 60));
+        if (k - lastE > 0.03 && k < 1) {
           lastE = k;
           const m = mouth(), aim = target.clone().sub(m).normalize();
-          fx.burst({ pos: m, count: c.n(7), colors: S.fire, speed: [4.5, 7.5], dir: aim, spread: 0.2, life: [220, 360],
-            size: [0.2, 0.38], sizeEnd: 2.4, gravity: -2, drag: 1.2, shape: 0 });
-          fx.burst({ pos: m, count: c.n(2), colors: [S.fire[0]], speed: [5, 7], dir: aim, spread: 0.06, life: [160, 260], size: [0.1, 0.18], sizeEnd: 1.5, drag: 1, shape: 1 });
+          if (((k * 100) | 0) % 2) fx.burst({ pos: m.clone().setY(m.y - 0.15), count: c.n(2), colors: ['#1a1210', '#2c2420'], speed: [3, 4.5], dir: aim, spread: 0.3, life: [420, 620],
+            size: [0.25, 0.4], sizeEnd: 2.4, gravity: -1.2, drag: 1.8, shape: 0, blend: 'normal', alpha: 0.28 });
+          fx.burst({ pos: m, count: c.n(14), colors: S.fire, speed: [5, 8.5], dir: aim, spread: 0.22, life: [240, 420],
+            size: [0.28, 0.5], sizeEnd: 2.4, gravity: -2, drag: 1.2, shape: 0 });
+          fx.burst({ pos: m, count: c.n(5), colors: [S.fire[0], '#ffffff'], speed: [6, 8.5], dir: aim, spread: 0.08, life: [200, 320], size: [0.24, 0.4], sizeEnd: 1.8, drag: 1, shape: 0 });
+          fx.burst({ pos: m, count: c.n(3), colors: S.fire.slice(1, 4), speed: [6, 9], dir: aim, spread: 0.35, life: [400, 700], size: [0.05, 0.09], sizeEnd: 0.4, gravity: 3, drag: 0.8, shape: 1 });
         }
-        if (k - lastF > 0.14 && k > 0.15 && k < 1) {
+        if (k - lastF > 0.12 && k > 0.12 && k < 1) {
           lastF = k;
-          fx.fire(victimPos.clone().setY(R(0.05, hV * 0.5)), { scale: 0.8, count: c.n(18), colors: S.fire.slice(0, 4) });
-          fx.embers(victimPos.clone().setY(0.2), { count: c.n(5), colors: S.fire.slice(1, 4) });
+          fx.inferno(victimPos.clone().setY(R(0.05, hV * 0.5)), { scale: 1.1, count: c.n(22), colors: S.fire.slice(0, 4) });
         }
-        V.position.set(victimPos.x + R(-0.02, 0.02) * (k < 1), 0, victimPos.z + R(-0.02, 0.02) * (k < 1));
+        V.position.set(victimPos.x + R(-0.03, 0.03) * (k < 1), 0, victimPos.z + R(-0.03, 0.03) * (k < 1));
       })]);
-      fx.ring(victimPos, { radius: 1.0, color: S.fire[2] });
-      // crumble: collapse to ash, embers rise, scorch
-      fx.scorch(victimPos, { radius: 0.62, ms: 2800 });
-      fx.dust(victimPos.clone().setY(hV * 0.4), { count: c.n(36), colors: ['#1a1310', '#2e2620', '#4a4038', '#0c0908'], speed: [0.4, 1.6], up: 0.6, life: [500, 900] });
-      fx.embers(victimPos.clone().setY(0.3), { count: c.n(26), colors: S.fire.slice(1, 4), radius: 0.35 });
-      fx.smoke(victimPos.clone().setY(0.3), { count: c.n(10), colors: ['#2c2622', '#4a4440'], alpha: 0.55 });
-      kit.shake(c, 0.05, 200);
+      // burst: ash shards, embers, inferno column, scorch
+      fx.scorch(victimPos, { radius: 1.1, ms: 3000 });
+      U.impact(c, target, { color: S.fire[2], power: 1.1, tint: S.fire[3], debris: ['#1a1310', '#2e2620', '#4a4038'], dust: ['#2a2220', '#3a302a', '#1a1412'], sfx: 'explosion' });
+      fx.inferno(victimPos.clone().setY(0.3), { scale: 1.7, count: c.n(60), colors: S.fire.slice(0, 4) });
+      fx.embers(victimPos.clone().setY(0.3), { count: c.n(50), colors: S.fire.slice(1, 4), radius: 0.6, size: [0.05, 0.09] });
       await Promise.all([
-        c.tween(460, e => { V.scale.set(1 + 0.25 * e, max(0.02, 1 - e), 1 + 0.25 * e); V.position.y = -0.05 * e; }, kit.ease.quadIn).then(() => { V.visible = false; }),
-        c.tween(150, e => kit.setLean(A, dir, 0.15 * (1 - e))).then(() => c.wait(80)).then(() => kit.hopTo(c, A, c.to, { ms: 280, height: 0.32, squash: 0.2 })),
+        U.shards(c, V, ['#1a1310', '#2e2620', '#120c08', S.fire[2], S.fire[3]], { count: 80, ms: 950, up: [2.5, 6.5] }),
+        c.tween(150, e => kit.setLean(A, dir, 0.15 * (1 - e))).then(() => c.wait(240)).then(() => kit.hopTo(c, A, c.to, { ms: 300, height: 0.35, squash: 0.2 })),
       ]);
-    }, { zoom: 0.82, tilt: 0.18 });
+    });
   } finally { U.finish(c); }
 }
 dragon.label = 'dragon-fire breath';
 const dragonKnight = Object.assign(c => dragon(c), { only: ['n', 'k'], weight: 1, label: 'dragon-fire (knight/king)' });
 
-/** Sky strike: rune circle locks on, then a holy pillar (white) or meteor (black) slams down. */
+/** Sky strike: a huge rune circle locks on, then a holy pillar (white) or a flaming meteor
+ *  (black) slams down: explosion across several squares, the victim blasted sky-high. */
 export async function smite(ctx) {
-  const c = U.prep(ctx, 2460);
+  const c = U.prep(ctx, 3030);
   const { kit, attacker: A, victim: V, victimPos, fx } = c;
   const S = side(c.color), hV = U.vh(V), holy = c.color === 'w';
   const dir = kit.flatDir(A.position, victimPos, c.dir);
   const rune = U.take(c, 'f.rune'), beam = U.take(c, 'f.beam'), met = U.take(c, 'f.meteor');
   rune.visible = false; beam.visible = false; met.visible = false;
   try {
-    await U.focus(c, async () => {
-      // attacker raises up (call down the strike)
+    await U.stage(c, async () => {
       const a0 = A.position.clone();
-      fx.sparkles(head(A, U.vh(A), 1).setY(U.vh(A) + 0.1), { count: c.n(16), colors: S.spark, speed: [0.5, 1.5] });
-      await c.tween(200, (e, k) => { A.position.y = a0.y + 0.22 * sin(k * PI); A.scale.set(1 - 0.06 * e, 1 + 0.1 * e, 1 - 0.06 * e); }, kit.ease.quadOut);
+      fx.sparkles(head(A, U.vh(A), 1).setY(U.vh(A) + 0.1), { count: c.n(30), colors: S.spark, speed: [0.8, 2.2] });
+      U.sound(c, 'spell', { at: a0 });
+      await c.tween(220, (e, k) => { A.position.y = a0.y + 0.3 * sin(k * PI); A.scale.set(1 - 0.08 * e, 1 + 0.14 * e, 1 - 0.08 * e); }, kit.ease.quadOut);
       A.scale.set(1, 1, 1); A.position.copy(a0);
-      // rune circle locks onto the victim
+      // the rune circle (2.5 squares wide) locks onto the victim
+      U.camTo(c, { point: victimPos }, 300);
       rune.visible = true; rune.material.color.set(holy ? '#ffd36a' : S.main); rune.material.opacity = 1;
       rune.position.set(victimPos.x, 0.02, victimPos.z);
       await Promise.all([
-        c.tween(360, (e, k) => { const s = 0.2 + 1.25 * e; rune.scale.set(s, 1, s); rune.rotation.y = k * 1.6; }, kit.ease.backOut),
-        jitter(c, V, 360, 0.025),
+        c.tween(400, (e, k) => { const s = 0.3 + 2.3 * e; rune.scale.set(s, 1, s); rune.rotation.y = k * 1.8; }, kit.ease.backOut),
+        jitter(c, V, 400, 0.03),
       ]);
-      // the strike
-      const impact = victimPos.clone().setY(0.25);
+      const impact = victimPos.clone().setY(0.3);
       if (holy) {
-        beam.visible = true; beam.material.color.set('#fff2c8'); beam.material.opacity = 1;
+        beam.visible = true; beam.material.color.set('#ffe7a8'); beam.material.opacity = 0.75;
         beam.position.set(victimPos.x, 0, victimPos.z);
-        await c.tween(170, (e, k) => { beam.scale.set(0.3 + 0.7 * e, 1, 0.3 + 0.7 * e); beam.position.y = 9 * (1 - e); rune.rotation.y = 1.6 + k; }, kit.ease.quadIn);
-        fx.sparkles(impact.clone().setY(0.6), { count: c.n(40), colors: ['#ffffff', '#fff2c8', '#ffd36a', S.light], speed: [1.5, 4], life: [500, 1000] });
+        U.sound(c, 'laser', { at: victimPos });
+        await c.tween(180, (e, k) => { beam.scale.set(0.4 + 0.9 * e, 1, 0.4 + 0.9 * e); beam.position.y = 9 * (1 - e); rune.rotation.y = 1.8 + k; }, kit.ease.quadIn);
+        fx.sparkles(impact.clone().setY(0.6), { count: c.n(70), colors: ['#ffffff', '#fff2c8', '#ffd36a', S.light], speed: [2, 5.5], life: [500, 1100], size: [0.1, 0.2] });
       } else {
-        met.visible = true;
-        const start = victimPos.clone().addScaledVector(dir, -2.8).add(new THREE.Vector3(-dir.z * 1.2, 7.5, dir.x * 1.2));
+        met.visible = true; met.scale.setScalar(2);
+        const start = victimPos.clone().addScaledVector(dir, -3).add(new THREE.Vector3(-dir.z * 1.4, 8, dir.x * 1.4));
         let last = 0;
-        await c.tween(380, (e, k) => {
+        U.sound(c, 'fire', { at: victimPos });
+        await c.tween(420, (e, k) => {
           met.position.lerpVectors(start, impact, e);
           met.rotation.set(k * 9, k * 5, 0);
-          rune.rotation.y = 1.6 + k;
-          if (k - last > 0.05 && k < 1) {
+          rune.rotation.y = 1.8 + k;
+          if (k - last > 0.04 && k < 1) {
             last = k;
-            fx.fire(met.position.clone(), { scale: 0.75, count: c.n(10) });
-            fx.smoke(met.position.clone(), { count: c.n(2), colors: ['#3a302a', '#5a4a40'], alpha: 0.5, size: [0.25, 0.4], up: 0.2 });
+            fx.inferno(met.position.clone(), { scale: 1.0, count: c.n(10) });
           }
         }, kit.ease.quadIn);
         met.visible = false;
       }
-      // impact
-      V.visible = false;
-      fx.explosion(impact, { scale: holy ? 1.0 : 1.2, flashColor: holy ? '#fff2c8' : '#ff8a3a',
-        debrisColors: [...body(c.victimColor), '#6f6a64', '#a39b8f'] });
-      fx.debris(impact.clone().setY(hV * 0.5), { count: c.n(10), colors: body(c.victimColor), speed: [2, 4.5] });
-      fx.ring(victimPos, { radius: 2.0, color: holy ? '#ffd36a' : S.main, ms: 480 });
-      if (holy) fx.boardFlash('#fff2c8', 420, 0.5);
-      kit.shake(c, 0.18, 380);
+      // impact: explosion, debris toward the camera, victim blasted up and away
+      fx.explosion(impact, { scale: holy ? 1.1 : 1.4, flashColor: holy ? '#ffd890' : '#ff8a3a', ringColor: holy ? '#ffd36a' : S.main,
+        debrisColors: [...body(c.victimColor), '#6f6a64', '#a39b8f'], boardFlash: false });
+      U.impact(c, impact, { color: holy ? '#ffd36a' : S.main, power: 1.25, ring: 3.0, debris: [...body(c.victimColor), '#6f6a64'], sfx: 'explosion', shake: 0.14 });
+      
       await Promise.all([
-        c.tween(380, e => {
-          rune.material.opacity = 1 - e; const s = 1.45 + 0.6 * e; rune.scale.set(s, 1, s);
-          if (holy) { beam.material.opacity = 1 - e; beam.scale.set(1 + 0.6 * e, 1, 1 + 0.6 * e); }
+        c.tween(440, e => {
+          rune.material.opacity = 1 - e; const s = 2.6 + 0.9 * e; rune.scale.set(s, 1, s);
+          if (holy) { beam.material.opacity = 0.75 * (1 - e); beam.scale.set(1.3 + 0.6 * e, 1, 1.3 + 0.6 * e); }
         }),
-        c.wait(260).then(() => kit.hopTo(c, A, c.to, { ms: 300, height: 0.4, squash: 0.25 })),
+        U.fling(c, V, dir, { ms: 1000, up: 9, speed: 4.2, spin: 18, bounce: 0.45 }),
+        c.wait(380).then(() => kit.hopTo(c, A, c.to, { ms: 300, height: 0.45, squash: 0.25 })),
       ]);
       rune.visible = false; beam.visible = false;
-    }, { zoom: 0.88, tilt: 0.22 });
+    });
   } finally {
-    rune.material.opacity = 1; beam.material.opacity = 1;
+    rune.material.opacity = 1; beam.material.opacity = 1; met.scale.setScalar(1);
     U.park(rune, beam, met); U.finish(c);
   }
 }

@@ -12,6 +12,7 @@
 // The figure is turned toward its owner (YAW) like the squire.
 import { sdf, P, mirrorX, colorize } from './sdf.js';
 import { drape, rows, inBands } from './drape.js';
+import { head } from './face.js';
 import { PAL, rgb, mixRGB, scaleRGB, sstep, prep, paintAbs, plinth, assemble } from './common.js';
 
 const L = { bodice: 1, trim: 2, skin: 3, hair: 4, sleeve: 5, cuff: 6 };
@@ -43,16 +44,10 @@ function field(THREE) {
   S.add(P.ellipsoid(...U(0.0, 0.775), 0.1, 0.034, 0.058), L.bodice, 0.04);
   S.add(P.capsule(U(0, WAIST + 0.01), U(0, WAIST - 0.05), 0.07, 0.074), L.bodice, 0.03);   // hips into the skirt
   S.add(P.torusY(0, WAIST + 0.006, 0, 0.074, 0.0105), L.trim, 0.008);                     // girdle
-  // ---- neck, head, nose
+  // ---- neck (the head is a separate fine sculpt: face.js)
   S.add(P.capsule(U(0, 0.79), U(0.002, 0.86), 0.026, 0.022), L.skin, 0.02);
-  S.add(P.sphere(...U(HEAD.u, HEAD.y), HEAD.r), L.skin, 0.02);
-  S.add(P.ellipsoid(...U(HEAD.u + 0.05, HEAD.y - 0.008), 0.009, 0.013, 0.01), L.skin, 0.006);
-  // ---- hair: swept back under the coronet into a low bun
-  S.add(P.ellipsoid(...U(HEAD.u - 0.008, HEAD.y + 0.008), 0.059, 0.056, 0.058), L.hair, 0.008);
-  S.add(mirrorX(P.capsule(U(HEAD.u + 0.005, HEAD.y - 0.01, 0.045), U(HEAD.u + 0.012, 0.79, 0.062), 0.022, 0.018)), L.hair, 0.012);   // locks over the shoulders
   // puffed sleeve heads
   S.add(mirrorX(P.ellipsoid(...U(0.0, 0.768, 0.1), 0.038, 0.034, 0.036)), L.sleeve, 0.012);
-  S.add(P.sphere(...U(HEAD.u - 0.06, HEAD.y - 0.035), 0.034), L.hair, 0.02);
   // ---- right arm: shoulder -> elbow -> hand round the sceptre
   S.add(P.chain([[...U(0, 0.77, 0.098), 0.029], [...U(-0.006, 0.68, 0.13), 0.025], [...U(SCEPTRE.u - 0.02, 0.64, SCEPTRE.x - 0.012), 0.021]]), L.bodice, 0.02);
   S.add(P.sphere(...U(SCEPTRE.u, 0.635, SCEPTRE.x - 0.004), 0.02), L.skin, 0.008);
@@ -65,7 +60,7 @@ function field(THREE) {
   // ---- bell sleeves: flaring from the elbow, open over the wrist
   S.add(P.capsule(U(0.0, 0.672, 0.133), U(SCEPTRE.u - 0.04, 0.643, SCEPTRE.x - 0.018), 0.027, 0.04, 0.85), L.sleeve, 0.012);
   S.add(P.capsule(U(0.02, 0.678, -0.142), U(0.074, 0.664, -0.156), 0.027, 0.04, 0.85), L.sleeve, 0.012);
-  cache = S.mesh(THREE, { min: [-0.2, WAIST - 0.004, -0.2], max: [0.2, 0.97, 0.12], cell: 0.022 });
+  cache = S.mesh(THREE, { min: [-0.2, WAIST - 0.004, -0.2], max: [0.2, 0.89, 0.12], cell: 0.022 });
   return cache;
 }
 
@@ -97,7 +92,7 @@ function gown(THREE, kit, K) {
     [rMantle(0.7) - 0.016, 0.7], [rMantle(0.45) - 0.016, 0.45], [rMantle(BASE) - 0.016, BASE + 0.004], [rMantle(BASE + 0.004), BASE + 0.004]];
   const nM = ysM.length + 2;
   const mantle = drape(THREE, {
-    sec: secM, open: openMantle, cols: 17, band: 0.03, z: 0.02,
+    sec: secM, open: openMantle, cols: 14, band: 0.03, z: 0.02,
     folds: (phi, y) => 0.03 * sin(phi * 6.5 + 0.4) * sstep(0.74, 0.2, y),
     paint: ({ row, edge, cap, y }) => {
       if (row >= nM + 1 && !cap) return K.lining;
@@ -121,7 +116,7 @@ function collar(THREE, kit, K) {
   const ys = rows(0.785, 0.93, 2, [[0.912, 0.93]]);
   const sec = [...ys.map(y => [R(y) + 0.004, y]), [R(0.93) + 0.004, 0.93], [R(0.93) - 0.003, 0.932], [R(0.785) - 0.003, 0.785]];
   const c = drape(THREE, {
-    sec, open: () => PI - A, cols: N * 4, band: 0,
+    sec, open: () => PI - A, cols: N * 3, band: 0,
     paint: ({ phi, y }) => {
       const rib = abs(sin((phi / A) * PI * N / 2));
       if (y > 0.911 || (rib < 0.2 && y > 0.8)) return { c: K.trim, metal: 1 };
@@ -156,7 +151,7 @@ function coronet(THREE, kit, K) {
     const spike = kit.place(kit.cylinder(0.003, 0.012, h, 5), { rx: atan2(r1 - r0, h) });
     kit.place(spike, { y: y0 + 0.036 + h / 2, z: (r0 + r1) / 2 });
     out.push(prep(THREE, kit.place(spike, { ry: a }), K.trim, { metal: 1 }));
-    const bead = kit.place(kit.sphere(0.02, 7, 5), { y: y0 + 0.04 + h + 0.008, z: r1 + 0.002 });
+    const bead = kit.place(kit.sphere(0.02, 6, 4), { y: y0 + 0.04 + h + 0.008, z: r1 + 0.002 });
     out.push(prep(THREE, kit.place(bead, { ry: a }), K.pearl, { glow: K.w ? 0.12 : 0.2, metal: 0.1 }));
   }
   // a thin gold circlet through the tips: from overhead the beads + circlet are the queen's dotted circle
@@ -202,6 +197,11 @@ function look(THREE, color) {
     bodice: C(w ? p.body : '#2a2830'),
     hair: C(w ? '#d4a95c' : '#6a4038'), hairShade: C(w ? '#9a7038' : '#2a1a18'),
     skin: mixRGB(C(p.body), C(w ? '#e8c9a8' : '#4a3d42'), 0.6),
+    face: w
+      ? { skin: C('#f0caa6'), skinShade: C('#c08a68'), brow: C('#8a5a2a'), lip: C('#c4545a'), eye: C('#1f2c52'), eyeGlow: 0,
+          hair: C('#e0b45e'), hairShade: C('#8e6226'), beard: C('#e0b45e'), beardShade: C('#8e6226') }
+      : { skin: C('#8c7b80'), skinShade: C('#4a3c40'), brow: C('#1a1012'), lip: C('#8a1a28'), eye: C('#ff3a24'), eyeGlow: 0.6,
+          hair: C('#3a2226'), hairShade: C('#120a0c'), beard: C('#3a2226'), beardShade: C('#120a0c') },
   };
 }
 
@@ -225,8 +225,8 @@ export function queen(THREE, kit, { color }) {
       }
     }
   });
-  const parts = [body, ...gown(THREE, kit, K), ...collar(THREE, kit, K), ...coronet(THREE, kit, K), ...sceptre(THREE, kit, K), ...orb(THREE, kit, K)];
+  const face = head(THREE, { key: 'queen', R: HEAD.r, at: U(HEAD.u, HEAD.y), hair: 'queen', beard: null, clipY: HEAD.y + 0.03, cell: 0.0112 }, K.face);
+  const parts = [body, face, ...gown(THREE, kit, K), ...collar(THREE, kit, K), ...coronet(THREE, kit, K), ...sceptre(THREE, kit, K), ...orb(THREE, kit, K)];
   for (const m of parts) m.rotateY(YAW);
-  queen.debug = parts.map(g => (g.index ? g.index.count : g.attributes.position.count) / 3);
-  return assemble(kit, color, [...plinth(THREE, kit, color, { R: 0.36, H: BASE, seg: 22 }), ...parts]);
+  return assemble(kit, color, [...plinth(THREE, kit, color, { R: 0.36, H: BASE, seg: 20 }), ...parts]);
 }

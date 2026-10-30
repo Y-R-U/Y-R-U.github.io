@@ -93,7 +93,7 @@ await ev(`G.boards[0].camera.preset('top')`);
 
 // 5) battle skip by tap
 await ev(`(()=>{const b=G.boards[0];b.setAnimSpeed(1);G.chess.load('4k3/8/8/3p4/4P3/8/8/4K3 w - - 0 1');b.setPosition(G.chess.fen());window.__t0=performance.now();window.__bp=b.applyMove(G.chess.move('exd5'),{battle:true}).then(()=>window.__bt=performance.now()-__t0);})()`);
-await sleep(2500);
+await until('G.boards[0].isAnimating()', 20000); await sleep(300);   // real-time GPUs finish a battle in ~1.5 s
 const midBattle = await ev('G.boards[0].isAnimating()');
 await shot('test_battle_before_skip');
 await mouse('mousePressed', 200, 400); await mouse('mouseReleased', 200, 400, 0);

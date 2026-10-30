@@ -46,7 +46,8 @@ const mats = (kit, color) => {
   const s = SIDES[color];
   return {
     body: kit.material({ color: '#ffffff', roughness: 0.62, metalness: 0, rim: s.rim, envMapIntensity: 0.7 }),
-    glow: kit.material({ color: s.glow, emissive: s.glow, emissiveIntensity: 1.5, roughness: 0.9 }),
+    glow: kit.material({ color: s.glow, emissive: s.glow, emissiveIntensity: 1.5, roughness: 0.9,
+      flicker: color === 'w' ? { mode: 'candle', amount: 0.28 } : { mode: 'pulse', amount: 0.3, speed: 0.7 } }),   // board-2: shared idle flicker
   };
 };
 

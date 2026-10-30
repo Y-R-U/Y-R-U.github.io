@@ -27,14 +27,19 @@ Read this first when resuming, then DECISIONS.md, TEAM_BRIEF.md, docs/notes/*.md
 | sculptor-fantasy-2 (p Squire + r Watchtower) | a5ed080f8e9319654 | DONE (7 / 8; reviewed, good; squire has baked 3/4 yaw — accepted) |
 | sculptor-halloween-3 (q Countess + k Pumpkin King + board) | a7fb25a00cc9ad998 | DONE (q 7, k 7.5, board 6.5–7; HALLOWEEN SET COMPLETE; reviewed) |
 | online (lobby/rooms/online game UI) | a9d1a88e113f7c5f8 | DONE (2-browser e2e ALL PASS 360+1440; reviewed) |
-| ui-2 (shared board, portrait layout, online offline-state, move review) | abd147e4f6019db1a | running (9518) |
+| ui-2 (shared board, portrait layout, online offline-state, move review) | abd147e4f6019db1a | DONE (1 WebGL ctx, all suites pass; puzzles hooked; ONLINE_PUBLIC=false in net.js — flip at deploy) |
 | battle-1 (fantasy + halloween battles, 4 each) | a7576b524d1e83742 | DONE (8 battles, no leaks, warm shaders; reviewed: works but too SMALL from Top view vs ref) |
 | sculptor-scifi-1 (concept + p + r) | a10763d1cd754a3ff | DONE ("Aegis vs Nova"; Drone 7.5, Bastion 7; reviewed, good) |
-| audio (sfx, theme battle sfx API, ambient loops) | a6b881a23e46068d6 | running (9524) |
 | battle-2 (BIG battles from Top, classic battles, kit FX housekeeping) | ac63a47fb05a1fe85 | running (9525) |
-| board-2 (facing, glow flicker, kit adoption, halloween env, perf pass) | ae9ab876383b1ff7f | running (9526) |
+| board-2 (facing, glow flicker, kit adoption, halloween env, perf pass) | ae9ab876383b1ff7f | DONE (all tests pass; 60 fps at 4× throttle; Halloween night sky reviewed: great) |
+| sculptor-scifi-2 (n Strider + b Psi Oracle) | a45993e7f5b3af467 | DONE (Strider 7.5, Oracle 6.5–7; reviewed) |
+| qa (playthrough, bug list, ui-3 items) | acfa57929d253287a | running (9528) |
+| audio | a6b881a23e46068d6 | DONE (procedural sfx all themes, sfx() battle API, 3 ACE-Step loops ~0.5–0.65 MB; models unloaded verified; NEEDS Aaron listen-check) |
+| sculptor-scifi-3 (q AI Core + k Commander + station board + sounds) | acf7e1f8f39903d53 | DONE (q 7, k 7.5, board 7.5, env 7; SCI-FI COMPLETE; reviewed) |
+| learn (course map, lessons, drills) | a6cf292ca55789272 | running (9531) |
+| sculptor-fantasy-polish (wizard rebuild, faces, fantasy squares, island life) | af0f22136d01c2ccc | running (9530) |
 | puzzles (Lichess CC0 + classics, map, play) | a53142481a3bac366 | DONE (618 puzzles, 4760 checks pass; map+play reviewed, great; hook → ui-2) |
-| sculptor-fantasy-3 (q Sorceress + k High King + island env) | a18ad162b144a5b7e | running (9520) |
+| sculptor-fantasy-3 (q Sorceress + k High King + island env) | a18ad162b144a5b7e | DONE (q 7, k 7.5, island 7; FANTASY SET COMPLETE; reviewed) |
 | server-2 (lag credit, queued moves, prov, allowance race) | a7456397fcdd35eae | DONE (all tests pass; told to switch credit to full RTT) |
 | server (Go lobby/relay/ratings, net.js) | abc9067d1e0062fbb | DONE (test.sh ALL PASS + net 24/24 verified; local :8094 via tools/server_run.sh; deploy steps in notes/server.md) |
 
@@ -76,3 +81,9 @@ Read this first when resuming, then DECISIONS.md, TEAM_BRIEF.md, docs/notes/*.md
 - 2026-10-31: battle-1 DONE. My review of Top-view strips: correct and clean but underwhelming vs ref_battle (FX tiny at overhead scale, fire stream thin). → battle-2: make them BIG from Top (camera push-in/zoom on the fight even when locked, then return; FX 2–3× scale, screen-wide flash/vignette, debris flying past camera, victim reactions larger, slow-mo beat at impact), classic battles to match, sci-fi battles later. capMs request sent to ui-2. Kit requests for board-2: adopt addFxWarmup/parkFX, fadeOut transparent-shader compile, pool flash/ring/lightning/scorch.
 - 2026-10-31: core DONE. Refilled to 6: battle-2 (owns kit FX section) + board-2 (owns board/*.js + kit materials/looks). ui-3 queue: show expectedMoveMs on bot cards, "re-test this device" setting, humanDelay, dispose bots; ambientAnim setting UI.
 - 2026-10-31: scifi-1 DONE. Next sci-fi: n Strider + b Psi Oracle, then q AI Core + k Commander + station board, then battles. Running 5 → wait.
+- 2026-10-31: ui-2 DONE. MILESTONE 3 committed+pushed (d4b71276). Refilled to 6: scifi-2, qa (+ui-3 items). DEPLOY CHECKLIST addition: set ONLINE_PUBLIC=true in js/app/net.js.
+- 2026-10-31: fantasy-3 DONE → Fantasy complete + floating island env (bright, cute, simpler than ref). env.update(dt) hook sent to board-2. Later fantasy polish: animate env (flames/waterfalls/clouds), richer islands/trees, gold-inlaid fantasy squares, wizard robe touch-up, faces.
+- 2026-10-31: audio DONE; sfx API relayed to battle-2. Refilled to 6: scifi-3, fantasy-polish. Open: online game has no "illegal" sound; slider styles inline. Questions for Aaron: listen-check sounds + music.
+- 2026-10-31: scifi-2 DONE. Oracle helmet egg-ish → sci-fi polish later. Running 5 → wait.
+- 2026-10-31: board-2 DONE. Running 4; holding the 2 free slots deliberately (next work depends on battle-2 / scifi-3 landing: sci-fi battles, then learn mode). Sculptors may switch to kit.vertexMaterial + flicker later.
+- 2026-10-31: scifi-3 DONE → all 4 themes complete. Started LEARN (D14) since the game is feature-complete. Remaining: sci-fi battles (after battle-2), board requests (camera to env.update, ambientMinPhi), sci-fi music loop, projects.js entry + screenshot, deploy (needs Aaron).

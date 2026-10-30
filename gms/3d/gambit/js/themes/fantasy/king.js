@@ -10,6 +10,7 @@
 // ermine collar over a wide side-colour cloak. The tallest piece (1.40).
 import { sdf, P, mirrorX, colorize } from './sdf.js';
 import { drape, rows, inBands } from './drape.js';
+import { head } from './face.js';
 import { PAL, rgb, mixRGB, scaleRGB, sstep, prep, paintAbs, plinth, assemble } from './common.js';
 
 const L = { plate: 1, trim: 2, skin: 3, hair: 4, fur: 5, mail: 6, glove: 7, boot: 8, cloth: 9 };
@@ -46,23 +47,11 @@ function field(THREE) {
   // ---- pauldrons: two layered lames each
   S.add(mirrorX(P.ellipsoid(...U(0, 0.855, 0.118), 0.062, 0.044, 0.062)), L.plate, 0.012);
   S.add(mirrorX(P.ellipsoid(...U(0.004, 0.818, 0.138), 0.054, 0.034, 0.052)), L.trim, 0.008);
-  // ---- arms: upper arm, couter, vambrace to the gauntlets on the pommel
-  for (const sx of [1, -1]) {
-    S.add(P.chain([[...U(0, 0.83, sx * 0.13), 0.034], [...U(0.05, 0.7, sx * 0.152), 0.03], [...U(SWORD.u - 0.035, SWORD.top - 0.032, sx * 0.05), 0.026]]), L.plate, 0.015);
-    S.add(P.sphere(...U(0.05, 0.7, sx * 0.152), 0.034), L.trim, 0.006);               // elbow cop
-    S.add(P.ellipsoid(...U(SWORD.u - 0.004, SWORD.top - 0.03, sx * 0.026), 0.032, 0.03, 0.026), L.glove, 0.012);
-  }
-  // ---- neck, head, nose, beard, moustache, hair
+  // ---- neck (arms are plain plate geometry: plateArms(); the head is a fine sculpt: face.js)
   S.add(P.capsule(U(0, 0.9), U(0.004, 0.97), 0.03, 0.026), L.skin, 0.02);
-  S.add(P.sphere(...U(HEAD.u, HEAD.y), HEAD.r), L.skin, 0.02);
-  S.add(P.ellipsoid(...U(HEAD.u + 0.055, HEAD.y - 0.008), 0.011, 0.015, 0.012), L.skin, 0.006);
-  S.add(P.capsule(U(HEAD.u + 0.036, HEAD.y - 0.03), U(HEAD.u + 0.058, 0.875), 0.044, 0.016, 0.9), L.hair, 0.02);
-  S.add(mirrorX(P.capsule(U(HEAD.u + 0.058, HEAD.y - 0.024, 0.006), U(HEAD.u + 0.048, HEAD.y - 0.036, 0.04), 0.011, 0.008)), L.hair, 0.008);
-  S.add(P.ellipsoid(...U(HEAD.u - 0.012, HEAD.y + 0.004), 0.06, 0.057, 0.06), L.hair, 0.01);
-  S.add(P.capsule(U(-0.03, HEAD.y - 0.01), U(-0.04, 0.92), 0.05, 0.05), L.hair, 0.02);
   // ---- ermine collar: a thick fur roll round the shoulders, deeper at the back
   S.add((x, y, z) => P.torusY(0, 0.895 - 0.012 * sstep(0, 0.1, -z), 0.012, 0.094, 0.036)(x * 0.95, y, z), L.fur, 0.02);
-  cache = S.mesh(THREE, { min: [-0.22, BASE - 0.005, -0.22], max: [0.22, 1.07, 0.15], cell: 0.025 });
+  cache = S.mesh(THREE, { min: [-0.22, BASE - 0.005, -0.22], max: [0.22, 0.99, 0.15], cell: 0.025 });
   return cache;
 }
 
@@ -117,6 +106,37 @@ function cloak(THREE, kit, K) {
   return out;
 }
 
+/** A plate segment as a lathe tube from a to b (prof = [[t, r], ...]); paint(t) -> colour/finish. */
+function tube(THREE, kit, a, b, prof, paint, seg = 9) {
+  const A = new THREE.Vector3(...a), d = new THREE.Vector3(...b).sub(A), len = d.length();
+  const g = prep(THREE, kit.lathe(prof.map(([t, r]) => new THREE.Vector2(r, t * len)), { segments: seg }), [1, 1, 1]);
+  paintAbs(g, (x, y) => paint(y / len));
+  g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()));
+  return g.translate(A.x, A.y, A.z);
+}
+
+/**
+ * Plate arms (polish pass; were SDF tubes): rerebrace with two lame ridges, a couter with a fan
+ * wing, a vambrace flaring into a gold gauntlet cuff, and the gauntlets on the pommel.
+ */
+function plateArms(THREE, kit, K) {
+  const out = [], plate = { c: K.plate, metal: K.plateMetal }, gold = { c: K.trim, metal: 1 };
+  const ridge = t => (Math.abs(t - 0.34) < 0.05 || Math.abs(t - 0.6) < 0.05 ? gold : plate);
+  for (const sx of [1, -1]) {
+    const S = U(0, 0.835, sx * 0.128), E = U(0.05, 0.7, sx * 0.152), W = U(SWORD.u - 0.035, SWORD.top - 0.032, sx * 0.05);
+    out.push(tube(THREE, kit, S, E, [[-0.1, 0.028], [0.05, 0.036], [0.3, 0.034], [0.34, 0.039], [0.38, 0.034], [0.56, 0.033], [0.6, 0.038], [0.64, 0.033], [1.0, 0.031]], ridge));
+    out.push(tube(THREE, kit, E, W, [[0, 0.03], [0.5, 0.028], [0.72, 0.029], [0.8, 0.04], [0.95, 0.046], [1.0, 0.044], [1.0, 0.03]], t => (t > 0.76 ? gold : plate)));
+    // couter: elbow cop + a fan wing on the outside
+    out.push(prep(THREE, kit.place(kit.sphere(0.037, 9, 6), { x: E[0], y: E[1], z: E[2] }), K.trim, { metal: 1 }));
+    const wing = prep(THREE, kit.place(kit.cylinder(0.046, 0.012, 0.016, 10), { rz: sx * PI / 2 }), K.plate, { metal: K.plateMetal });
+    paintAbs(wing, (x, y, z) => (Math.hypot(y, z) > 0.038 ? gold : null));
+    out.push(kit.place(wing, { x: E[0] + sx * 0.03, y: E[1], z: E[2] + 0.006 }));
+    // gauntlet round the grip
+    out.push(prep(THREE, kit.place(kit.sphere(0.03, 9, 7), { x: sx * 0.026, y: SWORD.top - 0.03, z: -(SWORD.u - 0.004), sx: 0.9, sy: 1.0, sz: 1.1 }), K.w ? K.trim : K.plate, { metal: 1 }));
+  }
+  return out;
+}
+
 /** Great sword planted point-down: blade with a fuller, down-curved quillons, grip, gem pommel. */
 function sword(THREE, kit, K) {
   const z = -SWORD.u, out = [];
@@ -154,7 +174,7 @@ function crown(THREE, kit, K) {
   }
   // two arches crossing over the cap (along the board axes, like the cross)
   for (const ry of [0, PI / 2]) {
-    const arch = kit.place(kit.torus(0.068, 0.0075, 3, 12, PI), { y: y0 + 0.052, ry });
+    const arch = kit.place(new THREE.TorusGeometry(0.068, 0.0075, 3, 12, PI), { y: y0 + 0.052, ry });
     // flatten the arch a little so the crown stays compact
     const p = arch.attributes.position;
     for (let i = 0; i < p.count; i++) p.setY(i, y0 + 0.052 + (p.getY(i) - y0 - 0.052) * 0.95);
@@ -199,6 +219,12 @@ function look(THREE, color) {
       return spotOn ? spot : mixRGB(furB, furA, 0.5 + 0.5 * sin(a * 23 + y * 90));
     },
     furA, furB, spot,
+    // the white king's beard is a warm gold-brown (not ivory-on-ivory); the black king's charcoal
+    face: w
+      ? { skin: C('#e4b58c'), skinShade: C('#a8714c'), brow: C('#6e4a22'), lip: C('#a85a4c'), eye: C('#1d2a4a'), eyeGlow: 0,
+          hair: C('#b88a4a'), hairShade: C('#5e3e1a'), beard: C('#c4955a'), beardShade: C('#6a4520') }
+      : { skin: C('#86727a'), skinShade: C('#3e3236'), brow: C('#141012'), lip: C('#5a2a30'), eye: C('#ff3a24'), eyeGlow: 0.8,
+          hair: C('#2e282b'), hairShade: C('#0e0c0d'), beard: C('#3a3336'), beardShade: C('#121011') },
   };
 }
 
@@ -210,7 +236,7 @@ export function king(THREE, kit, { color }) {
       case L.trim: return [...K.trim, 0, 1];
       case L.skin: return [...K.skin, 0, 0];
       case L.hair: return [...mixRGB(K.hairShade, K.hair, sstep(0.86, 0.98, y)), 0, 0];
-      case L.glove: return [...(w ? K.trim : C2(K)), 0, 1];
+      case L.glove: return [...(w ? K.trim : K.plate), 0, 1];
       case L.boot: return [...K.trim, 0, w ? 1 : 0.8];
       case L.fur: {
         // ermine spots: one vertex per cell is about the size of a tail tip at this resolution
@@ -227,10 +253,9 @@ export function king(THREE, kit, { color }) {
       }
     }
   });
-  const figure = [body, ...surcoat(THREE, K), ...cloak(THREE, kit, K), ...sword(THREE, kit, K), ...crown(THREE, kit, K)];
+  const face = head(THREE, { key: 'king', R: HEAD.r, at: U(HEAD.u, HEAD.y), hair: 'long', beard: 'full', clipY: CROWN_Y + 0.008, cell: 0.0122 }, K.face);
+  const figure = [body, face, ...plateArms(THREE, kit, K), ...surcoat(THREE, K), ...cloak(THREE, kit, K), ...sword(THREE, kit, K), ...crown(THREE, kit, K)];
   for (const m of figure) m.rotateY(YAW);
   const parts = [...figure, ...cross(THREE, kit, K)];                     // the cross stays on the board axes
-  king.debug = parts.map(g => (g.index ? g.index.count : g.attributes.position.count) / 3);
   return assemble(kit, color, [...plinth(THREE, kit, color, { R: 0.38, H: BASE, seg: 22 }), ...parts]);
 }
-const C2 = K => K.plate;

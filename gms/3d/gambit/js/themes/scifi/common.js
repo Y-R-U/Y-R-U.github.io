@@ -24,6 +24,7 @@ export const PAL = {
     dark:  { c: '#1d232c' },                     // panel-line grooves, wells, undersides
     well:  { c: '#10141a' },
     glass: { c: '#0b1119', metal: 0.55 },        // visor glass
+    canopy:{ c: '#1d4258', metal: 0.6 },         // tinted cockpit glass (knight)
     line:  { c: '#12c6ff', glow: 1 },            // the signature light-line
     lineHi:{ c: '#6fe6ff', glow: 1.2 },         // eyes, emitter cores
     lineLo:{ c: '#12c6ff', glow: 0.5 },         // dim glows (reactor in the well)
@@ -40,6 +41,7 @@ export const PAL = {
     dark:  { c: '#0c0e13' },
     well:  { c: '#07080b' },
     glass: { c: '#050608', metal: 0.55 },
+    canopy:{ c: '#1a0c14', metal: 0.6 },
     line:  { c: '#ff1a6c', glow: 1 },
     lineHi:{ c: '#ff6aa6', glow: 1.2 },
     lineLo:{ c: '#ff1a6c', glow: 0.5 },
@@ -202,4 +204,97 @@ export function refinish(THREE, g, color, fn) {
 /** Build the final piece Group (one mesh, one material). */
 export function assemble(kit, color, geoms) {
   return kit.piece(geoms, pieceMat(kit, color));
+}
+
+/**
+ * Hard-surface loft (round 2): a closed cross-section polygon swept through `secs` along z.
+ * secs = [{ z, pts: [[x, y, key, smooth?], ...], key? }, ...], every section with the same point
+ * count, polygon counter-clockwise in x-right / y-up. A point's `key` is the finish of the edge
+ * ENDING at it (same convention as hsLathe); `sec.key` overrides the whole band between the
+ * previous section and this one (transverse panel grooves, trim bands). Facets are flat (crisp
+ * hard-surface panels) unless a point is flagged smooth (normal averaged across that corner).
+ * `sec.smooth` (or opts.smoothZ) averages normals across that section with the neighbouring band (soft
+ * curve along z) unless the neighbour band has its own `key` (grooves stay crisp).
+ * opts: capStart / capEnd (true or a finish key), smoothZ.
+ */
+export function loft(THREE, color, secs, { capStart = true, capEnd = true, smoothZ = false } = {}) {
+  const n = secs[0].pts.length;
+  const pos = [], nor = [], col = [], uv = [];
+  const push = (x, y, z, N, f) => { pos.push(x, y, z); nor.push(N[0], N[1], N[2]); col.push(f.c[0], f.c[1], f.c[2]); uv.push(f.glow, f.metal); };
+  // signed area -> outward 2D direction sign
+  const P0 = secs[0].pts;
+  let area = 0; for (let i = 0; i < n; i++) { const a = P0[i], b = P0[(i + 1) % n]; area += a[0] * b[1] - b[0] * a[1]; }
+  const sg = area >= 0 ? 1 : -1;
+  // flat normal of band s (between secs[s] and secs[s+1]) edge e (pts[e] -> pts[e+1])
+  const bandN = (s, e) => {
+    const A = secs[s], B = secs[s + 1], i = e, j = (e + 1) % n;
+    const a0 = [A.pts[i][0], A.pts[i][1], A.z], b0 = [A.pts[j][0], A.pts[j][1], A.z];
+    const a1 = [B.pts[i][0], B.pts[i][1], B.z], b1 = [B.pts[j][0], B.pts[j][1], B.z];
+    const u = [(b0[0] + b1[0] - a0[0] - a1[0]) / 2, (b0[1] + b1[1] - a0[1] - a1[1]) / 2, (b0[2] + b1[2] - a0[2] - a1[2]) / 2];
+    const v = [(a1[0] + b1[0] - a0[0] - b0[0]) / 2, (a1[1] + b1[1] - a0[1] - b0[1]) / 2, (a1[2] + b1[2] - a0[2] - b0[2]) / 2];
+    let N = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+    const out = [u[1] * sg, -u[0] * sg];               // 2D outward of the edge
+    if (N[0] * out[0] + N[1] * out[1] < 0) N = N.map(x => -x);
+    const L = Math.hypot(...N) || 1; return N.map(x => x / L);
+  };
+  const nb = secs.length - 1, NB = [];
+  for (let s = 0; s < nb; s++) { NB.push([]); for (let e = 0; e < n; e++) NB[s].push(bandN(s, e)); }
+  const avg = (...v) => { const r = [0, 0, 0]; for (const x of v) { r[0] += x[0]; r[1] += x[1]; r[2] += x[2]; } const L = Math.hypot(...r) || 1; return r.map(x => x / L); };
+  for (let s = 0; s < nb; s++) {
+    const A = secs[s], B = secs[s + 1];
+    for (let e = 0; e < n; e++) {
+      const i = e, j = (e + 1) % n;
+      const f = fin(THREE, color, B.key || B.pts[j][2] || 'body');
+      const base = NB[s][e];
+      // corner smoothing (around the section) at point i / j
+      const nAt = (sec, k, side) => {
+        let N = base;
+        if (secs[sec].pts[k][3]) N = avg(base, NB[s][side === 'i' ? (e - 1 + n) % n : (e + 1) % n]);
+        if (smoothZ || secs[sec].smooth) { const o = sec === s ? s - 1 : s + 1; if (o >= 0 && o < nb && !secs[o + 1].key && !secs[s + 1].key) N = avg(N, NB[o][e]); }
+        return N;
+      };
+      const vA0 = [A.pts[i][0], A.pts[i][1], A.z], vB0 = [A.pts[j][0], A.pts[j][1], A.z];
+      const vA1 = [B.pts[i][0], B.pts[i][1], B.z], vB1 = [B.pts[j][0], B.pts[j][1], B.z];
+      const nA0 = nAt(s, i, 'i'), nB0 = nAt(s, j, 'j'), nA1 = nAt(s + 1, i, 'i'), nB1 = nAt(s + 1, j, 'j');
+      push(...vA0, nA0, f); push(...vB0, nB0, f); push(...vB1, nB1, f);
+      push(...vA0, nA0, f); push(...vB1, nB1, f); push(...vA1, nA1, f);
+    }
+  }
+  const cap = (sec, dirSign, key) => {
+    const contour = sec.pts.map(p => new THREE.Vector2(p[0], p[1]));
+    const tris = THREE.ShapeUtils.triangulateShape(contour, []);
+    const f = fin(THREE, color, typeof key === 'string' ? key : (sec.pts[0][2] || 'body'));
+    for (const t of tris) for (const k of t) push(sec.pts[k][0], sec.pts[k][1], sec.z, [0, 0, dirSign], f);
+  };
+  const dz = Math.sign(secs[nb].z - secs[0].z) || 1;
+  if (capStart) cap(secs[0], -dz, capStart);
+  if (capEnd) cap(secs[nb], dz, capEnd);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  return fixWinding(THREE, g);
+}
+
+/** Chamfered-rectangle section (CCW): w x h centred on (cx, cy), chamfer c. keys: {bot, side, top, ch}. */
+export function chamferRect(w, h, c, { cx = 0, cy = 0, bot = 'shade', side = 'body', top = 'body', ch = 'trim' } = {}) {
+  const x = w / 2, y = h / 2;
+  return [
+    [cx + x - c, cy - y, bot], [cx + x, cy - y + c, ch], [cx + x, cy + y - c, side], [cx + x - c, cy + y, ch],
+    [cx - x + c, cy + y, top], [cx - x, cy + y - c, ch], [cx - x, cy - y + c, side], [cx - x + c, cy - y, ch],
+  ];
+}
+
+/**
+ * A bevelled strut from A to B (3D points [x,y,z]): sections `sec(t)` -> pts (chamferRect etc.)
+ * lofted along local z at the given t values (a number, or {t, key} for a band finish), then aimed from A to B. Local x stays as level
+ * as possible (struts in a y-z plane keep x exactly).
+ */
+export function strut(THREE, color, A, B, sec, ts = [0, 1], opts) {
+  const a = new THREE.Vector3(...A), b = new THREE.Vector3(...B), d = b.clone().sub(a), L = d.length();
+  const g = loft(THREE, color, ts.map(t => (typeof t === 'number' ? { z: t * L, pts: sec(t) } : { z: t.t * L, pts: sec(t.t), key: t.key })), opts);
+  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), d.normalize());
+  g.applyQuaternion(q); g.translate(a.x, a.y, a.z);
+  return g;
 }

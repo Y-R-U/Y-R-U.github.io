@@ -43,7 +43,9 @@ export function parseFen(fen) {
  * opts: {theme='classic', fen, orientation='w', interactive=null, animSpeed=1,
  *        legalMoves(square) -> [sq | {to,...}]  (optional; else pass highlight({legalTargets})),
  *        onMoveAttempt, onPromotion, maxPixelRatio=2, keyboard=true, autoHighlight=true,
- *        coordinates=true, view='default', shadows=true}
+ *        coordinates=true, view='default', shadows=true,
+ *        ambientAnim=true (idle glow flicker / env.update, capped by ambientFps=24, ≈20 fps after vsync; setting `ambientAnim`),
+ *        forceAnim=null (anim label or fn name to prefer, gallery ?anim=)}
  */
 export async function createBoard(container, opts = {}) {
   const o = { theme: 'classic', orientation: 'w', interactive: null, animSpeed: 1, maxPixelRatio: 2, keyboard: true,
@@ -93,7 +95,7 @@ export async function createBoard(container, opts = {}) {
   let battleTl = null;
   let queue = Promise.resolve();
   let animCount = 0;
-  let shadowDirty = true;
+  let shadowDirty = true, lastShadow = 0;
   const listeners = new Map();
   const emit = (name, data) => { for (const fn of listeners.get(name) || []) { try { fn(data); } catch (e) { console.error(e); } } };
 
@@ -101,7 +103,25 @@ export async function createBoard(container, opts = {}) {
   let raf = 0, last = 0, disposed = false;
   const stat = { frames: 0, cpu: 0, js: 0, jsMs: 0, t0: performance.now(), fps: 0, frameMs: 0, calls: 0, tris: 0 };
   const keys = new Set();
-  function wake() { if (!raf && !disposed) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  function wake() {
+    if (ambTimer) { clearTimeout(ambTimer); ambTimer = 0; }
+    if (!raf && !disposed) { last = performance.now(); raf = requestAnimationFrame(frame); }
+  }
+  // ambient animation (idle glow flicker, env bats/fog): materials with userData.ambient read the
+  // shared kit.ambient.time uniform. When nothing else is moving the board re-renders at a capped
+  // rate (ambientFps) only if the option is on, the tab is visible and something uses it.
+  let ambTimer = 0, ambientOn = o.ambientAnim !== false;
+  const ambUsers = { base: false, env: false };
+  const usesAmbient = obj => {
+    let f = false;
+    obj?.traverse(x => { if (!f && x.material) f = (Array.isArray(x.material) ? x.material : [x.material]).some(m => m.userData?.ambient); });
+    return f;
+  };
+  let envUpdate = null, envLast = 0;   // theme environment's optional update(dt, t) hook (visible env only)
+  function scanAmbient() { ambUsers.base = usesAmbient(boardObj) || usesAmbient(pieces?.group); ambUsers.env = !!envUpdate || usesAmbient(envObj); }
+  const ambientWanted = () => ambientOn && !disposed && !document.hidden && (ambUsers.base || (ambUsers.env && !!envObj?.visible));
+  const onVisibility = () => { if (!document.hidden) wake(); };
+  document.addEventListener('visibilitychange', onVisibility);
   function frame(now) {
     raf = 0;
     const t0 = performance.now();
@@ -113,13 +133,23 @@ export async function createBoard(container, opts = {}) {
     tags.update();
     if (envObj) envObj.visible = rig.cur.phi + rig.focusState.tilt * rig.focusState.f > envMinPhi;
     const anyLive = pieces && pieces.liveGroup.children.length > 0;
-    if (renderer.shadowMap.enabled && (shadowDirty || anyLive)) { renderer.shadowMap.needsUpdate = true; shadowDirty = false; }
+    // shadows: exact on any settle (shadowDirty); while pieces fly, refresh at most ~30 Hz (board-2 perf pass:
+    // the shadow pass re-draws every caster, the biggest per-frame GPU cost while animating)
+    if (renderer.shadowMap.enabled && (shadowDirty || (anyLive && now - lastShadow >= 30))) { renderer.shadowMap.needsUpdate = true; shadowDirty = false; lastShadow = now; }
+    if (ambientOn) {
+      kit.ambient.time.value = (now / 1000) % 3600;
+      if (envUpdate && envObj?.visible) {
+        const edt = Math.min(100, Math.max(0, now - (envLast || now))); envLast = now;
+        try { envUpdate(edt, now / 1000); } catch (e) { console.error('[board] env.update failed', e); envUpdate = null; }
+      } else envLast = 0;
+    }
     const tr = performance.now(); stat.js += tr - t0;
     renderer.render(scene, camera);
     stat.calls = renderer.info.render.calls; stat.tris = renderer.info.render.triangles;
     stat.cpu += performance.now() - t0; stat.frames++;
     if (now - stat.t0 > 1000) { stat.fps = stat.frames * 1000 / (now - stat.t0); stat.frameMs = stat.cpu / stat.frames; stat.jsMs = stat.js / stat.frames; stat.frames = 0; stat.cpu = 0; stat.js = 0; stat.t0 = now; }
     if (timelines.size || (fx && fx.active) || camMoving || anyLive || keys.size || drag) wake();
+    else if (ambientWanted()) ambTimer = setTimeout(() => { ambTimer = 0; wake(); }, Math.max(0, 1000 / (o.ambientFps || 24) - (performance.now() - t0)));
   }
 
   // ------------------------------------------------------------ sizing
@@ -186,6 +216,7 @@ export async function createBoard(container, opts = {}) {
     scene.background = env?.background ?? null;
     scene.fog = env?.fog ?? null;
     if (env?.object) { envObj = env.object; envMinPhi = env.minPhi ?? 0.12; scene.add(envObj); }
+    envUpdate = typeof env?.update === 'function' ? env.update : null; envLast = 0;
     // fx (needs the light to pulse)
     fx?.dispose();
     fx = kit.createFX(scene, { overlayEl: flashEl, flashLight: hemi });
@@ -205,6 +236,7 @@ export async function createBoard(container, opts = {}) {
       else renderer.compile(scene, camera);
     } catch {}
     warm.forEach(w => pieces.removeLive(w));
+    scanAmbient();
     shadowDirty = true; wake();
     emit('theme', { id: theme.id });
   }
@@ -213,6 +245,7 @@ export async function createBoard(container, opts = {}) {
     const b = theme.board?.build ? theme.board : fallbackTheme.board;
     boardObj = b.build(THREE, kit, { orientation, coordinates: o.coordinates });
     scene.add(boardObj);
+    if (pieces) scanAmbient();
     shadowDirty = true;
   }
 
@@ -566,7 +599,11 @@ export async function createBoard(container, opts = {}) {
       type: rec.type, color: rec.color, fromSq, toSq, speed: tl.rate, fx, scene, camera: camApi(tl), ...extra };
   }
   function pickAnim(list, type) {
-    const c = (list || []).filter(a => typeof a === 'function' && (!a.only || a.only.includes(type)));
+    let c = (list || []).filter(a => typeof a === 'function' && (!a.only || a.only.includes(type)));
+    if (o.forceAnim) {     // option forceAnim: 'label' (or function name) -> use that anim when it fits (gallery ?anim=)
+      const f = c.filter(a => a.label === o.forceAnim || a.name === o.forceAnim);
+      if (f.length) c = f;
+    }
     if (!c.length) return null;
     const total = c.reduce((s, a) => s + (a.weight ?? 1), 0);
     let r = Math.random() * total;
@@ -748,6 +785,9 @@ export async function createBoard(container, opts = {}) {
       if ('legalMoves' in p) o.legalMoves = p.legalMoves;
       if ('maxPixelRatio' in p) { o.maxPixelRatio = p.maxPixelRatio; resize(); }
       if ('labels' in p) { o.labels = p.labels !== false; tags.enabled = o.labels; if (!o.labels) tags.hide(); }
+      if ('ambientAnim' in p) { ambientOn = p.ambientAnim !== false; wake(); }   // idle flicker / env life (setting `ambientAnim`)
+      if ('ambientFps' in p) o.ambientFps = p.ambientFps;
+      if ('forceAnim' in p) o.forceAnim = p.forceAnim || null;
     },
     select(sq) { select(isSq(sq) ? sq : null); },
     skip,
@@ -788,7 +828,7 @@ export async function createBoard(container, opts = {}) {
     /** Force one render now (tests/screenshots). */
     render() { renderer.shadowMap.needsUpdate = true; rig.update(16); renderer.render(scene, camera); stat.calls = renderer.info.render.calls; stat.tris = renderer.info.render.triangles; },
     dispose() {
-      disposed = true; cancelAnimationFrame(raf); finishAll();
+      disposed = true; cancelAnimationFrame(raf); clearTimeout(ambTimer); document.removeEventListener('visibilitychange', onVisibility); finishAll();
       ro.disconnect(); window.removeEventListener('orientationchange', onWinResize);
       window.removeEventListener('keydown', onKeyDown); window.removeEventListener('keyup', onKeyUp); window.removeEventListener('blur', onBlur);
       fx?.dispose(); pieces?.dispose(); overlays?.dispose();

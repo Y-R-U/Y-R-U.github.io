@@ -9,9 +9,9 @@
 /**
  * Square colours. D28: the dark square sits clearly between the black pieces (violet-black /
  * purple) and the light squares in value, so black pieces read on it from overhead.
- * (Request to board: adopt this as kit.boardLooks.graveyard so contrast is tuned in one place.)
+ * Tuned in ONE place: kit.boardLooks.graveyard (board-2). This copy is only the fallback.
  */
-export const LOOK = {
+export let LOOK = {
   light: '#d8d1bf', lightShade: '#bdb39c', lichen: ['#cfc77e', '#d9a95c', '#b9c08a'], lightLabel: '#4d465c',
   dark: '#6a7182', darkShade: '#565b6c', moss: ['#4f6a3a', '#5f7c40', '#3e5a34'], darkLabel: '#ece3c9',
   grout: '#2b3226', glow: '#7dff6a',
@@ -155,6 +155,7 @@ function pumpkin(THREE, kit, r, { seg = 16 } = {}) {
 
 // ------------------------------------------------------------------ board
 export function build(THREE, kit, { orientation = 'w', coordinates = true } = {}) {
+  if (kit.boardLooks?.graveyard) LOOK = kit.boardLooks.graveyard;
   const g = new THREE.Group(); g.name = 'halloween-board';
   const S = 128, N = S * 8;
   const tex = kit.canvasTexture(N, N, (c) => {
@@ -258,7 +259,8 @@ export function build(THREE, kit, { orientation = 'w', coordinates = true } = {}
   props.forEach(q => q.dispose());
   propMesh.castShadow = true; propMesh.receiveShadow = true; propMesh.name = 'kerb';
   g.add(propMesh);
-  const flameMesh = new THREE.Mesh(kit.merge(flames), kit.material({ color: '#ffd27a', emissive: '#ffb02a', emissiveIntensity: 2.2, roughness: 1 }));
+  const flameMesh = new THREE.Mesh(kit.merge(flames), kit.material({ color: '#ffd27a', emissive: '#ffb02a', emissiveIntensity: 2.2, roughness: 1,
+    flicker: { mode: 'candle', amount: 0.42, speed: 1.1, spread: 1 } }));
   flames.forEach(q => q.dispose());
   flameMesh.name = 'flames';
   g.add(flameMesh);
@@ -266,52 +268,354 @@ export function build(THREE, kit, { orientation = 'w', coordinates = true } = {}
 }
 
 // ------------------------------------------------------------------ environment
-/** Moonlit hill around the board (tilted views only), indigo night, moon, cool + warm lights. */
+// Moonlit graveyard (board-2). The 3D views look steeply down (only a 2-5 degree strip shows above the
+// board), so the sky is a skybox-style backdrop pass: drawn after the opaque scene at the far plane
+// (only uncovered pixels shade), with its painted horizon pinned to the projected far rim of a small
+// ground plot. Moon, spire, manor and hills scale with however much sky is visible, so every view
+// gets the same composition. Bats, fireflies and mist are GPU-only (kit.ambient clock): no per-frame JS.
+const RIM = 7.0;                         // ground plot radius (the painted horizon sits on its far edge)
+const GROUND_Y = -0.36;
+const SKY = { top: '#090a22', mid: '#1b1546', low: '#43295f', haze: '#6b5a8e', ground: '#0e0c1b' };
+
+/** Tileable skyline strip: far hills, manor with lit windows, church spire, dead trees, near ridge. */
+function skylineTexture(kit) {
+  const W = 4096, H = 192;                // spans SKY_W band units across, SKY_H band units tall
+  return kit.canvasTexture(W, H, (c) => {
+    const X = u => (u / SKY_W + 0.5) * W, Y = v => H - (v / SKY_H) * H;     // band units -> px
+    const ridge = (u, k) => k.reduce((s, [a, p, ph]) => s + a * Math.sin((u / SKY_W) * Math.PI * 2 * p + ph), 0);
+    const fillRidge = (base, k, color) => {
+      c.fillStyle = color; c.beginPath(); c.moveTo(0, H);
+      for (let px = 0; px <= W; px += 8) { const u = (px / W - 0.5) * SKY_W; c.lineTo(px, Y(base + ridge(u, k))); }
+      c.lineTo(W, H); c.closePath(); c.fill();
+    };
+    // far hills (hazy violet), with the manor on a rise right of centre
+    fillRidge(0.17, [[0.05, 3, 0.4], [0.035, 7, 1.9], [0.02, 13, 0.3], [0.06, 1, 2.6]], '#2a2050');
+    const manor = (u0, v0, s) => {
+      const x = X(u0), y = Y(v0), k = (H / SKY_H) * s;
+      c.fillStyle = '#1a1536';
+      c.fillRect(x - 0.42 * k, y - 0.16 * k, 0.84 * k, 0.17 * k);            // main block
+      c.fillRect(x - 0.16 * k, y - 0.27 * k, 0.32 * k, 0.12 * k);            // centre hall
+      c.beginPath(); c.moveTo(x - 0.2 * k, y - 0.27 * k); c.lineTo(x, y - 0.38 * k); c.lineTo(x + 0.2 * k, y - 0.27 * k); c.fill();
+      for (const [dx, h] of [[-0.42, 0.36], [0.42, 0.3]]) {                 // corner towers + cones
+        c.fillRect(x + (dx - 0.06) * k, y - h * k, 0.12 * k, h * k);
+        c.beginPath(); c.moveTo(x + (dx - 0.08) * k, y - h * k); c.lineTo(x + dx * k, y - (h + 0.14) * k); c.lineTo(x + (dx + 0.08) * k, y - h * k); c.fill();
+      }
+      c.fillRect(x + 0.22 * k, y - 0.24 * k, 0.03 * k, 0.1 * k);            // chimney
+      c.fillStyle = '#ffb347';                                              // a few lit windows
+      for (const [dx, dy] of [[-0.3, 0.1], [-0.12, 0.1], [0.18, 0.1], [0.05, 0.21], [-0.42, 0.26]]) c.fillRect(x + dx * k - 0.012 * k, y - dy * k - 0.022 * k, 0.024 * k, 0.034 * k);
+    };
+    manor(2.1, 0.2, 0.62);
+    // church with a tall spire, left of centre (it stands in front of the moon's halo)
+    const church = (u0, v0, s) => {
+      const x = X(u0), y = Y(v0), k = (H / SKY_H) * s;
+      c.fillStyle = '#151230';
+      c.fillRect(x - 0.05 * k, y - 0.42 * k, 0.1 * k, 0.43 * k);             // tower
+      c.beginPath(); c.moveTo(x - 0.065 * k, y - 0.42 * k); c.lineTo(x, y - 0.78 * k); c.lineTo(x + 0.065 * k, y - 0.42 * k); c.fill();
+      c.fillRect(x - 0.004 * k, y - 0.88 * k, 0.008 * k, 0.11 * k);          // cross
+      c.fillRect(x - 0.025 * k, y - 0.85 * k, 0.05 * k, 0.008 * k);
+      c.fillRect(x + 0.04 * k, y - 0.16 * k, 0.3 * k, 0.17 * k);             // nave + roof
+      c.beginPath(); c.moveTo(x + 0.04 * k, y - 0.16 * k); c.lineTo(x + 0.19 * k, y - 0.25 * k); c.lineTo(x + 0.34 * k, y - 0.16 * k); c.fill();
+      c.fillStyle = '#ffc860'; c.fillRect(x - 0.012 * k, y - 0.3 * k, 0.024 * k, 0.05 * k);
+    };
+    church(-1.3, 0.15, 1);
+    // nearer ridge in the ground colour (it meets the plot's rim), with bare trees and grave markers
+    fillRidge(0.075, [[0.025, 5, 1.1], [0.015, 11, 0.2], [0.03, 2, 0.7]], SKY.ground);
+    const tree = (u0, s, seed) => {
+      let r = seed * 9301 + 49297; const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
+      const x = X(u0), y = Y(0.07), k = (H / SKY_H) * s;
+      c.strokeStyle = SKY.ground; c.lineCap = 'round';
+      const br = (px, py, a, len, w, d) => {
+        const ex = px + Math.sin(a) * len, ey = py - Math.cos(a) * len;
+        c.lineWidth = w; c.beginPath(); c.moveTo(px, py); c.quadraticCurveTo(px + Math.sin(a + 0.3) * len * 0.5, py - Math.cos(a + 0.3) * len * 0.5, ex, ey); c.stroke();
+        if (d > 0) for (let i = 0; i < 2 + (rnd() < 0.4); i++) br(ex, ey, a + (rnd() - 0.5) * 1.6, len * (0.55 + rnd() * 0.25), w * 0.62, d - 1);
+      };
+      br(x, y, (rnd() - 0.5) * 0.3, 0.16 * k, 0.03 * k, 4);
+    };
+    tree(-3.3, 1.1, 3); tree(0.55, 0.8, 7); tree(3.6, 1.25, 11); tree(-6.5, 0.9, 5); tree(6.8, 1.0, 13); tree(-9.5, 1.2, 17); tree(9.8, 0.9, 19);
+    c.fillStyle = SKY.ground;
+    for (const u of [-2.4, -2.2, -0.2, 1.1, 1.3, 4.6, -5.0, 5.4, 8.2, -8.0]) {      // tiny crosses and stones on the ridge
+      const x = X(u), y = Y(0.07), k = H / SKY_H;
+      if (Math.abs(u * 7) % 2 < 1) { c.fillRect(x - 0.006 * k, y - 0.07 * k, 0.012 * k, 0.07 * k); c.fillRect(x - 0.02 * k, y - 0.055 * k, 0.04 * k, 0.01 * k); }
+      else { c.beginPath(); c.arc(x, y - 0.03 * k, 0.018 * k, Math.PI, 0); c.fill(); c.fillRect(x - 0.018 * k, y - 0.03 * k, 0.036 * k, 0.03 * k); }
+    }
+  }, { repeat: true });
+}
+const SKY_W = 24, SKY_H = 1.0;          // skyline strip size in band units
+
+const SKY_VERT = `
+uniform mat4 uInvVP;
+varying vec3 vDir;
+void main() {
+  vec4 p = uInvVP * vec4(position.xy, 1.0, 1.0);
+  vDir = p.xyz / p.w - cameraPosition;
+  gl_Position = vec4(position.xy, 1.0, 1.0);          // far plane: only pixels nothing else covered
+}`;
+const SKY_FRAG = `
+uniform float uAmbT; uniform vec4 uView;   // x = camera yaw, y = rim elevation, z = band unit (rad)
+uniform sampler2D uSkyline;
+uniform vec3 cTop, cMid, cLow, cHaze, cGround;
+varying vec3 vDir;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+void main() {
+  vec3 d = normalize(vDir);
+  float el = asin(clamp(d.y, -1.0, 1.0));
+  float az = atan(d.x, d.z) - uView.x - 3.14159265;
+  az = atan(sin(az), cos(az));
+  vec2 p = vec2(az, el - uView.y) / uView.z;          // painting coords in band units, horizon at y = 0
+  // sky gradient: violet glow at the horizon up to deep indigo
+  vec3 col = mix(cLow, cMid, smoothstep(0.0, 0.9, p.y));
+  col = mix(col, cTop, smoothstep(0.8, 2.6, p.y));
+  // stars (twinkle on the ambient clock)
+  vec2 g = floor(p * 9.0); float h = hash(g);
+  if (h > 0.965 && p.y > 0.35) {
+    vec2 f = fract(p * 9.0) - 0.5 - (vec2(hash(g + 3.1), hash(g + 7.7)) - 0.5) * 0.6;
+    float tw = 0.65 + 0.35 * sin(uAmbT * (1.5 + h * 3.0) + h * 40.0);
+    col += vec3(0.85, 0.85, 1.0) * smoothstep(0.09, 0.0, length(f)) * tw * smoothstep(0.35, 1.0, p.y) * (h - 0.965) * 22.0;
+  }
+  // the moon: big soft disc, faint craters, wide lavender halo
+  vec2 mc = vec2(-1.55, 0.62); float mr = 0.3;
+  float md = length(p - mc);
+  col += vec3(0.55, 0.5, 0.85) * 0.5 * exp(-max(md - mr, 0.0) * 2.2) + vec3(0.9, 0.85, 1.0) * 0.18 * exp(-max(md - mr, 0.0) * 9.0);
+  vec2 mq = (p - mc) / mr;
+  float crater = 0.08 * smoothstep(0.32, 0.18, length(mq - vec2(-0.25, 0.2))) + 0.06 * smoothstep(0.22, 0.1, length(mq - vec2(0.3, -0.15)))
+               + 0.05 * smoothstep(0.18, 0.06, length(mq - vec2(0.05, -0.45)));
+  vec3 moon = vec3(1.0, 0.97, 0.88) * (0.92 - crater - 0.12 * smoothstep(0.3, 1.0, length(mq - vec2(-0.3, 0.3))));
+  col = mix(col, moon, smoothstep(mr + 0.012, mr - 0.012, md));
+  // hazy band hugging the horizon (hides the seam with the 3D ground)
+  col = mix(col, cHaze, 0.55 * exp(-abs(p.y - 0.03) * 9.0));
+  // skyline silhouettes (alpha strip), then plain ground below the horizon
+  vec4 s = p.y >= 0.0 && p.y <= ${SKY_H.toFixed(2)} ? texture2D(uSkyline, vec2(p.x / ${SKY_W.toFixed(1)} + 0.5, p.y / ${SKY_H.toFixed(2)})) : vec4(0.0);
+  col = mix(col, s.rgb, s.a);
+  col = mix(col, cGround, smoothstep(0.0, -0.03, p.y));
+  col = mix(col, cHaze, 0.35 * exp(-abs(p.y) * 14.0) * step(p.y, 0.0));
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+function skyBackdrop(THREE, kit) {
+  const C3 = h => new THREE.Color(h);  // raw sRGB values: this shader writes straight to the canvas
+  const cc = h => { const c = C3(h); c.convertLinearToSRGB?.(); return c; };
+  const u = {
+    uAmbT: kit.ambient.time, uView: { value: new THREE.Vector4(0, -0.5, 0.06, 0) }, uInvVP: { value: new THREE.Matrix4() },
+    uSkyline: { value: skylineTexture(kit) },
+    cTop: { value: C3(SKY.top) }, cMid: { value: C3(SKY.mid) }, cLow: { value: C3(SKY.low) }, cHaze: { value: C3(SKY.haze) }, cGround: { value: C3(SKY.ground) },
+  };
+  // THREE.Color(hex) stores linear values; the shader writes raw, so convert back to sRGB
+  for (const k of ['cTop', 'cMid', 'cLow', 'cHaze', 'cGround']) u[k].value = cc(new THREE.Color(SKY[{ cTop: 'top', cMid: 'mid', cLow: 'low', cHaze: 'haze', cGround: 'ground' }[k]]));
+  u.uSkyline.value.colorSpace = THREE.NoColorSpace;
+  const mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: SKY_VERT, fragmentShader: SKY_FRAG, depthWrite: false, depthTest: true, depthFunc: THREE.LessEqualDepth, fog: false });
+  mat.userData.ambient = true;
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat);
+  mesh.frustumCulled = false; mesh.renderOrder = 1e6; mesh.name = 'sky';
+  const _f = new THREE.Vector3(), _top = new THREE.Vector3();
+  mesh.onBeforeRender = (r, s, cam) => {
+    u.uInvVP.value.multiplyMatrices(cam.matrixWorld, cam.projectionMatrixInverse);
+    const cp = cam.position, hd = Math.hypot(cp.x, cp.z) || 1e-3;
+    const yaw = Math.atan2(cp.x, cp.z);
+    const rimEl = Math.atan2(GROUND_Y + 0.05 - cp.y, hd + RIM);
+    cam.getWorldDirection(_f);
+    const topEl = Math.asin(THREE.MathUtils.clamp(_f.y, -1, 1)) + THREE.MathUtils.degToRad(cam.fov / 2);
+    const band = THREE.MathUtils.clamp((topEl - rimEl) * 0.95, 0.036, 0.09);  // one band unit = the visible sky strip
+    u.uView.value.set(yaw, rimEl, band, 0);
+  };
+  return mesh;
+}
+
+/** GPU bats: one mesh, each bat flaps and loops on its own path above the far side of the plot. */
+function bats(THREE, kit, n = 7) {
+  const pos = [], prm = [], wing = [];
+  const shape = [[0, 0, 0.06], [-0.05, 0.0, 0.02], [0.05, 0.0, 0.02],              // body (head toward +z)
+    [-0.03, 0, 0.03], [-0.2, 0.02, 0.0], [-0.04, 0, -0.04], [-0.2, 0.02, 0.0], [-0.16, 0, -0.06], [-0.04, 0, -0.04],
+    [0.03, 0, 0.03], [0.04, 0, -0.04], [0.2, 0.02, 0.0], [0.2, 0.02, 0.0], [0.04, 0, -0.04], [0.16, 0, -0.06]];
+  let r = 5;
+  const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < n; i++) {
+    const p = [rnd() * 6.28, 0.8 + rnd() * 2.2, 0.3 + rnd() * 0.3, 1.0 + rnd() * 1.1];   // phase, loop radius, speed, height
+    const s = 1.1 + rnd() * 0.6;
+    for (const v of shape) { pos.push(v[0] * s, v[1] * s, v[2] * s); prm.push(...p); wing.push(Math.abs(v[0]) * s); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('aBat', new THREE.Float32BufferAttribute(prm, 4));
+  g.setAttribute('aWing', new THREE.Float32BufferAttribute(wing, 1));
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { uAmbT: kit.ambient.time },
+    vertexShader: `uniform float uAmbT; attribute vec4 aBat; attribute float aWing;
+      void main() {
+        float t = uAmbT * aBat.z + aBat.x;
+        // a lazy loop behind the board as seen from the camera (either side), low enough to cross the sky band
+        vec2 bk = -normalize(cameraPosition.xz + vec2(1e-4, 0.0)); vec2 rt = vec2(-bk.y, bk.x);
+        vec2 l = vec2(sin(t) * (2.6 + aBat.y), cos(t) * aBat.y * 0.6);
+        vec2 dl = vec2(cos(t) * (2.6 + aBat.y), -sin(t) * aBat.y * 0.6);
+        vec3 c = vec3(rt * l.x + bk * (5.2 + l.y), 0.0); c = vec3(c.x, aBat.w + sin(t * 2.0) * 0.25, c.y);
+        vec2 vw = rt * dl.x + bk * dl.y;
+        float yaw = atan(vw.x, vw.y);
+        vec3 p = position;
+        p.y += sin(uAmbT * 13.0 + aBat.x * 7.0) * aWing * 0.9;              // flap
+        p.xz = mat2(cos(yaw), -sin(yaw), sin(yaw), cos(yaw)) * p.xz;
+        gl_Position = projectionMatrix * viewMatrix * vec4(c + p, 1.0);
+      }`,
+    fragmentShader: 'void main() { gl_FragColor = vec4(0.045, 0.035, 0.07, 1.0); }',
+    side: THREE.DoubleSide, fog: false,
+  });
+  mat.userData.ambient = true;
+  const m = new THREE.Mesh(g, mat); m.frustumCulled = false; m.name = 'bats';
+  return m;
+}
+
+/** GPU fireflies / will-o'-wisps: soft additive points drifting over the plot. */
+function fireflies(THREE, kit, n = 34) {
+  const pos = [], seed = [];
+  let r = 21;
+  const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < n; i++) {
+    const a = rnd() * Math.PI * 2, d = 4.9 + rnd() * 1.9;
+    pos.push(Math.sin(a) * d, GROUND_Y + 0.15 + rnd() * 0.9, Math.cos(a) * d); seed.push(rnd());
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('aSeed', new THREE.Float32BufferAttribute(seed, 1));
+  const u = { uAmbT: kit.ambient.time, uScale: { value: 600 } };
+  const mat = new THREE.ShaderMaterial({
+    uniforms: u, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
+    vertexShader: `uniform float uAmbT; uniform float uScale; attribute float aSeed; varying float vA; varying float vG;
+      void main() {
+        float t = uAmbT * (0.35 + aSeed * 0.3) + aSeed * 50.0;
+        vec3 p = position + vec3(sin(t) * 0.35, sin(t * 1.7) * 0.15, cos(t * 0.8) * 0.35);
+        vec4 mv = modelViewMatrix * vec4(p, 1.0);
+        vA = smoothstep(0.2, 1.0, sin(uAmbT * (0.9 + aSeed) + aSeed * 30.0) * 0.5 + 0.5);
+        vG = step(0.6, aSeed);
+        gl_PointSize = uScale * 0.06 / -mv.z;
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `varying float vA; varying float vG;
+      void main() { float d = length(gl_PointCoord - 0.5) * 2.0; float a = (smoothstep(1.0, 0.0, d) * 0.5 + smoothstep(0.35, 0.0, d)) * vA;
+        gl_FragColor = vec4(mix(vec3(1.0, 0.78, 0.3), vec3(0.62, 1.0, 0.45), vG) * a, a); }`,
+  });
+  mat.userData.ambient = true;
+  const pts = new THREE.Points(g, mat); pts.frustumCulled = false; pts.name = 'fireflies';
+  pts.onBeforeRender = (rnd2) => { u.uScale.value = rnd2.getDrawingBufferSize(_dbs).y; };
+  return pts;
+}
+let _dbs = null;
+
+/** Low mist: instanced camera-facing cards (one draw call), drifting on the ambient clock. */
+function mist(THREE, kit, n = 14) {
+  const g = new THREE.PlaneGeometry(1, 1);
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { uAmbT: kit.ambient.time, uColor: { value: new THREE.Color('#9a94c8') } },
+    transparent: true, depthWrite: false, fog: false,
+    vertexShader: `uniform float uAmbT; varying vec2 vUv; varying float vK;
+      void main() {
+        vec3 c = (instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+        float sx = length(instanceMatrix[0].xyz), sy = length(instanceMatrix[1].xyz);
+        float ph = c.x * 1.3 + c.z * 0.7;
+        c.x += sin(uAmbT * 0.06 + ph) * 0.7; c.z += cos(uAmbT * 0.05 + ph) * 0.4;
+        vec4 mv = viewMatrix * vec4(c, 1.0);
+        mv.xy += position.xy * vec2(sx, sy);
+        vUv = uv; vK = 0.75 + 0.25 * sin(uAmbT * 0.2 + ph * 2.0);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `uniform vec3 uColor; varying vec2 vUv; varying float vK;
+      void main() { vec2 q = (vUv - 0.5) * 2.0; float a = pow(max(0.0, 1.0 - dot(q, q)), 2.0) * 0.26 * vK; gl_FragColor = vec4(uColor, a); }`,
+  });
+  mat.userData.ambient = true;
+  const im = new THREE.InstancedMesh(g, mat, n);
+  const m = new THREE.Matrix4();
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2 + R(-0.15, 0.15), d = R(5.4, 7.2), w = R(3.2, 5.5);
+    m.makeScale(w, w * R(0.22, 0.32), 1).setPosition(Math.sin(a) * d, GROUND_Y + R(0.15, 0.45), Math.cos(a) * d);
+    im.setMatrixAt(i, m);
+  }
+  im.frustumCulled = false; im.renderOrder = 10; im.name = 'mist';
+  return im;
+}
+
+/**
+ * Ground material whose far edge is a STRAIGHT line across the screen (a line on the ground at RIM
+ * behind the board, perpendicular to the view), fading into the painted horizon colour, so the
+ * 3D plot and the sky backdrop meet seamlessly in any view or orientation.
+ */
+function horizonMaterial(THREE) {
+  const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0, envMapIntensity: 0.25 });
+  const rim = new THREE.Color(SKY.ground);
+  m.onBeforeCompile = sh => {
+    sh.uniforms.uRimCol = { value: rim };
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vEnvW;')
+      .replace('#include <project_vertex>', '#include <project_vertex>\nvEnvW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vEnvW; uniform vec3 uRimCol;')
+      .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
+        vec2 envBk = -normalize(cameraPosition.xz + vec2(1e-4, 0.0));
+        float envD = dot(vEnvW.xz, envBk);
+        if (envD > ${RIM.toFixed(2)}) discard;`)
+      .replace('#include <tonemapping_fragment>', `float envF = smoothstep(${(RIM - 2.2).toFixed(2)}, ${RIM.toFixed(2)}, envD);
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, uRimCol, envF * envF);
+        #include <tonemapping_fragment>`);
+  };
+  m.customProgramCacheKey = () => 'gambit-hw-horizon';
+  return m;
+}
+
+/** Moonlit graveyard around the board (tilted views only). */
 export function environment(THREE, kit) {
+  _dbs = new THREE.Vector2();
   const root = new THREE.Group(); root.name = 'halloween-env';
   rng = 101;
-  // rolling ground: flat under the board, rising into a low hill behind it
-  const ground = new THREE.PlaneGeometry(60, 60, 56, 56).rotateX(-Math.PI / 2);
-  const gp = ground.attributes.position;
-  for (let i = 0; i < gp.count; i++) {
-    const x = gp.getX(i), z = gp.getZ(i), r = Math.hypot(x, z);
-    const rise = Math.max(0, r - 6.5);
-    let y = -0.42 + rise * rise * 0.035 * (1 + 0.6 * Math.sin(Math.atan2(x, z) * 2 + 1)) + 0.25 * noise2(x * 0.3, z * 0.3) * Math.min(1, rise);
-    if (z < -6) y += (z + 6) * (z + 6) * 0.03;                      // the hill behind the board
-    gp.setY(i, y);
+  // the plot: a gently uneven disc that darkens into the horizon colour at its rim
+  const ground = new THREE.CircleGeometry(RIM + 0.3, 72, 0, Math.PI * 2);
+  const gr = [];
+  { // ring subdivide: rebuild as a polar grid so the rim fade has vertices to work with
+    const rings = 18, seg = 72, pos = [], idx = [];
+    for (let i = 0; i <= rings; i++) for (let j = 0; j < seg; j++) {
+      const rr = i <= 12 ? (RIM + 0.6) * Math.pow(i / 12, 0.8) : (RIM + 0.6) * Math.pow(4, (i - 12) / 6), a = (j / seg) * Math.PI * 2;
+      pos.push(Math.sin(a) * rr, 0, Math.cos(a) * rr);
+    }
+    for (let i = 0; i < rings; i++) for (let j = 0; j < seg; j++) {
+      const a = i * seg + j, b = i * seg + (j + 1) % seg, c = (i + 1) * seg + j, d = (i + 1) * seg + (j + 1) % seg;
+      idx.push(a, c, b, b, c, d);
+    }
+    ground.dispose();
+    gr.push(new THREE.BufferGeometry());
+    gr[0].setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); gr[0].setIndex(idx);
   }
-  ground.computeVertexNormals();
-  const g0 = C(THREE, '#1c2a24'), g1 = C(THREE, '#2c3d2e'), dirt = C(THREE, '#2e2620');
-  colorAll(kit, ground, (x, y, z) => {
-    const n = noise2(x * 0.7, z * 0.7), r = Math.hypot(x, z);
-    const t = Math.min(1, Math.max(0, n));
-    const c = [g0[0] + (g1[0] - g0[0]) * t, g0[1] + (g1[1] - g0[1]) * t, g0[2] + (g1[2] - g0[2]) * t];
-    const d = r < 5.6 ? 1 : r < 7 ? (7 - r) / 1.4 : 0;               // trodden earth around the plot
-    return [c[0] + (dirt[0] - c[0]) * d, c[1] + (dirt[1] - c[1]) * d, c[2] + (dirt[2] - c[2]) * d];
+  const plot = gr[0], pp = plot.attributes.position;
+  for (let i = 0; i < pp.count; i++) {
+    const x = pp.getX(i), z = pp.getZ(i), r = Math.hypot(x, z);
+    pp.setY(i, GROUND_Y + (r > 4.8 ? 0.12 * kit.noise3(x * 0.6, 0, z * 0.6) * Math.min(1, (r - 4.8) / 1.2) : 0));
+  }
+  plot.computeVertexNormals();
+  const grass = kit.rgb('#2b3340'), grass2 = kit.rgb('#36423f'), earth = kit.rgb('#2a2430'), rimC = kit.rgb('#0a0914'), lit = kit.rgb('#4a5368');
+  kit.colorize(plot, (x, y, z) => {
+    const r = Math.hypot(x, z), n = kit.noise3(x * 0.9, 1.7, z * 0.9);
+    let c = [0, 1, 2].map(k => grass[k] + (grass2[k] - grass[k]) * n);
+    const near = r < 5.0 ? 1 : r < 5.8 ? (5.8 - r) / 0.8 : 0;                          // trodden earth by the kerb
+    c = c.map((v, k) => v + (earth[k] - v) * near * 0.7);
+    const moon = Math.max(0, (-x * 0.6 - z * 0.8) / r) * (r > 4.6 ? 0.45 : 0);           // moonlit side (behind-left)
+    c = c.map((v, k) => v + (lit[k] - v) * moon * n);
+    return c;                                // the fade into the horizon is in the shader (camera-relative)
   });
-  const env = [ground];
-  // scattered headstones and pumpkins around the plot
+  const env = [plot];
+  // headstones and pumpkins in the ring between the kerb and the rim
   const spots = [];
-  for (let i = 0; i < 26; i++) {
-    const a = R(0, Math.PI * 2), r = R(5.8, 13);
-    const x = Math.sin(a) * r, z = Math.cos(a) * r;
-    if (Math.abs(x) < 6.2 && Math.abs(z) < 6.2) continue;
-    spots.push([x, z, a]);
+  for (let i = 0; i < 40 && spots.length < 22; i++) {
+    const a = R(0, Math.PI * 2), d = R(5.0, 6.6);
+    const x = Math.sin(a) * d, z = Math.cos(a) * d;
+    if (Math.abs(x) < 4.9 && Math.abs(z) < 4.9) continue;
+    if (spots.some(([u, v]) => Math.hypot(u - x, v - z) < 0.9)) continue;
+    spots.push([x, z]);
   }
-  const groundY = (x, z) => { const r = Math.hypot(x, z), rise = Math.max(0, r - 6.5); let y = -0.42 + rise * rise * 0.035 * (1 + 0.6 * Math.sin(Math.atan2(x, z) * 2 + 1)) + 0.25 * noise2(x * 0.3, z * 0.3) * Math.min(1, rise); if (z < -6) y += (z + 6) * (z + 6) * 0.03; return y; };
   spots.forEach(([x, z], i) => {
-    if (i % 3 === 2) { const p = pumpkin(THREE, kit, R(0.16, 0.3), { seg: 14 }); p.rotateY(R(0, 6)); p.translate(x, groundY(x, z) - 0.03, z); env.push(p); }
+    if (i % 4 === 3) { const p = pumpkin(THREE, kit, R(0.12, 0.2), { seg: 12 }); p.rotateY(R(0, 6)); p.translate(x, GROUND_Y - 0.02, z); env.push(p); }
     else {
-      const s = R(1.6, 2.6);
-      const t = tombstone(THREE, kit, 0.24 * s, 0.34 * s, 0.07 * s, { cross: i % 5 === 0, tint: i % 2 ? '#8a857c' : '#77736d' });
-      t.rotateX(R(-0.18, 0.12)); t.rotateZ(R(-0.12, 0.12)); t.rotateY(Math.atan2(-x, -z) + R(-0.4, 0.4));
-      t.translate(x, groundY(x, z) - 0.05, z); env.push(t);
+      const s = R(1.1, 1.7);
+      const t = tombstone(THREE, kit, 0.24 * s, 0.34 * s, 0.07 * s, { cross: i % 5 === 0, tint: i % 2 ? '#7d7d8c' : '#6c6b7a' });
+      t.rotateX(R(-0.2, 0.12)); t.rotateZ(R(-0.15, 0.15)); t.rotateY(Math.atan2(-x, -z) + R(-0.4, 0.4));
+      t.translate(x, GROUND_Y - 0.04, z); env.push(t);
     }
   });
-  // crooked bare trees
-  const bark = C(THREE, '#241c1c');
+  // gnarled dead trees near the rim: near-black silhouettes that rise into the sky band
+  const bark = kit.rgb('#0d0b14'), barkHi = kit.rgb('#1b1826');
   const branch = (out, p, dir, len, r, depth) => {
-    const seg = kit.cylinder(r * 0.65, r, len, 5);
+    const seg = kit.cylinder(r * 0.62, r, len, 5);
     seg.translate(0, len / 2, 0);
     seg.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir));
     seg.translate(p.x, p.y, p.z); out.push(seg);
@@ -319,56 +623,34 @@ export function environment(THREE, kit) {
     if (depth <= 0) return;
     const kids = depth > 2 ? 2 : 2 + (rand() < 0.5 ? 1 : 0);
     for (let k = 0; k < kids; k++) {
-      const d = dir.clone().add(new THREE.Vector3(R(-0.9, 0.9), R(-0.1, 0.5), R(-0.9, 0.9))).normalize();
-      branch(out, end, d, len * R(0.55, 0.8), r * 0.62, depth - 1);
+      const d = dir.clone().add(new THREE.Vector3(R(-1.0, 1.0), R(-0.25, 0.35), R(-1.0, 1.0))).normalize();
+      branch(out, end, d, len * R(0.55, 0.78), r * 0.6, depth - 1);
     }
   };
-  for (const [x, z, h] of [[-8.5, -9, 3.2], [9.5, -7.5, 2.6], [-11, 4, 2.4], [7, -12.5, 3.6]]) {
-    const segs = []; rng = Math.floor(x * 100 + z);
-    branch(segs, new THREE.Vector3(x, groundY(x, z) - 0.1, z), new THREE.Vector3(R(-0.2, 0.2), 1, R(-0.2, 0.2)).normalize(), h * 0.45, 0.16, 4);
+  // on the flanks only, so they never stand between the locked cameras (either side) and the board
+  for (const [a, d, h] of [[1.45, 6.5, 3.0], [1.95, 6.4, 2.3], [1.05, 6.3, 1.8], [-1.55, 6.4, 2.7], [-2.05, 6.6, 2.0], [-1.1, 6.2, 2.2]]) {
+    const x = Math.sin(a) * d, z = Math.cos(a) * d;
+    const segs = []; rng = Math.floor(a * 1000 + 7);
+    branch(segs, new THREE.Vector3(x, GROUND_Y - 0.05, z), new THREE.Vector3(R(-0.25, 0.25), 1, R(-0.25, 0.25)).normalize(), h * 0.42, 0.13, 4);
     const t = kit.merge(segs); segs.forEach(q => q.dispose());
-    colorAll(kit, t, () => bark); env.push(t);
+    kit.colorize(t, (px, py, pz) => (((px - x) * -0.6 + (pz - z) * -0.8) > 0.05 ? barkHi : bark));
+    env.push(t);
   }
-  const mesh = new THREE.Mesh(kit.merge(env), kit.material({ color: '#ffffff', roughness: 0.9, metalness: 0, envMapIntensity: 0.4 }));
+  const mesh = new THREE.Mesh(kit.merge(env), horizonMaterial(THREE));
   env.forEach(q => q.dispose());
   mesh.receiveShadow = false; mesh.castShadow = false; mesh.name = 'graveyard';
-  root.add(mesh);
-  // low fog cards drifting over the hill (soft alpha sprites, one material)
-  const fogTex = kit.canvasTexture(128, 64, (c, w, h) => {
-    const gr = c.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
-    gr.addColorStop(0, 'rgba(200,205,235,0.55)'); gr.addColorStop(1, 'rgba(200,205,235,0)');
-    c.fillStyle = gr; c.fillRect(0, 0, w, h);
-  });
-  const fogMat = new THREE.SpriteMaterial({ map: fogTex, transparent: true, depthWrite: false, opacity: 0.5, fog: false });
-  for (let i = 0; i < 9; i++) {
-    const a = (i / 9) * Math.PI * 2 + R(-0.2, 0.2), r = R(7.5, 12);
-    const s = new THREE.Sprite(fogMat); s.scale.set(R(7, 11), R(1.3, 2), 1);
-    s.position.set(Math.sin(a) * r, groundY(Math.sin(a) * r, Math.cos(a) * r) + 0.4, Math.cos(a) * r);
-    root.add(s);
-  }
-  // the moon
-  const moonTex = kit.canvasTexture(256, 256, (c, w) => {
-    const gr = c.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
-    gr.addColorStop(0, 'rgba(255,250,225,1)'); gr.addColorStop(0.32, 'rgba(250,244,215,1)'); gr.addColorStop(0.36, 'rgba(220,225,255,0.35)'); gr.addColorStop(1, 'rgba(160,170,255,0)');
-    c.fillStyle = gr; c.fillRect(0, 0, w, w);
-    c.fillStyle = 'rgba(190,180,160,0.35)';
-    for (const [x, y, r] of [[0.44, 0.42, 0.05], [0.56, 0.55, 0.035], [0.47, 0.6, 0.025], [0.58, 0.4, 0.02]]) { c.beginPath(); c.arc(x * w, y * w, r * w, 0, Math.PI * 2); c.fill(); }
-  });
-  const moon = new THREE.Sprite(new THREE.SpriteMaterial({ map: moonTex, transparent: true, depthWrite: false, fog: false }));
-  moon.scale.set(9, 9, 1); moon.position.set(-14, 13, -30);
-  root.add(moon);
+  root.add(mesh, skyBackdrop(THREE, kit), mist(THREE, kit), bats(THREE, kit), fireflies(THREE, kit));
 
-  // lights: warm key (keeps the pieces' colours true), cool moon rim, indigo sky fill
+  // lights: warm key (keeps the pieces' colours true), cool moon rim from behind-left, indigo sky fill
   const lights = new THREE.Group(); lights.name = 'lights';
-  const hemi = new THREE.HemisphereLight('#d9d6ff', '#2a2230', 0.6);
-  const key = new THREE.DirectionalLight('#fff0dc', 2.1); key.position.set(-3.2, 11, 4.5); key.castShadow = true;
-  const moonL = new THREE.DirectionalLight('#9fb2ff', 0.55); moonL.position.set(-8, 7, -12);
+  const hemi = new THREE.HemisphereLight('#c9c6ff', '#241c30', 0.55);
+  const key = new THREE.DirectionalLight('#fff0dc', 2.0); key.position.set(-3.2, 11, 4.5); key.castShadow = true;
+  const moonL = new THREE.DirectionalLight('#a8b8ff', 0.75); moonL.position.set(-7, 6, -12);
   lights.add(hemi, key, key.target, moonL);
 
   return {
     object: root, minPhi: 0.12, lights,
-    background: new THREE.Color('#120f20'),
-    fog: new THREE.Fog('#161227', 22, 60),
+    background: new THREE.Color('#0e0c1b'),
     envScene: kit.studioEnvironment({ top: '#1a1726', horizon: '#3c3448', floor: '#0c0a10', warm: '#ffdcae', cool: '#c4ccff' }),
   };
 }

@@ -28,5 +28,5 @@ export default {
     let t = 0, g = 0.6, gap = 0.16;
     for (let i = 0; i < 5; i++) { placeHit(s, { t, kind: 'marble', g, pitch: 1.05 + i * 0.05, ring: 1.5, pan: 0.1 * i }); t += gap; gap *= 0.62; g *= 0.6; }
   } },
-  music: { file: 'classic', loop: 64, xfade: 3.2 },
+  music: { file: 'classic', loop: 51.2, xfade: 4.8 },   // 16 bars @ 75 bpm + 1.5-bar crossfade
 };

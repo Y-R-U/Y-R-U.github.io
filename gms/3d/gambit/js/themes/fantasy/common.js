@@ -115,5 +115,7 @@ export function plinth(THREE, kit, color, { R = 0.36, H = 0.13, seg = 32 } = {})
 
 /** Build the final piece Group (one mesh, one material) from a list of prepared geometries. */
 export function assemble(kit, color, geoms) {
+  // sculpting aid: ?FANTASY_PARTS in the viewer logs triangles per part (largest first)
+  if (globalThis.FANTASY_PARTS) globalThis.FANTASY_PARTS.push(geoms.map((g, i) => [i, (g.index ? g.index.count : g.attributes.position.count) / 3]).sort((a, b) => b[1] - a[1]));
   return kit.piece(geoms, pieceMat(kit, color));
 }

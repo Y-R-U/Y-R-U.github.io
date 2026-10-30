@@ -54,6 +54,7 @@ export const DEFAULT_SETTINGS = {
   volume: 0.8, music: false, musicVolume: 0.5,   // audio agent: effects volume, ambient music (off by default)
   moveConfirm: false,
   coords: true,
+  ambientAnim: true,       // idle flicker / environment life on the board (board-2 reads it via setOptions)
   view: 'top',             // 'top' | 'tilt' | 'angle' | 'free' (legacy 'default' = 'tilt'); board agent 2026-10-31
   lastTc: '10+0',
   lastColor: 'random',

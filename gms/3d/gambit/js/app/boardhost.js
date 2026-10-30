@@ -20,7 +20,7 @@
 // Only one lease is live: acquiring revokes the previous one (its onRevoke runs).
 // The board is created with the current settings (theme, coords, view) on first use.
 import { deps } from './deps.js';
-import { getSettings } from './store.js';
+import { getSettings, onSettings } from './store.js';
 import { attachBoard } from './sound.js';   // audio: lets move sounds land with the animation
 
 let host = null, boardP = null, board = null, current = null;
@@ -30,7 +30,7 @@ function ensure() {
   if (!host) { host = document.createElement('div'); host.className = 'board-host'; }
   if (!boardP) {
     const s = getSettings();
-    boardP = deps.board.createBoard(host, { theme: s.theme, coords: s.coords, view: s.view, animSpeed: s.battleSpeed, interactive: null })
+    boardP = deps.board.createBoard(host, { theme: s.theme, coords: s.coords, view: s.view, animSpeed: s.battleSpeed, interactive: null, ambientAnim: s.ambientAnim !== false })
       .then(b => { board = b; attachBoard(b); return b; })
       .catch(e => { boardP = null; throw e; });
   }
@@ -85,6 +85,11 @@ export function acquire(container, opts = {}) {
   lease.ready = boardP.then(b => { if (!live) return null; reset(b, opts); return b; });
   return lease;
 }
+
+// Board-wide settings that no single screen owns: follow them for every screen (qa / ui-3).
+onSettings((s, patch) => {
+  if (board && patch && 'ambientAnim' in patch) board.setOptions?.({ ambientAnim: s.ambientAnim !== false });
+});
 
 /** The shared board if it exists (tests / devtools). */
 export function sharedBoard() { return board; }

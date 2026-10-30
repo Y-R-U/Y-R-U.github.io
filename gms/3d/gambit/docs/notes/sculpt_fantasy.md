@@ -101,3 +101,69 @@
 ## Requests
 - Board/manager: none blocking. If the board ever exposes a way to force a move anim by label in
   the gallery playground (`?anim=march`), anim review would be easier than stubbing Math.random.
+
+---
+
+# sculptor-fantasy-3 — round 3: Queen + King, move anims, island environment
+
+## Done
+- **Queen "Sorceress"** (`queen.js`) — layered gown: side-colour underskirt panel with a gold band,
+  ivory/ebony overskirt split open at the front (inverted V) with gold edges, floor-length mantle
+  (side colour, deep folds, gold border + hem, pale lining on the cut edge), puffed sleeves, bell
+  cuffs, hair locks, scalloped fan collar with gold ribs, sceptre (ring + glowing gem), a glowing orb
+  in a gold armillary ring hovering over her left palm. **Coronet**: jewelled band, side-colour cap,
+  8 flaring gold points tipped with **pearls** + a gold circlet through the tips, and a centre
+  finial with a gem — the dotted circle from above (pearls, not gems, so they read on the
+  blue/red mantle). Top ≈ 1.19. **5,990 tris, 1 mesh/material.** `YAW = 0.55` toward the owner.
+- **King "High King"** (`king.js`) — armoured king, both gauntlets on the pommel of a great sword
+  planted point-down; cuirass with a soft-edged side-colour tabard panel + gold ridge, layered
+  pauldrons, elbow cops, greaves + sabatons, split surcoat with gold hem, thick **ermine collar**
+  (pale ring from above — the black king's best read on dark squares), long cloak with gold edges,
+  pale lining and an ermine hem with black tail tufts, bearded head, arched crown (band with gems,
+  fleurons with pearls, velvet cap, two arches). **The monde + 3D cross is NOT yawed** with the
+  figure, so its arms lie on the board axes = a clean "+" from overhead (arms 0.19 wide). Gold
+  cross on white, light steel on black. Top 1.42 (tallest). **7,824 tris, 1 mesh/material.**
+- `drape.js`: indexed cloth shells (gown layers, mantles, cloaks): a closed (r,y) section swept
+  round the back, per-height front opening (warped angles), radial folds, end caps, and a painter
+  that gets exact row/column ids — so gold borders are crisp narrow bands (extra narrow edge
+  columns / band rows via `rows()`), not vertex-colour blotches. Far cheaper than SDF for big
+  smooth cloth; SDF stays for bodies/arms/heads.
+- **Move anims** (`anims.js`): `glide` (queens): lift, one full twirl across with a mantle flare
+  (x/z swell), sparkle trail, ring + sparkles on landing — 40+210+55+35 ms. `stride` (kings):
+  2 heavy strides (3 when castling) leaning in, cloak swish (yaw sway reversing each stride), dust
+  per footfall, stamp + faint gold ring — 260(285)+50 ms. End-to-end via `board.applyMove` in
+  headless: queen ~480 ms, king ~385–400 ms vs Classic hop 368–450 ms on the same moves.
+- **Environment** (`board.js`, registered as `board: { environment }` — squares + frame still
+  fall back to Classic so D28 contrast is untouched): floating stone island — flagstone deck
+  (one canvas texture), gold-trimmed rounded-square edge, block wall, craggy underside with a
+  grassy lip and hanging moss, **4 blue rune medallions** at the deck corners, **4 braziers**
+  (stone pedestal, gold bowl, additive flame cards), **4 banners** on gold poles (blue on white's
+  side, red on black's, gold border + crowned-shield emblem), small trees/bushes at the corners,
+  3 waterfalls off the rim, **10 distant floating islands** (cliffs, strata, trees, 3 with
+  castles), a cloud sea below + far cloud banks, vertex-colour sky dome, light fog. Hidden below
+  minPhi 0.12 → **Top view: 18 draw calls (unchanged)**; Tilt/3D/Free: 30 draw calls, env ≈ 24k
+  tris. Nothing casts shadows, nothing animates per frame. Background colour for Top = dusk blue.
+- `tools/sculpt_fantasy_view.html`: `&ty=<y>` sets the look-at height (face close-ups).
+
+## How to test
+- Close-ups: `tools/sculpt_fantasy_view.html?piece=q,k&view=angle`, faces `&view=side&noyaw=1&az=200&dist=1.4&ty=0.95`.
+- Gallery: `tools/board_gallery.html?theme=fantasy&view=all`, phone contrast FEN (MODEL_GUIDE §5).
+- Environment: `&mode=play&view=angle`, or Free then `G.boards[0].camera.orbit(0.6,0.6); G.boards[0].camera.zoom(3)` for the whole island.
+- Anims: playground + `Math.random=()=>0.999` (glide/stride are last in the list).
+
+## Honest scores
+- Queen ~7/10: regal silhouette, layered gown + pearl coronet read well at angle; face is a plain
+  egg (no features at this cell size), stomacher edge is soft. From Top at 360 px the coronet is
+  small (~15 px): readable as a pearl ring with zoom, but the mantle colour does most of the work.
+- King ~7.5/10: strong statue pose, ermine + cross read great; arms are a bit tube-like and the
+  white king's face/beard are low-contrast ivory-on-ivory.
+- Environment ~7/10 first pass: the diorama reads as the ref's floating island; trees/bushes are
+  toy-like low-poly, distant islands are simple, no animated fire/water.
+- Note: on Top the tall q/k tops shift toward the board edge by camera parallax (ranks 1/8); not
+  fixable in the model.
+
+## Requests
+- Board: optional per-frame hook for environments (`env.update(dt)`) so flames / waterfalls / clouds
+  could drift cheaply — only while tilted, only when the board is already rendering.
+- Manager: a fantasy-specific board build (squares with gold inlay like the ref) could follow; I
+  left the Classic squares on purpose to keep D28 contrast tuned in one place.

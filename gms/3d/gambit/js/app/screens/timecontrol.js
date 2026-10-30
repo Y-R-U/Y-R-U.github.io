@@ -3,7 +3,7 @@ import { h, esc, icon, avatar, segmented, bindSegmented } from '../ui.js';
 import { getSettings, setSettings, getStats, getResume, clearResume } from '../store.js';
 import { TIME_CONTROLS, parseTc } from '../clock.js';
 import { previewPoints } from '../ladder.js';
-import { isLocked, getBench } from './bots.js';
+import { isLocked, getBench, thinkLabel } from './bots.js';
 import { startNewGame } from './game.js';
 import { confirmDialog } from '../ui.js';
 
@@ -20,7 +20,7 @@ export function render(app, { botId }) {
     <div class="tc-bot card">
       ${avatar(bot.avatar, { size: 'xl', label: bot.name, hue: botHue(bot) })}
       <div><h2>${esc(bot.name)} <span class="elo">${bot.elo}</span></h2><p>${esc(bot.blurb || '')}</p>
-      ${rec ? `<span class="rec"><i class="good">${rec.w}W</i> <i>${rec.d}D</i> <i class="bad">${rec.l}L</i></span>` : ''}</div>
+      <div class="tc-meta">${rec ? `<span class="rec"><i class="good">${rec.w}W</i> <i>${rec.d}D</i> <i class="bad">${rec.l}L</i></span>` : ''}${thinkLabel(app.deps.bots, bot) ? `<span class="think">${icon('clock')}${thinkLabel(app.deps.bots, bot)}</span>` : ''}</div></div>
     </div>
     <div class="pts-row">
       <div><small>Win</small><b class="good">+${pts.win}</b></div>

@@ -14,12 +14,13 @@ export default {
   id: 'fantasy', name: 'Fantasy', tags: ['figurines'],
   board: {
     build(THREE, kit, { orientation, coordinates }) -> Object3D,   // playing surface top at y = 0
-    environment?(THREE, kit) -> { object?, minPhi?, background?, fog?, lights?, envScene?, envIntensity?, roomEnvironment? },
+    environment?(THREE, kit) -> { object?, minPhi?, background?, fog?, lights?, envScene?, envIntensity?, roomEnvironment?, update?(dt, t) },
     lightRig?(THREE, kit) -> Group,                                 // ignored if environment returns lights
     overlayStyle?: { lastMove, select, hint, hover, dot },          // highlight colours
   },
   pieces: { p, n, b, r, q, k: (THREE, kit, { color, type }) -> Object3D,
-            facing?: { w: yaw, b: yaw } },                           // default: knights face the player's left
+            facing?: { w?: yaw, b?: yaw,                             // theme-wide (default: sideways, the knight look)
+                       byType?: { p: 'player', b: 'player', q: 0.55, ... } } },   // per type, see §2
   names?: { p, n, b, r, q, k },  // optional piece names for the tap/hover name tag, e.g. {b: 'Wizard'}
                                  // shown as "Wizard" with "Bishop" underneath; omit for plain chess names
   moveAnims: [ fn, ... ],        // ctx => Promise, picked at random
@@ -36,6 +37,19 @@ export default {
   Keep the same order (king tallest, pawn shortest); a figurine theme may scale all up ≤ 1.4.
 - **Author the knight (and any piece with a face) looking toward -z.** The board rotates
   white pieces +90° (face screen-left) and black -90°. Bake no yaw into the model itself.
+- **Per-type facing** (board-2): `pieces.facing.byType[type]` overrides that yaw for one type.
+  (It is a separate `byType` key because `facing.b` already means "black".) Values:
+  - `'side'` — the theme-wide yaw (default; the knight's sideways look),
+  - `'player'` — face the piece's own player (white toward +z, black toward -z); good for faces,
+  - `'opponent'` — face the other side (the classic "marching forward" look),
+  - a number — extra yaw added to the side yaw; **positive turns toward the owner** (0.55 ≈ a 3/4 view),
+  - `{ w, b }` — absolute yaws per side.
+  Example (Halloween): `facing: { byType: { p: 'player', b: 'player', q: 'player', k: 'player' } }`.
+  Anims are unaffected: they move the outer group; the yaw lives on the inner group.
+- **Switching over a baked yaw** (e.g. sci-fi `pawn.js` turns its head/arms by `YAW = 0.55`): delete the
+  `rotateY(YAW)` on the parts and add `facing: { byType: { p: 0.55 } }` to the theme's `pieces`. The
+  result is identical except the WHOLE figure turns (plinth included, invisible on a round plinth);
+  turning only the head stays a modelling choice, so keep the bake if that is what you want.
 
 ## 3. Budgets (mid-range phone, 60 fps)
 | | per piece | notes |
@@ -83,8 +97,42 @@ Convention (Aaron's refs): **white = ivory/gold + blue accents, black = black/ch
 `kit.place(g,{x,y,z,rx,ry,rz,s,sx,sy,sz})`; `kit.tint(g,color)`, `kit.paint(g,(x,y,z)=>mult)`,
 `kit.carve(g,{normal,offset,width,depth,darken,where})`; `kit.merge([...])`; `kit.piece([{geom,mat}...])`;
 `kit.stats(obj)` → {tris, meshes}. Materials: `kit.material({...})` is cached — call it freely.
+More shared helpers (board-2, adopted from the sculptors' local copies — those copies may stay):
+`kit.colorize(g, (x,y,z) => rgb|hex|null)` (absolute colour, unlike `paint`'s multiply), `kit.noise3(x,y,z)`
+(smooth value noise 0..1), `kit.rgb(hex)` → linear [r,g,b], `kit.deform(g, (x,y,z) => [x,y,z])` (welds
+non-indexed input first so it shades smooth — fixes the "faceted after merge" gotcha),
+`kit.loft(spine, sec, {rings, segs, color})` (elliptical tube along a y-z spine: necks, tails, skulls),
+`kit.flameTongue({len, rad, curl, flat, wob, colors:[base, mid, tip]})`, `kit.refine(g, maxEdge)` +
+`kit.wrapDecal(g, {theta, y0, R(theta,y), lift, d})` (carved faces/windows on curved surfaces),
+`kit.hsLathe(pts, {seg, flat, closed, caps, phiStart, phiLength, finish})` (hard-surface lathe with crisp
+creases; pts `[r, y, finish, smooth?]`, finish `{c, glow, metal}` or a key resolved by `finish(key)`),
+`kit.fixWinding(g)`.
 All kit materials use vertex colours; geometries without a colour attribute get white automatically.
 Board textures: `kit.canvasTexture(w,h,draw)`, `kit.drawWood`, `kit.drawMarble`.
+
+## 6b. Glow, per-vertex finishes and idle flicker (board-2)
+**One material per side with per-vertex metal/glow** (the fantasy/sci-fi trick, now shared):
+`kit.vertexMaterial({roughness, metalRough, rim, glow = 2, dimGlow = 0.8, sheenMask = true, flicker})`
+(or `kit.vertexMaterial('w'|'b')` for palette defaults). Vertex data drives it: `color` = albedo,
+`uv.x` = glow amount (emissive = colour × glow × `glow` gain), `uv.y` = metal amount. Fill it with
+`kit.vertexFinish(g, colour, {glow, metal})` and `kit.paintFinish(g, (x,y,z) => rgb | {c, glow, metal})`
+(three's primitives ship real UVs that would read as glow/metal, so run every part through one of them;
+`kit.hsLathe` does it for you). `dimGlow` darkens the lit albedo of glowing parts so neon stays
+saturated; `sheenMask` limits the rim's overhead "top sheen" to bright non-glowing surfaces (wells and
+grooves stay dark from above). A whole piece is then 1 draw call per kind.
+
+**Idle flicker** — one shared clock (`kit.ambient.time`), so it never breaks instancing:
+- emissive materials: `kit.material({..., emissive, flicker: 'candle' | 'pulse' | 'slow' | {mode, amount, speed, spread}})`,
+  or `kit.addFlicker(myMaterial, opts)` for one you built yourself;
+- vertex materials: `kit.vertexMaterial({..., flicker: 'pulse'})` animates only the glow channel.
+`candle` = irregular flicker, `pulse` = smooth breathing (sci-fi light-lines), `slow` = a slow pulse.
+Each piece/object gets its own phase from its position (no lockstep rows of lanterns); `spread: 1` also
+varies it per vertex, for many flames merged into ONE mesh (board candles). Your own ShaderMaterials
+can use the clock too: put `uAmbT: kit.ambient.time` in their uniforms and set `material.userData.ambient = true`.
+Cost: while anything visible uses it, the board re-renders at a capped **~20 fps** when nothing else
+moves (no shadow updates); never while the setting **Ambient animation** (`ambientAnim`) is off or the
+tab is hidden. Static boards with no flicker stay at 0 fps at rest. Keep glow sparing: it is a
+full-scene re-render, not a free effect.
 
 ## 7. Animations
 Rules:
@@ -127,9 +175,24 @@ Helpers: `kit.focusFight(ctx, async () => {...}, {zoom, tilt})` (camera moves in
   (Color or Texture) and `fog` apply to the scene; leave background unset for a transparent canvas.
   `envScene` is a THREE.Scene baked into reflections once (default `kit.studioEnvironment()`; set
   `roomEnvironment: true` for three's RoomEnvironment). Keep its zenith dim or glossy boards glare.
+- `update(dt, t)` (optional, board-2): called once per rendered frame **only while the environment is
+  visible** (camera tilted past `minPhi`), only while `ambientAnim` is on, never in a hidden tab. It runs
+  at the ambient cap (~20 fps) when nothing else moves, at full rate during animations; `dt` is ms since
+  its previous call (≤ 100), `t` seconds. Use it for brazier flames, waterfalls, drifting clouds. Prefer
+  shader-driven motion on `kit.ambient.time` (zero JS per frame) for anything that can be expressed that
+  way; keep `update` to a few matrix/uniform writes (no allocation, no geometry rebuilds).
+- Square colours live in `kit.boardLooks.<name>` (`marble` = Classic, `graveyard` = Halloween) so D28
+  contrast is tuned in one place.
+- The views look steeply down: even "3D" shows only a 2–5° strip above the board, so a literal sky is
+  never seen. Halloween's trick (board.js `skyBackdrop`): a full-screen pass drawn after the opaque scene
+  at the far plane (only uncovered pixels pay), whose painted horizon is pinned each frame to the
+  projected far rim of the ground plot, and whose moon/skyline scale with the visible strip. The ground
+  shader cuts its far edge as a straight line across the screen so the two meet seamlessly.
 
 ## 9. Testing
-Gallery: `?theme=<id>&mode=lineup|turntable|play&view=all|top|default|angle`. Lineup shows every piece
+Gallery: `?theme=<id>&mode=lineup|turntable|play&view=all|top|default|angle`; in the playground
+`&anim=<label or function name>` forces that move/battle anim whenever it fits the piece (the labels are
+listed under the board) and `&ambient=0` turns idle flicker off. Lineup shows every piece
 on both square colours; Turntable spins it; Playground plays random legal moves with speed Off/1/2/5
 and demo buttons for castling, en passant and promotion. Stats under the board show draw calls,
 triangles and tris per piece. Screenshot at 360×740 and 1440×900 and look at Top view first.
@@ -138,3 +201,19 @@ triangles and tris per piece. Screenshot at 360×740 and 1440×900 and look at T
 Tapping a piece (or hovering it with a mouse) shows a small name tag over its head. By default it
 says the chess name; give your theme `names: {p:'Squire', n:'Dragon Knight', b:'Wizard', …}` and the
 tag shows your name with the chess name underneath. Keep names short (≤ 14 characters).
+
+## 11. Sounds (audio agent — details in docs/notes/audio.md)
+**Battle anims**: `import { sfx } from '../../audio/index.js';` then, at the moment it happens in
+your timeline (after the `await ctx.wait()/tween()` that leads there, never setTimeout):
+`sfx('clash', { ctx, at: ctx.victimPos })`. Passing `ctx` gives battle-speed scaling (1×/2×/5×,
+online cap) and skip handling (a tapped-through battle stops its sounds instead of dumping
+them). `at` (Vector3 / 'e4') pans subtly. Optional `delay` (s), `gain`.
+Names every theme can use: swing clash hit thud knock stone topple slide stomp poof · zap
+sparkle thunder fire explosion laser roar · bats wail creak pop hex · whoosh
+(aliases: sword, magic, flame, boom, bat, ghost, grave, pumpkin, fall, shove…). If a battle
+plays any sfx the default capture clack is skipped; if it plays none, the clack plays at the end.
+**Theme sounds**: add `js/themes/<id>/sounds.js` and ONE line in index.js:
+`sounds: () => import('./sounds.js'),`. It exports recipes `{dur, lvl, variants?, punch?, build(s, v)}`
+built with `js/audio/dsp.js` helpers (copy `classic/sounds.js`), overriding any core or battle
+name (move, capture, castle, check, promote, clash…), plus optional
+`music: {file, loop, xfade}` for `assets/audio/music/<file>.{ogg,m4a}`. Levels are normalised for you.

@@ -4,6 +4,10 @@
 //  - maglev:     the bastion lifts a hair off the deck on mag-lev, slides with a lagging
 //                lean and a light trail of side-coloured sparks, and clamps down with a
 //                ring pulse.                                                           (rooks)
+//  - jumpJet:    the strider crouches, fires its jump-jets and leaps in an arc with a thruster
+//                trail, then lands with a stomp ring and a spark skid.                   (knights)
+//  - phaseBlink: the oracle collapses into a column of light, streaks along the diagonal and
+//                re-forms out of a particle burst.                                       (bishops)
 // Unbuilt piece types use Classic's hop / slide.
 import { hop, slide } from '../classic/anims.js';
 import { PAL } from './common.js';
@@ -96,4 +100,89 @@ export async function maglev(ctx) {
 }
 maglev.only = ['r']; maglev.weight = 5; maglev.label = 'mag-lev slide';
 
-export const moveAnims = [hop, slide, hoverGlide, maglev];
+/**
+ * Strider jump-jet leap: crouch (45) -> launch flare + arc leap with a thruster trail (200–215)
+ * -> landing stomp: ring, ground-hugging spark skid, squash (60) ≈ 305–320 ms.
+ */
+export async function jumpJet(ctx) {
+  const { kit, piece, from, to, fx, color, THREE } = ctx;
+  const dir = kit.flatDir(from, to), p = piece.position, pal = PAL[color] || PAL.w, cols = pal.spark;
+  const span = kit.flatDist(from, to), H = Math.min(0.85, 0.5 + span * 0.1);
+  await ctx.tween(45, e => { piece.scale.set(1 + 0.06 * e, 1 - 0.12 * e, 1 + 0.06 * e); kit.setLean(piece, dir, -0.08 * e); }, kit.ease.quadOut);
+  // launch: jet wash blown out across the deck + a short plume under the hull + a ring
+  fx?.burst({ pos: from.clone().setY(from.y + 0.08), count: 16, colors: cols, speed: [1.0, 2.0], flat: 0.85, up: 0.05, spread: 1,
+    life: [160, 280], size: [0.08, 0.14], sizeEnd: 0.4, drag: 3, shape: 0, alpha: 0.85 });
+  fx?.burst({ pos: from.clone().setY(from.y + 0.42), count: 8, colors: pal.trail, speed: [0.6, 1.2], dir: new THREE.Vector3(0, -1, 0), spread: 0.3,
+    life: [120, 200], size: [0.1, 0.15], sizeEnd: 0.5, drag: 2.5, shape: 0 });
+  fx?.ring?.(from, { radius: 0.5, color: cols[2], ms: 200 });
+  let trail = 0;
+  const q = new THREE.Vector3();
+  await ctx.tween(Math.min(215, 190 + span * 8), (e, k) => {
+    kit.arc(p, from, to, H, e);
+    const s = 1 + 0.08 * Math.sin(Math.min(1, k * 4) * PI * 0.5) * (1 - k);
+    piece.scale.set(1 / Math.sqrt(s), s, 1 / Math.sqrt(s));
+    kit.setLean(piece, dir, -0.22 + 0.5 * e);               // nose up on the climb, down on the drop
+    // thruster trail: evenly spaced glowing puffs under the hull while climbing
+    if (ctx.tl?.instant) trail = e;
+    while (trail + 0.06 <= Math.min(e, 0.7)) {
+      trail += 0.06;
+      kit.arc(q, from, to, H, trail); q.y += 0.42;
+      fx?.burst({ pos: q, count: 2, colors: pal.trail, speed: [0.3, 0.9], dir: new THREE.Vector3(0, -1, 0), spread: 0.35,
+        life: [150, 260], size: [0.1, 0.15], sizeEnd: 0.6, drag: 3, shape: 0, alpha: 0.7 });
+    }
+  }, kit.ease.sineInOut);
+  p.copy(to); kit.setLean(piece, dir, 0); piece.scale.set(1, 1, 1);
+  // stomp
+  fx?.ring?.(to, { radius: 0.72, color: cols[2], ms: 260, thick: true });
+  fx?.ring?.(to, { radius: 0.55, dark: true, ms: 220, alpha: 0.35 });
+  fx?.burst({ pos: to.clone().setY(0.05), count: 14, colors: cols, speed: [1.2, 2.4], flat: 0.9, up: 0.05, spread: 1, life: [140, 260],
+    size: [0.03, 0.06], sizeEnd: 0.1, drag: 3, shape: 1 });
+  ctx.camera?.shake?.(0.02, 90);
+  await kit.squash(ctx, piece, 0.14, 60);
+}
+jumpJet.only = ['n']; jumpJet.weight = 5; jumpJet.label = 'jump-jet leap';
+
+/**
+ * Psi Oracle phase-blink: collapse into a column of light shedding particles (85) -> a streak
+ * of light races along the diagonal (110–140) -> re-form out of a particle burst with a
+ * slight overshoot (95) ≈ 290–320 ms.
+ */
+export async function phaseBlink(ctx) {
+  const { kit, piece, from, to, fx, color, THREE } = ctx;
+  const p = piece.position, pal = PAL[color] || PAL.w, cols = pal.spark, dir = kit.flatDir(from, to);
+  const span = kit.flatDist(from, to);
+  const mote = (pos, n, o = {}) => fx?.burst({ pos, count: n, colors: cols, speed: o.speed || [0.4, 1.3], up: o.up ?? 0.5, spread: 1,
+    life: o.life || [200, 360], size: [0.04, 0.08], sizeEnd: 0.2, drag: 2.2, gravity: -0.6, shape: 2, jitter: 0.12 });
+  fx?.ring?.(from, { radius: 0.45, color: cols[2], ms: 200 });
+  mote(from.clone().setY(from.y + 0.45), 16);
+  await ctx.tween(85, e => {
+    const w = 1 - 0.9 * e;
+    piece.scale.set(w, 1 + 0.35 * e, w);
+  }, kit.ease.cubicIn);
+  fx?.flash?.(from.clone().setY(from.y + 0.5), { color: cols[1], radius: 0.5, ms: 140 });
+  piece.scale.set(0.02, 0.02, 0.02);
+  let done = 0;
+  const q = new THREE.Vector3();
+  await ctx.tween(Math.min(140, 100 + span * 6), (e) => {
+    p.lerpVectors(from, to, e);
+    if (ctx.tl?.instant) done = e * span;
+    while (done + 0.1 <= e * span) {
+      done += 0.1;
+      q.copy(from).addScaledVector(dir, done); q.y = from.y + 0.5;
+      fx?.burst({ pos: q, count: 1, colors: pal.trail, speed: [0.02, 0.1], spread: 1, life: [140, 240], size: [0.1, 0.14], sizeEnd: 0.1, drag: 3, shape: 2, alpha: 0.9 });
+    }
+  }, kit.ease.sineInOut);
+  p.copy(to);
+  fx?.flash?.(to.clone().setY(to.y + 0.5), { color: cols[1], radius: 0.55, ms: 160 });
+  mote(to.clone().setY(to.y + 0.4), 14, { speed: [0.6, 1.4], up: 0.2 });
+  fx?.ring?.(to, { radius: 0.55, color: cols[2], ms: 240 });
+  await ctx.tween(95, (e) => {
+    const w = 0.1 + 0.9 * e + 0.08 * Math.sin(e * PI);
+    const h = 1.35 - 0.35 * e;
+    piece.scale.set(w, h, w);
+  }, kit.ease.quadOut);
+  piece.scale.set(1, 1, 1); p.copy(to);
+}
+phaseBlink.only = ['b']; phaseBlink.weight = 5; phaseBlink.label = 'phase blink';
+
+export const moveAnims = [hop, slide, hoverGlide, maglev, jumpJet, phaseBlink];

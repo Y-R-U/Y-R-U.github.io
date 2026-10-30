@@ -1,4 +1,4 @@
-// battle-1 test harness: headless Chrome over raw CDP.
+// battle-1 test harness (battle-2: BT.raw(true) measures un-normalised battle lengths): headless Chrome over raw CDP.
 //   ~/.claude/bin/cdp start --port 9519 -- --use-angle=metal --use-gl=angle --ignore-gpu-blocklist
 //   CDP_PORT=9519 node tools/battle_cdp.mjs <outDir> <spec.json | JSON>
 // spec: [{name, url?, w, h, mobile?, wait?, eval?, evalWait?, shot?}] — like board_cdp.mjs, plus:
@@ -75,7 +75,8 @@ window.BT = (() => {
     frames.sort((a, b) => b - a);
     return { before, after: stats(), times, worstFrameMs: Math.round(worst), p99: Math.round(frames[Math.floor(frames.length * 0.01)] || 0), frames: frames.length, picks };
   }
-  return { battle, done, stats, stress, board };
+  function raw(on = true) { globalThis.__BATTLE_RAW = on; return on; }
+  return { battle, done, stats, stress, board, raw };
 })();
 'injected'`;
 

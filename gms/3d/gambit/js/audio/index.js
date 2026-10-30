@@ -24,7 +24,7 @@ const REF_LOUD = -15;                       // dBFS (50 ms RMS window, crude K-w
 let ctx = null, sfxBus = null, musicBus = null, limiter = null;
 let unlocked = false;
 const vol = () => { const s = getSettings(); const v = s.volume ?? 0.8; return Math.max(0, Math.min(1, v)) ** 2; };
-const musicVol = () => { const s = getSettings(); const v = s.musicVolume ?? 0.5; return Math.max(0, Math.min(1, v)) ** 2 * 0.6; };
+const musicVol = () => { const s = getSettings(); const v = s.musicVolume ?? 0.5; return Math.max(0, Math.min(1, v)) ** 1.5 * 0.85; };   // files are -18 LUFS; default 0.5 -> -10 dB under the SFX; 0.85 = crossfade headroom
 const soundOn = () => getSettings().sound !== false;
 
 // ---------------------------------------------------------------- context + unlock

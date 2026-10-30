@@ -106,7 +106,13 @@ export function promotionPicker(stage, { color = 'w', to = null, board = null } 
     let pt = null;
     try { if (to && board && board.squareToScreen) pt = board.squareToScreen(to); } catch { pt = null; }
     const done = v => { o.remove(); resolve(v); };
+    // The picker opens inside the board's pointerup. On touch the browser then synthesizes the
+    // tap's click AT THE SAME POINT, which would land on this scrim and cancel at once (qa).
+    // Only clicks whose pointerdown started inside the picker count.
+    let downIn = false;
+    o.addEventListener('pointerdown', () => { downIn = true; });
     o.addEventListener('click', e => {
+      if (!downIn) return;
       const b = e.target.closest('[data-p]');
       if (b) done(b.dataset.p || null);
       else if (e.target === o) done(null);

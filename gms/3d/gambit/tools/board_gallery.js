@@ -1,8 +1,10 @@
 // GAMBIT board gallery: lineup (pieces on both square colours, any view, side by side),
 // turntable, and a playground that plays random legal moves to watch move/battle anims.
 // URL: ?theme=classic&view=top|default|angle|all&mode=lineup|turntable|play&auto=1&speed=1
+//      &anim=<label|fn name>  force that move/battle anim whenever it fits the piece (labels listed under the board)
+//      &ambient=0             turn the idle glow flicker / environment life off
 import { createBoard } from '../js/board/board.js';
-import { themeIds } from '../js/themes/index.js';
+import { themeIds, loadTheme } from '../js/themes/index.js';
 
 const Q = new URLSearchParams(location.search);
 const state = {
@@ -22,7 +24,7 @@ const $ = s => document.querySelector(s);
 const themeSel = $('#theme');
 for (const id of themeIds()) themeSel.add(new Option(id, id));
 themeSel.value = state.theme;
-themeSel.onchange = () => { state.theme = themeSel.value; boards.forEach(b => b.setTheme(state.theme)); syncUrl(); };
+themeSel.onchange = () => { state.theme = themeSel.value; loadTheme(state.theme).then(t => { G.theme = t; }); boards.forEach(b => b.setTheme(state.theme)); syncUrl(); };
 document.querySelectorAll('#modes button').forEach(b => b.onclick = () => { state.mode = b.dataset.mode; syncUrl(); render(); });
 document.querySelectorAll('#views button').forEach(b => b.onclick = () => {
   state.view = b.dataset.view; syncUrl();
@@ -42,6 +44,7 @@ function clear() { while (boards.length) boards.pop().dispose(); $('#main').inne
 
 async function render() {
   clear(); marks();
+  loadTheme(state.theme).then(t => { G.theme = t; });
   const main = $('#main');
   if (state.mode === 'lineup') {
     const views = state.view === 'all' ? ['top', 'tilt', 'angle'] : [state.view];
@@ -81,6 +84,7 @@ async function playground(main) {
   const host = main.querySelector('.host');
   const b = await createBoard(host, {
     theme: state.theme, view: state.view === 'all' ? 'top' : state.view, interactive: 'both', animSpeed: state.speed,
+    forceAnim: Q.get('anim') || null, ambientAnim: Q.get('ambient') !== '0',
     legalMoves: sq => chess.moves({ square: sq, verbose: true }).map(m => m.to),
   });
   boards.push(b);
@@ -139,7 +143,9 @@ function showStats() {
     const el = $('#stats'); if (!el || !boards.length) return;
     const s = boards[0].stats();
     const pieces = Object.entries(s.pieces || {}).filter(([k]) => k[0] === 'w').map(([k, v]) => `${k[1]}:${v.tris}`).join(' ');
-    el.textContent = `draw calls ${s.drawCalls} · tris ${s.triangles} · frame CPU ${s.frameMs} ms · fps ${s.fps} · dpr ${s.pixelRatio}\ntris/piece ${pieces}`;
+    const th = G.theme;
+    const labels = th ? ['moveAnims', 'battleAnims'].map(k => (th[k] || []).map(a => a.label || a.name).filter(Boolean).join(', ')).join(' | ') : '';
+    el.textContent = `anims (?anim=): ${labels}${Q.get('anim') ? `  [forced: ${Q.get('anim')}]` : ''}\ndraw calls ${s.drawCalls} · tris ${s.triangles} · frame CPU ${s.frameMs} ms · fps ${s.fps} · dpr ${s.pixelRatio}\ntris/piece ${pieces}`;
   }, 500);
 }
 

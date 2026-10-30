@@ -30,5 +30,5 @@ export default {
     s.noise({ dur: 0.22, g: 0.18, type: 'bandpass', f: 3800, f2: 1300, Q: 2, to: r });
     [0, 7, 12].forEach((n, i) => s.bell({ t: 0.12 + i * 0.05, f: NOTE(81 + n), ratio: 2.01, index: 0.6, dur: 0.6, g: 0.06, pan: -0.3 + i * 0.3, to: r }));
   } },
-  music: { file: 'fantasy', loop: 60, xfade: 3.3 },
+  music: { file: 'fantasy', loop: 60, xfade: 5 },   // 18 bars @ 72 bpm + 1.5-bar crossfade
 };

@@ -8,7 +8,7 @@
 import { promotionPicker, h, $, $$, esc, icon, avatar, toast, confirmDialog, openSheet, fmtInt } from '../ui.js';
 import { getSettings, setSettings, onSettings, getResume, setResume, clearResume, getLadder } from '../store.js';
 import { GameClock, fmtClock, parseTc } from '../clock.js';
-import { recordGame, playerRank } from '../ladder.js';
+import { recordGame, playerRank, previewPoints } from '../ladder.js';
 import { play, playMove } from '../sound.js';
 import { settingsPanel } from './settings.js';
 import { installedThemes } from '../themes-meta.js';
@@ -225,7 +225,11 @@ function nextTurn() {
   const turn = G.chess.turn();
   // D6: the side to move's clock only starts once the previous animation is done.
   // White's very first move is untimed (as on most sites).
-  if (G.chess.history().length >= 1) G.clock.start(turn);
+  if (G.chess.history().length >= 1) {
+    // tab hidden (bot game clocks pause): start this side's clock when the player comes back (qa)
+    if (document.visibilityState === 'hidden') G.pausedColor = turn;
+    else G.clock.start(turn);
+  }
   renderBars();
   if (turn === G.botColor) botTurn(); else setInteractive();
 }
@@ -321,7 +325,7 @@ function showResults() {
     </div>
     <div class="res-vs">
       <div>${avatar('lion', { label: 'You', size: 'md' })}<b>You</b></div>
-      <span class="score">${g.result.result.replace('1/2-1/2', '½–½').replace('-', '–')}</span>
+      <span class="score">${youVsBot(g)}</span>
       <div>${avatar(g.bot.avatar, { label: g.bot.name, size: 'md', hue: botHue(g.bot) })}<b>${esc(g.bot.name)}</b></div>
     </div>
     ${r ? `<div class="res-pts">
@@ -343,6 +347,13 @@ function showResults() {
     if (a.dataset.act === 'rematch') rematch();
     if (a.dataset.act === 'newbot') app.go('#/play/bot');
   });
+}
+
+// Score in the sheet's left→right order (You | bot), not White–Black: "0–1" when the bot won as White (qa).
+function youVsBot(g) {
+  const o = g.result.outcome;
+  if (g.result.reason === 'abort') return '–';
+  return o === 'win' ? '1–0' : o === 'loss' ? '0–1' : '½–½';
 }
 
 function rematch() {
@@ -475,7 +486,8 @@ function pickPromotion(color, to = null) {
   const stage = view && view.querySelector('.board-square');
   if (!stage || !G) return Promise.resolve('q');
   G.pending = true; setInteractive();
-  return promotionPicker(stage, { color, to, board }).then(p => { if (G) G.pending = false; return p; });
+  // restore interactivity on cancel too, or the board stays locked for the rest of the game (qa)
+  return promotionPicker(stage, { color, to, board }).then(p => { if (G) { G.pending = false; setInteractive(); } return p; });
 }
 
 function askConfirm(m) {
@@ -487,8 +499,11 @@ function askConfirm(m) {
     const o = h(`<div class="confirm-bar"><span>Play <b>${esc(m.san)}</b>?</span>
       <button class="btn btn-ghost btn-sm" data-c="0" aria-label="Cancel">${icon('x')}</button>
       <button class="btn btn-primary btn-sm" data-c="1" aria-label="Confirm">${icon('check')} Play</button></div>`);
+    // ignore the click synthesized from the tap that opened the bar (touch: it lands on ✕ / Play) (qa)
+    let downIn = false;
+    o.addEventListener('pointerdown', () => { downIn = true; });
     o.addEventListener('click', e => {
-      const b = e.target.closest('[data-c]'); if (!b) return;
+      const b = downIn && e.target.closest('[data-c]'); if (!b) return;
       o.remove();
       if (G) { G.pending = false; syncHighlights(); setInteractive(); }
       resolve(b.dataset.c === '1');
@@ -549,10 +564,22 @@ function renderMoves() {
   const ol = view.querySelector('.moves');
   let html = movesHtml(hist);
   if (G.over && G.result) html += `<li class="res"><span>${G.result.result.replace('1/2-1/2', '½–½')}</span></li>`;
-  ol.innerHTML = html || `<li class="empty">${G.color === 'b' ? `${esc(G.bot.name)} plays white…` : 'Your move — good luck!'}${G.bot.blurb ? `<q>${esc(G.bot.blurb)}</q>` : ''}</li>`;
+  ol.innerHTML = html || introHtml();
   const wrap = view.querySelector('.moves-wrap');
   if (review.on) review.sync();
   else requestAnimationFrame(() => { wrap.scrollLeft = wrap.scrollWidth; wrap.scrollTop = wrap.scrollHeight; review.sync(); });
+}
+
+// Before the first move the move box shows a centred intro card (qa / ui-3): who moves,
+// the bot's blurb and what a win is worth. CSS trims it to the title on short strips.
+function introHtml() {
+  const tc = G.tcInfo.unlimited ? 'No clock' : G.tcInfo.label;
+  const win = previewPoints(G.bot.elo).win;
+  return `<li class="empty intro">
+    <b class="intro-title">${G.color === 'b' ? `${esc(G.bot.name)} plays White…` : 'Your move — good luck!'}</b>
+    ${G.bot.blurb ? `<q>${esc(G.bot.blurb)}</q>` : ''}
+    <small class="intro-meta"><span class="kdot ${G.color}"></span><span>You play ${G.color === 'w' ? 'White' : 'Black'} · ${esc(tc)} · Win <b>+${fmtInt(win)}</b></span></small>
+  </li>`;
 }
 
 function renderActions() {
@@ -642,7 +669,11 @@ export function render(appRef) {
     if (!G || G.over) return;
     if (document.visibilityState === 'hidden') {
       G.pausedColor = G.clock.running; G.clock.stop(); saveResume();
-    } else if (G.pausedColor && !G.animating) { G.clock.start(G.pausedColor); G.pausedColor = null; }
+    } else if (G.pausedColor && !G.animating) {
+      // only the side to move may resume: the bot may have moved while the tab was hidden (qa)
+      if (!G.clock.running && G.chess.turn() === G.pausedColor) G.clock.start(G.pausedColor);
+      G.pausedColor = null;
+    }
   };
   const onHide = () => saveResume();
   document.addEventListener('visibilitychange', onVis);
@@ -660,7 +691,8 @@ export function render(appRef) {
       if (lease) lease.release();
       lease = null; board = null;
       view = null;
-      suspend(true);
+      suspend(true);                                   // disposes the bot's worker
+      try { app.deps.bots.stopHint?.(); } catch { /* ignore */ }   // and any hint / draw-offer search in flight
     },
   };
 }
@@ -671,6 +703,7 @@ window.__gambitTest = () => G && {
   myTurn: !G.over && !G.animating && !G.thinking && !G.pending && !review.on && G.chess.turn() === G.color,
   reviewing: review.on,
   over: G.over, plies: G.chess.history().length, result: G.result || null,
+  chess: G.chess, fen: G.chess.fen(), assisted: G.assisted,
   state: { animating: G.animating, thinking: G.thinking, pending: !!G.pending, boardAnimating: board && board.isAnimating && board.isAnimating(), turn: G.chess.turn(), color: G.color },
   // goes through the same entry point the board uses
   playAny() {

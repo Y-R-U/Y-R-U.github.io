@@ -31,14 +31,15 @@ scene.environment = pm.fromScene(kit.studioEnvironment(), 0.04).texture;
 const lights = kit.defaultLightRig(); scene.add(lights);
 lights.traverse(l => { if (l.isDirectionalLight) { l.shadow.mapSize.set(2048, 2048); const c = l.shadow.camera; c.left = -3; c.right = 3; c.top = 3; c.bottom = -3; c.updateProjectionMatrix(); l.shadow.bias = -0.0006; l.shadow.normalBias = 0.02; } });
 const sq = (light) => kit.canvasTexture(256, 256, (c, w, h) => kit.drawMarble(c, 0, 0, w, h, light ? {} : { base: '#3a3d45', vein: 'rgba(200,200,210,0.25)', cloud: 'rgba(0,0,0,0.2)' }));
+if (Q.get('parts')) globalThis.FANTASY_PARTS = [];
 const types = (Q.get('piece') || 'n').split(',');
-const cols = ['w', 'b'];
+const cols = Q.get('side') ? [Q.get('side')] : ['w', 'b'];   // &side=w|b: one side only
 let i = 0;
-const W = types.length * 2;
+const W = types.length * cols.length;
 for (const t of types) for (const c of cols) {
-  for (const row of [0, 1]) {
+  for (const row of (Q.get('one') ? [0] : [0, 1])) {          // &one=1: a single row (solo close-ups)
     const light = (i + row) % 2 === 0;
-    const x = i - (W - 1) / 2, z = row - 0.5;
+    const x = i - (W - 1) / 2, z = Q.get('one') ? 0 : row - 0.5;
     const m = new THREE.Mesh(new THREE.BoxGeometry(1, 0.1, 1), new THREE.MeshStandardMaterial({ map: sq(light), roughness: 0.25 }));
     m.position.set(x, -0.05, z); m.receiveShadow = true; scene.add(m);
     const fn = theme.pieces[t] || (await loadTheme('classic')).pieces[t];

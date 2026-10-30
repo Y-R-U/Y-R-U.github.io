@@ -15,7 +15,8 @@ export default {
   name: 'Halloween',
   tags: ['spooky', 'pumpkins', 'graveyard'],
   board: { build, environment, overlayStyle },   // graveyard flagstones + iron railing; hill/moon when tilted
-  pieces: { ...pieces, ...royals },
+  // faces (imp, witch, countess, king) turn toward their own player; the Nightmare keeps the sideways look (board-2)
+  pieces: { ...pieces, ...royals, facing: { byType: { p: 'player', b: 'player', q: 'player', k: 'player' } } },
   // name tags ("Pumpkin Imp · Pawn")
   names: { p: 'Pumpkin Imp', n: 'Nightmare', b: 'Witch', r: 'Crypt Tower', q: 'Vampire Countess', k: 'Pumpkin King' },
   moveAnims, battleAnims,
