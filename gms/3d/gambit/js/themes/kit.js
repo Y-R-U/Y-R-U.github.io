@@ -126,7 +126,21 @@ export const palette = {
 /** Ready-made premium looks (used by Classic): polished gold vs glossy black chrome. */
 export const metalLooks = {
   w: { color: '#f4c76a', metalness: 1.0, roughness: 0.2, rim: { mode: 'darken', color: '#3a2205', strength: 0.6, power: 2.0 } },
-  b: { color: '#3c3f4a', metalness: 0.95, roughness: 0.13, rim: { mode: 'glow', color: '#ff5a3c', strength: 0.09, power: 3.2 } },
+  // black: deep lacquered chrome; a cool silver fresnel rim outlines it on dark squares and a
+  // "top sheen" puts a bright cap on upward faces so it reads from straight overhead
+  b: { color: '#1c1d22', metalness: 0.9, roughness: 0.1,
+       rim: { mode: 'glow', color: '#c8d4f4', strength: 0.26, power: 3.4, top: { color: '#e8eeff', strength: 0.32, power: 18 } } },
+};
+/**
+ * Board colours — THE place to tune square contrast for every theme that uses them.
+ * Rule: the dark square must sit clearly between black pieces and light squares in value
+ * (black pieces must read on dark squares from overhead).
+ */
+export const boardLooks = {
+  marble: {
+    light: '#d8d4cb', lightCloud: 'rgba(140,140,150,0.12)', lightVein: 'rgba(105,108,120,0.42)', lightVein2: 'rgba(185,155,95,0.35)', lightLabel: '#4b5262',
+    dark: '#69717f', darkCloud: 'rgba(30,36,52,0.16)', darkVein: 'rgba(210,216,232,0.30)', darkVein2: 'rgba(222,184,104,0.40)', darkLabel: '#ece0bf',
+  },
 };
 /** Accent material for a side (blue for white, red for black), optionally glowing. */
 export function accentMaterial(color, { glow = 0, roughness = 0.5, metalness = 0 } = {}) {
@@ -173,19 +187,27 @@ export function addRim(m, rim) {
   const col = new THREE.Color(rim.color ?? '#ffffff');
   const mode = rim.mode === 'glow' ? 1 : 0;
   const strength = rim.strength ?? 0.5, power = rim.power ?? 2.5;
+  const top = rim.top || { color: '#000000', strength: 0, power: 8 };
+  const topCol = new THREE.Color(top.color ?? '#ffffff');
   m.onBeforeCompile = sh => {
     sh.uniforms.uRimColor = { value: col };
     sh.uniforms.uRim = { value: new THREE.Vector3(mode, strength, power) };
+    sh.uniforms.uTopColor = { value: topCol };
+    sh.uniforms.uTop = { value: new THREE.Vector2(top.strength ?? 0, top.power ?? 8) };
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform vec3 uRimColor; uniform vec3 uRim;')
+      .replace('#include <common>', '#include <common>\nuniform vec3 uRimColor; uniform vec3 uRim; uniform vec3 uTopColor; uniform vec2 uTop;')
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
       {
         float rimK = pow(1.0 - clamp(abs(dot(normalize(vViewPosition), normal)), 0.0, 1.0), uRim.z) * uRim.y;
         if (uRim.x < 0.5) diffuseColor.rgb = mix(diffuseColor.rgb, uRimColor, clamp(rimK, 0.0, 1.0));
         else totalEmissiveRadiance += uRimColor * rimK;
+        if (uTop.x > 0.0) {   // sheen on upward-facing surfaces (world space), reads from overhead
+          vec3 wN = inverseTransformDirection(normal, viewMatrix);
+          totalEmissiveRadiance += uTopColor * pow(max(wN.y, 0.0), uTop.y) * uTop.x;
+        }
       }`);
   };
-  m.customProgramCacheKey = () => `rim${mode}_${strength}_${power}`;
+  m.customProgramCacheKey = () => `rim${mode}_${strength}_${power}_${top.strength ?? 0}_${top.power ?? 8}`;
   return m;
 }
 /** Give obj its own material copies (so fades/flashes don't affect every piece). Board disposes them. */

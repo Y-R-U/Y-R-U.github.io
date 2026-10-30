@@ -27,7 +27,7 @@ export const BOTS = [
   {
     id: 'mabel', name: 'Mabel', elo: 400, avatar: '👵', color: '#d98bb5', style: 'beginner',
     blurb: 'Plays with her grandkids on Sundays. Will grab anything you leave hanging, and hang a few herself.',
-    mode: 'human', depth: 1, qMax: 0, noise: 140, temp: 95, blunder: 0.40, natural: 1.6, book: 0, typNodes: 40,
+    mode: 'human', depth: 1, qMax: 1, noise: 130, temp: 80, blunder: 0.36, natural: 1.4, book: 2, typNodes: 60,
     evalW: { mobility: 0, kingSafety: 0, pawns: 0, passed: 0, rookFiles: 0, bishopPair: 0, pst: 0.5 },
   },
   {

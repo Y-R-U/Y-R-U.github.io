@@ -74,3 +74,12 @@ The manager owns this file; agents propose changes in their notes.
   10 × min(3, 1 + diff/400); vs weaker = 10 × max(0.1, 2^(diff/200)), so win ≥ draw ≥ loss always.
   Undo/hint vs bots allowed but mark the game "assisted": ×0.5 ladder points, half Elo change,
   never a "best win".
+- D26 Camera views (Aaron, 2026-10-31): default **Top, locked** (drag/arrows/pinch don't move
+  the camera). The View button (and V key) cycles Top → Tilt (13°) → Angle (~48°) → Free; only
+  Free orbits/zooms. Saved in the `view` setting; legacy 'default' = 'tilt'. Amends D2/D3.
+- D27 Piece name tags (Aaron, 2026-10-31): tap an enemy piece with nothing selected, or select one of
+  your own → elegant tag above its head, fades after ~4 s (Aaron: 3–5 s); desktop hover any piece ~250 ms → tag. DOM overlay, gold-bordered pill,
+  Cinzel. Themes may supply `names` ("Wizard · Bishop"). Board option `labels` (default on).
+- D28 Contrast (Aaron, 2026-10-31): black pieces must read on dark squares from overhead at phone
+  size. Lighter dark squares (slate/walnut-grey, not near-black), stronger black-piece rim/spec,
+  contact AO under pieces. A rule for every theme (MODEL_GUIDE).

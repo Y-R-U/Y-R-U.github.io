@@ -17,7 +17,18 @@ export class PieceSet {
     this.group = new THREE.Group(); this.group.name = 'pieces';
     this.liveGroup = new THREE.Group(); this.liveGroup.name = 'live';
     scene.add(this.group, this.liveGroup);
-    this.protos = new Map();    // 'wp' -> {obj, parts:[InstancedMesh], height, radius, yaw}
+    this.protos = new Map();
+    // contact cue under every resting piece: soft dark AO + a faint light ring at the base edge
+    const tex = kit.canvasTexture(128, 128, (c, w) => {
+      const g = c.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+      g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(0.62, 'rgba(0,0,0,0.38)'); g.addColorStop(0.74, 'rgba(0,0,0,0.12)');
+      g.addColorStop(0.8, 'rgba(255,255,255,0.16)'); g.addColorStop(0.86, 'rgba(255,255,255,0.0)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      c.fillStyle = g; c.fillRect(0, 0, w, w);
+    });
+    this.blobMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
+    this.blobs = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), this.blobMat, CAP);
+    this.blobs.count = 0; this.blobs.frustumCulled = false; this.blobs.renderOrder = 0;
+    this.group.add(this.blobs);    // 'wp' -> {obj, parts:[InstancedMesh], height, radius, yaw}
   }
   /** Build prototypes for every kind from theme (falling back to `fallback` per missing piece). */
   load(theme, fallback) {
@@ -68,8 +79,11 @@ export class PieceSet {
   sync(recs) {
     const counts = new Map();
     for (const pr of this.protos.values()) for (const im of pr.parts) im.count = 0;
+    let nb = 0;
     for (const r of recs) {
       if (r.live) continue;
+      const prb = this.protos.get(r.color + r.type);
+      if (prb && nb < CAP) { const d = prb.radius * 2.45; _m.compose(_p.set(r.x, 0.0015, r.z), _q.identity(), new THREE.Vector3(d, 1, d)); this.blobs.setMatrixAt(nb++, _m); }
       const pr = this.protos.get(r.color + r.type); if (!pr) continue;
       const i = counts.get(pr) || 0; if (i >= CAP) continue;
       counts.set(pr, i + 1);
@@ -78,6 +92,7 @@ export class PieceSet {
       for (const im of pr.parts) { im.setMatrixAt(i, _m); im.count = i + 1; }
     }
     for (const pr of this.protos.values()) for (const im of pr.parts) im.instanceMatrix.needsUpdate = true;
+    this.blobs.count = nb; this.blobs.instanceMatrix.needsUpdate = true;
   }
   /** A live, animatable piece: outer Group (anims drive position/rotation/scale) → inner yaw → model. */
   makeLive(color, type) {

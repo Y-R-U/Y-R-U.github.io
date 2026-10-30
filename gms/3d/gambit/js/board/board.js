@@ -4,9 +4,12 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import * as kit from '../themes/kit.js';
 import { loadTheme } from '../themes/index.js';
-import { CameraRig } from './camera.js';
+import { CameraRig, VIEW_ORDER, VIEW_LABELS, normalizeView } from './camera.js';
+export { VIEW_ORDER, VIEW_LABELS, normalizeView };
 import { PieceSet } from './pieces.js';
 import { Overlays } from './overlays.js';
+import { NameTags, LABEL_MS } from './labels.js';
+export { LABEL_MS };
 
 const FILES = 'abcdefgh';
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -44,7 +47,7 @@ export function parseFen(fen) {
  */
 export async function createBoard(container, opts = {}) {
   const o = { theme: 'classic', orientation: 'w', interactive: null, animSpeed: 1, maxPixelRatio: 2, keyboard: true,
-    autoHighlight: true, coordinates: true, view: 'default', shadows: true, ...opts };
+    autoHighlight: true, coordinates: true, view: 'top', shadows: true, labels: true, ...opts };
   if ('coords' in opts) o.coordinates = opts.coords !== false;
 
   // ------------------------------------------------------------ renderer / scene
@@ -67,6 +70,7 @@ export async function createBoard(container, opts = {}) {
   const flashEl = document.createElement('div');
   Object.assign(flashEl.style, { position: 'absolute', inset: '0', pointerEvents: 'none', opacity: '0', background: '#fff' });
   container.appendChild(flashEl);
+  const finePointer = !!window.matchMedia?.('(pointer: fine)').matches;
 
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
@@ -106,6 +110,7 @@ export async function createBoard(container, opts = {}) {
     if (fx) { fx.rate = battleTl ? battleTl.rate : 1; fx.update(dt); }
     keyOrbit(dt);
     const camMoving = rig.update(dt);
+    tags.update();
     if (envObj) envObj.visible = rig.cur.phi + rig.focusState.tilt * rig.focusState.f > envMinPhi;
     const anyLive = pieces && pieces.liveGroup.children.length > 0;
     if (renderer.shadowMap.enabled && (shadowDirty || anyLive)) { renderer.shadowMap.needsUpdate = true; shadowDirty = false; }
@@ -119,6 +124,25 @@ export async function createBoard(container, opts = {}) {
 
   // ------------------------------------------------------------ sizing
   let cssW = 1, cssH = 1;
+  const _hp = new THREE.Vector3(), _up = new THREE.Vector3();
+  const tags = new NameTags(container, {
+    size: () => ({ w: cssW, h: cssH }),
+    project(sq, below) {                // head (or, below=true, the foot) of the piece on sq, in container px
+      const r = recs.get(sq); if (!r || !pieces) return null;
+      if (r.live) _hp.copy(r.live.position); else { const [x, z] = sqToXZ(sq); _hp.set(x, 0, z); }
+      _up.setFromMatrixColumn(camera.matrixWorld, 1);
+      if (below) _hp.addScaledVector(_up, -(pieces.radius(r.color, r.type) + 0.04));
+      else {
+        _hp.y += pieces.height(r.color, r.type) * (r.live ? r.live.scale.y : 1) + 0.08;
+        // lift along the camera's screen-up axis so the tag clears the piece even from straight overhead
+        _hp.addScaledVector(_up, pieces.radius(r.color, r.type) + 0.12);
+      }
+      _hp.project(camera);
+      if (_hp.z > 1) return null;
+      return { x: (_hp.x + 1) / 2 * cssW, y: (1 - _hp.y) / 2 * cssH };
+    },
+  });
+  tags.enabled = o.labels !== false;
   function resize() {
     const r = container.getBoundingClientRect();
     cssW = Math.max(1, Math.round(r.width)); cssH = Math.max(1, Math.round(r.height));
@@ -168,6 +192,7 @@ export async function createBoard(container, opts = {}) {
     fx.setViewport(cssH * renderer.getPixelRatio(), camera.fov);
     buildBoardMesh();
     // pieces
+    tags.setNames(theme.names);
     if (!pieces) pieces = new PieceSet(scene);
     pieces.load(theme, fallbackTheme);
     if (!overlays) overlays = new Overlays(scene, theme.board?.overlayStyle);
@@ -202,7 +227,7 @@ export async function createBoard(container, opts = {}) {
     if (rec.live) { pieces.removeLive(rec.live); rec.live = null; }
   }
   function setPositionNow(fen) {
-    finishAll(); gen++;
+    finishAll(); gen++; tags.hide();
     clearPending(false);
     for (const r of recs.values()) endLive(r);
     pieces?.liveGroup.clear();
@@ -278,6 +303,7 @@ export async function createBoard(container, opts = {}) {
   // ------------------------------------------------------------ selection / input
   const canMove = sq => { const r = recs.get(sq); if (!r || !interactive) return false; return interactive === 'both' || interactive === r.color; };
   function select(sq) {
+    if (!sq) tags.hide('select');
     selected = sq;
     legalTargets = [];
     if (sq && typeof o.legalMoves === 'function') {
@@ -346,6 +372,7 @@ export async function createBoard(container, opts = {}) {
     const prev = pointers.get(e.pointerId);
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (mode === 'pinch' && pointers.size >= 2) {
+      if (rig.locked) return;
       const [a, b] = [...pointers.values()];
       const d = Math.hypot(a.x - b.x, a.y - b.y);
       rig.setZoom(pinch.zoom * pinch.d / Math.max(20, d));
@@ -375,7 +402,14 @@ export async function createBoard(container, opts = {}) {
     else if (m === 'pendingPiece') {
       const sq = down.hit.piece;
       if (selected && selected !== sq && legalTargets.includes(sq)) attemptMove(selected, sq, false); // own-piece target (rare variants)
-      else select(selected === sq ? null : sq);
+      else {
+        select(selected === sq ? null : sq);
+        if (selected) tags.show(selected, recs.get(selected), 'select');   // own piece: tag + legal dots
+      }
+    } else if (m === 'pendingOrbit' && !selected) {
+      // nothing selected: tapping any (enemy / not-movable) piece shows its name tag
+      const sq = down.hit.piece;
+      if (sq) tags.show(sq, recs.get(sq), 'tap'); else tags.hide();
     } else if (m === 'pendingOrbit' && selected) {
       const sq = down.hit.piece || down.hit.ground;
       const ok = sq && sq !== selected && (legalTargets.length ? legalTargets.includes(sq) : typeof o.legalMoves !== 'function');
@@ -385,6 +419,7 @@ export async function createBoard(container, opts = {}) {
   }
   function updateHover(e) {
     const hit = pickAt(e.clientX, e.clientY);
+    if (finePointer && e.pointerType === 'mouse') tags.hover(hit.piece, hit.piece && recs.get(hit.piece));
     const own = hit.piece && canMove(hit.piece);
     const tgt = selected && legalTargets.includes(hit.piece || hit.ground);
     canvas.style.cursor = own || tgt ? 'pointer' : 'grab';
@@ -392,6 +427,7 @@ export async function createBoard(container, opts = {}) {
   function startDrag(sq, e) {
     const rec = recs.get(sq); if (!rec) return;
     if (selected !== sq) select(sq);
+    tags.hide();
     const live = goLive(rec);
     drag = { rec, live, from: sq, over: null };
     mode = 'drag';
@@ -462,6 +498,7 @@ export async function createBoard(container, opts = {}) {
     if (snap && p.rec.live && recs.get(p.rec.sq) === p.rec) snapBack(p.rec);
   }
   function onWheel(e) {
+    if (rig.locked) return;            // locked views: let the page scroll
     e.preventDefault();
     rig.zoomBy(Math.exp(e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.0015)));
     wake();
@@ -474,9 +511,16 @@ export async function createBoard(container, opts = {}) {
     if (!o.keyboard || editable(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
     if (!container.isConnected || !cssW) return;
     if (e.code === 'Digit0' || e.code === 'Home') { rig.reset(); wake(); return; }
-    const k = KEYMAP[e.code]; if (!k) return;
+    if (e.code === 'KeyV' && !e.repeat) { e.preventDefault(); cycleView(); return; }
+    const k = KEYMAP[e.code]; if (!k || rig.locked) return;
     e.preventDefault(); keys.add(k); wake();
   }
+  function setView(name) {
+    rig.preset(name); wake();
+    emit('view', { view: rig.presetName, label: VIEW_LABELS[rig.presetName], locked: rig.locked });
+    return rig.presetName;
+  }
+  function cycleView() { return setView(VIEW_ORDER[(VIEW_ORDER.indexOf(rig.presetName) + 1) % VIEW_ORDER.length]); }
   function onKeyUp(e) { const k = KEYMAP[e.code]; if (k) keys.delete(k); }
   function keyOrbit(dt) {
     if (!keys.size) return;
@@ -490,6 +534,8 @@ export async function createBoard(container, opts = {}) {
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerup', onPointerUp);
   canvas.addEventListener('pointercancel', onPointerUp);
+  const onLeave = () => tags.hover(null);
+  canvas.addEventListener('pointerleave', onLeave);
   canvas.addEventListener('wheel', onWheel, { passive: false });
   canvas.addEventListener('contextmenu', e => e.preventDefault());
   window.addEventListener('keydown', onKeyDown);
@@ -583,6 +629,7 @@ export async function createBoard(container, opts = {}) {
     const isPending = pending && pending.from === from && pending.to === to;
     const viaDrag = isPending && pending.viaDrag && rec.live;
     if (isPending) { clearTimeout(pending.timer); pending = null; }
+    tags.hide();
     const vrec = victimSq ? recs.get(victimSq) : null;
 
     // logical state first, so picking and the next queued move see the new position
@@ -657,6 +704,8 @@ export async function createBoard(container, opts = {}) {
     get speed() { return speed; },
     get renderer() { return renderer; },
     get scene() { return scene; },
+    /** The FX system (kit.createFX) — ui may use it for celebrations, e.g. board.fx.sparkles(...). */
+    get fx() { return fx; },
     setPosition(fen, { animate = false } = {}) {
       if (animate && pieces) { const p = setPositionAnimated(fen); queue = p.catch(() => {}); return p; }
       setPositionNow(fen); queue = Promise.resolve(); return Promise.resolve();
@@ -696,11 +745,15 @@ export async function createBoard(container, opts = {}) {
       if ('autoHighlight' in p) o.autoHighlight = !!p.autoHighlight;
       if ('legalMoves' in p) o.legalMoves = p.legalMoves;
       if ('maxPixelRatio' in p) { o.maxPixelRatio = p.maxPixelRatio; resize(); }
+      if ('labels' in p) { o.labels = p.labels !== false; tags.enabled = o.labels; if (!o.labels) tags.hide(); }
     },
     select(sq) { select(isSq(sq) ? sq : null); },
     skip,
     isAnimating() { return animCount > 0; },
     whenIdle() { return queue; },
+    /** Show / hide a piece name tag programmatically (e.g. learn mode). */
+    showLabel(sq) { const r = recs.get(sq); if (r) tags.show(sq, r, 'tap'); },
+    hideLabel() { tags.hide(); },
     pieceAt(sq) { const r = recs.get(sq); return r ? { type: r.type, color: r.color } : null; },
     /** Square centre in container CSS pixels (for placing the promotion picker etc.). */
     squareToScreen(sq, y = 0) {
@@ -708,7 +761,15 @@ export async function createBoard(container, opts = {}) {
       return { x: (v.x + 1) / 2 * cssW, y: (1 - v.y) / 2 * cssH };
     },
     camera: {
-      preset(name) { rig.preset(name); wake(); },
+      /** 'top' | 'tilt' | 'angle' | 'free' ('default' = 'tilt'). Emits 'view'. */
+      preset(name) { return setView(name); },
+      /** Top → Tilt → Angle → Free → Top. Returns the new view name. Also bound to the V key. */
+      cycle() { return cycleView(); },
+      get view() { return rig.presetName; },
+      get label() { return VIEW_LABELS[rig.presetName]; },
+      get locked() { return rig.locked; },
+      setLocked(on) { rig.setLocked(on); wake(); },
+      views: VIEW_ORDER, labels: VIEW_LABELS,
       reset() { rig.reset(); wake(); },
       orbit(dTheta, dPhi) { rig.orbit(dTheta, dPhi); wake(); },
       zoom(f) { rig.zoomBy(f); wake(); },
@@ -729,10 +790,11 @@ export async function createBoard(container, opts = {}) {
       fx?.dispose(); pieces?.dispose(); overlays?.dispose();
       if (boardObj) disposeDeep(boardObj); if (envObj) disposeDeep(envObj);
       envTex?.dispose(); pmrem.dispose(); renderer.dispose();
-      canvas.remove(); flashEl.remove();
+      canvas.remove(); flashEl.remove(); tags.dispose();
     },
   };
 
+  canvas.__board = board;             // devtools / headless tests: document.querySelector('canvas').__board
   resize();
   await setTheme(o.theme);
   setPositionNow(o.fen || START_FEN);

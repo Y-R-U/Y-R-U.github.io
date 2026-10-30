@@ -96,6 +96,14 @@ function ensureBoard() {
     }).then(b => {
       board = b;
       board.onMoveAttempt = onMoveAttempt;
+      // camera view changes (View button, V key) persist to settings
+      if (board.on) board.on('view', ({ view: v }) => {
+        if (getSettings().view !== v) {   // came from the View button or the V key
+          setSettings({ view: v });
+          toast(v === 'free' ? 'Free view: drag or pinch to look around' : `${viewLabel(v)} view`, { ms: 1200 });
+        }
+        syncViewBtn();
+      });
       // the board asks for the piece before calling onMoveAttempt (picker drawn over the board)
       board.onPromotion = ({ color }) => pickPromotion(color);
       applySettingsToBoard(getSettings(), null);
@@ -114,7 +122,7 @@ function applySettingsToBoard(s, patch) {
     const ok = installedThemes(app.deps).includes(s.theme);
     if (ok && board.setTheme) Promise.resolve(board.setTheme(s.theme)).catch(e => console.warn('[gambit] theme', e));
   }
-  if ((all || 'view' in patch) && board.camera && board.camera.preset) board.camera.preset(s.view);
+  if ((all || 'view' in patch) && board.camera && board.camera.preset && board.camera.view !== s.view) board.camera.preset(s.view);
   if (all || 'coords' in patch) {
     if (board.setCoords) board.setCoords(s.coords);
     else if (board.setOptions) board.setOptions({ coords: s.coords });
@@ -436,6 +444,17 @@ function cycleSpeed() {
   setSettings({ battleSpeed: next });
   toast(next === 'off' ? 'Battle animations off' : `Battle speed ${next}×`, { ms: 1200 });
 }
+const VIEW_NAMES = { top: 'Top', tilt: 'Tilt', angle: '3D', free: 'Free' };
+function viewLabel(v) { return VIEW_NAMES[v === 'default' ? 'tilt' : v] || 'Top'; }
+function syncViewBtn() {
+  const b = view && view.querySelector('[data-act="camera"] .lbl');
+  if (b) b.textContent = viewLabel(board && board.camera && board.camera.view || getSettings().view);
+}
+function cycleView() {
+  if (!board || !board.camera) return;
+  if (!board.camera.cycle) { board.camera.reset && board.camera.reset(); return; }
+  board.camera.cycle();   // emits 'view' -> saved, toast, label synced
+}
 function speedLabel(s) { return s === 'off' ? 'Off' : `${s}×`; }
 function syncSpeedBtn() {
   const b = view && view.querySelector('[data-act="speed"] .lbl');
@@ -559,7 +578,7 @@ function renderActions() {
     <button class="act" data-act="undo">${icon('undo')}<span>Undo</span></button>
     <button class="act" data-act="hint">${icon('bulb')}<span>Hint</span></button>
     <button class="act" data-act="flip">${icon('flip')}<span>Flip</span></button>
-    <button class="act" data-act="camera">${icon('camera')}<span>View</span></button>
+    <button class="act" data-act="camera" title="Cycle view (V)">${icon('camera')}<span class="lbl">${viewLabel(s.view)}</span></button>
     <button class="act" data-act="speed">${icon('swords')}<span class="lbl">${speedLabel(s.battleSpeed)}</span></button>`;
 }
 
@@ -601,7 +620,7 @@ export function render(appRef) {
     play('tap');
     ({
       resign, draw: offerDraw, undo, hint: showHint, flip, speed: cycleSpeed,
-      camera: () => board && board.camera && board.camera.reset && board.camera.reset(),
+      camera: cycleView,
       results: showResults, rematch, newbot: () => app.go('#/play/bot'),
     })[a.dataset.act]?.();
   });

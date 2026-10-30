@@ -3,6 +3,7 @@
 //   mytheme: () => import('./mytheme/index.js'),
 export const themes = {
   classic: () => import('./classic/index.js'),
+  fantasy: () => import('./fantasy/index.js'),
   halloween: () => import('./halloween/index.js'),
 };
 export default themes;

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fantasy close-up</title>
+<link rel="icon" href="data:,">
+<script type="importmap">
+{ "imports": { "three": "/gms/lib/three/0.180.0/three.module.js", "three/addons/": "/gms/lib/three/0.180.0/addons/" } }
+</script>
+<style>html,body{margin:0;background:#1a1c22;color:#ccc;font:12px system-ui}canvas{display:block}#s{position:fixed;left:6px;top:4px}</style>
+</head>
+<body>
+<div id="s"></div>
+<script type="module">
+// Sculptor close-up viewer: ?piece=n|b&view=angle|top|side|front|back&theme=fantasy&dist=2.6&az=0
+// Shows white + black pieces on a light and a dark marble square, same renderer settings as the board.
+import * as THREE from 'three';
+import * as kit from '../js/themes/kit.js';
+import { loadTheme } from '../js/themes/index.js';
+const Q = new URLSearchParams(location.search);
+const type = Q.get('piece') || 'n', view = Q.get('view') || 'angle', theme = await loadTheme(Q.get('theme') || 'fantasy');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.append(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#1a1c22');
+const pm = new THREE.PMREMGenerator(renderer);
+scene.environment = pm.fromScene(kit.studioEnvironment(), 0.04).texture;
+const lights = kit.defaultLightRig(); scene.add(lights);
+lights.traverse(l => { if (l.isDirectionalLight) { l.shadow.mapSize.set(2048, 2048); const c = l.shadow.camera; c.left = -3; c.right = 3; c.top = 3; c.bottom = -3; c.updateProjectionMatrix(); l.shadow.bias = -0.0006; l.shadow.normalBias = 0.02; } });
+const sq = (light) => kit.canvasTexture(256, 256, (c, w, h) => kit.drawMarble(c, 0, 0, w, h, light ? {} : { base: '#3a3d45', vein: 'rgba(200,200,210,0.25)', cloud: 'rgba(0,0,0,0.2)' }));
+const types = (Q.get('piece') || 'n').split(',');
+const cols = ['w', 'b'];
+let i = 0;
+const W = types.length * 2;
+for (const t of types) for (const c of cols) {
+  for (const row of [0, 1]) {
+    const light = (i + row) % 2 === 0;
+    const x = i - (W - 1) / 2, z = row - 0.5;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(1, 0.1, 1), new THREE.MeshStandardMaterial({ map: sq(light), roughness: 0.25 }));
+    m.position.set(x, -0.05, z); m.receiveShadow = true; scene.add(m);
+    const fn = theme.pieces[t] || (await loadTheme('classic')).pieces[t];
+    const obj = fn(THREE, kit, { color: c, type: t });
+    const yaw = c === 'w' ? Math.PI / 2 : -Math.PI / 2;
+    obj.rotation.y = Q.get('noyaw') ? 0 : yaw;
+    obj.position.set(x, 0, z); scene.add(obj);
+    obj.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; } });
+    if (row === 0) document.getElementById('s').textContent += ` ${c}${t}: ${kit.stats(obj).tris} tris, ${kit.stats(obj).meshes} meshes;`;
+  }
+  i++;
+}
+const cam = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.1, 100);
+const dist = +(Q.get('dist') || (W * 1.25 + 1.2));
+const views = { angle: [0, 0.75, 1], top: [0, 1, 0.0001], side: [0, 0.2, 1], front: [1, 0.25, 0.0001], back: [-1, 0.25, 0.0001], high: [0, 1, 0.45] };
+const v = new THREE.Vector3(...(views[view] || views.angle)).normalize().multiplyScalar(dist);
+v.applyAxisAngle(new THREE.Vector3(0, 1, 0), (+(Q.get('az') || 0)) * Math.PI / 180);   // &az=deg orbits the camera
+cam.position.copy(v).add(new THREE.Vector3(0, 0.45, 0)); cam.lookAt(0, 0.45, 0);
+renderer.render(scene, cam);
+window.DONE = true;
+</script>
+</body>
+</html>

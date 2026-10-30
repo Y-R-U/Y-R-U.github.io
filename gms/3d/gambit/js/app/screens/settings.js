@@ -33,7 +33,8 @@ export function settingsPanel(app, { compact = false } = {}) {
     ${segmented('battleSpeed', [{ value: 'off', label: 'Off' }, { value: 1, label: '1×' }, { value: 2, label: '2×' }, { value: 5, label: '5×' }], s.battleSpeed)}
 
     <h3 class="sect">Board view</h3>
-    ${segmented('view', [{ value: 'top', label: 'Top' }, { value: 'default', label: 'Default' }, { value: 'angle', label: 'Angled' }], s.view)}
+    <p class="hint-txt">Top, Tilt and 3D are fixed views. Free lets you drag, pinch and use the arrow keys to look around. Press V or the View button in a game to cycle.</p>
+    ${segmented('view', [{ value: 'top', label: 'Top' }, { value: 'tilt', label: 'Tilt' }, { value: 'angle', label: '3D' }, { value: 'free', label: 'Free' }], s.view === 'default' ? 'tilt' : s.view)}
 
     <h3 class="sect">Gameplay</h3>
     <div class="rows">

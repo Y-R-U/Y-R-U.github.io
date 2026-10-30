@@ -12,7 +12,9 @@ const state = {
   speed: Q.get('speed') || '1',
 };
 // each black piece on a light AND a dark square (ranks 7 and 6), same for white (3 and 2)
-const LINEUP = '8/pnbrqk2/1pnbrqk1/8/8/1PNBRQK1/PNBRQK2/8 w - - 0 1';
+const LINEUP = Q.get('fen') || '8/pnbrqk2/1pnbrqk1/8/8/1PNBRQK1/PNBRQK2/8 w - - 0 1';
+// contrast check: black pawns/king/knight/rook on DARK squares, gold on LIGHT squares
+export const CONTRAST_FEN = '1n1k3r/p1p1p1p1/1p1p4/8/8/8/P1P1P1P1/1N1Q1K2 w - - 0 1';
 const boards = [];
 window.G = { boards, state };
 
@@ -24,7 +26,7 @@ themeSel.onchange = () => { state.theme = themeSel.value; boards.forEach(b => b.
 document.querySelectorAll('#modes button').forEach(b => b.onclick = () => { state.mode = b.dataset.mode; syncUrl(); render(); });
 document.querySelectorAll('#views button').forEach(b => b.onclick = () => {
   state.view = b.dataset.view; syncUrl();
-  if (state.mode === 'lineup') render(); else boards.forEach(x => x.camera.preset(state.view === 'all' ? 'default' : state.view));
+  if (state.mode === 'lineup') render(); else boards.forEach(x => x.camera.preset(state.view === 'all' ? 'top' : state.view));
   marks();
 });
 function marks() {
@@ -42,7 +44,7 @@ async function render() {
   clear(); marks();
   const main = $('#main');
   if (state.mode === 'lineup') {
-    const views = state.view === 'all' ? ['top', 'default', 'angle'] : [state.view];
+    const views = state.view === 'all' ? ['top', 'tilt', 'angle'] : [state.view];
     const row = document.createElement('div'); row.className = 'row'; main.append(row);
     for (const v of views) {
       const cell = document.createElement('div'); cell.className = 'cell';
@@ -78,7 +80,7 @@ async function playground(main) {
     <div class="host tall"></div><div id="stats"></div>`;
   const host = main.querySelector('.host');
   const b = await createBoard(host, {
-    theme: state.theme, view: state.view === 'all' ? 'default' : state.view, interactive: 'both', animSpeed: state.speed,
+    theme: state.theme, view: state.view === 'all' ? 'top' : state.view, interactive: 'both', animSpeed: state.speed,
     legalMoves: sq => chess.moves({ square: sq, verbose: true }).map(m => m.to),
   });
   boards.push(b);

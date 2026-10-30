@@ -2,17 +2,18 @@
 // chess.com-style in-square coordinates), a black-lacquer frame with a gold inlay
 // border and gold corner medallions. 4 draw calls. Mood: refs/ref_gold_black_marble.jpg.
 
-const LIGHT = '#e2dfd8', DARK = '#262b37';
-const LIGHT_LABEL = '#3a3f4c', DARK_LABEL = '#e7d3a1';
+// colours live in kit.boardLooks.marble (single place to tune contrast)
+let M = null, LIGHT, DARK, LIGHT_LABEL, DARK_LABEL;
 
 export function build(THREE, kit, { orientation = 'w', coordinates = true } = {}) {
+  M = kit.boardLooks.marble; LIGHT = M.light; DARK = M.dark; LIGHT_LABEL = M.lightLabel; DARK_LABEL = M.darkLabel;
   const g = new THREE.Group(); g.name = 'classic-board';
   const S = 128, N = S * 8;
   const tex = kit.canvasTexture(N, N, (c) => {
     for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) {
       const dark = (f + r) % 2 === 0, x = f * S, y = (7 - r) * S;
-      if (dark) kit.drawMarble(c, x, y, S, S, { base: DARK, cloud: 'rgba(90,100,125,0.16)', vein: 'rgba(200,205,220,0.30)', vein2: 'rgba(214,176,98,0.45)', seed: f * 31 + r * 17 + 3, veins: 3 });
-      else kit.drawMarble(c, x, y, S, S, { base: LIGHT, cloud: 'rgba(140,140,150,0.10)', vein: 'rgba(110,112,125,0.45)', vein2: 'rgba(190,160,100,0.35)', seed: f * 29 + r * 13 + 7, veins: 4 });
+      if (dark) kit.drawMarble(c, x, y, S, S, { base: DARK, cloud: M.darkCloud, vein: M.darkVein, vein2: M.darkVein2, seed: f * 31 + r * 17 + 3, veins: 3 });
+      else kit.drawMarble(c, x, y, S, S, { base: LIGHT, cloud: M.lightCloud, vein: M.lightVein, vein2: M.lightVein2, seed: f * 29 + r * 13 + 7, veins: 4 });
     }
     c.strokeStyle = 'rgba(0,0,0,0.22)'; c.lineWidth = 1.2;  // fine joints between tiles
     for (let i = 1; i < 8; i++) { c.beginPath(); c.moveTo(i * S, 0); c.lineTo(i * S, N); c.moveTo(0, i * S); c.lineTo(N, i * S); c.stroke(); }

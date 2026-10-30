@@ -4,11 +4,21 @@
 import * as THREE from 'three';
 
 const D = THREE.MathUtils.degToRad;
+// View modes. Locked modes ignore orbit/zoom input (battle focus + shake still work and
+// always return to the locked pose). 'free' is the only user-orbitable mode.
 export const PRESETS = {
-  top: { phi: D(0.01), zoom: 1 },
-  default: { phi: D(13), zoom: 1 },
-  angle: { phi: D(48), zoom: 1 },
+  top: { phi: 0.0002, zoom: 1, locked: true },     // truly straight overhead
+  tilt: { phi: D(13), zoom: 1, locked: true },     // slight tilt so pieces show some 3D
+  angle: { phi: D(48), zoom: 1, locked: true },    // "3D"
+  free: { phi: D(32), zoom: 1, locked: false },    // drag / arrows / pinch orbit and zoom
 };
+export const VIEW_ORDER = ['top', 'tilt', 'angle', 'free'];
+export const VIEW_LABELS = { top: 'Top', tilt: 'Tilt', angle: '3D', free: 'Free' };
+/** Normalise saved/legacy view names ('default' was the old tilt preset). */
+export function normalizeView(name) {
+  if (name === 'default') return 'tilt';
+  return PRESETS[name] ? name : 'top';
+}
 const PHI_MIN = 0.0002, PHI_MAX = D(72), ZOOM_MIN = 0.5, ZOOM_MAX = 1.5;
 
 export class CameraRig {
@@ -16,8 +26,9 @@ export class CameraRig {
     this.camera = camera;
     this.fitHalf = fitHalf; this.fitHeight = fitHeight;
     this.baseTheta = 0;                     // 0 = white at bottom, PI = black
-    this.presetName = 'default';
-    this.goal = { phi: PRESETS.default.phi, theta: 0, zoom: 1 };
+    this.presetName = 'top';
+    this.locked = true;
+    this.goal = { phi: PRESETS.top.phi, theta: 0, zoom: 1 };
     this.cur = { ...this.goal };
     this.focusState = { f: 0, point: new THREE.Vector3(), zoom: 1, tilt: 0 };
     this.shakeAmp = 0; this.shakeT = 0; this.shakeMs = 1;
@@ -29,8 +40,9 @@ export class CameraRig {
   }
   setOrientation(color) { this.baseTheta = color === 'b' ? Math.PI : 0; this.moving = true; }
   preset(name) {
-    const p = PRESETS[name] || PRESETS.default;
-    this.presetName = PRESETS[name] ? name : 'default';
+    this.presetName = normalizeView(name);
+    const p = PRESETS[this.presetName];
+    this.locked = p.locked;
     this.goal.phi = p.phi; this.goal.zoom = p.zoom;
     // shortest way back to the player's side
     this.goal.theta = Math.round(this.cur.theta / (Math.PI * 2)) * Math.PI * 2;
@@ -38,17 +50,20 @@ export class CameraRig {
   }
   reset() { this.preset(this.presetName); }
   /** Orbit by deltas in radians (dTheta around, dPhi tilt). */
+  setLocked(on) { if (on) this.reset(); this.locked = !!on; this.moving = true; }
   orbit(dTheta, dPhi, immediate = false) {
+    if (this.locked) return;
     this.goal.theta += dTheta;
     this.goal.phi = THREE.MathUtils.clamp(this.goal.phi + dPhi, PHI_MIN, PHI_MAX);
     if (immediate) { this.cur.theta = this.goal.theta; this.cur.phi = this.goal.phi; }
     this.stiff = 16; this.moving = true;
   }
   zoomBy(f) {
+    if (this.locked) return;
     this.goal.zoom = THREE.MathUtils.clamp(this.goal.zoom * f, ZOOM_MIN, ZOOM_MAX);
     this.stiff = 14; this.moving = true;
   }
-  setZoom(z) { this.goal.zoom = THREE.MathUtils.clamp(z, ZOOM_MIN, ZOOM_MAX); this.stiff = 14; this.moving = true; }
+  setZoom(z) { if (this.locked) return; this.goal.zoom = THREE.MathUtils.clamp(z, ZOOM_MIN, ZOOM_MAX); this.stiff = 14; this.moving = true; }
   shake(amp, ms) { this.shakeAmp = Math.max(this.shakeAmp * (1 - this.shakeT / this.shakeMs), amp); this.shakeT = 0; this.shakeMs = Math.max(30, ms); this.moving = true; }
 
   /** Fit distance so the board (±fitHalf) fills the viewport at this angle. */
@@ -110,5 +125,5 @@ export class CameraRig {
     this.moving = !settled || shaking || !!this.autoRotate;
     return this.moving;
   }
-  get state() { return { phi: this.cur.phi, theta: this.cur.theta, zoom: this.cur.zoom, preset: this.presetName }; }
+  get state() { return { phi: this.cur.phi, theta: this.cur.theta, zoom: this.cur.zoom, preset: this.presetName, locked: this.locked }; }
 }

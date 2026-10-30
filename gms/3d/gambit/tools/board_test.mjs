@@ -56,7 +56,29 @@ for (let i = 1; i <= 4; i++) await mouse('mouseMoved', x0 + (x1 - x0) * i / 4, y
 await mouse('mouseReleased', x1, y1, 0); await sleep(1500);
 check('illegal drop snaps back', await ev(`G.boards[0].pieceAt('d2')?.type==='p' && !G.boards[0].pieceAt('d6')`));
 
-// 4) drag on an empty square orbits and never moves a piece
+// 4a) locked Top: drag on empty space, wheel and arrow keys do NOT move the camera
+const camKey = `JSON.stringify((({phi,theta,zoom})=>[phi,theta,zoom].map(v=>+v.toFixed(4)))(G.boards[0].camera.state))`;
+await ev(`G.boards[0].camera.preset('top')`); await sleep(1500);
+const c0 = await ev(camKey);
+[x0, y0] = await sp('d4');
+await mouse('mousePressed', x0, y0);
+for (let i = 1; i <= 6; i++) await mouse('mouseMoved', x0 + i * 15, y0 + i * 8);
+await mouse('mouseReleased', x0 + 90, y0 + 48, 0);
+await send('Input.dispatchMouseEvent', { type: 'mouseWheel', x: x0, y: y0, deltaX: 0, deltaY: -400 });
+await send('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'ArrowLeft', key: 'ArrowLeft', windowsVirtualKeyCode: 37 });
+await sleep(500);
+await send('Input.dispatchKeyEvent', { type: 'keyUp', code: 'ArrowLeft', key: 'ArrowLeft', windowsVirtualKeyCode: 37 });
+await sleep(800);
+const c1 = await ev(camKey);
+check('Top (locked): drag/wheel/keys do not move camera', c0 === c1 && (await ev('G.boards[0].camera.locked')) === true, `${c0} vs ${c1}`);
+await shot('mode_top_after_drag');
+// 4b) V cycles views
+await send('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyV', key: 'v', windowsVirtualKeyCode: 86 });
+await send('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyV', key: 'v', windowsVirtualKeyCode: 86 });
+check('V cycles top -> tilt', (await ev('G.boards[0].camera.view')) === 'tilt');
+check('legacy "default" maps to tilt', (await ev(`G.boards[0].camera.preset('default')`)) === 'tilt');
+// 4c) Free: drag on an empty square orbits and never moves a piece
+await ev(`G.boards[0].camera.preset('free')`); await sleep(1500);
 const th0 = await ev('G.boards[0].camera.state.theta');
 [x0, y0] = await sp('d4');
 await mouse('mousePressed', x0, y0);
@@ -66,7 +88,8 @@ await sleep(400);
 const th1 = await ev('G.boards[0].camera.state.theta');
 check('empty-space drag orbits', Math.abs(th1 - th0) > 0.2, `theta ${th0}→${th1.toFixed(2)}`);
 check('orbit moved no pieces', await ev(`G.chess.fen().split(' ')[0]===(()=>{let s='';for(let r=8;r>=1;r--){let e=0;for(const f of 'abcdefgh'){const p=G.boards[0].pieceAt(f+r);if(!p){e++;continue}if(e){s+=e;e=0}s+=p.color==='w'?p.type.toUpperCase():p.type}if(e)s+=e;if(r>1)s+='/'}return s})()`));
-await ev('G.boards[0].camera.reset()');
+await shot('mode_free_after_drag');
+await ev(`G.boards[0].camera.preset('top')`);
 
 // 5) battle skip by tap
 await ev(`(()=>{const b=G.boards[0];b.setAnimSpeed(1);G.chess.load('4k3/8/8/3p4/4P3/8/8/4K3 w - - 0 1');b.setPosition(G.chess.fen());window.__t0=performance.now();window.__bp=b.applyMove(G.chess.move('exd5'),{battle:true}).then(()=>window.__bt=performance.now()-__t0);})()`);

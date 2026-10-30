@@ -20,6 +20,8 @@ export default {
   },
   pieces: { p, n, b, r, q, k: (THREE, kit, { color, type }) -> Object3D,
             facing?: { w: yaw, b: yaw } },                           // default: knights face the player's left
+  names?: { p, n, b, r, q, k },  // optional piece names for the tap/hover name tag, e.g. {b: 'Wizard'}
+                                 // shown as "Wizard" with "Bishop" underneath; omit for plain chess names
   moveAnims: [ fn, ... ],        // ctx => Promise, picked at random
   battleAnims: [ fn, ... ],      // ctx => Promise, picked at random
   promoteAnim?: ctx => Promise,  // optional; ctx.piece is the NEW piece at scale 0.01
@@ -38,7 +40,7 @@ export default {
 ## 3. Budgets (mid-range phone, 60 fps)
 | | per piece | notes |
 |---|---|---|
-| triangles | ≤ 6k (knight/king ≤ 8k) | Classic: p 3.3k, r 2.8k, b 6.8k, q 5.2k, k 4k, n 6.2k |
+| triangles | ≤ 6k (knight/king ≤ 8k) | Classic: p 3.3k, r 2.9k, b 6.8k, q 5.4k, k 4.1k, n 5.7k |
 | materials | 1–2 | each material = one more draw call per piece **kind** |
 | meshes | any | the board merges them per material (`kit.piece` does it for you) |
 | textures | avoid on pieces | use vertex colours (`kit.tint`, `kit.paint`) |
@@ -59,6 +61,12 @@ The top silhouette is what players see 95% of the time. Each type must be obviou
 Check the gallery Lineup at Top view: every piece sits on a light AND a dark square.
 
 ## 5. Side colours
+**The black side must read on dark squares from overhead.** (Aaron, on his phone: black pawns on
+dark squares were the hardest thing to see.) Check the gallery with
+`?mode=lineup&fen=1n1k3r/p1p1p1p1/1p1p4/8/8/8/P1P1P1P1/1N1Q1K2%20w%20-%20-%200%201` at Top view, 360 px wide.
+Tune in ONE place: `kit.metalLooks` / `kit.palette` (piece looks, incl. rim + `rim.top` sheen) and
+`kit.boardLooks` (square colours). The board also draws a soft contact blob with a faint light
+base ring under every resting piece, so you don't need to fake one.
 Convention (Aaron's refs): **white = ivory/gold + blue accents, black = black/chrome + red accents.**
 - Use `kit.sideMaterial(color)` (ivory vs ebony, with a fresnel rim) or `kit.material(kit.metalLooks[color])`
   (polished gold vs black chrome, as Classic does). The rim matters: white gets a darkened edge
@@ -125,3 +133,8 @@ Gallery: `?theme=<id>&mode=lineup|turntable|play&view=all|top|default|angle`. Li
 on both square colours; Turntable spins it; Playground plays random legal moves with speed Off/1/2/5
 and demo buttons for castling, en passant and promotion. Stats under the board show draw calls,
 triangles and tris per piece. Screenshot at 360×740 and 1440×900 and look at Top view first.
+
+## 10. Name tags
+Tapping a piece (or hovering it with a mouse) shows a small name tag over its head. By default it
+says the chess name; give your theme `names: {p:'Squire', n:'Dragon Knight', b:'Wizard', …}` and the
+tag shows your name with the chess name underneath. Keep names short (≤ 14 characters).

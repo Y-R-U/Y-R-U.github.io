@@ -53,13 +53,17 @@ export const DEFAULT_SETTINGS = {
   sound: true,
   moveConfirm: false,
   coords: true,
-  view: 'default',         // 'top' | 'default' | 'angle'
+  view: 'top',             // 'top' | 'tilt' | 'angle' | 'free' (legacy 'default' = 'tilt'); board agent 2026-10-31
   lastTc: '10+0',
   lastColor: 'random',
 };
 let settingsCache = null;
 export function getSettings() {
-  if (!settingsCache) settingsCache = { ...DEFAULT_SETTINGS, ...read(KEYS.settings, {}) };
+  if (!settingsCache) {
+    settingsCache = { ...DEFAULT_SETTINGS, ...read(KEYS.settings, {}) };
+    if (settingsCache.view === 'default') settingsCache.view = 'tilt';   // old saves
+    if (!['top', 'tilt', 'angle', 'free'].includes(settingsCache.view)) settingsCache.view = 'top';
+  }
   return settingsCache;
 }
 export function setSettings(patch) {

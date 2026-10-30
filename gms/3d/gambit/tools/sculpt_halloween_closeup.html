@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Halloween closeup</title>
+<link rel="icon" href="data:,">
+<script type="importmap">
+{ "imports": {
+  "three": "/gms/lib/three/0.180.0/three.module.js",
+  "three/addons/": "/gms/lib/three/0.180.0/addons/"
+} }
+</script>
+<style>html,body{margin:0;background:#14161b;overflow:hidden}canvas{display:block}#s{position:fixed;left:6px;top:4px;color:#ccc;font:12px monospace}</style>
+</head>
+<body>
+<div id="s"></div>
+<script type="module">
+// Sculptor close-up bench: ?theme=halloween&types=pr&view=angle|top|low&theta=0.4&dist=3.2
+// Rows: black (back), white (front); each type twice so it sits on a light AND dark square.
+import * as THREE from 'three';
+import * as kit from '../js/themes/kit.js';
+import { loadTheme } from '../js/themes/index.js';
+const Q = new URLSearchParams(location.search);
+const theme = await loadTheme(Q.get('theme') || 'halloween');
+const types = (Q.get('types') || 'pr').split('');
+const view = Q.get('view') || 'angle';
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.body.append(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#14161b');
+const pm = new THREE.PMREMGenerator(renderer);
+scene.environment = pm.fromScene(kit.studioEnvironment(), 0.04).texture;
+const lights = kit.defaultLightRig(); scene.add(lights);
+lights.traverse(o => { if (o.isDirectionalLight) { o.shadow.mapSize.set(2048, 2048); Object.assign(o.shadow.camera, { left: -4, right: 4, top: 4, bottom: -4 }); o.shadow.bias = -0.0005; } });
+const cols = types.length * 2;
+const LIGHT = Q.get('light') || '#e2dfd8', DARK = Q.get('dark') || '#262b37';
+for (let i = 0; i < cols; i++) for (let j = 0; j < 2; j++) {
+  const sq = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: (i + j) % 2 ? DARK : LIGHT, roughness: 0.3 }));
+  sq.position.set(i - cols / 2 + 0.5, 0, j - 0.5); sq.receiveShadow = true; scene.add(sq);
+}
+let tris = {};
+types.forEach((t, k) => ['b', 'w'].forEach((c, j) => {
+  for (let m = 0; m < 2; m++) {
+    const fn = theme.pieces[t];
+    const obj = fn(THREE, kit, { color: c, type: t });
+    tris[c + t] = kit.stats(obj).tris + ' tris/' + kit.stats(obj).meshes + ' mesh';
+    const inner = new THREE.Group(); inner.rotation.y = theme.pieces?.facing?.[c] ?? (c === 'w' ? Math.PI / 2 : -Math.PI / 2);
+    inner.add(obj); inner.position.set(k * 2 + m - cols / 2 + 0.5, 0, j - 0.5); scene.add(inner);
+  }
+}));
+document.getElementById('s').textContent = JSON.stringify(tris);
+const cam = new THREE.PerspectiveCamera(view === 'top' ? 22 : 30, innerWidth / innerHeight, 0.05, 100);
+const theta = +(Q.get('theta') || 0), dist = +(Q.get('dist') || (cols * 1.15 + 0.8));
+const phi = { top: 0.0005, angle: 0.95, low: 1.25 }[view] ?? 0.95;
+const R = view === 'top' ? dist * 2.3 : dist;
+cam.position.set(R * Math.sin(phi) * Math.sin(theta), R * Math.cos(phi) + 0.35, R * Math.sin(phi) * Math.cos(theta));
+cam.lookAt(0, view === 'top' ? 0 : 0.35, 0);
+renderer.render(scene, cam);
+window.DONE = true;
+</script>
+</body>
+</html>

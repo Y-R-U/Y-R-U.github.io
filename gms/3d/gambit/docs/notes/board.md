@@ -43,18 +43,55 @@
   — only keys present change. `autoHighlight` sets lastMove on every applyMove.
 - `showArrows([{from,to,color?}])`, color may be a CSS colour or 'hint'|'good'|'bad'|'threat'.
 - `setCoords(bool)`, `setOptions({coords, keyboard, autoHighlight, legalMoves, maxPixelRatio})`.
-- `camera.preset('top'|'default'|'angle')`, `camera.reset()`, `camera.orbit(dθ,dφ)`, `camera.zoom(f)`,
-  `camera.setAutoRotate(rad/s)`, `camera.state`.
+- Camera views: `camera.preset('top'|'tilt'|'angle'|'free')` ('default' = 'tilt'), `camera.cycle()`
+  (Top → Tilt → Angle → Free), `camera.view`, `camera.label` ('Top'|'Tilt'|'3D'|'Free'), `camera.locked`,
+  `camera.setLocked(bool)`, `camera.reset()`, `camera.orbit/zoom` (no-ops while locked), `camera.setAutoRotate`, `camera.state`.
+  Emits `'view'` {view,label,locked} on every change (button, V key, preset). **Default is Top, locked.**
+- Name tags: option `labels` (default true; `setOptions({labels:false})` for puzzles/learn),
+  `showLabel(sq)` / `hideLabel()`. Themes may give `names: {p,n,b,r,q,k}`.
 - Events: `board.on('select'|'promotion'|'animstart'|'animend'|'battlestart'|'battleend'|'theme', fn)` → unsubscribe fn.
 - Also: `isAnimating()`, `whenIdle()`, `pieceAt(sq)`, `stats()` → {fps, frameMs, drawCalls, triangles, pieces}, `dispose()`.
-- Keyboard: arrows/WASD orbit, +/- zoom, 0/Home reset. Ignored while typing in inputs; disable with `keyboard:false`.
+- Keyboard: V cycles views; in Free view arrows/WASD orbit and +/- zoom; 0/Home reset. Ignored while typing in inputs; disable with `keyboard:false`.
+
+## Change log
+- 2026-10-31 (Aaron, via manager) **Camera modes**: presets top (straight overhead), tilt (13°),
+  angle (48°, label "3D") are LOCKED (drag on empty space, arrows, wheel and pinch do nothing;
+  piece tap/drag still works; battle focus/shake still play and return to the locked pose).
+  free (32°) orbits/zooms as before. Default = top. The game toolbar "View" button now cycles
+  Top → Tilt → 3D → Free with the current mode as its label + a toast, saved to the `view`
+  setting; V key does the same. Settings offers the same four; saved 'default' loads as 'tilt'
+  (store.js getSettings migrates it, DEFAULT_SETTINGS.view = 'top'). Edited ui files:
+  js/app/screens/game.js, js/app/screens/settings.js, js/app/store.js (two lines).
+- 2026-10-31 (Aaron) **Piece name tags** (`js/board/labels.js`): a DOM pill (dark translucent, gold
+  border, Cinzel small caps) that tracks the piece's projected head every frame and stays inside
+  the board container. Shown when you select your own piece (alongside the dots; hidden on
+  deselect/move), when you tap any piece with nothing selected, and on a fine pointer after
+  hovering a piece 250 ms (hides on leave). Every tag fades after `LABEL_MS = 4000`. Tapping an
+  enemy with your piece selected is still a capture attempt (no tag). Theme `names` shows
+  "Wizard" with "Bishop" underneath.
+  Placement: above the piece along the camera's screen-up axis (so it clears the piece even in
+  straight-overhead Top view); for your own selected piece it goes BELOW instead so it never covers
+  the legal-move dots. Positioned with plain left/top (no CSS transforms: under emulated-mobile
+  swiftshader a transformed overlay above the WebGL canvas didn't paint). Screens: 360×740
+  `scratchpad/board/tags_360_pair.png`, 1440×900 hover `scratchpad/board/game_tag_hover_1440.png`.
+  Headless gotchas: tags fade at 4 s, so screenshot within ~1.5 s; disable `.gb-tag` transitions
+  in tests (swiftshader runs ~0.1 fps at dpr 2, so CSS fades never advance).
+- 2026-10-31 (Aaron) **Black-on-dark contrast**: dark squares lifted to slate `#69717f` (were navy
+  `#262b37`), light squares down a touch (`#d8d4cb`); black chrome is a deeper lacquer `#1c1d22`
+  with a cool silver fresnel rim (0.26) and a new `rim.top` sheen (small bright cap on upward faces,
+  world-space, from the kit shader), replacing the red rim; every resting piece gets an instanced
+  contact blob (soft AO + faint light ring at the base edge, 1 draw call). Tuning lives only in
+  `kit.metalLooks` and `kit.boardLooks.marble`. Before/after (top row before, bottom after;
+  Top / Tilt / Angle at 360×740, phone scale):
+  `scratchpad/board/contrast_before_after.png` (also contrast_before_*.png / contrast_after_*.png).
+  Test position: `1n1k3r/p1p1p1p1/1p1p4/8/8/8/P1P1P1P1/1N1Q1K2 w - - 0 1`.
+- Tests: `node tools/board_test.mjs <dir>` (input, special moves, camera lock),
+  `node tools/board_game_test.mjs <dir>` (real game screen: view button cycle, tags tap/hover).
 
 ## Requests
 - ui: the game screen could set `board.onPromotion` to show its picker over `squareToScreen(to)`
   instead of returning false and re-applying (keeps a dragged pawn hovering on the target).
 
 ## Open issues / ideas
-- Black chrome from straight overhead on the dark marble relies on a faint red rim; acceptable at
-  360 px but the weakest contrast case. A tunable if Aaron wants more pop: `kit.metalLooks.b.rim.strength`.
 - No planar reflections (by design, phones). Glossy board uses the studio env map only.
 - Per-piece idle animation (flickering candles etc.) isn't supported by instancing yet.

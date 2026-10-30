@@ -32,6 +32,7 @@ window.__gambit = app;   // handy for tests / debugging
 // The loader is only called when the route is opened, so a missing module never 404s at boot.
 export const PLUGINS = {
   // puzzles: () => import('../puzzles/screen.js'),
+  online: () => import('./screens/online.js'),   // online agent
 };
 
 const ROUTES = [
@@ -170,7 +171,9 @@ async function boot() {
   setupFullscreen();
   setupTouch();
   $('#settings-btn').addEventListener('click', () => {
-    if (app.route === 'game') game.openSettingsSheet(); else app.go('#/settings');
+    if (app.route === 'game') game.openSettingsSheet();
+    else if (app.openSettingsHere) app.openSettingsHere();   // a plug-in screen with a live game (online)
+    else app.go('#/settings');
   });
   window.addEventListener('hashchange', render);
   render();
