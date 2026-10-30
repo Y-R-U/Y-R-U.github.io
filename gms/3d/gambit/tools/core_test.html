@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GAMBIT core test</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 14px/1.4 system-ui, sans-serif; margin: 16px; background: #1b1d22; color: #e8e8e8; }
+  pre { background: #0e0f12; padding: 8px; white-space: pre-wrap; max-height: 50vh; overflow: auto; }
+  select, button { font-size: 14px; padding: 6px 10px; margin: 2px; }
+  table { border-collapse: collapse; } td, th { padding: 2px 8px; border-bottom: 1px solid #333; text-align: left; }
+  .locked { opacity: .45; }
+  #board { font: 22px/1.05 monospace; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+<h3>GAMBIT core: bots in the worker</h3>
+<div>
+  White <select id="w"></select> Black <select id="b"></select>
+  <button id="play">Play game</button>
+  <button id="bench">Re-run benchmark</button>
+</div>
+<pre id="board"></pre>
+<pre id="log"></pre>
+<table id="bots"></table>
+<script type="module">
+import { Chess } from '../js/chess/chess.js';
+import { BOTS, benchmark, botAvailable, createBot, hint, solveMate, expectedMoveMs, sfBenchmark } from '../js/bots/bots.js';
+
+const $ = (id) => document.getElementById(id);
+const log = (s) => { $('log').textContent += s + '\n'; console.log(s); };
+const qs = new URLSearchParams(location.search);
+window.__core = { done: false, errors: [] };
+window.addEventListener('error', (e) => window.__core.errors.push(String(e.message)));
+
+for (const sel of [$('w'), $('b')]) for (const b of BOTS) sel.add(new Option(`${b.name} (${b.elo})`, b.id));
+$('w').value = qs.get('w') || 'juno'; $('b').value = qs.get('b') || 'bea';
+
+const glyph = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
+function draw(c) {
+  $('board').textContent = c.board().map((row) => row.map((x) => x ? (x.color === 'w' ? glyph[x.type].replace('♟','♙').replace('♞','♘').replace('♝','♗').replace('♜','♖').replace('♛','♕').replace('♚','♔') : glyph[x.type]) : '·').join(' ')).join('\n');
+}
+
+async function showBots(bench) {
+  $('bots').innerHTML = '<tr><th>bot</th><th>elo</th><th>engine</th><th>min score</th><th>~ms/move here</th><th>available</th></tr>' +
+    BOTS.map((b) => `<tr class="${botAvailable(b, bench) ? '' : 'locked'}"><td>${b.avatar} ${b.name}</td><td>${b.elo}</td><td>${b.engine}</td><td>${b.minDeviceScore}</td><td>${expectedMoveMs(b, bench)}</td><td>${botAvailable(b, bench) ? 'yes' : 'too strong for this device'}</td></tr>`).join('');
+}
+
+async function playGame(wId, bId, maxPlies = 400) {
+  const c = new Chess();
+  const bots = { w: createBot(wId, { humanDelay: false }), b: createBot(bId, { humanDelay: false }) };
+  const lans = [];
+  const t0 = performance.now();
+  const stat = { w: { ms: 0, n: 0 }, b: { ms: 0, n: 0 } };
+  while (!c.isGameOver() && lans.length < maxPlies) {
+    const side = c.turn();
+    const r = await bots[side].think(c.fen(), { startFen: new Chess().fen(), moves: lans });
+    const v = r && c.move(r.move);
+    if (!v) throw new Error(`${side} returned bad move ${r && r.move} in ${c.fen()}`);
+    if (!r.book) { stat[side].ms += r.ms; stat[side].n++; }
+    lans.push(v.lan);
+    draw(c);
+  }
+  bots.w.dispose(); bots.b.dispose();
+  const o = c.outcome();
+  return { result: o.result, reason: o.reason, plies: lans.length, ms: Math.round(performance.now() - t0),
+    msPerMove: { w: Math.round(stat.w.ms / Math.max(1, stat.w.n)), b: Math.round(stat.b.ms / Math.max(1, stat.b.n)) }, pgn: c.pgn({ White: wId, Black: bId }) };
+}
+
+async function main() {
+  const bench = await benchmark({ force: qs.has('fresh') });
+  log(`benchmark: ${JSON.stringify(bench)}`);
+  await showBots(bench);
+  window.__core.bench = bench;
+  window.__core.available = BOTS.filter((b) => botAvailable(b, bench)).map((b) => b.id);
+  if (qs.has('sfbench')) {
+    window.__core.sf1 = await sfBenchmark(1000, 1);
+    window.__core.sf4 = await sfBenchmark(1000, 4);
+    log('stockfish nps: ' + JSON.stringify([window.__core.sf1, window.__core.sf4]));
+  }
+  if (qs.has('auto')) {
+    const h = await hint('r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4', 500);
+    log(`hint (Scholar's mate): ${h.move} mate ${h.mate}`);
+    const s = await solveMate('2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - 0 1', 2);
+    log(`solveMate WAC mate-in-2: ${s.solutions} unique=${s.unique}`);
+    window.__core.hint = h.move; window.__core.solve = s.solutions;
+    const games = (qs.get('games') || 'juno:bea').split(',');
+    window.__core.games = [];
+    for (const g of games) {
+      const [a, b] = g.split(':');
+      const r = await playGame(a, b, +(qs.get('maxPlies') || 400));
+      log(`${a} vs ${b}: ${r.result} (${r.reason}, ${r.plies} plies, ${r.ms} ms, ms/move w ${r.msPerMove.w} b ${r.msPerMove.b})`);
+      window.__core.games.push({ a, b, ...r });
+    }
+    window.__core.done = true;
+  }
+}
+$('play').onclick = async () => { const r = await playGame($('w').value, $('b').value); log(`${r.result} ${r.reason}\n${r.pgn}`); };
+$('bench').onclick = async () => { const b = await benchmark({ force: true }); log('benchmark ' + JSON.stringify(b)); showBots(b); };
+main().catch((e) => { log('ERROR ' + e.stack); window.__core.errors.push(String(e)); window.__core.done = true; });
+</script>
+</body>
+</html>

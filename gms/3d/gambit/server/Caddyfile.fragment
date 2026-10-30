@@ -1,0 +1,8 @@
+# GAMBIT API (Go service, gms/3d/gambit/server). Merge INSIDE the existing games.br8t.com
+# block, before the static fallback (caddy_route.py does exactly this, idempotently).
+# reverse_proxy passes websocket upgrades through as-is (/gms/3d/gambit/api/ws).
+# Check loopback 8019 is free first: `ss -ltnp | grep 8019` (8005 filestore, 8012 clued, 8016 payments).
+handle /gms/3d/gambit/api/* {
+	header Cache-Control "no-store"
+	reverse_proxy 127.0.0.1:8019
+}

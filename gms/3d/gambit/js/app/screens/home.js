@@ -1,0 +1,66 @@
+import { botHue } from './game.js';
+import { h, esc, icon, fmtInt, avatar } from '../ui.js';
+import { getResume, getStats, getLadder, clearResume } from '../store.js';
+import { playerRank } from '../ladder.js';
+import { parseTc } from '../clock.js';
+import { knightMark } from '../main.js';
+
+export const ROUTE = 'home';
+
+export function render(app) {
+  const resume = getResume();
+  const st = getStats(), lad = getLadder();
+  const { rank, of } = playerRank();
+  const bot = resume && app.deps.bots.BOTS.find(b => b.id === resume.botId);
+  const el = h(`<section class="screen home">
+    <div class="hero">
+      <div class="hero-mark">${knightMark()}</div>
+      <h1 class="wordmark">GAMBIT</h1>
+      <p class="tagline">Chess with a little theatre.</p>
+    </div>
+    ${bot ? `<div class="continue card card-accent">
+      ${avatar(bot.avatar, { size: 'lg', label: bot.name, hue: botHue(bot) })}
+      <div class="continue-txt"><small>Game in progress</small><b>vs ${esc(bot.name)}</b>
+        <span>${parseTc(resume.tc).label} · move ${Math.floor((resume.moves || []).length / 2) + 1}</span></div>
+      <div class="continue-btns">
+        <button class="btn btn-primary" data-act="resume">${icon('play')} Continue</button>
+        <button class="btn btn-ghost btn-sm" data-act="discard">Discard</button>
+      </div>
+    </div>` : ''}
+    <nav class="home-menu">
+      <a class="menu-item primary" href="#/play/bot">
+        <span class="mi-ic">${icon('robot')}</span>
+        <span class="mi-txt"><b>Play Bots</b><small>${app.deps.bots.BOTS.length} opponents · climb the ladder</small></span>
+        <span class="mi-go">${icon('chevron')}</span></a>
+      <a class="menu-item" href="#/online">
+        <span class="mi-ic">${icon('globe')}</span>
+        <span class="mi-txt"><b>Play Online</b><small>Quick match, lobby, play a friend</small></span>
+        <span class="mi-go">${icon('chevron')}</span></a>
+      <a class="menu-item" href="#/puzzles">
+        <span class="mi-ic">${icon('puzzle')}</span>
+        <span class="mi-txt"><b>Puzzles</b><small>Mates and tactics, easy to fiendish</small></span>
+        <span class="mi-go">${icon('chevron')}</span></a>
+      <a class="menu-item" href="#/ladder">
+        <span class="mi-ic">${icon('trophy')}</span>
+        <span class="mi-txt"><b>Ladder</b><small>Rank <b class="hl">#${rank}</b> of ${of} · ${fmtInt(lad.points)} pts</small></span>
+        <span class="mi-go">${icon('chevron')}</span></a>
+      <a class="menu-item muted" href="#/learn">
+        <span class="mi-ic">${icon('book')}</span>
+        <span class="mi-txt"><b>Learn</b><small>Lessons for new players</small></span>
+        <span class="badge">Soon</span></a>
+    </nav>
+    <div class="home-stats">
+      <div><b>${fmtInt(st.games)}</b><small>Games</small></div>
+      <div><b class="good">${fmtInt(st.w)}</b><small>Wins</small></div>
+      <div><b>${fmtInt(st.d)}</b><small>Draws</small></div>
+      <div><b class="bad">${fmtInt(st.l)}</b><small>Losses</small></div>
+      <div><b>${lad.elo}</b><small>Ladder Elo</small></div>
+    </div>
+  </section>`);
+  el.addEventListener('click', e => {
+    const a = e.target.closest('[data-act]'); if (!a) return;
+    if (a.dataset.act === 'resume') app.go('#/game');
+    if (a.dataset.act === 'discard') { clearResume(); app.go('#/home'); }
+  });
+  return { el, top: { logo: true } };
+}

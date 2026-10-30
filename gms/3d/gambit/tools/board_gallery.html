@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gambit Board Gallery</title>
+<link rel="icon" href="data:,">
+<script type="importmap">
+{ "imports": {
+  "three": "/gms/lib/three/0.180.0/three.module.js",
+  "three/addons/": "/gms/lib/three/0.180.0/addons/"
+} }
+</script>
+<style>
+  :root { --bg: #14161b; --panel: #1e2129; --line: #343a47; --text: #e9e6df; --mute: #9aa0ad; --gold: #e3b45a; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px 12px; background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+  header h1 { font-size: 15px; margin: 0 8px 0 0; color: var(--gold); letter-spacing: .04em; }
+  select, button { font: inherit; color: var(--text); background: #2a2f3a; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; min-height: 36px; }
+  button.on { background: var(--gold); color: #1a1408; border-color: var(--gold); }
+  .grp { display: flex; gap: 4px; align-items: center; }
+  main { padding: 10px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cell { flex: 1 1 320px; min-width: 0; }
+  .cell h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--mute); margin: 4px 2px; }
+  .host { width: 100%; aspect-ratio: 1 / 1; background: radial-gradient(circle at 50% 40%, #2a2e38, #121318); border-radius: 10px; overflow: hidden; }
+  .host.tall { aspect-ratio: auto; height: min(78vh, 900px); }
+  #stats { font: 12px ui-monospace, Menlo, monospace; color: var(--mute); white-space: pre-wrap; margin-top: 8px; }
+  #controls { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  #promo { position: absolute; display: none; gap: 4px; background: #000c; padding: 6px; border-radius: 10px; z-index: 9; transform: translate(-50%, -50%); }
+  #promo button { width: 44px; height: 44px; font-size: 22px; }
+  @media (max-width: 600px) { header h1 { width: 100%; } .host.tall { height: auto; aspect-ratio: 1 / 1; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>GAMBIT · board gallery</h1>
+  <div class="grp"><select id="theme"></select></div>
+  <div class="grp" id="modes">
+    <button data-mode="lineup">Lineup</button><button data-mode="turntable">Turntable</button><button data-mode="play">Playground</button>
+  </div>
+  <div class="grp" id="views">
+    <button data-view="all">All</button><button data-view="top">Top</button><button data-view="default">Default</button><button data-view="angle">Angle</button>
+  </div>
+</header>
+<main id="main"></main>
+<div id="promo"></div>
+<script type="module" src="./board_gallery.js"></script>
+</body>
+</html>

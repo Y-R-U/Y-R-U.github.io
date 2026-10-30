@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0c0f15" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="GAMBIT: chess with 3D themed pieces, battle animations, a bot ladder, puzzles and online play." />
+  <title>GAMBIT · Chess</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0f15'/%3E%3Cpath fill='%23e0b660' d='M9 27h15v-2.6c0-3.4-1.6-6-1.6-9.6 0-4.2 1.6-6 1.6-6-2-2.9-5.4-4.4-8.6-4.1L13.8 3l-1.6 2.6C8.6 7.2 6.4 10.6 6 14.3l3.3 1.4 2.6-2.1 2.2.3c-1.6 2.3-4 4.4-5.1 7.6z'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&display=swap" />
+  <link rel="stylesheet" href="css/app.css" />
+  <script type="importmap">
+  { "imports": {
+      "three": "/gms/lib/three/0.180.0/three.module.js",
+      "three/addons/": "/gms/lib/three/0.180.0/addons/"
+  } }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="tb-left"></div>
+      <div class="tb-right">
+        <button id="fs-btn" class="tb-btn" aria-label="Fullscreen"></button>
+        <button id="settings-btn" class="tb-btn" aria-label="Settings">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        </button>
+      </div>
+    </header>
+    <main id="view"></main>
+  </div>
+
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-word">GAMBIT</div>
+      <div class="boot-spin"></div>
+      <div id="boot-status">Setting up the pieces…</div>
+      <button id="boot-reload" hidden>Reload</button>
+    </div>
+  </div>
+  <script>
+    // Boot watchdog: a stale cached module can hang the module graph silently.
+    (function () {
+      var shown = false;
+      function stuck(msg) {
+        if (window.__booted || shown) return;
+        shown = true;
+        var s = document.getElementById('boot-status'), b = document.getElementById('boot-reload');
+        if (s) s.textContent = msg || 'Still loading… something may be stuck.';
+        if (b) { b.hidden = false; b.onclick = function () { location.replace(location.pathname + '?v=' + Date.now() + location.hash); }; }
+      }
+      setTimeout(function () { stuck(); }, 10000);
+      addEventListener('error', function (e) {
+        if (!window.__booted && e.target && e.target.tagName === 'SCRIPT') stuck('Loading failed. Tap reload.');
+      }, true);
+    })();
+  </script>
+  <script type="module" src="js/app/main.js"></script>
+</body>
+</html>
