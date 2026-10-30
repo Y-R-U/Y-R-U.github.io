@@ -138,3 +138,68 @@ scratchpad (`mk.py` strips, `mkt.py` timings).
 ## Open issues / ideas
 - Holy smite's beam is still the brightest thing in the game from Top (toned down 25%).
 - Spotlight dims the board's highlight overlays too during the fight (by design).
+
+---
+# battle-3 — Sci-fi battles ("Aegis vs Nova": cyan vs magenta)
+
+## Done
+- `js/themes/scifi/battles.js` (new) + one import line and `battleAnims` in `scifi/index.js`
+  (sci-fi no longer falls back to Classic battles). No changes to battle_util.js or kit.js. All four
+  use battle-2's layer (`stage` push-in + spotlight, `impact`, `slowmo`, `punch`, `camTo`, `fling`,
+  `shards`, `sound`).
+  - **strafe** — lift-off (thruster ring + wash), flies a pass across the victim with twin guns
+    walking 14 side-coloured bolts over the deck and into it (ground hits: sparks/ring/smoke; body
+    hits: flash, recoil, 3 **armour panels** blown off each), swings round, charges (motes sucked
+    into the muzzle) and fires one fat bolt: impact + inferno + 22 panels + 90 shards.
+  - **stomp** — crouch, jump-jets ignite (inferno in jet colours + smoke wash), launch to y 2.7
+    toward the camera with an exhaust trail, slam down **beside** the victim: impact + **EMP
+    hex dome** + second shockwave; the victim **short-circuits** (arcs crawl over it, its
+    light-lines flicker via emissive, it shudders), then sags and glows orange, bursting into
+    **glowing scrap** (shards + embers + panels + scorch). Attacker steps onto the square.
+  - **orbital** — uplink sparkles, a **designator laser** paints the victim, a two-layer
+    **targeting reticle** (ring + brackets, 3.4 squares wide) spins down and blinks locked, pilot
+    beam, then the **beam slams in from the sky**: impact + explosion + **mushroom of light**
+    (cap rising toward the camera, torus, stem) and the victim is flung sky-high off the board.
+  - **tractor** — emitter flare, a striped scrolling **tractor cone** lifts the victim spinning
+    toward the camera, a **force-field cube** closes and **crushes** it into a scrap cube (panel
+    map + glowing seams in the victim's colours), slow-mo snap, the beam flicks the cube bouncing
+    off the board, and the attacker **teleports** onto the square (column of light out / in).
+- Weighting: Drone/Bastion → strafe (w3), Strider → stomp (w4), Psi Oracle/AI Core → tractor
+  (w4), Commander → orbital (w4), rooks/kings may stomp, queens/rooks may orbital; every type also
+  gets all four at weight 1. Stress pick counts over 90 random captures covered all 10 entries.
+- Pooled FX (`U.definePool`, prefix `s.`): instanced lasers (halo+core, 72) + a dark
+  under-ribbon (36, vertex alpha) so bolts read on pearl tiles, instanced armour plates (48),
+  reticle, beam, mushroom, EMP dome (hex texture), tractor cone, force field, scrap cube. A battle
+  only changes colours/opacity/map offset/transforms; everything is parked in `finally`.
+  A small `runner()` integrates lasers/plates every frame on the battle timeline (skip-safe).
+
+## Timing (gallery, Top, 360×740) — `prep` nominals = measured raw
+| | 1× | 2× | 5× | cap 1.2 s @1× / @2× |
+|---|---|---|---|---|
+| strafe (w p / b p) | 2.51–2.56 s | 1.33–1.35 s | 0.38–0.40 s | 0.98–1.01 / 0.80 s |
+| stomp (w n) | 2.68 s | 1.33 s | 0.35 s | 1.06 / 0.88 s |
+| orbital (w k / b q) | 2.66–2.88 s | 1.35–1.46 s | 0.36–0.38 s | 1.05–1.08 / 0.85–0.86 s |
+| tractor (w b) | 2.56 s | 1.33 s | 0.38 s | 1.03 / 0.79 s |
+Stress 30 random @1×: 2.50–2.81 s (skips 0.25 s).
+
+## Perf (headless Chrome ANGLE/Metal, 360×740 dpr 2)
+- `programs` 35 before, during and after every run (Top and 3D view): no mid-battle compiles.
+- 30 battles each at 1×, 2×, 5× (incl. 4 skips each): scene children 7, nodes 110,
+  geometries 82, textures 19 identical before/after the 2× and 5× runs (1× = first uploads);
+  worst frame 17 ms, p99 17 ms in all three. Console clean.
+
+## Verify
+Strips: scratchpad `battle3/final/` (`top_<anim>_<side+piece>.jpg` 10 frames at 0.25×, board
+crop; `D3_*.jpg` 6 frames at 1440×900 Angle view). Spec generators `battle3/mk.py` (strips:
+`python3 mk.py strafe:wp,orbital:bq top 360 740 1 <times>`), `mkt.py` (timings), `st.json`
+(stress + pick counter). Chrome: `~/.claude/bin/cdp start --port 9532 -- --use-angle=metal
+--use-gl=angle --ignore-gpu-blocklist`; `CDP_PORT=9532 node tools/battle_cdp.mjs <out> <spec>`.
+Note: `BT.battle` with K vs K+N FENs reports "illegal" in the browser (probably the K-vs-K
+insufficient-material end); add a pawn per side.
+
+## Open issues
+- Orbital impact is the brightest beat in the set (board washes cyan/magenta ~150 ms); toned
+  down once (halo 0.7, cap 0.75, tint 0.18) — Aaron may want it even louder or quieter.
+- The flung scrap cube is small from Top once it leaves the push-in frame.
+- Sounds use the shared vocabulary (laser, zap, hit, explosion, stomp, thunder, fire, whoosh,
+  topple, stone, poof); a dedicated scifi `emp` / `tractor hum` would suit (audio request).

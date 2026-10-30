@@ -30,14 +30,15 @@ Read this first when resuming, then DECISIONS.md, TEAM_BRIEF.md, docs/notes/*.md
 | ui-2 (shared board, portrait layout, online offline-state, move review) | abd147e4f6019db1a | DONE (1 WebGL ctx, all suites pass; puzzles hooked; ONLINE_PUBLIC=false in net.js — flip at deploy) |
 | battle-1 (fantasy + halloween battles, 4 each) | a7576b524d1e83742 | DONE (8 battles, no leaks, warm shaders; reviewed: works but too SMALL from Top view vs ref) |
 | sculptor-scifi-1 (concept + p + r) | a10763d1cd754a3ff | DONE ("Aegis vs Nova"; Drone 7.5, Bastion 7; reviewed, good) |
-| battle-2 (BIG battles from Top, classic battles, kit FX housekeeping) | ac63a47fb05a1fe85 | running (9525) |
+| battle-2 (BIG battles from Top, classic battles, kit FX housekeeping) | ac63a47fb05a1fe85 | DONE (before/after reviewed: much bigger; pooled FX; sfx wired) |
+| battle-3 (sci-fi battles) | af72d3e214f34a53b | running (9532) |
 | board-2 (facing, glow flicker, kit adoption, halloween env, perf pass) | ae9ab876383b1ff7f | DONE (all tests pass; 60 fps at 4× throttle; Halloween night sky reviewed: great) |
 | sculptor-scifi-2 (n Strider + b Psi Oracle) | a45993e7f5b3af467 | DONE (Strider 7.5, Oracle 6.5–7; reviewed) |
 | qa (playthrough, bug list, ui-3 items) | acfa57929d253287a | running (9528) |
 | audio | a6b881a23e46068d6 | DONE (procedural sfx all themes, sfx() battle API, 3 ACE-Step loops ~0.5–0.65 MB; models unloaded verified; NEEDS Aaron listen-check) |
 | sculptor-scifi-3 (q AI Core + k Commander + station board + sounds) | acf7e1f8f39903d53 | DONE (q 7, k 7.5, board 7.5, env 7; SCI-FI COMPLETE; reviewed) |
 | learn (course map, lessons, drills) | a6cf292ca55789272 | running (9531) |
-| sculptor-fantasy-polish (wizard rebuild, faces, fantasy squares, island life) | af0f22136d01c2ccc | running (9530) |
+| sculptor-fantasy-polish (wizard rebuild, faces, fantasy squares, island life) | af0f22136d01c2ccc | DONE (wizard 7.5, q 7.5, k 8, board 8, island 8; castle visible over far edge; reviewed) |
 | puzzles (Lichess CC0 + classics, map, play) | a53142481a3bac366 | DONE (618 puzzles, 4760 checks pass; map+play reviewed, great; hook → ui-2) |
 | sculptor-fantasy-3 (q Sorceress + k High King + island env) | a18ad162b144a5b7e | DONE (q 7, k 7.5, island 7; FANTASY SET COMPLETE; reviewed) |
 | server-2 (lag credit, queued moves, prov, allowance race) | a7456397fcdd35eae | DONE (all tests pass; told to switch credit to full RTT) |
@@ -87,3 +88,5 @@ Read this first when resuming, then DECISIONS.md, TEAM_BRIEF.md, docs/notes/*.md
 - 2026-10-31: scifi-2 DONE. Oracle helmet egg-ish → sci-fi polish later. Running 5 → wait.
 - 2026-10-31: board-2 DONE. Running 4; holding the 2 free slots deliberately (next work depends on battle-2 / scifi-3 landing: sci-fi battles, then learn mode). Sculptors may switch to kit.vertexMaterial + flicker later.
 - 2026-10-31: scifi-3 DONE → all 4 themes complete. Started LEARN (D14) since the game is feature-complete. Remaining: sci-fi battles (after battle-2), board requests (camera to env.update, ambientMinPhi), sci-fi music loop, projects.js entry + screenshot, deploy (needs Aaron).
+- 2026-10-31: battle-2 DONE. MILESTONE 4 committed+pushed (4e5fdaeb; learn WIP excluded). Started battle-3 (sci-fi). Running 4: qa, fantasy-polish, learn, battle-3. Scratch note: agents must use unique scratch subfolders (battle-2 rm -rf in shared b2/out).
+- 2026-10-31: fantasy-polish DONE. Running 3 (qa, learn, battle-3); holding. Next: projects.js entry + screenshot (manager).

@@ -1,6 +1,6 @@
 // Puzzle play: the real 3D board, opponent setup move, find-the-move loop, hints, reveal,
 // stars, rating, celebration. One persistent board is reused across puzzles.
-import { h, esc, icon, toast, promotionPicker } from '../app/ui.js';
+import { h, esc, icon, toast, promotionPicker, confirmDialog } from '../app/ui.js';
 import { getSettings, onSettings } from '../app/store.js';
 import { play as sfx, playMove } from '../app/sound.js';
 import { installedThemes } from '../app/themes-meta.js';
@@ -151,8 +151,15 @@ function hint() {
   renderPanel();
 }
 
-async function reveal() {
+async function reveal({ ask = true } = {}) {
   if (!S || S.busy || S.finished) return;
+  // a clean first attempt is charged as a miss: ask first so a stray tap doesn't cost rating (qa)
+  const pr = getProgress();
+  if (ask && !S.mistakes && !S.hints && !S.replay && pr.s[S.p.id] === undefined && !pr.a[S.p.id]) {
+    const s0 = S;
+    const ok = await confirmDialog({ title: 'Show the solution?', body: 'You won’t get stars for this puzzle, and your puzzle rating counts it as a miss.', ok: 'Show solution' });
+    if (!ok || S !== s0 || S.busy || S.finished) return;
+  }
   S.revealed = true;
   if (!S.mistakes && !S.hints && !S.replay) S.ratingDelta += recordFirstMiss(S.p);
   S.busy = true; setInteractive(); renderPanel();
@@ -370,5 +377,5 @@ window.__puzzleTest = () => S && {
     const ms = S.run.chess.moves({ verbose: true }).filter(m => lanOf(m) !== e && !m.san.includes('#'));
     const m = ms[0]; return m && onMoveAttempt({ from: m.from, to: m.to, promotion: m.promotion });
   },
-  hint, reveal, celebrate: () => celebrate(3),
+  hint, reveal: () => reveal({ ask: false }), celebrate: () => celebrate(3),
 };

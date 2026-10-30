@@ -10,6 +10,7 @@ import { queen, coreSpin } from './queen.js';   // sculptor-scifi-3
 import { king, commandJet } from './king.js';   // sculptor-scifi-3
 import { build as buildBoard, environment, overlayStyle } from './board.js';   // sculptor-scifi-3
 import { moveAnims } from './anims.js';
+import { battleAnims } from './battles.js';   // battle-3: strafe / stomp / orbital / tractor
 
 export default {
   id: 'scifi',
@@ -20,5 +21,6 @@ export default {
     facing: { byType: { k: 'player' } } },   // the Commander faces its owner
   names: { p: 'Drone', n: 'Strider', b: 'Psi Oracle', r: 'Bastion', q: 'AI Core', k: 'Commander' },
   moveAnims: [...moveAnims, coreSpin, commandJet],   // + AI Core / Commander moves (scifi-3)
+  battleAnims,   // battle-3 (js/themes/scifi/battles.js)
   sounds: () => import('./sounds.js'),   // synthy clamp/zap/alert set (scifi-3, audio-agent format)
 };

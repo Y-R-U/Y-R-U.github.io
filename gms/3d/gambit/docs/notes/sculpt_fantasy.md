@@ -167,3 +167,97 @@
   could drift cheaply — only while tilted, only when the board is already rendering.
 - Manager: a fantasy-specific board build (squares with gold inlay like the ref) could follow; I
   left the Classic squares on purpose to keep D28 contrast tuned in one place.
+
+---
+
+# sculptor-fantasy-polish — polish pass (raise the set toward the refs)
+
+## Done
+- **Faces** (`face.js`, new): a head is its own small SDF meshed at a fine cell (0.012–0.013 vs
+  the bodies' 0.022–0.028) with brow ridge, nose, cheekbones, eye sockets + eyeballs, ears, a
+  hairline that leaves the face clear (the old queen's hair ellipsoid fully covered her face), an
+  optional beard + moustache, and a flat cut under the hat/crown. Painted by feature for value
+  contrast: warm skin vs darker sockets/eyes, brows, lips. Black royals/wizard get faintly glowing
+  red eyes (uv glow channel). Cached per style, recoloured per side.
+- **Wizard rebuilt** (`bishop.js`): drape-shell coat split below the belt over a side-colour
+  underrobe (inner face repeats every outer row so the end caps follow the varying opening — the
+  first try had big gold cap triangles across the V), floor-length mantle with gold border, stole
+  either side of a long beard, gold belt + gem buckle, spellbook at the hip, lathe-tube arms with
+  hanging bell sleeves + gold cuffs (replacing lumpy SDF arms), rolled hood, staff with a gold
+  crescent cradling the orb. Hat 10% smaller, pushed back (0.14 rad) so the face shows at an angle.
+  **Slot** = a constant-width (0.021) ribbon lying on brim + crown front-to-back: a crisp dark line
+  from straight above (glowing red on black). Turned 3/4 toward the owner via
+  `facing: { byType: { b: 0.5 } }` (no baked yaw). **5,966 tris** (was 5,892).
+- **Queen**: sculpted head (`hair: 'queen'`: parted cap, locks framing the face, bun); blotchy
+  painted stomacher dropped (clean ivory/ebony bodice). Pearls 6×4, mantle 14 cols, collar 18 cols,
+  plinth 20 seg to stay in budget. **5,976 tris** (was 5,990).
+- **King**: sculpted head with a **gold-brown beard** on white (was ivory-on-ivory), charcoal on
+  black; plate arms are now crisp lathe tubes (rerebrace with two gold lame ridges, gold couter with
+  a fan wing, vambrace flaring into a gold gauntlet cuff, gauntlets on the pommel) instead of SDF
+  tubes; ermine roll a touch slimmer/lower so the beard shows; crown arches fixed (`kit.torus` has
+  no arc arg, so they were full rings dipping into the face — now `THREE.TorusGeometry(..., PI)`).
+  Body cell 0.025 → 0.028. **7,982 tris** (was 7,824; ≤ 8k).
+- **Fantasy board** (`squares.js`, new; `board: { build, environment }`): marble squares from
+  `kit.boardLooks.marble` (dark squares identical to Classic, D28) with fine **gold inlay lines**
+  between squares + diamond studs at the crossings — real metal via a metalness/roughness mask
+  canvas on the same material; deep blue-black marble frame with raised gold mouldings, gold
+  filigree scroll runs from each corner, a glowing blue **rune medallion** in a gold bezel at each
+  corner, gold lozenges with blue gems mid-edge. **4 draw calls, 4,994 tris** (Classic 3 / 1,858).
+  `runeTexture(kit)` exported and shared with the island deck.
+- **Island life** (`board.js`, uses board-2's `env.update(dt, t)`): flames lick + flicker
+  (vertex/fragment shader on a time uniform), waterfalls stream (tileable streak texture scrolled;
+  fades in-shader), the cloud sea drifts (one rotation), distant islands bob (each its own
+  phase/amplitude in the uv channel), banners sway with their embroidered crests (crests moved
+  into the cloth mesh), deck medallions breathe. `update()` costs ~1 µs; no per-vertex CPU work.
+- **Richer scenery**: oaks (leaning trunk, two limbs, five lumpy AO-shaded clumps) and ragged
+  drooping pines replace the cone-stack trees; flowering bushes; hanging crags under every island
+  (noise + curled tips) and strata/greenery on cliffs; two **great castles** (curtain wall with
+  crenellations, corner towers, gatehouse, keep with turrets and a tall central spire, blue
+  roofs, gold finials) — one behind each side. The archipelago and cloud sea moved **below** the
+  board's island: measured at the 3D preset only y < -18 is in frame 40 units out, so the old
+  islands (y up to +7) never appeared behind the board; now the castle shows over the far edge in
+  3D (very ref-like on a phone) and two high islands remain as silhouettes for low Free views.
+- `minPhi` 0.12 → **0.24**: Tilt (13°) only ever showed a sliver of deck, and an env with
+  `update` makes the board re-render at the ambient rate while visible. Top + Tilt pay nothing.
+
+## Numbers (headless Chrome, Metal ANGLE)
+| | before | after |
+|---|---|---|
+| tris/piece p n b r q k | 5992 7660 5892 5946 5990 7824 | 5992 7660 **5966** 5946 **5976** **7982** |
+| Top / Tilt idle, full army | 18 draw calls, 0 fps | 19 draw calls, 0 fps |
+| 3D idle | 30 draw calls, static | 32 draw calls, ambient ~20 fps @ 0.9 ms frame CPU |
+| environment | ~24k tris, static | 48.9k tris, 10 draw calls, build 39 ms |
+| board build | Classic 1.9k tris | 5.0k tris, 18 ms |
+Zero console errors across gallery Lineup/Turntable/Playground (all views, 360×740 + 1440×900),
+25 s autoplay at 2× with battles, and the close-up viewer.
+
+## How to test
+- Faces: `tools/sculpt_fantasy_view.html?piece=k&side=w&one=1&view=side&noyaw=1&az=210&dist=1.3&ty=0.95`
+  (new `&side=w|b` and `&one=1` = a single piece; `&parts=1` makes `assemble()` log triangles per
+  part into `FANTASY_PARTS` — how the budgets above were trimmed).
+- Wizard: `...?piece=b&side=w&one=1&view=angle&noyaw=1&az=200&dist=2.6&ty=0.55`; slot from above
+  `...?piece=b&side=w&one=1&view=top&dist=1.4&ty=0.7`.
+- Board/island: gallery `?theme=fantasy&mode=play&view=angle`, then Free + orbit for the island.
+  Ambient anim follows the board's `ambientAnim` option/setting.
+
+## Honest scores
+- Wizard **7.5/10** (was 6.5): reads as a wizard with face, beard, stole, book, sleeves, crisp slot;
+  still low-poly hands (spheres), sleeve droop is slightly papery at extreme close-up, hat is big.
+- Queen **7.5/10** (was 7): a real face with framing hair at angle; coronet still small from Top.
+- King **8/10** (was 7.5): beard/face contrast fixed, armoured arms read as plate; tabard panel on the
+  coarser body is soft-edged.
+- Board **8/10**: gold inlay + frame very close to the refs' mood; squares are matte-ish marble, no
+  real reflections (by design: cheap, D28-safe).
+- Island **8/10** (was 7): alive, castle in view, less toy-like vegetation; still stylised low-poly,
+  waterfalls are flat cards without mist.
+
+## Requests
+- Board/manager: MODEL_GUIDE §8 could document `env.update(dt, t)` (only called while the env is
+  visible + ambient on) and note that its presence makes the board render at the ambient rate while
+  the env shows — a theme should keep `minPhi` above Tilt unless Tilt shows real scenery.
+- kit: `kit.torus` silently ignores a 5th (arc) argument; an `arc` param would avoid the bug the king had.
+
+## Open issues
+- The great castle peeks over the far edge in 3D at 1440×900 (only ~2 units of background band
+  there); it is fully visible in portrait and Free views.
+- Faces are ~1k tris each; further detail would need a finer cell and budget elsewhere.

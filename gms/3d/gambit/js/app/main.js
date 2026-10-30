@@ -33,6 +33,7 @@ window.__gambit = app;   // handy for tests / debugging
 export const PLUGINS = {
   puzzles: () => import('../puzzles/screen.js'),
   online: () => import('./screens/online.js'),   // online agent
+  learn: () => import('../learn/screen.js'),
 };
 
 const ROUTES = [

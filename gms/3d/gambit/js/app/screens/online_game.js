@@ -358,6 +358,11 @@ function fmtDeadline(ms) {
   if (m >= 60) return `${Math.floor(m / 60)}h ${m % 60}m`;
   return fmtClock(ms);
 }
+// after a rated game the bars show the new rating (the snapshot keeps the pre-game one) (qa)
+function barRating(c, p) {
+  const r = O.over && O.result && O.result.ratings && O.result.ratings[c];
+  return r && typeof r.after === 'number' ? ratingTxt(r.after, r.prov) : ratingTxt(p.rating, p.prov);
+}
 function barHtml(c) {
   const p = side(c), mine = c === O.you;
   const cap = captured(c);
@@ -368,7 +373,7 @@ function barHtml(c) {
   return `<div class="pbar ${mine ? 'me' : 'opp'}${active ? ' active' : ''}"><div class="pbar-plate">
     ${playerAvatar(p, { size: 'sm', me: mine })}
     <div class="pb-id">
-      <div class="pb-name"><b>${mine ? 'You' : nameOf(p)}</b><span class="elo">${ratingTxt(p.rating, p.prov)}</span>${gone ? '<span class="tag ol-away">away</span>' : ''}</div>
+      <div class="pb-name"><b>${mine ? 'You' : nameOf(p)}</b><span class="elo">${barRating(c, p)}</span>${gone ? '<span class="tag ol-away">away</span>' : ''}</div>
       <div class="pb-cap"><span class="caps pc-${cap.opp}">${capHtml}</span>${cap.adv > 0 ? `<span class="adv">+${cap.adv}</span>` : ''}</div>
     </div>
     <div class="clock${active ? ' on' : ''}${O.g.tc.base ? '' : ' ol-corr'}" data-c="${c}">${clockText(c, clk)}</div>

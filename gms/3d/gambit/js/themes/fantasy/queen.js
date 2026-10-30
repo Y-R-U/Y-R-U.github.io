@@ -60,7 +60,7 @@ function field(THREE) {
   // ---- bell sleeves: flaring from the elbow, open over the wrist
   S.add(P.capsule(U(0.0, 0.672, 0.133), U(SCEPTRE.u - 0.04, 0.643, SCEPTRE.x - 0.018), 0.027, 0.04, 0.85), L.sleeve, 0.012);
   S.add(P.capsule(U(0.02, 0.678, -0.142), U(0.074, 0.664, -0.156), 0.027, 0.04, 0.85), L.sleeve, 0.012);
-  cache = S.mesh(THREE, { min: [-0.2, WAIST - 0.004, -0.2], max: [0.2, 0.89, 0.12], cell: 0.022 });
+  cache = S.mesh(THREE, { min: [-0.2, WAIST - 0.004, -0.2], max: [0.2, 0.89, 0.12], cell: 0.0235 });
   return cache;
 }
 
@@ -217,15 +217,13 @@ export function queen(THREE, kit, { color }) {
         return [...K.cloth, 0, 0];
       }
       default: {
-        // bodice: body colour with a side-colour stomacher (a V down the front), gold neckline
-        const v = abs(x) - 0.012 - (y - WAIST) * 0.36;
-        if (-z > 0.02 && y < 0.8) return [...mixRGB(mixRGB(scaleRGB(K.bodice, 0.8), K.bodice, sstep(WAIST, 0.75, y)), K.cloth, sstep(0.007, -0.007, v)), 0, 0];
+        // bodice: body colour (the old painted stomacher V was blotchy at this cell size), gold neckline
         if (y > 0.79 && hypot(x, z) < 0.05) return [...K.trim, 0, 1];
         return [...mixRGB(scaleRGB(K.bodice, 0.8), K.bodice, sstep(WAIST, 0.75, y)), 0, 0];
       }
     }
   });
-  const face = head(THREE, { key: 'queen', R: HEAD.r, at: U(HEAD.u, HEAD.y), hair: 'queen', beard: null, clipY: HEAD.y + 0.03, cell: 0.0112 }, K.face);
+  const face = head(THREE, { key: 'queen', R: HEAD.r, at: U(HEAD.u, HEAD.y), hair: 'queen', beard: null, clipY: HEAD.y + 0.03, cell: 0.0122 }, K.face);
   const parts = [body, face, ...gown(THREE, kit, K), ...collar(THREE, kit, K), ...coronet(THREE, kit, K), ...sceptre(THREE, kit, K), ...orb(THREE, kit, K)];
   for (const m of parts) m.rotateY(YAW);
   return assemble(kit, color, [...plinth(THREE, kit, color, { R: 0.36, H: BASE, seg: 20 }), ...parts]);

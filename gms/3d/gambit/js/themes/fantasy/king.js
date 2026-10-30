@@ -50,8 +50,8 @@ function field(THREE) {
   // ---- neck (arms are plain plate geometry: plateArms(); the head is a fine sculpt: face.js)
   S.add(P.capsule(U(0, 0.9), U(0.004, 0.97), 0.03, 0.026), L.skin, 0.02);
   // ---- ermine collar: a thick fur roll round the shoulders, deeper at the back
-  S.add((x, y, z) => P.torusY(0, 0.895 - 0.012 * sstep(0, 0.1, -z), 0.012, 0.094, 0.036)(x * 0.95, y, z), L.fur, 0.02);
-  cache = S.mesh(THREE, { min: [-0.22, BASE - 0.005, -0.22], max: [0.22, 0.99, 0.15], cell: 0.025 });
+  S.add((x, y, z) => P.torusY(0, 0.886 - 0.012 * sstep(0, 0.1, -z), 0.014, 0.094, 0.031)(x * 0.95, y, z), L.fur, 0.02);
+  cache = S.mesh(THREE, { min: [-0.22, BASE - 0.005, -0.22], max: [0.22, 0.99, 0.15], cell: 0.028 });
   return cache;
 }
 
@@ -81,7 +81,7 @@ function cloak(THREE, kit, K) {
   const n = ys.length + 2;
   const fold = (phi, y) => 0.028 * sin(phi * 6.5 + 0.9) * sstep(0.8, 0.22, y);
   const c = drape(THREE, {
-    sec, open: openCloak, cols: 16, band: 0.03, z: 0.024, folds: fold,
+    sec, open: openCloak, cols: 13, band: 0.03, z: 0.024, folds: fold,
     paint: ({ row, edge, cap, x, y, z }) => {
       if (inBands(y, fur) && (row < n || cap)) return K.ermine(x, y, z);
       if (row >= n + 1 && !cap) return K.lining;
@@ -107,7 +107,7 @@ function cloak(THREE, kit, K) {
 }
 
 /** A plate segment as a lathe tube from a to b (prof = [[t, r], ...]); paint(t) -> colour/finish. */
-function tube(THREE, kit, a, b, prof, paint, seg = 9) {
+function tube(THREE, kit, a, b, prof, paint, seg = 8) {
   const A = new THREE.Vector3(...a), d = new THREE.Vector3(...b).sub(A), len = d.length();
   const g = prep(THREE, kit.lathe(prof.map(([t, r]) => new THREE.Vector2(r, t * len)), { segments: seg }), [1, 1, 1]);
   paintAbs(g, (x, y) => paint(y / len));
@@ -127,12 +127,12 @@ function plateArms(THREE, kit, K) {
     out.push(tube(THREE, kit, S, E, [[-0.1, 0.028], [0.05, 0.036], [0.3, 0.034], [0.34, 0.039], [0.38, 0.034], [0.56, 0.033], [0.6, 0.038], [0.64, 0.033], [1.0, 0.031]], ridge));
     out.push(tube(THREE, kit, E, W, [[0, 0.03], [0.5, 0.028], [0.72, 0.029], [0.8, 0.04], [0.95, 0.046], [1.0, 0.044], [1.0, 0.03]], t => (t > 0.76 ? gold : plate)));
     // couter: elbow cop + a fan wing on the outside
-    out.push(prep(THREE, kit.place(kit.sphere(0.037, 9, 6), { x: E[0], y: E[1], z: E[2] }), K.trim, { metal: 1 }));
-    const wing = prep(THREE, kit.place(kit.cylinder(0.046, 0.012, 0.016, 10), { rz: sx * PI / 2 }), K.plate, { metal: K.plateMetal });
+    out.push(prep(THREE, kit.place(kit.sphere(0.037, 8, 5), { x: E[0], y: E[1], z: E[2] }), K.trim, { metal: 1 }));
+    const wing = prep(THREE, kit.place(kit.cylinder(0.046, 0.012, 0.016, 8), { rz: sx * PI / 2 }), K.plate, { metal: K.plateMetal });
     paintAbs(wing, (x, y, z) => (Math.hypot(y, z) > 0.038 ? gold : null));
     out.push(kit.place(wing, { x: E[0] + sx * 0.03, y: E[1], z: E[2] + 0.006 }));
     // gauntlet round the grip
-    out.push(prep(THREE, kit.place(kit.sphere(0.03, 9, 7), { x: sx * 0.026, y: SWORD.top - 0.03, z: -(SWORD.u - 0.004), sx: 0.9, sy: 1.0, sz: 1.1 }), K.w ? K.trim : K.plate, { metal: 1 }));
+    out.push(prep(THREE, kit.place(kit.sphere(0.03, 8, 6), { x: sx * 0.026, y: SWORD.top - 0.03, z: -(SWORD.u - 0.004), sx: 0.9, sy: 1.0, sz: 1.1 }), K.w ? K.trim : K.plate, { metal: 1 }));
   }
   return out;
 }
@@ -253,9 +253,9 @@ export function king(THREE, kit, { color }) {
       }
     }
   });
-  const face = head(THREE, { key: 'king', R: HEAD.r, at: U(HEAD.u, HEAD.y), hair: 'long', beard: 'full', clipY: CROWN_Y + 0.008, cell: 0.0122 }, K.face);
+  const face = head(THREE, { key: 'king', R: HEAD.r, at: U(HEAD.u, HEAD.y), hair: 'long', beard: 'full', clipY: CROWN_Y + 0.008, cell: 0.0135 }, K.face);
   const figure = [body, face, ...plateArms(THREE, kit, K), ...surcoat(THREE, K), ...cloak(THREE, kit, K), ...sword(THREE, kit, K), ...crown(THREE, kit, K)];
   for (const m of figure) m.rotateY(YAW);
   const parts = [...figure, ...cross(THREE, kit, K)];                     // the cross stays on the board axes
-  return assemble(kit, color, [...plinth(THREE, kit, color, { R: 0.38, H: BASE, seg: 22 }), ...parts]);
+  return assemble(kit, color, [...plinth(THREE, kit, color, { R: 0.38, H: BASE, seg: 20 }), ...parts]);
 }
