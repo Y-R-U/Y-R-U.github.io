@@ -4,7 +4,8 @@
 // console alert; promote is a power-up sweep into a rising FM arpeggio. Battle anims can use the
 // shared `laser` (overridden here with a punchier blaster), plus `zap`, `explosion` etc.
 // Loaded lazily via `sounds: () => import('./sounds.js')` in index.js; unlisted names fall back
-// to js/audio/core.js and js/audio/battle.js. No music file yet (none declared).
+// to js/audio/core.js and js/audio/battle.js (incl. the sci-fi battle sounds `emp` and `tractor`).
+// Music (polish-3): calm synth-pad loop, ACE-Step track 479d6f3546 (Music Studio project GAMBIT).
 import { placeHit, NOTE } from '../../audio/dsp.js';
 
 // mag-clamp on a metal deck: a bright stone/metal tap, a low clamp thump, a servo blip
@@ -16,6 +17,7 @@ function clamp(s, { t = 0, g = 0.6, pitch = 1, pan = 0, to, blip = 1 } = {}) {
 }
 
 export default {
+  music: { file: 'scifi', loop: 48, xfade: 4.5 },   // 16 bars @ 80 bpm + 1.5-bar crossfade
   // a droid setting down: hover hiss tail-off into a clamp; variants pitch the blip up/down
   move: { dur: 0.32, lvl: -2, punch: 2, variants: 4, build(s, v) {
     const r = s.verb(0.35, { mix: 0.12, tone: 6000 });

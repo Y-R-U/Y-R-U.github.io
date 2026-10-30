@@ -25,6 +25,8 @@ function describe(k) {
   if (st.bestWin) out.push(`Best win: ${st.bestWin.name} (${st.bestWin.elo})`);
   const pz = k['gambit.puzzles'];
   if (pz && pz.s && Object.keys(pz.s).length) out.push(`${Object.keys(pz.s).length} puzzles solved · rating ${pz.r || 800}`);
+  const ln = k['gambit.learn'];
+  if (ln && ln.l && Object.keys(ln.l).length) out.push(`${Object.keys(ln.l).length} lessons done`);
   return out;
 }
 

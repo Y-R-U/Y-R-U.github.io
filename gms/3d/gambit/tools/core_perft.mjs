@@ -104,6 +104,25 @@ const tf = new Chess();
 ['Nf3', 'Nf6', 'Ng1', 'Ng8', 'Nf3', 'Nf6', 'Ng1', 'Ng8'].forEach((m) => tf.move(m));
 ok(tf.isThreefoldRepetition() && tf.outcome().reason === 'repetition', 'threefold');
 ok(tf.move('e4') === null, 'no moves after game over');
+// polish-3: a set-up position that is already a dead draw stays playable (moves() and move() agree);
+// a capture that CREATES insufficient material still ends the game, and move() then refuses.
+{
+  const dead = new Chess('4k3/8/8/8/8/8/3n4/4K3 w - - 0 1');          // K v K+N, king takes the knight
+  ok(dead.outcome().reason === 'material' && dead.moves().includes('Kxd2'), 'dead set-up: outcome material, Kxd2 listed');
+  const v = dead.move('Kxd2');
+  ok(v && v.captured === 'n' && dead.outcome().reason === 'material', 'dead set-up: Kxd2 accepted, still material');
+  ok(dead.move('Ke7') && dead.move({ from: 'd2', to: 'e3' }), 'dead set-up: play continues (sandbox)');
+  const live = new Chess('4k3/8/8/8/8/8/3p4/4K1N1 w - - 0 1');         // K+N v K+P: not dead yet
+  ok(!live.isGameOver() && live.move('Kxd2') && live.outcome().reason === 'material', 'K+N v K+P: Kxd2 ends by material');
+  ok(live.move('Ke7') === null, 'K+N v K+P: no move after the material draw');
+  for (const f of ['4k3/8/8/8/8/8/3b4/4K1N1 w - - 0 1', '4k3/8/8/8/8/8/3q4/4K1N1 w - - 0 1', '4k3/8/8/8/8/8/3n4/4KN2 w - - 0 1']) {
+    const c = new Chess(f); ok(c.move('Kxd2') && c.isGameOver() && c.move('Ke7') === null, 'king capture -> material draw: ' + f);
+  }
+  const r = new Chess('8/8/8/4k3/8/8/2N5/4K3 w - - 0 1'); r.resign('w');
+  ok(r.move('Ke2') === null, 'dead set-up: resign still ends it');
+  const m = new Chess('4k3/8/8/8/8/8/3n4/4K3 w - - 0 1'); m.load('4k3/8/8/8/8/8/3p4/4K1N1 w - - 0 1');
+  ok(m.move('Kxd2') && m.move('Ke7') === null, 'load() resets the dead-start flag');
+}
 tf.undo();
 ok(!tf.isThreefoldRepetition(), 'undo leaves repetition');
 

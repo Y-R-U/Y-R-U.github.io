@@ -63,10 +63,10 @@ export function render(app) {
         <span class="mi-ic">${icon('trophy')}</span>
         <span class="mi-txt"><b>Ladder</b><small>Rank <b class="hl">#${rank}</b> of ${of} · ${fmtInt(lad.points)} pts</small></span>
         <span class="mi-go">${icon('chevron')}</span></a>
-      <a class="menu-item muted" href="#/learn">
+      <a class="menu-item" href="#/learn">
         <span class="mi-ic">${icon('book')}</span>
-        <span class="mi-txt"><b>Learn</b><small>Lessons for new players</small></span>
-        <span class="badge">Soon</span></a>
+        <span class="mi-txt"><b>Learn</b><small>${learnLine()}</small></span>
+        <span class="mi-go">${icon('chevron')}</span></a>
     </nav>
     <div class="home-stats">
       <div><b>${fmtInt(st.games)}</b><small>Games</small></div>
@@ -82,4 +82,12 @@ export function render(app) {
     if (a.dataset.act === 'discard') { clearResume(); app.go('#/home'); }
   });
   return { el, top: { logo: true } };
+}
+
+// Learn progress from gambit.learn without loading the course (27 lessons in js/learn/data.js).
+const LEARN_TOTAL = 27;
+function learnLine() {
+  let done = 0;
+  try { done = Object.keys(JSON.parse(localStorage.getItem('gambit.learn') || '{}').l || {}).length; } catch { /* blocked */ }
+  return done ? `${done} of ${LEARN_TOTAL} lessons done` : 'Lessons from the basics up';
 }

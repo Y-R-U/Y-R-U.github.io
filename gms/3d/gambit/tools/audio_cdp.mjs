@@ -142,6 +142,10 @@ await c.eval(`(async () => { const s = await import('${new URL('js/app/store.js'
 await sleep(2500);
 ms = await c.eval(`(async () => ${A}.music.state())()`);
 ok(ms.playing && ms.theme === 'fantasy', `theme switch -> fantasy loop (${JSON.stringify(ms)})`);
+await c.eval(`(async () => { const s = await import('${new URL('js/app/store.js', BASE).pathname}'); s.setSettings({ theme: 'scifi' }); })()`);
+await sleep(2500);
+ms = await c.eval(`(async () => ${A}.music.state())()`);
+ok(ms.playing && ms.theme === 'scifi' && ms.loop === 48, `theme switch -> scifi loop (polish-3) (${JSON.stringify(ms)})`);
 await c.eval(`(async () => { const s = await import('${new URL('js/app/store.js', BASE).pathname}'); s.setSettings({ music: false, theme: 'classic' }); })()`);
 await sleep(500);
 ms = await c.eval(`(async () => ${A}.music.state())()`);

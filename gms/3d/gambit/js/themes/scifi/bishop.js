@@ -64,12 +64,19 @@ export function bishop(THREE, kit, { color }) {
     parts.push(kit.place(sp, { x: s * 0.128, y: 0.632 }));
   }
 
-  // ---- flared sleeves sweeping from the shoulders to the hands in front ----
+  // ---- sleeves (polish-3): a round upper arm hanging at the side, then a bell sleeve flaring forward to
+  // the hands — octagonal sections so they read as sleeves from every side, not a flat strap ----
+  const oct = (rx, ry) => Array.from({ length: 8 }, (_, i) => {
+    const a = -PI / 2 + PI / 8 + i * PI / 4, sy = Math.sin(a);
+    return [rx * Math.cos(a), ry * sy, sy < -0.3 ? 'shade' : 'body'];
+  });
   for (const s of [-1, 1]) {
-    const sh = [s * 0.128, 0.62, 0.0], cuff = [s * 0.06, 0.47, -0.1];
-    parts.push(strut(THREE, color, sh, cuff, t => chamferRect(0.036 + 0.03 * t, 0.04 + 0.03 * t, 0.012, { side: 'body', top: 'body', bot: 'shade' }),
-      [0, 0.84, { t: 0.88, key: 'line' }, { t: 1, key: 'trim' }], { capStart: false, capEnd: 'dark' }));
-    parts.push(prep(THREE, kit.place(new THREE.SphereGeometry(0.017, 8, 6), { x: s * 0.046, y: 0.476, z: -0.116 }), color, 'trim'));
+    parts.push(strut(THREE, color, [s * 0.126, 0.632, 0.006], [s * 0.14, 0.528, -0.026], t => oct(0.029 + 0.005 * t, 0.031 + 0.004 * t),
+      [0, 1], { capStart: false, capEnd: false }));
+    parts.push(strut(THREE, color, [s * 0.141, 0.542, -0.02], [s * 0.068, 0.474, -0.112],
+      t => oct(0.034 + 0.03 * t ** 1.6, 0.037 + 0.025 * t ** 1.6),
+      [0, 0.45, 0.84, { t: 0.88, key: 'line' }, { t: 0.95, key: 'line' }, { t: 1, key: 'trim' }], { capStart: false, capEnd: 'dark' }));
+    parts.push(prep(THREE, kit.place(new THREE.SphereGeometry(0.019, 8, 6), { x: s * 0.044, y: 0.48, z: -0.124 }), color, 'trim'));
   }
   // psi orb between the hands, with a thin trim ring around it
   parts.push(prep(THREE, kit.place(new THREE.SphereGeometry(0.03, 14, 10), { y: 0.505, z: -0.14 }), color, 'lineHi'));
@@ -84,27 +91,36 @@ export function bishop(THREE, kit, { color }) {
     [0.092, 0.772, 'body'], [0.084, 0.778, 'dark'], [0, 0.778, 'dark'],
   ], { seg: 24 }));
 
-  // ---- split mitre: two half-shells leaning apart, glowing cut faces, a light blade between ----
-  const mit = [[0, 0.776, 'line'], [0.094, 0.776, 'dark'], [0.1, 0.784, 'trim'], [0.1, 0.792, 'trim']];
-  const tip = 0.985, base = 0.792;
-  for (let i = 1; i <= 8; i++) {
-    const t = i / 8, y = base + t * (tip - base);
-    mit.push([i === 8 ? 0 : 0.1 * Math.pow(1 - Math.pow(t, 1.3), 0.65), y, 'body', i < 8]);
+  // ---- split mitre (polish-3): a rim band, then two POINTED half-shells leaning apart from the brow so a
+  // V-shaped cleft opens toward the top. The cut faces glow (caps finished 'line') and a light blade stands
+  // low in the cleft, so from any side you look down into a lit gap between two horns, not at an egg. ----
+  const base = 0.8, H = 0.205, LEAN = 0.42, GAP = 0.016, ZS = 1.08, XS = 0.72;
+  const SPLAY = 0.3;   // the horns also splay front/back a little, so a pure side view shows two tips, not one dome
+  parts.push(hsLathe(THREE, color, [
+    [0, 0.774, 'dark'], [0.094, 0.774, 'dark'], [0.101, 0.781, 'trim'], [0.101, 0.79, 'line'], [0.098, 0.797, 'trim'],
+    [0.09, 0.804, 'dark'], [0, 0.804, 'dark'],
+  ], { seg: 24 }));
+  const shell = [[0, base - 0.02, 'line'], [0.094, base - 0.02, 'dark']];
+  for (let i = 0; i <= 9; i++) {
+    const t = i / 9;
+    shell.push([i === 9 ? 0 : 0.094 * (1 - t) ** 0.85 * (1 + 0.55 * t), base + t * H, i === 0 ? 'trim' : 'body', i > 0 && i < 9]);
   }
-  const LEAN = 0.2, GAP = 0.009, ZS = 1.25, XS = 0.88;   // mitre: long front-to-back, slim across
   for (const s of [-1, 1]) {
-    const h = hsLathe(THREE, color, mit, { seg: 12, phiStart: s > 0 ? 0 : PI, phiLength: PI, caps: true });
-    h.scale(XS, 1, ZS); h.translate(0, -base, 0); h.rotateZ(-s * LEAN); h.translate(s * GAP, base, 0);   // lean apart from the brow
+    const h = hsLathe(THREE, color, shell, { seg: 6, flat: true, phiStart: s > 0 ? 0 : PI, phiLength: PI, caps: true });
+    h.scale(XS, 1, ZS); h.translate(0, -base, 0); h.rotateZ(-s * LEAN); h.rotateX(s * SPLAY); h.translate(s * GAP, base, 0);
     parts.push(h);
   }
+  const tipY = base + H * Math.cos(LEAN);
   {
+    // the blade: a plate in the y-z plane standing in the cleft, lower than the horns
+    const prof = shell.slice(2).map(([r, y]) => [r * 0.9 * ZS, base - 0.01 + (y - base) * 0.84]);
     const shape = new THREE.Shape();
-    shape.moveTo(-0.09, base - 0.012);
-    for (const [r, y] of mit.slice(3)) shape.lineTo(-r * 0.92, y + 0.006);
-    for (const [r, y] of mit.slice(3).reverse()) shape.lineTo(r * 0.92, y + 0.006);
-    shape.lineTo(0.09, base - 0.012);
+    shape.moveTo(-0.1, base - 0.02);
+    for (const [r, y] of prof) shape.lineTo(-r, y);
+    for (const [r, y] of prof.slice().reverse()) shape.lineTo(r, y);
+    shape.lineTo(0.1, base - 0.02);
     const blade = new THREE.ExtrudeGeometry(shape, { depth: 0.02, bevelEnabled: false, curveSegments: 1 });
-    blade.translate(0, 0, -0.01); blade.rotateY(PI / 2); blade.scale(1, 1, ZS);      // plate in the y-z plane
+    blade.translate(0, 0, -0.01); blade.rotateY(PI / 2);      // plate in the y-z plane
     parts.push(prep(THREE, blade, color, 'lineHi'));
   }
   // faceplate: dark glass visor on the front of the helmet, with a glowing eye-line
@@ -117,7 +133,7 @@ export function bishop(THREE, kit, { color }) {
     parts.push(prep(THREE, e, color, 'lineHi'));
   }
   // floating orb above the tip
-  parts.push(prep(THREE, kit.place(new THREE.SphereGeometry(0.022, 10, 8), { y: tip + 0.045 }), color, 'lineHi'));
+  parts.push(prep(THREE, kit.place(new THREE.SphereGeometry(0.023, 10, 8), { y: tipY + 0.012 }), color, 'lineHi'));   // floats in the V between the horns
 
   return assemble(kit, color, parts);
 }

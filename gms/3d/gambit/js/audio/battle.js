@@ -110,6 +110,43 @@ export const BATTLE = {
     s.tone({ f, f2: 300, dur: 0.22, type: 'square', g: 0.14, a: 0.001, lp: 6000 });
     s.tone({ f: f * 1.01, f2: 310, dur: 0.22, type: 'sawtooth', g: 0.08, a: 0.001, lp: 5000, pan: 0.2 });
   } },
+  // EMP discharge (sci-fi stomp, polish-3): a hard electrical thump — sub drop + a mains-buzz burst
+  // (square at 50 Hz through a sweeping band-pass) + wide crackle — then the "power-down" whine of
+  // everything nearby dying (2.4 kHz -> 70 Hz) and a fading 100 Hz hum
+  emp: { dur: 1.5, lvl: 1, punch: 4, variants: 2, build(s) {
+    const v = s.verb(1.1, { mix: 0.3, tone: 4500 });
+    s.tone({ f: 110, f2: 30, dur: 0.6, glideT: 0.45, g: 0.5, a: 0.001, to: v });
+    s.noise({ dur: 0.05, g: 0.6, type: 'highpass', f: 2000, to: v });
+    const buzz = s.bus({ g: 1, bp: 900, Q: 1.4, to: v });
+    s.tone({ f: s.jit(50, 0.04), dur: 0.42, type: 'square', g: 0.55, a: 0.002, to: buzz });
+    s.tone({ f: s.jit(75, 0.04), dur: 0.36, type: 'sawtooth', g: 0.3, a: 0.002, to: buzz, pan: 0.3 });
+    s.noise({ dur: 0.45, g: 0.35, type: 'bandpass', f: 6000, f2: 700, Q: 1.2, to: v });
+    crackle(s, { dur: 0.6, n: 40, g: 0.3, f: 4500, to: v });
+    const w = s.jit(2400, 0.08);
+    s.tone({ t: 0.06, f: w, f2: 70, dur: 0.95, glideT: 0.9, type: 'triangle', g: 0.12, a: 0.01, to: v, decay: 'hold' });
+    s.tone({ t: 0.06, f: w * 1.5, f2: 105, dur: 0.85, glideT: 0.8, type: 'sine', g: 0.05, a: 0.01, pan: -0.25, to: v, decay: 'hold' });
+    s.tone({ t: 0.1, f: 100, dur: 1.1, type: 'sawtooth', g: 0.06, a: 0.05, lp: 600, to: v });
+  } },
+  // tractor beam hum (sci-fi tractor, polish-3): an emitter "thoom" into a sustained, throbbing
+  // two-oscillator drone (fifth apart, 7 Hz tremolo, slow filter sweep) with a rising sine "lift"
+  // glide and airy beam hiss; ~1.3 s, held then released
+  tractor: { dur: 1.6, lvl: -2, variants: 2, build(s) {
+    const oc = s.oc, v = s.verb(0.9, { mix: 0.22, tone: 5000 });
+    const H = 1.3, f0 = s.jit(98, 0.03);
+    s.tone({ f: 220, f2: 60, dur: 0.18, glideT: 0.15, g: 0.35, a: 0.002, to: v });
+    // tremolo bus: gain = 0.6 + 0.4 * sin(7 Hz)
+    const trem = oc.createGain(); trem.gain.value = 0.6;
+    const lfo = oc.createOscillator(), depth = oc.createGain();
+    lfo.frequency.value = s.jit(7, 0.08); depth.gain.value = 0.4; lfo.connect(depth).connect(trem.gain); lfo.start(0); lfo.stop(H + 0.2);
+    const lp = oc.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 3;
+    lp.frequency.setValueAtTime(400, 0); lp.frequency.exponentialRampToValueAtTime(1800, H * 0.8); lp.frequency.exponentialRampToValueAtTime(600, H);
+    trem.connect(lp).connect(v);
+    s.tone({ f: f0, f2: f0 * 1.12, glide: 'lin', dur: H, type: 'sawtooth', g: 0.35, a: 0.12, to: trem, decay: 'hold' });
+    s.tone({ f: f0 * 1.5, f2: f0 * 1.68, glide: 'lin', dur: H, type: 'sawtooth', g: 0.22, a: 0.15, to: trem, detune: 7, decay: 'hold' });
+    s.tone({ f: f0 / 2, dur: H, type: 'sine', g: 0.3, a: 0.1, to: trem, decay: 'hold' });
+    s.tone({ t: 0.08, f: 320, f2: 760, glide: 'lin', dur: H - 0.1, type: 'sine', g: 0.07, a: 0.2, to: v, vib: 5, vibDepth: 9, decay: 'hold' });
+    s.noise({ t: 0.04, dur: H - 0.05, a: 0.2, g: 0.08, color: 'pink', type: 'bandpass', f: 2400, f2: 4200, Q: 1.6, to: v, decay: 'hold' });
+  } },
   // a beast's roar (dragon): formant-filtered saw with slow vibrato
   roar: { dur: 1.6, lvl: 0, punch: 3, build(s) {
     const v = s.verb(1.2, { mix: 0.25, tone: 2500 });
@@ -174,7 +211,7 @@ export const BATTLE = {
 };
 
 export const BATTLE_ALIASES = {
-  sword: 'clash', blade: 'clash', slash: 'swing', magic: 'zap', spell: 'zap', bolt: 'zap', lightning: 'thunder',
+  sword: 'clash', blade: 'clash', slash: 'swing', pulse: 'emp', hum: 'tractor', magic: 'zap', spell: 'zap', bolt: 'zap', lightning: 'thunder',
   flame: 'fire', burn: 'fire', boom: 'explosion', blast: 'explosion', bat: 'bats', ghost: 'wail', grave: 'creak',
   pumpkin: 'pop', fall: 'topple', shove: 'slide', impact: 'hit', crunch: 'stone', vanish: 'poof', wood: 'thud', beam: 'laser',
 };

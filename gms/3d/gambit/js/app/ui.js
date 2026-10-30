@@ -24,10 +24,38 @@ let toastTimer = null;
 export function toast(msg, { ms = 2200, kind = '' } = {}) {
   let t = $('#toast');
   if (!t) { t = h('<div id="toast" role="status" aria-live="polite"></div>'); document.body.appendChild(t); }
-  t.className = 'show ' + kind;
   t.textContent = msg;
+  t.className = kind;
+  dockToast(t);
+  t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.className = ''; }, ms);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); }, ms);   // keep .dock while it fades
+}
+
+// In a game (bot or online) the toast docks inside the move list instead of covering it from the top of the
+// screen (qa #10): on the side away from the newest moves, so the last move stays readable. Strip (one
+// scrolling row, newest at the right) -> left end; scoresheet (newest at the bottom) -> top if it scrolls,
+// else bottom-left, clear of the ◀ ▶ buttons. Elsewhere (or a hidden move box) it stays top-centre.
+function dockToast(t) {
+  t.style.removeProperty('--tx'); t.style.removeProperty('--ty'); t.style.removeProperty('--tw');
+  const wrap = [...document.querySelectorAll('.screen.game .moves-wrap')].find(w => w.offsetParent && w.getClientRects().length);
+  if (!wrap || document.querySelector('.scrim')) return;   // a sheet / dialog is up: top-centre, above it
+  const r = wrap.getBoundingClientRect(), box = wrap.closest('.moves-box').getBoundingClientRect();
+  if (r.width < 160 || box.height < 36) return;
+  t.classList.add('dock');
+  const nav = wrap.parentElement.querySelector('.mv-nav');
+  const nr = nav && nav.offsetParent ? nav.getBoundingClientRect() : null;
+  const strip = box.height < 84 && r.height < 84;
+  let w = r.width - 16;
+  if (strip || (nr && nr.top < r.bottom - 4)) w = Math.min(w, (nr ? nr.left : r.right) - r.left - 14);   // nav shares the row
+  t.style.setProperty('--tw', Math.max(150, w) + 'px');
+  t.style.setProperty('--tx', (r.left + 8) + 'px');
+  const th = t.offsetHeight;
+  let y;
+  if (strip) y = box.top + (box.height - th) / 2;
+  else if (wrap.scrollHeight > wrap.clientHeight + 4) y = r.top + 8;            // scrolled: oldest moves at the top
+  else y = Math.min(r.bottom, nr ? nr.bottom : r.bottom) - th - 6;               // few moves: they sit at the top
+  t.style.setProperty('--ty', Math.max(box.top + 2, y) + 'px');
 }
 
 // ---------- modal dialog ----------

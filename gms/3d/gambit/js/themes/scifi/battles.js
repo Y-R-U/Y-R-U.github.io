@@ -444,7 +444,7 @@ export async function stomp(ctx) {
       // EMP: hex dome + second shockwave sweeps over the victim
       dome.visible = true; dome.position.copy(land); dome.material.color.set(S.main); dome.material.opacity = 1;
       fx.shockwave(land, { radius: 3.8, color: S.light, ms: 700, dust: false });
-      U.sound(c, 'thunder', { at: VP, gain: 0.8 });
+      U.sound(c, 'emp', { at: VP });
       const setE = emissiveCtl(c, V);
       let lastA = 0, lastF = 0;
       const v0 = VP.clone();
@@ -612,7 +612,7 @@ export async function tractor(ctx) {
         const L = H.distanceTo(Vc) * len; cone.scale.set(rad, rad, max(0.01, L));
         tex.offset.y -= 0.045;
       };
-      U.sound(c, 'laser', { at: VP, gain: 0.7 });
+      U.sound(c, 'tractor', { at: VP });   // hum runs through the lift and crush (~1.3 s at 1×)
       await c.tween(220, e => aim(e, 0.4 + 0.6 * e), kit.ease.cubicOut);
       // lift: victim rises toward the camera, spinning; motes stream up the beam
       const v0 = VP.clone(), LIFT = 1.35;

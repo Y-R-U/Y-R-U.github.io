@@ -489,6 +489,10 @@ export class Chess {
     this._startFen = this._pos.fen();
     this._hist = [];          // [{move:int, verbose}]
     this._outcome = null;     // manual outcome (timeout/resign/agreement)
+    // A set-up position that is ALREADY a dead draw (K v K, K+minor v K, same-colour bishops: gallery, battle
+    // tests, learn drills) stays playable: moves() lists moves, so move() must accept them (polish-3). Without
+    // a pawn/rook/queen the material can only shrink, so it stays dead; nothing else changes.
+    this._deadStart = this._pos.insufficientMaterial();
     if (fen.trim().split(/\s+/).slice(0, 4).join(' ') !== START_FEN.split(' ').slice(0, 4).join(' ')) {
       this._headers.SetUp = '1'; this._headers.FEN = this._startFen;
     } else { delete this._headers.SetUp; delete this._headers.FEN; }
@@ -592,7 +596,7 @@ export class Chess {
   }
 
   move(m) {
-    if (this.isGameOver()) return null;
+    if (this._ended()) return null;
     const [x, legal] = this._findMove(m);
     if (!x) return null;
     const before = this.fen();
@@ -625,6 +629,12 @@ export class Chess {
       !!(this._outcome && this._outcome.result === '1/2-1/2');
   }
   isGameOver() { return this.outcome().result !== '*'; }
+  // move() refuses once the game is over, except for the insufficient-material "end" of a position that was
+  // loaded dead (see load()). Mate / stalemate have no legal moves anyway.
+  _ended() {
+    const o = this.outcome();
+    return o.result !== '*' && !(o.reason === 'material' && this._deadStart && !this._outcome);
+  }
 
   // UI/server set results that the board can't know: timeout, resign, agreement.
   // For timeout pass the side that flagged; insufficient mating material for the winner => draw.

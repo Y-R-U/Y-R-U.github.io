@@ -391,6 +391,9 @@ a.bot-card:active { transform: scale(.985); }
 }
 #toast { position: fixed; left: 50%; top: calc(var(--tb-h) + var(--sat) + 10px); transform: translate(-50%, -12px); z-index: 60; max-width: calc(100% - 32px); padding: 11px 16px; border-radius: 12px; background: #f3efe8; color: #17140f; font-weight: 700; font-size: 14px; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; text-align: center; }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
+/* docked in the move list during a game (ui.js dockToast, qa #10) */
+#toast.dock { left: var(--tx); top: var(--ty); max-width: var(--tw); transform: translateY(4px); padding: 8px 12px; font-size: 13px; line-height: 1.3; text-align: left; }
+#toast.dock.show { transform: none; }
 
 /* ---------- results ---------- */
 .results { text-align: center; }

@@ -32,9 +32,9 @@ Severity: H = breaks a feature / wrong result, M = wrong behaviour with a workar
 | 7 | L | Settings theme picker | Previews/blurbs didn't match the boards ("Staunton pieces on warm walnut" brown preview vs gold/black chrome on marble; Sci-fi dark navy preview vs pale panel grid). | FIXED: colours sampled from the real boards, blurbs updated (`themes-meta.js`). |
 | 8 | L | Puzzles | "Solution" revealed instantly on a clean first attempt and charged the rating (one stray tap = −34). | FIXED: confirm dialog only when it would cost rating (`js/puzzles/play.js reveal`). |
 | 9 | L | Online game bars | After a rated game the player bars kept the pre-game rating ("1500?") while the sheet said 1338?. | FIXED (`online_game.js barRating`). |
-| 10 | L | Toasts | Toasts sit over the move list (e.g. "Pip: Too early for that…"). By design, short-lived. | open (ui, cosmetic) |
-| 11 | L | Online desktop | The "Opponent disconnected… claim in 28s" banner covers rank 8 of the board. | open (ui, cosmetic; by design "banners over the board") |
-| 12 | L | Bot game resume | A resume whose moves already end the game (e.g. threefold already reached) isn't checked on load; `makeGame` → `nextTurn` would ask the bot to move in a finished game. Only reachable by a crash between the final move and `clearResume`. | open (ui, low) |
+| 10 | L | Toasts | Toasts sit over the move list (e.g. "Pip: Too early for that…"). By design, short-lived. | FIXED (polish-3): toast docks inside the move box away from the newest moves (`ui.js dockToast`) |
+| 11 | L | Online desktop | The "Opponent disconnected… claim in 28s" banner covers rank 8 of the board. | FIXED (polish-3): side-panel layouts show banners at the top of the panel; portrait unchanged |
+| 12 | L | Bot game resume | A resume whose moves already end the game (e.g. threefold already reached) isn't checked on load; `makeGame` → `nextTurn` would ask the bot to move in a finished game. Only reachable by a crash between the final move and `clearResume`. | FIXED (polish-3): finished resumes are scored on load instead of starting the bot |
 | 13 | info | Test infra | Other agents' scripts attached to my Chromes on 9529/9530 (pages from the sculptor benches appeared in them), and mine briefly to theirs. Agents should use `cdp start` with a unique port and not reuse a port they didn't start. | manager |
 
 ## ui-3 items (manager) — done

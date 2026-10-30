@@ -655,7 +655,10 @@ export function render(appRef) {
     syncBoard();
     board.resize && board.resize();
     if (g.fresh) { g.fresh = false; play('start'); }
-    if (!g.over) nextTurn();
+    // a resume whose moves already end the game (crash between the last move and clearResume, qa #12):
+    // score it now instead of asking the bot to move in a finished position
+    if (!g.over && g.chess.isGameOver()) { const o = g.chess.outcome(); finish(o.result, o.reason); }
+    else if (!g.over) nextTurn();
   }).catch(e => {
     console.error('[gambit] board failed', e);
     const l = el.querySelector('.board-loading'); if (l) l.textContent = 'The board could not load. Try reloading.';

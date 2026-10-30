@@ -133,6 +133,14 @@ body[data-route="online"] #view:has(.ol-gamewrap) { overflow: hidden; }
 
 /* ---------- online game ---------- */
 .ol-banners { position: absolute; left: 8px; right: 8px; top: 8px; z-index: 8; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.ol-banners-side { display: none; }
+@media (orientation: landscape) and (min-width: 600px) {   /* side panel: banners above the move list, off the board (qa #11) */
+  .ol-banners-side { display: flex; position: static; flex: none; padding: 8px 8px 0; }
+  .ol-banners-side:empty { display: none; }
+  .ol-banners-side .ol-ban { flex-wrap: wrap; box-shadow: none; }
+  .ol-banners-side .ol-ban > span { flex-basis: calc(100% - 30px); }
+  .ol-banners-side .ol-ban .btn { flex: 1; }
+}
 .ol-ban { pointer-events: auto; display: flex; align-items: center; gap: 8px; padding: 7px 7px 7px 12px; min-height: 44px; border-radius: 12px; background: rgba(14, 18, 27, .94); border: 1px solid var(--line-2); box-shadow: var(--shadow); font-size: 13px; animation: fade .18s; backdrop-filter: blur(4px); }
 .ol-ban > span { flex: 1; min-width: 0; }
 .ol-ban > .ic { width: 18px; height: 18px; color: var(--accent); }

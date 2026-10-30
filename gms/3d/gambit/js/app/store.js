@@ -20,7 +20,7 @@ export const SYNCED_KEYS = [KEYS.settings, KEYS.ladder, KEYS.stats];
 // Cloud sync mirrors EVERY `gambit.` key except these local-only ones. Convention for
 // other agents: a key that must never leave this device ends in `.resume` (an in-progress
 // game, games/CLAUDE.md) or `.bench` (device speed), or starts with `gambit.local.`.
-export const KNOWN_SYNCED = [...SYNCED_KEYS, 'gambit.puzzles'];
+export const KNOWN_SYNCED = [...SYNCED_KEYS, 'gambit.puzzles', 'gambit.learn'];
 export function isLocalOnly(k) { return /\.(resume|bench)$/.test(k) || k.startsWith('gambit.local.'); }
 export function syncedKeys() {
   const out = new Set(KNOWN_SYNCED);

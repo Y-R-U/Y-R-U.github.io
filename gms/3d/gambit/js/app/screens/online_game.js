@@ -426,9 +426,14 @@ function renderActions() {
     <button class="act" data-act="speed" title="Battle speed (online)">${icon('swords')}<span class="lbl">${speedLabel(onlineSpeed())}</span></button>`;
 }
 // banners over the board: draw offer, opponent away / claim, first-move timer, connection
+// Landscape / desktop (side panel layout) shows them at the top of the panel instead, so they never cover
+// rank 8 (qa #11); portrait keeps them over the board's top edge (no other room).
+const SIDE_MQ = '(orientation: landscape) and (min-width: 600px)';
 function renderBanner() {
   if (!view || !O) return;
-  const host = view.querySelector('.ol-banners');
+  const sideHost = view.querySelector('.ol-banners-side'), boardHost = view.querySelector('.board-square .ol-banners');
+  const host = matchMedia(SIDE_MQ).matches ? sideHost : boardHost, other = host === sideHost ? boardHost : sideHost;
+  if (other.dataset.html) { other.dataset.html = ''; other.innerHTML = ''; }
   const g = O.g, clk = net.clock(O.id) || {};
   let html = '';
   if (net.state !== 'open') html += `<div class="ol-ban warn-b">${icon('globe')}<span>Reconnecting… your clock keeps running</span></div>`;
@@ -503,7 +508,7 @@ export function mountGame(root, ctx, id) {
       <div class="board-square"><div class="board-loading">Setting up the board…</div><div class="ol-banners"></div></div>
       <div class="bar-bottom"></div>
     </div></div>
-    <aside class="g-panel"><div class="moves-box"><div class="moves-wrap"><ol class="moves"></ol></div>${reviewNavHtml()}</div><div class="actions"></div></aside>
+    <aside class="g-panel"><div class="ol-banners ol-banners-side"></div><div class="moves-box"><div class="moves-wrap"><ol class="moves"></ol></div>${reviewNavHtml()}</div><div class="actions"></div></aside>
   </section>`);
   root.replaceChildren(el);
   view = el;
