@@ -11,7 +11,7 @@ export const MESSAGES = {
   banner: ['#krz-hud .krz-banner'],
   herald: ['.krz-reel', '.krz-paper-toast'],
   score: ['.krz-pop', '.krz-cer'],
-  coach: ['.krz-coach-bub', '.krz-st-coach'],
+  coach: ['.krz-coach-bub', '.krz-st-coach', '.krz-hint-bub'],
   story: ['.krz-st-brief .krz-st-card', '.krz-st-done .krz-st-card'],
   toast: ['.kz-toast', '.krz-plane-why'],
   tasks: ['.kz-tk-toast', '.kz-tk-cele .kz-tk-cc'],   // TASKS tick toast + set celebration (D34)

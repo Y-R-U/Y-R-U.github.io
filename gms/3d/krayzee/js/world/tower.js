@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Builder, col, mat } from './util.js';
-import { TOWER } from './layout.js';
+import royal from '../../data/airports/royal.js';
+const TOWER = royal.tower;
 import { buildCrown, decalQuad } from './terminal.js';
 
 const CONC = col('#e4ddd0'), CONC2 = col('#cfc7b8'), DARK = col('#2b2f34'), PURPLE = col('#4b1f7a'), GOLD = col('#e2ac2c');

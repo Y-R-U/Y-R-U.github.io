@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import { Builder, inRect } from './util.js';
+import { Builder, inRect, col } from './util.js';
 import { createSky, createLights, bakeEnvironment, setShadowFocus, SUN_DIR } from './env.js';
 import { createTerrain, createLake, inLake, lakeDist, airfieldMask, SHADE_EXTENT, CASTLE, setTerrainSite } from './terrain.js';
 import { buildTown } from './town.js';
 import { buildTrees, shadeTexture } from './trees.js';
 import { buildAirfieldEdge, BlockGrid } from './land.js';
-import { decalAtlas } from './textures.js';
+import { decalAtlas, asphaltTexture } from './textures.js';
 import { buildPavement, APRON_RECT, HANGAR_APRON, TOWER_PAD, ROADS, CAR_PARK } from './pavement.js';
 import { buildLights } from './lights.js';
 import { buildTerminal, buildHangars } from './terminal.js';
@@ -15,12 +15,30 @@ import { FRAMES, SEGMENTS } from './geom.js';
 import { AIRPORT } from './layout.js';
 import { buildSite } from './site.js';
 import { disposeWorld } from './dispose.js';
+import { buildPalace, palaceSurface, PALACE_FRAME } from './palace.js';
+import { riverDist, bankTrees, buildBridges } from './river.js';
+import { buildCars } from './cars.js';
+import { buildFete } from './fete.js';
+import { LANES } from './town.js';
 
 const aa = (r, x, z, pad = 0) => x >= r.x0 - pad && x <= r.x1 + pad && z >= r.z0 - pad && z <= r.z1 + pad;
 
 // MAP: opts.airport (default: the active layout airport). C-Tower 1 is built here; every other airport by js/world/site.js.
+// C-Tower 1's world, kept through a swap to an airport that shares it (D27: the Palace Lawn lives inside it). The next
+// buildWorld either takes it back (no rebuild) or frees it first.
+let parked = null;
 export async function buildWorld(scene, renderer, opts = {}) {
   const def = opts.airport || AIRPORT;
+  if (parked) {
+    const p = parked; parked = null;
+    if (def?.scenery?.biome === 'royal' && p.scene === scene) {
+      p.world.airport = def.id;
+      if (opts.quality) p.world.setQuality(opts.quality);
+      try { opts.onProgress?.(1, 'done'); } catch (e) { /* */ }
+      return p.world;
+    }
+    p.free();
+  }
   if (def && def.scenery?.biome !== 'royal') return buildSite(scene, renderer, def, opts);
   setTerrainSite(null);
   let quality = ['low', 'medium', 'high'].includes(opts.quality) ? opts.quality : 'high';
@@ -50,7 +68,7 @@ export async function buildWorld(scene, renderer, opts = {}) {
   await step(0.03, 'terrain');
   const terrain = createTerrain(renderer, quality);
   mark('terrain');
-  const lake = createLake(renderer, env);
+  const lake = createLake(renderer, env, undefined, terrain.heightAt);
   root.add(terrain.mesh, lake.mesh);
 
   mark('lake');
@@ -79,9 +97,21 @@ export async function buildWorld(scene, renderer, opts = {}) {
   const town = buildTown(TB, atlas, quality, terrain.heightAt);
   mark('town');
   colliders.push(...town.colliders);
+  buildFete(TB.matte, town.green, terrain.heightAt);
+  mark('fete');
+  const bridges = buildBridges(TB.matte, [...town.paths, { w: 12, pts: [[-3600, -1240], [3600, -1240]] }], terrain.heightAt, col);
+  mark('bridges');
   root.add(...town.objects);
   const edge = buildAirfieldEdge(quality);
   root.add(...edge.objects);
+  const LONG = { w: 12, pts: [[-3600, -1240], [3600, -1240]] }, SOUTH = { w: 9, pts: LANES[1].pts.filter(([x]) => Math.abs(x) < 4500) };
+  const cars = buildCars([LONG, SOUTH, LONG, { w: 9, pts: [[-560, -1550], [360, -1550]] }, SOUTH, LANES[4]], terrain.heightAt, bridges, quality);
+  root.add(cars.mesh);
+  mark('cars');
+  const pal = buildPalace(B.flags, atlas, quality, asphaltTexture(renderer, 256), TB.matte, TB.metal);
+  colliders.push(...pal.colliders);
+  root.add(pal.ground);
+  mark('palace');
   const socks = buildWindsocks(B);
   const flags = buildFlags(B.flags, atlas.texture);
 
@@ -137,19 +167,28 @@ export async function buildWorld(scene, renderer, opts = {}) {
   for (const c of colliders) block.rect(c.min[0] - 3, c.min[2] - 3, c.max[0] + 3, c.max[2] + 3);
   block.rect(town.green.x0 + 14, town.green.z0 + 14, town.green.x1 - 14, town.green.z1 - 14);
   block.disc(CASTLE.x, CASTLE.z, 140);
+  const palaceTrees = new Set(pal.trees.map(([x, z]) => `${x},${z}`));
+  const bankSet = new Set(bankTrees().map(([x, z]) => `${x},${z}`));
   const noGo = (x, z) => {
-    if (airfieldMask(x, z) > 0) return true;
+    if (Math.abs(x - PALACE_FRAME.cx) < 450 && Math.abs(z - PALACE_FRAME.cz) < 450 && palaceTrees.has(`${x},${z}`)) return false;
+    const rd = riverDist(x, z);
+    if (rd < 6) return true;
+    if (rd < 40 && bankSet.has(`${x},${z}`)) return airfieldMask(x, z) > 0 || ROADS.some((r) => aa(r, x, z, 7));
+    if (airfieldMask(x, z) > 0 && !aa(town.green, x, z, 10)) return true;
     for (const F of FRAMES) {
       const rx = x - F.cx, rz = z - F.cz;
       const a = Math.abs(rx * F.dx + rz * F.dz) - F.L / 2, b = Math.abs(-rx * F.dz + rz * F.dx);
       if (a > 0 && a < 3200 && b < 160 + a * 0.15) return true;
     }
+    { const F = PALACE_FRAME, rx = x - F.cx, rz = z - F.cz;
+      const a = Math.abs(rx * F.dx + rz * F.dz) - F.L / 2, b = -rx * F.dz + rz * F.dx;
+      if (a < 900 && b > -260 && b < 100 + Math.max(0, a) * 0.1 && (a > 0 ? Math.abs(b) < 70 + a * 0.1 : true)) return true; }
     if (lakeDist(x, z) < 1.1 || ROADS.some((r) => aa(r, x, z, 7))) return true;
     return block.has(x, z);
   };
   mark('meshes');
   await step(0.58, 'trees');
-  const trees = await buildTrees(renderer, quality, { heightAt: terrain.heightAt, noGo, extra: [...town.treeSpots, ...edge.trees], pause: (f) => step(0.58 + 0.3 * f, 'trees') });
+  const trees = await buildTrees(renderer, quality, { heightAt: terrain.heightAt, noGo, extra: [...town.treeSpots, ...edge.trees, ...pal.trees, ...bankTrees()], pause: (f) => step(0.58 + 0.3 * f, 'trees') });
   mark('trees');
   root.add(trees.group);
   await step(0.88, 'shade');
@@ -162,6 +201,8 @@ export async function buildWorld(scene, renderer, opts = {}) {
   const buildingBoxes = colliders.filter((c) => c.kind !== 'mast');
   function surfaceAt(x, z) {
     for (const c of buildingBoxes) if (x >= c.min[0] && x <= c.max[0] && z >= c.min[2] && z <= c.max[2]) return 'building';
+    const ps = palaceSurface(x, z);
+    if (ps) return ps;
     for (const F of FRAMES) if (inRect(x, z, F.rect)) return 'runway';
     for (const S of SEGMENTS) if (inRect(x, z, S.rect)) return 'taxiway';
     for (const F of FRAMES) if (inRect(x, z, F.strip)) return 'runway';
@@ -171,6 +212,7 @@ export async function buildWorld(scene, renderer, opts = {}) {
   }
   function runwayAt(x, z) {
     for (const F of FRAMES) if (inRect(x, z, F.rect)) return F.id;
+    if (inRect(x, z, PALACE_FRAME.rect)) return PALACE_FRAME.id;
     return null;
   }
 
@@ -196,6 +238,7 @@ export async function buildWorld(scene, renderer, opts = {}) {
     flags.uniforms.uTime.value = time;
     socks.update(time, wind.from, wind.kt);
     tower.update(dt, time, camera);
+    cars.update(dt);
   }
 
   function setQuality(q) {
@@ -215,13 +258,16 @@ export async function buildWorld(scene, renderer, opts = {}) {
   }
 
   try { opts.onProgress?.(1, 'done'); } catch (e) { /* */ }
-  return {
+  const W = {
     update,
     setQuality,
     get quality() { return quality; },
     treeStats: trees.stats,
     groundHeightAt: terrain.heightAt,
     surfaceAt,
+    // FLIGHTFIX5: narrow water for the LAND planner's coarse dry-block test (the river; the lake is wide). riverDist is
+    // interpolated from 40 m cells (≤ ~28 m off), hence the margin.
+    waterNear: (x, z, r) => riverDist(x, z) < r + 30,
     runwayAt,
     colliders,
     sun,
@@ -235,7 +281,9 @@ export async function buildWorld(scene, renderer, opts = {}) {
     papi: lights.papi,
     root,
     airport: def?.id || 'royal',
-    dispose: () => { trees.dispose(); disposeWorld(scene, root, { lights: [hemi, sun], uniformSets: [terrain.uniforms, lake.uniforms, flags.uniforms], textures: [env] }); },
+    dispose: () => { parked = { scene, world: W, free }; },
     debug: { terrain, trees, lake, timings },
   };
+  function free() { trees.dispose(); disposeWorld(scene, root, { lights: [hemi, sun], uniformSets: [terrain.uniforms, lake.uniforms, flags.uniforms], textures: [env] }); }
+  return W;
 }

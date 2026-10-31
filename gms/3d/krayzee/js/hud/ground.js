@@ -3,7 +3,7 @@
 // Any chip tap (even the selected one) or any flight control touch/key fades the whole set for this flight (Aaron, HUD4).
 import { aircraftLockText } from '../ui/index.js';
 import { HANGAR, SHORT } from '../ui/aircraft.js';
-import { rects, slotX } from './place.js';
+import { rects, slotX, startedOn } from './place.js';
 
 const LOCK = '<svg viewBox="0 0 10 12" aria-hidden="true"><rect x="1" y="5" width="8" height="6.5" rx="1.3" fill="currentColor"/><path d="M3 5V3.4a2 2 0 0 1 4 0V5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
 const lockOf = (a) => { try { return aircraftLockText(a); } catch (e) { return ''; } };
@@ -30,8 +30,11 @@ export function createGroundButtons(root, { chipRoot = root, onTakeoff, onSkip, 
   const stop = (e) => e.stopPropagation();
   el.addEventListener('pointerdown', stop);
   chips.addEventListener('pointerdown', stop);
-  to.addEventListener('click', (e) => { e.stopPropagation(); onTakeoff?.(); });
-  skip.addEventListener('click', (e) => { e.stopPropagation(); onSkip?.(); });
+  // the buttons slide when DEMAND IT shows or goes above them: a tap within 0.5 s of that was aimed at what used to be there
+  let movedAt = -1e9, lastY = null;
+  const fresh = (e) => e.detail && performance.now() - movedAt < 500;
+  to.addEventListener('click', (e) => { e.stopPropagation(); if (startedOn(to, e) && !fresh(e)) onTakeoff?.(); });
+  skip.addEventListener('click', (e) => { e.stopPropagation(); if (startedOn(skip, e) && !fresh(e)) onSkip?.(); });
   const plane = chips.querySelector('[data-g="plane"]'), why = chips.querySelector('[data-g="why"]');
   let whyT = 0;
   function paintLocks() {
@@ -120,6 +123,8 @@ export function createGroundButtons(root, { chipRoot = root, onTakeoff, onSkip, 
         if (!dismissed) { const was = chips.hidden; chips.hidden = !offered; if (was && offered) placeAt = 0; }
       }
       const now = performance.now();
+      const y = el.hidden ? null : Math.round(el.getBoundingClientRect().top);
+      if (y !== lastY) { lastY = y; movedAt = now; }
       if (chipsOn() && now > placeAt) { placeAt = now + 250; place(); }
     },
     get state() { const on = chipsOn(); return { takeoff: !to.hidden && !el.hidden, skip: !skip.hidden && !el.hidden, difficulty: diff.hidden || !on ? null : diff.querySelector('[aria-pressed="true"]')?.dataset.d, aircraft: plane.hidden || !on ? null : plane.querySelector('[aria-pressed="true"]')?.dataset.a,

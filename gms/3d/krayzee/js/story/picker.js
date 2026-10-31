@@ -1,12 +1,14 @@
 // Story mission picker: shown from the menu's Story button once Mission 1 is done. Mission n + 1 unlocks when n is done.
 import { MISSIONS, MISSION_IDS } from '../../data/story/index.js';
+import { AIRCRAFT } from '../../data/aircraft.js';
 import { ensureStoryCss, el, esc, loadProgress } from './dom.js';
 
 export function missionList(progress = loadProgress()) {
   return MISSION_IDS.map((id, k) => {
     const p = progress.missions?.[id] || {};
     const prev = MISSION_IDS[k - 1];
-    return { id, title: MISSIONS[id].title, subtitle: MISSIONS[id].subtitle || '', done: !!p.done, best: p.best || 0, diff: p.diff || null,
+    const plane = AIRCRAFT[MISSIONS[id].aircraft || 'c172']?.name || '';
+    return { id, title: MISSIONS[id].title, subtitle: [plane, MISSIONS[id].subtitle].filter(Boolean).join(' · '), done: !!p.done, best: p.best || 0, diff: p.diff || null,
       unlocked: k === 0 || !!progress.missions?.[prev]?.done, needs: prev };
   });
 }
@@ -23,7 +25,7 @@ export function createPicker({ parent = document.body, difficulty = 'easy', onPi
       <i>${m.id}</i><span><b>${esc(m.title)}</b><small>${esc(m.subtitle)}</small></span><em>${esc(tag)}</em></button>`;
   }).join('');
   const root = el('div', 'krz-st-pick', `<div class="krz-st-card" role="dialog" aria-label="Story missions">
-    <small class="k">The Peerage · Story</small><h2>Missions</h2><h3>All at C-Tower 1. Choose your crime.</h3>
+    <small class="k">The Peerage · Story</small><h2>Missions</h2><h3>Across the kingdom, all the way to the crown. Choose your crime.</h3>
     <div class="krz-st-picklist">${rows}</div>
     <p class="krz-st-pickfoot">Difficulty: <b>${esc(difficulty[0].toUpperCase() + difficulty.slice(1))}</b> (change it in Settings)</p>
     <div class="krz-st-btns"><button type="button" class="alt" data-a="close">Back to the menu</button></div></div>`);
@@ -36,6 +38,7 @@ export function createPicker({ parent = document.body, difficulty = 'easy', onPi
     if (id) { close(); onPick?.(id); }
   });
   parent.appendChild(root);
+  import('../ui/pass.js').then((m) => m.decoratePicker(root)).catch(() => {}); // ACCESS: br8t Pass rows + inline card (docs/ACCESS.md)
   requestAnimationFrame(() => root.classList.add('in'));
   function close() { root.remove(); }
   return { el: root, close, list };

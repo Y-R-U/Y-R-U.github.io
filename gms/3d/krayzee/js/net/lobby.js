@@ -4,7 +4,11 @@
 import { el, esc, onTap, injectCss, ICON } from '../ui/dom.js';
 import { VOICES } from '../ui/voices.js';
 import { TYPE_IDS, ROOM_TYPES, HOST_OPTIONS, defaultsFor, normalise, fixedKeys, summary, canDecree, canRanked } from './options.js';
-import { helloFromProfile } from './index.js';
+import { helloFromProfile, accountToken } from './index.js';
+import { access } from '../game/access.js';
+import { ACCESS } from '../../data/access.js';
+import { passCard, ensurePassCss } from '../ui/pass.js';
+import { openAccountPanel } from '../ui/account.js';
 
 const DIGITS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
 export const spokenCall = (n) => `${DIGITS[Math.floor(n / 10)]}-${DIGITS[n % 10]}`;
@@ -26,6 +30,7 @@ export function roomMeta(r, ageS = 0) {
 export function createLobby({ net, profile = () => ({}), onStart, onClose, parent = document.body } = {}) {
   injectCss();
   injectLobbyCss();
+  ensurePassCss();
   const node = el(`<section class="kzn" aria-label="Online lobby">
     <header class="kzn-top">
       <button class="kzn-back" data-a="back" aria-label="Back">${ICON.close}</button>
@@ -42,6 +47,49 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
   let view = 'home', editing = null, rooms = [], roomsAt = 0, stats = null, started = false, msgTimer = 0, quickT = 0, sheet = null;
   const myVotes = new Set();
   const offs = [];
+  // ACCESS (D36, docs/ACCESS.md): sign-in to host/join, the free daily online games, the br8t Pass card
+  const A = access();
+  let tokOk = null, gate = null, gateCard = null, lastEntry = null, signinRetry = false;
+  const needSignIn = () => !!net.net?.access?.signin && tokOk === false;
+  const counting = () => !!net.net?.access?.counting;
+  async function checkTok() { const was = tokOk; tokOk = !!(await accountToken()); if (was !== tokOk && view === 'home') renderHome(); return tokOk; }
+  function entry(fn) {
+    if (needSignIn()) { gate = 'signin'; renderHome(); return; }
+    lastEntry = fn; signinRetry = false; fn();
+  }
+  function allowText() {
+    const a = A.allowanceState;
+    if (!counting()) return A.enforcing || A.live ? '' : 'br8t Pass coming soon. Online is free for now.';
+    if (a?.unlimited || A.pass) return 'Unlimited online games with your br8t Pass.';
+    if (a && a.remaining >= 0) return `<b>${a.remaining} of ${a.perDay}</b> free online games left today`;
+    return `${ACCESS.onlinePerDay} free online games a day. Each new room you join uses one.`;
+  }
+  function paintGate() {
+    const slot = body.querySelector('[data-s="gate"]');
+    gateCard?.destroy(); gateCard = null;
+    if (!slot) return;
+    slot.innerHTML = '';
+    if (gate === 'signin' || needSignIn()) {
+      slot.innerHTML = `<div class="kzn-card kzp kzp-navy kzp-sign"><div class="kzp-crest">${ICON.crown}</div><small class="kzp-k">The Online Court</small>
+        <h4>Sign in to fly with other royals</h4><p>The Court admits signed-in royals only, so your rank, wins and br8t Pass follow you to any device. Free Flight and the story need no account.</p>
+        <div class="kzp-btns"><button type="button" data-a="signin">Sign in</button></div></div>`;
+      const b = slot.querySelector('[data-a="signin"]');
+      onTap(b, () => { if (!openAccountPanel()) say('Use the account button (top right) to sign in.'); });
+      return;
+    }
+    if (gate === 'nogames' && counting() && !A.pass) {
+      gateCard = passCard({ reason: 'online', skin: 'navy', onBack: () => { gate = null; renderHome(); }, backLabel: 'Back' });
+      slot.append(gateCard.el);
+    }
+  }
+  function paintAllow() {
+    const el = body.querySelector('[data-s="allow"]');
+    if (!el) return;
+    const t = allowText();
+    el.hidden = !t;
+    el.innerHTML = t;
+    el.dataset.left = String(A.allowanceState?.remaining ?? '');
+  }
 
   const say = (text, ms = 3200) => {
     msgEl.textContent = text;
@@ -62,8 +110,11 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
 
   // ------------------------------------------------------------------ home
   function renderHome() {
+    const locked = needSignIn();
     body.innerHTML = `<div class="kzn-col">
-      <button class="kz-btn primary" data-a="quick" ${quickT ? 'aria-busy="true" disabled' : ''}>${quickT ? 'Finding a court…' : 'Quick join'} <small>${quickT ? 'one moment' : 'busiest court nearby, or a new one'}</small></button>
+      <div data-s="gate"></div>
+      <p class="kzp-line kzn-allow" data-s="allow" hidden></p>
+      ${locked ? '' : `<button class="kz-btn primary" data-a="quick" ${quickT ? 'aria-busy="true" disabled' : ''}>${quickT ? 'Finding a court…' : 'Quick join'} <small>${quickT ? 'one moment' : 'busiest court nearby, or a new one'}</small></button>
       <div class="kzn-row">
         <button class="kz-btn" data-a="create">${ICON.crown}Create a room</button>
       </div>
@@ -71,25 +122,27 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
         <label class="kzn-lbl" for="kzn-code">Join with a code</label>
         <div class="kz-input"><input id="kzn-code" class="mono" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC234">
           <button class="kz-btn" data-a="join">Join</button></div>
-      </div>
+      </div>`}
       <div class="kzn-card">
         <div class="kzn-lbl"><div>Public rooms <small data-s="online"></small></div><button class="kzn-link" data-a="refresh">Refresh</button></div>
         <ul class="kzn-list" data-s="rooms"></ul>
       </div>
       ${saverRow()}
     </div>`;
-    const code = body.querySelector('#kzn-code');
+    paintGate(); paintAllow();
+    const code = body.querySelector('#kzn-code') || document.createElement('input');
     code.addEventListener('input', () => { code.value = code.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
     code.addEventListener('keydown', (e) => { if (e.key === 'Enter') joinCode(); });
-    const joinCode = () => { const c = code.value.trim(); if (c.length !== 6) { code.classList.add('bad'); say('Room codes have 6 letters and numbers.'); return; } code.classList.remove('bad'); net.join(c); };
-    bind({ quick: quickJoin, create: () => { editing = normalise(defaultsFor('court'), myRank()); go('create'); }, join: joinCode, refresh: () => net.list() });
+    const joinCode = () => { const c = code.value.trim(); if (c.length !== 6) { code.classList.add('bad'); say('Room codes have 6 letters and numbers.'); return; } code.classList.remove('bad'); entry(() => net.join(c)); };
+    bind({ quick: quickJoin, create: () => { if (needSignIn()) { gate = 'signin'; renderHome(); return; } editing = normalise(defaultsFor('court'), myRank()); go('create'); }, join: joinCode, refresh: () => net.list() });
     bindSaver();
     renderRooms();
   }
 
   function quickJoin() {
     if (quickT) return;
-    net.quick();
+    if (needSignIn()) { entry(() => {}); return; }
+    entry(() => net.quick());
     quickT = setTimeout(() => { quickT = 0; if (view === 'home') { renderHome(); say('No answer from the room server. Try again.'); } }, QUICK_MS);
     if (view === 'home') renderHome();
   }
@@ -116,7 +169,7 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
         <span class="kzn-room-name">${esc(r.name)}</span><span class="kzn-room-n">${r.n}/${r.max}</span>
         <span class="kzn-room-sub">${esc(s.name)} · ${esc(s.parts.slice(0, 2).join(' · '))}</span><span class="kzn-room-meta" data-phase="${esc(r.phase)}">${m.crown ? `<i class="kzn-mc">${CROWN}</i>` : ''}${esc(m.text)}</span></button></li>`;
     }).join('');
-    ul.querySelectorAll('[data-room]').forEach((b) => onTap(b, () => net.join({ id: b.dataset.room })));
+    ul.querySelectorAll('[data-room]').forEach((b) => onTap(b, () => entry(() => net.join({ id: b.dataset.room }))));
   }
 
   // ------------------------------------------------------------------ create / edit options
@@ -163,7 +216,9 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
       cancel: () => go(net.room ? 'room' : 'home'),
       ok: () => {
         if (net.room) { net.setOptions(editing); go('room'); return; }
-        net.create({ name: body.querySelector('#kzn-name')?.value || '', priv, set: editing });
+        const name = body.querySelector('#kzn-name')?.value || '';
+        if (needSignIn()) { gate = 'signin'; go('home'); return; }
+        lastEntry = () => net.create({ name, priv, set: editing }); signinRetry = false; lastEntry();
       },
     });
   }
@@ -279,7 +334,7 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
     pill.dataset.state = !net.connected ? 'off' : sum && sum.relayed ? 'relay' : 'ok';
   };
   offs.push(
-    net.on('connected', () => { setPill(); if (!net.room) net.list(); }),
+    net.on('connected', () => { setPill(); if (!net.room) net.list(); checkTok().then(() => { if (counting()) A.allowance().then(() => view === 'home' && paintAllow()); if (view === 'home') renderHome(); }); }),
     net.on('rooms', (m) => { rooms = m.rooms || []; roomsAt = performance.now(); stats = { players: m.players, online: m.online, region: m.region }; if (view === 'home') renderRooms(); }),
     net.on('joined', (r) => { started = false; myVotes.clear(); closeSheet(); quickDone(); go('room'); if (r.phase === 'flight') startNow(); }),
     net.on('room', (r) => {
@@ -291,7 +346,18 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
     net.on('phase', (p) => { if (p === 'flight') startNow(); else started = false; }),
     net.on('host', (h) => { if (h.me) say('You are now the host: the sky runs on your device.'); }),
     net.on('claim', (m) => { if (!m.ok) say(m.why === 'airborne' ? 'Land and park first to change voice.' : `${voiceName(m.voice)} is taken${m.byName ? ` by ${m.byName}` : ''}.`); }),
-    net.on('error', (m) => { quickDone(); say(m.msg || 'Something went wrong.'); }),
+    net.on('error', (m) => {
+      quickDone();
+      // ACCESS: a refused entry gets a card on the home view, never a dialog
+      if (m.code === 'nogames') { gate = 'nogames'; A.noteAllowance(m.allowance); go('home'); return; }
+      if (m.code === 'signin') {
+        // Our token may simply not have been checked yet (signed in a moment ago): send it and try once more.
+        checkTok().then((has) => { if (has && lastEntry && !signinRetry) { signinRetry = true; net.hello(); setTimeout(() => lastEntry?.(), 900); } else { gate = 'signin'; go('home'); } });
+        return;
+      }
+      say(m.msg || 'Something went wrong.');
+    }),
+    net.on('allowance', (a) => { A.noteAllowance(a); if (view === 'home') paintAllow(); }),
     net.on('kicked', (m) => { closeSheet(); say(m.msg || 'You left the room.', 5000); go('home'); }),
     net.on('left', () => { closeSheet(); myVotes.clear(); if (view === 'room') go('home'); }),
     net.on('link', setPill),
@@ -311,13 +377,18 @@ export function createLobby({ net, profile = () => ({}), onStart, onClose, paren
     else if (rooms.some((r) => r.meta?.left)) renderRooms();
   }, 1000);
 
+  // ACCESS: signing in (or out) while the lobby is open sends the new token and repaints the gate.
+  const Qs = new URLSearchParams(location.search);
+  if (!Qs.has('noaccount') && !Qs.get('uid')) import('/lib/auth/auth.js').then(({ auth }) => offs.push(auth.onChange(() => { net.hello(); checkTok().then((ok) => { if (ok && gate === 'signin') gate = null; if (view === 'home') renderHome(); if (counting()) A.allowance().then(() => view === 'home' && paintAllow()); }); }))).catch(() => {});
+  offs.push(A.on(() => { if (view === 'home') { paintAllow(); if (gate === 'nogames' && A.pass) { gate = null; renderHome(); } } }));
+  A.probe();
   render();
   net.connect().then(() => { setPill(); const code = new URLSearchParams(location.search).get('room'); if (code && !net.room) net.join(code); })
     .catch(() => { setPill(); say('Could not reach the room server.'); });
 
   return {
     node,
-    show(on) { node.classList.toggle('on', on); if (!on) closeSheet(); if (on) render(); },
+    show(on) { node.classList.toggle('on', on); if (!on) closeSheet(); if (on) { checkTok(); if (counting()) A.allowance().then(() => view === 'home' && paintAllow()); render(); } },
     get view() { return view; },
     destroy() { clearInterval(pillTimer); clearTimeout(quickT); closeSheet(); offs.forEach((f) => f()); node.remove(); },
   };
@@ -389,6 +460,7 @@ function injectLobbyCss() {
 @keyframes kzn-up { from { opacity: 0; transform: translateY(24px); } }
 @media (prefers-reduced-motion: reduce) { .kzn-sheet, .kzn-sheet-card { animation: none; } }
 .kzn-types { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.kzn-allow { margin: 0 4px; display: block; text-align: center; } .kzn-allow[hidden] { display: none; }
 .kzn-type { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 10px 12px; border-radius: 14px; cursor: pointer; min-height: 72px;
   border: 1px solid var(--kz-line2, rgba(255,255,255,.1)); background: rgba(0,0,0,.25); }
 .kzn-type b { font: italic 400 19px/1.05 var(--kz-serif, Georgia, serif); }

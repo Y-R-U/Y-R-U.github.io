@@ -1,6 +1,8 @@
 # Krayzee online rooms: architecture (lane ONLINE, 2026-10-21)
 
-Status (2026-10-22, lane NET): **O1–O5 done, local only** (LAN mode deferred, D5). Nothing is deployed. `js/main.js`
+Status (2026-10-29, lane ACCESS): deploy prepared for games.br8t.com port 8018 (D36, approved); sign-in required to
+create/join, free daily online games counted via the payments service (docs/ACCESS.md §3), F-35 nozzle/fan in state
+packets, rooms at C-Tower 1 only for v1. Earlier: (2026-10-22, lane NET): **O1–O5 done, local only** (LAN mode deferred, D5). Nothing is deployed. `js/main.js`
 carries the §15 wiring (O4 and O5 needed none; `tools/net/gen-main.mjs` skips patches already applied, by marker). O4 = §17,
 O5 = §18.
 `server/` is the real `krayzeenet` (snakenet fork + RAGDOJO ID tokens + the Krayzee rules); `js/net/` is the browser
@@ -494,7 +496,7 @@ C's two reports (ack lost / never seen), then A closes on final and B takes over
 restart, D's impact handler, the host's AP, B's ATC replica and B's dedupe, and requires exactly those checks to fail
 while the resend and handoff checks still pass. `--real` skips it, `--trace` prints detail. Screenshots `docs/shots/net/mp4-*`.
 
-Deploy (**not done; needs Aaron**): `server/deploy.sh` refuses without `CONFIRM=1` and refuses if port 8018 is taken on the
+Deploy (**approved D36; the manager commits, then runs it**): `server/deploy.sh` refuses without `CONFIRM=1` and refuses if port 8018 is taken on the
 box; `server/krayzeenet.service` (MemoryMax 64M), `server/caddy_route.py` adds `handle /gms/3d/krayzee/net/*`. TURN comes
 from snakenet's loopback `:8014/ice` (shared 800 GB cap).
 

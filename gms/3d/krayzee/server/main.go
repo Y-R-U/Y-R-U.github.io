@@ -14,6 +14,9 @@
 //	KRAYZEE_ORIGINS    extra allowed origins, comma separated host patterns
 //	KRAYZEE_PER_IP     sockets per address       (default 64, IPv6 per /64)
 //	KRAYZEE_IDLE_MS    public-room idle removal  (default 300000; 0 = off)
+//	KRAYZEE_SIGNIN     "required" = a br8t account to create/join (D36; access.go)
+//	KRAYZEE_ALLOWANCE  off | auto | on: free daily online games via the payments service (default auto = only when live)
+//	KRAYZEE_ALLOWANCE_URL / _GAME  payments base (default http://127.0.0.1:8016/api/br8t/) / allowance key (krayzee)
 //	KRAYZEE_DEV_AUTH=1 tests only: accept "dev:<uid>" and "anon:<uid>" tokens
 package main
 
@@ -62,6 +65,10 @@ func main() {
 		verify = devVerifier(verify)
 	}
 	h := newHub(ice, verify)
+	h.acc = loadAccess() // D36: KRAYZEE_SIGNIN, KRAYZEE_ALLOWANCE (access.go, docs/ACCESS.md)
+	h.spendFn = h.acc.spend
+	go h.acc.watchLive(5 * time.Minute)
+	log.Printf("access: signin required=%v, allowance=%s (%sallowance, game %s)", h.acc.signin, h.acc.mode, h.acc.url, h.acc.game)
 	if ms, err := strconv.Atoi(os.Getenv("KRAYZEE_GRACE_MS")); err == nil && ms >= 0 {
 		h.grace = time.Duration(ms) * time.Millisecond
 	}
@@ -98,7 +105,7 @@ func (h *hub) routes(prefix string, origins []string) http.Handler {
 	mux.HandleFunc(prefix+"/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Cache-Control", "no-store")
-		json.NewEncoder(w).Encode(map[string]any{"ok": true})
+		json.NewEncoder(w).Encode(map[string]any{"ok": true, "access": h.acc.view()})
 	})
 	mux.HandleFunc(prefix+"/stats", func(w http.ResponseWriter, r *http.Request) {
 		if o := r.Header.Get("Origin"); o != "" {

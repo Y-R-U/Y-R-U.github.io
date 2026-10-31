@@ -3,8 +3,8 @@ import { RANKS, titleFor } from './ranks.js';
 import { career } from './career.js';
 
 // Flyable in Free Flight (model + flight model). Order = Hangar card order.
-export const HANGAR = ['c172', 'tiger', 'bathtub', 'herc', 'f35', 'jumbo'];
-export const SHORT = { c172: 'Runabout', tiger: 'Moth', bathtub: 'Bathtub', herc: 'Wardrobe', f35: 'Tantrum', jumbo: 'Jumbo' };
+export const HANGAR = ['c172', 'cub', 'tiger', 'pitts', 'bathtub', 'herc', 'f35', 'jumbo', 'throne'];
+export const SHORT = { c172: 'Runabout', tiger: 'Moth', bathtub: 'Bathtub', herc: 'Wardrobe', f35: 'Tantrum', jumbo: 'Jumbo', cub: 'Cub', pitts: 'Show-Off', throne: 'Throne' };
 // ?allplanes: every Hangar plane unlocked, for testing
 const ALL = typeof location !== 'undefined' && new URLSearchParams(location.search).has('allplanes');
 const BLURB = {
@@ -14,6 +14,9 @@ const BLURB = {
   herc: 'Four turboprops, a rear ramp and a royal crate. Short runways, no fuss.',
   f35: 'Stealthy, fast, afterburner. Overshoots everything; the tower hates it.',
   jumbo: 'A palace with wings. Needs the whole runway, and then some.',
+  cub: 'Yellow, gentle, slower than the gardener. Lands on a lawn; loves a meadow.',
+  pitts: 'Rolls 240° a second. Everything else about it is also too much.',
+  throne: 'A throne with a jet pack. Hovers. Handles like a shopping trolley.',
 };
 
 // null when unlocked, else { text } (DESIGN §4: unlockRank per type; 'story' = finish the campaign).

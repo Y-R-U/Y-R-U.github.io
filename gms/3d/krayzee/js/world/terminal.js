@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { col, mat } from './util.js';
-import { TERMINAL } from './layout.js';
+import royal from '../../data/airports/royal.js';
+const TERMINAL = royal.terminal;
 import { uvQuad } from './textures.js';
 
 const STONE = col('#e9e0cc'), STONE2 = col('#d8ccb2'), RENDER = col('#f1ece2'), MULL = col('#2f3338');

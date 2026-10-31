@@ -482,3 +482,77 @@ How `jumbo`, `herc` and `f35` fly; the full write-up is docs/FLIGHT.md "Jets". S
   takeoff and vertical landing from the LAND slot's context button; the flight core drives `setNozzle/setLiftFan`.
   Controls, thresholds and difficulty: docs/STOVL.md.
 
+
+## ROSTER (V1 A1–A3, 2026-10-29): Butter Cub, Show-Off, Divine Right
+Three more `assembleRig` types, all flyable (`status: 'ready'`, in `main.js` FLYABLE and the Hangar). Viewer:
+`tools/jetview.html?type=cub|pitts|throne` (taildraggers now sit tail-down; `&level` for datum level, `&nozzle=0..1` for
+the throne). Screenshots: `docs/shots/roster/`.
+
+| file | what |
+|---|---|
+| `types/cub_cockpit.js` | Shared parametric flat-panel cockpit (`buildPanelCockpit`: panel canvas, live gauges from the instrument atlas, stick, throttle, rudder bar) + `paintDial`, `stickGeom`. Used by the Cub and the Pitts. |
+| `types/cub.js` | Piper J-3 "Butter Cub": butter-yellow fabric (fixed: it is the name), cowl + wheel discs in the player's primary, the lightning bolt in their secondary with an accent pinline, name aft, registration on fin and wings, crest on the rudder. Cabin with real glass, the right clamshell door open (upper half up under the wing, lower half folded down), inner liner/floor/seats, exposed finned cylinders, V lift struts + jury struts, bungee gear. Flown from the FRONT seat; a corgi rides behind. J-3 panel (four live dials, two oil dials, wet compass, the fuel cork wire out of the nose). |
+| `types/pitts.js` | Pitts S-2 "Show-Off": the sunburst in primary/secondary/accent on wings, fuselage and tail; swept upper wing on N-cabanes, I-struts, four ailerons, flying/landing wires, spats, round cowl with a spinner (secondary) and a two-blade metal prop. Rear open cockpit (front one wears its cover), leather coaming, harness, small windscreen; panel with a G-meter and a SMOKE switch. |
+| `types/throne.js` | "Divine Right": gilt throne on shopping-trolley castors, velvet (primary) cushion/seat/back with tufting, the crest + name + registration on the back of the backrest (what the chase camera sees), ogee arch, crown finial, lion-head armrests, footstool, gilt feathered angel wings (secondary tips) with ailerons, sceptre tail boom with banner tail surfaces, twin brass jet pods under the seat with one swivelling nozzle shaft + additive flames. Cockpit = a gilt lectern of state between the royal feet (VELOCITY / ALTITUDE / HORIZON / ASCENT), sceptre stick on the right armrest, orb throttle on the left. The scarf is tucked (the backrest is behind the neck). |
+
+Rig additions (throne): `rig.setNozzle(0..1, immediate)` (0 aft … 1 straight down, ~0.4 s ease), `rig.setLiftFan(v)` (stored only),
+`rig.jetState()`, `rig.exhaust()`, `rig.fxPoints`. `traffic.sync` drives setNozzle for any STOVL type (not only `P.jet`).
+
+### Geometry (build frame as the Tiger; local = build − CG)
+| | Cub | Pitts | Throne |
+|---|---|---|---|
+| CG (station, height) | 1.95, 1.0 | 1.45, 1.05 | 0.75, 0.95 |
+| mains / third | s 1.45 ±0.9 r 0.26 · tailwheel s 6.1 | s 1.1 ±0.75 r 0.2 · tailwheel s 4.75 | rear castors s 1.05 ±0.42 · front castors s 0.25 (castoring pair) |
+| 3-point attitude / restHeight | 12.0° / 0.874 | 12.0° / 0.955 | level / 0.95 |
+| eye (pilot) | s 1.8, y 1.72 | s 2.58, y 1.86 | s 0.8, y 1.38 |
+| prop | 1.83 m wood, hub y 1.27 | 1.93 m metal, hub y 1.32 | none (jet pods y 0.33, nozzle pivot s 0.98) |
+| LOD (high / low, m) | 240 / 140 | 220 / 130 | 200 / 120 |
+
+`tailY` in the flight blocks is the geometric tail-wheel contact less the tail spring's set under the attitude-shifted
+3-point load (the static-share formula assumes a level datum), so both settle at 12.0–12.1°.
+
+### Budgets (`tools/jetview.html` `__measure`, rig only, ANGLE Metal)
+| | Cub high | Cub low | Pitts high | Pitts low | Throne high | Throne low |
+|---|---|---|---|---|---|---|
+| chase calls | 16 | 16 | 19 | 19 | 18 | 18 |
+| cockpit calls | 12 | 12 | 17 | 17 | 12 | 12 |
+| chase tris | 29.8k | 11.0k | 28.1k | 11.3k | 25.7k | 10.4k |
+| far / far2 tris (1 call each) | 3.4k / 2.4k | same | 3.8k / 3.3k | same | 3.9k / 3.3k | same |
+All under the low-tier target (≤ 25 calls, ≤ 30k). The Pitts' 6 hinged surfaces (four ailerons) cost its extra calls.
+
+### Flight models (`data/aircraft.js` → `flight`; `node tools/flight-sim.mjs roster`)
+- **Cub:** 460 kg, 16.6 m², stall ~33 kt, cruise 70, max ~78, ~600 fpm. Takeoff ~110 m (99–113 m measured), off grass in
+  ≤ 160 m, min run 154 m (fits the 240 m Palace Lawn from 12 m in). `shortField` (new, autopilot): a LAND final at
+  1.12 Vs0, a near-three-point arrival kept tail-down with firm heel brakes (light ones tail-up): LAND stops ~95 m
+  after touchdown. Gentle roll (~60°/s full stick), very stable.
+- **Pitts:** 680 kg, 11.6 m², stall 52 kt, ~131 kt flat out, 2300 fpm, roll **241°/s** at 135 kt (full roll 1.6 s),
+  neutral spiral stability (`kBank 0`), quick pitch. `vcruise` 95 = the circuit pace (it flies the C172's circuit, hot,
+  at 70 kt approach); `vFast` 150 kt (new) stops the autopilot's "over cruise" path rule fighting a latched full throttle.
+  `controls.js` RATE.pitts 240 lets the player have it. Long hot rollouts can end in a field with no clear run: then
+  main's field hop takes over (checked).
+- **Throne:** 380 kg, game wing 9 m², CD0 0.11 (a chair), stall 45 kt, cruise 90, jet thrust with little lapse
+  (`engineKind: 'fighter'`, no `P.jet`: light-plane circuits, field LANDs allowed). `trolley` (new): a 0.05 rad/s yaw
+  pull to the left plus a wander — hands off it drifts ~11° left in 10 s; the AP trims it. Mild roll wobble.
+  **STOVL:** the F-35's flight computer with a gentler profile (`tw 1.3, vfMax 10, vsUp 5, hoverAgl 25`): VERTICAL
+  TAKEOFF, HOVER, LAND HERE, FLY ON, field DEMAND TAKEOFF = VTO, all difficulties. `stovl.landFirstKt: 50`: in the
+  circuit the context button reads LAND with HOVER as the pill (the F-35's 110 kt rule would put HOVER first at the
+  throne's 80 kt); `main.js` now passes the type's STOVL block as `contextButton({ stovl })`.
+- **Easy taildraggers:** `GL.easy` (2.5×) tail-wheel tracking/damping for the player on Easy (main sets
+  `ac.stovlLevel` = difficulty). Hard keeps the lively ground loop. Applies to the Tiger too.
+- **Anti-nose-over (`taxiGuard`, Cub + Pitts only):** the AP holds the stick back taxiing and eases the brakes if the
+  tail lifts at taxi speed (a mischief-taxiing AI Pitts used to nose over). Kept off the Tiger: changing its taxi timing
+  shifted atc-sim's seeded mixed-types soak into a separation loss.
+
+### Tests
+`node tools/flight-sim.mjs roster [--only=cub,pitts,throne]`: circuits 09/27 (takeoff run vs book, no ground loop,
+centreline, 3-point touchdown), override + handback, at-rest attitude/rpm/fuel, Easy tailwheel kick, roll rates, short
+field (lawn run, LAND roll ≤ 120 m, grass ≤ 160 m), throne STOVL (VTO/hold/LAND HERE ×3 difficulties, HOVER→FLY ON,
+field VTO, context button choices, trolley pull), LAND ×10, LANDFIX2/LAND NOW, FIX3 (DEMAND TAKEOFF, field LAND +
+field takeoff, taxiIn, parked-in-TDZ, latched lever, low hand-back), field-hop fallback, B3/B5, 12 min of AI traffic
+through the real ATC. `--falsify=roll|loop|vto|short|brake` each turn their checks red.
+
+### Known gaps
+- Cub: no skylight glass (painted), struts have no fairings at the wing, the right door's halves are static.
+- Pitts: no aileron slave struts, no smoke system, the spinner is static (a body of revolution).
+- Throne: castors do not swivel visually; flames are not merged into far LODs; the lift-fan value is stored only.
+- `main.js` AI pool (WORLD's `aiPool`) does not include `cub`/`pitts` yet.

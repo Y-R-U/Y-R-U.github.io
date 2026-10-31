@@ -96,6 +96,22 @@ const CSS = `/* parked AIRCRAFT chips: locked types (padlock, dimmed; the requir
   .krz-paper-toast:not(.in) { transform: translateY(4px); }
   .krz-pops { top: 54%; }
 }
+/* HUDPOLISH E3 hints.js: one-time first-run hints, small, beside the control, never touchable */
+.krz-hint { position: fixed; inset: 0; z-index: 25; pointer-events: none; opacity: 0; transition: opacity .3s; font-family: system-ui, sans-serif; }
+.krz-hint.in { opacity: 1; }
+.krz-hint[hidden] { display: none; }
+.krz-hint-ring { position: absolute; border-radius: 16px; border: 2px solid rgba(255,215,94,.85); animation: krz-ring 1.4s ease-in-out infinite; }
+.krz-hint-bub { position: absolute; width: min(60vw, 216px); box-sizing: border-box; padding: 7px 10px 8px; border-radius: 11px; background: rgba(255,248,230,.94);
+  color: #1e2433; font: 500 12px/1.3 system-ui, sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+.krz-hint-bub b { font-weight: 800; }
+.krz-hint-bub::after { content: ''; position: absolute; width: 10px; height: 10px; background: inherit; transform: rotate(45deg); }
+.krz-hint-bub[data-dir="down"]::after { bottom: -5px; left: calc(var(--ax, 50%) - 5px); }
+.krz-hint-bub[data-dir="up"]::after { top: -5px; left: calc(var(--ax, 50%) - 5px); }
+.krz-hint-bub[data-dir="right"]::after { right: -5px; top: calc(var(--ay, 50%) - 5px); }
+.krz-hint-bub[data-dir="left"]::after { left: -5px; top: calc(var(--ay, 50%) - 5px); }
+.krz-hint-bub[data-dir=""]::after { display: none; }
+@media (orientation: landscape) and (max-height: 500px) { .krz-hint-bub { width: min(34vw, 220px); font-size: 11.5px; } }
+@media (prefers-reduced-motion: reduce) { .krz-hint-ring { animation: none; } .krz-hint { transition: none; } }
 /* MSGFIX msgcap.js: messages over the on-screen budget wait, hidden, lowest priority first */
 html[data-krz-shed~="banner"] #krz-hud .krz-banner, html[data-krz-shed~="story"] .krz-st-coach, html[data-krz-shed~="score"] .krz-pop,
 html[data-krz-shed~="radio"] .krz-r-pill, html[data-krz-shed~="tasks"] .kz-tk-toast, html[data-krz-shed~="prompt"] .krz-prompt, html[data-krz-shed~="paper"] .krz-paper-toast { visibility: hidden !important; }

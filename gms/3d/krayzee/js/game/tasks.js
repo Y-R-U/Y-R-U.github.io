@@ -7,14 +7,23 @@ import { SETS, STATS, FSTATS, TIER_PP, SET_BONUS, TASKS_KEY, STORY, placeAt } fr
 import { AIRCRAFT } from '../../data/aircraft.js';
 import { INFRACTIONS } from '../../data/rules.js';
 import { RUNWAYS } from '../world/layout.js';
+import * as LAYOUT from '../world/layout.js';
+import { LAWN } from '../../data/airports/palace.js';
 
 export { TASKS_KEY };
 export const TASKS_VERSION = 1;
 const STORY_KEY = 'krayzee.story';
 const KT = 0.514444;
 const PAVED = ['runway', 'taxiway', 'apron'];
-const HF = new Set(['air', 'inverted', 'stall', 'formation', 'visit']); // per-frame events: saved on a timer, not each time
-const CONTROLLER = { tower_m: 'gerald', tower_f: 'imogen', tower_trainee: 'toby' };
+const HF = new Set(['air', 'inverted', 'stall', 'formation', 'visit']);
+// ROSTER rows: the Palace Lawn strip (C-Tower 3, in C-Tower 1's frame) and roll counting
+export function onLawn(x, z) {
+  const r = LAWN.ROT * Math.PI / 180, dx = x - LAWN.OX, dz = z - LAWN.OZ;
+  const lx = dx * Math.cos(r) + dz * Math.sin(r), lz = -dx * Math.sin(r) + dz * Math.cos(r);
+  return Math.abs(lx) <= LAWN.length / 2 + 10 && Math.abs(lz) <= LAWN.width / 2 + 6;
+}
+const wrapPi = (a) => Math.atan2(Math.sin(a), Math.cos(a)); // per-frame events: saved on a timer, not each time
+const CONTROLLER = { tower_m: 'gerald', tower_f: 'imogen', tower_trainee: 'toby', tower_raf: 'imogen', tower_farm: 'mudge' };
 export const INVERTED_RAD = 2.09; // |bank| > 120°
 
 function memoryStorage() { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; }
@@ -193,7 +202,10 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
       L.seen.add(ev);
       if (ev.type === 'touchdown') {
         const crash = ev.grade === 'crash';
-        const e = { type: 'touchdown', fpm: ev.fpm, grade: ev.grade, bounce: !!ev.bounce, surface: ev.surface, runway: runwayAt(ac.pos.x, ac.pos.z), crash, fuel: ac.fuelFraction ?? 1, vertical: (ac.vtol || 0) > 0.5 };
+        const airport = LAYOUT.AIRPORT?.id || 'royal';
+        const e = { type: 'touchdown', fpm: ev.fpm, grade: ev.grade, bounce: !!ev.bounce, surface: ev.surface, runway: runwayAt(ac.pos.x, ac.pos.z), crash, fuel: ac.fuelFraction ?? 1, vertical: (ac.vtol || 0) > 0.5,
+          airport, lawn: ev.surface === 'lawn' || ((airport === 'royal' || airport === 'palace') && onLawn(ac.pos.x, ac.pos.z)) };
+        L.td = crash || e.vertical ? null : { x: ac.pos.x, z: ac.pos.z };
         L.lastTouch = { surface: ev.surface, field: !PAVED.includes(ev.surface) && !nearRunway(ac.pos.x, ac.pos.z, 150) };
         handle(e);
       } else if (ev.type === 'crash') { handle({ type: 'crash', reason: ev.reason }); L.lastTouch = null; }
@@ -211,13 +223,24 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
     }
     L.wasGround = ground;
     L.parked = ground && ac.gs < 1;
-    if (ground) { L.inv = 0; L.stall = 0; L.hov = 0; return; }
+    // the landing roll, touchdown to stop (short-field tasks)
+    if (ground && L.td && ac.gs < 1) { handle({ type: 'stopped', rollM: Math.hypot(ac.pos.x - L.td.x, ac.pos.z - L.td.z) }); L.td = null; }
+    if (!ground) L.td = null;
+    if (ground) { L.inv = 0; L.stall = 0; L.hov = 0; L.roll = 0; L.rollT = 0; L.bank0 = null; return; }
     const rdt = dt / Math.max(1, +warp || 1);
     const speedKt = ac.speed / KT, vne = AIRCRAFT[ctx.plane]?.speeds?.vne || 0;
     handle({ type: 'air', dt: rdt, dist: (ac.gs || 0) * dt, alt: ac.alt ?? ac.pos.y, speedKt, vne });
     // D35: jet-borne and nearly still (F-35B hover)
     if ((ac.vtol || 0) > 0.5 && ac.speed < 15 * KT) { L.hov = (L.hov || 0) + rdt; handle({ type: 'hover', dt: rdt, run: L.hov }); } else L.hov = 0;
     if (Math.abs(ac.bank) > INVERTED_RAD) { L.inv += rdt; handle({ type: 'inverted', dt: rdt, run: L.inv }); } else L.inv = 0;
+    // a full roll: 360° of bank one way (a change of direction starts the count again); secs = how long it took
+    if (L.bank0 != null) {
+      const d = wrapPi(ac.bank - L.bank0);
+      if (d && Math.sign(d) !== Math.sign(L.roll || d)) { L.roll = 0; L.rollT = 0; }
+      L.roll = (L.roll || 0) + d; L.rollT = (L.rollT || 0) + rdt;
+      if (Math.abs(L.roll) >= 2 * Math.PI) { handle({ type: 'roll', secs: L.rollT }); L.roll = 0; L.rollT = 0; }
+    }
+    L.bank0 = ac.bank;
     let vs = 0;
     try { vs = ent.ap?._vstall?.() || 0; } catch (e) { vs = 0; }
     if (!vs) vs = (AIRCRAFT[ctx.plane]?.speeds?.vs1 || 48) * KT;

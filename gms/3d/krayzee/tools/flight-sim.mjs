@@ -1,5 +1,5 @@
 // Headless flight-core harness (no browser): node tools/flight-sim.mjs [scenario] [--trace]
-// Scenarios: jets (jumbo/herc/f35, --only=jumbo) | landmany | feel | circuit | override | cutin | stall | taxi | traffic | types | typeoverride | typeground | all
+// Scenarios: jets (jumbo/herc/f35, --only=jumbo) | roster (cub/pitts/throne, --only=, --falsify=roll|loop|vto|short|brake) | landmany | feel | circuit | override | cutin | stall | taxi | traffic | types | typeoverride | typeground | all
 import { Aircraft, TYPES, GL } from '../js/flight/aircraft.js';
 import { AIRCRAFT } from '../data/aircraft.js';
 import { Autopilot } from '../js/flight/autopilot.js';
@@ -355,8 +355,8 @@ function scTypeCircuit(type, END) {
 const DEG_ = Math.PI / 180;
 function scTypes() { for (const type of ['tiger', 'bathtub']) for (const END of ['09', '27']) scTypeCircuit(type, END); }
 
-function scTypeOverride() {
-  for (const type of ['tiger', 'bathtub']) {
+function scTypeOverride(types = ['tiger', 'bathtub']) {
+  for (const type of types) {
     const tr = new Traffic(env);
     const p = mk(tr, lined('09'), circuitRoute('09', { type }), { name: type, type, player: true });
     let t0 = null, released = false, devHdg = null;
@@ -382,9 +382,9 @@ function scTypeOverride() {
   }
 }
 
-function scTypeGround() {
+function scTypeGround(types = ['tiger', 'bathtub'], { generic = true } = {}) {
   const flat = { groundHeightAt: () => 0, surfaceAt: () => 'runway', colliders: [] };
-  for (const type of ['tiger', 'bathtub']) {
+  for (const type of types) {
     const ac = new Aircraft({ type }), P = ac.P, R = AIRCRAFT[type].engine;
     ac.place({ x: 0, z: 0, heading: 90 }, flat);
     const y0 = ac.pos.y, p0 = ac.pitch;
@@ -393,9 +393,10 @@ function scTypeGround() {
     if (P.groundPitch) check(`${type} at rest: placed and settled in the 3-point attitude, tail wheel down, no tail strike`, Math.abs(p0 - P.groundPitch) < 0.01 && Math.abs(ac.pitch - P.groundPitch) < 0.015 && Math.abs(ac.pos.y - y0) < 0.05 && ac.tailDown && !ac.noseDown && !evs.length, `placed ${(p0 / DEG_).toFixed(1)}° → ${(ac.pitch / DEG_).toFixed(1)}°, y ${y0.toFixed(2)} → ${ac.pos.y.toFixed(2)}, agl ${ac.agl.toFixed(2)}, events ${evs.join() || '-'}`);
     else check(`${type} at rest: four feet loaded, level, no events`, ac.wheels.length === 4 && ac.wheels.every((w) => w.load > 300) && Math.abs(ac.pitch) < 0.02 && !evs.length, `loads ${ac.wheels.map((w) => w.load.toFixed(0)).join('/')}`);
     const rpm = ac.instruments().rpm;
-    check(`${type}: idle rpm from the roster (${R.idleRpm}), full-power static < max ${R.maxRpm}`, Math.abs(rpm - R.idleRpm) < 60 && (ac.eng = 1, ac.instruments().rpm < R.maxRpm), `${rpm.toFixed(0)} / ${ac.instruments().rpm.toFixed(0)}`);
+    check(`${type}: idle rpm from the roster (${R.idleRpm}), full-power static < max ${R.maxRpm}`, Math.abs(rpm - R.idleRpm) < 60 && (ac.eng = 1, ac.engineKind === 'piston' ? ac.instruments().rpm < R.maxRpm : ac.instruments().rpm <= R.maxRpm), `${rpm.toFixed(0)} / ${ac.instruments().rpm.toFixed(0)}`);
     check(`${type}: fuel tanks hold ${P.fuelCap} L each`, ac.fuel.cap === P.fuelCap && ac.fuel.L > P.fuelCap - 0.5, `${ac.fuel.cap}`);
   }
+  if (!generic) return;
   // tail wheel steering: right rudder yaws right on the ground at taxi speed
   const tw = new Aircraft({ type: 'tiger' });
   tw.place({ x: 0, z: 0, heading: 90 }, flat);
@@ -430,7 +431,8 @@ function scTypeGround() {
 
 // PLAYTEST_2 B2: LAND from ten representative positions (incl. Mission 1's line-up / PRESS LAND points), every type:
 // a touchdown and a stop, no crash, no endless go-around. Fake world (rolling ground, castle hill, trees, town).
-async function scLandMany() {
+// retry: a 'nothing ahead' tap is tapped again for up to 1 s (the planner flickers mid-turn over the fake world's fields)
+async function scLandMany(types = ['c172', 'tiger', 'bathtub'], { goAround = true, retry = false } = {}) {
   const { planLandAhead } = await import('../js/assist/landahead.js');
   const { fakeWorld, layout } = await import('../js/assist/test/fakeworld.mjs');
   const w = fakeWorld(), wenv = { groundHeightAt: w.groundHeightAt, surfaceAt: w.surfaceAt, colliders: w.colliders };
@@ -443,7 +445,7 @@ async function scLandMany() {
     ['base for 27', at(e27, -2000, 1200, 200, 0, 85)], ['crosswise over the field', { x: 100, z: -1700, alt: 220, heading: 180, kt: 90 }],
     ['40° intercept, 3 km', at(e27, -3000, 1100, 260, 230)], ['open country (field)', { x: 2600, z: 1500, alt: 260, heading: 90, kt: 90 }],
   ];
-  for (const type of ['c172', 'tiger', 'bathtub']) {
+  for (const type of types) {
     const res = [];
     for (const [name, c] of CASES) {
       const tr = new Traffic(wenv);
@@ -453,7 +455,9 @@ async function scLandMany() {
       tr.add({ aircraft: ac, ap, player: true, name: 'P' });
       ap.setRoute(circuitRoute('27', { type })); ap.replan();
       for (let t = 0; t < 2; t += 1 / 60) tr.update(1 / 60);
-      const plan = planLandAhead({ pos: [ac.pos.x, ac.pos.y, ac.pos.z], vel: [ac.vel.x, ac.vel.y, ac.vel.z], heading: ac.heading, altitude: ac.alt, world: w, layout });
+      const tap = () => planLandAhead({ pos: [ac.pos.x, ac.pos.y, ac.pos.z], vel: [ac.vel.x, ac.vel.y, ac.vel.z], heading: ac.heading, altitude: ac.alt, world: w, layout });
+      let plan = tap();
+      for (let k = 0; retry && plan.fail === 'nothingAhead' && k < 4; k++) { for (let t = 0; t < 0.25; t += 1 / 60) tr.update(1 / 60); plan = tap(); }
       if (plan.fail) { res.push({ name, ok: false, why: plan.fail }); continue; }
       ap.landAt(plan);
       let t = 0, crash = null, td = null, ga = 0, far = 0;
@@ -470,6 +474,7 @@ async function scLandMany() {
     check(`LAND ×10 ${type}: touchdown + stop from every position (no crash, no endless go-around)`, !bad.length, bad.map((r) => `${r.name}: ${r.why || 'not stopped'}`).join('; ') || res.map((r) => `${r.plan} ${r.t.toFixed(0)}s${r.ga ? ' GA' + r.ga : ''}`).join(', '));
     check(`LAND ×10 ${type}: each within ${lim} s (max ${Math.max(...res.map((r) => r.t || 0)).toFixed(0)} s), never > 5 km from the touchdown`, !slow.length && res.every((r) => (r.far ?? 0) < 5000), slow.map((r) => `${r.name} ${(r.t ?? 0).toFixed(0)}s`).join('; '));
   }
+  if (!goAround) return;
   // a go-around on a LAND plan comes back round to the same spot (it used to climb away for ever)
   const tr = new Traffic(wenv), ac = new Aircraft({ dims: { gearHeight: 1.2 } });
   ac.place({ x: 2600, z: 1500, alt: 260, heading: 90, speed: 90 * KT, throttle: 0.6 }, wenv);
@@ -525,11 +530,11 @@ export function flyLandTap(W, layout, planLandAhead, type, c, { now = false, arm
   }
   return { plan: p, first, stopped: !crash && ap.done && ac.onGround && ac.speed < 0.5, t, climb, airRoll, f2td: flT != null && tdT != null ? tdT - flT : null, rise, td, ga, crash };
 }
-async function scAaron() {
+async function scAaron(types = ['c172', 'tiger', 'bathtub']) {
   const { planLandAhead, armLandNow } = await import('../js/assist/landahead.js');
   const { fakeWorld, layout } = await import('../js/assist/test/fakeworld.mjs');
   const W = fakeWorld();
-  for (const type of ['c172', 'tiger', 'bathtub']) for (const c of AARON) {
+  for (const type of types) for (const c of AARON) {
     const r = flyLandTap(W, layout, planLandAhead, type, c);
     const d = r.fail ? r.fail : `${r.plan.label}/${r.plan.pattern} stop ${r.t.toFixed(0)} s, climb ${r.climb.toFixed(1)} m, flare→td ${r.f2td?.toFixed(1)} s, bounce rise ${r.rise.toFixed(1)} m, airborne ROLLOUT ${r.airRoll.toFixed(2)} s, td ${r.td?.fpm} fpm, GA ${r.ga}`;
     check(`LANDFIX2 ${type} ${c.name}: straight ahead and down, stopped ≤ 60 s`, !r.fail && r.stopped && r.plan.pattern === 'straight' && r.t <= 60 && r.ga === 0, d);
@@ -537,7 +542,7 @@ async function scAaron() {
   }
   // LAND NOW: LAND chose a circuit/join; the second button flies straight ahead instead
   const e27 = runwayEnd('27'), [nx, nz] = fromRunway(e27, -900, -200);
-  for (const type of ['c172', 'tiger', 'bathtub']) {
+  for (const type of types) {
     const r = flyLandTap(W, layout, planLandAhead, type, { x: nx, z: nz, agl: 150, kt: 85, hdg: 270 }, { setup: 6, armLandNow });
     check(`LAND NOW ${type} (from a RWY 27 circuit, 150 m): straight ahead, stopped`, !r.fail && r.first?.pattern !== 'straight' && r.plan.pattern === 'straight' && r.stopped && r.climb < 5, r.fail || `LAND ${r.first?.label}/${r.first?.pattern} → NOW ${r.plan.label}/${r.plan.pattern}, stopped ${r.t.toFixed(0)} s`);
   }
@@ -579,8 +584,7 @@ function scThrottleTakeback() {
 }
 
 // PLAYTEST_2 B3/B4/B5 and the player's short final (B7).
-function scPlayerFeel() {
-  const types = ['c172', 'tiger', 'bathtub'];
+function scPlayerFeel(types = ['c172', 'tiger', 'bathtub'], { generic = true } = {}) {
   // B3: a hand-flown 25 % bank turn for 10 s: the engine keeps its power (no speed-hold idling it)
   for (const type of types) {
     const tr = new Traffic(env), ac = new Aircraft({ type });
@@ -594,7 +598,7 @@ function scPlayerFeel() {
     check(`B3 ${type}: stick-only bank/push keeps the throttle (min ${minThr.toFixed(2)} vs ${thr0.toFixed(2)} at the grab)`, minThr >= thr0 - 0.05, `phase ${ap.phase}`);
   }
   // B4: the lever latches in the air until the AUTO detent (releaseThrottle) or a resume()
-  {
+  if (generic) {
     const tr = new Traffic(env), ac = new Aircraft({ dims: { gearHeight: 1.2 } });
     ac.place({ x: 0, z: -3000, alt: 400, heading: 90, speed: 90 * KT, throttle: 0.8 }, env);
     const ap = new Autopilot(ac), p = tr.add({ aircraft: ac, ap, player: true, name: 'P' });
@@ -622,6 +626,7 @@ function scPlayerFeel() {
     for (let t = 0; t < 20; t += 1 / 60) { tr.update(1 / 60); minAgl = Math.min(minAgl, ac.agl); for (const ev of ac.events.splice(0)) if (/impact|crash|touchdown/.test(ev.type)) hit = true; }
     check(`B5 ${type}: released inverted at ${rel.agl.toFixed(0)} m AGL (bank ${rel.bank.toFixed(0)}°, nose ${rel.pitch.toFixed(0)}°) recovers clear of the ground`, !hit && minAgl > 15 && rel.agl - minAgl < 105 && !ac.crashed, `min agl ${minAgl.toFixed(0)} m, lost ${(rel.agl - minAgl).toFixed(0)} m`);
   }
+  if (!generic) return;
   // B7: the player's AP turns final at ~1.3 km (AI keep the published 1.8 km), with a stableFinal window for warp
   for (const player of [true, false]) {
     const tr = new Traffic(env), ac = new Aircraft({ dims: { gearHeight: 1.2 } }), e = runwayEnd('27');
@@ -710,12 +715,12 @@ async function scMixed() {
 }
 // FLIGHTFIX3 (test-loop findings, 2026-10-23): the player's route after DEMAND TAKEOFF, LAND's runway choice on the
 // home circuit, taildragger grass rollouts, ap.fieldTakeoff(), ap.taxiIn(). Fake world (rolling ground, trees, town).
-async function scFix3() {
+// noRunOk: types whose long field rollouts may end where no clear run exists (main.js falls back to its field hop)
+async function scFix3(types = ['c172', 'tiger', 'bathtub'], { noRunOk = [] } = {}) {
   const { planLandAhead, armLandNow } = await import('../js/assist/landahead.js');
   const { fakeWorld, layout } = await import('../js/assist/test/fakeworld.mjs');
   const { finishZone, DEFAULT_SPOT } = await import('../js/game/finish.js');
   const W = fakeWorld(), wenv = { groundHeightAt: W.groundHeightAt, surfaceAt: W.surfaceAt, colliders: W.colliders };
-  const types = ['c172', 'tiger', 'bathtub'];
   const setup = (type, place, route) => {
     const tr = new Traffic(wenv), ac = new Aircraft({ type }), ap = new Autopilot(ac);
     ac.place(place, wenv); ac.impactHandler = () => ({ result: 'bounce', restitution: 0.35 });   // Free Flight is Rubber
@@ -792,6 +797,7 @@ async function scFix3() {
       R.step(60, (t) => { if (TRACE && (R.ap.sub + R.ac.onGround !== lastSub || (R.ap.sub === 'lineup' && Math.round(t * 60) % 120 === 0))) { lastSub = R.ap.sub + R.ac.onGround; console.log(type, tap, t.toFixed(1), R.ap.phase, R.ap.sub, R.ac.onGround, (R.ac.speed / KT).toFixed(0), R.ac.heading.toFixed(0), R.ac.agl.toFixed(1), 'thr', R.ac.ctl.throttle.toFixed(2), 'rud', R.ac.ctl.rudder.toFixed(2), 'br', R.ac.ctl.brake.toFixed(2), 'el', R.ac.ctl.elevator.toFixed(2), 'tgt', R.ap.t.gSpeed?.toFixed?.(1)); } if (!R.ac.onGround && R.ac.agl > 10) { tAir = t; return true; } });
       R.step(60); R.step = step0;
       const leak = (R.ap.route?.legs || []).some((l) => l.end && typeof l.end === 'object' && l.kind === 'takeoff');
+      if (!run && !threw && noRunOk.includes(type)) { ft.push({ ok: true, d: `@${tap} no clear run here (hop fallback)` }); continue; }
       ft.push({ ok: !threw && !leak && !!run && tAir != null && tAir <= (run.turn > 45 ? 50 : 34) && R.ev.imp.length === imp0 && noDespawn(R.ap) && !R.ac.onGround && R.ac.agl > 40, d: `${threw ? 'THREW ' + threw + ' ' : ''}${leak ? 'virtual end left in route ' : ''}@${tap} run ${run ? `${run.heading}° (turn ${Math.round(run.turn)}°) ${Math.round(run.length)} m` : `none at ${R.ac.pos.x.toFixed(0)},${R.ac.pos.z.toFixed(0)} hdg ${R.ac.heading.toFixed(0)}`}, >10 m AGL after ${tAir?.toFixed(1)} s, ${R.ap.route?.name} ${R.ap.phase}` });
     }
     check(`FIX3 #3 ${type}: LAND → field rollout: no wingtip/impact, never airborne ≥ 0.4 s after touchdown, heading within 10°`, out.every((o) => o.ok), out.map((o) => o.d).join('; '));
@@ -1118,9 +1124,518 @@ function scMinRun() {
   check('a Moth lined up with ~780 m of runway left takes off from there (no taxi back)', ap.leg.kind === 'takeoff' && up != null && up < 40 && !ac.crashed, `airborne > 10 m after ${up?.toFixed(1)} s`);
 }
 
+// ROSTER (V1 A1–A3): Butter Cub, Show-Off (Pitts S-2) and Divine Right (the throne) through the whole loop.
+// node tools/flight-sim.mjs roster [--only=cub,pitts,throne]   --falsify=roll|loop|vto|short|brake breaks one thing on purpose.
+const ROSTER = ['cub', 'pitts', 'throne'];
+const RFALS = (args.find((a) => a.startsWith('--falsify=')) || '').slice(10);
+async function scRoster() {
+  const only = (args.find((a) => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
+  const types = only.length ? ROSTER.filter((t) => only.includes(t)) : ROSTER;
+  if (RFALS === 'roll') TYPES.pitts.maxRollRate = 1.2;
+  if (RFALS === 'loop') GL.easy = 1;
+  if (RFALS === 'vto') TYPES.throne.stovl = { ...TYPES.throne.stovl, tw: 0.9 };
+  if (RFALS === 'short') AIRCRAFT.cub.performance.takeoffRollM = 290;
+  if (RFALS === 'brake') delete TYPES.cub.shortField;
+  const flat = { groundHeightAt: () => 0, surfaceAt: () => 'runway', colliders: [] };
+  for (const type of types) for (const END of ['09', '27']) scTypeCircuit(type, END);
+  scTypeOverride(types);
+  scTypeGround(types, { generic: false });
+  // tailwheel ground roll on Easy: full power down the runway hands-on-neutral, a yaw kick at 25 kt. Easy keeps it
+  // straight and in one piece; Hard (no extra tail-wheel damping) swings further but stays catchable with rudder
+  const kick = (type, level, rudder) => {
+    const tr = new Traffic(flat), ac = new Aircraft({ type, id: 'player' }), ap = new Autopilot(ac);
+    ac.stovlLevel = level; ac.place({ x: 0, z: 0, heading: 90 }, flat);
+    const p = tr.add({ aircraft: ac, ap, player: true, name: 'P' }); ap.setRoute(circuitRoute('09', { type }));
+    let dev = 0, kicked = false;
+    for (let t = 0; t < 14 && ac.onGround; t += 1 / 120) {
+      p.manual.throttle = 1; p.manual.elevator = 0.2;
+      p.manual.aileron = rudder ? Math.max(-1, Math.min(1, wrapD(90 - ac.heading) * 0.05 + ac.w.y * 1.5)) : 0;
+      if (!kicked && ac.speed > 25 * KT) { ac.w.y -= 0.18; kicked = true; }
+      tr.update(1 / 120); if (kicked) dev = Math.max(dev, Math.abs(wrapD(ac.heading - 90)));
+    }
+    return { dev, crashed: ac.crashed || ac.events.some((e) => e.type === 'impact'), kicked };
+  };
+  for (const type of types.filter((t) => TYPES[t].gear.tailwheel)) {
+    const easy = kick(type, 'easy', false), hard = kick(type, 'hard', false), held = kick(type, 'hard', true);
+    check(`${type} Easy tailwheel roll: a 10°/s yaw kick at 25 kt hands-off stays within 12° and upright; Hard swings more, rudder catches it (< 8°)`,
+      easy.kicked && easy.dev < 12 && !easy.crashed && hard.dev > easy.dev && held.dev < 8 && !held.crashed, `easy ${easy.dev.toFixed(1)}°, hard hands-off ${hard.dev.toFixed(1)}°, hard + rudder ${held.dev.toFixed(1)}°`);
+  }
+  // Pitts: about 240°/s at full aileron at cruise; the Cub rolls gently
+  for (const type of types.filter((t) => t !== 'throne')) {
+    const ac = new Aircraft({ type }), cr = AIRCRAFT[type].speeds.cruise * KT;
+    ac.place({ x: 0, z: 0, alt: 800, heading: 90, speed: cr, throttle: 0.8 }, flat);
+    let peak = 0, roll360 = null, acc = 0;
+    for (let t = 0; t < 4; t += 1 / 240) { ac.ctl.aileron = 1; ac.ctl.elevator = 0.05; ac.step(1 / 240, flat); peak = Math.max(peak, -ac.w.z); acc += -ac.w.z / 240; if (roll360 == null && acc >= 2 * Math.PI) roll360 = t; }
+    const dps = peak / DEG_;
+    if (type === 'pitts') check(`pitts: full aileron at ${(cr / KT).toFixed(0)} kt rolls ~240°/s (220–260), a full roll in ≤ 1.8 s`, dps > 220 && dps < 260 && roll360 != null && roll360 < 1.8, `${dps.toFixed(0)}°/s, 360° in ${roll360?.toFixed(2)} s`);
+    else check(`${type}: full aileron at cruise rolls gently (40–80°/s)`, dps > 40 && dps < 80, `${dps.toFixed(0)}°/s`);
+  }
+  // short fields: the Cub uses the 240 m Palace Lawn from 12 m in and the 620 m farm strip with room to spare
+  {
+    const mr = Object.fromEntries(types.map((t) => [t, Math.round(new Autopilot(new Aircraft({ type: t }))._minRun())]));
+    if (mr.cub != null) check('cub: minimum takeoff run fits the 240 m Palace Lawn from a line-up 12 m in (≤ 228 m)', mr.cub <= 228, JSON.stringify(mr));
+    if (mr.pitts != null) check('pitts: minimum takeoff run fits the 620 m farm strip', mr.pitts <= 608, JSON.stringify(mr));
+  }
+  for (const type of types.filter((t) => t === 'cub')) {
+    // a LAND onto RWY 27: touchdown to a stop in ≤ 120 m, and the takeoff ground roll on grass
+    const e = runwayEnd('27'), [fx, fz] = fromRunway(e, -1500, 0);
+    const tr = new Traffic(env), ac = new Aircraft({ type }), ap = new Autopilot(ac);
+    ac.place({ x: fx, z: fz, alt: 100, heading: e.hdg, speed: ac.P.vapp * 1.2, throttle: 0.4 }, env);
+    tr.add({ aircraft: ac, ap, player: true, name: 'P' }); ap.setRoute(circuitRoute('27', { type })); ap.replan();
+    const { planLandAhead } = await import('../js/assist/landahead.js');
+    const plan = planLandAhead({ pos: ac.pos, vel: ac.vel, heading: ac.heading, altitude: ac.alt, onGround: false, world: { groundHeightAt: () => 0, surfaceAt: env.surfaceAt, colliders: [] }, layout: (await import('../js/assist/test/fakeworld.mjs')).layout });
+    if (!plan.fail) ap.landAt(plan);
+    let td = null, stop = null;
+    for (let t = 0; t < 200 && stop == null; t += 1 / 60) { tr.update(1 / 60); if (!td && ac.lastTouchdown) td = { x: ac.pos.x, z: ac.pos.z }; if (td && ac.onGround && ac.speed < 0.5) stop = Math.hypot(ac.pos.x - td.x, ac.pos.z - td.z); }
+    check('cub: LAND on RWY 27 rolls ≤ 120 m from touchdown to a stop (lands short)', stop != null && stop <= 120 && !ac.crashed, `${plan.label || plan.fail}: ${stop?.toFixed(0)} m`);
+    const g = new Aircraft({ type }); g.place({ x: 0, z: 0, heading: 90 }, { ...env, surfaceAt: () => 'grass' });
+    const gtr = new Traffic({ ...env, surfaceAt: () => 'grass' }), gap = new Autopilot(g);
+    gtr.add({ aircraft: g, ap: gap, player: true, name: 'G' });
+    gap.setRoute({ name: 'grass', legs: [{ kind: 'takeoff', end: { id: 'FIELD', virtual: true, label: 'FIELD', hdg: 90, u: [1, 0], thr: [0, 0], far: [600, 0], len: 600, width: 24, elev: 0 }, alt: 60 }, { kind: 'fly', to: [5000, 200, 0], speed: 70 }], loop: null });
+    let lift = null; for (let t = 0; t < 60 && lift == null; t += 1 / 60) { gtr.update(1 / 60); if (!g.onGround) lift = g.pos.x; }
+    check('cub: off grass in ≤ 160 m (loves grass)', lift != null && lift <= 160 && !g.crashed, `${lift?.toFixed(0)} m`);
+  }
+  if (types.includes('throne')) await rosterThrone();
+  await scLandMany(types, { goAround: false, retry: true });
+  await scAaron(types);
+  await scFix3(types, { noRunOk: ['pitts'] });
+  // main.js fieldHop's last resort (no clear run): placed 25 m up at 78 kt, full power — it must fly away
+  for (const type of types) {
+    const tr = new Traffic(env), ac = new Aircraft({ type }), ap = new Autopilot(ac);
+    ac.place({ x: -1400, z: 0, alt: 25, heading: 270, speed: 78 * KT, throttle: 1, flaps: 0 }, env);
+    tr.add({ aircraft: ac, ap, player: true, name: 'P' }); ap.setRoute(circuitRoute('27', { type })); ap.resumeCircuit('27');
+    let minA = 99; for (let t = 0; t < 30; t += 1 / 60) { tr.update(1 / 60); minA = Math.min(minA, ac.agl); }
+    check(`${type}: main's field-hop fallback (25 m, 78 kt, full power) flies away onto the circuit`, !ac.crashed && minA > 8 && ac.agl > 40, `min ${minA.toFixed(0)} m, now ${ac.agl.toFixed(0)} m ${ap.phase}`);
+  }
+  scPlayerFeel(types, { generic: false });
+  await rosterAI(types);
+}
+
+// The throne's jet pack: STOVL on the F-35's flight computer with a gentler profile (docs/STOVL.md)
+async function rosterThrone() {
+  const { contextButton, LEVELS } = await import('../js/flight/stovl.js');
+  const mkT = (place, level = 'easy') => {
+    const tr = new Traffic(env), ac = new Aircraft({ type: 'throne', id: 'player' }), ap = new Autopilot(ac);
+    ac.stovlLevel = level; ac.place(place, env);
+    const e = tr.add({ aircraft: ac, ap, player: true, name: 'P' }); ap.setRoute(circuitRoute('27', { type: 'throne' })); if (!ac.onGround) ap.replan();
+    const ev = [];
+    const step = (secs, stop) => { for (let t = 0; t < secs; t += 1 / 60) { tr.update(1 / 60); for (const x of ac.events.splice(0)) ev.push(x); ap.events.length = 0; if (stop && stop(t)) return t; } return null; };
+    return { tr, ac, ap, e, ev, step };
+  };
+  const G = { x: -1500, z: -1200, heading: 90 };
+  for (const level of ['easy', 'medium', 'hard']) {
+    const W = mkT(G, level);
+    const ok = W.ap.verticalTakeoff();
+    let lift = null;
+    W.step(40, (t) => { if (lift == null && !W.ac.onGround) lift = t; return W.ap.stovl?.mode === 'hover'; });
+    W.step(6);
+    const x0 = W.ac.pos.x, z0 = W.ac.pos.z, h0 = W.ac.agl; let drift = 0, dh = 0;
+    W.step(20, () => { drift = Math.max(drift, Math.hypot(W.ac.pos.x - x0, W.ac.pos.z - z0)); dh = Math.max(dh, Math.abs(W.ac.agl - h0)); });
+    const hold = level === 'hard' ? true : drift < 4 && dh < 1.5;
+    check(`throne ${level}: VERTICAL TAKEOFF to a ~25 m hover${level === 'hard' ? '' : ', held hands-off (≤ 4 m, ±1.5 m)'}`, ok && lift != null && lift < 4 && W.ap.stovl?.mode === 'hover' && h0 > 20 && hold && !W.ac.crashed, `lift-off ${lift?.toFixed(1)} s, hover ${h0.toFixed(1)} m, drift ${drift.toFixed(1)} m ±${dh.toFixed(1)} m, nozzle ${W.ac.nozzle.toFixed(2)}`);
+    W.ap.landHere({ x: W.ac.pos.x + 20, z: W.ac.pos.z });
+    let td = null; W.step(60, () => { td ||= W.ev.find((x) => x.type === 'touchdown'); return W.ap.done && W.ac.vtol <= 0; });
+    check(`throne ${level}: LAND HERE beside it: a gentle touchdown (< 500 fpm), parks (AP done), no impact`, !!td && td.fpm < 500 && W.ap.done && !W.ac.crashed && !W.ev.some((x) => x.type === 'impact'), `${td?.fpm} fpm ${td?.grade}, done ${W.ap.done}, vtol ${W.ac.vtol.toFixed(2)}`);
+  }
+  // wing-borne → HOVER → FLY ON → back on the circuit
+  {
+    const W = mkT({ x: -3000, z: -1500, alt: 120, heading: 90, speed: 80 * KT, throttle: 0.7 });
+    W.step(3);
+    const ok = W.ap.hover();
+    W.step(40, () => W.ap.stovl?.mode === 'hover' && W.ac.gs < 1.5);
+    const hov = W.ap.stovl?.mode === 'hover' && W.ac.gs < 1.5;
+    W.ap.flyOn();
+    let wing = null, minAgl = 1e9; W.step(60, (t) => { minAgl = Math.min(minAgl, W.ac.agl); if (!W.ap.stovl && wing == null) wing = t; return wing != null && t > wing + 15; });
+    check('throne: HOVER from 80 kt stops in the air; FLY ON goes back to wings and the circuit', ok && hov && wing != null && minAgl > 15 && !W.ac.crashed && W.ap.route?.name?.startsWith('circuits'), `hover ${hov}, wing-borne after ${wing?.toFixed(1)} s, lowest ${minAgl.toFixed(0)} m, ${(W.ac.speed / KT).toFixed(0)} kt`);
+  }
+  // DEMAND TAKEOFF from a field is a vertical takeoff that flies on
+  {
+    const W = mkT(G, 'medium');
+    const r = W.ap.fieldTakeoff({ world: {}, end: '27' });
+    let wing = null; W.step(70, (t) => { if (!W.ap.stovl && W.ac.speed > W.ac.P.vapp && wing == null) wing = t; return wing != null; });
+    check('throne: field DEMAND TAKEOFF = a vertical takeoff that flies on to the circuit', !!r?.vto && wing != null && !W.ac.crashed, `vto ${!!r?.vto}, wing-borne after ${wing?.toFixed(1)} s`);
+  }
+  // the context button offers the jet-pack choices for the throne; the Cub keeps the plain LAND button
+  {
+    const b1 = contextButton({ stovl: !!TYPES.throne.stovl, onGround: true, gsKt: 0, speedKt: 0, agl: 0, mode: null });
+    const b2 = contextButton({ stovl: !!TYPES.cub.stovl, onGround: true, gsKt: 0, speedKt: 0, agl: 0, mode: null });
+    check('throne: the LAND slot offers VERTICAL TAKEOFF on the ground (the Cub/Pitts keep the plain LAND button)', b1?.key === 'vto' && b2 == null && !TYPES.pitts.stovl, `${b1?.label} / ${b2}`);
+    const air = (kt) => contextButton({ stovl: TYPES.throne.stovl, onGround: false, gsKt: kt, speedKt: kt, agl: 150, mode: null, landPlan: { label: 'RWY 27' } });
+    const c80 = air(80), c45 = air(45);
+    check('throne: in the circuit (80 kt) the slot reads LAND with HOVER as the pill; slowed right down (45 kt) HOVER comes first', c80?.key === 'landrw' && c80.alt?.key === 'hover' && c45?.key === 'hover' && c45.alt?.key === 'landrw', `${c80?.label}+${c80?.alt?.label} / ${c45?.label}+${c45?.alt?.label}`);
+  }
+  // shopping trolley: hands-off at cruise it wanders and pulls left; the autopilot still flies the circuit (above)
+  {
+    const ac = new Aircraft({ type: 'throne' });
+    ac.place({ x: 0, z: 0, alt: 300, heading: 90, speed: 85 * KT, throttle: 0.75 }, env);
+    for (let t = 0; t < 10; t += 1 / 120) ac.step(1 / 120, env);
+    const turned = wrapD(ac.heading - 90);
+    check('throne: hands-off it pulls left like a shopping trolley (heading drifts left within 10 s)', turned < -3 && !ac.crashed, `${turned.toFixed(1)}° in 10 s`);
+  }
+}
+
+// AI traffic of the new types through the real ATC for 12 min (spawned like main's attract mix): no crash, they land
+async function rosterAI(types) {
+  const { createATC } = await import('../js/atc/index.js');
+  const { linkTraffic } = await import('../js/atc/bridge.js');
+  const R = await import('../js/flight/routes.js');
+  const real = Math.random, seeded = (s) => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const rnd = seeded(4242); Math.random = rnd;
+  const tr = new Traffic(env), atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false }), link = linkTraffic(atc, tr, { mischief: 'low', rnd });
+  const ai = [], landed = new Map(), crashes = [];
+  const pool = ['c172', ...types, ...types];
+  const spawn = (kind, o = {}) => {
+    const type = o.type || pool[Math.floor(rnd() * pool.length)], ac = new Aircraft({ type });
+    const plan = R.aiSpawn(kind, atc.activeRunway().end, { ...o, rnd, type, claimStand: () => tr.claimStand(ac) });
+    if (!plan) return;
+    ac.place(plan.place, env); if (plan.stand) tr.standOwner.set(plan.stand, ac);
+    const ap = new Autopilot(ac), e = tr.add({ aircraft: ac, ap, name: `${type}-${kind}${ai.length}` }); ap.setRoute(plan.route); ai.push(e);
+  };
+  types.forEach((t, i) => { spawn('final', { type: t, dist: 3000 + i * 1800 }); spawn('parked', { type: t, wait: 10 + i * 25 }); spawn('downwind', { type: t, wait: 20 }); });
+  let respawn = 30;
+  for (let k = 0; k < 12 * 60 * 60; k++) {
+    tr.update(1 / 60); link.update(1 / 60);
+    for (const e of [...ai]) {
+      for (const ev of e.ac.events.splice(0)) { if (ev.type === 'crash') crashes.push(`${e.name}: ${ev.reason}`); if (ev.type === 'touchdown' && !ev.bounce) landed.set(e.ac.type, (landed.get(e.ac.type) || 0) + 1); }
+      e.ap.events.length = 0;
+      if (e.ap.done && e.ap.phase === 'GONE') { atc.remove(link.idOf(e)); tr.remove(e); ai.splice(ai.indexOf(e), 1); }
+    }
+    if (ai.length < 7 && (respawn -= 1 / 60) <= 0) { respawn = 20 + rnd() * 20; spawn(rnd() < 0.5 ? 'arrive' : 'depart', { wait: 2 }); }
+  }
+  Math.random = real;
+  check(`AI traffic (${types.join('/')}) through the real ATC for 12 min: no crash, every type lands`, !crashes.length && types.every((t) => landed.get(t) > 0), `${crashes.join('; ') || 'no crashes'}; touchdowns ${JSON.stringify(Object.fromEntries(landed))}`);
+}
+
+// FLIGHTFIX4 (bug reports from the lanes): node tools/flight-sim.mjs fix4
+async function scFix4() {
+  // #1/#2 a recovery that ends in replan() moves to another leg; update() used to run the OLD leg's step on the new cur:
+  // "_pursue … reading 'length'" from _takeoff, "toRunway … reading 'thr'" from _approach (fuzz: LAND/stick/ATC go-around)
+  for (const [kind, label] of [['takeoff', '#1 _takeoff'], ['approach', '#2 _approach']]) {
+    const out = [];
+    for (const type of ['bathtub', 'c172', 'tiger']) {
+      const tr = new Traffic(env), ac = new Aircraft({ type }), ap = new Autopilot(ac), r = circuitRoute('27', { type });
+      const L = circuitLegs('27', { type }), d = L[2].to;   // downwind, level: replan() rejoins a fly leg
+      ac.place({ x: d[0], z: d[2], alt: d[1], heading: 90, speed: TYPES[type].vcruise * 0.9, throttle: 0.7 }, env);
+      tr.add({ aircraft: ac, ap, player: true, name: 'P' });
+      ap.setRoute(r, { start: r.legs.findIndex((l) => l.kind === kind) });
+      ap.recovering = true;
+      let err = null;
+      try { for (let k = 0; k < 600 && ap.leg.kind === kind; k++) tr.update(1 / 120); for (let k = 0; k < 60; k++) tr.update(1 / 120); } catch (x) { err = x.message; }
+      out.push({ ok: !err && ap.leg.kind === 'fly', d: `${type} ${err || ap.leg.kind + '/' + ap.phase}` });
+    }
+    check(`FIX4 ${label}: a recovery that replans onto another leg runs that leg (no stale-leg step)`, out.every((o) => o.ok), out.map((o) => o.d).join('; '));
+  }
+  // #2 Kingdom Map swap (js/map/index.js doSwap → ap.airportChanged): nothing the AP holds may name the old airport's
+  // runway ends or the old tower. A LAND's fallback route (_landPrev, circuits 27) restored at the farm threw
+  // "no runway end 27" in _begin and left cur half built; the old link's gate asked a dead ATC for clearances.
+  {
+    const L = await import('../js/world/layout.js'), { KINGDOM } = await import('../data/airports/kingdom.js');
+    for (const d of Object.values(KINGDOM)) L.registerAirport(d);
+    const out = [];
+    for (const to of ['farm', 'palace']) {
+      L.setAirport('royal');
+      const tr = new Traffic(env), ac = new Aircraft({ type: 'tiger' }), ap = new Autopilot(ac);
+      ac.place({ ...lined('27') }, env); tr.add({ aircraft: ac, ap, player: true, name: 'P' });
+      ap.setRoute(circuitRoute('27', { type: 'tiger' })); ap.gate = () => false; ap.__atcGate = true; ap.extendDownwind(400, '27');
+      ap.landAt({ route: circuitRoute('09', { type: 'tiger' }), label: 'RWY 09' });
+      L.setAirport(to);
+      ap.airportChanged();
+      const e = runwayEnd(L.RUNWAYS[0].ends[0]), [x, z] = fromRunway(e, -4000, 0);
+      ac.place({ x, z, alt: 300, heading: e.hdg, speed: 45, throttle: 0.6 }, env);
+      ap.setRoute(arrivalRoute(e.id, { type: 'tiger', from: [x, z] }));
+      let err = null;
+      try { ap.cancelLand(); for (let k = 0; k < 240; k++) tr.update(1 / 120); } catch (x) { err = x.message; }
+      out.push({ ok: !err && ap.route.name.startsWith('arrival') && !ap.gate && !ap.__atcGate && !ap.extendDW, d: `${to}: ${err || ap.route.name + ' ' + ap.phase} gate ${ap.gate ? 'OLD' : 'none'} ext ${ap.extendDW ? 'OLD' : 'none'}` });
+    }
+    L.setAirport('royal');
+    check('FIX4 #2 airport swap: LAND fallback, old tower gate and runway-end state do not survive ap.airportChanged()', out.every((o) => o.ok), out.map((o) => o.d).join('; '));
+  }
+  // #8 DEMAND TAKEOFF for a STOVL type where no runway fits (the Palace Lawn): a vertical takeoff that flies on, not
+  // "NO RUNWAY OPEN"; a conventional type there still gets false (main falls back as before)
+  {
+    const L = await import('../js/world/layout.js'), { KINGDOM } = await import('../data/airports/kingdom.js');
+    for (const d of Object.values(KINGDOM)) L.registerAirport(d);
+    L.setAirport('palace');
+    const out = [];
+    try {
+      for (const type of ['f35', 'throne', 'jumbo']) {
+        const tr = new Traffic(env), ac = new Aircraft({ type }), ap = new Autopilot(ac), e = runwayEnd(L.RUNWAYS[0].ends[0]), [x, z] = fromRunway(e, 40, 0);
+        ac.place({ x, z, heading: e.hdg }, env); tr.add({ aircraft: ac, ap, player: true, name: 'P' }); ap.setRoute(circuitRoute(e.id, { type }));
+        for (let k = 0; k < 60; k++) tr.update(1 / 60);
+        const r = ap.demandTakeoff({ ends: L.RUNWAYS[0].ends.slice(), prefer: e.id });
+        let up = 0; if (r?.vto) for (let k = 0; k < 60 * 20; k++) { tr.update(1 / 60); up = Math.max(up, ac.agl); }
+        out.push({ ok: type === 'f35' ? !!r?.vto && up > 15 : type === 'throne' ? !!r : r === false, d: `${type} ${JSON.stringify(r)} ${ap.stovlMode || ''} up ${up.toFixed(0)} m` });
+      }
+    } finally { L.setAirport('royal'); }
+    check('FIX4 #8 DEMAND TAKEOFF at the Palace Lawn: the F-35 goes straight up (no runway fits), the throne (240 m fits it) rolls, a jumbo is still refused', out.every((o) => o.ok), out.map((o) => o.d).join('; '));
+  }
+  // #7 short-field landing (runways < 500 m, the 240 m Palace Lawn): the AP's own circuit and a LAND both put the light
+  // types down near the threshold and stop on the lawn (the Moth used to flare at 48 m, float to 239 m and go round)
+  {
+    const L = await import('../js/world/layout.js'), { KINGDOM } = await import('../data/airports/kingdom.js');
+    const { planLandAhead, setLandAircraft } = await import('../js/assist/landahead.js');
+    for (const d of Object.values(KINGDOM)) L.registerAirport(d);
+    L.setAirport('palace');
+    const out = [];
+    try {
+      for (const type of ['tiger', 'cub', 'bathtub', 'throne']) for (const END of L.RUNWAYS[0].ends) for (const land of [false, true]) {
+        setLandAircraft(type);
+        const tr = new Traffic(env), ac = new Aircraft({ type }), ap = new Autopilot(ac), e = runwayEnd(END), [x, z] = fromRunway(e, 12, 0);
+        ac.place({ x, z, heading: e.hdg }, env); tr.add({ aircraft: ac, ap, player: land, name: 'P' }); ap.setRoute(circuitRoute(END, { type }));
+        let t = 0, td = null, ga = 0, bad = null, maxS = -1e9, ee = e;
+        const step = (stop) => { for (; t < 420; t += 1 / 60) { tr.update(1 / 60); for (const ev of ac.events.splice(0)) { if (ev.type === 'touchdown' && td == null && t > 30) td = toRunwayS(ee, ac); if (ev.type === 'crash') bad = ev.reason; } for (const ev of ap.events.splice(0)) if (ev.type === 'goaround') ga++; if (td != null && maxS === -1e9 && ac.speed < 9) maxS = toRunwayS(ee, ac); if (bad || stop()) return; } };
+        step(() => ap.phase === 'DOWNWIND');
+        if (land) { for (let k = 0; k < 600; k++) tr.update(1 / 60); const p = planLandAhead({ pos: ac.pos, vel: ac.vel, heading: ac.heading, altitude: ac.alt, onGround: false, world: env, layout: L }); if (p.fail) { out.push({ ok: false, d: `${type} ${END} LAND ${p.fail}` }); continue; } ap.landAt(p); ee = runwayEnd(p.runway); }
+        step(() => td != null && maxS > -1e9);
+        out.push({ ok: !bad && !ga && td != null && td > 0 && td < 80 && maxS < ee.len, d: `${type} ${land ? 'LAND→' + ee.id : END} td ${td?.toFixed(0)} stop ${maxS.toFixed(0)} ga ${ga}${bad ? ' ' + bad : ''}` });
+      }
+    } finally { L.setAirport('royal'); setLandAircraft(null); }
+    check('FIX4 #7 short-field landing on the 240 m lawn: circuit and LAND touch down 0–80 m in and are down to taxi speed (9 m/s, AP landed) on it, no go-around (Moth, Cub, Bathtub, Throne)', out.every((o) => o.ok), out.map((o) => o.d).join('; '));
+  }
+  // #5 js/map/index.js warmShaders (the swap's shader warm-up): a material disposed while it is still compiling must not
+  // throw from the poll's timer ("reading 'isReady'" in three.module), and the poll must end. The fake renderer's
+  // compileAsync is three r180's poll, verbatim in substance, for the falsify run (FIX4_WARM=three).
+  {
+    const { register } = await import('node:module'), { pathToFileURL } = await import('node:url'), path = await import('node:path');
+    const three = pathToFileURL(path.resolve(path.dirname(new URL(import.meta.url).pathname), '../../../lib/three/0.180.0/three.module.js')).href;
+    register('data:text/javascript,' + encodeURIComponent(`export async function resolve(s, c, n) { if (s === 'three') return { url: ${JSON.stringify(three)}, shortCircuit: true }; return n(s, c); }`));
+    const { warmShaders } = await import('../js/map/index.js');
+    const props = new Map(), get = (m) => { if (!props.has(m)) props.set(m, {}); return props.get(m); };
+    const mats = [1, 2, 3].map((i) => ({ id: i }));
+    let readyAt = Infinity;
+    for (const m of mats) props.set(m, { currentProgram: { isReady: () => Date.now() > readyAt } });
+    const R = {
+      properties: { get },
+      compile: () => new Set(mats),
+      compileAsync(sc, cam) {   // three r180 WebGLRenderer.compileAsync's poll
+        const ms = this.compile(sc, cam);
+        return new Promise((resolve) => { const chk = () => { ms.forEach((m) => { if (get(m).currentProgram.isReady()) ms.delete(m); }); if (ms.size === 0) return resolve(sc); setTimeout(chk, 10); }; chk(); });
+      },
+    };
+    const warm = process.env.FIX4_WARM === 'three' ? (r, s, c, o) => Promise.race([r.compileAsync(s, c), new Promise((res) => setTimeout(res, o.capMs))]) : warmShaders;
+    const errs = [], onErr = (e) => errs.push(e.message);
+    process.on('uncaughtException', onErr);
+    let gen = 0;
+    const res = await warm(R, {}, {}, { capMs: 120, cancelled: () => gen !== 0 });   // still compiling at the cap
+    props.delete(mats[1]);   // the next swap's world.dispose() frees one of them
+    await new Promise((r) => setTimeout(r, 150));
+    gen++; readyAt = 0;
+    const res2 = await warm(R, {}, {}, { capMs: 500 }).catch((e) => { errs.push('rejected: ' + e.message); return false; });   // a later swap, everything compiles
+    await new Promise((r) => setTimeout(r, 50));
+    process.off('uncaughtException', onErr);
+    // #9 a trip between airports sharing one world (royal → palace): a tower handover ~1.5 km out, no clouds, no teleport
+    {
+      const L = await import('../js/world/layout.js'), M = await import('../js/map/index.js'), { AI_JETS } = await import('../js/flight/attract.js');
+      const stub = () => new Proxy(function () {}, { get: (t, k) => (k in t ? t[k] : (t[k] = k === 'hidden' ? true : k === 'style' || k === 'dataset' ? {} : k === 'textContent' || k === 'innerHTML' ? '' : stub())), set: (t, k, v) => { t[k] = v; return true; }, apply: () => stub() });
+      const g = globalThis, saved = { document: g.document, window: g.window, innerWidth: g.innerWidth, innerHeight: g.innerHeight };
+      Object.assign(g, { document: stub(), window: {}, innerWidth: 390, innerHeight: 844 });
+      g.document.getElementById = () => null; g.document.querySelector = () => null;
+      L.setAirport('royal');
+      const tr = new Traffic(env), ac = new Aircraft({ type: 'tiger' }), ap = new Autopilot(ac), P = tr.add({ aircraft: ac, ap, player: true, name: 'P' });
+      const pal = M.sameWorld && (await import('../data/airports/kingdom.js')).KINGDOM.palace;
+      ac.place({ x: 0, z: 0, alt: 300, heading: 0, speed: 45, throttle: 0.6 }, env); ap.setRoute(circuitRoute('27', { type: 'tiger' }));
+      const S = { player: P, playMode: 'free', type: 'tiger' }, logs = [];
+      let placed = 0;
+      const K = M.createKingdom({ S, overlay: stub(), scene: { fog: { density: 1 } }, renderer: { info: { memory: {} }, compile: () => new Set(), properties: { get: () => ({}) } },
+        camera: {}, env, attract: { ai: [], despawn() {}, async start() {} }, traffic: tr, hud: { flash() {} }, log: (t, d) => logs.push(t),
+        wiring: { setWorld() {}, setTower() {}, activeEnd: () => L.RUNWAYS[0].ends[0], link: { placed() {} } },
+        getWorld: () => ({ dispose() {} }), buildWorld: async () => ({}), adoptWorld() {}, placePlayer: () => { placed++; }, anchor: () => null });
+      K.trip('palace', {});
+      K.frame(0.1); const far = K.state().phase;                     // 2 km out: nothing yet
+      const [tx, tz] = pal.center; ac.place({ x: tx, z: tz + 1200, alt: 300, heading: 0, speed: 45, throttle: 0.6 }, env);
+      const x0 = ac.pos.x;
+      for (let k = 0; k < 4; k++) K.frame(0.1);
+      for (let k = 0; k < 60 && K.state().airport !== 'palace'; k++) await new Promise((r) => setTimeout(r, 50));
+      for (let k = 0; k < 40 && K.state().phase; k++) { await new Promise((r) => setTimeout(r, 50)); K.frame(0.1); }
+      const st = K.state(), ok9 = far == null && st.airport === 'palace' && !logs.includes('mapClouds') && ac.pos.x === x0 && !placed && ap.route?.name?.startsWith('arrival') && AI_JETS.chance === 0;
+      L.setAirport('royal'); Object.assign(g, saved);
+      check('FIX4 #9 royal → Palace Lawn trip: tower handover within 1.5 km, no clouds, no teleport, arrival route, no AI jets', ok9,
+        `at 2 km phase ${far}; then airport ${st.airport}, clouds ${logs.includes('mapClouds')}, moved ${ac.pos.x !== x0}, placePlayer ${placed}, route ${ap.route?.name}, jets ${AI_JETS.chance}`);
+    }
+    check('FIX4 #5 swap shader warm-up: a material disposed mid-compile does not throw from the poll, and the poll stops at its cap', !errs.length && res !== true && !!res2,
+      `first ${res}, second ${res2}; uncaught: ${errs.join(' | ') || 'none'}`);
+  }
+}
+
+// FLIGHTFIX5 (manager verify): node tools/flight-sim.mjs fix5
+// #3 loop c172-easy "DEMAND IT greyed 'Land nearer a runway'": the player's LAND on final (which refuses the tower's
+// go-around) flew into a slower plane ahead on the same final; on Easy the rubber bounce dropped it on the grass ~760 m
+// short, where the LAND rollout stayed down and went DONE. The player's see-and-avoid on final was jets-only.
+async function scFix5() {
+  const { planLandAhead } = await import('../js/assist/landahead.js');
+  const L = await import('../js/world/layout.js');
+  const tg = Math.tan(4 * Math.PI / 180), bad = [];
+  let n = 0;
+  for (const ty of ['tiger', 'bathtub', 'cub']) for (const gap of [150, 300, 500]) {
+    const tr = new Traffic(env), e = runwayEnd('27');
+    const A = new Aircraft({ type: ty }), [ax, az] = fromRunway(e, -1661 + gap, 0);
+    A.place({ x: ax, z: az, alt: Math.max(4, (1661 - gap + 130) * tg), heading: 270, speed: TYPES[ty]?.vapp ?? 30, throttle: 0.3, flaps: 1 }, env);
+    const aa = new Autopilot(A); tr.add({ aircraft: A, ap: aa, name: 'AI' }); aa.setRoute(arrivalRoute('27', { type: ty, stand: 'auto' })); aa.replan();
+    const C = new Aircraft({ type: 'c172' }), [cx, cz] = fromRunway(e, -1661, 0);
+    C.place({ x: cx, z: cz, alt: 122, heading: 270, speed: 65 * KT, throttle: 0.4, flaps: 1 / 3 }, env);
+    const ca = new Autopilot(C); tr.add({ aircraft: C, ap: ca, name: 'P', player: true }); ca.setRoute(circuitRoute('27')); ca.replan();
+    ca.landAt(planLandAhead({ pos: C.pos, vel: C.vel, heading: C.heading, altitude: C.alt, world: env, layout: L, type: 'c172' }));
+    let minD = 1e9;
+    for (let t = 0; t < 150 && !C.crashed && !A.crashed; t += 1 / 60) {
+      tr.update(1 / 60);
+      if (!C.onGround || !A.onGround) minD = Math.min(minD, Math.hypot(A.pos.x - C.pos.x, A.pos.y - C.pos.y, A.pos.z - C.pos.z));
+    }
+    n++;
+    if (C.crashed || A.crashed || minD < 30) bad.push(`${ty} ${gap} m ahead: closest ${minD.toFixed(0)} m${C.crashed ? ', ' + C.crashReason : ''}`);
+  }
+  check('FIX5 #3 the player on LAND (C172) never flies into a slower plane ahead on the same final (Tiger/Bathtub/Cub, 150–500 m ahead)', !bad.length, bad.join(' | ') || `${n} cases, all ≥ 30 m apart in the air`);
+  // #1 loop jumbo-hard "DEMAND TAKEOFF: airborne again: not within 300 s": a jumbo DEMAND leaving its heavy spot (S4) for
+  // 09 met a C172 from S1/S2 coming down taxiway A for 27; the jumbo's CG was 16 m off A (not "on" the C172's path), each
+  // held for the other at 0 kt. Head-on stretches now go to whoever reaches them first; the other waits body-clear.
+  {
+    const { aiSpawn, heavySpot } = await import('../js/flight/routes.js');
+    const stuck = [];
+    let runs = 0;
+    for (const st of ['S1', 'S2', 'S3']) for (const wait of [22, 26, 30, 34]) {
+      const tr = new Traffic(env), hv = heavySpot('S4');
+      const J = new Aircraft({ type: 'jumbo' }); J.place({ x: hv.x, z: hv.z, heading: hv.heading }, env);
+      const ja = new Autopilot(J); tr.add({ aircraft: J, ap: ja, name: 'P', player: true }); ja.setRoute(circuitRoute('09')); tr.claimStand(J, 'S4');
+      const sp = aiSpawn('parked', '27', { stand: st, wait, type: 'c172', rnd: () => 0.3 });
+      const A = new Aircraft({ type: 'c172' }); A.place(sp.place, env); const aa = new Autopilot(A); tr.add({ aircraft: A, ap: aa, name: 'AI' }); aa.setRoute(sp.route);
+      ja.demandTakeoff({ prefer: '09' });
+      let air = false, t = 0;
+      for (; t < 300 && !air && !J.crashed && !A.crashed; t += 1 / 60) { tr.update(1 / 60); air = !J.onGround; }
+      runs++;
+      if (!air || J.crashed || A.crashed) stuck.push(`C172 from ${st} after ${wait} s: ${J.crashed ? J.crashReason : `jumbo at ${J.pos.x.toFixed(0)},${J.pos.z.toFixed(0)} ${ja.phase} ${J.gs.toFixed(1)} m/s, C172 ${aa.phase}`}`);
+    }
+    check('FIX5 #1 a jumbo DEMAND TAKEOFF from its heavy spot and a C172 heading the other way down taxiway A: no standoff, no bump, airborne within 300 s', !stuck.length, stuck.slice(0, 3).join(' | ') || `${runs} runs`);
+  }
+}
+
+// FLIGHTFIX6 (manager verify, loop suite): node tools/flight-sim.mjs fix6
+// #C/#A2 the player's LAND ran into a plane that had just landed ahead (jumbo "bumped into K-HECT", F-35 "bumped into
+// K-PLUM"): no look at the strip ahead after touchdown, a land-long aimed past where that plane was (not where it would
+// stop), and a LAND go-around for traffic ahead rejoined the same final the next frame (thousands of go-arounds, flying
+// on into the plane ahead). #B a wreck hung where it crashed (5 m up after a Rubber bounce series).
+async function scFix6() {
+  const { planLandAhead } = await import('../js/assist/landahead.js');
+  const L = await import('../js/world/layout.js');
+  const tg = Math.tan(3.2 * Math.PI / 180), bad = [], spam = [];
+  let n = 0;
+  for (const pt of ['c172', 'tiger', 'jumbo', 'f35']) for (const at of ['c172', 'tiger', 'bathtub', 'herc']) for (const gap of [250, 500, 900, 1400, 2000]) {
+    const tr = new Traffic(env), e = runwayEnd('27'), pd = AIRCRAFT[pt]?.flight?.jet || TYPES[pt].jet ? 4500 : 2200;
+    const A = new Aircraft({ type: at }), [ax, az] = fromRunway(e, -pd + gap, 0);
+    A.place({ x: ax, z: az, alt: Math.max(4, (pd - gap + 130) * tg), heading: 270, speed: TYPES[at]?.vapp ?? 30, throttle: 0.3, flaps: 1 }, env);
+    const aa = new Autopilot(A); tr.add({ aircraft: A, ap: aa, name: 'AI' }); aa.setRoute(arrivalRoute('27', { type: at, stand: 'auto' })); aa.replan();
+    const C = new Aircraft({ type: pt }), [cx, cz] = fromRunway(e, -pd, 0);
+    C.place({ x: cx, z: cz, alt: (pd + 130) * tg, heading: 270, speed: TYPES[pt].vapp * 1.05, throttle: 0.5, flaps: 2 / 3 }, env);
+    const ca = new Autopilot(C); tr.add({ aircraft: C, ap: ca, name: 'P', player: true }); ca.setRoute(circuitRoute('27', { type: pt })); ca.replan();
+    ca.landAt(planLandAhead({ pos: C.pos, vel: C.vel, heading: C.heading, altitude: C.alt, world: env, layout: L, type: pt }));
+    let hit = null, ga = 0, stopped = false;
+    for (let t = 0; t < 600 && !hit && !stopped; t += 1 / 60) {
+      tr.update(1 / 60);
+      for (const ev of C.events.splice(0)) if (ev.type === 'collision' || ev.type === 'crash') hit ||= `${ev.reason || ev.type} at ${t.toFixed(0)} s (${ca.phase})`;
+      for (const ev of ca.events.splice(0)) if (ev.type === 'goaround') ga++;
+      stopped = ca.done && C.gs < 0.5;
+    }
+    n++;
+    if (hit || !stopped) bad.push(`${pt} behind ${at} ${gap} m: ${hit || `not stopped in 600 s (${ca.phase})`}`);
+    if (ga > 4) spam.push(`${pt} behind ${at} ${gap} m: ${ga} go-arounds`);
+  }
+  check('FIX6 #C player LAND (C172/Tiger/Jumbo/F-35) behind a plane landing ahead (C172/Tiger/Bathtub/Herc, 250–2000 m): no contact, stopped within 600 s', !bad.length, bad.slice(0, 4).join(' | ') || `${n} runs`);
+  check('FIX6 #C a LAND go-around never loops straight back onto the same final (≤ 4 go-arounds per approach)', !spam.length, spam.slice(0, 4).join(' | ') || `${n} runs`);
+  // #D loop f35-medium "DEMAND IT: AP done and stopped on grass": LAND gone round for an occupied runway landed long
+  // with 633 m left (any landing needs ≥ 450 m), the F-35's book landing roll is 700 m: off the end onto the grass
+  {
+    const off = [], notDown = [];
+    for (const pt of ['c172', 'tiger', 'f35', 'herc']) for (const sPark of [250, 400, 550]) {
+      const tr = new Traffic(env), e = runwayEnd('27'), jet = !!TYPES[pt].jet, pd = jet ? 4500 : 2200;
+      const B = new Aircraft({ type: 'c172' }), [bx, bz] = fromRunway(e, sPark, 0);
+      B.place({ x: bx, z: bz, heading: 270 }, env); tr.add({ aircraft: B, name: 'PARKED' });
+      const C = new Aircraft({ type: pt }), [cx, cz] = fromRunway(e, -pd, 0);
+      C.place({ x: cx, z: cz, alt: (pd + 130) * tg, heading: 270, speed: TYPES[pt].vapp * 1.05, throttle: 0.5, flaps: 2 / 3 }, env);
+      const ca = new Autopilot(C); tr.add({ aircraft: C, ap: ca, name: 'P', player: true }); ca.setRoute(circuitRoute('27', { type: pt })); ca.replan();
+      ca.landAt(planLandAhead({ pos: C.pos, vel: C.vel, heading: C.heading, altitude: C.alt, world: env, layout: L, type: pt }));
+      let stopped = false, hit = null;
+      for (let t = 0; t < 420 && !stopped && !hit; t += 1 / 60) {
+        tr.update(1 / 60);
+        for (const ev of C.events.splice(0)) if (ev.type === 'collision' || ev.type === 'crash') hit = ev.reason || ev.type;
+        ca.events.length = 0;
+        stopped = ca.done && C.gs < 0.5;
+      }
+      if (hit || (stopped && !onRunway(C.pos.x, C.pos.z, 0))) off.push(`${pt}, plane parked ${sPark} m in: ${hit || `stopped off the runway at ${C.pos.x.toFixed(0)},${C.pos.z.toFixed(0)}`}`);
+      if (!jet && !stopped) notDown.push(`${pt} ${sPark}`);
+    }
+    check('FIX6 #D LAND past a plane parked on the runway never lands long into an overrun (F-35/Herc need their landing roll) and never hits it', !off.length, off.slice(0, 4).join(' | ') || '12 runs');
+    check('FIX6 #D … and the light types still land long past it within 420 s (FLIGHTFIX3)', !notDown.length, notDown.join(', ') || 'C172, Tiger × 3');
+  }
+  // #E loop cub/bathtub-hard "field LAND: touchdown not within 240 s": LAND on 04's final went round for "traffic ahead"
+  // twice; the see-and-avoid read any plane within 150 m of the final's line, ≤ 90 m up or down, as on our final.
+  // Traffic crossing 55 m above (or below) is not a collision course; one crossing at our height still is.
+  {
+    const wrong = [];
+    // the player on final for 04 (its own circuit approach); a plane flying straight across that final (kinematic, 50 m/s
+    // westbound) timed to cross where the player is at 15 s, dy above it
+    const final04 = (pt, crosser) => {
+      const tr = new Traffic(env), e = runwayEnd('04');
+      const C = new Aircraft({ type: pt }), [cx, cz] = fromRunway(e, -1500, 0);
+      C.place({ x: cx, z: cz, alt: (1500 + 130) * Math.tan(3 * Math.PI / 180), heading: e.hdg, speed: TYPES[pt].vapp, throttle: 0.4, flaps: 2 / 3 }, env);
+      const ca = new Autopilot(C); tr.add({ aircraft: C, ap: ca, name: 'P', player: true }); ca.setRoute(circuitRoute('04', { type: pt })); ca.replan();
+      if (crosser) {
+        const A = new Aircraft({ type: 'c172' });
+        A.place({ x: crosser.x + 50 * 15, z: crosser.z, alt: crosser.alt, heading: 270, speed: 50, throttle: 0.75 }, env);
+        A.vel.set(-50, 0, 0); A.step = function (dt) { this.prevPos.copy(this.pos); this.pos.addScaled(this.vel, dt); this.time += dt; this._derive(env); };
+        tr.add({ aircraft: A, name: 'X' });
+      }
+      let ga = false, at15 = null;
+      for (let t = 0; t < 25; t += 1 / 60) {
+        tr.update(1 / 60); C.events.length = 0;
+        for (const ev of ca.events.splice(0)) if (ev.type === 'goaround' && ev.reason === 'traffic ahead') ga = true;
+        if (!at15 && t >= 15) at15 = { x: C.pos.x, z: C.pos.z, alt: C.alt };
+      }
+      return { ga, at15 };
+    };
+    for (const pt of ['cub', 'bathtub', 'c172']) for (const [dy, want] of [[55, false], [-50, false], [3, true]]) {
+      const p15 = final04(pt).at15, { ga } = final04(pt, { ...p15, alt: p15.alt + dy });
+      if (ga !== want) wrong.push(`${pt} vs crossing ${dy > 0 ? '+' : ''}${dy} m: ${ga ? 'went round' : 'carried on'}`);
+    }
+    check('FIX6 #E the player\'s see-and-avoid on final goes round for a collision course only (crossing 50 m above/below: carry on; at our height: go round)', !wrong.length, wrong.join(' | ') || '9 runs');
+  }
+  // #B (what crashed the Tiger in both tiger-medium field LANDs, at x ≈ −1930 by the River Krumble): LAND NOW from the
+  // climb-out met its field fast (66 kt, Vapp 55) with ~430 m left; tail up = no brakes; it rolled on into the river
+  // bank (tail/wingtip strikes, a Medium bounce chain to DESTROYED). Reproduced live (real world), then here.
+  {
+    const { fakeWorld, layout: LY } = await import('../js/assist/test/fakeworld.mjs');
+    const { armLandNow } = await import('../js/assist/landahead.js');
+    const RX = -1970, base = fakeWorld();
+    const W = { ...base, groundHeightAt: () => 0, surfaceAt: (x, z) => (Math.abs(x - RX) < 20 ? 'water' : base.surfaceAt(x, z)), waterNear: (x, z, r) => Math.abs(x - RX) < 20 + r };
+    const wenv = { groundHeightAt: W.groundHeightAt, surfaceAt: W.surfaceAt, colliders: base.colliders };
+    const wet = [];
+    for (const type of ['tiger', 'c172', 'cub', 'bathtub']) for (const [x0, alt, kt] of [[-1000, 60, 70], [-900, 90, 75], [-1100, 40, 65]]) {
+      const tr = new Traffic(wenv), ac = new Aircraft({ type }), ap = new Autopilot(ac);
+      ac.place({ x: x0, z: 0, alt, heading: 270, speed: kt * KT, throttle: 0.8, flaps: 0 }, wenv);
+      ac.impactHandler = () => ({ result: 'bounce', restitution: 0.35 });
+      tr.add({ aircraft: ac, ap, player: true, name: 'P' }); ap.setRoute(circuitRoute('27', { type })); ap.replan();
+      armLandNow(); const p = planLandAhead({ pos: ac.pos, vel: ac.vel, heading: ac.heading, altitude: ac.alt, world: W, layout: LY, type });
+      if (p.fail) { wet.push(`${type} from ${x0}: no plan (${p.fail})`); continue; }
+      ap.landAt(p);
+      const imp = [];
+      for (let t = 0; t < 200 && !(ap.done && ac.gs < 0.5); t += 1 / 60) { tr.update(1 / 60); for (const ev of ac.events.splice(0)) if (ev.type === 'impact' || ev.type === 'crash') imp.push(ev.reason); ap.events.length = 0; }
+      const past = (p.strip.end[0] - ac.pos.x) * Math.sign(p.strip.end[0] - p.touchdown[0]) < 0;
+      if (imp.length || past || !ap.done) wet.push(`${type} from ${x0} m ${kt} kt: stopped at x ${ac.pos.x.toFixed(0)} (strip end ${p.strip.end[0].toFixed(0)}) ${imp.join()}`);
+    }
+    check('FIX6 #B a fast field arrival (LAND NOW from a climb-out) brakes to the strip it planned: stops inside it, never into the river beyond (Tiger/C172/Cub/Bathtub)', !wet.length, wet.join(' | ') || '12 runs');
+  }
+  // #B a wreck falls to the ground and rests there
+  {
+    const tr = new Traffic(env), ac = new Aircraft({ type: 'tiger' });
+    ac.place({ x: 0, z: 2000, alt: 5, heading: 90, speed: 25, throttle: 0.3 }, env);
+    tr.add({ aircraft: ac, name: 'W', player: true });
+    ac._crash('test wreck');
+    for (let t = 0; t < 3; t += 1 / 60) tr.update(1 / 60);
+    const rest = ac.aglRef;
+    check('FIX6 #B a wreck that crashed 5 m up falls to the ground within 3 s (it used to hang in the air)', Math.abs(ac.pos.y - rest) < 0.05, `CG ${ac.pos.y.toFixed(2)} m, rest ${rest.toFixed(2)} m`);
+  }
+}
+
 function R1speed(type) { return Math.min(80 * KT, (TYPES[type]?.vcruise ?? 95 * KT) * 0.8); }
 
-const S = { minrun: scMinRun, fix3: scFix3, aaron: scAaron, loopext: scLoopExtend, throttle: scThrottleTakeback, landmany: scLandMany, feel: scPlayerFeel, spawn: scSpawn, impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed, jets: scJets };
+const S = { fix6: scFix6, fix5: scFix5, fix4: scFix4, minrun: scMinRun, fix3: scFix3, aaron: scAaron, loopext: scLoopExtend, throttle: scThrottleTakeback, landmany: scLandMany, feel: scPlayerFeel, spawn: scSpawn, impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed, jets: scJets, roster: scRoster };
 for (const [k, f] of Object.entries(S)) if ((scen === 'all' && k !== 'mixed') || scen === k) { console.log(`\n== ${k}`); await f(); }
 const fails = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - fails}/${results.length} passed`);

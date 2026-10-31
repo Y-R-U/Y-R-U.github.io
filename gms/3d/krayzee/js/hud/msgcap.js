@@ -1,19 +1,20 @@
 // MSGFIX: one priority queue for every message on screen. At most `max` show at once (3 on a phone); the lowest-priority
 // extras are shed (html[data-krz-shed] → visibility hidden in style.js) and come back when room frees up. The response
-// sheet, the Herald reel, the rank-up ceremony and the TASKS set celebration are never shed; neither is a coach mark pointing at a control.
+// sheet, the Herald reel, the rank-up ceremony and the TASKS set celebration are never shed; neither is a coach mark or a first-run hint pointing at a control.
 const PRIORITY = [
   ['sheet', '.krz-r-panel, .krz-map:not([hidden])'],
   ['reel', '.krz-reel, .krz-cer, .kz-tk-cele.on'],
   ['banner', '#krz-hud.krz-flash .krz-banner'],
   ['story', '.krz-st-coach'],
   ['coach', '.krz-coach.in'],
+  ['hint', '.krz-hint.in'],
   ['score', '.krz-pop.in'],
   ['tasks', '.kz-tk-toast.on'],
   ['radio', '.krz-r-pill.in:not(.out)'],
   ['prompt', '.krz-prompt.in'],
   ['paper', '.krz-paper-toast.in'],
 ];
-const NEVER = new Set(['sheet', 'reel', 'coach']);
+const NEVER = new Set(['sheet', 'reel', 'coach', 'hint']);
 
 const shown = (e) => !e.hidden && !e.closest('[hidden]') && e.getClientRects().length > 0;
 

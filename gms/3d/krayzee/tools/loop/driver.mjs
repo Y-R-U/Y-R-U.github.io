@@ -69,9 +69,12 @@ export async function connect(port) {
     await D.tapAt(r.cx, r.cy);
     return r;
   };
-  // drag a real thumb from (x,y) by (dx,dy) and hold it there for holdMs (wall clock) before lifting
-  D.hold = async (x, y, dx, dy, holdMs, during) => {
-    const id = ++tid, steps = 8;
+  // drag a real thumb from (x,y) by (dx,dy) and hold it there for holdMs (wall clock) before lifting, or until stop() says so
+  // (HUDPOLISH E2: holds measured in SIM time stop through stop(): under load each touch dispatch waits for a slow frame, so a
+  // wall-clock hold of 0.75 s became 12 s of sim hand-flying at 4x)
+  D.hold = async (x, y, dx, dy, holdMs, during, stop) => {
+    // a sim-timed hold drags in with 2 moves: under load every dispatch waits for a frame, and 8 of them were seconds of sim
+    const id = ++tid, steps = stop ? 2 : 8;
     await D.touchStart(x, y, id);
     for (let i = 1; i <= steps; i++) { await sleep(25); await D.touchMove(x + dx * i / steps, y + dy * i / steps, id); }
     const t0 = Date.now();
@@ -80,6 +83,7 @@ export async function connect(port) {
       await sleep(120);
       await D.touchMove(x + dx + (k++ % 2), y + dy, id);
       if (during) await during();
+      if (stop && await stop()) break;
     }
     await D.touchEnd();
   };
@@ -104,7 +108,7 @@ export const SNAP = `(() => { const g = window.__game; if (!g) return null; cons
     diff: g.wiring?.difficulty || null, type: S.type || null,
     p: p && { x: p.x, z: p.z, alt: p.alt, agl: p.agl, kt: p.speedKt, hdg: p.heading, bank: p.bank, pitch: p.pitch, fpm: p.vsFpm, gnd: p.onGround, crashed: p.crashed, cr: p.crashReason,
       surf: p.surface, phase: p.phase, leg: p.leg, sub: p.sub, i: p.legIndex, apMode: p.apMode, modes: p.modes, thr: +(p.ctl.throttle ?? 0).toFixed(2),
-      thrMode: P?.axis?.throttle?.mode, done: !!P?.ap?.done, landing: P?.ap?.landing ? (P.ap.landing.label || 'yes') + '/' + (P.ap.landing.pattern || '') : null, fuel: P?.ac?.fuelFraction },
+      thrMode: P?.axis?.throttle?.mode, done: !!P?.ap?.done, act: P?.ac?.time ?? null, vtol: P?.ac?.vtol ?? 0, landing: P?.ap?.landing ? (P.ap.landing.label || 'yes') + '/' + (P.ap.landing.pattern || '') : null, fuel: P?.ac?.fuelFraction },
     pending: gs?.pending ?? null, banked: gs?.banked ?? null, lifetime: gs?.lifetimePP ?? null, outrage: gs?.outrage ?? null, finishReady: gs?.finishReady ?? null,
     finish: gh?.finish ? { state: gh.finish.state, reason: gh.finish.reason } : null,
     ground: gh?.ground?.state ? { takeoff: !!gh.ground.state.takeoff, skip: !!gh.ground.state.skip } : null,

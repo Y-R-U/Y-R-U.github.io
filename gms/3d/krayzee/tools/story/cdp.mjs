@@ -79,7 +79,7 @@ export async function connect(port) {
   C.load = async (url) => {
     await send('Page.navigate', { url });
     const t0 = Date.now();
-    while (Date.now() - t0 < 40000) {
+    while (Date.now() - t0 < 120000) {   // a loaded machine boots slowly
       await sleep(300);
       try { if (await C.ev('!!window.__krayzeeReady')) return true; } catch (e) { /* navigating */ }
     }

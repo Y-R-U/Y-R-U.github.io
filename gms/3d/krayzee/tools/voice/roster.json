@@ -202,5 +202,29 @@
   "design": "A junior air traffic controller, a young man in his twenties in his first week, with a mild English accent. An ordinary adult male speaking voice, mid-low pitched, at normal volume. Nervous and flustered, hesitant and gulping, trying hard and failing to sound professional.",
   "audition": "Um, Crazy Tower, uh, everyone? Please, please stop landing! Oh no. Oh no no no. Is this thing on? Is it mayday?",
   "sample": "Is this thing on? Is it mayday?"
+ },
+ "tower_farm": {
+  "label": "Farmer Mudge (C-Tower 2)",
+  "kind": "tower",
+  "f0": [
+   70,
+   150
+  ],
+  "design": "A grumpy old English farmer in his sixties from rural Somerset with a broad West Country accent: burring rolled r's, broad slow vowels, 'oi' for 'I'. A low, rough, weathered baritone, an ordinary adult male speaking voice at normal volume, dry, grudging and unimpressed, slow unhurried delivery.",
+  "audition": "This is Mudge, at Muckle Bottom. You'll land on the grass, not on my cows. I've a field to cut, so don't you go dawdling about up there.",
+  "audition_alt": "This be Mudge, at Muckle Bottom. You'll land on the grass, not on moi cows. Oi've a field to cut, so don't you go dawdlin' about up there.",
+  "prefer_alt": true,
+  "sample": "Land on the grass, not the cows."
+ },
+ "tower_butler": {
+  "label": "Mr Fennimore, the Royal Butler (C-Tower 3)",
+  "kind": "tower",
+  "f0": [
+   70,
+   150
+  ],
+  "design": "An elderly English butler in his seventies with an impeccable, old-fashioned Received Pronunciation accent. A low, soft, slightly dry baritone, an ordinary adult male speaking voice at normal volume, slow, measured and unflappable, perfectly polite, with very dry understatement.",
+  "audition": "Fennimore speaking, from the Palace Lawn. You are cleared to land, between the stripes, ideally. I have taken the liberty of moving the croquet hoops.",
+  "sample": "Do mind the croquet hoops."
  }
 }

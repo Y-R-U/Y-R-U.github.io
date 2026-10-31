@@ -114,7 +114,9 @@ const qb = document.createElement('button');
 qb.textContent = 'quality: ' + quality;
 qb.onclick = () => { q.set('q', { low: 'medium', medium: 'high', high: 'low' }[quality]); location.search = q.toString(); };
 ui.appendChild(qb);
-setPreset(q.get('cam') in presets ? q.get('cam') : 'final09');
+if (q.get('pos')) presets.custom = { pos: q.get('pos').split(',').map(Number), look: (q.get('look') || '0,0,0').split(',').map(Number), fov: +(q.get('fov') || 55) };
+setPreset(q.get('cam') in presets ? q.get('cam') : q.get('pos') ? 'custom' : 'final09');
+window.__ready = true;
 
 const keys = new Set();
 addEventListener('keydown', (e) => keys.add(e.key.toLowerCase()));

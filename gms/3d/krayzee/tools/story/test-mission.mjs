@@ -1,6 +1,6 @@
 // STORY: missions end-to-end in the real game (?mission=N) with real CDP touch (mouse/keys on desktop).
 //   ~/.claude/bin/cdp start --port 9632 -- --use-angle=metal
-//   node tools/story/test-mission.mjs [--mission=1..4] [--view=portrait|landscape|desktop] [--diff=easy|medium|hard]
+//   node tools/story/test-mission.mjs [--mission=1..10] [--view=portrait|landscape|desktop] [--diff=easy|medium|hard]
 //        [--port=9632] [--base=http://localhost:8790/gms/3d/krayzee/] [--falsify=<name>] [--cover[=<shot tag>]]
 // --cover (MSGFIX): sample the screen cover by message UI (tools/loop/cover.mjs), print it, save docs/review/loop/cover-*.json
 // Scripted help is limited to: Mission 1 medium/hard tower pass (teleport onto a low line at the tower, wings level) and
@@ -36,7 +36,9 @@ const FALSIFY_JS = {
   unlock: `(() => { const s = localStorage.setItem.bind(localStorage); localStorage.setItem = (k, v) => (k === 'krayzee.story' ? undefined : s(k, v)); return true; })()`,
   // the rule-break is never scored (objective never ticks → the mission cannot complete)
   // re-applied every 200 ms, so a game object rebuilt after load (a new play/session) is broken too
-  crime: `(() => { const RX = /cut_in|forced_go|queue_jump|unauth|runway_steal|double_occ|tower_buzz/; setInterval(() => { const g = window.__game.wiring.game; if (!g || g.__falsified) return; const h = g.handleEvent.bind(g); g.handleEvent = (e) => (RX.test(String(e?.type || '') + ' ' + String(e?.id || '')) ? null : h(e)); g.__falsified = true; }, 200); return true; })()`,
+  crime: `(() => { const RX = /cut_in|forced_go|queue_jump|unauth|runway_steal|double_occ|tower_buzz|wrong_way|grass_landing|apron_landing/; setInterval(() => { const g = window.__game.wiring.game; if (!g || g.__falsified) return; const h = g.handleEvent.bind(g); g.handleEvent = (e) => (RX.test(String(e?.type || '') + ' ' + String(e?.id || '')) ? null : h(e)); g.__falsified = true; }, 200); return true; })()`,
+  // STORY3 M7: the F-35 refuses to HOVER (so the hover objective can never be earned)
+  nohover: `(() => { setInterval(() => { const ap = window.__game.S.player?.ap; if (ap && !ap.__falsified) { ap.hover = () => false; ap.__falsified = true; } }, 200); return true; })()`,
   // the briefing objectives list is empty
   orders: `(() => { document.querySelector('.krz-st-obj')?.remove(); return true; })()`,
 };
@@ -54,6 +56,8 @@ const done = Object.fromEntries(Array.from({ length: MISSION - 1 }, (_, k) => [k
 await C.ev(`localStorage.setItem('krayzee.profile', ${JSON.stringify(JSON.stringify(PROFILE))}); localStorage.setItem('krayzee.story', JSON.stringify({ introSeen: true, missions: ${JSON.stringify(done)} })); const k = 'krayzee.settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.difficulty = '${DIFF}'; s.v = Math.max(s.v || 0, 3); localStorage.setItem(k, JSON.stringify(s)); true`);
 check('game boots', await C.load(BASE + `?mission=${MISSION}`));
 for (let i = 0; i < 60 && !(await C.ev(`!!window.__krzStory?.mission`)); i++) await C.sleep(250);
+// a loaded machine can boot past index.html's 20 s watchdog: its card stays up after the game is ready (not a story bug)
+if (await C.ev(`!!document.getElementById('krz-boot-fail') && !!window.__krayzeeReady`)) { console.log('  NOTE slow boot: removed the stale "fogged in" card'); await C.ev(`document.getElementById('krz-boot-fail').remove(); true`); }
 await C.ev(`window.__story = { story: window.__krzStory }; window.__lp0 = window.__game.wiring?.game?.career?.lifetimePP ?? 0; true`);
 C.errors.length = 0;
 let coverCam = null;
@@ -97,10 +101,14 @@ check('Fly closes the briefing', !(await rectOf('.krz-st-brief .krz-st-card')));
 const seen = new Set();
 let last = '', lastT = Date.now(), warpTapped = 0, demandTo = false, chip = false, lifted = 0, scripted = false, landTapped = 0, thrDone = 0;
 const LIMIT = { taxi: 400, takeoff: 120, turn: 60, letgo: 40, radio: 60, castle: 400, crime: 400, land: 500, touchdown: 300, stop: 300, demand: 60,
-  spot: 40, cut: FORCE === 'polite' ? 600 : 300, queue: 120, roll: 200, bless: 400, start: 120, climb: 120, throttle: 120, race: 400 };
+  spot: 40, cut: FORCE === 'polite' ? 600 : 300, queue: 120, roll: 200, bless: 400, start: 120, climb: 120, throttle: 120, race: 400,
+  clouds: 500, clouds2: 600, buzz: 700, buzz2: 700, hover: 400, over: 240, landhere: 150 };
 const STEPS = { 1: ['taxi', 'takeoff', 'turn', 'letgo', 'radio', 'castle', 'crime', 'land', 'touchdown', 'stop', 'demand'],
   2: ['spot', 'cut', 'land', 'touchdown', 'stop', 'demand'], 3: ['queue', 'roll', 'bless', 'land', 'touchdown', 'stop', 'demand'],
-  4: ['start', 'climb', 'throttle', 'race', 'land', 'touchdown', 'stop', 'demand'] }[MISSION];
+  4: ['start', 'climb', 'throttle', 'race', 'land', 'touchdown', 'stop', 'demand'],
+  5: ['clouds', 'buzz', 'land', 'touchdown', 'stop', 'demand'], 6: ['clouds', 'land', 'touchdown', 'stop', 'demand'],
+  7: ['clouds', 'hover', 'over', 'landhere', 'stop', 'demand'], 8: ['queue', 'roll', 'clouds', 'buzz', 'land', 'touchdown', 'stop', 'demand'],
+  9: ['clouds', 'buzz', 'clouds2', 'buzz2', 'land', 'touchdown', 'stop', 'demand'], 10: ['start', 'climb', 'throttle', 'race', 'land', 'touchdown', 'stop', 'demand'] }[MISSION];
 const warpTo5 = async (m) => { if (m.warp.level !== 5 && !m.warp.reason) { await C.tapSel('.krz-warp'); await C.sleep(250); } };
 async function tapLand(m, ok) {
   const r = await rectOf('.krz-land');
@@ -112,6 +120,13 @@ async function tapLand(m, ok) {
     console.log(`  tapped LAND (${landTapped}) li=${m.p.li}`);
     await C.sleep(1500);
   }
+}
+// the F-35 context button (docs/STOVL.md): the pill sits inside the main button, so tap the main one above the pill
+async function tapCtx(alt = false) {
+  const r = await rectOf(alt ? '.krz-land-now' : '.krz-land');
+  if (!r) return false;
+  await C.tap((r.l + r.r) / 2, alt ? (r.t + r.b) / 2 : Math.min((r.t + r.b) / 2, r.t + 22));
+  return true;
 }
 async function tapDemandTakeoff() {
   if (demandTo || !(await rectOf('.krz-gbtn-to'))) return;
@@ -130,7 +145,8 @@ while (true) {
     await layoutCheck(m.step);
     seen.add(m.step);
   }
-  if ((Date.now() - lastT) / 1000 > (LIMIT[m.step] || 200)) { check(`step ${m.step} finishes in time`, false, JSON.stringify(m.p)); break; }
+  // the limit is mission time (the sim's own clock: a loaded machine runs the game slowly), with a 3× wall-clock backstop
+  if (m.stepT > (LIMIT[m.step] || 200) || (Date.now() - lastT) / 1000 > 3 * (LIMIT[m.step] || 200)) { check(`step ${m.step} finishes in time`, false, `${m.stepT} s mission time · ${JSON.stringify(m.p)}`); break; }
   const mk = m.marks || {};
   const skipTo = (i) => C.ev(`(() => { const P = window.__game.S.player; P.ap.setRoute(P.ap.route, { start: ${i} }); return P.ap.i; })()`);
   if (FORCE === 'castle' && m.step === 'radio' && !seen.has('forced')) { seen.add('forced'); console.log('  FORCE: AP past the castle', await skipTo(mk.towerOut)); await C.sleep(14000); }
@@ -172,8 +188,20 @@ while (true) {
       await C.tap((r.l + r.r) / 2, (r.t + r.b) / 2); chip = true; console.log('  tapped radio chip');
       await C.sleep(800);
     } else if (/Tap RADIO/.test(m.coach) && !(await rectOf('.krz-r-panel'))) { await C.tapSel('.krz-r-btn'); console.log('  opened RADIO'); await C.sleep(500); }
-  } else if (m.step === 'castle' || m.step === 'bless' || (m.step === 'roll' && !m.p.ground)) {
+  } else if (m.step === 'castle' || m.step === 'bless' || (m.step === 'roll' && !m.p.ground) || (MISSION >= 5 && /^(clouds2?|buzz2?)$/.test(m.step))) {
     await warpTo5(m);
+  } else if (m.step === 'hover') {
+    // STOVL: HOVER about its stopping distance before the pad (main button, or the pill under LAND)
+    const h = await C.ev(`(() => { const t = window.__krzStory.mission.target, p = window.__game.state().player, b = window.__game.landButton(); return t && p && { d: Math.hypot(t.pos[0] - p.x, t.pos[2] - p.z), kt: p.speedKt, key: b?.ctx?.key, st: b?.ctx?.state, alt: b?.ctx?.alt }; })()`);
+    const v = (h?.kt || 0) * 0.5144, stop = (v * v) / 4 + 100;   // mission7.js hoverStop
+    if (h && h.d < stop + 120 && h.d > stop - 400 && !seen.has('hoverTap')) {
+      if (h.key === 'hover' && h.st === 'idle') { seen.add('hoverTap'); await C.shot(SHOTS, `${tag}_hover_button`); await tapCtx(false); console.log(`  tapped HOVER at ${Math.round(h.d)} m, ${Math.round(h.kt)} kt`); }
+      else if (h.alt === 'hover') { seen.add('hoverTap'); await C.shot(SHOTS, `${tag}_hover_button`); await tapCtx(true); console.log(`  tapped HOVER (pill) at ${Math.round(h.d)} m, ${Math.round(h.kt)} kt`); }
+    }
+    if (h && h.d > stop + 600) seen.delete('hoverTap');
+  } else if (m.step === 'landhere') {
+    const b = await C.ev(`window.__game.landButton()`);
+    if (b?.ctx?.key === 'land' && b.ctx.state === 'idle' && !seen.has('landHereTap')) { seen.add('landHereTap'); await C.sleep(400); await C.shot(SHOTS, `${tag}_landhere_button`); await tapCtx(false); console.log('  tapped LAND HERE'); await C.sleep(2500); seen.delete('landHereTap'); }
   } else if (m.step === 'crime') {
     if (m.warp.level === 1 && m.warp.scale === 1 && !m.warp.reason) { await C.tapSel('.krz-warp'); await C.sleep(200); await C.tapSel('.krz-warp'); }
     if (scripted && m.p.li < 8) scripted = false; // went round again
@@ -223,13 +251,23 @@ check('mission completes', fin.status === 'complete', JSON.stringify(fin.result)
 check('every step was reached in order', STEPS.join() === fin.stepsSeen.filter((x, i, a) => a.indexOf(x) === i).join(), fin.stepsSeen.join(','));
 if (MISSION > 1) {
   const ci = fin.log.findIndex((l) => l.type === 'complete'); const ev = fin.log.filter((l, i) => l.type === 'objective' && (ci < 0 || i < ci)).map((l) => l.id);
-  const need = { 2: ['cut'], 3: ['jump', 'bless'], 4: ['steal', 'throttle', 'race'] }[MISSION];
+  const need = { 2: ['cut'], 3: ['jump', 'bless'], 4: ['steal', 'throttle', 'race'], 5: ['clouds', 'buzz'], 6: ['clouds', 'wrong'], 7: ['clouds', 'hover', 'vland'],
+    8: ['go', 'clouds', 'buzz'], 9: ['mudge', 'raf'], 10: ['steal', 'race', 'buzz'] }[MISSION];
   check('the mission\'s rule-break and system objectives were earned in flight', need.every((x) => ev.includes(x)), `ticked in flight: ${ev.join(',')}`);
 }
 if (fin.status === 'complete') {
-  let reel = false, stacked = 0, calm = 0;
+  let reel = false, stacked = 0, calm = 0, ending = null;
   for (let i = 0; i < 100; i++) {
-    const both = await C.ev(`(() => { const v = (sel) => [...document.querySelectorAll(sel)].some((e) => !e.hidden && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'); return [v('.krz-st-done .krz-st-card'), v('.krz-reel')]; })()`);
+    const both = await C.ev(`(() => { const v = (sel) => [...document.querySelectorAll(sel)].some((e) => !e.hidden && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'); return [v('.krz-st-done .krz-st-card'), v('.krz-reel'), v('.krz-st-end .krz-st-card')]; })()`);
+    if (both[2] && !ending) {
+      // STORY3 finale: the coronation, before the reward card
+      await C.sleep(7500);
+      await C.shot(SHOTS, `${tag}_ending`);
+      ending = await C.ev(`(() => { const c = document.querySelector('.krz-st-end .krz-st-card'); const r = c.getBoundingClientRect(); const b = c.querySelector('button[data-a="on"]').getBoundingClientRect(); return { text: c.innerText.replace(/\\n+/g, ' | '), l: r.left, r: r.right, t: r.top, b: r.bottom, btnB: b.bottom, rewardUp: !!document.querySelector('.krz-st-done') }; })()`);
+      await C.tapSel('.krz-st-end button[data-a="on"]');
+      await C.sleep(800);
+      continue;
+    }
     if (both[0] && both[1]) stacked++;
     calm = both[0] && !both[1] ? calm + 1 : 0;
     if (calm >= 6) break;
@@ -240,6 +278,10 @@ if (fin.status === 'complete') {
     await C.sleep(500);
   }
   check('reward card never stacks with the Herald reel', !stacked, `reel ${reel ? 'shown' : 'none'}, stacked ${stacked}×`);
+  if (MISSION === 10) {
+    check('the finale crowns you: the coronation comes before the reward card and fits the screen', ending && /Sovereign of the Skies/.test(ending.text) && !ending.rewardUp && ending.l >= 0 && ending.r <= W && ending.t >= 0 && ending.b <= H && ending.btnB <= H, JSON.stringify(ending));
+    check('the story is complete: Bathtub unlocked (career), progress marked complete', await C.ev(`window.__game.wiring.game?.career?.storyComplete === true && !!JSON.parse(localStorage.getItem('krayzee.story')).complete`));
+  }
   await C.sleep(1800);
   await C.shot(SHOTS, `${tag}_complete`);
   const card = await C.ev(`(() => { const c = document.querySelector('.krz-st-done .krz-st-card'); if (!c) return { text: 'NO CARD' }; const r = c.getBoundingClientRect(); return { text: c.innerText, l: r.left, r: r.right, t: r.top, b: r.bottom, bar: c.querySelector('.bar i')?.style.width, next: !!c.querySelector('button[data-a="next"]') }; })()`);
@@ -248,11 +290,11 @@ if (fin.status === 'complete') {
   const lp = await C.ev(`window.__game.wiring.game?.career?.lifetimePP ?? 0`);
   const lp0 = await C.ev('window.__lp0');
   check('career PP grew by sortie + reward', lp - lp0 >= fin.result.bonus + fin.result.sortie, `${lp0} → ${lp}`);
-  if (MISSION > 1 && MISSION < 4) check('Next mission button offered', card.next);
+  if (MISSION > 1 && MISSION < 10) check('Next mission button offered', card.next);
   if (MISSION > 1) {
     const unlocked = await C.ev(`(async () => { const { missionList } = await import('${BASE}js/story/picker.js'); return missionList().map((m) => m.id + (m.unlocked ? 'U' : 'L') + (m.done ? 'D' : '')); })()`);
-    const nextOk = MISSION >= 4 || unlocked.includes(`${MISSION + 1}U`);
-    check(`progress saved; mission ${MISSION + 1 <= 4 ? MISSION + 1 + ' unlocked' : 'list complete'}`, unlocked.includes(`${MISSION}UD`) && nextOk, unlocked.join(' '));
+    const nextOk = MISSION >= 10 || unlocked.includes(`${MISSION + 1}U`);
+    check(`progress saved; mission ${MISSION + 1 <= 10 ? MISSION + 1 + ' unlocked' : 'list complete'}`, unlocked.includes(`${MISSION}UD`) && nextOk, unlocked.join(' '));
   }
   await C.tapSel(`.krz-st-btns button[data-a="continue"]`);
   await C.sleep(600);

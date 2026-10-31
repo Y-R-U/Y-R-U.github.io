@@ -122,7 +122,7 @@ export function createRadio(opts = {}) {
     const sp = speaker(speakerId);
     if (!sp) return null;
     const isTower = sp === tower;
-    const e = entry || (variant != null ? bank.variant(sp.voice, intent, variant) : bank.pick(sp.voice, intent, { tier: tierHint ?? (isTower ? tier : undefined) }));
+    const e = entry || (variant != null ? bank.variant(sp.voice, intent, variant) : bank.pick(sp.voice, intent, { tier: tierHint ?? (isTower ? tier : undefined) })) || (isTower ? bank.pickAny(intent) : null);
     if (!e) return null;
     const addressee = isTower ? speaker(about ?? target) : null;
     const rwy = e.rwy === 'post' ? String(ctx?.runway ?? o.getContext().runway ?? '27') : null;
@@ -199,13 +199,14 @@ export function createRadio(opts = {}) {
 
   async function play(item, onStart) {
     const { sp, entry } = item;
-    const body = bank.clip(sp.voice, entry.id);
+    const vo = entry.generic || !entry.voice ? sp.voice : entry.voice; // a line borrowed from another voice keeps its own clips
+    const body = bank.clip(vo, entry.id);
     const dur = body?.duration || estimateSeconds(item.text, entry.maxSeconds);
     const prio = item.priority;
     if (o.audio?.playRadio) {
       let src = body?.url || null;
       const parts = [];
-      const sc = (key) => bank.clip(sp.voice, `${sp.voice}.${key}`) || bank.clip(sp.voice, key);
+      const sc = (key) => bank.clip(vo, `${vo}.${key}`) || bank.clip(vo, key);
       if (sp === tower && entry.callsign === 'pre' && item.addressee) {
         const n = String(item.addressee.flightNo || 42);
         const word = String(item.addressee.splice || item.addressee.title || 'grace').toLowerCase().replace(/\s+/g, '_');
@@ -216,7 +217,7 @@ export function createRadio(opts = {}) {
       if (src && seq.length > 1 && o.audio.loadBuffer) {
         try { src = await splice(seq.map((c) => c.url), o.audio.loadBuffer); } catch { src = body.url; }
       }
-      return o.audio.playRadio(src, { speaker: sp === tower ? 'tower' : 'pilot', voiceId: sp.voice, text: item.text, priority: prio, duration: dur, onStart });
+      return o.audio.playRadio(src, { speaker: sp === tower ? 'tower' : 'pilot', voiceId: vo, text: item.text, priority: prio, duration: dur, onStart });
     }
     onStart({ missing: !body });
     return fallback.play({ url: body?.url, text: item.text, maxSeconds: entry.maxSeconds, duration: body?.duration }).done;

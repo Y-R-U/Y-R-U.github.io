@@ -34,6 +34,18 @@ Player's flight number defaults to random 11–99 (no trailing 0); online, pass 
 The callsign splice title word is `profile.splice` if given, else `title` lower-cased with spaces → `_` (matches
 `ranks.js` splice ids, e.g. `crown_prince`).
 
+## Map towers (C-Tower 2 / C-Tower 4)
+An airport def can carry `towerLines` (data/airports/farm-lines.js, airbase-lines.js). `wiring.setTower(def)` loads
+them into the bank once and switches the tower to their voice (`tower_farm`, `tower_raf`). Clips are found the usual
+way, by `audio/voices/barks.json[voice][id]`, and the callsign splice by `<voice>.cs_title_*` / `cs_digit_*`. So a map
+tower plays real audio as soon as its clips are in barks.json, with no radio code change. `tower_raf` is tower_f's
+voice under its own key, so Much Snoring's lines never mix into C-Tower 1. Headless check:
+`node js/radio/test/tower-audio.mjs --airport=farm|palace|airbase [--falsify]` (CDP 9709; see VOICES.md "New towers").
+A tower line the current tower voice does not have (a voiced story line such as Toby's `t_jumbo`, said in M8 while
+Gerald holds the tower) is taken from the voice that has it (`LineBank.pickAny`) and plays that voice's own clip and
+callsign splice; before this it was silently dropped. tower-audio.mjs checks it every run (falsified: without
+`pickAny` it reports "t_jumbo DROPPED").
+
 ## Event adapter — `radio.handleEvent(ev)`
 Ids are pilot ids as registered; the player's id is `'player'` (or `profile.id`). `actor` = who did it.
 | ev | effect |

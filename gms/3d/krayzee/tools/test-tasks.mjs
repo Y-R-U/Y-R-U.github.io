@@ -1,6 +1,6 @@
 // TASKS lane (D34) in the real game: real taps (tools/loop/driver.mjs), window.__game only read.
-//   ~/.claude/bin/cdp start --port 9671 -- --use-angle=metal ; python3 -m http.server 8889 (repo root)
-//   node tools/test-tasks.mjs [--port=9671] [--url=http://127.0.0.1:8889/gms/3d/krayzee/] [--timescale=6]
+//   ~/.claude/bin/cdp start --port 9671 -- --use-angle=metal ; the repo root served on :8888 (as test-loop)
+//   node tools/test-tasks.mjs [--port=9671] [--url=http://127.0.0.1:8888/gms/3d/krayzee/] [--timescale=6]
 // Checks: menu → Tasks grid opens and fits at 390×844 and 844×390; a real Free Flight completes tasks (take-off,
 // first landing) → the tick toast shows and the grid ticks; the pause screen link. Shots: docs/shots/tasks/.
 import { mkdirSync } from 'node:fs';
@@ -13,7 +13,7 @@ const OUT = join(HERE, '..', 'docs', 'shots', 'tasks');
 mkdirSync(OUT, { recursive: true });
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const a = argv.find((x) => x.startsWith(`--${k}`)); return a ? a.split('=')[1] ?? true : d; };
-const PORT = +arg('port', 9671), BASE = arg('url', 'http://127.0.0.1:8889/gms/3d/krayzee/'), TS = +arg('timescale', 6);
+const PORT = +arg('port', 9671), BASE = arg('url', 'http://127.0.0.1:8888/gms/3d/krayzee/'), TS = +arg('timescale', 6);
 const PROFILE = { name: 'Tasker', gender: 'f', company: 'Ledger Air', primary: '#1d4f91', secondary: '#f4efe6', accent: '#d4a017', voice: 'duchess', registration: 'K-TASK' };
 const COACH_SEEN = { 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 }, 'krayzee.coachTakeoff': 1 };
 
@@ -21,6 +21,8 @@ let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) { pass++; console.log('  ok  ' + m); } else { fail++; console.log('  FAIL ' + m); } return c; };
 const waitReal = async (fn, ms, every = 150) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { const v = await fn(); if (v) return v; await sleep(every); } return null; };
 
+// FLIGHTFIX5: a dead server used to surface as a localStorage SecurityError on Chrome's error page
+try { const r = await fetch(BASE); if (!r.ok) throw new Error('HTTP ' + r.status); } catch (e) { console.error(`game not served at ${BASE} (${e.message}): pass --url=`); process.exit(2); }
 const D = await connect(PORT);
 await D.send('Runtime.enable'); await D.send('Page.enable'); await D.send('Network.enable');
 await D.send('Network.setCacheDisabled', { cacheDisabled: true });

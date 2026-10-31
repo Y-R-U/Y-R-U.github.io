@@ -53,6 +53,10 @@
 .krz-st-coach.brief .krz-st-txt, html.krz-msg-busy .krz-st-coach .krz-st-txt { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .krz-st-coach.brief .krz-st-txt { -webkit-line-clamp: 1; }
 .krz-st-coach.brief { pointer-events: auto; cursor: pointer; }
+/* (was HUDPOLISH's in js/hud/style.js) a folded card stays one line when the screen is busy, and drops its goal row beside
+   the landscape HUD strip too (.side shows the goal inline, which would otherwise leave a folded card three lines tall) */
+html.krz-msg-busy .krz-st-coach.brief .krz-st-txt, html .krz-st-coach.brief .krz-st-txt { -webkit-line-clamp: 1; }
+html .krz-st-coach.side.brief .krz-st-goal { display: none; }
 .krz-st-coach.goal .krz-st-goal { animation: krz-st-goal 1.4s ease-out 1; }
 @keyframes krz-st-goal { 0% { color: #6fe3a0; } 100% { color: var(--krz-st-gold); } }
 .krz-st-coach.done { border-color: #6fe3a0; }
@@ -83,6 +87,28 @@
 .krz-st-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .krz-st-btns button { min-height: 48px; padding: 0 22px; border-radius: 24px; border: 1px solid #1c1a16; background: #1c1a16; color: #f3ecd9; font: 600 15px/1 system-ui, sans-serif; cursor: pointer; }
 .krz-st-btns button.alt { background: transparent; color: #1c1a16; }
+
+/* ---------- STORY3 finale: the coronation (after the Herald, before the reward card) ---------- */
+.krz-st-end { position: fixed; inset: 0; z-index: 29; display: grid; place-items: center; padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); background: radial-gradient(ellipse at 50% 30%, rgba(90,40,120,.55), rgba(5,7,12,.72)); opacity: 0; transition: opacity .8s ease; pointer-events: auto; }
+.krz-st-end.in { opacity: 1; }
+.krz-st-ecard { background: linear-gradient(#f7efd8, #efe2bf); }
+.krz-st-crown { font-size: 46px; line-height: 1; color: #b8862a; text-shadow: 0 2px 10px rgba(184,134,42,.45); animation: krz-st-crown 1.6s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes krz-st-crown { from { transform: translateY(-40px) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.krz-st-ecard h3 b { font-style: normal; color: #6b3fa0; }
+.krz-st-elines { display: grid; gap: 7px; margin: 0 0 12px; text-align: left; font-size: 14px; line-height: 1.3; color: #3b3428; }
+.krz-st-elines p, .krz-st-fin { margin: 0; opacity: 0; transform: translateY(6px); animation: krz-st-line .7s ease forwards; animation-delay: var(--d, 0s); }
+.krz-st-elines b { color: #8a6418; font-weight: 650; }
+.krz-st-end.all .krz-st-elines p, .krz-st-end.all .krz-st-fin { animation-delay: 0s; animation-duration: .2s; }
+.krz-st-fin { font: italic 400 19px/1.2 var(--krz-st-serif); color: #6b3fa0; margin: 0 0 14px; }
+@keyframes krz-st-line { to { opacity: 1; transform: none; } }
+@media (orientation: landscape) and (max-height: 500px) {
+  .krz-st-end .krz-st-card { width: min(100%, 760px); padding: 10px 18px 10px; }
+  .krz-st-crown { font-size: 28px; } .krz-st-end h2 { font-size: 26px; margin-top: 2px; } .krz-st-end h3 { font-size: 15px; margin-bottom: 6px; }
+  .krz-st-elines { grid-template-columns: 1fr 1fr; column-gap: 16px; gap: 4px; font-size: 12.5px; margin-bottom: 6px; }
+  .krz-st-fin { font-size: 16px; margin-bottom: 8px; } .krz-st-end .krz-st-btns button { min-height: 42px; }
+}
+@media (prefers-reduced-motion: reduce) { .krz-st-crown, .krz-st-elines p, .krz-st-fin { animation-duration: .01s; animation-delay: 0s; } }
 
 /* ---------- mission briefing (objectives) + mission picker ---------- */
 .krz-st-brief, .krz-st-pick { position: fixed; inset: 0; z-index: 29; display: grid; place-items: center; padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 16px);

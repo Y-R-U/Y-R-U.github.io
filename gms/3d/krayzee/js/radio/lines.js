@@ -54,6 +54,13 @@ export class LineBank {
 
   has(voice, intent) { return !!this.list(voice, intent)?.length; }
 
+  // A line only one voice has (a story line such as Toby's t_jumbo, said while Gerald holds the tower): that voice's own
+  // entry, so it plays its own clip instead of being dropped.
+  pickAny(intent) {
+    for (const [k, l] of this.byKey) if (!l.fallback && l.length && k.endsWith(`|${intent}`) && !k.startsWith('*|')) return this.resolve(l[0].voice, l[Math.floor(Math.random() * l.length)]);
+    return null;
+  }
+
   // Random variant, nearest tier first, never the one this voice used last for this intent.
   pick(voice, intent, { tier } = {}) {
     let list = this.list(voice, intent);

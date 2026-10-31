@@ -1,0 +1,52 @@
+/* br8t Pass card (js/ui/pass.js, docs/ACCESS.md). Inline only: it never covers the screen. */
+.kzp { position: relative; border-radius: 10px; padding: 14px 14px 12px; text-align: center; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; animation: kzp-in .28s cubic-bezier(.2, 1.1, .4, 1); }
+.kzp-crest { width: 34px; height: 24px; margin: 0 auto 4px; color: #c99a2e; }
+.kzp-crest svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 1px 2px rgba(120, 80, 10, .35)); }
+.kzp-k { display: block; font: 600 10.5px/1 system-ui, sans-serif; letter-spacing: .28em; text-transform: uppercase; }
+.kzp h4 { margin: 6px 0 4px; font: italic 400 22px/1.1 'Krayzee Serif', 'Instrument Serif', Didot, Georgia, serif; }
+.kzp p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.4; }
+.kzp-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
+.kzp-btns button { min-height: 46px; padding: 0 18px; border-radius: 23px; font: 600 14px/1.1 system-ui, sans-serif; cursor: pointer; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; touch-action: manipulation; }
+.kzp-btns button small { font: 500 11px/1 system-ui, sans-serif; opacity: .85; }
+.kzp-btns button[aria-busy="true"] { opacity: .6; cursor: progress; }
+.kzp-fine, .kzp-note { font-size: 12px !important; margin: 0 0 4px !important; }
+.kzp-soon, .kzp-ok { font: italic 600 14px/1.35 system-ui, sans-serif; margin: 2px 0 2px !important; }
+
+/* parchment (story picker) */
+.kzp-paper { background: linear-gradient(180deg, #fff6dc, #f1e3bb); color: #1c1a16; border: 1px solid #b8892a; box-shadow: inset 0 0 0 3px #fff6dc, inset 0 0 0 4px rgba(184, 137, 42, .5); }
+.kzp-paper .kzp-k { color: #8a6418; }
+.kzp-paper p { color: #4a4234; }
+.kzp-paper .kzp-btns button { border: 1px solid #1c1a16; background: #1c1a16; color: #f3ecd9; }
+.kzp-paper .kzp-btns button.alt2 { background: #8a6418; border-color: #8a6418; }
+.kzp-paper .kzp-btns button.alt { background: transparent; color: #1c1a16; }
+.kzp-paper .kzp-soon, .kzp-paper .kzp-ok { color: #2f7d4a; }
+.kzp-paper .kzp-note { color: #8a2a18; }
+.kzp-inpick { margin: -2px 0 2px; grid-column: 1 / -1; }
+
+/* navy (online lobby) */
+.kzp-navy { background: linear-gradient(180deg, rgba(226, 176, 74, .16), rgba(11, 17, 40, .82)); color: #fbf6ea; border: 1px solid #e2b04a; }
+.kzp-navy .kzp-crest { color: #f7dc8f; }
+.kzp-navy .kzp-k { color: #f7dc8f; }
+.kzp-navy p { color: #cbc2ad; }
+.kzp-navy .kzp-btns button { border: 1px solid transparent; background: linear-gradient(180deg, #f7dc8f, #d6a33d); color: #2a1a02; }
+.kzp-navy .kzp-btns button.alt2 { background: linear-gradient(180deg, #e9c46a, #b98a2a); }
+.kzp-navy .kzp-btns button.alt { background: rgba(255, 255, 255, .06); color: #fbf6ea; border-color: rgba(247, 220, 143, .26); }
+.kzp-navy .kzp-soon, .kzp-navy .kzp-ok { color: #a6f0b8; }
+.kzp-navy .kzp-note { color: #ffd88a; }
+
+/* locked rows in the story picker */
+.krz-st-picklist button[data-pass-locked] { background: repeating-linear-gradient(135deg, rgba(184, 137, 42, .08) 0 8px, rgba(184, 137, 42, .02) 8px 16px); border-style: dashed; }
+.krz-st-picklist button[data-pass-locked] em { color: #8a6418; }
+.kzp-tag { display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; font: 650 10px/1 system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #8a6418; }
+.kzp-tag svg { width: 13px; height: 9px; }
+.krz-st-picklist button[data-pass]:not([data-pass-locked]) .kzp-tag { color: #2f7d4a; }
+
+/* online allowance line in the lobby */
+.kzp-line { display: flex; align-items: center; gap: 8px; justify-content: space-between; font: 500 13px/1.35 system-ui, sans-serif; color: #cbc2ad; }
+.kzp-line b { color: #f7dc8f; font-weight: 700; }
+.kzp-line[data-left="0"] b { color: #ffb3bf; }
+.kzp-sign { text-align: left; }
+.kzp-sign h4 { text-align: center; }
+
+@keyframes kzp-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .kzp { animation: none; } }

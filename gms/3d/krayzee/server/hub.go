@@ -50,6 +50,8 @@ type hub struct {
 	started time.Time
 	ice     *iceSource
 	verify  verifier
+	acc     *accessCfg                                           // D36 sign-in + daily allowance (access.go); nil = open
+	spendFn func(tok, id string) (spendOutcome, json.RawMessage) // the allowance spend (tests inject one)
 	perIP   int
 	ipN     map[string]int
 	pubSeq  map[string]int
@@ -92,6 +94,9 @@ type client struct {
 	ctlN                float64
 	authBusy            bool
 	authNext            string
+	idTok               string // the last verified Firebase ID token (forwarded to the payments service only)
+	pending             *inMsg // create/join/quick waiting for a token check (access.go)
+	spending, ticket    bool   // an allowance spend in flight; one paid room entry not yet used
 }
 
 type roomMeta struct {
@@ -110,6 +115,7 @@ type room struct {
 	banned                 map[string]bool
 	votes                  map[string]map[string]bool // target id -> voter ids
 	meta                   *roomMeta
+	paid                   map[string]bool // uids that spent an online game on this room (re-entry is free)
 }
 
 type event struct {
@@ -256,12 +262,8 @@ func (h *hub) message(c *client, raw []byte) {
 		h.checkToken(c, m.Tok)
 	case "list":
 		h.sendList(c)
-	case "quick":
-		h.quickJoin(c)
-	case "create":
-		h.create(c, m)
-	case "join":
-		h.join(c, m)
+	case "create", "join", "quick":
+		h.entry(c, m) // access.go: sign-in + allowance gate, then create / join / quickJoin
 	case "rejoin":
 		h.rejoin(c, m.RJ)
 	case "leave":
@@ -369,7 +371,7 @@ func (h *hub) checkToken(c *client, tok string) {
 				log.Printf("client %s: token refused (%v)", c.id, err)
 				h.send(c, map[string]any{"t": "auth", "ok": false})
 			} else if c.uid == "" || c.uid == id.UID {
-				c.uid, c.ranked = id.UID, !id.Anonymous
+				c.uid, c.ranked, c.idTok = id.UID, !id.Anonymous, tok
 				h.send(c, map[string]any{"t": "auth", "ok": true, "ranked": c.ranked})
 				if c.room != nil {
 					if c.room.banned[c.uid] {
@@ -383,6 +385,10 @@ func (h *hub) checkToken(c *client, tok string) {
 				c.authNext = ""
 				h.checkToken(c, next)
 			}
+			if p := c.pending; p != nil && !c.authBusy {
+				c.pending = nil
+				h.entry(c, *p)
+			}
 		})
 	}()
 }
@@ -391,7 +397,7 @@ func (h *hub) checkToken(c *client, tok string) {
 
 func (h *hub) newRoom(c *client, name string, priv bool, set settings) *room {
 	r := &room{id: h.newID(6), code: h.newCode(), name: name, region: c.region, private: priv, set: set,
-		owner: c.id, phase: "lobby", banned: map[string]bool{}, votes: map[string]map[string]bool{}}
+		owner: c.id, phase: "lobby", banned: map[string]bool{}, votes: map[string]map[string]bool{}, paid: map[string]bool{}}
 	h.rooms[r.id] = r
 	h.codes[r.code] = r
 	return r
@@ -474,6 +480,9 @@ func (h *hub) join(c *client, m inMsg) {
 
 func (h *hub) enter(c *client, r *room) {
 	c.room, c.rdy, c.input = r, false, h.now()
+	if c.uid != "" && (c.ticket || !h.acc.counting()) {
+		r.paid[c.uid], c.ticket = true, false // this account's online game for this room (access.go)
+	}
 	c.voice = h.pickVoice(r, c.voices)
 	c.call = pickCallsign(r)
 	r.members = append(r.members, c)
@@ -805,7 +814,7 @@ func (h *hub) rejoin(c *client, rj *rejoinMsg) {
 	}
 	r := &room{id: rj.ID, name: cleanRoomName(rj.Name, c.name+"'s court"), region: regionOrDefault(rj.Region),
 		private: rj.Priv, epoch: rj.Epoch, phase: oneOf(rj.Phase, []string{"lobby", "flight", "podium"}, "lobby"),
-		owner: rj.Owner, set: cleanSettings(rj.Set, c.rank), banned: map[string]bool{}, votes: map[string]map[string]bool{}}
+		owner: rj.Owner, set: cleanSettings(rj.Set, c.rank), banned: map[string]bool{}, votes: map[string]map[string]bool{}, paid: map[string]bool{}}
 	code := strings.ToUpper(strings.TrimSpace(rj.Code))
 	if !validFrom(code, codeChars, 6, 6) || h.codes[code] != nil {
 		code = h.newCode()
@@ -1064,7 +1073,7 @@ func (h *hub) attach(e event) attachResult {
 
 func (h *hub) welcome(c *client, resumed bool) {
 	h.send(c, map[string]any{"t": "welcome", "id": c.id, "tok": c.tok, "ice": stunOnly, "voices": voiceRoster,
-		"grace": h.grace.Milliseconds(), "resumed": resumed})
+		"grace": h.grace.Milliseconds(), "resumed": resumed, "access": h.acc.view()})
 }
 
 func (h *hub) countStats() stats {

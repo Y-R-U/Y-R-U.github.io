@@ -1,6 +1,8 @@
 // C-Tower 4: RAF Much Snoring, the long-runway air base for heavies (D29, D33). Schema: docs/AIRPORTS.md §3.1 + docs/MAP.md.
 // C-Tower 1's layout, stretched: 09/27 2800 × 45 m, parallel taxiway A with four stubs, a big apron with 8 stands
 // (heavies take two), ops block, tower, shelters and a radar. World frame: +X east, -Z north, heading 0 = north.
+import { AIRBASE_LINES } from './airbase-lines.js';
+
 const rect = (x, z, w, d, heading = 0) => ({ center: [x, 0, z], size: [w, d], heading });
 
 export default {
@@ -12,6 +14,7 @@ export default {
   tower: { kind: 'military', position: [260, 0, -330], height: 30 },
   towerName: 'C-Tower 4 · Much Snoring',
   towerVoice: 'tower_f',
+  towerLines: AIRBASE_LINES,   // voice 'tower_raf' = tower_f's clone with its own C-Tower 4 script (VOICE2)
   wind: { from: 270, kt: 9 },
   patternAlt: 300,
   runways: [

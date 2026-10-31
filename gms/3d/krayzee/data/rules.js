@@ -37,7 +37,7 @@ export const INFRACTIONS = {
   ignored_instruction:{ name: 'Selective Hearing',    pp: 120, outrage: 10, scold: 'scold_generic', refusedWindow: 90, detect: 'still violating goaround/hold 8 s after instruction; or autopilot goaroundrefused (LAND) — scored once per go-around' },
   double_occupancy:  { name: 'Shared Runway',         pp: 300, outrage: 15, scold: 'scold_runway', detect: 'two planes on same runway rect, one > 40kt, player involved' },
   // D28/D30: SCORE-side contact close call (from reportImpact), never an ATC detector.
-  light_touch:       { name: 'Close Call',            pp: 150, outrage: 8, scold: 'scold_bump', maxRelKt: 12, minOwnKt: 5, surviveSecs: 3, detect: 'plane-to-plane contact <= 12 kt, own gs >= 5 kt; Easy/Medium: bounced or survived; Hard: survived (not destroyed 3 s later)' },
+  light_touch:       { name: 'Close Call',            pp: 150, outrage: 8, scold: 'scold_nudge', maxRelKt: 12, minOwnKt: 5, surviveSecs: 3, detect: 'plane-to-plane contact <= 12 kt, own gs >= 5 kt; Easy/Medium: bounced or survived; Hard: survived (not destroyed 3 s later)' },
   intersection_dash: { name: 'Crossroads',            pp: 200, outrage: 10, scold: 'scold_runway', detect: '09/27 x 04/22 intersection crossed while other plane on either runway' },
 };
 export const INFRACTION_COOLDOWN = 30;

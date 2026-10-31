@@ -13,6 +13,9 @@ RestartSec=3
 Environment=KRAYZEE_ADDR=127.0.0.1:8018
 Environment=KRAYZEE_PREFIX=/gms/3d/krayzee/net
 Environment=KRAYZEE_ICE_URL=http://127.0.0.1:8014/ice
+Environment=KRAYZEE_SIGNIN=required
+Environment=KRAYZEE_ALLOWANCE=auto
+Environment=KRAYZEE_ALLOWANCE_URL=http://127.0.0.1:8016/api/br8t/
 Environment=GOMEMLIMIT=40MiB
 MemoryMax=64M
 EnvironmentFile=-/srv/data/krayzeenet/krayzeenet.env

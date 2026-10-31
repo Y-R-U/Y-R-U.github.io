@@ -10,6 +10,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { connect, sleep, SNAP, LOAD_ROUTES, rwyGeom } from './loop/driver.mjs';
+import { freezeCheck, sampleOf } from './loop/freeze.mjs';
 import { COVER_INSTALL, COVER_FALSIFY, summarize, fmtCover, coverTake, coverShots, coverDir } from './loop/cover.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -25,12 +26,14 @@ const SOAK = arg('soak', false);
 // falsify runs default to the first quick case
 const FALSIFY = arg('falsify', '');
 const SHOTS = !!arg('shots', false);
+const LOG_TAIL = +arg('log', 14);   // game log lines kept with a failing step (--log=120 to debug)
 // MSGFIX screen cover: sampled every case; --cover-gate=<mean>,<p90> (airborne %, portrait only) turns it into a failing step
 const COVER_GATE = arg('cover-gate', '') ? String(arg('cover-gate')).split(',').map(Number) : null;
 const COVER_SHOTS = arg('cover-shots', false);   // --cover-shots[=tag] saves heavy-cover frames to docs/shots/msgfix/
 // JETCORE: the jets run with --jets (their own matrix) or --cases=jumbo:easy:portrait; they need ?plane= support in main.js
 const JETS = ['jumbo', 'herc', 'f35'];
-const PLANES = arg('jets') ? JETS : ['c172', 'tiger', 'bathtub'], DIFFS = ['easy', 'medium', 'hard'];
+const ROSTER = ['cub', 'pitts', 'throne'];
+const PLANES = arg('jets') ? JETS : arg('roster') ? ROSTER : ['c172', 'tiger', 'bathtub'], DIFFS = ['easy', 'medium', 'hard'];
 const ORIENT = { portrait: [390, 844], landscape: [844, 390] };
 
 let CASES;
@@ -58,7 +61,7 @@ const FALSIFY_ALL = ['freeze', 'stuck', 'error', 'cover', 'deadbutton', 'msgcove
 let FALSIFY_SET = FALSIFY === 'all' ? FALSIFY_ALL : FALSIFY ? String(FALSIFY).split(',') : [];
 
 const PROFILE = { name: 'Loop', gender: 'm', company: 'Loop Air', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017', voice: 'toff', registration: 'K-LOOP' };
-const COACH_SEEN = { 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 }, 'krayzee.coachTakeoff': 1 };
+const COACH_SEEN = { 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 }, 'krayzee.coachTakeoff': 1, 'krayzee.hints': { ctx: 'seen', map: 'seen' } };
 
 let D;
 const log = (...a) => console.log(...a);
@@ -86,19 +89,12 @@ function watch(s) {
     M.wasCrashed = p.crashed;
     if (!M.gone && (p.phase === 'GONE' || p.leg === 'despawn')) { M.gone = { simT: s.simT, x: Math.round(p.x), z: Math.round(p.z), agl: Math.round(p.agl) }; M.events.push({ type: 'PLAYER_GONE', ...M.gone }); }
   }
-  M.samples.push({ t: s.simT, p: p && [p.x, p.z, p.alt, p.gnd, p.kt], ai: s.ai });
+  M.samples.push(sampleOf(s));
   while (M.samples.length > 2 && s.simT - M.samples[1].t >= 8) M.samples.shift();
-  const a = M.samples[0];
-  if (!M.freeze && a && s.simT - a.t >= 6 && !s.paused) {
-    const moved = (u, v) => Math.hypot(u[0] - v[0], u[1] - v[1], u[2] - v[2]);
-    const pStatic = p && a.p && !p.gnd && moved(a.p, [p.x, p.z, p.alt]) < 0.3;
-    const prevAI = new Map(a.ai.map((x) => [x[0], x]));
-    const air = s.ai.filter((x) => !x[4] && !x[5] && prevAI.has(x[0]) && !prevAI.get(x[0])[4]);
-    const aiStatic = air.length >= 1 && air.every((x) => { const o = prevAI.get(x[0]); return Math.hypot(x[1] - o[1], x[2] - o[2], x[3] - o[3]) < 0.3; });
-    if (pStatic || aiStatic) {
-      M.freeze = { simT: s.simT, overSim: r1(s.simT - a.t), player: pStatic ? 'static in the air' : 'moving', ai: aiStatic ? `${air.length} airborne AI static` : 'moving' };
-      M.events.push({ type: 'FREEZE', ...M.freeze });
-    }
+  const fz = !M.freeze && freezeCheck(M.samples, s);
+  if (fz) {
+    M.freeze = { simT: s.simT, overSim: r1(s.simT - M.samples[0].t), ...fz };
+    M.events.push({ type: 'FREEZE', ...M.freeze });
   }
 }
 
@@ -135,7 +131,7 @@ async function step(name, budgetSim, fn, { needs = true, blocks = needs } = {}) 
   if (rec.ok && budgetSim && rec.simS > budgetSim * 1.0001) { rec.ok = false; rec.detail += ` | over budget ${rec.simS}s > ${budgetSim}s sim`; }
   if (!rec.ok) {
     try { rec.shot = await D.shot(OUT, `${CASE.id}-${name}`.replace(/[^\w.-]+/g, '_')); } catch (e) { /* */ }
-    rec.log = await D.evSafe('__game.log().slice(-14).map((l) => JSON.stringify(l).slice(0, 160))', []);
+    rec.log = await D.evSafe(`__game.log().slice(-${LOG_TAIL}).map((l) => JSON.stringify(l).slice(0, 160))`, []);
     if (blocks) CASE.blocked ||= name;
     rec.state = s1 && { phase: s1.p?.phase, leg: s1.p?.leg, sub: s1.p?.sub, agl: s1.p && r1(s1.p.agl), kt: s1.p && r1(s1.p.kt), gnd: s1.p?.gnd, x: s1.p && Math.round(s1.p.x), z: s1.p && Math.round(s1.p.z),
       land: s1.land?.txt, finish: s1.finish, ground: s1.ground, apMode: s1.p?.apMode, thrMode: s1.p?.thrMode };
@@ -165,12 +161,18 @@ async function tapUntil(sel, effect, { tries = 3, ms = 1500, rec } = {}) {
   await waitReal(() => D.rect(sel), 2000);
   await sleep(250); // let a fade-in finish before the thumb lands
   for (let i = 0; i < tries; i++) {
+    // a retry first looks again: under load the last tap's effect can land after the wait, and a second tap then hits
+    // whatever replaced the button (HUDPOLISH E2: a late DEMAND IT bank, then a retry onto DEMAND TAKEOFF)
+    if (i) { const s = await snap(); const v = s && await effect(s); if (v) { if (rec) rec.retries = (rec.retries || 0) + i; return v; } }
     let r = await D.tap(sel);
     if (!r) fail(`${sel} not visible`);
     if (r.covered) {
       // a player waits for a transient sheet (radio chips, toast) to go; a cover that stays is a failure
       const by = await D.hitName(r.cx, r.cy), t0 = Date.now();
-      r = await waitReal(async () => { const q = await D.tap(sel); return q && !q.covered ? q : null; }, 8000, 400);
+      // the target retiring meanwhile (LAND NOW reaching final) satisfies the effect: that is not a cover
+      let done = null;
+      r = await waitReal(async () => { const s = await snap(); if (s && (done = await effect(s))) return true; const q = await D.tap(sel); return q && !q.covered ? q : null; }, 8000, 400);
+      if (done) return done;
       if (!r) fail(`${sel} is covered at its centre by ${by} for 8 s real — a thumb would hit that instead`);
       if (rec) (rec.warn ||= []).push(`${sel} was covered by ${by} for ${r1((Date.now() - t0) / 1000)} s real`);
     }
@@ -315,9 +317,11 @@ async function runCase([plane, diff, orient]) {
     const base = await D.rect('.krz-stick-base');
     if (!base) fail('stick base not visible');
     if (!(await D.onTop('.krz-stick-zone', base.cx, base.cy))) fail('the stick zone is covered at the stick base');
-    let manualSeen = 0;
+    let manualSeen = 0, manualT0 = null;
     const s0 = await snap();
-    await D.hold(base.cx, base.cy, 32, 10, (B.stickHold / TS) * 1000, async () => { const s = await snap(); if (s?.p?.modes?.aileron === 'manual') manualSeen++; });
+    // the thumb stays on for B.stickHold SIM seconds of manual flight (a wall-clock hold became 5-12 s sim under load)
+    await D.hold(base.cx, base.cy, 32, 10, (B.stickHold / TS) * 1000 * 20, async () => { const s = await snap(); if (s?.p?.modes?.aileron === 'manual') { manualSeen++; manualT0 ??= s.simT; } },
+      async () => manualT0 != null && M.last.simT - manualT0 >= B.stickHold);
     const s1 = await snap();
     rec.manualSim = r1(s1.simT - s0.simT);
     if (!manualSeen) fail('aileron never went manual while the thumb was on the stick');
@@ -370,7 +374,7 @@ async function runCase([plane, diff, orient]) {
   // jets: a fast circuit can be flown and landed (and the plane parked: "the tower is making you wait") while the steps above
   // run; a player would DEMAND TAKEOFF and go round again, so the suite does that before the LAND steps
   const relaunch = async (rec) => {
-    if (!JETS.includes(CASE.plane)) return;
+    if (!JETS.includes(CASE.plane) && CASE.plane !== 'pitts') return;
     const s0 = await snap();
     if (!s0.p?.gnd) return;
     await until((s) => s.ground?.takeoff, 90, { label: 'DEMAND TAKEOFF offered (jet already landed)' });
@@ -378,27 +382,49 @@ async function runCase([plane, diff, orient]) {
     await until((s) => s.p && !s.p.gnd && s.p.agl > 30, 300, { label: 'airborne again' });
     rec.relaunched = true;
   };
-  await step('LAND probe downwind', JETS.includes(CASE.plane) ? 600 : 30, async (rec) => {
+  // The budget is on the game's own waits (the downwind, the cancel, the AP taking back). The taps, the LAND NOW wait and the
+  // stick touch are harness round trips: at 4x a CDP call that takes 1 s real under machine load is 4 s sim, so a whole-step
+  // budget measured the machine, not the game (HUDPOLISH E2). Both are reported: [sim s: ...] and game vs harness.
+  const PROBE_BUDGET = JETS.includes(CASE.plane) ? 600 : 30;
+  await step('LAND probe downwind', 0, async (rec) => {
+    const st0 = M.last.simT;
     await relaunch(rec);
+    // where the sim seconds go: the wait for the downwind, then each tap / hold (real-time harness waits × timescale)
+    const parts = rec.parts = {};
+    let game = M.last.simT - st0;
+    let mt = M.last.simT;
+    const mark = (k) => { parts[k] = r1(M.last.simT - mt); mt = M.last.simT; };
     // jets fly the circuit fast and ATC may stretch the downwind out of LAND's reach: any circuit leg before base will do
     // (the herc's short circuit is often on base by the time this step starts: base is still the home circuit)
     const legs = JETS.includes(CASE.plane) ? /^(CROSSWIND|DOWNWIND|UPWIND|BASE)$/ : /^DOWNWIND$/;
-    await until((s) => legs.test(s.p?.phase || '') && (!JETS.includes(CASE.plane) || s.p.agl > 100) && landOffered(s), 240, { label: 'downwind with LAND available' });
+    game += (await until((s) => legs.test(s.p?.phase || '') && (!JETS.includes(CASE.plane) || s.p.agl > 100) && landOffered(s), 240, { label: 'downwind with LAND available' })).simS;
+    mark('downwind');
     await tapUntil('.krz-land', (s) => s.land?.state === 'active', { rec, ms: 2000 });
+    mark('landTap');
     rec.pick = M.last.land.txt; rec.landing = M.last.p.landing;
     // LAND NOW (shown while LAND flies a circuit/join) must switch the plan to straight ahead and keep LAND active
+    // its effect is a new plan: straight ahead, or (nothing straight) the designed fallback, a field (FLIGHTFIX3) or a jet's
+    // runway with a quip, which retires the button. Waiting for "straight" only read a fallback as a swallowed tap and
+    // re-tapped a button that had gone (HUDPOLISH E2: the "LAND NOW not visible" warnings)
     if (await waitReal(() => D.evSafe('document.querySelector(".krz-land")?.dataset.now === "1"'), 2500)) {
-      await tapUntil('.krz-land-now', (s) => /straight/.test(s.p?.landing || ''), { rec, ms: 2500 }).catch((e) => { rec.landNowErr = e.message; });
+      await tapUntil('.krz-land-now', (s) => /straight/.test(s.p?.landing || '') || s.land?.now === false, { rec, ms: 2500 }).catch((e) => { rec.landNowErr = e.message; });
       const s = await snap();
-      rec.landNow = { landing: s.p?.landing, land: s.land?.state };
+      rec.landNow = { landing: s.p?.landing, land: s.land?.state, fallback: !/straight/.test(s.p?.landing || '') };
       if (rec.landNowErr || s.land?.state !== 'active') (rec.warn ||= []).push(`LAND NOW: ${rec.landNowErr || 'LAND no longer active'} (${s.p?.landing})`);
     }
+    mark('landNow');
     const b = await D.rect('.krz-stick-base');
-    await D.hold(b.cx, b.cy, 18, 0, 500);
-    await until((s) => s.land?.state !== 'active', 6, { label: 'a stick touch cancels LAND' });
-    await until((s) => s.p.apMode === 'AUTOPILOT', 15, { label: 'AP back after cancel' });
+    await D.hold(b.cx, b.cy, 18, 0, 500, null, async () => (await snap())?.land?.state !== 'active');
+    await snap();
+    mark('stickHold');
+    game += (await until((s) => s.land?.state !== 'active', 6, { label: 'a stick touch cancels LAND' })).simS;
+    mark('cancel');
+    game += (await until((s) => s.p.apMode === 'AUTOPILOT', 15, { label: 'AP back after cancel' })).simS;
+    mark('apBack');
+    rec.gameSim = r1(game); rec.harnessSim = r1(M.last.simT - st0 - game);
+    if (game > PROBE_BUDGET) fail(`the game's own waits took ${r1(game)} s sim > ${PROBE_BUDGET}`);
     if (/FIELD/i.test(rec.landing || rec.pick)) fail(`LAND on the home downwind picked ${rec.landing} ("${rec.pick}")${rec.landNow ? `; LAND NOW → ${rec.landNow.landing} (LAND ${rec.landNow.land})` : ''}`);
-    return `picked ${rec.landing}${rec.landNow ? `; LAND NOW → ${rec.landNow.landing}` : '; no LAND NOW'}; stick cancelled it`;
+    return `picked ${rec.landing}${rec.landNow ? `; LAND NOW → ${rec.landNow.landing}${rec.landNow.fallback ? ' (nothing straight: fallback)' : ''}` : '; no LAND NOW'}; stick cancelled it [game ${rec.gameSim} s sim (budget ${PROBE_BUDGET}), harness ${rec.harnessSim}; ${Object.entries(parts).map(([k, v]) => `${k} ${v}`).join(', ')}]`;
   }, { needs: false });
 
   // 5. LAND (+ LAND NOW when shown) → touchdown → 6. stop. Pressed on final, runway ahead, as D13 expects.

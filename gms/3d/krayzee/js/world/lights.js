@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { FRAMES, SEGMENTS, rwPt, rwDir } from './geom.js';
-import { TAXIWAY_WIDTH } from './layout.js';
+import royal from '../../data/airports/royal.js';
+const TAXIWAY_WIDTH = royal.taxiwayWidth;
 import { Builder, col, mat, inRect } from './util.js';
 
 const PAPI_ANGLES = [3.5, 3.17, 2.83, 2.5];

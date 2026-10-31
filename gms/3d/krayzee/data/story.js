@@ -13,6 +13,7 @@ export const CONTROLLERS = {
   gerald: { name: 'Gerald Calloway', voice: 'tower_m', blurb: '31 years in the tower, three of them calm. Collects ceramic owls. Retiring this season, whatever happens.' },
   imogen: { name: 'Imogen Frost', voice: 'tower_f', blurb: 'Flawless phraseology. Has never raised her voice. Yet.' },
   toby:   { name: 'Tobias "Toby" Wren', voice: 'tower_trainee', blurb: 'First week. Laminated cards. Thinks you are all wonderful, which is worse.' },
+  mudge:  { name: 'Farmer Mudge', voice: 'tower_farm', blurb: 'C-Tower 2. Runs the radio between milkings. Has opinions about jets, and hats.' },
 };
 
 export const MISSIONS = [

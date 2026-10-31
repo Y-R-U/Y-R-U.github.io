@@ -6,16 +6,51 @@ import { AIRCRAFT } from '../../data/aircraft.js';
 import { arrivalRoute } from '../flight/routes.js';
 import { AI_JETS } from '../flight/attract.js';
 import { FOG_DENSITY } from '../world/env.js';
+import { takeLandNow } from '../assist/landbutton.js';
 
 for (const d of Object.values(KINGDOM)) layout.registerAirport(d);
 
-export const TRAVEL = { swapM: 4000, arriveM: 5500, ferryM: 7500, ferryAlt: 450, cloudIn: 2.4, cloudOut: 2.8, fogK: 14 };
-const JET_CHANCE = { royal: AI_JETS.chance, farm: 0, airbase: 0.3 };
+export const TRAVEL = { swapM: 4000, arriveM: 5500, ferryM: 7500, ferryAlt: 450, cloudIn: 2.4, cloudOut: 2.8, fogK: 14, nearM: 1500 };
+const JET_CHANCE = { royal: AI_JETS.chance, farm: 0, airbase: 0.3, palace: 0 };
 const WINDS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
 const bearingOf = (dx, dz) => ((Math.atan2(dx, -dz) * 180) / Math.PI + 360) % 360;
 const wind16 = (h) => WINDS[Math.round(h / 22.5) % 16];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const here = () => layout.AIRPORT;
+// FLIGHTFIX4: airports that share one world (the Palace Lawn inside C-Tower 1's): a trip between them is a tower
+// handover ~1.5 km out, no magic clouds and no teleport (the lawn is really there, 2 km NNE of C-Tower 1)
+export const worldOf = (id) => KINGDOM[id]?.world || id;
+export const sameWorld = (a, b) => worldOf(a) === worldOf(b);
+// where the destination is in this world's frame: its own centre when it shares this world, else the kingdom offset
+function destXZ(to) {
+  const cur = here();
+  if (sameWorld(cur.id, to)) return KINGDOM[to].center || [0, 0];
+  const c = cur.center || [0, 0], [ox, oz] = offsetM(cur.id, to);
+  return [c[0] + ox, c[1] + oz];
+}
+
+// FLIGHTFIX4: shader warm-up after a swap. three's compileAsync polls every material it compiled until each program is
+// ready and cannot be stopped; a material disposed meanwhile (the next swap's world.dispose()) made its timer throw
+// "reading 'isReady'" (and never resolve). This poll is the same, guarded per material, capped and cancellable.
+export function warmShaders(renderer, scene, camera, { capMs = 3000, cancelled = () => false } = {}) {
+  let mats;
+  try { mats = renderer.compile(scene, camera); } catch (e) { return Promise.resolve(false); }
+  const props = renderer.properties;
+  if (!mats?.forEach || !props?.get) return Promise.resolve(true);
+  const t0 = performance.now();
+  return new Promise((resolve) => {
+    const tick = () => {
+      try {
+        if (cancelled()) return resolve(false);
+        for (const m of [...mats]) { const prog = props.get(m)?.currentProgram; if (!prog?.isReady || prog.isReady()) mats.delete(m); }
+        if (!mats.size) return resolve(true);
+        if (performance.now() - t0 > capMs) return resolve(false);
+      } catch (e) { return resolve(false); }
+      setTimeout(tick, 10);
+    };
+    setTimeout(tick, 0);
+  });
+}
 
 // ?airport=<id> at boot (before the world is built): only an airport the chosen plane can use.
 export function bootAirport(id, type) {
@@ -79,7 +114,7 @@ export function createKingdom(ctx) {
     at.textContent = `You are at C-Tower ${cur.n} · ${cur.short}`;
     const pos = P ? [cur.map[0] + P.ac.pos.x / 1000, cur.map[1] + P.ac.pos.z / 1000] : cur.map;
     const pin = (d, soon) => {
-      const [x, z] = d.map, sel = K.pick === d.id, bad = !soon && !canUse(d, type).ok;
+      const [x, z] = d.pin || d.map, sel = K.pick === d.id, bad = !soon && !canUse(d, type).ok;
       return `<g class="pin${sel ? ' sel' : ''}${soon ? ' soon' : ''}${bad ? ' bad' : ''}${d === cur ? ' cur' : ''}" data-pin="${d.id}" transform="translate(${x} ${z})">
         <circle r="5" class="hit"/><circle r="${soon ? 1.1 : 1.7}" class="dot"/>${soon ? '' : `<text y="-2.6" class="n">${d.n}</text>`}
         <text y="${soon ? 3.4 : 4.2}" class="lbl">${soon ? d.name : d.short}</text></g>`;
@@ -113,7 +148,7 @@ export function createKingdom(ctx) {
     card.innerHTML = `<h3>${d.name} <small>C-Tower ${d.n} · ${look.controller || ''}</small></h3>
       <p class="facts">RWY ${rw.id} · ${rw.length.toLocaleString('en-GB')} m ${rw.surface} · ${where}</p>
       <p class="dim">${look.blurb || ''}</p>
-      <p class="fit ${use.ok ? 'ok' : 'bad'}">${use.ok ? `Fits your ${plane} (needs ${use.need} m)` : `${use.short}<br><i>${use.quip}</i>`}</p>
+      <p class="fit ${use.ok ? 'ok' : 'bad'}">${use.ok ? `Fits your ${plane} (${use.vertical ? 'vertical landing' : `needs ${use.need} m`})` : `${use.short}<br><i>${use.quip}</i>`}</p>
       <div class="row">${btn}</div>`;
   }
 
@@ -136,14 +171,21 @@ export function createKingdom(ctx) {
     hud.flash(`COURSE SET · ${d.short.toUpperCase()} · ${wind16(bearingOf(ox, oz))}`, 'info', 3);
     ctx.log?.('mapDest', { to: d.id });
   }
-  function clear() { K.dest = null; K.ferry = false; }
+  function clear() { K.dest = null; K.ferry = false; K.owner = null; }
 
   // the autopilot's leg out: straight toward the destination, past the cloud line
   function setFerry(P) {
-    const cur = here(), [ox, oz] = offsetM(cur.id, K.dest), L = Math.hypot(ox, oz), c = cur.center || [0, 0];
-    const u = [ox / L, oz / L], x = c[0] + u[0] * TRAVEL.ferryM, z = c[1] + u[1] * TRAVEL.ferryM;
+    const cur = here(), near = sameWorld(cur.id, K.dest);
+    let x, z, alt = Math.max(TRAVEL.ferryAlt, Math.min(800, P.ac.alt));
+    if (near) {
+      // the same world: straight at the destination itself (the handover comes 1.5 km short), circuit-ish height
+      [x, z] = destXZ(K.dest); alt = Math.max(220, Math.min(450, P.ac.alt));
+    } else {
+      const [ox, oz] = offsetM(cur.id, K.dest), L = Math.hypot(ox, oz), c = cur.center || [0, 0];
+      x = c[0] + (ox / L) * TRAVEL.ferryM; z = c[1] + (oz / L) * TRAVEL.ferryM;
+    }
     P.ap.landing = null;
-    P.ap.setRoute({ name: `departure ferry ${K.dest}`, legs: [{ kind: 'fly', to: [x, Math.max(TRAVEL.ferryAlt, Math.min(800, P.ac.alt)), z], speed: 110, flaps: 0, label: `TO ${KINGDOM[K.dest].short.toUpperCase()}` }], loop: null });
+    P.ap.setRoute({ name: `departure ferry ${K.dest}`, legs: [{ kind: 'fly', to: [x, alt, z], speed: 110, flaps: 0, label: `TO ${KINGDOM[K.dest].short.toUpperCase()}` }], loop: null });
     K.ferry = true;
   }
 
@@ -151,6 +193,7 @@ export function createKingdom(ctx) {
   async function swap(id, mode) {
     if (K.phase) return;
     K.phase = 'in'; K.t = 0; K.mode = mode; K.to = id;
+    if (mode === 'near') { K.t = TRAVEL.cloudIn; K.fog = ctx.scene.fog; ctx.log?.('mapHandover', { to: id }); return; }   // no clouds: straight to the swap
     clouds.hidden = false;
     clouds.querySelector('span').textContent = `${KINGDOM[id].short} ahead`;
     K.fog = ctx.scene.fog;
@@ -159,14 +202,19 @@ export function createKingdom(ctx) {
   }
   async function doSwap() {
     const id = K.to, mode = K.mode, P = S.player, from = here().id, def = KINGDOM[id], t0 = performance.now();
-    const keep = P && mode === 'fly' ? { agl: Math.max(300, Math.min(700, P.ac.agl)), speed: P.ac.speed, throttle: P.ac.ctl.throttle } : null;
+    const keep = P && mode === 'near' ? { near: true } : P && mode === 'fly' ? { agl: K.owner?.agl ?? Math.max(300, Math.min(700, P.ac.agl)), speed: P.ac.speed, throttle: P.ac.ctl.throttle } : null;
     const memBefore = { ...ctx.renderer.info.memory };
+    K.gen = (K.gen || 0) + 1;   // stops the previous swap's shader warm-up poll before this one disposes its materials
+    const own = K.owner;
     try {
+      try { own?.beforeSwap?.(id); } catch (e) { console.warn('[map] trip', e); }
       const flush = () => { for (const e of [...ctx.attract.ai]) ctx.attract.despawn(e); };
       flush(); await sleep(300); flush();
       ctx.traffic.standOwner?.clear?.();
       ctx.getWorld().dispose();
       layout.setAirport(id);
+      // FLIGHTFIX4: the old airport's runway ends, LAND/STOVL fallbacks and the old tower's gate must not outlive it
+      try { P?.ap.airportChanged?.(); takeLandNow(); } catch (e) { console.warn('[map] ap reset', e); }
       AI_JETS.chance = JET_CHANCE[id] ?? JET_CHANCE.royal;
       const w = await ctx.buildWorld({ yield: true });
       ctx.adoptWorld(w);
@@ -174,11 +222,18 @@ export function createKingdom(ctx) {
       flush();
       S.lastStop = null;
       await ctx.attract.start();
-      if (P && keep) arrive(P, from, id, keep);
+      if (P && keep?.near) handover(P);
+      else if (P && keep) arrive(P, from, id, keep);
       else if (P) ctx.placePlayer();
-      try { await Promise.race([ctx.renderer.compileAsync?.(ctx.scene, ctx.camera), sleep(3000)]); } catch (e) { /* optimisation only */ }
-    } catch (e) { console.error('[map] swap failed', e); }
+      const gen = K.gen;
+      try { await warmShaders(ctx.renderer, ctx.scene, ctx.camera, { capMs: 3000, cancelled: () => K.gen !== gen }); } catch (e) { /* optimisation only */ }
+    } catch (e) {
+      console.error('[map] swap failed', e);
+      // the player's route may still name the old airport's runway ends: start them on this airport's runway
+      if (P && here().id !== from) try { ctx.placePlayer(); } catch (e2) { /* */ }
+    }
     clear();
+    if (own && P && keep) try { own.onArrive?.(id); } catch (e) { console.warn('[map] trip', e); }
     const ms = Math.round(performance.now() - t0);
     K.swaps.push({ from, to: id, mode, ms, before: memBefore, after: { ...ctx.renderer.info.memory } });
     ctx.log?.('mapSwap', { from, to: id, mode, ms });
@@ -197,6 +252,14 @@ export function createKingdom(ctx) {
     try { ctx.wiring.link?.placed(P, 8); } catch (e) { /* */ }
   }
 
+  // the same world (palace <-> royal): no teleport, the new tower's arrival from where the plane is
+  function handover(P) {
+    P.ap.landing = null;
+    P.ap.setRoute(arrivalRoute(ctx.wiring.activeEnd(), { type: S.type || 'c172', stand: 'auto', parkSeconds: 30, from: [P.ac.pos.x, P.ac.pos.z] }));
+    P.ap.replan?.();
+    try { ctx.wiring.link?.placed(P, 8); } catch (e) { /* */ }
+  }
+
   // ---------- per frame (real dt); true = the sim is frozen for the swap ----------
   function frame(dt) {
     const P = S.player;
@@ -204,13 +267,13 @@ export function createKingdom(ctx) {
     if (K.phase === 'in') {
       K.t += dt;
       const k = Math.min(1, K.t / TRAVEL.cloudIn);
-      clouds.style.opacity = String(k * k);
-      if (ctx.scene.fog) ctx.scene.fog.density = FOG_DENSITY * (1 + (TRAVEL.fogK - 1) * k);
+      if (K.mode !== 'near') { clouds.style.opacity = String(k * k); if (ctx.scene.fog) ctx.scene.fog.density = FOG_DENSITY * (1 + (TRAVEL.fogK - 1) * k); }
       if (k >= 1) { K.phase = 'swap'; doSwap(); }
       return K.phase === 'swap';
     }
     if (K.phase === 'swap') return true;
     if (K.phase === 'out') {
+      if (K.mode === 'near') { K.phase = null; return false; }
       K.t += dt;
       const k = Math.min(1, K.t / TRAVEL.cloudOut);
       clouds.style.opacity = String(1 - k);
@@ -218,9 +281,14 @@ export function createKingdom(ctx) {
       if (k >= 1) { K.phase = null; clouds.hidden = true; }
       return false;
     }
-    if (!K.dest || !P || P.ac.crashed || S.playMode !== 'free') return false;
-    if (P.ac.onGround) { K.ferry = false; return false; }
+    if (!K.dest || !P || P.ac.crashed || (S.playMode !== 'free' && !K.owner)) return false;
+    if (P.ac.onGround) { if (!K.owner) K.ferry = false; return false; }
     if (!K.ferry && P.ac.agl > 80 && !P.ap.landing) setFerry(P);
+    if (sameWorld(here().id, K.dest)) {
+      const [tx, tz] = destXZ(K.dest);
+      if (Math.hypot(P.ac.pos.x - tx, P.ac.pos.z - tz) < TRAVEL.nearM) swap(K.dest, 'near');
+      return false;
+    }
     const c = here().center || [0, 0], [ox, oz] = offsetM(here().id, K.dest);
     const dx = P.ac.pos.x - c[0], dz = P.ac.pos.z - c[1], d = Math.hypot(dx, dz);
     const toward = (dx * ox + dz * oz) / (d * Math.hypot(ox, oz) || 1);
@@ -255,8 +323,7 @@ export function createKingdom(ctx) {
   // where the HUD's gold diamond points while a trip is on: the destination, in this world's frame
   function target(P) {
     if (!K.dest || !P) return null;
-    const c = here().center || [0, 0], [ox, oz] = offsetM(here().id, K.dest);
-    const x = c[0] + ox, z = c[1] + oz;
+    const [x, z] = destXZ(K.dest);
     return { label: KINGDOM[K.dest].short.toUpperCase(), pos: [x, Math.max(300, P.ac.pos.y), z], dist: Math.hypot(x - P.ac.pos.x, z - P.ac.pos.z) };
   }
 
@@ -277,6 +344,9 @@ export function createKingdom(ctx) {
       while (K.phase) await sleep(100);
     },
     reset() { clear(); setOpen(false); },
+    // STORY3: a mission-owned trip, in any play mode and any plane (the mission flies its own leg out, so no ferry leg);
+    // o: { beforeSwap(to), onArrive(to), agl? (height out of the clouds) } — onArrive runs once the player is placed
+    trip(id, o = {}) { if (!KINGDOM[id] || id === here().id || K.phase) return false; K.dest = id; K.ferry = true; K.owner = o; return true; },
     afterBoot() { if (here().id !== 'royal') ctx.wiring.setTower(here()); },
     state: () => ({ airport: here().id, dest: K.dest, ferry: K.ferry, phase: K.phase, open: K.open, pick: K.pick, swaps: K.swaps.slice() }),
     open: setOpen,

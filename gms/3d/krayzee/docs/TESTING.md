@@ -35,6 +35,7 @@ node tools/test-loop.mjs --falsify=stuck --stuck=40                 # STUCK sepa
 | `--cover-gate=m,p` | off | fail a portrait case whose airborne screen cover is over mean m % or p90 p % (see "Screen cover") |
 | `--cover-shots[=tag]` | off | save heavy message-cover frames to `docs/shots/msgfix/` |
 | `--cover-raw` | off | keep every cover sample in the results JSON |
+| `--log=N` | 14 | game log lines kept with a failing step |
 
 The exit code is 0 only when every case is green (or, with `--falsify`, when every injected fault was caught).
 Each case starts from fresh storage: a seeded pilot (Baron Loop, K-LOOP), coach marks marked as seen, and a career at 0 PP.
@@ -59,10 +60,10 @@ Steps marked *independent* run even when an earlier step failed. A failed blocki
 | 1 | difficulty chip | taps Easy/Medium/Hard on the ground chips (the difficulty is also seeded in `krayzee.settings`, because at 4× the Bathtub lifts off about 2 s real after spawn and the chips go with it; if the chips are already gone, it is a WARN) | `wiring.difficulty` matches; the chip set fades | 2.5 s real/try |
 | 2 | takeoff | — (the AP rolls at once) | lift-off, then 60 m AGL | 60 + 90 |
 | — | time warp *(independent)* | taps the warp chip 1×→2×→5×, measures, then taps back to 1× | sim rate at 5× ≥ 3× the 1× rate. If D18 drops the warp straight back to 1× ("Traffic nearby"), it waits and retries, as a player would, and that is a WARN; still refused after 90 s sim is a FAIL | — |
-| 3 | stick+release | holds the stick base dragged 32 px right, 10 px down, for 3 s sim (real hold = 3 s ÷ timescale; CDP latency makes it 5–8 s sim), then lifts | aileron goes `manual` during the hold; AP back (`AUTOPILOT`, all axes auto) after release; back inside an AP bank (≤ 35°) and sink < 1500 fpm | AP back ≤ 10, recovered ≤ 12 |
+| 3 | stick+release | holds the stick base dragged 32 px right, 10 px down, until 3 s of SIM manual flight have passed (HUDPOLISH: the old wall-clock hold became 5–14 s sim under load), then lifts | aileron goes `manual` during the hold; AP back (`AUTOPILOT`, all axes auto) after release; back inside an AP bank (≤ 35°) and sink < 1500 fpm | AP back ≤ 10, recovered ≤ 12 |
 | 4 | throttle latch+AUTO | drags the lever to ~50 % and lifts; then taps **AUTO** | `latched` within 3 s and still latched 6 s later, value ≈ 0.5; AUTO → `auto` | 40 overall |
 | — | view toggle *(independent)* | taps the view button 3× | chase → center → cockpit → chase | — |
-| — | LAND probe downwind *(independent)* | taps **LAND** on the home downwind; if **LAND NOW** shows, taps it; then cancels with a stick touch | a runway is picked (PLAYTEST_3 #3); LAND NOW turns the plan `straight` and LAND stays active (WARN if not); stick cancels LAND; AP takes back | 30 |
+| — | LAND probe downwind *(independent)* | taps **LAND** on the home downwind; if **LAND NOW** shows, taps it; then cancels with a stick touch | a runway is picked (PLAYTEST_3 #3); LAND NOW makes a new plan: `straight`, or the designed fallback when nothing straight works (FLIGHTFIX3 field, or a jet's runway with a quip), which retires the button; LAND stays active (WARN if not); the stick touch (lifted as soon as LAND cancels) cancels LAND; AP takes back | 30 on the game's own waits (downwind + cancel + AP back); harness round trips reported, not budgeted |
 | 5 | LAND | taps **LAND** once the active runway is < 3.5 km ahead (±25°, aligned ±30°, as D13 expects). If **LAND NOW** shows, its rect is checked (tapped only with `--main-landnow`) | LAND goes active; touchdown with no crash | reach final ≤ 400 (circuit pacing, reported separately); touchdown ≤ 300 after the tap |
 | 6 | stop | — | on the ground and < 1 kt, **or** DEMAND IT already lit (< 5 kt): a player taps it as soon as it turns gold | 90 |
 | 7 | DEMAND IT | waits for the gold button (Hard: for the AP to reach the terminal), then taps it | pending → 0, banked += pending, fuel back to 100 %. Fails early if the AP is DONE and sits still for 40 s with the button not ready | 240 + 5 |
@@ -76,11 +77,39 @@ Steps marked *independent* run even when an earlier step failed. A failed blocki
 **LAND NOW.** LAND NOW (LANDFIX2) shows only while LAND flies a circuit or join. It lands straight ahead, so tapping it
 in the main loop turns the main loop into the field branch. The main loop records whether LAND NOW is shown. On final it never is, because the plan is already straight. The downwind probe taps it, and so does the field branch when it shows. `--main-landnow` taps it in the main loop too.
 
+### HUDPOLISH (2026-10-28): the four flakes and what they were
+
+- **quit confirm: `.krz-quitc-stay` not visible.** The confirm opened and was shut at once by a second click on its backdrop.
+  Under load the first tap's click came late, `tapUntil` tapped QUIT TO MENU again, and that click landed on the confirm's
+  backdrop (a backdrop tap closes it). A player double-tapping did the same. A 0.6 s guard was not enough: under load the
+  second click arrived later than that. Fix in the game (`js/hud/quit.js`): the backdrop no longer closes the card; Keep
+  flying / Quit and lose them are the only ways out. test-hud4: "a double tap on QUIT TO MENU leaves the confirm open".
+- **"LAND NOW not visible".** The probe waited for the plan to turn `straight`. When nothing straight works, LAND NOW makes
+  the designed fallback plan (FLIGHTFIX3 field `FIELD/base`, or a jet's runway with a quip) and retires the button, so the
+  harness read a working tap as swallowed and tapped a button that had gone. The effect is now "straight, or the button
+  retired"; the result says `(nothing straight: fallback)`.
+- **LAND probe over 30 s sim under load.** It was sim time, but most of it was harness: at 4× every real second of CDP round
+  trip is 4 s sim, and under load each `Input.dispatchTouchEvent` waits for a slow frame (a 0.5 s stick touch took ~5 s
+  real = 20 s sim). Load does not change the physics (fixed step; a frame over 0.1 s only slows the sim), but it does change
+  what a wall-clock thumb does to the sim: a "3 s" stick hold became 12–14 s sim of hand-flying. So holds now end on sim
+  time (`D.hold(..., stop)`), and the probe's 30 s budget is on the game's own waits; `[game x s sim, harness y; parts]` is printed.
+- **f35 stick+release "not recovered within 12 s".** Same cause: 12–14 s of sim hand-flying at 247 kt instead of 3 s. With
+  the sim-time hold it holds 3 s sim.
+- **(found on the way) DEMAND TAKEOFF fired by a tap on DEMAND IT.** When DEMAND TAKEOFF appears, DEMAND IT slides up and
+  DEMAND TAKEOFF takes its place; the click that ends a tap is aimed by where things are at touchend, so a thumb that went
+  down on DEMAND IT launched the plane (the loop's "DEMAND TAKEOFF offered: not within 30 s" — it had already left). Fix
+  (`js/hud/place.js startedOn`, `ground.js`, `finish.js`): a tap counts only on the button it went down on, and DEMAND
+  TAKEOFF / SKIP ignore taps for 0.5 s after they appear or move. test-hud4 stages the slide.
+
 ## Detectors (they run on every sample, in every step)
 
 - **Page errors**: `Runtime.exceptionThrown` and `console.error`. Any new one fails the step.
-- **FREEZE** (PLAYTEST_3 #2): over a window of at least 6 sim seconds, the sim clock advanced but either the airborne
-  player or every airborne AI moved < 0.3 m.
+- **FREEZE** (PLAYTEST_3 #2): over a window of at least 6 sim seconds, the sim clock advanced but either the
+  player's own physics clock (`ac.time`) stood still, or the player stayed within 0.3 m while airborne in **every**
+  sample of the window, or every airborne AI moved < 0.3 m. Not a freeze (FLIGHTFIX6, `tools/loop/freeze.mjs`,
+  `node tools/loop/freeze-test.mjs`): a wreck (crashes are reported as crashes), a jet-borne hover (`ac.vtol` > 0.5),
+  and a plane that was on the ground in an older sample (an F-35 VTO 0.2 m up, compared with a sample 18 s older on
+  the grass, read as "static in the air").
 - **STUCK**: no change of AP phase/leg/sub/ground for `--stuck` sim seconds while not parked.
 - **Budget**: a step over its sim budget fails. A real-time cap (budget ÷ timescale × 2.5 + 20 s) catches a stopped clock.
 - **Covered**: every tap checks `elementFromPoint` at the button centre. A button under another element is retried for up
@@ -161,6 +190,23 @@ portrait measured 10.5–13.0 % over four runs while tuning). The story coach wa
 heaviest (coach 7.1, radio 4.3, sheet 2.2): the landscape view is smaller once the side controls are taken out, so the same card is a bigger
 share. The machine was heavily loaded during these runs (other lanes' Chrome, load average 30–90), so step timings were
 slow; the cover numbers are per real second and do not depend on fps.
+
+### HUDPOLISH E1 before / after (2026-10-28, C172 Easy, airborne samples)
+
+Before = the tree with MSGFIX (M2 measured by HUDPOLISH on 2026-10-28; M1 and Free Flight are MSGFIX's 2026-10-27 "after"
+numbers). After = HUDPOLISH: a folded story coach is one line in landscape too (story.css let `.side` and the busy
+two-line clamp unfold it), a radio card that has finished speaking folds to one line on a landscape phone and lingers
+1.2 s instead of 2.2 s, the landscape sheet has one header row and 40 px chips, and chips that all go to the same target
+say it once in the header. Machine load was very high (load average 90-200) during most after runs.
+
+| run | portrait mean / p90 | landscape mean / p90 |
+|---|---|---|
+| Free Flight loop, before | 3.6 % / 8.8 % | 4.4 % / 10.9 % |
+| Free Flight loop, after | 3.7 % / 8.8 % | 4.5 % / 11.0 % |
+| Mission 1, before | 8.1 % / 13.4 % | 9.5 % / 15.8 % |
+| Mission 1, after | 7.7 % / 13.4 % | 7.2 % / 11.7 % (mission cut short at the stop step) |
+| Mission 2, before | 11.0 % / 21.3 % | 13.4 % / 28.6 % |
+| Mission 2, after | 11.2 % / 24.0 % | 10.0-10.9 % / 17-24 % (three runs) |
 
 ## Soak (`--soak`)
 

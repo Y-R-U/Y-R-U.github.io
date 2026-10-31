@@ -41,6 +41,12 @@ export const STORY = [
   { id: 2, title: 'The Pomfrey-Smythe Welcome', objectives: ['cut', 'land'] },
   { id: 3, title: "Queue Is a Commoner's Word", objectives: ['jump', 'bless', 'land'] },
   { id: 4, title: 'The Castle Cup', objectives: ['steal', 'throttle', 'race', 'land'] },
+  { id: 5, title: 'Cream Tea at Muckle Bottom', objectives: ['clouds', 'buzz', 'land'] },
+  { id: 6, title: 'The Royal Wardrobe', objectives: ['clouds', 'wrong', 'land'] },
+  { id: 7, title: 'Not Till That Jet Learns to Hover', objectives: ['clouds', 'hover', 'vland', 'land'] },
+  { id: 8, title: 'The Owls Evacuate', objectives: ['go', 'clouds', 'buzz', 'land'] },
+  { id: 9, title: 'Please Do Come', objectives: ['mudge', 'raf', 'land'] },
+  { id: 10, title: 'Coronation Day', objectives: ['steal', 'race', 'buzz', 'land'], finale: true },
 ];
 
 // Lifetime counters. add defaults to 1; unique counts distinct keys; max keeps the largest; resetOn zeroes it.
@@ -83,6 +89,7 @@ export const FSTATS = {
   formSecs: { on: 'formation', add: (e) => e.dt },
   invSecs:  { on: 'inverted', add: (e) => e.dt },
   hopSecs:  { on: 'air', add: (e) => e.dt, resetOn: ['touchdown'] },
+  pittsRolls: { on: 'roll', when: (e) => e.plane === 'pitts' },
   visits:   { on: 'visit', unique: (e) => e.place },
 };
 
@@ -116,6 +123,12 @@ const SKY = ['cut_in_final', 'forced_goaround', 'tower_buzz', 'terminal_buzz', '
 const ruleTask = (id) => T(`rule_${id}`, RULE_DESC[id][0], INFRACTIONS[id].name, RULE_DESC[id][1], RULE_DESC[id][2], { on: 'infraction', when: rule(id) });
 
 const HEAVY = ['jumbo', 'herc', 'f35'];
+const ROSTER = ['cub', 'pitts', 'throne'];
+// two per mission: finished, and finished with every objective ticked
+const storyTasks = (m) => [
+  T(`story_${m.id}`, m.finale ? '👑' : '📖', m.title, m.finale ? 'Finish the story: win the Royal Bathtub Derby and be crowned.' : `Complete Mission ${m.id}, "${m.title}".`, m.finale ? 'gold' : 'silver', { on: 'story', when: (e) => e.ok && e.mission === m.id }),
+  T(`story_${m.id}_all`, '🏅', `${m.title}: Full Marks`, `Tick every objective in Mission ${m.id}.`, 'silver', { on: 'story', when: (e) => e.ok && e.mission === m.id && m.objectives.every((o) => e.ticks?.includes(o)) }),
+];
 
 export const SETS = [
   { id: 'wheels', name: 'Wheels, Mostly Down', blurb: 'Arrivals of every quality', badge: '🛬', epithet: 'the Well-Landed', tasks: [
@@ -231,6 +244,21 @@ export const SETS = [
     T('f35_vfield', '🥕', 'Turnip Pad', 'Land the Tantrum vertically in a field.', 'gold', { on: 'touchdown', when: plane('f35', (e) => ok(e) && e.vertical && e.surface === 'grass'), plane: 'f35' }),
     T('f35_vhard', '🎯', 'Straight Down, Real Metal', 'Land the Tantrum vertically on Hard.', 'gold', { on: 'touchdown', when: plane('f35', (e) => ok(e) && e.vertical && e.diff === 'hard'), plane: 'f35' }),
   ] },
+  // ROSTER (V1 A1–A3): the Cub, the Pitts and the flying throne
+  { id: 'roster', name: 'Hangar: Show-Offs', blurb: 'Short fields, rolls and a throne', badge: '🎪', epithet: 'the Showman', tasks: [
+    T('fly_cub', '🧈', 'Butter Cub', 'Take off in the Butter Cub.', 'bronze', { on: 'takeoff', when: plane('cub'), plane: 'cub' }),
+    T('cub_lawn', '🌱', 'Croquet, Anyone?', 'Land the Cub on the Palace Lawn.', 'gold', { on: 'touchdown', when: plane('cub', (e) => ok(e) && e.lawn), plane: 'cub' }),
+    T('cub_short', '📏', 'Stop on a Sixpence', 'Land the Cub and stop within 100 m of touching down.', 'silver', { on: 'stopped', when: plane('cub', (e) => e.rollM < 100), plane: 'cub' }),
+    T('cub_farm', '🐑', 'Mind the Ewes', 'Land the Cub on the grass at Muckle Bottom.', 'silver', { on: 'touchdown', when: plane('cub', (e) => ok(e) && e.airport === 'farm' && e.surface === 'grass'), plane: 'cub' }),
+    T('fly_pitts', '🎪', 'Show-Off', 'Take off in the Show-Off.', 'bronze', { on: 'takeoff', when: plane('pitts'), plane: 'pitts' }),
+    T('pitts_snap', '🌪️', 'Snap Roll', 'A full roll in the Pitts in under 2 seconds.', 'silver', { on: 'roll', when: plane('pitts', (e) => e.secs < 2), plane: 'pitts' }),
+    T('pitts_10', '🎡', 'Ten in a Row', 'Ten full rolls in the Pitts in one flight.', 'gold', { fstat: 'pittsRolls', target: 10, plane: 'pitts' }),
+    T('pitts_inv', '🙃', 'Upside-Down Tea', 'Ten seconds inverted in the Pitts, in one go.', 'silver', { on: 'inverted', when: plane('pitts', (e) => e.run >= 10), plane: 'pitts' }),
+    T('fly_throne', '🪑', 'Divine Right', 'Take off in the flying throne.', 'silver', { on: 'takeoff', when: plane('throne'), plane: 'throne' }),
+    T('throne_hover', '👑', 'Holding Court', 'Hover the throne for 30 seconds in one go.', 'silver', { on: 'hover', when: plane('throne', (e) => e.run >= 30), plane: 'throne' }),
+    T('throne_vgrass', '🌼', 'Enthroned on the Lawn', 'Land the throne vertically on grass.', 'gold', { on: 'touchdown', when: plane('throne', (e) => ok(e) && e.vertical && (e.surface === 'grass' || e.surface === 'lawn')), plane: 'throne' }),
+    T('throne_hard', '⚖️', 'Heavy Is the Head', 'Hover the throne on Hard.', 'gold', { on: 'hover', when: plane('throne', (e) => e.diff === 'hard'), plane: 'throne' }),
+  ] },
   { id: 'trial', name: 'Trial by Difficulty', blurb: 'Rubber, partial, real metal', badge: '🛡️', epithet: 'the Hardened', tasks: [
     T('finish_easy', '🐣', 'Easy Does It', 'DEMAND IT to finish a flight on Easy.', 'bronze', { on: 'finished', when: (e) => e.diff === 'easy' }),
     T('finish_medium', '🍳', 'Medium Rare', 'Finish a flight on Medium.', 'bronze', { on: 'finished', when: (e) => e.diff === 'medium' }),
@@ -242,9 +270,12 @@ export const SETS = [
     T('iron_peer', '🗡️', 'Iron Peer', 'Five Hard finishes in a row without being destroyed.', 'gold', { stat: 'hardStreak', target: 5 }),
   ] },
   { id: 'peerage', name: 'The Peerage', blurb: 'The story, finished with flair', badge: '👑', epithet: 'of the Peerage', tasks: [
-    ...STORY.map((m) => T(`story_${m.id}`, '📖', m.title, `Complete Mission ${m.id}, "${m.title}".`, 'silver', { on: 'story', when: (e) => e.ok && e.mission === m.id })),
-    ...STORY.map((m) => T(`story_${m.id}_all`, '🏅', `${m.title}: Full Marks`, `Tick every objective in Mission ${m.id}.`, 'silver', { on: 'story', when: (e) => e.ok && e.mission === m.id && m.objectives.every((o) => e.ticks?.includes(o)) })),
+    ...STORY.filter((m) => m.id <= 5).flatMap(storyTasks),
     T('story_hard', '🎖️', 'Peer of the Realm', 'Complete any mission on Hard.', 'gold', { on: 'story', when: (e) => e.ok && e.diff === 'hard' }),
+  ] },
+  { id: 'coronation', name: 'The Coronation', blurb: 'Across the kingdom, all the way to the crown', badge: '⚜️', epithet: 'the Crowned', tasks: [
+    ...STORY.filter((m) => m.id > 5).flatMap(storyTasks),
+    T('story_crowned_hard', '🛁', 'Crowned in Real Metal', 'Win the Royal Bathtub Derby and be crowned, on Hard.', 'gold', { on: 'story', when: (e) => e.ok && e.diff === 'hard' && STORY.find((m) => m.id === e.mission)?.finale }),
   ] },
   { id: 'silly', name: 'Royal Eccentricities', blurb: 'Things no sane pilot would try', badge: '🥕', epithet: 'the Eccentric', tasks: [
     T('turnip_hop', '🥕', 'Turnip Hop', 'Land in a field, then DEMAND TAKEOFF straight out of it.', 'gold', { on: 'takeoff', when: (e) => e.fromField }),

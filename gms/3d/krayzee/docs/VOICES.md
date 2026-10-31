@@ -135,3 +135,66 @@ $PY gen_barks.py --only toff.greeting.1 --redo    # force one line
 - Voice Studio has no delete endpoint. Superseded `Krayzee · toff/comte/baronin` entries remain on its shelf; their
   ids are listed under `_superseded` in manifest.json. The manifest is the source of truth.
 - Audio total is 15 MB: samples 444 KB, design takes 2.1 MB, barks 11.3 MB.
+
+## New towers (VOICE2, 2026-10-28)
+
+| voice key | who | voice | lines | clips |
+|---|---|---|---|---|
+| `tower_farm` | Farmer Mudge, C-Tower 2 (Muckle Bottom) | new design, saved as `Krayzee · tower_farm` | `data/airports/farm-lines.js` (65) | 65 lines + 33 own title/digit splices |
+| `tower_raf` | Sqn Ldr Imogen Frost, C-Tower 4 (RAF Much Snoring) | **tower_f's saved clone** (manifest `aliasOf`) | `data/airports/airbase-lines.js` (72) | 70 lines + 35 splices copied from tower_f |
+| `tower_m/f/trainee` | `scold_nudge` (V1 D2), 4 tiers each | existing | `build_script.py` → script.json | 12 |
+
+- **Why the map towers are not in script.json.** The radio loads them from the airport def (`def.towerLines`, see
+  js/core/wiring.js `setTower`). Putting them in script.json as well would load each line twice and double the
+  variants. `data/barks/build_towers2.py` turns the two JS line files into `data/barks/towers2.json`, a render-only
+  script, adds the farm's splice ids, and copies tower_f's splice clips under `tower_raf` ids:
+  ```sh
+  python3 data/barks/build_towers2.py
+  cd tools/voice && ~/.cache/krayzee-asr/bin/python gen_barks.py --script ../../data/barks/towers2.json
+  node data/barks/check_towers.mjs --audio      # gate: every line + splice resolves, loudness/silence/duration
+  ```
+- **Mudge's design.** "A grumpy old English farmer in his sixties from rural Somerset … burring rolled r's … 'oi' for
+  'I'. A low, rough, weathered baritone, an ordinary adult male speaking voice at normal volume, dry, grudging …
+  slow". Energy words left out (the falsetto lesson). Six takes: three plain, three on a lightly phonetic audition
+  ("This be Mudge … not on moi cows. Oi've a field to cut … dawdlin'"). Saved: `ph23`, 104 Hz, WER 0.10; Whisper
+  heard "more cows" / "Or have", so the burr is in the reference. Lines get a light `say` spelling (I → Oi, my → moi;
+  build_towers2.py `WEST`); subtitles keep the plain text. His `maxSeconds` assumes ~2.6 words/s, capped at 6 s.
+- **Why C-Tower 4 reuses Imogen's voice.** The airbase controller is already written as "Squadron Leader Imogen"
+  (airbase.js `controllers: ['imogen']`, kingdom.js LOOKS). A new voice would make one character sound like two
+  people. So `tower_raf` is the same clone with its own clipped military script (dispersal, the Air Marshal,
+  "filing this in TRIPLICATE"). A separate voice key keeps those lines out of C-Tower 1, where tower_f also works.
+  If Aaron wants a different person at the airbase, design a new voice under `tower_raf` and re-render; the lines
+  and wiring stay.
+- **scold_nudge** is rendered but dormant: `data/rules.js` `light_touch.scold` still says `scold_bump`. Switching it
+  to `scold_nudge` is one word for the rules owner; every tower (including farm and RAF) has the set.
+- **Status (2026-10-29): complete.** 98 tower_farm clips + sample, 70 tower_raf lines (+35 copied splices), 12
+  scold_nudge. `check_towers.mjs --audio` GREEN: 217/217 resolve, lines −18.8 to −16.1 LUFS, no internal silence over
+  1 s, no runaway; falsified by moving one clip away (RED, 1 failure). Mudge's gravel overshot the limiter once
+  encoded (up to +0.1 dBTP; the originals top out at −1.2), so `build_towers2.py --fix-peaks` turns any new clip
+  above −1.2 dBTP down by the excess (13 passes; those few sit nearer −18 LUFS). Retaken: farm digits six/eight
+  (0.23 s fragments), two/four, titles countess/archduke/archduchess (the last was missing from the first list read).
+  The RAF lines run at Imogen's pace, so 27 of them were sped up 1.04–1.25× to fit `maxSeconds` (3 flagged `long`, all
+  ≤ 0.14 s over). Headless: `js/radio/test/tower-audio.mjs` GREEN at the farm (7/7 lines from clips, 8 splice clips
+  fetched) and the airbase (5/5, incl. `rwy_27`); `--falsify` (block the voice's mp3s) RED 0/9.
+- Render time: the first pass took 2 h 50 min for ~170 takes because five other lanes' headless Chromes had the
+  machine at load 290 and swap full (takes went from ~10 s to 5–10 min). On a quiet machine it is ~25 min.
+
+### Mr Fennimore, C-Tower 3 (`tower_butler`, 2026-10-30)
+- Design: "An elderly English butler in his seventies with an impeccable, old-fashioned Received Pronunciation accent.
+  A low, soft, slightly dry baritone … slow, measured and unflappable, perfectly polite, with very dry understatement."
+  Saved `s23`: 96 Hz, WER 0.04, 11.4 s for the 25-word audition (the slowest voice in the cast, as intended).
+- 65 lines (data/airports/palace-lines.js) + 33 title/digit splices + sample. build_towers2.py renders him with a
+  render-time cap of ~2.4 words/s (the line file says 5 s flat), so no take was sped up. Retaken: countess ("count
+  as"), earl ("world"). `cs_title_duke` is short (0.28 s) but clean.
+- Headless `tower-audio.mjs --airport=palace` (it boots in the Cub: the 240 m lawn refuses the C172) GREEN 6/6,
+  `--falsify` RED 0/6.
+
+### Story lines for missions 5–10 (2026-10-30)
+37 lines (12 narrator, 7 Mudge, 6 Imogen, 4 Toby, 2 Gerald, 5 Rupert, 2 Hyacinth) rendered with
+`tools/story/narrate.py lines`; `textOnly` dropped from all of them in data/story/lines.js. All at −16.4 to −16.9 LUFS.
+The six `wer` flags are Whisper writing numbers ("400", "40 feet") and spellings ("uninviting", "marvelous").
+`check_towers.mjs` now also requires every non-textOnly story line to have `audio/story/<id>.mp3` and a narration.json
+entry (falsified: moving `m_hover.mp3` away → RED).
+- js/story/actors.js copies only *textOnly* tower lines into every tower voice. A voiced line exists in its own voice
+  alone, so M8's `t_jumbo` (Toby, said while Gerald holds the tower) would have been dropped. js/radio now borrows
+  such a line from the voice that has it and plays it in that voice (RADIO.md "Map towers").

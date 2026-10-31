@@ -5,7 +5,7 @@
 //   3. the taxi graph: a hold for every departure end, every stand reaches every hold and back
 //   4. a native autopilot + ATC soak at each new airport (light traffic; heavies at the air base)
 // node tools/airport-check.mjs [--minutes=30] [--only=farm] [--control] [--nosoak] [--quiet]   (--control adds a C-Tower 1 soak)
-// node tools/airport-check.mjs --break=short|overlap|graph|approach   breaks the data on purpose: the run must go red
+// node tools/airport-check.mjs --break=short|overlap|graph|approach|lawn|lawnprop|lawnfloor   breaks the data on purpose: the run must go red
 import { KINGDOM, ORDER, canUse } from '../data/airports/kingdom.js';
 import * as L from '../js/world/layout.js';
 import { AIRCRAFT } from '../data/aircraft.js';
@@ -16,6 +16,7 @@ const EXPECT = {
   royal: FLYABLE,
   farm: ['c172', 'tiger', 'bathtub'],
   airbase: FLYABLE,
+  palace: ['tiger', 'bathtub', 'f35'],   // the F-35 by a vertical landing (palace.vertical)
 };
 let pass = 0, fail = 0;
 const check = (name, ok, detail = '') => { ok ? pass++ : fail++; if (!ok || !args.quiet) console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  · ' + detail : ''}`); };
@@ -25,6 +26,9 @@ if (args.break === 'short') defs.farm.runways[0].length = 900;
 if (args.break === 'overlap') defs.farm.props.push({ kind: 'bales', center: [...defs.farm.runways[0].center], size: [12, 8], heading: 0, h: 2.4 });
 if (args.break === 'graph') defs.farm.taxiways = defs.farm.taxiways.filter((t) => t.id !== 'H2');
 if (args.break === 'approach') defs.airbase.props.push({ kind: 'shed', center: [1700, 0, 10], size: [20, 12], heading: 0, h: 7 });
+if (args.break === 'lawn') defs.palace.runways[0].length = 180;
+if (args.break === 'lawnprop') defs.palace.props.push({ kind: 'topiary', shape: 'cone', center: [1440, 0, -1600], size: [3, 3], heading: 80, h: 4 });   // in the 26 approach
+if (args.break === 'lawnfloor') defs.palace.runways[0].length = 226;   // Tiger's floor 224 + 15 m line-up
 
 // ---------- 1. runway vs aircraft ----------
 for (const id of ORDER) {
@@ -33,8 +37,9 @@ for (const id of ORDER) {
   const row = FLYABLE.map((t) => { const u = canUse(def, t); return `${t} ${u.need}${u.ok ? '' : '✗'}`; }).join(' · ');
   check(`${id}: runway ${Math.max(...def.runways.map((r) => r.length))} m serves exactly ${EXPECT[id].join(', ')}`, allowed.join() === EXPECT[id].join(), row);
   for (const t of FLYABLE) if (!canUse(def, t).ok) check(`${id}: ${t} refused with a quip`, !!canUse(def, t).quip, canUse(def, t).quip);
-  // the autopilot only lines up / DEMANDs a takeoff with _minRun() of runway ahead (600 m, jets their roll + 10 %), from ~12 m in
-  const ap = allowed.map((t) => { const a = AIRCRAFT[t]; const m = a.flight?.jet ? Math.max(600, (a.performance?.takeoffRollM ?? 600) * 1.1) : 600; return [t, Math.round(m)]; });
+  // the autopilot only lines up / DEMANDs a takeoff with _minRun() of runway ahead (jets their roll + 10 %, at least 600 m;
+  // light types their roll × 1.4, at least 150 m), from ~12 m in. A STOVL jet at a vertical airport goes straight up instead.
+  const ap = allowed.filter((t) => !canUse(def, t).vertical).map((t) => { const a = AIRCRAFT[t], roll = a.performance?.takeoffRollM; const m = a.flight?.jet ? Math.max(600, (roll ?? 600) * 1.1) : roll ? Math.max(150, roll * 1.4) : 600; return [t, Math.round(m)]; });
   const usable = Math.max(...def.runways.filter((rw) => rw.departures !== false && !rw.closed).map((rw) => rw.length));
   check(`${id}: every allowed type can take off under the autopilot's runway floor (+15 m line-up)`, ap.every(([, m]) => usable >= m + 15), ap.map(([t, m]) => `${t} ${m}`).join(' · '));
 }
@@ -128,6 +133,7 @@ if (!args.nosoak) {
     ...(args.control ? [{ id: 'royal', types: ['c172', 'c172', 'tiger', 'bathtub'], max: 4, seed: 11 }] : []),
     { id: 'farm', types: ['c172', 'c172', 'tiger', 'bathtub'], max: 4, seed: 11 },
     { id: 'airbase', types: ['c172', 'c172', 'tiger', 'herc', 'f35', 'jumbo'], max: 4, seed: 23, oneJet: true },
+    { id: 'palace', types: KINGDOM.palace.aiTypes, max: 4, seed: 31 },   // what js/world/aipool.js lets fly there
   ];
   const mins = +(args.minutes || 30);
   for (const so of SOAKS) {

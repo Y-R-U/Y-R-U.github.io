@@ -376,7 +376,9 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     const r = rec.rig.root;
     r.position.set(ac.pos.x, ac.pos.y, ac.pos.z); r.quaternion.set(ac.q.x, ac.q.y, ac.q.z, ac.q.w);
     r.visible = true;
-    if (rec.ent) rec.ent.apOff = !!tr.latest()?.overriding;
+    const L = tr.latest();
+    if (rec.ent) rec.ent.apOff = !!L?.overriding;
+    if (L && L.nozzle != null) { ac.nozzle = L.nozzle; ac.liftFan = L.fan; } // F2: the F-35's nozzle + lift-fan doors (traffic.js poses the rig)
     rec.st = s;
     return s;
   }
@@ -448,7 +450,8 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     const livery = safe(() => (ui?.getLivery ? ui.getLivery() : p), p);
     return { t: 'hi', type: P?.ac.type || 'c172', livery, name: p.name, title: p.title, g: p.gender, voice: p.voice, sv: !!net.saver };
   }
-  function sayHi(to) { if (!P) return; const h = myHi(); if (to) net.send(to, h); else net.broadcast(h); }
+  // re: "please say hi back" — a peer that attached after our hi arrived dropped it (onMsg ignores messages while detached)
+  function sayHi(to, re = false) { if (!P) return; const h = myHi(); if (re) h.re = 1; if (to) net.send(to, h); else net.broadcast(h); }
 
   // ---------------------------------------------------------------- court
   function addCourtPlayer(m) {
@@ -607,7 +610,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     const fromHost = from === net.hostId;
     switch (m.t) {
       case 'sv': if (m.on) savers.add(from); else savers.delete(from); break;
-      case 'hi': if ('sv' in m) { if (m.sv) savers.add(from); else savers.delete(from); } if (m.livery && typeof m.livery === 'object') ensureHuman(from, m); if (!hiSent.has(from)) { hiSent.add(from); sayHi(from); } break;
+      case 'hi': if ('sv' in m) { if (m.sv) savers.add(from); else savers.delete(from); } if (m.livery && typeof m.livery === 'object') ensureHuman(from, m); if (!hiSent.has(from) || m.re) { hiSent.add(from); sayHi(from); } break;
       case 'inf': if (role === 'host') onInf(from, m); break;
       case 'bank': if (role === 'host') onBank(from, m); break;
       case 'bark': if (role === 'host') onBark(from, m); break;
@@ -649,7 +652,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
     if (!attached) return;
     const ids = new Set(net.members.map((m) => m.id));
     for (const id of [...humans.keys()]) if (!ids.has(id)) dropHuman(id);
-    for (const m of others()) if (!hiSent.has(m.id)) { hiSent.add(m.id); sayHi(m.id); }
+    for (const m of others()) if (!hiSent.has(m.id)) { hiSent.add(m.id); sayHi(m.id, true); }
     if (role === 'host') {
       for (const m of net.members) addCourtPlayer(m);
       for (const id of court.standings().map((p) => p.id)) if (!ids.has(id.slice(2))) court.removePlayer(id, net.roomTime());
@@ -871,7 +874,7 @@ export function createSession({ net, scene, traffic, wiring, createPlane, applyE
       }));
     }
     onRoom();
-    sayHi();
+    sayHi(null, true);
     log('net.attach', { role, room: net.room?.code });
   }
 

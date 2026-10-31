@@ -47,7 +47,8 @@
   "scold_near_miss",
   "scold_bump",
   "scold_generic",
-  "reply_priority"
+  "reply_priority",
+  "scold_nudge"
  ],
  "lines": [
   {
@@ -4773,6 +4774,44 @@
    "maxSeconds": 2.7
   },
   {
+   "id": "tower_m.scold_nudge.t1",
+   "voice": "tower_m",
+   "intent": "scold_nudge",
+   "tier": 1,
+   "text": "contact noted. Please keep your aircraft to yourself.",
+   "delivery": "calm, professional; calm male controller, weary",
+   "maxSeconds": 3.4,
+   "callsign": "pre"
+  },
+  {
+   "id": "tower_m.scold_nudge.t2",
+   "voice": "tower_m",
+   "intent": "scold_nudge",
+   "tier": 2,
+   "text": "did you just... nudge them? On purpose?",
+   "delivery": "strained, over-precise; calm male controller, weary",
+   "maxSeconds": 3.0,
+   "callsign": "pre"
+  },
+  {
+   "id": "tower_m.scold_nudge.t3",
+   "voice": "tower_m",
+   "intent": "scold_nudge",
+   "tier": 3,
+   "text": "This is an aerodrome, not a dodgem track!",
+   "delivery": "cracking, sarcastic, voice wobbling; calm male controller, weary",
+   "maxSeconds": 3.4
+  },
+  {
+   "id": "tower_m.scold_nudge.t4",
+   "voice": "tower_m",
+   "intent": "scold_nudge",
+   "tier": 4,
+   "text": "A love tap. He calls it a love tap. Thirty-one years.",
+   "delivery": "shouting then catching themselves; calm male controller, weary",
+   "maxSeconds": 4.4
+  },
+  {
    "id": "tower_m.cs_title_baron",
    "voice": "tower_m",
    "intent": "splice_title",
@@ -5726,6 +5765,44 @@
    "maxSeconds": 3.4
   },
   {
+   "id": "tower_f.scold_nudge.t1",
+   "voice": "tower_f",
+   "intent": "scold_nudge",
+   "tier": 1,
+   "text": "contact noted. Keep your wingtips to yourself.",
+   "delivery": "calm, professional; icy precise female controller",
+   "maxSeconds": 3.0,
+   "callsign": "pre"
+  },
+  {
+   "id": "tower_f.scold_nudge.t2",
+   "voice": "tower_f",
+   "intent": "scold_nudge",
+   "tier": 2,
+   "text": "you touched another aircraft. Deliberately. I saw.",
+   "delivery": "strained, over-precise; icy precise female controller",
+   "maxSeconds": 3.0,
+   "callsign": "pre"
+  },
+  {
+   "id": "tower_f.scold_nudge.t3",
+   "voice": "tower_f",
+   "intent": "scold_nudge",
+   "tier": 3,
+   "text": "A love tap. How touching. Literally.",
+   "delivery": "cracking, sarcastic, voice wobbling; icy precise female controller",
+   "maxSeconds": 2.7
+  },
+  {
+   "id": "tower_f.scold_nudge.t4",
+   "voice": "tower_f",
+   "intent": "scold_nudge",
+   "tier": 4,
+   "text": "Hands OFF the other aircraft! ...Thank you.",
+   "delivery": "shouting then catching themselves; icy precise female controller",
+   "maxSeconds": 3.0
+  },
+  {
    "id": "tower_f.cs_title_baron",
    "voice": "tower_f",
    "intent": "splice_title",
@@ -6675,6 +6752,44 @@
    "intent": "reply_priority",
    "tier": 4,
    "text": "You're all royalty! I'm just Toby!",
+   "delivery": "full panic, near tears; eager nervous young trainee",
+   "maxSeconds": 2.7
+  },
+  {
+   "id": "tower_trainee.scold_nudge.t1",
+   "voice": "tower_trainee",
+   "intent": "scold_nudge",
+   "tier": 1,
+   "text": "um, did you just touch them? Is that allowed?",
+   "delivery": "polite, uncertain; eager nervous young trainee",
+   "maxSeconds": 3.7,
+   "callsign": "pre"
+  },
+  {
+   "id": "tower_trainee.scold_nudge.t2",
+   "voice": "tower_trainee",
+   "intent": "scold_nudge",
+   "tier": 2,
+   "text": "no touching! There's definitely no touching!",
+   "delivery": "flustered, rushing; eager nervous young trainee",
+   "maxSeconds": 2.7,
+   "callsign": "pre"
+  },
+  {
+   "id": "tower_trainee.scold_nudge.t3",
+   "voice": "tower_trainee",
+   "intent": "scold_nudge",
+   "tier": 3,
+   "text": "You're nudging! Why is everyone nudging?!",
+   "delivery": "panicking, high-pitched; eager nervous young trainee",
+   "maxSeconds": 2.7
+  },
+  {
+   "id": "tower_trainee.scold_nudge.t4",
+   "voice": "tower_trainee",
+   "intent": "scold_nudge",
+   "tier": 4,
+   "text": "Gerald never said there'd be NUDGING!",
    "delivery": "full panic, near tears; eager nervous young trainee",
    "maxSeconds": 2.7
   },

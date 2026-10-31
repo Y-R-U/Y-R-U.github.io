@@ -64,7 +64,7 @@ console.log('aligned runway preference');
 
 console.log('grass when no pavement in the cone');
 {
-  const p = plan(2600, 1400, 220, 90);
+  const p = plan(2600, 2400, 220, 90);   // FLIGHTFIX4: was z 1400, which is an extended downwind of 27 (home since FIX4)
   ok(!p.fail && p.kind === 'grass', 'east of field heading east → grass', JSON.stringify({ k: p.kind, f: p.fail }));
   ok(!p.fail && p.stripLength >= LAND.minLen, 'strip ≥ 350 m', p.stripLength);
   if (!p.fail) ok(stripViolations(p).length === 0, 'grass strip clear', stripViolations(p).join(' '));
@@ -136,6 +136,63 @@ console.log(`random sweep ×${N}`);
   ok(badCone === 0, 'every strip ≥ minLen');
   ok(badAlt === 0, 'approach waypoints clear terrain by ≥ 20 m', `${badAlt}`);
   ok(plans > N * 0.3, 'planner finds something most of the time', `${plans}/${N}`);
+}
+
+// FLIGHTFIX4 (loop c172 "LAND probe downwind" picked FIELD): the home runway on the home circuit
+{
+  console.log('FLIGHTFIX4: home runway on the home circuit');
+  // a downwind ATC stretched ~3–4.5 km past the end (extendDownwind): still the home circuit, not a field ahead
+  const ext = [2900, 3600, 4400].map((x) => plan(x, 1150, 260, 90, 75, world));
+  ok(ext.every((p) => p.kind === 'runway'), 'LAND on a downwind extended 3–4.5 km past the end picks the home runway', ext.map((p) => `${p.label || p.fail}/${p.pattern}`).join(' '));
+  // low on the circuit with the runway ahead but too close for a straight-in: the runway's circuit, not a field
+  const low = [[-1300, 300, 80, 90], [-1300, 300, 60, 90], [-1500, 500, 80, 90]].map(([x, z, a, h]) => plan(x, z, world.groundHeightAt(x, z) + a, h, 70, world));
+  ok(low.every((p) => p.kind === 'runway'), 'low (60–80 m) near the home runway, runway ahead: LAND keeps the runway', low.map((p) => `${p.label || p.fail}/${p.pattern}`).join(' '));
+}
+
+// FLIGHTFIX5 (loop throne-hard "ditched in the water"): the River Krumble (17–32 m wide) slipped between the planner's
+// 48 m dry-block samples, so LAND NOW's field ran across it. An 18 m river placed exactly between the samples; the world
+// says where its narrow water is (waterNear), and no field strip may cross it. Red without waterNear in landahead.js.
+{
+  console.log('FLIGHTFIX5: narrow river');
+  const RX = -1884, wet = (x) => Math.abs(x - RX) < 9;
+  const w = { ...world, surfaceAt: (x, z) => (wet(x) ? 'water' : world.surfaceAt(x, z)), ...(args.falsify ? {} : { waterNear: (x, z, r) => Math.abs(x - RX) < r + 9 }) };
+  const bad = [];
+  let n = 0;
+  for (const z of [700, 900, 1100, 1500, 2000, 2400]) for (const x0 of [-1500, -1400, -1300]) for (const straight of [true, false]) {
+    const alt = w.groundHeightAt(x0, z) + 60;
+    const p = planLandAhead({ pos: [x0, alt, z], vel: [-33, 0, 0], heading: 270, altitude: alt, world: w, layout, straight });
+    if (p.fail || !p.strip) continue;
+    n++;
+    const [sx] = p.strip.start, [ex] = p.strip.end;
+    if (Math.min(sx, ex) < RX + 9 && Math.max(sx, ex) > RX - 9) bad.push(`${x0},${z}${straight ? ' NOW' : ''}: ${Math.round(sx)}→${Math.round(ex)}`);
+  }
+  ok(n >= 20 && !bad.length, 'no LAND / LAND NOW strip crosses an 18 m river that misses every dry-block sample', `${n} plans; across the water: ${bad.slice(0, 4).join(' | ')}`);
+}
+
+// FLIGHTFIX4: LAND NOW must not vanish from under the thumb (loop c172-hard: .krz-land-now covered by .krz-land-txt)
+{
+  console.log('FLIGHTFIX4: LAND NOW hysteresis');
+  const { createLandButton, noteLandPlan } = await import('../landbutton.js');
+  const node = () => { const n = { dataset: {}, children: [], style: {}, hidden: false, classList: { add() {}, remove() {}, toggle() {} }, setAttribute() {}, addEventListener() {}, appendChild(c) { n.children.push(c); }, append() {}, remove() {}, contains: () => false, querySelector: () => node(), set innerHTML(v) {}, get innerHTML() { return ''; } }; return n; };
+  const g = globalThis, doc0 = g.document;
+  g.document = { createElement: node, getElementById: () => null, head: node() };
+  let T = 0; const now0 = performance.now; performance.now = () => T;
+  const b = createLandButton({ container: node() });
+  const plan = { pattern: 'base', leg: 'fly' };
+  noteLandPlan(plan); b.setState('active', 'RWY 27');
+  const shown0 = b.nowShown;
+  T += 400; plan.leg = 'approach'; b.setState('active', 'RWY 27');   // the plan reaches its final 0.4 s later
+  const held = b.nowShown;
+  T += 3000; b.setState('active', 'RWY 27');
+  const gone = !b.nowShown;
+  plan.leg = 'fly'; T += 200; b.setState('active', 'RWY 27');        // a go-around 0.2 s after it went: not back at once
+  const gap = !b.nowShown;
+  T += 1500; b.setState('active', 'RWY 27');
+  const back = b.nowShown;
+  b.setState('idle'); const off = !b.nowShown;
+  b.dispose(); performance.now = now0; g.document = doc0;
+  ok(shown0 && held && gone && gap && back && off, 'LAND NOW, once shown, stays ≥ 2.5 s; hidden, it waits 1 s before coming back; LAND ending hides it at once',
+    JSON.stringify({ shown0, held, gone, gap, back, off }));
 }
 
 console.log(`\n${pass} passed, ${fail} failed${args.falsify ? '  (falsify mode: failures expected)' : ''}`);

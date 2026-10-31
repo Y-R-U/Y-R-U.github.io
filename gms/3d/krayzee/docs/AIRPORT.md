@@ -236,3 +236,32 @@ Screenshots in `docs/shots/art3/`: `before_*` / `after_*` (chase, center, cockpi
 - **Tower crew**: 12 meshes → one `SkinnedMesh` (one bone per body/head/arm, rigid weights; same animation code on the
   bones), hidden and not animated beyond 400 m of the cab. 13 calls → 2 (crew + radar) near the tower, 1 beyond 400 m.
   `tower.crew` still lists `{ body, head, arms }` (now bones). Shots: `tower-a/b.jpg` (arms animate).
+
+## Round 4 — WORLD lane, C2 Palace Lawn + C3 looks (2026-10-28)
+C2 (C-Tower 3, the Palace Lawn inside this world) is documented in docs/MAP.md "C-Tower 3 · The Palace Lawn". The world
+side: `js/world/palace.js` (one ground mesh + two merged meshes + the butler, all culled as one away from it;
+obstacles from `data/airports/palace.js` `props`), `palaceSurface()` in `surfaceAt`, the lawn id in `runwayAt`, a flat
+zone + approach corridors in `terrain.js`, croquet stripes in the terrain shader's mown grass, and the
+**park/revive** of this world in `buildWorld` (a swap to an airport with `scenery.biome: 'royal'` reuses it).
+C-Tower 1's builders (pavement, lights, props, terminal, tower, geom, terrain) read `data/airports/royal.js` instead of
+the live layout, so the world is identical whichever airport is active.
+
+C3 additions (C-Tower 1 only unless noted; draw calls added in brackets):
+- **Far hills** on every horizon (all airports): two ranges of blued ridges drawn in the sky shader (`env.js`, uniform
+  `uMount`) where the terrain's own edge fades into haze. [0]
+- **The River Krumble** (`js/world/river.js`): from the north-west hills into the lake, out of it south-west under the
+  09 approach; Catmull-Rom + meanders, 17–30 m wide, a ribbon draped on the terrain and merged into the lake's mesh (same
+  PBR water) [0]. A 40 m distance field (`riverDist`, built once, ~25k cells) drives the valley floor (openness and the
+  far-hill ramp), the muddy banks (mask .g), `surfaceAt` 'water' (via `inLake`), no woods/trees on the water, and
+  willows/alders along the banks (tree extras). Stone **bridges** with piers and parapets wherever a road, lane or farm
+  track crosses (`buildBridges`, merged into the town mesh) [0].
+- **Traffic** (`js/world/cars.js`): one `InstancedMesh` of saloons (26, low tier 14), instance-coloured, driving on the
+  left both ways along the long road, the south road, the high street and a lane, over the bridges. [1]
+- **Village fête** (`js/world/fete.js`): a mown village green (was a ploughed field under it), cricket square with
+  creases, stumps and sightscreens, a green-roofed pavilion, a red-and-white maypole with ribbons, bunting round the
+  green and down both village streets. Merged into the town mesh [0].
+- Not done: field-grid regularity (straight block lines visible from 2 km+), time of day. Ideas in docs/PERF.md.
+
+Tools: `tools/world-perf.mjs` (per-airport fps / CPU ms / calls / tris at a CPU throttle + the screenshots in
+`docs/shots/world/`), `tools/world-shot.mjs` (a still of the test bed from any `--pos/--look`), test bed
+`tools/airport.html?pos=x,y,z&look=x,y,z&fov=` (custom camera; sets `window.__ready`), `tools/test-palace.mjs`.

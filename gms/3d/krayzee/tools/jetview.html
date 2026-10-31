@@ -20,7 +20,7 @@
 </head>
 <body>
 <div id="bar">
-  <select id="type"><option value="jumbo">Royal Jumbo</option><option value="herc">Royal Hercules</option></select>
+  <select id="type"><option value="jumbo">Royal Jumbo</option><option value="herc">Royal Hercules</option><option value="cub">Butter Cub</option><option value="pitts">Show-Off (Pitts)</option><option value="throne">Divine Right (throne)</option></select>
   <button id="vChase" class="on">Chase</button><button id="vCenter">Center</button><button id="vCockpit">Cockpit</button>
   <button id="gear" class="on">Gear</button><button id="extra">Stairs/Ramp</button><button id="anim">Animate</button><button id="spin">Turntable</button>
 </div>
@@ -28,6 +28,7 @@
 <script type="module">
 // JETMODELS-A viewer: tools/jetview.html?type=jumbo|herc&view=chase|cockpit|center&az=&el=&dist=&fov=&q=low
 // &gear=0..1 &stairs=1 &ramp=0..1 &throttle= &flaps= &lod=0|1|2 (force a level) &shot (hide UI) &spin (turntable)
+// ROSTER: type=cub|pitts|throne too; &level (taildraggers datum-level instead of tail-down), &nozzle=0..1 (throne jet pack)
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { createPlane } from '../js/plane/index.js';
@@ -70,6 +71,8 @@ const plane = await createPlane({ type: TYPE, quality, cockpit: Q.get('cockpit')
 const buildMs = performance.now() - t0;
 const D = plane.dims;
 plane.root.position.y = D.restHeight ?? D.gearHeight;
+if (D.groundPitch && !Q.has('level')) plane.root.rotation.x = D.groundPitch;   // taildraggers sit tail-down (ROSTER)
+if (Q.has('nozzle')) { plane.setNozzle?.(+Q.get('nozzle'), true); plane.setLiftFan?.(+Q.get('nozzle'), true); }
 scene.add(plane.root);
 window.__plane = plane;
 if (Q.has('ramp')) plane.setRamp?.(+Q.get('ramp'));

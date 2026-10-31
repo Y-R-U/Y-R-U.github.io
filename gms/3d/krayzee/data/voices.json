@@ -127,6 +127,27 @@
       "gender": "m", "style": "trainee",
       "ttsDesign": "Panicky junior English air traffic controller, young man about 21, light English accent, eager and friendly but nervous, voice rising in pitch when stressed, rushed delivery, medium-high pitch.",
       "sample": "Go around! Go around! Sorry! Go around!"
+    },
+    "tower_farm": {
+      "name": "Farmer Mudge",
+      "blurb": "Runs C-Tower 2 from the milking parlour at Muckle Bottom. Has never wanted an airfield. Has one anyway.",
+      "gender": "m", "style": "farmer",
+      "ttsDesign": "A grumpy old English farmer in his sixties from rural Somerset with a broad West Country accent: burring rolled r's, broad slow vowels, 'oi' for 'I'. A low, rough, weathered baritone, an ordinary adult male speaking voice at normal volume, dry, grudging and unimpressed, slow unhurried delivery.",
+      "sample": "Land on the grass, not the cows."
+    },
+    "tower_butler": {
+      "name": "Mr Fennimore",
+      "blurb": "The Royal Butler, C-Tower 3 on the Palace Lawn. Runs the radio from a silver tray. Has never been flustered, and does not intend to start.",
+      "gender": "m", "style": "butler",
+      "ttsDesign": "An elderly English butler in his seventies with an impeccable, old-fashioned Received Pronunciation accent. A low, soft, slightly dry baritone, an ordinary adult male speaking voice at normal volume, slow, measured and unflappable, perfectly polite, with very dry understatement.",
+      "sample": "Do mind the croquet hoops."
+    },
+    "tower_raf": {
+      "name": "Imogen Frost",
+      "blurb": "Squadron Leader at RAF Much Snoring (C-Tower 4). Same Imogen, same voice, military frequency.",
+      "gender": "f", "style": "controller",
+      "sameVoiceAs": "tower_f",
+      "sample": "Off. My. Runway. That is not a request."
     }
   }
 }

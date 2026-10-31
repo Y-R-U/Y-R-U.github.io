@@ -198,3 +198,119 @@ M3 demandfast 16/16, M4 gate 16/16. Picker 8/8. Falsified (each makes its own ch
   `node tools/story/test-warp-chip.mjs` (real tap, traffic parked off the wing).
 - Results: M1 17/17, M2 16/16, M3 16/16 (+ landscape 16/16), M4 16/16 (+ landscape 16/16), M2 Medium 16/16 (scripted turn-in);
   `--falsify=crime`: M2 6/10, M3 15/16, M4 15/16 (each red).
+
+## STORY3 — Missions 5–10 across the Kingdom Map, the finale and the ending (2026-10-28)
+
+The campaign leaves C-Tower 1 (D29 deferred "missions between airports" to here): each mission flies its own plane, most
+cross the magic clouds, and Mission 10 crowns you.
+
+| # | title | plane | where | rule-break | the plane's moment |
+|---|---|---|---|---|---|
+| 5 | Cream Tea at Muckle Bottom | Tiger Moth | C-Tower 1 → Muckle Bottom | `tower_buzz` (Mudge's water tank) | open-cockpit hop through the clouds, grass strip |
+| 6 | The Royal Wardrobe | Hercules | C-Tower 1 → RAF Much Snoring | `wrong_way` (lands 09 while 27 is in use) | the coronation robes, delivered to the airbase |
+| 7 | Not Till That Jet Learns to Hover | F-35 | C-Tower 1 → Muckle Bottom | `grass_landing` / `apron_landing` | HOVER + LAND HERE in Mudge's turnip field (Easy) or farmyard (Medium/Hard) |
+| 8 | The Owls Evacuate | Jumbo | **starts at RAF Much Snoring** (third in an RAF queue) → C-Tower 1 | `queue_jump` (DEMAND TAKEOFF), `tower_buzz` | four hundred royals; a Jumbo low past Gerald's owls, then 1400 m |
+| 9 | Please Do Come | C172 | C-Tower 1 → Muckle Bottom → RAF Much Snoring | `tower_buzz` × 2 | every tower in the kingdom in one flight (two trips) |
+| 10 | Coronation Day (finale) | Bathtub | C-Tower 1, castle hill | `runway_steal`/`double_occupancy`, `tower_buzz` | the Royal Bathtub Derby vs Rupert's mauve bathtub; crowned |
+
+Characters: Toby, Gerald and Imogen as before; **Farmer Mudge** (C-Tower 2, `CONTROLLERS.mudge`, voice `tower_farm`); Imogen
+also runs Much Snoring; Lord Rupert (un-inviting people, "jets can't hover", the Derby); **Mother** — the Dowager Duchess
+Hyacinth, whom Rupert has threatened with since Mission 4 — finally speaks in the finale.
+
+### How it works
+- **Plane and airport per mission**: `def.aircraft`, `def.airport` (default `royal`). main.js (`// STORY3`, 3 lines):
+  `aircraftType()` returns `S.storyPlane` in story mode; `startMission(id, direct)` sets it, swaps to `story.airportFor(id)`
+  (`kingdom.ensure`), and passes `relaunch(n)` = end + quit + `startMission(n, true)`. The picker, **Next mission** and
+  **Fly it again** call `relaunch` whenever the plane or airport differs (`story/index.js needsRelaunch`, guarded by
+  `relaunched` so it can never loop).
+- **Trips** (`js/map/index.js trip(id, { beforeSwap, onArrive })`, STORY3 hook): a mission-owned trip in any play mode and
+  any plane (the F-35 to the farm). The mission flies its own leg out (`tripLeg`), the map swaps at 4 km as usual; story
+  planes are despawned before the swap (`beforeSwap`); `onArrive` → `missions.js arrived()` rebuilds the route for the new
+  airport (`def.route(end, diff, { from, at })`), starts it at `marks.arrive`, sets `def.arriveTower[id]`, runs `def.onArrive`.
+  `tripStep(to, { agl })` can set the height the plane comes out of the clouds (the Jumbo: 260 m, so it can get down
+  for the tower pass; the map's own trips keep 300–700 m).
+- **Shared steps** (`data/story/common.js`): `tripStep(to)` (the clouds; target = the map's destination diamond),
+  `buzzStep({ obj, lo })` (a low pass flown by `towerRun`/`passLegs` — low on Easy, wide/high on Medium/Hard; a miss goes
+  out and back in behind the lead-in, never a tight turn back onto it; the pass clearance follows the tower's height,
+  because the AP will not sink below ground + clearance + 40 m),
+  `landingTail(e, base)` (line-up racetrack + a takeoff leg for relaunches), `tripStart`, `arrivalPoint`, `msl()` (heights
+  over the real terrain: the farm's `elev` is not the world's ground height).
+- **M7 STOVL**: steps `hover` (tick when the AP reaches a hover after the player pressed HOVER), `over` (Easy/Medium: the
+  hover's hold point is walked over the pad, `host.hoverHold`; Hard: you fly it), `landhere`, then `stop`: a vertical landing
+  within 200 m of the pad ticks `vland`; the wrong spot for the difficulty's finish rules (or too far) → VERTICAL TAKEOFF
+  and back to the hover.
+- **Finale**: M4's race engine on the Derby course (church → castle → low past the tower), Rupert in a mauve bathtub,
+  lined up and gated: he lets the brakes off once you are rolling (Easy), once you DEMAND (Medium), or at once (Hard). A
+  bathtub cannot fly under ~45 kt, so Easy has him dawdle when ahead; Medium/Hard need your throttle (`BASE` 110 + 40 ×
+  lever route-knots vs his 90/96: a bathtub tops out near 55 kt, so his edge is small). `def.onComplete` → `career.setStoryComplete()` (Bathtub unlocked in Free Flight, rank
+  floor Prince, `canPickTitle`); `progress.complete` is saved; `def.ending` shows **the coronation** after the Herald reel and
+  before the reward card: crown, "Long live <title> <name>, Sovereign of the Skies", one line per character, "THE END"-style
+  closing line, **Long may you reign ›**.
+- **Text-only lines**: every new line is `textOnly: true` in `data/story/lines.js`: no clip is fetched, the radio shows the
+  subtitle; text-only tower lines are loaded for every tower voice (they still work if VOICE2 gives the airbase `tower_raf`).
+  Narration ids that are text-only are skipped by the briefing narrator.
+
+### Palace Lawn (D27) — moving the finale there
+The finale is built on what exists now: the Derby finishes low past C-Tower 1's tower and lands on the active runway. To
+move the landing to the lawn once WORLD ships it: in `mission10.js` replace `landingTail(e, …)` with legs that line up on
+the lawn's strip (its own `rwEnd`-style frame), point the `land` step's target at the lawn, and make `stop` accept the
+lawn as the finish spot (Hard: the lawn's designated spot). The C172-class floor in `Autopilot._minRun()` already lets a
+bathtub use a 240 m lawn. Nothing else in the Derby depends on the runway.
+
+### Lines needing VO (VOICE2)
+Render with `python3 tools/story/narrate.py lines` (it reads `BRIEF_LINES` + `RADIO_LINES`), then drop `textOnly` from each
+rendered line. Farmer Mudge (`tower_farm`) has no saved clone yet; his lines can wait for VOICE2's Mudge voice.
+
+| id | voice | line |
+|---|---|---|
+| n51 | narrator | The Queen has announced a coronation. Somebody will be crowned Sovereign of the Skies, and the tea must be perfect. |
+| n52 | narrator | The cream comes from Muckle Bottom. Through the magic clouds, in Grandfather's Moth. |
+| n61 | narrator | The coronation robes weigh four hundred pounds, and need pressing by the Royal Air Force. |
+| n62 | narrator | Only the Wardrobe can carry them. The runway at Much Snoring points one way. You prefer the other. |
+| n71 | narrator | Lord Rupert has told Farmer Mudge that jets cannot hover. Mudge has stopped the cream. |
+| n72 | narrator | Take the Tantrum to Muckle Bottom and land it straight down. Somewhere he will notice. |
+| n81 | narrator | Four hundred foreign royals are waiting at Much Snoring, with luggage. Only the Jumbo will do. |
+| n82 | narrator | Fly them home, and give the tower a proper view of the wings. |
+| n91 | narrator | Lord Rupert is un-inviting people from the coronation. Personally. In mauve. |
+| n92 | narrator | Re-invite them. Low over every tower in the kingdom, in one flight. |
+| n101 | narrator | Coronation Day. By the statute of 1907, the crown goes to the winner of the Royal Bathtub Derby. |
+| n102 | narrator | Lord Rupert has been practising in the bath since he was four. The Queen is watching. |
+| t_leave | tower_trainee (callsign) | you are leaving the circuit? Nobody leaves the circuit. Is that allowed? Have a lovely time! |
+| m_hello | tower_farm (callsign) | Muckle Bottom. You're after the cream, are you. Land on the grass and wipe your wheels. |
+| m_buzz | tower_farm (callsign) | that was my water tank. My hat's in the pond. The cream's gone and turned to butter. |
+| m_cream | tower_farm (callsign) | two pots of clotted cream, on the Crown's account. The Crown owes me for a hat. |
+| g_robes | tower_m (callsign) | the Royal Wardrobe is airborne. With the robes. Please do not open the back in flight. |
+| i_wrong | tower_f (callsign) | Much Snoring. You are landing on runway zero-nine. Everyone else is landing on two-seven. Towards you. |
+| i_wrong2 | tower_f (callsign) | wrong way, at seventy tonnes. It has been filed. In triplicate. With a diagram. |
+| i_robes | tower_f (callsign) | the robes are delivered. The pressing squadron has fainted. Standard procedure. |
+| m_nojets | tower_farm (callsign) | a jet? On my grass? Not till that thing learns to hover, Your Highness. |
+| m_hover | tower_farm (callsign) | it's... stopped. In the air. Doreen, come and look at this. Bring the bucket. |
+| m_landed | tower_farm (callsign) | right on the turnips. Straight down, like a tractor from heaven. The cream's back on. |
+| r_jets | toff | Hover? Nonsense. Jets cannot hover. I read it in a book. Mother wrote the book. |
+| i_jumbo | tower_f (callsign) | four hundred royal guests, cleared to depart. Eventually. Do not wait for it. |
+| t_jumbo | tower_trainee (callsign) | that is a very big aeroplane and it is very close to my window. Is it supposed to be this close? |
+| g_owls | tower_m (callsign) | the owls have evacuated. All forty. In an orderly line. I am going with them. |
+| r_uninvite | toff | Frightfully sorry, the coronation is cancelled. Moths. Do pass it on. |
+| m_invite | tower_farm (callsign) | an invitation, dropped through the tank. The purple one said it was off. I'll bring the cream. |
+| i_invite | tower_f (callsign) | invitation received, at forty feet. RAF Much Snoring will attend. In uniform. Pressed. |
+| h_derby | duchess | Rupert, darling, do win. It is terribly common to lose at one's own coronation. |
+| r_derby | toff | Two hundred years of bath-time, darling. The crown is as good as on my head. |
+| t_derby | tower_trainee (callsign) | two bathtubs on my runway. I have a laminated card for this. It just says "why". |
+| t_crown | tower_trainee | And the new Sovereign of the Skies is... sorry! Sorry. I'm allowed to say it this time! |
+| r_crown | toff | Mother will hear about this. |
+| h_crown | duchess | I heard, darling. I thought it was marvellous. |
+| r_crownwin | toff | And the crown goes to the bath of Pomfrey-Smythe! As was always intended. |
+
+The coronation card's epilogue lines are on-screen text only (not spoken).
+
+### STORY3 gates (2026-10-30, real `?mission=N`, 390×844 touch unless noted, server 127.0.0.1:8888, port 9703, serial)
+Easy: M5 16/16 (+ landscape 844×390 16/16), M6 16/16, M7 16/16, M8 16/16, M9 16/16, M10 18/18; finale Medium 18/18 and
+Hard 18/18 (coronation shown before the reward card, `career.storyComplete` and `progress.complete` set). Regression:
+M1 17/17, M2 16/16, M3 16/16, M4 17/17, picker 8/8, test-warp 6/6. Falsified (each goes red at its own check):
+`--falsify=crime` M5 6/10, M6 15/16, M8 6/10, M9 6/10, M10 17/18 (all fail "earned in flight"); M7 `--falsify=nohover`
+6/10; picker `--falsify=unlock` 3/8; test-warp `--falsify` 2/6. Step limits in test-mission are now mission time (the
+sim's clock) with a 3× wall-clock backstop, and the boot wait is 120 s: a machine loaded by every lane's headless Chrome
+runs the game slowly, and a wall-clock limit failed healthy runs.
+
+Palace Lawn note: WORLD has since shipped it as its own airport id `palace` (data/airports/palace.js, `world: 'royal'`).
+Moving the finale's landing there is the recipe above plus `def.airport`/a `tripStep('palace')`-free swap (same world).

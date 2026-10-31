@@ -52,6 +52,7 @@ export function threshold(rw, end) {
 }
 
 export function runwayHeadingFor(rw, end) {
+  if (!rw) return null;   // an end this airport does not have (a caller holding another airport's end id)
   return end === rw.ends[0] ? rw.heading : (rw.heading + 180) % 360;
 }
 

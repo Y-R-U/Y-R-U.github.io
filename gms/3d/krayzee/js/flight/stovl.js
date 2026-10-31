@@ -77,6 +77,7 @@ export const CONVERT = { maxKt: 300, maxAgl: 900, minAgl: 8, landFirstKt: 110, v
 // The context button (D35). s: { stovl, onGround, gsKt, speedKt, agl, crashed, mode (ap stovl mode or null), pad
 // (findPad result, hover only), landPlan ({ fail, hint } | plan | null), landActive, prefer (the wing-borne first choice
 // shown last, kept while both stay possible: main.js passes it for 1.5 s so the order never swaps under a thumb) }.
+// stovl may be the type's STOVL block: its landFirstKt (the throne's) replaces CONVERT.landFirstKt.
 // → { key, label, sub, state: 'idle'|'active'|'unavailable', alt: { key, label, sub } | null } | null (normal LAND)
 export function contextButton(s) {
   if (!s.stovl || s.crashed) return null;
@@ -100,6 +101,6 @@ export function contextButton(s) {
   const runway = s.landPlan && !s.landPlan.fail;
   const hover = { key: 'hover', label: 'HOVER', sub: 'stop in the air' };
   if (!canHover) return runway ? null : { key: 'hover', label: 'HOVER', sub: s.agl >= CONVERT.maxAgl ? 'go lower to hover' : 'slow down to hover', state: 'unavailable', alt: null };
-  if (runway && (s.prefer === 'landrw' || (s.prefer !== 'hover' && s.speedKt > CONVERT.landFirstKt))) return { key: 'landrw', label: 'LAND', sub: s.landPlan.label || '', state: 'idle', alt: hover };
+  if (runway && (s.prefer === 'landrw' || (s.prefer !== 'hover' && s.speedKt > (s.stovl.landFirstKt ?? CONVERT.landFirstKt)))) return { key: 'landrw', label: 'LAND', sub: s.landPlan.label || '', state: 'idle', alt: hover };
   return { ...hover, state: 'idle', alt: runway ? { key: 'landrw', label: 'LAND', sub: 'on the runway' } : null };
 }

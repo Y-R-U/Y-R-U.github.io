@@ -1,4 +1,5 @@
 // D19 "LANDED — DEMAND IT" button. Shares the prompt slot (bottom centre, clear of thumbs); main decides ready/greyed.
+import { startedOn } from './place.js';
 const CROWN = '<svg viewBox="0 0 24 18" aria-hidden="true"><path d="M2 16 L1 4 L7 9 L12 1 L17 9 L23 4 L22 16 Z" fill="currentColor"/></svg>';
 
 export function createFinishButton(root, { onPress } = {}) {
@@ -13,6 +14,7 @@ export function createFinishButton(root, { onPress } = {}) {
   el.addEventListener('pointerdown', (e) => e.stopPropagation());
   el.addEventListener('click', (e) => {
     e.stopPropagation();
+    if (!startedOn(el, e)) return;
     if (state === 'ready') onPress?.();
     else { el.classList.remove('nope'); void el.offsetWidth; el.classList.add('nope'); }
   });

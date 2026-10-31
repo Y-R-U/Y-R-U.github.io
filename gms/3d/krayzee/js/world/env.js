@@ -57,7 +57,7 @@ void main() {
 
 const skyFrag = /* glsl */`
 uniform vec3 uSun, uZenith, uHorizon, uGround, uHaze;
-uniform float uTime, uClouds;
+uniform float uTime, uClouds, uMount;
 varying vec3 vDir;
 float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
@@ -85,6 +85,17 @@ void main() {
     float a = c * smoothstep(0.0, 0.18, y) * uClouds;
     col = mix(col, cc, a * 0.95);
   }
+  // C3: two ranges of far hills on the horizon (the kingdom's edge), blued by distance; free: part of the sky pass
+  if (uMount > 0.0 && y > -0.03 && y < 0.09) {
+    vec2 az = normalize(d.xz + 1e-5);
+    float r1 = 0.012 + 0.11 * pow(fbm(az * 2.3 + 11.0), 2.6) + 0.008 * n(az * 23.0);
+    float r2 = 0.006 + 0.05 * pow(fbm(az * 3.7 - 5.0), 2.2) + 0.004 * n(az * 41.0 + 2.0);
+    float lit = 0.5 + 0.5 * dot(az, normalize(uSun.xz + 1e-4));
+    vec3 far = mix(uHaze, vec3(0.42, 0.52, 0.66), 0.55 + 0.1 * lit);
+    vec3 near = mix(uHaze, vec3(0.3, 0.4, 0.44), 0.62 + 0.12 * lit);
+    col = mix(col, far, smoothstep(r1 + 0.0015, r1 - 0.0015, y) * uMount);
+    col = mix(col, near, smoothstep(r2 + 0.0012, r2 - 0.0012, y) * uMount);
+  }
   col = mix(col, uGround, smoothstep(0.0, -0.06, y));
   gl_FragColor = vec4(col, 1.0);
   #include <tonemapping_fragment>
@@ -103,6 +114,7 @@ export function createSky(quality) {
       uGround: { value: FOG_COLOR.clone() },
       uTime: { value: 0 },
       uClouds: { value: 1 },
+      uMount: { value: 1 },
     },
     side: THREE.BackSide, depthWrite: false, depthTest: false, fog: false,
   });

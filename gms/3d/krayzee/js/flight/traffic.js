@@ -223,6 +223,8 @@ export class Traffic {
         if (e.rig.setAfterburner && e._abShown !== e.ac.ab) { e._abShown = e.ac.ab; e.rig.setAfterburner(e.ac.ab); }
         // D35 STOVL: swivel nozzle + lift-fan doors follow the flight model (the rig eases them)
         if (e.rig.setNozzle && e.ac.P.stovl && (e._nzShown !== e.ac.nozzle || e._lfShown !== e.ac.liftFan)) { e._nzShown = e.ac.nozzle; e._lfShown = e.ac.liftFan; e.rig.setNozzle(e.ac.nozzle); e.rig.setLiftFan?.(e.ac.liftFan); }
+      } else if (e.ac.P.stovl && e.rig.setNozzle && (e._nzShown !== e.ac.nozzle || e._lfShown !== e.ac.liftFan)) {   // ROSTER: the throne's jet pack
+        e._nzShown = e.ac.nozzle; e._lfShown = e.ac.liftFan; e.rig.setNozzle(e.ac.nozzle); e.rig.setLiftFan?.(e.ac.liftFan);
       }
       if (e.player) e.rig.updateInstruments(e.ac.instruments());
       e.rig.update(dt);
@@ -325,6 +327,19 @@ export class Traffic {
       }
       const theirs = this.groundAhead(o, 300);
       if (theirs.length < 2) continue;
+      // FLIGHTFIX6: I am sitting on their path just ahead of them, so they are stopping behind me (the branch above, from
+      // their side): never also give way to them at a crossing further on (atc-sim jetland: a Bathtub stopped on the
+      // jumbo's taxi line waiting for the jumbo to clear a crossing, the jumbo held behind the Bathtub, both for good)
+      const back = projectPoly(theirs, ac.pos.x, ac.pos.z);
+      if (back.d < 9 && back.s > 0 && back.s < 220) continue;
+      // FLIGHTFIX5: head-on along a shared stretch (taxiway A both ways): whoever reaches it first has it, the other waits
+      // short of it, body clear (the lateral tolerance grows with the two spans: a jumbo turning onto A blocks it 16 m off
+      // the centreline). Without it a jumbo leaving its heavy spot met a Cub coming down A: each held for the other at 0 kt.
+      const tol = 9 + Math.max(0, (ac.dims.span + oa.dims.span) / 2 - 20);
+      const eMe = opposedEntry(mine, theirs, tol, 300), eThem = eMe == null ? null : opposedEntry(theirs, mine, tol, 300);
+      if (eMe != null && eThem != null && (eThem < eMe - 5 || (Math.abs(eThem - eMe) <= 5 && oa.id < ac.id))) {
+        lim = Math.min(lim, stopAt(eMe - ac.dims.length / 2 - 5)); ap.yieldTo = oa.id; continue;
+      }
       const X = polyCross(mine, theirs, 160);
       if (!X) continue;
       const tMe = X.sa / Math.max(ac.gs, 3), tThem = X.sb / Math.max(oa.gs, 3);
@@ -486,6 +501,23 @@ function projectPoly(pts, x, z) {
     acc += L;
   }
   return best;
+}
+// FLIGHTFIX5: head-on along a shared stretch: where A first comes within tol of B (B's corridor) on the way to a stretch
+// where it runs the opposite way to B, as a distance along A (within maxA); null when A never meets B head-on.
+function opposedEntry(A, B, tol, maxA) {
+  let acc = 0, enter = null;
+  for (let i = 1; i < A.length && acc < maxA; i++) {
+    const a = A[i - 1], b = A[i], dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz);
+    if (L < 1e-6) continue;
+    for (let t = 0; t < L && acc + t < maxA; t += 6) {
+      const pr = projectPoly(B, a[0] + dx * t / L, a[1] + dz * t / L);
+      if (pr.d >= tol) { enter = null; continue; }
+      enter ??= acc + t;
+      if ((dx * pr.dir[0] + dz * pr.dir[1]) / L < -0.5) return enter;
+    }
+    acc += L;
+  }
+  return null;
 }
 // First crossing of polyline A (within maxA metres) with polyline B: distances along each.
 function polyCross(A, B, maxA) {

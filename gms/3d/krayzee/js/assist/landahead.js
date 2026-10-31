@@ -12,7 +12,7 @@ export const LAND = {
   halfW: 16,           // scanned half-width: C172 span 11 m + the 8 m cell rounding of the surface cache
   glideDeg: 4,         // matches FLIGHT's approach leg (routes.js GLIDE_DEG)
   flightAim: 130,      // FLIGHT's approach aims 130 m past its threshold (routes.js AIM_DIST)
-  runwayAim: 130, fieldAim: 60,
+  runwayAim: 130, fieldAim: 60, shortAim: 30,   // FLIGHTFIX4: a runway under minLen + runwayAim (the lawn) is aimed ~30 m in, as the AP's short-field circuit
   lowAgl: 120,
   maxGrad: 0.12, grade: 0.015, bump: 0.35,       // steepest pre-final descent the AP can fly at 75 kt with idle + 1/3 flap
   vApp: 38.6, bankDeg: 25, orbitR: 450, maxOrbits: 2,
@@ -101,13 +101,16 @@ class Field {
     return v;
   }
   // 48 m blocks whose corners and centre are all dry skip per-cell surfaceAt calls. Buildings come from the colliders
-  // anyway; this only matters for water, and a water body narrower than ~48 m could slip through.
+  // anyway; this only matters for water. FLIGHTFIX5: the River Krumble is 17–32 m wide and slipped between the samples
+  // (loop throne-hard: LAND NOW's field ran into it, "ditched in the water"), so a world with narrow water says where it
+  // is (world.waterNear(x, z, r): any water within r) and such a block is always checked cell by cell.
   dirty(x, z) {
     const bx = Math.floor(x / CB), bz = Math.floor(z / CB), k = key(bx, bz);
     let v = this.blk.get(k);
     if (v === undefined) {
       const x0 = bx * CB, z0 = bz * CB;
-      v = this.wet(bx, bz) || this.wet(bx + 1, bz) || this.wet(bx, bz + 1) || this.wet(bx + 1, bz + 1) || this._wet(x0 + CB / 2, z0 + CB / 2);
+      v = !!this.w.waterNear?.(x0 + CB / 2, z0 + CB / 2, CB * 0.71 + SC) ||
+        this.wet(bx, bz) || this.wet(bx + 1, bz) || this.wet(bx, bz + 1) || this.wet(bx + 1, bz + 1) || this._wet(x0 + CB / 2, z0 + CB / 2);
       this.blk.set(k, v);
     }
     return v;
@@ -318,19 +321,25 @@ function runwayCandidates(st, layout, inCone, push) {
     const [hx, hz] = hvec(rw.heading);
     let hit = false;
     for (let k = -2; k <= 2 && !hit; k++) hit = inCone(rw.center[0] + hx * rw.length * k / 5, rw.center[2] + hz * rw.length * k / 5);
-    const home = !hit && st.home?.includes(rw);
+    // FLIGHTFIX4: a home runway is home in the cone too (it used to lose the home bonus there: low on the home circuit,
+    // runway ahead but too close for straight in, its circuit cost +5000 and a field straight ahead won — loop c172 probe)
+    const home = !!st.home?.includes(rw);
     if (!hit && !home) continue;
     const ends = rw.ends.map((id, i) => ({ id, hdg: i === 0 ? rw.heading : (rw.heading + 180) % 360 }));
     ends.sort((a, b) => Math.abs(wrap180(a.hdg - st.H)) - Math.abs(wrap180(b.hdg - st.H)));
     for (const e of ends) {
-      if (!home && e !== ends[0] && Math.abs(wrap180(e.hdg - st.H)) > Math.abs(wrap180(ends[0].hdg - st.H)) + 5) continue;
+      if (hit && e !== ends[0] && Math.abs(wrap180(e.hdg - st.H)) > Math.abs(wrap180(ends[0].hdg - st.H)) + 5) continue;
       const [ux, uz] = hvec(e.hdg);
       const thr = [rw.center[0] - ux * rw.length / 2, rw.center[2] - uz * rw.length / 2];
       // on this end's own downwind (its circuit side, flying the reciprocal): that is the end the circuit is for
       const side = ((st.x - rw.center[0]) * -uz + (st.z - rw.center[2]) * ux) < 0 ? 'L' : 'R';
       const onDw = home && (layout.CIRCUIT?.[e.id] ?? 'L') === side && Math.abs(wrap180(st.H - e.hdg - 180)) < 60;
-      const base = { kind: 'runway', surface: 'runway', label: `RWY ${e.id}`, runway: e.id, heading: e.hdg, aim: LAND.runwayAim, width: rw.width, pref: home ? 0 : Math.abs(wrap180(e.hdg - st.H)), closed: !!rw.closed, home, prefer: st.prefer === e.id || onDw };
-      push({ ...base, origin: thr, length: rw.length });
+      const base = { kind: 'runway', surface: 'runway', label: `RWY ${e.id}`, runway: e.id, heading: e.hdg, aim: LAND.runwayAim, width: rw.width, pref: home && !hit ? 0 : Math.abs(wrap180(e.hdg - st.H)), closed: !!rw.closed, home, prefer: st.prefer === e.id || onDw };
+      // WORLD (C2): a strip too short for LAND's standard aim (the 240 m Palace Lawn): touch down near the threshold
+      // and stop within the type's landing roll × 1.25, on a virtual end so the approach aims at that touchdown
+      const roll = AIRCRAFT[st.type]?.performance?.landingRollM;
+      if (!st.pro.runwayOnly && roll && rw.length < LAND.minLen + LAND.runwayAim) push({ ...base, origin: thr, length: rw.length, aim: Math.max(20, Math.min(LAND.shortAim, rw.length - roll * 1.25 - 10)), minLen: roll * 1.25, remain: true });
+      else push({ ...base, origin: thr, length: rw.length });
       // already over (or just short of) it and low: the rest of the runway ahead, straight down onto it
       const lat = Math.abs((st.x - thr[0]) * -uz + (st.z - thr[1]) * ux), herr = Math.abs(wrap180(e.hdg - st.H));
       const sOff = (st.x - thr[0]) * ux + (st.z - thr[1]) * uz + st.minD + lat * 3 + herr * 8 - LAND.runwayAim;
@@ -429,7 +438,7 @@ function planCore(o) {
   // low (or LAND NOW, opts.straight): straight ahead and down beats any circuit; touchdown may be closer than 300 m
   const straight = !!o.straight, low = straight || agl < LAND.lowAgl;
   const minD = low ? 200 : LAND.minD;
-  const st = { x, z, alt, agl, H, V, sink: o.sink ?? PRO.sink ?? 3, low, straight, minD, pro: PRO, prefer: o.prefer || null, home: straight || o.noHome ? [] : homeRunways(o.layout, x, z, H, agl, PRO.homeR, PRO.homeAny) };
+  const st = { x, z, alt, agl, H, V, sink: o.sink ?? PRO.sink ?? 3, low, straight, minD, pro: PRO, type: o.type ?? LAND_TYPE, prefer: o.prefer || null, home: straight || o.noHome ? [] : homeRunways(o.layout, x, z, H, agl, PRO.homeR, PRO.homeAny) };
   const maxD = Math.max(1800, Math.min(PRO.maxD + (straight ? 1500 : 0), 1500 + agl * 9 + Math.max(0, V - 40) * 20) * (PRO.runwayOnly ? 1.6 : 1));
   if (dbg) dbg.cone = { x, z, heading: H, half: LAND.cone, minD, maxD };
   const inCone = (px, pz) => {
@@ -462,7 +471,7 @@ function planCore(o) {
         // paved: the touchdown must be on a clear run of the real thing
         if (s0 > aim) { rej('blocked'); continue; }
       }
-      if (s1 - s0 < PRO.minLen) { rej('short'); continue; }
+      if (s1 - s0 < (c.minLen ?? PRO.minLen)) { rej('short'); continue; }
       const T = [c.origin[0] + ux * (s0 + aim), c.origin[1] + uz * (s0 + aim)];
       if (!inCone(T[0], T[1]) && c.kind === 'grass') { rej('cone'); continue; }
       if (Math.hypot(T[0] - x, T[1] - z) < minD) { rej('close'); continue; }
@@ -474,7 +483,7 @@ function planCore(o) {
   const settle = (c) => {
     const { ux, uz, aim, s1 } = c;
     let s0 = c.s0, ok = false;
-    for (let tries = 0; tries < 6 && s1 - s0 >= PRO.minLen; tries++, s0 += 40) {
+    for (let tries = 0; tries < 6 && s1 - s0 >= (c.minLen ?? PRO.minLen); tries++, s0 += 40) {
       if (approachClear(F, c.origin[0] + ux * s0, c.origin[1] + uz * s0, ux, uz, F.height(c.origin[0] + ux * (s0 + aim), c.origin[1] + uz * (s0 + aim)), aim)) { ok = true; break; }
     }
     if (!ok) return false;
@@ -561,7 +570,10 @@ function homeRunways(layout, x, z, H, agl, homeR = 2300, any = false) {
   for (const rw of layout.RUNWAYS || []) {
     const [ux, uz] = hvec(rw.heading), dx = x - rw.center[0], dz = z - rw.center[2];
     const along = dx * ux + dz * uz, lat = Math.abs(dx * -uz + dz * ux), past = Math.abs(along) - rw.length / 2;
-    if (Math.hypot(Math.max(0, past), lat) > homeR) continue;   // the circuit: downwind 0.8–1.15 km out, base ≤ 1.8 km past
+    // FLIGHTFIX4: a downwind ATC stretched (extendDownwind, up to ~4.5 km past the end) is still the home circuit: abeam
+    // the axis at circuit width, flying along it (loop c172: LAND picked a field 2.4 km down an extended downwind)
+    const dwBand = lat > 400 && lat < 2000 && past < 6000 && Math.abs(Math.abs(wrap180(H - rw.heading)) - 90) > 50;
+    if (Math.hypot(Math.max(0, past), lat) > homeR && !dwBand) continue;   // the circuit: downwind 0.8–1.15 km out, base ≤ 1.8 km past
     const away = (dx * hx + dz * hz) / (Math.hypot(dx, dz) || 1);
     if (!any && past > 0 && lat < 700 && away > 0.7) continue;   // upwind / climb-out: the runway is behind
     out.push(rw);

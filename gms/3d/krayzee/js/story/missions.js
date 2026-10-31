@@ -6,7 +6,10 @@ import { createLandButton } from '../assist/landbutton.js';
 import { DIFFICULTY } from '../../data/rules.js';
 import { RANKS } from '../../data/ranks.js';
 import { CONTROLLERS } from '../../data/story.js';
+import { BRIEF_LINES } from '../../data/story/lines.js';
 import { ensureStoryCss, el, esc, isTouch, loadProgress, saveProgress } from './dom.js';
+
+const TEXT_ONLY = new Set(BRIEF_LINES.filter((l) => l.textOnly).map((l) => l.id)); // no clip yet: never fetched
 
 const COACH_AVOID = ['#krz-hud .krz-hud-strip', '#krz-hud .krz-ap', '#krz-hud .krz-axes', '#krz-hud .krz-flash', '.krz-r-subs', '.krz-score', '.krz-r-tower', '.krz-cer', '.krz-herald'];
 const AUDIO_BASE = new URL('../../audio/story/', import.meta.url).href;
@@ -43,7 +46,22 @@ export function createMission(def, o) {
     goto: (id) => { const n = def.steps.findIndex((s) => s.id === id); if (n >= 0) { M.pendingNext = n; M.pendingT = 0.3; } },
     log: (type, d) => log(type, d),
     showLandButton, showDemandButton,
+    // STORY3: a Kingdom Map trip (magic clouds); the route is rebuilt for the new airport on arrival (def.route sees it)
+    trip: (to, agl) => { M.mflag.tripTo = to; return host.trip(to, { agl, beforeSwap: () => host.despawnAll?.(), onArrive: (id) => arrived(id) }); },
+    reroute: (route, start = 0) => { M.route = route; host.setRoute(route, start); },
   };
+
+  function arrived(to) {
+    if (M.status !== 'running') return;
+    const end = host.activeEnd(), from = M.at;
+    M.at = to;
+    M.route = def.route(end, diff, { from, at: to }); M.end = end;
+    host.setRoute(M.route, M.route.marks?.arrive ?? 0);
+    M.mflag.arrived = to;
+    log('arrived', { to, end });
+    if (def.arriveTower?.[to]) host.setTowerVoice(CONTROLLERS[def.arriveTower[to]]?.voice);
+    try { def.onArrive?.(ctx, to); } catch (e) { console.warn('[story] arrive', e); }
+  }
 
   function goalText() {
     const g = objectives.find((x) => !M.ticks.has(x.id));
@@ -201,7 +219,7 @@ export function createMission(def, o) {
     stopVoice();
     const vol = Math.max(0, Math.min(1, o.volume ?? 1));
     if (!ids?.length || !vol) return;
-    const q = ids.slice();
+    const q = ids.filter((id) => !TEXT_ONLY.has(id));
     const next = () => {
       const id = q.shift(); if (!id) return;
       const a = new Audio(AUDIO_BASE + id + '.mp3');
@@ -217,7 +235,7 @@ export function createMission(def, o) {
     const tw = CONTROLLERS[def.tower];
     const items = objectives.map((x) => `<li>${esc(x.text)}</li>`).join('');
     brief = el('div', 'krz-st-brief', `<div class="krz-st-card krz-st-bcard" role="dialog" aria-label="Mission ${def.id} briefing">
-      <small class="k">Mission ${def.id}${tw ? ` · Tower: ${esc(tw.name.split(' ')[0])}` : ''}</small><h2>${esc(def.title)}</h2>
+      <small class="k">Mission ${def.id}${def.towerLabel ? ` · ${esc(def.towerLabel)}` : tw ? ` · Tower: ${esc(tw.name.split(' ')[0])}` : ''}</small><h2>${esc(def.title)}</h2>
       ${def.subtitle ? `<h3>${esc(def.subtitle)}</h3>` : ''}${def.brief ? `<p class="krz-st-bp">${esc(def.brief)}</p>` : ''}
       ${items ? `<div class="krz-st-obj"><b>Your orders</b><ol>${items}</ol></div>` : ''}
       ${def.diffNote?.[diff] ? `<p class="krz-st-dn"><b>${esc(diff[0].toUpperCase() + diff.slice(1))}:</b> ${esc(def.diffNote[diff])}</p>` : ''}
@@ -241,7 +259,8 @@ export function createMission(def, o) {
 
   async function start() {
     const end = host.activeEnd();
-    M.route = def.route(end, diff);
+    M.at = host.airport?.() || 'royal';
+    M.route = def.route(end, diff, { from: null, at: M.at });
     M.end = end;
     const where = place();
     host.setRoute(M.route, def.routeStart ?? 0);
@@ -336,13 +355,15 @@ export function createMission(def, o) {
     const P = loadProgress();
     const prev = P.missions[def.id] || {};
     P.missions[def.id] = { done: true, diff, best: Math.max(prev.best || 0, sortie + bonus), at: Date.now(), plays: (prev.plays || 0) + 1 };
+    if (def.ending && !P.complete) P.complete = { at: Date.now(), diff };
     saveProgress(P);
     const rank = rankInfo();
     M.result = { ok: true, mission: def.id, diff, sortie, bonus, crimes, secs: Math.round(M.t), rank, rankUp: c && before != null && c.rankIndex > before, objectives: [...M.ticks] };
     log('complete', M.result);
+    try { def.onComplete?.(ctx, M.result); } catch (e) { console.warn('[story] onComplete', e); }
     cleanup();
     teardownHud();
-    setTimeout(() => afterHerald(() => card(true)), 700);
+    setTimeout(() => afterHerald(() => (def.ending ? ending(() => card(true)) : card(true))), 700);
     try { o.onComplete?.(M.result); } catch (e) { console.error(e); }
   }
 
@@ -420,6 +441,30 @@ export function createMission(def, o) {
   }
   function closeCard() { if (cardEl) { cardEl.remove(); cardEl = null; } }
 
+  // STORY3 finale: the coronation, after the Herald and before the reward card. Lines arrive one by one; any tap shows the rest.
+  let endEl = null;
+  function ending(next) {
+    const E = def.ending, prof = o.profile?.() || {};
+    const who = esc(`${rankInfo()?.title || 'Your Grace'} ${prof.name || ''}`.trim());
+    const lines = E.lines.map((l, i) => `<p style="--d:${(0.9 + i * E.step).toFixed(2)}s">${l.who ? `<b>${esc(l.who)}</b> ` : ''}${esc(l.text)}</p>`).join('');
+    endEl = el('div', 'krz-st-end', `<div class="krz-st-card krz-st-ecard" role="dialog" aria-label="${esc(E.title)}">
+      <div class="krz-st-crown" aria-hidden="true">♛</div><small class="k">${esc(E.kicker)}</small><h2>${esc(E.title)}</h2>
+      <h3>${E.crowned.replace('{who}', who)}</h3><div class="krz-st-elines">${lines}</div>
+      <p class="krz-st-fin" style="--d:${(1.2 + E.lines.length * E.step).toFixed(2)}s">${esc(E.fin)}</p>
+      <div class="krz-st-btns"><button type="button" data-a="on">${esc(E.button)} <span aria-hidden="true">›</span></button></div></div>`);
+    endEl.addEventListener('pointerdown', (e) => e.stopPropagation());
+    endEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!e.target.closest('button[data-a="on"]')) { endEl.classList.add('all'); return; }
+      const x = endEl; endEl = null; x.remove();
+      log('ending', { seen: true });
+      next();
+    });
+    parent.appendChild(endEl);
+    log('ending', { shown: true });
+    requestAnimationFrame(() => endEl?.classList.add('in'));
+  }
+
   function teardownHud() {
     removeEventListener('resize', onResize);
     for (const f of off.splice(0)) { try { f(); } catch (e) { /* */ } }
@@ -432,6 +477,8 @@ export function createMission(def, o) {
   }
 
   function restart() {
+    // a mission flown elsewhere (another airport, or after a trip): main sets the plane and airport up again
+    if (o.relaunch && (host.airport?.() !== (def.airport || 'royal') || (def.aircraft && host.type?.() !== def.aircraft))) { cleanup(); teardownHud(); closeCard(); M.status = 'aborted'; coach.remove(); o.relaunch(def.id); return; }
     cleanup(); teardownHud(); closeCard();
     M.status = 'idle'; M.i = -1; M.events = []; M.pendingNext = -1; M.crashed = false; M.ticks.clear(); M.resumeLeg = null;
     for (const k of Object.keys(M.mflag)) delete M.mflag[k];
@@ -441,7 +488,7 @@ export function createMission(def, o) {
   return {
     start, update, restart,
     event: onEvent,
-    abort() { if (M.status === 'running') cleanup(); else closeBrief(); teardownHud(); closeCard(); coach.remove(); M.status = 'aborted'; },
+    abort() { if (M.status === 'running') cleanup(); else closeBrief(); teardownHud(); closeCard(); endEl?.remove(); endEl = null; coach.remove(); M.status = 'aborted'; },
     // D18: a reason string while the current step wants real time (feed it to the warp as `imminent`)
     get warpHold() { const st = def.steps[M.i]; if (M.status !== 'running' || !st?.warpHold) return false; return typeof st.warpHold === 'function' ? st.warpHold(ctx) || false : st.warpHold; },
     // the briefing card freezes the world until "Fly" is pressed

@@ -319,7 +319,7 @@ export class Net {
         if (m.t !== 'welcome') { this._onServer(m); return; }
         clearTimeout(fail);
         welcomed = true;
-        Object.assign(this, { id: m.id, tok: m.tok, grace: m.grace || 0, voices: m.voices || this.voices, connecting: null });
+        Object.assign(this, { id: m.id, tok: m.tok, grace: m.grace || 0, voices: m.voices || this.voices, access: m.access || null, connecting: null }); // ACCESS: {signin, allowance, counting}
         if (!this.room) this.ice = m.ice;
         this.sendHello();
         if (resume) {
@@ -445,6 +445,7 @@ export class Net {
     switch (m.t) {
       case 'rooms': this._emit('rooms', m); break;
       case 'auth': this._emit('auth', m); break;
+      case 'allowance': this._emit('allowance', m.allowance); break; // ACCESS: spent one free online game
       case 'claim': this._emit('claim', m); break;
       case 'err':
         if (this.reconnect) { this._giveUp(m.code || 'err'); break; }

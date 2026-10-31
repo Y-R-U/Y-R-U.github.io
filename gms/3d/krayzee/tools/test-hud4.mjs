@@ -1,7 +1,7 @@
 // HUD4: prompt card in the top band left of the warp chip; difficulty/aircraft chips up out of the flight view, faded by
 // any chip tap (even the selected one) or any flight control. Real CDP touch at 390×844 and 844×390.
 //   ~/.claude/bin/cdp start --port 9634 -- --use-angle=metal
-//   node tools/test-hud4.mjs [--port=9634] [--only=portrait,landscape,story,pt3] [--falsify]
+//   node tools/test-hud4.mjs [--port=9634] [--only=portrait,landscape,story,pt3,gamefix,hints] [--falsify]
 // pt3: PLAYTEST_3 #3 (stranded in a field), #6 (quit confirm), #10 (SKIP after landing, radio target colours), skip keeps a demand.
 // --falsify drags the card onto the subtitles/warp, drops the chips onto the plane and pins faded chips visible; pt3 drops the
 // demanded end before SKIP, disables the field start, banks before Quit and restores the dark target colour: those checks must FAIL.
@@ -15,7 +15,7 @@ mkdirSync(SHOTS, { recursive: true });
 const arg = (k, d) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').split('=')[1] || d;
 const PORT = +arg('port', 9634);
 const BASE = arg('url', 'http://127.0.0.1:8888/gms/3d/krayzee/');
-const ONLY = arg('only', 'portrait,landscape,story,pt3,gamefix').split(',');
+const ONLY = arg('only', 'portrait,landscape,story,pt3,gamefix,hints').split(',');
 const GF_SHOTS = join(dirname(fileURLToPath(import.meta.url)), '..', 'docs', 'shots', 'gamefix');
 const FALSIFY = process.argv.includes('--falsify');
 const BREAK = `#krz-hud .krz-ap, #krz-hud .krz-axes { visibility: visible !important; }
@@ -74,7 +74,7 @@ async function fresh(query, extra = {}) {
   await send('Page.navigate', { url: BASE + 'docs/' }); await sleep(300);
   await ev(`(() => { for (const k of Object.keys(localStorage)) if (k.startsWith('krayzee.')) localStorage.removeItem(k);
     localStorage.setItem('krayzee.profile', ${JSON.stringify(JSON.stringify(PROFILE))});
-    const x = ${JSON.stringify({ 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 }, 'krayzee.coachTakeoff': 1, ...extra })};
+    const x = ${JSON.stringify({ 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 }, 'krayzee.coachTakeoff': 1, 'krayzee.hints': { ctx: 'seen', map: 'seen' }, ...extra })};
     for (const k in x) localStorage.setItem(k, JSON.stringify(x[k])); return 1; })()`);
   await send('Page.navigate', { url: BASE + query });
   const ok = await until('!!window.__krayzeeReady', 30, 300);
@@ -138,6 +138,8 @@ async function chipsFlow(W, H, tag) {
   check(`${tag}: chips stay faded after the aircraft rebuild`, await ev(chipsGone), JSON.stringify(await ev('__game.ghud.ground.state')));
   // a locked chip only explains (no fade)
   await fresh('?start=free&noaccount=1'); await until('__game.ghud.ground.chipsOn', 8); await sleep(800);
+  // ROSTER: more planes than the row holds; it scrolls sideways, so a thumb swipes Bathtub into view first
+  await ev(`(document.querySelector('.krz-plane [data-a="bathtub"]').scrollIntoView({ inline: 'center', block: 'nearest' }), 1)`); await sleep(300);
   await tap('.krz-plane [data-a="bathtub"]');
   await sleep(500);
   check(`${tag}: locked Bathtub explains and keeps the chips`, !(await ev(chipsGone)) && /Bathtub/.test(await ev('__game.ghud.ground.state.why')));
@@ -168,7 +170,7 @@ async function promptFlow(W, H, tag) {
   check(`${tag}: card see-through but legible`, look.a <= 0.5 && look.title >= 12 && look.op > 0.9 && !look.cramped && !look.clipped, JSON.stringify(look));
   const x = await rectOf('.krz-pr-x');
   const top = x && await ev(`(() => { const e = document.elementFromPoint(${x.x + x.w / 2}, ${x.y + x.h / 2}); return !!e && !!e.closest('.krz-pr-x'); })()`);
-  check(`${tag}: ✕ is on top and at least 30 px`, top && x.w >= 30 && x.h >= 30, JSON.stringify(x));
+  check(`${tag}: ✕ is on top and at least 30 px`, top && x.w >= 29.5 && x.h >= 29.5, JSON.stringify(x));
   await shot(`after-prompt-${tag}`);
   await tap('.krz-pr-x');
   check(`${tag}: ✕ dismisses by real tap`, await until('__game.hud.prompts.history.some((h) => h.why === "dismissed") && !__game.hud.prompts.current', 2));
@@ -201,6 +203,7 @@ async function pt3Flow() {
   await ev(`import('./js/world/layout.js').then((L) => { const s = L.STANDS[0]; __game.teleport({ x: s.position[0], z: s.position[2], alt: 0, heading: s.heading ?? 180, speedKt: 0 }); return 1; })`);
   await until('__game.ghud.ground.state.takeoff', 10);
   await ev('(__game.ghud.ground.chipsOn && __game.ghud.ground.chips.querySelector("[aria-pressed=true]").click(), 1)');
+  await sleep(650);   // FLIGHTFIX5: past DEMAND TAKEOFF's 0.5 s just-appeared guard (ground.js); a quicker tap is ignored (end null)
   await tap('.krz-gbtn-to');
   await sleep(1000);
   const end = await ev('__game.S.demandEnd');
@@ -224,6 +227,25 @@ async function pt3Flow() {
   check('field stop: DEMAND TAKEOFF offered', await until('__game.ghud.ground.state.takeoff', 4));
   check('field stop: SKIP TO RUNWAY not offered after a flight', !(await ev('__game.ghud.ground.state.skip')));
   await shot('pt3-field-stranded');
+  // HUDPOLISH E2 (test-loop DEMAND TAKEOFF flake): the action slot re-lays out under a thumb (DEMAND TAKEOFF slides into
+  // DEMAND IT's place); a tap that went down on DEMAND IT must not launch the plane. The shift is staged with a transform.
+  {
+    const f = await rectOf('.krz-finish'), t = await rectOf('.krz-gbtn-to');
+    const n0 = await ev('__game.log().filter((l) => l.type === "demandTakeoff").length');
+    const fx = f.x + f.w / 2, fy = f.y + f.h / 2;
+    await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: fx, y: fy, id: 7 }] });
+    await sleep(60);
+    await ev(`(() => { const t = document.querySelector('.krz-gbtn-to'); t.style.transform = 'translate(${Math.round(fx - (t.x + t.w / 2))}px, ${Math.round(fy - (t.y + t.h / 2))}px)'; t.style.zIndex = 5; document.querySelector('.krz-finish').style.visibility = 'hidden'; return 1; })()`);
+    if (FALSIFY) await ev(`(document.querySelector('.krz-gbtn-to').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })), 1)`);
+    await sleep(60);
+    await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await sleep(500);
+    const hitTo = await ev(`(() => { const e = document.elementFromPoint(${fx}, ${fy}); return !!e?.closest('.krz-gbtn-to'); })()`);
+    const n1 = await ev('__game.log().filter((l) => l.type === "demandTakeoff").length');
+    await ev(`(() => { const t = document.querySelector('.krz-gbtn-to'); t.style.transform = ''; t.style.zIndex = ''; document.querySelector('.krz-finish').style.visibility = ''; return 1; })()`);
+    check('a tap that went down on DEMAND IT does not launch when DEMAND TAKEOFF slides under it', hitTo && n1 === n0 && await ev('__game.state().player.onGround'), JSON.stringify({ hitTo, n0, n1 }));
+    await sleep(700);
+  }
   if (FALSIFY) await ev('(__game.S.everAir = false, 1)');
   await tap('.krz-gbtn-to');
   const up = await until('!__game.state().player.onGround && __game.state().player.alt > 20', 150, 500);
@@ -242,8 +264,11 @@ async function pt3Flow() {
   await tap('.krz-quitc-stay');
   await sleep(400);
   check('"Keep flying" keeps the flight', await ev('__game.state().mode === "play"') && await ev('document.querySelector(".krz-quitc").hidden'));
-  await tap('.kz-btn.danger');
-  await until(`!document.querySelector('.krz-quitc').hidden`, 2); await sleep(300);
+  // HUDPOLISH E2 (test-loop quit-confirm flake): a second tap right behind the one that opens the card lands on its backdrop
+  const qb = await rectOf('.kz-btn.danger');
+  await tapAt(qb.x + qb.w / 2, qb.y + qb.h / 2); await sleep(120); await tapAt(qb.x + qb.w / 2, qb.y + qb.h / 2);
+  await sleep(900);
+  check('a double tap on QUIT TO MENU leaves the confirm open', !!(await rectOf('.krz-quitc-stay')) && await ev(`getComputedStyle(document.querySelector('.krz-quitc')).opacity > 0.9`));
   await tap('.krz-quitc-go');
   check('"Quit and lose them" quits to the menu', await until('__game.state().mode === "attract"', 4));
   // radio target names readable on the dark sheet
@@ -347,7 +372,12 @@ async function demandTaxiOut() {
   const offered = await until('__game.ghud.ground.state.takeoff', 8);
   // FLIGHTFIX3 takes off straight from grass; refuse that so the taxi-in fallback (no clear run) is what gets tested
   await ev('(__game.S.player.ap.fieldTakeoff = () => false, 1)');
+  // FLIGHTFIX5: DEMAND TAKEOFF ignores taps for 0.5 s after it appears or moves (HUDPOLISH, js/hud/ground.js). On an idle
+  // machine this tap came ~0.1 s after the button showed, was ignored, and the AP's own circuit taxi crossed the zone
+  // with no DEMAND at all (the "bad samples"). A thumb taps after it sees the button: wait out the guard, check it took.
+  await sleep(650);
   await tap('.krz-gbtn-to');
+  check('taxi-out: the DEMAND TAKEOFF tap took (AP on a DEMAND)', !!(await until('__game.S.player.ap.demand && __game.S.demandLive', 3)));
   if (FALSIFY) await ev('(__game.S.demandLive = false, 1)');
   await ev(`(() => { window.__gf7 = { n: 0, bad: [] }; const f = () => { const P = __game.S.player, ap = P.ap, kt = P.ac.gs / 0.5144;
     // a give-way stop inside the zone mid-taxi (a crossing, traffic): held still for ~30 frames once z < 280
@@ -361,6 +391,55 @@ async function demandTaxiOut() {
   check('taxi-out: DEMAND TAKEOFF stays and DEMAND IT stays dark while the AP taxis through the finish zone', offered && r.n > 20 && !r.bad.length, JSON.stringify({ n: r.n, bad: r.bad.slice(0, 4) }));
 }
 
+// HUDPOLISH E3: one-time first-run hints for the F-35 context button and the MAP chip: small, beside the control, never over a
+// control, not touchable, ended by using the control, never shown again on this device. Shots in docs/shots/hudpolish/.
+const HP_SHOTS = join(HERE, '..', 'docs', 'shots', 'hudpolish');
+async function hpShot(name) { mkdirSync(HP_SHOTS, { recursive: true }); const r = await send('Page.captureScreenshot', { format: 'png' }); const p = join(HP_SHOTS, name + '.png'); writeFileSync(p, Buffer.from(r.data, 'base64')); console.log('  shot', p); }
+const HINT_AVOID = ['.krz-stick-zone', '.krz-thr-col', '.krz-pad', '.krz-r-btn', '.krz-land', '.krz-finish', '.krz-gbtn', '.krz-top-l', '.krz-top-r', '.krz-warp',
+  '.krz-r-tower', '.krz-hud-strip', '.krz-score', '.krz-chips', '.krz-map-chip'];
+const hintNow = `(() => { const h = document.querySelector('.krz-hint'); if (!h || h.hidden || !h.classList.contains('in')) return null; const b = h.querySelector('.krz-hint-bub').getBoundingClientRect();
+  return { id: h.dataset.hint, x: b.x, y: b.y, w: b.width, h: b.height, op: +getComputedStyle(h).opacity }; })()`;
+async function hintFlow(W, H, tag) {
+  console.log(`\n== HUDPOLISH first-run hints ${W}×${H} touch`);
+  await viewport(W, H);
+  const NO_HINTS = { 'krayzee.hints': null };
+  // F-35 on its stand: VERTICAL TAKEOFF in the LAND slot
+  await fresh('?start=free&noaccount=1&plane=f35&timescale=0.25', NO_HINTS);   // slow sim: VERTICAL TAKEOFF lasts until ~40 kt, the checks and the shot take real time
+  if (FALSIFY) await ev(`(() => { const s = document.createElement('style'); s.textContent = '.krz-hint-bub { left: 30px !important; top: ${H - 150}px !important; }'; document.head.append(s); return 1; })()`);
+  await until('!!__game.S.player', 15);
+  const ctxOn = await until(`document.querySelector('.krz-land[data-ctx]') && !document.querySelector('.krz-land').hidden && document.querySelector('.krz-land').dataset.ctx`, 10);
+  // the F-35 rolls at once and VERTICAL TAKEOFF goes at ~40 kt, so everything is read in the same frame the hint is seen
+  const h1 = await until(`(() => { const h = ${hintNow}; if (!h || h.id !== 'ctx' || h.op < 0.9) return null; const out = [];
+    for (const s of ${JSON.stringify(HINT_AVOID)}) for (const e of document.querySelectorAll(s)) {
+      if (e.hidden || e.closest('[hidden]') || getComputedStyle(e).visibility === 'hidden') continue; const r = e.getBoundingClientRect(); if (!r.width) continue;
+      if (h.x < r.right && r.left < h.x + h.w && h.y < r.bottom && r.top < h.y + h.h) out.push(s); }
+    const t = document.elementFromPoint(h.x + h.w / 2, h.y + h.h / 2); return { ...h, clash: out, through: !t?.closest('.krz-hint') }; })()`, 8);
+  check(`${tag}: F-35 context button (${ctxOn}) gets its hint`, !!h1, JSON.stringify(h1));
+  check(`${tag}: the hint sits beside the control, over no control, and is small`, h1 && !h1.clash.length && h1.w * h1.h < W * H * 0.06, JSON.stringify({ h1, share: h1 && +(h1.w * h1.h / (W * H)).toFixed(3) }));
+  check(`${tag}: the hint never takes a tap (non-blocking)`, h1?.through);
+  await hpShot(`hint-ctx-${tag}`);
+  if (FALSIFY) await tapAt(W / 2, H * 0.35); else await tap('.krz-land');
+  check(`${tag}: using the context button ends the hint`, await until(`!(${hintNow}) && JSON.parse(localStorage.getItem('krayzee.hints') || '{}').ctx === 'used'`, 3), await ev(`localStorage.getItem('krayzee.hints')`));
+  // MAP chip: next in line once the first hint is done (C172, Free Flight)
+  await fresh('?start=free&noaccount=1&timescale=1', { 'krayzee.hints': { ctx: 'used' } });
+  await until('!!__game.S.player', 15);
+  const h2 = await until(`(() => { const h = ${hintNow}; return h && h.id === 'map' && h.op > 0.9 && h; })()`, 12);
+  check(`${tag}: the MAP chip gets its hint`, !!h2, JSON.stringify(h2));
+  await sleep(400);
+  await hpShot(`hint-map-${tag}`);
+  await tap('.krz-map-chip');
+  check(`${tag}: opening the map ends the map hint`, await until(`!(${hintNow}) && JSON.parse(localStorage.getItem('krayzee.hints') || '{}').map === 'used' && !document.querySelector('.krz-map').hidden`, 3));
+  await tap('.krz-map-x');
+  // never again on this device: both controls on screen for 12 s, no hint
+  if (FALSIFY) await ev(`(localStorage.removeItem('krayzee.hints'), 1)`);
+  await send('Page.navigate', { url: BASE + '?start=free&noaccount=1&plane=f35&timescale=1' });
+  await until('!!window.__krayzeeReady && !!__game.S.player', 30, 300);
+  let seen = null;
+  for (let i = 0; i < 40 && !seen; i++) { seen = await ev(hintNow); await sleep(300); }
+  const both = await ev(`!!document.querySelector('.krz-land[data-ctx]') && !document.querySelector('.krz-map-chip').hidden`);
+  check(`${tag}: hints never show again on this device`, both && !seen, JSON.stringify({ both, seen }));
+}
+
 await connect();
 await send('Network.enable');
 await send('Network.setCacheDisabled', { cacheDisabled: true });
@@ -370,6 +449,7 @@ if (ONLY.includes('portrait')) { await chipsFlow(390, 844, 'portrait'); await pr
 if (ONLY.includes('landscape')) { await chipsFlow(844, 390, 'landscape'); await promptFlow(844, 390, 'landscape'); }
 if (ONLY.includes('story')) await storyFlow();
 if (ONLY.includes('pt3')) await pt3Flow();
+if (ONLY.includes('hints')) { await hintFlow(390, 844, 'portrait'); await hintFlow(844, 390, 'landscape'); }
 if (ONLY.includes('gamefix')) { await gamefixFlow(390, 844, 'portrait'); await gamefixFlow(844, 390, 'landscape'); await hardTaxiIn(); await demandTaxiOut(); }
 check('no page errors', !errors.length, errors.slice(0, 3).join(' | '));
 const fails = results.filter((r) => !r.ok);

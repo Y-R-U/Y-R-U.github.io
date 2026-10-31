@@ -3,19 +3,22 @@
 import royal from './royal.js';
 import farm from './farm.js';
 import airbase from './airbase.js';
+import palace from './palace.js';
 import { AIRCRAFT } from '../aircraft.js';
 
-export const KINGDOM = { royal, farm, airbase };
-export const ORDER = ['royal', 'farm', 'airbase'];
-// On the map as "coming soon" pins only (docs/AIRPORTS.md §1). The Palace Lawn (C-Tower 3, D27) lives inside C-Tower 1.
+export const KINGDOM = { royal, farm, airbase, palace };
+export const ORDER = ['royal', 'palace', 'farm', 'airbase'];
+// On the map as "coming soon" pins only (docs/AIRPORTS.md §1). The Palace Lawn (C-Tower 3, D27) lives inside C-Tower 1's
+// world (palace.world = 'royal'): a trip between the two swaps the tower, not the world.
 export const SOON = [
   { id: 'sands', name: 'Saltwhistle Sands', map: [-30, 22] },
   { id: 'krumpet', name: 'Mount Krumpet Altiport', map: [12, -30] },
   { id: 'krz', name: 'Krayzee International', map: [34, 12] },
 ];
 export const LOOKS = {
-  royal: { blurb: 'The royal aerodrome. Crossing runways, a castle (Palace Lawn coming soon) and a very tired tower.', controller: 'Gerald, Imogen & Toby' },
+  royal: { blurb: 'The royal aerodrome. Crossing runways, a castle with a Palace Lawn at its foot, and a very tired tower.', controller: 'Gerald, Imogen & Toby' },
   farm: { blurb: 'A grass strip between the hedges. Mind the sheep. Farmer Mudge runs the radio between milkings.', controller: 'Farmer Mudge' },
+  palace: { blurb: 'A rolled croquet lawn at the foot of the castle. Short. Very short. The butler announces every arrival.', controller: 'Mr Fennimore, the Butler' },
   airbase: { blurb: 'Miles of concrete for the heavies. Squadron Leader Imogen has seen it all and filed it.', controller: 'Sqn Ldr Imogen' },
 };
 
@@ -31,6 +34,12 @@ export function usableLength(def) {
 }
 
 const QUIPS = {
+  palace: {
+    c172: "Mr Fennimore: \"The Runabout, Your Grace? It would end its run in the fountain.\"",
+    jumbo: "Mr Fennimore: \"One fears the Jumbo would rather crowd the croquet.\"",
+    herc: "Mr Fennimore: \"The Wardrobe will not fit on the lawn. Nor through the gates.\"",
+    pitts: "Mr Fennimore: \"The Show-Off lands rather faster than the lawn is long, Your Grace.\"",
+  },
   farm: {
     jumbo: "Farmer Mudge: \"You'll not land that great tin barn on my turnips.\"",
     herc: "Farmer Mudge: \"The Wardrobe? On my grass? It'd flatten Doreen.\"",
@@ -40,9 +49,11 @@ const QUIPS = {
 export function canUse(def, type) {
   const need = runwayNeed(type), have = usableLength(def);
   if (have >= need) return { ok: true, need, have };
+  // a STOVL jet goes up and comes down vertically where the airport allows it (the F-35 on the Palace Lawn)
+  if (def.vertical && AIRCRAFT[type]?.flight?.stovl) return { ok: true, need, have, vertical: true };
   const plane = AIRCRAFT[type]?.name || type;
-  const surf = def.runways[0]?.surface === 'grass' ? 'grass' : 'runway';
-  return { ok: false, need, have, short: `TOO SHORT FOR THE ${plane.toUpperCase()}`,
+  const surf = ['grass', 'lawn'].includes(def.runways[0]?.surface) ? def.runways[0].surface : 'runway';
+  return { ok: false, need, have, short: `TOO SHORT FOR THE ${plane.replace(/^the /i, '').toUpperCase()}`,
     quip: QUIPS[def.id]?.[type] || `${def.short} has ${have} m of ${surf}. The ${plane} wants ${need} m.` };
 }
 

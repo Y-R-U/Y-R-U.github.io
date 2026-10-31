@@ -5,6 +5,7 @@ const ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"
 // LAND NOW (Aaron): while LAND flies a circuit/join, a second button directly under LAND flies straight ahead and down
 // instead. main.js gets onPress('now') and plans as usual; armLandNow() makes that next planLandAhead() straight-only.
 let nowArmed = false, lastPlan = null;
+export const NOW_HOLD = 2500, NOW_GAP = 1000;   // ms: LAND NOW stays at least this long once shown / is not re-shown sooner
 export function armLandNow() { nowArmed = true; }
 export function takeLandNow() { const v = nowArmed; nowArmed = false; return v; }
 export function noteLandPlan(p) { if (p && !p.fail) lastPlan = p; }
@@ -66,7 +67,7 @@ export function createLandButton({ container, onPress, onContext, stickRight = f
     }
     if (now.contains(e.target)) {
       if (state !== 'active' || el.dataset.now !== '1') return;
-      armLandNow(); onPress?.('now', reason); nowArmed = false; showNow();
+      armLandNow(); onPress?.('now', reason); nowArmed = false; nowOnAt = -1e9; showNow();
       return;
     }
     // FLIGHTFIX3: a second tap within 0.7 s of LAND going active, or of LAND moving (LAND NOW showing/hiding slides it
@@ -77,11 +78,17 @@ export function createLandButton({ container, onPress, onContext, stickRight = f
   });
 
   // shown only while LAND is flying a non-straight pattern (the autopilot marks plan.leg as it goes)
-  let nowTimer = 0;
+  // FLIGHTFIX4: hysteresis. Hiding the pill slides LAND 58 px down onto where the pill was (loop c172-hard: the pill's
+  // centre became .krz-land-txt under the thumb), so once shown it stays NOW_HOLD ms (unless LAND ends or LAND NOW was
+  // tapped), and once hidden it is not offered again for NOW_GAP ms. Pressed late, LAND NOW plans straight ahead: harmless.
+  let nowTimer = 0, nowOnAt = -1e9, nowOffAt = -1e9;
   function showNow() {
     if (ctx) return;
-    const on = state === 'active' && !el.hidden && lastPlan && lastPlan.pattern !== 'straight' && !lastPlan.nowFallback && lastPlan.leg !== 'approach';   // a LAND NOW that found nothing straight is not offered again for that plan
-    if ((el.dataset.now === '1') !== !!on) { el.dataset.now = on ? '1' : '0'; guardAt = clock(); }
+    const live = state === 'active' && !el.hidden, cur = el.dataset.now === '1', t = clock();
+    let on = live && !!lastPlan && lastPlan.pattern !== 'straight' && !lastPlan.nowFallback && lastPlan.leg !== 'approach';   // a LAND NOW that found nothing straight is not offered again for that plan
+    if (live && cur && !on && t - nowOnAt < NOW_HOLD) on = true;
+    if (on && !cur && t - nowOffAt < NOW_GAP) on = false;
+    if (cur !== on) { el.dataset.now = on ? '1' : '0'; guardAt = t; if (on) nowOnAt = t; else nowOffAt = t; }
   }
   function setState(s, why = '') {
     if (ctx) { state = s; reason = why; return; }

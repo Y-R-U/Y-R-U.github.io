@@ -187,6 +187,31 @@ narrower than ~48 m could be missed (none exists today).
   all → `{ fail, hint: 'RUNWAY ONLY, SIRE', quip }`.
 - `ap.fieldTakeoff()` refuses for jets (docs/FLIGHT.md). Tests: `node tools/flight-sim.mjs jets` (LAND ×3 per jet, LAND NOW).
 
+## 3f. FLIGHTFIX4 (2026-10-30)
+- **LAND on the home circuit picked a field** (loop c172 "LAND probe downwind", easy + hard). Two causes, both in
+  `runwayCandidates` / `homeRunways`:
+  - a home runway that was also *in the cone* lost its home status (`home = !hit && …`), so low (< 120 m) with the
+    runway ahead but too close for a straight-in, its circuit cost +5000 and a straight field won. Home is now home in
+    the cone too (the in-cone end filter and `pref` are unchanged). Real world sweep, c172, 45–150 m AGL around the
+    field: field picks 1587 → 893 of 3888 (the rest < 50 m AGL or flying away, by design).
+  - a downwind ATC had stretched (`extendDownwind`, up to ~4.5 km past the end) left `homeR` (2.3 km): from ~2.4 km out
+    LAND chose `FIELD/straight` (seen live with a poller beside the loop). `homeRunways` also accepts the downwind band:
+    0.4–2 km abeam the axis, ≤ 6 km past an end, track within 40° of the axis.
+  - Not a planner bug, for the record: "downwind with LAND available never within 240 s" happened when the recovery after
+    the loop's stick test rejoined at BASE (no DOWNWIND phase until the next circuit), or (before this fix) when LAND was
+    greyed on that low early downwind.
+- **Short runways** (WORLD's palace block kept): the touchdown aim is now `LAND.shortAim` (30 m, the AP's short-field
+  aim) instead of up to 130 m, still capped so the type stops within roll × 1.25.
+- **LAND NOW hysteresis** (landbutton.js): the pill is not flapping in node (fuzz: ≤ 2 changes in any 3 s); the loop's
+  "covered by .krz-land-txt for 8 s" is the pill retiring when LAND reaches its final (plan.leg = 'approach') while the
+  harness, under load, was still on its way to tap it: hiding slides LAND 58 px down onto the pill's spot. Now, once
+  shown the pill stays ≥ `NOW_HOLD` (2.5 s) unless LAND ends or LAND NOW was tapped; once hidden it is not re-offered for
+  `NOW_GAP` (1 s). A late LAND NOW tap plans straight ahead (harmless on final).
+- Tests: landahead.test.mjs 39 (+3: extended downwind → runway, low near the home runway → runway, LAND NOW hysteresis
+  with a stub DOM; the first two fail on the old planner, the third without the hysteresis). One old case moved: "grass
+  east of the field heading east" was at (2600, 1400), which is an extended downwind of 27 (home since FIX4): now
+  (2600, 2400).
+
 ## 4. Tests (2026-10-22, after WORLD r2)
 ```
 node js/assist/test/landahead.test.mjs            # node, fake world with r2-style rolling ground + castle hill

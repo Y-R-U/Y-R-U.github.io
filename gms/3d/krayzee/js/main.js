@@ -27,6 +27,7 @@ import { createStory } from './story/index.js';
 import { configureRadio } from './radio/index.js';
 import { saveSettings, hasProfile } from './ui/store.js';
 import { createKingdom, bootAirport } from './map/index.js'; // MAP (D29 Kingdom Map, docs/MAP.md)
+import { aiPool } from './world/aipool.js'; // WORLD
 
 const AUTO = params.get('auto') === '1';
 const SHOT = params.get('shot') === '1';
@@ -47,6 +48,7 @@ async function boot() {
   try { career = loadCareer(); } catch (e) { career = undefined; }
   ui.initUI({ onPlay, onSettings, onProfile, onResume, onQuit, confirmQuit, onSound: (k) => audio.playUI(k), career, onOnline, onStory, onIntro: watchIntro });
   try { ui.setOnlineAvailable?.(!!params.get('net')); } catch (e) { /* */ }
+  if (!params.get('net') && location.hostname === 'games.br8t.com') fetch('/gms/3d/krayzee/net/health', { cache: 'no-store' }).then((r) => r.ok && ui.setOnlineAvailable?.(true)).catch(() => {}); // ACCESS: Online goes live once the room server answers (D36)
   ui.setLoading(0.05, 'Warming up the engines');
   try { audio.initAudio(); audio.setVolumes(ui.getSettings()); } catch (e) { console.warn('audio', e); }
   const set0 = settings();
@@ -91,7 +93,7 @@ async function boot() {
   configureRadio({ deferLoad: true }); // barks + clip manifest load after the first menu frame (or on first use)
   wiring = createWiring({ ui, audio, world, traffic, hud, ghud, career, log });
   attract = createAttract({ scene, traffic, env, createPlane, quality: contentQ, max: params.get('lite') === '1' ? 3 : 4,
-    onRig: (rig) => applyEnv(rig), onSpawn: (e) => { wiring.addAI(e); fx?.track(e.ac.id, { rig: e.rig, ac: e.ac }); }, onDespawn: (e) => { wiring.removeAI(e); fx?.untrack(e.ac.id); }, activeEnd: () => wiring.activeEnd(), types: ['c172', 'c172', 'tiger', 'bathtub'] });
+    onRig: (rig) => applyEnv(rig), onSpawn: (e) => { wiring.addAI(e); fx?.track(e.ac.id, { rig: e.rig, ac: e.ac }); }, onDespawn: (e) => { wiring.removeAI(e); fx?.untrack(e.ac.id); }, activeEnd: () => wiring.activeEnd(), types: aiPool(['c172', 'c172', 'tiger', 'bathtub', 'cub', 'pitts']) }); // WORLD: types the airport fits
   await attract.start();
   ui.setLoading(0.8, 'Briefing the pilots');
   await nextPaint();
@@ -145,6 +147,7 @@ async function boot() {
     }
   });
   window.__krayzeeReady = true;
+  import('./game/access.js').then((m) => (window.__access = m.access()).probe()).catch(() => {}); // ACCESS: br8t Pass probe, once (docs/ACCESS.md)
   ui.setLoading(1, 'Cleared for take-off');
   if (AUTO || params.get('start') === 'free') { ui.enterGameplay(); onPlay('free'); }
   else if (story && params.get('mission')) { ui.enterGameplay(); startMission(+params.get('mission') || 1); }
@@ -249,10 +252,11 @@ function attachGame() {
   });
 }
 // Free Flight aircraft (TRAFFIC r3): C172, Tiger Moth, Royal Flying Bathtub. ?plane= wins, then settings.aircraft.
-const FLYABLE = ['c172', 'tiger', 'bathtub', 'jumbo', 'herc', 'f35'];
+const FLYABLE = ['c172', 'tiger', 'bathtub', 'jumbo', 'herc', 'f35', 'cub', 'pitts', 'throne']; // ROSTER
 function aircraftType() {
   const q = params.get('plane');
   if (FLYABLE.includes(q)) return q;
+  if (S.playMode === 'story' && FLYABLE.includes(S.storyPlane)) return S.storyPlane; // STORY3: the mission's plane
   const a = settings().aircraft;
   return S.playMode !== 'story' && FLYABLE.includes(a) && ui.aircraftUnlocked(a) ? a : 'c172';
 }
@@ -305,10 +309,12 @@ function placeWarp() {
   w.style.top = `${Math.round(top)}px`; w.style.right = `${Math.round(right)}px`; w.style.transform = 'none';
 }
 // STORY (docs/STORY.md): the menu's Story button, ?mission=N, ?intro=1.
-function startMission(id = 1) {
-  return Promise.resolve(kingdom?.ensure('royal')).then(() => onPlay('story')).then(() => { // MAP: missions fly from C-Tower 1
+function startMission(id = 1, direct = false) {
+  S.storyPlane = story?.planeFor(id); // STORY3: the mission's plane and airport (C-Tower 1 unless it says)
+  return Promise.resolve(kingdom?.ensure(story?.airportFor(id) || 'royal')).then(() => onPlay('story')).then(() => { // MAP: missions fly from C-Tower 1
     if (!story || !S.player) return;
     story.startMission(id, {
+      direct, relaunched: direct ? id : null, relaunch: (n) => { story.endMission(); quitPlay(); startMission(n, true); }, // STORY3
       difficulty: settings().difficulty || 'easy',
       setTarget: (t) => { S.missionTarget = t; },
       onFail: () => { S.reelT = 0.4; },
@@ -603,7 +609,8 @@ function updateStovl(dt, P) {
     S.padT = 0.5;
     try { S.pad = findPad(env, ac.pos.x, ac.pos.z, { avoid: traffic.list.filter((e) => e.ac !== ac && e.ac.onGround).map((e) => [e.ac.pos.x, e.ac.pos.z, e.ac.dims.span * 0.6 + 4]) }); } catch (e) { S.pad = { fail: 'not clear' }; }
   } else if (mode !== 'hover' && mode !== 'vto') S.pad = null;
-  const base = { stovl: true, crashed: ac.crashed, onGround: ac.onGround, gsKt: ac.gs / KT, speedKt: ac.speed / KT, agl: ac.agl, mode, pad: S.pad,
+  const base = { stovl: ac.P.stovl, crashed: ac.crashed, // ROSTER: the type's STOVL profile (the throne's own LAND-first speed)
+    onGround: ac.onGround, gsKt: ac.gs / KT, speedKt: ac.speed / KT, agl: ac.agl, mode, pad: S.pad,
     landPlan: S.landPlan, landActive: land.state === 'active' && !mode };
   // HOVER / LAND as the first choice swap only once the new order has held 1.5 s (never under a thumb mid-tap)
   const first = (x) => (x && !mode && !ac.onGround && x.state === 'idle' && (x.key === 'hover' || x.key === 'landrw') ? x.key : null);
@@ -794,6 +801,7 @@ function updateGameHUD(dt, P, modes) {
     blocked: AUTO || SHOT || radioOpen || (!!toCoach?.wants && waiting && ghud.coach.active !== 'goal'),
     stable: calm && (ac.onGround || (Math.abs(ac.bank) < 0.6 && Math.abs(ac.vs) < 6)),
   });
+  ghud.hints.update(dt, { blocked: AUTO || SHOT || radioOpen || !!ghud.coach.active || !!toCoach?.active || !!S.reelOpen }); // HUDPOLISH E3
 }
 
 // ATC/AP reason codes → words (PLAYTEST_1: raw "CROSSINGTRAFFIC" reached the HUD).

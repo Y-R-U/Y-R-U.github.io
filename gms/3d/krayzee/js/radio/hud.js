@@ -3,9 +3,11 @@
 const RING_R = 33;
 // MSGFIX: a finished line lingers 2.2 s (0.6 s while the player is busy: hand-flying, low, or a sheet is open; main.js
 // sets html.krz-msg-busy). Only the newest card shows; older ones fold into its "+n" transcript badge (tap = log).
-const HOLD = 2.2, HOLD_BUSY = 0.6;
+// HUDPOLISH: a landscape phone's view is about half a portrait one once the side controls are out, so cards linger 1.2 s.
+const HOLD = 2.2, HOLD_LAND = 1.2, HOLD_BUSY = 0.6;
 const busy = () => document.documentElement.classList.contains('krz-msg-busy');
-const holdFor = (h) => Math.min(h, busy() ? HOLD_BUSY : HOLD);
+const landPhone = () => innerWidth > innerHeight && innerHeight < 520;
+const holdFor = (h) => Math.min(h, busy() ? HOLD_BUSY : landPhone() ? HOLD_LAND : HOLD);
 const RING_C = 2 * Math.PI * RING_R;
 const LOG_MAX = 20;
 
@@ -75,7 +77,7 @@ export function createRadioHud(parent, { onChoose, onOpenMenu, onClose } = {}) {
 
   const panel = el('div', 'krz-r-panel');
   panel.hidden = true;
-  panel.innerHTML = '<div class="krz-r-head"><div class="krz-r-title"><b></b><span></span></div><span class="krz-r-secs"></span><button type="button" class="krz-r-x" aria-label="Close">&times;</button></div><div class="krz-r-chips"></div>';
+  panel.innerHTML = '<div class="krz-r-head"><div class="krz-r-title"><b></b><i class="krz-r-to1"></i><span></span></div><span class="krz-r-secs"></span><button type="button" class="krz-r-x" aria-label="Close">&times;</button></div><div class="krz-r-chips"></div>';
   const chipsEl = panel.querySelector('.krz-r-chips');
   const secsEl = panel.querySelector('.krz-r-secs');
 
@@ -171,6 +173,11 @@ export function createRadioHud(parent, { onChoose, onOpenMenu, onClose } = {}) {
         chipsEl.appendChild(b);
       });
       chipsEl.dataset.n = chips.length;
+      // HUDPOLISH: every chip aimed at the same target says so once, in the header
+      const tg = chips.map((c) => c.targetName);
+      const same = chips.length > 1 && !!tg[0] && tg.every((t) => t === tg[0]);
+      chipsEl.classList.toggle('same', same);
+      panel.querySelector('.krz-r-to1').textContent = same ? `\u2192 ${tg[0]}` : '';
     },
     setCountdown(frac, left) {
       ringFg.style.strokeDashoffset = String(RING_C * (1 - Math.max(0, Math.min(1, frac))));

@@ -20,6 +20,13 @@ const G = await imp('js/game/index.js');
 const TK = await imp('js/game/tasks.js');
 const D = await imp('data/tasks.js');
 const { INFRACTIONS } = await imp('data/rules.js');
+const LY = await imp('js/world/layout.js');
+const { KINGDOM } = await imp('data/airports/kingdom.js');
+const { LAWN } = await imp('data/airports/palace.js');
+for (const d of Object.values(KINGDOM)) LY.registerAirport(d);
+const atFarm = (f) => { LY.setAirport('farm'); try { f(); } finally { LY.setAirport('royal'); } };
+// spin the bank `rad` radians per step for `n` steps of dt seconds (rolls)
+const spin = (h, n, rad = 0.5, dt = 0.1) => { h.lift(); let b = 0; for (let i = 0; i < n; i++) { b += rad; h.ac.bank = Math.atan2(Math.sin(b), Math.cos(b)); h.sample(dt); } h.ac.bank = 0; };
 
 let pass = 0, fail = 0;
 const failures = [];
@@ -173,6 +180,18 @@ const R = {
   fly_f35: (h) => { h.play({ plane: 'f35' }); h.takeoff(); },
   f35_fast: (h) => { h.play({ plane: 'f35' }); h.fly(1, { speed: 480 * KT, gs: 480 * KT }); },
   f35_flypast: (h) => { h.play({ plane: 'f35' }); h.inf('low_pass'); },
+  fly_cub: (h) => { h.play({ plane: 'cub' }); h.takeoff(); },
+  cub_lawn: (h) => { h.play({ plane: 'cub' }); h.touchdown(200, { surface: 'lawn', x: LAWN.OX, z: LAWN.OZ }); },
+  cub_short: (h) => { h.play({ plane: 'cub' }); h.lift(); h.touchdown(250); h.ground('runway', 60, 0); },
+  cub_farm: (h) => { h.play({ plane: 'cub' }); atFarm(() => h.touchdown(250, { surface: 'grass', z: 40 })); },
+  fly_pitts: (h) => { h.play({ plane: 'pitts' }); h.takeoff(); },
+  pitts_snap: (h) => { h.play({ plane: 'pitts' }); spin(h, 16); },
+  pitts_10: (h) => { h.play({ plane: 'pitts' }); spin(h, 10 * 13); },
+  pitts_inv: (h) => { h.play({ plane: 'pitts' }); h.fly(11, { bank: Math.PI }); },
+  fly_throne: (h) => { h.play({ plane: 'throne' }); h.takeoff(); },
+  throne_hover: (h) => { h.play({ plane: 'throne' }); h.fly(31, { vtol: 1, speed: 1, gs: 1, agl: 20, alt: 20 }); h.ac.vtol = 0; },
+  throne_vgrass: (h) => { h.play({ plane: 'throne' }); h.ac.vtol = 1; h.touchdown(150, { surface: 'grass', z: 400 }); h.ac.vtol = 0; },
+  throne_hard: (h) => { h.play({ plane: 'throne', diff: 'hard' }); h.fly(2, { vtol: 1, speed: 1, gs: 1, agl: 20, alt: 20 }); h.ac.vtol = 0; },
   f35_hover: (h) => { h.play({ plane: 'f35' }); h.fly(31, { vtol: 1, speed: 1, gs: 1, agl: 30, alt: 30 }); h.ac.vtol = 0; },
   f35_vfield: (h) => { h.play({ plane: 'f35' }); h.ac.vtol = 1; h.touchdown(250, { surface: 'grass', z: 400 }); h.ac.vtol = 0; },
   f35_vhard: (h) => { h.play({ plane: 'f35', diff: 'hard' }); h.ac.vtol = 1; h.touchdown(350); h.ac.vtol = 0; },
@@ -203,6 +222,7 @@ const R = {
   finish_10: (h) => rep(10, () => h.demand()),
   finish_100: (h) => rep(100, () => h.demand()),
   story_hard: (h) => h.tasks.story({ ok: true, mission: 2, diff: 'hard', objectives: ['cut'] }),
+  story_crowned_hard: (h) => h.tasks.story({ ok: true, mission: D.STORY.find((m) => m.finale).id, diff: 'hard', objectives: [] }),
 };
 for (const id of Object.keys(INFRACTIONS)) R[`rule_${id}`] = (h) => h.inf(id);
 for (const m of D.STORY) {
@@ -221,6 +241,21 @@ ok(ALL.every((t) => ['bronze', 'silver', 'gold'].includes(t.tier)), 'every task 
 ok(ALL.every((t) => t.on || ((t.stat && D.STATS[t.stat]) || (t.fstat && D.FSTATS[t.fstat])) && t.target > 0), 'every task names an event or a known counter with a target');
 ok(ALL.every((t) => R[t.id]), `a recipe for every task (missing: ${ALL.filter((t) => !R[t.id]).map((t) => t.id).join(', ') || 'none'})`);
 ok(Object.keys(INFRACTIONS).every((id) => ALL.some((t) => t.id === `rule_${id}`)), 'every rule in data/rules.js has its own task');
+
+// the STORY mirror must match the mission files (they import three, so read them as text)
+{
+  const dir = path.join(ROOT, 'data/story'), real = [];
+  for (const f of fs.readdirSync(dir).filter((x) => /^mission\d+\.js$/.test(x))) {
+    const src = fs.readFileSync(path.join(dir, f), 'utf8'), id = +(src.match(/\n\s+id: (\d+),\n\s+title:/) || [])[1];
+    const ob = src.slice(src.indexOf('objectives: ['), src.indexOf('],', src.indexOf('objectives: [')));
+    real.push({ id, objectives: [...ob.matchAll(/\{ id: '(\w+)'/g)].map((x) => x[1]) });
+  }
+  const bad = real.filter((m) => { const s = D.STORY.find((x) => x.id === m.id); return !s || s.objectives.join() !== m.objectives.join(); });
+  ok(real.length === D.STORY.length && !bad.length, `STORY mirrors data/story/mission*.js (${real.length} missions${bad.length ? '; differs: ' + bad.map((m) => m.id + ':' + m.objectives).join(' ') : ''})`);
+  ok(D.STORY.filter((m) => m.finale).length === 1, 'exactly one finale mission');
+  const hc = harness(); hc.tasks.story({ ok: true, mission: D.STORY.find((m) => m.finale).id, diff: 'medium', objectives: [] });
+  ok(hc.done(`story_${D.STORY.find((m) => m.finale).id}`) && !hc.done('story_crowned_hard'), 'crowned on Medium: the finale task, not the Hard one');
+}
 
 section('every task completes, and fires exactly once');
 const notDone = [], twice = [];
@@ -254,6 +289,12 @@ section('negative controls: near-misses of each detector do not complete');
   const h2 = harness(); h2.play({ diff: 'medium' }); h2.bankPP(1500); ok(!h2.done('hard_1000') && !h2.done('medium_2000'), '1,500 on Medium: neither Hard 1,000 nor Medium 2,000');
   const h3 = harness(); h3.play({ diff: 'hard' }); rep(4, () => h3.demand()); h3.destroy(); h3.demand(); ok(!h3.done('iron_peer'), 'iron peer: a destroyed breaks the streak (4 + 1)');
   const h4 = harness(); h4.tasks.story({ ok: true, mission: 4, diff: 'easy', objectives: ['steal', 'race', 'land'] }); ok(h4.done('story_4') && !h4.done('story_4_all'), 'mission 4 with an objective missed: done, not full marks');
+  // ROSTER: the near-misses
+  const hr = harness(); hr.play({ plane: 'cub' }); hr.lift(); hr.touchdown(250); hr.ground('runway', 160, 0); ok(!hr.done('cub_short'), 'cub: a 160 m roll is not a short-field stop');
+  hr.touchdown(250, { surface: 'grass', z: 40 }); ok(!hr.done('cub_farm') && !hr.done('cub_lawn'), 'cub: grass at C-Tower 1 is neither the farm nor the lawn');
+  const hp = harness(); hp.play({ plane: 'pitts' }); spin(hp, 26, 0.25); ok(!hp.done('pitts_snap'), 'pitts: a 2.6 s roll is not a snap roll');
+  const hp2 = harness(); hp2.play({ plane: 'pitts' }); hp2.lift(); for (let i = 0; i < 40; i++) { hp2.ac.bank = (i % 2 ? 1 : -1) * 1.2; hp2.sample(0.1); } ok(!hp2.done('pitts_snap'), 'pitts: rocking the wings is not a roll');
+  const ht = harness(); ht.play({ plane: 'throne', diff: 'easy' }); ht.fly(2, { vtol: 1, speed: 1, gs: 1, agl: 20, alt: 20 }); ok(!ht.done('throne_hard'), 'throne: a hover on Easy is not the Hard one');
   const h5 = harness(); h5.fly(1, { speed: 150 * KT }); ok(!h5.done('vne'), 'c172 at 150 kt is under Vne 163');
   const h6 = harness(); h6.play({ plane: 'bathtub' }); h6.touchdown(80); ok(h6.done('tub_butter') && h6.done('butter'), 'bathtub butter counts for both');
   // D35: STOVL tasks need a real vertical landing / an unbroken 30 s hover
@@ -276,6 +317,20 @@ section('unready planes stay locked ("coming soon")');
     ok(list.every((t) => !t.avail), `${p} is ${st}: its tasks show as locked`);
     for (const t of list) R[t.id](h);
     ok(list.every((t) => !h.done(t.id)), `${p}: locked tasks cannot complete`);
+  }
+  // FLIGHTFIX4: every hangar plane is 'ready' now, so the loop above never met a locked one and the falsify break
+  // "locked planes complete anyway" went uncaught. A synthetic non-ready plane (a real HEAVY_PLANES entry with its status
+  // set to 'soon' for this block) goes through the real planeReady and createTasks' default `ready`.
+  {
+    const p = D.HEAVY_PLANES[0], st0 = AIRCRAFT[p].status;
+    AIRCRAFT[p].status = 'soon';
+    try {
+      ok(!TK.planeReady(p), `planeReady('${p}') is false for a plane marked 'soon'`);
+      const h = harness(), list = h.tasks.tasks().filter((t) => t.plane === p);
+      ok(list.length > 0 && list.every((t) => !t.avail), `${p} marked 'soon': its tasks show as locked`);
+      for (const t of list) R[t.id](h);
+      ok(list.every((t) => !h.done(t.id)), `${p} marked 'soon': its tasks cannot complete`);
+    } finally { AIRCRAFT[p].status = st0; }
   }
   const h = harness({ ready: (p) => !p || p === 'jumbo' });
   ok(h.tasks.sets().find((s) => s.id === 'heavy').locked, 'Heavy Metal shows "new planes coming" while any of its planes is not ready');
@@ -413,6 +468,7 @@ function falsify() {
     ['save drops stats', 'js/game/tasks.js', "if (raw && typeof raw === 'object') D = { ...blank(), ...raw, v: TASKS_VERSION };", "if (raw && typeof raw === 'object') D = { ...blank(), ...raw, stats: {}, v: TASKS_VERSION };"],
     ['payments through addPP (sorties)', 'js/game/tasks.js', 'if (career?.addBonus) career.addBonus(pp); else career?.addPP(pp, {});', 'career?.addPP(pp, {});'],
     ['flight time counts warped sim time', 'js/game/tasks.js', 'const rdt = dt / Math.max(1, +warp || 1);', 'const rdt = dt;'],
+    ['a roll is any wobble', 'js/game/tasks.js', 'if (Math.abs(L.roll) >= 2 * Math.PI)', 'if (Math.abs(L.roll) >= 0.5)'],
     ['story full marks ignores ticks', 'data/tasks.js', '&& m.objectives.every((o) => e.ticks?.includes(o))', ''],
   ];
   let caught = 0;

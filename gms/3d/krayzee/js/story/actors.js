@@ -136,13 +136,36 @@ export function extendHost(H, G, o = {}) {
     const fresh = lines.filter((l) => !loaded.has(l.id));
     if (!fresh.length) return true;
     radio.bank.load(fresh.map((l) => ({ id: l.id, voice: l.voice, intent: l.id, text: l.text, callsign: l.callsign, maxSeconds: 12 })));
+    // a text-only tower line works whoever is in the tower (the airport's voice may change under it: VOICE2's tower_raf)
+    const TOWERS = ['tower_m', 'tower_f', 'tower_trainee', 'tower_farm', 'tower_raf'];
+    radio.bank.load(fresh.filter((l) => l.textOnly && TOWERS.includes(l.voice)).flatMap((l) => TOWERS.filter((v) => v !== l.voice).map((v) => ({ id: l.id, voice: v, intent: l.id, text: l.text, callsign: l.callsign, maxSeconds: 12 }))));
     const man = {};
-    for (const l of fresh) { (man[l.voice] ||= {})[l.id] = { file: base + l.id + '.mp3', duration: l.dur || 0 }; loaded.add(l.id); }
+    // textOnly: no clip yet (subtitles only, docs/STORY.md "lines needing VO")
+    for (const l of fresh) { if (!l.textOnly) (man[l.voice] ||= {})[l.id] = { file: base + l.id + '.mp3', duration: l.dur || 0 }; loaded.add(l.id); }
     radio.bank.loadManifest(man, '');
     return true;
   }, false);
   // who: 'tower' or a pilot id ('rupert'). about: whom the tower addresses (callsign splice).
   H.say = (who, id, { about = 'player', target = 'player' } = {}) => safe(() => W()?.radio?.say(who, id, who === 'tower' ? { about, target } : { target, priority: 2 }), false);
+  // a rival on frequency without a plane in the sky (he rings in from the clubhouse)
+  H.voiceRival = (who) => safe(() => {
+    const m = RIVALS.members.find((x) => x.id === who); if (!m) return false;
+    const [title, ...rest] = m.name.split(' ');
+    W()?.radio?.registerPilot({ id: m.id, name: rest.join(' '), title, voice: m.voice, color: RIVALS.livery.primary, rival: true, registration: 'K-POMF' });
+    return true;
+  }, false);
+
+  // STORY3: Kingdom Map trips (js/map/index.js trip) and the loaded airport
+  const K = () => (typeof window !== 'undefined' ? window.__kingdom : null);
+  H.airport = () => safe(() => K()?.state().airport || 'royal', 'royal');
+  H.trip = (to, o) => safe(() => !!K()?.trip(to, o), false);
+  H.tripTarget = () => safe(() => K()?.target(H.player()), null);
+  H.tripPhase = () => safe(() => K()?.state().phase || null, null);
+  H.type = () => H.player()?.ac.type || null;
+  // F-35 STOVL (docs/STOVL.md): mode, and the hover's hold point (Easy: the story walks the hover over the pad)
+  H.stovl = () => safe(() => H.player()?.ap?.stovlMode ?? null, null);
+  H.hoverHold = (x, z) => safe(() => { const st = H.player()?.ap?.stovl; if (st?.mode !== 'hover') return false; st.hold = { x, z }; return true; }, false);
+  H.verticalTakeoff = () => safe(() => !!H.player()?.ap?.verticalTakeoff({ end: H.activeEnd() }), false);
 
   return H;
 }

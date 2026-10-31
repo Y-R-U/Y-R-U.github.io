@@ -3,7 +3,8 @@ import { TOWN_ROADS } from './town.js';
 import { Builder, col, fbm, rng, ribbon, arc, segInRect } from './util.js';
 import { asphaltTexture, skidAtlas, uvQuad } from './textures.js';
 import { FRAMES, SEGMENTS, HOLDS, rwPt, rwDir, PAD_LEN } from './geom.js';
-import { TAXIWAY_WIDTH, STANDS, APRON, TERMINAL } from './layout.js';
+import royal from '../../data/airports/royal.js';
+const { taxiwayWidth: TAXIWAY_WIDTH, stands: STANDS, terminal: TERMINAL } = royal, APRON = royal.aprons[0];
 
 const Y_PAVE = 0.04, Y_MARK = 0.06;
 const WHITE = col('#f4f4ef', 0.92), YELLOW = col('#f2c21b', 0.95), RED = col('#c0182c', 0.9), DARK = col('#1d1f22');

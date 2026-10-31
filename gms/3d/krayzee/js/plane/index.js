@@ -18,6 +18,9 @@ const TYPE_BUILDERS = {
   f35: () => import('./types/f35.js').then((m) => m.createF35),
   jumbo: () => import('./types/jumbo.js').then((m) => m.createJumbo),
   herc: () => import('./types/herc.js').then((m) => m.createHerc),
+  cub: () => import('./types/cub.js').then((m) => m.createCub),
+  pitts: () => import('./types/pitts.js').then((m) => m.createPitts),
+  throne: () => import('./types/throne.js').then((m) => m.createThrone),
 };
 export const PLANE_TYPES = ['c172', ...Object.keys(TYPE_BUILDERS)];
 

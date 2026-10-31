@@ -3,25 +3,27 @@ import { spawn, execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { startMockPay } from '../tools/access/mockpay.mjs';
 
 const dir = dirname(fileURLToPath(import.meta.url));
-const bin = join(tmpdir(), 'krayzeenet-test');
-const PORT = 8718, GRACE = 600;
+const bin = join(tmpdir(), 'krayzeenet-test'), BIN = bin;
+const PORT = 8718, PORT2 = 8719, GRACE = 600;
+let srv2 = null, pay = null;
 execFileSync('go', ['build', '-o', bin, '.'], { cwd: dir, stdio: 'inherit' });
 const start = () => spawn(bin, [], { env: { ...process.env, KRAYZEE_ADDR: `127.0.0.1:${PORT}`, KRAYZEE_GRACE_MS: String(GRACE), KRAYZEE_DEV_AUTH: '1', KRAYZEE_ICE_URL: 'off' }, stdio: 'ignore' });
 let srv = start();
 const up = async () => { for (let i = 0; i < 50; i++) { try { await fetch(`http://127.0.0.1:${PORT}/gms/3d/krayzee/net/health`); return; } catch { await sleep(100); } } };
-const URL = `ws://127.0.0.1:${PORT}/gms/3d/krayzee/net/ws`;
+const URL = `ws://127.0.0.1:${PORT}/gms/3d/krayzee/net/ws`, URL2 = `ws://127.0.0.1:${PORT2}/gms/3d/krayzee/net/ws`;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 let fails = 0;
 const ok = (cond, msg) => { console.log(`${cond ? 'ok  ' : 'FAIL'} ${msg}`); if (!cond) fails++; };
 
 class P {
-  static async open(name, voices, q = '', extra = {}) {
+  static async open(name, voices, q = '', extra = {}, base = URL) {
     const p = new P();
     p.name = name; p.inbox = [];
-    p.ws = new WebSocket(URL + q, { headers: { origin: 'http://localhost:8888' } });
+    p.ws = new WebSocket(base + q, { headers: { origin: 'http://localhost:8888' } });
     p.ws.onmessage = e => p.inbox.push(JSON.parse(e.data));
     await new Promise((res, rej) => { p.ws.onopen = res; p.ws.onerror = rej; });
     const w = await p.next('welcome');
@@ -153,8 +155,10 @@ try {
   await sleep(150);
   G2.send({ t: 'join', code: jr.code });
   ok((await G2.next('err'))?.code === 'joust', 'no mid-join into a joust in flight');
+  H.drain(); // an old lobby-phase room message would let the join race the phase change (flaked "joust holds two")
   H.send({ t: 'phase', p: 'lobby' });
   await H.room(x => x.phase === 'lobby');
+  G2.drain();
   G2.send({ t: 'join', code: jr.code });
   ok((await G2.next('err'))?.code === 'full', 'joust holds two');
 
@@ -214,10 +218,46 @@ try {
   Z2.send({ t: 'rejoin', rj: { id: zr.id, code: zr.code, name: zr.name, priv: true, set: zr.set, phase: zr.phase, owner: zr.owner, members: zr.members, epoch: zr.epoch } });
   const z2 = await Z2.room();
   ok(Z2.id === Z.id && z2 && z2.code === zr.code && z2.set.type === 'garden' && voiceOf(z2, Z2) === 'laird' && z2.members[0].call === zr.members[0].call, 'room rebuilt after a server restart (code, options, voice, callsign)');
+
+  // D36 access (access.go): a second server with sign-in required and the allowance on, against a mock payments
+  // service. --falsify starts it with both switches off: the sign-in and "4th room refused" checks must then FAIL.
+  const FALSIFY = process.argv.includes('--falsify');
+  pay = await startMockPay({ live: true, perDay: 3, pass: ['passy'] });
+  srv2 = spawn(BIN, [], { env: { ...process.env, KRAYZEE_ADDR: `127.0.0.1:${PORT2}`, KRAYZEE_DEV_AUTH: '1', KRAYZEE_ICE_URL: 'off',
+    KRAYZEE_SIGNIN: FALSIFY ? '' : 'required', KRAYZEE_ALLOWANCE: FALSIFY ? 'off' : 'on', KRAYZEE_ALLOWANCE_URL: pay.url }, stdio: 'ignore' });
+  for (let i = 0; i < 50; i++) { try { await fetch(`http://127.0.0.1:${PORT2}/gms/3d/krayzee/net/health`); break; } catch { await sleep(100); } }
+  const health = await (await fetch(`http://127.0.0.1:${PORT2}/gms/3d/krayzee/net/health`)).json();
+  ok(health.ok && health.access, `health reports the access switches ${JSON.stringify(health.access)}`);
+  const P2 = (n, v, extra) => P.open(n, v, '', extra, URL2);
+  const GU = await P2('Guest', ['toff']);
+  GU.send({ t: 'quick' });
+  ok((await GU.next('err'))?.code === 'signin', 'a guest (no account) cannot quick join');
+  GU.send({ t: 'create', set: { type: 'court' } });
+  ok((await GU.next('err'))?.code === 'signin', 'a guest cannot create a room');
+  const HP = await P2('Passy', ['toff'], { tok: 'dev:passy' });
+  const U = await P2('Frugal', ['nan'], { tok: 'dev:frugal' });
+  const left = [];
+  for (let i = 0; i < 3; i++) {
+    HP.drain(); HP.send({ t: 'create', priv: true, set: { type: 'court' } });
+    const hr = await HP.room();
+    U.drain(); U.send({ t: 'join', code: hr.code });
+    const ur = await U.room((x) => x.code === hr.code, 4000);
+    const al = await U.next('allowance');
+    left.push(al?.allowance?.remaining);
+    ok(!!ur, `signed-in player joins room ${i + 1} (spends one game, ${al?.allowance?.remaining} left)`);
+  }
+  ok(JSON.stringify(left) === '[2,1,0]', `allowance counts down 3 → 0 (${left})`);
+  HP.drain(); HP.send({ t: 'create', set: { type: 'court' } });
+  const r4 = await HP.room();
+  U.drain(); U.send({ t: 'join', code: r4.code });
+  const no = await U.next('err', () => true, 4000);
+  ok(no?.code === 'nogames' && no.allowance?.remaining === 0 && /br8t Pass/.test(no.msg || ''), `the 4th room is refused politely (${no?.code}: ${no?.msg})`);
+  ok((pay.state.used.get('passy') || 0) === 0, 'a Pass holder is never counted');
+  srv2.kill(); await pay.close();
 } catch (e) {
   console.error(e); fails++;
 } finally {
-  srv.kill();
+  srv.kill(); srv2?.kill(); pay?.close();
 }
 console.log(fails ? `${fails} FAILED` : 'all passed');
 process.exit(fails ? 1 : 0);

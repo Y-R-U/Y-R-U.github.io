@@ -32,6 +32,7 @@
     d.querySelector('pre').textContent = why || '';
     d.querySelector('button').onclick = reload;
     (document.body || document.documentElement).appendChild(d);
+    var t = setInterval(function () { if (window.__krayzeeReady) { clearInterval(t); d.remove(); } }, 500);
   }
   addEventListener('error', function (e) {
     if (window.__krayzeeReady) return;

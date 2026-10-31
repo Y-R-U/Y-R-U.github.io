@@ -1,4 +1,6 @@
-import { RUNWAYS, TAXIWAYS, TAXIWAY_WIDTH, HOLD_OFFSET, headingToVec, threshold } from './layout.js';
+import { headingToVec, threshold } from './layout.js';
+import royal from '../../data/airports/royal.js';
+const { runways: RUNWAYS, taxiways: TAXIWAYS, taxiwayWidth: TAXIWAY_WIDTH, holdOffset: HOLD_OFFSET } = royal;
 import { segInRect } from './util.js';
 
 export const HOLD_DIST = HOLD_OFFSET;

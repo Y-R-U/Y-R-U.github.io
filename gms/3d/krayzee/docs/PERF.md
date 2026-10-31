@@ -236,3 +236,54 @@ the S22 Ultra realistic on low and medium.
   leak: the `heap` section forces GCs and reads 45–49 MB.
 - Another lane mid-edit can break boot (`ReferenceError` at main.js). The harness reports the console error; wait and
   re-run.
+
+## World looks pass (lane WORLD, C2/C3, 2026-10-28)
+Tool: `node tools/world-perf.mjs [--url=…] [--airports=royal,farm,airbase,palace] [--throttle=4] [--tiers=low,medium] [--noshots|--noperf]`
+(headless Metal Chrome, Android UA, 390×844 DPR 3, tier locked, the player held at fixed moments: takeoff in chase,
+climb-out in cockpit, circuit height in chase, plus town and castle views at C-Tower 1). It reports fps, main-thread
+ms per frame (all rAF callbacks), draw calls and triangles (incl. the shadow pass), and writes screenshots to
+docs/shots/world/. **Before vs after was measured interleaved** (3 rounds, medians): "before" = this tree with the
+world files and kingdom.js put back to HEAD, served from a scratch copy on :8893, alternated run by run with the real
+tree, because the machine was at load average 100–170 the whole time (other lanes' Chrome tests). Read the call and
+triangle columns as exact; fps and CPU ms only to ±5 fps / ±3 ms. fps is vsync-capped at 60.
+
+4× CPU throttle:
+
+| airport | moment | tier | fps before → after | cpu ms/frame before → after | calls before → after | tris before → after |
+|---|---|---|---|---|---|---|
+| airbase | circuit | low | 53.7 → 55.1 | 11.8 → 9.3 | 29 → 29 | 74k → 74k |
+| airbase | circuit | medium | 54.3 → 51.7 | 12.0 → 10.9 | 29 → 29 | 106k → 106k |
+| airbase | climb | low | 47.8 → 55.1 | 12.9 → 11.1 | 19 → 19 | 58k → 58k |
+| airbase | climb | medium | 51.5 → 55.9 | 11.5 → 10.7 | 19 → 19 | 90k → 90k |
+| airbase | takeoff | low | 57.1 → 54.5 | 10.6 → 13.1 | 34 → 34 | 78k → 77k |
+| airbase | takeoff | medium | 57.8 → 55.1 | 11.6 → 12.1 | 34 → 34 | 110k → 109k |
+| farm | circuit | low | 55.6 → 55.0 | 12.2 → 10.8 | 24 → 23 | 62k → 62k |
+| farm | circuit | medium | 52.6 → 55.0 | 12.3 → 10.8 | 23 → 24 | 94k → 94k |
+| farm | climb | low | 49.4 → 52.9 | 12.4 → 11.4 | 19 → 19 | 58k → 58k |
+| farm | climb | medium | 52.0 → 53.0 | 8.8 → 11.3 | 19 → 19 | 90k → 90k |
+| farm | takeoff | low | 55.8 → 54.8 | 10.4 → 10.6 | 29 → 30 | 68k → 68k |
+| farm | takeoff | medium | 57.9 → 58.0 | 12.3 → 9.8 | 29 → 30 | 100k → 100k |
+| royal | castle | low | 53.2 → 54.0 | 7.1 → 10.9 | 37 → 39 | 107k → 127k |
+| royal | castle | medium | 53.7 → 50.7 | 8.5 → 12.7 | 36 → 38 | 153k → 173k |
+| royal | circuit | low | 48.7 → 52.1 | 10.6 → 9.8 | 33 → 36 | 95k → 119k |
+| royal | circuit | medium | 49.8 → 47.8 | 11.9 → 14.5 | 33 → 36 | 127k → 151k |
+| royal | climb | low | 46.9 → 49.1 | 10.9 → 8.6 | 29 → 31 | 88k → 111k |
+| royal | climb | medium | 51.3 → 50.7 | 10.9 → 10.3 | 29 → 31 | 120k → 143k |
+| royal | takeoff | low | 56.0 → 54.2 | 9.3 → 9.2 | 50 → 52 | 138k → 160k |
+| royal | takeoff | medium | 53.3 → 49.7 | 7.9 → 13.2 | 49 → 50 | 169k → 192k |
+| royal | town | low | 53.3 → 53.0 | 7.1 → 12.9 | 38 → 40 | 104k → 124k |
+| royal | town | medium | 52.5 → 52.4 | 8.7 → 11.8 | 43 → 45 | 146k → 165k |
+
+The Palace Lawn (`?airport=palace`, Tiger, 4×, single run): takeoff low 60 fps / 47 calls / 130k, medium 48 / 163k;
+climb 36–39 calls; circuit 32–33 calls / 87–119k; castle 37 calls. No airport is below C-Tower 1's ~50 fps at 4×.
+
+What it costs at C-Tower 1: **+2–3 draw calls** (traffic `InstancedMesh` +1; the palace ground +1 when in view; the
+river is merged into the lake mesh, the far hills are in the sky shader, the palace, bridges and fête are merged into
+the town meshes) and **+20–24k triangles** with the shadow pass (river ribbon ~5k, palace ~3k, bridges, 26 cars ~4k,
+bunting ~2k, bank trees). Low-tier takeoff is now 160k (budget line in AIRPORTS.md §2: 160k). Farm and air base: no
+change beyond noise (they only gain the far hills, free). Build time at C-Tower 1: +~60 ms desktop (bridges 15, palace
+22, cars 10, river field ~20); the first cut cost +670 ms (a string key per tree candidate and an unculled
+road × river intersection) and was fixed.
+
+Per-frame CPU added: the traffic update (26 cars, 14 on low: a binary search, one `heightAt` and a matrix each). The river and
+palace add no per-frame work.

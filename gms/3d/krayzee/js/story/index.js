@@ -8,6 +8,7 @@ import { createPicker, missionList } from './picker.js';
 import { MISSIONS, MISSION_IDS } from '../../data/story/index.js';
 import { RADIO_LINES, STORY_AUDIO } from '../../data/story/lines.js';
 import { loadProgress } from './dom.js';
+import { missionBlocked } from '../game/access.js'; // ACCESS: br8t Pass gate (docs/ACCESS.md)
 
 export { createIntro, introSeen, markIntroSeen, loadNarration, createMission, createTimeWarp, createWarpToggle, warpStateFor, WARP_LEVELS, createHost, MISSIONS, MISSION_IDS, missionList, loadProgress };
 
@@ -60,16 +61,21 @@ export function createStory(opts = {}) {
     return null;
   }
 
+  // STORY3: a mission in another plane, or at another airport, is set up again by main (o.relaunch(id))
+  const needsRelaunch = (def) => (def.aircraft && host.type() !== def.aircraft) || host.airport() !== (def.airport || 'royal');
+
   function runMission(id, o = {}) {
     S.mission?.abort();
+    if (missionBlocked(id)) { S.mission = null; pick(o); return null; } // ACCESS: Missions 5+ need a br8t Pass when payments are live
     const def = MISSIONS[id];
     if (!def) throw new Error(`no mission ${id}`);
+    if (o.relaunch && o.relaunched !== id && host.player() && needsRelaunch(def)) { S.mission = null; o.relaunch(id); return null; }
     warp.reset();
     try { G.ghud?.coach?.complete?.(); } catch (e) { /* the mission does the teaching */ }
     host.addLines(RADIO_LINES, STORY_AUDIO);
     const next = MISSION_IDS.find((n) => n > id);
     S.mission = createMission(def, { host, camera: opts.camera, parent: opts.parent, difficulty: o.difficulty, gender: opts.getProfile?.()?.gender, setTarget: o.setTarget, log: opts.log,
-      volume: volume(), hasNext: !!next, onComplete: o.onComplete, onFail: o.onFail, onExit: o.onExit,
+      volume: volume(), hasNext: !!next, onComplete: o.onComplete, onFail: o.onFail, onExit: o.onExit, relaunch: o.relaunch, profile: opts.getProfile,
       onNext: () => runMission(next, o) });
     S.mission.start();
     showWarp(true);
@@ -108,6 +114,10 @@ export function createStory(opts = {}) {
     get cameraOwned() { return !!S.intro?.active; },
     get intro() { return S.intro; }, get mission() { return S.mission; }, get toggle() { return S.toggle; }, get picker() { return S.picker; },
     endMission() { S.mission?.abort(); S.mission = null; S.picker?.close(); S.picker = null; showWarp(false); },
+    // STORY3: what main must set up before a mission: the plane and the airport (C-Tower 1 unless the mission says)
+    planeFor: (id) => MISSIONS[id]?.aircraft || 'c172',
+    airportFor: (id) => MISSIONS[id]?.airport || 'royal',
+    storyComplete: () => !!loadProgress().complete,
     introSeen,
   };
   if (typeof window !== 'undefined') window.__krzStory = api; // tests / devhook reuse the game's own instance

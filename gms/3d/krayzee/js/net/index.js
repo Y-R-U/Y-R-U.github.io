@@ -47,7 +47,9 @@ export function createNet({ server = DEFAULT_SERVER, profile = () => ({}), getTo
 
   net.on('data', (peer, bytes) => {
     if (bytes[0] !== KIND.STATE || bytes.length < 33 || held.has(peer)) return;
-    pushState(peer, unpackState(bytes.subarray(1, 33)));
+    const st = unpackState(bytes.subarray(1, 33));
+    if (bytes.length >= 35) { st.nozzle = bytes[33] / 255; st.fan = bytes[34] / 255; } // F2: STOVL nozzle + lift fan
+    pushState(peer, st);
   });
   net.on('peerLeft', (id) => { tracks.delete(id); held.delete(id); });
   net.on('left', () => { tracks.clear(); held.clear(); api.setAutopilot(false); });
@@ -148,12 +150,19 @@ export function createNet({ server = DEFAULT_SERVER, profile = () => ({}), getTo
     sendPlane(ac, opts = {}, now = performance.now()) {
       if (!net.room || now - lastState < STATE_MS * 0.9) return false;
       lastState = now;
-      return api.sendPlaneBytes(ac.packState({ ...opts, roomTimeMs: net.roomTime() }));
+      const b = ac.packState({ ...opts, roomTimeMs: net.roomTime() });
+      if (!ac.P?.stovl) return api.sendPlaneBytes(b);
+      // F2: a STOVL plane adds two bytes after the 32-byte state (older clients read only the 32): nozzle, lift fan
+      const x = new Uint8Array(34);
+      x.set(b);
+      x[32] = Math.max(0, Math.min(255, Math.round((ac.nozzle || 0) * 255)));
+      x[33] = Math.max(0, Math.min(255, Math.round((ac.liftFan || 0) * 255)));
+      return api.sendPlaneBytes(x);
     },
-    sendPlaneBytes(bytes32) {
-      const out = new Uint8Array(33);
+    sendPlaneBytes(bytes) {
+      const out = new Uint8Array(1 + bytes.length);
       out[0] = KIND.STATE;
-      out.set(bytes32, 1);
+      out.set(bytes, 1);
       for (const m of others()) net.sendTo(m.id, 'u', out);
       return true;
     },

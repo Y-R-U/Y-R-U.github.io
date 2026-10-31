@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { Builder, col, mat, rng, inRect } from './util.js';
 import { FRAMES, HOLDS, SEGMENTS, rwPt } from './geom.js';
-import { TAXIWAY_WIDTH, TERMINAL, STANDS } from './layout.js';
+import royal from '../../data/airports/royal.js';
+const { taxiwayWidth: TAXIWAY_WIDTH, terminal: TERMINAL, stands: STANDS } = royal;
 import { decalQuad } from './terminal.js';
 import { APRON_RECT, HANGAR_APRON, ROADS, CAR_PARK, TOWER_PAD } from './pavement.js';
 
@@ -221,7 +222,7 @@ function prism(b, T, pts, w, capCol, edgeCol, skipEdge = -1) {
   }
 }
 
-function addCar(b, type, x, z, ry, paint, hi, trim = true) {
+export function addCar(b, type, x, z, ry, paint, hi, trim = true) {
   const [L, W, sill, hoodF, beltF, beltR, zWs, zRf, zRr, zRw, roof, gw] = CAR_TYPES[type];
   const T = new THREE.Matrix4().makeRotationY(ry).setPosition(x, 0, z);
   const h = L / 2;

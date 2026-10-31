@@ -179,7 +179,7 @@ export function createControls({ root, getSettings, getDifficulty, onView, onPau
 
   // Full-stick roll rate per type (deg/s) and the D-spec bank soft-limit: ~60° on Easy/Medium, none on Hard. The limit
   // is a detent: at the limit, ease off and push full again within a second to roll past it (until back under 40°).
-  const RATE = { c172: 45, tiger: 50, bathtub: 35 }, DEG = Math.PI / 180;
+  const RATE = { c172: 45, tiger: 50, bathtub: 35, cub: 40, pitts: 240, throne: 40 }, DEG = Math.PI / 180;
   const BANK_LIM = 60 * DEG, BANK_K = 2.6;
   function rollAssist(ail, ac, dt) {
     st.bankLimited = false;

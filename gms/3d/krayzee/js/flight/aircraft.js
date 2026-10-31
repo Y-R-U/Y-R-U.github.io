@@ -26,6 +26,8 @@ TYPES.tiger = { gearHeight: 1.25, ...AIRCRAFT.tiger.flight };
 TYPES.bathtub = { gearHeight: 1.05, ...AIRCRAFT.bathtub.flight, gear: { rollDrag: 0.06, ...AIRCRAFT.bathtub.flight.gear } };
 // JETCORE (D33): jumbo, herc, f35. Their flight blocks carry gearHeight and the jet fields (engineKind, spool, ...).
 for (const id of ['jumbo', 'herc', 'f35']) if (AIRCRAFT[id]?.flight) TYPES[id] = { ...AIRCRAFT[id].flight };
+// ROSTER: Butter Cub, Show-Off (Pitts), Divine Right (the throne: STOVL on a jet pack, no jet rules)
+for (const id of ['cub', 'pitts', 'throne']) if (AIRCRAFT[id]?.flight) TYPES[id] = { ...AIRCRAFT[id].flight };
 export const JET_TYPES = ['jumbo', 'herc', 'f35'];
 export const isJet = (type) => !!TYPES[type]?.jet;
 
@@ -46,7 +48,7 @@ const HP_NAMES = { nose: 'nose', tail: 'tail', wingL: 'left wingtip', wingR: 'ri
   propL1: 'left inboard propeller', propR1: 'right inboard propeller', propL2: 'left outboard propeller', propR2: 'right outboard propeller',
   stabL: 'left tailplane', stabR: 'right tailplane', finL: 'left fin', finR: 'right fin', tankL: 'left drop tank', tankR: 'right drop tank' };
 
-export const GL = { track: 0.2, damp: 0.5 };
+export const GL = { track: 0.2, damp: 0.5, easy: 2.5 };   // easy: the player's tail-wheel track/damp boost on Easy (ROSTER)
 const ROLL_MU = { runway: 0.02, taxiway: 0.022, apron: 0.022, grass: 0.075, building: 0.3, water: 0.6 };
 
 let nextId = 1;
@@ -132,6 +134,8 @@ export class Aircraft {
     this.gearWant = this.gear = air && this.P.jet && o.alt > 150 ? 0 : 1;
     this.ab = 0; this.rev = 0; this.spoil = 0; this.sbrake = 0; this.gear = 1;
     this.onGround = this.mainsDown = !air;
+    // FLIGHTFIX4: the surface under it now, not 'grass' until the first step (a swap's START HERE read the lawn as grass)
+    if (env?.surfaceAt) try { this.surface = env.surfaceAt(o.x, o.z) || 'grass'; } catch (e) { /* keep grass */ }
     this.prevPos.copy(this.pos); this.prevQ.copy(this.q);
     this._derive(env);
   }
@@ -145,7 +149,7 @@ export class Aircraft {
 
   step(dt, env) {
     this.prevPos.copy(this.pos); this.prevQ.copy(this.q);
-    if (this.crashed) { this.vel.scale(0.9); this.w.scale(0.9); return; }
+    if (this.crashed) { this.vel.scale(0.9); this.w.scale(0.9); this._wreckFall(dt, env); return; }
     this.time += dt;
     const P = this.P, c = this.ctl;
     this._burn(dt);
@@ -260,6 +264,8 @@ export class Aircraft {
     let tz = -(c.aileron * P.maxRollRate * eff) + (this.onGround ? 0 : P.kBank * bank * eff * (Math.abs(bank) < 1.2 ? 1 : 0));
     if (this.stalled) tz += Math.sin(this.time * 1.7 + this.pos.x) * 0.5 * eff;
     if (P.rollWobble && !this.onGround) tz += P.rollWobble.amp * Math.sin(2 * Math.PI * P.rollWobble.hz * this.time) * eff;
+    // the throne's shopping-trolley wheel: it pulls left and wanders, rolling or flying
+    if (P.trolley) ty += (P.trolley.pull + P.trolley.wobble * Math.sin(2 * Math.PI * P.trolley.hz * this.time)) * (this.onGround ? clamp(V / 8, 0, 1) : eff);
     // fly-by-wire bank limit (F-35): full stick holds the limit instead of rolling it inverted into the ground
     if (P.bankLimit && !this.onGround) {
       if (bank > P.bankLimit && tz < 0) tz = (bank - P.bankLimit) * 3;
@@ -275,9 +281,10 @@ export class Aircraft {
     // ground-loop if you let it) but some damping keeps it catchable with the rudder. FLIGHTFIX3: only while the tail
     // wheel is down — tail flying (a wheel landing, the takeoff roll) the fin and rudder work as in the air (a tail-up
     // rollout at 40–60 kt used to diverge with full opposite rudder and put a wingtip in)
-    const td = this.taildragger && this.tailDown;
-    let ay = (ty - this.w.y) * kt * (td ? GL.track : 1);
-    if (td) ay -= this.w.y * GL.damp;
+    // ROSTER: on Easy (main.js sets stovlLevel = the difficulty for the player) the tail wheel tracks and damps harder
+    const td = this.taildragger && this.tailDown, gk = td && this.stovlLevel === 'easy' ? GL.easy : 1;
+    let ay = (ty - this.w.y) * kt * (td ? GL.track * gk : 1);
+    if (td) ay -= this.w.y * GL.damp * gk;
     const ax = (tq - this.w.x) * kt, az = (tz - this.w.z) * kt;
     const tb = torque.applyQuatInv(this.q);
     if (this.onGround) tb.x += c.elevator * qd * P.wingArea * 0.09 * (1 + this.eng * 0.3);
@@ -428,9 +435,19 @@ export class Aircraft {
   }
   _push(n, pen) { if (pen > 0) this.pos.addScaled(_n.set(n[0], n[1], n[2]), pen + 0.05); }
 
+  // FLIGHTFIX6: a wreck drops to the ground; it used to hang where it crashed (5 m up after a Rubber bounce series)
+  _wreckFall(dt, env) {
+    if (!env?.groundHeightAt) return;
+    const gy = env.groundHeightAt(this.pos.x, this.pos.z), rest = gy + this.aglRef;
+    if (this.pos.y <= rest) { this._fallV = 0; return; }
+    this._fallV = Math.min((this._fallV || 0) + G * dt, 60);
+    this.pos.y = Math.max(rest, this.pos.y - this._fallV * dt);
+    this.alt = this.pos.y; this.agl = this.pos.y - gy - this.aglRef;
+  }
+
   _crash(reason) {
     if (this.crashed) return;
-    this.crashed = true; this.crashReason = reason;
+    this.crashed = true; this.crashReason = reason; this._fallV = 0;
     this.emit('crash', { reason, speed: this.speed });
   }
 

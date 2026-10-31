@@ -1,7 +1,7 @@
 # TASKS — the task grid (D34)
 
 Aaron: "a nice easy to follow task list … a nice grid of tasks to tick off … sets could give additional rewards and some
-tasks might be hard to do, including flight time tasks". 143 tasks in 16 sets. Tasks never gate ranks or planes.
+tasks might be hard to do, including flight time tasks". 171 tasks in 18 sets. Tasks never gate ranks or planes.
 
 ## Files
 | file | what |
@@ -228,6 +228,23 @@ A "flight" (per-flight counters) starts at play start, after DEMAND IT, and afte
 | `f35_vfield` | 🥕 Turnip Pad | gold | 750 | Land the Tantrum vertically in a field. | `touchdown` + `vertical` on grass (D35) |
 | `f35_vhard` | 🎯 Straight Down, Real Metal | gold | 750 | Land the Tantrum vertically on Hard. | `touchdown` + `vertical`, diff hard (D35) |
 
+### 🎪 Hangar: Show-Offs (12) · set bonus +2,800 PP · badge "the Showman"
+
+| id | task | tier | PP | what | detector |
+|---|---|---|---|---|---|
+| `fly_cub` | 🧈 Butter Cub | bronze | 100 | Take off in the Butter Cub. | `takeoff` + condition |
+| `cub_lawn` | 🌱 Croquet, Anyone? | gold | 750 | Land the Cub on the Palace Lawn. | `touchdown` + condition |
+| `cub_short` | 📏 Stop on a Sixpence | silver | 250 | Land the Cub and stop within 100 m of touching down. | `stopped` + condition |
+| `cub_farm` | 🐑 Mind the Ewes | silver | 250 | Land the Cub on the grass at Muckle Bottom. | `touchdown` + condition |
+| `fly_pitts` | 🎪 Show-Off | bronze | 100 | Take off in the Show-Off. | `takeoff` + condition |
+| `pitts_snap` | 🌪️ Snap Roll | silver | 250 | A full roll in the Pitts in under 2 seconds. | `roll` + condition |
+| `pitts_10` | 🎡 Ten in a Row | gold | 750 | Ten full rolls in the Pitts in one flight. | fstat `pittsRolls` ≥ 10 |
+| `pitts_inv` | 🙃 Upside-Down Tea | silver | 250 | Ten seconds inverted in the Pitts, in one go. | `inverted` + condition |
+| `fly_throne` | 🪑 Divine Right | silver | 250 | Take off in the flying throne. | `takeoff` + condition |
+| `throne_hover` | 👑 Holding Court | silver | 250 | Hover the throne for 30 seconds in one go. | `hover` + condition |
+| `throne_vgrass` | 🌼 Enthroned on the Lawn | gold | 750 | Land the throne vertically on grass. | `touchdown` + condition |
+| `throne_hard` | ⚖️ Heavy Is the Head | gold | 750 | Hover the throne on Hard. | `hover` + condition |
+
 ### 🛡️ Trial by Difficulty (8) · set bonus +2,200 PP · badge "the Hardened"
 
 | id | task | tier | PP | what | detector |
@@ -241,19 +258,37 @@ A "flight" (per-flight counters) starts at play start, after DEMAND IT, and afte
 | `hard_10` | ⚙️ Ten Real Ones | gold | 750 | Finish 10 flights on Hard. | stat `hardFinishes` ≥ 10 |
 | `iron_peer` | 🗡️ Iron Peer | gold | 750 | Five Hard finishes in a row without being destroyed. | stat `hardStreak` ≥ 5 |
 
-### 👑 The Peerage (9) · set bonus +1,700 PP · badge "of the Peerage"
+### 👑 The Peerage (11) · set bonus +2,000 PP · badge "of the Peerage"
 
 | id | task | tier | PP | what | detector |
 |---|---|---|---|---|---|
 | `story_1` | 📖 Letters Patent | silver | 250 | Complete Mission 1, "Letters Patent". | `story` + condition |
-| `story_2` | 📖 The Pomfrey-Smythe Welcome | silver | 250 | Complete Mission 2, "The Pomfrey-Smythe Welcome". | `story` + condition |
-| `story_3` | 📖 Queue Is a Commoner's Word | silver | 250 | Complete Mission 3, "Queue Is a Commoner's Word". | `story` + condition |
-| `story_4` | 📖 The Castle Cup | silver | 250 | Complete Mission 4, "The Castle Cup". | `story` + condition |
 | `story_1_all` | 🏅 Letters Patent: Full Marks | silver | 250 | Tick every objective in Mission 1. | `story` + condition |
+| `story_2` | 📖 The Pomfrey-Smythe Welcome | silver | 250 | Complete Mission 2, "The Pomfrey-Smythe Welcome". | `story` + condition |
 | `story_2_all` | 🏅 The Pomfrey-Smythe Welcome: Full Marks | silver | 250 | Tick every objective in Mission 2. | `story` + condition |
+| `story_3` | 📖 Queue Is a Commoner's Word | silver | 250 | Complete Mission 3, "Queue Is a Commoner's Word". | `story` + condition |
 | `story_3_all` | 🏅 Queue Is a Commoner's Word: Full Marks | silver | 250 | Tick every objective in Mission 3. | `story` + condition |
+| `story_4` | 📖 The Castle Cup | silver | 250 | Complete Mission 4, "The Castle Cup". | `story` + condition |
 | `story_4_all` | 🏅 The Castle Cup: Full Marks | silver | 250 | Tick every objective in Mission 4. | `story` + condition |
+| `story_5` | 📖 Cream Tea at Muckle Bottom | silver | 250 | Complete Mission 5, "Cream Tea at Muckle Bottom". | `story` + condition |
+| `story_5_all` | 🏅 Cream Tea at Muckle Bottom: Full Marks | silver | 250 | Tick every objective in Mission 5. | `story` + condition |
 | `story_hard` | 🎖️ Peer of the Realm | gold | 750 | Complete any mission on Hard. | `story` + condition |
+
+### ⚜️ The Coronation (11) · set bonus +2,300 PP · badge "the Crowned"
+
+| id | task | tier | PP | what | detector |
+|---|---|---|---|---|---|
+| `story_6` | 📖 The Royal Wardrobe | silver | 250 | Complete Mission 6, "The Royal Wardrobe". | `story` + condition |
+| `story_6_all` | 🏅 The Royal Wardrobe: Full Marks | silver | 250 | Tick every objective in Mission 6. | `story` + condition |
+| `story_7` | 📖 Not Till That Jet Learns to Hover | silver | 250 | Complete Mission 7, "Not Till That Jet Learns to Hover". | `story` + condition |
+| `story_7_all` | 🏅 Not Till That Jet Learns to Hover: Full Marks | silver | 250 | Tick every objective in Mission 7. | `story` + condition |
+| `story_8` | 📖 The Owls Evacuate | silver | 250 | Complete Mission 8, "The Owls Evacuate". | `story` + condition |
+| `story_8_all` | 🏅 The Owls Evacuate: Full Marks | silver | 250 | Tick every objective in Mission 8. | `story` + condition |
+| `story_9` | 📖 Please Do Come | silver | 250 | Complete Mission 9, "Please Do Come". | `story` + condition |
+| `story_9_all` | 🏅 Please Do Come: Full Marks | silver | 250 | Tick every objective in Mission 9. | `story` + condition |
+| `story_10` | 👑 Coronation Day | gold | 750 | Finish the story: win the Royal Bathtub Derby and be crowned. | `story` + condition |
+| `story_10_all` | 🏅 Coronation Day: Full Marks | silver | 250 | Tick every objective in Mission 10. | `story` + condition |
+| `story_crowned_hard` | 🛁 Crowned in Real Metal | gold | 750 | Win the Royal Bathtub Derby and be crowned, on Hard. | `story` + condition |
 
 ### 🥕 Royal Eccentricities (10) · set bonus +2,400 PP · badge "the Eccentric"
 
@@ -298,8 +333,8 @@ A "flight" (per-flight counters) starts at play start, after DEMAND IT, and afte
 
 ## Tests
 ```
-node tools/tasks-sim.mjs            # 88 assertions, ~2 s
-node tools/tasks-sim.mjs --falsify  # 16 breaks in scratch copies; each must fail the suite (~3 min)
+node tools/tasks-sim.mjs            # 98 assertions, ~2 s
+node tools/tasks-sim.mjs --falsify  # 17 breaks in scratch copies; each must fail the suite (~3 min)
 node tools/test-tasks.mjs [--port=9671] [--url=http://127.0.0.1:8889/gms/3d/krayzee/]   # real game, 48 checks, ~4 min
 ```
 Shots: `docs/shots/tasks/`.
@@ -307,5 +342,9 @@ Shots: `docs/shots/tasks/`.
 ## Notes / limits
 - Landmarks are C-Tower 1 only (`PLACES`). New airports need their own entries (or a per-airport table).
 - `STORY` mirrors mission ids/objective ids from `data/story/mission*.js` (those modules import three, so node can't load
-  them); add a row when a mission is added.
+  them); add a row when a mission is added. tasks-sim reads the mission files as text and fails if the mirror drifts.
+  Missions 1–5 feed The Peerage, 6–10 The Coronation (a set holds 8–12 tasks); `finale: true` marks the coronation.
+- Roster rows (Show-Offs) use three events the live adapter now makes: `touchdown` carries `airport` and `lawn` (the
+  Palace Lawn strip, data/airports/palace.js LAWN), `stopped {rollM}` (touchdown to stop), `roll {secs}` (360° of bank one way);
+  FSTATS `pittsRolls`. The tasks CONTROLLER maps `tower_raf` → imogen and `tower_farm` → mudge.
 - Heavy Metal ids are `jumbo`, `herc`, `f35`; they unlock when `data/aircraft.js` marks them `status: 'ready'`.

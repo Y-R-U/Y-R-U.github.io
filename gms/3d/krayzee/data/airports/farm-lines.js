@@ -1,9 +1,11 @@
-// C-Tower 2: Farmer Mudge, grumpy, runs the radio between milkings. Text lines for js/radio (voice 'tower_farm'); there
-// are no clips yet, so the radio shows them as subtitles only. Same shape as data/barks/script.json entries, so a BARKS
-// run can render them later (docs/MAP.md "Farmer Mudge's voice").
+// C-Tower 2: Farmer Mudge, grumpy, runs the radio between milkings. Lines for js/radio (voice 'tower_farm'), same shape as
+// data/barks/script.json entries. Clips: audio/voices/tower_farm/<id>.mp3, rendered by data/barks/build_towers2.py
+// (docs/VOICES.md "New towers"); edit a line here, rebuild, re-render and only that line changes.
 const V = 'tower_farm';
-const T = (intent, texts, extra = {}) => texts.map((text, i) => ({ id: `${V}.${intent}${extra.tier ? '_t' + extra.tier : ''}.${i}`, voice: V, intent, text, delivery: 'grumpy West Country farmer', maxSeconds: 5, callsign: 'pre', ...extra }));
-const L = (intent, texts) => texts.map((text, i) => ({ id: `${V}.${intent}.${i}`, voice: V, intent, text, delivery: 'grumpy West Country farmer', maxSeconds: 5 }));
+// Mudge is slow: ~2.6 words/s, capped at 6 s (a take past this is sped up, at most 1.25x).
+const secs = (t) => Math.round(Math.min(6, 0.8 + t.split(/\s+/).length / 2.6) * 10) / 10;
+const T = (intent, texts, extra = {}) => texts.map((text, i) => ({ id: `${V}.${intent}${extra.tier ? '_t' + extra.tier : ''}.${i}`, voice: V, intent, text, delivery: 'grumpy West Country farmer', maxSeconds: secs(text), callsign: 'pre', ...extra }));
+const L = (intent, texts) => texts.map((text, i) => ({ id: `${V}.${intent}.${i}`, voice: V, intent, text, delivery: 'grumpy West Country farmer', maxSeconds: secs(text) }));
 const scold = (k, a, b, c, d) => [T(k, [a], { tier: 1 }), T(k, [b], { tier: 2 }), T(k, [c], { tier: 3 }), T(k, [d], { tier: 4 })].flat();
 
 export const FARM_LINES = [
@@ -33,5 +35,6 @@ export const FARM_LINES = [
   ...scold('scold_buzz', 'too low over the yard.', 'the hens\'ve stopped laying, thanks to you.', 'you\'ve blown my hat clean into the pond.', 'THE HENS! THINK OF THE HENS!'),
   ...scold('scold_near_miss', 'that was close.', 'that was close enough to shear.', 'nearly had a collision over my best pasture.', 'I\'ve gone white. Whiter than the ewes.'),
   ...scold('scold_bump', 'you\'ve bumped him. Say sorry.', 'bumping again. Like rams in spring.', 'stop butting each other!', 'RAMS! The lot of you! RAMS!'),
+  ...scold('scold_nudge', 'you touched him. Keep your hands to yourself.', 'that\'s no way to say hello. Not even to a ewe.', 'nudging! Like heifers at the feed trough!', 'LOVE TAP, is it? The bull said that. Look where it got him.'),
   ...scold('scold_generic', 'not how we do it round here.', 'I\'ll be having words.', 'my nerves won\'t stand much more of this.', 'I\'m going to milk the cows. Don\'t talk to me.'),
 ];

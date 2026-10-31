@@ -29,3 +29,10 @@ export function slotX(obs, y, w, h, want, lo, hi, pad = 6) {
   }
   return best;
 }
+
+// HUDPOLISH E2: a tap counts for a button only if the finger went down on it. The bottom action slot re-lays out under a
+// thumb (DEMAND IT banks, DEMAND TAKEOFF appears in its place), and the click that ends the tap is aimed by where things
+// are THEN: a tap on DEMAND IT launched the plane. Keyboard and scripted clicks (detail 0) always count.
+let downOn = null;
+addEventListener('pointerdown', (e) => { downOn = e.target; }, { capture: true, passive: true });
+export const startedOn = (btn, e) => !e.detail || !downOn || btn.contains(downOn);

@@ -1,7 +1,11 @@
 import * as THREE from 'three';
 import { fbm } from './util.js';
 import { maskTexture, detailTexture, waterNormalTexture } from './textures.js';
-import { RUNWAYS, headingToVec } from './layout.js';
+import { AIRPORT, headingToVec } from './layout.js';
+import royal from '../../data/airports/royal.js';
+import palace from '../../data/airports/palace.js';
+import { palaceGrounds, palaceLawnGLSL } from './palace.js';
+import { riverDist, inRiver, riverGeometry } from './river.js';
 import { SUN_DIR } from './env.js';
 import { BLOCK, FIELD_SEED, TOWN_SEED, WOOD_T, FIELD_GLSL } from './fields.js';
 
@@ -19,8 +23,13 @@ export const LONG_ROAD_Z = -1240;
 let SITE = null;
 export function setTerrainSite(s) { SITE = s; }
 const site = () => SITE || ROYAL_SITE;
+// runways of the world being built: C-Tower 1's own (the Palace Lawn shares its world) or the site airport's
+const rws = () => (SITE ? AIRPORT.runways : royal.runways);
 
-const ROYAL_SITE = { flat: [AIRFIELD_FLAT], town: TOWN, lake: LAKE, castle: CASTLE, longRoadZ: LONG_ROAD_Z };
+// the Palace Lawn (C-Tower 3, D27) sits flat at the foot of the castle hill inside C-Tower 1's world
+const PALACE_FLAT = (([[x0, z0], [x1, z1]]) => ({ x0, x1, z0, z1 }))(palace.flat[0].rect);
+const VILLAGE_GREEN = { x0: -74, x1: 70, z0: -1640, z1: -1556 };   // town.js layoutVillage's green
+const ROYAL_SITE = { flat: [AIRFIELD_FLAT, PALACE_FLAT], town: TOWN, lake: LAKE, castle: CASTLE, longRoadZ: LONG_ROAD_Z };
 
 const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const rectDist = (r, x, z) => Math.hypot(Math.max(r.x0 - x, 0, x - r.x1), Math.max(r.z0 - z, 0, z - r.z1));
@@ -34,7 +43,7 @@ export function lakeDist(x, z) {
   const u = (x - L.x) / L.rx, v = (z - L.z) / L.rz;
   return Math.hypot(u, v) / lakeR(Math.atan2(v, u));
 }
-export function inLake(x, z) { return lakeDist(x, z) < 1; }
+export function inLake(x, z) { return lakeDist(x, z) < 1 || (!SITE && inRiver(x, z)); }
 
 export function castleMound(x, z) {
   const C = site().castle;
@@ -50,12 +59,19 @@ function openness(x, z) {
   for (const r of st.flat) d = Math.min(d, rectDist(r, x, z));
   if (st.town) d = Math.min(d, rectDist(st.town, x, z) + 40);
   if (st.longRoadZ != null && Math.abs(x) < 3700) d = Math.min(d, Math.max(0, Math.abs(z - st.longRoadZ) - 25));
-  for (const rw of RUNWAYS) {
+  for (const rw of rws()) {
     const [dx, dz] = rwv(rw);
     const rx = x - rw.center[0], rz = z - rw.center[2];
     const a = Math.abs(rx * dx + rz * dz) - rw.length / 2, b = Math.abs(-rx * dz + rz * dx);
     if (a > 0 && a < 3400) d = Math.min(d, Math.max(0, b - 160 - a * 0.15) + Math.max(0, a - 2600));
   }
+  if (!SITE) for (const rw of palace.runways) {
+    const [dx, dz] = rwv(rw);
+    const rx = x - rw.center[0], rz = z - rw.center[2];
+    const a = Math.abs(rx * dx + rz * dz) - rw.length / 2, b = Math.abs(-rx * dz + rz * dx);
+    if (a > 0 && a < 1200) d = Math.min(d, Math.max(0, b - 70 - a * 0.1) + Math.max(0, a - 900));
+  }
+  if (!SITE) d = Math.min(d, Math.max(0, riverDist(x, z) - 30));   // C3: the river's valley floor
   const C = st.castle;
   return sstep(0, 650, d) * (C ? sstep(C.r0, C.r1 * 0.8, Math.hypot(x - C.x, z - C.z)) : 1);
 }
@@ -70,13 +86,17 @@ export function terrainHeight(x, z) {
     const ramp = t * t * (3 - 2 * t);
     const n = fbm(x / 2600 + 11, z / 2600 - 3, 4);
     const ridge = 1 - Math.abs(fbm(x / 5200 - 7, z / 5200 + 2, 3) * 2 - 1);
-    h += ramp * (30 + n * 220 + ridge * 160);
+    h += ramp * (30 + n * 220 + ridge * 160) * (SITE ? 1 : sstep(60, 850, riverDist(x, z)));
   }
   return h + castleMound(x, z);
 }
 
 export function airfieldMask(x, z) {
   if (SITE) return SITE.mask(x, z);
+  const pg = palaceGrounds(x, z);
+  if (pg > 0) return pg;
+  const vg = 1 - Math.min(1, rectDist(VILLAGE_GREEN, x, z) / 8);   // the village green: mown, not ploughed
+  if (vg > 0) return vg;
   const ex = Math.max(Math.abs(x) - 820, 0), ez = Math.max(Math.abs(z + 5) - 455, 0);
   const d = Math.hypot(ex, ez) - 40;
   return 1 - Math.min(1, Math.max(0, d / 10));
@@ -89,7 +109,7 @@ export function stripMaskFor(rw, x, z) {
   const b = Math.abs(-rx * dz + rz * dx) - (rw.width >= 30 ? 75 : 40);
   return 1 - Math.min(1, Math.max(a, b, 0) / 6);
 }
-export const stripMask = (x, z) => Math.max(...RUNWAYS.map((rw) => stripMaskFor(rw, x, z)));
+export const stripMask = (x, z) => Math.max(...rws().map((rw) => stripMaskFor(rw, x, z)));
 
 // Grid lines: power-law spacing (fine near the field) plus a refined band around the castle hill.
 function gridLines(N, c0, c1, step) {
@@ -133,13 +153,13 @@ export function createTerrain(renderer, quality) {
   g.computeBoundingSphere();
 
   const mask = maskTexture(MAP_EXTENT, low ? 512 : 1024, (x, z) => [
-    airfieldMask(x, z), Math.max(0, Math.min(1, (1.3 - lakeDist(x, z)) / 0.3)), stripMaskFor(RUNWAYS[0], x, z), RUNWAYS.length > 1 ? Math.max(...RUNWAYS.slice(1).map((rw) => stripMaskFor(rw, x, z))) : 0,
+    airfieldMask(x, z), Math.max(0, Math.min(1, (1.3 - lakeDist(x, z)) / 0.3), SITE ? 0 : Math.min(1, (28 - riverDist(x, z)) / 26)), stripMaskFor(rws()[0], x, z), rws().length > 1 ? Math.max(...rws().slice(1).map((rw) => stripMaskFor(rw, x, z))) : 0,
   ]);
   const detail = detailTexture(renderer);
   const blank = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1);
   blank.needsUpdate = true;
   const uniforms = { uDetail: { value: detail }, uMask: { value: mask }, uShade: { value: blank }, uBump: { value: low ? 0 : 1 } };
-  // mown stripes along each runway strip: mask .b = RUNWAYS[0], .a = the others
+  // mown stripes along each runway strip: mask .b = rws()[0], .a = the others
   const mow = (rw) => { const [dx, dz] = headingToVec(rw.heading); return `dot(w - vec2(${rw.center[0].toFixed(1)}, ${rw.center[2].toFixed(1)}), vec2(${(-dz).toFixed(4)}, ${dx.toFixed(4)}))`; };
 
   const m = new THREE.MeshStandardMaterial({ roughness: 1, metalness: 0 });
@@ -157,7 +177,8 @@ export function createTerrain(renderer, quality) {
         float lineAA(float d, float hw) { float fw = max(fwidth(d), 1e-4); return clamp((hw - d) / fw + 0.5, 0.0, 1.0) * min(1.0, 2.0 * hw / fw); }
         float noWood(vec2 w) {
           float k = 0.0;
-          ${RUNWAYS.map((rw) => { const [dx, dz] = headingToVec(rw.heading); return `{ vec2 r = w - vec2(${rw.center[0].toFixed(1)}, ${rw.center[2].toFixed(1)}); float a = abs(dot(r, vec2(${dx.toFixed(4)}, ${dz.toFixed(4)}))) - ${(rw.length / 2).toFixed(1)}; float b = abs(dot(r, vec2(${(-dz).toFixed(4)}, ${dx.toFixed(4)}))); k = max(k, step(0.0, a) * step(a, 3200.0) * step(b, 160.0 + a * 0.15)); }`; }).join('\n          ')}
+          ${rws().map((rw) => { const [dx, dz] = headingToVec(rw.heading); return `{ vec2 r = w - vec2(${rw.center[0].toFixed(1)}, ${rw.center[2].toFixed(1)}); float a = abs(dot(r, vec2(${dx.toFixed(4)}, ${dz.toFixed(4)}))) - ${(rw.length / 2).toFixed(1)}; float b = abs(dot(r, vec2(${(-dz).toFixed(4)}, ${dx.toFixed(4)}))); k = max(k, step(0.0, a) * step(a, 3200.0) * step(b, 160.0 + a * 0.15)); }`; }).join('\n          ')}
+          ${SITE ? '' : palace.runways.map((rw) => { const [dx, dz] = headingToVec(rw.heading); return `{ vec2 r = w - vec2(${rw.center[0].toFixed(1)}, ${rw.center[2].toFixed(1)}); float a = abs(dot(r, vec2(${dx.toFixed(4)}, ${dz.toFixed(4)}))) - ${(rw.length / 2).toFixed(1)}; float b = abs(dot(r, vec2(${(-dz).toFixed(4)}, ${dx.toFixed(4)}))); k = max(k, step(0.0, a) * step(a, 1000.0) * step(b, 70.0 + a * 0.1)); }`; }).join('\n          ')}
           return k;
         }
         float stripes(float s, float period) { float fw = fwidth(s / period); return sign(sin(s / period * 3.14159)) * clamp(1.0 - fw * 1.6, 0.0, 1.0); }`)
@@ -254,8 +275,9 @@ export function createTerrain(renderer, quality) {
           float strip = max(mk.b, mk.a);
           gr = mix(gr * vec3(0.9, 0.93, 0.85) * (0.9 + 0.2 * texture(uDetail, w / 29.0 + 0.4).b), gr * vec3(1.06, 1.08, 1.0), strip);
           gr *= 1.0 + 0.03 * stripes(w.x, 9.0) * (1.0 - strip);
-          gr *= 1.0 + 0.065 * stripes(${mow(RUNWAYS[0])}, 6.0) * mk.b;
-          ${RUNWAYS.slice(1).map((rw) => `gr *= 1.0 + 0.065 * stripes(${mow(rw)}, 5.0) * mk.a * (1.0 - mk.b);`).join('\n          ')}
+          gr *= 1.0 + 0.065 * stripes(${mow(rws()[0])}, 6.0) * mk.b;
+          ${rws().slice(1).map((rw) => `gr *= 1.0 + 0.065 * stripes(${mow(rw)}, 5.0) * mk.a * (1.0 - mk.b);`).join('\n          ')}
+          ${SITE ? '' : palaceLawnGLSL()}
           col = mix(col, gr, mk.r);
         }
 
@@ -312,7 +334,7 @@ function gridIndex(xs, x) {
 
 // Lake: PBR water (sky reflection from the env map, fresnel from the BRDF), two scrolling ripple normals,
 // shallow-water tint toward the shore.
-export function createLake(renderer, env, LAKE = site().lake) {
+export function createLake(renderer, env, LAKE = site().lake, heightAt = null) {
   const n = 96, rings = 6;
   const pos = [LAKE.x, 0.12, LAKE.z], nor = [0, 1, 0], shore = [0], idx = [];
   for (let r = 1; r <= rings; r++) {
@@ -328,6 +350,13 @@ export function createLake(renderer, env, LAKE = site().lake) {
   for (let r = 1; r < rings; r++) for (let k = 0; k < n; k++) {
     const a = 1 + (r - 1) * n + k, b = 1 + (r - 1) * n + (k + 1) % n, c = a + n, d = b + n;
     idx.push(a, b, c, b, d, c);
+  }
+  // C3: the river joins the lake's mesh (C-Tower 1 only): same water, no extra draw call
+  if (!SITE && heightAt) {
+    const r = riverGeometry(heightAt), o = pos.length / 3;
+    pos.push(...r.attributes.position.array); nor.push(...r.attributes.normal.array); shore.push(...r.attributes.shore.array);
+    for (const i of r.index.array) idx.push(i + o);
+    r.dispose();
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));

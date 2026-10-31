@@ -27,7 +27,7 @@ let pick = null;
 for (let i = 0; i < 60 && !pick; i++) { await C.sleep(250); pick = await C.ev(`(() => { const c = document.querySelector('.krz-st-pick .krz-st-card'); if (!c) return null; const r = c.getBoundingClientRect(); return { rows: [...c.querySelectorAll('.krz-st-picklist button')].map((b) => b.dataset.id + (b.disabled ? 'L' : 'U') + (b.classList.contains('next') ? '*' : '')), l: r.left, r: r.right, t: r.top, b: r.bottom }; })()`); }
 await C.shot(SHOTS, 'picker_portrait');
 check('Story button opens the mission picker once Mission 1 is done', !!pick, JSON.stringify(pick));
-check('picker: 1 and 2 unlocked, 2 highlighted, 3 and 4 locked', pick && pick.rows.join() === '1U,2U*,3L,4L', pick?.rows.join());
+check('picker: 1 and 2 unlocked, 2 highlighted, 3 to 10 locked', pick && pick.rows.join() === '1U,2U*,3L,4L,5L,6L,7L,8L,9L,10L', pick?.rows.join());
 check('picker fits the screen', pick && pick.l >= 0 && pick.r <= W && pick.t >= 0 && pick.b <= H);
 check('the world waits behind the picker', await C.ev(`window.__krzStory.simScale() === 0`));
 const locked = await C.ev(`(() => { document.querySelector('.krz-st-picklist button[data-id="3"]')?.click(); return !!document.querySelector('.krz-st-pick'); })()`);

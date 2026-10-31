@@ -44,16 +44,16 @@ air base promised with D33. Design background: docs/AIRPORTS.md. This file is wh
 | planes | all six | C172, Tiger, Bathtub | all six |
 | AI jets | 7 % (JETCORE) | none | 30 % |
 
-Tower 3 is the Palace Lawn (D27, inside C-Tower 1, not built). Saltwhistle/Krumpet/KRZ are only map pins; when they
-are built they take the next free numbers.
+Tower 3 is the Palace Lawn (D27, inside C-Tower 1's world): see **C-Tower 3 · The Palace Lawn** below.
+Saltwhistle/Krumpet/KRZ are only map pins; when they are built they take the next free numbers.
 
 **Runway rule** (data/airports/kingdom.js `canUse`): a type needs max(take-off roll × 1.1, landing roll × 1.5) of
 usable runway (`performance` in data/aircraft.js): C172 319 m, Tiger 210, Bathtub 165, Herc 630, F-35 1050, Jumbo
 1375 (C-Tower 1's 1400 m just fits it). The farm's 620 m takes the light planes and refuses the rest.
 
-The farm is 620 m and not shorter because the autopilot will not line up or DEMAND a take-off with less than 600 m of
-runway ahead for any light type (`Autopilot._minRun()`, js/flight/autopilot.js). tools/airport-check.mjs checks this
-floor for every airport.
+The autopilot lines up / DEMANDs a take-off only with `Autopilot._minRun()` of runway ahead: jets their roll × 1.1 (at
+least 600 m), light types their roll × 1.4 (at least 150 m: C172 406, Tiger 224, Bathtub 210). tools/airport-check.mjs
+checks this floor (+15 m line-up) for every airport. A STOVL jet at an airport with `vertical: true` is exempt (it goes up).
 
 ## Data schema additions (on top of docs/AIRPORTS.md §3.1)
 
@@ -93,10 +93,59 @@ farm.js is authored along +X like C-Tower 1 and turned 20° in the file (`P()`),
 3. `world.dispose()`; `layout.setAirport(id)` (routes and ATC geometry follow `onLayoutChange`); AI jet chance per airport.
 4. `buildWorld` (yields between stages), main's `adoptWorld`, `wiring.setWorld` (new ATC/link/listeners/tower).
 5. `attract.start()`; the player is placed (arrival or, for START HERE, main's `placePlayer` at the runway start).
-6. Shader warm-up (`compileAsync`, capped 3 s), clouds part over 2.8 s.
+6. Shader warm-up (`warmShaders()`: `renderer.compile()` plus our own per-material poll, capped 3 s, cancelled by the
+   next swap; three's `compileAsync` poll could not be stopped and threw after a dispose), clouds part over 2.8 s.
+   `ap.airportChanged()` runs right after `layout.setAirport` and drops LAND/DEMAND/hold state and the old ATC gate.
+
+Same-world trips (royal ↔ palace) skip the clouds: FLY THERE flies straight at the destination and hands over at
+1.5 km (mode `near`), with no teleport; the new tower's arrival route starts where the plane is.
 
 The trip is "one airport at a time": airports live in kingdom km and a world is always built around its own field
 at the origin. A future one-world build only has to add `map × 1000` as a world offset; nothing else assumes the swap.
+
+## C-Tower 3 · The Palace Lawn (lane WORLD, C2 / D27, 2026-10-28)
+
+**What it is.** A 240 × 24 m striped croquet lawn (08/26) at the foot of the castle hill, 2 km NNE of C-Tower 1, inside
+C-Tower 1's world. Gravel walk G (96 m north, stubs G1/G2 at the thresholds, holds 48 m), a forecourt with three
+stands P1–P3 and red carpets, the Orangery (terminal: glazed bays, pediment, gilded dome), the gilded folly
+(C-Tower 3), a fountain, box parterres, topiary rows and a topiary peacock, yew walls, a ha-ha to the south, an avenue
+up to the castle drive, flagpoles, croquet hoops on the margin, and **Mr Fennimore the butler** by the 08 threshold
+waving a semaphore flag in each hand. Tower: `C-Tower 3 · Mr Fennimore` (text lines, `tower_butler`, subtitles until
+VOICE voices them: data/airports/palace-lines.js, 73 lines in Farmer Mudge's shape).
+
+**Who may use it** (`canUse`): Tiger (needs 210), Bathtub (165), and the **F-35 by vertical landing** (`vertical: true`:
+a STOVL type is allowed whatever its roll). Refused with the butler's quip: C172 (319: "It would end its run in the
+fountain"), Pitts (420), Herc, Jumbo. Cub and Throne fit by length.
+
+**How it works.**
+- data/airports/palace.js is an ordinary Kingdom airport (`world: 'royal'`, `scenery.biome: 'royal'`), so the map, the
+  swap, `?airport=palace`, ATC (its own uncontrolled-style instance via `wiring.setWorld`), routes, LAND, DEMAND IT and
+  DEMAND TAKEOFF all run on it unchanged. The lawn is drawn and surfaced by C-Tower 1's world, always: the lawn rolls as
+  `runway` (rolled like a billiard table: runway friction), the walk is `taxiway`, the forecourt `apron`.
+- **No rebuild between C-Tower 1 and the lawn.** `world.dispose()` of C-Tower 1's world parks it; the next
+  `buildWorld` takes it back when the new airport shares it (palace ↔ royal) and frees it first otherwise (farm, air
+  base), so test-map's memory gate is unchanged. A royal ↔ palace swap measures 0.65–1.2 s (despawn wait, ATC, attract,
+  shader warm-up) instead of a world build.
+- C-Tower 1's builders (pavement, lights, props, terminal, tower, geom, terrain) now read data/airports/royal.js
+  directly instead of the live layout, so C-Tower 1's world is the same whichever airport is active (it used to be
+  built from whatever `layout` held).
+- AI at the lawn: js/world/aipool.js keeps the AI type pool main.js hands to attract in step with the airport
+  (`def.aiTypes`, filtered by `canUse`; jets only where they fit). The lawn's pool is the Bathtub and the Cub (FLIGHTFIX4).
+- `js/assist/landahead.js` (one `// WORLD (C2)` block): a runway shorter than LAND's standard aim + strip (480 m) is
+  offered with its touchdown near the threshold (`aim` = length − landing roll × 1.25 − 10, ≥ 20 m) and a strip of
+  roll × 1.25, on a virtual end. Without it LAND never picked the lawn (it chose a field). Royal/farm/air base runways
+  take the old path (landahead tests 36/36).
+
+**Known limits:** fixed by FLIGHTFIX4 (2026-10-30, docs/FLIGHT.md): short-field landing on runways < 500 m (aim
+30 m in, 1.2 Vs0, no float, hard braking), STOVL DEMAND TAKEOFF falls back to a vertical take-off, same-world handover,
+"(vertical landing)" card wording, `JET_CHANCE.palace = 0`. Still open: the Moth is kept out of the lawn's AI pool (in
+the ATC soak it touched down ~140 m in and drew "uninvited landing").
+
+**Gates:** airport-check palace rows (runway table, quips, floor, 70 props clear, holds/graph, 30-min Bathtub soak:
+4 arrivals, 7 departures, 0 infractions) with `--break=lawn|lawnprop|lawnfloor`; `node tools/test-palace.mjs` (real
+taps): Tiger map → START HERE or FLY THERE → butler on the radio → LAND on the lawn → DEMAND IT + refuel → DEMAND
+TAKEOFF; F-35 `?airport=palace` → VERTICAL TAKEOFF → LAND HERE on the lawn → DEMAND IT → VERTICAL TAKEOFF; C172
+refused with the quip. `--falsify=surface|refuse|tower` must go red.
 
 ## Gates
 
@@ -121,7 +170,6 @@ at the origin. A future one-world build only has to add `map × 1000` as a world
   gives him a real voice; nothing else changes.
 - The F-35 is refused at the farm by the length rule. Once STOVL lands, the farm could accept it if the arrival flew
   a vertical landing (needs the STOVL lane's AP).
-- Autopilot `_minRun()` floor (600 m for every light type) should be per type (e.g. take-off roll × 1.8) so shorter
-  strips (the Palace Lawn's 240 m) can work; owner FLIGHT/STOVL.
+- (done) Autopilot `_minRun()` is per type now (roll × 1.4, ≥ 150 m).
 - Sheep don't scatter yet (`sheep_scatter` in AIRPORTS.md); no Grand Tour PP bonus for a trip; online rooms stay at
   C-Tower 1.

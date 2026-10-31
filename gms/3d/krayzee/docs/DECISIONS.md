@@ -58,3 +58,10 @@
 - D35 (2026-10-27) Aaron tried the jumbo and the jet: "very cool". NEXT is F-35 STOVL: hover, vertical takeoff and vertical landing. Aaron: vertical landing is "just via a button on the lower left hand side", showing "the most appropriate button for the situation".
   - Manager's call: it is ONE context button in the existing LAND button slot, never a second row of buttons. It reads, by situation, e.g. VERTICAL TAKEOFF (on the ground), HOVER (slow enough in the air), LAND HERE (in a hover over flat ground), FLY ON (in a hover, back to wing-borne flight). Normal LAND / LAND NOW still appear when they are the better choice.
   - The F-35 can land vertically anywhere flat and clear (fields, pads), which lifts the jets' runway-only rule for the F-35 only.
+- D36 (2026-10-29) Aaron: deploy online (approved: room server on games.br8t.com, port 8018). Plug in the br8t.com user login so players can change devices (cloud save of career, tasks, settings, story progress). Add limits without a br8t.com pass: how far you can go in story mode, and how many online games you can play.
+  - Manager's calls (changeable):
+    - Free: the intro plus Missions 1–4 (the whole C-Tower 1 chapter), Free Flight unlimited, all airports, 3 online games per day.
+    - With a pass: Missions 5+, unlimited online.
+    - Planes, ranks and tasks are never gated by the pass.
+    - Use the shared br8t entitlement (GET /api/br8t/entitlement, as Ragdojo does). Locks are friendly cards, never modals.
+    - A sign-in is required to host or join online.
