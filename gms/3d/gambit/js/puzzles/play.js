@@ -138,8 +138,10 @@ async function stepMove(res, { auto = false } = {}) {
   if (res.done) { syncCheck(); finish(); return; }
   if (!auto) sfx('correct', { delay: 0.38 });   // after the move lands
   if (!auto) setStatus('good', `<b>${esc(res.move.san)}</b> — correct! Keep going`);
-  syncCheck();
-  await wait(auto ? 380 : 320);
+  // checkalert: run.chess is already past the reply here, so a check given by this move comes from its SAN
+  // (the board resolves a colour to that side's king and only draws it if the king really is attacked)
+  syncCheck({ check: /[+#]/.test(res.move.san || '') ? res.move.color === 'w' ? 'b' : 'w' : null });
+  await wait((auto ? 380 : 320) + (/[+#]/.test(res.move.san || '') ? 650 : 0));   // checkalert: let a check register first
   if (S !== s) return;
   moveSound(res.reply);
   if (board) { try { await board.applyMove(res.reply, { battle: false }); } catch (e) { console.warn(e); } }

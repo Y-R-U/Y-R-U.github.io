@@ -32,7 +32,7 @@ export function createReview({ chess, board, onExit, onChange }) {
       b.setPosition(at.fen, { animate: false });
       let check = null;
       if (at.chess.inCheck()) check = kingSq(at.chess, at.chess.turn());
-      b.highlight({ lastMove: at.last ? { from: at.last.from, to: at.last.to } : null, check, hint: null, legalTargets: [] });
+      b.highlight({ lastMove: at.last ? { from: at.last.from, to: at.last.to } : null, check, checkPopup: false, hint: null, legalTargets: [] });   // checkalert: badge only while reviewing
       b.showArrows?.([]);
       r.sync();
       onChange && onChange(true);

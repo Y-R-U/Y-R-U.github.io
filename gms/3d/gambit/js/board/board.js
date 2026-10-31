@@ -343,12 +343,50 @@ export async function createBoard(container, opts = {}) {
     overlays.hint.set(hl.hint ? [hl.hint.from, hl.hint.to].filter(isSq) : []);
     let chk = hl.check;
     if (chk === 'w' || chk === 'b') chk = [...recs.values()].find(r => r.type === 'k' && r.color === chk)?.sq || null;
-    overlays.setCheck(isSq(chk) ? chk : null);
+    // checkalert: the check visuals (red king square, checker tint, links) wait for the move animation /
+    // battle to finish, and only show for a king that really is attacked in the board's own position
+    // (screens set `check` before or after applyMove; a stale value never draws a wrong link).
+    const kingRec = isSq(chk) ? recs.get(chk) : null;
+    const checkers = !animCount && kingRec?.type === 'k' ? attackersOf(chk, kingRec.color) : [];
+    const showCheck = !animCount && isSq(chk) && (!kingRec || kingRec.type !== 'k' || checkers.length > 0);
+    overlays.setCheck(showCheck ? chk : null);
+    overlays.setCheckers?.(showCheck && checkers.length ? chk : null, checkers);   // ?.: a stale cached overlays.js must not break the board
+    emitCheck(showCheck && kingRec?.type === 'k' ? { king: chk, color: kingRec.color, checkers } : null);
     overlays.setTargets(selected ? legalTargets : [], sq => recs.has(sq) || isEpTarget(sq));
     const all = [...arrows];
     if (hl.hint && hl.hint.arrow !== false && isSq(hl.hint.from) && isSq(hl.hint.to)) all.push({ from: hl.hint.from, to: hl.hint.to, color: '#3fa9ff', opacity: 0.8 });
     overlays.setArrows(all);
     wake();
+  }
+  // checkalert: pieces of the other colour attacking `sq` on the board's current placement
+  function attackersOf(sq, color) {
+    const out = [], f0 = sq.charCodeAt(0) - 97, r0 = +sq[1] - 1;
+    const at = (f, r) => (f < 0 || f > 7 || r < 0 || r > 7) ? undefined : recs.get(FILES[f] + (r + 1)) || null;
+    const enemy = (p, types) => p && p.color !== color && types.includes(p.type);
+    for (const [df, dr] of [[1, 2], [2, 1], [-1, 2], [-2, 1], [1, -2], [2, -1], [-1, -2], [-2, -1]]) {
+      const p = at(f0 + df, r0 + dr); if (enemy(p, 'n')) out.push(p.sq);
+    }
+    const pr = color === 'w' ? 1 : -1;            // an enemy pawn attacks from one rank "ahead" of the king
+    for (const df of [-1, 1]) { const p = at(f0 + df, r0 + pr); if (enemy(p, 'p')) out.push(p.sq); }
+    for (const [df, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+      const diag = df && dr;
+      for (let i = 1; i < 8; i++) {
+        const p = at(f0 + df * i, r0 + dr * i);
+        if (p === undefined) break;
+        if (!p) continue;
+        if (enemy(p, diag ? 'bq' : 'rq') || (i === 1 && enemy(p, 'k'))) out.push(p.sq);
+        break;
+      }
+    }
+    return out;
+  }
+  let lastCheckKey = '', checkSeq = 0;
+  function emitCheck(state) {
+    const key = state ? `${board.placement()}|${state.king}|${state.checkers.join(',')}` : '';
+    if (key === lastCheckKey) return;
+    lastCheckKey = key;
+    if (state) state.id = ++checkSeq;
+    emit('check', state ? { ...state, key, popup: hl.checkPopup !== false, double: state.checkers.length > 1 } : null);
   }
   function isEpTarget(sq) {
     const r = selected && recs.get(selected);
@@ -711,8 +749,8 @@ export async function createBoard(container, opts = {}) {
     let victim = null;
     if (vrec) { vrec.live || (vrec.live = pieces.makeLive(vrec.color, vrec.type)); victim = vrec.live; victim.position.copy(sqVec(victimSq)); }
     if (castle) { castle.rec.live || (castle.rec.live = pieces.makeLive(castle.rec.color, 'r')); castle.rec.live.position.copy(sqVec(castle.from)); }
-    syncPieces(); refreshOverlays();
-    animCount++; emit('animstart', { move: m });
+    animCount++; syncPieces(); refreshOverlays();   // (count first: check visuals wait for the animation)
+    emit('animstart', { move: m });
 
     const useBattle = vrec && battle && speed !== 'off' && speed !== 0;
     const tl = new kit.Timeline(useBattle ? Number(speed) || 1 : 1);
@@ -751,6 +789,7 @@ export async function createBoard(container, opts = {}) {
         syncPieces();
       } else { endLive(rec); if (castle) endLive(castle.rec); }
       animCount--; emit('animend', { move: m });
+      if (!animCount) refreshOverlays();   // checkalert: show the check (if any) now the move has landed
       wake();
     }
   }
@@ -793,7 +832,7 @@ export async function createBoard(container, opts = {}) {
       if (c !== 'w' && c !== 'b') return;
       orientation = c; rig.setOrientation(c);
       if (theme) buildBoardMesh();
-      if (pieces?.setView(c)) syncPieces();   // theme2d: flat icons stay upright from the player's side
+      if (pieces?.setView?.(c)) syncPieces();   // theme2d: flat icons stay upright from the player's side
       wake();
     },
     setTheme,
@@ -802,6 +841,7 @@ export async function createBoard(container, opts = {}) {
     highlight(h = {}) {
       if ('lastMove' in h) hl.lastMove = h.lastMove;
       if ('check' in h) hl.check = h.check;
+      if ('check' in h || 'checkPopup' in h) hl.checkPopup = h.checkPopup !== false;   // checkalert: review = false
       if ('hint' in h) hl.hint = h.hint;
       if ('legalTargets' in h) legalTargets = (h.legalTargets || []).map(t => (typeof t === 'string' ? t : t.to)).filter(isSq);
       if ('selected' in h) { selected = h.selected; }
@@ -835,6 +875,35 @@ export async function createBoard(container, opts = {}) {
     hideLabel() { tags.hide(); },
     pieceAt(sq) { const r = recs.get(sq); return r ? { type: r.type, color: r.color } : null; },
     /** Square centre in container CSS pixels (for placing the promotion picker etc.). */
+    /** checkalert: the current check as drawn {king, color, checkers[], double} or null. */
+    checkState() {
+      let chk = hl.check;
+      if (chk === 'w' || chk === 'b') chk = [...recs.values()].find(r => r.type === 'k' && r.color === chk)?.sq || null;
+      const k = isSq(chk) ? recs.get(chk) : null;
+      if (animCount || !k || k.type !== 'k') return null;
+      const checkers = attackersOf(chk, k.color);
+      return checkers.length ? { king: chk, color: k.color, checkers, double: checkers.length > 1 } : null;
+    },
+    /** checkalert: FEN placement field of the board's current position. */
+    placement() {
+      let out = '';
+      for (let r = 8; r >= 1; r--) {
+        let e = 0;
+        for (const f of FILES) { const p = recs.get(f + r); if (!p) { e++; continue; } if (e) { out += e; e = 0; } out += p.color === 'w' ? p.type.toUpperCase() : p.type; }
+        if (e) out += e; if (r > 1) out += '/';
+      }
+      return out;
+    },
+    /** checkalert: the 8×8 playing area's screen bounding box in container CSS px. */
+    boardRect() {
+      let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity;
+      for (const [x, z] of [[-4, -4], [4, -4], [-4, 4], [4, 4]]) {
+        const v = new THREE.Vector3(x, 0, z).project(camera);
+        const px = (v.x + 1) / 2 * cssW, py = (1 - v.y) / 2 * cssH;
+        l = Math.min(l, px); r = Math.max(r, px); t = Math.min(t, py); b = Math.max(b, py);
+      }
+      return { left: l, top: t, right: r, bottom: b, width: cssW, height: cssH };
+    },
     squareToScreen(sq, y = 0) {
       const v = sqVec(sq, y).project(camera);
       return { x: (v.x + 1) / 2 * cssW, y: (1 - v.y) / 2 * cssH };

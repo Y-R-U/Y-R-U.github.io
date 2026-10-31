@@ -48,6 +48,7 @@ export function settingsPanel(app, { compact = false } = {}) {
       <label class="row"><span><b>Music</b><small>Calm theme music, loops quietly</small></span>${toggle('music', !!s.music)}</label>
       <div class="row"><span><b>Music volume</b></span><input type="range" min="0" max="100" step="5" value="${Math.round((s.musicVolume ?? 0.5) * 100)}" data-vol="musicVolume" aria-label="Music volume" style="width:46%;max-width:200px;accent-color:var(--accent)"></div>
       <label class="row"><span><b>Confirm moves</b><small>Tap ✓ before a move is played</small></span>${toggle('moveConfirm', s.moveConfirm)}</label>
+      <label class="row"><span><b>Check alerts</b><small>A big CHECK sign when a king is attacked, then a badge by the board edge</small></span>${toggle('checkAlerts', s.checkAlerts !== false)}</label>
       <label class="row"><span><b>Show coordinates</b><small>a–h and 1–8 on the board edge</small></span>${toggle('coords', s.coords)}</label>
     </div>
     ${compact ? '' : `<h3 class="sect">This device</h3>

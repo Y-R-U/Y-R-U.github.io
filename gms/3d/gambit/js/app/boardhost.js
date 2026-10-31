@@ -22,6 +22,7 @@
 import { deps } from './deps.js';
 import { getSettings, onSettings } from './store.js';
 import { attachBoard } from './sound.js';   // audio: lets move sounds land with the animation
+import { attachCheckAlert } from './checkalert.js';   // checkalert: CHECK card + edge badge for every screen
 
 let host = null, boardP = null, board = null, current = null;
 const START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -31,7 +32,7 @@ function ensure() {
   if (!boardP) {
     const s = getSettings();
     boardP = deps.board.createBoard(host, { theme: s.theme, coords: s.coords, view: s.view, animSpeed: s.battleSpeed, interactive: null, ambientAnim: s.ambientAnim !== false })
-      .then(b => { board = b; attachBoard(b); return b; })
+      .then(b => { board = b; attachBoard(b); try { attachCheckAlert(b, host); } catch (e) { console.warn('[gambit] check alert', e); } return b; })
       .catch(e => { boardP = null; throw e; });
   }
   return boardP;
