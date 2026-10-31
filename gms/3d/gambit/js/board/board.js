@@ -124,6 +124,11 @@ export async function createBoard(container, opts = {}) {
   const ambientWanted = () => ambientOn && !disposed && !document.hidden && (ambUsers.base || (ambUsers.env && !!envObj?.visible));
   const onVisibility = () => { if (!document.hidden) wake(); };
   document.addEventListener('visibilitychange', onVisibility);
+  // Phones drop the WebGL context of a backgrounded tab; three.js restores it, but a board that
+  // only renders on change (Plain 2D, no ambient) would stay black until something moved.
+  const onRestored = () => { shadowDirty = true; wake(); };
+  canvas.addEventListener('webglcontextrestored', onRestored);
+  window.addEventListener('pageshow', onVisibility);
   function frame(now) {
     raf = 0;
     const t0 = performance.now();
@@ -934,7 +939,7 @@ export async function createBoard(container, opts = {}) {
     /** Force one render now (tests/screenshots). */
     render() { renderer.shadowMap.needsUpdate = true; rig.update(16); renderer.render(scene, camera); stat.calls = renderer.info.render.calls; stat.tris = renderer.info.render.triangles; },
     dispose() {
-      disposed = true; cancelAnimationFrame(raf); clearTimeout(ambTimer); document.removeEventListener('visibilitychange', onVisibility); finishAll();
+      disposed = true; cancelAnimationFrame(raf); clearTimeout(ambTimer); document.removeEventListener('visibilitychange', onVisibility); canvas.removeEventListener('webglcontextrestored', onRestored); window.removeEventListener('pageshow', onVisibility); finishAll();
       ro.disconnect(); window.removeEventListener('orientationchange', onWinResize);
       window.removeEventListener('keydown', onKeyDown); window.removeEventListener('keyup', onKeyUp); window.removeEventListener('blur', onBlur);
       fx?.dispose(); pieces?.dispose(); overlays?.dispose();
