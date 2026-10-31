@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Online agent end-to-end test: two real browsers play each other through the online UI.
 //
-//   tools/server_run.sh --bg                     # local server :8094, dev auth, fake allowance
+//   LIMITS=1 tools/server_run.sh --bg            # local server :8094, dev auth, fake allowance
 //   ~/.claude/bin/cdp start --port 9514 -- --use-angle=metal --use-gl=angle --ignore-gpu-blocklist
 //   ~/.claude/bin/cdp start --port 9515 -- --use-angle=metal --use-gl=angle --ignore-gpu-blocklist
 //   node tools/online_cdp.mjs [all|quick|friend|disconnect|allowance] [--out=DIR] [--shots=0]

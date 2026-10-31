@@ -10,9 +10,10 @@
 # be two players without Firebase (net.js picks a random per-tab uid when no Firebase token is
 # available, or use ?devuid=alice&devname=Alice[&devsigned=1]). Real Firebase tokens (anonymous
 # or signed in) are verified against Google's certs as on the box.
-# Allowance is "fake": guests 2/day and signed-in 5/day counted locally; dev uids that start
-# with "pass" (e.g. ?devuid=pass1&devsigned=1) have a BR8T Pass. Override with GAMBIT_ANON_PER_DAY=0
-# (= unlimited) etc.
+# Allowance: this is Aaron's home server, so by default everyone on it plays UNLIMITED online
+# games (Aaron, 2026-10-31). LIMITS=1 restores the "fake" allowance the tests need (guests 2/day
+# and signed-in 5/day counted locally; dev uids that start with "pass", e.g.
+# ?devuid=pass1&devsigned=1, have a BR8T Pass) — tools/online_cdp.mjs wants LIMITS=1.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 SRV="$HERE/server"
@@ -33,7 +34,11 @@ fi
 export GAMBIT_ADDR="0.0.0.0:$PORT"
 export GAMBIT_DATA="$RUN/data"
 export GAMBIT_DEV_AUTH=1
-export GAMBIT_ALLOWANCE="${GAMBIT_ALLOWANCE:-fake}"
+if [ -n "${LIMITS:-}" ]; then
+  export GAMBIT_ALLOWANCE="${GAMBIT_ALLOWANCE:-fake}"
+else
+  export GAMBIT_ALLOWANCE="${GAMBIT_ALLOWANCE:-off}" GAMBIT_ANON_PER_DAY="${GAMBIT_ANON_PER_DAY:-0}" GAMBIT_ANON_PER_IP_DAY="${GAMBIT_ANON_PER_IP_DAY:-0}"
+fi
 export GAMBIT_ORIGINS="${GAMBIT_ORIGINS:-http://192.168.0.236:8888,http://localhost:8888,http://127.0.0.1:8888,https://games.br8t.com}"
 
 echo "GAMBIT server: http://localhost:$PORT/gms/3d/gambit/api/health  (LAN: http://192.168.0.236:$PORT/…)"
