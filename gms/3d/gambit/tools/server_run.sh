@@ -26,7 +26,11 @@ if [ "${1:-}" = "--stop" ]; then
   rm -f "$RUN/pid"; exit 0
 fi
 if lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; then
-  echo "port $PORT is already in use:"; lsof -nP -iTCP:"$PORT" -sTCP:LISTEN; exit 1
+  echo "port $PORT is already in use:"; lsof -nP -iTCP:"$PORT" -sTCP:LISTEN
+  echo "(the always-on home server is launchd com.airon.gambit-local — it IS this server, unlimited."
+  echo " For a LIMITS=1 test run: launchctl unload ~/Library/LaunchAgents/com.airon.gambit-local.plist, test, then load it again;"
+  echo " after server code changes: (cd server && go build -o .run/gambit .) && launchctl kickstart -k gui/\$(id -u)/com.airon.gambit-local)"
+  exit 1
 fi
 [ -n "${FRESH:-}" ] && rm -rf "$RUN/data"
 (cd "$SRV" && CGO_ENABLED=0 go build -o "$RUN/gambit" .)
