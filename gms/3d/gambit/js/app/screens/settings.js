@@ -118,5 +118,7 @@ function benchText(app) {
 export function render(app) {
   const el = h('<section class="screen settings-screen"></section>');
   el.appendChild(settingsPanel(app));
-  return { el, top: { title: 'Settings', back: '#/home' } };
+  // back returns to wherever Settings was opened from (ui-4), home after a deep link
+  const prev = app.prevHash && app.prevHash();
+  return { el, top: { title: 'Settings', back: prev && !/^#\/settings/.test(prev) ? prev : '#/home' } };
 }

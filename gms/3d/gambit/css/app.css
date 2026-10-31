@@ -358,6 +358,7 @@ a.bot-card:active { transform: scale(.985); }
 .promo-card small { color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
 .promo-row { display: flex; gap: 8px; margin: 8px 0 2px; }
 .promo-row button { width: 64px; height: 64px; border-radius: 12px; background: var(--surface-3); font-size: 42px; line-height: 1; transition: transform .1s, background .15s; }
+.promo-row button img { width: 82%; height: 82%; display: block; margin: auto; pointer-events: none; }
 .promo-row button:hover { background: var(--accent-soft); transform: translateY(-2px); }
 .promo-row .pc-w { color: #f7f2e8; text-shadow: 0 0 2px #000, 0 2px 3px rgba(0, 0, 0, .5); }
 .promo-row .pc-b { color: #1b1a1c; text-shadow: 0 0 1px #fff9; background: #c9c1b3; }

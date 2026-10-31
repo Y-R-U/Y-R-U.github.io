@@ -57,6 +57,12 @@ export class Overlays {
     this.arrowGroup = new THREE.Group(); this.group.add(this.arrowGroup);
     this.arrowMats = new Map();
   }
+  /** Re-colour for a new theme's overlayStyle (ui-4: was only read from the first theme loaded). */
+  setStyle(style = {}) {
+    const s = { lastMove: '#f6d743', select: '#f6d743', hint: '#4fb3ff', hover: '#ffffff', dot: '#1b1b1b', ...style };
+    this.lastMove.mat.color.set(s.lastMove); this.select.mat.color.set(s.select); this.hint.mat.color.set(s.hint);
+    this.hover.mat.color.set(s.hover); this.dots.mat.color.set(s.dot); this.rings.mat.color.set(s.dot);
+  }
   setCheck(sq) {
     if (!sq) { this.check.visible = false; return; }
     const [x, z] = sqXZ(sq); this.check.position.set(x, Y + 0.0008, z); this.check.visible = true;

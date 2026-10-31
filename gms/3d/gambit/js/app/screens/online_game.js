@@ -12,9 +12,10 @@ import { promotionPicker, h, esc, icon, toast, confirmDialog, openSheet } from '
 import { getSettings, setSettings, onSettings } from '../store.js';
 import { fmtClock } from '../clock.js';
 import { play, playMove } from '../sound.js';
-import { settingsPanel } from './settings.js';
+import { openSettingsSheet } from '../settingsheet.js';
 import { installedThemes } from '../themes-meta.js';
 import { acquire } from '../boardhost.js';
+import { syncViewButton } from '../views.js';
 import { createReview, reviewNavHtml, movesHtml } from '../review.js';
 import { CHEAT_WARNING } from '../net.js';
 import { net, tcLabel, tcFull, ratingTxt, playerAvatar, handleError, nameOf, catName } from './online_common.js';
@@ -69,6 +70,7 @@ function acquireBoard(container) {
     const t = setTimeout(() => board && board.skip && board.skip(), BATTLE_SKIP_MS);
     if (O) O.capT = t;
   });
+  lease.on('theme', syncViewBtn);   // a theme may fix the camera (Plain = top)
   lease.track(onSettings(applySettings));
   return lease.ready.then(b => { if (!b) return null; board = b; applySettings(getSettings(), null); return b; });
 }
@@ -81,7 +83,7 @@ function applySettings(s, patch) {
   }
   if ((all || 'view' in patch) && board.camera && board.camera.preset && board.camera.view !== s.view) board.camera.preset(s.view);
   if (all || 'coords' in patch) board.setCoords && board.setCoords(s.coords);
-  syncSpeedBtn();
+  syncSpeedBtn(); syncViewBtn();
 }
 // ---------- state ----------
 function makeState(g) {
@@ -300,7 +302,7 @@ function cycleSpeed() {
 }
 const VIEW_NAMES = { top: 'Top', tilt: 'Tilt', angle: '3D', free: 'Free' };
 const viewLabel = v => VIEW_NAMES[v === 'default' ? 'tilt' : v] || 'Top';
-function syncViewBtn() { const b = view && view.querySelector('[data-act="camera"] .lbl'); if (b) b.textContent = viewLabel(board?.camera?.view || getSettings().view); }
+function syncViewBtn() { syncViewButton(view && view.querySelector('[data-act="camera"]'), board, getSettings().view); }
 function cycleView() { if (board && board.camera) (board.camera.cycle || board.camera.reset).call(board.camera); }
 const speedLabel = s => (s === 'off' ? 'Off' : `${s}×`);
 function syncSpeedBtn() { const b = view && view.querySelector('[data-act="speed"] .lbl'); if (b) b.textContent = speedLabel(onlineSpeed()); }
@@ -424,6 +426,7 @@ function renderActions() {
     <button class="act" data-act="flip">${icon('flip')}<span>Flip</span></button>
     <button class="act" data-act="camera" title="Cycle view (V)">${icon('camera')}<span class="lbl">${viewLabel(s.view)}</span></button>
     <button class="act" data-act="speed" title="Battle speed (online)">${icon('swords')}<span class="lbl">${speedLabel(onlineSpeed())}</span></button>`;
+  syncViewBtn();
 }
 // banners over the board: draw offer, opponent away / claim, first-move timer, connection
 // Landscape / desktop (side panel layout) shows them at the top of the panel instead, so they never cover
@@ -521,10 +524,7 @@ export function mountGame(root, ctx, id) {
   ctx.setTop({ title: `vs ${nameOf(opp)}`, sub: `Online · ${esc(tcFull(g.tc))} · ${g.rated ? 'Rated' : 'Casual'}`, back: '#/online' });
   ctx.canPester(() => !O || O.over);
   if (!getSettings().onlineWarnSeen) setSettings({ onlineWarnSeen: true });   // the Online home's cheat warning can collapse now
-  app.openSettingsHere = () => {
-    const sh = openSheet(`<div class="sheet-head"><h3>Settings</h3><button class="tb-btn" data-close aria-label="Close">${icon('x')}</button></div><div class="sheet-body"></div>`, { cls: 'sheet-tall' });
-    sh.el.querySelector('.sheet-body').appendChild(settingsPanel(app, { compact: true }));
-  };
+  app.openSettingsHere = () => openSettingsSheet(app);   // main.js opens the shared sheet anyway (board on show)
 
   el.addEventListener('click', e => {
     const a = e.target.closest('[data-act]'); if (!a || a.disabled) return;

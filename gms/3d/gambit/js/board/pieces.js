@@ -37,6 +37,7 @@ export class PieceSet {
     this.liveGroup = new THREE.Group(); this.liveGroup.name = 'live';
     scene.add(this.group, this.liveGroup);
     this.protos = new Map();
+    this.viewYaw = 0;              // theme2d: yaw for pieces.facing.view themes (flat icons face the viewer)
     // contact cue under every resting piece: soft dark AO + a faint light ring at the base edge
     const tex = kit.canvasTexture(128, 128, (c, w) => {
       const g = c.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
@@ -52,13 +53,16 @@ export class PieceSet {
   /** Build prototypes for every kind from theme (falling back to `fallback` per missing piece). */
   load(theme, fallback) {
     this.clearProtos();
+    this.blobs.visible = theme.pieces?.contact !== false;   // theme2d: flat themes opt out of the contact blob
     for (const color of ['w', 'b']) for (const t of KINDS) {
       let fn = theme.pieces?.[t], src = theme;
       if (typeof fn !== 'function') { fn = fallback?.pieces?.[t]; src = fallback; }
       let obj;
       try { obj = fn(THREE, kit, { color, type: t }); } catch (e) { console.error(`[board] piece ${color}${t} failed`, e); obj = fallback.pieces[t](THREE, kit, { color, type: t }); src = fallback; }
-      const yaw = facingYaw(src.pieces?.facing, color, t);
-      this.protos.set(color + t, this._bake(obj, yaw));
+      const view = !!src.pieces?.facing?.view;
+      const pr = this._bake(obj, view ? this.viewYaw : facingYaw(src.pieces?.facing, color, t));
+      pr.view = view;
+      this.protos.set(color + t, pr);
     }
   }
   _bake(obj, yaw) {
@@ -91,6 +95,17 @@ export class PieceSet {
     }
     const radius = Math.max(Math.abs(box.min.x), Math.abs(box.max.x), Math.abs(box.min.z), Math.abs(box.max.z));
     return { obj, parts, height: Math.max(0.3, box.max.y), radius: Math.min(0.48, radius), yaw };
+  }
+  /**
+   * theme2d: board orientation changed. Pieces of a theme with `pieces.facing.view` (flat 2D
+   * icons) turn so they read upright from the player's side. Returns true if any yaw changed.
+   */
+  setView(orientation) {
+    const y = orientation === 'b' ? Math.PI : 0;
+    this.viewYaw = y;
+    let changed = false;
+    for (const pr of this.protos.values()) if (pr.view && pr.yaw !== y) { pr.yaw = y; changed = true; }
+    return changed;
   }
   height(color, type) { return this.protos.get(color + type)?.height ?? 0.8; }
   radius(color, type) { return this.protos.get(color + type)?.radius ?? 0.35; }

@@ -1,10 +1,11 @@
 // Puzzle play: the real 3D board, opponent setup move, find-the-move loop, hints, reveal,
 // stars, rating, celebration. One persistent board is reused across puzzles.
 import { h, esc, icon, toast, promotionPicker, confirmDialog } from '../app/ui.js';
-import { getSettings, onSettings } from '../app/store.js';
+import { getSettings, setSettings, onSettings } from '../app/store.js';
 import { play as sfx, playMove } from '../app/sound.js';
 import { installedThemes } from '../app/themes-meta.js';
 import { acquire } from '../app/boardhost.js';
+import { syncViewButton, viewLabel as viewName } from '../app/views.js';
 import { PuzzleRun, goalText, lanOf } from './logic.js';
 import { getPuzzle } from './data.js';
 import { regionById, REGIONS } from './regions.js';
@@ -49,8 +50,23 @@ function acquireBoard(container) {
     onRevoke: () => { board = null; },
   });
   lease.track(onSettings(applySettings));
+  // View button / V key: save the view like the game screen does (D26)
+  lease.on('view', ({ view: v }) => {
+    if (getSettings().view !== v) {
+      setSettings({ view: v });
+      toast(v === 'free' ? 'Free view: drag or pinch to look around' : `${viewName(v)} view`, { ms: 1200 });
+    }
+    syncViewBtn();
+  });
+  lease.on('theme', syncViewBtn);   // a theme may fix the camera (Plain = top)
   boardP = lease.ready.then(b => { if (b) { board = b; applySettings(getSettings(), null); } return b; });
   return boardP;
+}
+const viewLabel = () => viewName(board?.camera?.fixed || board?.camera?.view || getSettings().view);
+function syncViewBtn() { syncViewButton(view && view.querySelector('.pz-acts [data-act="camera"]'), board, getSettings().view); }
+function cycleView() {
+  if (!board?.camera) return;
+  if (board.camera.cycle) board.camera.cycle(); else board.camera.reset?.();
 }
 function ensureBoard() { return boardP ? boardP.then(b => { if (!b) throw new Error('board taken'); return b; }) : Promise.reject(new Error('no board')); }
 function applySettings(s, patch) {
@@ -60,6 +76,7 @@ function applySettings(s, patch) {
   if ((all || 'theme' in patch) && installedThemes(app.deps).includes(s.theme)) Promise.resolve(board.setTheme?.(s.theme)).catch(e => console.warn('[puzzles] theme', e));
   if ((all || 'view' in patch) && board.camera?.preset && board.camera.view !== s.view) board.camera.preset(s.view);
   if (all || 'coords' in patch) board.setCoords?.(s.coords);
+  if (all || 'view' in patch) syncViewBtn();
 }
 
 function kingSq(chess, color) {
@@ -255,7 +272,6 @@ function renderPanel() {
   const fin = S.finished;
   const res = S.result;
   el.innerHTML = `
-    ${p.n ? `<div class="pz-story card"><small>Classic</small><b>${esc(p.n)}</b><p>${esc(p.st || '')}</p></div>` : ''}
     <div class="pz-score card">
       <div class="pz-starsbig ${fin ? 'final' : ''}">${starRow(fin && res ? res.stars : liveStars)}</div>
       <div class="pz-score-txt">
@@ -264,7 +280,6 @@ function renderPanel() {
           : `<b>${S.replay ? 'Replay' : 'First try'}</b><small>${S.mistakes ? `${S.mistakes} miss${S.mistakes > 1 ? 'es' : ''}` : 'No misses'}${S.hints ? ` · ${S.hints} hint${S.hints > 1 ? 's' : ''}` : ''}${best != null ? ` · best ${best}★` : ''}</small>`}
       </div>
     </div>
-    ${themeChips(p) ? `<div class="pz-chips">${themeChips(p)}</div>` : ''}
     <div class="pz-acts">
       ${fin ? `
         <button class="act" data-act="retry">${icon('rematch')}<span>Retry</span></button>
@@ -275,13 +290,68 @@ function renderPanel() {
         <button class="act" data-act="hint" ${S.busy ? 'disabled' : ''}>${icon('bulb')}<span>${S.hintStage === 1 ? 'More hint' : 'Hint'}</span></button>
         <button class="act" data-act="reveal" ${S.busy ? 'disabled' : ''}>${icon('book')}<span>Solution</span></button>
         <button class="act" data-act="restart">${icon('undo')}<span>Restart</span></button>
-        <button class="act" data-act="camera">${icon('camera')}<span>View</span></button>`}
-    </div>
-    ${fin && p.g ? `<a class="pz-src" href="https://lichess.org/${esc(p.g)}" target="_blank" rel="noopener">Original game on Lichess ↗</a>` : ''}`;
+        <button class="act" data-act="camera" title="Cycle view (V)">${icon('camera')}<span class="lbl">${viewLabel()}</span></button>`}
+    </div>`;
+  syncViewBtn();
+  renderInfo();
+}
+
+// ---------- info overlay (ui-4) ----------
+// The classic's story, theme chips and (when solved) the source link used to sit in the bottom
+// panel, which made the panel taller for some puzzles and shrank the board (Aaron: "puzzle 1 and 3
+// are zoomed out"). They now live in a card that slides over the top of the board: open for ~4 s
+// when a puzzle with a story starts, then it slides away leaving a small tab; tap or swipe the tab
+// down to bring it back, tap the tab or swipe the card up to put it away.
+const INFO_MS = 4000;
+let infoTimer = 0;
+function infoHtml(p) {
+  const chips = themeChips(p);
+  const src = S?.finished && p.g ? `<a class="pz-src" href="https://lichess.org/${esc(p.g)}" target="_blank" rel="noopener">Original game on Lichess ↗</a>` : '';
+  if (!p.n && !chips && !src) return '';
+  return `${p.n ? `<small>Classic</small><b>${esc(p.n)}</b>${p.st ? `<p>${esc(p.st)}</p>` : ''}` : `<small>${esc(p.goal || goalText(p))}</small>`}
+    ${chips ? `<div class="pz-chips">${chips}</div>` : ''}${src}`;
+}
+function renderInfo() {
+  const el = view && view.querySelector('.pz-info'); if (!el || !S) return;
+  const html = infoHtml(S.p);
+  el.hidden = !html;
+  if (!html) { setInfo(false); return; }
+  el.querySelector('.pz-info-card').innerHTML = html;
+  el.querySelector('.pz-info-tab .t').textContent = S.p.n || 'Puzzle info';
+}
+function setInfo(open, { auto = false } = {}) {
+  const el = view && view.querySelector('.pz-info'); if (!el) return;
+  clearTimeout(infoTimer);
+  if (open && el.hidden) open = false;
+  el.classList.toggle('open', !!open);
+  el.querySelector('.pz-info-tab')?.setAttribute('aria-expanded', String(!!open));
+  if (open && auto) infoTimer = setTimeout(() => setInfo(false), INFO_MS);
+}
+function bindInfo(el) {
+  const info = el.querySelector('.pz-info');
+  let y0 = null, x0 = 0, from = null;
+  info.addEventListener('pointerdown', e => {
+    const t = e.target.closest('.pz-info-tab, .pz-info-card'); if (!t) return;
+    if (e.target.closest('a')) return;
+    y0 = e.clientY; x0 = e.clientX; from = t.classList.contains('pz-info-tab') ? 'tab' : 'card';
+  });
+  const up = e => {
+    if (y0 == null) return;
+    const dy = e.clientY - y0, dx = e.clientX - x0, open = info.classList.contains('open');
+    y0 = null;
+    if (from === 'tab') {
+      if (dy > 24) setInfo(true);
+      else if (dy < -24) setInfo(false);
+      else if (Math.abs(dx) < 12 && Math.abs(dy) < 12) { sfx('tap'); setInfo(!open); }
+    } else if (dy < -24) setInfo(false);
+    else clearTimeout(infoTimer);   // touched the card: keep it up until put away
+  };
+  info.addEventListener('pointerup', up);
+  info.addEventListener('pointercancel', () => { y0 = null; });
 }
 
 // ---------- lifecycle ----------
-async function startPuzzle(id, { replay } = {}) {
+async function startPuzzle(id, { replay, restart: replayStart = false } = {}) {
   const gen = (S?.gen || 0) + 1;
   let p = null;
   try { p = await getPuzzle(id); } catch (e) { console.error(e); }
@@ -299,6 +369,7 @@ async function startPuzzle(id, { replay } = {}) {
   }).catch(() => {});
   view.style.setProperty('--ra', regionById(p.region)?.a || '#e0b660');
   renderHead(); renderPanel();
+  if (!replayStart && p.n && p.st) setInfo(true, { auto: true }); else setInfo(false);
   setStatus('', setup ? 'Watch the opponent’s move…' : `${sideName(run.player)} to move`);
   const s = S;
   try { await ensureBoard(); } catch (e) {
@@ -335,11 +406,16 @@ export function mountPlay(el, appRef, id) {
       <div class="pz-col">
         <div class="pz-head"></div>
         <div class="pz-board board-square"><div class="board-loading">Setting up the board…</div></div>
+        <div class="pz-info" hidden><div class="pz-info-slide">
+          <div class="pz-info-card" role="note"></div>
+          <button class="pz-info-tab" type="button" aria-expanded="false" aria-label="Puzzle info">${icon('info')}<span class="t">Info</span>${icon('chevron')}</button>
+        </div></div>
         <div class="pz-status" role="status" aria-live="polite"></div>
       </div>
     </div>
     <aside class="pz-panel"></aside>`;
   acquireBoard(el.querySelector('.pz-board')).catch(() => {});
+  bindInfo(el);
   const ro = new ResizeObserver(() => board?.resize?.());
   ro.observe(el.querySelector('.pz-board'));
 
@@ -349,8 +425,8 @@ export function mountPlay(el, appRef, id) {
     const act = a.dataset.act;
     if (act === 'hint') hint();
     else if (act === 'reveal') reveal();
-    else if (act === 'restart' || act === 'retry') { board?.skip?.(); startPuzzle(S.p.id, { replay: true }); }
-    else if (act === 'camera') board?.camera?.reset?.();
+    else if (act === 'restart' || act === 'retry') { board?.skip?.(); startPuzzle(S.p.id, { replay: true, restart: true }); }
+    else if (act === 'camera') cycleView();
     else if (act === 'map') app.go('#/puzzles');
     else if (act === 'next' && S?.next) app.go(`#/puzzles/p/${encodeURIComponent(S.next)}`);
   });
@@ -358,7 +434,7 @@ export function mountPlay(el, appRef, id) {
   startPuzzle(id);
   return {
     leave() {
-      ro.disconnect();
+      ro.disconnect(); clearTimeout(infoTimer);
       if (lease) lease.release();
       lease = null; board = null; boardP = null;
       view = null; S = null;

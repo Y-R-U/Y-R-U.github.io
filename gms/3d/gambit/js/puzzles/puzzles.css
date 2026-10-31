@@ -108,12 +108,15 @@
 body[data-route="puzzle"] #view, #view:has(> .pz-play) { overflow: hidden; }
 .screen.pz-play { max-width: none; height: 100%; padding: 0; display: flex; flex-direction: column; }
 .pz-stage { flex: 1; min-height: 0; container-type: size; display: flex; align-items: center; justify-content: center; }
-.pz-col { width: min(100cqw, 100cqh - 104px); display: flex; flex-direction: column; }
-.pz-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 10px; min-height: 56px; }
-.pz-goal { display: flex; gap: 10px; align-items: center; min-width: 0; flex: none; }
+.pz-col { width: min(100cqw, 100cqh - 114px); display: flex; flex-direction: column; position: relative; }
+/* ui-4: head, status and the bottom panel have FIXED heights so every puzzle gets the same board
+   (the story / chips used to grow the panel and shrink the board — they're in .pz-info now) */
+.pz-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 0 10px 12px; height: 64px; flex: none; }   /* bottom 12px: room for the info tab */
+.pz-goal { display: flex; gap: 10px; align-items: center; min-width: 0; flex: 0 1 auto; }
+.pz-goal > div { min-width: 0; }
 .pz-goal b { display: block; font-family: var(--display); font-size: 17px; letter-spacing: .03em; line-height: 1.15; white-space: nowrap; }
 @media (max-width: 400px) { .pz-goal b { font-size: 15px; } }
-.pz-goal small { display: block; color: var(--ra, var(--accent)); font-weight: 700; font-size: 13px; }
+.pz-goal small { display: block; color: var(--ra, var(--accent)); font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pz-side { width: 26px; height: 26px; border-radius: 50%; flex: none; border: 2px solid var(--accent); box-shadow: 0 0 10px rgba(224, 182, 96, .3); }
 .pz-side.w { background: radial-gradient(circle at 35% 30%, #fff, #d9d2c3); }
 .pz-side.b { background: radial-gradient(circle at 35% 30%, #4a4a50, #121214); }
@@ -121,7 +124,7 @@ body[data-route="puzzle"] #view, #view:has(> .pz-play) { overflow: hidden; }
 .pz-meta small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 .pz-meta b { font-size: 16px; font-variant-numeric: tabular-nums; }
 .pz-board { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.pz-status { min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px 12px; font-size: 15px; color: var(--text); }
+.pz-status { height: 48px; flex: none; overflow: hidden; line-height: 1.2; display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px 12px; font-size: 15px; color: var(--text); }
 .pz-status.good { color: var(--good); }
 .pz-status.bad { color: var(--bad); }
 .pz-status.pop { animation: pzPop .25s ease-out; }
@@ -129,7 +132,7 @@ body[data-route="puzzle"] #view, #view:has(> .pz-play) { overflow: hidden; }
 .pz-shake { animation: pzShake .42s cubic-bezier(.36, .07, .19, .97); }
 @keyframes pzShake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-8px); } 40%, 60% { transform: translateX(8px); } }
 
-.pz-panel { flex: none; display: flex; flex-direction: column; gap: 8px; padding: 8px 10px calc(8px + var(--sab)); background: var(--bg-2); border-top: 1px solid var(--line); max-height: 44vh; overflow-y: auto; }
+.pz-panel { flex: none; display: flex; flex-direction: column; gap: 8px; padding: 8px 10px calc(8px + var(--sab)); background: var(--bg-2); border-top: 1px solid var(--line); }   /* fixed: score row + action row */
 .pz-score { display: flex; align-items: center; gap: 12px; padding: 8px 12px; }
 .pz-starsbig { display: flex; gap: 2px; }
 .pz-starsbig svg { width: 26px; height: 26px; fill: #313642; transition: fill .3s, transform .3s; }
@@ -137,8 +140,9 @@ body[data-route="puzzle"] #view, #view:has(> .pz-play) { overflow: hidden; }
 .pz-starsbig.final svg.on { animation: pzStar .5s backwards; }
 .pz-starsbig.final svg:nth-child(2) { animation-delay: .12s; } .pz-starsbig.final svg:nth-child(3) { animation-delay: .24s; }
 @keyframes pzStar { from { transform: scale(.2) rotate(-40deg); } 70% { transform: scale(1.3); } to { transform: none; } }
+.pz-score-txt { min-width: 0; }
 .pz-score-txt b { display: block; font-size: 15px; }
-.pz-score-txt small { color: var(--muted); font-size: 13px; }
+.pz-score-txt small { display: block; color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pz-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .pz-chip { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); }
 .pz-acts { display: flex; gap: 4px; align-items: center; }
@@ -148,11 +152,35 @@ body[data-route="puzzle"] #view, #view:has(> .pz-play) { overflow: hidden; }
 .pz-story small { color: var(--accent); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
 .pz-story b { display: block; font-family: var(--display); font-size: 16px; letter-spacing: .03em; }
 .pz-story p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
-.pz-src { color: var(--muted); font-size: 12px; text-align: center; text-decoration: underline; text-underline-offset: 3px; padding: 4px; }
+.pz-src { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; text-align: center; text-decoration: underline; text-underline-offset: 3px; padding: 4px; }
 
-/* portrait: actions first so they stay on screen; story scrolls below */
+/* portrait: actions first so they stay on screen */
 .pz-panel .pz-acts { order: -1; }
 .pz-panel .pz-score { order: -2; }
+
+/* ---- info overlay over the top of the board (ui-4) ---- */
+.pz-info { position: absolute; left: 0; right: 0; top: 64px; bottom: 48px; z-index: 6; pointer-events: none; container-type: size;
+  clip-path: inset(-13px 0 0 0); }   /* over the board; the tab pokes 13px up into the head's spare strip */
+.pz-info[hidden] { display: none; }
+.pz-info-slide { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; align-items: center;
+  transform: translateY(calc(-100% + 13px)); transition: transform .42s cubic-bezier(.2, .8, .2, 1); }
+.pz-info.open .pz-info-slide { transform: none; }
+.pz-info-card { pointer-events: auto; touch-action: none; width: calc(100% - 16px); max-width: 520px; margin-top: 8px; max-height: 62cqh; overflow-y: auto;
+  padding: 10px 14px 12px; border-radius: 14px; background: rgba(12, 15, 22, .9); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border: 1px solid rgba(224, 182, 96, .55); box-shadow: 0 10px 30px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 230, 170, .1); }
+.pz-info-card > small { color: var(--accent); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+.pz-info-card > b { display: block; font-family: var(--display); font-size: 17px; letter-spacing: .03em; color: #f7e7c2; }
+.pz-info-card > p { margin: 4px 0 0; color: #cfd5df; font-size: 14px; line-height: 1.4; }
+.pz-info-card .pz-chips { margin-top: 8px; }
+.pz-info-tab { pointer-events: auto; touch-action: none; height: 26px; margin-top: 4px; padding: 0 10px 0 8px; display: inline-flex; align-items: center; gap: 5px; max-width: 70%;
+  border-radius: 13px; background: rgba(12, 15, 22, .9); border: 1px solid rgba(224, 182, 96, .55);
+  color: #f2dca8; font-size: 12px; font-weight: 700; letter-spacing: .02em; box-shadow: 0 4px 12px rgba(0, 0, 0, .45); }
+.pz-info-tab .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pz-info-tab .ic, .pz-info-tab svg { width: 14px; height: 14px; flex: none; }
+.pz-info-tab svg:last-child { transform: rotate(90deg); transition: transform .3s; }
+.pz-info.open .pz-info-tab svg:last-child { transform: rotate(-90deg); }
+.pz-info-tab { position: relative; }
+.pz-info-tab::after { content: ""; position: absolute; inset: -9px -8px 0; }   /* taller touch target, upward only (squares below) */
 
 @media (orientation: landscape) and (min-width: 600px) {
   .screen.pz-play { flex-direction: row; padding: 12px; gap: 12px; }

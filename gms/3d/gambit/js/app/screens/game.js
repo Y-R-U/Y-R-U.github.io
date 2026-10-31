@@ -10,9 +10,10 @@ import { getSettings, setSettings, onSettings, getResume, setResume, clearResume
 import { GameClock, fmtClock, parseTc } from '../clock.js';
 import { recordGame, playerRank, previewPoints } from '../ladder.js';
 import { play, playMove } from '../sound.js';
-import { settingsPanel } from './settings.js';
+import { openSettingsSheet as openSheetShared } from '../settingsheet.js';
 import { installedThemes } from '../themes-meta.js';
 import { acquire } from '../boardhost.js';
+import { syncViewButton } from '../views.js';
 import { createReview, reviewNavHtml, movesHtml } from '../review.js';
 
 export const ROUTE = 'game';
@@ -112,6 +113,7 @@ function acquireBoard(container) {
     }
     syncViewBtn();
   });
+  lease.on('theme', syncViewBtn);   // a theme may fix the camera (Plain = top)
   lease.track(onSettings(applySettingsToBoard));
   return lease.ready.then(b => {
     if (!b) return null;
@@ -134,7 +136,7 @@ function applySettingsToBoard(s, patch) {
     if (board.setCoords) board.setCoords(s.coords);
     else if (board.setOptions) board.setOptions({ coords: s.coords });
   }
-  if (view) syncSpeedBtn();
+  if (view) { syncSpeedBtn(); syncViewBtn(); }
 }
 
 function syncBoard() {
@@ -467,8 +469,7 @@ function cycleSpeed() {
 const VIEW_NAMES = { top: 'Top', tilt: 'Tilt', angle: '3D', free: 'Free' };
 function viewLabel(v) { return VIEW_NAMES[v === 'default' ? 'tilt' : v] || 'Top'; }
 function syncViewBtn() {
-  const b = view && view.querySelector('[data-act="camera"] .lbl');
-  if (b) b.textContent = viewLabel(board && board.camera && board.camera.view || getSettings().view);
+  syncViewButton(view && view.querySelector('[data-act="camera"]'), board, getSettings().view);
 }
 function cycleView() {
   if (!board || !board.camera) return;
@@ -603,14 +604,12 @@ function renderActions() {
     <button class="act" data-act="flip">${icon('flip')}<span>Flip</span></button>
     <button class="act" data-act="camera" title="Cycle view (V)">${icon('camera')}<span class="lbl">${viewLabel(s.view)}</span></button>
     <button class="act" data-act="speed">${icon('swords')}<span class="lbl">${speedLabel(s.battleSpeed)}</span></button>`;
+  syncViewBtn();
 }
 
 function renderAll() { renderBars(); renderMoves(); renderActions(); }
 
-export function openSettingsSheet() {
-  const sh = openSheet(`<div class="sheet-head"><h3>Settings</h3><button class="tb-btn" data-close aria-label="Close">${icon('x')}</button></div><div class="sheet-body"></div>`, { cls: 'sheet-tall' });
-  sh.el.querySelector('.sheet-body').appendChild(settingsPanel(app, { compact: true }));
-}
+export function openSettingsSheet() { return openSheetShared(app); }   // kept for callers; shared module (ui-4)
 
 // ---------- screen ----------
 export function render(appRef) {

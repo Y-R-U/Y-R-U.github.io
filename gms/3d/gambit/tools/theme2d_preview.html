@@ -1,0 +1,28 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plain 2D art preview</title>
+<style>body{margin:0;background:#302e2b;color:#ddd;font:14px system-ui}canvas{display:block;margin:8px auto;max-width:100%}</style>
+</head><body>
+<!-- theme2d: the Plain 2D piece art on both square colours, big and small. -->
+<canvas id="c"></canvas>
+<script type="module">
+import { drawPiece } from '../js/themes/plain/art.js';
+const cv = document.getElementById('c'), dpr = devicePixelRatio || 1;
+const W = Math.min(innerWidth - 16, 900), S = W / 6;
+cv.style.width = W + 'px'; cv.style.height = (S * 4 + S * 0.5 * 2) + 'px';
+cv.width = W * dpr; cv.height = (S * 4 + S * 0.5 * 2) * dpr;
+const c = cv.getContext('2d'); c.scale(dpr, dpr);
+const L = '#ebecd0', D = '#739552', T = 'pnbrqk';
+for (let row = 0; row < 4; row++) for (let i = 0; i < 6; i++) {
+  const col = row < 2 ? 'w' : 'b', dark = (i + row) % 2 === 1;
+  c.fillStyle = dark ? D : L; c.fillRect(i * S, row * S, S, S);
+  drawPiece(c, T[i], col, i * S, row * S, S);
+}
+const s = S / 2, y0 = S * 4;
+for (let row = 0; row < 2; row++) for (let i = 0; i < 12; i++) {
+  const col = i < 6 ? 'w' : 'b', dark = (i + row) % 2 === 1;
+  c.fillStyle = dark ? D : L; c.fillRect(i * s, y0 + row * s, s, s);
+  drawPiece(c, T[i % 6], col, i * s, y0 + row * s, s);
+}
+window.READY = 1;
+</script></body></html>

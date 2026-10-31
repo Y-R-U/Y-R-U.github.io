@@ -10,6 +10,7 @@ import * as game from './screens/game.js';
 import * as ladderScreen from './screens/ladder.js';
 import * as settings from './screens/settings.js';
 import * as placeholder from './screens/placeholder.js';
+import { openSettingsSheet, forgetSettingsSheet } from './settingsheet.js';
 
 const params = new URLSearchParams(location.search);
 const TEST = params.has('test') || params.has('nocloud');
@@ -21,7 +22,44 @@ export const app = {
   usingReal,
   go(hash) { if (location.hash === hash) render(); else location.hash = hash; },
   canPester() { return app.route !== 'game' || !game.isActive(); },
+  /** The screen we came from in this tab (null at the first screen / after a deep link). */
+  prevHash() { return nav.i > 0 ? nav.stack[nav.i - 1] || null : null; },
+  /** Go back to `fallback`: a real history.back() when that is where we came from, else navigate. */
+  back(fallback = '#/home') {
+    const prev = app.prevHash();
+    if (prev && (!fallback || prev === fallback)) history.back(); else app.go(fallback);
+  },
+  openSettings() { openSettings(); },
 };
+
+// ---------- in-tab navigation stack (ui-4) ----------
+// Each hash entry is numbered in history.state.gn so we know which screen is "previous":
+// the top-bar back arrow then becomes history.back() when it points there (so the Android back
+// button and the arrow agree, and history doesn't grow on every back tap), and Settings' back
+// returns to wherever you opened it from.
+const nav = (() => {
+  try { const v = JSON.parse(sessionStorage.getItem('gambit.nav') || 'null'); if (v && Array.isArray(v.stack)) return v; } catch { /* ignore */ }
+  return { stack: [], i: -1 };
+})();
+function trackNav() {
+  const st = history.state || {};
+  const hash = location.hash || '#/home';
+  if (typeof st.gn === 'number' && st.gn >= 0 && st.gn < nav.stack.length) nav.i = st.gn;   // back / forward
+  else {
+    nav.i += 1; nav.stack.length = nav.i;
+    try { history.replaceState({ ...st, gn: nav.i }, '', location.href); } catch { /* ignore */ }
+  }
+  nav.stack[nav.i] = hash;
+  if (nav.stack.length > 60) { nav.stack.splice(0, nav.stack.length - 60); nav.i = nav.stack.length - 1; }
+  try { sessionStorage.setItem('gambit.nav', JSON.stringify(nav)); } catch { /* ignore */ }
+}
+
+// Settings without losing your place: any screen with the shared 3D board on show (bot game,
+// online game, puzzle, lesson) gets the in-place sheet; everything else the full page.
+function openSettings() {
+  if (document.querySelector('#view .board-host')) openSettingsSheet(app);
+  else app.go('#/settings');
+}
 window.__gambit = app;   // handy for tests / debugging
 
 // ---------- plug-in screens (owned by other agents) ----------
@@ -83,6 +121,7 @@ function render() {
   if (!match) for (const [re, mod, p] of ROUTES) { const m = hash.match(re); if (m) { match = { mod, params: p(m) }; break; } }
   if (!match) { location.replace('#/home'); return; }
   if (current && current.leave) { try { current.leave(); } catch (e) { console.warn(e); } }
+  forgetSettingsSheet();
   closeAllOverlays();
   const view = $('#view');
   const res = match.mod.render(app, match.params) || {};
@@ -171,12 +210,15 @@ async function boot() {
   }
   setupFullscreen();
   setupTouch();
-  $('#settings-btn').addEventListener('click', () => {
-    if (app.route === 'game') game.openSettingsSheet();
-    else if (app.openSettingsHere) app.openSettingsHere();   // a plug-in screen with a live game (online)
-    else app.go('#/settings');
+  $('#settings-btn').addEventListener('click', openSettings);
+  // top-bar back arrow: pop history when it points at the screen we came from
+  $('#topbar').addEventListener('click', e => {
+    const a = e.target.closest('.tb-left a.tb-btn'); if (!a) return;
+    const href = a.getAttribute('href');
+    if (href && app.prevHash() === href) { e.preventDefault(); history.back(); }
   });
-  window.addEventListener('hashchange', render);
+  window.addEventListener('hashchange', () => { trackNav(); render(); });
+  trackNav();
   render();
   setupCloud();
   window.__booted = true;

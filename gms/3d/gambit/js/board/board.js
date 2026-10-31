@@ -55,7 +55,8 @@ export async function createBoard(container, opts = {}) {
   // ------------------------------------------------------------ renderer / scene
   if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-  const dpr = () => Math.min(window.devicePixelRatio || 1, o.maxPixelRatio);
+  let themeDpr = 0;                  // theme.board.pixelRatio (theme2d: cheap flat themes render up to DPR 3)
+  const dpr = () => Math.min(window.devicePixelRatio || 1, Math.max(o.maxPixelRatio, themeDpr));
   renderer.setPixelRatio(dpr());
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
@@ -88,6 +89,7 @@ export async function createBoard(container, opts = {}) {
   let orientation = o.orientation;
   let interactive = o.interactive;
   let speed = o.animSpeed;
+  let userView = normalizeView(o.view);   // theme2d: the user's chosen view, kept while a theme fixes the camera
   let selected = null, legalTargets = [], hl = { lastMove: null, check: null, hint: null }, arrows = [];
   let pending = null;                // user move awaiting applyMove {from,to,promotion,live,timer}
   let gen = 0;                       // bumps on setPosition so stale anims don't touch new state
@@ -188,12 +190,27 @@ export async function createBoard(container, opts = {}) {
   window.addEventListener('orientationchange', onWinResize);
 
   // ------------------------------------------------------------ theme
-  async function setTheme(id) {
+  // ui-4: every screen re-applies its settings when it borrows the shared board, so the same theme
+  // was rebuilt on each mount — and a rebuild while the previous compileAsync() was still polling
+  // disposed its materials, throwing "reading 'isReady'" inside three.js. Same id = the same promise;
+  // a different id waits for the previous switch to finish before tearing anything down.
+  let themeReq = null, themeChain = Promise.resolve();
+  function setTheme(id) {
+    if (themeReq && themeReq.id === id) return themeReq.p;
+    const p = themeChain.then(() => applyTheme(id));
+    themeChain = p.catch(() => {});
+    themeReq = { id, p };
+    p.catch(() => { if (themeReq && themeReq.p === p) themeReq = null; });
+    return p;
+  }
+  async function applyTheme(id) {
     const t = await loadTheme(id);
     fallbackTheme = fallbackTheme || await loadTheme('classic');
     if (disposed) return;
     finishAll();
+    const wasFixed = theme?.board?.view, hadTheme = !!theme;
     theme = t;
+    if ((theme.board?.pixelRatio || 0) !== themeDpr) { themeDpr = theme.board?.pixelRatio || 0; resize(); }
     // lights / environment
     if (lights) { scene.remove(lights); lights = null; }
     if (envObj) { scene.remove(envObj); kit.dispose(envObj); envObj = null; }
@@ -225,8 +242,13 @@ export async function createBoard(container, opts = {}) {
     // pieces
     tags.setNames(theme.names);
     if (!pieces) pieces = new PieceSet(scene);
+    pieces.viewYaw = orientation === 'b' ? Math.PI : 0;
     pieces.load(theme, fallbackTheme);
+    // theme2d: a theme may fix the camera (board.view, e.g. 'top' for flat 2D); leaving it restores the user's view
+    if (theme.board?.view) { rig.preset(theme.board.view); if (!hadTheme) rig.cur = { ...rig.goal }; }
+    else if (wasFixed) setView(userView);
     if (!overlays) overlays = new Overlays(scene, theme.board?.overlayStyle);
+    else overlays.setStyle(theme.board?.overlayStyle);   // ui-4: highlight colours follow the theme
     syncPieces(); refreshOverlays();
     // compile shaders up front (parallel where supported) so the first frame doesn't hitch
     // (plus one live, non-instanced piece per side: that is a different shader variant)
@@ -549,11 +571,13 @@ export async function createBoard(container, opts = {}) {
     e.preventDefault(); keys.add(k); wake();
   }
   function setView(name) {
+    userView = normalizeView(name);
+    if (theme?.board?.view) { rig.preset(theme.board.view); wake(); return rig.presetName; }   // fixed by the theme: remember, don't move
     rig.preset(name); wake();
     emit('view', { view: rig.presetName, label: VIEW_LABELS[rig.presetName], locked: rig.locked });
     return rig.presetName;
   }
-  function cycleView() { return setView(VIEW_ORDER[(VIEW_ORDER.indexOf(rig.presetName) + 1) % VIEW_ORDER.length]); }
+  function cycleView() { if (theme?.board?.view) return rig.presetName; return setView(VIEW_ORDER[(VIEW_ORDER.indexOf(rig.presetName) + 1) % VIEW_ORDER.length]); }
   function onKeyUp(e) { const k = KEYMAP[e.code]; if (k) keys.delete(k); }
   function keyOrbit(dt) {
     if (!keys.size) return;
@@ -625,23 +649,29 @@ export async function createBoard(container, opts = {}) {
   async function plainCapture(tl, vrec, delay) {
     const v = vrec.live;
     await tl.wait(delay);
+    if (theme?.captureAnim) {         // theme2d hook: the theme's own plain capture (ctx.piece = the victim)
+      try { await theme.captureAnim(animCtx(tl, vrec, vrec.sq, vrec.sq, { piece: v, victim: v })); } catch (e) { console.error('[board] captureAnim failed', e); }
+      v.visible = false; return;
+    }
     fx.smoke(v.position.clone().setY(0.2), { count: 7, alpha: 0.4, size: [0.2, 0.35] });
     await tl.tween(130, e => { v.scale.setScalar(Math.max(0.01, 1 - e)); v.position.y = -0.2 * e; }, kit.ease.quadIn);
     v.visible = false;
   }
   async function promoteFlourish(tl, rec, toSq, newType) {
     const old = rec.live, pos = sqVec(toSq);
-    const custom = theme?.promoteAnim;
-    fx.sparkles(pos.clone().setY(0.5), { count: 34 });
-    fx.flash(pos.clone().setY(0.5), { color: '#fff3c0', radius: 1.0 });
-    await tl.tween(140, e => { old.rotation.y = e * Math.PI; old.scale.setScalar(Math.max(0.01, 1 - e)); }, kit.ease.quadIn);
+    const custom = theme?.promoteAnim, plain = theme?.promoteFx === false;   // theme2d: promoteFx:false = no particles, no spin
+    if (!plain) {
+      fx.sparkles(pos.clone().setY(0.5), { count: 34 });
+      fx.flash(pos.clone().setY(0.5), { color: '#fff3c0', radius: 1.0 });
+    }
+    await tl.tween(plain ? 90 : 140, e => { if (!plain) old.rotation.y = e * Math.PI; old.scale.setScalar(Math.max(0.01, 1 - e)); }, kit.ease.quadIn);
     pieces.removeLive(old);
     rec.type = newType;
     rec.live = pieces.makeLive(rec.color, newType); rec.live.position.copy(pos); rec.live.scale.setScalar(0.01);
     const nu = rec.live;
     if (custom) { try { await custom({ ...animCtx(tl, rec, toSq, toSq), piece: nu }); } catch (e) { console.error(e); } }
     else {
-      fx.ring(pos, { radius: 0.9, color: '#ffe9a0' });
+      if (!plain) fx.ring(pos, { radius: 0.9, color: '#ffe9a0' });
       await tl.tween(260, (e, k) => { nu.scale.setScalar(Math.max(0.01, e)); nu.rotation.y = (1 - k) * Math.PI * 2; }, kit.ease.backOut);
     }
     nu.rotation.y = 0; nu.scale.setScalar(1);
@@ -702,7 +732,11 @@ export async function createBoard(container, opts = {}) {
       } else {
         const jobs = [];
         if (viaDrag) jobs.push(settle(tl, rec, to)); else jobs.push(runMoveAnim(tl, rec, from, to, m));
-        if (castle) jobs.push(kit.hopTo(animCtx(tl, castle.rec, castle.from, castle.to), castle.rec.live, sqVec(castle.to), { height: 0.9, ms: 300, squash: 0.2 }));
+        if (castle) {
+          const cctx = animCtx(tl, castle.rec, castle.from, castle.to);
+          jobs.push(theme?.castleAnim ? Promise.resolve().then(() => theme.castleAnim(cctx)).catch(e => console.error('[board] castleAnim failed', e))   // theme2d hook
+            : kit.hopTo(cctx, castle.rec.live, sqVec(castle.to), { height: 0.9, ms: 300, squash: 0.2 }));
+        }
         if (vrec) jobs.push(plainCapture(tl, vrec, viaDrag ? 40 : 150));
         await Promise.all(jobs);
       }
@@ -759,6 +793,7 @@ export async function createBoard(container, opts = {}) {
       if (c !== 'w' && c !== 'b') return;
       orientation = c; rig.setOrientation(c);
       if (theme) buildBoardMesh();
+      if (pieces?.setView(c)) syncPieces();   // theme2d: flat icons stay upright from the player's side
       wake();
     },
     setTheme,
@@ -812,6 +847,8 @@ export async function createBoard(container, opts = {}) {
       get view() { return rig.presetName; },
       get label() { return VIEW_LABELS[rig.presetName]; },
       get locked() { return rig.locked; },
+      /** theme2d: the view the current theme fixes the camera to (e.g. 'top' for Plain 2D), else null. */
+      get fixed() { return theme?.board?.view || null; },
       setLocked(on) { rig.setLocked(on); wake(); },
       views: VIEW_ORDER, labels: VIEW_LABELS,
       reset() { rig.reset(); wake(); },

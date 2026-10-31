@@ -6,6 +6,7 @@ export const THEME_META = [
   { id: 'fantasy', name: 'Fantasy', blurb: 'Wizards, witches, knights and dragons.', light: '#c8baa7', dark: '#4c4f57', w: '#f3ecdb', b: '#a3221d', accent: '#a98bff' },
   { id: 'halloween', name: 'Halloween', blurb: 'Pumpkins, ghouls and a haunted graveyard.', light: '#c4af9c', dark: '#58576a', w: '#f39a33', b: '#3a2350', accent: '#ff7a1a' },
   { id: 'scifi', name: 'Sci-fi', blurb: 'Sleek droids with glowing light-lines.', light: '#cdd4ea', dark: '#69718a', w: '#d9f6ff', b: '#ff4fa0', accent: '#3fe0ff' },
+  { id: 'plain', name: 'Plain 2D', blurb: 'Flat, traditional pieces on a green board. Simple.', light: '#ebecd0', dark: '#739552', w: '#ffffff', b: '#1c1c1c', accent: '#8fb05e' },
 ];
 
 // Installed theme ids: from the registry when the real board is in use, else only classic.

@@ -131,6 +131,14 @@ export function promotionPicker(stage, { color = 'w', to = null, board = null } 
       <div class="promo-card"><small>Promote to</small><div class="promo-row">
       ${['q', 'r', 'b', 'n'].map(p => `<button data-p="${p}" class="pc-${color}" aria-label="${PROMO_NAME[p]}">${PROMO_GLYPH[p]}</button>`).join('')}
       </div><button class="link" data-p="">Cancel</button></div></div>`);
+    // the flat Plain set draws its own pieces: show those instead of the Unicode glyphs (ui-4)
+    if (board && board.theme === 'plain') {
+      import('../themes/plain/art.js').then(m => {
+        o.querySelectorAll('.promo-row [data-p]').forEach(b => {
+          b.innerHTML = `<img src="${m.pieceDataURL(b.dataset.p, color, 120)}" alt="" draggable="false">`;
+        });
+      }).catch(() => { /* glyphs stay */ });
+    }
     let pt = null;
     try { if (to && board && board.squareToScreen) pt = board.squareToScreen(to); } catch { pt = null; }
     const done = v => { o.remove(); resolve(v); };

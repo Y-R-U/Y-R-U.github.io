@@ -84,6 +84,13 @@
 .ln-dots i.done { background: rgba(224, 182, 96, .55); }
 .ln-dots i.on { background: var(--accent); box-shadow: 0 0 6px rgba(224, 182, 96, .6); }
 .ln-board { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.ln-statusrow { flex: none; position: relative; }
+.ln-view { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 46px; height: 44px; border-radius: 12px; display: grid; place-items: center; align-content: center; gap: 0;
+  color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .04em; }
+.ln-view .ic, .ln-view svg { width: 20px; height: 20px; }
+.ln-view:hover, .ln-view:active { background: var(--surface); color: var(--text); }
+.ln-view:disabled { opacity: .35; pointer-events: none; }
+.ln-status { padding-left: 56px !important; padding-right: 56px !important; }
 .ln-status { flex: none; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px 12px; font-size: 15px; color: var(--muted); }
 .ln-status.good { color: var(--good); }
 .ln-status.bad { color: var(--bad); }

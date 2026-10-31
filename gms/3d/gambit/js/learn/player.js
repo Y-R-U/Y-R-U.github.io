@@ -1,11 +1,12 @@
 // Learn: the lesson player. A coach bubble above the shared 3D board, a status line and an action
 // panel below. Steps: info (with demos), tap (coordinates / find squares), stars (lone-piece
 // fields), move (guided tasks with fixed replies), quiz, play (practice vs the engine), cta.
-import { h, esc, icon, promotionPicker } from '../app/ui.js';
-import { getSettings, onSettings } from '../app/store.js';
+import { h, esc, icon, promotionPicker, toast } from '../app/ui.js';
+import { getSettings, setSettings, onSettings } from '../app/store.js';
 import { play as sfx, playMove } from '../app/sound.js';
 import { installedThemes } from '../app/themes-meta.js';
 import { acquire } from '../app/boardhost.js';
+import { syncViewButton, viewLabel } from '../app/views.js';
 import { Chess } from '../chess/chess.js';
 import { LESSONS, lessonById, unitById } from './data.js';
 import { fieldFromFen, fieldMoves, fieldHint } from './field.js';
@@ -36,9 +37,19 @@ function acquireBoard(container) {
     onRevoke: () => { board = null; },
   });
   lease.track(onSettings(applySettings));
+  // View button / V key cycle Top → Tilt → 3D → Free and are saved like in a game (D26, ui-4)
+  lease.on('view', ({ view: v }) => {
+    if (getSettings().view !== v) {
+      setSettings({ view: v });
+      toast(v === 'free' ? 'Free view: drag or pinch to look around' : `${viewLabel(v)} view`, { ms: 1200 });
+    }
+    syncViewBtn();
+  });
+  lease.on('theme', syncViewBtn);   // a theme may fix the camera (Plain = top)
   boardP = lease.ready.then(b => { if (b) { board = b; applySettings(getSettings(), null); } return b; });
   return boardP;
 }
+function syncViewBtn() { syncViewButton(view?.querySelector('.ln-view'), board, getSettings().view); }
 function applySettings(s, patch) {
   if (!board) return;
   const all = !patch;
@@ -46,6 +57,7 @@ function applySettings(s, patch) {
   if ((all || 'theme' in patch) && installedThemes(app.deps).includes(s.theme)) Promise.resolve(board.setTheme?.(s.theme)).then(() => ov?.kick()).catch(e => console.warn('[learn] theme', e));
   if ((all || 'view' in patch) && board.camera?.preset && board.camera.view !== s.view) board.camera.preset(s.view);
   if (all || 'coords' in patch) board.setCoords?.(s.coords);
+  if (all || 'view' in patch) syncViewBtn();
 }
 function kingSq(c, color) {
   const b = c.board();
@@ -506,7 +518,8 @@ export function mountPlayer(el, appRef, id, ctx) {
     <div class="ln-coach"><div class="ln-crest" aria-hidden="true">${COACH}</div>
       <div class="ln-bubble"><div class="ln-say"></div><div class="ln-dots"></div></div></div>
     <div class="ln-stage"><div class="ln-board board-square"><div class="board-loading">Setting up the board…</div></div></div>
-    <div class="ln-status" role="status" aria-live="polite"></div>
+    <div class="ln-statusrow"><div class="ln-status" role="status" aria-live="polite"></div>
+      <button class="ln-view" type="button" data-act="camera" aria-label="Change view">${icon('camera')}<span class="lbl">Top</span></button></div>
     <aside class="ln-panel"></aside>`;
   const boardEl = el.querySelector('.ln-board');
   acquireBoard(boardEl).catch(() => {});
@@ -523,6 +536,7 @@ export function mountPlayer(el, appRef, id, ctx) {
     else if (act === 'prev') { if (S.i > 0) enter(S.i - 1); }
     else if (act === 'retry') enter(S.i);
     else if (act === 'hint') hint();
+    else if (act === 'camera') { if (board?.camera?.cycle) board.camera.cycle(); }
     else if (act === 'demo') { const st = step(); runDemo(st, S, S.gen); }
     else if (act === 'map') app.go('#/learn');
     else if (act === 'replay') { view.querySelector('.ln-done')?.remove(); S.finished = null; S.misses = 0; enter(0); }
