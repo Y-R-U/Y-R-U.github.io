@@ -24,7 +24,7 @@ const hasLoc = typeof location !== 'undefined';
 // served from anywhere but localhost / the LAN (GitHub Pages, games.br8t.com) never touches the
 // network for online play: net.available() is false and the Online screen says "coming soon".
 // Flip to true in the deploy that ships server/ (or pass ?server=<base> to test a server).
-export const ONLINE_PUBLIC = false;
+export const ONLINE_PUBLIC = true;
 
 // Local-only hint for the Home screen's "online game in progress" card (no connection at boot).
 // `gambit.local.` keys are never cloud-synced (store.js isLocalOnly).

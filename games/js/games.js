@@ -22,6 +22,12 @@ export const GAMES = [
     blurb: "26 quiz games across 70 topics: picture reveals, maps, music clips, Movie Moments and more. Pub quiz, daily challenge, kids mode, a Learn tab, and online rooms friends join by link.",
   },
   {
+    id: "gambit", name: "GAMBIT", tag: "Chess with a little theatre",
+    path: "/gms/3d/gambit/", shot: "gambit", accent: "#d4a64a",
+    short: "3D themed chess: bots, puzzles, lessons and online play.",
+    blurb: "Classic, Fantasy, Halloween and Sci-fi piece sets with over-the-top capture battles. Twenty bots with ratings, 600+ puzzles, 27 lessons for beginners, and online games with friends or strangers.",
+  },
+  {
     id: "ragdojo", name: "RAGDOJO", tag: "Stick fighting, on paper",
     path: "/gms/2d/ragdojo/", shot: "ragdojo", accent: "#3d7fd6",
     short: "Draw your moves. Send stick fighters flying.",
