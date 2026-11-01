@@ -3,6 +3,7 @@
 //   ~/.claude/bin/cdp start --port 9512
 //   node tools/shots_cdp.mjs shots [--out=DIR] [--theme=greybox] [--holes=4,5] [--sizes=p,l]
 //        title, map, settings + each hole (flyover/tee/aim/rolling/rest), portrait 412x915 and landscape 1440x900
+//   node tools/shots_cdp.mjs story [--out=DIR]   career: name, intro, map, lesson 1, result, rival hole card
 //   node tools/shots_cdp.mjs play  [--out=DIR] [--from=N] [--minutes=20]   plays the front nine (or from hole N) through the real UI to the scorecard
 // Reports console errors / exceptions and exits 1 if there are any.
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -171,6 +172,65 @@ async function play(c) {
     await sleep(600);
   }
 }
+// Career: name entry, intro dialogue, the tour map, lesson 1 played by drags, result + dialogue,
+// then the rival event's first hole card (rival scores) and the theme picker.
+async function playHoles(c, W = 412, H = 915) {
+  const tEnd = Date.now() + 10 * 60e3;
+  while (Date.now() < tEnd) {
+    const s = await c.eval('__skyputt.round ? __skyputt.round.state : null');
+    if (!s) return;
+    if (s === 'done') return 'card';
+    if (s !== 'ready') { await sleep(300); continue; }
+    await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
+    const plan = await c.eval(`(${planInPage.toString()})()`);
+    const maxDrag = Math.min(W, H) * 0.5, len = 24 + plan.power * (maxDrag - 24);
+    await drag(c, W / 2, 300, W / 2 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
+    await sleep(600);
+  }
+}
+async function tapDialogue(c, name) {
+  for (let i = 0; i < 12; i++) {
+    const open = await c.eval(`!document.querySelector('#dialogue').hidden`);
+    if (!open) return;
+    if (i === 0 && name) await shot(c, name);
+    await c.eval(`document.querySelector('#dialogue').click()`); await sleep(250);
+  }
+}
+async function story(c) {
+  await size(c, 412, 915, true);
+  await go(c, 'fresh&noflyover');
+  await c.eval(`document.querySelector('#t-career').click()`); await sleep(400);
+  await shot(c, 'story-name');
+  await c.eval(`(() => { const i = document.querySelector('#c-name'); i.value = 'Robin'; document.querySelector('#career [data-a=ok]').click(); })()`);
+  await sleep(400);
+  await tapDialogue(c, 'story-intro');
+  await sleep(300);
+  await shot(c, 'story-career');
+  await c.eval(`document.querySelector('#career [data-ev="muni-l1"]').click()`); await sleep(400);
+  await tapDialogue(c, 'story-lesson1-before');
+  await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 30000);
+  await sleep(500);
+  await shot(c, 'story-lesson1-hole');
+  await playHoles(c);
+  await shot(c, 'story-lesson1-card');
+  await c.eval(`document.querySelector('#h-card [data-a=next]').click()`); await sleep(800);
+  await shot(c, 'story-lesson1-result');
+  console.log('   result:', await c.eval(`document.querySelector('#career .card')?.innerText.replace(/\\n+/g, ' | ')`));
+  await c.eval(`document.querySelector('#career [data-a=ok]').click()`); await sleep(300);
+  await tapDialogue(c);
+  // jump ahead: mark lessons + rounds passed, open the rival
+  await c.eval(`(() => { const st = __skyputt.store.story(); for (const id of ['muni-l1','muni-l2','muni-l3','muni-r1','muni-r2']) st.events[id] = { passed: true, best: 9 }; __skyputt.store.saveStory(); __skyputt.career.render(); })()`);
+  await sleep(300);
+  await shot(c, 'story-career-later');
+  await c.eval(`document.querySelector('#career [data-ev="muni-rival"]').click()`); await sleep(400);
+  await tapDialogue(c, 'story-rival-before');
+  await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 30000);
+  await playHoles(c);
+  await shot(c, 'story-rival-card');
+  console.log('   rival card:', await c.eval(`document.querySelector('#h-card .card')?.innerText.replace(/\\n+/g, ' | ')`));
+  console.log('   state:', JSON.stringify(await c.eval(`({ coins: __skyputt.store.data.coins, helpers: __skyputt.store.data.helpers, story: __skyputt.store.story() })`)));
+}
+
 // Runs in the page: searches heading x power with the real sim, returns the best relative to the camera.
 function planInPage() {
   const r = __skyputt.round, w = r.world, b = r.ball, h = r.hole, rig = __skyputt.app.rig;
@@ -196,6 +256,7 @@ await setup(c);
 try {
   if (MODE === 'shots') await shots(c);
   else if (MODE === 'play') await play(c);
+  else if (MODE === 'story') await story(c);
 } catch (e) { errors.push('driver: ' + e.message); }
 if (errors.length) { console.log('ERRORS:\n  ' + [...new Set(errors)].join('\n  ')); process.exit(1); }
 console.log('no console errors');

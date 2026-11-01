@@ -13,6 +13,7 @@ import { sfx } from '../game/sfxbus.js';
 import { Store } from './store.js';
 import { renderTitle, showMap, openSettings } from './menus.js';
 import { createAudio } from '../audio/index.js';
+import { createCareer } from '../story/career.js';
 
 const $ = s => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -68,11 +69,12 @@ async function boot() {
   const rig = new CameraRig(camera);
   const hud = new Hud($('#hud'));
 
-  const { theme, fallback, id: themeId } = await loadTheme(params.get('theme') || 'sky', renderer);
+  // theme: ?theme= overrides the saved pick (D7 loader falls back to greybox)
+  const first = await loadTheme(params.get('theme') || store.settings().theme || 'sky', renderer);
   const course = COURSES.sky;
-  const app = { renderer, scene, camera, rig, theme, fallback, quality, hud, canvas, themeId, fullscreen: null, store, audio };
+  const app = { renderer, scene, camera, rig, theme: first.theme, fallback: first.fallback, quality, hud, canvas, themeId: first.id, fullscreen: null, store, audio };
   app.openSettings = onClose => openSettings(store, { apply: applySettings, onClose, click: () => sfx.emit('click') });
-  audio?.music.start(course.theme || 'sky');
+  audio?.music.start(app.themeId);
 
   // ---- resize / orientation (D13): live, portrait and landscape
   function resize() {
@@ -93,15 +95,34 @@ async function boot() {
   let titleView = null, round = null;
   function showTitle() {
     round = null;
+    ensureTitleScene();
+    renderTitle(store, course, app.themeId, setTheme);
+    $('#title').hidden = false;
+  }
+  function ensureTitleScene() {
     if (!titleView) {
       const hole = buildHole(course.holes[0]);
-      titleView = buildHoleView(scene, hole, theme, fallback, { renderer, camera, quality });
+      titleView = buildHoleView(scene, hole, app.theme, app.fallback, { renderer, camera, quality });
       const c = titleView.info.bounds.getCenter(new THREE.Vector3()), sz = titleView.info.bounds.getSize(new THREE.Vector3());
       rig.mode = 'orbit'; rig.orbitT = 0.6;
       rig.orbitCenter = { x: c.x, y: c.y, z: c.z, r: Math.max(sz.x, sz.z) * 0.85 + 2 };
     }
-    renderTitle(store, course);
-    $('#title').hidden = false;
+  }
+  // Theme picker: swap themes in place (dispose the old one, load the new, rebuild the title scene).
+  let swapping = false;
+  async function setTheme(id) {
+    if (swapping || id === app.themeId) return;
+    swapping = true;
+    sfx.emit('click');
+    store.setSetting('theme', id);
+    titleView?.dispose(); titleView = null;
+    try { if (app.theme !== app.fallback) app.theme.dispose?.(); app.fallback.dispose?.(); } catch { /* */ }
+    const t = await loadTheme(id, renderer);
+    Object.assign(app, { theme: t.theme, fallback: t.fallback, themeId: t.id });
+    window.__skyputt.themeId = t.id;
+    audio?.music.start(t.id);
+    swapping = false;
+    showTitle();
   }
   function showCourseMap() {
     $('#title').hidden = true;
@@ -117,12 +138,30 @@ async function boot() {
     if (params.has('noflyover')) round.endFlyover();
     window.__skyputt.round = round;
   }
+  // ---- career (M3 story)
+  const career = createCareer({
+    store, click: () => sfx.emit('click'), back: () => sfx.emit('back'),
+    onBack: () => showTitle(),
+    // play an event's holes as a round; resolves with the result, or null if the player quits
+    startEvent: (ev, evCourse, { opponents, tips }) => new Promise(resolve => {
+      $('#title').hidden = true;
+      titleView?.dispose(); titleView = null;
+      round = new Round(app, evCourse, 0, {
+        mode: 'round', opponents, tips, label: ev.name,
+        onComplete: res => { round = null; ensureTitleScene(); resolve(res); },
+        onExit: () => { round = null; ensureTitleScene(); resolve(null); },
+      });
+      if (params.has('noflyover')) round.endFlyover();
+      window.__skyputt.round = round;
+    }),
+  });
+  $('#t-career').onclick = () => { sfx.emit('click'); $('#title').hidden = true; career.open(); };
   $('#t-play').onclick = () => { sfx.emit('click'); startRound(0, 'round'); };
   $('#t-map').onclick = () => { sfx.emit('click'); showCourseMap(); };
   $('#t-settings').innerHTML = ICONS.gear;
   $('#t-settings').onclick = () => { sfx.emit('click'); app.openSettings(() => {}); };
 
-  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, get round() { return round; }, set round(r) { round = r; }, themeId };
+  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
 
   const startHole = parseInt(params.get('hole'), 10);
   if (startHole >= 1 && startHole <= course.holes.length) startRound(startHole - 1, 'single'); else showTitle();

@@ -3,13 +3,16 @@
 const KEY = 'skyputt.save.v1';
 
 export const DEFAULT_SETTINGS = {
-  sfx: 0.9, music: 0.6, quality: 'high', camSens: 1, lefty: false,
+  sfx: 0.9, music: 0.6, quality: 'high', camSens: 1, lefty: false, theme: 'sky',
 };
 export const START_HELPERS = { longSight: 3, mulligan: 3 };
 export const COINS_PER_CRYSTAL = 5;
 
+// Career progress: profile + per-event results (best, passed) + which one-off lines were seen.
+export function freshStory() { return { name: '', events: {}, chapters: {}, seen: {} }; }
+
 function fresh() {
-  return { v: 1, holes: {}, coins: 0, helpers: { ...START_HELPERS }, settings: { ...DEFAULT_SETTINGS }, unlocked: {} };
+  return { v: 1, holes: {}, coins: 0, helpers: { ...START_HELPERS }, settings: { ...DEFAULT_SETTINGS }, unlocked: {}, story: freshStory() };
 }
 
 // stars: 0 = not finished / picked up, 1 = finished, 2 = par or better, 3 = under par
@@ -33,6 +36,7 @@ export class Store {
         settings: { ...f.settings, ...(d.settings || {}) },
         unlocked: typeof d.unlocked === 'object' && d.unlocked ? d.unlocked : {},
         coins: Number.isFinite(d.coins) ? d.coins : 0,
+        story: { ...freshStory(), ...(d.story && typeof d.story === 'object' ? d.story : {}) },
       };
     } catch { return fresh(); }
   }
@@ -67,6 +71,8 @@ export class Store {
     this.data.helpers[name]--; this.save(); return true;
   }
   giveHelper(name, n = 1) { this.data.helpers[name] = (this.data.helpers[name] | 0) + n; this.save(); }
+  story() { return this.data.story; }
+  saveStory() { this.save(); }
   settings() { return this.data.settings; }
   setSetting(k, v) { this.data.settings[k] = v; this.save(); }
 }

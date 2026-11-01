@@ -1,7 +1,7 @@
 // Sky Isles theme — buildEnvironment: sky, island under the course, waterfalls, foliage, lanterns,
 // backdrop set pieces, flyers, clouds and sparkles. Returns { update(dt, t), dispose() }.
 import * as THREE from 'three';
-import { Buckets, rng, distToPath, disposeTree, mat } from './util.js';
+import { Buckets, rng, distToPath, disposeTree, mat, inVoid, distToLines } from './util.js';
 import { buildSky } from './sky.js';
 import { buildCourseRock, buildWaterfalls, buildFoliage, roundRock, spikes } from './island.js';
 import { buildCastle, buildSmallIsland, buildBridge, IRON } from './backdrop.js';
@@ -14,7 +14,9 @@ const UP = new THREE.Vector3(0, 1, 0);
 function courseFrame(info) {
   const path = info.path;
   const tee = info.tee || path[0], cup = info.cup || path[path.length - 1];
-  const fwd = new THREE.Vector3(cup.x - tee.x, 0, cup.z - tee.z);
+  // engine M2 info.viewDir = the camera's heading at the tee: backdrops go where the player looks
+  // (tee→cup is sideways on hairpin holes like 7).
+  const fwd = info.viewDir ? new THREE.Vector3(info.viewDir.x, 0, info.viewDir.z) : new THREE.Vector3(cup.x - tee.x, 0, cup.z - tee.z);
   if (fwd.lengthSq() < 1e-6) fwd.set(0, 0, -1);
   fwd.normalize();
   const right = new THREE.Vector3().crossVectors(fwd, UP).normalize();
@@ -44,7 +46,8 @@ export function buildEnvironment(scene, info, M, quality) {
 
   // ---------- island under the course ----------
   const floor = Array.isArray(info.floor) && info.floor.length === path.length ? info.floor : null;
-  const course = buildCourseRock(path, widths, hi, floor);
+  const voids = info.voids || [], branches = info.branches || [];
+  const course = buildCourseRock(path, widths, hi, floor, voids);
   const rockList = course.geometry ? [course.geometry] : [];
   // hanging spikes under the course
   for (let i = 0; i < (hi ? 10 : 4); i++) {
@@ -75,6 +78,7 @@ export function buildEnvironment(scene, info, M, quality) {
         const p = f.p.clone().addScaledVector(dir, ext).add(new THREE.Vector3(0, -0.1, 0));
         const { d, i } = distToPath(path, p.x + dir.x * 0.8, p.z + dir.z * 0.8);
         if (d < (widths[i] ?? 1.5) / 2 + 0.5) continue;
+        if (inVoid(voids, p.x + dir.x * 0.8, p.z + dir.z * 0.8, 0.3)) continue;
         cands.push({ p, dir, f, score: dir.dot(back) * 0.6 + Math.abs(dir.dot(frame.right)) * 0.5 + r() * 0.3 });
       }
     }
@@ -104,6 +108,8 @@ export function buildEnvironment(scene, info, M, quality) {
       const x = path[i].x + rx * (w + 0.3), z = path[i].z + rz * (w + 0.3);
       const dd = distToPath(path, x, z);
       if (dd.d < (widths[dd.i] ?? 1.5) / 2 + 0.24) { side = -side; continue; }
+      // engine M2: never in a void, never on / beside a branch track (the plank on hole 7)
+      if (inVoid(voids, x, z, 0.15) || distToLines(branches, x, z) < 0.5) { side = -side; continue; }
       lanterns.push(new THREE.Vector3(x, path[i].y, z));
       side = -side;
     }
@@ -138,7 +144,7 @@ export function buildEnvironment(scene, info, M, quality) {
     ...lanterns.map(p => ({ x: p.x, z: p.z, r: 0.22 })),
     ...fallSpots.map(s => ({ x: s.p.x, z: s.p.z, r: s.width + 0.2 })),
   ];
-  for (const o of buildFoliage(course.frames, path, widths, hi, avoid)) root.add(o);
+  for (const o of buildFoliage(course.frames, path, widths, hi, avoid, voids, branches)) root.add(o);
 
   // ---------- backdrop: castle + islands + bridge ----------
   const back = new Buckets();

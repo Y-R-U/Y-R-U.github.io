@@ -19,8 +19,12 @@ const MAX_SIGHT = 3;              // Long Sight stacks per shot
 export class Round {
   // app: { renderer, scene, camera, rig, theme, fallback, quality, hud, canvas, fullscreen, store }
   // mode: 'round' (play on to the last hole, then the scorecard) | 'single' (one hole, then the map)
-  constructor(app, course, startIndex = 0, { onExit, mode = 'round' } = {}) {
+  // Story events add: onComplete(result) instead of the scorecard, opponents [{ name, colour, scores }]
+  // shown on every hole card, and tips (hint lines at each hole start).
+  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null } = {}) {
     this.app = app; this.course = course; this.onExit = onExit; this.mode = mode;
+    this.onComplete = onComplete; this.opponents = opponents; this.tips = tips; this.label = label;
+    this.used = { longSight: 0, mulligan: 0 };
     this.index = startIndex; this.startIndex = startIndex;
     this.scores = [];
     this.gems = 0;
@@ -88,14 +92,14 @@ export class Round {
     this.flyT = 0;
     this.flyPath = flyPath(hole);
     this.refreshHelpers();
-    hud.banner(`<small>Hole ${i + 1} · Par ${def.par}</small>${def.name}`, 'intro', 2600);
+    hud.banner(`<small>${this.label ? this.label + ' · ' : ''}Hole ${i + 1} · Par ${def.par}</small>${def.name}`, 'intro', 2600);
     hud.hint(true, 'Tap to skip');
   }
 
   endFlyover() {
     if (this.state !== 'flyover') return;
     this.state = 'ready';
-    this.app.hud.hint(true, 'Drag back anywhere to aim · release to putt');
+    this.app.hud.hint(true, this.tips?.[this.index] || this.tips?.[0] || 'Drag back anywhere to aim · release to putt');
     this.refreshHelpers();
   }
 
@@ -163,7 +167,7 @@ export class Round {
     if (!(this.state === 'ready' || this.state === 'flyover') || this.sight >= MAX_SIGHT) return;
     if (!this.app.store.useHelper('longSight')) { this.app.hud.banner('No Long Sight left', 'bad', 1200); sfx.emit('back'); return; }
     this.endFlyover();
-    this.sight++;
+    this.sight++; this.used.longSight++;
     this.aim.guideLevel = this.sight;
     sfx.emit('click');
     this.app.hud.banner(`Long Sight ×${this.sight}`, 'good', 900);
@@ -177,7 +181,7 @@ export class Round {
     this.ballMesh.position.set(L.x, L.y, L.z);
     this.app.rig.focus.set(L.x, L.y, L.z);
     this.strokes = L.strokes;
-    this.last = null;
+    this.last = null; this.used.mulligan++;
     this.app.hud.setStrokes(this.strokes, this.maxStrokes);
     this.app.rig.setGoalYaw(this.fairwayYaw());
     this.app.hud.banner('Mulligan! <small>shot undone</small>', 'good', 1100);
@@ -371,6 +375,7 @@ export class Round {
     const last = this.index >= n - 1;
     const nextOpen = !last && store.unlockedCount(this.course) > this.index + 1;
     const onNext = () => {
+      if (this.onComplete && last) { const res = this.result(); this.dispose(); this.onComplete(res); return; }
       if (this.mode === 'round') { if (!last) this.loadHole(this.index + 1); else this.showScorecard(); }
       else if (nextOpen) this.loadHole(this.index + 1);
       else this.exit();
@@ -382,7 +387,18 @@ export class Round {
       stars, coins, newBest, reward, totalCoins: store.data.coins,
       nextLabel: this.mode === 'round' ? (last ? 'Scorecard' : 'Next hole') : (nextOpen ? 'Next hole' : 'Course map'),
       onMap: this.mode === 'single' ? () => this.exit() : null,
+      rivals: this.opponents?.map(o => ({ name: o.name, colour: o.colour, strokes: o.scores[this.index],
+        total: o.scores.slice(0, this.index + 1).reduce((a, b) => a + b, 0) })),
+      youTotal: this.scores.filter(Boolean).reduce((a, r) => a + r.strokes, 0),
     }, onNext);
+  }
+
+  // Event result for the story: per-hole scores, stars, gems and helper use.
+  result() {
+    const rows = this.scores.filter(Boolean);
+    return { rows, total: rows.reduce((a, r) => a + r.strokes, 0), par: rows.reduce((a, r) => a + r.par, 0),
+      stars: rows.reduce((a, r) => a + (r.picked ? 0 : r.strokes < r.par ? 3 : r.strokes === r.par ? 2 : 1), 0),
+      gems: this.gems, used: { ...this.used } };
   }
 
   showScorecard() {

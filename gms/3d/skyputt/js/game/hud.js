@@ -89,7 +89,7 @@ export class Hud {
   hideCard() { this.el.card.hidden = true; this.el.card.innerHTML = ''; }
   _card(html) { const c = this.el.card; c.innerHTML = `<div class="card">${html}</div>`; c.hidden = false; return c; }
 
-  holeDone({ hole, n, name, par, strokes, picked, gems, stars = 0, coins = 0, newBest, reward, nextLabel, onMap }, onNext) {
+  holeDone({ hole, n, name, par, strokes, picked, gems, stars = 0, coins = 0, newBest, reward, nextLabel, onMap, rivals, youTotal }, onNext) {
     const label = scoreName(strokes, par, picked);
     const d = strokes - par;
     const cls = strokes === 1 ? 'ace' : d < 0 ? 'under' : d === 0 ? 'par' : 'over';
@@ -101,6 +101,9 @@ export class Hud {
       <div class="card-stats"><div><span>Strokes</span><b>${strokes}</b></div><div><span>Par</span><b>${par}</b></div><div><span>Coins</span><b>+${coins}</b></div></div>
       ${newBest ? '<div class="card-note good">New best!</div>' : ''}
       ${rw ? `<div class="card-note good">3 stars: +1 ${rw}</div>` : ''}
+      ${rivals?.length ? `<table class="scores rivals"><tr><th></th><th>Hole</th><th>Total</th></tr>
+        <tr class="you"><td>You</td><td>${strokes}</td><td>${youTotal}</td></tr>
+        ${(rivals.length > 4 ? [...rivals].sort((a, b) => a.total - b.total).slice(0, 4) : rivals).map(r => `<tr><td><i class="dot" style="background:${r.colour}"></i>${esc(r.name)}</td><td>${r.strokes}</td><td>${r.total}</td></tr>`).join('')}</table>` : ''}
       <button class="btn primary" data-a="next">${esc(nextLabel || 'Next hole')}</button>
       ${onMap ? '<button class="btn ghost" data-a="map">Course map</button>' : ''}`);
     c.querySelector('[data-a=next]').onclick = () => { this.hideCard(); onNext(); };

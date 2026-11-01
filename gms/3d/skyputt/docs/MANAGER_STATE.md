@@ -28,3 +28,6 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - 2026-11-02: spooky done (all 9 holes, notes/spooky.md); its engine issues (sprite raycast crash,
   mover skin doc, boost UVs, info.viewDir, landscape pitch) passed to engine for M2.
   Started `ai` agent (js/ai/: planner, golfers, worker, ghost, ai_test, ai_demo).
+- 2026-11-02: M2 committed+pushed 1658df29 (front nine, helpers, save, flyover, audio wired, spooky).
+  js/ai/ excluded (ai agent in progress). Engine agent now: theme picker, sky fixes (hole 7 voids,
+  lamps, mover skin), M3 story scaffolding in js/story/ (Old Mags, chapter 1 Muni, lessons, rival hooks).

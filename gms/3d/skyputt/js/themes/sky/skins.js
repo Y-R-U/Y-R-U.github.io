@@ -263,6 +263,26 @@ export function createSkins(M) {
     return object;
   }
 
+  // ---------------- mover (engine M2 extension) ----------------
+  // A sliding stone block: carved stone body, gold bands top and bottom, glowing blue runner strips
+  // on the faces it travels toward (local ±X). opts = { width, height, depth }, base at y = 0.
+  function mover(o = {}) {
+    const W = o.width ?? 0.42, H = o.height ?? 0.16, D = o.depth ?? 0.2;
+    const b = new Buckets();
+    b.add('stone', metreUv(new THREE.BoxGeometry(W - 0.02, H - 0.03, D - 0.02), W, H), null, mat(0, (H - 0.03) / 2 + 0.005, 0), true);
+    b.add('gold', new THREE.BoxGeometry(W, 0.022, D), null, mat(0, H - 0.011, 0));
+    b.add('gold', new THREE.BoxGeometry(W + 0.008, 0.012, D + 0.008), null, mat(0, 0.006, 0));
+    for (const sx of [-1, 1]) {
+      b.add('blue', new THREE.BoxGeometry(0.006, H * 0.42, D * 0.6), null, mat(sx * (W / 2 - 0.006), H * 0.45, 0));
+      b.add('gold', new THREE.BoxGeometry(0.02, H - 0.03, 0.02), null, mat(sx * (W / 2 - 0.012), (H - 0.03) / 2, D / 2 - 0.01));
+      b.add('gold', new THREE.BoxGeometry(0.02, H - 0.03, 0.02), null, mat(sx * (W / 2 - 0.012), (H - 0.03) / 2, -D / 2 + 0.01));
+    }
+    b.add('blue', new THREE.CylinderGeometry(0.03, 0.03, 0.01, 12), null, mat(0, H + 0.004, 0));
+    const object = new THREE.Group(); object.name = 'sky.mover';
+    b.build(mats, object, { castShadow: true, receiveShadow: true });
+    return object;
+  }
+
   // ---------------- tee pad ----------------
   function teePad(o = {}) {
     const R = o.radius ?? 0.6;
@@ -291,7 +311,7 @@ export function createSkins(M) {
   }
 
   return {
-    skins: { windmill, loop, tube, flag, pickup, bumper, teePad },
+    skins: { windmill, loop, tube, flag, pickup, bumper, teePad, mover },
     dispose() { for (const m of glowMats) m.dispose(); for (const d of disposables) d.dispose(); },
   };
 }

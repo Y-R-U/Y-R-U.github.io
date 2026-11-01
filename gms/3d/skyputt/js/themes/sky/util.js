@@ -174,3 +174,33 @@ export function disposeTree(obj, keep = new Set()) {
     }
   });
 }
+
+/** Engine M2 info.voids: polygons [[x, z], ...] that must stay empty. True if (x, z) is inside one
+ *  (or within `pad` metres of its edge). */
+export function inVoid(voids, x, z, pad = 0) {
+  if (!voids || !voids.length) return false;
+  for (const poly of voids) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, zi] = poly[i], [xj, zj] = poly[j];
+      if ((zi > z) !== (zj > z) && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) inside = !inside;
+      if (pad > 0) {   // distance to this edge
+        const dx = xj - xi, dz = zj - zi, l2 = dx * dx + dz * dz || 1e-9;
+        let t = ((x - xi) * dx + (z - zi) * dz) / l2; t = t < 0 ? 0 : t > 1 ? 1 : t;
+        if (Math.hypot(xi + dx * t - x, zi + dz * t - z) < pad) return true;
+      }
+    }
+    if (inside) return true;
+  }
+  return false;
+}
+/** Distance from (x, z) to the nearest of several polylines ([[x, y, z], ...]). */
+export function distToLines(lines, x, z) {
+  let best = Infinity;
+  for (const L of lines || []) for (let i = 0; i < L.length - 1; i++) {
+    const a = L[i], b = L[i + 1], dx = b[0] - a[0], dz = b[2] - a[2], l2 = dx * dx + dz * dz || 1e-9;
+    let t = ((x - a[0]) * dx + (z - a[2]) * dz) / l2; t = t < 0 ? 0 : t > 1 ? 1 : t;
+    best = Math.min(best, Math.hypot(a[0] + dx * t - x, a[2] + dz * t - z));
+  }
+  return best;
+}

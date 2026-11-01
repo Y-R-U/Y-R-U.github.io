@@ -1,4 +1,4 @@
-# engine — notes (M1 "First putt", M2 "Sky Isles front nine")
+# engine — notes (M1 "First putt", M2 "Sky Isles front nine", M3 start)
 
 Owner: `engine` agent. Status: **M1 playable** — title → 3 Sky Isles holes → scorecard, in portrait
 and landscape, with the `sky` theme (or `?theme=greybox`).
@@ -103,6 +103,45 @@ and landscape, with the `sky` theme (or `?theme=greybox`).
   Looks like a driver/touch-emulation artefact, not reproduced by hand.
 - Headless is still ~10 fps (software GL): ~35–50 draw calls, ~40–50k triangles per hole with sky.
 - Crystals respawn every play, so coins can be farmed (fine until the shop exists).
+
+## M3 start (2026-11-02)
+- **Theme picker** on the title: Sky Isles / Spooky Hollow chips with a CSS swatch; saved as
+  `settings.theme`; `?theme=` still overrides at load. Switching disposes the old theme and rebuilds
+  the title scene in place (no reload); music follows the theme id.
+- **Sky theme fixes** (js/themes/sky/, sky agent done): the course rock, foliage, lanterns and
+  waterfalls respect `info.voids` (hole 7's U is a real drop now) and keep off `info.branches`; the
+  backdrop frame and tee lanterns use `info.viewDir` (hole 7 had a lamp on the fairway because tee→cup
+  is sideways there); new sky `mover` skin (stone block, gold bands, blue runners); boost chevrons
+  re-mapped to the pad-centred u.
+- **Story "Nobody to Pro"** (`js/story/`):
+  - `data/` is pure data: `chapters.js` (6 tours, ranks Nobody → Legend; only Muni has data, the
+    rest show "Coming soon"), `ch1_muni.js` (intro/outro + 7 events), `characters.js` (Mags, Carl,
+    you: portrait params), `golfers.js` (AI roster: personality + skill). Chapter 2 = one more file.
+  - Muni events: 3 lessons (Aim and Putt; Long Sight, which grants 2 and requires using one;
+    Mulligan, which grants 2 and requires using one), 2 rounds with star targets, rival vs Careful Carl
+    (4 holes incl. the shortcut), the Muni Open (6 holes, 8 players, top 3). Coins + helpers on first
+    pass. Events unlock in order; finishing all → chapter done → rank "Amateur" + rank card.
+  - `portrait.js` draws SVG portraits from params; `dialogue.js` shows tap-through cards;
+    `career.js` = profile (name entry), tour map with event rows, the event runner (dialogue → play →
+    goal check → rewards → dialogue) and a result card with a leaderboard for rival/tournament.
+  - Rounds for events reuse `Round` with `{ onComplete, opponents, tips, label }`; hole cards list
+    the rival(s) hole + running total (top 4 for tournaments). `Round.result()` gives totals, stars, helper use.
+  - Save: `store.data.story = { name, events: { id: { passed, best, tries } }, chapters, seen }`.
+- **AI interface for the `ai` agent** (`js/story/opponents.js`, used through `playField()`):
+  ```js
+  // js/ai/index.js
+  export async function simulateRound({ holes, golfer, seed })
+  //   holes:  hole defs in play order; golfer: { id, name, personality: 'careful'|'power'|'banks'|'lucky'|'pro', skill: 0..1 }
+  //   seed:   int, deterministic
+  //   → { scores: [{ strokes, picked, shots?: [{ vx, vz, t0 }] }] }  one per hole, game rules (OOB +1, pick-up at par+4)
+  ```
+  Until it exists, a deterministic stub (par + skill/personality noise) plays the AI; the result card
+  says "simulated". `shots` will let the game replay ghosts later (not wired yet). Note: until
+  js/ai/index.js exists, the probe import logs one 404 in the console when a rival/tournament starts.
+- **Tests**: `node tools/story_test.mjs` (data integrity: holes/speakers/golfers exist; goal checks;
+  unlock + rank; stub determinism; the Pro beats a beginner); `node tools/shots_cdp.mjs story` drives
+  name → intro → career → lesson 1 (played by drags) → result → rival hole card. All pass, no console
+  errors besides the expected ai 404.
 
 ## Contract changes (THEME_CONTRACT.md, "Engine extensions" section)
 windmill `gapHeight` opt + exact blade layout at rotation 0 (blade along +Y·k, sail on +X from

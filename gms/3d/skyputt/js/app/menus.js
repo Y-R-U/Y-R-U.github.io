@@ -4,9 +4,20 @@ import { ICONS, starRow } from '../game/hud.js';
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-export function renderTitle(store, course) {
+// Pickable themes (D7 ids under js/themes/). The swatch is a tiny CSS preview of each look.
+export const THEME_LIST = [
+  { id: 'sky', name: 'Sky Isles', swatch: 'linear-gradient(160deg, #7fb4ef 0%, #f6c98a 55%, #4fae4a 56%, #3a8a37 100%)', moon: '#f2c75c' },
+  { id: 'spooky', name: 'Spooky Hollow', swatch: 'linear-gradient(160deg, #1b1233 0%, #4a2a6a 55%, #3e4a2c 56%, #262d1c 100%)', moon: '#ff8a2a' },
+];
+
+export function renderTitle(store, course, themeId, onTheme) {
   const tot = course.holes.reduce((a, h) => a + (store.hole(h.id)?.stars ?? 0), 0);
   $('#t-progress').innerHTML = `<span>${starRow(1, 1)} ${tot}/${course.holes.length * 3}</span><span>${ICONS.coin}${store.data.coins | 0}</span>`;
+  const el = $('#t-themes');
+  if (!el) return;
+  el.innerHTML = THEME_LIST.map(t => `<button class="theme-chip ${t.id === themeId ? 'on' : ''}" data-id="${t.id}" aria-pressed="${t.id === themeId}">
+    <span class="sw" style="background:${t.swatch}"><i style="background:${t.moon}"></i></span><span>${esc(t.name)}</span></button>`).join('');
+  el.onclick = e => { const b = e.target.closest('button'); if (b) onTheme?.(b.dataset.id); };
 }
 
 // Course map: one tile per hole with stars / best, locked holes greyed out.
