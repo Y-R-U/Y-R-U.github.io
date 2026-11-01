@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>SKYPUTT — theme preview</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #111; overflow: hidden; touch-action: none; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+    #hud { position: fixed; left: 8px; top: 8px; font: 12px/1.35 system-ui, sans-serif; color: #fff;
+      background: rgba(0,0,0,.45); padding: 6px 8px; border-radius: 6px; pointer-events: none; white-space: pre; }
+    #hud.hide { display: none; }
+  </style>
+  <script type="importmap">
+  { "imports": {
+      "three": "/gms/lib/three/0.180.0/three.module.js",
+      "three/addons/": "/gms/lib/three/0.180.0/addons/"
+  } }
+  </script>
+</head>
+<body>
+  <div id="hud"></div>
+  <script type="module" src="./theme_preview.js"></script>
+</body>
+</html>

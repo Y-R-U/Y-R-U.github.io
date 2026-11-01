@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SKYPUTT — sound preview</title>
+  <style>
+    :root { --bg: #0f1a2b; --card: #17263d; --fg: #e8f0fb; --dim: #8fa3bf; --acc: #f2c14e; --btn: #22395a; --btnh: #2d4a73; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; padding: 12px 16px 40px; }
+    h1 { font-size: 18px; margin: 0 0 4px; } h1 span { color: var(--acc); }
+    h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--dim); margin: 18px 0 8px; }
+    .card { background: var(--card); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+    button { background: var(--btn); color: var(--fg); border: 0; border-radius: 8px; padding: 10px 6px; font: inherit; cursor: pointer; }
+    button:hover { background: var(--btnh); } button:active { transform: scale(.97); }
+    button.on { background: var(--acc); color: #1b1b1b; }
+    label { display: flex; align-items: center; gap: 8px; margin: 6px 0; flex-wrap: wrap; }
+    label b { min-width: 74px; font-weight: 500; color: var(--dim); }
+    input[type=range] { flex: 1; min-width: 140px; }
+    select { background: var(--btn); color: var(--fg); border: 0; border-radius: 6px; padding: 6px; font: inherit; }
+    .row { display: flex; gap: 6px; flex-wrap: wrap; }
+    #meter { height: 8px; background: #0a1220; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+    #meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #4cc38a, #f2c14e 70%, #e5534b); }
+    #status { color: var(--dim); font-size: 12px; }
+    table { border-collapse: collapse; width: 100%; font: 12px/1.5 ui-monospace, monospace; }
+    td, th { padding: 2px 6px; text-align: right; } td:first-child, th:first-child { text-align: left; }
+    tr.bad td { color: #e5534b; }
+    #gate { position: fixed; inset: 0; background: rgba(5,10,20,.85); display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="gate">Tap to enable sound</div>
+  <h1>SKYPUTT <span>sound preview</span></h1>
+  <div id="status">audio: not started</div>
+  <div id="meter"><i></i></div>
+
+  <h2>Mix</h2>
+  <div class="card">
+    <label><b>master</b><input id="vMaster" type="range" min="0" max="1" step="0.01" value="0.9"></label>
+    <label><b>sfx</b><input id="vSfx" type="range" min="0" max="1" step="0.01" value="1"></label>
+    <label><b>music</b><input id="vMusic" type="range" min="0" max="1" step="0.01" value="0.6"></label>
+    <div class="row"><button id="mute">mute</button></div>
+  </div>
+
+  <h2>Shot / impacts</h2>
+  <div class="card">
+    <label><b>power</b><input id="pPower" type="range" min="0" max="1" step="0.01" value="0.6"><span id="pPowerV">0.60</span></label>
+    <label><b>speed</b><input id="pSpeed" type="range" min="0" max="6.4" step="0.1" value="3"><span id="pSpeedV">3.0</span> m/s</label>
+    <label><b>material</b><select id="pMat"><option>stone</option><option>wood</option><option>metal</option><option>glass</option></select></label>
+    <div class="grid" id="g-shot"></div>
+  </div>
+
+  <h2>Cup / hazards / features</h2>
+  <div class="card"><div class="grid" id="g-course"></div></div>
+
+  <h2>Results / UI</h2>
+  <div class="card"><div class="grid" id="g-ui"></div></div>
+
+  <h2>Roll</h2>
+  <div class="card">
+    <label><b>speed</b><input id="rSpeed" type="range" min="0" max="6.4" step="0.05" value="0"><span id="rSpeedV">0.00</span> m/s</label>
+    <label><b>surface</b><select id="rSurf"></select></label>
+    <div class="row"><button id="rPutt">simulate a putt</button><button id="rStop">stop</button></div>
+  </div>
+
+  <h2>Music</h2>
+  <div class="card">
+    <div class="row"><button id="mStart">start sky</button><button id="mStop">stop</button><button id="mDuck">duck</button></div>
+  </div>
+
+  <h2>Offline levels</h2>
+  <div class="card">
+    <div class="row"><button id="measure">render + measure all</button></div>
+    <div id="levels"></div>
+  </div>
+
+  <script type="module" src="./sound_preview.js"></script>
+</body>
+</html>

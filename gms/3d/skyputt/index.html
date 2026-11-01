@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#2b5d9c" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="SKYPUTT: 3D mini golf on floating sky islands." />
+  <title>SKYPUTT · Mini Golf</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232b5d9c'/%3E%3Ccircle cx='16' cy='19' r='7' fill='%23fff'/%3E%3Cpath d='M18 3v10' stroke='%23f4f0e0' stroke-width='1.6'/%3E%3Cpath d='M18 3l7 3-7 3z' fill='%23e8463a'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" />
+  <link rel="stylesheet" href="css/app.css" />
+  <script type="importmap">
+  { "imports": {
+      "three": "/gms/lib/three/0.180.0/three.module.js",
+      "three/addons/": "/gms/lib/three/0.180.0/addons/"
+  } }
+  </script>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="hud" hidden></div>
+
+  <div id="title" hidden>
+    <div class="title-card">
+      <div class="logo">SKY<span>PUTT</span></div>
+      <div class="tagline">Mini golf among the floating isles</div>
+      <button id="t-play" class="btn primary big">Play</button>
+      <div class="t-holes-lbl">Hole select</div>
+      <div id="t-holes" class="t-holes"></div>
+      <div class="t-foot">
+        <button id="fs-btn" class="round" aria-label="Fullscreen" hidden></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-word">SKYPUTT</div>
+      <div class="boot-spin"></div>
+      <div id="boot-status">Raising the islands…</div>
+      <button id="boot-reload" hidden>Reload</button>
+    </div>
+  </div>
+  <script>
+    // Boot watchdog: a stale cached module or a missing file can hang the module graph silently.
+    (function () {
+      var shown = false;
+      function stuck(msg) {
+        if (window.__booted || shown) return;
+        shown = true;
+        var s = document.getElementById('boot-status'), b = document.getElementById('boot-reload');
+        if (s) s.textContent = msg || 'Still loading… something may be stuck.';
+        if (b) { b.hidden = false; b.onclick = function () { location.replace(location.pathname + '?v=' + Date.now() + location.hash); }; }
+      }
+      setTimeout(function () { stuck(); }, 12000);
+      addEventListener('error', function (e) {
+        if (!window.__booted && e.target && e.target.tagName === 'SCRIPT') stuck('Loading failed. Tap reload.');
+      }, true);
+      window.__bootFail = stuck;
+    })();
+  </script>
+  <script type="module" src="js/app/main.js"></script>
+</body>
+</html>

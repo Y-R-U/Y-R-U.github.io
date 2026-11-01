@@ -1,0 +1,632 @@
+[
+ {
+  "key": "putt power=0.15",
+  "post": {
+   "peak": 0.1693,
+   "peakDb": -15.4,
+   "rmsDb": -38.5,
+   "active": 0.15
+  },
+  "pre": {
+   "peak": 0.1702,
+   "peakDb": -15.4,
+   "rmsDb": -34.7,
+   "active": 0.06
+  }
+ },
+ {
+  "key": "putt power=0.6",
+  "post": {
+   "peak": 0.3732,
+   "peakDb": -8.6,
+   "rmsDb": -37.1,
+   "active": 0.42
+  },
+  "pre": {
+   "peak": 0.3749,
+   "peakDb": -8.5,
+   "rmsDb": -35,
+   "active": 0.24
+  }
+ },
+ {
+  "key": "putt power=1",
+  "post": {
+   "peak": 0.5193,
+   "peakDb": -5.7,
+   "rmsDb": -34.6,
+   "active": 0.55
+  },
+  "pre": {
+   "peak": 0.5437,
+   "peakDb": -5.3,
+   "rmsDb": -33.1,
+   "active": 0.4
+  }
+ },
+ {
+  "key": "wall speed=1,material=stone",
+  "post": {
+   "peak": 0.0989,
+   "peakDb": -20.1,
+   "rmsDb": -35.9,
+   "active": 0.03
+  },
+  "pre": {
+   "peak": 0.0994,
+   "peakDb": -20.1,
+   "rmsDb": -36.1,
+   "active": 0.03
+  }
+ },
+ {
+  "key": "wall speed=6.4,material=stone",
+  "post": {
+   "peak": 0.3917,
+   "peakDb": -8.1,
+   "rmsDb": -36.3,
+   "active": 0.62
+  },
+  "pre": {
+   "peak": 0.3966,
+   "peakDb": -8,
+   "rmsDb": -34.4,
+   "active": 0.38
+  }
+ },
+ {
+  "key": "wall speed=1,material=wood",
+  "post": {
+   "peak": 0.1386,
+   "peakDb": -17.2,
+   "rmsDb": -41.7,
+   "active": 0.25
+  },
+  "pre": {
+   "peak": 0.1389,
+   "peakDb": -17.1,
+   "rmsDb": -35.7,
+   "active": 0.06
+  }
+ },
+ {
+  "key": "wall speed=6.4,material=wood",
+  "post": {
+   "peak": 0.3862,
+   "peakDb": -8.3,
+   "rmsDb": -34.7,
+   "active": 0.64
+  },
+  "pre": {
+   "peak": 0.3898,
+   "peakDb": -8.2,
+   "rmsDb": -34,
+   "active": 0.49
+  }
+ },
+ {
+  "key": "wall speed=1,material=metal",
+  "post": {
+   "peak": 0.08,
+   "peakDb": -21.9,
+   "rmsDb": -42.6,
+   "active": 0.52
+  },
+  "pre": {
+   "peak": 0.0802,
+   "peakDb": -21.9,
+   "rmsDb": -43.2,
+   "active": 0.43
+  }
+ },
+ {
+  "key": "wall speed=6.4,material=metal",
+  "post": {
+   "peak": 0.264,
+   "peakDb": -11.6,
+   "rmsDb": -33.5,
+   "active": 0.85
+  },
+  "pre": {
+   "peak": 0.265,
+   "peakDb": -11.5,
+   "rmsDb": -34.8,
+   "active": 0.75
+  }
+ },
+ {
+  "key": "wall speed=1,material=glass",
+  "post": {
+   "peak": 0.0566,
+   "peakDb": -25,
+   "rmsDb": -44.8,
+   "active": 0.48
+  },
+  "pre": {
+   "peak": 0.0547,
+   "peakDb": -25.2,
+   "rmsDb": -43.9,
+   "active": 0.28
+  }
+ },
+ {
+  "key": "wall speed=6.4,material=glass",
+  "post": {
+   "peak": 0.1838,
+   "peakDb": -14.7,
+   "rmsDb": -35.5,
+   "active": 0.75
+  },
+  "pre": {
+   "peak": 0.1843,
+   "peakDb": -14.7,
+   "rmsDb": -36.9,
+   "active": 0.69
+  }
+ },
+ {
+  "key": "bumper speed=1.5",
+  "post": {
+   "peak": 0.1752,
+   "peakDb": -15.1,
+   "rmsDb": -31.9,
+   "active": 0.75
+  },
+  "pre": {
+   "peak": 0.1505,
+   "peakDb": -16.5,
+   "rmsDb": -33.3,
+   "active": 0.63
+  }
+ },
+ {
+  "key": "bumper speed=6",
+  "post": {
+   "peak": 0.3494,
+   "peakDb": -9.1,
+   "rmsDb": -28.2,
+   "active": 1.09
+  },
+  "pre": {
+   "peak": 0.3088,
+   "peakDb": -10.2,
+   "rmsDb": -29.6,
+   "active": 0.9
+  }
+ },
+ {
+  "key": "windmillHit speed=4",
+  "post": {
+   "peak": 0.4509,
+   "peakDb": -6.9,
+   "rmsDb": -33.7,
+   "active": 0.87
+  },
+  "pre": {
+   "peak": 0.4671,
+   "peakDb": -6.6,
+   "rmsDb": -33.1,
+   "active": 0.7
+  }
+ },
+ {
+  "key": "cupRattle",
+  "post": {
+   "peak": 0.2797,
+   "peakDb": -11.1,
+   "rmsDb": -34.4,
+   "active": 0.55
+  },
+  "pre": {
+   "peak": 0.2038,
+   "peakDb": -13.8,
+   "rmsDb": -35.9,
+   "active": 0.39
+  }
+ },
+ {
+  "key": "cupDrop",
+  "post": {
+   "peak": 0.3357,
+   "peakDb": -9.5,
+   "rmsDb": -31.3,
+   "active": 0.9
+  },
+  "pre": {
+   "peak": 0.3365,
+   "peakDb": -9.5,
+   "rmsDb": -32.2,
+   "active": 0.73
+  }
+ },
+ {
+  "key": "lipOut",
+  "post": {
+   "peak": 0.1882,
+   "peakDb": -14.5,
+   "rmsDb": -37.4,
+   "active": 1.01
+  },
+  "pre": {
+   "peak": 0.116,
+   "peakDb": -18.7,
+   "rmsDb": -41.1,
+   "active": 0.92
+  }
+ },
+ {
+  "key": "splash",
+  "post": {
+   "peak": 0.3009,
+   "peakDb": -10.4,
+   "rmsDb": -33.6,
+   "active": 1.07
+  },
+  "pre": {
+   "peak": 0.2765,
+   "peakDb": -11.2,
+   "rmsDb": -35.4,
+   "active": 0.96
+  }
+ },
+ {
+  "key": "fall",
+  "post": {
+   "peak": 0.1915,
+   "peakDb": -14.4,
+   "rmsDb": -32.7,
+   "active": 1.3
+  },
+  "pre": {
+   "peak": 0.118,
+   "peakDb": -18.6,
+   "rmsDb": -36.4,
+   "active": 1.15
+  }
+ },
+ {
+  "key": "pickup combo=0",
+  "post": {
+   "peak": 0.1705,
+   "peakDb": -15.4,
+   "rmsDb": -30.7,
+   "active": 1.1
+  },
+  "pre": {
+   "peak": 0.1524,
+   "peakDb": -16.3,
+   "rmsDb": -33.1,
+   "active": 0.99
+  }
+ },
+ {
+  "key": "pickup combo=6",
+  "post": {
+   "peak": 0.2053,
+   "peakDb": -13.8,
+   "rmsDb": -30.6,
+   "active": 1.15
+  },
+  "pre": {
+   "peak": 0.1552,
+   "peakDb": -16.2,
+   "rmsDb": -33.2,
+   "active": 1.06
+  }
+ },
+ {
+  "key": "boost",
+  "post": {
+   "peak": 0.2191,
+   "peakDb": -13.2,
+   "rmsDb": -32.6,
+   "active": 1.03
+  },
+  "pre": {
+   "peak": 0.1523,
+   "peakDb": -16.3,
+   "rmsDb": -35.3,
+   "active": 0.9
+  }
+ },
+ {
+  "key": "loop",
+  "post": {
+   "peak": 0.1802,
+   "peakDb": -14.9,
+   "rmsDb": -34.9,
+   "active": 1.21
+  },
+  "pre": {
+   "peak": 0.111,
+   "peakDb": -19.1,
+   "rmsDb": -38.6,
+   "active": 1.07
+  }
+ },
+ {
+  "key": "holeInOne",
+  "post": {
+   "peak": 0.5926,
+   "peakDb": -4.5,
+   "rmsDb": -24,
+   "active": 3.75
+  },
+  "pre": {
+   "peak": 0.3655,
+   "peakDb": -8.7,
+   "rmsDb": -28,
+   "active": 3.6
+  }
+ },
+ {
+  "key": "birdie",
+  "post": {
+   "peak": 0.2348,
+   "peakDb": -12.6,
+   "rmsDb": -27.7,
+   "active": 1.79
+  },
+  "pre": {
+   "peak": 0.1447,
+   "peakDb": -16.8,
+   "rmsDb": -31.4,
+   "active": 1.64
+  }
+ },
+ {
+  "key": "par",
+  "post": {
+   "peak": 0.1616,
+   "peakDb": -15.8,
+   "rmsDb": -29.7,
+   "active": 1.27
+  },
+  "pre": {
+   "peak": 0.0996,
+   "peakDb": -20,
+   "rmsDb": -33,
+   "active": 1.11
+  }
+ },
+ {
+  "key": "bogey",
+  "post": {
+   "peak": 0.2317,
+   "peakDb": -12.7,
+   "rmsDb": -25.2,
+   "active": 1.59
+  },
+  "pre": {
+   "peak": 0.1428,
+   "peakDb": -16.9,
+   "rmsDb": -28.6,
+   "active": 1.38
+  }
+ },
+ {
+  "key": "click",
+  "post": {
+   "peak": 0.0899,
+   "peakDb": -20.9,
+   "rmsDb": -34.6,
+   "active": 0.02
+  },
+  "pre": {
+   "peak": 0.0897,
+   "peakDb": -20.9,
+   "rmsDb": -34.6,
+   "active": 0.02
+  }
+ },
+ {
+  "key": "back",
+  "post": {
+   "peak": 0.0799,
+   "peakDb": -21.9,
+   "rmsDb": -36.3,
+   "active": 0.09
+  },
+  "pre": {
+   "peak": 0.0564,
+   "peakDb": -25,
+   "rmsDb": -38.5,
+   "active": 0.09
+  }
+ },
+ {
+  "key": "star n=1",
+  "post": {
+   "peak": 0.1769,
+   "peakDb": -15,
+   "rmsDb": -31.3,
+   "active": 1.29
+  },
+  "pre": {
+   "peak": 0.1279,
+   "peakDb": -17.9,
+   "rmsDb": -34.3,
+   "active": 1.23
+  }
+ },
+ {
+  "key": "star n=2",
+  "post": {
+   "peak": 0.147,
+   "peakDb": -16.7,
+   "rmsDb": -29.8,
+   "active": 1.19
+  },
+  "pre": {
+   "peak": 0.1247,
+   "peakDb": -18.1,
+   "rmsDb": -32.7,
+   "active": 1.08
+  }
+ },
+ {
+  "key": "star n=3",
+  "post": {
+   "peak": 0.1674,
+   "peakDb": -15.5,
+   "rmsDb": -29.9,
+   "active": 1.29
+  },
+  "pre": {
+   "peak": 0.1274,
+   "peakDb": -17.9,
+   "rmsDb": -33,
+   "active": 1.21
+  }
+ },
+ {
+  "key": "coin",
+  "post": {
+   "peak": 0.1364,
+   "peakDb": -17.3,
+   "rmsDb": -34.6,
+   "active": 0.72
+  },
+  "pre": {
+   "peak": 0.0896,
+   "peakDb": -21,
+   "rmsDb": -36.5,
+   "active": 0.49
+  }
+ },
+ {
+  "key": "aimTick power=0",
+  "post": {
+   "peak": 0.0247,
+   "peakDb": -32.2,
+   "rmsDb": -45.2,
+   "active": 0.01
+  },
+  "pre": {
+   "peak": 0.0248,
+   "peakDb": -32.1,
+   "rmsDb": -45.2,
+   "active": 0.01
+  }
+ },
+ {
+  "key": "aimTick power=1",
+  "post": {
+   "peak": 0.0193,
+   "peakDb": -34.3,
+   "rmsDb": -46.2,
+   "active": 0.01
+  },
+  "pre": {
+   "peak": 0.0193,
+   "peakDb": -34.3,
+   "rmsDb": -46.2,
+   "active": 0.01
+  }
+ },
+ {
+  "key": "roll grass",
+  "post": {
+   "peak": 0.198,
+   "peakDb": -14.1,
+   "rmsDb": -29.4,
+   "active": 3.01
+  },
+  "pre": {
+   "peak": 0.122,
+   "peakDb": -18.3,
+   "rmsDb": -33.5,
+   "active": 3
+  }
+ },
+ {
+  "key": "roll sand",
+  "post": {
+   "peak": 0.2274,
+   "peakDb": -12.9,
+   "rmsDb": -32.6,
+   "active": 3.01
+  },
+  "pre": {
+   "peak": 0.1401,
+   "peakDb": -17.1,
+   "rmsDb": -36.8,
+   "active": 3
+  }
+ },
+ {
+  "key": "roll ice",
+  "post": {
+   "peak": 0.0859,
+   "peakDb": -21.3,
+   "rmsDb": -37,
+   "active": 2.98
+  },
+  "pre": {
+   "peak": 0.0529,
+   "peakDb": -25.5,
+   "rmsDb": -41.1,
+   "active": 2.94
+  }
+ },
+ {
+  "key": "roll wood",
+  "post": {
+   "peak": 0.312,
+   "peakDb": -10.1,
+   "rmsDb": -27.5,
+   "active": 3.05
+  },
+  "pre": {
+   "peak": 0.1922,
+   "peakDb": -14.3,
+   "rmsDb": -31.5,
+   "active": 3
+  }
+ },
+ {
+  "key": "roll metal",
+  "post": {
+   "peak": 0.1238,
+   "peakDb": -18.1,
+   "rmsDb": -35,
+   "active": 2.99
+  },
+  "pre": {
+   "peak": 0.0763,
+   "peakDb": -22.4,
+   "rmsDb": -39.1,
+   "active": 2.96
+  }
+ },
+ {
+  "key": "roll glass",
+  "post": {
+   "peak": 0.0972,
+   "peakDb": -20.2,
+   "rmsDb": -36.4,
+   "active": 3.01
+  },
+  "pre": {
+   "peak": 0.062,
+   "peakDb": -24.2,
+   "rmsDb": -40.5,
+   "active": 2.97
+  }
+ },
+ {
+  "key": "music sky 40s",
+  "post": {
+   "peak": 0.2021,
+   "peakDb": -13.9,
+   "rmsDb": -27.3,
+   "active": 39.67
+  },
+  "pre": {
+   "peak": 0.1245,
+   "peakDb": -18.1,
+   "rmsDb": -31.5,
+   "active": 39.64
+  }
+ }
+]
