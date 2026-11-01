@@ -4,6 +4,8 @@
 // Pure math, node-safe.
 
 export const SPACING = 0.2;
+export let LOOP_BANK = 0.8;   // loop floor tilt toward the side shift (1 = the ideal ratio; 0.8 measured best: exits within ~7 cm)
+export function setLoopBank(k) { LOOP_BANK = k; }
 
 export const v3 = {
   add: (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]],
@@ -108,7 +110,7 @@ export function loopFrames(E, { radius = 0.45, shift = 0.8, width = 0.5 }, piece
     const p = v3.add(v3.mad(E.p, f0, radius * Math.sin(th), Y, radius * (1 - Math.cos(th))), v3.mul(l0, sh));
     // tilt the floor toward the side shift so the normal force steers the ball across
     // (lateral accel / normal accel = shift * sin(th) / (2 pi r), independent of speed)
-    const up = v3.norm(v3.add(v3.add(v3.mul(f0, -Math.sin(th)), v3.mul(Y, Math.cos(th))), v3.mul(l0, shift * Math.sin(th) / (2 * Math.PI * radius))));
+    const up = v3.norm(v3.add(v3.add(v3.mul(f0, -Math.sin(th)), v3.mul(Y, Math.cos(th))), v3.mul(l0, LOOP_BANK * shift * Math.sin(th) / (2 * Math.PI * radius))));
     const tan = v3.add(v3.mad([0, 0, 0], f0, radius * Math.cos(th), Y, radius * Math.sin(th)), v3.mul(l0, shift * (1 - Math.cos(th)) / (2 * Math.PI)));
     const f = v3.norm(tan);
     const l = v3.norm(v3.cross(up, f));

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Builds every hole and checks it is beatable: a greedy planner searches aim x power with the real
 // sim and plays shot after shot until the ball drops.   node tools/holes_test.mjs [holeId] [--verbose]
-import { buildHole } from '../js/course/builder.js';
+import { buildHole, makeWorld } from '../js/course/builder.js';
 import { World, Ball } from '../js/engine/physics.js';
 import { simulateShot } from '../js/engine/sim.js';
 import { SHOT_MIN, SHOT_MAX, CUP_R } from '../js/engine/constants.js';
@@ -9,6 +9,11 @@ import { COURSES } from '../js/course/holes/index.js';
 
 const only = process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : null;
 const verbose = process.argv.includes('--verbose');
+// --human=N: also play N rounds with aim noise (sd 2.5 deg) and power noise (sd 5%) to rate difficulty
+const HUMAN = +(process.argv.find(a => a.startsWith('--human='))?.split('=')[1] || 0);
+let seed = 12345;
+const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+const gauss = () => Math.sqrt(-2 * Math.log(rnd() + 1e-12)) * Math.cos(2 * Math.PI * rnd());
 let fails = 0;
 
 export function sOf(h, x, y, z) {
@@ -49,7 +54,7 @@ for (const course of Object.values(COURSES)) {
     if (only && def.id !== only) continue;
     const t0 = Date.now();
     const h = buildHole(def);
-    const w = new World({ tris: h.colliders.tris, mats: h.colliders.mats, cup: h.cup, kinematics: h.kinematics, killY: h.killY });
+    const w = makeWorld(h);
     console.log(`${def.id} "${def.name}" par ${def.par}: length ${h.total.toFixed(1)} m, ${h.colliders.mats.length} collider tris, ${h.kinematics.length} kinematic, ${Object.keys(h.geo).length} mesh groups`);
     const b = new Ball(h.tee.x, h.tee.y, h.tee.z);
     let strokes = 0, t = 0, done = false;
@@ -62,6 +67,26 @@ for (const course of Object.values(COURSES)) {
         (verbose ? '  ' + r.events.filter(e => e.type !== 'rest').map(e => e.type).join(',') : ''));
       if (r.state === 'cup') done = true;
       if (r.state === 'oob') { b.place(b.rest.x, b.rest.y, b.rest.z); strokes++; }
+    }
+    if (HUMAN) {
+      const res = [];
+      for (let k = 0; k < HUMAN; k++) {
+        const hb = new Ball(h.tee.x, h.tee.y, h.tee.z);
+        let n = 0, tt = 7.3 * k, fin = false;
+        while (n < def.par + 4 && !fin) {
+          const p = plan(h, w, hb, tt);
+          const ang = p.ang + gauss() * 2.5 * Math.PI / 180, pw = Math.max(0.03, Math.min(1, p.pw * (1 + gauss() * 0.05)));
+          const sp = SHOT_MIN + (SHOT_MAX - SHOT_MIN) * pw;
+          n++;
+          const r = simulateShot(w, hb, Math.sin(ang) * sp, -Math.cos(ang) * sp, { t0: tt + rnd() * 0.4 });
+          tt = r.t1 + 2;
+          if (r.state === 'cup') fin = true;
+          if (r.state === 'oob') { hb.place(hb.rest.x, hb.rest.y, hb.rest.z); n++; }
+        }
+        res.push(fin ? n : def.par + 4);
+      }
+      const avg = res.reduce((a, b) => a + b, 0) / res.length;
+      console.log(`   human-ish x${HUMAN}: avg ${avg.toFixed(2)} (par ${def.par}, ${(avg - def.par >= 0 ? '+' : '')}${(avg - def.par).toFixed(2)})  [${res.join(' ')}]`);
     }
     const ok = done && strokes <= def.par;
     if (!ok) fails++;

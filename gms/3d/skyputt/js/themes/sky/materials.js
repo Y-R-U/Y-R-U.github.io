@@ -21,7 +21,9 @@ export function createMaterials(quality = 'high') {
     wood: T.woodTexture(S(256)),
     waterBump: T.noiseTexture(S(256), 6, 61, 4),
     ice: T.iceTexture(S(256)),
-    chevron: T.chevronTexture(),
+    // engine boost uv: u = metres across the pad from its centre line, v = metres along the push.
+    // repeat 2 / offset 0.5 puts one chevron (tip at 0.5) across a 0.5 m pad, centred. (engine fix, M2)
+    chevron: (() => { const t = T.chevronTexture(); t.repeat.x = 2; t.offset.x = 0.5; return t; })(),
     teePad: T.teePadTexture(S(512)),
     glow: T.glowTexture(64),
   };

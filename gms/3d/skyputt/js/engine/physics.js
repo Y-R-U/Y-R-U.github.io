@@ -2,7 +2,7 @@
 // Deterministic: fixed DT, no randomness, same iteration order every run. Pure JS, node-safe.
 import {
   BALL_R as R, CUP_R, CUP_DEPTH, G, DT, SPEED_CAP, STOP_SPEED, STOP_TIME, SHOT_TIMEOUT,
-  BOUNCE_MIN, ROLL_K, SURFACES, MAT,
+  BOUNCE_MIN, ROLL_K, SURFACES, MAT, BOOST_ACC, BOOST_MAX,
 } from './constants.js';
 import { CP, closestOnTri, TriGrid, rotAxis } from './shapes.js';
 
@@ -48,8 +48,11 @@ export class Ball {
 export class World {
   // tris: Float64Array (9 per tri), mats: Uint8Array (1 per tri),
   // cup: {x,y,z} | null, kinematics: [{pivot, axis, omega, phase, basis:[ex,ey,ez], shapes, mat}]
-  constructor({ tris, mats, cup = null, kinematics = [], killY = -3 }) {
-    this.tris = tris; this.mats = mats; this.cup = cup; this.kin = kinematics; this.killY = killY;
+  // dirs: optional Float32Array (3 per tri), the arrow of boost-pad triangles
+  constructor({ tris, mats, dirs = null, cup = null, kinematics = [], killY = -3 }) {
+    this.tris = tris; this.mats = mats; this.dirs = dirs; this.cup = cup; this.kin = kinematics; this.killY = killY;
+    this._kinP = kinematics.map(k => Float64Array.from(k.pivot));   // posed pivot (sliders move it)
+    this._kinV = kinematics.map(() => new Float64Array(3));          // slider linear velocity
     this.grid = new TriGrid(tris);
     this.time = 0;                 // obstacle clock (seconds)
     this._kinAxes = kinematics.map(() => new Float64Array(9));
@@ -67,7 +70,11 @@ export class World {
     if (t === this._kinT) return;
     this._kinT = t;
     for (let k = 0; k < this.kin.length; k++) {
-      const body = this.kin[k], A = this._kinAxes[k];
+      const body = this.kin[k], A = this._kinAxes[k], P = this._kinP[k], V = this._kinV[k];
+      if (body.slide) {   // pure function of time: pivot + dir * amp * sin(w t + phase)
+        const sl = body.slide, a = sl.omega * t + sl.phase, o = sl.amp * Math.sin(a), vo = sl.amp * sl.omega * Math.cos(a);
+        for (let j = 0; j < 3; j++) { P[j] = body.pivot[j] + sl.dir[j] * o; V[j] = sl.dir[j] * vo; }
+      }
       const ang = body.omega * t + body.phase;
       rotAxis(ROT, body.axis[0], body.axis[1], body.axis[2], ang);
       for (let a = 0; a < 3; a++) {
@@ -95,7 +102,7 @@ export class World {
     }
     if (kind === 3) { CP.x = px; CP.y = c.y - CUP_DEPTH; CP.z = pz; return MAT.CUP; }
     // kinematic shape
-    const body = this.kin[idx], s = body.shapes[sub], A = this._kinAxes[idx], pv = body.pivot;
+    const body = this.kin[idx], s = body.shapes[sub], A = this._kinAxes[idx], pv = this._kinP[idx];
     const dx = px - pv[0], dy = py - pv[1], dz = pz - pv[2];
     let lx = dx * A[0] + dy * A[1] + dz * A[2] - s.c[0];
     let ly = dx * A[3] + dy * A[4] + dz * A[5] - s.c[1];
@@ -125,6 +132,7 @@ export class World {
       const w = body.omega, ax = body.axis;
       KV.x = w * (ax[1] * wz - ax[2] * wy); KV.y = w * (ax[2] * wx - ax[0] * wz); KV.z = w * (ax[0] * wy - ax[1] * wx);
     }
+    if (body.slide) { const V = this._kinV[idx]; KV.x += V[0]; KV.y += V[1]; KV.z += V[2]; }
     return s.mat ?? body.mat ?? MAT.WALL;
   }
 
@@ -164,7 +172,7 @@ export class World {
       this._poseKin(t);
       for (let k = 0; k < this.kin.length; k++) {
         const body = this.kin[k];
-        const pv = body.pivot, dx = b.px - pv[0], dy = b.py - pv[1], dz = b.pz - pv[2];
+        const pv = this._kinP[k], dx = b.px - pv[0], dy = b.py - pv[1], dz = b.pz - pv[2];
         if (dx * dx + dy * dy + dz * dz > (body.reach + R) ** 2) continue;
         for (let s = 0; s < body.shapes.length && n < MAXC; s++) {
           this._closest(4, k, s, b.px, b.py, b.pz);
@@ -184,6 +192,7 @@ export class World {
     // ---- resolve sequentially, re-measuring each contact after earlier pushes
     let fJn = 0, fnx = 0, fny = 0, fnz = 0, fMat = -1, fBest = 0;
     const wasSupported = b.supported;
+    let boostTri = -1;
     let gax = 0, gay = -G * DT, gaz = 0;   // the gravity this step that is still inside v
     for (let i = 0; i < n; i++) {
       const mat = this._closest(cKind[i], cIdx[i], cSub[i], b.px, b.py, b.pz);
@@ -236,6 +245,7 @@ export class World {
       } else {
         fJn += jn; fnx += nx * jn; fny += ny * jn; fnz += nz * jn;
         if (jn > fBest) { fBest = jn; fMat = mat; }
+        if (mat === MAT.BOOST && cKind[i] === 0) boostTri = cIdx[i];
         if (jn > 0.8 && !wasSupported) b.events.push({ type: mat === MAT.RIM ? 'rim' : 'land', speed: jn, mat });
         else if (mat === MAT.RIM && jn > 0.15) b.events.push({ type: 'rim', speed: jn, mat });
       }
@@ -259,6 +269,14 @@ export class World {
       if (dec >= ts) { b.vx -= tx; b.vy -= ty; b.vz -= tz; }
       else if (ts > 1e-9) { const q = dec / ts; b.vx -= tx * q; b.vy -= ty * q; b.vz -= tz * q; }
     }
+    // boost pad: push along its arrow up to BOOST_MAX
+    if (boostTri >= 0 && this.dirs) {
+      const o = boostTri * 3, dx = this.dirs[o], dy = this.dirs[o + 1], dz = this.dirs[o + 2];
+      const along = b.vx * dx + b.vy * dy + b.vz * dz;
+      if (along < BOOST_MAX) { const k = Math.min(BOOST_ACC * DT, BOOST_MAX - along); b.vx += dx * k; b.vy += dy * k; b.vz += dz * k; }
+      if (!b.onBoost) b.events.push({ type: 'boost' });
+      b.onBoost = true;
+    } else if (b.supported) b.onBoost = false;
 
     // ---- cup capture, out of bounds, rest
     if (c) {

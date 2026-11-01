@@ -5,9 +5,9 @@ import { BALL_R, CUP_R } from '../engine/constants.js';
 
 const GROUP_MAT = {
   grass: ['grass'], fringe: ['fringe', 'grass'], wall: ['wall'], wallTop: ['wallTop', 'wall'], trim: ['trim'],
-  under: ['wall'], cupRim: ['cupRim'], sand: ['sand', 'grass'], ice: ['ice', 'grass'], boost: ['boost', 'grass'], bridge: ['bridge', 'grass'],
+  under: ['wall'], cupRim: ['cupRim'], sand: ['sand', 'grass'], ice: ['ice', 'grass'], boost: ['boost', 'grass'], bridge: ['bridge', 'grass'], sticky: ['sand', 'grass'],
 };
-const RECEIVE = new Set(['grass', 'fringe', 'sand', 'ice', 'boost', 'bridge', 'wallTop', 'cupRim', 'cupHole']);
+const RECEIVE = new Set(['grass', 'fringe', 'sand', 'ice', 'boost', 'bridge', 'sticky', 'wallTop', 'cupRim', 'cupHole']);
 const CAST = new Set(['wall', 'wallTop', 'trim']);
 
 const v = a => new THREE.Vector3(a[0], a[1], a[2]);
@@ -52,7 +52,7 @@ export function buildHoleView(scene, hole, theme, fallback, { renderer, camera, 
     group.add(obj);
   };
 
-  const rotors = [], pickups = [], updaters = [];
+  const rotors = [], pickups = [], updaters = [], movers = [];
   for (const f of hole.features) {
     if (f.type === 'windmill') {
       const s = skin('windmill', f.opts);
@@ -60,6 +60,16 @@ export function buildHoleView(scene, hole, theme, fallback, { renderer, camera, 
       if (s.rotor) rotors.push({ rotor: s.rotor, omega: f.omega, phase: f.phase });
     } else if (f.type === 'loop') {
       place(skin('loop', f.opts), f.p, f.basis);
+    } else if (f.type === 'tube') {
+      const curve = new THREE.CatmullRomCurve3(f.points.map(v), false, 'centripetal');
+      const obj = skin('tube', { curve, radius: f.radius });
+      obj.traverse?.(o => { o.userData.noOcclude = true; });
+      group.add(obj);
+    } else if (f.type === 'mover') {
+      const obj = skin('mover', f.opts);
+      const holder = new THREE.Group(); holder.add(obj);
+      place(holder, f.p, f.basis);
+      movers.push({ obj: holder, base: holder.position.clone(), slide: f.slide });
     } else if (f.type === 'bumper') {
       place(skin('bumper', f.opts), f.p, f.basis);
     } else if (f.type === 'pickup') {
@@ -84,20 +94,32 @@ export function buildHoleView(scene, hole, theme, fallback, { renderer, camera, 
   // theme environment (lights, sky, rock, backdrop)
   const bounds = new THREE.Box3(v(hole.bounds.min), v(hole.bounds.max));
   const info = {
-    bounds, path: hole.path.map(v), widths: hole.widths, floor: hole.floor,
+    bounds, path: hole.path.map(v), widths: hole.widths, floor: hole.floor, voids: hole.voids, branches: hole.branches, viewDir: v(hole.viewDir),
     tee: new THREE.Vector3(hole.tee.x, hole.tee.y - BALL_R, hole.tee.z), cup: new THREE.Vector3(hole.cup.x, hole.cup.y, hole.cup.z),
     camera, renderer, quality,
   };
   let env = null;
+  const before = new Set(scene.children);
   try { env = theme.buildEnvironment ? theme.buildEnvironment(scene, info) : null; } catch (e) { console.warn('[skyputt] theme environment failed, using greybox', e); env = null; }
   if (!env) env = fallback.buildEnvironment(scene, info);
+  // camera occluders: the course + skins, plus theme set pieces that sit near the hole
+  const near = bounds.clone().expandByScalar(2.5);
+  const occluders = [group];
+  for (const o of scene.children) {
+    if (before.has(o) || o === group || o.isLight || o.isPoints || o.isSprite) continue;
+    try { const bb = new THREE.Box3().setFromObject(o); if (!bb.isEmpty() && bb.intersectsBox(near) && bb.getSize(new THREE.Vector3()).length() < 60) occluders.push(o); } catch { /* skip */ }
+  }
 
   // flag lifts out when the ball is close to the cup (so it never hides a putt dropping)
   let flagLift = 0;
   return {
-    group, info, rotors, pickups, flagObj,
+    group, info, rotors, pickups, flagObj, occluders,
     update(dt, t, worldTime, ball) {
       for (const r of rotors) r.rotor.rotation.z = r.omega * worldTime + r.phase;
+      for (const m of movers) {
+        const sl = m.slide, o = sl.amp * Math.sin(sl.omega * worldTime + sl.phase);
+        m.obj.position.set(m.base.x + sl.dir[0] * o, m.base.y + sl.dir[1] * o, m.base.z + sl.dir[2] * o);
+      }
       for (const u of updaters) u(dt, t);
       for (const p of pickups) {
         if (p.skin.update) p.skin.update(dt, t);

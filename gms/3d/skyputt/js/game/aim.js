@@ -63,8 +63,8 @@ export class AimInput {
       this.rig.zoom = clampZoom(this.zoom0 * this.pinch0 / Math.max(10, d));
     } else if (this.mode === 'look') {
       const dx = p.x - p.x0, dy = p.y - p.y0;
-      this.rig.lookYaw = this.look0.yaw - dx * 0.006;
-      this.rig.lookPitch = Math.max(-0.4, Math.min(0.7, this.look0.pitch + dy * 0.004));
+      this.rig.lookYaw = this.look0.yaw - dx * 0.006 * (this.lookSens ?? 1);
+      this.rig.lookPitch = Math.max(-0.4, Math.min(0.7, this.look0.pitch + dy * 0.004 * (this.lookSens ?? 1)));
     } else if (this.mode === 'aim') {
       this._updateAim(p);
     }

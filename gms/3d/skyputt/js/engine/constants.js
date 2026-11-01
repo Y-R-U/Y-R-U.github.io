@@ -19,10 +19,12 @@ export const STOP_SPEED = 0.035;   // below this (while supported) for STOP_TIME
 export const STOP_TIME = 0.2;
 export const SHOT_TIMEOUT = 30;    // seconds; a shot that never settles is stopped
 export const BOUNCE_MIN = 0.3;     // normal speed below which contacts don't bounce (resting contact)
-export const ROLL_K = 5 / 7;       // a rolling solid sphere feels 5/7 of the slope's pull
+export const ROLL_K = 5 / 7;
+export const BOOST_ACC = 14;        // m/s^2 along a boost pad's arrow
+export const BOOST_MAX = 5.2;       // ...until the ball moves this fast along it       // a rolling solid sphere feels 5/7 of the slope's pull
 
 // Material ids on collider triangles / shapes.
-export const MAT = { GRASS: 0, FRINGE: 1, WALL: 2, RIM: 3, CUP: 4, BUMPER: 5, BLADE: 6, SAND: 7, ICE: 8, STICKY: 9, BOOST: 10, BRIDGE: 11 };
+export const MAT = { GRASS: 0, FRINGE: 1, WALL: 2, RIM: 3, CUP: 4, BUMPER: 5, BLADE: 6, SAND: 7, ICE: 8, STICKY: 9, BOOST: 10, BRIDGE: 11, GLASS: 12 };
 
 // Per-material response. roll = rolling friction coefficient (decel = roll * normal force),
 // drag = speed-proportional decel (1/s), e = restitution, scrub = tangential loss per unit normal impulse.
@@ -34,7 +36,8 @@ SURFACES[MAT.BRIDGE] = { floor: true,  roll: 0.060, drag: 0.08, e: 0.35, scrub: 
 SURFACES[MAT.SAND]   = { floor: true,  roll: 0.300, drag: 0.80, e: 0.05, scrub: 0.60 };
 SURFACES[MAT.ICE]    = { floor: true,  roll: 0.015, drag: 0.02, e: 0.30, scrub: 0.05 };
 SURFACES[MAT.STICKY] = { floor: true,  roll: 0.200, drag: 0.60, e: 0.10, scrub: 0.50 };
-SURFACES[MAT.BOOST]  = { floor: true,  roll: -0.15, drag: 0.00, e: 0.28, scrub: 0.25 };
+SURFACES[MAT.BOOST]  = { floor: true,  roll: 0.072, drag: 0.10, e: 0.28, scrub: 0.25 };   // + push along the pad (BOOST_*)
+SURFACES[MAT.GLASS]  = { floor: true,  roll: 0.040, drag: 0.05, e: 0.30, scrub: 0.10 };
 SURFACES[MAT.WALL]   = { floor: false, roll: 0,     drag: 0,    e: 0.72, scrub: 0.12 };
 SURFACES[MAT.RIM]    = { floor: true,  roll: 0.072, drag: 0.10, e: 0.0,  scrub: 0.30 };
 SURFACES[MAT.CUP]    = { floor: false, roll: 0,     drag: 0,    e: 0.25, scrub: 0.50 };

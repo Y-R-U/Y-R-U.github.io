@@ -6,10 +6,20 @@ import { kinematicBody } from '../engine/physics.js';
 import { v3 } from './frames.js';
 
 const Y = [0, 1, 0];
+const PATCHES = new Set(['sand', 'ice', 'boost', 'sticky']);
 export const SAIL_X = 0.018;   // blade sail offset from the spar (matches the contract)
 
+// s of the main-track frame nearest to [x, z] (authoring helper: features can say at: [x, z]).
+export function nearestS(frames, [x, z]) {
+  let best = Infinity, s = 0;
+  for (const f of frames) { if (f.loop || f.tube) continue; const d = (f.p[0] - x) ** 2 + (f.p[2] - z) ** 2; if (d < best) { best = d; s = f.s; } }
+  return s;
+}
+
 export function buildFeature(ft, ctx) {
-  const F = ctx.frameAt(ft.s ?? 0);
+  if (ft.at) ft = { ...ft, s: nearestS(ctx.frames, ft.at) };
+  const F = PATCHES.has(ft.type) ? null : ctx.frameAt(ft.s ?? 0);
+  if (PATCHES.has(ft.type)) return { type: ft.type };
   const fn = BUILDERS[ft.type];
   if (!fn) throw new Error('unknown feature ' + ft.type);
   return fn(ft, F, ctx);
@@ -62,6 +72,26 @@ const BUILDERS = {
     const p = v3.mad(F.p, F.l, ft.u ?? 0);
     kinematics.push(kinematicBody({ pivot: p, mat: MAT.BUMPER, shapes: [{ kind: 'cyl', c: [0, h / 2, 0], r, hh: h / 2 }] }));
     return { type: 'bumper', p, basis: [v3.mul(F.l, -1), Y, v3.mul(F.f, -1)], opts: { radius: r, height: h } };
+  },
+
+  // Moving block: slides side to side across the fairway, a pure function of time.
+  // u = centre offset, amp = half travel (m), period (s), size [w, h, d].
+  mover(ft, F, { kinematics }) {
+    const [w, h, d] = ft.size ?? [0.36, 0.16, 0.16];
+    const p = v3.mad(F.p, F.l, ft.u ?? 0);
+    const slide = { dir: F.l, amp: ft.amp ?? 0.4, omega: (2 * Math.PI) / (ft.period ?? 3), phase: ft.phase ?? 0 };
+    const basis = [v3.mul(F.l, -1), Y, v3.mul(F.f, -1)];
+    kinematics.push(kinematicBody({ pivot: p, basis, mat: MAT.WALL, slide, shapes: [{ kind: 'box', c: [0, h / 2, 0], h: [w / 2, h / 2, d / 2] }] }));
+    return { type: 'mover', p, basis, slide, opts: { width: w, height: h, depth: d } };
+  },
+
+  // Static block (a rock / hedge / divider on the fairway). size [w, h, d] along (across, up, along).
+  block(ft, F, { col, G }) {
+    const [w, h, d] = ft.size ?? [0.4, 0.14, 0.4];
+    const c = v3.mad(v3.mad(F.p, F.l, ft.u ?? 0), F.u, h / 2);
+    const g = k => (k === 'Y' ? G('wallTop') : k === 'y' ? null : G('wall'));
+    col.box(c, F.l, F.u, F.f, [w / 2, h / 2, d / 2], MAT.WALL, g, 'xXYzZ');
+    return { type: 'block', p: F.p };
   },
 
   // Collectible crystal (no physics; the game checks distance).

@@ -2,11 +2,19 @@
 // Node-safe (no THREE). The game turns `geo` groups into THREE meshes with theme materials.
 import { BALL_R, CUP_R, CUP_DEPTH, WALL_H, WALL_T, FLOOR_T, MAT } from '../engine/constants.js';
 import { v3, pathFrames, loopFrames, lerpFrame, frameAt } from './frames.js';
-import { buildFeature } from './features.js';
+import { buildFeature, nearestS } from './features.js';
+import { World } from '../engine/physics.js';
+
+// The physics world for a built hole.
+export function makeWorld(h) {
+  const c = h.colliders;
+  return new World({ tris: c.tris, mats: c.mats, dirs: c.dirs, cup: h.cup, kinematics: h.kinematics, killY: h.killY });
+}
 
 const FRINGE = 0.09;      // fringe band next to walls (visual only)
 const CUPA = 0.2;         // half-size of the square cut out of the floor around the cup
 const TRIM_H = 0.025;
+export const TUBE_R = 0.15;
 const SURF_MAT = { grass: MAT.GRASS, sand: MAT.SAND, ice: MAT.ICE, sticky: MAT.STICKY, boost: MAT.BOOST, bridge: MAT.BRIDGE };
 const SURF_GEO = { grass: 'grass', sand: 'sand', ice: 'ice', sticky: 'grass', boost: 'boost', bridge: 'bridge' };
 
@@ -31,9 +39,9 @@ export class Geo {
 }
 
 export class Col {
-  constructor() { this.t = []; this.m = []; }
-  tri(a, b, c, mat) { this.t.push(...a, ...b, ...c); this.m.push(mat); }
-  quad(P, mat) { this.tri(P[0], P[1], P[2], mat); this.tri(P[0], P[2], P[3], mat); }
+  constructor() { this.t = []; this.m = []; this.d = []; }
+  tri(a, b, c, mat, dir = null) { this.t.push(...a, ...b, ...c); this.m.push(mat); this.d.push(...(dir || [0, 0, 0])); }
+  quad(P, mat, dir = null) { this.tri(P[0], P[1], P[2], mat, dir); this.tri(P[0], P[2], P[3], mat, dir); }
   // oriented box: centre, axes (unit) ex/ey/ez, half sizes; faces = which faces to include
   box(c, ex, ey, ez, h, mat, geo = null, faces = 'xXyYzZ') {
     const corner = (sx, sy, sz) => v3.add(c, v3.add(v3.mul(ex, sx * h[0]), v3.add(v3.mul(ey, sy * h[1]), v3.mul(ez, sz * h[2]))));
@@ -53,54 +61,18 @@ export class Col {
   }
 }
 
-// ---------- main ----------
-export function buildHole(def) {
-  // 1. pieces → frames
-  let frames = [];
-  let pieceNo = 0;
-  for (const pc of def.pieces) {
-    let fr;
-    if (pc.type === 'path') {
-      const pts = pc.points.map(q => ({ ...q }));
-      if (frames.length) {          // start where the previous piece ended
-        const e = frames[frames.length - 1].p;
-        Object.assign(pts[0], { x: e[0], y: e[1], z: e[2] });
-      }
-      fr = pathFrames(pts, pieceNo);
-    } else if (pc.type === 'loop') {
-      fr = loopFrames(frames[frames.length - 1], pc, pieceNo);
-    } else throw new Error('unknown piece ' + pc.type);
-    if (frames.length) frames.pop();  // the new piece's first frame replaces the joint
-    frames.push(...fr);
-    pieceNo++;
-  }
-  let s = 0;
-  frames.forEach((f, i) => { if (i) s += v3.len(v3.sub(f.p, frames[i - 1].p)); f.s = s; });
-  const total = s;
+const hwOf = f => f.w / 2;
+const cols = f => {
+  const hw = hwOf(f), a = Math.min(CUPA, (hw - FRINGE) * 0.6);
+  return [-hw, -(hw - FRINGE), -a, a, hw - FRINGE, hw];
+};
+const stamp = fr => { let s = 0; fr.forEach((f, i) => { if (i) s += v3.len(v3.sub(f.p, fr[i - 1].p)); f.s = s; }); return fr; };
 
-  // 2. cup: cut one row-interval exactly [sc - CUPA, sc + CUPA]
-  const sc = def.cup.s < 0 ? total + def.cup.s : def.cup.s;
-  {
-    const a = frameAt(frames, sc - CUPA), b = frameAt(frames, sc + CUPA);
-    frames = frames.filter(f => f.s <= sc - CUPA - 0.04 || f.s >= sc + CUPA + 0.04);
-    let k = frames.findIndex(f => f.s > sc);
-    frames.splice(k, 0, { ...a, s: sc - CUPA, cupRow: true }, { ...b, s: sc + CUPA });
-  }
-  const cupRow = frames.findIndex(f => f.cupRow);
-  const cf = lerpFrame(frames[cupRow], frames[cupRow + 1], 0.5);
-  const cup = { x: cf.p[0], y: cf.p[1], z: cf.p[2] };
-
-  const geo = {};
-  const G = name => geo[name] || (geo[name] = new Geo());
-  const col = new Col();
-
+// Sweep a run of frames into floor / walls / skirts / gap faces (+ colliders).
+// drop lowers the whole run (branches sit 1.5 mm under the main floor where they overlap).
+function sweep(frames, cupRow, G, col, drop = 0) {
   // 3. floor rows
-  const hwOf = f => f.w / 2;
-  const cols = f => {
-    const hw = hwOf(f), a = Math.min(CUPA, (hw - FRINGE) * 0.6);
-    return [-hw, -(hw - FRINGE), -a, a, hw - FRINGE, hw];
-  };
-  const rowPts = frames.map(f => cols(f).map(x => v3.mad(f.p, f.l, x)));
+  const rowPts = frames.map(f => cols(f).map(x => v3.mad(v3.mad(f.p, f.l, x), f.u, drop)));
   for (let i = 0; i < frames.length - 1; i++) {
     const A = frames[i], B = frames[i + 1];
     if (!A.floor) continue;
@@ -112,7 +84,8 @@ export function buildHole(def) {
       const fringe = (c === 0 && A.wr) || (c === 4 && A.wl);
       const gname = A.surf === 'grass' && fringe ? 'fringe' : (SURF_GEO[A.surf] || 'grass');
       G(gname).quad(P, [A.u, A.u, B.u, B.u], [[ca[c], A.s], [ca[c + 1], A.s], [cb[c + 1], B.s], [cb[c], B.s]], A.u);
-      col.quad(P, mat);
+      if (col.floor && drop === 0) col.floor.push({ t: col.m.length, i, c, s: A.s, u: (ca[c] + ca[c + 1]) / 2, ua: ca[c], ub: ca[c + 1], n: A.u, f: A.f });
+      col.quad(P, mat, A.surf === 'boost' ? A.f : null);
     }
     // underside
     const th = A.loop ? 0.03 : FLOOR_T, thB = B.loop ? 0.03 : FLOOR_T;
@@ -187,6 +160,121 @@ export function buildHole(def) {
     }
   }
 
+}
+
+// Glass tubes: a ring of inward-facing collider quads around every run of tube frames.
+function buildTubes(frames, col) {
+  const out = [];
+  const N = 14;
+  let cur = null;
+  for (let i = 0; i < frames.length - 1; i++) {
+    const A = frames[i], B = frames[i + 1];
+    if (!A.tube) { cur = null; continue; }
+    const r = A.tube;
+    const ring = F => { const c = v3.mad(F.p, F.u, r); return { c, pts: Array.from({ length: N }, (_, k) => { const a = (k / N) * Math.PI * 2; return v3.mad(c, F.l, Math.sin(a) * r, F.u, -Math.cos(a) * r); }) }; };
+    const ra = ring(A), rb = ring({ ...B, u: B.tube ? B.u : A.u, l: B.tube ? B.l : A.l });
+    for (let k = 0; k < N; k++) {
+      const k2 = (k + 1) % N;
+      col.quad([ra.pts[k], ra.pts[k2], rb.pts[k2], rb.pts[k]], MAT.GLASS);
+    }
+    if (!cur) { cur = { radius: r, points: [ra.c] }; out.push(cur); }
+    cur.points.push(rb.c);
+  }
+  return out;
+}
+
+// Surface patches (sand / ice / boost / sticky) re-tag floor cells by (s, u) and get a decal mesh
+// that is exactly those cells lifted 3 mm, so what you see is what the physics uses.
+const PATCH = { sand: MAT.SAND, ice: MAT.ICE, boost: MAT.BOOST, sticky: MAT.STICKY };
+function applyPatches(def, frames, col, G, total) {
+  for (const ft of def.features || []) {
+    const mat = PATCH[ft.type];
+    if (mat === undefined) continue;
+    const S = (v, at) => at ? nearestS(frames, at) : v < 0 ? total + v : v;
+    const s0 = S(ft.s0, ft.at0), s1 = S(ft.s1, ft.at1);
+    const u0 = ft.u0 ?? -99, u1 = ft.u1 ?? 99;
+    const cells = col.floor.filter(c => !(c.s < s0 || c.s >= s1 || c.u < u0 || c.u > u1));
+    // pad centre line (across): boost uv.x is metres from it
+    const mid = cells.length ? (Math.min(...cells.map(c => c.ua)) + Math.max(...cells.map(c => c.ub))) / 2 : 0;
+    for (const c of cells) {
+      for (const t of [c.t, c.t + 1]) {
+        col.m[t] = mat;
+        if (mat === MAT.BOOST) { col.d[t * 3] = c.f[0]; col.d[t * 3 + 1] = c.f[1]; col.d[t * 3 + 2] = c.f[2]; }
+        const P = [0, 1, 2].map(k => v3.mad(col.t.slice(t * 9 + k * 3, t * 9 + k * 3 + 3), c.n, 0.003));
+        const uv = P.map(p => [p[0], p[2]]);
+        if (mat === MAT.BOOST) {   // uv.y runs along the pad so a theme can draw arrows
+          const o = frames[c.i].p;
+          for (let k = 0; k < 3; k++) { const d = v3.sub(P[k], o); uv[k] = [v3.dot(d, frames[c.i].l) - mid, c.s + v3.dot(d, c.f)]; }
+        }
+        G(ft.type).tri(P, [c.n, c.n, c.n], uv, c.n);
+      }
+    }
+  }
+}
+
+// Initial camera heading (horizontal unit vector): tee toward the track ~2.5 m ahead.
+function viewDir(frames, tf) {
+  const t = frameAt(frames, (tf.s ?? 0.45) + 2.5);
+  let dx = t.p[0] - tf.p[0], dz = t.p[2] - tf.p[2];
+  const l = Math.hypot(dx, dz) || 1;
+  return [dx / l, 0, dz / l];
+}
+
+// ---------- main ----------
+export function buildHole(def) {
+  // 1. pieces → frames
+  let frames = [];
+  let pieceNo = 0;
+  for (const pc of def.pieces) {
+    let fr;
+    if (pc.type === 'path') {
+      const pts = pc.points.map(q => ({ ...q }));
+      if (frames.length) {          // start where the previous piece ended
+        const e = frames[frames.length - 1].p;
+        Object.assign(pts[0], { x: e[0], y: e[1], z: e[2] });
+      }
+      fr = pathFrames(pts, pieceNo);
+    } else if (pc.type === 'tube') {
+      // glass tube: the ball rolls inside a ring of radius r whose bottom is the track line
+      const r = pc.radius ?? TUBE_R;
+      const pts = pc.points.map(q => ({ ...q, w: 2 * r, walls: '' }));
+      const e = frames[frames.length - 1].p;
+      Object.assign(pts[0], { x: e[0], y: e[1], z: e[2] });
+      fr = pathFrames(pts, pieceNo);
+      for (const f of fr) { f.floor = false; f.tube = r; }
+    } else if (pc.type === 'loop') {
+      fr = loopFrames(frames[frames.length - 1], pc, pieceNo);
+    } else throw new Error('unknown piece ' + pc.type);
+    if (frames.length) frames.pop();  // the new piece's first frame replaces the joint
+    frames.push(...fr);
+    pieceNo++;
+  }
+  let s = 0;
+  frames.forEach((f, i) => { if (i) s += v3.len(v3.sub(f.p, frames[i - 1].p)); f.s = s; });
+  const total = s;
+
+  // 2. cup: cut one row-interval exactly [sc - CUPA, sc + CUPA]
+  const sc = def.cup.s < 0 ? total + def.cup.s : def.cup.s;
+  {
+    const a = frameAt(frames, sc - CUPA), b = frameAt(frames, sc + CUPA);
+    frames = frames.filter(f => f.s <= sc - CUPA - 0.04 || f.s >= sc + CUPA + 0.04);
+    let k = frames.findIndex(f => f.s > sc);
+    frames.splice(k, 0, { ...a, s: sc - CUPA, cupRow: true }, { ...b, s: sc + CUPA });
+  }
+  const cupRow = frames.findIndex(f => f.cupRow);
+  const cf = lerpFrame(frames[cupRow], frames[cupRow + 1], 0.5);
+  const cup = { x: cf.p[0], y: cf.p[1], z: cf.p[2] };
+
+  const geo = {};
+  const G = name => geo[name] || (geo[name] = new Geo());
+  const col = new Col();
+
+  col.floor = [];
+  sweep(frames, cupRow, G, col);
+  const tubes = buildTubes(frames, col);
+  applyPatches(def, frames, col, G, total);
+  for (const br of def.branches || []) sweep(stamp(pathFrames(br.points, -1)), -1, G, col, -0.0015);
+
   // 5. end walls across the track at the start and the end
   const endWall = (F, dir) => {
     const hw = hwOf(F) + WALL_T;
@@ -242,6 +330,7 @@ export function buildHole(def) {
   const kinematics = [], features = [];
   const ctx = { frames, col, G, frameAt: s0 => frameAt(frames, s0 < 0 ? total + s0 : s0), kinematics, total };
   for (const ft of def.features || []) features.push(buildFeature(ft, ctx));
+  for (const t of tubes) features.push({ type: 'tube', points: t.points, radius: t.radius });
   // loops are features for the skin too
   for (const [i, pc] of def.pieces.entries()) {
     if (pc.type !== 'loop') continue;
@@ -257,10 +346,11 @@ export function buildHole(def) {
   return {
     id: def.id, name: def.name, par: def.par,
     frames, total, geo, cup, tee, teeFrame: tf, cupFrame: cf,
-    colliders: { tris: Float64Array.from(col.t), mats: Uint8Array.from(col.m) },
+    colliders: { tris: Float64Array.from(col.t), mats: Uint8Array.from(col.m), dirs: Float32Array.from(col.d) },
     kinematics, features,
     bounds: { min: mn, max: mx },
     killY: mn[1] - 1.2,
     path: mainFrames.map(f => f.p), widths: mainFrames.map(f => f.w), floor: mainFrames.map(f => f.floor),
+    voids: def.voids || [], viewDir: viewDir(frames, tf), branches: (def.branches || []).map(b => b.points.map(q => [q.x, q.y ?? 0, q.z])),
   };
 }

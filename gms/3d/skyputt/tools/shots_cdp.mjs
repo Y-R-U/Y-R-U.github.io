@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Headless Chrome driver (raw CDP, no puppeteer). Start Chrome first:
 //   ~/.claude/bin/cdp start --port 9512
-//   node tools/shots_cdp.mjs shots [--out=DIR] [--theme=greybox]   title + every hole, portrait 412x915 and landscape 1440x900
-//   node tools/shots_cdp.mjs play  [--out=DIR]                     plays hole 1-3 through the real UI (drag aim) to the scorecard
+//   node tools/shots_cdp.mjs shots [--out=DIR] [--theme=greybox] [--holes=4,5] [--sizes=p,l]
+//        title, map, settings + each hole (flyover/tee/aim/rolling/rest), portrait 412x915 and landscape 1440x900
+//   node tools/shots_cdp.mjs play  [--out=DIR] [--from=N] [--minutes=20]   plays the front nine (or from hole N) through the real UI to the scorecard
 // Reports console errors / exceptions and exits 1 if there are any.
 import { writeFileSync, mkdirSync } from 'node:fs';
 
@@ -92,17 +93,28 @@ async function release(c, x, y) {
   if (mobile) await c.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   else await c.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', buttons: 0, clickCount: 1 });
 }
-const state = c => c.eval('(() => { const r = __skyputt.round; return r ? { state: r.state, hole: r.index + 1, strokes: r.strokes, fps: __skyputt.fps, theme: __skyputt.themeId } : null })()');
+const state = c => c.eval('(() => { const r = __skyputt.round; return r ? { state: r.state, hole: r.index + 1, strokes: r.strokes, fps: Math.round(__skyputt.fps), theme: __skyputt.themeId, calls: __skyputt.app.renderer.info.render.calls, tris: __skyputt.app.renderer.info.render.triangles, coins: __skyputt.store.data.coins, helpers: __skyputt.store.data.helpers } : null })()');
 
 async function shots(c) {
+  const HOLES = (args.holes ? String(args.holes) : '1,2,3,4,5,6,7,8,9').split(',').map(Number);
+  const SIZES = (args.sizes ? String(args.sizes) : 'p,l').split(',');
   for (const [tag, w, h, mob] of [['p', 412, 915, true], ['l', 1440, 900, false]]) {
+    if (!SIZES.includes(tag)) continue;
     await size(c, w, h, mob);
-    await go(c);
+    await go(c, 'fresh');
     await sleep(800);
     await shot(c, `${tag}-title`);
-    for (let i = 1; i <= 3; i++) {
+    await c.eval(`document.querySelector('#t-map').click()`); await sleep(500);
+    await shot(c, `${tag}-map`);
+    await c.eval(`document.querySelector('#map [data-a=back]').click(); document.querySelector('#t-settings').click()`); await sleep(400);
+    await shot(c, `${tag}-settings`);
+    await c.eval(`document.querySelector('#sheet [data-a=close]').click()`);
+    for (const i of HOLES) {
       await go(c, `hole=${i}`);
-      await sleep(1500);
+      await sleep(300);
+      await shot(c, `${tag}-hole${i}-flyover`);
+      await waitFor(c, '__skyputt.round.state === "ready"', 40000);
+      await sleep(900);
       await shot(c, `${tag}-hole${i}-tee`);
       // aim: drag straight down from the middle (shoot forward) and hold
       const cx = w / 2, cy = h * 0.45;
@@ -110,7 +122,7 @@ async function shots(c) {
       await sleep(300);
       await shot(c, `${tag}-hole${i}-aim`);
       await release(c, cx - w * 0.02, cy + Math.min(w, h) * 0.3);
-      await sleep(900);
+      await sleep(1200);
       await shot(c, `${tag}-hole${i}-rolling`);
       await waitFor(c, '["ready","done","sinking"].includes(__skyputt.round.state)', 30000).catch(() => {});
       await sleep(900);
@@ -123,8 +135,11 @@ async function shots(c) {
 // Plays every hole through the UI: aim at the planned heading by converting it to a screen drag.
 async function play(c) {
   await size(c, 412, 915, true);
-  await go(c, 'hole=1');
-  const tEnd = Date.now() + 8 * 60e3;
+  await go(c, 'fresh');
+  if (args.from) await c.eval(`__skyputt.startRound(${+args.from - 1}, 'round')`);
+  else await c.eval(`document.querySelector('#t-play').click()`);
+  await sleep(1500);
+  const tEnd = Date.now() + (+(args.minutes || 20)) * 60e3;
   while (Date.now() < tEnd) {
     const s = await state(c);
     if (!s) break;

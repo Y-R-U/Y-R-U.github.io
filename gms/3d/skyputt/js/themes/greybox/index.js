@@ -140,6 +140,15 @@ export default function createTheme(ctx) {
         m.position.y = o.height / 2; m.castShadow = true;
         const g = new THREE.Group(); g.add(m); return g;
       },
+      // Extension (engine): a sliding block. opts = { width, height, depth }, base at the origin.
+      mover(o) {
+        const g = new THREE.Group();
+        const body = new THREE.Mesh(geom(new THREE.BoxGeometry(o.width, o.height, o.depth)), materials.wall);
+        body.position.y = o.height / 2; body.castShadow = body.receiveShadow = true; g.add(body);
+        const top = new THREE.Mesh(geom(new THREE.BoxGeometry(o.width + 0.01, 0.02, o.depth + 0.01)), materials.trim);
+        top.position.y = o.height - 0.01; g.add(top);
+        return g;
+      },
       teePad(o) {
         const m = new THREE.Mesh(geom(new THREE.RingGeometry(o.radius * 0.55, o.radius, 32)), mat(0x5b8fd6, { roughness: 0.5 }));
         m.rotation.x = -Math.PI / 2; m.position.y = 0.002; m.receiveShadow = true;

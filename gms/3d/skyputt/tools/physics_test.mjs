@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Headless physics tests:  node tools/physics_test.mjs
 // Straight putt, wall bounce, cup capture / lip-out, loop, no tunnelling at max power, determinism.
-import { buildHole } from '../js/course/builder.js';
+import { buildHole, makeWorld } from '../js/course/builder.js';
 import { World, Ball } from '../js/engine/physics.js';
 import { simulateShot } from '../js/engine/sim.js';
 import { BALL_R, SHOT_MAX, CUP_R } from '../js/engine/constants.js';
@@ -11,7 +11,7 @@ const ok = (cond, msg) => { if (cond) { passes++; console.log('  ok  ', msg); } 
 
 function worldFor(def) {
   const h = buildHole(def);
-  const w = new World({ tris: h.colliders.tris, mats: h.colliders.mats, cup: h.cup, kinematics: h.kinematics, killY: h.killY });
+  const w = makeWorld(h);
   return { h, w };
 }
 function ballAt(h, x, z) { return new Ball(x, h.tee.y, z); }

@@ -150,3 +150,63 @@ table.scores td.over { color: #ffb2a8; }
   .power { width: 380px; bottom: 34px; }
   .hint { font-size: 16px; bottom: 34px; }
 }
+
+/* ---------- M2: helpers tray, stars, map, settings, left-handed ---------- */
+.tray { position: absolute; right: calc(10px + var(--safe-r)); bottom: calc(84px + var(--safe-b)); display: flex; flex-direction: column; gap: 10px; }
+.tray-btn { position: relative; width: 54px; height: 54px; border-radius: 16px; border: 2px solid var(--panel-b); background: var(--panel);
+  display: grid; place-items: center; padding: 0; backdrop-filter: blur(4px); }
+.tray-btn svg { width: 26px; height: 26px; }
+.tray-btn .cnt { position: absolute; right: -6px; top: -6px; min-width: 21px; height: 21px; padding: 0 5px; border-radius: 99px;
+  background: var(--gold); color: var(--ink); font-size: 13px; font-weight: 700; line-height: 21px; }
+.tray-btn .lvl { position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%); font-size: 12px; font-weight: 700; color: var(--gold); text-shadow: 0 1px 3px #000; }
+.tray-btn.on { border-color: #9be8ff; box-shadow: 0 0 14px rgba(120, 220, 255, .7); }
+.tray-btn:disabled { opacity: .45; }
+.stars i { font-style: normal; color: rgba(255,255,255,.22); margin: 0 1px; }
+.stars i.on { color: var(--gold); text-shadow: 0 0 8px rgba(242,199,92,.6); }
+.card-stars { font-size: 34px; line-height: 1; margin: -4px 0 10px; }
+.card-note.good { color: var(--good); font-weight: 600; opacity: 1; }
+.t-progress { display: flex; justify-content: center; gap: 16px; margin: -10px 0 14px; font-size: 16px; font-weight: 600; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
+.t-progress span { display: inline-flex; align-items: center; gap: 5px; }
+.t-progress svg, .map-sub svg { width: 17px; height: 17px; vertical-align: -3px; }
+.t-foot { gap: 12px; }
+.round svg { pointer-events: none; }
+
+#map { position: fixed; inset: 0; z-index: 25; display: grid; place-items: center; padding: calc(12px + var(--safe-t)) 12px calc(12px + var(--safe-b));
+  background: rgba(8,14,34,.55); backdrop-filter: blur(3px); overflow: auto; }
+.map-card { width: min(440px, 100%); padding: 16px; border-radius: 24px; background: linear-gradient(#22356a, #162449); border: 2px solid var(--panel-b); box-shadow: 0 16px 40px rgba(0,0,0,.45); }
+.map-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.map-title { font-size: 26px; font-weight: 700; }
+.map-sub { font-size: 14px; opacity: .85; }
+.map-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tile { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px 7px; border-radius: 16px;
+  border: 2px solid var(--panel-b); background: rgba(255,255,255,.07); min-height: 104px; }
+.tile .num { font-size: 26px; line-height: 1; }
+.tile .stars { font-size: 17px; }
+.tile .nm { font-size: 12.5px; font-weight: 600; line-height: 1.1; text-align: center; }
+.tile .pr { font-size: 11px; opacity: .7; }
+.tile .lk svg { width: 20px; height: 20px; opacity: .8; }
+.tile.locked { opacity: .45; border-color: rgba(255,255,255,.18); }
+#sheet { position: fixed; z-index: 40; }
+.sheet .row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 9px 2px; border-bottom: 1px solid rgba(255,255,255,.1); text-align: left; }
+.sheet .row span { font-size: 16px; }
+.sheet input[type=range] { width: 52%; accent-color: var(--gold); }
+.seg { display: flex; border: 2px solid var(--panel-b); border-radius: 12px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 6px 14px; font-weight: 600; }
+.seg button.on { background: var(--gold); color: var(--ink); }
+
+body.lefty .tray { right: auto; left: calc(10px + var(--safe-l)); }
+body.lefty .hud-top { flex-direction: row-reverse; }
+body.lefty .hud-sub { left: auto; right: calc(10px + var(--safe-r)); }
+
+@media (orientation: landscape) {
+  .tray { flex-direction: column; bottom: 50%; transform: translateY(50%); right: calc(16px + var(--safe-r)); }
+  body.lefty .tray { left: calc(16px + var(--safe-l)); }
+  .map-card { width: min(640px, 100%); }
+  .map-grid { grid-template-columns: repeat(5, 1fr); }
+  .map-grid .tile { min-height: 96px; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .tray-btn { width: 46px; height: 46px; }
+  .map-grid { grid-template-columns: repeat(9, 1fr); }
+  .tile .nm { display: none; }
+}

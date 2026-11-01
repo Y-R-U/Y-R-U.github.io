@@ -78,3 +78,24 @@ visuals will drift from the colliders.
 - Windmill / bumper / pickup / teePad objects are placed with local X = right, Y = up,
   Z = back toward the tee (so the windmill rotor faces the incoming ball). The loop keeps the base
   contract: local +Z = travel direction at the entry, +X = the shift side (the player's left).
+
+## Engine extensions, M2 (engine agent, 2026-11-02)
+- **New skin `mover(opts)`** → Object3D. A block that slides across the fairway (the engine moves
+  it). opts = `{ width, height, depth }`; base centred at the origin, X across the fairway. Greybox
+  provides one; a theme may override (stone block with gold trim suits Sky Isles).
+- **`tube`** is now used: `opts.curve` is a centripetal `THREE.CatmullRomCurve3` through the tube
+  centre line in hole space (already placed — add the skin straight to the hole group), `opts.radius`
+  is the inner radius the ball rolls in (0.15). The ball must stay visible through it.
+- **Surface patches**: holes can re-tag floor cells as `sand`, `ice`, `boost` or `sticky`. The
+  engine draws them as decal meshes 3 mm above the grass using the theme's `sand` / `ice` / `boost`
+  materials (`sticky` uses `sand`). **Boost decal UVs:** `uv.x` = metres across the pad from the
+  pad's own centre line (0 = middle, ± half the pad width at its edges; pads are usually 0.4–0.6 m),
+  `uv.y` = metres along the push direction. Draw the chevron tip at u = 0 (sky uses repeat.x = 2,
+  offset.x = 0.5 on a 0..1 texture) and scroll along +v. Not 0..1 across.
+- **buildEnvironment info** gains:
+  - `voids: [[x, z][]]` — polygons (hole space, XZ) that must stay empty: no island ground, rock,
+    lamps or props. Hole 7's U-bend uses one so its plank shortcut reads as a drop into the sky.
+  - `viewDir: Vector3` — the camera's initial horizontal forward at the tee (unit). Backdrop set
+    pieces meant to be seen should sit roughly along it (hairpin holes otherwise hide them behind you).
+  - `branches: [[x, y, z][]]` — extra walkable tracks (e.g. that plank bridge), centre-line points.
+    They are not in `path`; don't put rock under them if they cross a void.

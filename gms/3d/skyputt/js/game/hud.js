@@ -9,8 +9,15 @@ export const ICONS = {
   eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   fullscreen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
   exitfs: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>',
+  sight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 4 8-9"/><path d="M15 7h5v5"/></svg>',
+  mull: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  coin: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#f2c75c" stroke="#b9862a" stroke-width="2"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4" stroke="#7a5512" stroke-width="1.6" fill="none"/></svg>',
   gem: '<svg viewBox="0 0 24 24"><path fill="#6fd6ff" d="M12 2l6 7-6 13L6 9z"/><path fill="#bff0ff" d="M12 2l-6 7h12z" opacity=".7"/></svg>',
 };
+
+export const starRow = (n, max = 3) => `<span class="stars">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? 'on' : ''}">★</i>`).join('')}</span>`;
 
 export function scoreName(strokes, par, picked) {
   if (picked) return 'Picked up';
@@ -32,6 +39,10 @@ export class Hud {
         <button id="h-pause" class="round" aria-label="Pause">${ICONS.pause}</button>
       </div>
       <div class="hud-sub"><div class="pill small" id="h-gems">${ICONS.gem}<b>0</b></div></div>
+      <div class="tray" id="h-tray">
+        <button id="h-sight" class="tray-btn" aria-label="Long Sight">${ICONS.sight}<span class="cnt">0</span><span class="lvl"></span></button>
+        <button id="h-mull" class="tray-btn" aria-label="Mulligan">${ICONS.mull}<span class="cnt">0</span></button>
+      </div>
       <div id="h-banner" class="banner"></div>
       <div id="h-hint" class="hint">Drag back anywhere to aim · release to putt</div>
       <div id="h-power" class="power" hidden><div class="power-track"><div class="power-fill"></div></div><div class="power-lbl"></div></div>
@@ -41,6 +52,7 @@ export class Hud {
       banner: $('#h-banner', root), hint: $('#h-hint', root), power: $('#h-power', root),
       fill: $('.power-fill', root), plbl: $('.power-lbl', root), card: $('#h-card', root),
       look: $('#h-look', root), pause: $('#h-pause', root),
+      sight: $('#h-sight', root), mull: $('#h-mull', root),
     };
     this._bt = 0;
   }
@@ -49,6 +61,15 @@ export class Hud {
   setStrokes(n, max) { this.el.strokes.textContent = n; this.el.strokes.classList.toggle('warn', n >= max - 1); }
   setGems(n) { this.el.gems.textContent = n; }
   setLook(on) { this.el.look.classList.toggle('on', on); this.el.look.setAttribute('aria-pressed', on); }
+  setHelpers({ longSight, mulligan, sight, canSight, canMull }) {
+    const S = this.el.sight, M = this.el.mull;
+    S.querySelector('.cnt').textContent = longSight;
+    M.querySelector('.cnt').textContent = mulligan;
+    S.querySelector('.lvl').textContent = sight ? '×' + sight : '';
+    S.classList.toggle('on', sight > 0);
+    S.disabled = !canSight || (longSight <= 0 && !sight) || sight >= 3;
+    M.disabled = !canMull || mulligan <= 0;
+  }
   hint(on, text) { if (text) this.el.hint.textContent = text; this.el.hint.classList.toggle('show', on); }
   power(aim) {
     const p = this.el.power;
@@ -68,28 +89,36 @@ export class Hud {
   hideCard() { this.el.card.hidden = true; this.el.card.innerHTML = ''; }
   _card(html) { const c = this.el.card; c.innerHTML = `<div class="card">${html}</div>`; c.hidden = false; return c; }
 
-  holeDone({ hole, n, name, par, strokes, picked, gems, last }, onNext) {
+  holeDone({ hole, n, name, par, strokes, picked, gems, stars = 0, coins = 0, newBest, reward, nextLabel, onMap }, onNext) {
     const label = scoreName(strokes, par, picked);
     const d = strokes - par;
     const cls = strokes === 1 ? 'ace' : d < 0 ? 'under' : d === 0 ? 'par' : 'over';
+    const rw = { longSight: 'Long Sight', mulligan: 'Mulligan' }[reward];
     const c = this._card(`
       <div class="card-kicker">Hole ${hole} of ${n} · ${esc(name)}</div>
       <div class="card-title ${cls}">${esc(label)}</div>
-      <div class="card-stats"><div><span>Strokes</span><b>${strokes}</b></div><div><span>Par</span><b>${par}</b></div><div><span>Crystals</span><b>${gems}</b></div></div>
-      <button class="btn primary" data-a="next">${last ? 'Scorecard' : 'Next hole'}</button>`);
+      <div class="card-stars">${starRow(stars)}</div>
+      <div class="card-stats"><div><span>Strokes</span><b>${strokes}</b></div><div><span>Par</span><b>${par}</b></div><div><span>Coins</span><b>+${coins}</b></div></div>
+      ${newBest ? '<div class="card-note good">New best!</div>' : ''}
+      ${rw ? `<div class="card-note good">3 stars: +1 ${rw}</div>` : ''}
+      <button class="btn primary" data-a="next">${esc(nextLabel || 'Next hole')}</button>
+      ${onMap ? '<button class="btn ghost" data-a="map">Course map</button>' : ''}`);
     c.querySelector('[data-a=next]').onclick = () => { this.hideCard(); onNext(); };
+    const m = c.querySelector('[data-a=map]'); if (m) m.onclick = () => { this.hideCard(); onMap(); };
   }
-  pause({ onResume, onRestart, onQuit, fsButton }) {
+  pause({ onResume, onRestart, onQuit, onSettings, fsButton }) {
     const c = this._card(`
       <div class="card-title">Paused</div>
       <button class="btn primary" data-a="resume">Resume</button>
       <button class="btn" data-a="restart">Restart hole</button>
+      ${onSettings ? '<button class="btn" data-a="settings">Settings</button>' : ''}
       ${fsButton ? '<button class="btn" data-a="fs">Fullscreen</button>' : ''}
       <button class="btn ghost" data-a="quit">Quit to title</button>`);
     c.querySelector('[data-a=resume]').onclick = () => { this.hideCard(); onResume(); };
     c.querySelector('[data-a=restart]').onclick = () => { this.hideCard(); onRestart(); };
     c.querySelector('[data-a=quit]').onclick = () => { this.hideCard(); onQuit(); };
     const fs = c.querySelector('[data-a=fs]'); if (fs) fs.onclick = fsButton;
+    const st = c.querySelector('[data-a=settings]'); if (st) st.onclick = () => { this.hideCard(); onSettings(); };
   }
   scorecard({ course, rows, gems }, { onAgain, onTitle }) {
     const tp = rows.reduce((a, r) => a + r.par, 0), ts = rows.reduce((a, r) => a + r.strokes, 0);

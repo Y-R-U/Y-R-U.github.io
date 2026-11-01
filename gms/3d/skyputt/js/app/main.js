@@ -1,6 +1,7 @@
 // SKYPUTT app shell: renderer, theme loading (?theme=), title screen with hole select, the round,
 // fullscreen, resize / orientation, and the frame loop.
-//   URL params: ?theme=<id> (default sky, else greybox) · ?hole=<n> start a hole directly · ?q=low
+//   URL params: ?theme=<id> (default sky, else greybox) · ?hole=<n> start a hole directly · ?q=low|high
+//   ?fresh (reset saved progress) · ?noflyover
 import * as THREE from 'three';
 import { COURSES } from '../course/holes/index.js';
 import { buildHole } from '../course/builder.js';
@@ -8,10 +9,35 @@ import { buildHoleView } from '../game/holeview.js';
 import { CameraRig } from '../game/camera.js';
 import { Hud, ICONS } from '../game/hud.js';
 import { Round } from '../game/play.js';
+import { sfx } from '../game/sfxbus.js';
+import { Store } from './store.js';
+import { renderTitle, showMap, openSettings } from './menus.js';
+import { createAudio } from '../audio/index.js';
 
 const $ = s => document.querySelector(s);
 const params = new URLSearchParams(location.search);
-const quality = params.get('q') === 'low' ? 'low' : 'high';
+const store = new Store();
+if (params.has('fresh')) store.reset();
+const quality = params.get('q') === 'low' || params.get('q') === 'high' ? params.get('q') : (store.settings().quality === 'low' ? 'low' : 'high');
+document.body.dataset.quality = quality;
+
+// Audio (js/audio, owned by the sound agent). Everything goes through the sfx bus.
+let audio = null;
+try { audio = createAudio({ sfx: store.settings().sfx, music: store.settings().music }); } catch (e) { console.warn('[skyputt] audio unavailable', e); }
+sfx.on((name, p) => {
+  if (!audio) return;
+  if (name === 'roll') audio.roll(p.speed, p.surface);
+  else if (name === 'stopRoll') audio.stopRoll();
+  else audio.play(name, p);
+});
+const unlock = () => { try { audio?.unlock(); } catch { /* */ } };
+addEventListener('pointerdown', unlock, true);
+addEventListener('keydown', unlock, true);
+function applySettings(st) {
+  try { audio?.setVolume({ sfx: st.sfx, music: st.music }); } catch { /* */ }
+  document.body.classList.toggle('lefty', !!st.lefty);
+}
+applySettings(store.settings());
 
 async function loadTheme(id, renderer) {
   const ctx = { THREE, renderer, quality };
@@ -44,7 +70,9 @@ async function boot() {
 
   const { theme, fallback, id: themeId } = await loadTheme(params.get('theme') || 'sky', renderer);
   const course = COURSES.sky;
-  const app = { renderer, scene, camera, rig, theme, fallback, quality, hud, canvas, themeId, fullscreen: null };
+  const app = { renderer, scene, camera, rig, theme, fallback, quality, hud, canvas, themeId, fullscreen: null, store, audio };
+  app.openSettings = onClose => openSettings(store, { apply: applySettings, onClose, click: () => sfx.emit('click') });
+  audio?.music.start(course.theme || 'sky');
 
   // ---- resize / orientation (D13): live, portrait and landscape
   function resize() {
@@ -65,28 +93,39 @@ async function boot() {
   let titleView = null, round = null;
   function showTitle() {
     round = null;
-    const hole = buildHole(course.holes[0]);
-    titleView = buildHoleView(scene, hole, theme, fallback, { renderer, camera, quality });
-    const c = titleView.info.bounds.getCenter(new THREE.Vector3()), s = titleView.info.bounds.getSize(new THREE.Vector3());
-    rig.mode = 'orbit'; rig.orbitT = 0.6;
-    rig.orbitCenter = { x: c.x, y: c.y, z: c.z, r: Math.max(s.x, s.z) * 0.85 + 2 };
+    if (!titleView) {
+      const hole = buildHole(course.holes[0]);
+      titleView = buildHoleView(scene, hole, theme, fallback, { renderer, camera, quality });
+      const c = titleView.info.bounds.getCenter(new THREE.Vector3()), sz = titleView.info.bounds.getSize(new THREE.Vector3());
+      rig.mode = 'orbit'; rig.orbitT = 0.6;
+      rig.orbitCenter = { x: c.x, y: c.y, z: c.z, r: Math.max(sz.x, sz.z) * 0.85 + 2 };
+    }
+    renderTitle(store, course);
     $('#title').hidden = false;
   }
-  function startRound(i) {
+  function showCourseMap() {
     $('#title').hidden = true;
+    showMap(store, course, {
+      onHole: i => startRound(i, 'single'), onFront: () => startRound(0, 'round'), onBack: showTitle,
+      click: () => sfx.emit('click'),
+    });
+  }
+  function startRound(i, mode = 'round') {
+    $('#title').hidden = true; $('#map').hidden = true;
     titleView?.dispose(); titleView = null;
-    round = new Round(app, course, i, { onExit: showTitle });
+    round = new Round(app, course, i, { mode, onExit: () => { if (mode === 'single') { showTitle(); showCourseMap(); } else showTitle(); } });
+    if (params.has('noflyover')) round.endFlyover();
     window.__skyputt.round = round;
   }
-  const holesEl = $('#t-holes');
-  holesEl.innerHTML = course.holes.map((h, i) => `<button data-i="${i}" aria-label="Hole ${i + 1}: ${h.name}"><b>${i + 1}</b><small>Par ${h.par}</small></button>`).join('');
-  holesEl.onclick = e => { const b = e.target.closest('button'); if (b) startRound(+b.dataset.i); };
-  $('#t-play').onclick = () => startRound(0);
+  $('#t-play').onclick = () => { sfx.emit('click'); startRound(0, 'round'); };
+  $('#t-map').onclick = () => { sfx.emit('click'); showCourseMap(); };
+  $('#t-settings').innerHTML = ICONS.gear;
+  $('#t-settings').onclick = () => { sfx.emit('click'); app.openSettings(() => {}); };
 
-  window.__skyputt = { app, THREE, course, startRound, get round() { return round; }, set round(r) { round = r; }, themeId };
+  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, get round() { return round; }, set round(r) { round = r; }, themeId };
 
   const startHole = parseInt(params.get('hole'), 10);
-  if (startHole >= 1 && startHole <= course.holes.length) startRound(startHole - 1); else showTitle();
+  if (startHole >= 1 && startHole <= course.holes.length) startRound(startHole - 1, 'single'); else showTitle();
 
   // ---- frame loop
   let last = performance.now(), t = 0, fpsN = 0, fpsT = 0;

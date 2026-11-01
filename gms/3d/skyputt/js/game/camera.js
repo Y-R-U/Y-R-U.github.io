@@ -38,9 +38,9 @@ export class CameraRig {
     this.focus.lerp(ball, rolling ? 1 - Math.exp(-dt * 9) : k);
     if (!frozen) this.yaw += wrap(this.goalYaw - this.yaw) * (1 - Math.exp(-dt * (rolling ? 1.6 : 3)));
     const yaw = this.yaw + this.lookYaw;
-    // D13: landscape (desktop) frames wider — a little higher and further back, looking further ahead
+    // D13: landscape (desktop) frames wider — further back, a touch flatter so the backdrop isn't cropped
     const land = this.camera.aspect > 1.05;
-    const pitch = Math.min(1.35, Math.max(0.2, this.pitch + (land ? 0.08 : 0) + this.lookPitch));
+    const pitch = Math.min(1.35, Math.max(0.2, this.pitch + (land ? -0.05 : 0) + this.lookPitch));
     const d = this.dist * this.zoom * (land ? 1.3 : 1);
     const fx = Math.sin(yaw), fz = -Math.cos(yaw);
     // look a little ahead of the ball so it sits in the lower part of the portrait frame
@@ -51,5 +51,37 @@ export class CameraRig {
     this.camera.lookAt(this.target);
   }
 }
+
+const _ray = new THREE.Raycaster(), _dir = new THREE.Vector3(), _from = new THREE.Vector3();
+
+// Keep the ball visible: if scenery sits between the ball and the camera, pull the camera in
+// along that line (eased both ways). `occluders` is a list of Object3Ds (from the hole view).
+CameraRig.prototype.avoidOcclusion = function (ball, dt) {
+  if (!this.occluders || this.mode !== 'follow') return;
+  const cam = this.camera;
+  _from.set(ball.x, ball.y + 0.04, ball.z);
+  _dir.copy(cam.position).sub(_from);
+  const full = _dir.length();
+  if (full < 1e-3) return;
+  _dir.multiplyScalar(1 / full);
+  this._occN = (this._occN || 0) + 1;
+  if (this._occN % 2 === 0 || this._occHit === undefined) {   // ray every other frame
+    _ray.set(_from, _dir); _ray.near = 0.12; _ray.far = full; _ray.camera = cam;
+    let hit = full;
+    for (const h of _ray.intersectObjects(this.occluders, true)) {
+      const m = h.object.material;
+      const o = h.object;
+      if (!o.visible || o.isSprite || o.isPoints || o.isLine || (m && (m.transparent || m.depthWrite === false)) || o.userData.noOcclude) continue;
+      hit = h.distance; break;
+    }
+    this._occHit = hit;
+  }
+  const want = this._occHit < full ? Math.max(0.35, this._occHit - 0.12) : full;
+  this._occD = this._occD === undefined ? full : this._occD;
+  // pull in fast, ease back out slowly
+  this._occD += (want - this._occD) * (1 - Math.exp(-dt * (want < this._occD ? 14 : 2.5)));
+  if (this._occD < full - 1e-3) cam.position.copy(_from).addScaledVector(_dir, this._occD);
+  else this._occD = full;
+};
 
 export { wrap };
