@@ -21,9 +21,15 @@ export function getProgress() {
   let v = null;
   try { v = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { v = null; }
   cache = { ...blank(), ...(v && typeof v === 'object' ? v : {}) };
-  if (!cache.s || typeof cache.s !== 'object') cache.s = {};
-  if (!cache.a || typeof cache.a !== 'object') cache.a = {};
-  if (!Array.isArray(cache.h)) cache.h = [];
+  // clientfix: synced key — right types per field, drop invalid entries (never throws / NaN)
+  const fin = x => x !== null && x !== '' && Number.isFinite(+x);
+  const nums = o => { const out = {}; if (o && typeof o === 'object' && !Array.isArray(o)) for (const [k, x] of Object.entries(o)) if (fin(x)) out[k] = +x; return out; };
+  cache.s = nums(cache.s); cache.a = nums(cache.a);
+  cache.h = Array.isArray(cache.h) ? cache.h.filter(fin).map(Number) : [];
+  cache.r = fin(cache.r) ? +cache.r : RATING_START;
+  cache.n = fin(cache.n) ? Math.max(0, Math.round(+cache.n)) : 0;
+  cache.pk = fin(cache.pk) ? +cache.pk : cache.r;
+  if (typeof cache.last !== 'string') cache.last = null;
   return cache;
 }
 function save() {

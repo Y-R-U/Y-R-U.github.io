@@ -126,7 +126,16 @@ export async function createBoard(container, opts = {}) {
   document.addEventListener('visibilitychange', onVisibility);
   // Phones drop the WebGL context of a backgrounded tab; three.js restores it, but a board that
   // only renders on change (Plain 2D, no ambient) would stay black until something moved.
-  const onRestored = () => { shadowDirty = true; wake(); };
+  // clientfix: the PMREM env map is a render target, so its texels die with the context; re-bake it
+  // (CPU-sourced textures re-upload by themselves, shadow maps redraw via shadowDirty).
+  let envSrc = null;
+  function bakeEnv() {
+    if (!envSrc) return;
+    if (envTex) envTex.dispose();
+    envTex = pmrem.fromScene(envSrc, 0.04).texture;
+    scene.environment = envTex;
+  }
+  const onRestored = () => { try { bakeEnv(); } catch (e) { console.error('[board] env re-bake failed', e); } shadowDirty = true; wake(); };
   canvas.addEventListener('webglcontextrestored', onRestored);
   window.addEventListener('pageshow', onVisibility);
   function frame(now) {
@@ -231,9 +240,8 @@ export async function createBoard(container, opts = {}) {
       sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3;
       sun.target.position.set(0, 0, 0); if (!sun.target.parent) scene.add(sun.target);
     }
-    if (envTex) envTex.dispose();
-    envTex = pmrem.fromScene(env?.envScene || (env?.roomEnvironment ? new RoomEnvironment() : kit.studioEnvironment()), 0.04).texture;
-    scene.environment = envTex;
+    envSrc = env?.envScene || (env?.roomEnvironment ? new RoomEnvironment() : kit.studioEnvironment());
+    bakeEnv();
     scene.environmentIntensity = env?.envIntensity ?? 1;
     scene.background = env?.background ?? null;
     scene.fog = env?.fog ?? null;
@@ -888,6 +896,16 @@ export async function createBoard(container, opts = {}) {
       if (animCount || !k || k.type !== 'k') return null;
       const checkers = attackersOf(chk, k.color);
       return checkers.length ? { king: chk, color: k.color, checkers, double: checkers.length > 1 } : null;
+    },
+    /** clientfix: en-passant target implied by the highlighted last move (a pawn double push), else '-'.
+     *  checkalert needs it: a check whose only answer is exd6 e.p. is not mate. */
+    epSquare() {
+      const m = hl.lastMove; if (!m || !isSq(m.from) || !isSq(m.to) || m.from[0] !== m.to[0]) return '-';
+      const p = recs.get(m.to), r1 = m.from[1], r2 = m.to[1];
+      if (!p || p.type !== 'p') return '-';
+      if (p.color === 'w' && r1 === '2' && r2 === '4') return m.to[0] + '3';
+      if (p.color === 'b' && r1 === '7' && r2 === '5') return m.to[0] + '6';
+      return '-';
     },
     /** checkalert: FEN placement field of the board's current position. */
     placement() {

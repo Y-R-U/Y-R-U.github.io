@@ -25,7 +25,8 @@ function ensureCss() {
 
 function parseSub(sub) {
   const m = String(sub || '').match(/^p\/(.+)$/);
-  return m ? { play: decodeURIComponent(m[1]) } : {};
+  if (!m) return {};
+  try { return { play: decodeURIComponent(m[1]) }; } catch { return { play: m[1] }; }   // clientfix: malformed %-escape -> not found
 }
 
 export function mount(container, ctx = {}) {

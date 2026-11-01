@@ -1,6 +1,6 @@
 // GAMBIT shell: boot, hash routing, top bar, fullscreen, wake lock, account glue.
 import { loadDeps, deps, usingReal } from './deps.js';
-import { $, h, icon, closeAllOverlays, toast } from './ui.js';
+import { $, h, icon, closeAllOverlays, toast, whenHistorySettled } from './ui.js';
 import { getSettings } from './store.js';
 import { unlockAudio } from './sound.js';
 import * as home from './screens/home.js';
@@ -20,7 +20,7 @@ export const app = {
   cloud: null,          // { matchFinished, checkpoint } once the account layer loads
   deps,
   usingReal,
-  go(hash) { if (location.hash === hash) render(); else location.hash = hash; },
+  go(hash) { whenHistorySettled(() => { if (location.hash === hash) render(); else location.hash = hash; }); },   // clientfix: after an overlay's history pop
   canPester() { return app.route !== 'game' || !game.isActive(); },
   /** The screen we came from in this tab (null at the first screen / after a deep link). */
   prevHash() { return nav.i > 0 ? nav.stack[nav.i - 1] || null : null; },
@@ -124,7 +124,16 @@ function render() {
   forgetSettingsSheet();
   closeAllOverlays();
   const view = $('#view');
-  const res = match.mod.render(app, match.params) || {};
+  // clientfix: a screen that throws (e.g. bad synced data) must not leave the boot overlay up or the
+  // old screen half-torn-down — log it and fall back to home (or a plain message if home itself fails).
+  let res;
+  try { res = match.mod.render(app, match.params) || {}; }
+  catch (e) {
+    console.error('[gambit] screen render failed', hash, e);
+    if (!/^#\/home\/?$/.test(hash)) { current = null; location.replace('#/home'); return; }   // hashchange renders home
+    res = { el: h('<section class="screen"><p class="fine">This screen could not load.</p></section>'), top: { logo: true } };
+  }
+  if (!res.el) res.el = document.createElement('section');
   app.route = res.route || match.mod.ROUTE || '';
   view.replaceChildren(res.el);
   view.scrollTop = 0;

@@ -6,7 +6,12 @@ const listeners = new Set();
 export function getProgress() {
   try {
     const v = JSON.parse(localStorage.getItem(KEY) || 'null');
-    if (v && typeof v === 'object' && v.l && typeof v.l === 'object') return { v: 1, last: null, ...v };
+    if (v && typeof v === 'object' && !Array.isArray(v)) {
+      // clientfix: synced key — keep valid lesson stars only, right types for the rest
+      const l = {};
+      if (v.l && typeof v.l === 'object' && !Array.isArray(v.l)) for (const [id, st] of Object.entries(v.l)) { const n = +st; if (st !== null && Number.isFinite(n)) l[id] = Math.min(3, Math.max(0, Math.round(n))); }
+      return { ...v, v: 1, l, last: typeof v.last === 'string' ? v.last : null };
+    }
   } catch { /* blocked / corrupt */ }
   return { v: 1, l: {}, last: null };
 }

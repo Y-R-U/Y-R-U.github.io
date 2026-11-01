@@ -65,7 +65,10 @@ export function attachCheckAlert(board, host) {
   function isMate(st) {
     try {
       const C = deps.chess?.Chess; if (!C) return false;
-      return !!new C(`${board.placement()} ${st.color} - - 0 1`).isCheckmate();
+      // clientfix: keep the en-passant square (from the board's last move) — it can be the only escape
+      const ep = (board.epSquare && board.epSquare()) || '-';
+      const epOk = ep === '-' || (st.color === 'w' ? ep[1] === '6' : ep[1] === '3');
+      return !!new C(`${board.placement()} ${st.color} - ${epOk ? ep : '-'} 0 1`).isCheckmate();
     } catch { return false; }
   }
 

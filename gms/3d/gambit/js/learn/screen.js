@@ -21,7 +21,8 @@ function ensureCss() {
 export function mount(container, ctx = {}) {
   ensureCss();
   const app = ctx.app || window.__gambit;
-  const id = decodeURIComponent(String(ctx.params?.rest || '').split('/')[0] || '');
+  const raw = String(ctx.params?.rest || '').split('/')[0] || '';
+  let id; try { id = decodeURIComponent(raw); } catch { id = raw; }   // clientfix: malformed %-escape -> "doesn't exist" 
   if (id) {
     container.classList.add('ln-screen');
     const r = mountPlayer(container, app, id, ctx);

@@ -17,6 +17,8 @@ export class GameClock {
   }
   // a move was made by `color`: bank its time and add the increment
   press(color) { if (this.unlimited) return; if (this.running === color) this.stop(); this.ms[color] += this.incMs; }
+  // clientfix: a takeback undoes `color`'s move: take back its increment too (never below 1 s from this)
+  unpress(color) { if (this.unlimited || !this.incMs) return; const m = this.ms[color]; this.ms[color] = Math.max(Math.min(m, 1000), m - this.incMs); }
   remaining(color) {
     if (this.running === color) return Math.max(0, this.ms[color] - (performance.now() - this.t0));
     return this.ms[color];

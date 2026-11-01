@@ -220,7 +220,8 @@ function finish(g) {
   renderAll();
   const o = O;
   // results-banner: the board stays visible; the translucent banner docks on its edge (Details = full sheet)
-  setTimeout(() => { if (O === o && view) { O.shownResults = true; showBanner({ celebrate: O.result.outcome === 'win' }); } }, g.reason === 'aborted' ? 0 : 700);
+  // clientfix: skip if Results was tapped first (showResults already made the banner / sheet)
+  setTimeout(() => { if (O === o && view) { O.shownResults = true; if (!banner && !(O.sheet && document.body.contains(O.sheet.el))) showBanner({ celebrate: O.result.outcome === 'win' }); } }, g.reason === 'aborted' ? 0 : 700);
 }
 const rawName = p => (p && p.name) || 'Player';
 function resultTitle() {

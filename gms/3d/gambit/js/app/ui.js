@@ -60,6 +60,55 @@ function dockToast(t) {
 
 // ---------- modal dialog ----------
 // confirmDialog({title, body, ok, cancel, danger}) -> Promise<boolean>
+// ---------- back button closes overlays (clientfix; generalised from settingsheet.js, ui-4) ----------
+// Each open sheet / dialog / promotion picker owns one history entry (same URL, so no hashchange
+// and no re-render). Android / browser back pops it and closes the overlay as a cancel; closing it
+// any other way pops the entry again so the next back press leaves the screen as before.
+// Entries are numbered by depth so a stacked dialog over a sheet unwinds one per back press.
+// Navigating while our own history.back() is still pending would be undone by it, so app.go()
+// and links inside an overlay wait for it (whenHistorySettled).
+const backStack = [];
+let skipPops = 0, afterPop = [], skipTimer = 0;
+function settle() { clearTimeout(skipTimer); skipPops = 0; const q = afterPop; afterPop = []; q.forEach(f => { try { f(); } catch (err) { console.error(err); } }); }
+function goBack(n) { skipPops++; clearTimeout(skipTimer); skipTimer = setTimeout(settle, 600); history.go(-n); }
+export function whenHistorySettled(fn) { if (skipPops) afterPop.push(fn); else fn(); }
+if (typeof window !== 'undefined') {
+  window.addEventListener('popstate', () => {
+    if (skipPops) { if (--skipPops === 0) settle(); return; }       // our own back from a non-back close
+    const depth = (history.state && history.state.gambitSheet) || 0;
+    while (backStack.length > depth) { const e = backStack.pop(); e.popped = true; try { e.close(); } catch (err) { console.warn(err); } }
+  });
+  // a #/ link inside an open overlay: drop the overlay entries first, then navigate (no dead back press)
+  document.addEventListener('click', e => {
+    if (!backStack.length || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    const a = e.target.closest && e.target.closest('a[href^="#"]');
+    const n = history.state && history.state.gambitSheet;
+    if (!a || !n) return;
+    e.preventDefault();
+    const href = a.getAttribute('href');
+    backStack.length = 0;        // the route change removes the overlays (closeAllOverlays)
+    goBack(n);
+    afterPop.push(() => { if (location.hash === href) window.dispatchEvent(new HashChangeEvent('hashchange')); else location.hash = href; });
+  });
+}
+/** Register an overlay's cancel/close fn with the back button. Returns release() for every other close. */
+export function backClosable(close) {
+  const e = { close, popped: false, pushed: false, hash: location.hash };
+  backStack.push(e);
+  // reopened while our own back is still pending (X then reopen in one task): push after it lands
+  whenHistorySettled(() => {
+    if (backStack.indexOf(e) < 0 || location.hash !== e.hash) return;
+    try { history.pushState({ ...(history.state || {}), gambitSheet: backStack.indexOf(e) + 1 }, '', location.href); e.pushed = true; } catch { /* ignore */ }
+  });
+  return () => {
+    const i = backStack.indexOf(e); if (i < 0) return;
+    backStack.splice(i, 1);
+    if (e.pushed && !e.popped && history.state && history.state.gambitSheet && location.hash === e.hash) goBack(1);
+  };
+}
+/** A route change removed the overlays: forget them without touching history. */
+export function forgetBackClosables() { backStack.length = 0; }
+
 export function confirmDialog({ title, body = '', ok = 'OK', cancel = 'Cancel', danger = false }) {
   return new Promise(resolve => {
     const m = h(`<div class="scrim dialog-scrim"><div class="dialog" role="dialog" aria-modal="true">
@@ -68,7 +117,9 @@ export function confirmDialog({ title, body = '', ok = 'OK', cancel = 'Cancel', 
         ${cancel ? `<button class="btn btn-ghost" data-v="0">${esc(cancel)}</button>` : ''}
         <button class="btn ${danger ? 'btn-danger' : 'btn-primary'}" data-v="1">${esc(ok)}</button>
       </div></div></div>`);
-    const done = v => { m.classList.remove('in'); setTimeout(() => m.remove(), 180); resolve(v); };
+    let settled = false;
+    const done = v => { if (settled) return; settled = true; release(); m.classList.remove('in'); setTimeout(() => m.remove(), 180); resolve(v); };
+    const release = backClosable(() => done(false));
     m.addEventListener('click', e => {
       const b = e.target.closest('[data-v]');
       if (b) done(b.dataset.v === '1');
@@ -82,15 +133,17 @@ export function confirmDialog({ title, body = '', ok = 'OK', cancel = 'Cancel', 
 
 // ---------- bottom sheet ----------
 // openSheet(html, {onClose, dismissable}) -> {el, close}
-export function openSheet(html, { onClose, dismissable = true, cls = '' } = {}) {
+export function openSheet(html, { onClose, dismissable = true, cls = '', back = true } = {}) {
   const m = h(`<div class="scrim sheet-scrim"><div class="sheet ${cls}" role="dialog" aria-modal="true">
     <div class="sheet-grip"></div>${html}</div></div>`);
   let closed = false;
   const close = () => {
     if (closed) return; closed = true;
+    release();
     m.classList.remove('in'); setTimeout(() => m.remove(), 240);
     onClose && onClose();
   };
+  const release = back ? backClosable(close) : () => {};
   if (dismissable) m.addEventListener('click', e => { if (e.target === m) close(); });
   m.addEventListener('click', e => { if (e.target.closest('[data-close]')) close(); });
   document.body.appendChild(m);
@@ -98,7 +151,7 @@ export function openSheet(html, { onClose, dismissable = true, cls = '' } = {}) 
   return { el: m.querySelector('.sheet'), close };
 }
 
-export function closeAllOverlays() { $$('.scrim').forEach(n => n.remove()); }
+export function closeAllOverlays() { forgetBackClosables(); $$('.scrim').forEach(n => n.remove()); }
 
 export function segmented(name, options, value) {
   return `<div class="seg" role="radiogroup" data-name="${name}">${options.map(o =>
@@ -141,7 +194,9 @@ export function promotionPicker(stage, { color = 'w', to = null, board = null } 
     }
     let pt = null;
     try { if (to && board && board.squareToScreen) pt = board.squareToScreen(to); } catch { pt = null; }
-    const done = v => { o.remove(); resolve(v); };
+    let settled = false;
+    const done = v => { if (settled) return; settled = true; release(); o.remove(); resolve(v); };
+    const release = backClosable(() => done(null));
     // The picker opens inside the board's pointerup. On touch the browser then synthesizes the
     // tap's click AT THE SAME POINT, which would land on this scrim and cancel at once (qa).
     // Only clicks whose pointerdown started inside the picker count.

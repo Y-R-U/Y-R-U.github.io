@@ -46,6 +46,16 @@ function write(key, value) {
 }
 function remove(key) { try { localStorage.removeItem(key); } catch { /* ignore */ } }
 
+// clientfix: these keys are cloud-synced and may be legacy/corrupt — normalise on read (types +
+// defaults per field) without rewriting storage; the next real save writes the cleaned shape.
+const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+const num = (v, d) => {
+  const n = typeof v === 'string' && v.trim() !== '' ? +v : v;
+  return typeof n === 'number' && Number.isFinite(n) ? n : d;
+};
+const cnt = (v, d = 0) => Math.max(0, Math.round(num(v, d)));
+const str = (v, d) => typeof v === 'string' ? v : d;
+
 // ---------- settings ----------
 export const DEFAULT_SETTINGS = {
   theme: 'classic',
@@ -63,9 +73,18 @@ export const DEFAULT_SETTINGS = {
 let settingsCache = null;
 export function getSettings() {
   if (!settingsCache) {
-    settingsCache = { ...DEFAULT_SETTINGS, ...read(KEYS.settings, {}) };
-    if (settingsCache.view === 'default') settingsCache.view = 'tilt';   // old saves
-    if (!['top', 'tilt', 'angle', 'free'].includes(settingsCache.view)) settingsCache.view = 'top';
+    const raw = read(KEYS.settings, {});
+    const c = settingsCache = { ...DEFAULT_SETTINGS, ...(isObj(raw) ? raw : {}) };
+    if (c.view === 'default') c.view = 'tilt';   // old saves
+    if (!['top', 'tilt', 'angle', 'free'].includes(c.view)) c.view = 'top';
+    // clientfix: right types per field (synced key — a bad value must not break a screen)
+    const D = DEFAULT_SETTINGS;
+    for (const k of ['sound', 'music', 'moveConfirm', 'coords', 'checkAlerts', 'ambientAnim']) if (typeof c[k] !== 'boolean') c[k] = D[k];
+    for (const k of ['volume', 'musicVolume']) c[k] = Math.min(1, Math.max(0, num(c[k], D[k])));
+    if (c.battleSpeed !== 'off') { const b = num(c.battleSpeed, NaN); c.battleSpeed = [1, 2, 5].includes(b) ? b : D.battleSpeed; }
+    if (typeof c.theme !== 'string' || !c.theme) c.theme = D.theme;
+    if (typeof c.lastTc !== 'string' || !(c.lastTc === 'unlimited' || /^\d+\+\d+$/.test(c.lastTc))) c.lastTc = D.lastTc;
+    if (!['w', 'b', 'random'].includes(c.lastColor)) c.lastColor = D.lastColor;
   }
   return settingsCache;
 }
@@ -81,16 +100,35 @@ export function onSettings(fn) { settingsListeners.add(fn); return () => setting
 
 // ---------- ladder / stats ----------
 export function getLadder() {
-  return { points: 0, elo: 800, games: 0, seed: 0, createdAt: 0, ...read(KEYS.ladder, {}) };
+  const v = read(KEYS.ladder, {});
+  const o = isObj(v) ? v : {};
+  return { ...o, points: cnt(o.points), elo: num(o.elo, 800), games: cnt(o.games), seed: num(o.seed, 0), createdAt: num(o.createdAt, 0) };
 }
 export function setLadder(v) { const { savedAt, ...rest } = v; write(KEYS.ladder, rest); }
 
+const RESULTS = ['win', 'draw', 'loss'];
 export function getStats() {
-  return { games: 0, w: 0, d: 0, l: 0, perBot: {}, bestWin: null, recent: [], ...read(KEYS.stats, {}) };
+  const v = read(KEYS.stats, {});
+  const o = isObj(v) ? v : {};
+  const perBot = {};
+  if (isObj(o.perBot)) for (const [id, r] of Object.entries(o.perBot)) if (isObj(r)) perBot[id] = { ...r, w: cnt(r.w), d: cnt(r.d), l: cnt(r.l) };
+  const bw = o.bestWin;
+  const bestWin = isObj(bw) && Number.isFinite(num(bw.elo, NaN)) ? { ...bw, name: str(bw.name, str(bw.botId, '?')), elo: num(bw.elo, 0) } : null;
+  const recent = (Array.isArray(o.recent) ? o.recent : []).filter(g => isObj(g) && RESULTS.includes(g.result))
+    .map(g => ({ ...g, name: str(g.name, str(g.botId, '?')), elo: num(g.elo, 0), pts: num(g.pts, 0), tc: str(g.tc, 'unlimited'), at: num(g.at, 0) }));
+  return { ...o, games: cnt(o.games), w: cnt(o.w), d: cnt(o.d), l: cnt(o.l), perBot, bestWin, recent };
 }
 export function setStats(v) { const { savedAt, ...rest } = v; write(KEYS.stats, rest); }
 
 // ---------- resume (local only) ----------
-export function getResume() { return read(KEYS.resume, null); }
+export function getResume() {
+  const r = read(KEYS.resume, null);
+  if (!isObj(r) || typeof r.botId !== 'string') return null;
+  // clientfix: shape check (local key, but a stale/foreign value must not throw on resume)
+  return { ...r, moves: Array.isArray(r.moves) ? r.moves.filter(m => typeof m === 'string') : [],
+    tc: typeof r.tc === 'string' && (r.tc === 'unlimited' || /^\d+\+\d+$/.test(r.tc)) ? r.tc : 'unlimited',
+    color: r.color === 'b' ? 'b' : 'w',
+    clocks: isObj(r.clocks) && Number.isFinite(r.clocks.w) && Number.isFinite(r.clocks.b) ? r.clocks : null };
+}
 export function setResume(v) { const { savedAt, ...rest } = v; write(KEYS.resume, rest); }
 export function clearResume() { remove(KEYS.resume); }

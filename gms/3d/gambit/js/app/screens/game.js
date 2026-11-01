@@ -316,7 +316,8 @@ function finish(result, reason) {
   if (app.cloud && reason !== 'abort') app.cloud.matchFinished();
   renderAll();
   // results-banner: the board stays visible; a translucent banner docks on its edge (Details = full sheet)
-  setTimeout(() => { if (G === g && view) showBanner({ celebrate: outcome === 'win' }); }, reason === 'abort' ? 0 : 650);
+  // clientfix: skip if Results was tapped first (showResults already made the banner / sheet)
+  setTimeout(() => { if (G === g && view && !banner && !resSheet) showBanner({ celebrate: outcome === 'win' }); }, reason === 'abort' ? 0 : 650);
 }
 
 // "Checkmate · You win" / "You lost on time" / "Draw by repetition" …
@@ -464,8 +465,9 @@ async function undo() {
   try { G.botImpl && G.botImpl.stop(); } catch { /* ignore */ }
   G.clock.stop();
   // undo back to the player's turn
-  G.chess.undo();
-  if (G.chess.turn() !== G.color && G.chess.history().length) G.chess.undo();
+  // clientfix: each undone ply also takes back the increment its mover banked (after undo, turn() = mover)
+  if (G.chess.undo()) G.clock.unpress(G.chess.turn());
+  if (G.chess.turn() !== G.color && G.chess.history().length && G.chess.undo()) G.clock.unpress(G.chess.turn());
   if (G.chess.turn() !== G.color) { /* player is black and only bot's first move remained */ }
   G.animating = false;
   syncBoard();
