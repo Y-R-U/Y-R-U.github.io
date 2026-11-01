@@ -108,7 +108,8 @@ async function playMoves(W, Bk, moves, { from = 0 } = {}) {
     await P.waitFor(`window.__gambitOnlineTest().srvPlies >= ${n}`, 15000, `${P.name} server ply ${n}`);
   }
 }
-async function waitOver(P) { await P.waitFor('window.__gambitOnlineTest().over && document.querySelector(".results")', 15000, `${P.name} results`); return (await P.T()).result; }
+// results-banner: game end shows the translucent banner on the board edge (no sheet over the board)
+async function waitOver(P) { await P.waitFor('window.__gambitOnlineTest().over && document.querySelector(".rb-card")', 15000, `${P.name} results banner`); return (await P.T()).result; }
 const closeSheets = P => P.eval(`document.querySelectorAll('.scrim').forEach(s => s.remove()); true`);
 
 // ---------------------------------------------------------------- scenarios
@@ -144,9 +145,15 @@ async function quick(A, B) {
   const rw = await waitOver(W), rb = await waitOver(Bk);
   check(rw.result === '0-1' && rw.reason === 'checkmate' && rw.outcome === 'loss' && rb.outcome === 'win', `Fool's mate: ${rw.result} ${rw.reason}`);
   check(!!(rb.ratings && rb.ratings[(await Bk.T()).you]), 'rated result carries rating change');
-  await sleep(800);
+  await sleep(1800);
+  check(await Bk.eval('!document.querySelector(".scrim") && window.__gambitOnlineTest().banner.state === "banner"'), 'end: banner up, no sheet over the board');
   await Bk.shot('results_win_' + Bk.tag);
   await W.shot('results_loss_' + W.tag);
+  await Bk.click('.rb [data-act=results]'); await Bk.waitFor('document.querySelector(".sheet .results")', 4000, 'details sheet');
+  check(/rating/i.test(await Bk.eval('document.querySelector(".sheet .results").textContent')), 'Details opens the full results (rating)');
+  await Bk.shot('results_win_expanded_' + Bk.tag);
+  await Bk.click('.sheet .res-hide'); await sleep(400);
+  check(await Bk.eval('!document.querySelector(".scrim") && window.__gambitOnlineTest().banner.state === "banner"'), 'Show board closes the sheet back to the banner');
   await closeSheets(W); await closeSheets(Bk);
 }
 
@@ -181,9 +188,10 @@ async function friend(A, B) {
   await Bk.shot('results_draw_' + Bk.tag);
   // rematch: A offers from the results sheet, B accepts
   const gid = (await W.T()).id;
-  await A.click('.results [data-act=rematch]');
-  await B.waitFor('/Accept rematch/.test(document.querySelector(".results [data-act=rematch]")?.textContent || "")', 8000, 'B sees Accept rematch');
-  await B.click('.results [data-act=rematch]');
+  await A.click('.rb [data-act=rematch]');
+  await B.waitFor('/Accept rematch/.test(document.querySelector(".rb [data-act=rematch]")?.getAttribute("aria-label") || "")', 8000, 'B sees Accept rematch');
+  await B.shot('rematch_offer_' + B.tag);
+  await B.click('.rb [data-act=rematch]');
   await A.waitFor(`window.__gambitOnlineTest() && window.__gambitOnlineTest().id !== ${JSON.stringify(gid)} && window.__gambitOnlineTest().ready`, 10000, 'A in rematch');
   const [W2, B2] = await bothInGame(A, B);
   check(W2 === Bk, 'rematch swapped colours');

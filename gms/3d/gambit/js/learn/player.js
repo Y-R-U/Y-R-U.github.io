@@ -499,6 +499,9 @@ function finishLesson() {
     burst.appendChild(sp);
   }
   stage.appendChild(o);
+  // results-banner: after the moment, the card docks to a translucent strip on the board's bottom edge
+  // so the finished position stays visible (it used to dim and cover the whole board)
+  setTimeout(() => { if (S === s && s.finished && o.isConnected) o.classList.add('docked'); }, 1800);
   sfx('solved');
   s.next = next;
   const panel = view.querySelector('.ln-panel'); if (panel) panel.innerHTML = `<div class="ln-panel-in"><div class="ln-panel-main"><div class="ln-acts"><button class="btn btn-ghost ln-next" data-act="replay">${icon('rematch')}<span>Replay lesson</span></button></div></div></div>`;

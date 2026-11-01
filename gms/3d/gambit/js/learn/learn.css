@@ -172,6 +172,21 @@
 .ln-done-btns .btn { flex: 1; min-height: 48px; gap: 6px; border-radius: 12px; font-weight: 800; }
 .ln-done-btns .btn-primary { flex: 1.5; }
 .ln-done-next { display: block; margin-top: 10px; color: var(--faint); font-size: 12px; }
+/* results-banner: docked lesson-complete strip (board stays visible) */
+.ln-done { transition: background .35s; }
+.ln-done.docked { background: transparent; pointer-events: none; align-items: end; padding: 6px; }
+.ln-done.docked .ln-burst, .ln-done.docked .ln-done-card > p, .ln-done.docked .ln-done-next { display: none; }
+.ln-done.docked .ln-done-card { pointer-events: auto; width: min(100%, 520px); display: grid; grid-template-columns: 1fr auto; column-gap: 8px; align-items: center; text-align: left;
+  padding: 5px 5px 5px 10px; border-radius: 14px; background: linear-gradient(180deg, rgba(18, 22, 32, .66), rgba(10, 12, 18, .6)); border: 1.5px solid rgba(227, 183, 96, .85);
+  -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px); box-shadow: 0 6px 22px rgba(0, 0, 0, .42); animation: lnDock .35s ease-out; }
+@keyframes lnDock { from { opacity: 0; transform: translateY(14px); } }
+.ln-done.docked .ln-done-card > small { display: none; }
+.ln-done.docked .ln-done-card > b { grid-column: 1; grid-row: 2; font-size: 15px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ln-done.docked .ln-done-stars { grid-column: 1; grid-row: 1; margin: 0; gap: 1px; justify-content: flex-start; }
+.ln-done.docked .ln-done-stars svg { width: 16px; height: 16px; animation: none; }
+.ln-done.docked .ln-done-btns { grid-column: 2; grid-row: 1 / 3; gap: 4px; }
+.ln-done.docked .ln-done-btns .btn { flex: none; min-height: 44px; padding: 0 9px; font-size: 13px; }
+.ln-done.docked .ln-done-btns .btn-ghost .ic { display: none; }
 
 @media (orientation: landscape) and (min-width: 600px) {
   .screen.ln-play { display: grid; grid-template-columns: minmax(0, 1fr) clamp(300px, 32vw, 430px); grid-template-rows: auto auto minmax(0, 1fr); gap: 0 16px; padding: 14px; }

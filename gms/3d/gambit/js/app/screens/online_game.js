@@ -18,6 +18,7 @@ import { acquire } from '../boardhost.js';
 import { syncViewButton } from '../views.js';
 import { createReview, reviewNavHtml, movesHtml } from '../review.js';
 import { CHEAT_WARNING } from '../net.js';
+import { showResultBanner, resHideBtn } from '../resultbanner.js';
 import { net, tcLabel, tcFull, ratingTxt, playerAvatar, handleError, nameOf, catName } from './online_common.js';
 
 const GLYPH = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
@@ -36,6 +37,7 @@ let app = null;
 let O = null;                 // the shown game {id, g, chess, you, over, ...}
 let lease = null, board = null;
 let view = null;
+let banner = null;            // results-banner: translucent result strip on the board edge (resultbanner.js)
 const review = createReview({
   chess: () => O && O.chess, board: () => board,
   onExit: () => { syncBoard(); setInteractive(); },
@@ -107,6 +109,7 @@ function syncFrom(g, { animate = true } = {}) {
   if (review.on) review.exit();
   if (prefix && local.length < srv.length) {
     for (const u of srv.slice(local.length)) { const v = O.chess.move(u); if (!v) { hardReset(g); break; } if (board) board.applyMove(v, battleOpts(v)); }
+    highlightLast();
   } else if (!prefix || local.length !== srv.length) {
     const rolledBack = local.length > srv.length;
     hardReset(g, animate);
@@ -154,6 +157,7 @@ function commitUserMove(m, sendAs = null) {
   O.inflight = uci;
   sfx(v);
   if (board) board.applyMove(v, battleOpts(v)).catch(() => {});
+  highlightLast();   // results-banner: check / mate red king + link (the board draws it once the move lands)
   renderAll(); setInteractive();
   net.move(o.id, uci).then(() => {
     if (O !== o) return;
@@ -190,6 +194,7 @@ function onNetMove(ev) {
   if (review.on) review.exit({ beforeLast: true });   // opponent moved: back to live, then animate it
   sfx(v);
   if (board) board.applyMove(v, battleOpts(v)).catch(() => {});
+  highlightLast();
   if (O.drawOfferBanner) O.drawOfferBanner = false;
   renderAll(); setInteractive();
   if (navigator.vibrate && navigator.userActivation?.hasBeenActive && document.visibilityState === 'visible') { try { navigator.vibrate(15); } catch { /* ignore */ } }
@@ -214,11 +219,55 @@ function finish(g) {
   net.myRatings().catch(() => {});
   renderAll();
   const o = O;
-  setTimeout(() => { if (O === o && view) showResults(); }, g.reason === 'aborted' ? 0 : 700);
+  // results-banner: the board stays visible; the translucent banner docks on its edge (Details = full sheet)
+  setTimeout(() => { if (O === o && view) { O.shownResults = true; showBanner({ celebrate: O.result.outcome === 'win' }); } }, g.reason === 'aborted' ? 0 : 700);
 }
+const rawName = p => (p && p.name) || 'Player';
+function resultTitle() {
+  const { outcome, reason } = O.result, opp = rawName(side(otherC(O.you)));
+  if (outcome === 'aborted') return 'Game aborted';
+  if (outcome === 'draw') return ({ stalemate: 'Draw · Stalemate', repetition: 'Draw by repetition', fifty: 'Draw · 50-move rule',
+    material: 'Draw · Insufficient material', agreement: 'Draw agreed', timeout: 'Draw · Time out vs bare king' })[reason] || 'Draw';
+  const win = outcome === 'win';
+  if (reason === 'checkmate') return win ? 'Checkmate · You win' : `Checkmate · ${opp} wins`;
+  if (reason === 'timeout') return win ? `${opp} lost on time · You win` : 'You lost on time';
+  if (reason === 'resign') return win ? `${opp} resigned · You win` : 'You resigned';
+  if (reason === 'abandoned') return win ? `${opp} left · You win` : 'You left the game';
+  return win ? 'You win' : `${opp} wins`;
+}
+function resultSub() {
+  const { outcome, ratings } = O.result, g = O.g;
+  const rc = ratings && ratings[O.you];
+  if (outcome === 'aborted') return 'Doesn’t count against your daily games';
+  if (!rc) return g.rated ? 'Rated' : 'Casual game · ratings unchanged';
+  const prov = net.ratings && net.ratings[g.cat] && net.ratings[g.cat].prov;
+  return `${esc(catName(g.cat))} ${rc.after}${prov ? '?' : ''} <span class="${rc.delta >= 0 ? 'good' : 'bad'}">${rc.delta >= 0 ? '+' : ''}${rc.delta}</span>`;
+}
+function bannerActions() {
+  if (O.result.outcome === 'aborted') return [{ act: 'newopp', label: 'New game', icon: 'globe', primary: true }];
+  const r = (O.g && O.g.rematch) || {};
+  if (O.rematchGone) return [{ act: 'newopp', label: 'New game', icon: 'globe', primary: true }];
+  if (r.them && !r.you) return [{ act: 'rematch', label: 'Accept', aria: 'Accept rematch', icon: 'rematch', primary: true, pulse: true }];
+  if (r.you) return [{ act: 'rematch', label: 'Sent…', aria: 'Rematch sent', icon: 'rematch', disabled: true }];
+  return [{ act: 'rematch', label: 'Rematch', icon: 'rematch', primary: true }];
+}
+function showBanner({ celebrate = false } = {}) {
+  if (!O || !O.result || !view) return;
+  const stage = view.querySelector('.board-square'); if (!stage) return;
+  banner?.dispose();
+  const k = O.result.outcome === 'aborted' ? 'abort' : O.result.outcome;
+  banner = showResultBanner(stage, {
+    board, celebrate, kind: k, title: resultTitle(), sub: resultSub(), actions: bannerActions(),
+    short: k === 'abort' ? 'Aborted' : k === 'win' ? 'You win' : k === 'loss' ? 'You lost' : 'Draw',
+  });
+}
+function refreshBanner() { if (banner && O && O.result) banner.update({ title: resultTitle(), sub: resultSub(), actions: bannerActions() }); }
 function showResults() {
   if (!O || !O.result) return;
   O.shownResults = true;
+  if (O.sheet && document.body.contains(O.sheet.el)) { O.sheet.close(); return; }   // Results / Details again = back to the board
+  if (!banner) showBanner();
+  banner && banner.setState('expanded');
   const { outcome, reason, ratings } = O.result;
   const g = O.g, me = side(O.you), them = side(otherC(O.you));
   const title = outcome === 'aborted' ? 'Game aborted' : outcome === 'win' ? 'You won!' : outcome === 'loss' ? `${nameOf(them)} won` : 'Draw';
@@ -226,6 +275,7 @@ function showResults() {
   const rc = ratings && ratings[O.you];
   const prov = net.ratings && net.ratings[g.cat] && net.ratings[g.cat].prov;
   const sh = openSheet(`<div class="results ${outcome === 'aborted' ? 'draw' : outcome}">
+    ${resHideBtn()}
     <div class="res-head"><div class="res-badge">${outcome === 'win' ? icon('trophy') : outcome === 'loss' ? icon('flag') : outcome === 'aborted' ? icon('x') : icon('handshake')}</div>
       <h2>${title}</h2><p>${esc(why)}</p></div>
     <div class="res-vs">
@@ -241,9 +291,9 @@ function showResults() {
       : `<p class="res-next">${outcome === 'aborted' ? 'Aborted games don’t count against your daily games.' : g.rated ? '' : 'Casual game: ratings unchanged.'}</p>`}
     <div class="res-btns">${outcome === 'aborted' ? '' : rematchBtn()}
       <button class="btn btn-ghost" data-act="newopp">${icon('globe')} New game</button></div>
-    <div class="res-links"><button class="link" data-close>View board</button><a class="link" href="#/online">Online</a><a class="link" href="#/home">Home</a></div>
+    <div class="res-links"><a class="link" href="#/online">Online</a><a class="link" href="#/home">Home</a></div>
     <p class="ol-res-warn">${esc(CHEAT_WARNING)}</p>
-  </div>`);
+  </div>`, { onClose: () => { if (O && O.sheet === sh) O.sheet = null; if (banner && banner.state === 'expanded') banner.setState('banner'); } });
   O.sheet = sh;
   sh.el.addEventListener('click', e => {
     const a = e.target.closest('[data-act]'); if (!a) return;
@@ -268,7 +318,7 @@ async function doRematch(btn) {
 function refreshRematch() {
   if (!O) return;
   O.sheet?.el.querySelectorAll('[data-act="rematch"], .res-btns > button:disabled').forEach(b => { b.outerHTML = rematchBtn(); });
-  renderActions();
+  renderActions(); refreshBanner();
 }
 function newOpponent() { app.go(`#/online/seek/${O.g.tc.id}`); }
 
@@ -293,7 +343,7 @@ async function drawBtn() {
 async function acceptDraw() { try { await net.acceptDraw(O.id); } catch (e) { handleError(e); } }
 async function declineDraw() { try { await net.declineDraw(O.id); O.g.drawOffer = ''; renderBanner(); renderActions(); } catch (e) { handleError(e); } }
 async function claim(kind) { try { await net.claim(O.id, kind); } catch (e) { handleError(e); } }
-function flip() { if (!O) return; O.flipped = !O.flipped; board && board.setOrientation(O.flipped ? otherC(O.you) : O.you); renderBars(); }
+function flip() { if (!O) return; O.flipped = !O.flipped; board && board.setOrientation(O.flipped ? otherC(O.you) : O.you); renderBars(); if (banner) setTimeout(() => banner && banner.place(), 60); }
 function cycleSpeed() {
   const s = onlineSpeed();
   const next = SPEEDS[(SPEEDS.findIndex(x => String(x) === String(s)) + 1) % SPEEDS.length];
@@ -414,7 +464,9 @@ function renderActions() {
       <button class="act wide primary" data-act="results">${icon('trophy')}<span>Results</span></button>
       ${O.result && O.result.outcome !== 'aborted' ? `<button class="act wide${r.them && !r.you ? ' primary ol-pulse' : ''}" data-act="rematch"${r.you || O.rematchGone ? ' disabled' : ''}>${icon('rematch')}<span>${r.them && !r.you ? 'Accept rematch' : r.you ? 'Rematch sent' : 'Rematch'}</span></button>` : ''}
       <button class="act wide" data-act="newopp">${icon('globe')}<span>New game</span></button>
-      <button class="act" data-act="flip">${icon('flip')}<span>Flip</span></button>`;
+      <button class="act" data-act="flip">${icon('flip')}<span>Flip</span></button>
+      <button class="act" data-act="camera" title="Cycle view (V)">${icon('camera')}<span class="lbl">${viewLabel(s.view)}</span></button>`;
+    syncViewBtn();
     return;
   }
   const n = (O.g.moves || []).length, abort = n < 2;
@@ -543,7 +595,7 @@ export function mountGame(root, ctx, id) {
     highlightLast();
     board.resize && board.resize();
     setInteractive();
-    if (O.over && !O.shownResults) showResults();
+    if (O.over && O.result) { O.shownResults = true; showBanner(); }
   }).catch(e => {
     console.error('[gambit] board failed', e);
     const l = el.querySelector('.board-loading'); if (l) l.textContent = 'The board could not load. Try reloading.';
@@ -568,7 +620,7 @@ export function mountGame(root, ctx, id) {
     net.on('rematch', ev => {
       if (!O || ev.gameId !== O.id) return;
       if (ev.action === 'decline' && !ev.mine) { O.rematchGone = true; toast('Rematch declined', { ms: 1800 }); }
-      if (ev.action === 'offer' && !ev.mine) { toast(`${nameOf(side(otherC(O.you)))} wants a rematch!`, { ms: 2200 }); if (!O.sheet || !document.body.contains(O.sheet.el)) showResults(); }
+      if (ev.action === 'offer' && !ev.mine) { toast(`${nameOf(side(otherC(O.you)))} wants a rematch!`, { ms: 2200 }); if (!O.sheet || !document.body.contains(O.sheet.el)) { if (!banner) showBanner(); else if (banner.state === 'pill') banner.setState('banner'); } }
       refreshRematch();
     }),
     net.on('state', () => { renderBanner(); setInteractive(); }),
@@ -587,6 +639,7 @@ export function mountGame(root, ctx, id) {
       wake(false);
       app.openSettingsHere = null;
       unbindReview();
+      banner?.dispose(); banner = null;
       clearTimeout(O && O.capT);
       if (lease) lease.release();
       lease = null; board = null;
@@ -601,6 +654,7 @@ export function mountGame(root, ctx, id) {
 // ---------- test hook (tools/online_cdp.mjs) ----------
 window.__gambitOnlineTest = () => O && {
   ready: !!board && !!view, id: O.id, you: O.you, myTurn: myTurn(), over: O.over, plies: O.chess.history().length,
+  banner: banner ? { state: banner.state, edge: banner.edge } : null, sheet: !!(O.sheet && document.body.contains(O.sheet.el)),
   srvPlies: (O.g.moves || []).length, result: O.result, fen: O.chess.fen(), drawOffer: O.g.drawOffer, opponentGone: O.g.opponentGone || null,
   clock: net.clock(O.id), boardAnimating: board && board.isAnimating && board.isAnimating(),
   play(uci) { const m = { from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] }; return onMoveAttempt(m); },

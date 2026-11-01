@@ -102,8 +102,9 @@ async function shots(c) {
     await waitFor(c, `window.__gambitTest().myTurn`, 20000);
     await shot(c, `${tag}-game-mid`);
     await click(c, '[data-act="resign"]'); await sleep(300); await shot(c, `${tag}-resign-dialog`);
-    await click(c, '.dialog [data-v="1"]'); await sleep(1200); await shot(c, `${tag}-results`);
-    await click(c, '.sheet [data-close]'); await sleep(400); await shot(c, `${tag}-game-over`);
+    await click(c, '.dialog [data-v="1"]'); await sleep(1200); await shot(c, `${tag}-game-over`);   // results-banner: banner on the board edge
+    await click(c, '.rb [data-act="results"]'); await sleep(500); await shot(c, `${tag}-results`);   // Details -> full sheet
+    await click(c, '.sheet [data-close]'); await sleep(400);
     await hash(c, '#/ladder'); await sleep(300); await shot(c, `${tag}-ladder`);
     await hash(c, '#/ladder/stats'); await shot(c, `${tag}-stats`);
     await hash(c, '#/settings'); await shot(c, `${tag}-settings`);

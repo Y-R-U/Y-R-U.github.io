@@ -15,6 +15,7 @@ import { installedThemes } from '../themes-meta.js';
 import { acquire } from '../boardhost.js';
 import { syncViewButton } from '../views.js';
 import { createReview, reviewNavHtml, movesHtml } from '../review.js';
+import { showResultBanner, resHideBtn } from '../resultbanner.js';
 
 export const ROUTE = 'game';
 const GLYPH = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
@@ -39,6 +40,8 @@ const review = createReview({
   onChange: () => setInteractive(),
 });
 let ticker = null;
+let banner = null;          // results-banner: the translucent result strip over the board edge (resultbanner.js)
+let resSheet = null;        // the expanded results sheet, when open
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const lanHistory = g => g.chess.history({ verbose: true }).map(m => m.lan || (m.from + m.to + (m.promotion || '')));
@@ -312,7 +315,41 @@ function finish(result, reason) {
   play(outcome === 'win' ? 'win' : outcome === 'loss' ? 'lose' : 'draw');
   if (app.cloud && reason !== 'abort') app.cloud.matchFinished();
   renderAll();
-  setTimeout(() => { if (G === g && view) showResults(); }, reason === 'abort' ? 0 : 650);
+  // results-banner: the board stays visible; a translucent banner docks on its edge (Details = full sheet)
+  setTimeout(() => { if (G === g && view) showBanner({ celebrate: outcome === 'win' }); }, reason === 'abort' ? 0 : 650);
+}
+
+// "Checkmate · You win" / "You lost on time" / "Draw by repetition" …
+function resultTitle(g) {
+  const { outcome, reason } = g.result, bot = g.bot.name;
+  if (reason === 'abort') return 'Game aborted';
+  if (outcome === 'draw') return ({ stalemate: 'Draw · Stalemate', repetition: 'Draw by repetition', fifty: 'Draw · 50-move rule',
+    material: 'Draw · Insufficient material', agreement: 'Draw agreed', 'timeout-material': 'Draw · Time out vs bare king' })[reason] || 'Draw';
+  const win = outcome === 'win';
+  if (reason === 'checkmate') return win ? 'Checkmate · You win' : `Checkmate · ${bot} wins`;
+  if (reason === 'timeout') return win ? `${bot} lost on time · You win` : 'You lost on time';
+  if (reason === 'resign') return win ? `${bot} resigned · You win` : 'You resigned';
+  return win ? 'You win' : `${bot} wins`;
+}
+function resultSub(g) {
+  const r = g.record;
+  if (!r) return 'Doesn’t count: no ladder points';
+  const rank = r.rankAfter < r.rankBefore ? ` · Rank #${r.rankAfter} <span class="good">▲${r.rankBefore - r.rankAfter}</span>` : ` · Rank #${r.rankAfter}`;
+  return `<span class="good">+${fmtInt(r.pts)}</span> ladder pts${g.assisted ? ' (halved)' : ''}${rank}`;
+}
+function showBanner({ celebrate = false } = {}) {
+  const g = G; if (!g || !g.result || !view) return;
+  const stage = view.querySelector('.board-square'); if (!stage) return;
+  banner?.dispose();
+  const { outcome, reason } = g.result;
+  banner = showResultBanner(stage, {
+    board, celebrate, kind: reason === 'abort' ? 'abort' : outcome,
+    title: resultTitle(g), sub: resultSub(g),
+    short: reason === 'abort' ? 'Aborted' : outcome === 'win' ? 'You win' : outcome === 'loss' ? 'You lost' : 'Draw',
+    actions: [reason === 'abort'
+      ? { act: 'newbot', label: 'New bot', icon: 'robot', primary: true }
+      : { act: 'rematch', label: 'Rematch', icon: 'rematch', primary: true }],
+  });
 }
 
 function showResults() {
@@ -320,7 +357,11 @@ function showResults() {
   const { outcome, reason } = g.result;
   const r = g.record;
   const title = reason === 'abort' ? 'Game aborted' : outcome === 'win' ? 'You won!' : outcome === 'loss' ? `${esc(g.bot.name)} won` : 'Draw';
+  if (resSheet) { resSheet.close(); return; }   // Results / Details again = toggle back to the board
+  if (!banner) showBanner();
+  banner && banner.setState('expanded');
   const sheet = openSheet(`<div class="results ${outcome}">
+    ${resHideBtn()}
     <div class="res-head">
       <div class="res-badge">${outcome === 'win' ? icon('trophy') : outcome === 'loss' ? icon('flag') : icon('handshake')}</div>
       <h2>${title}</h2><p>${REASON[reason] || ''}</p>
@@ -341,8 +382,9 @@ function showResults() {
       <button class="btn btn-primary" data-act="rematch">${icon('rematch')} Rematch</button>
       <button class="btn btn-ghost" data-act="newbot">${icon('robot')} New bot</button>
     </div>
-    <div class="res-links"><button class="link" data-close>View board</button><a class="link" href="#/ladder">Ladder</a><a class="link" href="#/home">Home</a></div>
-  </div>`, {});
+    <div class="res-links"><a class="link" href="#/ladder">Ladder</a><a class="link" href="#/play/bot">Bots</a><a class="link" href="#/home">Home</a></div>
+  </div>`, { onClose: () => { if (resSheet === sheet) resSheet = null; if (banner && banner.state === 'expanded') banner.setState('banner'); } });
+  resSheet = sheet;
   sheet.el.addEventListener('click', e => {
     const a = e.target.closest('[data-act]'); if (!a) return;
     sheet.close();
@@ -458,6 +500,7 @@ function flip() {
   G.flipped = !G.flipped;
   board && board.setOrientation(G.flipped ? G.botColor : G.color);
   renderBars();
+  if (banner) setTimeout(() => banner && banner.place(), 60);
 }
 
 function cycleSpeed() {
@@ -592,7 +635,9 @@ function renderActions() {
       <button class="act wide primary" data-act="results">${icon('trophy')}<span>Results</span></button>
       <button class="act wide" data-act="rematch">${icon('rematch')}<span>Rematch</span></button>
       <button class="act wide" data-act="newbot">${icon('robot')}<span>New bot</span></button>
-      <button class="act" data-act="flip">${icon('flip')}<span>Flip</span></button>`;
+      <button class="act" data-act="flip">${icon('flip')}<span>Flip</span></button>
+      <button class="act" data-act="camera" title="Cycle view (V)">${icon('camera')}<span class="lbl">${viewLabel(s.view)}</span></button>`;
+    syncViewBtn();
     return;
   }
   const abort = G.chess.history().length < 2;
@@ -690,6 +735,8 @@ export function render(appRef) {
       document.removeEventListener('visibilitychange', onVis);
       window.removeEventListener('pagehide', onHide);
       unbindReview();
+      banner?.dispose(); banner = null;
+      if (resSheet) { const sh = resSheet; resSheet = null; sh.close(); }
       if (lease) lease.release();
       lease = null; board = null;
       view = null;
@@ -705,8 +752,11 @@ window.__gambitTest = () => G && {
   myTurn: !G.over && !G.animating && !G.thinking && !G.pending && !review.on && G.chess.turn() === G.color,
   reviewing: review.on,
   over: G.over, plies: G.chess.history().length, result: G.result || null,
+  banner: banner ? { state: banner.state, edge: banner.edge, celebrating: banner.celebrating } : null, sheet: !!resSheet,
+  finish: (result, reason) => finish(result, reason),   // results-banner tests: end the game now
   chess: G.chess, fen: G.chess.fen(), assisted: G.assisted,
   state: { animating: G.animating, thinking: G.thinking, pending: !!G.pending, boardAnimating: board && board.isAnimating && board.isAnimating(), turn: G.chess.turn(), color: G.color },
+  play(uci) { return onMoveAttempt({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] }); },
   // goes through the same entry point the board uses
   playAny() {
     const ms = G.chess.moves({ verbose: true });
