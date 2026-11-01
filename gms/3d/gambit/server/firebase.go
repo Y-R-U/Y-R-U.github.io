@@ -90,7 +90,20 @@ func signingKeys(force bool) (map[string]*rsa.PublicKey, error) {
 	}
 	keys, maxAge, err := fetchCerts()
 	if err != nil {
-		if old, _ := cachedKeys(false); old != nil && force {
+		// Stale-while-error: Google unreachable keeps the old certs (they rotate over days,
+		// so yesterday's set still verifies today's tokens) and retries in a minute instead
+		// of failing every login.
+		certCache.Lock()
+		old := certCache.keys
+		if old != nil {
+			certCache.expires = time.Now().Add(forcedRefetchEvery)
+			if force {
+				certCache.lastForced = time.Now()
+			}
+		}
+		certCache.Unlock()
+		if old != nil {
+			log.Printf("certs: fetch failed, using the cached set: %v", err)
 			return old, nil
 		}
 		return nil, err
@@ -152,8 +165,9 @@ type fbIdentity struct {
 	Name          string
 	Email         string
 	EmailVerified bool
-	Anon          bool // Firebase anonymous user (every visitor has one)
-	Dev           bool // GAMBIT_DEV_AUTH token, local testing only
+	Anon          bool  // Firebase anonymous user (every visitor has one)
+	Dev           bool  // GAMBIT_DEV_AUTH token, local testing only
+	Exp           int64 // token expiry, unix seconds (0 = dev token, never)
 }
 
 // verifyToken accepts a Firebase ID token (anonymous users included, unlike Clued) or,
@@ -258,5 +272,5 @@ func verifyFirebaseToken(tok string) (fbIdentity, error) {
 		return none, errors.New("no sign-in provider")
 	}
 	return fbIdentity{UID: c.Sub, Name: c.Name, Email: strings.ToLower(c.Email), EmailVerified: c.Verified,
-		Anon: c.Firebase.Provider == "anonymous"}, nil
+		Anon: c.Firebase.Provider == "anonymous", Exp: c.Exp}, nil
 }

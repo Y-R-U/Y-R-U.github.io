@@ -30,6 +30,10 @@ type User struct {
 	Anon, Admin, Dev bool
 	IP               string
 	Tok              string // latest verified Firebase token (signed-in, for payments)
+	TokExp           int64  // Tok's expiry, unix seconds
+	tokBad           bool   // payments refused Tok (401/403): needs a fresh one
+	owed             []owedSpend
+	askedAuth        int64 // last authNeeded push (ms)
 	sess             map[*Sess]bool
 	goneAt           int64
 	allow            Allow // payments mode cache
@@ -39,6 +43,10 @@ type User struct {
 	rooms            map[string]*Room
 	games            map[string]*Game
 }
+
+// owedSpend is a counted game whose payments spend could not be sent with a valid token
+// yet; it is reserved like a pending game and sent when the client re-auths.
+type owedSpend struct{ ID, Game string }
 
 type Seek struct {
 	U      *User
@@ -56,6 +64,7 @@ type Room struct {
 	Rated   bool
 	Color   string // w | b | random (the host's colour)
 	Host    *User
+	IP      string // creator's IP (per-IP public room cap)
 	Rating  int
 	Prov    bool
 	Created int64
@@ -68,7 +77,13 @@ const (
 	roomHostGrace       = 60 * time.Second
 	roomTTL             = 30 * time.Minute
 	unlimitedRoomTTL    = 3 * 24 * time.Hour
+	unlimitedHostGrace  = 24 * time.Hour // an Unlimited room survives its host being away this long
+	tokMarginSec        = 120            // a token this close to expiry is refreshed before a gate
+	authAskEvery        = 60_000         // ms between authNeeded pushes
 )
+
+// maxPublicRoomsPerIP caps open public rooms per creator IP (a var for tests).
+var maxPublicRoomsPerIP = 3
 
 var hub = newHub()
 
@@ -161,7 +176,7 @@ func (h *Hub) allowView(u *User) Allow {
 		// Spends in flight are reserved like pending games, so the cache (which does not
 		// include them yet) can never let a last game be started twice.
 		a.Tier, a.PerDay, a.Used = u.allow.Tier, u.allow.PerDay, u.allow.Used
-		a.Pending += u.spending
+		a.Pending += u.spending + len(u.owed)
 		a.Remaining = max(0, u.allow.Remaining-a.Pending)
 		a.ResetsAt = u.allow.ResetsAt
 		return a
@@ -189,18 +204,92 @@ func (h *Hub) canStart(u *User) string {
 // game the spend just used (the "last game twice" race).
 func (h *Hub) refreshAllowance(u *User) {
 	h.mu.Lock()
-	need := cfg.AllowanceMode == "on" && !u.Anon && !u.Admin && !u.Dev && u.Tok != "" && nowMs()-u.allow.Fetched > 10_000 && u.spending == 0
+	need := u.usesPayments() && !u.tokStale() && nowMs()-u.allow.Fetched > 10_000 && u.spending == 0
 	tok, gen := u.Tok, u.allowGen
 	h.mu.Unlock()
 	if !need {
 		return
 	}
-	if a, ok := fetchAllowance(tok); ok {
-		h.mu.Lock()
+	a, res := fetchAllowance(tok)
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	switch res {
+	case fetchOK:
 		if u.allowGen == gen && u.spending == 0 {
 			u.allow = a
 		}
-		h.mu.Unlock()
+	case fetchStale:
+		if u.Tok == tok {
+			u.tokBad = true // the gate now answers stale_token; net.js refreshes and retries
+		}
+	}
+}
+
+// usesPayments: is u's allowance kept by br8t-payments (signed in, deploy mode)?
+func (u *User) usesPayments() bool {
+	return cfg.AllowanceMode == "on" && !u.Anon && !u.Admin && !u.Dev
+}
+
+// tokStale: u's payments bearer is expired, about to expire, or was refused by payments.
+// Such a user may not start games (stale_token) and their spends wait as owed.
+func (u *User) tokStale() bool {
+	if !u.usesPayments() {
+		return false
+	}
+	return u.tokBad || u.Tok == "" || nowFn().Unix() > u.TokExp-tokMarginSec
+}
+
+// askAuth tells u's clients to refresh their Firebase token now (throttled, lock held).
+func (h *Hub) askAuth(u *User) {
+	if now := nowMs(); now-u.askedAuth >= authAskEvery {
+		u.askedAuth = now
+		h.pushUser(u, ev("authNeeded"))
+	}
+}
+
+// spend sends one payments spend for u (lock held). Without a usable token it is kept as
+// owed (reserved, sent on the next auth); a 401/403 answer puts it back to owed.
+func (h *Hub) spend(u *User, o owedSpend) {
+	if u.tokStale() {
+		u.owed = append(u.owed, o)
+		h.askAuth(u)
+		return
+	}
+	tok := u.Tok
+	u.spending++ // reserved until payments answers (allowView subtracts it)
+	u.allowGen++
+	go func() {
+		res, a := spendAllowance(tok, o.ID)
+		h.mu.Lock()
+		defer h.mu.Unlock()
+		u.spending--
+		switch {
+		case res == spendStale:
+			if u.Tok == tok {
+				u.tokBad = true
+			}
+			h.spend(u, o) // owed now, or straight away if a fresh token arrived meanwhile
+			return
+		case a != nil:
+			u.allow = *a
+			u.allow.Fetched = nowMs()
+		case res == spendOK && !u.allow.Unlimited && u.allow.Remaining > 0:
+			u.allow.Used++
+			u.allow.Remaining--
+		}
+		if res == spendDenied {
+			log.Printf("allowance: %s had no games left at count time (game %s goes on)", u.PID, o.Game)
+		}
+		h.pushUser(u, ev("allowance", "allowance", h.allowView(u)))
+	}()
+}
+
+// flushOwed resends owed spends after a fresh token arrived (lock held).
+func (h *Hub) flushOwed(u *User) {
+	owed := u.owed
+	u.owed = nil
+	for _, o := range owed {
+		h.spend(u, o)
 	}
 }
 
@@ -220,28 +309,8 @@ func (h *Hub) countGame(g *Game) {
 			if !isFakePass(u.UID) {
 				recordLocal("S:"+u.UID, g.ID, u.IP)
 			}
-		case cfg.AllowanceMode == "on" && u.Tok != "" && !u.Dev:
-			tok, id := u.Tok, payUUID("gambit", g.ID, u.UID)
-			u.spending++ // reserved until payments answers (allowView subtracts it)
-			u.allowGen++
-			go func() {
-				res, a := spendAllowance(tok, id)
-				h.mu.Lock()
-				defer h.mu.Unlock()
-				u.spending--
-				switch {
-				case a != nil:
-					u.allow = *a
-					u.allow.Fetched = nowMs()
-				case res == spendOK && !u.allow.Unlimited && u.allow.Remaining > 0:
-					u.allow.Used++
-					u.allow.Remaining--
-				}
-				if res == spendDenied {
-					log.Printf("allowance: %s had no games left at count time (game %s goes on)", u.PID, g.ID)
-				}
-				h.pushUser(u, ev("allowance", "allowance", h.allowView(u)))
-			}()
+		case u.usesPayments():
+			h.spend(u, owedSpend{ID: payUUID("gambit", g.ID, u.UID), Game: g.ID})
 			continue
 		}
 		h.pushUser(u, ev("allowance", "allowance", h.allowView(u)))
@@ -429,6 +498,9 @@ func (h *Hub) lobbyView() map[string]any {
 	}
 	sort.Slice(list, func(i, j int) bool { return list[i].Created > list[j].Created })
 	for _, r := range list {
+		if len(r.Host.sess) == 0 {
+			continue // host offline: still joinable by code, not advertised
+		}
 		rooms = append(rooms, r.view())
 	}
 	seeking := map[string]int{}
@@ -579,12 +651,12 @@ func (h *Hub) tick() {
 		}
 	}
 	for _, r := range h.rooms {
-		ttl := roomTTL
+		ttl, grace := roomTTL, roomHostGrace
 		if r.TC.Unlimited() {
-			ttl = unlimitedRoomTTL
+			ttl, grace = unlimitedRoomTTL, unlimitedHostGrace
 		}
 		switch {
-		case r.Host.goneAt > 0 && now-r.Host.goneAt > roomHostGrace.Milliseconds() && !r.TC.Unlimited():
+		case r.Host.goneAt > 0 && now-r.Host.goneAt > grace.Milliseconds():
 			h.closeRoom(r, "host_left")
 		case now-r.Created > ttl.Milliseconds():
 			h.closeRoom(r, "expired")
@@ -592,7 +664,7 @@ func (h *Hub) tick() {
 	}
 	h.match()
 	for uid, u := range h.users {
-		if len(u.sess) == 0 && len(u.games) == 0 && len(u.rooms) == 0 && u.seek == nil && now-u.goneAt > 10*60_000 {
+		if len(u.sess) == 0 && len(u.games) == 0 && len(u.rooms) == 0 && u.seek == nil && len(u.owed) == 0 && u.spending == 0 && now-u.goneAt > 10*60_000 {
 			delete(h.users, uid)
 		}
 	}

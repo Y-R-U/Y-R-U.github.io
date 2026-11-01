@@ -277,11 +277,8 @@ func (h *Hub) attach(s *Sess, id fbIdentity, m inMsg, tok string) {
 	defer h.mu.Unlock()
 	u := h.user(id.UID)
 	u.Name = displayName(m.Name, id.Name, u.PID)
-	u.Anon, u.Dev, u.IP = id.Anon, id.Dev, s.ip
-	u.Admin = !id.Dev && !id.Anon && id.EmailVerified && cfg.Admins[id.Email]
-	if !id.Anon && !id.Dev {
-		u.Tok = tok
-	}
+	u.IP = s.ip
+	h.applyIdentity(u, id, tok)
 	upsertPlayer(u.UID, u.Name, u.Anon)
 	s.u = u
 	back := len(u.sess) == 0 && u.goneAt > 0
@@ -308,10 +305,28 @@ func (h *Hub) attach(s *Sess, id fbIdentity, m inMsg, tok string) {
 		seek = map[string]any{"tc": u.seek.TC.ID, "rated": u.seek.Rated, "at": u.seek.At}
 	}
 	s.push(map[string]any{"t": "welcome", "id": m.ID, "now": now, "v": protocolVersion,
-		"you":     map[string]any{"pid": u.PID, "name": u.Name, "anon": u.Anon, "admin": u.Admin, "dev": u.Dev},
+		"you":     h.youView(u),
 		"ratings": loadRatings(u.UID), "games": games, "rooms": rooms, "seek": seek,
 		"allowance": h.allowView(u), "tcs": tcList(), "paused": paused()})
 	h.dirty = true
+}
+
+// applyIdentity copies a verified token's identity onto u (lock held). Used by hello and
+// by auth, so linking an anonymous account in the open tab (same uid) upgrades the session.
+func (h *Hub) applyIdentity(u *User, id fbIdentity, tok string) {
+	wasAnon := u.Anon
+	u.Anon, u.Dev = id.Anon, id.Dev
+	u.Admin = !id.Dev && !id.Anon && id.EmailVerified && cfg.Admins[id.Email]
+	if !id.Anon && !id.Dev {
+		u.Tok, u.TokExp, u.tokBad = tok, id.Exp, false
+	}
+	if wasAnon && !u.Anon {
+		u.allow = Allow{} // fetched from payments at the next gate
+	}
+}
+
+func (h *Hub) youView(u *User) map[string]any {
+	return map[string]any{"pid": u.PID, "name": u.Name, "anon": u.Anon, "admin": u.Admin, "dev": u.Dev}
 }
 
 func (h *Hub) detach(s *Sess) {
@@ -374,6 +389,7 @@ var errText = map[string]string{
 	"bad_name":        "that name is not allowed",
 	"bad_request":     "bad request",
 	"not_now":         "not possible right now",
+	"stale_token":     "your sign-in needs refreshing, try again in a moment",
 }
 
 func (s *Sess) failCode(id int64, code string, kv ...any) { s.fail(id, code, errText[code], kv...) }
@@ -397,12 +413,45 @@ func (h *Hub) dispatch(s *Sess, m inMsg) {
 			return
 		}
 		h.mu.Lock()
-		if !id.Anon && !id.Dev {
-			u.Tok = m.Token
+		before := h.youView(u)
+		h.applyIdentity(u, id, m.Token)
+		after := h.youView(u)
+		if before["anon"] != after["anon"] || before["admin"] != after["admin"] {
+			upsertPlayer(u.UID, u.Name, u.Anon) // leaderboard eligibility follows the account
+			h.pushUser(u, ev("identity", "you", after, "allowance", h.allowView(u)))
 		}
+		h.flushOwed(u)
 		h.mu.Unlock()
 		s.reply(m.ID)
 		return
+	case "ratings":
+		s.reply(m.ID, "ratings", loadRatings(u.UID)) // DB only: never under the hub lock
+		return
+	case "leaderboard":
+		cat := m.Cat
+		if !validCat(cat) {
+			cat = "blitz"
+		}
+		s.reply(m.ID, "cat", cat, "rows", leaderboard(cat, clampLimit(m.Limit)))
+		return
+	case "rename":
+		n, err := cleanName(m.Name)
+		if err != nil {
+			s.failCode(m.ID, "bad_name")
+			return
+		}
+		h.mu.Lock()
+		u.Name = n
+		anon := u.Anon
+		h.mu.Unlock()
+		upsertPlayer(u.UID, n, anon)
+		s.reply(m.ID, "name", n)
+		return
+	case "peekRoom":
+		if !hit("join", u.UID) || !hit("joinip", s.ip) {
+			s.failCode(m.ID, "rate_limited")
+			return
+		}
 	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -415,23 +464,6 @@ func (h *Hub) dispatch(s *Sess, m inMsg) {
 		s.reply(m.ID, "lobby", h.lobbyView())
 	case "allowance":
 		s.reply(m.ID, "allowance", h.allowView(u))
-	case "ratings":
-		s.reply(m.ID, "ratings", loadRatings(u.UID))
-	case "leaderboard":
-		cat := m.Cat
-		if !validCat(cat) {
-			cat = "blitz"
-		}
-		s.reply(m.ID, "cat", cat, "rows", leaderboard(cat, clampLimit(m.Limit)))
-	case "rename":
-		n, err := cleanName(m.Name)
-		if err != nil {
-			s.failCode(m.ID, "bad_name")
-			return
-		}
-		u.Name = n
-		upsertPlayer(u.UID, n, u.Anon)
-		s.reply(m.ID, "name", n)
 	case "seek":
 		h.doSeek(s, m)
 	case "unseek":
@@ -498,6 +530,14 @@ func (h *Hub) gate(s *Sess, id int64, tc TimeControl) bool {
 		s.failCode(id, c)
 		return false
 	}
+	// The acting player needs a payments bearer that is still good (fresh token or the
+	// owed-spend path would let an expired one play on a cached count forever). Passive
+	// parties (room host, matched seek, rematch partner) are checked on the cached count:
+	// their spends wait as owed until they re-auth.
+	if u.tokStale() {
+		s.failCode(id, "stale_token")
+		return false
+	}
 	if c := h.canStart(u); c != "" {
 		s.failCode(id, c, "allowance", h.allowView(u))
 		return false
@@ -546,11 +586,18 @@ func (h *Hub) doCreateRoom(s *Sess, m inMsg) {
 	}
 	public := m.Public != nil && *m.Public
 	if public {
-		n := 0
+		n, mine := 0, 0
 		for _, r := range h.rooms {
 			if r.Public {
 				n++
+				if r.IP == s.ip {
+					mine++
+				}
 			}
+		}
+		if mine >= maxPublicRoomsPerIP {
+			s.failCode(m.ID, "too_many_rooms")
+			return
 		}
 		if n >= cfg.MaxPublicRooms {
 			s.failCode(m.ID, "lobby_full")
@@ -583,7 +630,7 @@ func (h *Hub) doCreateRoom(s *Sess, m inMsg) {
 	}
 	rating, prov := h.ratingFor(u, tc.Cat)
 	r := &Room{Code: code, Public: public, Name: name, TC: tc, Rated: m.Rated == nil || *m.Rated, Color: color,
-		Host: u, Rating: rating, Prov: prov, Created: nowMs()}
+		Host: u, IP: s.ip, Rating: rating, Prov: prov, Created: nowMs()}
 	h.rooms[code] = r
 	u.rooms[code] = r
 	if public {
@@ -594,7 +641,7 @@ func (h *Hub) doCreateRoom(s *Sess, m inMsg) {
 
 func (h *Hub) doJoinRoom(s *Sess, m inMsg) {
 	u := s.u
-	if !hit("join", u.UID) {
+	if !hit("join", u.UID) || !hit("joinip", s.ip) {
 		s.failCode(m.ID, "rate_limited")
 		return
 	}
@@ -658,6 +705,9 @@ func (h *Hub) doGameAction(s *Sess, g *Game, m inMsg, now int64) {
 			s.failCode(m.ID, err.Error(), "game", g.view(side, now))
 			return
 		}
+		if len(g.Moves) == 2 {
+			h.countGame(g) // before persist: a restart must not find the game uncounted (Spent)
+		}
 		h.persist(g)
 		s.reply(m.ID, "san", san, "lag", g.Credit)
 		ply = len(g.Moves) - 1
@@ -665,9 +715,6 @@ func (h *Hub) doGameAction(s *Sess, g *Game, m inMsg, now int64) {
 			return ev("move", "game", g.ID, "ply", ply, "uci", mv.UCI(), "san", san, "fen", g.pos.FEN(),
 				"clock", g.clockView(now), "drawOffer", colorName(g.Draw))
 		})
-		if len(g.Moves) == 2 {
-			h.countGame(g)
-		}
 		if g.Ended {
 			h.finish(g)
 		}

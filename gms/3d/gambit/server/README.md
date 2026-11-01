@@ -25,7 +25,9 @@ controls + clock · `glicko.go` Glicko-2 · `game.go` game model, PGN, client vi
 - **Rules**: own Go implementation, not a library — no licence question, ~600 lines, perft
   matches the standard suite to depth 4–5 (start, kiwipete, pos 3–6). Auto-ends on checkmate,
   stalemate, insufficient material, 50-move rule (100 plies) and threefold repetition (matches
-  the JS core's `isDraw()`); timeout vs a side that cannot mate = draw.
+  the JS core's `isDraw()`); timeout = loss unless the opponent cannot mate by any legal
+  sequence (FIDE 6.9; helpmates count: K+N vs K+P is a win on time, K+N / K+B vs bare K or
+  same-colour bishops only is a draw).
 - **Rating: Glicko-2** (τ 0.5, start 1500/350/0.06, RD floor 45). Each game is its own rating
   period (lichess-style); RD grows with idle time (one period per 7 days). Why: the RD gives a
   principled **provisional** flag (RD > 110), new players converge fast, and returning or
@@ -71,8 +73,14 @@ email in `GAMBIT_ADMINS`, default aaron@itmatters.mobi) are unlimited.
 
 `GAMBIT_ALLOWANCE`: `on` (payments, the box) · `fake` (local: signed-in counted here at
 `GAMBIT_SIGNED_PER_DAY`=5, dev uids starting `pass` have a Pass) · `off` (signed-in
-unlimited). Payments unreachable or answering anything but 200/429 → the game goes ahead
+unlimited). Payments unreachable / 5xx / other unexpected status → the game goes ahead
 (fail open, as Clued). A 429 at count time (raced elsewhere) is logged, the game goes on.
+**Stale tokens never fail open**: the server keeps the held token's `exp`; a gated action
+(seek/create/join/rematch) by a signed-in player whose token expires within 2 min, or whom
+payments answered 401/403, gets error `stale_token` (net.js force-refreshes, sends `auth`,
+resends once). A spend due at ply 2 without a good token is kept as **owed** (reserved like a
+pending game, `authNeeded` pushed) and sent on the next `auth`; a 401/403 spend goes back to
+owed. Owed spends live in memory only (lost on restart = that game is free).
 A spend still in flight counts as `pending` (reserved), and a payments refresh that
 overlapped a spend is discarded, so a last game cannot be started twice.
 
@@ -87,8 +95,10 @@ started but not yet counted). `signedPerDay` is for the "sign in for 5 a day" hi
 ## Abuse bounds
 Message ≤ 4 KB (bigger closes the socket) · 10 msg/s per socket, burst 30 · 60 websocket
 opens/min and 12 concurrent sockets per IP · 800 sockets total · hello within 10 s · 1 seek,
-2 open rooms, 1 timed + 10 Unlimited games per player · 20 room creates and 60 joins/seeks per
-player per 10 min · 100 public rooms, 1000 rooms total · origins: `GAMBIT_ORIGINS` (websocket
+2 open rooms, 1 timed + 10 Unlimited games per player · 20 room creates and 60 joins+peeks/seeks per
+player per 10 min, 200 joins+peeks per IP per 10 min · room codes 6 chars (31^6) · 100 public
+rooms, 3 per IP, 1000 rooms total · a room closes when its host has been offline 60 s (Unlimited:
+24 h), and is not listed in the lobby while the host is offline · origins: `GAMBIT_ORIGINS` (websocket
 Origin checked against the same list) · names cleaned + profanity-filtered (Clued's `names.go`).
 `./gambit pause on|off` (run with `GAMBIT_DATA` set) refuses new games at once; `./gambit stats`.
 
@@ -103,7 +113,7 @@ else is a server push (`t` = event name). Times are server epoch ms (`now` in we
 | t | fields | reply data / effect |
 |---|---|---|
 | `hello` | `token`, `name?`, `v` | must be first, within 10 s → `welcome` (or error `bad_token` + close 4001) |
-| `auth` | `token` | refresh the held token (same uid; a different uid closes 4001). net.js sends it every 45 min |
+| `auth` | `token` | refresh the held token (same uid; a different uid closes 4001) and apply its identity (guest → signed in, admin) → `identity` push if that changed; sends owed spends. net.js sends it every 45 min, on `authNeeded`, on `stale_token` and when the account layer links the guest |
 | `ping` | | `pong {now}` |
 | `lobby` | `on` (default true) | `{lobby}`; while on, `lobby` pushes (≤ 1/s) |
 | `seek` | `tc`, `rated` (default true) | `{seek:{tc,rated,at}}`; later `start` |
@@ -133,6 +143,8 @@ else is a server push (`t` = event name). Times are server epoch ms (`now` in we
 | `draw` / `rematch` | `game`, `by` w\|b, `action` offer\|decline |
 | `opponent` | `game`, `status` gone\|back, `claimAt` (ms; 0 for Unlimited) |
 | `allowance` | `allowance` |
+| `identity` | `you`, `allowance` (after an `auth` that changed anon/admin; net.js updates `net.me`, emits `identity`) |
+| `authNeeded` | (send a fresh token: a spend is waiting) |
 | `seek` | `seek: null`, `reason?` (seek dropped: matched or no games left) |
 | `roomClosed` | `code`, `reason` started\|closed\|host_left\|expired\|playing\|no_games_left |
 

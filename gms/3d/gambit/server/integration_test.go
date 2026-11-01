@@ -344,7 +344,7 @@ func TestPrivateRoomDrawRematch(t *testing.T) {
 	watcher.ok(map[string]any{"t": "lobby", "on": true})
 	room := host.ok(map[string]any{"t": "createRoom", "tc": "10+5", "rated": false, "color": "b", "public": false})["room"].(map[string]any)
 	code := room["code"].(string)
-	if len(code) != 5 {
+	if len(code) != codeLen {
 		t.Fatalf("room code %q", code)
 	}
 	// Private rooms are not listed.

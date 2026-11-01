@@ -5,7 +5,7 @@ Protocol + deploy steps: `server/README.md` (the source of truth; keep this file
 
 ## Done (2026-10-31)
 - Go service (`server/`): websocket lobby + relay, quick match by time control (D8 list incl.
-  Unlimited), public waiting rooms (name, tc, rated, host colour), private 5-letter codes,
+  Unlimited), public waiting rooms (name, tc, rated, host colour), private 6-char codes (5 before serverfix),
   rematch (colours swap), resign / draw offers / abort before ply 2, disconnect grace + claim
   after 30 s, reconnect resume via `welcome`, live games persisted (restart-safe, downtime
   credited to timed clocks).

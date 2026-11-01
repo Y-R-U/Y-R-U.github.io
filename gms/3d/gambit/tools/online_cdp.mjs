@@ -86,7 +86,9 @@ class Page {
 
 let fails = 0;
 function check(ok, msg) { console.log(`${ok ? 'PASS' : 'FAIL'} ${msg}`); if (!ok) fails++; }
-const url = (uid, name, extra = '') => `${BASE}?nocloud&devuid=${uid}&devname=${encodeURIComponent(name)}${extra}`;
+// --server=<base> points the pages at another server (e.g. a scratch instance on a spare port).
+const SRVQ = args.server ? `&server=${encodeURIComponent(args.server)}` : '';
+const url = (uid, name, extra = '') => `${BASE}?nocloud&devuid=${uid}&devname=${encodeURIComponent(name)}${SRVQ}${extra}`;
 
 // both players reach the game screen of the same game
 async function bothInGame(A, B) {
@@ -328,7 +330,8 @@ async function lobbyShots(A, B) {
 }
 
 // ---------------------------------------------------------------- main
-const A = new Page('A', 9514), B = new Page('B', 9515);
+const [PA, PB] = String(args.ports || '9514,9515').split(',').map(Number); // --ports=9614,9615
+const A = new Page('A', PA), B = new Page('B', PB);
 await A.open(); await B.open();
 const W = +(args.w || 360), H = +(args.h || 740);
 for (const P of [A, B]) { await P.size(W, H); P.tag = `${W}`; }

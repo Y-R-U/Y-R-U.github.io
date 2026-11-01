@@ -20,6 +20,8 @@ var limits = map[string]bucket{
 	"http": {600, time.Minute},
 	"room": {20, 10 * time.Minute},
 	"join": {60, 10 * time.Minute},
+	// joinRoom + peekRoom per IP: private codes (31^6) must not be enumerable.
+	"joinip": {200, 10 * time.Minute},
 }
 
 var (

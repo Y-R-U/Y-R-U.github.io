@@ -650,24 +650,43 @@ func (p *Pos) InsufficientMaterial() bool {
 	return knights == 0 && (bishopsLight == 0 || bishopsDark == 0)
 }
 
-// CanMate reports whether colour c has enough material to ever deliver mate
-// (used for "timeout vs insufficient material" = draw).
+// CanMate reports whether colour c could ever checkmate by some legal sequence (FIDE 6.9:
+// a player who flags loses unless the opponent cannot mate "by any possible series of legal
+// moves"). Helpmates count, so a lone knight or bishop CAN mate when the other side has
+// material to block its own king. No mate is possible only when c has a bare king, or a
+// single knight vs a bare king, or when every non-king piece on the board is a bishop and
+// they all stand on one square colour (K+B / K+B+B vs K, or vs same-colour bishops).
 func (p *Pos) CanMate(c int) bool {
-	n, b := 0, 0
-	for _, pc := range p.b {
-		if pc == empty || colorOf(pc) != c {
+	knights, bishops, oppOther := 0, 0, 0
+	var bishopSq [2]int // bishops (both sides) on dark / light squares
+	for i, pc := range p.b {
+		if pc == empty || kindOf(pc) == king {
 			continue
 		}
-		switch kindOf(pc) {
-		case pawn, rook, queen:
+		k, own := kindOf(pc), colorOf(pc) == c
+		if k == bishop {
+			bishopSq[(fileOf(int8(i))+rankOf(int8(i)))%2]++
+		}
+		switch {
+		case own && (k == pawn || k == rook || k == queen):
 			return true
-		case knight:
-			n++
-		case bishop:
-			b++
+		case own && k == knight:
+			knights++
+		case own && k == bishop:
+			bishops++
+		case !own && k != bishop:
+			oppOther++
 		}
 	}
-	return n+b >= 2
+	switch {
+	case knights+bishops == 0:
+		return false
+	case knights == 0 && oppOther == 0 && (bishopSq[0] == 0 || bishopSq[1] == 0):
+		return false // only same-colour bishops on the board
+	case knights == 1 && bishops == 0:
+		return oppOther > 0 || bishopSq[0]+bishopSq[1] > 0 // lone knight: needs a blocker
+	}
+	return true
 }
 
 func perft(p Pos, depth int) int64 {

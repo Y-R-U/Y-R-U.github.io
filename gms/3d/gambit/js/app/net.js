@@ -87,7 +87,7 @@ async function firebaseToken(force = false) {
     authMod = authMod || await import('/lib/auth/auth.js');
     const { auth } = authMod;
     await auth.ready();
-    if (auth.signedIn) {
+    if (auth.signedIn && !force) { // auth.getIdToken() cannot force a refresh
       const t = await auth.getIdToken();
       if (t) return t;
     }
@@ -185,10 +185,12 @@ class GambitNet {
     this._setState('closed');
   }
 
-  async _token() {
+  async _token(fresh = false) {
     const d = this._opts.devUser || devFromURL();
     if (d) return devToken(d);
-    const t = await withTimeout(firebaseToken(), 6000);
+    // On a reconnect ask Firebase for a new token (the server refuses gated actions on one
+    // about to expire); offline / slow -> fall back to the cached one.
+    const t = (fresh && await withTimeout(firebaseToken(true), 6000)) || await withTimeout(firebaseToken(), 6000);
     if (t) return t;
     if (await this._devAllowed()) return devToken(randomDev());
     return null;
@@ -202,7 +204,7 @@ class GambitNet {
 
   async _open() {
     this._setState(this._retry ? 'reconnecting' : 'connecting');
-    const token = await this._token();
+    const token = await this._token(this._retry > 0);
     if (this._closedByUser) return;
     if (!token) {
       this._fail(Object.assign(new Error('could not get a sign-in token (is /lib/auth/ loaded?)'), { code: 'no_token' }));
@@ -252,10 +254,13 @@ class GambitNet {
   _watchAuth() {
     this._authWatch = true;
     import('/lib/auth/auth.js').then(m => {
-      let uid = m.auth.user?.uid;
+      let uid = m.auth.user?.uid, anon = m.auth.user?.anon;
       m.auth.onChange(u => {
         if (u && uid && u.uid !== uid && this._ws) { try { this._ws.close(4000); } catch (e) { /* ignore */ } }
-        if (u) uid = u.uid;
+        // Linking an anonymous account keeps the uid: send the new token so the server
+        // upgrades this session (it answers with an 'identity' push).
+        else if (u && uid && u.uid === uid && !!u.anon !== !!anon && this.state === 'open') this._refreshToken();
+        if (u) { uid = u.uid; anon = u.anon; }
       });
     }).catch(() => { /* no account layer: dev or Node */ });
   }
@@ -333,8 +338,19 @@ class GambitNet {
   _onMessage(m) {
     if ((m.t === 'ok' || m.t === 'error' || m.t === 'pong') && m.id && this._pending.has(m.id)) {
       const p = this._pending.get(m.id);
-      this._pending.delete(m.id);
       clearTimeout(p.timer);
+      // stale_token: the server wants a fresh Firebase token before this action. Refresh,
+      // re-auth and resend once; a second refusal reaches the caller.
+      if (m.t === 'error' && m.code === 'stale_token' && !p.retried && p.msg.t !== 'auth') {
+        p.retried = true;
+        this._refreshToken().finally(() => {
+          if (this._pending.get(m.id) !== p) return;
+          if (this.state !== 'open' || !this._send(p.msg)) p.queued = true;
+          this._arm(m.id, p);
+        });
+        return;
+      }
+      this._pending.delete(m.id);
       if (m.game && typeof m.game === 'object' && m.game.id) this._storeGame(m.game, 'sync');
       if (m.allowance) this._setAllowance(m.allowance);
       if (m.t === 'error') {
@@ -350,6 +366,12 @@ class GambitNet {
         return;
       case 'lobby': this.lobby = m.lobby; return this._emit('lobby', m.lobby);
       case 'allowance': return this._setAllowance(m.allowance);
+      case 'authNeeded': this._refreshToken(); return;
+      case 'identity': // same uid, account changed in this tab (guest -> signed in)
+        this.me = { ...(this.me || {}), ...m.you };
+        if (this._welcome) this._welcome.you = this.me;
+        this._emit('identity', this.me);
+        return this._setAllowance(m.allowance);
       case 'seek': this.seek = m.seek || null; return this._emit('seek', { seek: this.seek, reason: m.reason || null });
       case 'roomClosed': this.rooms.delete(m.code); return this._emit('roomClosed', m);
       case 'start': {
@@ -432,10 +454,17 @@ class GambitNet {
     if ((m.games || []).length) this._emit('resume', { games: m.games.map(g => this.games.get(g.id)) });
   }
 
-  async _refreshToken() {
-    if (this._opts.devUser || devFromURL()) return;
-    const t = await withTimeout(firebaseToken(true), 6000);
-    if (t) this.request('auth', { token: t }).catch(() => {});
+  /** Force-refresh the Firebase token and send it ({t:auth}). Resolves true when the server
+   *  took it. Concurrent calls share one refresh. */
+  _refreshToken() {
+    if (this._opts.devUser || devFromURL()) return Promise.resolve(false);
+    if (this._refreshing) return this._refreshing;
+    this._refreshing = (async () => {
+      const t = await withTimeout(firebaseToken(true), 6000);
+      if (!t) return false;
+      try { await this.request('auth', { token: t }); return true; } catch (e) { return false; }
+    })().finally(() => { this._refreshing = null; });
+    return this._refreshing;
   }
 
   _storeGame(g, why) {

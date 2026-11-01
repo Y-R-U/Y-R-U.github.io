@@ -614,13 +614,13 @@ export function mountGame(root, ctx, id) {
     }),
     net.on('opponent', ev => {
       if (!O || ev.gameId !== O.id) return;
-      if (ev.status === 'back') toast(`${nameOf(side(otherC(O.you)))} is back`, { ms: 1600 });
+      if (ev.status === 'back') toast(`${(side(otherC(O.you)) || {}).name || 'Player'} is back`, { ms: 1600 });
       renderBars(); renderBanner();
     }),
     net.on('rematch', ev => {
       if (!O || ev.gameId !== O.id) return;
       if (ev.action === 'decline' && !ev.mine) { O.rematchGone = true; toast('Rematch declined', { ms: 1800 }); }
-      if (ev.action === 'offer' && !ev.mine) { toast(`${nameOf(side(otherC(O.you)))} wants a rematch!`, { ms: 2200 }); if (!O.sheet || !document.body.contains(O.sheet.el)) { if (!banner) showBanner(); else if (banner.state === 'pill') banner.setState('banner'); } }
+      if (ev.action === 'offer' && !ev.mine) { toast(`${(side(otherC(O.you)) || {}).name || 'Player'} wants a rematch!`, { ms: 2200 }); if (!O.sheet || !document.body.contains(O.sheet.el)) { if (!banner) showBanner(); else if (banner.state === 'pill') banner.setState('banner'); } }
       refreshRematch();
     }),
     net.on('state', () => { renderBanner(); setInteractive(); }),

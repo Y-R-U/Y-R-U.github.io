@@ -289,7 +289,7 @@ function homeScreen(root, ctx) {
   });
 
   renderConn(); renderMe(); renderLive(); renderTab();
-  offs.push(net.on('allowance', renderMe), net.on('welcome', () => { renderMe(); renderLive(); }),
+  offs.push(net.on('allowance', renderMe), net.on('identity', renderMe), net.on('welcome', () => { renderMe(); renderLive(); }),
     net.on('state', renderConn), net.on('end', renderLive),
     net.on('lobby', () => { if (homeTab !== 'leaders') { const sy = document.querySelector('#view')?.scrollTop; renderTab(); if (sy != null) document.querySelector('#view').scrollTop = sy; } }));
   net.subscribeLobby(true).catch(() => {});

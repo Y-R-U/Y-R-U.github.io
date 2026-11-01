@@ -12,8 +12,10 @@ package main
 // Modes (GAMBIT_ALLOWANCE): "on" = signed-in users go through payments (deploy);
 // "fake" = signed-in users counted locally at GAMBIT_FAKE_SIGNED_PER_DAY, dev uids
 // starting "pass" have a Pass (local UI testing); "off" = signed-in unlimited.
-// Payments unreachable or answering anything but 200/429 = the game goes ahead (fail
-// open, as Clued does).
+// Payments unreachable or answering 5xx (or another unexpected status) = the game goes
+// ahead (fail open, as Clued does). 401/403 is NOT an outage: payments refused the bearer
+// (expired / revoked token), so the player is asked for a fresh token (stale_token) and the
+// spend is kept as owed until one arrives - never counted as free.
 
 import (
 	"bytes"
@@ -72,28 +74,39 @@ func (p payAllowance) toAllow() Allow {
 		ResetsAt: p.ResetsAt, SignedPer: cfg.SignedPerDay, Fetched: nowMs()}
 }
 
-// fetchAllowance GETs the payments allowance; ok=false means unknown (fail open).
-func fetchAllowance(tok string) (Allow, bool) {
+type fetchResult int
+
+const (
+	fetchOK      fetchResult = iota
+	fetchUnknown             // unreachable / 5xx / unexpected: fail open
+	fetchStale               // 401/403: payments refused the bearer
+)
+
+// fetchAllowance GETs the payments allowance.
+func fetchAllowance(tok string) (Allow, fetchResult) {
 	req, err := http.NewRequest("GET", cfg.AllowanceURL+"allowance?game="+cfg.AllowanceGame, nil)
 	if err != nil {
-		return Allow{}, false
+		return Allow{}, fetchUnknown
 	}
 	req.Header.Set("Authorization", "Bearer "+tok)
 	res, err := allowanceHTTP.Do(req)
 	if err != nil {
 		log.Printf("allowance: payments unreachable: %v", err)
-		return Allow{}, false
+		return Allow{}, fetchUnknown
 	}
 	defer res.Body.Close()
+	if res.StatusCode == 401 || res.StatusCode == 403 {
+		return Allow{}, fetchStale
+	}
 	if res.StatusCode != 200 {
 		log.Printf("allowance: payments GET answered %d (is %s in BR8T_FREE_PER_DAY?)", res.StatusCode, cfg.AllowanceGame)
-		return Allow{}, false
+		return Allow{}, fetchUnknown
 	}
 	var p payAllowance
 	if json.NewDecoder(io.LimitReader(res.Body, 64<<10)).Decode(&p) != nil {
-		return Allow{}, false
+		return Allow{}, fetchUnknown
 	}
-	return p.toAllow(), true
+	return p.toAllow(), fetchOK
 }
 
 type spendResult int
@@ -102,6 +115,7 @@ const (
 	spendOK spendResult = iota
 	spendDenied
 	spendOpen
+	spendStale // 401/403: retry with a fresh token (owed), never free
 )
 
 func spendAllowance(tok, id string) (spendResult, *Allow) {
@@ -118,6 +132,9 @@ func spendAllowance(tok, id string) (spendResult, *Allow) {
 		return spendOpen, nil
 	}
 	defer res.Body.Close()
+	if res.StatusCode == 401 || res.StatusCode == 403 {
+		return spendStale, nil
+	}
 	var out struct {
 		Allowance *payAllowance `json:"allowance"`
 	}
