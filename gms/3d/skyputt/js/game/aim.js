@@ -15,6 +15,7 @@ export class AimInput {
     this.mode = null;            // aim | look | pinch
     this.lookMode = false;       // toggle: one finger looks around even when the ball is ready
     this.guideLevel = 0;         // Long Sight stacks (0 = base: short line, no bounce)
+    this.powerMul = 1;           // Power Tee raises the max launch speed for one shot
     this.aim = { active: false, power: 0, cancel: true, dir: new THREE.Vector3(0, 0, -1) };
     this._down = this._down.bind(this); this._move = this._move.bind(this); this._up = this._up.bind(this); this._wheel = this._wheel.bind(this);
     const el = this.el;
@@ -101,7 +102,7 @@ export class AimInput {
     a.active = false;
     this.mode = cancelled ? 'pinch' : null;
     if (!cancelled && !a.cancel && a.power > 0) {
-      const sp = shotSpeed(a.power);
+      const sp = shotSpeed(a.power) * this.powerMul;
       this.onShoot(a.dir.x * sp, a.dir.z * sp, a.power);
     }
     a.power = 0;
@@ -113,7 +114,7 @@ export class AimInput {
     const a = this.aim;
     if (!a.active || a.cancel || a.power <= 0) { this.guide.hide(); return; }
     const b = this.getBall();
-    const sp = shotSpeed(a.power);
+    const sp = shotSpeed(a.power) * this.powerMul;
     const lv = this.guideLevel;
     const g = traceGuide(this.world, b, a.dir.x * sp, a.dir.z * sp, { len: 0.9 + 1.1 * lv, maxBounces: lv, t0: worldTime });
     this.guide.show(scene, g.pts, a.power);

@@ -8,6 +8,7 @@ import { playDialogue } from './dialogue.js';
 import { playField } from './opponents.js';
 import { COURSES } from '../course/holes/index.js';
 import { ICONS } from '../game/hud.js';
+import { helperName, HELPER_BY_ID } from '../meta/helpers.js';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -226,6 +227,6 @@ function rewardText(r, long = false) {
   if (!r) return '';
   const parts = [];
   if (r.coins) parts.push(`${ICONS.coin}${r.coins}`);
-  for (const [k, n] of Object.entries(r.helpers || {})) parts.push(long ? `+${n} ${k === 'longSight' ? 'Long Sight' : 'Mulligan'}` : `+${n}${k === 'longSight' ? '⤴' : '↶'}`);
+  for (const [k, n] of Object.entries(r.helpers || {})) parts.push(long ? `+${n} ${helperName(k)}` : `+${n}${HELPER_BY_ID[k]?.short || ''}`);
   return parts.join(' ');
 }

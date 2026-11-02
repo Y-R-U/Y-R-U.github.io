@@ -5,31 +5,35 @@ import { makeLedger } from '../app/store.js';
 import { COURSES } from '../course/holes/index.js';
 import { ICONS } from '../game/hud.js';
 import { THEME_LIST } from '../app/menus.js';
+import { helperName } from '../meta/helpers.js';
+import { CHESTS } from '../meta/economy.js';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const back = `<button class="round" data-a="back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>`;
 const swatch = ev => (THEME_LIST.find(t => t.id === (ev.themeWanted || ev.theme)) || THEME_LIST[0]).swatch;
-const FROST_SWATCH = 'linear-gradient(160deg, #cfe6ff 0%, #8fb8e8 55%, #f4f8ff 56%, #d9e6f2 100%)';
 
 export function rewardHTML(r) {
   if (!r) return '';
   const out = [];
   if (r.coins) out.push(`${ICONS.coin}${r.coins}`);
-  for (const [k, n] of Object.entries(r.helpers || {})) out.push(`+${n} ${k === 'longSight' ? 'Long Sight' : 'Mulligan'}`);
+  for (const [k, n] of Object.entries(r.helpers || {})) out.push(`+${n} ${helperName(k)}`);
+  for (const k of [].concat(r.chest || [])) out.push(esc(CHESTS[k]?.name || 'Chest'));
   return out.join(' · ');
 }
 function grant(store, r) {
   if (!r) return;
   if (r.coins) store.addCoins(r.coins);
   for (const [k, n] of Object.entries(r.helpers || {})) store.giveHelper(k, n);
+  for (const k of [].concat(r.chest || [])) store.data.chests?.queue.push(k);   // M5 chests (opened in the Shop)
+  store.save();
 }
 
 // ctx: { store, now(), playEvent(ev, course, opts) → Promise<result|null>, onBack, click }
 export function createEvents(ctx) {
   const { store } = ctx;
   const prog = ev => store.eventProgress(ev.id, freshProgress);
-  const sw = ev => ev.themeWanted === 'frost' ? FROST_SWATCH : swatch(ev);
+  const sw = ev => swatch(ev);
 
   function list() {
     const now = ctx.now(), el = $('#events');
@@ -84,7 +88,6 @@ export function createEvents(ctx) {
         <tr class="${r.you ? 'you' : ''}"><td>${r.rank}</td><td>${esc(r.name)}</td><td>${r.points}</td></tr>`).join('')}</table>
       <div class="sec">Final rank rewards</div>
       <div class="tiers">${ev.rankRewards.map(t => `<div class="${tier === t ? 'on' : ''}"><b>Top ${t.top}</b><span>${rewardHTML(t.reward)}${t.title ? ` · “${esc(t.title)}”` : ''}</span></div>`).join('')}</div>
-      ${ev.themeWanted && ev.themeWanted !== ev.theme ? '<div class="card-note small">Frost Fair skin coming soon; plays on Sky Isles for now.</div>' : ''}
     </div>`;
     el.hidden = false;
     el.scrollTop = 0;

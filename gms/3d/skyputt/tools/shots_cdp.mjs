@@ -5,6 +5,7 @@
 //        title, map, settings + each hole (flyover/tee/aim/rolling/rest), portrait 412x915 and landscape 1440x900
 //   node tools/shots_cdp.mjs story [--out=DIR]   career: name, intro, map, lesson 1, result, rival hole card
 //   node tools/shots_cdp.mjs play  [--out=DIR] [--from=N] [--minutes=20]   plays the front nine (or from hole N) through the real UI to the scorecard
+//   node tools/shots_cdp.mjs meta  [--out=DIR] [--sizes=p,l]   M5: ladder, shop, chest, helper tray, cosmetics, week rollover
 // Reports console errors / exceptions and exits 1 if there are any.
 import { writeFileSync, mkdirSync } from 'node:fs';
 
@@ -352,6 +353,78 @@ async function eventsMode(c) {
   await shot(c, 'ev-frost-live');
 }
 
+// M5: title, ladder (this week + a settled week via ?eventdate), shop tabs, a chest opening,
+// helper tray + tooltip, armed helpers in play (guard rails, ghost), a skinned ball with a trail,
+// in portrait 412x915 and landscape 1440x900.
+async function metaMode(c) {
+  const SIZES = (args.sizes ? String(args.sizes) : 'p,l').split(',');
+  for (const [tag, w, h, mob] of [['p', 412, 915, true], ['l', 1440, 900, false]]) {
+    if (!SIZES.includes(tag)) continue;
+    await size(c, w, h, mob);
+    await go(c, 'fresh&noflyover&eventdate=2026-11-04');
+    await c.eval(`(() => { const s = __skyputt.store; s.data.coins = 3000; s.data.chests.queue.push('gold', 'silver', 'wood'); s.save(); })()`);
+    // a few ladder points so you sit mid-table
+    await c.eval(`(() => { const m = __skyputt.meta; for (const id of ['sky1','sky2','sky3','sky4','sky5','sky6','sky7','sky8','sky9']) m.onHole({ id, par: 3, strokes: 3, picked: false, stars: 2 }); })()`);
+    await go(c, 'noflyover&eventdate=2026-11-04');
+    await shot(c, `${tag}-m-title`);
+    await c.eval(`document.querySelector('#t-ladder').click()`); await sleep(400);
+    await shot(c, `${tag}-m-ladder`);
+    console.log('   ladder:', (await c.eval(`document.querySelector('#ladder .lad-hero')?.innerText.replace(/\\n+/g,' | ')`)));
+    await c.eval(`document.querySelector('#ladder').scrollTop = 9999`); await sleep(200);
+    await shot(c, `${tag}-m-ladder-bottom`);
+    await c.eval(`document.querySelector('#ladder [data-a=back]').click()`); await sleep(200);
+    await c.eval(`document.querySelector('#t-shop').click()`); await sleep(400);
+    await shot(c, `${tag}-m-shop-chests`);
+    await c.eval(`document.querySelector('#shop [data-open]').click()`); await sleep(500);
+    await shot(c, `${tag}-m-chest-closed`);
+    await c.eval(`document.querySelector('#chest').click()`); await sleep(2300);
+    await shot(c, `${tag}-m-chest-open`);
+    console.log('   chest:', await c.eval(`document.querySelector('#chest .prizes')?.innerText.replace(/\\n+/g,' ')`));
+    await c.eval(`document.querySelector('#chest .chest-ok').click()`); await sleep(300);
+    for (const t of ['helpers', 'balls', 'trails']) {
+      await c.eval(`document.querySelector('#shop [data-tab=${t}]').click()`); await sleep(300);
+      await shot(c, `${tag}-m-shop-${t}`);
+    }
+    // buy + equip the glow ball and the rainbow trail (two taps each)
+    await c.eval(`document.querySelector('#shop [data-tab=balls]').click()`); await sleep(200);
+    for (let i = 0; i < 2; i++) { await c.eval(`document.querySelector('#shop [data-item="ball:glow"]').click()`); await sleep(200); }
+    await c.eval(`document.querySelector('#shop [data-tab=trails]').click()`); await sleep(200);
+    for (let i = 0; i < 2; i++) { await c.eval(`document.querySelector('#shop [data-item="trail:${tag === 'p' ? 'rainbow' : 'sparkle'}"]').click()`); await sleep(200); }
+    console.log('   cosmetics:', JSON.stringify(await c.eval('__skyputt.store.data.cosmetics')), 'coins', await c.eval('__skyputt.store.data.coins'));
+    await c.eval(`document.querySelector('#shop [data-a=back]').click()`); await sleep(200);
+    // play hole 7: tray + tooltip, Bumper Guard + Ghost armed, then a roll with the trail
+    await c.eval(`__skyputt.startRound(6, 'single')`);
+    await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 30000); await sleep(900);
+    await c.eval(`(() => { const b = document.querySelector('#h-guard'); b.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })); })()`);
+    await c.eval(`document.querySelector('#h-guard').click()`); await sleep(150);
+    await c.eval(`document.querySelector('#h-ghost').click()`); await sleep(400);
+    await shot(c, `${tag}-m-hole7-armed`);
+    console.log('   armed:', JSON.stringify(await c.eval('__skyputt.round.armed')), 'mods', JSON.stringify(await c.eval('__skyputt.round.ball.mods')), 'tip:', await c.eval(`document.querySelector('#h-tip').innerText.replace(/\\n/g,' ')`));
+    const cx = w / 2, cy = h * 0.45;
+    await drag(c, cx, cy, cx, cy + Math.min(w, h) * 0.32, { hold: true }); await sleep(300);
+    await shot(c, `${tag}-m-hole7-aim`);
+    await release(c, cx, cy + Math.min(w, h) * 0.32);
+    await sleep(700);
+    await shot(c, `${tag}-m-hole7-trail`);
+    await waitFor(c, '["ready","done","sinking"].includes(__skyputt.round.state)', 30000).catch(() => {});
+    console.log('   after shot armed:', JSON.stringify(await c.eval('__skyputt.round.armed')), 'helpers', JSON.stringify(await c.eval('__skyputt.store.data.helpers')));
+    await sleep(500);
+    await shot(c, `${tag}-m-hole7-rest`);
+  }
+  // week rollover: play some holes on Nov 4, then open on Nov 10 → result + claim
+  await size(c, 412, 915, true);
+  await go(c, 'fresh&noflyover&eventdate=2026-11-04');
+  await c.eval(`(() => { const m = __skyputt.meta; for (let i = 0; i < 3; i++) for (const id of ['sky1','sky2','sky3','sky4','sky5','sky6','sky7','sky8','sky9']) m.onHole({ id, par: 3, strokes: 2, picked: false, stars: 3 }); })()`);
+  await go(c, 'noflyover&eventdate=2026-11-10');
+  await shot(c, 'p-m-title-rollover');
+  await c.eval(`document.querySelector('#t-ladder').click()`); await sleep(400);
+  await shot(c, 'p-m-ladder-result');
+  console.log('   result:', await c.eval(`document.querySelector('#ladder .lad-result')?.innerText.replace(/\\n+/g,' | ')`));
+  await c.eval(`document.querySelector('#ladder [data-claim]').click()`); await sleep(300);
+  await shot(c, 'p-m-ladder-claimed');
+  console.log('   claimed:', await c.eval(`document.querySelector('#ladder .card-note')?.innerText`), JSON.stringify(await c.eval('({ tier: __skyputt.meta.ladder().tier, chests: __skyputt.store.data.chests.queue, coins: __skyputt.store.data.coins })')));
+}
+
 // Runs in the page: searches heading x power with the real sim, returns the best relative to the camera.
 function planInPage() {
   const r = __skyputt.round, w = r.world, b = r.ball, h = r.hole, rig = __skyputt.app.rig;
@@ -380,6 +453,7 @@ try {
   else if (MODE === 'story') await story(c);
   else if (MODE === 'muni') await muni(c);
   else if (MODE === 'events') await eventsMode(c);
+  else if (MODE === 'meta') await metaMode(c);
 } catch (e) { errors.push('driver: ' + e.message); }
 if (errors.length) { console.log('ERRORS:\n  ' + [...new Set(errors)].join('\n  ')); process.exit(1); }
 console.log('no console errors');

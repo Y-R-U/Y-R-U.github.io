@@ -1,15 +1,18 @@
 // Round controller: hole flow (flyover → ready → rolling → rest / cup / out → done), strokes,
-// pickups, helpers (Long Sight, Mulligan), stars/coins/progress, the fixed-step physics loop, ball
-// visuals, the chase camera goal and every sound (through the sfx bus).
+// pickups, helpers (Long Sight, Mulligan + the M5 one-shot helpers), stars/coins/progress, ladder
+// points (app.meta), the fixed-step physics loop, ball visuals + cosmetics, the chase camera goal and
+// every sound (through the sfx bus).
 import * as THREE from 'three';
 import { DT, BALL_R, CUP_R, MAT } from '../engine/constants.js';
 import { Ball } from '../engine/physics.js';
 import { buildHole, makeWorld } from '../course/builder.js';
 import { frameAt } from '../course/frames.js';
-import { buildHoleView, makeBall } from './holeview.js';
+import { buildHoleView } from './holeview.js';
 import { AimInput } from './aim.js';
 import { sfx } from './sfxbus.js';
 import { COINS_PER_CRYSTAL } from '../app/store.js';
+import { HELPERS, HELPER_BY_ID, helperName, STEADY_CLOCK, POWER_TEE } from '../meta/helpers.js';
+import { makeSkinnedBall, disposeBall, Trail } from '../meta/cosmetics.js';
 
 const MAX_STEPS_PER_FRAME = 48;   // 0.2 s of sim; longer hitches are dropped, not caught up
 const PICKUP_R = 0.15;
@@ -24,7 +27,8 @@ export class Round {
   constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null, ledger = null, currency = null, ghosts = null } = {}) {
     this.app = app; this.course = course; this.onExit = onExit; this.mode = mode;
     this.onComplete = onComplete; this.opponents = opponents; this.tips = tips; this.label = label;
-    this.used = { longSight: 0, mulligan: 0 };
+    this.used = Object.fromEntries(HELPERS.map(h => [h.id, 0]));
+    this.armed = {};   // one-shot helpers armed for the next shot (kind 'pre'), consumed on arming
     // pickups pay out once per (hole, index); event rounds pass their own ledger + currency
     this.ledger = ledger || app.store.ledger();
     this.currency = currency;   // { icon, name } in event rounds: pickups are event currency, not coins
@@ -34,9 +38,11 @@ export class Round {
     this.scores = [];
     this.gems = 0;
     this.paused = false;
-    this.ballMesh = makeBall();
+    const cos = app.store.data.cosmetics || {};
+    this.ballMesh = makeSkinnedBall(cos.ball);
     this.ballMesh.visible = false;
     app.scene.add(this.ballMesh);
+    this.trail = new Trail(app.scene, cos.trail);
     this.aim = new AimInput({
       el: app.canvas, rig: app.rig,
       canReady: () => this.state === 'ready' && !this.paused,
@@ -48,8 +54,7 @@ export class Round {
     const hud = app.hud;
     hud.el.pause.onclick = () => { sfx.emit('click'); this.pause(); };
     hud.el.look.onclick = () => { sfx.emit('click'); this.aim.lookMode = !this.aim.lookMode; hud.setLook(this.aim.lookMode); if (!this.aim.lookMode) app.rig.lookPitch = 0; };
-    hud.el.sight.onclick = () => this.useLongSight();
-    hud.el.mull.onclick = () => this.useMulligan();
+    hud.onHelper = id => this.tapHelper(id);
     hud.setLook(false);
     hud.show(true);
     this._skip = () => { if (this.state === 'flyover') this.endFlyover(); };
@@ -62,12 +67,15 @@ export class Round {
 
   loadHole(i) {
     const app = this.app;
+    this.refundArmed();
     this.view?.dispose();
     this.index = i;
     const def = this.def;
     const hole = this.hole = buildHole(def);
     this.world = makeWorld(hole);
     this.aim.world = this.world;
+    this.buildGuardMesh(hole);
+    this.trail.clear();
     this.view = buildHoleView(app.scene, hole, app.theme, app.fallback, { renderer: app.renderer, camera: app.camera, quality: app.quality });
     this.ball = new Ball(hole.tee.x, hole.tee.y, hole.tee.z);
     this.ballMesh.visible = true;
@@ -160,6 +168,7 @@ export class Round {
 
   shoot(vx, vz, power = 0.5) {
     if (this.state !== 'ready') return;
+    this.applyMods();   // a fresh copy of the armed mods for this roll (Ghost Ball starts armed)
     const rig = this.app.rig;
     rig.yaw += rig.lookYaw; rig.lookYaw = 0; rig.lookPitch = 0;
     rig.goalYaw = rig.yaw;
@@ -179,11 +188,83 @@ export class Round {
 
   // ---- helpers
   refreshHelpers() {
-    const h = this.app.store.helpers();
     this.app.hud.setHelpers({
-      longSight: h.longSight | 0, mulligan: h.mulligan | 0, sight: this.sight,
-      canSight: this.state === 'ready' || this.state === 'flyover', canMull: this.state === 'ready' && !!this.last,
+      counts: this.app.store.helpers(), sight: this.sight, armed: this.armed,
+      canPre: this.state === 'ready' || this.state === 'flyover', canMull: this.state === 'ready' && !!this.last,
     });
+  }
+  tapHelper(id) {
+    if (id === 'longSight') return this.useLongSight();
+    if (id === 'mulligan') return this.useMulligan();
+    if (HELPER_BY_ID[id]?.kind === 'pre') this.togglePre(id);
+  }
+  // One-shot helpers: tap to arm (uses one), tap again before shooting to take it back (refunded).
+  togglePre(id) {
+    if (!(this.state === 'ready' || this.state === 'flyover')) return;
+    const name = helperName(id);
+    if (this.armed[id]) {
+      delete this.armed[id]; this.used[id]--;
+      this.app.store.giveHelper(id);
+      this.app.hud.banner(`${name} off`, '', 800);
+      sfx.emit('back');
+    } else {
+      if (!this.app.store.useHelper(id)) { this.app.hud.banner(`No ${name} left`, 'bad', 1200); sfx.emit('back'); return; }
+      this.endFlyover();
+      this.armed[id] = true; this.used[id]++;
+      this.app.hud.banner(`${name}! <small>${id === 'power' ? 'more power this shot' : 'next shot'}</small>`, 'good', 1000);
+      sfx.emit('click');
+    }
+    this.applyMods();
+    this.refreshHelpers();
+  }
+  // Push the armed helpers into the sim: ball.mods (magnet / sticky / guard / ghost), the obstacle
+  // clock (Steady Hands) and the aim's power cap (Power Tee). The guide line traces with them too.
+  applyMods() {
+    const A = this.armed, b = this.ball;
+    const any = A.magnet || A.sticky || A.guard || A.ghost;
+    if (b) b.mods = any ? { magnet: !!A.magnet, sticky: !!A.sticky, guard: !!A.guard, ghost: A.ghost ? 1 : 0, ghostId: -1 } : null;
+    if (this.world) this.world.clock = A.steady ? STEADY_CLOCK : 1;
+    this.aim.powerMul = A.power ? POWER_TEE : 1;
+    if (this.guardMesh) this.guardMesh.visible = !!A.guard;
+    const m = this.ballMesh.material, ghost = !!A.ghost;
+    if (m.transparent !== ghost) { m.transparent = ghost; m.opacity = ghost ? 0.5 : 1; m.needsUpdate = true; }
+  }
+  // The shot is over (rest / cup / out): the one-shot helpers are spent.
+  endShot() {
+    if (!Object.keys(this.armed).length) return;
+    this.armed = {};
+    this.applyMods();
+    this.refreshHelpers();
+  }
+  // Armed but never shot (hole restarted / quit / next hole): give them back.
+  refundArmed() {
+    if (this.state !== 'rolling') for (const id of Object.keys(this.armed)) { this.app.store.giveHelper(id); this.used[id]--; }
+    this.armed = {};   // (mid-roll they were already spent)
+    if (this.ball) this.applyMods();
+  }
+  // Bumper Guard rails: a glowing see-through mesh over the guard colliders, shown while armed.
+  buildGuardMesh(hole) {
+    if (this.guardMesh) { this.app.scene.remove(this.guardMesh); this.guardMesh.geometry.dispose(); this.guardMesh.material.dispose(); this.guardMesh = null; }
+    const q = hole.guards?.quads;
+    if (!q?.length) return;
+    const pos = new Float32Array(q.length * 18), uv = new Float32Array(q.length * 12);
+    q.forEach((P, k) => {
+      [0, 1, 2, 0, 2, 3].forEach((j, n) => { pos.set(P[j], k * 18 + n * 3); uv.set([0, j >= 2 ? 1 : 0], k * 12 + n * 2); });
+    });
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    const mat = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+      uniforms: { uTime: { value: 0 } },
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: `uniform float uTime; varying vec2 vUv;
+        void main(){ float y = clamp(vUv.y, 0.0, 1.0); float a = 0.22 + 0.7 * smoothstep(0.75, 1.0, y) + 0.1 * sin(uTime * 4.0 + y * 6.0);
+          gl_FragColor = vec4(vec3(0.45, 0.9, 1.0) * a, a); }`,
+    });
+    this.guardMesh = new THREE.Mesh(geo, mat);
+    this.guardMesh.renderOrder = 4; this.guardMesh.visible = false; this.guardMesh.userData.noOcclude = true; this.guardMesh.frustumCulled = false;
+    this.app.scene.add(this.guardMesh);
   }
   useLongSight() {
     if (!(this.state === 'ready' || this.state === 'flyover') || this.sight >= MAX_SIGHT) return;
@@ -226,13 +307,18 @@ export class Round {
   exit() { this.dispose(); this.onExit?.(); }
 
   dispose() {
+    this.refundArmed();
+    this.app.hud.onHelper = null;
+    this.app.hud.tipHide?.();
     this.aim.dispose();
     this.app.canvas.removeEventListener('pointerdown', this._skip);
     this.view?.dispose(); this.view = null;
     this.ghost?.ball.removeFromParent(); this.ghost?.ball.dispose?.(); this.ghost = null;
     this.app.rig.occluders = null;
     this.app.scene.remove(this.ballMesh);
-    this.ballMesh.geometry.dispose(); this.ballMesh.material.map?.dispose(); this.ballMesh.material.dispose();
+    disposeBall(this.ballMesh);
+    this.trail.dispose();
+    if (this.guardMesh) { this.app.scene.remove(this.guardMesh); this.guardMesh.geometry.dispose(); this.guardMesh.material.dispose(); this.guardMesh = null; }
     sfx.emit('stopRoll');
     this.app.hud.show(false);
     this.app.hud.hideCard();
@@ -252,7 +338,7 @@ export class Round {
           this.checkPickups();
           this.checkLip();
         }
-        w.time += DT;
+        w.time += DT * w.clock;   // Steady Hands slows the obstacle clock (poses are a pure function of it)
       }
     }
     // ball visual: position + roll
@@ -297,6 +383,8 @@ export class Round {
     if (this.state === 'ready') this.aim.updateGuide(app.scene, w.time); else this.aim.guide.hide();
     this.view.update(dt, t, w.time, this.ballPos());
     if (this.ghost && this.state !== 'flyover' && !this.paused) this.ghost.player.update(dt);
+    this.trail.update(dt, m.position, this.state === 'rolling' && b.speed() > 0.15);
+    if (this.guardMesh?.visible) this.guardMesh.material.uniforms.uTime.value = t;
   }
 
   updateFlyover(dt) {
@@ -319,6 +407,7 @@ export class Round {
         case 'cup': {
           this.state = 'sinking'; this.timer = 0; this.sinkY0 = this.ball.py;
           const ace = this.strokes === 1;
+          this.endShot();
           this.app.hud.banner(ace ? 'HOLE IN ONE!' : 'In the cup!', ace ? 'ace' : 'good', 1500);
           sfx.emit('stopRoll'); sfx.emit('cupDrop');
           const d = this.strokes - this.def.par;
@@ -327,13 +416,16 @@ export class Round {
         }
         case 'oob':
           this.state = 'oob'; this.timer = 0;
+          this.endShot();
           this.strokes++;  // D9: +1 stroke
           this.app.hud.setStrokes(this.strokes, this.maxStrokes);
           this.app.hud.banner('Out of bounds <small>+1 stroke</small>', 'bad', 1400);
           sfx.emit('stopRoll'); sfx.emit('fall');
           break;
-        case 'rest': sfx.emit('stopRoll'); this.onRest(); break;
+        case 'rest': sfx.emit('stopRoll'); this.endShot(); this.onRest(); break;
         case 'wall': sfx.emit('wall', { speed: e.speed, material: 'stone' }); break;
+        case 'guard': sfx.emit('bumper', { speed: e.speed * 0.6 }); break;
+        case 'ghost': this.app.hud.banner('Ghosted through!', 'good', 900); sfx.emit('boost'); break;
         case 'obstacle': sfx.emit(e.mat === MAT.BUMPER ? 'bumper' : e.mat === MAT.BLADE ? 'windmillHit' : 'wall', { speed: e.speed, material: 'stone' }); break;
         case 'rim': case 'cup-hit': sfx.emit('cupRattle'); break;
         case 'boost': sfx.emit('boost'); break;
@@ -392,16 +484,20 @@ export class Round {
     const { stars, newBest } = store.recordHole(def.id, strokes, def.par, picked);
     store.markFinished(def.id);
     if (!picked && strokes === 1) this.aces++;
-    const coins = this.currency ? 0 : this.holeGems * COINS_PER_CRYSTAL;
-    if (coins) store.addCoins(coins);
+    const crystalCoins = this.currency ? 0 : this.holeGems * COINS_PER_CRYSTAL;
+    if (crystalCoins) store.addCoins(crystalCoins);
+    // M5: ladder points + coins for playing the hole, a chest every few 3-star holes
+    const meta = this.app.meta?.onHole({ id: def.id, par: def.par, strokes, picked, stars }) || null;
+    const coins = crystalCoins + (meta?.coins || 0);
     let reward = null;
-    if (stars === 3) {   // a 3-star hole earns a helper (whichever you hold fewer of)
+    if (stars === 3) {   // a 3-star hole earns a helper (whichever you hold fewest of)
       const h = store.helpers();
-      reward = (h.mulligan | 0) < (h.longSight | 0) ? 'mulligan' : 'longSight';
+      reward = HELPERS.reduce((a, x) => ((h[x.id] | 0) < (h[a] | 0) ? x.id : a), 'longSight');
       store.giveHelper(reward);
     }
     const n = this.course.holes.length;
     const last = this.index >= n - 1;
+    const roundBonus = last && this.mode === 'round' && this.startIndex === 0 && this.app.meta ? this.app.meta.onRound({ holes: n }) : null;
     const nextOpen = !last && store.unlockedCount(this.course) > this.index + 1;
     const onNext = () => {
       if (this.onComplete && last) { const res = this.result(); this.dispose(); this.onComplete(res); return; }
@@ -410,10 +506,12 @@ export class Round {
       else this.exit();
     };
     stars && [0, 1, 2].slice(0, stars).forEach(k => setTimeout(() => sfx.emit('star', { n: k + 1 }), 700 + k * 350));
-    if (coins) setTimeout(() => sfx.emit('coin'), 700 + stars * 350 + 100);
+    if (coins || roundBonus?.coins) setTimeout(() => sfx.emit('coin'), 700 + stars * 350 + 100);
+    if (meta?.chest) setTimeout(() => sfx.emit('holeInOne'), 900 + stars * 350);
     this.app.hud.holeDone({
       hole: this.index + 1, n, name: def.name, par: def.par, strokes, picked, gems: this.holeGems,
-      stars, coins, newBest, reward, totalCoins: store.data.coins,
+      stars, coins: coins + (roundBonus?.coins || 0), newBest, reward, totalCoins: store.data.coins,
+      ladder: meta && { points: meta.points, streak: meta.streak }, chest: meta?.chest, roundBonus,
       nextLabel: this.mode === 'round' ? (last ? 'Scorecard' : 'Next hole') : (nextOpen ? 'Next hole' : 'Course map'),
       onMap: this.mode === 'single' ? () => this.exit() : null,
       rivals: this.opponents?.map(o => ({ name: o.name, colour: o.colour, strokes: o.scores[this.index],

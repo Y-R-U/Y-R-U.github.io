@@ -46,3 +46,7 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - 2026-11-02: 46ccc0c3 pushed (frost theme files; picker/event hookup done by meta). Aaron: reserve
   usage — let running agents (meta M5, sound spooky/frost music) finish, then PAUSE: start no new
   agents until Aaron says "continue". After they finish: test, commit+push, report, then wait.
+- 2026-11-02: 4d6502ef (spooky/frost music) + M5 pushed (weekly ladder/tiers, shop + cosmetics,
+  chests, 6 helpers, frost in picker, Frost Fair event uses frost). PAUSED per Aaron — no agents
+  running; wait for "continue". Next when resumed: M6 online server (deploy needs OK), story ch2-6,
+  back-nine holes, projects.js + hub card, real-phone perf check of the game.

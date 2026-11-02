@@ -1,5 +1,7 @@
 // DOM HUD: hole / par / strokes pills, pause + look buttons, power meter, banners and the cards
-// (hole complete, pause menu, scorecard). Pure DOM, no THREE.
+// (hole complete, pause menu, scorecard), and the helper tray (M5: every helper in js/meta/helpers.js,
+// scrollable, with tooltips on hover / long-press / tap). Pure DOM, no THREE.
+import { HELPERS, HELPER_ICONS, helperName } from '../meta/helpers.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -16,6 +18,17 @@ export const ICONS = {
   coin: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#f2c75c" stroke="#b9862a" stroke-width="2"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4" stroke="#7a5512" stroke-width="1.6" fill="none"/></svg>',
   gem: '<svg viewBox="0 0 24 24"><path fill="#6fd6ff" d="M12 2l6 7-6 13L6 9z"/><path fill="#bff0ff" d="M12 2l-6 7h12z" opacity=".7"/></svg>',
 };
+
+const TRAY_ID = { longSight: 'sight', mulligan: 'mull' };   // keeps the M2 ids (#h-sight, #h-mull)
+
+// A little chest (wood / silver / gold) for cards and the shop.
+export const CHEST_COLORS = { wood: ['#b8743a', '#7a4a22', '#e0a35a'], silver: ['#cfd6e0', '#6c7686', '#ffffff'], gold: ['#f2c75c', '#9a6a12', '#fff3c4'] };
+export function chestIcon(kind, size = 40) {
+  const [a, b, c] = CHEST_COLORS[kind] || CHEST_COLORS.wood;
+  return `<svg class="chest-ic" width="${size}" height="${size}" viewBox="0 0 40 40"><rect x="5" y="17" width="30" height="18" rx="3" fill="${a}" stroke="${b}" stroke-width="2"/>
+    <path d="M5 18c0-8 5-12 15-12s15 4 15 12z" fill="${c}" stroke="${b}" stroke-width="2"/><rect x="5" y="16" width="30" height="4" fill="${b}"/>
+    <rect x="17" y="15" width="6" height="9" rx="1.5" fill="#f2c75c" stroke="#7a5512" stroke-width="1.4"/></svg>`;
+}
 
 export const starRow = (n, max = 3) => `<span class="stars">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? 'on' : ''}">★</i>`).join('')}</span>`;
 
@@ -39,10 +52,8 @@ export class Hud {
         <button id="h-pause" class="round" aria-label="Pause">${ICONS.pause}</button>
       </div>
       <div class="hud-sub"><div class="pill small" id="h-gems">${ICONS.gem}<b>0</b></div></div>
-      <div class="tray" id="h-tray">
-        <button id="h-sight" class="tray-btn" aria-label="Long Sight">${ICONS.sight}<span class="cnt">0</span><span class="lvl"></span></button>
-        <button id="h-mull" class="tray-btn" aria-label="Mulligan">${ICONS.mull}<span class="cnt">0</span></button>
-      </div>
+      <div class="tray" id="h-tray">${HELPERS.map(h => `<button id="h-${TRAY_ID[h.id] || h.id}" class="tray-btn" data-h="${h.id}" aria-label="${h.name}">${HELPER_ICONS[h.id]}<span class="cnt">0</span>${h.kind !== 'post' ? '<span class="lvl"></span>' : ''}</button>`).join('')}</div>
+      <div id="h-tip" class="tip" role="tooltip"></div>
       <div id="h-banner" class="banner"></div>
       <div id="h-hint" class="hint">Drag back anywhere to aim · release to putt</div>
       <div id="h-power" class="power" hidden><div class="power-track"><div class="power-fill"></div></div><div class="power-lbl"></div></div>
@@ -52,10 +63,46 @@ export class Hud {
       banner: $('#h-banner', root), hint: $('#h-hint', root), power: $('#h-power', root),
       fill: $('.power-fill', root), plbl: $('.power-lbl', root), card: $('#h-card', root),
       look: $('#h-look', root), pause: $('#h-pause', root),
-      sight: $('#h-sight', root), mull: $('#h-mull', root),
+      sight: $('#h-sight', root), mull: $('#h-mull', root), tray: $('#h-tray', root), tip: $('#h-tip', root),
     };
     this._bt = 0;
+    this.onHelper = null;   // (id) → set by the round
+    this._wireTray();
   }
+  _wireTray() {
+    const tray = this.el.tray;
+    let pressT = 0, longPressed = false;
+    tray.addEventListener('click', e => {
+      const b = e.target.closest('.tray-btn'); if (!b) return;
+      if (longPressed) { longPressed = false; return; }   // a long-press only shows the tip
+      this.tipFor(b, 1800);
+      if (!b.classList.contains('off')) this.onHelper?.(b.dataset.h);
+    });
+    tray.addEventListener('pointerdown', e => {
+      const b = e.target.closest('.tray-btn'); if (!b || e.pointerType === 'mouse') return;
+      longPressed = false; clearTimeout(pressT);
+      pressT = setTimeout(() => { longPressed = true; this.tipFor(b, 2600); }, 450);
+    });
+    for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) tray.addEventListener(ev, () => clearTimeout(pressT));
+    tray.addEventListener('scroll', () => this.tipHide());
+    tray.addEventListener('pointerover', e => { const b = e.target.closest('.tray-btn'); if (b && e.pointerType === 'mouse') this.tipFor(b, 0); });
+    tray.addEventListener('pointerout', e => { if (e.pointerType === 'mouse' && !tray.contains(e.relatedTarget)) this.tipHide(); });
+    // unusable buttons get .off (not the disabled attribute) so they still show their tip
+  }
+  tipFor(b, ms) {
+    const h = HELPERS.find(x => x.id === b.dataset.h), tip = this.el.tip;
+    if (!h) return;
+    const n = b.querySelector('.cnt').textContent;
+    tip.innerHTML = `<b>${esc(h.name)}</b> <span>×${esc(n)}</span><small>${esc(h.desc)}${h.kind === 'pre' ? ' Tap again to take it back.' : ''}</small>`;
+    const r = b.getBoundingClientRect(), left = r.left + r.width / 2 < innerWidth / 2;
+    tip.style.top = `${Math.max(8, Math.min(innerHeight - 90, r.top + r.height / 2 - 30))}px`;
+    tip.style.left = left ? `${r.right + 10}px` : 'auto';
+    tip.style.right = left ? 'auto' : `${innerWidth - r.left + 10}px`;
+    tip.classList.add('show');
+    clearTimeout(this._tt);
+    if (ms) this._tt = setTimeout(() => this.tipHide(), ms);
+  }
+  tipHide() { this.el.tip.classList.remove('show'); }
   show(on) { this.root.hidden = !on; }
   setHole(i, n, par) { this.el.hole.textContent = `${i}/${n}`; this.el.par.textContent = par; }
   setStrokes(n, max) { this.el.strokes.textContent = n; this.el.strokes.classList.toggle('warn', n >= max - 1); }
@@ -66,14 +113,20 @@ export class Hud {
     else if (!icon && pill.querySelector('.cur')) { pill.querySelector('.cur').remove(); pill.insertAdjacentHTML('afterbegin', ICONS.gem); }
   }
   setLook(on) { this.el.look.classList.toggle('on', on); this.el.look.setAttribute('aria-pressed', on); }
-  setHelpers({ longSight, mulligan, sight, canSight, canMull }) {
-    const S = this.el.sight, M = this.el.mull;
-    S.querySelector('.cnt').textContent = longSight;
-    M.querySelector('.cnt').textContent = mulligan;
-    S.querySelector('.lvl').textContent = sight ? '×' + sight : '';
-    S.classList.toggle('on', sight > 0);
-    S.disabled = !canSight || (longSight <= 0 && !sight) || sight >= 3;
-    M.disabled = !canMull || mulligan <= 0;
+  // counts: { id: n } · sight: Long Sight stacks this shot · armed: { id: true } one-shot helpers on
+  // canPre: before a shot · canMull: a shot to undo. Long Sight + Mulligan always show; the rest only
+  // when you hold one (or it is armed), so a fresh tray stays short.
+  setHelpers({ counts, sight = 0, armed = {}, canPre, canMull }) {
+    for (const b of this.el.tray.children) {
+      const id = b.dataset.h, h = HELPERS.find(x => x.id === id), n = counts[id] | 0, on = id === 'longSight' ? sight > 0 : !!armed[id];
+      b.querySelector('.cnt').textContent = n;
+      const lvl = b.querySelector('.lvl');
+      if (lvl) lvl.textContent = id === 'longSight' ? (sight ? '×' + sight : '') : on ? 'ON' : '';
+      b.classList.toggle('on', on);
+      b.hidden = !(id === 'longSight' || id === 'mulligan' || n > 0 || on);
+      const off = h.kind === 'post' ? !canMull || n <= 0 : h.kind === 'stack' ? !canPre || (n <= 0 && !sight) || sight >= 3 : !canPre || (n <= 0 && !on);
+      b.classList.toggle('off', off); b.setAttribute('aria-disabled', off);
+    }
   }
   hint(on, text) { if (text) this.el.hint.textContent = text; this.el.hint.classList.toggle('show', on); }
   power(aim) {
@@ -94,18 +147,21 @@ export class Hud {
   hideCard() { this.el.card.hidden = true; this.el.card.innerHTML = ''; }
   _card(html) { const c = this.el.card; c.innerHTML = `<div class="card">${html}</div>`; c.hidden = false; return c; }
 
-  holeDone({ hole, n, name, par, strokes, picked, gems, stars = 0, coins = 0, newBest, reward, nextLabel, onMap, rivals, youTotal, currency }, onNext) {
+  holeDone({ hole, n, name, par, strokes, picked, gems, stars = 0, coins = 0, newBest, reward, nextLabel, onMap, rivals, youTotal, currency, ladder, chest, roundBonus }, onNext) {
     const label = scoreName(strokes, par, picked);
     const d = strokes - par;
     const cls = strokes === 1 ? 'ace' : d < 0 ? 'under' : d === 0 ? 'par' : 'over';
-    const rw = { longSight: 'Long Sight', mulligan: 'Mulligan' }[reward];
+    const rw = reward ? helperName(reward) : null;
     const c = this._card(`
       <div class="card-kicker">Hole ${hole} of ${n} · ${esc(name)}</div>
       <div class="card-title ${cls}">${esc(label)}</div>
       <div class="card-stars">${starRow(stars)}</div>
       <div class="card-stats"><div><span>Strokes</span><b>${strokes}</b></div><div><span>Par</span><b>${par}</b></div>${currency ? `<div><span>${esc(currency.name)}</span><b>+${gems}</b></div>` : `<div><span>Coins</span><b>+${coins}</b></div>`}</div>
       ${newBest ? '<div class="card-note good">New best!</div>' : ''}
-      ${rw ? `<div class="card-note good">3 stars: +1 ${rw}</div>` : ''}
+      ${rw ? `<div class="card-note good">3 stars: +1 ${esc(rw)}</div>` : ''}
+      ${ladder ? `<div class="card-ladder"><span class="lp">+${ladder.points} ladder pts</span>${ladder.streak > 1 ? `<span class="streak">🔥 ${ladder.streak}-day streak</span>` : ''}</div>` : ''}
+      ${roundBonus && (roundBonus.points || roundBonus.coins) ? `<div class="card-note good">Round complete: +${roundBonus.points} pts${roundBonus.coins ? ` · ${ICONS.coin}+${roundBonus.coins}` : ''}</div>` : ''}
+      ${chest ? `<div class="card-chest">${chestIcon(chest, 34)}<span>Chest earned! <small>Open it in the Shop</small></span></div>` : ''}
       ${rivals?.length ? `<table class="scores rivals"><tr><th></th><th>Hole</th><th>Total</th></tr>
         <tr class="you"><td>You</td><td>${strokes}</td><td>${youTotal}</td></tr>
         ${(rivals.length > 4 ? [...rivals].sort((a, b) => a.total - b.total).slice(0, 4) : rivals).map(r => `<tr><td><i class="dot" style="background:${r.colour}"></i>${esc(r.name)}</td><td>${r.strokes}</td><td>${r.total}</td></tr>`).join('')}</table>` : ''}

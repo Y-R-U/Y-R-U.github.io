@@ -1,6 +1,7 @@
 // Hole builder: hole data (D6, theme-independent) → frames → mesh groups + colliders + features.
 // Node-safe (no THREE). The game turns `geo` groups into THREE meshes with theme materials.
-import { BALL_R, CUP_R, CUP_DEPTH, WALL_H, WALL_T, FLOOR_T, MAT } from '../engine/constants.js';
+import { BALL_R, CUP_R, CUP_DEPTH, WALL_H, WALL_T, FLOOR_T, MAT, SURFACES } from '../engine/constants.js';
+import { TriGrid, closestOnTri, CP } from '../engine/shapes.js';
 import { v3, pathFrames, loopFrames, lerpFrame, frameAt } from './frames.js';
 import { buildFeature, nearestS } from './features.js';
 import { World } from '../engine/physics.js';
@@ -8,13 +9,14 @@ import { World } from '../engine/physics.js';
 // The physics world for a built hole.
 export function makeWorld(h) {
   const c = h.colliders;
-  return new World({ tris: c.tris, mats: c.mats, dirs: c.dirs, cup: h.cup, kinematics: h.kinematics, killY: h.killY });
+  return new World({ tris: c.tris, mats: c.mats, dirs: c.dirs, cup: h.cup, kinematics: h.kinematics, killY: h.killY, guards: h.guards?.tris });
 }
 
 const FRINGE = 0.09;      // fringe band next to walls (visual only)
 const CUPA = 0.2;         // half-size of the square cut out of the floor around the cup
 const TRIM_H = 0.025;
 export const TUBE_R = 0.15;
+const GUARD_H = 0.12;     // Bumper Guard rail height
 const SURF_MAT = { grass: MAT.GRASS, sand: MAT.SAND, ice: MAT.ICE, sticky: MAT.STICKY, boost: MAT.BOOST, bridge: MAT.BRIDGE };
 const SURF_GEO = { grass: 'grass', sand: 'sand', ice: 'ice', sticky: 'grass', boost: 'boost', bridge: 'bridge' };
 
@@ -137,6 +139,8 @@ function sweep(frames, cupRow, G, col, drop = 0) {
           [n0, n1, n1, n0], [[A.s, 0], [B.s, 0], [B.s, 1], [A.s, 1]], n0);
         tr(otA, otB, sA, sB);
         tr(itA, itB, inA, inB);
+        // Bumper Guard: a rail on the wall top too, so a hopping ball can't leave the track
+        if (col.guardCand && !A.loop && !B.loop) col.guardCand.push({ P: [itA, itB, v3.mad(itB, B.u, GUARD_H), v3.mad(itA, A.u, GUARD_H)], wall: true });
         // end caps where the wall starts / stops
         if (!has(i - 1)) {
           const n = v3.mul(A.f, -1), P = [ibA, obA, otA, itA];
@@ -156,6 +160,8 @@ function sweep(frames, cupRow, G, col, drop = 0) {
         col.quad(P, MAT.WALL);
         const T = [v3.mad(eA, A.u, 0.003), v3.mad(eB, B.u, 0.003), v3.mad(eB, B.u, -TRIM_H), v3.mad(eA, A.u, -TRIM_H)];
         G('trim').quad([v3.mad(T[0], sA, 0.004), v3.mad(T[1], sB, 0.004), v3.mad(T[2], sB, 0.004), v3.mad(T[3], sA, 0.004)], [sA, sB, sB, sA], [[A.s, 0], [B.s, 0], [B.s, 1], [A.s, 1]], sA);
+        // Bumper Guard candidate: a rail standing on this open edge (filtered at track joints later)
+        if (col.guardCand) col.guardCand.push({ P: [eA, eB, v3.mad(eB, B.u, GUARD_H), v3.mad(eA, A.u, GUARD_H)], out: v3.lerp(sA, sB, 0.5), up: A.u });
       }
     }
   }
@@ -210,6 +216,35 @@ function applyPatches(def, frames, col, G, total) {
       }
     }
   }
+}
+
+// Bumper Guard rails (M5): every open-edge segment gets a rail unless floor continues just outside it
+// (a junction such as hole 7's plank, or another stretch of track), so the helper never blocks a route.
+// → { tris: Float64Array (colliders, used only by a ball with mods.guard), quads: [[p0..p3]] (visual) }
+function buildGuards(col) {
+  const cand = col.guardCand || [];
+  if (!cand.length) return { tris: new Float64Array(0), quads: [] };
+  const tris = Float64Array.from(col.t), grid = new TriGrid(tris);
+  const floorAt = p => {
+    const cell = grid.query(p[0], p[1], p[2]);
+    for (let i = 0; i < cell.length; i++) {
+      const ti = cell[i];
+      if (!SURFACES[col.m[ti]]?.floor) continue;
+      closestOnTri(tris, ti * 9, p[0], p[1], p[2]);
+      if (Math.hypot(p[0] - CP.x, p[1] - CP.y, p[2] - CP.z) < 0.05) return true;
+    }
+    return false;
+  };
+  const quads = [], t = [];
+  for (const g of cand) {
+    const [a, b] = g.P;
+    const joint = !g.wall && [0.1, 0.5, 0.9].some(k => floorAt(v3.mad(v3.mad(v3.lerp(a, b, k), g.out, 0.12), g.up, 0.01)));
+    if (joint) continue;
+    quads.push(g.P);
+    t.push(...g.P[0], ...g.P[1], ...g.P[2], ...g.P[0], ...g.P[2], ...g.P[3]);
+  }
+  delete col.guardCand;
+  return { tris: Float64Array.from(t), quads };
 }
 
 // Initial camera heading (horizontal unit vector): tee toward the track ~2.5 m ahead.
@@ -270,10 +305,13 @@ export function buildHole(def) {
   const col = new Col();
 
   col.floor = [];
+  col.guardCand = [];
   sweep(frames, cupRow, G, col);
   const tubes = buildTubes(frames, col);
   applyPatches(def, frames, col, G, total);
   for (const br of def.branches || []) sweep(stamp(pathFrames(br.points, -1)), -1, G, col, -0.0015);
+
+  const guards = buildGuards(col);
 
   // 5. end walls across the track at the start and the end
   const endWall = (F, dir) => {
@@ -347,7 +385,7 @@ export function buildHole(def) {
     id: def.id, name: def.name, par: def.par,
     frames, total, geo, cup, tee, teeFrame: tf, cupFrame: cf,
     colliders: { tris: Float64Array.from(col.t), mats: Uint8Array.from(col.m), dirs: Float32Array.from(col.d) },
-    kinematics, features,
+    kinematics, features, guards,
     bounds: { min: mn, max: mx },
     killY: mn[1] - 1.2,
     path: mainFrames.map(f => f.p), widths: mainFrames.map(f => f.w), floor: mainFrames.map(f => f.floor),

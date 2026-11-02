@@ -16,6 +16,9 @@ import { createAudio } from '../audio/index.js';
 import { createCareer } from '../story/career.js';
 import { createEvents } from '../events/screen.js';
 import { featured, timeText, status, nowFrom } from '../events/events.js';
+import { createMeta } from '../meta/meta.js';
+import { createMetaScreens, tierBadge } from '../meta/screens.js';
+import { TIERS, weekCountdown } from '../meta/ladder.js';
 
 const $ = s => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -74,7 +77,9 @@ async function boot() {
   // theme: ?theme= overrides the saved pick (D7 loader falls back to greybox)
   const first = await loadTheme(params.get('theme') || store.settings().theme || 'sky', renderer);
   const course = COURSES.sky;
-  const app = { renderer, scene, camera, rig, theme: first.theme, fallback: first.fallback, quality, hud, canvas, themeId: first.id, fullscreen: null, store, audio };
+  // M5 meta (ladder, coins, chests, shop). `?eventdate=YYYY-MM-DD` pins its clock too (week tests).
+  const meta = createMeta(store, () => nowFrom());
+  const app = { renderer, scene, camera, rig, theme: first.theme, fallback: first.fallback, quality, hud, canvas, themeId: first.id, fullscreen: null, store, audio, meta };
   app.openSettings = onClose => openSettings(store, { apply: applySettings, onClose, click: () => sfx.emit('click') });
   audio?.music.start(app.themeId);
 
@@ -100,6 +105,7 @@ async function boot() {
     ensureTitleScene();
     renderTitle(store, course, app.themeId, setTheme);
     renderEventTile();
+    renderMetaTiles();
     $('#title').hidden = false;
   }
   function ensureTitleScene() {
@@ -186,12 +192,25 @@ async function boot() {
     const ev = featured(now()), st = status(ev, now());
     $('#t-events').innerHTML = `<span class="et-ic">${ev.currency.icon}</span><span class="et-main"><b>${ev.name}</b><small>${timeText(ev, now())}</small></span><span class="badge ${st}">${st === 'live' ? 'Live' : st}</span>`;
   }
+  // ---- ladder + shop (M5)
+  const metaScreens = createMetaScreens({
+    store, meta, click: () => sfx.emit('click'), sfx: (n, p) => sfx.emit(n, p),
+    onBack: () => showTitle(), playerName: () => store.story().name || 'You',
+  });
+  function renderMetaTiles() {
+    const L = meta.ladder(), claim = meta.unclaimed().length, chests = store.data.chests.queue.length;
+    $('#t-ladder').innerHTML = `${tierBadge(L.tier, 30)}<span class="tm"><b>${TIERS[L.tier].name}</b><small>${claim ? 'Reward ready!' : `${L.points} pts · ${weekCountdown(nowFrom())}`}</small></span>${claim ? '<i class="dotn">!</i>' : ''}`;
+    $('#t-shop').innerHTML = `<span class="tm-ic">${ICONS.coin}</span><span class="tm"><b>Shop</b><small>${store.data.coins | 0} coins</small></span>${chests ? `<i class="dotn">${chests}</i>` : ''}`;
+  }
+  $('#t-ladder').onclick = () => { sfx.emit('click'); $('#title').hidden = true; metaScreens.ladder(); };
+  $('#t-shop').onclick = () => { sfx.emit('click'); $('#title').hidden = true; metaScreens.shop(store.data.chests.queue.length ? 'chests' : 'balls'); };
+
   $('#t-play').onclick = () => { sfx.emit('click'); startRound(0, 'round'); };
   $('#t-map').onclick = () => { sfx.emit('click'); showCourseMap(); };
   $('#t-settings').innerHTML = ICONS.gear;
   $('#t-settings').onclick = () => { sfx.emit('click'); app.openSettings(() => {}); };
 
-  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, events, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
+  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, events, meta, metaScreens, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
 
   const startHole = parseInt(params.get('hole'), 10);
   if (startHole >= 1 && startHole <= course.holes.length) startRound(startHole - 1, 'single'); else showTitle();

@@ -10,7 +10,7 @@ export function simulateShot(world, ball, vx, vz, { t0 = world.time, maxSteps = 
   let t = t0, steps = 0;
   while (ball.state === 'moving' && steps < maxSteps) {
     world.stepBall(ball, t);
-    t += DT; steps++;
+    t += DT * world.clock; steps++;
     if (ball.events.length) { events.push(...ball.events); ball.events.length = 0; }
     if (trace && steps % trace === 0) path.push([ball.px, ball.py, ball.pz]);
   }
@@ -29,10 +29,10 @@ export function traceGuide(world, ball, vx, vz, { len = 1.2, maxBounces = 0, t0 
   let t = t0, dist = 0, i = 0;
   let lx = b.px, ly = b.py, lz = b.pz;
   while (b.state === 'moving' && i < 240 * 12) {
-    world.stepBall(b, t); t += DT; i++;
+    world.stepBall(b, t); t += DT * world.clock; i++;
     dist += Math.hypot(b.px - lx, b.py - ly, b.pz - lz); lx = b.px; ly = b.py; lz = b.pz;
     let hit = false;
-    for (const e of b.events) if (e.type === 'wall' || e.type === 'obstacle') hit = true;
+    for (const e of b.events) if (e.type === 'wall' || e.type === 'obstacle' || e.type === 'guard') hit = true;
     b.events.length = 0;
     if (hit) {
       pts.push([b.px, b.py, b.pz]);

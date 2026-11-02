@@ -8,6 +8,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 export const THEME_LIST = [
   { id: 'sky', name: 'Sky Isles', swatch: 'linear-gradient(160deg, #7fb4ef 0%, #f6c98a 55%, #4fae4a 56%, #3a8a37 100%)', moon: '#f2c75c' },
   { id: 'spooky', name: 'Spooky Hollow', swatch: 'linear-gradient(160deg, #1b1233 0%, #4a2a6a 55%, #3e4a2c 56%, #262d1c 100%)', moon: '#ff8a2a' },
+  { id: 'frost', name: 'Frost Fair', swatch: 'linear-gradient(160deg, #0b1440 0%, #2a4a9a 55%, #e8eefa 56%, #c4d2ee 100%)', moon: '#f4f2e6' },
 ];
 
 export function renderTitle(store, course, themeId, onTheme) {

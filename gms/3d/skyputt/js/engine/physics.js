@@ -10,7 +10,11 @@ const R2 = R * R;
 const MAXC = 64;
 const JN_CAP = 2.5 * G * DT;
 const GRAZE = 0.3;                       // |u.n| < GRAZE*|u| counts as rolling over a curve
-const RIM_HOP = 0.3, RIM_KEEP = 0.92;   // lip-out tuning (m/s upward cap, horizontal keep)        // rolling-friction normal impulse cap per step (landings don't skid to a halt)
+const RIM_HOP = 0.3, RIM_KEEP = 0.92;   // lip-out tuning (m/s upward cap, horizontal keep)
+// One-shot helpers (M5). They live on `ball.mods` so guide traces / clones carry them; null = none.
+//   magnet: the cup pulls the ball in from MAGNET_R · sticky: walls/obstacles keep STICKY_E of their bounce
+//   guard: temporary rails on open edges (World.guards) · ghost: 1 armed, 2 passing through, 3 spent
+export const MAGNET_R = 0.5, MAGNET_ACC = 2.6, STICKY_E = 0.3;
 
 // Contact scratch (kind: 0 tri, 1 cup rim, 2 cup wall, 3 cup floor, 4 kinematic shape)
 const cKind = new Int32Array(MAXC), cIdx = new Int32Array(MAXC), cSub = new Int32Array(MAXC);
@@ -29,6 +33,7 @@ export class Ball {
     this.surf = MAT.GRASS;
     this.rest = { x, y, z };       // last resting spot (D9)
     this.events = [];
+    this.mods = null;              // one-shot helper modifiers (see MAGNET_R above)
   }
   speed() { return Math.hypot(this.vx, this.vy, this.vz); }
   clone() {
@@ -37,6 +42,7 @@ export class Ball {
     b.restT = this.restT; b.moveT = this.moveT; b.supported = this.supported;
     b.nx = this.nx; b.ny = this.ny; b.nz = this.nz; b.surf = this.surf;
     b.rest = { ...this.rest };
+    b.mods = this.mods ? { ...this.mods } : null;
     return b;
   }
   place(x, y, z) {
@@ -49,8 +55,12 @@ export class World {
   // tris: Float64Array (9 per tri), mats: Uint8Array (1 per tri),
   // cup: {x,y,z} | null, kinematics: [{pivot, axis, omega, phase, basis:[ex,ey,ez], shapes, mat}]
   // dirs: optional Float32Array (3 per tri), the arrow of boost-pad triangles
-  constructor({ tris, mats, dirs = null, cup = null, kinematics = [], killY = -3 }) {
+  // guards: optional Float64Array (9 per tri) of rails on open edges, only active for a ball with mods.guard
+  constructor({ tris, mats, dirs = null, cup = null, kinematics = [], killY = -3, guards = null }) {
     this.tris = tris; this.mats = mats; this.dirs = dirs; this.cup = cup; this.kin = kinematics; this.killY = killY;
+    this.guards = guards && guards.length ? guards : null;
+    this.guardGrid = this.guards ? new TriGrid(this.guards) : null;
+    this.clock = 1;                // obstacle clock rate (Steady Hands slows it; callers advance time by DT * clock)
     this._kinP = kinematics.map(k => Float64Array.from(k.pivot));   // posed pivot (sliders move it)
     this._kinV = kinematics.map(() => new Float64Array(3));          // slider linear velocity
     this.grid = new TriGrid(tris);
@@ -101,6 +111,7 @@ export class World {
       CP.y = Math.min(c.y, Math.max(c.y - CUP_DEPTH, py)); return MAT.CUP;
     }
     if (kind === 3) { CP.x = px; CP.y = c.y - CUP_DEPTH; CP.z = pz; return MAT.CUP; }
+    if (kind === 5) { closestOnTri(this.guards, idx * 9, px, py, pz); return MAT.WALL; }
     // kinematic shape
     const body = this.kin[idx], s = body.shapes[sub], A = this._kinAxes[idx], pv = this._kinP[idx];
     const dx = px - pv[0], dy = py - pv[1], dz = pz - pv[2];
@@ -128,11 +139,11 @@ export class World {
     qx += s.c[0]; qy += s.c[1]; qz += s.c[2];
     const wx = A[0] * qx + A[3] * qy + A[6] * qz, wy = A[1] * qx + A[4] * qy + A[7] * qz, wz = A[2] * qx + A[5] * qy + A[8] * qz;
     CP.x = pv[0] + wx; CP.y = pv[1] + wy; CP.z = pv[2] + wz;
-    if (body.omega) {                                  // v = omega * axis x r
-      const w = body.omega, ax = body.axis;
+    if (body.omega) {                                  // v = omega * axis x r (scaled by the obstacle clock)
+      const w = body.omega * this.clock, ax = body.axis;
       KV.x = w * (ax[1] * wz - ax[2] * wy); KV.y = w * (ax[2] * wx - ax[0] * wz); KV.z = w * (ax[0] * wy - ax[1] * wx);
     }
-    if (body.slide) { const V = this._kinV[idx]; KV.x += V[0]; KV.y += V[1]; KV.z += V[2]; }
+    if (body.slide) { const V = this._kinV[idx], ck = this.clock; KV.x += V[0] * ck; KV.y += V[1] * ck; KV.z += V[2] * ck; }
     return s.mat ?? body.mat ?? MAT.WALL;
   }
 
@@ -168,17 +179,37 @@ export class World {
         if (db < R && n < MAXC) { cKind[n] = 3; cIdx[n] = 0; cSub[n] = 0; cD[n++] = db * db; }
       }
     }
+    const mods = b.mods;
     if (this.kin.length) {
       this._poseKin(t);
+      let ghostTouch = false;
       for (let k = 0; k < this.kin.length; k++) {
         const body = this.kin[k];
         const pv = this._kinP[k], dx = b.px - pv[0], dy = b.py - pv[1], dz = b.pz - pv[2];
         if (dx * dx + dy * dy + dz * dz > (body.reach + R) ** 2) continue;
+        // Ghost Ball: the first obstacle touched (a windmill's blades count as one) is passed through
+        // (a ball deep inside a shape may be farther than R from its surface, so "still passing" is
+        // judged by the body's bounding reach, not by contact)
+        const gid = body.group ?? k;
+        if (mods && mods.ghost === 2 && mods.ghostId === gid) { ghostTouch = true; continue; }
+        const ghosting = mods && mods.ghost === 1;
         for (let s = 0; s < body.shapes.length && n < MAXC; s++) {
           this._closest(4, k, s, b.px, b.py, b.pz);
           const ex = b.px - CP.x, ey = b.py - CP.y, ez = b.pz - CP.z, d2 = ex * ex + ey * ey + ez * ez;
-          if (d2 < R2) { cKind[n] = 4; cIdx[n] = k; cSub[n] = s; cD[n++] = d2; }
+          if (d2 < R2) {
+            if (ghosting) { if (mods.ghost === 1) b.events.push({ type: 'ghost' }); mods.ghost = 2; mods.ghostId = gid; ghostTouch = true; continue; }
+            cKind[n] = 4; cIdx[n] = k; cSub[n] = s; cD[n++] = d2;
+          }
         }
+      }
+      if (mods && mods.ghost === 2 && !ghostTouch) mods.ghost = 3;   // out the other side: spent
+    }
+    if (mods && mods.guard && this.guardGrid) {
+      const cell = this.guardGrid.query(b.px, b.py, b.pz);
+      for (let i = 0; i < cell.length && n < MAXC; i++) {
+        closestOnTri(this.guards, cell[i] * 9, b.px, b.py, b.pz);
+        const dx = b.px - CP.x, dy = b.py - CP.y, dz = b.pz - CP.z, d2 = dx * dx + dy * dy + dz * dz;
+        if (d2 < R2) { cKind[n] = 5; cIdx[n] = cell[i]; cSub[n] = 0; cD[n++] = d2; }
       }
     }
     // insertion sort by distance (deepest first)
@@ -224,7 +255,7 @@ export class World {
           rolled = true;
         }
       }
-      const e = !rolled && jn > BOUNCE_MIN && !(S.floor && wasSupported) ? S.e : 0;
+      const e = !rolled && jn > BOUNCE_MIN && !(S.floor && wasSupported) ? (mods && mods.sticky && !S.floor ? S.e * STICKY_E : S.e) : 0;
       if (!rolled) { rvx -= (1 + e) * vn * nx; rvy -= (1 + e) * vn * ny; rvz -= (1 + e) * vn * nz; }
       if (mat === MAT.RIM && jn > 0.25) {
         // The far lip: a rolling ball pivots round the edge and keeps its pace (energy), it does
@@ -241,7 +272,7 @@ export class World {
         const tx = rvx - vnn * nx, ty = rvy - vnn * ny, tz = rvz - vnn * nz;
         const ts = Math.hypot(tx, ty, tz);
         if (ts > 1e-9) { const k = Math.max(0, 1 - S.scrub * jn / ts); rvx = vnn * nx + tx * k; rvy = vnn * ny + ty * k; rvz = vnn * nz + tz * k; }
-        if (jn > 0.12) b.events.push({ type: cKind[i] === 4 ? 'obstacle' : (mat === MAT.CUP ? 'cup-hit' : 'wall'), speed: jn, mat });
+        if (jn > 0.12) b.events.push({ type: cKind[i] === 4 ? 'obstacle' : cKind[i] === 5 ? 'guard' : (mat === MAT.CUP ? 'cup-hit' : 'wall'), speed: jn, mat });
       } else {
         fJn += jn; fnx += nx * jn; fny += ny * jn; fnz += nz * jn;
         if (jn > fBest) { fBest = jn; fMat = mat; }
@@ -278,6 +309,17 @@ export class World {
       b.onBoost = true;
     } else if (b.supported) b.onBoost = false;
 
+    // Magnet Cup: a pull toward the cup centre (and a damping of the sideways part) inside MAGNET_R
+    if (mods && mods.magnet && c && b.supported) {
+      const dx = c.x - b.px, dz = c.z - b.pz, dh = Math.hypot(dx, dz);
+      if (dh < MAGNET_R && dh > 1e-6 && Math.abs(b.py - c.y) < 0.2) {
+        const ux = dx / dh, uz = dz / dh, w = 1 - dh / MAGNET_R;
+        const k = MAGNET_ACC * DT * (0.4 + 0.6 * w);
+        const vr = b.vx * ux + b.vz * uz, tx = b.vx - vr * ux, tz = b.vz - vr * uz;
+        const damp = Math.max(0, 1 - 3 * w * DT);
+        b.vx = (vr + k) * ux + tx * damp; b.vz = (vr + k) * uz + tz * damp;
+      }
+    }
     // ---- cup capture, out of bounds, rest
     if (c) {
       const dh = Math.hypot(b.px - c.x, b.pz - c.z);

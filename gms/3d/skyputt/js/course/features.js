@@ -55,7 +55,7 @@ const BUILDERS = {
     const r0 = 0.06, x0 = -0.015, x1 = SAIL_X + bladeW + 0.01;
     for (let k = 0; k < count; k++) {
       kinematics.push(kinematicBody({
-        pivot, axis: back, omega, phase: phase + (2 * Math.PI * k) / count,
+        pivot, axis: back, omega, phase: phase + (2 * Math.PI * k) / count, group: `windmill@${ft.s ?? 0}`,   // one obstacle for Ghost Ball
         basis: [right, Y, back], mat: MAT.BLADE,
         shapes: [{ kind: 'box', c: [(x0 + x1) / 2, (r0 + L) / 2, 0], h: [(x1 - x0) / 2, (L - r0) / 2, 0.022] }],
       }));
