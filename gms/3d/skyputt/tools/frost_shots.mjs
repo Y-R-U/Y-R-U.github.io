@@ -2,6 +2,7 @@
 // Frost Fair checks inside the REAL game (raw CDP). Start Chrome first:
 //   ~/.claude/bin/cdp start --port 9534
 //   node tools/frost_shots.mjs [--holes=1-9] [--sizes=p,l] [--q=low] [--out=docs/notes/frost_shots] [--tag=x] [--t=seconds]
+//   node tools/frost_shots.mjs --swap        # title screen: swap frost → sky → spooky → frost (dispose check), screenshot
 // For each hole and size: a tee screenshot plus draw calls / triangles from renderer.info, and the
 // console errors. Exits 1 on errors.
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -60,7 +61,20 @@ async function waitFor(expr, ms = 5000) {
 }
 const DIMS = { p: [412, 915, true], l: [1440, 900, false] };
 try {
-  for (const s of SIZES) {
+  if (args.swap) {   // title-screen theme swaps exercise theme.dispose() + env dispose; any throw shows up as an error
+    await c.send('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
+    await c.send('Page.navigate', { url: `${BASE}?theme=${THEME}&t=${Date.now()}` });
+    await sleep(500);
+    await waitFor('window.__booted === true', 40000);
+    for (const id of ['sky', 'spooky', THEME]) {
+      await c.eval(`__skyputt.setTheme(${JSON.stringify(id)})`);
+      await sleep(2500);
+      console.log('swapped to', await c.eval('__skyputt.themeId'), JSON.stringify(await c.eval(`(() => { const ri = __skyputt.app.renderer.info; return { geos: ri.memory.geometries, tex: ri.memory.textures }; })()`)));
+    }
+    const r = await c.send('Page.captureScreenshot', { format: 'png' });
+    writeFileSync(`${OUT}/${TAG}title-swap.png`, Buffer.from(r.data, 'base64'));
+  }
+  for (const s of (args.swap ? [] : SIZES)) {
     const [w, h, mob] = DIMS[s];
     await c.send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: mob ? 2 : 1, mobile: mob });
     await c.send('Emulation.setTouchEmulationEnabled', { enabled: mob });

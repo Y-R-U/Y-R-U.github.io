@@ -38,3 +38,8 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - Next free slot: Frost Fair theme agent (js/themes/frost/).
 - 2026-11-02: ai done (js/ai/, notes/ai.md, simulateRound live). Not yet committed: engine agent to
   verify story↔AI integration + tune rosters (D14) first. Next slot: Frost Fair theme agent.
+- 2026-11-02: 9074625c pushed (js/ai, story real AI + rival ghost, events framework, crystals once).
+  Engine agent retired (context ~600k; handoff in notes/engine.md). New `meta` agent: M5 weekly
+  ladder/tiers, shop + cosmetics, chests, 6 more helpers (notes/meta.md). `frost` still running.
+- Remaining after M5: frost registration + Frost Fair event switch to theme 'frost'; M6 online
+  (server — deploy needs Aaron OK); story chapters 2-6; more holes per theme; projects.js entry.
