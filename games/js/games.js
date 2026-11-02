@@ -28,6 +28,12 @@ export const GAMES = [
     blurb: "Classic, Fantasy, Halloween and Sci-fi piece sets with over-the-top capture battles. Twenty bots with ratings, 600+ puzzles, 27 lessons for beginners, and online games with friends or strangers.",
   },
   {
+    id: "skyputt", name: "SKYPUTT", tag: "Mini golf in the clouds",
+    path: "/gms/3d/skyputt/", shot: "skyputt", accent: "#f2c75c", soon: true,
+    short: "3D mini golf: one-thumb putts, four themes, a career to Legend.",
+    blurb: "Eighteen floating-island holes with windmills, loops and jumps in four themes. A story from nobody to Legend, helpers, a weekly ladder, seasonal events, and online rooms with friends.",
+  },
+  {
     id: "ragdojo", name: "RAGDOJO", tag: "Stick fighting, on paper",
     path: "/gms/2d/ragdojo/", shot: "ragdojo", accent: "#3d7fd6",
     short: "Draw your moves. Send stick fighters flying.",
