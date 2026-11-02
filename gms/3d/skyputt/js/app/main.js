@@ -20,6 +20,9 @@ import { createMeta } from '../meta/meta.js';
 import { createMetaScreens, tierBadge } from '../meta/screens.js';
 import { TIERS, weekCountdown } from '../meta/ladder.js';
 import { createOnline } from '../net/index.js';
+import { createDaily } from '../daily/daily.js';
+import { createDailyScreen, dailyTileHTML } from '../daily/screen.js';
+import { DailyRound } from '../daily/round.js';
 
 const $ = s => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -106,6 +109,7 @@ async function boot() {
     ensureTitleScene();
     renderTitle(store, course, app.themeId, setTheme);
     renderEventTile();
+    renderDailyTile();
     renderMetaTiles();
     renderOnlineTile?.();
     $('#title').hidden = false;
@@ -200,6 +204,23 @@ async function boot() {
   function renderEventTile() {
     $('#t-events').innerHTML = eventTileHTML(now());   // events3: live / next event + what follows
   }
+  // ---- daily challenge (js/daily/): one hole a day, 3 tries, streak, ghost board
+  const daily = createDaily(store, now);
+  const dailyScreen = createDailyScreen({
+    store, daily, now, click: () => sfx.emit('click'), onBack: () => showTitle(),
+    play: (ch, att) => new Promise(async resolve => {
+      $('#title').hidden = true;
+      await useTheme(ch.theme);
+      if (app.themeId !== ch.theme) await useTheme('sky');   // theme missing → Sky Isles, not greybox
+      titleView?.dispose(); titleView = null;
+      const done = async res => { round = null; await useTheme(playerTheme()); ensureTitleScene(); resolve(res); };
+      round = new DailyRound(app, ch, { tryNo: att.i + 1, onComplete: done, onExit: () => done(null) });
+      if (params.has('noflyover')) round.endFlyover();
+      window.__skyputt.round = round;
+    }),
+  });
+  $('#t-daily').onclick = () => { sfx.emit('click'); $('#title').hidden = true; dailyScreen.open(); };
+  function renderDailyTile() { $('#t-daily').innerHTML = dailyTileHTML(daily); }
   // ---- ladder + shop (M5)
   const metaScreens = createMetaScreens({
     store, meta, click: () => sfx.emit('click'), sfx: (n, p) => sfx.emit(n, p),
@@ -225,14 +246,14 @@ async function boot() {
   $('#t-online').onclick = () => { sfx.emit('click'); $('#title').hidden = true; online.open(); };
   function renderOnlineTile() {
     const h = online.hint();
-    $('#t-online').innerHTML = `Online<small>${h ? `Rejoin room ${h.code}` : 'Friends, public rooms, ghost AIs'}</small>`;
+    $('#t-online').innerHTML = `Online<small>${h ? `Rejoin room ${h.code}` : 'Friends, rooms, ghost AIs'}</small>`;
   }
   $('#t-play').onclick = () => { sfx.emit('click'); startRound(0, 'round', course.nines?.[0]?.to); };
   $('#t-map').onclick = () => { sfx.emit('click'); showCourseMap(); };
   $('#t-settings').innerHTML = ICONS.gear;
   $('#t-settings').onclick = () => { sfx.emit('click'); app.openSettings(() => {}); };
 
-  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, events, meta, metaScreens, online, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
+  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, events, meta, metaScreens, online, daily, dailyScreen, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
 
   const startHole = parseInt(params.get('hole'), 10);
   const startCourse = COURSES[params.get('course')] || course;   // events2: ?course=festival&hole=3

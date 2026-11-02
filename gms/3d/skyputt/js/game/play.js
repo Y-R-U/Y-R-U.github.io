@@ -24,11 +24,12 @@ export class Round {
   // mode: 'round' (play on to the last hole, then the scorecard) | 'single' (one hole, then the map)
   // Story events add: onComplete(result) instead of the scorecard, opponents [{ name, colour, scores }]
   // shown on every hole card, and tips (hint lines at each hole start).
-  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null, ledger = null, currency = null, ghosts = null, inventory = null, end = null } = {}) {
+  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null, ledger = null, currency = null, ghosts = null, inventory = null, end = null, doneLabel = null } = {}) {
     this.app = app;
     this.inv = inventory || app.store;   // helper counts: the save, or an online room's own (js/net)
     this.course = course; this.onExit = onExit; this.mode = mode;
     this.onComplete = onComplete; this.opponents = opponents; this.tips = tips; this.label = label;
+    this.doneLabel = doneLabel;   // the last hole card's button with onComplete (daily: 'Back to the daily')
     this.used = Object.fromEntries(HELPERS.map(h => [h.id, 0]));
     this.armed = {};   // one-shot helpers armed for the next shot (kind 'pre'), consumed on arming
     // pickups pay out once per (hole, index); event rounds pass their own ledger + currency
@@ -517,7 +518,7 @@ export class Round {
       hole: this.index + 1, n, name: def.name, par: def.par, strokes, picked, gems: this.holeGems,
       stars, coins: coins + (roundBonus?.coins || 0), newBest, reward, totalCoins: store.data.coins,
       ladder: meta && { points: meta.points, streak: meta.streak }, chest: meta?.chest, roundBonus,
-      nextLabel: this.mode === 'round' ? (last ? 'Scorecard' : 'Next hole') : (nextOpen ? 'Next hole' : 'Course map'),
+      nextLabel: this.mode === 'round' ? (last ? (this.doneLabel || 'Scorecard') : 'Next hole') : (nextOpen ? 'Next hole' : 'Course map'),
       onMap: this.mode === 'single' ? () => this.exit() : null,
       rivals: this.opponents?.map(o => ({ name: o.name, colour: o.colour, strokes: o.scores[this.index],
         total: o.scores.slice(0, this.index + 1).reduce((a, b) => a + b, 0) })),

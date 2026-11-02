@@ -11,6 +11,7 @@
 //        --course=festival (events2) loads ?course=festival&hole=N
 //   node tools/shots_cdp.mjs events2 [--out=DIR] [--only=lunar,candy,egg,sky-games,fallback,map] [--quick]   events2: the 2027
 //        events via ?eventdate= (Egg Hunt played to the end), candy theme fallback, Festival Isles map tab
+//   node tools/shots_cdp.mjs daily [--out=DIR] [--day=YYYY-MM-DD] [--sizes=p,d,l]   Daily Challenge: tile, page, a try, share, quits, shot clock
 //   node tools/shots_cdp.mjs events3 [--out=DIR] [--days=YYYY-MM-DD,…] [--sizes=p,d,l] [--quick|--no-play]   events3: rolling
 //        calendar (tile / list / page per date and size) and a weekend round played to the end
 //   node tools/shots_cdp.mjs nines [--out=DIR]   story2: map nine tabs, back nine lock, Play back nine, scorecard
@@ -739,6 +740,91 @@ async function events3Mode(c) {
   console.log('     save:', await c.eval(`JSON.stringify(Object.fromEntries(Object.entries(__skyputt.store.data.events).map(([k, v]) => [k, { pts: v.points, r: v.rounds, cur: v.currency, cl: v.claimed }])))`), '· coins', await c.eval('__skyputt.store.data.coins'));
 }
 
+// daily: the Daily Challenge. Title tile + page at 3 sizes, a full try played by drags (fixed kit),
+// share, two quit tries → no tries left, the shot clock running out, no-helpers tray, the next day.
+async function dailyMode(c) {
+  const SIZES = { p: [412, 915, true], d: [1440, 900, false], l: [844, 390, true] };
+  const sizes = (args.sizes ? String(args.sizes) : 'p,d,l').split(',');
+  const DAY = args.day || '2026-11-03';
+  let fresh = 'fresh&';
+  const overflow = () => c.eval(`(() => { const el = document.querySelector('#daily .career-card'); return el ? el.scrollWidth > el.clientWidth + 1 || document.documentElement.scrollWidth > innerWidth + 1 : 'none'; })()`);
+  const titleFits = () => c.eval(`(() => { const r = document.querySelector('.title-card').getBoundingClientRect(); return r.top >= -1 && r.bottom <= innerHeight + 1 && document.documentElement.scrollWidth <= innerWidth + 1; })()`);
+  for (const sz of sizes) {
+    await size(c, ...SIZES[sz]);
+    await go(c, `${fresh}noflyover&eventdate=${DAY}`); fresh = '';
+    console.log(`   ${sz}: tile =`, await c.eval(`document.querySelector('#t-daily').innerText.replace(/\\n+/g, ' | ')`), '· title fits:', await titleFits());
+    await shot(c, `daily-${sz}-title`);
+    await c.eval(`document.querySelector('#t-daily').click()`); await sleep(400);
+    await shot(c, `daily-${sz}-page`);
+    if (await overflow()) console.log('     WARNING: horizontal overflow on the daily page');
+  }
+  const pageText = () => c.eval(`document.querySelector('#daily .map-title').innerText + ' · ' + [...document.querySelectorAll('#daily .dl-twist, #daily .ev-stats, #daily .dl-flash, #daily .dl-tries')].map(e => e.innerText.replace(/\\n+/g, ' ')).join(' · ')`);
+  const playTry = async () => { await c.eval(`document.querySelector('#daily [data-a=play]').click()`); await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 60000); await sleep(1200); };
+  const quit = async () => { await c.eval('__skyputt.round.exit()'); await waitFor(c, '!document.querySelector("#daily").hidden', 30000); await sleep(500); };
+  await size(c, 412, 915, true);
+  await go(c, `noflyover&eventdate=${DAY}`);
+  await c.eval(`document.querySelector('#t-daily').click()`); await sleep(300);
+  console.log('   page:', await pageText());
+  await playTry();
+  console.log('     round:', await c.eval(`__skyputt.round.label + ' · theme ' + __skyputt.app.themeId + ' · kit ' + JSON.stringify(__skyputt.round.inv.helpers()) + ' · own longSight ' + __skyputt.store.data.helpers.longSight`));
+  await shot(c, 'daily-try1-hole');
+  for (let n = 0; n < 40; n++) {
+    const st = await c.eval('__skyputt.round ? __skyputt.round.state : null');
+    if (!st) break;
+    if (st === 'done') {
+      console.log('     card:', (await c.eval(`document.querySelector('#h-card .card')?.innerText.replace(/\\n+/g, ' | ')`) || '').slice(0, 140));
+      await shot(c, 'daily-try1-card');
+      await c.eval(`document.querySelector('#h-card [data-a=next]')?.click()`); await sleep(1200); n--; continue;
+    }
+    if (st !== 'ready') { await sleep(400); n--; continue; }
+    await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
+    const plan = await c.eval(`(${planInPage.toString()})()`);
+    const len = 24 + plan.power * 182;
+    await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
+    await sleep(700);
+  }
+  await waitFor(c, '!document.querySelector("#daily").hidden', 60000); await sleep(600);
+  console.log('     after try 1:', await pageText(), '· theme', await c.eval('__skyputt.app.themeId'), '· coins', await c.eval('__skyputt.store.data.coins'));
+  await shot(c, 'daily-after-try1');
+  await c.eval(`document.querySelector('#daily [data-a=share]').click()`); await sleep(500);
+  console.log('     share:', JSON.stringify(await c.eval(`document.querySelector('#daily .dl-share')?.value || document.querySelector('#daily [data-a=share]').innerText`)));
+  await shot(c, 'daily-share');
+  await playTry(); await quit(); await playTry(); await quit();
+  console.log('     after 2 quits:', await pageText(), '· play button:', await c.eval(`!!document.querySelector('#daily [data-a=play]')`));
+  await shot(c, 'daily-no-tries');
+  console.log('     board:', await c.eval(`[...document.querySelectorAll('#daily .dl-board tr')].map(r => r.innerText.replace(/\\s+/g, ' ')).join(' / ')`));
+  // shot clock day: let it run out once
+  const clockDay = args.clockday || '2026-11-07';
+  await go(c, `noflyover&eventdate=${clockDay}`);
+  await c.eval(`document.querySelector('#t-daily').click()`); await sleep(300);
+  console.log('   clock day:', await pageText());
+  await playTry();
+  await sleep(10500);
+  console.log('     clock shown:', await c.eval(`document.querySelector('#daily-ov .net-clock')?.innerText`), '· strokes', await c.eval('__skyputt.round.strokes'));
+  await shot(c, 'daily-clock');
+  await waitFor(c, '__skyputt.round.strokes >= 1', 12000);
+  await sleep(1500);
+  console.log('     after timeout: strokes', await c.eval('__skyputt.round.strokes'), '· state', await c.eval('__skyputt.round.state'));
+  await c.eval('__skyputt.round.pause()'); await sleep(300);
+  console.log('     pause menu:', await c.eval(`document.querySelector('#h-card .card')?.innerText.replace(/\\n+/g, ' | ')`));
+  await shot(c, 'daily-pause');
+  await c.eval(`document.querySelector('#h-card [data-a=quit]').click()`); await waitFor(c, '!document.querySelector("#daily").hidden', 30000); await sleep(500);
+  console.log('     clock overlay removed:', await c.eval(`!document.querySelector('#daily-ov')`), '· tile streak', await c.eval(`(__skyputt.daily.streak().count)`));
+  // no-helpers day: tray hidden
+  const noDay = args.nohelpersday || '2026-11-15';
+  await go(c, `noflyover&eventdate=${noDay}`);
+  await c.eval(`document.querySelector('#t-daily').click()`); await sleep(300);
+  await playTry();
+  console.log('   no-helpers day:', await c.eval('__skyputt.round.label'), '· tray hidden', await c.eval(`document.querySelector('#h-tray').hidden`));
+  await shot(c, 'daily-nohelpers');
+  await quit();
+  console.log('     tray back after:', await c.eval(`!document.querySelector('#h-tray').hidden`));
+  // landscape phone round HUD on the kit day + title next day
+  await go(c, `noflyover&eventdate=2026-11-04`);
+  console.log('   next day tile:', await c.eval(`document.querySelector('#t-daily').innerText.replace(/\\n+/g, ' | ')`), '· streak', await c.eval('JSON.stringify(__skyputt.daily.streak())'));
+  await shot(c, 'daily-nextday-title');
+}
+
 const c = await CDP.open();
 await setup(c);
 try {
@@ -749,6 +835,7 @@ try {
   else if (MODE === 'events') await eventsMode(c);
   else if (MODE === 'events2') await events2Mode(c);
   else if (MODE === 'events3') await events3Mode(c);
+  else if (MODE === 'daily') await dailyMode(c);
   else if (MODE === 'meta') await metaMode(c);
   else if (MODE === 'overview') await overview(c);
   else if (MODE === 'nines') await ninesMode(c);

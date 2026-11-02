@@ -1,0 +1,43 @@
+/* SKYPUTT — Daily Challenge (js/daily/): title tile next to Online, the #daily page, the shot clock overlay. */
+#daily { position: fixed; z-index: 30; overflow-y: auto; align-items: start; padding-top: calc(16px + var(--safe-t)); grid-template-columns: minmax(0, 1fr); }
+#daily .career-card { margin: 0 auto auto; }
+
+/* title tile: shares a row with Online */
+.t-row .btn.t-online { min-width: 0; }
+.t-row .btn.t-online small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.btn.t-daily { justify-content: flex-start; background: linear-gradient(90deg, rgba(127,180,239,.22), rgba(255,255,255,.06)); }
+.t-daily .dl-ic { flex: none; line-height: 0; }
+.t-daily .dl-ic svg { width: 28px; height: 28px; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+.t-daily .tm { flex: 1; }
+.dl-st { font-style: normal; font-size: 12.5px; color: #ffb36b; margin-left: 2px; }
+
+/* page */
+.dl-hero { display: flex; align-items: center; gap: 12px; margin: 8px 0 6px; }
+.dl-what { display: flex; flex-direction: column; line-height: 1.15; text-align: left; min-width: 0; }
+.dl-what b { font-size: 20px; }
+.dl-what small { font-size: 13px; opacity: .75; }
+.dl-twist { position: relative; display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 9px 12px; border-radius: 14px;
+  background: rgba(255,255,255,.07); border: 2px solid rgba(255,255,255,.12); }
+.dl-twist b { font-size: 15px; color: var(--gold); }
+.dl-twist span { font-size: 13.5px; opacity: .9; }
+.dl-twist em { position: absolute; top: 8px; right: 10px; font-style: normal; font-size: 12px; font-weight: 700; color: var(--good); }
+.dl-twist.met { border-color: var(--good); }
+.dl-flash { line-height: 1.35; }
+.dl-flash svg { width: 14px; height: 14px; vertical-align: -2px; }
+.dl-tries { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 8px 0 0; }
+.dl-tries span { font-size: 13px; padding: 3px 10px; border-radius: 10px; background: rgba(255,255,255,.08); }
+.dl-tries span.met { background: rgba(111,227,154,.2); color: var(--good); }
+.dl-tries span.bad { opacity: .65; }
+.dl-share { width: 100%; min-height: 76px; margin-top: 8px; padding: 8px; border-radius: 12px; border: 2px solid var(--panel-b); background: rgba(0,0,0,.25);
+  color: #fff; font: 13px/1.35 'Fredoka', system-ui, sans-serif; resize: none; user-select: text; -webkit-user-select: text; }
+table.dl-board td:last-child { text-align: right; font-weight: 600; }
+.dl-miles div.next { outline: 2px dashed rgba(242,199,92,.6); outline-offset: -2px; }
+.dl-miles b { width: 70px; }
+
+@media (orientation: landscape) and (min-width: 700px) {
+  #daily .career-card.wide { width: min(640px, 100%); }
+}
+
+/* shot clock twist: reuses the online .net-clock look */
+#daily-ov { position: fixed; inset: 0; z-index: 12; pointer-events: none; }
+@media (orientation: landscape) { #daily-ov .net-clock { top: calc(14px + var(--safe-t)); } }

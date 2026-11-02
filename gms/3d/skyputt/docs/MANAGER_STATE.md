@@ -80,3 +80,5 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - 2026-11-03: polish tray fix pushed (7a3cae34). One slot free; courses2 running.
 - 2026-11-03: started `events3` (yearly recurrence for all events, rotating weekend mini-events, live/next on events screen).
 - 2026-11-03: events3 done (yearly recurrence, weekend events, events screen) — uncommitted; main.js shares a line with courses2, so commit both together when courses2 finishes, then start next agent (proposal: daily challenge to fill Mon-Thu gaps).
+- 2026-11-03: 18c5b9af pushed (Hollow Woods + events3). Started `daily` (daily challenge, streaks, local board, optional server leaderboard). games.br8t.com client still at 41803a87 — redeploy awaits Aaron (classifier blocks without explicit OK).
+- 2026-11-03: daily done + pushed (daily challenge, streaks, local board; online daily board proposal in notes/daily.md, server unchanged).

@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" />
   <link rel="stylesheet" href="css/app.css" />
   <link rel="stylesheet" href="css/online.css" />
+  <link rel="stylesheet" href="css/daily.css" />
   <script type="importmap">
   { "imports": {
       "three": "/gms/lib/three/0.180.0/three.module.js",
@@ -36,7 +37,10 @@
       </div>
       <div class="t-right">
       <button id="t-career" class="btn primary big">Career</button>
-      <button id="t-online" class="btn t-online">Online</button>
+      <div class="t-row">
+        <button id="t-online" class="btn t-online">Online</button>
+        <button id="t-daily" class="btn t-meta t-daily" aria-label="Daily challenge"></button>
+      </div>
       <button id="t-events" class="btn event-tile" aria-label="Events"></button>
       <div class="t-row">
         <button id="t-ladder" class="btn t-meta" aria-label="Weekly ladder"></button>
@@ -57,6 +61,7 @@
   <div id="career" class="card-wrap" hidden></div>
   <div id="online" class="card-wrap" hidden></div>
   <div id="events" class="card-wrap" hidden></div>
+  <div id="daily" class="card-wrap" hidden></div>
   <div id="dialogue" hidden></div>
   <div id="ladder" class="card-wrap" hidden></div>
   <div id="shop" class="card-wrap" hidden></div>
