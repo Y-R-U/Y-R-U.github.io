@@ -20,7 +20,7 @@ const hasLoc = typeof location !== 'undefined';
 // from anywhere but localhost / the LAN (GitHub Pages, games.br8t.com) never touches the network
 // for online play and the Online screen says "coming soon". Flip to true in the deploy that ships
 // server/ (or pass ?server=<base> to test a server).
-export const ONLINE_PUBLIC = false;
+export const ONLINE_PUBLIC = true;
 export const LOCAL_PORT = 8098;   // tools/server_run.sh (8094 is GAMBIT's)
 
 // Local-only hint for the title's "Rejoin" button (no connection at boot).

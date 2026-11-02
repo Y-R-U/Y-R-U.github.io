@@ -32,6 +32,7 @@ GAMES=(
 )
 # SYNTHWILD is NOT listed: it ships (client + Go API) via gms/3d/synthwild/server/deploy.sh
 # GAMBIT is NOT listed either: it ships (client + Go API) via CONFIRM=yes STATIC=1 gms/3d/gambit/server/deploy.sh
+# SKYPUTT likewise: CONFIRM=yes STATIC=1 gms/3d/skyputt/server/deploy.sh
 
 # Ragdojo releases are minified and omit developer tools. Build before any remote action.
 RAGDOJO_BUILD="$REPO/gms/2d/ragdojo/dist/home"

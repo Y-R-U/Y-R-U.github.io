@@ -29,7 +29,7 @@ export const GAMES = [
   },
   {
     id: "skyputt", name: "SKYPUTT", tag: "Mini golf in the clouds",
-    path: "/gms/3d/skyputt/", shot: "skyputt", accent: "#f2c75c", soon: true,
+    path: "/gms/3d/skyputt/", shot: "skyputt", accent: "#f2c75c",
     short: "3D mini golf: one-thumb putts, four themes, a career to Legend.",
     blurb: "Eighteen floating-island holes with windmills, loops and jumps in four themes. A story from nobody to Legend, helpers, a weekly ladder, seasonal events, and online rooms with friends.",
   },
