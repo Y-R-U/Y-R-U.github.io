@@ -66,11 +66,14 @@ ok(live.muted === false, 'mute(true) silences play()');
 await sleep(4500);
 st = await ev('window.__audio.debugState()');
 ok(st.active === 0, `voice counter drains back to 0 (${st.active})`);
+const themes = await ev(`(async () => { const a = window.__audio, r = [];
+  for (const th of ['spooky', 'frost', 'sky']) { a.music.start(th); await new Promise(z => setTimeout(z, 1500)); r.push(a.music.theme); } return r; })()`);
+ok(themes.join() === 'spooky,frost,sky', `music themes switch live (${themes})`);
 await ev('window.__audio.music.stop(), true');
 
 // offline renders
 const t0 = Date.now();
-const rows = await ev('window.__renderAll({ music: 40 })');
+const rows = await ev('window.__renderAll({ music: 90 })');
 console.log(`\noffline renders: ${rows.length} in ${((Date.now() - t0) / 1000).toFixed(1)} s\n`);
 console.log('sound'.padEnd(30), 'peak'.padStart(7), 'peakdB'.padStart(7), 'rmsdB'.padStart(7), 'prePk'.padStart(7), 'len'.padStart(6));
 for (const r of rows) console.log(r.key.padEnd(30), r.post.peak.toFixed(3).padStart(7), String(r.post.peakDb).padStart(7), String(r.post.rmsDb).padStart(7), r.pre.peak.toFixed(3).padStart(7), r.post.active.toFixed(2).padStart(6));
@@ -85,9 +88,9 @@ ok(errors.length === 0, `zero console errors/warnings${errors.length ? ':\n  ' +
 if (WAV) {
   mkdirSync(WAV, { recursive: true });
   const names = await ev(`window.__names`);
-  for (const n of [...names, 'music']) {
+  for (const n of [...names, 'music', 'music_spooky', 'music_frost']) {
     const b64 = await ev(`(async () => { const A = await import('/gms/3d/skyputt/js/audio/index.js');
-      const r = '${n}' === 'music' ? await A.renderMusic('sky', 12) : await A.renderSfx('${n}', { power: .8, speed: 4, material: 'wood', n: 3 });
+      const r = '${n}'.startsWith('music') ? await A.renderMusic('${n}'.split('_')[1] || 'sky', 12) : await A.renderSfx('${n}', { power: .8, speed: 4, material: 'wood', n: 3 });
       const b = r.buf, L = b.length, out = new DataView(new ArrayBuffer(44 + L * 4));
       const W = (o, s) => { for (let i = 0; i < s.length; i++) out.setUint8(o + i, s.charCodeAt(i)); };
       W(0,'RIFF'); out.setUint32(4, 36 + L*4, true); W(8,'WAVEfmt '); out.setUint32(16,16,true); out.setUint16(20,1,true); out.setUint16(22,2,true);

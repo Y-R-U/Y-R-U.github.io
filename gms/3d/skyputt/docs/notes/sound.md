@@ -11,7 +11,7 @@ Audition page: http://192.168.0.236:8888/gms/3d/skyputt/tools/sound_preview.html
 | `js/audio/core.js` | helpers: noise buffers, impulse, voices (self-disconnecting), envelopes, modal impacts, FM bells |
 | `js/audio/sfx.js` | every one-shot recipe, per-sound throttle, auto-duck table |
 | `js/audio/roll.js` | continuous rolling noise, one reusable chain, per-surface profiles |
-| `js/audio/music.js` | generative ambient player; `sky` theme |
+| `js/audio/music.js` | generative ambient player; themes `sky`, `spooky`, `frost` |
 | `js/audio/offline.js` | OfflineAudioContext renders and peak/RMS measurement (tests, preview) |
 | `tools/sound_preview.html/.js` | audition page: every sound, roll slider and surface, music, mix, level meter, offline level table |
 | `tools/sound_preview_cdp.mjs` | headless test (see Testing) |
@@ -64,7 +64,7 @@ After 2 s of silence the chain is torn down, so an idle game costs no CPU.
 | game event | call |
 |---|---|
 | first pointerdown / keydown (and every later one) | `audio.unlock()` |
-| enter a hole / the menu | `audio.music.start('sky')` (the theme's id; unknown ids fall back to sky) |
+| enter a hole / the menu, theme swap | `audio.music.start(themeId)`; unknown ids (e.g. `greybox`) fall back to sky. Already wired in `js/app/main.js` (initial load and `useTheme`); the ids match the theme folders `sky` / `spooky` / `frost` |
 | aim drag, power changes by about ≥ 0.04 | `audio.play('aimTick', { power })` |
 | shot released | `audio.play('putt', { power })` |
 | every render frame while the ball moves | `audio.roll(supported ? speed : 0, surfaceOfContact)`. Pass 0 while airborne |
@@ -94,7 +94,7 @@ It checks that there is no AudioContext before a gesture, that play() is a no-op
 that pre-unlock calls don't throw, that unlock works on a click, that a pre-unlock `music.start`
 begins on unlock, that every sfx plays live, that mute works and that the voice counter drains. It
 then renders every sfx variant, all 6 roll surfaces and 40 s of music offline through the real
-master chain, and checks peak < 1.0 and RMS > -50 dBFS. It also checks for zero console errors or
+master chain, and checks peak < 1.0 and RMS > -50 dBFS. It also starts each music theme live. 90 s of each music theme is rendered (with the extras forced on, spooky 0.234 / -26.9 dB RMS and frost 0.214 / -27.1, so the extras never spike). It also checks for zero console errors or
 warnings. All pass (2026-11-02).
 
 Levels (final output, with RMS over the audible span). Recipes are randomised, so values move by about ±1 dB between runs. The full table, including the pre-limiter peaks, is in `tools/sound_preview_levels.json`:
@@ -115,7 +115,7 @@ Levels (final output, with RMS over the audible span). Recipes are randomised, s
 | lipOut | 0.203 | -13.8 | -37.6 | | star 1/2/3 | 0.18/0.15/0.16 | -15.0/-16.7/-15.8 | ~-30.5 |
 | roll grass (4.5 m/s → 0) | 0.179 | -14.9 | -29.4 | | coin | 0.137 | -17.3 | -34.8 |
 | roll sand | 0.225 | -13.0 | -32.8 | | aimTick p=0 / 1 | 0.018 / 0.026 | -34.8 / -31.8 | -46 |
-| roll ice | 0.088 | -21.1 | -36.9 | | music sky 40 s | 0.190 | -14.4 | -27.5 |
+| roll ice | 0.088 | -21.1 | -36.9 | | music sky / spooky / frost 90 s | 0.197 / 0.247 / 0.207 | -14.1 / -12.1 / -13.7 | -27.7 / -27.1 / -27.8 |
 | roll wood | 0.290 | -10.8 | -27.5 | | | | | |
 | roll metal / glass | 0.123 / 0.089 | -18.2 / -21.0 | -34.9 / -36.5 | | | | | |
 
@@ -123,15 +123,23 @@ The highest peak is 0.543 (putt at full power), so there is at least 5 dB of hea
 and the limiter and soft clip are only a safety net. Harp pitch was checked by autocorrelation and
 is within 1 cent.
 
-## Music: `sky`
-D major (with drifts to A and C major), 66 bpm. Warm detuned-saw pads go through one slowly
-breathing lowpass, with a sine root under them. Karplus-Strong harp plucks are rendered once every
-3 semitones and repitched, and soft FM bells sit an octave up. A ping-pong delay sits on the
-arpeggios, and a quiet pink-noise "air" bed with a wandering bandpass runs under everything.
-Chords follow a Markov graph (7 chords, 2–4 bars each). Phrase types are rest / sparse / up / down
-/ wander / bells, chosen by a random-walk density, and the timing and velocity are humanised, so
-nothing repeats verbatim. The scheduler runs every 250 ms with a 1.5 s lookahead. Adding a theme
-means adding an entry to `THEMES` in music.js (chords, key set, bpm, levels).
+## Music
+All themes share one player (music.js `Player`): a pad bus through a slowly breathing lowpass
+with a sine root, plucked or struck voices on an arp bus with a ping-pong delay, a quiet
+pink-noise "air" bed, and the shared reverb. Chords follow a Markov graph (2–4 bars each) and drift
+between three key centres. Phrase types are rest / sparse / up / down / wander / bells, chosen by a
+random-walk density. Each phrase picks a lead voice from the theme's `mains`, and timing and velocity
+are humanised, so nothing repeats verbatim. The scheduler runs every 250 ms with a 1.5 s lookahead.
+Extras are rolled once per chord.
+
+| theme | harmony | pad | voices | extras |
+|---|---|---|---|---|
+| `sky` | D major (drifts to A, C), 66 bpm, lydian IV | detuned saws | Karplus-Strong harp, soft FM bells | none |
+| `spooky` | E minor (to D, G minor), 76 bpm, Phrygian bII, V7 with raised leading tone, half-dim ii | soft drawbar organ (PeriodicWave) | music box (FM 4:1), pizzicato (short dark KS plucks, an octave down), bells | theremin glide between 3 chord tones with growing vibrato (30%/chord), distant owl "hoo … hoo-hoo", panned and mostly reverb (16%/chord) |
+| `frost` | F major (to G, D), 72 bpm, carol-style ii–V, minor iv (Bbm6) | wider-detuned saws ("strings") | celesta (FM 4:1), harp, glockenspiel (FM 2.76:1) | subtle sleigh bells for 1–2 bars (28%/chord), faint fireside crackle (12% per eighth note) |
+
+To add a theme, add an entry to `THEMES` in music.js with chords, keys, bpm, levels, pad, air,
+voices, mains, bellVoice and extras.
 
 ## Known issues / notes
 - **The levels were balanced by meter and spectrogram, not by ear.** The agent cannot listen. Aaron or
@@ -141,8 +149,9 @@ means adding an entry to `THEMES` in music.js (chords, key set, bpm, levels).
   noise roar. It reads as a cheer but not a real crowd.
 - `lipOut` cannot be triggered by physics today; the engine has no lip-out event yet.
 - The CDP test cannot pull a WAV larger than about 5 MB through Runtime.evaluate (the socket closes),
-  so `--wav` renders only 12 s of music.
+  so `--wav` renders only 12 s of each music theme.
 - The harp buffers are about 0.4 MB each, and about 10 get cached per context.
+- spooky and frost (2026-11-02) were checked by meter, spectrogram and forced-extras renders only. Audition the theremin and owl levels, and check that the sleigh bells stay subtle.
 - Proposals for DECISIONS: (1) music starts on the menu at 0.6 and sfx at 1.0, and the settings
   show master / sfx / music sliders plus mute; (2) theme packs add a music theme id with the same
-  name as the visual theme (`sky`, `spooky`, `frost`).
+  name as the visual theme (done for `sky`, `spooky`, `frost`).

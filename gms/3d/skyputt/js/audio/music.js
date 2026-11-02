@@ -1,4 +1,6 @@
-// SKYPUTT audio — generative ambient music. One player per theme; `sky` is the launch theme.
+// SKYPUTT audio — generative ambient music. One player per theme: `sky` (launch), `spooky`
+// (Spooky Hollow) and `frost` (Frost Fair). Themes differ in harmony, pad type, plucked/struck
+// voices and occasional "extras" (theremin, owl, sleigh bells, fire crackle).
 // Nothing loops verbatim: chords walk a Markov graph, the key drifts between three centres,
 // arpeggio phrases (up / down / wander / sparse / bells / rest) are picked by a slowly
 // wandering density, and every note's timing and velocity is humanised.
@@ -21,20 +23,83 @@ const SKY = {
     iii:   { pad: [57, 61, 64, 66], root: 42, arp: [66, 69, 73, 76, 78, 81], next: ['vi', 'IV', 'ii'] },
     IVlyd: { pad: [55, 59, 61, 66], root: 43, arp: [67, 71, 73, 74, 78, 79, 85], next: ['I', 'vi', 'iii'] },
   },
-  level: { pad: 0.03, root: 0.036, harp: 0.1, bell: 0.032, air: 0.014 },
+  level: { pad: 0.03, root: 0.036, air: 0.014 },
+  pad: { type: 'saw', cut: 900, lfo: 320, att: 3.2, rel: 4.5 },
+  air: { f: 1500, q: 0.5, lfo: 700 },
+  voices: {
+    harp: { kind: 'ks', gain: 0.1 },
+    bell: { kind: 'fm', ratio: 3, index: 0.9, dur: 2.6, oct: 12, gain: 0.032 },
+  },
+  mains: ['harp'], bellVoice: 'bell', extras: [],
 };
-export const THEMES = { sky: SKY };
+
+// Playful-eerie: E minor with a Phrygian bII and a raised-leading-tone V7, music box and
+// pizzicato over a soft organ; now and then a theremin glide or a distant owl.
+const SPOOKY = {
+  id: 'spooky', bpm: 76,
+  keys: [0, 0, 0, -2, 3],                          // E minor home, D minor and G minor excursions
+  start: 'i',
+  chords: {
+    i:    { pad: [52, 59, 64, 66], root: 40, arp: [64, 67, 71, 72, 74, 76, 79], next: ['iv', 'VI', 'bII', 'iiø', 'V7'] },
+    iv:   { pad: [57, 60, 64, 66], root: 45, arp: [64, 69, 72, 76, 78, 81], next: ['i', 'V7', 'iiø', 'VI'] },
+    VI:   { pad: [55, 59, 60, 64], root: 48, arp: [67, 71, 72, 76, 79], next: ['iiø', 'iv', 'V7', 'i'] },
+    V7:   { pad: [54, 57, 59, 63], root: 47, arp: [63, 66, 69, 71, 75, 78], next: ['i', 'VI', 'iv'] },
+    'iiø': { pad: [54, 57, 60, 64], root: 42, arp: [66, 69, 72, 76, 78], next: ['V7', 'i', 'bII'] },
+    bII:  { pad: [53, 57, 60, 64], root: 41, arp: [65, 69, 72, 76, 77], next: ['i', 'V7', 'iv'] },
+  },
+  level: { pad: 0.034, root: 0.03, air: 0.011 },
+  pad: { type: 'organ', cut: 1300, lfo: 250, att: 2.6, rel: 4 },
+  air: { f: 520, q: 0.7, lfo: 260 },
+  voices: {
+    musicbox: { kind: 'fm', ratio: 4, index: 0.55, dur: 1.5, oct: 12, gain: 0.05 },
+    pizz: { kind: 'ks', short: true, gain: 0.16, oct: -12 },
+    bell: { kind: 'fm', ratio: 3.5, index: 1.1, dur: 2.2, oct: 12, gain: 0.026 },
+  },
+  mains: ['musicbox', 'pizz', 'pizz'], bellVoice: 'bell',
+  extras: [['theremin', 0.3], ['owl', 0.16]],
+};
+
+// Warm and cosy: F major with carol-style ii-V and a minor iv, celesta / glockenspiel / harp
+// over soft strings; subtle sleigh bells now and then and a faint fireside crackle.
+const FROST = {
+  id: 'frost', bpm: 72,
+  keys: [0, 0, 0, 2, -3],                          // F major home, G major and D major excursions
+  start: 'I',
+  chords: {
+    I:   { pad: [53, 60, 64, 67], root: 41, arp: [65, 67, 69, 72, 76, 77, 79, 81], next: ['IV', 'vi', 'ii', 'V', 'iii'] },
+    IV:  { pad: [58, 62, 65, 69], root: 46, arp: [70, 72, 74, 77, 81, 82], next: ['I', 'ivm', 'V', 'ii'] },
+    V:   { pad: [55, 60, 64, 70], root: 48, arp: [67, 70, 72, 76, 79, 84], next: ['I', 'vi', 'IV'] },
+    vi:  { pad: [57, 60, 62, 65], root: 50, arp: [69, 72, 74, 77, 81], next: ['ii', 'IV', 'V'] },
+    ii:  { pad: [55, 58, 62, 65], root: 43, arp: [67, 70, 74, 77, 79], next: ['V', 'IV', 'I'] },
+    iii: { pad: [57, 60, 64, 67], root: 45, arp: [69, 72, 76, 79, 81], next: ['vi', 'IV'] },
+    ivm: { pad: [58, 61, 65, 67], root: 46, arp: [70, 73, 77, 79, 82], next: ['I'] },
+  },
+  level: { pad: 0.028, root: 0.034, air: 0.008 },
+  pad: { type: 'strings', cut: 1150, lfo: 280, att: 3.0, rel: 4.5 },
+  air: { f: 450, q: 0.7, lfo: 200 },
+  voices: {
+    celesta: { kind: 'fm', ratio: 4, index: 0.45, dur: 1.8, oct: 0, gain: 0.07 },
+    glock: { kind: 'fm', ratio: 2.76, index: 0.4, dur: 1.4, oct: 12, gain: 0.035 },
+    harp: { kind: 'ks', gain: 0.09 },
+    bell: { kind: 'fm', ratio: 3.5, index: 0.8, dur: 2.4, oct: 12, gain: 0.03 },
+  },
+  mains: ['celesta', 'harp', 'glock'], bellVoice: 'glock',
+  extras: [['sleigh', 0.28]], crackle: 0.12,
+};
+export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST };
 
 // Karplus-Strong pluck, rendered once per base note (multiples of 3 semitones) and repitched.
-export function harpBuffer(ctx, base) {
-  const s = shared(ctx), key = 'harp_' + base;
+// short = pizzicato: darker excitation, fast decay.
+export function harpBuffer(ctx, base, short = false) {
+  const s = shared(ctx), key = (short ? 'pizz_' : 'harp_') + base;
   if (s[key]) return s[key];
-  const sr = ctx.sampleRate, f = mtof(base), dur = clamp(3.0 - (base - 55) * 0.05, 1.3, 3.0);
+  const sr = ctx.sampleRate, f = mtof(base), dur = short ? 0.7 : clamp(3.0 - (base - 55) * 0.05, 1.3, 3.0);
   const n = Math.floor(sr * dur), b = ctx.createBuffer(1, n, sr), d = b.getChannelData(0);
   const P = sr / f - 0.5, start = Math.ceil(P) + 2;
   let lp = 0;
-  for (let i = 0; i < start; i++) { lp += 0.45 * ((Math.random() * 2 - 1) - lp); d[i] = lp; }
-  const loss = Math.pow(10, -3 / (dur * 0.7 * f));
+  const ex = short ? 0.22 : 0.45;
+  for (let i = 0; i < start; i++) { lp += ex * ((Math.random() * 2 - 1) - lp); d[i] = lp; }
+  const loss = Math.pow(10, -3 / (dur * (short ? 0.4 : 0.7) * f));
   const at = x => { const i = Math.floor(x), fr = x - i; return d[i] * (1 - fr) + d[i + 1] * fr; };
   for (let i = start; i < n; i++) d[i] = loss * 0.5 * (at(i - P) + at(i - P - 1));
   let dc = 0, pk = 0;
@@ -60,8 +125,13 @@ class Player {
     this.outWet = G(0);
     this.out.connect(E.music.dry); this.outWet.connect(E.music.wet);
     // pad bus: shared lowpass breathing on a slow LFO
-    this.padF = ctx.createBiquadFilter(); this.padF.type = 'lowpass'; this.padF.frequency.value = 900; this.padF.Q.value = 0.5;
-    const plfo = ctx.createOscillator(), plg = G(320); plfo.frequency.value = 0.045;
+    this.padF = ctx.createBiquadFilter(); this.padF.type = 'lowpass'; this.padF.frequency.value = theme.pad.cut; this.padF.Q.value = 0.5;
+    const plfo = ctx.createOscillator(), plg = G(theme.pad.lfo); plfo.frequency.value = 0.045;
+    if (theme.pad.type === 'organ') {
+      // soft drawbar organ: 8' + 4' + a touch of 2 2/3' and 2'
+      const re = new Float32Array([0, 1, 0.45, 0.12, 0.1, 0, 0.03]), im = new Float32Array(re.length);
+      this.organ = ctx.createPeriodicWave(re, im);
+    }
     plfo.connect(plg); plg.connect(this.padF.frequency);
     const padOut = G(1), padWet = G(0.55);
     this.padF.connect(padOut); this.padF.connect(padWet); padOut.connect(this.out); padWet.connect(this.outWet);
@@ -80,8 +150,8 @@ class Player {
     } else { dl.connect(this.out); dr.connect(this.out); }
     // air bed: pink noise, wandering bandpass, slow pan drift
     const air = ctx.createBufferSource(); air.buffer = noiseBuffer(ctx, 'pink'); air.loop = true;
-    const af = ctx.createBiquadFilter(); af.type = 'bandpass'; af.frequency.value = 1500; af.Q.value = 0.5;
-    const alfo = ctx.createOscillator(), alg = G(700); alfo.frequency.value = 0.031;
+    const af = ctx.createBiquadFilter(); af.type = 'bandpass'; af.frequency.value = theme.air.f; af.Q.value = theme.air.q;
+    const alfo = ctx.createOscillator(), alg = G(theme.air.lfo); alfo.frequency.value = 0.031;
     alfo.connect(alg); alg.connect(af.frequency);
     const ag = G(theme.level.air);
     air.connect(af); af.connect(ag); ag.connect(this.out); ag.connect(this.outWet);
@@ -133,7 +203,7 @@ class Player {
     const th = this.th, t = this.nextChordT, bar = this.beat * 4;
     if (this.chordCount > 0) {
       // key excursion: only from the home chord, after a while
-      if (this.chord === 'I' && this.chordCount % 6 === 0 && Math.random() < 0.45) {
+      if (this.chord === th.start && this.chordCount % 6 === 0 && Math.random() < 0.45) {
         const opts = th.keys.filter(k => k !== this.key);
         this.key = pick(opts);
       }
@@ -148,11 +218,12 @@ class Player {
     const dur = pick([2, 3, 3, 4]) * bar;
     this.chordList.push({ t, name: this.chord, key: this.key });
     this.pad(t, dur, th.chords[this.chord], this.key);
+    for (const [name, prob] of th.extras) if (Math.random() < prob) this[name](t + rnd(1, Math.max(1.5, dur - 3)), th.chords[this.chord], this.key);
     this.nextChordT = t + dur;
   }
 
   pad(t, dur, ch, key) {
-    const ctx = this.ctx, L = this.th.level, att = 3.2, rel = 4.5;
+    const ctx = this.ctx, L = this.th.level, PT = this.th.pad, att = PT.att, rel = PT.rel;
     const g = ctx.createGain();
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(1, t + att);
@@ -164,8 +235,10 @@ class Player {
     const lift = Math.random() < 0.3 ? (Math.random() * ch.pad.length) | 0 : -1;
     ch.pad.forEach((m, i) => {
       const f = mtof(m + key + (i === lift ? 12 : 0));
-      for (const dt of [-8, 8]) {
-        const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = dt + rnd(-3, 3);
+      const spread = PT.type === 'organ' ? 4 : PT.type === 'strings' ? 11 : 8;
+      for (const dt of [-spread, spread]) {
+        const o = ctx.createOscillator(); o.frequency.value = f; o.detune.value = dt + rnd(-3, 3);
+        if (this.organ) o.setPeriodicWave(this.organ); else o.type = 'sawtooth';
         const og = ctx.createGain(); og.gain.value = L.pad;
         o.connect(og); og.connect(g); o.start(t); o.stop(end); this.keep(o);
       }
@@ -184,7 +257,7 @@ class Player {
     const sum = types.reduce((a, [, w]) => a + w, 0);
     let r = Math.random() * sum, k = 0;
     while (r > types[k][1] && k < types.length - 1) r -= types[k++][1];
-    this.phrase = { type: types[k][0], left: pick([8, 8, 16]), first: true };
+    this.phrase = { type: types[k][0], left: pick([8, 8, 16]), first: true, inst: pick(this.th.mains) };
   }
 
   scheduleStep() {
@@ -194,16 +267,17 @@ class Player {
     const ph = this.phrase; ph.left--;
     const c = this.chordAt(t0);
     if (!c) return;
-    const pool = this.th.chords[c.name].arp, L = this.th.level;
+    const th = this.th, pool = th.chords[c.name].arp;
+    if (th.crackle && Math.random() < th.crackle) this.crackle(t0 + rnd(0, this.step));
     const t = t0 + (n % 2 ? this.step * 0.08 : 0) + rnd(-0.008, 0.012);
-    let play = false, inst = 'harp', oct = 0;
+    let play = false, inst = ph.inst, oct = 0;
     switch (ph.type) {
       case 'rest': break;
       case 'sparse': play = Math.random() < 0.22; this.idx = (Math.random() * pool.length) | 0; break;
       case 'up': play = Math.random() < 0.85; if (ph.first) this.idx = (Math.random() * 3) | 0; else this.idx += Math.random() < 0.8 ? 1 : 2; break;
       case 'down': play = Math.random() < 0.85; if (ph.first) this.idx = pool.length - 1 - ((Math.random() * 2) | 0); else this.idx -= Math.random() < 0.8 ? 1 : 2; break;
       case 'wander': play = Math.random() < 0.6; this.idx += pick([-2, -1, -1, 1, 1, 2]); break;
-      case 'bells': play = Math.random() < 0.28; inst = 'bell'; oct = 12; this.idx = (Math.random() * pool.length) | 0; break;
+      case 'bells': play = Math.random() < 0.28; inst = th.bellVoice; this.idx = (Math.random() * pool.length) | 0; break;
     }
     ph.first = false;
     // wrap the walk inside the pool, shifting octave instead of clamping
@@ -212,13 +286,20 @@ class Player {
     this.idx = clamp(this.idx, 0, pool.length - 1) | 0;
     if (!play) return;
     const m = pool[this.idx] + c.key + oct, vel = rnd(0.55, 1) * (n % 8 === 0 ? 1.1 : 1);
-    if (inst === 'harp') this.harp(t, m, L.harp * vel);
-    else this.bell(t, m, L.bell * vel);
+    this.note(t, m, inst, vel);
   }
 
-  harp(t, m, gain) {
+  note(t, m, name, vel) {
+    const v = this.th.voices[name];
+    if (!v) return;
+    m += v.oct || 0;
+    if (v.kind === 'ks') this.pluck(t, m, v.gain * vel, !!v.short);
+    else this.fm(t, m, v.gain * vel, v);
+  }
+
+  pluck(t, m, gain, short) {
     const ctx = this.ctx, base = Math.round(m / 3) * 3, src = ctx.createBufferSource(), g = ctx.createGain();
-    src.buffer = harpBuffer(ctx, base); src.playbackRate.value = Math.pow(2, (m - base) / 12);
+    src.buffer = harpBuffer(ctx, base, short); src.playbackRate.value = Math.pow(2, (m - base) / 12);
     g.gain.value = gain;
     if (ctx.createStereoPanner) {
       const p = ctx.createStereoPanner(); p.pan.value = clamp((m - 74) / 18, -0.7, 0.7);
@@ -227,15 +308,95 @@ class Player {
     src.start(t); this.keep(src);
   }
 
-  bell(t, m, gain) {
+  // two-operator FM: celesta / music box / glockenspiel / bell, depending on ratio and index
+  fm(t, m, gain, { ratio = 3, index = 0.9, dur = 2.6 } = {}) {
     const ctx = this.ctx, f = mtof(m), c = ctx.createOscillator(), md = ctx.createOscillator(), mg = ctx.createGain(), g = ctx.createGain();
-    const dur = 2.6;
-    c.frequency.value = f; md.frequency.value = f * 3;
-    mg.gain.setValueAtTime(f * 0.9, t); mg.gain.exponentialRampToValueAtTime(f * 0.05, t + 1.5);
+    c.frequency.value = f; md.frequency.value = f * ratio;
+    mg.gain.setValueAtTime(f * index, t); mg.gain.exponentialRampToValueAtTime(Math.max(1, f * 0.05), t + dur * 0.58);
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     md.connect(mg); mg.connect(c.frequency); c.connect(g); g.connect(this.arp);
     c.start(t); md.start(t); c.stop(t + dur + 0.05); md.stop(t + dur + 0.05);
     this.keep(c); this.keep(md);
+  }
+
+  // ---- extras --------------------------------------------------------------------------------
+  // `far` = mostly reverb (distant), `near` = mostly dry. Created on first use.
+  bus(kind) {
+    if (this[kind]) return this[kind];
+    const ctx = this.ctx, g = ctx.createGain(), dry = ctx.createGain(), wet = ctx.createGain();
+    dry.gain.value = kind === 'far' ? 0.3 : 1; wet.gain.value = kind === 'far' ? 1.1 : 0.35;
+    g.connect(dry); g.connect(wet); dry.connect(this.out); wet.connect(this.outWet);
+    this.nodes.push(g, dry, wet);
+    return (this[kind] = g);
+  }
+
+  panned(dest, pan) {
+    const ctx = this.ctx;
+    if (!ctx.createStereoPanner) return dest;
+    const p = ctx.createStereoPanner(); p.pan.value = pan; p.connect(dest);
+    return p;
+  }
+
+  // a sine glide between three chord tones with growing vibrato
+  theremin(t, ch, key) {
+    const ctx = this.ctx, notes = [pick(ch.arp), pick(ch.arp), pick(ch.arp)].map(m => mtof(m + key));
+    const dest = this.panned(this.bus('far'), rnd(-0.5, 0.5)), g = ctx.createGain(), end = t + 5;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.026, t + 0.8);
+    g.gain.setValueAtTime(0.026, t + 3.4); g.gain.setTargetAtTime(0, t + 3.4, 0.35);
+    g.connect(dest);
+    const lfo = ctx.createOscillator(), lg = ctx.createGain();
+    lfo.frequency.value = 5.6; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(28, t + 1.4);
+    lfo.connect(lg);
+    for (const [mul, a] of [[1, 1], [2, 0.12]]) {
+      const o = ctx.createOscillator(), og = ctx.createGain(); og.gain.value = a;
+      o.frequency.setValueAtTime(notes[0] * mul, t);
+      o.frequency.setTargetAtTime(notes[1] * mul, t + 1.3, 0.18);
+      o.frequency.setTargetAtTime(notes[2] * mul, t + 2.5, 0.25);
+      lg.connect(o.detune); o.connect(og); og.connect(g); o.start(t); o.stop(end); this.keep(o);
+    }
+    lfo.start(t); lfo.stop(end); this.keep(lfo);
+  }
+
+  // a distant owl: "hoo ... hoo-hoo"
+  owl(t) {
+    const ctx = this.ctx, f0 = rnd(330, 400), dest = this.panned(this.bus('far'), pick([-0.7, 0.7]) * rnd(0.6, 1));
+    for (const [dt, len] of [[0, 0.42], [0.72, 0.16], [0.95, 0.5]]) {
+      const tt = t + dt, o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.setValueAtTime(f0 * 1.04, tt); o.frequency.exponentialRampToValueAtTime(f0 * 0.9, tt + len);
+      g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.03, tt + 0.07);
+      g.gain.exponentialRampToValueAtTime(0.0001, tt + len + 0.08);
+      o.connect(g); g.connect(dest); o.start(tt); o.stop(tt + len + 0.1); this.keep(o);
+    }
+  }
+
+  // subtle sleigh bells shaken on the beat for one or two bars
+  sleigh(t) {
+    const ctx = this.ctx, dest = this.panned(this.bus('near'), rnd(-0.4, 0.4)), steps = pick([8, 16]);
+    for (let i = 0; i < steps; i++) {
+      if (i % 2 && Math.random() < 0.5) continue;
+      const tt = t + i * this.step + rnd(-0.006, 0.006), acc = (i % 4 === 0 ? 1 : 0.6) * (1 - 0.4 * i / steps);
+      for (let k = 0; k < 3; k++) {
+        const o = ctx.createOscillator(), g = ctx.createGain(), tk = tt + rnd(0, 0.018), d = rnd(0.08, 0.15);
+        o.frequency.value = rnd(4800, 7600);
+        g.gain.setValueAtTime(0, tk); g.gain.linearRampToValueAtTime(0.007 * acc, tk + 0.002);
+        g.gain.exponentialRampToValueAtTime(0.0001, tk + d);
+        o.connect(g); g.connect(dest); o.start(tk); o.stop(tk + d + 0.02); this.keep(o);
+      }
+      const n = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+      n.buffer = noiseBuffer(ctx, 'white'); f.type = 'bandpass'; f.frequency.value = 7000; f.Q.value = 1.5;
+      g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.03 * acc, tt + 0.003);
+      g.gain.exponentialRampToValueAtTime(0.0001, tt + 0.06);
+      n.connect(f); f.connect(g); g.connect(dest); n.start(tt, Math.random()); n.stop(tt + 0.07); this.keep(n);
+    }
+  }
+
+  // a faint fireside crackle (one tiny click)
+  crackle(t) {
+    const ctx = this.ctx, n = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(), d = rnd(0.003, 0.009);
+    n.buffer = noiseBuffer(ctx, 'white'); f.type = 'bandpass'; f.frequency.value = rnd(1200, 3800); f.Q.value = 0.8;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(rnd(0.006, 0.02), t + 0.0008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    n.connect(f); f.connect(g); g.connect(this.bus('near')); n.start(t, Math.random()); n.stop(t + d + 0.01); this.keep(n);
   }
 }
 

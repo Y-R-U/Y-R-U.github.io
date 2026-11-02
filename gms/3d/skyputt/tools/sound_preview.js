@@ -1,6 +1,6 @@
 // SKYPUTT sound preview: audition every sound, the roll engine and the music.
 // Also exposes window.__renderAll() for tools/sound_preview_cdp.mjs.
-import { createAudio, SFX_NAMES, ROLL_SURFACES, renderSfx, renderRoll, renderMusic } from '../js/audio/index.js';
+import { createAudio, SFX_NAMES, ROLL_SURFACES, MUSIC_THEMES, renderSfx, renderRoll, renderMusic } from '../js/audio/index.js';
 
 const $ = id => document.getElementById(id);
 const audio = createAudio();
@@ -59,7 +59,9 @@ function frame(now) {
 requestAnimationFrame(frame);
 
 // music
-$('mStart').onclick = () => { audio.unlock(); audio.music.start('sky'); };
+for (const id of MUSIC_THEMES) { const o = document.createElement('option'); o.textContent = id; $('mTheme').appendChild(o); }
+$('mStart').onclick = () => { audio.unlock(); audio.music.start($('mTheme').value); };
+$('mTheme').onchange = () => { if (audio.music.playing) audio.music.start($('mTheme').value); };
 $('mStop').onclick = () => audio.music.stop();
 $('mDuck').onclick = () => { const on = !$('mDuck').classList.contains('on'); $('mDuck').classList.toggle('on', on); audio.music.duck(on); };
 
@@ -93,7 +95,7 @@ window.__renderAll = async ({ music = 40 } = {}) => {
   const rows = [];
   for (const [n, p] of CASES) { const r = await renderSfx(n, p); rows.push({ key: label(n, p), post: r.post, pre: r.pre }); }
   for (const s of ROLL_SURFACES) { const r = await renderRoll(s, 4.5, 3); rows.push({ key: 'roll ' + s, post: r.post, pre: r.pre }); }
-  if (music) { const r = await renderMusic('sky', music); rows.push({ key: `music sky ${music}s`, post: r.post, pre: r.pre }); }
+  if (music) for (const th of MUSIC_THEMES) { const r = await renderMusic(th, music); rows.push({ key: `music ${th} ${music}s`, post: r.post, pre: r.pre }); }
   return rows;
 };
 window.__names = SFX_NAMES;

@@ -43,3 +43,6 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
   ladder/tiers, shop + cosmetics, chests, 6 more helpers (notes/meta.md). `frost` still running.
 - Remaining after M5: frost registration + Frost Fair event switch to theme 'frost'; M6 online
   (server — deploy needs Aaron OK); story chapters 2-6; more holes per theme; projects.js entry.
+- 2026-11-02: 46ccc0c3 pushed (frost theme files; picker/event hookup done by meta). Aaron: reserve
+  usage — let running agents (meta M5, sound spooky/frost music) finish, then PAUSE: start no new
+  agents until Aaron says "continue". After they finish: test, commit+push, report, then wait.
