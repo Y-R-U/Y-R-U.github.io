@@ -76,3 +76,7 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
   in headless Chrome. tools/online_cdp.mjs can't run against live (uses devuid = dev auth only).
   Future client updates: re-export HEAD and rerun deploy.sh with STATIC=1 (Aaron OK'd deploys).
 - 2026-11-03: events2 done (Festival Isles fest1-9, 4 events 2027, spooky voids fix) — NOT committed yet: main.js also holds polish's in-progress fov hunk; commit with polish. Started `courses2` (Hollow Woods wood1-9, map tab, online-selectable).
+- 2026-11-03: 37d2d054 pushed (Festival Isles, 4 events, spooky voids, candy music, landscape framing/title). Pages updated. games.br8t.com client re-deploy was blocked by the auto-mode classifier (production deploy) — asked Aaron. Note: Festival rooms need the new client; old live client says 'update the game'. courses2 running (woods lines held out of holes/index.js in that commit).
+- 2026-11-03: polish tray fix pushed (7a3cae34). One slot free; courses2 running.
+- 2026-11-03: started `events3` (yearly recurrence for all events, rotating weekend mini-events, live/next on events screen).
+- 2026-11-03: events3 done (yearly recurrence, weekend events, events screen) — uncommitted; main.js shares a line with courses2, so commit both together when courses2 finishes, then start next agent (proposal: daily challenge to fill Mon-Thu gaps).

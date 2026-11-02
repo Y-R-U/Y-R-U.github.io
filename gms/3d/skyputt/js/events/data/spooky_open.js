@@ -1,7 +1,8 @@
-// Seasonal event (PLAN 2.8). Pure data. Dates are local calendar days; `end` is inclusive.
+// Seasonal event (PLAN 2.8). Pure data. events3: recurs yearly; `dates` is the rule (js/events/calendar.js)
+// and each year's run is `${series}-${year}` (own save, ladder, goals). Local days, `end` inclusive.
 export default {
-  id: 'spooky-open-2026', name: 'Spooky Hollow Open', theme: 'spooky',
-  start: '2026-10-20', end: '2026-11-08',
+  series: 'spooky-open', since: 2026, recur: 'yearly', name: 'Spooky Hollow Open', theme: 'spooky',
+  dates: { from: '10-20', to: '11-08' },
   blurb: 'The Muni goes dark for Halloween. Pumpkins hide on every fairway.',
   course: 'sky', holes: ['sky2', 'sky3', 'sky5', 'sky6', 'sky8', 'sky9'],
   currency: { id: 'pumpkins', name: 'Pumpkins', one: 'Pumpkin', icon: '🎃', colour: '#ff8a2a' },

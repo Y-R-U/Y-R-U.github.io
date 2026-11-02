@@ -195,7 +195,8 @@ export function createCareer(ctx) {
       st.seen[ev.id + ':grant'] = true; store.saveStory();
     }
     const course = COURSES[ch.course];
-    const holes = ev.holes.map(id => course.holes.find(h => h.id === id));
+    // courses2: an event may name holes from another course (Hollow Masters plays Hollow Woods)
+    const holes = ev.holes.map(id => course.holes.find(h => h.id === id) || Object.values(COURSES).flatMap(c => c.holes).find(h => h.id === id));
     const seed = (Date.now() / 1000) | 0;
     let field = null;
     if (ev.kind === 'rival' || ev.kind === 'tournament') {

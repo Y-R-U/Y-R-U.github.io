@@ -1,9 +1,14 @@
 // Events framework logic (PLAN 2.8): calendar, progress, goals and the local ladder. Pure functions
-// (no DOM), so node tests and the screen share them. Event definitions live in ./data/.
-import { EVENTS } from './data/index.js';
+// (no DOM), so node tests and the screen share them. Event definitions live in ./data/; events3 made
+// them yearly series with weekend events between (./calendar.js).
+import { SERIES } from './data/index.js';
 import { COURSES } from '../course/holes/index.js';
+import { run, calendar, eventById, dayStart, localYmd, DAY, addDays } from './calendar.js';
 
-export { EVENTS };
+export { SERIES, calendar, eventById, dayStart };
+export { run, bigEvents, weekend, weekends, easter, LUNAR_NEW_YEAR, bigOn, localYmd, addDays } from './calendar.js';
+// The first run of every series: the six dated events from before events3 (same ids, dates, seeds).
+export const EVENTS = SERIES.map(s => run(s, s.since));
 // events2: an event's hole defs, in play order. `ev.course` is searched first, then every course,
 // so an event can mix Festival Isles holes with Sky Isles ones. Unknown ids are dropped.
 export function holeDef(id, courseId) {
@@ -13,10 +18,8 @@ export function holeDef(id, courseId) {
   return null;
 }
 export const eventHoles = ev => ev.holes.map(id => holeDef(id, ev.course)).filter(Boolean);
-const DAY = 86400000;
 
 // ---- calendar (local time) ----
-export function dayStart(ymd) { const [y, m, d] = ymd.split('-').map(Number); return new Date(y, m - 1, d).getTime(); }
 export const startsAt = ev => dayStart(ev.start);
 export const endsAt = ev => dayStart(ev.end) + DAY;            // end day is inclusive
 // `?eventdate=YYYY-MM-DD` pins "now" to noon of that local day (testing)
@@ -35,8 +38,22 @@ export function timeText(ev, now) {
   const st = status(ev, now);
   return st === 'live' ? `Ends in ${countdown(endsAt(ev) - now)}` : st === 'upcoming' ? `Starts in ${countdown(startsAt(ev) - now)}` : 'Ended';
 }
+// events3: every event (big + weekend) from `back` days ago to `ahead` days on, by start date.
+export function around(now, back = 45, ahead = 400) { const d = localYmd(now); return calendar(addDays(d, -back), addDays(d, ahead)); }
+// What the Events screen shows: live now, the next few coming up, and recently ended runs.
+export function overview(now, { upcoming = 5, recent = 21 } = {}) {
+  const all = around(now, recent, 400);
+  return {
+    live: all.filter(e => status(e, now) === 'live').sort((a, b) => endsAt(a) - endsAt(b)),
+    // the next few, plus the next two big events even when weekends come first
+    upcoming: (up => [...new Set([...up.slice(0, upcoming), ...up.filter(e => e.kind !== 'weekend').slice(0, 2)])])(all.filter(e => status(e, now) === 'upcoming')),
+    ended: all.filter(e => status(e, now) === 'ended').reverse(),
+  };
+}
+// The next event to start after `now` (optionally only big ones).
+export function nextUp(now, big = false) { return around(now, 0, 400).find(e => status(e, now) === 'upcoming' && (!big || e.kind !== 'weekend')) || null; }
 // The event to feature on the title: live first (ending soonest), else the next upcoming, else the last one.
-export function featured(now, list = EVENTS) {
+export function featured(now, list = around(now)) {
   const live = list.filter(e => status(e, now) === 'live').sort((a, b) => endsAt(a) - endsAt(b));
   if (live.length) return live[0];
   const up = list.filter(e => status(e, now) === 'upcoming').sort((a, b) => startsAt(a) - startsAt(b));
@@ -47,11 +64,12 @@ export function featured(now, list = EVENTS) {
 export function freshProgress() { return { currency: 0, rounds: 0, aces: 0, bestUnder: null, points: 0, claimed: [], rankClaimed: false, pickups: {} }; }
 // Event points for one finished round: steady play + under-par bonus + aces + new currency.
 // More rounds = more points (D12: the more you play, the higher you go).
-export function roundPoints({ total, par, aces, currency }) {
-  return Math.max(10, 40 + 12 * (par - total)) + 25 * aces + 3 * currency;
+// events3: an event may tune it with `scoring` { under, ace } (Ace Hunt, Fewest Strokes).
+export function roundPoints({ total, par, aces, currency }, scoring = {}) {
+  return Math.max(10, 40 + (scoring.under ?? 12) * (par - total)) + (scoring.ace ?? 25) * aces + 3 * currency;
 }
-export function applyRound(p, { total, par, aces, newCurrency }) {
-  const pts = roundPoints({ total, par, aces, currency: newCurrency });
+export function applyRound(p, { total, par, aces, newCurrency }, scoring) {
+  const pts = roundPoints({ total, par, aces, currency: newCurrency }, scoring);
   p.rounds++; p.aces += aces; p.currency += newCurrency; p.points += pts;
   p.bestUnder = Math.max(p.bestUnder ?? -99, par - total);
   return pts;

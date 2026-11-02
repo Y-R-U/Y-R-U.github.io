@@ -28,6 +28,15 @@ import fest6 from './fest6.js';
 import fest7 from './fest7.js';
 import fest8 from './fest8.js';
 import fest9 from './fest9.js';
+import wood1 from './wood1.js';
+import wood2 from './wood2.js';
+import wood3 from './wood3.js';
+import wood4 from './wood4.js';
+import wood5 from './wood5.js';
+import wood6 from './wood6.js';
+import wood7 from './wood7.js';
+import wood8 from './wood8.js';
+import wood9 from './wood9.js';
 
 export const COURSES = {
   sky: {
@@ -40,6 +49,13 @@ export const COURSES = {
   festival: {
     id: 'festival', name: 'Festival Isles', theme: 'sky',
     holes: [fest1, fest2, fest3, fest4, fest5, fest6, fest7, fest8, fest9],
+  },
+  // courses2: Hollow Woods, a 9-hole course built to look best in Spooky Hollow (any theme skins it, D6).
+  // A map tab; locked until the Sky Isles front nine is finished (`lockedBy`, js/app/menus.js showMap).
+  woods: {
+    id: 'woods', name: 'Hollow Woods', theme: 'spooky',
+    holes: [wood1, wood2, wood3, wood4, wood5, wood6, wood7, wood8, wood9],
+    lockedBy: { hole: 'sky9', course: 'sky', note: 'Finish the Sky Isles front nine to open Hollow Woods.' },
   },
 };
 

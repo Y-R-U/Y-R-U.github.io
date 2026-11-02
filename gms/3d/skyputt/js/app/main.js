@@ -14,8 +14,8 @@ import { Store } from './store.js';
 import { renderTitle, showMap, openSettings } from './menus.js';
 import { createAudio } from '../audio/index.js';
 import { createCareer } from '../story/career.js';
-import { createEvents } from '../events/screen.js';
-import { featured, timeText, status, nowFrom } from '../events/events.js';
+import { createEvents, eventTileHTML } from '../events/screen.js';
+import { nowFrom } from '../events/events.js';
 import { createMeta } from '../meta/meta.js';
 import { createMetaScreens, tierBadge } from '../meta/screens.js';
 import { TIERS, weekCountdown } from '../meta/ladder.js';
@@ -148,7 +148,7 @@ async function boot() {
     mapCourse = c;
     showMap(store, c, {
       onHole: i => startRound(i, 'single', null, c), onFront: () => startRound(0, 'round', c === course ? 9 : null, c), onNine: nine => startRound(nine.from, 'round', nine.to, c), onBack: showTitle,
-      click: () => sfx.emit('click'), courses: [course, COURSES.festival].filter(Boolean), onCourse: c2 => showCourseMap(c2),
+      click: () => sfx.emit('click'), courses: [course, COURSES.festival, COURSES.woods].filter(Boolean), onCourse: c2 => showCourseMap(c2),
     });
   }
   function startRound(i, mode = 'round', end = null, c = course) {
@@ -198,8 +198,7 @@ async function boot() {
   });
   $('#t-events').onclick = () => { sfx.emit('click'); $('#title').hidden = true; events.list(); };
   function renderEventTile() {
-    const ev = featured(now()), st = status(ev, now());
-    $('#t-events').innerHTML = `<span class="et-ic">${ev.currency.icon}</span><span class="et-main"><b>${ev.name}</b><small>${timeText(ev, now())}</small></span><span class="badge ${st}">${st === 'live' ? 'Live' : st}</span>`;
+    $('#t-events').innerHTML = eventTileHTML(now());   // events3: live / next event + what follows
   }
   // ---- ladder + shop (M5)
   const metaScreens = createMetaScreens({

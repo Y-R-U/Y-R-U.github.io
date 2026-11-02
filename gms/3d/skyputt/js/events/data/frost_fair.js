@@ -1,7 +1,8 @@
-// Seasonal event (PLAN 2.8). Pure data. Dates are local calendar days; `end` is inclusive.
+// Seasonal event (PLAN 2.8). Pure data. events3: recurs yearly; `dates` is the rule (js/events/calendar.js)
+// and each year's run is `${series}-${year}` (own save, ladder, goals). Local days, `end` inclusive.
 export default {
-  id: 'frost-fair-2026', name: 'Frost Fair Festival', theme: 'frost',
-  start: '2026-12-01', end: '2027-01-06',
+  series: 'frost-fair', since: 2026, recur: 'yearly', name: 'Frost Fair Festival', theme: 'frost',
+  dates: { from: '12-01', to: '01-06' },   // into the new year
   blurb: 'Lanterns, snow and candy canes over the Sky Isles. Bring a scarf.',
   course: 'sky', holes: ['sky1', 'sky4', 'sky5', 'sky7', 'sky8', 'sky9'],
   currency: { id: 'canes', name: 'Candy canes', one: 'Candy cane', icon: '🍬', colour: '#ff5a6e' },

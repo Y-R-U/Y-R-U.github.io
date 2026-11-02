@@ -1,9 +1,10 @@
-// Seasonal event (PLAN 2.8). Pure data. Dates are local calendar days; `end` is inclusive.
+// Seasonal event (PLAN 2.8). Pure data. events3: recurs yearly; `dates` is the rule (js/events/calendar.js)
+// and each year's run is `${series}-${year}` (own save, ladder, goals). Local days, `end` inclusive.
 // events2: Lunar New Year 2027 (Feb 6) through the Lantern Festival (Feb 20). Mixes Festival Isles
 // holes (course 'festival') with Sky Isles ones: event holes may come from any course (eventHoles()).
 export default {
-  id: 'lunar-lanterns-2027', name: 'Lunar Lantern Festival', theme: 'frost',
-  start: '2027-01-27', end: '2027-02-21',
+  series: 'lunar-lanterns', since: 2027, recur: 'yearly', name: 'Lunar Lantern Festival', theme: 'frost',
+  dates: { rule: 'lunar', before: 10, after: 15 },   // 2027: 01-27 → 02-21
   blurb: 'Lanterns over the winter isles for the New Year. Lucky envelopes on every fairway.',
   course: 'festival', holes: ['fest1', 'fest6', 'sky10', 'fest4', 'sky13', 'fest9'],
   currency: { id: 'envelopes', name: 'Lucky envelopes', one: 'Lucky envelope', icon: '🧧', colour: '#e8323c' },

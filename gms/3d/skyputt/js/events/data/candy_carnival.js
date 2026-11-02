@@ -1,9 +1,11 @@
-// Seasonal event (PLAN 2.8). Pure data. Dates are local calendar days; `end` is inclusive.
+// Seasonal event (PLAN 2.8). Pure data. events3: recurs yearly; `dates` is the rule (js/events/calendar.js)
+// and each year's run is `${series}-${year}` (own save, ladder, goals). Local days, `end` inclusive.
 // events2: plays on the 'candy' theme (js/themes/candy/, built by the candy agent). If that theme is
 // missing or fails to load, the round uses `themeFallback` (main.js) instead of greybox.
 export default {
-  id: 'candy-carnival-2027', name: 'Candy Carnival', theme: 'candy', themeFallback: 'sky',
-  start: '2027-02-24', end: '2027-03-17',
+  series: 'candy-carnival', since: 2027, recur: 'yearly', name: 'Candy Carnival', theme: 'candy', themeFallback: 'sky',
+  // between the Lantern Festival and the Egg Hunt with 2 free days each side, at most 24 days (2027: 02-24 → 03-17)
+  dates: { rule: 'between', after: 'lunar-lanterns', before: 'egg-hunt', gap: 3, max: 24, from: '02-24', to: '03-17' },
   blurb: 'The isles turn to sugar: bumper cars, toboggans and lollipops everywhere.',
   course: 'festival', holes: ['fest2', 'fest5', 'sky16', 'fest8', 'sky11', 'fest3'],
   currency: { id: 'lollipops', name: 'Lollipops', one: 'Lollipop', icon: '🍭', colour: '#ff4f9a' },

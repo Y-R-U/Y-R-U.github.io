@@ -13,6 +13,7 @@ import { portraitSVG } from '../js/story/portrait.js';
 
 let fails = 0; const ok = (c, m) => { console.log(c ? '  ok  ' : '  FAIL', m); if (!c) fails++; };
 
+const ANY_HOLE = id => Object.values(COURSES).flatMap(c => c.holes).find(h => h.id === id);
 console.log('data');
 for (const ch of CHAPTERS.filter(c => c.data)) {
   const d = ch.data, course = COURSES[d.course];
@@ -21,7 +22,7 @@ for (const ch of CHAPTERS.filter(c => c.data)) {
   for (const ev of d.events) {
     ok(!ids.has(ev.id), `${ev.id}: unique id`); ids.add(ev.id);
     ok(['lesson', 'round', 'rival', 'tournament'].includes(ev.kind), `${ev.id}: kind ${ev.kind}`);
-    ok(ev.holes.every(h => course.holes.some(x => x.id === h)), `${ev.id}: holes exist (${ev.holes.join(',')})`);
+    ok(ev.holes.every(h => ANY_HOLE(h)), `${ev.id}: holes exist (${ev.holes.join(',')})`);   // courses2: any course
     const lines = [...(ev.before || []), ...(ev.after || []), ...(ev.lose || [])];
     ok(lines.every(([w]) => CHARACTERS[w]), `${ev.id}: every speaker is a character`);
     if (ev.kind === 'rival') ok(!!GOLFERS[ev.rival], `${ev.id}: rival ${ev.rival} exists`);
@@ -77,7 +78,7 @@ console.log('chapters 2-6 (story2)');
       if (ev.goal.use) ok(!!HELPER_BY_ID[ev.goal.use] && (ev.grant?.[ev.goal.use] > 0 || ev.goal.use === 'longSight' || ev.goal.use === 'mulligan'), `${ev.id}: lesson helper ${ev.goal.use} exists and is granted`);
       for (const h of Object.keys({ ...ev.grant, ...ev.reward?.helpers })) ok(!!HELPER_BY_ID[h], `${ev.id}: helper ${h} exists`);
       if (ev.reward?.cosmetic) { const [t, id] = ev.reward.cosmetic.split(':'); ok(!!COS[t]?.[id], `${ev.id}: cosmetic ${ev.reward.cosmetic} exists`); }
-      const hs = ev.holes.map(id => COURSES.sky.holes.find(h => h.id === id));
+      const hs = ev.holes.map(ANY_HOLE);
       if (ev.goal.starsAtLeast) ok(ev.goal.starsAtLeast <= hs.length * 3, `${ev.id}: star target reachable`);
       if (ev.goal.place) ok(ev.goal.place < ev.field.length + 1, `${ev.id}: place target inside the field`);
     }
@@ -142,7 +143,7 @@ if (process.argv.includes('--difficulty')) {
   const HUMANISH = { sky1: 0.38, sky2: 1.0, sky3: -0.5, sky4: 0, sky5: -0.25, sky6: 0.38, sky7: 1.25, sky8: -0.63, sky9: 1.0,
     sky10: -0.44, sky11: -0.38, sky12: 0.25, sky13: -0.81, sky14: 0, sky15: -0.06, sky16: 0.31, sky17: 1.75, sky18: 1.5 };
   const N = +(process.argv.find(a => a.startsWith('--seeds='))?.split('=')[1] || 6);
-  const H = id => COURSES.sky.holes.find(h => h.id === id);
+  const H = ANY_HOLE;
   const rows = [];
   for (const ch of CHAPTERS) {
     for (const ev of ch.data.events.filter(e => e.kind === 'rival' || e.kind === 'tournament')) {

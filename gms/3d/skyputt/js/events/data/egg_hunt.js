@@ -1,8 +1,9 @@
-// Seasonal event (PLAN 2.8). Pure data. Dates are local calendar days; `end` is inclusive.
+// Seasonal event (PLAN 2.8). Pure data. events3: recurs yearly; `dates` is the rule (js/events/calendar.js)
+// and each year's run is `${series}-${year}` (own save, ladder, goals). Local days, `end` inclusive.
 // events2: around Easter 2027 (Sunday 28 March).
 export default {
-  id: 'egg-hunt-2027', name: 'Easter Egg Hunt', theme: 'sky',
-  start: '2027-03-20', end: '2027-04-05',
+  series: 'egg-hunt', since: 2027, recur: 'yearly', name: 'Easter Egg Hunt', theme: 'sky',
+  dates: { rule: 'easter', before: 8, after: 8 },   // 2027: 03-20 → 04-05
   blurb: 'Painted eggs are hidden all over the spring isles. Find every one.',
   course: 'festival', holes: ['fest1', 'sky4', 'fest4', 'sky14', 'fest6', 'fest7'],
   currency: { id: 'eggs', name: 'Painted eggs', one: 'Painted egg', icon: '🥚', colour: '#f2c94c' },

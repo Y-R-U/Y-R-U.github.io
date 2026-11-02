@@ -31,11 +31,14 @@ export function showMap(store, course, { onHole, onFront, onNine, onBack, click,
   const open = store.unlockedCount(course);
   const nines = course.nines || [{ id: course.id, name: course.name, from: 0, to: course.holes.length }];
   const extra = (courses || []).filter(c => c !== course);
+  // courses2: a course with `lockedBy: { hole }` stays locked until that hole (on another course) is finished
+  const gated = c => !!c.lockedBy && !store.data.unlocked?.[c.lockedBy.hole];
+  const gate = gated(course);
   let nine = nines.find(n => n.id === mapNine) || nines.filter(n => n.from < open).pop() || nines[0];
   const render = () => {
     const holes = course.holes.slice(nine.from, nine.to);
     const tot = holes.reduce((a, h) => a + (store.hole(h.id)?.stars ?? 0), 0);
-    const locked = nine.from >= open;
+    const locked = gate || nine.from >= open;
     el.innerHTML = `
     <div class="map-card">
       <div class="map-head">
@@ -43,15 +46,15 @@ export function showMap(store, course, { onHole, onFront, onNine, onBack, click,
         <div><div class="map-title">${esc(course.name)}</div><div class="map-sub">${esc(nine.name)} · ${starRow(1, 1)} ${tot}/${holes.length * 3} · ${ICONS.coin}${store.data.coins | 0}</div></div>
       </div>
       ${nines.length > 1 || extra.length ? `<div class="seg nines">${(courses || [course]).map(c => c !== course
-        ? (c.nines || [{ id: c.id, name: c.name }]).map(n => `<button data-course="${c.id}" data-cnine="${n.id}">${esc(n.name)}</button>`).join('')
-        : nines.map(n => `<button data-nine="${n.id}" class="${n === nine ? 'on' : ''}">${esc(n.name)}${n.from >= open ? ' ' + ICONS.lock : ''}</button>`).join('')).join('')}</div>` : ''}
+        ? (c.nines || [{ id: c.id, name: c.name }]).map(n => `<button data-course="${c.id}" data-cnine="${n.id}">${esc(n.name)}${gated(c) ? ' ' + ICONS.lock : ''}</button>`).join('')
+        : nines.map(n => `<button data-nine="${n.id}" class="${n === nine ? 'on' : ''}">${esc(n.name)}${gate || n.from >= open ? ' ' + ICONS.lock : ''}</button>`).join('')).join('')}</div>` : ''}
       <div class="map-grid">${holes.map((h, k) => {
-        const i = nine.from + k, rec = store.hole(h.id), lk = i >= open && !rec;   // events2: a hole already played (e.g. in an event) is open
+        const i = nine.from + k, rec = store.hole(h.id), lk = (gate || i >= open) && !rec;   // events2: a hole already played (e.g. in an event) is open
         return `<button class="tile ${lk ? 'locked' : ''}" data-i="${i}" ${lk ? 'disabled' : ''} aria-label="Hole ${i + 1}: ${esc(h.name)}${lk ? ' (locked)' : ''}">
           <b class="num">${i + 1}</b>${lk ? `<span class="lk">${ICONS.lock}</span>` : starRow(rec?.stars ?? 0)}
           <span class="nm">${esc(h.name)}</span><span class="pr">Par ${h.par}${rec?.best ? ` · best ${rec.best}` : ''}</span></button>`;
       }).join('')}</div>
-      ${locked ? `<div class="card-note small">Finish hole ${nine.from} to open the ${esc(nine.name.toLowerCase())}.</div>` : ''}
+      ${locked ? `<div class="card-note small">${gate ? esc(course.lockedBy.note || 'Locked.') : `Finish hole ${nine.from} to open the ${esc(nine.name.toLowerCase())}.`}</div>` : ''}
       <button class="btn primary" data-a="front" ${locked ? 'disabled' : ''}>Play ${esc(nine.name.toLowerCase())}</button>
     </div>`;
   };

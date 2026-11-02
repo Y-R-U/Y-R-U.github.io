@@ -335,6 +335,22 @@ table.ladder tr.gap td { text-align: center; opacity: .5; padding: 0; }
 .tiers div.on { background: rgba(242,199,92,.18); }
 .tiers b { width: 60px; flex: none; }
 .btn svg { width: 18px; height: 18px; vertical-align: -3px; }
+/* events3: weekend events, next-up line, hole chips */
+.event-tile .et-main small.et-next { font-size: 11.5px; opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.event-tile .et-main { min-width: 0; }
+.ev-kind { font-style: normal; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; padding: 1px 6px; margin-left: 4px; border-radius: 99px; background: rgba(127,180,239,.3); vertical-align: 2px; }
+.ev-tile .badge { flex: none; }
+.ev-tile.wknd { padding: 8px 10px; }
+.ev-holes { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 2px; }
+.ev-holes span { font-size: 12.5px; padding: 3px 9px; border-radius: 10px; background: rgba(255,255,255,.08); }
+.ev-holes i { font-style: normal; opacity: .6; margin-left: 5px; font-size: 11px; }
+.g-top b { min-width: 45%; }
+.g-top span { white-space: normal; text-align: right; }   /* long rewards wrap instead of squeezing the goal text */
+.ev-tile .ev-main small:last-child { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (orientation: landscape) and (min-width: 700px) {
+  #events .career-card.wide { width: min(880px, 100%); }
+  #events .ev-list, #events .goals { display: grid; grid-template-columns: 1fr 1fr; }
+}
 
 /* ---------- M5: helper tray (scrolls when tall), tooltips ---------- */
 .tray { max-height: calc(100% - 84px - var(--safe-b) - 150px - var(--safe-t)); overflow-y: auto; overflow-x: visible; padding: 8px 8px 8px 10px;

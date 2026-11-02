@@ -48,10 +48,11 @@ export default {
       reward: { coins: 90 },
     },
     {
-      id: 'world-r2', kind: 'round', name: 'Hollow Masters', holes: ['sky7', 'sky16', 'sky17'], theme: 'spooky',
+      // courses2: played on Hollow Woods (was sky7 / sky16 / sky17)
+      id: 'world-r2', kind: 'round', name: 'Hollow Masters', holes: ['wood2', 'wood7', 'wood9'], theme: 'spooky',
       goal: { starsAtLeast: 7 }, goalText: 'Earn 7 stars over 3 holes',
-      before: [['sunny', 'The Hollow Masters, at midnight of course. Three of the meanest holes on the tour.']],
-      after: [['pro', 'You took the plank on seven. I never take the plank. ...I may reconsider.']],
+      before: [['sunny', 'The Hollow Masters, at midnight of course, deep in Hollow Woods. Three of the meanest holes on the tour.']],
+      after: [['pro', 'You took the log over the ravine on Crow’s Fork. I never take the log. ...I may reconsider.']],
       reward: { coins: 100, helpers: { ghost: 1, magnet: 1 } },
     },
     {
