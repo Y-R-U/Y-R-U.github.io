@@ -3,7 +3,7 @@
 //   ~/.claude/bin/cdp start --port 9512    and    ~/.claude/bin/cdp start --port 9513
 //   (one browser per client: headless Chrome only sends frames to one window per browser)
 //   tools/server_run.sh --bg
-//   node tools/online_cdp.mjs [--out=DIR] [--port=9512] [--port2=9513]
+//   node tools/online_cdp.mjs [--out=DIR] [--port=9512] [--port2=9513] [--blp]   (--blp: Bob plays on an 844x390 landscape phone)
 // Alice (portrait phone) creates a room through the UI (3 holes, 2 ghost AIs), Bob (desktop landscape)
 // joins with the code; both play every hole with a planner bot driving the real Round (shots are
 // relayed, ghosts replay), tap Next on each scoreboard, Bob reloads mid-round and rejoins, then both
@@ -106,7 +106,7 @@ async function main() {
   const browserAt = async port => { const ver = await (await fetch(`http://127.0.0.1:${port}/json/version`)).json(); const ws = await open(ver.webSocketDebuggerUrl); return { ws, b: rpc(ws) }; };
   const b1 = await browserAt(PORT), b2 = await browserAt(PORT2);
   const A = await Page.create(b1.b, 'alice', PORT), B = await Page.create(b2.b, 'bob', PORT2);
-  await A.size(412, 915, true); await B.size(1440, 900, false);
+  await A.size(412, 915, true); await (args.blp ? B.size(844, 390, true) : B.size(1440, 900, false));   // --blp: Bob on a landscape phone
   const qs = name => `devuid=${name}${Date.now().toString(36)}&devname=${name[0].toUpperCase() + name.slice(1)}&fresh&noflyover&q=low`;
   await Promise.all([A.go(qs('alice')), B.go(qs('bob'))]);
   await A.shot('a-title');

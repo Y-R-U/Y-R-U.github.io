@@ -61,7 +61,7 @@ async function waitFor(expr, ms = 5000) {
   while (Date.now() - t0 < ms) { try { if (await c.eval(expr)) return true; } catch { /* navigating */ } await sleep(100); }
   throw new Error('timeout waiting for ' + expr);
 }
-const DIMS = { p: [412, 915, true], l: [1440, 900, false], lp: [844, 390, true] };   // lp = landscape phone
+const DIMS = { p: [412, 915, true], l: [1440, 900, false], lp: [844, 390, true], lp2: [740, 360, true] };   // lp/lp2 = landscape phones
 try {
   if (args.swap) {   // title-screen theme swaps exercise theme.dispose() + env dispose; any throw shows up as an error
     await c.send('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });

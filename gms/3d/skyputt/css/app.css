@@ -352,7 +352,12 @@ table.ladder tr.gap td { text-align: center; opacity: .5; padding: 0; }
   .tray { max-height: calc(100% - 140px); bottom: 50%; }
 }
 @media (orientation: landscape) and (max-height: 500px) {
-  .tray { max-height: calc(100% - 100px); gap: 8px; }
+  /* landscape phone: up to 4 per column, filling the column at the screen edge first (rtl), so all 8
+     helpers fit beside the course without scrolling; the thumb's column stays Long Sight / Mulligan */
+  .tray { max-height: calc(100% - 100px); gap: 8px; display: grid; grid-auto-flow: column;
+    grid-template-rows: repeat(4, auto); grid-auto-columns: 46px; direction: rtl; }
+  body.lefty .tray { direction: ltr; }
+  .tray-btn { direction: ltr; }
 }
 
 /* hole card: ladder + chest lines */

@@ -59,9 +59,36 @@ Aim and putting were checked in landscape: aim uses the drag vector and doesn't 
   short screens.
 - Checked at 412x915 (2x2 theme chips, unchanged) and 1440x900 (right-hand card, unchanged).
 
+## 4. Helper tray on landscape phones (follow-up, 2026-11-03)
+**Problem.** At 844x390 and 740x360 the tray showed all 8 helpers in one column. The column already scrolled,
+but nothing showed that it did, so the ghost button was simply cut off.
+
+**Fix.** It is CSS only, in `css/app.css`, in the M5 tray block under `landscape and max-height: 500px`:
+- The tray becomes a grid with **up to 4 buttons per column**. It fills the column at the screen edge first
+  (`direction: rtl`, or `ltr` for left-handed).
+- With 8 helpers that makes two columns of 46 px. Long Sight, Mulligan, Magnet and Timer sit in the edge column,
+  closest to the thumb.
+- A fresh tray (only Long Sight and Mulligan) stays one column.
+
+**Fit.** The tray is about 224 px tall and centred vertically, so it sits between the eye/pause buttons and the
+hint pill. It stays well right of the course and tee. The scroll is kept as a fallback for more than 8 helpers
+on very short screens.
+
+**Online.** I ran `online_cdp.mjs` with the new `--blp` option, which puts Bob on an 844x390 phone. The players
+strip (top left) and the shot-clock ring (top centre) don't touch the tray. The run was ALL PASS before and
+after.
+
+**Unchanged layouts.** Portrait 412x915 and desktop 1440x900 don't match the media query, so they are unchanged.
+Shots confirm it.
+
+**Shots** (in `polish_shots/`):
+- `tray-{before,after}-{p,l,lp,lp2}-hole3.png`
+- `tray-{before,after}-online-lp-{hole1,ghosts}.png`
+
 ## Tools
 `tools/candy_shots.mjs` gained two options:
-- `--sizes=lp` adds an 844x390 landscape phone.
+- `--sizes=lp` / `lp2` add 844x390 and 740x360 landscape phones.
+- `tools/online_cdp.mjs --blp` puts Bob on an 844x390 phone for the whole online run.
 - `--eval='js'` runs JS after the fly-over and prints any returned value; useful for camera tuning.
 
 It works for any `--theme=`. Example:
@@ -79,9 +106,7 @@ for th in sky spooky frost candy; do node tools/candy_shots.mjs --theme=$th --ho
   the candy theme)
 
 ## Known issues / proposals
-- **Helper rail overflow (not fixed).** On a landscape phone the right-hand helper rail (8 buttons) is taller than
-  390 px, so the last button (ghost) is cut off at the bottom. This happened before my change too. It needs a
-  compact rail, for example 2 columns or smaller buttons under max-height 500 (hud.js/app.css).
+- Helper rail overflow on landscape phones: fixed (section 4).
 - **Fly-over.** The fly-over in landscape uses the same lens shift. It looked fine, but I didn't review it frame by
   frame.
 - **Proposal for D13.** Landscape framing = flatter pitch + 60° FOV + a 12% lens shift, so the top edge sits about
