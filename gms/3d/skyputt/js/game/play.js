@@ -21,10 +21,15 @@ export class Round {
   // mode: 'round' (play on to the last hole, then the scorecard) | 'single' (one hole, then the map)
   // Story events add: onComplete(result) instead of the scorecard, opponents [{ name, colour, scores }]
   // shown on every hole card, and tips (hint lines at each hole start).
-  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null } = {}) {
+  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null, ledger = null, currency = null, ghosts = null } = {}) {
     this.app = app; this.course = course; this.onExit = onExit; this.mode = mode;
     this.onComplete = onComplete; this.opponents = opponents; this.tips = tips; this.label = label;
     this.used = { longSight: 0, mulligan: 0 };
+    // pickups pay out once per (hole, index); event rounds pass their own ledger + currency
+    this.ledger = ledger || app.store.ledger();
+    this.currency = currency;   // { icon, name } in event rounds: pickups are event currency, not coins
+    this.aces = 0;
+    this.ghosts = ghosts;   // [{ name, colour, shots: [per hole: shot list | null] }] → GhostBall replays (js/ai/ghost.js)
     this.index = startIndex; this.startIndex = startIndex;
     this.scores = [];
     this.gems = 0;
@@ -85,8 +90,11 @@ export class Round {
     hud.setStrokes(0, this.maxStrokes);
     hud.setGems(this.gems);
     this.refreshHelpers();
+    for (const p of this.view.pickups) if (this.ledger.has(def.id, p.index)) { p.taken = true; p.obj.visible = false; }
+    hud.setGems(this.gems, this.currency?.icon);
     this.view.update(0, 0, 0, this.ballPos());
     sfx.emit('stopRoll');
+    this.loadGhost(i);
     // fly-over: cup → tee, tap to skip
     this.state = 'flyover';
     this.flyT = 0;
@@ -94,6 +102,20 @@ export class Round {
     this.refreshHelpers();
     hud.banner(`<small>${this.label ? this.label + ' · ' : ''}Hole ${i + 1} · Par ${def.par}</small>${def.name}`, 'intro', 2600);
     hud.hint(true, 'Tap to skip');
+  }
+
+  // Rival ghost: replay their recorded shots for this hole as a translucent ball, alongside your play.
+  async loadGhost(i) {
+    this.ghost?.ball.removeFromParent(); this.ghost?.ball.dispose?.(); this.ghost = null;
+    const g = this.ghosts?.find(x => x.shots?.[i]?.length);
+    if (!g) return;
+    try {
+      const { GhostBall, GhostPlayer } = await import('../ai/ghost.js');
+      if (this.index !== i || !this.view) return;   // hole changed while loading
+      const ball = new GhostBall({ color: g.colour || '#ffffff', label: g.name, opacity: 0.75 });
+      this.app.scene.add(ball);
+      this.ghost = { ball, player: new GhostPlayer(ball, { shots: g.shots[i] }, { gap: 1.4 }), name: g.name };
+    } catch (e) { console.warn('[skyputt] ghost unavailable', e); }
   }
 
   endFlyover() {
@@ -207,6 +229,7 @@ export class Round {
     this.aim.dispose();
     this.app.canvas.removeEventListener('pointerdown', this._skip);
     this.view?.dispose(); this.view = null;
+    this.ghost?.ball.removeFromParent(); this.ghost?.ball.dispose?.(); this.ghost = null;
     this.app.rig.occluders = null;
     this.app.scene.remove(this.ballMesh);
     this.ballMesh.geometry.dispose(); this.ballMesh.material.map?.dispose(); this.ballMesh.material.dispose();
@@ -273,6 +296,7 @@ export class Round {
     // guide line while aiming
     if (this.state === 'ready') this.aim.updateGuide(app.scene, w.time); else this.aim.guide.hide();
     this.view.update(dt, t, w.time, this.ballPos());
+    if (this.ghost && this.state !== 'flyover' && !this.paused) this.ghost.player.update(dt);
   }
 
   updateFlyover(dt) {
@@ -349,7 +373,11 @@ export class Round {
     for (const p of this.view.pickups) {
       if (p.taken) continue;
       const d = Math.hypot(p.p.x - b.px, p.p.y - b.py, p.p.z - b.pz);
-      if (d < PICKUP_R) { p.taken = true; this.gems++; this.holeGems++; this.app.hud.setGems(this.gems); sfx.emit('pickup'); }
+      if (d < PICKUP_R) {
+        p.taken = true; this.gems++; this.holeGems++;
+        this.ledger.add(this.def.id, p.index);
+        this.app.hud.setGems(this.gems, this.currency?.icon); sfx.emit('pickup');
+      }
     }
   }
 
@@ -363,7 +391,8 @@ export class Round {
     if (picked) this.ballMesh.visible = false;
     const { stars, newBest } = store.recordHole(def.id, strokes, def.par, picked);
     store.markFinished(def.id);
-    const coins = this.holeGems * COINS_PER_CRYSTAL;
+    if (!picked && strokes === 1) this.aces++;
+    const coins = this.currency ? 0 : this.holeGems * COINS_PER_CRYSTAL;
     if (coins) store.addCoins(coins);
     let reward = null;
     if (stars === 3) {   // a 3-star hole earns a helper (whichever you hold fewer of)
@@ -390,6 +419,7 @@ export class Round {
       rivals: this.opponents?.map(o => ({ name: o.name, colour: o.colour, strokes: o.scores[this.index],
         total: o.scores.slice(0, this.index + 1).reduce((a, b) => a + b, 0) })),
       youTotal: this.scores.filter(Boolean).reduce((a, r) => a + r.strokes, 0),
+      currency: this.currency,
     }, onNext);
   }
 
@@ -398,7 +428,7 @@ export class Round {
     const rows = this.scores.filter(Boolean);
     return { rows, total: rows.reduce((a, r) => a + r.strokes, 0), par: rows.reduce((a, r) => a + r.par, 0),
       stars: rows.reduce((a, r) => a + (r.picked ? 0 : r.strokes < r.par ? 3 : r.strokes === r.par ? 2 : 1), 0),
-      gems: this.gems, used: { ...this.used } };
+      gems: this.gems, aces: this.aces, used: { ...this.used } };
   }
 
   showScorecard() {

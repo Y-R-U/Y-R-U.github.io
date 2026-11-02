@@ -1,4 +1,4 @@
-# engine — notes (M1 "First putt", M2 "Sky Isles front nine", M3 start)
+# engine — notes (M1 "First putt", M2 "Sky Isles front nine", M3 start, M4 events)
 
 Owner: `engine` agent. Status: **M1 playable** — title → 3 Sky Isles holes → scorecard, in portrait
 and landscape, with the `sky` theme (or `?theme=greybox`).
@@ -102,7 +102,7 @@ and landscape, with the `sky` theme (or `?theme=greybox`).
   at 85%; real drags (the `play` run, manual CDP drags, mouse in landscape) aim and draw correctly.
   Looks like a driver/touch-emulation artefact, not reproduced by hand.
 - Headless is still ~10 fps (software GL): ~35–50 draw calls, ~40–50k triangles per hole with sky.
-- Crystals respawn every play, so coins can be farmed (fine until the shop exists).
+- (fixed in M4) crystals pay out once per hole/pickup.
 
 ## M3 start (2026-11-02)
 - **Theme picker** on the title: Sky Isles / Spooky Hollow chips with a CSS swatch; saved as
@@ -142,6 +142,59 @@ and landscape, with the `sky` theme (or `?theme=greybox`).
   unlock + rank; stub determinism; the Pro beats a beginner); `node tools/shots_cdp.mjs story` drives
   name → intro → career → lesson 1 (played by drags) → result → rival hole card. All pass, no console
   errors besides the expected ai 404.
+
+## M4 events framework (2026-11-02)
+- **Data** (`js/events/data/`): `spooky_open.js` (2026-10-20 → 2026-11-08, theme `spooky`, pumpkins,
+  holes 2 3 5 6 8 9) and `frost_fair.js` (2026-12-01 → 2027-01-06, candy canes, **plays on `sky`**,
+  `themeWanted: 'frost'` + TODO for the frost theme agent). Each has dates (local, end inclusive),
+  theme, course + hole set, currency {id, name, icon}, goals (kind currency | rounds | underPar | aces |
+  points, target, reward), ladder {seed, size, pace}, rankRewards [{top, reward, title?}].
+  `index.js` is the bundled schedule.
+- **Logic** (`js/events/events.js`, pure): status/countdown/featured; `?eventdate=YYYY-MM-DD` pins
+  "now" to local noon; progress = { currency, rounds, aces, bestUnder, points, claimed[], rankClaimed,
+  pickups }; round points = max(10, 40 + 12·(par − strokes)) + 25·aces + 3·new currency (more play →
+  higher, D12). Ladder: 29 generated players (names from the seed); each has a rounds/day activity and
+  a points/round quality; their points are summed per day from per-day RNG(seed, day), plus the elapsed
+  part of today, so the board advances with the date, is identical on every device, and freezes at the
+  end. Rank rewards are claimable once after the end (if you played).
+- **UI** (`js/events/screen.js`): title Events tile (featured event, countdown, Live badge) → list
+  (live / upcoming / ended, with swatch + currency icon) → event page: currency / points / rank /
+  rounds, Play event round (loads the event theme for the round, restores yours after), goals track
+  with progress bars + Claim, ladder (top 5 + you ±2), final rank reward tiers + Claim when ended.
+- **Coins farming fix**: crystals (and event currency) pay once per (hole, pickup) — a ledger in the
+  save (`store.data.pickups`, and per event `events[id].pickups`). Collected ones are hidden on replays.
+  Currency goals are capped by the pickups on the event's holes (tested: 18 per event).
+- **Lesson fix**: a `use: helper` goal also passes on a hole in one (nothing to use it on).
+- **Muni played end to end in the browser** (`node tools/shots_cdp.mjs muni`, ~26 min headless):
+  all 7 events passed in order (Long Sight / Mulligan used where the lessons ask), every dialogue,
+  result card, reward, the outro and the "New rank: Amateur" card; career shows Amateur, all ✓.
+  Found: the AI module landed mid-run with an empty `js/ai/calib.js`, so its quick mode gave every
+  tournament golfer a pick-up on every hole (all 41). `opponents.js` now treats an all-pick-up result
+  as broken, warns in the console and uses the stub. **For the ai agent:** `simulateRound` quick mode
+  needs a filled CALIB (or a fallback) — today it returns par + 4 on every hole.
+- **Tests**: `node tools/events_test.mjs` (data, calendar incl. inclusive end, featured, ladder
+  determinism + monotonic + frozen after end, points, goals, tiers);
+  `node tools/shots_cdp.mjs events` (tile, list, Spooky page, a full event round by drags in the
+  spooky theme, claims, ended page + rank claim via `?eventdate=2026-11-20`, Frost live on 2026-12-03);
+  `node tools/shots_cdp.mjs muni` plays all of chapter 1 through the UI to the rank card.
+
+## Real AI wired (2026-11-02, after js/ai landed)
+- `playField` now gets `source: 'ai'` from `js/ai/index.js` `simulateRound` (auto: full sims for the
+  4-hole rival match with `shots`, quick histograms for the 6-hole Open). The stand-in label is gone;
+  the stub remains only as a fallback (import failure, or an all-pick-up result).
+- "Carl is warming up…" / "The field is warming up…" card with a spinner while the AI plans.
+- D14: opponents capped at skill 0.9 in `playField` (`MAX_SKILL`); roster: Carl 0.36, Open field
+  0.22–0.46, The Pro 0.9 (cameo only, not in chapter 1). Node, real AI, Muni Open (par 17):
+  field 20–30 strokes, so top 3 needs about +4 or better.
+- **Rival ghost**: in the rival match, Carl's recorded shots for each hole replay as a translucent
+  `GhostBall` (js/ai/ghost.js `GhostPlayer`, 1.4 s between shots), starting when the fly-over ends and
+  running alongside your play. Cheap: paths are precomputed, no physics on the main thread.
+  Known gap: the ghost isn't synced to the obstacle clock (the ai notes suggest launching each shot at
+  `world.time ≡ t0`); on the windmill hole its blades won't match the ghost's path. Fine for now.
+- Browser check with the real AI (`shots_cdp muni --skip=5`): warming-up card, Carl's ghost replaying on
+  hole 1, rival 6 vs Carl 19 (4 holes, par 12), Muni Open field 17–26 (par 17), rank card, no console errors.
+- API notes for the ai agent: none blocking. `GhostBall.dispose()` exists and is used; a
+  `GhostPlayer.dispose()` would be handy.
 
 ## Contract changes (THEME_CONTRACT.md, "Engine extensions" section)
 windmill `gapHeight` opt + exact blade layout at rotation 0 (blade along +Y·k, sail on +X from

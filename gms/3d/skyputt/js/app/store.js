@@ -12,13 +12,21 @@ export const COINS_PER_CRYSTAL = 5;
 export function freshStory() { return { name: '', events: {}, chapters: {}, seen: {} }; }
 
 function fresh() {
-  return { v: 1, holes: {}, coins: 0, helpers: { ...START_HELPERS }, settings: { ...DEFAULT_SETTINGS }, unlocked: {}, story: freshStory() };
+  return { v: 1, holes: {}, coins: 0, helpers: { ...START_HELPERS }, settings: { ...DEFAULT_SETTINGS }, unlocked: {}, story: freshStory(), pickups: {}, events: {} };
 }
 
 // stars: 0 = not finished / picked up, 1 = finished, 2 = par or better, 3 = under par
 export function starsFor(strokes, par, picked) {
   if (picked) return 0;
   return strokes < par ? 3 : strokes === par ? 2 : 1;
+}
+
+export function makeLedger(store, obj) {
+  return {
+    has: (hole, i) => (obj[hole] || []).includes(i),
+    add: (hole, i) => { (obj[hole] || (obj[hole] = [])).includes(i) || obj[hole].push(i); store.save(); },
+    count: () => Object.values(obj).reduce((a, l) => a + l.length, 0),
+  };
 }
 
 export class Store {
@@ -37,6 +45,8 @@ export class Store {
         unlocked: typeof d.unlocked === 'object' && d.unlocked ? d.unlocked : {},
         coins: Number.isFinite(d.coins) ? d.coins : 0,
         story: { ...freshStory(), ...(d.story && typeof d.story === 'object' ? d.story : {}) },
+        pickups: d.pickups && typeof d.pickups === 'object' ? d.pickups : {},
+        events: d.events && typeof d.events === 'object' ? d.events : {},
       };
     } catch { return fresh(); }
   }
@@ -71,6 +81,10 @@ export class Store {
     this.data.helpers[name]--; this.save(); return true;
   }
   giveHelper(name, n = 1) { this.data.helpers[name] = (this.data.helpers[name] | 0) + n; this.save(); }
+  // Crystal ledger: a crystal pays coins only the first time it is collected (per hole, per index).
+  // Event rounds use their own ledger (see eventLedger) so event currency follows the same rule.
+  ledger() { return makeLedger(this, this.data.pickups); }
+  eventProgress(id, fresh) { return this.data.events[id] || (this.data.events[id] = fresh()); }
   story() { return this.data.story; }
   saveStory() { this.save(); }
   settings() { return this.data.settings; }

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>SKYPUTT — ghost AI demo</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0d1420; overflow: hidden; touch-action: none; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+    #board { position: fixed; left: 10px; top: 10px; font: 13px/1.4 system-ui, sans-serif; color: #fff;
+      background: rgba(10,16,28,.62); padding: 8px 10px; border-radius: 10px; pointer-events: none; min-width: 190px; }
+    #board h1 { font-size: 14px; margin: 0 0 4px; font-weight: 700; }
+    #board .row { display: flex; gap: 8px; align-items: center; }
+    #board .row.on { font-weight: 700; }
+    #board .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+    #board .nm { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #board .sub { opacity: .7; font-size: 11px; }
+    #msg { position: fixed; left: 0; right: 0; bottom: 18px; text-align: center; font: 600 15px system-ui, sans-serif; color: #fff;
+      text-shadow: 0 1px 3px #000; pointer-events: none; }
+  </style>
+  <script type="importmap">
+  { "imports": {
+      "three": "/gms/lib/three/0.180.0/three.module.js",
+      "three/addons/": "/gms/lib/three/0.180.0/addons/"
+  } }
+  </script>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="board"></div>
+  <div id="msg">Ghosts are planning…</div>
+  <script type="module" src="./ai_demo.js"></script>
+</body>
+</html>

@@ -28,3 +28,5 @@ The manager owns this file; agents propose changes in their notes.
 - D13 (Aaron, 2026-11-02) Mobile-first portrait AND a proper desktop landscape layout (wide camera
   framing, HUD placed for landscape, mouse drag aim + wheel zoom). Fullscreen toggle shown where the
   Fullscreen API works (Android Chrome, desktop), hidden on iOS Safari.
+- D14 AI skill capped at 0.9 for opponents (skill 1 finds inhuman hole-in-one lines). Early story
+  rivals/fields must be tuned to beatable (e.g. Muni rival ~0.3-0.4, Muni Open field mostly < 0.5).

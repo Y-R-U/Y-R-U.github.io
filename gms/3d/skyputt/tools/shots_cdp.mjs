@@ -231,6 +231,127 @@ async function story(c) {
   console.log('   state:', JSON.stringify(await c.eval(`({ coins: __skyputt.store.data.coins, helpers: __skyputt.store.data.helpers, story: __skyputt.store.story() })`)));
 }
 
+// The whole of chapter 1 through the UI: every event in order, helpers used where a lesson asks,
+// every dialogue tapped through, until the chapter-complete rank card.
+async function muni(c) {
+  await size(c, 412, 915, true);
+  await go(c, 'fresh&noflyover');
+  await c.eval(`document.querySelector('#t-career').click()`); await sleep(400);
+  await c.eval(`(() => { document.querySelector('#c-name').value = 'Robin'; document.querySelector('#career [data-a=ok]').click(); })()`);
+  await sleep(400); await tapDialogue(c);
+  if (args.skip) {   // --skip=N: mark the first N Muni events passed (e.g. 5 = straight to the rival)
+    await c.eval(`(() => { const st = __skyputt.store.story(); ['muni-l1','muni-l2','muni-l3','muni-r1','muni-r2','muni-rival'].slice(0, ${+args.skip}).forEach(id => st.events[id] = { passed: true, best: 9 }); __skyputt.store.saveStory(); __skyputt.career.render(); })()`);
+    await sleep(300);
+  }
+  const tries = {};
+  for (let guard = 0; guard < 14; guard++) {
+    const next = await c.eval(`(() => { const b = [...document.querySelectorAll('#career .ev.open')][0]; return b ? b.dataset.ev : null })()`);
+    if (!next) break;
+    tries[next] = (tries[next] || 0) + 1;
+    if (tries[next] > 3) { console.log('   giving up on', next); break; }
+    const t0 = Date.now();
+    await c.eval(`document.querySelector('#career [data-ev="${next}"]').click()`); await sleep(400);
+    await tapDialogue(c, `muni-${next}-before`);
+    if (next === 'muni-rival' || next === 'muni-open') {
+      const warm = await c.eval(`document.querySelector('#career .card-title')?.innerText || ''`);
+      if (/warming/i.test(warm)) { await shot(c, `muni-${next}-warming`); console.log('   ' + warm); }
+    }
+    await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 90000);
+    const log = [];
+    let ghostShot = false, waitedGhost = 0;
+    for (;;) {
+      const s = await c.eval('__skyputt.round ? { st: __skyputt.round.state, n: __skyputt.round.strokes, used: __skyputt.round.used, hole: __skyputt.round.index } : null');
+      if (!s) break;
+      if (s.st === 'done') {
+        log.push(await c.eval(`document.querySelector('#h-card .card-title')?.innerText`));
+        if (s.hole === 0 && next === 'muni-rival') await shot(c, 'muni-rival-card1');
+        await c.eval(`document.querySelector('#h-card [data-a=next]').click()`); await sleep(900); continue;
+      }
+      if (next === 'muni-rival' && !ghostShot && await c.eval('!!(__skyputt.round.ghost && __skyputt.round.ghost.ball.playing)')) {
+        ghostShot = true; await shot(c, 'muni-rival-ghost'); console.log('   ghost replaying:', await c.eval('__skyputt.round.ghost.name'));
+      }
+      if (s.st !== 'ready') { await sleep(300); continue; }
+      if (next === 'muni-rival' && s.n === 0 && !ghostShot && (waitedGhost = (waitedGhost || 0) + 1) < 12) { await sleep(2500); continue; }   // let the ghost tee off first
+      if (next === 'muni-l2' && !s.used.longSight) { await c.eval(`document.querySelector('#h-sight').click()`); await sleep(200); }
+      if (next === 'muni-l3' && !s.used.mulligan && s.n === 0) {
+        await drag(c, 206, 300, 206, 300 + 24 + 0.12 * 182, { steps: 6 });   // a deliberate dud
+        await waitFor(c, '__skyputt.round.state === "ready"', 30000); await sleep(300);
+        await c.eval(`document.querySelector('#h-mull').click()`); await sleep(400);
+        continue;
+      }
+      await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
+      const plan = await c.eval(`(${planInPage.toString()})()`);
+      const len = 24 + plan.power * 182;
+      await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
+      await sleep(600);
+    }
+    await sleep(600);
+    await shot(c, `muni-${next}-result`);
+    const card = await c.eval(`document.querySelector('#career .card')?.innerText.replace(/\\n+/g, ' | ')`);
+    console.log(`   ${next} (${((Date.now() - t0) / 1000) | 0}s) holes: ${log.join(', ')}\n      ${card}`);
+    await c.eval(`document.querySelector('#career [data-a=ok]').click()`); await sleep(300);
+    await tapDialogue(c, `muni-${next}-after`);
+    const rank = await c.eval(`(() => { const t = document.querySelector('#career .card-title'); return t && /New rank/.test(t.innerText) ? t.innerText : null })()`);
+    if (rank) { await shot(c, 'muni-rank'); console.log('   ' + rank); await c.eval(`document.querySelector('#career [data-a=ok]').click()`); await sleep(400); }
+  }
+  await shot(c, 'muni-career-end');
+  console.log('   final:', JSON.stringify(await c.eval(`({ coins: __skyputt.store.data.coins, helpers: __skyputt.store.data.helpers, chapters: __skyputt.store.story().chapters, events: __skyputt.store.story().events })`)));
+}
+
+// Events: title tile, list, Spooky page, one full event round by drags, claims, then the Frost
+// Fair (upcoming, then live via ?eventdate) and the ended Spooky page with its rank claim.
+async function eventsMode(c) {
+  await size(c, 412, 915, true);
+  await go(c, 'fresh&noflyover&eventdate=2026-11-02');
+  await shot(c, 'ev-title');
+  await c.eval(`document.querySelector('#t-events').click()`); await sleep(400);
+  await shot(c, 'ev-list');
+  await c.eval(`document.querySelector('#events [data-id^="spooky"]').click()`); await sleep(400);
+  await shot(c, 'ev-spooky');
+  await c.eval(`document.querySelector('#events [data-a=play]').click()`);
+  await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 40000);
+  await sleep(600);
+  await shot(c, 'ev-round-hole1');
+  console.log('   theme in round:', await c.eval('__skyputt.app.themeId'));
+  for (;;) {
+    const s = await c.eval('__skyputt.round ? __skyputt.round.state : null');
+    if (!s) break;
+    if (s === 'done') {
+      const card = await c.eval(`document.querySelector('#h-card .card')?.innerText.replace(/\\n+/g, ' | ')`);
+      console.log('   ' + card.slice(0, 150));
+      await c.eval(`document.querySelector('#h-card [data-a=next]').click()`); await sleep(900); continue;
+    }
+    if (s !== 'ready') { await sleep(300); continue; }
+    await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
+    const plan = await c.eval(`(${planInPage.toString()})()`);
+    const len = 24 + plan.power * 182;
+    await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
+    await sleep(600);
+  }
+  await waitFor(c, '!document.querySelector("#events").hidden', 30000);
+  await sleep(500);
+  console.log('   theme after:', await c.eval('__skyputt.app.themeId'));
+  console.log('   page:', await c.eval(`document.querySelector('#events .card-note')?.innerText`));
+  await shot(c, 'ev-after-round');
+  // claim every claimable goal
+  for (let i = 0; i < 6; i++) { const any = await c.eval(`(() => { const b = document.querySelector('#events [data-claim]'); if (b) b.click(); return !!b })()`); if (!any) break; await sleep(300); }
+  await shot(c, 'ev-claimed');
+  console.log('   progress:', JSON.stringify(await c.eval(`({ coins: __skyputt.store.data.coins, ev: __skyputt.store.data.events })`)).slice(0, 400));
+  // play the same round's pickups again → no new currency (ledger)
+  await go(c, 'noflyover&eventdate=2026-11-20');
+  await c.eval(`document.querySelector('#t-events').click()`); await sleep(400);
+  await shot(c, 'ev-list-nov20');
+  await c.eval(`document.querySelector('#events [data-id^="spooky"]').click()`); await sleep(400);
+  await shot(c, 'ev-spooky-ended');
+  const claim = await c.eval(`(() => { const b = document.querySelector('#events [data-a=rank]'); if (b) b.click(); return !!b })()`);
+  await sleep(300);
+  console.log('   rank claim button:', claim, '→', await c.eval(`document.querySelector('#events .card-note')?.innerText`));
+  await go(c, 'noflyover&eventdate=2026-12-03');
+  await c.eval(`document.querySelector('#t-events').click()`); await sleep(300);
+  await c.eval(`document.querySelector('#events [data-id^="frost"]').click()`); await sleep(400);
+  await shot(c, 'ev-frost-live');
+}
+
 // Runs in the page: searches heading x power with the real sim, returns the best relative to the camera.
 function planInPage() {
   const r = __skyputt.round, w = r.world, b = r.ball, h = r.hole, rig = __skyputt.app.rig;
@@ -257,6 +378,8 @@ try {
   if (MODE === 'shots') await shots(c);
   else if (MODE === 'play') await play(c);
   else if (MODE === 'story') await story(c);
+  else if (MODE === 'muni') await muni(c);
+  else if (MODE === 'events') await eventsMode(c);
 } catch (e) { errors.push('driver: ' + e.message); }
 if (errors.length) { console.log('ERRORS:\n  ' + [...new Set(errors)].join('\n  ')); process.exit(1); }
 console.log('no console errors');

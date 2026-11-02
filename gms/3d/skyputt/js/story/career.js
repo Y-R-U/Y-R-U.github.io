@@ -29,7 +29,8 @@ export function checkGoal(ev, res, field) {
   const fails = [];
   if (g.maxStrokes !== undefined && res.total > g.maxStrokes) fails.push(`took ${res.total} (needed ${g.maxStrokes} or fewer)`);
   if (g.starsAtLeast !== undefined && res.stars < g.starsAtLeast) fails.push(`${res.stars} stars (needed ${g.starsAtLeast})`);
-  if (g.use && !(res.used?.[g.use] > 0)) fails.push(`didn't use ${g.use === 'longSight' ? 'Long Sight' : 'a Mulligan'}`);
+  // an ace leaves no room to use a helper, so it counts (a lesson must never punish a hole in one)
+  if (g.use && !(res.used?.[g.use] > 0) && !(res.rows?.length === 1 && res.total === 1)) fails.push(`didn't use ${g.use === 'longSight' ? 'Long Sight' : 'a Mulligan'}`);
   let place = null;
   if (field) {
     const board = leaderboard(res, field);
@@ -147,9 +148,14 @@ export function createCareer(ctx) {
     const holes = ev.holes.map(id => course.holes.find(h => h.id === id));
     const seed = (Date.now() / 1000) | 0;
     let field = null;
-    if (ev.kind === 'rival') field = await playField([{ id: ev.rival, ...GOLFERS[ev.rival] }], holes, seed);
-    if (ev.kind === 'tournament') field = await playField(ev.field.map(id => ({ id, ...GOLFERS[id] })), holes, seed);
-    const res = await ctx.startEvent(ev, { id: ev.id, name: ev.name, holes }, { opponents: field, tips: ev.tips });
+    if (ev.kind === 'rival' || ev.kind === 'tournament') {
+      warming(ev.kind === 'rival' ? `${GOLFERS[ev.rival].name} is warming up…` : 'The field is warming up…');
+      const golfers = ev.kind === 'rival' ? [ev.rival] : ev.field;
+      field = await playField(golfers.map(id => ({ id, ...GOLFERS[id] })), holes, seed);
+      $('#career').hidden = true;
+    }
+    const ghosts = ev.kind === 'rival' ? field.filter(f => f.shots?.some(x => x?.length)) : null;
+    const res = await ctx.startEvent(ev, { id: ev.id, name: ev.name, holes }, { opponents: field, tips: ev.tips, ghosts });
     if (!res) { render(); return; }   // quit
     const check = checkGoal(ev, res, field);
     const rec = st.events[ev.id] || {};
@@ -170,6 +176,13 @@ export function createCareer(ctx) {
     render();
   }
 
+  function warming(text) {
+    const el = $('#career');
+    el.innerHTML = `<div class="card career-card"><div class="card-title">${esc(text)}</div><div class="boot-spin"></div>
+      <div class="card-note small">Planning shots on the real course</div></div>`;
+    el.hidden = false;
+  }
+
   function resultCard(ev, res, check, field, first) {
     return new Promise(resolve => {
       const el = $('#career');
@@ -180,7 +193,6 @@ export function createCareer(ctx) {
         <div class="card-note">${esc(ev.goalText)}${check.passed ? '' : ` — ${esc(check.detail)}`}</div>
         <div class="card-stats"><div><span>Strokes</span><b>${res.total}</b></div><div><span>Par</span><b>${res.par}</b></div><div><span>Stars</span><b>${res.stars}</b></div></div>
         ${board ? `<table class="scores board">${board.map((r, i) => `<tr class="${r.you ? 'you' : ''}"><td>${i + 1}</td><td>${r.colour ? `<i class="dot" style="background:${r.colour}"></i>` : ''}${esc(r.name)}</td><td>${r.total}</td></tr>`).join('')}</table>` : ''}
-        ${field && field[0].source === 'stub' ? '<div class="card-note small">AI golfers are simulated (placeholder until the ghost AI lands)</div>' : ''}
         ${first && ev.reward ? `<div class="card-note good">Reward: ${rewardText(ev.reward, true)}</div>` : ''}
         <button class="btn primary" data-a="ok">${check.passed ? 'Continue' : 'Back to career'}</button></div>`;
       el.hidden = false;

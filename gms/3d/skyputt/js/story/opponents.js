@@ -44,13 +44,20 @@ async function ai() {
 }
 
 // Play every golfer through the holes. → [{ id, name, colour, scores: [strokes], total, source }]
+export const MAX_SKILL = 0.9;   // D14: opponents never above 0.9 (skill 1 finds inhuman ace lines)
+
 export async function playField(golfers, holes, seed) {
   const m = await ai();
   const out = [];
-  for (const g of golfers) {
+  for (const g0 of golfers) {
+    const g = { ...g0, skill: Math.min(MAX_SKILL, g0.skill ?? 0.5) };
     let res = null, source = 'stub';
     if (m) { try { res = await m.simulateRound({ holes, golfer: g, seed }); source = 'ai'; } catch (e) { console.warn('[skyputt] ai simulateRound failed, using stub', e); } }
-    if (!res || !Array.isArray(res.scores) || res.scores.length !== holes.length) { res = stubRound({ holes, golfer: g, seed }); source = 'stub'; }
+    // sanity: a result where every hole is a pick-up (par + 4) is a broken/uncalibrated AI, not a
+    // golfer — fall back so the story stays playable, and say so in the console
+    const degenerate = res && Array.isArray(res.scores) && res.scores.length && res.scores.every((s, i) => s.strokes >= holes[i].par + 4);
+    if (degenerate) console.warn(`[skyputt] ai simulateRound gave ${g.name} a pick-up on every hole (uncalibrated?); using the stub`);
+    if (!res || !Array.isArray(res.scores) || res.scores.length !== holes.length || degenerate) { res = stubRound({ holes, golfer: g, seed }); source = 'stub'; }
     const scores = res.scores.map(s => s.strokes);
     out.push({ id: g.id, name: g.name, colour: g.colour, scores, total: scores.reduce((a, b) => a + b, 0), source, shots: res.scores.map(s => s.shots || null) });
   }

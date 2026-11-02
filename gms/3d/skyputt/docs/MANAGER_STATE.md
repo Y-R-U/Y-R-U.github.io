@@ -31,3 +31,10 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - 2026-11-02: M2 committed+pushed 1658df29 (front nine, helpers, save, flyover, audio wired, spooky).
   js/ai/ excluded (ai agent in progress). Engine agent now: theme picker, sky fixes (hole 7 voids,
   lamps, mover skin), M3 story scaffolding in js/story/ (Old Mags, chapter 1 Muni, lessons, rival hooks).
+- 2026-11-02: 89fea4b1 pushed (theme picker, sky fixes, story ch1 Muni with AI stand-in). Note
+  tools/ai_test.mjs slipped into that commit (harmless; js/ai still uncommitted). AI agent given
+  `simulateRound` interface. Engine agent: verify Muni in browser, then M4 events framework
+  (Spooky Hollow Open live to 2026-11-08, Frost Fair Festival Dec), coin-farming fix.
+- Next free slot: Frost Fair theme agent (js/themes/frost/).
+- 2026-11-02: ai done (js/ai/, notes/ai.md, simulateRound live). Not yet committed: engine agent to
+  verify story↔AI integration + tune rosters (D14) first. Next slot: Frost Fair theme agent.

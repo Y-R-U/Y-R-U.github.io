@@ -14,6 +14,8 @@ import { Store } from './store.js';
 import { renderTitle, showMap, openSettings } from './menus.js';
 import { createAudio } from '../audio/index.js';
 import { createCareer } from '../story/career.js';
+import { createEvents } from '../events/screen.js';
+import { featured, timeText, status, nowFrom } from '../events/events.js';
 
 const $ = s => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -97,6 +99,7 @@ async function boot() {
     round = null;
     ensureTitleScene();
     renderTitle(store, course, app.themeId, setTheme);
+    renderEventTile();
     $('#title').hidden = false;
   }
   function ensureTitleScene() {
@@ -112,9 +115,15 @@ async function boot() {
   let swapping = false;
   async function setTheme(id) {
     if (swapping || id === app.themeId) return;
-    swapping = true;
     sfx.emit('click');
     store.setSetting('theme', id);
+    await useTheme(id);
+    showTitle();
+  }
+  // Load a theme without saving it (event rounds use their own skin, then restore the player's).
+  async function useTheme(id) {
+    if (id === app.themeId) return;
+    swapping = true;
     titleView?.dispose(); titleView = null;
     try { if (app.theme !== app.fallback) app.theme.dispose?.(); app.fallback.dispose?.(); } catch { /* */ }
     const t = await loadTheme(id, renderer);
@@ -122,8 +131,8 @@ async function boot() {
     window.__skyputt.themeId = t.id;
     audio?.music.start(t.id);
     swapping = false;
-    showTitle();
   }
+  const playerTheme = () => params.get('theme') || store.settings().theme || 'sky';
   function showCourseMap() {
     $('#title').hidden = true;
     showMap(store, course, {
@@ -143,11 +152,11 @@ async function boot() {
     store, click: () => sfx.emit('click'), back: () => sfx.emit('back'),
     onBack: () => showTitle(),
     // play an event's holes as a round; resolves with the result, or null if the player quits
-    startEvent: (ev, evCourse, { opponents, tips }) => new Promise(resolve => {
+    startEvent: (ev, evCourse, { opponents, tips, ghosts }) => new Promise(resolve => {
       $('#title').hidden = true;
       titleView?.dispose(); titleView = null;
       round = new Round(app, evCourse, 0, {
-        mode: 'round', opponents, tips, label: ev.name,
+        mode: 'round', opponents, tips, ghosts, label: ev.name,
         onComplete: res => { round = null; ensureTitleScene(); resolve(res); },
         onExit: () => { round = null; ensureTitleScene(); resolve(null); },
       });
@@ -156,12 +165,33 @@ async function boot() {
     }),
   });
   $('#t-career').onclick = () => { sfx.emit('click'); $('#title').hidden = true; career.open(); };
+
+  // ---- events (M4)
+  const now = () => nowFrom();
+  const events = createEvents({
+    store, now, click: () => sfx.emit('click'),
+    onBack: () => showTitle(),
+    playEvent: (ev, evCourse, { ledger, currency }) => new Promise(async resolve => {
+      $('#title').hidden = true;
+      await useTheme(ev.theme);
+      titleView?.dispose(); titleView = null;
+      const done = async res => { round = null; await useTheme(playerTheme()); ensureTitleScene(); resolve(res); };
+      round = new Round(app, evCourse, 0, { mode: 'round', label: ev.name, ledger, currency, onComplete: done, onExit: () => done(null) });
+      if (params.has('noflyover')) round.endFlyover();
+      window.__skyputt.round = round;
+    }),
+  });
+  $('#t-events').onclick = () => { sfx.emit('click'); $('#title').hidden = true; events.list(); };
+  function renderEventTile() {
+    const ev = featured(now()), st = status(ev, now());
+    $('#t-events').innerHTML = `<span class="et-ic">${ev.currency.icon}</span><span class="et-main"><b>${ev.name}</b><small>${timeText(ev, now())}</small></span><span class="badge ${st}">${st === 'live' ? 'Live' : st}</span>`;
+  }
   $('#t-play').onclick = () => { sfx.emit('click'); startRound(0, 'round'); };
   $('#t-map').onclick = () => { sfx.emit('click'); showCourseMap(); };
   $('#t-settings').innerHTML = ICONS.gear;
   $('#t-settings').onclick = () => { sfx.emit('click'); app.openSettings(() => {}); };
 
-  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
+  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, events, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
 
   const startHole = parseInt(params.get('hole'), 10);
   if (startHole >= 1 && startHole <= course.holes.length) startRound(startHole - 1, 'single'); else showTitle();

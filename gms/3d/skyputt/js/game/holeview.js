@@ -77,7 +77,7 @@ export function buildHoleView(scene, hole, theme, fallback, { renderer, camera, 
       const holder = new THREE.Group();
       holder.add(s.object || s);
       place(holder, f.p, f.basis);
-      pickups.push({ obj: holder, skin: s, p: v(f.p), taken: false, t: 0 });
+      pickups.push({ obj: holder, skin: s, p: v(f.p), taken: false, t: 0, index: pickups.length });
     }
   }
   // tee pad and flag

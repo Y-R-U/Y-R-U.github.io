@@ -59,7 +59,12 @@ export class Hud {
   show(on) { this.root.hidden = !on; }
   setHole(i, n, par) { this.el.hole.textContent = `${i}/${n}`; this.el.par.textContent = par; }
   setStrokes(n, max) { this.el.strokes.textContent = n; this.el.strokes.classList.toggle('warn', n >= max - 1); }
-  setGems(n) { this.el.gems.textContent = n; }
+  setGems(n, icon = null) {
+    this.el.gems.textContent = n;
+    const pill = this.el.gems.parentElement, svg = pill.querySelector('svg, .cur');
+    if (icon && !pill.querySelector('.cur')) { svg?.remove(); pill.insertAdjacentHTML('afterbegin', `<span class="cur">${icon}</span>`); }
+    else if (!icon && pill.querySelector('.cur')) { pill.querySelector('.cur').remove(); pill.insertAdjacentHTML('afterbegin', ICONS.gem); }
+  }
   setLook(on) { this.el.look.classList.toggle('on', on); this.el.look.setAttribute('aria-pressed', on); }
   setHelpers({ longSight, mulligan, sight, canSight, canMull }) {
     const S = this.el.sight, M = this.el.mull;
@@ -89,7 +94,7 @@ export class Hud {
   hideCard() { this.el.card.hidden = true; this.el.card.innerHTML = ''; }
   _card(html) { const c = this.el.card; c.innerHTML = `<div class="card">${html}</div>`; c.hidden = false; return c; }
 
-  holeDone({ hole, n, name, par, strokes, picked, gems, stars = 0, coins = 0, newBest, reward, nextLabel, onMap, rivals, youTotal }, onNext) {
+  holeDone({ hole, n, name, par, strokes, picked, gems, stars = 0, coins = 0, newBest, reward, nextLabel, onMap, rivals, youTotal, currency }, onNext) {
     const label = scoreName(strokes, par, picked);
     const d = strokes - par;
     const cls = strokes === 1 ? 'ace' : d < 0 ? 'under' : d === 0 ? 'par' : 'over';
@@ -98,7 +103,7 @@ export class Hud {
       <div class="card-kicker">Hole ${hole} of ${n} · ${esc(name)}</div>
       <div class="card-title ${cls}">${esc(label)}</div>
       <div class="card-stars">${starRow(stars)}</div>
-      <div class="card-stats"><div><span>Strokes</span><b>${strokes}</b></div><div><span>Par</span><b>${par}</b></div><div><span>Coins</span><b>+${coins}</b></div></div>
+      <div class="card-stats"><div><span>Strokes</span><b>${strokes}</b></div><div><span>Par</span><b>${par}</b></div>${currency ? `<div><span>${esc(currency.name)}</span><b>+${gems}</b></div>` : `<div><span>Coins</span><b>+${coins}</b></div>`}</div>
       ${newBest ? '<div class="card-note good">New best!</div>' : ''}
       ${rw ? `<div class="card-note good">3 stars: +1 ${rw}</div>` : ''}
       ${rivals?.length ? `<table class="scores rivals"><tr><th></th><th>Hole</th><th>Total</th></tr>
