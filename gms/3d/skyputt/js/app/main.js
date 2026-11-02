@@ -89,7 +89,7 @@ async function boot() {
     const w = innerWidth, h = innerHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    camera.fov = w > h ? 50 : 62;   // portrait needs a taller view to see down the fairway
+    camera.fov = w > h ? 60 : 62;   // portrait needs a taller view down the fairway; landscape a taller one for the backdrop (camera.js LAND)
     camera.updateProjectionMatrix();
   }
   addEventListener('resize', resize);
@@ -141,17 +141,20 @@ async function boot() {
     swapping = false;
   }
   const playerTheme = () => params.get('theme') || store.settings().theme || 'sky';
-  function showCourseMap() {
+  // events2: the map also has a Festival Isles tab (COURSES.festival); `mapCourse` is the course it shows.
+  let mapCourse = course;
+  function showCourseMap(c = mapCourse) {
     $('#title').hidden = true;
-    showMap(store, course, {
-      onHole: i => startRound(i, 'single'), onFront: () => startRound(0, 'round', 9), onNine: nine => startRound(nine.from, 'round', nine.to), onBack: showTitle,
-      click: () => sfx.emit('click'),
+    mapCourse = c;
+    showMap(store, c, {
+      onHole: i => startRound(i, 'single', null, c), onFront: () => startRound(0, 'round', c === course ? 9 : null, c), onNine: nine => startRound(nine.from, 'round', nine.to, c), onBack: showTitle,
+      click: () => sfx.emit('click'), courses: [course, COURSES.festival].filter(Boolean), onCourse: c2 => showCourseMap(c2),
     });
   }
-  function startRound(i, mode = 'round', end = null) {
+  function startRound(i, mode = 'round', end = null, c = course) {
     $('#title').hidden = true; $('#map').hidden = true;
     titleView?.dispose(); titleView = null;
-    round = new Round(app, course, i, { mode, end, onExit: () => { if (mode === 'single') { showTitle(); showCourseMap(); } else showTitle(); } });
+    round = new Round(app, c, i, { mode, end, onExit: () => { if (mode === 'single') { showTitle(); showCourseMap(); } else showTitle(); } });
     if (params.has('noflyover')) round.endFlyover();
     window.__skyputt.round = round;
   }
@@ -185,6 +188,7 @@ async function boot() {
     playEvent: (ev, evCourse, { ledger, currency }) => new Promise(async resolve => {
       $('#title').hidden = true;
       await useTheme(ev.theme);
+      if (app.themeId !== ev.theme && ev.themeFallback) await useTheme(ev.themeFallback);   // events2: theme missing → its fallback, not greybox
       titleView?.dispose(); titleView = null;
       const done = async res => { round = null; await useTheme(playerTheme()); ensureTitleScene(); resolve(res); };
       round = new Round(app, evCourse, 0, { mode: 'round', label: ev.name, ledger, currency, onComplete: done, onExit: () => done(null) });
@@ -232,7 +236,8 @@ async function boot() {
   window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, events, meta, metaScreens, online, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
 
   const startHole = parseInt(params.get('hole'), 10);
-  if (startHole >= 1 && startHole <= course.holes.length) startRound(startHole - 1, 'single'); else showTitle();
+  const startCourse = COURSES[params.get('course')] || course;   // events2: ?course=festival&hole=3
+  if (startHole >= 1 && startHole <= startCourse.holes.length) { mapCourse = startCourse; startRound(startHole - 1, 'single', null, startCourse); } else showTitle();
   if (params.get('room')) { $('#title').hidden = true; online.open({ join: params.get('room') }); }   // invite link
 
   // ---- frame loop

@@ -61,3 +61,18 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
   and new dated special events (e.g. Candy event, spring/Easter, summer, Lunar New Year). Still max 2 agents.
   Aaron feedback (phone): ch1 lesson tips said helper buttons "bottom right" (they're top of the right
   tray); ace passing the Mulligan lesson confused him → passed to story2 to fix wording + explain.
+- 2026-11-03: 4a84a08d pushed (online M6 local-only, back nine sky10-18, story ch2-6, ch1 tip fixes).
+  Started `events2` (spooky voids fix, Festival Isles fest1-9 course, new dated events: Lunar New Year,
+  Easter Egg Hunt, Candy Carnival (theme candy), Midyear Sky Games). `candy` still running.
+- 2026-11-03: 9beee35a pushed (Candy Land theme + theme chips wrap). Started `polish` (candy music,
+  landscape backdrop cropping, landscape-phone title layout). events2 still running. Manager: projects.js + hub card.
+- 2026-11-03: e84d0c20 pushed (projects.js entry, assets/screenshots/skyputt.jpg, games hub card soon:true — headlining on games.br8t.com needs deploy.sh GAMES + VPS deploy, Aaron's call).
+- 2026-11-03: Aaron: "You can deploy when ready". 41803a87 pushed (ONLINE_PUBLIC=true, hub card live).
+  Deployed from a clean `git archive HEAD` export (never the dirty tree): `CONFIRM=yes RUN_TESTS=1
+  STATIC=1 server/deploy.sh` → skyputt.service on 127.0.0.1:8023, devAuth off, Caddy route added
+  (backup /etc/caddy/Caddyfile.bak-skyputt-20261102-164517), static client synced; hub index/css/js +
+  screenshot rsynced by hand (not games/deploy.sh, which ships the dirty tree for every game).
+  Verified live: health, CORS for yru.br8t.com/games.br8t.com/github.io, ws 101, quick play with 3 AIs
+  in headless Chrome. tools/online_cdp.mjs can't run against live (uses devuid = dev auth only).
+  Future client updates: re-export HEAD and rerun deploy.sh with STATIC=1 (Aaron OK'd deploys).
+- 2026-11-03: events2 done (Festival Isles fest1-9, 4 events 2027, spooky voids fix) — NOT committed yet: main.js also holds polish's in-progress fov hunk; commit with polish. Started `courses2` (Hollow Woods wood1-9, map tab, online-selectable).

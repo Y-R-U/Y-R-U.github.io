@@ -2,7 +2,7 @@
 // graves, fences, gargoyles, cauldron, haunted mansion, skull rock, bats, fog wisps, lightning.
 // Returns { update(dt, t), dispose() }.
 import * as THREE from 'three';
-import { Buckets, rng, distToPath, disposeTree, mat } from './util.js';
+import { Buckets, rng, distToPath, disposeTree, mat, inVoid, distToLines } from './util.js';
 import { buildSky } from './sky.js';
 import { buildCourseRock, buildLavaFalls, buildFoliage, roundRock, spikes } from './island.js';
 import { buildMansion, buildSkullRock, buildCrag } from './backdrop.js';
@@ -69,7 +69,8 @@ export function buildEnvironment(scene, info, M, quality) {
 
   // ---------- crag under the course ----------
   const floor = Array.isArray(info.floor) && info.floor.length === path.length ? info.floor : null;
-  const course = buildCourseRock(path, widths, hi, floor);
+  const voids = info.voids || [], branches = info.branches || [];
+  const course = buildCourseRock(path, widths, hi, floor, voids);
   const rockList = course.geometry ? [course.geometry] : [];
   for (let i = 0; i < (hi ? 10 : 4); i++) {
     const f = course.frames[Math.floor(r() * course.frames.length)];
@@ -86,7 +87,12 @@ export function buildEnvironment(scene, info, M, quality) {
   const fog = scene.fog;
 
   // helper: is (x,z) clear of the fairway by `pad` m?
-  const clear = (x, z, pad) => { const { d, i } = distToPath(path, x, z); return d >= (widths[i] ?? 1.5) / 2 + pad; };
+  // (engine M2: also never inside info.voids, never on / beside an info.branches track)
+  const clear = (x, z, pad) => {
+    const { d, i } = distToPath(path, x, z);
+    if (d < (widths[i] ?? 1.5) / 2 + pad) return false;
+    return !inVoid(voids, x, z, 0.15) && distToLines(branches, x, z) >= 0.5;
+  };
 
   // ---------- lava falls off the course crag (few, toward the camera side) ----------
   const fallSpots = [];
@@ -248,7 +254,7 @@ export function buildEnvironment(scene, info, M, quality) {
 
   // ---------- foliage ----------
   avoid.push({ x: frame.tee.x, z: frame.tee.z, r: w0 + 0.55 }, ...fallSpots.map(s => ({ x: s.p.x, z: s.p.z, r: s.width + 0.3 })));
-  for (const o of buildFoliage(course.frames, path, widths, hi, avoid)) { root.add(o); }
+  for (const o of buildFoliage(course.frames, path, widths, hi, avoid, voids, branches)) { root.add(o); }
 
   // ---------- backdrop ----------
   const back = new Buckets();

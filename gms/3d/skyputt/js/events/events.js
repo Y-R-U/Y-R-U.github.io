@@ -1,8 +1,18 @@
 // Events framework logic (PLAN 2.8): calendar, progress, goals and the local ladder. Pure functions
 // (no DOM), so node tests and the screen share them. Event definitions live in ./data/.
 import { EVENTS } from './data/index.js';
+import { COURSES } from '../course/holes/index.js';
 
 export { EVENTS };
+// events2: an event's hole defs, in play order. `ev.course` is searched first, then every course,
+// so an event can mix Festival Isles holes with Sky Isles ones. Unknown ids are dropped.
+export function holeDef(id, courseId) {
+  const own = COURSES[courseId]?.holes.find(h => h.id === id);
+  if (own) return own;
+  for (const c of Object.values(COURSES)) { const h = c.holes.find(x => x.id === id); if (h) return h; }
+  return null;
+}
+export const eventHoles = ev => ev.holes.map(id => holeDef(id, ev.course)).filter(Boolean);
 const DAY = 86400000;
 
 // ---- calendar (local time) ----

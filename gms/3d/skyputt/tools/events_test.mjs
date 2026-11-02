@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Events framework checks:  node tools/events_test.mjs
-import { EVENTS, status, featured, dayStart, nowFrom, standings, botPoints, ladderPlayers, freshProgress, applyRound, goalState, rankReward, timeText, endsAt } from '../js/events/events.js';
+import { EVENTS, status, featured, dayStart, nowFrom, standings, botPoints, ladderPlayers, freshProgress, applyRound, goalState, rankReward, timeText, endsAt, startsAt, eventHoles, holeDef } from '../js/events/events.js';
+import { HELPERS } from '../js/meta/helpers.js';
+import { CHESTS } from '../js/meta/economy.js';
 import { COURSES } from '../js/course/holes/index.js';
 
 let fails = 0; const ok = (c, m) => { console.log(c ? '  ok  ' : '  FAIL', m); if (!c) fails++; };
@@ -9,13 +11,52 @@ const spooky = EVENTS.find(e => e.id.startsWith('spooky')), frost = EVENTS.find(
 
 console.log('data');
 for (const ev of EVENTS) {
-  const course = COURSES[ev.course];
-  ok(ev.holes.every(id => course.holes.some(h => h.id === id)), `${ev.id}: holes exist`);
-  const crystals = ev.holes.reduce((a, id) => a + (course.holes.find(h => h.id === id).features || []).filter(f => f.type === 'pickup').length, 0);
+  ok(!!COURSES[ev.course] && ev.holes.every(id => holeDef(id, ev.course)) && eventHoles(ev).length === ev.holes.length, `${ev.id}: holes exist (${ev.holes.length})`);
+  const crystals = eventHoles(ev).reduce((a, h) => a + (h.features || []).filter(f => f.type === 'pickup').length, 0);
   const curGoals = ev.goals.filter(g => g.kind === 'currency');
   ok(curGoals.every(g => g.target <= crystals), `${ev.id}: currency goals reachable (${curGoals.map(g => g.target).join(',')} of ${crystals} pickups)`);
   ok(new Set(ev.goals.map(g => g.id)).size === ev.goals.length, `${ev.id}: unique goal ids`);
   ok(dayStart(ev.start) < endsAt(ev), `${ev.id}: start before end`);
+}
+
+console.log('events2: 2027 events');
+const HELPER_IDS = new Set(HELPERS.map(h => h.id));
+const rewardOk = r => !!r && Object.keys(r).every(k => ['coins', 'helpers', 'chest'].includes(k)) && (r.coins ?? 0) >= 0
+  && Object.entries(r.helpers || {}).every(([k, n]) => HELPER_IDS.has(k) && n > 0) && [].concat(r.chest || []).every(k => CHESTS[k]);
+const KINDS = new Set(['currency', 'rounds', 'underPar', 'aces', 'points']);
+for (const ev of EVENTS) {
+  ok(ev.goals.every(g => KINDS.has(g.kind) && g.target > 0 && rewardOk(g.reward)) && ev.rankRewards.every(t => rewardOk(t.reward)), `${ev.id}: goal kinds, helper ids and chests are valid`);
+  ok(ev.rankRewards.every((t, i, a) => !i || t.top > a[i - 1].top) && ev.rankRewards.at(-1).top >= (ev.ladder?.size ?? 29) + 1, `${ev.id}: rank tiers ascend and cover the whole board`);
+  ok(/^\d{4}-\d{2}-\d{2}$/.test(ev.start) && /^\d{4}-\d{2}-\d{2}$/.test(ev.end) && ev.currency?.icon && ev.currency?.name && ev.theme, `${ev.id}: dates, currency, theme`);
+}
+ok(new Set(EVENTS.map(e => e.id)).size === EVENTS.length && new Set(EVENTS.map(e => e.ladder.seed)).size === EVENTS.length, 'unique event ids and ladder seeds');
+const sorted = [...EVENTS].sort((a, b) => startsAt(a) - startsAt(b));
+ok(sorted.every((e, i) => !i || startsAt(e) >= endsAt(sorted[i - 1])), 'no two events overlap: ' + sorted.map(e => `${e.id} ${e.start}→${e.end}`).join(' | '));
+const lunar = EVENTS.find(e => e.id.startsWith('lunar')), candy = EVENTS.find(e => e.id.startsWith('candy')),
+  eggs = EVENTS.find(e => e.id.startsWith('egg')), games = EVENTS.find(e => e.id.startsWith('sky-games'));
+ok(lunar && candy && eggs && games, 'Lunar Lanterns, Candy Carnival, Egg Hunt and Sky Games are in the schedule');
+ok(status(lunar, at('2027-02-06')) === 'live' && status(lunar, at('2027-02-20')) === 'live' && status(lunar, at('2027-01-26')) === 'upcoming', 'Lunar Lanterns live on New Year (02-06) and the Lantern Festival (02-20)');
+ok(status(candy, at('2027-03-01')) === 'live' && status(candy, at('2027-02-23')) === 'upcoming' && status(candy, dayStart('2027-03-18')) === 'ended', 'Candy Carnival 02-24 → 03-17');
+ok(status(eggs, at('2027-03-28')) === 'live' && status(eggs, at('2027-04-05')) === 'live' && status(eggs, dayStart('2027-04-06')) === 'ended', 'Egg Hunt live on Easter Sunday 2027-03-28, ends after 04-05');
+ok(status(games, at('2027-07-01')) === 'live' && status(games, at('2027-06-25')) === 'upcoming', 'Sky Games live 2027-07-01');
+ok(featured(at('2027-01-10')) === lunar && featured(at('2027-02-22')) === candy && featured(at('2027-03-25')) === eggs && featured(at('2027-05-01')) === games, 'featured: next upcoming between events');
+ok(['?eventdate=2027-02-06', '?eventdate=2027-03-01', '?eventdate=2027-03-28', '?eventdate=2027-07-01'].map(q => featured(nowFrom(q)).id).join() === [lunar, candy, eggs, games].map(e => e.id).join(), '?eventdate= override picks each new event as live');
+ok(candy.theme === 'candy' && candy.themeFallback === 'sky', 'Candy Carnival asks for the candy theme with a sky fallback');
+for (const ev of [lunar, candy, eggs, games]) {
+  const fest = ev.holes.filter(id => id.startsWith('fest')).length, sky = ev.holes.filter(id => id.startsWith('sky')).length;
+  ok(fest >= 3 && sky >= 1, `${ev.id}: mixes ${fest} Festival Isles + ${sky} Sky Isles holes`);
+  // a strong player (one round a day, ~3 under par, all currency once) reaches the points goal and a top-10 finish
+  const p = freshProgress(), par = eventHoles(ev).reduce((a, h) => a + h.par, 0);
+  const pickups = eventHoles(ev).reduce((a, h) => a + h.features.filter(f => f.type === 'pickup').length, 0);
+  const days = Math.round((endsAt(ev) - startsAt(ev)) / 864e5);
+  for (let d = 0; d < days; d++) applyRound(p, { total: par - 3, par, aces: d % 3 === 0 ? 1 : 0, newCurrency: d ? 0 : pickups });
+  const ptsGoal = ev.goals.find(g => g.kind === 'points');
+  const rank = standings(ev, endsAt(ev), { name: 'Robin', points: p.points }).find(r => r.you).rank;
+  ok(ev.goals.every(g => goalState(p, g).done) && rank <= 10, `${ev.id}: daily player finishes every goal (${p.points} pts vs ${ptsGoal.target}) and ranks ${rank}/30`);
+  // a casual player (3 rounds, par) can finish the first goals but not the points goal
+  const q = freshProgress();
+  for (let d = 0; d < 3; d++) applyRound(q, { total: par, par, aces: 0, newCurrency: 3 });
+  ok(goalState(q, ev.goals[0]).done && !goalState(q, ptsGoal).done, `${ev.id}: 3 casual rounds → first goal yes, points goal not yet (${q.points}/${ptsGoal.target})`);
 }
 
 console.log('calendar');

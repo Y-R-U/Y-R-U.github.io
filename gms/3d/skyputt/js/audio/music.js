@@ -1,5 +1,5 @@
 // SKYPUTT audio — generative ambient music. One player per theme: `sky` (launch), `spooky`
-// (Spooky Hollow) and `frost` (Frost Fair). Themes differ in harmony, pad type, plucked/struck
+// (Spooky Hollow), `frost` (Frost Fair) and `candy` (Candy Land, a 3/4 waltz). Themes differ in harmony, pad type, plucked/struck
 // voices and occasional "extras" (theremin, owl, sleigh bells, fire crackle).
 // Nothing loops verbatim: chords walk a Markov graph, the key drifts between three centres,
 // arpeggio phrases (up / down / wander / sparse / bells / rest) are picked by a slowly
@@ -86,7 +86,35 @@ const FROST = {
   mains: ['celesta', 'harp', 'glock'], bellVoice: 'glock',
   extras: [['sleigh', 0.28]], crackle: 0.12,
 };
-export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST };
+// "Sugar Rush Waltz": a bouncy 3/4 in F major. An oom-pah-pah pulse (soft tuba on the downbeat,
+// pizzicato chord tones on beats 2 and 3) under a celesta lead that moves on the beat, glockenspiel
+// sparkles on the off-beats and light strings. Extras: a slide-whistle fill, sugar tinkles and a
+// faint bubbling chocolate river. Kept light: one oscillator per "oom", cached KS buffers for "pah".
+const CANDY = {
+  id: 'candy', bpm: 150, meter: 3, chordBars: [2, 2, 4, 4],
+  keys: [0, 0, 0, -5, 2],                          // F major home, C major and G major excursions
+  start: 'I',
+  chords: {
+    I:   { pad: [53, 57, 60, 64], root: 41, arp: [65, 67, 69, 72, 76, 77, 81, 84], next: ['IV', 'V7', 'vi', 'ii', 'II7'] },
+    IV:  { pad: [58, 62, 65, 69], root: 46, arp: [65, 69, 70, 72, 74, 77, 81, 82], next: ['I', 'V7', 'ii', 'vi'] },
+    V7:  { pad: [55, 58, 60, 64], root: 48, arp: [67, 70, 72, 76, 79, 82, 84], next: ['I', 'vi', 'IV'] },
+    ii:  { pad: [55, 58, 62, 65], root: 43, arp: [67, 70, 74, 77, 79, 82], next: ['V7', 'IV', 'I'] },
+    vi:  { pad: [57, 60, 62, 65], root: 50, arp: [69, 72, 74, 77, 81, 86], next: ['ii', 'IV', 'II7', 'V7'] },
+    II7: { pad: [55, 59, 62, 65], root: 43, arp: [67, 71, 74, 77, 79, 83], next: ['V7', 'ii'] },
+  },
+  level: { pad: 0.026, root: 0.012, air: 0.006 },
+  pad: { type: 'strings', cut: 1500, lfo: 300, att: 0.5, rel: 1.6 },
+  air: { f: 600, q: 0.7, lfo: 250 },
+  delaySend: 0.16,
+  voices: {
+    celesta: { kind: 'fm', ratio: 4, index: 0.45, dur: 1.1, oct: 0, gain: 0.11 },
+    glock: { kind: 'fm', ratio: 2.76, index: 0.4, dur: 0.9, oct: 12, gain: 0.05 },
+  },
+  mains: ['celesta', 'celesta', 'glock'], bellVoice: 'glock', leadStep: 2,
+  waltz: { tuba: 0.13, pah: 0.15, sparkle: 0.07 },
+  extras: [['whistle', 0.16], ['tinkle', 0.22], ['bubble', 0.2]],
+};
+export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST, candy: CANDY };
 
 // Karplus-Strong pluck, rendered once per base note (multiples of 3 semitones) and repitched.
 // short = pizzicato: darker excitation, fast decay.
@@ -137,7 +165,7 @@ class Player {
     this.padF.connect(padOut); this.padF.connect(padWet); padOut.connect(this.out); padWet.connect(this.outWet);
     // arp bus: gentle lowpass, reverb send, ping-pong delay
     this.arp = ctx.createBiquadFilter(); this.arp.type = 'lowpass'; this.arp.frequency.value = 4200; this.arp.Q.value = 0.5;
-    const arpWet = G(0.4), dSend = G(0.28);
+    const arpWet = G(0.4), dSend = G(theme.delaySend ?? 0.28);
     this.arp.connect(this.out); this.arp.connect(arpWet); arpWet.connect(this.outWet); this.arp.connect(dSend);
     const beat = 60 / theme.bpm;
     const dl = ctx.createDelay(2), dr = ctx.createDelay(2), fl = G(0.38), fr = G(0.38), dlp = ctx.createBiquadFilter();
@@ -167,7 +195,9 @@ class Player {
   }
 
   begin(t, fade = 2.5) {
-    this.nextChordT = t + 0.05; this.nextStepT = t + this.beat * 2;
+    this.nextChordT = t + 0.05;
+    // a metered theme (waltz) starts its eighth-note steps on a downbeat, so step n % 6 === 0 is beat 1
+    this.nextStepT = this.th.meter ? t + 0.05 + this.beat * this.th.meter : t + this.beat * 2;
     holdParam(this.out.gain, t); this.out.gain.linearRampToValueAtTime(1, t + fade);
     holdParam(this.outWet.gain, t); this.outWet.gain.linearRampToValueAtTime(1, t + fade);
   }
@@ -200,7 +230,7 @@ class Player {
   }
 
   scheduleChord() {
-    const th = this.th, t = this.nextChordT, bar = this.beat * 4;
+    const th = this.th, t = this.nextChordT, bar = this.beat * (th.meter || 4);
     if (this.chordCount > 0) {
       // key excursion: only from the home chord, after a while
       if (this.chord === th.start && this.chordCount % 6 === 0 && Math.random() < 0.45) {
@@ -215,7 +245,7 @@ class Player {
       this.prev = this.chord; this.chord = opts[k];
     }
     this.chordCount++;
-    const dur = pick([2, 3, 3, 4]) * bar;
+    const dur = pick(th.chordBars || [2, 3, 3, 4]) * bar;
     this.chordList.push({ t, name: this.chord, key: this.key });
     this.pad(t, dur, th.chords[this.chord], this.key);
     for (const [name, prob] of th.extras) if (Math.random() < prob) this[name](t + rnd(1, Math.max(1.5, dur - 3)), th.chords[this.chord], this.key);
@@ -269,6 +299,7 @@ class Player {
     if (!c) return;
     const th = this.th, pool = th.chords[c.name].arp;
     if (th.crackle && Math.random() < th.crackle) this.crackle(t0 + rnd(0, this.step));
+    if (th.waltz) this.waltzStep(t0 + rnd(-0.004, 0.006), n, c);
     const t = t0 + (n % 2 ? this.step * 0.08 : 0) + rnd(-0.008, 0.012);
     let play = false, inst = ph.inst, oct = 0;
     switch (ph.type) {
@@ -280,6 +311,8 @@ class Player {
       case 'bells': play = Math.random() < 0.28; inst = th.bellVoice; this.idx = (Math.random() * pool.length) | 0; break;
     }
     ph.first = false;
+    // leadStep 2: the lead moves on the beat, with an occasional eighth-note pickup
+    if (th.leadStep && n % th.leadStep && Math.random() > 0.2) play = false;
     // wrap the walk inside the pool, shifting octave instead of clamping
     if (this.idx >= pool.length) this.idx %= pool.length;
     if (this.idx < 0) this.idx = pool.length + (this.idx % pool.length);
@@ -317,6 +350,62 @@ class Player {
     md.connect(mg); mg.connect(c.frequency); c.connect(g); g.connect(this.arp);
     c.start(t); md.start(t); c.stop(t + dur + 0.05); md.stop(t + dur + 0.05);
     this.keep(c); this.keep(md);
+  }
+
+  // oom-pah-pah: tuba on beat 1 (root, alternating with the fifth below every other bar),
+  // pizzicato chord tones on beats 2 and 3, now and then a glockenspiel sparkle on an off-beat
+  waltzStep(t, n, c) {
+    const W = this.th.waltz, ch = this.th.chords[c.name], pos = n % 6, k = c.key;
+    if (pos === 0) this.tuba(t, ch.root + k + ((n / 6) % 2 ? -5 : 0), W.tuba * rnd(0.85, 1));
+    else if (pos === 2 || pos === 4) {
+      const lo = pos === 2 ? 1 : 2, v = W.pah * rnd(0.75, 1) * (pos === 2 ? 1 : 0.8);
+      this.pluck(t, ch.pad[lo] + k, v, true);
+      this.pluck(t + 0.006, ch.pad[lo + 1] + k, v * 0.8, true);
+    } else if (Math.random() < W.sparkle) this.note(t, pick(ch.arp) + k, 'glock', rnd(0.5, 0.9));
+  }
+
+  // a soft tuba-ish "oom": one triangle through a closing lowpass
+  tuba(t, m, gain) {
+    const ctx = this.ctx, o = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = ctx.createGain(), d = this.beat * 0.85;
+    o.type = 'triangle'; o.frequency.value = mtof(m);
+    f.type = 'lowpass'; f.Q.value = 0.7;
+    f.frequency.setValueAtTime(900, t); f.frequency.exponentialRampToValueAtTime(260, t + d);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.025);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(f); f.connect(g); g.connect(this.bus('near'));
+    o.start(t); o.stop(t + d + 0.05); this.keep(o);
+  }
+
+  // slide-whistle fill: a sine swooping up an octave and back down, with a little vibrato
+  whistle(t, ch, key) {
+    const ctx = this.ctx, f0 = mtof(pick(ch.arp) + key), up = Math.random() < 0.5, d = rnd(0.7, 1.1);
+    const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.exponentialRampToValueAtTime(f0 * (up ? 2 : 0.5), t + d * 0.55);
+    o.frequency.exponentialRampToValueAtTime(f0 * (up ? 1.5 : 0.75), t + d);
+    lfo.frequency.value = 6.5; lg.gain.value = 18; lfo.connect(lg); lg.connect(o.detune);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.016, t + 0.06);
+    g.gain.setValueAtTime(0.016, t + d * 0.8); g.gain.linearRampToValueAtTime(0, t + d);
+    o.connect(g); g.connect(this.panned(this.bus('near'), rnd(-0.5, 0.5)));
+    o.start(t); o.stop(t + d + 0.05); lfo.start(t); lfo.stop(t + d + 0.05); this.keep(o); this.keep(lfo);
+  }
+
+  // sugar tinkle: a quick descending run of three or four glockenspiel notes
+  tinkle(t, ch, key) {
+    const top = [...ch.arp].sort((a, b) => b - a).slice(0, 4), n = pick([3, 4]);
+    for (let i = 0; i < n; i++) this.note(t + i * this.step * 0.5, top[i % top.length] + key, 'glock', 0.7 - i * 0.12);
+  }
+
+  // a faint bubbling chocolate river: a few rising sine blips, far away
+  bubble(t) {
+    const ctx = this.ctx, dest = this.panned(this.bus('far'), pick([-0.6, 0.6])), n = 3 + ((Math.random() * 4) | 0);
+    for (let i = 0; i < n; i++) {
+      const tt = t + i * rnd(0.08, 0.22), o = ctx.createOscillator(), g = ctx.createGain(), f = rnd(260, 520), d = rnd(0.04, 0.07);
+      o.frequency.setValueAtTime(f, tt); o.frequency.exponentialRampToValueAtTime(f * 1.7, tt + d);
+      g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.014, tt + 0.006);
+      g.gain.exponentialRampToValueAtTime(0.0001, tt + d);
+      o.connect(g); g.connect(dest); o.start(tt); o.stop(tt + d + 0.02); this.keep(o);
+    }
   }
 
   // ---- extras --------------------------------------------------------------------------------

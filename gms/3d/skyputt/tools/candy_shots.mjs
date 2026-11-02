@@ -4,6 +4,7 @@
 //   ~/.claude/bin/cdp start --port 9512
 //   node tools/candy_shots.mjs [--holes=1-18] [--sizes=p,l] [--q=low] [--out=docs/notes/candy_shots] [--tag=x] [--t=seconds]
 //   node tools/candy_shots.mjs --swap        # title screen: swap candy → sky → spooky → frost → candy (dispose check)
+//   --theme=frost|sky|spooky works too; --sizes=lp is an 844x390 landscape phone; --eval='js' runs after the fly-over
 //   node tools/candy_shots.mjs --preview='view=row&hud=0&t=2' --sizes=l   # tools/theme_preview.html instead of the game
 // For each hole and size: a tee screenshot plus draw calls / triangles from renderer.info, and the
 // console errors. Exits 1 on errors.
@@ -60,7 +61,7 @@ async function waitFor(expr, ms = 5000) {
   while (Date.now() - t0 < ms) { try { if (await c.eval(expr)) return true; } catch { /* navigating */ } await sleep(100); }
   throw new Error('timeout waiting for ' + expr);
 }
-const DIMS = { p: [412, 915, true], l: [1440, 900, false] };
+const DIMS = { p: [412, 915, true], l: [1440, 900, false], lp: [844, 390, true] };   // lp = landscape phone
 try {
   if (args.swap) {   // title-screen theme swaps exercise theme.dispose() + env dispose; any throw shows up as an error
     await c.send('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
@@ -113,6 +114,10 @@ try {
       await waitFor('window.__booted === true', 40000);
       await sleep(1500);
       if (!args.fly) await c.eval(`(() => { const r = __skyputt.round; if (r && r.state === 'flyover') r.endFlyover(); })()`).catch(() => {});
+      if (args.eval) {   // e.g. tweak or measure camera params; a returned value is printed
+        const ev = await c.eval(String(args.eval)).catch(e => errors.push('--eval: ' + e.message));
+        if (ev !== undefined && ev !== true && typeof ev !== 'number') console.log('  eval:', ev);
+      }
       await sleep(+(args.t || 3) * 1000);
       if (args.look) {   // optional: swing the camera to look along the hole (debug)
         await c.eval(`(() => { const r = __skyputt.app.rig; r.lookYaw = ${+args.look}; })()`).catch(() => {});

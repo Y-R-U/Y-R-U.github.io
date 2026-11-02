@@ -19,12 +19,27 @@ import sky15 from './sky15.js';
 import sky16 from './sky16.js';
 import sky17 from './sky17.js';
 import sky18 from './sky18.js';
+import fest1 from './fest1.js';
+import fest2 from './fest2.js';
+import fest3 from './fest3.js';
+import fest4 from './fest4.js';
+import fest5 from './fest5.js';
+import fest6 from './fest6.js';
+import fest7 from './fest7.js';
+import fest8 from './fest8.js';
+import fest9 from './fest9.js';
 
 export const COURSES = {
   sky: {
     id: 'sky', name: 'Sky Isles', theme: 'sky',
     holes: [sky1, sky2, sky3, sky4, sky5, sky6, sky7, sky8, sky9, sky10, sky11, sky12, sky13, sky14, sky15, sky16, sky17, sky18],
     nines: [{ id: 'front', name: 'Front nine', from: 0, to: 9 }, { id: 'back', name: 'Back nine', from: 9, to: 18 }],
+  },
+  // events2: Festival Isles, a 9-hole course built for special events (any theme skins it, D6).
+  // Not on the title / course map; events (js/events/data/) and online rooms pick holes from it.
+  festival: {
+    id: 'festival', name: 'Festival Isles', theme: 'sky',
+    holes: [fest1, fest2, fest3, fest4, fest5, fest6, fest7, fest8, fest9],
   },
 };
 

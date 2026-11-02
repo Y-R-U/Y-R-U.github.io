@@ -25,10 +25,12 @@ export function renderTitle(store, course, themeId, onTheme) {
 // Course map: one tile per hole with stars / best, locked holes greyed out. Courses with `nines`
 // (Sky Isles: front + back, story2) get a tab per nine; the map opens on the nine you're playing.
 let mapNine = null;
-export function showMap(store, course, { onHole, onFront, onNine, onBack, click }) {
+// events2: `courses` (optional) adds a tab per extra course (Festival Isles); `onCourse(c)` switches to it.
+export function showMap(store, course, { onHole, onFront, onNine, onBack, click, courses = null, onCourse = null }) {
   const el = $('#map');
   const open = store.unlockedCount(course);
-  const nines = course.nines || [{ id: 'all', name: 'Front nine', from: 0, to: course.holes.length }];
+  const nines = course.nines || [{ id: course.id, name: course.name, from: 0, to: course.holes.length }];
+  const extra = (courses || []).filter(c => c !== course);
   let nine = nines.find(n => n.id === mapNine) || nines.filter(n => n.from < open).pop() || nines[0];
   const render = () => {
     const holes = course.holes.slice(nine.from, nine.to);
@@ -40,9 +42,11 @@ export function showMap(store, course, { onHole, onFront, onNine, onBack, click 
         <button class="round" data-a="back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
         <div><div class="map-title">${esc(course.name)}</div><div class="map-sub">${esc(nine.name)} · ${starRow(1, 1)} ${tot}/${holes.length * 3} · ${ICONS.coin}${store.data.coins | 0}</div></div>
       </div>
-      ${nines.length > 1 ? `<div class="seg nines">${nines.map(n => `<button data-nine="${n.id}" class="${n === nine ? 'on' : ''}">${esc(n.name)}${n.from >= open ? ' ' + ICONS.lock : ''}</button>`).join('')}</div>` : ''}
+      ${nines.length > 1 || extra.length ? `<div class="seg nines">${(courses || [course]).map(c => c !== course
+        ? (c.nines || [{ id: c.id, name: c.name }]).map(n => `<button data-course="${c.id}" data-cnine="${n.id}">${esc(n.name)}</button>`).join('')
+        : nines.map(n => `<button data-nine="${n.id}" class="${n === nine ? 'on' : ''}">${esc(n.name)}${n.from >= open ? ' ' + ICONS.lock : ''}</button>`).join('')).join('')}</div>` : ''}
       <div class="map-grid">${holes.map((h, k) => {
-        const i = nine.from + k, rec = store.hole(h.id), lk = i >= open;
+        const i = nine.from + k, rec = store.hole(h.id), lk = i >= open && !rec;   // events2: a hole already played (e.g. in an event) is open
         return `<button class="tile ${lk ? 'locked' : ''}" data-i="${i}" ${lk ? 'disabled' : ''} aria-label="Hole ${i + 1}: ${esc(h.name)}${lk ? ' (locked)' : ''}">
           <b class="num">${i + 1}</b>${lk ? `<span class="lk">${ICONS.lock}</span>` : starRow(rec?.stars ?? 0)}
           <span class="nm">${esc(h.name)}</span><span class="pr">Par ${h.par}${rec?.best ? ` · best ${rec.best}` : ''}</span></button>`;
@@ -58,6 +62,7 @@ export function showMap(store, course, { onHole, onFront, onNine, onBack, click 
     if (!b || b.disabled) return;
     click?.();
     if (b.dataset.nine) { nine = nines.find(n => n.id === b.dataset.nine); mapNine = nine.id; render(); }
+    else if (b.dataset.course) { mapNine = b.dataset.cnine; onCourse?.((courses || []).find(c => c.id === b.dataset.course)); }
     else if (b.dataset.a === 'back') { el.hidden = true; onBack(); }
     else if (b.dataset.a === 'front') { el.hidden = true; if (onNine && course.nines) onNine(nine); else onFront(); }
     else if (b.dataset.i) { el.hidden = true; onHole(+b.dataset.i); }

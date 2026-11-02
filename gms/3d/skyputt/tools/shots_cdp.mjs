@@ -8,6 +8,9 @@
 //   node tools/shots_cdp.mjs meta  [--out=DIR] [--sizes=p,l]   M5: ladder, shop, chest, helper tray, cosmetics, week rollover
 //   node tools/shots_cdp.mjs overview [--out=DIR] [--holes=10,11] [--themes=sky,spooky,frost]   story2: per theme + hole, the
 //        portrait tee view and a high landscape overview of the whole hole (rock under gaps, voids, backdrop)
+//        --course=festival (events2) loads ?course=festival&hole=N
+//   node tools/shots_cdp.mjs events2 [--out=DIR] [--only=lunar,candy,egg,sky-games,fallback,map] [--quick]   events2: the 2027
+//        events via ?eventdate= (Egg Hunt played to the end), candy theme fallback, Festival Isles map tab
 //   node tools/shots_cdp.mjs nines [--out=DIR]   story2: map nine tabs, back nine lock, Play back nine, scorecard
 //   node tools/shots_cdp.mjs career [--out=DIR] [--chapter=2]   story2: chapter 2-6 screens (tour map, intro, a lesson, rival + tournament setup)
 // Reports console errors / exceptions and exits 1 if there are any.
@@ -26,7 +29,7 @@ class CDP {
   constructor(ws) { this.ws = ws; this.id = 0; this.pending = new Map(); this.handlers = []; }
   static async open() {
     const list = await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json();
-    let page = list.find(t => t.type === 'page');
+    let page = args.own ? null : list.find(t => t.type === 'page');   // --own: always a fresh target (shared Chrome)
     if (!page) page = await (await fetch(`http://127.0.0.1:${PORT}/json/new?about:blank`, { method: 'PUT' })).json();
     const ws = new WebSocket(page.webSocketDebuggerUrl);
     await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
@@ -133,11 +136,12 @@ async function overview(c) {
   const THEMES = (args.themes ? String(args.themes) : 'sky,spooky,frost').split(',');
   for (const th of THEMES) for (const i of HOLES) {
     await size(c, 412, 915, true);
-    await c.send('Page.navigate', { url: `${BASE}?theme=${th}&hole=${i}&noflyover&t=${Date.now()}` });
+    await c.send('Page.navigate', { url: `${BASE}?theme=${th}&hole=${i}${args.course ? '&course=' + args.course : ''}&noflyover&t=${Date.now()}` });
     await sleep(500);
     await waitFor(c, 'window.__booted === true && !!__skyputt.round && __skyputt.round.state === "ready"', 40000);
     await sleep(1500);
-    await shot(c, `${th}-hole${i}-tee`);
+    const tag = args.course ? args.course + i : 'hole' + i;   // events2: --course=festival
+    await shot(c, `${th}-${tag}-tee`);
     await size(c, 1280, 800, false);
     await sleep(400);
     await c.eval(`(() => { const r = __skyputt.round, { THREE } = __skyputt, cam = __skyputt.app.camera;
@@ -147,7 +151,7 @@ async function overview(c) {
       cam.position.set(ctr.x - vd.x * L * 0.55 + 0.3 * L, ctr.y + L * 0.75, ctr.z - vd.z * L * 0.55);
       cam.lookAt(ctr); cam.updateMatrixWorld(); })()`);
     await sleep(1200);
-    await shot(c, `${th}-hole${i}-over`);
+    await shot(c, `${th}-${tag}-over`);
     console.log('  ', th, 'hole', i, JSON.stringify(await state(c)));
   }
 }
@@ -498,6 +502,90 @@ async function eventsMode(c) {
   await shot(c, 'ev-frost-live');
 }
 
+// events2: the 2027 events. For each, ?eventdate= on a live day → title tile, list, event page, start the
+// round (theme + first hole), quit (player theme restored). The Egg Hunt round is played to the end by drags
+// (Festival Isles holes in the browser). Candy Carnival is also run with its theme forced missing → fallback.
+// Then the course map's Festival Isles tab and a festival hole from it.
+async function events2Mode(c) {
+  await size(c, 412, 915, true);
+  const EVS = [['lunar', '2027-02-06'], ['candy', '2027-03-01'], ['egg', '2027-03-28'], ['sky-games', '2027-07-01']];
+  const only = args.only ? String(args.only).split(',') : null;
+  let fresh = 'fresh&';
+  for (const [key, day] of EVS) {
+    if (only && !only.includes(key)) continue;
+    await go(c, `${fresh}noflyover&eventdate=${day}`); fresh = '';
+    console.log(`   ${key} @ ${day}: tile =`, await c.eval(`document.querySelector('#t-events').innerText.replace(/\\n+/g, ' | ')`));
+    await shot(c, `e2-${key}-title`);
+    await c.eval(`document.querySelector('#t-events').click()`); await sleep(400);
+    await shot(c, `e2-${key}-list`);
+    await c.eval(`document.querySelector('#events [data-id^="${key}"]').click()`); await sleep(400);
+    await shot(c, `e2-${key}-page`);
+    console.log('     page:', await c.eval(`document.querySelector('#events [data-a=play]')?.innerText.replace(/\\n+/g, ' ')`));
+    await c.eval(`document.querySelector('#events [data-a=play]').click()`);
+    await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 60000);
+    await sleep(1500);
+    await shot(c, `e2-${key}-hole1`);
+    console.log('     round theme:', await c.eval('__skyputt.app.themeId'), '· hole 1:', await c.eval('__skyputt.round.def.id + " " + __skyputt.round.def.name'), '· holes:', await c.eval('__skyputt.round.course.holes.map(h => h.id).join(",")'));
+    if (key === 'egg' && !args.quick) {   // play the whole round
+      for (let n = 0; n < 60; n++) {
+        const st = await c.eval('__skyputt.round ? __skyputt.round.state : null');
+        if (!st) break;
+        if (st === 'done') {
+          const card = await c.eval(`document.querySelector('#h-card .card')?.innerText.replace(/\\n+/g, ' | ')`);
+          console.log('     ' + (card || '').slice(0, 120));
+          await c.eval(`document.querySelector('#h-card [data-a=next]')?.click()`); await sleep(1200); n--; continue;
+        }
+        if (st !== 'ready') { await sleep(400); n--; continue; }
+        await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
+        const plan = await c.eval(`(${planInPage.toString()})()`);
+        const len = 24 + plan.power * 182;
+        await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
+        await sleep(700);
+      }
+      await waitFor(c, '!document.querySelector("#events").hidden', 60000);
+      await sleep(600);
+      console.log('     after round:', await c.eval(`document.querySelector('#events .card-note')?.innerText`), '· theme', await c.eval('__skyputt.app.themeId'));
+      for (let i = 0; i < 8; i++) { const any = await c.eval(`(() => { const b = document.querySelector('#events [data-claim]'); if (b) b.click(); return !!b })()`); if (!any) break; await sleep(300); }
+      await shot(c, `e2-${key}-after`);
+    } else {
+      await c.eval('__skyputt.round.exit ? __skyputt.round.exit() : __skyputt.round.onExit()');
+      await waitFor(c, '!document.querySelector("#events").hidden', 30000);
+      await sleep(600);
+      console.log('     quit → theme', await c.eval('__skyputt.app.themeId'));
+    }
+  }
+  if (!only || only.includes('fallback')) {   // Candy Carnival with its theme missing → themeFallback (sky), not greybox
+    await go(c, 'noflyover&eventdate=2027-03-01');
+    await c.eval(`import('./js/events/data/candy_carnival.js').then(m => { m.default.theme = 'no-such-theme'; })`);
+    await c.eval(`document.querySelector('#t-events').click()`); await sleep(400);
+    await c.eval(`document.querySelector('#events [data-id^="candy"]').click()`); await sleep(400);
+    await c.eval(`document.querySelector('#events [data-a=play]').click()`);
+    await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 60000);
+    await sleep(1200);
+    console.log('   candy with a missing theme → round theme:', await c.eval('__skyputt.app.themeId'));
+    await shot(c, 'e2-candy-fallback');
+    await c.eval('__skyputt.round.exit ? __skyputt.round.exit() : __skyputt.round.onExit()');
+    await sleep(1500);
+  }
+  if (!only || only.includes('map')) {   // the course map's Festival Isles tab
+    await go(c, 'noflyover');
+    await c.eval(`document.querySelector('#t-map').click()`); await sleep(400);
+    await c.eval(`document.querySelector('#map [data-course="festival"]').click()`); await sleep(400);
+    await shot(c, 'e2-map-festival');
+    console.log('   map:', await c.eval(`document.querySelector('#map .map-title').innerText + ' · ' + [...document.querySelectorAll('#map .tile')].map(t => t.querySelector('.nm').innerText + (t.disabled ? ' (locked)' : '')).join(', ')`));
+    await c.eval(`document.querySelector('#map .tile[data-i="0"]').click()`);
+    await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 60000);
+    await sleep(1000);
+    console.log('   map → hole:', await c.eval('__skyputt.round.def.id + " · HUD " + document.querySelector("#hud")?.innerText.split("\\n").slice(0, 2).join(" ")'));
+    await shot(c, 'e2-map-fest1');
+    await c.eval('__skyputt.round.exit ? __skyputt.round.exit() : __skyputt.round.onExit()');
+    await sleep(1500);
+    console.log('   back on map:', await c.eval(`!document.querySelector('#map').hidden && document.querySelector('#map .map-title').innerText`));
+    await c.eval(`document.querySelector('#map [data-nine="front"], #map [data-course="sky"]')?.click()`); await sleep(400);
+    console.log('   tab back to sky:', await c.eval(`document.querySelector('#map .map-title').innerText + ' · ' + document.querySelector('#map .map-sub').innerText`));
+  }
+}
+
 // M5: title, ladder (this week + a settled week via ?eventdate), shop tabs, a chest opening,
 // helper tray + tooltip, armed helpers in play (guard rails, ghost), a skinned ball with a trail,
 // in portrait 412x915 and landscape 1440x900.
@@ -598,6 +686,7 @@ try {
   else if (MODE === 'story') await story(c);
   else if (MODE === 'muni') await muni(c);
   else if (MODE === 'events') await eventsMode(c);
+  else if (MODE === 'events2') await events2Mode(c);
   else if (MODE === 'meta') await metaMode(c);
   else if (MODE === 'overview') await overview(c);
   else if (MODE === 'nines') await ninesMode(c);

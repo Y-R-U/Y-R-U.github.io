@@ -11,7 +11,7 @@ Audition page: http://192.168.0.236:8888/gms/3d/skyputt/tools/sound_preview.html
 | `js/audio/core.js` | helpers: noise buffers, impulse, voices (self-disconnecting), envelopes, modal impacts, FM bells |
 | `js/audio/sfx.js` | every one-shot recipe, per-sound throttle, auto-duck table |
 | `js/audio/roll.js` | continuous rolling noise, one reusable chain, per-surface profiles |
-| `js/audio/music.js` | generative ambient player; themes `sky`, `spooky`, `frost` |
+| `js/audio/music.js` | generative ambient player; themes `sky`, `spooky`, `frost`, `candy` |
 | `js/audio/offline.js` | OfflineAudioContext renders and peak/RMS measurement (tests, preview) |
 | `tools/sound_preview.html/.js` | audition page: every sound, roll slider and surface, music, mix, level meter, offline level table |
 | `tools/sound_preview_cdp.mjs` | headless test (see Testing) |
@@ -115,7 +115,7 @@ Levels (final output, with RMS over the audible span). Recipes are randomised, s
 | lipOut | 0.203 | -13.8 | -37.6 | | star 1/2/3 | 0.18/0.15/0.16 | -15.0/-16.7/-15.8 | ~-30.5 |
 | roll grass (4.5 m/s → 0) | 0.179 | -14.9 | -29.4 | | coin | 0.137 | -17.3 | -34.8 |
 | roll sand | 0.225 | -13.0 | -32.8 | | aimTick p=0 / 1 | 0.018 / 0.026 | -34.8 / -31.8 | -46 |
-| roll ice | 0.088 | -21.1 | -36.9 | | music sky / spooky / frost 90 s | 0.197 / 0.247 / 0.207 | -14.1 / -12.1 / -13.7 | -27.7 / -27.1 / -27.8 |
+| roll ice | 0.088 | -21.1 | -36.9 | | music sky / spooky / frost / candy 90 s | 0.20 / 0.24 / 0.20 / 0.26 | -14 / -12.6 / -14 / -11.8 | -27.4 / -27.1 / -27.8 / -28.3 |
 | roll wood | 0.290 | -10.8 | -27.5 | | | | | |
 | roll metal / glass | 0.123 / 0.089 | -18.2 / -21.0 | -34.9 / -36.5 | | | | | |
 
@@ -137,9 +137,11 @@ Extras are rolled once per chord.
 | `sky` | D major (drifts to A, C), 66 bpm, lydian IV | detuned saws | Karplus-Strong harp, soft FM bells | none |
 | `spooky` | E minor (to D, G minor), 76 bpm, Phrygian bII, V7 with raised leading tone, half-dim ii | soft drawbar organ (PeriodicWave) | music box (FM 4:1), pizzicato (short dark KS plucks, an octave down), bells | theremin glide between 3 chord tones with growing vibrato (30%/chord), distant owl "hoo … hoo-hoo", panned and mostly reverb (16%/chord) |
 | `frost` | F major (to G, D), 72 bpm, carol-style ii–V, minor iv (Bbm6) | wider-detuned saws ("strings") | celesta (FM 4:1), harp, glockenspiel (FM 2.76:1) | subtle sleigh bells for 1–2 bars (28%/chord), faint fireside crackle (12% per eighth note) |
+| `candy` | "Sugar Rush Waltz" (polish agent, 2026-11-03): **3/4**, 150 bpm, F major (to C, G), I–IV–V7–ii–vi with a II7→V7 secondary dominant, chords 2 or 4 bars | light strings, short attack | oom-pah-pah: soft triangle tuba on beat 1 (root / fifth below on alternate bars), pizzicato dyads on beats 2 and 3; celesta lead on the beat (`leadStep: 2`, occasional eighth pickups); glockenspiel sparkles on off-beats | slide-whistle swoop (16%/chord), sugar tinkle run (22%), faint far chocolate-river bubbles (20%) |
 
 To add a theme, add an entry to `THEMES` in music.js with chords, keys, bpm, levels, pad, air,
-voices, mains, bellVoice and extras.
+voices, mains, bellVoice and extras. Optional (used by candy): `meter` (beats per bar; steps then start on a
+downbeat), `chordBars`, `delaySend`, `leadStep`, `waltz` (oom-pah-pah levels).
 
 ## Known issues / notes
 - **The levels were balanced by meter and spectrogram, not by ear.** The agent cannot listen. Aaron or

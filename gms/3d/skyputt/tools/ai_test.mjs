@@ -3,7 +3,7 @@
 // with seeded RNGs. Prints strokes vs par, OOB and aces per round, planner cost, and checks:
 //   The Pro at skill 1 averages near or under par · low skill is well over par · skill helps ·
 //   Bertha has more OOB and more aces than Carl · runs are deterministic · plans fit the budget.
-//   node tools/ai_test.mjs [--rounds=20] [--skills=0.1,0.4,0.7,1] [--golfers=pro,carl] [--holes=sky1,sky9] [--jobs=6] [--json=FILE]
+//   node tools/ai_test.mjs [--rounds=20] [--skills=0.1,0.4,0.7,1] [--golfers=pro,carl] [--holes=sky1,sky9] [--course=festival] [--jobs=6] [--json=FILE]
 import { fork } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -18,8 +18,9 @@ const args = Object.fromEntries(process.argv.slice(2).filter(a => a.startsWith('
 const ROUNDS = +(args.rounds || 20);
 const SKILLS = (args.skills || '0.1,0.4,0.7,1').split(',').map(Number);
 const GOLFERS = args.golfers ? args.golfers.split(',') : PERSONALITY_IDS;
-const COURSE = COURSES.sky;
-const HOLES = args.holes ? COURSE.holes.filter(h => args.holes.split(',').includes(h.id)) : COURSE.holes;
+const COURSE = COURSES[args.course] || COURSES.sky;   // events2: --course=festival (or --holes from any course)
+const ALL_HOLES = Object.values(COURSES).flatMap(c => c.holes);
+const HOLES = args.holes ? ALL_HOLES.filter(h => args.holes.split(',').includes(h.id)) : COURSE.holes;
 const PAR = HOLES.reduce((a, h) => a + h.par, 0);
 
 // ---- one job = one golfer at one skill, ROUNDS rounds of every hole

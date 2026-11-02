@@ -2,104 +2,104 @@
  {
   "key": "putt power=0.15",
   "post": {
-   "peak": 0.1348,
-   "peakDb": -17.4,
-   "rmsDb": -41.1,
-   "active": 0.24
+   "peak": 0.1753,
+   "peakDb": -15.1,
+   "rmsDb": -38.6,
+   "active": 0.15
   },
   "pre": {
-   "peak": 0.1351,
-   "peakDb": -17.4,
-   "rmsDb": -34.9,
+   "peak": 0.1757,
+   "peakDb": -15.1,
+   "rmsDb": -33.9,
    "active": 0.05
   }
  },
  {
   "key": "putt power=0.6",
   "post": {
-   "peak": 0.3796,
-   "peakDb": -8.4,
-   "rmsDb": -37,
-   "active": 0.42
+   "peak": 0.3162,
+   "peakDb": -10,
+   "rmsDb": -37.4,
+   "active": 0.43
   },
   "pre": {
-   "peak": 0.3812,
-   "peakDb": -8.4,
-   "rmsDb": -35,
-   "active": 0.25
+   "peak": 0.317,
+   "peakDb": -10,
+   "rmsDb": -34.9,
+   "active": 0.23
   }
  },
  {
   "key": "putt power=1",
   "post": {
-   "peak": 0.4989,
-   "peakDb": -6,
-   "rmsDb": -34.9,
-   "active": 0.59
+   "peak": 0.5053,
+   "peakDb": -5.9,
+   "rmsDb": -34.2,
+   "active": 0.5
   },
   "pre": {
-   "peak": 0.5221,
-   "peakDb": -5.6,
-   "rmsDb": -33.5,
+   "peak": 0.5303,
+   "peakDb": -5.5,
+   "rmsDb": -33.4,
    "active": 0.44
   }
  },
  {
   "key": "wall speed=1,material=stone",
   "post": {
-   "peak": 0.102,
-   "peakDb": -19.8,
-   "rmsDb": -41.9,
-   "active": 0.16
+   "peak": 0.0916,
+   "peakDb": -20.8,
+   "rmsDb": -39.9,
+   "active": 0.08
   },
   "pre": {
-   "peak": 0.1025,
-   "peakDb": -19.8,
-   "rmsDb": -35.5,
-   "active": 0.04
+   "peak": 0.092,
+   "peakDb": -20.7,
+   "rmsDb": -35.3,
+   "active": 0.03
   }
  },
  {
   "key": "wall speed=6.4,material=stone",
   "post": {
-   "peak": 0.4141,
-   "peakDb": -7.7,
-   "rmsDb": -36.2,
-   "active": 0.61
+   "peak": 0.4829,
+   "peakDb": -6.3,
+   "rmsDb": -36,
+   "active": 0.55
   },
   "pre": {
-   "peak": 0.4239,
-   "peakDb": -7.5,
-   "rmsDb": -34,
-   "active": 0.35
+   "peak": 0.5038,
+   "peakDb": -6,
+   "rmsDb": -34.2,
+   "active": 0.37
   }
  },
  {
   "key": "wall speed=1,material=wood",
   "post": {
-   "peak": 0.1181,
-   "peakDb": -18.6,
-   "rmsDb": -43,
-   "active": 0.32
+   "peak": 0.1302,
+   "peakDb": -17.7,
+   "rmsDb": -40.9,
+   "active": 0.2
   },
   "pre": {
-   "peak": 0.1185,
-   "peakDb": -18.5,
-   "rmsDb": -38.5,
-   "active": 0.1
+   "peak": 0.1308,
+   "peakDb": -17.7,
+   "rmsDb": -39.7,
+   "active": 0.14
   }
  },
  {
   "key": "wall speed=6.4,material=wood",
   "post": {
-   "peak": 0.3785,
-   "peakDb": -8.4,
-   "rmsDb": -34.5,
-   "active": 0.61
+   "peak": 0.3843,
+   "peakDb": -8.3,
+   "rmsDb": -34.9,
+   "active": 0.68
   },
   "pre": {
-   "peak": 0.3797,
-   "peakDb": -8.4,
+   "peak": 0.3879,
+   "peakDb": -8.2,
    "rmsDb": -34,
    "active": 0.5
   }
@@ -107,73 +107,73 @@
  {
   "key": "wall speed=1,material=metal",
   "post": {
-   "peak": 0.093,
-   "peakDb": -20.6,
-   "rmsDb": -42.8,
-   "active": 0.54
+   "peak": 0.0806,
+   "peakDb": -21.9,
+   "rmsDb": -42.6,
+   "active": 0.52
   },
   "pre": {
-   "peak": 0.0932,
-   "peakDb": -20.6,
-   "rmsDb": -42.3,
-   "active": 0.35
+   "peak": 0.0808,
+   "peakDb": -21.8,
+   "rmsDb": -42.4,
+   "active": 0.36
   }
  },
  {
   "key": "wall speed=6.4,material=metal",
   "post": {
-   "peak": 0.3073,
-   "peakDb": -10.2,
-   "rmsDb": -33.3,
-   "active": 0.83
+   "peak": 0.2747,
+   "peakDb": -11.2,
+   "rmsDb": -33.8,
+   "active": 0.9
   },
   "pre": {
-   "peak": 0.3082,
-   "peakDb": -10.2,
-   "rmsDb": -34.6,
-   "active": 0.73
+   "peak": 0.2761,
+   "peakDb": -11.2,
+   "rmsDb": -34.9,
+   "active": 0.75
   }
  },
  {
   "key": "wall speed=1,material=glass",
   "post": {
-   "peak": 0.0575,
-   "peakDb": -24.8,
-   "rmsDb": -45,
-   "active": 0.48
+   "peak": 0.0672,
+   "peakDb": -23.5,
+   "rmsDb": -44.7,
+   "active": 0.46
   },
   "pre": {
-   "peak": 0.0577,
-   "peakDb": -24.8,
-   "rmsDb": -43.1,
-   "active": 0.23
+   "peak": 0.0675,
+   "peakDb": -23.4,
+   "rmsDb": -45.6,
+   "active": 0.42
   }
  },
  {
   "key": "wall speed=6.4,material=glass",
   "post": {
-   "peak": 0.1663,
-   "peakDb": -15.6,
-   "rmsDb": -35.5,
-   "active": 0.74
+   "peak": 0.1943,
+   "peakDb": -14.2,
+   "rmsDb": -35.6,
+   "active": 0.76
   },
   "pre": {
-   "peak": 0.1609,
-   "peakDb": -15.9,
-   "rmsDb": -37.1,
-   "active": 0.71
+   "peak": 0.1952,
+   "peakDb": -14.2,
+   "rmsDb": -36.7,
+   "active": 0.65
   }
  },
  {
   "key": "bumper speed=1.5",
   "post": {
-   "peak": 0.1757,
+   "peak": 0.1765,
    "peakDb": -15.1,
    "rmsDb": -32.1,
-   "active": 0.8
+   "active": 0.79
   },
   "pre": {
-   "peak": 0.1505,
+   "peak": 0.1504,
    "peakDb": -16.5,
    "rmsDb": -33.9,
    "active": 0.73
@@ -182,239 +182,239 @@
  {
   "key": "bumper speed=6",
   "post": {
-   "peak": 0.3509,
+   "peak": 0.3502,
    "peakDb": -9.1,
-   "rmsDb": -28.2,
-   "active": 1.07
+   "rmsDb": -28.1,
+   "active": 1.05
   },
   "pre": {
    "peak": 0.3088,
    "peakDb": -10.2,
-   "rmsDb": -29.6,
-   "active": 0.88
+   "rmsDb": -29.9,
+   "active": 0.96
   }
  },
  {
   "key": "windmillHit speed=4",
   "post": {
-   "peak": 0.4776,
-   "peakDb": -6.4,
-   "rmsDb": -33.5,
-   "active": 0.81
+   "peak": 0.4455,
+   "peakDb": -7,
+   "rmsDb": -33.4,
+   "active": 0.8
   },
   "pre": {
-   "peak": 0.4985,
-   "peakDb": -6,
-   "rmsDb": -32.5,
-   "active": 0.6
+   "peak": 0.4605,
+   "peakDb": -6.7,
+   "rmsDb": -32.8,
+   "active": 0.65
   }
  },
  {
   "key": "cupRattle",
   "post": {
-   "peak": 0.2472,
-   "peakDb": -12.1,
-   "rmsDb": -33.3,
-   "active": 0.57
+   "peak": 0.2523,
+   "peakDb": -12,
+   "rmsDb": -34.3,
+   "active": 0.54
   },
   "pre": {
-   "peak": 0.1651,
-   "peakDb": -15.6,
-   "rmsDb": -35.1,
-   "active": 0.4
+   "peak": 0.1622,
+   "peakDb": -15.8,
+   "rmsDb": -35.2,
+   "active": 0.32
   }
  },
  {
   "key": "cupDrop",
   "post": {
-   "peak": 0.348,
-   "peakDb": -9.2,
+   "peak": 0.3911,
+   "peakDb": -8.2,
    "rmsDb": -31.1,
-   "active": 0.89
+   "active": 0.87
   },
   "pre": {
-   "peak": 0.3486,
-   "peakDb": -9.2,
-   "rmsDb": -32.4,
-   "active": 0.81
+   "peak": 0.3947,
+   "peakDb": -8.1,
+   "rmsDb": -32,
+   "active": 0.74
   }
  },
  {
   "key": "lipOut",
   "post": {
-   "peak": 0.1883,
-   "peakDb": -14.5,
-   "rmsDb": -37.3,
-   "active": 1.01
+   "peak": 0.1921,
+   "peakDb": -14.3,
+   "rmsDb": -37.5,
+   "active": 1.03
   },
   "pre": {
-   "peak": 0.116,
-   "peakDb": -18.7,
-   "rmsDb": -41.2,
-   "active": 0.95
+   "peak": 0.1183,
+   "peakDb": -18.5,
+   "rmsDb": -41.3,
+   "active": 0.96
   }
  },
  {
   "key": "splash",
   "post": {
-   "peak": 0.2402,
-   "peakDb": -12.4,
-   "rmsDb": -33.4,
-   "active": 1.02
+   "peak": 0.3007,
+   "peakDb": -10.4,
+   "rmsDb": -33.7,
+   "active": 1.1
   },
   "pre": {
-   "peak": 0.2187,
-   "peakDb": -13.2,
-   "rmsDb": -35.5,
-   "active": 0.96
+   "peak": 0.265,
+   "peakDb": -11.5,
+   "rmsDb": -35.2,
+   "active": 0.94
   }
  },
  {
   "key": "fall",
   "post": {
-   "peak": 0.207,
-   "peakDb": -13.7,
-   "rmsDb": -32.6,
-   "active": 1.28
+   "peak": 0.1632,
+   "peakDb": -15.7,
+   "rmsDb": -32.9,
+   "active": 1.3
   },
   "pre": {
-   "peak": 0.1275,
-   "peakDb": -17.9,
-   "rmsDb": -36.3,
-   "active": 1.14
+   "peak": 0.1005,
+   "peakDb": -20,
+   "rmsDb": -36.7,
+   "active": 1.2
   }
  },
  {
   "key": "pickup combo=0",
   "post": {
-   "peak": 0.1724,
+   "peak": 0.172,
    "peakDb": -15.3,
-   "rmsDb": -30.5,
-   "active": 1.18
+   "rmsDb": -30.7,
+   "active": 1.12
   },
   "pre": {
-   "peak": 0.1553,
-   "peakDb": -16.2,
-   "rmsDb": -32.9,
-   "active": 1.02
+   "peak": 0.161,
+   "peakDb": -15.9,
+   "rmsDb": -33.4,
+   "active": 1.06
   }
  },
  {
   "key": "pickup combo=6",
   "post": {
-   "peak": 0.1886,
-   "peakDb": -14.5,
-   "rmsDb": -30.5,
-   "active": 1.04
+   "peak": 0.1908,
+   "peakDb": -14.4,
+   "rmsDb": -30.7,
+   "active": 1.1
   },
   "pre": {
-   "peak": 0.1603,
-   "peakDb": -15.9,
-   "rmsDb": -32.8,
-   "active": 0.89
+   "peak": 0.1589,
+   "peakDb": -16,
+   "rmsDb": -32.7,
+   "active": 0.88
   }
  },
  {
   "key": "boost",
   "post": {
-   "peak": 0.2213,
-   "peakDb": -13.1,
-   "rmsDb": -32,
-   "active": 1.01
+   "peak": 0.1919,
+   "peakDb": -14.3,
+   "rmsDb": -33.2,
+   "active": 1.02
   },
   "pre": {
-   "peak": 0.1642,
-   "peakDb": -15.7,
-   "rmsDb": -35.1,
-   "active": 0.93
+   "peak": 0.1423,
+   "peakDb": -16.9,
+   "rmsDb": -35.8,
+   "active": 0.89
   }
  },
  {
   "key": "loop",
   "post": {
-   "peak": 0.1929,
-   "peakDb": -14.3,
+   "peak": 0.1725,
+   "peakDb": -15.3,
    "rmsDb": -34.7,
-   "active": 1.18
+   "active": 1.16
   },
   "pre": {
-   "peak": 0.1189,
-   "peakDb": -18.5,
-   "rmsDb": -38.4,
-   "active": 1.05
+   "peak": 0.1063,
+   "peakDb": -19.5,
+   "rmsDb": -38.3,
+   "active": 1.01
   }
  },
  {
   "key": "holeInOne",
   "post": {
-   "peak": 0.5355,
-   "peakDb": -5.4,
+   "peak": 0.5324,
+   "peakDb": -5.5,
    "rmsDb": -24,
-   "active": 3.69
+   "active": 3.71
   },
   "pre": {
-   "peak": 0.33,
-   "peakDb": -9.6,
-   "rmsDb": -28.1,
+   "peak": 0.328,
+   "peakDb": -9.7,
+   "rmsDb": -28,
    "active": 3.59
   }
  },
  {
   "key": "birdie",
   "post": {
-   "peak": 0.2511,
-   "peakDb": -12,
+   "peak": 0.2362,
+   "peakDb": -12.5,
    "rmsDb": -27.5,
-   "active": 1.68
+   "active": 1.75
   },
   "pre": {
-   "peak": 0.1547,
-   "peakDb": -16.2,
-   "rmsDb": -31.1,
-   "active": 1.51
+   "peak": 0.1455,
+   "peakDb": -16.7,
+   "rmsDb": -31.2,
+   "active": 1.6
   }
  },
  {
   "key": "par",
   "post": {
-   "peak": 0.1632,
-   "peakDb": -15.7,
+   "peak": 0.1693,
+   "peakDb": -15.4,
    "rmsDb": -29.6,
-   "active": 1.3
+   "active": 1.38
   },
   "pre": {
-   "peak": 0.1006,
-   "peakDb": -19.9,
-   "rmsDb": -32.7,
-   "active": 1.09
+   "peak": 0.1043,
+   "peakDb": -19.6,
+   "rmsDb": -32.8,
+   "active": 1.17
   }
  },
  {
   "key": "bogey",
   "post": {
-   "peak": 0.2335,
-   "peakDb": -12.6,
-   "rmsDb": -25.4,
-   "active": 1.69
+   "peak": 0.2443,
+   "peakDb": -12.2,
+   "rmsDb": -25.1,
+   "active": 1.63
   },
   "pre": {
-   "peak": 0.1439,
-   "peakDb": -16.8,
-   "rmsDb": -29.2,
-   "active": 1.57
+   "peak": 0.1505,
+   "peakDb": -16.4,
+   "rmsDb": -28.9,
+   "active": 1.54
   }
  },
  {
   "key": "click",
   "post": {
-   "peak": 0.0849,
-   "peakDb": -21.4,
+   "peak": 0.0816,
+   "peakDb": -21.8,
    "rmsDb": -34.6,
    "active": 0.02
   },
   "pre": {
-   "peak": 0.0848,
-   "peakDb": -21.4,
+   "peak": 0.0816,
+   "peakDb": -21.8,
    "rmsDb": -34.6,
    "active": 0.02
   }
@@ -422,7 +422,7 @@
  {
   "key": "back",
   "post": {
-   "peak": 0.0798,
+   "peak": 0.0799,
    "peakDb": -22,
    "rmsDb": -36.3,
    "active": 0.09
@@ -437,119 +437,119 @@
  {
   "key": "star n=1",
   "post": {
-   "peak": 0.1769,
-   "peakDb": -15,
-   "rmsDb": -30.3,
-   "active": 1.1
+   "peak": 0.1815,
+   "peakDb": -14.8,
+   "rmsDb": -30.7,
+   "active": 1.18
   },
   "pre": {
-   "peak": 0.1278,
-   "peakDb": -17.9,
-   "rmsDb": -33.4,
-   "active": 1.06
+   "peak": 0.1311,
+   "peakDb": -17.6,
+   "rmsDb": -33.7,
+   "active": 1.13
   }
  },
  {
   "key": "star n=2",
   "post": {
-   "peak": 0.1673,
-   "peakDb": -15.5,
-   "rmsDb": -30.3,
-   "active": 1.19
+   "peak": 0.1506,
+   "peakDb": -16.4,
+   "rmsDb": -30.2,
+   "active": 1.14
   },
   "pre": {
    "peak": 0.1247,
    "peakDb": -18.1,
    "rmsDb": -33,
-   "active": 1.04
+   "active": 1.02
   }
  },
  {
   "key": "star n=3",
   "post": {
-   "peak": 0.1562,
-   "peakDb": -16.1,
-   "rmsDb": -30.4,
-   "active": 1.29
+   "peak": 0.1633,
+   "peakDb": -15.7,
+   "rmsDb": -29.5,
+   "active": 1.26
   },
   "pre": {
    "peak": 0.1274,
    "peakDb": -17.9,
-   "rmsDb": -33.2,
+   "rmsDb": -32.5,
    "active": 1.13
   }
  },
  {
   "key": "coin",
   "post": {
-   "peak": 0.1356,
-   "peakDb": -17.4,
-   "rmsDb": -34.9,
-   "active": 0.78
+   "peak": 0.1373,
+   "peakDb": -17.2,
+   "rmsDb": -34.5,
+   "active": 0.7
   },
   "pre": {
-   "peak": 0.0889,
-   "peakDb": -21,
-   "rmsDb": -37.6,
-   "active": 0.64
+   "peak": 0.0902,
+   "peakDb": -20.9,
+   "rmsDb": -37.8,
+   "active": 0.66
   }
  },
  {
   "key": "aimTick power=0",
   "post": {
-   "peak": 0.0251,
-   "peakDb": -32,
-   "rmsDb": -44.7,
+   "peak": 0.0149,
+   "peakDb": -36.5,
+   "rmsDb": -47,
    "active": 0.01
   },
   "pre": {
-   "peak": 0.0251,
-   "peakDb": -32,
-   "rmsDb": -44.7,
+   "peak": 0.0149,
+   "peakDb": -36.5,
+   "rmsDb": -47,
    "active": 0.01
   }
  },
  {
   "key": "aimTick power=1",
   "post": {
-   "peak": 0.0256,
-   "peakDb": -31.8,
-   "rmsDb": -45.2,
+   "peak": 0.0239,
+   "peakDb": -32.4,
+   "rmsDb": -45.7,
    "active": 0.01
   },
   "pre": {
-   "peak": 0.0257,
-   "peakDb": -31.8,
-   "rmsDb": -45.1,
+   "peak": 0.0238,
+   "peakDb": -32.5,
+   "rmsDb": -45.7,
    "active": 0.01
   }
  },
  {
   "key": "roll grass",
   "post": {
-   "peak": 0.2859,
-   "peakDb": -10.9,
-   "rmsDb": -29.4,
-   "active": 3.01
+   "peak": 0.2133,
+   "peakDb": -13.4,
+   "rmsDb": -29.2,
+   "active": 3.03
   },
   "pre": {
-   "peak": 0.1762,
-   "peakDb": -15.1,
-   "rmsDb": -33.6,
+   "peak": 0.1314,
+   "peakDb": -17.6,
+   "rmsDb": -33.3,
    "active": 3
   }
  },
  {
   "key": "roll sand",
   "post": {
-   "peak": 0.2343,
-   "peakDb": -12.6,
+   "peak": 0.2689,
+   "peakDb": -11.4,
    "rmsDb": -32.7,
-   "active": 3.01
+   "active": 3
   },
   "pre": {
-   "peak": 0.1443,
-   "peakDb": -16.8,
+   "peak": 0.1657,
+   "peakDb": -15.6,
    "rmsDb": -36.8,
    "active": 3
   }
@@ -559,104 +559,119 @@
   "post": {
    "peak": 0.0864,
    "peakDb": -21.3,
-   "rmsDb": -37,
+   "rmsDb": -36.9,
    "active": 2.99
   },
   "pre": {
    "peak": 0.0532,
    "peakDb": -25.5,
-   "rmsDb": -41.1,
-   "active": 2.95
+   "rmsDb": -41,
+   "active": 2.94
   }
  },
  {
   "key": "roll wood",
   "post": {
-   "peak": 0.2615,
-   "peakDb": -11.7,
-   "rmsDb": -27.3,
-   "active": 3.03
+   "peak": 0.2787,
+   "peakDb": -11.1,
+   "rmsDb": -27.6,
+   "active": 3.05
   },
   "pre": {
-   "peak": 0.1611,
-   "peakDb": -15.9,
-   "rmsDb": -31.5,
-   "active": 3
+   "peak": 0.1723,
+   "peakDb": -15.3,
+   "rmsDb": -31.7,
+   "active": 3.01
   }
  },
  {
   "key": "roll metal",
   "post": {
-   "peak": 0.1125,
-   "peakDb": -19,
-   "rmsDb": -34.8,
+   "peak": 0.1222,
+   "peakDb": -18.3,
+   "rmsDb": -35,
    "active": 3
   },
   "pre": {
-   "peak": 0.0693,
-   "peakDb": -23.2,
-   "rmsDb": -39,
-   "active": 2.98
+   "peak": 0.0778,
+   "peakDb": -22.2,
+   "rmsDb": -39.1,
+   "active": 2.96
   }
  },
  {
   "key": "roll glass",
   "post": {
-   "peak": 0.087,
-   "peakDb": -21.2,
-   "rmsDb": -36.6,
-   "active": 3.03
+   "peak": 0.0902,
+   "peakDb": -20.9,
+   "rmsDb": -36.3,
+   "active": 3
   },
   "pre": {
-   "peak": 0.0536,
-   "peakDb": -25.4,
-   "rmsDb": -40.7,
+   "peak": 0.0555,
+   "peakDb": -25.1,
+   "rmsDb": -40.4,
    "active": 2.96
   }
  },
  {
   "key": "music sky 90s",
   "post": {
-   "peak": 0.1966,
-   "peakDb": -14.1,
-   "rmsDb": -27.7,
-   "active": 89.7
+   "peak": 0.2001,
+   "peakDb": -14,
+   "rmsDb": -27.4,
+   "active": 89.73
   },
   "pre": {
-   "peak": 0.1211,
-   "peakDb": -18.3,
-   "rmsDb": -31.9,
+   "peak": 0.1233,
+   "peakDb": -18.2,
+   "rmsDb": -31.6,
    "active": 89.65
   }
  },
  {
   "key": "music spooky 90s",
   "post": {
-   "peak": 0.2474,
-   "peakDb": -12.1,
+   "peak": 0.2355,
+   "peakDb": -12.6,
    "rmsDb": -27.1,
-   "active": 89.77
+   "active": 89.7
   },
   "pre": {
-   "peak": 0.1524,
-   "peakDb": -16.3,
+   "peak": 0.1451,
+   "peakDb": -16.8,
    "rmsDb": -31.3,
-   "active": 89.66
+   "active": 89.6
   }
  },
  {
   "key": "music frost 90s",
   "post": {
-   "peak": 0.2068,
-   "peakDb": -13.7,
+   "peak": 0.1992,
+   "peakDb": -14,
    "rmsDb": -27.8,
    "active": 89.72
   },
   "pre": {
-   "peak": 0.1274,
-   "peakDb": -17.9,
+   "peak": 0.1227,
+   "peakDb": -18.2,
    "rmsDb": -32,
-   "active": 89.66
+   "active": 89.63
+  }
+ },
+ {
+  "key": "music candy 90s",
+  "post": {
+   "peak": 0.2571,
+   "peakDb": -11.8,
+   "rmsDb": -28.3,
+   "active": 89.83
+  },
+  "pre": {
+   "peak": 0.1584,
+   "peakDb": -16,
+   "rmsDb": -32.5,
+   "active": 89.79
   }
  }
 ]

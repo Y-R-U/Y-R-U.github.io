@@ -135,6 +135,18 @@ table.scores td.over { color: #ffb2a8; }
   .card { padding: 14px 16px 12px; }
   .card-title { font-size: 26px; margin: 2px 0 6px; }
   .btn { padding: 9px 14px; margin-top: 7px; }
+  /* title in two columns: logo, progress and theme chips left (settings under them), buttons right */
+  #title { place-items: center; padding: 8px calc(20px + var(--safe-r)) 8px calc(20px + var(--safe-l));
+    background: linear-gradient(90deg, rgba(10,20,45,.1), rgba(10,20,45,.55)); }
+  .title-card { width: min(780px, 100%); display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px;
+    grid-template-areas: "left right" "foot right"; align-items: center; }
+  .t-left { grid-area: left; align-self: end; }
+  .t-right { grid-area: right; }
+  .t-right > .btn:first-child { margin-top: 0; }
+  .t-foot { grid-area: foot; align-self: start; }
+  .t-progress { margin: -4px 0 10px; }
+  .t-themes { margin: 0; }
+  .hint { bottom: calc(8px + var(--safe-b)); padding: 5px 14px; font-size: 13px; }   /* clear of the tee (camera.js LAND) */
 }
 @media (hover: hover) and (pointer: fine) {
   #c { cursor: crosshair; }

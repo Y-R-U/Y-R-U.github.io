@@ -3,6 +3,9 @@
 import * as THREE from 'three';
 
 const TAU = Math.PI * 2;
+// Landscape framing (D13). pitch: added to the chase pitch (negative = flatter); dist: distance
+// multiplier; shift: lens shift as a fraction of the view height (see applyShift).
+export const LAND = { pitch: -0.12, dist: 1.05, shift: 0.12 };
 const wrap = a => { a = (a + Math.PI) % TAU; return a < 0 ? a + Math.PI : a - Math.PI; };
 
 export class CameraRig {
@@ -26,8 +29,18 @@ export class CameraRig {
   forward(out = new THREE.Vector3()) { const y = this.yaw + this.lookYaw; return out.set(Math.sin(y), 0, -Math.cos(y)); }
   right(out = new THREE.Vector3()) { const y = this.yaw + this.lookYaw; return out.set(Math.cos(y), 0, Math.sin(y)); }
 
+  // Landscape lens shift: slide the view window up (a shift lens, no extra tilt) so the ball sits
+  // lower and the tall backdrop pieces (palace, moon, castle, rainbow) clear the top edge.
+  applyShift(on) {
+    const s = on ? LAND.shift : 0, cam = this.camera;
+    if (s === (cam.view?.enabled ? -cam.view.offsetY : 0)) return;
+    // setViewOffset sets camera.aspect = fullWidth / fullHeight, so pass the real aspect
+    if (s) cam.setViewOffset(cam.aspect, 1, 0, -s, cam.aspect, 1); else cam.clearViewOffset();
+  }
+
   update(dt, ball, { rolling = false, frozen = false, center = null } = {}) {
     if (this.mode === 'orbit' && center) {
+      this.applyShift(false);
       this.orbitT += dt * 0.08;
       const r = center.r;
       this.camera.position.set(center.x + Math.sin(this.orbitT) * r, center.y + r * 0.55, center.z + Math.cos(this.orbitT) * r);
@@ -38,10 +51,13 @@ export class CameraRig {
     this.focus.lerp(ball, rolling ? 1 - Math.exp(-dt * 9) : k);
     if (!frozen) this.yaw += wrap(this.goalYaw - this.yaw) * (1 - Math.exp(-dt * (rolling ? 1.6 : 3)));
     const yaw = this.yaw + this.lookYaw;
-    // D13: landscape (desktop) frames wider — further back, a touch flatter so the backdrop isn't cropped
+    // D13: landscape frames wider: flatter, a taller FOV (main.js) and a lens shift (LAND), so the tall
+    // backdrop pieces clear the top edge (top of frame ~17° above the horizon vs ~4° before)
     const land = this.camera.aspect > 1.05;
-    const pitch = Math.min(1.35, Math.max(0.2, this.pitch + (land ? -0.05 : 0) + this.lookPitch));
-    const d = this.dist * this.zoom * (land ? 1.3 : 1);
+    this.applyShift(land);
+    const L = LAND;
+    const pitch = Math.min(1.35, Math.max(0.2, this.pitch + (land ? L.pitch : 0) + this.lookPitch));
+    const d = this.dist * this.zoom * (land ? L.dist : 1);
     const fx = Math.sin(yaw), fz = -Math.cos(yaw);
     // look a little ahead of the ball so it sits in the lower part of the portrait frame
     const ahead = 0.55 * d;

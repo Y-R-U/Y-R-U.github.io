@@ -1,8 +1,7 @@
 // Events UI: the list (live / upcoming / ended), an event page with countdown, Play, the goals track,
 // the ladder and final-rank rewards. Event rounds are played through ctx.playEvent.
-import { EVENTS, status, timeText, startsAt, endsAt, freshProgress, applyRound, goalState, standings, rankReward } from './events.js';
+import { EVENTS, status, timeText, startsAt, endsAt, freshProgress, applyRound, goalState, standings, rankReward, eventHoles } from './events.js';
 import { makeLedger } from '../app/store.js';
-import { COURSES } from '../course/holes/index.js';
 import { ICONS } from '../game/hud.js';
 import { THEME_LIST } from '../app/menus.js';
 import { helperName } from '../meta/helpers.js';
@@ -64,7 +63,7 @@ export function createEvents(ctx) {
     const me = board.find(r => r.you);
     const show = board.filter(r => r.rank <= 5 || Math.abs(r.rank - me.rank) <= 2);
     const tier = rankReward(ev, me.rank);
-    const holes = ev.holes.length, par = ev.holes.reduce((a, id) => a + COURSES[ev.course].holes.find(h => h.id === id).par, 0);
+    const evHoles = eventHoles(ev), holes = evHoles.length, par = evHoles.reduce((a, h) => a + h.par, 0);
     el.innerHTML = `<div class="career-card wide">
       <div class="map-head">${back}<span class="sw big" style="background:${sw(ev)}"><i>${ev.currency.icon}</i></span>
         <div><div class="map-title">${esc(ev.name)}</div><div class="map-sub">${esc(timeText(ev, now))} · ${esc(fmtRange(ev))}</div></div></div>
@@ -108,7 +107,7 @@ export function createEvents(ctx) {
       }
       if (b.dataset.a === 'play' && status(ev, ctx.now()) === 'live') {
         el.hidden = true;
-        const course = { id: ev.id, name: ev.name, holes: ev.holes.map(id => COURSES[ev.course].holes.find(h => h.id === id)) };
+        const course = { id: ev.id, name: ev.name, holes: eventHoles(ev) };
         const before = p.currency;
         const ledger = makeLedger(store, p.pickups);
         const res = await ctx.playEvent(ev, course, { ledger, currency: { icon: ev.currency.icon, name: ev.currency.name } });

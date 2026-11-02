@@ -123,10 +123,9 @@ body.lefty .net-strip { left: auto; right: calc(10px + var(--safe-r)); }
   .net-wait { bottom: calc(20px + var(--safe-b)); }
 }
 @media (orientation: landscape) and (max-height: 500px) {
-  /* phone sideways: the title card is taller than the screen → compact tile + scroll, never clip the top */
+  /* phone sideways: the title is two columns (app.css); scrolling stays as a fallback for very short screens */
   #title { overflow-y: auto; align-items: safe center; }
-  .btn.t-online { padding: 8px 14px; }
-  .btn.t-online small { display: none; }
+  .btn.t-online { padding: 6px 14px; }
   .net-strip { top: calc(96px + var(--safe-t)); gap: 2px; }
   .ns { font-size: 12px; padding: 1px 8px 1px 5px; }
   .net-code b { font-size: 30px; }

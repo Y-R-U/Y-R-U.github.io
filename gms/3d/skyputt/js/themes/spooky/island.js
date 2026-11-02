@@ -1,7 +1,7 @@
 // Spooky Hollow theme — floating crag masses (course island + round crags), lava falls, dead grass.
 // Adapted from sky/island.js (same sweep), with a dark basalt palette.
 import * as THREE from 'three';
-import { fbm3, noise3, rng, distToPath, paint } from './util.js';
+import { fbm3, noise3, rng, distToPath, paint, inVoid, distToLines } from './util.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { lavaTexture, fadeTexture } from './textures.js';
 
@@ -97,7 +97,7 @@ function sweepRock(frames, seed, hi) {
 }
 
 /** Build sweep frames under the course path, with rounded end caps and curvature-limited inner extents. */
-export function courseFrames(path, widths, hi, seed = 3) {
+export function courseFrames(path, widths, hi, seed = 3, voids = null) {
   const step = hi ? 0.45 : 0.8;
   // resample by distance
   const pts = [], ws = [];
@@ -128,6 +128,16 @@ export function courseFrames(path, widths, hi, seed = 3) {
       // cross(t_prev, t_next).y < 0 means turning toward +right
       if (k > 0) er = Math.min(er, lim); else el = Math.min(el, lim);
     }
+    // engine info.voids: pull each side's edge back so the crag never fills a void (as sky does)
+    if (voids && voids.length) {
+      const t = tangents[i];
+      const clampSide = (ext, sx, sz) => {
+        for (let e = w + 0.06; e <= ext; e += 0.05) if (inVoid(voids, p.x + sx * e, p.z + sz * e, 0.08)) return Math.max(w + 0.04, e - 0.08);
+        return ext;
+      };
+      el = clampSide(el, t.z, -t.x);
+      er = clampSide(er, -t.z, t.x);
+    }
     const d = 1.6 + (el + er) * 0.95 + noise3(i * 0.22, off + 20, 0) * 2.4;
     frames.push({ p: p.clone(), t: tangents[i], el, er, d });
   });
@@ -156,7 +166,7 @@ export function courseFrames(path, widths, hi, seed = 3) {
  * the rock is split into one mass per solid run, trimmed back from each gap so the gap reads as a drop.
  * Returns { geometry (vcRock), frames }.
  */
-export function buildCourseRock(path, widths, hi, floor = null) {
+export function buildCourseRock(path, widths, hi, floor = null, voids = null) {
   const runs = [];
   let cur = null;
   for (let i = 0; i < path.length; i++) {
@@ -178,7 +188,7 @@ export function buildCourseRock(path, widths, hi, floor = null) {
     if (a > 0) a = trim(a, -1);
     if (b < path.length - 1) b = trim(b, 1);
     if (b - a < 1) return;
-    const f = courseFrames(path.slice(a, b + 1), widths.slice(a, b + 1), hi, 3 + k);
+    const f = courseFrames(path.slice(a, b + 1), widths.slice(a, b + 1), hi, 3 + k, voids);
     geos.push(sweepRock(f, 13.7 + k * 3.1, hi));
     frames.push(...f);
   });
@@ -305,7 +315,7 @@ export function buildLavaFalls(spots, hi) {
 
 // ---------------- foliage ----------------
 /** Dark thorny shrubs + mushrooms on the course island top, outside the fairway. Returns Object3D[]. */
-export function buildFoliage(frames, path, widths, hi, avoid = []) {
+export function buildFoliage(frames, path, widths, hi, avoid = [], voids = null, branches = null) {
   const r = rng(29);
   const maxW = Math.max(...widths, 1.2) / 2;
   const bushN = hi ? 60 : 24, shroomN = hi ? 24 : 8;
@@ -323,6 +333,7 @@ export function buildFoliage(frames, path, widths, hi, avoid = []) {
       const w = (widths[i] ?? maxW * 2) / 2;
       if (d < w + minClear) continue;
       if (avoid.some(a => Math.hypot(a.x - x, a.z - z) < a.r)) continue;
+      if (inVoid(voids, x, z, 0.1) || distToLines(branches, x, z) < 0.45) continue;
       list.push({ x, y: f.p.y - 0.03, z, s: 0.6 + r() * 0.8, rot: r() * Math.PI * 2 });
     }
   };
