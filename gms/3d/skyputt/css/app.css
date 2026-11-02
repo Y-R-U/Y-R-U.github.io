@@ -193,6 +193,12 @@ table.scores td.over { color: #ffb2a8; }
 .seg { display: flex; border: 2px solid var(--panel-b); border-radius: 12px; overflow: hidden; }
 .seg button { border: 0; background: transparent; padding: 6px 14px; font-weight: 600; }
 .seg button.on { background: var(--gold); color: var(--ink); }
+/* story2: front / back nine tabs on the course map */
+.seg.nines { margin: 0 0 10px; }
+.seg.nines button { flex: 1; padding: 8px 6px; font-size: 15px; color: inherit; }
+.seg.nines button.on { color: var(--ink); }
+.seg.nines svg { width: 14px; height: 14px; vertical-align: -2px; }
+.map-card .btn[disabled] { opacity: .5; }
 
 body.lefty .tray { right: auto; left: calc(10px + var(--safe-l)); }
 body.lefty .hud-top { flex-direction: row-reverse; }
@@ -238,6 +244,10 @@ body.lefty .hud-sub { left: auto; right: calc(10px + var(--safe-r)); }
 .tour-body { flex: 1; min-width: 0; }
 .tour-name { font-size: 19px; font-weight: 700; }
 .tour-sub { font-size: 13px; opacity: .75; margin-bottom: 4px; }
+/* story2: fold finished tours, lock reason */
+.tour-name { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tour-fold { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 10px; border: 1.5px solid var(--panel-b); background: rgba(255,255,255,.08); color: inherit; }
+.tour-lock { font-style: italic; }
 .evs { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
 .ev { display: flex; align-items: center; gap: 10px; text-align: left; padding: 9px 10px; border-radius: 14px;
   border: 2px solid var(--panel-b); background: rgba(255,255,255,.07); }

@@ -24,8 +24,10 @@ export class Round {
   // mode: 'round' (play on to the last hole, then the scorecard) | 'single' (one hole, then the map)
   // Story events add: onComplete(result) instead of the scorecard, opponents [{ name, colour, scores }]
   // shown on every hole card, and tips (hint lines at each hole start).
-  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null, ledger = null, currency = null, ghosts = null } = {}) {
-    this.app = app; this.course = course; this.onExit = onExit; this.mode = mode;
+  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null, ledger = null, currency = null, ghosts = null, inventory = null, end = null } = {}) {
+    this.app = app;
+    this.inv = inventory || app.store;   // helper counts: the save, or an online room's own (js/net)
+    this.course = course; this.onExit = onExit; this.mode = mode;
     this.onComplete = onComplete; this.opponents = opponents; this.tips = tips; this.label = label;
     this.used = Object.fromEntries(HELPERS.map(h => [h.id, 0]));
     this.armed = {};   // one-shot helpers armed for the next shot (kind 'pre'), consumed on arming
@@ -35,6 +37,8 @@ export class Round {
     this.aces = 0;
     this.ghosts = ghosts;   // [{ name, colour, shots: [per hole: shot list | null] }] → GhostBall replays (js/ai/ghost.js)
     this.index = startIndex; this.startIndex = startIndex;
+    // a round plays to `end` (exclusive): one nine of an 18-hole course (story2); default = the last hole
+    this.end = Math.min(course.holes.length, end ?? course.holes.length);
     this.scores = [];
     this.gems = 0;
     this.paused = false;
@@ -189,7 +193,7 @@ export class Round {
   // ---- helpers
   refreshHelpers() {
     this.app.hud.setHelpers({
-      counts: this.app.store.helpers(), sight: this.sight, armed: this.armed,
+      counts: this.inv.helpers(), sight: this.sight, armed: this.armed,
       canPre: this.state === 'ready' || this.state === 'flyover', canMull: this.state === 'ready' && !!this.last,
     });
   }
@@ -204,11 +208,11 @@ export class Round {
     const name = helperName(id);
     if (this.armed[id]) {
       delete this.armed[id]; this.used[id]--;
-      this.app.store.giveHelper(id);
+      this.inv.giveHelper(id);
       this.app.hud.banner(`${name} off`, '', 800);
       sfx.emit('back');
     } else {
-      if (!this.app.store.useHelper(id)) { this.app.hud.banner(`No ${name} left`, 'bad', 1200); sfx.emit('back'); return; }
+      if (!this.inv.useHelper(id)) { this.app.hud.banner(`No ${name} left`, 'bad', 1200); sfx.emit('back'); return; }
       this.endFlyover();
       this.armed[id] = true; this.used[id]++;
       this.app.hud.banner(`${name}! <small>${id === 'power' ? 'more power this shot' : 'next shot'}</small>`, 'good', 1000);
@@ -238,7 +242,7 @@ export class Round {
   }
   // Armed but never shot (hole restarted / quit / next hole): give them back.
   refundArmed() {
-    if (this.state !== 'rolling') for (const id of Object.keys(this.armed)) { this.app.store.giveHelper(id); this.used[id]--; }
+    if (this.state !== 'rolling') for (const id of Object.keys(this.armed)) { this.inv.giveHelper(id); this.used[id]--; }
     this.armed = {};   // (mid-roll they were already spent)
     if (this.ball) this.applyMods();
   }
@@ -268,7 +272,7 @@ export class Round {
   }
   useLongSight() {
     if (!(this.state === 'ready' || this.state === 'flyover') || this.sight >= MAX_SIGHT) return;
-    if (!this.app.store.useHelper('longSight')) { this.app.hud.banner('No Long Sight left', 'bad', 1200); sfx.emit('back'); return; }
+    if (!this.inv.useHelper('longSight')) { this.app.hud.banner('No Long Sight left', 'bad', 1200); sfx.emit('back'); return; }
     this.endFlyover();
     this.sight++; this.used.longSight++;
     this.aim.guideLevel = this.sight;
@@ -278,7 +282,7 @@ export class Round {
   }
   useMulligan() {
     if (this.state !== 'ready' || !this.last) return;
-    if (!this.app.store.useHelper('mulligan')) { this.app.hud.banner('No Mulligans left', 'bad', 1200); sfx.emit('back'); return; }
+    if (!this.inv.useHelper('mulligan')) { this.app.hud.banner('No Mulligans left', 'bad', 1200); sfx.emit('back'); return; }
     const L = this.last;
     this.ball.place(L.x, L.y, L.z);
     this.ballMesh.position.set(L.x, L.y, L.z);
@@ -496,8 +500,9 @@ export class Round {
       store.giveHelper(reward);
     }
     const n = this.course.holes.length;
-    const last = this.index >= n - 1;
-    const roundBonus = last && this.mode === 'round' && this.startIndex === 0 && this.app.meta ? this.app.meta.onRound({ holes: n }) : null;
+    const last = this.index >= this.end - 1;
+    const fullRound = this.startIndex === 0 || !!this.course.nines?.some(x => x.from === this.startIndex);
+    const roundBonus = last && this.mode === 'round' && fullRound && this.app.meta ? this.app.meta.onRound({ holes: this.end - this.startIndex }) : null;
     const nextOpen = !last && store.unlockedCount(this.course) > this.index + 1;
     const onNext = () => {
       if (this.onComplete && last) { const res = this.result(); this.dispose(); this.onComplete(res); return; }
@@ -531,7 +536,8 @@ export class Round {
 
   showScorecard() {
     const rows = this.scores.filter(Boolean);
-    this.app.hud.scorecard({ course: this.course.name, rows, gems: this.gems }, {
+    const nine = this.course.nines && this.course.nines.find(x => x.from === this.startIndex && x.to === this.end);
+    this.app.hud.scorecard({ course: this.course.name + (nine ? ' · ' + nine.name : ''), rows, gems: this.gems }, {
       onAgain: () => { this.scores = []; this.gems = 0; this.loadHole(this.startIndex ?? 0); },
       onTitle: () => this.exit(),
     });

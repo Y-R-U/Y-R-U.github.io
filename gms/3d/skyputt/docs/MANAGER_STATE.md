@@ -50,3 +50,14 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
   chests, 6 helpers, frost in picker, Frost Fair event uses frost). PAUSED per Aaron — no agents
   running; wait for "continue". Next when resumed: M6 online server (deploy needs OK), story ch2-6,
   back-nine holes, projects.js + hub card, real-phone perf check of the game.
+- 2026-11-02: Aaron said "continue" — unpaused. Started `online` (M6: server/ Go+SQLite modelled on
+  GAMBIT, js/net/, rooms, ghost-AI fill, helper modes; local test on :8098; NO VPS deploy) and
+  `story2` (story chapters 2-6 + back-nine holes 10-18). Notes: notes/online.md, notes/story2.md.
+- 2026-11-02: `online` done (M6 local-only on :8098, ONLINE_PUBLIC=false on Pages; notes/online.md,
+  deploy steps there — needs Aaron's OK, box port 8023). Not committed yet: shares main.js/play.js
+  edits with story2, so commit both together when story2 finishes. Started `candy` (Candy Land theme).
+- 2026-11-03: Aaron: "If you run out of tasks, create more levels? Or special events..." → standing
+  backlog filler: when the queue is empty (and not paused), start agents on more holes/courses per theme
+  and new dated special events (e.g. Candy event, spring/Easter, summer, Lunar New Year). Still max 2 agents.
+  Aaron feedback (phone): ch1 lesson tips said helper buttons "bottom right" (they're top of the right
+  tray); ace passing the Mulligan lesson confused him → passed to story2 to fix wording + explain.

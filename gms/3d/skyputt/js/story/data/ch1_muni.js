@@ -4,7 +4,7 @@
 // Goals: { maxStrokes } | { starsAtLeast } | { use: 'longSight'|'mulligan' } | { beat: true } | { place: n }
 // Dialogue lines: [speakerId, text]; {name} is replaced with the player's name.
 export default {
-  id: 'muni', name: 'Muni', title: 'Chapter 1 · Muni', course: 'sky', rankOnFinish: 'Amateur',
+  id: 'muni', name: 'Muni', title: 'Chapter 1 · Muni', course: 'sky', rankOnFinish: 'Amateur', trophy: 'The Pineapple',
   blurb: 'The rundown Sky Isles municipal course. Everyone starts here.',
   intro: [
     ['mags', 'Well now. A new face at the Muni. The windmill sticks and the loop rattles, but she plays true.'],
@@ -34,11 +34,11 @@ export default {
       grant: { longSight: 2 },
       before: [
         ['mags', 'See that windmill? Time it right and you slip through the tunnel.'],
-        ['mags', "Here, take two Long Sights. Tap the arrow button before a shot and your guide line stretches out and shows the bounce."],
+        ['mags', "Here, take two Long Sights. Tap the arrow at the top of your helper column before a shot and your guide line stretches out and shows the bounce."],
         ['mags', 'Stack up to three for an even longer look. They don’t grow on trees, mind.'],
       ],
       after: [['mags', 'See how much easier it is when you know where it’s going? Use them wisely.']],
-      tips: ['Tap the Long Sight button (bottom right) before you aim'],
+      tips: ['Tap Long Sight (the arrow, top of the helper column) before you aim'],
       reward: { coins: 25, helpers: { longSight: 1 } },
     },
     {
@@ -51,7 +51,7 @@ export default {
         ['mags', 'Try one on this loop. Go on, mess one up on purpose. I won’t tell.'],
       ],
       after: [['mags', "That's the spirit. Now let's see you play a proper round."]],
-      tips: ['After a bad shot, tap the undo button (bottom right)'],
+      tips: ['Hit a shot, then tap Mulligan (the undo arrow, second in the helper column)'],
       reward: { coins: 25, helpers: { mulligan: 1 } },
     },
     {
@@ -78,7 +78,7 @@ export default {
       ],
       after: [['carl', 'Hmph. Beginner’s luck. ...Good putting, though.'], ['mags', 'Ha! I haven’t seen Carl lose since the snack hut got a roof.']],
       lose: [['carl', 'Steady wins, kid. Come back when you’ve learned patience.'], ['mags', 'Shake it off. Try again.']],
-      reward: { coins: 80, helpers: { mulligan: 1, longSight: 1 } },
+      reward: { coins: 80, helpers: { mulligan: 1, longSight: 1 }, cosmetic: 'ball:lime' },
     },
     {
       id: 'muni-open', kind: 'tournament', name: 'The Muni Open', holes: ['sky1', 'sky2', 'sky3', 'sky4', 'sky5', 'sky6'],

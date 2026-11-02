@@ -18,6 +18,7 @@ import { shotSpeed, SPEED_CAP, DT } from '../js/engine/constants.js';
 let fails = 0; const ok = (c, m) => { console.log(c ? '  ok  ' : '  FAIL', m); if (!c) fails++; };
 const at = (key, h = 12) => dayStart(key) + h * 3600e3;
 const course = COURSES.sky;
+const frontNine = course.holes.slice(0, 9);   // story2: Sky Isles has 18 holes; the economy is per nine
 const mem = {}; globalThis.localStorage = { getItem: k => mem[k] ?? null, setItem: (k, v) => { mem[k] = String(v); } };
 
 console.log('week maths (Monday 00:00 local)');
@@ -107,8 +108,8 @@ console.log('week end: promote, relegate, rewards claimable once');
 
 console.log('economy');
 {
-  const front = course.holes.reduce((a, h) => a + holeCoins({ stars: 3, picked: false, ace: false }), 0) + roundCoins(9);
-  const crystals = course.holes.reduce((a, h) => a + (h.features || []).filter(f => f.type === 'pickup').length, 0) * 5;
+  const front = frontNine.reduce((a, h) => a + holeCoins({ stars: 3, picked: false, ace: false }), 0) + roundCoins(9);
+  const crystals = frontNine.reduce((a, h) => a + (h.features || []).filter(f => f.type === 'pickup').length, 0) * 5;
   console.log(`    3-star front nine = ${front} coins (+5 per ace); first pass adds ${crystals} from crystals (once)`);
   ok(front === 72, 'income: a 3-star front nine pays 72 coins');
   ok(Object.values(HELPER_PRICES).every(p => p <= front), 'every helper costs less than one 3-star round');

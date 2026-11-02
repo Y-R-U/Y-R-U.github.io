@@ -50,7 +50,8 @@ export function zoneOf(tier, rank) {
 
 // ---- points ----
 // Harder holes pay more: by par, plus a bonus from the measured difficulty (holes_test --human).
-export const HARD = { sky1: 3, sky2: 2, sky5: 1, sky7: 6, sky8: 2, sky9: 6 };
+export const HARD = { sky1: 3, sky2: 2, sky5: 1, sky7: 6, sky8: 2, sky9: 6,
+  sky12: 1, sky14: 1, sky16: 2, sky17: 6, sky18: 6 };   // back nine (story2, holes_test --human=16)
 export const streakMult = days => 1 + 0.1 * Math.min(5, Math.max(0, (days | 0) - 1));   // +10% a day in a row, up to +50%
 export function holePoints({ id, par, strokes, picked, stars, streak = 1 }) {
   let p;

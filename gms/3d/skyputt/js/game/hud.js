@@ -170,16 +170,18 @@ export class Hud {
     c.querySelector('[data-a=next]').onclick = () => { this.hideCard(); onNext(); };
     const m = c.querySelector('[data-a=map]'); if (m) m.onclick = () => { this.hideCard(); onMap(); };
   }
-  pause({ onResume, onRestart, onQuit, onSettings, fsButton }) {
+  // onRestart null hides Restart (online rounds); title / note / quitLabel are optional
+  pause({ onResume, onRestart, onQuit, onSettings, fsButton, title = 'Paused', note = '', quitLabel = 'Quit to title' }) {
     const c = this._card(`
-      <div class="card-title">Paused</div>
+      <div class="card-title">${esc(title)}</div>
+      ${note ? `<div class="card-note">${esc(note)}</div>` : ''}
       <button class="btn primary" data-a="resume">Resume</button>
-      <button class="btn" data-a="restart">Restart hole</button>
+      ${onRestart ? '<button class="btn" data-a="restart">Restart hole</button>' : ''}
       ${onSettings ? '<button class="btn" data-a="settings">Settings</button>' : ''}
       ${fsButton ? '<button class="btn" data-a="fs">Fullscreen</button>' : ''}
-      <button class="btn ghost" data-a="quit">Quit to title</button>`);
+      <button class="btn ghost" data-a="quit">${esc(quitLabel)}</button>`);
     c.querySelector('[data-a=resume]').onclick = () => { this.hideCard(); onResume(); };
-    c.querySelector('[data-a=restart]').onclick = () => { this.hideCard(); onRestart(); };
+    const rs = c.querySelector('[data-a=restart]'); if (rs) rs.onclick = () => { this.hideCard(); onRestart(); };
     c.querySelector('[data-a=quit]').onclick = () => { this.hideCard(); onQuit(); };
     const fs = c.querySelector('[data-a=fs]'); if (fs) fs.onclick = fsButton;
     const st = c.querySelector('[data-a=settings]'); if (st) st.onclick = () => { this.hideCard(); onSettings(); };

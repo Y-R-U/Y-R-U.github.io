@@ -6,6 +6,10 @@
 //   node tools/shots_cdp.mjs story [--out=DIR]   career: name, intro, map, lesson 1, result, rival hole card
 //   node tools/shots_cdp.mjs play  [--out=DIR] [--from=N] [--minutes=20]   plays the front nine (or from hole N) through the real UI to the scorecard
 //   node tools/shots_cdp.mjs meta  [--out=DIR] [--sizes=p,l]   M5: ladder, shop, chest, helper tray, cosmetics, week rollover
+//   node tools/shots_cdp.mjs overview [--out=DIR] [--holes=10,11] [--themes=sky,spooky,frost]   story2: per theme + hole, the
+//        portrait tee view and a high landscape overview of the whole hole (rock under gaps, voids, backdrop)
+//   node tools/shots_cdp.mjs nines [--out=DIR]   story2: map nine tabs, back nine lock, Play back nine, scorecard
+//   node tools/shots_cdp.mjs career [--out=DIR] [--chapter=2]   story2: chapter 2-6 screens (tour map, intro, a lesson, rival + tournament setup)
 // Reports console errors / exceptions and exits 1 if there are any.
 import { writeFileSync, mkdirSync } from 'node:fs';
 
@@ -96,6 +100,57 @@ async function release(c, x, y) {
   else await c.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', buttons: 0, clickCount: 1 });
 }
 const state = c => c.eval('(() => { const r = __skyputt.round; return r ? { state: r.state, hole: r.index + 1, strokes: r.strokes, fps: Math.round(__skyputt.fps), theme: __skyputt.themeId, calls: __skyputt.app.renderer.info.render.calls, tris: __skyputt.app.renderer.info.render.triangles, coins: __skyputt.store.data.coins, helpers: __skyputt.store.data.helpers } : null })()');
+
+// story2: course map front / back nine tabs, the back nine lock, Play back nine → hole 10/18, scorecard title.
+async function ninesMode(c) {
+  await size(c, 412, 915, true);
+  await go(c, 'fresh&noflyover');
+  await c.eval(`document.querySelector('#t-map').click()`); await sleep(500);
+  await shot(c, 'nines-map-front');
+  await c.eval(`document.querySelector('#map [data-nine=back]').click()`); await sleep(400);
+  await shot(c, 'nines-map-back-locked');
+  console.log('   locked back nine:', await c.eval(`({ disabled: document.querySelector('#map [data-a=front]').disabled, note: document.querySelector('#map .card-note')?.innerText })`));
+  await c.eval(`(() => { for (let i = 1; i <= 9; i++) __skyputt.store.markFinished('sky' + i); document.querySelector('#map [data-a=back]').click(); document.querySelector('#t-map').click(); })()`); await sleep(500);
+  await shot(c, 'nines-map-back-open');
+  await c.eval(`document.querySelector('#map [data-a=front]').click()`); await sleep(1500);
+  await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 40000);
+  const r = await c.eval(`({ index: __skyputt.round.index, end: __skyputt.round.end, hud: document.querySelector('#hud').innerText.split('\\n').slice(0, 4).join(' ') })`);
+  console.log('   back nine round:', JSON.stringify(r));
+  if (r.index !== 9 || r.end !== 18) errors.push('back nine round did not start at hole 10 / end at 18');
+  await shot(c, 'nines-hole10');
+  // jump to the last hole of the nine and finish it with a debug putt sequence → scorecard
+  await c.eval(`(() => { const R = __skyputt.round; R.scores = []; R.loadHole(17); R.endFlyover(); })()`); await sleep(800);
+  await c.eval(`(() => { const R = __skyputt.round; R.strokes = 5; R.finishHole(false); })()`); await sleep(1200);
+  console.log('   last card:', await c.eval(`document.querySelector('#h-card .card')?.innerText.replace(/\\n+/g, ' | ')`));
+  await c.eval(`document.querySelector('#h-card [data-a=next]').click()`); await sleep(1000);
+  await shot(c, 'nines-scorecard');
+  console.log('   scorecard:', await c.eval(`document.querySelector('#h-card .card-kicker')?.innerText`));
+}
+
+// story2: tee view + a high overview of each hole in each theme (looks for rock under gaps, voids, props on the track)
+async function overview(c) {
+  const HOLES = (args.holes ? String(args.holes) : '10,11,12,13,14,15,16,17,18').split(',').map(Number);
+  const THEMES = (args.themes ? String(args.themes) : 'sky,spooky,frost').split(',');
+  for (const th of THEMES) for (const i of HOLES) {
+    await size(c, 412, 915, true);
+    await c.send('Page.navigate', { url: `${BASE}?theme=${th}&hole=${i}&noflyover&t=${Date.now()}` });
+    await sleep(500);
+    await waitFor(c, 'window.__booted === true && !!__skyputt.round && __skyputt.round.state === "ready"', 40000);
+    await sleep(1500);
+    await shot(c, `${th}-hole${i}-tee`);
+    await size(c, 1280, 800, false);
+    await sleep(400);
+    await c.eval(`(() => { const r = __skyputt.round, { THREE } = __skyputt, cam = __skyputt.app.camera;
+      r.update = () => {};   // freeze the round; the frame loop keeps rendering
+      const b = r.view.info.bounds, ctr = b.getCenter(new THREE.Vector3()), sz = b.getSize(new THREE.Vector3());
+      const L = Math.max(sz.x, sz.z), vd = r.view.info.viewDir;
+      cam.position.set(ctr.x - vd.x * L * 0.55 + 0.3 * L, ctr.y + L * 0.75, ctr.z - vd.z * L * 0.55);
+      cam.lookAt(ctr); cam.updateMatrixWorld(); })()`);
+    await sleep(1200);
+    await shot(c, `${th}-hole${i}-over`);
+    console.log('  ', th, 'hole', i, JSON.stringify(await state(c)));
+  }
+}
 
 async function shots(c) {
   const HOLES = (args.holes ? String(args.holes) : '1,2,3,4,5,6,7,8,9').split(',').map(Number);
@@ -299,6 +354,96 @@ async function muni(c) {
   console.log('   final:', JSON.stringify(await c.eval(`({ coins: __skyputt.store.data.coins, helpers: __skyputt.store.data.helpers, chapters: __skyputt.store.story().chapters, events: __skyputt.store.story().events })`)));
 }
 
+// story2: a later chapter through the real UI. Earlier tours are marked done (or just their rival
+// beaten with --open), the chapter's events are played in order by planner drags, lesson helpers
+// are armed from the event data, every dialogue is tapped through, and the theme of each event is
+// checked. --chapter=2..6 · --only=id,id (mark the others passed, play just these) · --holes1 (quit
+// each event after its first hole card, for a quick look) · --open (gate check: beat only the
+// previous rival, leave its tournament open).
+async function careerMode(c) {
+  const K = +(args.chapter || 2) - 1;
+  await size(c, 412, 915, true);
+  await go(c, 'fresh&noflyover');
+  await c.eval(`document.querySelector('#t-career').click()`); await sleep(400);
+  await c.eval(`(() => { document.querySelector('#c-name').value = 'Robin'; document.querySelector('#career [data-a=ok]').click(); })()`);
+  await sleep(400); await tapDialogue(c);
+  const data = await c.eval(`import('./js/story/data/chapters.js').then(m => m.CHAPTERS.map(ch => ({ id: ch.id, theme: ch.data.theme || null, events: ch.data.events.map(e => ({ id: e.id, kind: e.kind, use: e.goal.use || null, theme: e.theme || null })) })))`);
+  const ch = data[K];
+  const only = args.only ? String(args.only).split(',') : null;
+  await c.eval(`(() => { const st = __skyputt.store.story(), D = ${JSON.stringify(data)};
+    for (let k = 0; k < ${K}; k++) { for (const e of D[k].events) if (!${!!args.open} || e.kind === 'rival' || k < ${K - 1}) st.events[e.id] = { passed: true, best: 9 }; if (!${!!args.open} || k < ${K - 1}) st.chapters[D[k].id] = { done: true }; }
+    ${only ? `for (const e of D[${K}].events) if (!${JSON.stringify(only)}.includes(e.id)) st.events[e.id] = { passed: true, best: 9 };` : ''}
+    __skyputt.store.saveStory(); __skyputt.career.render(); })()`);
+  await sleep(500);
+  await shot(c, `career${K + 1}-map`);
+  console.log('   tours:', await c.eval(`[...document.querySelectorAll('#career .tour')].map(t => (t.classList.contains('open') ? 'open ' : 'locked ') + t.querySelector('.tour-name').innerText.replace(/\\n/g, ' ') + ' — ' + t.querySelector('.tour-sub').innerText).join(' | ')`));
+  const tries = {};
+  for (let guard = 0; guard < 16; guard++) {
+    const next = await c.eval(`(() => { const b = [...document.querySelectorAll('#career .ev.open')].find(b => b.dataset.ch === '${ch.id}'); return b ? b.dataset.ev : null })()`);
+    if (!next) break;
+    tries[next] = (tries[next] || 0) + 1;
+    if (tries[next] > (+args.tries || 2)) { console.log('   giving up on', next); break; }
+    const ev = ch.events.find(e => e.id === next), t0 = Date.now();
+    await c.eval(`document.querySelector('#career [data-ev="${next}"]').click()`); await sleep(400);
+    await tapDialogue(c, tries[next] === 1 ? `career${K + 1}-${next}-before` : null);
+    if (ev.kind === 'rival' || ev.kind === 'tournament') {
+      const warm = await c.eval(`document.querySelector('#career .card-title')?.innerText || ''`);
+      if (/warming/i.test(warm)) console.log('   ' + warm);
+    }
+    await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 120000);
+    const want = ev.theme || ch.theme;
+    const theme = await c.eval('__skyputt.themeId');
+    if (want && theme !== want) errors.push(`${next}: theme ${theme}, wanted ${want}`);
+    if (tries[next] === 1) await shot(c, `career${K + 1}-${next}-hole`);
+    const log = [];
+    let armed = false, quit = false;
+    for (;;) {
+      const s = await c.eval('__skyputt.round ? { st: __skyputt.round.state, n: __skyputt.round.strokes, used: __skyputt.round.used, hole: __skyputt.round.index } : null');
+      if (!s) break;
+      if (s.st === 'done') {
+        log.push(await c.eval(`document.querySelector('#h-card .card-title')?.innerText`));
+        if (s.hole === 0 && tries[next] === 1) await shot(c, `career${K + 1}-${next}-card1`);
+        if (args.holes1) { quit = true; await c.eval('__skyputt.round.exit ? __skyputt.round.exit() : __skyputt.round.onExit()'); await sleep(1500); break; }
+        await c.eval(`document.querySelector('#h-card [data-a=next]').click()`); await sleep(900); continue;
+      }
+      if (s.st !== 'ready') { await sleep(300); continue; }
+      if (ev.use === 'mulligan' && !s.used.mulligan && s.n === 0) {
+        await drag(c, 206, 300, 206, 300 + 24 + 0.12 * 182, { steps: 6 });
+        await waitFor(c, '__skyputt.round.state === "ready"', 30000); await sleep(300);
+        await c.eval(`document.querySelector('#h-mull').click()`); await sleep(400);
+        continue;
+      }
+      if (ev.use && ev.use !== 'mulligan' && !armed) {
+        armed = true;
+        const sel = ev.use === 'longSight' ? '#h-sight' : '#h-' + ev.use;
+        await c.eval(`document.querySelector('${sel}').click()`); await sleep(300);
+      }
+      await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
+      const plan = await c.eval(`(${planInPage.toString()})()`);
+      const len = 24 + plan.power * 182;
+      await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
+      await sleep(600);
+    }
+    if (quit) {   // quick look: count it as passed so the next event opens
+      console.log(`   ${next}: first hole ${log.join(', ')} (quit, theme ${theme})`);
+      await waitFor(c, '!document.querySelector("#career").hidden', 20000).catch(() => {}); await sleep(400);
+      await c.eval(`(() => { __skyputt.store.story().events['${next}'] = { passed: true, best: 9 }; __skyputt.store.saveStory(); __skyputt.career.render(); })()`); await sleep(300);
+      continue;
+    }
+    await sleep(600);
+    await shot(c, `career${K + 1}-${next}-result`);
+    const card = await c.eval(`document.querySelector('#career .card')?.innerText.replace(/\\n+/g, ' | ')`);
+    console.log(`   ${next} (${((Date.now() - t0) / 1000) | 0}s) holes: ${log.join(', ')}\n      ${card}`);
+    await c.eval(`document.querySelector('#career [data-a=ok]').click()`); await sleep(300);
+    await tapDialogue(c, `career${K + 1}-${next}-after`);
+    const rank = await c.eval(`(() => { const t = document.querySelector('#career .card-title'); return t && /New rank|Trophy/.test(t.innerText) ? t.innerText : null })()`);
+    if (rank) { await shot(c, `career${K + 1}-rank`); console.log('   ' + rank); await c.eval(`document.querySelector('#career [data-a=ok]').click()`); await sleep(400); }
+    if (only && only.every(id => tries[id])) break;
+  }
+  await shot(c, `career${K + 1}-end`);
+  console.log('   final:', JSON.stringify(await c.eval(`({ rank: document.querySelector('#career .map-sub')?.innerText, coins: __skyputt.store.data.coins, owned: __skyputt.store.data.cosmetics.owned, chapters: __skyputt.store.story().chapters, theme: __skyputt.themeId })`)));
+}
+
 // Events: title tile, list, Spooky page, one full event round by drags, claims, then the Frost
 // Fair (upcoming, then live via ?eventdate) and the ended Spooky page with its rank claim.
 async function eventsMode(c) {
@@ -454,6 +599,9 @@ try {
   else if (MODE === 'muni') await muni(c);
   else if (MODE === 'events') await eventsMode(c);
   else if (MODE === 'meta') await metaMode(c);
+  else if (MODE === 'overview') await overview(c);
+  else if (MODE === 'nines') await ninesMode(c);
+  else if (MODE === 'career') await careerMode(c);
 } catch (e) { errors.push('driver: ' + e.message); }
 if (errors.length) { console.log('ERRORS:\n  ' + [...new Set(errors)].join('\n  ')); process.exit(1); }
 console.log('no console errors');

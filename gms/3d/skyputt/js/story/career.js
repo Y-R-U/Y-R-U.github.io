@@ -9,6 +9,12 @@ import { playField } from './opponents.js';
 import { COURSES } from '../course/holes/index.js';
 import { ICONS } from '../game/hud.js';
 import { helperName, HELPER_BY_ID } from '../meta/helpers.js';
+import { BALL_BY_ID, TRAIL_BY_ID } from '../meta/economy.js';
+
+const COSMETICS = { ball: BALL_BY_ID, trail: TRAIL_BY_ID };
+// the chapter an event belongs to, and the tour after it (for the 'unlocked' line on a rival win)
+const ch0Of = ev => CHAPTERS.findIndex(c => c.data?.events.includes(ev));
+const nextTourName = k => (k >= 0 && CHAPTERS[k + 1]?.data ? CHAPTERS[k + 1].data.title : null);
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -16,22 +22,55 @@ const KIND = { lesson: 'Lesson', round: 'Round', rival: 'Rival', tournament: 'To
 const KIND_ICON = { lesson: '✎', round: '⛳', rival: '⚔', tournament: '🏆' };
 
 // ---- progress helpers (pure, testable) ----
+// Rank = the best rank any finished chapter grants (chapters without `rankOnFinish`, like the World
+// Tour, give a trophy instead). Derived from the save, so old profiles keep working.
 export function rankOf(story) {
-  let n = 0;
-  for (const ch of CHAPTERS) if (ch.data && story.chapters?.[ch.id]?.done) n++;
-  return RANKS[Math.min(n, RANKS.length - 1)];
+  let r = 0;
+  for (const ch of CHAPTERS) if (ch.data && story.chapters?.[ch.id]?.done) r = Math.max(r, RANKS.indexOf(ch.data.rankOnFinish));
+  return RANKS[Math.max(0, r)];
 }
 export function eventOpen(story, chapter, i) { return i === 0 || !!story.events[chapter.events[i - 1].id]?.passed; }
-export function chapterOpen(story, k) { return k === 0 || !!story.chapters?.[CHAPTERS[k - 1].id]?.done; }
+// story2: the next tour opens once the previous tour's rival is beaten (or the tour is done).
+export const rivalOf = data => data?.events.find(e => e.kind === 'rival') || null;
+export function chapterOpen(story, k) {
+  if (k === 0) return true;
+  const prev = CHAPTERS[k - 1];
+  if (!prev.data || !CHAPTERS[k].data) return false;
+  return !!story.chapters?.[prev.id]?.done || !!story.events[rivalOf(prev.data)?.id]?.passed;
+}
+// The chapter to point the player at: the last open one that isn't finished (else the last open one).
+export function currentChapter(story) {
+  let cur = 0;
+  CHAPTERS.forEach((ch, k) => { if (ch.data && chapterOpen(story, k)) cur = k; });
+  for (let k = 0; k <= cur; k++) if (CHAPTERS[k].data && !story.chapters?.[CHAPTERS[k].id]?.done && chapterOpen(story, k)) return k;
+  return cur;
+}
+// A rival's cosmetic reward ('ball:lime' | 'trail:ember'); if it is already owned, half its price in coins.
+export function grantCosmetic(store, key, catalog) {
+  const d = store.data;
+  if (!key || !d.cosmetics) return null;
+  const [type, id] = key.split(':');
+  const item = catalog?.[type]?.[id];
+  if (d.cosmetics.owned.includes(key)) { const c = Math.round((item?.price || 200) / 2); store.addCoins(c); return { key, coins: c, name: item?.name || id }; }
+  d.cosmetics.owned.push(key); store.save();
+  return { key, coins: 0, name: item?.name || id };
+}
 
-// Goal check → { passed, detail }
+// How to use each helper, for a failed lesson's message (aceUse explains the hole-in-one pass).
+const HOW_TO_USE = {
+  mulligan: 'hit a shot, then tap Mulligan to take it back',
+  longSight: 'tap Long Sight at the top of the helper column before you aim',
+};
+// Goal check → { passed, detail, place, aceUse }
 export function checkGoal(ev, res, field) {
   const g = ev.goal || {};
   const fails = [];
   if (g.maxStrokes !== undefined && res.total > g.maxStrokes) fails.push(`took ${res.total} (needed ${g.maxStrokes} or fewer)`);
   if (g.starsAtLeast !== undefined && res.stars < g.starsAtLeast) fails.push(`${res.stars} stars (needed ${g.starsAtLeast})`);
   // an ace leaves no room to use a helper, so it counts (a lesson must never punish a hole in one)
-  if (g.use && !(res.used?.[g.use] > 0) && !(res.rows?.length === 1 && res.total === 1)) fails.push(`didn't use ${g.use === 'longSight' ? 'Long Sight' : 'a Mulligan'}`);
+  const usedIt = res.used?.[g.use] > 0, ace = res.rows?.length === 1 && res.total === 1;
+  if (g.use && !usedIt && !ace) fails.push(`didn't use ${helperName(g.use)} (${HOW_TO_USE[g.use] || `tap ${helperName(g.use)} in the helper column before a shot`})`);
+  const aceUse = !!g.use && !usedIt && ace;   // passed by a hole in one: say so on the result card
   let place = null;
   if (field) {
     const board = leaderboard(res, field);
@@ -39,7 +78,7 @@ export function checkGoal(ev, res, field) {
     if (g.beat && !(res.total < field[0].total)) fails.push(res.total === field[0].total ? 'tied' : `lost ${res.total}–${field[0].total}`);
     if (g.place && place > g.place) fails.push(`finished ${ordinal(place)} (needed top ${g.place})`);
   }
-  return { passed: fails.length === 0, detail: fails.join(', '), place };
+  return { passed: fails.length === 0, detail: fails.join(', '), place, aceUse };
 }
 // You win ties on the board (home advantage) except for `beat`, which needs strictly fewer.
 export function leaderboard(res, field) {
@@ -53,6 +92,7 @@ export function ordinal(n) { const t = n % 100; if (t >= 11 && t <= 13) return n
 export function createCareer(ctx) {
   const { store } = ctx;
   const story = () => store.story();
+  const expanded = {};   // tour index → unfolded (session only)
 
   async function ensureProfile() {
     if (story().name) return true;
@@ -94,13 +134,17 @@ export function createCareer(ctx) {
   function render() {
     const st = story();
     const el = $('#career');
+    const cur = currentChapter(st);
     const chapters = CHAPTERS.map((ch, k) => {
       const open = !!ch.data && chapterOpen(st, k), done = !!st.chapters?.[ch.id]?.done;
+      const shown = open && (expanded[k] ?? k === cur);   // story2: only the current tour is unfolded
+      const prevRival = k > 0 ? rivalOf(CHAPTERS[k - 1].data) : null;
+      const lockNote = !ch.data ? 'Coming soon' : `Beat ${esc(GOLFERS[prevRival?.rival]?.name || 'the last rival')} to unlock`;
       return `<div class="tour ${open ? 'open' : 'locked'} ${done ? 'done' : ''}">
         <div class="tour-node">${done ? '✓' : k + 1}</div>
-        <div class="tour-body"><div class="tour-name">${esc(ch.name)}</div>
-          <div class="tour-sub">${ch.data ? esc(ch.data.blurb) : 'Coming soon'}</div>
-          ${open ? `<div class="evs">${ch.data.events.map((ev, i) => eventRow(st, ch.data, ev, i)).join('')}</div>` : ''}
+        <div class="tour-body"><div class="tour-name">${esc(ch.name)}${open && k !== cur ? `<button class="tour-fold" data-tour="${k}" aria-expanded="${shown}">${shown ? 'Hide' : 'Show'}</button>` : ''}</div>
+          <div class="tour-sub">${ch.data ? esc(ch.data.blurb) : ''}${open ? '' : `<span class="tour-lock"> · ${lockNote}</span>`}</div>
+          ${shown ? `<div class="evs">${ch.data.events.map((ev, i) => eventRow(st, ch.data, ev, i)).join('')}</div>` : ''}
         </div></div>`;
     }).join('');
     el.innerHTML = `<div class="career-card wide">
@@ -116,11 +160,16 @@ export function createCareer(ctx) {
       const b = e.target.closest('button'); if (!b || b.disabled) return;
       ctx.click?.();
       if (b.dataset.a === 'back') { el.hidden = true; ctx.onBack(); return; }
+      if (b.dataset.tour) { const k = +b.dataset.tour; expanded[k] = !(expanded[k] ?? k === currentChapter(st)); render(); return; }
       if (b.dataset.a === 'mags') { el.hidden = true; await playDialogue(magsTip(st), { name: st.name }); render(); return; }
       if (b.dataset.ev) {
         const ch = CHAPTERS.find(c => c.id === b.dataset.ch).data;
         const ev = ch.events.find(x => x.id === b.dataset.ev);
         el.hidden = true;
+        if (!st.seen[ch.id + ':intro']) {   // a new tour's opening scene, once
+          await playDialogue(ch.intro, { name: st.name });
+          st.seen[ch.id + ':intro'] = true; store.saveStory();
+        }
         await runEvent(ch, ev);
       }
     };
@@ -156,23 +205,29 @@ export function createCareer(ctx) {
       $('#career').hidden = true;
     }
     const ghosts = ev.kind === 'rival' ? field.filter(f => f.shots?.some(x => x?.length)) : null;
-    const res = await ctx.startEvent(ev, { id: ev.id, name: ev.name, holes }, { opponents: field, tips: ev.tips, ghosts });
+    const res = await ctx.startEvent(ev, { id: ev.id, name: ev.name, holes }, { opponents: field, tips: ev.tips, ghosts, theme: ev.theme || ch.theme || null });
     if (!res) { render(); return; }   // quit
     const check = checkGoal(ev, res, field);
     const rec = st.events[ev.id] || {};
     const first = check.passed && !rec.passed;
     st.events[ev.id] = { passed: rec.passed || check.passed, best: Math.min(rec.best ?? Infinity, res.total), tries: (rec.tries || 0) + 1 };
+    let cosmetic = null;
     if (first && ev.reward) {
       if (ev.reward.coins) store.addCoins(ev.reward.coins);
       for (const [k, n] of Object.entries(ev.reward.helpers || {})) store.giveHelper(k, n);
+      if (ev.reward.cosmetic) cosmetic = grantCosmetic(store, ev.reward.cosmetic, COSMETICS);
     }
     let chapterDone = false;
     if (check.passed && ch.events.every(e => st.events[e.id]?.passed) && !st.chapters[ch.id]?.done) {
       st.chapters[ch.id] = { done: true }; chapterDone = true;
     }
     store.saveStory();
-    await resultCard(ev, res, check, field, first);
-    await playDialogue(check.passed ? ev.after : (ev.lose || [['mags', 'Not this time. Have another go when you’re ready.']]), { name });
+    await resultCard(ev, res, check, field, first, cosmetic);
+    const afterLines = check.aceUse ? [['mags', `A hole in one! No ${helperName(ev.goal.use)} needed — that counts. You'll find a use for it later.`], ...(ev.after || [])] : ev.after;
+    const loseLines = ev.lose || (ev.goal?.use && !res.used?.[ev.goal.use]
+      ? [['mags', `Close! This lesson is about the ${helperName(ev.goal.use)}: ${HOW_TO_USE[ev.goal.use] || `tap ${helperName(ev.goal.use)} in the helper column before a shot`}.`]]
+      : [['mags', 'Not this time. Have another go when you’re ready.']]);
+    await playDialogue(check.passed ? afterLines : loseLines, { name });
     if (chapterDone) { await playDialogue(ch.outro, { name }); await rankCard(ch); }
     render();
   }
@@ -184,7 +239,7 @@ export function createCareer(ctx) {
     el.hidden = false;
   }
 
-  function resultCard(ev, res, check, field, first) {
+  function resultCard(ev, res, check, field, first, cosmetic) {
     return new Promise(resolve => {
       const el = $('#career');
       const board = field ? leaderboard(res, field) : null;
@@ -192,9 +247,11 @@ export function createCareer(ctx) {
         <div class="card-kicker">${esc(ev.name.startsWith(KIND[ev.kind]) ? ev.name : KIND[ev.kind] + ' · ' + ev.name)}</div>
         <div class="card-title ${check.passed ? 'under' : 'over'}">${check.passed ? (ev.kind === 'tournament' ? `${ordinal(check.place)} place!` : ev.kind === 'rival' ? 'You win!' : 'Goal complete!') : 'Not quite'}</div>
         <div class="card-note">${esc(ev.goalText)}${check.passed ? '' : ` — ${esc(check.detail)}`}</div>
+        ${check.aceUse ? `<div class="card-note good">A hole in one! No ${esc(helperName(ev.goal.use))} needed — that counts.</div>` : ''}
         <div class="card-stats"><div><span>Strokes</span><b>${res.total}</b></div><div><span>Par</span><b>${res.par}</b></div><div><span>Stars</span><b>${res.stars}</b></div></div>
         ${board ? `<table class="scores board">${board.map((r, i) => `<tr class="${r.you ? 'you' : ''}"><td>${i + 1}</td><td>${r.colour ? `<i class="dot" style="background:${r.colour}"></i>` : ''}${esc(r.name)}</td><td>${r.total}</td></tr>`).join('')}</table>` : ''}
-        ${first && ev.reward ? `<div class="card-note good">Reward: ${rewardText(ev.reward, true)}</div>` : ''}
+        ${first && ev.reward ? `<div class="card-note good">Reward: ${rewardText(ev.reward, true)}${cosmetic ? ` · ${cosmetic.coins ? `${esc(cosmetic.name)} (owned: +${cosmetic.coins} coins)` : `new ${cosmetic.key.startsWith('ball') ? 'ball' : 'trail'}: ${esc(cosmetic.name)}`}` : ''}</div>` : ''}
+        ${check.passed && first && ev.kind === 'rival' && nextTourName(ch0Of(ev)) ? `<div class="card-note good">${esc(nextTourName(ch0Of(ev)))} unlocked!</div>` : ''}
         <button class="btn primary" data-a="ok">${check.passed ? 'Continue' : 'Back to career'}</button></div>`;
       el.hidden = false;
       el.onclick = e => { if (e.target.closest('[data-a=ok]')) { ctx.click?.(); el.hidden = true; resolve(); } };
@@ -205,7 +262,8 @@ export function createCareer(ctx) {
     return new Promise(resolve => {
       const el = $('#career');
       el.innerHTML = `<div class="card career-card"><div class="card-kicker">${esc(ch.title)} complete</div>
-        <div class="card-title under">New rank: ${esc(ch.rankOnFinish || rankOf(story()))}</div>
+        <div class="card-title under">${ch.rankOnFinish ? `New rank: ${esc(ch.rankOnFinish)}` : `Trophy: ${esc(ch.trophy || ch.name)}`}</div>
+        ${ch.trophy && ch.rankOnFinish ? `<div class="card-note">Trophy: ${esc(ch.trophy)}</div>` : ''}
         <div class="dlg-face center">${portraitSVG(CHARACTERS.you.portrait, { size: 110 })}</div>
         <button class="btn primary" data-a="ok">Onward</button></div>`;
       el.hidden = false;
@@ -214,10 +272,16 @@ export function createCareer(ctx) {
   }
 
   function magsTip(st) {
-    const ch = CHAPTERS[0].data;
+    const ch = CHAPTERS[currentChapter(st)].data;
     const next = ch.events.find(e => !st.events[e.id]?.passed);
-    if (!next) return [['mags', 'You’ve outgrown the Muni, {name}. The Club Tour is coming.']];
-    return [['mags', `Next up: ${next.name}. ${next.goalText}.`], ['mags', ch.events.indexOf(next) < 3 ? 'Take your time. Lessons are free.' : 'Remember: Long Sight before the tricky ones, Mulligan when it goes wrong.']];
+    if (!next) return ch.done || [['mags', 'Nothing left to teach you, {name}. Go and enjoy it.']];
+    const rival = rivalOf(ch);
+    const hint = next.kind === 'lesson' ? 'Take your time. Lessons are free.'
+      : next.kind === 'rival' ? `${GOLFERS[next.rival]?.name || 'Your rival'} is the one to beat. Win and the next tour opens.`
+      : ch.tip || 'Remember: Long Sight before the tricky ones, Mulligan when it goes wrong.';
+    const lines = [['mags', `Next up: ${next.name}. ${next.goalText}.`], ['mags', hint]];
+    if (rival && st.events[rival.id]?.passed && next.kind === 'tournament') lines.push(['mags', 'You can head on to the next tour any time, but there’s a trophy here with your name on it.']);
+    return lines;
   }
 
   return { open, render };
@@ -228,5 +292,6 @@ function rewardText(r, long = false) {
   const parts = [];
   if (r.coins) parts.push(`${ICONS.coin}${r.coins}`);
   for (const [k, n] of Object.entries(r.helpers || {})) parts.push(long ? `+${n} ${helperName(k)}` : `+${n}${HELPER_BY_ID[k]?.short || ''}`);
+  if (r.cosmetic && !long) parts.push('🎁');
   return parts.join(' ');
 }

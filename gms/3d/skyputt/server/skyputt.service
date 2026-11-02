@@ -1,0 +1,30 @@
+[Unit]
+Description=skyputt — SKYPUTT online mini golf rooms and shot relay (games.br8t.com/gms/3d/skyputt/)
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/srv/apps/skyputt
+ExecStart=/srv/apps/skyputt/skyputt
+Restart=on-failure
+RestartSec=3
+Environment=SKYPUTT_ADDR=127.0.0.1:8023
+Environment=SKYPUTT_DATA=/srv/data/skyputt
+Environment=SKYPUTT_PREFIX=/gms/3d/skyputt
+Environment=GOMEMLIMIT=40MiB
+MemoryMax=96M
+# Optional overrides (origins, limits) live only on the box; "-" = optional. NEVER set SKYPUTT_DEV_AUTH here.
+EnvironmentFile=-/srv/data/skyputt/skyputt.env
+UMask=0077
+TimeoutStopSec=8
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/srv/data/skyputt
+
+[Install]
+WantedBy=multi-user.target

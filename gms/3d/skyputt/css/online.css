@@ -1,0 +1,133 @@
+/* SKYPUTT online (M6, js/net/): title tile, online screens, in-game strip / clock / boards. */
+
+/* title tile */
+.btn.t-online { display: flex; flex-direction: column; align-items: center; line-height: 1.15; padding: 10px 16px;
+  background: linear-gradient(90deg, rgba(79,195,255,.22), rgba(255,255,255,.06)); }
+.btn.t-online small, .btn.big small { display: block; font-size: 12.5px; font-weight: 500; opacity: .8; margin-top: 2px; letter-spacing: 0; }
+
+/* screens */
+#online { position: fixed; z-index: 30; overflow-y: auto; align-items: start; padding: calc(14px + var(--safe-t)) 12px calc(14px + var(--safe-b)); }
+.net-card-main { width: min(420px, 100%); text-align: left; }
+.net-card-main .card-note, .net-card-main .card-title { text-align: center; }
+.net-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.net-head > div { flex: 1; min-width: 0; }
+.net-dot { width: 12px; height: 12px; border-radius: 50%; background: #888; box-shadow: 0 0 0 3px rgba(255,255,255,.08); flex: none; }
+.net-dot.open { background: var(--good); }
+.net-dot.connecting, .net-dot.reconnecting { background: var(--gold); animation: blink 1s infinite; }
+.net-dot.closed { background: var(--bad); }
+@keyframes blink { 50% { opacity: .35; } }
+.net-spin { width: 34px; height: 34px; margin: 18px auto; border: 4px solid rgba(255,255,255,.25); border-top-color: #fff; border-radius: 50%; animation: spin .9s linear infinite; }
+.card-note.bad { color: var(--bad); opacity: 1; font-weight: 600; }
+.net-warn { font-size: 12.5px; margin-top: 12px; }
+.net-card-main .row, .net-form .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,.1); }
+.net-form .row.col { flex-direction: column; align-items: stretch; gap: 7px; }
+.net-form .row > span, .net-name > span { font-size: 15px; font-weight: 600; }
+.net-card-main input[type=text], .net-card-main select { font: inherit; color: #fff; background: rgba(255,255,255,.08); border: 2px solid var(--panel-b);
+  border-radius: 12px; padding: 8px 11px; min-width: 0; }
+.net-card-main select option { color: #000; }
+.net-name input { width: 58%; }
+.net-form input[type=text] { width: 58%; }
+.net-form select { width: 100%; }
+.net-form .row:not(.col) select { width: 58%; }
+.net-form .seg { flex-wrap: wrap; }
+.net-form .seg button { flex: 1 1 auto; padding: 7px 8px; font-size: 14px; color: inherit; }
+.net-form .seg button.on { color: var(--ink); }
+.net-form .seg.wrap button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.net-form .seg .sw { width: 16px; height: 16px; border-radius: 5px; display: inline-block; flex: none; }
+.net-form .sub { display: flex; align-items: center; gap: 10px; }
+.net-form .sub small, .net-form small.dim { opacity: .75; font-size: 13px; flex: 1; }
+.stepper { display: inline-flex; align-items: center; border: 2px solid var(--panel-b); border-radius: 12px; overflow: hidden; }
+.stepper button { width: 38px; height: 34px; border: 0; background: rgba(255,255,255,.08); font-size: 20px; font-weight: 700; padding: 0; }
+.stepper b { min-width: 34px; text-align: center; font-size: 17px; }
+.mini { border: 2px solid var(--panel-b); background: rgba(255,255,255,.08); border-radius: 10px; padding: 5px 12px; font-weight: 600; font-size: 14px; }
+.net-join { display: flex; gap: 8px; margin-top: 10px; }
+.net-join input { flex: 1; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; text-align: center; }
+.net-join .btn { width: auto; margin: 0; padding: 8px 18px; }
+.net-sec { margin: 16px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 1.4px; opacity: .75; }
+.net-rooms { display: flex; flex-direction: column; gap: 6px; }
+.net-room { display: flex; align-items: center; gap: 10px; text-align: left; padding: 9px 11px; border-radius: 14px;
+  border: 2px solid var(--panel-b); background: rgba(255,255,255,.07); }
+.net-room .sw { width: 28px; height: 28px; border-radius: 9px; flex: none; }
+.net-room .rm { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+.net-room .rm small { font-size: 12px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.net-room .pl { font-weight: 700; font-size: 17px; }
+.net-code { text-align: center; padding: 10px; border-radius: 16px; background: rgba(0,0,0,.18); border: 2px dashed var(--panel-b); }
+.net-code small { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1.3px; opacity: .8; }
+.net-code b { display: block; font-size: 40px; letter-spacing: 7px; color: var(--gold); margin: 2px 0 4px; user-select: text; -webkit-user-select: text; }
+.net-share { display: flex; gap: 8px; }
+.net-share .btn { margin: 0; padding: 8px 10px; font-size: 15px; }
+.net-cd { margin-top: 8px; color: var(--gold); opacity: 1; font-weight: 600; }
+.net-players { display: flex; flex-direction: column; gap: 5px; }
+.np { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 12px; background: rgba(255,255,255,.06); }
+.np i { width: 14px; height: 14px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px rgba(255,255,255,.3); }
+.np span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.np.me { background: rgba(242,199,92,.16); }
+.np.ai i { background: repeating-linear-gradient(45deg, #9fb3d9 0 3px, #5a6d94 3px 6px); }
+.np.open { opacity: .6; } .np.open i { background: transparent; box-shadow: inset 0 0 0 2px rgba(255,255,255,.4); }
+.np em, .ns em { font-style: normal; font-size: 11.5px; padding: 1px 7px; border-radius: 99px; background: rgba(255,255,255,.12); white-space: nowrap; }
+.np em.host, .ns em.host { background: var(--gold); color: var(--ink); }
+.np em.away, .ns em.away { background: rgba(255,122,107,.3); }
+.net-sum { margin: 10px 0 0; font-size: 14px; opacity: .85; text-align: center; }
+.net-toast { margin-bottom: 8px; }
+
+/* ---------- in game ---------- */
+#net-ov { position: fixed; inset: 0; z-index: 12; pointer-events: none; }
+#net-ov .card-wrap, #net-ov button { pointer-events: auto; }
+.net-strip { position: absolute; left: calc(10px + var(--safe-l)); top: calc(108px + var(--safe-t)); display: flex; flex-direction: column; gap: 4px; max-width: 46vw; }
+.ns { display: flex; align-items: center; gap: 6px; padding: 3px 9px 3px 6px; border-radius: 99px; background: var(--panel); border: 1.5px solid rgba(255,255,255,.12);
+  font-size: 13px; line-height: 1.2; backdrop-filter: blur(3px); }
+.ns i { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.ns span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ns b { font-size: 14px; min-width: 18px; text-align: right; }
+.ns em { font-size: 10px; padding: 0 5px; }
+.ns.me { border-color: var(--panel-b); }
+.ns.done { opacity: .72; }
+.ns b .roll { display: inline-block; animation: blink .8s infinite; }
+.net-clock { position: absolute; left: 50%; top: calc(64px + var(--safe-t)); transform: translateX(-50%); width: 48px; height: 48px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--panel); border: 2px solid var(--panel-b); }
+.net-clock i { position: absolute; inset: 3px; border-radius: 50%; background: conic-gradient(var(--gold) calc(var(--k) * 360deg), transparent 0);
+  -webkit-mask: radial-gradient(circle, transparent 58%, #000 60%); mask: radial-gradient(circle, transparent 58%, #000 60%); }
+.net-clock b { font-size: 18px; position: relative; }
+.net-clock.low { border-color: var(--bad); animation: blink .5s infinite; }
+.net-clock.low i { background: conic-gradient(var(--bad) calc(var(--k) * 360deg), transparent 0); }
+.net-wait { position: absolute; left: 50%; bottom: calc(24px + var(--safe-b)); transform: translateX(-50%); padding: 9px 18px; border-radius: 18px;
+  background: var(--panel); border: 2px solid var(--panel-b); text-align: center; max-width: calc(100% - 140px); }
+.net-wait b { color: var(--gold); }
+.net-wait small { display: block; font-size: 13px; opacity: .85; }
+.net-conn { position: absolute; left: 50%; top: calc(118px + var(--safe-t)); transform: translateX(-50%); padding: 5px 14px; border-radius: 99px; background: rgba(255,122,107,.85); font-weight: 600; font-size: 14px; }
+.net-card { z-index: 2; }
+.net-board { width: min(400px, 100%); }
+.net-table td.rk { opacity: .7; width: 22px; }
+.net-table td.nm { text-align: left; white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+.net-table td small { opacity: .7; font-size: 12px; }
+.net-table em, .net-podium em { font-style: normal; font-size: 10px; padding: 0 5px; border-radius: 99px; background: rgba(255,255,255,.14); }
+.net-podium { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 5px; text-align: left; }
+.net-podium li { display: flex; align-items: center; gap: 8px; padding: 7px 11px; border-radius: 12px; background: rgba(255,255,255,.06); }
+.net-podium li.you { background: rgba(242,199,92,.16); }
+.net-podium .pl { width: 36px; font-weight: 700; opacity: .8; }
+.net-podium li.p1 .pl { color: var(--gold); opacity: 1; } .net-podium li.p2 .pl { color: #dfe6f0; opacity: 1; } .net-podium li.p3 .pl { color: #e0a35a; opacity: 1; }
+.net-podium .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.net-podium b { font-size: 19px; } .net-podium small { opacity: .7; width: 30px; text-align: right; }
+.net-scroll { overflow-x: auto; margin: 0 -6px; }
+.net-holes { font-size: 13px; }
+.net-holes td:first-child { text-align: left; white-space: nowrap; }
+.net-holes td.nm { max-width: 104px; overflow: hidden; text-overflow: ellipsis; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+.btn[disabled] { opacity: .55; }
+
+body.lefty .net-strip { left: auto; right: calc(10px + var(--safe-r)); }
+@media (orientation: landscape) {
+  .net-strip { top: calc(118px + var(--safe-t)); left: calc(16px + var(--safe-l)); max-width: 30vw; }
+  .net-clock { top: calc(14px + var(--safe-t)); }
+  .net-wait { bottom: calc(20px + var(--safe-b)); }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  /* phone sideways: the title card is taller than the screen → compact tile + scroll, never clip the top */
+  #title { overflow-y: auto; align-items: safe center; }
+  .btn.t-online { padding: 8px 14px; }
+  .btn.t-online small { display: none; }
+  .net-strip { top: calc(96px + var(--safe-t)); gap: 2px; }
+  .ns { font-size: 12px; padding: 1px 8px 1px 5px; }
+  .net-code b { font-size: 30px; }
+}

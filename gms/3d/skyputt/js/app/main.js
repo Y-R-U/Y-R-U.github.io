@@ -19,6 +19,7 @@ import { featured, timeText, status, nowFrom } from '../events/events.js';
 import { createMeta } from '../meta/meta.js';
 import { createMetaScreens, tierBadge } from '../meta/screens.js';
 import { TIERS, weekCountdown } from '../meta/ladder.js';
+import { createOnline } from '../net/index.js';
 
 const $ = s => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -106,6 +107,7 @@ async function boot() {
     renderTitle(store, course, app.themeId, setTheme);
     renderEventTile();
     renderMetaTiles();
+    renderOnlineTile?.();
     $('#title').hidden = false;
   }
   function ensureTitleScene() {
@@ -142,14 +144,14 @@ async function boot() {
   function showCourseMap() {
     $('#title').hidden = true;
     showMap(store, course, {
-      onHole: i => startRound(i, 'single'), onFront: () => startRound(0, 'round'), onBack: showTitle,
+      onHole: i => startRound(i, 'single'), onFront: () => startRound(0, 'round', 9), onNine: nine => startRound(nine.from, 'round', nine.to), onBack: showTitle,
       click: () => sfx.emit('click'),
     });
   }
-  function startRound(i, mode = 'round') {
+  function startRound(i, mode = 'round', end = null) {
     $('#title').hidden = true; $('#map').hidden = true;
     titleView?.dispose(); titleView = null;
-    round = new Round(app, course, i, { mode, onExit: () => { if (mode === 'single') { showTitle(); showCourseMap(); } else showTitle(); } });
+    round = new Round(app, course, i, { mode, end, onExit: () => { if (mode === 'single') { showTitle(); showCourseMap(); } else showTitle(); } });
     if (params.has('noflyover')) round.endFlyover();
     window.__skyputt.round = round;
   }
@@ -158,13 +160,16 @@ async function boot() {
     store, click: () => sfx.emit('click'), back: () => sfx.emit('back'),
     onBack: () => showTitle(),
     // play an event's holes as a round; resolves with the result, or null if the player quits
-    startEvent: (ev, evCourse, { opponents, tips, ghosts }) => new Promise(resolve => {
+    // story2: a chapter / event may name a theme (the tour travels); the player's own is restored after
+    startEvent: (ev, evCourse, { opponents, tips, ghosts, theme }) => new Promise(async resolve => {
       $('#title').hidden = true;
+      if (theme) await useTheme(theme);
       titleView?.dispose(); titleView = null;
+      const done = async res => { round = null; if (theme) await useTheme(playerTheme()); ensureTitleScene(); resolve(res); };
       round = new Round(app, evCourse, 0, {
         mode: 'round', opponents, tips, ghosts, label: ev.name,
-        onComplete: res => { round = null; ensureTitleScene(); resolve(res); },
-        onExit: () => { round = null; ensureTitleScene(); resolve(null); },
+        onComplete: res => done(res),
+        onExit: () => done(null),
       });
       if (params.has('noflyover')) round.endFlyover();
       window.__skyputt.round = round;
@@ -205,15 +210,30 @@ async function boot() {
   $('#t-ladder').onclick = () => { sfx.emit('click'); $('#title').hidden = true; metaScreens.ladder(); };
   $('#t-shop').onclick = () => { sfx.emit('click'); $('#title').hidden = true; metaScreens.shop(store.data.chests.queue.length ? 'chests' : 'balls'); };
 
-  $('#t-play').onclick = () => { sfx.emit('click'); startRound(0, 'round'); };
+  // ---- online rooms (M6, js/net/): the online module builds its own OnlineRound
+  const online = createOnline({
+    app, store, click: () => sfx.emit('click'), onBack: () => showTitle(),
+    hooks: {
+      enter: async themeId => { $('#title').hidden = true; await useTheme(themeId || playerTheme()); titleView?.dispose(); titleView = null; },
+      leave: async () => { round = null; await useTheme(playerTheme()); ensureTitleScene(); },
+      setRound: r => { round = r; window.__skyputt.round = r; if (r && params.has('noflyover')) r.endFlyover(); },
+    },
+  });
+  $('#t-online').onclick = () => { sfx.emit('click'); $('#title').hidden = true; online.open(); };
+  function renderOnlineTile() {
+    const h = online.hint();
+    $('#t-online').innerHTML = `Online<small>${h ? `Rejoin room ${h.code}` : 'Friends, public rooms, ghost AIs'}</small>`;
+  }
+  $('#t-play').onclick = () => { sfx.emit('click'); startRound(0, 'round', course.nines?.[0]?.to); };
   $('#t-map').onclick = () => { sfx.emit('click'); showCourseMap(); };
   $('#t-settings').innerHTML = ICONS.gear;
   $('#t-settings').onclick = () => { sfx.emit('click'); app.openSettings(() => {}); };
 
-  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, events, meta, metaScreens, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
+  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, events, meta, metaScreens, online, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
 
   const startHole = parseInt(params.get('hole'), 10);
   if (startHole >= 1 && startHole <= course.holes.length) startRound(startHole - 1, 'single'); else showTitle();
+  if (params.get('room')) { $('#title').hidden = true; online.open({ join: params.get('room') }); }   // invite link
 
   // ---- frame loop
   let last = performance.now(), t = 0, fpsN = 0, fpsT = 0;
