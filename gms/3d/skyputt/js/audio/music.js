@@ -1,5 +1,6 @@
 // SKYPUTT audio — generative ambient music. One player per theme: `sky` (launch), `spooky`
-// (Spooky Hollow), `frost` (Frost Fair) and `candy` (Candy Land, a 3/4 waltz). Themes differ in harmony, pad type, plucked/struck
+// (Spooky Hollow), `frost` (Frost Fair), `candy` (Candy Land, a 3/4 waltz) and `volcano` (Volcano Forge,
+// slow drums and anvils). Themes differ in harmony, pad type, plucked/struck
 // voices and occasional "extras" (theremin, owl, sleigh bells, fire crackle).
 // Nothing loops verbatim: chords walk a Markov graph, the key drifts between three centres,
 // arpeggio phrases (up / down / wander / sparse / bells / rest) are picked by a slowly
@@ -114,7 +115,36 @@ const CANDY = {
   waltz: { tuba: 0.13, pah: 0.15, sparkle: 0.07 },
   extras: [['whistle', 0.16], ['tinkle', 0.22], ['bubble', 0.2]],
 };
-export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST, candy: CANDY };
+// "Forge of the Deep" (Volcano Forge): slow and heavy in D minor with a Phrygian bII. Low brass drones
+// (detuned saws under a dark lowpass), a taiko-style drum on beat 1 with a lighter push before beat 4,
+// anvil clangs on 2 and 4 (sometimes a smith's double tap), a low dulcimer and an inharmonic forge bell
+// on top. Extras: a swelling brass horn, bellows breaths and a distant volcanic rumble. CPU: one sine +
+// one short noise burst per drum, two FM oscillators per anvil hit.
+const VOLCANO = {
+  id: 'volcano', bpm: 64, meter: 4, chordBars: [2, 2, 4],
+  keys: [0, 0, 0, -2, 3],                          // D minor home, C minor and F minor excursions
+  start: 'i',
+  chords: {
+    i:    { pad: [38, 45, 50, 53], root: 38, arp: [62, 65, 69, 70, 74, 77], next: ['bVI', 'iv', 'bII', 'bVII', 'v'] },
+    bVI:  { pad: [46, 50, 53, 58], root: 46, arp: [62, 65, 70, 74, 77], next: ['bVII', 'iv', 'i'] },
+    bVII: { pad: [48, 52, 55, 60], root: 48, arp: [64, 67, 72, 76, 79], next: ['i', 'bVI'] },
+    iv:   { pad: [43, 50, 55, 58], root: 43, arp: [62, 67, 70, 74, 79], next: ['v', 'i', 'bII'] },
+    v:    { pad: [45, 52, 57, 60], root: 45, arp: [64, 69, 72, 76], next: ['i', 'bVI'] },
+    bII:  { pad: [39, 46, 51, 55], root: 39, arp: [63, 67, 70, 75], next: ['i', 'v'] },
+  },
+  level: { pad: 0.028, root: 0.032, air: 0.009 },
+  pad: { type: 'brass', cut: 720, lfo: 260, att: 2.2, rel: 3.5 },
+  air: { f: 280, q: 0.6, lfo: 120 },
+  delaySend: 0.18,
+  voices: {
+    dulcimer: { kind: 'ks', gain: 0.085, oct: -12 },
+    bell: { kind: 'fm', ratio: 2.71, index: 1.3, dur: 3.2, oct: 0, gain: 0.028 },
+  },
+  mains: ['dulcimer', 'dulcimer', 'bell'], bellVoice: 'bell', leadStep: 2,
+  forge: { drum: 0.16, anvil: 0.03 },
+  extras: [['horn', 0.3], ['bellows', 0.18], ['rumble', 0.2]],
+};
+export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST, candy: CANDY, volcano: VOLCANO };
 
 // Karplus-Strong pluck, rendered once per base note (multiples of 3 semitones) and repitched.
 // short = pizzicato: darker excitation, fast decay.
@@ -265,7 +295,7 @@ class Player {
     const lift = Math.random() < 0.3 ? (Math.random() * ch.pad.length) | 0 : -1;
     ch.pad.forEach((m, i) => {
       const f = mtof(m + key + (i === lift ? 12 : 0));
-      const spread = PT.type === 'organ' ? 4 : PT.type === 'strings' ? 11 : 8;
+      const spread = PT.type === 'organ' ? 4 : PT.type === 'strings' ? 11 : PT.type === 'brass' ? 6 : 8;
       for (const dt of [-spread, spread]) {
         const o = ctx.createOscillator(); o.frequency.value = f; o.detune.value = dt + rnd(-3, 3);
         if (this.organ) o.setPeriodicWave(this.organ); else o.type = 'sawtooth';
@@ -300,6 +330,7 @@ class Player {
     const th = this.th, pool = th.chords[c.name].arp;
     if (th.crackle && Math.random() < th.crackle) this.crackle(t0 + rnd(0, this.step));
     if (th.waltz) this.waltzStep(t0 + rnd(-0.004, 0.006), n, c);
+    if (th.forge) this.forgeStep(t0 + rnd(-0.004, 0.006), n);
     const t = t0 + (n % 2 ? this.step * 0.08 : 0) + rnd(-0.008, 0.012);
     let play = false, inst = ph.inst, oct = 0;
     switch (ph.type) {
@@ -362,6 +393,86 @@ class Player {
       this.pluck(t, ch.pad[lo] + k, v, true);
       this.pluck(t + 0.006, ch.pad[lo + 1] + k, v * 0.8, true);
     } else if (Math.random() < W.sparkle) this.note(t, pick(ch.arp) + k, 'glock', rnd(0.5, 0.9));
+  }
+
+  // forge groove (4/4, eighth-note steps, n % 8 === 0 is beat 1): a heavy drum on 1, a lighter push on
+  // the "and" of 3 and sometimes on 4 of every other bar, anvil clangs on 2 and 4 (now and then a double tap)
+  forgeStep(t, n) {
+    const F = this.th.forge, pos = n % 8, bar = Math.floor(n / 8);
+    if (pos === 0) this.drum(t, F.drum * rnd(0.9, 1), 1);
+    else if (pos === 5 && Math.random() < 0.6) this.drum(t, F.drum * 0.5, 0.82);
+    else if (pos === 6 && bar % 2 === 1 && Math.random() < 0.5) this.drum(t, F.drum * 0.42, 0.9);
+    if ((pos === 2 || pos === 6) && Math.random() < 0.6) {
+      this.anvil(t, F.anvil * rnd(0.7, 1));
+      if (pos === 6 && Math.random() < 0.3) this.anvil(t + this.step * 0.5, F.anvil * 0.55);
+    }
+  }
+
+  // taiko-style drum: a sine dropping in pitch plus a short low noise thump
+  drum(t, gain, k = 1) {
+    const ctx = this.ctx, dest = this.bus('near');
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.setValueAtTime(105 * k, t); o.frequency.exponentialRampToValueAtTime(44 * k, t + 0.22);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
+    o.connect(g); g.connect(dest); o.start(t); o.stop(t + 0.9); this.keep(o);
+    const nz = ctx.createBufferSource(), f = ctx.createBiquadFilter(), ng = ctx.createGain();
+    nz.buffer = noiseBuffer(ctx, 'white'); f.type = 'lowpass'; f.frequency.value = 320;
+    ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(gain * 0.6, t + 0.004);
+    ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+    nz.connect(f); f.connect(ng); ng.connect(dest); nz.start(t, Math.random()); nz.stop(t + 0.16); this.keep(nz);
+  }
+
+  // anvil clang: a bright inharmonic FM ping with a fast-falling index and a short upper partial
+  anvil(t, gain) {
+    const ctx = this.ctx, dest = this.panned(this.bus('near'), rnd(-0.45, 0.45));
+    const f = mtof(pick([86, 88, 89, 91]));
+    const c = ctx.createOscillator(), md = ctx.createOscillator(), mg = ctx.createGain(), g = ctx.createGain();
+    c.frequency.value = f; md.frequency.value = f * 2.756;
+    mg.gain.setValueAtTime(f * 2.6, t); mg.gain.exponentialRampToValueAtTime(f * 0.15, t + 0.09);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.002);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
+    md.connect(mg); mg.connect(c.frequency); c.connect(g); g.connect(dest);
+    const p = ctx.createOscillator(), pg = ctx.createGain();
+    p.frequency.value = f * 2.41;
+    pg.gain.setValueAtTime(0, t); pg.gain.linearRampToValueAtTime(gain * 0.45, t + 0.002);
+    pg.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+    p.connect(pg); pg.connect(dest);
+    for (const o of [c, md]) { o.start(t); o.stop(t + 1.15); this.keep(o); }
+    p.start(t); p.stop(t + 0.4); this.keep(p);
+  }
+
+  // a low brass horn swelling on the root and fifth, far away
+  horn(t, ch, key) {
+    const ctx = this.ctx, dest = this.panned(this.bus('far'), rnd(-0.3, 0.3)), d = rnd(3.5, 5);
+    const f = ctx.createBiquadFilter(), g = ctx.createGain();
+    f.type = 'lowpass'; f.Q.value = 1.2;
+    f.frequency.setValueAtTime(260, t); f.frequency.linearRampToValueAtTime(1100, t + d * 0.45); f.frequency.linearRampToValueAtTime(300, t + d);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.022, t + d * 0.4); g.gain.linearRampToValueAtTime(0, t + d);
+    f.connect(g); g.connect(dest);
+    for (const m of [ch.root + key, ch.root + key + 7]) {
+      const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = mtof(m); o.detune.value = rnd(-6, 6);
+      o.connect(f); o.start(t); o.stop(t + d + 0.05); this.keep(o);
+    }
+  }
+
+  // bellows: two slow breaths of band-passed noise
+  bellows(t) {
+    const ctx = this.ctx, dest = this.panned(this.bus('far'), pick([-0.5, 0.5]));
+    for (const dt of [0, 2.4]) {
+      const tt = t + dt, n = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+      n.buffer = noiseBuffer(ctx, 'pink'); n.loop = true; f.type = 'bandpass'; f.frequency.value = rnd(300, 420); f.Q.value = 1.2;
+      g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.03, tt + 1.0); g.gain.linearRampToValueAtTime(0, tt + 2.0);
+      n.connect(f); f.connect(g); g.connect(dest); n.start(tt, Math.random()); n.stop(tt + 2.05); this.keep(n);
+    }
+  }
+
+  // a distant volcanic rumble: low-passed noise swelling and fading
+  rumble(t) {
+    const ctx = this.ctx, n = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(), d = rnd(3, 4.5);
+    n.buffer = noiseBuffer(ctx, 'pink'); n.loop = true; f.type = 'lowpass'; f.frequency.value = 95; f.Q.value = 0.8;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.09, t + d * 0.35); g.gain.linearRampToValueAtTime(0, t + d);
+    n.connect(f); f.connect(g); g.connect(this.bus('far')); n.start(t, Math.random()); n.stop(t + d + 0.05); this.keep(n);
   }
 
   // a soft tuba-ish "oom": one triangle through a closing lowpass

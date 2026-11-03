@@ -101,6 +101,9 @@ function rand(seed) {   // same generator as events.js rng (kept local so this f
   return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 export const allHoles = () => Object.values(COURSES).flatMap(c => c.holes.map(h => ({ h, course: c.id })));
+// the theme offset per round only matters when the theme count shares a factor with the kind count
+// (4 themes × 4 kinds); with 5 themes plain rotation already meets every kind/theme pair.
+const gcd = (a, b) => (b ? gcd(b, a % b) : a);
 export const themeIds = () => THEME_LIST.map(t => t.id).filter(id => id !== 'greybox');
 const pickups = holes => holes.reduce((a, h) => a + (h.features || []).filter(f => f.type === 'pickup').length, 0);
 
@@ -136,7 +139,7 @@ export function weekend(fri) {
   const themes = themeIds(), holes = picks.map(x => x.h), round = Math.floor(sl.ord / WEEKEND_KINDS.length);
   const ev = {
     id: key, kind: 'weekend', weekendKind: K.kind, week, year: +sl.span[0].slice(0, 4),
-    name: K.name, blurb: K.blurb, theme: themes[(sl.ord + round) % themes.length], themeFallback: 'sky',
+    name: K.name, blurb: K.blurb, theme: themes[(sl.ord + (gcd(themes.length, WEEKEND_KINDS.length) > 1 ? round : 0)) % themes.length], themeFallback: 'sky',
     start: sl.span[0], end: sl.span[1], course: picks[0]?.course || 'sky', holes: holes.map(h => h.id),
     currency: K.currency, scoring: K.scoring, goals: K.goals(pickups(holes)), ladder: { ...WEEKEND_LADDER, seed }, rankRewards: K.rankRewards,
   };
