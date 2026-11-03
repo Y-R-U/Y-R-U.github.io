@@ -37,6 +37,15 @@ import wood6 from './wood6.js';
 import wood7 from './wood7.js';
 import wood8 from './wood8.js';
 import wood9 from './wood9.js';
+import sugar1 from './sugar1.js';
+import sugar2 from './sugar2.js';
+import sugar3 from './sugar3.js';
+import sugar4 from './sugar4.js';
+import sugar5 from './sugar5.js';
+import sugar6 from './sugar6.js';
+import sugar7 from './sugar7.js';
+import sugar8 from './sugar8.js';
+import sugar9 from './sugar9.js';
 
 export const COURSES = {
   sky: {
@@ -56,6 +65,13 @@ export const COURSES = {
     id: 'woods', name: 'Hollow Woods', theme: 'spooky',
     holes: [wood1, wood2, wood3, wood4, wood5, wood6, wood7, wood8, wood9],
     lockedBy: { hole: 'sky9', course: 'sky', note: 'Finish the Sky Isles front nine to open Hollow Woods.' },
+  },
+  // courses3: Sugar Summit, a 9-hole climb up a candy mountain, built to look best in Candy Land (any theme skins it, D6).
+  // A map tab after Hollow Woods; locked until Festival Isles is finished (fest9, `lockedBy`).
+  sugar: {
+    id: 'sugar', name: 'Sugar Summit', theme: 'candy',
+    holes: [sugar1, sugar2, sugar3, sugar4, sugar5, sugar6, sugar7, sugar8, sugar9],
+    lockedBy: { hole: 'fest9', course: 'festival', note: 'Finish Festival Isles to open Sugar Summit.' },
   },
 };
 

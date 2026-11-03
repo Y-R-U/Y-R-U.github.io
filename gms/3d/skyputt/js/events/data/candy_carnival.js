@@ -7,7 +7,8 @@ export default {
   // between the Lantern Festival and the Egg Hunt with 2 free days each side, at most 24 days (2027: 02-24 → 03-17)
   dates: { rule: 'between', after: 'lunar-lanterns', before: 'egg-hunt', gap: 3, max: 24, from: '02-24', to: '03-17' },
   blurb: 'The isles turn to sugar: bumper cars, toboggans and lollipops everywhere.',
-  course: 'festival', holes: ['fest2', 'fest5', 'sky16', 'fest8', 'sky11', 'fest3'],
+  // courses3: Sugar Summit's Lollipop Loops replaces sky11 (3 pickups each, so still 18 lollipops)
+  course: 'festival', holes: ['fest2', 'fest5', 'sky16', 'fest8', 'sugar6', 'fest3'],
   currency: { id: 'lollipops', name: 'Lollipops', one: 'Lollipop', icon: '🍭', colour: '#ff4f9a' },
   goals: [
     { id: 'g1', kind: 'rounds', target: 1, text: 'Play an event round', reward: { coins: 30 } },

@@ -82,3 +82,6 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - 2026-11-03: events3 done (yearly recurrence, weekend events, events screen) — uncommitted; main.js shares a line with courses2, so commit both together when courses2 finishes, then start next agent (proposal: daily challenge to fill Mon-Thu gaps).
 - 2026-11-03: 18c5b9af pushed (Hollow Woods + events3). Started `daily` (daily challenge, streaks, local board, optional server leaderboard). games.br8t.com client still at 41803a87 — redeploy awaits Aaron (classifier blocks without explicit OK).
 - 2026-11-03: daily done + pushed (daily challenge, streaks, local board; online daily board proposal in notes/daily.md, server unchanged).
+- 2026-11-03: a9cfee29 pushed (daily). Started `courses3` (Sugar Summit sugar1-9, candy-designed) and `volcano` (Volcano Forge theme + music).
+- 2026-11-03: Aaron: finish current agents (courses3, volcano — resumed after rate limit) then PAUSE; start nothing new until he says continue. Gave him a progress report.
+- 2026-11-03: courses3 + volcano done. Aaron: commit/push and deploy the update when agents finish; then PAUSED. Phone speed seemed OK to him; he'll play more before feedback.
