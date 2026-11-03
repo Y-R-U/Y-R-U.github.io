@@ -4,6 +4,7 @@ import { REGIONS } from './regions.js';
 import { loadIndex } from './data.js';
 import { buildGraph, computeState, nextOpen } from './layout.js';
 import { getProgress, onProgress } from './progress.js';
+import { getRush } from './rush.js';
 import { GLYPHS, DECOR, starRow, crest } from './art.js';
 
 const ROW_H = 86, TOP_PAD = 38, BOT_PAD = 30;
@@ -41,6 +42,7 @@ export function mountMap(el, app, { focus } = {}) {
         </div>
         <div class="pz-stat"><small>Solved</small><b>${solved}<span>/${total}</span></b></div>
         <div class="pz-stat"><small>Stars</small><b class="gold">★ ${stars}</b></div>
+        <a class="pz-rushbar" href="#/puzzles/rush">${icon('clock')}<b>Puzzle Rush</b><span>${rushLine()}</span>${icon('chevron')}</a>
       </div>`;
   }
 
@@ -193,7 +195,7 @@ export function mountMap(el, app, { focus } = {}) {
     if (dead) return;
     G = res;
     el.querySelector('.pz-foot').innerHTML = `
-      <div class="pz-rush card"><span class="badge">Later</span><b>Puzzle Rush</b><span>Race the clock through ever-harder puzzles — three strikes and you're out.</span></div>
+      <a class="pz-rush card" href="#/puzzles/rush"><b>Puzzle Rush</b><span>Race the clock through ever-harder puzzles — three strikes and you're out.</span></a>
       <p class="pz-credit">${esc(res.idx.attribution || '')}</p>`;
     layout();
     const p = getProgress();
@@ -208,4 +210,10 @@ export function mountMap(el, app, { focus } = {}) {
   return {
     leave() { dead = true; ro.disconnect(); off(); clearTimeout(rt); },
   };
+}
+
+function rushLine() {
+  const b = getRush().best;
+  const best = Math.max(b['3'] || 0, b['5'] || 0);
+  return best ? `Best ${best}` : 'Race the clock';
 }

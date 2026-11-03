@@ -10,6 +10,7 @@
 import { h } from '../app/ui.js';
 import { mountMap } from './map.js';
 import { mountPlay, isActive } from './play.js';
+import { mountRush } from './rush.js';
 
 export const ROUTE = 'puzzles';
 
@@ -34,7 +35,11 @@ export function mount(container, ctx = {}) {
   const app = ctx.app || window.__gambit;
   const { play } = parseSub(ctx.params?.rest ?? ctx.rest ?? ctx.sub);
   let out;
-  if (play) {
+  if ((ctx.params?.rest ?? ctx.rest ?? ctx.sub) === 'rush') {
+    container.classList.add('pz-screen');
+    const r = mountRush(container, app, ctx);
+    out = { route: 'puzzle', top: { title: 'Puzzle Rush', sub: 'Beat the clock', back: '#/puzzles' }, leave: r.leave };
+  } else if (play) {
     container.classList.add('pz-screen');
     const r = mountPlay(container, app, play);
     out = { route: 'puzzle', top: { title: 'Puzzle', sub: 'Find the best move', back: '#/puzzles' }, leave: r.leave };
