@@ -337,6 +337,7 @@ func (h *Hub) detach(s *Sess) {
 		return
 	}
 	delete(u.sess, s)
+	h.unwatchAll(s)
 	if len(u.sess) > 0 {
 		return
 	}
@@ -374,6 +375,7 @@ var errText = map[string]string{
 	"paused":          "new online games are paused for a little while",
 	"bad_tc":          "unknown time control",
 	"no_game":         "no such game",
+	"own_game":        "you are playing in this game",
 	"not_your_turn":   "it is not your turn",
 	"stale_ply":       "out of sync, refreshing the game",
 	"illegal_move":    "illegal move",
@@ -485,6 +487,41 @@ func (h *Hub) dispatch(s *Sess, m inMsg) {
 			return
 		}
 		s.reply(m.ID, "room", r.view())
+	case "watchList":
+		s.reply(m.ID, "games", h.watchList(now))
+	case "watch":
+		g := h.games[m.Game]
+		on := m.On == nil || *m.On
+		if !on {
+			if g != nil && g.watch[s] {
+				delete(g.watch, s)
+				h.pushWatchers(g)
+			}
+			s.reply(m.ID)
+			return
+		}
+		if g == nil {
+			s.failCode(m.ID, "no_game")
+			return
+		}
+		if g.seatOf(u.UID) >= 0 {
+			s.failCode(m.ID, "own_game")
+			return
+		}
+		if !g.watch[s] {
+			if len(g.watch) >= maxWatchersPerGame || h.watchingCount(s) >= maxWatchPerSess {
+				s.failCode(m.ID, "rate_limited")
+				return
+			}
+			if g.watch == nil {
+				g.watch = map[*Sess]bool{}
+			}
+			g.watch[s] = true
+			h.pushWatchers(g)
+		}
+		v := g.view(-1, now)
+		v["watchers"] = len(g.watch)
+		s.reply(m.ID, "watch", v)
 	case "game":
 		g := u.games[m.Game]
 		if g == nil {
@@ -676,7 +713,7 @@ func (h *Hub) doJoinRoom(s *Sess, m inMsg) {
 		}
 	}
 	h.closeRoom(r, "started")
-	g := h.startGame(w, b, r.TC, r.Rated, r.Code)
+	g := h.startGame(w, b, r.TC, r.Rated, r.Code, !r.Public)
 	s.reply(m.ID, "game", g.ID)
 }
 
@@ -812,7 +849,7 @@ func (h *Hub) doGameAction(s *Sess, g *Game, m inMsg, now int64) {
 			return
 		}
 		w, b := h.user(g.Seats[1].UID), h.user(g.Seats[0].UID) // colours swap
-		ng := h.startGame(w, b, g.tc, g.Rated, "")
+		ng := h.startGame(w, b, g.tc, g.Rated, "", g.Private)
 		g.Next = ng.ID
 		s.reply(m.ID, "game", ng.ID)
 	}

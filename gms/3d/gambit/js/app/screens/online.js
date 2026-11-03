@@ -17,6 +17,7 @@ import {
   outOfGamesSheet, openAccount, buyPass, handleError, connBanner, nameOf,
 } from './online_common.js';
 import { mountGame } from './online_game.js';
+import { mountWatch } from './online_watch.js';
 
 const TC_GROUPS = [
   { group: 'Bullet', items: ['1+0', '2+1'] },
@@ -74,21 +75,22 @@ export function mount(el, ctx) {
   let left = false;
   const ui = h('<div class="ol-wrap"><div class="ol-loading"><div class="boot-spin"></div><span>Connecting to the online server…</span></div></div>');
   el.appendChild(ui);
-  if (sub === 'game') el.classList.add('ol-gamewrap');
+  if (sub === 'game' || (sub === 'watch' && arg)) el.classList.add('ol-gamewrap');
 
   let inner = null;
   const start = () => {
     if (left) return;
     try {
       if (sub === 'game') inner = mountGame(ui, ctx, arg);
+      else if (sub === 'watch' && arg) inner = mountWatch(ui, ctx, arg);
       else if (sub === 'seek') inner = seekScreen(ui, ctx, arg);
       else if (sub === 'room') inner = roomScreen(ui, ctx, arg.toUpperCase());
       else if (sub === 'join') inner = joinScreen(ui, ctx, arg.toUpperCase());
-      else if (sub === 'leaders' || sub === 'lobby') { homeTab = sub; inner = homeScreen(ui, ctx); }
+      else if (sub === 'leaders' || sub === 'lobby' || sub === 'watch') { homeTab = sub; inner = homeScreen(ui, ctx); }
       else inner = homeScreen(ui, ctx);
     } catch (e) { console.error('[gambit] online screen', e); ui.textContent = 'This screen could not load.'; }
   };
-  if (sub !== 'game') ctx.setTop({ title: 'Play Online', back: '#/home' });
+  if (sub !== 'game' && !(sub === 'watch' && arg)) ctx.setTop({ title: 'Play Online', back: '#/home' });
 
   let slow = 0;
   const connect = () => {
@@ -155,6 +157,7 @@ function unavailable(root, ctx) {
 function homeScreen(root, ctx) {
   const offs = [];
   let lb = { cat: getSettings().onlineLbCat || 'blitz', rows: null, err: null };
+  const wl = { rows: null, err: null, at: 0, loading: false };
   const rated = () => getSettings().onlineRated !== false;
 
   const el = h(`<div class="ol-home">
@@ -162,7 +165,7 @@ function homeScreen(root, ctx) {
     <div class="ol-me card card-accent"></div>
     <div class="ol-live"></div>
     <div class="tabs ol-tabs" role="tablist">
-      <a role="tab" data-tab="play">Play</a><a role="tab" data-tab="lobby">Lobby</a><a role="tab" data-tab="leaders">Leaderboard</a>
+      <a role="tab" data-tab="play">Play</a><a role="tab" data-tab="lobby">Lobby</a><a role="tab" data-tab="watch">Watch</a><a role="tab" data-tab="leaders">Leaders</a>
     </div>
     <div class="ol-tab"></div>
   </div>`);
@@ -195,6 +198,7 @@ function homeScreen(root, ctx) {
     const body = el.querySelector('.ol-tab');
     if (homeTab === 'play') body.innerHTML = playTab();
     else if (homeTab === 'lobby') body.innerHTML = lobbyTab();
+    else if (homeTab === 'watch') { body.innerHTML = watchTab(); if (!wl.loading && Date.now() - wl.at > 3000) loadWatch(); }
     else body.innerHTML = leadersTab();
     if (homeTab === 'leaders' && !lb.rows && !lb.err && !lb.loading) loadLb();
   }
@@ -234,6 +238,28 @@ function homeScreen(root, ctx) {
         ${r.host && r.host.pid === mine ? `<a class="btn btn-ghost btn-sm" href="#/online/room/${esc(r.code)}">Yours</a>` : `<button class="btn btn-primary btn-sm" data-join="${esc(r.code)}">Join</button>`}
       </li>`).join('')}</ul>` : `<div class="ol-empty card">${icon('globe')}<p>No open rooms right now.</p><small>Create one, or try a quick match.</small></div>`}
       ${lobbyStats()}`;
+  }
+  function watchTab() {
+    const mine = net.me && net.me.pid;
+    const rows = wl.rows;
+    if (wl.err && !rows) return '<div class="ol-empty card"><p>Could not load live games.</p></div>';
+    if (!rows) return '<div class="ol-empty card"><div class="boot-spin"></div></div>';
+    const list = rows.map(g => {
+      const own = mine && (g.white?.pid === mine || g.black?.pid === mine);
+      return `<li>
+        <span class="ol-rn"><b>${nameOf(g.white)} <span class="elo">${ratingTxt(g.white?.rating, g.white?.prov)}</span> <i class="ol-vs">vs</i> ${nameOf(g.black)} <span class="elo">${ratingTxt(g.black?.rating, g.black?.prov)}</span></b>
+          <small>${esc(tcFull(g.tc))} · ${g.rated ? 'Rated' : 'Casual'} · move ${Math.floor((g.plies || 0) / 2) + 1}${g.watchers ? ` · ${icon('eye')} ${g.watchers}` : ''}</small></span>
+        ${own ? `<a class="btn btn-ghost btn-sm" href="#/online/game/${esc(g.id)}">Yours</a>` : `<a class="btn btn-primary btn-sm" href="#/online/watch/${esc(g.id)}">${icon('eye')} Watch</a>`}
+      </li>`; }).join('');
+    return `<div class="ol-lobby-head"><h3 class="sect">Live games</h3></div>
+      ${rows.length ? `<ul class="ol-rooms ol-watchlist">${list}</ul>` : `<div class="ol-empty card">${icon('eye')}<p>Nobody is playing right now.</p><small>Games from private rooms only show to people with the link.</small></div>`}
+      ${lobbyStats()}`;
+  }
+  async function loadWatch() {
+    wl.loading = true;
+    try { wl.rows = await net.watchList(); wl.err = null; } catch (e) { wl.err = e; }
+    wl.loading = false; wl.at = Date.now();
+    if (homeTab === 'watch') renderTab();
   }
   function leadersTab() {
     const rows = lb.rows;

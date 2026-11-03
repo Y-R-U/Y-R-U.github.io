@@ -112,6 +112,7 @@ class GambitNet {
     this.allowance = null;        // see README "Allowance"
     this.tcs = [];                // [{id, base, inc, name, cat}]
     this.games = new Map();       // id -> game snapshot, kept current from events
+    this.watched = new Map();     // id -> spectated game snapshot (never mixed into games / the home hint)
     this.rooms = new Map();       // my open rooms, code -> room
     this.seek = null;             // my quick-match seek {tc, rated, at} or null
     this.lobby = null;            // last lobby payload
@@ -379,7 +380,13 @@ class GambitNet {
         this.seek = null;
         return this._emit('start', { game: g });
       }
+      case 'watchers': {
+        const g = this.games.get(m.game) || this.watched.get(m.game);
+        if (g) g.watchers = m.n;
+        return this._emit('watchers', { gameId: m.game, n: m.n });
+      }
       case 'move': {
+        if (!this.games.has(m.game) && this.watched.has(m.game)) return this._watchedMove(m);
         const g = this.games.get(m.game);
         if (g && m.ply === g.moves.length) {
           g.moves.push(m.uci); g.sans.push(m.san);
@@ -395,6 +402,11 @@ class GambitNet {
         return this._emit('move', { gameId: m.game, ply: m.ply, uci: m.uci, san: m.san, fen: m.fen, clock: m.clock, mine, game: g });
       }
       case 'end': {
+        if (!this.games.has(m.game) && this.watched.has(m.game)) {
+          const w = this.watched.get(m.game);
+          Object.assign(w, { status: 'ended', result: m.result, reason: m.reason, pgn: m.pgn, ratings: m.ratings || null, clock: m.clock, drawOffer: '' });
+          return this._emit('wend', { gameId: m.game, game: w });
+        }
         const g = this.games.get(m.game);
         if (g) Object.assign(g, { status: 'ended', result: m.result, reason: m.reason, pgn: m.pgn, ratings: m.ratings || null, clock: m.clock, drawOffer: '', opponentGone: null });
         this._writeHint();
@@ -406,11 +418,13 @@ class GambitNet {
         return this._emit('end', { gameId: m.game, result: m.result, reason: m.reason, pgn: m.pgn, ratings: m.ratings || null, game: g });
       }
       case 'draw': {
+        if (!this.games.has(m.game) && this.watched.has(m.game)) { this.watched.get(m.game).drawOffer = m.action === 'offer' ? m.by : ''; return this._emit('wdraw', m); }
         const g = this.games.get(m.game);
         if (g) g.drawOffer = m.action === 'offer' ? m.by : '';
         return this._emit('draw', { gameId: m.game, by: m.by, action: m.action, mine: g ? m.by === g.you : false, game: g });
       }
       case 'rematch': {
+        if (!this.games.has(m.game) && this.watched.has(m.game)) return;
         const g = this.games.get(m.game);
         if (g) {
           g.rematch = g.rematch || { you: false, them: false };
@@ -437,6 +451,7 @@ class GambitNet {
     const live = new Set();
     for (const g of m.games || []) { this._storeGame(g); live.add(g.id); }
     for (const [id, g] of this.games) if (!live.has(id) && g.status === 'playing') { g.status = 'unknown'; }
+    for (const id of this.watched.keys()) this.watch(id).then(g => this._emit('wsync', { game: g })).catch(() => {});   // the server forgot us on disconnect
     this._writeHint();
     this._setAllowance(m.allowance);
     this._setState('open');
@@ -518,11 +533,31 @@ class GambitNet {
   async joinRoom(code) { return (await this.request('joinRoom', { code: String(code).trim().toUpperCase() })).game; }
   async peekRoom(code) { return (await this.request('peekRoom', { code: String(code).trim().toUpperCase() })).room; }
 
+  // ------------------------------------------------------------- spectating
+  /** Live public games: [{id, tc, rated, white, black, plies, watchers, created, lastMove, fen}] */
+  async watchList() { return (await this.request('watchList')).games; }
+  /** Start watching; resolves with the snapshot (also kept in this.watched). Emits wmove / wend / wdraw / watchers. */
+  async watch(id) {
+    const r = await this.request('watch', { game: id, on: true });
+    const g = r.watch; g.moves = g.moves || []; g.sans = g.sans || [];
+    this.watched.set(id, g);
+    return g;
+  }
+  unwatch(id) { this.watched.delete(id); return this.state === 'open' ? this.request('watch', { game: id, on: false }).catch(() => {}) : Promise.resolve(); }
+  _watchedMove(m) {
+    const g = this.watched.get(m.game);
+    if (m.ply === g.moves.length) {
+      g.moves.push(m.uci); g.sans.push(m.san); g.fen = m.fen; g.clock = m.clock; g.drawOffer = m.drawOffer || '';
+      return this._emit('wmove', { gameId: m.game, ply: m.ply, uci: m.uci, san: m.san, clock: m.clock, game: g });
+    }
+    if (m.ply > g.moves.length) this.watch(m.game).then(x => this._emit('wsync', { game: x })).catch(() => {});   // missed one: resnapshot
+  }
+
   // ------------------------------------------------------------- in game
   game(id) { return this.games.get(id) || null; }
   /** Live clock {w, b, turn, running} in ms, extrapolated to now. w/b null for Unlimited. */
   clock(id) {
-    const g = this.games.get(id);
+    const g = this.games.get(id) || this.watched.get(id);
     if (!g || !g.clock) return null;
     const c = g.clock;
     const out = { w: c.w, b: c.b, turn: c.turn, running: c.running, deadline: c.deadline || 0, deadlineAborts: !!c.deadlineAborts };

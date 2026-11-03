@@ -545,6 +545,13 @@ async function wake(on) {
   } catch { lock = null; }
 }
 
+function renderWatchers() {
+  const b = view && view.querySelector('.ol-watchbadge'); if (!b || !O) return;
+  const n = O.g.watchers || 0;
+  b.hidden = !n;
+  b.innerHTML = `${icon('eye')} ${n} watching`;
+}
+
 // ---------- mount ----------
 export function mountGame(root, ctx, id) {
   app = ctx.app;
@@ -561,7 +568,7 @@ export function mountGame(root, ctx, id) {
   const el = h(`<section class="screen game ol-game">
     <div class="g-stage"><div class="g-col">
       <div class="bar-top"></div>
-      <div class="board-square"><div class="board-loading">Setting up the board…</div><div class="ol-banners"></div></div>
+      <div class="board-square"><div class="board-loading">Setting up the board…</div><div class="ol-banners"></div><div class="ol-watchbadge" hidden></div></div>
       <div class="bar-bottom"></div>
     </div></div>
     <aside class="g-panel"><div class="ol-banners ol-banners-side"></div><div class="moves-box"><div class="moves-wrap"><ol class="moves"></ol></div>${reviewNavHtml()}</div><div class="actions"></div></aside>
@@ -625,7 +632,9 @@ export function mountGame(root, ctx, id) {
       refreshRematch();
     }),
     net.on('state', () => { renderBanner(); setInteractive(); }),
+    net.on('watchers', ev => { if (O && ev.gameId === O.id) { O.g.watchers = ev.n; renderWatchers(); } }),
   ];
+  renderWatchers();
   const ticker = setInterval(tick, 100);
   const ro = new ResizeObserver(() => board && board.resize && board.resize());
   ro.observe(el.querySelector('.board-square'));

@@ -118,6 +118,71 @@ func (h *Hub) pushGame(g *Game, f func(side int) any) {
 			h.pushUser(u, f(side))
 		}
 	}
+	if len(g.watch) > 0 {
+		b := encode(f(-1))
+		for s := range g.watch {
+			s.sendRaw(b)
+		}
+	}
+}
+
+// ---------------------------------------------------------------- spectators
+
+const (
+	maxWatchersPerGame = 100
+	maxWatchPerSess    = 3
+)
+
+// watchList is the public Watch tab: live games not from a private room, busiest first.
+func (h *Hub) watchList(now int64) []map[string]any {
+	list := []*Game{}
+	for _, g := range h.games {
+		if !g.Ended && !g.Private {
+			list = append(list, g)
+		}
+	}
+	sort.Slice(list, func(i, j int) bool {
+		if len(list[i].watch) != len(list[j].watch) {
+			return len(list[i].watch) > len(list[j].watch)
+		}
+		return list[i].LastMove > list[j].LastMove
+	})
+	out := []map[string]any{}
+	for i, g := range list {
+		if i >= 50 {
+			break
+		}
+		seat := func(s Seat) map[string]any {
+			return map[string]any{"pid": s.PID, "name": s.Name, "rating": s.Rating, "prov": s.Prov}
+		}
+		out = append(out, map[string]any{"id": g.ID, "tc": g.tc, "rated": g.Rated, "white": seat(g.Seats[0]), "black": seat(g.Seats[1]),
+			"plies": len(g.Moves), "watchers": len(g.watch), "created": g.Created, "lastMove": g.LastMove, "fen": g.pos.FEN()})
+	}
+	return out
+}
+
+func (h *Hub) watchingCount(s *Sess) int {
+	n := 0
+	for _, g := range h.games {
+		if g.watch[s] {
+			n++
+		}
+	}
+	return n
+}
+
+func (h *Hub) pushWatchers(g *Game) {
+	h.pushGame(g, func(int) any { return ev("watchers", "game", g.ID, "n", len(g.watch)) })
+}
+
+// unwatchAll drops a closing session from every game it was watching (lock held).
+func (h *Hub) unwatchAll(s *Sess) {
+	for _, g := range h.games {
+		if g.watch[s] {
+			delete(g.watch, s)
+			h.pushWatchers(g)
+		}
+	}
 }
 
 func ev(t string, kv ...any) map[string]any {
@@ -363,14 +428,14 @@ func (h *Hub) seat(u *User, cat string) Seat {
 	return Seat{UID: u.UID, PID: u.PID, Name: u.Name, Anon: u.Anon, Rating: r, Prov: prov}
 }
 
-func (h *Hub) startGame(w, b *User, tc TimeControl, rated bool, room string) *Game {
+func (h *Hub) startGame(w, b *User, tc TimeControl, rated bool, room string, private bool) *Game {
 	now := nowMs()
 	id := randString("abcdefghijkmnpqrstuvwxyz23456789", 10)
 	for h.games[id] != nil {
 		id = randString("abcdefghijkmnpqrstuvwxyz23456789", 10)
 	}
 	g := newGame(id, tc, rated, h.seat(w, tc.Cat), h.seat(b, tc.Cat), now)
-	g.Room = room
+	g.Room, g.Private = room, private
 	h.games[id] = g
 	w.games[id], b.games[id] = g, g
 	for _, u := range []*User{w, b} {
@@ -461,7 +526,7 @@ func (h *Hub) match() {
 			if randString("01", 1) == "1" {
 				w, bl = bl, w
 			}
-			h.startGame(w, bl, a.TC, a.Rated, "")
+			h.startGame(w, bl, a.TC, a.Rated, "", false)
 			paired = true
 		}
 		if !paired {

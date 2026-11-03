@@ -23,7 +23,8 @@ type Game struct {
 	ID       string   `json:"id"`
 	TCID     string   `json:"tc"`
 	Rated    bool     `json:"rated"`
-	Room     string   `json:"room,omitempty"` // room code it came from ("" = quick match / rematch)
+	Room     string   `json:"room,omitempty"`    // room code it came from ("" = quick match / rematch)
+	Private  bool     `json:"private,omitempty"` // from a private room (or a rematch of one): not in the public Watch list
 	Seats    [2]Seat  `json:"seats"`
 	Moves    []string `json:"moves"`
 	Clock    Clock    `json:"clock"`
@@ -48,6 +49,8 @@ type Game struct {
 	AfterPr [2]bool `json:"-"` // provisional after the game
 	PGN     string  `json:"-"`
 	Next    string  `json:"-"` // rematch game id once started
+
+	watch map[*Sess]bool // spectators (not persisted: they re-subscribe after a restart)
 
 	tc   TimeControl
 	pos  Pos
@@ -312,7 +315,7 @@ func (g *Game) view(you int, now int64) map[string]any {
 		"white": seat(g.Seats[0]), "black": seat(g.Seats[1]),
 		"you": colorName(you), "moves": g.Moves, "sans": g.sans, "fen": g.pos.FEN(),
 		"clock": g.clockView(now), "status": "playing", "drawOffer": colorName(g.Draw),
-		"created": g.Created,
+		"created": g.Created, "watchers": len(g.watch),
 	}
 	if you >= 0 && g.Gone[1-you] > 0 && !g.Ended {
 		v["opponentGone"] = map[string]any{"since": g.Gone[1-you], "claimAt": g.claimAt(1 - you)}
