@@ -311,7 +311,7 @@ function finish(result, reason) {
   else if (result === '0-1') outcome = g.color === 'b' ? 'win' : 'loss';
   g.result = { result, reason, outcome };
   if (reason === 'abort') { g.record = null; }
-  else g.record = recordGame({ bot: g.bot, result: outcome, assisted: g.assisted, reason, tc: g.tc, color: g.color, moves: plies });
+  else g.record = recordGame({ bot: g.bot, result: outcome, assisted: g.assisted, reason, tc: g.tc, color: g.color, moves: plies, uci: lanHistory(g) });
   play(outcome === 'win' ? 'win' : outcome === 'loss' ? 'lose' : 'draw');
   if (app.cloud && reason !== 'abort') app.cloud.matchFinished();
   renderAll();

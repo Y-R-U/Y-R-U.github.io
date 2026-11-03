@@ -362,21 +362,27 @@ func handlePlayer(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, 404, "not_found", "no such player")
 		return
 	}
-	rows, _ := db.Query(`SELECT id, white_uid, white_name, black_name, tc, rated, result, reason, ended FROM games
-		WHERE white_uid = ? OR black_uid = ? ORDER BY ended DESC LIMIT 20`, uid, uid)
+	limit := 20
+	if n, err := strconv.Atoi(r.URL.Query().Get("limit")); err == nil && n > 0 {
+		limit = min(n, 100)
+	}
+	rows, _ := db.Query(`SELECT id, white_uid, white_name, black_name, tc, cat, rated, result, reason, white_r, black_r, white_d, black_d, moves, ended FROM games
+		WHERE white_uid = ? OR black_uid = ? ORDER BY ended DESC LIMIT ?`, uid, uid, limit)
 	recent := []map[string]any{}
 	if rows != nil {
 		for rows.Next() {
-			var id, wu, wn, bn, tc, res, reason string
+			var id, wu, wn, bn, tc, cat, res, reason, moves string
 			var rated bool
+			var wr, br, wd, bd int
 			var ended int64
-			rows.Scan(&id, &wu, &wn, &bn, &tc, &rated, &res, &reason, &ended)
-			color := "b"
+			rows.Scan(&id, &wu, &wn, &bn, &tc, &cat, &rated, &res, &reason, &wr, &br, &wd, &bd, &moves, &ended)
+			color, myR, myD, oppR := "b", br, bd, wr
 			if wu == uid {
-				color = "w"
+				color, myR, myD, oppR = "w", wr, wd, br
 			}
-			recent = append(recent, map[string]any{"id": id, "white": wn, "black": bn, "tc": tc, "rated": rated,
-				"result": res, "reason": reason, "ended": ended, "color": color})
+			recent = append(recent, map[string]any{"id": id, "white": wn, "black": bn, "tc": tc, "cat": cat, "rated": rated,
+				"result": res, "reason": reason, "ended": ended, "color": color,
+				"rating": myR, "delta": myD, "oppRating": oppR, "plies": len(strings.Fields(moves))})
 		}
 		rows.Close() // before loadRatings: one pooled connection
 	}

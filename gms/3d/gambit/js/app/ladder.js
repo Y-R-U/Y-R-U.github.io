@@ -140,7 +140,7 @@ export function playerRank() {
 
 // ---------- recording a finished bot game ----------
 // result: 'win' | 'draw' | 'loss' (from the player's side)
-export function recordGame({ bot, result, assisted, reason, tc, color, moves }) {
+export function recordGame({ bot, result, assisted, reason, tc, color, moves, uci }) {
   const lad = ensureSeed();
   const before = playerRank();
   const pts = pointsFor(result, bot.elo, lad.elo, assisted);
@@ -163,7 +163,7 @@ export function recordGame({ bot, result, assisted, reason, tc, color, moves }) 
     st.bestWin = { botId: bot.id, name: bot.name, elo: bot.elo, at: Date.now() };
     newBest = true;
   }
-  st.recent = [{ botId: bot.id, name: bot.name, elo: bot.elo, result, reason, pts, tc, color, moves, assisted: !!assisted, at: Date.now() },
+  st.recent = [{ botId: bot.id, name: bot.name, elo: bot.elo, result, reason, pts, tc, color, moves, ...(Array.isArray(uci) && uci.length ? { uci: uci.slice(0, 600) } : {}), assisted: !!assisted, at: Date.now() },
     ...(st.recent || [])].slice(0, 30);
   setStats(st);
 

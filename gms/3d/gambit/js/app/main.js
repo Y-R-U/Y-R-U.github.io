@@ -72,6 +72,7 @@ export const PLUGINS = {
   puzzles: () => import('../puzzles/screen.js'),
   online: () => import('./screens/online.js'),   // online agent
   learn: () => import('../learn/screen.js'),
+  history: () => import('./screens/history.js'),
 };
 
 const ROUTES = [

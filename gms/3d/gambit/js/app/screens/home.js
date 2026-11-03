@@ -5,7 +5,8 @@ import { playerRank } from '../ladder.js';
 import { parseTc } from '../clock.js';
 import { knightMark } from '../main.js';
 import { net, readHint } from '../net.js';
-import { playerAvatar, tcFull, ratingTxt } from './online_common.js';
+import { playerAvatar, tcFull, ratingTxt, catName } from './online_common.js';
+import { onlineTotals } from './history.js';
 
 export const ROUTE = 'home';
 
@@ -21,6 +22,8 @@ function puzzleLine() {
 export function render(app) {
   const resume = getResume();
   const st = getStats(), lad = getLadder();
+  const ot = onlineTotals() || { games: 0, w: 0, d: 0, l: 0 };   // online W/D/L from the last History/Online fetch
+  if (ot.rating) ot.rating.name = catName(ot.rating.cat);
   const { rank, of } = playerRank();
   const bot = resume && app.deps.bots.BOTS.find(b => b.id === resume.botId);
   // online games in progress, from net.js's local hint (no server connection at boot)
@@ -67,14 +70,17 @@ export function render(app) {
         <span class="mi-ic">${icon('book')}</span>
         <span class="mi-txt"><b>Learn</b><small>${learnLine()}</small></span>
         <span class="mi-go">${icon('chevron')}</span></a>
+      <a class="menu-item" href="#/history">
+        <span class="mi-ic">${icon('clock')}</span>
+        <span class="mi-txt"><b>History</b><small>Every game, online and bots · replay any move</small></span>
+        <span class="mi-go">${icon('chevron')}</span></a>
     </nav>
-    <div class="home-stats">
-      <div><b>${fmtInt(st.games)}</b><small>Games</small></div>
-      <div><b class="good">${fmtInt(st.w)}</b><small>Wins</small></div>
-      <div><b>${fmtInt(st.d)}</b><small>Draws</small></div>
-      <div><b class="bad">${fmtInt(st.l)}</b><small>Losses</small></div>
+    <a class="home-stats" href="#/history" title="Tap for every game, online and bots">
+      <div><b>${fmtInt(st.games + ot.games)}</b><small>Games</small></div>
+      <div class="hs-wide"><b><span class="good">${fmtInt(ot.w)}</span>·${fmtInt(ot.d)}·<span class="bad">${fmtInt(ot.l)}</span></b><small>Online W·D·L</small></div>
+      <div><b>${ot.rating ? ratingTxt(ot.rating.r, ot.rating.prov) : '–'}</b><small>${ot.rating ? `${esc(ot.rating.name)} rating` : 'Online rating'}</small></div>
       <div><b>${lad.elo}</b><small>Ladder Elo</small></div>
-    </div>
+    </a>
   </section>`);
   el.addEventListener('click', e => {
     const a = e.target.closest('[data-act]'); if (!a) return;

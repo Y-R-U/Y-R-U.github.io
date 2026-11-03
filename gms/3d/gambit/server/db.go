@@ -145,7 +145,8 @@ func loadRatings(uid string) map[string]map[string]any {
 	for _, c := range categories {
 		r := loadRating(uid, c)
 		rr := r.decay(nowMs())
-		out[c] = map[string]any{"r": int(r.R + 0.5), "rd": int(rr.RD + 0.5), "prov": rr.Provisional(), "games": r.Games}
+		out[c] = map[string]any{"r": int(r.R + 0.5), "rd": int(rr.RD + 0.5), "prov": rr.Provisional(), "games": r.Games,
+			"wins": r.Wins, "losses": r.Losses, "draws": r.Draws}
 	}
 	return out
 }
