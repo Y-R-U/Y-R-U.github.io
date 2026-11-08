@@ -1,11 +1,44 @@
 // Slingshot aim (D8): drag anywhere, back and away from where you touched. The ball goes the
-// opposite way to the drag; power = drag length (capped). A small cancel zone near the start point.
+// opposite way to the drag. Power is edge-relative: full power is reached just before the screen
+// edge in the drag direction, wherever the drag started (see dragReach). A small cancel zone near
+// the start point. The fine-putt curve lives in shotSpeed (power^SHOT_CURVE), not here.
 // Also owns pinch / wheel zoom and one-finger look-around (when not aiming or in look mode).
 import * as THREE from 'three';
 import { shotSpeed, BALL_R } from '../engine/constants.js';
 import { traceGuide } from '../engine/sim.js';
 
 const CANCEL_PX = 24;
+
+// How far (px) a drag must travel from its start point (x0, y0) along unit direction (ux, uy) to
+// reach full power in a W x H viewport: the distance to the viewport edge minus a small margin,
+// clamped so a drag that starts near the edge still has usable travel and huge screens don't need
+// absurdly long drags. Exported (pure) for tools/aim_test.mjs.
+export function dragReach(x0, y0, ux, uy, W, H) {
+  const m = Math.min(W, H);
+  const margin = Math.max(14, Math.min(40, m * 0.05));
+  const maxR = Math.min(420, m * 0.42);
+  const minR = Math.min(maxR, Math.max(60, m * 0.15));
+  let t = Infinity;
+  if (ux > 1e-6) t = Math.min(t, (W - margin - x0) / ux); else if (ux < -1e-6) t = Math.min(t, (margin - x0) / ux);
+  if (uy > 1e-6) t = Math.min(t, (H - margin - y0) / uy); else if (uy < -1e-6) t = Math.min(t, (margin - y0) / uy);
+  return Math.max(minR, Math.min(maxR, t));
+}
+// Cancel radius for a drag whose full-power reach is `reach`: the usual 24 px, shrunk (to >= 12 px)
+// when the room to the edge is tight (landscape phones) so more of it is usable power.
+const cancelPx = reach => Math.min(CANCEL_PX, Math.max(12, reach * 0.2));
+// { power 0..1, cancel } for a drag from (x0, y0) to (x, y) in a W x H viewport.
+export function dragPower(x0, y0, x, y, W, H) {
+  const dx = x - x0, dy = y - y0, len = Math.hypot(dx, dy);
+  if (len < 1) return { power: 0, cancel: true };
+  const reach = dragReach(x0, y0, dx / len, dy / len, W, H), c = cancelPx(reach);
+  if (len < c) return { power: 0, cancel: true };
+  return { power: Math.min(1, (len - c) / Math.max(1, reach - c)), cancel: false };
+}
+// Inverse, for test drivers (tools/shots_cdp.mjs): drag length that gives `power` along (ux, uy).
+export function dragForPower(power, x0, y0, ux, uy, W, H) {
+  const reach = dragReach(x0, y0, ux, uy, W, H), c = cancelPx(reach);
+  return c + Math.max(0, Math.min(1, power)) * (reach - c);
+}
 
 export class AimInput {
   // opts: { el, rig, canReady(): bool, getBall(): Ball, world, onShoot(vx, vz, power), onAimChange(state) }
@@ -33,7 +66,7 @@ export class AimInput {
     el.removeEventListener('wheel', this._wheel);
     this.guide.dispose();
   }
-  maxDrag() { return Math.min(innerWidth, innerHeight) * 0.5; }
+  viewport() { return [innerWidth, innerHeight]; }   // clientX/Y space
 
   _down(e) {
     this.el.setPointerCapture?.(e.pointerId);
@@ -87,8 +120,9 @@ export class AimInput {
     const dx = p.x - p.x0, dy = p.y - p.y0;
     const len = Math.hypot(dx, dy);
     const a = this.aim;
-    a.cancel = len < CANCEL_PX;
-    a.power = a.cancel ? 0 : Math.min(1, (len - CANCEL_PX) / (this.maxDrag() - CANCEL_PX));
+    const [W, H] = this.viewport();
+    const d = dragPower(p.x0, p.y0, p.x, p.y, W, H);
+    a.cancel = d.cancel; a.power = d.power;
     if (len > 2) {
       // screen drag (dx right, dy down) → world aim: pull down = shoot forward, pull right = shoot left
       const y = this._yaw0;

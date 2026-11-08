@@ -95,9 +95,10 @@ Shots (`docs/notes/volcano_shots/`, gitignored): `v3-p-hole*.png` (high), `v4-lp
 `wav/music_volcano.wav` (12 s render).
 
 ## Known issues
-- In portrait the volcano reaches the top edge on most holes and its plume is off-screen (it shows in landscape).
-  It sits in the same view-relative spot every hole, like the other themes' hero pieces.
-- The obsidian `ice` patch reads quite purple; distinct and readable, but could be darker if Aaron prefers.
+- (aim agent, 2026-11-08) Peak lowered 5° → 3.3° above the horizon so the base of the plume shows in portrait;
+  its upper part still crops at the top edge. It sits in the same view-relative spot every hole.
+- (aim agent, 2026-11-08) Obsidian `ice` retoned from plum to near-black glass with cool grey sheen lines
+  (texture + neutral emissive). The obsidian crystal props still have their violet tint (props.js / materials.js).
 - The loop band is opaque (as in every theme), so the ball hides in it from the side.
 - `water` (lava) is supplied but the engine draws no water patches yet.
 - Heat shimmer not implemented (cost). Music not auditioned by ear (levels: 90 s render peak 0.244, RMS

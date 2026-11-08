@@ -387,7 +387,7 @@ export class Round {
     // guide line while aiming
     if (this.state === 'ready') this.aim.updateGuide(app.scene, w.time); else this.aim.guide.hide();
     this.view.update(dt, t, w.time, this.ballPos());
-    if (this.ghost && this.state !== 'flyover' && !this.paused) this.ghost.player.update(dt);
+    if (this.ghost && !this.paused) this.ghost.player.update(dt, w.time);   // on the obstacle clock (ai/ghost.js)
     this.trail.update(dt, m.position, this.state === 'rolling' && b.speed() > 0.15);
     if (this.guardMesh?.visible) this.guardMesh.material.uniforms.uTime.value = t;
   }

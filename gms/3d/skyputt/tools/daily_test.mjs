@@ -84,7 +84,9 @@ console.log('locked courses');
   ok(O.every((x, i) => x.hole.id === g[i].hole.id), 'all courses open → the same hole as the global pick');
   const notWoods = g.map((x, i) => i).filter(i => !GATED.has(g[i].course));
   const same = notWoods.filter(i => L[i].hole.id === g[i].hole.id).length;
-  ok(same / notWoods.length >= 0.85, `locked players share the global hole on most open-course days (${same}/${notWoods.length})`);
+  ok(same === notWoods.length, `locked players share the global hole on every open-course day (${same}/${notWoods.length})`);
+  const repL = L.filter((x, i) => L.slice(Math.max(0, i - RECENT), i).some(y => y.hole.id === x.hole.id)).length;
+  ok(repL === 0, `locked players: no hole repeats within ${RECENT} days either (${repL} repeats)`);
   // a started day keeps its hole even if Hollow Woods opens later that day
   const s = freshStore(), y = year.find((d, i) => g[i].course === 'woods');
   const dl = createDaily(s, () => at(y));

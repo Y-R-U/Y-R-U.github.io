@@ -85,3 +85,5 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - 2026-11-03: a9cfee29 pushed (daily). Started `courses3` (Sugar Summit sugar1-9, candy-designed) and `volcano` (Volcano Forge theme + music).
 - 2026-11-03: Aaron: finish current agents (courses3, volcano — resumed after rate limit) then PAUSE; start nothing new until he says continue. Gave him a progress report.
 - 2026-11-03: courses3 + volcano done. Aaron: commit/push and deploy the update when agents finish; then PAUSED. Phone speed seemed OK to him; he'll play more before feedback.
+- 2026-11-03: deployed 3d0678e3 to games.br8t.com (server rebuilt, tests on box passed, static client synced). PAUSED now — no agents running; wait for Aaron's 'continue'.
+- 2026-11-08: Aaron feedback: (1) drag power too insensitive esp. desktop (drag starts at ball, runs out of screen) — near screen edge must = max power; (2) ball-ball collisions ON by default, with a toggle to pass through. Resumed list, max 2 agents: started `aim` and `ballhit`.

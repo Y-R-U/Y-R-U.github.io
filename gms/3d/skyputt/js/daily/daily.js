@@ -78,7 +78,7 @@ function rawPick(ymd, pool, skip = null) {
 // result is a pure function of (date, pool) and never repeats a hole within RECENT days.
 const WINDOW = 28;
 const pickCache = new Map();
-function pickFor(ymd, pool, key) {
+function walkPick(ymd, pool, key) {
   const ck = `${key}|${ymd}`;
   if (pickCache.has(ck)) return pickCache.get(ck);
   const seq = [];
@@ -87,7 +87,33 @@ function pickFor(ymd, pool, key) {
     seq.push((skip.size < pool.length && rawPick(d, pool, skip)) || rawPick(d, pool));
   }
   const e = seq[seq.length - 1];
-  if (pickCache.size > 2000) pickCache.clear();
+  if (pickCache.size > 4000) pickCache.clear();
+  pickCache.set(ck, e);
+  return e;
+}
+// A restricted pool (a player with locked courses) follows the global sequence: every day whose global
+// pick is open to them gets that same hole (shared board), and only days on a locked course get a
+// fallback, chosen to avoid both their own last RECENT picks and the global picks of the next RECENT
+// days, so they still never see a repeat within RECENT days. (An independent walk over the smaller
+// pool drifted off the global hole on ~15% of open-course days because the skip histories differed.)
+const fullKey = () => allHoles().map(x => x.h.id).join(',');
+function pickFor(ymd, pool, key) {
+  const all = allHoles(), fk = fullKey();
+  if (key === fk) return walkPick(ymd, all, fk);
+  const ck = `R:${key}|${ymd}`;
+  if (pickCache.has(ck)) return pickCache.get(ck);
+  const inPool = new Set(pool.map(e => e.h.id));
+  const g = d => walkPick(d, all, fk);
+  const seq = [];
+  for (let k = WINDOW; k >= 0; k--) {
+    const d = addDays(ymd, -k), gp = g(d);
+    if (inPool.has(gp.h.id)) { seq.push(gp); continue; }
+    const skip = new Set(seq.slice(-RECENT).map(e => e.h.id));
+    for (let j = 1; j <= RECENT; j++) { const f = g(addDays(d, j)); if (inPool.has(f.h.id)) skip.add(f.h.id); }
+    seq.push((skip.size < pool.length && rawPick(d, pool, skip)) || rawPick(d, pool));
+  }
+  const e = seq[seq.length - 1];
+  if (pickCache.size > 4000) pickCache.clear();
   pickCache.set(ck, e);
   return e;
 }

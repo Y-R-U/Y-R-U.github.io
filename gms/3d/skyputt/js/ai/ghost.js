@@ -60,14 +60,16 @@ export class GhostBall extends THREE.Group {
 
   get playing() { return !this.done; }
 
-  update(dt) {
+  // at (optional): seconds since this shot started, from the obstacle clock (GhostPlayer clocked
+  // mode) instead of accumulating dt, so the replay stays in phase with the moving obstacles.
+  update(dt, at) {
     if (this.done) {   // trail keeps fading out after the shot
       if (this.hist.length) { this.hist.shift(); this._rebuildTrail(); }
       return;
     }
     const s = this.shot, p = s.path, hz = s.hz || 30;
     const n = p ? p.length / 3 : 0;
-    this.t += dt * this.speed;
+    if (at != null) this.t = Math.max(0, at); else this.t += dt * this.speed;
     const f = this.t * hz;
     if (n === 0 || f >= n - 1) {
       // end of the path: settle, sink or vanish
@@ -129,6 +131,10 @@ export class GhostBall extends THREE.Group {
 
 // Plays a whole ghost record (round.js playHoleSync / worker 'hole') shot after shot.
 //   const p = new GhostPlayer(ghost, record, { gap: 0.8 }); each frame p.update(dt); p.finished
+// Clocked: p.update(dt, worldTime) with the live hole's obstacle clock (world.time, 0 at hole load like
+// the record's t0 = 0). Each shot then starts when the clock reaches its recorded t0 and its path is
+// sampled at clock - t0, so movers are where they were when the shot was simulated (no passing through
+// them; Steady Hands slows the ghost with the obstacles). Shots without a t0 fall back to `gap`.
 export class GhostPlayer {
   constructor(ghost, record, { gap = 0.8, speed = 1, onShot, onDone } = {}) {
     this.ghost = ghost; this.rec = record; this.gap = gap; this.speed = speed; this.onShot = onShot; this.onDone = onDone;
@@ -136,15 +142,22 @@ export class GhostPlayer {
     const s0 = record.shots[0];
     if (s0) ghost.place(s0.from);
   }
-  update(dt) {
-    this.ghost.update(dt);
+  update(dt, worldTime) {
+    const clocked = worldTime != null && this.cur && Number.isFinite(this.cur.t0);
+    this.ghost.update(dt, clocked && this.ghost.playing ? worldTime - this.cur.t0 : undefined);
     if (this.finished || this.ghost.playing) return;
     if (this.i >= this.rec.shots.length) { this.finished = true; this.onDone?.(this.rec); return; }
-    this.wait += dt;
-    if (this.wait < this.gap) return;
-    this.wait = 0;
-    const s = this.rec.shots[this.i++];
-    this.onShot?.(s, this.i);
-    this.ghost.play(s, { speed: this.speed });
+    const next = this.rec.shots[this.i];
+    if (worldTime != null && Number.isFinite(next.t0)) {
+      if (worldTime < next.t0) return;
+    } else {
+      this.wait += dt;
+      if (this.wait < this.gap) return;
+      this.wait = 0;
+    }
+    this.i++; this.cur = next;
+    this.onShot?.(next, this.i);
+    this.ghost.play(next, { speed: this.speed });
+    if (worldTime != null && Number.isFinite(next.t0)) this.ghost.update(0, worldTime - next.t0);
   }
 }

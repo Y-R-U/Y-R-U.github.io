@@ -101,6 +101,11 @@ async function drag(c, x0, y0, x1, y1, { steps = 8, hold = false } = {}) {
     if (!hold) await c.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: x1, y: y1, button: 'left', buttons: 0, clickCount: 1 });
   }
 }
+// Drag length (px) that gives `power` for a drag from (x0, y0) toward screen direction rel (camera-relative
+// shot angle), using the game's own edge-relative mapping (js/game/aim.js dragForPower) in the live viewport.
+async function dragLen(c, power, rel, x0, y0) {
+  return c.eval(`import('./js/game/aim.js').then(m => m.dragForPower(${power}, ${x0}, ${y0}, ${-Math.sin(rel)}, ${Math.cos(rel)}, innerWidth, innerHeight))`);
+}
 async function release(c, x, y) {
   if (mobile) await c.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   else await c.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', buttons: 0, clickCount: 1 });
@@ -224,12 +229,11 @@ async function play(c) {
     await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
     // ask the page for a good shot (headless planner in-page) and convert to a drag
     const plan = await c.eval(`(${planInPage.toString()})()`);
-    const W = 412, H = 915, maxDrag = Math.min(W, H) * 0.5, CANCEL = 24;
-    const len = CANCEL + plan.power ** (1) * (maxDrag - CANCEL);
+    const W = 412, x0 = W / 2, y0 = 300;
+    const len = await dragLen(c, plan.power, plan.rel, x0, y0);
     // drag vector: aim = F*dy - R*dx with camera yaw; rel angle a from camera forward: dir = (sin a) R + (cos a) F
     // → dy = cos a * len, dx = -sin a * len
     const dx = -Math.sin(plan.rel) * len, dy = Math.cos(plan.rel) * len;
-    const x0 = W / 2, y0 = 300;
     await drag(c, x0, y0, x0 + dx, y0 + dy, { steps: 10 });
     console.log(`   hole ${s.hole} stroke ${s.strokes + 1}: rel ${(plan.rel * 180 / Math.PI).toFixed(1)}° power ${(plan.power * 100).toFixed(0)}% (expect ${plan.expect})`);
     await sleep(600);
@@ -246,7 +250,7 @@ async function playHoles(c, W = 412, H = 915) {
     if (s !== 'ready') { await sleep(300); continue; }
     await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
     const plan = await c.eval(`(${planInPage.toString()})()`);
-    const maxDrag = Math.min(W, H) * 0.5, len = 24 + plan.power * (maxDrag - 24);
+    const len = await dragLen(c, plan.power, plan.rel, W / 2, 300);
     await drag(c, W / 2, 300, W / 2 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
     await sleep(600);
   }
@@ -337,14 +341,14 @@ async function muni(c) {
       if (next === 'muni-rival' && s.n === 0 && !ghostShot && (waitedGhost = (waitedGhost || 0) + 1) < 12) { await sleep(2500); continue; }   // let the ghost tee off first
       if (next === 'muni-l2' && !s.used.longSight) { await c.eval(`document.querySelector('#h-sight').click()`); await sleep(200); }
       if (next === 'muni-l3' && !s.used.mulligan && s.n === 0) {
-        await drag(c, 206, 300, 206, 300 + 24 + 0.12 * 182, { steps: 6 });   // a deliberate dud
+        await drag(c, 206, 300, 206, 300 + await dragLen(c, 0.12, 0, 206, 300), { steps: 6 });   // a deliberate dud
         await waitFor(c, '__skyputt.round.state === "ready"', 30000); await sleep(300);
         await c.eval(`document.querySelector('#h-mull').click()`); await sleep(400);
         continue;
       }
       await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
       const plan = await c.eval(`(${planInPage.toString()})()`);
-      const len = 24 + plan.power * 182;
+      const len = await dragLen(c, plan.power, plan.rel, 206, 300);
       await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
       await sleep(600);
     }
@@ -415,7 +419,7 @@ async function careerMode(c) {
       }
       if (s.st !== 'ready') { await sleep(300); continue; }
       if (ev.use === 'mulligan' && !s.used.mulligan && s.n === 0) {
-        await drag(c, 206, 300, 206, 300 + 24 + 0.12 * 182, { steps: 6 });
+        await drag(c, 206, 300, 206, 300 + await dragLen(c, 0.12, 0, 206, 300), { steps: 6 });
         await waitFor(c, '__skyputt.round.state === "ready"', 30000); await sleep(300);
         await c.eval(`document.querySelector('#h-mull').click()`); await sleep(400);
         continue;
@@ -427,7 +431,7 @@ async function careerMode(c) {
       }
       await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
       const plan = await c.eval(`(${planInPage.toString()})()`);
-      const len = 24 + plan.power * 182;
+      const len = await dragLen(c, plan.power, plan.rel, 206, 300);
       await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
       await sleep(600);
     }
@@ -477,7 +481,7 @@ async function eventsMode(c) {
     if (s !== 'ready') { await sleep(300); continue; }
     await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
     const plan = await c.eval(`(${planInPage.toString()})()`);
-    const len = 24 + plan.power * 182;
+    const len = await dragLen(c, plan.power, plan.rel, 206, 300);
     await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
     await sleep(600);
   }
@@ -541,7 +545,7 @@ async function events2Mode(c) {
         if (st !== 'ready') { await sleep(400); n--; continue; }
         await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
         const plan = await c.eval(`(${planInPage.toString()})()`);
-        const len = 24 + plan.power * 182;
+        const len = await dragLen(c, plan.power, plan.rel, 206, 300);
         await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
         await sleep(700);
       }
@@ -727,7 +731,7 @@ async function events3Mode(c) {
       if (st !== 'ready') { await sleep(400); n--; continue; }
       await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
       const plan = await c.eval(`(${planInPage.toString()})()`);
-      const len = 24 + plan.power * 182;
+      const len = await dragLen(c, plan.power, plan.rel, 206, 300);
       await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
       await sleep(700);
     }
@@ -779,7 +783,7 @@ async function dailyMode(c) {
     if (st !== 'ready') { await sleep(400); n--; continue; }
     await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
     const plan = await c.eval(`(${planInPage.toString()})()`);
-    const len = 24 + plan.power * 182;
+    const len = await dragLen(c, plan.power, plan.rel, 206, 300);
     await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
     await sleep(700);
   }

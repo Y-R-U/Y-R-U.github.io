@@ -254,11 +254,12 @@ export function buildEnvironment(scene, info, M, quality) {
   const lavaFar = [];
   // the volcano: far ahead along viewDir, a little right, rising out of the lava sea
   {
-    // peak ~5° above the horizon from the tee camera (portrait's top edge is ~8°), plume above it
+    // peak ~3.3° above the horizon from the tee camera: portrait's top edge is only ~6-8°, and at 5° the
+    // eruption plume above the crater was cropped off in portrait (landscape shows more sky either way)
     const dist = frame.vmax + 230;
     const vp = frame.atV(frame.wmax * 0.3 + 22, 0, dist);
     vp.y = sky.seaY - 4;
-    const peakY = frame.tee.y + 3 + Math.tan(5 * Math.PI / 180) * (dist + 4);
+    const peakY = frame.tee.y + 3 + Math.tan(3.3 * Math.PI / 180) * (dist + 4);
     const H = Math.max(30, peakY - vp.y), RB = H * 0.72;
     const vM = new THREE.Matrix4().makeTranslation(vp.x, vp.y, vp.z).multiply(frame.viewBasis);
     const v = volcanoGeometry(H, RB, hi, 5);

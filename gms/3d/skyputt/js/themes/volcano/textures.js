@@ -190,7 +190,7 @@ export function ashTexture(size = 256) {
   return toTexture(c);
 }
 
-/** Obsidian (ice patches): glossy deep plum-black glass with conchoidal ripples and pale sheen lines. */
+/** Obsidian (ice patches): glossy near-black glass with conchoidal ripples and cool grey sheen lines. */
 export function obsidianTexture(size = 256) {
   const c = makeCanvas(size);
   paintPixels(c, (u, v) => {
@@ -198,7 +198,7 @@ export function obsidianTexture(size = 256) {
     const rip = 0.5 + 0.5 * Math.sin((Math.hypot(u - 0.3, v - 0.6) * 14 + n * 4) * Math.PI * 2);
     const line = smooth(0.88, 0.98, rip);
     const k = 0.75 + n * 0.35;
-    return [clamp255(62 * k + line * 90), clamp255(46 * k + line * 76), clamp255(78 * k + line * 100)];
+    return [clamp255(28 * k + line * 64), clamp255(29 * k + line * 66), clamp255(33 * k + line * 72)];
   });
   return toTexture(c);
 }

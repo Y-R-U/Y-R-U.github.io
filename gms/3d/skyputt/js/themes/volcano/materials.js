@@ -62,7 +62,7 @@ export function createMaterials(quality = 'high') {
     sand: std({ map: tex.ash, roughness: 0.95 }),
     // lava (the engine has no water patches yet; pools and falls use the same look)
     water: new THREE.MeshBasicMaterial({ map: tex.lava, toneMapped: false }),
-    ice: std({ map: tex.obsidian, roughness: 0.06, metalness: 0.2, emissive: 0x24142e, emissiveIntensity: 0.4 }),
+    ice: std({ map: tex.obsidian, roughness: 0.06, metalness: 0.3, emissive: 0x16181c, emissiveIntensity: 0.4 }),
     boost: std({ color: 0x3a2a24, roughness: 0.35, metalness: 0.5, emissive: 0xffffff, emissiveMap: tex.chevron, emissiveIntensity: 1.8 }),
     bridge: std({ map: tex.iron, roughness: 0.55, metalness: 0.45 }),
     rock: std({ map: tex.rockData, color: 0x5a5452, roughness: 0.9 }),
