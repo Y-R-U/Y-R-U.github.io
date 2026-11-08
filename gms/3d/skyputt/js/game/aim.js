@@ -41,7 +41,8 @@ export function dragForPower(power, x0, y0, ux, uy, W, H) {
 }
 
 export class AimInput {
-  // opts: { el, rig, canReady(): bool, getBall(): Ball, world, onShoot(vx, vz, power), onAimChange(state) }
+  // opts: { el, rig, canReady(): bool, getBall(): Ball, world, onShoot(vx, vz, power), onAimChange(state),
+  //         getTargets?(): [[x, y, z], ...] | null — resting balls the putt would knock (ball hits on) }
   constructor(opts) {
     Object.assign(this, opts);
     this.pointers = new Map();
@@ -150,8 +151,9 @@ export class AimInput {
     const b = this.getBall();
     const sp = shotSpeed(a.power) * this.powerMul;
     const lv = this.guideLevel;
-    const g = traceGuide(this.world, b, a.dir.x * sp, a.dir.z * sp, { len: 0.9 + 1.1 * lv, maxBounces: lv, t0: worldTime });
-    this.guide.show(scene, g.pts, a.power);
+    const targets = this.getTargets?.() || null;
+    const g = traceGuide(this.world, b, a.dir.x * sp, a.dir.z * sp, { len: 0.9 + 1.1 * lv, maxBounces: lv, t0: worldTime, targets: targets && targets.length ? targets : null });
+    this.guide.show(scene, g.pts, a.power, g.contact);
   }
 }
 
@@ -187,10 +189,30 @@ class GuideLine {
     this.mesh.frustumCulled = false;
     this.mesh.renderOrder = 5;
     this.mesh.visible = false;
+    // contact marker (ball hits on): a "ghost ball" ring where my ball would touch a resting ball,
+    // plus a small dot at the touching point
+    const rg = new THREE.RingGeometry(BALL_R * 0.92, BALL_R * 1.22, 28);
+    rg.rotateX(-Math.PI / 2);
+    const dot = new THREE.CircleGeometry(BALL_R * 0.32, 14); dot.rotateX(-Math.PI / 2);
+    this.ringMat = new THREE.MeshBasicMaterial({ color: 0xffb040, transparent: true, opacity: 0.95, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+    this.ring = new THREE.Group();
+    this.ring.add(new THREE.Mesh(rg, this.ringMat), new THREE.Mesh(dot, this.ringMat));
+    this.ring.children[1].name = 'dot';
+    this.ring.children.forEach(m => { m.renderOrder = 6; m.frustumCulled = false; m.raycast = () => {}; });
+    this.ring.visible = false;
   }
-  hide() { this.mesh.visible = false; }
-  show(scene, pts, power) {
+  hide() { this.mesh.visible = false; this.ring.visible = false; }
+  show(scene, pts, power, contact = null) {
     if (this.mesh.parent !== scene) scene.add(this.mesh);
+    if (this.ring.parent !== scene) scene.add(this.ring);
+    if (contact) {
+      const a = contact.at, p = contact.point, y = a[1] - BALL_R + 0.01;
+      this.ring.position.set(a[0], y, a[2]);
+      this.ring.children[1].position.set(p[0] - a[0], 0.001, p[2] - a[2]);
+      this.ring.scale.setScalar(1 + 0.08 * Math.sin(performance.now() / 160));
+      this.ring.children[1].position.multiplyScalar(1 / this.ring.scale.x);
+      this.ring.visible = true;
+    } else this.ring.visible = false;
     this.mat.uniforms.uTime.value = performance.now() / 1000;
     const c = this.mat.uniforms.uColor.value;
     c.setHSL(0.52 - 0.5 * power * power * 0.55, 0.9, 0.62);
@@ -220,7 +242,11 @@ class GuideLine {
     this.geo.attributes.fade.needsUpdate = true;
     this.mesh.visible = true;
   }
-  dispose() { this.mesh.parent?.remove(this.mesh); this.geo.dispose(); this.mat.dispose(); this.tex.dispose(); }
+  dispose() {
+    this.mesh.parent?.remove(this.mesh); this.ring.parent?.remove(this.ring);
+    this.geo.dispose(); this.mat.dispose(); this.tex.dispose();
+    this.ring.children.forEach(m => m.geometry.dispose()); this.ringMat.dispose();
+  }
 }
 
 function chevronTexture() {

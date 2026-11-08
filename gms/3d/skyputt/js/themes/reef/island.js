@@ -210,8 +210,8 @@ export function buildCourseRock(path, widths, hi, floor = null, voids = null) {
 }
 
 /** Round reef outcrop of radius R and depth D, sea-grass top at y = 0. */
-export function roundIsland(R, D, seed = 1, hi = true) {
-  const N = hi ? 22 : 14;
+export function roundIsland(R, D, seed = 1, hi = true, n = 0) {
+  const N = n || (hi ? 22 : 14);
   const r = rng(seed);
   const off = r() * 50;
   const L = Math.max(1, R * 0.22);
@@ -296,7 +296,7 @@ export function branchCoralGeometry(lo = false) {
   const parts = [];
   const seg = 4;
   const add = (len, r0, r1, tilt, yaw, y, x = 0, z = 0) => {
-    const g = new THREE.CylinderGeometry(r1, r0, len, seg, 1);
+    const g = new THREE.CylinderGeometry(r1, r0, len, seg, 1, true);   // open: the caps are never seen (halves the tris)
     g.translate(0, len / 2, 0); g.rotateZ(tilt); g.rotateY(yaw); g.translate(x, y, z);
     const n = g.toNonIndexed(); g.dispose(); n.deleteAttribute('uv'); parts.push(n);
     // the tip end point
@@ -319,7 +319,7 @@ export function branchCoralGeometry(lo = false) {
 export function seaFanGeometry(lo = false) {
   const parts = [];
   const st = new THREE.CylinderGeometry(0.02, 0.035, 0.2, 4); st.translate(0, 0.1, 0); parts.push(st.toNonIndexed()); st.dispose();
-  const n = lo ? 7 : 11;
+  const n = lo ? 7 : 9;
   for (let i = 0; i < n; i++) {
     const a = -1.1 + 2.2 * i / (n - 1);
     const len = 0.75 * (0.8 + 0.2 * Math.cos(a * 1.3));
@@ -327,8 +327,8 @@ export function seaFanGeometry(lo = false) {
     g.translate(0, len / 2, 0); g.rotateZ(a * 0.85); g.translate(0, 0.18, 0);
     parts.push(g.toNonIndexed()); g.dispose();
   }
-  for (const rr of [0.35, 0.55, 0.72]) {
-    const g = new THREE.TorusGeometry(rr, 0.008, 3, lo ? 8 : 12, Math.PI * 0.95);
+  for (const rr of (lo ? [0.4, 0.7] : [0.35, 0.55, 0.72])) {
+    const g = new THREE.TorusGeometry(rr, 0.008, 3, lo ? 6 : 9, Math.PI * 0.95);
     g.rotateZ(Math.PI * 0.025); g.translate(0, 0.18, 0);
     parts.push(g.toNonIndexed()); g.dispose();
   }
@@ -340,7 +340,7 @@ export function seaFanGeometry(lo = false) {
 
 /** Kelp strand: a ribbon (uv.y 0 at the holdfast → 1 at the tip) of height 1 with a slight twist. */
 export function kelpGeometry(lo = false) {
-  const segs = lo ? 5 : 8;
+  const segs = 5;   // the sway reads the same as 8 (tri budget, polish2)
   const g = new THREE.PlaneGeometry(0.16, 1, 1, segs);
   g.translate(0, 0.5, 0);
   const p = g.attributes.position;
@@ -403,7 +403,7 @@ export function buildFoliage(frames, path, widths, hi, avoid = [], voids = null,
     objects.push(im);
   }
   if (fans.length && mats.coral) {
-    const g = seaFanGeometry(!hi);
+    const g = seaFanGeometry(true);   // the 7-rib, 2-ring fan: same read at 20-40 cm, 30% fewer tris
     const im = new THREE.InstancedMesh(g, mats.coral, fans.length);
     const FC = [0xc060d0, 0xff6a60, 0xffb050, 0xe05090];
     fans.forEach((b, k) => {
@@ -415,7 +415,7 @@ export function buildFoliage(frames, path, widths, hi, avoid = [], voids = null,
     objects.push(im);
   }
   if (sponges.length && mats.coral) {
-    const g = new THREE.IcosahedronGeometry(1, hi ? 1 : 0);
+    const g = new THREE.IcosahedronGeometry(1, 0);   // 5-13 cm lumps: 20 tris read the same as 80
     const pp = g.attributes.position;
     for (let i = 0; i < pp.count; i++) {
       const x = pp.getX(i), y = pp.getY(i), z = pp.getZ(i);
@@ -437,7 +437,7 @@ export function buildFoliage(frames, path, widths, hi, avoid = [], voids = null,
   // kelp on the reef's outer edge (short) and rising from the seabed beside the reef (tall)
   if (mats.kelp) {
     const tall = [];
-    for (let i = 0; i < (hi ? 26 : 12); i++) {
+    for (let i = 0; i < (hi ? 22 : 12); i++) {
       const f = frames[Math.floor(r() * frames.length)];
       if (!f) break;
       const side = r() < 0.5 ? -1 : 1;

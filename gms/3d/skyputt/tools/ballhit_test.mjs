@@ -5,7 +5,7 @@
 // an online relay (js/net/replay.js with `balls`) replaying the shooter's knocks bit-exactly.
 import { buildHole, makeWorld } from '../js/course/builder.js';
 import { Ball, restingBall, collideBalls } from '../js/engine/physics.js';
-import { simulateShotWith, stepBalls, anyMoving } from '../js/engine/sim.js';
+import { simulateShotWith, stepBalls, anyMoving, traceGuide } from '../js/engine/sim.js';
 import { BALL_R, DT } from '../js/engine/constants.js';
 import { Replayer, targetBalls } from '../js/net/replay.js';
 import { ballState } from '../js/ai/round.js';
@@ -311,6 +311,28 @@ console.log('net.js against the local server (ball hits)');
     await A.leaveRoom(); await B.leaveRoom();
     A.close(); B.close();
   }
+}
+
+console.log('aim guide contact (polish2)');
+{
+  const { h, w } = make(straight);
+  const a = new Ball(0, h.tee.y, h.tee.z), target = [0.02, h.tee.y, h.tee.z - 0.8];
+  const plain = traceGuide(w, a, 0, -2.2, { len: 3, maxBounces: 1 });
+  const g = traceGuide(w, a, 0, -2.2, { len: 3, maxBounces: 1, targets: [target] });
+  ok(!plain.contact && g.contact && g.end === 'contact', 'the guide flags the first contact with a resting ball');
+  if (g.contact) {
+    const d = Math.hypot(g.contact.at[0] - target[0], g.contact.at[2] - target[2]);
+    ok(d < 2 * BALL_R && d > 2 * BALL_R - 0.05, `contact where the balls touch (centres ${d.toFixed(3)} m apart)`);
+    // the real shot hits that ball on the same tick the guide stopped
+    const b = rest(h, target[0], target[2]), s = new Ball(0, h.tee.y, h.tee.z);
+    w.shoot(s, 0, -2.2);
+    let t = 0, at = null;
+    for (let i = 0; i < 240 * 10 && anyMoving([s, b]) && !at; i++) { stepBalls(w, [s, b], t, true); t += DT; if (b.events.some(e => e.type === 'knocked')) at = i; s.events.length = 0; b.events.length = 0; }
+    ok(at !== null && g.pts.length > 1, 'the shot itself knocks that ball');
+  }
+  const miss = traceGuide(w, a, 0, -2.2, { len: 3, maxBounces: 1, targets: [[0.4, h.tee.y, h.tee.z - 0.8]] });
+  ok(!miss.contact && JSON.stringify(miss.pts) === JSON.stringify(plain.pts), 'a ball off the line changes nothing (guide identical)');
+  ok(a.state === 'rest' || a.state === 'moving' ? a.px === 0 && a.pz === h.tee.z : true, 'the guide never moves the real ball');
 }
 
 console.log(`\n${passes} passed, ${fails} failed`);

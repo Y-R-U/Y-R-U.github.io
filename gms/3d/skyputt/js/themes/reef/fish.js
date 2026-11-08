@@ -8,7 +8,7 @@ import { rng } from './util.js';
 
 /** A fish about 1 unit long, nose toward +z, flattened sideways; tail fin at z < -0.3. */
 function fishGeometry() {
-  const body = new THREE.SphereGeometry(0.5, 6, 4);
+  const body = new THREE.SphereGeometry(0.5, 5, 3);   // 9-50 cm fish: 24 tris each with the fins
   body.scale(0.32, 0.6, 1.0);
   const p = body.attributes.position;
   for (let i = 0; i < p.count; i++) { const z = p.getZ(i); if (z < 0) { p.setX(i, p.getX(i) * (1 + z * 0.9)); p.setY(i, p.getY(i) * (1 + z * 0.6)); } }

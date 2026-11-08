@@ -5,7 +5,7 @@ import { BALL_R, CUP_R } from '../engine/constants.js';
 
 const GROUP_MAT = {
   grass: ['grass'], fringe: ['fringe', 'grass'], wall: ['wall'], wallTop: ['wallTop', 'wall'], trim: ['trim'],
-  under: ['wall'], cupRim: ['cupRim'], sand: ['sand', 'grass'], ice: ['ice', 'grass'], boost: ['boost', 'grass'], bridge: ['bridge', 'grass'], sticky: ['sticky', 'sand', 'grass'],
+  under: ['wall'], ledge: ['wall'], cupRim: ['cupRim'], sand: ['sand', 'grass'], ice: ['ice', 'grass'], boost: ['boost', 'grass'], bridge: ['bridge', 'grass'], sticky: ['sticky', 'sand', 'grass'],
 };
 const RECEIVE = new Set(['grass', 'fringe', 'sand', 'ice', 'boost', 'bridge', 'sticky', 'wallTop', 'cupRim', 'cupHole']);
 const CAST = new Set(['wall', 'wallTop', 'trim']);
@@ -21,6 +21,20 @@ export function buildHoleView(scene, hole, theme, fallback, { renderer, camera, 
   };
   const cupHoleMat = new THREE.MeshStandardMaterial({ color: 0x15130f, roughness: 1 });
   owned.push(cupHoleMat);
+  // ledge drops: a soft shadow band on the floor below each lip (builder ledgeDress), dark at the lip,
+  // fading out over ~0.55 m (uv.y 0 → 1). Theme-independent; plain basic material, no custom shader.
+  let shadeMat = null;
+  const shadeMaterial = () => {
+    if (shadeMat) return shadeMat;
+    const n = 64, d = new Uint8Array(n * 4);
+    for (let i = 0; i < n; i++) { const a = Math.round(255 * Math.pow(1 - i / (n - 1), 0.6)); d.set([a, a, a, 255], i * 4); }
+    const tex = new THREE.DataTexture(d, 1, n);
+    tex.magFilter = tex.minFilter = THREE.LinearFilter; tex.needsUpdate = true;
+    shadeMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.62, alphaMap: tex, depthWrite: false,
+      polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    owned.push(tex, shadeMat);
+    return shadeMat;
+  };
 
   // playable meshes
   for (const [name, g] of Object.entries(hole.geo)) {
@@ -32,8 +46,9 @@ export function buildHoleView(scene, hole, theme, fallback, { renderer, camera, 
     geo.setIndex(g.idx);
     geo.computeBoundingSphere();
     owned.push(geo);
-    const m = new THREE.Mesh(geo, name === 'cupHole' ? cupHoleMat : material(name));
+    const m = new THREE.Mesh(geo, name === 'cupHole' ? cupHoleMat : name === 'shade' ? shadeMaterial() : material(name));
     m.name = 'hole.' + name;
+    if (name === 'shade') m.renderOrder = 1;
     m.receiveShadow = RECEIVE.has(name);
     m.castShadow = CAST.has(name);
     group.add(m);

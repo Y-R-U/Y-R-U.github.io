@@ -103,6 +103,11 @@ export function paint(geo, color, matrix = null, keepUv = false) {
 /** Merge a list of geometries (already painted / same attribute set); disposes the inputs. */
 export function merge(list) {
   if (!list.length) return null;
+  // buckets can be aliased together (Buckets alias): keep only the attributes every part has
+  const keys = Object.keys(list[0].attributes).filter(k => list.every(g => g.attributes[k]));
+  if (list.some(g => Object.keys(g.attributes).length !== keys.length)) for (const g of list) for (const k of Object.keys(g.attributes)) if (!keys.includes(k)) g.deleteAttribute(k);
+  const idx = list.filter(g => g.index).length;
+  if (idx && idx !== list.length) for (let i = 0; i < list.length; i++) if (list[i].index) { const n = list[i].toNonIndexed(); list[i].dispose(); list[i] = n; }
   const m = mergeGeometries(list, false);
   for (const g of list) g.dispose();
   return m;
@@ -118,13 +123,20 @@ export function mat(px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0, s = 1) {
 }
 
 /** A "bucket" collects painted geometry per material key, then builds one mesh per key. */
+const NO_SHADOW = new Set(['glow', 'win']);
+// Bucket aliases: materials that look the same at that distance / quality share one draw call.
+// vcWood and vc are the same shader (rough, vertex coloured, caustics), so wood always joins vc.
+export const ALIAS_HI = { wood: 'vc' };
+export const ALIAS_LO = { wood: 'vc', metal: 'vc', gloss: 'vc', stone: 'vc' };   // low: one lit vertex-colour draw per object
 export class Buckets {
-  constructor() { this.map = new Map(); }
+  constructor(alias = null) { this.map = new Map(); this.alias = alias; }
   add(key, geo, color, matrix, keepUv = false) {
+    key = this.alias?.[key] ?? key;
     if (!this.map.has(key)) this.map.set(key, []);
     this.map.get(key).push(paint(geo, color, matrix, keepUv));
   }
   addRaw(key, geo) {
+    key = this.alias?.[key] ?? key;
     if (!this.map.has(key)) this.map.set(key, []);
     this.map.get(key).push(geo);
   }
@@ -134,7 +146,7 @@ export class Buckets {
       const g = merge(list);
       if (!g) continue;
       const mesh = new THREE.Mesh(g, materials[key]);
-      mesh.castShadow = !!opts.castShadow;
+      mesh.castShadow = !!opts.castShadow && !NO_SHADOW.has(key);   // emissive parts never cast (saves a shadow draw per skin)
       mesh.receiveShadow = !!opts.receiveShadow;
       mesh.name = key;
       parent.add(mesh);

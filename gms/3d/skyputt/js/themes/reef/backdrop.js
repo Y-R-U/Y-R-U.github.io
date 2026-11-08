@@ -7,13 +7,13 @@
 import * as THREE from 'three';
 import { rng, mat, noise3 } from './util.js';
 import { roundIsland, spikes } from './island.js';
-import { anemone, clam, amphora, brokenColumn, fallenDrum, lanternPost, barrel, anchorProp, chest, brainCoral, tubeSponges, starfish, COLORS } from './props.js';
+import { anemone, clam, amphora, brokenColumn, fallenDrum, lanternPost, barrel, anchorProp, chest, brainCoral, COLORS } from './props.js';
 
 const put = (b, key, geo, color, M, local, keepUv = false) => b.add(key === 'coral' ? 'vc' : key, geo, color, local ? M.clone().multiply(local) : M, keepUv);
 
 /** Planked hull geometry (vertex coloured, no uv), bow toward +x, keel at y = 0, deck edge at y = H. */
 function hullGeometry(L, W, H, hi) {
-  const NS = hi ? 28 : 16, NJ = hi ? 12 : 8;
+  const NS = hi ? 20 : 14, NJ = hi ? 10 : 8;   // 35+ m away
   const pos = [], col = [], idx = [];
   const c = new THREE.Color(), wood = new THREE.Color(COLORS.wood), wood2 = new THREE.Color(COLORS.wood2),
     weed = new THREE.Color(0x4a6a3a), barn = new THREE.Color(0xc8c0b0), dark = new THREE.Color(0x2a2218);
@@ -72,15 +72,15 @@ export function buildShip(b, M, hi) {
     put(b, 'wood', new THREE.BoxGeometry(L / NS * 1.02, 0.18, w), i % 2 ? COLORS.wood3 : COLORS.wood, M, mat(x, y, 0));
   }
   // rail posts along both sides
-  if (hi) for (let i = 1; i < 14; i++) {
-    const t = i / 14, x = -L / 2 + t * L, w = hull.half(t), y = hull.sheer(t);
+  if (hi) for (let i = 1; i < 10; i++) {
+    const t = i / 10, x = -L / 2 + t * L, w = hull.half(t), y = hull.sheer(t);
     for (const s of [-1, 1]) put(b, 'wood', new THREE.BoxGeometry(0.14, 0.7, 0.14), COLORS.wood2, M, mat(x, y + 0.3, s * w * 0.95));
   }
   // stern cabin with windows
   put(b, 'wood', new THREE.BoxGeometry(4.4, 2.4, 4.6), COLORS.wood2, M, mat(-L / 2 + 2.6, H + 1.0, 0));
   put(b, 'wood', new THREE.BoxGeometry(5.0, 0.3, 5.2), COLORS.wood3, M, mat(-L / 2 + 2.6, H + 2.3, 0, 0, 0, 0.04));
-  for (const z of [-1.2, 0, 1.2]) put(b, 'win', new THREE.BoxGeometry(0.1, 0.6, 0.5), null, M, mat(-L / 2 + 0.35, H + 1.1, z));
-  for (const x of [-L / 2 + 1.6, -L / 2 + 3.4]) put(b, 'win', new THREE.BoxGeometry(0.6, 0.5, 0.1), null, M, mat(x, H + 1.2, 2.32));
+  for (const z of [-1.2, 0, 1.2]) put(b, 'glow', new THREE.BoxGeometry(0.1, 0.6, 0.5), 0x80f0e0, M, mat(-L / 2 + 0.35, H + 1.1, z));
+  for (const x of [-L / 2 + 1.6, -L / 2 + 3.4]) put(b, 'glow', new THREE.BoxGeometry(0.6, 0.5, 0.1), 0x80f0e0, M, mat(x, H + 1.2, 2.32));
   glows.push({ p: Wp(-L / 2 + 0.2, H + 1.1, 0), w: 4, color: [0.5, 1, 0.9], a: 0.25 });
   // foremast standing, with a yard and a tattered sail; the mainmast snapped off
   const fx = L * 0.22;
@@ -102,11 +102,11 @@ export function buildShip(b, M, hi) {
   // bowsprit and a figurehead lump
   put(b, 'wood', new THREE.CylinderGeometry(0.1, 0.18, 7, 6), COLORS.wood2, M, mat(L / 2 + 2.2, H + 1.4, 0, 0, 0, -1.2));
   // a lantern hanging at the stern, still glowing
-  const lp = lanternPost(b, M.clone().multiply(mat(-L / 2 + 0.6, H + 2.4, 2.0)), 1.6, !hi);
+  const lp = lanternPost(b, M.clone().multiply(mat(-L / 2 + 0.6, H + 2.4, 2.0)), 1.6, true);
   glows.push({ p: Wp(-L / 2 + 0.6 + lp.x, H + 2.4 + lp.y, 2.0), w: 2.6, color: [0.6, 1, 0.85], a: 0.55 });
   // barrels, an anchor and a chest spilled on the sand beside it
-  barrel(b, M.clone().multiply(mat(3, 0, W * 0.7, 0, 0.4, 0)), 1.1, true, !hi);
-  barrel(b, M.clone().multiply(mat(4.6, 0, W * 0.8, 0, -0.3, 0)), 1.0, false, !hi);
+  barrel(b, M.clone().multiply(mat(3, 0, W * 0.7, 0, 0.4, 0)), 1.1, true, true);
+  barrel(b, M.clone().multiply(mat(4.6, 0, W * 0.8, 0, -0.3, 0)), 1.0, false, true);
   anchorProp(b, M.clone().multiply(mat(L / 2 - 1, 0, -W * 0.72, 0, 0.6, 0)), 3.2);
   const cg = chest(b, M.clone().multiply(mat(-2, 0, W * 0.85, 0, 0.5, 0)), 1.2);
   glows.push({ p: Wp(-2, cg.y, W * 0.85), w: 1.8, color: [1, 0.85, 0.4], a: 0.45 });
@@ -128,7 +128,7 @@ export function buildTemple(b, M, hi) {
   for (let i = 0; i < 3; i++) put(b, 'stone', new THREE.BoxGeometry(18 - i * 1.4, 0.7, 11 - i * 1.4), i % 2 ? S2 : S1, M, mat(0, 0.35 + i * 0.7, 0));
   const top = 2.1;
   // two rows of columns: front row intact under the pediment, side columns broken at varied heights
-  const colH = 7.5, cr = 0.55, seg = hi ? 12 : 8;
+  const colH = 7.5, cr = 0.55, seg = hi ? 10 : 8;
   const fluted = (h) => {
     const g = new THREE.CylinderGeometry(cr * 0.9, cr, h, seg * 2, 1);
     const p = g.attributes.position;
@@ -142,7 +142,7 @@ export function buildTemple(b, M, hi) {
   for (const [z, front] of [[3.6, true], [-3.0, false]]) {
     xs.forEach((x, k) => {
       if (!front && (k === 1 || k === 4)) {   // fallen: drums lying in front of the plinth
-        if (hi) fallenDrum(b, M.clone().multiply(mat(x + 1.2, 0, z - 4.6 + k * 0.4, 0, 0.6 + k, 0)), 1.6, !hi);
+        if (hi) fallenDrum(b, M.clone().multiply(mat(x + 1.2, 0, z - 4.6 + k * 0.4, 0, 0.6 + k, 0)), 1.6, true);
         return;
       }
       const h = front ? colH : colH * (0.35 + r() * 0.55);
@@ -186,20 +186,20 @@ export function buildTemple(b, M, hi) {
   for (const [x, z] of [[-7.6, 4.4], [7.6, 4.4], [-7.6, -4.0], [7.6, -4.0]]) {
     put(b, 'stone', new THREE.CylinderGeometry(0.35, 0.45, 1.6, 8), S2, M, mat(x, top + 0.8, z));
     put(b, 'metal', new THREE.CylinderGeometry(0.6, 0.3, 0.4, 10, 1, true), COLORS.bronze, M, mat(x, top + 1.8, z));
-    put(b, 'glow', new THREE.SphereGeometry(0.38, 10, 6), 0x9ff8f0, M, mat(x, top + 2.0, z));
+    put(b, 'glow', new THREE.SphereGeometry(0.38, 8, 5), 0x9ff8f0, M, mat(x, top + 2.0, z));
     glows.push({ p: Wp(x, top + 2.1, z), w: 3.4, color: [0.45, 1, 0.9], a: 0.5 });
   }
   // anemones and clams on the steps
-  for (let i = 0; i < (hi ? 6 : 3); i++) {
+  for (let i = 0; i < 3; i++) {
     const x = -8 + r() * 16, z = 4.8 + r() * 0.8;
     const L2 = mat(x, 0.7 * (1 + (i % 2)), z + (i % 2 ? -0.7 : 0));
-    const g = anemone(b, M.clone().multiply(L2), 0.9 + r() * 0.5, i, !hi);
+    const g = anemone(b, M.clone().multiply(L2), 0.9 + r() * 0.5, i, true);
     glows.push({ p: g.applyMatrix4(L2).applyMatrix4(M), w: 1.6, color: i % 3 === 1 ? [0.5, 1, 0.9] : [1, 0.5, 0.8], a: 0.4 });
   }
-  const cp = clam(b, M.clone().multiply(mat(5.5, 0, 6.8, 0, -0.4, 0)), 1.8, !hi);
+  const cp = clam(b, M.clone().multiply(mat(5.5, 0, 6.8, 0, -0.4, 0)), 1.8, true);
   glows.push({ p: Wp(5.5, cp.y, 6.8 + cp.z), w: 1.4, color: [0.9, 0.95, 1], a: 0.55 });
-  amphora(b, M.clone().multiply(mat(-4.5, 0, 7.0, 0, 0.3, 0)), 1.4, true, !hi);
-  amphora(b, M.clone().multiply(mat(-3.4, 0, 6.6, 0, 1.0, 0)), 1.3, false, !hi);
+  amphora(b, M.clone().multiply(mat(-4.5, 0, 7.0, 0, 0.3, 0)), 1.4, true, true);
+  amphora(b, M.clone().multiply(mat(-3.4, 0, 6.6, 0, 1.0, 0)), 1.3, false, true);
   bubbles.push(Wp(0, yA + 3.6, 3.6), Wp(-2.6, top + 5, -3.0));
   return { glows, bubbles };
 }
@@ -208,7 +208,7 @@ export function buildTemple(b, M, hi) {
 export function buildIsle(b, rocks, M0, lp, R, D, kind, seed, hi, kelpPts) {
   const r = rng(seed);
   const M = new THREE.Matrix4().makeTranslation(lp.x, lp.y, lp.z).multiply(M0);
-  const { geometry, L } = roundIsland(R, D, seed, hi);
+  const { geometry, L } = roundIsland(R, D, seed, false, 12);   // 20-70 m away: 12 lobes read the same as 22
   geometry.applyMatrix4(M);
   rocks.push(geometry);
   const sp = []; spikes(sp, 0, -L * 1.5, 0, R, D, hi ? 4 : 2, seed + 1);
@@ -218,17 +218,16 @@ export function buildIsle(b, rocks, M0, lp, R, D, kind, seed, hi, kelpPts) {
   const at = (rad, ry = null) => { const a = r() * Math.PI * 2, d = R * rad * (0.3 + r() * 0.7); return mat(Math.cos(a) * d, 0, Math.sin(a) * d, 0, ry ?? r() * 6.28, 0); };
   const add = (L2) => M.clone().multiply(L2);
   const CC = [0xff7a8a, 0xffa050, 0xc080e0, 0xf0d060];
-  if (kind === 'corals') for (let i = 0; i < (hi ? 3 : 2); i++) brainCoral(b, add(at(0.6)), R * (0.18 + r() * 0.12), CC[i % 4], !hi);
-  if (kind === 'clams') { const Lx = at(0.4); const p = clam(b, add(Lx), R * 0.5, !hi); glows.push({ p: W(p.applyMatrix4(Lx)), w: R * 0.4, color: [0.9, 0.95, 1], a: 0.5 }); }
-  if (kind === 'amphorae') for (let i = 0; i < 3; i++) amphora(b, add(at(0.6)), R * 0.3, i === 1, !hi);
+  if (kind === 'corals') for (let i = 0; i < (hi ? 3 : 2); i++) brainCoral(b, add(at(0.6)), R * (0.18 + r() * 0.12), CC[i % 4], true);
+  if (kind === 'clams') { const Lx = at(0.4); const p = clam(b, add(Lx), R * 0.5, true); glows.push({ p: W(p.applyMatrix4(Lx)), w: R * 0.4, color: [0.9, 0.95, 1], a: 0.5 }); }
+  if (kind === 'amphorae') for (let i = 0; i < 3; i++) amphora(b, add(at(0.6)), R * 0.3, i === 1, true);
   if (kind === 'anemones') for (let i = 0; i < (hi ? 4 : 2); i++) {
-    const Lx = at(0.6); const g = anemone(b, add(Lx), R * 0.22, i, !hi);
+    const Lx = at(0.6); const g = anemone(b, add(Lx), R * 0.22, i, true);
     glows.push({ p: W(g.applyMatrix4(Lx)), w: R * 0.45, color: i % 3 === 1 ? [0.5, 1, 0.9] : [1, 0.5, 0.8], a: 0.45 });
   }
-  if (kind === 'columns') { brokenColumn(b, add(at(0.3)), R * 0.9, r, !hi); fallenDrum(b, add(at(0.6)), R * 0.35, !hi); }
-  if (kind === 'kelp' && kelpPts) for (let i = 0; i < (hi ? 6 : 3); i++) { const p = W(new THREE.Vector3(0, 0, 0).applyMatrix4(at(0.7))); kelpPts.push({ x: p.x, y: p.y, z: p.z, h: R * (0.8 + r() * 0.9) }); }
-  if (kind !== 'corals') brainCoral(b, add(at(0.85)), R * (0.12 + r() * 0.08), CC[(seed >> 2) % 4], !hi);
-  if (hi) tubeSponges(b, add(at(0.8)), R * 0.3, r, 3, [0xb070c0, 0xe0a050, 0xff7a9a][seed % 3]);
-  if (hi && kind !== 'anemones') starfish(b, add(at(0.7)), R * 0.1, r() < 0.5 ? COLORS.star : COLORS.star2);
+  if (kind === 'columns') { brokenColumn(b, add(at(0.3)), R * 0.9, r, true); fallenDrum(b, add(at(0.6)), R * 0.35, true); }
+  if (kind === 'kelp' && kelpPts) for (let i = 0; i < (hi ? 5 : 3); i++) { const p = W(new THREE.Vector3(0, 0, 0).applyMatrix4(at(0.7))); kelpPts.push({ x: p.x, y: p.y, z: p.z, h: R * (0.8 + r() * 0.9) }); }
+  if (kind !== 'corals') brainCoral(b, add(at(0.85)), R * (0.12 + r() * 0.08), CC[(seed >> 2) % 4], true);
+  // (tube sponges and starfish used to dress every outcrop too: under a few pixels at 20-70 m, dropped for the tri budget)
   return glows;
 }

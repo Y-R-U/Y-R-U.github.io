@@ -61,7 +61,10 @@ export function simulateShotWith(world, ball, vx, vz, others, { t0 = world.time,
 // Guide line: run the real sim forward from `ball` with the given velocity.
 // Base length `len` metres of travel; stops at the bounce number `maxBounces + 1`.
 // Returns an array of [x, y, z] points (ball centre) and the bounce points.
-export function traceGuide(world, ball, vx, vz, { len = 1.2, maxBounces = 0, t0 = world.time, step = 3 } = {}) {
+// `targets` (optional, [[x, y, z], ...]): resting balls; the trace stops at the first step where the
+// ball would touch one (the same 2R test as collideBalls) and reports `contact` = { at: my ball centre,
+// ball: the struck ball, point: the touching point }. Read-only: the targets never move.
+export function traceGuide(world, ball, vx, vz, { len = 1.2, maxBounces = 0, t0 = world.time, step = 3, targets = null } = {}) {
   const b = ball.clone();
   b.events = [];
   world.shoot(b, vx, vz);
@@ -69,9 +72,18 @@ export function traceGuide(world, ball, vx, vz, { len = 1.2, maxBounces = 0, t0 
   const bounces = [];
   let t = t0, dist = 0, i = 0;
   let lx = b.px, ly = b.py, lz = b.pz;
+  let contact = null;
+  const D2 = 4 * BALL_R * BALL_R;
   while (b.state === 'moving' && i < 240 * 12) {
     world.stepBall(b, t); t += DT * world.clock; i++;
     dist += Math.hypot(b.px - lx, b.py - ly, b.pz - lz); lx = b.px; ly = b.py; lz = b.pz;
+    if (targets && b.state === 'moving') {
+      for (const q of targets) {
+        const dx = q[0] - b.px, dy = q[1] - b.py, dz = q[2] - b.pz;
+        if (dx * dx + dy * dy + dz * dz < D2) { contact = { at: [b.px, b.py, b.pz], ball: q, point: [b.px + dx / 2, b.py + dy / 2, b.pz + dz / 2] }; break; }
+      }
+      if (contact) { pts.push([b.px, b.py, b.pz]); break; }
+    }
     let hit = false;
     for (const e of b.events) if (e.type === 'wall' || e.type === 'obstacle' || e.type === 'guard') hit = true;
     b.events.length = 0;
@@ -83,5 +95,5 @@ export function traceGuide(world, ball, vx, vz, { len = 1.2, maxBounces = 0, t0 
     if (dist >= len) { pts.push([b.px, b.py, b.pz]); break; }
   }
   if (b.state !== 'moving') pts.push([b.px, b.py, b.pz]);
-  return { pts, bounces, end: b.state, radius: BALL_R };
+  return { pts, bounces, end: contact ? 'contact' : b.state, radius: BALL_R, contact };
 }

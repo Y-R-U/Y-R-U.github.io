@@ -46,6 +46,21 @@ export function createMaterials(quality = 'high') {
   tex.lavaSlow.repeat.set(0.25, 0.25);
 
   const std = (o) => new THREE.MeshStandardMaterial(o);
+  // Faint ember rim: a fresnel glow on grazing faces, as if lit by the lava. The view vector is
+  // length-guarded and the pow() base clamped (Adreno NaN rule).
+  const emberRim = (m, key) => {
+    m.onBeforeCompile = (sh) => {
+      sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+        {
+          float vl = length(vViewPosition);
+          vec3 rv = vl > 1e-4 ? vViewPosition / vl : vec3(0.0, 0.0, 1.0);
+          float rim = pow(clamp(1.0 - abs(dot(normal, rv)), 0.0, 1.0), 3.0);
+          totalEmissiveRadiance += vec3(1.0, 0.34, 0.08) * rim * 0.55;
+        }`);
+    };
+    m.customProgramCacheKey = () => 'volcano-rim-' + key;
+    return m;
+  };
 
   // trim: brass bands with a molten channel that flows along the wall and pulses gently
   const trimMat = std({ map: tex.trim, roughness: 0.4, metalness: 0.55, emissive: 0xffffff, emissiveMap: tex.trimGlow, emissiveIntensity: 1.6 });
@@ -131,9 +146,9 @@ export function createMaterials(quality = 'high') {
     vc: std({ vertexColors: true, roughness: 0.85 }),
     // basalt / dark stone for props and set pieces
     vcStone: std({ vertexColors: true, roughness: 0.9, flatShading: true }),
-    // obsidian crystals: glossy, a faint violet glow
-    vcGloss: std({ vertexColors: true, roughness: 0.12, metalness: 0.2, emissive: 0x1a0c22, emissiveIntensity: 0.6 }),
-    crystalInst: std({ color: 0xffffff, roughness: 0.1, metalness: 0.25, emissive: 0x22102e, emissiveIntensity: 0.7, flatShading: true }),
+    // obsidian crystals: dark glassy black / grey like the obsidian ice, with a faint ember rim (fresnel)
+    vcGloss: emberRim(std({ vertexColors: true, roughness: 0.08, metalness: 0.3, emissive: 0x16181c, emissiveIntensity: 0.4 }), 'vg'),
+    crystalInst: emberRim(std({ color: 0xffffff, roughness: 0.08, metalness: 0.3, emissive: 0x16181c, emissiveIntensity: 0.4, flatShading: true }), 'ci'),
     stoneInst: std({ color: 0xffffff, roughness: 0.92, flatShading: true }),
     vcCloth: std({ vertexColors: true, roughness: 0.8, side: THREE.DoubleSide }),
     // iron / brass / copper (vertex colour picks which)

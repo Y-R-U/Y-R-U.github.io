@@ -269,14 +269,17 @@ export function buildEnvironment(scene, info, M, quality) {
     glow(cp.clone().add(new THREE.Vector3(0, 2, 0)), v.RC * 4.5, [1, 0.42, 0.1], 0.55);
     glow(cp.clone().add(new THREE.Vector3(0, 6, 0)), v.RC * 9, [1, 0.32, 0.08], 0.22);
     for (const s of v.streams) glow(s.clone().applyMatrix4(vM), 9, [1, 0.38, 0.1], 0.2);
-    // eruption plume: dark smoke columns rising and spreading, embers thrown up
+    // eruption plume: dark smoke rising off the crater and bent over by the wind toward the middle of the
+    // view (a tall column cropped off the top of portrait; this ash cloud spreads sideways instead and
+    // stays within ~4-5 deg above the peak), embers thrown up
     const nP = hi ? 22 : 12;
     for (let i = 0; i < nP; i++) {
-      smokeItems.push({ p: cp.clone().add(new THREE.Vector3((r() - 0.5) * 5, 1 + r() * 3, (r() - 0.5) * 5)), w: 18 + r() * 14,
-        a: 0.92, color: [0.16 + r() * 0.05, 0.1, 0.085], phase: i / nP, drift: 40 + r() * 16, uvk: (r() * 4) | 0 });
+      const w = 14 + r() * 10;
+      smokeItems.push({ p: cp.clone().add(new THREE.Vector3((r() - 0.5) * 5, 1 + r() * 2, (r() - 0.5) * 5)), w, h: w * 0.55,
+        a: 0.92, color: [0.16 + r() * 0.05, 0.1, 0.085], phase: i / nP, drift: 6 + r() * 2.5, lean: 5, uvk: (r() * 4) | 0 });
     }
     for (let i = 0; i < (hi ? 30 : 14); i++) {
-      sparkItems.push({ p: cp.clone().add(new THREE.Vector3((r() - 0.5) * 6, 4 + r() * 18, (r() - 0.5) * 6)), w: 0.7 + r() * 0.6,
+      sparkItems.push({ p: cp.clone().add(new THREE.Vector3((r() - 0.5) * 6, 3 + r() * 9, (r() - 0.5) * 6)), w: 0.7 + r() * 0.6,
         a: 1, color: [1, 0.5 + r() * 0.3, 0.15], phase: r(), drift: 4 + r() * 4 });
     }
   }
@@ -359,7 +362,7 @@ export function buildEnvironment(scene, info, M, quality) {
   if (smokeItems.length) {
     for (const s of smokeItems) s.uv = cell(s.uvk || 0);
     smokeItems.sort((a, b) => b.p.distanceTo(eye) - a.p.distanceTo(eye));
-    const sm = makeBillboards(smokeItems, { map: smokeTex, mode: 'smoke', fog, uniforms: M.uniforms, renderOrder: 2 });
+    const sm = makeBillboards(smokeItems, { map: smokeTex, mode: 'smoke', fog, uniforms: M.uniforms, renderOrder: 2, wind: frame.viewRight.clone().negate() });
     sm.name = 'volcano.smoke';
     root.add(sm);
   }

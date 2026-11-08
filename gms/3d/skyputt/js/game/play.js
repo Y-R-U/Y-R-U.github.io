@@ -62,6 +62,7 @@ export class Round {
       getBall: () => this.ball, world: null,
       onShoot: (vx, vz, power) => this.shoot(vx, vz, power),
       onAimChange: a => this.onAim(a),
+      getTargets: () => this.guideTargets(),
     });
     this.aim.lookSens = app.store.settings().camSens ?? 1;
     const hud = app.hud;
@@ -548,6 +549,22 @@ export class Round {
   }
 
   // ---- ball hits: other real balls on the hole
+  // Resting balls my next putt would collide with, for the aim guide's contact marker (read-only; the
+  // shot itself is simulated as before). Online rooms use the same list the shot is relayed with.
+  guideTargets() {
+    if (!this.collide) return null;
+    const b = this.ball, out = [];
+    if (typeof this.targetsFor === 'function') {   // OnlineRound (js/net/round.js)
+      for (const t of this.targetsFor(this.og.you, { x: b.px, y: b.py, z: b.pz })) out.push([t.x, t.y, t.z]);
+      return out;
+    }
+    const gs = this.ghost?.sim || null;
+    if (gs && this.strokes === 0) return null;   // a teed-up ball never collides with the ghost (update loop: noHit)
+    const ok = o => o.state === 'rest' && !o.noHit && Math.hypot(o.px - b.px, o.py - b.py, o.pz - b.pz) >= 2 * BALL_R + 0.002;
+    for (const o of this.others) if (ok(o)) out.push([o.px, o.py, o.pz]);
+    if (gs && ok(gs.ball)) out.push([gs.ball.px, gs.ball.py, gs.ball.pz]);
+    return out;
+  }
   ballsMoving() { return this.ball.state === 'moving' || (this.others.length > 0 && anyMoving(this.others)); }
   whenSettled(fn) { if (!this.ballsMoving() && !this._settle.length) fn(); else this._settle.push(fn); }
   flushSettled() { const q = this._settle; this._settle = []; for (const fn of q) fn(); }

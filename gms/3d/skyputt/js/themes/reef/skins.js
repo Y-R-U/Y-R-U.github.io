@@ -1,7 +1,7 @@
 // Sunken Reef theme — obstacle skins (visual only; the engine owns colliders).
 // Placement conventions follow THEME_CONTRACT "Engine extensions" (same as the other themes).
 import * as THREE from 'three';
-import { Buckets, mat } from './util.js';
+import { Buckets, mat, ALIAS_HI, ALIAS_LO } from './util.js';
 import { COLORS } from './props.js';
 
 const STONE = COLORS.stone, STONE2 = COLORS.stone2, STONE3 = COLORS.stone3, MOSS = COLORS.moss;
@@ -18,6 +18,7 @@ export function createSkins(M) {
   const glowMats = [];
   const disposables = [];
   const lo = M.quality === 'low';
+  const alias = lo ? ALIAS_LO : ALIAS_HI;   // shared-look buckets → fewer draw calls per skin
 
   function ringGlowMaterial(color, pulse = 1) {
     const m = new THREE.ShaderMaterial({
@@ -43,7 +44,7 @@ export function createSkins(M) {
   const knobRing = (b, R, y, n, rr = 0.012, key = 'gloss', colors = [0xd8d0c0, 0xc8c0b0]) => {
     for (let i = 0; i < n; i++) {
       const a = i / n * Math.PI * 2 + (i % 3) * 0.13;
-      b.add(key, new THREE.SphereGeometry(rr * (0.7 + (i % 3) * 0.2), 5, 3, 0, Math.PI * 2, 0, Math.PI / 2), colors[i % colors.length],
+      b.add(key, new THREE.SphereGeometry(rr * (0.7 + (i % 3) * 0.2), 5, 2, 0, Math.PI * 2, 0, Math.PI / 2), colors[i % colors.length],
         mat(Math.sin(a) * R, y + ((i * 7) % 5) * rr * 0.3, Math.cos(a) * R, 0, a, 0).multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2)));
     }
   };
@@ -54,7 +55,7 @@ export function createSkins(M) {
     const n = o.bladeCount ?? 4, BL = o.bladeLength ?? 0.8, BW = o.bladeWidth ?? 0.2, gap = o.gapWidth ?? 0.3;
     const g2 = gap / 2;
     const th = o.gapHeight ?? 0.24;
-    const b = new Buckets();
+    const b = new Buckets(alias);
     const beta = Math.acos(Math.min(0.99, g2 / R));
     const zFace = Math.sqrt(Math.max(0, R * R - g2 * g2));
     const seg = lo ? 8 : 12;
@@ -109,7 +110,7 @@ export function createSkins(M) {
     // rotor: a bronze hub with a glowing pearl, wooden spars, planked paddles in bronze frames, barnacles.
     // Blade k along +Y rotated 2πk/n; the paddle spans x ∈ [0.018, 0.018 + BW], radius 0.06 → BL, within ±0.022 in Z.
     const rotor = new THREE.Group(); rotor.name = 'reef.windmill.rotor';
-    const rb = new Buckets();
+    const rb = new Buckets(alias);
     rb.add('metal', new THREE.CylinderGeometry(0.085, 0.085, 0.035, 16), BRONZE, mat(0, 0, 0.018, Math.PI / 2, 0, 0));
     rb.add('glow', new THREE.SphereGeometry(0.04, 10, 6), 0xf0f8ff, mat(0, 0, 0.036, 0, 0, 0, [1, 1, 0.5]));
     const PL = [WOOD, WOOD3, WOOD2];
@@ -153,10 +154,10 @@ export function createSkins(M) {
   }
   function loop(o = {}) {
     const R = o.radius ?? 0.6, W = o.width ?? 0.5, S = o.sideShift ?? W * 1.3;
-    const b = new Buckets();
+    const b = new Buckets(alias);
     for (const s of [-1, 1]) {
       const c = new Helix(R, S, 0.04, s * (W / 2 + 0.014));
-      b.add('metal', new THREE.TubeGeometry(c, lo ? 40 : 56, 0.018, 5, false), BRONZE, null);
+      b.add('metal', new THREE.TubeGeometry(c, lo ? 32 : 40, 0.018, 4, false), BRONZE, null);
     }
     // plank band behind the track (uv: u = metres along, v 0..1 across; a glow seam down the middle)
     const pos = [], nor = [], uvs = [], idx = [];
@@ -178,12 +179,12 @@ export function createSkins(M) {
     b.add('band', band, null, null, true);
     // bronze edge piping and coral knobs along both outer edges
     for (const e of [-1, 1]) {
-      b.add('metal', new THREE.TubeGeometry(new Helix(R, S, -out - 0.004, e * BWd), 48, 0.013, 3, false), BRONZE2, null);
+      b.add('metal', new THREE.TubeGeometry(new Helix(R, S, -out - 0.004, e * BWd), lo ? 32 : 40, 0.013, 3, false), BRONZE2, null);
       const nB = lo ? 12 : 20;
       for (let i = 1; i < nB; i++) {
         const t = i / nB, a = t * Math.PI * 2, r = R + out + 0.012;
         const Mx = mat(loopX(S, t) + e * (BWd + 0.004), R - r * Math.cos(a), r * Math.sin(a), a, 0, 0);
-        b.add('vc', new THREE.SphereGeometry(0.022 + (i % 3) * 0.006, 6, 3, 0, Math.PI * 2, 0, Math.PI / 2), CORAL[(i + (e > 0 ? 1 : 0)) % CORAL.length], Mx);
+        b.add('vc', new THREE.SphereGeometry(0.022 + (i % 3) * 0.006, 6, 2, 0, Math.PI * 2, 0, Math.PI / 2), CORAL[(i + (e > 0 ? 1 : 0)) % CORAL.length], Mx);
       }
     }
     // a giant clam crowning the top, a glowing pearl in it
@@ -206,7 +207,7 @@ export function createSkins(M) {
     const glass = new THREE.Mesh(new THREE.TubeGeometry(curve, segs, r * 1.02, lo ? 10 : 14, false), I.glass);
     glass.renderOrder = 4;
     object.add(glass);
-    const b = new Buckets();
+    const b = new Buckets(alias);
     const nRings = Math.max(2, Math.floor(len / 0.32));
     const q = new THREE.Quaternion(), Z = new THREE.Vector3(0, 0, 1);
     const m4 = new THREE.Matrix4();
@@ -232,7 +233,7 @@ export function createSkins(M) {
   function flag(o = {}) {
     const H = o.poleHeight ?? 1.0;
     const object = new THREE.Group(); object.name = 'reef.flag';
-    const b = new Buckets();
+    const b = new Buckets(alias);
     b.add('wood', new THREE.CylinderGeometry(0.012, 0.015, H, 8, 1, true), WOOD2, mat(0, H / 2, 0));
     for (const f of [0.3, 0.6]) b.add('metal', new THREE.CylinderGeometry(0.017, 0.017, 0.02, 8), BRONZE, mat(0, H * f, 0));
     b.add('metal', new THREE.CylinderGeometry(0.02, 0.014, 0.03, 8), BRONZE, mat(0, H + 0.005, 0));
@@ -265,7 +266,7 @@ export function createSkins(M) {
   // ---------------- pickup: a spinning, bobbing pearl in a scallop shell with a glow ----------------
   const pearlCols = [0xf8f4ff, 0xffd8ec, 0xb8fff4];
   const pickGeos = pearlCols.map((c) => {
-    const b = new Buckets();
+    const b = new Buckets(alias);
     b.add('glow', new THREE.SphereGeometry(0.045, 12, 8), c, mat(0, 0.012, 0));
     // the scallop: a fan of ribs below the pearl
     for (let i = 0; i < 7; i++) {
@@ -310,13 +311,13 @@ export function createSkins(M) {
   let bumpN = 0;
   function bumper(o = {}) {
     const r = o.radius ?? 0.1, h = Math.max(o.height ?? 0.2, r * 1.1);
-    const b = new Buckets();
+    const b = new Buckets(lo ? alias : { ...alias, vc: 'stone' });   // knobs + moss flat-shaded with the drum: 3 draws → 2
     const k = bumpN++;
     const sides = 10, R = r / Math.cos(Math.PI / sides) * 1.01;   // the flat faces sit on the collider radius
     b.add('stone', new THREE.CylinderGeometry(R * 0.97, R, h * 0.84, sides), k % 2 ? STONE : STONE2, mat(0, h * 0.42, 0));
     b.add('stone', new THREE.CylinderGeometry(R * 1.04, R * 1.06, h * 0.1, sides), STONE3, mat(0, h * 0.05, 0));
-    knobRing(b, R * 0.99, h * 0.2, lo ? 6 : 10, Math.min(0.018, r * 0.18), 'vc', [CORAL[k % 4], CORAL[(k + 1) % 4]]);
-    knobRing(b, R * 0.99, h * 0.55, lo ? 4 : 6, Math.min(0.012, r * 0.12), 'vc');
+    knobRing(b, R * 0.99, h * 0.2, lo ? 6 : 8, Math.min(0.018, r * 0.18), 'vc', [CORAL[k % 4], CORAL[(k + 1) % 4]]);
+    knobRing(b, R * 0.99, h * 0.55, lo ? 4 : 5, Math.min(0.012, r * 0.12), 'vc');
     b.add('vc', new THREE.CylinderGeometry(R * 0.94, R * 0.97, h * 0.12, sides), MOSS, mat(0, h * 0.9, 0));
     // the anemone's tentacles, glowing
     const nT = lo ? 6 : 10;
@@ -339,7 +340,7 @@ export function createSkins(M) {
     disc.rotation.y = Math.PI;   // the shell's fan (texture +v) opens back toward the tee, behind the ball
     disc.receiveShadow = true;
     object.add(disc);
-    const b = new Buckets();
+    const b = new Buckets(alias);
     b.add('metal', new THREE.TorusGeometry(R * 0.99, Math.min(0.016, R * 0.05), 5, 48), BRONZE, mat(0, 0.006, 0, Math.PI / 2, 0, 0));
     for (let i = 0; i < 8; i++) {
       const a = i / 8 * Math.PI * 2 + Math.PI / 8;
@@ -356,7 +357,7 @@ export function createSkins(M) {
   let moverN = 0;
   function mover(o = {}) {
     const w = o.width ?? 0.4, h = o.height ?? 0.16, d = o.depth ?? 0.2;
-    const b = new Buckets();
+    const b = new Buckets(alias);
     const k = moverN++ % 2;
     b.add('stone', new THREE.BoxGeometry(w, h * 0.86, d), k ? STONE : STONE2, mat(0, h * 0.43, 0));
     b.add('stone', new THREE.BoxGeometry(w * 0.98, h * 0.14, d * 0.98), STONE3, mat(0, h * 0.93, 0));

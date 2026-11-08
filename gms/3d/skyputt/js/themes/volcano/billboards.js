@@ -4,8 +4,11 @@ import * as THREE from 'three';
 
 /**
  * items: [{ p: Vector3|[x,y,z], w, h, uv?: [u0,v0,u1,v1], color?: [r,g,b], a?: number,
- *           phase?: number, drift?: number }]
- * opts: { map, additive, mode: 'static'|'sparkle'|'flicker'|'mist'|'rise'|'bat'|'drift', fog (THREE.Fog), uniforms (shared uTime) }
+ *           phase?: number, drift?: number, lean?: integer }]
+ * opts: { map, additive, mode: 'static'|'sparkle'|'flicker'|'mist'|'rise'|'bat'|'drift', fog (THREE.Fog), uniforms (shared uTime),
+ *         wind?: Vector3 (smoke: horizontal unit direction a `lean` item is blown along) }
+ * smoke + lean k >= 1: a wind-bent plume — rises `drift` (easing out) while it is carried k * drift along `wind`
+ * and spreads; k rides in the integer part of the phase attribute (the shader only uses the fraction as phase).
  */
 export function makeBillboards(items, opts) {
   const n = items.length;
@@ -24,7 +27,7 @@ export function makeBillboards(items, opts) {
       size[v * 2] = it.w; size[v * 2 + 1] = it.h ?? it.w;
       uv.set(r, v * 4);
       col.set([c[0], c[1], c[2], it.a ?? 1], v * 4);
-      ph[v * 2] = it.phase ?? (i * 0.6180339) % 1; ph[v * 2 + 1] = it.drift ?? 0;
+      ph[v * 2] = (it.phase ?? (i * 0.6180339) % 1) % 1 + (it.lean ? Math.max(1, Math.round(it.lean)) : 0); ph[v * 2 + 1] = it.drift ?? 0;
     }
     idx.set([i * 4, i * 4 + 1, i * 4 + 2, i * 4, i * 4 + 2, i * 4 + 3], i * 6);
   });
@@ -45,13 +48,14 @@ export function makeBillboards(items, opts) {
     uniforms: {
       map: { value: opts.map },
       uTime: opts.uniforms?.uTime || { value: 0 },
+      uWind: { value: opts.wind ? opts.wind.clone() : new THREE.Vector3(1, 0, 0) },
       fogColor: { value: fog ? fog.color : new THREE.Color(0xffffff) },
       fogNear: { value: fog ? fog.near : 1e6 },
       fogFar: { value: fog ? fog.far : 2e6 },
     },
     vertexShader: /* glsl */`
       attribute vec2 aCorner; attribute vec2 aSize; attribute vec4 aUv; attribute vec4 aColor; attribute vec2 aPhase;
-      uniform float uTime; uniform float fogNear; uniform float fogFar;
+      uniform float uTime; uniform float fogNear; uniform float fogFar; uniform vec3 uWind;
       varying vec2 vUv; varying vec4 vCol; varying float vFog;
       void main(){
         vec3 c = position;
@@ -85,10 +89,18 @@ export function makeBillboards(items, opts) {
           c.z += cos(uTime * 0.037 + aPhase.x * 4.1) * aPhase.y * 0.6;
           a *= 0.65 + 0.35 * sin(uTime * 0.31 + aPhase.x * 9.0);
         #elif MODE == 7
+          float lk = floor(aPhase.x);   // 0: a rising column; k >= 1: wind-bent plume (see makeBillboards)
           float m = fract(uTime * 0.05 * (0.7 + fract(aPhase.x * 3.7) * 0.6) + aPhase.x);
-          c.y += m * aPhase.y;
-          c.x += m * aPhase.y * 0.25 + sin(uTime * 0.2 + aPhase.x * 20.0) * aPhase.y * 0.04;
-          sz *= 0.45 + m * 1.6;
+          if (lk < 0.5) {
+            c.y += m * aPhase.y;
+            c.x += m * aPhase.y * 0.25 + sin(uTime * 0.2 + aPhase.x * 20.0) * aPhase.y * 0.04;
+            sz *= 0.45 + m * 1.6;
+          } else {
+            float rise = 1.0 - (1.0 - m) * (1.0 - m);
+            c.y += rise * aPhase.y + sin(uTime * 0.2 + aPhase.x * 20.0) * aPhase.y * 0.06;
+            c += uWind * (m * m * aPhase.y * lk);   // rises first, then bends over
+            sz *= vec2(0.5 + m * 1.3, 0.5 + m * 0.7);
+          }
           a *= sin(m * 3.14159);
         #endif
         vec4 mv = modelViewMatrix * vec4(c, 1.0);

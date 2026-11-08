@@ -5,7 +5,7 @@
 // schools of fish, bubble streams, drifting plankton and silt.
 // Returns { update(dt, t), dispose() }.
 import * as THREE from 'three';
-import { Buckets, rng, distToPath, disposeTree, inVoid, distToLines } from './util.js';
+import { Buckets, ALIAS_HI, ALIAS_LO, rng, distToPath, disposeTree, inVoid, distToLines } from './util.js';
 import { buildSky } from './sky.js';
 import { buildCourseRock, buildFoliage, roundIsland, spikes, spires } from './island.js';
 import { buildShip, buildTemple, buildIsle } from './backdrop.js';
@@ -98,7 +98,8 @@ export function buildEnvironment(scene, info, M, quality) {
   };
 
   // ---------- near props ----------
-  const near = new Buckets();
+  const alias = hi ? ALIAS_HI : ALIAS_LO;
+  const near = new Buckets(alias);
   const avoid = [];
   const yawTo = (from, to) => Math.atan2(to.x - from.x, to.z - from.z);
   const camGuess = frame.tee.clone().addScaledVector(frame.view, -2.5);
@@ -226,7 +227,7 @@ export function buildEnvironment(scene, info, M, quality) {
   }
 
   // ---------- backdrop ----------
-  const back = new Buckets();
+  const back = new Buckets({ ...alias, gloss: 'vc' });   // 30-60 m away: gloss reads as vc
   const backRocks = [];
   const kelpPts = [];
   // the sunken ship: ahead along viewDir, right of centre, listing on the seabed
@@ -252,29 +253,31 @@ export function buildEnvironment(scene, info, M, quality) {
     backRocks.push(geometry);
   }
   const isles = [
-    [frame.wmin - 15, -4, frame.vmax * 0.3 + 4, 3.0, 5, 'anemones'],
-    [frame.wmax + 16, -3, frame.vmax + 8, 3.4, 6, 'kelp'],
-    [frame.wmin - 15, -9, frame.vmin + 4, 2.4, 4, 'clams'],
-    [frame.wmax + 15, -8, frame.vmin + 8, 2.4, 4, 'corals'],
-    [frame.wmin - 30, 2, frame.vmax + 26, 4.2, 8, 'columns'],
-    [frame.wmax + 34, 3, frame.vmax + 14, 4.6, 9, 'amphorae'],
+    // the four nearest sit well out to the sides and low: landscape's wide view sees them beside the tee
+    [frame.wmin - 22, -6, frame.vmax * 0.3 + 6, 2.6, 4.5, 'anemones'],
+    [frame.wmax + 28, -6, frame.vmax + 12, 2.6, 4.5, 'kelp'],
+    [frame.wmin - 24, -12, frame.vmin + 8, 2.0, 3.5, 'clams'],
+    [frame.wmax + 24, -11, frame.vmin + 12, 2.0, 3.5, 'corals'],
+    [frame.wmin - 36, 0, frame.vmax + 30, 3.4, 6.5, 'columns'],
+    [frame.wmax + 40, 1, frame.vmax + 18, 3.8, 7.5, 'amphorae'],
     [40, -1, frame.vmax + 70, 4.6, 8, 'kelp'],
     [-16, -5, frame.vmin - 26, 3.6, 6, 'anemones'],
     [22, 0, frame.vmin - 34, 4.6, 8, 'corals'],
   ];
-  isles.slice(0, hi ? isles.length : 6).forEach(([lx, ly, lz, R, D, kind], k) => {
+  // the 9th outcrop sits behind the camera (only the fly-over saw it): high draws 8, low 6
+  isles.slice(0, hi ? 8 : 6).forEach(([lx, ly, lz, R, D, kind], k) => {
     const lp = frame.atV(lx, ly, lz);
     for (const g of buildIsle(back, backRocks, frame.viewBasis, lp, R, D, kind, 300 + k * 17, hi, kelpPts)) glowItems.push(g);
     // a spire down to the seabed under each outcrop
     spires(backRocks, [{ x: lp.x, z: lp.z, y: lp.y - D * 0.45, w: R * 0.95 }], bedY - 0.5, 400 + k);
-    for (let j = 0; j < (hi ? 4 : 2); j++) {
+    for (let j = 0; j < (hi ? 3 : 2); j++) {
       const a = r() * 6.28;
       kelpPts.push({ x: lp.x + Math.cos(a) * R * 1.4, y: bedY, z: lp.z + Math.sin(a) * R * 1.4, h: Math.max(3, lp.y - bedY - 0.5) * (0.6 + r() * 0.4) });
     }
   });
   for (const m of Object.values(back.build(bucketMats, root, { castShadow: false, receiveShadow: false }))) m.name = 'back.' + m.name;
   // far kelp forest on the seabed round the backdrop (joins the reef's kelp: one instanced mesh, swaying)
-  for (let i = 0; i < (hi ? 40 : 16); i++) {
+  for (let i = 0; i < (hi ? 20 : 14); i++) {
     const a = r() * Math.PI * 2, d = frame.size * 0.5 + 8 + r() * 40;
     kelpPts.push({ x: frame.center.x + Math.cos(a) * d, y: bedY, z: frame.center.z + Math.sin(a) * d, h: 4 + r() * 6 });
   }
@@ -368,11 +371,11 @@ export function buildEnvironment(scene, info, M, quality) {
       const side = i % 2 ? -1 : 1;
       const along = (i + 0.5) / nNear;
       const p = frame.atV(side * ((frame.wmax - frame.wmin) * 0.5 + 3.5 + r() * 3), 1.0 + r() * 1.5, frame.vmin + (frame.vmax - frame.vmin) * along + 2);
-      schools.push({ c: p, R: 1.4 + r() * 1.2, n: hi ? 14 : 9, size: 0.09 + r() * 0.04, speed: 0.6 + r() * 0.3, colors: FC[i % FC.length] });
+      schools.push({ c: p, R: 1.4 + r() * 1.2, n: hi ? 10 : 8, size: 0.09 + r() * 0.04, speed: 0.6 + r() * 0.3, colors: FC[i % FC.length] });
     }
     for (let i = 0; i < nFar; i++) {
       const p = frame.atV((r() - 0.5) * 50, 2 + r() * 6, frame.vmax + 18 + r() * 30);
-      schools.push({ c: p, R: 4 + r() * 4, n: hi ? 14 : 8, size: 0.3 + r() * 0.2, speed: 1.2 + r() * 0.6, colors: FC[(i + 3) % FC.length] });
+      schools.push({ c: p, R: 4 + r() * 4, n: hi ? 7 : 6, size: 0.3 + r() * 0.2, speed: 1.2 + r() * 0.6, colors: FC[(i + 3) % FC.length] });
     }
     fish = buildFish(schools, fog, 11);
     root.add(fish.mesh);
@@ -380,7 +383,7 @@ export function buildEnvironment(scene, info, M, quality) {
   }
 
   // drifting bubbles and plankton around the camera
-  const parts = buildParticles(hi ? 70 : 30, hi ? 160 : 70, hi ? 12 : 10, fog);
+  const parts = buildParticles(hi ? 70 : 0, hi ? 160 : 80, hi ? 12 : 10, fog);   // low: plankton only (one draw; the bubble streams still rise)
   root.add(parts.group);
 
   // ---------- cup beacon: a soft aqua beam so the cup reads from far away ----------

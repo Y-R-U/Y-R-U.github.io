@@ -426,10 +426,21 @@ table.lad-board tr.you td { background: rgba(242,199,92,.16); color: var(--gold)
 .lad-tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .lad-tiers div { display: flex; align-items: center; gap: 7px; padding: 5px 7px; border-radius: 12px; background: rgba(255,255,255,.05); font-size: 12px; }
 .lad-tiers div b { font-size: 14px; min-width: 62px; }
-.lad-tiers div span { display: flex; flex-direction: column; gap: 1px; opacity: .9; line-height: 1.15; }
-.lad-tiers div span em { font-style: normal; display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+.lad-tiers div > span { display: flex; flex-direction: column; gap: 1px; opacity: .9; line-height: 1.15; }
+.lad-tiers div > span em { font-style: normal; display: flex; align-items: center; gap: 3px; white-space: nowrap; }
 .lad-tiers div.on { background: rgba(242,199,92,.2); outline: 2px solid var(--gold); }
 .lad-tiers svg.chest-ic { vertical-align: -3px; }
+/* narrow phones (polish2): two cards per row only fit when the name sits above the rewards */
+.lad-tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lad-tiers div { min-width: 0; }
+@media (max-width: 480px) {
+  .lad-tiers div { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 6px; row-gap: 1px; padding: 5px 6px; }
+  .lad-tiers div > :first-child { grid-row: span 2; }
+  .lad-tiers div b { min-width: 0; font-size: 13px; }
+  .lad-tiers div > span { font-size: 11px; }
+  .lad-tiers div > span em { flex-wrap: wrap; column-gap: 3px; row-gap: 0; }
+  .lad-tiers .cn { white-space: nowrap; }
+}
 .lad-result { display: flex; align-items: center; gap: 10px; padding: 10px; margin: 6px 0; border-radius: 16px; border: 2px solid var(--gold);
   background: linear-gradient(90deg, rgba(242,199,92,.22), rgba(255,255,255,.04)); animation: pop .35s ease-out; }
 .lad-result.up { border-color: var(--good); }

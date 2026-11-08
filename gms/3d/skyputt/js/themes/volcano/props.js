@@ -8,10 +8,10 @@ import { mat } from './util.js';
 
 export const COLORS = {
   iron: 0x4a4644, iron2: 0x33302e, brass: 0xc8923c, brass2: 0xa8742a, copper: 0xb8643a, basalt: 0x4c4c50,
-  basalt2: 0x3a3a3e, ash: 0x6a6660, ember: 0xff6a1a, ember2: 0xffa040, coal: 0xd8401a, obsidian: 0x2a1e36,
-  obsidian2: 0x3e2a50, leather: 0x5a3020, wood: 0x4a3020, char: 0x221c18,
+  basalt2: 0x3a3a3e, ash: 0x6a6660, ember: 0xff6a1a, ember2: 0xffa040, coal: 0xd8401a, obsidian: 0x1c1c20,
+  obsidian2: 0x3a3a40, leather: 0x5a3020, wood: 0x4a3020, char: 0x221c18,
 };
-export const CRYSTAL_COLS = [0x3a2a4a, 0x2a1e36, 0x4a3060, 0x30243e];
+export const CRYSTAL_COLS = [0x2c2c30, 0x1c1c20, 0x3a3a40, 0x242428];   // obsidian: black / smoky grey glass
 
 const put = (b, key, geo, color, M, local, keepUv = false) => b.add(key, geo, color, local ? M.clone().multiply(local) : M, keepUv);
 

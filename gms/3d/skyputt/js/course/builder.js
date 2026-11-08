@@ -107,6 +107,8 @@ function sweep(frames, cupRow, G, col, drop = 0) {
     col.quad(P, MAT.WALL);
     const T = [v3.mad(rowPts[i][0], F.u, 0.004), v3.mad(rowPts[i][5], F.u, 0.004), v3.mad(rowPts[i][5], F.u, -TRIM_H), v3.mad(rowPts[i][0], F.u, -TRIM_H)].map(p => v3.mad(p, out, 0.004));
     G('trim').quad(T, [out, out, out, out], [[0, 0], [F.w, 0], [F.w, 1], [0, 1]], out);
+    // a lip where the main floor stops (ledge drop or jump): dressed after all floors exist (ledgeDress)
+    if (!here && drop === 0 && !F.tube && !F.loop && !frames[i - 1].tube) (col.lips || (col.lips = [])).push({ F, row: rowPts[i] });
   }
 
   // 4. walls / open-edge skirts, per side (sg = +1 left, -1 right)
@@ -166,6 +168,73 @@ function sweep(frames, cupRow, G, col, drop = 0) {
     }
   }
 
+}
+
+// Ledge drops (visual only — no colliders, no bounds): from a high camera the lower floor ran right up
+// to the lip and a drop read as a painted step. Every lip where the main floor stops gets
+//  - a trim strip along the top edge (the edge line you see from above / behind),
+//  - a cliff face from the lip down to whatever floor lies under it (seen from the sides and from below),
+//  - a soft shadow band on that lower floor just past the lip ('shade', holeview gives it a dark fade).
+// Floors are found by probing the floor colliders straight down, so catch pads, branches and slopes
+// all work; a lip over a void (a jump) gets only the edge strip.
+const LIP_W = 0.05, SHADE_L = 0.55, PROBE_MAX = 1.6;
+function ledgeDress(col, G) {
+  if (!col.lips?.length) return;
+  const t = col.t, m = col.m, nT = m.length;
+  const FLOORISH = new Set([MAT.GRASS, MAT.FRINGE, MAT.SAND, MAT.ICE, MAT.STICKY, MAT.BOOST, MAT.BRIDGE, MAT.RIM]);
+  // highest floor point under (x, z) strictly below yTop, within PROBE_MAX; null if none
+  const probe = (x, z, yTop) => {
+    let best = null;
+    for (let k = 0; k < nT; k++) {
+      if (!FLOORISH.has(m[k])) continue;
+      const o = k * 9;
+      const ax = t[o], ay = t[o + 1], az = t[o + 2], bx = t[o + 3], by = t[o + 4], bz = t[o + 5], cx = t[o + 6], cy = t[o + 7], cz = t[o + 8];
+      const d = (bz - cz) * (ax - cx) + (cx - bx) * (az - cz);
+      if (Math.abs(d) < 1e-9) continue;
+      const l1 = ((bz - cz) * (x - cx) + (cx - bx) * (z - cz)) / d, l2 = ((cz - az) * (x - cx) + (ax - cx) * (z - cz)) / d, l3 = 1 - l1 - l2;
+      if (l1 < -1e-6 || l2 < -1e-6 || l3 < -1e-6) continue;
+      const y = l1 * ay + l2 * by + l3 * cy;
+      if (y < yTop && y > yTop - PROBE_MAX && (best === null || y > best)) best = y;
+    }
+    return best;
+  };
+  const N = 8;   // samples across the lip
+  for (const { F, row } of col.lips) {
+    const L = row[0], R = row[5], w = v3.len(v3.sub(R, L));
+    const up = F.u, fw = F.f, back = v3.mul(fw, -1);
+    // 1. edge strip on top
+    const a = v3.mad(L, up, 0.0025), b = v3.mad(R, up, 0.0025);
+    G('trim').quad([a, b, v3.mad(b, back, LIP_W), v3.mad(a, back, LIP_W)], [up, up, up, up], [[0, 0], [w, 0], [w, 1], [0, 1]], up);
+    // 2 + 3. probe the floor under the lip and along the shade band
+    const yLip = (L[1] + R[1]) / 2 - FLOOR_T - 0.02;
+    const across = k => v3.lerp(L, R, k / N);
+    const below = [];
+    for (let k = 0; k <= N; k++) { const p = across(k); below.push(probe(p[0], p[2], yLip)); }
+    for (let k = 0; k < N; k++) {
+      if (below[k] === null || below[k + 1] === null) continue;
+      const p0 = across(k), p1 = across(k + 1);
+      const t0 = v3.mad(p0, up, -FLOOR_T), t1 = v3.mad(p1, up, -FLOOR_T);
+      const b0 = [p0[0], below[k] - 0.01, p0[2]], b1 = [p1[0], below[k + 1] - 0.01, p1[2]];
+      G('ledge').quad([t0, t1, b1, b0], [fw, fw, fw, fw], [[k / N * w, t0[1]], [(k + 1) / N * w, t1[1]], [(k + 1) / N * w, b1[1]], [k / N * w, b0[1]]], fw);
+    }
+    const M = 4;
+    const grid = [];
+    for (let j = 0; j <= M; j++) {
+      const r = [];
+      for (let k = 0; k <= N; k++) {
+        const p = v3.mad(across(k), fw, SHADE_L * j / M);
+        const y = probe(p[0], p[2], yLip);
+        r.push(y === null ? null : [p[0], y + 0.003, p[2]]);
+      }
+      grid.push(r);
+    }
+    const nu = [0, 1, 0];
+    for (let j = 0; j < M; j++) for (let k = 0; k < N; k++) {
+      const P = [grid[j][k], grid[j][k + 1], grid[j + 1][k + 1], grid[j + 1][k]];
+      if (P.some(p => !p)) continue;
+      G('shade').quad(P, [nu, nu, nu, nu], [[k / N, j / M], [(k + 1) / N, j / M], [(k + 1) / N, (j + 1) / M], [k / N, (j + 1) / M]], nu);
+    }
+  }
 }
 
 // Glass tubes: a ring of inward-facing collider quads around every run of tube frames.
@@ -312,6 +381,7 @@ export function buildHole(def) {
   for (const br of def.branches || []) sweep(stamp(pathFrames(br.points, -1)), -1, G, col, -0.0015);
 
   const guards = buildGuards(col);
+  ledgeDress(col, G);
 
   // 5. end walls across the track at the start and the end
   const endWall = (F, dir) => {
@@ -379,7 +449,7 @@ export function buildHole(def) {
 
   // 8. bounds, theme path info
   let mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
-  for (const g of Object.values(geo)) for (let i = 0; i < g.pos.length; i += 3) for (let k = 0; k < 3; k++) { mn[k] = Math.min(mn[k], g.pos[i + k]); mx[k] = Math.max(mx[k], g.pos[i + k]); }
+  for (const [name, g] of Object.entries(geo)) if (name !== 'ledge' && name !== 'shade') for (let i = 0; i < g.pos.length; i += 3) for (let k = 0; k < 3; k++) { mn[k] = Math.min(mn[k], g.pos[i + k]); mx[k] = Math.max(mx[k], g.pos[i + k]); }
   const mainFrames = frames.filter(f => !f.loop);
   return {
     id: def.id, name: def.name, par: def.par,

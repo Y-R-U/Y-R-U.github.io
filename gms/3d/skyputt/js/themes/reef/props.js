@@ -97,7 +97,7 @@ export function lanternPost(b, M, h, lo = false) {
   put(b, 'wood', new THREE.CylinderGeometry(h * 0.03, h * 0.04, h, 6), COLORS.wood2, M, mat(0, h / 2, 0, 0.03, 0, 0.04));
   put(b, 'wood', new THREE.BoxGeometry(h * 0.22, h * 0.03, h * 0.03), COLORS.wood2, M, mat(h * 0.09, h * 0.95, 0));
   const lx = h * 0.18, ly = h * 0.8, s = h * 0.09;
-  put(b, 'win', new THREE.CylinderGeometry(s * 0.7, s * 0.7, s * 1.5, 6), null, M, mat(lx, ly, 0));
+  put(b, 'glow', new THREE.CylinderGeometry(s * 0.7, s * 0.7, s * 1.5, 6), 0x80f0e0, M, mat(lx, ly, 0));
   put(b, 'metal', new THREE.ConeGeometry(s * 1.1, s * 0.8, 6), COLORS.bronze2, M, mat(lx, ly + s * 1.1, 0));
   put(b, 'metal', new THREE.CylinderGeometry(s * 1.0, s * 0.8, s * 0.3, 6), COLORS.bronze2, M, mat(lx, ly - s * 0.9, 0));
   if (!lo) for (let i = 0; i < 3; i++) {

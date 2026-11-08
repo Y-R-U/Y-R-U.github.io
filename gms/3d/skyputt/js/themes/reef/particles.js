@@ -102,7 +102,7 @@ function particles(count, box, fog, kind, seed) {
 /** Returns { group, update(t, camera), dispose }. */
 export function buildParticles(nBubble, nPlankton, box, fog) {
   const group = new THREE.Group(); group.name = 'reef.particles';
-  const parts = [particles(nBubble, box, fog, 'bubble', 177), particles(nPlankton, box * 1.3, fog, 'plankton', 211)];
+  const parts = [nBubble > 0 && particles(nBubble, box, fog, 'bubble', 177), particles(nPlankton, box * 1.3, fog, 'plankton', 211)].filter(Boolean);
   for (const p of parts) group.add(p.mesh);
   return {
     group,

@@ -381,7 +381,7 @@ export function buildFoliage(frames, path, widths, hi, avoid = [], voids = null,
     g.scale(0.4, 1, 0.4); g.translate(0, 0.6, 0);
     const im = new THREE.InstancedMesh(g, mats.crystal, crys.length * 3);
     let k = 0;
-    const CC = [0x3a2a4a, 0x2a1e36, 0x4a3060];
+    const CC = [0x2c2c30, 0x1c1c20, 0x3a3a40];   // obsidian: black / smoky grey glass
     for (const b of crys) for (let j = 0; j < 3; j++) {
       const s = (0.05 + b.s * 0.04) * (j ? 0.6 : 1);
       m4.compose(p.set(b.x + (j ? Math.cos(b.rot + j * 2) * 0.05 : 0), b.y, b.z + (j ? Math.sin(b.rot + j * 2) * 0.05 : 0)),
