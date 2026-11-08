@@ -46,6 +46,15 @@ import sugar6 from './sugar6.js';
 import sugar7 from './sugar7.js';
 import sugar8 from './sugar8.js';
 import sugar9 from './sugar9.js';
+import reef1 from './reef1.js';
+import reef2 from './reef2.js';
+import reef3 from './reef3.js';
+import reef4 from './reef4.js';
+import reef5 from './reef5.js';
+import reef6 from './reef6.js';
+import reef7 from './reef7.js';
+import reef8 from './reef8.js';
+import reef9 from './reef9.js';
 
 export const COURSES = {
   sky: {
@@ -72,6 +81,14 @@ export const COURSES = {
     id: 'sugar', name: 'Sugar Summit', theme: 'candy',
     holes: [sugar1, sugar2, sugar3, sugar4, sugar5, sugar6, sugar7, sugar8, sugar9],
     lockedBy: { hole: 'fest9', course: 'festival', note: 'Finish Festival Isles to open Sugar Summit.' },
+  },
+  // reef: Sunken Reef, a 9-hole underwater course built to look best in Sunken Reef (any theme skins it, D6).
+  // A map tab after Sugar Summit; locked until Sugar Summit is finished (sugar9, `lockedBy`).
+  reef: {
+    id: 'reef', name: 'Sunken Reef', theme: 'reef',
+    holes: [reef1, reef2, reef3, reef4, reef5, reef6, reef7, reef8, reef9],
+    lockedBy: { hole: 'sugar9', course: 'sugar', note: 'Finish Sugar Summit to open Sunken Reef.' },
+    dailyFrom: '2026-11-16',   // joins the daily pool from this date, so days already played keep their hole (js/daily/daily.js)
   },
 };
 

@@ -5,7 +5,7 @@ import { BALL_R, CUP_R } from '../engine/constants.js';
 
 const GROUP_MAT = {
   grass: ['grass'], fringe: ['fringe', 'grass'], wall: ['wall'], wallTop: ['wallTop', 'wall'], trim: ['trim'],
-  under: ['wall'], cupRim: ['cupRim'], sand: ['sand', 'grass'], ice: ['ice', 'grass'], boost: ['boost', 'grass'], bridge: ['bridge', 'grass'], sticky: ['sand', 'grass'],
+  under: ['wall'], cupRim: ['cupRim'], sand: ['sand', 'grass'], ice: ['ice', 'grass'], boost: ['boost', 'grass'], bridge: ['bridge', 'grass'], sticky: ['sticky', 'sand', 'grass'],
 };
 const RECEIVE = new Set(['grass', 'fringe', 'sand', 'ice', 'boost', 'bridge', 'sticky', 'wallTop', 'cupRim', 'cupHole']);
 const CAST = new Set(['wall', 'wallTop', 'trim']);

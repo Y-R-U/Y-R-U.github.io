@@ -11,6 +11,7 @@ export const THEME_LIST = [
   { id: 'frost', name: 'Frost Fair', swatch: 'linear-gradient(160deg, #0b1440 0%, #2a4a9a 55%, #e8eefa 56%, #c4d2ee 100%)', moon: '#f4f2e6' },
   { id: 'candy', name: 'Candy Land', swatch: 'linear-gradient(160deg, #6fb0f2 0%, #ffc6e4 55%, #8fe0ae 56%, #ff9cc8 100%)', moon: '#ff4f9a' },
   { id: 'volcano', name: 'Volcano Forge', swatch: 'linear-gradient(160deg, #2a120c 0%, #ff7a34 55%, #6c7a4a 56%, #3a3634 100%)', moon: '#ff5a1a' },
+  { id: 'reef', name: 'Sunken Reef', swatch: 'linear-gradient(160deg, #9ef0f0 0%, #1c88a4 55%, #60a05c 56%, #c8bc8a 100%)', moon: '#7af0e0', dailyFrom: '2026-11-16' },
 ];
 
 export function renderTitle(store, course, themeId, onTheme) {

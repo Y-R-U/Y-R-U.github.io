@@ -152,7 +152,7 @@ async function boot() {
     mapCourse = c;
     showMap(store, c, {
       onHole: i => startRound(i, 'single', null, c), onFront: () => startRound(0, 'round', c === course ? 9 : null, c), onNine: nine => startRound(nine.from, 'round', nine.to, c), onBack: showTitle,
-      click: () => sfx.emit('click'), courses: [course, COURSES.festival, COURSES.woods, COURSES.sugar].filter(Boolean), onCourse: c2 => showCourseMap(c2),
+      click: () => sfx.emit('click'), courses: [course, COURSES.festival, COURSES.woods, COURSES.sugar, COURSES.reef].filter(Boolean), onCourse: c2 => showCourseMap(c2),
     });
   }
   function startRound(i, mode = 'round', end = null, c = course) {

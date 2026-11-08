@@ -13,6 +13,7 @@
 // in their position otherwise. Adding a course only changes the days where one of its holes wins.
 import { COURSES } from '../course/holes/index.js';
 import { allHoles, themeIds, addDays, daysBetween, localYmd } from '../events/calendar.js';
+import { THEME_LIST } from '../app/menus.js';
 import { quickScores, makeRng, hashStr, PERSONALITY_IDS } from '../ai/index.js';
 
 export const DAILY_EPOCH = '2026-11-03';   // Daily #1
@@ -78,12 +79,18 @@ function rawPick(ymd, pool, skip = null) {
 // result is a pure function of (date, pool) and never repeats a hole within RECENT days.
 const WINDOW = 28;
 const pickCache = new Map();
-function walkPick(ymd, pool, key) {
-  const ck = `${key}|${ymd}`;
+// A course (or theme) added after the daily went live joins the pool only from its `dailyFrom` date
+// (reef), so days already played (and today) keep their hole and theme; every day's pool is the holes
+// live on that day.
+const liveOn = (ymd, from) => !from || from <= ymd;
+const fullAt = d => allHoles().filter(e => liveOn(d, COURSES[e.course].dailyFrom));
+const fullKey = () => allHoles().map(x => x.h.id + (COURSES[x.course].dailyFrom || '')).join(',');
+function walkPick(ymd) {
+  const ck = `${fullKey()}|${ymd}`;
   if (pickCache.has(ck)) return pickCache.get(ck);
   const seq = [];
   for (let k = WINDOW; k >= 0; k--) {
-    const d = addDays(ymd, -k), skip = new Set(seq.slice(-RECENT).map(e => e.h.id));
+    const d = addDays(ymd, -k), pool = fullAt(d), skip = new Set(seq.slice(-RECENT).map(e => e.h.id));
     seq.push((skip.size < pool.length && rawPick(d, pool, skip)) || rawPick(d, pool));
   }
   const e = seq[seq.length - 1];
@@ -96,21 +103,18 @@ function walkPick(ymd, pool, key) {
 // fallback, chosen to avoid both their own last RECENT picks and the global picks of the next RECENT
 // days, so they still never see a repeat within RECENT days. (An independent walk over the smaller
 // pool drifted off the global hole on ~15% of open-course days because the skip histories differed.)
-const fullKey = () => allHoles().map(x => x.h.id).join(',');
-function pickFor(ymd, pool, key) {
-  const all = allHoles(), fk = fullKey();
-  if (key === fk) return walkPick(ymd, all, fk);
-  const ck = `R:${key}|${ymd}`;
+function pickFor(ymd, open, key) {
+  if (key === null) return walkPick(ymd);
+  const ck = `R:${fullKey()}:${key}|${ymd}`;
   if (pickCache.has(ck)) return pickCache.get(ck);
-  const inPool = new Set(pool.map(e => e.h.id));
-  const g = d => walkPick(d, all, fk);
   const seq = [];
   for (let k = WINDOW; k >= 0; k--) {
-    const d = addDays(ymd, -k), gp = g(d);
+    const d = addDays(ymd, -k), gp = walkPick(d), pool = fullAt(d).filter(e => open(COURSES[e.course]));
+    const inPool = new Set(pool.map(e => e.h.id));
     if (inPool.has(gp.h.id)) { seq.push(gp); continue; }
     const skip = new Set(seq.slice(-RECENT).map(e => e.h.id));
-    for (let j = 1; j <= RECENT; j++) { const f = g(addDays(d, j)); if (inPool.has(f.h.id)) skip.add(f.h.id); }
-    seq.push((skip.size < pool.length && rawPick(d, pool, skip)) || rawPick(d, pool));
+    for (let j = 1; j <= RECENT; j++) { const f = walkPick(addDays(d, j)); if (inPool.has(f.h.id)) skip.add(f.h.id); }
+    seq.push(pool.length ? ((skip.size < pool.length && rawPick(d, pool, skip)) || rawPick(d, pool)) : gp);
   }
   const e = seq[seq.length - 1];
   if (pickCache.size > 4000) pickCache.clear();
@@ -119,13 +123,16 @@ function pickFor(ymd, pool, key) {
 }
 // → { ymd, n, hole (def), course (id), twist, theme }. `open(course)` filters the pool (default: all).
 export function dailyFor(ymd, { open = () => true } = {}) {
-  const pool = allHoles().filter(e => open(COURSES[e.course]));
+  const full = fullAt(ymd);
+  const pool = full.filter(e => open(COURSES[e.course]));
   if (!pool.length) return null;
-  const e = pickFor(ymd, pool, pool.map(x => x.h.id).join(','));
+  // the key names which live courses this player has open (null = all of them → the global pick)
+  const cs = [...new Set(full.map(e => e.course))], openCs = cs.filter(c => open(COURSES[c]));
+  const e = pickFor(ymd, open, openCs.length === cs.length ? null : openCs.join(','));
   const def = e.h;
   const tw = TWISTS.filter(t => t.ok(def));
   const twist = tw[Math.floor(unit(`skyputt-twist:${ymd}:${def.id}`) * tw.length)];
-  const themes = themeIds();
+  const themes = themeIds().filter(id => liveOn(ymd, THEME_LIST.find(t => t.id === id)?.dailyFrom));
   const theme = themes[Math.floor(unit(`skyputt-theme:${ymd}`) * themes.length)];
   return { ymd, n: dayNumber(ymd), hole: def, course: e.course, twist, theme };
 }

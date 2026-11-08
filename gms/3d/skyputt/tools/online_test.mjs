@@ -34,6 +34,12 @@ ok(holesFor('sky', '0-9').length === Math.min(9, sky.holes.length), 'nine holes'
 const c = courseForRoom({ course: 'sky', holes: [{ id: sky.holes[2].id, par: 3 }, { id: sky.holes[0].id, par: 2 }] });
 ok(c && c.holes[0] === sky.holes[2] && c.holes[1] === sky.holes[0], 'courseForRoom keeps room order');
 ok(courseForRoom({ course: 'sky', holes: [{ id: 'nope99', par: 3 }] }) === null, 'unknown hole → null (update the game)');
+{ // reef: every course in COURSES is room-selectable (client side only; the server takes any course/hole id)
+  const ids = Object.keys(COURSES);
+  ok(ids.every(id => /^[a-z0-9][a-z0-9_-]{0,31}$/.test(id) && COURSES[id].holes.every(h => /^[a-z0-9][a-z0-9_-]{0,31}$/.test(h.id))), `every course / hole id fits the server's id rule (${ids.join(', ')})`);
+  const rf = holesFor('reef', '6-3'), rc = courseForRoom({ course: 'reef', holes: rf.map(h => ({ id: h.id, par: h.par })) });
+  ok(rf.map(h => h.id).join() === 'reef7,reef8,reef9' && rc && rc.holes[2] === COURSES.reef.holes[8], 'Sunken Reef: room hole sets and courseForRoom (holes 7-9)');
+}
 const d = defaultOpts({ theme: 'spooky' });
 ok(d.theme === 'spooky' && d.holes.length === 3 && !('holeSet' in wireOpts(d)), 'default opts / wire form');
 ok(quickOpts().public === true && quickOpts().ai.count === 3, 'quick opts');

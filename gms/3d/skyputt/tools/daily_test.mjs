@@ -72,7 +72,7 @@ console.log('goals');
 
 console.log('locked courses');
 {
-  const locked = freshStore(), open = freshStore({ sky9: true, fest9: true });   // courses3: Sugar Summit opens on fest9
+  const locked = freshStore(), open = freshStore({ sky9: true, fest9: true, sugar9: true });   // courses3: Sugar Summit opens on fest9; reef: Sunken Reef on sugar9
   const GATED = new Set(Object.values(COURSES).filter(c => c.lockedBy).map(c => c.id));
   const L = year.map(y => createDaily(locked, () => at(y)).challenge(y)), O = year.map(y => createDaily(open, () => at(y)).challenge(y));
   ok(courseOpen(locked)(COURSES.woods) === false && courseOpen(open)(COURSES.woods) === true && courseOpen(locked)(COURSES.sky), 'Hollow Woods is locked until sky9 is finished');
@@ -80,6 +80,14 @@ console.log('locked courses');
   ok(O.some(x => x.course === 'woods'), `with it open, woods holes come up (${O.filter(x => x.course === 'woods').length} days)`);
   ok(courseOpen(locked)(COURSES.sugar) === false && courseOpen(freshStore({ fest9: true }))(COURSES.sugar) === true, 'Sugar Summit is locked until fest9 is finished');
   ok(L.every(x => x.course !== 'sugar') && O.some(x => x.course === 'sugar'), `sugar holes only once it is open (${O.filter(x => x.course === 'sugar').length} days)`);
+  ok(courseOpen(freshStore({ fest9: true }))(COURSES.reef) === false && courseOpen(freshStore({ sugar9: true }))(COURSES.reef) === true, 'Sunken Reef is locked until sugar9 is finished');
+  ok(L.every(x => x.course !== 'reef') && O.some(x => x.course === 'reef'), `reef holes only once it is open (${O.filter(x => x.course === 'reef').length} days)`);
+  // reef joins the daily pool (hole and theme) only from its dailyFrom date: earlier days keep the hole and theme
+  // they had before the course was added (= the pick with reef locked, and never the reef theme)
+  const RF = COURSES.reef.dailyFrom, preReef = year.filter(y => y < RF), noReef = c => c.id !== 'reef';
+  ok(RF && preReef.length > 0 && preReef.every(y => { const a = dailyFor(y), b = dailyFor(y, { open: noReef }); return a.hole.id === b.hole.id && a.course !== 'reef' && a.theme !== 'reef'; }),
+    `days before ${RF} are unchanged by Sunken Reef (${preReef.length} days: same hole, no reef hole or theme)`);
+  ok(year.filter(y => y >= RF).some(y => dailyFor(y).course === 'reef') && year.filter(y => y >= RF).some(y => dailyFor(y).theme === 'reef'), `from ${RF} reef holes and the reef theme come up`);
   const g = year.map(y => dailyFor(y, { open: ALL }));
   ok(O.every((x, i) => x.hole.id === g[i].hole.id), 'all courses open → the same hole as the global pick');
   const notWoods = g.map((x, i) => i).filter(i => !GATED.has(g[i].course));

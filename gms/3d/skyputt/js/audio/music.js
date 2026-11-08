@@ -1,6 +1,6 @@
 // SKYPUTT audio — generative ambient music. One player per theme: `sky` (launch), `spooky`
-// (Spooky Hollow), `frost` (Frost Fair), `candy` (Candy Land, a 3/4 waltz) and `volcano` (Volcano Forge,
-// slow drums and anvils). Themes differ in harmony, pad type, plucked/struck
+// (Spooky Hollow), `frost` (Frost Fair), `candy` (Candy Land, a 3/4 waltz), `volcano` (Volcano Forge,
+// slow drums and anvils) and `reef` (Sunken Reef, calm and watery). Themes differ in harmony, pad type, plucked/struck
 // voices and occasional "extras" (theremin, owl, sleigh bells, fire crackle).
 // Nothing loops verbatim: chords walk a Markov graph, the key drifts between three centres,
 // arpeggio phrases (up / down / wander / sparse / bells / rest) are picked by a slowly
@@ -144,7 +144,36 @@ const VOLCANO = {
   forge: { drum: 0.16, anvil: 0.03 },
   extras: [['horn', 0.3], ['bellows', 0.18], ['rumble', 0.2]],
 };
-export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST, candy: CANDY, volcano: VOLCANO };
+// "Tides of the Reef" (Sunken Reef): calm and watery, Eb major with a Lydian #4 and soft maj7 / add9
+// colours. Muffled strings under a slow, deep filter swell (the pad seems to breathe like water), a
+// harp and a soft vibraphone (low-index FM) drifting through a long ping-pong delay, glassy bells.
+// Extras: bubbles rising, water-drop plips and, rarely, a distant whale call. CPU: two sines per drop,
+// three short sines per bubble run, one glide for the whale.
+const REEF = {
+  id: 'reef', bpm: 68, meter: 4, chordBars: [2, 3, 4],
+  keys: [0, 0, 0, 2, -3],                          // Eb major home, F major and C major excursions
+  start: 'I',
+  chords: {
+    I:     { pad: [51, 55, 58, 62], root: 39, arp: [63, 65, 67, 70, 74, 75, 77, 79, 82], next: ['IVlyd', 'vi', 'ii', 'Vsus', 'iii'] },
+    IVlyd: { pad: [56, 60, 62, 67], root: 44, arp: [63, 67, 68, 70, 72, 74, 79, 80], next: ['I', 'vi', 'ii'] },
+    vi:    { pad: [48, 55, 58, 62], root: 48, arp: [60, 63, 67, 70, 72, 74, 79], next: ['IVlyd', 'ii', 'I'] },
+    ii:    { pad: [53, 56, 60, 63], root: 41, arp: [65, 68, 70, 72, 75, 77, 80], next: ['Vsus', 'IVlyd', 'I'] },
+    Vsus:  { pad: [53, 56, 58, 63], root: 46, arp: [65, 68, 70, 72, 75, 77, 82], next: ['I', 'vi'] },
+    iii:   { pad: [55, 58, 62, 65], root: 43, arp: [62, 65, 67, 70, 74, 79], next: ['vi', 'IVlyd'] },
+  },
+  level: { pad: 0.03, root: 0.03, air: 0.012 },
+  pad: { type: 'strings', cut: 760, lfo: 420, att: 3.6, rel: 5 },
+  air: { f: 380, q: 0.6, lfo: 220 },
+  delaySend: 0.36,
+  voices: {
+    harp: { kind: 'ks', gain: 0.085 },
+    vibes: { kind: 'fm', ratio: 4, index: 0.28, dur: 2.6, oct: 0, gain: 0.06 },
+    bell: { kind: 'fm', ratio: 3.5, index: 0.7, dur: 3.0, oct: 12, gain: 0.024 },
+  },
+  mains: ['harp', 'vibes', 'vibes'], bellVoice: 'bell', leadStep: 2,
+  extras: [['bubble', 0.35], ['drip', 0.3], ['whale', 0.1]],
+};
+export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST, candy: CANDY, volcano: VOLCANO, reef: REEF };
 
 // Karplus-Strong pluck, rendered once per base note (multiples of 3 semitones) and repitched.
 // short = pizzicato: darker excitation, fast decay.
@@ -517,6 +546,29 @@ class Player {
       g.gain.exponentialRampToValueAtTime(0.0001, tt + d);
       o.connect(g); g.connect(dest); o.start(tt); o.stop(tt + d + 0.02); this.keep(o);
     }
+  }
+
+  // a water-drop "plip": a sine that bends sharply up in pitch, then a softer echo
+  drip(t) {
+    const ctx = this.ctx, dest = this.panned(this.bus('far'), rnd(-0.7, 0.7)), n = 1 + ((Math.random() * 2) | 0);
+    for (let i = 0; i < n; i++) {
+      const tt = t + i * rnd(0.3, 0.9), f = rnd(700, 1300), o = ctx.createOscillator(), g = ctx.createGain(), d = 0.09;
+      o.frequency.setValueAtTime(f, tt); o.frequency.exponentialRampToValueAtTime(f * 2.4, tt + d * 0.6);
+      g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.012 * (i ? 0.5 : 1), tt + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, tt + d);
+      o.connect(g); g.connect(dest); o.start(tt); o.stop(tt + d + 0.02); this.keep(o);
+    }
+  }
+
+  // a distant whale call: a low sine gliding up and back down, heavily reverbed
+  whale(t, ch, key) {
+    const ctx = this.ctx, dest = this.panned(this.bus('far'), pick([-0.6, 0.6])), d = rnd(3.2, 4.6);
+    const f0 = mtof(ch.root + key + 12), o = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 900;
+    o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * 1.5, t + d * 0.4);
+    o.frequency.exponentialRampToValueAtTime(f0 * 0.9, t + d);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.02, t + d * 0.3); g.gain.linearRampToValueAtTime(0, t + d);
+    o.connect(lp); lp.connect(g); g.connect(dest); o.start(t); o.stop(t + d + 0.05); this.keep(o);
   }
 
   // ---- extras --------------------------------------------------------------------------------
