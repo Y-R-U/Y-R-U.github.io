@@ -18,7 +18,7 @@ import { bookMove, makeRng, timeBudget } from './play.js';
 const BENCH_KEY = 'gambit.bench';
 const BENCH_VERSION = 2;
 // A bot is locked when its typical move would take longer than this on the device.
-export const THINK_LIMIT_MS = 6500;
+export const THINK_LIMIT_MS = 10000;
 // Stockfish wasm nodes/s relative to our engine's benchmark nps on the same device
 // (measured: see docs/notes/core.md). Used only for gating the Stockfish bots.
 export const SF_SPEED_RATIO = 1.5;
