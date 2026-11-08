@@ -122,7 +122,24 @@ export async function createBoard(container, opts = {}) {
   let envUpdate = null, envLast = 0;   // theme environment's optional update(dt, t) hook (visible env only)
   function scanAmbient() { ambUsers.base = usesAmbient(boardObj) || usesAmbient(pieces?.group); ambUsers.env = !!envUpdate || usesAmbient(envObj); }
   const ambientWanted = () => ambientOn && !disposed && !document.hidden && (ambUsers.base || (ambUsers.env && !!envObj?.visible));
-  const onVisibility = () => { if (!document.hidden) wake(); };
+  // Android: after a long background the board came back without its pieces (not reproducible on
+  // desktop). Fresh geometry/buffers sidestep whatever GPU state went stale.
+  let hiddenAt = 0;
+  function rebuildPieces() {
+    if (!theme || !pieces || disposed) return;
+    try {
+      finishAll();
+      for (const r of recs.values()) endLive(r);
+      pieces.liveGroup.clear();
+      pieces.load(theme, fallbackTheme);
+      syncPieces(); scanAmbient();
+    } catch (e) { console.error('[board] piece rebuild failed', e); }
+  }
+  const onVisibility = () => {
+    if (document.hidden) { hiddenAt = hiddenAt || performance.now(); return; }
+    if (hiddenAt && performance.now() - hiddenAt > 15000) rebuildPieces();
+    hiddenAt = 0; shadowDirty = true; wake();
+  };
   document.addEventListener('visibilitychange', onVisibility);
   // Phones drop the WebGL context of a backgrounded tab; three.js restores it, but a board that
   // only renders on change (Plain 2D, no ambient) would stay black until something moved.
@@ -135,7 +152,7 @@ export async function createBoard(container, opts = {}) {
     envTex = pmrem.fromScene(envSrc, 0.04).texture;
     scene.environment = envTex;
   }
-  const onRestored = () => { try { bakeEnv(); } catch (e) { console.error('[board] env re-bake failed', e); } shadowDirty = true; wake(); };
+  const onRestored = () => { try { bakeEnv(); } catch (e) { console.error('[board] env re-bake failed', e); } rebuildPieces(); shadowDirty = true; wake(); };
   canvas.addEventListener('webglcontextrestored', onRestored);
   window.addEventListener('pageshow', onVisibility);
   function frame(now) {
