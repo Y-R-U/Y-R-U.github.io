@@ -1,5 +1,6 @@
 // Headless helpers on top of physics.js: run a shot to completion, trace a guide path.
 import { DT, BALL_R } from './constants.js';
+import { collideBalls } from './physics.js';
 
 // Run one shot from the ball's current spot until it rests, drops or goes out.
 // Returns { state, x, y, z, time, steps, events, path? }. Mutates `ball` and leaves world.time alone.
@@ -15,6 +16,46 @@ export function simulateShot(world, ball, vx, vz, { t0 = world.time, maxSteps = 
     if (trace && steps % trace === 0) path.push([ball.px, ball.py, ball.pz]);
   }
   return { state: ball.state, x: ball.px, y: ball.py, z: ball.pz, time: steps * DT, steps, events, path, t1: t };
+}
+
+// One fixed step for several real balls on the same hole: every moving ball steps in list order,
+// then (collide) ball-vs-ball contacts resolve in pair order. The game's live loop (Round.update)
+// and every replay call exactly this, so a shot with knocks replays bit-exactly anywhere.
+export function stepBalls(world, balls, t, collide = true) {
+  for (let i = 0; i < balls.length; i++) if (balls[i].state === 'moving' && !balls[i].kinematic) world.stepBall(balls[i], t);   // (kinematic: posed by its owner)
+  if (collide && balls.length > 1) collideBalls(balls);
+}
+export const anyMoving = balls => balls.some(b => b.state === 'moving');
+
+// simulateShot with other balls on the hole: shoot `ball`, step it and `others` (Ball[], usually at
+// rest) until nothing moves. Struck balls roll, can drop or fall out (state cup / oob; an oob ball's
+// `rest` is the spot it was knocked from). trace = physics steps per path sample; every ball's path
+// is sampled on the same ticks from step 0, so they line up in time.
+// Returns { state, x, y, z, time, steps, events, path, t1, others: [{ moved, state, x, y, z, path, events }] }.
+export function simulateShotWith(world, ball, vx, vz, others, { t0 = world.time, maxSteps = 240 * 40, trace = 0, collide = true } = {}) {
+  world.shoot(ball, vx, vz);
+  const balls = [ball, ...others];
+  const paths = balls.map(() => (trace ? [] : null));
+  const evs = balls.map(() => []);
+  const start = others.map(b => [b.px, b.py, b.pz]);
+  let t = t0, steps = 0, ownSteps = 0;
+  while (steps < maxSteps && anyMoving(balls)) {
+    stepBalls(world, balls, t, collide);
+    t += DT * world.clock; steps++;
+    if (ball.state === 'moving') ownSteps = steps;
+    for (let i = 0; i < balls.length; i++) {
+      const b = balls[i];
+      if (b.events.length) { evs[i].push(...b.events); b.events.length = 0; }
+      if (trace && steps % trace === 0) paths[i].push([b.px, b.py, b.pz]);
+    }
+  }
+  return {
+    state: ball.state, x: ball.px, y: ball.py, z: ball.pz, time: ownSteps * DT, steps, events: evs[0], path: paths[0], t1: t,
+    others: others.map((b, k) => {
+      const moved = evs[k + 1].some(e => e.type === 'knocked');
+      return { moved, state: b.state, x: b.px, y: b.py, z: b.pz, from: start[k], rest: { ...b.rest }, path: paths[k + 1], events: evs[k + 1] };
+    }),
+  };
 }
 
 // Guide line: run the real sim forward from `ball` with the given velocity.

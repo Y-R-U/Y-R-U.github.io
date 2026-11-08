@@ -265,7 +265,7 @@ export class SkyputtNet {
       case 'roomClosed':
         if (this.room && this.room.code === m.code) { this.room = null; writeHint(null); }
         return this._emit('roomClosed', m);
-      case 'shot': case 'result': case 'mulligan':
+      case 'shot': case 'result': case 'mulligan': case 'knock':
         return this._emit(m.t, m);
     }
   }

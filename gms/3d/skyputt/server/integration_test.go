@@ -756,3 +756,105 @@ func TestReloadMidShotVoidsAtOnce(t *testing.T) {
 	}
 	b2.ok(shotMsg(0, 1)) // can putt again straight away
 }
+
+// Ball hits (notes/ballhit.md): the shooter relays the balls it simulated against and reports
+// where it left them; the server moves a knocked ball only if it hasn't moved since the shot.
+func TestBallHits(t *testing.T) {
+	resetWorld(t)
+	a, b, _ := twoUp(t, opts("collide", true, "max", 3))
+	a.ok(map[string]any{"t": "start"})
+	r := a.waitEv("holeStart")
+	b.waitEv("holeStart")
+	if r["opts"].(map[string]any)["collide"] != true {
+		t.Fatalf("collide not in room opts %v", r["opts"])
+	}
+	// bob plays off the tee first and rests at z = -2
+	b.ok(shotMsg(0, 0))
+	b.ok(resultMsg(0, 0, "rest"))
+	a.drain()
+	b.drain()
+	// alice putts at bob's ball: the relay carries the ball list (bad entries dropped)
+	bobBall := map[string]any{"seat": 1, "n": 1, "x": 0.5, "y": 0.05, "z": -2}
+	a.ok(shotMsg(0, 0, "balls", []map[string]any{bobBall, {"seat": 0, "n": 0, "x": 0, "y": 0, "z": 0}, {"seat": 9, "n": 0, "x": 0, "y": 0, "z": 0}}))
+	sh := b.wait("shot")
+	bl, _ := sh["balls"].([]any)
+	if len(bl) != 1 || num(bl[0].(map[string]any)["seat"]) != 1 {
+		t.Fatalf("relayed balls %v", sh["balls"])
+	}
+	// alice reports: her ball rests, bob's was knocked to z = -3.1
+	res := a.ok(resultMsg(0, 0, "rest", "knocks", []map[string]any{{"seat": 1, "state": "rest", "to": []float64{0.4, 0.05, -3.1}}}))
+	if ks, _ := res["knocks"].([]any); len(ks) != 1 {
+		t.Fatalf("knocks in reply %v", res)
+	}
+	k := b.wait("knock")
+	if num(k["seat"]) != 1 || num(k["by"]) != 0 || num(k["n"]) != 2 || k["to"].([]any)[2].(float64) != -3.1 || num(k["strokes"]) != 1 {
+		t.Fatalf("knock event %v", k)
+	}
+	a.wait("knock") // the shooter hears it too
+	// bob's old shot number is stale now; his position moved; no penalty, no Mulligan of the old shot
+	b.fails(shotMsg(0, 1), "stale_shot")
+	b.fails(map[string]any{"t": "mulligan", "hole": 0}, "not_now")
+	// a knock on a ball that moved since (bob shot in between) is dropped; his own shot wins
+	a.ok(shotMsg(0, 1, "balls", []map[string]any{{"seat": 1, "n": 2, "x": 0.4, "y": 0.05, "z": -3.1}}))
+	b.ok(shotMsg(0, 2))
+	b.ok(resultMsg(0, 2, "rest", "to", []float64{0.1, 0.05, -5}))
+	res = a.ok(resultMsg(0, 1, "rest", "knocks", []map[string]any{{"seat": 1, "state": "cup"}}))
+	if ks, _ := res["knocks"].([]any); len(ks) != 0 {
+		t.Fatalf("stale knock applied %v", res)
+	}
+	// knocked into the cup: holed for its owner at his current strokes (2)
+	b.drain()
+	a.ok(shotMsg(0, 2, "balls", []map[string]any{{"seat": 1, "n": 3, "x": 0.1, "y": 0.05, "z": -5}}))
+	a.ok(resultMsg(0, 2, "rest", "knocks", []map[string]any{{"seat": 1, "state": "cup"}}))
+	k = b.wait("knock")
+	if k["state"] != "cup" || k["done"] != true || k["picked"] != false || num(k["strokes"]) != 2 {
+		t.Fatalf("knocked in %v", k)
+	}
+	b.fails(shotMsg(0, 3), "hole_done")
+}
+
+// Knocked out of bounds: back where it was, +1 to its owner (not the shooter); a knock on a ball not in the shot's list is ignored.
+func TestBallHitsOOB(t *testing.T) {
+	resetWorld(t)
+	a, b, _ := twoUp(t, opts("collide", true))
+	a.ok(map[string]any{"t": "start"})
+	a.waitEv("holeStart")
+	b.ok(shotMsg(0, 0))
+	b.ok(resultMsg(0, 0, "rest"))
+	b.drain()
+	a.ok(shotMsg(0, 0, "balls", []map[string]any{{"seat": 1, "n": 1, "x": 0.5, "y": 0.05, "z": -2}}))
+	a.ok(resultMsg(0, 0, "rest", "knocks", []map[string]any{{"seat": 1, "state": "oob"}}))
+	k := b.wait("knock")
+	if k["state"] != "oob" || num(k["strokes"]) != 2 || k["to"].([]any)[2].(float64) != -2 {
+		t.Fatalf("oob knock: back to his spot and +1 to Bob %v", k)
+	}
+	if r := b.ok(shotMsg(0, 2)); r["t"] != "ok" { // bob plays on from his old spot at shot 2
+		t.Fatalf("%v", r)
+	}
+	if r := b.ok(resultMsg(0, 2, "rest")); num(r["strokes"]) != 3 {
+		t.Fatalf("bob's strokes after the knock-out penalty %v", r)
+	}
+	a.ok(shotMsg(0, 1))
+	if r := a.ok(resultMsg(0, 1, "rest", "knocks", []map[string]any{{"seat": 1, "state": "cup"}})); len(r["knocks"].([]any)) != 0 {
+		t.Fatalf("knock without a ball ref applied %v", r)
+	}
+}
+
+func TestBallHitsOff(t *testing.T) {
+	resetWorld(t)
+	a, b, _ := twoUp(t, opts()) // collide not set = off (older clients)
+	a.ok(map[string]any{"t": "start"})
+	a.waitEv("holeStart")
+	b.ok(shotMsg(0, 0))
+	b.ok(resultMsg(0, 0, "rest"))
+	b.drain()
+	a.ok(shotMsg(0, 0, "balls", []map[string]any{{"seat": 1, "n": 1, "x": 0.5, "y": 0.05, "z": -2}}))
+	if sh := b.wait("shot"); sh["balls"] != nil {
+		t.Fatalf("balls relayed with ball hits off %v", sh)
+	}
+	res := a.ok(resultMsg(0, 0, "rest", "knocks", []map[string]any{{"seat": 1, "state": "cup"}}))
+	if ks, _ := res["knocks"].([]any); len(ks) != 0 {
+		t.Fatalf("knock applied with ball hits off %v", res)
+	}
+	b.ok(shotMsg(0, 1)) // bob's shot number untouched
+}

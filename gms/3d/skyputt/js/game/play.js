@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { DT, BALL_R, CUP_R, MAT } from '../engine/constants.js';
 import { Ball } from '../engine/physics.js';
+import { stepBalls, anyMoving } from '../engine/sim.js';
 import { buildHole, makeWorld } from '../course/builder.js';
 import { frameAt } from '../course/frames.js';
 import { buildHoleView } from './holeview.js';
@@ -24,7 +25,7 @@ export class Round {
   // mode: 'round' (play on to the last hole, then the scorecard) | 'single' (one hole, then the map)
   // Story events add: onComplete(result) instead of the scorecard, opponents [{ name, colour, scores }]
   // shown on every hole card, and tips (hint lines at each hole start).
-  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null, ledger = null, currency = null, ghosts = null, inventory = null, end = null, doneLabel = null } = {}) {
+  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null, ledger = null, currency = null, ghosts = null, inventory = null, end = null, doneLabel = null, collide = null } = {}) {
     this.app = app;
     this.inv = inventory || app.store;   // helper counts: the save, or an online room's own (js/net)
     this.course = course; this.onExit = onExit; this.mode = mode;
@@ -37,6 +38,13 @@ export class Round {
     this.currency = currency;   // { icon, name } in event rounds: pickups are event currency, not coins
     this.aces = 0;
     this.ghosts = ghosts;   // [{ name, colour, shots: [per hole: shot list | null] }] → GhostBall replays (js/ai/ghost.js)
+    // Ball hits (notes/ballhit.md): `others` are the other REAL balls on this hole (engine Balls) that
+    // my shots can knock (online peers). Empty in single player. A rival ghost (this.ghost.sim, js/ai/
+    // ghostsim.js) joins the same step when ball hits are on. A shot isn't over (no
+    // next putt, no report) until every ball has stopped: `whenSettled` queues what waits for that.
+    this.collide = collide ?? (app.store.settings().ballHit !== false);
+    this.others = [];
+    this._settle = [];
     this.index = startIndex; this.startIndex = startIndex;
     // a round plays to `end` (exclusive): one nine of an 18-hole course (story2); default = the last hole
     this.end = Math.min(course.holes.length, end ?? course.holes.length);
@@ -83,6 +91,8 @@ export class Round {
     this.trail.clear();
     this.view = buildHoleView(app.scene, hole, app.theme, app.fallback, { renderer: app.renderer, camera: app.camera, quality: app.quality });
     this.ball = new Ball(hole.tee.x, hole.tee.y, hole.tee.z);
+    this.others = []; this._settle = [];
+    this.holeNotes = [];   // lines for the hole card ("Knocked out by Carl +1")
     this.ballMesh.visible = true;
     this.ballMesh.position.set(hole.tee.x, hole.tee.y, hole.tee.z);
     this.ballMesh.scale.setScalar(1);
@@ -122,12 +132,30 @@ export class Round {
     this.ghost?.ball.removeFromParent(); this.ghost?.ball.dispose?.(); this.ghost = null;
     const g = this.ghosts?.find(x => x.shots?.[i]?.length);
     if (!g) return;
+    // a replayed hole starts from the recorded score again (a knock may have changed it last time)
+    if (g.scores) { g.recScores = g.recScores || g.scores.slice(); g.scores[i] = g.recScores[i]; g.total = g.scores.reduce((a, v) => a + (v | 0), 0); }
     try {
       const { GhostBall, GhostPlayer } = await import('../ai/ghost.js');
+      const GS = this.collide ? await import('../ai/ghostsim.js') : null;
+      const AI = this.collide ? await import('../ai/index.js') : null;
       if (this.index !== i || !this.view) return;   // hole changed while loading
       const ball = new GhostBall({ color: g.colour || '#ffffff', label: g.name, opacity: 0.75 });
       this.app.scene.add(ball);
-      this.ghost = { ball, player: new GhostPlayer(ball, { shots: g.shots[i] }, { gap: 1.4 }), name: g.name };
+      this.ghost = { ball, player: new GhostPlayer(ball, { shots: g.shots[i] }, { gap: 1.4 }), name: g.name, src: g };
+      // ball hits on: the ghost is a ball the physics can hit; knocked off its line it plays on with
+      // the AI at its own level (its recorded skill, or one estimated from its recorded score)
+      if (GS) {
+        const def = this.def;
+        const golfer = AI.golferFor({ id: g.id, name: g.name, personality: g.personality || 'pro',
+          skill: g.skill ?? ghostSkill(g.scores?.[i], def.par) }, hashSeed(`${g.name}:${def.id}`));
+        const client = AI.aiClient();
+        const plan = (st, t0) => client.shot(def, golfer, st, { t0, budgetScale: 0.5 }).then(r => ({ aim: r.shot.aim, power: r.shot.power, t0: r.t0 }));
+        this.ghost.sim = new GS.GhostSim({ shots: g.shots[i], maxStrokes: def.par + 4, golfer, tee: this.hole.tee, plan });
+        this.ghost.finishSync = () => {
+          const pl = new AI.Planner(this.hole);
+          return GS.finishSync(this.ghost.sim, this.world, (st, t) => { const r = AI.takeShot(pl, golfer, st, t, golfer.ticket(), { trace: false, budgetScale: 0.5 }); return { aim: r.shot.aim, power: r.shot.power, t0: r.t0 }; }, this.world.time);
+        };
+      }
     } catch (e) { console.warn('[skyputt] ghost unavailable', e); }
   }
 
@@ -336,13 +364,29 @@ export class Round {
       this.acc = Math.min(this.acc + dt, MAX_STEPS_PER_FRAME * DT);
       while (this.acc >= DT) {
         this.acc -= DT;
-        if (this.state === 'rolling') {
+        const others = this.others, gs = this.ghost?.sim || null;
+        if (gs) { gs.pose(w.time); b.noHit = this.strokes === 0 && b.state === 'rest'; }   // (a teed-up ball never collides)
+        if ((others.length || gs) && (this.state === 'rolling' || b.state === 'moving' || anyMoving(others) || gs?.ball.state === 'moving')) {
+          // several real balls: one shared fixed step (engine/sim.js stepBalls — the replays use it too)
+          const all = this._all || (this._all = []);
+          all.length = 0; all.push(b, ...others);
+          if (gs) all.push(gs.ball);
+          stepBalls(w, all, w.time, this.collide);
+          if (gs) gs.after(w.time);
+          if (b.state === 'moving' && (this.state === 'ready' || this.state === 'flyover')) this.bumped();
+          if (b.events.length) this.onEvents(b.events);
+          b.events.length = 0;
+          for (let k = 0; k < others.length; k++) if (others[k].events.length) { this.onOtherEvents(k, others[k].events); others[k].events.length = 0; }
+          if (this.state === 'rolling') { this.checkPickups(); this.checkLip(); }
+        } else if (this.state === 'rolling') {
           w.stepBall(b, w.time);
           if (b.events.length) this.onEvents(b.events);
           b.events.length = 0;
           this.checkPickups();
           this.checkLip();
         }
+        if (gs?.events.length) this.onGhostEvents(gs);
+        if (this._settle.length && !this.ballsMoving()) this.flushSettled();
         w.time += DT * w.clock;   // Steady Hands slows the obstacle clock (poses are a pure function of it)
       }
     }
@@ -355,7 +399,7 @@ export class Round {
       m.position.x += (cx - m.position.x) * Math.min(1, dt * 12);
       m.position.z += (cz - m.position.z) * Math.min(1, dt * 12);
       m.position.y = Math.max(this.hole.cup.y - 0.16 + BALL_R, this.sinkY0 - k * k * 0.12);
-      if (this.timer > 0.9) this.finishHole(false);
+      if (this.timer > 0.9 && !this.ballsMoving()) this.finishHole(false);
     } else if (this.state !== 'oob' || this.timer < 0.05) {
       const dx = b.px - m.position.x, dz = b.pz - m.position.z;
       const dist = Math.hypot(dx, dz);
@@ -368,7 +412,7 @@ export class Round {
     }
     if (this.state === 'oob') {
       this.timer += dt;
-      if (this.timer > 1.0) this.returnToRest();
+      if (this.timer > 1.0 && !this.ballsMoving()) this.returnToRest();
     }
     // rolling sound
     if (this.state === 'rolling') sfx.emit('roll', { speed: b.supported ? b.speed() : 0, surface: b.surf });
@@ -387,7 +431,10 @@ export class Round {
     // guide line while aiming
     if (this.state === 'ready') this.aim.updateGuide(app.scene, w.time); else this.aim.guide.hide();
     this.view.update(dt, t, w.time, this.ballPos());
-    if (this.ghost && !this.paused) this.ghost.player.update(dt, w.time);   // on the obstacle clock (ai/ghost.js)
+    if (this.ghost && !this.paused) {
+      if (this.ghost.sim?.mode === 'live') this.drawLiveGhost(dt);   // knocked off its record: drawn from the sim
+      else this.ghost.player.update(dt, w.time);   // on the obstacle clock (ai/ghost.js)
+    }
     this.trail.update(dt, m.position, this.state === 'rolling' && b.speed() > 0.15);
     if (this.guardMesh?.visible) this.guardMesh.material.uniforms.uTime.value = t;
   }
@@ -408,11 +455,13 @@ export class Round {
 
   onEvents(evs) {
     for (const e of evs) {
+      if (this.state === 'bumped' && this.onBumpedEvent(e)) continue;
       switch (e.type) {
         case 'cup': {
           this.state = 'sinking'; this.timer = 0; this.sinkY0 = this.ball.py;
           const ace = this.strokes === 1;
-          this.endShot();
+          this._settle.length = 0;   // (a ball re-woken after its rest event: that rest is void)
+          this.whenSettled(() => this.endShot());
           this.app.hud.banner(ace ? 'HOLE IN ONE!' : 'In the cup!', ace ? 'ace' : 'good', 1500);
           sfx.emit('stopRoll'); sfx.emit('cupDrop');
           const d = this.strokes - this.def.par;
@@ -421,13 +470,15 @@ export class Round {
         }
         case 'oob':
           this.state = 'oob'; this.timer = 0;
-          this.endShot();
+          this._settle.length = 0;
+          this.whenSettled(() => this.endShot());
           this.strokes++;  // D9: +1 stroke
           this.app.hud.setStrokes(this.strokes, this.maxStrokes);
           this.app.hud.banner('Out of bounds <small>+1 stroke</small>', 'bad', 1400);
           sfx.emit('stopRoll'); sfx.emit('fall');
           break;
-        case 'rest': sfx.emit('stopRoll'); this.endShot(); this.onRest(); break;
+        case 'rest': sfx.emit('stopRoll'); this.whenSettled(() => { if (this.ball.state === 'rest' && this.state === 'rolling') { this.endShot(); this.onRest(); } }); break;
+        case 'ball': if (e.speed > 0.15) sfx.emit('wall', { speed: Math.min(3, e.speed * 1.4), material: 'stone' }); break;
         case 'wall': sfx.emit('wall', { speed: e.speed, material: 'stone' }); break;
         case 'guard': sfx.emit('bumper', { speed: e.speed * 0.6 }); break;
         case 'ghost': this.app.hud.banner('Ghosted through!', 'good', 900); sfx.emit('boost'); break;
@@ -437,6 +488,73 @@ export class Round {
         case 'land': if (e.speed > 1.2) sfx.emit('wall', { speed: e.speed * 0.5, material: 'wood' }); break;
       }
     }
+  }
+
+  // ---- ball hits: my resting ball knocked by a ghost (no stroke; rules in notes/ballhit.md)
+  bumped() {
+    if (this.state === 'flyover') this.endFlyover();
+    this.state = 'bumped';
+    this.aim.guide.hide(); this.app.hud.hint(false); this.refreshHelpers();
+    this.last = null;   // no Mulligan back past someone else's knock
+    this.app.hud.banner(`Knocked by ${this.ghost?.name || 'a ball'}!`, '', 1200);
+  }
+  onBumpedEvent(e) {
+    const back = () => { this.state = 'ready'; this.app.rig.setGoalYaw(this.fairwayYaw()); this.refreshHelpers(); };
+    if (e.type === 'rest') { sfx.emit('stopRoll'); back(); return true; }
+    if (e.type === 'oob') {   // knocked out: back where it was hit, +1 to me (the owner) — as for my own ball
+      const r = this.ball.rest, by = this.ghost?.name || 'a ball';
+      this.ball.place(r.x, r.y, r.z); this.ballMesh.position.set(r.x, r.y, r.z);
+      this.strokes++;
+      this.app.hud.setStrokes(this.strokes, this.maxStrokes);
+      this.app.hud.banner(`Knocked out by ${by} <small>+1 stroke</small>`, 'bad', 1600);
+      this.holeNotes.push(`Knocked out by ${by} +1`);
+      sfx.emit('fall');
+      if (this.strokes >= this.maxStrokes) { this.finishHole(true); return true; }
+      back(); return true;
+    }
+    if (e.type === 'cup') {   // knocked in: holed at your current strokes
+      this.state = 'sinking'; this.timer = 0; this.sinkY0 = this.ball.py;
+      this.app.hud.banner('Knocked in!', 'good', 1500);
+      sfx.emit('stopRoll'); sfx.emit('cupDrop');
+      return true;
+    }
+    return false;   // sounds etc. as usual
+  }
+  onGhostEvents(gs) {
+    for (const e of gs.events) {
+      if (e.type === 'diverge') this.app.hud.banner(`${this.ghost.name}<small>knocked off their line</small>`, '', 1400);
+      else if (e.type === 'oob' && e.knocked) { this.app.hud.banner(`${this.ghost.name} knocked out <small>+1 to them</small>`, '', 1400); this.holeNotes.push(`${this.ghost.name}: knocked out +1`); }
+      else if (e.type === 'cup' && gs.mode === 'live') sfx.emit('cupDrop', { volume: 0.5 });
+    }
+    gs.events.length = 0;
+  }
+  drawLiveGhost(dt) {
+    const G = this.ghost, gb = G.ball, sb = G.sim.ball;
+    if (!G.live) { G.live = true; gb.done = true; gb.onDone = null; gb._setOpacity(1); gb.ball.visible = true; }
+    if (sb.state === 'cup') { gb.fade = Math.max(0, (gb.fade ?? 1) - dt * 2.5); gb._setOpacity(gb.fade); if (gb.fade <= 0) gb.ball.visible = false; }
+    gb.ball.position.set(sb.px, sb.py, sb.pz);
+    if (sb.state === 'moving') gb._pushHist(); else gb.update(dt);
+  }
+  // The hole is over for me: a ghost knocked off its line plays the rest of its hole headlessly and
+  // its score for the hole becomes what it really took (an undisturbed one keeps its record).
+  settleGhost() {
+    const G = this.ghost;
+    if (!G?.sim || G.settled || G.sim.mode !== 'live') return;
+    G.settled = true;
+    let r;
+    try { r = G.sim.done ? G.sim.result() : G.finishSync(); } catch (e) { console.warn('[skyputt] ghost finish failed', e); return; }
+    const g = G.src;
+    if (g?.scores) { g.scores[this.index] = r.strokes; g.total = g.scores.reduce((a, v) => a + (v | 0), 0); }
+  }
+
+  // ---- ball hits: other real balls on the hole
+  ballsMoving() { return this.ball.state === 'moving' || (this.others.length > 0 && anyMoving(this.others)); }
+  whenSettled(fn) { if (!this.ballsMoving() && !this._settle.length) fn(); else this._settle.push(fn); }
+  flushSettled() { const q = this._settle; this._settle = []; for (const fn of q) fn(); }
+  // events of other ball k (knocked / ball / rest / cup / oob); subclasses show them
+  onOtherEvents(k, evs) {
+    for (const e of evs) if (e.type === 'ball' && e.other > k + 1 && e.speed > 0.15)   // (pairs with my ball sound from mine)
+      sfx.emit('wall', { speed: Math.min(3, e.speed * 1.4), material: 'stone' });
   }
 
   // lip-out: the ball dipped over the cup and came out again
@@ -480,11 +598,12 @@ export class Round {
 
   finishHole(picked) {
     if (this.state === 'done') return;
+    this.settleGhost();
     this.state = 'done';
     this.refreshHelpers();
     const def = this.def, store = this.app.store;
     const strokes = picked ? this.maxStrokes : this.strokes;
-    this.scores[this.index] = { hole: this.index + 1, par: def.par, strokes, picked };
+    this.scores[this.index] = { hole: this.index + 1, par: def.par, strokes, picked, ...(this.holeNotes?.length ? { notes: this.holeNotes.slice() } : {}) };
     if (picked) this.ballMesh.visible = false;
     const { stars, newBest } = store.recordHole(def.id, strokes, def.par, picked);
     store.markFinished(def.id);
@@ -523,7 +642,7 @@ export class Round {
       rivals: this.opponents?.map(o => ({ name: o.name, colour: o.colour, strokes: o.scores[this.index],
         total: o.scores.slice(0, this.index + 1).reduce((a, b) => a + b, 0) })),
       youTotal: this.scores.filter(Boolean).reduce((a, r) => a + r.strokes, 0),
-      currency: this.currency,
+      currency: this.currency, notes: this.holeNotes,
     }, onNext);
   }
 
@@ -581,6 +700,9 @@ function flyPose(fp, u, pos, look) {
   pos.copy(_a).addScaledVector(_b, -(1.6 + 1.2 * (1 - e))).add(_up.set(0, h, 0));
 }
 const smooth = t => t * t * (3 - 2 * t);
+// a ghost's level when the record doesn't carry one: from its recorded score on the hole vs par
+const ghostSkill = (strokes, par) => (strokes ? Math.max(0.05, Math.min(0.9, 0.55 - 0.18 * (strokes - par))) : 0.45);
+const hashSeed = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return h >>> 0; };
 
 const _axis = new THREE.Vector3(), _q = new THREE.Quaternion(), _v = new THREE.Vector3();
 const _rigPos = new THREE.Vector3(), _rigLook = new THREE.Vector3(), _flyPos = new THREE.Vector3(), _flyLook = new THREE.Vector3();

@@ -1,6 +1,6 @@
 // Room options form (create a room, or the host editing it in the lobby). DOM only.
 import { COURSES } from '../course/holes/index.js';
-import { THEME_LIST } from '../app/menus.js';
+import { THEME_LIST, ballHitHint } from '../app/menus.js';
 import { HELPERS } from '../meta/helpers.js';
 import { holeSets, holesFor, SHOT_CLOCKS, MAX_PLAYERS, MIN_PLAYERS, AI_PERSONALITIES, AI_RANKS, rankForSkill } from './rooms.js';
 
@@ -25,6 +25,7 @@ export function renderForm(el, opts, { quick = false, humans = 1, onChange, clic
       <div class="row"><span>Max players</span>${step('max', o.max, Math.max(MIN_PLAYERS, humans), MAX_PLAYERS)}</div>
       <div class="row col"><span>Helpers</span>${seg('helpers', [['off', 'Off'], ['fixed', 'Everyone gets'], ['own', 'Own inventory']], o.helpers.mode)}
         ${o.helpers.mode === 'fixed' ? `<div class="sub">${step('helperN', o.helpers.n, 1, 5)}<small>of each of the ${nHelpers} helpers</small></div>` : ''}</div>
+      <div class="row col"><span>Ball hits</span>${seg('collide', [['1', 'Battle'], ['0', 'Classic']], o.collide ? '1' : '0')}<small class="dim">${esc(ballHitHint(!!o.collide))}</small></div>
       <div class="row col"><span>Shot clock</span>${seg('shotClock', SHOT_CLOCKS.map(s => [s, s ? `${s}s` : 'Off']), o.shotClock)}</div>
       <div class="row col"><span>Ghost AIs</span>
         ${quick ? '<small class="dim">Empty seats fill with ghost AIs</small>' : `<div class="sub">${step('aiCount', o.ai.count, 0, maxAI)}<small>${o.ai.count >= maxAI ? 'fills every empty seat' : 'added at the start'}</small><button class="mini" data-a="fill">Fill</button></div>`}
@@ -53,6 +54,7 @@ export function renderForm(el, opts, { quick = false, humans = 1, onChange, clic
       else if (k === 'theme') o.theme = v;
       else if (k === 'helpers') o.helpers = { mode: v, n: v === 'fixed' ? (o.helpers.n || 2) : 0 };
       else if (k === 'shotClock') o.shotClock = +v;
+      else if (k === 'collide') o.collide = v === '1';
       else if (k === 'rank') o.ai.skill = AI_RANKS.find(r => r.name === v)?.skill ?? 0.45;
       return changed();
     }

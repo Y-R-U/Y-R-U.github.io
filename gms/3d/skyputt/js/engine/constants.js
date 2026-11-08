@@ -21,6 +21,7 @@ export const SHOT_TIMEOUT = 30;    // seconds; a shot that never settles is stop
 export const BOUNCE_MIN = 0.3;     // normal speed below which contacts don't bounce (resting contact)
 export const ROLL_K = 5 / 7;
 export const BOOST_ACC = 14;        // m/s^2 along a boost pad's arrow
+export const BALL_E = 0.88;         // ball-vs-ball restitution (two golf balls clacking)
 export const BOOST_MAX = 5.2;       // ...until the ball moves this fast along it       // a rolling solid sphere feels 5/7 of the slope's pull
 
 // Material ids on collider triangles / shapes.

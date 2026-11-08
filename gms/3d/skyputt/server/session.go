@@ -115,25 +115,27 @@ func (s *Sess) pinger() {
 }
 
 type inMsg struct {
-	T     string     `json:"t"`
-	ID    int64      `json:"id"`
-	Token string     `json:"token"`
-	Name  string     `json:"name"`
-	On    *bool      `json:"on"`
-	Code  string     `json:"code"`
-	Opts  *RoomOpts  `json:"opts"`
-	Seat  *int       `json:"seat"`
-	Hole  *int       `json:"hole"`
-	N     *int       `json:"n"`
-	VX    float64    `json:"vx"`
-	VZ    float64    `json:"vz"`
-	T0    float64    `json:"t0"`
-	Aim   float64    `json:"aim"`
-	Power float64    `json:"power"`
-	Mods  Mods       `json:"mods"`
-	Ball  *BallState `json:"ball"`
-	State string     `json:"state"`
-	To    []float64  `json:"to"`
+	T      string     `json:"t"`
+	ID     int64      `json:"id"`
+	Token  string     `json:"token"`
+	Name   string     `json:"name"`
+	On     *bool      `json:"on"`
+	Code   string     `json:"code"`
+	Opts   *RoomOpts  `json:"opts"`
+	Seat   *int       `json:"seat"`
+	Hole   *int       `json:"hole"`
+	N      *int       `json:"n"`
+	VX     float64    `json:"vx"`
+	VZ     float64    `json:"vz"`
+	T0     float64    `json:"t0"`
+	Aim    float64    `json:"aim"`
+	Power  float64    `json:"power"`
+	Mods   Mods       `json:"mods"`
+	Ball   *BallState `json:"ball"`
+	State  string     `json:"state"`
+	To     []float64  `json:"to"`
+	Balls  []BallRef  `json:"balls"`
+	Knocks []Knock    `json:"knocks"`
 }
 
 func handleWS(w http.ResponseWriter, r *http.Request) {

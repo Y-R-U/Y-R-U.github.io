@@ -2,7 +2,7 @@
 // Deterministic: fixed DT, no randomness, same iteration order every run. Pure JS, node-safe.
 import {
   BALL_R as R, CUP_R, CUP_DEPTH, G, DT, SPEED_CAP, STOP_SPEED, STOP_TIME, SHOT_TIMEOUT,
-  BOUNCE_MIN, ROLL_K, SURFACES, MAT, BOOST_ACC, BOOST_MAX,
+  BOUNCE_MIN, ROLL_K, SURFACES, MAT, BOOST_ACC, BOOST_MAX, BALL_E,
 } from './constants.js';
 import { CP, closestOnTri, TriGrid, rotAxis } from './shapes.js';
 
@@ -333,6 +333,65 @@ export class World {
     } else b.restT = 0;
     if (b.moveT > SHOT_TIMEOUT) { b.vx = b.vy = b.vz = 0; b.state = 'rest'; b.events.push({ type: 'rest', timeout: true }); }
   }
+}
+
+// ---- ball vs ball (equal-mass spheres). Deterministic: pairs in list order, no randomness.
+// A ball at rest that is struck wakes up as if shot (its `rest` = the spot it was knocked from,
+// so out of bounds puts it back there) and gets `knockedBy` = the index of the ball that hit it.
+// Rolling balls (both supported): the normal impulse is scaled by 5/7, the classic rolling-ball
+// result — a head-on hit leaves the striker ~2/7 of its speed ("follow"), the struck ball ~5/7
+// (floor friction turns sliding into rolling). Airborne: the plain restitution impulse.
+// Balls in the cup or out of bounds take no part, nor does a ball with `noHit` (a ghost still on the
+// tee). A `kinematic` ball (an undisturbed replayed ghost, js/ai/ghostsim.js) collides like any other
+// — the impulse lands in its velocity and its owner turns it into a simulated ball. Returns the number of impacts.
+const D2 = 4 * R2;
+export function collideBalls(balls, e = BALL_E) {
+  let hits = 0;
+  for (let i = 0; i < balls.length; i++) {
+    const a = balls[i];
+    if ((a.state !== 'moving' && a.state !== 'rest') || a.noHit) continue;
+    for (let j = i + 1; j < balls.length; j++) {
+      const b = balls[j];
+      if ((b.state !== 'moving' && b.state !== 'rest') || b.noHit) continue;
+      if (a.state === 'rest' && b.state === 'rest') continue;
+      let nx = b.px - a.px, ny = b.py - a.py, nz = b.pz - a.pz;
+      const d2 = nx * nx + ny * ny + nz * nz;
+      if (d2 >= D2) continue;
+      const d = Math.sqrt(d2);
+      if (d < 1e-9) { nx = 1; ny = 0; nz = 0; } else { nx /= d; ny /= d; nz /= d; }
+      const vrel = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny + (a.vz - b.vz) * nz;   // > 0: closing
+      const pen = 2 * R - d;
+      if (vrel <= 0) {
+        // touching but separating (or resting contact): only un-overlap the moving ball(s)
+        if (a.state === 'moving' && b.state === 'moving') { const h = pen / 2; a.px -= nx * h; a.py -= ny * h; a.pz -= nz * h; b.px += nx * h; b.py += ny * h; b.pz += nz * h; }
+        else if (a.state === 'moving') { a.px -= nx * pen; a.py -= ny * pen; a.pz -= nz * pen; }
+        else { b.px += nx * pen; b.py += ny * pen; b.pz += nz * pen; }
+        continue;
+      }
+      const k = a.supported && b.supported ? ROLL_K : 1;
+      const jn = (1 + e) / 2 * vrel * k;
+      for (const [q, other, sgn] of [[a, j, -1], [b, i, 1]]) {
+        if (q.state === 'rest') {
+          q.rest = { x: q.px, y: q.py, z: q.pz };
+          q.state = 'moving'; q.restT = 0; q.moveT = 0; q.knockedBy = other;
+          q.events.push({ type: 'knocked', by: other, speed: vrel });
+        }
+        q.vx += sgn * jn * nx; q.vy += sgn * jn * ny; q.vz += sgn * jn * nz;
+        q.restT = 0;
+        q.events.push({ type: 'ball', speed: vrel, other });
+      }
+      const h = pen / 2;
+      a.px -= nx * h; a.py -= ny * h; a.pz -= nz * h; b.px += nx * h; b.py += ny * h; b.pz += nz * h;
+      hits++;
+    }
+  }
+  return hits;
+}
+// A ball resting at a known spot (an online peer's position): every client builds it the same way.
+export function restingBall(x, y, z) {
+  const b = new Ball(x, y, z);
+  b.supported = true;
+  return b;
 }
 
 // Helper for kinematic bodies: reach = bounding radius of its shapes around the pivot.

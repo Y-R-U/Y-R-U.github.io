@@ -66,18 +66,19 @@ export function courseForRoom(opts) {
   return { id: opts.course, name: opts.courseName || c?.name || 'Online', holes: defs };
 }
 
-export function defaultOpts({ theme = 'sky', course = 'sky' } = {}) {
+// collide: ball hits (notes/ballhit.md) — the creator's setting becomes the room's rule.
+export function defaultOpts({ theme = 'sky', course = 'sky', collide = true } = {}) {
   const c = COURSES[course] || COURSES.sky;
   return {
     name: '', public: false, course: c.id, courseName: c.name, holeSet: '0-3', holes: holesFor(c.id, '0-3'),
     theme, max: 4, helpers: { mode: 'fixed', n: 2 }, shotClock: 30,
-    ai: { count: 2, personality: 'any', skill: 0.45 },
+    ai: { count: 2, personality: 'any', skill: 0.45 }, collide: !!collide,
   };
 }
 
 // Quick play: a public table of 4 that fills with ghost AIs; 3 random holes.
-export function quickOpts({ theme = 'sky' } = {}) {
-  const o = defaultOpts({ theme });
+export function quickOpts({ theme = 'sky', collide = true } = {}) {
+  const o = defaultOpts({ theme, collide });
   return { ...o, public: true, holeSet: 'r3', holes: holesFor(o.course, 'r3'), helpers: { mode: 'fixed', n: 1 }, ai: { count: 3, personality: 'any', skill: 0.4 } };
 }
 
@@ -108,6 +109,8 @@ export function helpersLabel(h) {
   if (h.mode === 'fixed') return `${h.n} of each helper`;
   return 'Own helpers';
 }
+// Ball hits: only a server that knows the rule echoes `collide: true` (older servers → pass through).
+export const collideLabel = c => (c ? 'Battle (ball hits)' : 'Classic (no ball hits)');
 export const clockLabel = s => (s ? `${s}s shot clock` : 'No shot clock');
 
 // Share link for a room code (?room=CODE on this page).

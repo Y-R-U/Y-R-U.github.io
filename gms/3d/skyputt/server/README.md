@@ -79,15 +79,20 @@ JSON text frames. Client messages `{t, id?, …}`; a message with `id` gets exac
 | `room` | | `{room}` snapshot (resync) |
 | `setOpts` | `opts` | host, lobby → `{room}` |
 | `start` | | host, lobby; needs ≥ 2 seats incl. AIs |
-| `shot` | `hole`, `n`, `vx`, `vz`, `t0`, `aim`, `power`, `mods`, `ball`, `seat?` | `{seat, n}`; others get `shot` |
-| `result` | `hole`, `n`, `state` rest\|oob\|cup, `to [x,y,z]`, `seat?` | `{seat, strokes, done, picked}`; others get `result` |
+| `shot` | `hole`, `n`, `vx`, `vz`, `t0`, `aim`, `power`, `mods`, `ball`, `seat?`, `balls?` | `{seat, n}`; others get `shot` |
+| `result` | `hole`, `n`, `state` rest\|oob\|cup, `to [x,y,z]`, `seat?`, `knocks?` | `{seat, strokes, done, picked, knocks}`; others get `result` (after any `knock`s) |
 | `mulligan` | `hole`, `seat?` | `{seat, strokes, to}`; others get `mulligan` (back to before the last shot) |
 | `next` | | ready for the next hole (board phase) |
 | `again` | | host, after the round → lobby |
 
 `seat` is only for AI-controlled seats (host). **opts**: `{name, public, course, courseName,
 holes:[{id,par}] (1–18, client hole ids), theme, max 2–8, helpers:{mode off|fixed|own, n 1–5},
-shotClock 0|20|30|45|60, ai:{count 0–7, personality any|carl|bertha|banks|lou|pro|professor|zoe|mags, skill (≤ 0.9)}}`.
+shotClock 0|20|30|45|60, ai:{count 0–7, personality any|carl|bertha|banks|lou|pro|professor|zoe|mags, skill (≤ 0.9)}, collide bool}`.
+**Ball hits** (`collide`, docs/notes/ballhit.md): `balls` = `[{seat, n, x, y, z}]`, the other seats' resting balls the
+shot was simulated against (relayed so replays match; dropped when `collide` is off); `knocks` = `[{seat, state
+rest|oob|cup, to}]`, where the shot left them. A knock applies only to a listed ball whose seat hasn't moved since
+(same `n`, not in flight, not done): rest → moved there, oob → stays put and +1 to its owner (par + 4 picks it up), cup → holed at its current strokes;
+it bumps that seat's `n` and clears its Mulligan.
 **mods**: `{magnet, sticky, guard, ghost, steady, power, sight 0–3}` (helpers armed for that shot).
 **ball**: `{x,y,z,sup,n:[3],surf}` (js/ai/round.js `ballState`, the shooter's ball before the shot).
 
@@ -100,13 +105,14 @@ shotClock 0|20|30|45|60, ai:{count 0–7, personality any|carl|bertha|banks|lou|
 | `shot` | `seat`, `hole`, `n`, `vx`, `vz`, `t0`, `aim`, `power`, `mods`, `ball` |
 | `result` | `seat`, `hole`, `n`, `state` rest\|oob\|cup\|void, `to` (null = tee), `strokes`, `done`, `picked` |
 | `mulligan` | `seat`, `hole`, `to`, `strokes` |
+| `knock` | `seat`, `hole`, `by` (shooter seat), `n` (its new shot number), `state` rest\|oob\|cup, `to`, `strokes`, `done`, `picked` — to everyone, the shooter too |
 | `roomClosed` | `code`, `reason` left\|empty\|expired\|joined_other |
 
 **room**: `{code, opts, quick, state lobby|playing|ended, host (seat), you (seat), created, startAt,
 startedAt, hole, phase play|board, holeAt, capAt, boardAt, nextAt, endedAt, roundId, now,
 seats:[{i, kind human|ai, name, color, ctrl human|ai, left, next, online, host?, pid?, ai?{personality,skill,seed},
 total, scores[] (-1 = not yet), picked[], uses{helper:n}, cur:{strokes, n, pos|null, done, picked, flying, mull}}]}`.
-**listing**: `{code, name, quick, players, max, holes, course, courseName, theme, helpers, shotClock, ai, host, startAt, created}`.
+**listing**: `{code, name, quick, players, max, holes, course, courseName, theme, helpers, shotClock, ai, host, startAt, created, collide}`.
 
 ### Error codes
 `bad_token` `bad_request` `rate_limited` `paused` `lobby_full` `too_many_rooms` `no_room` `in_play`

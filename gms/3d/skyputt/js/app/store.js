@@ -4,6 +4,7 @@ const KEY = 'skyputt.save.v1';
 
 export const DEFAULT_SETTINGS = {
   sfx: 0.9, music: 0.6, quality: 'high', camSens: 1, lefty: false, theme: 'sky',
+  ballHit: true,   // balls knock each other when several real balls share a hole (notes/ballhit.md)
 };
 // M5 helpers start at 1 each so players meet them; Long Sight + Mulligan as before.
 export const START_HELPERS = { longSight: 3, mulligan: 3, magnet: 1, steady: 1, sticky: 1, power: 1, guard: 1, ghost: 1 };

@@ -36,6 +36,7 @@ export class OnlineGame {
     on('room', e => this.onRoom(e));
     on('shot', m => { this.patch(m.seat, { flying: true }); this.round?.onRemoteShot(m); });
     on('result', m => this.onResult(m));
+    on('knock', m => this.onKnock(m));
     on('mulligan', m => { this.patch(m.seat, { strokes: m.strokes, pos: m.to, mull: false }); this.round?.onRemoteMulligan(m); this.renderStrip(true); });
     on('roomClosed', m => this.end(m.reason === 'left' ? 'left' : 'closed'));
     on('state', s => this.renderStrip(true, s));
@@ -78,6 +79,13 @@ export class OnlineGame {
     }
     this.renderStrip(true);
   }
+  // ball hits: a shot knocked seat m.seat's ball (the server applied it; the shooter hears it too)
+  onKnock(m) {
+    if (m.hole !== this.room?.hole) return;
+    this.patch(m.seat, { pos: m.to, n: m.n, strokes: m.strokes, done: m.done, picked: m.picked, mull: false });
+    this.round?.onKnock(m);
+    this.renderStrip(true);
+  }
   patch(i, cur) {
     const s = this.room?.seats?.[i];
     if (!s) return;
@@ -92,8 +100,13 @@ export class OnlineGame {
   sendResult(m) {
     const i = m.seat ?? this.you;
     this.patch(i, { flying: false, n: m.n + 1, pos: m.state === 'cup' ? null : m.to });
-    this.net.result(m).then(r => { this.patch(i, { strokes: r.strokes, done: r.done, picked: r.picked }); this.renderStrip(true); })
-      .catch(e => this.syncErr(e, 'result'));
+    this.net.result(m).then(r => {
+      this.patch(i, { strokes: r.strokes, done: r.done, picked: r.picked });
+      // knocks the server didn't take (that ball moved first): put those balls back where it has them
+      if (m.knocks?.length) this.round?.knocksConfirmed(m.hole, m.knocks, r.knocks || []);
+      this.round?.shotSettled(i, m.n);
+      this.renderStrip(true);
+    }).catch(e => { if (m.knocks?.length) this.round?.knocksConfirmed(m.hole, m.knocks, []); this.syncErr(e, 'result'); });
     this.renderStrip(true);
   }
   sendMulligan(m) {
@@ -153,7 +166,7 @@ export class OnlineGame {
     if (this.myDone && r.phase === 'play') {
       const left = seats.filter(s => !s.cur.done).map(s => s.name);
       const d = this.myDone;
-      w.innerHTML = `<b>${esc(d.label || scoreLabel(d.strokes, holePar, d.picked))}</b>${d.points ? ` · +${d.points} ladder pts` : ''}<small>${left.length ? `Waiting for ${esc(left.slice(0, 3).join(', '))}${left.length > 3 ? ` +${left.length - 3}` : ''}…` : 'Hole complete'}</small>`;
+      w.innerHTML = `<b>${esc(d.label || scoreLabel(d.strokes, holePar, d.picked))}</b>${d.points ? ` · +${d.points} ladder pts` : ''}${d.notes?.length ? `<small>${esc(d.notes.join(' · '))}</small>` : ''}<small>${left.length ? `Waiting for ${esc(left.slice(0, 3).join(', '))}${left.length > 3 ? ` +${left.length - 3}` : ''}…` : 'Hole complete'}</small>`;
       w.hidden = false;
     } else w.hidden = true;
   }

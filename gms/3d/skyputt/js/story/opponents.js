@@ -59,7 +59,7 @@ export async function playField(golfers, holes, seed) {
     if (degenerate) console.warn(`[skyputt] ai simulateRound gave ${g.name} a pick-up on every hole (uncalibrated?); using the stub`);
     if (!res || !Array.isArray(res.scores) || res.scores.length !== holes.length || degenerate) { res = stubRound({ holes, golfer: g, seed }); source = 'stub'; }
     const scores = res.scores.map(s => s.strokes);
-    out.push({ id: g.id, name: g.name, colour: g.colour, scores, total: scores.reduce((a, b) => a + b, 0), source, shots: res.scores.map(s => s.shots || null) });
+    out.push({ id: g.id, name: g.name, colour: g.colour, personality: g.personality, skill: g.skill, scores, total: scores.reduce((a, b) => a + b, 0), source, shots: res.scores.map(s => s.shots || null) });
   }
   return out;
 }

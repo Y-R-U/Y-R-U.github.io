@@ -48,6 +48,7 @@ type Flight struct {
 	Strokes int // strokes before the shot
 	From    *[3]float64
 	At      int64
+	Balls   map[int]int // ball hits: seat → its shot number, for the balls this shot was simulated against
 }
 
 type Prev struct {
@@ -203,7 +204,7 @@ func (h *Hub) listing(r *Room) map[string]any {
 	return map[string]any{"code": r.Code, "name": r.Opts.Name, "quick": r.Quick, "players": r.humans(), "max": r.Opts.Max,
 		"holes": len(r.Opts.Holes), "course": r.Opts.Course, "courseName": r.Opts.CourseName, "theme": r.Opts.Theme,
 		"helpers": r.Opts.Helpers, "shotClock": r.Opts.ShotClock, "ai": r.Opts.AI, "host": hostName,
-		"startAt": r.StartAt, "created": r.Created}
+		"startAt": r.StartAt, "created": r.Created, "collide": r.Opts.Collide}
 }
 
 // pushRoom sends every member their own snapshot (as `t`, default "room").
@@ -700,10 +701,21 @@ func (h *Hub) shot(u *User, m inMsg) (map[string]any, string) {
 		s.Uses[id] += n
 	}
 	from := &[3]float64{m.Ball.X, m.Ball.Y, m.Ball.Z}
+	balls := r.ballRefs(i, m.Balls)
 	s.Cur.Flight = &Flight{N: s.Cur.N, Strokes: s.Cur.Strokes, From: from, At: nowMs()}
+	if len(balls) > 0 {
+		s.Cur.Flight.Balls = map[int]int{}
+		for _, b := range balls {
+			s.Cur.Flight.Balls[b.Seat] = b.N
+		}
+	}
 	s.Cur.Prev = &Prev{Strokes: s.Cur.Strokes, Pos: s.Cur.Pos}
-	h.pushEv(r, u.UID, ev("shot", "seat", i, "hole", r.Hole, "n", s.Cur.N, "vx", m.VX, "vz", m.VZ, "t0", m.T0,
-		"aim", m.Aim, "power", m.Power, "mods", m.Mods, "ball", m.Ball))
+	e := ev("shot", "seat", i, "hole", r.Hole, "n", s.Cur.N, "vx", m.VX, "vz", m.VZ, "t0", m.T0,
+		"aim", m.Aim, "power", m.Power, "mods", m.Mods, "ball", m.Ball)
+	if len(balls) > 0 {
+		e["balls"] = balls
+	}
+	h.pushEv(r, u.UID, e)
 	return map[string]any{"seat": i, "n": s.Cur.N}, ""
 }
 
@@ -757,11 +769,82 @@ func (h *Hub) result(u *User, m inMsg) (map[string]any, string) {
 	} else if s.Cur.Strokes >= r.maxStrokes() {
 		s.Cur.Done, s.Cur.Picked, s.Cur.Prev = true, true, nil
 	}
+	knocked := h.applyKnocks(r, i, f, m.Knocks) // before the result: clients unlock a knocked ball on the result
 	h.pushEv(r, u.UID, ev("result", "seat", i, "hole", r.Hole, "n", f.N, "state", m.State, "to", posView(s.Cur.Pos),
 		"strokes", s.Cur.Strokes, "done", s.Cur.Done, "picked", s.Cur.Picked))
-	out := map[string]any{"seat": i, "strokes": s.Cur.Strokes, "done": s.Cur.Done, "picked": s.Cur.Picked}
+	out := map[string]any{"seat": i, "strokes": s.Cur.Strokes, "done": s.Cur.Done, "picked": s.Cur.Picked, "knocks": knocked}
 	h.checkHole(r)
 	return out, ""
+}
+
+// ballRefs keeps the relayed balls of a shot by seat i that make sense (lock held): ball hits on,
+// another seat of this room, finite, each seat once, in the shooter's order (the replay's step order).
+func (r *Room) ballRefs(i int, in []BallRef) []BallRef {
+	if !r.Opts.Collide || len(in) == 0 {
+		return nil
+	}
+	out := []BallRef{}
+	seen := map[int]bool{}
+	for _, b := range in {
+		if len(out) >= maxBallRefs || b.Seat < 0 || b.Seat >= len(r.Seats) || b.Seat == i || seen[b.Seat] {
+			continue
+		}
+		if !okVec([]float64{b.X, b.Y, b.Z}) {
+			continue
+		}
+		seen[b.Seat] = true
+		out = append(out, b)
+	}
+	return out
+}
+
+// applyKnocks moves the balls a shot knocked (lock held). Rules (notes/ballhit.md): a knock only
+// counts for a ball the shot was simulated against that hasn't moved since (same shot number, not
+// in flight, not holed) — otherwise its owner's own shot wins and the knock is dropped. rest = it
+// plays from there; oob = back where it was and +1 to its OWNER (as for their own ball out of bounds;
+// the shooter pays nothing; at par + 4 that picks the seat up); cup = holed at its current strokes. Each
+// applied knock bumps the seat's shot number (a plan from the old spot is stale) and clears its
+// Mulligan. Every member (the shooter too) gets a "knock" event. Returns the applied knocks.
+func (h *Hub) applyKnocks(r *Room, i int, f *Flight, ks []Knock) []map[string]any {
+	out := []map[string]any{}
+	if !r.Opts.Collide || f.Balls == nil {
+		return out
+	}
+	done := map[int]bool{}
+	for _, k := range ks {
+		n, ok := f.Balls[k.Seat]
+		if !ok || done[k.Seat] || k.Seat == i {
+			continue
+		}
+		t := r.Seats[k.Seat]
+		if t.Cur.Done || t.Cur.Flight != nil || t.Cur.N != n || t.Cur.Pos == nil {
+			continue
+		}
+		switch k.State {
+		case "rest":
+			if !okVec(k.To) {
+				continue
+			}
+			t.Cur.Pos = &[3]float64{k.To[0], k.To[1], k.To[2]}
+		case "oob":
+			t.Cur.Strokes = min(t.Cur.Strokes+1, r.maxStrokes())
+			if t.Cur.Strokes >= r.maxStrokes() {
+				t.Cur.Done, t.Cur.Picked = true, true
+			}
+		case "cup":
+			t.Cur.Done, t.Cur.Picked = true, false
+		default:
+			continue
+		}
+		done[k.Seat] = true
+		t.Cur.N++
+		t.Cur.Prev = nil
+		e := ev("knock", "seat", k.Seat, "hole", r.Hole, "by", i, "n", t.Cur.N, "state", k.State, "to", posView(t.Cur.Pos),
+			"strokes", t.Cur.Strokes, "done", t.Cur.Done, "picked", t.Cur.Picked)
+		h.pushEv(r, "", e)
+		out = append(out, e)
+	}
+	return out
 }
 
 func (h *Hub) mulligan(u *User, m inMsg) (map[string]any, string) {

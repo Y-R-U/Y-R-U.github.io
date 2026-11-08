@@ -147,7 +147,7 @@ export class Hud {
   hideCard() { this.el.card.hidden = true; this.el.card.innerHTML = ''; }
   _card(html) { const c = this.el.card; c.innerHTML = `<div class="card">${html}</div>`; c.hidden = false; return c; }
 
-  holeDone({ hole, n, name, par, strokes, picked, gems, stars = 0, coins = 0, newBest, reward, nextLabel, onMap, rivals, youTotal, currency, ladder, chest, roundBonus }, onNext) {
+  holeDone({ hole, n, name, par, strokes, picked, gems, stars = 0, coins = 0, newBest, reward, nextLabel, onMap, rivals, youTotal, currency, ladder, chest, roundBonus, notes = null }, onNext) {
     const label = scoreName(strokes, par, picked);
     const d = strokes - par;
     const cls = strokes === 1 ? 'ace' : d < 0 ? 'under' : d === 0 ? 'par' : 'over';
@@ -157,6 +157,7 @@ export class Hud {
       <div class="card-title ${cls}">${esc(label)}</div>
       <div class="card-stars">${starRow(stars)}</div>
       <div class="card-stats"><div><span>Strokes</span><b>${strokes}</b></div><div><span>Par</span><b>${par}</b></div>${currency ? `<div><span>${esc(currency.name)}</span><b>+${gems}</b></div>` : `<div><span>Coins</span><b>+${coins}</b></div>`}</div>
+      ${(notes || []).map(t => `<div class="card-note bad">${esc(t)}</div>`).join('')}
       ${newBest ? '<div class="card-note good">New best!</div>' : ''}
       ${rw ? `<div class="card-note good">3 stars: +1 ${esc(rw)}</div>` : ''}
       ${ladder ? `<div class="card-ladder"><span class="lp">+${ladder.points} ladder pts</span>${ladder.streak > 1 ? `<span class="streak">🔥 ${ladder.streak}-day streak</span>` : ''}</div>` : ''}

@@ -67,6 +67,7 @@ type RoomOpts struct {
 	Helpers    HelperOpts `json:"helpers"`
 	ShotClock  int        `json:"shotClock"` // seconds per shot, 0 = off
 	AI         AIOpts     `json:"ai"`
+	Collide    bool       `json:"collide"` // ball hits: balls knock each other (notes/ballhit.md); false = pass through
 }
 
 func finite(v float64) bool { return !math.IsNaN(v) && !math.IsInf(v, 0) }
@@ -197,6 +198,24 @@ func (b BallState) ok() bool {
 	}
 	return b.Surf >= 0 && b.Surf < 64
 }
+
+// BallRef: another seat's resting ball a shot was simulated against (relayed for exact replays).
+type BallRef struct {
+	Seat int     `json:"seat"`
+	N    int     `json:"n"` // that seat's shot number when the shot was taken
+	X    float64 `json:"x"`
+	Y    float64 `json:"y"`
+	Z    float64 `json:"z"`
+}
+
+// Knock: where a shot left another seat's ball (reported with the shooter's result).
+type Knock struct {
+	Seat  int       `json:"seat"`
+	State string    `json:"state"` // rest | cup | oob (oob = back to where it was, no penalty)
+	To    []float64 `json:"to"`
+}
+
+const maxBallRefs = maxPlayers - 1
 
 func okVec(v []float64) bool {
 	if len(v) != 3 {

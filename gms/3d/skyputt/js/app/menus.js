@@ -73,6 +73,9 @@ export function showMap(store, course, { onHole, onFront, onNine, onBack, click,
   };
 }
 
+// Ball hits modes (notes/ballhit.md): Battle = balls collide, knocked out of bounds = +1 to its owner; Classic = pass through.
+export const ballHitHint = on => (on ? 'Battle: knock rivals’ balls, out of bounds = +1 to them.' : 'Classic: balls pass through each other.');
+
 // Settings sheet. apply(settings) is called on every change (audio volumes, camera, lefty).
 export function openSettings(store, { apply, onClose, click }) {
   const el = $('#sheet');
@@ -88,6 +91,9 @@ export function openSettings(store, { apply, onClose, click }) {
         <button data-v="low" class="${s.quality === 'low' ? 'on' : ''}">Low</button><button data-v="high" class="${s.quality !== 'low' ? 'on' : ''}">High</button></div></div>
       <div class="row"><span>Left-handed HUD</span><div class="seg" data-k="lefty">
         <button data-v="0" class="${!s.lefty ? 'on' : ''}">Off</button><button data-v="1" class="${s.lefty ? 'on' : ''}">On</button></div></div>
+      <div class="row"><span>Ball hits</span><div class="seg" data-k="ballHit">
+        <button data-v="1" class="${s.ballHit !== false ? 'on' : ''}">Battle</button><button data-v="0" class="${s.ballHit === false ? 'on' : ''}">Classic</button></div></div>
+      <div class="card-note small" id="ballhit-hint">${ballHitHint(s.ballHit !== false)} Online, the room’s host picks this for everyone.</div>
       <div class="card-note" id="sheet-note" hidden>Quality changes apply after a reload.</div>
       <button class="btn" data-a="reload" hidden>Reload now</button>
       <button class="btn primary" data-a="close">Done</button>
@@ -103,8 +109,9 @@ export function openSettings(store, { apply, onClose, click }) {
       click?.();
       seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
       const k = seg.dataset.k;
-      store.setSetting(k, k === 'lefty' ? b.dataset.v === '1' : b.dataset.v);
+      store.setSetting(k, k === 'lefty' || k === 'ballHit' ? b.dataset.v === '1' : b.dataset.v);
       apply(store.settings());
+      if (k === 'ballHit') { const h = el.querySelector('#ballhit-hint'); if (h) h.textContent = `${ballHitHint(b.dataset.v === '1')} Online, the room’s host picks this for everyone.`; }
       if (k === 'quality') { const changed = b.dataset.v !== qualityAtLoad; note.hidden = !changed; reload.hidden = !changed; }
     };
   });

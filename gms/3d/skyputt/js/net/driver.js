@@ -6,6 +6,7 @@
 import { AIGolfer } from '../ai/golfers.js';
 import { aiClient } from '../ai/index.js';
 import { shotSpeed } from '../engine/constants.js';
+import { Replayer } from './replay.js';
 
 const FIRST_AT = 3.6;          // s of the shared hole clock before the AIs start (after the fly-over)
 const THINK = [0.9, 1.6];      // s between an AI's ball stopping and its next putt (min, + random)
@@ -76,13 +77,23 @@ export class AIDriver {
     const b = p.ball;
     const ballMsg = { x: b.x, y: b.y, z: b.z, sup: b.sup ?? false, n: b.n || [0, 1, 0], surf: b.surf ?? 0 };
     st.phase = 'rolling';
-    this.g.sendShot({ seat: s.i, hole, n, vx, vz, t0: p.t0, aim: p.shot.aim, power: p.shot.power, mods: {}, ball: ballMsg });
-    const state = p.state === 'cup' || p.state === 'oob' ? p.state : 'rest';
-    const shot = { path: p.path, hz: 30, state, from: p.from, to: state === 'oob' ? p.from : p.to };
+    // ball hits: the AI planned alone, but its putt plays out against the resting balls (the same
+    // sim every client replays from the relayed `balls`); it may knock them, mine included
+    const balls = round.targetsFor(s.i, b);
+    let state = p.state === 'cup' || p.state === 'oob' ? p.state : 'rest';
+    let shot = { path: p.path, hz: 30, state, from: p.from, to: state === 'oob' ? p.from : p.to }, knocks = [];
+    if (balls.length) {
+      round.replayer = round.replayer || new Replayer(round.hole);
+      const r = round.replayer.shot({ vx, vz, t0: p.t0, mods: {}, ball: ballMsg, balls });
+      state = r.state; shot = r; knocks = r.knocks;
+    }
+    this.g.sendShot({ seat: s.i, hole, n, vx, vz, t0: p.t0, aim: p.shot.aim, power: p.shot.power, mods: {}, ball: ballMsg, ...(balls.length ? { balls } : {}) });
+    if (knocks.length) round.playKnocks(s.i, n, knocks);
     round.playGhost(s.i, shot, () => {
       if (!this.still(s.i, hole, n)) return;
-      this.g.sendResult({ seat: s.i, hole, n, state, to: shot.to });
-      st.ball = state === 'oob' ? { x: p.from[0], y: p.from[1], z: p.from[2] } : state === 'rest' ? p.rest : null;
+      const ks = knocks.map(k => ({ seat: k.seat, state: k.state, to: k.to }));
+      this.g.sendResult({ seat: s.i, hole, n, state, to: shot.to, ...(ks.length ? { knocks: ks } : {}) });
+      st.ball = balls.length ? null : state === 'oob' ? { x: p.from[0], y: p.from[1], z: p.from[2] } : state === 'rest' ? p.rest : null;
       st.ballN = n + 1;
       st.n = n + 1;
       st.phase = 'idle';

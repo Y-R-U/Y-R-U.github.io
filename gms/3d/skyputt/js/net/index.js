@@ -7,7 +7,7 @@
 import { net, CHEAT_WARNING, readHint } from './net.js';
 import { OnlineGame } from './game.js';
 import { renderForm } from './form.js';
-import { defaultOpts, quickOpts, wireOpts, holesFor, helpersLabel, clockLabel, personalityName, rankForSkill, shareLink } from './rooms.js';
+import { defaultOpts, quickOpts, wireOpts, holesFor, helpersLabel, clockLabel, collideLabel, personalityName, rankForSkill, shareLink } from './rooms.js';
 import { THEME_LIST } from '../app/menus.js';
 
 const $ = s => document.querySelector(s);
@@ -98,7 +98,7 @@ export function createOnline({ app, store, hooks, click = () => {}, onBack }) {
     const rooms = net.lobby?.rooms || [];
     box.innerHTML = rooms.length ? rooms.map(r => `<button class="net-room" data-code="${esc(r.code)}">
         <span class="sw" style="background:${THEME_LIST.find(t => t.id === r.theme)?.swatch || '#456'}"></span>
-        <span class="rm"><b>${esc(r.name || `${r.host}’s room`)}</b><small>${r.holes} holes · ${esc(themeName(r.theme))} · ${esc(helpersLabel(r.helpers))}${r.shotClock ? ` · ${r.shotClock}s clock` : ''}</small></span>
+        <span class="rm"><b>${esc(r.name || `${r.host}’s room`)}</b><small>${r.holes} holes · ${esc(themeName(r.theme))} · ${esc(helpersLabel(r.helpers))}${r.shotClock ? ` · ${r.shotClock}s clock` : ''}${r.collide ? ' · Battle' : ' · Classic'}</small></span>
         <span class="pl">${r.players}/${r.max}</span></button>`).join('')
       : '<div class="card-note">No open rooms right now. Make one, or try Quick play.</div>';
   }
@@ -106,7 +106,7 @@ export function createOnline({ app, store, hooks, click = () => {}, onBack }) {
   // ---- create
   function create() {
     view = 'create';
-    draft = draft || defaultOpts({ theme: app.themeId === 'greybox' ? 'sky' : app.themeId });
+    draft = draft || defaultOpts({ theme: app.themeId === 'greybox' ? 'sky' : app.themeId, collide: store.settings().ballHit !== false });
     show(`${head('Create a room')}<div class="net-form"></div>
       <button class="btn primary" data-a="make">Create room</button>`);
     draft = renderForm(el.querySelector('.net-form'), draft, { onChange: o => { draft = o; }, click });
@@ -132,7 +132,7 @@ export function createOnline({ app, store, hooks, click = () => {}, onBack }) {
       <div class="net-players">${r.seats.map(s => `<div class="np ${s.i === r.you ? 'me' : ''}"><i style="background:${s.color}"></i><span>${esc(s.name)}${s.i === r.you ? ' (you)' : ''}</span>${s.i === r.host ? '<em class="host">host</em>' : ''}${!s.online ? '<em class="away">away</em>' : ''}</div>`).join('')}
         ${ai ? `<div class="np ai"><i></i><span>+ ${ai} ghost AI${ai === 1 ? '' : 's'}</span><em>${esc(personalityName(o.ai.personality))} · ${esc(rankForSkill(o.ai.skill).name)}</em></div>` : ''}
         ${empty ? `<div class="np open"><i></i><span>${empty} open seat${empty === 1 ? '' : 's'}</span></div>` : ''}</div>
-      <div class="net-sum">${esc(helpersLabel(o.helpers))} · ${esc(clockLabel(o.shotClock))}</div>
+      <div class="net-sum">${esc(helpersLabel(o.helpers))} · ${esc(clockLabel(o.shotClock))} · ${esc(collideLabel(o.collide === true))}</div>
       ${host ? `<button class="btn" data-a="edit">${editOpen ? 'Hide options' : 'Room options'}</button><div class="net-form" ${editOpen ? '' : 'hidden'}></div>` : ''}
       ${host ? `<button class="btn primary" data-a="start" ${humans + ai < 2 ? 'disabled' : ''}>${humans + ai < 2 ? 'Add a ghost AI or a friend' : 'Start round'}</button>` : '<div class="card-note">Waiting for the host to start…</div>'}
       <button class="btn ghost" data-a="leave">Leave room</button>
@@ -211,7 +211,7 @@ export function createOnline({ app, store, hooks, click = () => {}, onBack }) {
         case 'retry': return open();
         case 'quick':
           b.disabled = true;
-          try { await net.quick(wireOpts(quickOpts({ theme: app.themeId === 'greybox' ? 'sky' : app.themeId }))); lobby(); }
+          try { await net.quick(wireOpts(quickOpts({ theme: app.themeId === 'greybox' ? 'sky' : app.themeId, collide: store.settings().ballHit !== false }))); lobby(); }
           catch (err) { b.disabled = false; toast(errText(err)); }
           return;
         case 'create': return create();
