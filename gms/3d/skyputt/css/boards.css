@@ -1,0 +1,21 @@
+/* SKYPUTT — online board tabs (boards agent, js/net/boardsui.js) on the Daily and Ladder pages. */
+.seg.ob-tabs { margin: 8px 0 8px; }
+.seg.ob-tabs button, .seg.ob-seg button { flex: 1; padding: 7px 6px; font-size: 14.5px; color: inherit; }
+.seg.ob-tabs button.on, .seg.ob-seg button.on { color: var(--ink); }
+.ob-panel { display: flex; flex-direction: column; gap: 8px; }
+.ob-panel[hidden] { display: none; }
+.ob-row { display: flex; gap: 8px; }
+.ob-row .seg { flex: 1; min-width: 0; }
+.ob-row .seg button { padding: 6px 4px; font-size: 13.5px; white-space: nowrap; }
+.ob-sel { width: 100%; padding: 8px 10px; border-radius: 12px; border: 2px solid var(--panel-b); background: rgba(0,0,0,.25);
+  color: #fff; font: 600 15px 'Fredoka', system-ui, sans-serif; }
+.ob-sel option { color: #1b2440; }
+.ob-me { font-size: 14px; opacity: .9; }
+.ob-me b { color: var(--gold); }
+.ob-body { display: flex; flex-direction: column; gap: 6px; }
+table.ob-board { margin: 0; }
+table.ob-board td:last-child { text-align: right; font-weight: 600; white-space: nowrap; }
+table.ob-board td:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 0; width: 100%; }
+.ob-met { font-style: normal; color: var(--good); }
+.ob-par { font-weight: 500; opacity: .7; margin-left: 4px; }
+.ob-foot { opacity: .65; }

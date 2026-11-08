@@ -1,5 +1,7 @@
 // Daily Challenge screen (#daily) and the title tile. The round itself is played through ctx.play.
-//   ctx: { store, daily (createDaily), now(), click, onBack, play(ch, att) → Promise<result|null> }
+//   ctx: { store, daily (createDaily), now(), click, onBack, play(ch, att) → Promise<result|null>,
+//          boards? (js/net/boards.js: Online tab + auto submit), netName?() }
+import { onlineTabs, dailyPanel } from '../net/boardsui.js';
 import { TRIES, MILESTONES, nextMilestone, goalMet, FINISH_REWARD, GOAL_REWARD } from './daily.js';
 import { dayStart, addDays } from '../events/calendar.js';
 import { countdown } from '../events/events.js';
@@ -52,9 +54,9 @@ export function createDailyScreen(ctx) {
       ${rec?.tries.length ? `<div class="dl-tries">${rec.tries.map((t, i) => `<span class="${goalMet(ch.twist, ch.hole, t) ? 'met' : t.quit || t.picked ? 'bad' : ''}">Try ${i + 1}: <b>${esc(tryText(t, ch))}</b></span>`).join('')}</div>` : ''}
       ${used ? `<button class="btn" data-a="share">Share result</button><textarea class="dl-share" readonly hidden></textarea>` : ''}
       ${st.atRisk ? `<div class="card-note">Finish today’s hole to keep your ${st.count}-day streak.</div>` : ''}
-      <div class="sec">Today’s board <small>you vs the ghost field · ties go to you</small></div>
-      <table class="scores board dl-board">${rows.map(r => `<tr class="${r.you ? 'you' : ''}"><td>${r.rank}</td><td>${esc(r.name)}</td><td>${r.strokes ?? '–'}</td></tr>`).join('')}</table>
-      ${me ? '' : '<div class="card-note small">Hole out to join the board.</div>'}
+      <div class="sec dl-bsec">Today’s board <small>you vs the ghost field · ties go to you</small></div>
+      <div class="dl-local"><table class="scores board dl-board">${rows.map(r => `<tr class="${r.you ? 'you' : ''}"><td>${r.rank}</td><td>${esc(r.name)}</td><td>${r.strokes ?? '–'}</td></tr>`).join('')}</table>
+      ${me ? '' : '<div class="card-note small">Hole out to join the board.</div>'}</div>
       <div class="sec">Rewards</div>
       <div class="tiers">
         <div class="${rec?.paid.finish ? 'on' : ''}"><b>Finish</b><span>${rewardHTML(FINISH_REWARD)}${rec?.paid.finish ? ' ✓' : ''}</span></div>
@@ -66,6 +68,9 @@ export function createDailyScreen(ctx) {
     </div>`;
     el.hidden = false;
     el.scrollTop = 0;
+    // boards agent: Ghosts | Online tabs (hidden unless the server has online boards)
+    onlineTabs({ el: el.querySelector('.dl-bsec'), local: el.querySelector('.dl-local'), boards: ctx.boards, key: 'daily', onlineSub: 'real players on the same hole today',
+      online: dailyPanel(ctx.boards, { day: ymd, hole: ch.hole.id, sent: best != null, wait: () => lastSubmit }) });
     el.onclick = async e => {
       const b = e.target.closest('button'); if (!b) return;
       ctx.click?.();
@@ -76,11 +81,21 @@ export function createDailyScreen(ctx) {
         if (!att) { page(); return; }
         el.hidden = true;
         let res = null;
+        const t0 = Date.now();
         try { res = await ctx.play(att.ch, att); } catch (err) { console.warn('[skyputt] daily round failed', err); }
         const out = daily.finish(att, res);
+        submit(att, out.try, Date.now() - t0);
         page(flashFor(out, att));
       }
     };
+  }
+
+  // A finished try goes to the online board (fire and forget; boards.js queues it if offline).
+  let lastSubmit = null;   // the Online panel waits for it, so your new result is on the board it loads
+  function submit(att, t, ms) {
+    if (!ctx.boards || !t || t.quit || t.picked || !(t.strokes > 0)) return;
+    lastSubmit = ctx.boards.submitDaily({ day: att.ymd, hole: att.ch.hole.id, twist: att.ch.twist.id, try: att.i + 1, strokes: t.strokes, gems: t.gems, ms,
+      name: ctx.netName?.() || '' }).catch(() => {});
   }
 
   function flashFor(out, att) {

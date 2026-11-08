@@ -61,6 +61,9 @@ func openDB(path string) {
 	if _, err := db.Exec(schema); err != nil {
 		log.Fatalf("schema: %v", err)
 	}
+	if _, err := db.Exec(boardsSchema); err != nil { // additive (boards.go)
+		log.Fatalf("boards schema: %v", err)
+	}
 }
 
 func pidOf(uid string) string {
@@ -132,4 +135,5 @@ func sweepDB() {
 	old := nowFn().Add(-365 * 24 * time.Hour).UnixMilli()
 	db.Exec(`DELETE FROM round_players WHERE round IN (SELECT id FROM rounds WHERE ended < ?)`, old)
 	db.Exec(`DELETE FROM rounds WHERE ended < ?`, old)
+	sweepBoards()
 }

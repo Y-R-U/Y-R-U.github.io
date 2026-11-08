@@ -5,6 +5,7 @@ import { BALLS, TRAILS, HELPER_PRICES, CHESTS, STAR_CHEST_EVERY, STAR_CHESTS_PER
 import { HELPERS, HELPER_ICONS, helperName } from './helpers.js';
 import { ballPreview, trailPreviewCSS } from './cosmetics.js';
 import { ICONS, chestIcon, CHEST_COLORS } from '../game/hud.js';
+import { onlineTabs, roundPanel } from '../net/boardsui.js';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -31,7 +32,8 @@ export function rewardLine(r) {
   return out.join(' · ');
 }
 
-// ctx: { store, meta, click(), sfx(name), onBack(), playerName() }
+// ctx: { store, meta, click(), sfx(name), onBack(), playerName(),
+//        boards?: { api (js/net/boards.js), rounds: roundList(), wait() } — the Online rounds tab }
 export function createMetaScreens(ctx) {
   const { store, meta } = ctx;
   let shopTab = 'chests';
@@ -62,8 +64,8 @@ export function createMetaScreens(ctx) {
         <div class="ev-stats"><div><span>Points</span><b>${L.points}</b></div><div><span>Rank</span><b>${me.rank}/${BOARD}</b></div><div><span>Streak</span><b>${streak}d${sm > 1 ? ` <small>×${sm.toFixed(1)}</small>` : ''}</b></div><div><span>Holes</span><b>${L.holes}</b></div></div>
         <div class="lad-zones">${up ? `<span class="z up">Top ${PROMOTE} → ${esc(up.name)}</span>` : '<span class="z up">Top of the ladder</span>'}${down ? `<span class="z down">Bottom ${RELEGATE} → ${esc(down.name)}</span>` : '<span class="z">No relegation from Bronze</span>'}</div>
       </div>
-      <table class="scores board ladder lad-board">${show.map((r, i) => `${i && r.rank - show[i - 1].rank > 1 ? '<tr class="gap"><td colspan="3">⋯</td></tr>' : ''}
-        <tr class="${r.you ? 'you' : ''} ${r.zone} ${r.rank === PROMOTE && up ? 'cut-up' : ''} ${r.rank === BOARD - RELEGATE && down ? 'cut-down' : ''}"><td>${r.rank}</td><td>${r.zone === 'up' ? '<i class="zi up">▲</i>' : r.zone === 'down' ? '<i class="zi down">▼</i>' : ''}${esc(r.name)}</td><td>${r.points}</td></tr>`).join('')}</table>
+      <div class="lad-local"><table class="scores board ladder lad-board">${show.map((r, i) => `${i && r.rank - show[i - 1].rank > 1 ? '<tr class="gap"><td colspan="3">⋯</td></tr>' : ''}
+        <tr class="${r.you ? 'you' : ''} ${r.zone} ${r.rank === PROMOTE && up ? 'cut-up' : ''} ${r.rank === BOARD - RELEGATE && down ? 'cut-down' : ''}"><td>${r.rank}</td><td>${r.zone === 'up' ? '<i class="zi up">▲</i>' : r.zone === 'down' ? '<i class="zi down">▼</i>' : ''}${esc(r.name)}</td><td>${r.points}</td></tr>`).join('')}</table></div>
       <div class="sec">Earn points <small>any hole, any mode: course, career, events</small></div>
       <ul class="lad-how">
         <li><b>10</b> for every hole you finish</li>
@@ -76,6 +78,10 @@ export function createMetaScreens(ctx) {
       <div class="lad-tiers">${TIERS.map((t, k) => `<div class="${k === L.tier ? 'on' : ''}">${tierBadge(k, 34)}<b>${esc(t.name)}</b><span><em>Play: ${coin(t.coins)} ${chestIcon('silver', 15)}</em>${k < TIERS.length - 1 ? `<em>Promoted: ${coin(Math.round(t.coins * 1.5))} ${chestIcon('gold', 15)}</em>` : '<em>The top tier</em>'}</span></div>`).join('')}</div>
     </div>`;
     el.hidden = false;
+    // boards agent: Your tier | Online rounds (hidden unless the server has online boards)
+    const B = ctx.boards;
+    if (B) onlineTabs({ el: el.querySelector('.lad-hero'), local: el.querySelector('.lad-local'), boards: B.api, key: 'ladder', labels: ['Your tier', 'Online rounds'],
+      online: roundPanel(B.api, { rounds: B.rounds, week: key, wait: B.wait }) });
     el.onclick = e => {
       const b = e.target.closest('button'); if (!b) return;
       ctx.click?.();

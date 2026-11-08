@@ -18,11 +18,12 @@ import { createEvents, eventTileHTML } from '../events/screen.js';
 import { nowFrom } from '../events/events.js';
 import { createMeta } from '../meta/meta.js';
 import { createMetaScreens, tierBadge } from '../meta/screens.js';
-import { TIERS, weekCountdown } from '../meta/ladder.js';
+import { TIERS, weekCountdown, weekKey } from '../meta/ladder.js';
 import { createOnline } from '../net/index.js';
 import { createDaily } from '../daily/daily.js';
 import { createDailyScreen, dailyTileHTML } from '../daily/screen.js';
 import { DailyRound } from '../daily/round.js';
+import { boards, roundIdFor, roundList } from '../net/boards.js';
 
 const $ = s => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -159,8 +160,23 @@ async function boot() {
     $('#title').hidden = true; $('#map').hidden = true;
     titleView?.dispose(); titleView = null;
     round = new Round(app, c, i, { mode, end, onExit: () => { if (mode === 'single') { showTitle(); showCourseMap(); } else showTitle(); } });
+    if (mode === 'round') submitRoundOnScorecard(round, c);
     if (params.has('noflyover')) round.endFlyover();
     window.__skyputt.round = round;
+  }
+  // boards agent: a full course round (a nine, or a whole course without nines) goes to the online
+  // round board when its scorecard shows (also after "Play again"). Fire and forget, queued if offline.
+  const netName = () => store.settings().netName || store.story().name || '';
+  let roundSubmit = null;
+  function submitRoundOnScorecard(r, c) {
+    const show = r.showScorecard;
+    r.showScorecard = function () {
+      const rid = roundIdFor(c, this.startIndex, this.end), rows = this.scores.slice(this.startIndex, this.end);
+      if (rid && rows.length === this.end - this.startIndex && rows.every(Boolean)) {
+        roundSubmit = boards.submitRound({ course: c.id, round: rid, week: weekKey(nowFrom()), scores: rows.map(x => x.strokes), name: netName() }).catch(() => {});
+      }
+      return show.call(this);
+    };
   }
   // ---- career (M3 story)
   const career = createCareer({
@@ -207,7 +223,7 @@ async function boot() {
   // ---- daily challenge (js/daily/): one hole a day, 3 tries, streak, ghost board
   const daily = createDaily(store, now);
   const dailyScreen = createDailyScreen({
-    store, daily, now, click: () => sfx.emit('click'), onBack: () => showTitle(),
+    store, daily, now, click: () => sfx.emit('click'), onBack: () => showTitle(), boards, netName,
     play: (ch, att) => new Promise(async resolve => {
       $('#title').hidden = true;
       await useTheme(ch.theme);
@@ -225,6 +241,7 @@ async function boot() {
   const metaScreens = createMetaScreens({
     store, meta, click: () => sfx.emit('click'), sfx: (n, p) => sfx.emit(n, p),
     onBack: () => showTitle(), playerName: () => store.story().name || 'You',
+    boards: { api: boards, rounds: roundList([course, COURSES.festival, COURSES.woods, COURSES.sugar, COURSES.reef].filter(Boolean)), wait: () => roundSubmit },
   });
   function renderMetaTiles() {
     const L = meta.ladder(), claim = meta.unclaimed().length, chests = store.data.chests.queue.length;
@@ -253,7 +270,7 @@ async function boot() {
   $('#t-settings').innerHTML = ICONS.gear;
   $('#t-settings').onclick = () => { sfx.emit('click'); app.openSettings(() => {}); };
 
-  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, events, meta, metaScreens, online, daily, dailyScreen, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
+  window.__skyputt = { app, THREE, course, store, audio, startRound, showCourseMap, setTheme, career, events, meta, metaScreens, online, daily, dailyScreen, boards, get round() { return round; }, set round(r) { round = r; }, themeId: app.themeId };
 
   const startHole = parseInt(params.get('hole'), 10);
   const startCourse = COURSES[params.get('course')] || course;   // events2: ?course=festival&hole=3

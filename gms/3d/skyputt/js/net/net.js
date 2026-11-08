@@ -238,6 +238,9 @@ export class SkyputtNet {
     }
   }
 
+  /** The sign-in token the websocket hello uses (Firebase ID token or a dev token); null if none. */
+  authToken(fresh = false) { return this._token(fresh); }
+
   serverNow() { return Date.now() + this.offset; }
   _ping() {
     const sent = Date.now();

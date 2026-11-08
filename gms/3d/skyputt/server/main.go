@@ -168,7 +168,10 @@ func runCLI(args []string) {
 		var players, rounds int
 		db.QueryRow(`SELECT COUNT(*) FROM players`).Scan(&players)
 		db.QueryRow(`SELECT COUNT(*) FROM rounds`).Scan(&rounds)
-		fmt.Printf("players %d · finished rounds %d\n", players, rounds)
+		var daily, ladder int
+		db.QueryRow(`SELECT COUNT(*) FROM daily_results`).Scan(&daily)
+		db.QueryRow(`SELECT COUNT(*) FROM ladder_results`).Scan(&ladder)
+		fmt.Printf("players %d · finished rounds %d · daily results %d · round results %d\n", players, rounds, daily, ladder)
 	default:
 		fmt.Println("usage: skyputt [pause on|off|status | stats]")
 		os.Exit(2)
@@ -184,6 +187,10 @@ func routes() http.Handler {
 	api.HandleFunc("GET /api/ws", handleWS)
 	api.HandleFunc("GET /api/rooms", handleRooms)
 	api.HandleFunc("GET /api/rounds/{id}", handleGetRound)
+	api.HandleFunc("POST /api/daily", handleDailySubmit) // boards.go
+	api.HandleFunc("GET /api/daily", handleDailyBoard)
+	api.HandleFunc("POST /api/ladder", handleLadderSubmit)
+	api.HandleFunc("GET /api/ladder", handleLadderBoard)
 	api.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, "not_found", "no such endpoint")
 	})
@@ -242,7 +249,7 @@ func applyCORS(w http.ResponseWriter, r *http.Request) bool {
 	}
 	h.Set("Access-Control-Allow-Origin", o)
 	if r.Method == http.MethodOptions {
-		h.Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		h.Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		h.Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		h.Set("Access-Control-Max-Age", "600")
 	}
@@ -264,7 +271,7 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	conns, rooms := hub.conns, len(hub.rooms)
 	hub.mu.Unlock()
 	writeJSON(w, 200, map[string]any{"ok": true, "name": "skyputt", "version": buildVersion, "protocol": protocolVersion,
-		"now": nowMs(), "conns": conns, "rooms": rooms, "devAuth": cfg.DevAuth})
+		"now": nowMs(), "conns": conns, "rooms": rooms, "devAuth": cfg.DevAuth, "boards": boardsVersion})
 }
 
 func handleStatus(w http.ResponseWriter, r *http.Request) {

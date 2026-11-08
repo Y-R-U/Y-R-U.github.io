@@ -18,7 +18,8 @@ no cheat detection yet**). Online is **free**: no allowance / br8t-payments gate
 `main.go` config, HTTP routes, CLI · `hub.go` users, lobby, quick play, dispatch, timers ·
 `room.go` rooms, seats, holes, relay, scoring, host migration, AI takeover · `opts.go` room options,
 shot modifiers, ball state validation · `session.go` websocket · `db.go` players + finished rounds ·
-`firebase.go` ID tokens (from GAMBIT, anonymous allowed) · `limits.go`, `names.go` (from GAMBIT/Clued).
+`firebase.go` ID tokens (from GAMBIT, anonymous allowed) · `limits.go`, `names.go` (from GAMBIT/Clued) ·
+`boards.go` online leaderboards · `daily.go` + `dailypool.json` the daily pick (Go port of js/daily, for checks).
 
 ## How a round works
 - **Lobby**: the host picks options; members join by code (or from the public list / quick play).
@@ -120,9 +121,15 @@ total, scores[] (-1 = not yet), picked[], uses{helper:n}, cur:{strokes, n, pos|n
 `bad_helpers` `bad_clock` `bad_ai` `bad_name` `not_your_seat` `stale_hole` `stale_shot` `hole_done`
 `in_flight` `bad_shot` `bad_result` `no_helpers` `no_helpers_left`. net.js adds `offline`, `timeout`, `unavailable`.
 
-### HTTP (CORS for `SKYPUTT_ORIGINS`, GET only)
-`/api/health` · `/api/status` (limits, personalities) · `/api/rooms` (lobby view) · `/api/rounds/{id}`
-(a finished round: holes + seats with scores, totals, ranks).
+### HTTP (CORS for `SKYPUTT_ORIGINS`, GET + POST)
+`/api/health` (`boards: 1` when the leaderboards exist) · `/api/status` (limits, personalities) · `/api/rooms`
+(lobby view) · `/api/rounds/{id}` (a finished round: holes + seats with scores, totals, ranks).
+
+**Leaderboards** (`boards.go`, `daily.go`; full spec in `docs/notes/boards.md`): `POST /api/daily`, `GET /api/daily`
+(Daily Challenge board per day + hole), `POST /api/ladder`, `GET /api/ladder` (best course round per week / all
+time). Auth = the same token as `hello`, as `Authorization: Bearer`. Daily results are checked against the daily
+pick ported to Go; **after changing courses / themes / `dailyFrom` run `node tools/daily_pool.mjs`** (regenerates
+`dailypool.json` + the cross-check fixture), then `test.sh`, then redeploy.
 
 ## Deploy (later, with Aaron's OK — nothing here has touched the box)
 1. Check loopback **8023** is free on the box: `ss -ltnp | grep 8023` (8005 filestore, 8012 clued,

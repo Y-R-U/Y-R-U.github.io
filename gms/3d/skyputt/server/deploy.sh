@@ -35,7 +35,9 @@ ssh "$HOST" "sudo install -d -o deploy -g deploy /srv/apps/$APP $BUILD $BUILD/se
   sudo find /srv/data/$APP -maxdepth 1 -type f -exec chmod 600 {} +"
 
 echo ">> syncing server source"
-rsync -az --delete --include='go.mod' --include='go.sum' --include='*.go' --include='test.sh' --exclude='*' \
+# dailypool.json is go:embed-ed (boards); testdata/ holds the Go↔JS daily cross-check fixture for test.sh
+rsync -az --delete --include='go.mod' --include='go.sum' --include='*.go' --include='test.sh' --include='dailypool.json' \
+  --include='testdata/' --include='testdata/*.json' --exclude='*' \
   "$SERVER_DIR/" "$HOST:$BUILD/server/"
 
 echo ">> building on box (1 CPU, low priority, to spare the live apps)"
