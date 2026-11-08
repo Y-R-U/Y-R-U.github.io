@@ -6,6 +6,8 @@
 //     exactly by js/net/replay.js from the relayed input — on every hole
 //  3. js/net/net.js against a running server (tools/server_run.sh, :8098; skipped if it's down):
 //     create / join / start / shot relay / result / mulligan / scoreboard / AI seats
+//  4. protocol gate (docs/notes/protogate.md): the live v1 net.js (git 0c8f5ad6) is refused play with
+//     a reload text and stays connected (no reconnect loop); net.js's 'update' event / old_client stop
 //   node tools/online_test.mjs [--server=http://127.0.0.1:8098/gms/3d/skyputt]
 import { COURSES } from '../js/course/holes/index.js';
 import { buildHole, makeWorld } from '../js/course/builder.js';
@@ -45,6 +47,8 @@ ok(courseForRoom({ course: 'sky', holes: [{ id: 'nope99', par: 3 }] }) === null,
   ok(ids.every(id => /^[a-z0-9][a-z0-9_-]{0,31}$/.test(id) && COURSES[id].holes.every(h => /^[a-z0-9][a-z0-9_-]{0,31}$/.test(h.id))), `every course / hole id fits the server's id rule (${ids.join(', ')})`);
   const rf = holesFor('reef', '6-3'), rc = courseForRoom({ course: 'reef', holes: rf.map(h => ({ id: h.id, par: h.par })) });
   ok(rf.map(h => h.id).join() === 'reef7,reef8,reef9' && rc && rc.holes[2] === COURSES.reef.holes[8], 'Sunken Reef: room hole sets and courseForRoom (holes 7-9)');
+  const sf = holesFor('star', '3-3'), scr = courseForRoom({ course: 'star', holes: sf.map(h => ({ id: h.id, par: h.par })) });
+  ok(sf.map(h => h.id).join() === 'star4,star5,star6' && scr && scr.holes[0] === COURSES.star.holes[3], 'Star Station: room hole sets and courseForRoom (holes 4-6)');
 }
 const d = defaultOpts({ theme: 'spooky' });
 ok(d.theme === 'spooky' && d.holes.length === 3 && !('holeSet' in wireOpts(d)), 'default opts / wire form');

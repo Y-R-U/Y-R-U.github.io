@@ -54,7 +54,8 @@ export const HARD = { sky1: 3, sky2: 2, sky5: 1, sky7: 6, sky8: 2, sky9: 6,
   sky12: 1, sky14: 1, sky16: 2, sky17: 6, sky18: 6,   // back nine (story2, holes_test --human=16)
   wood1: 2, wood2: 2, wood3: 2, wood5: 4, wood6: 1, wood8: 1, wood9: 2,   // Hollow Woods (courses2, --human=8)
   sugar1: 1, sugar6: 1,   // Sugar Summit (courses3, --human=8: the only holes over +0.3)
-  reef5: 1, reef7: 1, reef8: 1 };   // Sunken Reef (reef, --human=8: the holes over +0.3)
+  reef5: 1, reef7: 1, reef8: 1,   // Sunken Reef (reef, --human=8: the holes over +0.3)
+  star4: 1, star5: 1, star8: 1, star9: 1 };   // Star Station (star, --human=8: the holes over +0.3)
 export const streakMult = days => 1 + 0.1 * Math.min(5, Math.max(0, (days | 0) - 1));   // +10% a day in a row, up to +50%
 export function holePoints({ id, par, strokes, picked, stars, streak = 1 }) {
   let p;

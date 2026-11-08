@@ -67,8 +67,8 @@ await sleep(4500);
 st = await ev('window.__audio.debugState()');
 ok(st.active === 0, `voice counter drains back to 0 (${st.active})`);
 const themes = await ev(`(async () => { const a = window.__audio, r = [];
-  for (const th of ['spooky', 'frost', 'candy', 'volcano', 'reef', 'sky']) { a.music.start(th); await new Promise(z => setTimeout(z, 1500)); r.push(a.music.theme); } return r; })()`);
-ok(themes.join() === 'spooky,frost,candy,volcano,reef,sky', `music themes switch live (${themes})`);
+  for (const th of ['spooky', 'frost', 'candy', 'volcano', 'reef', 'star', 'sky']) { a.music.start(th); await new Promise(z => setTimeout(z, 1500)); r.push(a.music.theme); } return r; })()`);
+ok(themes.join() === 'spooky,frost,candy,volcano,reef,star,sky', `music themes switch live (${themes})`);
 await ev('window.__audio.music.stop(), true');
 
 // offline renders
@@ -88,7 +88,7 @@ ok(errors.length === 0, `zero console errors/warnings${errors.length ? ':\n  ' +
 if (WAV) {
   mkdirSync(WAV, { recursive: true });
   const names = await ev(`window.__names`);
-  for (const n of [...names, 'music', 'music_spooky', 'music_frost', 'music_candy', 'music_volcano', 'music_reef']) {
+  for (const n of [...names, 'music', 'music_spooky', 'music_frost', 'music_candy', 'music_volcano', 'music_reef', 'music_star']) {
     const b64 = await ev(`(async () => { const A = await import('/gms/3d/skyputt/js/audio/index.js');
       const r = '${n}'.startsWith('music') ? await A.renderMusic('${n}'.split('_')[1] || 'sky', 12) : await A.renderSfx('${n}', { power: .8, speed: 4, material: 'wood', n: 3 });
       const b = r.buf, L = b.length, out = new DataView(new ArrayBuffer(44 + L * 4));

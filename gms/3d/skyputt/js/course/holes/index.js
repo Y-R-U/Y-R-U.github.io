@@ -55,6 +55,15 @@ import reef6 from './reef6.js';
 import reef7 from './reef7.js';
 import reef8 from './reef8.js';
 import reef9 from './reef9.js';
+import star1 from './star1.js';
+import star2 from './star2.js';
+import star3 from './star3.js';
+import star4 from './star4.js';
+import star5 from './star5.js';
+import star6 from './star6.js';
+import star7 from './star7.js';
+import star8 from './star8.js';
+import star9 from './star9.js';
 
 export const COURSES = {
   sky: {
@@ -89,6 +98,14 @@ export const COURSES = {
     holes: [reef1, reef2, reef3, reef4, reef5, reef6, reef7, reef8, reef9],
     lockedBy: { hole: 'sugar9', course: 'sugar', note: 'Finish Sugar Summit to open Sunken Reef.' },
     dailyFrom: '2026-11-16',   // joins the daily pool from this date, so days already played keep their hole (js/daily/daily.js)
+  },
+  // star: Star Station, a 9-hole orbital course built to look best in Star Station (any theme skins it, D6).
+  // A map tab after Sunken Reef; locked until Sunken Reef is finished (reef9, `lockedBy`).
+  star: {
+    id: 'star', name: 'Star Station', theme: 'star',
+    holes: [star1, star2, star3, star4, star5, star6, star7, star8, star9],
+    lockedBy: { hole: 'reef9', course: 'reef', note: 'Finish Sunken Reef to open Star Station.' },
+    dailyFrom: '2026-11-23',   // joins the daily pool from this date (js/daily/daily.js)
   },
 };
 

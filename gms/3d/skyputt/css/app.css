@@ -210,6 +210,7 @@ table.scores td.over { color: #ffb2a8; }
 .seg.nines button { flex: 1; padding: 8px 6px; font-size: 15px; color: inherit; }
 .seg.nines button.on { color: var(--ink); }
 .seg.nines svg { width: 14px; height: 14px; vertical-align: -2px; }
+.seg.nines { flex-wrap: wrap; } .seg.nines button { flex: 1 1 22%; }
 .map-card .btn[disabled] { opacity: .5; }
 
 body.lefty .tray { right: auto; left: calc(10px + var(--safe-l)); }

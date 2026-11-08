@@ -96,3 +96,5 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - 2026-11-08: polish2 committed (reef perf at budget, volcano crystals/plume, ledge drop trims, aim contact ring, ladder 412px). Aaron: standing OK — deploy any time after commit/push.
 - 2026-11-08: deployed 0c8f5ad6 (ballhit + boards + reef + polish2) to games.br8t.com; health boards:1. Note: no protocol gate — a stale v1 client in a Battle room ignores knocks (server still authoritative). Gate task queued.
 - 2026-11-09: protogate committed (protocol 2; v1 clients get 'reload' text, can't take seats) + deployed.
+- 2026-11-09: 93cec7a1 deployed (health protocol 2/min 2). Started `events4` (Deep Dive + Battle Royale Cup yearly events, 2-3 weekend twists). Running: star, events4.
+- 2026-11-09: star committed + deployed (Star Station theme/STAR music/star1-9 par 30, lockedBy reef9, dailyFrom 2026-11-23, daily pool regenerated). Map-tab wrap CSS added by me. Running: events4.

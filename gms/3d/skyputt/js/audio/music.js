@@ -1,6 +1,6 @@
 // SKYPUTT audio — generative ambient music. One player per theme: `sky` (launch), `spooky`
 // (Spooky Hollow), `frost` (Frost Fair), `candy` (Candy Land, a 3/4 waltz), `volcano` (Volcano Forge,
-// slow drums and anvils) and `reef` (Sunken Reef, calm and watery). Themes differ in harmony, pad type, plucked/struck
+// slow drums and anvils), `reef` (Sunken Reef, calm and watery) and `star` (Star Station, spacey synth pads + arpeggio). Themes differ in harmony, pad type, plucked/struck
 // voices and occasional "extras" (theremin, owl, sleigh bells, fire crackle).
 // Nothing loops verbatim: chords walk a Markov graph, the key drifts between three centres,
 // arpeggio phrases (up / down / wander / sparse / bells / rest) are picked by a slowly
@@ -173,7 +173,37 @@ const REEF = {
   mains: ['harp', 'vibes', 'vibes'], bellVoice: 'bell', leadStep: 2,
   extras: [['bubble', 0.35], ['drip', 0.3], ['whale', 0.1]],
 };
-export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST, candy: CANDY, volcano: VOLCANO, reef: REEF };
+// "Orbit Drift" (Star Station): calm and spacey, E Lydian with sus and maj9 colours. Wide detuned-saw pads
+// under a slow, deep filter sweep; a soft analog-style arpeggio (one filtered square per eighth note, an
+// up-and-down figure over the chord, its level and brightness drifting in and out over minutes); a glassy
+// FM lead and a harp through a long ping-pong delay. Extras: a filtered-noise sweep (a ship passing), a
+// sonar ping and faint radio "comms" blips. CPU: one oscillator + one filter per arpeggio note.
+const STAR = {
+  id: 'star', bpm: 72, meter: 4, chordBars: [2, 4, 4],
+  keys: [0, 0, 0, 2, -3],                          // E major (Lydian) home, F# and C# excursions
+  start: 'I',
+  chords: {
+    I:    { pad: [52, 59, 63, 66], root: 40, arp: [64, 66, 68, 71, 75, 76, 78, 80, 83], next: ['II', 'vi', 'IV', 'Vsus', 'iii'] },
+    II:   { pad: [54, 58, 61, 66], root: 42, arp: [66, 68, 70, 73, 75, 78, 80, 82], next: ['I', 'vi', 'iii'] },
+    vi:   { pad: [49, 56, 59, 63], root: 37, arp: [61, 63, 64, 68, 71, 73, 76, 80], next: ['IV', 'II', 'I'] },
+    IV:   { pad: [57, 61, 64, 68], root: 45, arp: [64, 66, 68, 69, 71, 73, 76, 81], next: ['I', 'Vsus', 'II', 'vi'] },
+    Vsus: { pad: [54, 59, 64, 66], root: 47, arp: [64, 66, 71, 73, 76, 78, 83], next: ['I', 'vi', 'IV'] },
+    iii:  { pad: [56, 59, 63, 66], root: 44, arp: [63, 66, 68, 71, 75, 78, 80], next: ['vi', 'IV', 'II'] },
+  },
+  level: { pad: 0.028, root: 0.03, air: 0.01 },
+  pad: { type: 'saw', cut: 1050, lfo: 520, att: 4.0, rel: 6 },
+  air: { f: 900, q: 0.6, lfo: 500 },
+  delaySend: 0.4,
+  voices: {
+    glass: { kind: 'fm', ratio: 2, index: 0.35, dur: 3.2, oct: 0, gain: 0.05 },
+    harp: { kind: 'ks', gain: 0.07 },
+    bell: { kind: 'fm', ratio: 3.01, index: 0.6, dur: 3.4, oct: 12, gain: 0.022 },
+  },
+  mains: ['glass', 'glass', 'harp'], bellVoice: 'bell', leadStep: 2,
+  seq: { gain: 0.02, cut: 1400 },
+  extras: [['sweep', 0.22], ['ping', 0.3], ['comms', 0.18]],
+};
+export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST, candy: CANDY, volcano: VOLCANO, reef: REEF, star: STAR };
 
 // Karplus-Strong pluck, rendered once per base note (multiples of 3 semitones) and repitched.
 // short = pizzicato: darker excitation, fast decay.
@@ -360,6 +390,7 @@ class Player {
     if (th.crackle && Math.random() < th.crackle) this.crackle(t0 + rnd(0, this.step));
     if (th.waltz) this.waltzStep(t0 + rnd(-0.004, 0.006), n, c);
     if (th.forge) this.forgeStep(t0 + rnd(-0.004, 0.006), n);
+    if (th.seq) this.seqStep(t0 + rnd(-0.003, 0.004), n, c);
     const t = t0 + (n % 2 ? this.step * 0.08 : 0) + rnd(-0.008, 0.012);
     let play = false, inst = ph.inst, oct = 0;
     switch (ph.type) {
@@ -569,6 +600,60 @@ class Player {
     o.frequency.exponentialRampToValueAtTime(f0 * 0.9, t + d);
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.02, t + d * 0.3); g.gain.linearRampToValueAtTime(0, t + d);
     o.connect(lp); lp.connect(g); g.connect(dest); o.start(t); o.stop(t + d + 0.05); this.keep(o);
+  }
+
+  // star arpeggio: an up-and-down eighth-note figure over the lowest chord tones, a soft filtered square;
+  // its level and brightness drift slowly (a "density" of its own), so it comes and goes
+  seqStep(t, n, c) {
+    const Q = this.th.seq, ch = this.th.chords[c.name];
+    if (n % 16 === 0) this.seqLvl = clamp((this.seqLvl ?? 0.5) + rnd(-0.25, 0.25), 0, 1);
+    const lvl = this.seqLvl ?? 0.5;
+    if (lvl < 0.15) return;
+    const pool = ch.arp.slice(0, 5), pat = [0, 1, 2, 3, 4, 3, 2, 1], m = pool[pat[n % 8]] + c.key - (n % 16 < 8 ? 0 : 12);
+    const ctx = this.ctx, o = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = ctx.createGain(), d = this.step * 1.6;
+    o.type = 'square'; o.frequency.value = mtof(m); o.detune.value = rnd(-4, 4);
+    f.type = 'lowpass'; f.Q.value = 3;
+    const cut = Q.cut * (0.5 + lvl * 0.8);
+    f.frequency.setValueAtTime(cut * 2.2, t); f.frequency.exponentialRampToValueAtTime(Math.max(200, cut * 0.4), t + d);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(Q.gain * lvl * (n % 4 === 0 ? 1.15 : 0.85), t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(f); f.connect(g); g.connect(this.panned(this.arp, n % 2 ? 0.35 : -0.35));
+    o.start(t); o.stop(t + d + 0.05); this.keep(o);
+  }
+
+  // a ship passing: band-passed noise sweeping up and back down, far away
+  sweep(t) {
+    const ctx = this.ctx, n = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(), d = rnd(4, 6);
+    n.buffer = noiseBuffer(ctx, 'pink'); n.loop = true; f.type = 'bandpass'; f.Q.value = 2.5;
+    f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(rnd(1800, 2600), t + d * 0.55); f.frequency.exponentialRampToValueAtTime(400, t + d);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.03, t + d * 0.5); g.gain.linearRampToValueAtTime(0, t + d);
+    n.connect(f); f.connect(g); g.connect(this.panned(this.bus('far'), pick([-0.6, 0.6]))); n.start(t, Math.random()); n.stop(t + d + 0.05); this.keep(n);
+  }
+
+  // a sonar ping: a pure sine on a chord tone with a soft attack and a long, reverbed tail (and an echo)
+  ping(t, ch, key) {
+    const ctx = this.ctx, dest = this.panned(this.bus('far'), rnd(-0.6, 0.6)), m = pick(ch.arp) + key + 12;
+    for (const [dt, a] of [[0, 1], [this.beat * 1.5, 0.35]]) {
+      const tt = t + dt, o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.value = mtof(m);
+      g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.022 * a, tt + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, tt + 2.2);
+      o.connect(g); g.connect(dest); o.start(tt); o.stop(tt + 2.25); this.keep(o);
+    }
+  }
+
+  // faint radio comms: a few short high beeps, like distant telemetry
+  comms(t) {
+    const ctx = this.ctx, dest = this.panned(this.bus('far'), pick([-0.7, 0.7])), n = 3 + ((Math.random() * 4) | 0), f = rnd(1400, 2200);
+    let tt = t;
+    for (let i = 0; i < n; i++) {
+      const d = Math.random() < 0.4 ? 0.12 : 0.05, o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f * (Math.random() < 0.3 ? 1.5 : 1);
+      g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.006, tt + 0.004);
+      g.gain.setValueAtTime(0.006, tt + d); g.gain.linearRampToValueAtTime(0, tt + d + 0.01);
+      o.connect(g); g.connect(dest); o.start(tt); o.stop(tt + d + 0.02); this.keep(o);
+      tt += d + rnd(0.05, 0.12);
+    }
   }
 
   // ---- extras --------------------------------------------------------------------------------
