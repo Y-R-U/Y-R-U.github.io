@@ -65,6 +65,12 @@ type client struct {
 
 func dial(t *testing.T, uid, name string) *client {
 	t.Helper()
+	return dialV(t, uid, name, protocolVersion)
+}
+
+// dialV says hello with protocol v (nil: no v at all, like a client from before versions).
+func dialV(t *testing.T, uid, name string, v any) *client {
+	t.Helper()
 	u := "ws" + strings.TrimPrefix(ts.URL, "http") + "/gms/3d/skyputt/api/ws"
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -92,7 +98,11 @@ func dial(t *testing.T, uid, name string) *client {
 		}
 	}()
 	t.Cleanup(func() { c.Close(websocket.StatusNormalClosure, "") })
-	cl.send(map[string]any{"t": "hello", "token": "dev:" + uid + ":" + name + ":anon", "name": name})
+	hello := map[string]any{"t": "hello", "token": "dev:" + uid + ":" + name + ":anon", "name": name}
+	if v != nil {
+		hello["v"] = v
+	}
+	cl.send(hello)
 	cl.welcome = cl.wait("welcome")
 	return cl
 }

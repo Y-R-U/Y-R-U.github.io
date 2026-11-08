@@ -26,7 +26,12 @@ import (
 )
 
 const buildVersion = "0.1.0"
-const protocolVersion = 1
+
+// protocolVersion is what this server speaks; minProtocol the oldest client it lets play. 2 = ball hits
+// (room opt collide, shot balls, result knocks): a v1 client would ignore knocks and replay shots
+// as pass-through, so it is refused (session.go serveOldClient, docs/notes/protogate.md).
+const protocolVersion = 2
+const minProtocol = 2
 
 var cfg struct {
 	Addr           string
@@ -271,12 +276,12 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	conns, rooms := hub.conns, len(hub.rooms)
 	hub.mu.Unlock()
 	writeJSON(w, 200, map[string]any{"ok": true, "name": "skyputt", "version": buildVersion, "protocol": protocolVersion,
-		"now": nowMs(), "conns": conns, "rooms": rooms, "devAuth": cfg.DevAuth, "boards": boardsVersion})
+		"minProtocol": minProtocol, "now": nowMs(), "conns": conns, "rooms": rooms, "devAuth": cfg.DevAuth, "boards": boardsVersion})
 }
 
 func handleStatus(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, map[string]any{"now": nowMs(), "paused": paused(), "devAuth": cfg.DevAuth, "protocol": protocolVersion,
-		"limits": map[string]any{"maxPlayers": maxPlayers, "minPlayers": minPlayers, "maxHoles": maxHoles, "shotClocks": shotClocks,
+		"minProtocol": minProtocol, "limits": map[string]any{"maxPlayers": maxPlayers, "minPlayers": minPlayers, "maxHoles": maxHoles, "shotClocks": shotClocks,
 			"personalities": personalityIDs(), "maxAISkill": maxAISkill}})
 }
 

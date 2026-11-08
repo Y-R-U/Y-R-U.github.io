@@ -4,7 +4,7 @@
 //
 //   const online = createOnline({ app, store, hooks: { enter, leave, setRound }, click, onBack });
 //   online.open({ join: 'ABC23K' })
-import { net, CHEAT_WARNING, readHint } from './net.js';
+import { net, CHEAT_WARNING, OLD_CLIENT_TEXT, readHint } from './net.js';
 import { OnlineGame } from './game.js';
 import { renderForm } from './form.js';
 import { defaultOpts, quickOpts, wireOpts, holesFor, helpersLabel, clockLabel, collideLabel, personalityName, rankForSkill, shareLink } from './rooms.js';
@@ -20,7 +20,28 @@ const ERR = {
   paused: 'Online play is paused for maintenance.', rate_limited: 'Slow down a little and try again.', offline: 'Can’t reach the online server.',
   timeout: 'The server didn’t answer. Try again.', bad_name: 'That name isn’t allowed.', update: 'This room uses holes your game doesn’t have yet. Reload to update.',
   need_players: 'Add a ghost AI or wait for a friend.', unavailable: 'Online play isn’t available here yet.',
+  old_client: OLD_CLIENT_TEXT,
 };
+
+// "Update available — reload": the server speaks a newer protocol than this build (welcome or
+// /api/health, net.js noteProtocol). One banner over everything; blocked = online play refused.
+function updateBanner(u) {
+  if (typeof document === 'undefined') return;
+  let b = document.getElementById('net-update');
+  if (!b) {
+    b = document.createElement('div');
+    b.id = 'net-update'; b.className = 'net-update'; b.setAttribute('role', 'status');
+    b.innerHTML = '<span></span><button class="btn primary" data-u="reload">Reload</button><button class="round" data-u="x" aria-label="Dismiss">×</button>';
+    b.onclick = e => {
+      const a = e.target.closest('button')?.dataset.u;
+      if (a === 'reload') location.reload();
+      else if (a === 'x') b.hidden = true;
+    };
+    document.body.appendChild(b);
+  }
+  b.querySelector('span').textContent = u.blocked ? 'Update available — reload to keep playing online.' : 'Update available — reload for the new version.';
+  b.hidden = false;
+}
 const errText = e => ERR[e?.code] || e?.message || 'Something went wrong.';
 
 export function createOnline({ app, store, hooks, click = () => {}, onBack }) {
@@ -35,6 +56,8 @@ export function createOnline({ app, store, hooks, click = () => {}, onBack }) {
     <span class="net-dot ${net.state}" title="${esc(net.state)}"></span></div>`;
 
   // ---- net events
+  net.on('update', updateBanner);
+  if (net.update) updateBanner(net.update);
   net.on('state', () => { const d = el.querySelector('.net-dot'); if (d) d.className = `net-dot ${net.state}`; });
   net.on('lobby', () => { if (view === 'home') renderRooms(); });
   net.on('room', ({ room }) => {
@@ -59,6 +82,12 @@ export function createOnline({ app, store, hooks, click = () => {}, onBack }) {
       if (join) return joinCode(join);
       home();
     } catch (e) {
+      if (e?.code === 'old_client') {
+        show(`${head('Online')}<div class="card-note bad">${esc(errText(e))}</div>
+          <button class="btn primary" data-a="reload">Reload</button>`);
+        view = 'error';
+        return;
+      }
       show(`${head('Online')}<div class="card-note bad">${esc(errText(e))}</div>
         <div class="card-note">Online play needs the SKYPUTT server${location.hostname.match(/^(192\.168|10\.|localhost|127\.)/) ? ' (tools/server_run.sh on port 8098)' : ''}.</div>
         <button class="btn primary" data-a="retry">Try again</button>`);
@@ -209,6 +238,7 @@ export function createOnline({ app, store, hooks, click = () => {}, onBack }) {
           if (!net.room) net.close();
           return onBack?.();
         case 'retry': return open();
+        case 'reload': return location.reload();
         case 'quick':
           b.disabled = true;
           try { await net.quick(wireOpts(quickOpts({ theme: app.themeId === 'greybox' ? 'sky' : app.themeId, collide: store.settings().ballHit !== false }))); lobby(); }

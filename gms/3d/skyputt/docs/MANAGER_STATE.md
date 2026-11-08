@@ -94,3 +94,5 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - 2026-11-08: boards done + committed (online daily + ladder boards; server/daily.go ports daily pick, rerun tools/daily_pool.mjs on course/theme/dailyFrom changes; deploy.sh filter now ships dailypool.json + testdata). Server redeploy (ballhit+boards) awaits Aaron's OK.
 - 2026-11-08: 14e153c1 pushed (boards). Started `star` (Star Station theme+music+star1-9, lockedBy reef9, dailyFrom 2026-11-23). polish2 also got ladder 412px overflow fix.
 - 2026-11-08: polish2 committed (reef perf at budget, volcano crystals/plume, ledge drop trims, aim contact ring, ladder 412px). Aaron: standing OK — deploy any time after commit/push.
+- 2026-11-08: deployed 0c8f5ad6 (ballhit + boards + reef + polish2) to games.br8t.com; health boards:1. Note: no protocol gate — a stale v1 client in a Battle room ignores knocks (server still authoritative). Gate task queued.
+- 2026-11-09: protogate committed (protocol 2; v1 clients get 'reload' text, can't take seats) + deployed.

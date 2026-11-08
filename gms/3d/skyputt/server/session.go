@@ -119,6 +119,7 @@ type inMsg struct {
 	ID     int64      `json:"id"`
 	Token  string     `json:"token"`
 	Name   string     `json:"name"`
+	V      int        `json:"v"` // hello: the client's protocol version (missing = 0)
 	On     *bool      `json:"on"`
 	Code   string     `json:"code"`
 	Opts   *RoomOpts  `json:"opts"`
@@ -191,6 +192,10 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 		s.close(4001, "bad token")
 		return
 	}
+	if m.V < minProtocol {
+		serveOldClient(ctx, s, id, m)
+		return
+	}
 	hub.attach(s, id, m)
 	defer hub.detach(s)
 	go s.pinger()
@@ -229,4 +234,55 @@ func readMsg(ctx context.Context, c *websocket.Conn) (inMsg, error) {
 		m.T = "bad"
 	}
 	return m, nil
+}
+
+// oldClientTTL: how long an outdated client's socket is kept (it reconnects quietly afterwards).
+var oldClientTTL = 30 * time.Minute
+
+const oldClientText = "SKYPUTT has been updated. Reload the page to play online."
+
+// serveOldClient handles a hello below minProtocol (a cached pre-ball-hit v1 page). It is refused
+// play, but not hung up on: the v1 client (js/net/net.js at 0c8f5ad6) reconnects forever on any close
+// and only ever says "can't reach the online server". So it gets an `old_client` push (what a v2+
+// client acts on: it stops and asks for a reload), then a welcome with no room so a v1 client settles,
+// and every request but ping / lobby fails with `old_client` and a reload text, which the v1 Online
+// screen shows as is (its errText falls back to the server's message). The session never joins the
+// hub: no room, no seat, no presence, no pushes, no player row. Boards (HTTP) don't look at versions.
+func serveOldClient(ctx context.Context, s *Sess, id fbIdentity, m inMsg) {
+	pid := pidOf(id.UID)
+	s.push(map[string]any{"t": "error", "id": m.ID, "code": "old_client", "error": oldClientText, "v": protocolVersion, "min": minProtocol})
+	s.push(map[string]any{"t": "welcome", "id": m.ID, "now": nowMs(), "v": protocolVersion, "min": minProtocol, "old": true,
+		"you": map[string]any{"pid": pid, "name": displayName(m.Name, id.Name, pid), "anon": id.Anon, "dev": id.Dev}, "room": nil, "paused": paused()})
+	go s.pinger()
+	ctx, cancel := context.WithTimeout(ctx, oldClientTTL)
+	defer cancel()
+	for {
+		m, err := readMsg(ctx, s.c)
+		if err != nil {
+			if ctx.Err() != nil {
+				s.close(4002, "old client")
+			}
+			return
+		}
+		select {
+		case <-s.done:
+			return
+		default:
+		}
+		if !s.allowMsg() {
+			s.fail(m.ID, "rate_limited", "slow down")
+			continue
+		}
+		switch m.T {
+		case "ping":
+			s.push(map[string]any{"t": "pong", "id": m.ID, "now": nowMs()})
+		case "lobby":
+			hub.mu.Lock()
+			v := hub.lobbyView()
+			hub.mu.Unlock()
+			s.reply(m.ID, "lobby", v)
+		default:
+			s.fail(m.ID, "old_client", oldClientText, "v", protocolVersion, "min", minProtocol)
+		}
+	}
 }

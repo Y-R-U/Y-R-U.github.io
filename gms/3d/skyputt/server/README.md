@@ -61,15 +61,20 @@ room's helper mode (`off`: none; `fixed`: N of each per round incl. Long Sight s
 `own`: the client's own inventory, unchecked) · `./skyputt pause on|off` (with `SKYPUTT_DATA` set)
 refuses new rooms at once · `./skyputt stats`.
 
-## Protocol (v1)
+## Protocol (v2)
 Websocket: `wss://games.br8t.com/gms/3d/skyputt/api/ws` (local `ws://<host>:8098/gms/3d/skyputt/api/ws`).
-JSON text frames. Client messages `{t, id?, …}`; a message with `id` gets exactly one reply
+JSON text frames. **Versions** (`docs/notes/protogate.md`): the server speaks `protocolVersion` (2 = ball hits)
+and plays with clients ≥ `minProtocol` (2). A hello below that (v1 = the pre-ball-hit client, or no `v`) gets an
+`error old_client` push, then a welcome `{old: true, room: null}`; it stays connected, but every request except
+`ping` / `lobby` fails with `old_client` + "Reload the page" text, and it never joins a room or the hub. The socket
+is closed (4002) after 30 min. A client seeing `v` / `min` (welcome) or `protocol` / `minProtocol` (health) above
+its own shows "Update available — reload". Client messages `{t, id?, …}`; a message with `id` gets exactly one reply
 `{t:"ok", id, …}` or `{t:"error", id, code, error}`. Everything else is a push. Times are server epoch ms.
 
 ### Client → server
 | t | fields | reply / effect |
 |---|---|---|
-| `hello` | `token`, `name?`, `v` | first, within 10 s → `welcome` (or `bad_token` + close 4001) |
+| `hello` | `token`, `name?`, `v` | first, within 10 s → `welcome` (or `bad_token` + close 4001; `v` < 2 → `old_client`, see above) |
 | `ping` | | `pong {now}` |
 | `lobby` | `on` (default true) | `{lobby}`; while on, `lobby` pushes (≤ 1/s) |
 | `rename` | `name` | `{name}` |
@@ -100,7 +105,7 @@ it bumps that seat's `n` and clears its Mulligan.
 ### Server → client
 | t | fields |
 |---|---|
-| `welcome` | `you {pid,name,anon,dev}`, `now`, `v`, `room` (snapshot or null: you are put back in your room), `paused` |
+| `welcome` | `you {pid,name,anon,dev}`, `now`, `v`, `min`, `old?`, `room` (snapshot or null: you are put back in your room), `paused` |
 | `lobby` | `{rooms:[listing], playing, online}` |
 | `room` | `room` snapshot, `ev?` holeStart \| holeEnd \| end (pushed on every structural change: joins, leaves, presence, options, host, takeover, phase) |
 | `shot` | `seat`, `hole`, `n`, `vx`, `vz`, `t0`, `aim`, `power`, `mods`, `ball` |
@@ -119,10 +124,10 @@ total, scores[] (-1 = not yet), picked[], uses{helper:n}, cur:{strokes, n, pos|n
 `bad_token` `bad_request` `rate_limited` `paused` `lobby_full` `too_many_rooms` `no_room` `in_play`
 `room_full` `not_host` `not_now` `need_players` `bad_course` `bad_theme` `bad_holes` `bad_max`
 `bad_helpers` `bad_clock` `bad_ai` `bad_name` `not_your_seat` `stale_hole` `stale_shot` `hole_done`
-`in_flight` `bad_shot` `bad_result` `no_helpers` `no_helpers_left`. net.js adds `offline`, `timeout`, `unavailable`.
+`in_flight` `bad_shot` `bad_result` `no_helpers` `no_helpers_left` `old_client`. net.js adds `offline`, `timeout`, `unavailable`.
 
 ### HTTP (CORS for `SKYPUTT_ORIGINS`, GET + POST)
-`/api/health` (`boards: 1` when the leaderboards exist) · `/api/status` (limits, personalities) · `/api/rooms`
+`/api/health` (`protocol`, `minProtocol`; `boards: 1` when the leaderboards exist) · `/api/status` (limits, personalities) · `/api/rooms`
 (lobby view) · `/api/rounds/{id}` (a finished round: holes + seats with scores, totals, ranks).
 
 **Leaderboards** (`boards.go`, `daily.go`; full spec in `docs/notes/boards.md`): `POST /api/daily`, `GET /api/daily`

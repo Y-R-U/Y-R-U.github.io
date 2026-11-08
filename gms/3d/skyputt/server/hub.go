@@ -99,7 +99,7 @@ func (h *Hub) attach(s *Sess, id fbIdentity, m inMsg) {
 		h.pushRoom(r) // everyone sees them back (incl. this session, which gets the welcome first)
 		room = h.roomView(r, u.UID)
 	}
-	s.push(map[string]any{"t": "welcome", "id": m.ID, "now": nowMs(), "v": protocolVersion,
+	s.push(map[string]any{"t": "welcome", "id": m.ID, "now": nowMs(), "v": protocolVersion, "min": minProtocol,
 		"you": map[string]any{"pid": u.PID, "name": u.Name, "anon": u.Anon, "dev": u.Dev}, "room": room, "paused": paused()})
 	h.dirty = true
 }

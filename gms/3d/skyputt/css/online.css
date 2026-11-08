@@ -130,3 +130,13 @@ body.lefty .net-strip { left: auto; right: calc(10px + var(--safe-r)); }
   .ns { font-size: 12px; padding: 1px 8px 1px 5px; }
   .net-code b { font-size: 30px; }
 }
+
+/* "Update available — reload" (js/net/index.js updateBanner: the server speaks a newer protocol) */
+.net-update { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); top: calc(8px + var(--safe-t));
+  width: min(420px, calc(100% - 24px)); display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 14px;
+  border-radius: 16px; border: 2px solid var(--panel-b); background: var(--panel); backdrop-filter: blur(6px);
+  font-size: 14px; line-height: 1.25; box-shadow: 0 8px 18px rgba(0,0,0,.3); }
+.net-update[hidden] { display: none; }
+.net-update span { flex: 1; min-width: 0; }
+.net-update .btn { width: auto; margin: 0; padding: 8px 14px; flex: none; }
+.net-update .round { width: 34px; height: 34px; flex: none; font-size: 18px; line-height: 1; }

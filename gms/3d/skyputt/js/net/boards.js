@@ -64,6 +64,7 @@ export function createBoards({ net = defaultNet, base = null, timeoutMs = 5000 }
           const res = await fetch(root() + '/api/health', { cache: 'no-store', signal: ctl.signal });
           clearTimeout(t);
           const j = res.ok ? await res.json().catch(() => null) : null;
+          if (j) net.noteProtocol?.(j.protocol, j.minProtocol);   // a newer server → "Update available"
           return !!(j && j.ok && j.boards >= 1);
         } catch { return false; }
       })();

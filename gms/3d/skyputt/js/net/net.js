@@ -9,7 +9,11 @@
 // Auto-reconnects with backoff; the welcome brings back the room you were in. Requests return
 // Promises that reject with an Error carrying .code. Works in Node >= 22 too (global WebSocket).
 
-export const PROTOCOL = 1;
+// 2 = ball hits (collide / balls / knocks). The server refuses clients below its minimum with
+// `old_client`; a server newer than this build raises the 'update' event (docs/notes/protogate.md).
+export const PROTOCOL = 2;
+export const OLD_CLIENT_TEXT = 'SKYPUTT has been updated. Reload the page to play online.';
+const oldClientErr = (msg = OLD_CLIENT_TEXT) => Object.assign(new Error(msg), { code: 'old_client' });
 
 // D11: shown wherever online play is offered.
 export const CHEAT_WARNING = 'Scores are reported by each player’s own game. There is no cheat detection yet, so play with people you trust and try not to stress about odd scores.';
@@ -100,6 +104,7 @@ export class SkyputtNet {
     this.room = null;        // last room snapshot (server view)
     this.lobby = null;
     this.offset = 0;         // serverNow - Date.now()
+    this.update = null;      // { server, min, blocked } once the server speaks a newer protocol
     this._ws = null; this._ls = new Map(); this._pending = new Map(); this._id = 0;
     this._opts = {}; this._retry = 0; this._timers = []; this._lobbyOn = false; this._bestRtt = Infinity;
     this.timeoutMs = 10000;
@@ -125,7 +130,7 @@ export class SkyputtNet {
       const res = await fetch(base.replace(/\/$/, '') + '/api/health', { cache: 'no-store', signal: ctl.signal });
       clearTimeout(t);
       const j = res.ok ? await res.json().catch(() => null) : null;
-      if (j) this._dev = !!j.devAuth;
+      if (j) { this._dev = !!j.devAuth; this.noteProtocol(j.protocol, j.minProtocol); }
       return !!(j && j.ok);
     } catch { return false; }
   }
@@ -135,6 +140,7 @@ export class SkyputtNet {
     const base = this._opts.base || this.base || defaultBase();
     if (!base) return Promise.reject(Object.assign(new Error('online play is not available here yet'), { code: 'unavailable' }));
     this.base = base.replace(/\/$/, '');
+    if (this.update?.blocked) return Promise.reject(oldClientErr());
     if (this.state === 'open') return Promise.resolve(this._welcome);
     if (this._connecting) return this._connecting;
     this._closedByUser = false;
@@ -148,6 +154,7 @@ export class SkyputtNet {
     clearTimeout(this._reconnectT);
     this._timers.forEach(clearInterval); this._timers = [];
     try { this._ws?.close(1000); } catch { /* */ }
+    this._ws = null;
     for (const [, p] of this._pending) { clearTimeout(p.timer); p.reject(Object.assign(new Error('closed'), { code: 'offline' })); }
     this._pending.clear();
     if (this._welcomeWaiter) { this._welcomeWaiter.reject(Object.assign(new Error('closed'), { code: 'offline' })); this._welcomeWaiter = null; }
@@ -176,7 +183,7 @@ export class SkyputtNet {
     try { ws = new WebSocket(this.base.replace(/^http/, 'ws') + '/api/ws'); } catch { return this._scheduleReconnect(); }
     this._ws = ws;
     ws.onopen = () => ws.send(JSON.stringify({ t: 'hello', v: PROTOCOL, token, name: this._opts.name || '' }));
-    ws.onmessage = e => { let m; try { m = JSON.parse(e.data); } catch { return; } this._onMessage(m); };
+    ws.onmessage = e => { if (this._ws !== ws) return; let m; try { m = JSON.parse(e.data); } catch { return; } this._onMessage(m); };
     ws.onclose = e => {
       if (this._ws !== ws) return;
       this._ws = null;
@@ -262,7 +269,9 @@ export class SkyputtNet {
     }
     switch (m.t) {
       case 'welcome': return this._onWelcome(m);
-      case 'error': if (m.code === 'bad_token') this._emit('error', Object.assign(new Error(m.error), { code: m.code })); return;
+      case 'error':
+        if (m.code === 'old_client') return this._outdated(m);
+        if (m.code === 'bad_token') this._emit('error', Object.assign(new Error(m.error), { code: m.code })); return;
       case 'lobby': this.lobby = m.lobby; return this._emit('lobby', m.lobby);
       case 'room': this._setRoom(m.room); return this._emit('room', { room: this.room, ev: m.ev || null });
       case 'roomClosed':
@@ -275,7 +284,32 @@ export class SkyputtNet {
 
   _setRoom(r) { this.room = r; if (r && Number.isFinite(r.now)) { /* snapshot time is informational */ } writeHint(r); }
 
+  /**
+   * A server's protocol (welcome `v`/`min`, health `protocol`/`minProtocol`). Newer than PROTOCOL →
+   * this.update + an 'update' event ({ server, min, blocked }; blocked = this build can't play).
+   */
+  noteProtocol(v, min) {
+    v = Number(v) || 0; min = Number(min) || 0;
+    const blocked = min > PROTOCOL;
+    if (v <= PROTOCOL && !blocked) return;
+    if (this.update && (this.update.blocked || !blocked)) return;   // already said so
+    this.update = { server: Math.max(v, min), min, blocked };
+    this._emit('update', this.update);
+  }
+
+  // The server refused this build (`old_client`, before its welcome): stop, don't reconnect.
+  _outdated(m) {
+    this.noteProtocol(m.v, Math.max(Number(m.min) || 0, PROTOCOL + 1));
+    const err = oldClientErr(m.error || OLD_CLIENT_TEXT);
+    if (this._welcomeWaiter) { this._welcomeWaiter.reject(err); this._welcomeWaiter = null; }
+    this._connecting = null;
+    this._emit('error', err);
+    this.close();
+  }
+
   _onWelcome(m) {
+    this.noteProtocol(m.v, m.min);
+    if (this.update?.blocked) return this._outdated(m);
     this._retry = 0;
     this._welcome = m;
     this.offset = m.now - Date.now();

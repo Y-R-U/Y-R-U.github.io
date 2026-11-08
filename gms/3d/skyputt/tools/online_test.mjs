@@ -15,7 +15,13 @@ import { ballState } from '../js/ai/round.js';
 import { Replayer, modsFor } from '../js/net/replay.js';
 import { STEADY_CLOCK } from '../js/meta/helpers.js';
 import { holeSets, holesFor, courseForRoom, defaultOpts, quickOpts, wireOpts, makeInventory, rankForSkill, AI_RANKS } from '../js/net/rooms.js';
-import { SkyputtNet } from '../js/net/net.js';
+import { SkyputtNet, PROTOCOL } from '../js/net/net.js';
+import { createBoards } from '../js/net/boards.js';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const args = Object.fromEntries(process.argv.slice(2).map(a => { const [k, ...v] = a.replace(/^--/, '').split('='); return [k, v.join('=') || true]; }));
 let fails = 0, passes = 0;
@@ -149,6 +155,76 @@ else {
   ok(wb.room && wb.room.code === room.code && wb.room.you === 1 && wb.room.hole === 1, 'rejoin after reconnect');
   await A.leaveRoom(); await B2.leaveRoom();
   A.close(); B2.close();
+}
+
+// ---------------------------------------------------------------- 4. protocol gate
+section('protocol gate');
+{
+  ok(PROTOCOL === 2, 'client speaks protocol 2');
+  // new client, offline: a newer server in the welcome / health / an old_client refusal
+  const N = new SkyputtNet(), seen = [];
+  N.on('update', u => seen.push({ ...u }));
+  N.noteProtocol(2, 2); N.noteProtocol(1, 1); N.noteProtocol(undefined, undefined);
+  ok(!N.update && !seen.length, 'same or older server: no update prompt');
+  N._onMessage({ t: 'welcome', now: Date.now(), v: 3, min: 2, you: { pid: 'x', name: 'N' }, room: null });
+  ok(N.update && N.update.server === 3 && !N.update.blocked && seen.length === 1 && N.state === 'open', 'welcome v3 min 2: update prompt, still playing');
+  N.noteProtocol(3, 2);
+  ok(seen.length === 1, 'prompt raised once');
+  N._onMessage({ t: 'error', code: 'old_client', error: 'Reload please', v: 3, min: 3 });
+  ok(N.update.blocked && seen.length === 2 && N.state === 'closed', 'old_client: blocked, socket closed (no reconnect)');
+  let e1 = null; try { await N.connect({ base: 'http://127.0.0.1:1/x' }); } catch (e) { e1 = e; }
+  ok(e1?.code === 'old_client', 'connect after a refusal rejects old_client at once');
+  // health says newer (net.available and boards.available)
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({ ok: true, protocol: 3, minProtocol: 2, boards: 1, devAuth: false }) });
+  try {
+    const H = new SkyputtNet(); let hu = null; H.on('update', u => { hu = u; });
+    ok(await H.available() && hu?.server === 3 && !hu.blocked, 'health protocol 3: update prompt (net.available)');
+    const H2 = new SkyputtNet(); H2.base = 'http://x'; let hu2 = null; H2.on('update', u => { hu2 = u; });
+    ok(await createBoards({ net: H2 }).available() && hu2?.server === 3, 'health protocol 3: update prompt (boards.available)');
+  } finally { globalThis.fetch = realFetch; }
+
+  if (!up) console.log('  (server part skipped: no dev server)');
+  else {
+    const H = new SkyputtNet(); let hu = null; H.on('update', u => { hu = u; });
+    await H.available();
+    ok(hu === null, 'local server health: no update prompt for this build');
+    const h = await (await fetch(BASE + '/api/health')).json();
+    ok(h.protocol === 2 && h.minProtocol === 2, 'health reports protocol 2 / minProtocol 2');
+    // the live v1 client (as deployed at 0c8f5ad6) against this server
+    const here = dirname(fileURLToPath(import.meta.url));
+    let src = null;
+    try { src = execFileSync('git', ['show', '0c8f5ad6:./js/net/net.js'], { cwd: join(here, '..'), encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); } catch { /* no git */ }
+    if (!src) console.log('  (v1 client part skipped: git show 0c8f5ad6 failed)');
+    else {
+      ok(/export const PROTOCOL = 1;/.test(src), 'v1 net.js fetched from git');
+      const dir = mkdtempSync(join(tmpdir(), 'skyputt-v1-'));
+      writeFileSync(join(dir, 'net_v1.mjs'), src);
+      try {
+        const { SkyputtNet: OldNet } = await import(join(dir, 'net_v1.mjs'));
+        const stamp = Date.now().toString(36);
+        const host = new SkyputtNet();
+        await host.connect({ base: BASE, devUser: { uid: 'ph' + stamp, name: 'Hana' }, name: 'Hana' });
+        const room = await host.createRoom(wireOpts({ ...defaultOpts(), public: true, collide: true }));
+        const O = new OldNet();
+        const w = await O.connect({ base: BASE, devUser: { uid: 'po' + stamp, name: 'Otto' }, name: 'Otto' });
+        ok(w && w.old === true && w.room === null && O.state === 'open', 'v1 client: welcome (old, no room), connected');
+        const lobby = await O.subscribeLobby(true);
+        ok(lobby && lobby.rooms.some(r => r.code === room.code), 'v1 client still sees the room list');
+        // what its Online screen shows: ERR[code] || message (index.js errText at 0c8f5ad6)
+        for (const [what, fn] of [['quick', () => O.quick(wireOpts(quickOpts()))], ['join', () => O.joinRoom(room.code)], ['create', () => O.createRoom(wireOpts(defaultOpts()))]]) {
+          let e = null; try { await fn(); } catch (x) { e = x; }
+          ok(e?.code === 'old_client' && /Reload the page/.test(e.message), `v1 client ${what}: refused with the reload text (${e?.message})`);
+        }
+        const hr = await host.resync();
+        ok(hr.seats.length === 1, 'v1 client never took a seat');
+        await new Promise(r => setTimeout(r, 1500));
+        ok(O.state === 'open' && O._retry === 0, 'v1 client stays connected (no reconnect loop)');
+        O.close();
+        await host.leaveRoom(); host.close();
+      } finally { rmSync(dir, { recursive: true, force: true }); }
+    }
+  }
 }
 
 console.log(`\n${passes} passed, ${fails} failed`);
