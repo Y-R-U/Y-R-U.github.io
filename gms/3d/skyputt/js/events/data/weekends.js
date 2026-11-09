@@ -34,7 +34,7 @@ export const WEEKEND_KINDS = [
   },
   {
     kind: 'bumper', name: 'Bumper Bash', holes: 5, since: '2026-11-16',
-    blurb: 'Bumper holes only. Every bumper you bounce off is worth a bonk (3 a hole).',
+    blurb: 'Bumper holes only. Every bumper you bounce off is worth a bonk (3 a hole, once per event).',
     pick: h => bumpers(h) >= 2,
     twist: { bonus: { bumper: 1 }, bumperCap: 3 },
     currency: { id: 'bonks', name: 'Bonks', one: 'Bonk', icon: '💥', colour: '#ffb43c' },
@@ -64,7 +64,7 @@ export const WEEKEND_KINDS = [
     kind: 'mirror', name: 'Mirror Weekend', holes: 5, since: '2026-11-16',
     blurb: 'Five holes flipped left to right. You know them, but not this way round.',
     pick: h => h.par <= 4, transform: 'mir',
-    currency: { id: 'shards', name: 'Mirror shards', one: 'Mirror shard', icon: '🪞', colour: '#bfe6ff' },
+    currency: { id: 'shards', name: 'Mirror shards', one: 'Mirror shard', icon: '✨', colour: '#bfe6ff' },
     goals: n => [
       { id: 'g1', kind: 'rounds', target: 1, text: 'Play a weekend round', reward: { coins: 15 } },
       { id: 'g2', kind: 'currency', target: half(n), text: `Collect ${half(n)} mirror shards`, reward: { coins: 20 } },

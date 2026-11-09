@@ -6,12 +6,15 @@
 //      collide: true         ball hits on whatever the setting says (Battle Royale Cup)
 //      rivals: n             every ghost with shots shares the hole (allGhosts)
 //      bonus.bumper + bumperCap   a bumper bounce off your own shot pays event currency, at most cap a hole (Bumper Bash)
+//                            polish3: once per hole per event run, like pickups — opts.bonked { holeId: bonks already
+//                            paid this run } (the run's progress.bonks); a replayed round only pays bonks above that
 //  * battle stats for the screen: `bumpers` (paid bounces), `hits` (rivals your shots struck) and
 //    `knockouts` (rivals knocked out of bounds by your shot, directly or by the rival you hit).
 import { Round } from '../game/play.js';
 import { makeInventory } from '../net/rooms.js';
 import { MAT, BALL_R } from '../engine/constants.js';
 import { tasterCourse } from './access.js';
+import { newBonks } from './events.js';
 
 export class EventRound extends Round {
   constructor(app, course, startIndex = 0, opts = {}) {
@@ -23,6 +26,8 @@ export class EventRound extends Round {
       allGhosts: !!tw.rivals,
     });
     this.twist = tw;
+    this.bonked = opts.bonked || {};   // polish3: bonks paid on each hole in earlier rounds of this run
+    this.bumpHoles = {};               // bonks this round, per hole id (max over replays of the hole)
     this.helpersOff = tw.helpers === 'off';
     if (this.helpersOff) { app.hud.el.tray.hidden = true; this.refreshHelpers(); }
   }
@@ -32,7 +37,8 @@ export class EventRound extends Round {
     this.marked = new Set();   // ghosts my current shot has struck (a knock-out while marked is mine)
     super.loadHole(i);
   }
-  get bumpers() { return this._bumpers | 0; }
+  // bonks this round that pay: per hole, only those above what the run already paid there
+  get bumpers() { return newBonks(this.bumpHoles, this.bonked); }
   get hits() { return this._hits | 0; }
   get knockouts() { return this._kos | 0; }
 
@@ -56,8 +62,10 @@ export class EventRound extends Round {
     if (pay && this.state === 'rolling') {
       for (const e of evs) {
         if (e.type !== 'obstacle' || e.mat !== MAT.BUMPER || this.holeBumps >= cap) continue;
-        this.holeBumps++; this._bumpers = this.bumpers + 1;
-        this.app.hud.banner(`Bonk! <small>+${pay} ${this.currency?.icon || ''} · ${this.holeBumps}/${cap} this hole</small>`, 'good', 800);
+        const id = this.def.id, paid = this.holeBumps < (this.bonked[id] | 0);
+        this.holeBumps++; this.bumpHoles[id] = Math.max(this.bumpHoles[id] | 0, this.holeBumps);
+        this.app.hud.banner(paid ? `Bonk! <small>${this.holeBumps}/${cap} · paid in an earlier round</small>`
+          : `Bonk! <small>+${pay} ${this.currency?.icon || ''} · ${this.holeBumps}/${cap} this hole</small>`, 'good', 800);
       }
     }
     super.onEvents(evs);
@@ -88,7 +96,7 @@ export class EventRound extends Round {
     super.onGhostEvents(G);
   }
 
-  result() { return { ...super.result(), bumpers: this.bumpers, hits: this.hits, knockouts: this.knockouts, tasters: this.tasters | 0 }; }
+  result() { return { ...super.result(), bumpers: this.bumpers, bumpHoles: { ...this.bumpHoles }, hits: this.hits, knockouts: this.knockouts, tasters: this.tasters | 0 }; }
 
   dispose() {
     super.dispose();

@@ -109,6 +109,7 @@ export function buildHoleView(scene, hole, theme, fallback, { renderer, camera, 
   // theme environment (lights, sky, rock, backdrop)
   const bounds = new THREE.Box3(v(hole.bounds.min), v(hole.bounds.max));
   const info = {
+    id: hole.id,   // polish3: themes may vary their backdrop per hole (deterministic from the id)
     bounds, path: hole.path.map(v), widths: hole.widths, floor: hole.floor, voids: hole.voids, branches: hole.branches, viewDir: v(hole.viewDir),
     tee: new THREE.Vector3(hole.tee.x, hole.tee.y - BALL_R, hole.tee.z), cup: new THREE.Vector3(hole.cup.x, hole.cup.y, hole.cup.z),
     camera, renderer, quality,

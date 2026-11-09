@@ -4,7 +4,7 @@ import { EVENTS, status, featured, dayStart, nowFrom, standings, botPoints, ladd
 import { HELPERS } from '../js/meta/helpers.js';
 import { SERIES, run, calendar, eventById, weekend, weekends, easter, LUNAR_NEW_YEAR, bigOn, addDays, overview, nextUp, around } from '../js/events/events.js';
 import { kindsOn } from '../js/events/calendar.js';
-import { bonusCurrency, rivalsBeaten } from '../js/events/events.js';
+import { bonusCurrency, rivalsBeaten, newBonks, noteBonks } from '../js/events/events.js';
 import { THEME_LIST } from '../js/app/menus.js';
 import { Store } from '../js/app/store.js';
 import { CHESTS } from '../js/meta/economy.js';
@@ -313,6 +313,14 @@ console.log('events4: twist weekends');
   ok(weekend('2026-11-20').weekendKind === 'bumper', 'first twist weekend: Bumper Bash, Nov 20–22');
   const byKind = k => W4.filter(w => w.weekendKind === k);
   ok(byKind('bumper').length >= 5 && byKind('bumper').every(w => w.twist.bonus.bumper === 1 && eventHoles(w).every(h => h.features.filter(f => f.type === 'bumper').length >= 2)), `Bumper Bash (${byKind('bumper').length} runs): 2+ bumpers on every hole, bumper bounces pay`);
+  { // polish3: bonks count once per hole per event run (a replayed round only pays above the best on that hole)
+    const p = freshProgress(), cap = byKind('bumper')[0].twist.bumperCap;
+    const r1 = { a: 3, b: 1 }, paid1 = newBonks(r1, p.bonks); noteBonks(p, r1);
+    const r2 = { a: 3, b: 2, c: 1 }, paid2 = newBonks(r2, p.bonks); noteBonks(p, r2);
+    const paid3 = newBonks(r2, p.bonks); noteBonks(p, r2);
+    ok(cap === 3 && paid1 === 4 && paid2 === 2 && paid3 === 0 && JSON.stringify(p.bonks) === '{"a":3,"b":2,"c":1}',
+      `Bumper Bash bonks pay once per hole per run (4, then 2 new, then 0 on a replay; max ${5 * cap} a run)`);
+  }
   ok(byKind('mirror').length >= 5 && byKind('mirror').every(w => w.holes.every(id => id.startsWith('mir-')) && eventHoles(w).length === w.holes.length), `Mirror Weekend (${byKind('mirror').length} runs): every hole a mirrored remix`);
   ok(byKind('pure').length >= 5 && byKind('pure').every(w => w.twist.helpers === 'off' && w.scoring.under === 16), `Pure Putt (${byKind('pure').length} runs): no helpers, 16 points per stroke under par`);
   // new content (a course or theme with dailyFrom) joins weekends from its release date only
@@ -343,6 +351,13 @@ console.log('events4: taster rule (locked holes stay locked)');
   const gated = EVENTS.map(e => [e.id, eventHoles(e).filter(h => tasterCourse(fresh, h.id)).map(h => h.id)]).filter(([, l]) => l.length);
   console.log('    tasters for a new player: ' + gated.map(([id, l]) => `${id} (${l.join(' ')})`).join(' · '));
   ok(gated.find(([id]) => id.startsWith('deep-dive'))?.[1].join() === 'reef1,reef3,reef5,reef9' && gated.find(([id]) => id.startsWith('battle-royale'))?.[1].join() === 'wood3', 'new player: Deep Dive\'s reef holes and the Cup\'s Hollow Woods hole are tasters');
+  { // polish3: online rooms follow the taster rule — a room hole never writes solo progress (records / unlocks)
+    const fs = await import('node:fs');
+    const src = fs.readFileSync(new URL('../js/net/round.js', import.meta.url), 'utf8');
+    const fin = src.slice(src.indexOf('  finishHole(picked) {'), src.indexOf('  keepsProgress()'));
+    ok(fin.length > 100 && !/recordHole|markFinished|\.unlocked/.test(fin) && /keepsProgress\(\) \{ return false; \}/.test(src) && /tasterCourse\(store, def\.id\)/.test(fin),
+      'online rooms: a room hole records no best / stars and unlocks nothing; locked-course holes say "Taster" on the card');
+  }
   delete globalThis.localStorage;
 }
 
@@ -359,6 +374,10 @@ console.log('events4: Battle Royale rivals (real AI, seeded)');
   const sig = F => JSON.stringify(F.map(g => [g.scores, g.shots.map(h => h.map(s => [s.t0, s.aim, s.power]))]));
   ok(sig(f) === sig(f2), 'deterministic: the same round records the same shots');
   ok(f.every((g, k) => g.shots[0][0].t0 >= STAGGER[k]) && f[0].shots[0][0].t0 < f[2].shots[0][0].t0, 'rivals tee off staggered (they don\'t all leave the tee at once)');
+  // polish3: tee shots are simulated at their slot (not shifted afterwards), so they go promptly, ~1 s apart, during the fly-over
+  const tees = f.map(g => g.shots.map(h => h[0].t0));
+  ok(STAGGER[0] <= 1.5 && f.every((g, k) => tees[k].every(t => t >= STAGGER[k] - 1e-6 && t <= STAGGER[k] + 1.5)) && tees[0].every((t, h) => t < tees[1][h] && tees[1][h] < tees[2][h]),
+    `rivals tee off promptly, in turn, ~1 s apart (${tees.map(T => T.map(t => t.toFixed(2)).join('/')).join(' · ')} s)`);
   // three rivals on one hole at once, with collisions (the Round loop, headless): deterministic, scores sane
   const { GhostSim, finishSync } = await import('../js/ai/ghostsim.js');
   const { stepBalls } = await import('../js/engine/sim.js');

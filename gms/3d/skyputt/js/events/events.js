@@ -97,6 +97,14 @@ export function bonusCurrency(twist, { bumpers = 0, knockouts = 0, beaten = 0 } 
   const b = twist?.bonus || {};
   return (b.bumper ?? 0) * bumpers + (b.knockout ?? 0) * knockouts + (b.beat ?? 0) * beaten;
 }
+// polish3: Bumper Bash bonks count once per hole per event run (like pickups), so replayed rounds can't
+// farm currency / points. p.bonks { holeId: most bonks paid there }; EventRound pays only above it.
+export const newBonks = (bumpHoles, bonked = {}) => Object.entries(bumpHoles || {}).reduce((a, [id, n]) => a + Math.max(0, (n | 0) - (bonked[id] | 0)), 0);
+export function noteBonks(p, bumpHoles) {
+  const b = p.bonks || (p.bonks = {});
+  for (const [id, n] of Object.entries(bumpHoles || {})) if ((n | 0) > (b[id] | 0)) b[id] = n | 0;
+  return b;
+}
 // Rivals a round finished ahead of: strictly fewer strokes than each rival's (knock-adjusted) total.
 export const rivalsBeaten = (total, field) => (field || []).filter(f => total < f.total).length;
 export function goalValue(p, kind) {

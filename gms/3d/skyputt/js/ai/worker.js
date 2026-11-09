@@ -37,9 +37,10 @@ export function handle(msg) {
     case 'hole': {   // { def, golfer, t0, trace, budgetScale } → ghost record of a whole hole
       return playHoleSync({ planner: plannerFor(msg.def), golfer: new AIGolfer(msg.golfer), t0: msg.t0 || 0, trace: msg.trace !== false, budgetScale: msg.budgetScale ?? 1 });
     }
-    case 'round': {  // { defs, golfer, trace, budgetScale } → [record per hole]; one golfer RNG stream across the round
+    case 'round': {  // { defs, golfer, trace, budgetScale, t0?, firstThink? } → [record per hole]; one golfer RNG stream across the round
+      // t0 = obstacle clock each hole starts at, firstThink = [min, spread] s before the tee shot (default: as every shot)
       const g = new AIGolfer(msg.golfer);
-      return msg.defs.map(def => playHoleSync({ planner: plannerFor(def), golfer: g, t0: 0, trace: msg.trace !== false, budgetScale: msg.budgetScale ?? 1 }));
+      return msg.defs.map(def => playHoleSync({ planner: plannerFor(def), golfer: g, t0: msg.t0 || 0, firstThink: msg.firstThink || null, trace: msg.trace !== false, budgetScale: msg.budgetScale ?? 1 }));
     }
     case 'ping': return 'pong';
     default: throw new Error('unknown ai request ' + msg.type);
@@ -107,7 +108,7 @@ export function createAIClient({ worker = true, url } = {}) {
     shot: (def, golfer, ball, { t0 = 0, ticket, trace = true, budgetScale = 1, budgetMs = 0 } = {}) =>
       request({ type: 'shot', def, golfer: gj(golfer), ball, t0, ticket: ticket || golfer.ticket(), trace, budgetScale, budgetMs }),
     hole: (def, golfer, { t0 = 0, trace = true, budgetScale = 1 } = {}) => request({ type: 'hole', def, golfer: gj(golfer), t0, trace, budgetScale }),
-    round: (defs, golfer, { trace = true, budgetScale = 1 } = {}) => request({ type: 'round', defs, golfer: gj(golfer), trace, budgetScale }),
+    round: (defs, golfer, { trace = true, budgetScale = 1, t0 = 0, firstThink = null } = {}) => request({ type: 'round', defs, golfer: gj(golfer), trace, budgetScale, t0, firstThink }),
     dispose() { w?.terminate(); w = null; for (const [, p] of pending) p.rej(new Error('ai client disposed')); pending.clear(); },
   };
 }

@@ -34,7 +34,7 @@ export function takeShot(planner, golfer, ball, t0, ticket, { trace = true, budg
 
 // Play a whole hole. Returns a ghost record:
 // { hole, golfer, par, strokes, pickedUp, oob, ace, shots: [{ n, t0, aim, power, from, to, state, walls, path, hz, penalty }] }
-export function playHoleSync({ planner, hole, golfer, t0 = 0, maxStrokes, trace = true, budgetScale = 1, think = [1.0, 1.0] }) {
+export function playHoleSync({ planner, hole, golfer, t0 = 0, maxStrokes, trace = true, budgetScale = 1, think = [1.0, 1.0], firstThink = null }) {
   golfer = asGolfer(golfer);
   planner = planner || new Planner(hole);
   hole = planner.hole;
@@ -44,7 +44,8 @@ export function playHoleSync({ planner, hole, golfer, t0 = 0, maxStrokes, trace 
   const shots = [];
   while (strokes < max) {
     const ticket = golfer.ticket();
-    const ready = t + think[0] + golfer.rng() * think[1];
+    const th = strokes === 0 && firstThink ? firstThink : think;   // (the rng draw is the same either way)
+    const ready = t + th[0] + golfer.rng() * th[1];
     const s = takeShot(planner, golfer, ball, ready, ticket, { trace, budgetScale });
     strokes++;
     const rec = { n: strokes, t0: s.t0, aim: s.shot.aim, power: s.shot.power, plan: s.plan, from: s.from, to: s.to, state: s.state, walls: s.walls, path: s.path, hz: TRACE_HZ, penalty: 0 };

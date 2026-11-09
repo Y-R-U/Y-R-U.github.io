@@ -15,7 +15,13 @@ export const ROSTER = [
   { id: 'max', name: 'Max Mallet', personality: 'pro', colour: '#9cff6a' },
   { id: 'zip', name: 'Zip Zola', personality: 'fast', colour: '#c89bff' },
 ];
-export const STAGGER = [2.6, 4.6, 6.6];   // s added to each rival's recorded clock so they don't all tee off together
+// polish3: each rival's tee shot is *simulated* at its slot on the obstacle clock (STAGGER[k], plus any wait
+// the planner picks to time a mover), so they tee off one by one, ~1 s apart, while the 3.2 s fly-over runs:
+// skip it and you watch them go; sit through it and the last leaves as the camera lands, with balls already
+// out there to hit. (events4 shifted recorded shots by 2.6-6.6 s instead, which put rivals out of sync with
+// the movers and off screen for the first 4-7 s.)
+export const STAGGER = [1.0, 2.0, 3.0];
+const FIRST_THINK = 0.3;   // s of thinking before the tee shot (the record starts this much before the slot)
 
 const hash = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return h >>> 0; };
 function rand(seed) {
@@ -40,10 +46,10 @@ export async function battleField(ev, holes, roundNo, { simulate = null } = {}) 
   const seed = roundSeed(ev, roundNo), out = [];
   for (const [k, g] of battleRoster(ev, roundNo).entries()) {
     let res = null, source = 'stub';
-    if (sim) { try { res = await sim({ holes, golfer: g, seed, mode: 'full', budgetScale: 0.5 }); source = 'ai'; } catch (e) { console.warn('[skyputt] rival round failed, using the stub', e); } }
-    if (!res?.scores || res.scores.length !== holes.length) { res = stubRound({ holes, golfer: g, seed }); source = 'stub'; }
     const off = STAGGER[k % STAGGER.length];
-    const shots = res.scores.map(s => (s.shots?.length ? s.shots.map(x => ({ ...x, t0: x.t0 + off })) : null));
+    if (sim) { try { res = await sim({ holes, golfer: g, seed, mode: 'full', budgetScale: 0.5, start: off - FIRST_THINK, firstThink: [FIRST_THINK, 0] }); source = 'ai'; } catch (e) { console.warn('[skyputt] rival round failed, using the stub', e); } }
+    if (!res?.scores || res.scores.length !== holes.length) { res = stubRound({ holes, golfer: g, seed }); source = 'stub'; }
+    const shots = res.scores.map(s => (s.shots?.length ? s.shots : null));
     const scores = res.scores.map(s => s.strokes);
     out.push({ ...g, scores, total: scores.reduce((a, b) => a + b, 0), shots, source });
   }

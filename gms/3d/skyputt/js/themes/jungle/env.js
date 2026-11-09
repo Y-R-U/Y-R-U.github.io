@@ -77,6 +77,18 @@ function buildLianas(list, material, hi) {
   return im;
 }
 
+// polish3: the big backdrop pieces move per hole, deterministically from the hole id: which side each
+// sits on (they stay on opposite sides), how far out / across / up, and how they're turned. All within a
+// band around the original spots (well clear of the course, never on the line down viewDir), so the
+// view and the budget are unchanged. No id (theme previews) → the original layout.
+function backdropPlan(id) {
+  if (!id) return { s: 1, j: () => 0 };
+  let h = 2166136261; for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619);
+  const r = rng(h >>> 0);
+  const s = r() < 0.5 ? 1 : -1;
+  return { s, j: (amp) => (r() * 2 - 1) * amp };   // a jitter in ±amp
+}
+
 export function buildEnvironment(scene, info, M, quality) {
   const hi = quality !== 'low';
   const I = M.internal;
@@ -288,16 +300,17 @@ export function buildEnvironment(scene, info, M, quality) {
   // ---------- backdrop ----------
   const back = new Buckets(hi ? { gold: 'stone' } : { stone: 'vc', gold: 'vc', leaf: 'leaf' });
   const backRocks = [];
-  // the stepped pyramid: ahead along viewDir, left of centre, rising out of the canopy
+  // the stepped pyramid: ahead along viewDir, to one side of centre (per hole: backdropPlan), rising out of the canopy
+  const bp = backdropPlan(info.id), S = bp.s;
   {
-    const pp = frame.atV(frame.wmin * 0.4 - 32, -16, frame.vmax + 72);
-    const pM = new THREE.Matrix4().makeTranslation(pp.x, pp.y, pp.z).multiply(frame.viewBasis).multiply(new THREE.Matrix4().makeRotationY(-0.35));
+    const pp = frame.atV((S > 0 ? frame.wmin : frame.wmax) * 0.4 - S * (32 + bp.j(5)), -16 + bp.j(3), frame.vmax + 72 + bp.j(12));
+    const pM = new THREE.Matrix4().makeTranslation(pp.x, pp.y, pp.z).multiply(frame.viewBasis).multiply(new THREE.Matrix4().makeRotationY(-S * 0.35 + bp.j(0.5)));
     take(buildPyramid(back, pM, hi));
   }
-  // the waterfall gorge: ahead-right
+  // the waterfall gorge: ahead on the other side
   {
-    const gp = frame.atV(frame.wmax * 0.3 + 30, 0, frame.vmax + 58);
-    const gM = new THREE.Matrix4().makeTranslation(gp.x, gp.y, gp.z).multiply(frame.viewBasis).multiply(new THREE.Matrix4().makeRotationY(-0.4));
+    const gp = frame.atV((S > 0 ? frame.wmax : frame.wmin) * 0.3 + S * (30 + bp.j(5)), bp.j(2), frame.vmax + 58 + bp.j(10));
+    const gM = new THREE.Matrix4().makeTranslation(gp.x, gp.y, gp.z).multiply(frame.viewBasis).multiply(new THREE.Matrix4().makeRotationY(-0.4 * S + bp.j(0.4)));
     take(buildGorge(back, backRocks, gM, hi));
   }
   // giant trees framing the view (bases far below in the canopy)

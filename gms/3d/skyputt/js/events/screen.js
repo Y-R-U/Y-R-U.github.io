@@ -2,7 +2,7 @@
 // the ladder and final-rank rewards. Event rounds are played through ctx.playEvent.
 // events3: the list is the rolling calendar (yearly runs + weekend events): live now, coming up with
 // dates, recently ended, and any older run that still has a final-rank reward to claim.
-import { status, timeText, startsAt, endsAt, freshProgress, applyRound, goalState, standings, rankReward, eventHoles, overview, featured, nextUp, eventById, bonusCurrency, rivalsBeaten } from './events.js';
+import { status, timeText, startsAt, endsAt, freshProgress, applyRound, goalState, standings, rankReward, eventHoles, overview, featured, nextUp, eventById, bonusCurrency, rivalsBeaten, noteBonks } from './events.js';
 import { tasterCourse } from './access.js';
 import { battleField } from './rivals.js';
 import { COURSES } from '../course/holes/index.js';
@@ -21,9 +21,9 @@ const swatch = ev => (THEME_LIST.find(t => t.id === (ev.themeWanted || ev.theme)
 export function twistText(ev) {
   const t = ev.twist || {}, out = [];
   if (t.rivals) out.push(`⚔️ ${t.rivals} AI rivals share every hole and ball hits are always on. Knock them out of bounds (+1 to them) and beat them on the card.`);
-  if (t.bonus?.bumper) out.push(`💥 Every bumper bounce pays ${t.bonus.bumper === 1 ? `a ${(ev.currency.one || ev.currency.name).toLowerCase()}` : `${t.bonus.bumper} ${ev.currency.name.toLowerCase()}`} (up to ${t.bumperCap ?? 3} a hole).`);
+  if (t.bonus?.bumper) out.push(`💥 Every bumper bounce pays ${t.bonus.bumper === 1 ? `a ${(ev.currency.one || ev.currency.name).toLowerCase()}` : `${t.bonus.bumper} ${ev.currency.name.toLowerCase()}`} (up to ${t.bumperCap ?? 3} a hole, paid once per hole per event).`);
   if (t.helpers === 'off') out.push('🚫 No helpers this weekend.');
-  if (ev.holes.some(id => id.startsWith('mir-'))) out.push(ev.holes.every(id => id.startsWith('mir-')) ? '🪞 Every hole is mirrored left to right.' : '🪞 Holes marked (Mirror) are old holes flipped left to right.');
+  if (ev.holes.some(id => id.startsWith('mir-'))) out.push(ev.holes.every(id => id.startsWith('mir-')) ? '↔️ Every hole is mirrored left to right.' : '↔️ Holes marked (Mirror) are old holes flipped left to right.');
   return out.join(' ');
 }
 export function rewardHTML(r) {
@@ -148,8 +148,9 @@ export function createEvents(ctx) {
         const before = p.currency;
         const ledger = makeLedger(store, p.pickups);
         const res = await ctx.playEvent(ev, course, { ledger, currency: { icon: ev.currency.icon, name: ev.currency.name }, twist: ev.twist || null,
-          ...(field ? { ghosts: field, opponents: field } : {}) });
+          ...(field ? { ghosts: field, opponents: field } : {}), ...(ev.twist?.bonus?.bumper ? { bonked: p.bonks || {} } : {}) });
         if (!res) { page(ev); return; }
+        if (res.bumpHoles) noteBonks(p, res.bumpHoles);   // polish3: bonks count once per hole per run
         const beaten = field ? rivalsBeaten(res.total, field) : 0, knockouts = res.knockouts | 0;
         const bonus = bonusCurrency(ev.twist, { bumpers: res.bumpers | 0, knockouts, beaten });
         const newCurrency = ledger.count() - before + bonus;

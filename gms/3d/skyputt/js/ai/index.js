@@ -34,11 +34,13 @@ export function golferFor(g, seed = 1) {
 //                   (tournament fields). The choice depends only on the inputs, so it is reproducible.
 //   → { scores: [{ strokes, picked, shots? }], mode }
 //      shots: [{ vx, vz, t0, aim, power, from, to, state, path (Float32Array xyz @ 30 Hz), penalty }]
-export async function simulateRound({ holes, golfer, seed = 1, mode = 'auto', trace = true, budgetScale = 0.75 }) {
+//   start / firstThink (full mode): obstacle clock each hole's record starts at, and [min, spread] s of
+//   thinking before the tee shot (events4 Battle Royale: rivals tee off promptly, ~1 s apart)
+export async function simulateRound({ holes, golfer, seed = 1, mode = 'auto', trace = true, budgetScale = 0.75, start = 0, firstThink = null }) {
   const g = golferFor(golfer, seed);
   const m = mode === 'auto' ? (holes.length <= 4 ? 'full' : 'quick') : mode;
   if (m === 'quick') return { mode: 'quick', scores: quickScores(holes, g, seed) };
-  const recs = await aiClient().round(holes, g, { trace, budgetScale });
+  const recs = await aiClient().round(holes, g, { trace, budgetScale, t0: start, firstThink });
   return {
     mode: 'full',
     scores: recs.map(r => ({

@@ -10,6 +10,10 @@
 //    my result reports where they ended (`knocks`). The server moves a knocked ball only if it hasn't
 //    moved since; everyone then gets a `knock` event. A shot that will knock MY ball (seen by replaying
 //    it) freezes my ball ('knocked' state) and plays the knock on it until the server confirms.
+//  * polish3, the taster rule (as events, notes/events4.md + polish3.md): rooms are social and the host
+//    picks any course, locks or not. A room hole never records a best / stars and never marks a hole
+//    finished, so it unlocks nothing on your solo map; a hole of a course you haven't opened (or the
+//    gate hole of one) says so on your hole card. Ladder points and star coins pay as for any hole.
 import * as THREE from 'three';
 import { BALL_R } from '../engine/constants.js';
 import { Round } from '../game/play.js';
@@ -19,6 +23,7 @@ import { GhostBall } from '../ai/ghost.js';
 import { ballState } from '../ai/round.js';
 import { starsFor, COINS_PER_CRYSTAL } from '../app/store.js';
 import { Replayer, targetBalls } from './replay.js';
+import { tasterCourse } from '../events/access.js';
 
 let PENDING = null;   // the OnlineGame, handed to overrides that run inside super()
 
@@ -344,8 +349,12 @@ export class OnlineRound extends Round {
     if (crystalCoins) store.addCoins(crystalCoins);
     const meta = this.app.meta?.onHole({ id: def.id, par: def.par, strokes, picked, stars }) || null;
     this.scores[this.index] = { hole: this.index + 1, par: def.par, strokes, picked };
+    const tc = tasterCourse(store, def.id);   // (nothing is recorded or unlocked here: see the header)
+    if (tc) this.holeNotes.push(`Taster: ${tc.name} stays locked on your map`);
     this.og.onMyHoleDone({ strokes, picked, label: scoreName(strokes, def.par, picked), notes: this.holeNotes, points: meta?.points || 0, coins: crystalCoins + (meta?.coins || 0) });
   }
+
+  keepsProgress() { return false; }   // polish3: online play never writes solo progress
 
   // Online the menu never pauses play: other players (and the shot clock) keep going.
   pause() {

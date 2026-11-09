@@ -15,6 +15,18 @@ import { makeBillboards } from './billboards.js';
 import { fadeTexture } from './textures.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
+
+// polish3: the big backdrop pieces move per hole, deterministically from the hole id: which side each
+// sits on (they stay on opposite sides), how far out / across / up, and how they're turned. All within a
+// band around the original spots (well clear of the course, never on the line down viewDir), so the
+// view and the budget are unchanged. No id (theme previews) → the original layout.
+function backdropPlan(id) {
+  if (!id) return { s: 1, j: () => 0 };
+  let h = 2166136261; for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619);
+  const r = rng(h >>> 0);
+  const s = r() < 0.5 ? 1 : -1;
+  return { s, j: (amp) => (r() * 2 - 1) * amp };   // a jitter in ±amp
+}
 const TEAL = [0.35, 1, 0.95], RED = [1, 0.32, 0.28], AMBER = [1, 0.72, 0.3], WHITE = [0.85, 0.95, 1];
 
 function courseFrame(info) {
@@ -201,18 +213,20 @@ export function buildEnvironment(scene, info, M, quality) {
   // ---------- backdrop ----------
   const back = new Buckets(alias);
   const backRocks = [];
-  // the main station: ahead along viewDir, right of centre, a little above the course
+  // the main station: ahead along viewDir, to one side of centre (per hole: backdropPlan), a little above the course
+  const bp = backdropPlan(info.id), S = bp.s;
+  const side = (k, lat) => (k > 0 ? frame.wmax : frame.wmin) * 0.3 + k * lat;   // lat m beyond that side of the course
   {
-    const sp = frame.atV(frame.wmax * 0.3 + 30, 9, frame.vmax + 88);
+    const sp = frame.atV(side(S, 30 + bp.j(5)), 9 + bp.j(4), frame.vmax + 88 + bp.j(12));
     const sM = new THREE.Matrix4().makeTranslation(sp.x, sp.y, sp.z).multiply(frame.viewBasis)
-      .multiply(new THREE.Matrix4().makeRotationY(0.6)).multiply(new THREE.Matrix4().makeRotationZ(0.18)).multiply(new THREE.Matrix4().makeRotationX(0.12));
+      .multiply(new THREE.Matrix4().makeRotationY(S * 0.6 + bp.j(0.7))).multiply(new THREE.Matrix4().makeRotationZ(S * (0.18 + bp.j(0.08)))).multiply(new THREE.Matrix4().makeRotationX(0.12));
     const st = buildStation(back, sM, hi);
     glowItems.push(...st.glows); for (const b of st.blinks) blinkItems.push({ ...b, a: 1, drift: 1.3 });
   }
-  // the solar array farm: ahead-left, lower
+  // the solar array farm: ahead on the other side, lower
   {
-    const ap = frame.atV(frame.wmin * 0.4 - 34, -3, frame.vmax + 70);
-    const aM = new THREE.Matrix4().makeTranslation(ap.x, ap.y, ap.z).multiply(frame.viewBasis).multiply(new THREE.Matrix4().makeRotationY(-0.5));
+    const ap = frame.atV((S > 0 ? frame.wmin : frame.wmax) * 0.4 - S * (34 + bp.j(6)), -3 + bp.j(3), frame.vmax + 70 + bp.j(10));
+    const aM = new THREE.Matrix4().makeTranslation(ap.x, ap.y, ap.z).multiply(frame.viewBasis).multiply(new THREE.Matrix4().makeRotationY(-S * 0.5 + bp.j(0.6)));
     const af = buildArrayFarm(back, aM, hi);
     glowItems.push(...af.glows); for (const b of af.blinks) blinkItems.push({ ...b, a: 1, drift: 1.1 });
   }
