@@ -4,6 +4,7 @@
 import { SERIES } from './data/index.js';
 import { COURSES } from '../course/holes/index.js';
 import { run, calendar, eventById, dayStart, localYmd, DAY, addDays } from './calendar.js';
+import { remixOf, REMIXES } from './remix.js';
 
 export { SERIES, calendar, eventById, dayStart };
 export { run, bigEvents, weekend, weekends, easter, LUNAR_NEW_YEAR, bigOn, localYmd, addDays } from './calendar.js';
@@ -11,7 +12,14 @@ export { run, bigEvents, weekend, weekends, easter, LUNAR_NEW_YEAR, bigOn, local
 export const EVENTS = SERIES.map(s => run(s, s.since));
 // events2: an event's hole defs, in play order. `ev.course` is searched first, then every course,
 // so an event can mix Festival Isles holes with Sky Isles ones. Unknown ids are dropped.
+// events4: `mir-<id>` is a remix of hole <id> (./remix.js), built once and cached.
+const remixed = new Map();
 export function holeDef(id, courseId) {
+  const rx = remixOf(id);
+  if (rx) {
+    if (!remixed.has(id)) { const base = holeDef(rx.base, courseId); remixed.set(id, base ? REMIXES[rx.kind](base) : null); }
+    return remixed.get(id);
+  }
   const own = COURSES[courseId]?.holes.find(h => h.id === id);
   if (own) return own;
   for (const c of Object.values(COURSES)) { const h = c.holes.find(x => x.id === id); if (h) return h; }
@@ -61,21 +69,39 @@ export function featured(now, list = around(now)) {
 }
 
 // ---- progress ----
-export function freshProgress() { return { currency: 0, rounds: 0, aces: 0, bestUnder: null, points: 0, claimed: [], rankClaimed: false, pickups: {} }; }
+export function freshProgress() { return { currency: 0, rounds: 0, aces: 0, bestUnder: null, points: 0, claimed: [], rankClaimed: false, pickups: {}, knockouts: 0, beaten: 0, wins: 0 }; }
 // Event points for one finished round: steady play + under-par bonus + aces + new currency.
 // More rounds = more points (D12: the more you play, the higher you go).
 // events3: an event may tune it with `scoring` { under, ace } (Ace Hunt, Fewest Strokes).
-export function roundPoints({ total, par, aces, currency }, scoring = {}) {
-  return Math.max(10, 40 + (scoring.under ?? 12) * (par - total)) + (scoring.ace ?? 25) * aces + 3 * currency;
+// events4: Battle Royale adds { knockout, beat } — points per rival knocked out of bounds by your shots
+// and per rival you finished the round ahead of (both 0 elsewhere, so other events score as before).
+export function roundPoints({ total, par, aces, currency, knockouts = 0, beaten = 0 }, scoring = {}) {
+  return Math.max(10, 40 + (scoring.under ?? 12) * (par - total)) + (scoring.ace ?? 25) * aces + 3 * currency
+    + (scoring.knockout ?? 0) * knockouts + (scoring.beat ?? 0) * beaten;
 }
-export function applyRound(p, { total, par, aces, newCurrency }, scoring) {
-  const pts = roundPoints({ total, par, aces, currency: newCurrency }, scoring);
+// newCurrency already includes any twist bonus (bonusCurrency). `rivals`: how many there were (a win =
+// finishing ahead of every one of them).
+export function applyRound(p, { total, par, aces, newCurrency, knockouts = 0, beaten = 0, rivals = 0 }, scoring) {
+  const pts = roundPoints({ total, par, aces, currency: newCurrency, knockouts, beaten }, scoring);
   p.rounds++; p.aces += aces; p.currency += newCurrency; p.points += pts;
   p.bestUnder = Math.max(p.bestUnder ?? -99, par - total);
+  if (knockouts || beaten || rivals) {   // (older saves have no such fields)
+    p.knockouts = (p.knockouts | 0) + knockouts; p.beaten = (p.beaten | 0) + beaten;
+    p.wins = (p.wins | 0) + (rivals > 0 && beaten >= rivals ? 1 : 0);
+  }
   return pts;
 }
+// events4: event currency a twist pays on top of pickups: twist.bonus { bumper, knockout, beat } per
+// bumper bounce (capped per hole in the round), rival knocked out, rival beaten.
+export function bonusCurrency(twist, { bumpers = 0, knockouts = 0, beaten = 0 } = {}) {
+  const b = twist?.bonus || {};
+  return (b.bumper ?? 0) * bumpers + (b.knockout ?? 0) * knockouts + (b.beat ?? 0) * beaten;
+}
+// Rivals a round finished ahead of: strictly fewer strokes than each rival's (knock-adjusted) total.
+export const rivalsBeaten = (total, field) => (field || []).filter(f => total < f.total).length;
 export function goalValue(p, kind) {
-  return { currency: p.currency, rounds: p.rounds, aces: p.aces, points: p.points, underPar: Math.max(0, p.bestUnder ?? 0) }[kind] ?? 0;
+  return { currency: p.currency, rounds: p.rounds, aces: p.aces, points: p.points, underPar: Math.max(0, p.bestUnder ?? 0),
+    knockouts: p.knockouts | 0, beaten: p.beaten | 0, wins: p.wins | 0 }[kind] ?? 0;
 }
 export function goalState(p, g) {
   const v = goalValue(p, g.kind);

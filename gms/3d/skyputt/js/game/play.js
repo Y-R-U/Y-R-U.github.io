@@ -11,7 +11,7 @@ import { frameAt } from '../course/frames.js';
 import { buildHoleView } from './holeview.js';
 import { AimInput } from './aim.js';
 import { sfx } from './sfxbus.js';
-import { COINS_PER_CRYSTAL } from '../app/store.js';
+import { COINS_PER_CRYSTAL, starsFor } from '../app/store.js';
 import { HELPERS, HELPER_BY_ID, helperName, STEADY_CLOCK, POWER_TEE } from '../meta/helpers.js';
 import { makeSkinnedBall, disposeBall, Trail } from '../meta/cosmetics.js';
 
@@ -25,7 +25,7 @@ export class Round {
   // mode: 'round' (play on to the last hole, then the scorecard) | 'single' (one hole, then the map)
   // Story events add: onComplete(result) instead of the scorecard, opponents [{ name, colour, scores }]
   // shown on every hole card, and tips (hint lines at each hole start).
-  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null, ledger = null, currency = null, ghosts = null, inventory = null, end = null, doneLabel = null, collide = null } = {}) {
+  constructor(app, course, startIndex = 0, { onExit, mode = 'round', onComplete = null, opponents = null, tips = null, label = null, ledger = null, currency = null, ghosts = null, inventory = null, end = null, doneLabel = null, collide = null, allGhosts = false } = {}) {
     this.app = app;
     this.inv = inventory || app.store;   // helper counts: the save, or an online room's own (js/net)
     this.course = course; this.onExit = onExit; this.mode = mode;
@@ -38,6 +38,10 @@ export class Round {
     this.currency = currency;   // { icon, name } in event rounds: pickups are event currency, not coins
     this.aces = 0;
     this.ghosts = ghosts;   // [{ name, colour, shots: [per hole: shot list | null] }] → GhostBall replays (js/ai/ghost.js)
+    // events4: the story shows one rival ghost per hole (the first with shots); `allGhosts` puts every
+    // ghost with shots for the hole on it at once (Battle Royale Cup). `ghost` = the first of them.
+    this.allGhosts = allGhosts;
+    this.ghostList = [];
     // Ball hits (notes/ballhit.md): `others` are the other REAL balls on this hole (engine Balls) that
     // my shots can knock (online peers). Empty in single player. A rival ghost (this.ghost.sim, js/ai/
     // ghostsim.js) joins the same step when ball hits are on. A shot isn't over (no
@@ -78,6 +82,15 @@ export class Round {
   }
 
   get def() { return this.course.holes[this.index]; }
+  get ghost() { return this.ghostList[0] || null; }
+  clearGhosts() {
+    for (const G of this.ghostList) { G.ball.removeFromParent(); G.ball.dispose?.(); }
+    this.ghostList = [];
+    this._ghostTok = (this._ghostTok || 0) + 1;   // a load still in flight for the old hole is dropped
+  }
+  // events4: false = this hole is a taster (an event hole the player hasn't unlocked): it is played and
+  // scored as usual but leaves no record, unlocks nothing and opens nothing on the map (EventRound).
+  keepsProgress() { return true; }
 
   loadHole(i) {
     const app = this.app;
@@ -128,34 +141,39 @@ export class Round {
     hud.hint(true, 'Tap to skip');
   }
 
-  // Rival ghost: replay their recorded shots for this hole as a translucent ball, alongside your play.
+  // Rival ghost(s): replay their recorded shots for this hole as translucent balls, alongside your play.
   async loadGhost(i) {
-    this.ghost?.ball.removeFromParent(); this.ghost?.ball.dispose?.(); this.ghost = null;
-    const g = this.ghosts?.find(x => x.shots?.[i]?.length);
-    if (!g) return;
+    this.clearGhosts();
+    const tok = this._ghostTok;
+    const all = (this.ghosts || []).filter(x => x.shots?.[i]?.length);
+    const list = this.allGhosts ? all : all.slice(0, 1);
+    if (!list.length) return;
     // a replayed hole starts from the recorded score again (a knock may have changed it last time)
-    if (g.scores) { g.recScores = g.recScores || g.scores.slice(); g.scores[i] = g.recScores[i]; g.total = g.scores.reduce((a, v) => a + (v | 0), 0); }
+    for (const g of list) if (g.scores) { g.recScores = g.recScores || g.scores.slice(); g.scores[i] = g.recScores[i]; g.total = g.scores.reduce((a, v) => a + (v | 0), 0); }
     try {
       const { GhostBall, GhostPlayer } = await import('../ai/ghost.js');
       const GS = this.collide ? await import('../ai/ghostsim.js') : null;
       const AI = this.collide ? await import('../ai/index.js') : null;
-      if (this.index !== i || !this.view) return;   // hole changed while loading
-      const ball = new GhostBall({ color: g.colour || '#ffffff', label: g.name, opacity: 0.75 });
-      this.app.scene.add(ball);
-      this.ghost = { ball, player: new GhostPlayer(ball, { shots: g.shots[i] }, { gap: 1.4 }), name: g.name, src: g };
-      // ball hits on: the ghost is a ball the physics can hit; knocked off its line it plays on with
-      // the AI at its own level (its recorded skill, or one estimated from its recorded score)
-      if (GS) {
-        const def = this.def;
-        const golfer = AI.golferFor({ id: g.id, name: g.name, personality: g.personality || 'pro',
-          skill: g.skill ?? ghostSkill(g.scores?.[i], def.par) }, hashSeed(`${g.name}:${def.id}`));
-        const client = AI.aiClient();
-        const plan = (st, t0) => client.shot(def, golfer, st, { t0, budgetScale: 0.5 }).then(r => ({ aim: r.shot.aim, power: r.shot.power, t0: r.t0 }));
-        this.ghost.sim = new GS.GhostSim({ shots: g.shots[i], maxStrokes: def.par + 4, golfer, tee: this.hole.tee, plan });
-        this.ghost.finishSync = () => {
-          const pl = new AI.Planner(this.hole);
-          return GS.finishSync(this.ghost.sim, this.world, (st, t) => { const r = AI.takeShot(pl, golfer, st, t, golfer.ticket(), { trace: false, budgetScale: 0.5 }); return { aim: r.shot.aim, power: r.shot.power, t0: r.t0 }; }, this.world.time);
-        };
+      if (this.index !== i || !this.view || tok !== this._ghostTok) return;   // hole changed while loading
+      for (const g of list) {
+        const ball = new GhostBall({ color: g.colour || '#ffffff', label: g.name, opacity: 0.75 });
+        this.app.scene.add(ball);
+        const G = { ball, player: new GhostPlayer(ball, { shots: g.shots[i] }, { gap: 1.4 }), name: g.name, src: g };
+        this.ghostList.push(G);
+        // ball hits on: the ghost is a ball the physics can hit; knocked off its line it plays on with
+        // the AI at its own level (its recorded skill, or one estimated from its recorded score)
+        if (GS) {
+          const def = this.def;
+          const golfer = AI.golferFor({ id: g.id, name: g.name, personality: g.personality || 'pro',
+            skill: g.skill ?? ghostSkill(g.scores?.[i], def.par) }, hashSeed(`${g.name}:${def.id}`));
+          const client = AI.aiClient();
+          const plan = (st, t0) => client.shot(def, golfer, st, { t0, budgetScale: 0.5 }).then(r => ({ aim: r.shot.aim, power: r.shot.power, t0: r.t0 }));
+          G.sim = new GS.GhostSim({ shots: g.shots[i], maxStrokes: def.par + 4, golfer, tee: this.hole.tee, plan });
+          G.finishSync = () => {
+            const pl = new AI.Planner(this.hole);
+            return GS.finishSync(G.sim, this.world, (st, t) => { const r = AI.takeShot(pl, golfer, st, t, golfer.ticket(), { trace: false, budgetScale: 0.5 }); return { aim: r.shot.aim, power: r.shot.power, t0: r.t0 }; }, this.world.time);
+          };
+        }
       }
     } catch (e) { console.warn('[skyputt] ghost unavailable', e); }
   }
@@ -347,7 +365,7 @@ export class Round {
     this.aim.dispose();
     this.app.canvas.removeEventListener('pointerdown', this._skip);
     this.view?.dispose(); this.view = null;
-    this.ghost?.ball.removeFromParent(); this.ghost?.ball.dispose?.(); this.ghost = null;
+    this.clearGhosts();
     this.app.rig.occluders = null;
     this.app.scene.remove(this.ballMesh);
     disposeBall(this.ballMesh);
@@ -365,15 +383,17 @@ export class Round {
       this.acc = Math.min(this.acc + dt, MAX_STEPS_PER_FRAME * DT);
       while (this.acc >= DT) {
         this.acc -= DT;
-        const others = this.others, gs = this.ghost?.sim || null;
-        if (gs) { gs.pose(w.time); b.noHit = this.strokes === 0 && b.state === 'rest'; }   // (a teed-up ball never collides)
-        if ((others.length || gs) && (this.state === 'rolling' || b.state === 'moving' || anyMoving(others) || gs?.ball.state === 'moving')) {
+        const others = this.others, GL = this.ghostList;
+        let gs = false, gMoving = false;
+        for (let k = 0; k < GL.length; k++) { const S = GL[k].sim; if (S) { gs = true; S.pose(w.time); if (S.ball.state === 'moving') gMoving = true; } }
+        if (gs) b.noHit = this.strokes === 0 && b.state === 'rest';   // (a teed-up ball never collides)
+        if ((others.length || gs) && (this.state === 'rolling' || b.state === 'moving' || anyMoving(others) || gMoving)) {
           // several real balls: one shared fixed step (engine/sim.js stepBalls — the replays use it too)
           const all = this._all || (this._all = []);
           all.length = 0; all.push(b, ...others);
-          if (gs) all.push(gs.ball);
+          for (let k = 0; k < GL.length; k++) if (GL[k].sim) all.push(GL[k].sim.ball);
           stepBalls(w, all, w.time, this.collide);
-          if (gs) gs.after(w.time);
+          for (let k = 0; k < GL.length; k++) GL[k].sim?.after(w.time);
           if (b.state === 'moving' && (this.state === 'ready' || this.state === 'flyover')) this.bumped();
           if (b.events.length) this.onEvents(b.events);
           b.events.length = 0;
@@ -386,7 +406,7 @@ export class Round {
           this.checkPickups();
           this.checkLip();
         }
-        if (gs?.events.length) this.onGhostEvents(gs);
+        for (let k = 0; k < GL.length; k++) if (GL[k].sim?.events.length) this.onGhostEvents(GL[k]);
         if (this._settle.length && !this.ballsMoving()) this.flushSettled();
         w.time += DT * w.clock;   // Steady Hands slows the obstacle clock (poses are a pure function of it)
       }
@@ -432,9 +452,9 @@ export class Round {
     // guide line while aiming
     if (this.state === 'ready') this.aim.updateGuide(app.scene, w.time); else this.aim.guide.hide();
     this.view.update(dt, t, w.time, this.ballPos());
-    if (this.ghost && !this.paused) {
-      if (this.ghost.sim?.mode === 'live') this.drawLiveGhost(dt);   // knocked off its record: drawn from the sim
-      else this.ghost.player.update(dt, w.time);   // on the obstacle clock (ai/ghost.js)
+    if (!this.paused) for (const G of this.ghostList) {
+      if (G.sim?.mode === 'live') this.drawLiveGhost(G, dt);   // knocked off its record: drawn from the sim
+      else G.player.update(dt, w.time);   // on the obstacle clock (ai/ghost.js)
     }
     this.trail.update(dt, m.position, this.state === 'rolling' && b.speed() > 0.15);
     if (this.guardMesh?.visible) this.guardMesh.material.uniforms.uTime.value = t;
@@ -497,13 +517,13 @@ export class Round {
     this.state = 'bumped';
     this.aim.guide.hide(); this.app.hud.hint(false); this.refreshHelpers();
     this.last = null;   // no Mulligan back past someone else's knock
-    this.app.hud.banner(`Knocked by ${this.ghost?.name || 'a ball'}!`, '', 1200);
+    this.app.hud.banner(`Knocked by ${this.knockerName()}!`, '', 1200);
   }
   onBumpedEvent(e) {
     const back = () => { this.state = 'ready'; this.app.rig.setGoalYaw(this.fairwayYaw()); this.refreshHelpers(); };
     if (e.type === 'rest') { sfx.emit('stopRoll'); back(); return true; }
     if (e.type === 'oob') {   // knocked out: back where it was hit, +1 to me (the owner) — as for my own ball
-      const r = this.ball.rest, by = this.ghost?.name || 'a ball';
+      const r = this.ball.rest, by = this.knockerName();
       this.ball.place(r.x, r.y, r.z); this.ballMesh.position.set(r.x, r.y, r.z);
       this.strokes++;
       this.app.hud.setStrokes(this.strokes, this.maxStrokes);
@@ -521,16 +541,22 @@ export class Round {
     }
     return false;   // sounds etc. as usual
   }
-  onGhostEvents(gs) {
+  // Who knocked my resting ball: the ghost whose ball is at that index of the shared step list.
+  knockerName() {
+    const k = this.ball.knockedBy, o = this.others.length;
+    return (k > o && this._all?.[k] && this.ghostList.find(G => G.sim?.ball === this._all[k])?.name) || this.ghost?.name || 'a ball';
+  }
+  onGhostEvents(G) {
+    const gs = G.sim;
     for (const e of gs.events) {
-      if (e.type === 'diverge') this.app.hud.banner(`${this.ghost.name}<small>knocked off their line</small>`, '', 1400);
-      else if (e.type === 'oob' && e.knocked) { this.app.hud.banner(`${this.ghost.name} knocked out <small>+1 to them</small>`, '', 1400); this.holeNotes.push(`${this.ghost.name}: knocked out +1`); }
+      if (e.type === 'diverge') this.app.hud.banner(`${G.name}<small>knocked off their line</small>`, '', 1400);
+      else if (e.type === 'oob' && e.knocked) { this.app.hud.banner(`${G.name} knocked out <small>+1 to them</small>`, '', 1400); this.holeNotes.push(`${G.name}: knocked out +1`); }
       else if (e.type === 'cup' && gs.mode === 'live') sfx.emit('cupDrop', { volume: 0.5 });
     }
     gs.events.length = 0;
   }
-  drawLiveGhost(dt) {
-    const G = this.ghost, gb = G.ball, sb = G.sim.ball;
+  drawLiveGhost(G, dt) {
+    const gb = G.ball, sb = G.sim.ball;
     if (!G.live) { G.live = true; gb.done = true; gb.onDone = null; gb._setOpacity(1); gb.ball.visible = true; }
     if (sb.state === 'cup') { gb.fade = Math.max(0, (gb.fade ?? 1) - dt * 2.5); gb._setOpacity(gb.fade); if (gb.fade <= 0) gb.ball.visible = false; }
     gb.ball.position.set(sb.px, sb.py, sb.pz);
@@ -538,8 +564,8 @@ export class Round {
   }
   // The hole is over for me: a ghost knocked off its line plays the rest of its hole headlessly and
   // its score for the hole becomes what it really took (an undisturbed one keeps its record).
-  settleGhost() {
-    const G = this.ghost;
+  settleGhost() { for (const G of this.ghostList) this.settleOne(G); }
+  settleOne(G) {
     if (!G?.sim || G.settled || G.sim.mode !== 'live') return;
     G.settled = true;
     let r;
@@ -558,11 +584,11 @@ export class Round {
       for (const t of this.targetsFor(this.og.you, { x: b.px, y: b.py, z: b.pz })) out.push([t.x, t.y, t.z]);
       return out;
     }
-    const gs = this.ghost?.sim || null;
-    if (gs && this.strokes === 0) return null;   // a teed-up ball never collides with the ghost (update loop: noHit)
+    const sims = this.ghostList.map(G => G.sim).filter(Boolean);
+    if (sims.length && this.strokes === 0) return null;   // a teed-up ball never collides with the ghost (update loop: noHit)
     const ok = o => o.state === 'rest' && !o.noHit && Math.hypot(o.px - b.px, o.py - b.py, o.pz - b.pz) >= 2 * BALL_R + 0.002;
     for (const o of this.others) if (ok(o)) out.push([o.px, o.py, o.pz]);
-    if (gs && ok(gs.ball)) out.push([gs.ball.px, gs.ball.py, gs.ball.pz]);
+    for (const gs of sims) if (ok(gs.ball)) out.push([gs.ball.px, gs.ball.py, gs.ball.pz]);
     return out;
   }
   ballsMoving() { return this.ball.state === 'moving' || (this.others.length > 0 && anyMoving(this.others)); }
@@ -622,8 +648,10 @@ export class Round {
     const strokes = picked ? this.maxStrokes : this.strokes;
     this.scores[this.index] = { hole: this.index + 1, par: def.par, strokes, picked, ...(this.holeNotes?.length ? { notes: this.holeNotes.slice() } : {}) };
     if (picked) this.ballMesh.visible = false;
-    const { stars, newBest } = store.recordHole(def.id, strokes, def.par, picked);
-    store.markFinished(def.id);
+    // events4: a taster hole (keepsProgress false) scores as usual but records and unlocks nothing
+    const keep = this.keepsProgress(def);
+    const { stars, newBest } = keep ? store.recordHole(def.id, strokes, def.par, picked) : { stars: starsFor(strokes, def.par, picked), newBest: false };
+    if (keep) store.markFinished(def.id);
     if (!picked && strokes === 1) this.aces++;
     const crystalCoins = this.currency ? 0 : this.holeGems * COINS_PER_CRYSTAL;
     if (crystalCoins) store.addCoins(crystalCoins);

@@ -14,6 +14,8 @@
 //   node tools/shots_cdp.mjs daily [--out=DIR] [--day=YYYY-MM-DD] [--sizes=p,d,l]   Daily Challenge: tile, page, a try, share, quits, shot clock
 //   node tools/shots_cdp.mjs events3 [--out=DIR] [--days=YYYY-MM-DD,…] [--sizes=p,d,l] [--quick|--no-play]   events3: rolling
 //        calendar (tile / list / page per date and size) and a weekend round played to the end
+//   node tools/shots_cdp.mjs events4 [--out=DIR] [--only=lists,deep,cup,bumper,mirror,pure]   events4: lists, and a round of
+//        Deep Dive, the Battle Royale Cup (+ a scripted knock), Bumper Bash, Mirror Weekend and Pure Putt from fresh saves
 //   node tools/shots_cdp.mjs nines [--out=DIR]   story2: map nine tabs, back nine lock, Play back nine, scorecard
 //   node tools/shots_cdp.mjs career [--out=DIR] [--chapter=2]   story2: chapter 2-6 screens (tour map, intro, a lesson, rival + tournament setup)
 // Reports console errors / exceptions and exits 1 if there are any.
@@ -744,6 +746,79 @@ async function events3Mode(c) {
   console.log('     save:', await c.eval(`JSON.stringify(Object.fromEntries(Object.entries(__skyputt.store.data.events).map(([k, v]) => [k, { pts: v.points, r: v.rounds, cur: v.currency, cl: v.claimed }])))`), '· coins', await c.eval('__skyputt.store.data.coins'));
 }
 
+// events4: Deep Dive, the Battle Royale Cup and the three twist weekends at 412x915, each from a fresh save:
+// the events list, the event page, hole 1, every hole card (the Cup's shows the rivals), a round played to the
+// end by planner drags, the page after it. The Cup also takes one scripted putt at a resting rival (a knock).
+// Logs the taster check (no record / unlock on locked courses) and the tray for Pure Putt.
+async function events4Mode(c) {
+  await size(c, 412, 915, true);
+  const only = args.only ? String(args.only).split(',') : null;
+  if (!only || only.includes('lists')) for (const day of ['2026-11-20', '2027-06-08', '2027-09-10']) {
+    await go(c, `fresh&noflyover&eventdate=${day}`);
+    await c.eval(`document.querySelector('#t-events').click()`); await sleep(400);
+    console.log(`   ${day} list:`, await c.eval(`[...document.querySelectorAll('#events .sec, #events .ev-tile b')].map(e => e.innerText).join(' / ')`));
+    await shot(c, `e4-list-${day}`);
+    const over = await c.eval(`document.documentElement.scrollWidth > innerWidth + 1`);
+    if (over) console.log('     WARNING: horizontal overflow');
+  }
+  const RUNS = [['deep', '2027-06-08', 'deep-dive-2027'], ['cup', '2027-09-10', 'battle-royale-2027'], ['bumper', '2026-11-20', 'weekend-bumper-2026-11-20'],
+    ['mirror', '2027-01-08', 'weekend-mirror-2027-01-08'], ['pure', '2027-01-22', 'weekend-pure-2027-01-22']];
+  for (const [tag, day, id] of RUNS) {
+    if (only && !only.includes(tag)) continue;
+    console.log(`  == ${tag} (${id})`);
+    await go(c, `fresh&noflyover&eventdate=${day}`);
+    await c.eval(`document.querySelector('#t-events').click()`); await sleep(400);
+    await c.eval(`document.querySelector('#events [data-id="${id}"]').click()`); await sleep(400);
+    await shot(c, `e4-${tag}-page`);
+    console.log('     page:', await c.eval(`[...document.querySelectorAll('#events .map-title, #events .ev-twist, #events .ev-holes')].map(e => e.innerText.replace(/\\n+/g, ' ')).join(' | ')`));
+    const over = await c.eval(`document.documentElement.scrollWidth > innerWidth + 1`);
+    if (over) console.log('     WARNING: horizontal overflow');
+    await c.eval(`document.querySelector('#events [data-a=play]').click()`);
+    if (tag === 'cup') { await sleep(150); await shot(c, `e4-${tag}-warming`); }
+    await waitFor(c, '__skyputt.round && __skyputt.round.state === "ready"', 90000);
+    await sleep(tag === 'cup' ? 4500 : 1500);
+    await shot(c, `e4-${tag}-hole1`);
+    console.log('     round theme:', await c.eval('__skyputt.app.themeId'), '· holes:', await c.eval('__skyputt.round.course.holes.map(h => h.id).join(",")'),
+      '· collide', await c.eval('__skyputt.round.collide'), '· ghosts', await c.eval('__skyputt.round.ghostList.length'), '· tray hidden', await c.eval('__skyputt.app.hud.el.tray.hidden'));
+    if (tag === 'cup') {   // one putt straight at a rival resting off the tee
+      const hit = await waitFor(c, `(() => { const r = __skyputt.round, b = r.ball; return r.state === 'ready' && r.ghostList.some(G => G.sim && G.sim.ball.state === 'rest' && !G.sim.ball.noHit && Math.hypot(G.sim.ball.px - b.px, G.sim.ball.pz - b.pz) < 4); })()`, 40000).catch(() => false);
+      if (hit) {
+        const info = await c.eval(`(() => { const r = __skyputt.round, b = r.ball; const G = r.ghostList.filter(G => G.sim && G.sim.ball.state === 'rest' && !G.sim.ball.noHit).sort((x, y) => Math.hypot(x.sim.ball.px - b.px, x.sim.ball.pz - b.pz) - Math.hypot(y.sim.ball.px - b.px, y.sim.ball.pz - b.pz))[0]; const g = G.sim.ball;
+          const hd = Math.atan2(g.px - b.px, -(g.pz - b.pz)) * 180 / Math.PI; r.debugShoot(hd, 3.2); return G.name + ' at ' + Math.hypot(g.px - b.px, g.pz - b.pz).toFixed(2) + ' m'; })()`);
+        console.log('     scripted putt at', info);
+        await sleep(700); await shot(c, `e4-${tag}-knock`);
+        await waitFor(c, `__skyputt.round.state !== 'rolling'`, 20000).catch(() => {});
+        console.log('     after it: hits', await c.eval('__skyputt.round.hits'), '· knock-outs', await c.eval('__skyputt.round.knockouts'), '· live rivals', await c.eval('__skyputt.round.ghostList.filter(G => G.sim?.mode === "live").map(G => G.name).join(",")'));
+      } else console.log('     (no rival resting within 4 m in time: scripted putt skipped)');
+    }
+    let cards = 0;
+    for (let n = 0; n < 90; n++) {
+      const st = await c.eval('__skyputt.round ? __skyputt.round.state : null');
+      if (!st) break;
+      if (st === 'done') {
+        await sleep(500);
+        const card = await c.eval(`document.querySelector('#h-card .card')?.innerText.replace(/\\n+/g, ' | ')`);
+        console.log('     card: ' + (card || '').slice(0, 220));
+        if (cards++ < 2) await shot(c, `e4-${tag}-card${cards}`);
+        await c.eval(`document.querySelector('#h-card [data-a=next]')?.click()`); await sleep(1500); n--; continue;
+      }
+      if (st !== 'ready') { await sleep(400); n--; continue; }
+      await waitFor(c, 'Math.abs(((__skyputt.app.rig.goalYaw - __skyputt.app.rig.yaw + 9*Math.PI) % (2*Math.PI)) - Math.PI) < 0.003', 8000).catch(() => {});
+      if (n === 3) await shot(c, `e4-${tag}-mid`);
+      const plan = await c.eval(`(${planInPage.toString()})()`);
+      const len = await dragLen(c, plan.power, plan.rel, 206, 300);
+      await drag(c, 206, 300, 206 - Math.sin(plan.rel) * len, 300 + Math.cos(plan.rel) * len, { steps: 10 });
+      await sleep(700);
+    }
+    await waitFor(c, '!document.querySelector("#events").hidden', 60000);
+    await sleep(600);
+    console.log('     after round:', await c.eval(`document.querySelector('#events .card-note.good')?.innerText`), '· theme', await c.eval('__skyputt.app.themeId'));
+    await shot(c, `e4-${tag}-after`);
+    console.log('     taster check: holes', await c.eval(`Object.keys(__skyputt.store.data.holes).join(',')`), '· unlocked', await c.eval(`Object.keys(__skyputt.store.data.unlocked).join(',')`));
+    console.log('     save:', await c.eval(`JSON.stringify(__skyputt.store.data.events['${id}'], (k, v) => k === 'pickups' ? undefined : v)`));
+  }
+}
+
 // daily: the Daily Challenge. Title tile + page at 3 sizes, a full try played by drags (fixed kit),
 // share, two quit tries → no tries left, the shot clock running out, no-helpers tray, the next day.
 async function dailyMode(c) {
@@ -840,6 +915,7 @@ try {
   else if (MODE === 'events2') await events2Mode(c);
   else if (MODE === 'events3') await events3Mode(c);
   else if (MODE === 'daily') await dailyMode(c);
+  else if (MODE === 'events4') await events4Mode(c);
   else if (MODE === 'meta') await metaMode(c);
   else if (MODE === 'overview') await overview(c);
   else if (MODE === 'nines') await ninesMode(c);

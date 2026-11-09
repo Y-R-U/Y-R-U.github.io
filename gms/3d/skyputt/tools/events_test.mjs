@@ -3,6 +3,8 @@
 import { EVENTS, status, featured, dayStart, nowFrom, standings, botPoints, ladderPlayers, freshProgress, applyRound, goalState, rankReward, timeText, endsAt, startsAt, eventHoles, holeDef, bigEvents } from '../js/events/events.js';
 import { HELPERS } from '../js/meta/helpers.js';
 import { SERIES, run, calendar, eventById, weekend, weekends, easter, LUNAR_NEW_YEAR, bigOn, addDays, overview, nextUp, around } from '../js/events/events.js';
+import { kindsOn } from '../js/events/calendar.js';
+import { bonusCurrency, rivalsBeaten } from '../js/events/events.js';
 import { THEME_LIST } from '../js/app/menus.js';
 import { Store } from '../js/app/store.js';
 import { CHESTS } from '../js/meta/economy.js';
@@ -17,7 +19,8 @@ for (const ev of EVENTS) {
   ok(!!COURSES[ev.course] && ev.holes.every(id => holeDef(id, ev.course)) && eventHoles(ev).length === ev.holes.length, `${ev.id}: holes exist (${ev.holes.length})`);
   const crystals = eventHoles(ev).reduce((a, h) => a + (h.features || []).filter(f => f.type === 'pickup').length, 0);
   const curGoals = ev.goals.filter(g => g.kind === 'currency');
-  ok(curGoals.every(g => g.target <= crystals), `${ev.id}: currency goals reachable (${curGoals.map(g => g.target).join(',')} of ${crystals} pickups)`);
+  // events4: a twist with a currency bonus (Battle Royale crowns for knock-outs / rivals beaten) can pay past the pickups
+  ok(curGoals.every(g => g.target <= crystals) || (ev.twist?.bonus && curGoals.every(g => g.target <= crystals + 5 * 6)), `${ev.id}: currency goals reachable (${curGoals.map(g => g.target).join(',')} of ${crystals} pickups${ev.twist?.bonus ? ' + twist bonus' : ''})`);
   ok(new Set(ev.goals.map(g => g.id)).size === ev.goals.length, `${ev.id}: unique goal ids`);
   ok(dayStart(ev.start) < endsAt(ev), `${ev.id}: start before end`);
 }
@@ -26,7 +29,7 @@ console.log('events2: 2027 events');
 const HELPER_IDS = new Set(HELPERS.map(h => h.id));
 const rewardOk = r => !!r && Object.keys(r).every(k => ['coins', 'helpers', 'chest'].includes(k)) && (r.coins ?? 0) >= 0
   && Object.entries(r.helpers || {}).every(([k, n]) => HELPER_IDS.has(k) && n > 0) && [].concat(r.chest || []).every(k => CHESTS[k]);
-const KINDS = new Set(['currency', 'rounds', 'underPar', 'aces', 'points']);
+const KINDS = new Set(['currency', 'rounds', 'underPar', 'aces', 'points', 'knockouts', 'beaten', 'wins']);   // (events4: the last three)
 for (const ev of EVENTS) {
   ok(ev.goals.every(g => KINDS.has(g.kind) && g.target > 0 && rewardOk(g.reward)) && ev.rankRewards.every(t => rewardOk(t.reward)), `${ev.id}: goal kinds, helper ids and chests are valid`);
   ok(ev.rankRewards.every((t, i, a) => !i || t.top > a[i - 1].top) && ev.rankRewards.at(-1).top >= (ev.ladder?.size ?? 29) + 1, `${ev.id}: rank tiers ascend and cover the whole board`);
@@ -43,7 +46,7 @@ ok(status(candy, at('2027-03-01')) === 'live' && status(candy, at('2027-02-23'))
 ok(status(eggs, at('2027-03-28')) === 'live' && status(eggs, at('2027-04-05')) === 'live' && status(eggs, dayStart('2027-04-06')) === 'ended', 'Egg Hunt live on Easter Sunday 2027-03-28, ends after 04-05');
 ok(status(games, at('2027-07-01')) === 'live' && status(games, at('2027-06-25')) === 'upcoming', 'Sky Games live 2027-07-01');
 const BIG = bigEvents(2026, 2028);   // events3: weekend events now sit between, so check the big-event order on its own
-ok(featured(at('2027-01-10'), BIG) === lunar && featured(at('2027-02-22'), BIG) === candy && featured(at('2027-03-25'), BIG) === eggs && featured(at('2027-05-01'), BIG) === games, 'featured: next upcoming between events');
+ok(featured(at('2027-01-10'), BIG) === lunar && featured(at('2027-02-22'), BIG) === candy && featured(at('2027-03-25'), BIG) === eggs && featured(at('2027-05-01'), BIG).series === 'deep-dive' && featured(at('2027-06-20'), BIG) === games, 'featured: next upcoming between events');
 ok(['?eventdate=2027-02-06', '?eventdate=2027-03-01', '?eventdate=2027-03-28', '?eventdate=2027-07-01'].map(q => featured(nowFrom(q)).id).join() === [lunar, candy, eggs, games].map(e => e.id).join(), '?eventdate= override picks each new event as live');
 ok(candy.theme === 'candy' && candy.themeFallback === 'sky', 'Candy Carnival asks for the candy theme with a sky fallback');
 for (const ev of [lunar, candy, eggs, games]) {
@@ -96,12 +99,12 @@ console.log(`    600 points on 2026-11-02 → rank ${mid.find(r => r.you).rank}/
 
 // ---------------------------------------------------------------- events3
 console.log('events3: yearly recurrence');
-ok(SERIES.length === 6 && SERIES.every(s => s.recur === 'yearly' && s.series && s.dates && !s.id && !s.start), 'all six events are yearly series (no fixed id / dates in the data)');
+ok(SERIES.length === 8 && SERIES.every(s => s.recur === 'yearly' && s.series && s.dates && !s.id && !s.start), 'all eight events are yearly series (no fixed id / dates in the data)');
 // the first runs are exactly the old fixed events: same ids, dates and ladder seeds (old saves + old ladders)
 const OLD = { 'spooky-open-2026': ['2026-10-20', '2026-11-08', 1031], 'frost-fair-2026': ['2026-12-01', '2027-01-06', 1224],
   'lunar-lanterns-2027': ['2027-01-27', '2027-02-21', 2027], 'candy-carnival-2027': ['2027-02-24', '2027-03-17', 3141],
   'egg-hunt-2027': ['2027-03-20', '2027-04-05', 328], 'sky-games-2027': ['2027-06-26', '2027-07-18', 707] };
-ok(EVENTS.map(e => e.id).join() === Object.keys(OLD).join() && EVENTS.every(e => { const o = OLD[e.id]; return e.start === o[0] && e.end === o[1] && e.ladder.seed === o[2]; }),
+ok(EVENTS.slice(0, 6).map(e => e.id).join() === Object.keys(OLD).join() && EVENTS.slice(0, 6).every(e => { const o = OLD[e.id]; return e.start === o[0] && e.end === o[1] && e.ladder.seed === o[2]; }),
   'first runs keep the old ids, dates and ladder seeds');
 const EASTER = { 2026: '04-05', 2027: '03-28', 2028: '04-16', 2029: '04-01', 2030: '04-21', 2031: '04-13', 2032: '03-28', 2033: '04-17', 2034: '04-09', 2035: '03-25' };
 ok(Object.entries(EASTER).every(([y, md]) => easter(+y) === `${y}-${md}`), 'Easter computus 2026–2035');
@@ -160,7 +163,7 @@ console.log('events3: saves per year, old saves');
 
 console.log('events3: weekend events');
 const W = weekends('2026-11-01', '2030-12-31');
-const kinds = ['windmill', 'aces', 'fewest', 'crystals'];
+const kinds = ['windmill', 'aces', 'fewest', 'crystals', 'bumper', 'mirror', 'pure'];   // (events4: the last three)
 ok(W.length > 100 && W.every(w => w.kind === 'weekend' && kinds.includes(w.weekendKind)), `${W.length} weekend runs 2026-11 → 2030`);
 ok(W.every(w => { const n = (dayStart(w.end) - dayStart(w.start)) / 864e5 + 1; const d0 = new Date(dayStart(w.start)).getDay(); return n >= 2 && n <= 3 && [5, 6].includes(d0) && new Date(dayStart(w.end)).getDay() <= 6; }),
   'each lasts 2–3 days over Fri–Sun');
@@ -173,9 +176,12 @@ const sats = allDays.filter(d => new Date(dayStart(d)).getDay() === 6);
 ok(sats.every(d => bigOn(d) || W.some(w => w.start <= d && d <= w.end)), `every Saturday has something live (${sats.length} Saturdays)`);
 let gap = 0, maxGap = 0; for (const d of allDays) { const live = everything.some(e => e.start <= d && d <= e.end); gap = live ? 0 : gap + 1; maxGap = Math.max(maxGap, gap); }
 ok(maxGap <= 6, `longest stretch with nothing live is ${maxGap} days (weekdays between weekend runs)`);
-ok(W.every((w, i) => i < 3 || new Set(W.slice(i - 3, i + 1).map(x => x.weekendKind)).size === 4), 'kinds take turns: any 4 runs in a row are all 4 kinds');
+// events4: the kinds live on a Friday (kindsOn) take turns: any n runs in a row with the same n live are all different
+ok(W.every((w, i) => { const n = kindsOn(w.start.slice(0, 10)).length, win = W.slice(Math.max(0, i - n + 1), i + 1);
+  return win.length < n || win.some(x => kindsOn(x.start).length !== n) || new Set(win.map(x => x.weekendKind)).size === n; }), 'kinds take turns: any n runs in a row are all n kinds (4 before events4, 7 after)');
 const weekOf = W.slice(0, 60);
-const usedCourses = new Set(weekOf.flatMap(w => w.holes.map(id => Object.values(COURSES).find(c => c.holes.some(h => h.id === id)).id)));
+const baseId = id => id.replace(/^mir-/, '');
+const usedCourses = new Set(weekOf.flatMap(w => w.holes.map(id => Object.values(COURSES).find(c => c.holes.some(h => h.id === baseId(id))).id)));
 ok(Object.keys(COURSES).every(c => usedCourses.has(c)), `weekend holes come from every course in COURSES (${[...usedCourses].join(', ')})`);
 const themeIdsAll = THEME_LIST.map(t => t.id);
 ok(W.every(w => themeIdsAll.includes(w.theme) && w.themeFallback === 'sky') && themeIdsAll.every(t => W.some(w => w.theme === t)), `weekend themes rotate through every theme (${themeIdsAll.join(', ')})`);
@@ -186,7 +192,8 @@ ok(W.every(w => eventById(w.id) === w && weekend(w.id.slice(-10)) === w), 'weeke
 ok(new Set(W.map(w => w.ladder.seed)).size === W.length && W.every(w => !big35.some(b => b.ladder.seed === w.ladder.seed)), 'weekend ladder seeds are unique');
 for (const w of W.slice(0, 8)) {
   const pick = eventHoles(w).reduce((a, h) => a + h.features.filter(f => f.type === 'pickup').length, 0);
-  ok(w.goals.every(g => KINDS.has(g.kind) && rewardOk(g.reward) && (g.kind !== 'currency' || g.target <= pick)) && w.rankRewards.every(t => rewardOk(t.reward)) && w.rankRewards.at(-1).top >= w.ladder.size + 1,
+  const bonus = w.twist?.bonus?.bumper ? w.twist.bonus.bumper * (w.twist.bumperCap ?? 3) * w.holes.length : 0;   // events4: Bumper Bash bonks
+  ok(w.goals.every(g => KINDS.has(g.kind) && rewardOk(g.reward) && (g.kind !== 'currency' || g.target <= pick + bonus)) && w.rankRewards.every(t => rewardOk(t.reward)) && w.rankRewards.at(-1).top >= w.ladder.size + 1,
     `${w.id}: ${w.theme}, ${w.start}→${w.end}, ${w.holes.join(' ')} · goals valid, currency ≤ ${pick}`);
 }
 
@@ -228,8 +235,158 @@ ok(!o10.live.length && nextUp(at('2026-11-10')).start === '2026-11-13' && o10.en
 ok(featured(at('2026-11-14')).kind === 'weekend' && status(featured(at('2026-11-14')), at('2026-11-14')) === 'live', 'Nov 14: the weekend event is featured live');
 ok(nextUp(at('2026-11-14'), true) === frost, 'next big event after that weekend: Frost Fair');
 ok(featured(nowFrom('?eventdate=2031-10-25')).id === 'spooky-open-2031', '?eventdate=2031-10-25 → Spooky Hollow Open 2031');
-ok(around(at('2026-11-03')).length > 40, 'around(): a rolling year of runs');
+ok(around(at('2026-11-03')).length > 30, 'around(): a rolling year of runs');   // (events4: two more big events take ~6 weekends)
 console.log('    next 12 months: ' + calendar('2026-11-03', '2027-11-03').filter(e => e.kind !== 'weekend').map(e => `${e.name} ${e.start}→${e.end}`).join(' · '));
+
+
+// ---------------------------------------------------------------- events4
+console.log('events4: Deep Dive + Battle Royale Cup');
+{
+  const deep = EVENTS.find(e => e.series === 'deep-dive'), cup = EVENTS.find(e => e.series === 'battle-royale');
+  ok(deep?.id === 'deep-dive-2027' && deep.start === '2027-06-01' && deep.end === '2027-06-15' && status(deep, at('2027-06-08')) === 'live', 'Deep Dive 2027-06-01 → 06-15, live on World Ocean Day (06-08)');
+  ok(cup?.id === 'battle-royale-2027' && cup.start === '2027-09-03' && cup.end === '2027-09-26' && status(cup, at('2027-09-10')) === 'live', 'Battle Royale Cup 2027-09-03 → 09-26');
+  ok(deep.theme === 'reef' && deep.themeFallback === 'sky' && THEME_LIST.some(t => t.id === 'reef'), 'Deep Dive plays in the Sunken Reef theme (sky fallback)');
+  const reefN = deep.holes.filter(id => /^reef\d/.test(id)).length, mirN = deep.holes.filter(id => id.startsWith('mir-')).length;
+  ok(reefN >= 3 && mirN >= 2 && eventHoles(deep).length === deep.holes.length, `Deep Dive: ${reefN} Sunken Reef holes + ${mirN} mirrored remixes, all resolve`);
+  ok(cup.twist.collide === true && cup.twist.rivals === 3 && cup.scoring.knockout > 0 && cup.scoring.beat > 0, 'Cup: ball hits forced on, 3 rivals, knock-outs and wins score');
+  ok(cup.goals.some(g => g.kind === 'knockouts') && cup.goals.some(g => g.kind === 'beaten') && cup.goals.some(g => g.kind === 'wins'), 'Cup goals reward knocking rivals out and finishing ahead of them');
+  for (let y = 2027; y <= 2040; y++) {
+    const d = run(S('deep-dive'), y), c = run(S('battle-royale'), y), ga = run(S('sky-games'), y), eg = run(S('egg-hunt'), y), sp = run(S('spooky-open'), y);
+    if (!(d && c && d.start > eg.end && d.end < ga.start && c.start > ga.end && c.end < sp.start)) { ok(false, `${y}: Deep Dive / Cup sit between Easter, Sky Games and Spooky`); break; }
+    if (y === 2040) ok(true, 'every year 2027–2040: Egg Hunt < Deep Dive < Sky Games < Cup < Spooky Open (no collisions, late Easter included)');
+  }
+  // scoring: knock-outs and rivals beaten
+  const q = freshProgress();
+  const pts = applyRound(q, { total: 14, par: 14, aces: 0, newCurrency: 5, knockouts: 2, beaten: 3, rivals: 3 }, cup.scoring);
+  ok(pts === 40 + 15 + 2 * cup.scoring.knockout + 3 * cup.scoring.beat && q.knockouts === 2 && q.beaten === 3 && q.wins === 1, `Cup round: par, 2 knock-outs, beat all 3 → ${pts} points, a win`);
+  applyRound(q, { total: 16, par: 14, aces: 0, newCurrency: 0, knockouts: 0, beaten: 1, rivals: 3 }, cup.scoring);
+  ok(q.wins === 1 && q.beaten === 4 && goalState(q, cup.goals.find(g => g.kind === 'wins')).done, 'beating 1 of 3 is not a win; wins / beaten accumulate');
+  const old = { currency: 3, rounds: 1, aces: 0, bestUnder: 0, points: 50, claimed: [], rankClaimed: false, pickups: {} };   // a save from before events4
+  ok(goalState(old, cup.goals.find(g => g.kind === 'knockouts')).value === 0 && applyRound(old, { total: 14, par: 14, aces: 0, newCurrency: 0 }) === 40 && !('knockouts' in old), 'older progress (no battle fields) still scores as before');
+  ok(bonusCurrency(cup.twist, { knockouts: 2, beaten: 3 }) === 7 && bonusCurrency(null, { knockouts: 9 }) === 0 && rivalsBeaten(10, [{ total: 9 }, { total: 10 }, { total: 12 }]) === 1, 'bonus crowns (2 a knock-out, 1 a rival beaten); ties don\'t beat a rival');
+  // balance: a keen Cup player (a round a day, beats ~2, a knock-out every other day) finishes every goal, top 10
+  const par = eventHoles(cup).reduce((a, h) => a + h.par, 0), picks = eventHoles(cup).reduce((a, h) => a + h.features.filter(f => f.type === 'pickup').length, 0);
+  const keen = freshProgress(), dd = Math.round((endsAt(cup) - startsAt(cup)) / 864e5);
+  for (let d = 0; d < dd; d++) { const ko = d % 2, bt = d % 3 ? 2 : 3; applyRound(keen, { total: par - 1, par, aces: 0, newCurrency: (d ? 0 : picks) + bonusCurrency(cup.twist, { knockouts: ko, beaten: bt }), knockouts: ko, beaten: bt, rivals: 3 }, cup.scoring); }
+  const kr = standings(cup, endsAt(cup), { points: keen.points }).find(r => r.you).rank;
+  ok(cup.goals.every(g => goalState(keen, g).done) && kr <= 10, `Cup: a keen player finishes every goal (${keen.points} pts) and ranks ${kr}/30`);
+  const cas = freshProgress(); for (let d = 0; d < 3; d++) applyRound(cas, { total: par + 2, par, aces: 0, newCurrency: 3, knockouts: 0, beaten: 1, rivals: 3 }, cup.scoring);
+  ok(goalState(cas, cup.goals[0]).done && !goalState(cas, cup.goals.find(g => g.kind === 'points')).done, `Cup: 3 casual rounds → first goal, not the points goal (${cas.points})`);
+  const dk = freshProgress(); const dpar = eventHoles(deep).reduce((a, h) => a + h.par, 0), dpk = eventHoles(deep).reduce((a, h) => a + h.features.filter(f => f.type === 'pickup').length, 0);
+  for (let d = 0; d < 15; d++) applyRound(dk, { total: dpar - 3, par: dpar, aces: d % 3 ? 0 : 1, newCurrency: d ? 0 : dpk });
+  ok(deep.goals.every(g => goalState(dk, g).done) && standings(deep, endsAt(deep), { points: dk.points }).find(r => r.you).rank <= 10, `Deep Dive: a daily player finishes every goal (${dk.points} pts)`);
+}
+
+console.log('events4: remixes (mirror)');
+{
+  const { mirrorHole, remixOf } = await import('../js/events/remix.js');
+  const { buildHole, makeWorld } = await import('../js/course/builder.js');
+  const { simulateShot } = await import('../js/engine/sim.js');
+  const { Ball } = await import('../js/engine/physics.js');
+  ok(remixOf('mir-sky14')?.base === 'sky14' && remixOf('sky14') === null && remixOf('zzz-sky14') === null, 'remix ids: mir-<hole id>');
+  ok(holeDef('mir-sky14') === holeDef('mir-sky14') && holeDef('mir-sky14').name === 'Island Hop (Mirror)' && holeDef('mir-nope') === null, 'holeDef resolves (and caches) remixes; unknown base → null');
+  ok(!Object.values(COURSES).some(c => c.holes.some(h => h.id.startsWith('mir-'))), 'remixes are not in COURSES (map, daily pool, server port, online rooms never see them)');
+  const strip = d => JSON.stringify({ ...d, id: 0, name: 0, remixOf: 0, remix: 0, features: (d.features || []).map(f => ({ ...f, phase: f.type === 'mover' ? 0 : f.phase })) });
+  const all = Object.values(COURSES).flatMap(c => c.holes);
+  ok(all.every(h => strip(mirrorHole(mirrorHole(h))) === strip(h)), `mirroring twice gives the original data back (${all.length} holes)`);
+  let exact = 0, built = 0; const bad = [];
+  for (const h of all) {
+    const A = buildHole(h), B = buildHole(mirrorHole(h)); built++;
+    const pa = (h.features || []).filter(f => f.type === 'pickup').length, pb = B.features.filter(f => f.type === 'pickup').length;
+    if (pa !== pb || Math.abs(A.total - B.total) > 1e-6 || Math.abs(A.tee.x + B.tee.x) > 1e-6 || Math.abs(A.cup.x + B.cup.x) > 1e-6) bad.push(h.id);
+    // a gentle straight putt on the mirror lands on the mirror image of the same putt on the original
+    const ra = simulateShot(makeWorld(A), new Ball(A.tee.x, A.tee.y, A.tee.z), 0, -1.2, { t0: 0 }), rb = simulateShot(makeWorld(B), new Ball(B.tee.x, B.tee.y, B.tee.z), 0, -1.2, { t0: 0 });
+    if (Math.hypot(ra.x + rb.x, ra.y - rb.y, ra.z - rb.z) < 0.005 && ra.state === rb.state) exact++; else bad.push(h.id + '(shot)');
+  }
+  ok(!bad.length, `every hole mirrors: same length, pickups, tee and cup reflected, a straight putt reflects (${exact}/${built})${bad.length ? ' bad: ' + bad.join(' ') : ''}`);
+  // the AI holes out every remix the events use (Deep Dive, the Cup, the first Mirror Weekends)
+  const AI = await import('../js/ai/index.js');
+  const used = [...new Set([...EVENTS.flatMap(e => e.holes), ...weekends('2026-11-16', '2027-12-31').filter(w => w.weekendKind === 'mirror').slice(0, 3).flatMap(w => w.holes)].filter(id => id.startsWith('mir-')))];
+  const res = used.map(id => { const d = holeDef(id), r = AI.playHoleSync({ hole: buildHole(d), golfer: AI.golferFor({ id: 'pro', name: 'Pro', personality: 'pro', skill: 0.9 }, 3), trace: false, budgetScale: 0.6 }); return [id, d.par, r.strokes, r.pickedUp]; });
+  ok(res.every(([, par, n, up]) => !up && n <= par + 1), `the AI (skill 0.9) holes out every remix in use within par + 1: ${res.map(([id, par, n]) => `${id} ${n}/${par}`).join(', ')}`);
+}
+
+console.log('events4: twist weekends');
+{
+  const W4 = weekends('2026-11-09', '2028-12-31');
+  ok(weekend('2026-11-13').weekendKind === 'fewest' && kindsOn('2026-11-13').length === 4 && kindsOn('2026-11-20').length === 7, 'the weekend already announced (Nov 13) keeps its kind; the three twist kinds join from Nov 16');
+  ok(weekend('2026-11-20').weekendKind === 'bumper', 'first twist weekend: Bumper Bash, Nov 20–22');
+  const byKind = k => W4.filter(w => w.weekendKind === k);
+  ok(byKind('bumper').length >= 5 && byKind('bumper').every(w => w.twist.bonus.bumper === 1 && eventHoles(w).every(h => h.features.filter(f => f.type === 'bumper').length >= 2)), `Bumper Bash (${byKind('bumper').length} runs): 2+ bumpers on every hole, bumper bounces pay`);
+  ok(byKind('mirror').length >= 5 && byKind('mirror').every(w => w.holes.every(id => id.startsWith('mir-')) && eventHoles(w).length === w.holes.length), `Mirror Weekend (${byKind('mirror').length} runs): every hole a mirrored remix`);
+  ok(byKind('pure').length >= 5 && byKind('pure').every(w => w.twist.helpers === 'off' && w.scoring.under === 16), `Pure Putt (${byKind('pure').length} runs): no helpers, 16 points per stroke under par`);
+  // new content (a course or theme with dailyFrom) joins weekends from its release date only
+  const rel = [...Object.values(COURSES).filter(c => c.dailyFrom), ...THEME_LIST.filter(t => t.dailyFrom)];
+  ok(W4.every(w => rel.every(x => x.dailyFrom <= w.start || (w.theme !== x.id && !w.holes.some(id => (COURSES[x.id]?.holes || []).some(h => h.id === id.replace(/^mir-/, '')))))),
+    `weekends before a release date never use that course / theme (${rel.map(x => `${x.id} ${x.dailyFrom}`).join(', ')})`);
+  const wMax4 = Math.max(...W4.filter(w => ['bumper', 'mirror', 'pure'].includes(w.weekendKind)).map(w => w.goals.reduce((a, g) => a + (g.reward.coins || 0), 0) + (w.rankRewards[0].reward.coins || 0)));
+  ok(wMax4 <= 185, `a perfect twist weekend pays ≤ ${wMax4} coins (same budget as the others)`);
+}
+
+console.log('events4: taster rule (locked holes stay locked)');
+{
+  const { keepsProgress, tasterCourse } = await import('../js/events/access.js');
+  const mem = {}; globalThis.localStorage = { getItem: k => mem[k] ?? null, setItem: (k, v) => { mem[k] = String(v); } };
+  const st = new Store();
+  ok(keepsProgress(st, 'sky1') && keepsProgress(st, 'sky5') && keepsProgress(st, 'fest4'), 'fresh save: holes on open courses keep progress (events2: an event hole opens on the map)');
+  ok(tasterCourse(st, 'reef1')?.id === 'reef' && tasterCourse(st, 'wood3')?.id === 'woods' && tasterCourse(st, 'sugar4')?.id === 'sugar', 'holes on gated courses are tasters');
+  ok(tasterCourse(st, 'sky9')?.id === 'woods' && tasterCourse(st, 'fest9')?.id === 'sugar', 'a gate hole not reached yet is a taster (finishing it would open Hollow Woods / Sugar Summit)');
+  ok(keepsProgress(st, 'mir-reef9') && keepsProgress(st, 'mir-sky9'), 'remixes are never tasters (they unlock nothing)');
+  for (let i = 0; i < 8; i++) st.markFinished(`sky${i + 1}`);
+  ok(keepsProgress(st, 'sky9') && tasterCourse(st, 'wood1')?.id === 'woods', 'sky1–8 done: sky9 is reached, so it counts; Hollow Woods still locked');
+  st.markFinished('sky9');
+  ok(keepsProgress(st, 'wood1') && keepsProgress(st, 'wood3'), 'front nine done: Hollow Woods holes keep progress');
+  st.recordHole('reef4', 3, 3, false);
+  ok(keepsProgress(st, 'reef4') && !keepsProgress(st, 'reef5'), 'a hole with a record from before events4 stays open (matches the map); its neighbours stay tasters');
+  // every event that uses a gated course's holes: for a new player those holes are tasters
+  const fresh = new Store(); fresh.reset();
+  const gated = EVENTS.map(e => [e.id, eventHoles(e).filter(h => tasterCourse(fresh, h.id)).map(h => h.id)]).filter(([, l]) => l.length);
+  console.log('    tasters for a new player: ' + gated.map(([id, l]) => `${id} (${l.join(' ')})`).join(' · '));
+  ok(gated.find(([id]) => id.startsWith('deep-dive'))?.[1].join() === 'reef1,reef3,reef5,reef9' && gated.find(([id]) => id.startsWith('battle-royale'))?.[1].join() === 'wood3', 'new player: Deep Dive\'s reef holes and the Cup\'s Hollow Woods hole are tasters');
+  delete globalThis.localStorage;
+}
+
+console.log('events4: Battle Royale rivals (real AI, seeded)');
+{
+  const { battleRoster, battleField, STAGGER, ROSTER } = await import('../js/events/rivals.js');
+  const cup = EVENTS.find(e => e.series === 'battle-royale');
+  const r0 = battleRoster(cup, 0), r1 = battleRoster(cup, 1);
+  ok(r0.length === 3 && new Set(r0.map(g => g.id)).size === 3 && r0.every(g => g.skill >= 0.3 && g.skill <= 0.6 && ROSTER.some(x => x.id === g.id)), `round 0 rivals: ${r0.map(g => `${g.name} (${g.personality} ${g.skill})`).join(', ')}`);
+  ok(JSON.stringify(battleRoster(cup, 0)) === JSON.stringify(r0) && JSON.stringify(r1) !== JSON.stringify(r0), 'same round → same rivals; the next round → different ones');
+  const holes = eventHoles(cup).slice(0, 2);
+  const t0 = Date.now(), f = await battleField(cup, holes, 0), ms = Date.now() - t0, f2 = await battleField(cup, holes, 0);
+  ok(f.every(g => g.source === 'ai' && g.shots.every(s => s?.length) && g.total === g.scores.reduce((a, b) => a + b, 0)), `every rival is played by the AI with recorded shots (${ms} ms for ${f.length} × ${holes.length} holes)`);
+  const sig = F => JSON.stringify(F.map(g => [g.scores, g.shots.map(h => h.map(s => [s.t0, s.aim, s.power]))]));
+  ok(sig(f) === sig(f2), 'deterministic: the same round records the same shots');
+  ok(f.every((g, k) => g.shots[0][0].t0 >= STAGGER[k]) && f[0].shots[0][0].t0 < f[2].shots[0][0].t0, 'rivals tee off staggered (they don\'t all leave the tee at once)');
+  // three rivals on one hole at once, with collisions (the Round loop, headless): deterministic, scores sane
+  const { GhostSim, finishSync } = await import('../js/ai/ghostsim.js');
+  const { stepBalls } = await import('../js/engine/sim.js');
+  const { buildHole, makeWorld } = await import('../js/course/builder.js');
+  const { Ball } = await import('../js/engine/physics.js');
+  const { DT } = await import('../js/engine/constants.js');
+  function share(def, field, i, shootMe) {
+    const hole = buildHole(def), world = makeWorld(hole), pl = new AI.Planner(hole);
+    const sims = field.map(g => { const gl = AI.golferFor(g, 5); return new GhostSim({ shots: g.shots[i], maxStrokes: def.par + 4, golfer: gl, tee: hole.tee,
+      plan: (st, t) => { const r = AI.takeShot(pl, gl, st, t, gl.ticket(), { trace: false, budgetScale: 0.5 }); return { aim: r.shot.aim, power: r.shot.power, t0: r.t0 }; } }); });
+    const me = new Ball(hole.tee.x, hole.tee.y, hole.tee.z); me.noHit = true;
+    let t = 0, ev = [];
+    for (let k = 0; k < 240 * 60 && !(sims.every(g => g.done) && me.state !== 'moving'); k++) {
+      for (const g of sims) g.pose(t);
+      if (shootMe && Math.abs(t - shootMe.t) < DT / 2) { me.noHit = false; world.shoot(me, shootMe.vx, shootMe.vz); }
+      stepBalls(world, [me, ...sims.map(g => g.ball)], t, true);
+      for (const g of sims) { g.after(t); ev.push(...g.events.map(e => e.type)); g.events.length = 0; }
+      if (me.state === 'oob') me.place(me.rest.x, me.rest.y, me.rest.z);
+      me.events.length = 0; t += DT;
+    }
+    for (const g of sims) if (!g.done) finishSync(g, world, (st, tt) => { const gl = g.golfer, r = AI.takeShot(pl, gl, st, tt, gl.ticket(), { trace: false, budgetScale: 0.5 }); return { aim: r.shot.aim, power: r.shot.power, t0: r.t0 }; }, t);
+    return { res: sims.map(g => g.result()), ev, me: [me.px, me.pz] };
+  }
+  const AI = await import('../js/ai/index.js');
+  const A = share(holes[0], f, 0, { t: 9.0, vx: 0.2, vz: -1.6 }), B = share(holes[0], f2, 0, { t: 9.0, vx: 0.2, vz: -1.6 });
+  ok(JSON.stringify(A) === JSON.stringify(B), `three rivals + my putt on ${holes[0].id}: identical twice (${A.res.map(r => `${r.strokes}${r.diverged ? '*' : ''}`).join(' ')}; events ${[...new Set(A.ev)].join(',')})`);
+  ok(A.res.every(r => r.strokes >= 1 && r.strokes <= holes[0].par + 4), 'every rival finishes the hole with a legal score');
+}
 
 console.log(fails ? `${fails} failed` : 'all passed');
 process.exit(fails ? 1 : 0);

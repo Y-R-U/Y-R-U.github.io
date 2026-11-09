@@ -16,6 +16,7 @@ import { createAudio } from '../audio/index.js';
 import { createCareer } from '../story/career.js';
 import { createEvents, eventTileHTML } from '../events/screen.js';
 import { nowFrom } from '../events/events.js';
+import { EventRound } from '../events/round.js';
 import { createMeta } from '../meta/meta.js';
 import { createMetaScreens, tierBadge } from '../meta/screens.js';
 import { TIERS, weekCountdown, weekKey } from '../meta/ladder.js';
@@ -205,13 +206,15 @@ async function boot() {
   const events = createEvents({
     store, now, click: () => sfx.emit('click'),
     onBack: () => showTitle(),
-    playEvent: (ev, evCourse, { ledger, currency }) => new Promise(async resolve => {
+    // events4: an EventRound (js/events/round.js: taster rule + the event's twist); `extra` = its options
+    // (twist, ghosts / opponents for the Battle Royale Cup)
+    playEvent: (ev, evCourse, { ledger, currency, ...extra }) => new Promise(async resolve => {
       $('#title').hidden = true;
       await useTheme(ev.theme);
       if (app.themeId !== ev.theme && ev.themeFallback) await useTheme(ev.themeFallback);   // events2: theme missing → its fallback, not greybox
       titleView?.dispose(); titleView = null;
       const done = async res => { round = null; await useTheme(playerTheme()); ensureTitleScene(); resolve(res); };
-      round = new Round(app, evCourse, 0, { mode: 'round', label: ev.name, ledger, currency, onComplete: done, onExit: () => done(null) });
+      round = new EventRound(app, evCourse, 0, { ...extra, mode: 'round', label: ev.name, ledger, currency, onComplete: done, onExit: () => done(null) });
       if (params.has('noflyover')) round.endFlyover();
       window.__skyputt.round = round;
     }),

@@ -7,6 +7,7 @@
 import { Round } from '../game/play.js';
 import { makeInventory } from '../net/rooms.js';
 import { sfx } from '../game/sfxbus.js';
+import { keepsProgress } from '../events/access.js';
 
 const memLedger = () => {
   const o = {};
@@ -41,6 +42,9 @@ export class DailyRound extends Round {
   }
 
   tapHelper(id) { if (!this.helpersOff) super.tapHelper(id); }
+  // events4 taster rule (js/events/access.js): a daily on a gate hole you haven't reached (e.g. sky9)
+  // must not open the course behind it; it is scored for the daily but keeps no record.
+  keepsProgress(def) { return keepsProgress(this.app.store, def.id); }
 
   pause() {
     if (this.paused || this.state === 'done') return;

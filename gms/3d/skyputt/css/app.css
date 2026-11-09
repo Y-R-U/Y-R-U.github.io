@@ -345,6 +345,9 @@ table.ladder tr.gap td { text-align: center; opacity: .5; padding: 0; }
 .ev-holes { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 2px; }
 .ev-holes span { font-size: 12.5px; padding: 3px 9px; border-radius: 10px; background: rgba(255,255,255,.08); }
 .ev-holes i { font-style: normal; opacity: .6; margin-left: 5px; font-size: 11px; }
+/* events4: taster holes (a course you haven't opened) and the event's twist line */
+.ev-holes span.taster { background: transparent; border: 1px dashed rgba(255,255,255,.35); }
+.ev-twist { margin-top: 8px; }
 .g-top b { min-width: 45%; }
 .g-top span { white-space: normal; text-align: right; }   /* long rewards wrap instead of squeezing the goal text */
 .ev-tile .ev-main small:last-child { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }

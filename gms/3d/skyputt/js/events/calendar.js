@@ -101,10 +101,15 @@ function rand(seed) {   // same generator as events.js rng (kept local so this f
   return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 export const allHoles = () => Object.values(COURSES).flatMap(c => c.holes.map(h => ({ h, course: c.id })));
+// events4: a course or theme with `dailyFrom` (its release date, the daily pool uses it too) joins weekend
+// events from that date on, so shipping new content never reshuffles weekends already announced or live.
+const released = (x, ymd) => !x?.dailyFrom || x.dailyFrom <= ymd;
+// events4: the weekend kinds live on Friday `fri` (a kind with `since` joins from that date).
+export const kindsOn = fri => WEEKEND_KINDS.filter(k => !k.since || k.since <= fri);
 // the theme offset per round only matters when the theme count shares a factor with the kind count
 // (4 themes × 4 kinds); with 5 themes plain rotation already meets every kind/theme pair.
 const gcd = (a, b) => (b ? gcd(b, a % b) : a);
-export const themeIds = () => THEME_LIST.map(t => t.id).filter(id => id !== 'greybox');
+export const themeIds = (ymd = null) => THEME_LIST.filter(t => t.id !== 'greybox' && (!ymd || released(t, ymd))).map(t => t.id);
 const pickups = holes => holes.reduce((a, h) => a + (h.features || []).filter(f => f.type === 'pickup').length, 0);
 
 // Weekend slots, week by week from the epoch: the free span of each week (Fri–Sun if free, else
@@ -128,20 +133,21 @@ export function weekend(fri) {
   if (n < 0 || fri < WEEKEND_FIRST || +fri.slice(0, 4) > LAST_YEAR) return null;
   const week = n / 7, sl = slot(week);
   if (!sl) return null;
-  const K = WEEKEND_KINDS[sl.ord % WEEKEND_KINDS.length], key = `weekend-${K.kind}-${fri}`;
+  const kinds = kindsOn(fri), K = kinds[sl.ord % kinds.length], key = `weekend-${K.kind}-${fri}`;
   if (cache.has(key)) return cache.get(key);
   const seed = 50000 + week;
   // holes: every course in COURSES (read now, so new courses join in), ranked by a per-weekend hash
-  const pool = allHoles().filter(x => K.pick(x.h)).map(x => ({ ...x, r: rand(hash(`${seed}:${x.h.id}`))() })).sort((a, b) => a.r - b.r);
+  const pool = allHoles().filter(x => released(COURSES[x.course], fri) && K.pick(x.h)).map(x => ({ ...x, r: rand(hash(`${seed}:${x.h.id}`))() })).sort((a, b) => a.r - b.r);
   let picks = pool.slice(0, K.holes);
   if (K.must && !picks.some(x => K.must(x.h))) { const m = pool.find(x => K.must(x.h)); if (m) picks = [m, ...picks.slice(0, -1)]; }
   picks.sort((a, b) => a.h.par - b.h.par || a.r - b.r);   // shortest holes first
-  const themes = themeIds(), holes = picks.map(x => x.h), round = Math.floor(sl.ord / WEEKEND_KINDS.length);
+  const themes = themeIds(fri), holes = picks.map(x => x.h), round = Math.floor(sl.ord / kinds.length);
   const ev = {
     id: key, kind: 'weekend', weekendKind: K.kind, week, year: +sl.span[0].slice(0, 4),
-    name: K.name, blurb: K.blurb, theme: themes[(sl.ord + (gcd(themes.length, WEEKEND_KINDS.length) > 1 ? round : 0)) % themes.length], themeFallback: 'sky',
-    start: sl.span[0], end: sl.span[1], course: picks[0]?.course || 'sky', holes: holes.map(h => h.id),
-    currency: K.currency, scoring: K.scoring, goals: K.goals(pickups(holes)), ladder: { ...WEEKEND_LADDER, seed }, rankRewards: K.rankRewards,
+    name: K.name, blurb: K.blurb, theme: themes[(sl.ord + (gcd(themes.length, kinds.length) > 1 ? round : 0)) % themes.length], themeFallback: 'sky',
+    // events4: a `transform` kind (Mirror Weekend) plays remixes of the picked holes (js/events/remix.js)
+    start: sl.span[0], end: sl.span[1], course: picks[0]?.course || 'sky', holes: holes.map(h => (K.transform ? `${K.transform}-${h.id}` : h.id)),
+    currency: K.currency, scoring: K.scoring, twist: K.twist, goals: K.goals(pickups(holes)), ladder: { ...WEEKEND_LADDER, seed }, rankRewards: K.rankRewards,
   };
   cache.set(key, ev);
   return ev;

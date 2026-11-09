@@ -2,7 +2,9 @@
 // the ladder and final-rank rewards. Event rounds are played through ctx.playEvent.
 // events3: the list is the rolling calendar (yearly runs + weekend events): live now, coming up with
 // dates, recently ended, and any older run that still has a final-rank reward to claim.
-import { status, timeText, startsAt, endsAt, freshProgress, applyRound, goalState, standings, rankReward, eventHoles, overview, featured, nextUp, eventById } from './events.js';
+import { status, timeText, startsAt, endsAt, freshProgress, applyRound, goalState, standings, rankReward, eventHoles, overview, featured, nextUp, eventById, bonusCurrency, rivalsBeaten } from './events.js';
+import { tasterCourse } from './access.js';
+import { battleField } from './rivals.js';
 import { COURSES } from '../course/holes/index.js';
 import { makeLedger } from '../app/store.js';
 import { ICONS } from '../game/hud.js';
@@ -15,6 +17,15 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const back = `<button class="round" data-a="back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>`;
 const swatch = ev => (THEME_LIST.find(t => t.id === (ev.themeWanted || ev.theme)) || THEME_LIST[0]).swatch;
 
+// events4: one line saying what is different about this event's rounds (or '' for none)
+export function twistText(ev) {
+  const t = ev.twist || {}, out = [];
+  if (t.rivals) out.push(`⚔️ ${t.rivals} AI rivals share every hole and ball hits are always on. Knock them out of bounds (+1 to them) and beat them on the card.`);
+  if (t.bonus?.bumper) out.push(`💥 Every bumper bounce pays ${t.bonus.bumper === 1 ? `a ${(ev.currency.one || ev.currency.name).toLowerCase()}` : `${t.bonus.bumper} ${ev.currency.name.toLowerCase()}`} (up to ${t.bumperCap ?? 3} a hole).`);
+  if (t.helpers === 'off') out.push('🚫 No helpers this weekend.');
+  if (ev.holes.some(id => id.startsWith('mir-'))) out.push(ev.holes.every(id => id.startsWith('mir-')) ? '🪞 Every hole is mirrored left to right.' : '🪞 Holes marked (Mirror) are old holes flipped left to right.');
+  return out.join(' ');
+}
 export function rewardHTML(r) {
   if (!r) return '';
   const out = [];
@@ -78,6 +89,8 @@ export function createEvents(ctx) {
     const show = board.filter(r => r.rank <= 5 || Math.abs(r.rank - me.rank) <= 2);
     const tier = rankReward(ev, me.rank);
     const evHoles = eventHoles(ev), holes = evHoles.length, par = evHoles.reduce((a, h) => a + h.par, 0);
+    // events4: holes on courses (or map tiles) the player hasn't opened are tasters (./access.js)
+    const taster = id => tasterCourse(store, id), tasters = evHoles.filter(h => taster(h.id)).length, tw = twistText(ev);
     el.innerHTML = `<div class="career-card wide">
       <div class="map-head">${back}<span class="sw big" style="background:${sw(ev)}"><i>${ev.currency.icon}</i></span>
         <div><div class="map-title">${esc(ev.name)}</div><div class="map-sub">${esc(timeText(ev, now))} · ${esc(fmtRange(ev, now))}</div></div></div>
@@ -85,7 +98,9 @@ export function createEvents(ctx) {
       <div class="ev-stats"><div><span>${esc(ev.currency.name)}</span><b>${ev.currency.icon} ${p.currency}</b></div><div><span>Points</span><b>${p.points}</b></div><div><span>Rank</span><b>${me.rank}/${board.length}</b></div><div><span>Rounds</span><b>${p.rounds}</b></div></div>
       ${st === 'live' ? `<button class="btn primary" data-a="play">Play event round <small>· ${holes} holes, par ${par}</small></button>` : ''}
       ${st === 'upcoming' ? `<div class="card-note">Opens ${esc(new Date(startsAt(ev)).toDateString())}. ${esc(ev.blurb)}</div>` : ''}
-      <div class="ev-holes">${evHoles.map(h => `<span title="${esc(courseName(h.id))}">${esc(h.name)}<i>par ${h.par}</i></span>`).join('')}</div>
+      ${tw ? `<div class="card-note ev-twist">${esc(tw)}</div>` : ''}
+      <div class="ev-holes">${evHoles.map(h => `<span class="${taster(h.id) ? 'taster' : ''}" title="${esc(courseName(h.remixOf || h.id))}">${esc(h.name)}<i>par ${h.par}${taster(h.id) ? ' · taster' : ''}</i></span>`).join('')}</div>
+      ${tasters && st !== 'ended' ? `<div class="card-note small">Taster holes are on courses you haven't opened yet: play them here for the event, but they keep no record and unlock nothing.</div>` : ''}
       ${st === 'ended' ? (p.rankClaimed ? `<div class="card-note">Final rank ${me.rank}. Rewards claimed.</div>`
         : tier && p.rounds > 0 ? `<button class="btn primary" data-a="rank">Claim final rank ${me.rank} reward: ${rewardHTML(tier.reward)}</button>`
         : '<div class="card-note">This event has ended.</div>') : ''}
@@ -121,16 +136,28 @@ export function createEvents(ctx) {
         return;
       }
       if (b.dataset.a === 'play' && status(ev, ctx.now()) === 'live') {
-        el.hidden = true;
         const course = { id: ev.id, name: ev.name, holes: eventHoles(ev) };
+        // events4: Battle Royale — the AI plays the round for the rivals first (seeded by run + round number)
+        let field = null;
+        if (ev.twist?.rivals) {
+          el.innerHTML = `<div class="card career-card"><div class="card-title">The rivals are warming up…</div><div class="boot-spin"></div>
+            <div class="card-note small">Planning their shots on the real course</div></div>`;
+          field = await battleField(ev, course.holes, p.rounds);
+        }
+        el.hidden = true;
         const before = p.currency;
         const ledger = makeLedger(store, p.pickups);
-        const res = await ctx.playEvent(ev, course, { ledger, currency: { icon: ev.currency.icon, name: ev.currency.name } });
+        const res = await ctx.playEvent(ev, course, { ledger, currency: { icon: ev.currency.icon, name: ev.currency.name }, twist: ev.twist || null,
+          ...(field ? { ghosts: field, opponents: field } : {}) });
         if (!res) { page(ev); return; }
-        const newCurrency = ledger.count() - before;
-        const pts = applyRound(p, { total: res.total, par: res.par, aces: res.aces || 0, newCurrency }, ev.scoring);
+        const beaten = field ? rivalsBeaten(res.total, field) : 0, knockouts = res.knockouts | 0;
+        const bonus = bonusCurrency(ev.twist, { bumpers: res.bumpers | 0, knockouts, beaten });
+        const newCurrency = ledger.count() - before + bonus;
+        const pts = applyRound(p, { total: res.total, par: res.par, aces: res.aces || 0, newCurrency, knockouts, beaten, rivals: field?.length || 0 }, ev.scoring);
         store.save();
-        page(ev, `Round done: ${res.total} (par ${res.par}) · +${pts} points · +${newCurrency} ${esc(ev.currency.name.toLowerCase())}`);
+        const extra = [field ? `beat ${beaten}/${field.length} rivals` : '', knockouts ? `${knockouts} knock-out${knockouts > 1 ? 's' : ''}` : '',
+          res.bumpers ? `${res.bumpers} bonk${res.bumpers > 1 ? 's' : ''}` : '', res.tasters ? `${res.tasters} taster hole${res.tasters > 1 ? 's' : ''}` : ''].filter(Boolean);
+        page(ev, `Round done: ${res.total} (par ${res.par}) · +${pts} points · +${newCurrency} ${esc(ev.currency.name.toLowerCase())}${extra.length ? ` · ${esc(extra.join(' · '))}` : ''}`);
       }
     };
   }
