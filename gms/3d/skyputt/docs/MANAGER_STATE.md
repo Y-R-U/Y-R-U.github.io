@@ -104,3 +104,4 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - 2026-11-09: deployed 4c9689d7 (events4 + jungle). Started `polish3` (Cup rival tee-off, bonk farming, online taster rule, star/jungle backdrop variety, update banner check, mirror emoji) and `story7` (World Tour chapter(s) over reef/star/jungle, a Battle-mode rival).
 - 2026-11-09: polish3 committed + deployed (Cup rivals tee off at 1/2/3 s, bonks once per hole per run, online taster note, star/jungle backdrop per-hole placement, update banner layout, mirror icon ✨). Open: Bumper g3 (pickups+10 of 15 bonks) maybe lower to +8. Running: story7.
 - 2026-11-09: story7 committed + deployed (ch7 Grand Tour: Pearl/Nova/Rocco, knock-out lesson w/ Tika, final; tips ≤54 chars, ch1 tips fixed). No agents running.
+- 2026-11-09: storyrows CSS committed + deployed. CHECKPOINT: list done, no agents running; waiting for Aaron's playtest feedback / go-ahead for more content.
