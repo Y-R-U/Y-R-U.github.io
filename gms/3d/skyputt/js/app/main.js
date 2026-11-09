@@ -154,7 +154,7 @@ async function boot() {
     mapCourse = c;
     showMap(store, c, {
       onHole: i => startRound(i, 'single', null, c), onFront: () => startRound(0, 'round', c === course ? 9 : null, c), onNine: nine => startRound(nine.from, 'round', nine.to, c), onBack: showTitle,
-      click: () => sfx.emit('click'), courses: [course, COURSES.festival, COURSES.woods, COURSES.sugar, COURSES.reef, COURSES.star].filter(Boolean), onCourse: c2 => showCourseMap(c2),
+      click: () => sfx.emit('click'), courses: [course, COURSES.festival, COURSES.woods, COURSES.sugar, COURSES.reef, COURSES.star, COURSES.jungle].filter(Boolean), onCourse: c2 => showCourseMap(c2),
     });
   }
   function startRound(i, mode = 'round', end = null, c = course) {
@@ -244,7 +244,7 @@ async function boot() {
   const metaScreens = createMetaScreens({
     store, meta, click: () => sfx.emit('click'), sfx: (n, p) => sfx.emit(n, p),
     onBack: () => showTitle(), playerName: () => store.story().name || 'You',
-    boards: { api: boards, rounds: roundList([course, COURSES.festival, COURSES.woods, COURSES.sugar, COURSES.reef, COURSES.star].filter(Boolean)), wait: () => roundSubmit },
+    boards: { api: boards, rounds: roundList([course, COURSES.festival, COURSES.woods, COURSES.sugar, COURSES.reef, COURSES.star, COURSES.jungle].filter(Boolean)), wait: () => roundSubmit },
   });
   function renderMetaTiles() {
     const L = meta.ladder(), claim = meta.unclaimed().length, chests = store.data.chests.queue.length;

@@ -13,6 +13,7 @@ export const THEME_LIST = [
   { id: 'volcano', name: 'Volcano Forge', swatch: 'linear-gradient(160deg, #2a120c 0%, #ff7a34 55%, #6c7a4a 56%, #3a3634 100%)', moon: '#ff5a1a' },
   { id: 'reef', name: 'Sunken Reef', swatch: 'linear-gradient(160deg, #9ef0f0 0%, #1c88a4 55%, #60a05c 56%, #c8bc8a 100%)', moon: '#7af0e0', dailyFrom: '2026-11-16' },
   { id: 'star', name: 'Star Station', swatch: 'linear-gradient(160deg, #04060e 0%, #3a2a78 55%, #3a8e6a 56%, #c8d2dc 100%)', moon: '#e0b070', dailyFrom: '2026-11-23' },
+  { id: 'jungle', name: 'Jungle Temple', swatch: 'linear-gradient(160deg, #e8dcae 0%, #5e8460 55%, #4e8a3c 56%, #8a8e84 100%)', moon: '#e0b048', dailyFrom: '2026-11-30' },
 ];
 
 export function renderTitle(store, course, themeId, onTheme) {

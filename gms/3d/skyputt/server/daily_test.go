@@ -64,7 +64,7 @@ func TestDailyPicksMatchJS(t *testing.T) {
 	if sets != 1<<len(lockable)-1 {
 		t.Errorf("fixture has %d open sets, want %d", sets, 1<<len(lockable)-1)
 	}
-	// reef and star join the pool only from their dailyFrom
+	// reef, star and jungle join the pool only from their dailyFrom
 	for i := 0; i < fx.Days; i++ {
 		d := addDays(fx.From, i)
 		p := dailyForSet(d, lockable)
@@ -73,6 +73,9 @@ func TestDailyPicksMatchJS(t *testing.T) {
 		}
 		if d < "2026-11-23" && (strings.HasPrefix(p.Hole, "star") || p.Theme == "star") {
 			t.Errorf("%s picked %s / theme %s before star's dailyFrom", d, p.Hole, p.Theme)
+		}
+		if d < "2026-11-30" && (strings.HasPrefix(p.Hole, "jungle") || p.Theme == "jungle") {
+			t.Errorf("%s picked %s / theme %s before jungle's dailyFrom", d, p.Hole, p.Theme)
 		}
 	}
 	if bad > 0 {

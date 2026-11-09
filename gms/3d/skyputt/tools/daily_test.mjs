@@ -72,7 +72,7 @@ console.log('goals');
 
 console.log('locked courses');
 {
-  const locked = freshStore(), open = freshStore({ sky9: true, fest9: true, sugar9: true, reef9: true });   // courses3: Sugar Summit opens on fest9; reef: Sunken Reef on sugar9; star: Star Station on reef9
+  const locked = freshStore(), open = freshStore({ sky9: true, fest9: true, sugar9: true, reef9: true, star9: true });   // courses3: Sugar Summit opens on fest9; reef: Sunken Reef on sugar9; star: Star Station on reef9; jungle: Jungle Temple on star9
   const GATED = new Set(Object.values(COURSES).filter(c => c.lockedBy).map(c => c.id));
   const L = year.map(y => createDaily(locked, () => at(y)).challenge(y)), O = year.map(y => createDaily(open, () => at(y)).challenge(y));
   ok(courseOpen(locked)(COURSES.woods) === false && courseOpen(open)(COURSES.woods) === true && courseOpen(locked)(COURSES.sky), 'Hollow Woods is locked until sky9 is finished');
@@ -95,6 +95,13 @@ console.log('locked courses');
   ok(SF && preStar.length > 0 && preStar.every(y => { const a = dailyFor(y), b = dailyFor(y, { open: noStar }); return a.hole.id === b.hole.id && a.course !== 'star' && a.theme !== 'star'; }),
     `days before ${SF} are unchanged by Star Station (${preStar.length} days: same hole, no star hole or theme)`);
   ok(year.filter(y => y >= SF).some(y => dailyFor(y).course === 'star') && year.filter(y => y >= SF).some(y => dailyFor(y).theme === 'star'), `from ${SF} star holes and the star theme come up`);
+  // jungle: Jungle Temple opens on star9 and joins the daily pool (hole and theme) only from its own dailyFrom
+  ok(courseOpen(freshStore({ reef9: true }))(COURSES.jungle) === false && courseOpen(freshStore({ star9: true }))(COURSES.jungle) === true, 'Jungle Temple is locked until star9 is finished');
+  ok(L.every(x => x.course !== 'jungle') && O.some(x => x.course === 'jungle'), `jungle holes only once it is open (${O.filter(x => x.course === 'jungle').length} days)`);
+  const JF = COURSES.jungle.dailyFrom, preJungle = year.filter(y => y < JF), noJungle = c => c.id !== 'jungle';
+  ok(JF && preJungle.length > 0 && preJungle.every(y => { const a = dailyFor(y), b = dailyFor(y, { open: noJungle }); return a.hole.id === b.hole.id && a.course !== 'jungle' && a.theme !== 'jungle'; }),
+    `days before ${JF} are unchanged by Jungle Temple (${preJungle.length} days: same hole, no jungle hole or theme)`);
+  ok(year.filter(y => y >= JF).some(y => dailyFor(y).course === 'jungle') && year.filter(y => y >= JF).some(y => dailyFor(y).theme === 'jungle'), `from ${JF} jungle holes and the jungle theme come up`);
   const g = year.map(y => dailyFor(y, { open: ALL }));
   ok(O.every((x, i) => x.hole.id === g[i].hole.id), 'all courses open → the same hole as the global pick');
   const notWoods = g.map((x, i) => i).filter(i => !GATED.has(g[i].course));

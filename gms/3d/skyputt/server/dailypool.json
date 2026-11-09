@@ -387,6 +387,60 @@
      "pickups": 3
     }
    ]
+  },
+  {
+   "id": "jungle",
+   "name": "Jungle Temple",
+   "locked": true,
+   "dailyFrom": "2026-11-30",
+   "nines": [],
+   "holes": [
+    {
+     "id": "jungle1",
+     "par": 3,
+     "pickups": 3
+    },
+    {
+     "id": "jungle2",
+     "par": 3,
+     "pickups": 3
+    },
+    {
+     "id": "jungle3",
+     "par": 3,
+     "pickups": 3
+    },
+    {
+     "id": "jungle4",
+     "par": 3,
+     "pickups": 3
+    },
+    {
+     "id": "jungle5",
+     "par": 2,
+     "pickups": 3
+    },
+    {
+     "id": "jungle6",
+     "par": 4,
+     "pickups": 3
+    },
+    {
+     "id": "jungle7",
+     "par": 4,
+     "pickups": 3
+    },
+    {
+     "id": "jungle8",
+     "par": 4,
+     "pickups": 3
+    },
+    {
+     "id": "jungle9",
+     "par": 5,
+     "pickups": 3
+    }
+   ]
   }
  ],
  "themes": [
@@ -412,6 +466,10 @@
   {
    "id": "star",
    "dailyFrom": "2026-11-23"
+  },
+  {
+   "id": "jungle",
+   "dailyFrom": "2026-11-30"
   }
  ]
 }

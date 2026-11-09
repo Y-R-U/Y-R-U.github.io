@@ -64,6 +64,15 @@ import star6 from './star6.js';
 import star7 from './star7.js';
 import star8 from './star8.js';
 import star9 from './star9.js';
+import jungle1 from './jungle1.js';
+import jungle2 from './jungle2.js';
+import jungle3 from './jungle3.js';
+import jungle4 from './jungle4.js';
+import jungle5 from './jungle5.js';
+import jungle6 from './jungle6.js';
+import jungle7 from './jungle7.js';
+import jungle8 from './jungle8.js';
+import jungle9 from './jungle9.js';
 
 export const COURSES = {
   sky: {
@@ -106,6 +115,14 @@ export const COURSES = {
     holes: [star1, star2, star3, star4, star5, star6, star7, star8, star9],
     lockedBy: { hole: 'reef9', course: 'reef', note: 'Finish Sunken Reef to open Star Station.' },
     dailyFrom: '2026-11-23',   // joins the daily pool from this date (js/daily/daily.js)
+  },
+  // jungle: Jungle Temple, a 9-hole lost-ruins course built to look best in Jungle Temple (any theme skins it, D6).
+  // A map tab after Star Station; locked until Star Station is finished (star9, `lockedBy`).
+  jungle: {
+    id: 'jungle', name: 'Jungle Temple', theme: 'jungle',
+    holes: [jungle1, jungle2, jungle3, jungle4, jungle5, jungle6, jungle7, jungle8, jungle9],
+    lockedBy: { hole: 'star9', course: 'star', note: 'Finish Star Station to open Jungle Temple.' },
+    dailyFrom: '2026-11-30',   // joins the daily pool from this date (js/daily/daily.js)
   },
 };
 

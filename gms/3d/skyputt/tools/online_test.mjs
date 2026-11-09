@@ -49,6 +49,8 @@ ok(courseForRoom({ course: 'sky', holes: [{ id: 'nope99', par: 3 }] }) === null,
   ok(rf.map(h => h.id).join() === 'reef7,reef8,reef9' && rc && rc.holes[2] === COURSES.reef.holes[8], 'Sunken Reef: room hole sets and courseForRoom (holes 7-9)');
   const sf = holesFor('star', '3-3'), scr = courseForRoom({ course: 'star', holes: sf.map(h => ({ id: h.id, par: h.par })) });
   ok(sf.map(h => h.id).join() === 'star4,star5,star6' && scr && scr.holes[0] === COURSES.star.holes[3], 'Star Station: room hole sets and courseForRoom (holes 4-6)');
+  const jf = holesFor('jungle', '6-3'), jcr = courseForRoom({ course: 'jungle', holes: jf.map(h => ({ id: h.id, par: h.par })) });
+  ok(jf.map(h => h.id).join() === 'jungle7,jungle8,jungle9' && jcr && jcr.holes[2] === COURSES.jungle.holes[8], 'Jungle Temple: room hole sets and courseForRoom (holes 7-9)');
 }
 const d = defaultOpts({ theme: 'spooky' });
 ok(d.theme === 'spooky' && d.holes.length === 3 && !('holeSet' in wireOpts(d)), 'default opts / wire form');

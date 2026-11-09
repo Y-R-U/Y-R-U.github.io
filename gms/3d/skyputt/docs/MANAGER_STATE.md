@@ -98,3 +98,6 @@ Docs: PLAN.md (full plan + milestones), DECISIONS.md, TEAM_BRIEF.md, THEME_CONTR
 - 2026-11-09: protogate committed (protocol 2; v1 clients get 'reload' text, can't take seats) + deployed.
 - 2026-11-09: 93cec7a1 deployed (health protocol 2/min 2). Started `events4` (Deep Dive + Battle Royale Cup yearly events, 2-3 weekend twists). Running: star, events4.
 - 2026-11-09: star committed + deployed (Star Station theme/STAR music/star1-9 par 30, lockedBy reef9, dailyFrom 2026-11-23, daily pool regenerated). Map-tab wrap CSS added by me. Running: events4.
+- 2026-11-09: b3f6c559 deployed (star). Started `jungle` (Jungle Temple theme+music+jungle1-9, lockedBy star9, dailyFrom 2026-11-30). Running: events4, jungle.
+- 2026-11-09: both agents hit the 5h rate limit; resumed after Aaron's 'continue'. Aaron: events may use locked-course holes as a one-off taster (no unlock).
+- 2026-11-09: events4 + jungle committed and deployed (Deep Dive, Battle Royale Cup, Bumper Bash/Mirror/Pure Putt weekends, taster rule incl. daily; Jungle Temple par 31, lockedBy star9, dailyFrom 2026-11-30). No agents running.

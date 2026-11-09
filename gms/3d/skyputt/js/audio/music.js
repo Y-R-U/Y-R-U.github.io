@@ -1,6 +1,7 @@
 // SKYPUTT audio — generative ambient music. One player per theme: `sky` (launch), `spooky`
 // (Spooky Hollow), `frost` (Frost Fair), `candy` (Candy Land, a 3/4 waltz), `volcano` (Volcano Forge,
-// slow drums and anvils), `reef` (Sunken Reef, calm and watery) and `star` (Star Station, spacey synth pads + arpeggio). Themes differ in harmony, pad type, plucked/struck
+// slow drums and anvils), `reef` (Sunken Reef, calm and watery) and `star` (Star Station, spacey synth pads + arpeggio)
+// and `jungle` (Jungle Temple, marimba + kalimba over soft hand drums, bird calls). Themes differ in harmony, pad type, plucked/struck
 // voices and occasional "extras" (theremin, owl, sleigh bells, fire crackle).
 // Nothing loops verbatim: chords walk a Markov graph, the key drifts between three centres,
 // arpeggio phrases (up / down / wander / sparse / bells / rest) are picked by a slowly
@@ -203,7 +204,37 @@ const STAR = {
   seq: { gain: 0.02, cut: 1400 },
   extras: [['sweep', 0.22], ['ping', 0.3], ['comms', 0.18]],
 };
-export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST, candy: CANDY, volcano: VOLCANO, reef: REEF, star: STAR };
+// "Temple Canopy" (Jungle Temple): calm and warm, G major pentatonic with 6/9, maj9 and a Mixolydian bVII.
+// Soft strings low under the canopy, a wooden marimba (FM, ratio 4, fast-falling index) and a kalimba
+// (inharmonic FM ratio) trading the arpeggio through a ping-pong delay, over a quiet hand-drum groove (a
+// low "dum" on 1, finger "teks", bars that rest now and then). Extras: bird calls (chirp runs), a turaco's
+// soft coo and a rainstick shower. CPU: one sine + one short noise burst per drum hit.
+const JUNGLE = {
+  id: 'jungle', bpm: 70, meter: 4, chordBars: [2, 2, 4],
+  keys: [0, 0, 0, 2, -2],                          // G major home, A major and F major excursions
+  start: 'I',
+  chords: {
+    I:    { pad: [55, 59, 62, 64], root: 43, arp: [67, 69, 71, 74, 76, 79, 81, 83], next: ['IV', 'vi', 'ii', 'Vsus', 'bVII'] },
+    IV:   { pad: [52, 55, 60, 62], root: 48, arp: [64, 67, 69, 71, 74, 76, 79], next: ['I', 'vi', 'Vsus', 'ii'] },
+    vi:   { pad: [52, 55, 59, 62], root: 40, arp: [64, 66, 67, 71, 74, 76, 79, 83], next: ['IV', 'ii', 'I'] },
+    ii:   { pad: [57, 60, 64, 67], root: 45, arp: [64, 67, 69, 72, 74, 76, 79, 81], next: ['Vsus', 'IV', 'vi'] },
+    Vsus: { pad: [55, 57, 60, 62], root: 38, arp: [62, 64, 67, 69, 72, 74, 79], next: ['I', 'vi', 'bVII'] },
+    bVII: { pad: [53, 57, 60, 67], root: 41, arp: [65, 67, 69, 72, 74, 77, 79], next: ['I', 'IV'] },
+  },
+  level: { pad: 0.027, root: 0.032, air: 0.009 },
+  pad: { type: 'strings', cut: 680, lfo: 280, att: 3.4, rel: 5 },
+  air: { f: 2600, q: 0.7, lfo: 900 },               // a faint high hiss: distant insects
+  delaySend: 0.3,
+  voices: {
+    marimba: { kind: 'fm', ratio: 4, index: 0.55, dur: 1.1, oct: -12, gain: 0.09 },
+    kalimba: { kind: 'fm', ratio: 5.4, index: 0.4, dur: 1.6, oct: 0, gain: 0.055 },
+    kbell: { kind: 'fm', ratio: 5.4, index: 0.3, dur: 2.2, oct: 12, gain: 0.02 },
+  },
+  mains: ['marimba', 'marimba', 'kalimba'], bellVoice: 'kbell', leadStep: 2,
+  hands: { dum: 0.08, tek: 0.018 },
+  extras: [['birdcall', 0.45], ['coo', 0.2], ['rainstick', 0.14]],
+};
+export const THEMES = { sky: SKY, spooky: SPOOKY, frost: FROST, candy: CANDY, volcano: VOLCANO, reef: REEF, star: STAR, jungle: JUNGLE };
 
 // Karplus-Strong pluck, rendered once per base note (multiples of 3 semitones) and repitched.
 // short = pizzicato: darker excitation, fast decay.
@@ -391,6 +422,7 @@ class Player {
     if (th.waltz) this.waltzStep(t0 + rnd(-0.004, 0.006), n, c);
     if (th.forge) this.forgeStep(t0 + rnd(-0.004, 0.006), n);
     if (th.seq) this.seqStep(t0 + rnd(-0.003, 0.004), n, c);
+    if (th.hands) this.handStep(t0 + rnd(-0.006, 0.008), n);
     const t = t0 + (n % 2 ? this.step * 0.08 : 0) + rnd(-0.008, 0.012);
     let play = false, inst = ph.inst, oct = 0;
     switch (ph.type) {
@@ -654,6 +686,69 @@ class Player {
       o.connect(g); g.connect(dest); o.start(tt); o.stop(tt + d + 0.02); this.keep(o);
       tt += d + rnd(0.05, 0.12);
     }
+  }
+
+  // jungle hand drums (4/4, eighth-note steps): a soft low "dum" on 1 (and sometimes on 3), finger "teks"
+  // on the off-beats, a ghost tek now and then; some bars rest so the groove breathes
+  handStep(t, n) {
+    const H = this.th.hands, pos = n % 8;
+    if (pos === 0) this.handRest = Math.random() < 0.22;
+    if (this.handRest) return;
+    if (pos === 0) this.hand(t, H.dum * rnd(0.85, 1), 'dum');
+    else if (pos === 4 && Math.random() < 0.45) this.hand(t, H.dum * 0.6, 'dum');
+    else if ((pos === 3 || pos === 6) && Math.random() < 0.8) this.hand(t, H.tek * rnd(0.7, 1), 'tek');
+    else if (Math.random() < 0.12) this.hand(t, H.tek * 0.45, 'tek');
+  }
+
+  hand(t, gain, kind) {
+    const ctx = this.ctx, dest = this.panned(this.bus('near'), kind === 'dum' ? -0.15 : 0.25);
+    if (kind === 'dum') {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(72, t + 0.12);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+      o.connect(g); g.connect(dest); o.start(t); o.stop(t + 0.45); this.keep(o);
+    }
+    const nz = ctx.createBufferSource(), f = ctx.createBiquadFilter(), ng = ctx.createGain(), d = kind === 'dum' ? 0.06 : 0.045;
+    nz.buffer = noiseBuffer(ctx, 'white'); f.type = 'bandpass'; f.frequency.value = kind === 'dum' ? 700 : 2800; f.Q.value = 1.2;
+    ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(kind === 'dum' ? gain * 0.35 : gain, t + 0.002);
+    ng.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    nz.connect(f); f.connect(ng); ng.connect(dest); nz.start(t, Math.random()); nz.stop(t + d + 0.02); this.keep(nz);
+  }
+
+  // a bird call: a run of 2-5 quick rising chirps high above a chord tone, far away
+  birdcall(t, ch, key) {
+    const ctx = this.ctx, dest = this.panned(this.bus('far'), rnd(-0.8, 0.8)), n = 2 + ((Math.random() * 4) | 0);
+    const f0 = mtof(pick(ch.arp) + key + 24), up = Math.random() < 0.7;
+    let tt = t;
+    for (let i = 0; i < n; i++) {
+      const o = ctx.createOscillator(), g = ctx.createGain(), d = rnd(0.06, 0.11), f = f0 * (1 + (i % 2) * 0.12);
+      o.frequency.setValueAtTime(up ? f * 0.82 : f * 1.15, tt); o.frequency.exponentialRampToValueAtTime(up ? f * 1.12 : f * 0.86, tt + d);
+      g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.01, tt + 0.01); g.gain.linearRampToValueAtTime(0, tt + d);
+      o.connect(g); g.connect(dest); o.start(tt); o.stop(tt + d + 0.02); this.keep(o);
+      tt += d + rnd(0.04, 0.1);
+    }
+  }
+
+  // a turaco's soft coo: "hoo HOO hoo", a low filtered triangle
+  coo(t) {
+    const ctx = this.ctx, dest = this.panned(this.bus('far'), pick([-0.7, 0.7]) * rnd(0.5, 1)), f0 = rnd(420, 520);
+    for (const [dt, len, k] of [[0, 0.22, 1], [0.32, 0.34, 1.12], [0.78, 0.26, 0.96]]) {
+      const tt = t + dt, o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+      o.type = 'triangle'; o.frequency.setValueAtTime(f0 * k, tt); o.frequency.linearRampToValueAtTime(f0 * k * 0.94, tt + len);
+      lp.type = 'lowpass'; lp.frequency.value = 900;
+      g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.016, tt + 0.05); g.gain.linearRampToValueAtTime(0, tt + len);
+      o.connect(lp); lp.connect(g); g.connect(dest); o.start(tt); o.stop(tt + len + 0.03); this.keep(o);
+    }
+  }
+
+  // a rainstick: one high band-passed noise shower that thins out over ~2 s
+  rainstick(t) {
+    const ctx = this.ctx, n = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(), d = rnd(1.6, 2.4);
+    n.buffer = noiseBuffer(ctx, 'white'); n.loop = true; f.type = 'bandpass'; f.Q.value = 3;
+    f.frequency.setValueAtTime(5200, t); f.frequency.exponentialRampToValueAtTime(2600, t + d);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.012, t + 0.25); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    n.connect(f); f.connect(g); g.connect(this.panned(this.bus('far'), rnd(-0.5, 0.5))); n.start(t, Math.random()); n.stop(t + d + 0.05); this.keep(n);
   }
 
   // ---- extras --------------------------------------------------------------------------------
