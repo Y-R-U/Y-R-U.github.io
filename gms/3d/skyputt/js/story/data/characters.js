@@ -30,6 +30,23 @@ export const CHARACTERS = {
     name: 'Sunny Vale', role: 'Tour announcer',
     portrait: { skin: '#e8b890', hair: 'cap', hairColor: '#8a4a20', outfit: '#e8463a', accent: '#ffffff', mood: 'happy' },
   },
+  // story7: the Grand Tour (Sunken Reef → Star Station → Jungle Temple)
+  pearl: {
+    name: 'Pearl Marlowe', role: 'Sunken Reef champion · free-diver, never in a hurry',
+    portrait: { skin: '#8a5a3c', hair: 'long', hairColor: '#1f3f4a', outfit: '#1f8a8a', accent: '#f4efe0', mood: 'wry' },
+  },
+  nova: {
+    name: 'Commander Nova Reyes', role: 'Star Station · flight engineer, calculates every putt',
+    portrait: { skin: '#e2b48c', hair: 'short', hairColor: '#2a2230', outfit: '#3a2a78', accent: '#e0b070', visor: '#8fd0ff', mood: 'smug' },
+  },
+  rocco: {
+    name: 'Rocco Thorn', role: 'Jungle Temple · loves a ball fight',
+    portrait: { skin: '#b07a50', hair: 'spiky', hairColor: '#3a2a14', outfit: '#3f7a2a', accent: '#ffcf6a', beard: true, mood: 'happy' },
+  },
+  tika: {
+    name: 'Tika Thorn', role: 'Temple guide · Rocco’s little sister',
+    portrait: { skin: '#b07a50', hair: 'bun', hairColor: '#3a2a14', outfit: '#c8a040', accent: '#3f7a2a', mood: 'happy' },
+  },
   you: {
     name: 'You', role: '',
     portrait: { skin: '#c98e6a', hair: 'cap', hairColor: '#3a2a1c', outfit: '#3b6fd6', accent: '#ffffff', mood: 'happy' },

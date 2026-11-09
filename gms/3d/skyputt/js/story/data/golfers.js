@@ -69,4 +69,26 @@ export const GOLFERS = {
   lou_legend:  { name: 'Lucky Lou',      personality: 'lucky',   skill: 0.68, colour: '#c58cff', who: 'lou' },
   carl_legend: { name: 'Careful Carl',   personality: 'careful', skill: 0.66, colour: '#c9d36a', who: 'carl' },
   ada:         { name: 'Ada Quill',      personality: 'pro',     skill: 0.78, colour: '#ffe08a' },
+
+  // ---- ch7 Grand Tour (story7). Skill numbers are NOT comparable with chapters 1-6: the AI plays the
+  // reef / star / jungle holes much better per skill point than the sky holes (story_test --difficulty:
+  // the field at the Legends' 0.78 mean needed -6.5 to make the podium, a Pearl at 0.78 needed -1.9).
+  // Tuned by measured difficulty instead (docs/notes/story7.md): rival need-to-win ≈ +1.0 / +0.2 / +1.0
+  // vs par, the Final ≈ +0.1 (Legends Cup +1.3). Rivals still rise stop by stop; D14: all ≤ 0.9.
+  pearl:       { name: 'Pearl Marlowe',  personality: 'careful', skill: 0.45, colour: '#5fe0d0', who: 'pearl' },
+  nova:        { name: 'Nova Reyes',     personality: 'professor', skill: 0.5, colour: '#b9a0ff', who: 'nova' },
+  rocco:       { name: 'Rocco Thorn',    personality: 'power',   skill: 0.88, colour: '#8fd24a', who: 'rocco' },   // power: erratic, needs the high number
+  // the sparring ball in the knock-out lesson: only her first shot is used (it parks on the bridge)
+  tika:        { name: 'Tika Thorn',     personality: 'professor', skill: 0.3, colour: '#ffd060', who: 'tika' },
+  rocco_gt:    { name: 'Rocco Thorn',    personality: 'power',   skill: 0.54, colour: '#8fd24a', who: 'rocco' },
+  nova_gt:     { name: 'Nova Reyes',     personality: 'professor', skill: 0.52, colour: '#b9a0ff', who: 'nova' },
+  pro_gt:      { name: 'Sterling Vance', personality: 'pro',     skill: 0.52, colour: '#f2c75c', who: 'pro' },
+  pearl_gt:    { name: 'Pearl Marlowe',  personality: 'careful', skill: 0.50, colour: '#5fe0d0', who: 'pearl' },
+  ada_gt:      { name: 'Ada Quill',      personality: 'pro',     skill: 0.50, colour: '#ffe08a' },
+  prof_gt:     { name: 'The Professor',  personality: 'professor', skill: 0.48, colour: '#4fd6d6' },
+  kenji:       { name: 'Kenji Sato',     personality: 'pro',     skill: 0.48, colour: '#a0e0ff' },
+  bertha_gt:   { name: 'Big Bertha',     personality: 'power',   skill: 0.46, colour: '#ff7a6b', who: 'bertha' },
+  banks_gt:    { name: 'Remy Banks',     personality: 'banks',   skill: 0.46, colour: '#7fd1ff', who: 'banks' },
+  zoe_gt:      { name: 'Zippy Zoe',      personality: 'zoe',     skill: 0.44, colour: '#ff6fc8' },
+  marisol:     { name: 'Marisol Vega',   personality: 'lucky',   skill: 0.44, colour: '#ff9fb0' },
 };

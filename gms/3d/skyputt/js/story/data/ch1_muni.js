@@ -38,7 +38,7 @@ export default {
         ['mags', 'Stack up to three for an even longer look. They don’t grow on trees, mind.'],
       ],
       after: [['mags', 'See how much easier it is when you know where it’s going? Use them wisely.']],
-      tips: ['Tap Long Sight (the arrow, top of the helper column) before you aim'],
+      tips: ['Tap Long Sight (top of the helper column) to aim'],
       reward: { coins: 25, helpers: { longSight: 1 } },
     },
     {
@@ -51,7 +51,7 @@ export default {
         ['mags', 'Try one on this loop. Go on, mess one up on purpose. I won’t tell.'],
       ],
       after: [['mags', "That's the spirit. Now let's see you play a proper round."]],
-      tips: ['Hit a shot, then tap Mulligan (the undo arrow, second in the helper column)'],
+      tips: ['Putt, then tap Mulligan (2nd in the helper column)'],
       reward: { coins: 25, helpers: { mulligan: 1 } },
     },
     {

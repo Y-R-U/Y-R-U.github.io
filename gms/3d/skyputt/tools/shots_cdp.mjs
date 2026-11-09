@@ -17,7 +17,8 @@
 //   node tools/shots_cdp.mjs events4 [--out=DIR] [--only=lists,deep,cup,bumper,mirror,pure]   events4: lists, and a round of
 //        Deep Dive, the Battle Royale Cup (+ a scripted knock), Bumper Bash, Mirror Weekend and Pure Putt from fresh saves
 //   node tools/shots_cdp.mjs nines [--out=DIR]   story2: map nine tabs, back nine lock, Play back nine, scorecard
-//   node tools/shots_cdp.mjs career [--out=DIR] [--chapter=2]   story2: chapter 2-6 screens (tour map, intro, a lesson, rival + tournament setup)
+//   node tools/shots_cdp.mjs career [--out=DIR] [--chapter=2]   story2: chapter 2-7 screens (tour map, intro, a lesson, rival + tournament setup)
+//        story7: --chapter=7 (Grand Tour) · --classic (Ball hits: Classic) · events marked passed also finish their holes
 // Reports console errors / exceptions and exits 1 if there are any.
 import { writeFileSync, mkdirSync } from 'node:fs';
 
@@ -380,12 +381,16 @@ async function careerMode(c) {
   await c.eval(`document.querySelector('#t-career').click()`); await sleep(400);
   await c.eval(`(() => { document.querySelector('#c-name').value = 'Robin'; document.querySelector('#career [data-a=ok]').click(); })()`);
   await sleep(400); await tapDialogue(c);
-  const data = await c.eval(`import('./js/story/data/chapters.js').then(m => m.CHAPTERS.map(ch => ({ id: ch.id, theme: ch.data.theme || null, events: ch.data.events.map(e => ({ id: e.id, kind: e.kind, use: e.goal.use || null, theme: e.theme || null })) })))`);
+  const data = await c.eval(`import('./js/story/data/chapters.js').then(m => m.CHAPTERS.map(ch => ({ id: ch.id, theme: ch.data.theme || null, events: ch.data.events.map(e => ({ id: e.id, kind: e.kind, use: e.goal.use || null, theme: e.theme || null, holes: e.holes })) })))`);
   const ch = data[K];
   const only = args.only ? String(args.only).split(',') : null;
   await c.eval(`(() => { const st = __skyputt.store.story(), D = ${JSON.stringify(data)};
-    for (let k = 0; k < ${K}; k++) { for (const e of D[k].events) if (!${!!args.open} || e.kind === 'rival' || k < ${K - 1}) st.events[e.id] = { passed: true, best: 9 }; if (!${!!args.open} || k < ${K - 1}) st.chapters[D[k].id] = { done: true }; }
-    ${only ? `for (const e of D[${K}].events) if (!${JSON.stringify(only)}.includes(e.id)) st.events[e.id] = { passed: true, best: 9 };` : ''}
+    // story7: an event marked passed also marks its holes finished, as playing it would (course locks)
+    const pass = e => { st.events[e.id] = { passed: true, best: 9 }; for (const h of e.holes) __skyputt.store.data.unlocked[h] = true; };
+    for (let k = 0; k < ${K}; k++) { for (const e of D[k].events) if (!${!!args.open} || e.kind === 'rival' || k < ${K - 1}) pass(e); if (!${!!args.open} || k < ${K - 1}) st.chapters[D[k].id] = { done: true }; }
+    ${only ? `for (const e of D[${K}].events) if (!${JSON.stringify(only)}.includes(e.id)) pass(e);` : ''}
+    ${args.classic ? "__skyputt.store.setSetting('ballHit', false);" : ''}
+    __skyputt.store.save();
     __skyputt.store.saveStory(); __skyputt.career.render(); })()`);
   await sleep(500);
   await shot(c, `career${K + 1}-map`);
@@ -440,7 +445,7 @@ async function careerMode(c) {
     if (quit) {   // quick look: count it as passed so the next event opens
       console.log(`   ${next}: first hole ${log.join(', ')} (quit, theme ${theme})`);
       await waitFor(c, '!document.querySelector("#career").hidden', 20000).catch(() => {}); await sleep(400);
-      await c.eval(`(() => { __skyputt.store.story().events['${next}'] = { passed: true, best: 9 }; __skyputt.store.saveStory(); __skyputt.career.render(); })()`); await sleep(300);
+      await c.eval(`(() => { __skyputt.store.story().events['${next}'] = { passed: true, best: 9 }; for (const h of ${JSON.stringify(ev.holes)}) __skyputt.store.markFinished(h); __skyputt.store.saveStory(); __skyputt.career.render(); })()`); await sleep(300);
       continue;
     }
     await sleep(600);

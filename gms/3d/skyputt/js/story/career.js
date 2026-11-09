@@ -31,13 +31,36 @@ export function rankOf(story) {
 }
 export function eventOpen(story, chapter, i) { return i === 0 || !!story.events[chapter.events[i - 1].id]?.passed; }
 // story2: the next tour opens once the previous tour's rival is beaten (or the tour is done).
-export const rivalOf = data => data?.events.find(e => e.kind === 'rival') || null;
+// story7: a tour may have several rivals (the Grand Tour has one per stop); the LAST one is the gate.
+export const rivalOf = data => data?.events.filter(e => e.kind === 'rival').pop() || null;
 export function chapterOpen(story, k) {
   if (k === 0) return true;
   const prev = CHAPTERS[k - 1];
   if (!prev.data || !CHAPTERS[k].data) return false;
   return !!story.chapters?.[prev.id]?.done || !!story.events[rivalOf(prev.data)?.id]?.passed;
 }
+// story7: course locks. A story event plays a hole only once its course is open (`lockedBy` gate hole
+// finished), counting holes played earlier in the same event (the qualifier plays fest9 then sugar9).
+// The story opens courses by playing their gate hole, as ch4 always has (sky9 → Hollow Woods).
+// → the first closed course (its `lockedBy.note` says how to open it), or null.
+const COURSE_OF = id => Object.values(COURSES).find(c => c.holes.some(h => h.id === id)) || null;
+export function courseLock(unlocked, ev) {
+  const done = { ...(unlocked || {}) };
+  for (const id of ev.holes) {
+    const c = COURSE_OF(id);
+    if (c?.lockedBy && !done[c.lockedBy.hole]) return c;
+    done[id] = true;
+  }
+  return null;
+}
+// Courses still gated in this save (to say "Star Station is open" after the event that opened it).
+export const gatedCourses = unlocked => Object.values(COURSES).filter(c => c.lockedBy && !unlocked?.[c.lockedBy.hole]).map(c => c.id);
+// story7: Battle (ball hits) vs Classic, from the player's setting (default Battle; notes/ballhit.md).
+export const battleOn = store => store.settings?.()?.ballHit !== false;
+export const modeName = on => (on ? 'Battle' : 'Classic');
+// A ball of the golfer knocked out of bounds during the round (play.js hole note "<name>: knocked out +1").
+export const knockedOut = (res, name) => !!res.rows?.some(r => r.notes?.some(n => n.startsWith(name + ': knocked out')));
+
 // The chapter to point the player at: the last open one that isn't finished (else the last open one).
 export function currentChapter(story) {
   let cur = 0;
@@ -176,9 +199,10 @@ export function createCareer(ctx) {
   }
 
   function eventRow(st, ch, ev, i) {
-    const open = eventOpen(st, ch, i), rec = st.events[ev.id];
+    const prevOk = eventOpen(st, ch, i), gate = prevOk ? courseLock(store.data.unlocked, ev) : null;
+    const open = prevOk && !gate, rec = st.events[ev.id];
     const state = rec?.passed ? 'passed' : open ? 'open' : 'locked';
-    const best = rec?.best ? ` · best ${rec.best}` : '';
+    const best = (rec?.best ? ` · best ${rec.best}` : '') + (ev.battle ? ` · ${modeName(battleOn(store))}` : '') + (gate ? ` · ${gate.lockedBy.note || gate.name + ' is locked'}` : '');
     return `<button class="ev ${state}" data-ch="${ch.id}" data-ev="${ev.id}" ${open ? '' : 'disabled'}>
       <span class="ev-ic">${rec?.passed ? '✓' : open ? KIND_ICON[ev.kind] : '🔒'}</span>
       <span class="ev-main"><b>${esc(ev.name)}</b><small>${esc(KIND[ev.kind])} · ${esc(ev.goalText)}${best}</small></span>
@@ -188,7 +212,8 @@ export function createCareer(ctx) {
   async function runEvent(ch, ev) {
     const st = story();
     const name = st.name;
-    await playDialogue(ev.before, { name });
+    const battle = battleOn(store);   // story7: events with `battle` say which mode is on
+    await playDialogue([...(ev.before || []), ...(ev.battle ? ev.battle[battle ? 'on' : 'off'] || [] : [])], { name });
     // lesson grants (once)
     if (ev.grant && !st.seen[ev.id + ':grant']) {
       for (const [k, n] of Object.entries(ev.grant)) store.giveHelper(k, n);
@@ -198,15 +223,25 @@ export function createCareer(ctx) {
     // courses2: an event may name holes from another course (Hollow Masters plays Hollow Woods)
     const holes = ev.holes.map(id => course.holes.find(h => h.id === id) || Object.values(COURSES).flatMap(c => c.holes).find(h => h.id === id));
     const seed = (Date.now() / 1000) | 0;
-    let field = null;
+    let field = null, ghosts = null;
     if (ev.kind === 'rival' || ev.kind === 'tournament') {
-      warming(ev.kind === 'rival' ? `${GOLFERS[ev.rival].name} is warming up…` : 'The field is warming up…');
+      warming(ev.kind === 'rival' ? `${GOLFERS[ev.rival].name} is warming up…` : 'The field is warming up…', ev.battle ? `Ball hits: ${modeName(battle)}` : '');
       const golfers = ev.kind === 'rival' ? [ev.rival] : ev.field;
       field = await playField(golfers.map(id => ({ id, ...GOLFERS[id] })), holes, seed);
       $('#career').hidden = true;
+      if (ev.kind === 'rival') ghosts = field.filter(f => f.shots?.some(x => x?.length));
+    } else if (ev.sparring) {
+      // story7: a lesson with a ball to knock — the golfer's first `park` shots on a fixed seed, so the ball
+      // stops in the same place every try (no score, no board: it is only there to be hit)
+      const g = ev.sparring;
+      warming(`${GOLFERS[g.golfer].name} is teeing up…`, `Ball hits: ${modeName(battle)}`);
+      const f = await playField([{ id: g.golfer, ...GOLFERS[g.golfer] }], holes, g.seed);
+      $('#career').hidden = true;
+      ghosts = f.map(x => ({ ...x, shots: x.shots.map(s => s?.slice(0, g.park || 1) || null) })).filter(x => x.shots.some(s => s?.length));
     }
-    const ghosts = ev.kind === 'rival' ? field.filter(f => f.shots?.some(x => x?.length)) : null;
-    const res = await ctx.startEvent(ev, { id: ev.id, name: ev.name, holes }, { opponents: field, tips: ev.tips, ghosts, theme: ev.theme || ch.theme || null });
+    const tips = ev.tipsClassic && !battle ? ev.tipsClassic : ev.tips;
+    const gatedBefore = gatedCourses(store.data.unlocked);
+    const res = await ctx.startEvent(ev, { id: ev.id, name: ev.name, holes }, { opponents: field, tips, ghosts, theme: ev.theme || ch.theme || null });
     if (!res) { render(); return; }   // quit
     const check = checkGoal(ev, res, field);
     const rec = st.events[ev.id] || {};
@@ -223,8 +258,11 @@ export function createCareer(ctx) {
       st.chapters[ch.id] = { done: true }; chapterDone = true;
     }
     store.saveStory();
-    await resultCard(ev, res, check, field, first, cosmetic);
-    const afterLines = check.aceUse ? [['mags', `A hole in one! No ${helperName(ev.goal.use)} needed — that counts. You'll find a use for it later.`], ...(ev.after || [])] : ev.after;
+    // story7: courses this event opened (its gate hole was played), named on the result card
+    const opened = gatedBefore.filter(id => !gatedCourses(store.data.unlocked).includes(id)).map(id => COURSES[id].name);
+    await resultCard(ev, res, check, field, first, cosmetic, { opened, gate: rivalOf(ch) === ev, mode: ev.battle ? modeName(battle) : null });
+    const knock = ev.afterKnock && ev.sparring && knockedOut(res, GOLFERS[ev.sparring.golfer].name);
+    const afterLines = check.aceUse ? [['mags', `A hole in one! No ${helperName(ev.goal.use)} needed — that counts. You'll find a use for it later.`], ...(ev.after || [])] : knock ? [...ev.afterKnock, ...(ev.after || [])] : ev.after;
     const loseLines = ev.lose || (ev.goal?.use && !res.used?.[ev.goal.use]
       ? [['mags', `Close! This lesson is about the ${helperName(ev.goal.use)}: ${HOW_TO_USE[ev.goal.use] || `tap ${helperName(ev.goal.use)} in the helper column before a shot`}.`]]
       : [['mags', 'Not this time. Have another go when you’re ready.']]);
@@ -233,14 +271,14 @@ export function createCareer(ctx) {
     render();
   }
 
-  function warming(text) {
+  function warming(text, note = '') {
     const el = $('#career');
     el.innerHTML = `<div class="card career-card"><div class="card-title">${esc(text)}</div><div class="boot-spin"></div>
-      <div class="card-note small">Planning shots on the real course</div></div>`;
+      <div class="card-note small">Planning shots on the real course${note ? ` · ${esc(note)}` : ''}</div></div>`;
     el.hidden = false;
   }
 
-  function resultCard(ev, res, check, field, first, cosmetic) {
+  function resultCard(ev, res, check, field, first, cosmetic, { opened = [], gate = true, mode = null } = {}) {
     return new Promise(resolve => {
       const el = $('#career');
       const board = field ? leaderboard(res, field) : null;
@@ -252,7 +290,9 @@ export function createCareer(ctx) {
         <div class="card-stats"><div><span>Strokes</span><b>${res.total}</b></div><div><span>Par</span><b>${res.par}</b></div><div><span>Stars</span><b>${res.stars}</b></div></div>
         ${board ? `<table class="scores board">${board.map((r, i) => `<tr class="${r.you ? 'you' : ''}"><td>${i + 1}</td><td>${r.colour ? `<i class="dot" style="background:${r.colour}"></i>` : ''}${esc(r.name)}</td><td>${r.total}</td></tr>`).join('')}</table>` : ''}
         ${first && ev.reward ? `<div class="card-note good">Reward: ${rewardText(ev.reward, true)}${cosmetic ? ` · ${cosmetic.coins ? `${esc(cosmetic.name)} (owned: +${cosmetic.coins} coins)` : `new ${cosmetic.key.startsWith('ball') ? 'ball' : 'trail'}: ${esc(cosmetic.name)}`}` : ''}</div>` : ''}
-        ${check.passed && first && ev.kind === 'rival' && nextTourName(ch0Of(ev)) ? `<div class="card-note good">${esc(nextTourName(ch0Of(ev)))} unlocked!</div>` : ''}
+        ${check.passed && first && ev.kind === 'rival' && gate && nextTourName(ch0Of(ev)) ? `<div class="card-note good">${esc(nextTourName(ch0Of(ev)))} unlocked!</div>` : ''}
+        ${opened.map(n => `<div class="card-note good">${esc(n)} is open on the course map!</div>`).join('')}
+        ${mode ? `<div class="card-note small">Ball hits: ${esc(mode)}${mode === 'Classic' ? ' (change it in Settings)' : ''}</div>` : ''}
         <button class="btn primary" data-a="ok">${check.passed ? 'Continue' : 'Back to career'}</button></div>`;
       el.hidden = false;
       el.onclick = e => { if (e.target.closest('[data-a=ok]')) { ctx.click?.(); el.hidden = true; resolve(); } };
@@ -278,10 +318,10 @@ export function createCareer(ctx) {
     if (!next) return ch.done || [['mags', 'Nothing left to teach you, {name}. Go and enjoy it.']];
     const rival = rivalOf(ch);
     const hint = next.kind === 'lesson' ? 'Take your time. Lessons are free.'
-      : next.kind === 'rival' ? `${GOLFERS[next.rival]?.name || 'Your rival'} is the one to beat. Win and the next tour opens.`
+      : next.kind === 'rival' ? next.tip || `${GOLFERS[next.rival]?.name || 'Your rival'} is the one to beat. Win and the next tour opens.`
       : ch.tip || 'Remember: Long Sight before the tricky ones, Mulligan when it goes wrong.';
     const lines = [['mags', `Next up: ${next.name}. ${next.goalText}.`], ['mags', hint]];
-    if (rival && st.events[rival.id]?.passed && next.kind === 'tournament') lines.push(['mags', 'You can head on to the next tour any time, but there’s a trophy here with your name on it.']);
+    if (rival && st.events[rival.id]?.passed && next.kind === 'tournament' && CHAPTERS[currentChapter(st) + 1]?.data) lines.push(['mags', 'You can head on to the next tour any time, but there’s a trophy here with your name on it.']);
     return lines;
   }
 

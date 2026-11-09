@@ -23,7 +23,7 @@ export default {
         ['mags', "No new tricks today. Par, and I'll say you're ready."],
       ],
       after: [['mags', "Ready. Don't let it go to your head."]],
-      tips: ['Everything at once: time the windmill, commit to the loop'],
+      tips: ['Time the windmill, then commit to the loop'],
       reward: { coins: 80 },
     },
     {
