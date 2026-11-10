@@ -1,12 +1,12 @@
 # TASKS — the task grid (D34)
 
 Aaron: "a nice easy to follow task list … a nice grid of tasks to tick off … sets could give additional rewards and some
-tasks might be hard to do, including flight time tasks". 171 tasks in 18 sets. Tasks never gate ranks or planes.
+tasks might be hard to do, including flight time tasks". 182 tasks in 19 sets. Tasks never gate ranks or planes.
 
 ## Files
 | file | what |
 |---|---|
-| `data/tasks.js` | every set and task, the counters (`STATS` lifetime, `FSTATS` per flight), landmark geometry (`PLACES`), story mirror (`STORY`), tier PP |
+| `data/tasks.js` | every set and task, the counters (`STATS` lifetime, `FSTATS` per flight, `SSTATS` per sitting), landmark geometry (`PLACES`), story mirror (`STORY`), tier PP |
 | `js/game/tasks.js` | pure engine (no DOM, no clock) + the live adapter (`attach` / `sample` / `story`); `getTasks()` shared instance |
 | `js/ui/tasks.js` | menu button, grid popup, pause-screen link, in-flight tick toast, set-complete card, pilot-card medal |
 | `css/tasks.css` | grid styling on the `css/ui.css` variables |
@@ -30,7 +30,7 @@ tasks might be hard to do, including flight time tasks". 171 tasks in 18 sets. T
 - A finished set pays `max(1000, 60 % of its tasks' PP)` once, plus a cosmetic: a badge + epithet ("the Buttery"). The first set
   earned is worn automatically; any earned one can be worn from the grid. The worn badge shows on the menu pilot-card roundel
   and in the grid ("Styled: Dirk the Buttery"). Never spoken on the radio (D1).
-- Everything together: 80,200 PP (~31 % of Emperor's 260k), earned over 50+ hours. Tasks can promote you; they never lock anything.
+- Everything together: 102,800 PP (~40 % of Emperor's 260k; tasks-sim caps it under 40 %), earned over 50+ hours. Tasks can promote you; they never lock anything.
 
 ## Persistence
 `localStorage['krayzee.tasks']` = `{ v, done:{id:t}, sets:{id:t}, stats, uniq, best, worn, unseen, savedAt }`. Saved on every
@@ -52,8 +52,13 @@ The adapter turns the game's existing events into one vocabulary; every event ca
 | `hover {dt, run}` | D35: the F-35B jet-borne (`ac.vtol > 0.5`) and under 15 kt; `run` = seconds of this unbroken hover (real time). `touchdown.vertical` = the landing was jet-borne (LAND HERE / let down) |
 | `takeoff {surface, fromField}` | ground → air transition; `fromField` = the last touchdown was off pavement > 150 m from any runway and the take-off left from off pavement (covers DEMAND TAKEOFF's field run and its hop) |
 | `air {dt, dist, alt, speedKt, vne}`, `inverted {dt, run}` (|bank| > 120°), `stall {dt, run}` (speed < 1.03·Vs + 3 kt, > 30 m AGL — the stall-hum condition), `formation {dt}` (another airborne plane < 50 m), `visit {place, low}` | sampled each frame. **Time counters (`air.dt`, inverted, stall, formation) are REAL play time**: sim dt ÷ main's `simK` (D18 warp × `?timescale`), so ×5 warp never shortcuts the hours ladder. Distance is as flown (sim). |
+| `arrival {airport}` | MAPTASKS (C4): a non-crash touchdown ON an airport's runway or lawn (any plane, vertical let-downs included) that then comes to a stop (< 1 m/s) without lifting off. `airport` = `royal` (09/27 or 04/22 from data/airports/royal.js), `palace` (the lawn, `onLawn`), `farm`, `airbase` (the live layout's runways). C-Tower 1 and the lawn share a world, so both are checked whichever of the two towers is active. A field, a crash, a touch-and-go, or being placed on the runway (START HERE, spawn) is not an arrival |
+| `trip {from, to}` | MAPTASKS: the loaded airport (`layout.AIRPORT.id`) changed while the player was airborne: a magic-cloud swap or the royal ↔ lawn handover. A START HERE swap on the ground is not a trip |
 | `story {ok, mission, diff, ticks}` | `startMission`'s `onComplete` + retro from `krayzee.story` |
 A "flight" (per-flight counters) starts at play start, after DEMAND IT, and after being destroyed; the best flight is kept.
+A "sitting" (per-sitting counters, `SSTATS`, MAPTASKS) starts when play starts from the menu (a fresh `attach`) and ends on
+quitting to the menu (`detach` via `wiring.endPlay`). DEMAND IT, being destroyed and map swaps (`wiring.setWorld` re-attaches
+without a detach) do not end it. Not saved: a page reload ends it too.
 
 ## Sets
 
@@ -115,7 +120,7 @@ A "flight" (per-flight counters) starts at play start, after DEMAND IT, and afte
 | `rule_ignored_instruction` | 🙉 Selective Hearing | bronze | 100 | Ignore a go-around. Selective hearing is hereditary. | `infraction` + condition |
 | `rule_light_touch` | 💋 Close Call | silver | 250 | Swap paint gently with another aircraft: a Close Call. | `infraction` + condition |
 
-### ⛓️ Habitual Offender (9) · set bonus +2,400 PP · badge "the Incorrigible"
+### ⛓️ Habitual Offender (12) · set bonus +3,000 PP · badge "the Incorrigible"
 
 | id | task | tier | PP | what | detector |
 |---|---|---|---|---|---|
@@ -128,6 +133,13 @@ A "flight" (per-flight counters) starts at play start, after DEMAND IT, and afte
 | `variety` | 🎭 Variety Act | silver | 250 | Five different rules broken in one flight. | one flight: `rules` ≥ 5 |
 | `rap_sheet` | 📜 Full Rap Sheet | gold | 750 | Break all 21 rules at least once. | stat `rules` ≥ 21 |
 | `frozen` | 📸 Nothing Counts | bronze | 100 | Break a rule while the press are watching (after a scandal). | `infraction` + condition |
+| `sheep_1` | 🐑 Sheep Scatterer | bronze | 100 | Scatter a flock of sheep at Muckle Bottom from the air. Doreen will recover. | stat `sheepScatters` ≥ 1 |
+| `sheep_10` | 🐏 Flock Botherer | silver | 250 | Scatter Muckle Bottom flocks 10 times. Farmer Mudge has noticed. | stat `sheepScatters` ≥ 10 |
+| `sheep_50` | 🧶 Shepherd's Warning | gold | 750 | Scatter Muckle Bottom flocks 50 times. The ewes have formed a union. | stat `sheepScatters` ≥ 50 |
+
+`sheepScatters` (D38) counts `{ type: 'sheep' }` events: the live adapter turns each Woolly Jumper the score paid
+(`pp` id `sheep_scatter`) into one, so the score's once-per-flock-per-minute cooldown also stops a flock being farmed
+here. Sheep scatters are not rule breaks (not in `infractions`, `rules` or the Rap Sheet).
 
 ### ☕ Tower Torment (8) · set bonus +2,000 PP · badge "Bane of Towers"
 
@@ -181,7 +193,24 @@ A "flight" (per-flight counters) starts at play start, after DEMAND IT, and afte
 | `village_low` | 🧹 Chimney Sweep | silver | 250 | Over the village rooftops, under 30 m. | `visit` + condition |
 | `terminal_low` | 🧽 Window Cleaner | silver | 250 | Over the terminal, under 40 m. Mind the roof. | `visit` + condition |
 | `lake_low` | 🌊 Wet Wheels | silver | 250 | Over the lake, under 5 m. | `visit` + condition |
-| `grand_tour` | 🗺️ Grand Tour | gold | 750 | Castle, church, village, lake and terminal in one flight. | one flight: `visits` ≥ 5 |
+| `grand_tour` | 🗺️ Sightseeing Tour | gold | 750 | Castle, church, village, lake and terminal in one flight. | one flight: `visits` ≥ 5 |
+
+### 🧭 The Kingdom Map (8) · set bonus +1,400 PP · badge "the Well-Travelled" (MAPTASKS, V1 C4)
+
+| id | task | tier | PP | what | detector |
+|---|---|---|---|---|---|
+| `land_royal` | 🏰 Home Field | bronze | 100 | Land at C-Tower 1, Krayzee Royal, and stop on the runway. | `arrival` royal |
+| `land_farm` | 🚜 Wipe Your Wheels | bronze | 100 | Land at Muckle Bottom, C-Tower 2, and stop on the grass strip. | `arrival` farm |
+| `land_palace` | 🌹 Lawn Order | silver | 250 | Land on the Palace Lawn, C-Tower 3, and stop on it. | `arrival` palace |
+| `land_airbase` | 🎖️ Much Snoring, Little Sleep | bronze | 100 | Land at RAF Much Snoring, C-Tower 4, and stop on the runway. | `arrival` airbase |
+| `trip_1` | ☁️ Cross-Country | bronze | 100 | Fly from one airport to another on the Kingdom Map. | `trip` |
+| `trip_10` | 🧳 Kingdom Commuter | silver | 250 | Ten trips between airports. | stat `trips` ≥ 10 |
+| `kingdom_tour` | 🗺️ Grand Tour | gold | 750 | Land at all four airports in the kingdom. | stat `airports` (unique arrival airports) ≥ 4 |
+| `tour_nonstop` | 👑 Grand Tour, Non-Stop | gold | 750 | Land at all four airports without quitting to the menu. | sitting `airports` ≥ 4 |
+
+The old landmark row `grand_tour` (Royal Tourist) is now called **Sightseeing Tour** (same id, so saves keep it) so that
+"Grand Tour" means the airports. The Tiger, Cub and Bathtub fit all four airports (data/airports/kingdom.js `canUse`), and the F-35
+can let down on the lawn, so the Non-Stop is one long Free Flight: royal → lawn → farm → air base.
 
 ### ⏳ The Long Reign (10) · set bonus +2,200 PP · badge "the Long-Reigning"
 
@@ -319,12 +348,12 @@ A "flight" (per-flight counters) starts at play start, after DEMAND IT, and afte
 | `finish_100` | 🫅 Demanded It, Habitually | silver | 250 | Finish 100 flights with DEMAND IT. | stat `finishes` ≥ 100 |
 
 ## UI
-- Menu: a full-width **✓ TASKS n/143** button under the 2×2 grid; a red dot while there are ticks you have not looked at.
+- Menu: a full-width **✓ TASKS n/182** button under the 2×2 grid; a red dot while there are ticks you have not looked at.
 - Grid popup (`.kz-tasks`): totals + bar, logbook line (time aloft, km, landings, rules), regalia chips (tap to wear), All / To do
   / Done filter, then one section per set (badge, name, reward or "✓ Complete", n/total) with tiles: icon, name, tier stripe
   (bronze/silver/gold), progress bar for counted tasks, PP. Tap a tile: a one-line description in the footer with tier,
   progress ("12 / 50", "1 h 5 min / 2 h", "best flight") and PP. Planes not yet `status: 'ready'` show 🔒 SOON tiles.
-- Pause: "✓ TASKS n/143 ›" at the top of the Settings popup opens the same grid above it.
+- Pause: "✓ TASKS n/182 ›" at the top of the Settings popup opens the same grid above it.
 - In flight: a small pill "✓ Butter Fingers +250 PP", 2 s, queued, under the score at the left edge; it slides down past any
   visible HUD (strip, AP pill, axis chips, banner, subtitles, tower badge, warp chip) and never takes a tap. Held while a
   popup is open; dropped (the menu dot carries it) on quit.
@@ -333,14 +362,17 @@ A "flight" (per-flight counters) starts at play start, after DEMAND IT, and afte
 
 ## Tests
 ```
-node tools/tasks-sim.mjs            # 98 assertions, ~2 s
-node tools/tasks-sim.mjs --falsify  # 17 breaks in scratch copies; each must fail the suite (~3 min)
+node tools/tasks-sim.mjs            # 127 assertions, ~2 s
+node tools/tasks-sim.mjs --falsify  # 26 breaks in scratch copies; each must fail the suite (~4 min)
 node tools/test-tasks.mjs [--port=9671] [--url=http://127.0.0.1:8889/gms/3d/krayzee/]   # real game, 48 checks, ~4 min
 ```
-Shots: `docs/shots/tasks/`.
+Shots: `docs/shots/tasks/`. test-tasks also checks Home Field after its real LAND (ticked if it stopped on the runway, not
+ticked if LAND chose a field). The airport rows are checked in the real game by `tools/test-map.mjs` (see docs/MAP.md
+"Map tasks"): farm case = Cross-Country + Wipe Your Wheels, jumbo case = Much Snoring, `--cases=tour` = all four + Grand Tour +
+Non-Stop in one Tiger sitting; `--falsify=notask` must go red.
 
 ## Notes / limits
-- Landmarks are C-Tower 1 only (`PLACES`). New airports need their own entries (or a per-airport table).
+- Landmarks are C-Tower 1 only (`PLACES`; the airports themselves are the Kingdom Map set). New airports need their own entries (or a per-airport table).
 - `STORY` mirrors mission ids/objective ids from `data/story/mission*.js` (those modules import three, so node can't load
   them); add a row when a mission is added. tasks-sim reads the mission files as text and fails if the mirror drifts.
   Missions 1–5 feed The Peerage, 6–10 The Coronation (a set holds 8–12 tasks); `finale: true` marks the coronation.

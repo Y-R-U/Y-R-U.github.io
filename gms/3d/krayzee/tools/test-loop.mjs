@@ -46,7 +46,7 @@ else CASES = PLANES.flatMap((p) => DIFFS.flatMap((d) => Object.keys(ORIENT).map(
 const B0 = {
   bootReal: 40, menuToPlayReal: 15,
   liftoff: 60, climb60: 90,
-  stickHold: 3, apBack: 10, minAglManual: 15,
+  stickHold: 3, apBack: 14, apEarliest: 8, minAglManual: 15,   // D37: the AP takes back after the 10 s AUTO countdown (+ 2 s blend)
   latch: 3, latchHold: 6, thrAuto: 6,
   warpRatio5: 3,
   landActive: 3, waitFinal: 400, touchdown: 300, stop: 90,
@@ -57,11 +57,11 @@ const B0 = {
 // jets: a 4-5 min circuit, a long taxi to the threshold; LAND never picks a field (the field branch lands on the runway)
 const BJ = { ...B0, liftoff: 90, waitFinal: 700, touchdown: 450, stop: 150, demandReady: 420, airborne2: 300, fieldTouchdown: 600, fieldStop: 150, fieldTakeoffBtn: 30, fieldAirborne: 300 };
 let B = B0;
-const FALSIFY_ALL = ['freeze', 'stuck', 'error', 'cover', 'deadbutton', 'msgcover'];
+const FALSIFY_ALL = ['countdown', 'freeze', 'stuck', 'error', 'cover', 'deadbutton', 'msgcover'];
 let FALSIFY_SET = FALSIFY === 'all' ? FALSIFY_ALL : FALSIFY ? String(FALSIFY).split(',') : [];
 
 const PROFILE = { name: 'Loop', gender: 'm', company: 'Loop Air', primary: '#b3122e', secondary: '#f4efe6', accent: '#d4a017', voice: 'toff', registration: 'K-LOOP' };
-const COACH_SEEN = { 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 }, 'krayzee.coachTakeoff': 1, 'krayzee.hints': { ctx: 'seen', map: 'seen' } };
+const COACH_SEEN = { 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 }, 'krayzee.coachTakeoff': 1, 'krayzee.hints': { ctx: 'seen', map: 'seen', auto: 'seen', mouse: 'seen' } };
 
 let D;
 const log = (...a) => console.log(...a);
@@ -73,7 +73,9 @@ function newMon() {
   return { samples: [], lastPhase: null, lastPhaseT: 0, maxStall: 0, freeze: null, events: [], last: null, minAgl: Infinity, crashes: 0, wasCrashed: false };
 }
 let M = newMon();
+let frontT = 0;
 async function snap() {
+  if (Date.now() - frontT > 20000) { frontT = Date.now(); await D.front(); }   // CONTROLS: a stray chrome:// tab mid-case
   const s = await D.evSafe(SNAP);
   if (s) watch(s);
   return s;
@@ -195,6 +197,7 @@ async function skipReel() {
 // ---------------------------------------------------------------- the loop
 async function fresh(plane, w, h, diff = 'easy') {
   await D.viewport(w, h);
+  await D.front();   // CONTROLS: a stray chrome:// tab in front stops this page's frames
   await D.send('Page.navigate', { url: BASE + 'docs/' }); await sleep(400);
   await D.ev(`(() => { for (const k of Object.keys(localStorage)) if (k.startsWith('krayzee.')) localStorage.removeItem(k);
     localStorage.setItem('krayzee.profile', ${JSON.stringify(JSON.stringify(PROFILE))});
@@ -215,11 +218,13 @@ const FALSIFY_JS = {
   // MSGFIX: a giant radio card pinned over the middle of the view; the screen-cover sampler must report it
   msgcover: COVER_FALSIFY,
   // DEMAND TAKEOFF accepts the tap and does nothing: the plane just sits there
+  // D37: the player's 10 s AUTO countdown lost (back to the old 1.5 s release)
+  countdown: `(() => { __game.S.player.wait = 1.5; return 1; })()`,
   deadbutton: `(() => { const ap = __game.S.player.ap; ap.demandTakeoff = () => 'dead'; window.__game.wiring.link && (window.__game.wiring.link.demandTakeoff = () => 'dead'); return 1; })()`,
 };
-const FALSIFY_AT = { freeze: 'stick', stuck: 'land', error: 'throttle', cover: 'bank', deadbutton: 'bank', msgcover: 'stick' };
+const FALSIFY_AT = { countdown: 'stick', freeze: 'stick', stuck: 'land', error: 'throttle', cover: 'bank', deadbutton: 'bank', msgcover: 'stick' };
 // what the suite must report for each fault
-const FALSIFY_EXPECT = { freeze: /FREEZE|froze/, stuck: /STUCK/, error: /page errors/, cover: /covered/, deadbutton: /airborne again/, msgcover: /screen cover/ };
+const FALSIFY_EXPECT = { countdown: /AUTO countdown/, freeze: /FREEZE|froze/, stuck: /STUCK/, error: /page errors/, cover: /covered/, deadbutton: /airborne again/, msgcover: /screen cover/ };
 async function maybeFalsify(at) {
   for (const f of FALSIFY_SET) if (FALSIFY_AT[f] === at) { log(`  !! falsify '${f}' injected before ${at}`); await D.ev(FALSIFY_JS[f]); CASE.falsified.push(f); }
 }
@@ -322,16 +327,33 @@ async function runCase([plane, diff, orient]) {
     // the thumb stays on for B.stickHold SIM seconds of manual flight (a wall-clock hold became 5-12 s sim under load)
     await D.hold(base.cx, base.cy, 32, 10, (B.stickHold / TS) * 1000 * 20, async () => { const s = await snap(); if (s?.p?.modes?.aileron === 'manual') { manualSeen++; manualT0 ??= s.simT; } },
       async () => manualT0 != null && M.last.simT - manualT0 >= B.stickHold);
-    const s1 = await snap();
+    const s1 = await snap(), rt1 = await D.evSafe('performance.now() / 1000 - 0.3', 0);
     rec.manualSim = r1(s1.simT - s0.simT);
     if (!manualSeen) fail('aileron never went manual while the thumb was on the stick');
-    const back = await until((s) => s.p && s.p.apMode === 'AUTOPILOT' && Object.values(s.p.modes).every((m) => m === 'auto' || m === 'latched'), B.apBack, { label: 'AP takes back' });
-    rec.apBackSim = r1(back.simS);
+    // D37: the AUTO button counts down from 10 and the AP takes back at 0; only a real upset may cut it short. The game
+    // says so itself: an 'ap.recovery' event ("AUTOPILOT · RECOVERING" flash) right after the release. A Pitts or an F-35 on Hard
+    // (no 60° bank detent there) rolls past 70° in the 3 s hold, and the RECOVERY phase can be over between
+    // two samples, so the event log is read, not only the sampled phase.
+    let countSeen = null, recovery = false;
+    const back = await until(async (s) => {
+      if (s.p?.phase === 'RECOVERY') recovery = true;
+      if (!countSeen) { const r = await D.rect('.krz-autobtn'); if (r?.state === 'count') countSeen = r.txt; }
+      return s.p && s.p.apMode === 'AUTOPILOT' && Object.values(s.p.modes).every((m) => m === 'auto' || m === 'latched');
+    }, B.apBack, { label: 'AP takes back (after the AUTO countdown)' });
+    if (!recovery && !countSeen) recovery = !!(await D.evSafe(`__game.log().some((l) => l.t >= ${rt1} && l.type === 'ap.recovery')`, false));
+    rec.apBackSim = r1(back.simS); rec.autoCount = countSeen; rec.recovery = recovery; rec.releaseBank = r1(s1.p.bank);
     if (M.crashes) fail('crashed during the manual bit');
-    // the AP may be mid-turn on its circuit, so "recovered" = back inside a normal AP bank (≤ 35°) and not sinking hard
-    const rcv = await until((s) => s.p && Math.abs(s.p.bank) <= 35 && s.p.fpm > -1500, 12, { label: 'recovered after release (|bank| ≤ 35°, sink < 1500 fpm)' });
+    // an upset skip must be a D37 upset: banked past 70°, or sinking fast (the stall / ground cases sink)
+    if (recovery && !countSeen && !(Math.abs(s1.p.bank) > 66 || s1.p.fpm < -1500)) fail(`the countdown was skipped as an upset, but the release was not one (bank ${r1(s1.p.bank)}°, ${s1.p.fpm} fpm)`);
+    if (!countSeen && !recovery) fail('the AUTO button never showed its countdown after the stick was let go');
+    if (back.simS < B.apEarliest && !recovery) fail(`the AP took back after only ${r1(back.simS)} s sim: the D37 10 s AUTO countdown was skipped with no upset`);
+    // the AP may be mid-turn on its circuit, so "recovered" = back inside a normal AP bank and not sinking hard. That bank is
+    // 30° × the type's apBankScale + 5° (≤ 35° light types; the F-35 turns at 45°, so ≤ 50°): after D37's 10 s held turn
+    // the AP often has to turn back, at its own bank, for longer than the old 1.5 s hand-back ever needed
+    const bankMax = Math.max(35, 30 * ((await D.evSafe('__game.S.player.ac.P.apBankScale', 1)) || 1) + 5);
+    const rcv = await until((s) => s.p && Math.abs(s.p.bank) <= bankMax && s.p.fpm > -1500, 12, { label: `recovered after release (|bank| ≤ ${bankMax}°, sink < 1500 fpm)` });
     rec.recoverSim = r1(rcv.simS);
-    return `manual ${rec.manualSim}s sim, bank ${r1(s1.p.bank)}°, AP back in ${rec.apBackSim}s sim`;
+    return `manual ${rec.manualSim}s sim, bank ${r1(s1.p.bank)}°, ${countSeen ? `AUTO counted (${countSeen})` : 'upset at release: AP recovery at once (D37)'}, AP back in ${rec.apBackSim}s sim`;
   });
 
   // 4. latch the throttle, hold, then AUTO
@@ -419,7 +441,9 @@ async function runCase([plane, diff, orient]) {
     mark('stickHold');
     game += (await until((s) => s.land?.state !== 'active', 6, { label: 'a stick touch cancels LAND' })).simS;
     mark('cancel');
-    game += (await until((s) => s.p.apMode === 'AUTOPILOT', 15, { label: 'AP back after cancel' })).simS;
+    // D37: the stick touch starts the 10 s AUTO countdown and the AP takes back at 0 (tapping AUTO is covered by
+    // tools/test-controls.mjs; an instant hand-back here re-planned onto whatever runway the LAND NOW turn pointed at)
+    game += (await until((s) => s.p.apMode === 'AUTOPILOT', 15, { label: 'AP back after cancel (AUTO countdown)' })).simS;
     mark('apBack');
     rec.gameSim = r1(game); rec.harnessSim = r1(M.last.simT - st0 - game);
     if (game > PROBE_BUDGET) fail(`the game's own waits took ${r1(game)} s sim > ${PROBE_BUDGET}`);

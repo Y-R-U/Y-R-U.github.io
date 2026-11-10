@@ -274,7 +274,7 @@ export function createMission(def, o) {
     let ready = !def.setup;
     if (def.setup) Promise.resolve().then(() => def.setup(ctx)).catch((e) => console.warn('[story] setup', e)).then(() => { ready = true; });
     showBrief(() => {
-      const go = () => { if (M.gen !== gen || M.status !== 'running') return; if (!ready) { setTimeout(go, 100); return; } log('go', {}); try { def.onGo?.(ctx); } catch (e) { console.warn('[story] go', e); } enterStep(0); };
+      const go = () => { if (M.gen !== gen || M.status !== 'running') return; if (!ready) { setTimeout(go, 100); return; } log('go', {}); if (where === 'ground') host.clearStart?.(); try { def.onGo?.(ctx); } catch (e) { console.warn('[story] go', e); } enterStep(0); };
       go();
     });
   }

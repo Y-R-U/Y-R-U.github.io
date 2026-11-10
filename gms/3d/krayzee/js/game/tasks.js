@@ -3,12 +3,13 @@
 //   tasks.handle({ type: 'touchdown', fpm: 80, ... })   // normalised events (the live adapter below makes them)
 //   tasks.on('task' | 'set' | 'change', fn)
 // Live adapter: tasks.attach({ game, atc, radio, mode, difficulty, plane }) per play; tasks.sample(dt, ent, traffic) per frame.
-import { SETS, STATS, FSTATS, TIER_PP, SET_BONUS, TASKS_KEY, STORY, placeAt } from '../../data/tasks.js';
+import { SETS, STATS, FSTATS, SSTATS, TIER_PP, SET_BONUS, TASKS_KEY, STORY, placeAt } from '../../data/tasks.js';
 import { AIRCRAFT } from '../../data/aircraft.js';
 import { INFRACTIONS } from '../../data/rules.js';
 import { RUNWAYS } from '../world/layout.js';
 import * as LAYOUT from '../world/layout.js';
 import { LAWN } from '../../data/airports/palace.js';
+import ROYAL from '../../data/airports/royal.js'; // MAPTASKS: C-Tower 1's runways, whichever airport of its world is active
 
 export { TASKS_KEY };
 export const TASKS_VERSION = 1;
@@ -35,20 +36,20 @@ export const setBonus = (s) => s.bonus ?? Math.max(SET_BONUS.min, Math.round(s.t
 
 const blank = () => ({ v: TASKS_VERSION, done: {}, sets: {}, stats: {}, uniq: {}, best: {}, worn: null, unseen: [], savedAt: 0 });
 
-export function createTasks({ career = null, storage = defaultStorage(), now = () => Date.now(), sets = SETS, stats = STATS, fstats = FSTATS, ready = planeReady, autosave = true, retro = true } = {}) {
+export function createTasks({ career = null, storage = defaultStorage(), now = () => Date.now(), sets = SETS, stats = STATS, fstats = FSTATS, sstats = SSTATS, ready = planeReady, autosave = true, retro = true } = {}) {
   const ALL = sets.flatMap((s) => s.tasks.map((t) => ({ ...t, set: s.id })));
   const BY_ID = new Map(ALL.map((t) => [t.id, t]));
   const SET_BY = new Map(sets.map((s) => [s.id, s]));
   const byEvent = (defs) => { const m = new Map(); for (const [k, d] of Object.entries(defs)) { for (const ty of [d.on, ...(d.resetOn || [])]) (m.get(ty) || m.set(ty, []).get(ty)).push(k); } return m; };
-  const STAT_EV = byEvent(stats), FSTAT_EV = byEvent(fstats);
+  const STAT_EV = byEvent(stats), FSTAT_EV = byEvent(fstats), SSTAT_EV = byEvent(sstats);
   const TASK_EV = new Map();
   for (const t of ALL) if (t.on) (TASK_EV.get(t.on) || TASK_EV.set(t.on, []).get(t.on)).push(t);
-  const BY_STAT = new Map(), BY_FSTAT = new Map();
-  for (const t of ALL) { if (t.stat) (BY_STAT.get(t.stat) || BY_STAT.set(t.stat, []).get(t.stat)).push(t); if (t.fstat) (BY_FSTAT.get(t.fstat) || BY_FSTAT.set(t.fstat, []).get(t.fstat)).push(t); }
+  const BY_STAT = new Map(), BY_FSTAT = new Map(), BY_SSTAT = new Map();
+  for (const t of ALL) { if (t.stat) (BY_STAT.get(t.stat) || BY_STAT.set(t.stat, []).get(t.stat)).push(t); if (t.fstat) (BY_FSTAT.get(t.fstat) || BY_FSTAT.set(t.fstat, []).get(t.fstat)).push(t); if (t.sstat) (BY_SSTAT.get(t.sstat) || BY_SSTAT.set(t.sstat, []).get(t.sstat)).push(t); }
 
   let D = blank();
   try { const raw = JSON.parse(storage.getItem(TASKS_KEY)); if (raw && typeof raw === 'object') D = { ...blank(), ...raw, v: TASKS_VERSION }; } catch (e) { /* fresh */ }
-  let F = {}, FU = {};
+  let F = {}, FU = {}, S = {}, SU = {}; // per flight; per sitting (MAPTASKS)
   let ctx = { plane: 'c172', diff: 'easy', mode: 'free' };
   const listeners = {};
   const emit = (t, p) => { for (const fn of listeners[t] || []) try { fn(p); } catch (e) { console.warn('[tasks]', e); } };
@@ -107,15 +108,18 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
   function handle(ev) {
     if (!ev?.type) return [];
     if (ev.type === 'flightStart') { F = {}; FU = {}; return []; }
+    if (ev.type === 'sessionStart') { S = {}; SU = {}; return []; }
     const e = { ...ctx, ...ev };
     const out = [];
     const sc = bump(stats, STAT_EV.get(e.type), e, D.stats, D.uniq);
     const fc = bump(fstats, FSTAT_EV.get(e.type), e, F, FU);
+    const ssc = bump(sstats, SSTAT_EV.get(e.type), e, S, SU);
     for (const k of fc) if ((F[k] ?? 0) > fBest(k)) D.best[k] = F[k];
     if (sc.length || fc.length) touch();
     for (const t of TASK_EV.get(e.type) || []) if (!D.done[t.id] && (!t.when || t.when(e))) { const r = complete(t, e); if (r) out.push(r); }
     for (const k of sc) for (const t of BY_STAT.get(k) || []) if (!D.done[t.id] && statVal(k) >= t.target) { const r = complete(t, e); if (r) out.push(r); }
     for (const k of fc) for (const t of BY_FSTAT.get(k) || []) if (!D.done[t.id] && (F[k] ?? 0) >= t.target) { const r = complete(t, e); if (r) out.push(r); }
+    for (const k of ssc) for (const t of BY_SSTAT.get(k) || []) if (!D.done[t.id] && (S[k] ?? 0) >= t.target) { const r = complete(t, e); if (r) out.push(r); }
     if (out.length || (dirty && !HF.has(e.type))) { if (autosave) save(); }
     if (out.length) emit('change', out);
     return out;
@@ -132,7 +136,7 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
   function progressOf(t) {
     if (D.done[t.id]) return { value: t.target ?? 1, target: t.target ?? 1, frac: 1 };
     const target = t.target ?? 1;
-    const value = t.stat ? statVal(t.stat) : t.fstat ? Math.max(fBest(t.fstat), F[t.fstat] ?? 0) : 0;
+    const value = t.stat ? statVal(t.stat) : t.fstat ? Math.max(fBest(t.fstat), F[t.fstat] ?? 0) : t.sstat ? (S[t.sstat] ?? 0) : 0;
     return { value: Math.min(value, target), target, frac: Math.max(0, Math.min(1, value / target)) };
   }
 
@@ -147,21 +151,39 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
     }
     return null;
   }
+  // MAPTASKS (C4): which airport's runway/lawn (x, z) is on. C-Tower 1 and the Palace Lawn share one world, so both are
+  // checked whichever of the two is active; the farm and the air base use the live layout's runways.
+  const onRect = (rw, x, z, slack) => {
+    const h = (rw.heading * Math.PI) / 180, ax = Math.sin(h), az = -Math.cos(h), dx = x - rw.center[0], dz = z - rw.center[2];
+    return Math.abs(dx * ax + dz * az) <= rw.length / 2 + slack && Math.abs(dx * az - dz * ax) <= rw.width / 2 + slack;
+  };
+  function stripAt(x, z) {
+    const id = LAYOUT.AIRPORT?.id || 'royal';
+    if (id === 'royal' || id === 'palace' || LAYOUT.AIRPORT?.world === 'royal') {
+      if (onLawn(x, z)) return 'palace';
+      return ROYAL.runways.some((rw) => onRect(rw, x, z, 5)) ? 'royal' : null;
+    }
+    return (RUNWAYS || []).some((rw) => onRect(rw, x, z, 5)) ? id : null;
+  }
   const nearRunway = (x, z, m) => (RUNWAYS || []).some((rw) => {
     const h = (rw.heading * Math.PI) / 180, ax = Math.sin(h), az = -Math.cos(h), dx = x - rw.center[0], dz = z - rw.center[2];
     return Math.hypot(Math.max(0, Math.abs(dx * ax + dz * az) - rw.length / 2), Math.max(0, Math.abs(dx * az - dz * ax) - rw.width / 2)) <= m;
   });
 
   function attach({ game, atc = null, radio = null, mode = 'free', difficulty = 'easy', plane = 'c172' } = {}) {
+    // a map swap re-attaches without detaching first (wiring.setWorld): the sitting and the trip origin carry on
+    const fresh = !L.attached;
     detach();
     ctx = { plane, diff: difficulty || 'easy', mode: mode || 'free' };
     L.attached = true; L.wasGround = null; L.inv = 0; L.stall = 0; L.lastTouch = null;
+    if (fresh) { handle({ type: 'sessionStart' }); L.apt = LAYOUT.AIRPORT?.id || 'royal'; L.arr = null; }
     handle({ type: 'flightStart' });
     const on = (src, t, fn) => { const u = src?.on?.(t, fn); if (typeof u === 'function') L.off.push(u); };
     if (game) {
       on(game, 'pp', (e) => {
         if (e.id === 'banter') handle({ type: 'banter', name: e.name });
         else if (e.id === 'impeccable') handle({ type: 'impeccable' });
+        else if (e.id === 'sheep_scatter') handle({ type: 'sheep', flock: e.flock, n: e.sheep, frozen: !!e.frozen }); // SHEEP2 (D38): one per scored flock scatter
         else if (INFRACTIONS[e.id]) handle({ type: 'infraction', id: e.id, amount: e.amount, frozen: !!e.frozen, combo: e.combo });
       });
       on(game, 'combo', (e) => { if (e.mult > 1) handle({ type: 'combo', mult: e.mult }); });
@@ -206,6 +228,7 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
         const e = { type: 'touchdown', fpm: ev.fpm, grade: ev.grade, bounce: !!ev.bounce, surface: ev.surface, runway: runwayAt(ac.pos.x, ac.pos.z), crash, fuel: ac.fuelFraction ?? 1, vertical: (ac.vtol || 0) > 0.5,
           airport, lawn: ev.surface === 'lawn' || ((airport === 'royal' || airport === 'palace') && onLawn(ac.pos.x, ac.pos.z)) };
         L.td = crash || e.vertical ? null : { x: ac.pos.x, z: ac.pos.z };
+        L.arr = crash ? null : stripAt(ac.pos.x, ac.pos.z); // MAPTASKS: touched down on this airport's runway/lawn
         L.lastTouch = { surface: ev.surface, field: !PAVED.includes(ev.surface) && !nearRunway(ac.pos.x, ac.pos.z, 150) };
         handle(e);
       } else if (ev.type === 'crash') { handle({ type: 'crash', reason: ev.reason }); L.lastTouch = null; }
@@ -213,8 +236,12 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
       else if (ev.type === 'fuelempty') handle({ type: 'fuelempty' });
       else if (ev.type === 'impact' && ev.result === 'bounce') handle({ type: 'bounce' });
     }
-    if (ac.crashed) { L.wasGround = null; L.parked = false; return; }
+    if (ac.crashed) { L.wasGround = null; L.parked = false; L.arr = null; return; }
     const ground = !!ac.onGround;
+    // MAPTASKS: the airport changed under a flying plane (a map trip: magic clouds, or the royal ↔ lawn handover)
+    const apt = LAYOUT.AIRPORT?.id || 'royal';
+    if (L.apt && apt !== L.apt && !ground) handle({ type: 'trip', from: L.apt, to: apt });
+    L.apt = apt;
     if (ground) L.lastGroundSurface = ac.surface;
     if (L.wasGround === true && !ground) {
       const fromField = !!L.lastTouch?.field && !PAVED.includes(L.lastGroundSurface);
@@ -223,6 +250,11 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
     }
     L.wasGround = ground;
     L.parked = ground && ac.gs < 1;
+    // MAPTASKS: a touchdown on a runway/lawn that rolled (or let down) to a stop without lifting off = an arrival there
+    // (a taildragger skipping along the lawn is not a take-off: only a real climb-away, > 3 s or 10 m up, cancels it)
+    if (ground && L.arr && ac.gs < 1) { handle({ type: 'arrival', airport: L.arr }); L.arr = null; }
+    if (ground) L.arrAir = 0;
+    else if (L.arr && ((L.arrAir = (L.arrAir || 0) + dt) > 3 || (ac.agl ?? 0) > 10)) L.arr = null;
     // the landing roll, touchdown to stop (short-field tasks)
     if (ground && L.td && ac.gs < 1) { handle({ type: 'stopped', rollM: Math.hypot(ac.pos.x - L.td.x, ac.pos.z - L.td.z) }); L.td = null; }
     if (!ground) L.td = null;
@@ -264,12 +296,13 @@ export function createTasks({ career = null, storage = defaultStorage(), now = (
     get attached() { return L.attached; },
     get parked() { return L.parked; },
     get towerController() { return controller(); },
-    tasks() { return ALL.map((t) => ({ id: t.id, set: t.set, icon: t.icon, name: t.name, desc: t.desc, tier: t.tier, pp: taskPP(t), plane: t.plane || null, done: !!D.done[t.id], at: D.done[t.id] || 0, avail: avail(t), counted: !!(t.stat || t.fstat), perFlight: !!t.fstat, ...progressOf(t) })); },
+    tasks() { return ALL.map((t) => ({ id: t.id, set: t.set, icon: t.icon, name: t.name, desc: t.desc, tier: t.tier, pp: taskPP(t), plane: t.plane || null, done: !!D.done[t.id], at: D.done[t.id] || 0, avail: avail(t), counted: !!(t.stat || t.fstat || t.sstat), perFlight: !!t.fstat, perSitting: !!t.sstat, ...progressOf(t) })); },
     sets() { return sets.map((s) => { const n = s.tasks.filter((t) => D.done[t.id]).length; return { id: s.id, name: s.name, blurb: s.blurb, badge: s.badge, epithet: s.epithet, bonus: setBonus(s), done: !!D.sets[s.id], count: n, total: s.tasks.length, locked: s.tasks.some((t) => !avail(t)) }; }); },
     summary() { const done = ALL.filter((t) => D.done[t.id]).length; const earned = ALL.reduce((a, t) => a + (D.done[t.id] ? taskPP(t) : 0), 0) + sets.reduce((a, s) => a + (D.sets[s.id] ? setBonus(s) : 0), 0); return { done, total: ALL.length, sets: Object.keys(D.sets).length, setTotal: sets.length, earned }; },
     stats() { return { ...D.stats }; },
     best() { return { ...D.best }; },
     flight() { return { ...F }; },
+    sitting() { return { ...S, airportsSeen: (SU.airports || []).slice() }; },
     isDone: (id) => !!D.done[id],
     task: (id) => BY_ID.get(id) || null,
     // cosmetics: a finished set's badge + epithet, worn on the pilot card

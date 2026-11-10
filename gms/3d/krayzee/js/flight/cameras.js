@@ -24,7 +24,7 @@ export function createFlightCamera(camera, env) {
   };
   const api = {
     get view() { return S.view; },
-    setView(v) { S.view = v === 'cockpit' || v === 'center' ? v : 'chase'; S.inited = false; api.fit(); },
+    setView(v) { S.view = v === 'cockpit' || v === 'center' ? v : 'chase'; S.inited = false; S.zoomed = false; S.vfov = null; api.fit(); },
     fit() {
       // Inside views: wide phones in landscape get a fixed ~92° horizontal view, not 66° vertical (that was ~110° wide and
       // filled the screen with door panels and A-pillars); look a touch lower there so the panel isn't cropped.
@@ -37,7 +37,8 @@ export function createFlightCamera(camera, env) {
     },
     kick(a) { S.shake = Math.max(S.shake, a); },
     // look = controls' look-around state { x (yaw rad), y (pitch rad), active }
-    update(dt, rig, ac, look) {
+    // aim = mouse aim's world direction (js/flight/mouseaim.js) or null: the view looks along it; zoom = wheel factor
+    update(dt, rig, ac, look, aim = null, zoom = 1) {
       if (!look.active) { const k = 1 - Math.exp(-dt * 3.5); look.x -= look.x * k; look.y -= look.y * k; }
       const root = rig.root;
       if (S.view !== 'chase') {
@@ -45,25 +46,35 @@ export function createFlightCamera(camera, env) {
         let eye, pitch;
         if (rig.viewEye) {
           const v = rig.viewEye(S.view, camera.aspect, _v);
-          eye = v.eye; pitch = v.pitch;
+          eye = v.eye; pitch = v.pitch; S.vfov = v.fov;
           if (v.fov && Math.abs(camera.fov - v.fov) > 0.01) { camera.fov = v.fov; camera.updateProjectionMatrix(); }
         } else {
           eye = center ? (rig.eyeCenter || _v.set(0, rig.eye.y, rig.eye.z)) : rig.eye;
           pitch = center ? rig.eyeCenterPitch ?? rig.eyePitch : rig.eyePitch;
         }
         camera.position.copy(eye).applyMatrix4(root.matrixWorld);
-        _e.set(look.y + (pitch || 0) + (S.pitchBias || 0), look.x, 0);
+        let lx = look.x, ly = look.y;
+        if (aim) {   // the aim in the cockpit frame: yaw left +, pitch up +
+          _q.copy(root.quaternion).invert(); _p.set(aim.x, aim.y, aim.z).applyQuaternion(_q);
+          S.ax = (S.ax ?? 0) + (Math.max(-2.6, Math.min(2.6, Math.atan2(-_p.x, -_p.z))) - (S.ax ?? 0)) * (1 - Math.exp(-dt * 10));
+          S.ay = (S.ay ?? 0) + (Math.max(-0.9, Math.min(1.0, Math.atan2(_p.y, Math.hypot(_p.x, _p.z)))) - (S.ay ?? 0)) * (1 - Math.exp(-dt * 10));
+          lx = S.ax; ly = S.ay - (pitch || 0);
+        } else S.ax = S.ay = 0;
+        if (zoom === 1 && !S.zoomed) S.inBase = camera.fov;
+        else { const f = zoom === 1 ? S.inBase : Math.max(25, Math.min(100, (S.vfov || S.inBase) * zoom)); S.zoomed = zoom !== 1; if (Math.abs(camera.fov - f) > 0.01) { camera.fov = f; camera.updateProjectionMatrix(); } }
+        _e.set(ly + (pitch || 0) + (S.pitchBias || 0), lx, 0);
         camera.quaternion.copy(root.quaternion).multiply(_q.setFromEuler(_e));
       } else {
         const p = root.position;
         const fwd = _v.set(0, 0, -1).applyQuaternion(root.quaternion);
-        if (ac.gs > 6) fwd.set(ac.vel.x, ac.vel.y * 0.5, ac.vel.z);
-        fwd.y = Math.max(-0.5, Math.min(0.5, fwd.y));
+        if (aim) fwd.set(aim.x, Math.max(-0.85, Math.min(0.85, aim.y)), aim.z);
+        else if (ac.gs > 6) fwd.set(ac.vel.x, ac.vel.y * 0.5, ac.vel.z);
+        if (!aim) fwd.y = Math.max(-0.5, Math.min(0.5, fwd.y));
         fwd.normalize();
-        S.fwd.lerp(fwd, S.inited ? 1 - Math.exp(-dt * 3) : 1).normalize();
+        S.fwd.lerp(fwd, S.inited ? 1 - Math.exp(-dt * (aim ? 9 : 3)) : 1).normalize();
         // JETCORE: the chase sits back by the airframe's size (a jumbo is 8.5 C172s long) and a little more with speed
         const k = chaseScale(ac), fast = Math.max(0, ac.speed - 70);
-        const dist = (15 + Math.min(6, ac.speed * 0.05)) * k + Math.min(25, fast * 0.12), h = 3.6 * Math.pow(k, 0.85);
+        const dist = ((15 + Math.min(6, ac.speed * 0.05)) * k + Math.min(25, fast * 0.12)) * zoom, h = 3.6 * Math.pow(k, 0.85) * Math.sqrt(zoom);
         const back = _v.copy(S.fwd).applyAxisAngle(UP, look.x);
         const want = new THREE.Vector3().copy(p).addScaledVector(back, -dist * Math.cos(look.y * 0.8));
         want.y += h + dist * Math.sin(look.y * 0.8) * -1;

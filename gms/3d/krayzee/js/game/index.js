@@ -19,7 +19,7 @@ export function createGame(opts = {}) {
 
   if (career) {
     let sinceBank = { scandals: 0, crashes: 0, infractions: 0 };
-    score.on('pp', (e) => { if (e.id && e.id !== 'banter' && e.id !== 'impeccable') sinceBank.infractions++; });
+    score.on('pp', (e) => { if (e.id && e.id !== 'banter' && e.id !== 'impeccable' && e.id !== 'sheep_scatter') sinceBank.infractions++; }); // SHEEP2: sheep_scatter is a bonus, not a rule
     score.on('scandal', () => sinceBank.scandals++);
     score.on('destroyed', () => sinceBank.crashes++);
     score.on('banked', (e) => {

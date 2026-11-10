@@ -443,3 +443,53 @@ html.krz-cer-on .krz-r-subs { opacity: .12; transition: opacity .4s; }
 /* PLAYTEST_3 #10: "You took the controls" on the warp chip fades after a few seconds */
 .krz-warp[data-state="off"] small:not(:empty) { animation: krz-warp-why 7s ease forwards; }
 @keyframes krz-warp-why { 0%, 85% { opacity: 1; } 100% { opacity: 0; font-size: 0; line-height: 0; } }
+
+/* D37 AUTO button (js/flight/autobtn.js): on the stick side. Portrait: beside LAND on its row above the stick zone (in
+   LAND's place while LAND is hidden). Landscape: inboard of the stick zone at the bottom, stacked above LAND. */
+.krz-autobtn { --ab: var(--krz-auto); position: absolute; z-index: 39; pointer-events: auto; touch-action: manipulation; cursor: pointer;
+  width: 84px; height: 48px; padding: 0 6px; border-radius: 24px; border: 2px solid var(--ab); background: rgba(14, 22, 38, .78); color: var(--ab);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .4); font-family: system-ui, sans-serif; display: grid; place-items: center; overflow: hidden;
+  bottom: calc(var(--sb, 0px) + var(--krz-ctl-bottom, 200px) + 10px); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.krz-autobtn[hidden] { display: none; }
+.krz-autobtn:active { transform: scale(.95); }
+.krz-ab-txt { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
+.krz-ab-txt b { font-size: 13px; font-weight: 800; letter-spacing: .1em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.krz-ab-txt small { font-size: 8.5px; font-weight: 700; letter-spacing: .05em; color: rgba(246, 241, 228, .78); white-space: nowrap; }
+.krz-ab-ring { position: absolute; left: 12px; right: 12px; bottom: 5px; height: 3px; border-radius: 2px; background: rgba(246, 241, 228, .14); display: none; }
+.krz-ab-ring::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: var(--p, 100%); border-radius: 2px; background: var(--ab); }
+.krz-autobtn[data-state="count"] { --ab: var(--krz-wait); }
+.krz-autobtn[data-state="count"] .krz-ab-ring { display: block; }
+.krz-autobtn[data-state="hold"] { --ab: var(--krz-man); }
+.krz-autobtn[data-state="off"] { --ab: var(--krz-man); background: rgba(48, 30, 8, .86); }
+.krz-autobtn[data-side="left"] { left: calc(var(--sl, 0px) + 12px); }
+.krz-autobtn[data-side="right"] { right: calc(var(--sr, 0px) + 12px); }
+html.krz-land-on .krz-autobtn[data-side="left"] { left: calc(var(--sl, 0px) + 20px + var(--krz-land-w, 96px)); }
+html.krz-land-on .krz-autobtn[data-side="right"] { right: calc(var(--sr, 0px) + 20px + var(--krz-land-w, 96px)); }
+html.krz-land-on.krz-ab-up .krz-autobtn { translate: 0 -58px; }   /* LAND's pill row (LAND NOW / FLY ON) pushes LAND up: AUTO follows */
+@media (orientation: portrait) {
+  html[data-krz-view="center"] .krz-autobtn, html[data-krz-view="cockpit"] .krz-autobtn { bottom: calc(var(--sb, 0px) + var(--krz-ctl-bottom, 200px) - 60px); }
+}
+@media (orientation: landscape) {
+  .krz-autobtn { bottom: calc(var(--sb, 0px) + 14px); }
+  html.krz-land-on .krz-autobtn { bottom: calc(var(--sb, 0px) + 70px); }
+  .krz-autobtn[data-side="left"], html.krz-land-on .krz-autobtn[data-side="left"] { left: calc(var(--krz-ctl-left, 190px) + 10px); }
+  .krz-autobtn[data-side="right"], html.krz-land-on .krz-autobtn[data-side="right"] { right: calc(var(--krz-ctl-right, 190px) + 10px); }
+  /* the bottom action slot steps clear of AUTO when it stands alone in LAND's place */
+  html.krz-auto-on:not(.krz-land-on)[data-krz-hand="left"] .krz-actions { --l0: calc(var(--krz-ctl-left, 190px) + 104px);
+    width: min(400px, calc(100vw - var(--l0) - var(--krz-ctl-right, 190px) - 8px)); left: calc(var(--l0) + (100vw - var(--l0) - var(--krz-ctl-right, 190px)) / 2); }
+  html.krz-auto-on:not(.krz-land-on)[data-krz-hand="right"] .krz-actions { --r0: calc(var(--krz-ctl-right, 190px) + 104px);
+    width: min(400px, calc(100vw - var(--krz-ctl-left, 190px) - var(--r0) - 8px)); left: calc(var(--krz-ctl-left, 190px) + (100vw - var(--krz-ctl-left, 190px) - var(--r0)) / 2); }
+}
+
+/* desktop mouse aim (js/flight/mouseaim.js): the aim circle (where the mouse points) and the nose cross */
+.krz-maim { position: absolute; inset: 0; pointer-events: none; z-index: 8; }
+.krz-maim[hidden], .krz-maim [hidden] { display: none; }
+.krz-maim-aim, .krz-maim-nose { position: absolute; left: 0; top: 0; will-change: transform; }
+.krz-maim-aim::before { content: ''; position: absolute; left: -15px; top: -15px; width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid rgba(246, 241, 228, .85); box-shadow: 0 0 0 1px rgba(0, 0, 0, .35); }
+.krz-maim[data-engaged="1"] .krz-maim-aim::before { border-color: #ffd75e; }
+.krz-maim-nose::before, .krz-maim-nose::after { content: ''; position: absolute; background: rgba(246, 241, 228, .9); box-shadow: 0 0 2px rgba(0, 0, 0, .6); }
+.krz-maim-nose::before { left: -9px; top: -1px; width: 18px; height: 2px; }
+.krz-maim-nose::after { left: -1px; top: -9px; width: 2px; height: 18px; }
+.krz-maim-tip { position: absolute; left: 50%; top: 62%; transform: translateX(-50%); padding: 5px 10px; border-radius: 10px;
+  background: rgba(14, 18, 28, .5); font: 700 11px/1.2 system-ui; letter-spacing: .06em; color: var(--krz-ink); white-space: nowrap; }

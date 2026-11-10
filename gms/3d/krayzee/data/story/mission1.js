@@ -98,7 +98,7 @@ export const MISSION_1 = {
     },
     {
       id: 'letgo',
-      coach: () => '<b>Now let go.</b> The autopilot takes back over from wherever you are.',
+      coach: () => '<b>Now let go.</b> AUTO counts down from 10, then the autopilot takes back over. Tap <b>AUTO</b> to hand it back now.', // CONTROLS (D37)
       done: (c) => !c.s.stick && c.s.apMode === 'AUTOPILOT',
     },
     {

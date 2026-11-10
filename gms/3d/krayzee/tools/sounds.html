@@ -87,6 +87,7 @@ const SOUNDS = [
   ['Gear thump', 'heavy landing thud', () => A.playGearThump()],
   ['Crash', 'realistic mode', () => A.playCrash(1)],
   ['Rubber BOING', 'impossiRubber bounce', () => A.playBoing(1)],
+  ['Sheep bleat', 'Muckle Bottom flock scatters (C5)', () => { A.playBleat({ pitch: 1.1 }); A.playBleat({ pitch: 0.95, delay: 0.3 }); A.playBleat({ pitch: 1.2, delay: 0.7 }); }],
   ['Radio click on', 'squelch', () => A.playSquelch('on')],
   ['Radio click off', 'squelch', () => A.playSquelch('off')],
   ['Radio line', 'a voice through the radio filter', () => A.playRadio('../audio/voices/toff/sample.mp3', { speaker: 'pilot', voiceId: 'toff' })],

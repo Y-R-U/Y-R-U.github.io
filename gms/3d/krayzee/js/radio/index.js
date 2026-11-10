@@ -61,7 +61,7 @@ export function createRadio(opts = {}) {
   let outrage = 0, tier = 1, scandal = false;
   let t = 0, gapUntil = 0, lastAi = -99, lastInbound = -99, playerFree = 0, token = 0;
   let queue = [], current = null, win = null, pendingScold = null, scheduled = [];
-  let lastInteractor = null, lastCrime = null, enabled = true, voicesData = null;
+  let lastInteractor = null, lastCrime = null, enabled = true, hushed = false, voicesData = null;
   const nameTower = () => {
     const n = voicesData?.towers?.[tower.voice]?.name;
     if (n && !tower.fixedName) tower.name = `Tower \u00b7 ${n.split(' ')[0]}`;
@@ -140,7 +140,7 @@ export function createRadio(opts = {}) {
   }
 
   function enqueue(item) {
-    if (!item) return false;
+    if (!item || hushed) return false;
     if (item.speakerId === 'tower' && queue.some((q) => q.speakerId === 'tower' && q.intent === item.intent)) return false;
     queue.push(item);
     queue.sort((a, b) => b.priority - a.priority || a.queuedAt - b.queuedAt);
@@ -149,7 +149,7 @@ export function createRadio(opts = {}) {
   }
 
   function aiSay(id, intent, { chance = 1, target, after, priority } = {}) {
-    if (!enabled || id == null || id === 'tower' || isPlayer(id)) return false;
+    if (!enabled || hushed || id == null || id === 'tower' || isPlayer(id)) return false;
     const p = speaker(id);
     if (!p || p.human) return false;
     if (o.rng() > chance || t - lastAi < chatterGap() || (speakerFree.get(id) || 0) > t) return false;
@@ -158,9 +158,9 @@ export function createRadio(opts = {}) {
     return ok;
   }
 
-  function towerSay(intent, { about, target, priority, after, ctx, delay = 0 } = {}) {
-    if (!enabled) return false;
-    const item = makeItem('tower', intent, { about, target, priority, after, ctx });
+  function towerSay(intent, { about, target, priority, after, ctx, delay = 0, stale } = {}) {
+    if (!enabled || hushed) return false;
+    const item = makeItem('tower', intent, { about, target, priority, after, ctx, stale });
     if (!item) { after?.(); return false; }
     if (!delay) return enqueue(item);
     // A second scold within scoldReplaceWithin replaces the pending one instead of stacking.
@@ -173,6 +173,7 @@ export function createRadio(opts = {}) {
   const scoldDelay = () => CFG.scoldDelay[0] + o.rng() * (CFG.scoldDelay[1] - CFG.scoldDelay[0]);
 
   function startNext() {
+    if (hushed) return;
     queue = queue.filter((q) => t - q.queuedAt <= q.stale || (q.priority >= CFG.priority.player && q.speakerId === player?.id));
     const item = queue.shift();
     if (!item) return;
@@ -188,7 +189,7 @@ export function createRadio(opts = {}) {
       emit('line', { speaker: item.speakerId, voice: item.sp.voice, intent: item.intent, id: item.entry.id, variant: item.entry.variant, text: item.text, target: item.target, missing: info?.missing });
     };
     const onEnd = (info) => {
-      if (!started) onStart(info);
+      if (!started && !hushed && !item.dropped && !info?.hushed && !info?.cancelled) onStart(info); // a line dropped before it went on air never shows
       row?.end(info?.steppedOn ? 1.5 : 0.8 + 2.4);
       if (item.sp === tower) hud.setTowerTalking(false);
       if (my === token) { current = null; gapUntil = t + 0.25; }
@@ -217,6 +218,7 @@ export function createRadio(opts = {}) {
       if (src && seq.length > 1 && o.audio.loadBuffer) {
         try { src = await splice(seq.map((c) => c.url), o.audio.loadBuffer); } catch { src = body.url; }
       }
+      if (hushed) return { hushed: true };
       return o.audio.playRadio(src, { speaker: sp === tower ? 'tower' : 'pilot', voiceId: vo, text: item.text, priority: prio, duration: dur, onStart });
     }
     onStart({ missing: !body });
@@ -248,7 +250,7 @@ export function createRadio(opts = {}) {
   }
 
   function openResponse(kind, specs, { target, cause, title, force = false } = {}) {
-    if (!player || !enabled || o.mode === 'follower' && !force) return false;
+    if (!player || !enabled || hushed || o.mode === 'follower' && !force) return false;
     if (!force && t - lastInbound < CFG.inboundWindowGap) return false;
     const chips = buildChips(specs, target, { ignoreCooldown: true });
     if (!chips.length) return false;
@@ -275,7 +277,7 @@ export function createRadio(opts = {}) {
 
   function openMenu() {
     load();
-    if (!player || !enabled || t < playerFree) return false;
+    if (!player || !enabled || hushed || t < playerFree) return false;
     const chips = buildChips(contextChips(), null);
     if (!chips.length) return false;
     win = { kind: 'menu', chips, t0: t, dur: 12 };
@@ -514,6 +516,18 @@ export function createRadio(opts = {}) {
     setChatter(level) { o.chatter = level; },
     setSubtitles: (on) => hud.setSubtitles(on),
     setMode(m) { o.mode = m; },
+    // INTROSHEEP: the story intro silences the whole channel. Everything queued or arriving is dropped (never buffered
+    // to burst out afterwards) and a line on air is cut; hush(false) resumes normal radio. HUD visibility is untouched.
+    hush(on) {
+      hushed = !!on;
+      if (!hushed) return;
+      queue = []; pendingScold = null; scheduled = [];
+      closeWindow('hushed');
+      if (current) { current.cut = current.dropped = true; ++token; current = null; gapUntil = t + 0.25; }
+      fallback.stop();
+      try { o.audio?.stopRadio?.(); } catch (e) { /* */ }
+    },
+    get hushed() { return hushed; },
     setEnabled(on) { enabled = !!on; if (!on) { queue = []; pendingScold = null; closeWindow('disabled'); } hud.setVisible(on); },
     setVisible: (on) => { if (on) load(); hud.setVisible(on); },
     on(type, fn) { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(fn); return () => listeners.get(type).delete(fn); },

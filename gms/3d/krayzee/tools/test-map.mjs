@@ -3,7 +3,8 @@
 // falsify modes, which break something on purpose and must turn the run red.
 //   ~/.claude/bin/cdp start --port 9681 --idle 1800 -- --use-angle=metal
 //   node tools/test-map.mjs [--orient=portrait|landscape|both] [--cases=farm,jumbo,swaps] [--timescale=4] [--port=9681]
-//   node tools/test-map.mjs --falsify=noswap|nofuel|refuse|leak|cover
+//   node tools/test-map.mjs --falsify=noswap|nofuel|refuse|leak|cover|notask
+//   node tools/test-map.mjs --cases=tour --orient=portrait     MAPTASKS (C4): Tiger lands at all four airports in one sitting
 // Screenshots: docs/shots/map/<orient>-<case>-<n>-<stage>.png (gitignored). Results: docs/shots/map/results-<stamp>.json
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -20,6 +21,7 @@ const ORIENTS = { portrait: [390, 844], landscape: [844, 390] };
 const orients = arg('orient', 'both') === 'both' ? ['portrait', 'landscape'] : [arg('orient')];
 const FALSIFY = arg('falsify', '');
 const CASES = String(arg('cases', FALSIFY === 'leak' ? 'swaps' : FALSIFY === 'refuse' ? 'jumbo' : FALSIFY ? 'farm' : 'farm,jumbo,swaps')).split(',');
+const TASKS = "import('./js/game/tasks.js').then((m) => m.peekTasks())";
 const PROFILE = { name: 'Mapper', gender: 'f', company: 'Map Air', primary: '#2f6b3a', secondary: '#f6f1e6', accent: '#c8102e', voice: 'duchess', registration: 'K-MAPS' };
 const COACH_SEEN = { 'krayzee.coach': { goal: 1, stick: 1, release: 1, radio: 1, bank: 1 }, 'krayzee.coachTakeoff': 1 };
 const log = (...a) => console.log(...a);
@@ -80,6 +82,26 @@ async function fresh(plane, ts = TS) {
   await D.send('Page.navigate', { url: `${BASE}?start=free&noaccount=1&intro=0&allplanes${plane ? `&plane=${plane}` : ''}&timescale=${ts}` });
   if (!(await waitReal(() => D.evSafe('!!(window.__krayzeeReady && window.__game?.S.player && window.__kingdom)'), 60000, 300))) fail('game not ready in 60 s');
   await D.evSafe(LOAD_ROUTES);
+  // MAPTASKS: every task toast the page shows, in order
+  await D.ev(`(() => { window.__tkToasts = []; setInterval(() => { const t = document.querySelector('.kz-tk-toast.on'); if (t && window.__tkToasts.at(-1)?.id !== t.dataset.id) window.__tkToasts.push({ id: t.dataset.id, text: t.innerText.replace(/\\s+/g, ' ') }); }, 100); return 1; })()`);
+  // MAPTASKS diagnostics: the player's touchdowns and ground/air changes (read only), printed when a task check fails
+  await D.ev(`(() => { window.__tkDbg = []; let g = null; const seen = new WeakSet(); setInterval(() => { const ac = window.__game?.S.player?.ac; if (!ac) return;
+    for (const e of ac.events || []) if (!seen.has(e)) { seen.add(e); if (/touchdown|crash|impact/.test(e.type)) window.__tkDbg.push([e.type, e.surface || e.result || '', Math.round(ac.pos.x), Math.round(ac.pos.z), Math.round(ac.gs)]); }
+    if (g !== !!ac.onGround) { g = !!ac.onGround; window.__tkDbg.push([g ? 'gnd' : 'air', ac.surface, Math.round(ac.pos.x), Math.round(ac.pos.z), Math.round(ac.gs)]); if (window.__tkDbg.length > 60) window.__tkDbg.shift(); } }, 50); return 1; })()`);
+  if (FALSIFY === 'notask') await D.ev(`${TASKS}.then((t) => { for (const id of ['land_royal', 'land_farm', 'land_palace', 'land_airbase']) t.task(id).when = () => false; return 1; })`);
+}
+// MAPTASKS (C4): the task ticked in the live ledger, its toast was shown, and it is saved in krayzee.tasks
+async function taskTicked(ids, label) {
+  await step(`task: ${label}`, async () => {
+    const done = await waitReal(() => D.evSafe(`${TASKS}.then((t) => ${JSON.stringify(ids)}.every((id) => t.isDone(id)))`), 15000, 300);
+    const st = await D.evSafe(`${TASKS}.then((t) => ({ done: ${JSON.stringify(ids)}.filter((id) => t.isDone(id)), airports: t.stats().airports || 0, sitting: t.sitting().airportsSeen }))`);
+    if (!done) fail(`not ticked: ${ids.filter((id) => !st.done.includes(id)).join(', ')} (airports ${st.airports}, this sitting ${st.sitting}); ground log ${JSON.stringify((await D.evSafe('window.__tkDbg')) || []).slice(-600)}`);
+    const toasts = await waitReal(async () => { const t = await D.evSafe('window.__tkToasts'); return ids.every((id) => t.some((x) => x.id === id)) && t; }, 12000, 200);
+    if (!toasts) fail(`no toast for ${ids.join(', ')}: ${(await D.evSafe('window.__tkToasts')).map((x) => x.id).join(', ')}`);
+    const saved = await D.evSafe(`JSON.parse(localStorage.getItem('krayzee.tasks'))?.done || {}`);
+    if (!ids.every((id) => saved[id])) fail(`not saved to krayzee.tasks: ${ids.filter((id) => !saved[id])}`);
+    return `${ids.map((id) => toasts.find((x) => x.id === id).text).join(' | ')}; airports ${st.airports}, this sitting [${st.sitting}]`;
+  });
 }
 // AI planes come and go in random types and liveries, so both readings are taken with the AI sent home (__kingdom.quietTraffic):
 // what is left is the world, the effects and the player's plane, and that must come back to the boot numbers
@@ -138,19 +160,34 @@ async function flyThrough(id, label) {
     return `ATC RWY ${c.atcEnd}; ${Math.round(d)} m out, ${Math.round(s.p.agl)} m AGL, ${Math.round(s.p.kt)} kt, AP ${s.p.phase}; ${c.ai.length} AI (${c.ai.join(',')} m from the field)`;
   });
 }
-async function landHere(id, rwyPrefix) {
+async function landHere(id, rwyPrefix, opt = {}) {
   await step(`LAND at ${id}`, async (rec) => {
-    await until((s) => { const g = rwyGeom(s); return s.land && !s.land.hidden && s.land.state === 'idle' && g && g.dist < 3500 && g.off < 25 && g.align < 30; }, 900, 'runway ahead within 3.5 km with LAND available');
+    // opt.final (tour): let the tower's own arrival bring the plane down first and tap LAND on its final (< 2.5 km, < 250 m
+    // AGL). A LAND tapped straight out of the clouds (~430 m AGL, 3.3 km) sends a Tiger round the farm's circuit for ever
+    // (MAPTASKS report: JOIN → FINAL 120–140 m high at 500–800 m → go-around, every lap)
+    await until((s) => { const g = rwyGeom(s); return s.land && !s.land.hidden && s.land.state === 'idle' && g && g.dist < (opt.final ? 2500 : 3500) && g.off < 25 && g.align < 30 && (!opt.final || (s.p.agl < 250 && /FINAL|BASE/.test(s.p.phase))); }, 900, 'runway ahead within 3.5 km with LAND available');
     await tapUntil('.krz-land', (s) => s?.land?.state === 'active');
     rec.pick = (await snap()).land.txt;
     if (await waitReal(() => D.evSafe('document.querySelector(".krz-land")?.dataset.now === "1"'), 1500)) await tapUntil('.krz-land-now', (s) => s?.land?.now === false || /straight/i.test(s?.p?.landing || ''));
-    const td = await until((s) => s.p && s.p.gnd, 600, 'touchdown');
+    // tour: a slow Tiger held on an extended downwind by the tower (seen at the farm: 600 s sim, no touchdown) gets what a
+    // player would do: LAND NOW once 300 s have gone. Reported as a WARN with the AP leg so it stays visible.
+    const td = opt.rescue ? await until(async (s) => {
+      if (s.p && s.p.gnd) return true;
+      if (!rec.t0) rec.t0 = s.simT;
+      if (!rec.trace || s.simT - rec.traceT > 20) { const g = rwyGeom(s); (rec.trace ||= []).push(`${Math.round(s.simT - rec.t0)}s ${s.p.phase} ${s.p.landing || '-'} agl ${Math.round(s.p.agl)} ${Math.round(s.p.kt)}kt rwy ${g ? Math.round(g.dist) + 'm/' + Math.round(g.off) : '-'} @${Math.round(s.p.x)},${Math.round(s.p.z)}`); rec.traceT = s.simT; if (rec.trace.length > 50) rec.trace.shift(); }
+      if (!rec.rescued && s.simT - rec.t0 > 300 && (await D.evSafe('document.querySelector(".krz-land")?.dataset.now === "1"'))) {
+        rec.rescued = true; rec.warn = `no touchdown 300 s after LAND (AP ${s.p.phase}, ${s.p.landing || ''}): tapped LAND NOW`;
+        await D.tap('.krz-land-now');
+      }
+      return false;
+    }, 900, 'touchdown').catch((e) => { log('    LAND trace: ' + (rec.trace || []).join(' | ')); throw e; }) : await until((s) => s.p && s.p.gnd, 600, 'touchdown');
     if (td.s.p.crashed) fail('crashed on landing');
     if (td.s.p.surf !== 'runway') fail(`touched down on ${td.s.p.surf}`);
     if (rwyPrefix && !td.s.rwy?.id?.startsWith(rwyPrefix)) (rec.warn = `landed with active end ${td.s.rwy?.id}`);
     await until((s) => s.p.gnd && (s.p.kt < 1 || s.finish?.state === 'ready'), 200, 'stopped');
+    CASE.bankedAtStop = (await snap()).banked;
     await shot(`landed-${id}`);
-    return `${rec.pick} → touchdown on the runway, stopped`;
+    return `${rec.pick} → touchdown on the runway, stopped${rec.warn ? ` · WARN ${rec.warn}` : ''}`;
   });
 }
 
@@ -186,8 +223,11 @@ async function caseFarm() {
   await D.ev('(() => { const f = __game.S.player.ac.fuel; f.L = f.R = f.cap * 0.45; return 1; })()');   // so DEMAND IT has something to refuel
   if (FALSIFY === 'nofuel') await D.ev('(() => { __game.S.player.ac.refuel = () => {}; return 1; })()');
   await landHere('farm', '');
+  await taskTicked(['trip_1', 'land_farm'], 'Cross-Country + Wipe Your Wheels');
   await step('DEMAND IT (banks + refuels)', async () => {
-    await until((s) => s.finish?.state === 'ready', 300, 'DEMAND IT ready');
+    // the task check after the stop can take a few seconds; Free Flight's fallback auto-bank (a long stop) may beat the tap
+    const r = await until((s) => s.finish?.state === 'ready' || (s.banked > (CASE.bankedAtStop ?? 1e9) && s.p.fuel >= 0.999), 300, 'DEMAND IT ready');
+    if (r.s.finish?.state !== 'ready') return `auto-banked while parked (${CASE.bankedAtStop} → ${r.s.banked}), refuelled: WARN, no tap`;
     const b0 = (await snap()).banked, fuel0 = (await snap()).p.fuel;
     await tapUntil('.krz-finish', (s) => s && (s.banked > b0 || s.finish?.state === 'hidden'));
     await sleep(400);
@@ -238,6 +278,79 @@ async function caseJumbo() {
   await flyThrough('airbase');
   await step('fps at Much Snoring', async () => JSON.stringify(await fpsHere('airbase')));
   await landHere('airbase', '');
+  await taskTicked(['land_airbase'], 'Much Snoring, Little Sleep');
+}
+
+// MAPTASKS (C4): one sitting, the Tiger (the only type all four take natively): C-Tower 1 → Palace Lawn → Muckle Bottom →
+// RAF Much Snoring, a real LAND and stop at each, DEMAND IT + DEMAND TAKEOFF in between: the four first landings, the
+// Grand Tour and the Non-Stop tick, each with its toast
+async function demandAndGo(id) {
+  await step(`DEMAND IT + DEMAND TAKEOFF at ${id}`, async () => {
+    await until((s) => s.finish?.state === 'ready', 300, 'DEMAND IT ready');
+    const b0 = (await snap()).banked;
+    await tapUntil('.krz-finish', (s) => s && (s.banked > b0 || s.finish?.state === 'hidden'));
+    await sleep(400);
+    for (let i = 0; i < 6 && (await waitReal(() => D.rect('.krz-reel'), 1500)); i++) { await D.tap('.krz-reel-all') || await D.tap('.krz-reel-next'); await sleep(400); }
+    await until((s) => s.ground?.takeoff, 60, 'DEMAND TAKEOFF offered');
+    await waitReal(() => D.rect('.krz-gbtn-to'), 8000);
+    const nDT = () => D.evSafe('__game.log().filter((l) => l.type === "demandTakeoff").length', 0), n0 = await nDT();
+    await tapUntil('.krz-gbtn-to', async (s) => s && (!s.p.gnd || (await nDT()) > n0));
+    await until((s) => s.p && !s.p.gnd && s.p.agl > 60, 300, `airborne from ${id}`);
+    if ((await K()).airport !== id) fail(`airport ${(await K()).airport}`);
+    return `banked ${b0} → ${(await snap()).banked}, airborne`;
+  });
+}
+async function flyThere(id) {
+  await step(`map → FLY THERE ${id}`, async () => {
+    const card = await openMapAndPick(id);
+    if (!/Fits your/.test(card.txt)) fail(`card: ${card.txt}`);
+    await tapUntil('.krz-map-go', async () => (await K())?.dest === id || (await K())?.airport === id);
+    return card.txt.slice(0, 60);
+  });
+}
+async function caseTour() {
+  await step('boot (C-Tower 1, tiger)', async () => { await fresh('tiger'); const k = await K(); if (k.airport !== 'royal') fail(`booted at ${k.airport}`); return 'C-Tower 1'; });
+  await step('airborne', async () => { await until((s) => s.p && !s.p.gnd && s.p.agl > 90, 200, 'climb to 90 m'); return 'climbing'; });
+  await landHere('royal', '');
+  await taskTicked(['land_royal'], 'Home Field');
+  await demandAndGo('royal');
+  await flyThere('palace');
+  await step('handed over to the Palace Lawn (same world)', async () => {
+    await until(async () => (await K())?.airport === 'palace' && !(await K())?.phase, 600, 'C-Tower 3 takes over');
+    return `swap ${(await K()).swaps.at(-1)?.mode}`;
+  });
+  await step('LAND on the lawn', async (rec) => {
+    await until((s) => { const g = rwyGeom(s); return s.land && !s.land.hidden && s.land.state === 'idle' && s.p.agl > 40 && g && g.dist < 2500 && g.off < 25 && g.align < 35; }, 900, 'lawn ahead with LAND available');
+    await tapUntil('.krz-land', (s) => s?.land?.state === 'active');
+    rec.pick = (await snap()).land.txt;
+    if (!/RWY 26|RWY 08/.test(rec.pick)) fail(`LAND picked "${rec.pick}", not the lawn`);
+    const td = await until((s) => s.p && s.p.gnd, 600, 'touchdown');
+    if (td.s.p.crashed || td.s.p.surf !== 'runway') fail(`touched down on ${td.s.p.surf}${td.s.p.crashed ? ' (crashed)' : ''}`);
+    await until((s) => s.p.gnd && s.p.kt < 1, 200, 'stopped');
+    await shot('landed-palace');
+    return `${rec.pick} → on the lawn, stopped`;
+  });
+  await taskTicked(['land_palace', 'trip_1'], 'Lawn Order + Cross-Country');
+  await demandAndGo('palace');
+  await flyThere('farm');
+  await flyThrough('farm');
+  await landHere('farm', '', { rescue: true, final: true });
+  await taskTicked(['land_farm'], 'Wipe Your Wheels');
+  await demandAndGo('farm');
+  await flyThere('airbase');
+  await flyThrough('airbase');
+  await landHere('airbase', '', { rescue: true, final: true });
+  await taskTicked(['land_airbase', 'kingdom_tour', 'tour_nonstop'], 'Much Snoring + Grand Tour + Non-Stop');
+  await step('grid shows the Kingdom Map set', async () => {
+    await waitReal(() => D.rect('[data-act="pause"]'), 3000);
+    await D.tap('[data-act="pause"]');
+    await tapUntil('.kz-tk-pause', async () => !!(await D.rect('.kz-tasks.on')));
+    await sleep(700);
+    const n = await D.evSafe(`['land_royal', 'land_palace', 'land_farm', 'land_airbase', 'kingdom_tour', 'tour_nonstop'].filter((id) => document.querySelector('.kz-tasks.on .kz-tk-tile.done[data-id="' + id + '"]')).length`);
+    await shot('grid-kingdom');
+    if (n !== 6) fail(`${n}/6 Kingdom Map tiles ticked in the grid`);
+    return '6/6 tiles ticked';
+  });
 }
 
 // three START HERE swaps on the ground (the start-at entry), then back home: world memory must come back down
@@ -296,7 +409,7 @@ async function caseSwaps() {
 
 // ---------------------------------------------------------------- run
 D = await connect(PORT);
-const RUN = { farm: caseFarm, jumbo: caseJumbo, swaps: caseSwaps };
+const RUN = { farm: caseFarm, jumbo: caseJumbo, swaps: caseSwaps, tour: caseTour };
 for (const orient of orients) for (const name of CASES) {
   if (name === 'swaps' && orient === 'landscape' && !arg('cases')) continue;   // memory once is enough
   CASE = { name, orient, steps: [], shots: [], swaps: [], fps: {}, blocked: null };

@@ -13,9 +13,12 @@ const write = (v) => { try { localStorage.setItem(KEY, JSON.stringify(v)); } cat
 const HINTS = [
   { id: 'ctx', sel: '.krz-land[data-ctx]', text: () => '<b>One button for the F-35.</b> It changes as you fly: <b>VERTICAL TAKEOFF</b>, <b>HOVER</b>, <b>LAND HERE</b>.' },
   { id: 'map', sel: '.krz-map-chip', text: () => '<b>MAP:</b> the whole Kingdom. Pick an airfield and fly there.' },
+  // CONTROLS (D37): the AUTO button, the first time it counts down; desktop mouse aim's keys, the first time it is on
+  { id: 'auto', sel: '.krz-autobtn[data-state="count"]', text: () => '<b>AUTO</b> takes back over when this reaches 0. Tap it to hand back now. Tap it while the autopilot flies for <b>AUTO OFF</b>.' },
+  { id: 'mouse', sel: '.krz-maim:not([hidden]) .krz-maim-aim', text: () => '<b>Mouse aim:</b> point and the plane flies there. <b>W/S</b> throttle · <b>A/D</b> rudder · <b>Q/E</b> roll · <b>wheel</b> zoom · <b>C</b> view · <b>Space</b> brakes · <b>F</b> flaps · <b>Z</b> AUTO · <b>Esc</b> frees the mouse' },
 ];
 // a hint never sits on these (controls, the HUD, and the other message cards)
-const AVOID = ['.krz-stick-zone', '.krz-thr-col', '.krz-pad', '.krz-r-btn', '.krz-land', '.krz-finish', '.krz-gbtn', '.krz-top-l', '.krz-top-r', '.krz-warp',
+const AVOID = ['.krz-stick-zone', '.krz-thr-col', '.krz-pad', '.krz-r-btn', '.krz-land', '.krz-autobtn', '.krz-finish', '.krz-gbtn', '.krz-top-l', '.krz-top-r', '.krz-warp',
   '.krz-r-tower', '#krz-hud .krz-hud-strip', '#krz-hud .krz-ap', '.krz-score', '.krz-chips', '.krz-map-chip', '.krz-r-pill', '.krz-st-coach', '.krz-prompt',
   '.krz-coach-bub', '.krz-r-panel'];
 const shown = (e) => e && !e.hidden && !e.closest('[hidden]') && e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden';

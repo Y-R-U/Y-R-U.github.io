@@ -12,7 +12,7 @@ export const MISCHIEF = ['off', 'low', 'high'];
 export const QUALITIES = ['auto', 'low', 'medium', 'high'];
 export const VIEWS = ['chase', 'center', 'cockpit'];
 const SETTINGS_V = 3;
-export const DEFAULT_SETTINGS = { view: 'chase', views: VIEWS, quality: 'auto', sfx: 1, voice: 1, music: 0.6, invertPitch: false, stickRight: false, units: 'aviation', difficulty: 'easy', hints: true, trafficMarkers: true, stallHorn: false, aiMischief: 'low', aircraft: 'c172' };
+export const DEFAULT_SETTINGS = { view: 'chase', views: VIEWS, quality: 'auto', sfx: 1, voice: 1, music: 0.6, invertPitch: false, stickRight: false, units: 'aviation', difficulty: 'easy', hints: true, trafficMarkers: true, stallHorn: false, aiMischief: 'low', aircraft: 'c172', mouseAim: false };
 
 export const LIMITS = { name: 12, company: 14, display: 14 };
 
@@ -60,6 +60,7 @@ function storedSettings() {
   s.hints = s.hints !== false;
   s.trafficMarkers = s.trafficMarkers !== false;
   s.stallHorn = s.stallHorn === true;
+  s.mouseAim = s.mouseAim === true; // CONTROLS: desktop mouse aim, off by default
   if (!MISCHIEF.includes(s.aiMischief)) s.aiMischief = 'low';
   if (!HANGAR.includes(s.aircraft)) s.aircraft = 'c172';
   s.invertPitch = !!s.invertPitch;

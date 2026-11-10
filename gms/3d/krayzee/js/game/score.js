@@ -1,5 +1,5 @@
 // Royal Privilege economy (DESIGN §1.2–1.4, rules.js). Pure: no DOM, no clock; time only advances through update(dt).
-import { INFRACTIONS, BANK, CLEAN, BANTER, MULTIPLIERS as M, OUTRAGE, PROTECTION as P, DIFFICULTY, CLOSE_CALL } from '../../data/rules.js';
+import { INFRACTIONS, BANK, CLEAN, BANTER, MULTIPLIERS as M, OUTRAGE, PROTECTION as P, DIFFICULTY, CLOSE_CALL, BONUSES } from '../../data/rules.js';
 import { AIRCRAFT } from '../../data/aircraft.js';
 import { FREE_FLIGHT, ROOM_TYPES } from '../../data/modes.js';
 import { FINISH, difficultyFor } from './finish.js';
@@ -72,7 +72,7 @@ export function createScore(opts = {}) {
     comboStep: -1, comboLeft: 0, frozen: 0,
     protectionMode: mode.protection, protection: mode.protection === 'partial' ? mode.partialStart : mode.protection === 'rubber' ? 100 : 0,
     rankIndex: opts.rankIndex ?? 0, aircraft: opts.aircraft || 'c172', ppScale: 1,
-    airborne: false, landed: false, stopT: 0, gsKt: 0, impeccableDone: false, gag: 0, t: 0, closeAt: {}, touchWait: null, gaIgnoredAt: -1e9,
+    airborne: false, landed: false, stopT: 0, gsKt: 0, impeccableDone: false, gag: 0, t: 0, closeAt: {}, sheepAt: {}, touchWait: null, gaIgnoredAt: -1e9,
     stats: { infractions: 0, bestCombo: 1, bounces: 0, crashes: 0, scandals: 0, sorties: 0, ripostes: 0 },
   };
 
@@ -158,6 +158,33 @@ export function createScore(opts = {}) {
     addOutrage(CLEAN.impeccable.outrage, 'impeccable');
   }
 
+  // D38 Woolly Jumper: a player scatter of one Muckle Bottom flock from the air. Same multipliers as a rule break
+  // (combo as it stands, heat, aircraft, scale), but it never starts or extends a combo, and one flock pays once per
+  // cooldownPerFlock. Its outrage (+3, Mudge's composure) is forwarded to ATC like a bounce.
+  function sheepScatter(ev) {
+    const r = BONUSES.sheep_scatter, d = ev.data || ev;
+    if (r.airOnly && (d.air === false || d.onGround)) return null;
+    if ((d.n ?? 0) < r.minSheep) return null;
+    const k = d.flock ?? 0;
+    if (S.t - (S.sheepAt[k] ?? -1e9) < r.cooldownPerFlock) return null;
+    S.sheepAt[k] = S.t;
+    const frozen = S.frozen > 0;
+    const parts = {
+      base: r.pp,
+      combo: r.comboFeed === false ? (S.comboLeft > 0 ? comboMult(Math.max(0, S.comboStep)) : 1) : 1,
+      audacity: 1,
+      heat: heatMult(S.outrage),
+      aircraft: AIRCRAFT[S.aircraft]?.ppMult ?? 1,
+      scale: mode.ppRate * S.ppScale,
+    };
+    addOutrage(r.outrage, 'sheep_scatter');
+    const mult = parts.combo * parts.heat * parts.aircraft * parts.scale;
+    const amount = frozen ? 0 : round10(r.pp * mult);
+    const text = frozen ? `${r.name.toUpperCase()} — the press are watching` : `${r.name.toUpperCase()}! +${amount}${Math.abs(mult - 1) > 0.005 ? ' ' + fmt(mult) : ''}`;
+    gain(amount, { id: 'sheep_scatter', name: r.name, text, mult, parts, frozen, combo: parts.combo, flock: k, sheep: d.n ?? 0 });
+    return amount;
+  }
+
   function banter(b) {
     if (b.source !== 'response' || S.frozen > 0) return;
     let amount = BANTER.riposte, name = 'Riposte';
@@ -201,6 +228,7 @@ export function createScore(opts = {}) {
     const meterIsMine = ev.key != null ? ev.key === (opts.outragePerPlayer ? `tower:${me}` : 'tower') : (mine(ev) || !opts.outragePerPlayer);
 
     if (ev.type === 'barked') banter(ev);
+    else if (id === 'sheep_scatter') { if (mine(ev)) sheepScatter(ev); }
     else if (id === 'impeccable' && mine(ev)) impeccable();
     else if (ev.type === 'landed' && mine(ev)) { S.landed = true; if (ev.impeccable) impeccable(); }
     else if (ev.type === 'goaroundrefused' && (ev.actor == null || mine(ev))) ignoredGoAround(ev, true);

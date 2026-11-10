@@ -151,6 +151,14 @@ console.log('\n# real Free Flight: take off, LAND, first touchdown → toast + g
   const t2 = await waitReal(() => D.evSafe('window.__tkToasts.find((t) => t.id === "touch_down")'), 6000, 100);
   ok(!!t2, `first landing toast: "${t2?.text}"`);
   await D.shot(OUT, 'flight-landed-portrait');
+  // MAPTASKS (C4): a LAND on C-Tower 1's runway that stops = Home Field; a LAND that chose a field must not tick it
+  if (down?.p?.surf === 'runway') {
+    const t3 = await waitReal(() => D.evSafe('window.__tkToasts.find((t) => t.id === "land_royal")'), 120000, 200);
+    ok(!!t3, `stopped on the runway: Home Field toast ("${t3?.text}")`);
+  } else {
+    await waitReal(async () => { const s = await D.evSafe(SNAP); return s?.p?.gnd && s.p.kt < 1; }, 60000, 300);
+    ok(!(await D.evSafe(`import('./js/game/tasks.js').then((m) => m.peekTasks().isDone('land_royal'))`)), `stopped in a field (${down?.p?.surf}): Home Field not ticked`);
+  }
   const toasts = await D.evSafe('window.__tkToasts');
   console.log('   toasts:', toasts.map((t) => t.text).join(' | '));
   const ids = toasts.map((t) => t.id);

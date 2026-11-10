@@ -41,6 +41,12 @@ export const INFRACTIONS = {
   intersection_dash: { name: 'Crossroads',            pp: 200, outrage: 10, scold: 'scold_runway', detect: '09/27 x 04/22 intersection crossed while other plane on either runway' },
 };
 export const INFRACTION_COOLDOWN = 30;
+// D38 (SHEEP2): small score-side bonuses that are not rules broken (not in INFRACTIONS: no rule task, no rap sheet, no
+// ATC detector). sheep_scatter = the player scatters a Muckle Bottom flock from the air (js/world/sheep.js → score).
+// Rides the live combo/heat/aircraft multipliers but never starts or extends a combo; once per flock per cooldown.
+export const BONUSES = {
+  sheep_scatter: { name: 'Woolly Jumper', pp: 30, outrage: 3, cooldownPerFlock: 60, minSheep: 3, airOnly: true, comboFeed: false, voice: 'sheep_scatter', detect: 'player airborne below 60 m AGL scares >= 3 sheep of one flock (flock.js onScatter)' },
+};
 // D30: one window per pair across every close call, touch or miss.
 export const CLOSE_CALL = { ids: ['near_miss', 'light_touch', 'formation'], pairCooldown: 60 };
 

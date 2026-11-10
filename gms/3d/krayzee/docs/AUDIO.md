@@ -144,7 +144,8 @@ the doppler check. Zeroing the prop detunes by hand dropped the beat from 0.17 t
 ## One-shots (optional `{ position }` for other planes, `{ delay }`)
 `playTouchdown(intensity 0..1)` (screech + thud; pass sink rate mapped to 0..1), `playGearThump()`,
 `playCrash(intensity)`, `playBoing(intensity)` (impossiRubber bounce), `playUI('click'|'confirm'|'back'|'toggle'|'error')`,
-`playSquelch('on'|'off')`.
+`playSquelch('on'|'off')`, `playBleat({ position, pitch, gain, delay })` (C5 sheep: sawtooth through two vowel
+formants with the 24–32 Hz bleat tremolo, lowpassed at 3 kHz; js/world/sheep.js calls it at the sheep).
 
 ## Radio
 ```js

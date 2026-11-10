@@ -3,6 +3,7 @@
 //   { on, when? }            one-shot: the first matching event completes it
 //   { stat, target }         lifetime counter (STATS) reaching target
 //   { fstat, target }        per-flight counter (FSTATS) reaching target in a single flight
+//   { sstat, target }        per-sitting counter (SSTATS) reaching target from starting play to quitting to the menu
 // Event shapes (all carry plane, diff, mode): see docs/TASKS.md "Events".
 import { INFRACTIONS } from './rules.js';
 
@@ -80,6 +81,10 @@ export const STATS = {
   tubSecs:      { on: 'air', when: plane('bathtub'), add: (e) => e.dt },
   mothSecs:     { on: 'air', when: plane('tiger'), add: (e) => e.dt },
   missions:     { on: 'story', when: (e) => e.ok, unique: (e) => e.mission },
+  sheepScatters: { on: 'sheep' }, // D38: one per player flock scatter the score accepted (per-flock cooldown)
+  // MAPTASKS (C4): `arrival` = a touchdown on an airport's runway/lawn that came to a stop; `trip` = the airport changed in flight
+  airports:     { on: 'arrival', unique: (e) => e.airport },
+  trips:        { on: 'trip' },
 };
 
 // Per-flight counters: zeroed at each flight start (play start, DEMAND IT, respawn); the best flight is kept.
@@ -92,6 +97,14 @@ export const FSTATS = {
   pittsRolls: { on: 'roll', when: (e) => e.plane === 'pitts' },
   visits:   { on: 'visit', unique: (e) => e.place },
 };
+
+// Per-sitting counters (MAPTASKS, C4): zeroed when play starts from the menu, kept through DEMAND IT, respawns and map
+// trips, gone on quitting to the menu.
+export const SSTATS = {
+  airports: { on: 'arrival', unique: (e) => e.airport },
+};
+// the four airports of the Kingdom Map (data/airports/kingdom.js ORDER)
+export const AIRPORT_IDS = ['royal', 'palace', 'farm', 'airbase'];
 
 const T = (id, icon, name, desc, tier, rule) => ({ id, icon, name, desc, tier, ...rule });
 
@@ -164,6 +177,10 @@ export const SETS = [
     T('variety', '🎭', 'Variety Act', 'Five different rules broken in one flight.', 'silver', { fstat: 'rules', target: 5 }),
     T('rap_sheet', '📜', 'Full Rap Sheet', `Break all ${RULE_IDS.length} rules at least once.`, 'gold', { stat: 'rules', target: RULE_IDS.length }),
     T('frozen', '📸', 'Nothing Counts', 'Break a rule while the press are watching (after a scandal).', 'bronze', { on: 'infraction', when: (e) => !!e.frozen }),
+    // SHEEP2 (D38): Muckle Bottom's flocks, scattered from the air (one count per flock per minute)
+    T('sheep_1', '🐑', 'Sheep Scatterer', 'Scatter a flock of sheep at Muckle Bottom from the air. Doreen will recover.', 'bronze', { stat: 'sheepScatters', target: 1 }),
+    T('sheep_10', '🐏', 'Flock Botherer', 'Scatter Muckle Bottom flocks 10 times. Farmer Mudge has noticed.', 'silver', { stat: 'sheepScatters', target: 10 }),
+    T('sheep_50', '🧶', 'Shepherd\'s Warning', 'Scatter Muckle Bottom flocks 50 times. The ewes have formed a union.', 'gold', { stat: 'sheepScatters', target: 50 }),
   ] },
   { id: 'tower', name: 'Tower Torment', blurb: 'Composure is a finite resource', badge: '☕', epithet: 'Bane of Towers', tasks: [
     T('strained', '😐', 'Mildly Strained', 'Push the tower to Strained.', 'bronze', { on: 'composure', when: (e) => e.tier >= 2 }),
@@ -205,7 +222,18 @@ export const SETS = [
     T('village_low', '🧹', 'Chimney Sweep', 'Over the village rooftops, under 30 m.', 'silver', { on: 'visit', when: (e) => e.place === 'village' && e.low }),
     T('terminal_low', '🧽', 'Window Cleaner', 'Over the terminal, under 40 m. Mind the roof.', 'silver', { on: 'visit', when: (e) => e.place === 'terminal' && e.low }),
     T('lake_low', '🌊', 'Wet Wheels', 'Over the lake, under 5 m.', 'silver', { on: 'visit', when: (e) => e.place === 'lake' && e.low }),
-    T('grand_tour', '🗺️', 'Grand Tour', 'Castle, church, village, lake and terminal in one flight.', 'gold', { fstat: 'visits', target: 5 }),
+    T('grand_tour', '🗺️', 'Sightseeing Tour', 'Castle, church, village, lake and terminal in one flight.', 'gold', { fstat: 'visits', target: 5 }),
+  ] },
+  // MAPTASKS (C4): first landing at each airport (touch down on its runway or lawn and come to a stop, any plane) + trips
+  { id: 'kingdom', name: 'The Kingdom Map', blurb: 'Every tower in the realm', badge: '🧭', epithet: 'the Well-Travelled', tasks: [
+    T('land_royal', '🏰', 'Home Field', 'Land at C-Tower 1, Krayzee Royal, and stop on the runway.', 'bronze', { on: 'arrival', when: (e) => e.airport === 'royal' }),
+    T('land_farm', '🚜', 'Wipe Your Wheels', 'Land at Muckle Bottom, C-Tower 2, and stop on the grass strip.', 'bronze', { on: 'arrival', when: (e) => e.airport === 'farm' }),
+    T('land_palace', '🌹', 'Lawn Order', 'Land on the Palace Lawn, C-Tower 3, and stop on it. Mr Fennimore will announce you.', 'silver', { on: 'arrival', when: (e) => e.airport === 'palace' }),
+    T('land_airbase', '🎖️', 'Much Snoring, Little Sleep', 'Land at RAF Much Snoring, C-Tower 4, and stop on the runway.', 'bronze', { on: 'arrival', when: (e) => e.airport === 'airbase' }),
+    T('trip_1', '☁️', 'Cross-Country', 'Fly from one airport to another on the Kingdom Map.', 'bronze', { on: 'trip' }),
+    T('trip_10', '🧳', 'Kingdom Commuter', 'Ten trips between airports.', 'silver', { stat: 'trips', target: 10 }),
+    T('kingdom_tour', '🗺️', 'Grand Tour', 'Land at all four airports in the kingdom.', 'gold', { stat: 'airports', target: AIRPORT_IDS.length }),
+    T('tour_nonstop', '👑', 'Grand Tour, Non-Stop', 'Land at all four airports without quitting to the menu.', 'gold', { sstat: 'airports', target: AIRPORT_IDS.length }),
   ] },
   { id: 'reign', name: 'The Long Reign', blurb: 'Hours aloft. Lots of them.', badge: '⏳', epithet: 'the Long-Reigning', tasks: [
     T('air_30m', '⏱️', 'Elevenses Aloft', '30 minutes airborne in all.', 'bronze', { stat: 'airSecs', target: 1800 }),

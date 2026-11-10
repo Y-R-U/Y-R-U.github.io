@@ -83,6 +83,13 @@ transmission. If any splice clip is missing the body plays alone; subtitles alwa
 - `line` `{speaker, voice, intent, id, variant, text, target, missing}` when a transmission starts.
 - `window` `{open, kind, cause, intents | reason:'chosen'|'timeout'|'closed'}`. `event` echoes every adapted event.
 
+## Hush — `radio.hush(on)` (story intro)
+`hush(true)` silences the channel: queue, pending scold and scheduled lines are dropped, the line on air is cut
+(`audio.stopRadio`), an open window closes, and every new line (AI, tower, player, online schedule) is refused until
+`hush(false)`. Nothing is buffered. HUD visibility is untouched. `radio.hushed` reads it. Used by js/story/index.js
+around the intro. A line cut before it went on air (hushed, or cancelled by `stopRadio`) no longer emits `line` or
+adds a log row.
+
 ## Online (ONLINE §5/§10)
 - `radio.setMode('host'|'follower'|'local')`. Follower: events only update outrage; lines come from the host.
 - `radio.schedule(atRoomMs, msg)` with `createRadio({ roomTime: () => hostMs })`. `msg` = `{speaker, intent, variant,

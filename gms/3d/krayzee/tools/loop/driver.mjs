@@ -87,7 +87,14 @@ export async function connect(port) {
     }
     await D.touchEnd();
   };
+  // CONTROLS: headless Chrome sometimes opens a chrome://settings/help tab in front; this page then goes 'hidden' (no rAF:
+  // the sim stops, Input.dispatchTouchEvent times out). Close strays and bring this page to the front (fresh() calls it too)
+  D.front = async () => {
+    try { for (const t of await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()) if (t.type === 'page' && t.url.startsWith('chrome://') && t.id !== page.id) await fetch(`http://127.0.0.1:${port}/json/close/${t.id}`); } catch (e) { /* */ }
+    await send('Page.bringToFront').catch(() => {});
+  };
   await send('Page.enable'); await send('Runtime.enable'); await send('Network.enable');
+  await D.front();
   await send('Network.setCacheDisabled', { cacheDisabled: true });
   return D;
 }

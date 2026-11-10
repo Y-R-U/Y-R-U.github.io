@@ -129,7 +129,7 @@ function paintDetail() {
   if (!t) { d.innerHTML = '<span class="kz-tk-hint">Tap a task to see what it wants.</span>'; return; }
   const p = progressText(t);
   d.innerHTML = `<span class="kz-tk-di" aria-hidden="true">${t.avail ? t.icon : '🔒'}</span><span class="kz-tk-dt"><b>${esc(t.name)}</b> ${esc(t.avail ? t.desc : 'Coming soon: this aircraft is still in the Royal workshop.')}</span>
-    <span class="kz-tk-dm"><em class="${t.tier}">${TIER[t.tier]}</em>${p ? `<small>${esc(p)}${t.perFlight && !t.done ? ' · best flight' : ''}</small>` : ''}<b>+${fmt(t.pp)} PP</b></span>`;
+    <span class="kz-tk-dm"><em class="${t.tier}">${TIER[t.tier]}</em>${p ? `<small>${esc(p)}${t.perFlight && !t.done ? ' · best flight' : ''}${t.perSitting && !t.done ? ' · without quitting' : ''}</small>` : ''}<b>+${fmt(t.pp)} PP</b></span>`;
 }
 
 function onGridTap(e) {

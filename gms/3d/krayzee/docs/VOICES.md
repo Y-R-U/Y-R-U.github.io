@@ -198,3 +198,17 @@ entry (falsified: moving `m_hover.mp3` away → RED).
 - js/story/actors.js copies only *textOnly* tower lines into every tower voice. A voiced line exists in its own voice
   alone, so M8's `t_jumbo` (Toby, said while Gerald holds the tower) would have been dropped. js/radio now borrows
   such a line from the voice that has it and plays it in that voice (RADIO.md "Map towers").
+
+### Farmer Mudge's sheep lines (`tower_farm.sheep_scatter.0–9`, SHEEP2, 2026-11-05)
+10 lines in data/airports/farm-lines.js (`L('sheep_scatter', …)`, no callsign, no tiers), said when the player scatters
+a flock from the air (js/world/sheep.js, D38). Same pipeline as the rest of Mudge: `python3 data/barks/build_towers2.py`
+→ `gen_barks.py --script ../../data/barks/towers2.json --only tower_farm.sheep_scatter.0,…` (63 s for all ten on a quiet
+GPU, every one accepted on seed 1) → `build_towers2.py --fix-peaks` (1 pass) → `check_towers.mjs --audio` GREEN 379/379
+(was 369; falsified by moving `sheep_scatter.5.mp3` away → RED, 1 failure). Loudness −18.5 to −16.4 LUFS, peaks −1.8 to
+−1.2 dBTP, 2.0–3.7 s, none sped up.
+- Whisper flags (WER > 0, all the burr, not a bad take): `.1` "My ewes … more ewes" (say "moi ewes"), `.5` "them sheep,
+  not skittles" (the 's of "Them's" is soft: listen), `.7` "or you'll be counting" ("Oi'll"), `.8` "Over maw flock … oil
+  set the dog" ("moi", "Oi'll").
+- Gotcha: re-running build_towers2.py re-copies tower_f's splice entries under tower_raf (`alias_raf`) and rewrites
+  their `maxSeconds` in barks.json (1.4 → 1.2). Metadata only; SHEEP2 restored the old tower_raf block to keep the diff
+  to the 10 new entries.

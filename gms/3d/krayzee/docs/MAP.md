@@ -40,7 +40,7 @@ air base promised with D33. Design background: docs/AIRPORTS.md. This file is wh
 | stands | 8 | 4 (farmyard) | 8 (heavies take two) |
 | tower | royal tower | water tank on stilts with a shed cab, "C-TOWER 2" | concrete block + glass cab, "C-TOWER 4" |
 | terminal | royal terminal | red barn, "ARRIVALS & SILAGE" | ops block, "RAF MUCH SNORING" |
-| props | (hand-built) | farmhouse, 2 silos, shed, hay bales, tractor, 5 hedges, 34 sheep, 15 cows, pond, 2 windsocks | hangar, 3 hardened shelters, 2 fuel tanks, radar dome, 2 sheds, 2 windsocks |
+| props | (hand-built) | farmhouse, 2 silos, shed, hay bales, tractor, 5 hedges, 34 sheep in 3 fields (they scatter, C5), 15 cows, pond, 2 windsocks | hangar, 3 hardened shelters, 2 fuel tanks, radar dome, 2 sheds, 2 windsocks |
 | planes | all six | C172, Tiger, Bathtub | all six |
 | AI jets | 7 % (JETCORE) | none | 30 % |
 
@@ -156,9 +156,9 @@ refused with the quip. `--falsify=surface|refuse|tower` must go red.
   soak at the farm (light types) and the air base (with jets). `--control` adds a C-Tower 1 soak; `--break=short|
   overlap|graph|approach` breaks the data on purpose (each goes red).
 - `node tools/test-map.mjs` (headless Metal Chrome, real taps, 390×844 and 844×390): farm trip in the C172 (map →
-  FLY THERE → clouds → emerged → C-Tower 2 on the radio → LAND → DEMAND IT + refuel → DEMAND TAKEOFF), jumbo refused
+  FLY THERE → clouds → emerged → C-Tower 2 on the radio → LAND → map tasks tick → DEMAND IT + refuel → DEMAND TAKEOFF), jumbo refused
   at the farm then flown to the air base and landed, and six START HERE swaps on the ground with memory read with the
-  AI sent home (boot → after 3 → after 6 must stay flat). `--falsify=noswap|nofuel|refuse|leak|cover` must go red.
+  AI sent home (boot → after 3 → after 6 must stay flat). `--falsify=noswap|nofuel|refuse|leak|cover|notask` must go red. `--cases=tour`: the map tasks (below).
   Screenshots + JSON in docs/shots/map/.
 - `tools/map-view.html?swaps=3` builds royal → farm → airbase → royal three times in an empty page and lists
   renderer.info.memory after each build (window.__swap): world geometries/textures return exactly to the boot numbers.
@@ -171,5 +171,53 @@ refused with the quip. `--falsify=surface|refuse|tower` must go red.
 - The F-35 is refused at the farm by the length rule. Once STOVL lands, the farm could accept it if the arrival flew
   a vertical landing (needs the STOVL lane's AP).
 - (done) Autopilot `_minRun()` is per type now (roll × 1.4, ≥ 150 m).
-- Sheep don't scatter yet (`sheep_scatter` in AIRPORTS.md); no Grand Tour PP bonus for a trip; online rooms stay at
-  C-Tower 1.
+- (done, C5 + D38) Sheep scatter: see "Sheep" below; buzzing a flock pays the Woolly Jumper bonus. No Grand Tour PP bonus for a
+  trip; online rooms stay at C-Tower 1.
+
+## Map tasks (C4, lane MAPTASKS, 2026-11-09)
+The task grid's **Kingdom Map** set (docs/TASKS.md): first landing at each airport (Home Field / Wipe Your Wheels / Lawn Order /
+Much Snoring, Little Sleep), Cross-Country (one trip) and Kingdom Commuter (ten), **Grand Tour** (landed at all four, ever) and
+**Grand Tour, Non-Stop** (all four without quitting to the menu). Pure task code, no map code changed:
+- A landing counts when the touchdown is on that airport's runway or lawn (not a crash), and the plane then stops (< 1 m/s)
+  without lifting off. Any plane, any mode (story missions too), vertical let-downs included. Fields, touch-and-goes, START HERE
+  and spawns do not count. C-Tower 1 and the Palace Lawn share a world, so a lawn landing is the lawn whichever tower is active,
+  and 09/27 / 04/22 is C-Tower 1 even while Mr Fennimore has the radio.
+- A trip is the loaded airport changing while the player is airborne (cloud swap or the royal ↔ lawn handover at 1.5 km).
+- The "sitting" survives DEMAND IT, being destroyed and map swaps (`wiring.setWorld` re-attaches the tasks without a detach,
+  and `attach` only starts a sitting when it was detached), and ends at `wiring.endPlay` (quit to the menu). Not saved.
+- Gates: `node tools/tasks-sim.mjs` (MAPTASKS section, 7 falsify breaks); `node tools/test-map.mjs` farm case ticks Cross-Country +
+  Wipe Your Wheels, jumbo case ticks Much Snoring (toast seen, saved in `krayzee.tasks`); `node tools/test-map.mjs --cases=tour
+  --orient=portrait` flies one Tiger sitting royal → lawn → farm → air base with a real LAND at each and checks all six rows tick
+  and show in the grid; `--falsify=notask` (the four first-landing rows' detectors disabled in the page) must go red.
+
+## Sheep (C5, lane INTRO+SHEEP, 2026-11-04)
+34 sheep in three fields at Muckle Bottom: the south pasture beside the strip (18, behind the hedge), and a field
+under each final approach (9 east under the 25 final, 7 west under 07). One instanced mesh, one draw call.
+- **Scatter** (js/world/flock.js, pure logic): a plane below 60 m AGL scares sheep within 130 m (at 0 m) shrinking to
+  45 m (at 60 m); a plane rolling on the ground faster than 4 m/s within 40–110 m (by speed); a parked or crawling
+  plane, or anything above 60 m, does nothing. A scared sheep bolts directly away (±25° jitter) at 5.5–7.5 m/s with a
+  bouncing gait for 2.5–4.5 s, its neighbours within 14 m catch the panic a beat later, then it slows, settles and
+  grazes again, stepping back towards where it started (the flock re-forms in a couple of minutes).
+- Sheep never leave their field (clamped to the footprint, turning along the hedge), so they are never on the strip
+  or a taxi route, and they are not colliders: nothing to hit.
+- **Bleat**: `audio.playBleat`, synthesised (no file), placed at the sheep; 1–3 per scatter, at most one burst per
+  flock per 3.5 s; a quiet contented bleat every 18–48 s from a grazing flock. Not played beyond 450 m of the camera.
+- **Panic tally** (SHEEP2): flock.js reports the sheep a plane reaches frame by frame (1–2 at a time on a pass), so
+  js/world/sheep.js adds up one flock's fresh scares by the player from the air until it has been quiet for 5 s
+  (`PANIC.gap`). That tally is one panic.
+- **Woolly Jumper +30 PP** (D38, lane SHEEP2): each report goes to the score as `{ type: 'sheep_scatter', flock, n }`.
+  The score pays once the tally reaches 3 sheep, once per flock per 60 s, airborne only, never for AI, outrage +3. It
+  is a bonus, not a rule (data/rules.js `BONUSES`). The task grid counts the scatters the score paid (Habitual Offender:
+  Sheep Scatterer 1, Flock Botherer 10, Shepherd's Warning 50).
+- **Farmer Mudge**: when one panic reaches 3 sheep, one roll at 60 % (at most once a minute, never in a story mission)
+  of his own `sheep_scatter` lines (10 voiced clips: Doreen, Gladys, Big Brenda). If those clips are missing he falls
+  back to `scold_buzz`.
+- js/world/sheep.js joins it to the game; main.js calls `world.sheep?.update(simDt, traffic.list, camera.position, …)`
+  (`// INTROSHEEP`; SHEEP2 adds `game: wiring.game` to its ctx). The cows are still static (docs/V1.md "Later").
+- Gates: `node tools/sheep-sim.mjs` (14 checks on the real farm data; `--falsify=deaf|ceiling|fence` each go red),
+  `node tools/test-sheep.mjs --port=9731` (real game, portrait + landscape: low pass scatters + bleat, 220 m pass
+  does nothing; SHEEP2: the low pass pays Woolly Jumper once per flock, adds to the task counter, and Mudge (chance
+  forced to 1) answers with a voiced `sheep_scatter` clip; 24 checks; `--falsify=nosheep|nobonus|noclips` each go red;
+  `--closeup` writes docs/shots/sheep/closeup_*.png). Score rules: `node tools/score-sim.mjs` "D38" (17 checks, 6
+  falsify breaks); task counting: `node tools/tasks-sim.mjs` (4 sheep negative controls, 2 falsify breaks).
+

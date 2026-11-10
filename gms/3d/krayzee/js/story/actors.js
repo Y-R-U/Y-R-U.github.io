@@ -103,10 +103,24 @@ export function extendHost(H, G, o = {}) {
     const P = H.player(); if (!P) return false;
     for (const k of Object.keys(P.axis)) { P.axis[k].mode = 'auto'; P.manual[k] = null; }
     G.release?.();
+    // an attract plane on the start spot (the hold) is a collision at once, and on Hard that ends the mission at 0 s. Free
+    // Flight's play start seeds a hold rival asynchronously, so it can arrive after this: cleared again at "Fly" (clearStart)
+    H.groundStart = { x, z, heading };
+    G.clearAround?.(x, z, 80);
     P.ac.place({ x, z, heading }, T().env);
     W()?.link?.placed(P, 6);
+    clearInterval(H._startGuard);
+    let n = 0;
+    H._startGuard = setInterval(() => { if (++n > 60) clearInterval(H._startGuard); H.clearStart(); }, 100);
     return true;
   }, false);
+
+  H.clearStart = () => safe(() => {
+    const g = H.groundStart, P = H.player(); if (!g || !P) return;
+    G.clearAround?.(g.x, g.z, 80);
+    // already touched by it while the briefing was up (still on the spot): put the plane back, whole
+    if (P.ac.crashed && Math.hypot(P.ac.pos.x - g.x, P.ac.pos.z - g.z) < 10) { P.ac.place({ x: g.x, z: g.z, heading: g.heading }, T().env); W()?.link?.placed(P, 6); }
+  });
 
   // D20: fraction 0..1 of both tanks; burn = fuel burn multiplier (1 = real). Returns the previous { fraction, burn }.
   H.fuel = (fraction = null, burn = null) => safe(() => {

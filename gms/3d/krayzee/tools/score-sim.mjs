@@ -382,6 +382,59 @@ section("goaroundrefused → Selective Hearing (once per go-around)");
   ok(pp.length === 1 && pp[0].amount === 120, 'ATC first, refusal second: still once');
 }
 
+section('D38 Woolly Jumper: sheep scatter bonus (SHEEP2)');
+{
+  const sh = (flock = 0, extra = {}) => ({ type: 'sheep_scatter', actor: 'player', flock, n: 6, air: true, ...extra });
+  const pays = []; const g = game({ autoBank: false }); g.on('pp', (e) => pays.push(e));
+  const deltas = []; g.on('outrageDelta', (d) => deltas.push(d.amount));
+  g.handleEvent(sh(0));
+  ok(pays.length === 1 && pays[0].id === 'sheep_scatter' && pays[0].amount === 30 && pays[0].name === 'Woolly Jumper', `first flock scatter pays Woolly Jumper +30 (got ${pays[0]?.name} ${pays[0]?.amount})`);
+  ok(g.state().outrage === 3 && deltas[0] === 3, `+3 outrage, forwarded to ATC (outrage ${g.state().outrage}, delta ${deltas[0]})`);
+  ok(g.state().stats.infractions === 0, 'a bonus, not a rule break (stats.infractions stays 0)');
+  g.update(10, {}); g.handleEvent(sh(0));
+  ok(pays.length === 1, 'same flock again 10 s later: nothing (per-flock cooldown)');
+  g.handleEvent(sh(1));
+  ok(pays.length === 2 && pays[1].flock === 1, 'another flock inside the cooldown still pays');
+  g.update(45, {}); g.handleEvent(sh(0));
+  ok(pays.length === 2, 'same flock at 55 s: still cooling down');
+  g.update(6, {}); g.handleEvent(sh(0));
+  ok(pays.length === 3, 'same flock after 60 s pays again');
+  const n0 = pays.length;
+  g.handleEvent(sh(2, { air: false }));
+  g.handleEvent(sh(2, { n: 2 }));
+  g.handleEvent(sh(2, { actor: 'ai7' }));
+  ok(pays.length === n0, 'rolling on the ground, 2 sheep, or an AI plane: no bonus');
+  g.handleEvent(sh(2));
+  ok(pays.length === n0 + 1, 'flock 2 was not used up by the refused scatters');
+}
+{
+  // never starts or extends a combo, but rides one that is running
+  const g = game({ autoBank: false }); const pays = []; g.on('pp', (e) => pays.push(e));
+  g.handleEvent(sh2(0)); g.handleEvent(sh2(1)); g.handleEvent(sh2(2));
+  ok(g.state().comboLeft === 0 && g.state().combo === 1, 'three scatters start no combo');
+  g.handleEvent(inf('tower_buzz', { outrage: 0, victim: 'x' }));
+  eq(pays.at(-1).combo, 1, 'the next rule break is the combo opener (×1), sheep did not count');
+  const g2 = game({ autoBank: false }); const p2 = []; g2.on('pp', (e) => p2.push(e));
+  g2.handleEvent(inf('tower_buzz', { outrage: 0, victim: 'a' })); g2.handleEvent(inf('terminal_buzz', { outrage: 0, victim: 'b' }));
+  const left = g2.state().comboLeft;
+  g2.update(5, {}); g2.handleEvent(sh2(0));
+  eq(p2.at(-1).parts.combo, 1.25, 'scatter inside a ×1.25 combo rides it');
+  ok(Math.abs(g2.state().comboLeft - (left - 5)) < 1e-6, 'and does not refresh the combo window');
+  g2.update(16, {});
+  ok(g2.state().combo === 1, 'combo expires on its own schedule after a scatter');
+  const g3 = game({ autoBank: false, mode: 'story', difficulty: 'medium' }); let p3 = null; g3.on('pp', (e) => (p3 = e));
+  g3.handleEvent(sh2(0));
+  ok(p3?.amount === 30, `story missions pay it too (${p3?.amount})`);
+  const g4 = game({ autoBank: false }); let p4 = null; g4.on('pp', (e) => (p4 = e));
+  g4.handleEvent({ type: 'scandal', key: 'tower' }); g4.handleEvent(sh2(0));
+  ok(p4?.id === 'sheep_scatter' && p4.amount === 0 && p4.frozen, 'press watching (after a scandal): 0 PP, still reported');
+  const st = memStore(); const c = G.loadCareer({ storage: st });
+  const g5 = G.createGame({ mode: 'free', career: c, rng: seeded(7), autoBank: false });
+  g5.handleEvent(sh2(0)); g5.handleEvent(inf('low_pass', { outrage: 0 })); landAndStop(g5); g5.demand({ ok: true });
+  ok(c.stats.infractions === 1, `career counts the low pass, not the sheep (${c.stats.infractions})`);
+}
+function sh2(flock) { return { type: 'sheep_scatter', actor: 'player', flock, n: 6, air: true }; }
+
 section('career: D2 / D3');
 {
   const st = memStore(); let t = 1000;
@@ -547,6 +600,12 @@ function falsify() {
     { name: 'GAMEFIX auto-bank ignores the finish zone', file: 'js/game/score.js', from: "const zoneOk = f.finishOk ?? (difficulty() !== 'hard' || !!f.atStand);", to: 'const zoneOk = true;' },
     { name: 'GAMEFIX auto-bank Hard default allows runways', file: 'js/game/score.js', from: "(difficulty() !== 'hard' || !!f.atStand)", to: 'true' },
     { name: 'GAMEFIX auto-bank ignores finishOk from wiring', file: 'js/game/score.js', from: "f.finishOk ?? (", to: '(' },
+    { name: 'D38 sheep per-flock cooldown dropped', file: 'js/game/score.js', from: 'if (S.t - (S.sheepAt[k] ?? -1e9) < r.cooldownPerFlock) return null;', to: '' },
+    { name: 'D38 sheep cooldown shared by all flocks', file: 'js/game/score.js', from: 'const k = d.flock ?? 0;', to: 'const k = 0;' },
+    { name: 'D38 sheep pays on the ground', file: 'data/rules.js', from: 'airOnly: true,', to: 'airOnly: false,' },
+    { name: 'D38 sheep feeds the combo (as a rule break)', file: 'js/game/score.js', from: "else if (id === 'sheep_scatter') { if (mine(ev)) sheepScatter(ev); }", to: "else if (id === 'sheep_scatter') { if (mine(ev)) { INFRACTIONS.sheep_scatter = { ...BONUSES.sheep_scatter }; infraction('sheep_scatter', ev, true); } }" },
+    { name: 'D38 sheep never pays', file: 'data/rules.js', from: "name: 'Woolly Jumper', pp: 30,", to: "name: 'Woolly Jumper', pp: 0," },
+    { name: 'D38 AI scatters pay', file: 'js/game/score.js', from: "{ if (mine(ev)) sheepScatter(ev); }", to: '{ sheepScatter(ev); }' },
     { name: 'D19 hard accepts runways', file: 'js/game/finish.js', from: 'const ok = atSpot || (onApron(x, z) && nearStand(x, z));', to: 'const ok = true;' },
   ];
   let allCaught = true;

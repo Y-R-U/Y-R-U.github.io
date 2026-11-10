@@ -2,6 +2,9 @@ import { clamp, moveTo } from './vmath.js';
 import { OVERRIDE } from './traffic.js';
 
 const NOTCHES = [0, 1 / 3, 2 / 3, 1];
+// CONTROLS: both were lost in b5e91495 (ReferenceError: the FLAPS button/F key threw, a held Shift/Ctrl threw every frame)
+const FLAP_HOLD = 10;     // s a player's flap notch stays theirs
+const KEY_THR_HOLD = 3;   // s a keyboard throttle stays manual after the key is let go (then the lever latches)
 const EXPO = 0.45;
 const expo = (x) => Math.sign(x) * (EXPO * Math.abs(x) ** 3 + (1 - EXPO) * Math.abs(x));
 // D9: invertPitch false = stick/ArrowDown/S DOWN → nose UP. D10: stickRight false = stick on the LEFT.
@@ -11,7 +14,8 @@ export function flightPrefs(s = {}) {
 }
 
 // Player input → per-axis "manual" values (null = released, autopilot has it).
-export function createControls({ root, getSettings, getDifficulty, onView, onPause, onFullscreen, onThrottleAuto }) {
+// mouseAim (js/flight/mouseaim.js, desktop Settings › Mouse aim) remaps the keys and adds the instructor's stick; onAuto = Z (D37 AUTO).
+export function createControls({ root, getSettings, getDifficulty, onView, onPause, onFullscreen, onThrottleAuto, mouseAim = null, onAuto, getAutoOff }) {
   const el = document.createElement('div');
   el.id = 'krz-controls';
   el.innerHTML = `
@@ -133,7 +137,7 @@ export function createControls({ root, getSettings, getDifficulty, onView, onPau
   // ---- look-around on empty screen (canvas) ----
   const canvas = document.querySelector('#krz-canvas');
   canvas?.addEventListener('pointerdown', (e) => {
-    if (st.look.id != null) return;
+    if (st.look.id != null || (e.pointerType === 'mouse' && mouseAim?.enabled)) return;   // mouse aim: a click locks the pointer instead
     st.look.id = e.pointerId; st.look.active = true; st.look.lx = e.clientX; st.look.ly = e.clientY;
     canvas.setPointerCapture?.(e.pointerId);
   });
@@ -148,15 +152,16 @@ export function createControls({ root, getSettings, getDifficulty, onView, onPau
   canvas?.addEventListener('pointerup', endLook); canvas?.addEventListener('pointercancel', endLook);
 
   // ---- keyboard ----
-  const KEYMAP = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight', 'KeyB', 'Equal', 'Minus']);
+  const KEYMAP = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight', 'KeyB', 'Equal', 'Minus', 'Space']);
   addEventListener('keydown', (e) => {
     if (e.target?.closest?.('input,textarea,select,[contenteditable]')) return;
-    if (KEYMAP.has(e.code)) { st.keys.add(e.code); if (e.code.startsWith('Arrow')) e.preventDefault(); }
+    if (KEYMAP.has(e.code)) { st.keys.add(e.code); if (e.code.startsWith('Arrow') || (e.code === 'Space' && mouseAim?.enabled)) e.preventDefault(); }
     if (e.repeat) return;
     if (e.code === 'KeyF') cycleFlaps();
     else if (e.code === 'KeyC' || e.code === 'KeyV') onView?.();
     else if (e.code === 'KeyP') onPause?.();
     else if (e.code === 'KeyT') { api.releaseThrottle(); onThrottleAuto?.(); }
+    else if (e.code === 'KeyZ') onAuto?.();
   });
   addEventListener('keyup', (e) => st.keys.delete(e.code));
   addEventListener('blur', () => st.keys.clear());
@@ -228,20 +233,30 @@ export function createControls({ root, getSettings, getDifficulty, onView, onPau
         // on the ground the same thumb steers the nosewheel (unless a rudder button is held)
         if (ac.onGround) m.rudder = clamp(st.stickX * 1.2, -1, 1);
       }
-      // keyboard axes (ramped)
-      const ka = (k.has('ArrowRight') || k.has('KeyD') ? 1 : 0) - (k.has('ArrowLeft') || k.has('KeyA') ? 1 : 0);
-      const ke = ((k.has('ArrowDown') || k.has('KeyS') ? 1 : 0) - (k.has('ArrowUp') || k.has('KeyW') ? 1 : 0)) * inv;
-      const kr = (k.has('KeyE') ? 1 : 0) - (k.has('KeyQ') ? 1 : 0);
+      // keyboard axes (ramped). Mouse aim: the mouse is the stick (instructor), W/S throttle, A/D rudder, Q/E roll
+      // override, Space brakes; the arrows still pitch/roll over the top.
+      const MA = !!mouseAim?.enabled;
+      const ka = (k.has('ArrowRight') || (!MA && k.has('KeyD')) ? 1 : 0) - (k.has('ArrowLeft') || (!MA && k.has('KeyA')) ? 1 : 0);
+      const ke = ((k.has('ArrowDown') || (!MA && k.has('KeyS')) ? 1 : 0) - (k.has('ArrowUp') || (!MA && k.has('KeyW')) ? 1 : 0)) * inv;
+      const kr = MA ? (k.has('KeyD') ? 1 : 0) - (k.has('KeyA') ? 1 : 0) : (k.has('KeyE') ? 1 : 0) - (k.has('KeyQ') ? 1 : 0);
+      const kq = MA ? (k.has('KeyE') ? 1 : 0) - (k.has('KeyQ') ? 1 : 0) : 0;
       st.kAil = moveTo(st.kAil, ka, dt * (ka ? 2.5 : 5));
       st.kEle = moveTo(st.kEle, ke, dt * (ke ? 2 : 5));
       st.kRud = moveTo(st.kRud, kr, dt * (kr ? 3 : 6));
-      if (ka || ke || Math.abs(st.kAil) > 0.01 || Math.abs(st.kEle) > 0.01) { m.aileron = st.kAil; m.elevator = st.kEle; }
+      st.kRoll = moveTo(st.kRoll || 0, kq, dt * (kq ? 3 : 6));
+      let aimed = false;
+      if (MA && ac) {
+        const ia = mouseAim.update(dt, ac, { autoOff: !!getAutoOff?.(), hard: (getDifficulty?.() ?? getSettings?.().difficulty) === 'hard' });
+        if (ia) { m.aileron = ia.aileron; m.elevator = ia.elevator; m.rudder = ia.rudder; aimed = true; }
+        if (kq || Math.abs(st.kRoll) > 0.01) { m.aileron = st.kRoll; if (m.elevator == null) m.elevator = 0; }
+      }
+      if (ka || ke || Math.abs(st.kAil) > 0.01 || Math.abs(st.kEle) > 0.01) { m.aileron = st.kAil; m.elevator = st.kEle; aimed = false; }
       if (kr || Math.abs(st.kRud) > 0.01) m.rudder = st.kRud;
-      const kt = (k.has('ShiftLeft') || k.has('ShiftRight') || k.has('Equal') ? 1 : 0) - (k.has('ControlLeft') || k.has('ControlRight') || k.has('Minus') ? 1 : 0);
+      const kt = (k.has('ShiftLeft') || k.has('ShiftRight') || k.has('Equal') || (MA && k.has('KeyW')) ? 1 : 0) - (k.has('ControlLeft') || k.has('ControlRight') || k.has('Minus') || (MA && k.has('KeyS')) ? 1 : 0);
       if (kt) { st.kThr = clamp((st.kThr ?? ac.ctl.throttle) + kt * dt * 0.7, 0, 1); st.kThrT = KEY_THR_HOLD; }
       else if (st.kThr != null && (st.kThrT -= dt) <= 0) st.kThr = null;
       if (st.kThr != null) m.throttle = st.kThr;
-      if (k.has('KeyB')) m.brake = 1;
+      if (k.has('KeyB') || (MA && k.has('Space'))) m.brake = 1;
       // gamepad
       const p = readPad();
       if (p) {
@@ -261,12 +276,13 @@ export function createControls({ root, getSettings, getDifficulty, onView, onPau
       if (st.inject && performance.now() < st.injectUntil) for (const a in st.inject) m[a] = st.inject[a];
       else st.inject = null;
       // D35: in a hover the stick is a speed/turn command (STOVL flight computer), no bank or pitch assists
-      if (m.aileron != null && !st.inject && !(ac?.vtol > 0.5)) { m.aileron = rollAssist(m.aileron, ac, dt); m.elevator = pitchAssist(m.elevator ?? 0, ac); }
+      if (m.aileron != null && !st.inject && !aimed && !(ac?.vtol > 0.5)) { m.aileron = rollAssist(m.aileron, ac, dt); m.elevator = pitchAssist(m.elevator ?? 0, ac); }
       for (const a of ['aileron', 'elevator', 'rudder']) if (m[a] != null) m[a] = clamp(m[a], -1, 1);
       return m;
     },
     // thrAxis = the player's traffic axis: a manual or latched lever shows the PLAYER's setting, not the engine's
-    paint(ac, modes, view, multiView = true, thrAxis = null) {
+    // auto = traffic.autoState(player) (D37): the stick tag reads AUTO 7 / AUTO OFF instead of RESUMING / MANUAL
+    paint(ac, modes, view, multiView = true, thrAxis = null, auto = null) {
       const mine = modes.throttle === 'manual' || modes.throttle === 'latched';
       const lv = st.thr != null ? st.thrVal : mine && thrAxis ? thrAxis.val : ac.ctl.throttle;
       const t = Math.round(clamp(lv, 0, 1) * 200) / 200, P = st.paint ||= {};
@@ -275,7 +291,8 @@ export function createControls({ root, getSettings, getDifficulty, onView, onPau
       set('tm', modes.throttle, (v) => { thr.dataset.mode = v; });
       set('ta', mine, (v) => { thrAuto.dataset.on = v ? '1' : ''; });
       const man = modes.elevator === 'manual' || modes.aileron === 'manual';
-      set('stag', man ? (st.bankLimited ? 'BANK 60°' : 'MANUAL') : modes.elevator === 'auto' && modes.aileron === 'auto' ? 'AUTO' : 'RESUMING', (v) => { stickTag.textContent = v; });
+      const tag = auto?.off && st.stick == null ? 'AUTO OFF' : man ? (st.bankLimited ? 'BANK 60°' : 'MANUAL') : auto?.countdown != null ? `AUTO IN ${Math.max(1, Math.ceil(auto.countdown - 1e-6))}` : modes.elevator === 'auto' && modes.aileron === 'auto' ? 'AUTO' : 'RESUMING';
+      set('stag', tag, (v) => { stickTag.textContent = v; });
       set('bm', man ? 'manual' : modes.elevator === 'auto' ? 'auto' : 'wait', (v) => { base.dataset.mode = v; });
       const prefs = flightPrefs(getSettings?.());
       if (st.stick == null) {

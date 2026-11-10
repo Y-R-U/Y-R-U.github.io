@@ -58,7 +58,11 @@ export default {
     { kind: 'hedge', pts: [P([60, -370]), P([430, -370])], h: 2.4 },
     { kind: 'hedge', pts: [P([-430, -370]), P([-430, -140])], h: 2.4 },
     { kind: 'hedge', pts: [P([430, -370]), P([430, -140])], h: 2.4 },
-    { kind: 'flock', type: 'sheep', ...rect(30, 160, 500, 110), count: 34 },
+    // C5: sheep scatter from low/close planes (js/world/flock.js). South pasture beside the strip, plus a field under
+    // each final approach, all behind hedges/off the strip and taxi track.
+    { kind: 'flock', type: 'sheep', ...rect(30, 140, 500, 130), count: 18 },
+    { kind: 'flock', type: 'sheep', ...rect(570, 0, 160, 120), count: 9 },
+    { kind: 'flock', type: 'sheep', ...rect(-570, 0, 150, 110), count: 7 },
     { kind: 'flock', type: 'cow', ...rect(-380, -240, 80, 100), count: 9 },
     { kind: 'flock', type: 'cow', ...rect(360, -250, 70, 80), count: 6 },
   ],

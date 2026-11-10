@@ -333,12 +333,14 @@ export class Autopilot {
       }
     }
     if (this.attHold) {
-      // the player just let go: hold the attitude they left (pitch clamped), wings level, until the blend
+      // the player just let go: hold the attitude they left (pitch clamped), wings level, until the blend.
+      // D37 (holdBank: the 10 s AUTO countdown / AUTO OFF): the bank they left is held too (≤ 50°), so a turn carries on
       if (this._hold0 == null) this._hold0 = clamp(ac.pitch, -0.05, 0.18);
-      t.air = true; t.bank = 0; t.pitch = this._hold0; t.speed = ac.speed;
+      if (this._holdB == null) this._holdB = this.holdBank ? clamp(ac.bank, -0.87, 0.87) : 0;
+      t.air = true; t.bank = this._holdB; t.pitch = this._hold0; t.speed = ac.speed;
       return this._finish(dt);
     }
-    this._hold0 = null;
+    this._hold0 = null; this._holdB = null;
     // FLIGHTFIX4: the recovery's replan() above may have moved to another leg (and rebuilt this.cur for it): running the
     // old leg's step on the new cur read cur.line / cur.e of a fly leg ("_pursue … reading 'length'", "toRunway … 'thr'")
     if (leg !== this.leg) { leg = this.leg; if (!leg || this.done) return this._finish(dt); }
@@ -513,7 +515,7 @@ export class Autopilot {
   landAt(plan) {
     if (!plan?.route) return false;
     if (!this._landPrev) this._landPrev = { route: this.route, i: this.i };
-    this.landing = plan; this.tgo = false; this.wantThrottleAuto = true; this._landDown = false; this._landGAs = 0;
+    this.landing = plan; this.tgo = false; this.wantThrottleAuto = true; this.wantAuto = true; this._landDown = false; this._landGAs = 0;
     this.setRoute(plan.route);
     this._emit('replan', { to: 'land', label: plan.label });
     return true;
@@ -595,7 +597,7 @@ export class Autopilot {
     const T = this._takeoffRoute(best.id);
     this.landing = null; this._landPrev = null;
     this.route = T.route; this.i = T.i; this.done = false; this.override = T.override;
-    this.demand = true; this.demandEntry = best.entry; this.demandDirect = !!best.direct; this.wantThrottleAuto = true;
+    this.demand = true; this.demandEntry = best.entry; this.demandDirect = !!best.direct; this.wantThrottleAuto = true; this.wantAuto = true;
     this._begin(true);
     this._emit('demand', { end: best.id, entry: best.entry, direct: !!best.direct });
     return best.id;
@@ -621,7 +623,7 @@ export class Autopilot {
     ac.place({ x, z, heading: e.hdg }, env);
     const T = this._takeoffRoute(end);
     this.route = T.route; this.i = T.i; this.done = false; this.override = T.override; this.demand = false; this.landing = null; this._landPrev = null;
-    this.wantThrottleAuto = true;
+    this.wantThrottleAuto = true; this.wantAuto = true;
     this._begin(true);
     this.sub = 'ready';
     this._emit('skiptorunway', { end });
@@ -647,7 +649,7 @@ export class Autopilot {
     this.landing = null; this._landPrev = null;
     this.route = { ...c, name: c.name, legs: [{ kind: 'takeoff', end: e, alt: 60, label: 'TAKEOFF' }, ...c.legs], loop: 1 };
     this.i = 0; this.done = false; this.override = null;
-    this.demand = true; this.demandEntry = null; this.wantThrottleAuto = true;
+    this.demand = true; this.demandEntry = null; this.wantThrottleAuto = true; this.wantAuto = true;
     this._begin(true);
     this._emit('demand', { end: 'FIELD', heading: run.heading, run: Math.round(run.length) });
     return run;
@@ -1466,7 +1468,7 @@ export class Autopilot {
     if (!this.stovl) this._stovlPrev = this._landPrev?.route ? this._landPrev : { route: this.route, i: this.i };
     this.landing = null; this._landPrev = null; this.demand = false;
     this.stovl = { t: 0, hold: null, ...st };
-    this.ac.vtolWant = 1; this.wantThrottleAuto = true;
+    this.ac.vtolWant = 1; this.wantThrottleAuto = true; this.wantAuto = true;
     this._emit('stovl', { mode: st.mode });
     return true;
   }
@@ -1485,14 +1487,14 @@ export class Autopilot {
   landHere(pad) {
     const ac = this.ac, m = this.stovl?.mode;
     if (ac.onGround || !(m === 'hover' || m === 'vto')) return false;
-    Object.assign(this.stovl, { mode: 'land', pad: { x: pad?.x ?? ac.pos.x, z: pad?.z ?? ac.pos.z }, t: 0 });
+    Object.assign(this.stovl, { mode: 'land', pad: { x: pad?.x ?? ac.pos.x, z: pad?.z ?? ac.pos.z }, t: 0 }); this.wantAuto = true;
     this._emit('stovl', { mode: 'land' });
     return true;
   }
   flyOn() {
     const ac = this.ac;
     if (!this.stovl || ac.onGround) return false;
-    Object.assign(this.stovl, { mode: 'flyon', vf: Math.max(0, this._fwdSpeed()), t: 0, agl: Math.max(ac.agl, 40) });
+    Object.assign(this.stovl, { mode: 'flyon', vf: Math.max(0, this._fwdSpeed()), t: 0, agl: Math.max(ac.agl, 40) }); this.wantAuto = true;
     this._emit('stovl', { mode: 'flyon' });
     return true;
   }

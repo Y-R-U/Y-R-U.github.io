@@ -28,14 +28,17 @@ export function createStory(opts = {}) {
   const warp = createTimeWarp({ onChange: () => S.toggle?.paint() });
   const settings = () => { try { return opts.getSettings?.() || {}; } catch (e) { return {}; } };
 
+  // The intro owns the soundtrack: background radio (AI chatter, tower barks, scolds) is hushed until it ends or is skipped.
+  const hushRadio = (on) => { try { G.wiring?.radio?.hush?.(on); } catch (e) { console.warn('[story] radio hush', e); } };
   function playIntro({ onDone } = {}) {
     S.intro?.dispose();
+    hushRadio(true);
     const vol = settings().voice ?? settings().master ?? 1;
     S.intro = createIntro({
       camera: opts.camera, scene: opts.scene, traffic: G.traffic, env: opts.env || G.traffic?.env,
       profile: opts.getProfile?.(), livery: opts.getLivery?.() || opts.getProfile?.(), createPlane: opts.createPlane, prepareRig: opts.prepareRig,
       quality: opts.quality, volume: typeof vol === 'number' ? Math.max(0, Math.min(1, vol > 1 ? vol / 100 : vol)) : 1, parent: opts.parent,
-      onDone: (r) => { opts.log?.('story.intro', r); S.intro = null; onDone?.(r); },
+      onDone: (r) => { opts.log?.('story.intro', r); S.intro = null; hushRadio(false); onDone?.(r); },
     });
     S.intro.start();
     return S.intro;

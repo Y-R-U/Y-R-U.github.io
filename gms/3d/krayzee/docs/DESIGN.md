@@ -102,6 +102,11 @@ noted). All values below are mirrored in `data/rules.js` (`INFRACTIONS`).
 | `double_occupancy` | Shared Runway | two planes on the same runway rect simultaneously, at least one moving > 40 kt, player is one of them | 300 | +15 |
 | `intersection_dash` | Crossroads | player crosses the 09/27 × 04/22 intersection while another plane is on either runway | 200 | +10 |
 
+Bonus, not a rule (D38, `BONUSES` in data/rules.js): **Woolly Jumper** (`sheep_scatter`), the player scares ≥ 3 sheep of
+one Muckle Bottom flock from the air: 30 PP, +3 outrage, once per flock per 60 s. It takes the heat/aircraft multipliers
+and a running combo's multiplier, but never starts or extends a combo; story missions pay it; AI planes and taxiing do
+not.
+
 **Multipliers** (applied in order, rounded to 10):
 
 * **Style**: infractions chained within **20 s** of the previous one build a combo: ×1.0, ×1.25, ×1.5, ×2.0, ×2.5 (cap).

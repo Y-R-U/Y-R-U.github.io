@@ -37,4 +37,17 @@ export const FARM_LINES = [
   ...scold('scold_bump', 'you\'ve bumped him. Say sorry.', 'bumping again. Like rams in spring.', 'stop butting each other!', 'RAMS! The lot of you! RAMS!'),
   ...scold('scold_nudge', 'you touched him. Keep your hands to yourself.', 'that\'s no way to say hello. Not even to a ewe.', 'nudging! Like heifers at the feed trough!', 'LOVE TAP, is it? The bull said that. Look where it got him.'),
   ...scold('scold_generic', 'not how we do it round here.', 'I\'ll be having words.', 'my nerves won\'t stand much more of this.', 'I\'m going to milk the cows. Don\'t talk to me.'),
+  // SHEEP2: the player scattered a flock from the air (js/world/sheep.js; D38). Doreen, Gladys and Big Brenda are his.
+  ...L('sheep_scatter', [
+    'You\'ve upset Doreen! She\'s gone right off her grass.',
+    'My ewes! You\'ve scattered my ewes!',
+    'Look at them go. That\'s a week\'s fattening, run clean off.',
+    'Doreen\'s in the hedge again. That\'s your doing, that is.',
+    'Gladys won\'t come out from under the trough now. Thank you very much.',
+    'Them\'s sheep, not skittles!',
+    'Big Brenda\'s jumped the ditch. She hasn\'t jumped since she were a lamb.',
+    'I\'ll be counting that lot till Tuesday.',
+    'Over my flock again and I\'ll set the dog on your wheels.',
+    'Doreen\'s fainted. She does that. Go away.',
+  ]),
 ];

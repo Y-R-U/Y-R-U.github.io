@@ -23,6 +23,7 @@ export function createSettings(root, { onChange, onTitle, onResume, onQuit, onCl
     <div class="kz-sec"><h3>Flying</h3>
       <div class="kz-row"><span>Invert pitch<small data-say="invertPitch"></small></span><button class="kz-switch" role="switch" data-k="invertPitch" aria-label="Invert pitch"></button></div>
       <div class="kz-row"><span>Stick on right<small data-say="stickRight"></small></span><button class="kz-switch" role="switch" data-k="stickRight" aria-label="Stick on right"></button></div>
+      <div class="kz-row kz-mouse"><span>Mouse aim (desktop)<small>Point with the mouse and the plane flies there. Click the view to lock the mouse, Esc frees it. W/S throttle, A/D rudder, Q/E roll</small></span><button class="kz-switch" role="switch" data-k="mouseAim" aria-label="Mouse aim"></button></div>
       <div class="kz-row"><span>Units</span>${seg('units', [['aviation', 'kt · ft'], ['metric', 'km/h · m']])}</div>
       <div class="kz-row stack"><span>Difficulty<small data-say="difficulty"></small></span>${seg('difficulty', [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard']]).replace('kz-seg"', 'kz-seg wide"')}</div>
       <div class="kz-row"><span>Opportunity hints<small>Prompts suggesting the next rule to break</small></span><button class="kz-switch" role="switch" data-k="hints" aria-label="Opportunity hints"></button></div>
@@ -47,6 +48,8 @@ export function createSettings(root, { onChange, onTitle, onResume, onQuit, onCl
       <div class="kz-acct-row"><p>Sign in to keep your pilot and settings on every device.</p><button class="kz-btn ghost" data-act="account">Account</button></div>
     </div>`;
   let s = loadSettings();
+  // CONTROLS: mouse aim is offered on devices with a mouse / trackpad only (phones never see it)
+  try { pop.body.querySelector('.kz-mouse').hidden = !matchMedia('(any-pointer: fine)').matches; } catch (e) { /* */ }
 
   const titles = pop.body.querySelector('.kz-titles');
   function paintPeerage() {

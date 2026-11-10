@@ -3,8 +3,10 @@
 //   node tools/story/test-mission.mjs [--mission=1..10] [--view=portrait|landscape|desktop] [--diff=easy|medium|hard]
 //        [--port=9632] [--base=http://localhost:8790/gms/3d/krayzee/] [--falsify=<name>] [--cover[=<shot tag>]]
 // --cover (MSGFIX): sample the screen cover by message UI (tools/loop/cover.mjs), print it, save docs/review/loop/cover-*.json
-// Scripted help is limited to: Mission 1 medium/hard tower pass (teleport onto a low line at the tower, wings level) and
-// Mission 2 medium/hard turn-in (teleport onto the centreline 1.6 km out, ahead of Rupert).
+// Scripted help is limited to: Mission 1 medium/hard tower pass (the shared low pass below),
+// Mission 2 medium/hard turn-in (teleport onto the centreline 1.6 km out, ahead of Rupert), and (B4, MAPTASKS) the
+// Medium/Hard low tower passes of Missions 5, 8 and 9 (a teleport 12 s out onto a line 40 m beside the tower, 22 m over
+// its top, a scripted thumb holding height and line) and Mission 7 Hard's hand-flown hover over the pad (a scripted thumb on the stick: turn to the pad, push forward).
 // --falsify breaks one thing in the page so the check that guards it must fail (see FALSIFY below).
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -99,6 +101,32 @@ await C.sleep(600);
 check('Fly closes the briefing', !(await rectOf('.krz-st-brief .krz-st-card')));
 
 const seen = new Set();
+let buzzT = 0, buzzN = 0;
+// B4: a low pass for a Medium/Hard buzz step (the AP's own pass is wide/high there by design): teleport ~12 s before the
+// tower (past ATC's 8 s placement grace) on a line 40 m beside it, ~22 m over its top, then a thumb flies it: the stick
+// holds that height and line until past the tower, then AUTO is tapped. A neutral stick sank a Jumbo 30 m in 5 s and a
+// nose-down one flew a Moth into the farm; with no stick at all the AP turned straight back to its route.
+const BUZZ_PASS = `(() => { const t = window.__krzStory.mission.target, p = window.__game.state().player; if (!t || !p) return null;
+  const T = [t.pos[0], t.pos[2]], top = t.pos[1] - 8, dx = T[0] - p.x, dz = T[1] - p.z, d = Math.hypot(dx, dz), ux = dx / d, uz = dz / d;
+  // ATC gives a teleported plane 8 s of grace (no crimes), so start ~12 s out
+  const kt = Math.max(60, p.speedKt || 0), v = kt * 0.5144, back = Math.max(300, v * 12), off = 40;
+  const A = [T[0] - uz * off, T[1] + ux * off], sx = A[0] - ux * back, sz = A[1] - uz * back;
+  const h = (Math.atan2(ux, -uz) * 180 / Math.PI + 360) % 360, thr = window.__game.S.player.ac.type === 'jumbo' ? 0.85 : 0.6, want = top + 22;
+  window.__game.teleport({ x: sx, z: sz, alt: 120, heading: h, speedKt: kt, throttle: thr });
+  const q0 = window.__game.state().player, g0 = q0.alt - q0.agl;
+  window.__game.teleport({ x: sx, z: sz, alt: Math.max(15, want - g0), heading: h, speedKt: kt, throttle: thr });
+  // a thumb on the stick: hold the height (P on height, D on climb rate) and the line to the aim point beside the tower
+  let last = null; window.__bz = { min: 1e9 };
+  const iv = setInterval(() => { const P = window.__game.S.player, q = window.__game.state().player; if (!P || !q) return clearInterval(iv);
+    const vs = last ? (q.alt - last) / 0.1 : 0; last = q.alt;
+    const along = (q.x - A[0]) * ux + (q.z - A[1]) * uz, side = -(q.x - A[0]) * uz + (q.z - A[1]) * ux;
+    const want_h = (Math.atan2(ux, -uz) * 180 / Math.PI) - Math.max(-25, Math.min(25, side * 0.4)), err = ((want_h - q.heading + 540) % 360) - 180;
+    const elev = Math.max(-0.35, Math.min(0.35, 0.02 * (want - q.alt) - 0.06 * vs)), ail = Math.max(-0.4, Math.min(0.4, 0.03 * err - 1.0 * (P.ac.bank || 0)));
+    window.__game.setControls({ aileron: ail, elevator: elev, rudder: 0 }, 250);
+    const dd = Math.hypot(q.x - T[0], q.z - T[1]); if (dd < window.__bz.min) window.__bz = { min: Math.round(dd), agl: Math.round(q.agl), overTop: Math.round(q.alt - top), kt: Math.round(q.speedKt) };
+    if (along > 120) { clearInterval(iv); window.__bz.done = 1; } }, 100);
+  setTimeout(() => clearInterval(iv), (back + 400) / v * 1000);
+  return { back: Math.round(back), agl: Math.round(want - g0), hdg: Math.round(h), ms: Math.round((back + 120) / v * 1000) }; })()`;
 let last = '', lastT = Date.now(), warpTapped = 0, demandTo = false, chip = false, lifted = 0, scripted = false, landTapped = 0, thrDone = 0;
 const LIMIT = { taxi: 400, takeoff: 120, turn: 60, letgo: 40, radio: 60, castle: 400, crime: 400, land: 500, touchdown: 300, stop: 300, demand: 60,
   spot: 40, cut: FORCE === 'polite' ? 600 : 300, queue: 120, roll: 200, bless: 400, start: 120, climb: 120, throttle: 120, race: 400,
@@ -188,6 +216,25 @@ while (true) {
       await C.tap((r.l + r.r) / 2, (r.t + r.b) / 2); chip = true; console.log('  tapped radio chip');
       await C.sleep(800);
     } else if (/Tap RADIO/.test(m.coach) && !(await rectOf('.krz-r-panel'))) { await C.tapSel('.krz-r-btn'); console.log('  opened RADIO'); await C.sleep(500); }
+  } else if (/^buzz2?$/.test(m.step) && MISSION >= 5 && DIFF !== 'easy' && (await C.ev(`(() => { const t = window.__krzStory.mission.target, p = window.__game.state().player; return t && p ? Math.hypot(t.pos[0] - p.x, t.pos[2] - p.z) : 1e9; })()`)) < 3500 && Date.now() - buzzT > 30000 && buzzN < 4) {
+    buzzT = Date.now(); buzzN++;
+    const bp = await C.ev(BUZZ_PASS);
+    console.log('  scripted low tower pass', JSON.stringify(bp));
+    // past the tower: hand straight back to the autopilot (AUTO now), as a player taps AUTO rather than wait out the count
+    if (bp?.ms) { await C.sleep(bp.ms + 300); console.log('  closest to the tower:', JSON.stringify(await C.ev('window.__bz'))); if (await rectOf('.krz-autobtn')) { await C.tapSel('.krz-autobtn'); console.log('  tapped AUTO'); } }
+  } else if (m.step === 'over' && DIFF === 'hard' && !seen.has('hoverThumb')) {
+    // Hard: no flight computer, the thumb flies the hover (docs/STOVL.md: stick left/right turns, forward/back moves) to
+    // the pad, then lets go over it (the step then asks for LAND HERE, tapped below)
+    seen.add('hoverThumb');
+    console.log('  thumb flies the hover to the pad', JSON.stringify(await C.ev(`(() => { const t = window.__krzStory.mission.target; if (!t) return null;
+      clearInterval(window.__hvT); window.__hvT = setInterval(() => { const q = window.__game.state().player, st = window.__krzStory.mission.state.step;
+        if (!q || st !== 'over' || q.onGround) { clearInterval(window.__hvT); window.__hvT = 0; return; }
+        const dx = t.pos[0] - q.x, dz = t.pos[2] - q.z, d = Math.hypot(dx, dz), brg = Math.atan2(dx, -dz) * 180 / Math.PI, err = ((brg - q.heading + 540) % 360) - 180;
+        if (d < 12) return;
+        const ail = Math.max(-1, Math.min(1, err / 30)), fwd = Math.abs(err) < 25 ? Math.max(0.15, Math.min(1, d / 120)) : 0;
+        window.__game.setControls({ aileron: ail, elevator: -fwd, rudder: 0 }, 250); }, 100);
+      return { d: Math.round(Math.hypot(t.pos[0] - window.__game.state().player.x, t.pos[2] - window.__game.state().player.z)) }; })()`)));
+  } else if (m.step !== 'over' && seen.has('hoverThumb')) { seen.delete('hoverThumb');
   } else if (m.step === 'castle' || m.step === 'bless' || (m.step === 'roll' && !m.p.ground) || (MISSION >= 5 && /^(clouds2?|buzz2?)$/.test(m.step))) {
     await warpTo5(m);
   } else if (m.step === 'hover') {
@@ -207,9 +254,11 @@ while (true) {
     if (scripted && m.p.li < 8) scripted = false; // went round again
     if (DIFF !== 'easy' && !scripted && m.p.li >= 8) {
       scripted = true;
-      await C.ev(`(() => { const T = [190, -260], p = window.__game.state().player; const dx = T[0] - p.x, dz = T[1] - p.z, d = Math.hypot(dx, dz); const h = (Math.atan2(dx, -dz) * 180 / Math.PI + 360) % 360; window.__game.teleport({ x: T[0] - dx / d * 300, z: T[1] - dz / d * 300, alt: 58, heading: h, speedKt: 90, throttle: 0.5 }); return h; })()`);
-      await C.ev(`window.__game.setControls({ aileron: 0, elevator: -0.1, rudder: 0 }, 9000)`);
-      console.log('  scripted low tower pass');
+      // B4: the shared closed-loop pass (the old one teleported 300 m out straight at the cab with the nose pushed down:
+      // rubber bounced off the tower on Easy/Medium, Hard crashed into it, and the 8 s ATC grace could swallow the buzz)
+      const bp = await C.ev(BUZZ_PASS);
+      console.log('  scripted low tower pass', JSON.stringify(bp));
+      if (bp?.ms) { await C.sleep(bp.ms + 300); console.log('  closest to the tower:', JSON.stringify(await C.ev('window.__bz'))); if (await rectOf('.krz-autobtn')) { await C.tapSel('.krz-autobtn'); console.log('  tapped AUTO'); } }
     }
   } else if (m.step === 'cut') {
     // Medium/Hard: scripted help (as M1's tower pass): put the plane on the centreline 1.6 km out, in front of Rupert
@@ -247,6 +296,8 @@ while (true) {
 }
 const fin = await C.ev(`(() => { const m = window.__story.story.mission.state; return { status: m.status, result: m.result, ticks: m.ticks, stepsSeen: m.stepsSeen, log: m.log.filter((l) => l.type !== 'event' || l.id).slice(-40) }; })()`);
 console.log(`[${secs()}s] mission ${fin.status}`, JSON.stringify(fin.result));
+if (fin.status !== 'complete') console.log('  mission log:', fin.log.map((l) => `${l.t}:${l.type}${l.id ? '=' + l.id : ''}`).join(' '));
+if (fin.status === 'failed') console.log('  player at the end:', JSON.stringify(await C.ev(`(() => { const a = window.__game.S.player?.ac; return a && { crash: a.crashReason, td: a.lastTouchdown, fuel: a.fuelFraction, gnd: a.onGround, surf: a.surface }; })()`)));
 check('mission completes', fin.status === 'complete', JSON.stringify(fin.result));
 check('every step was reached in order', STEPS.join() === fin.stepsSeen.filter((x, i, a) => a.indexOf(x) === i).join(), fin.stepsSeen.join(','));
 if (MISSION > 1) {

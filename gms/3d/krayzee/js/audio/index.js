@@ -328,6 +328,29 @@ export function createAudioSystem(ctx, opts = {}) {
     osc.start(t); lfo.start(t); osc.stop(t + dur + 0.05); lfo.stop(t + dur + 0.05);
     tone('sine', 70, 40, t, 0.15, 0.5, out);
   };
+  // C5 sheep bleat: a buzzy "meh-eh-eh" — sawtooth through two vowel formants, opened by a quick "m", with the
+  // 20-30 Hz bleat tremolo and a little pitch flutter. Lowpassed at 3 kHz: nothing piercing (D23).
+  S.playBleat = (o = {}) => {
+    const t = now() + (o.delay || 0), out = oneShotOut(o, o.gain ?? 0.6);
+    const p = o.pitch ?? 1, f = 290 * p, dur = 0.5 + Math.random() * 0.35;
+    const osc = ctx.createOscillator(); osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(f * 0.9, t);
+    osc.frequency.linearRampToValueAtTime(f * 1.05, t + 0.1);
+    osc.frequency.exponentialRampToValueAtTime(f * 0.86, t + dur);
+    const lfo = ctx.createOscillator(); lfo.frequency.setValueAtTime(24 + Math.random() * 8, t);
+    const flutter = g(f * 0.035); lfo.connect(flutter); flutter.connect(osc.frequency);
+    const amp = g(0.6), depth = g(0.4); lfo.connect(depth); depth.connect(amp.gain);
+    const open = filt('lowpass', 380, 0.8);
+    open.frequency.setValueAtTime(380, t); open.frequency.exponentialRampToValueAtTime(2600, t + 0.07);
+    const f1 = filt('bandpass', 720 * Math.sqrt(p), 4), f2 = filt('bandpass', 1450 * Math.sqrt(p), 6), mix = g(1), f2g = g(0.55), lp = filt('lowpass', 3000, 0.7);
+    const env = g(0);
+    env.gain.setValueAtTime(0, t); env.gain.linearRampToValueAtTime(1, t + 0.04);
+    env.gain.setValueAtTime(1, t + dur * 0.55); env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(open); open.connect(f1); open.connect(f2); f2.connect(f2g);
+    f1.connect(mix); f2g.connect(mix); chain(mix, amp, env, lp, out);
+    osc.start(t); lfo.start(t); osc.stop(t + dur + 0.05); lfo.stop(t + dur + 0.05);
+    burst(buf.white, t, 0.12, { filter: filt('bandpass', 1200, 1.2), gain: 0.06, attack: 0.02, out });
+  };
   S.playUI = (kind = 'click') => {
     const t = now(), out = oneShotOut({}, 0.5);
     if (kind === 'confirm') { tone('sine', 660, 660, t, 0.12, 0.4, out); tone('sine', 990, 990, t + 0.08, 0.2, 0.35, out); }
@@ -560,6 +583,7 @@ export const playFlyby = call('playFlyby');
 export const playGearThump = call('playGearThump');
 export const playCrash = call('playCrash');
 export const playBoing = call('playBoing');
+export const playBleat = call('playBleat');
 export const playUI = call('playUI');
 export const playSquelch = call('playSquelch');
 export const playRadio = (src, o) => { const s = getAudio(); return s ? s.playRadio(src, o) : Promise.resolve({ played: false }); };

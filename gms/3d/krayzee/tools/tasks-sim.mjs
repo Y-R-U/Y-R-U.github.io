@@ -25,6 +25,8 @@ const { KINGDOM } = await imp('data/airports/kingdom.js');
 const { LAWN } = await imp('data/airports/palace.js');
 for (const d of Object.values(KINGDOM)) LY.registerAirport(d);
 const atFarm = (f) => { LY.setAirport('farm'); try { f(); } finally { LY.setAirport('royal'); } };
+// MAPTASKS (C4): run f with airport `id` loaded (the live layout, as a map swap leaves it), then back to C-Tower 1
+const atApt = (id, f) => { LY.setAirport(id); try { f(); } finally { LY.setAirport('royal'); } };
 // spin the bank `rad` radians per step for `n` steps of dt seconds (rolls)
 const spin = (h, n, rad = 0.5, dt = 0.1) => { h.lift(); let b = 0; for (let i = 0; i < n; i++) { b += rad; h.ac.bank = Math.atan2(Math.sin(b), Math.cos(b)); h.sample(dt); } h.ac.bank = 0; };
 
@@ -72,11 +74,17 @@ function harness({ storage = memStore(), career = null, ready, plane = 'c172', d
     h.ac.events.push({ type: 'touchdown', fpm, grade, bounce: false, surface });
     h.sample(); h.ac.events.length = 0; h.ac.fuelFraction = 1;
   };
+  // MAPTASKS: touch down on (x, z) and roll to a stop there; a map trip = the airport changing under a flying plane
+  h.arrive = (x = 0, z = 0, surface = 'runway') => { h.touchdown(250, { surface, x, z }); h.ground(surface, x + 30, z); };
+  h.trip = (to) => { h.lift(); LY.setAirport(to); h.sample(); };
+  h.quit = () => tasks.detach(); // wiring.endPlay (quit to the menu)
   h.acEvent = (ev) => { h.ac.events.push(ev); h.sample(); h.ac.events.length = 0; };
   h.fly = (secs, o = {}, dt = 1) => { Object.assign(h.ac, { onGround: false, crashed: false, gs: 50, speed: 50, agl: 300, alt: 300, bank: 0, ...o }); h.ac.pos.y = h.ac.alt; for (let t = 0; t < secs - 1e-9 && !ABORT; t += dt) h.sample(dt); };
   h.at = (x, z, agl) => { Object.assign(h.ac, { onGround: false, gs: 40, speed: 40, agl, alt: agl, bank: 0 }); h.ac.pos.x = x; h.ac.pos.z = z; h.sample(); };
   // through the real score economy: ATC-shaped infraction events (numeric ids, fresh victims)
   h.inf = (id, extra = {}) => { h.game.handleEvent({ type: id, id: ++h.n, actor: 'player', victim: `ai${++h.victim}`, ...extra }); };
+  // D38 (SHEEP2): a player flock scatter from the air, through the real score (which owns the per-flock cooldown)
+  h.sheep = (flock = 0, extra = {}) => h.game.handleEvent({ type: 'sheep_scatter', actor: 'player', flock, n: 6, air: true, ...extra });
   h.bark = (b) => h.game.handleEvent({ type: 'barked', source: 'response', ...b });
   h.gupd = (dt, f) => h.game.update(dt, f);
   h.landStop = () => { h.gupd(0.1, { onGround: false, gsKt: 60 }); h.gupd(0.1, { onGround: true, gsKt: 30, surface: 'runway' }); for (let i = 0; i < 5; i++) h.gupd(0.1, { onGround: true, gsKt: 0, surface: 'runway' }); };
@@ -118,6 +126,9 @@ const R = {
   variety: (h) => ['tower_buzz', 'terminal_buzz', 'low_pass', 'queue_jump', 'cut_in_final'].forEach((id) => h.inf(id)),
   rap_sheet: (h) => Object.keys(INFRACTIONS).forEach((id) => h.inf(id)),
   frozen: (h) => h.inf('tower_buzz', { frozen: true }),
+  sheep_1: (h) => h.sheep(0),
+  sheep_10: (h) => rep(10, (i) => { h.sheep(i % 3); h.gupd(25, {}); }),
+  sheep_50: (h) => rep(50, (i) => { h.sheep(i % 3); h.gupd(25, {}); }),
   strained: (h) => h.atc.emit('composure', { key: 'tower', tier: 2, from: 1 }),
   cracking: (h) => h.atc.emit('composure', { key: 'tower', tier: 3, from: 2 }),
   meltdown: (h) => h.atc.emit('composure', { key: 'tower', tier: 4, from: 3 }),
@@ -221,6 +232,15 @@ const R = {
   life_500k: (h) => rep(50, () => h.bankPP(10000)),
   finish_10: (h) => rep(10, () => h.demand()),
   finish_100: (h) => rep(100, () => h.demand()),
+  // MAPTASKS (C4): first landings + trips + the Grand Tour (lifetime) and the non-stop one (one sitting)
+  land_royal: (h) => h.arrive(0, 0),
+  land_palace: (h) => h.arrive(LAWN.OX, LAWN.OZ, 'lawn'),
+  land_farm: (h) => atApt('farm', () => h.arrive(0, 0, 'grass')),
+  land_airbase: (h) => atApt('airbase', () => h.arrive(400, 0)),
+  trip_1: (h) => { h.trip('farm'); LY.setAirport('royal'); },
+  trip_10: (h) => { rep(10, (i) => h.trip(i % 2 ? 'royal' : 'airbase')); LY.setAirport('royal'); },
+  kingdom_tour: (h) => { R.land_royal(h); h.quit(); h.play(); R.land_farm(h); h.quit(); h.play(); R.land_palace(h); h.quit(); h.play(); R.land_airbase(h); },
+  tour_nonstop: (h) => { h.quit(); h.play(); R.land_royal(h); h.demand(); R.land_palace(h); atApt('farm', () => { h.trip('farm'); h.arrive(0, 0, 'grass'); h.trip('airbase'); h.arrive(0, 0); }); },
   story_hard: (h) => h.tasks.story({ ok: true, mission: 2, diff: 'hard', objectives: ['cut'] }),
   story_crowned_hard: (h) => h.tasks.story({ ok: true, mission: D.STORY.find((m) => m.finale).id, diff: 'hard', objectives: [] }),
 };
@@ -238,7 +258,7 @@ ok(ALL.length >= 120, `120+ tasks (${ALL.length})`);
 ok(new Set(ALL.map((t) => t.id)).size === ALL.length, 'task ids unique');
 for (const s of D.SETS) ok(s.tasks.length >= 8 && s.tasks.length <= 12, `set ${s.id}: 8–12 tasks (${s.tasks.length})`);
 ok(ALL.every((t) => ['bronze', 'silver', 'gold'].includes(t.tier)), 'every task has a tier');
-ok(ALL.every((t) => t.on || ((t.stat && D.STATS[t.stat]) || (t.fstat && D.FSTATS[t.fstat])) && t.target > 0), 'every task names an event or a known counter with a target');
+ok(ALL.every((t) => t.on || ((t.stat && D.STATS[t.stat]) || (t.fstat && D.FSTATS[t.fstat]) || (t.sstat && D.SSTATS[t.sstat])) && t.target > 0), 'every task names an event or a known counter with a target');
 ok(ALL.every((t) => R[t.id]), `a recipe for every task (missing: ${ALL.filter((t) => !R[t.id]).map((t) => t.id).join(', ') || 'none'})`);
 ok(Object.keys(INFRACTIONS).every((id) => ALL.some((t) => t.id === `rule_${id}`)), 'every rule in data/rules.js has its own task');
 
@@ -289,6 +309,13 @@ section('negative controls: near-misses of each detector do not complete');
   const h2 = harness(); h2.play({ diff: 'medium' }); h2.bankPP(1500); ok(!h2.done('hard_1000') && !h2.done('medium_2000'), '1,500 on Medium: neither Hard 1,000 nor Medium 2,000');
   const h3 = harness(); h3.play({ diff: 'hard' }); rep(4, () => h3.demand()); h3.destroy(); h3.demand(); ok(!h3.done('iron_peer'), 'iron peer: a destroyed breaks the streak (4 + 1)');
   const h4 = harness(); h4.tasks.story({ ok: true, mission: 4, diff: 'easy', objectives: ['steal', 'race', 'land'] }); ok(h4.done('story_4') && !h4.done('story_4_all'), 'mission 4 with an objective missed: done, not full marks');
+  // D38: hovering over one flock counts once a minute; AI planes, taxiing and 2-sheep nudges never count
+  const hs = harness(); rep(30, () => { hs.sheep(1); hs.gupd(1, {}); });
+  ok(hs.tasks.stats().sheepScatters === 1 && hs.done('sheep_1') && !hs.done('sheep_10'), `sheep: 30 s circling one flock = 1 scatter (${hs.tasks.stats().sheepScatters})`);
+  hs.gupd(31, {}); hs.sheep(1); ok(hs.tasks.stats().sheepScatters === 2, 'sheep: the same flock counts again after the minute');
+  const hs2 = harness(); hs2.sheep(0, { actor: 'ai4' }); hs2.sheep(1, { air: false }); hs2.sheep(2, { n: 2 });
+  ok(!hs2.tasks.stats().sheepScatters && !hs2.done('sheep_1'), 'sheep: AI, ground roll and a 2-sheep nudge do not count');
+  const hs3 = harness(); hs3.sheep(0); ok(hs3.tasks.stats().infractions == null && !hs3.tasks.stats().rules, 'sheep: not a rule broken (no infraction, no rap sheet)');
   // ROSTER: the near-misses
   const hr = harness(); hr.play({ plane: 'cub' }); hr.lift(); hr.touchdown(250); hr.ground('runway', 160, 0); ok(!hr.done('cub_short'), 'cub: a 160 m roll is not a short-field stop');
   hr.touchdown(250, { surface: 'grass', z: 40 }); ok(!hr.done('cub_farm') && !hr.done('cub_lawn'), 'cub: grass at C-Tower 1 is neither the farm nor the lawn');
@@ -303,6 +330,50 @@ section('negative controls: near-misses of each detector do not complete');
   h7.fly(20, { vtol: 1, speed: 1, gs: 1, agl: 30 }); h7.fly(2, { vtol: 1, speed: 60, gs: 60 }); h7.fly(20, { vtol: 1, speed: 1, gs: 1, agl: 30 });
   ok(!h7.done('f35_hover'), 'two 20 s hovers are not a 30 s hover');
   h7.fly(11, { vtol: 1, speed: 1, gs: 1, agl: 30 }); ok(h7.done('f35_hover'), '…a 31 s one is');
+}
+
+section('MAPTASKS (C4): first landing at each airport, trips, the Grand Tour');
+{
+  const { ORDER } = await imp('data/airports/kingdom.js');
+  ok(D.AIRPORT_IDS.slice().sort().join() === ORDER.slice().sort().join(), `the tour covers every Kingdom Map airport (${ORDER.join(', ')})`);
+  const a = harness();
+  a.touchdown(250); a.lift(); a.fly(4, { agl: 8, alt: 8 }); a.ground('runway', 300, 0); ok(!a.done('land_royal'), 'royal: a touch-and-go (no stop) is not an arrival');
+  const sk = harness(); sk.touchdown(250, { x: -500 }); sk.lift({ agl: 1, alt: 1, gs: 22 }); sk.sample(0.5); sk.ground('runway', -420, 0);
+  ok(sk.done('land_royal'), 'royal: a skip (bounce half a second off the runway, no new touchdown event) and then a stop still counts');
+  a.touchdown(250, { surface: 'grass', z: 60 }); a.ground('grass', 30, 60); ok(!a.done('land_royal'), 'royal: stopping on the grass beside the runway is not it');
+  a.touchdown(1300, { grade: 'crash' }); a.ground('runway', 30, 0); ok(!a.done('land_royal'), 'royal: a crash on the runway is not it');
+  a.ground('runway', 0, 0); a.ground('runway', 10, 0); ok(!a.done('land_royal'), 'royal: being placed on the runway (START HERE / spawn) is not a landing');
+  a.touchdown(250, { surface: 'grass', z: 1500 }); a.ground('grass', 30, 1500); ok(!a.tasks.stats().airports, 'a field landing is no airport');
+  a.arrive(-600, 0); ok(a.done('land_royal') && a.tasks.stats().airports === 1, 'royal: touch down on 09/27 and stop = Home Field');
+  a.touchdown(250, { x: 0, z: 0 }); a.ground('runway', 40, 0); ok(a.tasks.stats().airports === 1, 'landing at the same airport again adds nothing');
+  const b = harness();
+  b.arrive(LAWN.OX + 60, LAWN.OZ - 10, 'lawn'); ok(b.done('land_palace') && !b.done('land_royal'), 'the lawn while C-Tower 1 is active counts as the Palace Lawn, not C-Tower 1');
+  atApt('palace', () => b.arrive(200, 0)); ok(b.done('land_royal'), "C-Tower 1's runway while the lawn's tower is active still counts as C-Tower 1");
+  const c = harness();
+  atApt('farm', () => { c.touchdown(250, { surface: 'grass', x: 0, z: 200 }); c.ground('grass', 20, 200); });
+  ok(!c.done('land_farm'), 'farm: a field next to the strip is not the strip');
+  const fv = harness({ plane: 'f35' }); fv.play({ plane: 'f35' }); fv.ac.vtol = 1; fv.touchdown(200, { surface: 'lawn', x: LAWN.OX, z: LAWN.OZ }); fv.ground('lawn', LAWN.OX, LAWN.OZ); fv.ac.vtol = 0;
+  ok(fv.done('land_palace'), 'a vertical F-35 let-down on the lawn counts (any plane)');
+  const t = harness();
+  t.ground('runway');
+  atApt('farm', () => { t.ground('runway'); t.sample(); ok(!t.done('trip_1'), 'trip: a swap on the ground (START HERE) is not a trip');
+    t.lift(); t.sample(); t.sample(); ok(!t.done('trip_1'), 'trip: taking off and flying at the new airport is not a trip'); t.ground('runway'); });
+  t.ground('runway');
+  const g = harness();
+  R.land_royal(g); R.land_palace(g); R.land_farm(g); ok(!g.done('kingdom_tour') && g.tasks.stats().airports === 3, 'three airports is not the Grand Tour');
+  g.quit(); g.play(); R.land_airbase(g);
+  ok(g.done('kingdom_tour') && !g.done('tour_nonstop'), 'all four with a quit to the menu in between: Grand Tour, not Non-Stop');
+  ok((g.tasks.sitting().airports || 0) === 1, `quitting to the menu empties the sitting (${g.tasks.sitting().airports})`);
+  const n = harness(), pn = () => n.tasks.tasks().find((x) => x.id === 'tour_nonstop');
+  n.quit(); n.play(); R.land_royal(n); n.demand(); R.land_palace(n);
+  n.play(); // a map swap re-attaches the tasks without a quit (wiring.setWorld)
+  ok(pn().value === 2 && pn().perSitting, `a map swap keeps the sitting (2/4 shown: ${pn().value})`);
+  atApt('farm', () => { n.trip('farm'); n.arrive(0, 0, 'grass'); }); n.destroy();
+  ok(!n.done('tour_nonstop'), 'three of four is not the tour');
+  atApt('airbase', () => { n.trip('airbase'); n.arrive(0, 0); });
+  ok(n.done('tour_nonstop') && n.done('kingdom_tour') && n.done('trip_1'), 'all four in one sitting (DEMAND IT, a swap and a respawn in between): Non-Stop + Grand Tour');
+  const st = memStore(), s1 = harness({ storage: st }); R.land_royal(s1); R.land_farm(s1); s1.quit();
+  const s2 = TK.createTasks({ storage: st }); ok(s2.stats().airports === 2 && s2.isDone('land_farm') && !s2.sitting().airports, 'airports landed at survive a reload; the sitting does not');
 }
 
 section('unready planes stay locked ("coming soon")');
@@ -469,6 +540,16 @@ function falsify() {
     ['payments through addPP (sorties)', 'js/game/tasks.js', 'if (career?.addBonus) career.addBonus(pp); else career?.addPP(pp, {});', 'career?.addPP(pp, {});'],
     ['flight time counts warped sim time', 'js/game/tasks.js', 'const rdt = dt / Math.max(1, +warp || 1);', 'const rdt = dt;'],
     ['a roll is any wobble', 'js/game/tasks.js', 'if (Math.abs(L.roll) >= 2 * Math.PI)', 'if (Math.abs(L.roll) >= 0.5)'],
+    ['sheep scatters not forwarded', 'js/game/tasks.js', "else if (e.id === 'sheep_scatter') handle(", "else if (e.id === 'sheep_scatterX') handle("],
+    ['sheep per-flock cooldown dropped', 'js/game/score.js', 'if (S.t - (S.sheepAt[k] ?? -1e9) < r.cooldownPerFlock) return null;', ''],
+    ['a bounce cancels the arrival', 'js/game/tasks.js', "else if (L.arr && ((L.arrAir = (L.arrAir || 0) + dt) > 3 || (ac.agl ?? 0) > 10)) L.arr = null;", 'else L.arr = null;'],
+    ['arrival without a stop', 'js/game/tasks.js', "if (ground && L.arr && ac.gs < 1)", "if (ground && L.arr)"],
+    ['arrival anywhere at C-Tower 1', 'js/game/tasks.js', "return ROYAL.runways.some((rw) => onRect(rw, x, z, 5)) ? 'royal' : null;", "return 'royal';"],
+    ['lawn counted as C-Tower 1', 'js/game/tasks.js', "if (onLawn(x, z)) return 'palace';", ''],
+    ['sitting reset on a map swap', 'js/game/tasks.js', 'const fresh = !L.attached;', 'const fresh = true;'],
+    ['sitting survives quitting', 'js/game/tasks.js', "if (ev.type === 'sessionStart') { S = {}; SU = {}; return []; }", "if (ev.type === 'sessionStart') return [];"],
+    ['trip counted on the ground', 'js/game/tasks.js', "if (L.apt && apt !== L.apt && !ground)", "if (L.apt && apt !== L.apt)"],
+    ['grand tour needs three', 'data/tasks.js', "{ stat: 'airports', target: AIRPORT_IDS.length }", "{ stat: 'airports', target: 3 }"],
     ['story full marks ignores ticks', 'data/tasks.js', '&& m.objectives.every((o) => e.ticks?.includes(o))', ''],
   ];
   let caught = 0;

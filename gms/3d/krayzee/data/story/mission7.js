@@ -2,13 +2,16 @@
 // 620 m of grass. HOVER, then LAND HERE: on Easy in Mudge's turnip field, on Medium/Hard in his farmyard (rule-break:
 // grass_landing / apron_landing). The F-35's context button does it all (docs/STOVL.md); no runway in this one.
 import { finishSteps, tripLeg, tripStart, tripStep, here, msl, rwEnd } from './common.js';
+import { DEFAULT_SPOT } from '../../js/game/finish.js';
 
 const KT = 0.514444;
 // the pads in the farm's frame (data/airports/farm.js is laid out along +X, then turned 20°): a field south of the
 // strip, inside Easy's 300 m finishing ring, and the farmyard apron in front of the barn (Medium/Hard's finish area)
 const FARM_ROT = -20 * Math.PI / 180;
 const farmXZ = ([x, z]) => [x * Math.cos(FARM_ROT) - z * Math.sin(FARM_ROT), x * Math.sin(FARM_ROT) + z * Math.cos(FARM_ROT)];
-export const PADS = { field: { xz: farmXZ([-300, 140]), label: 'TURNIP FIELD' }, yard: { xz: farmXZ([-110, -135]), label: 'FARMYARD' } };
+export const PADS = { field: { xz: farmXZ([-300, 140]), label: 'TURNIP FIELD' }, yard: { xz: farmXZ([-60, -175]), label: 'FARMYARD' } };
+// B4: the yard pad sits between stands S1/S2 (~36 m from each). At its old spot (-110, -135) a landing on it was > 45 m from
+// every stand, which Hard's finish rule (apron AND by a stand) refuses: the stop step sent you up again for ever (scandal).
 const padFor = (diff) => (diff === 'easy' ? PADS.field : PADS.yard);
 const LANDINGS = new Set(['grass_landing', 'apron_landing', 'taxiway_landing']);
 const dPad = (c) => { const p = padFor(c.diff).xz; return Math.hypot(c.s.x - p[0], c.s.z - p[1]); };
@@ -111,8 +114,12 @@ export const MISSION_7 = {
       coach: () => 'Down, on Mudge\'s land. Let the dust settle.',
       enter: (c) => { if (dPad(c) < 200) { c.tick('vland'); setTimeout(() => c.host.say('tower', 'm_landed'), 2500); } },
       update: (c) => {
+        // B4: Hard down on the farmyard pad but not by a stand (LAND HERE picks clear ground ~40 m off the pad, and Hard's
+        // finish wants a stand): taxi in like every other Hard finish (common.js) instead of going up again. Each VTO + let-down
+        // was unauth_takeoff + apron_landing, so the retries ended in a Royal Scandal
+        if (c.diff === 'hard' && c.ticked('vland') && c.stepT > 3 && c.s.finishState && c.s.finishState !== 'ready' && !c.flag.again && !c.flag.taxi) { c.flag.taxi = 1; c.setCoach('Down by the barn. Mudge wants you on a stand: the autopilot taxis you in.'); c.host.taxiTo(DEFAULT_SPOT.id); }
         // the finish rules want somewhere else (Medium: runway/apron, Hard: the farmyard): back up and try again
-        if (c.stepT > 6 && ((c.s.finishState && c.s.finishState !== 'ready') || !c.ticked('vland')) && !c.flag.again) {
+        if (c.stepT > 6 && !c.flag.taxi && ((c.s.finishState && c.s.finishState !== 'ready') || !c.ticked('vland')) && !c.flag.again) {
           c.flag.again = 1; c.mflag.down = 0; c.mflag.pressed = 0; c.mflag.hovered = 0;
           c.setCoach(c.ticked('vland') ? 'Wrong spot for these rules. Up again: hover over the gold marker and <b>LAND HERE</b>.' : 'Mudge cannot see you from there. Up again: hover over the gold marker and <b>LAND HERE</b>.');
           c.host.verticalTakeoff();

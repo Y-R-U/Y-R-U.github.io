@@ -110,19 +110,29 @@ export class Traffic {
   // (releaseThrottle — the lever's AUTO detent), a full resume(), an AP command (LAND, DEMAND TAKEOFF, skip to runway)
   // or an upset recovery. On the ground a lever left at idle goes back to the AP at once.
   // Releasing the stick low, sinking or banked hard skips the wait: the AP recovers at once.
+  // D37 (player only): `e.wait` = the stick's release countdown (10 s) instead of OVERRIDE.wait; during a long countdown
+  // the let-go stick holds the attitude the player left — bank included, never back to the route — and only a real upset
+  // skips it. `e.autoOff` = AUTO OFF: released axes stay the player's (in the air the same attitude hold, on the ground a
+  // neutral stick; the lever latched) until resume() / autoNow() / an AP command (ap.wantAuto).
   _mix(e, h) {
     const ac = e.ac, ap = e.ap, A = e.axis;
     if (e.player && ap) this._boundary(e);
     if (ap?.wantResume) { ap.wantResume = false; this.resume(e); }
-    if (ap?.wantThrottleAuto) { ap.wantThrottleAuto = false; this.releaseThrottle(e); }
+    if (ap?.wantAuto) { ap.wantAuto = false; this.autoNow(e); }
+    if (ap?.wantThrottleAuto) { ap.wantThrottleAuto = false; if (!e.autoOff) this.releaseThrottle(e); }
     const stickAxes = ['aileron', 'elevator', 'rudder'];
-    const urgent = !ac.onGround && (ac.agl < 150 || ac.vs < -3.6 || Math.abs(ac.bank) > 1.05 || ac.stalled);
+    const stickWait = e.wait ?? OVERRIDE.wait, longWait = stickWait > OVERRIDE.wait + 0.01, off = !!e.autoOff;
+    // long countdown: only a real upset — banked past 70° (Easy/Medium's bank detent holds a full-stick turn AT 60°, so
+    // 60° would rescue every max-bank turn), stalled, or sinking onto the ground within ~15 s (low: 2 m/s)
+    const urgent = !off && !ac.onGround && (longWait ? (ac.vs < -1.5 && ac.agl < -ac.vs * 15) || (ac.agl < 40 && ac.vs < -2) || Math.abs(ac.bank) > 1.22 || ac.stalled
+      : ac.agl < 150 || ac.vs < -3.6 || Math.abs(ac.bank) > 1.05 || ac.stalled);
     let wait = false;
-    for (const k of stickAxes) if (A[k].mode === 'wait') wait = true;
+    for (const k of stickAxes) if (A[k].mode === 'wait' || (off && A[k].mode === 'manual' && e.manual[k] == null)) wait = true;
     if (ap) {
       ap.manualNow = AXES.some((k) => e.manual[k] != null && k !== 'throttle');
       ap.stickManual = stickAxes.some((k) => e.manual[k] != null);
       ap.attHold = wait && !ac.onGround;
+      ap.holdBank = longWait || off;
       ap.playerThrottle = A.throttle.mode === 'manual' || A.throttle.mode === 'latched' ? A.throttle.val : null;
       ap.throttleLatched = A.throttle.mode === 'latched';
       ap.playerBrake = e.manual.brake;
@@ -136,18 +146,19 @@ export class Traffic {
       if (k === 'rudder' && m == null && ac.onGround && e.manual.aileron != null) m = e.manual.aileron;
       if (m != null) {
         if (st.mode !== 'manual') { st.mode = 'manual'; if (ap && k !== 'throttle') { ap._emit('override', { axis: k }); ap.lastOverride = ac.time; } }
-        st.val = m; st.t = 0;
+        st.val = m; st.t = 0; st.live = true;
       } else if (st.mode === 'manual') {
         st.t = 0;
-        if (k === 'throttle' && (st.val > 0.05 || !ac.onGround)) st.mode = 'latched';
+        if (off) { if (k === 'throttle') st.mode = 'latched'; else if (st.live && k !== 'flaps') st.val = 0; st.live = false; }   // AUTO OFF: stays the player's
+        else if (k === 'throttle' && (st.val > 0.05 || !ac.onGround)) st.mode = 'latched';
         else if (urgent && k !== 'throttle' && apOut) { st.mode = 'blend'; st.from = st.val; st.dur = 0.25; replan = true; recover = true; }
         else { st.mode = 'wait'; st.dur = OVERRIDE.blend; if (k === 'elevator' || k === 'aileron' || k === 'rudder') st.val = 0; }
       } else if (st.mode === 'latched') {
         st.t = 0;
-        if (ac.onGround && st.val <= 0.05 && apOut) { st.mode = 'blend'; st.from = st.val; st.dur = OVERRIDE.blend; }
+        if (ac.onGround && st.val <= 0.05 && apOut && !off) { st.mode = 'blend'; st.from = st.val; st.dur = OVERRIDE.blend; }
       } else if (st.mode === 'wait') {
         st.t += h;
-        if (st.t >= OVERRIDE.wait || (urgent && k !== 'throttle')) { st.mode = 'blend'; st.t = 0; st.from = k !== 'throttle' && apOut && !ac.onGround ? apOut[k] : st.val; st.dur = urgent ? 0.25 : OVERRIDE.blend; replan = true; }
+        if (st.t >= (stickAxes.includes(k) ? stickWait : OVERRIDE.wait) || (urgent && k !== 'throttle')) { st.mode = 'blend'; st.t = 0; st.from = k !== 'throttle' && apOut && !ac.onGround ? apOut[k] : st.val; st.dur = urgent ? 0.25 : OVERRIDE.blend; replan = true; }
       } else if (st.mode === 'blend') {
         st.t += h;
         if (st.t >= (st.dur || OVERRIDE.blend)) st.mode = 'auto';
@@ -157,7 +168,7 @@ export class Traffic {
       let v;
       if (!apOut) v = st.mode === 'auto' ? (k === 'brake' ? 0 : k === 'throttle' || k === 'flaps' ? ac.ctl[k] : 0) : st.val;
       else if (st.mode === 'auto') v = apOut[k];
-      else if (st.mode === 'wait' && k !== 'throttle' && k !== 'brake' && k !== 'flaps' && !ac.onGround) v = apOut[k]; // AP attitude hold
+      else if ((st.mode === 'wait' || (off && st.mode === 'manual' && m == null && stickAxes.includes(k))) && k !== 'throttle' && k !== 'brake' && k !== 'flaps' && !ac.onGround) v = apOut[k]; // AP attitude hold
       else if (st.mode === 'blend') {
         const f = Math.min(1, st.t / (st.dur || OVERRIDE.blend)), s = f * f * (3 - 2 * f);
         v = lerp(st.from, apOut[k], s);
@@ -166,7 +177,7 @@ export class Traffic {
     }
     if (ap) {
       ap.overridden = anyManual || anyWait;
-      if (replan && !anyManual && !e.apOff) ap.replan();
+      if (replan && !anyManual && !anyWait && !e.apOff) ap.replan();
       if (recover) ap.forceRecover = true;
     }
   }
@@ -187,6 +198,7 @@ export class Traffic {
 
   // Deliberate hand-back (AP button, LAND assist): every axis, including a latched throttle, blends back now.
   resume(e) {
+    e.autoOff = false;
     for (const k of AXES) {
       const st = e.axis[k];
       e.manual[k] = null;
@@ -195,9 +207,41 @@ export class Traffic {
     e.ap?.replan();
   }
 
+  // D37 AUTO OFF: every axis the player is not touching is held for them (stick neutral, flaps/brake where they are,
+  // the lever latched); nothing times out until the player turns AUTO back on. off=false hands back like autoNow().
+  setAutoOff(e, on = true) {
+    if (!on) return this.autoNow(e);
+    e.autoOff = true;
+    for (const k of AXES) {
+      const st = e.axis[k];
+      if (st.mode === 'manual') continue;
+      if (k === 'throttle') { st.mode = 'latched'; st.val = e.ac.ctl.throttle; }
+      else { st.mode = 'manual'; st.val = k === 'flaps' ? e.ac.ctl.flaps : k === 'brake' ? (e.ac.onGround ? e.ac.ctl.brake : 0) : 0; }
+      st.t = 0; st.live = false;
+    }
+    if (e.ap) e.ap.lastOverride = e.ac.time;
+  }
+  // AUTO now (an AP command, the AUTO button mid-countdown): stop waiting and blend every released axis back at once;
+  // a latched lever stays latched (the commands release it themselves), the player's live inputs stay theirs.
+  autoNow(e) {
+    e.autoOff = false;
+    for (const k of AXES) {
+      const st = e.axis[k];
+      if (e.manual[k] != null || st.mode === 'auto' || st.mode === 'blend' || st.mode === 'latched') continue;
+      st.mode = 'blend'; st.from = e.ac.ctl[k]; st.t = 0; st.dur = 1;
+    }
+  }
+  // For the AUTO button: { off, holding (a hand on the stick), countdown (s left before the AP takes back, or null), wait }
+  autoState(e) {
+    const stick = ['aileron', 'elevator', 'rudder'], wait = e.wait ?? OVERRIDE.wait;
+    let left = null;
+    for (const k of stick) { const st = e.axis[k]; if (st.mode === 'wait') left = Math.max(left ?? 0, wait - st.t); }
+    return { off: !!e.autoOff, holding: !e.autoOff && stick.some((k) => e.manual[k] != null), countdown: e.autoOff ? null : left, wait };
+  }
+
   modeOf(e) {
     const m = AXES.map((k) => e.axis[k].mode);   // a latched throttle shows as axis.throttle.mode === 'latched'
-    if (e.apOff) return 'MANUAL';
+    if (e.apOff || e.autoOff) return 'MANUAL';
     if (m.includes('manual')) return 'MANUAL';
     if (m.includes('wait') || m.includes('blend')) return 'RESUMING';
     return 'AUTOPILOT';

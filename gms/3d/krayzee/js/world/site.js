@@ -10,6 +10,8 @@ import { asphaltTexture } from './textures.js';
 import { runwaySurface, clipPolyline, dashed, holdLines } from './pavement.js';
 import { headingToVec, threshold } from './layout.js';
 import { disposeWorld } from './dispose.js';
+import { createFlocks } from './flock.js';
+import { createSheepHerd } from './sheep.js';
 
 const Y_PAVE = 0.04, Y_MARK = 0.06, PAD_LEN = 45;
 const WHITE = col('#f4f4ef', 0.92), YELLOW = col('#f2c21b', 0.95);
@@ -235,9 +237,11 @@ function windsocks(M, spots) {
   return { mesh: socks, update };
 }
 
-// livestock: one instanced mesh per species, scattered in each flock's area, all grazing in random directions
+// livestock: one instanced mesh per species, scattered in each flock's area, all grazing in random directions.
+// Sheep are alive (C5, js/world/flock.js): they bolt from low planes; `sheep.update` moves their instances.
 function flocks(list, rnd, heightAt) {
   const meshes = [];
+  let live = null;
   const sheep = new Builder(), cow = new Builder();
   sheep.box(0, 0.75, 0, 1.15, 0.7, 0.75, col('#ece8dc'));
   sheep.box(0.72, 0.85, 0, 0.36, 0.38, 0.34, col('#262321'));
@@ -249,7 +253,33 @@ function flocks(list, rnd, heightAt) {
   for (const [x, z] of [[-0.8, -0.32], [-0.8, 0.32], [0.75, -0.32], [0.75, 0.32]]) cow.box(x, 0.36, z, 0.18, 0.72, 0.18, [0.9, 0.9, 0.9]);
   const geo = { sheep: sheep.build(), cow: cow.build() };
   const matr = new THREE.MeshLambertMaterial({ vertexColors: true });
-  for (const type of ['sheep', 'cow']) {
+  const sheepFields = list.filter((p) => p.type === 'sheep').map((f) => ({ ...footprint(f), count: f.count }));
+  if (sheepFields.length) {
+    const fl = createFlocks(sheepFields, { rnd, heightAt });
+    const m = new THREE.InstancedMesh(geo.sheep, matr, fl.sheep.length);
+    const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(0, 0, 0, 'YXZ'), p = new THREE.Vector3(), sc = new THREE.Vector3();
+    const write = (force) => {
+      let any = false;
+      fl.sheep.forEach((s, i) => {
+        if (!s.dirty && !force) return;
+        s.dirty = false; any = true;
+        const run = Math.min(1, s.speed / 3), hop = Math.abs(Math.sin(s.hop)) * 0.28 * run;
+        e.set(0, s.ang, Math.sin(s.hop * 2) * 0.12 * run);
+        m.setMatrixAt(i, mm.compose(p.set(s.x, s.y + hop, s.z), q.setFromEuler(e), sc.setScalar(s.s)));
+      });
+      if (any) m.instanceMatrix.needsUpdate = true;
+    };
+    write(true);
+    m.castShadow = true; m.receiveShadow = true; m.name = 'flock-sheep';
+    // sheep never leave their fields: one sphere around all of them keeps frustum culling right while they run
+    let R = 0, cx = 0, cz = 0;
+    for (const f of sheepFields) { cx += f.cx / sheepFields.length; cz += f.cz / sheepFields.length; }
+    for (const f of sheepFields) R = Math.max(R, Math.hypot(f.cx - cx, f.cz - cz) + Math.hypot(f.a, f.b) + 2);
+    m.boundingSphere = new THREE.Sphere(new THREE.Vector3(cx, heightAt(cx, cz), cz), R + 20);
+    meshes.push(m);
+    live = { flock: fl, mesh: m, write };
+  } else geo.sheep.dispose();
+  for (const type of ['cow']) {
     const spots = [];
     for (const f of list.filter((p) => p.type === type)) {
       const F = footprint(f), L = local(F);
@@ -267,7 +297,7 @@ function flocks(list, rnd, heightAt) {
     m.computeBoundingSphere();
     meshes.push(m);
   }
-  return meshes;
+  return { meshes, live };
 }
 
 function hedges(list, quality) {
@@ -464,7 +494,8 @@ export async function buildSite(scene, renderer, def, opts = {}) {
   }
   const socks = windsocks(M, def.windsocks || []);
   const hedge = hedges(hedgeProps, quality);
-  const animals = flocks(flockProps, r, terrain.heightAt);
+  const { meshes: animals, live: sheepLive } = flocks(flockProps, r, terrain.heightAt);
+  const sheep = sheepLive ? createSheepHerd({ ...sheepLive, heightAt: terrain.heightAt }) : null;
   const matteMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0 });
   const metalMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.4, metalness: 0.7, envMap: env, envMapIntensity: 1.0 });
   const matte = new THREE.Mesh(M.build(), matteMat); matte.name = 'buildings';
@@ -538,7 +569,7 @@ export async function buildSite(scene, renderer, def, opts = {}) {
     update, setQuality, get quality() { return quality; },
     treeStats: trees.stats, groundHeightAt: terrain.heightAt, surfaceAt, runwayAt, colliders, sun, hemi, envMap: env, wind, setWind,
     setShadowFocus: (x, z, rad) => setShadowFocus(sun, x, z, rad), sunDir: SUN_DIR.clone(),
-    tower: { cab: tr.cab, crew: null }, papi: null, root, airport: def.id,
+    tower: { cab: tr.cab, crew: null }, papi: null, root, airport: def.id, sheep,
     dispose: () => { trees.dispose(); disposeWorld(scene, root, { lights: [hemi, sun], uniformSets: [terrain.uniforms, lake?.uniforms], textures: [env, A.texture] }); },
     debug: { terrain, trees, lake, timings },
   };

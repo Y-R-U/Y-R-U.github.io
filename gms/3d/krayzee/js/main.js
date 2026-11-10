@@ -28,6 +28,9 @@ import { configureRadio } from './radio/index.js';
 import { saveSettings, hasProfile } from './ui/store.js';
 import { createKingdom, bootAirport } from './map/index.js'; // MAP (D29 Kingdom Map, docs/MAP.md)
 import { aiPool } from './world/aipool.js'; // WORLD
+import { createAutoButton } from './flight/autobtn.js'; // CONTROLS (D37)
+import { createMouseAim, fromBody } from './flight/mouseaim.js'; // CONTROLS
+const AUTO_COUNTDOWN = 10; // CONTROLS (D37): the player's AUTO countdown (s) after letting go of the stick; AI keep OVERRIDE.wait 1.5 s
 
 const AUTO = params.get('auto') === '1';
 const SHOT = params.get('shot') === '1';
@@ -35,6 +38,7 @@ const TIMESCALE = Math.min(8, Math.max(0.1, +params.get('timescale') || 1));
 const S = { mode: 'boot', paused: false, view: 'chase', player: null, log: [], respawnT: 0, startT: 0 };
 let R, scene, camera, world, env, traffic, attract, controls, hud, ghud, markers, land, fcam, sunFollow, gov, wiring, career, engine = null, fx = null, story = null, SET = null, toCoach = null;
 let kingdom = null; // MAP
+let autoBtn = null, mouseAim = null; // CONTROLS
 // settings are read every frame; ui.getSettings() parses localStorage, so keep a copy (refreshed in onSettings)
 const settings = () => (SET ||= ui.getSettings());
 const aiVoices = new Map(), errSeen = new Set();
@@ -98,8 +102,10 @@ async function boot() {
   ui.setLoading(0.8, 'Briefing the pilots');
   await nextPaint();
 
+  mouseAim = createMouseAim({ canvas, overlay, getSettings: settings, isPlaying: () => S.mode === 'play' && !S.paused && !!S.player }); // CONTROLS
   controls = createControls({
     root: overlay, getSettings: settings, getDifficulty: () => (S.player ? wiring.difficulty : null),
+    mouseAim, onAuto: () => autoBtn && S.player && !S.paused && onAutoTap(autoBtn.state), getAutoOff: () => !!S.player?.autoOff, // CONTROLS
     onView: () => { const v = viewList(); setView(v[(v.indexOf(S.view) + 1) % v.length]); },
     onPause: pause,
     onFullscreen: toggleFullscreen,
@@ -110,9 +116,10 @@ async function boot() {
   // ASSIST (D12 markers, D13 LAND): docs/ASSIST.md §1
   const st0 = ui.getSettings();
   markers = createMarkers({ container: overlay, camera, units: st0.units, traffic: st0.trafficMarkers !== false, getOrigin: () => S.player?.ac.pos ?? camera.position,
-    avoid: ['.krz-r-btn', '.krz-r-tower', '.krz-land', '.krz-top-l', '.krz-top-r', '.krz-prompt', '.krz-finish', '.krz-gbtn'] });
+    avoid: ['.krz-r-btn', '.krz-r-tower', '.krz-land', '.krz-autobtn', '.krz-top-l', '.krz-top-r', '.krz-prompt', '.krz-finish', '.krz-gbtn'] });
   land = createLandButton({ container: overlay, stickRight: st0.stickRight, onPress: onLandPress, onContext: onStovlPress });
   markers.setVisible(false); land.setVisible(false);
+  autoBtn = createAutoButton({ root: overlay, onTap: onAutoTap }); autoBtn.setSide(!!st0.stickRight); // CONTROLS (D37)
   fcam = createFlightCamera(camera, env);
   sunFollow = world.setShadowFocus ? (p) => world.setShadowFocus(p.x, p.z, S.player ? R.tier.shadowBox : 160) : followSun(world.sun, R);
   gov = createFpsGovernor(R, { enabled: qpick.auto });
@@ -219,6 +226,7 @@ async function onPlay(mode) {
     S.type = type;
     const ap = new Autopilot(ac);
     S.player = traffic.add({ aircraft: ac, ap, rig, player: true, name: livery.registration || 'PLAYER' });
+    S.player.wait = AUTO_COUNTDOWN; mouseAim?.reset(); // CONTROLS (D37): the stick's 10 s AUTO countdown
     S.mode = 'play'; S.playMode = mode;
     placePlayer(S.lastStop);
     wiring.startPlay(mode, S.player, mode === 'online' ? { room: onlineRoom() } : {});
@@ -355,6 +363,7 @@ function placePlayer(from = null) {
   ent.ap.setRoute(circuitRoute(E, { type: S.type || 'c172' }));
   fx?.reset('player');
   for (const k of AXES) { ent.axis[k].mode = 'auto'; ent.manual[k] = null; }
+  ent.autoOff = false; mouseAim?.release(); // CONTROLS
   controls.release();
   try { wiring.link?.placed(ent, 8); } catch (e) { /* */ }
   attract.seedRivals?.().catch?.(() => {});
@@ -374,6 +383,7 @@ function quitPlay() {
   wiring.endPlay();
   engine?.dispose(); engine = null;
   controls.setVisible(false); hud.setVisible(false); ghud.setVisible(false); showSpot(false); toCoach?.hide();
+  autoBtn?.setVisible(false); mouseAim?.unlock(); S.autoOn = S.autoNowUp = false; document.documentElement.classList.remove('krz-auto-on', 'krz-ab-up'); // CONTROLS
   markers.setVisible(false); land.setVisible(false); S.landOn = false; document.documentElement.classList.remove('krz-land-on', 'krz-msg-busy'); S.msgBusy = false; delete document.documentElement.dataset.krzAct;
   S.mode = 'attract'; S.paused = false;
   fitFov(camera, 70, 45, 85);
@@ -396,6 +406,7 @@ function setView(v) {
 function pause() {
   if (S.mode !== 'play') return;
   S.paused = true;
+  mouseAim?.unlock(); // CONTROLS
   try { audio.setVolumes({ ...ui.getSettings(), sfx: 0 }); } catch (e) { /* */ }
   // The radio freezes with the game (its queue only advances in wiring.update) and goes quiet and out of sight.
   try { audio.stopRadio?.(); } catch (e) { /* */ }
@@ -417,6 +428,7 @@ function onSettings(s) {
   if (S.player && s.difficulty && s.difficulty !== prevDiff) setDifficulty(s.difficulty, true);
   markers?.setOptions({ units: s.units, traffic: s.trafficMarkers !== false });
   land?.setSide(!!s.stickRight);
+  autoBtn?.setSide(!!s.stickRight); // CONTROLS
   if (s.view && s.view !== S.view && !params.get('view')) setView(s.view);
   const q = pickQuality(s.quality);
   gov.setAuto(q.auto);
@@ -457,12 +469,15 @@ function frame(dt) {
   for (const e of traffic.list) e.rig?.root.updateMatrixWorld();
 
   if (P) {
-    fcam.update(dt, P.rig, P.ac, controls.look);
+    fcam.update(dt, P.rig, P.ac, controls.look, mouseAim?.engaged ? mouseAim.aimDir() : null, mouseAim?.zoom ?? 1); // CONTROLS: mouse aim
     handleEvents(P, dt);
     const status = P.ap.status();
     const modes = modesOf(P);
+    const auto = traffic.autoState(P); // CONTROLS (D37)
+    if (auto.off) status.phase = 'AUTO OFF'; else if (auto.countdown != null) status.phase = `AUTO IN ${Math.max(1, Math.ceil(auto.countdown - 1e-6))}`; // CONTROLS
     hud.update(dt, P.ac, status, traffic.modeOf(P), modes, settings().units);
-    controls.paint(P.ac, modes, S.view, viewList().length > 1, P.axis.throttle);
+    controls.paint(P.ac, modes, S.view, viewList().length > 1, P.axis.throttle, auto); // CONTROLS: + auto
+    updateAuto(P, auto); // CONTROLS
     updateGameHUD(dt, P, modes);
   } else if (!story?.cameraOwned) attract.updateCamera(dt, camera);
   for (const e of traffic.list) if (!e.player) {
@@ -477,11 +492,13 @@ function frame(dt) {
   if (session) try { ghud.online.sync(session, net); } catch (e) { /* */ }
 
   world.update?.(dt, camera);
+  if (world.sheep) try { world.sheep.update(S.paused ? 0 : dt * (S.simK || 1), traffic.list, camera.position, { audio, radio: wiring.radio, story: !!story?.mission, game: wiring.game }); } catch (e) { /* */ } // INTROSHEEP: C5 sheep scatter; SHEEP2: + game (D38 bonus)
   const focus = P ? P.rig.root.position : camera.position.clone().add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(60));
   sunFollow(focus);
   updateAudio(dt);
   R.renderer.render(scene, camera);
   if (P) updateMarkers(P);
+  if (mouseAim) paintAim(P); // CONTROLS
   gov.tick(dt, S.cpuMs || 0);
 }
 
@@ -568,6 +585,7 @@ function onLandPress(state) {
   const P = S.player; if (!P) return;
   if (state === 'active') return cancelLand();
   if (!P.ap.landAt) return land.setState('unavailable', 'AUTOPILOT NOT READY');
+  traffic.autoNow(P); // CONTROLS (D37): LAND is an autopilot order: AUTO OFF / the countdown end here
   let plan;
   try { plan = planNow(); } catch (e) { console.warn('planLandAhead', e); return land.setState('unavailable', 'NO FIELD AHEAD'); }
   if (plan.fail) return land.setState('unavailable', plan.hint);
@@ -627,6 +645,7 @@ function onStovlPress(key, state) {
   const ap = P.ap, ac = P.ac;
   log('stovl', { key, state });
   S.stovlT = 0;
+  if (state !== 'unavailable') traffic.autoNow(P); // CONTROLS (D37)
   if (state === 'unavailable') { const why = land.context?.sub; if (why) hud.flash(why.replace(/^no: /, 'CAN\'T LAND · ').toUpperCase(), 'warn', 2); return; }
   if (key === 'landrw') return onLandPress('idle');
   if (key === 'vto') {
@@ -640,6 +659,36 @@ function onStovlPress(key, state) {
   } else if (key === 'flyon') ap.flyOn();
   // (no flash: the button itself now says what is happening; D32 keeps the screen clear)
   updateStovl(0, P);
+}
+// ---- CONTROLS (D37): the AUTO button, and the mouse-aim reticle ----
+function onAutoTap(state) {
+  const P = S.player; if (!P || P.ac.crashed) return;
+  if (state === 'on') {
+    if (land.state === 'active' && !P.ap.stovlMode) cancelLand();
+    traffic.setAutoOff(P, true);
+    if (mouseAim?.enabled) mouseAim.hold();
+    hud.flash('AUTO OFF · YOU HAVE CONTROL', 'info', 1.6);
+  } else { traffic.resume(P); mouseAim?.release(); hud.flash('AUTOPILOT ON', 'good', 1.2); }
+  log('auto', { from: state });
+}
+function updateAuto(P, a) {
+  const show = !SHOT && !AUTO && !S.paused && !P.ac.crashed && (!P.ac.onGround || a.off || a.countdown != null || a.holding);
+  autoBtn.setVisible(show);
+  if (show) autoBtn.paint(a);
+  if (S.autoOn !== show) { S.autoOn = show; document.documentElement.classList.toggle('krz-auto-on', show); }
+  const now = !land.el.hidden && land.el.dataset.now === '1';   // LAND steps up 58 px over its LAND NOW / second-choice pill
+  if (S.autoNowUp !== now) { S.autoNowUp = now; document.documentElement.classList.toggle('krz-ab-up', now); }
+}
+const _mp = new THREE.Vector3(), _mn = {}, _mf = { x: 0, y: 0, z: -1 };
+function screenOf(x, y, z) {
+  _mp.set(x, y, z).project(camera);
+  return _mp.z < 1 && _mp.z > -1 ? { x: (_mp.x + 1) / 2 * innerWidth, y: (1 - _mp.y) / 2 * innerHeight } : null;
+}
+function paintAim(P) {
+  const on = !!P && S.mode === 'play' && !S.paused && !SHOT && !P.ac.crashed;
+  if (!on || !mouseAim.enabled) { mouseAim.paint(null, null, false); return; }
+  const p = P.rig.root.position, a = mouseAim.aimDir(), n = fromBody(P.ac.q, _mf, _mn), D = 600;
+  mouseAim.paint(screenOf(p.x + a.x * D, p.y + a.y * D, p.z + a.z * D), screenOf(p.x + n.x * D, p.y + n.y * D, p.z + n.z * D), true);
 }
 // ---- ASSIST: markers (D12); the target is the live opportunity, else Hard's finishing spot, else the active runway ----
 const mkTarget = { id: 'target', kind: 'target', label: '', worldPos: [0, 0, 0] };
@@ -703,6 +752,7 @@ function fieldHop(P) {
 function demandTakeoff() {
   const P = S.player; if (!P?.ap?.demandTakeoff) return;
   if (S.reelOpen) ghud.headlines.closeReel(false);
+  traffic.autoNow(P); // CONTROLS (D37)
   const fh = S.everAir && P.ac.onGround && fieldHop(P);
   if (fh) { log('demandTakeoff', { field: fh }); S.demandedT = true; S.demandLive = fh === 'run'; ghud.score.announce('BY ROYAL PREROGATIVE', fh === 'vto' ? 'Straight up from the turnips. The farmer may duck.' : fh === 'run' ? 'Off across the turnips. The farmer may watch.' : 'Airborne from the turnips. The farmer may watch.'); return; }
   try { if (!(S.demandEnd = wiring.link?.demandTakeoff ? wiring.link.demandTakeoff(P) : P.ap.demandTakeoff())) { hud.flash('NO RUNWAY OPEN FOR YOUR GRACE', 'warn'); return; } } catch (e) { console.warn('demandTakeoff', e); return; }
@@ -905,7 +955,11 @@ window.__game = {
     activeEnd: wiring?.activeEnd(), game: wiring?.state(), player: S.player ? summary(S.player) : null, ai: traffic ? traffic.list.filter((e) => !e.player).map(summary) : [],
   }),
   setControls: (c, ms = 1000) => controls.inject(c, ms),
+  autoState: () => (S.player ? { ...traffic.autoState(S.player), btn: autoBtn?.el.hidden ? null : autoBtn?.state, label: autoBtn?.el.querySelector('b')?.textContent } : null), // CONTROLS
+  mouseAim: () => mouseAim && { enabled: mouseAim.enabled, engaged: mouseAim.engaged, locked: mouseAim.state.locked, hdg: mouseAim.state.hdg, pitch: mouseAim.state.pitch, zoom: mouseAim.zoom }, // CONTROLS
+  get mouseAimObj() { return mouseAim; }, // CONTROLS (tools/test-controls.mjs --falsify only)
   release: () => controls.release(),
+  clearAround: (x, z, r = 80) => attract?.clearAround(x, z, r), // MAPTASKS: story ground starts (js/story/actors.js placeGround)
   teleport(o) {
     const P = S.player; if (!P) return false;
     P.ac.place({ x: o.x, z: o.z, alt: o.alt, heading: o.heading ?? 90, speed: (o.speedKt ?? 0) * KT, throttle: o.throttle, flaps: o.flaps }, env);

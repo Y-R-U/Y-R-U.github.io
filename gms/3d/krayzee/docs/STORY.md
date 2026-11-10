@@ -35,6 +35,11 @@ tower → tower close → the Pomfrey-Smythe mauve plane (follows a live AI) →
 with the "By Royal Warrant" name card → title card. Captions in Instrument Serif, bottom-centre, letterbox vignette.
 Any tap shows **Skip intro ›** for 3.5 s; Esc/Enter/Space skip on desktop. Narration never says the player's name —
 only the card shows it (D1). `markIntroSeen()` is called on finish or skip.
+**Radio silence** (Aaron 2026-11-04): `story.playIntro` calls `wiring.radio.hush(true)` and the intro's `onDone`
+calls `hush(false)`, so every way in (first launch, the menu's "Watch the intro", Story before Mission 1, `?intro=1`)
+is covered. While hushed the director drops everything (AI chatter, tower lines, scolds, scheduled lines; nothing is
+buffered to burst out afterwards) and cuts a line already on air; the narration is HTMLAudio and is not affected.
+`test-intro.mjs` checks it in portrait and landscape (first run, menu replay, `?intro=1`); `--falsify=hush` makes it red.
 
 Narrator: designed voice "Krayzee · narrator" (Qwen Voice Studio `http://192.168.0.236:7876`, Ryan, seed 37,
 saved clone `60aba718…`), warm dry British RP. Clips at ≈ −17 LUFS; ASR-checked (all WER 0 except proper-noun
@@ -142,7 +147,7 @@ All at C-Tower 1. Each mission teaches **one more rule-break + one more system**
 |---|---|---|---|---|---|---|
 | 1 | Letters Patent | Toby | **at the hold** (was stand S6) | tower buzz | override/let go, radio, LAND, DEMAND IT | ~6 min |
 | 2 | The Pomfrey-Smythe Welcome | Gerald | airborne, downwind, Lord Rupert (C172) on a long final | cut-in on final (`cut_in_final`, often `forced_goaround`) | LAND *with traffic* (press it when the runway is dead ahead: `landCue`) | ~2.5 min |
-| 3 | Queue Is a Commoner's Word | Imogen | 5th in the departure queue (3 story planes + hold), tanks at 14/12/10 % | out of turn (`queue_jump` / `unauth_takeoff`) via **DEMAND TAKEOFF** | **fuel** (burn ×5/×7/×8, low-fuel warning, DEMAND IT refuels; Easy/Medium bowser top-up at 2 %, Hard: dry = fail) | ~4 min |
+| 3 | Queue Is a Commoner's Word | Imogen | 5th in the departure queue (3 story planes + hold), tanks at 14/12/12 % (Hard was 10 %, B4) | out of turn (`queue_jump` / `unauth_takeoff`) via **DEMAND TAKEOFF** | **fuel** (burn ×5/×7/×5 (Hard was ×8), low-fuel warning, DEMAND IT refuels; Easy/Medium bowser top-up at 2 %, Hard: dry = fail) | ~4 min |
 | 4 | The Castle Cup | Toby | at the hold, Rupert's mauve **Tiger Moth** lined up and rolling | onto his runway while he rolls (`double_occupancy` / `runway_steal` / `unauth_takeoff`) | **THROTTLE lever** by hand while the AP steers (lever sets the race pace: legs fly 92 + 40 × lever kt) | ~5 min |
 
 M4 race: gates church → castle → back over runway (any crossing of the runway strip). First through all three wins; Rupert first =
@@ -314,3 +319,44 @@ runs the game slowly, and a wall-clock limit failed healthy runs.
 
 Palace Lawn note: WORLD has since shipped it as its own airport id `palace` (data/airports/palace.js, `world: 'royal'`).
 Moving the finale's landing there is the recipe above plus `def.airport`/a `tripStep('palace')`-free swap (same world).
+
+## B4 — Medium and Hard for every mission (lane MAPTASKS, 2026-11-10)
+
+`node tools/story/test-mission.mjs --mission=N --diff=medium|hard --port=9741 --base=http://127.0.0.1:8888/gms/3d/krayzee/`
+(the flag already existed; the harness now has the help Medium/Hard need, and the game had three bugs). 390×844 touch, serial.
+
+**First run (current tree, before any fix): Medium 6/10, Hard 2/10.**
+
+| | Medium first | Hard first | cause | fix |
+|---|---|---|---|---|
+| M1 | pass | crashed at 0 s | a Free Flight hold rival (`attract.seedRivals`, async) parks on the mission's hold start; on Hard any contact ends it | **game**: `js/story/actors.js placeGround` clears attract AI within 80 m of the start and keeps clearing for 6 s, and again at "Fly" (`host.clearStart`, missions.js); a plane already touched is put back whole. `window.__game.clearAround` (main.js, `// MAPTASKS`) |
+| M1 | | crashed into the tower | harness: the old scripted pass teleported 300 m straight at the cab, nose pushed down (rubber bounced off it on Easy/Medium) | harness: shared closed-loop low pass (below) |
+| M2 | **fail** | crashed in the flare | flight (LAND), see "Open" | none (Hard passed 16/16 on a rerun) |
+| M3 | pass | tank ran dry | **tuning**: Hard `FUEL [0.1, 8]` ran dry ~108 s in; the mission's own route (church, LAND on its cue) needs ~160 s to touchdown, so Hard was impossible as flown | `data/story/mission3.js` Hard `[0.12, 5]` (~25 % margin, still no bowser). Manager/Aaron may want it tighter |
+| M4 | pass | crashed at 0 s | same hold-start collision as M1 | M1's fix |
+| M5, M8, M9 | **fail** | **fail** | harness: Medium/Hard buzz passes are wide/high by design (you go low by hand); the harness never did | harness: teleport ~12 s out (ATC gives a teleported plane 8 s of crime grace) onto a line 40 m beside the tower, ~22 m over its top, and a scripted thumb holds height and line until past it, then taps AUTO. A neutral stick sank the Jumbo 30 m in 5 s; a nose-down one flew the Moth into the farm; no stick let the AP turn away |
+| M6, M10 | pass | pass | | |
+| M7 | pass | Royal Scandal | harness: Hard has no flight computer over the pad (the hover overheats and lets down where it is: grass landing + VTO each cycle → scandal). Then a **game** bug: down on the farmyard pad, Hard's finish rule (apron AND within 45 m of a stand) refused it, because the pad was > 45 m from every stand and LAND HERE picks clear ground ~40 m off the pad anyway, so the stop step sent you up again until the scandal | harness: a thumb flies the hover (turn to the pad, stick forward). **game** (`data/story/mission7.js`): the yard pad moved between stands S1/S2, and on Hard a vertical landing that ticked `vland` taxis in to the Hard spot (as every other Hard finish does, common.js) instead of going up again |
+
+**After the fixes (2026-11-10, real `?mission=N`, 390×844 touch, port 9741):**
+
+| | M1 | M2 | M3 | M4 | M5 | M6 | M7 | M8 | M9 | M10 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Easy (regression) | 17/17 | 16/16 | 16/16 | 17/17 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 | 18/18 |
+| Medium | 17/17 | **6/10** | 16/16 | 17/17 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 | 18/18 |
+| Hard | 17/17 | 16/16 | 16/16 | 17/17 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 | 18/18 |
+
+Medium M1/M3/M4/M6/M10 and Hard M6/M10 passed on the first run (before the fixes); the rest are the last run after them.
+Falsified: before the hold-start fix, M1 and M4 Hard crash at 0 s (the fix is what turns them green); before the M3 tuning, Hard
+runs dry ~108 s in; `--falsify=crime` still turns the buzz missions red ("earned in flight").
+
+**Open (flight / LAND, not story):** Mission 2 Medium. After the scripted turn-in (teleport onto 27's centreline 1.6 km out,
+115 m AGL, 85 kt, ahead of Rupert), LAND picks **RWY 22** (the closed crosswind runway) instead of 27 straight ahead. The plane
+leaves the 27 centreline, `landCue` goes false and stays false, so the cut-in is never judged; the cut step runs out at 300 s
+(or, on an earlier run, the cut ticked only after a touchdown and the relaunch loop ran the land step out). Repro: probe at
+`requestLand()` right after that teleport returns `RWY 22`. LAND only takes a closed runway "when no open one works"
+(landahead.js `rk`), so it judged 27 unusable from there: ATC / traffic awareness on 27 (Rupert on final behind) is the
+suspect. The same script passed on Hard and passed on Medium in October.
+
+**Harness notes.** `tools/story/test-mission.mjs` prints the mission log and the player's crash/touchdown state when a run fails.
+The M1 Medium/Hard scripted pass now uses the same closed-loop pass as M5/M8/M9.

@@ -408,3 +408,15 @@ node tools/atc-sim.mjs --only=flight # ATC lane's smoke with the real Aircraft/A
 ~/.claude/bin/cdp stop 9431
 ```
 Screenshots land in `docs/shots/flight/`.
+
+### CONTROLS (D37 AUTO button, desktop mouse aim, 2026-11-04)
+| item | API / behaviour |
+|---|---|
+| player countdown | `ent.wait` (main sets `AUTO_COUNTDOWN` = 10 s on the player; unset = `OVERRIDE.wait` 1.5 s for AI/sims) is the stick axes' release wait; brake/flaps keep 1.5 s. During a long wait the AP's `attHold` keeps the **bank** too (`ap.holdBank`, ≤ 50°) — no wings-levelling, no route. Upset skip for a long wait: bank > 70° (not 60°: the Easy/Medium bank detent holds full stick at 60°), stalled, `vs < −1.5 && agl < −vs·15`, or `agl < 40 && vs < −2`. Replan only once nothing waits. |
+| AUTO OFF | `traffic.setAutoOff(e, true)`: every untouched axis becomes the player's (`manual`, stick 0, flaps/brake as they are, lever `latched`); released stick axes in the air get the AP attitude hold, on the ground neutral; no timeouts, no upset rescue, `wantThrottleAuto` ignored; `modeOf` = MANUAL. `traffic.resume(e)` or `traffic.autoNow(e)` ends it. |
+| `traffic.autoNow(e)` | stop waiting: released / held axes blend back in 1 s (a latched lever stays latched). `ap.wantAuto` (set by `landAt`, `demandTakeoff`, `skipToRunway`, `fieldTakeoff`, `_stovlStart`, `landHere`, `flyOn`) calls it from the mixer. |
+| `traffic.autoState(e)` | `{ off, holding, countdown (s left | null), wait }` — the AUTO button (js/flight/autobtn.js), the stick tag ("AUTO IN 7" / "AUTO OFF") and the HUD pill phase read it. `__game.autoState()` adds `btn`/`label`. |
+| mouse aim | js/flight/mouseaim.js: `instruct(ac, aimDir, {hard})` (three-free) = bank-to-turn instructor (lx·5 roll, ly·4.5 pitch, wings-level blend inside 12°, bank soft limit 70° / Hard 85° read 0.3 s ahead, no pull past 85 % stall α on Easy/Medium, hover: turn only). `createMouseAim` = pointer lock on a mouse click on the canvas, `movementX/Y` × 0.12°/px, 10 px dead zone, release after 1 s rest on the aim (≤ 4°) or 5 s rest; wheel zoom 0.55–2.4. `fcam.update(…, aim, zoom)`: chase looks along the aim, inside views turn to it. controls.js remaps keys while on: W/S (and Shift/Ctrl) throttle, A/D rudder, Q/E roll override, Space brake; arrows still pitch/roll; Z = AUTO. |
+| fixed | `FLAP_HOLD` (10 s) / `KEY_THR_HOLD` (3 s) were undefined since b5e91495: the FLAPS button/F key threw (a flap notch then stayed manual for ever) and a held Shift/Ctrl threw every frame. Restored. |
+
+Tests: `node tools/controls-sim.mjs` (26; `--falsify=wait|attHold|urgent|nosafety|off|cmd|roll|level`, `--root=<HEAD export>`), `node tools/test-controls.mjs --port=9721` (60, real touch 390×844 / 844×390 + mouse/keys 1280×800; `--falsify=countdown|autooff|layout|aim|toggle`). Shots: docs/shots/controls/.

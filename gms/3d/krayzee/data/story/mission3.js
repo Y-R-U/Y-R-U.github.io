@@ -4,7 +4,9 @@
 import { holdPoint, departureRoute } from '../../js/flight/routes.js';
 import { CHURCH, at, d2, rwEnd, lineUpLegs, finishSteps } from './common.js';
 
-const FUEL = { easy: [0.14, 5], medium: [0.12, 7], hard: [0.1, 8] };
+// B4 (2026-11-10): Hard was [0.1, 8], which ran dry ~108 s in while the mission's own route (church, then LAND on its
+// cue) needs ~160 s to touchdown: impossible as flown. Hard keeps the no-bowser rule with ~25 % margin.
+const FUEL = { easy: [0.14, 5], medium: [0.12, 7], hard: [0.12, 5] };
 const JUMPS = new Set(['queue_jump', 'unauth_takeoff', 'runway_steal', 'double_occupancy']);
 const QUEUE = 3;
 
