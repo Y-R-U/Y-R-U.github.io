@@ -18,7 +18,7 @@ of figures without the sim caring.
 
 | Lane | Owns |
 |---|---|
-| **G (gameplay)** | `index.html`, `css/`, `js/main.js`, `js/config.js`, `js/sim/**`, `js/input.js`, `js/audio.js`, `js/ui/**`, `tools/sim_test.mjs` |
+| **G (gameplay)** | `index.html`, `css/`, `js/main.js`, `js/config.js`, `js/sim/**`, `js/input.js`, `js/audio.js`, `js/ui/**`, `js/meta/**`, `tools/sim_test.mjs`, `tools/meta_test.mjs`, `tools/ladder_tune.mjs` |
 | **R (render)** | `js/render/**`, `js/world/**`, `tools/render_*.{mjs,html}` |
 
 Never edit the other lane's files. If you need a change there, write it in

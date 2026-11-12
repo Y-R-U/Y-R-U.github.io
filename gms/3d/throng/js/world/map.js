@@ -54,8 +54,8 @@ function splitRect(rnd, r, minSide, maxSide, out, depth = 0) {
   }
 }
 
-const FACADES = [0xe9dcc0, 0xdcc19a, 0xe2b98a, 0xd9a58e, 0xcfcac2, 0xe6d3ad, 0xc9b49a, 0xd8c7b4];
-const ROOFS = { mansard: [0x5d6880, 0x66708a, 0x6e625e, 0x55648a, 0x7a6a62], dome: [0x4f6aa0, 0x4f8a80, 0x5a6fa8], pitched: [0xb85c38, 0xa85032, 0xc4703f, 0x9e5e3c, 0xb0643a], flat: [0x9c8c7a, 0xa48f78] };
+const FACADES = [0xeadfc6, 0xdcc6a0, 0xcf8a66, 0xe0b070, 0x95a8bd, 0xa7b797, 0xd8aa9c, 0xe8d8b8];
+const ROOFS = { mansard: [0x4f5a72, 0x5b6680, 0x5e5658, 0x48587a, 0x66605e], dome: [0x3f5f9a, 0x4a8a7c, 0x52669e], pitched: [0xb4553a, 0xa24a30, 0xc06a40, 0x9a5638, 0xb85e3e], flat: [0x9c8c7a, 0xa48f78] };
 
 function pick(rnd, a) { return a[Math.floor(rnd() * a.length)]; }
 
@@ -66,7 +66,7 @@ function makeBuildings(rnd, fp, opts) {
     const w = p.w, d = p.d;
     const floors = (opts.floorsMin ?? 3) + Math.floor(rnd() * ((opts.floorsMax ?? 5) - (opts.floorsMin ?? 3) + 1));
     const r = rnd();
-    let roof = r < 0.38 ? 'mansard' : r < 0.76 ? 'pitched' : r < 0.84 ? 'flat' : 'dome';
+    let roof = r < 0.34 ? 'mansard' : r < 0.68 ? 'pitched' : r < 0.84 ? 'flat' : 'dome';
     if (roof === 'dome' && Math.min(w, d) < 9) roof = 'mansard';
     const e = 0.01;
     const ext = {
@@ -121,7 +121,7 @@ export function generateMap(seed = 1, opts = {}) {
     if (b.kind === 'build') {
       const fp = { x: b.x, z: b.z, w: b.w - SIDEWALK * 2, d: b.d - SIDEWALK * 2 };
       obstacles.push({ type: 'rect', x: fp.x, z: fp.z, w: fp.w, d: fp.d });
-      buildings.push(...makeBuildings(rnd, fp, { min: 8, max: 15 }));
+      buildings.push(...makeBuildings(rnd, fp, { min: 8, max: 15, floorsMin: 2, floorsMax: 4 }));
     } else if (b.kind === 'plaza') {
       const r = 4.2 + rnd() * 0.8;
       obstacles.push({ type: 'circle', x: b.x, z: b.z, r });
@@ -172,7 +172,7 @@ export function generateMap(seed = 1, opts = {}) {
     { x: -H + EDGE / 2, z: 0, w: EDGE, d: size - EDGE * 2 },
     { x: H - EDGE / 2, z: 0, w: EDGE, d: size - EDGE * 2 },
   ];
-  for (const fp of perimFps) buildings.push(...makeBuildings(rnd, fp, { min: 10, max: 18, floorsMin: 4, floorsMax: 6 }));
+  for (const fp of perimFps) buildings.push(...makeBuildings(rnd, fp, { min: 10, max: 18, floorsMin: 3, floorsMax: 5 }));
 
   // Visual-only outer city, beyond the perimeter, lost in fog.
   const OUT = H + 60;

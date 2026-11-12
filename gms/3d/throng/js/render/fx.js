@@ -436,7 +436,7 @@ export function createPickups(max, shared) {
       attribute vec4 iP; attribute vec4 iC; varying vec2 vUv; varying vec4 vC; varying float vE;
       #include <fog_pars_vertex>
       void main() { vUv = uv; vC = iC;
-        vec3 w = vec3(iP.x + position.x * iP.w, position.y * 3.2 * iP.w, iP.y + position.z * iP.w);
+        vec3 w = vec3(iP.x + position.x * iP.w, position.y * 6.5 * iP.w, iP.y + position.z * iP.w);
         vec3 V = normalize(cameraPosition - w);
         vE = abs(dot(normalize(vec3(normal.x, 0.0, normal.z)), V));
         vec4 mvPosition = viewMatrix * vec4(w, 1.0); gl_Position = projectionMatrix * mvPosition;
@@ -455,13 +455,179 @@ export function createPickups(max, shared) {
   });
   const beams = new THREE.Mesh(bg, beamMat);
   beams.frustumCulled = false; beams.renderOrder = 5;
+
+  const ig = quadGeo();
+  ig.setAttribute('iP', ia); ig.setAttribute('iC', ic);
+  ig.instanceCount = 0;
+  const uIconS = { value: 1.4 };
+  const iconMat = new THREE.ShaderMaterial({
+    fog: true, transparent: true, depthWrite: false,
+    uniforms: { ...fogUniforms(), uTime: shared.uTime, uAtlas: { value: atlas }, uIconS },
+    vertexShader: /* glsl */`
+      attribute vec4 iP; attribute vec4 iC; uniform float uTime; uniform float uIconS; varying vec2 vUv; varying vec4 vC; varying float vK;
+      #include <fog_pars_vertex>
+      void main() { vUv = vec2(position.x, -position.z); vC = iC; vK = iP.z;
+        float S = uIconS * iP.w;
+        vec3 c = vec3(iP.x, 2.2 + 1.6 * S + 0.25 * S * sin(uTime * 2.4 + iP.x), iP.y);
+        vec3 rt = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
+        vec3 up = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
+        vec3 w = c + rt * vUv.x * S + up * vUv.y * S;
+        vec4 mvPosition = viewMatrix * vec4(w, 1.0); gl_Position = projectionMatrix * mvPosition;
+        #include <fog_vertex>
+      }`,
+    fragmentShader: /* glsl */`
+      uniform sampler2D uAtlas; varying vec2 vUv; varying vec4 vC; varying float vK;
+      #include <fog_pars_fragment>
+      void main() {
+        float d = length(vUv);
+        float aa = fwidth(d) * 1.5;
+        float disc = 1.0 - smoothstep(1.0 - aa, 1.0, d);
+        if (disc <= 0.0) discard;
+        float ring = smoothstep(0.78 - aa, 0.78, d);
+        vec2 iuv = vUv / 0.62 * 0.5 + 0.5;
+        float icon = 0.0;
+        if (iuv.x > 0.02 && iuv.x < 0.98 && iuv.y > 0.02 && iuv.y < 0.98) icon = texture2D(uAtlas, vec2((iuv.x + vK) / 3.0, iuv.y)).a;
+        vec3 bg = mix(vC.rgb * 0.42, vC.rgb * 0.7, smoothstep(0.8, -0.6, vUv.y));
+        vec3 col = mix(bg, vec3(1.0), max(ring * 0.95, icon));
+        gl_FragColor = vec4(col, disc * min(1.0, vC.a));
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+        #include <fog_fragment>
+      }`,
+  });
+  const icons = new THREE.Mesh(ig, iconMat);
+  icons.frustumCulled = false; icons.renderOrder = 11;
   return {
-    pads, beams,
+    pads, beams, icons,
+    setView(d) { uIconS.value = Math.min(3.4, Math.max(1.2, d / 36)); },
     set(i, x, z, kind, alpha, scale = 1) {
       const col = PICKUP_COL[kind] || PICKUP_COL.speed;
       a[i * 4] = x; a[i * 4 + 1] = z; a[i * 4 + 2] = KIND_IDX[kind] ?? 0; a[i * 4 + 3] = scale;
       c[i * 4] = col.r * 1.6; c[i * 4 + 1] = col.g * 1.6; c[i * 4 + 2] = col.b * 1.6; c[i * 4 + 3] = alpha;
     },
-    commit(n) { g.instanceCount = n; bg.instanceCount = n; ia.needsUpdate = true; ic.needsUpdate = true; },
+    commit(n) { g.instanceCount = n; bg.instanceCount = n; ig.instanceCount = n; ia.needsUpdate = true; ic.needsUpdate = true; },
   };
+}
+
+// ---------- pigeons: small flocks on plazas that scatter when a crowd comes near ----------
+export function createPigeons(map, shared, perFlock = 12) {
+  const flocks = [];
+  for (const p of map.plazas || []) {
+    const r = Math.min(p.r * 0.75, 30);
+    flocks.push({ x: p.x, z: p.z, r, inner: (p.central ? 10 : 6) });
+  }
+  const n = flocks.length * perFlock;
+  const P = [], A = [];
+  const tri = (a, b, c, part) => { for (const v of [a, b, c]) { P.push(...v); A.push(part); } };
+  tri([0, 0.12, 0.2], [-0.07, 0.1, -0.1], [0.07, 0.1, -0.1], 0);
+  tri([0, 0.12, 0.2], [0.07, 0.1, -0.1], [0, 0.04, -0.05], 0);
+  tri([0, 0.12, 0.2], [0, 0.04, -0.05], [-0.07, 0.1, -0.1], 0);
+  tri([0, 0.1, -0.1], [-0.05, 0.11, -0.22], [0.05, 0.11, -0.22], 0);
+  tri([0, 0.16, 0.24], [-0.03, 0.12, 0.17], [0.03, 0.12, 0.17], 3);
+  tri([0.04, 0.12, 0.08], [0.04, 0.12, -0.08], [0.3, 0.12, -0.02], 1);
+  tri([-0.04, 0.12, -0.08], [-0.04, 0.12, 0.08], [-0.3, 0.12, -0.02], 2);
+  const g = new THREE.InstancedBufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+  g.setAttribute('aPart', new THREE.Float32BufferAttribute(A, 1));
+  const ip = new Float32Array(n * 4), iff = new Float32Array(n * 4);
+  const aP = new THREE.InstancedBufferAttribute(ip, 4).setUsage(THREE.DynamicDrawUsage);
+  const aF = new THREE.InstancedBufferAttribute(iff, 4).setUsage(THREE.DynamicDrawUsage);
+  g.setAttribute('iP', aP); g.setAttribute('iF', aF);
+  g.instanceCount = n;
+  const mat = new THREE.ShaderMaterial({
+    fog: true, side: THREE.DoubleSide,
+    uniforms: { ...fogUniforms(), uTime: shared.uTime, uSkyCol: shared.uSkyCol, uLampCol: shared.uLampCol },
+    vertexShader: /* glsl */`
+      attribute float aPart; attribute vec4 iP; attribute vec4 iF;
+      uniform float uTime; uniform vec3 uSkyCol; uniform vec3 uLampCol; varying vec3 vC;
+      #include <fog_pars_vertex>
+      void main() {
+        vec3 p = position * 2.0;
+        float fly = iF.y;
+        if (aPart > 0.5 && aPart < 2.5) {
+          float side = aPart < 1.5 ? 1.0 : -1.0;
+          float a = fly > 0.5 ? sin(uTime * 26.0 + iF.x) * 1.1 : 1.35;
+          float x = p.x * side;
+          p.x = side * x * cos(a); p.y += x * sin(a) * (fly > 0.5 ? 1.0 : 0.15);
+        }
+        if (fly < 0.5) p.yz = mat2(cos(iF.z), -sin(iF.z), sin(iF.z), cos(iF.z)) * (p.yz - vec2(0.15, 0.0)) + vec2(0.15, 0.0);
+        float c = cos(iP.w), s = sin(iP.w);
+        vec3 w = vec3(p.x * c + p.z * s, p.y, -p.x * s + p.z * c) + iP.xyz;
+        float shade = iF.w;
+        vC = (shade > 0.85 ? vec3(0.8, 0.79, 0.76) : mix(vec3(0.3, 0.32, 0.38), vec3(0.5, 0.52, 0.56), shade)) * (uSkyCol * 1.4 + uLampCol * 0.35);
+        if (aPart > 2.5) vC *= 0.55;
+        vec4 mvPosition = viewMatrix * vec4(w, 1.0); gl_Position = projectionMatrix * mvPosition;
+        #include <fog_vertex>
+      }`,
+    fragmentShader: /* glsl */`
+      varying vec3 vC;
+      #include <fog_pars_fragment>
+      void main() { gl_FragColor = vec4(vC, 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+        #include <fog_fragment>
+      }`,
+  });
+  const mesh = new THREE.Mesh(g, mat);
+  mesh.frustumCulled = false;
+  const B = [];
+  let seed = 12345;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const spot = (f, b) => {
+    for (let k = 0; k < 8; k++) {
+      const a = rnd() * Math.PI * 2, rr = f.inner + rnd() * (f.r - f.inner);
+      b.tx = f.x + Math.cos(a) * rr; b.tz = f.z + Math.sin(a) * rr;
+      if (!map.walkable || map.walkable(b.tx, b.tz)) return;
+    }
+  };
+  flocks.forEach((f, fi) => {
+    const cx = f.x + (rnd() - 0.5) * f.r, cz = f.z + (rnd() - 0.5) * f.r;
+    for (let k = 0; k < perFlock; k++) {
+      const b = { f, fi, x: cx + (rnd() - 0.5) * 4, z: cz + (rnd() - 0.5) * 4, y: 0, yaw: rnd() * 6.28, vx: 0, vy: 0, vz: 0, state: 0, t: rnd() * 3, peck: 0, shade: rnd(), ph: rnd() * 6.28, tx: 0, tz: 0 };
+      if (map.walkable && !map.walkable(b.x, b.z)) { spot(f, b); b.x = b.tx; b.z = b.tz; }
+      B.push(b);
+    }
+  });
+  function update(dt, crowds) {
+    dt = Math.min(dt, 0.05);
+    for (let i = 0; i < B.length; i++) {
+      const b = B[i];
+      if (b.state === 0) {
+        let threat = null, td = 1e9;
+        for (const c of crowds) {
+          if (!c || !c.alive) continue;
+          const d = Math.hypot(b.x - c.x, b.z - c.z) - (c.visR || 1);
+          if (d < td) { td = d; threat = c; }
+        }
+        if (threat && td < 5) {
+          b.state = 1; b.t = 0;
+          const dx = b.x - threat.x, dz = b.z - threat.z, l = Math.hypot(dx, dz) || 1;
+          const a = Math.atan2(dz, dx) + (rnd() - 0.5) * 1.2;
+          b.vx = Math.cos(a) * (6 + rnd() * 3); b.vz = Math.sin(a) * (6 + rnd() * 3); b.vy = 4 + rnd() * 2;
+          spot(b.f, b);
+          void l;
+        } else {
+          b.t -= dt;
+          if (b.t < 0) { b.t = 0.6 + rnd() * 2.5; b.peck = rnd() < 0.5 ? 0.35 : 0; if (rnd() < 0.3) b.yaw += (rnd() - 0.5) * 2; }
+          b.peck = Math.max(0, b.peck - dt);
+        }
+      } else {
+        b.t += dt;
+        const climb = b.t < 2.5;
+        const dx = b.tx - b.x, dz = b.tz - b.z, dist = Math.hypot(dx, dz);
+        const sp = climb ? 9 : Math.min(9, dist * 1.2 + 1);
+        const k = 1 - Math.exp(-dt * 1.5);
+        b.vx += ((dx / (dist || 1)) * sp - b.vx) * k; b.vz += ((dz / (dist || 1)) * sp - b.vz) * k;
+        const wantY = climb ? 9 : Math.min(9, dist * 0.6);
+        b.vy += (wantY - b.y) * dt * 2 - b.vy * dt * 1.5;
+        b.x += b.vx * dt; b.y = Math.max(0, b.y + b.vy * dt); b.z += b.vz * dt;
+        b.yaw = Math.atan2(b.vx, b.vz);
+        if (!climb && dist < 0.6 && b.y < 0.3) { b.state = 0; b.y = 0; b.t = 1 + rnd() * 2; b.vx = b.vy = b.vz = 0; }
+      }
+      ip[i * 4] = b.x; ip[i * 4 + 1] = b.y; ip[i * 4 + 2] = b.z; ip[i * 4 + 3] = b.yaw;
+      iff[i * 4] = b.ph; iff[i * 4 + 1] = b.state; iff[i * 4 + 2] = b.peck > 0 ? 0.7 : 0; iff[i * 4 + 3] = b.shade;
+    }
+    aP.needsUpdate = true; aF.needsUpdate = true;
+  }
+  return { mesh, update, count: n };
 }

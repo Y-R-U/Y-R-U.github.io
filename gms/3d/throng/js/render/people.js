@@ -60,19 +60,19 @@ export function personGeometry(detail = 1) {
     g.tbox(0.11 * s, 0.035, 0.0, 0.11, 0.16, 0.26, 0.15, 0.23, part, 4, { noBottom: true });
   }
   g.tbox(0, 0, 0.72, 0.9, 0.38, 0.23, 0.39, 0.24, 0, 2, { noTop: true });
-  g.tbox(0, 0, 0.88, SH + 0.06, 0.39, 0.24, 0.52, 0.28, 0, 1, { noBottom: true });
+  g.tbox(0, 0, 0.86, SH + 0.07, 0.42, 0.26, 0.6, 0.32, 0, 1, { noBottom: true });
   for (const s of [1, -1]) {
     const part = s > 0 ? 3 : 4;
-    const x = 0.315 * s;
-    g.tbox(x, 0, SH - 0.3, SH + 0.05, 0.13, 0.14, 0.14, 0.15, part, 1, { noBottom: true });
+    const x = 0.35 * s;
+    g.tbox(x, 0, SH - 0.34, SH + 0.06, 0.15, 0.16, 0.16, 0.18, part, 1, { noBottom: true });
     g.tbox(x, 0.01, 0.7, SH - 0.3, 0.095, 0.105, 0.11, 0.12, part, 0, { noTop: true });
   }
   const n = detail > 1 ? 8 : detail ? 6 : 5;
-  g.ring(SH + 0.03, SH + 0.11, 0.07, 0.13, n, 5, () => 0);
-  g.ring(SH + 0.11, SH + 0.26, 0.13, 0.158, n, 5, () => 0);
-  g.ring(SH + 0.26, SH + 0.38, 0.158, 0.152, n, 5, (a) => (Math.cos(a) < 0.3 ? 3 : 0));
-  g.ring(SH + 0.38, SH + 0.46, 0.162, 0.11, n, 5, () => 3);
-  g.cap(SH + 0.46, 0.11, n, true, 5, 3);
+  g.ring(SH + 0.04, SH + 0.11, 0.07, 0.115, n, 5, () => 0);
+  g.ring(SH + 0.11, SH + 0.25, 0.115, 0.138, n, 5, () => 0);
+  g.ring(SH + 0.25, SH + 0.35, 0.138, 0.133, n, 5, (a) => (Math.cos(a) < 0.3 ? 3 : 0));
+  g.ring(SH + 0.35, SH + 0.42, 0.142, 0.095, n, 5, () => 3);
+  g.cap(SH + 0.42, 0.095, n, true, 5, 3);
 
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(g.P, 3));
@@ -94,6 +94,7 @@ attribute vec4 iB;
 attribute vec4 iC;
 uniform float uTime;
 uniform float uFlip;
+uniform float uFigScale;
 uniform vec3 uSkin[5];
 uniform vec3 uHair[6];
 uniform vec3 uPants[6];
@@ -138,7 +139,7 @@ void main() {
   }
   p.y += abs(cos(ph)) * 0.07 * g;
 
-  float s = iC.w * 1.28;
+  float s = iC.w * 1.28 * uFigScale;
   float cy = cos(iA.w), sy = sin(iA.w);
   p *= s;
   vec3 w = vec3(p.x * cy + p.z * sy, p.y, -p.x * sy + p.z * cy) + iA.xyz;
@@ -146,11 +147,13 @@ void main() {
   w.y *= uFlip; nw.y *= uFlip;
 
   float h1 = fract(look * 7.13), h2 = fract(look * 13.7), h3 = fract(look * 3.31);
+  float sat = clamp((max(iC.r, max(iC.g, iC.b)) - min(iC.r, min(iC.g, iC.b))) * 2.5, 0.0, 1.0);
+  bool cap = h3 > 0.5 && sat > 0.4;
   vec3 base;
   if (reg < 0.5) base = uSkin[int(h1 * 4.99)];
   else if (reg < 1.5) base = iC.rgb;
   else if (reg < 2.5) base = uPants[int(h2 * 5.99)];
-  else if (reg < 3.5) base = uHair[int(h3 * 5.99)];
+  else if (reg < 3.5) base = cap ? iC.rgb * 0.8 : uHair[int(h3 * 5.99)];
   else base = h2 > 0.7 ? vec3(0.8) : vec3(0.035);
 
   vec3 info = sampleInfo(iA.xz);
@@ -159,7 +162,7 @@ void main() {
   if (reg > 0.5 && reg < 1.5) light = mix(light, vec3(dot(light, vec3(0.3, 0.5, 0.2))), 0.55);
   float rim = pow(max(1.0 - max(dot(nw, V), 0.0), 0.0), 3.0);
   vec3 col = base * light * 0.72 + rim * uRimCol * (0.2 + 0.4 * info.r);
-  if (reg > 0.5 && reg < 1.5) col += iC.rgb * (0.16 + 0.12 * max(nw.y, 0.0));
+  if ((reg > 0.5 && reg < 1.5) || (reg > 2.5 && reg < 3.5 && cap)) col += iC.rgb * mix(0.1, 0.3, sat) * (1.0 + 0.6 * max(nw.y, 0.0)) + rim * iC.rgb * 0.6 * sat;
   col += flash * vec3(1.0, 0.95, 0.85) * 1.6;
   if (uFlip < 0.0) col = mix(col * 0.75, uReflSky, smoothstep(0.0, 2.2, -w.y) * 0.8);
   vCol = col;
@@ -185,12 +188,13 @@ const SHADOW_VERT = /* glsl */`
 attribute vec4 iA;
 attribute vec4 iC;
 uniform vec2 uSunXZ;
+uniform float uFigScale;
 varying vec2 vUv;
 varying float vA;
 #include <fog_pars_vertex>
 void main() {
   vUv = position.xz;
-  float s = iC.w * 1.12;
+  float s = iC.w * 1.12 * uFigScale;
   vec2 dir = uSunXZ;
   vec2 perp = vec2(-dir.y, dir.x);
   vec2 q = position.x * perp * 0.42 + position.z * dir * 0.85 + dir * 0.55;
@@ -263,7 +267,7 @@ export function createPeople(capacity, shared, opts = {}) {
   const smat = new THREE.ShaderMaterial({
     vertexShader: SHADOW_VERT, fragmentShader: SHADOW_FRAG, fog: true,
     transparent: true, depthWrite: false,
-    uniforms: { ...fogUniforms(), uSunXZ: shared.uSunXZ, uShadowA: { value: 0.42 } },
+    uniforms: { ...fogUniforms(), uSunXZ: shared.uSunXZ, uFigScale: shared.uFigScale, uShadowA: { value: 0.42 } },
   });
   const shadows = new THREE.Mesh(sgeo, smat);
   shadows.frustumCulled = false;

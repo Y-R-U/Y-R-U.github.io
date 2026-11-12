@@ -10,15 +10,17 @@ export function createCameraRig(camera) {
   };
   const target = new THREE.Vector3();
 
+  // Half-extent of ground (m) the short screen axis must show around the crowd.
+  const viewR = (R) => Math.max(12, 7 + 3.0 * R);
+
   function fit(R, aspect) {
     const fovV = aspect < 1 ? 62 - (1 - aspect) * 6 : aspect > 1.7 ? 40 : 58 - (aspect - 1) / 0.7 * 18;
     const hv = THREE.MathUtils.degToRad(fovV / 2);
     const hh = Math.atan(Math.tan(hv) * aspect);
-    const M = R * 1.12 + 5 + R * 0.5;
-    const pitch = rig.pitch;
-    const dh = M / Math.tan(hh);
-    const dv = (M * Math.sin(pitch) * 1.12 + 1.5) / Math.tan(hv);
-    return { fovV, d: Math.max(15, dh, dv) };
+    const V = viewR(R);
+    const dh = V / Math.tan(hh);
+    const dv = (V * (aspect > 1 ? 0.88 : 1) * Math.sin(rig.pitch) * 1.05 + 1.5) / Math.tan(hv);
+    return { fovV, d: Math.max(15, dh, dv), V };
   }
 
   return {
@@ -30,14 +32,11 @@ export function createCameraRig(camera) {
     update(dt, focus, aspect) {
       dt = Math.min(dt, 0.1);
       const R = Math.max(1, focus.radius || 1);
-      rig.pitch = THREE.MathUtils.lerp(0.86, 1.0, smooth(18, 110, rig.d));
+      rig.pitch = rig.showcase ? 0.8 : THREE.MathUtils.lerp(0.88, 1.04, smooth(20, 150, rig.d));
       const f = fit(R, aspect);
-      const sp = Math.hypot(focus.vx || 0, focus.vz || 0);
-      const M = R * 1.12 + 5 + R * 0.5;
-      let lx = (focus.vx || 0) * 0.5, lz = (focus.vz || 0) * 0.5;
-      const ll = Math.hypot(lx, lz), lmax = 0.28 * M;
+      let lx = (focus.vx || 0) * 0.9, lz = (focus.vz || 0) * 0.9;
+      const ll = Math.hypot(lx, lz), lmax = 0.35 * f.V;
       if (ll > lmax) { lx *= lmax / ll; lz *= lmax / ll; }
-      void sp;
       if (!rig.init) {
         rig.tx = focus.x; rig.tz = focus.z; rig.d = f.d; rig.lx = lx; rig.lz = lz; rig.init = true; rig.fovV = f.fovV;
       }
@@ -54,7 +53,7 @@ export function createCameraRig(camera) {
       if (rig.endOn) rig.end = Math.min(1, rig.end + dt / 4);
       const e = smooth(0, 1, rig.end);
       let d = rig.d * (1 + 0.16 * rig.p) * (1 - 0.4 * e);
-      let yaw = rig.yaw + 0.22 * e + (rig.yawDrift ? 0.35 * Math.sin(rig.yawDrift) : 0);
+      let yaw = rig.yaw + 0.22 * e + (rig.yawDrift ? 0.6 * Math.sin(rig.yawDrift) : 0);
       let pitch = rig.pitch - 0.1 * e;
       let tx = rig.tx, tz = rig.tz;
       if (rig.fixed) { d = rig.fixed.d; tx = rig.fixed.x; tz = rig.fixed.z; yaw = rig.fixed.yaw ?? yaw; pitch = rig.fixed.pitch ?? pitch; }

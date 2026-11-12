@@ -19,7 +19,7 @@ function paintColour(map, n, sunXZ) {
   // outer streets beyond the perimeter
   ctx.fillStyle = '#6a645e';
   for (const b of map.buildings) if (b.outer) { rectPath(ctx, b.x - b.w / 2 - 3, b.z - b.d / 2 - 3, b.x + b.w / 2 + 3, b.z + b.d / 2 + 3); ctx.fill(); }
-  ctx.fillStyle = '#4c4a52'; ctx.fillRect(-H + E, -H + E, (H - E) * 2, (H - E) * 2);
+  ctx.fillStyle = '#44464f'; ctx.fillRect(-H + E, -H + E, (H - E) * 2, (H - E) * 2);
   // lane markings
   for (const [roads, axis] of [[map.roadsX, 'x'], [map.roadsZ, 'z']]) {
     roads.forEach((r, idx) => {
@@ -43,7 +43,7 @@ function paintColour(map, n, sunXZ) {
     });
   }
   // intersections: clear markings
-  ctx.fillStyle = '#4c4a52';
+  ctx.fillStyle = '#44464f';
   for (const rx of map.roadsX) for (const rz of map.roadsZ) ctx.fillRect(rx.a, rz.a, rx.w, rz.w);
   // crossings
   ctx.fillStyle = 'rgba(236,232,222,0.85)';
@@ -67,7 +67,7 @@ function paintColour(map, n, sunXZ) {
     const a = k * Math.PI / 16;
     ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * 8.5, cz + Math.sin(a) * 8.5); ctx.lineTo(cx + Math.cos(a) * (cr - 4), cz + Math.sin(a) * (cr - 4)); ctx.stroke();
   }
-  ctx.fillStyle = '#a3967f';
+  ctx.fillStyle = 'rgba(163,150,127,0.45)';
   for (let k = 0; k < 8; k++) {
     const a = k * Math.PI / 4;
     ctx.beginPath();
@@ -174,10 +174,10 @@ function paintInfo(map, n, sunDir) {
     shadowBox(b.x - b.w / 2, b.z - b.d / 2, b.x + b.w / 2, b.z + b.d / 2, b.h + extra * 0.7);
   }
   for (const t of map.trees) {
-    ctx.globalAlpha = 0.55;
+    ctx.globalAlpha = 0.38;
     ctx.beginPath(); ctx.ellipse(t.x + sx * 3.4 * t.s * L, t.z + sz * 3.4 * t.s * L, 1.9 * t.s, 1.9 * t.s, 0, 0, Math.PI * 2); ctx.fill();
   }
-  ctx.globalAlpha = 0.7;
+  ctx.globalAlpha = 0.45;
   for (const s of map.statues) {
     const hh = s.kind === 'obelisk' ? 13 : 6;
     ctx.lineWidth = 1.4; ctx.strokeStyle = '#000'; ctx.beginPath(); ctx.moveTo(s.x, s.z); ctx.lineTo(s.x + sx * hh * L, s.z + sz * hh * L); ctx.stroke();
@@ -279,6 +279,7 @@ export function buildGround(map, shared, quality) {
       uMap: { value: tex },
       uMapXf: { value: new THREE.Vector4(-EXT, -EXT, 1 / (2 * EXT), 1 / (2 * EXT)) },
       uRefl: { value: 1 },
+      uHalf: { value: map.size / 2 },
       uSkyRefl: { value: new THREE.Color(0.55, 0.42, 0.45) },
       uOuter: { value: new THREE.Color(0x3a3638).convertSRGBToLinear() },
     },
@@ -311,6 +312,7 @@ const GROUND_FRAG = /* glsl */`
 uniform sampler2D uMap;
 uniform vec4 uMapXf;
 uniform float uRefl;
+uniform float uHalf;
 uniform float uTime;
 uniform vec3 uSkyRefl;
 uniform vec3 uOuter;
@@ -344,35 +346,50 @@ void main() {
   vec3 info = sampleInfo(p);
   float kind = info.g;
   float fw = length(fwidth(p));
+  float inMap = step(max(abs(p.x), abs(p.y)), uHalf);
   float h = 0.5, g = 0.0;
-  if (kind < 0.17) g = tiles(p, vec2(0.62, 0.62), 1.0, fw, h);
-  else if (kind < 0.5) g = tiles(p, vec2(0.95, 0.95), 0.0, fw, h);
-  else if (kind < 0.83) g = tiles(p, vec2(1.3, 0.65), 1.0, fw, h);
-  else { h = vnoise(p * 1.7); }
-  base *= 0.9 + 0.2 * h;
-  base *= 1.0 - g * 0.38;
+  float big = vnoise(p * 0.11 + 3.0);
+  if (kind < 0.17) {
+    float grain = vnoise(p * 3.1) * 0.5 + vnoise(p * 9.7) * 0.3 + vnoise(p * 0.7) * 0.2;
+    h = mix(0.5, grain, 1.0 - smoothstep(0.03, 0.14, fw));
+    base *= 0.9 + 0.2 * h;
+    base *= 1.0 - 0.07 * smoothstep(0.58, 0.62, vnoise(p * 0.07 + 11.0));
+  } else {
+    vec2 sz = kind < 0.5 ? vec2(0.9, 0.9) : kind < 0.83 ? vec2(1.2, 0.6) : vec2(1.0);
+    if (kind < 0.83) {
+      g = tiles(p, sz, kind < 0.5 ? 0.0 : 1.0, fw, h);
+      float cf = 1.0 - smoothstep(0.08, 0.3, fw / min(sz.x, sz.y));
+      base *= 1.0 + (h - 0.5) * 0.16 * cf;
+      base *= 1.0 - g * 0.32;
+      base *= 1.0 - 0.06 * (1.0 - cf);
+    } else { h = vnoise(p * 1.7); base *= 0.9 + 0.2 * h; }
+  }
+  base *= 0.96 + 0.08 * big * inMap;
 
   float n1 = vnoise(p * 0.16) * 0.55 + vnoise(p * 0.47) * 0.3 + vnoise(p * 1.3) * 0.15;
-  float puddle = smoothstep(0.52, 0.66, n1) * (kind > 0.83 ? 0.0 : 1.0);
+  float road0 = 1.0 - smoothstep(0.1, 0.25, kind);
+  float puddle = mix(smoothstep(0.6, 0.68, n1) * 0.7, smoothstep(0.57, 0.66, n1), road0) * (kind > 0.83 ? 0.0 : 1.0) * inMap;
   float road = 1.0 - smoothstep(0.1, 0.25, kind);
-  float wet = (kind > 0.83 ? 0.15 : 0.6 + 0.2 * road) + 0.4 * puddle;
-  base *= mix(1.0, 0.88, puddle);
+  float wet = (kind > 0.83 ? 0.15 : 0.6 + 0.3 * road) + 0.4 * puddle;
+  base *= mix(1.0, mix(0.9, 0.8, road0), puddle);
 
   vec3 N = vec3(0.0, 1.0, 0.0);
   vec3 V = normalize(cameraPosition - vW);
-  vec3 col = base * lightAt(N, info);
-  vec3 Nj = normalize(vec3((h - 0.5) * 0.16 * (1.0 - puddle), 1.0, (hash(floor(p * 1.7)) - 0.5) * 0.16 * (1.0 - puddle)));
+  vec3 infoG = vec3(info.r, info.g, info.b * 0.72);
+  vec3 col = base * lightAt(N, infoG);
+  float nj = (1.0 - puddle) * (1.0 - smoothstep(0.05, 0.2, fw));
+  vec3 Nj = normalize(vec3((h - 0.5) * 0.16 * nj, 1.0, (vnoise(p * 2.3 + 5.0) - 0.5) * 0.16 * nj));
   vec3 R = reflect(-V, Nj);
   float spec = pow(max(dot(R, uSunDir), 0.0), 60.0) * wet * info.r;
   col += uSunCol * spec * 0.9;
-  float glint = 0.55 + 0.9 * h * (1.0 - puddle) + 0.8 * puddle;
-  col += uLampCol * info.b * info.b * wet * glint * (0.45 + 0.45 * road);
-  col += uLampCol * vec3(1.0, 0.8, 0.6) * road * wet * 0.025;
+  float glint = 0.55 + 0.6 * h * (1.0 - puddle) + 1.1 * puddle;
+  col += uLampCol * vec3(1.0, 0.85, 0.7) * info.b * info.b * wet * glint * (0.35 + 0.5 * road);
+  col += uLampCol * vec3(1.0, 0.8, 0.6) * road * wet * 0.03;
   float fres = pow(max(1.0 - max(V.y, 0.0), 0.0), 4.0);
-  float refl = clamp(mix(0.05, 0.36, puddle) * (kind > 0.83 ? 0.2 : 1.0) + fres * 0.12, 0.0, 0.5);
+  float refl = clamp(mix(0.08 + 0.06 * road, 0.5, puddle) * (kind > 0.83 ? 0.2 : 1.0) + fres * 0.14, 0.0, 0.6);
   float a = 1.0;
   if (uRefl > 0.5) a = 1.0 - refl;
-  else col += uSkyRefl * refl * 0.45;
+  else col += uSkyRefl * (refl - 0.3 * puddle * road) * 0.3;
   gl_FragColor = vec4(col, a);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>

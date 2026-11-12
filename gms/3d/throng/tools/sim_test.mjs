@@ -1,8 +1,9 @@
-// node tools/sim_test.mjs [--matches=N] [--map=stub|real|both] [--break=determinism|nan|stuck|leak|events|distribution|jitter] [--quiet]
+// node tools/sim_test.mjs [--matches=N] [--map=stub|real|both] [--break=determinism|nan|stuck|leak|events|distribution|jitter|league] [--quiet]
 import { createSim, SIM_DT, stateHash } from '../js/sim/sim.js';
 import { createBots } from '../js/sim/bots.js';
 import { makePlayers } from '../js/sim/match.js';
 import { generateMap as stubMap } from './stub_map.js';
+import { buildRoster } from '../js/meta/roster.js';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] = a.replace(/^--/, '').split('='); return [k, v ?? true]; }));
 const MATCHES = +(args.matches || 24);
@@ -24,7 +25,9 @@ const EVENT_TYPES = ['recruit', 'steal', 'elim', 'respawn', 'pickup', 'lead', 'p
 
 function runMatch(seed, genMap, opts = {}) {
   const map = genMap(seed);
-  const { players, botIndices, botSpecs } = makePlayers({ seed, allBots: true });
+  const roster = opts.rating != null ? buildRoster({ seed, rating: opts.rating }) : null;
+  if (roster && BREAK === 'league') roster.forEach((r) => { r.throttle = 1; r.skill = 0.6; r.aggr = 1; });
+  const { players, botIndices, botSpecs } = makePlayers({ seed, allBots: true, roster });
   const config = { ...SET };
   if (BREAK === 'nan') config.radiusK = NaN;
   if (BREAK === 'stuck') config.speedBase = 0.15;
@@ -164,6 +167,31 @@ for (const [mapName, genMap] of mapSets) {
     console.log('arc (mean count by rank): ' + arcRows.map((r) => `${r[0]}s ${r[1]}/${r[2]}/${r[3]}/${r[4]}`).join('  '));
   }
 }
+// sim-online rosters: league-scaled skill/aggression and the human-feeling bots must not get stuck or jitter.
+{
+  const [mapName, genMap] = mapSets[mapSets.length - 1];
+  const rows = [], places = {};
+  for (const [label, rating] of [['Bronze', 0], ['Diamond', 1300], ['Legend', 4000]]) {
+    const rs = [];
+    for (let m = 0; m < Math.max(4, MATCHES >> 2); m++) rs.push(runMatch(5000 + m * 31, genMap, { rating }));
+    let place = 0, winner = 0;
+    for (const r of rs) {
+      place += r.S.crowds[0].rank; winner += Math.max(...r.S.crowds.map((c) => c.count));
+      r.S.crowds.forEach((c, i) => {
+        const who = `${label} ${r.players[i].humanish ? 'human-ish ' : ''}${r.players[i].persona} seed ${r.seed}`;
+        if (r.stuckSecs[i] > 6) fail(`[${mapName}] online: ${who} stationary ${r.stuckSecs[i]}s`);
+        if (c.travelled < 300) fail(`[${mapName}] online: ${who} travelled only ${c.travelled.toFixed(0)} m`);
+        if (r.turnRate[i] > 120) fail(`[${mapName}] online: ${who} jitter ${r.turnRate[i].toFixed(0)} deg/s`);
+      });
+      if (r.leakAt >= 0 || r.nanAt >= 0) fail(`[${mapName}] online ${label} seed ${r.seed}: leak/NaN`);
+    }
+    places[label] = place / rs.length;
+    rows.push(`${label.padEnd(8)} auto-player mean place ${(place / rs.length).toFixed(2)}  winner mean ${(winner / rs.length).toFixed(0)}`);
+  }
+  if (places.Legend - places.Bronze < 1) fail(`[${mapName}] leagues are not a difficulty curve: the auto-player places ${places.Bronze.toFixed(2)} in Bronze and ${places.Legend.toFixed(2)} in Legend`);
+  if (!quiet) console.log(`\n[${mapName}] sim-online rosters (crowd 0 = the ?auto=1 bot, skill 0.8):\n  ` + rows.join('\n  '));
+}
+
 console.log(`\n${failures.length ? 'FAIL' : 'PASS'} in ${((Date.now() - t0) / 1000).toFixed(1)}s${BREAK ? ` (break=${BREAK})` : ''}`);
 for (const f of failures) console.log('  - ' + f);
 process.exit(failures.length ? 1 : 0);

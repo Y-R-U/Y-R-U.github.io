@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 // Non-indexed flat-shaded writer: position, normal, color (linear), aEmit.
 export class GeoWriter {
-  constructor() { this.p = []; this.n = []; this.c = []; this.e = []; }
+  constructor() { this.p = []; this.n = []; this.c = []; this.e = []; this.w = []; this.win = 0; }
   tri(a, b, c, col, emit = 0) {
     const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2];
     const vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
@@ -12,9 +12,19 @@ export class GeoWriter {
     nx /= l; ny /= l; nz /= l;
     for (const v of [a, b, c]) {
       this.p.push(v[0], v[1], v[2]); this.n.push(nx, ny, nz);
-      this.c.push(col.r, col.g, col.b); this.e.push(emit);
+      this.c.push(col.r, col.g, col.b); this.e.push(emit); this.w.push(this.win);
     }
   }
+  // smooth-shaded triangle: per-vertex normals and colours
+  triN(a, b, c, na, nb, nc, ca, cb, cc) {
+    const V = [a, b, c], N = [na, nb, nc], Cc = [ca, cb, cc];
+    for (let k = 0; k < 3; k++) {
+      this.p.push(V[k][0], V[k][1], V[k][2]); this.n.push(N[k][0], N[k][1], N[k][2]);
+      this.c.push(Cc[k].r, Cc[k].g, Cc[k].b); this.e.push(0); this.w.push(0);
+    }
+  }
+  // appends another writer's triangles after this one's
+  append(o) { for (const k of ['p', 'n', 'c', 'e', 'w']) for (let i = 0; i < o[k].length; i++) this[k].push(o[k][i]); }
   // counter-clockwise seen from the front
   quad(a, b, c, d, col, emit = 0) { this.tri(a, b, c, col, emit); this.tri(a, c, d, col, emit); }
   poly(pts, col, emit = 0) { for (let k = 1; k < pts.length - 1; k++) this.tri(pts[0], pts[k], pts[k + 1], col, emit); }
@@ -78,19 +88,26 @@ export class GeoWriter {
       }
     }
   }
-  blob(cx, cy, cz, r, col, rnd, sq = 1) {
+  blob(cx, cy, cz, r, col, rnd, sq = 1, smooth = false) {
     const ico = new THREE.IcosahedronGeometry(r, 1);
     const pos = ico.attributes.position;
     const jit = new Map();
-    const v = [];
+    const v = [], nv = [], cv = [];
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
       const key = `${x.toFixed(3)},${y.toFixed(3)},${z.toFixed(3)}`;
-      if (!jit.has(key)) jit.set(key, 0.85 + rnd() * 0.3);
-      const j = jit.get(key);
+      if (!jit.has(key)) jit.set(key, [0.85 + rnd() * 0.3, (rnd() - 0.5) * 0.16]);
+      const [j, cj] = jit.get(key);
       v.push([cx + x * j, cy + y * j * sq, cz + z * j]);
+      if (smooth) {
+        const l = Math.hypot(x, y / Math.max(sq, 0.3), z) || 1;
+        nv.push([x / l, y / Math.max(sq, 0.3) / l, z / l]);
+        const k = 0.62 + 0.5 * (y / r * 0.5 + 0.5) + cj;
+        cv.push({ r: col.r * k, g: col.g * k, b: col.b * k });
+      }
     }
     for (let i = 0; i < v.length; i += 3) {
+      if (smooth) { this.triN(v[i], v[i + 1], v[i + 2], nv[i], nv[i + 1], nv[i + 2], cv[i], cv[i + 1], cv[i + 2]); continue; }
       const yy = (v[i][1] + v[i + 1][1] + v[i + 2][1]) / 3 - cy;
       const k = 0.8 + 0.35 * (yy / r) + (rnd() - 0.5) * 0.12;
       const c = { r: col.r * k, g: col.g * k, b: col.b * k };
@@ -104,6 +121,7 @@ export class GeoWriter {
     g.setAttribute('normal', new THREE.Float32BufferAttribute(this.n, 3));
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.c, 3));
     g.setAttribute('aEmit', new THREE.Float32BufferAttribute(this.e, 1));
+    g.setAttribute('aWin', new THREE.Float32BufferAttribute(this.w, 1));
     g.computeBoundingSphere();
     return g;
   }

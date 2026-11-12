@@ -1,5 +1,7 @@
 import { CONFIG } from '../config.js';
 import { createMinimap } from './minimap.js';
+import { LEAGUES, badgeSvg } from '../meta/leagues.js';
+import { UI_ICON } from './kit.js';
 
 const hex = (c) => '#' + c.toString(16).padStart(6, '0');
 const esc = (s) => String(s).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
@@ -15,14 +17,14 @@ export const ICON = {
 };
 const FX_LABEL = { speed: 'SPEED', magnet: 'MAGNET', double: 'x2 SIZE' };
 
-export function createHud({ root, audio, getRenderer }) {
+export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
   root.innerHTML = `
     <div class="badges"></div>
     <div class="floaters"></div>
     <div class="hud-tl">
       <div class="timer-row">
         <div class="timer pill">${ICON.clock}<span class="t">2:00</span></div>
-        <button type="button" class="mute round" aria-label="Sound">${audio.muted ? ICON.mute : ICON.sound}</button>
+        <button type="button" class="pause-btn round" aria-label="Pause">${UI_ICON.pause}</button>
       </div>
       <div class="kills pill">Kills: <b>0</b></div>
     </div>
@@ -33,6 +35,7 @@ export function createHud({ root, audio, getRenderer }) {
     <div class="powerups"></div>
     <div class="edge-arrow hidden"><div class="ea-in"><span class="ea-crown">${ICON.crown}</span><b></b></div><i></i></div>
     <div class="toasts"></div>
+    <div class="emotes"></div>
     <div class="countdown"></div>
     <div class="dead-veil hidden"><div class="dv-title">ABSORBED!</div><div class="dv-sub"></div></div>`;
   const $ = (s) => root.querySelector(s);
@@ -40,18 +43,17 @@ export function createHud({ root, audio, getRenderer }) {
   const lb = $('.lb'), badgesEl = $('.badges'), floatersEl = $('.floaters'), toastsEl = $('.toasts');
   const countdownEl = $('.countdown'), powerEl = $('.powerups'), deadVeil = $('.dead-veil'), deadSub = $('.dv-sub');
   const edge = $('.edge-arrow'), edgeB = edge.querySelector('b'), edgeI = edge.querySelector('i');
-  const muteBtn = $('.mute');
-  muteBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
-  muteBtn.addEventListener('click', (e) => { e.stopPropagation(); audio.setMuted(!audio.muted); });
-  audio.onMute((m) => { muteBtn.innerHTML = m ? ICON.mute : ICON.sound; });
+  const pauseBtn = $('.pause-btn'), emotesEl = $('.emotes');
+  pauseBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+  pauseBtn.addEventListener('click', (e) => { e.stopPropagation(); onPause(); });
   const minimap = createMinimap($('.mm'));
 
-  let me = 0, rows = [], badges = [], meta = [];
+  let me = 0, rows = [], badges = [], meta = [], toastStyle = '', emotes = [];
   let lastTimer = '', lastKills = -1, lastCd = '';
   let recruitAcc = 0, recruitT = 0, stealIn = 0, stealOut = 0, lastLeadToast = -99, said30 = false;
   const fxEls = {};
   const proj = { x: 0, y: 0, visible: false };
-  let hudOn = true;
+  let hudOn = true, lbRows = 0, frameN = 0, pillScale = 1, lastPill = '';
 
   for (const k of ['speed', 'magnet', 'double']) {
     const d = document.createElement('div');
@@ -61,24 +63,27 @@ export function createHud({ root, audio, getRenderer }) {
     fxEls[k] = { el: d, ring: d.querySelector('.pu-ring'), on: false };
   }
 
-  function setMatch({ players, playerIndex = 0, map }) {
+  function setMatch({ players, playerIndex = 0, map, league = null, plate = 'classic', badge = 'classic', toast: ts = 'classic' }) {
     me = playerIndex;
     meta = players;
+    toastStyle = ' ts-' + ts;
+    emotesEl.innerHTML = ''; emotes = [];
     lb.innerHTML = '';
     badgesEl.innerHTML = '';
     floatersEl.innerHTML = '';
     toastsEl.innerHTML = '';
     rows = players.map((p, i) => {
       const r = document.createElement('div');
-      r.className = 'lb-row' + (i === me ? ' me' : '');
+      r.className = 'lb-row' + (i === me ? ' me plate-' + plate : '');
       r.style.setProperty('--c', hex(p.color));
-      r.innerHTML = `<span class="lb-rank">${i + 1}</span><span class="lb-ico">${ICON.person}</span><span class="lb-name">${esc(p.name)}</span><span class="lb-n">0</span><span class="lb-crown">${ICON.crown}</span>`;
+      const tag = i === me ? (league != null ? `<span class="lb-lg">${badgeSvg(LEAGUES[league], 16)}</span>` : '') : p.flag ? `<span class="lb-flag">${esc(p.flag)}</span>` : '';
+      r.innerHTML = `<span class="lb-rank">${i + 1}</span><span class="lb-ico">${ICON.person}</span>${tag}<span class="lb-name">${esc(p.name)}</span><span class="lb-n">0</span><span class="lb-crown">${ICON.crown}</span>`;
       lb.appendChild(r);
       return { el: r, rank: r.querySelector('.lb-rank'), n: r.querySelector('.lb-n'), lastN: -1, lastSlot: -1, lastRank: -1 };
     });
     badges = players.map((p, i) => {
       const b = document.createElement('div');
-      b.className = 'badge hidden' + (i === me ? ' me' : '');
+      b.className = 'badge hidden' + (i === me ? ' me bs-' + badge : '');
       b.style.setProperty('--c', hex(p.color));
       b.innerHTML = `<span class="b-crown">${ICON.crown}</span><span class="b-n">0</span>`;
       badgesEl.appendChild(b);
@@ -127,7 +132,11 @@ export function createHud({ root, audio, getRenderer }) {
     const back = c.radius * CONFIG.UI.badgeBack;
     const x = c.px + (c.x - c.px) * alpha - Math.sin(yaw) * back, z = c.pz + (c.z - c.pz) * alpha - Math.cos(yaw) * back;
     let y = CONFIG.UI.badgeHeight + yOff;
-    if (state.leader === i && !r.debug2d) y += Math.max(0, CONFIG.UI.crownClear - c.radius * 0.45);
+    if (state.leader === i && !r.debug2d) {
+      let top = NaN;
+      if (typeof r.crownTop === 'function') { try { top = r.crownTop(); } catch {} }
+      y = Number.isFinite(top) ? Math.max(y, top + 0.6) : y + Math.max(0, CONFIG.UI.crownClear - c.radius * 0.45);
+    }
     r.project(x, y, z, proj);
     return proj;
   }
@@ -145,15 +154,15 @@ export function createHud({ root, audio, getRenderer }) {
           else if (e.from === me) stealOut += e.n;
           break;
         case 'elim':
-          if (e.by === me) toast('ABSORBED', { sub: name(e.victim), cls: 'big' });
+          if (e.by === me) toast('ABSORBED', { sub: name(e.victim), cls: 'big' + toastStyle });
           else if (e.victim === me) { deadSub.innerHTML = 'by ' + name(e.by); deadVeil.classList.remove('hidden'); }
           break;
         case 'respawn':
           if (e.crowd === me) deadVeil.classList.add('hidden');
           break;
         case 'lead':
-          if (state.time - lastLeadToast < 4) break;
-          if (e.crowd === me) { toast('TOOK THE LEAD!', { cls: 'gold' }); lastLeadToast = state.time; }
+          if (state.time - lastLeadToast < 4 || state.duration - state.timeLeft < 8) break;
+          if (e.crowd === me) { toast('TOOK THE LEAD!', { cls: 'gold' + toastStyle }); lastLeadToast = state.time; }
           else if (rows[me].lastRank === 1) { toast('LOST THE LEAD', { sub: name(e.crowd), cls: 'warn' }); lastLeadToast = state.time; }
           break;
         case 'pickup':
@@ -189,8 +198,9 @@ export function createHud({ root, audio, getRenderer }) {
       if (cd) countdownEl.classList.add('pop');
     }
 
-    // Leaderboard: top N plus the player's row, sliding into place.
-    const nRows = CONFIG.UI.leaderboardRows;
+    // Leaderboard: top N plus the player's row, sliding into place. Portrait shows fewer rows.
+    const nRows = window.innerHeight > window.innerWidth ? CONFIG.UI.leaderboardRowsPortrait : CONFIG.UI.leaderboardRows;
+    if (nRows !== lbRows) { lbRows = nRows; lb.style.setProperty('--rows', nRows); for (const r of rows) r.lastSlot = -1; }
     for (const c of state.crowds) {
       const r = rows[c.index];
       let slot = c.rank - 1;
@@ -208,6 +218,19 @@ export function createHud({ root, audio, getRenderer }) {
       if (c.count !== r.lastN) { r.n.textContent = c.count; r.lastN = c.count; }
     }
     lb.classList.toggle('has-sep', mc.rank > nRows);
+
+    // Pills and floaters shrink as the camera pulls out (pixels per metre at your crowd, viewport-normalised).
+    if (hudOn && (frameN++ % 10) === 0 && mc.alive) {
+      const r = getRenderer(), a = { x: 0, y: 0 }, b = { x: 0, y: 0 };
+      r.project(mc.x, 0, mc.z, a); r.project(mc.x + 10, 0, mc.z, b);
+      const ppm = Math.hypot(b.x - a.x, b.y - a.y) / 10 * 390 / Math.max(1, Math.min(window.innerWidth, window.innerHeight));
+      if (Number.isFinite(ppm)) {
+        const target = Math.max(0.78, Math.min(1, 0.78 + 0.22 * (ppm - 4.5) / 11));
+        pillScale += (target - pillScale) * 0.35;
+        const v = pillScale.toFixed(2);
+        if (v !== lastPill) { lastPill = v; badgesEl.style.setProperty('--bs', v); floatersEl.style.setProperty('--bs', v); emotesEl.style.setProperty('--bs', v); }
+      }
+    }
 
     // Count badges over every crowd.
     if (hudOn) {
@@ -264,6 +287,27 @@ export function createHud({ root, audio, getRenderer }) {
     }
 
     if (hudOn) minimap.draw(state, me, getRenderer().cameraYaw(), alpha);
+    if (emotes.length) drawEmotes(state, alpha);
+  }
+
+  // Speech bubbles over a crowd's count pill (human-feeling bots, and your own equipped emote).
+  function emote(index, text) {
+    if (!badges[index]) return;
+    const e = document.createElement('div');
+    e.className = 'emote' + (index === me ? ' mine' : '');
+    e.textContent = text;
+    emotesEl.appendChild(e);
+    const it = { el: e, index, until: performance.now() + 2200 };
+    emotes.push(it);
+    while (emotes.length > 4) { emotes[0].el.remove(); emotes.shift(); }
+  }
+  function drawEmotes() {
+    const t = performance.now();
+    for (let i = emotes.length - 1; i >= 0; i--) {
+      const it = emotes[i], b = badges[it.index];
+      if (t > it.until || !b.shown) { it.el.remove(); emotes.splice(i, 1); continue; }
+      it.el.style.transform = `translate3d(${b.x.toFixed(0)}px, ${(b.y - 34).toFixed(0)}px, 0) translate(-50%, -100%)`;
+    }
   }
 
   let rectsAt = -1, rects = [];
@@ -305,7 +349,7 @@ export function createHud({ root, audio, getRenderer }) {
   }
 
   return {
-    setMatch, update, toast,
+    setMatch, update, toast, emote,
     show(v) { root.classList.toggle('hidden', !v); },
     setHudVisible(v) { hudOn = v; root.classList.toggle('bare', !v); },
     resize() { minimap.resize(); },

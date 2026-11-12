@@ -23,8 +23,10 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     return C.speedBase * (1 - C.speedFall * f) * (c.fx.speed > 0 ? C.fx.speed.mult : 1)
       * (c.eating > 0 ? C.eatDrag : 1) * (c.panic > 0 ? C.panicBoost : 1);
   };
+  let topCount = 1;
   const reachOf = (c) => {
     let r = c.radius + C.reachPad + c.radius * C.reachGrow;
+    if (c.count < topCount * C.underdogBelow) r += C.underdogReach;
     if (c.fx.magnet > 0) r = r * C.fx.magnet.mult + C.fx.magnet.pad;
     return r;
   };
@@ -190,7 +192,10 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     }
     c.alive = true;
     c.x = c.px = best.x; c.z = c.pz = best.z; c.vx = c.vz = 0;
-    c.count = C.respawnCount; c.radius = radiusOf(c.count);
+    let sum = 0, n = 0;
+    for (const o of crowds) if (o.alive && o !== c) { sum += o.count; n++; }
+    c.count = Math.max(C.respawnCount, Math.round(C.respawnShare * (n ? sum / n : 0)));
+    c.radius = radiusOf(c.count);
     c.protect = C.protect;
     c.fx.speed = c.fx.magnet = c.fx.double = 0;
     emit({ type: 'respawn', crowd: c.index, x: c.x, z: c.z, count: c.count });
@@ -364,6 +369,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     rankOrder.sort((a, b) => (crowds[b].count - crowds[a].count) || (crowds[a].rank - crowds[b].rank));
     rankOrder.forEach((ci, r) => { crowds[ci].rank = r + 1; });
     const top = rankOrder[0];
+    topCount = Math.max(1, crowds[top].count);
     if (top !== state.leader) {
       state.leader = top;
       if (playing) { state.leadChanges++; emit({ type: 'lead', crowd: top }); }

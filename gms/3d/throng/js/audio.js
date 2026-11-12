@@ -1,10 +1,9 @@
-const KEY = 'throng.muted';
 const SCALE = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24, 26, 28, 31, 33, 36];
 
-export function createAudio() {
+export function createAudio({ music: musicOn = true, sfx: sfxOn = true } = {}) {
   let ctx = null, master = null, sfx = null, musicBus = null, comp = null;
-  let muted = false;
-  try { muted = localStorage.getItem(KEY) === '1'; } catch {}
+  let muted = !sfxOn;
+  let musicMuted = !musicOn;
   let noiseBuf = null;
   let murmur = null, music = null;
   let lastTick = 0, streak = 0, lastRecruit = 0, lastWhoosh = 0;
@@ -25,7 +24,7 @@ export function createAudio() {
       master.gain.value = muted ? 0 : 0.9;
       master.connect(comp); comp.connect(ctx.destination);
       sfx = ctx.createGain(); sfx.gain.value = 1; sfx.connect(master);
-      musicBus = ctx.createGain(); musicBus.gain.value = 0.55; musicBus.connect(master);
+      musicBus = ctx.createGain(); musicBus.gain.value = musicMuted ? 0 : 0.5; musicBus.connect(comp);
       noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
       const d = noiseBuf.getChannelData(0);
       let b = 0;
@@ -108,7 +107,7 @@ export function createAudio() {
       while (m.next < now() + 0.25) {
         const t = m.next, s = m.step, bar = Math.floor(s / 8) % 4, beat = s % 8;
         const ch = PROG[bar];
-        if (!muted) {
+        if (!musicMuted) {
           if (beat === 0 || beat === 4 || (m.intense && beat === 6)) tone(hz(ch[0] - 24), { type: 'triangle', t, peak: 0.16, dec: 0.32, dest: musicBus });
           if (beat % 2 === 1) for (const n of ch) tone(hz(n), { type: 'square', t, peak: 0.018, dec: 0.12, dest: musicBus, detune: (Math.random() - 0.5) * 8 });
           if (beat === 2 || beat === 6) tone(hz(ch[(s >> 1) % 3] + 12), { type: 'sine', t, peak: 0.035, dec: 0.25, dest: musicBus });
@@ -125,15 +124,22 @@ export function createAudio() {
   function stopMusic() { if (music) { clearInterval(music.timer); music = null; } }
 
   const api = {
-    get muted() { return muted; },
+    get muted() { return muted && musicMuted; },
+    get sfxOn() { return !muted; },
+    get musicOn() { return !musicMuted; },
     get state() { return ctx ? ctx.state : 'none'; },
     ensure,
-    setMuted(v) {
-      muted = !!v;
-      try { localStorage.setItem(KEY, muted ? '1' : '0'); } catch {}
+    setSfx(on) {
+      muted = !on;
       if (master) master.gain.setTargetAtTime(muted ? 0 : 0.9, now(), 0.03);
-      listeners.forEach((f) => f(muted));
+      listeners.forEach((f) => f(api.muted));
     },
+    setMusic(on) {
+      musicMuted = !on;
+      if (musicBus) musicBus.gain.setTargetAtTime(musicMuted ? 0 : 0.5, now(), 0.05);
+      listeners.forEach((f) => f(api.muted));
+    },
+    setMuted(v) { api.setSfx(!v); api.setMusic(!v); },
     onMute(f) { listeners.add(f); },
     setCrowd(n) { crowdLevel = n; },
     startMusic, stopMusic,

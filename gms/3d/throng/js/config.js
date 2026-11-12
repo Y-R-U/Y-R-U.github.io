@@ -40,6 +40,9 @@ export const CONFIG = {
 
     respawnDelay: 3,
     respawnCount: 5,
+    respawnShare: 0.12,      // respawn with this share of the other crowds' mean size (comeback)
+    underdogBelow: 0.25,     // crowds under this fraction of the leader get extra reach
+    underdogReach: 2.5,
     protect: 2.2,
 
     pickupCount: 5,
@@ -69,7 +72,7 @@ export const CONFIG = {
     { persona: 'hunter', skill: 0.85 },
     { persona: 'coward', skill: 0.6 },
     { persona: 'opportunist', skill: 0.8 },
-    { persona: 'wanderer', skill: 0.4 },
+    { persona: 'wanderer', skill: 0.55 },
     { persona: 'bully', skill: 0.65 },
     { persona: 'sprinter', skill: 0.55 },
   ],
@@ -81,7 +84,7 @@ export const CONFIG = {
     hunter:      { greed: 0.7, hunt: 1.8, pickup: 0.6, fear: 0.8, courage: 1.4, wander: 0.0, chase: 85 },
     coward:      { greed: 1.2, hunt: 0.3, pickup: 0.7, fear: 1.8, courage: 0.6, wander: 0.0, chase: 25 },
     opportunist: { greed: 1.0, hunt: 1.1, pickup: 1.4, fear: 1.1, courage: 1.0, wander: 0.0, chase: 55 },
-    wanderer:    { greed: 0.7, hunt: 0.6, pickup: 0.5, fear: 0.9, courage: 1.0, wander: 1.0, chase: 35 },
+    wanderer:    { greed: 1.1, hunt: 0.6, pickup: 0.9, fear: 1.3, courage: 0.9, wander: 0.35, chase: 35 },
     bully:       { greed: 0.9, hunt: 1.4, pickup: 0.5, fear: 0.7, courage: 1.6, wander: 0.0, chase: 60 },
     sprinter:    { greed: 1.1, hunt: 0.8, pickup: 2.2, fear: 1.0, courage: 1.0, wander: 0.0, chase: 45 },
   },
@@ -94,6 +97,7 @@ export const CONFIG = {
 
   UI: {
     leaderboardRows: 5,
+    leaderboardRowsPortrait: 3,
     badgeHeight: 2.6,        // metres above ground for the count pill
     badgeBack: 0.8,          // pill sits this fraction of the radius toward the far side of the crowd
     crownClear: 7,           // extra lift for the leader's pill so it clears the 3D crown on small crowds

@@ -79,10 +79,12 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
 
   const bots = indices.map((ci, k) => {
     const spec = specs[k] || { persona: 'collector', skill: 0.6 };
-    const P = CONFIG.PERSONAS[spec.persona] || CONFIG.PERSONAS.collector;
+    const base = CONFIG.PERSONAS[spec.persona] || CONFIG.PERSONAS.collector;
+    const aggr = spec.aggr ?? 1;
+    const P = aggr === 1 ? base : { ...base, hunt: base.hunt * aggr, chase: base.chase * aggr, courage: base.courage * aggr, fear: base.fear / aggr };
     const skill = Math.max(0, Math.min(1, spec.skill ?? 0.6));
     return {
-      ci, persona: spec.persona, P, skill,
+      ci, persona: spec.persona, P, skill, human: !!spec.human, holdUntil: 0, nextHold: 0, throttle: spec.throttle ?? 1,
       rng: createRng('bot:' + seed + ':' + ci),
       react: Math.round(16 - 11 * skill),
       turn: 0.1 + 0.22 * skill,
@@ -167,8 +169,11 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
       if (best >= 0) { setGoal(b, 'flee', nav.cx(best), nav.cz(best), null, best, start); return; }
     }
 
-    let goal = null, gs = 0;
-    const consider = (kind, x, z, s, target) => { if (s > gs) { gs = s; goal = { kind, x, z, target }; } };
+    let goal = null, gs = 0, alt = null, as = 0;
+    const consider = (kind, x, z, s, target) => {
+      if (s > gs) { if (goal && (goal.kind !== kind || goal.target !== target)) { alt = goal; as = gs; } gs = s; goal = { kind, x, z, target }; }
+      else if (s > as && b.human) { as = s; alt = { kind, x, z, target }; }
+    };
 
     const chase = P.chase * (late ? 1.3 : 1);
     for (const o of state.crowds) {
@@ -218,6 +223,8 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
       consider('wander', b.wanderX, b.wanderZ, (P.wander * gs * 0.9 + 0.5) * (b.goal && b.goal.kind === 'wander' ? 1.35 : 1), null);
     }
 
+    // Human-feeling bots sometimes change their mind for a decent second choice.
+    if (b.human && alt && as > gs * 0.6 && rng.chance(0.14)) { goal = alt; gs = as; }
     if (!goal) {
       const x = rng.range(-half + 10, half - 10), z = rng.range(-half + 10, half - 10);
       goal = { kind: 'roam', x, z, target: null };
@@ -312,7 +319,13 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
       }
       steer(b);
       turnToward(b);
-      sim.setInput(b.ci, b.dirX, b.dirZ);
+      if (b.human && b.mode !== 'flee') {
+        if (!b.nextHold) b.nextHold = state.tick + 150 + b.rng.int(450);
+        else if (state.tick >= b.nextHold) { b.holdUntil = state.tick + 8 + b.rng.int(18); b.nextHold = state.tick + 240 + b.rng.int(600); }
+        if (state.tick < b.holdUntil) { sim.setInput(b.ci, b.dirX * 0.15, b.dirZ * 0.15); continue; }
+      }
+      const th = b.mode === 'flee' ? Math.min(1, b.throttle + 0.08) : b.throttle;
+      sim.setInput(b.ci, b.dirX * th, b.dirZ * th);
     }
   }
 

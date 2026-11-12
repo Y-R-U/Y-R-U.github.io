@@ -9,6 +9,7 @@ export function createShared() {
   const sxz = new THREE.Vector2(-sunDir.x, -sunDir.z).normalize();
   return {
     uTime: { value: 0 },
+    uFigScale: { value: 1 },
     uSunDir: { value: sunDir },
     uSunXZ: { value: sxz },
     uSunCol: { value: new THREE.Color(1.0, 0.66, 0.38).multiplyScalar(1.65) },

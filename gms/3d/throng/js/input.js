@@ -20,7 +20,8 @@ export function createInput({ el, getYaw = () => 0, onActivity = () => {} }) {
   let pid = null, ox = 0, oy = 0, sx = 0, sy = 0;
   let lastX = 0, lastZ = 0;             // last world direction (kept on release)
   let enabled = true;
-  const keepMoving = () => cfg.keepMovingOnRelease;
+  let keep = cfg.keepMovingOnRelease;
+  const keepMoving = () => keep;
   const tmp = { x: 0, z: 0 };
 
   function place() {
@@ -111,5 +112,5 @@ export function createInput({ el, getYaw = () => 0, onActivity = () => {} }) {
   function reset() { pid = null; keys.clear(); lastX = lastZ = 0; sx = sy = 0; joy.classList.add('hidden'); }
   function setEnabled(v) { enabled = v; if (!v) reset(); }
 
-  return { vector, reset, setEnabled, get dragging() { return pid !== null; } };
+  return { vector, reset, setEnabled, setKeepMoving(v) { keep = !!v; }, get dragging() { return pid !== null; }, get enabled() { return enabled; } };
 }

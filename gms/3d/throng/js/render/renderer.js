@@ -9,7 +9,7 @@ import { buildGround } from './ground.js';
 import { createPeople } from './people.js';
 import { createCrowdSystem } from './crowd.js';
 import { createCameraRig } from './camera.js';
-import { createRings, createHalos, createParticles, createWater, createCrown, createPickups, PICKUP_COL } from './fx.js';
+import { createRings, createHalos, createParticles, createWater, createCrown, createPickups, createPigeons, PICKUP_COL } from './fx.js';
 
 const QUALITY = {
   high: { dpr: 2, bloom: true, reflCity: true, reflPeople: true, budget: 7000 },
@@ -42,7 +42,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
   const city = buildCity(map, quality);
   const cityMesh = new THREE.Mesh(city.geometry, cityMaterial(shared, 1));
   cityMesh.frustumCulled = false;
-  const cityRefl = new THREE.Mesh(city.geometry, cityMaterial(shared, -1));
+  const cityRefl = new THREE.Mesh(city.reflGeometry, cityMaterial(shared, -1));
   cityRefl.frustumCulled = false;
   cityRefl.renderOrder = -5;
   scene.add(cityMesh, cityRefl);
@@ -61,7 +61,9 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
   const crown = createCrown(shared);
   scene.add(crown.group, crown.shaft);
   const pickups = createPickups(32, shared);
-  scene.add(pickups.pads, pickups.beams);
+  scene.add(pickups.pads, pickups.beams, pickups.icons);
+  const pigeons = createPigeons(map, shared, quality === 'lite' ? 7 : 12);
+  scene.add(pigeons.mesh);
   const particles = createParticles(3000, shared);
   scene.add(particles.points);
 
@@ -232,7 +234,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
       crownState.x += (c.x - crownState.x) * k; crownState.z += (c.z - crownState.z) * k;
       crownState.y += (ty - crownState.y) * k;
     }
-    const s = Math.min(4.5, Math.max(1.2, rig.rig.d / 32)) * crownState.a;
+    const s = Math.min(3.4, Math.max(1.2, rig.rig.d / 34)) * crownState.a;
     const bob = Math.sin(time * 2.2) * 0.18 * s;
     crown.group.position.set(crownState.x, 2.6 + 1.1 * s + bob, crownState.z);
     crown.group.scale.setScalar(Math.max(0.001, s));
@@ -286,16 +288,24 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     updatePickups(state, dt);
     fountainSpray();
     particles.update(dt);
+    pigeons.update(dt, crowd.crowds);
 
     const fi = showcase && state.leader != null && state.leader >= 0 ? state.leader : focus;
     const fc = crowd.crowds[fi];
     const f = fc ? { x: fc.x, z: fc.z, vx: fc.vx, vz: fc.vz, radius: fc.alive ? fc.visR : 3 } : { x: 0, z: 0, radius: 5 };
-    if (showcase) { f.radius = f.radius * 1.4 + 10; f.vx = 0; f.vz = 0; }
+    if (showcase) {
+      const pz = map.plazas && map.plazas[0];
+      if (pz) { f.x = pz.x + (f.x - pz.x) * 0.3; f.z = pz.z + (f.z - pz.z) * 0.3; }
+      f.radius = 9; f.vx = 0; f.vz = 0;
+    }
+    rig.rig.showcase = showcase;
     rig.rig.yawDrift = showcase ? (rig.rig.yawDrift || 0) + dt * 0.05 : 0;
     const d = rig.update(dt, f, cssW / cssH);
     shared.uYaw.value = rig.rig.yaw;
-    scene.fog.near = d * 0.95;
-    scene.fog.far = d * 2.5 + 30;
+    pickups.setView(d);
+    shared.uFigScale.value = 1 + 0.3 * Math.min(1, Math.max(0, (d - 35) / 110));
+    scene.fog.near = d * 1.15 + 10;
+    scene.fog.far = d * 2.8 + 40;
     shared.uFocus.value.set(f.x, f.z, f.radius * 1.15 + 3, fc && fc.alive ? 1 : 0);
     shared.uPointScale.value = gl.domElement.height * camera.projectionMatrix.elements[5] / 2;
 
@@ -332,7 +342,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     setFocus(i) { if (i !== focus) focus = i; },
     punch(s) { rig.punch(s); },
     crownTop() {
-      const s = Math.min(4.5, Math.max(1.2, rig.rig.d / 32));
+      const s = Math.min(3.4, Math.max(1.2, rig.rig.d / 34));
       return 2.6 + 2.5 * s;
     },
     setCameraMode(mode) { showcase = mode === 'showcase'; },
@@ -369,7 +379,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
         particles: particles.alive,
         quality: q,
         popIn: crowd.stats.popIn, popOut: crowd.stats.popOut, recruits: crowd.stats.recruits, transfers: crowd.stats.transfers,
-        cityVerts: city.verts,
+        cityVerts: city.verts, cityBaseVerts: city.baseVerts,
         dpr: gl.getPixelRatio(),
       };
     },

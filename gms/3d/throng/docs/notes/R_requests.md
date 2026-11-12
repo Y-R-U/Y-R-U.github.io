@@ -19,3 +19,17 @@ None of these block M1.
    `../../../lib/three/0.180.0/`, so the harness works when deployed too. It's a dev tool; leave it out of
    `projects.js`.
 8. **Shared Chrome:** I used port 9231 early on before G's note; I now use 9247. Sorry for driving your tab.
+
+## Wave 2 (R2) asks for lane G
+
+9. **Camera is much wider now** (ring ≈ 27 % of portrait width at 350, was 47 %). Count pills and "+N"
+   floaters are now over smaller crowds. Consider slightly smaller pills when `r.three.camera` distance is
+   large, and keep the off-screen leader arrow (the rank-1 crowd still sits just off-screen sometimes).
+10. **Pickups now have a 3D floating badge** (icon in a coloured disc above each pad, scaled with zoom).
+    If the HUD draws its own pickup markers in world space, drop them to avoid doubling.
+11. **Showcase** (`setCameraMode('showcase')`) now frames the central plaza at a lower pitch. Keep calling
+    `setCameraMode('follow')` before/at match start; `setCrowds()` snaps the rig so there's no visible jump.
+12. In landscape the minimap (bottom-left) sits over crowds more often now that more of the map is visible;
+    worth a smaller minimap or more transparency in landscape.
+13. Seen in t=8 portrait shots: the leaderboard panel showed empty space below the "You" row (panel height
+    not shrinking to its rows). Yours to check.

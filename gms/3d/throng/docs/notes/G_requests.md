@@ -26,3 +26,28 @@ Nothing here blocks M1; the game runs against the renderer as it is now.
    `cdp stop 9231`, and the browser on that port by then was a later restart (pid 77813, not mine), so
    if a render test of yours died around then, that was me, sorry. Start your own with
    `~/.claude/bin/cdp start --port <yours>`, on a port other than 9231.
+
+## Wave 2 (lane G2) — renderer-dependent cosmetics and small asks
+
+None block M2; the locker ships only colour, name plate, count badge, emote and toast styles.
+
+1. **Crowd cosmetics through `setCrowds`.** The locker would sell these if the renderer accepted them.
+   Proposed shape (all optional, unknown keys ignored, defaults = today's look):
+   ```js
+   r.setCrowds([{ index, name, color,
+     hat: null | 'cap' | 'crown' | 'party' | 'beanie' | 'viking',   // on every follower, or only the leader if `hatLeaderOnly`
+     hatLeaderOnly: false,
+     trail: null | 'sparkle' | 'confetti' | 'hearts' | 'smoke',     // particles behind the leader while moving
+     flag: null | '🇦🇺' | 'banner:blue' ,                            // a flag carried by the leader (emoji or a banner colour)
+     leader: null | 'knight' | 'chef' | 'robot' | 'astronaut',      // a distinct leader figure at the front
+     ring: null | 'double' | 'dashed' | 'pulse',                    // team glow ring variant
+     palette: null | [0xRRGGBB, 0xRRGGBB],                          // shirt colours mixed across followers (two-tone crowds)
+   }])
+   ```
+   Lane G would only pass ids it has listed in `js/meta/shop.js`; please say which ones are cheap.
+2. **`emote(index, glyph)` in 3D** (optional): a world-space speech bubble would survive the pill clamping;
+   today the HUD draws emotes over the count pill and drops them when the crowd is off screen.
+3. **Showcase hand-off**: G now calls `setCameraMode('follow')` *before* `setCrowds()` at match start and
+   `setCameraMode('showcase')` before the attract `setCrowds()`, per your item 11.
+4. **Pause in practice** passes `dt = 0` and `alpha = 1` to `frame()` while paused. Fine today; if any effect
+   divides by `dt`, guard it.

@@ -353,7 +353,12 @@ export function createCrowdSystem(people, map) {
             if (h < 0.06 && u > 0.6) r *= 1.1 + h * 2.5;
           }
           const jx = Math.sin(time * 0.7 + look[f] * 40) * 0.22, jz = Math.cos(time * 0.6 + look[f] * 23) * 0.22;
-          const tx = c.x + Math.cos(a) * r + jx - c.vx * 0.06 * u, tz = c.z + Math.sin(a) * r + jz - c.vz * 0.06 * u;
+          let tx = c.x + Math.cos(a) * r + jx - c.vx * 0.06 * u, tz = c.z + Math.sin(a) * r + jz - c.vz * 0.06 * u;
+          if (map.pushOut) {
+            // slots inside a building fold back out into a loose band rather than a line along the wall
+            map.pushOut(tx, tz, 0.3, tmp);
+            if (tmp.hit) { const fx = tmp.x - tx, fz = tmp.z - tz; tx = tmp.x + fx * 0.6 + jz; tz = tmp.z + fz * 0.6 + jx; }
+          }
           const kk = 2.6 - 1.2 * u;
           let dvx = c.vx * (1 - 0.12 * u) + (tx - px[f]) * kk;
           let dvz = c.vz * (1 - 0.12 * u) + (tz - pz[f]) * kk;
