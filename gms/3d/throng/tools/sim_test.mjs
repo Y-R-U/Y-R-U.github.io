@@ -1,0 +1,169 @@
+// node tools/sim_test.mjs [--matches=N] [--map=stub|real|both] [--break=determinism|nan|stuck|leak|events|distribution|jitter] [--quiet]
+import { createSim, SIM_DT, stateHash } from '../js/sim/sim.js';
+import { createBots } from '../js/sim/bots.js';
+import { makePlayers } from '../js/sim/match.js';
+import { generateMap as stubMap } from './stub_map.js';
+
+const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] = a.replace(/^--/, '').split('='); return [k, v ?? true]; }));
+const MATCHES = +(args.matches || 24);
+const BREAK = args.break || '';
+const quiet = !!args.quiet;
+const SET = {};
+for (const kv of String(args.set || '').split(',').filter(Boolean)) { const [k, v] = kv.split(':'); SET[k] = +v; }
+
+let realMap = null;
+try { realMap = (await import('../js/world/map.js')).generateMap; } catch (e) { if (args.map === 'real') throw e; }
+const mapMode = args.map || (realMap ? 'both' : 'stub');
+const mapSets = [];
+if (mapMode === 'stub' || mapMode === 'both') mapSets.push(['stub', stubMap]);
+if ((mapMode === 'real' || mapMode === 'both') && realMap) mapSets.push(['real', realMap]);
+
+const failures = [];
+const fail = (msg) => { failures.push(msg); };
+const EVENT_TYPES = ['recruit', 'steal', 'elim', 'respawn', 'pickup', 'lead', 'phase'];
+
+function runMatch(seed, genMap, opts = {}) {
+  const map = genMap(seed);
+  const { players, botIndices, botSpecs } = makePlayers({ seed, allBots: true });
+  const config = { ...SET };
+  if (BREAK === 'nan') config.radiusK = NaN;
+  if (BREAK === 'stuck') config.speedBase = 0.15;
+  if (BREAK === 'events') config.pickupCount = 0;
+  if (BREAK === 'distribution') { config.neutralStart = 0; config.neutralRespawn = 0; }
+  const sim = createSim({ seed, map, players, config });
+  const bots = createBots({ sim, indices: botIndices, specs: botSpecs, seed });
+  const S = sim.state, nc = S.crowds.length;
+  const seen = new Set();
+  const stats = { elims: 0, leads: 0, steals: 0, recruits: 0, pickups: 0, neutralsMin: Infinity, arc: [], neutralsSum: 0, samples: 0 };
+  const stuckSecs = new Array(nc).fill(0);
+  const winPos = S.crowds.map((c) => ({ x: c.x, z: c.z, t: 0, aliveFor: 0 }));
+  const turn = new Array(nc).fill(0), lastIn = S.crowds.map(() => null);
+  let nanAt = -1, leakAt = -1, midHash = '';
+  const prev = new Int32Array(nc);
+  const total = SIM_DT;
+  const steps = Math.round((S.duration + 3.5) / total);
+  for (let s = 0; s < steps; s++) {
+    for (let i = 0; i < nc; i++) prev[i] = S.crowds[i].count;
+    bots.update();
+    if (opts.perturb && S.tick === 500) sim.setInput(0, Math.random(), Math.random());
+    if (BREAK === 'jitter' && S.tick % 2) { const c = S.crowds[3]; sim.setInput(3, -c.ix, -c.iz); }
+    for (const c of S.crowds) {
+      if (!c.alive || S.phase !== 'play') { lastIn[c.index] = null; continue; }
+      const a = Math.atan2(c.ix, c.iz), l = lastIn[c.index];
+      if (l !== null) { let d = a - l; d -= Math.round(d / (2 * Math.PI)) * 2 * Math.PI; turn[c.index] += Math.abs(d); }
+      lastIn[c.index] = a;
+    }
+    sim.step();
+    if (BREAK === 'leak' && S.tick === 900) S.crowds[2].count += 1;
+    const ev = sim.drainEvents();
+    const delta = new Int32Array(nc);
+    for (const e of ev) {
+      seen.add(e.type);
+      if (e.type === 'recruit') { delta[e.crowd] += e.n; stats.recruits++; }
+      else if (e.type === 'steal') { delta[e.from] -= e.n; delta[e.to] += e.n; stats.steals++; if (e.n <= 0) fail(`seed ${seed}: steal with n=${e.n}`); }
+      else if (e.type === 'respawn') delta[e.crowd] += e.count;
+      else if (e.type === 'elim') stats.elims++;
+      else if (e.type === 'lead') stats.leads++;
+      else if (e.type === 'pickup') stats.pickups++;
+    }
+    for (let i = 0; i < nc; i++) {
+      const c = S.crowds[i];
+      if (leakAt < 0 && c.count !== prev[i] + delta[i]) leakAt = S.tick;
+      if (c.alive && c.count < 1 && leakAt < 0) leakAt = S.tick;
+    }
+    if (nanAt < 0 && S.tick % 15 === 0) {
+      for (const c of S.crowds) if (![c.x, c.z, c.vx, c.vz, c.count, c.radius, c.heading].every(Number.isFinite)) nanAt = S.tick;
+      const N = S.neutrals;
+      for (let i = 0; i < N.cap; i++) if (N.state[i] && !(Number.isFinite(N.x[i]) && Number.isFinite(N.z[i]))) { nanAt = S.tick; break; }
+    }
+    if (S.tick % 30 === 0) {
+      stats.neutralsMin = Math.min(stats.neutralsMin, S.neutrals.active);
+      stats.neutralsSum += S.neutrals.active; stats.samples++;
+      for (const c of S.crowds) {
+        const w = winPos[c.index];
+        if (S.phase === 'play' && c.alive && c.protect === 0 && w.aliveFor >= 1 && Math.hypot(c.x - w.x, c.z - w.z) < 0.5) stuckSecs[c.index]++;
+        w.aliveFor = c.alive ? w.aliveFor + 1 : 0;
+        w.x = c.x; w.z = c.z;
+      }
+    }
+    if (S.tick === 1800) midHash = stateHash(S);
+    if (S.phase === 'play' && S.tick % 600 === 0) {
+      const cs = S.crowds.map((c) => c.count).sort((x, y) => y - x);
+      stats.arc.push([Math.round(S.duration - S.timeLeft), cs[0], cs[1], cs[3], cs[7]]);
+    }
+  }
+  const playTicks = S.duration / SIM_DT;
+  return {
+    seed, S, stats, seen, nanAt, leakAt, midHash, hash: stateHash(S), stuckSecs,
+    turnRate: turn.map((t) => t / (playTicks * SIM_DT) * 180 / Math.PI),
+    players,
+  };
+}
+
+const median = (a) => { const s = a.slice().sort((x, y) => x - y); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+const mean = (a) => a.reduce((x, y) => x + y, 0) / Math.max(1, a.length);
+const pad = (v, n) => String(v).padStart(n);
+
+const t0 = Date.now();
+for (const [mapName, genMap] of mapSets) {
+  const tag = `[${mapName}]`;
+  const a = runMatch(7, genMap), b = runMatch(7, genMap, { perturb: BREAK === 'determinism' });
+  if (a.hash !== b.hash || a.midHash !== b.midHash) fail(`${tag} determinism: seed 7 hashes differ (${a.midHash}/${a.hash} vs ${b.midHash}/${b.hash})`);
+
+  const results = [];
+  for (let m = 0; m < MATCHES; m++) results.push(runMatch(1000 + m * 17, genMap));
+
+  const seen = new Set();
+  const byPersona = {};
+  const winners = [], allFinals = [], elims = [], leads = [], spreads = [];
+  let maxStuck = 0, maxStuckWho = '', minTravel = Infinity, minTravelWho = '', maxTurn = 0, maxTurnWho = '';
+  for (const r of results) {
+    r.seen.forEach((t) => seen.add(t));
+    if (r.nanAt >= 0) fail(`${tag} seed ${r.seed}: NaN at tick ${r.nanAt}`);
+    if (r.leakAt >= 0) fail(`${tag} seed ${r.seed}: count not conserved at tick ${r.leakAt}`);
+    const finals = r.S.crowds.map((c) => c.count);
+    winners.push(Math.max(...finals));
+    finals.forEach((f) => allFinals.push(f));
+    elims.push(r.stats.elims); leads.push(r.stats.leads);
+    spreads.push(Math.max(...finals) - Math.min(...finals));
+    r.S.crowds.forEach((c, i) => {
+      const p = r.players[i].persona + (i === 0 ? '*' : '');
+      const e = byPersona[p] || (byPersona[p] = { finals: [], best: [], kills: [], deaths: [], wins: 0, travel: [], stuck: [], turn: [], rec: [], stole: [] });
+      e.finals.push(c.count); e.best.push(c.best); e.kills.push(c.kills); e.deaths.push(c.deaths);
+      e.travel.push(c.travelled); e.rec.push(c.recruited); e.stole.push(c.stolen); e.stuck.push(r.stuckSecs[i]); e.turn.push(r.turnRate[i]);
+      if (c.rank === 1) e.wins++;
+      if (r.stuckSecs[i] > maxStuck) { maxStuck = r.stuckSecs[i]; maxStuckWho = `${p} seed ${r.seed}`; }
+      if (c.travelled < minTravel) { minTravel = c.travelled; minTravelWho = `${p} seed ${r.seed}`; }
+      if (r.turnRate[i] > maxTurn) { maxTurn = r.turnRate[i]; maxTurnWho = `${p} seed ${r.seed}`; }
+    });
+    if (r.stats.neutralsMin < r.S.neutrals.cap * 0.25) fail(`${tag} seed ${r.seed}: city emptied (min ${r.stats.neutralsMin} pedestrians)`);
+  }
+  for (const t of EVENT_TYPES) if (!seen.has(t)) fail(`${tag} event type '${t}' never occurred`);
+  if (maxStuck > 6) fail(`${tag} a crowd was stationary ${maxStuck}s (${maxStuckWho})`);
+  if (minTravel < 300) fail(`${tag} a crowd travelled only ${minTravel.toFixed(0)} m (${minTravelWho})`);
+  if (maxTurn > 120) fail(`${tag} jittery steering: ${maxTurn.toFixed(0)} deg/s mean turn (${maxTurnWho})`);
+  const wMed = median(winners);
+  if (wMed < 300 || wMed > 2500) fail(`${tag} median winning count ${wMed} outside 300..2500`);
+  if (Math.min(...winners) < 120) fail(`${tag} a match was won with only ${Math.min(...winners)}`);
+  if (mean(elims) < 1) fail(`${tag} fewer than 1 elimination per match (${mean(elims).toFixed(2)})`);
+  if (mean(leads) < 1) fail(`${tag} fewer than 1 lead change per match`);
+
+  if (!quiet) {
+    console.log(`\n${tag} ${MATCHES} matches  (determinism hash ${a.hash})`);
+    console.log('persona        mean  median  best  kills deaths  wins  travel  stuck  turn°/s  recruit  stolen');
+    for (const [p, e] of Object.entries(byPersona).sort((x, y) => mean(y[1].finals) - mean(x[1].finals))) {
+      console.log(`${p.padEnd(13)}${pad(mean(e.finals).toFixed(0), 6)}${pad(median(e.finals), 8)}${pad(mean(e.best).toFixed(0), 6)}${pad(mean(e.kills).toFixed(1), 7)}${pad(mean(e.deaths).toFixed(1), 7)}${pad(e.wins, 6)}${pad(mean(e.travel).toFixed(0), 8)}${pad(Math.max(...e.stuck), 7)}${pad(mean(e.turn).toFixed(0), 9)}${pad(mean(e.rec).toFixed(0), 9)}${pad(mean(e.stole).toFixed(0), 8)}`);
+    }
+    const wr = results.map((r) => r.S.crowds.find((c) => c.rank === 1));
+    console.log(`winner sources: recruited ${mean(wr.map((c) => c.recruited)).toFixed(0)}  stolen ${mean(wr.map((c) => c.stolen)).toFixed(0)}  lost ${mean(wr.map((c) => c.lost)).toFixed(0)}`);
+    console.log(`winner   mean ${mean(winners).toFixed(0)}  median ${wMed}  min ${Math.min(...winners)}  max ${Math.max(...winners)}`);
+    console.log(`all      median ${median(allFinals)}  p10 ${allFinals.slice().sort((x, y) => x - y)[Math.floor(allFinals.length * 0.1)]}  p90 ${allFinals.slice().sort((x, y) => x - y)[Math.floor(allFinals.length * 0.9)]}`);
+    console.log(`per match: elims ${mean(elims).toFixed(1)}  lead changes ${mean(leads).toFixed(1)}  steals ${mean(results.map((r) => r.stats.steals)).toFixed(0)}  pickups ${mean(results.map((r) => r.stats.pickups)).toFixed(1)}  pedestrians avg ${mean(results.map((r) => r.stats.neutralsSum / r.stats.samples)).toFixed(0)}`);
+    console.log(`worst: stuck ${maxStuck}s (${maxStuckWho}), least travel ${minTravel.toFixed(0)} m (${minTravelWho}), max turn ${maxTurn.toFixed(0)}°/s (${maxTurnWho})`);
+    const arcRows = results[0].stats.arc.map((row, k) => [row[0], ...[1, 2, 3, 4].map((j) => mean(results.map((r) => (r.stats.arc[k] || row)[j])).toFixed(0))]);
+    console.log('arc (mean count by rank): ' + arcRows.map((r) => `${r[0]}s ${r[1]}/${r[2]}/${r[3]}/${r[4]}`).join('  '));
+  }
+}
+console.log(`\n${failures.length ? 'FAIL' : 'PASS'} in ${((Date.now() - t0) / 1000).toFixed(1)}s${BREAK ? ` (break=${BREAK})` : ''}`);
+for (const f of failures) console.log('  - ' + f);
+process.exit(failures.length ? 1 : 0);

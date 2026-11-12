@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>THRONG render harness</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #1a1418; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+  #hud { position: fixed; left: 6px; top: 6px; font: 11px/1.35 ui-monospace, monospace; color: #fff; background: rgba(0,0,0,.45); padding: 4px 6px; border-radius: 4px; pointer-events: none; white-space: pre; }
+  #err { position: fixed; left: 6px; bottom: 6px; right: 6px; font: 12px ui-monospace, monospace; color: #ff8080; white-space: pre-wrap; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../../../lib/three/0.180.0/three.module.js", "three/addons/": "../../../lib/three/0.180.0/addons/" } }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud"></div>
+<div id="err"></div>
+<script>
+  window.__harness = { ready: false, frames: 0, errors: [] };
+  window.addEventListener('error', (e) => { window.__harness.errors.push(String(e.message)); document.getElementById('err').textContent += e.message + '\n'; });
+  window.addEventListener('unhandledrejection', (e) => { window.__harness.errors.push(String(e.reason && e.reason.stack || e.reason)); document.getElementById('err').textContent += (e.reason && e.reason.stack || e.reason) + '\n'; });
+</script>
+<script type="module">
+import { generateMap } from '../js/world/map.js';
+import { createRenderer } from '../js/render/renderer.js';
+import { createFakeSim, SIM_DT } from './render_fake.mjs';
+
+const P = new URLSearchParams(location.search);
+const num = (k, d) => (P.has(k) ? +P.get(k) : d);
+const seed = num('seed', 1);
+const map = generateMap(seed);
+const scene = P.get('scene') || 'late';
+const sim = createFakeSim({
+  map, seed, scene,
+  player: num('player', scene === 'late' ? 1200 : 20),
+  rivals: (P.get('rivals') || '1100,900,780,640').split(',').filter(Boolean).map(Number),
+  neutrals: num('neutrals', 600), move: num('move', 1), ai: num('ai', 1), duration: num('dur', 120),
+});
+const canvas = document.getElementById('c');
+const r = await createRenderer({ canvas, map, quality: P.get('q') || 'high', adaptive: P.get('adaptive') !== '0' });
+r.setCrowds(sim.state.crowds.map((c) => ({ index: c.index, name: c.name, color: c.color })));
+r.setFocus(num('focus', 0));
+if (P.has('fixed')) {
+  const [x, z, d] = P.get('fixed').split(',').map(Number);
+  r.setFixedCamera({ x, z, d });
+}
+const ff = num('t', 0);
+for (let k = 0; k < ff / SIM_DT; k++) sim.step();
+sim.drainEvents();
+const keys = new Set();
+addEventListener('keydown', (e) => keys.add(e.key.toLowerCase()));
+addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
+window.__harness.renderer = r;
+window.__harness.sim = sim;
+const hud = document.getElementById('hud');
+if (P.get('hud') === '0') hud.style.display = 'none';
+let acc = 0, last = performance.now();
+const paused = P.get('pause') === '1';
+function loop(now) {
+  const dt = Math.min(0.1, (now - last) / 1000);
+  last = now;
+  let ax = 0, az = 0;
+  if (keys.has('w') || keys.has('arrowup')) az -= 1;
+  if (keys.has('s') || keys.has('arrowdown')) az += 1;
+  if (keys.has('a') || keys.has('arrowleft')) ax -= 1;
+  if (keys.has('d') || keys.has('arrowright')) ax += 1;
+  if (ax || az) {
+    const y = r.cameraYaw();
+    sim.setInput(ax * Math.cos(y) + az * Math.sin(y), -ax * Math.sin(y) + az * Math.cos(y));
+  } else sim.setInput(0, 0);
+  if (!paused) {
+    acc += dt;
+    while (acc >= SIM_DT) { sim.step(); acc -= SIM_DT; }
+  }
+  const t0 = performance.now();
+  r.frame(sim.state, sim.drainEvents(), dt, paused ? 1 : acc / SIM_DT);
+  const ms = performance.now() - t0;
+  window.__harness.cpuMs = (window.__harness.cpuMs || ms) * 0.95 + ms * 0.05;
+  window.__harness.frames++;
+  if (window.__harness.frames % 15 === 0 && hud.style.display !== 'none') {
+    const s = r.stats();
+    hud.textContent = `${s.fps} fps  ${s.quality}  dpr ${s.dpr}\ndraws ${s.drawCalls}  tris ${(s.triangles / 1000).toFixed(0)}k\nfigures ${s.instances} (crowd ${s.crowdFigures} / ped ${s.neutralFigures})\nplayer ${sim.state.crowds[0].count}`;
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+window.__harness.ready = true;
+</script>
+</body>
+</html>
