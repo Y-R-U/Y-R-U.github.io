@@ -98,6 +98,7 @@ attribute vec4 iC;
 uniform float uTime;
 uniform float uFigScale;
 uniform float uSeg;
+uniform float uAccScale;
 uniform sampler2D uHatTex;
 varying vec3 vCol;
 ${shaderCommon.lightPars}
@@ -105,7 +106,8 @@ ${shaderCommon.lightPars}
 ${BODY_POSE}
 void main() {
   int hat = int(floor(iB.z));
-  float look = fract(iB.z), g = clamp(iB.y, 0.0, 1.0), ph = iB.x;
+  float hz = step(1.5, iB.y);
+  float look = fract(iB.z), g = clamp(iB.y - 2.0 * hz, 0.0, 1.0), ph = iB.x * (1.0 - 0.35 * hz);
   int j = int(aH.x);
   vec4 q0 = texelFetch(uHatTex, ivec2(j, hat), 0);
   vec4 q1 = texelFetch(uHatTex, ivec2(j + 1, hat), 0);
@@ -121,11 +123,15 @@ void main() {
   vec3 n = dir * (q1.y - q0.y) - vec3(0.0, q1.x - q0.x, 0.0);
   n = dot(n, n) < 1e-8 ? vec3(0.0, 1.0, 0.0) : normalize(n);
   if (mode > 8.5 && mode < 9.5) p = vec3(0.0, 1.7, 0.0);
+  // hats grow with camera distance (on top of the figure scale) so their shapes still read when zoomed out
+  vec3 piv = vec3(0.0, 1.6, 0.0);
+  p = piv + (p - piv) * vec3(uAccScale, 1.0 + (uAccScale - 1.0) * 1.15, uAccScale);
   float idle = 1.0 - g;
   float breath = sin(uTime * 2.1 + look * 37.0);
-  float lean = 0.16 * g;
+  float lean = 0.16 * g + hz * (0.32 + 0.08 * sin(ph * 0.5 + look * 9.0));
   p = rotX(p, 0.78, 0.0, lean); n = rotXn(n, lean);
   p.y += idle * breath * 0.008 + abs(cos(ph)) * 0.07 * g;
+  p.x += hz * sin(ph * 0.5 + look * 20.0) * 0.06;
   float s = iC.w * 1.28 * uFigScale;
   float cy = cos(iA.w), sy = sin(iA.w);
   p *= s;
@@ -351,6 +357,7 @@ attribute vec4 iC;
 attribute vec4 iD;
 uniform float uTime;
 uniform float uFigScale;
+uniform float uWind;
 uniform vec3 uSkin[5];
 uniform vec3 uHair[6];
 uniform vec3 uPants[6];
@@ -377,7 +384,8 @@ void main() {
     vec3 hand = vec3(0.36, 0.85, 0.28);
     if (part > 7.5) {
       float u = uv.x;
-      float wave = sin(u * 7.0 - uTime * 7.5 + look * 20.0) * (0.05 + 0.06 * u) * u;
+      float ws = 7.5 + 6.0 * uWind;
+      float wave = sin(u * 7.0 - uTime * ws + look * 20.0) * (0.05 + 0.06 * u) * u * (1.0 + 1.4 * uWind);
       p.x += wave; p.y -= u * u * 0.04 * (1.0 - g);
       n = normalize(vec3(1.0, 0.0, -cos(u * 7.0 - uTime * 7.5) * 0.6 * u));
       vUvS = vec3(uv, 1.0);

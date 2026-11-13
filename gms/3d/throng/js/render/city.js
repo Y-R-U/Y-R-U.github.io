@@ -1,19 +1,32 @@
 import * as THREE from 'three';
 import { GeoWriter, mulberry, C, mul, mix } from './geo.js';
 import { shaderCommon, fogUniforms } from './shared.js';
+import { FACADES, ROOFS } from '../world/map.js';
+import { getTheme } from './themes.js';
 
 const GOLD = C(0xe0a838);
 const STONE = C(0xcfc3ad);
 const STONE_D = C(0xa89c88);
 const IRON = C(0x1d2226);
-const AWNINGS = [0xb3302c, 0x2d6b4b, 0x24427a, 0xd7ae52, 0x7a2f58, 0x2f5f6e].map((h) => C(h));
-const LIT = [C(0xffc77a), C(0xffb05a), C(0xffd9a0), C(0xff9a48), C(0xfff0d0)];
-const GLASS = C(0x1a2236);
+const AWN0 = [0xb3302c, 0x2d6b4b, 0x24427a, 0xd7ae52, 0x7a2f58, 0x2f5f6e];
+const LIT0 = [0xffc77a, 0xffb05a, 0xffd9a0, 0xff9a48, 0xfff0d0];
+const SIGN0 = [0x1f3a2c, 0x5a1e26, 0x1d2a4a, 0x231c1a, 0x3d2a52, 0x6a4a1c];
+// theme-dependent palettes, set at the start of buildCity
+let AWNINGS, LIT, GLASS, SIGNS, T;
+function setPalettes(theme) {
+  T = theme;
+  AWNINGS = (T.awnings || AWN0).map((h) => C(h));
+  LIT = (T.lit || LIT0).map((h) => C(h));
+  GLASS = C(T.glass);
+  SIGNS = SIGN0.map((h) => C(h));
+}
+setPalettes(getTheme('evening'));
+const litP = (p) => Math.min(0.95, p * T.litK);
 
 const BACK = { n: 's', s: 'n', e: 'w', w: 'e' };
 const ENDS = { n: 'ew', s: 'ew', e: 'ns', w: 'ns' };
-const SIGNS = [0x1f3a2c, 0x5a1e26, 0x1d2a4a, 0x231c1a, 0x3d2a52, 0x6a4a1c].map((h) => C(h));
 const FLOOR0 = 4.2, FH = 3.1;
+const FLOWERS = [0xd8324a, 0xf2c23a, 0xe85aa0, 0xf6f2ea, 0x9a4ad8, 0xf07a2a];
 
 function styleOf(b) {
   const r = mulberry(b.seed ^ 0x2c1b3c6d);
@@ -28,6 +41,7 @@ function styleOf(b) {
     arch: landmark || r() < 0.25,
     trim: lum > 0.62 ? mix(F, C(0xfffaf0), 0.6) : mix(C(0xf1e6d2), F, 0.15),
     sign: SIGNS[Math.floor(r() * SIGNS.length)],
+    neon: T.signs ? C(T.signs[Math.floor(r() * T.signs.length)]) : null,
     shutters: !landmark && r() < 0.3 ? mix(C([0x3f5e4a, 0x47607e, 0x6b3a32, 0x55606a][Math.floor(r() * 4)]), F, 0.1) : null,
   };
 }
@@ -58,7 +72,7 @@ function facadeSide(G, D, rnd, b, st, side, x0, z0, x1, z1) {
   const trim = st.trim;
   const nb = Math.max(1, Math.floor((L - 1.2) / 2.9));
   const sp = L / nb;
-  const lit = () => rnd() < b.lit;
+  const lit = () => rnd() < litP(b.lit);
 
   if (!ext) {
     for (let f = 0; f < b.floors; f++) {
@@ -109,6 +123,9 @@ function facadeSide(G, D, rnd, b, st, side, x0, z0, x1, z1) {
         boxL(D, u - 0.9, u + 0.9, y0 - 0.32, y0 - 0.14, 0, 0.72, trim);
         rect(D, u - 0.9, u + 0.9, y0 - 0.14, y0 + 0.7, 0.72, mix(IRON, F, 0.18));
         boxL(D, u - 0.92, u + 0.92, y0 + 0.7, y0 + 0.78, 0.66, 0.78, mix(IRON, trim, 0.3), { ends: true });
+      } else if (T.decor.flowers && rnd() < 0.55) {
+        boxL(D, u - 0.62, u + 0.62, y0 - 0.44, y0 - 0.2, 0, 0.32, C(0xa9583a), { ends: true });
+        boxL(D, u - 0.6, u + 0.6, y0 - 0.2, y0 - 0.02, 0.02, 0.36, C(FLOWERS[(k + f + b.seed) % FLOWERS.length]), { ends: true });
       }
     }
     if (st.pil) for (let k = 0; k <= nb; k++) {
@@ -118,6 +135,17 @@ function facadeSide(G, D, rnd, b, st, side, x0, z0, x1, z1) {
   }
   // frieze under the cornice
   boxL(D, 0, L, b.h - 0.45, b.h, 0, 0.16, mix(trim, F, 0.4), { ends: true });
+  if (st.neon) {
+    rect(G, 0.1, L - 0.1, 3.97, 4.07, 0.21, st.neon, 2.6);
+    if (b.floors >= 2 && rnd() < 0.55) {
+      const u = rnd() < 0.5 ? 1.0 : L - 1.0, y0 = 5.0, y1 = 5.0 + Math.min(4.2, b.floors * 1.6);
+      const nc = C(T.signs[(b.seed >> 3) % T.signs.length]);
+      const q = [at(u, y0, 0.15), at(u, y0, 1.15), at(u, y1, 1.15), at(u, y1, 0.15)];
+      G.quad(q[0], q[1], q[2], q[3], nc, 2.2); G.quad(q[3], q[2], q[1], q[0], nc, 2.2);
+      const m = [at(u, y0 + 0.4, 0.3), at(u, y0 + 0.4, 1.0), at(u, y1 - 0.4, 1.0), at(u, y1 - 0.4, 0.3)].map((p, i) => [p[0] + (side === 'n' || side === 's' ? 0.03 : 0) * (i < 2 ? 1 : 1), p[1], p[2] + (side === 'e' || side === 'w' ? 0.03 : 0)]);
+      G.quad(m[0], m[1], m[2], m[3], C(0xfff4ff), 2.4);
+    }
+  }
 
   // ground floor
   if (st.landmark) {
@@ -130,7 +158,7 @@ function facadeSide(G, D, rnd, b, st, side, x0, z0, x1, z1) {
     }
     boxL(D, 0, L, 3.75, 4.02, 0, 1.0, trim, { ends: true });
     for (let k = 0; k < nb; k++) {
-      const u = sp * (k + 0.5), on = rnd() < 0.85;
+      const u = sp * (k + 0.5), on = rnd() < litP(0.85);
       const col = on ? LIT[(k + b.seed) % 3] : GLASS;
       rect(G, u - 0.65, u + 0.65, 0.4, 2.7, 0.04, col, on ? 1.5 : 0);
       arch(G, u, 2.7, 0.65, 0.04, col, on ? 1.5 : 0);
@@ -139,17 +167,21 @@ function facadeSide(G, D, rnd, b, st, side, x0, z0, x1, z1) {
   }
   const ns = Math.max(1, Math.floor(L / 3.8));
   const sb = L / ns;
-  const awn = b.awning ? AWNINGS[b.seed % AWNINGS.length] : null;
+  const awn = b.awning || T.decor.flowers ? AWNINGS[b.seed % AWNINGS.length] : null;
   for (let k = 0; k < ns; k++) {
     const u = sb * (k + 0.5);
-    const on = rnd() < 0.8;
+    const on = rnd() < litP(0.8);
     rect(G, u - 1.25, u + 1.25, 0.45, 3.0, 0.05, on ? LIT[(k + b.seed) % 3] : GLASS, on ? 1.6 : 0);
     rect(D, u - 1.4, u + 1.4, 0.3, 0.45, 0.06, mul(st.sign, 1.4));
     rect(D, u - 1.38, u - 1.25, 0.45, 3.0, 0.07, st.sign);
     rect(D, u + 1.25, u + 1.38, 0.45, 3.0, 0.07, st.sign);
     const sy0 = awn ? 3.5 : 3.1, sy1 = awn ? 3.95 : 3.6;
     boxL(D, u - 1.45, u + 1.45, sy0, sy1, 0, 0.12, st.sign, { ends: true });
-    rect(D, u - 0.85, u + 0.85, sy0 + 0.13, sy1 - 0.12, 0.125, C(0xf5d58a), 0.9);
+    if (st.neon) {
+      const nc = (k + b.seed) % 3 ? st.neon : C(T.signs[(b.seed + k) % T.signs.length]);
+      rect(G, u - 1.1, u + 1.1, sy0 + 0.1, sy1 - 0.1, 0.13, nc, 2.6);
+      rect(G, u - 1.45, u + 1.45, 3.02, 3.1, 0.14, nc, 2.2);
+    } else rect(D, u - 0.85, u + 0.85, sy0 + 0.13, sy1 - 0.12, 0.125, C(0xf5d58a), T.lampsOn ? 0.9 : 0);
     if (awn) {
       const a = at(u - 1.45, 3.45, 0.02), bb = at(u + 1.45, 3.45, 0.02);
       const c = at(u + 1.45, 2.95, 1.5), d = at(u - 1.45, 2.95, 1.5);
@@ -188,7 +220,7 @@ function hipRoof(G, cx, cz, y, w, d, rh, R, nb, o, con) {
 }
 
 // small gabled dormer whose front sits at (px,pz) facing `side`
-function dormer(G, rnd, px, y, pz, side, wallCol, roofCol, litP) {
+function dormer(G, rnd, px, y, pz, side, wallCol, roofCol, lp) {
   const alongX = side === 'n' || side === 's';
   const hw = 0.6, dep = 1.6, h = 1.3;
   const sgn = side === 's' || side === 'e' ? 1 : -1;
@@ -205,13 +237,52 @@ function dormer(G, rnd, px, y, pz, side, wallCol, roofCol, litP) {
   q(e0, b0, rb, r0, roofCol); q(e1, r0, rb, b1, mul(roofCol, 0.9));
   const t0 = P(-hw, y + h, 0.01), t1 = P(hw, y + h, 0.01), tt = P(0, ry - 0.08, 0.01);
   G.tri(t0, t1, tt, wallCol); G.tri(t1, t0, tt, wallCol);
-  const on = rnd() < litP;
+  const on = rnd() < litP(lp);
   G.win = on ? rnd() + 0.001 : 0;
   const w0 = P(-0.34, y + 0.2, -0.02), w1 = P(0.34, y + 0.2, -0.02), w2 = P(0.34, y + 1.05, -0.02), w3 = P(-0.34, y + 1.05, -0.02);
   const col = on ? LIT[Math.floor(rnd() * LIT.length)] : GLASS;
   G.quad(w0, w1, w2, w3, col, on ? 1.6 : 0); G.quad(w3, w2, w1, w0, col, on ? 1.6 : 0);
   G.win = 0;
   void fx; void fz;
+}
+
+// mansard cap with a courtyard light well: four slopes up to a ridge ring, then lit walls down into the well
+function wellCap(G, rnd, cx, cz, y, tw, td, capH, zinc, facade) {
+  const s = Math.min(3.0, Math.min(tw, td) * 0.33);
+  const X0 = cx - tw / 2, X1 = cx + tw / 2, Z0 = cz - td / 2, Z1 = cz + td / 2;
+  const x0 = X0 + s, x1 = X1 - s, z0 = Z0 + s, z1 = Z1 - s, yr = y + capH;
+  G.win = -2;
+  G.quad([X0, y, Z1], [X1, y, Z1], [x1, yr, z1], [x0, yr, z1], zinc);
+  G.quad([X1, y, Z0], [X0, y, Z0], [x0, yr, z0], [x1, yr, z0], mul(zinc, 0.86));
+  G.quad([X1, y, Z1], [X1, y, Z0], [x1, yr, z0], [x1, yr, z1], mul(zinc, 0.94));
+  G.quad([X0, y, Z0], [X0, y, Z1], [x0, yr, z1], [x0, yr, z0], mul(zinc, 0.94));
+  G.win = 0;
+  const yb = yr - 3.0, wall = mul(facade, 0.78), floor = mix(C(0x9a8a74), facade, 0.25);
+  const walls = [
+    [[x0, yb, z0], [x1, yb, z0], [x1, yr, z0], [x0, yr, z0]],
+    [[x1, yb, z1], [x0, yb, z1], [x0, yr, z1], [x1, yr, z1]],
+    [[x0, yb, z1], [x0, yb, z0], [x0, yr, z0], [x0, yr, z1]],
+    [[x1, yb, z0], [x1, yb, z1], [x1, yr, z1], [x1, yr, z0]],
+  ];
+  for (const [a, b2, c, d] of walls) {
+    G.quad(a, b2, c, d, wall);
+    const L = Math.hypot(b2[0] - a[0], b2[2] - a[2]), n = Math.max(1, Math.floor(L / 2.2));
+    const nx = -(b2[2] - a[2]), nz = b2[0] - a[0];
+    const nl = Math.hypot(nx, nz) || 1, ox = nx / nl * 0.03, oz = nz / nl * 0.03;
+    for (let k = 0; k < n; k++) {
+      const t0 = (k + 0.3) / n, t1 = (k + 0.7) / n, on = rnd() < litP(0.6);
+      const P = (t, yy) => [a[0] + (b2[0] - a[0]) * t + ox, yy, a[2] + (b2[2] - a[2]) * t + oz];
+      G.win = on ? rnd() + 0.001 : 0;
+      G.quad(P(t0, yr - 2.2), P(t1, yr - 2.2), P(t1, yr - 0.7), P(t0, yr - 0.7), on ? LIT[k % LIT.length] : GLASS, on ? 1.5 : 0);
+      G.win = 0;
+    }
+  }
+  G.quad([x0, yb, z0], [x0, yb, z1], [x1, yb, z1], [x1, yb, z0], floor);
+  if ((x1 - x0) * (z1 - z0) > 9) { G.win = -8; G.blob((x0 + x1) / 2, yb + 1.3, (z0 + z1) / 2, 1.0, C(0x4d7f2f), rnd, 0.9, true); G.win = 0; }
+  G.box(x0 - 0.12, yr, z0 - 0.12, x1 + 0.12, yr + 0.14, z0 + 0.04, mix(zinc, C(0xffffff), 0.2), { skip: 'b' });
+  G.box(x0 - 0.12, yr, z1 - 0.04, x1 + 0.12, yr + 0.14, z1 + 0.12, mix(zinc, C(0xffffff), 0.2), { skip: 'b' });
+  G.box(x0 - 0.12, yr, z0, x0 + 0.04, yr + 0.14, z1, mix(zinc, C(0xffffff), 0.2), { skip: 'b' });
+  G.box(x1 - 0.04, yr, z0, x1 + 0.12, yr + 0.14, z1, mix(zinc, C(0xffffff), 0.2), { skip: 'b' });
 }
 
 function roof(G, D, rnd, b, st, x0, z0, x1, z1, h, lod) {
@@ -226,7 +297,9 @@ function roof(G, D, rnd, b, st, x0, z0, x1, z1, h, lod) {
     G.win = -2;
     G.frustum(cx, cz, top, top + mh, w + 0.1, d + 0.1, tw, td, R, { noTop: true });
     const capH = Math.min(Math.min(tw, td) * 0.22, 1.8);
-    hipRoof(G, cx, cz, top + mh, tw, td, capH, b.roof === 'dome' ? mix(R, zinc, 0.5) : zinc, 1, 0, 0);
+    const well = b.roof === 'mansard' && lod === 0 && tw >= 8 && td >= 7.5;
+    if (well) wellCap(G, rnd, cx, cz, top + mh, tw, td, capH, zinc, C(b.facade));
+    else hipRoof(G, cx, cz, top + mh, tw, td, capH, b.roof === 'dome' ? mix(R, zinc, 0.5) : zinc, 1, 0, 0);
     G.win = 0;
     if (lod === 0) {
       // balustrade on the cornice of landmarks
@@ -258,7 +331,7 @@ function roof(G, D, rnd, b, st, x0, z0, x1, z1, h, lod) {
           D.cyl(qx, qz, yc + 1.5, yc + 1.95, 0.13, 0.11, 5, pot, { topCol: C(0x2a1d18) });
         }
       }
-      if (tw * td > 40) {
+      if (tw * td > 40 && !well) {
         const nsk = 1 + Math.floor(rnd() * 3);
         for (let k = 0; k < nsk; k++) {
           const sx = cx + (rnd() - 0.5) * tw * 0.45, sz = cz + (rnd() - 0.5) * td * 0.45;
@@ -271,7 +344,8 @@ function roof(G, D, rnd, b, st, x0, z0, x1, z1, h, lod) {
       for (let k = 0; k < nch; k++) {
         const u = -L / 2 + (L / nch) * (k + 0.5);
         const side = k % 2 ? 1 : -1;
-        const px = long ? cx + u : cx + side * tw * 0.3, pz = long ? cz + side * td * 0.3 : cz + u;
+        const off = well ? 0.5 - 1.1 / (long ? td : tw) : 0.3;
+        const px = long ? cx + u : cx + side * tw * off, pz = long ? cz + side * td * off : cz + u;
         D.box(px - 0.45, top + mh - 0.2, pz - 0.3, px + 0.45, top + mh + capH * 0.7 + 1.1, pz + 0.3, C(0xa8644a), { skip: 'b', top: C(0x2e2420) });
         D.box(px - 0.55, top + mh + capH * 0.7 + 1.1, pz - 0.4, px + 0.55, top + mh + capH * 0.7 + 1.3, pz + 0.4, C(0xc8a890), { skip: 'b' });
         for (const s2 of [-0.22, 0.0, 0.22]) D.box(px + s2 - 0.06, top + mh + capH * 0.7 + 1.3, pz - 0.06, px + s2 + 0.06, top + mh + capH * 0.7 + 1.55, pz + 0.06, C(0x9a5a44), { skip: 'b' });
@@ -359,6 +433,19 @@ function roof(G, D, rnd, b, st, x0, z0, x1, z1, h, lod) {
       }
       const sx = cx + w * 0.18, sz = cz;
       D.box(sx - 1.0, top + 0.2, sz - 0.7, sx + 1.0, top + 0.7, sz + 0.7, C(0xd8d0c4), { skip: 'b', top: C(0x9fc0d8) });
+      if (T.decor.neon) {
+        const bw2 = Math.min(w - 2, 7) / 2, by0 = top + 1.4, by1 = top + 4.4, bz = cz - d * 0.15;
+        for (const px of [cx - bw2 + 0.4, cx + bw2 - 0.4]) G.box(px - 0.1, top, bz - 0.1, px + 0.1, by0, bz + 0.1, IRON);
+        const c1 = C(T.signs[b.seed % T.signs.length]), c2 = C(T.signs[(b.seed + 2) % T.signs.length]);
+        G.box(cx - bw2 - 0.1, by0 - 0.1, bz - 0.12, cx + bw2 + 0.1, by1 + 0.1, bz - 0.02, C(0x12121a), { skip: 's' });
+        const ym = (by0 + by1) / 2;
+        for (const [zz, flip] of [[bz + 0.0, false], [bz - 0.14, true]]) {
+          const q = (ya, yb2, col, e) => { const p = [[cx - bw2, ya, zz], [cx + bw2, ya, zz], [cx + bw2, yb2, zz], [cx - bw2, yb2, zz]]; if (flip) G.quad(p[1], p[0], p[3], p[2], col, e); else G.quad(p[0], p[1], p[2], p[3], col, e); };
+          q(ym, by1, c1, 1.9); q(by0, ym, c2, 1.9);
+          const t = (ya, yb2, u0, u1) => { const p = [[cx - bw2 + u0, ya, zz + (flip ? -0.01 : 0.01)], [cx - bw2 + u1, ya, zz + (flip ? -0.01 : 0.01)], [cx - bw2 + u1, yb2, zz + (flip ? -0.01 : 0.01)], [cx - bw2 + u0, yb2, zz + (flip ? -0.01 : 0.01)]]; if (flip) G.quad(p[1], p[0], p[3], p[2], C(0xffffff), 2.6); else G.quad(p[0], p[1], p[2], p[3], C(0xffffff), 2.6); };
+          t(ym + 0.35, ym + 0.95, 0.6, bw2 * 1.3); t(by0 + 0.4, by0 + 0.7, 0.6, bw2 * 0.9);
+        }
+      }
     }
   }
 }
@@ -388,7 +475,7 @@ function building(G, D, b) {
       for (let f = -1; f < b.floors; f++) {
         const y = f < 0 ? 0.5 : FLOOR0 + f * FH + 0.7, hh = f < 0 ? 2.4 : 1.6;
         for (let k = 0; k < nb; k++) {
-          const u = sp * (k + 0.5), on = rnd() < (f < 0 ? 0.8 : b.lit), hw = f < 0 ? 1.1 : 0.5;
+          const u = sp * (k + 0.5), on = rnd() < litP(f < 0 ? 0.8 : b.lit), hw = f < 0 ? 1.1 : 0.5;
           const p = [at(u - hw, y), at(u + hw, y), at(u + hw, y + hh), at(u - hw, y + hh)];
           const col = on ? LIT[(k + f + 1) % LIT.length] : GLASS;
           if (s === 'n' || s === 'e') G.quad(p[1], p[0], p[3], p[2], col, on ? 1.3 : 0); else G.quad(p[0], p[1], p[2], p[3], col, on ? 1.3 : 0);
@@ -408,6 +495,15 @@ function building(G, D, b) {
       G.box(px - 0.3, 4.45, pz - 0.3, px + 0.3, h, pz + 0.3, mix(light, F, 0.2), { skip: 'tb' });
     }
     for (const s of ['n', 's', 'e', 'w']) facadeSide(G, D, rnd, b, st, s, x0, z0, x1, z1);
+    // cutaway cap: hidden until the building sinks, then a tidy flat lid with a light outline of the footprint
+    G.win = -6;
+    const X0 = x0 - 0.2, X1 = x1 + 0.2, Z0 = z0 - 0.2, Z1 = z1 + 0.2, y = 4.5, bw = 0.5;
+    const rim = mix(light, C(0xffffff), 0.35), lid = mix(mul(F, 0.42), C(0x262430), 0.45);
+    const flat = (ax0, az0, ax1, az1, col) => G.quad([ax0, y, az0], [ax0, y, az1], [ax1, y, az1], [ax1, y, az0], col);
+    flat(X0, Z0, X1, Z0 + bw, rim); flat(X0, Z1 - bw, X1, Z1, rim);
+    flat(X0, Z0 + bw, X0 + bw, Z1 - bw, rim); flat(X1 - bw, Z0 + bw, X1, Z1 - bw, rim);
+    flat(X0 + bw, Z0 + bw, X1 - bw, Z1 - bw, lid);
+    G.win = 0;
   }
   roof(G, D, rnd, b, st, x0, z0, x1, z1, h, lod);
 }
@@ -418,7 +514,7 @@ function lamp(G, l, rnd, halos) {
   G.cyl(x, z, 0.55, 4.3, 0.08, 0.07, 5, IRON, { top: false });
   const lantern = (lx, lz, y) => {
     G.cyl(lx, lz, y - 0.1, y, 0.12, 0.2, 6, IRON, { top: false });
-    G.cyl(lx, lz, y, y + 0.55, 0.2, 0.24, 6, C(0xffd08a), { emit: 3.2, top: false });
+    G.cyl(lx, lz, y, y + 0.55, 0.2, 0.24, 6, T.lampsOn ? C(0xffd08a) : C(0xd8d2c4), { emit: T.lampsOn ? 3.2 : 0, top: false });
     G.cyl(lx, lz, y + 0.55, y + 0.8, 0.3, 0.0, 6, IRON);
     halos.push(lx, y + 0.3, lz, l.grand ? 1.7 : 1.9);
   };
@@ -438,12 +534,14 @@ function lamp(G, l, rnd, halos) {
     const blue = C(0x1d3a9a), gold = GOLD;
     const o = 0.12, y0 = 2.0, y1 = 3.7, bw = 0.78;
     const pts = [[x + o, y1, z], [x + o + bw, y1, z], [x + o + bw, y0 + 0.25, z], [x + o + bw / 2, y0, z], [x + o, y0 + 0.25, z]];
+    G.win = -7;
     G.poly(pts, blue); G.poly([...pts].reverse(), blue);
     const cy = (y0 + y1) / 2 + 0.15, cxx = x + o + bw / 2;
     const em = [[cxx - 0.22, cy - 0.1, z + 0.01], [cxx + 0.22, cy - 0.1, z + 0.01], [cxx + 0.26, cy + 0.2, z + 0.01], [cxx + 0.1, cy + 0.06, z + 0.01], [cxx, cy + 0.24, z + 0.01], [cxx - 0.1, cy + 0.06, z + 0.01], [cxx - 0.26, cy + 0.2, z + 0.01]];
     G.poly(em, gold, 0.4);
     const em2 = em.map((p) => [p[0], p[1], z - 0.01]).reverse();
     G.poly(em2, gold, 0.4);
+    G.win = 0;
     G.box(x + o - 0.02, y1, z - 0.03, x + o + bw + 0.02, y1 + 0.06, z + 0.03, gold);
   }
 }
@@ -456,7 +554,9 @@ function tree(G, t, rnd) {
   const greens = [0x3f6e2c, 0x4d7f2f, 0x36632a, 0x5a8a34, 0x47783a];
   const g = C(greens[Math.floor(rnd() * greens.length)]);
   const parts = [[0, 3.4, 0, 1.5, 1], [0.85, 3.0, 0.35, 1.1, 0.92], [-0.7, 3.1, -0.55, 1.15, 1.02], [-0.3, 3.0, 0.8, 1.0, 0.96], [0.55, 3.2, -0.75, 1.0, 1.0], [0.1, 4.3, -0.05, 1.05, 1.12]];
+  G.win = -8;
   for (const [dx, dy, dz, r, k] of parts) G.blob(t.x + dx * s, dy * s, t.z + dz * s, r * s, mul(g, k), rnd, 0.82, true);
+  G.win = 0;
 }
 
 // prism of n sides between two points
@@ -566,7 +666,127 @@ function statueGeo(G, s, rnd) {
   }
 }
 
-export function buildCity(map, quality) {
+function themed(b) {
+  if (!T.facades && !T.roofs) return b;
+  const fi = FACADES.indexOf(b.facade), ri = ROOFS[b.roof] ? ROOFS[b.roof].indexOf(b.roofCol) : -1;
+  return { ...b, facade: T.facades && fi >= 0 ? T.facades[fi] : b.facade, roofCol: T.roofs && ri >= 0 ? T.roofs[b.roof][ri] : b.roofCol };
+}
+
+// bulbs (and festival pennants / lanterns) strung across every street between facing sidewalk lamps
+function streetLights(G, map, rnd) {
+  const out = [];
+  const H = map.size / 2, E = map.edge;
+  const bulbCols = T.decor.bunting ? [0xff4a4a, 0xffd23a, 0x4ad2ff, 0x6aff7a, 0xff7ae0, 0xffa030] : [0xffd890, 0xffc060, 0xfff0c8];
+  const flagCols = [0xe0302c, 0xf2b31f, 0x2a7ae8, 0x2fb85a, 0xe85aa8, 0xffffff];
+  const string = (ax, az, bx, bz, ya = 6.4, yb = 6.4) => {
+    const L = Math.hypot(bx - ax, bz - az), n = Math.max(6, Math.round(L / 1.3));
+    const sag = Math.min(1.3, L * 0.06);
+    const P = (t) => [ax + (bx - ax) * t, ya + (yb - ya) * t - sag * 4 * t * (1 - t), az + (bz - az) * t];
+    const px = -(bz - az) / L, pz = (bx - ax) / L;
+    for (let k = 0; k < n; k++) {
+      const a = P(k / n), b = P((k + 1) / n);
+      G.quad([a[0] - px * 0.015, a[1], a[2] - pz * 0.015], [b[0] - px * 0.015, b[1], b[2] - pz * 0.015], [b[0] + px * 0.015, b[1] + 0.03, b[2] + pz * 0.015], [a[0] + px * 0.015, a[1] + 0.03, a[2] + pz * 0.015], IRON);
+      const m = P((k + 0.5) / n);
+      if (T.decor.bunting) {
+        G.win = -7;
+        const fc = C(flagCols[k % flagCols.length]);
+        const tri = [[a[0], a[1], a[2]], [b[0], b[1], b[2]], [m[0], m[1] - 1.0, m[2]]];
+        G.tri(tri[0], tri[1], tri[2], fc, 0.45); G.tri(tri[1], tri[0], tri[2], mul(fc, 0.85), 0.45);
+        G.win = 0;
+      }
+      if (T.decor.lanterns && k % 3 === 1) {
+        const lc = C([0xff4020, 0xff8a1a, 0xffc030][k % 3]);
+        G.cyl(m[0], m[2], m[1] - 1.05, m[1] - 0.15, 0.3, 0.34, 6, lc, { emit: 2.4, topCol: mul(lc, 0.4) });
+        continue;
+      }
+      if (k % 2 === 0) {
+        const c = C(bulbCols[(k >> 1) % bulbCols.length]), r = 0.17;
+        const y = m[1] - 0.08;
+        G.tri([m[0] - r, y, m[2]], [m[0], y, m[2] + r], [m[0], y + r * 1.4, m[2]], c, 3);
+        G.tri([m[0], y, m[2] + r], [m[0] + r, y, m[2]], [m[0], y + r * 1.4, m[2]], c, 3);
+        G.tri([m[0] + r, y, m[2]], [m[0], y, m[2] - r], [m[0], y + r * 1.4, m[2]], c, 3);
+        G.tri([m[0], y, m[2] - r], [m[0] - r, y, m[2]], [m[0], y + r * 1.4, m[2]], c, 3);
+        G.tri([m[0], y, m[2] + r], [m[0] - r, y, m[2]], [m[0], y - r * 1.4, m[2]], c, 3);
+        G.tri([m[0] + r, y, m[2]], [m[0], y, m[2] + r], [m[0], y - r * 1.4, m[2]], c, 3);
+        out.push(m[0], y, m[2]);
+      }
+    }
+  };
+  for (const r of map.roadsX) for (const bz of map.blocksZ) {
+    if (r.a < -H + E + 1 || r.b > H - E - 1) continue;
+    string(r.a - 1.2, bz.c, r.b + 1.2, bz.c);
+  }
+  for (const r of map.roadsZ) for (const bx of map.blocksX) {
+    if (r.a < -H + E + 1 || r.b > H - E - 1) continue;
+    string(bx.c, r.a - 1.2, bx.c, r.b + 1.2);
+  }
+  // festival: a canopy of strings from a mast over the grand fountain out to the plaza edge
+  const pz = map.plazas.find((p) => p.central);
+  if (T.decor.bunting && pz) {
+    G.cyl(pz.x, pz.z, 9.5, 12.5, 0.12, 0.08, 6, IRON, { top: false });
+    for (let i = 0; i < 10; i++) {
+      const a = (i + 0.5) / 10 * Math.PI * 2, rr = pz.r - 4;
+      string(pz.x + Math.cos(a) * 0.4, pz.z + Math.sin(a) * 0.4, pz.x + Math.cos(a) * rr, pz.z + Math.sin(a) * rr, 12.2, 5.8);
+    }
+  }
+  void rnd;
+  return out;
+}
+
+// sunny-day market: striped stalls along the edges of the open squares, parasols with café tables
+function market(G, map, rnd, props) {
+  const stripes = AWNINGS;
+  const stall = (x, z, rot, k) => {
+    const c = Math.cos(rot), s = Math.sin(rot);
+    const P = (u, y, v) => [x + u * c - v * s, y, z + u * s + v * c];
+    const box = (u0, v0, u1, v1, y0, y1, col) => {
+      const p = [P(u0, 0, v0), P(u1, 0, v0), P(u1, 0, v1), P(u0, 0, v1)];
+      const up = (q, y) => [q[0], y, q[2]];
+      G.quad(up(p[0], y1), up(p[3], y1), up(p[2], y1), up(p[1], y1), col);
+      for (let i = 0; i < 4; i++) { const a = p[i], b = p[(i + 1) % 4]; G.quad(up(b, y0), up(a, y0), up(a, y1), up(b, y1), mul(col, 0.82)); }
+    };
+    box(-1.2, -0.5, 1.2, 0.5, 0, 0.95, C(0x8a5a36));
+    for (const [u, v] of [[-1.15, -0.45], [1.15, -0.45], [-1.15, 0.45], [1.15, 0.45]]) box(u - 0.04, v - 0.04, u + 0.04, v + 0.04, 0.95, 2.3, C(0x5a3a24));
+    const goods = [0xe8402a, 0xf2a020, 0x6ab03a, 0xf4e0a0, 0xc0306a];
+    for (let i = 0; i < 4; i++) box(-1.0 + i * 0.52, -0.35, -0.62 + i * 0.52, 0.3, 0.95, 1.12 + (i % 2) * 0.06, C(goods[(i + k) % goods.length]));
+    const sc = stripes[k % stripes.length], n = 6;
+    for (let i = 0; i < n; i++) {
+      const u0 = -1.35 + 2.7 * i / n, u1 = -1.35 + 2.7 * (i + 1) / n, col = i % 2 ? sc : C(0xf4ecdc);
+      G.quad(P(u0, 2.3, -0.75), P(u0, 2.75, 0.0), P(u1, 2.75, 0.0), P(u1, 2.3, -0.75), mul(col, 0.92));
+      G.quad(P(u1, 2.3, 0.75), P(u1, 2.75, 0.0), P(u0, 2.75, 0.0), P(u0, 2.3, 0.75), col);
+    }
+    props.push(x, z, 1.4);
+  };
+  const parasol = (x, z, k) => {
+    const col = k % 2 ? AWNINGS[(k >> 1) % AWNINGS.length] : C(0xf4ecdc);
+    G.cyl(x, z, 0, 2.3, 0.04, 0.04, 4, C(0x6a6a6a), { top: false });
+    G.cyl(x, z, 1.9, 2.55, 1.45, 0.05, 8, col, { top: false, colFn: (i) => (i % 2 ? col : mix(col, C(0xffffff), 0.55)) });
+    G.cyl(x, z, 0, 0.74, 0.5, 0.5, 6, C(0xe8e2d4), { topCol: C(0xf0ece2) });
+    props.push(x, z, 0.8);
+  };
+  let k = 0;
+  for (const p of map.plazas) {
+    if (p.central) {
+      const r = p.r - 9;
+      for (let i = 0; i < 12; i++) {
+        const a = (i + 0.5) / 12 * Math.PI * 2;
+        if (Math.abs(Math.sin(2 * a)) > 0.95) continue;
+        stall(p.x + Math.cos(a) * r, p.z + Math.sin(a) * r, a + Math.PI / 2, k++);
+      }
+      for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.3; parasol(p.x + Math.cos(a) * 21, p.z + Math.sin(a) * 21, k++); }
+    } else {
+      for (let i = 0; i < 4; i++) {
+        const a = i * Math.PI / 2, rr = p.r - 7;
+        parasol(p.x + Math.cos(a) * rr, p.z + Math.sin(a) * rr, k++);
+        parasol(p.x + Math.cos(a + 0.18) * (rr - 2.6), p.z + Math.sin(a + 0.18) * (rr - 2.6), k++);
+      }
+    }
+  }
+  void rnd;
+}
+
+export function buildCity(map, quality, themeObj) {
+  setPalettes(themeObj || getTheme('evening'));
   const G = new GeoWriter(), D = new GeoWriter();
   const rnd = mulberry(map.seed * 31 + 7);
   const blds = [];
@@ -575,9 +795,12 @@ export function buildCity(map, quality) {
     if (b.outer && innerVerts < 0) innerVerts = G.verts;
     G.bld = D.bld = b.outer ? -1 : blds.length;
     if (!b.outer) blds.push({ x0: b.x - b.w / 2, z0: b.z - b.d / 2, x1: b.x + b.w / 2, z1: b.z + b.d / 2, top: b.h + 2, cut: 0, want: 0 });
-    building(G, D, b);
+    building(G, D, themed(b));
   }
   G.bld = D.bld = -1;
+  const props = [];
+  const bulbs = T.decor.lights ? streetLights(G, map, rnd) : [];
+  if (T.decor.market) market(G, map, rnd, props);
   const halos = [];
   for (const l of map.lamps) lamp(G, l, rnd, halos);
   for (const t of map.trees) tree(G, t, rnd);
@@ -638,7 +861,7 @@ export function buildCity(map, quality) {
   // lite draws the city without the facade/roof detail pass; medium reflects only the in-map buildings
   const range = (n) => { const g = new THREE.BufferGeometry(); for (const k of Object.keys(geometry.attributes)) g.setAttribute(k, geometry.getAttribute(k)); g.setDrawRange(0, n); return g; };
   const liteGeometry = range(baseVerts), reflCheap = range(innerVerts < 0 ? baseVerts : innerVerts);
-  return { geometry, reflGeometry, liteGeometry, reflCheap, halos: new Float32Array(halos), water, jets, verts: G.verts, baseVerts, blds };
+  return { geometry, reflGeometry, liteGeometry, reflCheap, halos: new Float32Array(halos), water, jets, verts: G.verts, baseVerts, blds, props, bulbs };
 }
 
 const CITY_VERT = /* glsl */`
@@ -650,6 +873,8 @@ uniform float uFlip;
 uniform float uTime;
 uniform sampler2D uCut;
 uniform float uCutN;
+uniform float uSnow;
+uniform float uWind;
 varying vec3 vCol;
 varying vec3 vW;
 varying vec3 vN;
@@ -660,10 +885,18 @@ void main() {
   vec3 w = (modelMatrix * vec4(position, 1.0)).xyz;
   vec3 n = normal;
   vW = w; vN = n; vTag = min(aWin, 0.0);
-  // buildings between the camera and the player's crowd sink to their ground floor
-  if (aBld > -0.5 && w.y > 4.45) {
+  // buildings between the camera and the player's crowd sink to their ground floor under a flat lid
+  bool isCap = aWin < -5.5 && aWin > -6.5;
+  if (aBld > -0.5 && (w.y > 4.45 || isCap)) {
     float cut = texture2D(uCut, vec2((aBld + 0.5) / uCutN, 0.5)).r;
-    w.y = mix(w.y, 4.45 + (w.y - 4.45) * 0.03, cut);
+    if (isCap) { if (cut < 0.02) w = vec3(0.0, -500.0, 0.0); }
+    else w.y = mix(w.y, 4.45, cut);
+  }
+  if (aWin < -6.5) {
+    float sway = aWin < -7.5 ? max(w.y - 2.2, 0.0) * 0.06 : 1.0;
+    float a = (0.03 + 0.2 * uWind) * sway;
+    w.x += sin(uTime * (1.6 + 2.5 * uWind) + w.x * 0.35 + w.z * 0.2) * a;
+    w.z += cos(uTime * (1.3 + 2.1 * uWind) + w.z * 0.31) * a * 0.6;
   }
   w.y *= uFlip;
   vec3 info = w.y < 7.0 ? sampleInfo(w.xz) : vec3(1.0, 0.0, 0.0);
@@ -679,6 +912,10 @@ void main() {
     float on = step(0.3, fract(uTime / (18.0 + aWin * 40.0) + aWin * 13.7));
     em *= on; base = mix(base * 0.1, base, on);
   } else if (aWin > 0.8) em *= 0.8 + 0.2 * sin(uTime * 7.0 + aWin * 90.0) * sin(uTime * 2.3 + aWin * 40.0);
+  if (uSnow > 0.0 && em < 0.05) {
+    float cover = smoothstep(0.32, 0.8, n.y) * uSnow * (aWin < -7.5 ? 0.9 : 1.0);
+    base = mix(base, vec3(0.86, 0.89, 0.97), cover);
+  }
   vec3 col = base * L * ao * (0.92 + 0.16 * h) + base * em;
   if (uFlip < 0.0) col = mix(col * 0.75, uReflSky, smoothstep(0.0, 9.0, hy) * 0.9);
   vCol = col;
@@ -690,6 +927,7 @@ void main() {
 
 const CITY_FRAG = /* glsl */`
 uniform float uFlip;
+${shaderCommon.safe}
 varying vec3 vCol;
 varying vec3 vW;
 varying vec3 vN;
@@ -722,7 +960,13 @@ float surface(float tag, vec3 p, vec3 n) {
 void main() {
   float a = 1.0;
   vec3 colIn = vCol;
-  if (vTag < -0.5 && uFlip > 0.0) colIn *= surface(vTag, vW, normalize(vN));
+  if (vTag < -0.5 && vTag > -4.5 && uFlip > 0.0) colIn *= surface(vTag, vW, normalize(vN));
+  else if (vTag < -5.5 && vTag > -6.5) {
+    float hv = (vW.x + vW.z) * 1.4, fw = fwidth(hv);
+    float hl = 1.0 - smoothstep(0.0, max(fw, 0.05), abs(fract(hv) - 0.5) - 0.38);
+    colIn *= 1.0 - 0.28 * hl * (1.0 - smoothstep(0.3, 0.7, fw));
+  }
+  colIn = safeTint(colIn, vW.xz);
   gl_FragColor = vec4(colIn, a);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
@@ -780,6 +1024,11 @@ export function createCutaway(blds) {
         }
       }
       if (dirty) tex.needsUpdate = true;
+    },
+    // is any in-map building between the camera and this disc? (ghost rings for hidden rivals)
+    hidden(cam, f) {
+      for (let i = 0; i < blds.length; i++) if (occludes(blds[i], cam, f, 0.8)) return true;
+      return false;
     },
     snap() { for (let i = 0; i < blds.length; i++) { blds[i].cut = blds[i].want; data[i * 4] = blds[i].cut * 255; } tex.needsUpdate = true; },
   };

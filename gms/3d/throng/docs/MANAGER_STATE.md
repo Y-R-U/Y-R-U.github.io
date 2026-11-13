@@ -77,3 +77,15 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 
 ## STATE @ 2026-11-13 20:50
 - G4 died on the limit again (was waiting on test arms); resumed alone via SendMessage. R4 stays paused until G4 lands (one at a time).
+
+## STATE @ 2026-11-13 (G4 landed and shipped; R4 running alone)
+- G4 landed. Manager verified in a clean release tree (HEAD + G4 files, committed renderer): sim_test + meta_test PASS, all 5 modes + menu boot with 0 errors. NOT re-run by the manager: net_test with G4's changes (G4 reports PASS).
+- Manager fixes: portrait menu header moved under the account row (sign-in callout was clipped over the coin pill) in css/ui.css; server/hub.go `plausible()` now accepts early ends for lcs/infection after 40 s (no unit test for that branch yet).
+- Commit e4f073ba pushed (gameplay + server files only; render files left uncommitted for R4). Static + server redeployed; health OK.
+- R4 (aabb406b96b7c7ef3) resumed and running ALONE. Its files: js/render/**, js/world/**, tools/render_*, docs/CONTRACT.md, docs/notes/R*.
+- New REVIEW decisions from G4 are in DECISIONS.md D14–D18.
+
+## NEXT (after R4)
+1. All suites + net_test, screenshots per theme, commit, push, rsync deploy.
+2. Hub card on games.br8t.com.
+3. Wave 5 (ONE agent at a time): blind-critic art pass, balance sweeps for the new modes (Teams blue bias 8/12, LCS circle, Infection), unit test for the lcs/infection plausibility branch, lobby shows the host's mode pick (server field), per-mode online boards, real-device checklist for Aaron.

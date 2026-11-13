@@ -22,7 +22,7 @@ export class GeoWriter {
     const V = [a, b, c], N = [na, nb, nc], Cc = [ca, cb, cc];
     for (let k = 0; k < 3; k++) {
       this.p.push(V[k][0], V[k][1], V[k][2]); this.n.push(N[k][0], N[k][1], N[k][2]);
-      this.c.push(Cc[k].r, Cc[k].g, Cc[k].b); this.e.push(0); this.w.push(0); this.b.push(this.bld);
+      this.c.push(Cc[k].r, Cc[k].g, Cc[k].b); this.e.push(0); this.w.push(this.win); this.b.push(this.bld);
       this._top(V[k][1]);
     }
   }

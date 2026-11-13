@@ -3,11 +3,20 @@ import { STRIDE } from './people.js';
 import { parseCosmetics } from './cosmetics.js';
 
 const GOLDEN = 2.399963229728653;
-const NEUTRAL_SHIRTS = [0xf4f3ef, 0xdcdcd8, 0xc3c6c9, 0xebe2d0, 0xa3a7ac, 0xffffff, 0xd2cbbd, 0x8d939b].map((h) => new THREE.Color(h));
+const NEUTRAL_DEFAULT = [0xf4f3ef, 0xdcdcd8, 0xc3c6c9, 0xebe2d0, 0xa3a7ac, 0xffffff, 0xd2cbbd, 0x8d939b].map((h) => new THREE.Color(h));
 const F_FREE = 0, F_CROWD = 1, F_NEUTRAL = 2, F_DYING = 3, F_ABSORB = 4;
+
+function normColor(hex) {
+  const col = new THREE.Color(hex);
+  const hsl = {}; col.getHSL(hsl, THREE.SRGBColorSpace);
+  col.setHSL(hsl.h, Math.max(0.85, hsl.s), Math.min(0.56, Math.max(0.46, hsl.l)), THREE.SRGBColorSpace);
+  return col;
+}
 
 export function createCrowdSystem(people, map) {
   const cap = people.capacity;
+  let NEUTRALS = NEUTRAL_DEFAULT;
+  const wave = new Float32Array(cap), pend = new Uint8Array(cap);
   const px = new Float32Array(cap), pz = new Float32Array(cap), py = new Float32Array(cap);
   const vx = new Float32Array(cap), vz = new Float32Array(cap);
   const yaw = new Float32Array(cap), phase = new Float32Array(cap), gait = new Float32Array(cap);
@@ -34,7 +43,7 @@ export function createCrowdSystem(people, map) {
 
   const crowds = [];
   const PC = 4, POFF = 200, PN = 100;
-  const props = Array.from({ length: PN * PN }, () => null);
+  let props = Array.from({ length: PN * PN }, () => null);
   const addProp = (x, z, r) => {
     const i0 = Math.floor((x - r + POFF) / PC), i1 = Math.floor((x + r + POFF) / PC);
     const j0 = Math.floor((z - r + POFF) / PC), j1 = Math.floor((z + r + POFF) / PC);
@@ -43,8 +52,13 @@ export function createCrowdSystem(people, map) {
       (props[j * PN + i] ||= []).push(x, z, r);
     }
   };
-  for (const t of map.trees || []) addProp(t.x, t.z, 0.45 + 0.35 * t.s);
-  for (const l of map.lamps || []) addProp(l.x, l.z, l.grand ? 0.75 : 0.4);
+  function baseProps(extra) {
+    props = Array.from({ length: PN * PN }, () => null);
+    for (const t of map.trees || []) addProp(t.x, t.z, 0.45 + 0.35 * t.s);
+    for (const l of map.lamps || []) addProp(l.x, l.z, l.grand ? 0.75 : 0.4);
+    if (extra) for (let k = 0; k < extra.length; k += 3) addProp(extra[k], extra[k + 1], extra[k + 2]);
+  }
+  baseProps(null);
   function propPush(f) {
     const i = Math.floor((px[f] + POFF) / PC), j = Math.floor((pz[f] + POFF) / PC);
     if (i < 0 || j < 0 || i >= PN || j >= PN) return;
@@ -95,12 +109,10 @@ export function createCrowdSystem(people, map) {
     crowds.length = 0;
     nCap = 0; lastTick = -1;
     for (const m of meta) {
-      const col = new THREE.Color(m.color);
-      const hsl = {}; col.getHSL(hsl, THREE.SRGBColorSpace);
-      col.setHSL(hsl.h, Math.max(0.85, hsl.s), Math.min(0.56, Math.max(0.46, hsl.l)), THREE.SRGBColorSpace);
+      const col = normColor(m.color);
       const cos = parseCosmetics(m);
       crowds[m.index] = {
-        index: m.index, color: col, figs: [], alive: false, cos,
+        index: m.index, color: col, ringCol: col.clone(), meta: { ...m }, figs: [], alive: false, cos,
         palette: cos.palette ? cos.palette.map((h) => new THREE.Color(h)) : null,
         hero: !!(cos.leader || cos.flag), onScreen: true, skip: 0,
         x: 0, z: 0, prevX: 0, prevZ: 0, curX: 0, curZ: 0, vx: 0, vz: 0, heading: 0,
@@ -110,6 +122,29 @@ export function createCrowdSystem(people, map) {
   }
 
   function crowdAt(i) { return crowds[i]; }
+
+  // change one crowd's colour / cosmetics mid-match; the new shirt colour runs through the crowd as a wave from `from`
+  function updateMeta(index, meta, from) {
+    const c = crowds[index];
+    if (!c || !meta) return false;
+    const m = { ...c.meta, ...meta, index };
+    c.meta = m;
+    const col = normColor(m.color);
+    const recolor = col.getHex() !== c.color.getHex() || JSON.stringify(m.palette || null) !== JSON.stringify(c.cos.palette || null);
+    c.color = col;
+    c.cos = parseCosmetics(m);
+    c.palette = c.cos.palette ? c.cos.palette.map((h) => new THREE.Color(h)) : null;
+    c.hero = !!(c.cos.leader || c.cos.flag);
+    if (!recolor) return true;
+    const ox = from && Number.isFinite(from.x) ? from.x : c.x, oz = from && Number.isFinite(from.z) ? from.z : c.z;
+    const span = Math.max(4, c.visR * 1.1);
+    for (const f of c.figs) {
+      const d = Math.sqrt((px[f] - ox) ** 2 + (pz[f] - oz) ** 2);
+      wave[f] = Math.min(1.4, d / span * 1.1) + Math.random() * 0.08;
+      pend[f] = 1;
+    }
+    return true;
+  }
 
   function joinCrowd(f, c, fromColor = true) {
     kind[f] = F_CROWD; owner[f] = c.index;
@@ -160,7 +195,7 @@ export function createCrowdSystem(people, map) {
     else {
       f = alloc(e.x, e.z);
       if (f < 0) return;
-      setColor(f, NEUTRAL_SHIRTS[Math.min(7, (look[f] * 8) | 0)], true);
+      setColor(f, NEUTRALS[Math.min(7, (look[f] * 8) | 0)], true);
     }
     if (c.figs.length < c.want + 4) joinCrowd(f, c); else absorbInto(f, c);
     flash[f] = 1; run[f] = 0.8; hop[f] = 0.3;
@@ -289,7 +324,7 @@ export function createCrowdSystem(people, map) {
         f = alloc(x, z, N.look ? N.look[s] / 255 : Math.random());
         if (f < 0) continue;
         kind[f] = F_NEUTRAL; nfig[s] = f;
-        setColor(f, NEUTRAL_SHIRTS[Math.min(7, (look[f] * 8) | 0)], true);
+        setColor(f, NEUTRALS[Math.min(7, (look[f] * 8) | 0)], true);
         yaw[f] = N.heading ? N.heading[s] : 0;
       }
       nState[s] = st;
@@ -306,7 +341,7 @@ export function createCrowdSystem(people, map) {
         const c = crowds[N.target[s]];
         if (c) {
           teamShade(c, look[f], shade);
-          const base = NEUTRAL_SHIRTS[Math.min(7, (look[f] * 8) | 0)];
+          const base = NEUTRALS[Math.min(7, (look[f] * 8) | 0)];
           tr[f] = base.r + (shade.r - base.r) * 0.3; tg[f] = base.g + (shade.g - base.g) * 0.3; tb[f] = base.b + (shade.b - base.b) * 0.3;
         }
       }
@@ -318,7 +353,7 @@ export function createCrowdSystem(people, map) {
       const c = crowds[sc.index];
       if (!c) continue;
       c.alive = sc.alive; c.count = sc.count; c.radius = sc.radius;
-      c.protect = sc.protect || 0; c.panic = sc.panic || 0; c.eating = sc.eating || 0;
+      c.protect = sc.protect || 0; c.panic = sc.panic || 0; c.eating = sc.eating || 0; c.horde = !!sc.horde; c.boost = sc.boost || 0;
       const nx = c.prevX + (c.curX - c.prevX) * alpha, nz = c.prevZ + (c.curZ - c.prevZ) * alpha;
       c.vx = Number.isFinite(sc.vx) ? sc.vx : (dt > 0 ? (nx - c.x) / dt : 0);
       c.vz = Number.isFinite(sc.vz) ? sc.vz : (dt > 0 ? (nz - c.z) / dt : 0);
@@ -443,7 +478,7 @@ export function createCrowdSystem(people, map) {
       }
     }
   }
-  function release(i) { kind[i] = F_FREE; scale[i] = 0; free.push(i); }
+  function release(i) { kind[i] = F_FREE; scale[i] = 0; pend[i] = 0; free.push(i); }
 
   function update(state, alpha, dt) {
     time += dt;
@@ -492,9 +527,10 @@ export function createCrowdSystem(people, map) {
     }
     const put = (i) => {
       const o = n * STRIDE;
+      const hc = owner[i] >= 0 && kind[i] === F_CROWD ? crowds[owner[i]] : null;
       const h = hop[i] > 0 ? Math.sin((hop[i] / 0.3) * Math.PI) * 0.35 : 0;
       d[o] = px[i]; d[o + 1] = Math.max(0, h); d[o + 2] = pz[i]; d[o + 3] = yaw[i];
-      d[o + 4] = phase[i] % 628.3185; d[o + 5] = gait[i]; d[o + 6] = hatOf[i] + Math.min(look[i], 0.999); d[o + 7] = flash[i];
+      d[o + 4] = phase[i] % 628.3185; d[o + 5] = gait[i] + (hc && hc.horde ? 2 : 0); d[o + 6] = hatOf[i] + Math.min(look[i], 0.999); d[o + 7] = flash[i];
       d[o + 8] = cr[i]; d[o + 9] = cg[i]; d[o + 10] = cb[i]; d[o + 11] = scale[i];
       n++;
     };
@@ -507,6 +543,14 @@ export function createCrowdSystem(people, map) {
       if (run[i] > 0) run[i] = Math.max(0, run[i] - dt);
       flash[i] *= fl;
       hop[i] = Math.max(0, hop[i] - dt);
+      if (pend[i]) {
+        wave[i] -= dt;
+        if (wave[i] <= 0) {
+          pend[i] = 0;
+          const oc = owner[i] >= 0 ? crowds[owner[i]] : null;
+          if (oc && (k === F_CROWD || k === F_ABSORB)) { setColor(i, teamShade(oc, look[i], shade), false); flash[i] = Math.max(flash[i], 0.6); hop[i] = 0.25; }
+        }
+      }
       cr[i] += (tr[i] - cr[i]) * cl; cg[i] += (tg[i] - cg[i]) * cl; cb[i] += (tb[i] - cb[i]) * cl;
       if (scale[i] < 0.01) continue;
       if (!inView(px[i], pz[i])) { culled++; continue; }
@@ -544,6 +588,12 @@ export function createCrowdSystem(people, map) {
     setCrowds, update, write, crowdAt, crowds, stats, setView, inView, leaderState,
     onRecruit, onSteal, onElim, onRespawn,
     setBudget(b) { budget = b; },
+    updateMeta,
+    setProps(extra) { baseProps(extra); },
+    setNeutralPalette(list) {
+      NEUTRALS = list ? list.map((h) => new THREE.Color(h)) : NEUTRAL_DEFAULT;
+      for (let i = 0; i < hi; i++) if (kind[i] === F_NEUTRAL) setColor(i, NEUTRALS[Math.min(7, (look[i] * 8) | 0)], true);
+    },
     setFigScale(v) { figScale = v; },
     figPos(f) { return [px[f], pz[f]]; },
   };

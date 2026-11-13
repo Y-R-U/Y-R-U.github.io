@@ -108,6 +108,30 @@ Rules for M1 (all numbers in `js/config.js`, tune freely):
 - Pickups respawn on a timer. `double` multiplies recruits, not existing members.
 - Leaders and pedestrians collide with `map.obstacles`; crowds do not (the disc may overhang).
 
+### Game modes (M4, lane G)
+
+`createSim({ ..., mode })` with `mode` one of `classic | teams | koth | lcs | infection` (`CONFIG.MODES` holds every
+knob; `duration` defaults to the mode's). `classic` is the M1–M3 rules bit for bit (sim_test pins the stub-map hash).
+Extra state the renderer and HUD may read:
+
+```js
+state.mode
+state.zone = { x, z, r, holder }, state.zoneNext, state.zoneT     // koth: crown zone, the next one (last 6 s), seconds to the move
+state.circle = { x, z, r, nx, nz, nr, shrinkIn, stage, tx, tz }    // lcs: safe circle now and the one it shrinks to
+state.teams = [{ team, name, color, score }]                       // teams: score = sum of the side's counts
+state.endReason                                                    // '' (time) | 'last' (lcs) | 'horde' (infection)
+crowd.team, crowd.score, crowd.out (lcs, no respawn), crowd.horde (infection), crowd.infections, crowd.boost (teams)
+```
+
+New events: `bleed {crowd, n}` (lcs: people lost outside the circle), `infect {crowd, by}` (crowd joined the horde),
+`zone {x, z, r}` (koth: the zone moved), `shrink {stage, r}` (lcs), and online only `emote {crowd, id}`. `elim.by` is
+`-1` when a crowd bled out. Rank in a mode follows the mode's score (teams: team score first), so `state.leader` and
+the crown follow the mode's leader.
+
+Renderer calls lane G makes when the renderer has them (all optional, checked before each call):
+`setZones([{ x, z, r, color, style: 'crown'|'next'|'safe'|'safe-next' }])`, `setTheme(id)`, `setWeather(id)`,
+`updateCrowdMeta(index, meta, { from: { x, z } })`. Without `setZones` the HUD draws the rings itself with `project()`.
+
 Bots live in `js/sim/bots.js` and drive crowds only through `setInput` — exactly what a network
 player will do in M3.
 
@@ -174,6 +198,51 @@ Behaviour:
 Renderer extras added in R3:
 - `stats()` also returns `hats`, `heroes`, `culled` (figures outside the view, not uploaded) and `uploadKB` (instance bytes per frame).
 - It also returns `ms`: `{ update, write, other, submit }` (EMA ms of the renderer's JS stages).
+
+### Themes, weather, zones, mid-match recolour (R4)
+
+All optional; callers should feature-test (`if (r.setZones) ...`). Unknown ids are ignored.
+
+```js
+r.setTheme(id) → id in effect     // 'evening' (default) | 'night-neon' | 'snow' | 'sunny-day' | 'festival'
+r.setWeather(id) → id in effect   // 'clear' | 'rain' | 'fog' | 'wind' | 'snow';  null/unknown = the theme's own default
+r.themes() / r.weathers()          // the id lists
+r.setZones(zones)                  // replaces the whole set; [] clears (zones fade out)
+r.updateCrowdMeta(index, meta, { from: { x, z } }?) → bool
+r.setCameraMode('showcase' | 'follow', { theme?, cycle? })
+```
+
+- **setTheme** rebuilds the city and ground for the same `generateMap` layout (obstacles, spawns, plazas and streets are
+  untouched; dressing is visual only). It costs about 0.2 s on an M5 (expect 0.5–1 s on a phone), so call it before a match
+  or behind a screen. Crowds, camera and zones survive it. Themes set lighting, palettes and dressing: night-neon (neon
+  fascias, strip lights, blade signs, roof billboards, coloured light pools, very wet streets), snow (snow on every
+  up-facing surface, trodden slush where crowds walk, string lights over every street, dark winter-coat pedestrians,
+  falling snow by default), sunny-day (high sun with crisp shadows, Mediterranean palette, lamps off, window flower
+  boxes, awnings everywhere, market stalls and parasols on the plazas; followers step around the stalls), festival
+  (evening light, colourful facades, bunting and lanterns over every street, a festoon canopy over the central plaza,
+  confetti, fireworks at the `phase: over` event).
+- **setWeather** is independent of theme and cheap (no rebuild): rain (streaks, puddle ripples, wetter and darker,
+  splashes under running crowds), fog (fog starts just past the player's crowd, lamp halos grow), wind (blowing leaves and
+  paper, flags and banners flap harder, trees sway), snow (falling snow). The snow theme defaults to `snow`; the others to
+  `clear`. Weather is one extra draw on medium/high and uses the shared particle pool on lite (no extra draw).
+- **Test override:** `?theme=<id>` and/or `?weather=<id>` on the page URL win over every `setTheme`/`setWeather` call
+  (a forced theme also keeps its own default weather), so the real game and the harness can be shot in any look.
+- **setZones** shape: `[{ id?, x, z, r, color?: 0xRRGGBB, style, progress?: 0..1 }]`.
+  `style`: `'crown'` gold rim, slow rays, soft column of light; `'capture'` like crown with a bright arc showing `progress`
+  (send `progress` and include it in your change key); `'safe'` a wall of light at `r` with hazard stripes outside, and
+  everything outside the circle (ground and buildings fully, figures lightly so team colours still read) desaturated and red-tinted;
+  `'danger'` red hazard disc; `'next'` and `'safe-next'` dashed previews of the next crown zone / next safe circle.
+  Zones are matched by `id` (default `<style><index>`), so moving or resizing one between calls glides instead of jumping;
+  new zones fade in, missing ones fade out. Only the first `safe` zone tints the world. Cost: the floors ride in the ring
+  draw (free); walls/columns are one draw for all zones on medium/high and are skipped on lite.
+- **updateCrowdMeta** merges `meta` (any `setCrowds` field: name, color, palette, hat, leader, flag, trail, ring) into
+  that crowd only. Nothing else is rebuilt and the camera does not move. A colour change runs through the crowd as a
+  wave from `opts.from` (default: the crowd's leader) over about 1 s, each figure flipping with a flash and a hop; the ring
+  colour blends over ~0.5 s. Late joiners and Infection both use this.
+- **Showcase:** a slow continuous orbit at a lower pitch, framing the central plaza pulled toward the biggest crowds.
+  `{ theme }` sets a theme; `{ cycle: true }` steps through all themes every 14 s with a short fade (each step is a rebuild).
+- Also new: a crowd hidden behind a block shows a ghost of its ring and area through the building (medium/high);
+  `state.crowds[i].remote` adds a pulsing inner ring to other humans' crowds; `stats()` reports `theme`, `weather`, `zones`.
 
 ## Test hooks (lane G wires, both lanes use)
 

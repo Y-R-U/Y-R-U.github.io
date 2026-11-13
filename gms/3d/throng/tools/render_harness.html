@@ -79,11 +79,37 @@ if (at) {
   c0.x = c0.px = at[0]; c0.z = c0.pz = at[1]; c0.vx = c0.vz = 0;
   if (sim.pin) sim.pin(0, at[0], at[1]);
 }
+// probe=plaza|road: all 8 team crowds (120 each) in a row on the central plaza or along a street, for contrast checks
+if (P.has('probe')) {
+  const road = P.get('probe') === 'road';
+  const pz = map.plazas[0], rx = map.roadsX[1];
+  sim.state.crowds.forEach((c, i) => {
+    const x = road ? rx.c : pz.x + 14 + (i % 2) * 14, z = road ? -42 + i * 12 : pz.z - 25 + Math.floor(i / 2) * 15;
+    c.count = 120; c.radius = 0.55 * Math.sqrt(120); c.x = c.px = x; c.z = c.pz = z; c.vx = c.vz = 0; c.alive = true;
+    if (sim.pin) sim.pin(i, x, z);
+  });
+  r.setFixedCamera(road ? { x: rx.c, z: -2, d: 95 } : { x: pz.x + 21, z: pz.z - 3, d: 90 });
+}
 // close=d frames the player crowd from a fixed camera at distance d (pitch=deg optional)
 if (P.has('close')) {
   const c0 = sim.state.crowds[0];
   r.setFixedCamera({ x: c0.x, z: c0.z, d: num('close', 14), pitch: P.has('pitch') ? num('pitch', 50) * Math.PI / 180 : undefined });
 }
+// zones=crown,safe,capture,danger|all: demo zones (the safe circle shrinks); recolor=i: crowd i turns the player's colour after 2.5 s
+const zoneKinds = P.has('zones') ? (P.get('zones') === 'all' ? ['crown', 'safe', 'capture', 'danger'] : P.get('zones').split(',')) : [];
+const pl = map.plazas;
+function demoZones(t) {
+  const out = [];
+  for (const k of zoneKinds) {
+    if (k === 'crown') out.push({ id: 'crown', style: 'crown', x: pl[1 % pl.length].x, z: pl[1 % pl.length].z, r: 12 });
+    if (k === 'capture') out.push({ id: 'cap', style: 'capture', x: pl[2 % pl.length].x, z: pl[2 % pl.length].z, r: 10, color: 0x2f7bff, progress: (t * 0.08) % 1 });
+    if (k === 'safe') out.push({ id: 'safe', style: 'safe', x: pl[0].x + 10, z: pl[0].z - 6, r: Math.max(40, 95 - t * 1.2) });
+    if (k === 'danger') out.push({ id: 'dng', style: 'danger', x: pl[0].x - 30, z: pl[0].z + 26, r: 9 });
+  }
+  return out;
+}
+if (P.has('recolor')) setTimeout(() => r.updateCrowdMeta(+P.get('recolor'), { color: meta[0].color }), 2500);
+let zoneT = num('zt', 0);
 const keys = new Set();
 addEventListener('keydown', (e) => keys.add(e.key.toLowerCase()));
 addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
@@ -111,6 +137,9 @@ function loop(now) {
     while (acc >= SIM_DT) { sim.step(); acc -= SIM_DT; }
   }
   if (P.has('close')) { const c0 = sim.state.crowds[0]; r.setFixedCamera({ x: c0.x, z: c0.z, d: num('close', 14), pitch: P.has('pitch') ? num('pitch', 50) * Math.PI / 180 : undefined }); }
+  if (zoneKinds.length) { zoneT += paused ? 0 : dt; r.setZones(demoZones(zoneT)); }
+  // horde=i,j marks Infection horde crowds; boost=i,j keeps the Teams merge boost on
+  for (const k of ['horde', 'boost']) if (P.has(k)) for (const i of P.get(k).split(',').map(Number)) { const c = sim.state.crowds[i]; if (c) c[k] = k === 'horde' ? true : 1; }
   const t0 = performance.now();
   r.frame(sim.state, sim.drainEvents(), dt, paused ? 1 : acc / SIM_DT);
   const ms = performance.now() - t0;

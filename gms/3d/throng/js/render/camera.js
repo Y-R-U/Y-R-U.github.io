@@ -42,7 +42,7 @@ export function createCameraRig(camera) {
     update(dt, focus, aspect) {
       dt = Math.min(dt, 0.1);
       const R = Math.max(1, focus.radius || 1);
-      rig.pitch = rig.showcase ? 0.8 : THREE.MathUtils.lerp(0.88, 1.04, smooth(20, 150, rig.d));
+      rig.pitch = rig.showcase ? 0.7 : THREE.MathUtils.lerp(0.88, 1.04, smooth(20, 150, rig.d));
       const f = fit(R, aspect);
       let lx = (focus.vx || 0) * 0.9, lz = (focus.vz || 0) * 0.9;
       const ll = Math.hypot(lx, lz), lmax = 0.35 * f.V;
@@ -63,7 +63,7 @@ export function createCameraRig(camera) {
       if (rig.endOn) rig.end = Math.min(1, rig.end + dt / 4);
       const e = smooth(0, 1, rig.end);
       let d = rig.d * (1 + 0.16 * rig.p) * (1 - 0.4 * e);
-      let yaw = rig.yaw + 0.22 * e + (rig.yawDrift ? 0.6 * Math.sin(rig.yawDrift) : 0);
+      let yaw = rig.yaw + 0.22 * e + (rig.orbit || 0);
       let pitch = rig.pitch - 0.1 * e;
       let tx = rig.tx + rig.ex, tz = rig.tz + rig.ez;
       if (rig.fixed) { d = rig.fixed.d; tx = rig.fixed.x; tz = rig.fixed.z; yaw = rig.fixed.yaw ?? yaw; pitch = rig.fixed.pitch ?? pitch; }

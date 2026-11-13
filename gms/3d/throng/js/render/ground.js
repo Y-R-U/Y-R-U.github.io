@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { shaderCommon, fogUniforms } from './shared.js';
 
 const EXT = 150;
+const EVE_LAWN = '#4c6a30';
 
 function canvas(n) {
   const c = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(n, n) : Object.assign(document.createElement('canvas'), { width: n, height: n });
@@ -12,19 +13,19 @@ function canvas(n) {
 
 function rectPath(ctx, x0, z0, x1, z1) { ctx.beginPath(); ctx.rect(x0, z0, x1 - x0, z1 - z0); }
 
-function paintColour(map, n, sunXZ) {
+function paintColour(map, n, P) {
   const { c, ctx } = canvas(n);
   const H = map.size / 2, E = map.edge;
-  ctx.fillStyle = '#343238'; ctx.fillRect(-EXT, -EXT, EXT * 2, EXT * 2);
+  ctx.fillStyle = P.base; ctx.fillRect(-EXT, -EXT, EXT * 2, EXT * 2);
   // outer streets beyond the perimeter
-  ctx.fillStyle = '#6a645e';
+  ctx.fillStyle = P.outerSt;
   for (const b of map.buildings) if (b.outer) { rectPath(ctx, b.x - b.w / 2 - 3, b.z - b.d / 2 - 3, b.x + b.w / 2 + 3, b.z + b.d / 2 + 3); ctx.fill(); }
-  ctx.fillStyle = '#44464f'; ctx.fillRect(-H + E, -H + E, (H - E) * 2, (H - E) * 2);
+  ctx.fillStyle = P.asphalt; ctx.fillRect(-H + E, -H + E, (H - E) * 2, (H - E) * 2);
   // lane markings
   for (const [roads, axis] of [[map.roadsX, 'x'], [map.roadsZ, 'z']]) {
     roads.forEach((r, idx) => {
       const boulevard = r.w > 19.5;
-      ctx.strokeStyle = 'rgba(232,190,90,0.75)'; ctx.lineWidth = 0.18;
+      ctx.strokeStyle = P.lane; ctx.lineWidth = 0.18;
       ctx.setLineDash(boulevard ? [] : [2.4, 2.2]);
       const offs = boulevard ? [-0.25, 0.25] : [0];
       for (const o of offs) {
@@ -33,7 +34,7 @@ function paintColour(map, n, sunXZ) {
         ctx.stroke();
       }
       ctx.setLineDash([]);
-      ctx.strokeStyle = 'rgba(230,226,215,0.35)'; ctx.lineWidth = 0.14;
+      ctx.strokeStyle = P.edge; ctx.lineWidth = 0.14;
       for (const o of [-r.w / 2 + 1.2, r.w / 2 - 1.2]) {
         ctx.beginPath();
         if (axis === 'x') { ctx.moveTo(r.c + o, -H + E); ctx.lineTo(r.c + o, H - E); } else { ctx.moveTo(-H + E, r.c + o); ctx.lineTo(H - E, r.c + o); }
@@ -43,10 +44,10 @@ function paintColour(map, n, sunXZ) {
     });
   }
   // intersections: clear markings
-  ctx.fillStyle = '#44464f';
+  ctx.fillStyle = P.asphalt;
   for (const rx of map.roadsX) for (const rz of map.roadsZ) ctx.fillRect(rx.a, rz.a, rx.w, rz.w);
   // crossings
-  ctx.fillStyle = 'rgba(236,232,222,0.85)';
+  ctx.fillStyle = P.zebra;
   for (const cr of map.crossings) {
     if (cr.dir === 'x') { for (let z = cr.z - cr.d / 2; z < cr.z + cr.d / 2 - 0.3; z += 1.1) ctx.fillRect(cr.x - cr.w / 2, z, cr.w, 0.6); }
     else { for (let x = cr.x - cr.w / 2; x < cr.x + cr.w / 2 - 0.3; x += 1.1) ctx.fillRect(x, cr.z - cr.d / 2, 0.6, cr.d); }
@@ -55,19 +56,19 @@ function paintColour(map, n, sunXZ) {
   const bx = map.blocksX, bz = map.blocksZ;
   const c0x = bx[1].a, c1x = bx[2].b, c0z = bz[1].a, c1z = bz[2].b;
   const cx = (c0x + c1x) / 2, cz = (c0z + c1z) / 2, cr = Math.min(c1x - c0x, c1z - c0z) / 2;
-  ctx.fillStyle = '#8d8273'; ctx.fillRect(c0x, c0z, c1x - c0x, c1z - c0z);
-  ctx.strokeStyle = '#8f816c'; ctx.lineWidth = 1.2; ctx.strokeRect(c0x + 2.5, c0z + 2.5, c1x - c0x - 5, c1z - c0z - 5);
+  ctx.fillStyle = P.central; ctx.fillRect(c0x, c0z, c1x - c0x, c1z - c0z);
+  ctx.strokeStyle = P.centralLine; ctx.lineWidth = 1.2; ctx.strokeRect(c0x + 2.5, c0z + 2.5, c1x - c0x - 5, c1z - c0z - 5);
   for (let r = cr - 4, k = 0; r > 8; r -= 2.6, k++) {
-    ctx.strokeStyle = k % 2 ? '#9b8f7c' : '#7a6f60';
+    ctx.strokeStyle = k % 2 ? P.ringA : P.ringB;
     ctx.lineWidth = k % 3 === 0 ? 0.9 : 0.35;
     ctx.beginPath(); ctx.arc(cx, cz, r, 0, Math.PI * 2); ctx.stroke();
   }
-  ctx.strokeStyle = 'rgba(120,106,88,0.7)'; ctx.lineWidth = 0.3;
+  ctx.strokeStyle = P.spoke; ctx.lineWidth = 0.3;
   for (let k = 0; k < 32; k++) {
     const a = k * Math.PI / 16;
     ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * 8.5, cz + Math.sin(a) * 8.5); ctx.lineTo(cx + Math.cos(a) * (cr - 4), cz + Math.sin(a) * (cr - 4)); ctx.stroke();
   }
-  ctx.fillStyle = 'rgba(163,150,127,0.45)';
+  ctx.fillStyle = P.star;
   for (let k = 0; k < 8; k++) {
     const a = k * Math.PI / 4;
     ctx.beginPath();
@@ -82,36 +83,36 @@ function paintColour(map, n, sunXZ) {
     if (b.kind === 'central') continue;
     const x0 = b.x - b.w / 2, z0 = b.z - b.d / 2;
     if (b.kind === 'park') {
-      ctx.fillStyle = '#736c66'; ctx.fillRect(x0, z0, b.w, b.d);
-      ctx.fillStyle = '#4c6a30'; ctx.fillRect(x0 + 3, z0 + 3, b.w - 6, b.d - 6);
+      ctx.fillStyle = P.walk; ctx.fillRect(x0, z0, b.w, b.d);
+      ctx.fillStyle = P.lawn; ctx.fillRect(x0 + 3, z0 + 3, b.w - 6, b.d - 6);
       for (let k = 0; k < 60; k++) {
-        ctx.fillStyle = `rgba(${70 + (k * 37) % 40},${100 + (k * 53) % 40},${40 + (k * 17) % 20},0.35)`;
+        ctx.fillStyle = P.lawn === EVE_LAWN ? `rgba(${70 + (k * 37) % 40},${100 + (k * 53) % 40},${40 + (k * 17) % 20},0.35)` : 'rgba(255,255,255,0.08)';
         ctx.beginPath(); ctx.arc(x0 + 3 + ((k * 97) % 100) / 100 * (b.w - 6), z0 + 3 + ((k * 61) % 100) / 100 * (b.d - 6), 1.5 + (k % 4), 0, Math.PI * 2); ctx.fill();
       }
-      ctx.strokeStyle = '#a3967f'; ctx.lineWidth = 2.6;
+      ctx.strokeStyle = P.path; ctx.lineWidth = 2.6;
       ctx.beginPath(); ctx.arc(b.x, b.z, Math.min(b.w, b.d) * 0.3, 0, Math.PI * 2); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(x0 + 3, z0 + 3); ctx.lineTo(x0 + b.w - 3, z0 + b.d - 3); ctx.moveTo(x0 + b.w - 3, z0 + 3); ctx.lineTo(x0 + 3, z0 + b.d - 3); ctx.stroke();
-      ctx.fillStyle = '#a3967f'; ctx.beginPath(); ctx.arc(b.x, b.z, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = P.path; ctx.beginPath(); ctx.arc(b.x, b.z, 6, 0, Math.PI * 2); ctx.fill();
     } else if (b.kind === 'plaza' || b.kind === 'square') {
-      ctx.fillStyle = '#887d6d'; ctx.fillRect(x0, z0, b.w, b.d);
-      ctx.strokeStyle = '#8a7d68'; ctx.lineWidth = 0.8; ctx.strokeRect(x0 + 2.2, z0 + 2.2, b.w - 4.4, b.d - 4.4);
+      ctx.fillStyle = P.plaza; ctx.fillRect(x0, z0, b.w, b.d);
+      ctx.strokeStyle = P.plazaLine; ctx.lineWidth = 0.8; ctx.strokeRect(x0 + 2.2, z0 + 2.2, b.w - 4.4, b.d - 4.4);
       const r0 = Math.min(b.w, b.d) / 2 - 3;
       for (let r = r0, k = 0; r > 5; r -= 1.8, k++) {
-        ctx.strokeStyle = k % 2 ? '#988c79' : '#776c5d'; ctx.lineWidth = 0.3;
+        ctx.strokeStyle = k % 2 ? P.pRingA : P.pRingB; ctx.lineWidth = 0.3;
         ctx.beginPath(); ctx.arc(b.x, b.z, r, 0, Math.PI * 2); ctx.stroke();
       }
-      ctx.fillStyle = '#9d9080';
+      ctx.fillStyle = P.dot;
       for (let k = 0; k < 4; k++) {
         const a = Math.PI / 4 + k * Math.PI / 2;
         ctx.beginPath(); ctx.arc(b.x + Math.cos(a) * r0 * 0.7, b.z + Math.sin(a) * r0 * 0.7, 1.6, 0, Math.PI * 2); ctx.fill();
       }
     } else {
-      ctx.fillStyle = '#736c66'; ctx.fillRect(x0, z0, b.w, b.d);
-      ctx.fillStyle = '#2b2826'; ctx.fillRect(x0 + map.sidewalk, z0 + map.sidewalk, b.w - map.sidewalk * 2, b.d - map.sidewalk * 2);
+      ctx.fillStyle = P.walk; ctx.fillRect(x0, z0, b.w, b.d);
+      ctx.fillStyle = P.yard; ctx.fillRect(x0 + map.sidewalk, z0 + map.sidewalk, b.w - map.sidewalk * 2, b.d - map.sidewalk * 2);
     }
   }
   // perimeter terrace sidewalk
-  ctx.fillStyle = '#736c66';
+  ctx.fillStyle = P.walk;
   ctx.fillRect(-H, -H, H * 2, E); ctx.fillRect(-H, H - E, H * 2, E); ctx.fillRect(-H, -H, E, H * 2); ctx.fillRect(H - E, -H, E, H * 2);
   // contact darkening around building bases
   ctx.lineJoin = 'round';
@@ -124,7 +125,6 @@ function paintColour(map, n, sunXZ) {
   for (const f of map.fountains) {
     ctx.fillStyle = 'rgba(30,22,26,0.25)'; ctx.beginPath(); ctx.arc(f.x, f.z, f.r + (f.kind === 'grand' ? 2.2 : 1), 0, Math.PI * 2); ctx.fill();
   }
-  void sunXZ;
   return c;
 }
 
@@ -260,9 +260,59 @@ function paintInfo(map, n, sunDir) {
   return out;
 }
 
-export function buildGround(map, shared, quality) {
+// coloured light on the ground: lamp pools in the theme's lamp colour, shop-window spill (neon on night-neon)
+function paintSpill(map, n, T) {
+  const { c, ctx } = canvas(n);
+  ctx.fillStyle = '#000'; ctx.fillRect(-EXT, -EXT, EXT * 2, EXT * 2);
+  if (!T.lampsOn) return c;
+  ctx.globalCompositeOperation = 'lighter';
+  const lc = T.lamp, mx = Math.max(lc[0], lc[1], lc[2]);
+  const rgb = (r, g, b, a) => `rgba(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)},${a})`;
+  const L = (a) => rgb(lc[0] / mx, lc[1] / mx, lc[2] / mx, a);
+  for (const l of map.lamps) {
+    const r = l.grand ? 11 : 12;
+    const g = ctx.createRadialGradient(l.x, l.z, 0, l.x, l.z, r);
+    g.addColorStop(0, L(0.85)); g.addColorStop(0.3, L(0.4)); g.addColorStop(0.65, L(0.12)); g.addColorStop(1, L(0));
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(l.x, l.z, r, 0, Math.PI * 2); ctx.fill();
+  }
+  for (const b of map.buildings) {
+    if (b.outer) continue;
+    let sc = [1.0, 0.72, 0.42];
+    if (T.signs) { const h = T.signs[b.seed % T.signs.length]; sc = [(h >> 16 & 255) / 255, (h >> 8 & 255) / 255, (h & 255) / 255]; }
+    const S = T.signs ? 11 : 8, a0 = T.signs ? 1.0 : 0.42;
+    const x0 = b.x - b.w / 2, x1 = b.x + b.w / 2, z0 = b.z - b.d / 2, z1 = b.z + b.d / 2;
+    const strip = (ax0, az0, ax1, az1, gx0, gz0, gx1, gz1) => {
+      const g = ctx.createLinearGradient(gx0, gz0, gx1, gz1);
+      g.addColorStop(0, rgb(sc[0], sc[1], sc[2], a0)); g.addColorStop(0.4, rgb(sc[0], sc[1], sc[2], a0 * 0.38)); g.addColorStop(1, rgb(sc[0], sc[1], sc[2], 0));
+      ctx.fillStyle = g; ctx.fillRect(ax0, az0, ax1 - ax0, az1 - az0);
+    };
+    if (b.ext.s) strip(x0, z1, x1, z1 + S, 0, z1, 0, z1 + S);
+    if (b.ext.n) strip(x0, z0 - S, x1, z0, 0, z0, 0, z0 - S);
+    if (b.ext.e) strip(x1, z0, x1 + S, z1, x1, 0, x1 + S, 0);
+    if (b.ext.w) strip(x0 - S, z0, x0, z1, x0, 0, x0 - S, 0);
+  }
+  for (const f of map.fountains) {
+    const r = f.r * 1.9;
+    const g = ctx.createRadialGradient(f.x, f.z, f.r * 0.8, f.x, f.z, r);
+    g.addColorStop(0, 'rgba(120,190,255,0.3)'); g.addColorStop(1, 'rgba(120,190,255,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(f.x, f.z, r, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  return c;
+}
+
+export function buildGround(map, shared, quality, T) {
   const cn = quality === 'lite' ? 1024 : 2048;
-  const col = paintColour(map, cn);
+  const col = paintColour(map, cn, T.g);
+  const spill = new THREE.CanvasTexture(paintSpill(map, 512, T));
+  spill.flipY = false;
+  spill.minFilter = THREE.LinearFilter; spill.generateMipmaps = false;
+  // where crowds have walked (snow): R8 over the playable square, stamped from the renderer
+  const TN = 256, trodData = new Uint8Array(TN * TN);
+  const trod = new THREE.DataTexture(trodData, TN, TN, THREE.RedFormat);
+  trod.magFilter = trod.minFilter = THREE.LinearFilter;
+  trod.needsUpdate = true;
+  const half = map.size / 2;
   const tex = new THREE.CanvasTexture(col);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.flipY = false;
@@ -271,6 +321,7 @@ export function buildGround(map, shared, quality) {
   tex.minFilter = THREE.LinearMipmapLinearFilter;
   const n = 1024;
   const info = paintInfo(map, n, shared.uSunDir.value);
+  if (!T.lampsOn) for (let i = 2; i < info.length; i += 4) info[i] = 0;
   const itex = new THREE.DataTexture(info, n, n, THREE.RGBAFormat);
   itex.magFilter = itex.minFilter = THREE.LinearFilter;
   itex.flipY = false;
@@ -286,8 +337,12 @@ export function buildGround(map, shared, quality) {
       uMapXf: { value: new THREE.Vector4(-EXT, -EXT, 1 / (2 * EXT), 1 / (2 * EXT)) },
       uRefl: { value: 1 },
       uHalf: { value: map.size / 2 },
-      uSkyRefl: { value: new THREE.Color(0.55, 0.42, 0.45) },
-      uOuter: { value: new THREE.Color(0x3a3638).convertSRGBToLinear() },
+      uSkyRefl: { value: new THREE.Color(T.skyRefl[0], T.skyRefl[1], T.skyRefl[2]) },
+      uOuter: { value: new THREE.Color(T.outer).convertSRGBToLinear() },
+      uSpill: { value: spill },
+      uSpillK: { value: T.lampsOn ? Math.max(T.lamp[0], T.lamp[1], T.lamp[2]) * T.lamp[3] : 0 },
+      uTrod: { value: trod },
+      uTrodK: { value: T.snow > 0 ? 1 : 0 },
     },
   });
   const geo = new THREE.PlaneGeometry(1600, 1600);
@@ -298,7 +353,27 @@ export function buildGround(map, shared, quality) {
   return {
     mesh, colorTex: tex, infoTex: itex,
     setReflect(on) { mat.uniforms.uRefl.value = on ? 1 : 0; mat.transparent = !!on; mat.needsUpdate = true; },
-    dispose() { geo.dispose(); mat.dispose(); tex.dispose(); itex.dispose(); },
+    // stamp crowd discs into the trodden-snow mask
+    stamp(crowds, dt) {
+      if (!mat.uniforms.uTrodK.value) return;
+      let dirty = false;
+      const k = Math.min(1, dt * 2.2) * 255;
+      for (const c of crowds) {
+        if (!c || !c.alive) continue;
+        const R = Math.max(1.2, c.visR * 0.85), sc = TN / map.size;
+        const cx = (c.x + half) * sc, cz = (c.z + half) * sc, rr = R * sc;
+        const i0 = Math.max(0, Math.floor(cx - rr)), i1 = Math.min(TN - 1, Math.ceil(cx + rr));
+        const j0 = Math.max(0, Math.floor(cz - rr)), j1 = Math.min(TN - 1, Math.ceil(cz + rr));
+        for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+          const d2 = ((i - cx) ** 2 + (j - cz) ** 2) / (rr * rr);
+          if (d2 > 1) continue;
+          const o = j * TN + i, v = trodData[o];
+          if (v < 250) { trodData[o] = Math.min(255, v + Math.ceil(k * (1 - d2 * 0.7) * 0.25)); dirty = true; }
+        }
+      }
+      if (dirty) trod.needsUpdate = true;
+    },
+    dispose() { geo.dispose(); mat.dispose(); tex.dispose(); itex.dispose(); spill.dispose(); trod.dispose(); },
   };
 }
 
@@ -322,6 +397,13 @@ uniform float uHalf;
 uniform float uTime;
 uniform vec3 uSkyRefl;
 uniform vec3 uOuter;
+uniform sampler2D uSpill;
+uniform float uSpillK;
+uniform sampler2D uTrod;
+uniform float uTrodK;
+uniform float uWet;
+uniform float uRain;
+uniform float uSnow;
 varying vec3 vW;
 ${shaderCommon.lightPars}
 #include <fog_pars_fragment>
@@ -374,28 +456,55 @@ void main() {
 
   float n1 = vnoise(p * 0.16) * 0.55 + vnoise(p * 0.47) * 0.3 + vnoise(p * 1.3) * 0.15;
   float road0 = 1.0 - smoothstep(0.1, 0.25, kind);
-  float puddle = mix(smoothstep(0.6, 0.68, n1) * 0.7, smoothstep(0.57, 0.66, n1), road0) * (kind > 0.83 ? 0.0 : 1.0) * inMap;
+  float pw = clamp(uWet - 1.0, 0.0, 1.0) * 0.07;
+  float puddle = mix(smoothstep(0.6 - pw, 0.68 - pw, n1) * 0.7, smoothstep(0.57 - pw, 0.66 - pw, n1), road0) * (kind > 0.83 ? 0.0 : 1.0) * inMap * min(uWet, 1.0);
   float road = 1.0 - smoothstep(0.1, 0.25, kind);
-  float wet = (kind > 0.83 ? 0.15 : 0.6 + 0.3 * road) + 0.4 * puddle;
+  float wet = ((kind > 0.83 ? 0.15 : 0.6 + 0.3 * road) + 0.4 * puddle) * min(uWet, 1.3);
+  vec2 tuv = p / (uHalf * 2.0) + 0.5;
+  float trod = uTrodK > 0.0 && inMap > 0.5 ? texture2D(uTrod, tuv).r * uTrodK : 0.0;
+  if (uSnow > 0.0) {
+    float drift = vnoise(p * 0.35 + 7.0) * 0.6 + vnoise(p * 1.9) * 0.4;
+    float cover = (kind < 0.17 ? 0.16 + 0.1 * drift : 0.85 + 0.15 * drift) * (1.0 - trod * 0.75);
+    vec3 slush = base * vec3(0.78, 0.8, 0.86);
+    base = mix(slush, vec3(0.86, 0.89, 0.96) * (0.92 + 0.08 * drift), cover * uSnow * inMap);
+    wet *= 1.0 - cover * 0.8;
+    puddle *= 1.0 - cover;
+  }
   base *= mix(1.0, mix(0.9, 0.8, road0), puddle);
 
   vec3 N = vec3(0.0, 1.0, 0.0);
   vec3 V = normalize(cameraPosition - vW);
-  vec3 infoG = vec3(info.r, info.g, info.b * 0.72);
-  vec3 col = base * lightAt(N, infoG);
+  vec3 spill = texture2D(uSpill, uv).rgb * uSpillK * (inside ? 1.0 : 0.0);
+  vec3 col = base * (lightAt(N, vec3(info.r, info.g, 0.0)) + spill * 0.72);
   float nj = (1.0 - puddle) * (1.0 - smoothstep(0.05, 0.2, fw));
   vec3 Nj = normalize(vec3((h - 0.5) * 0.16 * nj, 1.0, (vnoise(p * 2.3 + 5.0) - 0.5) * 0.16 * nj));
   vec3 R = reflect(-V, Nj);
   float spec = pow(max(dot(R, uSunDir), 0.0), 60.0) * wet * info.r;
   col += uSunCol * spec * 0.9;
-  float glint = 0.55 + 0.6 * h * (1.0 - puddle) + 1.1 * puddle;
-  col += uLampCol * vec3(1.0, 0.85, 0.7) * info.b * info.b * wet * glint * (0.35 + 0.5 * road);
+  float glint = 0.6 + 0.6 * (0.5 + (h - 0.5) * 0.35) * (1.0 - puddle) + 1.1 * puddle;
+  float sb = max(spill.r, max(spill.g, spill.b)) / max(uSpillK, 1e-3);
+  col += spill * vec3(1.0, 0.85, 0.7) * sb * wet * glint * (0.35 + 0.5 * road);
   col += uLampCol * vec3(1.0, 0.8, 0.6) * road * wet * 0.03;
+  if (uRain > 0.0) {
+    float rip = 0.0;
+    for (int L = 0; L < 2; L++) {
+      vec2 q = p * (1.4 + float(L) * 0.9) + float(L) * 7.3;
+      vec2 cc = floor(q), f = fract(q) - 0.5;
+      vec2 o = vec2(hash(cc + 3.1), hash(cc + 7.7)) - 0.5;
+      float t = fract(uTime * 1.2 + hash(cc));
+      float d = length(f - o * 0.5);
+      float e = (d - t * 0.42) / 0.035;
+      rip += exp(-e * e) * (1.0 - t);
+    }
+    float wetA = max(puddle, road * 0.35) * (1.0 - smoothstep(0.05, 0.25, fw));
+    col += (uSkyRefl * 0.5 + spill * 0.6) * rip * wetA * uRain;
+  }
   float fres = pow(max(1.0 - max(V.y, 0.0), 0.0), 4.0);
-  float refl = clamp(mix(0.08 + 0.06 * road, 0.5, puddle) * (kind > 0.83 ? 0.2 : 1.0) + fres * 0.14, 0.0, 0.6);
+  float refl = clamp((mix(0.08 + 0.06 * road, 0.5, puddle) * (kind > 0.83 ? 0.2 : 1.0) + fres * 0.14) * min(uWet, 1.35), 0.0, 0.65);
   float a = 1.0;
   if (uRefl > 0.5) a = 1.0 - refl;
   else col += uSkyRefl * (refl - 0.3 * puddle * road) * 0.3;
+  col = safeTint(col, p);
   gl_FragColor = vec4(col, a);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>

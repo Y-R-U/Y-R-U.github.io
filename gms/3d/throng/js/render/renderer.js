@@ -3,72 +3,68 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { createShared } from './shared.js';
+import { createShared, applyThemeLight } from './shared.js';
 import { buildCity, cityMaterial, createCutaway } from './city.js';
 import { buildGround } from './ground.js';
 import { createPeople } from './people.js';
 import { createCrowdSystem } from './crowd.js';
 import { createCameraRig } from './camera.js';
 import { createHats, createHeroes, trailEmit } from './cosmetics.js';
-import { createRings, createHalos, createParticles, createWater, createCrown, createPickups, createPigeons, PICKUP_COL } from './fx.js';
+import { createRings, createZoneWalls, createPrecip, PRECIP, ZONE_STYLES, KIND_IDX, createHalos, createParticles, createWater, createCrown, createPickups, createPigeons, PICKUP_COL } from './fx.js';
+import { THEMES, THEME_IDS, WEATHER_IDS, getTheme } from './themes.js';
 
 const QUALITY = {
-  high: { dpr: 2, bloom: true, reflCity: true, reflPeople: true, budget: 7000 },
-  medium: { dpr: 1.5, bloom: false, reflCity: true, reflPeople: false, budget: 5000, cheapRefl: true },
-  lite: { dpr: 1, bloom: false, reflCity: false, reflPeople: false, budget: 2000, lite: true },
+  high: { dpr: 2, bloom: true, reflCity: true, reflPeople: true, budget: 7000, precip: 5000 },
+  medium: { dpr: 1.5, bloom: false, reflCity: true, reflPeople: false, budget: 5000, cheapRefl: true, precip: 3200 },
+  lite: { dpr: 1, bloom: false, reflCity: false, reflPeople: false, budget: 2000, lite: true, precip: 0 },
 };
 const ORDER = ['lite', 'medium', 'high'];
-const FOG_COL = new THREE.Color(0x6e5562);
+const ZONE_COL = { crown: 0xffc23a, safe: 0x9ff2ff, danger: 0xff3a2a, capture: 0xffe08a, next: 0xffc23a, 'safe-next': 0xffffff };
 
 export async function createRenderer({ canvas, map, quality = 'high', adaptive = true, capacity = 9000 } = {}) {
+  const URLP = typeof location !== 'undefined' ? new URLSearchParams(location.search) : new URLSearchParams();
+  // test override: ?theme= / ?weather= win over setTheme / setWeather calls
+  const forceTheme = THEMES[URLP.get('theme')] ? URLP.get('theme') : null;
+  const forceWeather = WEATHER_IDS.includes(URLP.get('weather')) ? URLP.get('weather') : null;
+
   const gl = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', stencil: false });
   gl.toneMapping = THREE.ACESFilmicToneMapping;
   gl.toneMappingExposure = 1.0;
   gl.outputColorSpace = THREE.SRGBColorSpace;
   gl.info.autoReset = false;
-  gl.setClearColor(FOG_COL);
 
+  const fogCol = new THREE.Color(0x6e5562);
   const scene = new THREE.Scene();
-  scene.background = FOG_COL.clone();
-  scene.fog = new THREE.Fog(FOG_COL.clone(), 60, 200);
+  scene.background = fogCol.clone();
+  scene.fog = new THREE.Fog(fogCol.clone(), 60, 200);
   const camera = new THREE.PerspectiveCamera(45, 1, 0.5, 800);
 
   const shared = createShared();
   shared.uPointScale = { value: 500 };
   shared.uYaw = { value: 0.55 };
-
-  const ground = buildGround(map, shared, quality);
-  scene.add(ground.mesh);
-
-  const city = buildCity(map, quality);
-  const cutaway = createCutaway(city.blds);
-  const cityMesh = new THREE.Mesh(city.geometry, cityMaterial(shared, 1, cutaway));
-  cityMesh.frustumCulled = false;
-  const cityRefl = new THREE.Mesh(city.reflGeometry, cityMaterial(shared, -1, cutaway));
-  cityRefl.frustumCulled = false;
-  cityRefl.renderOrder = -5;
-  scene.add(cityMesh, cityRefl);
-
-  const water = createWater(city.water, city.jets, shared);
-  scene.add(water.water, water.jets);
-  const halos = createHalos(city.halos, shared);
-  scene.add(halos.points, halos.reflection);
+  shared.uHaloK = { value: 1 };
 
   const people = createPeople(capacity, shared, { detail: quality === 'lite' ? 0 : 1 });
+  people.mesh.renderOrder = 1;
   scene.add(people.mesh, people.reflection, people.shadows);
   const crowd = createCrowdSystem(people, map);
   const hats = createHats(people, shared, quality === 'lite' ? 0 : 1);
   const heroes = createHeroes(shared);
+  hats.mesh.renderOrder = 1; heroes.mesh.renderOrder = 1;
   scene.add(hats.mesh, heroes.mesh);
   const lead = {};
   const perf = { update: 0, write: 0, other: 0, submit: 0, upload: 0 };
 
-  const rings = createRings(16, shared);
-  scene.add(rings.mesh);
+  const rings = createRings(16 + 16 + 32, shared);
+  scene.add(rings.mesh, rings.ghost);
+  const walls = createZoneWalls(16, shared);
+  scene.add(walls.mesh);
+  const precip = createPrecip(5000, shared);
+  scene.add(precip.mesh);
   const crown = createCrown(shared);
   scene.add(crown.group, crown.shaft);
   const pickups = createPickups(32, shared);
-  scene.add(pickups.pads, pickups.beams, pickups.icons);
+  scene.add(pickups.beams, pickups.icons);
   const pigeons = createPigeons(map, shared, quality === 'lite' ? 7 : 12);
   scene.add(pigeons.mesh);
   const particles = createParticles(3000, shared);
@@ -92,21 +88,85 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
   const ndc = new THREE.Vector2();
   let cssW = 1, cssH = 1;
 
-  function applyQuality() {
+  // ---------- world: city, ground, lamps, water; rebuilt by setTheme ----------
+  let T = getTheme(forceTheme || 'evening');
+  let W = null, water = null;
+  function buildWorld() {
+    applyThemeLight(shared, T);
+    const ground = buildGround(map, shared, q === 'lite' && quality === 'lite' ? 'lite' : quality, T);
+    const city = buildCity(map, quality, T);
+    const cutaway = createCutaway(city.blds);
+    const cityMesh = new THREE.Mesh(city.geometry, cityMaterial(shared, 1, cutaway));
+    cityMesh.frustumCulled = false;
+    const cityRefl = new THREE.Mesh(city.reflGeometry, cityMaterial(shared, -1, cutaway));
+    cityRefl.frustumCulled = false;
+    cityRefl.renderOrder = -5;
+    const halos = createHalos(city.halos, shared, T.halo);
+    if (!water) { water = createWater(city.water, city.jets, shared); scene.add(water.water, water.jets); }
+    scene.add(ground.mesh, cityMesh, cityRefl, halos.points, halos.reflection);
+    crowd.setProps(city.props.length ? city.props : null);
+    crowd.setNeutralPalette(T.neutrals);
+    fogCol.setHex(T.fog);
+    gl.toneMappingExposure = T.exposure;
+    if (bloom) { bloom.threshold = T.bloomT || 1.5; bloom.strength = T.bloomS || 0.6; }
+    W = { ground, city, cutaway, cityMesh, cityRefl, halos };
+    applyWeather();
+  }
+  function disposeWorld() {
+    if (!W) return;
+    scene.remove(W.ground.mesh, W.cityMesh, W.cityRefl, W.halos.points, W.halos.reflection);
+    W.ground.dispose();
+    for (const g of [W.city.geometry, W.city.reflGeometry, W.city.liteGeometry, W.city.reflCheap]) g.dispose();
+    W.cityMesh.material.dispose(); W.cityRefl.material.dispose();
+    W.cutaway.uniforms.uCut.value.dispose();
+    for (const p of [W.halos.points, W.halos.reflection]) { p.geometry.dispose(); p.material.dispose(); }
+    W = null;
+  }
+
+  // ---------- weather ----------
+  let weatherId = forceWeather || T.weather || 'clear';
+  let weatherSet = !!forceWeather;
+  const wx = { rain: 0, fog: 0, wind: 0, snow: 0, acc: 0 };
+  function applyWeather() {
+    const sunBase = T.sunCol;
+    const rain = weatherId === 'rain' ? 1 : 0;
+    shared.uSunCol.value.setRGB(sunBase[0], sunBase[1], sunBase[2]).multiplyScalar(sunBase[3] * (rain ? 0.6 : 1));
+    shared.uWet.value = rain ? Math.max(1.8, T.wet + 1.0) : T.wet;
+    gl.toneMappingExposure = T.exposure * (rain ? 0.86 : weatherId === 'fog' ? 0.95 : 1);
+    shared.uRain.value = rain;
+    shared.uWind.value = weatherId === 'wind' ? 1 : 0;
+    shared.uHaloK.value = weatherId === 'fog' ? 1.9 : 1;
+    fogCol.setHex(T.fog);
+    if (weatherId === 'fog') fogCol.lerp(new THREE.Color(T.snow ? 0xc8ccd8 : T.lampsOn ? 0x9a90a0 : 0xd6dde6), 0.7);
+    if (rain) fogCol.lerp(new THREE.Color(0x3c4250), 0.4);
+    if (W) {
+      const reflect = T.reflect || rain;
+      W.ground.setReflect(QUALITY[q].reflCity && reflect);
+      W.ground.mesh.material.uniforms.uSkyRefl.value.setRGB(T.skyRefl[0], T.skyRefl[1], T.skyRefl[2]);
+    }
+    scene.background.copy(fogCol); scene.fog.color.copy(fogCol); gl.setClearColor(fogCol);
+    applyQuality(true);
+  }
+
+  function applyQuality(keepWarm) {
     const Q = QUALITY[q];
-    cityRefl.visible = Q.reflCity;
-    halos.reflection.visible = Q.reflCity;
-    people.reflection.visible = Q.reflPeople;
-    ground.setReflect(Q.reflCity);
+    const reflect = Q.reflCity && (T.reflect || weatherId === 'rain');
+    if (W) {
+      W.cityRefl.visible = reflect;
+      W.halos.reflection.visible = reflect && T.lampsOn;
+      W.ground.setReflect(reflect);
+      W.cityMesh.geometry = Q.lite ? W.city.liteGeometry : W.city.geometry;
+      W.cityRefl.geometry = Q.cheapRefl ? W.city.reflCheap : W.city.reflGeometry;
+    }
+    people.reflection.visible = Q.reflPeople && (T.reflect || weatherId === 'rain');
     crowd.setBudget(Q.budget);
-    cityMesh.geometry = Q.lite ? city.liteGeometry : city.geometry;
-    cityRefl.geometry = Q.cheapRefl ? city.reflCheap : city.reflGeometry;
-    fpsS.warm = fpsS.started ? 2 : 0; fpsS.low = 0; fpsS.started = true;
+    rings.ghost.visible = !Q.lite;
+    if (!keepWarm) { fpsS.warm = fpsS.started ? 2 : 0; fpsS.low = 0; fpsS.started = true; }
     if (Q.bloom && !composer) {
       const rt = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 });
       composer = new EffectComposer(gl, rt);
       composer.addPass(new RenderPass(scene, camera));
-      bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.6, 0.5, 1.5);
+      bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), T.bloomS || 0.6, 0.5, T.bloomT || 1.5);
       composer.addPass(bloom);
       composer.addPass(new OutputPass());
     }
@@ -128,22 +188,28 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     camera.updateProjectionMatrix();
   }
 
-  function setCrowds(meta) {
-    crowd.setCrowds(meta);
-    crowd.setView(null);
+  function refreshEmblems() {
     const em = [];
     for (const c of crowd.crowds) if (c && c.cos.flag) em[c.index % 16] = c.cos.flag.emblem;
     heroes.setEmblems(em);
+  }
+
+  function setCrowds(meta) {
+    crowd.setCrowds(meta);
+    crowd.setView(null);
+    refreshEmblems();
     metaSet = true;
     pickAlpha.clear();
     crownState.idx = -1; crownState.a = 0;
     lastLead = -1;
+    fireworks.on = false;
     rig.setEnd(false);
+    if (!showcase) rig.rig.orbit = 0;
     rig.snap();
     cutSnap = true;
   }
 
-  function teamCol(i) { return crowd.crowds[i]?.color || FOG_COL; }
+  function teamCol(i) { return crowd.crowds[i]?.color || fogCol; }
 
   function handleEvents(events, state) {
     if (!events) return;
@@ -166,7 +232,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
         }
         case 'elim': {
           const v = crowd.crowds[e.victim];
-          const vc = v ? v.color : FOG_COL, bc = teamCol(e.by);
+          const vc = v ? v.color : fogCol, bc = teamCol(e.by);
           crowd.onElim(e);
           particles.burst(e.x, e.z, vc, 40, 9, 1.2, 8);
           particles.burst(e.x, e.z, bc, 30, 6, 1.0, 10);
@@ -202,6 +268,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
         }
         case 'phase': {
           rig.setEnd(e.phase === 'over');
+          if (e.phase === 'over' && T.fireworks) { fireworks.on = true; fireworks.t = 0; fireworks.next = 0; }
           break;
         }
       }
@@ -219,31 +286,110 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     stealGain *= Math.exp(-dt * 1.5); stealLoss *= Math.exp(-dt * 1.5);
   }
 
-  function updateRings() {
+  // ---------- zones ----------
+  const zones = new Map();
+  const zCol = new THREE.Color();
+  function setZones(list) {
+    const seen = new Set();
+    (Array.isArray(list) ? list : []).forEach((z, i) => {
+      if (!z || !Number.isFinite(z.x) || !Number.isFinite(z.z)) return;
+      const id = z.id ?? `${z.style || 'zone'}${i}`;
+      seen.add(id);
+      const style = ZONE_STYLES[z.style] ? z.style : 'capture';
+      let o = zones.get(id);
+      const r = Math.max(0.5, Number.isFinite(z.r) ? z.r : 8);
+      const fresh = !o;
+      if (!o) { o = { cx: z.x, cz: z.z, cr: style === 'safe' || style === 'safe-next' ? r * 1.15 : r * 0.4, a: 0, col: new THREE.Color(), tcol: new THREE.Color(), cp: 0 }; zones.set(id, o); }
+      o.x = z.x; o.z = z.z; o.r = r; o.style = style; o.dead = false;
+      o.tcol.set(z.color != null ? z.color : ZONE_COL[style]);
+      if (fresh) o.col.copy(o.tcol);
+      o.progress = Number.isFinite(z.progress) ? Math.min(1, Math.max(0, z.progress)) : (style === 'capture' ? 0 : 1);
+    });
+    for (const [id, o] of zones) if (!seen.has(id)) o.dead = true;
+  }
+  function updateZones(dt, base) {
+    let n = base, nw = 0, safe = null;
+    const k = 1 - Math.exp(-dt * 4);
+    for (const [id, o] of zones) {
+      o.a += ((o.dead ? 0 : 1) - o.a) * Math.min(1, dt * (o.dead ? 5 : 2.5));
+      if (o.dead && o.a < 0.02) { zones.delete(id); continue; }
+      o.cx += (o.x - o.cx) * k; o.cz += (o.z - o.cz) * k; o.cr += (o.r - o.cr) * k;
+      o.cp += (o.progress - o.cp) * Math.min(1, dt * 6);
+      o.col.lerp(o.tcol, Math.min(1, dt * 3));
+      const st = ZONE_STYLES[o.style];
+      rings.set(n++, o.cx, o.cz, o.cr, o.a, o.col, o.style === 'safe' ? 1.1 : 1.0, st, o.cp, 0);
+      if (o.style === 'safe' && !safe) safe = o;
+      if (!QUALITY[q].lite && nw < 16 && st < 9) {
+        const h = o.style === 'safe' ? 9 : o.style === 'danger' ? 2.6 : o.style === 'crown' ? 26 : 18;
+        const rr = o.style === 'safe' || o.style === 'danger' ? o.cr : o.cr * 0.92;
+        zCol.copy(o.col);
+        if (o.style === 'capture') zCol.multiplyScalar(0.5 + 0.7 * o.cp);
+        walls.set(nw++, o.cx, o.cz, rr, h, zCol, st, o.a);
+      }
+      if ((o.style === 'crown' || o.style === 'capture') && Math.random() < dt * (8 + o.cr) * (QUALITY[q].lite ? 0.4 : 1)) {
+        const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * o.cr;
+        particles.emit(o.cx + Math.cos(a) * rr, 0.3, o.cz + Math.sin(a) * rr, 0, 1.5 + Math.random() * 2, 0, o.col.r * 1.8, o.col.g * 1.8, o.col.b * 1.8, 0.35, 1.6, -0.3);
+      }
+    }
+    walls.commit(nw);
+    if (safe) shared.uSafe.value.set(safe.cx, safe.cz, safe.cr, safe.a);
+    else shared.uSafe.value.w = 0;
+    return n;
+  }
+
+  // ---------- ground decals: crowd rings, then zones, then pickup pads ----------
+  let ghostTick = 0;
+  function updateDecals(state, dt) {
     let n = 0;
+    ghostTick = (ghostTick + 1) % 4;
+    const kc = Math.min(1, dt * 3);
     for (const c of crowd.crowds) {
       if (!c || !c.alive) continue;
+      c.ringCol.lerp(c.color, kc);
       let inten = c.index === focus ? 1.25 : 1.0, alpha = 1, r = Math.max(1.2, c.visR);
       if (c.protect > 0) alpha = Math.sin(time * 16) > 0 ? 0.9 : 0.3;
       if (c.panic > 0) { r *= 1 + 0.025 * Math.sin(time * 38); inten *= 1.2 + 0.4 * Math.sin(time * 20); }
       if (c.eating > 0) inten *= 1.35;
+      if (c.boost > 0) inten *= 1.35 + 0.35 * Math.sin(time * 9);
       if (c.cos.ring === 4) r *= 1 + 0.012 * Math.sin(time * 5.5);
-      rings.set(n++, c.x, c.z, r, alpha, c.color, inten * 1.7, c.cos.ring);
+      if (ghostTick === 0) c.hidden = !QUALITY[q].lite && W.cutaway.hidden(camera.position, { x: c.x, z: c.z, r: Math.max(1.2, c.visR) });
+      rings.set(n++, c.x, c.z, r, alpha, c.ringCol, inten * 1.7, c.cos.ring, 0, (c.remote && c.index !== focus ? 1 : 0) + (c.hidden ? 2 : 0));
     }
+    rings.markCrowds(n);
+    n = updateZones(dt, n);
+    const list = state.pickups || [];
+    let np = 0;
+    for (const p of list) {
+      let st = pickAlpha.get(p.id);
+      if (!st) { st = { a: 0, s: 0 }; pickAlpha.set(p.id, st); }
+      const want = p.active ? 1 : 0;
+      st.a += (want - st.a) * Math.min(1, dt * (want ? 3 : 8));
+      st.s += ((p.active ? 1 : 1.6) - st.s) * Math.min(1, dt * 6);
+      if (st.a < 0.02) continue;
+      const sc = st.s * (1 + 0.04 * Math.sin(time * 3 + p.id));
+      pickups.set(np++, p.x, p.z, p.kind, st.a, sc);
+      const col = PICKUP_COL[p.kind] || PICKUP_COL.speed;
+      zCol.copy(col).multiplyScalar(1.6);
+      rings.set(n++, p.x, p.z, 2.6 * sc, st.a, zCol, 1, 9, KIND_IDX[p.kind] ?? 0, 0);
+    }
+    pickups.commit(np);
     rings.commit(n);
   }
 
   // leader variants, flags, trails, flame-ring embers
+  const trailPool = { sk: 1, emit(...a) { a[9] *= trailPool.sk; particles.emit(...a); } };
   function updateCosmetics(dt) {
     heroes.begin();
     const fs = shared.uFigScale.value;
     const flagH = 2.9 * Math.min(3.4, Math.max(1.2, rig.rig.d / 34));
     const lite = q === 'lite';
+    trailPool.sk = Math.min(2.6, Math.max(1, rig.rig.d / 40));
     for (const c of crowd.crowds) {
       if (!c || !c.alive) continue;
       const cos = c.cos;
       if (c.hero && crowd.leaderState(c, lead)) {
         heroes.add(lead, c, cos.flag ? flagH : 0);
+        c.headTop = cos.leader ? lead.scale * 1.28 * fs * 1.95 : 0;
         if (cos.flag) {
           const S = lead.scale * 1.28 * fs, cy = Math.cos(lead.yaw), sy = Math.sin(lead.yaw);
           c.poleX = lead.x + (0.36 * cy + 0.28 * sy) * S; c.poleZ = lead.z + (-0.36 * sy + 0.28 * cy) * S;
@@ -253,12 +399,12 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
       if (!c.onScreen) continue;
       const sp = Math.hypot(c.vx, c.vz);
       if (cos.trail && sp > 0.8) {
-        c.trailAcc = (c.trailAcc || 0) + dt * (12 + c.visR * 2) * Math.min(1, sp / 3) * (lite ? 0.5 : 1);
+        c.trailAcc = (c.trailAcc || 0) + dt * (8 + c.visR * 3.2) * Math.min(1.4, sp / 2.5) * (lite ? 0.5 : 1);
         const hx = -c.vx / sp, hz = -c.vz / sp;
         while (c.trailAcc >= 1) {
           c.trailAcc -= 1;
-          const a = Math.atan2(hz, hx) + (Math.random() - 0.5) * 2.4, rr = c.visR * (0.55 + Math.random() * 0.45);
-          trailEmit(particles, cos.trail, c.x + Math.cos(a) * rr, c.z + Math.sin(a) * rr, c.vx, c.vz, c.color);
+          const a = Math.atan2(hz, hx) + (Math.random() - 0.5) * 2.6, rr = c.visR * (0.6 + Math.random() * 0.45);
+          trailEmit(trailPool, cos.trail, c.x + Math.cos(a) * rr, c.z + Math.sin(a) * rr, c.vx, c.vz, c.color);
         }
       }
       if (cos.ring === 3) {
@@ -269,6 +415,24 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
           particles.emit(c.x + Math.cos(a) * rr, 0.2, c.z + Math.sin(a) * rr, Math.cos(a) * 0.4, 1.2 + Math.random() * 1.4, Math.sin(a) * 0.4,
             1.6 + c.color.r, 0.7 + c.color.g * 0.8, 0.25 + c.color.b * 0.6, 0.35 + Math.random() * 0.25, 0.5 + Math.random() * 0.4, -1, 0, 0);
         }
+      }
+      // infection horde: green spores drifting up off the crowd
+      if (c.horde && Math.random() < dt * (5 + c.visR * 1.2) * (lite ? 0.5 : 1)) {
+        const a = Math.random() * Math.PI * 2, rr = c.visR * Math.sqrt(Math.random());
+        particles.emit(c.x + Math.cos(a) * rr, 1.6, c.z + Math.sin(a) * rr, (Math.random() - 0.5) * 0.6, 0.7 + Math.random() * 0.8, (Math.random() - 0.5) * 0.6, 0.55, 1.5, 0.15, 0.4 * trailPool.sk, 1.6, -0.2, 6, 0);
+      }
+      // teams merge boost: sparks along the contact between touching teammates
+      if (c.boost > 0) for (const o of crowd.crowds) {
+        if (!o || o === c || !o.alive || !(o.boost > 0) || o.index < c.index) continue;
+        const dx = o.x - c.x, dz = o.z - c.z, dd = Math.hypot(dx, dz);
+        if (dd > c.visR + o.visR + 3 || Math.random() > dt * 30) continue;
+        const t = c.visR / Math.max(0.1, c.visR + o.visR), px = (Math.random() - 0.5) * Math.min(c.visR, o.visR);
+        particles.emit(c.x + dx * t - dz / (dd || 1) * px, 0.6, c.z + dz * t + dx / (dd || 1) * px, 0, 2 + Math.random() * 2, 0, c.color.r * 2.2 + 0.4, c.color.g * 2.2 + 0.4, c.color.b * 2.2 + 0.4, 0.5 * trailPool.sk, 0.6, 2);
+      }
+      // rain: splashes under a running crowd
+      if (wx.rain > 0.5 && sp > 1.5 && Math.random() < dt * (6 + c.visR * 1.5) * (lite ? 0.4 : 1)) {
+        const a = Math.random() * Math.PI * 2, rr = c.visR * Math.sqrt(Math.random());
+        for (let k = 0; k < 3; k++) particles.emit(c.x + Math.cos(a) * rr, 0.1, c.z + Math.sin(a) * rr, (Math.random() - 0.5) * 1.6, 1.2 + Math.random() * 1.2, (Math.random() - 0.5) * 1.6, 0.55, 0.62, 0.75, 0.18 * trailPool.sk, 0.35, 9);
       }
     }
     heroes.commit();
@@ -289,18 +453,18 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
   }
 
   function updateCrown(state, dt) {
-    let lead = state.leader;
-    if (lead == null || lead < 0) {
-      for (const sc of state.crowds) if (sc.alive && sc.rank === 1) lead = sc.index;
+    let ld = state.leader;
+    if (ld == null || ld < 0) {
+      for (const sc of state.crowds) if (sc.alive && sc.rank === 1) ld = sc.index;
     }
-    const c = lead != null && lead >= 0 ? crowd.crowds[lead] : null;
+    const c = ld != null && ld >= 0 ? crowd.crowds[ld] : null;
     const show = !!(c && c.alive);
     crownState.a += ((show ? 1 : 0) - crownState.a) * Math.min(1, dt * 4);
     if (show) {
       const ty = 5.5;
-      if (crownState.idx !== lead) {
+      if (crownState.idx !== ld) {
         if (crownState.idx < 0) { crownState.x = c.x; crownState.z = c.z; crownState.y = ty; }
-        crownState.idx = lead;
+        crownState.idx = ld;
       }
       const k = 1 - Math.exp(-dt * 7);
       const px = c.cos.flag && c.poleX != null ? c.poleX : c.x, pz = c.cos.flag && c.poleZ != null ? c.poleZ : c.z;
@@ -311,6 +475,8 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     const bob = Math.sin(time * 2.2) * 0.18 * s;
     let cy = 2.6 + 1.1 * s;
     if (c && c.alive && c.cos.flag && c.poleTop) cy = Math.max(cy, c.poleTop + 0.25 * s);
+    // a leader variant (king, robot, mascot, caped) is 2x tall: the rank-1 crown floats clear of its head
+    else if (c && c.alive && c.cos.leader && c.headTop) cy = Math.max(cy, c.headTop + 0.45 * s + 0.3);
     crownState.lift = (crownState.lift ?? cy) + (cy - (crownState.lift ?? cy)) * Math.min(1, dt * 5);
     crown.group.position.set(crownState.x, crownState.lift + bob, crownState.z);
     crown.group.scale.setScalar(Math.max(0.001, s));
@@ -326,21 +492,6 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     crown.shaftMat.uniforms.uA.value = crownState.a;
   }
 
-  function updatePickups(state, dt) {
-    let n = 0;
-    const list = state.pickups || [];
-    for (const p of list) {
-      let st = pickAlpha.get(p.id);
-      if (!st) { st = { a: 0, s: 0 }; pickAlpha.set(p.id, st); }
-      const want = p.active ? 1 : 0;
-      st.a += (want - st.a) * Math.min(1, dt * (want ? 3 : 8));
-      st.s += ((p.active ? 1 : 1.6) - st.s) * Math.min(1, dt * 6);
-      if (st.a < 0.02) continue;
-      pickups.set(n++, p.x, p.z, p.kind, st.a, st.s * (1 + 0.04 * Math.sin(time * 3 + p.id)));
-    }
-    pickups.commit(n);
-  }
-
   function fountainSpray() {
     for (const j of water.jetList) {
       if (Math.random() > 0.35) continue;
@@ -349,6 +500,97 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     }
   }
 
+  // ---------- weather particles: one GPU draw on medium/high, the shared particle pool on lite ----------
+  function updateWeather(dt, d) {
+    const id = weatherId;
+    const tgt = { rain: id === 'rain' ? 1 : 0, fog: id === 'fog' ? 1 : 0, wind: id === 'wind' ? 1 : 0, snow: id === 'snow' ? 1 : 0 };
+    for (const k of ['rain', 'fog', 'wind', 'snow']) wx[k] += (tgt[k] - wx[k]) * Math.min(1, dt * 1.5);
+    let mode = id === 'rain' ? PRECIP.rain : id === 'snow' ? PRECIP.snow : id === 'wind' ? PRECIP.wind : T.confetti ? PRECIP.confetti : 0;
+    const Q = QUALITY[q];
+    const cp = camera.position, tx = rig.rig.tx + rig.rig.ex, tz = rig.rig.tz + rig.rig.ez;
+    const wind = id === 'wind' ? 7 : id === 'rain' ? 3 : 1.2;
+    const U = precip.U;
+    U.uWindV.value.set(Math.cos(0.7 + time * 0.05) * wind, Math.sin(0.7 + time * 0.05) * wind);
+    if (mode && !Q.lite) {
+      const n = mode === PRECIP.rain ? Q.precip : mode === PRECIP.snow ? Q.precip * 0.55 : mode === PRECIP.wind ? 260 : 240;
+      precip.setCount(n);
+      U.uMode.value = mode;
+      const toward = mode === PRECIP.wind || mode === PRECIP.confetti ? 0.15 : 0.4;
+      U.uCenter.value.set(tx + (cp.x - tx) * toward, 0, tz + (cp.z - tz) * toward);
+      const hb = Math.max(18, d * 0.55);
+      U.uBox.value.set(hb, mode === PRECIP.rain ? Math.max(14, cp.y * 0.45) : Math.max(10, cp.y * 0.4), hb);
+      U.uNear.value = d * 0.5;
+      U.uSize.value = Math.max(1, d / 38) * (mode === PRECIP.rain ? 1.2 : mode === PRECIP.snow ? 0.7 : 1);
+      U.uDens.value = mode === PRECIP.rain ? wx.rain : mode === PRECIP.snow ? wx.snow : 1;
+      const lit = shared.uSkyCol.value;
+      U.uLit.value.setRGB(0.55 + lit.r, 0.55 + lit.g, 0.55 + lit.b).multiplyScalar(mode === PRECIP.snow ? 0.95 : 0.8);
+    } else precip.setCount(0);
+    if (mode && Q.lite) {
+      const rate = mode === PRECIP.rain ? 260 : mode === PRECIP.snow ? 140 : mode === PRECIP.wind ? 22 : 30;
+      wx.acc += dt * rate;
+      const hb = Math.max(16, d * 0.5), sk = Math.max(1, d / 38);
+      while (wx.acc >= 1) {
+        wx.acc -= 1;
+        const x = tx + (cp.x - tx) * 0.3 + (Math.random() - 0.5) * 2 * hb, z = tz + (cp.z - tz) * 0.3 + (Math.random() - 0.5) * 2 * hb;
+        const vx = U.uWindV.value.x, vz = U.uWindV.value.y;
+        if (mode === PRECIP.rain) particles.emit(x, 8 + Math.random() * 10, z, vx * 0.3, -24, vz * 0.3, 0.32, 0.36, 0.42, 1.1 * sk, 0.6, 0, 7, 0);
+        else if (mode === PRECIP.snow) particles.emit(x, 6 + Math.random() * 12, z, vx * 0.3, -1.2, vz * 0.3, 0.6, 0.62, 0.68, 0.32 * sk, 6, 0, 6, 0);
+        else if (mode === PRECIP.wind) particles.emit(x, 0.5 + Math.random() * 3, z, vx * 1.4, 0.5, vz * 1.4, 0.55, 0.32, 0.1, 0.3 * sk, 3, 0.3, 2, Math.random() * 6);
+        else particles.emit(x, 6 + Math.random() * 6, z, vx * 0.5, -1.5, vz * 0.5, 1.2 * Math.random() + 0.3, 1.2 * Math.random() + 0.3, 1.2 * Math.random() + 0.3, 0.25 * sk, 4, 0.2, 5, Math.random() * 6);
+      }
+    }
+  }
+
+  // ---------- festival fireworks at match end ----------
+  const fireworks = { on: false, t: 0, next: 0 };
+  const fwCols = [new THREE.Color(1, 0.3, 0.3), new THREE.Color(1, 0.85, 0.3), new THREE.Color(0.3, 0.7, 1), new THREE.Color(0.5, 1, 0.5), new THREE.Color(1, 0.45, 0.9)];
+  function updateFireworks(dt, d) {
+    if (!fireworks.on) return;
+    fireworks.t += dt; fireworks.next -= dt;
+    if (fireworks.t > 9) { fireworks.on = false; return; }
+    if (fireworks.next > 0) return;
+    fireworks.next = 0.35 + Math.random() * 0.5;
+    const tx = rig.rig.tx, tz = rig.rig.tz, yaw = rig.rig.yaw + (rig.rig.orbit || 0);
+    const x = tx - Math.sin(yaw) * d * 0.35 + (Math.random() - 0.5) * d * 0.7, z = tz - Math.cos(yaw) * d * 0.35 + (Math.random() - 0.5) * d * 0.4;
+    const y = 18 + Math.random() * d * 0.25, col = fwCols[(Math.random() * fwCols.length) | 0];
+    const n = QUALITY[q].lite ? 40 : 90, sp = 6 + d * 0.06;
+    for (let k = 0; k < n; k++) {
+      const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, r = Math.sqrt(1 - u * u);
+      particles.emit(x, y, z, Math.cos(a) * r * sp, u * sp + 1, Math.sin(a) * r * sp, col.r * 3, col.g * 3, col.b * 3, 0.5 * Math.max(1, d / 40), 1.4 + Math.random() * 0.6, 3);
+    }
+  }
+
+  // ---------- showcase: slow orbit over the central plaza, framing the biggest crowds; optional theme cycle ----------
+  const show = { cycle: false, t: 0, fade: 0, pending: null };
+  function showcaseFocus(state, f) {
+    const pz = map.plazas && map.plazas[0];
+    if (!pz) return;
+    let sx = 0, sz = 0, sw = 0;
+    const list = [...state.crowds].filter((c) => c.alive).sort((a, b) => b.count - a.count).slice(0, 3);
+    for (const c of list) { sx += c.x * c.count; sz += c.z * c.count; sw += c.count; }
+    let ax = pz.x, az = pz.z;
+    if (sw > 0) {
+      ax = sx / sw; az = sz / sw;
+      const dx = ax - pz.x, dz = az - pz.z, dl = Math.hypot(dx, dz), lim = pz.r * 0.55;
+      if (dl > lim) { ax = pz.x + dx / dl * lim; az = pz.z + dz / dl * lim; }
+    }
+    show.x = show.x == null ? ax : show.x + (ax - show.x) * 0.01;
+    show.z = show.z == null ? az : show.z + (az - show.z) * 0.01;
+    f.x = pz.x + (show.x - pz.x) * 0.6; f.z = pz.z + (show.z - pz.z) * 0.6;
+    f.radius = 10; f.vx = 0; f.vz = 0;
+  }
+  function updateShowcaseCycle(dt) {
+    if (!showcase || !show.cycle || forceTheme) { if (show.fade > 0) { show.fade = Math.max(0, show.fade - dt * 2); gl.toneMappingExposure = T.exposure * (1 - show.fade); } return; }
+    show.t += dt;
+    if (show.t > 14 && !show.pending) { const i = THEME_IDS.indexOf(T.id); show.pending = THEME_IDS[(i + 1) % THEME_IDS.length]; }
+    if (show.pending) {
+      show.fade = Math.min(1, show.fade + dt * 2.2);
+      if (show.fade >= 1) { const id = show.pending; show.pending = null; show.t = 0; T = getTheme(id); if (!weatherSet) weatherId = T.weather || 'clear'; disposeWorld(); buildWorld(); cutSnap = true; }
+    } else show.fade = Math.max(0, show.fade - dt * 1.6);
+    gl.toneMappingExposure = T.exposure * (1 - show.fade * 0.92);
+  }
+
+  let stampT = 0;
   function frame(state, events, dt = 1 / 60, alpha = 1) {
     if (!state) return;
     dt = Math.min(Math.max(dt, 0), 0.1);
@@ -359,42 +601,48 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     selfPunches(dt);
     const p0 = performance.now();
     crowd.update(state, alpha, dt);
+    for (const sc of state.crowds) { const c = crowd.crowds[sc.index]; if (c) c.remote = !!sc.remote; }
     const p1 = performance.now();
     hats.setCount(crowd.write(dt));
     const p2 = performance.now();
-    updateRings();
+    updateDecals(state, dt);
     updateCosmetics(dt);
     updateCrown(state, dt);
-    updatePickups(state, dt);
     fountainSpray();
     particles.update(dt);
-    if (!QUALITY[q].lite) pigeons.update(dt, crowd.crowds);
+    pigeons.update(dt, crowd.crowds);
+    if ((stampT += dt) > 0.12) { W.ground.stamp(crowd.crowds, stampT); stampT = 0; }
+    updateShowcaseCycle(dt);
 
     const fi = showcase && state.leader != null && state.leader >= 0 ? state.leader : focus;
     const fc = crowd.crowds[fi];
     const f = fc ? { x: fc.x, z: fc.z, vx: fc.vx, vz: fc.vz, radius: fc.alive ? fc.visR : 3 } : { x: 0, z: 0, radius: 5 };
-    if (showcase) {
-      const pz = map.plazas && map.plazas[0];
-      if (pz) { f.x = pz.x + (f.x - pz.x) * 0.3; f.z = pz.z + (f.z - pz.z) * 0.3; }
-      f.radius = 9; f.vx = 0; f.vz = 0;
-    }
+    if (showcase) showcaseFocus(state, f);
     rig.rig.showcase = showcase;
-    rig.rig.yawDrift = showcase ? (rig.rig.yawDrift || 0) + dt * 0.05 : 0;
+    if (showcase) rig.rig.orbit = (rig.rig.orbit || 0) + dt * 0.055;
     const d = rig.update(dt, f, cssW / cssH);
-    shared.uYaw.value = rig.rig.yaw;
+    shared.uYaw.value = rig.rig.yaw + (rig.rig.orbit || 0);
     pickups.setView(d);
     shared.uFigScale.value = 1 + 0.3 * Math.min(1, Math.max(0, (d - 35) / 110));
+    shared.uAccScale.value = 1 + 0.55 * Math.min(1, Math.max(0, (d - 30) / 110));
     crowd.setFigScale(shared.uFigScale.value);
-    scene.fog.near = d * 1.15 + 10;
-    scene.fog.far = d * 2.8 + 40;
+    const fg = wx.fog;
+    const fn = (d * T.fogNear + 10) * (1 - 0.25 * wx.rain), ff = (d * T.fogFar + 40) * (1 - 0.3 * wx.rain);
+    scene.fog.near = fn + (d * 0.8 - fn) * fg;
+    scene.fog.far = ff + (d * 1.75 + 25 - ff) * fg;
     shared.uFocus.value.set(f.x, f.z, f.radius * 1.15 + 3, fc && fc.alive ? 1 : 0);
     updateView();
-    cutaway.update(dt, camera.position, { x: fc ? fc.x : f.x, z: fc ? fc.z : f.z, r: f.radius }, !!(fc && fc.alive) && !showcase && !rig.rig.fixed);
-    if (cutSnap) { cutaway.snap(); cutSnap = false; }
+    updateWeather(dt, d);
+    updateFireworks(dt, d);
+    W.cutaway.update(dt, camera.position, { x: fc ? fc.x : f.x, z: fc ? fc.z : f.z, r: f.radius }, !!(fc && fc.alive) && !showcase && !rig.rig.fixed);
+    if (cutSnap) { W.cutaway.snap(); cutSnap = false; }
     shared.uPointScale.value = gl.domElement.height * camera.projectionMatrix.elements[5] / 2;
 
-    if (QUALITY[q].lite) { crown.shaft.visible = false; pickups.beams.visible = false; pigeons.mesh.visible = false; water.jets.visible = false; halos.points.visible = false; }
-    else { pickups.beams.visible = true; pigeons.mesh.visible = true; water.jets.visible = true; halos.points.visible = true; }
+    const lite = QUALITY[q].lite;
+    crown.shaft.visible = crown.shaft.visible && !lite;
+    pickups.beams.visible = !lite;
+    water.jets.visible = !lite;
+    W.halos.points.visible = !lite && T.lampsOn;
     const p3 = performance.now();
     gl.info.reset();
     if (composer && QUALITY[q].bloom) composer.render(dt);
@@ -403,7 +651,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     const ek = 0.05;
     perf.update += (p1 - p0 - perf.update) * ek; perf.write += (p2 - p1 - perf.write) * ek;
     perf.other += (p3 - p2 - perf.other) * ek; perf.submit += (p4 - p3 - perf.submit) * ek;
-    perf.upload = crowd.stats.drawn * 48 + particles.top * 36 + heroes.count * 80 + 16 * 36;
+    perf.upload = crowd.stats.drawn * 48 + particles.top * 36 + heroes.count * 80 + 64 * 44;
 
     const now = performance.now();
     const ft = now - lastNow;
@@ -427,12 +675,12 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     fpsS.frames++;
   }
 
-  applyQuality();
+  buildWorld();
   window.addEventListener('resize', resize);
 
   return {
     three: { renderer: gl, scene, camera },
-    _dbg: { crowd, people, city, map },
+    _dbg: { crowd, people, hats, heroes, get city() { return W.city; }, map, rings, walls, precip, zones, wx },
     setCrowds,
     frame,
     setFocus(i) { if (i !== focus) focus = i; },
@@ -441,7 +689,36 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
       const s = Math.min(3.4, Math.max(1.2, rig.rig.d / 34));
       return (crownState.lift ?? 2.6 + 1.1 * s) + 1.4 * s;
     },
-    setCameraMode(mode) { showcase = mode === 'showcase'; },
+    setCameraMode(mode, opts = {}) {
+      showcase = mode === 'showcase';
+      show.cycle = showcase && !!opts.cycle;
+      show.t = 0; show.x = show.z = null;
+      if (opts.theme) this.setTheme(opts.theme);
+    },
+    // optional (R4): city theme; rebuilds the city and ground (~0.2 s on desktop), keeps crowds and camera
+    setTheme(id) {
+      if (forceTheme || !THEMES[id] || id === T.id) return T.id;
+      T = getTheme(id);
+      if (!weatherSet) weatherId = T.weather || 'clear';
+      disposeWorld(); buildWorld();
+      cutSnap = true;
+      return T.id;
+    },
+    setWeather(id) {
+      if (forceWeather || forceTheme) return weatherId;
+      weatherSet = id != null;
+      weatherId = WEATHER_IDS.includes(id) ? id : (T.weather || 'clear');
+      applyWeather();
+      return weatherId;
+    },
+    setZones,
+    updateCrowdMeta(index, meta, opts = {}) {
+      const ok = crowd.updateMeta(index, meta, opts.from);
+      if (ok) refreshEmblems();
+      return ok;
+    },
+    themes() { return THEME_IDS.slice(); },
+    weathers() { return WEATHER_IDS.slice(); },
     project(x, y, z, out = {}) {
       tmpV.set(x, y, z).applyMatrix4(camera.matrixWorldInverse);
       out.behind = tmpV.z > 0;
@@ -459,7 +736,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
       out.x = tmpV.x; out.z = tmpV.z;
       return out;
     },
-    cameraYaw() { return rig.rig.yaw; },
+    cameraYaw() { return rig.rig.yaw + (rig.rig.orbit || 0); },
     resize,
     setQuality(nq) { if (QUALITY[nq]) { q = nq; applyQuality(); } },
     setAdaptive(on) { adaptive = !!on; },
@@ -475,19 +752,19 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
         crowdFigures: crowd.stats.crowdFigs,
         neutralFigures: crowd.stats.neutralFigs,
         particles: particles.alive,
-        quality: q,
+        quality: q, theme: T.id, weather: weatherId, zones: zones.size,
         popIn: crowd.stats.popIn, popOut: crowd.stats.popOut, recruits: crowd.stats.recruits, transfers: crowd.stats.transfers,
-        cityVerts: city.verts, cityBaseVerts: city.baseVerts,
+        cityVerts: W.city.verts, cityBaseVerts: W.city.baseVerts,
         dpr: gl.getPixelRatio(),
       };
     },
     dispose() {
       window.removeEventListener('resize', resize);
+      disposeWorld();
       scene.traverse((o) => {
         if (o.geometry) o.geometry.dispose();
         if (o.material) { for (const v of Object.values(o.material.uniforms || {})) if (v && v.value && v.value.isTexture) v.value.dispose(); o.material.dispose(); }
       });
-      ground.dispose();
       people.dispose();
       if (composer) composer.dispose();
       gl.dispose();

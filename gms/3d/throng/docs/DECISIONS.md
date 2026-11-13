@@ -17,3 +17,9 @@ Manager decisions. Aaron reviews the ones marked REVIEW at each milestone.
 | D11 | D8 REVISED: real online is **host-run**. A small Go server on br8t does rooms, matchmaking, relaying and leaderboards; one player's browser runs the sim (bots included) and the others send inputs and receive snapshots; if the host leaves, another client takes over from the last snapshot | The box has Go only, 1 CPU and 845 MB RAM; a Go port of sim + bots + map (~1,500 lines) would need re-porting on every balance change. Cost: a host can cheat, and results sent to leaderboards are only sanity-capped | REVIEW |
 | D12 | "Play" stays the simulated-online ladder mode. Real online is a separate "Play with friends / Online room" entry until it has enough players to be the default | Empty real lobbies are worse than good bots | REVIEW |
 | D13 | Leaving a ladder match counts as last place; a hidden tab puts you on autopilot rather than pausing | Matches behave as if online | REVIEW |
+| D14 | Only Classic moves the ladder rating; other modes pay coins and XP and count toward the monthly cup | Ratings stay comparable | REVIEW |
+| D15 | In Infection, patient zero is always a bot | Nobody starts a match as the villain by lottery | REVIEW |
+| D16 | Online quick match rotates modes every 10 minutes, Classic every other slot | Variety without splitting a small player pool | REVIEW |
+| D17 | Seasons are 28 days from 2 Nov 2026; reward once for peak league; rating keeps 40 % of what was above the league floor | Fresh climb each month without a full wipe | REVIEW |
+| D18 | Events run on a fixed UTC calendar with no server (Double Crowd and Night Market weekends, Rush Hour, Giant Slayer, Mode of the Day ×1.5 coins, monthly cup) | Same for everyone, works offline | REVIEW |
+| D19 | One sub-agent at a time on THRONG (Aaron, 2026-11-13) | Both builders kept hitting the spend limit together | set |

@@ -109,6 +109,7 @@ uniform float uFigScale;
 uniform vec3 uSkin[5];
 uniform vec3 uHair[6];
 uniform vec3 uPants[6];
+uniform float uRimDark;
 varying vec3 vCol;
 ${shaderCommon.lightPars}
 #include <fog_pars_vertex>
@@ -126,7 +127,8 @@ vec3 rotXn(vec3 n, float a) {
 void main() {
   float part = aPR.x;
   float reg = aPR.y;
-  float ph = iB.x, g = clamp(iB.y, 0.0, 1.0), look = fract(iB.z), flash = iB.w;
+  float hz = step(1.5, iB.y);
+  float ph = iB.x * (1.0 - 0.35 * hz), g = clamp(iB.y - 2.0 * hz, 0.0, 1.0), look = fract(iB.z), flash = iB.w;
   vec3 p = position;
   vec3 n = normal;
   float sw = sin(ph);
@@ -139,14 +141,15 @@ void main() {
     if (p.y < 0.45) p.y += lift;
   } else if (part > 2.5 && part < 4.5) {
     float side = part < 3.5 ? 1.0 : -1.0;
-    float a = -sw * 0.85 * g * side + idle * 0.06 * breath * side - 0.15 * g;
+    float a = mix(-sw * 0.85 * g * side + idle * 0.06 * breath * side - 0.15 * g, -1.35 + sw * 0.12 * side, hz);
     p = rotX(p, 1.3, 0.0, a); n = rotXn(n, a);
     p.x += side * idle * 0.01;
   }
   if (part < 0.5 || part > 2.5) {
-    float lean = 0.16 * g;
+    float lean = 0.16 * g + hz * (0.32 + 0.08 * sin(ph * 0.5 + look * 9.0));
     p = rotX(p, 0.78, 0.0, lean); n = rotXn(n, lean);
     p.y += idle * breath * 0.008 * step(1.0, p.y);
+    p.x += hz * sin(ph * 0.5 + look * 20.0) * 0.06 * step(0.8, p.y);
   }
   p.y += abs(cos(ph)) * 0.07 * g;
 
@@ -174,6 +177,8 @@ void main() {
   float rim = pow(max(1.0 - max(dot(nw, V), 0.0), 0.0), 3.0);
   vec3 col = base * light * 0.72 + rim * uRimCol * (0.2 + 0.4 * info.r);
   if ((reg > 0.5 && reg < 1.5) || (reg > 2.5 && reg < 3.5 && cap)) col += iC.rgb * mix(0.1, 0.3, sat) * (1.0 + 0.6 * max(nw.y, 0.0)) + rim * iC.rgb * 0.6 * sat;
+  col *= 1.0 - rim * uRimDark * 2.0;
+  col = mix(col, safeTint(col, iA.xz), 0.18);
   col += flash * vec3(1.0, 0.95, 0.85) * 1.6;
   if (uFlip < 0.0) col = mix(col * 0.75, uReflSky, smoothstep(0.0, 2.2, -w.y) * 0.8);
   vCol = col;

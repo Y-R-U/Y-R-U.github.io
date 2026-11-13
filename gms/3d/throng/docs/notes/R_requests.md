@@ -61,3 +61,39 @@ None of these block M1.
     If the settings screen offers "Auto", call `setAdaptive(true)`. A manual pick should call `setAdaptive(false)` and then `setQuality(q)`.
     On a device that starts slow, create the renderer as `'lite'`, because the lite person LOD is only chosen at creation.
 19. **3D emote bubble** (G2 ask 2) is not done this wave.
+
+## Wave 4 (R4) asks for lane G
+
+20. **New renderer calls are live** (CONTRACT.md → "Themes, weather, zones, mid-match recolour (R4)"). Your existing calls in
+    `main.js` (`setTheme`/`setWeather` from `look`, `setZones(zonesOf(state))`, `updateCrowdMeta` for late joiners and
+    Infection) already work against them. The ids your events use (`festival`, `night-neon`, `sunny-day`, `evening` + `rain`)
+    all exist; `snow` is a fifth theme no event uses yet (good for a winter event; it defaults to falling snow).
+21. **`setWeather('clear')` overrides a theme's own weather.** `setLook` always sends a weather, so a future snow event
+    must send `weather: 'snow'` (or `null` to get the theme's default) to get falling snow.
+22. **Zones: include `progress` (and `color`) in `pushZones`' change key.** The key is built from x/z/r/style only, so a
+    `capture` zone's progress arc would never update. KOTH and LCS are fine as they are. Your `'next'` and `'safe-next'`
+    styles are now drawn as dashed previews (no wall, no tint). Give zones stable `id`s if two of the same style can exist
+    at once, so they glide instead of swapping.
+23. **Theme switches cost a rebuild** (~0.2 s M5, guess 0.5–1 s on a phone). Call `setTheme` behind the results/menu screen,
+    not mid-match. `setWeather` is free at any time.
+24. **Attract mode for the menu:** the renderer now orbits slowly at a lower pitch and frames the biggest crowds over the
+    central plaza (`setCameraMode('showcase')`). It would look much better if the attract match were fast-forwarded
+    further (~40 s instead of 18) and its bots steered toward the central plaza, so crowds are big and clashing behind the
+    title. `setCameraMode('showcase', { cycle: true })` cycles every theme every 14 s with a fade, if you want the menu to
+    show them off; `{ theme }` picks one.
+25. **Online human hint (O ask 1):** other humans' crowds (`state.crowds[i].remote`) get a pulsing inner ring.
+26. **Infection recolour:** pass `{ from: { x, z } }` as the third argument of `updateCrowdMeta` (the contact point of the
+    infecting crowd) and the colour wave starts there instead of at the leader.
+27. **Festival fireworks** fire on the renderer's `phase: 'over'` event. If results appear earlier than ~3 s after that
+    event, the player will only see the first rockets.
+28. **G4 asks answered:** (1a) done: the ground and buildings outside the safe circle are desaturated and red-tinted,
+    with hazard stripes just outside the wall (figures are tinted only lightly so team colours still read). (1b) send the
+    holder's colour as `z.color` on the crown zone (gold when nobody holds it); the renderer blends zone colour changes over
+    ~0.3 s, so a hand-over glides. Remember to put `color` in the `pushZones` change key. (4) Horde look: horde followers
+    (`state.crowds[i].horde`) now walk hunched with arms reaching forward and a lurching sway, and lime spores drift up off
+    the horde. (7) Merge boost: teammates with `boost > 0` get a brighter, pulsing ring and sparks along their contact line.
+    (5) The 3D emote bubble is still not done.
+29. **"0 hats on a 4-person crowd" (online guest):** not a dropped cosmetic. The crowd's leader always wears its hat unless
+    the crowd also has a leader variant (king/robot/mascot/caped), which replaces the hat. Measured: 24 seeded 4-person
+    crowds with a hat each showed 1–4 hats. With a leader variant the 3 followers each wear it 60 % of the time, so zero
+    hats is about a 6 % chance. `cap`/`beanie`/`headband` are also team-coloured and nearly invisible on a tiny crowd.
