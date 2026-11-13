@@ -108,7 +108,7 @@ export const CONFIG = {
   // Real online (M3, docs/NET.md). ONLINE_PUBLIC stays false until the server is deployed: until then the
   // Online entry shows only on localhost or with ?online=1 / ?net=host:port.
   NET: {
-    ONLINE_PUBLIC: false,
+    ONLINE_PUBLIC: true,
     url: 'wss://games.br8t.com/gms/3d/throng/api/ws',
     path: '/gms/3d/throng/api',
     port: 8024,
