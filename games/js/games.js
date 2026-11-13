@@ -34,6 +34,12 @@ export const GAMES = [
     blurb: "Eighteen floating-island holes with windmills, loops and jumps in four themes. A story from nobody to Legend, helpers, a weekly ladder, seasonal events, and online rooms with friends.",
   },
   {
+    id: "throng", name: "THRONG", tag: "Gather the biggest crowd",
+    path: "/gms/3d/throng/", shot: "throng", accent: "#ff5a4d",
+    short: "Sweep the city, grow your crowd, swallow the rest.",
+    blurb: "Two-minute crowd battles in a glowing evening city. Sweep up pedestrians, absorb smaller crowds, and climb eight leagues. Five modes, weekend events, and online rooms with friends.",
+  },
+  {
     id: "ragdojo", name: "RAGDOJO", tag: "Stick fighting, on paper",
     path: "/gms/2d/ragdojo/", shot: "ragdojo", accent: "#3d7fd6",
     short: "Draw your moves. Send stick fighters flying.",
