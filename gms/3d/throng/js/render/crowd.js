@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { STRIDE } from './people.js';
+import { parseCosmetics } from './cosmetics.js';
 
 const GOLDEN = 2.399963229728653;
 const NEUTRAL_SHIRTS = [0xf4f3ef, 0xdcdcd8, 0xc3c6c9, 0xebe2d0, 0xa3a7ac, 0xffffff, 0xd2cbbd, 0x8d939b].map((h) => new THREE.Color(h));
@@ -17,6 +18,17 @@ export function createCrowdSystem(people, map) {
   const kind = new Uint8Array(cap), owner = new Int16Array(cap), run = new Float32Array(cap);
   const free = [];
   for (let i = cap - 1; i >= 0; i--) free.push(i);
+  // per-slot trig (slot k at angle k·GOLDEN and its 3/7/12 harmonics) and per-figure jitter phases, so the hot loop has no trig
+  const GC = new Float32Array(cap), GS = new Float32Array(cap), H3 = new Float32Array(cap * 2), H7 = new Float32Array(cap * 2), H12 = new Float32Array(cap * 2);
+  for (let k = 0; k < cap; k++) {
+    const a = k * GOLDEN;
+    GC[k] = Math.cos(a); GS[k] = Math.sin(a);
+    H3[k * 2] = Math.sin(3 * a); H3[k * 2 + 1] = Math.cos(3 * a);
+    H7[k * 2] = Math.sin(7 * a); H7[k * 2 + 1] = Math.cos(7 * a);
+    H12[k * 2] = Math.sin(12 * a); H12[k * 2 + 1] = Math.cos(12 * a);
+  }
+  const J = new Float32Array(cap * 4);
+  const obs = map.obstacles || [];
   let hi = 0;
   const tmp = { x: 0, z: 0, hit: false };
 
@@ -50,8 +62,8 @@ export function createCrowdSystem(people, map) {
   let nCap = 0, nfig = null, nPrevX = null, nPrevZ = null, nCurX = null, nCurZ = null, nState = null;
   let lastTick = -1;
   let budget = 6000;
-  let time = 0;
-  const stats = { drawn: 0, crowdFigs: 0, neutralFigs: 0, popIn: 0, popOut: 0, recruits: 0, transfers: 0 };
+  let time = 0, figScale = 1;
+  const stats = { drawn: 0, crowdFigs: 0, neutralFigs: 0, popIn: 0, popOut: 0, recruits: 0, transfers: 0, hats: 0, culled: 0 };
 
   function alloc(x, z, look0) {
     const i = free.pop();
@@ -59,6 +71,7 @@ export function createCrowdSystem(people, map) {
     px[i] = x; pz[i] = z; py[i] = 0; vx[i] = 0; vz[i] = 0;
     yaw[i] = Math.random() * Math.PI * 2; phase[i] = Math.random() * 6.28; gait[i] = 0;
     look[i] = look0 ?? Math.random(); flash[i] = 0; hop[i] = 0;
+    J[i * 4] = Math.sin(look[i] * 40); J[i * 4 + 1] = Math.cos(look[i] * 40); J[i * 4 + 2] = Math.sin(look[i] * 23); J[i * 4 + 3] = Math.cos(look[i] * 23);
     scale[i] = 0; scaleT[i] = 1; run[i] = 0; owner[i] = -1;
     if (i + 1 > hi) hi = i + 1;
     return i;
@@ -68,7 +81,8 @@ export function createCrowdSystem(people, map) {
     tr[i] = c.r; tg[i] = c.g; tb[i] = c.b;
     if (instant) { cr[i] = c.r; cg[i] = c.g; cb[i] = c.b; }
   }
-  function teamShade(c, lk, out) {
+  function teamShade(cw, lk, out) {
+    const c = cw.palette ? cw.palette[Math.floor(((lk * 5.31) % 1) * cw.palette.length)] : cw.color;
     const k = 0.82 + 0.36 * ((lk * 9.13) % 1);
     out.r = c.r * k; out.g = c.g * k; out.b = c.b * k;
     return out;
@@ -84,8 +98,11 @@ export function createCrowdSystem(people, map) {
       const col = new THREE.Color(m.color);
       const hsl = {}; col.getHSL(hsl, THREE.SRGBColorSpace);
       col.setHSL(hsl.h, Math.max(0.85, hsl.s), Math.min(0.56, Math.max(0.46, hsl.l)), THREE.SRGBColorSpace);
+      const cos = parseCosmetics(m);
       crowds[m.index] = {
-        index: m.index, color: col, figs: [], alive: false,
+        index: m.index, color: col, figs: [], alive: false, cos,
+        palette: cos.palette ? cos.palette.map((h) => new THREE.Color(h)) : null,
+        hero: !!(cos.leader || cos.flag), onScreen: true, skip: 0,
         x: 0, z: 0, prevX: 0, prevZ: 0, curX: 0, curZ: 0, vx: 0, vz: 0, heading: 0,
         radius: 1, visR: 1, count: 0, want: 0, stealAcc: 0, vScale: 1, seen: false,
       };
@@ -97,11 +114,11 @@ export function createCrowdSystem(people, map) {
   function joinCrowd(f, c, fromColor = true) {
     kind[f] = F_CROWD; owner[f] = c.index;
     c.figs.push(f);
-    setColor(f, teamShade(c.color, look[f], shade), !fromColor);
+    setColor(f, teamShade(c, look[f], shade), !fromColor);
   }
   function absorbInto(f, c) {
     kind[f] = F_ABSORB; owner[f] = c.index;
-    setColor(f, teamShade(c.color, look[f], shade), false);
+    setColor(f, teamShade(c, look[f], shade), false);
   }
   function removeAt(c, idx) {
     const last = c.figs.pop();
@@ -288,7 +305,7 @@ export function createCrowdSystem(people, map) {
       if (st === 2) {
         const c = crowds[N.target[s]];
         if (c) {
-          teamShade(c.color, look[f], shade);
+          teamShade(c, look[f], shade);
           const base = NEUTRAL_SHIRTS[Math.min(7, (look[f] * 8) | 0)];
           tr[f] = base.r + (shade.r - base.r) * 0.3; tg[f] = base.g + (shade.g - base.g) * 0.3; tb[f] = base.b + (shade.b - base.b) * 0.3;
         }
@@ -331,30 +348,50 @@ export function createCrowdSystem(people, map) {
       for (let k = 0; k < drop; k++) { kill(c.figs.pop()); stats.popOut++; }
 
       const figs = c.figs, N = figs.length;
+      // off-screen crowds integrate every other frame at twice the step
+      if (!c.onScreen && (c.skip ^= 1)) continue;
+      const fdt = c.onScreen ? dt : dt * 2;
       const R = c.visR * 0.9;
-      const lsp = Math.hypot(c.vx, c.vz);
+      const bodyR = 0.34 * figScale;
+      const lsp = Math.sqrt(c.vx * c.vx + c.vz * c.vz);
       const ldx = lsp > 0.3 ? c.vx / lsp : Math.sin(sc.heading || 0), ldz = lsp > 0.3 ? c.vz / lsp : Math.cos(sc.heading || 0);
       if (lsp > 0.3) c.heading = Math.atan2(c.vx, c.vz);
+      // only crowds whose disc reaches an obstacle pay for push-out
+      let near = false;
+      if (map.pushOut) {
+        const reach = R * 1.35 + 3;
+        for (const o of obs) {
+          const dx = o.type === 'rect' ? Math.max(0, Math.abs(c.x - o.x) - o.w / 2) : Math.max(0, Math.hypot(c.x - o.x, c.z - o.z) - o.r);
+          const dz = o.type === 'rect' ? Math.max(0, Math.abs(c.z - o.z) - o.d / 2) : 0;
+          if (dx * dx + dz * dz < reach * reach) { near = true; break; }
+        }
+      }
+      const ph = c.index * 1.7;
+      const t3 = time * 0.45 + ph, t7 = -time * 0.7 + ph, t12 = time * 1.1;
+      const s3 = Math.sin(t3), c3 = Math.cos(t3), s7 = Math.sin(t7), c7 = Math.cos(t7), s12 = Math.sin(t12), c12 = Math.cos(t12);
+      const sj1 = Math.sin(time * 0.7), cj1 = Math.cos(time * 0.7), sj2 = Math.sin(time * 0.6), cj2 = Math.cos(time * 0.6);
+      const blRun = 1 - Math.exp(-fdt * 9), blWalk = 1 - Math.exp(-fdt * 5);
+      const kg = Math.min(1, fdt * 5), kyF = Math.min(1, fdt * 9), kyS = Math.min(1, fdt * 1.5);
+      const idleYaw = Math.atan2(ldx, ldz);
       for (let k = 0; k < N; k++) {
         const f = figs[k];
         if (k === 0) {
           px[f] = c.x; pz[f] = c.z; vx[f] = c.vx; vz[f] = c.vz;
-          scaleT[f] = 1.35;
+          scaleT[f] = c.cos.leader ? 2.0 : 1.35;
         } else {
           const u = k / N;
-          const a = k * GOLDEN;
           let r = R * Math.sqrt(u);
           if (u > 0.45) {
-            const ph = c.index * 1.7;
-            const edge = 1 + 0.08 * Math.sin(3 * a + time * 0.45 + ph) + 0.05 * Math.sin(7 * a - time * 0.7 + ph) + 0.035 * Math.sin(12 * a + time * 1.1);
+            const edge = 1 + 0.08 * (H3[k * 2] * c3 + H3[k * 2 + 1] * s3) + 0.05 * (H7[k * 2] * c7 + H7[k * 2 + 1] * s7) + 0.035 * (H12[k * 2] * c12 + H12[k * 2 + 1] * s12);
             const t = Math.min(1, (u - 0.45) / 0.4);
             r *= 1 + (edge - 1) * t;
             const h = (look[f] * 97.3) % 1;
             if (h < 0.06 && u > 0.6) r *= 1.1 + h * 2.5;
           }
-          const jx = Math.sin(time * 0.7 + look[f] * 40) * 0.22, jz = Math.cos(time * 0.6 + look[f] * 23) * 0.22;
-          let tx = c.x + Math.cos(a) * r + jx - c.vx * 0.06 * u, tz = c.z + Math.sin(a) * r + jz - c.vz * 0.06 * u;
-          if (map.pushOut) {
+          const j = f * 4;
+          const jx = (sj1 * J[j + 1] + cj1 * J[j]) * 0.22, jz = (cj2 * J[j + 3] - sj2 * J[j + 2]) * 0.22;
+          let tx = c.x + GC[k] * r + jx - c.vx * 0.06 * u, tz = c.z + GS[k] * r + jz - c.vz * 0.06 * u;
+          if (near) {
             // slots inside a building fold back out into a loose band rather than a line along the wall
             map.pushOut(tx, tz, 0.3, tmp);
             if (tmp.hit) { const fx = tmp.x - tx, fz = tmp.z - tz; tx = tmp.x + fx * 0.6 + jz; tz = tmp.z + fz * 0.6 + jx; }
@@ -363,24 +400,24 @@ export function createCrowdSystem(people, map) {
           let dvx = c.vx * (1 - 0.12 * u) + (tx - px[f]) * kk;
           let dvz = c.vz * (1 - 0.12 * u) + (tz - pz[f]) * kk;
           const lim = lsp * 1.25 + 3.5 + run[f] * 5;
-          const dl = Math.hypot(dvx, dvz);
-          if (dl > lim) { dvx *= lim / dl; dvz *= lim / dl; }
-          const bl = 1 - Math.exp(-dt * (run[f] > 0 ? 9 : 5));
+          const dl2 = dvx * dvx + dvz * dvz;
+          if (dl2 > lim * lim) { const q = lim / Math.sqrt(dl2); dvx *= q; dvz *= q; }
+          const bl = run[f] > 0 ? blRun : blWalk;
           vx[f] += (dvx - vx[f]) * bl; vz[f] += (dvz - vz[f]) * bl;
-          px[f] += vx[f] * dt; pz[f] += vz[f] * dt;
-          if (map.pushOut) {
-            map.pushOut(px[f], pz[f], 0.25, tmp);
+          px[f] += vx[f] * fdt; pz[f] += vz[f] * fdt;
+          if (near) {
+            map.pushOut(px[f], pz[f], bodyR * c.vScale, tmp);
             if (tmp.hit) { px[f] = tmp.x; pz[f] = tmp.z; }
           }
           propPush(f);
           scaleT[f] = c.vScale;
         }
-        const sp = Math.hypot(vx[f], vz[f]);
+        const sp = Math.sqrt(vx[f] * vx[f] + vz[f] * vz[f]);
         const g = Math.min(1, Math.max(0, (sp - 0.35) / 2.2));
-        gait[f] += (g - gait[f]) * Math.min(1, dt * 5);
-        phase[f] += dt * (4.5 + Math.min(sp, 9) * 0.85);
-        const ty = sp > 0.6 ? Math.atan2(vx[f], vz[f]) : Math.atan2(ldx, ldz);
-        yaw[f] = angLerp(yaw[f], ty, Math.min(1, dt * (sp > 0.6 ? 9 : 1.5)));
+        gait[f] += (g - gait[f]) * kg;
+        phase[f] += fdt * (4.5 + Math.min(sp, 9) * 0.85);
+        const ty = sp > 0.6 ? Math.atan2(vx[f], vz[f]) : idleYaw;
+        yaw[f] = angLerp(yaw[f], ty, sp > 0.6 ? kyF : kyS);
       }
     }
   }
@@ -396,6 +433,7 @@ export function createCrowdSystem(people, map) {
         const s = 6 + run[i] * 3;
         vx[i] += (dx / d * s - vx[i]) * Math.min(1, dt * 6); vz[i] += (dz / d * s - vz[i]) * Math.min(1, dt * 6);
         px[i] += vx[i] * dt; pz[i] += vz[i] * dt;
+        if (map.pushOut) { map.pushOut(px[i], pz[i], 0.34 * figScale, tmp); if (tmp.hit) { px[i] = tmp.x; pz[i] = tmp.z; } }
         gait[i] = 1; phase[i] += dt * 10;
         yaw[i] = angLerp(yaw[i], Math.atan2(vx[i], vz[i]), Math.min(1, dt * 10));
         if (d < c.visR * 0.55) scaleT[i] = 0;
@@ -417,15 +455,52 @@ export function createCrowdSystem(people, map) {
     updateLoose(dt);
   }
 
+  // view: ground quad of the screen (4 points, counter-clockwise or clockwise), or null = draw everything
+  let view = null;
+  const vn = new Float32Array(12);
+  function setView(q, margin) {
+    if (!q) { view = null; return; }
+    let area = 0;
+    for (let k = 0; k < 4; k++) { const a = q[k], b = q[(k + 1) % 4]; area += a[0] * b[1] - b[0] * a[1]; }
+    const sgn = area > 0 ? 1 : -1;
+    for (let k = 0; k < 4; k++) {
+      const a = q[k], b = q[(k + 1) % 4];
+      let nx = (b[1] - a[1]) * sgn, nz = -(b[0] - a[0]) * sgn;
+      const l = Math.hypot(nx, nz) || 1;
+      nx /= l; nz /= l;
+      vn[k * 3] = nx; vn[k * 3 + 1] = nz; vn[k * 3 + 2] = nx * a[0] + nz * a[1] + margin;
+    }
+    view = vn;
+  }
+  const inView = (x, z, r = 0) => !view || (
+    view[0] * x + view[1] * z <= view[2] + r && view[3] * x + view[4] * z <= view[5] + r &&
+    view[6] * x + view[7] * z <= view[8] + r && view[9] * x + view[10] * z <= view[11] + r);
+
+  const hatOf = new Uint8Array(cap);
+  const SKIP = 255;
   function write(dt) {
     const d = people.data;
-    let n = 0, cf = 0, nf = 0;
+    let n = 0, cf = 0, nf = 0, culled = 0;
     const cl = 1 - Math.exp(-dt * 4.5);
     const kUp = 1 - Math.exp(-dt * 9), kDown = 1 - Math.exp(-dt * 14);
     const fl = Math.exp(-dt * 4);
     let newHi = 0;
+    for (const c of crowds) {
+      if (!c) continue;
+      c.onScreen = c.alive && inView(c.x, c.z, c.visR + 6);
+      c.leadFig = c.alive && c.figs.length ? c.figs[0] : -1;
+    }
+    const put = (i) => {
+      const o = n * STRIDE;
+      const h = hop[i] > 0 ? Math.sin((hop[i] / 0.3) * Math.PI) * 0.35 : 0;
+      d[o] = px[i]; d[o + 1] = Math.max(0, h); d[o + 2] = pz[i]; d[o + 3] = yaw[i];
+      d[o + 4] = phase[i] % 628.3185; d[o + 5] = gait[i]; d[o + 6] = hatOf[i] + Math.min(look[i], 0.999); d[o + 7] = flash[i];
+      d[o + 8] = cr[i]; d[o + 9] = cg[i]; d[o + 10] = cb[i]; d[o + 11] = scale[i];
+      n++;
+    };
     for (let i = 0; i < hi; i++) {
       const k = kind[i];
+      hatOf[i] = SKIP;
       if (k === F_FREE) continue;
       newHi = i + 1;
       scale[i] += (scaleT[i] - scale[i]) * (scaleT[i] < scale[i] ? kDown : kUp);
@@ -434,30 +509,49 @@ export function createCrowdSystem(people, map) {
       hop[i] = Math.max(0, hop[i] - dt);
       cr[i] += (tr[i] - cr[i]) * cl; cg[i] += (tg[i] - cg[i]) * cl; cb[i] += (tb[i] - cb[i]) * cl;
       if (scale[i] < 0.01) continue;
-      const o = n * STRIDE;
-      const h = hop[i] > 0 ? Math.sin((hop[i] / 0.3) * Math.PI) * 0.35 : 0;
-      d[o] = px[i]; d[o + 1] = Math.max(0, h); d[o + 2] = pz[i]; d[o + 3] = yaw[i];
-      d[o + 4] = phase[i] % 628.3185; d[o + 5] = gait[i]; d[o + 6] = look[i]; d[o + 7] = flash[i];
-      d[o + 8] = cr[i]; d[o + 9] = cg[i]; d[o + 10] = cb[i]; d[o + 11] = scale[i];
-      n++;
+      if (!inView(px[i], pz[i])) { culled++; continue; }
+      let hat = 0;
+      const c = owner[i] >= 0 ? crowds[owner[i]] : null;
+      if (c && k !== F_NEUTRAL) {
+        const lead = c.leadFig === i;
+        if (lead && c.cos.leader) continue;
+        const cos = c.cos;
+        if (cos.hat && (lead || (!cos.hatLeaderOnly && ((look[i] * 53.71) % 1) < cos.hatShare))) hat = cos.hat;
+      }
       if (k === F_NEUTRAL) nf++; else cf++;
+      hatOf[i] = hat;
+      if (hat) put(i);
     }
+    const nh = n;
+    for (let i = 0; i < newHi; i++) if (hatOf[i] === 0) put(i);
     hi = newHi;
     people.setCount(n);
-    stats.drawn = n; stats.crowdFigs = cf; stats.neutralFigs = nf;
-    return n;
+    stats.drawn = n; stats.crowdFigs = cf; stats.neutralFigs = nf; stats.hats = nh; stats.culled = culled;
+    return nh;
+  }
+
+  // state of a crowd's leader figure, for the hero mesh
+  function leaderState(c, out) {
+    const f = c.leadFig;
+    if (f == null || f < 0 || kind[f] === F_FREE) return null;
+    out.x = px[f]; out.z = pz[f]; out.y = hop[f] > 0 ? Math.max(0, Math.sin((hop[f] / 0.3) * Math.PI) * 0.35) : 0;
+    out.yaw = yaw[f]; out.phase = phase[f] % 628.3185; out.gait = gait[f]; out.look = Math.min(look[f], 0.999); out.flash = flash[f];
+    out.scale = scale[f];
+    return out;
   }
 
   return {
-    setCrowds, update, write, crowdAt, crowds, stats,
+    setCrowds, update, write, crowdAt, crowds, stats, setView, inView, leaderState,
     onRecruit, onSteal, onElim, onRespawn,
     setBudget(b) { budget = b; },
+    setFigScale(v) { figScale = v; },
     figPos(f) { return [px[f], pz[f]]; },
   };
 }
 
 function angLerp(a, b, t) {
   let d = b - a;
-  d = ((d + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
-  return a + d * t;
+  if (d > Math.PI || d < -Math.PI) d = ((d + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+  const r = a + d * t;
+  return r > 50 || r < -50 ? r % (Math.PI * 2) : r;
 }

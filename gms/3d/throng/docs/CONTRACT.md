@@ -138,6 +138,43 @@ landscape framing).
 
 Lane G draws all text and HUD in DOM (count badges and "+N" floaters via `r.project`).
 
+### Crowd cosmetics (R3) — optional fields on each `setCrowds` entry
+
+Every field is optional. A missing field, or a value not in the list below, gives today's look.
+The renderer parses them in `js/render/cosmetics.js` (`parseCosmetics`, and the id lists `HAT_IDS`,
+`LEADER_IDS`, `EMBLEM_IDS`, `TRAIL_IDS`, `RING_IDS`).
+
+```js
+r.setCrowds([{ index, name, color,
+  palette:       [0xRRGGBB, ...],   // 1–3 shirt colours mixed across the followers (two-tone crowds). Default: [color]
+  hat:           'cap' | 'tophat' | 'beanie' | 'crown' | 'party' | 'cowboy' | 'hardhat' | 'headband' | 'chef' | 'wizard' | 'halo',
+  hatShare:      0..1,              // share of followers wearing the hat (default 0.5); the leader always wears it
+  hatLeaderOnly: false,             // true = only the leader wears it
+  leader:        'caped' | 'king' | 'robot' | 'mascot',   // aliases: knight/hero → caped, astronaut → robot
+  flag:          true | 'star' | 'heart' | 'bolt' | 'crown' | 'moon' | 'diamond' | 'skull' | 'paw' | 'flame' | 'sun'
+                 | '<1–3 characters or an emoji>'          // drawn as a white silhouette on the cloth
+                 | 'banner:<css colour>'                   // star on a cloth of that colour
+                 | { emblem, color: 0xRRGGBB },            // cloth colour defaults to the team colour
+  trail:         'sparkle' | 'petals' | 'dust' | 'lightning' | 'confetti' | 'hearts' | 'smoke',  // behind a moving crowd
+  ring:          'solid' | 'dashed' | 'double' | 'flame' | 'pulse',
+}])
+```
+
+Cost (all inside the existing draw-call budget; nothing creates a per-crowd material):
+- `palette`, `ring`: free (instance data and one shader branch).
+- `hat`: one instanced draw shared by every crowd, about 120 triangles per hatted figure (60 on lite).
+- `leader` and `flag`: one instanced draw for all crowds, about 1.5k triangles per leader, at most 16.
+- `trail`, and the embers of `flame`: these come from the shared particle pool (no extra draw), at about 12 + 2·R particles/s while moving.
+  Rates are halved on lite and off-screen crowds emit nothing.
+
+Behaviour:
+- A leader variant replaces the hat on the leader and draws the leader at 2× follower size.
+- A flag is held in the leader's right hand. Its pole height scales with zoom. When that crowd is rank 1, the crown sits on top of the pole, and `crownTop()` follows it.
+
+Renderer extras added in R3:
+- `stats()` also returns `hats`, `heroes`, `culled` (figures outside the view, not uploaded) and `uploadKB` (instance bytes per frame).
+- It also returns `ms`: `{ update, write, other, submit }` (EMA ms of the renderer's JS stages).
+
 ## Test hooks (lane G wires, both lanes use)
 
 - `?auto=1` player is driven by a bot · `?lite=1` cheapest quality · `?seed=N` fixed match

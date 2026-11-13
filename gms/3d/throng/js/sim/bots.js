@@ -297,6 +297,7 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
     const playing = state.phase === 'play';
     for (const b of bots) {
       const me = state.crowds[b.ci];
+      if (b.off) { b.goal = null; continue; }
       if (!me.alive || !playing) { sim.setInput(b.ci, 0, 0); b.goal = null; b.dirX = b.dirZ = 0; continue; }
       if (state.tick - b.checkTick >= 30) {
         const moved = Math.hypot(me.x - b.checkX, me.z - b.checkZ);
@@ -329,5 +330,11 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
     }
   }
 
-  return { update, bots, nav };
+  // Online: a human-steered crowd's bot is switched off; it comes back as autopilot when they go quiet.
+  function setEnabled(ci, on) {
+    for (const b of bots) if (b.ci === ci) { b.off = !on; b.goal = null; b.dirX = b.dirZ = 0; }
+  }
+  const enabled = (ci) => bots.some((b) => b.ci === ci && !b.off);
+
+  return { update, bots, nav, setEnabled, enabled };
 }

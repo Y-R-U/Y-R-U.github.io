@@ -1,5 +1,6 @@
 import { CONFIG } from '../config.js';
 import { createRng } from './rng.js';
+import { botCosmetics } from '../meta/shop.js';
 
 const rgb = (c) => [(c >> 16) & 255, (c >> 8) & 255, c & 255];
 const colorDist = (a, b) => { const x = rgb(a), y = rgb(b); return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]); };
@@ -7,7 +8,8 @@ const colorDist = (a, b) => { const x = rgb(a), y = rgb(b); return Math.hypot(x[
 // Crowd 0 is always the local player. Bots get the remaining teams; persona→team is seeded.
 // roster (optional): [{ name, flag, persona, skill, aggr, human, league }] for sim-online opponents.
 // playerColor (optional): a locker colour; the team closest to it sits out so no bot looks like you.
-export function makePlayers({ seed = 1, playerName = 'You', playerTeam = 0, playerColor = null, auto = false, allBots = false, roster = null } = {}) {
+// playerCos: the renderer cosmetics (hat, leader, flag, trail, ring) of crowd 0; bots get some by league.
+export function makePlayers({ seed = 1, playerName = 'You', playerTeam = 0, playerColor = null, playerCos = null, auto = false, allBots = false, roster = null } = {}) {
   const rng = createRng('players:' + seed);
   const teams = CONFIG.TEAMS.slice(0, CONFIG.MATCH.crowds);
   if (playerColor != null) {
@@ -22,6 +24,7 @@ export function makePlayers({ seed = 1, playerName = 'You', playerTeam = 0, play
   const players = [{
     id: 'p0', name: (playerName || '').trim() || pt.name, team: pt.name, color: playerColor ?? pt.color,
     isBot: allBots, skill: CONFIG.AUTO_PLAYER.skill, persona: CONFIG.AUTO_PLAYER.persona, human: !allBots,
+    cos: allBots ? botCosmetics('p0:' + seed, 2) : playerCos || {},
   }];
   order.forEach((ti, k) => {
     const r = roster && roster[k];
@@ -29,6 +32,7 @@ export function makePlayers({ seed = 1, playerName = 'You', playerTeam = 0, play
     players.push({
       id: 'b' + ti, name: r ? r.name : teams[ti].name, team: teams[ti].name, color: teams[ti].color, isBot: true,
       skill: s.skill, persona: s.persona, aggr: s.aggr, throttle: s.throttle, humanish: !!(r && r.human), flag: r ? r.flag : '', league: r ? r.league : null,
+      cos: r && r.cos ? r.cos : botCosmetics('b' + ti + ':' + seed, 2),
     });
   });
   const botIndices = [], botSpecs = [];

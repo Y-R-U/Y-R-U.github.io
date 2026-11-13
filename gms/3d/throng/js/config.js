@@ -105,6 +105,15 @@ export const CONFIG = {
     toastTime: 1.9,
   },
 
+  // Real online (M3, docs/NET.md). ONLINE_PUBLIC stays false until the server is deployed: until then the
+  // Online entry shows only on localhost or with ?online=1 / ?net=host:port.
+  NET: {
+    ONLINE_PUBLIC: false,
+    url: 'wss://games.br8t.com/gms/3d/throng/api/ws',
+    path: '/gms/3d/throng/api',
+    port: 8024,
+  },
+
   // Fake-online name pool for later milestones (M2 lobby).
   NAME_POOL: [
     'xXSlayerXx', 'MoonPie', 'kaito_77', 'Lil Boss', 'NoScope', 'Mr Waddles', 'zara.k', 'Pixel Pete',

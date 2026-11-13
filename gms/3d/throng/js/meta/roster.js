@@ -2,6 +2,7 @@ import { CONFIG } from '../config.js';
 import { neighbours } from './ladder.js';
 import { leagueOf, botProfile } from './leagues.js';
 import { hash32, unit } from './hash.js';
+import { botCosmetics } from './shop.js';
 
 // The opponents of one sim-online match: ladder neighbours with skill drawn around their league.
 export function buildRoster({ seed, rating, count = 7 }) {
@@ -17,6 +18,7 @@ export function buildRoster({ seed, rating, count = 7 }) {
     return {
       name: row.name, flag: row.flag, rank: row.rank, rating: row.rating, league: lg.index,
       persona: personas[(off + i) % personas.length], skill, aggr: prof.aggr, throttle: prof.throttle, human: humans.has(i),
+      cos: botCosmetics(row.name + ':' + row.rank, lg.index),
     };
   });
 }

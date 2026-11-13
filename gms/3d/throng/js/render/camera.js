@@ -6,12 +6,21 @@ export function createCameraRig(camera) {
   const rig = {
     yaw: 0.55, pitch: 0.95, tx: 0, tz: 0, d: 20, lx: 0, lz: 0,
     p: 0, pv: 0, end: 0, endOn: false, init: false, fixed: null,
-    fovV: 45,
+    fovV: 45, ex: 0, ez: 0, bound: 0,
   };
   const target = new THREE.Vector3();
+  const ndc = new THREE.Vector3(), dir = new THREE.Vector3();
+  // ground hit of a screen corner, or null near the horizon
+  const groundAt = (sx, sy) => {
+    ndc.set(sx, sy, 0.5).unproject(camera);
+    dir.copy(ndc).sub(camera.position);
+    if (dir.y > -0.05) return null;
+    const t = -camera.position.y / dir.y;
+    return [camera.position.x + dir.x * t, camera.position.z + dir.z * t];
+  };
 
   // Half-extent of ground (m) the short screen axis must show around the crowd.
-  const viewR = (R) => Math.max(12, 7 + 3.0 * R);
+  const viewR = (R) => Math.max(12, 6 + 2.4 * R);
 
   function fit(R, aspect) {
     const fovV = aspect < 1 ? 62 - (1 - aspect) * 6 : aspect > 1.7 ? 40 : 58 - (aspect - 1) / 0.7 * 18;
@@ -28,7 +37,8 @@ export function createCameraRig(camera) {
     yaw: () => rig.yaw,
     punch(s) { rig.pv -= Math.max(0, Math.min(1.5, s)) * 2.6; },
     setEnd(on) { if (on && !rig.endOn) rig.end = 0; rig.endOn = on; },
-    snap() { rig.init = false; },
+    snap() { rig.init = false; rig.ex = rig.ez = 0; },
+    setBound(b) { rig.bound = b; },
     update(dt, focus, aspect) {
       dt = Math.min(dt, 0.1);
       const R = Math.max(1, focus.radius || 1);
@@ -55,7 +65,7 @@ export function createCameraRig(camera) {
       let d = rig.d * (1 + 0.16 * rig.p) * (1 - 0.4 * e);
       let yaw = rig.yaw + 0.22 * e + (rig.yawDrift ? 0.6 * Math.sin(rig.yawDrift) : 0);
       let pitch = rig.pitch - 0.1 * e;
-      let tx = rig.tx, tz = rig.tz;
+      let tx = rig.tx + rig.ex, tz = rig.tz + rig.ez;
       if (rig.fixed) { d = rig.fixed.d; tx = rig.fixed.x; tz = rig.fixed.z; yaw = rig.fixed.yaw ?? yaw; pitch = rig.fixed.pitch ?? pitch; }
       camera.fov = rig.fovV;
       const hd = Math.cos(pitch) * d;
@@ -66,6 +76,22 @@ export function createCameraRig(camera) {
       camera.far = d * 5 + 400;
       camera.aspect = aspect;
       camera.updateProjectionMatrix();
+      // keep the visible ground inside the built city: slide the look target inward near the map edge
+      if (rig.bound > 0 && !rig.fixed) {
+        camera.updateMatrixWorld();
+        let ox = 0, oz = 0;
+        const B = rig.bound;
+        for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+          const g = groundAt(sx, sy);
+          if (!g) continue;
+          const gx = g[0] - rig.ex, gz = g[1] - rig.ez;
+          if (gx > B) ox = Math.min(ox, B - gx); if (gx < -B) ox = Math.max(ox, -B - gx);
+          if (gz > B) oz = Math.min(oz, B - gz); if (gz < -B) oz = Math.max(oz, -B - gz);
+        }
+        const lim = 0.5 * f.V, k = 1 - Math.exp(-dt * 3);
+        rig.ex += (Math.max(-lim, Math.min(lim, ox)) - rig.ex) * k;
+        rig.ez += (Math.max(-lim, Math.min(lim, oz)) - rig.ez) * k;
+      }
       return d;
     },
   };

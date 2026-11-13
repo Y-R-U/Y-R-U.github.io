@@ -293,7 +293,7 @@ function buildGrid(obstacles, size) {
   const off = (size + 64) / 2;
   const cells = Array.from({ length: n * n }, () => []);
   obstacles.forEach((o, idx) => {
-    const hw = o.type === 'rect' ? o.w / 2 : o.r, hd = o.type === 'rect' ? o.d / 2 : o.r;
+    const hw = (o.type === 'rect' ? o.w / 2 : o.r) + 1.2, hd = (o.type === 'rect' ? o.d / 2 : o.r) + 1.2;
     const i0 = Math.max(0, Math.floor((o.x - hw + off) / CELL)), i1 = Math.min(n - 1, Math.floor((o.x + hw + off) / CELL));
     const j0 = Math.max(0, Math.floor((o.z - hd + off) / CELL)), j1 = Math.min(n - 1, Math.floor((o.z + hd + off) / CELL));
     for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) cells[j * n + i].push(idx);

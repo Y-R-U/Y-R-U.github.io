@@ -1,4 +1,4 @@
-// node tools/sim_test.mjs [--matches=N] [--map=stub|real|both] [--break=determinism|nan|stuck|leak|events|distribution|jitter|league] [--quiet]
+// node tools/sim_test.mjs [--matches=N] [--map=stub|real|both] [--break=determinism|nan|stuck|leak|events|distribution|jitter|league|restore|remote] [--quiet]
 import { createSim, SIM_DT, stateHash } from '../js/sim/sim.js';
 import { createBots } from '../js/sim/bots.js';
 import { makePlayers } from '../js/sim/match.js';
@@ -190,6 +190,84 @@ for (const [mapName, genMap] of mapSets) {
   }
   if (places.Legend - places.Bronze < 1) fail(`[${mapName}] leagues are not a difficulty curve: the auto-player places ${places.Bronze.toFixed(2)} in Bronze and ${places.Legend.toFixed(2)} in Legend`);
   if (!quiet) console.log(`\n[${mapName}] sim-online rosters (crowd 0 = the ?auto=1 bot, skill 0.8):\n  ` + rows.join('\n  '));
+}
+
+// Online (M3): serialize → restore continues exactly; a state-only restore (host migration) carries on with
+// the same counts; a remote-steered crowd is never driven by its bot.
+{
+  const [mapName, genMap] = mapSets[mapSets.length - 1];
+  const tag = `[${mapName}] online`;
+  const seed = 77, map = genMap(seed);
+  const { players, botIndices, botSpecs } = makePlayers({ seed, allBots: true });
+  const A = createSim({ seed, map, players });
+  const botsA = createBots({ sim: A, indices: botIndices, specs: botSpecs, seed });
+  for (let i = 0; i < 1500; i++) { botsA.update(); A.step(); A.drainEvents(); }
+  const snap = JSON.parse(JSON.stringify(A.serialize()));
+  if (BREAK === 'restore') delete snap.rng;
+  const B = createSim({ seed, map, players, restore: snap });
+  if (stateHash(B.state) !== stateHash(A.state)) fail(`${tag}: restored state hash differs at once (${stateHash(A.state)} vs ${stateHash(B.state)})`);
+  while (A.state.phase !== 'over') {
+    botsA.update();
+    for (const c of A.state.crowds) B.setInput(c.index, c.ix, c.iz);
+    A.step(); B.step(); A.drainEvents(); B.drainEvents();
+  }
+  if (stateHash(B.state) !== stateHash(A.state)) fail(`${tag}: serialize/restore did not continue exactly (${stateHash(A.state)} vs ${stateHash(B.state)})`);
+
+  // Partial restore: only what a guest's mirror has (contract fields, no RNG, no wander targets).
+  const S0 = createSim({ seed, map, players });
+  const bots0 = createBots({ sim: S0, indices: botIndices, specs: botSpecs, seed });
+  for (let i = 0; i < 1800; i++) { bots0.update(); S0.step(); S0.drainEvents(); }
+  const N = S0.state.neutrals;
+  const mirror = {
+    tick: S0.state.tick, time: S0.state.time, timeLeft: S0.state.timeLeft, countdownLeft: 0, phase: S0.state.phase, leader: S0.state.leader, leadChanges: S0.state.leadChanges,
+    crowds: S0.state.crowds.map((c) => ({ alive: c.alive, x: c.x, z: c.z, vx: c.vx, vz: c.vz, heading: c.heading, count: c.count, radius: c.radius, kills: c.kills, best: c.best,
+      rank: c.rank, protect: c.protect, respawnIn: c.respawnIn, eating: c.eating, panic: c.panic, recruited: c.recruited, stolen: c.stolen, lost: c.lost, deaths: c.deaths, fx: { ...c.fx } })),
+    neutrals: { x: N.x.slice(), z: N.z.slice(), heading: N.heading.slice(), state: N.state.slice(), target: N.target.slice(), look: N.look.slice() },
+    pickups: S0.state.pickups.map((p) => ({ ...p })),
+  };
+  const P = createSim({ seed, map, players, restore: mirror });
+  const countsBefore = S0.state.crowds.map((c) => c.count).join(',');
+  if (P.state.crowds.map((c) => c.count).join(',') !== countsBefore) fail(`${tag}: partial restore changed counts`);
+  if (P.state.neutrals.active !== N.active) fail(`${tag}: partial restore has ${P.state.neutrals.active} pedestrians, source ${N.active}`);
+  if (P.state.tick !== S0.state.tick) fail(`${tag}: partial restore lost the tick`);
+  const botsP = createBots({ sim: P, indices: botIndices, specs: botSpecs, seed: seed + 1 });
+  const prevP = new Int32Array(8);
+  let leakP = -1, jumps = 0;
+  const lastX = P.state.crowds.map((c) => [c.x, c.z]);
+  while (P.state.phase !== 'over') {
+    P.state.crowds.forEach((c, i) => { prevP[i] = c.count; });
+    botsP.update(); P.step();
+    const d = new Int32Array(8);
+    for (const e of P.drainEvents()) {
+      if (e.type === 'recruit') d[e.crowd] += e.n; else if (e.type === 'steal') { d[e.from] -= e.n; d[e.to] += e.n; } else if (e.type === 'respawn') d[e.crowd] += e.count;
+    }
+    P.state.crowds.forEach((c, i) => {
+      if (leakP < 0 && c.count !== prevP[i] + d[i]) leakP = P.state.tick;
+      if (c.alive && Math.hypot(c.x - lastX[i][0], c.z - lastX[i][1]) > 1.5) jumps++;
+      lastX[i] = [c.x, c.z];
+    });
+  }
+  if (leakP >= 0) fail(`${tag}: partial-restore match leaked people at tick ${leakP}`);
+  if (jumps > 8) fail(`${tag}: partial-restore leaders jumped ${jumps} times (more than the respawns)`);
+
+  // Remote crowd: its bot is switched off; the input set from outside must survive bots.update().
+  const R = createSim({ seed, map, players });
+  const botsR = createBots({ sim: R, indices: [0, 1, 2, 3, 4, 5, 6, 7], specs: botSpecs.concat([{ persona: 'collector', skill: 0.6 }]), seed });
+  R.setRemote(3, true, 'Remote');
+  if (BREAK !== 'remote') botsR.setEnabled(3, false);
+  let overridden = 0;
+  for (let i = 0; i < 600; i++) {
+    R.setInput(3, 0.6, -0.8);
+    botsR.update();
+    if (R.state.phase === 'play' && (Math.abs(R.state.crowds[3].ix - 0.6) > 1e-9 || Math.abs(R.state.crowds[3].iz + 0.8) > 1e-9)) overridden++;
+    R.step(); R.drainEvents();
+  }
+  if (overridden) fail(`${tag}: a remote crowd's input was overwritten by its bot on ${overridden} ticks`);
+  if (R.state.crowds[3].name !== 'Remote' || !R.state.crowds[3].remote) fail(`${tag}: setRemote did not mark the crowd`);
+  botsR.setEnabled(3, true);
+  for (let i = 0; i < 120; i++) { R.setInput(3, 0.6, -0.8); botsR.update(); R.step(); R.drainEvents(); }
+  if (Math.abs(R.state.crowds[3].ix - 0.6) < 1e-9 && Math.abs(R.state.crowds[3].iz + 0.8) < 1e-9) fail(`${tag}: re-enabled bot (autopilot) did not take the crowd back`);
+  if (!quiet) console.log(`\n${tag}: serialize/restore exact, partial restore conserved (jumps ${jumps}), remote crowd untouched by its bot`);
 }
 
 console.log(`\n${failures.length ? 'FAIL' : 'PASS'} in ${((Date.now() - t0) / 1000).toFixed(1)}s${BREAK ? ` (break=${BREAK})` : ''}`);

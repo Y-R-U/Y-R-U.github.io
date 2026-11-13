@@ -1,4 +1,4 @@
-// node tools/meta_test.mjs [--break=ladder|ladder-slight|curve|curve-slight|names|names-slight|hash|daily|economy|save|progress]
+// node tools/meta_test.mjs [--break=ladder|ladder-slight|curve|curve-slight|names|names-slight|hash|daily|economy|save|progress|shop|botcos]
 // Pure meta-layer checks. Each --break arm makes one real input wrong and must turn the run red.
 import { LADDER, rankOf, ratingAt, ratingDelta, around, rowAt } from '../js/meta/ladder.js';
 import { LEAGUES, leagueOf, nextLeague } from '../js/meta/leagues.js';
@@ -7,7 +7,8 @@ import { hash32, unit, rngFrom } from '../js/meta/hash.js';
 import { buildRoster } from '../js/meta/roster.js';
 import { challengeFor, dayKey, claimLogin, loginState, LOGIN_REWARDS } from '../js/meta/daily.js';
 import { ECON, spend, earn } from '../js/meta/economy.js';
-import { SHOP, buy, equip } from '../js/meta/shop.js';
+import { SHOP, buy, equip, CROWD_SLOTS, crowdCosmetics, botCosmetics, unlocked } from '../js/meta/shop.js';
+import { readFileSync } from 'node:fs';
 import { defaults, migrate, load, write, memoryStorage, SAVE_KEY } from '../js/meta/save.js';
 import { applyMatch } from '../js/meta/progress.js';
 
@@ -118,7 +119,7 @@ const T0 = Date.parse('2026-11-12T08:00:00Z');
   for (let i = 0; i < 4000 && !bad; i++) {
     const op = Math.floor(r() * 5);
     if (op === 0) spend(s, Math.floor(r() * 900));
-    else if (op === 1) { const slot = Object.keys(SHOP)[Math.floor(r() * 5)]; const it = SHOP[slot][Math.floor(r() * SHOP[slot].length)]; buy(s, slot, it.id); equip(s, slot, it.id); }
+    else if (op === 1) { const slot = Object.keys(SHOP)[Math.floor(r() * Object.keys(SHOP).length)]; const it = SHOP[slot][Math.floor(r() * SHOP[slot].length)]; buy(s, slot, it.id); equip(s, slot, it.id); }
     else if (op === 2) applyMatch(s, { place: 1 + Math.floor(r() * 8), count: Math.floor(r() * 900), best: Math.floor(r() * 1000), kills: Math.floor(r() * 4), recruited: Math.floor(r() * 500), crownSecs: r() * 40, left: r() < 0.05 }, T0 + i * 3600000);
     else if (op === 3) claimLogin(s, T0 + i * 3600000);
     else earn(s, -50);
@@ -163,6 +164,46 @@ const T0 = Date.parse('2026-11-12T08:00:00Z');
   const top = defaults(); top.rating = 4000; top.league = 7;
   const L = applyMatch(top, { place: 8, left: true }, T0);
   check(L.delta < 0 && L.total === 0 && top.stats.streak === 0, 'leaving a match at the top was free');
+}
+
+// 9. Crowd cosmetics (R3): every shop id is one the renderer draws; unlocks gate purchases; bots by league
+{
+  if (BREAK === 'shop') SHOP.hat.push({ id: 'viking', name: 'Viking', price: 500 });
+  // The renderer's own id lists, read from its source (js/render/cosmetics.js imports three, so not importable here).
+  const src = readFileSync(new URL('../js/render/cosmetics.js', import.meta.url), 'utf8');
+  const ids = (name) => JSON.parse(src.match(new RegExp(`export const ${name} = (\\[[^\\]]*\\])`))[1].replace(/'/g, '"'));
+  const known = { hat: ids('HAT_IDS'), leader: ids('LEADER_IDS'), flag: ids('EMBLEM_IDS'), trail: ids('TRAIL_IDS'), ring: ids('RING_IDS') };
+  for (const slot of CROWD_SLOTS) {
+    check(SHOP[slot][0].price === 0, `${slot}: the first (default) item is not free`);
+    for (const it of SHOP[slot].slice(1)) {
+      check(known[slot].includes(it.id), `${slot} '${it.id}' is not an id the renderer draws`);
+      check(it.price > 0 && Number.isInteger(it.price), `${slot} '${it.id}' has no price`);
+    }
+    check(new Set(SHOP[slot].map((x) => x.id)).size === SHOP[slot].length, `${slot}: duplicate ids`);
+  }
+  check(Object.keys(crowdCosmetics(defaults().equip)).length === 0, 'the default equip set changes the crowd look');
+  const s = defaults(); s.coins = 100000;
+  const gated = CROWD_SLOTS.flatMap((slot) => SHOP[slot].filter((x) => x.level || x.league).map((x) => [slot, x]));
+  check(gated.length >= 10, `only ${gated.length} cosmetics are earned by climbing`);
+  for (const [slot, it] of gated) check(buy(s, slot, it.id).why === 'locked', `${slot} '${it.id}' was bought by a level-1 Bronze player`);
+  s.level = 30; s.league = 7;
+  for (const [slot, it] of gated) check(buy(s, slot, it.id).ok, `${slot} '${it.id}' could not be bought at level 30 Legend`);
+  const c = crowdCosmetics(s.equip);
+  check(CROWD_SLOTS.every((k) => c[k]) && c.hatShare > 0, 'equipped crowd cosmetics are not all passed to setCrowds');
+  const old = migrate({ v: 1, coins: 5, equip: { color: 'mint' }, owned: { color: ['mint'] } });
+  check(old.equip.hat === 'none' && Array.isArray(old.owned.trail) && old.equip.color === 'mint', 'a pre-cosmetics save does not get the new slots');
+  const per = [];
+  for (let lg = 0; lg < 8; lg++) {
+    let n = 0, bad = '';
+    for (let i = 0; i < 300; i++) {
+      const cos = botCosmetics('bot' + i, BREAK === 'botcos' ? 7 : lg);
+      for (const slot of CROWD_SLOTS) if (cos[slot]) { n++; const it = SHOP[slot].find((x) => x.id === cos[slot]); if (!it || !unlocked({ level: 2 + lg * 3, league: lg }, it)) bad = `${slot} ${cos[slot]} at league ${lg}`; }
+    }
+    if (bad) check(false, 'a bot wears something its league has not unlocked: ' + bad);
+    per.push(n / 300);
+  }
+  check(JSON.stringify(botCosmetics('same', 3)) === JSON.stringify(botCosmetics('same', 3)), 'bot cosmetics are not deterministic');
+  check(per[0] > 0.2 && per[7] > per[0] * 2, `bots do not dress up with league (items per bot ${per.map((x) => x.toFixed(2)).join(' ')})`);
 }
 
 console.log(`${fails.length ? 'FAIL' : 'PASS'} meta_test${BREAK ? ` (break=${BREAK})` : ''}`);

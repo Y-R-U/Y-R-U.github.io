@@ -3,6 +3,7 @@ import { LEAGUES, badgeSvg } from '../meta/leagues.js';
 import { rankOf } from '../meta/ladder.js';
 import { xpToNext } from '../meta/economy.js';
 import { challengeState, loginState } from '../meta/daily.js';
+import { GLOBE } from './online.js';
 
 export function createMenu({ root, app, onPlay, onPractice, open }) {
   const el = h(`<section class="screen menu hidden">
@@ -17,7 +18,8 @@ export function createMenu({ root, app, onPlay, onPractice, open }) {
     <div class="m-mid">
       <h1 class="logo"><span>THRONG</span></h1>
       <p class="tagline">Gather the biggest crowd in the city</p>
-      <button type="button" class="btn btn-primary play">PLAY</button>
+      <div class="m-play-row"><button type="button" class="btn btn-primary play">PLAY</button>
+        <button type="button" class="btn btn-online m-online hidden" data-open="online">${GLOBE}<span>ONLINE</span></button></div>
       <button type="button" class="m-practice">Practice <small>· offline, no rating</small></button>
     </div>
     <button type="button" class="m-daily" data-open="daily"><span class="md-ico">${UI_ICON.star}</span><span class="md-t"></span><span class="md-p"></span></button>
@@ -49,6 +51,7 @@ export function createMenu({ root, app, onPlay, onPractice, open }) {
     $('.md-p').innerHTML = c.done ? `${UI_ICON.check}` : `${num(c.progress)}/${num(c.ch.target)} <span class="md-c">${UI_ICON.coin}${c.ch.coins}</span>`;
     $('.m-daily').classList.toggle('done', c.done);
     $('.m-nav .dot').classList.toggle('hidden', !loginState(s).canClaim);
+    $('.m-online').classList.toggle('hidden', !(app.net && app.net.visible));
   }
 
   return {

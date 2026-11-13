@@ -4,8 +4,36 @@ import { CONFIG } from '../config.js';
 
 export const SIM_DT = 1 / 30;
 
+export function leaderSpeed(c, C) {
+  const f = Math.min(1, Math.log(Math.max(1, c.count)) / Math.log(C.speedRef));
+  return C.speedBase * (1 - C.speedFall * f) * (c.fx.speed > 0 ? C.fx.speed.mult : 1)
+    * (c.eating > 0 ? C.eatDrag : 1) * (c.panic > 0 ? C.panicBoost : 1);
+}
+
+// One fixed step of a leader toward target velocity (tx, tz). Shared with the online guest's prediction.
+export function integrateLeader(c, tx, tz, C, col, tmp) {
+  const dt = SIM_DT;
+  const dot = c.vx * tx + c.vz * tz;
+  const a = Math.min(1, C.accel * (dot < 0 ? C.turnBoost : 1) * dt);
+  c.vx += (tx - c.vx) * a; c.vz += (tz - c.vz) * a;
+  tmp.x = c.x + c.vx * dt; tmp.z = c.z + c.vz * dt;
+  col.pushOut(tmp, C.leaderRadius);
+  const mx = tmp.x - c.x, mz = tmp.z - c.z;
+  c.vx = mx / dt; c.vz = mz / dt;
+  c.x = tmp.x; c.z = tmp.z;
+  const m = Math.sqrt(mx * mx + mz * mz);
+  if (m > 0.004) c.heading = Math.atan2(c.vx, c.vz);
+  return m;
+}
+
+const CROWD_KEYS = ['alive', 'x', 'z', 'px', 'pz', 'vx', 'vz', 'heading', 'count', 'radius', 'kills', 'best', 'rank',
+  'protect', 'respawnIn', 'eating', 'panic', 'recruited', 'stolen', 'lost', 'deaths', 'travelled', 'ix', 'iz', 'remote', 'name', 'id', 'isBot'];
+const STATE_KEYS = ['tick', 'time', 'timeLeft', 'countdownLeft', 'phase', 'duration', 'leader', 'leadChanges'];
+
 // heading convention: Math.atan2(vx, vz) — 0 faces +Z, matches three's rotation.y for a +Z-forward model.
-export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.duration, countdown = CONFIG.MATCH.countdown, config }) {
+// restore: a sim.serialize() result (exact continuation) or a contract-shaped state (online host migration:
+// wander targets, steal progress and the RNG are regenerated).
+export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.duration, countdown = CONFIG.MATCH.countdown, config, restore = null }) {
   const C = { ...CONFIG.SIM, ...(config || {}) };
   const rng = createRng('sim:' + seed);
   const col = createCollider(map);
@@ -18,11 +46,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
   const emit = (e) => { e.tick = state.tick; events.push(e); };
 
   const radiusOf = (n) => Math.max(C.radiusMin, C.radiusK * Math.sqrt(n));
-  const speedOf = (c) => {
-    const f = Math.min(1, Math.log(Math.max(1, c.count)) / Math.log(C.speedRef));
-    return C.speedBase * (1 - C.speedFall * f) * (c.fx.speed > 0 ? C.fx.speed.mult : 1)
-      * (c.eating > 0 ? C.eatDrag : 1) * (c.panic > 0 ? C.panicBoost : 1);
-  };
+  const speedOf = (c) => leaderSpeed(c, C);
   let topCount = 1;
   const reachOf = (c) => {
     let r = c.radius + C.reachPad + c.radius * C.reachGrow;
@@ -41,7 +65,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     rank: i + 1,
     protect: 0, respawnIn: 0, eating: 0, panic: 0,
     recruited: 0, stolen: 0, lost: 0, deaths: 0, travelled: 0,
-    ix: 0, iz: 0,
+    ix: 0, iz: 0, remote: !!p.remote,
   }));
 
   // Initial spawns: spread crowds over the spawn list, deterministic shuffle.
@@ -218,18 +242,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
       if (c.panic > 0) c.panic -= dt;
       for (const k in c.fx) if (c.fx[k] > 0) c.fx[k] = Math.max(0, c.fx[k] - dt);
       const sp = speedOf(c);
-      const tx = playing ? c.ix * sp : 0, tz = playing ? c.iz * sp : 0;
-      const dot = c.vx * tx + c.vz * tz;
-      const a = Math.min(1, C.accel * (dot < 0 ? C.turnBoost : 1) * dt);
-      c.vx += (tx - c.vx) * a; c.vz += (tz - c.vz) * a;
-      tmp.x = c.x + c.vx * dt; tmp.z = c.z + c.vz * dt;
-      col.pushOut(tmp, C.leaderRadius);
-      const mx = tmp.x - c.x, mz = tmp.z - c.z;
-      c.vx = mx / dt; c.vz = mz / dt;
-      c.x = tmp.x; c.z = tmp.z;
-      const m = Math.sqrt(mx * mx + mz * mz);
-      c.travelled += m;
-      if (m > 0.004) c.heading = Math.atan2(c.vx, c.vz);
+      c.travelled += integrateLeader(c, playing ? c.ix * sp : 0, playing ? c.iz * sp : 0, C, col, tmp);
     }
   }
 
@@ -406,6 +419,73 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     stepRanks(playing);
   }
 
+  // Online: a remote crowd is steered by a network player, so bots leave it alone.
+  function setRemote(i, on, name) {
+    const c = crowds[i];
+    if (!c) return;
+    c.remote = !!on;
+    c.isBot = !on;
+    if (name) c.name = name;
+  }
+
+  function serialize() {
+    const N = neutrals, A = (a) => Array.from(a);
+    return {
+      v: 1, seed, rng: rng.getState(), pickupId, neutralRespawnAcc, topCount,
+      state: Object.fromEntries(STATE_KEYS.map((k) => [k, state[k]])),
+      crowds: crowds.map((c) => ({ ...Object.fromEntries(CROWD_KEYS.map((k) => [k, c[k]])), fx: { ...c.fx } })),
+      neutrals: { x: A(N.x), z: A(N.z), heading: A(N.heading), state: A(N.state), target: A(N.target), look: A(N.look),
+        tx: A(nTx), tz: A(nTz), timer: A(nTimer), speed: A(nSpeed) },
+      pickups: pickups.map((p) => ({ ...p })),
+      stealAcc: A(stealAcc),
+    };
+  }
+
+  function applyRestore(R) {
+    const S = R.state || R;
+    for (const k of STATE_KEYS) if (S[k] !== undefined) state[k] = S[k];
+    if (!R.rng) rng.setState(createRng('sim:' + seed + ':restore:' + state.tick).getState());
+    else rng.setState(R.rng);
+    (R.crowds || []).forEach((src, i) => {
+      const c = crowds[i];
+      if (!c || !src) return;
+      for (const k of CROWD_KEYS) if (src[k] !== undefined) c[k] = src[k];
+      if (src.fx) Object.assign(c.fx, src.fx);
+      if (src.px === undefined) { c.px = c.x; c.pz = c.z; }
+    });
+    const N = neutrals, RN = R.neutrals;
+    if (RN) {
+      N.active = 0;
+      for (let i = 0; i < cap; i++) {
+        N.state[i] = RN.state[i] || 0;
+        N.x[i] = N.px[i] = RN.x[i] || 0; N.z[i] = N.pz[i] = RN.z[i] || 0;
+        N.heading[i] = RN.heading ? RN.heading[i] : 0;
+        N.target[i] = RN.target ? RN.target[i] : -1;
+        N.look[i] = RN.look ? RN.look[i] : rng.int(256);
+        if (N.state[i] === 2 && !(N.target[i] >= 0 && N.target[i] < nc)) { N.state[i] = 1; N.target[i] = -1; }
+        if (!N.state[i]) continue;
+        N.active++;
+        if (RN.tx) { nTx[i] = RN.tx[i]; nTz[i] = RN.tz[i]; nTimer[i] = RN.timer[i]; nSpeed[i] = RN.speed[i]; }
+        else { nSpeed[i] = rng.range(C.neutralSpeedMin, C.neutralSpeedMax); pickWanderTarget(i); }
+      }
+    }
+    if (R.pickups) {
+      R.pickups.forEach((src, i) => {
+        if (!pickups[i]) pickups[i] = { id: src.id, kind: 'speed', x: 0, z: 0, active: false, respawnIn: 0 };
+        Object.assign(pickups[i], src);
+      });
+      pickups.length = R.pickups.length;
+    }
+    pickupId = R.pickupId ?? pickups.reduce((m, p) => Math.max(m, p.id + 1), 0);
+    neutralRespawnAcc = R.neutralRespawnAcc ?? 0;
+    if (R.stealAcc) stealAcc.set(R.stealAcc); else stealAcc.fill(0);
+    let top = 1;
+    for (const c of crowds) top = Math.max(top, c.count);
+    topCount = R.topCount ?? top;
+    events.length = 0;
+  }
+  if (restore) applyRestore(restore);
+
   const out = [];
   function drainEvents() {
     out.length = 0;
@@ -415,7 +495,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
   }
 
   return {
-    state, step, setInput, drainEvents,
+    state, step, setInput, drainEvents, setRemote, serialize,
     collider: col, map, config: C,
     radiusOf, speedOf, reachOf,
   };

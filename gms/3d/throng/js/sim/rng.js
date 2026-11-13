@@ -33,5 +33,7 @@ export function createRng(seed) {
     chance: (p) => next() < p,
     pick: (arr) => arr[Math.floor(next() * arr.length)],
     fork: (tag) => createRng(nextU32() + ':' + tag),
+    getState: () => [a >>> 0, b >>> 0, c >>> 0, d >>> 0],
+    setState: (s) => { [a, b, c, d] = s; },
   };
 }

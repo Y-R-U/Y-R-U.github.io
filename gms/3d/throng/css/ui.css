@@ -665,3 +665,79 @@ button { font-family: inherit; font-size: inherit; cursor: pointer; -webkit-tap-
 @media (min-width: 1000px) and (min-height: 700px) {
   .m-mid .logo span { font-size: 5.4em; }
 }
+
+/* ---------- online (M3) ---------- */
+.m-play-row { display: flex; align-items: center; justify-content: center; gap: .6em; flex-wrap: wrap; }
+.btn-online { display: inline-flex; align-items: center; gap: .4em; font-size: 1.1em; padding: .6em 1.2em; color: #fff;
+  background: linear-gradient(180deg, #3ad0ff 0%, #1677d8 100%); box-shadow: 0 4px 0 #0b3f7a, 0 8px 16px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.5); }
+.btn-online svg { width: 1.25em; height: 1.25em; }
+.btn-online:active { box-shadow: 0 2px 0 #0b3f7a, inset 0 2px 0 rgba(255,255,255,.5); }
+.on-status { display: flex; align-items: center; gap: .5em; padding: .45em .7em; border-radius: .8em; background: rgba(0,0,0,.25); font-weight: 800; font-size: .9em; }
+.on-status i { flex: none; width: .7em; height: .7em; border-radius: 50%; background: #8a93b8; }
+.on-status[data-tone="ok"] i { background: #3ddc84; box-shadow: 0 0 8px #3ddc84; }
+.on-status[data-tone="wait"] i { background: #ffd23a; animation: dotPulse 1s ease-in-out infinite; }
+.on-status[data-tone="bad"] i { background: #ff6b6b; }
+.on-status span { flex: 1; }
+.on-retry { border: 0; border-radius: 999px; padding: .3em .8em; font-weight: 900; color: #4a2400; background: var(--gold); }
+.sh-online .btn-primary.on-quick { align-self: center; font-size: 1.35em; padding: .5em 2em; }
+.on-hint { margin: -.3em 0 0; text-align: center; font-size: .8em; font-weight: 700; opacity: .8; }
+.on-row { display: flex; gap: .6em; align-items: center; justify-content: center; flex-wrap: wrap; }
+.on-join { display: flex; gap: .4em; align-items: center; }
+.on-code { width: 6.4em; font: inherit; font-size: 1.15em; font-weight: 900; letter-spacing: .12em; text-align: center; text-transform: uppercase; color: #fff;
+  padding: .5em .4em; border-radius: 999px; border: 0; outline: none; background: rgba(14,20,48,.75); box-shadow: inset 0 2px 6px rgba(0,0,0,.5), 0 0 0 2px rgba(255,255,255,.3);
+  -webkit-user-select: text; user-select: text; touch-action: manipulation; }
+.on-code:focus { box-shadow: inset 0 2px 6px rgba(0,0,0,.5), 0 0 0 3px #ffd23a; }
+.on-code::placeholder { color: rgba(255,255,255,.35); letter-spacing: .05em; }
+.on-err { margin: 0; text-align: center; font-weight: 800; color: #ffb0b0; font-size: .9em; }
+.btn[disabled] { pointer-events: none; }
+
+.olobby { background: rgba(8,10,28,.45); }
+.olobby.in .lb-card { transform: none; opacity: 1; }
+.ol-card { display: flex; flex-direction: column; gap: .6em; }
+.ol-head { display: flex; align-items: center; gap: .6em; }
+.ol-ico svg { width: 2.4em; height: 2.4em; color: #8fe8ff; display: block; }
+.ol-t { font-weight: 900; font-size: 1.3em; letter-spacing: .5px; }
+.ol-sub { font-weight: 800; opacity: .85; font-size: .9em; }
+.ol-code { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: .3em .7em; padding: .5em .7em; border-radius: .9em; background: rgba(0,0,0,.28); }
+.ol-code > span { font-size: .8em; font-weight: 800; opacity: .8; text-transform: uppercase; letter-spacing: 1px; }
+.ol-code > b { font-size: 1.8em; font-weight: 900; letter-spacing: .14em; color: var(--gold); -webkit-user-select: text; user-select: text; }
+.ol-share { grid-column: 1 / -1; display: flex; gap: .5em; }
+.ol-share .btn { font-size: .9em; padding: .45em 1em; flex: 1; }
+.ol-link { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.ol-list { margin: 0; }
+.slot.off { opacity: .55; }
+.slot small { opacity: .75; font-weight: 700; }
+.sl-flag svg { width: 1.2em; height: .95em; display: block; }
+.ol-tag { font-size: .72em; font-weight: 900; letter-spacing: .5px; opacity: .9; display: flex; }
+.ol-tag svg { width: 1.4em; height: 1.4em; color: #7dffb0; }
+.slot.ol-bots { background: none; opacity: .7; font-style: italic; }
+.ol-btns { display: flex; gap: .5em; justify-content: center; flex-wrap: wrap; }
+.ol-ready.on { background: rgba(47,209,122,.35); box-shadow: inset 0 0 0 2px #7dffb0; }
+.ol-ready svg { width: 1em; height: 1em; vertical-align: -.12em; color: #7dffb0; }
+.ol-start { font-size: 1.1em; padding: .55em 1.4em; }
+.rl-live { font-style: normal; font-size: .62em; font-weight: 900; padding: .1em .4em; border-radius: .4em; background: #3ddc84; color: #06301a; vertical-align: .15em; letter-spacing: .5px; }
+.ld-tabs { margin-bottom: .2em; }
+.ld-pane { display: flex; flex-direction: column; gap: .7em; }
+.ob-p, .ob-k { flex-wrap: wrap; }
+
+.net-pill { position: absolute; top: calc(var(--sat) + var(--gap)); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: .4em;
+  padding: .22em .7em; border-radius: 999px; background: rgba(16,22,44,.6); font-weight: 800; font-size: .78em; white-space: nowrap; pointer-events: none; opacity: .9; }
+.net-pill i { width: .55em; height: .55em; border-radius: 50%; background: #3ddc84; }
+.net-pill[data-tone="warn"] i { background: #ffd23a; }
+.net-pill[data-tone="bad"] i { background: #ff6b6b; animation: dotPulse .8s ease-in-out infinite; }
+@media (orientation: portrait) { .net-pill { top: auto; bottom: calc(var(--sab) + var(--gap)); } }
+@media (orientation: landscape) and (max-height: 500px) {
+  .ol-card { gap: .4em; width: min(34em, 100%); }
+  .ol-list { display: grid; grid-template-columns: 1fr 1fr; }
+  .m-play-row .btn-online { font-size: 1em; padding: .45em 1em; }
+}
+/* locker: crowd cosmetics */
+.pv-flag { position: relative; width: 2.4em; height: 2.6em; display: block; }
+.pv-flag i { position: absolute; left: .5em; top: .1em; width: .18em; height: 2.4em; border-radius: .1em; background: #d8dbe6; }
+.pv-flag b { position: absolute; left: .68em; top: .2em; width: 1.6em; height: 1.15em; border-radius: 0 .25em .25em 0; background: var(--c); display: grid; place-items: center; font-size: .85em; }
+.pv-ring { width: 2.6em; height: 1.3em; border-radius: 50%; display: block; border: .22em solid var(--c); box-shadow: 0 0 .6em var(--c); }
+.pv-ring-dashed { border-style: dashed; }
+.pv-ring-double { border-style: double; border-width: .38em; }
+.pv-ring-pulse { animation: dotPulse 1s ease-in-out infinite; }
+.pv-ring-flame { border-color: #ffb020; box-shadow: 0 0 .5em #ff7a00, 0 -.3em .8em #ff4d00, inset 0 0 .4em #ffd23a; }
+.lk-f svg.league, .lk-f > svg:not(.coin) { width: 1em; height: 1em; }

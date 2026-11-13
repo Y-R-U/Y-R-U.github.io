@@ -39,3 +39,18 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 
 ## STATE @ 2026-11-13 05:50
 - Both wave-2 agents (R2 a5eef911ec9d38110, G2 ad68a88a9708075be) died on the usage limit mid-task; resumed in place via SendMessage after the reset. If they die again: SendMessage the same ids rather than starting fresh.
+
+## STATE @ 2026-11-13 (wave 2 landed)
+- R2 + G2 landed. Tests green (sim_test, meta_test, render_map_test). Committed + pushed a9792514; registered in projects.js with assets/screenshots/throng.jpg.
+- DEPLOYED to games.br8t.com/gms/3d/throng/ by rsync of `git archive HEAD gms/3d/throng` (minus docs/, tools/) — NOT via games/deploy.sh, and no hub card yet (games/js/games.js untouched).
+- Manager-seen weak spots: big crowds overhang buildings and the roof cutaway looks odd; "x2 SIZE!" toast is washed out; audio never listened to; Bronze may be too easy.
+- Wave 3 launched: lane O (real online, host-run + Go relay server, port 8024; owns server/**, js/net/**, and may edit G's files) and lane R3 (cosmetics hats/trails/flags from G_requests, building overhang, phone perf; owns js/render/**, js/world/**). Ports: O cdp 9280-9289 / http 8760-8769; R3 cdp 9270-9279 / http 8750-8759.
+
+## NEXT (after wave 3)
+1. Tests, screenshots, commit, push, rsync deploy. Server deploy: server/deploy.sh (CONFIRM=yes), first time needs the Caddy route.
+2. Hub card on games.br8t.com (check games/ for uncommitted ragdojo work first).
+3. Wave 4 = M4: modes (Teams, King of the Plaza, Infection), date-scheduled events, second district theme; br8t account + cloud save.
+- TODO next tick: Pages was mid-rollout for a9792514 (new files js/meta/*, js/ui/lobby.js gave 404/503 right after the build). Re-check `curl -o /dev/null -w "%{http_code}" https://yru.br8t.com/gms/3d/throng/js/meta/save.js`; if still 404, empty commit + push.
+
+## STATE @ 2026-11-13 10:50
+- Wave-3 agents (O a15fe67d3e64c7b48, R3 a3836a77d21cecb71) died on the usage limit; resumed in place via SendMessage. Pages rollout of a9792514 confirmed (200s).

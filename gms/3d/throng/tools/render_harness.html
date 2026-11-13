@@ -41,7 +41,24 @@ const sim = createFakeSim({
 });
 const canvas = document.getElementById('c');
 const r = await createRenderer({ canvas, map, quality: P.get('q') || 'high', adaptive: P.get('adaptive') !== '0' });
-r.setCrowds(sim.state.crowds.map((c) => ({ index: c.index, name: c.name, color: c.color })));
+// cosmetics for the player: hat, hatShare, hatLeaderOnly, leader, flag (emblem id or text), flagColor, trail, ring, palette=hex,hex
+// cos=all gives every crowd a different set, to preview them side by side
+const COS = { hat: ['cap', 'tophat', 'beanie', 'crown', 'party', 'cowboy', 'hardhat', 'headband', 'chef', 'wizard', 'halo'],
+  leader: ['caped', 'king', 'robot', 'mascot'], flag: ['star', 'heart', 'bolt', 'crown', 'moon', 'diamond', 'skull', 'paw', 'flame', 'sun'],
+  trail: ['sparkle', 'petals', 'dust', 'lightning', 'confetti', 'hearts', 'smoke'], ring: ['solid', 'dashed', 'double', 'flame', 'pulse'] };
+const meta = sim.state.crowds.map((c) => ({ index: c.index, name: c.name, color: c.color }));
+const mine = {};
+for (const k of ['hat', 'leader', 'trail', 'ring']) if (P.has(k)) mine[k] = P.get(k);
+if (P.has('hatShare')) mine.hatShare = +P.get('hatShare');
+if (P.get('hatLeaderOnly') === '1') mine.hatLeaderOnly = true;
+if (P.has('flag')) mine.flag = P.has('flagColor') ? { emblem: P.get('flag'), color: parseInt(P.get('flagColor'), 16) } : P.get('flag');
+if (P.has('palette')) mine.palette = P.get('palette').split(',').map((h) => parseInt(h, 16));
+Object.assign(meta[0], mine);
+if (P.get('cos') === 'all') meta.forEach((m, i) => Object.assign(m, {
+  hat: COS.hat[i % COS.hat.length], leader: COS.leader[i % COS.leader.length], flag: COS.flag[i % COS.flag.length],
+  trail: COS.trail[i % COS.trail.length], ring: COS.ring[i % COS.ring.length] }, i === 0 ? mine : {}));
+window.__harness.meta = meta;
+r.setCrowds(meta);
 r.setFocus(num('focus', 0));
 if (P.has('fixed')) {
   const [x, z, d] = P.get('fixed').split(',').map(Number);
@@ -50,6 +67,23 @@ if (P.has('fixed')) {
 const ff = num('t', 0);
 for (let k = 0; k < ff / SIM_DT; k++) sim.step();
 sim.drainEvents();
+// at=x,z puts the player there; corner=k puts it against the k-th block corner (camera side), for building-overlap checks
+let at = P.has('at') ? P.get('at').split(',').map(Number) : null;
+if (P.has('corner')) {
+  const rects = map.obstacles.filter((o) => o.type === 'rect' && o.w < map.size * 0.5 && o.d < map.size * 0.5);
+  const o = rects[num('corner', 0) % rects.length], c0 = sim.state.crowds[0], k = c0.radius * 0.35;
+  at = [o.x + o.w / 2 + k, o.z + o.d / 2 + k];
+}
+if (at) {
+  const c0 = sim.state.crowds[0];
+  c0.x = c0.px = at[0]; c0.z = c0.pz = at[1]; c0.vx = c0.vz = 0;
+  if (sim.pin) sim.pin(0, at[0], at[1]);
+}
+// close=d frames the player crowd from a fixed camera at distance d (pitch=deg optional)
+if (P.has('close')) {
+  const c0 = sim.state.crowds[0];
+  r.setFixedCamera({ x: c0.x, z: c0.z, d: num('close', 14), pitch: P.has('pitch') ? num('pitch', 50) * Math.PI / 180 : undefined });
+}
 const keys = new Set();
 addEventListener('keydown', (e) => keys.add(e.key.toLowerCase()));
 addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
@@ -70,11 +104,13 @@ function loop(now) {
   if (ax || az) {
     const y = r.cameraYaw();
     sim.setInput(ax * Math.cos(y) + az * Math.sin(y), -ax * Math.sin(y) + az * Math.cos(y));
-  } else sim.setInput(0, 0);
+  } else if (P.get('drive') === '1') { const a = now / 1000 * 0.35; sim.setInput(Math.cos(a), Math.sin(a)); }
+  else sim.setInput(0, 0);
   if (!paused) {
     acc += dt;
     while (acc >= SIM_DT) { sim.step(); acc -= SIM_DT; }
   }
+  if (P.has('close')) { const c0 = sim.state.crowds[0]; r.setFixedCamera({ x: c0.x, z: c0.z, d: num('close', 14), pitch: P.has('pitch') ? num('pitch', 50) * Math.PI / 180 : undefined }); }
   const t0 = performance.now();
   r.frame(sim.state, sim.drainEvents(), dt, paused ? 1 : acc / SIM_DT);
   const ms = performance.now() - t0;

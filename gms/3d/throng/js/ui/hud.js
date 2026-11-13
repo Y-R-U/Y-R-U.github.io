@@ -37,6 +37,7 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
     <div class="toasts"></div>
     <div class="emotes"></div>
     <div class="countdown"></div>
+    <div class="net-pill hidden"><i></i><span></span></div>
     <div class="dead-veil hidden"><div class="dv-title">ABSORBED!</div><div class="dv-sub"></div></div>`;
   const $ = (s) => root.querySelector(s);
   const timerEl = $('.timer'), timerT = $('.timer .t'), killsB = $('.kills b');
@@ -348,8 +349,23 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
     if (edgeB.textContent !== String(c.count)) edgeB.textContent = c.count;
   }
 
+  // Online: a crowd changed hands (late joiner) → its name in the board and toasts.
+  function setName(i, n) {
+    if (!meta[i]) return;
+    meta[i] = { ...meta[i], name: n };
+    const el = rows[i] && rows[i].el.querySelector('.lb-name');
+    if (el) el.textContent = n;
+  }
+  const netPill = root.querySelector('.net-pill'), netText = netPill.querySelector('span');
+  function setNet(text, tone = '') {
+    netPill.classList.toggle('hidden', !text);
+    if (!text) return;
+    if (netText.textContent !== text) netText.textContent = text;
+    netPill.dataset.tone = tone;
+  }
+
   return {
-    setMatch, update, toast, emote,
+    setMatch, update, toast, emote, setName, setNet,
     show(v) { root.classList.toggle('hidden', !v); },
     setHudVisible(v) { hudOn = v; root.classList.toggle('bare', !v); },
     resize() { minimap.resize(); },

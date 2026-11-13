@@ -6,11 +6,16 @@ import { shaderCommon, fogUniforms } from './shared.js';
 export const STRIDE = 12;
 
 // Regions: 0 skin, 1 shirt, 2 trousers, 3 hair, 4 shoes. Parts: 0 body, 1 legL, 2 legR, 3 armL, 4 armR, 5 head.
-function builder() {
-  const P = [], N = [], A = [], I = [];
+// iB.z (look) carries the hat id in its integer part: look = hat + fract.
+export function builder() {
+  const P = [], N = [], A = [], I = [], M = [], U = [];
+  const g = { mask: 0, uv: null };
   const face = (pts, n, part, reg) => {
     const b = P.length / 3;
-    for (const p of pts) { P.push(p[0], p[1], p[2]); N.push(n[0], n[1], n[2]); A.push(part, reg); }
+    for (const p of pts) {
+      P.push(p[0], p[1], p[2]); N.push(n[0], n[1], n[2]); A.push(part, reg); M.push(g.mask);
+      const uv = g.uv ? g.uv(p) : [0, 0]; U.push(uv[0], uv[1]);
+    }
     for (let k = 1; k < pts.length - 1; k++) I.push(b, b + k, b + k + 1);
   };
   const nrm = (a, b, c) => {
@@ -48,11 +53,21 @@ function builder() {
     if (!up) pts.reverse();
     face(pts, [0, up ? 1 : -1, 0], part, reg);
   };
-  return { P, N, A, I, tbox, ring, cap };
+  return Object.assign(g, { P, N, A, I, M, U, face, quad, nrm, tbox, ring, cap });
 }
 
 export function personGeometry(detail = 1) {
   const g = builder();
+  addBody(g, detail);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(g.P, 3));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(g.N, 3));
+  geo.setAttribute('aPR', new THREE.Float32BufferAttribute(g.A, 2));
+  geo.setIndex(g.I);
+  return geo;
+}
+
+export function addBody(g, detail = 1, headMask = null) {
   const HIP = 0.8, SH = 1.3;
   for (const s of [1, -1]) {
     const part = s > 0 ? 1 : 2;
@@ -68,24 +83,20 @@ export function personGeometry(detail = 1) {
     g.tbox(x, 0.01, 0.7, SH - 0.3, 0.095, 0.105, 0.11, 0.12, part, 0, { noTop: true });
   }
   const n = detail > 1 ? 8 : detail ? 6 : 5;
+  const m0 = g.mask;
+  if (headMask != null) g.mask = headMask;
   g.ring(SH + 0.04, SH + 0.11, 0.07, 0.115, n, 5, () => 0);
   g.ring(SH + 0.11, SH + 0.25, 0.115, 0.138, n, 5, () => 0);
   g.ring(SH + 0.25, SH + 0.35, 0.138, 0.133, n, 5, (a) => (Math.cos(a) < 0.3 ? 3 : 0));
   g.ring(SH + 0.35, SH + 0.42, 0.142, 0.095, n, 5, () => 3);
   g.cap(SH + 0.42, 0.095, n, true, 5, 3);
-
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(g.P, 3));
-  geo.setAttribute('normal', new THREE.Float32BufferAttribute(g.N, 3));
-  geo.setAttribute('aPR', new THREE.Float32BufferAttribute(g.A, 2));
-  geo.setIndex(g.I);
-  return geo;
+  g.mask = m0;
 }
 
 const lin = (hex) => { const c = new THREE.Color(hex); return c; };
-const SKIN = [0xf2c7a5, 0xe0a882, 0xc68a62, 0x9a6440, 0x6b4128].map(lin);
-const HAIR = [0x2a1d16, 0x4a3020, 0x7a5030, 0xc8a060, 0x9a9590, 0x8c4a2a].map(lin);
-const PANTS = [0x23293a, 0x2f3c5a, 0x1c1c22, 0x4a4a52, 0x6b5a44, 0x39424f].map(lin);
+export const SKIN = [0xf2c7a5, 0xe0a882, 0xc68a62, 0x9a6440, 0x6b4128].map(lin);
+export const HAIR = [0x2a1d16, 0x4a3020, 0x7a5030, 0xc8a060, 0x9a9590, 0x8c4a2a].map(lin);
+export const PANTS = [0x23293a, 0x2f3c5a, 0x1c1c22, 0x4a4a52, 0x6b5a44, 0x39424f].map(lin);
 
 const VERT = /* glsl */`
 attribute vec2 aPR;
@@ -115,7 +126,7 @@ vec3 rotXn(vec3 n, float a) {
 void main() {
   float part = aPR.x;
   float reg = aPR.y;
-  float ph = iB.x, g = clamp(iB.y, 0.0, 1.0), look = iB.z, flash = iB.w;
+  float ph = iB.x, g = clamp(iB.y, 0.0, 1.0), look = fract(iB.z), flash = iB.w;
   vec3 p = position;
   vec3 n = normal;
   float sw = sin(ph);
@@ -148,7 +159,7 @@ void main() {
 
   float h1 = fract(look * 7.13), h2 = fract(look * 13.7), h3 = fract(look * 3.31);
   float sat = clamp((max(iC.r, max(iC.g, iC.b)) - min(iC.r, min(iC.g, iC.b))) * 2.5, 0.0, 1.0);
-  bool cap = h3 > 0.5 && sat > 0.4;
+  bool cap = h3 > 0.5 && sat > 0.4 && iB.z < 1.0;
   vec3 base;
   if (reg < 0.5) base = uSkin[int(h1 * 4.99)];
   else if (reg < 1.5) base = iC.rgb;
@@ -274,7 +285,7 @@ export function createPeople(capacity, shared, opts = {}) {
   shadows.renderOrder = 2;
 
   return {
-    data, capacity, mesh, reflection, shadows,
+    data, capacity, mesh, reflection, shadows, attrs: { ia, ib, ic },
     setCount(n) {
       igeo.instanceCount = n; rgeo.instanceCount = n; sgeo.instanceCount = n;
       buf.clearUpdateRanges();

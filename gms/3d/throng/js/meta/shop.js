@@ -1,7 +1,8 @@
 import { spend } from './economy.js';
+import { unit } from './hash.js';
 
-// Only cosmetics that work without renderer changes: the crowd colour (setCrowds takes one per crowd),
-// DOM name plates and count badges, the victory emote, and the style of your own big toasts.
+// DOM cosmetics (name plate, count badge, victory emote, toast style) and the crowd colour; the 3D crowd
+// cosmetics (hat, leader, flag, trail, ring) are added below.
 export const SHOP = {
   color: [
     { id: 'blue', name: 'Empire Blue', color: 0x2f7bff, price: 0 },
@@ -52,14 +53,101 @@ export const SHOP = {
     { id: 'royal', name: 'Royal', price: 900 },
   ],
 };
+// Crowd cosmetics drawn by the renderer (R3, CONTRACT.md "Crowd cosmetics"). `level` / `league` gate the
+// purchase: a few are earned by climbing, not only bought.
+Object.assign(SHOP, {
+  hat: [
+    { id: 'none', name: 'No hat', price: 0 },
+    { id: 'cap', name: 'Cap', price: 300 },
+    { id: 'beanie', name: 'Beanie', price: 350 },
+    { id: 'headband', name: 'Headband', price: 350 },
+    { id: 'party', name: 'Party Hat', price: 500 },
+    { id: 'hardhat', name: 'Hard Hat', price: 600 },
+    { id: 'chef', name: 'Chef', price: 700, level: 4 },
+    { id: 'cowboy', name: 'Cowboy', price: 800, level: 5 },
+    { id: 'tophat', name: 'Top Hat', price: 1000, level: 8 },
+    { id: 'wizard', name: 'Wizard', price: 1300, level: 10 },
+    { id: 'crown', name: 'Crowns', price: 2000, league: 3 },
+    { id: 'halo', name: 'Halo', price: 2500, league: 5 },
+  ],
+  leader: [
+    { id: 'none', name: 'Classic', price: 0 },
+    { id: 'mascot', name: 'Mascot', price: 900, level: 3 },
+    { id: 'robot', name: 'Robot', price: 1200, level: 6 },
+    { id: 'caped', name: 'Caped Hero', price: 1600, level: 9 },
+    { id: 'king', name: 'The King', price: 3000, league: 4 },
+  ],
+  flag: [
+    { id: 'none', name: 'No flag', price: 0 },
+    { id: 'star', name: 'Star', price: 400 },
+    { id: 'heart', name: 'Heart', price: 400 },
+    { id: 'paw', name: 'Paw', price: 450 },
+    { id: 'sun', name: 'Sun', price: 500 },
+    { id: 'moon', name: 'Moon', price: 500 },
+    { id: 'bolt', name: 'Bolt', price: 600, level: 3 },
+    { id: 'flame', name: 'Flame', price: 700, level: 5 },
+    { id: 'skull', name: 'Skull', price: 800, level: 7 },
+    { id: 'diamond', name: 'Diamond', price: 1200, league: 3 },
+    { id: 'crown', name: 'Royal', price: 1800, league: 5 },
+  ],
+  trail: [
+    { id: 'none', name: 'No trail', price: 0 },
+    { id: 'dust', name: 'Dust', price: 350 },
+    { id: 'petals', name: 'Petals', price: 600 },
+    { id: 'hearts', name: 'Hearts', price: 700, level: 3 },
+    { id: 'confetti', name: 'Confetti', price: 900, level: 5 },
+    { id: 'smoke', name: 'Smoke', price: 900, level: 6 },
+    { id: 'sparkle', name: 'Sparkle', price: 1400, league: 2 },
+    { id: 'lightning', name: 'Lightning', price: 2200, league: 4 },
+  ],
+  ring: [
+    { id: 'solid', name: 'Solid', price: 0 },
+    { id: 'dashed', name: 'Dashed', price: 400 },
+    { id: 'double', name: 'Double', price: 700, level: 4 },
+    { id: 'pulse', name: 'Pulse', price: 1000, level: 7 },
+    { id: 'flame', name: 'Flame', price: 2000, league: 4 },
+  ],
+});
+export const CROWD_SLOTS = ['hat', 'leader', 'flag', 'trail', 'ring'];
+
 export const SLOTS = Object.keys(SHOP);
 export const item = (slot, id) => (SHOP[slot] || []).find((x) => x.id === id) || SHOP[slot][0];
 export const owns = (save, slot, id) => (save.owned[slot] || []).includes(id) || item(slot, id).price === 0;
+export const unlocked = (save, it) => (save.level || 1) >= (it.level || 0) && (save.league || 0) >= (it.league || 0);
+
+// The setCrowds fields for an equip set (unknown / 'none' ids are left out: today's look).
+export function crowdCosmetics(eq = {}) {
+  const out = {};
+  for (const slot of CROWD_SLOTS) {
+    const id = eq[slot];
+    if (!id || id === 'none' || (slot === 'ring' && id === 'solid') || !(SHOP[slot] || []).some((x) => x.id === id)) continue;
+    out[slot] = id;
+  }
+  if (out.hat) out.hatShare = 0.6;
+  return out;
+}
+
+// A plausible look for a bot of a league: more and fancier items higher up, only what it could have unlocked.
+export function botCosmetics(key, league = 0) {
+  let n = 0;
+  const rnd = () => unit('cos:' + key + ':' + n++);
+  const level = 2 + league * 3;
+  const fake = { level, league };
+  const share = 0.18 + league * 0.09;
+  const eq = {};
+  for (const slot of CROWD_SLOTS) {
+    if (rnd() > share * (slot === 'hat' ? 1.6 : slot === 'leader' ? 0.6 : 1)) continue;
+    const pool = SHOP[slot].filter((it) => it.price > 0 && unlocked(fake, it));
+    if (pool.length) eq[slot] = pool[Math.floor(rnd() * pool.length)].id;
+  }
+  return crowdCosmetics(eq);
+}
 
 export function buy(save, slot, id) {
   const it = (SHOP[slot] || []).find((x) => x.id === id);
   if (!it) return { ok: false, why: 'unknown' };
   if (owns(save, slot, id)) return { ok: false, why: 'owned' };
+  if (!unlocked(save, it)) return { ok: false, why: 'locked' };
   if (!spend(save, it.price)) return { ok: false, why: 'coins' };
   save.owned[slot] = [...(save.owned[slot] || []), id];
   save.equip[slot] = id;

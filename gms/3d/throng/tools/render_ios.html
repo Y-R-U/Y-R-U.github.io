@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>THRONG device check</title>
+<style>html, body { margin: 0; height: 100%; background: #111; } iframe { border: 0; width: 100vw; height: 100vh; display: block; }</style>
+</head>
+<body>
+<!-- Dev tool for the iOS Simulator: loads ?page=<url relative to this folder> in a same-origin iframe and POSTs
+     the game's own error list, WebGL program diagnostics and renderer stats to ?log=<url> every 4 s. -->
+<iframe id="f"></iframe>
+<script>
+const P = new URLSearchParams(location.search);
+const f = document.getElementById('f');
+const t0 = performance.now();
+f.src = P.get('page') || '../index.html?auto=1&seed=7&t=40';
+function report() {
+  const w = f.contentWindow || {};
+  const g = w.__game || w.__harness || {};
+  const r = g.renderer;
+  const out = { tag: P.get('tag') || 'run', t: Math.round(performance.now() - t0), ua: navigator.userAgent, ready: !!g.ready, errors: (g.errors || []).map(String) };
+  try {
+    if (r) {
+      out.stats = r.stats();
+      const R = r.three.renderer, c = R.getContext();
+      out.programs = (R.info.programs || []).length;
+      out.badPrograms = (R.info.programs || []).filter((p) => p.diagnostics && p.diagnostics.runnable === false).map((p) => p.name);
+      out.gl = { err: c.getError(), ver: c.getParameter(c.VERSION), lost: c.isContextLost() };
+    }
+  } catch (e) { out.reportError = e.message; }
+  fetch(P.get('log') || '/log', { method: 'POST', body: JSON.stringify(out) }).catch(() => {});
+}
+setInterval(report, 4000);
+</script>
+</body>
+</html>

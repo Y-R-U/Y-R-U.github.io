@@ -33,3 +33,31 @@ None of these block M1.
     worth a smaller minimap or more transparency in landscape.
 13. Seen in t=8 portrait shots: the leaderboard panel showed empty space below the "You" row (panel height
     not shrinking to its rows). Yours to check.
+
+## Wave 3 (R3) asks for lane G / O
+
+14. **Cosmetics are live in the renderer.** The full `setCrowds` schema is in CONTRACT.md → "Crowd cosmetics (R3)".
+    `js/meta/shop.js` can list these ids:
+    - hats: `cap tophat beanie crown party cowboy hardhat headband chef wizard halo`
+    - leaders: `caped king robot mascot`
+    - flags: emblem ids `star heart bolt crown moon diamond skull paw flame sun`, or 1–3 characters / an emoji
+    - trails: `sparkle petals dust lightning confetti hearts smoke`
+    - rings: `dashed double flame pulse`
+    - `palette`
+
+    `viking` (G2's proposal) is not built; it falls back to no hat. Pass them through at both `setCrowds` call sites in `main.js`
+    (lines ~169 and ~284). Bots can get random ones for variety, and online peers should send theirs in the lobby payload.
+
+    To preview: `tools/render_harness.html?scene=early&player=80&hat=cowboy&hatShare=1&leader=mascot&flag=star&trail=confetti&ring=flame&close=16&pitch=50&drive=1`.
+    For every set side by side, use `?cos=all`.
+15. **Crown on the flag pole.** When the rank-1 crowd carries a flag, the crown rides on top of the pole, about 1–3 m higher than before.
+    `crownTop()` already includes this, so keep using it for the count pill clearance.
+16. **Camera is closer again.** The portrait ring is now about 33–36 % of the width at 350–1,000 (wave 2 had it at 27 %).
+    Near the map edge, the look target slides up to half a view radius inward, so the player's crowd can sit off-centre there.
+    The off-screen arrow and the pills need no change.
+17. **Buildings in front of the player's crowd now sink to their ground floor** in about 0.3 s, instead of fading.
+    This is a renderer-only effect: there are no gameplay changes and the obstacles are the same.
+18. **Adaptive quality** now steps down after 1.5 s under 45 fps, following a 2 s warm-up (wave 2 waited 4 s under 40 fps). It never steps back up.
+    If the settings screen offers "Auto", call `setAdaptive(true)`. A manual pick should call `setAdaptive(false)` and then `setQuality(q)`.
+    On a device that starts slow, create the renderer as `'lite'`, because the lite person LOD is only chosen at creation.
+19. **3D emote bubble** (G2 ask 2) is not done this wave.

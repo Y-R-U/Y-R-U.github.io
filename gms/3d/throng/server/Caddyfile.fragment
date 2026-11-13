@@ -1,0 +1,8 @@
+# THRONG API (Go service, gms/3d/throng/server). Merge INSIDE the existing games.br8t.com
+# block, before the static fallback (caddy_route.py does exactly this, idempotently).
+# reverse_proxy passes websocket upgrades through as-is (/gms/3d/throng/api/ws).
+# Check loopback 8024 is free first: `ss -ltnp | grep 8024` (8005 filestore, 8012 clued, 8016 payments, 8019 gambit, 8023 skyputt).
+handle /gms/3d/throng/api/* {
+	header Cache-Control "no-store"
+	reverse_proxy 127.0.0.1:8024
+}

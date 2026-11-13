@@ -569,7 +569,15 @@ function statueGeo(G, s, rnd) {
 export function buildCity(map, quality) {
   const G = new GeoWriter(), D = new GeoWriter();
   const rnd = mulberry(map.seed * 31 + 7);
-  for (const b of map.buildings) building(G, D, b);
+  const blds = [];
+  let innerVerts = -1;
+  for (const b of map.buildings) {
+    if (b.outer && innerVerts < 0) innerVerts = G.verts;
+    G.bld = D.bld = b.outer ? -1 : blds.length;
+    if (!b.outer) blds.push({ x0: b.x - b.w / 2, z0: b.z - b.d / 2, x1: b.x + b.w / 2, z1: b.z + b.d / 2, top: b.h + 2, cut: 0, want: 0 });
+    building(G, D, b);
+  }
+  G.bld = D.bld = -1;
   const halos = [];
   for (const l of map.lamps) lamp(G, l, rnd, halos);
   for (const t of map.trees) tree(G, t, rnd);
@@ -621,20 +629,27 @@ export function buildCity(map, quality) {
   kerbRect(-H + E - 0.3, -H + E - 0.3, H - E + 0.3, H - E + 0.3);
   const baseVerts = G.verts;
   G.append(D);
+  for (let i = 0; i < blds.length; i++) if (G.tops[i] > 0) blds[i].top = G.tops[i];
   const geometry = G.build();
   // reflections draw only the base geometry, without facade/roof detail
   const reflGeometry = new THREE.BufferGeometry();
   for (const k of Object.keys(geometry.attributes)) reflGeometry.setAttribute(k, geometry.getAttribute(k));
   reflGeometry.setDrawRange(0, baseVerts);
-  return { geometry, reflGeometry, halos: new Float32Array(halos), water, jets, verts: G.verts, baseVerts };
+  // lite draws the city without the facade/roof detail pass; medium reflects only the in-map buildings
+  const range = (n) => { const g = new THREE.BufferGeometry(); for (const k of Object.keys(geometry.attributes)) g.setAttribute(k, geometry.getAttribute(k)); g.setDrawRange(0, n); return g; };
+  const liteGeometry = range(baseVerts), reflCheap = range(innerVerts < 0 ? baseVerts : innerVerts);
+  return { geometry, reflGeometry, liteGeometry, reflCheap, halos: new Float32Array(halos), water, jets, verts: G.verts, baseVerts, blds };
 }
 
 const CITY_VERT = /* glsl */`
 attribute vec3 color;
 attribute float aEmit;
 attribute float aWin;
+attribute float aBld;
 uniform float uFlip;
 uniform float uTime;
+uniform sampler2D uCut;
+uniform float uCutN;
 varying vec3 vCol;
 varying vec3 vW;
 varying vec3 vN;
@@ -645,6 +660,11 @@ void main() {
   vec3 w = (modelMatrix * vec4(position, 1.0)).xyz;
   vec3 n = normal;
   vW = w; vN = n; vTag = min(aWin, 0.0);
+  // buildings between the camera and the player's crowd sink to their ground floor
+  if (aBld > -0.5 && w.y > 4.45) {
+    float cut = texture2D(uCut, vec2((aBld + 0.5) / uCutN, 0.5)).r;
+    w.y = mix(w.y, 4.45 + (w.y - 4.45) * 0.03, cut);
+  }
   w.y *= uFlip;
   vec3 info = w.y < 7.0 ? sampleInfo(w.xz) : vec3(1.0, 0.0, 0.0);
   float hy = abs(w.y);
@@ -669,7 +689,6 @@ void main() {
 `;
 
 const CITY_FRAG = /* glsl */`
-uniform vec4 uFocus;
 uniform float uFlip;
 varying vec3 vCol;
 varying vec3 vW;
@@ -704,13 +723,6 @@ void main() {
   float a = 1.0;
   vec3 colIn = vCol;
   if (vTag < -0.5 && uFlip > 0.0) colIn *= surface(vTag, vW, normalize(vN));
-  if (uFocus.w > 0.5 && uFlip > 0.0 && vW.y > 3.0 && vW.y < cameraPosition.y - 0.5) {
-    vec3 d = vW - cameraPosition;
-    vec3 g = cameraPosition + d * (cameraPosition.y / max(cameraPosition.y - vW.y, 0.001));
-    float dist = length(g.xz - uFocus.xy);
-    float keep = mix(0.12, 1.0, smoothstep(uFocus.z * 0.75, uFocus.z * 1.15, dist));
-    a = mix(1.0, keep, smoothstep(3.0, 6.5, vW.y));
-  }
   gl_FragColor = vec4(colIn, a);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
@@ -718,11 +730,65 @@ void main() {
 }
 `;
 
-export function cityMaterial(shared, flip) {
+export function createCutaway(blds) {
+  const n = Math.max(1, blds.length);
+  const data = new Uint8Array(n * 4);
+  const tex = new THREE.DataTexture(data, n, 1, THREE.RGBAFormat);
+  tex.magFilter = tex.minFilter = THREE.NearestFilter;
+  tex.needsUpdate = true;
+  const uniforms = { uCut: { value: tex }, uCutN: { value: n } };
+  // sample points of the crowd disc at body height; a building occludes if any ray from a point to the camera crosses its box
+  const PTS = [];
+  for (let k = 0; k < 20; k++) PTS.push([Math.cos(k * 0.31416), Math.sin(k * 0.31416)]);
+  for (let k = 0; k < 8; k++) PTS.push([0.55 * Math.cos(k * 0.785 + 0.4), 0.55 * Math.sin(k * 0.785 + 0.4)]);
+  PTS.push([0, 0]);
+  const rayHits = (b, px, py, pz, dx, dy, dz) => {
+    let t0 = 0, t1 = 1;
+    const sl = (o, d, lo, hi) => {
+      if (Math.abs(d) < 1e-6) return o >= lo && o <= hi;
+      let a = (lo - o) / d, c = (hi - o) / d;
+      if (a > c) { const t = a; a = c; c = t; }
+      t0 = Math.max(t0, a); t1 = Math.min(t1, c);
+      return t0 <= t1;
+    };
+    return sl(px, dx, b.x0, b.x1) && sl(pz, dz, b.z0, b.z1) && sl(py, dy, 0, b.top);
+  };
+  const occludes = (b, cam, f, grow) => {
+    const R = f.r * grow + (grow > 1 ? 1 : 0);
+    const minX = Math.min(f.x - R, cam.x), maxX = Math.max(f.x + R, cam.x), minZ = Math.min(f.z - R, cam.z), maxZ = Math.max(f.z + R, cam.z);
+    if (b.x1 < minX || b.x0 > maxX || b.z1 < minZ || b.z0 > maxZ) return false;
+    for (const [u, v] of PTS) {
+      const px = f.x + u * R, pz = f.z + v * R;
+      if (px > b.x0 - 0.3 && px < b.x1 + 0.3 && pz > b.z0 - 0.3 && pz < b.z1 + 0.3) continue;
+      if (rayHits(b, px, 1.3, pz, cam.x - px, cam.y - 1.3, cam.z - pz)) return true;
+    }
+    return false;
+  };
+  return {
+    uniforms,
+    update(dt, cam, focus, on) {
+      let dirty = false;
+      for (let i = 0; i < blds.length; i++) {
+        const b = blds[i];
+        b.want = on && occludes(b, cam, focus, b.want ? 1.15 : 1) ? 1 : 0;
+        const c = b.cut + Math.max(-dt * 2.2, Math.min(dt * 3.2, b.want - b.cut));
+        if (c !== b.cut) {
+          b.cut = c;
+          const s = c * c * (3 - 2 * c);
+          data[i * 4] = Math.round(s * 255);
+          dirty = true;
+        }
+      }
+      if (dirty) tex.needsUpdate = true;
+    },
+    snap() { for (let i = 0; i < blds.length; i++) { blds[i].cut = blds[i].want; data[i * 4] = blds[i].cut * 255; } tex.needsUpdate = true; },
+  };
+}
+
+export function cityMaterial(shared, flip, cut) {
   return new THREE.ShaderMaterial({
     vertexShader: CITY_VERT, fragmentShader: CITY_FRAG, fog: true,
     side: flip < 0 ? THREE.BackSide : THREE.FrontSide,
-    uniforms: { ...fogUniforms(), ...shared, uFlip: { value: flip } },
-    alphaToCoverage: flip > 0,
+    uniforms: { ...fogUniforms(), ...shared, ...cut.uniforms, uFlip: { value: flip } },
   });
 }

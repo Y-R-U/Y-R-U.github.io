@@ -11,7 +11,8 @@ import { createDebug2D } from './ui/debug2d.js';
 import { load, write, defaults } from './meta/save.js';
 import { buildRoster } from './meta/roster.js';
 import { applyMatch } from './meta/progress.js';
-import { item } from './meta/shop.js';
+import { item, crowdCosmetics } from './meta/shop.js';
+import { createOnline, serverUrl, onlineVisible, httpBase, newDeviceId, newCid } from './net/online.js';
 
 const Q = new URLSearchParams(location.search);
 const flag = (k) => Q.has(k) && Q.get(k) !== '0' && Q.get(k) !== 'false';
@@ -85,6 +86,8 @@ async function loadRenderer(map) {
 
 const HELLO = ['hi', '👋', 'glhf', 'gl', 'yo'], BRAG = ['gg', '😎', 'ez', '💪', '😂', 'yum'], OUCH = ['noo', '😭', '💀', 'rip', 'wow', 'bruh'], CROWN = ['👑', 'mine', '😤'];
 const any = (a) => a[Math.floor(Math.random() * a.length)];
+// setCrowds entries: name + colour + the renderer cosmetics (CONTRACT.md "Crowd cosmetics").
+const crowdsMeta = (players) => players.map((p, i) => ({ ...(p.cos || {}), index: i, name: p.name, color: p.color }));
 
 async function boot() {
   const { gen, stub } = await loadMapGen();
@@ -100,6 +103,7 @@ async function boot() {
   const input = createInput({ el: stage, getYaw: () => { try { return renderer.cameraYaw() || 0; } catch { return 0; } } });
 
   const app = {
+    net: null,
     get save() { return save; },
     audio,
     persist() { write(storage, save); },
@@ -110,7 +114,12 @@ async function boot() {
     applySettings() {
       const s = save.settings;
       audio.setMusic(s.music); audio.setSfx(s.sfx);
-      try { renderer.setQuality && renderer.setQuality(pickQuality()); } catch (e) { logErr('setQuality', e); }
+      try {
+        // R3: "Auto" lets the renderer step quality down on a slow device; a manual pick pins it.
+        if (renderer.setAdaptive) renderer.setAdaptive(false);
+        if (renderer.setQuality && G.ready) renderer.setQuality(pickQuality());
+        if (renderer.setAdaptive) renderer.setAdaptive(s.quality === 'auto' && !opts.lite);
+      } catch (e) { logErr('setQuality', e); }
       hudRoot.classList.toggle('lefty', !!s.lefty);
       input.setKeepMoving(s.keepMoving);
     },
@@ -124,12 +133,200 @@ async function boot() {
     },
   };
 
+  // ---------------------------------------------------------------- online (M3, docs/NET.md)
+  const session = (() => { try { const k = '__throng_probe'; sessionStorage.setItem(k, '1'); sessionStorage.removeItem(k); return sessionStorage; } catch { return null; } })();
+  const devId = (() => { let d = storage.getItem('throng.dev'); if (!/^[0-9a-f]{32}$/.test(d || '')) { d = newDeviceId(); storage.setItem('throng.dev', d); } return d; })();
+  const cid = (() => { let c = session && session.getItem('throng.cid'); if (!c) { c = newCid(); if (session) session.setItem('throng.cid', c); } return c; })();
+  let online = null, lastRecorded = null, netNotice = '', netNoticeUntil = 0, netPillAt = 0;
+  const notice = (t, ms = 3500) => { netNotice = t; netNoticeUntil = performance.now() + ms; };
+  const net = {
+    visible: onlineVisible(),
+    pendingCode: (Q.get('room') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6),
+    sheetUpdate: null,
+    get status() { return online ? online.status : 'idle'; },
+    get you() { return online && online.you; },
+    connect(force) {
+      if (!online) online = createOnline({ url: serverUrl(), map, name: app.playerName(), dev: devId, cid, cos: crowdCosmetics(save.equip), emit: onNet });
+      if (force && online.status === 'unavailable') { online.close(); }
+      online.connect();
+    },
+    async ensure() {
+      net.connect();
+      const t0 = performance.now();
+      while (online.status !== 'online') {
+        if (online.status === 'unavailable' || online.status === 'old' || performance.now() - t0 > 7000) throw new Error(online.status === 'old' ? 'THRONG was updated. Reload the page to play online.' : 'Online play is not available right now. Try again in a minute, or press Play.');
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      const n = app.playerName();
+      online.setName(n);
+      online.setCos(crowdCosmetics(save.equip));
+      if (online.you && online.you.name !== n && n !== 'You') { try { const r = await online.rename(n); online.you.name = r.name; } catch {} }
+      return online;
+    },
+    quick: async () => enterRoom((await (await net.ensure()).quick()).room),
+    create: async () => enterRoom((await (await net.ensure()).create()).room),
+    join: async (code) => {
+      const o = await net.ensure();
+      try { enterRoom((await o.join(code)).room); } catch (e) { throw new Error(e.code === 'no_room' ? `No room called ${code}. Check the code.` : e.message); }
+      net.pendingCode = '';
+    },
+    leaveRoom() { if (online) online.leave(); showMenu(); },
+    ready: (on) => online && online.ready(on),
+    start: () => online.start(),
+    shareLink(code) {
+      const extra = Q.get('net') ? '&net=' + encodeURIComponent(Q.get('net')) : '';
+      return location.origin + location.pathname + '?room=' + code + extra;
+    },
+    async boards(period, kind) {
+      const base = httpBase(online ? online.url : serverUrl());
+      const me = online && online.you ? '&me=' + online.you.pid : '';
+      const r = await fetch(`${base}/boards?period=${period}&kind=${kind}${me}`);
+      if (!r.ok) throw new Error('boards ' + r.status);
+      return r.json();
+    },
+  };
+
+  function onNet(type, d) {
+    try {
+      if (net.sheetUpdate && (type === 'status' || type === 'room')) net.sheetUpdate();
+      switch (type) {
+        case 'room': if (mode === 'olobby') screens.room.update(d); break;
+        case 'begin': startOnlineMatch(d.match, d.late); break;
+        case 'role':
+          if (mode === 'match') { hud.toast(d.role === 'host' ? 'YOU ARE THE HOST' : 'HOST CHANGED', { sub: d.role === 'host' ? 'the last host left' : '', cls: 'warn' }); notice('Host changed'); }
+          break;
+        case 'meta': if (match && match.net) d.players.forEach((p, i) => hud.setName(i, p.name)); break;
+        case 'ended':
+          lastRecorded = d.recorded;
+          if (mode === 'results' && lastKind === 'online') screens.results.setOnlineNote(recordedText());
+          break;
+        case 'closed': if (mode === 'olobby') showMenu(); break;
+        case 'error': if (mode === 'olobby' && d.error) screens.room.error(d.error); break;
+        case 'offline': notice('Offline · the match finishes on this device', 6000); break;
+        case 'status':
+          if (d.status === 'unavailable' && mode === 'olobby') screens.room.error('Lost the connection to the online server.');
+          break;
+      }
+    } catch (e) { logErr('net ' + type, e); }
+  }
+
+  function recordedText() {
+    const nm = lastNet;
+    if (nm && nm.offline) return 'Finished offline: not on the leaderboard';
+    if (nm && nm.late) return 'You joined late: this match is not on the leaderboard';
+    if (lastRecorded === true) return 'Saved to the Online leaderboard';
+    if (lastRecorded === false) return 'Not saved to the leaderboard this time';
+    return 'Saving to the Online leaderboard…';
+  }
+  let lastNet = null;
+
+  function enterRoom(room) {
+    if (!room) return;
+    if (mode === 'match' && match && match.net) return;
+    mode = 'olobby';
+    screens.hideAll();
+    if (!match || !match.attract) { cam('showcase'); newMatch(attractPre()); fastForward(18); }
+    hud.show(false);
+    input.setEnabled(false);
+    screens.room.show(room);
+  }
+
+  function startOnlineMatch(nm, late) {
+    mode = 'match';
+    lastKind = 'online';
+    lastRecorded = null;
+    lastNet = nm;
+    nm.late = !!late;
+    screens.hideAll();
+    cam('follow');
+    const me = nm.me, players = nm.players;
+    match = { kind: 'online', net: nm, seed: nm.meta.seed, players, me, attract: false, crownSecs: 0, left: false };
+    renderer.setCrowds(crowdsMeta(players));
+    renderer.setFocus(me);
+    hud.setMatch({ players, playerIndex: me, map, league: null, plate: save.equip.plate, badge: save.equip.badge, toast: save.equip.toast });
+    acc = 0; frameEvents = []; resultsAt = 0; lastBeep = -1; lastTick = -1; wasLeader = false;
+    paused = false; autopilot = false; hiddenAt = 0;
+    input.reset();
+    hud.show(true);
+    hud.setHudVisible(true);
+    input.setEnabled(true);
+    audio.ensure();
+    hints.stop();
+    if (late) notice('You took over a crowd mid-match', 4000);
+    if (document.hidden) onHidden();
+  }
+
+  function finishOnline(left) {
+    const nm = match.net;
+    mode = 'results';
+    hud.show(false);
+    hints.stop();
+    screens.pause.hide();
+    paused = false; autopilot = false;
+    input.setEnabled(false);
+    save.tutorialDone = true;
+    app.persist();
+    const state = nm.state;
+    screens.showResults({ state, players: nm.players, me: nm.me, left, online: { note: left ? 'Your crowd was handed to a bot' : recordedText() } });
+    G.resultsShown = (G.resultsShown || 0) + 1;
+    if (online) online.endMatch();
+  }
+
+  function onlineFrame(now, dt) {
+    const nm = match.net;
+    let ax = 0, az = 0;
+    if (mode === 'match' && !autopilot) { input.vector(v); ax = v.x; az = v.z; }
+    nm.setAutopilot(autopilot);
+    let r = null;
+    try { r = nm.frame(now, dt, ax, az); } catch (e) { logErr('net frame', e); }
+    if (r && r.state) {
+      const state = r.state;
+      try { direct(state, r.events); } catch (e) { logErr('director', e); }
+      try { renderer.frame(state, r.events, dt, r.alpha); } catch (e) { logErr('renderer.frame', e); }
+      if (mode === 'match') {
+        try { hud.update(state, r.events, dt, r.alpha); } catch (e) { logErr('hud', e); }
+        if (state.phase === 'over' && !nm.over) {
+          nm.over = true;
+          if (online) online.report();
+          input.setEnabled(false); audio.stopMusic();
+          if (!resultsAt) resultsAt = now + 1700;
+        }
+      }
+    }
+    if (now - netPillAt > 250) {
+      netPillAt = now;
+      let t = '', tone = '';
+      const st = online ? online.status : 'idle';
+      if (nm.offline) { t = 'Offline'; tone = 'bad'; }
+      else if (st === 'reconnecting' || st === 'connecting') { t = 'Reconnecting…'; tone = 'bad'; }
+      else if (nm.role === 'guest' && nm.ready && performance.now() - nm.lastPeer > 1200) { t = 'Waiting for the host…'; tone = 'bad'; }
+      if (now < netNoticeUntil) { t = netNotice + (t ? ' · ' + t : ''); tone = tone || 'warn'; }
+      if (!t && online) t = `${Math.round(online.rtt)} ms${nm.role === 'host' ? ' · host' : ''}`;
+      hud.setNet(mode === 'match' ? t : '', tone);
+    }
+    if (mode === 'match' && resultsAt && now >= resultsAt) { resultsAt = 0; finishOnline(false); }
+  }
+
+  // A hidden host tab gets no animation frames: a slow timer keeps the match running for everyone.
+  setInterval(() => {
+    if (!document.hidden || !match || !match.net || match.net.role !== 'host' || mode !== 'match') return;
+    const now = performance.now(), dt = Math.min(2, (now - last) / 1000);
+    last = now;
+    try { match.net.frame(now, dt, 0, 0, 60); } catch (e) { logErr('net pump', e); }
+  }, 200);
+
   const screens = createScreens({
     root: document.getElementById('screens'), app,
     onPlay: () => playOnline(),
     onPractice: () => startMatch(prepare('practice')),
-    onAgain: () => (lastKind === 'practice' ? startMatch(prepare('practice')) : playOnline()),
-    onMenu: () => showMenu(),
+    onAgain: () => {
+      if (lastKind === 'online') {
+        if (online && online.room && !online.room.quick) return enterRoom(online.room);
+        return net.quick().catch(() => { showMenu(); screens.open('online'); });
+      }
+      return lastKind === 'practice' ? startMatch(prepare('practice')) : playOnline();
+    },
+    onMenu: () => { if (lastKind === 'online' && online && online.room) online.leave(); showMenu(); },
     onResume: () => resumeMatch(),
     onLeave: () => leaveMatch(),
   });
@@ -153,7 +350,7 @@ async function boot() {
   function prepare(kind) {
     const seed = newSeed(kind === 'practice' ? ':practice' : '');
     const roster = kind === 'sim-online' ? buildRoster({ seed, rating: save.rating, count: CONFIG.MATCH.crowds - 1 }) : null;
-    const p = makePlayers({ seed, playerName: app.playerName(), playerColor: app.colorHex(), roster });
+    const p = makePlayers({ seed, playerName: app.playerName(), playerColor: app.colorHex(), playerCos: crowdCosmetics(save.equip), roster });
     return { kind, seed, ...p };
   }
 
@@ -166,7 +363,7 @@ async function boot() {
     const sim = createSim({ seed, map, players, countdown });
     const bots = createBots({ sim, indices: idx, specs, seed });
     match = { kind: pre.kind, seed, players, sim, bots, attract, crownSecs: 0, left: false };
-    renderer.setCrowds(players.map((p, i) => ({ index: i, name: p.name, color: p.color })));
+    renderer.setCrowds(crowdsMeta(players));
     renderer.setFocus(0);
     hud.setMatch({
       players, playerIndex: 0, map, league: pre.kind === 'sim-online' ? save.league : null,
@@ -210,7 +407,8 @@ async function boot() {
   }
 
   function direct(state, events) {
-    const me = state.crowds[0];
+    const mi = match.me || 0;
+    const me = state.crowds[mi];
     audio.setCrowd(match.attract || !me.alive ? 0 : me.count);
     if (match.attract) return;
     if (state.phase === 'countdown') {
@@ -224,20 +422,20 @@ async function boot() {
     audio.setIntense(state.phase === 'play' && state.timeLeft <= 30);
     for (const e of events) {
       switch (e.type) {
-        case 'recruit': if (e.crowd === 0) audio.recruit(e.n); break;
+        case 'recruit': if (e.crowd === mi) audio.recruit(e.n); break;
         case 'steal':
-          if (e.to === 0) audio.steal(e.n, true);
-          else if (e.from === 0) audio.steal(e.n, false);
+          if (e.to === mi) audio.steal(e.n, true);
+          else if (e.from === mi) audio.steal(e.n, false);
           break;
         case 'elim':
-          if (e.by === 0) { audio.absorb(); hud.emote(0, app.emoteGlyph()); }
-          else if (e.victim === 0) audio.absorbed();
+          if (e.by === mi) { audio.absorb(); hud.emote(mi, app.emoteGlyph()); }
+          else if (e.victim === mi) audio.absorbed();
           humanEmote(e.by, BRAG, 0.55);
           humanEmote(e.victim, OUCH, 0.5, 3300);
           break;
-        case 'pickup': if (e.crowd === 0) audio.pickup(e.kind); break;
+        case 'pickup': if (e.crowd === mi) audio.pickup(e.kind); break;
         case 'lead':
-          if (e.crowd === 0) { audio.lead(true); wasLeader = true; }
+          if (e.crowd === mi) { audio.lead(true); wasLeader = true; }
           else if (wasLeader) { audio.lead(false); wasLeader = false; }
           humanEmote(e.crowd, CROWN, 0.3);
           break;
@@ -247,8 +445,8 @@ async function boot() {
             match.players.forEach((p, i) => humanEmote(i, HELLO, 0.5, 600 + Math.random() * 2600));
           }
           if (e.phase === 'over') {
-            audio.stopMusic(); audio.end(state.crowds[0].rank === 1); input.setEnabled(false); resultsAt = performance.now() + 1700;
-            if (state.crowds[0].rank === 1) hud.emote(0, app.emoteGlyph());
+            audio.stopMusic(); audio.end(state.crowds[mi].rank === 1); input.setEnabled(false); resultsAt = performance.now() + 1700;
+            if (state.crowds[mi].rank === 1) hud.emote(mi, app.emoteGlyph());
             match.players.forEach((p, i) => humanEmote(i, ['gg', 'gg', 'gg wp', 'close one'], state.crowds[i].rank === 1 ? 0.9 : 0.3));
           }
           break;
@@ -263,6 +461,7 @@ async function boot() {
     if (!(dt > 0)) dt = 0;
     if (dt > 0.25) dt = 0.25;
     if (!match) return;
+    if (match.net) return onlineFrame(now, dt);
     if (paused) { acc = 0; dt = 0; }
     acc += dt;
     let steps = 0;
@@ -281,14 +480,14 @@ async function boot() {
       if (++renderFails >= 3 && !renderer.debug2d) {
         try { renderer.dispose(); } catch {}
         renderer = createDebug2D({ canvas: freshCanvas(), map });
-        renderer.setCrowds(match.players.map((p, i) => ({ index: i, name: p.name, color: p.color })));
+        renderer.setCrowds(crowdsMeta(match.players));
         renderer.setFocus(0);
       }
     }
     if (mode === 'match' || mode === 'menu') {
       try { hud.update(state, frameEvents, dt, alpha); } catch (e) { logErr('hud', e); }
     }
-    if (mode === 'match') { try { hints.update(state, 0, input.dragging); } catch (e) { logErr('hints', e); } }
+    if (mode === 'match') { try { hints.update(state, match.me || 0, input.dragging); } catch (e) { logErr('hints', e); } }
     frameEvents.length = 0;
     if (match.attract && state.phase === 'over') newMatch(attractPre());
     if (mode === 'match' && state.phase === 'over' && !resultsAt) { input.setEnabled(false); audio.stopMusic(); resultsAt = now + 1700; }
@@ -362,13 +561,14 @@ async function boot() {
     if (document.hidden) onHidden();
   }
 
-  const live = () => mode === 'match' && match && !match.attract && match.sim.state.phase !== 'over';
+  const curState = () => match && (match.net ? match.net.state : match.sim.state);
+  const live = () => mode === 'match' && match && !match.attract && curState() && curState().phase !== 'over';
 
   function pauseMatch(away = 0) {
     if (!live()) return;
-    if (match.kind === 'sim-online') autopilot = true; else paused = true;
+    if (match.kind !== 'practice') autopilot = true; else paused = true;
     input.setEnabled(false);
-    screens.pause.show({ online: match.kind === 'sim-online', away });
+    screens.pause.show({ online: match.kind !== 'practice', away });
   }
 
   function resumeMatch() {
@@ -381,6 +581,7 @@ async function boot() {
   function leaveMatch() {
     screens.pause.hide();
     if (!match || match.attract) return showMenu();
+    if (match.net) { audio.stopMusic(); if (online) online.leave(); return finishOnline(true); }
     if (match.kind === 'sim-online') { audio.stopMusic(); finishMatch(true); } else showMenu();
   }
 
@@ -388,11 +589,13 @@ async function boot() {
     if (!live()) return;
     hiddenAt = Date.now();
     pauseMatch();
+    if (match.net && match.net.role === 'host' && online) online.handoff();
   }
   function onVisible() {
     if (!hiddenAt) return;
     const away = (Date.now() - hiddenAt) / 1000;
     hiddenAt = 0;
+    if (match && match.net && mode === 'match') { last = performance.now(); if (live()) screens.pause.show({ online: true, away }); return; }
     if (!match || match.kind !== 'sim-online' || mode !== 'match') return;
     const st = match.sim.state;
     const left = (st.phase === 'countdown' ? st.countdownLeft : 0) + st.timeLeft + 0.2;
@@ -417,7 +620,8 @@ async function boot() {
   document.addEventListener('dblclick', (e) => e.preventDefault());
 
   Object.defineProperties(G, {
-    state: { get: () => match && match.sim.state },
+    state: { get: () => curState() },
+    online: { get: () => online },
     sim: { get: () => match && match.sim },
     match: { get: () => match },
     mode: { get: () => mode },
@@ -437,10 +641,16 @@ async function boot() {
     stepSeconds: (s) => fastForward(s),
   });
 
+  app.net = net;
+  Object.assign(G, { net });
   app.applySettings();
   if (opts.shot) startMatch(prepare('practice'));
   else if (opts.auto) startMatch(prepare('sim-online'));
   else showMenu();
+  if (net.pendingCode && !opts.shot && !opts.auto) {
+    try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&])room=[^&]*&?/, '$1').replace(/[?&]$/, '')); } catch {}
+    screens.open('online');
+  }
   onResize();
   requestAnimationFrame((t) => { last = t; frame(t); });
 

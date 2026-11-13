@@ -19,32 +19,36 @@ function quadGeo() {
 }
 
 // ---------- team rings ----------
+// styles: 0 solid, 1 dashed, 2 double, 3 flame, 4 pulse
+export const RING_STYLES = { solid: 0, dashed: 1, double: 2, flame: 3, pulse: 4 };
 export function createRings(max, shared) {
   const g = quadGeo();
-  const a = new Float32Array(max * 4), c = new Float32Array(max * 4);
+  const a = new Float32Array(max * 4), c = new Float32Array(max * 4), st = new Float32Array(max);
   const ia = new THREE.InstancedBufferAttribute(a, 4).setUsage(THREE.DynamicDrawUsage);
   const ic = new THREE.InstancedBufferAttribute(c, 4).setUsage(THREE.DynamicDrawUsage);
-  g.setAttribute('iR', ia); g.setAttribute('iC', ic);
+  const is = new THREE.InstancedBufferAttribute(st, 1).setUsage(THREE.DynamicDrawUsage);
+  g.setAttribute('iR', ia); g.setAttribute('iC', ic); g.setAttribute('iS', is);
   g.instanceCount = 0;
   const mat = new THREE.ShaderMaterial({
     fog: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { ...fogUniforms(), uTime: shared.uTime },
+    uniforms: { ...fogUniforms(), uTime: shared.uTime, uInfo: shared.uInfo, uInfoXf: shared.uInfoXf },
     vertexShader: /* glsl */`
-      attribute vec4 iR; attribute vec4 iC;
-      varying vec2 vUv; varying vec4 vC; varying float vR;
+      attribute vec4 iR; attribute vec4 iC; attribute float iS;
+      varying vec2 vUv; varying vec4 vC; varying float vR; varying float vS; varying vec2 vW;
       #include <fog_pars_vertex>
       void main() {
         float R = max(iR.z, 0.5);
-        float ext = 1.0 + max(1.6, R * 0.22) / R;
-        vUv = position.xz * ext; vR = R; vC = vec4(iC.rgb, iR.w * iC.w);
+        float ext = 1.0 + max(1.6, R * 0.22) * (iS > 2.5 && iS < 3.5 ? 2.4 : 1.0) / R;
+        vUv = position.xz * ext; vR = R; vC = vec4(iC.rgb, iR.w * iC.w); vS = iS;
         vec3 w = vec3(iR.x + position.x * R * ext, 0.06, iR.y + position.z * R * ext);
+        vW = w.xz;
         vec4 mvPosition = viewMatrix * vec4(w, 1.0);
         gl_Position = projectionMatrix * mvPosition;
         #include <fog_vertex>
       }`,
     fragmentShader: /* glsl */`
-      uniform float uTime;
-      varying vec2 vUv; varying vec4 vC; varying float vR;
+      uniform float uTime; uniform sampler2D uInfo; uniform vec4 uInfoXf;
+      varying vec2 vUv; varying vec4 vC; varying float vR; varying float vS; varying vec2 vW;
       #include <fog_pars_fragment>
       void main() {
         float d = length(vUv);
@@ -59,8 +63,33 @@ export function createRings(max, shared) {
         float rp = fract(uTime * 0.45);
         float rx = d - rp;
         float ripple = exp(-rx * rx / 0.0025) * (1.0 - rp) * 0.35 * step(d, 1.0);
+        vec3 hot = vec3(0.0);
+        if (vS > 0.5 && vS < 1.5) {
+          float n = max(10.0, floor(6.2832 * vR / 3.2));
+          float u = fract(ang / 6.2832 * n + uTime * 0.12);
+          float m = smoothstep(0.0, 0.06, u) * (1.0 - smoothstep(0.54, 0.6, u));
+          line *= m * 1.3; glow *= 0.5; spark = 0.0;
+        } else if (vS > 1.5 && vS < 2.5) {
+          float x2 = d - (1.0 - max(0.7, vR * 0.06) / vR);
+          line = line + exp(-x2 * x2 / (lw * lw * 0.7)) * 0.85;
+        } else if (vS > 2.5 && vS < 3.5) {
+          float n1 = 0.5 + 0.5 * sin(ang * 9.0 + uTime * 5.0), n2 = 0.5 + 0.5 * sin(ang * 23.0 - uTime * 8.3 + 1.7), n3 = 0.5 + 0.5 * sin(ang * 4.0 - uTime * 2.1);
+          float h = (0.25 + 0.75 * n1 * n2 + 0.35 * n3) * max(1.3, vR * 0.13) / vR;
+          float tongue = x > 0.0 ? exp(-x / max(h, 1e-3)) : exp(-x * x / (gw * gw * 0.3));
+          glow = tongue * 0.9;
+          hot = mix(vec3(1.0, 0.32, 0.04), vec3(1.0, 0.75, 0.3), exp(-x * x / (lw * lw * 2.0))) * tongue * 0.3;
+          spark *= 0.5;
+        } else if (vS > 3.5) {
+          float p = 0.5 + 0.5 * sin(uTime * 5.5);
+          line *= 0.7 + 0.8 * p; glow *= 0.6 + 0.9 * p;
+          float rp2 = fract(uTime * 0.9), rx2 = d - 1.0 - rp2 * 0.35;
+          ripple += exp(-rx2 * rx2 / 0.0012) * (1.0 - rp2) * 0.6;
+        }
         float v = line * 1.5 + glow * 0.45 + fill + spark * 1.2 + ripple;
-        gl_FragColor = vec4(vC.rgb * v * vC.a, 1.0);
+        vec2 iuv = (vW - uInfoXf.xy) * uInfoXf.zw;
+        float open = texture2D(uInfo, iuv).a;
+        float k = mix(0.08, 1.0, open);
+        gl_FragColor = vec4((vC.rgb * v + hot) * vC.a * k, 1.0);
         ${FOG_ALPHA}
       }`,
   });
@@ -69,11 +98,12 @@ export function createRings(max, shared) {
   mesh.renderOrder = 3;
   return {
     mesh,
-    set(i, x, z, r, alpha, col, inten = 1) {
+    set(i, x, z, r, alpha, col, inten = 1, style = 0) {
       a[i * 4] = x; a[i * 4 + 1] = z; a[i * 4 + 2] = r; a[i * 4 + 3] = alpha;
       c[i * 4] = col.r; c[i * 4 + 1] = col.g; c[i * 4 + 2] = col.b; c[i * 4 + 3] = inten;
+      st[i] = style;
     },
-    commit(n) { g.instanceCount = n; ia.needsUpdate = true; ic.needsUpdate = true; },
+    commit(n) { g.instanceCount = n; ia.needsUpdate = true; ic.needsUpdate = true; is.needsUpdate = true; },
   };
 }
 
@@ -85,10 +115,17 @@ uniform float uScale;
 uniform float uFlip;
 uniform float uTime;
 varying vec4 vCol;
+#ifdef SHAPES
+attribute vec2 aShape;
+varying vec2 vShape;
+#endif
 #include <fog_pars_vertex>
 void main() {
   vec3 p = position; p.y *= uFlip;
   vCol = aCol;
+#ifdef SHAPES
+  vShape = aShape;
+#endif
   vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
   gl_Position = projectionMatrix * mvPosition;
   gl_PointSize = aSize * uScale / max(-mvPosition.z, 0.1);
@@ -96,16 +133,51 @@ void main() {
 }`;
 const POINT_FRAG = /* glsl */`
 varying vec4 vCol;
+#ifdef SHAPES
+uniform sampler2D uShapes;
+uniform float uTime;
+varying vec2 vShape;
+#endif
 #include <fog_pars_fragment>
 void main() {
   vec2 q = gl_PointCoord * 2.0 - 1.0;
   float d = dot(q, q);
+#ifdef SHAPES
+  if (vShape.x > 0.5) {
+    float a = vShape.y + uTime * (vShape.x > 4.5 && vShape.x < 5.5 ? 5.0 : vShape.x > 1.5 && vShape.x < 2.5 ? 2.0 : 0.0);
+    vec2 r = mat2(cos(a), -sin(a), sin(a), cos(a)) * q;
+    vec2 uv = clamp(r * 0.5 + 0.5, 0.0, 1.0);
+    float m = texture2D(uShapes, vec2((uv.x + vShape.x - 1.0) / 6.0, 1.0 - uv.y)).a;
+    if (m < 0.02) discard;
+    gl_FragColor = vec4(vCol.rgb * m * vCol.a, 1.0);
+    ${FOG_ALPHA}
+    return;
+  }
+#endif
   if (d > 1.0) discard;
   float core = exp(-d * 9.0);
   float halo = (1.0 - d) * (1.0 - d) * 0.35;
   gl_FragColor = vec4(vCol.rgb * (core + halo) * vCol.a, 1.0);
   ${FOG_ALPHA}
 }`;
+
+// 6 white sprites in a row: star, petal, heart, bolt, confetti, puff
+function shapeAtlas() {
+  const cv = document.createElement('canvas');
+  cv.width = 384; cv.height = 64;
+  const x = cv.getContext('2d');
+  x.fillStyle = '#fff';
+  const at = (k, f) => { x.save(); x.translate(k * 64 + 32, 32); f(); x.restore(); };
+  at(0, () => { x.beginPath(); for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4, r = k % 2 ? 6 : 28; x.lineTo(Math.cos(a) * r, Math.sin(a) * r); } x.fill(); });
+  at(1, () => { x.beginPath(); x.ellipse(0, 0, 12, 24, 0.5, 0, Math.PI * 2); x.fill(); });
+  at(2, () => { x.beginPath(); x.moveTo(0, 22); x.bezierCurveTo(-34, 0, -20, -28, 0, -10); x.bezierCurveTo(20, -28, 34, 0, 0, 22); x.fill(); });
+  at(3, () => { x.beginPath(); x.moveTo(8, -30); x.lineTo(-14, 4); x.lineTo(0, 4); x.lineTo(-8, 30); x.lineTo(16, -6); x.lineTo(2, -6); x.closePath(); x.fill(); });
+  at(4, () => { x.fillRect(-14, -8, 28, 16); });
+  at(5, () => { const g = x.createRadialGradient(0, 0, 0, 0, 0, 30); g.addColorStop(0, 'rgba(255,255,255,0.7)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.beginPath(); x.arc(0, 0, 30, 0, Math.PI * 2); x.fill(); });
+  const t = new THREE.CanvasTexture(cv);
+  t.generateMipmaps = false; t.minFilter = THREE.LinearFilter;
+  return t;
+}
 
 function pointsMaterial(shared, flip = 1) {
   return new THREE.ShaderMaterial({
@@ -141,22 +213,27 @@ export function createHalos(data, shared) {
 }
 
 export function createParticles(max, shared) {
-  const pos = new Float32Array(max * 3), size = new Float32Array(max), col = new Float32Array(max * 4);
+  const pos = new Float32Array(max * 3), size = new Float32Array(max), col = new Float32Array(max * 4), shp = new Float32Array(max * 2);
   const vel = new Float32Array(max * 3), life = new Float32Array(max), maxLife = new Float32Array(max), size0 = new Float32Array(max);
   const grav = new Float32Array(max);
   const g = new THREE.BufferGeometry();
   const pa = new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage);
   const sa = new THREE.BufferAttribute(size, 1).setUsage(THREE.DynamicDrawUsage);
   const ca = new THREE.BufferAttribute(col, 4).setUsage(THREE.DynamicDrawUsage);
-  g.setAttribute('position', pa); g.setAttribute('aSize', sa); g.setAttribute('aCol', ca);
+  const ha = new THREE.BufferAttribute(shp, 2).setUsage(THREE.DynamicDrawUsage);
+  g.setAttribute('position', pa); g.setAttribute('aSize', sa); g.setAttribute('aCol', ca); g.setAttribute('aShape', ha);
   g.setDrawRange(0, 0);
-  const pts = new THREE.Points(g, pointsMaterial(shared, 1));
+  const pmat = pointsMaterial(shared, 1);
+  pmat.defines = { SHAPES: 1 };
+  pmat.uniforms.uShapes = { value: shapeAtlas() };
+  const pts = new THREE.Points(g, pmat);
   pts.frustumCulled = false; pts.renderOrder = 8;
-  let top = 0, cursor = 0, alive = 0;
+  let top = 0, cursor = 0, alive = 0, dirtyShape = false;
   return {
     points: pts,
     get alive() { return alive; },
-    emit(x, y, z, vx, vy, vz, r, gr, b, sz, lf, gravity = 9) {
+    get top() { return top; },
+    emit(x, y, z, vx, vy, vz, r, gr, b, sz, lf, gravity = 9, shape = 0, spin = 0) {
       let i = cursor;
       for (let k = 0; k < max; k++) { if (life[i] <= 0) break; i = (i + 1) % max; }
       cursor = (i + 1) % max;
@@ -164,7 +241,9 @@ export function createParticles(max, shared) {
       vel[i * 3] = vx; vel[i * 3 + 1] = vy; vel[i * 3 + 2] = vz;
       col[i * 4] = r; col[i * 4 + 1] = gr; col[i * 4 + 2] = b; col[i * 4 + 3] = 1;
       size0[i] = sz; size[i] = sz; life[i] = lf; maxLife[i] = lf; grav[i] = gravity;
+      shp[i * 2] = shape; shp[i * 2 + 1] = spin;
       if (i + 1 > top) top = i + 1;
+      dirtyShape = true;
     },
     update(dt) {
       let hi = 0; alive = 0;
@@ -188,6 +267,7 @@ export function createParticles(max, shared) {
       pa.clearUpdateRanges(); pa.addUpdateRange(0, top * 3);
       sa.clearUpdateRanges(); sa.addUpdateRange(0, top);
       ca.clearUpdateRanges(); ca.addUpdateRange(0, top * 4);
+      if (dirtyShape) { ha.needsUpdate = true; ha.clearUpdateRanges(); ha.addUpdateRange(0, top * 2); dirtyShape = false; }
     },
     burst(x, z, col, n, speed = 6, size = 0.9, up = 6) {
       for (let k = 0; k < n; k++) {

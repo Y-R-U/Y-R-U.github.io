@@ -27,7 +27,8 @@ export function createResults({ root, app, onAgain, onMenu }) {
   const later = (ms, f) => timers.push(setTimeout(f, ms));
   const cancel = () => { timers.forEach(clearTimeout); timers = []; };
 
-  function show({ state, players, me = 0, report = null, practice = false, left = false }) {
+  // online: { quick, note } for a real online match (no rating, no coins; humans are tagged LIVE).
+  function show({ state, players, me = 0, report = null, practice = false, left = false, online = null }) {
     cancel();
     const sorted = state.crowds.slice().sort((a, b) => a.rank - b.rank);
     const mc = state.crowds[me];
@@ -35,26 +36,29 @@ export function createResults({ root, app, onAgain, onMenu }) {
     const won = place === 1 && !left;
     el.classList.toggle('won', won);
     $('.res-place').textContent = left ? 'LEFT MATCH' : won ? 'VICTORY!' : `${ord(place)} PLACE`;
-    $('.res-sub').textContent = left ? 'Counted as last place' : won ? 'Biggest crowd in the city' : place <= 3 ? 'So close. Go again!' : 'The city is waiting. Go again!';
+    $('.res-sub').textContent = left ? (online ? 'You left the online match' : 'Counted as last place') : won ? 'Biggest crowd in the city' : place <= 3 ? 'So close. Go again!' : 'The city is waiting. Go again!';
     const emote = $('.res-emote');
     emote.textContent = won ? app.emoteGlyph() : '';
     emote.classList.toggle('hidden', !won);
     const plate = 'plate-' + app.save.equip.plate;
     $('.res-list').innerHTML = sorted.map((c) => {
       const p = players[c.index], isMe = c.index === me;
-      const lg = isMe ? (practice ? null : LEAGUES[app.save.league]) : p.league != null ? LEAGUES[p.league] : null;
+      const lg = isMe ? (practice || online ? null : LEAGUES[app.save.league]) : p.league != null ? LEAGUES[p.league] : null;
       return `<li class="${isMe ? 'me ' + plate : ''}" style="--c:${hex(c.color)}">
         <span class="rl-rank">${c.rank === 1 ? ICON.crown : c.rank}</span>
         <span class="rl-ico">${ICON.person}</span>
         <span class="rl-flag">${esc(p.flag || '')}</span>
-        <span class="rl-name">${esc(p.name)}</span>
+        <span class="rl-name">${esc(p.name)}${online && p.human && !isMe ? ' <i class="rl-live">LIVE</i>' : ''}</span>
         <span class="rl-lg">${lg ? badgeSvg(lg, 16) : ''}</span>
         <span class="rl-n">${c.count}</span>
       </li>`;
     }).join('');
 
     const rw = $('.res-rewards');
-    if (practice || !report) {
+    if (online) {
+      rw.innerHTML = `<div class="rw-note rw-online">${esc(online.note || 'Online match')}</div>
+        <div class="rw-stats"><span>Best <b>${mc.best}</b></span><span>Absorbed <b>${mc.kills}</b></span><span>Recruited <b>${mc.recruited}</b></span></div>`;
+    } else if (practice || !report) {
       rw.innerHTML = `<div class="rw-note">Practice match: no rating or coins.</div>
         <div class="rw-stats"><span>Best <b>${mc.best}</b></span><span>Absorbed <b>${mc.kills}</b></span><span>Recruited <b>${mc.recruited}</b></span></div>`;
     } else renderRewards(rw, report, mc);
@@ -124,5 +128,9 @@ export function createResults({ root, app, onAgain, onMenu }) {
     }
   }
 
-  return { show, hide() { cancel(); el.classList.add('hidden'); el.classList.remove('in'); } };
+  return {
+    show, hide() { cancel(); el.classList.add('hidden'); el.classList.remove('in'); },
+    setOnlineNote(t) { const n = el.querySelector('.rw-online'); if (n) n.textContent = t; },
+    get open() { return !el.classList.contains('hidden'); },
+  };
 }

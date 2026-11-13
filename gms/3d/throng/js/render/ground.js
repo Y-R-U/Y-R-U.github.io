@@ -238,8 +238,15 @@ function paintInfo(map, n, sunDir) {
   }
   ctx.globalCompositeOperation = 'source-over';
 
+  // A: 0 inside solid building blocks (rings dim there)
+  const fm = canvas(n);
+  ctx = fm.ctx;
+  ctx.fillStyle = '#fff'; ctx.fillRect(-EXT, -EXT, EXT * 2, EXT * 2);
+  ctx.fillStyle = '#000';
+  for (const o of map.obstacles) if (o.type === 'rect') ctx.fillRect(o.x - o.w / 2 + 0.4, o.z - o.d / 2 + 0.4, o.w - 0.8, o.d - 0.8);
+  ctx.fillRect(-EXT, -EXT, EXT * 2, EXT - H); ctx.fillRect(-EXT, H, EXT * 2, EXT - H); ctx.fillRect(-EXT, -EXT, EXT - H, EXT * 2); ctx.fillRect(H, -EXT, EXT - H, EXT * 2);
   const get = (cv) => cv.ctx.getImageData(0, 0, n, n).data;
-  const R = get(sh), Gk = get(kd), B = get(lp);
+  const R = get(sh), Gk = get(kd), B = get(lp), Fm = get(fm);
   const out = new Uint8Array(n * n * 4);
   const fr = new Float32Array(n * n * 4);
   for (let i = 0; i < n * n; i++) fr[i * 4] = R[i * 4];
@@ -248,9 +255,8 @@ function paintInfo(map, n, sunDir) {
     out[i * 4] = Math.round(70 + fr[i * 4] * (185 / 255));
     out[i * 4 + 1] = Gk[i * 4];
     out[i * 4 + 2] = Math.min(255, B[i * 4]);
-    out[i * 4 + 3] = 255;
+    out[i * 4 + 3] = Fm[i * 4];
   }
-  void H;
   return out;
 }
 

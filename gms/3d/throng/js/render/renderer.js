@@ -4,17 +4,18 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { createShared } from './shared.js';
-import { buildCity, cityMaterial } from './city.js';
+import { buildCity, cityMaterial, createCutaway } from './city.js';
 import { buildGround } from './ground.js';
 import { createPeople } from './people.js';
 import { createCrowdSystem } from './crowd.js';
 import { createCameraRig } from './camera.js';
+import { createHats, createHeroes, trailEmit } from './cosmetics.js';
 import { createRings, createHalos, createParticles, createWater, createCrown, createPickups, createPigeons, PICKUP_COL } from './fx.js';
 
 const QUALITY = {
   high: { dpr: 2, bloom: true, reflCity: true, reflPeople: true, budget: 7000 },
-  medium: { dpr: 1.5, bloom: false, reflCity: true, reflPeople: false, budget: 5000 },
-  lite: { dpr: 1, bloom: false, reflCity: false, reflPeople: false, budget: 3000 },
+  medium: { dpr: 1.5, bloom: false, reflCity: true, reflPeople: false, budget: 5000, cheapRefl: true },
+  lite: { dpr: 1, bloom: false, reflCity: false, reflPeople: false, budget: 2000, lite: true },
 };
 const ORDER = ['lite', 'medium', 'high'];
 const FOG_COL = new THREE.Color(0x6e5562);
@@ -40,9 +41,10 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
   scene.add(ground.mesh);
 
   const city = buildCity(map, quality);
-  const cityMesh = new THREE.Mesh(city.geometry, cityMaterial(shared, 1));
+  const cutaway = createCutaway(city.blds);
+  const cityMesh = new THREE.Mesh(city.geometry, cityMaterial(shared, 1, cutaway));
   cityMesh.frustumCulled = false;
-  const cityRefl = new THREE.Mesh(city.reflGeometry, cityMaterial(shared, -1));
+  const cityRefl = new THREE.Mesh(city.reflGeometry, cityMaterial(shared, -1, cutaway));
   cityRefl.frustumCulled = false;
   cityRefl.renderOrder = -5;
   scene.add(cityMesh, cityRefl);
@@ -55,6 +57,11 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
   const people = createPeople(capacity, shared, { detail: quality === 'lite' ? 0 : 1 });
   scene.add(people.mesh, people.reflection, people.shadows);
   const crowd = createCrowdSystem(people, map);
+  const hats = createHats(people, shared, quality === 'lite' ? 0 : 1);
+  const heroes = createHeroes(shared);
+  scene.add(hats.mesh, heroes.mesh);
+  const lead = {};
+  const perf = { update: 0, write: 0, other: 0, submit: 0, upload: 0 };
 
   const rings = createRings(16, shared);
   scene.add(rings.mesh);
@@ -68,10 +75,11 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
   scene.add(particles.points);
 
   const rig = createCameraRig(camera);
+  rig.setBound((map.outer || map.size / 2 + 60) - 4);
 
   let composer = null, bloom = null;
   let q = QUALITY[quality] ? quality : 'high';
-  let focus = 0, metaSet = false, showcase = false;
+  let focus = 0, metaSet = false, showcase = false, cutSnap = false;
   const pickAlpha = new Map();
   const crownState = { x: 0, z: 0, y: 4, idx: -1, s: 1, a: 0 };
   const recruitWin = [];
@@ -91,6 +99,9 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     people.reflection.visible = Q.reflPeople;
     ground.setReflect(Q.reflCity);
     crowd.setBudget(Q.budget);
+    cityMesh.geometry = Q.lite ? city.liteGeometry : city.geometry;
+    cityRefl.geometry = Q.cheapRefl ? city.reflCheap : city.reflGeometry;
+    fpsS.warm = fpsS.started ? 2 : 0; fpsS.low = 0; fpsS.started = true;
     if (Q.bloom && !composer) {
       const rt = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 });
       composer = new EffectComposer(gl, rt);
@@ -119,12 +130,17 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
 
   function setCrowds(meta) {
     crowd.setCrowds(meta);
+    crowd.setView(null);
+    const em = [];
+    for (const c of crowd.crowds) if (c && c.cos.flag) em[c.index % 16] = c.cos.flag.emblem;
+    heroes.setEmblems(em);
     metaSet = true;
     pickAlpha.clear();
     crownState.idx = -1; crownState.a = 0;
     lastLead = -1;
     rig.setEnd(false);
     rig.snap();
+    cutSnap = true;
   }
 
   function teamCol(i) { return crowd.crowds[i]?.color || FOG_COL; }
@@ -211,9 +227,65 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
       if (c.protect > 0) alpha = Math.sin(time * 16) > 0 ? 0.9 : 0.3;
       if (c.panic > 0) { r *= 1 + 0.025 * Math.sin(time * 38); inten *= 1.2 + 0.4 * Math.sin(time * 20); }
       if (c.eating > 0) inten *= 1.35;
-      rings.set(n++, c.x, c.z, r, alpha, c.color, inten * 1.7);
+      if (c.cos.ring === 4) r *= 1 + 0.012 * Math.sin(time * 5.5);
+      rings.set(n++, c.x, c.z, r, alpha, c.color, inten * 1.7, c.cos.ring);
     }
     rings.commit(n);
+  }
+
+  // leader variants, flags, trails, flame-ring embers
+  function updateCosmetics(dt) {
+    heroes.begin();
+    const fs = shared.uFigScale.value;
+    const flagH = 2.9 * Math.min(3.4, Math.max(1.2, rig.rig.d / 34));
+    const lite = q === 'lite';
+    for (const c of crowd.crowds) {
+      if (!c || !c.alive) continue;
+      const cos = c.cos;
+      if (c.hero && crowd.leaderState(c, lead)) {
+        heroes.add(lead, c, cos.flag ? flagH : 0);
+        if (cos.flag) {
+          const S = lead.scale * 1.28 * fs, cy = Math.cos(lead.yaw), sy = Math.sin(lead.yaw);
+          c.poleX = lead.x + (0.36 * cy + 0.28 * sy) * S; c.poleZ = lead.z + (-0.36 * sy + 0.28 * cy) * S;
+          c.poleTop = 0.85 * S + 1.05 * flagH;
+        }
+      }
+      if (!c.onScreen) continue;
+      const sp = Math.hypot(c.vx, c.vz);
+      if (cos.trail && sp > 0.8) {
+        c.trailAcc = (c.trailAcc || 0) + dt * (12 + c.visR * 2) * Math.min(1, sp / 3) * (lite ? 0.5 : 1);
+        const hx = -c.vx / sp, hz = -c.vz / sp;
+        while (c.trailAcc >= 1) {
+          c.trailAcc -= 1;
+          const a = Math.atan2(hz, hx) + (Math.random() - 0.5) * 2.4, rr = c.visR * (0.55 + Math.random() * 0.45);
+          trailEmit(particles, cos.trail, c.x + Math.cos(a) * rr, c.z + Math.sin(a) * rr, c.vx, c.vz, c.color);
+        }
+      }
+      if (cos.ring === 3) {
+        c.emberAcc = (c.emberAcc || 0) + dt * Math.min(30, 4 + c.visR * 1.2) * (lite ? 0.5 : 1);
+        while (c.emberAcc >= 1) {
+          c.emberAcc -= 1;
+          const a = Math.random() * Math.PI * 2, rr = c.visR * (1 + Math.random() * 0.08);
+          particles.emit(c.x + Math.cos(a) * rr, 0.2, c.z + Math.sin(a) * rr, Math.cos(a) * 0.4, 1.2 + Math.random() * 1.4, Math.sin(a) * 0.4,
+            1.6 + c.color.r, 0.7 + c.color.g * 0.8, 0.25 + c.color.b * 0.6, 0.35 + Math.random() * 0.25, 0.5 + Math.random() * 0.4, -1, 0, 0);
+        }
+      }
+    }
+    heroes.commit();
+  }
+
+  const qv = [[0, 0], [0, 0], [0, 0], [0, 0]], vND = new THREE.Vector3();
+  function updateView() {
+    camera.updateMatrixWorld();
+    const cp = camera.position;
+    let ok = true;
+    [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([sx, sy], k) => {
+      vND.set(sx, sy, 0.5).unproject(camera).sub(cp);
+      if (vND.y > -0.02) { ok = false; return; }
+      const t = -cp.y / vND.y;
+      qv[k][0] = cp.x + vND.x * t; qv[k][1] = cp.z + vND.z * t;
+    });
+    crowd.setView(ok && !showcase ? qv : null, 3.5 * shared.uFigScale.value);
   }
 
   function updateCrown(state, dt) {
@@ -231,21 +303,25 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
         crownState.idx = lead;
       }
       const k = 1 - Math.exp(-dt * 7);
-      crownState.x += (c.x - crownState.x) * k; crownState.z += (c.z - crownState.z) * k;
+      const px = c.cos.flag && c.poleX != null ? c.poleX : c.x, pz = c.cos.flag && c.poleZ != null ? c.poleZ : c.z;
+      crownState.x += (px - crownState.x) * k; crownState.z += (pz - crownState.z) * k;
       crownState.y += (ty - crownState.y) * k;
     }
     const s = Math.min(3.4, Math.max(1.2, rig.rig.d / 34)) * crownState.a;
     const bob = Math.sin(time * 2.2) * 0.18 * s;
-    crown.group.position.set(crownState.x, 2.6 + 1.1 * s + bob, crownState.z);
+    let cy = 2.6 + 1.1 * s;
+    if (c && c.alive && c.cos.flag && c.poleTop) cy = Math.max(cy, c.poleTop + 0.25 * s);
+    crownState.lift = (crownState.lift ?? cy) + (cy - (crownState.lift ?? cy)) * Math.min(1, dt * 5);
+    crown.group.position.set(crownState.x, crownState.lift + bob, crownState.z);
     crown.group.scale.setScalar(Math.max(0.001, s));
     crown.crown.rotation.y = time * 1.1;
     crown.group.visible = crownState.a > 0.02;
     crown.shaft.visible = crown.group.visible;
     crown.shaft.position.set(crownState.x, 0, crownState.z);
-    crown.shaft.scale.set(Math.max(0.6, s * 0.8), 2.6 + 1.1 * s, Math.max(0.6, s * 0.8));
+    crown.shaft.scale.set(Math.max(0.6, s * 0.8), crownState.lift, Math.max(0.6, s * 0.8));
     if (crown.group.visible && Math.random() < 0.5) {
       const a = Math.random() * Math.PI * 2, r = 0.9 * s;
-      particles.emit(crownState.x + Math.cos(a) * r, 2.6 + 1.3 * s, crownState.z + Math.sin(a) * r, Math.cos(a) * 0.6, 0.4, Math.sin(a) * 0.6, 2.2, 1.4, 0.4, 0.35 * s, 0.9, 1.5);
+      particles.emit(crownState.x + Math.cos(a) * r, crownState.lift + 0.2 * s, crownState.z + Math.sin(a) * r, Math.cos(a) * 0.6, 0.4, Math.sin(a) * 0.6, 2.2, 1.4, 0.4, 0.35 * s, 0.9, 1.5);
     }
     crown.shaftMat.uniforms.uA.value = crownState.a;
   }
@@ -281,14 +357,18 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     if (!metaSet) setCrowds(state.crowds.map((c) => ({ index: c.index, name: c.name, color: c.color })));
     handleEvents(events, state);
     selfPunches(dt);
+    const p0 = performance.now();
     crowd.update(state, alpha, dt);
-    crowd.write(dt);
+    const p1 = performance.now();
+    hats.setCount(crowd.write(dt));
+    const p2 = performance.now();
     updateRings();
+    updateCosmetics(dt);
     updateCrown(state, dt);
     updatePickups(state, dt);
     fountainSpray();
     particles.update(dt);
-    pigeons.update(dt, crowd.crowds);
+    if (!QUALITY[q].lite) pigeons.update(dt, crowd.crowds);
 
     const fi = showcase && state.leader != null && state.leader >= 0 ? state.leader : focus;
     const fc = crowd.crowds[fi];
@@ -304,14 +384,26 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     shared.uYaw.value = rig.rig.yaw;
     pickups.setView(d);
     shared.uFigScale.value = 1 + 0.3 * Math.min(1, Math.max(0, (d - 35) / 110));
+    crowd.setFigScale(shared.uFigScale.value);
     scene.fog.near = d * 1.15 + 10;
     scene.fog.far = d * 2.8 + 40;
     shared.uFocus.value.set(f.x, f.z, f.radius * 1.15 + 3, fc && fc.alive ? 1 : 0);
+    updateView();
+    cutaway.update(dt, camera.position, { x: fc ? fc.x : f.x, z: fc ? fc.z : f.z, r: f.radius }, !!(fc && fc.alive) && !showcase && !rig.rig.fixed);
+    if (cutSnap) { cutaway.snap(); cutSnap = false; }
     shared.uPointScale.value = gl.domElement.height * camera.projectionMatrix.elements[5] / 2;
 
+    if (QUALITY[q].lite) { crown.shaft.visible = false; pickups.beams.visible = false; pigeons.mesh.visible = false; water.jets.visible = false; halos.points.visible = false; }
+    else { pickups.beams.visible = true; pigeons.mesh.visible = true; water.jets.visible = true; halos.points.visible = true; }
+    const p3 = performance.now();
     gl.info.reset();
     if (composer && QUALITY[q].bloom) composer.render(dt);
     else gl.render(scene, camera);
+    const p4 = performance.now();
+    const ek = 0.05;
+    perf.update += (p1 - p0 - perf.update) * ek; perf.write += (p2 - p1 - perf.write) * ek;
+    perf.other += (p3 - p2 - perf.other) * ek; perf.submit += (p4 - p3 - perf.submit) * ek;
+    perf.upload = crowd.stats.drawn * 48 + particles.top * 36 + heroes.count * 80 + 16 * 36;
 
     const now = performance.now();
     const ft = now - lastNow;
@@ -320,9 +412,12 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     if (fpsS.acc > 500) {
       fpsS.fps = 1000 * fpsS.n / fpsS.acc;
       fpsS.acc = 0; fpsS.n = 0;
-      if (adaptive) {
-        if (fpsS.fps < 40) fpsS.low++; else fpsS.low = 0;
-        if (fpsS.low >= 8) {
+      // step down only (never back up, so it cannot oscillate): skip 2 s after a change for shader warm-up,
+      // then 3 windows in a row under 45 fps (1.5 s) drop one tier
+      fpsS.warm = (fpsS.warm || 0) + 1;
+      if (adaptive && fpsS.warm > 4) {
+        if (fpsS.fps < 45) fpsS.low++; else fpsS.low = 0;
+        if (fpsS.low >= 3) {
           const i = ORDER.indexOf(q);
           if (i > 0) { q = ORDER[i - 1]; applyQuality(); }
           fpsS.low = 0;
@@ -337,13 +432,14 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
 
   return {
     three: { renderer: gl, scene, camera },
+    _dbg: { crowd, people, city, map },
     setCrowds,
     frame,
     setFocus(i) { if (i !== focus) focus = i; },
     punch(s) { rig.punch(s); },
     crownTop() {
       const s = Math.min(3.4, Math.max(1.2, rig.rig.d / 34));
-      return 2.6 + 2.5 * s;
+      return (crownState.lift ?? 2.6 + 1.1 * s) + 1.4 * s;
     },
     setCameraMode(mode) { showcase = mode === 'showcase'; },
     project(x, y, z, out = {}) {
@@ -374,6 +470,8 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
         drawCalls: gl.info.render.calls,
         triangles: gl.info.render.triangles,
         instances: crowd.stats.drawn,
+        hats: crowd.stats.hats, culled: crowd.stats.culled, heroes: heroes.count,
+        ms: { update: +perf.update.toFixed(2), write: +perf.write.toFixed(2), other: +perf.other.toFixed(2), submit: +perf.submit.toFixed(2) }, uploadKB: Math.round(perf.upload / 1024),
         crowdFigures: crowd.stats.crowdFigs,
         neutralFigures: crowd.stats.neutralFigs,
         particles: particles.alive,
