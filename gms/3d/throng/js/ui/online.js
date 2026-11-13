@@ -95,7 +95,9 @@ export function createRoomLobby({ root, app }) {
     $('.ol-start').disabled = true;
     net().start().catch((e) => error(e.message)).finally(() => { $('.ol-start').disabled = false; });
   });
-  el.querySelectorAll('.olm-strip [data-mode]').forEach((b) => b.addEventListener('click', () => { app.audio.ui(); net().roomMode = b.dataset.mode; render(); }));
+  let sentMode = '';
+  const pushMode = (m) => { const o = app.net.client; sentMode = room.code + ':' + m; if (o) o.setMode(m); };
+  el.querySelectorAll('.olm-strip [data-mode]').forEach((b) => b.addEventListener('click', () => { app.audio.ui(); net().roomMode = b.dataset.mode; pushMode(b.dataset.mode); render(); }));
   const link = () => net().shareLink(room.code);
   $('.ol-copy').addEventListener('click', async () => {
     const b = $('.ol-copy');
@@ -127,10 +129,16 @@ export function createRoomLobby({ root, app }) {
     } else sub = isHost ? 'Share the code, then press Start. Bots fill the empty spots.' : 'Waiting for the host to start';
     $('.ol-sub').textContent = sub;
     const pick = !quick && isHost && room.state === 'lobby';
+    const shown = !quick && CONFIG.MODES[room.mode] ? room.mode : '';
+    // The server's copy of the pick wins (it survives a host change); the host pushes its own pick once per room.
+    if (shown && !pick) net().roomMode = shown;
+    if (pick && shown !== (net().roomMode || 'classic') && sentMode !== room.code + ':' + (net().roomMode || 'classic')) pushMode(net().roomMode || 'classic');
     $('.olm-strip').classList.toggle('hidden', !pick);
     const rm = net().roomMode || 'classic';
     el.querySelectorAll('.olm-strip [data-mode]').forEach((b) => b.classList.toggle('on', b.dataset.mode === rm));
-    $('.olm-t').textContent = pick ? CONFIG.MODES[rm].blurb : quick ? `${CONFIG.MODES[quickMode()].name} (quick matches rotate every 10 min)` : 'The host picks the mode';
+    const olmT = pick ? esc(CONFIG.MODES[rm].blurb) : quick ? esc(`${CONFIG.MODES[quickMode()].name} (quick matches rotate every 10 min)`)
+      : shown ? `<b class="olm-pick">${MODE_ICON[shown]}${esc(CONFIG.MODES[shown].name)}</b><br>${esc(CONFIG.MODES[shown].blurb)}` : 'The host picks the mode';
+    if ($('.olm-t').innerHTML !== olmT) $('.olm-t').innerHTML = olmT;
     $('.ol-code').classList.toggle('hidden', quick);
     $('.ol-code b').textContent = room.code;
     $('.ol-link').value = quick ? '' : link();
@@ -169,30 +177,35 @@ const TEAM = [0x2f7bff, 0xff3a3a, 0xffbf1a, 0x9b4dff, 0x2fd14a, 0xff8320, 0xff58
 // Ladder sheet, Online tab: daily / weekly / all-time boards from the server.
 export function renderOnlineBoards(body, { app }) {
   const net = app.net;
-  let period = net.boardPeriod || 'day', kind = net.boardKind || 'best';
+  let period = net.boardPeriod || 'day', kind = net.boardKind || 'best', bmode = net.boardMode || 'all';
   body.innerHTML = `
     <div class="seg-row"><div class="seg ob-p">${[['day', 'Today'], ['week', 'This week'], ['all', 'All time']].map(([k, l]) => `<button type="button" data-p="${k}">${l}</button>`).join('')}</div>
       <div class="seg ob-k">${[['best', 'Best crowd'], ['wins', 'Wins']].map(([k, l]) => `<button type="button" data-k="${k}">${l}</button>`).join('')}</div></div>
+    <div class="m-modes ob-m"><button type="button" data-bm="all"><span>All modes</span></button>${CONFIG.MODE_ORDER.map((m) => `<button type="button" data-bm="${m}" aria-label="${esc(CONFIG.MODES[m].name)}">${MODE_ICON[m]}<span>${esc(CONFIG.MODES[m].short)}</span></button>`).join('')}</div>
+    <p class="ld-note ob-old hidden">This server has one board for every mode for now.</p>
     <ol class="ld-list ob-list"><li class="gap">Loading…</li></ol>
     <p class="ld-note">Real players only: the host's result, confirmed by another player in the match. Days and weeks start at 00:00 UTC.</p>`;
   const list = body.querySelector('.ob-list');
   async function load() {
     body.querySelectorAll('[data-p]').forEach((b) => b.classList.toggle('on', b.dataset.p === period));
     body.querySelectorAll('[data-k]').forEach((b) => b.classList.toggle('on', b.dataset.k === kind));
-    net.boardPeriod = period; net.boardKind = kind;
+    body.querySelectorAll('[data-bm]').forEach((b) => b.classList.toggle('on', b.dataset.bm === bmode));
+    net.boardPeriod = period; net.boardKind = kind; net.boardMode = bmode;
     list.innerHTML = '<li class="gap">Loading…</li>';
     try {
-      const d = await net.boards(period, kind);
+      const d = await net.boards(period, kind, bmode);
       if (!body.isConnected) return;
+      body.querySelector('.ob-old').classList.toggle('hidden', !!d.mode || bmode === 'all');
       const mine = net.you && net.you.pid;
       const rows = d.rows.map((r) => `<li class="${r.pid === mine ? 'me' : ''}"><span class="ld-rk">${num(r.rank)}</span><span class="ld-n">${esc(r.name)}</span><span class="ld-r">${num(r.value)}</span></li>`);
       if (d.me && !d.rows.some((r) => r.pid === mine)) rows.push(`<li class="gap">⋯</li><li class="me"><span class="ld-rk">${num(d.me.rank)}</span><span class="ld-n">${esc(app.save.name || 'You')}</span><span class="ld-r">${num(d.me.value)}</span></li>`);
-      list.innerHTML = rows.join('') || `<li class="gap">No ${kind === 'wins' ? 'wins' : 'results'} yet ${period === 'day' ? 'today' : period === 'week' ? 'this week' : ''}. Be the first.</li>`;
+      list.innerHTML = rows.join('') || `<li class="gap">No ${kind === 'wins' ? 'wins' : 'results'}${bmode !== 'all' && CONFIG.MODES[bmode] ? ' in ' + esc(CONFIG.MODES[bmode].short) : ''} yet ${period === 'day' ? 'today' : period === 'week' ? 'this week' : ''}. Be the first.</li>`;
     } catch (e) {
       if (body.isConnected) list.innerHTML = '<li class="gap">The online leaderboard is not reachable right now.</li>';
     }
   }
   body.querySelectorAll('[data-p]').forEach((b) => b.addEventListener('click', () => { period = b.dataset.p; app.audio.ui(); load(); }));
   body.querySelectorAll('[data-k]').forEach((b) => b.addEventListener('click', () => { kind = b.dataset.k; app.audio.ui(); load(); }));
+  body.querySelectorAll('[data-bm]').forEach((b) => b.addEventListener('click', () => { bmode = b.dataset.bm; app.audio.ui(); load(); }));
   load();
 }

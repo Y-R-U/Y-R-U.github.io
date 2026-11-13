@@ -8,7 +8,10 @@ export function screenToWorld(sx, sy, yaw, out) {
   return out;
 }
 
-export function createInput({ el, getYaw = () => 0, onActivity = () => {} }) {
+// Mouse users can steer by pointing (setMouseMode('follow')): the crowd heads for the ground under the cursor, no
+// button held. Needs getLeader() → the local crowd's sim state and groundPoint(clientX, clientY, out). Touch and pen
+// always use the floating joystick; keys override both while held.
+export function createInput({ el, getYaw = () => 0, onActivity = () => {}, getLeader = () => null, groundPoint = () => null }) {
   const cfg = CONFIG.INPUT;
   const keys = new Set();
   const joy = document.createElement('div');
@@ -22,7 +25,15 @@ export function createInput({ el, getYaw = () => 0, onActivity = () => {} }) {
   let enabled = true;
   let keep = cfg.keepMovingOnRelease;
   const keepMoving = () => keep;
-  const tmp = { x: 0, z: 0 };
+  const tmp = { x: 0, z: 0 }, gp = { x: 0, z: 0 };
+  let mouseMode = 'follow', mx = 0, my = 0, mouseIn = false, mouseSeen = false, fx = 0, fz = 0, fAt = 0;
+  const follow = () => mouseMode === 'follow' && mouseSeen;
+  window.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    mx = e.clientX; my = e.clientY; mouseIn = mouseSeen = true;
+  }, { passive: true });
+  document.documentElement.addEventListener('mouseleave', () => { mouseIn = false; });
+  window.addEventListener('blur', () => { mouseIn = false; });
 
   function place() {
     joy.style.transform = `translate3d(${ox}px, ${oy}px, 0)`;
@@ -32,6 +43,7 @@ export function createInput({ el, getYaw = () => 0, onActivity = () => {} }) {
   function down(e) {
     if (!enabled || pid !== null) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e.pointerType === 'mouse' && mouseMode === 'follow') { mx = e.clientX; my = e.clientY; mouseIn = mouseSeen = true; onActivity(); e.preventDefault(); return; }
     pid = e.pointerId;
     ox = e.clientX; oy = e.clientY; sx = sy = 0;
     try { el.setPointerCapture(pid); } catch {}
@@ -96,6 +108,7 @@ export function createInput({ el, getYaw = () => 0, onActivity = () => {} }) {
       const l = Math.hypot(sx, sy);
       if (l > cfg.deadZone) { const m = Math.min(1, l); vx = sx / l * m; vy = sy / l * m; }
     }
+    if (!vx && !vy && pid === null && follow()) return followVector(out);
     if (vx || vy) {
       screenToWorld(vx, vy, getYaw(), tmp);
       const l = Math.hypot(tmp.x, tmp.z);
@@ -109,8 +122,39 @@ export function createInput({ el, getYaw = () => 0, onActivity = () => {} }) {
     return out;
   }
 
-  function reset() { pid = null; keys.clear(); lastX = lastZ = 0; sx = sy = 0; joy.classList.add('hidden'); }
+  // Steer from the leader's SIM position (not the drawn, look-ahead camera) to the cursor's ground point, so the
+  // camera moving under a resting cursor cannot feed back into the heading; a short low-pass absorbs punch zooms.
+  function followVector(out) {
+    const C = cfg, now = performance.now();
+    const dt = Math.min(0.25, Math.max(0, (now - (fAt || now)) / 1000));
+    fAt = now;
+    let tx = fx, tz = fz;
+    if (mouseIn) {
+      const L = getLeader();
+      const g = L && groundPoint(mx, my, gp);
+      if (g) {
+        const dx = g.x - L.x, dz = g.z - L.z, d = Math.hypot(dx, dz);
+        const m = Math.max(0, Math.min(1, (d - C.followDead) / (C.followFull - C.followDead)));
+        tx = d > 1e-6 ? dx / d * m : 0; tz = d > 1e-6 ? dz / d * m : 0;
+      }
+    } else if (!keepMoving()) { tx = tz = 0; }
+    const k = 1 - Math.exp(-dt / C.followTau);
+    fx += (tx - fx) * k; fz += (tz - fz) * k;
+    const l = Math.hypot(fx, fz);
+    if (l > 1) { fx /= l; fz /= l; }
+    if (l > 0.05) { lastX = fx / Math.max(l, 1e-6); lastZ = fz / Math.max(l, 1e-6); }
+    out.x = fx; out.z = fz;
+    return out;
+  }
+
+  function reset() { pid = null; keys.clear(); lastX = lastZ = 0; sx = sy = 0; fx = fz = 0; fAt = 0; joy.classList.add('hidden'); }
   function setEnabled(v) { enabled = v; if (!v) reset(); }
 
-  return { vector, reset, setEnabled, setKeepMoving(v) { keep = !!v; }, get dragging() { return pid !== null; }, get enabled() { return enabled; } };
+  return {
+    vector, reset, setEnabled, setKeepMoving(v) { keep = !!v; },
+    setMouseMode(m) { mouseMode = m === 'drag' ? 'drag' : 'follow'; },
+    get mouseMode() { return mouseMode; },
+    get following() { return follow() && pid === null && !keys.size; },
+    get dragging() { return pid !== null || (follow() && mouseIn); }, get enabled() { return enabled; },
+  };
 }

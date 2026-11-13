@@ -55,6 +55,66 @@ func openDB(path string) {
 	if _, err := db.Exec(schema); err != nil {
 		log.Fatalf("schema: %v", err)
 	}
+	if err := migrate(); err != nil {
+		log.Fatalf("migrate: %v", err)
+	}
+}
+
+// Schema 2 (wave 5): per-mode boards. results gains a mode column and alltime_mode holds the per-mode
+// all-time rows; alltime stays the all-modes aggregate (and the name lookup). Rows written before this
+// were Classic matches. Idempotent: safe on a fresh file, an M3/M4 file, and an already-migrated one.
+func migrate() error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	has := false
+	rows, err := tx.Query(`PRAGMA table_info(results)`)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var cid, notnull, pk int
+		var name, typ string
+		var dflt sql.NullString
+		rows.Scan(&cid, &name, &typ, &notnull, &dflt, &pk)
+		if name == "mode" {
+			has = true
+		}
+	}
+	rows.Close()
+	if !has {
+		if _, err := tx.Exec(`ALTER TABLE results ADD COLUMN mode TEXT NOT NULL DEFAULT 'classic'`); err != nil {
+			return err
+		}
+	}
+	var v int
+	tx.QueryRow(`SELECT CAST(value AS INTEGER) FROM settings WHERE key = 'schema'`).Scan(&v)
+	for _, q := range []string{
+		`CREATE TABLE IF NOT EXISTS alltime_mode (
+		  pid TEXT NOT NULL, mode TEXT NOT NULL, name TEXT NOT NULL, best INTEGER NOT NULL, wins INTEGER NOT NULL,
+		  matches INTEGER NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (pid, mode))`,
+		`CREATE INDEX IF NOT EXISTS idx_alltime_mode_best ON alltime_mode(mode, best DESC)`,
+		`CREATE INDEX IF NOT EXISTS idx_alltime_mode_wins ON alltime_mode(mode, wins DESC)`,
+		`CREATE INDEX IF NOT EXISTS idx_results_mode_day ON results(mode, day, pid)`,
+		`CREATE INDEX IF NOT EXISTS idx_results_mode_week ON results(mode, week, pid)`,
+	} {
+		if _, err := tx.Exec(q); err != nil {
+			return err
+		}
+	}
+	if v < 2 {
+		if _, err := tx.Exec(`INSERT OR IGNORE INTO alltime_mode(pid, mode, name, best, wins, matches, at)
+			SELECT pid, 'classic', name, best, wins, matches, at FROM alltime`); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(`INSERT INTO settings(key, value) VALUES('schema', '2') ON CONFLICT(key) DO UPDATE SET value = excluded.value`); err != nil {
+			return err
+		}
+		log.Printf("db: migrated to schema 2 (per-mode boards; existing rows are Classic)")
+	}
+	return tx.Commit()
 }
 
 func getSetting(k string) string {

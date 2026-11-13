@@ -249,6 +249,7 @@ r.setCameraMode('showcase' | 'follow', { theme?, cycle? })
 - `?auto=1` player is driven by a bot · `?lite=1` cheapest quality · `?seed=N` fixed match
 - `?shot=1` no menu, straight into a match, HUD hidden, for thumbnails
 - `?t=N` fast-forward the sim N seconds before the first frame (R needs big crowds on screen fast)
+- `?fps=1` a strip at the bottom: fps, the slowest 5 % of frames, quality, DPR, draw calls, triangles (from `stats()`)
 - `window.__game = { state, sim, renderer, start(), ready, errors }`
 
 ## House rules

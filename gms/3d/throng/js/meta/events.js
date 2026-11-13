@@ -61,9 +61,15 @@ export function eventSim(ids) {
   return out;
 }
 
-export function eventLook(ids) {
+// Winter lights, 18 Dec – 6 Jan UTC: the snow theme (with its own falling snow) when no event has a look.
+export function winterLook(t = Date.now()) {
+  const x = new Date(t), m = x.getUTCMonth(), d = x.getUTCDate();
+  return (m === 11 && d >= 18) || (m === 0 && d <= 6) ? { theme: 'snow', weather: null, event: 'winter' } : null;
+}
+
+export function eventLook(ids, t = Date.now()) {
   for (const id of ['market', 'rush', 'double', 'slayer']) if (ids.includes(id)) return { ...EVENTS[id].look, event: id };
-  return null;
+  return winterLook(t);
 }
 
 // What a match started at `t` in `mode` gets: event ids, sim overrides, look, coin multiplier.
@@ -72,7 +78,7 @@ export function matchEvents(t = Date.now(), mode = 'classic') {
   const ids = live.map((w) => w.id).filter((id) => id !== 'motd');
   const motd = live.find((w) => w.id === 'motd');
   const coinMul = motd && motd.mode === mode ? EVENTS.motd.coinMul : 1;
-  return { ids, sim: eventSim(ids), look: eventLook(ids), coinMul, featured: motd ? motd.mode : null, slayer: ids.includes('slayer') ? EVENTS.slayer.bonus : 0 };
+  return { ids, sim: eventSim(ids), look: eventLook(ids, t), coinMul, featured: motd ? motd.mode : null, slayer: ids.includes('slayer') ? EVENTS.slayer.bonus : 0 };
 }
 
 export function fmtCountdown(ms) {

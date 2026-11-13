@@ -89,3 +89,31 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 1. All suites + net_test, screenshots per theme, commit, push, rsync deploy.
 2. Hub card on games.br8t.com.
 3. Wave 5 (ONE agent at a time): blind-critic art pass, balance sweeps for the new modes (Teams blue bias 8/12, LCS circle, Infection), unit test for the lcs/infection plausibility branch, lobby shows the host's mode pick (server field), per-mode online boards, real-device checklist for Aaron.
+
+## STATE @ 2026-11-13 (R4 landed — M4 shipped)
+- R4 landed. Manager: sim_test, meta_test, render_map_test PASS on the full tree; all five themes, LCS+rain and the menu boot with 0 errors; screenshots looked at (night-neon, snow, LCS zone all good).
+- Commit 5d8d9139 pushed; static deployed. Server unchanged since e4f073ba's hub.go deploy.
+- HUB CARD: deliberately NOT added. games/ is clean, but nothing in THRONG has been human-played (Aaron pulled Voidcast from the hub for that). Add only when Aaron says so.
+- Wave 5 launched, ONE agent: G5 (render asks 20–29, server tests + lobby mode + per-mode boards, balance sweeps, hardening, first-session audit, docs/PLAYTEST.md). Report → docs/notes/G5_report.md. Ports cdp 9280-9289 / http 8760-8769.
+
+## NEXT (after G5)
+1. All suites incl. net_test + server/test.sh; commit; push; rsync deploy; server deploy (schema migration — read G5's deploy note first).
+2. Then ONE render agent: blind-critic art pass (Sonnet critics vs refs/reference.png are cheap — but still one at a time), weakest items from R4_report (sunny-day flat streets, festival canopy, night-neon blockiness, outer fog ring, 3D emote bubble, white pedestrians on evening paving).
+3. Give Aaron docs/PLAYTEST.md; ask about the hub card.
+
+## STATE @ 2026-11-13 (Aaron played it)
+- Aaron played on desktop + phone: "looks and plays well". Two asks, sent to G5 (a62be449b97a55eb6, resumed after dying on the limit) as its first items: (A) Settings option for mouse follow-pointer steering on desktop; (B) results popup top-right corner hidden under the account badge on mobile; audit all sheets.
+- Aaron on agents: the point of one-at-a-time is fewer agents cold-restarting a big context after a 5-hour reset. Keep briefs small enough to land inside a window; after G5, use fresh tightly scoped agents rather than long ones.
+
+## STATE @ 2026-11-13 (Aaron: PAUSE after G5 ships)
+- Aaron: pause THRONG after G5's work is verified and shipped (weekly usage). Hub card APPROVED ("yes also add hub card").
+- When G5 lands: all suites, screenshots, commit, push, rsync deploy, server deploy, hub card. Then CronDelete 3de94b4f and launch NOTHING more.
+- If G5 dies on the limit: do NOT resume it. Ship what passes, leave the rest on disk with a note here, cancel the cron.
+- Deferred until Aaron restarts: art pass (NEXT item 2), whatever his phone playtest finds.
+- HUB CARD DONE: commit 9e58f48c, games.js + throng.jpg deployed to games.br8t.com (card sits after SKYPUTT). THRONG is NOT in games/deploy.sh GAMES (own deploy, noted there).
+
+## STATE @ 2026-11-14 (G5 landed — wave 5 shipped — PAUSED)
+- G5 landed. Manager re-ran sim_test, meta_test, render_map_test, server/test.sh, net_test (classic): all PASS. Screenshots of menu + results (390x664, 844x390) looked at.
+- Shipped: mouse follow-pointer setting (default ON for mouse), popups clear of the account badge, fullscreen toggle (Settings; iPhone gets an Add to Home Screen hint), per-mode online boards (schema 2), lobby shows host mode, Teams + Infection rebalance, guest reload rejoin, docs/PLAYTEST.md, ?fps=1.
+- PAUSED at Aaron's request. Cron tick cancelled. No agents running. To restart: NEXT item 2 (art pass, one agent) and whatever Aaron's phone playtest finds.
+- Open small items: early-leave row shows live rank under "Counted as last place"; crown on a 4-person crowd at kick-off; minified three.js not on the box (1.3 MB saving); locker ≈ 17 h of play (prices unreviewed).

@@ -25,7 +25,7 @@ func weekKey(t time.Time) string {
 	return fmt.Sprintf("%d-W%02d", y, w)
 }
 
-func recordResults(mid string, entries []boardEntry, now int64) error {
+func recordResults(mid, mode string, entries []boardEntry, now int64) error {
 	if len(entries) == 0 {
 		return nil
 	}
@@ -47,8 +47,8 @@ func recordResults(mid string, entries []boardEntry, now int64) error {
 		if n >= perDayCap {
 			continue
 		}
-		res, err := tx.Exec(`INSERT OR IGNORE INTO results(mid, pid, name, day, week, best, win, at) VALUES(?,?,?,?,?,?,?,?)`,
-			mid, e.PID, e.Name, day, week, e.Best, b2i(e.Win), now)
+		res, err := tx.Exec(`INSERT OR IGNORE INTO results(mid, pid, name, day, week, best, win, at, mode) VALUES(?,?,?,?,?,?,?,?,?)`,
+			mid, e.PID, e.Name, day, week, e.Best, b2i(e.Win), now, mode)
 		if err != nil {
 			return err
 		}
@@ -60,9 +60,16 @@ func recordResults(mid string, entries []boardEntry, now int64) error {
 			wins = wins + excluded.wins, matches = matches + 1, at = excluded.at`, e.PID, e.Name, e.Best, b2i(e.Win), now); err != nil {
 			return err
 		}
+		if _, err := tx.Exec(`INSERT INTO alltime_mode(pid, mode, name, best, wins, matches, at) VALUES(?,?,?,?,?,1,?)
+			ON CONFLICT(pid, mode) DO UPDATE SET name = excluded.name, best = MAX(best, excluded.best),
+			wins = wins + excluded.wins, matches = matches + 1, at = excluded.at`, e.PID, mode, e.Name, e.Best, b2i(e.Win), now); err != nil {
+			return err
+		}
 	}
 	return tx.Commit()
 }
+
+func with(args []any, extra ...any) []any { return append(append([]any{}, args...), extra...) }
 
 func b2i(b bool) int {
 	if b {
@@ -80,7 +87,8 @@ type boardRow struct {
 	Value int    `json:"value"`
 }
 
-// GET /api/boards?period=day|week|all&kind=best|wins&me=<pid>&limit=1..100
+// GET /api/boards?period=day|week|all&kind=best|wins&mode=all|classic|teams|koth|lcs|infection&me=<pid>&limit=1..100
+// No mode (old clients) or mode=all: every mode together, as before schema 2.
 func handleBoards(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	period, kind := q.Get("period"), q.Get("kind")
@@ -92,6 +100,14 @@ func handleBoards(w http.ResponseWriter, r *http.Request) {
 	}
 	if (period != "day" && period != "week" && period != "all") || (kind != "best" && kind != "wins") {
 		writeErr(w, 400, "bad_request", "period day|week|all, kind best|wins")
+		return
+	}
+	mode := q.Get("mode")
+	if mode == "" {
+		mode = "all"
+	}
+	if mode != "all" && !validModes[mode] {
+		writeErr(w, 400, "bad_request", "mode all|classic|teams|koth|lcs|infection")
 		return
 	}
 	limit, _ := strconv.Atoi(q.Get("limit"))
@@ -110,24 +126,35 @@ func handleBoards(w http.ResponseWriter, r *http.Request) {
 	if kind == "wins" {
 		agg = "SUM(win)"
 	}
+	modeWhere := ""
+	if mode != "all" {
+		modeWhere = ` AND mode = ?`
+	}
 	switch period {
-	case "day":
+	case "day", "week":
 		key = dayKey(now)
-		inner = `SELECT pid, ` + agg + ` AS v, MAX(at) AS last FROM results WHERE day = ? GROUP BY pid`
+		if period == "week" {
+			key = weekKey(now)
+		}
+		inner = `SELECT pid, ` + agg + ` AS v, MAX(at) AS last FROM results WHERE ` + period + ` = ?` + modeWhere + ` GROUP BY pid`
 		args = []any{key}
-	case "week":
-		key = weekKey(now)
-		inner = `SELECT pid, ` + agg + ` AS v, MAX(at) AS last FROM results WHERE week = ? GROUP BY pid`
-		args = []any{key}
+		if mode != "all" {
+			args = append(args, mode)
+		}
 	default:
 		col := "best"
 		if kind == "wins" {
 			col = "wins"
 		}
-		inner = `SELECT pid, ` + col + ` AS v, at AS last FROM alltime`
+		if mode == "all" {
+			inner = `SELECT pid, ` + col + ` AS v, at AS last FROM alltime`
+		} else {
+			inner = `SELECT pid, ` + col + ` AS v, at AS last FROM alltime_mode WHERE mode = ?`
+			args = []any{mode}
+		}
 	}
 	nameOf := `(SELECT name FROM alltime a WHERE a.pid = t.pid)`
-	rows, err := db.Query(`SELECT t.pid, `+nameOf+`, t.v FROM (`+inner+`) t WHERE t.v > 0 ORDER BY t.v DESC, t.last ASC LIMIT ?`, append(args, limit)...)
+	rows, err := db.Query(`SELECT t.pid, `+nameOf+`, t.v FROM (`+inner+`) t WHERE t.v > 0 ORDER BY t.v DESC, t.last ASC LIMIT ?`, with(args, limit)...)
 	if err != nil {
 		writeErr(w, 500, "db", "board unavailable")
 		return
@@ -142,13 +169,13 @@ func handleBoards(w http.ResponseWriter, r *http.Request) {
 		b.Rank = len(out) + 1
 		out = append(out, b)
 	}
-	res := map[string]any{"period": period, "kind": kind, "key": key, "rows": out, "now": now.UnixMilli()}
+	res := map[string]any{"period": period, "kind": kind, "mode": mode, "key": key, "rows": out, "now": now.UnixMilli()}
 	if me != "" {
 		var v int
 		var last int64
-		if err := db.QueryRow(`SELECT t.v, t.last FROM (`+inner+`) t WHERE t.pid = ?`, append(args, me)...).Scan(&v, &last); err == nil && v > 0 {
+		if err := db.QueryRow(`SELECT t.v, t.last FROM (`+inner+`) t WHERE t.pid = ?`, with(args, me)...).Scan(&v, &last); err == nil && v > 0 {
 			var above int
-			db.QueryRow(`SELECT COUNT(*) FROM (`+inner+`) t WHERE t.v > ? OR (t.v = ? AND t.last < ?)`, append(args, v, v, last)...).Scan(&above)
+			db.QueryRow(`SELECT COUNT(*) FROM (`+inner+`) t WHERE t.v > ? OR (t.v = ? AND t.last < ?)`, with(args, v, v, last)...).Scan(&above)
 			res["me"] = map[string]any{"rank": above + 1, "value": v}
 		}
 	}

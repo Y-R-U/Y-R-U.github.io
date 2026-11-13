@@ -1,4 +1,4 @@
-// node tools/net_test.mjs [--duration=120] [--mode=classic|teams|koth|lcs|infection] [--break=counts|migrate|late|bytes|rate|version|mode|emote] [--keep]
+// node tools/net_test.mjs [--duration=120] [--mode=classic|teams|koth|lcs|infection] [--break=counts|migrate|late|bytes|rate|version|mode|emote|lobbymode|reload] [--keep]
 // Builds and starts the Go server locally, runs headless clients (tools/net_client.mjs, the real js/net code;
 // the host runs the real sim + bots) through a whole match and asserts the online guarantees. Exit 1 on failure.
 import { fork, spawn, execFileSync } from 'node:child_process';
@@ -145,6 +145,11 @@ try {
   await sleep(300);
   check(old.got.some((m) => m.code === 'old_client') && old.closed === 4002, `different protocol version refused at hello (close ${old.closed})`);
 
+  const pick = MODE || 'koth';
+  await H.cmd('mode', { mode: pick });
+  const sawMode = await Promise.all([G1, G2].map((c) => c.wait((m) => m.ev === 'room' && m.room && m.room.mode === pick, 4000, 'lobby mode').catch(() => null)));
+  check(sawMode.every(Boolean), `both guests see the host's mode pick in the lobby (${pick})`);
+
   await H.cmd('start');
   const [bh, b1, b2] = await Promise.all([H.wait((m) => m.ev === 'begin'), G1.wait((m) => m.ev === 'begin'), G2.wait((m) => m.ev === 'begin')]);
   check(bh.role === 'host' && b1.role === 'guest' && b2.role === 'guest', 'creator hosts, joiners are guests');
@@ -169,6 +174,21 @@ try {
     check(L.last && L.last.counts && L.last.counts[bl.me] > 4, `the bot crowd it took over kept its people (${L.last && L.last.counts && L.last.counts[bl.me]})`);
   }
   if (jl.error) fail('late join failed: ' + jl.error);
+
+  // ------------------------------------------------------------ a guest reloads its page mid-match
+  await at(DUR * 0.2);
+  console.log('\n[reload] a guest reloads the page mid-match');
+  const meBefore = b2.me;
+  G2.events = G2.events.filter((m) => m.ev !== 'begin');
+  await G2.cmd('reload');
+  let rb = null;
+  try { rb = await G2.wait((m) => m.ev === 'begin', 6000, 'begin after reload'); } catch (e) { fail(e.message); }
+  if (rb) {
+    check(rb.me === meBefore && rb.role === 'guest' && !rb.late, `the reloaded guest got its own crowd back (${rb.me}, was ${meBefore}), not as a late joiner`);
+    await sleep(2500);
+    const lag = H.last.tick - (G2.last && G2.last.tick || 0);
+    check(G2.last && G2.last.tick > 0 && Math.abs(lag) < 45, `the reloaded guest is back in sync (host tick ${H.last.tick}, guest ${G2.last && G2.last.tick})`);
+  }
 
   // ------------------------------------------------------------ input flood trips the rate limit
   await at(DUR * 0.3);
@@ -235,8 +255,9 @@ try {
   }
   check(compared >= 10 && diff === 0, `sampled ticks compared across clients: ${compared}, mismatching ${diff}${MODE ? ' (counts + mode scores/out/horde)' : ''}`);
   if (MODE) {
-    const any = Object.values(S.Cara.samples).some((a) => a.length === 16 && a.slice(8).some((x) => +String(x).split('|')[0] > 0));
-    check(any, 'guests mirrored non-zero mode scores from the snapshots');
+    // Teams has no per-crowd score: its side totals ride in the samples as T<score>.
+    const any = Object.values(S.Cara.samples).some((a) => a.length >= 16 && a.slice(8).some((x) => +String(x).replace(/^T/, '').split('|')[0] > 0));
+    check(any, `guests mirrored non-zero mode scores from the snapshots${MODE === 'teams' ? ' (team totals)' : ''}`);
   }
   // Pedestrians: what each guest reconstructed from deltas vs what the host (old, then new) simulated.
   const hostN = { ...hostSamples.hsamples, ...S.Bob.hsamples };

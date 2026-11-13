@@ -12,7 +12,7 @@ export function defaults() {
     owned: { color: [], plate: [], badge: [], emote: [], toast: [], hat: [], leader: [], flag: [], trail: [], ring: [] },
     equip: { color: 'blue', plate: 'classic', badge: 'classic', emote: 'gg', toast: 'classic', hat: 'none', leader: 'none', flag: 'none', trail: 'none', ring: 'solid' },
     daily: { loginStep: 0, lastClaim: '', chKey: '', chProgress: 0, chDone: false, firstWinKey: '' },
-    settings: { music: true, sfx: true, quality: 'auto', lefty: false, keepMoving: true, haptics: true },
+    settings: { music: true, sfx: true, quality: 'auto', lefty: false, keepMoving: true, haptics: true, mouse: 'follow' },
     mode: 'classic',
     season: { n: 0, peakLeague: 0, matchesAtStart: 0 },
     cup: { key: '', results: [], claimed: [] },

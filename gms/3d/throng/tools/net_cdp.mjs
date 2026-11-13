@@ -1,4 +1,4 @@
-// node tools/net_cdp.mjs --cdp=9284 --cdp2=9285 [--static=8764] [--server=18090] [--shots=DIR] [--break=sync] [--mode=teams|koth|lcs|infection]
+// node tools/net_cdp.mjs --cdp=9284 --cdp2=9285 [--static=8764] [--server=18090] [--shots=DIR] [--break=sync|rejoin|hidden] [--mode=teams|koth|lcs|infection] [--quick]
 // Two real headless Chrome tabs (one per browser = separate players) play one online match:
 // create room → join by code (share link) → ready → start → same crowds on both → host tab closed →
 // the other tab carries on → results. Starts its own Go server and static server and stops them.
@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, extname, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CONFIG } from '../js/config.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = join(ROOT, '../../..');
@@ -195,7 +196,10 @@ try {
   if (MODE) {
     await A.tap(`.olm-strip [data-mode="${MODE}"]`);
     check(await A.ev('__game.net.roomMode') === MODE && await A.ev(`document.querySelector('.olm-strip [data-mode="${MODE}"]').classList.contains('on')`), `host picked ${MODE} in the room lobby by touch`);
-    check(await B.ev(`document.querySelector('.olm-strip').classList.contains('hidden') && /host picks/.test(document.querySelector('.olm-t').textContent)`), 'the guest sees "the host picks the mode", no picker');
+    const want = CONFIG.MODES[MODE].name;
+    await B.waitFor(`document.querySelector('.olm-strip').classList.contains('hidden') && document.querySelector('.olm-t').textContent.includes(${JSON.stringify(want)})`, 5000, 'guest sees the pick').catch(() => {});
+    check(await B.ev(`document.querySelector('.olm-strip').classList.contains('hidden') && document.querySelector('.olm-t').textContent.includes(${JSON.stringify(want)})`), `the guest sees the host's pick ("${await B.ev(`document.querySelector('.olm-t').textContent`)}"), no picker`);
+    await B.shot('room_guest_mode_l');
     await A.shot('room_host_mode_p');
   }
   await A.tap('.ol-start');
@@ -241,12 +245,73 @@ try {
   const pill = await B.ev(`document.querySelector('.net-pill span').textContent`);
   check(/ms/.test(pill), `in-match ping pill on the guest: "${pill}"`);
 
-  // ------------------------------------------------------------ host tab closed → B carries on
-  const tickBefore = await B.ev('__game.state.tick');
-  await A.browser.send('Target.closeTarget', { targetId: A.tid });
+  // ------------------------------------------------------------ the guest reloads its page mid-match
+  if (!args.quick) {
+    const meBefore = await B.ev('__game.online.match.me');
+    if (BREAK === 'rejoin') await B.ev(`(() => { sessionStorage.removeItem('throng.live'); return true; })()`);
+    await B.send('Page.reload', { ignoreCache: true });
+    await sleep(800);
+    await B.waitFor('!!(window.__game && window.__game.ready)', 20000, 'B booted after the reload');
+    const back = await B.waitFor(`__game.mode === 'match' && !!(__game.online && __game.online.match && __game.online.match.ready)`, 12000, 'B back in its match by itself').catch(() => false);
+    const meAfter = back ? await B.ev('__game.online.match.me') : -1;
+    check(back && meAfter === meBefore && await B.ev('__game.online.match.role') === 'guest', `after a reload the guest is back on its own crowd without touching anything (${meAfter}, was ${meBefore})`);
+    if (back) {
+      await B.sampler();
+      await sleep(4000);
+      const a2 = await A.ev('__samples'), b2 = await B.ev('__samples');
+      let n2 = 0, bad2 = 0;
+      for (const t of Object.keys(b2)) if (a2[t]) { n2++; if (a2[t] !== b2[t]) bad2++; }
+      check(n2 >= 4 && bad2 === 0, `the reloaded guest mirrors the host again (${n2} sampled ticks, ${bad2} differ)`);
+      await B.shot('match_guest_reloaded_l');
+    }
+  }
+
+  // ------------------------------------------------------------ host tab hidden 30 s (phone in a pocket): the room must not freeze
+  let H = A, Gt = B;
+  if (!args.quick) {
+    if (BREAK === 'hidden') await A.ev('(() => { __game.online.handoff = () => {}; return true; })()');
+    await A.send('Emulation.setFocusEmulationEnabled', { enabled: false });   // focus emulation keeps a tab "visible"
+    const cover = (await A.browser.send('Target.createTarget', { url: 'about:blank', browserContextId: A.ctx, newWindow: false })).result.targetId;
+    await A.browser.send('Target.activateTarget', { targetId: cover });
+    await sleep(300);
+    const vis = await A.ev('document.visibilityState');
+    check(vis === 'hidden', `the host tab is really hidden (visibilityState ${vis}; timers throttled by Chrome)`);
+    const hidAt = Date.now(), t0b = await B.ev('__game.state.tick');
+    // The other player's view: the longest time its shown tick stood still (sampled every 50 ms).
+    await B.ev(`(() => { window.__stall = { max: 0, at: performance.now(), tick: -1 }; clearInterval(window.__stallT); window.__stallT = setInterval(() => { const s = __game.state; if (!s) return; const n = performance.now(); if (s.tick !== __stall.tick) { __stall.tick = s.tick; __stall.at = n; } else __stall.max = Math.max(__stall.max, n - __stall.at); }, 50); return true; })()`);
+    const took = await B.waitFor(`__game.online.match && __game.online.match.role === 'host'`, 8000, 'B took over').then(() => Date.now() - hidAt).catch(() => -1);
+    check(took >= 0, `the guest took over from the hidden host after ${took} ms`);
+    await B.ev('(() => { __stall.max = 0; return true; })()');
+    // A phone browser suspends a background page outright: freeze the hidden tab for most of the 30 s (not under the break arm).
+    await sleep(2000);
+    if (BREAK !== 'hidden') await A.send('Page.setWebLifecycleState', { state: 'frozen' });
+    const ticks = [];
+    for (let k = 0; k < 5; k++) { await sleep(5000); ticks.push(await B.ev('__game.state.tick')); }
+    if (BREAK !== 'hidden') await A.send('Page.setWebLifecycleState', { state: 'active' });
+    const rates = ticks.map((t, k) => (t - (k ? ticks[k - 1] : t0b)) / 5);
+    const stall = await B.ev('__stall.max');
+    check(Math.min(...rates.slice(1)) > 24 && stall < 700, `the match kept running for the other player while the host tab was hidden ~30 s (ticks/s ${rates.map((r) => r.toFixed(0)).join(' ')}, longest stall ${stall.toFixed(0)} ms)`);
+    await A.browser.send('Target.activateTarget', { targetId: A.tid });
+    await A.browser.send('Target.closeTarget', { targetId: cover });
+    await A.send('Emulation.setFocusEmulationEnabled', { enabled: true });
+    await A.send('Page.bringToFront');
+    await sleep(2500);
+    const roleA = await A.ev('__game.online.match && __game.online.match.role');
+    const lagA = (await B.ev('__game.state.tick')) - (await A.ev('__game.state.tick'));
+    check(roleA === 'guest' && Math.abs(lagA) < 30, `back in front, the old host follows as a guest (role ${roleA}, ${lagA} ticks behind)`);
+    const pauseShown = await A.ev(`!!document.querySelector('.pause:not(.hidden)')`).catch(() => false);
+    await A.shot('match_old_host_back_p');
+    console.log(`       old host on return: pause sheet ${pauseShown ? 'shown' : 'not shown'}`);
+    if (roleA === 'guest') { H = B; Gt = A; }
+  }
+
+  // ------------------------------------------------------------ host tab closed → the other carries on
+  const tickBefore = await Gt.ev('__game.state.tick');
+  await H.browser.send('Target.closeTarget', { targetId: H.tid });
   const closedAt = Date.now();
-  await B.waitFor(`__game.online.match && __game.online.match.role === 'host'`, 8000, 'B promoted');
+  await Gt.waitFor(`__game.online.match && __game.online.match.role === 'host'`, 8000, 'promoted after the host tab closed');
   check(true, `the guest tab took over as host ${Date.now() - closedAt} ms after the host tab closed`);
+  if (Gt === A) { const t = A; A = B; B = t; }
   await sleep(2500);
   const tickAfter = await B.ev('__game.state.tick');
   check(tickAfter > tickBefore + 40, `the match continues on the new host (tick ${tickBefore} → ${tickAfter})`);
@@ -288,9 +353,12 @@ try {
   await B.shot('online_sheet_l');
   await B.size(1440, 900); await B.shot('online_sheet_d');
 
-  const errs = await B.errors();
+  // The tabs may have swapped roles (B is whichever survived): skip the deliberate unreachable-server probe and the
+  // socket a navigation drops into the back-forward cache, on both.
+  const probe = (l) => !/net::ERR_CONNECTION_REFUSED|net::ERR_UNSAFE_PORT|127\.0\.0\.1:1\/|Back-Forward Cache/.test(l);
+  const errs = (await B.errors()).filter(probe);
   check(errs.length === 0, `tab B console/page errors: ${errs.length ? errs.join(' / ') : 'none'}`);
-  const errsA = A.logs.filter((l) => !/net::ERR_CONNECTION_REFUSED|127\.0\.0\.1:1\//.test(l));
+  const errsA = A.logs.filter(probe);
   check(errsA.length === 0, `tab A console errors (besides the deliberate unreachable-server probe): ${errsA.length ? errsA.join(' / ') : 'none'}`);
 } catch (e) {
   check(false, 'harness: ' + (e && e.stack || e));

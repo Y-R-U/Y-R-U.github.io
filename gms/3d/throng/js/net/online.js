@@ -41,7 +41,7 @@ export function createOnline({ url, map, name = 'Player', dev, cid, cos = null, 
   const sim = simVersion(), mv = mapVersion(map);
   let ws = null, status = 'idle', you = null, room = null, match = null, wantOpen = false;
   let attempts = 0, retryT = 0, pingT = 0, rtt = 0, serverOffset = 0, lastPong = 0, giveUpAt = 0;
-  let reqId = 1;
+  let reqId = 1, feat = [];
   const pending = new Map();
   const preBin = [];
   const net = { sent: 0, recv: 0, sentBin: 0, recvBin: 0, since: now() };
@@ -143,7 +143,7 @@ export function createOnline({ url, map, name = 'Player', dev, cid, cos = null, 
     }
     switch (m.t) {
       case 'welcome':
-        you = m.you; attempts = 0; giveUpAt = 0;
+        you = m.you; attempts = 0; giveUpAt = 0; feat = Array.isArray(m.feat) ? m.feat : [];
         serverOffset = m.now - Date.now();
         set('online', { you });
         clearInterval(pingT);
@@ -247,6 +247,9 @@ export function createOnline({ url, map, name = 'Player', dev, cid, cos = null, 
     start: () => req('start'),
     rename: (n) => req('rename', { name: n }),
     handoff: () => sendJson({ t: 'handoff' }),
+    // Private-room host: show the mode pick to everyone in the lobby (servers before wave 5 have no 'mode' message).
+    setMode: (mode) => (feat.includes('mode') && room && !room.quick ? req('mode', { mode }).catch(() => {}) : Promise.resolve()),
+    has: (f) => feat.includes(f),
     setName(n) { name = n; },
     setCos(c) { cos = c; sendJson({ t: 'cos', cos }); },
     get status() { return status; },

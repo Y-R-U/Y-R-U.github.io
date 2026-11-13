@@ -68,11 +68,18 @@ export function createMenu({ root, app, onPlay, onPractice, open }) {
     $('.m-rank-l').innerHTML = badgeSvg(lg, 20) + `<b style="color:${lg.color}">${esc(lg.name.toUpperCase())}</b>`;
     $('.m-rank-r').textContent = num(s.rating) + ' pts';
     $('.m-rank-n').textContent = '#' + num(rankOf(s.rating));
-    const c = challengeState(s);
-    $('.md-t').textContent = c.ch.text;
-    $('.md-p').innerHTML = c.done ? `${UI_ICON.check}` : `${num(c.progress)}/${num(c.ch.target)} <span class="md-c">${UI_ICON.coin}${c.ch.coins}</span>`;
-    $('.m-daily').classList.toggle('done', c.done);
-    $('.m-nav .dot').classList.toggle('hidden', !loginState(s).canClaim);
+    const c = challengeState(s), login = loginState(s);
+    // An unclaimed login reward is easy to miss behind a nav dot: the daily strip offers it first.
+    if (login.canClaim) {
+      $('.md-t').textContent = `Daily reward ready · day ${login.day + 1}`;
+      $('.md-p').innerHTML = `<span class="md-c">${UI_ICON.coin}${login.rewards[login.day]}</span> CLAIM`;
+    } else {
+      $('.md-t').textContent = c.ch.text;
+      $('.md-p').innerHTML = c.done ? `${UI_ICON.check}` : `${num(c.progress)}/${num(c.ch.target)} <span class="md-c">${UI_ICON.coin}${c.ch.coins}</span>`;
+    }
+    $('.m-daily').classList.toggle('done', c.done && !login.canClaim);
+    $('.m-daily').classList.toggle('claim', login.canClaim);
+    $('.m-nav .dot').classList.toggle('hidden', !login.canClaim);
     $('.m-online').classList.toggle('hidden', !(app.net && app.net.visible));
     const feat = featuredMode(Date.now());
     el.querySelectorAll('[data-mode]').forEach((b) => {

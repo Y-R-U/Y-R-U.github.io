@@ -9,7 +9,7 @@ const colorDist = (a, b) => { const x = rgb(a), y = rgb(b); return Math.hypot(x[
 // roster (optional): [{ name, flag, persona, skill, aggr, human, league }] for sim-online opponents.
 // playerColor (optional): a locker colour; the team closest to it sits out so no bot looks like you.
 // playerCos: the renderer cosmetics (hat, leader, flag, trail, ring) of crowd 0; bots get some by league.
-export function makePlayers({ seed = 1, mode = 'classic', playerName = 'You', playerTeam = 0, playerColor = null, playerCos = null, auto = false, allBots = false, roster = null } = {}) {
+export function makePlayers({ seed = 1, mode = 'classic', playerName = 'You', playerTeam = 0, playerColor = null, playerCos = null, auto = false, allBots = false, roster = null, teamDraft = 'top' } = {}) {
   const rng = createRng('players:' + seed);
   const teams = CONFIG.TEAMS.slice(0, CONFIG.MATCH.crowds);
   if (playerColor != null) {
@@ -20,6 +20,19 @@ export function makePlayers({ seed = 1, mode = 'classic', playerName = 'You', pl
   const order = teams.map((t, i) => i).filter((i) => i !== playerTeam);
   const specs = CONFIG.BOTS.slice();
   for (let i = specs.length - 1; i > 0; i--) { const j = rng.int(i + 1); [specs[i], specs[j]] = [specs[j], specs[i]]; }
+  if (mode === 'teams' && teamDraft !== 'none') {
+    // Bot k plays crowd k + 1: even k = the other side (4 bots), odd k = your teammates (3). You count as the first pick.
+    const bots = order.map((ti, k) => ({ r: roster && roster[k], s: specs[k % specs.length] }));
+    const power = (b) => { const x = b.r || b.s; return (x.skill ?? 0.6) * (x.throttle ?? 1); };
+    const ranked = bots.slice().sort((a, b) => power(b) - power(a));
+    const theirs = teamDraft === 'snake' ? [0, 1, 4, 5] : [0, 1, 2, 3];
+    const them = ranked.filter((b, i) => theirs.includes(i)), us = ranked.filter((b, i) => !theirs.includes(i));
+    const edge = CONFIG.MODES.teams.oppThrottle || 0;
+    const up = (x) => x && { ...x, throttle: Math.min(1, (x.throttle ?? 1) + edge) };
+    const dealt = bots.map((b, k) => (k % 2 === 0 ? { r: up(them[k >> 1].r), s: up(them[k >> 1].s) } : us[k >> 1]));
+    if (roster) roster = dealt.map((b) => b.r);
+    dealt.forEach((b, k) => { specs[k] = b.s; });
+  }
   const pt = teams[playerTeam];
   const players = [{
     id: 'p0', name: (playerName || '').trim() || pt.name, team: pt.name, color: playerColor ?? pt.color,

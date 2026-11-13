@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -64,6 +65,7 @@ func newServer(t *testing.T) *httptest.Server {
 	resetLimits()
 	db.Exec(`DELETE FROM results`)
 	db.Exec(`DELETE FROM alltime`)
+	db.Exec(`DELETE FROM alltime_mode`)
 	s := httptest.NewServer(routes())
 	t.Cleanup(s.Close)
 	return s
@@ -523,5 +525,211 @@ func TestCleanCos(t *testing.T) {
 	room := a.req(map[string]any{"t": "create"})["room"].(map[string]any)
 	if c := room["members"].([]any)[0].(map[string]any)["cos"].(map[string]any); c["hat"] != "tophat" {
 		t.Fatalf("room member cos: %v", c)
+	}
+}
+
+// LCS and Infection end when one crowd (or the horde) is left: an early end after 40 s of play is real.
+// Every other mode, and a mode the server does not know, still has to run the full clock.
+func TestPlausibilityEarlyEndModes(t *testing.T) {
+	ok := []ResultRow{{0, 100, 120, 1, 1}, {1, 50, 60, 0, 2}}
+	for _, c := range []struct {
+		mode     string
+		duration float64
+		at       int64 // ms after BeganAt
+		want     bool
+	}{
+		{"lcs", 90, 3000 + 72000, true},
+		{"lcs", 90, 3000 + 41000, true},
+		{"lcs", 90, 3000 + 30000, false},
+		{"infection", 120, 3000 + 64000, true},
+		{"infection", 120, 3000 + 35000, false},
+		{"classic", 120, 3000 + 64000, false},
+		{"", 120, 3000 + 64000, false},
+		{"teams", 120, 3000 + 64000, false},
+		{"koth", 120, 3000 + 64000, false},
+		{"bogus", 120, 3000 + 64000, false},
+		{"classic", 120, 123000, true},
+		{"lcs", 90, 93000, true},
+	} {
+		r := &Room{Duration: c.duration, Countdown: 3, BeganAt: 1000, Mode: c.mode}
+		if got := plausible(r, ok, 1000+c.at); got != c.want {
+			t.Errorf("mode %q, %d ms in: plausible = %v, want %v", c.mode, c.at, got, c.want)
+		}
+	}
+}
+
+func TestLobbyModePick(t *testing.T) {
+	s := newServer(t)
+	h, g := dial(t, s, "Hana", nil), dial(t, s, "Gus", nil)
+	code := h.req(map[string]any{"t": "create"})["room"].(map[string]any)["code"]
+	g.req(map[string]any{"t": "join", "code": code})
+	if r := h.req(map[string]any{"t": "mode", "mode": "koth"}); r["t"] != "ok" {
+		t.Fatalf("host mode pick: %v", r)
+	}
+	seen := g.waitf(func(m map[string]any) bool {
+		room, _ := m["room"].(map[string]any)
+		return m["t"] == "room" && room != nil && room["mode"] == "koth"
+	}, "room with mode koth")
+	if seen == nil {
+		t.Fatal("guest never saw the mode")
+	}
+	if r := g.req(map[string]any{"t": "mode", "mode": "lcs"}); r["code"] != "not_now" {
+		t.Fatalf("a guest changed the mode: %v", r)
+	}
+	if r := h.req(map[string]any{"t": "mode", "mode": "darts"}); r["code"] != "bad_request" {
+		t.Fatalf("unknown mode accepted: %v", r)
+	}
+	// a late joiner sees the pick in its join reply
+	l := dial(t, s, "Lou", nil)
+	if room := l.req(map[string]any{"t": "join", "code": code})["room"].(map[string]any); room["mode"] != "koth" {
+		t.Fatalf("join reply mode %v", room["mode"])
+	}
+	// the pick survives a match: the room is back in its lobby with the same mode
+	mid := h.req(map[string]any{"t": "begin", "meta": meta(h.you, g.you, l.you)})["mid"]
+	if r := h.req(map[string]any{"t": "mode", "mode": "teams"}); r["code"] != "not_now" {
+		t.Fatalf("mode changed mid-match: %v", r)
+	}
+	time.Sleep(50 * time.Millisecond)
+	h.mu.Lock()
+	h.msgs = nil
+	h.mu.Unlock()
+	advance(123 * time.Second)
+	h.bin(snap(1, 3600))
+	rows := []map[string]any{}
+	for i := 0; i < 8; i++ {
+		rows = append(rows, map[string]any{"crowd": i, "count": 10 * (8 - i), "best": 10 * (8 - i), "kills": 0, "rank": i + 1})
+	}
+	for _, x := range []*tc{h, g, l} {
+		x.send(map[string]any{"t": "result", "mid": mid, "rows": rows})
+	}
+	time.Sleep(50 * time.Millisecond)
+	settleTicks(1)
+	h.wait("ended")
+	back := h.waitf(func(m map[string]any) bool {
+		room, _ := m["room"].(map[string]any)
+		return m["t"] == "room" && room != nil && room["state"] == "lobby"
+	}, "room back in lobby")
+	if back["room"].(map[string]any)["mode"] != "koth" {
+		t.Fatalf("mode after the match: %v", back["room"])
+	}
+	// quick rooms rotate on a clock: nobody picks
+	q := dial(t, s, "Quin", nil)
+	q.req(map[string]any{"t": "quick"})
+	if r := q.req(map[string]any{"t": "mode", "mode": "koth"}); r["code"] != "not_now" {
+		t.Fatalf("mode pick in a quick room: %v", r)
+	}
+}
+
+func TestWelcomeFeatures(t *testing.T) {
+	s := newServer(t)
+	u := "ws" + strings.TrimPrefix(s.URL, "http") + "/gms/3d/throng/api/ws"
+	c, _, err := websocket.Dial(context.Background(), u, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.CloseNow()
+	b, _ := json.Marshal(map[string]any{"t": "hello", "v": protocolVersion, "sim": tSim, "map": tMap, "dev": fmt.Sprintf("%032x", 42), "cid": "cid-feat-xxxxxx", "name": "Feat"})
+	c.Write(context.Background(), websocket.MessageText, b)
+	_, msg, err := c.Read(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	var w struct {
+		T    string   `json:"t"`
+		Feat []string `json:"feat"`
+	}
+	json.Unmarshal(msg, &w)
+	if w.T != "welcome" || strings.Join(w.Feat, ",") != "mode,boards-mode" {
+		t.Fatalf("welcome %s", msg)
+	}
+}
+
+func board(t *testing.T, s *httptest.Server, q string) (int, []boardRow) {
+	t.Helper()
+	res, err := http.Get(s.URL + "/gms/3d/throng/api/boards?" + q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer res.Body.Close()
+	var b struct {
+		Rows []boardRow `json:"rows"`
+	}
+	json.NewDecoder(res.Body).Decode(&b)
+	return res.StatusCode, b.Rows
+}
+
+func TestBoardsPerMode(t *testing.T) {
+	s := newServer(t)
+	now := nowMs()
+	recordResults("m1", "classic", []boardEntry{{PID: "aaaaaaaaaaaa", Name: "Ann", Best: 700, Win: true}, {PID: "bbbbbbbbbbbb", Name: "Bob", Best: 300}}, now)
+	recordResults("m2", "lcs", []boardEntry{{PID: "bbbbbbbbbbbb", Name: "Bob", Best: 900, Win: true}}, now+1)
+	recordResults("m3", "lcs", []boardEntry{{PID: "cccccccccccc", Name: "Cy", Best: 400}}, now+2)
+	for _, c := range []struct {
+		q    string
+		want string
+	}{
+		{"period=day&kind=best", "Bob:900,Ann:700,Cy:400"},
+		{"period=day&kind=best&mode=all", "Bob:900,Ann:700,Cy:400"},
+		{"period=day&kind=best&mode=classic", "Ann:700,Bob:300"},
+		{"period=week&kind=best&mode=lcs", "Bob:900,Cy:400"},
+		{"period=day&kind=wins&mode=lcs", "Bob:1"},
+		{"period=all&kind=best&mode=lcs", "Bob:900,Cy:400"},
+		{"period=all&kind=best&mode=classic", "Ann:700,Bob:300"},
+		{"period=all&kind=wins", "Ann:1,Bob:1"},
+		{"period=all&kind=best&mode=teams", ""},
+	} {
+		code, rows := board(t, s, c.q)
+		got := []string{}
+		for _, r := range rows {
+			got = append(got, fmt.Sprintf("%s:%d", r.Name, r.Value))
+		}
+		if code != 200 || strings.Join(got, ",") != c.want {
+			t.Errorf("%s: %d %v, want %s", c.q, code, got, c.want)
+		}
+	}
+	if code, _ := board(t, s, "period=day&mode=darts"); code != 400 {
+		t.Errorf("unknown mode: HTTP %d", code)
+	}
+}
+
+// An M3/M4 database file (no mode column, no alltime_mode) opens, keeps its rows as Classic, and opens again.
+func TestMigrateOldDatabase(t *testing.T) {
+	keep := db
+	defer func() { db = keep }()
+	path := t.TempDir() + "/old.db"
+	old, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := old.Exec(`CREATE TABLE results (mid TEXT NOT NULL, pid TEXT NOT NULL, name TEXT NOT NULL, day TEXT NOT NULL, week TEXT NOT NULL,
+		best INTEGER NOT NULL, win INTEGER NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (mid, pid));
+		CREATE TABLE alltime (pid TEXT PRIMARY KEY, name TEXT NOT NULL, best INTEGER NOT NULL, wins INTEGER NOT NULL, matches INTEGER NOT NULL, at INTEGER NOT NULL);
+		CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);`); err != nil {
+		t.Fatal(err)
+	}
+	t0 := time.Now()
+	old.Exec(`INSERT INTO results VALUES ('m0', 'dddddddddddd', 'Dee', ?, ?, 650, 1, ?)`, dayKey(t0), weekKey(t0), t0.UnixMilli())
+	old.Exec(`INSERT INTO alltime VALUES ('dddddddddddd', 'Dee', 650, 3, 9, ?)`, t0.UnixMilli())
+	old.Close()
+	for pass := 0; pass < 2; pass++ {
+		openDB(path)
+		var mode string
+		var n, wins int
+		db.QueryRow(`SELECT mode FROM results WHERE pid = 'dddddddddddd'`).Scan(&mode)
+		db.QueryRow(`SELECT COUNT(*), SUM(wins) FROM alltime_mode WHERE mode = 'classic'`).Scan(&n, &wins)
+		if mode != "classic" || n != 1 || wins != 3 {
+			t.Fatalf("pass %d: results mode %q, alltime_mode classic rows %d wins %d", pass, mode, n, wins)
+		}
+		recordResults(fmt.Sprintf("mx%d", pass), "teams", []boardEntry{{PID: "dddddddddddd", Name: "Dee", Best: 100, Win: true}}, t0.UnixMilli()+int64(pass)+1)
+		db.Close()
+	}
+	openDB(path)
+	defer db.Close()
+	var all, teams, classic int
+	db.QueryRow(`SELECT wins FROM alltime WHERE pid = 'dddddddddddd'`).Scan(&all)
+	db.QueryRow(`SELECT wins FROM alltime_mode WHERE pid = 'dddddddddddd' AND mode = 'teams'`).Scan(&teams)
+	db.QueryRow(`SELECT wins FROM alltime_mode WHERE pid = 'dddddddddddd' AND mode = 'classic'`).Scan(&classic)
+	if all != 5 || teams != 2 || classic != 3 {
+		t.Fatalf("after two opens: all-modes wins %d (want 5), teams %d (want 2), classic %d (want 3)", all, teams, classic)
 	}
 }

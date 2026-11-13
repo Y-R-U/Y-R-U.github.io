@@ -180,6 +180,7 @@ type inMsg struct {
 	MID   string          `json:"mid"`
 	Rows  []ResultRow     `json:"rows"`
 	Cos   json.RawMessage `json:"cos"`
+	Mode  string          `json:"mode"`
 }
 
 func handleWS(w http.ResponseWriter, r *http.Request) {

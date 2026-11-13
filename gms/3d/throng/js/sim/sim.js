@@ -433,6 +433,7 @@ export function createSim({ seed = 1, map, players, mode = 'classic', duration, 
         stealAcc[k] -= n;
         small.count -= n; big.count += n;
         small.lost += n; big.stolen += n;
+        if (MODE === 'infection' && big.horde && !small.horde) big.score += n * MC.eatScore;
         const inv = d > 1e-6 ? 1 / d : 0;
         const sx = small === a ? 1 : -1;
         emit({ type: 'steal', from: small.index, to: big.index, n,
@@ -554,7 +555,7 @@ export function createSim({ seed = 1, map, players, mode = 'classic', duration, 
       if (state.timeLeft <= 1e-9) {
         state.timeLeft = 0;
         state.phase = 'over';
-        if (MODE === 'infection') for (const c of crowds) if (!c.horde) c.score += MC.surviveBonus;
+        if (MODE === 'infection') for (const c of crowds) if (!c.horde) c.score += MC.surviveBonus + (c.alive ? c.count : 0) * MC.surviveSize;
         emit({ type: 'phase', phase: 'over' });
       }
     }

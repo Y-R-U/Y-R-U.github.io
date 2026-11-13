@@ -111,3 +111,22 @@ if r.Duration < 90 || r.Duration > 180 || now-r.BeganAt < minRun { return false 
 
 The server also records "best crowd" and "wins" for every mode in one board. If mode boards are wanted later, add
 `mode` to the `results` rows.
+
+## Wave 5 (lane G5) — after R asks 20–29
+
+R asks 20–29 are answered in `docs/notes/G5_report.md` §1. What G now sends, and what would help:
+
+1. **Zones now carry stable ids.** A crown zone's id is `k<x>,<z>` (rounded plaza centre), so the dashed `next` preview
+   and the crown that replaces it share an id and the renderer swaps the style in place. LCS uses `safe` and `safe-next`.
+   The crown's `color` is the holder's crowd colour (gold `0xffd23a` when nobody holds it), and `color`/`progress` are in
+   the change key. Nothing sends `capture` yet.
+2. **Weather.** G never sends `'clear'` over the snow theme now. Event looks send their own weather, and no look sends
+   `null` (the theme's default). From 18 Dec to 6 Jan UTC, when no event has a look, the menu and matches use `snow` +
+   `null`: please check that look at gameplay zoom on a phone (R4 noted sparse flakes far out).
+3. **Attract match.** It is now fast-forwarded 20 s with bigger, faster-growing crowds (start 40, recruits ×2) whose bots
+   lean toward the central plaza. At the menu the top three are about 300/310/300 (was about 100/90/85), and about 3 of
+   8 crowds are within 50 m of the centre. A slightly closer showcase framing would now fill the title with crowds.
+4. **Festival.** Results wait 3.2 s after the whistle on the festival theme (1.7 s otherwise), for the fireworks.
+5. **Still open:** the 3D emote bubble (G2 ask 2).
+6. **Perf hook:** `?fps=1` shows fps, the 5 % low, quality, DPR, draws and triangles from `stats()`. If `stats()` grows a
+   GPU-time field, G will add it to the strip.

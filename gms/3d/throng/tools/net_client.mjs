@@ -72,7 +72,8 @@ function loop() {
   if (auth && auth.tick % 150 === 0 && !samples[auth.tick]) {
     const mc = m.role === 'host' ? (auth.mode !== 'classic' ? auth.crowds.map((c) => `${Math.round(c.score * 10) / 10}|${c.out}|${c.horde}`) : [])
       : (auth.mode ? auth.mode.crowds.map((c) => `${c.score}|${c.out}|${c.horde}`) : []);
-    samples[auth.tick] = auth.crowds.map((c) => c.count).concat(mc);
+    const ts = m.role === 'host' ? (auth.teams ? auth.teams.map((t) => t.score) : []) : (auth.mode && auth.mode.teams ? auth.mode.teams : []);
+    samples[auth.tick] = auth.crowds.map((c) => c.count).concat(mc, ts.map((v) => 'T' + v));
   }
   if (m.role === 'host') hostSample(m.sim.state);
   if (st.phase === 'over' && !m.over) {
@@ -99,24 +100,39 @@ setInterval(() => {
   });
 }, 250);
 
+let conn = null;
+function open(msg) {
+  conn = msg;
+  online = createOnline({
+    url: msg.url, map, name: msg.name, dev: msg.dev, cid: msg.cid,
+    ...(MODE ? { pickMode: (quick) => (quick ? 'classic' : MODE) } : {}),
+    emit: (type, data) => {
+      if (type === 'room') tell({ ev: 'room', room: data });
+      else if (type === 'begin') tell({ ev: 'begin', me: data.match.me, role: data.match.role, late: data.late, humans: data.match.players.map((p) => !!p.human), counts: null, mode: data.match.mode });
+      else if (type === 'role') tell({ ev: 'role', role: data.role, why: data.why });
+      else if (type === 'status') tell({ ev: 'status', status: data.status });
+      else if (type === 'ended') tell({ ev: 'ended', recorded: data.recorded, why: data.why });
+      else if (type === 'error') tell({ ev: 'error', code: data.code, error: data.error });
+    },
+  });
+  if (breakMode === 'lobbymode') online.setMode = () => Promise.resolve();
+  online.connect();
+}
+
 process.on('message', async (msg) => {
   try {
     if (msg.cmd === 'connect') {
       breakMode = msg.break || '';
-      online = createOnline({
-        url: msg.url, map, name: msg.name, dev: msg.dev, cid: msg.cid,
-        ...(MODE ? { pickMode: (quick) => (quick ? 'classic' : MODE) } : {}),
-        emit: (type, data) => {
-          if (type === 'room') tell({ ev: 'room', room: data });
-          else if (type === 'begin') tell({ ev: 'begin', me: data.match.me, role: data.match.role, late: data.late, humans: data.match.players.map((p) => !!p.human), counts: null, mode: data.match.mode });
-          else if (type === 'role') tell({ ev: 'role', role: data.role, why: data.why });
-          else if (type === 'status') tell({ ev: 'status', status: data.status });
-          else if (type === 'ended') tell({ ev: 'ended', recorded: data.recorded, why: data.why });
-          else if (type === 'error') tell({ ev: 'error', code: data.code, error: data.error });
-        },
-      });
-      online.connect();
-    } else if (msg.cmd === 'quick') tell({ ev: 'reply', cmd: 'quick', room: (await online.quick()).room });
+      open(msg);
+    } else if (msg.cmd === 'reload') {
+      // A page reload: the socket goes away (1001) and a new page says hello with the same per-tab cid.
+      online.close();
+      ver = null; verSynced = false;   // the new page's first keyframe may arrive before the match is wrapped
+      await new Promise((r) => setTimeout(r, 300));
+      open({ ...conn, cid: breakMode === 'reload' ? conn.cid + 'x' : conn.cid });
+      tell({ ev: 'reply', cmd: 'reload' });
+    } else if (msg.cmd === 'mode') { await online.setMode(msg.mode); tell({ ev: 'reply', cmd: 'mode' }); }
+    else if (msg.cmd === 'quick') tell({ ev: 'reply', cmd: 'quick', room: (await online.quick()).room });
     else if (msg.cmd === 'create') tell({ ev: 'reply', cmd: 'create', room: (await online.create()).room });
     else if (msg.cmd === 'join') {
       try { tell({ ev: 'reply', cmd: 'join', room: (await online.join(msg.code)).room }); } catch (e) { tell({ ev: 'reply', cmd: 'join', error: e.code }); }

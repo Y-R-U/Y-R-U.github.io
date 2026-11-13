@@ -1,4 +1,4 @@
-// node tools/sim_test.mjs [--matches=N] [--map=stub|real|both] [--break=determinism|nan|stuck|leak|events|distribution|jitter|league|restore|remote|classic|ally|zone|circle|infect|event] [--quiet] [--only=modes]
+// node tools/sim_test.mjs [--matches=N] [--map=stub|real|both] [--break=determinism|nan|stuck|leak|events|distribution|jitter|league|restore|remote|classic|ally|zone|circle|infect|spread|event] [--quiet] [--only=modes]
 import { createSim, SIM_DT, stateHash } from '../js/sim/sim.js';
 import { CONFIG } from '../js/config.js';
 import { EVENTS } from '../js/meta/events.js';
@@ -351,6 +351,7 @@ async function modeSuite() {
   if (BREAK === 'zone') CONFIG.MODES.koth.rate = 0;
   if (BREAK === 'circle') { CONFIG.MODES.lcs.bleedBase = 0; CONFIG.MODES.lcs.bleedPer = 0; }
   if (BREAK === 'infect') CONFIG.MODES.infection.riseDelay = 1e6;
+  if (BREAK === 'spread') CONFIG.MODES.infection.surviveSize = 0;
   console.log(`\n[${mapName}] modes, ${N} matches each (all bots; crowd 0 = the ?auto bot)`);
   console.log('mode        end s   early  winner   p0 place  score(win)  elims  notes');
   for (const mode of ['teams', 'koth', 'lcs', 'infection']) {
@@ -409,7 +410,8 @@ async function modeSuite() {
         if (r.infects && !r.hordeMoved) fail(`${tag} seed ${r.seed}: risen horde crowds never moved`);
         if (horde !== 1 + r.infects) fail(`${tag} seed ${r.seed}: ${horde} horde crowds but ${r.infects} infections`);
         if (S.endReason !== 'horde' && r.overAt < full - 1) fail(`${tag} seed ${r.seed}: ended early without everyone infected`);
-        for (const c of S.crowds) if (c.score > CONFIG.MODES.infection.duration + CONFIG.MODES.infection.surviveBonus + c.infections * CONFIG.MODES.infection.infectScore + 0.1) fail(`${tag} seed ${r.seed}: score ${c.score.toFixed(1)} above the time limit`);
+        const MI = CONFIG.MODES.infection;
+        for (const c of S.crowds) if (c.score > MI.duration + MI.surviveBonus + c.infections * MI.infectScore + c.stolen * MI.eatScore + c.count * MI.surviveSize + 0.1) fail(`${tag} seed ${r.seed}: score ${c.score.toFixed(1)} above the time limit`);
       }
     }
     if (mode === 'teams') { if (Math.min(...side) < N * 0.15) fail(`${tag}: one side won ${Math.max(...side)}/${N}`); notes.push(`blue ${side[0]} red ${side[1]}`); }
@@ -422,6 +424,11 @@ async function modeSuite() {
       notes.push(`one left ${last}/${N}, bleeds ${mean(rs.map((r) => r.bleeds)).toFixed(0)}`);
     }
     if (mode === 'infection') {
+      // Survivors who finish are told apart by size, not only by the clock.
+      const spread = median(rs.map((r) => { const s = r.S.crowds.filter((c) => !c.horde).map((c) => c.score); return s.length > 1 ? Math.max(...s) - Math.min(...s) : 99; }));
+      if (spread < 8) fail(`${tag}: survivors' scores spread only ${spread.toFixed(1)} points (median)`);
+      const hw = rs.filter((r) => r.S.crowds.find((c) => c.rank === 1).horde).length;
+      notes.push(`horde won ${hw}/${N}, survivor spread ${spread.toFixed(0)}`);
       const inf = mean(rs.map((r) => r.infects)), all = rs.filter((r) => r.S.endReason === 'horde').length;
       if (inf < 2) fail(`${tag}: the horde infects only ${inf.toFixed(1)} crowds per match`);
       if (all > N * 0.8) fail(`${tag}: everyone was infected in ${all}/${N} matches (survival is hopeless)`);

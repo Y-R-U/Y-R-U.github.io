@@ -1,3 +1,4 @@
+import { fsSupported, fsActive, standalone, toggleFullscreen, onFullscreenChange } from './fullscreen.js';
 import { esc, num, UI_ICON } from './kit.js';
 import { LEAGUES, badgeSvg, leagueOf } from '../meta/leagues.js';
 import { LADDER, rankOf, around, top } from '../meta/ladder.js';
@@ -105,6 +106,9 @@ export function renderSettings(body, { app, close }) {
     ${tog('music', 'Music')}${tog('sfx', 'Sound effects')}
     <div class="seg-row"><span>Graphics</span><div class="seg">${['auto', 'high', 'medium', 'lite'].map((q) => `<button type="button" data-q="${q}" class="${s.quality === q ? 'on' : ''}">${q[0].toUpperCase() + q.slice(1)}</button>`).join('')}</div></div>
     <p class="st-note q-note hidden">Lite fully applies after a reload.</p>
+    <div class="seg-row st-mouse"><span>Mouse<small>Follow: your crowd heads for the pointer. Drag: press and drag like the phone stick.</small></span><div class="seg">${[['follow', 'Follow pointer'], ['drag', 'Drag joystick']].map(([k, l]) => `<button type="button" data-mouse="${k}" class="${(s.mouse || 'follow') === k ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+    ${fsSupported() && !standalone() ? `<label class="tg st-fs"><span>Fullscreen<small>Hide the browser bars (back or swipe to leave)</small></span><input type="checkbox" class="fs-tg" ${fsActive() ? 'checked' : ''}><i></i></label>`
+      : !standalone() ? '<p class="st-note st-fs-hint">On iPhone: Share → Add to Home Screen for fullscreen</p>' : ''}
     ${tog('lefty', 'Left-handed HUD', 'Mirror the HUD sides')}
     ${tog('keepMoving', 'Keep moving on release', 'Your crowd keeps its heading when you let go')}
     ${tog('haptics', 'Vibration', 'Buzz on absorb, absorbed and power-ups (phones that support it)')}
@@ -112,7 +116,12 @@ export function renderSettings(body, { app, close }) {
       <div class="st-confirm hidden"><p>This wipes your coins, items, rating and stats on this device.</p>
         <div class="st-row"><button type="button" class="btn btn-ghost st-no">Cancel</button><button type="button" class="btn btn-danger st-yes">Reset everything</button></div></div></div>
     <p class="st-ver">THRONG · progress is saved on this device${app.accountName ? ' and in your br8t account' : ''}</p>`;
-  body.querySelectorAll('input[type=checkbox]').forEach((c) => c.addEventListener('change', () => {
+  const fsTg = body.querySelector('.fs-tg');
+  if (fsTg) {
+    fsTg.addEventListener('change', () => { toggleFullscreen(); app.audio.ui(); });
+    const off = onFullscreenChange(() => { if (!fsTg.isConnected) { off(); return; } fsTg.checked = fsActive(); });
+  }
+  body.querySelectorAll('input[type=checkbox][data-k]').forEach((c) => c.addEventListener('change', () => {
     s[c.dataset.k] = c.checked; app.persist(); app.applySettings(); app.audio.ui();
     if (c.dataset.k === 'haptics' && c.checked) app.haptic(30);
   }));
@@ -120,6 +129,10 @@ export function renderSettings(body, { app, close }) {
     s.quality = b.dataset.q; app.persist(); app.applySettings(); app.audio.ui();
     body.querySelectorAll('[data-q]').forEach((x) => x.classList.toggle('on', x === b));
     body.querySelector('.q-note').classList.toggle('hidden', s.quality !== 'lite');
+  }));
+  body.querySelectorAll('[data-mouse]').forEach((b) => b.addEventListener('click', () => {
+    s.mouse = b.dataset.mouse; app.persist(); app.applySettings(); app.audio.ui();
+    body.querySelectorAll('[data-mouse]').forEach((x) => x.classList.toggle('on', x === b));
   }));
   const conf = body.querySelector('.st-confirm'), resetBtn = body.querySelector('.st-reset');
   resetBtn.addEventListener('click', () => { conf.classList.remove('hidden'); resetBtn.classList.add('hidden'); });

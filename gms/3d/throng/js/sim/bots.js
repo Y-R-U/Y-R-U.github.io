@@ -54,7 +54,8 @@ function buildNav(sim) {
   return { n, blocked, dist, parent, cellOf, cx, cz, nearestFree, bfs };
 }
 
-export function createBots({ sim, indices, specs, seed = 1 }) {
+// focus (menu attract match only): { x, z, r, w } scores goals near that point up to (1 + w)×, so crowds meet there.
+export function createBots({ sim, indices, specs, seed = 1, focus = null }) {
   const state = sim.state, col = sim.collider;
   const MODE = sim.mode || 'classic', M = MODE !== 'classic';
   const ally = (a, b) => M && sim.allied(a, b);
@@ -181,6 +182,7 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
 
     let goal = null, gs = 0, alt = null, as = 0;
     const consider = (kind, x, z, s, target) => {
+      if (focus) s *= 1 + focus.w * Math.max(0, 1 - Math.hypot(x - focus.x, z - focus.z) / focus.r);
       if (s > gs) { if (goal && (goal.kind !== kind || goal.target !== target)) { alt = goal; as = gs; } gs = s; goal = { kind, x, z, target }; }
       else if (s > as && b.human) { as = s; alt = { kind, x, z, target }; }
     };

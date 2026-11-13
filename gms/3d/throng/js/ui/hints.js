@@ -1,5 +1,5 @@
 // First-match callouts. Never block: pointer-events none, each one leaves on its own.
-export function createHints(root) {
+export function createHints(root, mouseMode = () => 'drag') {
   const el = document.createElement('div');
   el.className = 'hint-pill hidden';
   root.appendChild(el);
@@ -11,7 +11,7 @@ export function createHints(root) {
     'Bigger crowds absorb smaller ones.<br><b>Run from big, chase small!</b>',
   ];
 
-  function show(i, now) { step = i; shownAt = now; el.innerHTML = TEXT[i]; el.className = 'hint-pill h' + i; void el.offsetWidth; el.classList.add('in'); }
+  function show(i, now) { step = i; shownAt = now; el.innerHTML = i === 0 && fine && mouseMode() === 'follow' ? 'Point where you want to go<br><small>or use WASD</small>' : TEXT[i]; el.className = 'hint-pill h' + i; void el.offsetWidth; el.classList.add('in'); }
   function hide(now, gap = 1.2) { el.classList.remove('in'); el.classList.add('out'); nextAt = now + gap; step = step + 0.5; }
 
   return {

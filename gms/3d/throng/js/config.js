@@ -69,6 +69,7 @@ export const CONFIG = {
       ],
       boostReach: 1.3,       // reach multiplier while touching a teammate ("merge boost")
       boostHold: 0.5,
+      oppThrottle: 0.03,        // the other side's bots drive this much harder: you count as their equal plus a bit
     },
     koth: {
       name: 'King of the Plaza', short: 'King', duration: 120, blurb: 'Be the biggest crowd inside the crown zone to score. It moves every 30 s.',
@@ -81,8 +82,8 @@ export const CONFIG = {
       bleedBase: 3, bleedPer: 0.05,      // people/s lost outside the circle = base + per * count
     },
     infection: {
-      name: 'Infection', short: 'Infection', duration: 120, blurb: 'One crowd is the horde. Whoever it absorbs joins it. Survivors score time alive.',
-      hordeColor: 0xa4ff1a, hordeStart: 50, riseDelay: 1.2, riseCount: 20, surviveBonus: 20, hordeSpeed: 1.15, hordeStealMul: 1.5, hordeReach: 4, infectScore: 8,
+      name: 'Infection', short: 'Infection', duration: 120, blurb: 'One crowd is the horde. Whoever it absorbs joins it. Survivors score time alive and size at the end; the horde scores what it eats.',
+      hordeColor: 0xa4ff1a, hordeStart: 50, riseDelay: 1.2, riseCount: 20, surviveBonus: 20, hordeSpeed: 1.15, hordeStealMul: 1.5, hordeReach: 4, infectScore: 8, eatScore: 0.2, surviveSize: 0.06,
     },
   },
   MODE_ORDER: ['classic', 'teams', 'koth', 'lcs', 'infection'],
@@ -124,6 +125,9 @@ export const CONFIG = {
     keepMovingOnRelease: true,
     joyRadius: 56,           // CSS px for full deflection
     deadZone: 0.12,
+    // Mouse "follow pointer": head for the ground under the cursor. Speed eases from 0 at `followDead` metres from the
+    // leader to full at `followFull`; the direction is low-passed with time constant `followTau` seconds.
+    followDead: 1.2, followFull: 4.5, followTau: 0.09,
   },
 
   UI: {

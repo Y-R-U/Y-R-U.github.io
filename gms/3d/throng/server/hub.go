@@ -72,6 +72,7 @@ type Room struct {
 	MID                                  string
 	Duration, Countdown                  float64
 	Mode                                 string
+	LobbyMode                            string // private room: the host's pick, shown to everyone in the lobby
 	key                                  []byte
 	tail                                 [][]byte
 	hostReport                           *Report
@@ -93,6 +94,19 @@ type Report struct {
 }
 
 var hub = newHub()
+
+// Game modes the boards know. Anything else (and the empty mode of pre-M4 clients) is Classic.
+var validModes = map[string]bool{"classic": true, "teams": true, "koth": true, "lcs": true, "infection": true}
+
+func boardMode(m string) string {
+	if validModes[m] {
+		return m
+	}
+	return "classic"
+}
+
+// serverFeatures lets new clients use additions an older server would refuse (no protocol bump needed).
+var serverFeatures = []string{"mode", "boards-mode"}
 
 func newHub() *Hub {
 	return &Hub{rooms: map[string]*Room{}, members: map[string]*Member{}, perIP: map[string]int{}}
@@ -155,7 +169,7 @@ func (h *Hub) attach(s *Sess, m inMsg) bool {
 	}
 	s.m = mem
 	s.push(map[string]any{"t": "welcome", "id": m.ID, "now": nowMs(), "v": protocolVersion,
-		"you": map[string]any{"id": mem.ID, "pid": mem.PID, "name": mem.Name}, "ver": ver, "paused": paused()})
+		"you": map[string]any{"id": mem.ID, "pid": mem.PID, "name": mem.Name}, "ver": ver, "paused": paused(), "feat": serverFeatures})
 	if r := mem.room; r != nil {
 		r.EmptyAt = 0
 		if r.State == "playing" && mem.Crowd >= 0 {
@@ -376,6 +390,9 @@ func (h *Hub) roomView(r *Room, you *Member) map[string]any {
 	if r.Host != nil {
 		v["host"] = r.Host.ID
 	}
+	if r.LobbyMode != "" {
+		v["mode"] = r.LobbyMode
+	}
 	if you != nil {
 		v["you"] = you.ID
 	}
@@ -513,6 +530,18 @@ func (h *Hub) dispatch(s *Sess, m inMsg) {
 		r.GoAt = nowMs()
 		s.push(ev("go", "code", r.Code))
 		s.reply(m.ID)
+	case "mode":
+		if r == nil || r.Quick || r.Host != mem || r.State != "lobby" {
+			s.fail(m.ID, "not_now", "only the host picks the mode, in the room lobby")
+			return
+		}
+		if !validModes[m.Mode] {
+			s.fail(m.ID, "bad_request", "unknown mode")
+			return
+		}
+		r.LobbyMode = m.Mode
+		s.reply(m.ID)
+		h.pushRoom(r)
 	case "begin":
 		h.begin(s, mem, r, m)
 	case "meta":
@@ -787,7 +816,7 @@ func sameHumans(r *Room, a, b []ResultRow) bool {
 func plausible(r *Room, rows []ResultRow, now int64) bool {
 	minRun := int64((r.Duration+r.Countdown)*1000) - 8000
 	// these two modes end when one side is left, well before the clock
-	if r.Mode == "lcs" || r.Mode == "infection" {
+	if mode := boardMode(r.Mode); mode == "lcs" || mode == "infection" {
 		minRun = int64((40 + r.Countdown) * 1000)
 	}
 	if r.Duration < 90 || r.Duration > 180 || now-r.BeganAt < minRun {
@@ -818,7 +847,7 @@ func (h *Hub) record(r *Room, rows []ResultRow, now int64) bool {
 			entries = append(entries, boardEntry{PID: m.PID, Name: m.Name, Best: x.Best, Win: x.Rank == 1})
 		}
 	}
-	return recordResults(r.MID, entries, now) == nil
+	return recordResults(r.MID, boardMode(r.Mode), entries, now) == nil
 }
 
 func (h *Hub) endMatch(r *Room, recorded bool, why string) {

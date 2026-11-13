@@ -56,6 +56,7 @@ JSON text frames for control, binary frames for the game stream. A message with 
 | `create` | | private room → `ok {room}` (you host) |
 | `join` | `code` | private room by code (any case). Lobby: you're in. Playing with > 45 s left: late join. Playing, less left: you wait in the room for the next round |
 | `leave` / `ready {on}` / `rename {name}` | | |
+| `mode` | `mode` | private-room host, lobby only: the mode pick everyone sees (`room.mode`). Only sent when `welcome.feat` has `mode` (wave 5) |
 | `start` | | private host, lobby → server sends `go` |
 | `begin` | `meta` | host only, after `go`: `{v, seed, duration, countdown, players:[{id, name, color, human, persona, skill, …}×8]}`; humans carry their member `id` |
 | `meta` | `meta` | host: player list changed (a late joiner took a crowd) |
@@ -67,8 +68,8 @@ JSON text frames for control, binary frames for the game stream. A message with 
 
 | t | fields |
 |---|---|
-| `welcome` | `you {id, pid, name}`, `now`, `v`, `ver` |
-| `room` | `room {code, quick, state lobby\|playing, host, you, members:[{id, pid, name, ready, host, crowd, online, late}], startAt, beganAt, endsAt, epoch, mid, now, max}` |
+| `welcome` | `you {id, pid, name}`, `now`, `v`, `ver`, `feat` (wave 5: `['mode', 'boards-mode']`; older servers send none) |
+| `room` | `room {code, quick, state lobby\|playing, host, you, members:[{id, pid, name, ready, host, crowd, online, late}], startAt, beganAt, endsAt, epoch, mid, now, max, mode?}` (`mode`: the private host's pick, once made; kept across matches and host changes) |
 | `go` | to the host: build `meta` and `begin` (quick: when the 8 s lobby wait runs out or 8 humans are in) |
 | `begin` | `meta, crowd (yours), epoch, mid, late, beganAt, endsAt, host` — followed by keyframe + tail for late joiners and reconnects |
 | `promote` | `epoch, away:[crowds], meta, crowd, mid, why` — you are the host now; sent **after** the cached keyframe + every snapshot since |
@@ -165,6 +166,9 @@ and releases them when its delayed view reaches that tick, so a recruit fires as
   `hostGrace` 2 s (it may reconnect: it is then re-sent the replay + `promote` and carries on); no
   snapshot for `hostSilence` 3 s → migrate; host tab hidden → client sends `handoff`.
 - If nobody can take over, the room waits for the host to come back (30 s), then closes.
+- A page reload mid-match (guest or host) reconnects by itself: the tab keeps `throng.live` in sessionStorage while a
+  match is on, and at boot that reconnects with the same per-tab `cid`, so the server hands the crowd back
+  (begin + keyframe + tail; a host is re-promoted). Tested in `net_test` ([reload]) and `net_cdp` (real reload).
 - Server gone for good: a guest rebuilds a local sim from its mirror and finishes the match **offline**
   (all other crowds become bots); a host just carries on. Neither is recorded.
 
@@ -188,8 +192,14 @@ disputed table waits 10 s and is dropped. Plausibility: duration 90–180 s, the
 duration + countdown − 8 s of wall time, best ≤ 6,000, count ≤ best, kills ≤ 60, ranks distinct 1–8; at most
 300 rows per device per UTC day.
 
-`GET /api/boards?period=day|week|all&kind=best|wins&me=<pid>&limit=1..100` →
-`{period, kind, key, rows:[{rank, pid, name, value}], me?:{rank, value}, now}`. Days and ISO weeks are UTC.
+`GET /api/boards?period=day|week|all&kind=best|wins&mode=all|classic|teams|koth|lcs|infection&me=<pid>&limit=1..100` →
+`{period, kind, mode, key, rows:[{rank, pid, name, value}], me?:{rank, value}, now}`. Days and ISO weeks are UTC. No `mode`
+(clients before wave 5) or `mode=all` = every mode together, as before.
+
+Schema 2 (wave 5): `results.mode` (default `classic`) and `alltime_mode (pid, mode)`; `alltime` stays the all-modes
+total and the name lookup. The migration runs at start-up, once (`settings.schema = 2`); rows written before it are
+Classic. A result's mode is the host's `begin` meta `mode` (unknown or missing → classic). Plausibility: LCS and
+Infection may end early after 40 s of play (one crowd left / all horde); every other mode must run its clock.
 
 ## Limits (abuse)
 
@@ -234,7 +244,9 @@ Tests:
 ```
 cd server && go test ./...              # rooms, relay, late join, three migration triggers, quick timer, results + boards, limits, names
 node tools/net_test.mjs                 # ~3 min: real server + 4 headless clients through a 120 s match (+ quick-match and cap checks)
-node tools/net_test.mjs --break=counts|migrate|late|bytes|rate|version   # each must FAIL
+node tools/net_test.mjs --break=counts|migrate|late|bytes|rate|version|emote|lobbymode|reload   # each must FAIL (mode: with --mode=koth)
+node tools/net_test.mjs --mode=teams|koth|lcs|infection
 ~/.claude/bin/cdp start --port 9284 -- --use-angle=metal
-node tools/net_cdp.mjs --cdp=9284       # two Chrome tabs, create → join → play → host closes → results (~2.5 min)
+node tools/net_cdp.mjs --cdp=9284       # two Chrome tabs: create → join → play → guest reload → host hidden 30 s → host closes → results (~3.5 min)
+node tools/net_cdp.mjs --cdp=9284 --break=sync|rejoin|hidden   # each must FAIL
 ```

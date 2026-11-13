@@ -22,7 +22,7 @@ import { zonesOf } from './ui/hud.js';
 const Q = new URLSearchParams(location.search);
 const flag = (k) => Q.has(k) && Q.get(k) !== '0' && Q.get(k) !== 'false';
 const opts = {
-  auto: flag('auto'), lite: flag('lite'), shot: flag('shot'), debug2d: flag('debug2d'), nocloud: flag('nocloud'),
+  auto: flag('auto'), lite: flag('lite'), shot: flag('shot'), debug2d: flag('debug2d'), nocloud: flag('nocloud'), fps: flag('fps'),
   mode: Q.get('mode') || '', event: Q.get('event') || '',
   seed: Q.has('seed') && Q.get('seed') !== '' ? Q.get('seed') : null,
   t: Math.max(0, +Q.get('t') || 0),
@@ -108,8 +108,12 @@ async function boot() {
   const audio = createAudio(save.settings);
   const hudRoot = document.getElementById('hud');
   const hud = createHud({ root: hudRoot, audio, getRenderer: () => renderer, onPause: () => pauseMatch() });
-  const hints = createHints(hudRoot);
-  const input = createInput({ el: stage, getYaw: () => { try { return renderer.cameraYaw() || 0; } catch { return 0; } } });
+  const input = createInput({
+    el: stage, getYaw: () => { try { return renderer.cameraYaw() || 0; } catch { return 0; } },
+    getLeader: () => { const st = curState(); return st && match ? st.crowds[match.me || 0] : null; },
+    groundPoint: (x, y, o) => { try { return renderer.groundPoint ? renderer.groundPoint(x, y, o) : null; } catch { return null; } },
+  });
+  const hints = createHints(hudRoot, () => input.mouseMode);
 
   const app = {
     net: null,
@@ -136,6 +140,7 @@ async function boot() {
       } catch (e) { logErr('setQuality', e); }
       hudRoot.classList.toggle('lefty', !!s.lefty);
       input.setKeepMoving(s.keepMoving);
+      input.setMouseMode(s.mouse);
     },
     resetProgress() {
       const keep = save.settings;
@@ -186,17 +191,18 @@ async function boot() {
       try { enterRoom((await o.join(code)).room); } catch (e) { throw new Error(e.code === 'no_room' ? `No room called ${code}. Check the code.` : e.message); }
       net.pendingCode = '';
     },
-    leaveRoom() { if (online) online.leave(); showMenu(); },
+    leaveRoom() { markLive(false); if (online) online.leave(); showMenu(); },
     ready: (on) => online && online.ready(on),
     start: () => online.start(),
     shareLink(code) {
       const extra = Q.get('net') ? '&net=' + encodeURIComponent(Q.get('net')) : '';
       return location.origin + location.pathname + '?room=' + code + extra;
     },
-    async boards(period, kind) {
+    get client() { return online; },
+    async boards(period, kind, bmode = 'all') {
       const base = httpBase(online ? online.url : serverUrl());
       const me = online && online.you ? '&me=' + online.you.pid : '';
-      const r = await fetch(`${base}/boards?period=${period}&kind=${kind}${me}`);
+      const r = await fetch(`${base}/boards?period=${period}&kind=${kind}&mode=${encodeURIComponent(bmode)}${me}`);
       if (!r.ok) throw new Error('boards ' + r.status);
       return r.json();
     },
@@ -253,13 +259,20 @@ async function boot() {
     if (mode === 'match' && match && match.net) return;
     mode = 'olobby';
     screens.hideAll();
-    if (!match || !match.attract) { cam('showcase'); newMatch(attractPre()); fastForward(18); }
+    if (!match || !match.attract) { cam('showcase'); attractMatch(); }
     hud.show(false);
     input.setEnabled(false);
     screens.room.show(room);
   }
 
+  // A reload mid-match lands on the menu: this marker (per tab, like the cid) reconnects at boot and the
+  // server hands the crowd back (begin + keyframe + tail).
+  const LIVE = 'throng.live';
+  const markLive = (on) => { try { if (!session) return; if (on) session.setItem(LIVE, String(Date.now() + 200000)); else session.removeItem(LIVE); } catch {} };
+  const wasLive = () => { try { return session && +session.getItem(LIVE) > Date.now(); } catch { return false; } };
+
   function startOnlineMatch(nm, late) {
+    markLive(true);
     mode = 'match';
     lastKind = 'online';
     lastRecorded = null;
@@ -288,6 +301,7 @@ async function boot() {
   }
 
   function finishOnline(left) {
+    markLive(false);
     const nm = match.net;
     mode = 'results';
     hud.show(false);
@@ -324,7 +338,7 @@ async function boot() {
           nm.over = true;
           if (online) online.report();
           input.setEnabled(false); audio.stopMusic();
-          if (!resultsAt) { resultsAt = now + 1700; watchWinner(state); }
+          if (!resultsAt) { resultsAt = now + overHold(); watchWinner(state); }
         }
       }
     }
@@ -401,8 +415,8 @@ async function boot() {
     const countdown = attract || opts.shot ? 0 : CONFIG.MATCH.countdown;
     const mode = attract ? 'classic' : modeOf(pre.mode);
     const ev = pre.ev || null;
-    const sim = createSim({ seed, map, players, countdown, mode, config: ev ? ev.sim : null });
-    const bots = createBots({ sim, indices: idx, specs, seed });
+    const sim = createSim({ seed, map, players, countdown, mode, config: attract ? ATTRACT.sim : ev ? ev.sim : null });
+    const bots = createBots({ sim, indices: idx, specs, seed, focus: attract ? attractFocus : null });
     match = { kind: pre.kind, seed, players, sim, bots, attract, crownSecs: 0, left: false, mode, ev, slayer: 0 };
     renderer.setCrowds(crowdsMeta(players));
     renderer.setFocus(0);
@@ -497,7 +511,7 @@ async function boot() {
             match.players.forEach((p, i) => humanEmote(i, HELLO, 0.5, 600 + Math.random() * 2600));
           }
           if (e.phase === 'over') {
-            audio.stopMusic(); audio.end(state.crowds[mi].rank === 1); input.setEnabled(false); resultsAt = performance.now() + 1700;
+            audio.stopMusic(); audio.end(state.crowds[mi].rank === 1); input.setEnabled(false); resultsAt = performance.now() + overHold();
             watchWinner(state);
             if (state.crowds[mi].rank === 1) myEmote(app.emoteGlyph());
             match.players.forEach((p, i) => humanEmote(i, ['gg', 'gg', 'gg wp', 'close one'], state.crowds[i].rank === 1 ? 0.9 : 0.3));
@@ -536,26 +550,48 @@ async function boot() {
     try { renderer.updateCrowdMeta(i, { ...(p.cos || {}), index: i, name: p.name, color: CONFIG.MODES.infection.hordeColor, palette: undefined }, src ? { from: { x: src.x, z: src.z } } : {}); } catch (e) { logErr('updateCrowdMeta', e); }
   }
 
+  // weather null = the theme's own (snow falls on the snow theme); never force 'clear' over it.
+  let lookTheme = 'evening';
   function setLook(look) {
     try {
-      if (renderer.setTheme) renderer.setTheme(look ? look.theme : 'evening');
-      if (renderer.setWeather) renderer.setWeather(look ? look.weather : 'clear');
+      const theme = look && look.theme || 'evening', weather = look && look.weather || null;
+      if (renderer.setTheme) lookTheme = renderer.setTheme(theme) || theme;
+      if (renderer.setWeather) renderer.setWeather(weather === 'clear' && lookTheme === 'snow' ? null : weather);
     } catch (e) { logErr('setTheme', e); }
   }
+  // Festival fireworks start at the whistle: hold the results long enough to see them.
+  const overHold = () => (lookTheme === 'festival' ? 3200 : 1700);
 
   let zonesKey = '';
   function resetZones() { zonesKey = ''; try { renderer.setZones && renderer.setZones([]); } catch {} }
   function pushZones(state) {
     if (!renderer.setZones) return;
-    const z = zonesOf(state);
-    const key = z.map((q) => `${q.x.toFixed(1)},${q.z.toFixed(1)},${q.r.toFixed(1)},${q.style}`).join('|');
+    const z = zonesOf(state, match.players.map((p) => p.color));
+    const key = z.map((q) => `${q.id},${q.x.toFixed(1)},${q.z.toFixed(1)},${q.r.toFixed(1)},${q.style},${q.color},${q.progress ?? ''}`).join('|');
     if (key === zonesKey) return;
     zonesKey = key;
     try { renderer.setZones(z); } catch (e) { logErr('setZones', e); }
   }
 
+  // ?fps=1: frame rate as measured here (mean and the slowest 5 % of frames), quality tier and draw calls.
+  const fpsBox = opts.fps ? Object.assign(document.createElement('div'), { className: 'fps-box' }) : null;
+  const ft = [];
+  let fpsAt = 0;
+  if (fpsBox) document.body.appendChild(fpsBox);
+  function fpsMeter(now, dtMs) {
+    ft.push(dtMs); if (ft.length > 120) ft.shift();
+    if (now - fpsAt < 500) return;
+    fpsAt = now;
+    const sorted = ft.slice().sort((a, b) => a - b), mean = ft.reduce((a, b) => a + b, 0) / ft.length, p95 = sorted[Math.floor(sorted.length * 0.95)] || 0;
+    let st = {};
+    try { st = renderer.stats() || {}; } catch {}
+    fpsBox.textContent = `${(1000 / mean).toFixed(0)} fps · 5% low ${(1000 / p95).toFixed(0)} · ${st.quality || '2d'}${st.dpr ? ' @' + st.dpr.toFixed(1) + 'x' : ''} · ${st.drawCalls ?? '–'} draws · ${st.triangles ? (st.triangles / 1e6).toFixed(2) + 'M tris' : ''}`;
+    fpsBox.dataset.tone = 1000 / mean >= 50 ? 'ok' : 1000 / mean >= 30 ? 'warn' : 'bad';
+  }
+
   function frame(now) {
     requestAnimationFrame(frame);
+    if (fpsBox) fpsMeter(now, now - last);
     let dt = (now - last) / 1000;
     last = now;
     if (!(dt > 0)) dt = 0;
@@ -592,8 +628,8 @@ async function boot() {
     }
     if (mode === 'match') { try { hints.update(state, match.me || 0, input.dragging); } catch (e) { logErr('hints', e); } }
     frameEvents.length = 0;
-    if (match.attract && state.phase === 'over') newMatch(attractPre());
-    if (mode === 'match' && state.phase === 'over' && !resultsAt) { input.setEnabled(false); audio.stopMusic(); resultsAt = now + 1700; }
+    if (match.attract && state.phase === 'over') attractMatch();
+    if (mode === 'match' && state.phase === 'over' && !resultsAt) { input.setEnabled(false); audio.stopMusic(); resultsAt = now + overHold(); }
     if (mode === 'match' && resultsAt && now >= resultsAt && !opts.shot) {
       resultsAt = 0;
       finishMatch(false);
@@ -625,6 +661,11 @@ async function boot() {
     G.lastReport = report;
   }
 
+  // The menu's attract match: bigger, faster-growing crowds that drift to the central plaza (behind the title).
+  const ATTRACT = { sim: { startCount: 40, recruitValue: 2 }, ff: 20 };
+  const centre = map.plazas && map.plazas.length ? map.plazas.reduce((a, p) => (Math.hypot(p.x, p.z) < Math.hypot(a.x, a.z) ? p : a)) : { x: 0, z: 0 };
+  const attractFocus = { x: centre.x, z: centre.z, r: 80, w: 3 };
+  function attractMatch() { newMatch(attractPre()); fastForward(ATTRACT.ff); }
   function attractPre() {
     const seed = newSeed(':attract');
     return { kind: 'attract', seed, ...makePlayers({ seed, allBots: true }) };
@@ -635,8 +676,7 @@ async function boot() {
     audio.stopMusic();
     hints.stop();
     cam('showcase');
-    newMatch(attractPre());
-    fastForward(18);
+    attractMatch();
     hud.show(false);
     screens.showMenu();
     input.setEnabled(false);
@@ -646,8 +686,9 @@ async function boot() {
     const pre = prepare('sim-online');
     screens.hideAll();
     mode = 'lobby';
-    if (!match || !match.attract) { cam('showcase'); newMatch(attractPre()); fastForward(18); }
-    screens.lobby.show({ players: pre.players, league: save.league, onDone: () => startMatch(pre), onCancel: () => showMenu() });
+    if (!match || !match.attract) { cam('showcase'); attractMatch(); }
+    // The very first match should start quickly: the fake "finding players" wait is short then.
+    screens.lobby.show({ players: pre.players, league: save.league, onDone: () => startMatch(pre), onCancel: () => showMenu(), ...(save.tutorialDone ? {} : { total: 1300 }) });
   }
 
   function startMatch(pre) {
@@ -765,6 +806,7 @@ async function boot() {
   if (opts.shot) startMatch(prepare('practice'));
   else if (opts.auto) startMatch(prepare('sim-online'));
   else showMenu();
+  if (wasLive() && !opts.shot && !opts.auto) { notice('Rejoining your match…', 6000); G.rejoining = true; net.connect(); setTimeout(() => { if (mode !== 'match') markLive(false); }, 15000); }
   if (net.pendingCode && !opts.shot && !opts.auto) {
     try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&])room=[^&]*&?/, '$1').replace(/[?&]$/, '')); } catch {}
     screens.open('online');

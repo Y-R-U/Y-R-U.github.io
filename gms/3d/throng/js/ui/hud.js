@@ -22,15 +22,19 @@ ICON.zone = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" 
 ICON.circle = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
 
 // The zones the current mode draws: { x, z, r, color, style: 'crown'|'next'|'safe'|'safe-next' }.
-export function zonesOf(state) {
+// Crown zones are keyed by their plaza, so the "next" preview turns into the crown in place when the zone moves.
+// colors: crowd colours by index (the crown glows in the holder's colour, gold when nobody holds it).
+export function zonesOf(state, colors = null) {
   const out = [];
+  const zid = (z) => `k${Math.round(z.x)},${Math.round(z.z)}`;
   if (state.mode === 'koth' && state.zone) {
-    out.push({ x: state.zone.x, z: state.zone.z, r: state.zone.r, color: 0xffd23a, style: 'crown' });
-    if (state.zoneNext) out.push({ x: state.zoneNext.x, z: state.zoneNext.z, r: state.zoneNext.r, color: 0xffd23a, style: 'next' });
+    const h = state.zone.holder, hc = h >= 0 && colors && colors[h] != null ? colors[h] : 0xffd23a;
+    out.push({ id: zid(state.zone), x: state.zone.x, z: state.zone.z, r: state.zone.r, color: hc, style: 'crown' });
+    if (state.zoneNext) out.push({ id: zid(state.zoneNext), x: state.zoneNext.x, z: state.zoneNext.z, r: state.zoneNext.r, color: 0xffd23a, style: 'next' });
   } else if (state.mode === 'lcs' && state.circle) {
     const c = state.circle;
-    out.push({ x: c.x, z: c.z, r: c.r, color: 0x7fe3ff, style: 'safe' });
-    if (c.nr < c.r - 0.5) out.push({ x: c.nx, z: c.nz, r: c.nr, color: 0xffffff, style: 'safe-next' });
+    out.push({ id: 'safe', x: c.x, z: c.z, r: c.r, color: 0x7fe3ff, style: 'safe' });
+    if (c.nr < c.r - 0.5) out.push({ id: 'safe-next', x: c.nx, z: c.nz, r: c.nr, color: 0xffffff, style: 'safe-next' });
   }
   return out;
 }
@@ -386,7 +390,7 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
       cls = outside ? 'bad' : '';
     } else if (mode === 'infection') {
       const horde = state.crowds.filter((c) => c.horde).length;
-      t = mc.horde ? `<em>HORDE</em> ${horde}/${state.crowds.length} · <b>${Math.floor(mc.score)}</b> pts · bite = +8` : `SURVIVOR <b>${Math.floor(mc.score)}</b> pts · horde ${horde}/${state.crowds.length}`;
+      t = mc.horde ? `<em>HORDE</em> ${horde}/${state.crowds.length} · <b>${Math.floor(mc.score)}</b> pts · eat survivors` : `SURVIVOR <b>${Math.floor(mc.score)}</b> pts · horde ${horde}/${state.crowds.length}`;
       cls = mc.horde ? 'horde' : '';
     } else if (mode === 'teams' && state.teams) {
       t = `+${mc.boost > 0 ? ' BOOST' : ''}`;
