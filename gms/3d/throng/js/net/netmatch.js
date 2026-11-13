@@ -1,7 +1,10 @@
 // One online match on this client, as host (runs the sim) or guest (mirrors snapshots).
 // DOM-free: the browser (js/main.js) and the node harness (tools/net_test.mjs) drive the same code.
 import { CONFIG } from '../config.js';
-import { createSim, SIM_DT } from '../sim/sim.js';
+import { createSim, SIM_DT, modeOf, modeDuration } from '../sim/sim.js';
+import { applyModeLooks } from '../sim/match.js';
+import { eventSim } from '../meta/events.js';
+import { encodeEmote } from './proto.js';
 import { createBots } from '../sim/bots.js';
 import { createRng } from '../sim/rng.js';
 import { playerFor } from '../meta/names.js';
@@ -10,7 +13,8 @@ import { createHost } from './host.js';
 import { createGuest } from './guest.js';
 
 // The host builds this when the room starts: humans first (join order), bots fill to 8.
-export function buildMeta({ seed, members }) {
+// mode: the room's game mode; events: the live event ids (their sim overrides travel with the match).
+export function buildMeta({ seed, members, mode = 'classic', events = [] }) {
   const rng = createRng('meta:' + seed);
   const teams = CONFIG.TEAMS.slice(0, CONFIG.MATCH.crowds);
   const specs = CONFIG.BOTS.slice();
@@ -21,19 +25,24 @@ export function buildMeta({ seed, members }) {
     const s = specs[i % specs.length], p = playerFor('online:' + seed + ':' + i);
     return { id: '', name: p.name, flag: p.flag, color: t.color, team: t.name, human: false, persona: s.persona, skill: Math.min(0.85, s.skill), throttle: 0.92, cos: botCosmetics('online:' + seed + ':' + i, 2) };
   });
-  return { v: 1, seed: String(seed), duration: CONFIG.MATCH.duration, countdown: CONFIG.MATCH.countdown, players };
+  mode = modeOf(mode);
+  applyModeLooks(players, mode, seed);
+  return { v: 1, seed: String(seed), mode, events: events.slice(0, 6), duration: modeDuration(mode), countdown: CONFIG.MATCH.countdown, players };
 }
 
-const simPlayers = (meta) => meta.players.map((p, i) => ({ id: p.id || 'b' + i, name: p.name, color: p.color, isBot: !p.human, remote: !!p.human, persona: p.persona, skill: p.skill }));
+const simPlayers = (meta) => meta.players.map((p, i) => ({ id: p.id || 'b' + i, name: p.name, color: p.color, isBot: !p.human, remote: !!p.human, persona: p.persona, skill: p.skill, team: p.team, horde: !!p.horde }));
+export const metaConfig = (meta) => eventSim(Array.isArray(meta.events) ? meta.events : []);
 
 export function createNetMatch({ map, meta, me, role, epoch = 0, sendBin = () => {}, restore = null, offline = false }) {
   let host = null, guest = null, sim = null, bots = null;
   let acc = 0, autopilot = false, over = false, crownSecs = 0, lastState = null, lastPeer = 0;
   const frameEvents = [];
   const players = meta.players.map((p) => ({ ...p }));
+  const mode = modeOf(meta.mode), config = metaConfig(meta);
+  const localEvents = [];
 
   function startHost(fromState, ep) {
-    sim = createSim({ seed: meta.seed, map, players: simPlayers(meta), duration: meta.duration, countdown: meta.countdown, restore: fromState });
+    sim = createSim({ seed: meta.seed, map, players: simPlayers(meta), mode, config, duration: meta.duration, countdown: meta.countdown, restore: fromState });
     const idx = players.map((p, i) => i);
     bots = createBots({ sim, indices: idx, specs: players.map((p) => ({ persona: p.persona || 'opportunist', skill: p.skill ?? 0.7, throttle: p.throttle ?? 1 })), seed: meta.seed + ':' + ep });
     host = createHost({ sim, bots, me, send: offline ? () => {} : sendBin, epoch: ep });
@@ -48,7 +57,7 @@ export function createNetMatch({ map, meta, me, role, epoch = 0, sendBin = () =>
   }
 
   function startGuest() {
-    guest = createGuest({ map, me, players, send: sendBin });
+    guest = createGuest({ map, me, players, send: sendBin, mode, config: { ...CONFIG.SIM, ...config } });
     host = null; sim = null; bots = null;
     role = 'guest';
   }
@@ -58,7 +67,10 @@ export function createNetMatch({ map, meta, me, role, epoch = 0, sendBin = () =>
   // maxSteps: a hidden host tab is pumped by a 1 Hz timer, so it may need ~30 steps at once.
   function frame(now, dt, ax = 0, az = 0, maxSteps = 8) {
     frameEvents.length = 0;
+    for (const e of localEvents) frameEvents.push(e);
+    localEvents.length = 0;
     if (role === 'host') {
+      for (const e of host.takeEmotes()) frameEvents.push(e);
       acc += Math.min(dt, maxSteps * SIM_DT);
       let steps = 0;
       while (acc >= SIM_DT && steps < maxSteps) {
@@ -108,7 +120,7 @@ export function createNetMatch({ map, meta, me, role, epoch = 0, sendBin = () =>
   function pickBotCrowd() {
     if (role !== 'host') return -1;
     const st = sim.state;
-    const cand = players.map((p, i) => i).filter((i) => !players[i].human && i !== me);
+    const cand = players.map((p, i) => i).filter((i) => !players[i].human && i !== me && !st.crowds[i].out);
     if (!cand.length) return -1;
     const pool = cand.filter((i) => i !== st.leader && st.crowds[i].alive);
     const list = pool.length ? pool : cand;
@@ -134,8 +146,14 @@ export function createNetMatch({ map, meta, me, role, epoch = 0, sendBin = () =>
     return st.crowds.map((c, i) => ({ crowd: i, count: c.count, best: c.best, kills: c.kills, rank: c.rank }));
   }
 
+  // Your emote: the host puts it straight into the stream; a guest sends it to the host first.
+  function emote(id) {
+    if (role === 'host') { const e = { type: 'emote', crowd: me, id, tick: sim.state.tick }; host.pushEvent(e); }
+    else if (guest && guest.synced) sendBin(encodeEmote(guest.localTick, id));
+  }
+
   return {
-    frame, promote, demote, pickBotCrowd, assign, setPlayers, result,
+    frame, promote, demote, pickBotCrowd, assign, setPlayers, result, emote, mode,
     onSnap: (b, now) => { if (guest) guest.onSnap(b, now); },
     onInput: (b, now) => { if (host) host.onInput(b, now); },
     setAway: (c, away) => { if (host) host.setAway(c, away); },

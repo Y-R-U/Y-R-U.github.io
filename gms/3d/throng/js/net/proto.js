@@ -4,18 +4,22 @@ import { SIM_DT } from '../sim/sim.js';
 import { hash32 } from '../meta/hash.js';
 
 export const PROTO = 1;
-export const SIM_REV = 1;                 // bump when sim.js changes behaviour without a CONFIG change
+export const SIM_REV = 2;                 // 2: game modes (M4)                 // bump when sim.js changes behaviour without a CONFIG change
 export const SNAP_EVERY = 2;              // sim ticks per snapshot (30 Hz sim → 15 Hz)
 export const KEY_EVERY = 240;             // a full keyframe every 8 s (late joiners start from it)
 export const NEUTRAL_EPS = 0.35;          // metres a pedestrian may drift from the guests' model before a correction
 export const MSG = { SNAP: 1, KEY: 2, INPUT: 3 };
 const PHASES = ['countdown', 'play', 'over'];
 const KINDS = ['speed', 'magnet', 'double'];
-const EV = { recruit: 1, steal: 2, elim: 3, respawn: 4, pickup: 5, lead: 6, phase: 7 };
+const EV = { recruit: 1, steal: 2, elim: 3, respawn: 4, pickup: 5, lead: 6, phase: 7, bleed: 8, infect: 9, zone: 10, shrink: 11, emote: 12 };
+export const MODE_WIRE = ['classic', 'teams', 'koth', 'lcs', 'infection'];
+// Emotes travel as an index into this list (guest → host inside a 5-byte input frame with ax = -128).
+export const EMOTES = ['👍', '😎', '💪', '🔥', '🎉', '🤡', '🫡', '👑', 'hi', '👋', 'glhf', 'gl', 'yo', 'gg', 'ez', '😂', 'yum', 'noo', '😭', '💀', 'rip', 'wow', 'bruh', 'mine', '😤', 'gg wp', 'close one'];
+export const emoteId = (g) => { const i = EMOTES.indexOf(g); return i < 0 ? 0 : i; };
 const TAU = Math.PI * 2;
 
 export function simVersion() {
-  return hash32(JSON.stringify({ sim: CONFIG.SIM, match: CONFIG.MATCH, rev: SIM_REV })).toString(36);
+  return hash32(JSON.stringify({ sim: CONFIG.SIM, match: CONFIG.MATCH, modes: CONFIG.MODES, rev: SIM_REV })).toString(36);
 }
 export function mapVersion(map) {
   return hash32(JSON.stringify([map.size, map.obstacles, map.spawns, map.plazas])).toString(36);
@@ -142,14 +146,19 @@ export function createSnapEncoder(cap) {
       if (!t) continue;
       ne++; w.u8(t);
       if (t === 1) { w.u8(e.crowd); w.u16(e.slot); w.u8(e.n || 1); }
-      else if (t === 3) { w.u8(e.victim); w.u8(e.by); }
+      else if (t === 3) { w.u8(e.victim); w.u8(e.by < 0 ? 255 : e.by); }
       else if (t === 4) { w.u8(e.crowd); w.i16(q16(e.x)); w.i16(q16(e.z)); w.u16(e.count || 0); }
       else if (t === 5) { w.u8(e.crowd); w.u8(e.id); w.u8(Math.max(0, KINDS.indexOf(e.kind))); }
       else if (t === 6) w.u8(e.crowd);
       else if (t === 7) w.u8(Math.max(0, PHASES.indexOf(e.phase)));
+      else if (t === 8) { w.u8(e.crowd); w.u16(Math.min(65535, e.n)); }
+      else if (t === 9) { w.u8(e.crowd); w.u8(e.by); }
+      else if (t === 11) w.u8(e.stage || 0);
+      else if (t === 12) { w.u8(e.crowd); w.u8(e.id & 255); }
     }
     for (const [k, v] of steals) { ne++; w.u8(2); w.u8(k >> 6); w.u8(k & 63); w.u16(Math.min(65535, v)); }
     w.at(evPos, ne);
+    if (state.mode && state.mode !== 'classic') encodeMode(w, state);
     const out = w.bytes();
     stats[full ? 'keys' : 'snaps']++; stats.bytes += out.length; stats.slots += n;
     return out;
@@ -209,8 +218,16 @@ export function decodeSnap(buf) {
     else if (t === 5) s.events.push({ type: 'pickup', crowd: r.u8(), id: r.u8(), kind: KINDS[r.u8()] || 'speed' });
     else if (t === 6) s.events.push({ type: 'lead', crowd: r.u8() });
     else if (t === 7) s.events.push({ type: 'phase', phase: PHASES[r.u8()] || 'play' });
+    else if (t === 8) s.events.push({ type: 'bleed', crowd: r.u8(), n: r.u16() });
+    else if (t === 9) s.events.push({ type: 'infect', crowd: r.u8(), by: r.u8() });
+    else if (t === 10) s.events.push({ type: 'zone' });
+    else if (t === 11) s.events.push({ type: 'shrink', stage: r.u8() });
+    else if (t === 12) s.events.push({ type: 'emote', crowd: r.u8(), id: r.u8() });
     else break;
   }
+  for (const e of s.events) if (e.type === 'elim' && e.by === 255) e.by = -1;
+  s.modeAt = r.o;
+  if (r.o < r.dv.byteLength) decodeMode(r, s);
   s.bytes = r.dv.byteLength;
   return s;
 }
@@ -236,6 +253,60 @@ export function encodeInput(seq, ax, az) {
 export function decodeForwardedInput(buf) {
   const r = new Reader(buf);
   if (r.u8() !== MSG.INPUT || r.dv.byteLength < 6) return null;
-  return { crowd: r.u8(), seq: r.u16(), ax: r.i8() / 127, az: r.i8() / 127 };
+  const crowd = r.u8(), seq = r.u16(), ax = r.i8();
+  if (ax === -128) return { crowd, seq, emote: r.u8() };
+  return { crowd, seq, ax: ax / 127, az: r.i8() / 127 };
 }
 export const quantAxis = (v) => clamp(Math.round(v * 127), -127, 127) / 127;
+
+// Mode block, appended after the events only when the mode is not Classic (Classic snapshots are unchanged):
+// u8 mode, per crowd: u8 flags(out|horde<<1) u8 team u16 score (1/10), u16 extra (lcs outAt / infections, 1/10)
+// koth: zone + next zone (i16 x z, u16 r cm, i8 holder) + u16 zoneT ds; lcs: circle x z r, next x z r, u16 shrinkIn ds, u8 stage;
+// teams: u16 score per side.
+const qz = (w, z) => { w.i16(q16(z.x)); w.i16(q16(z.z)); w.u16(clamp(Math.round(z.r * 100), 0, 65535)); };
+const rz = (r) => ({ x: r.i16() / 100, z: r.i16() / 100, r: r.u16() / 100 });
+function encodeMode(w, st) {
+  w.u8(Math.max(0, MODE_WIRE.indexOf(st.mode)));
+  for (const c of st.crowds) {
+    w.u8((c.out ? 1 : 0) | (c.horde ? 2 : 0)); w.u8(c.team & 255);
+    w.u16(clamp(Math.round(c.score * 10), 0, 65535)); w.u16(clamp(st.mode === 'lcs' ? Math.round(c.outAt * 10) : c.infections, 0, 65535));
+  }
+  if (st.mode === 'koth') {
+    qz(w, st.zone); w.i8(st.zone.holder);
+    w.u8(st.zoneNext ? 1 : 0); if (st.zoneNext) qz(w, st.zoneNext);
+    w.u16(clamp(Math.round(st.zoneT * 10), 0, 65535));
+  } else if (st.mode === 'lcs') {
+    const c = st.circle;
+    qz(w, c); qz(w, { x: c.nx, z: c.nz, r: c.nr }); w.i16(q16(c.tx)); w.i16(q16(c.tz));
+    w.u16(clamp(Math.round(c.shrinkIn * 10), 0, 65535)); w.u8(c.stage || 0);
+  } else if (st.mode === 'teams') {
+    for (const t of st.teams) w.u16(clamp(t.score, 0, 65535));
+  }
+  w.u8(st.endReason === 'last' ? 1 : st.endReason === 'horde' ? 2 : 0);
+}
+function decodeMode(r, s) {
+  const m = { mode: MODE_WIRE[r.u8()] || 'classic', crowds: [] };
+  for (let i = 0; i < s.crowds.length; i++) {
+    const f = r.u8();
+    m.crowds.push({ out: !!(f & 1), horde: !!(f & 2), team: r.u8(), score: r.u16() / 10, extra: r.u16() });
+  }
+  if (m.mode === 'koth') {
+    m.zone = rz(r); m.zone.holder = r.i8();
+    m.zoneNext = r.u8() ? rz(r) : null;
+    m.zoneT = r.u16() / 10;
+  } else if (m.mode === 'lcs') {
+    const c = rz(r), n = rz(r);
+    m.circle = { ...c, nx: n.x, nz: n.z, nr: n.r, tx: r.i16() / 100, tz: r.i16() / 100, shrinkIn: r.u16() / 10, stage: r.u8() };
+  } else if (m.mode === 'teams') {
+    m.teams = [r.u16(), r.u16()];
+  }
+  m.endReason = ['', 'last', 'horde'][r.u8()] || '';
+  s.mode = m;
+}
+
+// Guest → host emote: an input frame whose ax byte is -128 (never produced by a real stick) and az = emote id.
+export function encodeEmote(seq, id) {
+  const b = new Uint8Array(5), dv = new DataView(b.buffer);
+  dv.setUint8(0, MSG.INPUT); dv.setUint16(1, seq & 65535); dv.setInt8(3, -128); dv.setUint8(4, id & 255);
+  return b;
+}

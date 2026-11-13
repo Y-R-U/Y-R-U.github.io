@@ -20,6 +20,15 @@ export const UI_ICON = {
   star: '<svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21.1l1.4-7L2 9.3l7-.8z"/></svg>',
 };
 
+export const MODE_ICON = {
+  classic: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M3 20c0-4 2.7-6.5 6-6.5s6 2.5 6 6.5zM14 20c0-2.3-.6-4.3-1.8-5.6 1-.6 2.1-.9 3.3-.9 2.8 0 5 2.1 5 6.5z"/></svg>',
+  teams: '<svg viewBox="0 0 24 24"><circle cx="7" cy="8" r="3" fill="#5aa0ff"/><circle cx="17" cy="8" r="3" fill="#ff6a55"/><path d="M1.5 20c0-4 2.4-6.5 5.5-6.5s5 2.5 5 6.5z" fill="#5aa0ff"/><path d="M12 20c0-4 2-6.5 5-6.5s5.5 2.5 5.5 6.5z" fill="#ff6a55"/></svg>',
+  koth: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="18" rx="9.5" ry="3.6" fill="none" stroke="#ffd23a" stroke-width="2" stroke-dasharray="3 2.4"/><path d="M5 14l2-8 5 4 5-4 2 8z" fill="#ffd23a"/></svg>',
+  lcs: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#7fe3ff" stroke-width="2.2"/><circle cx="12" cy="12" r="1.8"/></svg>',
+  infection: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.6" fill="#a4ff1a"/><path fill="#a4ff1a" d="M12 2.5a5 5 0 00-2.8 9.2 5 5 0 005.6 0A5 5 0 0012 2.5zM4 15.5a5 5 0 008.1 4.6 5 5 0 00-2.8-4.9 5 5 0 00-5.3.3zM20 15.5a5 5 0 00-5.3-.3 5 5 0 00-2.8 4.9 5 5 0 008.1-4.6z"/></svg>',
+};
+export const EV_ICON = '<svg viewBox="0 0 24 24"><path d="M12 2l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 15.6l-5.4 2.9 1.2-6L3.3 8.3l6.1-.7z"/><circle cx="19" cy="4" r="2.6" fill="#ff4d6d"/></svg>';
+
 // Sheets: in-game popups that never trap the player. Backdrop tap, the X and Escape all close.
 export function createSheets(root, { onOpen = () => {}, onClose = () => {} } = {}) {
   const layer = h('<div class="sheet-layer hidden"><div class="sheet-back"></div></div>');

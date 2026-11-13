@@ -10,7 +10,7 @@ export const DELAY_MS = 120;
 const TICK_MS = SIM_DT * 1000;
 const HIST = 256;
 
-export function createGuest({ map, me, players, send, config = CONFIG.SIM, delayMs = DELAY_MS }) {
+export function createGuest({ map, me, players, send, config = CONFIG.SIM, delayMs = DELAY_MS, mode = 'classic' }) {
   const C = config;
   const col = createCollider(map);
   const cap = C.neutralCap;
@@ -29,10 +29,11 @@ export function createGuest({ map, me, players, send, config = CONFIG.SIM, delay
     alive: true, x: 0, z: 0, px: 0, pz: 0, vx: 0, vz: 0, heading: 0, count: 1, radius: radiusOf(1), kills: 0, best: 1,
     fx: { speed: 0, magnet: 0, double: 0 }, rank: i + 1, protect: 0, respawnIn: 0, eating: 0, panic: 0,
     recruited: 0, stolen: 0, lost: 0, deaths: 0,
+    team: mode === 'teams' ? (p.team ?? i % 2) : mode === 'infection' ? (p.horde ? 1 : 0) : i, score: 0, out: false, horde: mode === 'infection' && !!p.horde, outAt: 0, infections: 0,
   }));
   const view = {
     tick: 0, time: 0, timeLeft: 0, countdownLeft: 0, phase: 'countdown', duration: CONFIG.MATCH.duration,
-    crowds, neutrals: N, pickups: [], leader: 0, leadChanges: 0, online: true,
+    crowds, neutrals: N, pickups: [], leader: 0, leadChanges: 0, online: true, mode,
   };
 
   const queue = [];
@@ -41,7 +42,7 @@ export function createGuest({ map, me, players, send, config = CONFIG.SIM, delay
   const stats = { snaps: 0, keys: 0, bytes: 0, since: 0, latency: [], late: 0, corrections: 0, maxErr: 0 };
 
   // Own-leader prediction: a copy of the leader integrated every local tick from your input.
-  const pred = { x: 0, z: 0, vx: 0, vz: 0, heading: 0, count: 1, fx: { speed: 0, magnet: 0, double: 0 }, eating: 0, panic: 0, alive: false };
+  const pred = { x: 0, z: 0, vx: 0, vz: 0, heading: 0, count: 1, fx: { speed: 0, magnet: 0, double: 0 }, eating: 0, panic: 0, alive: false, horde: false };
   const hx = new Float32Array(HIST), hz = new Float32Array(HIST);
   let lt = 0, acc = 0, predOk = false, offX = 0, offZ = 0, prevPX = 0, prevPZ = 0;
   let sentAx = 2, sentAz = 2, sentAt = 0;
@@ -93,6 +94,9 @@ export function createGuest({ map, me, players, send, config = CONFIG.SIM, delay
         }
         case 'elim': { const v = crowds[e.victim]; e.x = v ? v.x : 0; e.z = v ? v.z : 0; break; }
         case 'pickup': { const p = view.pickups.find((q) => q.id === e.id); e.x = p ? p.x : 0; e.z = p ? p.z : 0; break; }
+        case 'bleed': { const c = crowds[e.crowd]; e.x = c ? c.x : 0; e.z = c ? c.z : 0; break; }
+        case 'zone': if (s.mode && s.mode.zone) { e.x = s.mode.zone.x; e.z = s.mode.zone.z; e.r = s.mode.zone.r; } break;
+        case 'shrink': if (s.mode && s.mode.circle) e.r = s.mode.circle.nr; break;
       }
       out.push(e);
     }
@@ -133,10 +137,28 @@ export function createGuest({ map, me, players, send, config = CONFIG.SIM, delay
       c.radius = sc.alive ? radiusOf(sc.count) : c.radius;
       if (sc.alive && !wasAlive) { c.x = sc.x; c.z = sc.z; }
     }
+    if (s.mode) applyMode(s.mode);
     view.pickups = s.pickups;
     view.leader = s.leader; view.leadChanges = s.leadChanges;
     view.phase = s.phase; view.duration = s.duration || view.duration;
     applied = s;
+  }
+
+  function applyMode(m) {
+    m.crowds.forEach((mc, i) => {
+      const c = crowds[i];
+      if (!c) return;
+      c.out = mc.out; c.horde = mc.horde; c.team = mc.team; c.score = mc.score;
+      if (m.mode === 'lcs') c.outAt = mc.extra / 10; else c.infections = mc.extra;
+    });
+    if (m.zone) { view.zone = m.zone; view.zoneNext = m.zoneNext; view.zoneT = m.zoneT; }
+    if (m.circle) view.circle = m.circle;
+    if (m.teams) {
+      if (!view.teams) view.teams = CONFIG.MODES.teams.sides.map((sd, t) => ({ team: t, name: sd.name, color: sd.colors[0], score: 0 }));
+      m.teams.forEach((v, t) => { view.teams[t].score = v; });
+    }
+    view.endReason = m.endReason;
+    pred.horde = !!(crowds[me] && crowds[me].horde);
   }
 
   // auto: autopilot (paused / tab was hidden). Nothing is sent, so the host's bot takes the crowd.
@@ -287,7 +309,12 @@ export function createGuest({ map, me, players, send, config = CONFIG.SIM, delay
         alive: c.alive, x: c.x, z: c.z, vx: c.vx, vz: c.vz, heading: c.heading, count: c.count, radius: c.alive ? radiusOf(c.count) : radiusOf(1),
         kills: c.kills, best: c.best, rank: c.rank, protect: c.protect, respawnIn: c.respawnIn, eating: c.eating, panic: c.panic,
         recruited: c.recruited, stolen: c.stolen, lost: c.lost, deaths: c.deaths, fx: { ...c.fx }, remote: c.remote,
+        ...(s.mode ? { out: crowds[c.index].out, horde: crowds[c.index].horde, team: crowds[c.index].team, score: crowds[c.index].score,
+          outAt: crowds[c.index].outAt, infections: crowds[c.index].infections } : {}),
       })),
+      ...(view.zone ? { zone: view.zone, zoneNext: view.zoneNext, zoneT: view.zoneT } : {}),
+      ...(view.circle ? { circle: view.circle } : {}),
+      ...(view.teams ? { teams: view.teams } : {}),
       neutrals: { x: nx, z: nz, heading: model.heading, state: model.state.slice(), target: model.target.slice(), look: model.look.slice() },
       pickups: s.pickups.map((p) => ({ ...p })),
     };

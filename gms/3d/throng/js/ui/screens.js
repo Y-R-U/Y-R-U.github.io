@@ -6,6 +6,7 @@ import { createPause } from './pause.js';
 import { renderLocker } from './locker.js';
 import { renderLadder, renderDaily, renderProfile, renderSettings } from './panels.js';
 import { renderOnline, renderOnlineBoards, createRoomLobby } from './online.js';
+import { renderEvents } from './eventsheet.js';
 
 function renderLadderTabs(body, ctl) {
   const { app } = ctl;
@@ -28,6 +29,7 @@ const SHEETS = {
   ladder: { title: 'Ladder', cls: 'sh-ladder', render: renderLadderTabs },
   online: { title: 'Online', cls: 'sh-online', render: renderOnline },
   daily: { title: 'Daily', cls: 'sh-daily', render: renderDaily },
+  events: { title: 'Events', cls: 'sh-events', render: renderEvents },
   settings: { title: 'Settings', cls: 'sh-settings', render: renderSettings },
   profile: { title: 'Profile', cls: 'sh-profile', render: renderProfile },
 };

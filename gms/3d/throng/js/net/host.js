@@ -9,6 +9,7 @@ export function createHost({ sim, bots, me, send, epoch = 0 }) {
   const enc = createSnapEncoder(sim.state.neutrals.cap);
   const remote = new Map();     // crowd → { ax, az, seq, applied, at, away }
   const pending = [];
+  const emotes = [];
   let lastKey = -1e9, forceKey = true;
 
   function setRemote(crowd, on, name) {
@@ -35,6 +36,13 @@ export function createHost({ sim, bots, me, send, epoch = 0 }) {
     if (!m) return;
     const r = remote.get(m.crowd);
     if (!r) return;
+    if (m.emote !== undefined) {
+      if (now - (r.emoteAt || -1e9) < 1500) return;
+      r.emoteAt = now;
+      const e = { type: 'emote', crowd: m.crowd, id: m.emote, tick: sim.state.tick };
+      pending.push(e); emotes.push(e);
+      return;
+    }
     r.ax = m.ax; r.az = m.az; r.seq = m.seq; r.applied = 0; r.at = now;
   }
 
@@ -71,6 +79,8 @@ export function createHost({ sim, bots, me, send, epoch = 0 }) {
   return {
     setRemote, setAway, onInput, beforeStep, afterStep, enc, remote,
     key() { forceKey = true; },
+    pushEvent(e) { pending.push(e); emotes.push(e); },
+    takeEmotes() { const out = emotes.slice(); emotes.length = 0; return out; },
     get epoch() { return epoch; },
     isLive: (crowd) => !!(remote.get(crowd) && remote.get(crowd).live),
     tickMs: SIM_DT * 1000,

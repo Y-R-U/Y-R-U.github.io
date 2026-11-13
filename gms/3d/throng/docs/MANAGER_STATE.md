@@ -54,3 +54,26 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 
 ## STATE @ 2026-11-13 10:50
 - Wave-3 agents (O a15fe67d3e64c7b48, R3 a3836a77d21cecb71) died on the usage limit; resumed in place via SendMessage. Pages rollout of a9792514 confirmed (200s).
+
+## STATE @ 2026-11-13 (wave 3 landed — M3 shipped)
+- O + R3 landed. Manager re-ran sim_test, meta_test, render_map_test, server/test.sh, net_test (x4 after fixing a too-tight continuity threshold: now per sim time, ≤110; `--break=migrate` still fails 5 checks).
+- Commits 9414eb4a + 07b6c49b pushed. Static deployed by `git archive HEAD gms/3d/throng | rsync` minus docs/ tools/ server/.
+- SERVER DEPLOYED: `cd server && CONFIRM=yes RUN_TESTS=1 ./deploy.sh` → systemd `throng` on 127.0.0.1:8024, Caddy route /gms/3d/throng/api/* (backup /etc/caddy/Caddyfile.bak-throng-20261113-015117), data /srv/data/throng. Health: https://games.br8t.com/gms/3d/throng/api/health. Other sites checked 200 after the reload.
+- `CONFIG.NET.ONLINE_PUBLIC = true` (Online button on for everyone).
+- NOT verified: a real two-device match through production (only handshake + on-box tests); real phone fps; audio by ear.
+- Wave 4 launched: G4 (modes, scheduled events, seasons, cloud save, loose ends; owns everything except render/world/server) and R4 (second district theme, weather, roofs, cosmetics legibility; owns js/render/**, js/world/**). Ports: G4 cdp 9280-9289 / http 8760-8769; R4 cdp 9270-9279 / http 8750-8759.
+
+## NEXT (after wave 4)
+1. Tests (all five suites), screenshots, commit, push, rsync deploy; server deploy only if server/ changed.
+2. Hub card on games.br8t.com (check `git status games/ lib/` for others' uncommitted work first; deploy hub-only from git archive).
+3. Wave 5 = M5: blind-critic art pass (Sonnet critics), balance sweeps, tutorial polish, real-device checklist for Aaron.
+
+## STATE @ 2026-11-13 15:50
+- Wave-4 agents (G4 a3cf9dc7e0b7e9ee0, R4 aabb406b96b7c7ef3) died on the spend limit almost immediately (little done); resumed in place via SendMessage.
+
+## STATE @ 2026-11-13 (Aaron: one at a time)
+- Aaron: "Maybe we will need to run 1 at a time?" → ONE sub-agent at a time on THRONG from now on.
+- R4 (aabb406b96b7c7ef3, render themes/weather/zones) PAUSED by the manager mid-task; its partial edits are on disk in js/render/**. When G4 (a3cf9dc7e0b7e9ee0) lands: verify + commit G4 only if the tree with R4's half-done render files still boots (else commit after R4), then resume R4 with SendMessage to the same id.
+
+## STATE @ 2026-11-13 20:50
+- G4 died on the limit again (was waiting on test arms); resumed alone via SendMessage. R4 stays paused until G4 lands (one at a time).

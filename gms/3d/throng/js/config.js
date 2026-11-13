@@ -45,6 +45,8 @@ export const CONFIG = {
     underdogReach: 2.5,
     protect: 2.2,
 
+    recruitValue: 1,         // people per pedestrian recruited (events: Double Crowd = 2)
+
     pickupCount: 5,
     pickupRespawn: 11,
     pickupRadius: 2.2,
@@ -55,6 +57,35 @@ export const CONFIG = {
       double: { dur: 8 },
     },
   },
+
+  // Game modes (M4). Classic is the M1 rules, untouched. The sim takes `mode`; everything here is the mode's knobs.
+  MODES: {
+    classic: { name: 'Classic', short: 'Classic', blurb: 'Biggest crowd when the clock runs out wins.' },
+    teams: {
+      name: 'Teams', short: 'Teams', duration: 120, blurb: '4 v 4. Team score is every crowd added up. Teammates can\'t steal from each other.',
+      sides: [
+        { name: 'Blue', colors: [0x2f7bff, 0x4a90ff, 0x1d58d8, 0x3a6cf0], crews: ['Jays', 'Waves', 'Sharks', 'Comets'] },
+        { name: 'Red', colors: [0xff3a3a, 0xff5040, 0xd92626, 0xe8305a], crews: ['Foxes', 'Rockets', 'Flames', 'Hawks'] },
+      ],
+      boostReach: 1.3,       // reach multiplier while touching a teammate ("merge boost")
+      boostHold: 0.5,
+    },
+    koth: {
+      name: 'King of the Plaza', short: 'King', duration: 120, blurb: 'Be the biggest crowd inside the crown zone to score. It moves every 30 s.',
+      every: 30, warn: 6, rMin: 15, rMax: 24, rate: 1,
+    },
+    lcs: {
+      name: 'Last Crowd Standing', short: 'Last Standing', duration: 90, blurb: 'No respawns. The safe circle shrinks: outside it your crowd bleeds away. Last one alive wins.',
+      r0: 175,
+      stages: [[14, 16, 110], [44, 14, 72], [64, 10, 42], [78, 8, 18]],   // [start s, shrink s, radius] of play time
+      bleedBase: 3, bleedPer: 0.05,      // people/s lost outside the circle = base + per * count
+    },
+    infection: {
+      name: 'Infection', short: 'Infection', duration: 120, blurb: 'One crowd is the horde. Whoever it absorbs joins it. Survivors score time alive.',
+      hordeColor: 0xa4ff1a, hordeStart: 50, riseDelay: 1.2, riseCount: 20, surviveBonus: 20, hordeSpeed: 1.15, hordeStealMul: 1.5, hordeReach: 4, infectScore: 8,
+    },
+  },
+  MODE_ORDER: ['classic', 'teams', 'koth', 'lcs', 'infection'],
 
   TEAMS: [
     { name: 'Blue Empire', color: 0x2f7bff },

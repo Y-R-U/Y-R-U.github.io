@@ -56,6 +56,13 @@ function buildNav(sim) {
 
 export function createBots({ sim, indices, specs, seed = 1 }) {
   const state = sim.state, col = sim.collider;
+  const MODE = sim.mode || 'classic', M = MODE !== 'classic';
+  const ally = (a, b) => M && sim.allied(a, b);
+  // LCS: where the circle will be soon (the next radius while a shrink is due), so bots move in early.
+  const safe = () => {
+    const c = state.circle;
+    return c.shrinkIn < 8 ? { x: c.nx, z: c.nz, r: c.nr } : { x: c.x, z: c.z, r: c.r };
+  };
   const nav = buildNav(sim);
   const half = sim.map.size / 2;
   const dn = Math.ceil(sim.map.size / DEN);
@@ -110,12 +117,12 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
     const threats = [];
     let pressure = 0;
     for (const o of state.crowds) {
-      if (o === me || !o.alive) continue;
+      if (o === me || !o.alive || ally(me, o)) continue;
       const ratio = o.count / me.count;
       if (ratio < 1.1) continue;
       const d = Math.hypot(o.x - me.x, o.z - me.z);
       const gap = d - o.radius - me.radius;
-      const range = (10 + o.radius * 0.9) * P.fear * aware;
+      const range = (10 + o.radius * 0.9) * P.fear * aware * (M && o.horde ? 1.4 : 1);
       if (gap > range) continue;
       let p = (1 - Math.max(0, gap) / range) * Math.min(1, (ratio - 1) / 0.5);
       if (skill > 0.45) {
@@ -130,8 +137,10 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
       pressure += p;
     }
 
+    const sc = MODE === 'lcs' ? safe() : null;
     const threatPenalty = (x, z) => {
       let f = 1;
+      if (sc && (x - sc.x) ** 2 + (z - sc.z) ** 2 > (sc.r - 4) ** 2) f *= 0.05;
       for (const t of threats) {
         const d = Math.hypot(x - t.o.x, z - t.o.z) - t.o.radius;
         if (d < 14) f *= 0.08; else if (d < 28) f *= 0.5;
@@ -162,6 +171,7 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
           if ((ax * bx + az * bz) / (al * bl) > 0.3) s -= 40 * t.p;
         }
         if (Math.abs(x) > half - 14 || Math.abs(z) > half - 14) s -= 15;
+        if (sc && Math.hypot(x - sc.x, z - sc.z) > sc.r - 4) s -= 80;
         const di = Math.floor((x + half) / DEN) + Math.floor((z + half) / DEN) * dn;
         s += Math.min(den[di], 20) * 0.3 + rng.next() * 2;
         if (s > bestS) { bestS = s; best = c; }
@@ -175,9 +185,10 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
       else if (s > as && b.human) { as = s; alt = { kind, x, z, target }; }
     };
 
-    const chase = P.chase * (late ? 1.3 : 1);
+    const horde = M && me.horde;
+    const chase = P.chase * (late ? 1.3 : 1) * (horde ? 1.7 : 1);
     for (const o of state.crowds) {
-      if (o === me || !o.alive || o.protect > 0) continue;
+      if (o === me || !o.alive || o.protect > 0 || ally(me, o)) continue;
       const ratio = o.count / me.count;
       if (ratio > 0.86) continue;
       const pd = pathDist(o.x, o.z);
@@ -189,6 +200,7 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
       let s = P.hunt * o.count * catchP * Math.min(1, (1 - ratio) * 2.5) / (gap / speed + 2);
       if (o.index === state.leader) s *= 1.4;
       if (late) s *= 1.4;
+      if (horde) s *= o.horde ? 0 : 2.4;
       if (b.goal && b.goal.target === o.index) s *= 1.35;
       consider('prey', o.x, o.z, s * threatPenalty(o.x, o.z) * noise(), o.index);
     }
@@ -210,6 +222,28 @@ export function createBots({ sim, indices, specs, seed = 1 }) {
       let s = P.greed * den[c] / (pd / speed + 2.5);
       if (b.goal && b.goal.kind === 'people' && Math.hypot(b.goal.x - x, b.goal.z - z) < 12) s *= 1.3;
       consider('people', x, z, s * threatPenalty(x, z) * noise());
+    }
+
+    if (MODE === 'koth' && state.zone) {
+      const z = state.zoneNext && state.zoneT < 4 ? state.zoneNext : state.zone;
+      let top = 0;
+      for (const o of state.crowds) if (o !== me && o.alive && (o.x - z.x) ** 2 + (o.z - z.z) ** 2 < z.r * z.r) top = Math.max(top, o.count);
+      const inside = (me.x - z.x) ** 2 + (me.z - z.z) ** 2 < (z.r * 0.8) ** 2;
+      const pd = Math.max(0, pathDist(z.x, z.z));
+      if (inside && me.count > top) {
+        if (!b.zx || Math.hypot(b.zx - me.x, b.zz - me.z) < 4 || rng.chance(0.08)) {
+          const a = rng.next() * Math.PI * 2, r = Math.sqrt(rng.next()) * z.r * 0.6;
+          b.zx = z.x + Math.cos(a) * r; b.zz = z.z + Math.sin(a) * r;
+        }
+        consider('zone', b.zx, b.zz, 1e6, null);
+      } else {
+        const can = me.count >= top * 0.85 ? 1 : 0.25;
+        consider('zone', z.x, z.z, can * (90 + me.count * 0.45) / (pd / speed + 2) * threatPenalty(z.x, z.z) * noise(), null);
+      }
+    }
+    if (sc) {
+      const d = Math.hypot(me.x - sc.x, me.z - sc.z);
+      if (d > sc.r - 6) consider('safe', sc.x, sc.z, 1e6 * (d - sc.r + 7), null);
     }
 
     if (P.wander > 0) {

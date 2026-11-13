@@ -2,11 +2,38 @@ import { h, esc, hex, num, ord, countUp, UI_ICON } from './kit.js';
 import { ICON } from './hud.js';
 import { LEAGUES, badgeSvg } from '../meta/leagues.js';
 import { xpToNext } from '../meta/economy.js';
+import { CONFIG } from '../config.js';
+import { cupView, cupMode, modeName } from '../meta/events.js';
+import { shareCard } from './sharecard.js';
+
+const HORDE = CONFIG.MODES.infection.hordeColor;
+function headline(mode, state, mc, place, won, left) {
+  if (left) return null;
+  if (mode === 'teams' && state.teams) {
+    const w = state.teams[0].score >= state.teams[1].score ? 0 : 1;
+    const nm = state.teams[w].name.toUpperCase();
+    const share = `You brought ${mc.count.toLocaleString('en-US')} of ${state.teams[mc.team].score.toLocaleString('en-US')}`;
+    return won ? ['YOUR TEAM WINS!', share] : [`${nm} TEAM WINS`, share];
+  }
+  if (mode === 'koth') return won ? ['KING OF THE PLAZA!', `${Math.floor(mc.score)} s holding the crown zone`] : [`${ord(place)} PLACE`, `${Math.floor(mc.score)} s in the crown zone`];
+  if (mode === 'lcs') return won ? ['LAST CROWD STANDING!', 'Everyone else is gone'] : [`${ord(place)} PLACE`, mc.out ? `Out after ${Math.floor(mc.outAt)} s` : 'Still standing at the whistle'];
+  if (mode === 'infection') {
+    if (!mc.horde) return [won ? 'SURVIVED!' : `${ord(place)} PLACE`, `Never infected · ${Math.floor(mc.score)} pts`];
+    return [won ? 'VICTORY!' : `${ord(place)} PLACE`, `Infected ${mc.infections || 0} crowd${mc.infections === 1 ? '' : 's'}`];
+  }
+  return null;
+}
+function value(mode, c) {
+  if (mode === 'koth') return Math.floor(c.score) + 's';
+  if (mode === 'infection') return (c.horde ? ICON.biohazard || '' : '') + Math.floor(c.score);
+  if (mode === 'lcs' && c.out) return 'OUT';
+  return c.count;
+}
 
 export function createResults({ root, app, onAgain, onMenu }) {
   const el = h(`<section class="screen results hidden">
     <div class="res-card">
-      <div class="res-head"><div class="res-emote"></div><div class="res-place"></div><div class="res-sub"></div></div>
+      <div class="res-head"><div class="res-mode"></div><div class="res-emote"></div><div class="res-place"></div><div class="res-sub"></div></div>
       <div class="res-body">
         <ol class="res-list"></ol>
         <div class="res-side">
@@ -14,6 +41,7 @@ export function createResults({ root, app, onAgain, onMenu }) {
           <div class="res-btns">
             <button type="button" class="btn btn-primary again">PLAY AGAIN</button>
             <button type="button" class="btn btn-ghost to-menu">MENU</button>
+            <button type="button" class="res-share">Share result</button>
           </div>
         </div>
       </div>
@@ -23,20 +51,33 @@ export function createResults({ root, app, onAgain, onMenu }) {
   const $ = (s) => el.querySelector(s);
   $('.again').addEventListener('click', () => { app.audio.ui(); cancel(); onAgain(); });
   $('.to-menu').addEventListener('click', () => { app.audio.ui(); cancel(); onMenu(); });
-  let timers = [];
+  let timers = [], card = null;
+  $('.res-share').addEventListener('click', async () => {
+    if (!card) return;
+    app.audio.ui();
+    const b = $('.res-share');
+    const r = await shareCard(card).catch(() => 'failed');
+    b.textContent = r === 'downloaded' ? 'Saved image' : r === 'shared' ? 'Shared!' : 'Share result';
+    setTimeout(() => { b.textContent = 'Share result'; }, 2000);
+  });
   const later = (ms, f) => timers.push(setTimeout(f, ms));
   const cancel = () => { timers.forEach(clearTimeout); timers = []; };
 
   // online: { quick, note } for a real online match (no rating, no coins; humans are tagged LIVE).
-  function show({ state, players, me = 0, report = null, practice = false, left = false, online = null }) {
+  function show({ state, players, me = 0, report = null, practice = false, left = false, online = null, mode = 'classic', ev = null }) {
     cancel();
     const sorted = state.crowds.slice().sort((a, b) => a.rank - b.rank);
     const mc = state.crowds[me];
     const place = report ? report.place : mc.rank;
-    const won = place === 1 && !left;
+    const teamWon = mode === 'teams' && state.teams && state.teams[mc.team].score >= state.teams[1 - mc.team].score;
+    const won = !left && (mode === 'teams' ? teamWon : place === 1);
     el.classList.toggle('won', won);
-    $('.res-place').textContent = left ? 'LEFT MATCH' : won ? 'VICTORY!' : `${ord(place)} PLACE`;
-    $('.res-sub').textContent = left ? (online ? 'You left the online match' : 'Counted as last place') : won ? 'Biggest crowd in the city' : place <= 3 ? 'So close. Go again!' : 'The city is waiting. Go again!';
+    el.dataset.mode = mode;
+    const hl = headline(mode, state, mc, place, won, left);
+    $('.res-place').textContent = left ? 'LEFT MATCH' : hl ? hl[0] : won ? 'VICTORY!' : `${ord(place)} PLACE`;
+    $('.res-sub').textContent = left ? (online ? 'You left the online match' : report && !report.rated ? 'No coins this time' : 'Counted as last place')
+      : hl ? hl[1] : won ? 'Biggest crowd in the city' : place <= 3 ? 'So close. Go again!' : 'The city is waiting. Go again!';
+    $('.res-mode').textContent = mode === 'classic' ? '' : modeName(mode).toUpperCase();
     const emote = $('.res-emote');
     emote.textContent = won ? app.emoteGlyph() : '';
     emote.classList.toggle('hidden', !won);
@@ -44,16 +85,26 @@ export function createResults({ root, app, onAgain, onMenu }) {
     $('.res-list').innerHTML = sorted.map((c) => {
       const p = players[c.index], isMe = c.index === me;
       const lg = isMe ? (practice || online ? null : LEAGUES[app.save.league]) : p.league != null ? LEAGUES[p.league] : null;
-      return `<li class="${isMe ? 'me ' + plate : ''}" style="--c:${hex(c.color)}">
+      const col = mode === 'infection' && c.horde ? HORDE : c.color;
+      return `<li class="${isMe ? 'me ' + plate : ''}${c.horde ? ' horde' : ''}${c.out ? ' out' : ''}${mode === 'teams' ? ' team' + c.team : ''}" style="--c:${hex(col)}">
         <span class="rl-rank">${c.rank === 1 ? ICON.crown : c.rank}</span>
         <span class="rl-ico">${ICON.person}</span>
         <span class="rl-flag">${esc(p.flag || '')}</span>
         <span class="rl-name">${esc(p.name)}${online && p.human && !isMe ? ' <i class="rl-live">LIVE</i>' : ''}</span>
         <span class="rl-lg">${lg ? badgeSvg(lg, 16) : ''}</span>
-        <span class="rl-n">${c.count}</span>
+        <span class="rl-n">${value(mode, c)}</span>
       </li>`;
     }).join('');
+    if (mode === 'teams' && state.teams) {
+      $('.res-list').insertAdjacentHTML('afterbegin', `<li class="rl-teams">${state.teams.map((t) => `<span style="--c:${hex(t.color)}"><b>${esc(t.name)}</b> ${num(t.score)}</span>`).join('<i>vs</i>')}</li>`);
+    }
 
+    card = left ? null : {
+      title: $('.res-place').textContent, sub: $('.res-sub').textContent, mode, me,
+      rows: sorted.map((c) => ({ index: c.index, name: players[c.index].name, color: mode === 'infection' && c.horde ? HORDE : c.color, value: String(value(mode, c)).replace(/<[^>]+>/g, '') })),
+      stats: `Best crowd ${mc.best} · Absorbed ${mc.kills} · Recruited ${mc.recruited}`,
+    };
+    $('.res-share').classList.toggle('hidden', !card);
     const rw = $('.res-rewards');
     if (online) {
       rw.innerHTML = `<div class="rw-note rw-online">${esc(online.note || 'Online match')}</div>
@@ -62,6 +113,14 @@ export function createResults({ root, app, onAgain, onMenu }) {
       rw.innerHTML = `<div class="rw-note">Practice match: no rating or coins.</div>
         <div class="rw-stats"><span>Best <b>${mc.best}</b></span><span>Absorbed <b>${mc.kills}</b></span><span>Recruited <b>${mc.recruited}</b></span></div>`;
     } else renderRewards(rw, report, mc);
+    if (report && !report.left) {
+      const cv = cupView(app.save);
+      if (mode === cupMode()) {
+        const next = cv.tiers.find((t) => !t.got);
+        rw.insertAdjacentHTML('beforeend', `<div class="rw-cup">${UI_ICON.star}<span>Monthly cup: <b>${cv.pts}</b> pts (best ${cv.top.length} of 5)</span><b>${next ? `${next.name} at ${next.pts}` : 'Gold cup won!'}</b></div>`);
+      }
+      if (!report.rated) rw.insertAdjacentHTML('afterbegin', `<div class="rw-note rw-unrated">${esc(modeName(mode))} is unrated: coins and XP only. Classic moves your rating.</div>`);
+    }
 
     el.classList.remove('hidden');
     void el.offsetWidth;
@@ -75,7 +134,7 @@ export function createResults({ root, app, onAgain, onMenu }) {
     rw.innerHTML = `
       <div class="rw-rating">
         <span class="rw-lg">${badgeSvg(lgB, 34)}</span>
-        <span class="rw-rv"><b class="rw-r">${num(R.before.rating)}</b> pts <i class="rw-d ${dCls}">${R.delta > 0 ? '+' : ''}${R.delta}</i></span>
+        <span class="rw-rv"><b class="rw-r">${num(R.before.rating)}</b> pts ${R.rated === false ? '<i class="rw-d">unrated</i>' : `<i class="rw-d ${dCls}">${R.delta > 0 ? '+' : ''}${R.delta}</i>`}</span>
         <span class="rw-rank"><span class="rw-rk">#${num(R.before.rank)}</span>${rankGain ? `<i class="${rankGain > 0 ? 'up' : 'down'}">${rankGain > 0 ? UI_ICON.up : UI_ICON.down}${num(Math.abs(rankGain))}</i>` : ''}</span>
       </div>
       <div class="rw-promo hidden"></div>

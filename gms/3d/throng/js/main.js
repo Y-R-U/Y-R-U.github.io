@@ -12,12 +12,18 @@ import { load, write, defaults } from './meta/save.js';
 import { buildRoster } from './meta/roster.js';
 import { applyMatch } from './meta/progress.js';
 import { item, crowdCosmetics } from './meta/shop.js';
-import { createOnline, serverUrl, onlineVisible, httpBase, newDeviceId, newCid } from './net/online.js';
+import { createOnline, serverUrl, onlineVisible, httpBase, newDeviceId, newCid, quickMode } from './net/online.js';
+import { modeOf } from './sim/sim.js';
+import { matchEvents, liveEvents, eventLook, eventSim } from './meta/events.js';
+import { rollSeason } from './meta/season.js';
+import { EMOTES, emoteId } from './net/proto.js';
+import { zonesOf } from './ui/hud.js';
 
 const Q = new URLSearchParams(location.search);
 const flag = (k) => Q.has(k) && Q.get(k) !== '0' && Q.get(k) !== 'false';
 const opts = {
-  auto: flag('auto'), lite: flag('lite'), shot: flag('shot'), debug2d: flag('debug2d'),
+  auto: flag('auto'), lite: flag('lite'), shot: flag('shot'), debug2d: flag('debug2d'), nocloud: flag('nocloud'),
+  mode: Q.get('mode') || '', event: Q.get('event') || '',
   seed: Q.has('seed') && Q.get('seed') !== '' ? Q.get('seed') : null,
   t: Math.max(0, +Q.get('t') || 0),
 };
@@ -36,6 +42,8 @@ const storage = (() => {
   return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) };
 })();
 let save = load(storage);
+const seasonReport = rollSeason(save);
+if (seasonReport) write(storage, save);
 
 async function loadMapGen() {
   try {
@@ -86,6 +94,7 @@ async function loadRenderer(map) {
 
 const HELLO = ['hi', '👋', 'glhf', 'gl', 'yo'], BRAG = ['gg', '😎', 'ez', '💪', '😂', 'yum'], OUCH = ['noo', '😭', '💀', 'rip', 'wow', 'bruh'], CROWN = ['👑', 'mine', '😤'];
 const any = (a) => a[Math.floor(Math.random() * a.length)];
+const esc = (s) => String(s).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 // setCrowds entries: name + colour + the renderer cosmetics (CONTRACT.md "Crowd cosmetics").
 const crowdsMeta = (players) => players.map((p, i) => ({ ...(p.cos || {}), index: i, name: p.name, color: p.color }));
 
@@ -107,7 +116,12 @@ async function boot() {
     get save() { return save; },
     audio,
     persist() { write(storage, save); },
-    playerName: () => save.name || 'You',
+    playerName: () => save.name || app.accountName || 'You',
+    accountName: '',
+    seasonReport,
+    get mode() { return modeOf(save.mode); },
+    setMode(m) { save.mode = modeOf(m); app.persist(); screens.refresh(); },
+    haptic(ms) { if (save.settings.haptics && navigator.vibrate) { try { navigator.vibrate(ms); } catch {} } },
     colorHex: () => item('color', save.equip.color).color,
     emoteGlyph: () => item('emote', save.equip.emote).glyph,
     changed() { screens.refresh(); },
@@ -142,11 +156,13 @@ async function boot() {
   const net = {
     visible: onlineVisible(),
     pendingCode: (Q.get('room') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6),
+    roomMode: 'classic',
     sheetUpdate: null,
     get status() { return online ? online.status : 'idle'; },
     get you() { return online && online.you; },
     connect(force) {
-      if (!online) online = createOnline({ url: serverUrl(), map, name: app.playerName(), dev: devId, cid, cos: crowdCosmetics(save.equip), emit: onNet });
+      if (!online) online = createOnline({ url: serverUrl(), map, name: app.playerName(), dev: devId, cid, cos: crowdCosmetics(save.equip), emit: onNet,
+        pickMode: (quick) => (quick ? quickMode() : modeOf(net.roomMode || 'classic')) });
       if (force && online.status === 'unavailable') { online.close(); }
       online.connect();
     },
@@ -195,7 +211,19 @@ async function boot() {
         case 'role':
           if (mode === 'match') { hud.toast(d.role === 'host' ? 'YOU ARE THE HOST' : 'HOST CHANGED', { sub: d.role === 'host' ? 'the last host left' : '', cls: 'warn' }); notice('Host changed'); }
           break;
-        case 'meta': if (match && match.net) d.players.forEach((p, i) => hud.setName(i, p.name)); break;
+        case 'meta':
+          if (match && match.net) {
+            d.players.forEach((p, i) => {
+              hud.setName(i, p.name);
+              // Late joiner's look: only if the renderer can swap one crowd's look without a camera snap.
+              const key = JSON.stringify(p.cos || {});
+              if (renderer.updateCrowdMeta && match.cosKeys && match.cosKeys[i] !== key) {
+                match.cosKeys[i] = key;
+                try { renderer.updateCrowdMeta(i, { ...(p.cos || {}), index: i, name: p.name, color: p.color }); } catch (e) { logErr('updateCrowdMeta', e); }
+              }
+            });
+          }
+          break;
         case 'ended':
           lastRecorded = d.recorded;
           if (mode === 'results' && lastKind === 'online') screens.results.setOnlineNote(recordedText());
@@ -240,10 +268,13 @@ async function boot() {
     screens.hideAll();
     cam('follow');
     const me = nm.me, players = nm.players;
-    match = { kind: 'online', net: nm, seed: nm.meta.seed, players, me, attract: false, crownSecs: 0, left: false };
+    match = { kind: 'online', net: nm, seed: nm.meta.seed, players, me, attract: false, crownSecs: 0, left: false, mode: nm.mode,
+      cosKeys: players.map((p) => JSON.stringify(p.cos || {})) };
     renderer.setCrowds(crowdsMeta(players));
     renderer.setFocus(me);
-    hud.setMatch({ players, playerIndex: me, map, league: null, plate: save.equip.plate, badge: save.equip.badge, toast: save.equip.toast });
+    setLook(eventLook(nm.meta.events || []));
+    resetZones();
+    hud.setMatch({ players, playerIndex: me, map, league: null, plate: save.equip.plate, badge: save.equip.badge, toast: save.equip.toast, mode: nm.mode });
     acc = 0; frameEvents = []; resultsAt = 0; lastBeep = -1; lastTick = -1; wasLeader = false;
     paused = false; autopilot = false; hiddenAt = 0;
     input.reset();
@@ -267,8 +298,9 @@ async function boot() {
     save.tutorialDone = true;
     app.persist();
     const state = nm.state;
-    screens.showResults({ state, players: nm.players, me: nm.me, left, online: { note: left ? 'Your crowd was handed to a bot' : recordedText() } });
+    screens.showResults({ state, players: nm.players, me: nm.me, left, mode: nm.mode, online: { note: left ? 'Your crowd was handed to a bot' : recordedText() } });
     G.resultsShown = (G.resultsShown || 0) + 1;
+    G.matchCompleted();
     if (online) online.endMatch();
   }
 
@@ -281,7 +313,10 @@ async function boot() {
     try { r = nm.frame(now, dt, ax, az); } catch (e) { logErr('net frame', e); }
     if (r && r.state) {
       const state = r.state;
+      if (!match.spectating && match.mode === 'lcs' && state.crowds[match.me].out) match.spectating = true;
+      if (match.spectating && state.phase === 'play') { try { renderer.setFocus(state.leader); } catch {} }
       try { direct(state, r.events); } catch (e) { logErr('director', e); }
+      pushZones(state);
       try { renderer.frame(state, r.events, dt, r.alpha); } catch (e) { logErr('renderer.frame', e); }
       if (mode === 'match') {
         try { hud.update(state, r.events, dt, r.alpha); } catch (e) { logErr('hud', e); }
@@ -289,7 +324,7 @@ async function boot() {
           nm.over = true;
           if (online) online.report();
           input.setEnabled(false); audio.stopMusic();
-          if (!resultsAt) resultsAt = now + 1700;
+          if (!resultsAt) { resultsAt = now + 1700; watchWinner(state); }
         }
       }
     }
@@ -349,9 +384,13 @@ async function boot() {
   // kind: 'sim-online' (rated, ladder opponents, never really stops) | 'practice' (offline, real pause).
   function prepare(kind) {
     const seed = newSeed(kind === 'practice' ? ':practice' : '');
+    const mode = modeOf(opts.mode || save.mode);
+    if (kind === 'sim-online') { const rep = rollSeason(save); if (rep) { app.seasonReport = rep; app.persist(); } }
     const roster = kind === 'sim-online' ? buildRoster({ seed, rating: save.rating, count: CONFIG.MATCH.crowds - 1 }) : null;
-    const p = makePlayers({ seed, playerName: app.playerName(), playerColor: app.colorHex(), playerCos: crowdCosmetics(save.equip), roster });
-    return { kind, seed, ...p };
+    const p = makePlayers({ seed, mode, playerName: app.playerName(), playerColor: app.colorHex(), playerCos: crowdCosmetics(save.equip), roster });
+    const ev = matchEvents(Date.now(), mode);
+    if (opts.event) { ev.ids = opts.event.split(','); ev.sim = eventSim(ev.ids); ev.look = eventLook(ev.ids); ev.slayer = ev.ids.includes('slayer') ? 30 : ev.slayer; }
+    return { kind, seed, mode, ev, ...p };
   }
 
   function newMatch(pre) {
@@ -360,14 +399,18 @@ async function boot() {
     const idx = botIndices.slice(), specs = botSpecs.slice();
     if (!idx.includes(0)) { idx.unshift(0); specs.unshift({ ...CONFIG.AUTO_PLAYER }); }
     const countdown = attract || opts.shot ? 0 : CONFIG.MATCH.countdown;
-    const sim = createSim({ seed, map, players, countdown });
+    const mode = attract ? 'classic' : modeOf(pre.mode);
+    const ev = pre.ev || null;
+    const sim = createSim({ seed, map, players, countdown, mode, config: ev ? ev.sim : null });
     const bots = createBots({ sim, indices: idx, specs, seed });
-    match = { kind: pre.kind, seed, players, sim, bots, attract, crownSecs: 0, left: false };
+    match = { kind: pre.kind, seed, players, sim, bots, attract, crownSecs: 0, left: false, mode, ev, slayer: 0 };
     renderer.setCrowds(crowdsMeta(players));
     renderer.setFocus(0);
+    setLook(attract ? eventLook(liveEvents().map((w) => w.id)) : ev && ev.look);
+    resetZones();
     hud.setMatch({
       players, playerIndex: 0, map, league: pre.kind === 'sim-online' ? save.league : null,
-      plate: save.equip.plate, badge: save.equip.badge, toast: save.equip.toast,
+      plate: save.equip.plate, badge: save.equip.badge, toast: save.equip.toast, mode,
     });
     acc = 0; frameEvents = []; resultsAt = 0; lastBeep = -1; lastTick = -1; wasLeader = false;
     paused = false; autopilot = false; hiddenAt = 0;
@@ -422,18 +465,27 @@ async function boot() {
     audio.setIntense(state.phase === 'play' && state.timeLeft <= 30);
     for (const e of events) {
       switch (e.type) {
+        case 'emote': if (e.crowd !== mi && EMOTES[e.id]) hud.emote(e.crowd, EMOTES[e.id]); break;
+        case 'infect':
+          if (e.crowd === mi) { audio.absorbed(); app.haptic([40, 60, 120]); }
+          else if (e.by === mi) audio.absorb();
+          crowdLook(e.crowd, e.by);
+          break;
         case 'recruit': if (e.crowd === mi) audio.recruit(e.n); break;
         case 'steal':
           if (e.to === mi) audio.steal(e.n, true);
           else if (e.from === mi) audio.steal(e.n, false);
           break;
         case 'elim':
-          if (e.by === mi) { audio.absorb(); hud.emote(mi, app.emoteGlyph()); }
-          else if (e.victim === mi) audio.absorbed();
+          if (e.by === mi) {
+            audio.absorb(); app.haptic(60); myEmote(app.emoteGlyph());
+            const v = state.crowds[e.victim];
+            if (match.ev && match.ev.slayer && v && v.rank < state.crowds[mi].rank) match.slayer++;
+          } else if (e.victim === mi) { audio.absorbed(); app.haptic([90, 50, 90]); if (match.mode === 'lcs') spectate(state); }
           humanEmote(e.by, BRAG, 0.55);
           humanEmote(e.victim, OUCH, 0.5, 3300);
           break;
-        case 'pickup': if (e.crowd === mi) audio.pickup(e.kind); break;
+        case 'pickup': if (e.crowd === mi) { audio.pickup(e.kind); app.haptic(25); } break;
         case 'lead':
           if (e.crowd === mi) { audio.lead(true); wasLeader = true; }
           else if (wasLeader) { audio.lead(false); wasLeader = false; }
@@ -446,12 +498,60 @@ async function boot() {
           }
           if (e.phase === 'over') {
             audio.stopMusic(); audio.end(state.crowds[mi].rank === 1); input.setEnabled(false); resultsAt = performance.now() + 1700;
-            if (state.crowds[mi].rank === 1) hud.emote(mi, app.emoteGlyph());
+            watchWinner(state);
+            if (state.crowds[mi].rank === 1) myEmote(app.emoteGlyph());
             match.players.forEach((p, i) => humanEmote(i, ['gg', 'gg', 'gg wp', 'close one'], state.crowds[i].rank === 1 ? 0.9 : 0.3));
           }
           break;
       }
     }
+  }
+
+  // Your own emote: shown at once, and sent to the room in online play.
+  function myEmote(glyph) {
+    const mi = match.me || 0;
+    hud.emote(mi, glyph);
+    if (match.net) { try { match.net.emote(emoteId(glyph)); } catch (e) { logErr('emote', e); } }
+  }
+
+  // A few seconds on the winner before the results (when it isn't you).
+  function watchWinner(state) {
+    const mi = match.me || 0, w = state.leader;
+    if (w === mi || !state.crowds[w] || !state.crowds[w].alive) return;
+    try { renderer.setFocus(w); } catch {}
+    resultsAt += 1300;
+    hud.toast(esc(match.players[w].name), { sub: 'takes it', cls: 'gold small' });
+  }
+
+  // LCS: once you are out, the camera follows whoever leads.
+  function spectate(state) {
+    match.spectating = true;
+    try { renderer.setFocus(state.leader); } catch {}
+  }
+
+  // Infection: a crowd that turned. The 3D crowd only changes colour if the renderer has updateCrowdMeta.
+  function crowdLook(i, by) {
+    if (!renderer.updateCrowdMeta) return;
+    const p = match.players[i], st = curState(), src = st && st.crowds[by];
+    try { renderer.updateCrowdMeta(i, { ...(p.cos || {}), index: i, name: p.name, color: CONFIG.MODES.infection.hordeColor, palette: undefined }, src ? { from: { x: src.x, z: src.z } } : {}); } catch (e) { logErr('updateCrowdMeta', e); }
+  }
+
+  function setLook(look) {
+    try {
+      if (renderer.setTheme) renderer.setTheme(look ? look.theme : 'evening');
+      if (renderer.setWeather) renderer.setWeather(look ? look.weather : 'clear');
+    } catch (e) { logErr('setTheme', e); }
+  }
+
+  let zonesKey = '';
+  function resetZones() { zonesKey = ''; try { renderer.setZones && renderer.setZones([]); } catch {} }
+  function pushZones(state) {
+    if (!renderer.setZones) return;
+    const z = zonesOf(state);
+    const key = z.map((q) => `${q.x.toFixed(1)},${q.z.toFixed(1)},${q.r.toFixed(1)},${q.style}`).join('|');
+    if (key === zonesKey) return;
+    zonesKey = key;
+    try { renderer.setZones(z); } catch (e) { logErr('setZones', e); }
   }
 
   function frame(now) {
@@ -472,6 +572,9 @@ async function boot() {
     const alpha = paused ? 1 : Math.min(1, acc / SIM_DT);
     const state = match.sim.state;
     try { direct(state, frameEvents); } catch (e) { logErr('director', e); }
+    if (!match.spectating && match.mode === 'lcs' && state.crowds[0].out) match.spectating = true;
+    if (match.spectating && state.phase === 'play') { try { renderer.setFocus(state.leader); } catch {} }
+    pushZones(state);
     try {
       renderer.frame(state, frameEvents, dt, alpha);
       renderFails = 0;
@@ -509,13 +612,15 @@ async function boot() {
     if (!practice) {
       report = applyMatch(save, {
         place: me.rank, count: me.count, best: me.best, kills: me.kills, recruited: me.recruited,
-        crownSecs: match.crownSecs, left,
+        crownSecs: match.crownSecs, left, mode: match.mode, coinMul: match.ev ? match.ev.coinMul : 1,
+        slayer: match.ev && match.ev.slayer ? { n: match.slayer, bonus: match.ev.slayer } : null,
       });
     }
     if (!opts.auto) save.tutorialDone = true;
     app.persist();
     if (left) input.setEnabled(false);
-    screens.showResults({ state, players: match.players, me: 0, report, practice, left });
+    screens.showResults({ state, players: match.players, me: 0, report, practice, left, mode: match.mode, ev: match.ev });
+    G.matchCompleted();
     G.resultsShown = (G.resultsShown || 0) + 1;
     G.lastReport = report;
   }
@@ -568,7 +673,7 @@ async function boot() {
     if (!live()) return;
     if (match.kind !== 'practice') autopilot = true; else paused = true;
     input.setEnabled(false);
-    screens.pause.show({ online: match.kind !== 'practice', away });
+    screens.pause.show({ online: match.kind !== 'practice', away, rated: match.kind === 'sim-online' && match.mode === 'classic' });
   }
 
   function resumeMatch() {
@@ -595,7 +700,7 @@ async function boot() {
     if (!hiddenAt) return;
     const away = (Date.now() - hiddenAt) / 1000;
     hiddenAt = 0;
-    if (match && match.net && mode === 'match') { last = performance.now(); if (live()) screens.pause.show({ online: true, away }); return; }
+    if (match && match.net && mode === 'match') { last = performance.now(); if (live()) screens.pause.show({ online: true, away, rated: false }); return; }
     if (!match || match.kind !== 'sim-online' || mode !== 'match') return;
     const st = match.sim.state;
     const left = (st.phase === 'countdown' ? st.countdownLeft : 0) + st.timeLeft + 0.2;
@@ -603,7 +708,7 @@ async function boot() {
     try { fastForward(Math.min(away, left)); } catch (e) { logErr('catch-up', e); }
     last = performance.now();
     if (match.sim.state.phase === 'over') { screens.pause.hide(); return; }
-    screens.pause.show({ online: true, away });
+    screens.pause.show({ online: true, away, rated: match.mode === 'classic' });
   }
   document.addEventListener('visibilitychange', () => (document.hidden ? onHidden() : onVisible()));
 
@@ -643,6 +748,19 @@ async function boot() {
 
   app.net = net;
   Object.assign(G, { net });
+
+  // br8t account + cloud save: optional, never blocks; the nudge only shows on the menu or results.
+  let cloudSync = null;
+  if (!opts.auto && !opts.shot && !opts.nocloud) {
+    import('./cloud.js').then((m) => {
+      cloudSync = m.initCloud({
+        canPester: () => (mode === 'menu' && !screens.sheets.current) || mode === 'results',
+        onName: (n) => { if (n !== app.accountName) { app.accountName = n; screens.refresh(); } },
+      });
+      G.cloud = cloudSync;
+    }).catch((e) => { G.cloudError = String(e && e.message || e); console.warn('[throng] account layer unavailable', e); });
+  }
+  G.matchCompleted = () => { try { cloudSync && cloudSync.matchCompleted(); } catch {} };
   app.applySettings();
   if (opts.shot) startMatch(prepare('practice'));
   else if (opts.auto) startMatch(prepare('sim-online'));

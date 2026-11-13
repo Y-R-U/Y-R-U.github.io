@@ -1,5 +1,6 @@
 const hex = (c) => '#' + c.toString(16).padStart(6, '0');
 const VIEW = 105; // metres from centre to rim
+const HORDE = '#a4ff1a';
 
 export function createMinimap(canvas) {
   const g = canvas.getContext('2d');
@@ -32,7 +33,7 @@ export function createMinimap(canvas) {
     resize();
   }
 
-  function draw(state, me, yaw, alpha) {
+  function draw(state, me, yaw, alpha, zones = []) {
     if (!map || !size) { resize(); if (!size) return; }
     if ((frame++ & 1) === 1) return;
     const W = canvas.width, R = W / 2, k = R / VIEW;
@@ -52,6 +53,17 @@ export function createMinimap(canvas) {
       g.fillStyle = p.kind === 'speed' ? '#5cc8ff' : p.kind === 'magnet' ? '#ff5d6c' : '#c27bff';
       g.beginPath(); g.arc(p.x, p.z, 2.6, 0, Math.PI * 2); g.fill();
     }
+    for (const z of zones) {
+      g.beginPath(); g.arc(z.x, z.z, z.r, 0, Math.PI * 2);
+      if (z.style === 'safe') {
+        g.save(); g.fillStyle = 'rgba(255,60,80,0.28)'; g.beginPath(); g.rect(-400, -400, 800, 800); g.arc(z.x, z.z, z.r, 0, Math.PI * 2, true); g.fill('evenodd'); g.restore();
+        g.beginPath(); g.arc(z.x, z.z, z.r, 0, Math.PI * 2);
+      }
+      if (z.style === 'crown') { g.fillStyle = 'rgba(255,210,58,0.28)'; g.fill(); }
+      g.setLineDash(z.style === 'next' || z.style === 'safe-next' ? [6 / k, 5 / k] : []);
+      g.strokeStyle = '#' + z.color.toString(16).padStart(6, '0'); g.lineWidth = 2.2 * dpr / k; g.stroke();
+      g.setLineDash([]);
+    }
     g.restore();
 
     const cs = Math.cos(yaw), sn = Math.sin(yaw);
@@ -65,7 +77,7 @@ export function createMinimap(canvas) {
       const d = Math.hypot(x - R, y - R), rim = R - 5 * dpr;
       let r = Math.max(3 * dpr, c.radius * k * 1.25);
       if (d > rim) { x = R + (x - R) / d * rim; y = R + (y - R) / d * rim; r = 3.2 * dpr; }
-      const col = hex(c.color);
+      const col = c.horde ? HORDE : hex(c.color);
       g.fillStyle = col;
       g.globalAlpha = 0.35; g.beginPath(); g.arc(x, y, r * 1.6, 0, Math.PI * 2); g.fill();
       g.globalAlpha = 1; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
@@ -73,7 +85,7 @@ export function createMinimap(canvas) {
     }
     if (c0.alive) {
       const r = Math.max(3 * dpr, c0.radius * k * 1.25);
-      g.fillStyle = hex(c0.color);
+      g.fillStyle = c0.horde ? HORDE : hex(c0.color);
       g.globalAlpha = 0.4; g.beginPath(); g.arc(R, R, r * 1.5, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
       const h = c0.heading, hx = Math.sin(h), hz = Math.cos(h);
       const ax = cs * hx - sn * hz, ay = sn * hx + cs * hz;

@@ -99,9 +99,31 @@ u8 leader, u8 leadChanges, u8 nCrowds,
      u16 ackSeq, u8 applied, u8 heading
 u8 nPickups, per pickup (7 B): u8 id, u8 kind|active<<7, i16 x z, u8 respawnIn (1/10 s)
 u16 nSlots, per slot: u16 slot|state<<14, and if state≠0: i16 x z, i8 vx vz (0.1 m/s), u8 heading, i8 target, u8 look
-u16 nEvents, per event: u8 type + recruit[crowd u8, slot u16, n u8] | steal[from, to, n u16] | elim[victim, by] |
+u16 nEvents, per event: u8 type + recruit[crowd u8, slot u16, n u8] | steal[from, to, n u16] | elim[victim, by (255 = none)] |
    respawn[crowd, x i16, z i16, count u16] | pickup[crowd, id, kind] | lead[crowd] | phase[phase]
+   | 8 bleed[crowd, n u16] | 9 infect[crowd, by] | 10 zone[] | 11 shrink[stage u8] | 12 emote[crowd, id u8]
+[mode block — only when the mode is not Classic, so Classic snapshots are byte-for-byte what M3 sent]
+u8 mode (0 classic 1 teams 2 koth 3 lcs 4 infection)
+  per crowd (6 B): u8 flags(out | horde<<1), u8 team, u16 score ×10, u16 extra (LCS: outAt ×10; Infection: infections)
+  koth: zone (i16 x z, u16 r cm), i8 holder, u8 hasNext [+ next zone], u16 zoneT ×10
+  lcs:  circle (i16 x z, u16 r cm), next circle (same), i16 target x z, u16 shrinkIn ×10, u8 stage
+  teams: u16 score per side
+  u8 endReason (0 time, 1 last crowd, 2 all horde)
 ```
+
+**Modes online (M4).** The host's `begin` meta carries `mode` and `events` (the live match-wide event ids:
+`double`, `rush`, `market`). Everyone builds the sim config from `events` (`eventSim()`), so a guest predicts
+with the same speeds and pedestrian cap as the host. Private rooms: the host picks the mode in the room lobby
+(`net.roomMode`); guests see "The host picks the mode" and learn it at `begin`. Quick match: the mode comes from a
+shared 10-minute UTC rotation (`QUICK_ROTATION` in `js/net/online.js`, Classic every other slot). The server knows
+nothing about modes (it relays `meta` as raw JSON). `SIM_REV` is 2 and `simVersion()` hashes `CONFIG.MODES` too, so
+builds with different mode rules never share a room; `PROTO` stays 1 (old clients are already kept apart by the
+version key, and the server accepts `v` 1).
+
+**Emotes (M4).** A guest's emote rides an input frame: `[3][seq][ax = -128][az = emote id]` (a real stick never
+sends -128). The host turns it into an `emote` event (at most one per 1.5 s per crowd) and every client draws it
+(over the crowd's pill, or on its leaderboard row when the crowd is off screen). Ids index `EMOTES` in
+`js/net/proto.js`. The server forwards input frames without reading them, so no server change.
 
 **Pedestrians (≤ 650 slots) are sent by exception.** Host and guests hold the same model per slot —
 quantised position + velocity at tick `t0` — and everyone predicts `x(t) = x0 + v·(t − t0)·dt`. The host
@@ -152,7 +174,9 @@ and releases them when its delayed view reaches that tick, so a recruit fires as
 `want`; the host picks the bot crowd nearest the bots' median size (never the leader) and sends `assign`;
 the joiner gets `begin {late: true}` + keyframe + tail. The bot keeps steering until the joiner's first
 input arrives, so the handover is seamless. Late joiners are not recorded on the boards (part of that
-crowd was a bot's work).
+crowd was a bot's work). In Last Crowd Standing a crowd that is out is never offered. Everyone already in the match
+gets the joiner's look through `renderer.updateCrowdMeta()` when the `meta` update arrives (no camera snap); a
+renderer without it shows the old look until the next match.
 
 ## Leaderboards
 

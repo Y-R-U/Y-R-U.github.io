@@ -1,4 +1,4 @@
-// node tools/net_cdp.mjs --cdp=9284 --cdp2=9285 [--static=8764] [--server=18090] [--shots=DIR] [--break=sync]
+// node tools/net_cdp.mjs --cdp=9284 --cdp2=9285 [--static=8764] [--server=18090] [--shots=DIR] [--break=sync] [--mode=teams|koth|lcs|infection]
 // Two real headless Chrome tabs (one per browser = separate players) play one online match:
 // create room → join by code (share link) → ready → start → same crowds on both → host tab closed →
 // the other tab carries on → results. Starts its own Go server and static server and stops them.
@@ -17,6 +17,7 @@ const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] 
 const CDP = +(args.cdp || 9284), CDP2 = +(args.cdp2 || CDP + 1), SPORT = +(args.static || 8764), NPORT = +(args.server || 18090);
 const SHOTS = args.shots || join(tmpdir(), 'throng-net-shots');
 const BREAK = args.break || '';
+const MODE = args.mode && args.mode !== 'classic' ? args.mode : '';
 fs.mkdirSync(SHOTS, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const failures = [];
@@ -132,7 +133,9 @@ async function tab(name, port) {
     },
     // Authoritative counts per tick (host: the sim; guest: its latest snapshot), every 30 ticks.
     sampler: () => ev(`(() => { window.__samples = {}; setInterval(() => { const m = __game.online && __game.online.match; if (!m) return;
-      const st = m.role === 'host' ? m.sim.state : m.guest.latest; if (st && st.tick % 30 === 0 && !__samples[st.tick]) __samples[st.tick] = st.crowds.map((c) => c.count).join(','); }, 8); return true; })()`),
+      const st = m.role === 'host' ? m.sim.state : m.guest.latest; if (st && st.tick % 30 === 0 && !__samples[st.tick]) {
+        const md = m.role === 'host' ? (st.mode !== 'classic' ? st.crowds.map((c) => (Math.round(c.score * 10) / 10) + '|' + c.horde + '|' + c.out) : []) : (st.mode ? st.mode.crowds.map((c) => c.score + '|' + c.horde + '|' + c.out) : []);
+        __samples[st.tick] = st.crowds.map((c) => c.count).concat(md).join(','); } }, 8); return true; })()`),
   };
   return T;
 }
@@ -189,10 +192,20 @@ try {
 
   // ------------------------------------------------------------ start → same crowds
   await A.sampler(); await B.sampler();
+  if (MODE) {
+    await A.tap(`.olm-strip [data-mode="${MODE}"]`);
+    check(await A.ev('__game.net.roomMode') === MODE && await A.ev(`document.querySelector('.olm-strip [data-mode="${MODE}"]').classList.contains('on')`), `host picked ${MODE} in the room lobby by touch`);
+    check(await B.ev(`document.querySelector('.olm-strip').classList.contains('hidden') && /host picks/.test(document.querySelector('.olm-t').textContent)`), 'the guest sees "the host picks the mode", no picker');
+    await A.shot('room_host_mode_p');
+  }
   await A.tap('.ol-start');
   await Promise.all([A.waitFor(`__game.mode === 'match' && !!__game.state`, 10000, 'A match'), B.waitFor(`__game.mode === 'match' && !!__game.state`, 10000, 'B match')]);
   const roles = [await A.ev('__game.online.match.role'), await B.ev('__game.online.match.role')];
   check(roles[0] === 'host' && roles[1] === 'guest', `roles ${roles.join('/')}`);
+  if (MODE) {
+    const ms = [await A.ev('__game.state.mode'), await B.ev('__game.state.mode')];
+    check(ms[0] === MODE && ms[1] === MODE, `both tabs play ${MODE} (${ms.join('/')})`);
+  }
   console.log(`       visibility A ${await A.ev('document.visibilityState')}, B ${await B.ev('document.visibilityState')}`);
   const meA = await A.ev('__game.online.match.me');
   const cosB = await B.ev(`JSON.stringify(__game.online.match.players[${meA}].cos)`);
@@ -221,7 +234,7 @@ try {
   const sA = await A.ev('__samples'), sB = await B.ev('__samples');
   let n = 0, bad = 0;
   for (const t of Object.keys(sA)) if (sB[t]) { n++; if (sA[t] !== sB[t]) bad++; }
-  check(n >= 10 && bad === 0, `both tabs saw the same crowd counts at ${n} sampled ticks (${bad} differ)`);
+  check(n >= 10 && bad === 0, `both tabs saw the same crowd counts${MODE ? ' and mode state' : ''} at ${n} sampled ticks (${bad} differ)`);
   const viewA = await A.ev(`__game.state.crowds.map((c) => c.count).join(',')`), viewB = await B.ev(`__game.state.crowds.map((c) => c.count).join(',')`);
   console.log(`       on screen now  A ${viewA}\n                      B ${viewB} (B is ~120 ms behind)`);
   await A.shot('match_host_p'); await B.shot('match_guest_l');

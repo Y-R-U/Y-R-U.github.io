@@ -24,7 +24,7 @@ export function createPause({ root, app, onResume, onLeave }) {
   leave.addEventListener('click', () => {
     if (!armed) {
       leave.classList.add('armed');
-      leave.textContent = el.classList.contains('online') ? 'TAP AGAIN: COUNTS AS LAST' : 'TAP AGAIN TO LEAVE';
+      leave.textContent = el.classList.contains('rated') ? 'TAP AGAIN: COUNTS AS LAST' : 'TAP AGAIN TO LEAVE';
       armed = setTimeout(reset, 3000);
       return;
     }
@@ -37,9 +37,10 @@ export function createPause({ root, app, onResume, onLeave }) {
   });
 
   return {
-    show({ online, away = 0 }) {
+    show({ online, away = 0, rated = online }) {
       reset();
       el.classList.toggle('online', online);
+      el.classList.toggle('rated', !!rated);
       el.querySelector('.pz-t').textContent = online ? 'AUTOPILOT' : 'PAUSED';
       el.querySelector('.pz-s').textContent = online
         ? (away >= 1 ? `You were away ${Math.round(away)} s. The match kept going and autopilot steered your crowd.` : 'The match is live: autopilot is steering your crowd until you resume.')

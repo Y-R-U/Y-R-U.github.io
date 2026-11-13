@@ -7,7 +7,7 @@ export const SIM_DT = 1 / 30;
 export function leaderSpeed(c, C) {
   const f = Math.min(1, Math.log(Math.max(1, c.count)) / Math.log(C.speedRef));
   return C.speedBase * (1 - C.speedFall * f) * (c.fx.speed > 0 ? C.fx.speed.mult : 1)
-    * (c.eating > 0 ? C.eatDrag : 1) * (c.panic > 0 ? C.panicBoost : 1);
+    * (c.eating > 0 ? C.eatDrag : 1) * (c.panic > 0 ? C.panicBoost : 1) * (c.horde ? CONFIG.MODES.infection.hordeSpeed : 1);
 }
 
 // One fixed step of a leader toward target velocity (tx, tz). Shared with the online guest's prediction.
@@ -27,14 +27,37 @@ export function integrateLeader(c, tx, tz, C, col, tmp) {
 }
 
 const CROWD_KEYS = ['alive', 'x', 'z', 'px', 'pz', 'vx', 'vz', 'heading', 'count', 'radius', 'kills', 'best', 'rank',
-  'protect', 'respawnIn', 'eating', 'panic', 'recruited', 'stolen', 'lost', 'deaths', 'travelled', 'ix', 'iz', 'remote', 'name', 'id', 'isBot'];
-const STATE_KEYS = ['tick', 'time', 'timeLeft', 'countdownLeft', 'phase', 'duration', 'leader', 'leadChanges'];
+  'protect', 'respawnIn', 'eating', 'panic', 'recruited', 'stolen', 'lost', 'deaths', 'travelled', 'ix', 'iz', 'remote', 'name', 'id', 'isBot',
+  'team', 'score', 'out', 'horde', 'boost', 'infections', 'outAt', 'rise'];
+const STATE_KEYS = ['tick', 'time', 'timeLeft', 'countdownLeft', 'phase', 'duration', 'leader', 'leadChanges', 'mode', 'zone', 'zoneNext', 'zoneT', 'circle', 'teams', 'endReason'];
+
+export const MODE_IDS = ['classic', 'teams', 'koth', 'lcs', 'infection'];
+export const modeOf = (m) => (MODE_IDS.includes(m) ? m : 'classic');
+export const modeDuration = (m) => (modeOf(m) === 'classic' ? CONFIG.MATCH.duration : CONFIG.MODES[modeOf(m)].duration);
+
+// LCS safe circle as a pure function of play time: shrinks in stages from the city centre toward `target`.
+export function lcsCircle(MC, t, target) {
+  let r = MC.r0, next = null, shrinkIn = 0;
+  for (const [at, dur, to] of MC.stages) {
+    if (t >= at + dur) { r = to; continue; }
+    if (t >= at) { r = r + (to - r) * ((t - at) / dur); next = to; shrinkIn = 0; break; }
+    next = to; shrinkIn = at - t; break;
+  }
+  const r1 = MC.stages[0][2];
+  const k = Math.max(0, Math.min(1, (MC.r0 - r) / (MC.r0 - r1)));
+  const kn = next == null ? 1 : Math.max(0, Math.min(1, (MC.r0 - next) / (MC.r0 - r1)));
+  return { x: target.x * k, z: target.z * k, r, nx: target.x * kn, nz: target.z * kn, nr: next == null ? r : next, shrinkIn };
+}
 
 // heading convention: Math.atan2(vx, vz) — 0 faces +Z, matches three's rotation.y for a +Z-forward model.
 // restore: a sim.serialize() result (exact continuation) or a contract-shaped state (online host migration:
 // wander targets, steal progress and the RNG are regenerated).
-export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.duration, countdown = CONFIG.MATCH.countdown, config, restore = null }) {
+export function createSim({ seed = 1, map, players, mode = 'classic', duration, countdown = CONFIG.MATCH.countdown, config, restore = null }) {
   const C = { ...CONFIG.SIM, ...(config || {}) };
+  const MODE = modeOf(mode);
+  const MC = MODE === 'classic' ? null : CONFIG.MODES[MODE];
+  if (duration == null) duration = MC ? MC.duration : CONFIG.MATCH.duration;
+  const mrng = MC ? createRng('mode:' + seed) : null;
   const rng = createRng('sim:' + seed);
   const col = createCollider(map);
   const half = map.size / 2;
@@ -52,6 +75,10 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     let r = c.radius + C.reachPad + c.radius * C.reachGrow;
     if (c.count < topCount * C.underdogBelow) r += C.underdogReach;
     if (c.fx.magnet > 0) r = r * C.fx.magnet.mult + C.fx.magnet.pad;
+    if (MC) {
+      if (c.boost > 0) r *= MC.boostReach;
+      if (c.horde) r += MC.hordeReach;
+    }
     return r;
   };
 
@@ -66,7 +93,15 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     protect: 0, respawnIn: 0, eating: 0, panic: 0,
     recruited: 0, stolen: 0, lost: 0, deaths: 0, travelled: 0,
     ix: 0, iz: 0, remote: !!p.remote,
+    team: MODE === 'teams' ? (p.team ?? i % 2) : MODE === 'infection' ? (p.horde ? 1 : 0) : i,
+    score: 0, out: false, horde: MODE === 'infection' && !!p.horde, boost: 0, infections: 0, outAt: 0, rise: false,
   }));
+  if (MODE === 'infection') {
+    if (!crowds.some((c) => c.horde)) { crowds[nc - 1].horde = true; crowds[nc - 1].team = 1; }
+    for (const c of crowds) if (c.horde) { c.count = c.best = MC.hordeStart; c.radius = radiusOf(c.count); }
+  }
+  // Two crowds that may never steal from each other: teammates, or two horde crowds.
+  const allied = (a, b) => !!MC && (MODE === 'teams' ? a.team === b.team : MODE === 'infection' && a.horde && b.horde);
 
   // Initial spawns: spread crowds over the spawn list, deterministic shuffle.
   const order = spawns.map((s, i) => i);
@@ -107,7 +142,36 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     crowds, neutrals, pickups,
     leader: 0,
     leadChanges: 0,
+    mode: MODE,
   };
+  let lcsTarget = null;
+  const bleedAcc = new Float64Array(nc);
+  if (MODE === 'koth') {
+    state.zone = zoneAt(nearestPlaza(0, 0));
+    state.zoneNext = null;
+    state.zoneT = MC.every;
+    state.zone.holder = -1;
+  } else if (MODE === 'lcs') {
+    const far = plazas.filter((p) => Math.hypot(p.x, p.z) > 20);
+    lcsTarget = (far.length ? far : plazas)[mrng.int((far.length ? far : plazas).length)];
+    state.circle = lcsCircle(MC, 0, lcsTarget);
+    state.circle.tx = lcsTarget.x; state.circle.tz = lcsTarget.z; state.circle.stage = 0;
+  } else if (MODE === 'teams') {
+    state.teams = MC.sides.map((s, t) => ({ team: t, name: s.name, color: s.colors[0], score: 0 }));
+  }
+
+  function nearestPlaza(x, z) {
+    let best = plazas[0], bd = Infinity;
+    for (const p of plazas) { const d = Math.hypot(p.x - x, p.z - z); if (d < bd) { bd = d; best = p; } }
+    return best;
+  }
+  function zoneAt(p) { return { x: p.x, z: p.z, r: Math.max(MC.rMin, Math.min(MC.rMax, p.r)), holder: -1 }; }
+  function pickNextZone() {
+    const z = state.zone;
+    const cand = plazas.filter((p) => Math.hypot(p.x - z.x, p.z - z.z) > 25);
+    const list = cand.length ? cand : plazas;
+    return zoneAt(list[mrng.int(list.length)]);
+  }
 
   function pickWanderTarget(i) {
     const x = neutrals.x[i], z = neutrals.z[i];
@@ -216,9 +280,11 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     }
     c.alive = true;
     c.x = c.px = best.x; c.z = c.pz = best.z; c.vx = c.vz = 0;
+    if (MODE === 'infection' && c.rise) { best = { x: c.x, z: c.z }; c.rise = false; }
     let sum = 0, n = 0;
     for (const o of crowds) if (o.alive && o !== c) { sum += o.count; n++; }
     c.count = Math.max(C.respawnCount, Math.round(C.respawnShare * (n ? sum / n : 0)));
+    if (MODE === 'infection' && c.horde) c.count = Math.max(c.count, MC.riseCount);
     c.radius = radiusOf(c.count);
     c.protect = C.protect;
     c.fx.speed = c.fx.magnet = c.fx.double = 0;
@@ -231,6 +297,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     for (const c of crowds) {
       c.px = c.x; c.pz = c.z;
       if (!c.alive) {
+        if (c.out) continue;
         if (playing) {
           c.respawnIn -= dt;
           if (c.respawnIn <= 0) respawnCrowd(c);
@@ -240,6 +307,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
       if (c.protect > 0) c.protect = Math.max(0, c.protect - dt);
       if (c.eating > 0) c.eating -= dt;
       if (c.panic > 0) c.panic -= dt;
+      if (c.boost > 0) c.boost -= dt;
       for (const k in c.fx) if (c.fx[k] > 0) c.fx[k] = Math.max(0, c.fx[k] - dt);
       const sp = speedOf(c);
       c.travelled += integrateLeader(c, playing ? c.ix * sp : 0, playing ? c.iz * sp : 0, C, col, tmp);
@@ -258,7 +326,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
         if (!c || !c.alive || !playing) { N.state[i] = 1; N.target[i] = -1; pickWanderTarget(i); continue; }
         const dx = c.x - x, dz = c.z - z, d = Math.sqrt(dx * dx + dz * dz);
         if (d < Math.max(c.radius * 0.85, 1.4)) {
-          const n = c.fx.double > 0 ? 2 : 1;
+          const n = (c.fx.double > 0 ? 2 : 1) * C.recruitValue;
           c.count += n; c.recruited += n;
           N.state[i] = 0; N.target[i] = -1; N.active--;
           emit({ type: 'recruit', crowd: c.index, slot: i, x, z, n });
@@ -310,15 +378,27 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     } else neutralRespawnAcc = 0;
   }
 
+  // by: the absorbing crowd, or null (LCS: bled out outside the safe circle).
   function eliminate(victim, by) {
     victim.alive = false;
     victim.count = 0;
     victim.respawnIn = C.respawnDelay;
     victim.deaths++;
     victim.vx = victim.vz = 0;
-    by.kills++;
+    if (by) by.kills++;
     for (let k = 0; k < nc; k++) { stealAcc[k * nc + victim.index] = 0; stealAcc[victim.index * nc + k] = 0; }
-    emit({ type: 'elim', victim: victim.index, by: by.index, x: victim.x, z: victim.z });
+    emit({ type: 'elim', victim: victim.index, by: by ? by.index : -1, x: victim.x, z: victim.z });
+    if (!MC) return;
+    if (MODE === 'lcs') {
+      victim.out = true; victim.respawnIn = 0;
+      victim.outAt = state.duration - state.timeLeft;
+      victim.score = victim.outAt;
+    } else if (MODE === 'infection' && by && by.horde && !victim.horde) {
+      victim.horde = true; victim.team = 1; victim.rise = true;
+      victim.respawnIn = MC.riseDelay;
+      by.infections++; by.score += MC.infectScore;
+      emit({ type: 'infect', crowd: victim.index, by: by.index });
+    }
   }
 
   function stepSteals() {
@@ -329,6 +409,11 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
         const key = i * nc + j, keyR = j * nc + i;
         if (!a.alive || !b.alive || a.protect > 0 || b.protect > 0 || a.count === b.count) { stealAcc[key] = stealAcc[keyR] = 0; continue; }
         const dx = b.x - a.x, dz = b.z - a.z, d = Math.sqrt(dx * dx + dz * dz);
+        if (MC && allied(a, b)) {
+          stealAcc[key] = stealAcc[keyR] = 0;
+          if (MODE === 'teams' && d < a.radius + b.radius) a.boost = b.boost = MC.boostHold;
+          continue;
+        }
         const big = a.count > b.count ? a : b, small = big === a ? b : a;
         const depth = big.radius + small.radius - d;
         const k = big === a ? key : keyR;
@@ -338,7 +423,8 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
         const overlap = Math.min(1, depth / (2 * small.radius));
         const rf = Math.min(1, (ratio - 1 - C.stealDeadzone) / C.stealRatioFull);
         const boost = 1 + Math.min(ratio - 1, C.stealBoostCap) * C.stealBoost;
-        const rate = (C.stealBase + C.stealPer * small.count) * Math.pow(overlap, C.stealOverlapPow) * rf * boost;
+        let rate = (C.stealBase + C.stealPer * small.count) * Math.pow(overlap, C.stealOverlapPow) * rf * boost;
+        if (MC && big.horde) rate *= MC.hordeStealMul;
         stealAcc[k] += rate * dt;
         big.eating = small.panic = C.eatHold;
         let n = Math.floor(stealAcc[k]);
@@ -377,16 +463,80 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
   }
 
   const rankOrder = crowds.map((c, i) => i);
+  const teamScore = (c) => (state.teams ? state.teams[c.team].score : 0);
+  const modeCmp = (ia, ib) => {
+    const a = crowds[ia], b = crowds[ib];
+    if (MODE === 'teams') return (teamScore(b) - teamScore(a)) || (b.count - a.count) || (a.rank - b.rank);
+    if (MODE === 'lcs') return ((a.out ? 1 : 0) - (b.out ? 1 : 0)) || (a.out ? b.score - a.score : b.count - a.count) || (a.rank - b.rank);
+    return (b.score - a.score) || (b.count - a.count) || (a.rank - b.rank);
+  };
   function stepRanks(playing) {
     // Stable: ties keep their previous order, so the lead only changes on a strict overtake.
-    rankOrder.sort((a, b) => (crowds[b].count - crowds[a].count) || (crowds[a].rank - crowds[b].rank));
+    if (MC) rankOrder.sort(modeCmp);
+    else rankOrder.sort((a, b) => (crowds[b].count - crowds[a].count) || (crowds[a].rank - crowds[b].rank));
     rankOrder.forEach((ci, r) => { crowds[ci].rank = r + 1; });
     const top = rankOrder[0];
     topCount = Math.max(1, crowds[top].count);
+    if (MC) for (const c of crowds) if (c.count > topCount) topCount = c.count;
     if (top !== state.leader) {
       state.leader = top;
       if (playing) { state.leadChanges++; emit({ type: 'lead', crowd: top }); }
     }
+  }
+
+  function stepMode() {
+    const t = state.duration - state.timeLeft;
+    if (MODE === 'teams') {
+      for (const tm of state.teams) tm.score = 0;
+      for (const c of crowds) if (c.alive) state.teams[c.team].score += c.count;
+    } else if (MODE === 'koth') {
+      state.zoneT -= dt;
+      if (!state.zoneNext && state.zoneT <= MC.warn) state.zoneNext = pickNextZone();
+      if (state.zoneT <= 0) {
+        state.zone = state.zoneNext || pickNextZone();
+        state.zoneNext = null;
+        state.zoneT = MC.every;
+        emit({ type: 'zone', x: state.zone.x, z: state.zone.z, r: state.zone.r });
+      }
+      const z = state.zone;
+      let best = null, tie = false;
+      for (const c of crowds) {
+        if (!c.alive || (c.x - z.x) ** 2 + (c.z - z.z) ** 2 > z.r * z.r) continue;
+        if (!best || c.count > best.count) { best = c; tie = false; } else if (c.count === best.count) tie = true;
+      }
+      z.holder = best && !tie ? best.index : -1;
+      if (z.holder >= 0) best.score += MC.rate * dt;
+    } else if (MODE === 'lcs') {
+      const cc = lcsCircle(MC, t, lcsTarget);
+      cc.tx = lcsTarget.x; cc.tz = lcsTarget.z;
+      cc.stage = MC.stages.filter((st) => t >= st[0]).length;
+      if (cc.stage > (state.circle.stage || 0)) emit({ type: 'shrink', stage: cc.stage, r: cc.nr });
+      state.circle = cc;
+      for (const c of crowds) {
+        if (!c.alive) { bleedAcc[c.index] = 0; continue; }
+        c.score = t;
+        if ((c.x - cc.x) ** 2 + (c.z - cc.z) ** 2 <= cc.r * cc.r) { bleedAcc[c.index] = 0; continue; }
+        bleedAcc[c.index] += (MC.bleedBase + MC.bleedPer * c.count) * dt;
+        const n = Math.min(c.count, Math.floor(bleedAcc[c.index]));
+        if (n <= 0) continue;
+        bleedAcc[c.index] -= n;
+        c.count -= n; c.lost += n;
+        emit({ type: 'bleed', crowd: c.index, n, x: c.x, z: c.z });
+        if (c.count <= 0) eliminate(c, null);
+      }
+    } else if (MODE === 'infection') {
+      for (const c of crowds) if (c.alive && !c.horde) c.score += dt;
+    }
+  }
+
+  function modeOver() {
+    if (MODE === 'lcs') {
+      let n = 0;
+      for (const c of crowds) if (!c.out) n++;
+      return n <= 1 ? 'last' : '';
+    }
+    if (MODE === 'infection') return crowds.every((c) => c.horde) ? 'horde' : '';
+    return '';
   }
 
   function step() {
@@ -404,6 +554,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
       if (state.timeLeft <= 1e-9) {
         state.timeLeft = 0;
         state.phase = 'over';
+        if (MODE === 'infection') for (const c of crowds) if (!c.horde) c.score += MC.surviveBonus;
         emit({ type: 'phase', phase: 'over' });
       }
     }
@@ -411,6 +562,15 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     stepCrowds(playing);
     stepNeutrals(playing);
     if (playing) { stepSteals(); stepPickups(); }
+    if (MC && playing) {
+      stepMode();
+      const why = modeOver();
+      if (why) {
+        state.endReason = why;
+        state.phase = 'over';
+        emit({ type: 'phase', phase: 'over' });
+      }
+    }
     for (const c of crowds) {
       if (!c.alive) continue;
       c.radius = radiusOf(c.count);
@@ -432,6 +592,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
     const N = neutrals, A = (a) => Array.from(a);
     return {
       v: 1, seed, rng: rng.getState(), pickupId, neutralRespawnAcc, topCount,
+      mrng: mrng ? mrng.getState() : null, bleedAcc: A(bleedAcc), lcsTarget,
       state: Object.fromEntries(STATE_KEYS.map((k) => [k, state[k]])),
       crowds: crowds.map((c) => ({ ...Object.fromEntries(CROWD_KEYS.map((k) => [k, c[k]])), fx: { ...c.fx } })),
       neutrals: { x: A(N.x), z: A(N.z), heading: A(N.heading), state: A(N.state), target: A(N.target), look: A(N.look),
@@ -443,7 +604,10 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
 
   function applyRestore(R) {
     const S = R.state || R;
-    for (const k of STATE_KEYS) if (S[k] !== undefined) state[k] = S[k];
+    for (const k of STATE_KEYS) if (S[k] !== undefined && k !== 'mode') state[k] = S[k] && typeof S[k] === 'object' ? JSON.parse(JSON.stringify(S[k])) : S[k];
+    if (mrng && R.mrng) mrng.setState(R.mrng);
+    if (R.bleedAcc) bleedAcc.set(R.bleedAcc);
+    if (MODE === 'lcs' && state.circle && state.circle.tx !== undefined) lcsTarget = R.lcsTarget || { x: state.circle.tx, z: state.circle.tz };
     if (!R.rng) rng.setState(createRng('sim:' + seed + ':restore:' + state.tick).getState());
     else rng.setState(R.rng);
     (R.crowds || []).forEach((src, i) => {
@@ -496,7 +660,7 @@ export function createSim({ seed = 1, map, players, duration = CONFIG.MATCH.dura
 
   return {
     state, step, setInput, drainEvents, setRemote, serialize,
-    collider: col, map, config: C,
+    collider: col, map, config: C, mode: MODE, modeConfig: MC, allied,
     radiusOf, speedOf, reachOf,
   };
 }

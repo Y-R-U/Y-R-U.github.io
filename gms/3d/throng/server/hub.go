@@ -71,6 +71,7 @@ type Room struct {
 	Meta                                 json.RawMessage
 	MID                                  string
 	Duration, Countdown                  float64
+	Mode                                 string
 	key                                  []byte
 	tail                                 [][]byte
 	hostReport                           *Report
@@ -579,6 +580,7 @@ type matchMeta struct {
 	Seed      json.RawMessage `json:"seed"`
 	Duration  float64         `json:"duration"`
 	Countdown float64         `json:"countdown"`
+	Mode      string          `json:"mode"`
 	Players   []struct {
 		Name string `json:"name"`
 		ID   string `json:"id"`
@@ -613,6 +615,7 @@ func (h *Hub) begin(s *Sess, mem *Member, r *Room, m inMsg) {
 	now := nowMs()
 	r.State, r.Meta, r.BeganAt, r.MID = "playing", m.Meta, now, newKey()[:12]
 	r.Duration, r.Countdown = meta.Duration, meta.Countdown
+	r.Mode = meta.Mode
 	r.EndsAt = now + int64((meta.Duration+meta.Countdown)*1000)
 	r.LastBin, r.key, r.tail, r.hostReport = now, nil, nil, nil
 	for _, o := range r.Members {
@@ -782,7 +785,12 @@ func sameHumans(r *Room, a, b []ResultRow) bool {
 
 // plausible: caps on what a 2-minute match can produce (the host's browser is trusted for the rest, D11).
 func plausible(r *Room, rows []ResultRow, now int64) bool {
-	if r.Duration < 90 || r.Duration > 180 || now-r.BeganAt < int64((r.Duration+r.Countdown)*1000)-8000 {
+	minRun := int64((r.Duration+r.Countdown)*1000) - 8000
+	// these two modes end when one side is left, well before the clock
+	if r.Mode == "lcs" || r.Mode == "infection" {
+		minRun = int64((40 + r.Countdown) * 1000)
+	}
+	if r.Duration < 90 || r.Duration > 180 || now-r.BeganAt < minRun {
 		return false
 	}
 	seen := map[int]bool{}

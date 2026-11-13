@@ -1,4 +1,4 @@
-// node tools/net_test.mjs [--duration=120] [--break=counts|migrate|late|bytes|rate|version] [--keep]
+// node tools/net_test.mjs [--duration=120] [--mode=classic|teams|koth|lcs|infection] [--break=counts|migrate|late|bytes|rate|version|mode|emote] [--keep]
 // Builds and starts the Go server locally, runs headless clients (tools/net_client.mjs, the real js/net code;
 // the host runs the real sim + bots) through a whole match and asserts the online guarantees. Exit 1 on failure.
 import { fork, spawn, execFileSync } from 'node:child_process';
@@ -11,6 +11,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] = a.replace(/^--/, '').split('='); return [k, v ?? true]; }));
 const BREAK = args.break || '';
 const DUR = +(args.duration || (BREAK ? 60 : 120));
+const MODE = args.mode && args.mode !== 'classic' ? args.mode : '';
 const PORT = 18024 + Math.floor(Math.random() * 40);
 const PORT2 = PORT + 100;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -46,7 +47,7 @@ await waitHealth(PORT);
 const url = `ws://127.0.0.1:${PORT}/gms/3d/throng/api/ws`;
 
 function client(name, env = {}) {
-  const c = fork(join(ROOT, 'tools/net_client.mjs'), [], { env: { ...process.env, NET_DURATION: String(DUR), ...env }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'] });
+  const c = fork(join(ROOT, 'tools/net_client.mjs'), [], { env: { ...process.env, NET_DURATION: String(DUR), NET_MODE: MODE, ...env }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'] });
   c.stderr.on('data', (d) => { c.errs = (c.errs || '') + d; });
   c.stdout.on('data', () => {});
   Object.assign(c, { name, last: null, events: [], waiters: [] });
@@ -87,9 +88,37 @@ function raw(hello, port = PORT) {
     ws.onerror = () => { setTimeout(() => resolve(out), 100); };
   });
 }
-const SIMV = await (async () => { const { CONFIG } = await import('../js/config.js'); CONFIG.MATCH.duration = DUR; const p = await import('../js/net/proto.js'); return p.simVersion(); })();
+const SIMV = await (async () => { const { CONFIG } = await import('../js/config.js'); CONFIG.MATCH.duration = DUR; if (MODE) CONFIG.MODES[MODE].duration = DUR; const p = await import('../js/net/proto.js'); return p.simVersion(); })();
 const MAPV = await (async () => { const p = await import('../js/net/proto.js'); let g; try { g = (await import('../js/world/map.js')).generateMap; } catch { g = (await import('./stub_map.js')).generateMap; } return p.mapVersion(g(1)); })();
 const hello = (o = {}) => ({ t: 'hello', v: 1, sim: SIMV, map: MAPV, dev: dev(), cid: cid('raw'), name: 'Raw', ...o });
+
+// ------------------------------------------------------------ in-process: emotes guest → host → guests, mode in meta
+{
+  console.log('\n[emote] in-process host + guest (no server)');
+  const { createNetMatch, buildMeta } = await import('../js/net/netmatch.js');
+  const { EMOTES, emoteId } = await import('../js/net/proto.js');
+  let g; try { g = (await import('../js/world/map.js')).generateMap; } catch { g = (await import('./stub_map.js')).generateMap; }
+  const map = g(1);
+  const meta = buildMeta({ seed: 5, members: [{ id: 'h', name: 'Host' }, { id: 'g', name: 'Guest' }], mode: MODE || 'koth', events: ['market'] });
+  const toGuest = [], toHost = [];
+  const H = createNetMatch({ map, meta, me: 0, role: 'host', sendBin: (b) => toGuest.push(b) });
+  const G = createNetMatch({ map, meta, me: 1, role: 'guest', sendBin: (b) => toHost.push(b) });
+  const seen = { host: [], guest: [] };
+  let now = 0;
+  for (let f = 0; f < 400; f++) {
+    now += 33;
+    if (f === 150) G.emote(emoteId('🔥'));
+    if (f === 200) H.emote(emoteId('gg'));
+    for (const e of H.frame(now, 0.033, 0, 0).events) if (e.type === 'emote') seen.host.push(e.crowd + ':' + EMOTES[e.id]);
+    while (toGuest.length) G.onSnap(toGuest.shift(), now);
+    while (toHost.length) { const b = toHost.shift(); const fw = new Uint8Array(6); fw[0] = 3; fw[1] = 1; fw.set(b.slice(1), 2); if (BREAK !== 'emote') H.onInput(fw, now); }
+    const r = G.frame(now, 0.033, 0.3, 0.2);
+    if (r.events) for (const e of r.events) if (e.type === 'emote') seen.guest.push(e.crowd + ':' + EMOTES[e.id]);
+  }
+  check(seen.host.includes('1:🔥') && seen.guest.includes('1:🔥'), `a guest emote reaches the host and comes back in the stream (host ${seen.host.join(' ')}, guest ${seen.guest.join(' ')})`);
+  check(seen.guest.includes('0:gg'), 'the host emote reaches the guest');
+  check(G.mode === (MODE || 'koth') && G.state && G.state.mode === (MODE || 'koth') && H.sim.config.pickupCount === 14, `the guest mirrors the host's mode (${G.state && G.state.mode}) and the event config travels in the meta`);
+}
 
 let exitCode = 0;
 try {
@@ -120,6 +149,7 @@ try {
   const [bh, b1, b2] = await Promise.all([H.wait((m) => m.ev === 'begin'), G1.wait((m) => m.ev === 'begin'), G2.wait((m) => m.ev === 'begin')]);
   check(bh.role === 'host' && b1.role === 'guest' && b2.role === 'guest', 'creator hosts, joiners are guests');
   check(new Set([bh.me, b1.me, b2.me]).size === 3, `three distinct crowds (${bh.me}, ${b1.me}, ${b2.me})`);
+  if (MODE) check(bh.mode === MODE && b1.mode === MODE && b2.mode === MODE, `everyone plays the host's mode (${bh.mode}/${b1.mode}/${b2.mode})`);
   const humans0 = bh.humans.map((x, i) => (x ? i : -1)).filter((i) => i >= 0);
   const t0 = Date.now();
   const at = (s) => sleep(Math.max(0, t0 + s * 1000 - Date.now()));
@@ -203,7 +233,11 @@ try {
       if (a.join() !== b.join()) diff++;
     }
   }
-  check(compared >= 10 && diff === 0, `sampled ticks compared across clients: ${compared}, mismatching ${diff}`);
+  check(compared >= 10 && diff === 0, `sampled ticks compared across clients: ${compared}, mismatching ${diff}${MODE ? ' (counts + mode scores/out/horde)' : ''}`);
+  if (MODE) {
+    const any = Object.values(S.Cara.samples).some((a) => a.length === 16 && a.slice(8).some((x) => +String(x).split('|')[0] > 0));
+    check(any, 'guests mirrored non-zero mode scores from the snapshots');
+  }
   // Pedestrians: what each guest reconstructed from deltas vs what the host (old, then new) simulated.
   const hostN = { ...hostSamples.hsamples, ...S.Bob.hsamples };
   let ncmp = 0, nStateBad = 0, nMaxErr = 0;

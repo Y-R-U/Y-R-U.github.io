@@ -3,6 +3,24 @@ import { LEAGUES, badgeSvg, leagueOf } from '../meta/leagues.js';
 import { LADDER, rankOf, around, top } from '../meta/ladder.js';
 import { xpToNext } from '../meta/economy.js';
 import { challengeState, loginState, claimLogin, msToRollover, LOGIN_REWARDS, dayKey } from '../meta/daily.js';
+import { CUP, modeName } from '../meta/events.js';
+import { seasonAt } from '../meta/season.js';
+import { CONFIG } from '../config.js';
+
+const CUP_SVG = (c) => `<svg viewBox="0 0 24 24" width="40" height="40"><path d="M6 3h12v4a6 6 0 01-12 0z" fill="${c}" stroke="#2a1a00" stroke-width="1.3"/><path d="M6 5H3a3 3 0 003 4M18 5h3a3 3 0 01-3 4" fill="none" stroke="${c}" stroke-width="1.8"/><path d="M10.5 13h3v4h-3z" fill="${c}"/><path d="M7.5 21a4.5 2.4 0 019 0z" fill="${c}" stroke="#2a1a00" stroke-width="1.2"/></svg>`;
+function trophyShelf(save) {
+  const list = (save.trophies || []).slice().sort((a, b) => (b.at || 0) - (a.at || 0));
+  if (!list.length) return `<div class="tr-empty">${UI_ICON.star}<span>No trophies yet. Reach a tier in the monthly cup, or play through a season.</span></div>`;
+  return `<ul class="tr-shelf">${list.map((t) => {
+    if (t.kind === 'season') {
+      const lg = LEAGUES[t.league] || LEAGUES[0];
+      return `<li style="--c:${lg.color}">${badgeSvg(lg, 40)}<b>Season ${esc(String(t.key).replace(/^S/, ''))}</b><small>${esc(lg.name)}</small></li>`;
+    }
+    const tier = CUP.tiers.find((x) => x.id === t.tier) || CUP.tiers[0];
+    const d = new Date(String(t.key) + '-01T00:00:00Z');
+    return `<li style="--c:${tier.color}">${CUP_SVG(tier.color)}<b>${esc(tier.name)}</b><small>${esc(d.toLocaleString('en', { month: 'short', year: 'numeric', timeZone: 'UTC' }))} · ${esc(modeName(t.mode))}</small></li>`;
+  }).join('')}</ul>`;
+}
 
 const row = (r, plate) => {
   const lg = leagueOf(r.rating);
@@ -68,7 +86,10 @@ export function renderProfile(body, { app }) {
       ${stat('Matches', num(st.matches))}${stat('Wins', num(st.wins))}${stat('Top 3s', num(st.top3))}
       ${stat('Best crowd', num(st.bestCrowd))}${stat('Recruited', num(st.recruited))}${stat('Absorbed', num(st.absorbed))}
       ${stat('Win streak', num(st.streak))}${stat('Best streak', num(st.bestStreak))}${stat('Crown time', fmtSecs(st.crownSecs))}
-    </div>`;
+    </div>
+    <h3 class="sh-h">Trophies <small>· Season ${seasonAt().n}, ${seasonAt().daysLeft} days left</small></h3>
+    ${trophyShelf(s)}
+    <div class="pf-modes">${CONFIG.MODE_ORDER.map((m) => { const x = (s.modeStats || {})[m] || { matches: 0, wins: 0 }; return `<div class="stat"><b>${num(x.wins)}<small>/${num(x.matches)}</small></b><span>${esc(CONFIG.MODES[m].short)} wins</span></div>`; }).join('')}</div>`;
   const input = body.querySelector('input');
   const commit = () => { const v = input.value.trim().slice(0, 14); if (v !== s.name) { s.name = v; app.persist(); app.changed(); } };
   input.addEventListener('change', commit);
@@ -86,12 +107,14 @@ export function renderSettings(body, { app, close }) {
     <p class="st-note q-note hidden">Lite fully applies after a reload.</p>
     ${tog('lefty', 'Left-handed HUD', 'Mirror the HUD sides')}
     ${tog('keepMoving', 'Keep moving on release', 'Your crowd keeps its heading when you let go')}
+    ${tog('haptics', 'Vibration', 'Buzz on absorb, absorbed and power-ups (phones that support it)')}
     <div class="st-danger"><button type="button" class="btn btn-ghost st-reset">Reset progress</button>
       <div class="st-confirm hidden"><p>This wipes your coins, items, rating and stats on this device.</p>
         <div class="st-row"><button type="button" class="btn btn-ghost st-no">Cancel</button><button type="button" class="btn btn-danger st-yes">Reset everything</button></div></div></div>
-    <p class="st-ver">THRONG · progress is saved on this device</p>`;
+    <p class="st-ver">THRONG · progress is saved on this device${app.accountName ? ' and in your br8t account' : ''}</p>`;
   body.querySelectorAll('input[type=checkbox]').forEach((c) => c.addEventListener('change', () => {
     s[c.dataset.k] = c.checked; app.persist(); app.applySettings(); app.audio.ui();
+    if (c.dataset.k === 'haptics' && c.checked) app.haptic(30);
   }));
   body.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => {
     s.quality = b.dataset.q; app.persist(); app.applySettings(); app.audio.ui();

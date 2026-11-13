@@ -31,7 +31,7 @@ export function nextLeague(current, rating) {
 // The real difficulty curve: opponents' skill and aggression by league.
 export function botProfile(leagueIndex) {
   const t = leagueIndex / (LEAGUES.length - 1);
-  return { skill: 0.34 + 0.56 * t, spread: 0.12, aggr: 0.9 + 0.25 * t, throttle: 0.8 + 0.2 * t };
+  return { skill: 0.42 + 0.48 * t, spread: 0.12, aggr: 0.95 + 0.2 * t, throttle: 0.91 + 0.09 * t };
 }
 
 export function badgeSvg(l, size = 24) {

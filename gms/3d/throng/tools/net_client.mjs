@@ -3,9 +3,12 @@
 import { CONFIG } from '../js/config.js';
 
 const DUR = +process.env.NET_DURATION || 0;
+const MODE = process.env.NET_MODE || '';
 if (DUR) CONFIG.MATCH.duration = DUR;
+if (DUR && MODE && CONFIG.MODES[MODE]) CONFIG.MODES[MODE].duration = DUR;
 const { createOnline } = await import('../js/net/online.js');
 const { decodeSnap, applyNeutrals, createNeutralModel, predictX, predictZ } = await import('../js/net/proto.js');
+let km = 0;
 let genMap;
 try { genMap = (await import('../js/world/map.js')).generateMap; } catch { genMap = (await import('./stub_map.js')).generateMap; }
 const map = genMap(1);
@@ -41,6 +44,7 @@ function wrap(m) {
   const on = m.onSnap; let k = 0;
   m.onSnap = (b, now) => {
     if (breakMode === 'counts' && m.role === 'guest' && b[0] === 1 && ++k % 7 === 0) return;
+    if (breakMode === 'mode' && m.role === 'guest' && ++km % 3 === 0) { const s = decodeSnap(b); if (s && s.mode) b = b.slice(0, s.modeAt); }
     on(b, now);
     if (m.role === 'guest') verify(b);
   };
@@ -65,7 +69,11 @@ function loop() {
   if (!st) return;
   // The authoritative view: the host's sim, or the guest's latest snapshot.
   const auth = m.role === 'host' ? m.sim.state : m.guest.latest;
-  if (auth && auth.tick % 150 === 0 && !samples[auth.tick]) samples[auth.tick] = auth.crowds.map((c) => c.count);
+  if (auth && auth.tick % 150 === 0 && !samples[auth.tick]) {
+    const mc = m.role === 'host' ? (auth.mode !== 'classic' ? auth.crowds.map((c) => `${Math.round(c.score * 10) / 10}|${c.out}|${c.horde}`) : [])
+      : (auth.mode ? auth.mode.crowds.map((c) => `${c.score}|${c.out}|${c.horde}`) : []);
+    samples[auth.tick] = auth.crowds.map((c) => c.count).concat(mc);
+  }
   if (m.role === 'host') hostSample(m.sim.state);
   if (st.phase === 'over' && !m.over) {
     m.over = true;
@@ -97,9 +105,10 @@ process.on('message', async (msg) => {
       breakMode = msg.break || '';
       online = createOnline({
         url: msg.url, map, name: msg.name, dev: msg.dev, cid: msg.cid,
+        ...(MODE ? { pickMode: (quick) => (quick ? 'classic' : MODE) } : {}),
         emit: (type, data) => {
           if (type === 'room') tell({ ev: 'room', room: data });
-          else if (type === 'begin') tell({ ev: 'begin', me: data.match.me, role: data.match.role, late: data.late, humans: data.match.players.map((p) => !!p.human), counts: null });
+          else if (type === 'begin') tell({ ev: 'begin', me: data.match.me, role: data.match.role, late: data.late, humans: data.match.players.map((p) => !!p.human), counts: null, mode: data.match.mode });
           else if (type === 'role') tell({ ev: 'role', role: data.role, why: data.why });
           else if (type === 'status') tell({ ev: 'status', status: data.status });
           else if (type === 'ended') tell({ ev: 'ended', recorded: data.recorded, why: data.why });

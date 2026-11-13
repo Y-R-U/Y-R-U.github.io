@@ -1,7 +1,9 @@
 // Online UI: the Online sheet (quick match / create / join by code), the room lobby, and the Online
 // leaderboard tab. All in-game DOM, nothing blocks: every sheet closes with the X, the backdrop or Escape.
-import { h, esc, hex, num, UI_ICON } from './kit.js';
+import { h, esc, hex, num, UI_ICON, MODE_ICON } from './kit.js';
 import { ICON } from './hud.js';
+import { CONFIG } from '../config.js';
+import { quickMode } from '../net/online.js';
 
 export const GLOBE = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M2.5 12h19M12 2.5c3 3 3 16 0 19M12 2.5c-3 3-3 16 0 19" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
 
@@ -72,6 +74,7 @@ export function createRoomLobby({ root, app }) {
       <div class="ol-code hidden"><span>Room code</span><b></b>
         <div class="ol-share"><button type="button" class="btn btn-ghost ol-copy">Copy link</button><button type="button" class="btn btn-ghost ol-native hidden">Share</button></div>
         <input class="ol-link" readonly tabindex="-1"></div>
+      <div class="ol-mode"><span class="olm-l">Mode</span><div class="m-modes olm-strip">${CONFIG.MODE_ORDER.map((m) => `<button type="button" data-mode="${m}">${MODE_ICON[m]}<span>${esc(CONFIG.MODES[m].short)}</span></button>`).join('')}</div><span class="olm-t"></span></div>
       <ol class="lby-list ol-list"></ol>
       <p class="on-err hidden"></p>
       <div class="ol-btns">
@@ -92,6 +95,7 @@ export function createRoomLobby({ root, app }) {
     $('.ol-start').disabled = true;
     net().start().catch((e) => error(e.message)).finally(() => { $('.ol-start').disabled = false; });
   });
+  el.querySelectorAll('.olm-strip [data-mode]').forEach((b) => b.addEventListener('click', () => { app.audio.ui(); net().roomMode = b.dataset.mode; render(); }));
   const link = () => net().shareLink(room.code);
   $('.ol-copy').addEventListener('click', async () => {
     const b = $('.ol-copy');
@@ -122,6 +126,11 @@ export function createRoomLobby({ root, app }) {
       sub = left > 0 ? `Starting in ${left} s… bots fill the empty spots` : 'Starting…';
     } else sub = isHost ? 'Share the code, then press Start. Bots fill the empty spots.' : 'Waiting for the host to start';
     $('.ol-sub').textContent = sub;
+    const pick = !quick && isHost && room.state === 'lobby';
+    $('.olm-strip').classList.toggle('hidden', !pick);
+    const rm = net().roomMode || 'classic';
+    el.querySelectorAll('.olm-strip [data-mode]').forEach((b) => b.classList.toggle('on', b.dataset.mode === rm));
+    $('.olm-t').textContent = pick ? CONFIG.MODES[rm].blurb : quick ? `${CONFIG.MODES[quickMode()].name} (quick matches rotate every 10 min)` : 'The host picks the mode';
     $('.ol-code').classList.toggle('hidden', quick);
     $('.ol-code b').textContent = room.code;
     $('.ol-link').value = quick ? '' : link();

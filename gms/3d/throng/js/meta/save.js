@@ -12,7 +12,12 @@ export function defaults() {
     owned: { color: [], plate: [], badge: [], emote: [], toast: [], hat: [], leader: [], flag: [], trail: [], ring: [] },
     equip: { color: 'blue', plate: 'classic', badge: 'classic', emote: 'gg', toast: 'classic', hat: 'none', leader: 'none', flag: 'none', trail: 'none', ring: 'solid' },
     daily: { loginStep: 0, lastClaim: '', chKey: '', chProgress: 0, chDone: false, firstWinKey: '' },
-    settings: { music: true, sfx: true, quality: 'auto', lefty: false, keepMoving: true },
+    settings: { music: true, sfx: true, quality: 'auto', lefty: false, keepMoving: true, haptics: true },
+    mode: 'classic',
+    season: { n: 0, peakLeague: 0, matchesAtStart: 0 },
+    cup: { key: '', results: [], claimed: [] },
+    trophies: [],
+    modeStats: {},
     tutorialDone: false,
     last: null,
   };
@@ -24,7 +29,8 @@ function fill(base, raw) {
   for (const k of Object.keys(base)) {
     if (!(k in raw)) continue;
     const b = base[k], r = raw[k];
-    if (isObj(b)) base[k] = fill(b, r);
+    if (isObj(b) && !Object.keys(b).length) base[k] = isObj(r) ? JSON.parse(JSON.stringify(r)) : b;
+    else if (isObj(b)) base[k] = fill(b, r);
     else if (Array.isArray(b)) base[k] = Array.isArray(r) ? r.slice() : b;
     else if (b === null || typeof r === typeof b) base[k] = r;
   }

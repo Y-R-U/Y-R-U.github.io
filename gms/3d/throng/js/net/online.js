@@ -2,6 +2,13 @@
 import { CONFIG } from '../config.js';
 import { PROTO, simVersion, mapVersion, MSG } from './proto.js';
 import { buildMeta, createNetMatch } from './netmatch.js';
+import { liveEvents } from '../meta/events.js';
+
+// Quick match rotates modes on a shared 10-minute UTC clock, Classic every other slot.
+export const QUICK_ROTATION = ['classic', 'teams', 'classic', 'koth', 'classic', 'lcs', 'classic', 'infection'];
+export const quickMode = (t = Date.now()) => QUICK_ROTATION[Math.floor(t / 600000) % QUICK_ROTATION.length];
+// Match-wide events (not Mode of the Day / Giant Slayer, which are coin rules) travel in the match meta.
+export const matchEventIds = (t = Date.now()) => liveEvents(t).map((w) => w.id).filter((id) => id === 'double' || id === 'rush' || id === 'market');
 
 const BACKOFF = [400, 800, 1600, 3200, 6000, 10000];
 
@@ -29,7 +36,8 @@ export const newDeviceId = () => Array.from({ length: 32 }, () => ((Math.random(
 export const newCid = () => rid(22);
 
 // opts: url, map, name, dev, cid, WS (constructor), now(), emit(type, data)
-export function createOnline({ url, map, name = 'Player', dev, cid, cos = null, WS = globalThis.WebSocket, now = () => performance.now(), emit = () => {} }) {
+// pickMode(quick): the mode the host starts (private rooms: the host's pick; quick: the rotation).
+export function createOnline({ url, map, name = 'Player', dev, cid, cos = null, WS = globalThis.WebSocket, now = () => performance.now(), emit = () => {}, pickMode = (quick) => (quick ? quickMode() : 'classic') }) {
   const sim = simVersion(), mv = mapVersion(map);
   let ws = null, status = 'idle', you = null, room = null, match = null, wantOpen = false;
   let attempts = 0, retryT = 0, pingT = 0, rtt = 0, serverOffset = 0, lastPong = 0, giveUpAt = 0;
@@ -179,7 +187,7 @@ export function createOnline({ url, map, name = 'Player', dev, cid, cos = null, 
   function onGo() {
     if (!room || !you || room.host !== you.id || room.state !== 'lobby') return;
     const members = room.members.filter((x) => x.online).slice(0, CONFIG.MATCH.crowds);
-    const meta = buildMeta({ seed: (Math.random() * 1e9) | 0, members });
+    const meta = buildMeta({ seed: (Math.random() * 1e9) | 0, members, mode: pickMode(!!room.quick), events: matchEventIds(Date.now() + serverOffset) });
     req('begin', { meta }).catch((e) => emit('error', { code: e.code, error: e.message }));
   }
 
