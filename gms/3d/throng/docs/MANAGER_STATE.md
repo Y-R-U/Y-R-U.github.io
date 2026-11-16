@@ -161,3 +161,4 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 - G6 landed. Manager re-ran sim_test, meta_test, render_map_test, threat_test, net_test: PASS. Looked at nearby-indicator shots (384x692 classic, 844x390 teams): labels + threat chips + edge arrows read well. NOT re-run by the manager: the three CDP tests (hud_nearby, layout, quality) — G6 reports PASS with break arms.
 - Not verified anywhere: indicators in a browser online match; dpr 2 on the real S22; S Pen as "fine pointer".
 - Next: chain B (G7: D20 match lengths + D21 LCS rating).
+- Chain B LAUNCHED: G7 `a2519909210184cf3` (Opus/high): D20 match lengths + D21 LCS rating. Report → docs/notes/G7_report.md. Server likely changes → read its deploy note, back up /srv/data/throng/throng.db (+ -wal), server first, then static. After shipping B: launch chain C (art pass).
