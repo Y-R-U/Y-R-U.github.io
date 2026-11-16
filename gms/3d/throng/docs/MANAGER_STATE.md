@@ -147,3 +147,12 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 6. D20 match lengths (2/3/5 min rooms, events); D21 LCS counts for rating (after a sweep).
 7. Early-leave row rank; crown at kick-off tie; minified three.js on the box.
 8. Art pass (one agent), then anything else from phone testing (landscape, fullscreen tap, online phone vs Mac still untested).
+
+## STATE @ 2026-11-17 (UNPAUSED — chain of three, ONE agent at a time)
+- Aaron: "start new, kick off an agent to do 1-5 (7 as well). If it finishes, kick off an agent for 6. If that also manages to finish you can start the art pass."
+- Cron tick d1c13959 (17,47 * * * *) re-created for auto-resume.
+- CHAIN:
+  A. G6 `ab4e9116874da32f8` (Opus/high) RUNNING: restart-list items 1–5 + the two display oddities from 7. Report → docs/notes/G6_report.md. Ports cdp 9280-9289 / http 8760-8769. (Minified three.js NOT given to the agent: needs files on the box; manager job at a deploy.)
+  B. After A is verified + shipped: G7 = item 6 (D20 room match lengths 2/3/5 min + event lengths, ladder stays 2:00; D21 LCS counts for rating after a mode_sweep comparison with Classic, scale points if easier; server may need a room field → server deploy).
+  C. After B is shipped: art pass (NEXT item 2 from the wave-4 list; blind critics vs refs/reference.png, weakest R4 items).
+- Each landing: all suites, screenshots, commit explicit paths, push, rsync deploy (server deploy only if server/ changed), then launch the next. Check on Aaron's phone when it is connected (adb may need `adb connect`; never ?auto=1 there).
