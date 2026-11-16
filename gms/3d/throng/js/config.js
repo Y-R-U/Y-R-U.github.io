@@ -135,6 +135,7 @@ export const CONFIG = {
     leaderboardRowsPortrait: 3,
     badgeHeight: 2.6,        // metres above ground for the count pill
     badgeBack: 0.8,          // pill sits this fraction of the radius toward the far side of the crowd
+    outBanner: 3,            // seconds the LCS "OUT!" banner stays before it shrinks to a Spectating chip
     crownClear: 7,           // extra lift for the leader's pill so it clears the 3D crown on small crowds
     floaterWindow: 0.35,     // seconds of recruits merged into one "+N"
     toastTime: 1.9,

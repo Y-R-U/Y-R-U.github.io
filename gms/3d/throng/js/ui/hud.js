@@ -2,6 +2,7 @@ import { CONFIG } from '../config.js';
 import { createMinimap } from './minimap.js';
 import { LEAGUES, badgeSvg } from '../meta/leagues.js';
 import { UI_ICON } from './kit.js';
+import { threatOf, outrightLeader } from './threat.js';
 
 const hex = (c) => '#' + c.toString(16).padStart(6, '0');
 const esc = (s) => String(s).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
@@ -19,6 +20,15 @@ const FX_LABEL = { speed: 'SPEED', magnet: 'MAGNET', double: 'x2 SIZE' };
 const HORDE = CONFIG.MODES.infection.hordeColor;
 ICON.biohazard = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.6"/><path d="M12 2.5a5 5 0 00-2.8 9.2 5 5 0 005.6 0A5 5 0 0012 2.5zM4 15.5a5 5 0 008.1 4.6 5 5 0 00-2.8-4.9 5 5 0 00-5.3.3zM20 15.5a5 5 0 00-5.3-.3 5 5 0 00-2.8 4.9 5 5 0 008.1-4.6z" opacity=".9"/></svg>';
 ICON.zone = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-dasharray="4 3"/><path d="M6.5 14l2-5 3.5 3 3.5-3 2 5z" fill="#ffd23a"/></svg>';
+// Threat glyphs: shape as well as colour (bigger = up, smaller = down), so it reads without colour vision.
+const TH_ICON = {
+  danger: '<svg viewBox="0 0 12 12"><path d="M6 1.2L11.4 10.6H.6z"/></svg>',
+  prey: '<svg viewBox="0 0 12 12"><path d="M6 10.8L.6 1.4h10.8z"/></svg>',
+  even: '<svg viewBox="0 0 12 12"><path d="M1.5 3.2h9v2h-9zM1.5 6.8h9v2h-9z"/></svg>',
+  ally: '<svg viewBox="0 0 12 12"><path d="M6 .8l4.8 1.7v3.6c0 2.7-2.1 4.4-4.8 5.1C3.3 10.5 1.2 8.8 1.2 6.1V2.5z"/></svg>',
+};
+const HUD_BREAK = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('hudbreak') || '' : '';
+const NB_MAX = HUD_BREAK === 'arrows' ? 0 : 4;
 ICON.circle = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
 
 // The zones the current mode draws: { x, z, r, color, style: 'crown'|'next'|'safe'|'safe-next' }.
@@ -60,18 +70,27 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
       <div class="mm-wrap"><canvas class="mm"></canvas></div>
     </div>
     <div class="powerups"></div>
-    <div class="edge-arrow hidden"><div class="ea-in"><span class="ea-crown">${ICON.crown}</span><b></b></div><i></i></div>
-    <div class="edge-arrow zone-arrow hidden"><div class="ea-in"><span class="ea-crown"></span><b></b></div><i></i></div>
+    <div class="nb-arrows"></div>
+    <div class="edge-arrow zone-arrow hidden"><div class="ea-in"><span class="ea-crown"></span><b></b></div><i><s></s></i></div>
     <div class="toasts"></div>
     <div class="emotes"></div>
     <div class="countdown"></div>
     <div class="net-pill hidden"><i></i><span></span></div>
-    <div class="dead-veil hidden"><div class="dv-title">ABSORBED!</div><div class="dv-sub"></div></div>`;
+    <div class="dead-veil hidden"><div class="dv-title">ABSORBED!</div><div class="dv-sub"></div></div>
+    <div class="spec-chip hidden"><b>SPECTATING</b><span></span></div>`;
   const $ = (s) => root.querySelector(s);
   const timerEl = $('.timer'), timerT = $('.timer .t'), killsB = $('.kills b');
   const lb = $('.lb'), badgesEl = $('.badges'), floatersEl = $('.floaters'), toastsEl = $('.toasts');
   const countdownEl = $('.countdown'), powerEl = $('.powerups'), deadVeil = $('.dead-veil'), deadSub = $('.dv-sub');
-  const edge = $('.edge-arrow'), edgeB = edge.querySelector('b'), edgeI = edge.querySelector('i');
+  const arrowsEl = $('.nb-arrows');
+  const arrows = [];
+  for (let k = 0; k < NB_MAX + 1; k++) {
+    const d = document.createElement('div');
+    d.className = 'edge-arrow nb hidden';
+    d.innerHTML = `<div class="ea-in"><span class="ea-crown">${ICON.crown}</span><span class="ea-th"></span><b></b></div><i><s></s></i>`;
+    arrowsEl.appendChild(d);
+    arrows.push({ el: d, th: d.querySelector('.ea-th'), b: d.querySelector('b'), i: d.querySelector('i'), shown: false, idx: -1, t: '', n: '', lead: false, x: -999, y: -999, a: 99, c: '' });
+  }
   const pauseBtn = $('.pause-btn'), emotesEl = $('.emotes');
   pauseBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
   pauseBtn.addEventListener('click', (e) => { e.stopPropagation(); onPause(); });
@@ -79,7 +98,8 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
   const modePill = $('.mode-pill'), modeIco = $('.mp-ico'), modeT = $('.mp-t'), teamBar = $('.team-bar'), zoneWarn = $('.zone-warn');
   const ringCv = $('.zone-ring'), ringG = ringCv.getContext('2d');
   const zArrow = $('.zone-arrow'), zArrowB = zArrow.querySelector('b'), zArrowI = zArrow.querySelector('i'), zArrowIco = zArrow.querySelector('.ea-crown');
-  let mode = 'classic', lastMode = '', zones = [], ringDrawn = false, dead = false;
+  let mode = 'classic', lastMode = '', zones = [], ringDrawn = false, dead = false, outT = 0, hitBy = -1, hitAt = -99;
+  const specChip = $('.spec-chip'), specName = specChip.querySelector('span');
 
   let me = 0, rows = [], badges = [], meta = [], toastStyle = '', emotes = [];
   let lastTimer = '', lastKills = -1, lastCd = '';
@@ -112,7 +132,8 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
       teamBar.querySelector('.tb-b i').textContent = (mine === 1 ? 'YOU · ' : '') + sides[1].name.toUpperCase();
     }
     zoneWarn.classList.add('hidden');
-    zones = []; ringDrawn = false; dead = false;
+    zones = []; ringDrawn = false; dead = false; outT = 0; hitBy = -1; hitAt = -99;
+    specChip.classList.add('hidden'); specName.textContent = ''; deadVeil.classList.remove('final');
     ringG.clearRect(0, 0, ringCv.width, ringCv.height);
     toastStyle = ' ts-' + ts;
     emotesEl.innerHTML = ''; emotes = [];
@@ -133,16 +154,17 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
       const b = document.createElement('div');
       b.className = 'badge hidden' + (i === me ? ' me bs-' + badge : '');
       b.style.setProperty('--c', hex(p.color));
-      b.innerHTML = `<span class="b-crown">${ICON.crown}</span><span class="b-n">0</span>`;
+      b.innerHTML = `<span class="b-crown">${ICON.crown}</span><span class="b-n"><i class="b-th"></i><span class="b-v">0</span></span>`;
       badgesEl.appendChild(b);
-      return { el: b, n: b.querySelector('.b-n'), lastN: -1, shown: false, lead: false, x: -999, y: -999 };
+      return { el: b, n: b.querySelector('.b-v'), pill: b.querySelector('.b-n'), th: b.querySelector('.b-th'), t: '', lastN: -1, shown: false, lead: false, x: -999, y: -999 };
     });
     minimap.setMap(map);
     lastTimer = ''; lastKills = -1; lastCd = ''; lastLeadToast = -99; said30 = false;
     recruitAcc = stealIn = stealOut = 0;
     for (const k in fxEls) { fxEls[k].on = false; fxEls[k].el.classList.remove('on'); }
     deadVeil.classList.add('hidden');
-    edge.classList.add('hidden');
+    for (const a of arrows) { a.shown = false; a.el.classList.add('hidden'); a.idx = -1; }
+    measureFont(); rectsAt = -1;
   }
 
   function toast(title, { sub = '', color = '', cls = '' } = {}) {
@@ -172,7 +194,7 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
   }
 
   // Badges sit over the far edge of the crowd disc (as seen from the camera), clear of the 3D crown.
-  function crowdScreen(state, i, alpha, yOff = 0) {
+  function crowdScreen(state, i, alpha, yOff = 0, lead = state.leader) {
     const r = getRenderer();
     const c = state.crowds[i];
     let yaw = 0;
@@ -180,7 +202,7 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
     const back = c.radius * CONFIG.UI.badgeBack;
     const x = c.px + (c.x - c.px) * alpha - Math.sin(yaw) * back, z = c.pz + (c.z - c.pz) * alpha - Math.cos(yaw) * back;
     let y = CONFIG.UI.badgeHeight + yOff;
-    if (state.leader === i && !r.debug2d) {
+    if (lead === i && !r.debug2d) {
       let top = NaN;
       if (typeof r.crownTop === 'function') { try { top = r.crownTop(); } catch {} }
       y = Number.isFinite(top) ? Math.max(y, top + 0.6) : y + Math.max(0, CONFIG.UI.crownClear - c.radius * 0.45);
@@ -199,15 +221,20 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
           break;
         case 'steal':
           if (e.to === me) stealIn += e.n;
-          else if (e.from === me) stealOut += e.n;
+          else if (e.from === me) { stealOut += e.n; hitBy = e.to; hitAt = state.time; }
+          break;
+        case 'bleed':
+          if (e.crowd === me) { hitBy = -1; hitAt = state.time; }
           break;
         case 'elim':
           if (e.by === me) toast('ABSORBED', { sub: name(e.victim), cls: 'big' + toastStyle });
           else if (e.victim === me) {
-            const out = mode === 'lcs';
-            deadVeil.querySelector('.dv-title').textContent = out ? 'OUT!' : 'ABSORBED!';
-            deadSub.innerHTML = (e.by >= 0 ? 'by ' + name(e.by) : 'lost outside the circle') + (out ? '<br><small>No respawns in Last Crowd Standing. Watching the rest…</small>' : '');
-            deadVeil.classList.remove('hidden'); dead = out;
+            if (mode === 'lcs') knockedOut(state, e.by);
+            else {
+              deadVeil.querySelector('.dv-title').textContent = 'ABSORBED!';
+              deadSub.innerHTML = 'by ' + name(e.by);
+              deadVeil.classList.remove('hidden', 'final');
+            }
           }
           break;
         case 'respawn':
@@ -250,12 +277,17 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
     if (!said30 && state.phase === 'play' && state.timeLeft <= 30) { said30 = true; toast('30 SECONDS LEFT!', { cls: 'warn' }); }
     if (mc.kills !== lastKills) { lastKills = mc.kills; killsB.textContent = mc.kills; }
     if (mode !== 'classic') modeHud(state, mc);
-    if (mode === 'lcs' && mc.out && !dead) {
-      dead = true;
-      deadVeil.querySelector('.dv-title').textContent = 'OUT!';
-      deadSub.innerHTML = '<small>No respawns in Last Crowd Standing. Watching the rest…</small>';
-      deadVeil.classList.remove('hidden');
-    }
+    // The knock-out was missed (catch-up after a hidden tab, a late join): name whoever was last eating you.
+    if (mode === 'lcs' && mc.out && !dead) knockedOut(state, state.time - hitAt < 2 ? hitBy : -1);
+    if (dead) {
+      const now = performance.now();
+      if (state.phase === 'over') { if (!deadVeil.classList.contains('hidden') || !specChip.classList.contains('hidden')) { deadVeil.classList.add('hidden'); specChip.classList.add('hidden'); } }
+      else if (now - outT > CONFIG.UI.outBanner * 1000) {
+        if (!deadVeil.classList.contains('hidden')) { deadVeil.classList.add('hidden'); specChip.classList.remove('hidden'); }
+        const L = state.crowds[state.leader], nm = L && L.alive && meta[L.index] ? meta[L.index].name : '';
+        if (specName.textContent !== nm) specName.textContent = nm;
+      }
+    } else if (state.phase === 'over' && !deadVeil.classList.contains('hidden')) deadVeil.classList.add('hidden');
 
     let cd = '';
     if (state.phase === 'countdown') cd = String(Math.max(1, Math.ceil(state.countdownLeft)));
@@ -270,8 +302,9 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
     }
 
     // Leaderboard: top N plus the player's row, sliding into place. Portrait shows fewer rows.
-    const nRows = window.innerHeight > window.innerWidth ? CONFIG.UI.leaderboardRowsPortrait : CONFIG.UI.leaderboardRows;
-    if (nRows !== lbRows) { lbRows = nRows; lb.style.setProperty('--rows', nRows); for (const r of rows) r.lastSlot = -1; }
+    const nRows = window.innerHeight > window.innerWidth || (window.innerHeight < 420 && window.innerWidth < 600) ? CONFIG.UI.leaderboardRowsPortrait : CONFIG.UI.leaderboardRows;
+    if (nRows !== lbRows) { lbRows = nRows; lb.style.setProperty('--rows', nRows); for (const r of rows) r.lastSlot = -1; rectsAt = -1; }
+    const king = state.phase === 'countdown' ? -1 : outrightLeader(state);
     for (const c of state.crowds) {
       const r = rows[c.index];
       let slot = c.rank - 1;
@@ -282,16 +315,16 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
         r.el.style.transform = `translateY(${slot * 100}%)`;
         r.el.classList.toggle('off', hidden);
         r.el.classList.toggle('sep', slot === nRows && !hidden);
-        r.el.classList.toggle('first', c.rank === 1);
         r.lastSlot = slot; r.hidden = hidden;
       }
+      if ((c.index === king) !== r.first) { r.first = c.index === king; r.el.classList.toggle('first', r.first); }
       if (c.rank !== r.lastRank) { r.rank.textContent = c.rank; r.lastRank = c.rank; }
       const v = rowValue(c);
       if (v !== r.lastN) { r.n.textContent = v; r.lastN = v; }
       if (!!c.horde !== r.horde) { r.horde = !!c.horde; r.el.classList.toggle('horde', r.horde); r.ico.innerHTML = r.horde ? ICON.biohazard : ICON.person; if (r.horde) r.el.style.setProperty('--c', hex(HORDE)); }
       if (!!c.out !== r.out) { r.out = !!c.out; r.el.classList.toggle('out', r.out); }
     }
-    lb.classList.toggle('has-sep', mc.rank > nRows);
+    if ((mc.rank > nRows) !== lb.classList.contains('has-sep')) { lb.classList.toggle('has-sep', mc.rank > nRows); rectsAt = -1; }
 
     // Pills and floaters shrink as the camera pulls out (pixels per metre at your crowd, viewport-normalised).
     if (hudOn && (frameN++ % 10) === 0 && mc.alive) {
@@ -306,40 +339,9 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
       }
     }
 
-    // Count badges over every crowd.
+    // Count labels over crowds on screen; edge arrows for the nearest ones off it (and the leader).
     if (hudOn) {
-      for (const c of state.crowds) {
-        const b = badges[c.index];
-        let show = c.alive;
-        if (show) {
-          crowdScreen(state, c.index, alpha);
-          show = proj.visible && Number.isFinite(proj.x);
-          const bx = proj.x, by = proj.y;
-          centreScreen(state, c.index, alpha);
-          const W = window.innerWidth, H = window.innerHeight;
-          if (Number.isFinite(proj.x) && proj.x > 0 && proj.x < W && proj.y > 0 && proj.y < H) {
-            // Crowd is on screen but its pill would be off the edge: pin the pill inside.
-            proj.x = Math.min(W - 30, Math.max(30, Number.isFinite(bx) ? bx : proj.x));
-            proj.y = Math.min(H - 10, Math.max(44, Number.isFinite(by) ? by : proj.y));
-            show = true;
-          } else { proj.x = bx; proj.y = by; }
-        }
-        if (show !== b.shown) { b.el.classList.toggle('hidden', !show); b.shown = show; }
-        if (!show) continue;
-        if (Math.abs(proj.x - b.x) > 0.3 || Math.abs(proj.y - b.y) > 0.3) {
-          b.x = proj.x; b.y = proj.y;
-          b.el.style.transform = `translate3d(${proj.x.toFixed(1)}px, ${proj.y.toFixed(1)}px, 0) translate(-50%, -100%)`;
-        }
-        if (!!c.horde !== !!b.horde) { b.horde = !!c.horde; b.el.classList.toggle('horde', b.horde); b.el.style.setProperty('--c', hex(b.horde ? HORDE : meta[c.index].color)); }
-        if (c.count !== b.lastN) {
-          if (c.index === me && c.count > b.lastN && b.lastN > 0) { b.el.classList.remove('bump'); void b.el.offsetWidth; b.el.classList.add('bump'); }
-          b.n.textContent = c.count; b.lastN = c.count;
-        }
-        const lead = state.leader === c.index && state.phase !== 'countdown' && !!getRenderer().debug2d;
-        if (lead !== b.lead) { b.el.classList.toggle('lead', lead); b.lead = lead; }
-      }
-      edgeArrow(state);
-      zoneArrow(state, mc);
+      indicators(state, alpha, mc);
     }
 
     // "+N" floaters, merged over a short window so a sweep reads as one number.
@@ -358,7 +360,7 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
     for (const k in fxEls) {
       const f = fxEls[k], v = mc.alive ? mc.fx[k] : 0;
       const on = v > 0;
-      if (on !== f.on) { f.on = on; f.el.classList.toggle('on', on); }
+      if (on !== f.on) { f.on = on; f.el.classList.toggle('on', on); rectsAt = -1; }
       if (on) f.ring.style.setProperty('--p', (v / CONFIG.SIM.fx[k].dur).toFixed(3));
     }
 
@@ -366,6 +368,15 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
     if (hudOn) minimap.draw(state, me, getRenderer().cameraYaw(), alpha, zones);
     if (hudOn && !(getRenderer().setZones)) drawRing(zones); else if (ringDrawn) { ringG.clearRect(0, 0, ringCv.width, ringCv.height); ringDrawn = false; }
     if (emotes.length) drawEmotes(state, alpha);
+  }
+
+  function knockedOut(state, by) {
+    dead = true; outT = performance.now();
+    deadVeil.querySelector('.dv-title').textContent = 'OUT!';
+    deadSub.innerHTML = (by >= 0 && meta[by] ? 'Knocked out by ' + name(by) : 'The circle got you') + '<br><small>No respawns in Last Crowd Standing</small>';
+    deadVeil.classList.add('final');
+    deadVeil.classList.remove('hidden');
+    specChip.classList.add('hidden');
   }
 
   function rowValue(c) {
@@ -469,64 +480,221 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
     }
   }
 
-  let rectsAt = -1, rects = [];
+  let rectsAt = -1, rects = [], joyShown = false, fs = 13;
+  const joyEl = () => document.querySelector('.joy');
+  function measureFont() { const v = parseFloat(getComputedStyle(root).fontSize); if (v > 0) fs = v; }
+  // Everything an indicator must not cover: HUD panels, the joystick while it is up, the account badge.
   function panelRects() {
     const t = performance.now();
+    const j = joyEl(), js = !!j && !j.classList.contains('hidden');
+    if (js !== joyShown) { joyShown = js; rectsAt = -1; }
     if (t - rectsAt > 500) {
       rectsAt = t;
-      rects = ['.hud-tl', '.lb', '.mm-wrap', '.powerups'].map((s) => root.querySelector(s).getBoundingClientRect()).filter((r) => r.width > 0);
+      const list = ['.hud-tl', '.lb', '.mm-wrap', '.powerups', '.team-bar', '.net-pill', '.zone-warn'].map((s) => root.querySelector(s).getBoundingClientRect());
+      if (js) list.push(j.querySelector('.joy-base').getBoundingClientRect());
+      const acc = document.getElementById('br8t-account'), fab = acc && acc.shadowRoot && acc.shadowRoot.querySelector('.fab');
+      if (fab) list.push(fab.getBoundingClientRect());
+      if (HUD_BREAK === 'avoid') list.length = 0;
+      rects = list.filter((r) => r.width > 0 && r.height > 0).map((r) => ({ l: r.left - 3, t: r.top - 3, r: r.right + 3, b: r.bottom + 3 }));
     }
     return rects;
   }
+  const hit = (a, b) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
+  function clear(R, list, W, H) {
+    if (R.l < 0 || R.t < 0 || R.r > W || R.b > H) return false;
+    for (const o of list) if (hit(R, o)) return false;
+    return true;
+  }
+  const blocked = [], dbg = [];
+  let ppm = 0;
 
-  function edgeArrow(state) {
-    const li = state.leader;
-    const c = state.crowds[li];
-    if (li === me || !c.alive || state.phase !== 'play') { edge.classList.add('hidden'); return; }
-    getRenderer().project(c.x, 2, c.z, proj);
-    const W = window.innerWidth, H = window.innerHeight;
-    const inView = proj.visible && proj.x > 0 && proj.x < W && proj.y > 0 && proj.y < H;
-    if (inView || !Number.isFinite(proj.x)) { edge.classList.add('hidden'); return; }
-    const cx = W / 2, cy = H / 2;
-    let dx = proj.x - cx, dy = proj.y - cy;
-    if (!proj.visible && proj.behind) { dx = -dx; dy = -dy; }
-    const m = 46;
-    const k = Math.min(Math.abs((cx - m) / (dx || 1e-6)), Math.abs((cy - m) / (dy || 1e-6)));
-    let x = cx + dx * k, y = cy + dy * k;
-    // Slide along the screen edge until clear of HUD panels.
-    for (const r of panelRects()) {
-      if (x < r.left - 30 || x > r.right + 30 || y < r.top - 26 || y > r.bottom + 26) continue;
-      const sideEdge = Math.abs(x - m) < 2 || Math.abs(x - (W - m)) < 2;
-      if (sideEdge) y = (r.top + r.bottom) / 2 < cy ? r.bottom + 30 : r.top - 30;
-      else x = (r.left + r.right) / 2 < cx ? r.right + 34 : r.left - 34;
-    }
-    edge.classList.remove('hidden');
-    edge.style.setProperty('--c', hex(c.color));
-    edge.style.transform = `translate3d(${x.toFixed(0)}px, ${y.toFixed(0)}px, 0)`;
-    edgeI.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
-    if (edgeB.textContent !== String(c.count)) edgeB.textContent = c.count;
+  // Label rect from its bottom-centre anchor; nudged out of anything it covers, or dropped (returns null).
+  function placeLabel(x, y, hw, h, dn, W, H, force) {
+    x = Math.min(W - hw - 2, Math.max(hw + 2, x)); y = Math.min(H - dn - 2, Math.max(h + 2, y));
+    const R = { l: x - hw, r: x + hw, t: y - h, b: y + dn };
+    if (clear(R, blocked, W, H)) return R;
+    let best = null, bd = Infinity;
+    const tryAround = (x0, y0, o, depth) => {
+      for (const [nx, ny] of [[x0, o.t - dn - 1], [x0, o.b + h + 1], [o.l - hw - 1, y0], [o.r + hw + 1, y0]]) {
+        const d = Math.abs(nx - x) + Math.abs(ny - y);
+        if (d >= bd) continue;
+        const C = { l: nx - hw, r: nx + hw, t: ny - h, b: ny + dn };
+        if (clear(C, blocked, W, H)) { best = C; bd = d; continue; }
+        if (depth > 0) for (const o2 of blocked) if (o2 !== o && hit(C, o2)) tryAround(nx, ny, o2, depth - 1);
+      }
+    };
+    for (const o of blocked) if (hit(R, o)) tryAround(x, y, o, 1);
+    return best || (force ? R : null);
   }
 
-  // Pin an arrow on the screen edge toward a world point that is off screen. Returns false if it is on screen.
-  function pinEdge(el, arrowI, x, z) {
-    getRenderer().project(x, 2, z, proj);
-    const W = window.innerWidth, H = window.innerHeight;
-    if (!Number.isFinite(proj.x) || (proj.visible && proj.x > 0 && proj.x < W && proj.y > 0 && proj.y < H)) return false;
-    const cx = W / 2, cy = H / 2;
-    let dx = proj.x - cx, dy = proj.y - cy;
-    if (!proj.visible && proj.behind) { dx = -dx; dy = -dy; }
-    const m = 46;
-    const k = Math.min(Math.abs((cx - m) / (dx || 1e-6)), Math.abs((cy - m) / (dy || 1e-6)));
-    let ex = cx + dx * k, ey = cy + dy * k;
-    for (const r of panelRects()) {
-      if (ex < r.left - 30 || ex > r.right + 30 || ey < r.top - 26 || ey > r.bottom + 26) continue;
-      const sideEdge = Math.abs(ex - m) < 2 || Math.abs(ex - (W - m)) < 2;
-      if (sideEdge) ey = (r.top + r.bottom) / 2 < cy ? r.bottom + 30 : r.top - 30;
-      else ex = (r.left + r.right) / 2 < cx ? r.right + 34 : r.left - 34;
+  // A point on the inset screen rectangle, by distance t clockwise from its top-left corner.
+  function perim(t, m, W, H, out) {
+    const w = W - 2 * m, h = H - 2 * m, P = 2 * (w + h);
+    t = ((t % P) + P) % P;
+    if (t < w) { out.x = m + t; out.y = m; } else if (t < w + h) { out.x = W - m; out.y = m + t - w; }
+    else if (t < 2 * w + h) { out.x = W - m - (t - w - h); out.y = H - m; } else { out.x = m; out.y = H - m - (t - 2 * w - h); }
+    return out;
+  }
+  function perimT(x, y, m, W, H) {
+    const w = W - 2 * m, h = H - 2 * m;
+    const dT = Math.abs(y - m), dR = Math.abs(x - (W - m)), dB = Math.abs(y - (H - m)), dL = Math.abs(x - m), mn = Math.min(dT, dR, dB, dL);
+    if (mn === dT) return x - m;
+    if (mn === dR) return w + (y - m);
+    if (mn === dB) return w + h + (W - m - x);
+    return 2 * w + h + (H - m - y);
+  }
+  const pt = { x: 0, y: 0 };
+  // The pointer is a 1.15em x .9em box orbiting 1.4em..2.55em out from the arrow's centre.
+  function arrowRect(x, y, hw, hh, top, ang, out) {
+    const c = Math.cos(ang), s = Math.sin(ang);
+    out.l = x - hw; out.r = x + hw; out.t = y - hh - top; out.b = y + hh;
+    for (const u of [1.4, 2.55]) for (const v of [-0.45, 0.45]) {
+      const px = x + (u * c - v * s) * fs, py = y + (u * s + v * c) * fs;
+      if (px < out.l) out.l = px; if (px > out.r) out.r = px; if (py < out.t) out.t = py; if (py > out.b) out.b = py;
     }
-    el.style.transform = `translate3d(${ex.toFixed(0)}px, ${ey.toFixed(0)}px, 0)`;
-    arrowI.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
-    return true;
+    out.l -= 1; out.r += 1; out.t -= 1; out.b += 1;
+    return out;
+  }
+  // Pin an arrow on the screen edge toward a projected point (tx, ty; behind = projected from behind the camera).
+  // Slides along the edge until clear of the HUD and the other indicators. Returns { x, y, ang, R } or null.
+  function placeEdge(tx, ty, behind, hw, hh, top, W, H) {
+    const cx = W / 2, cy = H / 2;
+    let dx = tx - cx, dy = ty - cy;
+    if (behind) { dx = -dx; dy = -dy; }
+    if (!dx && !dy) dy = 1;
+    const m = Math.max(34, 2.45 * fs);
+    const k = Math.min(Math.abs((cx - m) / (dx || 1e-6)), Math.abs((cy - m) / (dy || 1e-6)));
+    const t0 = perimT(cx + dx * k, cy + dy * k, m, W, H), P = 2 * (W + H - 4 * m);
+    const far = behind ? 1e5 : 1;
+    const gx = behind ? cx + dx * far : tx, gy = behind ? cy + dy * far : ty;
+    const R = { l: 0, t: 0, r: 0, b: 0 };
+    for (let s = 0, step = Math.max(6, fs * 0.6); s * step < P / 2; s++) {
+      for (const sg of s ? [1, -1] : [1]) {
+        perim(t0 + sg * s * step, m, W, H, pt);
+        const ang = Math.atan2(gy - pt.y, gx - pt.x);
+        arrowRect(pt.x, pt.y, hw, hh, top, ang, R);
+        if (clear(R, blocked, W, H)) return { x: pt.x, y: pt.y, ang, R };
+      }
+    }
+    return null;
+  }
+  const ARW = (digits) => ({ hw: (1.95 + 0.6 * digits) * fs * 0.95 / 2 + 1, hh: 1.45 * fs * 0.95 / 2 + 1 });
+
+  const cand = [], lab = [];
+  function indicators(state, alpha, mc) {
+    const r = getRenderer(), W = window.innerWidth, H = window.innerHeight;
+    const lead = state.phase === 'countdown' ? -1 : outrightLeader(state);
+    blocked.length = 0;
+    for (const o of panelRects()) blocked.push(o);
+    zoneArrow(state, mc);
+    const meAlive = mc.alive;
+    if (meAlive) {
+      const a = { x: 0, y: 0 }, b = { x: 0, y: 0 };
+      r.project(mc.x, 0, mc.z, a); r.project(mc.x + 10, 0, mc.z, b);
+      const v = Math.hypot(b.x - a.x, b.y - a.y) / 10;
+      if (Number.isFinite(v) && v > 0) ppm = v;
+    }
+    const range = ppm > 0 ? 1.3 * Math.hypot(W, H) / 2 / ppm : 0;
+    const mx = mc.px + (mc.x - mc.px) * alpha, mz = mc.pz + (mc.z - mc.pz) * alpha;
+    cand.length = 0; lab.length = 0; dbg.length = 0;
+    for (const c of state.crowds) {
+      const D = { index: c.index, kind: 'none', why: '', threat: '', on: false, range: false, d: 0, rect: null };
+      dbg.push(D);
+      const b = badges[c.index];
+      if (!c.alive) { D.why = 'dead'; continue; }
+      const t = c.index === me || !meAlive ? '' : threatOf(mc, c, mode, HUD_BREAK === 'threat' ? 0.5 : undefined);
+      D.threat = t;
+      centreScreen(state, c.index, alpha);
+      const on = Number.isFinite(proj.x) && proj.visible && proj.x >= 0 && proj.x <= W && proj.y >= 0 && proj.y <= H;
+      const ux = proj.x, uy = proj.y, behind = !proj.visible && !!proj.behind;
+      const x = c.px + (c.x - c.px) * alpha, z = c.pz + (c.z - c.pz) * alpha;
+      D.d = Math.max(0, Math.hypot(x - mx, z - mz) - c.radius - mc.radius);
+      D.on = on;
+      D.range = c.index !== me && meAlive && D.d <= range;
+      if (on || c.index === me) {
+        crowdScreen(state, c.index, alpha, 0, lead);
+        lab.push({ c, b, t, D, x: Number.isFinite(proj.x) ? proj.x : ux, y: Number.isFinite(proj.y) ? proj.y : uy, ok: on || (proj.visible && Number.isFinite(proj.x)) });
+      } else if (Number.isFinite(ux) && state.phase === 'play' && (D.range || c.index === lead)) {
+        cand.push({ c, t, D, ux, uy, behind });
+      } else D.why = D.range ? 'phase' : 'far';
+    }
+
+    // Labels: yours first, then nearest first; a label that cannot be placed clear is dropped (the farther one).
+    lab.sort((p, q) => (p.c.index === me ? -1 : q.c.index === me ? 1 : p.D.d - q.D.d));
+    const bs = pillScale;
+    for (const L of lab) {
+      const { c, b, D } = L;
+      let R = null;
+      if (L.ok) {
+        const f = fs * bs * (c.index === me ? 1.4 : 1.15), digits = String(c.count).length;
+        const hw = Math.max(2.6, 1.3 + 0.62 * digits) * f / 2 + (L.t ? 0.6 * f : 0) + 2, h = 1.5 * f + 2, dn = 0.45 * f + 1;
+        const crownH = b.lead ? 1.45 * fs * bs : 0;
+        R = placeLabel(L.x, L.y, hw, h + crownH, dn, W, H, c.index === me);
+        if (R) {
+          const ax = (R.l + R.r) / 2, ay = R.b - dn;
+          if (Math.abs(ax - b.x) > 0.3 || Math.abs(ay - b.y) > 0.3) {
+            b.x = ax; b.y = ay;
+            b.el.style.transform = `translate3d(${ax.toFixed(1)}px, ${ay.toFixed(1)}px, 0) translate(-50%, -100%)`;
+          }
+          blocked.push(R);
+        }
+      }
+      const show = !!R;
+      if (show !== b.shown) { b.el.classList.toggle('hidden', !show); b.shown = show; }
+      D.kind = show ? 'label' : 'none'; D.why = show ? '' : 'overlap'; D.rect = R;
+      if (show) badgeText(state, c, b, L.t, lead);
+      else if (c.index !== me && state.phase === 'play') {
+        // Under the HUD or boxed in: point at it from the screen edge instead.
+        centreScreen(state, c.index, alpha);
+        if (Number.isFinite(proj.x)) cand.push({ c, t: L.t, D, ux: proj.x, uy: proj.y, behind: false, near: true });
+      }
+    }
+    for (const c of state.crowds) {
+      const b = badges[c.index];
+      if (b.shown && dbg[c.index].kind !== 'label') { b.el.classList.add('hidden'); b.shown = false; }
+    }
+
+    // Arrows: the leader always, plus the NB_MAX nearest within range.
+    cand.sort((p, q) => p.D.d - q.D.d);
+    let n = 0, k = 0;
+    for (const A of cand) {
+      const isLead = A.c.index === lead;
+      if (!isLead && n >= NB_MAX && !A.near) { A.D.why = 'cap'; continue; }
+      const digits = String(A.c.count).length, { hw, hh } = ARW(digits);
+      const P = placeEdge(A.ux, A.uy, A.behind, hw, hh, isLead ? 1.05 * fs : 0, W, H);
+      if (!P) { A.D.why = 'nospace'; continue; }
+      if (!isLead) n++;
+      blocked.push(P.R);
+      A.D.kind = 'arrow'; A.D.rect = P.R; A.D.why = A.near ? 'under' : '';
+      setArrow(arrows[k++], A, P, isLead);
+    }
+    for (; k < arrows.length; k++) if (arrows[k].shown) { arrows[k].shown = false; arrows[k].idx = -1; arrows[k].el.classList.add('hidden'); }
+  }
+
+  function badgeText(state, c, b, t, lead) {
+    if (!!c.horde !== !!b.horde) { b.horde = !!c.horde; b.el.classList.toggle('horde', b.horde); b.el.style.setProperty('--c', hex(b.horde ? HORDE : meta[c.index].color)); }
+    if (c.count !== b.lastN) {
+      if (c.index === me && c.count > b.lastN && b.lastN > 0) { b.el.classList.remove('bump'); void b.el.offsetWidth; b.el.classList.add('bump'); }
+      b.n.textContent = c.count; b.lastN = c.count;
+    }
+    if (t !== b.t) { b.t = t; b.el.dataset.th = t; b.th.innerHTML = t ? TH_ICON[t] : ''; }
+    const ld = lead === c.index && !!getRenderer().debug2d;
+    if (ld !== b.lead) { b.el.classList.toggle('lead', ld); b.lead = ld; }
+  }
+
+  function setArrow(a, A, P, isLead) {
+    const c = A.c;
+    if (!a.shown) { a.shown = true; a.el.classList.remove('hidden'); }
+    a.idx = c.index;
+    if (Math.abs(P.x - a.x) > 0.3 || Math.abs(P.y - a.y) > 0.3) { a.x = P.x; a.y = P.y; a.el.style.transform = `translate3d(${P.x.toFixed(1)}px, ${P.y.toFixed(1)}px, 0)`; }
+    if (Math.abs(P.ang - a.a) > 0.01) { a.a = P.ang; a.i.style.transform = `rotate(${P.ang.toFixed(3)}rad)`; }
+    const t = A.t || 'even';
+    if (t !== a.t) { a.t = t; a.el.dataset.th = t; a.th.innerHTML = TH_ICON[t]; }
+    if (isLead !== a.lead) { a.lead = isLead; a.el.classList.toggle('lead', isLead); }
+    const col = hex(c.horde ? HORDE : meta[c.index].color);
+    if (col !== a.c) { a.c = col; a.el.style.setProperty('--cc', col); }
+    const nn = String(c.count);
+    if (nn !== a.n) { a.n = nn; a.b.textContent = nn; }
   }
 
   // King: the crown zone when it is off screen. LCS: the safe circle when you are outside it.
@@ -538,12 +706,27 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
       const c = state.circle;
       if ((mc.x - c.x) ** 2 + (mc.z - c.z) ** 2 > c.r * c.r) { t = c; ico = ICON.circle; label = 'SAFE'; }
     }
-    const show = !!t && pinEdge(zArrow, zArrowI, t.x, t.z);
-    zArrow.classList.toggle('hidden', !show);
+    let P = null;
+    if (t) {
+      getRenderer().project(t.x, 2, t.z, proj);
+      const W = window.innerWidth, H = window.innerHeight;
+      const on = proj.visible && proj.x > 0 && proj.x < W && proj.y > 0 && proj.y < H;
+      if (Number.isFinite(proj.x) && !on) {
+        const { hw, hh } = ARW(label.length + 2);
+        P = placeEdge(proj.x, proj.y, !proj.visible && !!proj.behind, hw, hh, 0, W, H);
+      }
+    }
+    const show = !!P;
+    if (show === zArrow.classList.contains('hidden')) zArrow.classList.toggle('hidden', !show);
+    zoneRect = P ? P.R : null;
     if (!show) return;
+    blocked.push(P.R);
+    zArrow.style.transform = `translate3d(${P.x.toFixed(1)}px, ${P.y.toFixed(1)}px, 0)`;
+    zArrowI.style.transform = `rotate(${P.ang.toFixed(3)}rad)`;
     if (zArrowIco.dataset.k !== mode) { zArrowIco.dataset.k = mode; zArrowIco.innerHTML = ico; }
     if (zArrowB.textContent !== label) zArrowB.textContent = label;
   }
+  let zoneRect = null;
 
   // Online: a crowd changed hands (late joiner) → its name in the board and toasts.
   function setName(i, n) {
@@ -563,8 +746,9 @@ export function createHud({ root, audio, getRenderer, onPause = () => {} }) {
   return {
     setMatch, update, toast, emote, setName, setNet,
     get zones() { return zones; },
+    get indicators() { return { list: dbg, zone: zoneRect, blockers: rects, fs }; },
     show(v) { root.classList.toggle('hidden', !v); },
     setHudVisible(v) { hudOn = v; root.classList.toggle('bare', !v); },
-    resize() { minimap.resize(); },
+    resize() { minimap.resize(); measureFont(); rectsAt = -1; },
   };
 }

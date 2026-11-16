@@ -156,3 +156,8 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
   B. After A is verified + shipped: G7 = item 6 (D20 room match lengths 2/3/5 min + event lengths, ladder stays 2:00; D21 LCS counts for rating after a mode_sweep comparison with Classic, scale points if easier; server may need a room field → server deploy).
   C. After B is shipped: art pass (NEXT item 2 from the wave-4 list; blind critics vs refs/reference.png, weakest R4 items).
 - Each landing: all suites, screenshots, commit explicit paths, push, rsync deploy (server deploy only if server/ changed), then launch the next. Check on Aaron's phone when it is connected (adb may need `adb connect`; never ?auto=1 there).
+
+## STATE @ 2026-11-17 (chain A shipped)
+- G6 landed. Manager re-ran sim_test, meta_test, render_map_test, threat_test, net_test: PASS. Looked at nearby-indicator shots (384x692 classic, 844x390 teams): labels + threat chips + edge arrows read well. NOT re-run by the manager: the three CDP tests (hud_nearby, layout, quality) — G6 reports PASS with break arms.
+- Not verified anywhere: indicators in a browser online match; dpr 2 on the real S22; S Pen as "fine pointer".
+- Next: chain B (G7: D20 match lengths + D21 LCS rating).

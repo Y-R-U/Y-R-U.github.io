@@ -198,6 +198,7 @@ Behaviour:
 Renderer extras added in R3:
 - `stats()` also returns `hats`, `heroes`, `culled` (figures outside the view, not uploaded) and `uploadKB` (instance bytes per frame).
 - It also returns `ms`: `{ update, write, other, submit }` (EMA ms of the renderer's JS stages).
+- (G6) Adaptive quality goes both ways on a ladder lite@1 → medium@1.5 → medium@2 → high@2 (touch Auto tops out at medium@2, desktop at high@2): down after 1.5 s under 45 fps, up after 8 s at 55+; a climb that drops under 55 within 6 s steps straight back and doubles that level's wait. `stats().adapt = { level, max, on, ups, downs, fails }`; `_dbg.adapt.noUp = true` disables climbing (test break arm). The 3D crown only shows when the leader leads outright (`outrightLeader` in js/ui/threat.js).
 
 ### Themes, weather, zones, mid-match recolour (R4)
 
@@ -251,6 +252,7 @@ r.setCameraMode('showcase' | 'follow', { theme?, cycle? })
 - `?t=N` fast-forward the sim N seconds before the first frame (R needs big crowds on screen fast)
 - `?fps=1` a strip at the bottom: fps, the slowest 5 % of frames, quality, DPR, draw calls, triangles (from `stats()`)
 - `window.__game = { state, sim, renderer, start(), ready, errors }`
+- (G6) `__game.hud.indicators` = `{ list: [{ index, kind: 'label'|'arrow'|'none', why, threat, on, range, d, rect }], zone, blockers, fs }` for the nearby-crowd labels/arrows; `?hudbreak=avoid|threat|arrows` breaks them on purpose (tools/hud_nearby_test.mjs `--break`).
 
 ## House rules
 

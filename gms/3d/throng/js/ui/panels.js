@@ -99,6 +99,13 @@ export function renderProfile(body, { app }) {
 }
 const fmtSecs = (t) => t >= 3600 ? `${Math.floor(t / 3600)}h ${Math.floor(t / 60) % 60}m` : `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
 
+// The Mouse row needs a fine pointer. Phones report one for a stylus (S Pen) too, so a touch-first device
+// also has to have sent a real mouse event before the row shows.
+let mouseUsed = false;
+if (typeof window !== 'undefined') window.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') mouseUsed = true; }, { passive: true, capture: true });
+const mq = (q) => typeof matchMedia === 'function' && matchMedia(q).matches;
+export const showMouseSetting = () => mq('(any-pointer: fine)') && (!mq('(pointer: coarse)') || mouseUsed);
+
 export function renderSettings(body, { app, close }) {
   const s = app.save.settings;
   const tog = (key, label, sub = '') => `<label class="tg"><span>${label}${sub ? `<small>${sub}</small>` : ''}</span><input type="checkbox" data-k="${key}" ${s[key] ? 'checked' : ''}><i></i></label>`;
@@ -106,7 +113,7 @@ export function renderSettings(body, { app, close }) {
     ${tog('music', 'Music')}${tog('sfx', 'Sound effects')}
     <div class="seg-row"><span>Graphics</span><div class="seg">${['auto', 'high', 'medium', 'lite'].map((q) => `<button type="button" data-q="${q}" class="${s.quality === q ? 'on' : ''}">${q[0].toUpperCase() + q.slice(1)}</button>`).join('')}</div></div>
     <p class="st-note q-note hidden">Lite fully applies after a reload.</p>
-    <div class="seg-row st-mouse"><span>Mouse<small>Follow: your crowd heads for the pointer. Drag: press and drag like the phone stick.</small></span><div class="seg">${[['follow', 'Follow pointer'], ['drag', 'Drag joystick']].map(([k, l]) => `<button type="button" data-mouse="${k}" class="${(s.mouse || 'follow') === k ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+    <div class="seg-row st-mouse${showMouseSetting() ? '' : ' hidden'}"><span>Mouse<small>Follow: your crowd heads for the pointer. Drag: press and drag like the phone stick.</small></span><div class="seg">${[['follow', 'Follow pointer'], ['drag', 'Drag joystick']].map(([k, l]) => `<button type="button" data-mouse="${k}" class="${(s.mouse || 'follow') === k ? 'on' : ''}">${l}</button>`).join('')}</div></div>
     ${fsSupported() && !standalone() ? `<label class="tg st-fs"><span>Fullscreen<small>Hide the browser bars (back or swipe to leave)</small></span><input type="checkbox" class="fs-tg" ${fsActive() ? 'checked' : ''}><i></i></label>`
       : !standalone() ? '<p class="st-note st-fs-hint">On iPhone: Share → Add to Home Screen for fullscreen</p>' : ''}
     ${tog('lefty', 'Left-handed HUD', 'Mirror the HUD sides')}

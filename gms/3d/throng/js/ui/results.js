@@ -66,8 +66,11 @@ export function createResults({ root, app, onAgain, onMenu }) {
   // online: { quick, note } for a real online match (no rating, no coins; humans are tagged LIVE).
   function show({ state, players, me = 0, report = null, practice = false, left = false, online = null, mode = 'classic', ev = null }) {
     cancel();
-    const sorted = state.crowds.slice().sort((a, b) => a.rank - b.rank);
     const mc = state.crowds[me];
+    // Leaving early counts as last place, so the list shows it: you at the bottom, everyone below you moves up one.
+    let sorted = state.crowds.slice().sort((a, b) => a.rank - b.rank);
+    if (left) sorted = sorted.filter((c) => c !== mc).concat(mc);
+    const rankOf = (c) => (left ? sorted.indexOf(c) + 1 : c.rank);
     const place = report ? report.place : mc.rank;
     const teamWon = mode === 'teams' && state.teams && state.teams[mc.team].score >= state.teams[1 - mc.team].score;
     const won = !left && (mode === 'teams' ? teamWon : place === 1);
@@ -87,7 +90,7 @@ export function createResults({ root, app, onAgain, onMenu }) {
       const lg = isMe ? (practice || online ? null : LEAGUES[app.save.league]) : p.league != null ? LEAGUES[p.league] : null;
       const col = mode === 'infection' && c.horde ? HORDE : c.color;
       return `<li class="${isMe ? 'me ' + plate : ''}${c.horde ? ' horde' : ''}${c.out ? ' out' : ''}${mode === 'teams' ? ' team' + c.team : ''}" style="--c:${hex(col)}">
-        <span class="rl-rank">${c.rank === 1 ? ICON.crown : c.rank}</span>
+        <span class="rl-rank">${rankOf(c) === 1 ? ICON.crown : rankOf(c)}</span>
         <span class="rl-ico">${ICON.person}</span>
         <span class="rl-flag">${esc(p.flag || '')}</span>
         <span class="rl-name">${esc(p.name)}${online && p.human && !isMe ? ' <i class="rl-live">LIVE</i>' : ''}</span>

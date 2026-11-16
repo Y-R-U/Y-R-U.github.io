@@ -12,13 +12,19 @@ import { createCameraRig } from './camera.js';
 import { createHats, createHeroes, trailEmit } from './cosmetics.js';
 import { createRings, createZoneWalls, createPrecip, PRECIP, ZONE_STYLES, KIND_IDX, createHalos, createParticles, createWater, createCrown, createPickups, createPigeons, PICKUP_COL } from './fx.js';
 import { THEMES, THEME_IDS, WEATHER_IDS, getTheme } from './themes.js';
+import { outrightLeader } from '../ui/threat.js';
 
 const QUALITY = {
   high: { dpr: 2, bloom: true, reflCity: true, reflPeople: true, budget: 7000, precip: 5000 },
   medium: { dpr: 1.5, bloom: false, reflCity: true, reflPeople: false, budget: 5000, cheapRefl: true, precip: 3200 },
   lite: { dpr: 1, bloom: false, reflCity: false, reflPeople: false, budget: 2000, lite: true, precip: 0 },
 };
-const ORDER = ['lite', 'medium', 'high'];
+// Adaptive steps: tier + pixel-ratio cap. Touch devices start at 1 and may climb to 2 (medium @2x); desktops to 3.
+const LADDER = [{ q: 'lite', dpr: 1 }, { q: 'medium', dpr: 1.5 }, { q: 'medium', dpr: 2 }, { q: 'high', dpr: 2 }];
+const LVL = { lite: 0, medium: 1, high: 3 }, LVL_MAX = { lite: 0, medium: 2, high: 3 };
+// Down: 3 windows (1.5 s) under 45 fps. Up: 16 windows (8 s) at 55+; each failed climb to a level doubles its wait.
+// For 6 s after a climb, 3 windows under 55 count as a failed climb and step straight back.
+const ADAPT = { win: 500, low: 45, high: 55, downN: 3, upN: 16, probation: 12 };
 const ZONE_COL = { crown: 0xffc23a, safe: 0x9ff2ff, danger: 0xff3a2a, capture: 0xffe08a, next: 0xffc23a, 'safe-next': 0xffffff };
 
 export async function createRenderer({ canvas, map, quality = 'high', adaptive = true, capacity = 9000 } = {}) {
@@ -63,6 +69,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
   scene.add(precip.mesh);
   const crown = createCrown(shared);
   scene.add(crown.group, crown.shaft);
+  crown.group.userData.isCrown = true;
   const pickups = createPickups(32, shared);
   scene.add(pickups.beams, pickups.icons);
   const pigeons = createPigeons(map, shared, quality === 'lite' ? 7 : 12);
@@ -75,6 +82,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
 
   let composer = null, bloom = null;
   let q = QUALITY[quality] ? quality : 'high';
+  const adapt = { lvl: LVL[q], max: LVL_MAX[q], dpr: QUALITY[q].dpr, high: 0, probe: 0, fails: [0, 0, 0, 0], ups: 0, downs: 0, noUp: false };
   let focus = 0, metaSet = false, showcase = false, cutSnap = false;
   const pickAlpha = new Map();
   const crownState = { x: 0, z: 0, y: 4, idx: -1, s: 1, a: 0 };
@@ -176,7 +184,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
   function resize() {
     cssW = canvas.clientWidth || window.innerWidth;
     cssH = canvas.clientHeight || window.innerHeight;
-    const dpr = Math.min(window.devicePixelRatio || 1, QUALITY[q].dpr);
+    const dpr = Math.min(window.devicePixelRatio || 1, adapt.dpr);
     gl.setPixelRatio(dpr);
     gl.setSize(cssW, cssH, false);
     if (composer && QUALITY[q].bloom) {
@@ -457,6 +465,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     if (ld == null || ld < 0) {
       for (const sc of state.crowds) if (sc.alive && sc.rank === 1) ld = sc.index;
     }
+    if (ld != null && ld >= 0 && (state.phase === 'countdown' || outrightLeader(state, ld) < 0)) ld = -1;
     const c = ld != null && ld >= 0 ? crowd.crowds[ld] : null;
     const show = !!(c && c.alive);
     crownState.a += ((show ? 1 : 0) - crownState.a) * Math.min(1, dt * 4);
@@ -660,19 +669,38 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     if (fpsS.acc > 500) {
       fpsS.fps = 1000 * fpsS.n / fpsS.acc;
       fpsS.acc = 0; fpsS.n = 0;
-      // step down only (never back up, so it cannot oscillate): skip 2 s after a change for shader warm-up,
-      // then 3 windows in a row under 45 fps (1.5 s) drop one tier
       fpsS.warm = (fpsS.warm || 0) + 1;
-      if (adaptive && fpsS.warm > 4) {
-        if (fpsS.fps < 45) fpsS.low++; else fpsS.low = 0;
-        if (fpsS.low >= 3) {
-          const i = ORDER.indexOf(q);
-          if (i > 0) { q = ORDER[i - 1]; applyQuality(); }
-          fpsS.low = 0;
-        }
-      }
+      if (adaptive && fpsS.warm > 4) adaptStep(fpsS.fps);
     }
     fpsS.frames++;
+  }
+
+  function setLevel(l) {
+    adapt.lvl = l; q = LADDER[l].q; adapt.dpr = LADDER[l].dpr;
+    applyQuality();
+  }
+  function adaptStep(fps) {
+    if (adapt.probe > 0) {
+      adapt.probe--;
+      if (fps < ADAPT.high) fpsS.low++; else fpsS.low = 0;
+      if (fpsS.low >= ADAPT.downN) {
+        adapt.fails[adapt.lvl]++; adapt.downs++; adapt.probe = 0; adapt.high = 0;
+        setLevel(adapt.lvl - 1);
+      }
+      return;
+    }
+    if (fps < ADAPT.low) fpsS.low++; else fpsS.low = 0;
+    if (fpsS.low >= ADAPT.downN) {
+      fpsS.low = 0; adapt.high = 0;
+      if (adapt.lvl > 0) { adapt.downs++; setLevel(adapt.lvl - 1); }
+      return;
+    }
+    if (fps >= ADAPT.high) adapt.high++; else adapt.high = 0;
+    const next = adapt.lvl + 1;
+    if (!adapt.noUp && next <= adapt.max && adapt.high >= ADAPT.upN * 2 ** Math.min(4, adapt.fails[next])) {
+      adapt.high = 0; adapt.ups++; adapt.probe = ADAPT.probation;
+      setLevel(next);
+    }
   }
 
   buildWorld();
@@ -680,7 +708,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
 
   return {
     three: { renderer: gl, scene, camera },
-    _dbg: { crowd, people, hats, heroes, get city() { return W.city; }, map, rings, walls, precip, zones, wx },
+    _dbg: { adapt, crowd, people, hats, heroes, get city() { return W.city; }, map, rings, walls, precip, zones, wx },
     setCrowds,
     frame,
     setFocus(i) { if (i !== focus) focus = i; },
@@ -738,8 +766,12 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
     },
     cameraYaw() { return rig.rig.yaw + (rig.rig.orbit || 0); },
     resize,
-    setQuality(nq) { if (QUALITY[nq]) { q = nq; applyQuality(); } },
-    setAdaptive(on) { adaptive = !!on; },
+    setQuality(nq) {
+      if (!QUALITY[nq]) return;
+      q = nq; adapt.lvl = LVL[nq]; adapt.max = LVL_MAX[nq]; adapt.dpr = QUALITY[nq].dpr; adapt.high = adapt.probe = 0;
+      applyQuality();
+    },
+    setAdaptive(on) { adaptive = !!on; adapt.high = adapt.probe = 0; },
     setFixedCamera(fx) { rig.rig.fixed = fx; },
     stats() {
       return {
@@ -756,6 +788,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
         popIn: crowd.stats.popIn, popOut: crowd.stats.popOut, recruits: crowd.stats.recruits, transfers: crowd.stats.transfers,
         cityVerts: W.city.verts, cityBaseVerts: W.city.baseVerts,
         dpr: gl.getPixelRatio(),
+        adapt: { level: adapt.lvl, max: adapt.max, on: !!adaptive, ups: adapt.ups, downs: adapt.downs, fails: adapt.fails.slice() },
       };
     },
     dispose() {
