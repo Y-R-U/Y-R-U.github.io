@@ -117,3 +117,6 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 - Shipped: mouse follow-pointer setting (default ON for mouse), popups clear of the account badge, fullscreen toggle (Settings; iPhone gets an Add to Home Screen hint), per-mode online boards (schema 2), lobby shows host mode, Teams + Infection rebalance, guest reload rejoin, docs/PLAYTEST.md, ?fps=1.
 - PAUSED at Aaron's request. Cron tick cancelled. No agents running. To restart: NEXT item 2 (art pass, one agent) and whatever Aaron's phone playtest finds.
 - Open small items: early-leave row shows live rank under "Counted as last place"; crown on a 4-person crowd at kick-off; minified three.js not on the box (1.3 MB saving); locker ≈ 17 h of play (prices unreviewed).
+
+## STATE @ 2026-11-16 (decisions reviewed; still PAUSED)
+- Aaron approved D1, D3, D4, D5, D7, D11 (for now), D12, D13, D14 (for now), D15, D17, D18. D16 deferred. New TODO D20: rooms pick 2/3/5-minute matches; events at other lengths.
