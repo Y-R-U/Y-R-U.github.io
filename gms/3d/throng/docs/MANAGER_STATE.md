@@ -132,3 +132,8 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
   2. LCS "OUT!" banner reads "No respawns in Last Crowd Standing. Watching the rest… — respawning…" (contradiction).
   3. Small/near-square viewports (split screen): results card overflows sideways (right column and Play Again clipped, scrollbars); HUD leaderboard overlaps the pause button; "OUT!" overlaps the leaderboard.
 - NOT yet tested on the phone: full-screen portrait and landscape, fullscreen toggle, an online match phone vs Mac.
+- Second run, Chrome FULL SCREEN portrait (384x692 CSS px), Practice LCS autopilot 72 s: 59–60 fps at medium @ dpr 1.5, worst frame 64 ms (start) / 62 ms (958 figures), 0 errors. Results card and Settings look right; badge clear of the results card; Fullscreen toggle present.
+- Finding 1 revised: full screen stays at medium@1.5; the drop to lite@1 was seen only in split screen (still should recover when there is headroom). 1.5 of 2.8 dpr is soft but acceptable; consider 2.0 on phones that hold 60.
+- Finding 2 confirmed full screen, plus: the LCS "OUT!" banner never clears (it waits for a respawn) and sits under "X takes it" at the end; it names the final winner, not who knocked you out.
+- New: Settings shows the Mouse option on a touch-only phone (hide when no fine pointer).
+- Still untested on the phone: landscape, tapping the fullscreen toggle, online phone vs Mac.
