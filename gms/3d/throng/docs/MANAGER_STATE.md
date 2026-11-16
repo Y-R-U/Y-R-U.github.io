@@ -123,3 +123,12 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 
 ## STATE @ 2026-11-17 (still PAUSED)
 - New TODO D21: LCS counts for rating. Phone testing over wireless adb: adb installed (brew android-platform-tools); phone = S22 Ultra 192.168.0.98; BLOCKED by macOS Local Network permission for iTerm (System Settings → Privacy & Security → Local Network). Aaron may retry later; needs a fresh pairing code each time until paired.
+
+## STATE @ 2026-11-17 (first real-phone test; still PAUSED)
+- Wireless adb works: paired with the S22 Ultra (SM-S908E, 192.168.0.98). `adb mdns services` gives the connect port; `adb forward tcp:9290 localabstract:chrome_devtools_remote`; then raw CDP to the THRONG tab. Never use `?auto=1` on Aaron's phone (rated match on his real save): use `__game.start({kind:'practice'}); __game.setAuto(true)`.
+- Tested in Android split screen only (384x314–359 CSS px, dpr 2.81), Practice LCS on autopilot, 60 s: 60 fps, worst frame 38 ms, 0 errors, up to 647 figures.
+- FOUND (to fix on restart):
+  1. Adaptive quality had dropped to `lite` at dpr 1 while holding a flat 60 fps (auto = medium on touch). Picture is visibly blocky on a 2.8-dpr screen. It should step back up when there is headroom, or not drop that far.
+  2. LCS "OUT!" banner reads "No respawns in Last Crowd Standing. Watching the rest… — respawning…" (contradiction).
+  3. Small/near-square viewports (split screen): results card overflows sideways (right column and Play Again clipped, scrollbars); HUD leaderboard overlaps the pause button; "OUT!" overlaps the leaderboard.
+- NOT yet tested on the phone: full-screen portrait and landscape, fullscreen toggle, an online match phone vs Mac.
