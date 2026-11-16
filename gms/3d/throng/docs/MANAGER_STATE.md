@@ -137,3 +137,13 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 - Finding 2 confirmed full screen, plus: the LCS "OUT!" banner never clears (it waits for a respawn) and sits under "X takes it" at the end; it names the final winner, not who knocked you out.
 - New: Settings shows the Mouse option on a touch-only phone (hide when no fine pointer).
 - Still untested on the phone: landscape, tapping the fullscreen toggle, online phone vs Mac.
+
+## RESTART LIST (ordered; project still PAUSED)
+1. **Nearby-crowd indicators (Aaron, 2026-11-17, "important"):** today only the leader gets an edge arrow + number. Every crowd near you should get one: an edge arrow with its count when it is off screen or only partly on screen, and a count label over crowds on screen, so on a small screen you can tell whether the crowd whose edge you see is bigger or smaller than you. Manager's suggestion: tint by threat (bigger than you = red/warning, smaller = green/edible), cap at ~4 nearest within a range that scales with camera zoom, leader keeps its crown.
+2. LCS knock-out banner: wrong text, never clears, names the winner.
+3. Hide the Mouse setting when there is no fine pointer.
+4. Quality: recover from lite when there is headroom; consider dpr 2.0 on phones holding 60.
+5. Split-screen / tiny viewport layout (results card, HUD overlaps).
+6. D20 match lengths (2/3/5 min rooms, events); D21 LCS counts for rating (after a sweep).
+7. Early-leave row rank; crown at kick-off tie; minified three.js on the box.
+8. Art pass (one agent), then anything else from phone testing (landscape, fullscreen tap, online phone vs Mac still untested).
