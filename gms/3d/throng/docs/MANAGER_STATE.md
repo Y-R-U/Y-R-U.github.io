@@ -120,3 +120,6 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 
 ## STATE @ 2026-11-16 (decisions reviewed; still PAUSED)
 - Aaron approved D1, D3, D4, D5, D7, D11 (for now), D12, D13, D14 (for now), D15, D17, D18. D16 deferred. New TODO D20: rooms pick 2/3/5-minute matches; events at other lengths.
+
+## STATE @ 2026-11-17 (still PAUSED)
+- New TODO D21: LCS counts for rating. Phone testing over wireless adb: adb installed (brew android-platform-tools); phone = S22 Ultra 192.168.0.98; BLOCKED by macOS Local Network permission for iTerm (System Settings → Privacy & Security → Local Network). Aaron may retry later; needs a fresh pairing code each time until paired.

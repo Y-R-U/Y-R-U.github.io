@@ -24,3 +24,4 @@ Manager decisions. Aaron reviews the ones marked REVIEW at each milestone.
 | D18 | Events run on a fixed UTC calendar with no server (Double Crowd and Night Market weekends, Rush Hour, Giant Slayer, Mode of the Day ×1.5 coins, monthly cup) | Same for everyone, works offline | APPROVED 2026-11-16 |
 | D19 | One sub-agent at a time on THRONG (Aaron, 2026-11-13) | Both builders kept hitting the spend limit together | set |
 | D20 | TODO (Aaron, 2026-11-16): match length options. Private rooms choose 2, 3 or 5 minutes; events may run at other lengths. Ladder Play stays 2:00 | His idea when approving D3; not built yet | TODO |
+| D21 | TODO (Aaron, 2026-11-17): Last Crowd Standing also moves the ladder rating (amends D14). Before switching on: run `tools/mode_sweep.mjs` to compare LCS finishing place per league with Classic (3.07 Bronze → 4.38 Legend) and scale points if LCS is easier to farm | His idea; LCS gives a clean 1–8 finishing order like Classic | TODO |
