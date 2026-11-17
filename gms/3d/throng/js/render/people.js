@@ -167,7 +167,11 @@ void main() {
   if (reg < 0.5) base = uSkin[int(h1 * 4.99)];
   else if (reg < 1.5) base = iC.rgb;
   else if (reg < 2.5) base = uPants[int(h2 * 5.99)];
-  else if (reg < 3.5) base = cap ? iC.rgb * 0.8 : uHair[int(h3 * 5.99)];
+  else if (reg < 3.5) {
+    // the full hair range, and team-tinted when zoomed out, so a big crowd reads as one colour, not black speckle
+    base = cap ? iC.rgb * 0.8 : uHair[int(fract(h3 * 2.0) * 5.99)];
+    if (!cap) base = mix(base, iC.rgb * 0.5, sat * (0.25 + 0.4 * smoothstep(1.02, 1.25, uFigScale)));
+  }
   else base = h2 > 0.7 ? vec3(0.8) : vec3(0.035);
 
   vec3 info = sampleInfo(iA.xz);

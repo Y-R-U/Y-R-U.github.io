@@ -170,3 +170,9 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 - Not verified: phone fps in a 5:00 late game (~7,000 people on the map); a two-browser online match at 3:00/5:00.
 - Next: chain C (art pass), ONE agent.
 - Chain B DEPLOYED (commit a3663dbf; server redeployed after db backup 20261117-050411; static rsynced; health OK; other sites 200). Chain C LAUNCHED: R5 `a3ca4c91e738ef874` (Opus/high) art pass, owns js/render/**, js/world/**, tools/render_*. Report → docs/notes/R5_report.md. Ports cdp 9270-9279 / http 8750-8759. After R5: verify (suites + CDP tests + LOOK at before/after shots in scratchpad/r5), commit, push, rsync deploy, then STOP: chain complete, cancel cron d1c13959, report to Aaron.
+
+## STATE @ 2026-11-17 (chain C shipped — CHAIN COMPLETE, idle)
+- R5 art pass landed. Manager re-ran sim_test, meta_test, render_map_test, threat_test: PASS; compared before/after mid-match and sunny-day portrait shots: more saturated, crowds read as one team-colour mass, cut-away roofs are paved terraces, kerb lines. NOT re-run by the manager: the three CDP tests (R5 reports PASS).
+- Still weak (R5): rain puddles read as patches, paving invisible at phone zoom, roof terrace odd/white in snow, festival pink cast + canopy, outer fog ring unchecked, no emote bubble. Nothing judged in motion or on a phone.
+- Cron d1c13959 cancelled. No agents. Waiting for Aaron: phone impressions; answers on (1) LCS leave-after-knockout place, (2) 5:00 coin rate; D20/D21 review; D16 still deferred.
+- Manager todo at next deploy: minified three.js to the box.

@@ -498,7 +498,7 @@ function building(G, D, b) {
     // cutaway cap: hidden until the building sinks, then a tidy flat lid with a light outline of the footprint
     G.win = -6;
     const X0 = x0 - 0.2, X1 = x1 + 0.2, Z0 = z0 - 0.2, Z1 = z1 + 0.2, y = 4.5, bw = 0.5;
-    const rim = mix(light, C(0xffffff), 0.35), lid = mix(mul(F, 0.42), C(0x262430), 0.45);
+    const rim = mix(light, C(0xffffff), 0.35), lid = mix(mul(mix(light, F, 0.5), 0.44), C(0x34343e), 0.3);
     const flat = (ax0, az0, ax1, az1, col) => G.quad([ax0, y, az0], [ax0, y, az1], [ax1, y, az1], [ax1, y, az0], col);
     flat(X0, Z0, X1, Z0 + bw, rim); flat(X0, Z1 - bw, X1, Z1, rim);
     flat(X0, Z0 + bw, X0 + bw, Z1 - bw, rim); flat(X1 - bw, Z0 + bw, X1, Z1 - bw, rim);
@@ -962,9 +962,11 @@ void main() {
   vec3 colIn = vCol;
   if (vTag < -0.5 && vTag > -4.5 && uFlip > 0.0) colIn *= surface(vTag, vW, normalize(vN));
   else if (vTag < -5.5 && vTag > -6.5) {
-    float hv = (vW.x + vW.z) * 1.4, fw = fwidth(hv);
-    float hl = 1.0 - smoothstep(0.0, max(fw, 0.05), abs(fract(hv) - 0.5) - 0.38);
-    colIn *= 1.0 - 0.28 * hl * (1.0 - smoothstep(0.3, 0.7, fw));
+    vec2 q = vW.xz / 1.6, f = abs(fract(q) - 0.5);
+    float fw = max(fwidth(q.x), fwidth(q.y));
+    float gl = 1.0 - smoothstep(0.0, max(fw, 0.02), 0.5 - max(f.x, f.y) - 0.03);
+    float th = hsh(floor(q));
+    colIn *= (0.92 + 0.16 * th * (1.0 - smoothstep(0.15, 0.4, fw))) * (1.0 - 0.3 * gl * (1.0 - smoothstep(0.2, 0.5, fw)));
   }
   colIn = safeTint(colIn, vW.xz);
   gl_FragColor = vec4(colIn, a);

@@ -25,7 +25,16 @@ const LVL = { lite: 0, medium: 1, high: 3 }, LVL_MAX = { lite: 0, medium: 2, hig
 // Down: 3 windows (1.5 s) under 45 fps. Up: 16 windows (8 s) at 55+; each failed climb to a level doubles its wait.
 // For 6 s after a climb, 3 windows under 55 count as a failed climb and step straight back.
 const ADAPT = { win: 500, low: 45, high: 55, downN: 3, upN: 16, probation: 12 };
-const ZONE_COL = { crown: 0xffc23a, safe: 0x9ff2ff, danger: 0xff3a2a, capture: 0xffe08a, next: 0xffc23a, 'safe-next': 0xffffff };
+// ACES then a saturation grade: ACES alone left every theme flat and greyed.
+const GRADE = /* glsl */`vec3 CustomToneMapping( vec3 color ) {
+  vec3 c = ACESFilmicToneMapping( color );
+  float l = dot( c, vec3( 0.2126, 0.7152, 0.0722 ) );
+  return saturate( mix( vec3( l ), c, 1.25 ) );
+}`;
+const TM_STUB = 'vec3 CustomToneMapping( vec3 color ) { return color; }';
+const GRADED = THREE.ShaderChunk.tonemapping_pars_fragment.includes(TM_STUB);
+if (GRADED) THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment.replace(TM_STUB, GRADE);
+const ZONE_COL = { crown:0xffc23a, safe: 0x9ff2ff, danger: 0xff3a2a, capture: 0xffe08a, next: 0xffc23a, 'safe-next': 0xffffff };
 
 export async function createRenderer({ canvas, map, quality = 'high', adaptive = true, capacity = 9000 } = {}) {
   const URLP = typeof location !== 'undefined' ? new URLSearchParams(location.search) : new URLSearchParams();
@@ -34,7 +43,7 @@ export async function createRenderer({ canvas, map, quality = 'high', adaptive =
   const forceWeather = WEATHER_IDS.includes(URLP.get('weather')) ? URLP.get('weather') : null;
 
   const gl = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', stencil: false });
-  gl.toneMapping = THREE.ACESFilmicToneMapping;
+  gl.toneMapping = GRADED ? THREE.CustomToneMapping : THREE.ACESFilmicToneMapping;
   gl.toneMappingExposure = 1.0;
   gl.outputColorSpace = THREE.SRGBColorSpace;
   gl.info.autoReset = false;

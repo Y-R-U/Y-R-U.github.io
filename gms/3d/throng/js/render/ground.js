@@ -114,8 +114,18 @@ function paintColour(map, n, P) {
   // perimeter terrace sidewalk
   ctx.fillStyle = P.walk;
   ctx.fillRect(-H, -H, H * 2, E); ctx.fillRect(-H, H - E, H * 2, E); ctx.fillRect(-H, -H, E, H * 2); ctx.fillRect(H - E, -H, E, H * 2);
-  // contact darkening around building bases
+  // kerbs: a dark gutter on the road side, then a light kerbstone edge, round every block and the perimeter
+  const kerbRects = map.blocks.filter((b) => b.kind !== 'central').map((b) => [b.x - b.w / 2, b.z - b.d / 2, b.w, b.d]);
+  kerbRects.push([c0x, c0z, c1x - c0x, c1z - c0z], [-H + E, -H + E, (H - E) * 2, (H - E) * 2]);
   ctx.lineJoin = 'round';
+  for (const [x, z, w, d] of kerbRects) {
+    const inv = w > H;
+    ctx.strokeStyle = P.gutter; ctx.lineWidth = 0.7;
+    ctx.strokeRect(x + (inv ? 0.45 : -0.45), z + (inv ? 0.45 : -0.45), w + (inv ? -0.9 : 0.9), d + (inv ? -0.9 : 0.9));
+    ctx.strokeStyle = P.kerb; ctx.lineWidth = 0.32;
+    ctx.strokeRect(x + (inv ? -0.16 : 0.16), z + (inv ? -0.16 : 0.16), w + (inv ? 0.32 : -0.32), d + (inv ? 0.32 : -0.32));
+  }
+  // contact darkening around building bases
   for (const b of map.buildings) {
     for (const [lw, a] of [[2.4, 0.12], [1.2, 0.18], [0.5, 0.25]]) {
       ctx.strokeStyle = `rgba(20,14,18,${a})`; ctx.lineWidth = lw;
@@ -454,10 +464,11 @@ void main() {
   }
   base *= 0.96 + 0.08 * big * inMap;
 
-  float n1 = vnoise(p * 0.16) * 0.55 + vnoise(p * 0.47) * 0.3 + vnoise(p * 1.3) * 0.15;
+  float n1 = vnoise(p * 0.23) * 0.55 + vnoise(p * 0.61) * 0.3 + vnoise(p * 1.7) * 0.15;
   float road0 = 1.0 - smoothstep(0.1, 0.25, kind);
   float pw = clamp(uWet - 1.0, 0.0, 1.0) * 0.07;
-  float puddle = mix(smoothstep(0.6 - pw, 0.68 - pw, n1) * 0.7, smoothstep(0.57 - pw, 0.66 - pw, n1), road0) * (kind > 0.83 ? 0.0 : 1.0) * inMap * min(uWet, 1.0);
+  float pe = max(fw * 0.04, 0.05);
+  float puddle = mix(smoothstep(0.63 - pw, 0.63 - pw + pe, n1) * 0.7, smoothstep(0.6 - pw, 0.6 - pw + pe, n1), road0) * (kind > 0.83 ? 0.0 : 1.0) * inMap * min(uWet, 1.0);
   float road = 1.0 - smoothstep(0.1, 0.25, kind);
   float wet = ((kind > 0.83 ? 0.15 : 0.6 + 0.3 * road) + 0.4 * puddle) * min(uWet, 1.3);
   vec2 tuv = p / (uHalf * 2.0) + 0.5;
@@ -470,7 +481,7 @@ void main() {
     wet *= 1.0 - cover * 0.8;
     puddle *= 1.0 - cover;
   }
-  base *= mix(1.0, mix(0.9, 0.8, road0), puddle);
+  base *= mix(1.0, mix(0.8, 0.62, road0), puddle);
 
   vec3 N = vec3(0.0, 1.0, 0.0);
   vec3 V = normalize(cameraPosition - vW);
@@ -500,7 +511,7 @@ void main() {
     col += (uSkyRefl * 0.5 + spill * 0.6) * rip * wetA * uRain;
   }
   float fres = pow(max(1.0 - max(V.y, 0.0), 0.0), 4.0);
-  float refl = clamp((mix(0.08 + 0.06 * road, 0.5, puddle) * (kind > 0.83 ? 0.2 : 1.0) + fres * 0.14) * min(uWet, 1.35), 0.0, 0.65);
+  float refl = clamp((mix(0.08 + 0.06 * road, 0.4, puddle) * (kind > 0.83 ? 0.2 : 1.0) + fres * 0.14) * min(uWet, 1.35), 0.0, 0.65);
   float a = 1.0;
   if (uRefl > 0.5) a = 1.0 - refl;
   else col += uSkyRefl * (refl - 0.3 * puddle * road) * 0.3;
