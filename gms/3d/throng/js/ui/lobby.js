@@ -4,7 +4,7 @@ import { LEAGUES, badgeSvg } from '../meta/leagues.js';
 export function createLobby({ root, app }) {
   const el = h(`<section class="screen lobby hidden">
     <div class="lb-card">
-      <div class="lby-head"><span class="lby-lg"></span><div><div class="lby-t">FINDING PLAYERS…</div><div class="lby-n"><b>1</b>/8</div></div></div>
+      <div class="lby-head"><span class="lby-lg"></span><div><div class="lby-t">FINDING PLAYERS…</div><div class="lby-n"><b>1</b>/8<span class="lby-len hidden"></span></div></div></div>
       <ol class="lby-list"></ol>
       <button type="button" class="btn btn-ghost lby-cancel">CANCEL</button>
     </div>
@@ -18,8 +18,11 @@ export function createLobby({ root, app }) {
   function hide() { el.classList.add('hidden'); el.classList.remove('in'); }
 
   // players: the match's players (index 0 = you). Resolves through onDone once all 8 have "joined".
-  function show({ players, league, onDone, onCancel, total = 2000 + Math.random() * 2000 }) {
+  // len: a line about a non-standard match length (an event's), or ''.
+  function show({ players, league, onDone, onCancel, len = '', total = 2000 + Math.random() * 2000 }) {
     clear();
+    el.querySelector('.lby-len').textContent = len;
+    el.querySelector('.lby-len').classList.toggle('hidden', !len);
     cancelCb = onCancel;
     const lg = LEAGUES[league];
     el.querySelector('.lby-lg').innerHTML = badgeSvg(lg, 44);

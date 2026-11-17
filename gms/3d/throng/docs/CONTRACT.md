@@ -123,6 +123,12 @@ state.endReason                                                    // '' (time) 
 crowd.team, crowd.score, crowd.out (lcs, no respawn), crowd.horde (infection), crowd.infections, crowd.boost (teams)
 ```
 
+**Match lengths (D20, G7).** `duration` may be 120, 180 or 300 (`CONFIG.MATCH.lengths`); `matchDuration(mode, len)` in
+`js/sim/sim.js` picks the clock (LCS always keeps its own; an unknown length falls back to the mode's). Everything in the
+sim stays absolute except the street refill: after 120 s of play pedestrians respawn at `neutralRespawn × neutralLateMul`
+(0.5), so a 2:00 match never reaches it. `state.duration` carries the clock (snapshots already send it); the HUD timer
+reads it. A state-only restore keeps the restored state's clock.
+
 New events: `bleed {crowd, n}` (lcs: people lost outside the circle), `infect {crowd, by}` (crowd joined the horde),
 `zone {x, z, r}` (koth: the zone moved), `shrink {stage, r}` (lcs), and online only `emote {crowd, id}`. `elim.by` is
 `-1` when a crowd bled out. Rank in a mode follows the mode's score (teams: team score first), so `state.leader` and

@@ -1,17 +1,17 @@
-// node tools/meta_test.mjs [--break=ladder|ladder-slight|curve|curve-slight|names|names-slight|hash|daily|economy|save|progress|shop|botcos|events|season|season-slight|cup|unrated]
+// node tools/meta_test.mjs [--break=ladder|ladder-slight|curve|curve-slight|names|names-slight|hash|daily|economy|save|progress|shop|botcos|events|season|season-slight|cup|unrated|marathon|lenpay|lenrated|lcsrated|lcsleave]
 // Pure meta-layer checks. Each --break arm makes one real input wrong and must turn the run red.
-import { LADDER, rankOf, ratingAt, ratingDelta, around, rowAt } from '../js/meta/ladder.js';
+import { LADDER, rankOf, ratingAt, ratingDelta, around, rowAt, RATED } from '../js/meta/ladder.js';
 import { LEAGUES, leagueOf, nextLeague } from '../js/meta/leagues.js';
 import { playerFor } from '../js/meta/names.js';
 import { hash32, unit, rngFrom } from '../js/meta/hash.js';
 import { buildRoster } from '../js/meta/roster.js';
 import { challengeFor, dayKey, claimLogin, loginState, LOGIN_REWARDS } from '../js/meta/daily.js';
-import { ECON, spend, earn } from '../js/meta/economy.js';
+import { ECON, spend, earn, matchPayout } from '../js/meta/economy.js';
 import { SHOP, buy, equip, CROWD_SLOTS, crowdCosmetics, botCosmetics, unlocked } from '../js/meta/shop.js';
 import { readFileSync } from 'node:fs';
 import { defaults, migrate, load, write, memoryStorage, SAVE_KEY } from '../js/meta/save.js';
 import { applyMatch } from '../js/meta/progress.js';
-import { calendar, liveEvents, nextEvents, featuredMode, cupMode, matchEvents, eventSim, recordCup, cupView, CUP, EVENTS, FEATURED } from '../js/meta/events.js';
+import { calendar, liveEvents, nextEvents, featuredMode, cupMode, matchEvents, eventSim, eventLength, recordCup, cupView, CUP, EVENTS, FEATURED } from '../js/meta/events.js';
 import { seasonAt, rollSeason, softReset, SEASON } from '../js/meta/season.js';
 
 const BREAK = (process.argv.find((a) => a.startsWith('--break=')) || '').slice(8);
@@ -267,7 +267,7 @@ const T0 = Date.parse('2026-11-12T08:00:00Z');
   check(migrate({ v: 1, coins: 3 }).season.n === 0 && Array.isArray(migrate({ v: 1 }).trophies), 'an old save lacks the season/trophy fields');
 }
 
-// 12. Monthly cup + mode payouts: best 5 count; tiers pay once; only Classic moves the rating
+// 12. Monthly cup + mode payouts: best 5 count; tiers pay once; an unrated mode leaves the rating alone
 {
   const t = Date.parse('2026-11-20T10:00:00Z'), cm = cupMode(t), s = defaults();
   for (const place of [1, 2, 3, 8, 8, 4, 5]) recordCup(s, place, cm, t);
@@ -289,6 +289,51 @@ const T0 = Date.parse('2026-11-12T08:00:00Z');
   check(C.rated && C.delta > 0, 'Classic did not move the rating');
   const sl = applyMatch(defaults(), { place: 3, mode: 'classic', slayer: { n: 2, bonus: 30 } }, t);
   check(sl.coins.some((c) => c.id === 'slayer' && c.n === 60), 'Giant Slayer bonus not paid');
+}
+
+// 13. Match lengths (D20): Marathon is a Wednesday evening slot for the unrated modes; payouts scale with the clock;
+// a non-2:00 match never moves the rating.
+{
+  const t0 = Date.parse('2026-11-13T00:00:00Z');
+  const mar = calendar(t0, 28).filter((w) => w.id === 'marathon');
+  if (BREAK === 'marathon') mar.push({ id: 'marathon', start: t0, end: t0 + 3600000 });
+  check(mar.length === 4, `marathon windows in 4 weeks: ${mar.length}`);
+  for (const w of mar) { const d = new Date(w.start); check(d.getUTCDay() === 3 && d.getUTCHours() === 19 && w.end - w.start === 4 * 3600000, `marathon at ${d.toISOString()}`); }
+  const wed = Date.parse('2026-11-18T20:00:00Z');
+  check(matchEvents(wed, 'teams').len === 300 && matchEvents(wed, 'koth').len === 300 && matchEvents(wed, 'infection').len === 300, 'Marathon does not lengthen Teams/King/Infection');
+  check(matchEvents(wed, 'classic').len === 0 && matchEvents(wed, 'lcs').len === 0, 'Marathon lengthened a rated mode');
+  check(matchEvents(wed - 2 * 3600000, 'teams').len === 0 && eventLength([], 'teams') === 0, 'a length outside the Marathon window');
+  const u = defaults(); u.rating = 500;
+  const long = applyMatch(u, { place: 1, kills: 2, best: 2400, mode: 'teams', duration: BREAK === 'lenpay' ? 0 : 300 }, t0);
+  const short = applyMatch(defaults(), { place: 1, kills: 2, best: 2400, mode: 'teams', duration: 120 }, t0);
+  const pc = (R) => (R.coins.find((c) => c.id === 'place') || {}).n;
+  check(long.lenMul === 2.5 && pc(long) === Math.round(ECON.placeCoins[0] * 2.5) && pc(short) === ECON.placeCoins[0], `5:00 placement coins ${pc(long)} vs 2:00 ${pc(short)} (want ×2.5)`);
+  const lp = matchPayout({ place: 1, best: 6000, lenMul: 2.5 }), sp = matchPayout({ place: 1, best: 6000 });
+  check(lp.coins.find((c) => c.id === 'peak').n === ECON.peakCap * 2.5 && sp.coins.find((c) => c.id === 'peak').n === ECON.peakCap, 'peak coin cap does not scale with the clock');
+  const c5 = defaults(); c5.rating = 500;
+  const R5 = applyMatch(c5, { place: 1, best: 300, mode: 'classic', duration: BREAK === 'lenrated' ? 120 : 300 }, t0);
+  check(!R5.rated && R5.delta === 0 && c5.rating === 500, 'a 5:00 Classic match moved the rating');
+  const c2 = defaults(); c2.rating = 500;
+  check(applyMatch(c2, { place: 1, best: 300, mode: 'classic', duration: 120 }, t0).delta === ratingDelta(500, 1), 'a 2:00 Classic match with an explicit duration pays differently');
+}
+
+// 14. Last Crowd Standing moves the rating (D21) at the per-minute-scaled multiplier; leaving counts as last.
+{
+  if (BREAK === 'lcsrated') delete RATED.lcs;
+  const t = Date.parse('2026-11-13T10:00:00Z');
+  check(RATED.classic.join() === '1,1' && RATED.lcs && RATED.lcs.every((m) => m > 0.4 && m < 0.9), `LCS multipliers ${RATED.lcs}`);
+  for (const [rating, place] of [[0, 1], [500, 1], [500, 4], [500, 8], [2400, 3], [4500, 8], [4500, 1]]) {
+    const s = defaults(); s.rating = rating;
+    const R = applyMatch(s, { place, best: 200, mode: 'lcs', duration: 90 }, t);
+    const want = ratingDelta(rating, place, LADDER, ...(RATED.lcs || []));
+    check(R.rated && R.delta === want && s.rating === Math.max(0, rating + want), `LCS place ${place} at ${rating}: delta ${R.delta}, want ${want}`);
+    const full = ratingDelta(rating, place);
+    if (full && RATED.lcs) check(Math.abs(want) < Math.abs(full) && Math.abs(want - full * RATED.lcs[full < 0 ? 1 : 0]) <= 1, `LCS delta ${want} is not ×${RATED.lcs} of Classic's ${full}`);
+  }
+  const s = defaults(); s.rating = 1500;
+  const L = applyMatch(s, { place: BREAK === 'lcsleave' ? 2 : 2, best: 200, mode: 'lcs', left: BREAK !== 'lcsleave', duration: 90 }, t);
+  check(L.place === 8 && L.delta === ratingDelta(1500, 8, LADDER, ...(RATED.lcs || [])) && L.delta < 0, `leaving an LCS match: place ${L.place}, delta ${L.delta}`);
+  for (let r = 0; r < 5000; r += 97) for (let p = 1; p <= 8; p++) if (ratingDelta(r, p, LADDER, ...RATED.classic) !== ratingDelta(r, p)) check(false, `the Classic multipliers changed Classic points at ${r} place ${p}`);
 }
 
 console.log(`${fails.length ? 'FAIL' : 'PASS'} meta_test${BREAK ? ` (break=${BREAK})` : ''}`);

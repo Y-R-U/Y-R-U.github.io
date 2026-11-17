@@ -11,10 +11,11 @@ import { createDebug2D } from './ui/debug2d.js';
 import { load, write, defaults } from './meta/save.js';
 import { buildRoster } from './meta/roster.js';
 import { applyMatch } from './meta/progress.js';
+import { RATED } from './meta/ladder.js';
 import { item, crowdCosmetics } from './meta/shop.js';
 import { createOnline, serverUrl, onlineVisible, httpBase, newDeviceId, newCid, quickMode } from './net/online.js';
-import { modeOf } from './sim/sim.js';
-import { matchEvents, liveEvents, eventLook, eventSim } from './meta/events.js';
+import { modeOf, matchDuration, modeDuration, fmtLength } from './sim/sim.js';
+import { matchEvents, liveEvents, eventLook, eventSim, eventLength } from './meta/events.js';
 import { rollSeason } from './meta/season.js';
 import { EMOTES, emoteId } from './net/proto.js';
 import { zonesOf } from './ui/hud.js';
@@ -26,6 +27,7 @@ const opts = {
   mode: Q.get('mode') || '', event: Q.get('event') || '',
   seed: Q.has('seed') && Q.get('seed') !== '' ? Q.get('seed') : null,
   t: Math.max(0, +Q.get('t') || 0),
+  len: +Q.get('len') || 0,
 };
 const errors = [];
 const logErr = (where, e) => { const m = `${where}: ${e && e.stack || e}`; errors.push(m); console.error(m); };
@@ -162,12 +164,13 @@ async function boot() {
     visible: onlineVisible(),
     pendingCode: (Q.get('room') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6),
     roomMode: 'classic',
+    roomLen: 120,
     sheetUpdate: null,
     get status() { return online ? online.status : 'idle'; },
     get you() { return online && online.you; },
     connect(force) {
       if (!online) online = createOnline({ url: serverUrl(), map, name: app.playerName(), dev: devId, cid, cos: crowdCosmetics(save.equip), emit: onNet,
-        pickMode: (quick) => (quick ? quickMode() : modeOf(net.roomMode || 'classic')) });
+        pickMode: (quick) => (quick ? quickMode() : modeOf(net.roomMode || 'classic')), pickLength: (quick) => (quick ? 0 : net.roomLen || 0) });
       if (force && online.status === 'unavailable') { online.close(); }
       online.connect();
     },
@@ -248,6 +251,7 @@ async function boot() {
     const nm = lastNet;
     if (nm && nm.offline) return 'Finished offline: not on the leaderboard';
     if (nm && nm.late) return 'You joined late: this match is not on the leaderboard';
+    if (nm && nm.meta && nm.meta.duration > CONFIG.MATCH.duration) return `${fmtLength(nm.meta.duration)} match: the leaderboard counts 2:00 matches only`;
     if (lastRecorded === true) return 'Saved to the Online leaderboard';
     if (lastRecorded === false) return 'Not saved to the leaderboard this time';
     return 'Saving to the Online leaderboard…';
@@ -403,8 +407,10 @@ async function boot() {
     const roster = kind === 'sim-online' ? buildRoster({ seed, rating: save.rating, count: CONFIG.MATCH.crowds - 1 }) : null;
     const p = makePlayers({ seed, mode, playerName: app.playerName(), playerColor: app.colorHex(), playerCos: crowdCosmetics(save.equip), roster });
     const ev = matchEvents(Date.now(), mode);
-    if (opts.event) { ev.ids = opts.event.split(','); ev.sim = eventSim(ev.ids); ev.look = eventLook(ev.ids); ev.slayer = ev.ids.includes('slayer') ? 30 : ev.slayer; }
-    return { kind, seed, mode, ev, ...p };
+    if (opts.event) { ev.ids = opts.event.split(','); ev.sim = eventSim(ev.ids); ev.look = eventLook(ev.ids); ev.slayer = ev.ids.includes('slayer') ? 30 : ev.slayer; ev.len = eventLength(ev.ids, mode); }
+    // Ladder Classic and LCS always run their own clock (D20); ?len= is a Practice test hook.
+    const len = RATED[mode] != null && kind === 'sim-online' ? 0 : (kind === 'practice' && opts.len) || ev.len;
+    return { kind, seed, mode, ev, duration: matchDuration(mode, len), ...p };
   }
 
   function newMatch(pre) {
@@ -415,7 +421,7 @@ async function boot() {
     const countdown = attract || opts.shot ? 0 : CONFIG.MATCH.countdown;
     const mode = attract ? 'classic' : modeOf(pre.mode);
     const ev = pre.ev || null;
-    const sim = createSim({ seed, map, players, countdown, mode, config: attract ? ATTRACT.sim : ev ? ev.sim : null });
+    const sim = createSim({ seed, map, players, countdown, mode, config: attract ? ATTRACT.sim : ev ? ev.sim : null, ...(pre.duration ? { duration: pre.duration } : {}) });
     const bots = createBots({ sim, indices: idx, specs, seed, focus: attract ? attractFocus : null });
     match = { kind: pre.kind, seed, players, sim, bots, attract, crownSecs: 0, left: false, mode, ev, slayer: 0 };
     renderer.setCrowds(crowdsMeta(players));
@@ -649,7 +655,7 @@ async function boot() {
       report = applyMatch(save, {
         place: me.rank, count: me.count, best: me.best, kills: me.kills, recruited: me.recruited,
         crownSecs: match.crownSecs, left, mode: match.mode, coinMul: match.ev ? match.ev.coinMul : 1,
-        slayer: match.ev && match.ev.slayer ? { n: match.slayer, bonus: match.ev.slayer } : null,
+        slayer: match.ev && match.ev.slayer ? { n: match.slayer, bonus: match.ev.slayer } : null, duration: state.duration,
       });
     }
     if (!opts.auto) save.tutorialDone = true;
@@ -688,7 +694,8 @@ async function boot() {
     mode = 'lobby';
     if (!match || !match.attract) { cam('showcase'); attractMatch(); }
     // The very first match should start quickly: the fake "finding players" wait is short then.
-    screens.lobby.show({ players: pre.players, league: save.league, onDone: () => startMatch(pre), onCancel: () => showMenu(), ...(save.tutorialDone ? {} : { total: 1300 }) });
+    const len = pre.duration !== modeDuration(pre.mode) ? `${fmtLength(pre.duration)} match` : '';
+    screens.lobby.show({ players: pre.players, league: save.league, len, onDone: () => startMatch(pre), onCancel: () => showMenu(), ...(save.tutorialDone ? {} : { total: 1300 }) });
   }
 
   function startMatch(pre) {
@@ -714,7 +721,7 @@ async function boot() {
     if (!live()) return;
     if (match.kind !== 'practice') autopilot = true; else paused = true;
     input.setEnabled(false);
-    screens.pause.show({ online: match.kind !== 'practice', away, rated: match.kind === 'sim-online' && match.mode === 'classic' });
+    screens.pause.show({ online: match.kind !== 'practice', away, rated: match.kind === 'sim-online' && RATED[match.mode] != null });
   }
 
   function resumeMatch() {
@@ -749,7 +756,7 @@ async function boot() {
     try { fastForward(Math.min(away, left)); } catch (e) { logErr('catch-up', e); }
     last = performance.now();
     if (match.sim.state.phase === 'over') { screens.pause.hide(); return; }
-    screens.pause.show({ online: true, away, rated: match.mode === 'classic' });
+    screens.pause.show({ online: true, away, rated: RATED[match.mode] != null });
   }
   document.addEventListener('visibilitychange', () => (document.hidden ? onHidden() : onVisible()));
 

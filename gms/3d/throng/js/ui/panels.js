@@ -40,7 +40,7 @@ export function renderLadder(body, { app }) {
       <div class="ld-sub">${num(s.rating)} pts${next ? ` · ${num(Math.max(0, next.min - s.rating))} to ${esc(next.name)}` : ' · top league'}</div></div></div>
     <div class="ld-tiers">${LEAGUES.map((l) => `<span class="${l.index === s.league ? 'on' : l.index < s.league ? 'past' : ''}" title="${esc(l.name)}">${badgeSvg(l, 26)}<i>${l.index === 0 ? '0' : num(l.min)}</i></span>`).join('')}</div>
     <ol class="ld-list">${tops.map((r) => row(r)).join('')}${tops.length ? '<li class="gap">⋯</li>' : ''}${rows.map((r) => row(r, 'plate-' + s.equip.plate)).join('')}</ol>
-    <p class="ld-note">Rating moves with where you finish against where your rank expects you to. The higher you climb, the tougher the crowds you meet.</p>`;
+    <p class="ld-note">Classic and Last Crowd Standing move your rating: where you finish against where your rank expects you to (a shorter Last Crowd Standing match moves it a little less). The higher you climb, the tougher the crowds you meet.</p>`;
   requestAnimationFrame(() => body.querySelector('.ld-list .me')?.scrollIntoView({ block: 'nearest' }));
 }
 

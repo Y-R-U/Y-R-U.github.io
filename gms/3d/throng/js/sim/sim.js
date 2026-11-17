@@ -34,6 +34,9 @@ const STATE_KEYS = ['tick', 'time', 'timeLeft', 'countdownLeft', 'phase', 'durat
 export const MODE_IDS = ['classic', 'teams', 'koth', 'lcs', 'infection'];
 export const modeOf = (m) => (MODE_IDS.includes(m) ? m : 'classic');
 export const modeDuration = (m) => (modeOf(m) === 'classic' ? CONFIG.MATCH.duration : CONFIG.MODES[modeOf(m)].duration);
+// The clock for a mode at a picked length (seconds). LCS ignores it: its circle schedule is its clock.
+export const matchDuration = (m, len) => (modeOf(m) === 'lcs' || !CONFIG.MATCH.lengths.includes(+len) ? modeDuration(m) : +len);
+export const fmtLength = (s) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
 
 // LCS safe circle as a pure function of play time: shrinks in stages from the city centre toward `target`.
 export function lcsCircle(MC, t, target) {
@@ -367,7 +370,7 @@ export function createSim({ seed = 1, map, players, mode = 'classic', duration, 
       N.x[i] = nx; N.z[i] = nz;
     }
     if (N.active < cap) {
-      neutralRespawnAcc += C.neutralRespawn * dt;
+      neutralRespawnAcc += C.neutralRespawn * (state.duration - state.timeLeft > C.neutralLateAt ? C.neutralLateMul : 1) * dt;
       while (neutralRespawnAcc >= 1) {
         neutralRespawnAcc -= 1;
         let slot = -1;

@@ -18,6 +18,7 @@ let online = null, steerA = Math.random() * 6.28, steerT = 0, last = performance
 const samples = {};           // tick → counts (every 150 ticks) from what this client sees as authoritative
 const series = [];            // { t, tick, counts, role } every 250 ms
 let breakMode = '';
+let roomLen = 0;
 let inputsRecv = 0;
 // Pedestrian reconstruction check: an independent model fed exactly what this client received.
 const nsamples = {}, hsamples = {};
@@ -92,7 +93,7 @@ setInterval(() => {
   series.push({ t: Date.now(), tick: auth.tick, role: m.role, counts: auth.crowds.map((c) => c.count), alive: auth.crowds.map((c) => c.alive) });
   const g = m.guest;
   tell({
-    ev: 'tick', role: m.role, me: m.me, tick: auth.tick, phase: auth.phase, timeLeft: auth.timeLeft,
+    ev: 'tick', role: m.role, me: m.me, tick: auth.tick, phase: auth.phase, timeLeft: auth.timeLeft, duration: auth.duration,
     counts: auth.crowds.map((c) => c.count), humans: m.players.map((p) => !!p.human),
     net: online.net, netSecs: (performance.now() - online.net.since) / 1000, rtt: online.rtt, inputsRecv,
     guest: g ? { bytes: g.stats.bytes, secs: (performance.now() - g.stats.since) / 1000, snaps: g.stats.snaps, keys: g.stats.keys, since: g.stats.since, latency: g.stats.latency.slice(-200), corrections: g.stats.corrections, maxErr: g.stats.maxErr } : null,
@@ -106,9 +107,10 @@ function open(msg) {
   online = createOnline({
     url: msg.url, map, name: msg.name, dev: msg.dev, cid: msg.cid,
     ...(MODE ? { pickMode: (quick) => (quick ? 'classic' : MODE) } : {}),
+    pickLength: () => (breakMode === 'lenmeta' ? 0 : roomLen),
     emit: (type, data) => {
       if (type === 'room') tell({ ev: 'room', room: data });
-      else if (type === 'begin') tell({ ev: 'begin', me: data.match.me, role: data.match.role, late: data.late, humans: data.match.players.map((p) => !!p.human), counts: null, mode: data.match.mode });
+      else if (type === 'begin') tell({ ev: 'begin', me: data.match.me, role: data.match.role, late: data.late, humans: data.match.players.map((p) => !!p.human), counts: null, mode: data.match.mode, duration: data.match.meta.duration });
       else if (type === 'role') tell({ ev: 'role', role: data.role, why: data.why });
       else if (type === 'status') tell({ ev: 'status', status: data.status });
       else if (type === 'ended') tell({ ev: 'ended', recorded: data.recorded, why: data.why });
@@ -116,6 +118,8 @@ function open(msg) {
     },
   });
   if (breakMode === 'lobbymode') online.setMode = () => Promise.resolve();
+  if (breakMode === 'lobbylen' || msg.old) online.setLength = () => Promise.resolve();
+  if (msg.old) roomLen = 0;
   online.connect();
 }
 
@@ -132,6 +136,7 @@ process.on('message', async (msg) => {
       open({ ...conn, cid: breakMode === 'reload' ? conn.cid + 'x' : conn.cid });
       tell({ ev: 'reply', cmd: 'reload' });
     } else if (msg.cmd === 'mode') { await online.setMode(msg.mode); tell({ ev: 'reply', cmd: 'mode' }); }
+    else if (msg.cmd === 'len') { if (!conn.old) roomLen = msg.len; await online.setLength(msg.len); tell({ ev: 'reply', cmd: 'len', feat: online.has('len') }); }
     else if (msg.cmd === 'quick') tell({ ev: 'reply', cmd: 'quick', room: (await online.quick()).room });
     else if (msg.cmd === 'create') tell({ ev: 'reply', cmd: 'create', room: (await online.create()).room });
     else if (msg.cmd === 'join') {

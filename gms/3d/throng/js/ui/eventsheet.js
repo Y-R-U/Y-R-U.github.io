@@ -1,5 +1,6 @@
 import { esc, num, UI_ICON, MODE_ICON } from './kit.js';
 import { CONFIG } from '../config.js';
+import { fmtLength } from '../sim/sim.js';
 import { EVENTS, liveEvents, nextEvents, featuredMode, cupView, fmtCountdown, modeName } from '../meta/events.js';
 import { seasonAt, SEASON } from '../meta/season.js';
 import { LEAGUES, badgeSvg } from '../meta/leagues.js';
@@ -14,7 +15,7 @@ export function renderEvents(body, { app, close }) {
     const card = (w, on) => {
       const d = EVENTS[w.id];
       return `<li class="ev-card ${on ? 'live' : ''}" style="--c:${d.color}"><span class="ev-ico">${esc(d.icon)}</span>
-        <div><b>${esc(d.name)}</b><small>${esc(d.blurb)}</small></div>
+        <div><b>${esc(d.name)}${d.len ? ` <i class="ev-len">${fmtLength(d.len)} matches</i>` : ''}</b><small>${esc(d.blurb)}</small></div>
         <span class="ev-t">${on ? `<em>LIVE</em> <span data-to="${w.end}">${fmtCountdown(w.end - now)}</span>` : `in <span data-to="${w.start}">${fmtCountdown(w.start - now)}</span><i>${esc(when(w.start))}</i>`}</span></li>`;
     };
     body.innerHTML = `

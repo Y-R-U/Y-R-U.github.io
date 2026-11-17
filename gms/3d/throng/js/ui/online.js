@@ -4,6 +4,7 @@ import { h, esc, hex, num, UI_ICON, MODE_ICON } from './kit.js';
 import { ICON } from './hud.js';
 import { CONFIG } from '../config.js';
 import { quickMode } from '../net/online.js';
+import { fmtLength } from '../sim/sim.js';
 
 export const GLOBE = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M2.5 12h19M12 2.5c3 3 3 16 0 19M12 2.5c-3 3-3 16 0 19" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
 
@@ -74,7 +75,8 @@ export function createRoomLobby({ root, app }) {
       <div class="ol-code hidden"><span>Room code</span><b></b>
         <div class="ol-share"><button type="button" class="btn btn-ghost ol-copy">Copy link</button><button type="button" class="btn btn-ghost ol-native hidden">Share</button></div>
         <input class="ol-link" readonly tabindex="-1"></div>
-      <div class="ol-mode"><span class="olm-l">Mode</span><div class="m-modes olm-strip">${CONFIG.MODE_ORDER.map((m) => `<button type="button" data-mode="${m}">${MODE_ICON[m]}<span>${esc(CONFIG.MODES[m].short)}</span></button>`).join('')}</div><span class="olm-t"></span></div>
+      <div class="ol-mode"><span class="olm-l">Mode</span><div class="m-modes olm-strip">${CONFIG.MODE_ORDER.map((m) => `<button type="button" data-mode="${m}">${MODE_ICON[m]}<span>${esc(CONFIG.MODES[m].short)}</span></button>`).join('')}</div><span class="olm-t"></span>
+        <div class="seg oll-strip" role="radiogroup" aria-label="Match length">${CONFIG.MATCH.lengths.map((n) => `<button type="button" role="radio" data-len="${n}">${fmtLength(n)}</button>`).join('')}</div><span class="oll-t"></span></div>
       <ol class="lby-list ol-list"></ol>
       <p class="on-err hidden"></p>
       <div class="ol-btns">
@@ -98,6 +100,9 @@ export function createRoomLobby({ root, app }) {
   let sentMode = '';
   const pushMode = (m) => { const o = app.net.client; sentMode = room.code + ':' + m; if (o) o.setMode(m); };
   el.querySelectorAll('.olm-strip [data-mode]').forEach((b) => b.addEventListener('click', () => { app.audio.ui(); net().roomMode = b.dataset.mode; pushMode(b.dataset.mode); render(); }));
+  let sentLen = '';
+  const pushLen = (n) => { const o = app.net.client; sentLen = room.code + ':' + n; if (o) o.setLength(n); };
+  el.querySelectorAll('.oll-strip [data-len]').forEach((b) => b.addEventListener('click', () => { app.audio.ui(); net().roomLen = +b.dataset.len; pushLen(+b.dataset.len); render(); }));
   const link = () => net().shareLink(room.code);
   $('.ol-copy').addEventListener('click', async () => {
     const b = $('.ol-copy');
@@ -139,6 +144,19 @@ export function createRoomLobby({ root, app }) {
     const olmT = pick ? esc(CONFIG.MODES[rm].blurb) : quick ? esc(`${CONFIG.MODES[quickMode()].name} (quick matches rotate every 10 min)`)
       : shown ? `<b class="olm-pick">${MODE_ICON[shown]}${esc(CONFIG.MODES[shown].name)}</b><br>${esc(CONFIG.MODES[shown].blurb)}` : 'The host picks the mode';
     if ($('.olm-t').innerHTML !== olmT) $('.olm-t').innerHTML = olmT;
+    // Match length (D20): same pattern as the mode. Old servers send no len: guests then learn the clock at begin.
+    const lens = CONFIG.MATCH.lengths, shownLen = !quick && lens.includes(room.len) ? room.len : 0;
+    if (shownLen && !pick) net().roomLen = shownLen;
+    const rl = lens.includes(net().roomLen) ? net().roomLen : lens[0];
+    if (pick && shownLen !== rl && sentLen !== room.code + ':' + rl) pushLen(rl);
+    const canLen = pick && app.net.client && app.net.client.has('len');
+    $('.oll-strip').classList.toggle('hidden', !canLen);
+    el.querySelectorAll('.oll-strip [data-len]').forEach((b) => { const on = +b.dataset.len === rl; b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); });
+    const lcs = (pick ? rm : shown) === 'lcs';
+    const ollT = quick ? '2:00 matches' : lcs ? 'Last Crowd Standing keeps its own clock (about 1:30)'
+      : canLen ? (rl === lens[0] ? 'Match length · 2:00 matches go on the leaderboard' : `Match length · ${fmtLength(rl)} matches are not on the leaderboard`)
+      : pick ? '2:00 matches' : shownLen ? `<b class="olm-pick">${fmtLength(shownLen)}</b> match${shownLen !== lens[0] ? ' · not on the leaderboard' : ''}` : '';
+    if ($('.oll-t').innerHTML !== ollT) $('.oll-t').innerHTML = ollT;
     $('.ol-code').classList.toggle('hidden', quick);
     $('.ol-code b').textContent = room.code;
     $('.ol-link').value = quick ? '' : link();

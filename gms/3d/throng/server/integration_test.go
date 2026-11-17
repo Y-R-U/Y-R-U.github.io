@@ -639,7 +639,7 @@ func TestWelcomeFeatures(t *testing.T) {
 		Feat []string `json:"feat"`
 	}
 	json.Unmarshal(msg, &w)
-	if w.T != "welcome" || strings.Join(w.Feat, ",") != "mode,boards-mode" {
+	if w.T != "welcome" || strings.Join(w.Feat, ",") != "mode,boards-mode,len" {
 		t.Fatalf("welcome %s", msg)
 	}
 }
@@ -731,5 +731,109 @@ func TestMigrateOldDatabase(t *testing.T) {
 	db.QueryRow(`SELECT wins FROM alltime_mode WHERE pid = 'dddddddddddd' AND mode = 'classic'`).Scan(&classic)
 	if all != 5 || teams != 2 || classic != 3 {
 		t.Fatalf("after two opens: all-modes wins %d (want 5), teams %d (want 2), classic %d (want 3)", all, teams, classic)
+	}
+}
+
+// D20: the host's match length is a room field everyone sees, survives a match and a lobby host change, and a
+// non-2:00 result is settled but kept off the boards.
+func TestLobbyLengthPick(t *testing.T) {
+	s := newServer(t)
+	h, g := dial(t, s, "Lena", nil), dial(t, s, "Gil", nil)
+	code := h.req(map[string]any{"t": "create"})["room"].(map[string]any)["code"]
+	g.req(map[string]any{"t": "join", "code": code})
+	if r := h.req(map[string]any{"t": "len", "len": 300}); r["t"] != "ok" {
+		t.Fatalf("host length pick: %v", r)
+	}
+	if g.waitf(func(m map[string]any) bool {
+		room, _ := m["room"].(map[string]any)
+		return m["t"] == "room" && room != nil && room["len"] == float64(300)
+	}, "room with len 300") == nil {
+		t.Fatal("guest never saw the length")
+	}
+	if r := g.req(map[string]any{"t": "len", "len": 180}); r["code"] != "not_now" {
+		t.Fatalf("a guest changed the length: %v", r)
+	}
+	for _, bad := range []int{0, 60, 200, 600} {
+		if r := h.req(map[string]any{"t": "len", "len": bad}); r["code"] != "bad_request" {
+			t.Fatalf("length %d accepted: %v", bad, r)
+		}
+	}
+	l := dial(t, s, "Lars", nil)
+	if room := l.req(map[string]any{"t": "join", "code": code})["room"].(map[string]any); room["len"] != float64(300) {
+		t.Fatalf("join reply len %v", room["len"])
+	}
+	m := meta(h.you, g.you, l.you)
+	m["duration"] = 300
+	mid := h.req(map[string]any{"t": "begin", "meta": m})["mid"]
+	if r := h.req(map[string]any{"t": "len", "len": 120}); r["code"] != "not_now" {
+		t.Fatalf("length changed mid-match: %v", r)
+	}
+	time.Sleep(50 * time.Millisecond)
+	h.mu.Lock()
+	h.msgs = nil
+	h.mu.Unlock()
+	advance(303 * time.Second)
+	h.bin(snap(1, 9000))
+	rows := []map[string]any{}
+	for i := 0; i < 8; i++ {
+		rows = append(rows, map[string]any{"crowd": i, "count": 900 * (8 - i), "best": 900 * (8 - i), "kills": 0, "rank": i + 1})
+	}
+	for _, x := range []*tc{h, g, l} {
+		x.send(map[string]any{"t": "result", "mid": mid, "rows": rows})
+	}
+	time.Sleep(50 * time.Millisecond)
+	settleTicks(1)
+	if e := h.wait("ended"); e["recorded"] != false {
+		t.Fatalf("a 5:00 result went on the boards: %v", e)
+	}
+	var n int
+	db.QueryRow(`SELECT COUNT(*) FROM results WHERE mid = ?`, mid).Scan(&n)
+	if n != 0 {
+		t.Fatalf("%d board rows from a 5:00 match", n)
+	}
+	back := h.waitf(func(m map[string]any) bool {
+		room, _ := m["room"].(map[string]any)
+		return m["t"] == "room" && room != nil && room["state"] == "lobby"
+	}, "room back in lobby")
+	if back["room"].(map[string]any)["len"] != float64(300) {
+		t.Fatalf("length after the match: %v", back["room"])
+	}
+	// the host leaves in the lobby: the new host's room still carries the length
+	h.req(map[string]any{"t": "leave"})
+	if g.waitf(func(m map[string]any) bool {
+		room, _ := m["room"].(map[string]any)
+		return m["t"] == "room" && room != nil && room["host"] != h.you && room["len"] == float64(300)
+	}, "new host, same length") == nil {
+		t.Fatal("length lost on a host change")
+	}
+	q := dial(t, s, "Quix", nil)
+	q.req(map[string]any{"t": "quick"})
+	if r := q.req(map[string]any{"t": "len", "len": 300}); r["code"] != "not_now" {
+		t.Fatalf("length pick in a quick room: %v", r)
+	}
+}
+
+func TestPlausibilityLength(t *testing.T) {
+	ok := []ResultRow{{0, 100, 120, 1, 1}, {1, 50, 60, 0, 2}}
+	big := []ResultRow{{0, 9000, 12000, 120, 1}, {1, 50, 60, 0, 2}}
+	for _, c := range []struct {
+		duration float64
+		rows     []ResultRow
+		at       int64
+		want     bool
+	}{
+		{120, ok, 123000, true},
+		{120, big, 123000, false}, // 2:00 caps unchanged
+		{180, ok, 183000, true},
+		{180, ok, 123000, false}, // a 3:00 room must run its clock
+		{300, big, 303000, true},
+		{300, []ResultRow{{0, 100, 16000, 1, 1}}, 303000, false},
+		{300, []ResultRow{{0, 100, 120, 160, 1}}, 303000, false},
+		{301, ok, 304000, false},
+	} {
+		r := &Room{Duration: c.duration, Countdown: 3, BeganAt: 0, Mode: "classic"}
+		if got := plausible(r, c.rows, c.at); got != c.want {
+			t.Errorf("duration %v, rows %+v at %d: plausible = %v, want %v", c.duration, c.rows, c.at, got, c.want)
+		}
 	}
 }

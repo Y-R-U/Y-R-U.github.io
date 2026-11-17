@@ -1,4 +1,4 @@
-// node tools/net_test.mjs [--duration=120] [--mode=classic|teams|koth|lcs|infection] [--break=counts|migrate|late|bytes|rate|version|mode|emote|lobbymode|reload] [--keep]
+// node tools/net_test.mjs [--duration=120] [--mode=classic|teams|koth|lcs|infection] [--break=counts|migrate|late|bytes|rate|version|mode|emote|lobbymode|reload|lobbylen|lenmeta] [--keep]
 // Builds and starts the Go server locally, runs headless clients (tools/net_client.mjs, the real js/net code;
 // the host runs the real sim + bots) through a whole match and asserts the online guarantees. Exit 1 on failure.
 import { fork, spawn, execFileSync } from 'node:child_process';
@@ -120,8 +120,65 @@ const hello = (o = {}) => ({ t: 'hello', v: 1, sim: SIMV, map: MAPV, dev: dev(),
   check(G.mode === (MODE || 'koth') && G.state && G.state.mode === (MODE || 'koth') && H.sim.config.pickupCount === 14, `the guest mirrors the host's mode (${G.state && G.state.mode}) and the event config travels in the meta`);
 }
 
+// ------------------------------------------------------------ in-process: the room's match length rides the meta (D20)
+{
+  console.log('\n[length] in-process host + guest at 5:00');
+  const { createNetMatch, buildMeta } = await import('../js/net/netmatch.js');
+  let g; try { g = (await import('../js/world/map.js')).generateMap; } catch { g = (await import('./stub_map.js')).generateMap; }
+  const map = g(1);
+  const meta = buildMeta({ seed: 9, members: [{ id: 'h', name: 'Host' }, { id: 'g', name: 'Guest' }], mode: MODE || 'classic', len: BREAK === 'lenmeta' ? 0 : 300 });
+  const toGuest = [];
+  const H = createNetMatch({ map, meta, me: 0, role: 'host', sendBin: (b) => toGuest.push(b) });
+  const G = createNetMatch({ map, meta, me: 1, role: 'guest', sendBin: () => {} });
+  let now = 0;
+  for (let f = 0; f < 200; f++) { now += 33; H.frame(now, 0.033, 0, 0); while (toGuest.length) G.onSnap(toGuest.shift(), now); G.frame(now, 0.033, 0, 0); }
+  const want = MODE === 'lcs' ? DUR : 300;
+  check(H.sim.state.duration === want && G.guest.latest && G.guest.latest.duration === want, `a 5:00 room: host clock ${H.sim.state.duration} s, guest mirror ${G.guest.latest && G.guest.latest.duration} s (want ${want}${MODE === 'lcs' ? ': LCS keeps its own' : ''})`);
+  check(buildMeta({ seed: 1, members: [], mode: 'lcs', len: 300 }).duration === buildMeta({ seed: 1, members: [], mode: 'lcs' }).duration && buildMeta({ seed: 1, members: [], mode: 'koth', len: 999 }).duration === buildMeta({ seed: 1, members: [], mode: 'koth' }).duration,
+    'LCS ignores the length; an unknown length falls back to the mode clock');
+}
+
 let exitCode = 0;
 try {
+  // ------------------------------------------------------------ private room at 5:00: guests see the pick, late join + migration keep it
+  {
+    console.log('\n[length] private room at 5:00 through the server');
+    const X = client('Xena'), Y = client('Yuri'), Z = client('Zack'), O = client('Olde');
+    await Promise.all([connect(X), connect(Y), connect(Z), connect(O, { old: true })]);
+    const code = (await X.cmd('create')).room.code;
+    await Y.cmd('join', { code }); await Z.cmd('join', { code });
+    const r = await X.cmd('len', { len: 300 });
+    check(r.feat, 'the server offers the len feature');
+    const saw = await Promise.all([Y, Z].map((c) => c.wait((m) => m.ev === 'room' && m.room && m.room.len === 300, 4000, 'lobby len').catch(() => null)));
+    check(saw.every(Boolean), 'both guests see the host\'s 5:00 pick in the lobby');
+    await X.cmd('start');
+    const bs = await Promise.all([X, Y, Z].map((c) => c.wait((m) => m.ev === 'begin', 8000, 'begin').catch(() => null)));
+    const wantDur = MODE === 'lcs' ? DUR : 300;
+    check(bs.every((b) => b && b.duration === wantDur), `everyone's match runs ${bs.map((b) => b && b.duration).join('/')} s (want ${wantDur})`);
+    await sleep(4000);
+    const late = client('Lana'); await connect(late);
+    await late.cmd('join', { code });
+    let lb = null; try { lb = await late.wait((m) => m.ev === 'begin', 8000, 'late begin'); } catch (e) { fail(e.message); }
+    check(lb && lb.late && lb.duration === wantDur, `a late joiner gets the room's length (${lb && lb.duration} s)`);
+    X.kill('SIGKILL');
+    let pr = null; try { pr = await Y.wait((m) => m.ev === 'role' && m.role === 'host', 8000, 'promotion'); } catch (e) { fail(e.message); }
+    await sleep(2500);
+    check(pr && Y.last && Y.last.role === 'host' && Y.last.duration === wantDur && Y.last.timeLeft > wantDur - 30 && Z.last && Z.last.duration === wantDur,
+      `after host migration the new host still runs a ${Y.last && Y.last.duration} s clock (${Y.last && Math.round(Y.last.timeLeft)} s left), guest ${Z.last && Z.last.duration}`);
+    // An old client (before D20) hosting: it never sends len, so its room has no len and its guests get the mode clock.
+    const oc = (await O.cmd('create')).room.code;
+    const P = client('Pip'); await connect(P);
+    await P.cmd('join', { code: oc });
+    await O.cmd('len', { len: 300 });
+    await sleep(400);
+    await O.cmd('start');
+    const ob = await Promise.all([O, P].map((c) => c.wait((m) => m.ev === 'begin', 8000, 'begin').catch(() => null)));
+    const roomP = P.events.filter((m) => m.ev === 'room').pop();
+    check(roomP && roomP.room.len === undefined && ob.every((b) => b && b.duration === DUR), `an old host's room carries no length and plays the default clock (${ob.map((b) => b && b.duration).join('/')} s)`);
+    for (const c of [X, Y, Z, late, O, P]) { try { c.kill('SIGKILL'); } catch {} }
+    await sleep(300);
+  }
+
   // ------------------------------------------------------------ private room: create → join by code → start
   console.log('\n[room] create, join by code, start');
   const H = client('Alice'), G1 = client('Bob'), G2 = client('Cara');

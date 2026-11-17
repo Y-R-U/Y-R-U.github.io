@@ -1,6 +1,7 @@
 export const CONFIG = {
   MATCH: {
     duration: 120,
+    lengths: [120, 180, 300],   // match lengths a private room or an event may pick (D20); Last Crowd Standing keeps its own
     crowds: 8,
     countdown: 3,
   },
@@ -22,6 +23,8 @@ export const CONFIG = {
     neutralCap: 650,
     neutralStart: 560,
     neutralRespawn: 26,      // per second, while below cap
+    neutralLateAt: 120,      // 3:00 / 5:00 matches: after this much play the street refills slower, so crowds don't
+    neutralLateMul: 0.5,     // outgrow the city (2:00 never reaches it)
     neutralSpawnClear: 22,   // metres from any crowd edge
     neutralSpeedMin: 1.0,
     neutralSpeedMax: 1.9,

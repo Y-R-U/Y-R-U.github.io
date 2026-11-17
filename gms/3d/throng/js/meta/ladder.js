@@ -41,13 +41,19 @@ export function parAt(rating, cfg = LADDER) {
   return P[P.length - 1][1];
 }
 
-// Rating change for finishing `place` (1 = won) out of 8.
-export function ratingDelta(rating, place, cfg = LADDER) {
+// Modes that move the rating: [gain, loss] multipliers on Classic's points (D21). A Last Crowd Standing match lasts
+// about 75 s against Classic's 120 and the ladder bot places a little worse in it; these make the expected gain per
+// minute of play match Classic in every league, within the sweep noise (tools/mode_sweep.mjs --rating, G7 report).
+export const RATED = { classic: [1, 1], lcs: [0.73, 0.65] };
+
+// Rating change for finishing `place` (1 = won) out of 8. gainMul / lossMul: the mode's multipliers (RATED).
+export function ratingDelta(rating, place, cfg = LADDER, gainMul = 1, lossMul = gainMul) {
   const par = parAt(rating, cfg);
   let d = cfg.k * (par - place);
   if (d < 0) d *= cfg.lossMul;
   if (place === 1) d += cfg.winBonus;
-  d = Math.round(Math.max(-cfg.maxLoss, Math.min(cfg.maxGain, d)));
+  d = Math.max(-cfg.maxLoss, Math.min(cfg.maxGain, d));
+  d = Math.round(d * (d < 0 ? lossMul : gainMul));
   if (rating + d < 0) d = -rating;
   return d;
 }

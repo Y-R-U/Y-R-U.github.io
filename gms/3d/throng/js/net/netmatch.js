@@ -1,7 +1,7 @@
 // One online match on this client, as host (runs the sim) or guest (mirrors snapshots).
 // DOM-free: the browser (js/main.js) and the node harness (tools/net_test.mjs) drive the same code.
 import { CONFIG } from '../config.js';
-import { createSim, SIM_DT, modeOf, modeDuration } from '../sim/sim.js';
+import { createSim, SIM_DT, modeOf, matchDuration } from '../sim/sim.js';
 import { applyModeLooks } from '../sim/match.js';
 import { eventSim } from '../meta/events.js';
 import { encodeEmote } from './proto.js';
@@ -13,8 +13,9 @@ import { createHost } from './host.js';
 import { createGuest } from './guest.js';
 
 // The host builds this when the room starts: humans first (join order), bots fill to 8.
-// mode: the room's game mode; events: the live event ids (their sim overrides travel with the match).
-export function buildMeta({ seed, members, mode = 'classic', events = [] }) {
+// mode: the room's game mode; events: the live event ids (their sim overrides travel with the match);
+// len: the private room's match length in seconds (0 = the mode's own; LCS always keeps its own).
+export function buildMeta({ seed, members, mode = 'classic', events = [], len = 0 }) {
   const rng = createRng('meta:' + seed);
   const teams = CONFIG.TEAMS.slice(0, CONFIG.MATCH.crowds);
   const specs = CONFIG.BOTS.slice();
@@ -27,7 +28,7 @@ export function buildMeta({ seed, members, mode = 'classic', events = [] }) {
   });
   mode = modeOf(mode);
   applyModeLooks(players, mode, seed);
-  return { v: 1, seed: String(seed), mode, events: events.slice(0, 6), duration: modeDuration(mode), countdown: CONFIG.MATCH.countdown, players };
+  return { v: 1, seed: String(seed), mode, events: events.slice(0, 6), duration: matchDuration(mode, len), countdown: CONFIG.MATCH.countdown, players };
 }
 
 const simPlayers = (meta) => meta.players.map((p, i) => ({ id: p.id || 'b' + i, name: p.name, color: p.color, isBot: !p.human, remote: !!p.human, persona: p.persona, skill: p.skill, team: p.team, horde: !!p.horde }));

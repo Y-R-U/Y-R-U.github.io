@@ -376,6 +376,7 @@ button { font-family: inherit; font-size: inherit; cursor: pointer; -webkit-tap-
 @keyframes breathe { 50% { transform: scale(1.05); } }
 .m-practice { border: 0; background: none; color: #fff; font-weight: 800; font-size: .95em; padding: .5em 1em; opacity: .9; text-shadow: 0 1px 3px rgba(0,0,0,.8); text-decoration: underline; text-underline-offset: .2em; text-decoration-color: rgba(255,255,255,.4); }
 .m-practice small { font-weight: 700; opacity: .75; }
+.play-len { margin-left: .45em; font-size: .55em; vertical-align: middle; padding: .1em .4em; border-radius: .4em; background: rgba(0,0,0,.25); }
 .m-daily { align-self: center; border: 0; color: #fff; display: flex; align-items: center; gap: .5em; max-width: 100%; padding: .45em .9em .45em .5em; border-radius: 1em; background: linear-gradient(180deg, rgba(60,40,140,.85), rgba(30,22,80,.85)); box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 0 0 1.5px rgba(255,210,58,.5), 0 4px 12px rgba(0,0,0,.35); font-weight: 800; font-size: .92em; }
 .md-ico svg { width: 1.3em; height: 1.3em; fill: var(--gold); display: block; }
 .md-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
@@ -414,6 +415,8 @@ button { font-family: inherit; font-size: inherit; cursor: pointer; -webkit-tap-
 .lobby.found .lby-t { color: var(--gold); animation: winPulse .5s ease-in-out; }
 .lby-n { font-weight: 800; opacity: .85; }
 .lby-n b { color: var(--gold); font-size: 1.2em; }
+.ev-len { font-style: normal; font-size: .8em; padding: .05em .4em; border-radius: .4em; background: rgba(255,154,60,.22); color: #ffc48a; white-space: nowrap; }
+.lby-len { margin-left: .6em; padding: .05em .45em; border-radius: .4em; background: rgba(255,154,60,.22); color: #ffc48a; font-size: .85em; white-space: nowrap; }
 .lby-list { list-style: none; margin: 0 0 .9em; padding: 0; display: flex; flex-direction: column; gap: .25em; }
 .slot { display: flex; align-items: center; gap: .5em; height: 2em; padding: 0 .65em; border-radius: .65em; background: rgba(255,255,255,.06); font-weight: 800; }
 .slot.in { background: linear-gradient(90deg, color-mix(in srgb, var(--c) 40%, transparent), rgba(255,255,255,.06) 70%); animation: slotIn .35s cubic-bezier(.3,1.6,.5,1); }
@@ -904,6 +907,9 @@ button { font-family: inherit; font-size: inherit; cursor: pointer; -webkit-tap-
 .olm-t { font-size: .8em; font-weight: 700; opacity: .85; text-align: center; }
 .olm-pick { display: inline-flex; align-items: center; gap: .3em; font-size: 1.15em; font-weight: 900; color: var(--gold); }
 .olm-pick svg { width: 1.3em; height: 1.3em; fill: currentColor; }
+.oll-strip { margin-top: .25em; }
+.oll-strip button { min-width: 52px; min-height: 36px; font-size: max(12px, .9em); font-variant-numeric: tabular-nums; }
+.oll-t { font-size: max(11px, .75em); font-weight: 700; opacity: .8; text-align: center; }
 .ob-m { margin: .1em 0 .45em; gap: .3em; }
 .ob-m button { font-size: .78em; padding: .3em .6em .3em .4em; }
 @media (orientation: landscape) and (max-height: 500px) {

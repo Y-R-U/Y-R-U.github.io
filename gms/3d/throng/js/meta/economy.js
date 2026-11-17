@@ -12,14 +12,16 @@ export const ECON = {
 
 export const xpToNext = (level) => 120 + 30 * (level - 1);
 
-export function matchPayout({ place, kills = 0, best = 0, left = false }) {
+// lenMul: match length / the mode's normal length (D20). Placement and the peak caps scale with it; kills and
+// peak crowd already grow with a longer clock.
+export function matchPayout({ place, kills = 0, best = 0, left = false, lenMul = 1 }) {
   if (left) return { coins: [], xp: 10 };
   const coins = [
-    { id: 'place', label: 'Placement', n: ECON.placeCoins[Math.max(0, Math.min(7, place - 1))] },
+    { id: 'place', label: 'Placement', n: Math.round(ECON.placeCoins[Math.max(0, Math.min(7, place - 1))] * lenMul) },
     { id: 'kills', label: 'Crowds absorbed', n: kills * ECON.killCoins },
-    { id: 'peak', label: 'Peak crowd', n: Math.min(ECON.peakCap, Math.floor(best / ECON.peakPer)) },
+    { id: 'peak', label: 'Peak crowd', n: Math.min(Math.round(ECON.peakCap * lenMul), Math.floor(best / ECON.peakPer)) },
   ].filter((c) => c.n > 0);
-  const xp = ECON.placeXp(place) + kills * ECON.killXp + Math.min(ECON.peakXpCap, Math.floor(best / ECON.peakXpPer));
+  const xp = Math.round(ECON.placeXp(place) * lenMul) + kills * ECON.killXp + Math.min(Math.round(ECON.peakXpCap * lenMul), Math.floor(best / ECON.peakXpPer));
   return { coins, xp };
 }
 

@@ -73,6 +73,7 @@ type Room struct {
 	Duration, Countdown                  float64
 	Mode                                 string
 	LobbyMode                            string // private room: the host's pick, shown to everyone in the lobby
+	LobbyLen                             int    // private room: the host's match length in seconds (D20), 0 = not picked
 	key                                  []byte
 	tail                                 [][]byte
 	hostReport                           *Report
@@ -106,7 +107,12 @@ func boardMode(m string) string {
 }
 
 // serverFeatures lets new clients use additions an older server would refuse (no protocol bump needed).
-var serverFeatures = []string{"mode", "boards-mode"}
+var serverFeatures = []string{"mode", "boards-mode", "len"}
+
+// Match lengths a private room may pick (D20). The leaderboards only take standard-length matches.
+var validLens = map[int]bool{120: true, 180: true, 300: true}
+
+const boardMaxDuration = 120
 
 func newHub() *Hub {
 	return &Hub{rooms: map[string]*Room{}, members: map[string]*Member{}, perIP: map[string]int{}}
@@ -393,6 +399,9 @@ func (h *Hub) roomView(r *Room, you *Member) map[string]any {
 	if r.LobbyMode != "" {
 		v["mode"] = r.LobbyMode
 	}
+	if r.LobbyLen > 0 {
+		v["len"] = r.LobbyLen
+	}
 	if you != nil {
 		v["you"] = you.ID
 	}
@@ -540,6 +549,18 @@ func (h *Hub) dispatch(s *Sess, m inMsg) {
 			return
 		}
 		r.LobbyMode = m.Mode
+		s.reply(m.ID)
+		h.pushRoom(r)
+	case "len":
+		if r == nil || r.Quick || r.Host != mem || r.State != "lobby" {
+			s.fail(m.ID, "not_now", "only the host picks the length, in the room lobby")
+			return
+		}
+		if !validLens[m.Len] {
+			s.fail(m.ID, "bad_request", "length 120, 180 or 300")
+			return
+		}
+		r.LobbyLen = m.Len
 		s.reply(m.ID)
 		h.pushRoom(r)
 	case "begin":
@@ -812,20 +833,26 @@ func sameHumans(r *Room, a, b []ResultRow) bool {
 	return true
 }
 
-// plausible: caps on what a 2-minute match can produce (the host's browser is trusted for the rest, D11).
+// plausible: caps on what a match can produce (the host's browser is trusted for the rest, D11). The caps were set
+// for 2 minutes and scale with a longer room clock (D20).
 func plausible(r *Room, rows []ResultRow, now int64) bool {
 	minRun := int64((r.Duration+r.Countdown)*1000) - 8000
 	// these two modes end when one side is left, well before the clock
 	if mode := boardMode(r.Mode); mode == "lcs" || mode == "infection" {
 		minRun = int64((40 + r.Countdown) * 1000)
 	}
-	if r.Duration < 90 || r.Duration > 180 || now-r.BeganAt < minRun {
+	if r.Duration < 90 || r.Duration > 300 || now-r.BeganAt < minRun {
 		return false
 	}
+	scale := r.Duration / 120
+	if scale < 1 {
+		scale = 1
+	}
+	maxBest, maxKills := int(6000*scale), int(60*scale)
 	seen := map[int]bool{}
 	for _, x := range rows {
 		if x.Crowd < 0 || x.Crowd >= maxCrowds || x.Rank < 1 || x.Rank > maxCrowds || seen[x.Rank] ||
-			x.Count < 0 || x.Best < x.Count || x.Best > 6000 || x.Kills < 0 || x.Kills > 60 {
+			x.Count < 0 || x.Best < x.Count || x.Best > maxBest || x.Kills < 0 || x.Kills > maxKills {
 			return false
 		}
 		seen[x.Rank] = true
@@ -837,6 +864,9 @@ func (h *Hub) record(r *Room, rows []ResultRow, now int64) bool {
 	if !plausible(r, rows, now) {
 		log.Printf("room %s: implausible result, not recorded", r.Code)
 		return false
+	}
+	if r.Duration > boardMaxDuration {
+		return false // a 3:00 / 5:00 room: fine, but the boards compare 2:00 matches only
 	}
 	var entries []boardEntry
 	for _, m := range r.Members {

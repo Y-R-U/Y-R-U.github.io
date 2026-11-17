@@ -37,7 +37,8 @@ export const newCid = () => rid(22);
 
 // opts: url, map, name, dev, cid, WS (constructor), now(), emit(type, data)
 // pickMode(quick): the mode the host starts (private rooms: the host's pick; quick: the rotation).
-export function createOnline({ url, map, name = 'Player', dev, cid, cos = null, WS = globalThis.WebSocket, now = () => performance.now(), emit = () => {}, pickMode = (quick) => (quick ? quickMode() : 'classic') }) {
+// pickLength(quick): the match length in seconds (private rooms: the host's pick; quick: 0 = 2:00).
+export function createOnline({ url, map, name = 'Player', dev, cid, cos = null, WS = globalThis.WebSocket, now = () => performance.now(), emit = () => {}, pickMode = (quick) => (quick ? quickMode() : 'classic'), pickLength = () => 0 }) {
   const sim = simVersion(), mv = mapVersion(map);
   let ws = null, status = 'idle', you = null, room = null, match = null, wantOpen = false;
   let attempts = 0, retryT = 0, pingT = 0, rtt = 0, serverOffset = 0, lastPong = 0, giveUpAt = 0;
@@ -187,7 +188,7 @@ export function createOnline({ url, map, name = 'Player', dev, cid, cos = null, 
   function onGo() {
     if (!room || !you || room.host !== you.id || room.state !== 'lobby') return;
     const members = room.members.filter((x) => x.online).slice(0, CONFIG.MATCH.crowds);
-    const meta = buildMeta({ seed: (Math.random() * 1e9) | 0, members, mode: pickMode(!!room.quick), events: matchEventIds(Date.now() + serverOffset) });
+    const meta = buildMeta({ seed: (Math.random() * 1e9) | 0, members, mode: pickMode(!!room.quick), events: matchEventIds(Date.now() + serverOffset), len: room.quick ? 0 : pickLength(false) });
     req('begin', { meta }).catch((e) => emit('error', { code: e.code, error: e.message }));
   }
 
@@ -249,6 +250,8 @@ export function createOnline({ url, map, name = 'Player', dev, cid, cos = null, 
     handoff: () => sendJson({ t: 'handoff' }),
     // Private-room host: show the mode pick to everyone in the lobby (servers before wave 5 have no 'mode' message).
     setMode: (mode) => (feat.includes('mode') && room && !room.quick ? req('mode', { mode }).catch(() => {}) : Promise.resolve()),
+    // Same for the match length (D20; servers before it have no 'len' message, and their guests just see the clock at begin).
+    setLength: (len) => (feat.includes('len') && room && !room.quick ? req('len', { len }).catch(() => {}) : Promise.resolve()),
     has: (f) => feat.includes(f),
     setName(n) { name = n; },
     setCos(c) { cos = c; sendJson({ t: 'cos', cos }); },

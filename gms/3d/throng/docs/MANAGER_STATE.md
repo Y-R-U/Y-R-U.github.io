@@ -162,3 +162,10 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 - Not verified anywhere: indicators in a browser online match; dpr 2 on the real S22; S Pen as "fine pointer".
 - Next: chain B (G7: D20 match lengths + D21 LCS rating).
 - Chain B LAUNCHED: G7 `a2519909210184cf3` (Opus/high): D20 match lengths + D21 LCS rating. Report → docs/notes/G7_report.md. Server likely changes → read its deploy note, back up /srv/data/throng/throng.db (+ -wal), server first, then static. After shipping B: launch chain C (art pass).
+
+## STATE @ 2026-11-17 (chain B shipped)
+- G7 landed (died once on the limit, resumed). Manager re-ran sim_test, meta_test, render_map_test, threat_test, server/test.sh, net_test (default): PASS.
+- Shipped: room match lengths 2/3/5 min (server `len` field, no schema change; only ≤2:00 results go on boards), Marathon Wednesday event (5:00 Teams/KOTH/Infection, 19–23 UTC), pedestrian refill halves after 120 s, LCS moves the ladder rating (gains ×0.73, losses ×0.65; Master +19% per minute vs Classic, others within 10%).
+- Open for Aaron: (1) a player knocked out in LCS who leaves before the end drops to 8th — keep elimination place instead? (2) 5:00 pays up to 37% more coins per wall-clock minute; (3) daily challenges are easier in Marathon; (4) Practice has no length picker.
+- Not verified: phone fps in a 5:00 late game (~7,000 people on the map); a two-browser online match at 3:00/5:00.
+- Next: chain C (art pass), ONE agent.

@@ -1,4 +1,4 @@
-// node tools/sim_test.mjs [--matches=N] [--map=stub|real|both] [--break=determinism|nan|stuck|leak|events|distribution|jitter|league|restore|remote|classic|ally|zone|circle|infect|spread|event] [--quiet] [--only=modes]
+// node tools/sim_test.mjs [--matches=N] [--map=stub|real|both] [--break=determinism|nan|stuck|leak|events|distribution|jitter|league|restore|remote|classic|ally|zone|circle|infect|spread|event|length|taper|lenrestore] [--quiet] [--only=modes|length]
 import { createSim, SIM_DT, stateHash } from '../js/sim/sim.js';
 import { CONFIG } from '../js/config.js';
 import { EVENTS } from '../js/meta/events.js';
@@ -278,8 +278,8 @@ if (!ONLY) {
   if (!quiet) console.log(`\n${tag}: serialize/restore exact, partial restore conserved (jumps ${jumps}), remote crowd untouched by its bot`);
 }
 
-await modeSuite();
-await eventSuite();
+if (ONLY !== 'length') { await modeSuite(); await eventSuite(); }
+await lengthSuite();
 
 console.log(`\n${failures.length ? 'FAIL' : 'PASS'} in ${((Date.now() - t0) / 1000).toFixed(1)}s${BREAK ? ` (break=${BREAK})` : ''}`);
 for (const f of failures) console.log('  - ' + f);
@@ -483,5 +483,59 @@ async function eventSuite() {
   if (!quiet) {
     console.log(`\n[${mapName}] events (classic, 4 matches each; ratios against no event)`);
     for (const r of rows) console.log(`  ${r.id.padEnd(8)} winner ${r.win.toFixed(0).padStart(5)}  recruited ×${(r.rec / base).toFixed(2)}  pickups ×${(r.pk / basePk).toFixed(2)}`);
+  }
+}
+
+// Match lengths (D20): 3:00 / 5:00 run their clock, the street refills slower after 2:00, LCS keeps its own clock,
+// and a state-only restore (host migration) keeps the room's clock.
+async function lengthSuite() {
+  const [mapName, genMap] = mapSets[mapSets.length - 1];
+  const { matchDuration } = await import('../js/sim/sim.js');
+  if (matchDuration('lcs', 300) !== CONFIG.MODES.lcs.duration || matchDuration('classic', 0) !== 120 || matchDuration('teams', 180) !== 180 || matchDuration('koth', 200) !== 120)
+    fail('matchDuration: LCS must ignore the length, unknown lengths fall back to the mode clock');
+  const rows = [];
+  for (const [mode, len] of [['classic', 300], ['classic', 180], ['koth', 300], ['infection', 300], ['teams', 300], ['lcs', 300]]) {
+    for (let m = 0; m < 2; m++) {
+      const seed = 6100 + m * 17, map = genMap(seed);
+      const mk = makePlayers({ seed, mode, allBots: true });
+      const config = BREAK === 'taper' ? { neutralLateMul: 1 } : null;
+      const sim = createSim({ seed, map, players: mk.players, mode, config, duration: BREAK === 'length' ? undefined : matchDuration(mode, len) });
+      const bots = createBots({ sim, indices: mk.botIndices, specs: mk.botSpecs, seed });
+      const S = sim.state;
+      const people = () => S.neutrals.active + S.crowds.reduce((a, c) => a + (c.alive ? c.count : 0), 0);
+      const spawned = () => S.neutrals.active + S.crowds.reduce((a, c) => a + c.recruited, 0);
+      let p0 = -1, p120 = -1, peak = 0, minN = Infinity, snap = null, nan = false;
+      while (S.phase !== 'over' && S.tick < (len + 10) / SIM_DT) {
+        bots.update(); sim.step(); sim.drainEvents();
+        const t = S.duration - S.timeLeft;
+        if (S.phase !== 'play') continue;
+        if (p0 < 0) p0 = spawned();
+        if (p120 < 0 && t >= 120) p120 = spawned();
+        if (S.tick % 30 === 0) minN = Math.min(minN, S.neutrals.active);
+        for (const c of S.crowds) { peak = Math.max(peak, c.count); if (!Number.isFinite(c.x)) nan = true; }
+        if (!snap && t >= 150) snap = JSON.parse(JSON.stringify({ ...S, neutrals: { ...S.neutrals, x: Array.from(S.neutrals.x), z: Array.from(S.neutrals.z), state: Array.from(S.neutrals.state), target: Array.from(S.neutrals.target), look: Array.from(S.neutrals.look), heading: Array.from(S.neutrals.heading) } }));
+      }
+      const tEnd = S.duration - S.timeLeft, pEnd = people(), sEnd = spawned();
+      const tag = `[${mapName}] ${mode} ${len} s seed ${seed}`;
+      if (nan) fail(`${tag}: NaN`);
+      if (mode === 'lcs') { if (S.duration !== CONFIG.MODES.lcs.duration) fail(`${tag}: LCS took the room length (${S.duration} s)`); continue; }
+      if (S.duration !== len) fail(`${tag}: clock is ${S.duration} s`);
+      if (mode !== 'infection' && Math.abs(tEnd - len) > 0.05) fail(`${tag}: ended at ${tEnd.toFixed(1)} s`);
+      if (minN < 40 && mode !== 'infection') fail(`${tag}: the street ran down to ${minN} pedestrians`);
+      if (peak > 6000 * len / 120 * 0.8) fail(`${tag}: peak crowd ${peak} near the server cap`);
+      const g1 = (p120 - p0) / 120, g2 = tEnd > 130 ? (sEnd - p120) / (tEnd - 120) : g1 * 0.5;
+      // Recruits count Double power-ups twice, hence the slack over the late refill rate.
+      if (!(g2 <= CONFIG.SIM.neutralRespawn * CONFIG.SIM.neutralLateMul * 1.2)) fail(`${tag}: pedestrians spawn ${g2.toFixed(1)}/s after 2:00 (before ${g1.toFixed(1)}/s; late refill cap ${CONFIG.SIM.neutralRespawn * CONFIG.SIM.neutralLateMul}/s)`);
+      if (snap && m === 0) {
+        if (BREAK === 'lenrestore') snap.duration = undefined;
+        const R = createSim({ seed, map, players: mk.players, mode, restore: snap });
+        if (R.state.duration !== len) fail(`${tag}: a state-only restore (host migration) runs a ${R.state.duration} s clock`);
+      }
+      rows.push({ tag: `${mode} ${len}`, tEnd, peak, minN, g1, g2, pEnd });
+    }
+  }
+  if (!quiet) {
+    console.log(`\n[${mapName}] match lengths (2 matches each)`);
+    for (const r of rows) console.log(`  ${r.tag.padEnd(14)} end ${r.tEnd.toFixed(0).padStart(4)} s  peak crowd ${String(r.peak).padStart(5)}  people at end ${String(r.pEnd).padStart(5)}  street min ${String(r.minN).padStart(4)}  spawns ${r.g1.toFixed(1)}/s → ${r.g2.toFixed(1)}/s after 2:00`);
   }
 }

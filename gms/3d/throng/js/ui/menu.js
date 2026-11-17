@@ -5,7 +5,8 @@ import { xpToNext } from '../meta/economy.js';
 import { challengeState, loginState } from '../meta/daily.js';
 import { GLOBE } from './online.js';
 import { CONFIG } from '../config.js';
-import { liveEvents, featuredMode, EVENTS, fmtCountdown } from '../meta/events.js';
+import { liveEvents, featuredMode, EVENTS, fmtCountdown, matchEvents } from '../meta/events.js';
+import { fmtLength } from '../sim/sim.js';
 import { seasonAt } from '../meta/season.js';
 
 
@@ -87,7 +88,8 @@ export function createMenu({ root, app, onPlay, onPractice, open }) {
       b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
       b.querySelector('.m-feat').classList.toggle('hidden', b.dataset.mode !== feat);
     });
-    $('.play').textContent = app.mode === 'classic' ? 'PLAY' : 'PLAY ' + CONFIG.MODES[app.mode].short.toUpperCase();
+    const evLen = matchEvents(Date.now(), app.mode).len;
+    $('.play').innerHTML = esc(app.mode === 'classic' ? 'PLAY' : 'PLAY ' + CONFIG.MODES[app.mode].short.toUpperCase()) + (evLen ? `<small class="play-len">${fmtLength(evLen)}</small>` : '');
     const sa = seasonAt();
     $('.m-rank-n').textContent = '#' + num(rankOf(s.rating)) + ` · S${sa.n} · ${sa.daysLeft}d`;
     const rep = app.seasonReport;

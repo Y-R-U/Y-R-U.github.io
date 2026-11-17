@@ -1,4 +1,5 @@
 import { h, esc, hex, num, ord, countUp, UI_ICON } from './kit.js';
+import { fmtLength } from '../sim/sim.js';
 import { ICON } from './hud.js';
 import { LEAGUES, badgeSvg } from '../meta/leagues.js';
 import { xpToNext } from '../meta/economy.js';
@@ -122,7 +123,8 @@ export function createResults({ root, app, onAgain, onMenu }) {
         const next = cv.tiers.find((t) => !t.got);
         rw.insertAdjacentHTML('beforeend', `<div class="rw-cup">${UI_ICON.star}<span>Monthly cup: <b>${cv.pts}</b> pts (best ${cv.top.length} of 5)</span><b>${next ? `${next.name} at ${next.pts}` : 'Gold cup won!'}</b></div>`);
       }
-      if (!report.rated) rw.insertAdjacentHTML('afterbegin', `<div class="rw-note rw-unrated">${esc(modeName(mode))} is unrated: coins and XP only. Classic moves your rating.</div>`);
+      const lenNote = report.lenMul && report.lenMul !== 1 ? `${fmtLength(report.duration)} match: placement pays ×${+report.lenMul.toFixed(2)}. ` : '';
+      if (!report.rated) rw.insertAdjacentHTML('afterbegin', `<div class="rw-note rw-unrated">${lenNote}${esc(modeName(mode))} is unrated: coins and XP only. Classic and Last Crowd Standing move your rating.</div>`);
     }
 
     el.classList.remove('hidden');

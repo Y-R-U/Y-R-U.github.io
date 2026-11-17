@@ -181,6 +181,7 @@ type inMsg struct {
 	Rows  []ResultRow     `json:"rows"`
 	Cos   json.RawMessage `json:"cos"`
 	Mode  string          `json:"mode"`
+	Len   int             `json:"len"`
 }
 
 func handleWS(w http.ResponseWriter, r *http.Request) {

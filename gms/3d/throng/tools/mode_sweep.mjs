@@ -1,5 +1,8 @@
 // node tools/mode_sweep.mjs [--modes=classic,teams,koth,lcs,infection] [--leagues=0,2,7] [--matches=60] [--workers=8]
 //                           [--variant=base|flip|fair] [--map=1|vary] [--set=mode.key:value,...] [--econ] [--seed0=20000]
+//                           [--len=120,300] [--sizes] [--rating[=only]] [--json=FILE]
+// --len: match clock(s) in seconds (D20). --sizes: peak crowd / people on the map / street minimum. --rating: the auto
+// player's place distribution and ladder points per minute of play (D21); =only skips the per-mode tables.
 // Balance sweeps in the real sim on the real map: crowd 0 is the ?auto bot (the "you" of every table) against sim-online
 // rosters at each league's rating. Prints one table per mode, ratios rather than raw totals.
 // Teams variants: flip = crowd 0 plays for Red (odd side); fair = crowd 0 gets a roster bot's spec instead of the auto
@@ -12,6 +15,7 @@ import { makePlayers } from '../js/sim/match.js';
 import { buildRoster } from '../js/meta/roster.js';
 import { LEAGUES } from '../js/meta/leagues.js';
 import { CONFIG } from '../js/config.js';
+import { ratingDelta, RATED } from '../js/meta/ladder.js';
 
 const ARGS = isMainThread
   ? Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] = a.replace(/^--/, '').split('='); return [k, v ?? true]; }))
@@ -36,7 +40,7 @@ async function mapFor(seed) {
   return map1 || (map1 = mapGen(+(ARGS.map || 1)));
 }
 
-export async function runOne({ mode, li, seed, variant }) {
+export async function runOne({ mode, li, seed, variant, len = 0 }) {
   const map = await mapFor(seed);
   const rating = LEAGUES[li].min + 20;
   const roster = buildRoster({ seed, rating, count: variant === 'fair' ? 8 : 7 });
@@ -45,11 +49,11 @@ export async function runOne({ mode, li, seed, variant }) {
   const players = mk.players, specs = mk.botSpecs.slice();
   if (variant === 'fair') { const r = roster[7]; specs[0] = { persona: r.persona, skill: r.skill, aggr: r.aggr, throttle: r.throttle, human: r.human }; }
   if (variant === 'flip' && mode === 'teams') players.forEach((p, i) => { p.team = (i + 1) % 2; });
-  const sim = createSim({ seed, map, players, mode });
+  const sim = createSim({ seed, map, players, mode, ...(len ? { duration: len } : {}) });
   const bots = createBots({ sim, indices: mk.botIndices, specs, seed });
   const S = sim.state, nc = S.crowds.length;
   const out = { mode, li, seed, variant, circleDeaths: [], crowdDeaths: 0, lateLeads: 0, holderChanges: 0, contested: 0, playTicks: 0,
-    countSum: new Array(nc).fill(0), alive60: -1, outside: new Array(nc).fill(0), outsidePeak: new Array(nc).fill(0) };
+    countSum: new Array(nc).fill(0), peakBest: 0, peakPeople: 0, peakNeutral: 0, minNeutral: 1e9, alive60: -1, outside: new Array(nc).fill(0), outsidePeak: new Array(nc).fill(0) };
   let lastHolder = -2;
   const maxTicks = Math.round((S.duration + 8) / SIM_DT);
   while (S.phase !== 'over' && S.tick < maxTicks) {
@@ -66,7 +70,11 @@ export async function runOne({ mode, li, seed, variant }) {
     }
     if (S.phase !== 'play') continue;
     out.playTicks++;
-    for (let i = 0; i < nc; i++) out.countSum[i] += S.crowds[i].alive ? S.crowds[i].count : 0;
+    let people = S.neutrals.active;
+    for (let i = 0; i < nc; i++) { const n = S.crowds[i].alive ? S.crowds[i].count : 0; out.countSum[i] += n; people += n; if (n > out.peakBest) out.peakBest = n; }
+    if (people > out.peakPeople) out.peakPeople = people;
+    if (S.neutrals.active > out.peakNeutral) out.peakNeutral = S.neutrals.active;
+    if (S.tick % 30 === 0 && S.neutrals.active < out.minNeutral) out.minNeutral = S.neutrals.active;
     if (mode === 'koth') {
       const h = S.zone.holder;
       if (h !== lastHolder && h >= 0 && lastHolder !== -2) out.holderChanges++;
@@ -92,7 +100,7 @@ export async function runOne({ mode, li, seed, variant }) {
   const counts = S.crowds.map((c) => (c.alive ? c.count : 0));
   const sorted = counts.slice().sort((a, b) => b - a);
   Object.assign(out, {
-    end: t, endReason: S.endReason || '', leadChanges: S.leadChanges, p0rank: S.crowds[0].rank, p0count: counts[0], p0best: S.crowds[0].best, p0kills: S.crowds[0].kills,
+    len, end: t, endReason: S.endReason || '', leadChanges: S.leadChanges, p0rank: S.crowds[0].rank, p0count: counts[0], p0best: S.crowds[0].best, p0kills: S.crowds[0].kills,
     p0recruited: S.crowds[0].recruited,
     winner: w.index, winnerScore: w.score, winnerCount: counts[w.index], top2: sorted[1] > 0 ? sorted[0] / sorted[1] : 99,
     scores: S.crowds.map((c) => c.score), horde: S.crowds.map((c) => c.horde), outs: S.crowds.map((c) => c.out), counts,
@@ -134,10 +142,26 @@ const P = (v, n) => String(v).padStart(n);
 
 function tables(rs) {
   const byKey = {};
-  for (const r of rs) (byKey[`${r.mode}|${r.variant}`] ||= {}) && ((byKey[`${r.mode}|${r.variant}`][r.li] ||= []).push(r));
+  for (const r of rs) { const k = `${r.mode}|${r.variant}|${r.len || 0}`; ((byKey[k] ||= {})[r.li] ||= []).push(r); }
   for (const [key, rows] of Object.entries(byKey)) {
-    const [mode, variant] = key.split('|');
-    console.log(`\n== ${mode}${variant !== 'base' ? ' (' + variant + ')' : ''}`);
+    const [mode, variant, len] = key.split('|');
+    console.log(`\n== ${mode}${variant !== 'base' ? ' (' + variant + ')' : ''}${+len ? ` (${len} s)` : ''}`);
+    if (ARGS.sizes) {
+      console.log('league     n  end s med  you place  peak crowd p50/p90/max  people on map max  pedestrians min p10');
+      for (const [li, a] of Object.entries(rows)) console.log(`${LEAGUES[li].name.padEnd(9)}${P(a.length, 4)}${P(q(a.map((r) => r.end), 0.5).toFixed(0), 11)}${P(mean(a.map((r) => r.p0rank)).toFixed(2), 11)}${P(`${q(a.map((r) => r.peakBest), 0.5)}/${q(a.map((r) => r.peakBest), 0.9)}/${Math.max(...a.map((r) => r.peakBest))}`, 24)}${P(Math.max(...a.map((r) => r.peakPeople)), 19)}${P(q(a.map((r) => r.minNeutral), 0.1), 21)}`);
+    }
+    if (ARGS.rating) {
+      // The auto player's place against a roster at the league's floor; rating/min = mean delta / minutes of play.
+      // raw = Classic's points for the same place; rated = with the mode's RATED multipliers (D21).
+      console.log('league     n  mean place  place 1..8 share                 end s mean  raw delta  raw/min  rated/min of play');
+      for (const [li, a] of Object.entries(rows)) {
+        const rating = LEAGUES[li].min + 20, d = a.map((r) => ratingDelta(rating, r.p0rank)), mins = mean(a.map((r) => r.end)) / 60;
+        const dr = a.map((r) => ratingDelta(rating, r.p0rank, undefined, ...(RATED[mode] || [0, 0])));
+        const dist = [1, 2, 3, 4, 5, 6, 7, 8].map((k) => P((100 * a.filter((r) => r.p0rank === k).length / a.length).toFixed(0), 3)).join('');
+        console.log(`${LEAGUES[li].name.padEnd(9)}${P(a.length, 4)}${P(mean(a.map((r) => r.p0rank)).toFixed(2), 12)}  ${dist}  ${P((mins * 60).toFixed(1), 12)}${P(mean(d).toFixed(2), 11)}${P((mean(d) / mins).toFixed(2), 9)}${P((mean(dr) / mins).toFixed(2), 19)}`);
+      }
+      if (ARGS.rating !== true) continue;
+    }
     if (mode === 'classic') {
       console.log('league     n   you place  win   top3  you final  winner final  lead chg');
       for (const [li, a] of Object.entries(rows)) console.log(`${LEAGUES[li].name.padEnd(9)}${P(a.length, 4)}${P(mean(a.map((r) => r.p0rank)).toFixed(2), 11)}${P(pct(a.filter((r) => r.p0rank === 1).length, a.length), 6)}${P(pct(a.filter((r) => r.p0rank <= 3).length, a.length), 6)}${P(mean(a.map((r) => r.p0count)).toFixed(0), 11)}${P(mean(a.map((r) => r.winnerCount)).toFixed(0), 14)}${P(mean(a.map((r) => r.leadChanges)).toFixed(1), 10)}`);
@@ -187,7 +211,8 @@ if (isMainThread && process.argv[1] && fileURLToPath(import.meta.url) === proces
   const N = +(ARGS.matches || 60), seed0 = +(ARGS.seed0 || 20000);
   const variants = String(ARGS.variant || 'base').split(',');
   const jobs = [];
-  for (const mode of modes) for (const variant of variants) for (const li of leagues) for (let m = 0; m < N; m++) jobs.push({ mode, li, seed: seed0 + m * 7919 + li * 131, variant });
+  const lens = String(ARGS.len || '0').split(',').map(Number);
+  for (const len of lens) for (const mode of modes) for (const variant of variants) for (const li of leagues) for (let m = 0; m < N; m++) jobs.push({ mode, li, seed: seed0 + m * 7919 + li * 131, variant, len });
   const t0 = Date.now();
   const rs = await sweep(jobs, +(ARGS.workers || 8));
   console.log(`${rs.length} matches in ${((Date.now() - t0) / 1000).toFixed(0)} s (map ${ARGS.map || 1}${ARGS.set ? ', set ' + ARGS.set : ''})`);

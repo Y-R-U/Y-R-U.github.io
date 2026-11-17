@@ -10,6 +10,8 @@ export const EVENTS = {
   market: { name: 'Night Market', short: 'Night Market', icon: '★', color: '#c27bff', blurb: 'Power-ups on every corner, back in seconds.', sim: { pickupCount: 14, pickupRespawn: 5 }, look: { theme: 'night-neon', weather: 'clear' } },
   rush: { name: 'Rush Hour', short: 'Rush Hour', icon: '»', color: '#5cc8ff', blurb: 'Twice the pedestrians, and everyone is in a hurry.', sim: { neutralCap: 1000, neutralStart: 900, neutralRespawn: 52, neutralSpeedMin: 1.5, neutralSpeedMax: 2.8, speedBase: 9.4, pullSpeed: 8.5 }, look: { theme: 'sunny-day', weather: 'clear' } },
   slayer: { name: 'Giant Slayer', short: 'Giant Slayer', icon: '⚔', color: '#ff6b6b', blurb: '+30 coins for absorbing a crowd ranked above you.', bonus: 30, look: { theme: 'evening', weather: 'rain' } },
+  // len: the match clock (s) in `modes` while it is on, in Play and Practice. Rated modes keep theirs (D20).
+  marathon: { name: 'Marathon Wednesday', short: 'Marathon', icon: '⏱', color: '#ff9a3c', blurb: '5-minute matches in Teams, King of the Plaza and Infection. Coins and XP scale with the clock.', len: 300, modes: ['teams', 'koth', 'infection'] },
   motd: { name: 'Mode of the Day', short: 'Mode of the Day', icon: '◆', color: '#5fe0d0', blurb: 'Coins ×1.5 in the featured mode.', coinMul: 1.5 },
 };
 
@@ -33,6 +35,7 @@ function windowsOfDay(d) {
     out.push({ id: 'rush', start: s + 7 * HOUR, end: s + 9 * HOUR });
     out.push({ id: 'rush', start: s + 17 * HOUR, end: s + 19 * HOUR });
   }
+  if (wd === 3) out.push({ id: 'marathon', start: s + 19 * HOUR, end: s + 23 * HOUR });
   out.push({ id: 'motd', start: s, end: s + DAY, mode: FEATURED[((d % 4) + 4) % 4] });
   return out;
 }
@@ -72,13 +75,19 @@ export function eventLook(ids, t = Date.now()) {
   return winterLook(t);
 }
 
-// What a match started at `t` in `mode` gets: event ids, sim overrides, look, coin multiplier.
+// The match length a live event sets for `mode`, or 0 (the mode's own clock).
+export function eventLength(ids, mode) {
+  for (const id of ids) { const e = EVENTS[id]; if (e && e.len && e.modes.includes(mode)) return e.len; }
+  return 0;
+}
+
+// What a match started at `t` in `mode` gets: event ids, sim overrides, look, coin multiplier, length (0 = default).
 export function matchEvents(t = Date.now(), mode = 'classic') {
   const live = liveEvents(t);
   const ids = live.map((w) => w.id).filter((id) => id !== 'motd');
   const motd = live.find((w) => w.id === 'motd');
   const coinMul = motd && motd.mode === mode ? EVENTS.motd.coinMul : 1;
-  return { ids, sim: eventSim(ids), look: eventLook(ids, t), coinMul, featured: motd ? motd.mode : null, slayer: ids.includes('slayer') ? EVENTS.slayer.bonus : 0 };
+  return { ids, sim: eventSim(ids), look: eventLook(ids, t), coinMul, featured: motd ? motd.mode : null, slayer: ids.includes('slayer') ? EVENTS.slayer.bonus : 0, len: eventLength(ids, mode) };
 }
 
 export function fmtCountdown(ms) {

@@ -57,6 +57,7 @@ JSON text frames for control, binary frames for the game stream. A message with 
 | `join` | `code` | private room by code (any case). Lobby: you're in. Playing with > 45 s left: late join. Playing, less left: you wait in the room for the next round |
 | `leave` / `ready {on}` / `rename {name}` | | |
 | `mode` | `mode` | private-room host, lobby only: the mode pick everyone sees (`room.mode`). Only sent when `welcome.feat` has `mode` (wave 5) |
+| `len` | `len` | private-room host, lobby only: the match length in seconds, 120 / 180 / 300 (`room.len`). Only sent when `welcome.feat` has `len` (G7, D20) |
 | `start` | | private host, lobby → server sends `go` |
 | `begin` | `meta` | host only, after `go`: `{v, seed, duration, countdown, players:[{id, name, color, human, persona, skill, …}×8]}`; humans carry their member `id` |
 | `meta` | `meta` | host: player list changed (a late joiner took a crowd) |
@@ -68,8 +69,8 @@ JSON text frames for control, binary frames for the game stream. A message with 
 
 | t | fields |
 |---|---|
-| `welcome` | `you {id, pid, name}`, `now`, `v`, `ver`, `feat` (wave 5: `['mode', 'boards-mode']`; older servers send none) |
-| `room` | `room {code, quick, state lobby\|playing, host, you, members:[{id, pid, name, ready, host, crowd, online, late}], startAt, beganAt, endsAt, epoch, mid, now, max, mode?}` (`mode`: the private host's pick, once made; kept across matches and host changes) |
+| `welcome` | `you {id, pid, name}`, `now`, `v`, `ver`, `feat` (wave 5: `['mode', 'boards-mode']`; G7 adds `'len'`; older servers send none) |
+| `room` | `room {code, quick, state lobby\|playing, host, you, members:[{id, pid, name, ready, host, crowd, online, late}], startAt, beganAt, endsAt, epoch, mid, now, max, mode?, len?}` (`mode` / `len`: the private host's picks, once made; kept across matches and host changes) |
 | `go` | to the host: build `meta` and `begin` (quick: when the 8 s lobby wait runs out or 8 humans are in) |
 | `begin` | `meta, crowd (yours), epoch, mid, late, beganAt, endsAt, host` — followed by keyframe + tail for late joiners and reconnects |
 | `promote` | `epoch, away:[crowds], meta, crowd, mid, why` — you are the host now; sent **after** the cached keyframe + every snapshot since |
@@ -172,6 +173,13 @@ and releases them when its delayed view reaches that tick, so a recruit fires as
 - Server gone for good: a guest rebuilds a local sim from its mirror and finishes the match **offline**
   (all other crowds become bots); a host just carries on. Neither is recorded.
 
+**Match length (G7, D20).** Private rooms: the host picks 2:00, 3:00 or 5:00 next to the mode (`net.roomLen`, sent as
+`len`); guests see the pick from `room.len`. The host's `begin` meta carries `duration` (LCS always its own ~90 s), so
+late joiners, reconnects and a promoted host all run the same clock (the snapshot header carries `duration` too). Quick
+match is always 2:00. Additive: `PROTO` stays 1. A client against a server without `len` simply never sends it (its host
+still starts at its own pick; guests then learn it at `begin`); an old client never sends `len`, so its room has no
+`room.len` and its matches run the mode's clock.
+
 ## Late join
 
 `join`/`quick` into a running match with > 45 s left and a free bot crowd: the server sends the host
@@ -188,9 +196,11 @@ SQLite (`throng.db`): `results` (one row per player per match, 16 days, for toda
 `alltime` (best crowd, wins, matches). `pid` = sha256("throng-pid:" + device id)[:12] — the device id never
 leaves the server. A match is written when the **host's** table is confirmed by another client from a
 different device on every human crowd (exact match), or when there is no other human to confirm; a
-disputed table waits 10 s and is dropped. Plausibility: duration 90–180 s, the match ran at least
-duration + countdown − 8 s of wall time, best ≤ 6,000, count ≤ best, kills ≤ 60, ranks distinct 1–8; at most
-300 rows per device per UTC day.
+disputed table waits 10 s and is dropped. Plausibility: duration 90–300 s, the match ran at least
+duration + countdown − 8 s of wall time, best ≤ 6,000 and kills ≤ 60 (both × duration / 120 above 2:00), count ≤ best,
+ranks distinct 1–8; at most 300 rows per device per UTC day. Only matches of 2:00 or less go on the boards (G7, D20): a
+3:00 / 5:00 room is settled as usual but `ended.recorded` is false, and the results card says the board counts 2:00
+matches only.
 
 `GET /api/boards?period=day|week|all&kind=best|wins&mode=all|classic|teams|koth|lcs|infection&me=<pid>&limit=1..100` →
 `{period, kind, mode, key, rows:[{rank, pid, name, value}], me?:{rank, value}, now}`. Days and ISO weeks are UTC. No `mode`
@@ -244,7 +254,7 @@ Tests:
 ```
 cd server && go test ./...              # rooms, relay, late join, three migration triggers, quick timer, results + boards, limits, names
 node tools/net_test.mjs                 # ~3 min: real server + 4 headless clients through a 120 s match (+ quick-match and cap checks)
-node tools/net_test.mjs --break=counts|migrate|late|bytes|rate|version|emote|lobbymode|reload   # each must FAIL (mode: with --mode=koth)
+node tools/net_test.mjs --break=counts|migrate|late|bytes|rate|version|emote|lobbymode|reload|lobbylen|lenmeta   # each must FAIL (mode: with --mode=koth)
 node tools/net_test.mjs --mode=teams|koth|lcs|infection
 ~/.claude/bin/cdp start --port 9284 -- --use-angle=metal
 node tools/net_cdp.mjs --cdp=9284       # two Chrome tabs: create → join → play → guest reload → host hidden 30 s → host closes → results (~3.5 min)
