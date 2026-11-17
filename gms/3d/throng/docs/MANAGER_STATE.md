@@ -169,3 +169,4 @@ Read this first, then PLAN.md, CONTRACT.md, DECISIONS.md.
 - Open for Aaron: (1) a player knocked out in LCS who leaves before the end drops to 8th — keep elimination place instead? (2) 5:00 pays up to 37% more coins per wall-clock minute; (3) daily challenges are easier in Marathon; (4) Practice has no length picker.
 - Not verified: phone fps in a 5:00 late game (~7,000 people on the map); a two-browser online match at 3:00/5:00.
 - Next: chain C (art pass), ONE agent.
+- Chain B DEPLOYED (commit a3663dbf; server redeployed after db backup 20261117-050411; static rsynced; health OK; other sites 200). Chain C LAUNCHED: R5 `a3ca4c91e738ef874` (Opus/high) art pass, owns js/render/**, js/world/**, tools/render_*. Report → docs/notes/R5_report.md. Ports cdp 9270-9279 / http 8750-8759. After R5: verify (suites + CDP tests + LOOK at before/after shots in scratchpad/r5), commit, push, rsync deploy, then STOP: chain complete, cancel cron d1c13959, report to Aaron.
