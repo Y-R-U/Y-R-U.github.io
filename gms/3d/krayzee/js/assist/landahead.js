@@ -21,6 +21,8 @@ export const LAND = {
   margin: 6, treeR: 4, treeH: 11, step: 8, trim: 12, clearance: 10,
 };
 const RANK = { runway: 0, taxiway: 1, apron: 1, grass: 2 };
+// test switches (landahead.test.mjs --falsify=<key>)
+export const FALSIFY = {};
 
 // JETCORE: LAND per aircraft type. Light types use LAND as is. Jets: runways only (a field landing makes no sense for a
 // jumbo), their own approach speed (turn radii), descent gradient, landing distance and a longer reach.
@@ -31,7 +33,13 @@ export const NOW_QUIPS = ['A field, Sire? Not in a {name}. The runway it is.', '
 let nq = 0;
 export function landProfile(type = LAND_TYPE) {
   const a = type ? AIRCRAFT[type] : null, f = a?.flight;
-  if (!f?.jet) return LAND;
+  if (!f?.jet) {
+    // FLIGHTFIX7: a light type faster than the C172 (the Spitfire's 110 kt circuit, 76 kt approach) plans with its own
+    // pace: turn radii, orbits, the slow-down and its (wider) home circuit scale with vcruise / 95 kt. Slower types keep LAND.
+    const k = f?.vcruise ? f.vcruise / (95 * 0.514444) : 1;
+    if (k <= 1.02 || FALSIFY.pace) return LAND;
+    return { ...LAND, type, vApp: Math.max(LAND.vApp * k, f.vapp ?? 0), orbitR: Math.round(LAND.orbitR * k * k), homeR: Math.round(2300 * k * k) };
+  }
   const k = a.circuitScale ?? 1, vApp = f.vapp;
   return { ...LAND, type, name: a.name.replace(/^The /, ''), runwayOnly: true, vApp, maxGrad: 0.075, sink: 5.5, maxD: 9000, homeR: 12000, homeAny: true,
     minLen: Math.round((a.performance?.landingRollM ?? 600) * 1.15 + 150), orbitR: Math.max(LAND.orbitR, Math.round(vApp * vApp / (G * Math.tan(25 * DEG)))) };
@@ -527,7 +535,9 @@ function planCore(o) {
       let cost = p.feas.pathLength + (p.feas.turn || 0) * 4 + p.feas.orbits * 900 + c.pref * 25 - Math.min(c.stripLength, 900) * (c.kind === 'grass' ? 1 : 0.2);
       // FLIGHTFIX3: low, a straight-in runway beats a field short of it (grass +1200, was +300); on the home circuit
       // (st.home: ≥ 50 m AGL, not flying away down the axis) the runway's circuit beats a field too
-      if (low) cost = p.kind === 'straight' ? p.feas.pathLength + (c.kind === 'taxiway' || c.kind === 'apron' ? 3000 : c.kind === 'grass' ? 1200 : rank * 150) + c.pref * 10 - Math.min(c.stripLength, 900) * 0.3
+      // FLIGHTFIX7: a home runway straight in keeps the home bonus too (M2 Medium: lined up on 27's final at 115 m, a base
+      // into closed 22 won on the bonus alone)
+      if (low) cost = p.kind === 'straight' ? p.feas.pathLength + (c.kind === 'taxiway' || c.kind === 'apron' ? 3000 : c.kind === 'grass' ? 1200 : rank * 150) + c.pref * 10 - Math.min(c.stripLength, 900) * 0.3 - (c.home && !c.closed && !FALSIFY.m2 ? 4000 : 0)
         : c.home ? cost - 4000 : cost + 5000;
       if (c.prefer) cost -= 800;
       if (dbg) dbg.cands.push({ kind: c.kind, label: c.label, touchdown: c.touchdown, start: c.start, end: c.stripEnd, cost: Math.round(cost) });
@@ -572,10 +582,11 @@ function homeRunways(layout, x, z, H, agl, homeR = 2300, any = false) {
     const along = dx * ux + dz * uz, lat = Math.abs(dx * -uz + dz * ux), past = Math.abs(along) - rw.length / 2;
     // FLIGHTFIX4: a downwind ATC stretched (extendDownwind, up to ~4.5 km past the end) is still the home circuit: abeam
     // the axis at circuit width, flying along it (loop c172: LAND picked a field 2.4 km down an extended downwind)
-    const dwBand = lat > 400 && lat < 2000 && past < 6000 && Math.abs(Math.abs(wrap180(H - rw.heading)) - 90) > 50;
+    const dwBand = lat > 400 && lat < (any ? 2000 : Math.max(2000, homeR * 0.87)) && past < 6000 && Math.abs(Math.abs(wrap180(H - rw.heading)) - 90) > 50;
     if (Math.hypot(Math.max(0, past), lat) > homeR && !dwBand) continue;   // the circuit: downwind 0.8–1.15 km out, base ≤ 1.8 km past
     const away = (dx * hx + dz * hz) / (Math.hypot(dx, dz) || 1);
     if (!any && past > 0 && lat < 700 && away > 0.7) continue;   // upwind / climb-out: the runway is behind
+    if (rw.closed && !FALSIFY.m2) continue;   // FLIGHTFIX7: a closed runway is never the home circuit
     out.push(rw);
   }
   return out;

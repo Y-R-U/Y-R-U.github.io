@@ -41,6 +41,8 @@ const FALSIFY_JS = {
   crime: `(() => { const RX = /cut_in|forced_go|queue_jump|unauth|runway_steal|double_occ|tower_buzz|wrong_way|grass_landing|apron_landing/; setInterval(() => { const g = window.__game.wiring.game; if (!g || g.__falsified) return; const h = g.handleEvent.bind(g); g.handleEvent = (e) => (RX.test(String(e?.type || '') + ' ' + String(e?.id || '')) ? null : h(e)); g.__falsified = true; }, 200); return true; })()`,
   // STORY3 M7: the F-35 refuses to HOVER (so the hover objective can never be earned)
   nohover: `(() => { setInterval(() => { const ap = window.__game.S.player?.ap; if (ap && !ap.__falsified) { ap.hover = () => false; ap.__falsified = true; } }, 200); return true; })()`,
+  // FLIGHTFIX7: the old LAND home bonus (closed 22 counts as home; a straight-in home runway gets none): M2 Medium's cut-in LAND goes to 22
+  m2land: `import('./js/assist/landahead.js').then((m) => { m.FALSIFY.m2 = true; return true; })`,
   // the briefing objectives list is empty
   orders: `(() => { document.querySelector('.krz-st-obj')?.remove(); return true; })()`,
 };

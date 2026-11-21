@@ -502,14 +502,30 @@ export function createATC(opts = {}) {
     return null;
   }
 
+  // FLIGHTFIX7: the nearest arrival (remaining m) to the reciprocal of `end`: the player's wrong-way LAND (09 while ATC
+  // runs 27) met AI departing and landing 27 head-on (loop jumbo-hard: mid-air collision). Landers just over the runway
+  // leave the sequence, so a committed LAND (s.landing) counts until it is down.
+  function oppositeRem(end, selfId) {
+    const rw = rwOfEnd(end);
+    let best = 1e9;
+    for (const e of rw.ends) {
+      if (e === end) continue;
+      for (const o of S.seqs[e] || []) if (o !== selfId && S.strips[o]) best = Math.min(best, S.strips[o].rem ?? 1e9);
+      for (const id in D) if (id !== selfId && !D[id].g && S.strips[id]?.landing?.end === e) best = Math.min(best, S.strips[id].rem ?? Gm.dist2(D[id].p2, info(e).T));
+    }
+    return best;
+  }
+
   function number1(s, d, end, rwId) {
     const cleared = s.cmds.clearedLand || s.cmds.clearedTouchAndGo;
     const blockers = blockersFor(rwId, s.id);
-    const intruder = coneIntruder(end, s.id);
+    // a lander on the reciprocal that is committed (the player's LAND) or nearer: we give way, it never does
+    const opp = s.landing ? 1e9 : oppositeRem(end, s.id);
+    const intruder = coneIntruder(end, s.id) || (opp < Math.min(T.oppositeBlock, (s.rem ?? 1e9) + 3000) ? 'opposite' : null);
     if (cleared) {
       const culprit = illegitIn(blockers, rwId) || intruder;
       if (blockers.length || intruder) {
-        if (s.rem < T.revokeDist) goAround(s, intruder && !blockers.length ? 'traffic' : 'runwayOccupied', culprit);
+        if (s.rem < T.revokeDist) goAround(s, intruder && !blockers.length ? (intruder === 'opposite' ? 'opposite' : 'traffic') : 'runwayOccupied', culprit);
         else revokeLanding(s);
       }
       return;
@@ -530,7 +546,7 @@ export function createATC(opts = {}) {
     }
     if (d.prog?.onFinal && s.rem < T.goAroundDist && cfg.authority) {
       const culprit = illegitIn(blockers, rwId) || intruder;
-      goAround(s, blockers.length ? 'runwayOccupied' : intruder ? 'traffic' : !S.open[rwId] ? 'runwayClosed' : 'crossingTraffic', culprit);
+      goAround(s, blockers.length ? 'runwayOccupied' : intruder === 'opposite' ? 'opposite' : intruder ? 'traffic' : !S.open[rwId] ? 'runwayClosed' : 'crossingTraffic', culprit);
     }
   }
 
@@ -610,7 +626,7 @@ export function createATC(opts = {}) {
       const s = S.strips[id], d = D[id];
       if (!s.cmds.clearedTakeoff || d.gs > (T.committedGs[s.type] ?? 20)) continue;   // a rolling heavy is committed long before 20 m/s
       const blk = blockersFor(rw.id, id).filter((o) => !(D[o].g && Gm.toEnd(inf, D[o].p2).a < Gm.toEnd(inf, d.p2).a - 30));
-      const intr = rw.ends.map((e) => coneIntruder(e, id)).find(Boolean);
+      const intr = rw.ends.map((e) => coneIntruder(e, id)).find(Boolean) || (oppositeRem(end, id) < T.oppositeBlock * 0.6 ? 'opposite' : null);
       if (blk.length || intr) {
         issue(s, { type: 'cancelTakeoff', runwayEnd: end, reason: blk.length ? 'runwayOccupied' : 'traffic' });
         releaseMutex(id);
@@ -642,7 +658,7 @@ export function createATC(opts = {}) {
     }
     const keys = mutexKeys(rw.id);
     const runwayClear = !blk.length && !resv.length && !intr;
-    const goOk = runwayClear && minRem > (d.linedUp ? T.arrivalBlockLinedUp : T.arrivalBlockDep) && !traffic;
+    const goOk = runwayClear && minRem > (d.linedUp ? T.arrivalBlockLinedUp : T.arrivalBlockDep) && !traffic && oppositeRem(end, first) > T.oppositeBlock;
     // line up behind a lander that is already rolling away down the runway
     // line up only if it can still roll before the next arrival: once landers rolling/vacating along the runway are
     // off it, that arrival must be outside arrivalBlockLinedUp (else both wait and the arrival is sent round)

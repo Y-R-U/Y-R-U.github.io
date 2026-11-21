@@ -33,6 +33,7 @@ export const T = {
   revokeDist: 1500,                // blocked runway with the lander further out: revoke instead of go-around
   arrivalBlockDep: 2200,           // DESIGN says 3 km; 2.2 km keeps a busy light-aircraft circuit flowing
   arrivalBlockLinedUp: 1800,       // already lined up: it rolls at once
+  oppositeBlock: 9000,             // FLIGHTFIX7: a lander this close on the reciprocal end: no departure, no landing clearance (head-on)
   lineUpArrivalClear: 3000,        // line up and wait only if the next arrival is at least this far out
   lineUpBehind: 250,               // ...or behind a lander already this far down the runway
   lineUpSlack: 20,                 // s spare between the runway projected free and the arrival reaching arrivalBlockLinedUp

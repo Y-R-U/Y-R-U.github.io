@@ -1004,7 +1004,7 @@ async function jetLand() {
   const layout = await import('../js/world/layout.js');
   const N = +(args.starts || 6), TYPES = ['c172', 'c172', 'tiger', 'bathtub'], res = [];
   const realRandom = Math.random;
-  for (const jet of ['jumbo', 'herc', 'f35']) for (let seed = 1; seed <= N; seed++) {
+  for (const jet of (typeof args.jets === 'string' ? args.jets.split(',') : ['jumbo', 'herc', 'f35'])) for (let seed = +(args.seed0 || 1); seed < +(args.seed0 || 1) + N; seed++) {
     const rnd = seeded(seed * 7 + jet.length); Math.random = rnd;
     const env = { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
     const tr = new Traffic(env, {}), atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false }), link = linkTraffic(atc, tr, { rnd });
@@ -1053,8 +1053,111 @@ async function jetLand() {
     res.push({ jet, seed, ok: !hits.length && !pac.crashed && up != null, d: `${up != null ? 'demand→air ' + up.toFixed(0) + ' s ' : 'DEMAND TAKEOFF not airborne (' + P.ap.phase + ') '}` + `${jet}#${seed} ${plan?.label || plan?.fail}/${plan?.pattern} ${hits.join('; ') || (P.ap.done && pac.onGround ? 'stopped ' + (t - t1).toFixed(0) + ' s' : 'not stopped ' + P.ap.phase)}` });
   }
   Math.random = realRandom;
+  if (args.dbgjet) for (const r of res) console.log('  JL', r.ok ? 'ok  ' : 'FAIL', r.d);
   const bad = res.filter((r) => !r.ok);
   check(`jet LAND in the climb-out amid light traffic (${res.length} starts, Realistic): lands and stops without touching anyone, then DEMAND TAKEOFF past a rival at the hold`, !bad.length, bad.length ? bad.map((r) => r.d).join(' | ') : res.map((r) => r.d.split(' ').slice(0, 2).join(' ')).join(', '));
+}
+
+// FLIGHTFIX7: LAND straight out of the farm's magic clouds (~440 m AGL, 3.3 km out) after a sortie at another airport.
+// The map swap re-places the plane (ac.time restarts at 0): the AP's terrain floor, stamped at the old airport's later
+// time, was never re-read, so the farm LAND held the old hills + 35 m (149 m) and went round "too high" every lap.
+// The old world here is a 115 m plateau; the swap mutates the same env object, as main.js adoptWorld does.
+async function farmLand() {
+  const { Aircraft, Autopilot, Traffic, R } = await flightLib();
+  const { planLandAhead, armLandNow, setLandAircraft } = await import('../js/assist/landahead.js');
+  if (typeof args['falsify-ap'] === 'string') { const { FALSIFY } = await import('../js/flight/autopilot.js'); for (const k of args['falsify-ap'].split(',')) FALSIFY[k] = true; }
+  const L = await import('../js/world/layout.js'), { KINGDOM } = await import('../data/airports/kingdom.js');
+  for (const d of Object.values(KINGDOM)) L.registerAirport(d);
+  const out = [];
+  try {
+    const { AIRCRAFT } = await import('../data/aircraft.js');
+    for (const type of ['c172', 'tiger', 'bathtub', 'cub', 'pitts', 'throne', 'spitfire'].filter((k) => k === 'c172' || AIRCRAFT[k]?.flight)) {
+      L.setAirport('royal'); setLandAircraft(type);
+      const env = { groundHeightAt: (x, z) => (Math.hypot(x, z) > 1500 ? 115 : 0), surfaceAt: (x, z) => (R.onRunway(x, z, 0) ? 'runway' : 'grass'), colliders: [] };
+      const tr = new Traffic(env, {}), ac = new Aircraft({ type }), ap = new Autopilot(ac);
+      tr.add({ aircraft: ac, ap, player: true, name: 'P' });
+      ac.place({ x: 3000, z: 0, alt: 300, heading: 0, speed: 45, throttle: 0.6 }, env);
+      ap.setRoute({ name: 'sortie', legs: [[3000, -3000], [-3000, -3000], [-3000, 3000], [3000, 3000]].map(([x, z]) => ({ kind: 'fly', to: [x, 420, z], speed: 85, flaps: 0, label: 'SORTIE' })), loop: 0 });
+      for (let t = 0; t < 900; t += 1 / 60) tr.update(1 / 60);   // a long sortie: the old floor's stamp outlives the farm approach
+      L.setAirport('farm'); ap.airportChanged?.();
+      env.groundHeightAt = () => 0;
+      const e = R.runwayEnd('25'), x = e.thr[0] - e.u[0] * 5300, z = e.thr[1] - e.u[1] * 5300;
+      ac.place({ x, z, alt: 400, heading: e.hdg, speed: 41, throttle: 0.6 }, env);
+      ap.landing = null; ap.setRoute(R.arrivalRoute('25', { type, stand: 'auto', parkSeconds: 30, from: [x, z] }));
+      let t = 0, tapped = null, td = null, ga = 0, bad = null, plan = null, top = 0; const gaWhy = [];
+      for (; t < 900 && td == null && !bad; t += 1 / 60) {
+        tr.update(1 / 60);
+        for (const ev of ap.events.splice(0)) if (ev.type === 'goaround') { ga++; gaWhy.push(`${ev.reason} ${(t - tapped).toFixed(0)}s ${ac.agl.toFixed(0)}m ${Math.round(R.toRunway(e, ac.pos.x, ac.pos.z).s)}`); }
+        for (const ev of ac.events.splice(0)) { if (ev.type === 'touchdown' && tapped != null) td = t - tapped; if (ev.type === 'crash') bad = ev.reason; }
+        if (tapped == null && Math.hypot(ac.pos.x - e.thr[0], ac.pos.z - e.thr[1]) < 3400) {
+          armLandNow(); plan = planLandAhead({ pos: ac.pos, vel: ac.vel, heading: ac.heading, altitude: ac.alt, onGround: false, world: env, layout: L });
+          if (plan.fail) { bad = 'LAND ' + plan.fail; break; }
+          ap.landAt(plan); tapped = t; top = ac.agl;
+        }
+      }
+      out.push({ ok: !bad && td != null && td < 300 && !ga && ac.surface === 'runway', d: `${type} LAND ${plan?.label}/${plan?.pattern} from ${top.toFixed(0)} m: ${bad || (td != null ? `down ${td.toFixed(0)} s on ${ac.surface}` : 'no touchdown')}, ${ga} go-around(s)${gaWhy.length ? ' (' + gaWhy.join(', ') + ')' : ''}` });
+    }
+  } finally { L.setAirport('royal'); setLandAircraft(null); }
+  check('FLIGHTFIX7 farm LAND straight out of the clouds after a sortie elsewhere (stale terrain floor): every light type down on the strip < 300 s, no go-around', out.every((o) => o.ok), out.map((o) => o.d).join('; '));
+}
+
+// FLIGHTFIX7 (loop jumbo-hard "mid-air collision with K-TUPP"): the player's LAND onto the reciprocal of the active
+// runway (09 while ATC lands and departs 27: the wrong_way crime) with AI landing / lined up / departing 27 head-on.
+// Nobody may touch: the AI yield to the committed LAND, the player's AP avoids what is coming the other way.
+async function headOn() {
+  const { planLandAhead, setLandAircraft } = await import('../js/assist/landahead.js');
+  const layout = await import('../js/world/layout.js');
+  const { Aircraft, Autopilot } = await flightLib();
+  if (typeof args['falsify-ap'] === 'string') { const { FALSIFY } = await import('../js/flight/autopilot.js'); for (const k of args['falsify-ap'].split(',')) FALSIFY[k] = true; }
+  const rows = [];
+  const jets = typeof args.jets === 'string' ? args.jets.split(',') : ['jumbo', 'herc', 'f35'];
+  for (const jet of jets) for (const [what, pd, ad] of [['final', 4500, 2600], ['final', 6000, 3200], ['final', 3500, 1800], ['final', 8000, 4000], ['depart', 5000, 0], ['depart', 3500, 0], ['holding', 4200, 0], ['holding', 6500, 0]]) {
+    setLandAircraft(jet);
+    const W = await seqWorld(7);
+    const ai = W.spawn(what, what === 'final' ? { dist: ad, type: 'c172' } : { type: 'c172', wait: 1 });
+    const e9 = R0().runwayEnd('09'), [px, pz] = R0().fromRunway(e9, -pd, 0);
+    const ac = new Aircraft({ type: jet });
+    ac.place({ x: px, z: pz, alt: Math.min(pd * 0.07 + 20, 450), heading: 90, speed: (ac.P.jet ? ac.P.vapp * 1.25 : 80 * 0.5144), throttle: 0.5 }, W.env);
+    const P = W.tr.add({ aircraft: ac, ap: new Autopilot(ac), player: true, name: 'player' });
+    P.ap.setRoute(R0().circuitRoute('27', { type: jet })); W.link.placed(P, 1);
+    W.step(1);
+    const plan = planLandAhead({ pos: ac.pos, vel: ac.vel, heading: ac.heading, altitude: ac.alt, onGround: false, world: W.env, layout, type: jet, prefer: '09' });
+    if (plan.fail || plan.runway !== '09') { rows.push({ ok: false, d: `${jet} ${what} ${pd}: LAND picked ${plan.runway || plan.fail}` }); continue; }
+    P.ap.landAt(plan);
+    let minD = 1e9, hit = null, gaP = 0, gaA = 0;
+    W.step(420, () => {
+      for (const ev of ac.events.splice(0)) if (ev.type === 'collision' || ev.type === 'crash') hit ??= `${ev.type} ${ev.reason || ev.other || ''} @${W.t.toFixed(0)}`;
+      for (const ev of P.ap.events.splice(0)) if (ev.type === 'goaround') gaP++;
+      for (const ev of ai.ap.events.splice(0)) if (ev.type === 'goaround') gaA++;
+      if (!ai.ac.crashed && !(ai.ac.onGround && ac.onGround)) minD = Math.min(minD, Math.hypot(ai.ac.pos.x - ac.pos.x, ai.ac.pos.y - ac.pos.y, ai.ac.pos.z - ac.pos.z));
+      return !!hit || (P.ap.done && ac.onGround && ac.speed < 0.5);
+    });
+    const ok = !hit && minD > 90 + ac.dims.span / 2;
+    rows.push({ ok, d: `${jet} vs ${what} (${pd}/${ad}): ${hit || `closest ${minD.toFixed(0)} m`}, player ${ac.onGround ? 'down' : P.ap.phase} GA ${gaP}, AI ${ai.ap.phase} GA ${gaA}` });
+  }
+  setLandAircraft(null);
+  if (args.dbgjet) for (const r of rows) console.log('  HO', r.ok ? 'ok  ' : 'FAIL', r.d);
+  const bad = rows.filter((r) => !r.ok);
+  check(`LAND onto the reciprocal (09) with AI landing / waiting / departing 27 head-on (${rows.length}): no contact, nobody airborne within 90 m + half span`, !bad.length, (bad.length ? bad : rows).map((r) => r.d).join(' | '));
+}
+
+// FLIGHTFIX7 (loop f35: "AP took back after 5.1 s" / "throttle latched: not within 3 s"): an F-35 7.1 km out, fast and
+// heading out, is inside the boundary's rearm ring but predicted past the turn line: the escort's turnback and clear
+// alternated every frame. One turnback, held until it points home.
+async function edgeFlap() {
+  const { Aircraft, Autopilot, Traffic, R } = await flightLib();
+  const out = [];
+  for (const [type, kt] of [['f35', 420], ['f35', 300], ['jumbo', 280], ['c172', 120]]) {
+    const env = { groundHeightAt: () => 0, surfaceAt: () => 'grass', colliders: [] };
+    const tr = new Traffic(env, {}), ac = new Aircraft({ type }), ap = new Autopilot(ac);
+    tr.add({ aircraft: ac, ap, player: true, name: 'P' });
+    ac.place({ x: 7100, z: 0, alt: 600, heading: 90, speed: kt * 0.514444, throttle: 1 }, env);
+    ap.setRoute(R.circuitRoute('27', { type }));
+    let turn = 0, clear = 0;
+    for (let t = 0; t < 4; t += 1 / 60) { tr.update(1 / 60); for (const ev of ap.events.splice(0)) if (ev.type === 'boundary') { if (ev.stage === 'turnback') turn++; if (ev.stage === 'clear') clear++; } }
+    out.push({ ok: turn <= 1 && clear <= 1, d: `${type} ${kt} kt: ${turn} turnback / ${clear} clear in 4 s` });
+  }
+  check('boundary escort at 7.1 km heading out fast: one turnback, no turnback/clear flapping', out.every((o) => o.ok), out.map((o) => o.d).join('; '));
 }
 
 const R0 = () => FL.R;
@@ -1202,6 +1305,7 @@ if (!XF) { SCEN.flightcut = flightCutIn; SCEN.gameplay = gameplay; SCEN.avoid = 
 SCEN.flight = flightSoak;
 // after the soaks: aircraft ids are global, and the soaks' see-and-avoid tie-breaks (higher id gives way) depend on them
 if (!XF) Object.assign(SCEN, { landseq: landSeq, placed: placedLineUp, closedx: closedCrossing, uturn, refusedga: refusedGA, jetland: jetLand });   // jetland last: it adds planes (global ids)
+if (!XF) Object.assign(SCEN, { farmland: farmLand, headon: headOn, edgeflap: edgeFlap });
 for (const [name, fn] of Object.entries(SCEN)) {
   if (args.only && args.only !== name) continue;
   const t0 = Date.now();
@@ -1251,10 +1355,14 @@ function falsify() {
     ['closed crossing at once', 'js/atc/index.js', '        if (!S.open[h.runway]) {', '        if (false) {', 'closedx', 'closed 04/22'],
     ['U-turn exit', 'js/atc/index.js', 'a - 60), towardHold()); // an exit just behind: U-turn', 'a + 60), towardHold());', 'uturn', 'U-turn'],
     ['refused go-around noted', 'js/atc/bridge.js', "if (last?.type === 'goaroundrefused') atc.noteGoAroundRefused?.(id, last.reason);", '', 'refusedga', 'LAND refuses'],
+    // FLIGHTFIX7: a wrong-way LAND (09) against AI on 27
+    ['no departure into a reciprocal lander (release + cancel)', 'js/atc/index.js', ['&& !traffic && oppositeRem(end, first) > T.oppositeBlock;', "|| (oppositeRem(end, id) < T.oppositeBlock * 0.6 ? 'opposite' : null);"], ['&& !traffic;', ';'], 'headon', 'LAND onto the reciprocal'],
+    ['AI landers yield to a reciprocal lander', 'js/atc/index.js', "|| (opp < Math.min(T.oppositeBlock, (s.rem ?? 1e9) + 3000) ? 'opposite' : null);", ';', 'headon', 'LAND onto the reciprocal'],
   ];
   const files = ['js/atc/index.js', 'js/atc/geometry.js', 'js/atc/rules.js', 'js/atc/outrage.js', 'js/atc/bridge.js', 'js/world/layout.js', 'js/flight/routes.js', 'data/aircraft.js', 'data/rules.js', ...fs.readdirSync(path.join(ROOT, 'data/airports')).map((f) => `data/airports/${f}`)];
   let ok = 0;
   for (const [label, file, orig, broken, scen, expect, extra] of B) {
+    if (typeof args.scen === 'string' && !args.scen.split(',').includes(scen)) continue;   // --falsify --scen=headon,farmland
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'atc-falsify-'));
     for (const f of files) { fs.mkdirSync(path.join(tmp, path.dirname(f)), { recursive: true }); fs.copyFileSync(path.join(ROOT, f), path.join(tmp, f)); }
     let src = fs.readFileSync(path.join(tmp, file), 'utf8');

@@ -527,7 +527,9 @@ export class Traffic {
       B.lock = true; e.ap.wantResume = true; e.ap.homing = true;
       const quiet = ac.time - (B.quipT ?? -1e9) < 30; if (!quiet) B.quipT = ac.time;   // one quip per 30 s, however often it bounces off
       e.ap._emit('boundary', { stage: 'turnback', dist: Math.round(r), quip: quiet ? null : q('turnback') });
-    } else if (B.lock && (r < BOUNDARY.rearm || (vr < -0.7 * ac.gs && Math.abs(ac.bank) < 0.25))) {   // pointing home, wings level: yours again
+    // FLIGHTFIX7: back inside the rearm ring only counts once the prediction is too (a fast F-35 7.1 km out, heading out:
+    // turnback and clear alternated every frame, the stick taken and given back 60 times a second)
+    } else if (B.lock && ((r < BOUNDARY.rearm && ahead < BOUNDARY.turn) || (vr < -0.7 * ac.gs && Math.abs(ac.bank) < 0.25))) {   // pointing home, wings level: yours again
       B.lock = false; e.ap.homing = false;
       e.ap._emit('boundary', { stage: 'clear', dist: Math.round(r) });
     }

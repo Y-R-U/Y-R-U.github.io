@@ -1,13 +1,18 @@
-// node js/assist/test/landahead.test.mjs [--falsify] [--n=400]
+// node js/assist/test/landahead.test.mjs [--falsify[=m2]] [--n=400]
 // --falsify hands the planner a flat world with no colliders, trees or water: the safety check MUST then fail.
-import { planLandAhead, LAND, takeoffRun } from '../landahead.js';
+// --falsify=pace plans the Spitfire at the C172's pace: its fast, low extended-downwind check MUST fail.
+// --falsify=m2 restores the pre-FLIGHTFIX7 home bonus (closed 22 counts as home, straight-in gets none): M2's cut-in check MUST fail.
+import { planLandAhead, LAND, takeoffRun, FALSIFY, setLandAircraft } from '../landahead.js';
 import { circuitLegs } from '../../flight/routes.js';
 import { fakeWorld, layout } from './fakeworld.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
 const N = +args.n || 400;
+const BLIND = args.falsify === true;
+if (args.falsify === 'm2') FALSIFY.m2 = true;
+if (args.falsify === 'pace') FALSIFY.pace = true;
 const world = fakeWorld();
-const blind = args.falsify ? { ...world, colliders: [], trees: [], groundHeightAt: () => 0, surfaceAt: (x, z) => { const s = world.surfaceAt(x, z); return s === 'water' || s === 'building' ? 'grass' : s; } } : world;
+const blind = BLIND ? { ...world, colliders: [], trees: [], groundHeightAt: () => 0, surfaceAt: (x, z) => { const s = world.surfaceAt(x, z); return s === 'water' || s === 'building' ? 'grass' : s; } } : world;
 let pass = 0, fail = 0;
 const ok = (cond, name, detail = '') => { if (cond) pass++; else { fail++; console.log(`  FAIL ${name} ${detail}`); } };
 const DEG = Math.PI / 180;
@@ -38,6 +43,32 @@ function stripViolations(p) {
     for (const t of trees) if (Math.hypot(t[0] - x, t[1] - z) < 4) { out.push(`tree@${x | 0},${z | 0}`); return out; }
   }
   return out;
+}
+
+// FLIGHTFIX7 (M2 Medium): lined up on 27's final, low (< 120 m), Rupert behind → RWY 27 straight in, never closed 22
+console.log('FLIGHTFIX7: low on an open runway\'s final keeps it');
+for (const [s, alt] of [[1600, 115], [1500, 110], [1300, 100], [1000, 80]]) {
+  const p = plan(700 + s, 0, alt, 270, 85, world);
+  ok(p.runway === '27' && p.pattern === 'straight', `27 final ${s} m out at ${alt} m → RWY 27 straight`, JSON.stringify({ r: p.runway, p: p.pattern, f: p.fail }));
+}
+
+// FLIGHTFIX7 (ROSTER2 loop spitfire: "LAND on the home downwind picked FIELD"): a fast light type, low (~105 m AGL over
+// 44 m ground) and fast (140-155 kt) on an extended 27 downwind. At the C172's pace its base turn costs too much and a
+// field straight ahead wins; at its own pace (vcruise / 95 kt: radii, orbits, slow-down) it is the home runway.
+console.log('FLIGHTFIX7: a fast light type plans at its own pace');
+{
+  const hill = { ...world, groundHeightAt: (x, z) => (x > 3000 ? 44 : world.groundHeightAt(x, z)) };
+  setLandAircraft('spitfire');
+  for (const [kt, x, lat, alt] of [[155, 4500, 1150, 150], [155, 4500, 700, 150], [145, 4000, 1150, 140]]) {
+    const p = plan(x, lat, alt, 90, kt, hill);
+    ok(p.kind === 'runway' && p.runway === '27', `Spitfire ${kt} kt ${alt - 44} m AGL on the extended downwind (${x}, ${lat}) → RWY 27`, JSON.stringify({ k: p.kind, r: p.runway, p: p.pattern, f: p.fail }));
+  }
+  // loop spitfire-easy: its own (wider) circuit's downwind, 2.27 km abeam 09/27 at 290 m, 94 kt → still the home runway
+  for (const [x, lat, hdg] of [[1109, 2265, 74], [0, 2400, 90], [-800, 2200, 95]]) {
+    const p = plan(x, lat, 290, hdg, 94, world);
+    ok(p.kind === 'runway', `Spitfire on its own downwind (${x}, ${lat}) hdg ${hdg} → a runway, never a field`, JSON.stringify({ k: p.kind, r: p.runway, p: p.pattern, f: p.fail }));
+  }
+  setLandAircraft(null);
 }
 
 console.log('aligned runway preference');
@@ -74,7 +105,7 @@ console.log('nothing suitable / too high');
 {
   // heading straight at the town from close in: houses everywhere in a narrow, short cone
   const town = fakeWorld({ extra: Array.from({ length: 400 }, (_, i) => ({ min: [-2500 + (i % 20) * 250, 0, -6000 + Math.floor(i / 20) * 250], max: [-2500 + (i % 20) * 250 + 240, 20, -6000 + Math.floor(i / 20) * 250 + 240], kind: 'house' })) });
-  const n = plan(0, -1100, 40, 0, 70, args.falsify ? blind : town);
+  const n = plan(0, -1100, 40, 0, 70, BLIND ? blind : town);
   ok(n.fail === 'nothingAhead', 'built-up ahead → nothingAhead', JSON.stringify({ f: n.fail, k: n.kind, s: n.strip }));
   const h = plan(-700 - 1200, 0, 1400, 90);
   ok(h.fail === 'tooHigh', '1400 m over a field 1.2 km out → tooHigh', JSON.stringify({ f: h.fail, k: h.kind }));
@@ -155,7 +186,7 @@ console.log(`random sweep ×${N}`);
 {
   console.log('FLIGHTFIX5: narrow river');
   const RX = -1884, wet = (x) => Math.abs(x - RX) < 9;
-  const w = { ...world, surfaceAt: (x, z) => (wet(x) ? 'water' : world.surfaceAt(x, z)), ...(args.falsify ? {} : { waterNear: (x, z, r) => Math.abs(x - RX) < r + 9 }) };
+  const w = { ...world, surfaceAt: (x, z) => (wet(x) ? 'water' : world.surfaceAt(x, z)), ...(BLIND ? {} : { waterNear: (x, z, r) => Math.abs(x - RX) < r + 9 }) };
   const bad = [];
   let n = 0;
   for (const z of [700, 900, 1100, 1500, 2000, 2400]) for (const x0 of [-1500, -1400, -1300]) for (const straight of [true, false]) {

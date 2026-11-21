@@ -556,3 +556,61 @@ through the real ATC. `--falsify=roll|loop|vto|short|brake` each turn their chec
 - Pitts: no aileron slave struts, no smoke system, the spinner is static (a body of revolution).
 - Throne: castors do not swivel visually; flames are not merged into far LODs; the lift-fan value is stored only.
 - `main.js` AI pool (WORLD's `aiPool`) does not include `cub`/`pitts` yet.
+
+## ROSTER2 (V1 A4, 2026-11-20): Spitfire "Teatime" and Learjet "Monogrammed Lear"
+Two more flyable types (`status: 'ready'`, in `main.js` FLYABLE, the Hangar and the ground chips). Every rank now unlocks
+a plane: Archduke = the Lear (moved from Prince), Crown Prince = the Spitfire. `data/ranks.js` unlock lists now also name
+the Herc (Duke) and the F-35 (Prince), so the rank-up card shows them. Viewer: `tools/jetview.html?type=spitfire|bizjet`
+(`&taxi=0|1` forces the Spitfire's taxi pose, `&gear=0` gear up, `&level` datum level). Shots: `docs/shots/roster2/`.
+
+| file | what |
+|---|---|
+| `types/spitfire.js` | Spitfire-ish: elliptical wing (straight 25 % chord line, 6° dihedral), long pointed spinner (accent), four-blade Rotol prop with yellow tips, six exhaust stubs a side, chin intake, a radiator under each wing, cannon stubs, split flaps (85°), elliptical stab and fin with the purple/gold/accent fin flash and a crest, royal roundels, the player's name + a teapot on the nose, registration aft, accent fuselage band. Primary above / secondary below. Main gear legs on pivots retract **outward into the wing** (`rig.setGear`, or `ctl.gear` through `setControls`); far LODs collapse the gear's vertex range like the F-35. Sliding hood + armoured seat; panel cockpit (blind-flying six, tach, oil/coolant, clock, gunsight, spade-grip stick, throttle quadrant on the left wall, a teapot on the coaming; ASI dial to 400 kt). |
+| `types/bizjet.js` | Learjet-ish (jetkit + glass cockpit, like the Herc): drooped nose with a dark radome, raised windshield, five cabin windows, airstair door, swept low wing with tip tanks (+ little ventral fins), two rear-fuselage engines on pylons (chrome lips, fan faces), T-tail with a bullet fairing. Livery: primary body, secondary cheatline with accent pinstripes, secondary fin + tip tanks, and the **royal monogram**: the first letter of the player's name in gold under a crown. Gear telescopes (`finishBig`). Two-seat glass flight deck (no overhead). |
+| `instruments.js` / `cub_cockpit.js` | `createInstruments({ quality, asiMax, asiArcs })`: the ASI face and needle scale to `asiMax` (default 200, unchanged for every other type). `buildPanelCockpit` passes `spec.inst` through. |
+
+**Taxi pose (no forward view on the ground):** the Spitfire rig measures its own ground speed from the root's motion
+(so AI and online rigs do it too). Stopped or below ~32 kt with the gear down, the hood slides back 0.62 m, the seat rises
+on a purple-and-gold **royal booster cushion** (pilot +0.24 m) and `viewEye()` lifts the cockpit eye 0.3 m and pitches it
+down a touch: the player can see over the cowl while taxiing; the hood shuts and the seat drops for the takeoff roll.
+`rig.setTaxiPose(null | 0..1)`, `rig.taxiPose()`.
+
+### Geometry (build frame as the Pitts / Herc; local = build − CG)
+| | Spitfire | Learjet |
+|---|---|---|
+| CG (station, height) | 2.6, 1.75 | 7.7, 1.35 |
+| mains / third | s 2.05 ±0.84 r 0.34 (pivots ±0.62, y 1.02) · tail wheel s 8.35 | s 8.3 ±1.25 r 0.30 · nose s 2.4 r 0.21 |
+| ground attitude / restHeight | 12.0° 3-point / 1.597 | level / 1.35 |
+| eye | s 3.92, y 2.72 (+0.3 taxiing) | left seat x −0.33, s 3.95, y 1.92 |
+| LOD (high / low, m) | 260 / 150 | 360 / 210 |
+
+### Budgets (`tools/jetview.html` `__measure`, rig only, ANGLE Metal)
+| | Spitfire high | Spitfire low | Lear high | Lear low |
+|---|---|---|---|---|
+| chase calls / tris | 24 / 25.3k | 24 / 10.6k | 12 / 11.2k | 12 / 5.2k |
+| cockpit calls / tris | 17–19 / 21–23k | 17 / 9.0k | 11 / 17.9k | 10 / 6.6k |
+| far / far2 tris | 2.2k / 1.6k (1 call each) | same | 1.0k / 1.0k (+1 call while the gear is down) | same |
+All within the low-tier target (≤ 25 calls, ≤ 30k).
+
+### Flight models (`data/aircraft.js` → `flight`; `node tools/flight-sim.mjs roster2`)
+- **Spitfire:** 2,900 kg, 22.5 m², stall 70 kt clean / 61 kt with the split flaps (`flapCD 0.13`: they are air brakes),
+  flat out ~300 kt level, ~3,900 fpm at 105 kt, roll ~100°/s at 200 kt (`controls.js` RATE 90). AP takeoff 270 m (book
+  280), lift-off ~83 kt. Circuit pace `vcruise` 110 kt (downwind ~98 kt), `apBankScale 1.3` (a 39° curved approach),
+  `vapp` 76 kt, `flareAgl 8` (the flare starts high enough to bleed off the speed). The AP **wheel-lands** it (~70 kt, the
+  tail flying, then down at ~62 kt): `vr` 64 kt keeps the circuit rollout from pulling the tail down while the wing can
+  still fly (a 3-point arrival at this speed ballooned). `retract: true` (new, `js/flight/aircraft.js`): the jets'
+  automatic gear logic for a non-jet, plus `ctl.gear` so the rig follows. `taxiGuard`, `maxSteer 0.9` (a 6.3 m wheelbase;
+  0.3 took 50 s per taxiway corner). `shortField { vapp 1.25, brake 0.6, wheel 0.2 }`: LAND rolls ~400 m (it rolled
+  1 km tail-up without, and Hard's taxi to the terminal ran out of the loop suite's 240 s). Book rolls 280 / 400 m → needs 600 m: fits the 620 m farm strip, not the lawn.
+- **Learjet:** 6,500 kg, 23.5 m², 31 kN, a jet (`jet`, `noField`, turbofan audio): AP takeoff 543 m @ 127 kt (book 600),
+  approach ~131 kt, touchdown ~220 fpm, `circuitScale 1.6`, `apBankScale 1.4` (at 30° its 145 kt base turn needed a 1 km
+  radius and overshot the final by 600 m). Book rolls 600 / 650 → needs 975 m: C-Tower 1 and Much Snoring only; LAND
+  never offers the farm or the lawn; `fieldTakeoff` refuses with a quip.
+
+### Tests
+`node tools/flight-sim.mjs roster2 [--only=spitfire,bizjet]` (75 checks): Spitfire circuits 09/27 (book roll, wheel
+landing, no ground loop, centreline), override/handback, rest attitude, Easy tail-wheel kick, roll rate, flat-out speed +
+climb, gear up/down, min run, LAND ×10, FIX3 set, field-hop fallback, B3–B7, every Kingdom airport (circuits + LAND both
+ends at the farm and Much Snoring, refusal at the lawn), 12 min of AI traffic; the Lear runs the whole `jets` scenario
+(`scJets(['bizjet'])`) plus the airports and AI traffic. `--falsify=spitroll|spitloop|spitgear|spitfarm|spitbrake|learfield|learfarm`
+each turn their checks red. Tasks: the "Hangar: Fast Company" set (8 rows) in `tools/tasks-sim.mjs` (+ 2 falsify breaks).

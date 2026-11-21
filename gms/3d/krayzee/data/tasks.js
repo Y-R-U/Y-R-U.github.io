@@ -9,7 +9,7 @@ import { INFRACTIONS } from './rules.js';
 
 export const TASKS_KEY = 'krayzee.tasks';
 export const TIER_PP = { bronze: 100, silver: 250, gold: 750 };
-export const SET_BONUS = { share: 0.6, min: 1000 };
+export const SET_BONUS = { share: 0.55, min: 1000 };   // ROSTER2: 0.6 → 0.55 makes room for the Fast Company set under the 40 % cap
 
 const ok = (e) => !e.crash;
 const plane = (id, f = () => true) => (e) => e.plane === id && f(e);
@@ -286,6 +286,17 @@ export const SETS = [
     T('throne_hover', '👑', 'Holding Court', 'Hover the throne for 30 seconds in one go.', 'silver', { on: 'hover', when: plane('throne', (e) => e.run >= 30), plane: 'throne' }),
     T('throne_vgrass', '🌼', 'Enthroned on the Lawn', 'Land the throne vertically on grass.', 'gold', { on: 'touchdown', when: plane('throne', (e) => ok(e) && e.vertical && (e.surface === 'grass' || e.surface === 'lawn')), plane: 'throne' }),
     T('throne_hard', '⚖️', 'Heavy Is the Head', 'Hover the throne on Hard.', 'gold', { on: 'hover', when: plane('throne', (e) => e.diff === 'hard'), plane: 'throne' }),
+  ] },
+  // ROSTER2 (V1 A4): the Crown Prince's Spitfire and the Archduke's Learjet
+  { id: 'fast', name: 'Hangar: Fast Company', blurb: 'Tea at 300 knots, champagne on the runway', badge: '☕', epithet: 'the Swift', tasks: [
+    T('fly_spitfire', '☕', 'Teatime', 'Take off in Teatime, the Spitfire.', 'bronze', { on: 'takeoff', when: plane('spitfire'), plane: 'spitfire' }),
+    T('spit_fast', '🫖', 'Tea, Hurried', 'Exceed 300 kt in the Spitfire.', 'silver', { on: 'air', when: plane('spitfire', (e) => e.speedKt > 300), plane: 'spitfire' }),
+    T('spit_farm', '🐑', 'Scramble!', 'Land the Spitfire on the grass at Muckle Bottom.', 'gold', { on: 'touchdown', when: plane('spitfire', (e) => ok(e) && e.airport === 'farm' && e.surface === 'grass'), plane: 'spitfire' }),
+    T('spit_roll', '🎉', 'Victory Roll', 'A full roll in the Spitfire.', 'bronze', { on: 'roll', when: plane('spitfire'), plane: 'spitfire' }),
+    T('fly_bizjet', '🥂', 'Monogrammed Lear', 'Take off in the Monogrammed Lear.', 'bronze', { on: 'takeoff', when: plane('bizjet'), plane: 'bizjet' }),
+    T('lear_airbase', '🛬', 'Wheels Down, Much Snoring', 'Land the Lear at RAF Much Snoring.', 'silver', { on: 'touchdown', when: plane('bizjet', (e) => ok(e) && e.airport === 'airbase'), plane: 'bizjet' }),
+    T('lear_butter', '🍾', 'Not a Drop Spilled', 'Land the Lear under 150 fpm.', 'gold', { on: 'touchdown', when: plane('bizjet', (e) => ok(e) && e.fpm < 150), plane: 'bizjet' }),
+    T('lear_high', '🌤️', 'Champagne Altitude', 'Take the Lear above 10,000 ft.', 'bronze', { on: 'air', when: plane('bizjet', (e) => e.alt > 3048), plane: 'bizjet' }),
   ] },
   { id: 'trial', name: 'Trial by Difficulty', blurb: 'Rubber, partial, real metal', badge: '🛡️', epithet: 'the Hardened', tasks: [
     T('finish_easy', '🐣', 'Easy Does It', 'DEMAND IT to finish a flight on Easy.', 'bronze', { on: 'finished', when: (e) => e.diff === 'easy' }),

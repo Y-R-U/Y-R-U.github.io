@@ -21,6 +21,8 @@ const TYPE_BUILDERS = {
   cub: () => import('./types/cub.js').then((m) => m.createCub),
   pitts: () => import('./types/pitts.js').then((m) => m.createPitts),
   throne: () => import('./types/throne.js').then((m) => m.createThrone),
+  spitfire: () => import('./types/spitfire.js').then((m) => m.createSpitfire),   // ROSTER2
+  bizjet: () => import('./types/bizjet.js').then((m) => m.createBizjet),
 };
 export const PLANE_TYPES = ['c172', ...Object.keys(TYPE_BUILDERS)];
 

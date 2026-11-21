@@ -19,6 +19,7 @@ export async function connect(port) {
     if (d.id && pending.has(d.id)) { const { r, j } = pending.get(d.id); pending.delete(d.id); d.error ? j(new Error(d.error.message)) : r(d.result); return; }
     if (d.method === 'Runtime.exceptionThrown') D.errors.push(String(d.params.exceptionDetails.exception?.description || d.params.exceptionDetails.text).split('\n').slice(0, 3).join(' | '));
     else if (d.method === 'Runtime.consoleAPICalled' && d.params.type === 'error') D.errors.push(d.params.args.map((a) => a.value ?? a.description).join(' ').split('\n').slice(0, 3).join(' | '));
+    else if (d.method === 'Debugger.paused') D.onPaused?.(d.params);
     else if (d.method === 'Runtime.consoleAPICalled' && d.params.type === 'warning') D.warns.push(d.params.args.map((a) => a.value ?? a.description).join(' ').slice(0, 200));
   };
   const send = (method, params = {}) => new Promise((r, j) => {
@@ -93,7 +94,23 @@ export async function connect(port) {
     try { for (const t of await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()) if (t.type === 'page' && t.url.startsWith('chrome://') && t.id !== page.id) await fetch(`http://127.0.0.1:${port}/json/close/${t.id}`); } catch (e) { /* */ }
     await send('Page.bringToFront').catch(() => {});
   };
+  // FLIGHTFIX7: a page whose sim clock stopped and whose evaluates time out is stuck in a script: pause it and say where
+  // FLIGHTFIX7: is the browser itself still there? (cdp's --max hard cap kills Chrome mid-matrix: 'sim advanced 0 s')
+  D.alive = async () => { try { const r = await fetch(`http://127.0.0.1:${port}/json/version`, { signal: AbortSignal.timeout(3000) }); return r.ok; } catch (e) { return false; } };
+  D.stack = async (ms = 8000) => {
+    if (!process.env.KRZ_STACK) return null;
+    const got = new Promise((r) => { D.onPaused = (p) => r(p.callFrames.slice(0, 12).map((f) => `${f.functionName || '(anon)'} ${f.url.replace(/^.*\/krayzee\//, '')}:${f.location.lineNumber + 1}`)); });
+    try {
+      await send('Debugger.pause');
+      const frames = await Promise.race([got, sleep(ms).then(() => null)]);
+      await send('Debugger.resume').catch(() => {});
+      return frames;
+    } catch (e) { return [`(no stack: ${e.message})`]; } finally { D.onPaused = null; }
+  };
   await send('Page.enable'); await send('Runtime.enable'); await send('Network.enable');
+  // the debugger is on from the start (enabling it later needs the page's main thread); no breakpoints are ever set.
+  // Opt-in (KRZ_STACK=1): only stall diagnosis needs it
+  if (process.env.KRZ_STACK) await send('Debugger.enable').catch(() => {});
   await D.front();
   await send('Network.setCacheDisabled', { cacheDisabled: true });
   return D;

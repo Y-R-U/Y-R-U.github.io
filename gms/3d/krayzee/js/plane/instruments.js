@@ -47,18 +47,21 @@ function glare(ctx) {
 
 const asiAng = (kt) => { const k = Math.max(0, Math.min(200, kt)); return k < 40 ? k * 0.75 : 30 + (k - 40) * 1.95; };
 
+// asi options (ROSTER2): { asiMax (dial full scale, kt; default 200), asiArcs { white, green, yellow: [lo, hi], red } }
+const ASI_ARCS = { white: [33, 85], green: [48, 129], yellow: [129, 163], red: 163 };
 const STATIC = {
-  asi(ctx) {
+  asi(ctx, o = {}) {
+    const K = (o.asiMax ?? 200) / 200, A = o.asiArcs || ASI_ARCS, ang = (kt) => asiAng(kt / K);
     face(ctx);
-    arc(ctx, asiAng(33), asiAng(85), 0.86, 0.07, '#f2f2ee');
-    arc(ctx, asiAng(48), asiAng(129), 0.78, 0.09, '#1fa64a');
-    arc(ctx, asiAng(129), asiAng(163), 0.78, 0.09, '#e7c51f');
-    ctx.save(); ctx.rotate(asiAng(163) * D2R); ctx.fillStyle = '#d6262a'; ctx.fillRect(-0.025, -0.92, 0.05, 0.2); ctx.restore();
+    arc(ctx, ang(A.white[0]), ang(A.white[1]), 0.86, 0.07, '#f2f2ee');
+    arc(ctx, ang(A.green[0]), ang(A.green[1]), 0.78, 0.09, '#1fa64a');
+    arc(ctx, ang(A.yellow[0]), ang(A.yellow[1]), 0.78, 0.09, '#e7c51f');
+    ctx.save(); ctx.rotate(ang(A.red) * D2R); ctx.fillStyle = '#d6262a'; ctx.fillRect(-0.025, -0.92, 0.05, 0.2); ctx.restore();
     for (let k = 40; k <= 200; k += 10) {
       const a = (asiAng(k) - 90) * D2R, big = k % 20 === 0;
       ctx.strokeStyle = '#f2f2ee'; ctx.lineWidth = big ? 0.035 : 0.022;
       ctx.beginPath(); ctx.moveTo(Math.cos(a) * 0.92, Math.sin(a) * 0.92); ctx.lineTo(Math.cos(a) * (big ? 0.74 : 0.8), Math.sin(a) * (big ? 0.74 : 0.8)); ctx.stroke();
-      if (big && k <= 180) label(ctx, String(k), Math.cos(a) * 0.56, Math.sin(a) * 0.56, 0.17);
+      if (big && k <= 180) label(ctx, String(Math.round(k * K)), Math.cos(a) * 0.56, Math.sin(a) * 0.56, K > 1.5 ? 0.15 : 0.17);
     }
     label(ctx, 'AIRSPEED', 0, 0.3, 0.1, '#cfcfca'); label(ctx, 'KNOTS', 0, 0.44, 0.1, '#cfcfca');
   },
@@ -124,7 +127,7 @@ const STATIC = {
 };
 
 const DYN = {
-  asi(ctx, v) { needle(ctx, asiAng(v.airspeed), 0.86, 0.045); hub(ctx); },
+  asi(ctx, v, card, o = {}) { needle(ctx, asiAng(v.airspeed * 200 / (o.asiMax ?? 200)), 0.86, 0.045); hub(ctx); },
   alt(ctx, v) {
     const a = ((v.altitude % 1000) / 1000) * 360;
     const b = ((v.altitude % 10000) / 10000) * 360;
@@ -226,7 +229,7 @@ function compassCard(C) {
   return c;
 }
 
-export function createInstruments({ quality }) {
+export function createInstruments({ quality, ...opts }) {
   const C = quality === 'low' ? 128 : 256;
   const canvas = mkCanvas(1);
   canvas.width = C * COLS; canvas.height = C * ROWS;
@@ -238,7 +241,7 @@ export function createInstruments({ quality }) {
   const faces = {};
   for (const k of Object.keys(STATIC)) {
     const c = mkCanvas(C), x = c.getContext('2d');
-    unit(x, C); STATIC[k](x);
+    unit(x, C); STATIC[k](x, opts);
     faces[k] = c;
   }
   const glareC = mkCanvas(C); { const x = glareC.getContext('2d'); unit(x, C); glare(x); }
@@ -274,7 +277,7 @@ export function createInstruments({ quality }) {
     x.fillStyle = '#000'; x.fillRect(0, 0, C, C);
     if (faces[k]) x.drawImage(faces[k], 0, 0);
     unit(x, C);
-    DYN[k](x, shown, card);
+    DYN[k](x, shown, card, opts);
     x.setTransform(1, 0, 0, 1, 0, 0);
     x.drawImage(glareC, 0, 0);
     const i = GAUGES.indexOf(k);

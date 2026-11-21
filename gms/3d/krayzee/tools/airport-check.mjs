@@ -11,10 +11,10 @@ import * as L from '../js/world/layout.js';
 import { AIRCRAFT } from '../data/aircraft.js';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] = a.replace(/^--/, '').split('='); return [k, v ?? true]; }));
-const FLYABLE = ['c172', 'tiger', 'bathtub', 'jumbo', 'herc', 'f35'];
+const FLYABLE = ['c172', 'tiger', 'bathtub', 'jumbo', 'herc', 'f35', 'spitfire', 'bizjet'];
 const EXPECT = {
   royal: FLYABLE,
-  farm: ['c172', 'tiger', 'bathtub'],
+  farm: ['c172', 'tiger', 'bathtub', 'spitfire'],   // the Spitfire wants 600 m: the 620 m strip just takes it
   airbase: FLYABLE,
   palace: ['tiger', 'bathtub', 'f35'],   // the F-35 by a vertical landing (palace.vertical)
 };

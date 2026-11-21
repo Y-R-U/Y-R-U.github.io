@@ -5,6 +5,9 @@ import { TYPES, typeInfo, stallSpeed, thrustFactor } from './aircraft.js';
 import { takeoffRun } from '../assist/landahead.js';
 import { level as stovlLevel, vsToLever, CONVERT } from './stovl.js';
 
+// test switches (tools/atc-sim.mjs --only=farmland --falsify-ap=floor|hiFinal): put a FLIGHTFIX7 fix back the old way
+export const FALSIFY = {};
+
 const G = 9.81, RHO = 1.225, TANG = Math.tan(GLIDE_DEG * DEG);
 // FLIGHTFIX4 short-field landing: a runway under SHORT_RW m (the 240 m Palace Lawn) is aimed SHORT_AIM m in (not
 // AIM_DIST), flown at a slower final, flared without float and braked hard once less than 1.5 × the landing roll is left
@@ -899,7 +902,9 @@ export class Autopilot {
     // a latched lever that cannot hold the path near the ground (slow, or sinking while the path is level) goes back
     // to the AP before the field arrives (the lever would fly it into the ground — FLIGHTFIX3 #6 lets the speed float)
     if (this.playerThrottle != null && !this.manualNow && ac.agl < 60 && t.vs > -1 && (ac.speed < this._vstall() * 1.3 || ac.vs < -2)) this.wantThrottleAuto = true;
-    if (!(this._floorT > ac.time - 0.5)) { this._floorT = ac.time; this._floor = this._terrainFloor(pr.hdg, leg.clearance ?? (this.landing ? 35 : 120)); }
+    // FLIGHTFIX7: place() restarts ac.time at 0 (a map swap, a teleport): a floor stamped later is from the old world
+    // (the farm's LAND held 149 m, the old airport's hills + 35, for a whole sortie of go-arounds)
+    if (!(this._floorT > ac.time - 0.5) || (this._floorT > ac.time && !FALSIFY.floor)) { this._floorT = ac.time; this._floor = this._terrainFloor(pr.hdg, leg.clearance ?? (this.landing ? 35 : 120)); }
     const floor = this._floor;
     if (floor != null && ac.alt < floor + 40) {
       t.vs = Math.max(t.vs, ac.alt < floor ? clamp((floor - ac.alt) * 0.1, 1.5, 5) : 0);
@@ -940,10 +945,12 @@ export class Autopilot {
     if (sub === 'goaround') {
       this._setPhase('GO AROUND');
       // jets sidestep 300 m toward the circuit side: a heavy going round must not climb straight up a departure's back
-      const [fx, fz] = fromRunway(e, p.s + 800, P.jet && !e.virtual ? (circuitSide(e.id) === 'left' ? -300 : 300) : 0);
+      // FLIGHTFIX7: sent round for traffic landing the other way: break off to the circuit side, never up the runway at it
+      const side = !e.virtual ? (circuitSide(e.id) === 'left' ? -1 : 1) : 0, opp = /other way/.test(this._gaWhy || '') && !FALSIFY.oppGA;
+      const [fx, fz] = fromRunway(e, p.s + 800, opp ? side * 900 : P.jet && !e.virtual ? side * 300 : 0);
       t.air = true; t.thr = 1; t.flaps = ac.agl > 60 ? 0 : 1 / 3; t.speed = P.vy; t.vs = 5;
       if (P.jet) { t.speed = Math.max(P.vapp, Math.min(P.vy, ac.speed + 3)); t.vs = ac.agl < 30 ? 3 : 6; }   // spooling up: climb, never dive for speed
-      t.bank = this._bankFor(bearing(ac.pos.x, ac.pos.z, fx, fz), P.jet && ac.agl < 40 ? 4 : 15);   // a jumbo's outboard pods touch at ~9° of bank
+      t.bank = this._bankFor(bearing(ac.pos.x, ac.pos.z, fx, fz), P.jet && ac.agl < 40 ? 4 : opp && ac.agl > 40 ? 30 : 15);   // a jumbo's outboard pods touch at ~9° of bank
       if (this.landing && ac.agl > 50) { this._landCircuit(e); return this._fly(t, this.leg); }
       if (ac.agl > (P.jet ? 220 : 140)) { this._ignoreLand = e.id; this._ignoreUntil = ac.time + 40; this.replan(); }
       return;
@@ -1043,7 +1050,11 @@ export class Autopilot {
     t.speed = est ? ((this.landing && ac.taildragger) || sf ? Math.min(P.vapp, P.vs0 * (P.shortField?.vapp ?? (sf ? 1.2 : 1.25))) : P.vapp) : this._kt(75);   // LAND: a slower taildragger arrival = a short 3-point float
     let vs = -ac.gs * TANG + (gpAlt - ac.alt) * 0.22;
     if (d > 2600 && ac.alt < gpAlt) vs = Math.max(vs, 0);
-    t.vs = clamp(vs, P.jet ? -Math.max(4.2, ac.gs * TANG + 2) : -4.2, 3);   // a jet's glide path alone sinks ~5 m/s
+    // FLIGHTFIX7: a light LAND high on a straight-in (LAND NOW out of the farm's clouds, 380 m at 3.4 km) dives at up to
+    // 1.3 Vapp while well out, idle sinks faster there (a flapless Tiger ~3.3 → 4.6 m/s), and slows to Vapp by 700 m
+    const hiF = this.landing && !P.jet && !FALSIFY.hiFinal && d > 700 ? ac.alt - gpAlt : 0;
+    if (hiF > 15) t.speed = Math.max(t.speed, Math.min(P.vapp * 1.3, P.vapp + (hiF - 15) * 0.08, P.vapp + (d - 700) * 0.01));
+    t.vs = clamp(vs, P.jet ? -Math.max(4.2, ac.gs * TANG + 2) : hiF > 15 ? -6 : -4.2, 3);   // a jet's glide path alone sinks ~5 m/s
     if (P.jet) t.free = true;   // jets fly the glide path and leave the speed to the throttle (no zooming to bleed it)
     if (this.landing && ac.agl < 60) {
       // LANDFIX2: low LAND never climbs back up to the glide path (level off and let it come down to us), never trades

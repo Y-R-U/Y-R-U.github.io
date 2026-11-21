@@ -14,6 +14,9 @@ Output: `docs/review/loop/results-<stamp>[-soak|-falsify].json`, plus a screensh
 ~/.claude/bin/cdp start --port 9636 -- --use-angle=metal      # Metal, or every fps number is fiction
 node tools/test-loop.mjs --quick                                 # every commit: C172 Easy portrait + Bathtub Hard landscape (~5 min)
 node tools/test-loop.mjs                                         # full matrix, 18 cases (~40 min at 4x)
+node tools/test-loop.mjs --jets                                  # jumbo / herc / f35, 18 cases
+node tools/test-loop.mjs --roster                                # cub / pitts / throne, 18 cases
+node tools/test-loop.mjs --roster2                               # spitfire / bizjet (ROSTER2), 12 cases
 node tools/test-loop.mjs --cases=tiger:medium:landscape,c172:hard:portrait
 node tools/test-loop.mjs --soak[=30]                             # 30 sim-minute Free Flight soak (C172 Easy portrait)
 node tools/test-loop.mjs --falsify=freeze,error,cover,deadbutton    # prove the detectors fire (one fresh run per fault)
@@ -44,7 +47,7 @@ Use `?plane=` because a 0 PP Baron cannot pick the Moth or the Bathtub on the ch
 ## Matrix
 
 C172 / Tiger / Bathtub × Easy / Medium / Hard × portrait 390×844 / landscape 844×390, with an Android touch UA and DPR 2.
-`--quick` covers C172 Easy portrait and Bathtub Hard landscape.
+`--quick` covers C172 Easy portrait and Bathtub Hard landscape. Verify flow: `--quick`, full, `--jets`, `--roster`, `--roster2` (the bizjet flies as a jet in every step: runway-only LAND, relaunch, jet budgets).
 
 ## The loop (per case) and its budgets
 
@@ -117,6 +120,20 @@ in the main loop turns the main loop into the field branch. The main loop record
   element. If the button is still covered, the step fails.
 - **PLAYER_GONE**: the player's AP reached a `despawn` leg (phase GONE). This fails the step it happens in.
 - **Crash**: a crash during a manual bit, a LAND approach or a rollout fails that step.
+- **Contacts** (FLIGHTFIX7): every plane-to-plane contact is recorded in the page (`traffic.onContact`, read only) with
+  both sides' position, speed, phase, leg and LAND label; a step that fails on a crash prints the last three.
+- **Page stuck** (FLIGHTFIX7): when the real-time cap hits with the sim clock stopped and the page not answering, the
+  driver pauses the page's script (`D.stack()`, CDP `Debugger.pause`) and the failure names the functions it is stuck in.
+  Opt-in: `KRZ_STACK=1 node tools/test-loop.mjs ...` (the debugger must be enabled at connect: enabling it later needs
+  the stuck main thread). When Chrome itself is gone the failure says so (cdp's `--max` hard cap kills it mid-matrix;
+  see `/tmp/cdp-<port>/watchdog.log`): that was the 2026-11-21 herc-hard-portrait "sim advanced 0 s" + CDP timeouts.
+- **time warp** (FLIGHTFIX7): when D18 drops the 5× warp mid-window ("Traffic nearby") the rate is measured over the part
+  the warp held (≥ 1 s real; WARN). Every jets / roster2 warp red since 2026-11-19 (×2.2–3, herc / bizjet / f35) was that
+  drop, not fps. (A retry was tried first: the extra 5× flying took the F-35 to the Kingdom's edge, where the royal escort
+  takes the stick and the stick+release / throttle steps went red.)
+- **stick+release upset** (FLIGHTFIX7): "the countdown was skipped with no upset" is judged on every sample from the
+  release to the AP's take-back (bank > 66°, sink > 1500 fpm, sinking into the ground within 15 s, or < 40 m at 2 m/s),
+  not on the release alone: a dive left at release keeps steepening, and D37 rightly rescues it (jets 1/36 false red).
 - **Swallowed taps**: a tap whose effect does not show is retried up to 3×, and the retries are recorded (headless
   Chrome sometimes drops a touchStart).
 
@@ -247,3 +264,6 @@ heap 220–540 MB with no growth. 10 stick grabs, 3 LAND taps, 1 DEMAND TAKEOFF.
 route plus `extendDownwind`, and Free Flight did not reach it in 30 min.
 
 The findings with repro steps and owners are in the LOOPTEST report to the manager (MANAGER_STATE).
+
+## Full regression (manager gate)
+`tools/verify-all.sh [port] > verify.log 2>&1`, then `grep -E "^== |passed|green;|✗|FAIL|GREEN" verify.log`. Every node gate, then each browser suite one at a time on one Chrome (missions 1–10 Easy + M2 Medium, the map tour, test-loop quick/jets/roster/roster2/full). Several hours: run it once per round in the background; lanes run only the targeted tests for what they changed.

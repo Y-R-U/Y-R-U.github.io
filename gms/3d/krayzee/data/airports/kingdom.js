@@ -39,11 +39,14 @@ const QUIPS = {
     jumbo: "Mr Fennimore: \"One fears the Jumbo would rather crowd the croquet.\"",
     herc: "Mr Fennimore: \"The Wardrobe will not fit on the lawn. Nor through the gates.\"",
     pitts: "Mr Fennimore: \"The Show-Off lands rather faster than the lawn is long, Your Grace.\"",
+    spitfire: "Mr Fennimore: \"The Teatime would arrive at the lawn and depart through the orangery, Your Grace.\"",
+    bizjet: "Mr Fennimore: \"A jet on the lawn, Your Grace? The monogram would be in the moat.\"",
   },
   farm: {
     jumbo: "Farmer Mudge: \"You'll not land that great tin barn on my turnips.\"",
     herc: "Farmer Mudge: \"The Wardrobe? On my grass? It'd flatten Doreen.\"",
     f35: "Farmer Mudge: \"Not till that jet learns to hover, Your Highness.\"",
+    bizjet: "Farmer Mudge: \"That shiny Lear? It'd go clean through the hedge and into the slurry.\"",
   },
 };
 export function canUse(def, type) {

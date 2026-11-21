@@ -28,7 +28,9 @@ TYPES.bathtub = { gearHeight: 1.05, ...AIRCRAFT.bathtub.flight, gear: { rollDrag
 for (const id of ['jumbo', 'herc', 'f35']) if (AIRCRAFT[id]?.flight) TYPES[id] = { ...AIRCRAFT[id].flight };
 // ROSTER: Butter Cub, Show-Off (Pitts), Divine Right (the throne: STOVL on a jet pack, no jet rules)
 for (const id of ['cub', 'pitts', 'throne']) if (AIRCRAFT[id]?.flight) TYPES[id] = { ...AIRCRAFT[id].flight };
-export const JET_TYPES = ['jumbo', 'herc', 'f35'];
+// ROSTER2: the Spitfire (tailwheel, retracting gear: `retract`) and the Learjet (a jet)
+for (const id of ['spitfire', 'bizjet']) if (AIRCRAFT[id]?.flight) TYPES[id] = { ...AIRCRAFT[id].flight };
+export const JET_TYPES = ['jumbo', 'herc', 'f35', 'bizjet'];
 export const isJet = (type) => !!TYPES[type]?.jet;
 
 // Thrust fraction at airspeed V: a propeller fades linearly to thrustV0; a jet (thrustLapse) holds most of it.
@@ -46,7 +48,7 @@ export function typeInfo(type) { return AIRCRAFT[type] || AIRCRAFT.c172; }
 const HP_NAMES = { nose: 'nose', tail: 'tail', wingL: 'left wingtip', wingR: 'right wingtip', lowerWingL: 'left lower wingtip', lowerWingR: 'right lower wingtip', belly: 'belly', propTip: 'propeller',
   engL1: 'left inboard engine', engR1: 'right inboard engine', engL2: 'left outboard engine', engR2: 'right outboard engine',
   propL1: 'left inboard propeller', propR1: 'right inboard propeller', propL2: 'left outboard propeller', propR2: 'right outboard propeller',
-  stabL: 'left tailplane', stabR: 'right tailplane', finL: 'left fin', finR: 'right fin', tankL: 'left drop tank', tankR: 'right drop tank' };
+  stabL: 'left tailplane', stabR: 'right tailplane', finL: 'left fin', finR: 'right fin', tankL: 'left drop tank', tankR: 'right drop tank', engL: 'left engine', engR: 'right engine', radL: 'left radiator', radR: 'right radiator' };
 
 export const GL = { track: 0.2, damp: 0.5, easy: 2.5 };   // easy: the player's tail-wheel track/damp boost on Easy (ROSTER)
 const ROLL_MU = { runway: 0.02, taxiway: 0.022, apron: 0.022, grass: 0.075, building: 0.3, water: 0.6 };
@@ -131,7 +133,7 @@ export class Aircraft {
     this.vel.set(0, 0, -sp).applyQuat(this.q);
     this.eng = this.ctl.throttle = o.throttle != null ? o.throttle : air ? 0.6 : 0;
     this.flapsPos = this.ctl.flaps = fl;
-    this.gearWant = this.gear = air && this.P.jet && o.alt > 150 ? 0 : 1;
+    this.gearWant = this.gear = air && (this.P.jet || this.P.retract) && o.alt > 150 ? 0 : 1;
     this.ab = 0; this.rev = 0; this.spoil = 0; this.sbrake = 0; this.gear = 1;
     this.onGround = this.mainsDown = !air;
     // FLIGHTFIX4: the surface under it now, not 'grass' until the first step (a swap's START HERE read the lawn as grass)
@@ -178,7 +180,7 @@ export class Aircraft {
       const ge = agl < this.dims.span ? 0.55 + 0.45 * Math.max(0, agl) / this.dims.span : 1;
       if (this.spoil > 0) CL *= 1 - 0.75 * this.spoil;   // lift dump on the runway
       const CD = P.CD0 + this.flapsPos * P.flapCD + P.K * ge * CL * CL + (Math.abs(alpha) > aS ? 1.4 * Math.sin(alpha) ** 2 : 0)
-        + 0.08 * this.spoil + (P.speedbrake ?? 0) * this.sbrake + (P.jet ? 0.015 * this.gear : 0) + (P.vWall && V > P.vWall ? P.CDwall * ((V - P.vWall) / 50) ** 2 : 0);
+        + 0.08 * this.spoil + (P.speedbrake ?? 0) * this.sbrake + (P.jet || P.retract ? 0.015 * this.gear : 0) + (P.vWall && V > P.vWall ? P.CDwall * ((V - P.vWall) / 50) ** 2 : 0);
       const vdir = _vd.copy(va).scale(1 / V);
       const ldir = _ld.crossVectors(R, vdir).normalize();
       force.addScaled(ldir, qd * P.wingArea * CL);
@@ -248,9 +250,11 @@ export class Aircraft {
     if (P.spoilers) this.spoil = moveTo(this.spoil, rolling ? 1 : 0, dt * 2.5);
     if (P.speedbrake) this.sbrake = moveTo(this.sbrake, !this.onGround && c.throttle < 0.03 ? 1 : 0, dt * 1.5);
     // jets: automatic gear (rig.setGear(ac.gear)): up once climbing away, down low and slowish or descending low
-    if (P.jet) {
+    // ROSTER2 `retract` (Spitfire): the same, and ctl.gear carries it to the rig (traffic syncs rig gear for jets only)
+    if (P.jet || P.retract) {
       const want = this.onGround || agl < 35 || (agl < 250 && this.vel.y < 1 && V < P.vapp * 1.5) ? 1 : agl > 40 && this.vel.y > 1 ? 0 : this.gear > 0.5 ? 1 : 0;
       this.gearWant = want; this.gear = moveTo(this.gear, want, dt / (P.gearTime ?? 7));
+      if (P.retract) c.gear = want;
     }
 
     // Aerodynamic rotation: rate tracking toward what the surfaces + stability ask for.

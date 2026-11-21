@@ -200,6 +200,14 @@ const R = {
   pitts_10: (h) => { h.play({ plane: 'pitts' }); spin(h, 10 * 13); },
   pitts_inv: (h) => { h.play({ plane: 'pitts' }); h.fly(11, { bank: Math.PI }); },
   fly_throne: (h) => { h.play({ plane: 'throne' }); h.takeoff(); },
+  fly_spitfire: (h) => { h.play({ plane: 'spitfire' }); h.takeoff(); },
+  spit_fast: (h) => { h.play({ plane: 'spitfire' }); h.fly(1, { speed: 310 * KT, gs: 310 * KT }); },
+  spit_farm: (h) => { h.play({ plane: 'spitfire' }); atFarm(() => h.touchdown(250, { surface: 'grass', z: 40 })); },
+  fly_bizjet: (h) => { h.play({ plane: 'bizjet' }); h.takeoff(); },
+  lear_airbase: (h) => { h.play({ plane: 'bizjet' }); atApt('airbase', () => h.touchdown(300, { z: 0 })); },
+  lear_butter: (h) => { h.play({ plane: 'bizjet' }); h.touchdown(120); },
+  spit_roll: (h) => { h.play({ plane: 'spitfire' }); spin(h, 16); },
+  lear_high: (h) => { h.play({ plane: 'bizjet' }); h.fly(1, { alt: 3100 }); },
   throne_hover: (h) => { h.play({ plane: 'throne' }); h.fly(31, { vtol: 1, speed: 1, gs: 1, agl: 20, alt: 20 }); h.ac.vtol = 0; },
   throne_vgrass: (h) => { h.play({ plane: 'throne' }); h.ac.vtol = 1; h.touchdown(150, { surface: 'grass', z: 400 }); h.ac.vtol = 0; },
   throne_hard: (h) => { h.play({ plane: 'throne', diff: 'hard' }); h.fly(2, { vtol: 1, speed: 1, gs: 1, agl: 20, alt: 20 }); h.ac.vtol = 0; },
@@ -320,6 +328,12 @@ section('negative controls: near-misses of each detector do not complete');
   const hr = harness(); hr.play({ plane: 'cub' }); hr.lift(); hr.touchdown(250); hr.ground('runway', 160, 0); ok(!hr.done('cub_short'), 'cub: a 160 m roll is not a short-field stop');
   hr.touchdown(250, { surface: 'grass', z: 40 }); ok(!hr.done('cub_farm') && !hr.done('cub_lawn'), 'cub: grass at C-Tower 1 is neither the farm nor the lawn');
   const hp = harness(); hp.play({ plane: 'pitts' }); spin(hp, 26, 0.25); ok(!hp.done('pitts_snap'), 'pitts: a 2.6 s roll is not a snap roll');
+  // ROSTER2: the near-misses
+  const hs4 = harness(); hs4.play({ plane: 'spitfire' }); hs4.fly(1, { speed: 290 * KT, gs: 290 * KT }); hs4.touchdown(250, { surface: 'grass', z: 400 });
+  ok(!hs4.done('spit_fast') && !hs4.done('spit_farm'), 'spitfire: 290 kt is not 300, and grass at C-Tower 1 is not the farm');
+  const hl3 = harness(); hl3.play({ plane: 'bizjet' }); hl3.fly(1, { alt: 2900 }); spin(hl3, 16); ok(!hl3.done('lear_high') && !hl3.done('spit_roll'), 'lear: 9,500 ft is not 10,000, and a roll in the Lear is not a Spitfire victory roll');
+  const hl = harness(); hl.play({ plane: 'bizjet' }); hl.touchdown(160); ok(!hl.done('lear_butter') && !hl.done('lear_airbase'), 'lear: 160 fpm is not butter, and C-Tower 1 is not Much Snoring');
+  const hl2 = harness(); hl2.play({ plane: 'f35' }); atApt('airbase', () => hl2.touchdown(120, { z: 0 })); ok(!hl2.done('lear_butter') && !hl2.done('lear_airbase'), 'lear: an F-35 at Much Snoring ticks neither Lear row');
   const hp2 = harness(); hp2.play({ plane: 'pitts' }); hp2.lift(); for (let i = 0; i < 40; i++) { hp2.ac.bank = (i % 2 ? 1 : -1) * 1.2; hp2.sample(0.1); } ok(!hp2.done('pitts_snap'), 'pitts: rocking the wings is not a roll');
   const ht = harness(); ht.play({ plane: 'throne', diff: 'easy' }); ht.fly(2, { vtol: 1, speed: 1, gs: 1, agl: 20, alt: 20 }); ok(!ht.done('throne_hard'), 'throne: a hover on Easy is not the Hard one');
   const h5 = harness(); h5.fly(1, { speed: 150 * KT }); ok(!h5.done('vne'), 'c172 at 150 kt is under Vne 163');
@@ -551,6 +565,8 @@ function falsify() {
     ['trip counted on the ground', 'js/game/tasks.js', "if (L.apt && apt !== L.apt && !ground)", "if (L.apt && apt !== L.apt)"],
     ['grand tour needs three', 'data/tasks.js', "{ stat: 'airports', target: AIRPORT_IDS.length }", "{ stat: 'airports', target: 3 }"],
     ['story full marks ignores ticks', 'data/tasks.js', '&& m.objectives.every((o) => e.ticks?.includes(o))', ''],
+    ['lear row ignores the airport', 'data/tasks.js', "(e) => ok(e) && e.airport === 'airbase'), plane: 'bizjet'", "(e) => ok(e)), plane: 'bizjet'"],
+    ['spitfire rows take any plane', 'data/tasks.js', "{ on: 'roll', when: plane('spitfire'), plane: 'spitfire' }", "{ on: 'roll', plane: 'spitfire' }"],
   ];
   let caught = 0;
   for (const [name, file, a, b] of breaks) {

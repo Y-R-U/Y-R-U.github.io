@@ -5,7 +5,7 @@
 // Hooks marked "optional" are called only if the Autopilot implements them (see docs/ATC.md §Integration).
 
 const REFUSE_GA_SECS = 60;
-const GA_TEXT = { spacing: 'too close behind traffic', runwayOccupied: 'runway occupied', traffic: 'traffic ahead on final', crossingTraffic: 'runway not clear', runwayClosed: 'runway closed', runwayChange: 'runway change' };
+const GA_TEXT = { spacing: 'too close behind traffic', runwayOccupied: 'runway occupied', traffic: 'traffic ahead on final', crossingTraffic: 'runway not clear', runwayClosed: 'runway closed', runwayChange: 'runway change', opposite: 'traffic landing the other way' };
 
 // aiMischief: chance per taxi / landing that a rival royal misbehaves (mildly: taxi speeding, a low pass instead of landing).
 export const MISCHIEF = { off: 0, low: 0.12, high: 0.4 };

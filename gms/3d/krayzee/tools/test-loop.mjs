@@ -2,7 +2,7 @@
 // Input.dispatchTouchEvent taps on live element rects. window.__game is read only (state, sim clock, logs, timeouts);
 // it never drives the flow. Falsify modes inject a fault on purpose (see FALSIFY) and the suite must then FAIL.
 //   ~/.claude/bin/cdp start --port 9636 -- --use-angle=metal
-//   node tools/test-loop.mjs [--quick] [--cases=c172:easy:portrait,...] [--timescale=4] [--port=9636]
+//   node tools/test-loop.mjs [--quick|--jets|--roster|--roster2] [--cases=c172:easy:portrait,...] [--timescale=4] [--port=9636]
 //   node tools/test-loop.mjs --soak[=30] [--cases=c172:easy:portrait]      (sim minutes)
 //   node tools/test-loop.mjs --falsify=freeze|stuck|error|cover|all --quick
 // Docs: docs/TESTING.md. Results: docs/review/loop/results-<stamp>.json (+ failure screenshots in docs/review/loop/).
@@ -31,9 +31,11 @@ const LOG_TAIL = +arg('log', 14);   // game log lines kept with a failing step (
 const COVER_GATE = arg('cover-gate', '') ? String(arg('cover-gate')).split(',').map(Number) : null;
 const COVER_SHOTS = arg('cover-shots', false);   // --cover-shots[=tag] saves heavy-cover frames to docs/shots/msgfix/
 // JETCORE: the jets run with --jets (their own matrix) or --cases=jumbo:easy:portrait; they need ?plane= support in main.js
-const JETS = ['jumbo', 'herc', 'f35'];
+const JETS = ['jumbo', 'herc', 'f35', 'bizjet'];   // jet behaviour (runway-only LAND, relaunch, budgets)
 const ROSTER = ['cub', 'pitts', 'throne'];
-const PLANES = arg('jets') ? JETS : arg('roster') ? ROSTER : ['c172', 'tiger', 'bathtub'], DIFFS = ['easy', 'medium', 'hard'];
+const ROSTER2 = ['spitfire', 'bizjet'];
+// matrices: --jets keeps its 18 cases (the bizjet runs in --roster2)
+const PLANES = arg('jets') ? JETS.filter((p) => p !== 'bizjet') : arg('roster2') ? ROSTER2 : arg('roster') ? ROSTER : ['c172', 'tiger', 'bathtub'], DIFFS = ['easy', 'medium', 'hard'];
 const ORIENT = { portrait: [390, 844], landscape: [844, 390] };
 
 let CASES;
@@ -103,6 +105,10 @@ function watch(s) {
 // ---------------------------------------------------------------- steps
 // LAND offered: the button idle and reading LAND (D35: the F-35's slot may read HOVER / VERTICAL TAKEOFF instead; tools/test-stovl.mjs)
 const landOffered = (s) => s.land && !s.land.hidden && s.land.state === 'idle' && /^LAND\b(?! HERE)/.test(s.land.txt || 'LAND');
+// FLIGHTFIX7: every plane-to-plane contact, both sides as they were (read only; reported when a step fails on a crash)
+const CONTACTS_JS = `(() => { const T = __game.traffic; if (!T || T.onContact?.__loop) return 0; const f = T.onContact; window.__loopContacts ||= [];
+  const side = (E) => { const a = E.ac, ap = E.ap; return { id: a.id, name: E.name, player: !!E.player, type: a.type, x: Math.round(a.pos.x), z: Math.round(a.pos.z), y: +a.pos.y.toFixed(1), agl: +a.agl.toFixed(1), kt: Math.round(a.speed / 0.5144), hdg: Math.round(a.heading), vs: +a.vs.toFixed(1), gnd: a.onGround, phase: ap?.phase, leg: ap?.leg?.kind, sub: ap?.sub, end: ap?.cur?.e?.id, land: ap?.landing?.label || null }; };
+  T.onContact = (ev) => { try { window.__loopContacts.push({ t: +T.time.toFixed(1), rel: +ev.relSpeed.toFixed(1), a: side(ev.a), b: side(ev.b) }); if (window.__loopContacts.length > 20) window.__loopContacts.shift(); } catch (e) { /* */ } return f?.(ev); }; T.onContact.__loop = 1; return 1; })()`;
 class StepFail extends Error {}
 const fail = (msg) => { throw new StepFail(msg); };
 let CASE = null;
@@ -110,6 +116,7 @@ async function step(name, budgetSim, fn, { needs = true, blocks = needs } = {}) 
   const rec = { step: name, ok: false, simS: 0, realS: 0, budget: budgetSim, pp0: M.last?.pending ?? null, pp1: null, banked1: null, detail: '', errors: 0, stall: 0 };
   CASE.steps.push(rec);
   if (needs && CASE.blocked) { rec.skip = `blocked by ${CASE.blocked}`; log(`  SKIP ${name} (${rec.skip})`); return null; }
+  await D.evSafe(CONTACTS_JS);
   const s0 = (await snap()) || M.last, e0 = D.errors.length, t0 = Date.now();
   M.lastPhaseT = s0?.simT ?? 0; M.maxStall = 0; M.freeze = null;
   const sim0 = s0?.simT ?? 0;
@@ -132,6 +139,7 @@ async function step(name, budgetSim, fn, { needs = true, blocks = needs } = {}) 
   if (M.gone && !M.goneReported) { M.goneReported = true; rec.ok = false; rec.detail += ` | the player's AP reached a despawn leg (GONE) ${JSON.stringify(M.gone)}`; }
   if (rec.ok && budgetSim && rec.simS > budgetSim * 1.0001) { rec.ok = false; rec.detail += ` | over budget ${rec.simS}s > ${budgetSim}s sim`; }
   if (!rec.ok) {
+    if (/crash|collision|bumped/.test(rec.detail)) { rec.contacts = await D.evSafe('window.__loopContacts', null); if (rec.contacts?.length) log(`    contacts: ${JSON.stringify(rec.contacts.slice(-3))}`); }
     try { rec.shot = await D.shot(OUT, `${CASE.id}-${name}`.replace(/[^\w.-]+/g, '_')); } catch (e) { /* */ }
     rec.log = await D.evSafe(`__game.log().slice(-${LOG_TAIL}).map((l) => JSON.stringify(l).slice(0, 160))`, []);
     if (blocks) CASE.blocked ||= name;
@@ -153,7 +161,15 @@ async function until(cond, simBudget, { label = 'condition', every = 250, realCa
     const st = s ? s.simT - M.lastPhaseT : 0;
     if (s && st > STUCK && !(s.p?.gnd && s.p?.kt < 1)) fail(`${label}: STUCK — no phase change for ${r1(st)} s sim (${s.p?.phase}/${s.p?.leg}/${s.p?.sub})`);
     if (s && s.simT - sim0 > simBudget) fail(`${label}: not within ${simBudget} s sim`);
-    if (Date.now() - t0 > cap) fail(`${label}: real-time cap ${r1(cap / 1000)} s hit (sim advanced ${r1((s?.simT ?? sim0) - sim0)} s)`);
+    if (Date.now() - t0 > cap) {
+      const adv = (s?.simT ?? sim0) - sim0;
+      // FLIGHTFIX7: a stopped clock with no answer from the page = a script that never returns: where is it?
+      const gone = adv < 1 && !s && !(await D.alive());
+      if (gone) fail(`${label}: real-time cap ${r1(cap / 1000)} s hit: Chrome on port ${PORT} is gone (cdp --idle/--max cap? see /tmp/cdp-${PORT}/watchdog.log)`);
+      const stack = adv < 1 && !s ? await D.stack() : null;
+      if (stack) { log(`    page stuck in: ${stack.join(' < ')}`); CASE.events.push({ type: 'PAGE_STUCK', stack }); }
+      fail(`${label}: real-time cap ${r1(cap / 1000)} s hit (sim advanced ${r1(adv)} s)${stack ? ` | page stuck in ${stack.slice(0, 4).join(' < ')}` : ''}`);
+    }
     await sleep(every);
   }
 }
@@ -305,10 +321,18 @@ async function runCase([plane, diff, orient]) {
       await sleep(5000 / TS); await snap();
     }
     if (refused) (rec.warn ||= []).push(`warp refused for ${r1(M.last.simT - s0)} s sim ("${refused}")`);
+    // FLIGHTFIX7: D18 drops the warp mid-window for "Traffic nearby" (every jets/roster2 warp red: ×2.2–3, chip still 'on'):
+    // the rate is measured over the part of the window the warp held (≥ 1 s real); no retry, so no extra sim flying
     await tapUntil('.krz-warp', () => D.evSafe('document.querySelector(".krz-warp")?.dataset.level === "5"'), { rec });
     const st = await D.evSafe('document.querySelector(".krz-warp")?.dataset.state');
-    const r5 = await rate(2500);
+    const pts = [], t0 = Date.now();
+    while (Date.now() - t0 < 2500) { const q = await D.evSafe('[__game.traffic.time, document.querySelector(".krz-warp")?.dataset.level, performance.now()]'); if (q) pts.push(q); await sleep(200); }
+    const held = pts.findIndex((q) => q[1] !== '5'), seg = held < 0 ? pts : pts.slice(0, held);
     const why = await D.evSafe('document.querySelector(".krz-warp small")?.textContent || ""');
+    const span = seg.length > 1 ? (seg.at(-1)[2] - seg[0][2]) / 1000 : 0;
+    if (held >= 0) (rec.warn ||= []).push(`5× dropped after ${r1(span)} s real ("${why}"): measured over that`);
+    if (span < 1) return `5× dropped at once ("${why}") — not measurable here; base ${r1(base)} sim s/s`;
+    const r5 = (seg.at(-1)[0] - seg[0][0]) / span;
     await tapUntil('.krz-warp', () => D.evSafe('document.querySelector(".krz-warp")?.dataset.level === "1"'), { rec });
     rec.warp = { base: r1(base), at5: r1(r5), ratio: r1(r5 / base), chip: st, why };
     if (st === 'held') return `5× HELD at 1× (${why}) — not measurable here; base ${r1(base)} sim s/s`;
@@ -335,7 +359,12 @@ async function runCase([plane, diff, orient]) {
     // (no 60° bank detent there) rolls past 70° in the 3 s hold, and the RECOVERY phase can be over between
     // two samples, so the event log is read, not only the sampled phase.
     let countSeen = null, recovery = false;
+    // FLIGHTFIX7: a dive left at release keeps steepening, so a D37 upset is judged on every sample up to the AP's
+    // take-back (bank > 70°, sinking into the ground within ~15 s, or below 40 m at 2 m/s), not on the release alone
+    const upsetOf = (p) => { const vs = (p?.fpm ?? 0) * 0.00508; return !!p && !p.gnd && (Math.abs(p.bank) > 66 || p.fpm < -1500 || (vs < -1.5 && p.agl < -vs * 15) || (p.agl < 40 && vs < -2)); };
+    let upset = upsetOf(s1.p) ? s1.p : null;
     const back = await until(async (s) => {
+      if (!upset && upsetOf(s.p)) upset = s.p;
       if (s.p?.phase === 'RECOVERY') recovery = true;
       if (!countSeen) { const r = await D.rect('.krz-autobtn'); if (r?.state === 'count') countSeen = r.txt; }
       return s.p && s.p.apMode === 'AUTOPILOT' && Object.values(s.p.modes).every((m) => m === 'auto' || m === 'latched');
@@ -344,7 +373,8 @@ async function runCase([plane, diff, orient]) {
     rec.apBackSim = r1(back.simS); rec.autoCount = countSeen; rec.recovery = recovery; rec.releaseBank = r1(s1.p.bank);
     if (M.crashes) fail('crashed during the manual bit');
     // an upset skip must be a D37 upset: banked past 70°, or sinking fast (the stall / ground cases sink)
-    if (recovery && !countSeen && !(Math.abs(s1.p.bank) > 66 || s1.p.fpm < -1500)) fail(`the countdown was skipped as an upset, but the release was not one (bank ${r1(s1.p.bank)}°, ${s1.p.fpm} fpm)`);
+    rec.upset = upset && `bank ${r1(upset.bank)}°, ${upset.fpm} fpm, ${r1(upset.agl)} m AGL`;
+    if (recovery && !countSeen && !upset) fail(`the countdown was skipped as an upset, but the plane was never in one (release: bank ${r1(s1.p.bank)}°, ${s1.p.fpm} fpm)`);
     if (!countSeen && !recovery) fail('the AUTO button never showed its countdown after the stick was let go');
     if (back.simS < B.apEarliest && !recovery) fail(`the AP took back after only ${r1(back.simS)} s sim: the D37 10 s AUTO countdown was skipped with no upset`);
     // the AP may be mid-turn on its circuit, so "recovered" = back inside a normal AP bank and not sinking hard. That bank is
@@ -353,7 +383,7 @@ async function runCase([plane, diff, orient]) {
     const bankMax = Math.max(35, 30 * ((await D.evSafe('__game.S.player.ac.P.apBankScale', 1)) || 1) + 5);
     const rcv = await until((s) => s.p && Math.abs(s.p.bank) <= bankMax && s.p.fpm > -1500, 12, { label: `recovered after release (|bank| ≤ ${bankMax}°, sink < 1500 fpm)` });
     rec.recoverSim = r1(rcv.simS);
-    return `manual ${rec.manualSim}s sim, bank ${r1(s1.p.bank)}°, ${countSeen ? `AUTO counted (${countSeen})` : 'upset at release: AP recovery at once (D37)'}, AP back in ${rec.apBackSim}s sim`;
+    return `manual ${rec.manualSim}s sim, bank ${r1(s1.p.bank)}°, ${countSeen ? `AUTO counted (${countSeen})` : `upset (${rec.upset}): AP recovery at once (D37)`}, AP back in ${rec.apBackSim}s sim`;
   });
 
   // 4. latch the throttle, hold, then AUTO
@@ -396,7 +426,7 @@ async function runCase([plane, diff, orient]) {
   // jets: a fast circuit can be flown and landed (and the plane parked: "the tower is making you wait") while the steps above
   // run; a player would DEMAND TAKEOFF and go round again, so the suite does that before the LAND steps
   const relaunch = async (rec) => {
-    if (!JETS.includes(CASE.plane) && CASE.plane !== 'pitts') return;
+    if (!JETS.includes(CASE.plane) && CASE.plane !== 'pitts' && CASE.plane !== 'spitfire') return;
     const s0 = await snap();
     if (!s0.p?.gnd) return;
     await until((s) => s.ground?.takeoff, 90, { label: 'DEMAND TAKEOFF offered (jet already landed)' });
@@ -407,7 +437,7 @@ async function runCase([plane, diff, orient]) {
   // The budget is on the game's own waits (the downwind, the cancel, the AP taking back). The taps, the LAND NOW wait and the
   // stick touch are harness round trips: at 4x a CDP call that takes 1 s real under machine load is 4 s sim, so a whole-step
   // budget measured the machine, not the game (HUDPOLISH E2). Both are reported: [sim s: ...] and game vs harness.
-  const PROBE_BUDGET = JETS.includes(CASE.plane) ? 600 : 30;
+  const PROBE_BUDGET = JETS.includes(CASE.plane) ? 600 : 30, PROBE_DOWNWIND = 30;
   await step('LAND probe downwind', 0, async (rec) => {
     const st0 = M.last.simT;
     await relaunch(rec);
@@ -424,6 +454,7 @@ async function runCase([plane, diff, orient]) {
     await tapUntil('.krz-land', (s) => s.land?.state === 'active', { rec, ms: 2000 });
     mark('landTap');
     rec.pick = M.last.land.txt; rec.landing = M.last.p.landing;
+    { const q = M.last.p; rec.from = `@${Math.round(q.x)},${Math.round(q.z)} hdg ${Math.round(q.hdg)} ${Math.round(q.kt)} kt ${Math.round(q.agl)} m ${q.phase}`; }
     // LAND NOW (shown while LAND flies a circuit/join) must switch the plan to straight ahead and keep LAND active
     // its effect is a new plan: straight ahead, or (nothing straight) the designed fallback, a field (FLIGHTFIX3) or a jet's
     // runway with a quip, which retires the button. Waiting for "straight" only read a fallback as a swallowed tap and
@@ -446,8 +477,10 @@ async function runCase([plane, diff, orient]) {
     game += (await until((s) => s.p.apMode === 'AUTOPILOT', 15, { label: 'AP back after cancel (AUTO countdown)' })).simS;
     mark('apBack');
     rec.gameSim = r1(game); rec.harnessSim = r1(M.last.simT - st0 - game);
-    if (game > PROBE_BUDGET) fail(`the game's own waits took ${r1(game)} s sim > ${PROBE_BUDGET}`);
-    if (/FIELD/i.test(rec.landing || rec.pick)) fail(`LAND on the home downwind picked ${rec.landing} ("${rec.pick}")${rec.landNow ? `; LAND NOW → ${rec.landNow.landing} (LAND ${rec.landNow.land})` : ''}`);
+    // reaching the downwind depends on where the previous step left the circuit (0–25 s): it gets its own allowance
+    const waits = game - Math.min(parts.downwind ?? 0, PROBE_DOWNWIND);
+    if (waits > PROBE_BUDGET) fail(`the game's own waits took ${r1(game)} s sim > ${PROBE_BUDGET} + downwind allowance [${Object.entries(parts).map(([k, v]) => `${k} ${v}`).join(', ')}]`);
+    if (/FIELD/i.test(rec.landing || rec.pick)) fail(`LAND on the home downwind picked ${rec.landing} ("${rec.pick}") ${rec.from}${rec.landNow ? `; LAND NOW → ${rec.landNow.landing} (LAND ${rec.landNow.land})` : ''}`);
     return `picked ${rec.landing}${rec.landNow ? `; LAND NOW → ${rec.landNow.landing}${rec.landNow.fallback ? ' (nothing straight: fallback)' : ''}` : '; no LAND NOW'}; stick cancelled it [game ${rec.gameSim} s sim (budget ${PROBE_BUDGET}), harness ${rec.harnessSim}; ${Object.entries(parts).map(([k, v]) => `${k} ${v}`).join(', ')}]`;
   }, { needs: false });
 

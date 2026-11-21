@@ -237,6 +237,15 @@ Tests: `node tools/flight-sim.mjs fix5` (2): #3 player LAND behind slower traffi
 
 Tests: `node tools/flight-sim.mjs fix6` (7): #C LAND behind landing traffic × 80 (red: 6 contacts) and no go-around loop (red: 328–787 go-arounds per approach), #D land-long with a plane parked 250/400/550 m in (red: F-35 stopped off the runway at x −755/−852), light types still land long, #E crossing traffic 50 m above/below vs at our height (red: went round for all six clear crossings), #B fast field arrival before a river (red: Tiger ditched ×2), #B wreck falls (red: hangs at 5 m). `node tools/loop/freeze-test.mjs` (8, recorded sample shapes; red with the old detector: 4 false freezes). atc-sim jetland is the deadlock's gate (red without the traffic.js breaker: 2 jumbo standoffs). test-loop `--log=N` keeps N game-log lines with a failing step.
 
+### FLIGHTFIX7 (MAPTASKS / verify6 reports, 2026-11-19)
+| item | root cause → fix |
+|---|---|
+| M2 Medium: LAND after the scripted cut-in picks closed RWY 22 | Not traffic: the planner alone (node, no AI) picks 22 from 27's final at < 120 m. Low, only a *non*-straight plan got the home-runway bonus (−4000), and closed 22 counted as a home runway, so a base into 22 beat 27 straight ahead. `landahead.js`: a closed runway is never a home runway, and a straight-in home runway gets the same bonus. landahead.test "FLIGHTFIX7" (4 positions; `--falsify=m2` red 4/4); M2 Easy/Medium/Hard 16/16 (`test-mission --falsify=m2land` red: cut step times out, closed_runway). |
+| Tiger at the farm goes round for ever | **Stale terrain floor.** `place()` restarts `ac.time` at 0 (map swap, teleport); `_fly` re-reads the terrain floor only when `_floorT < ac.time − 0.5`, so after a swap it kept the old airport's floor (149 m = hills + 35) for as long as the previous sortie had lasted: the LAND circuit flew at 150 m and every final was 80–140 m high ("too high"). Re-read also when the stamp is in the future. Plus: a light LAND high on a straight-in (> 15 m above the glide path, > 700 m out) may fly up to 1.3 Vapp and sink 6 m/s (a flapless Tiger idles down 3.3 → 4.6 m/s) and is at Vapp by 700 m: the Tiger's LAND NOW from 380 m at 3.4 km went round once before. atc-sim `farmland` (7 light types, swap after a 15-min sortie over a 115 m plateau; `--falsify-ap=floor` red: C172/Pitts no touchdown in 900 s; `--falsify-ap=hiFinal` red: Tiger 1 go-around). test-map tour now taps LAND straight out of the clouds: 22/22, farm 188 s, 0 go-arounds (red on the old floor: 4 "too high" go-arounds, no touchdown in 480 s). |
+| jumbo-hard field LAND "mid-air collision with K-TUPP" | Real (ATC). On Hard the climb-out LAND often picks 09 (the reciprocal: wrong_way), and ATC sequenced each end on its own: it released 27 departures and cleared 27 landings head-on into it (node: departures passed 62–87 m from a landing jumbo/F-35/Herc). `js/atc`: `oppositeRem(end)` = nearest arrival to the reciprocal (a committed LAND counts until it is down); no takeoff release inside `oppositeBlock` (9 km), an uncommitted clearance is cancelled inside 5.4 km; an AI lander yields (no clearance / go-around 'opposite') to a reciprocal lander that is committed or nearer; an AI sent round for it breaks off 900 m to its circuit side at up to 30° bank instead of climbing up the runway at it. atc-sim `headon` (24: jumbo/Herc/F-35 × AI on final / departing / at the hold; closest airborne ≥ 90 m + half span). Falsify: release + cancel reverted → red (62 m), yield reverted → red, `--falsify-ap=oppGA` → red (113 m). |
+| boundary escort flapping (seen in loop f35 logs) | An F-35 on its own wide downwind, 7.1 km out and fast, is inside the 7.5 km rearm ring but predicted past the 10 km turn line: `_boundary` locked (turnback) and cleared on the same frame, ~40 times a second, taking the stick and giving it back. Clear on the ring only once the prediction is inside the turn line too. atc-sim `edgeflap` (red without: 116–170 turnback/clear pairs in 4 s). |
+| Spitfire LAND on the home downwind picks a FIELD (ROSTER2) | LAND planned every light type at the C172's pace (vApp 75 kt radii, 450 m orbits, slow-down from there). A Spitfire fast and low on an extended downwind (140–155 kt, ~100 m AGL over 44 m ground) found the home base turn too costly and took a field straight ahead. `landProfile`: a light type faster than the C172 (vcruise > 95 kt: the Spitfire) scales vApp by vcruise / 95 kt and the orbit radius by its square; slower types keep LAND. In-page sweep (real world, 2560 states): 4 field → runway, 0 runway → field. landahead.test "FLIGHTFIX7: own pace" (3; `--falsify=pace` red 3/3). |
+
 ### Jets (JETCORE, D33, 2026-10-27): `jumbo`, `herc`, `f35`
 Roster: `data/aircraft.js` (`flight` blocks; geometry from JETMODELS-A/B, docs/PLANES.md "Jets geometry").
 `TYPES.jumbo/herc/f35` are the blocks as-is; `isJet(type)`, `JET_TYPES`, `thrustFactor(P, V)`, `stallSpeed(P, flaps)` are
@@ -337,6 +346,14 @@ height and look-ahead scale with it, + up to 25 m with speed above 70 m/s; the c
 **AI**: `createAttract` draws a jet now and then (`AI_JETS`: 7 % of spawns, one at a time, herc 2 : f35 2 : jumbo 1)
 only once `PLANE_TYPES` has its model. Never as the 'holding' rival.
 
+### ROSTER2 (V1 A4): `spitfire`, `bizjet`
+Flight blocks in `data/aircraft.js`, details in docs/PLANES.md "ROSTER2". `TYPES.spitfire/bizjet` as-is; `JET_TYPES` gains
+`bizjet` (a jet: runway-only LAND, `noField`, automatic gear, jet AP paths). New optional field **`retract`** (Spitfire):
+the jets' automatic gear (up climbing away above 40 m, down below 35 m or low, slow and descending) for a non-jet, its gear
+drag, and `ctl.gear` = the wanted position so `rig.setControls(ac.ctl)` drives the rig (traffic syncs `rig.setGear` for jets
+only). New hard-point names `engL/engR` ('left engine'…) and `radL/radR` (radiators). `controls.js` RATE: spitfire 90,
+bizjet 45. Test: `node tools/flight-sim.mjs roster2` (75 checks; scJets now takes a type list).
+
 ### Status for HUD / ATC
 `ap.status()` → `{ engaged, overridden, phase, sub, leg, legIndex, label, route, recovering, done, target, speedKt, end }`;
 `ap.events` (`phase`, `override`, `replan`, `goaround`, `recovery`, `landed`, `takeoffroll`, `waypoint`) — drained by main
@@ -398,6 +415,7 @@ node tools/flight-sim.mjs fix5       # FLIGHTFIX5: player LAND behind slower tra
 node tools/flight-sim.mjs fix4       # FLIGHTFIX4: stale-leg step, swap state, short field, STOVL demand, map handover, warm-up
 node tools/flight-sim.mjs jets       # JETCORE: jumbo/herc/f35 × circuit, LAND ×3, LAND NOW, go-around, taxi-in + DEMAND
                                      # TAKEOFF, fieldTakeoff refusal, hand-flown upset, world edge; F-35 afterburner; wake (--only=f35)
+node tools/flight-sim.mjs roster2    # ROSTER2: Spitfire + Learjet (circuits, LAND, airports, AI); --only=, --falsify=spitroll|spitloop|spitgear|spitfarm|spitbrake|learfield|learfarm
 node tools/flight-sim.mjs mixed      # opt-in: atc-sim's 30-min C172 + Tiger + bathtub soak through real ATC (~30 s)
 node tools/flight-sim.mjs landat     # one scenario
 ~/.claude/bin/cdp start --port 9431 -- --use-angle=metal

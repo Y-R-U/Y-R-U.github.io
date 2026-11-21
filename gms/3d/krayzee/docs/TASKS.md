@@ -27,10 +27,10 @@ tasks might be hard to do, including flight time tasks". 182 tasks in 19 sets. T
 ## Rewards
 - Each task pays `TIER_PP`: bronze 100, silver 250, gold 750 PP, through `career.addBonus(pp)`: lifetime PP and rank-ups, but
   not counted as a sortie (`stats.sorties` / `bestSortie` untouched).
-- A finished set pays `max(1000, 60 % of its tasks' PP)` once, plus a cosmetic: a badge + epithet ("the Buttery"). The first set
+- A finished set pays `max(1000, 55 % of its tasks' PP)` once, plus a cosmetic: a badge + epithet ("the Buttery"). The first set
   earned is worn automatically; any earned one can be worn from the grid. The worn badge shows on the menu pilot-card roundel
   and in the grid ("Styled: Dirk the Buttery"). Never spoken on the radio (D1).
-- Everything together: 102,800 PP (~40 % of Emperor's 260k; tasks-sim caps it under 40 %), earned over 50+ hours. Tasks can promote you; they never lock anything.
+- Everything together: 103,500 PP (~40 % of Emperor's 260k; tasks-sim caps it under 40 %), earned over 50+ hours. Tasks can promote you; they never lock anything.
 
 ## Persistence
 `localStorage['krayzee.tasks']` = `{ v, done:{id:t}, sets:{id:t}, stats, uniq, best, worn, unseen, savedAt }`. Saved on every

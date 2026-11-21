@@ -6,7 +6,7 @@ import { pbrMaterial, RM, M4, rod, fan, canvasTexture, noiseFill } from './kit.j
 // A flat instrument panel with live gauges from the shared atlas, a stick on the rig's stick pivot, a throttle and a
 // rudder bar: the Butter Cub's and the Show-Off's cockpits. Build frame of the type (y up, z = station aft).
 // spec: { PS, outline [[x,y]...], box {x0,x1,y0,y1}, paint(g, txt, W), gauges {asi:[x,y,d]..}, bezel, extras(B, n, high),
-//   stick(sb, n, high), throttle { pos, len, axis, build(tb, n) }, rudder { pos, w }, openDials }
+//   stick(sb, n, high), throttle { pos, len, axis, build(tb, n) }, rudder { pos, w }, openDials, inst (createInstruments options) }
 export const COL = {
   steel: srgb('#5b5f63'), black: srgb('#0f1012'), brass: srgb('#c99d48'), chrome: srgb('#d6d9dc'), leather: srgb('#4a2b18'),
   wood: srgb('#5d3018'), red: srgb('#9c1b1b'), card: srgb('#e3d9bd'), glass: srgb('#20262a'), cream: srgb('#e9e1c9'), rubber: srgb('#141416'),
@@ -73,7 +73,7 @@ export function buildPanelCockpit(quality, mats, ctx, S) {
   interior.name = 'cockpit-detail'; interior.receiveShadow = true;
   group.add(interior);
 
-  const inst = createInstruments({ quality });
+  const inst = createInstruments({ quality, ...(S.inst || {}) });
   const gq = new Builder();
   for (const [k, [x, y, d]] of Object.entries(S.gauges)) {
     const [u0, v0, u1, v1] = inst.cells[k], r = d / 2, z = PS + 0.0015;
