@@ -400,6 +400,7 @@ export function createATC(opts = {}) {
   // + wake spacing behind a heavy for anything lighter (JETCORE)
   const spacingBehind = (lead, s) => (lead.isPlayer ? T.spacingPlayer : lead.intent === 'circuits' ? T.spacingTG : T.spacingFullType[lead.type] ?? T.spacingFull)
     + (T.wakeSpacing[lead.type] && lead.type !== s?.type ? T.wakeSpacing[lead.type] : 0);
+  const fastBehind = (s, lead) => (T.depKt[s?.type] ?? 100) > (T.depKt[lead?.type] ?? 100) * T.depFastRatio;
   // Seconds to the threshold: finals are flown slower than the rest of the circuit.
   const eta = (s, rem = s.rem, ext = s.ext) => {
     const fin = Math.min(rem, Gm.G.FINAL_LEN + ext), slow = Math.min(fin, T.finalSlowFrom);
@@ -452,7 +453,7 @@ export function createATC(opts = {}) {
           const gap = eta(s) - eta(lead);
           const need = spacingBehind(lead, s);
           if (preBase && gap < need - 3) stretch(s, d, end, need - gap, follow);
-          else if (!preBase && d.prog?.leg === 'final' && gap < T.minFinalGap) {
+          else if (!preBase && d.prog?.leg === 'final' && gap < T.minFinalGap && s.rem < (T.spacingGaDist[s.type] ?? Infinity)) {
             if (lead.cutPending?.victim === s.id) checkCut(lead.id, s.id, end, true);
             const culprit = lead.penaltyUntil > S.t ? lead.id : null;
             goAround(s, 'spacing', culprit);
@@ -654,6 +655,7 @@ export function createATC(opts = {}) {
       if (id === first || D[id].g) continue;
       const loc = Gm.toEnd(inf, D[id].p2);
       if (loc.a > -300 && loc.a < T.depSpacing && Math.abs(loc.c) < 450 && D[id].agl < 450) traffic = true;
+      else if (D[id].s?.intent === 'depart' && fastBehind(s, D[id].s) && loc.a > -300 && loc.a < inf.length + T.depSpacingFast && Math.abs(loc.c) < T.depSideFast) traffic = true;
       if (D[id].s.cmds.goAround && loc.a > -2500 && loc.a < info(end).length + 1500 && Math.abs(loc.c) < 600) traffic = true; // going round overhead
     }
     const keys = mutexKeys(rw.id);

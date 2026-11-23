@@ -17,6 +17,11 @@ export default {
   towerLines: AIRBASE_LINES,   // voice 'tower_raf' = tower_f's clone with its own C-Tower 4 script (VOICE2)
   wind: { from: 270, kt: 9 },
   patternAlt: 300,
+  // AIRLINERS (V1 A5): js/world/aipool.js. Light types as everywhere plus the Spitfire; jets: the airliners, the heavies,
+  // the Lear, at most two at once (js/map/index.js JET_CHANCE.airbase)
+  aiTypes: ['c172', 'c172', 'tiger', 'bathtub', 'cub', 'pitts', 'spitfire'],
+  aiJets: ['dash8', 'dash8', 'dash8', 'a320', 'a320', 'a320', 'herc', 'f35', 'jumbo', 'bizjet'],
+  aiJetMax: 2,
   runways: [
     { id: '09/27', ends: ['09', '27'], center: [0, 0, 0], heading: 90, length: 2800, width: 45, surface: 'asphalt', departures: true, closed: false, markings: 'icao' },
   ],

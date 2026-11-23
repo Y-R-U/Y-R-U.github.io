@@ -41,8 +41,9 @@ air base promised with D33. Design background: docs/AIRPORTS.md. This file is wh
 | tower | royal tower | water tank on stilts with a shed cab, "C-TOWER 2" | concrete block + glass cab, "C-TOWER 4" |
 | terminal | royal terminal | red barn, "ARRIVALS & SILAGE" | ops block, "RAF MUCH SNORING" |
 | props | (hand-built) | farmhouse, 2 silos, shed, hay bales, tractor, 5 hedges, 34 sheep in 3 fields (they scatter, C5), 15 cows, pond, 2 windsocks | hangar, 3 hardened shelters, 2 fuel tanks, radar dome, 2 sheds, 2 windsocks |
-| planes | all six | C172, Tiger, Bathtub | all six |
-| AI jets | 7 % (JETCORE) | none | 30 % |
+| planes | all six (+ Spitfire, Lear, A320) | C172, Tiger, Bathtub (+ Spitfire) | all six (+ Spitfire, Lear, A320) |
+| AI light pool | C172 ×2, Tiger, Bathtub, Cub, Pitts, Spitfire | C172 ×2, Tiger, Bathtub, Cub, Pitts | as C-Tower 1 |
+| AI jets | 7 %, one at a time: Herc, F-35, Jumbo, Lear | none | 50 %, two at a time: Dash 8 ×3, A320 ×3, Herc, F-35, Jumbo, Lear |
 
 Tower 3 is the Palace Lawn (D27, inside C-Tower 1's world): see **C-Tower 3 · The Palace Lawn** below.
 Saltwhistle/Krumpet/KRZ are only map pins; when they are built they take the next free numbers.
@@ -173,6 +174,25 @@ refused with the quip. `--falsify=surface|refuse|tower` must go red.
 - (done) Autopilot `_minRun()` is per type now (roll × 1.4, ≥ 150 m).
 - (done, C5 + D38) Sheep scatter: see "Sheep" below; buzzing a flock pays the Woolly Jumper bonus. No Grand Tour PP bonus for a
   trip; online rooms stay at C-Tower 1.
+
+## AI traffic pools (AIRLINERS, V1 A5, 2026-11-23)
+Each airport's AI comes from its data: `aiTypes` (the light pool; the old main.js list is the fallback) and, at the air base,
+`aiJets` + `aiJetMax: 2` (js/world/aipool.js; attract.js rolls a jet at `JET_CHANCE`, js/map/index.js: air base 0.5). Every
+type is still filtered by `canUse`. So at RAF Much Snoring airliners (Dash 8, A320) arrive from 5 km, fly their stretched
+circuits, land, taxi to a stand, board and depart, alongside the light types, the Herc, F-35, Jumbo and the Lear.
+- Spitfire: C-Tower 1 and the air base. Not the farm: it fits the 620 m strip, but an AI Spitfire rolled out to the far end
+  and back-taxied onto the strip in the 60-min farm soak (runway incursion). Not the lawn (240 m).
+- Lear: C-Tower 1 (the global jet pool) and the air base. Never the farm or the lawn (975 m).
+- The AI Spitfire flies its circuit 100 m higher and 20 % wider than the C172's (routes.js `aiSpawn`): at C172 height it ran
+  up the back of the C172s and the Pitts on the downwind. The player's Spitfire circuit is unchanged.
+- ATC (`js/atc`): a departure much faster than the one ahead of it (`depKt` ratio ≥ 1.6: an A320 behind a Tiger) is held
+  until that one is past the far end + 900 m or 600 m off the centreline; an airliner on its long final is sent round for
+  spacing only inside 2.5 km (sent round 9 km out it went straight back onto the final, which ATC logged as ignoring it).
+- Autopilot `_rollOut`: an AI departure takes the other of its two out-turns from a departure still climbing out ahead on its side,
+  so a fast one never runs up a slow one's back after the turn.
+- Gates: `node tools/airport-check.mjs` (AI pool rows per airport, `--break=aipool|ailear`; the farm and air-base soaks now
+  fly the game's own pools, the air base with the airliners and two jets at a time; `--seed=N`), `node tools/atc-sim.mjs
+  --only=airliners` (+ two `--falsify --scen=airliners` breaks), `node tools/flight-sim.mjs airliners`.
 
 ## Map tasks (C4, lane MAPTASKS, 2026-11-09)
 The task grid's **Kingdom Map** set (docs/TASKS.md): first landing at each airport (Home Field / Wipe Your Wheels / Lawn Order /

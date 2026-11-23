@@ -11,7 +11,7 @@ import { takeLandNow } from '../assist/landbutton.js';
 for (const d of Object.values(KINGDOM)) layout.registerAirport(d);
 
 export const TRAVEL = { swapM: 4000, arriveM: 5500, ferryM: 7500, ferryAlt: 450, cloudIn: 2.4, cloudOut: 2.8, fogK: 14, nearM: 1500 };
-const JET_CHANCE = { royal: AI_JETS.chance, farm: 0, airbase: 0.3, palace: 0 };
+const JET_CHANCE = { royal: AI_JETS.chance, farm: 0, airbase: 0.5, palace: 0 };   // AIRLINERS: airbase 0.3 → 0.5
 const WINDS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
 const bearingOf = (dx, dz) => ((Math.atan2(dx, -dz) * 180) / Math.PI + 360) % 360;
 const wind16 = (h) => WINDS[Math.round(h / 22.5) % 16];

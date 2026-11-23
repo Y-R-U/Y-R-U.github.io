@@ -6,6 +6,7 @@ export default {
   center: [0, 0],                      // field reference point: arrival spawn ring, ATC region radius
   controllers: ['gerald', 'imogen', 'toby'],
   wind: { from: 270, kt: 8 },
+  aiTypes: ['c172', 'c172', 'tiger', 'bathtub', 'cub', 'pitts', 'spitfire'],   // js/world/aipool.js (AIRLINERS: + the Spitfire)
   patternAlt: 300,
   runways: [
     // Main runway 09/27: threshold of 09 at the west end.

@@ -1733,7 +1733,8 @@ async function roster2Airports(types) {
   const L = await import('../js/world/layout.js'), { KINGDOM, canUse } = await import('../data/airports/kingdom.js');
   const { planLandAhead, setLandAircraft } = await import('../js/assist/landahead.js');
   for (const d of Object.values(KINGDOM)) L.registerAirport(d);
-  const FIT = { spitfire: { royal: true, farm: true, airbase: true, palace: false }, bizjet: { royal: true, farm: false, airbase: true, palace: false } };
+  const FIT = { spitfire: { royal: true, farm: true, airbase: true, palace: false }, bizjet: { royal: true, farm: false, airbase: true, palace: false },
+    dash8: { royal: true, farm: false, airbase: true, palace: false }, a320: { royal: true, farm: false, airbase: true, palace: false } };
   for (const type of types) {
     const use = Object.fromEntries(['royal', 'farm', 'airbase', 'palace'].map((id) => [id, canUse(KINGDOM[id], type)]));
     const bad = Object.entries(FIT[type]).filter(([id, ok]) => use[id].ok !== ok || (!ok && !use[id].quip));
@@ -1771,9 +1772,35 @@ async function roster2Airports(types) {
   }
 }
 
+// AIRLINERS (V1 A5): the Dash 8 and the A320 (AI airliners at RAF Much Snoring): node tools/flight-sim.mjs airliners
+// [--only=dash8,a320] [--falsify=side]
+async function scAirliners() {
+  const only = (args.find((a) => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
+  const types = ['dash8', 'a320'].filter((t) => !only.length || only.includes(t));
+  await scJets(types); await roster2Airports(types); await rosterAI(types);
+  await departSide();
+}
+// An AI departure turns out the other way from a slower departure still climbing out ahead on its side (autopilot _rollOut)
+async function departSide() {
+  const { FALSIFY } = await import('../js/flight/autopilot.js');
+  if (R2FALS === 'side') FALSIFY.departSide = true;
+  const e = runwayEnd('27'), side = (to) => Math.sign((to[2] - e.thr[1]) * e.u[0] - (to[0] - e.thr[0]) * e.u[1]);
+  const tr = new Traffic(env), out = e.hdg - 50;
+  const slow = new Aircraft({ type: 'tiger' }), sr = departureRoute('27', { outHeading: out }), [sx, sz] = fromRunway(e, e.len + 900, 0);
+  slow.place({ x: sx, z: sz, alt: 230, heading: e.hdg, speed: TYPES.tiger.vy, throttle: 0.8 }, env);
+  const sap = new Autopilot(slow); tr.add({ aircraft: slow, ap: sap, name: 'tiger' }); sap.setRoute(sr); sap.i = sr.legs.findIndex((l) => l.label === 'CLIMB OUT'); sap.replan();
+  const jet = new Aircraft({ type: 'a320' }), jr = departureRoute('27', { outHeading: out }), h = holdPoint('27');
+  jet.place({ x: h[0], z: h[1], heading: (Math.atan2(e.thr[0] - h[0], -(e.thr[1] - h[1])) * 180 / Math.PI + 360) % 360 }, env);   // at the hold, as attract's 'holding'
+  const jap = new Autopilot(jet); tr.add({ aircraft: jet, ap: jap, name: 'a320' }); jap.setRoute({ ...jr, legs: jr.legs.filter((l) => l.kind !== 'taxi') });
+  let minD = 1e9;
+  for (let t = 0; t < 300; t += 1 / 60) { tr.update(1 / 60); if (!jet.onGround) minD = Math.min(minD, Math.hypot(jet.pos.x - slow.pos.x, jet.pos.z - slow.pos.z, jet.alt - slow.alt)); }
+  const js = side(jap.route.legs.filter((l) => l.label === 'DEPARTING').pop().to), ts = side(sr.legs.filter((l) => l.label === 'DEPARTING').pop().to);
+  check('AI departure side: an A320 rolling behind a Tiger climbing out on the same side turns out the other way, never within 500 m of it', js === -ts && minD > 500 && !jet.crashed, `tiger side ${ts}, A320 side ${js}, closest ${minD.toFixed(0)} m`);
+}
+
 function R1speed(type) { return Math.min(80 * KT, (TYPES[type]?.vcruise ?? 95 * KT) * 0.8); }
 
-const S = { fix6: scFix6, fix5: scFix5, fix4: scFix4, minrun: scMinRun, fix3: scFix3, aaron: scAaron, loopext: scLoopExtend, throttle: scThrottleTakeback, landmany: scLandMany, feel: scPlayerFeel, spawn: scSpawn, impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed, jets: () => scJets(), roster: scRoster, roster2: scRoster2 };
+const S = { fix6: scFix6, fix5: scFix5, fix4: scFix4, minrun: scMinRun, fix3: scFix3, aaron: scAaron, loopext: scLoopExtend, throttle: scThrottleTakeback, landmany: scLandMany, feel: scPlayerFeel, spawn: scSpawn, impact: scImpact, fuel: scFuel, landat: scLandAt, ground: scGround, handback: scHandback, circuit: scCircuit, circuit27: () => scCircuit('27'), override: scOverride, cutin: scCutIn, stall: scStall, traffic: scTraffic, types: scTypes, typeoverride: scTypeOverride, typeground: scTypeGround, mixed: scMixed, jets: () => scJets(), roster: scRoster, roster2: scRoster2, airliners: scAirliners };
 for (const [k, f] of Object.entries(S)) if ((scen === 'all' && k !== 'mixed') || scen === k) { console.log(`\n== ${k}`); await f(); }
 const fails = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - fails}/${results.length} passed`);

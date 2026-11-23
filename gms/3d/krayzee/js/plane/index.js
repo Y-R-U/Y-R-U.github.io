@@ -23,6 +23,8 @@ const TYPE_BUILDERS = {
   throne: () => import('./types/throne.js').then((m) => m.createThrone),
   spitfire: () => import('./types/spitfire.js').then((m) => m.createSpitfire),   // ROSTER2
   bizjet: () => import('./types/bizjet.js').then((m) => m.createBizjet),
+  dash8: () => import('./types/dash8.js').then((m) => m.createDash8),   // AIRLINERS
+  a320: () => import('./types/a320.js').then((m) => m.createA320),
 };
 export const PLANE_TYPES = ['c172', ...Object.keys(TYPE_BUILDERS)];
 

@@ -9,7 +9,8 @@ export function aiPool(base) {
   const fill = (def) => {
     const ok = (def.aiTypes || base).filter((t) => canUse(def, t).ok && !canUse(def, t).vertical);
     pool.splice(0, pool.length, ...(ok.length ? ok : base));
-    AI_JETS.pool.splice(0, AI_JETS.pool.length, ...jets.filter((t) => canUse(def, t).ok && !canUse(def, t).vertical));
+    AI_JETS.pool.splice(0, AI_JETS.pool.length, ...(def.aiJets || jets).filter((t) => canUse(def, t).ok && !canUse(def, t).vertical));
+    AI_JETS.max = def.aiJetMax ?? 1;   // AIRLINERS: the air base keeps two jets about (its airliners + the heavies)
   };
   fill(AIRPORT);
   onLayoutChange(fill);

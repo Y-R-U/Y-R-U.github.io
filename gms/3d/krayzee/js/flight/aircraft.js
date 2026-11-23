@@ -30,7 +30,9 @@ for (const id of ['jumbo', 'herc', 'f35']) if (AIRCRAFT[id]?.flight) TYPES[id] =
 for (const id of ['cub', 'pitts', 'throne']) if (AIRCRAFT[id]?.flight) TYPES[id] = { ...AIRCRAFT[id].flight };
 // ROSTER2: the Spitfire (tailwheel, retracting gear: `retract`) and the Learjet (a jet)
 for (const id of ['spitfire', 'bizjet']) if (AIRCRAFT[id]?.flight) TYPES[id] = { ...AIRCRAFT[id].flight };
-export const JET_TYPES = ['jumbo', 'herc', 'f35', 'bizjet'];
+// AIRLINERS: the Dash 8 (a turboprop flown by the jet rules, as the Herc) and the A320
+for (const id of ['dash8', 'a320']) if (AIRCRAFT[id]?.flight) TYPES[id] = { ...AIRCRAFT[id].flight };
+export const JET_TYPES = ['jumbo', 'herc', 'f35', 'bizjet', 'dash8', 'a320'];
 export const isJet = (type) => !!TYPES[type]?.jet;
 
 // Thrust fraction at airspeed V: a propeller fades linearly to thrustV0; a jet (thrustLapse) holds most of it.

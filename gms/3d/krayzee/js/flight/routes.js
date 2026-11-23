@@ -439,7 +439,11 @@ function turnaroundRoute(endId = DEFAULT_END, opts = {}) {
 // speedScale: the aircraft type's speed vs the C172 (aircraft.js typeSpeedScale) for the airborne start speeds.
 // type: the aircraft type (its circuit + start speeds); speedScale overrides the speed ratio vs the C172.
 function aiSpawn(kind, endId, { rnd = Math.random, claimStand = () => null, stand, wait, dist, laps, type = null, speedScale } = {}) {
-  const fl = type && AIRCRAFT[type]?.flight, ct = type ? { type } : {};
+  const fl = type && AIRCRAFT[type]?.flight;
+  // AIRLINERS: an AI light type faster than the C172 (the Spitfire) flies its circuit 100 m higher and 20 % wider: on the
+  // C172's own circuit it ran up the back of the C172s and Pitts on the downwind
+  const fast = fl && !fl.jet && fl.vcruise > 105 * 0.514444;
+  const ct = !type ? {} : fast ? { type, alt: PATTERN_ALT + 100, width: Math.round(CIRC.downwindOff * 1.2) } : { type };
   const e = runwayEnd(endId), KTS = 0.514444 * (speedScale ?? (fl ? fl.vcruise / (95 * 0.514444) : 1));
   if (kind === 'parked' || kind === 'depart') {
     const sid = stand || claimStand();

@@ -7,8 +7,9 @@ import { fitFov } from './cameras.js';
 import { PLANE_TYPES } from '../plane/index.js';
 
 // JETCORE (D33): AI is mostly light planes; now and then (one at a time) a heavy or the fast jet drops by, once its model
-// exists (until then createPlane would draw a C172 for it). Weights: herc 2, f35 2, jumbo 1.
-export const AI_JETS = { chance: 0.07, pool: ['herc', 'herc', 'f35', 'f35', 'jumbo'] };
+// exists (until then createPlane would draw a C172 for it). Weights: herc 2, f35 2, jumbo 1, Lear 1. AIRLINERS: an airport
+// may bring its own jet pool and allow more than one at a time (js/world/aipool.js: def.aiJets / aiJetMax).
+export const AI_JETS = { chance: 0.07, pool: ['herc', 'herc', 'f35', 'f35', 'jumbo', 'bizjet'], max: 1 };
 
 const NAMES = ['Wobble', 'Fizz', 'Crumpet', 'Toff', 'Bunty', 'Pip', 'Monty', 'Gussie', 'Plum', 'Biffy', 'Tuppence', 'Hector', 'Dottie', 'Jasper', 'Clarice'];
 const COMPANIES = ['Fizz Air', 'Posh Wings', 'Crumpet Air', 'Monocle Jet', 'Royal Wobble', 'Tiara Air', 'Scone Air', 'Gin & Wings', 'Duke Air', 'Corgi Air'];
@@ -41,7 +42,7 @@ export function createAttract({ scene, traffic, env, createPlane, quality, max =
 
   async function spawn(kind, opts = {}) {
     let type = opts.type || pick(types);
-    if (!opts.type && kind !== 'holding' && Math.random() < AI_JETS.chance && !ai.some((e) => AI_JETS.pool.includes(e.type))) {
+    if (!opts.type && kind !== 'holding' && Math.random() < AI_JETS.chance && ai.filter((e) => AI_JETS.pool.includes(e.type)).length < (AI_JETS.max ?? 1)) {
       const j = pick(AI_JETS.pool);
       if (PLANE_TYPES.includes(j)) type = j;
     }

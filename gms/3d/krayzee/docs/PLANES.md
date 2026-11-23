@@ -614,3 +614,57 @@ climb, gear up/down, min run, LAND ×10, FIX3 set, field-hop fallback, B3–B7, 
 ends at the farm and Much Snoring, refusal at the lawn), 12 min of AI traffic; the Lear runs the whole `jets` scenario
 (`scJets(['bizjet'])`) plus the airports and AI traffic. `--falsify=spitroll|spitloop|spitgear|spitfarm|spitbrake|learfield|learfarm`
 each turn their checks red. Tasks: the "Hangar: Fast Company" set (8 rows) in `tools/tasks-sim.mjs` (+ 2 falsify breaks).
+
+## AIRLINERS (V1 A5, 2026-11-23): Dash 8 "Commoner Shuttle" and A320 "Peasant Express"
+Two airliner types for the AI traffic at RAF Much Snoring (C-Tower 4). The **Dash 8 is AI-only** (`aiOnly`, no flight
+deck: `cockpit:false` everywhere it appears). The **A320 is also flyable at King** (Hangar card, ground chip, `?plane=a320`),
+because `data/ranks.js` already named it as a King unlock and the glass cockpit is shared: it cost a cockpit config and a
+Hangar line, and it passes the jets' flight-sim set and a loop case. It has no task rows (the task PP budget is at its cap).
+Viewer: `tools/jetview.html?type=dash8|a320` (`&q=low`, `&lod=1|2`). Shots: `docs/shots/airliners/`.
+
+| file | what |
+|---|---|
+| `types/dash8.js` | Q400-ish: long slim fuselage, high straight wing (constant chord to the nacelles, then tapered, 2.5° dihedral outboard), two long underwing nacelles with the twin-wheel mains in them, six-blade props (one spin mesh, the Herc's blur-disc logic), a T-tail with a bullet fairing and dorsal fillet. Livery: primary body, a secondary belly sweeping up into the tail with an accent stripe, the company name aft of the wing, registration forward, and the "commoners' badge" (accent disc with the company initial) on the fin. No cockpit build. |
+| `types/a320.js` | A320-ish: low swept wing with a kinked trailing edge and sharklets, flap-track fairings, belly fairing, two underwing turbofans on pylons (fan face, spinner, core nozzle and plug), conventional swept tail with a low tailplane (6° dihedral) and APU exhaust. Livery: primary body, secondary cheatline that swoops up into a secondary tail, accent pinstripe, the company (or player) name big along the cabin, a crown on the fin, cabin windows and door outlines. Glass flight deck (`buildGlassCockpit`, two-lever pedestal, overhead), label "PEASANT EXPRESS". |
+AI airliners get `attract.js`'s random livery: the name painted on the side is the company ("Fizz Air") when it has one.
+
+### Geometry (build frame; local = build − CG)
+| | Dash 8 | A320 |
+|---|---|---|
+| CG (station, height) | 14.6, 2.45 | 17.2, 3.55 |
+| mains / nose | s 15.6 ±4.2 twin r 0.48 · nose s 2.6 twin r 0.32 | s 18.3 ±3.8 twin r 0.58 · nose s 5.1 twin r 0.38 |
+| tail strike on the mains | 8.8° (s 24.6) | 13.2° (s 29.8) |
+| props / engines | 4.1 m Ø six-blade at s 11.0, x ±4.2, tips 1.3 m off the ground | nacelles x ±5.75, r 0.98, 0.54 m off the ground |
+| LOD (high / low, m) | 480 / 280 | 520 / 300 |
+
+### Budgets (`tools/jetview.html` `__measure` + `__lodTris`, rig only, ANGLE Metal)
+| | Dash 8 high | Dash 8 low | A320 high | A320 low |
+|---|---|---|---|---|
+| chase calls / tris (AI, no cockpit) | 15 / 18.7k | 16 / 7.9k | 15 / 17.9k | 15 / 8.2k |
+| far / far2 tris (1 call each, +1 while the gear is down) | 1.4k / 1.1k | same | 1.6k / 1.1k | same |
+A320 with its flight deck (player): chase 15 calls / 17.9k, cockpit view 7 / 15.0k (high). All within the low-tier rig target (≤ 25 calls, ≤ 30k).
+
+### Flight models (`data/aircraft.js` → `flight`; `node tools/flight-sim.mjs airliners`)
+Both are flown by the jet rules (`jet`, `noField`: runways only, gear retracts, LAND never picks a field, `fieldTakeoff`
+refuses), the Dash 8 with turboprop audio like the Herc, the A320 with turbofan audio.
+- **Dash 8:** 24 t, wing area 75 m² (game value; 63 real) so Vs0 ≈ 90 kt, 105 kN, `vr` 112 kt, approach 116 kt, circuit pace 160 kt,
+  `circuitScale` 1.4, pattern 400 m. AP takeoff 736 m @ 128 kt (book 770), touchdown ~405 fpm, stops in ~620 m. Book rolls
+  770 / 600 → needs 900 m: C-Tower 1 and Much Snoring, not the farm or the lawn.
+- **A320:** 62 t, 135 m² (game value; 122.6 real), 220 kN, `vr` 140 kt, approach 135 kt, circuit pace 180 kt, `circuitScale` 2.0,
+  pattern 450 m, wake `heavy`. AP takeoff 1,044 m @ 147 kt (book 1,100), touchdown ~395 fpm, stops in ~780 m. Needs 1,210 m:
+  it fits C-Tower 1's 1,400 m (like the Jumbo) and Much Snoring; refused at the farm and the lawn with their own quips.
+- ATC (`js/atc/rules.js`): `spacingFullType` Dash 8 70 s / A320 85 s, `wakeSpacing` A320 +20 s, `committedGs` 8 / 6 m/s.
+
+### Tests
+`node tools/flight-sim.mjs airliners [--only=dash8,a320] [--falsify=side]`: the whole jets scenario for each (circuit 27 with
+book roll, gear, centreline, touchdown < 500 fpm; LAND ×3 + go-around + occupied touchdown zone; LAND NOW; LAND offered on its
+own circuit; LAND in the climb-out; go-around at 60 m; Hard taxi-in + DEMAND TAKEOFF incl. the busy-hold and mid-runway
+cases; fieldTakeoff refused; upset recovery; world edge), every Kingdom airport (circuits + LAND both ends at Much Snoring,
+LAND never picks the farm or the lawn), 12 min of AI traffic through the real ATC, and the AI departure-side check (an A320
+rolling behind a Tiger that is climbing out on the same side turns the other way; `--falsify=side` turns it red at 135 m).
+Where they fly and the ATC/AP changes that keep that traffic clean: docs/MAP.md "AI traffic pools".
+Browser: `node tools/test-loop.mjs --cases=a320:medium:portrait` (A320 is in test-loop's JETS list, jet budgets; not in any
+matrix) 1/1 green; `node tools/test-map.mjs --cases=jumbo` 18/18 with the airliners in the air base's traffic.
+Shots (`docs/shots/airliners/`): `a320_dirkair`, `a320_fizzair`, `a320_cockpit`, `dash8_dirkair`, `dash8_sconeair` (jetview), and
+in the game at Much Snoring: `game_a320_takeoff_airbase`, `game_ai_a320_final_airbase` (an AI A320 on final beside the
+player's: "number two, behind the heavy"), `game_ai_dash8_climbout_airbase`.

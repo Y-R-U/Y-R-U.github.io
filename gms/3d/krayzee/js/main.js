@@ -260,7 +260,7 @@ function attachGame() {
   });
 }
 // Free Flight aircraft (TRAFFIC r3): C172, Tiger Moth, Royal Flying Bathtub. ?plane= wins, then settings.aircraft.
-const FLYABLE = ['c172', 'tiger', 'bathtub', 'jumbo', 'herc', 'f35', 'cub', 'pitts', 'throne', 'spitfire', 'bizjet']; // ROSTER, ROSTER2
+const FLYABLE = ['c172', 'tiger', 'bathtub', 'jumbo', 'herc', 'f35', 'cub', 'pitts', 'throne', 'spitfire', 'bizjet', 'a320']; // ROSTER, ROSTER2, AIRLINERS
 function aircraftType() {
   const q = params.get('plane');
   if (FLYABLE.includes(q)) return q;

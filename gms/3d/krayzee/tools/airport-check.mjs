@@ -4,14 +4,14 @@
 //   2. no prop / building / flock / tower / terminal on a runway strip, a taxiway, an apron, a stand or an approach
 //   3. the taxi graph: a hold for every departure end, every stand reaches every hold and back
 //   4. a native autopilot + ATC soak at each new airport (light traffic; heavies at the air base)
-// node tools/airport-check.mjs [--minutes=30] [--only=farm] [--control] [--nosoak] [--quiet]   (--control adds a C-Tower 1 soak)
-// node tools/airport-check.mjs --break=short|overlap|graph|approach|lawn|lawnprop|lawnfloor   breaks the data on purpose: the run must go red
+// node tools/airport-check.mjs [--minutes=30] [--only=farm] [--seed=N] [--control] [--nosoak] [--quiet]   (--control adds a C-Tower 1 soak)
+// node tools/airport-check.mjs --break=short|overlap|graph|approach|lawn|lawnprop|lawnfloor|aipool|ailear   breaks the data on purpose: the run must go red
 import { KINGDOM, ORDER, canUse } from '../data/airports/kingdom.js';
 import * as L from '../js/world/layout.js';
 import { AIRCRAFT } from '../data/aircraft.js';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] = a.replace(/^--/, '').split('='); return [k, v ?? true]; }));
-const FLYABLE = ['c172', 'tiger', 'bathtub', 'jumbo', 'herc', 'f35', 'spitfire', 'bizjet'];
+const FLYABLE = ['c172', 'tiger', 'bathtub', 'jumbo', 'herc', 'f35', 'spitfire', 'bizjet', 'a320'];
 const EXPECT = {
   royal: FLYABLE,
   farm: ['c172', 'tiger', 'bathtub', 'spitfire'],   // the Spitfire wants 600 m: the 620 m strip just takes it
@@ -29,6 +29,8 @@ if (args.break === 'approach') defs.airbase.props.push({ kind: 'shed', center: [
 if (args.break === 'lawn') defs.palace.runways[0].length = 180;
 if (args.break === 'lawnprop') defs.palace.props.push({ kind: 'topiary', shape: 'cone', center: [1440, 0, -1600], size: [3, 3], heading: 80, h: 4 });   // in the 26 approach
 if (args.break === 'lawnfloor') defs.palace.runways[0].length = 226;   // Tiger's floor 224 + 15 m line-up
+if (args.break === 'aipool') defs.airbase.aiJets = ['herc', 'f35'];   // AIRLINERS: no airliners in the air base's pool
+if (args.break === 'ailear') defs.farm.aiTypes = [...defs.farm.aiTypes, 'bizjet'];   // a Lear in the farm's light pool
 
 // ---------- 1. runway vs aircraft ----------
 for (const id of ORDER) {
@@ -42,6 +44,23 @@ for (const id of ORDER) {
   const ap = allowed.filter((t) => !canUse(def, t).vertical).map((t) => { const a = AIRCRAFT[t], roll = a.performance?.takeoffRollM; const m = a.flight?.jet ? Math.max(600, (roll ?? 600) * 1.1) : roll ? Math.max(150, roll * 1.4) : 600; return [t, Math.round(m)]; });
   const usable = Math.max(...def.runways.filter((rw) => rw.departures !== false && !rw.closed).map((rw) => rw.length));
   check(`${id}: every allowed type can take off under the autopilot's runway floor (+15 m line-up)`, ap.every(([, m]) => usable >= m + 15), ap.map(([t, m]) => `${t} ${m}`).join(' · '));
+}
+
+// ---------- 1b. AI pools (AIRLINERS): what js/world/aipool.js flies at each airport ----------
+// every listed type must fit (the pool filter would drop it silently), the light pool holds no jets, and the air base's jet
+// pool carries the airliners (dash8, a320); the Spitfire flies at C-Tower 1 and the air base, the Lear at neither strip
+{
+  const { isJet } = await import('../js/flight/aircraft.js');
+  const WANT = { royal: { has: ['spitfire'] }, farm: { not: ['bizjet', 'spitfire'] }, airbase: { has: ['spitfire'], jets: ['dash8', 'a320', 'bizjet'] }, palace: { not: ['bizjet', 'spitfire'] } };
+  for (const id of ORDER) {
+    const def = defs[id], light = def.aiTypes || [], jets = def.aiJets || [], w = WANT[id] || {}, bad = [];
+    for (const t of [...light, ...jets]) if (!canUse(def, t).ok || canUse(def, t).vertical) bad.push(`${t} does not fit`);
+    for (const t of light) if (isJet(t)) bad.push(`jet ${t} in the light pool`);
+    for (const t of w.has || []) if (!light.includes(t)) bad.push(`no ${t}`);
+    for (const t of w.not || []) if (light.includes(t) || jets.includes(t)) bad.push(`${t} listed`);
+    for (const t of w.jets || []) if (!jets.includes(t)) bad.push(`no ${t} in the jet pool`);
+    check(`${id}: AI pool fits the airport (light ${light.join('/') || 'default'}${jets.length ? '; jets ' + [...new Set(jets)].join('/') + ' ×' + (def.aiJetMax ?? 1) : ''})`, !bad.length, bad.join('; '));
+  }
 }
 
 // ---------- 2. overlaps ----------
@@ -131,27 +150,30 @@ if (!args.nosoak) {
   const seeded = (seed) => { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
   const SOAKS = [
     ...(args.control ? [{ id: 'royal', types: ['c172', 'c172', 'tiger', 'bathtub'], max: 4, seed: 11 }] : []),
-    { id: 'farm', types: ['c172', 'c172', 'tiger', 'bathtub'], max: 4, seed: 11 },
-    { id: 'airbase', types: ['c172', 'c172', 'tiger', 'herc', 'f35', 'jumbo'], max: 4, seed: 23, oneJet: true },
+    // AIRLINERS: the farm and the air base soak the game's own pools (data aiTypes / aiJets, attract.js's jet roll)
+    { id: 'farm', types: defs.farm.aiTypes, max: 4, seed: 11 },
+    { id: 'airbase', types: defs.airbase.aiTypes, jets: defs.airbase.aiJets, jetChance: 0.5, jetMax: defs.airbase.aiJetMax ?? 1, max: 4, seed: 23 },   // js/map/index.js JET_CHANCE.airbase
     { id: 'palace', types: KINGDOM.palace.aiTypes, max: 4, seed: 31 },   // what js/world/aipool.js lets fly there
   ];
   const mins = +(args.minutes || 30);
   for (const so of SOAKS) {
     if (args.only && args.only !== so.id) continue;
     L.registerAirport(defs[so.id]); L.setAirport(so.id);
-    const rnd = seeded(so.seed), real = Math.random; Math.random = rnd;
+    const rnd = seeded(+(args.seed || so.seed)), real = Math.random; Math.random = rnd;
     const Gm = makeGeometry(defs[so.id]);
     const env = { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
     const tr = new Traffic(env, {});
     const atc = createATC({ wind: defs[so.id].wind, detectCollisions: false });
     const link = linkTraffic(atc, tr, { rnd });
     const evs = []; atc.on('event', (e) => evs.push(e));
-    const ai = [], st = { types: {}, arr: 0, dep: 0, crash: 0, stuck: 0, holdMax: 0, spawned: 0 };
+    const ai = [], st = { types: {}, spawnedT: {}, arr: 0, dep: 0, crash: 0, stuck: 0, holdMax: 0, spawned: 0 };
     const JETS = ['jumbo', 'herc', 'f35'];
     const spawn = (kind, o = {}) => {
       let type = so.types[Math.floor(rnd() * so.types.length)];
       if (so.oneJet && JETS.includes(type) && ai.some((e) => JETS.includes(e.ac.type))) type = 'c172';
+      if (so.jets && kind !== 'holding' && rnd() < so.jetChance && ai.filter((e) => so.jets.includes(e.ac.type)).length < so.jetMax) type = so.jets[Math.floor(rnd() * so.jets.length)];
       const ac = new Aircraft({ type, id: `ac${++st.spawned}` });
+      st.spawnedT[type] = (st.spawnedT[type] || 0) + 1;
       const plan = R.aiSpawn(kind, atc.activeRunway().end, { ...o, rnd, type, claimStand: () => tr.claimStand(ac) });
       if (!plan) return null;
       ac.place(plan.place, env);
@@ -183,8 +205,8 @@ if (!args.nosoak) {
     }
     Math.random = real;
     const bad = evs.filter((e) => AI_BAD.includes(e.type) && !e.isPlayer);
-    const tag = `${so.id} soak ${mins} min (${[...new Set(so.types)].join('/')})`;
-    const sum = `landed ${JSON.stringify(st.types)} arr ${st.arr} dep ${st.dep} GA ${atc.counts.goArounds || 0} holdMax ${st.holdMax.toFixed(0)}s stuck ${st.stuck} crash ${st.crash}`;
+    const tag = `${so.id} soak ${mins} min (${[...new Set([...so.types, ...(so.jets || [])])].join('/')})`;
+    const sum = `spawned ${JSON.stringify(st.spawnedT)} landed ${JSON.stringify(st.types)} arr ${st.arr} dep ${st.dep} GA ${atc.counts.goArounds || 0} holdMax ${st.holdMax.toFixed(0)}s stuck ${st.stuck} crash ${st.crash}`;
     check(`${tag}: no AI infractions or separation losses`, !bad.length, bad.slice(0, 4).map((e) => `${e.type}:${e.actor}@${e.t.toFixed(0)}`).join(', ') || sum);
     check(`${tag}: traffic flows (arrivals + departures, nobody stuck, no crash)`, st.arr >= mins * 0.12 && st.dep >= mins * 0.12 && !st.stuck && !st.crash && st.holdMax < 300, sum);
   }

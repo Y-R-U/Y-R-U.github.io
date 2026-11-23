@@ -31,11 +31,11 @@ const LOG_TAIL = +arg('log', 14);   // game log lines kept with a failing step (
 const COVER_GATE = arg('cover-gate', '') ? String(arg('cover-gate')).split(',').map(Number) : null;
 const COVER_SHOTS = arg('cover-shots', false);   // --cover-shots[=tag] saves heavy-cover frames to docs/shots/msgfix/
 // JETCORE: the jets run with --jets (their own matrix) or --cases=jumbo:easy:portrait; they need ?plane= support in main.js
-const JETS = ['jumbo', 'herc', 'f35', 'bizjet'];   // jet behaviour (runway-only LAND, relaunch, budgets)
+const JETS = ['jumbo', 'herc', 'f35', 'bizjet', 'a320'];   // jet behaviour (runway-only LAND, relaunch, budgets); AIRLINERS: a320 via --cases
 const ROSTER = ['cub', 'pitts', 'throne'];
 const ROSTER2 = ['spitfire', 'bizjet'];
 // matrices: --jets keeps its 18 cases (the bizjet runs in --roster2)
-const PLANES = arg('jets') ? JETS.filter((p) => p !== 'bizjet') : arg('roster2') ? ROSTER2 : arg('roster') ? ROSTER : ['c172', 'tiger', 'bathtub'], DIFFS = ['easy', 'medium', 'hard'];
+const PLANES = arg('jets') ? JETS.filter((p) => p !== 'bizjet' && p !== 'a320') : arg('roster2') ? ROSTER2 : arg('roster') ? ROSTER : ['c172', 'tiger', 'bathtub'], DIFFS = ['easy', 'medium', 'hard'];
 const ORIENT = { portrait: [390, 844], landscape: [844, 390] };
 
 let CASES;

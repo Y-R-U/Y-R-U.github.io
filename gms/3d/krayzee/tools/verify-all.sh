@@ -21,4 +21,5 @@ run tools/story/test-mission.mjs --mission=2 --diff=medium --port=$P
 run tools/story/test-picker.mjs --port=$P
 run tools/story/test-warp.mjs
 for g in --quick --jets --roster --roster2 ""; do run tools/test-loop.mjs $g --port=$P; done
+run tools/test-loop.mjs --cases=a320:medium:portrait --port=$P
 echo ALLDONE

@@ -20,6 +20,9 @@ export default {
   towerName: 'C-Tower 2 · Farmer Mudge',
   towerLines: FARM_LINES,
   wind: { from: H(270), kt: 7 },
+  // js/world/aipool.js. AIRLINERS: no AI Spitfire (it fits 620 m, but rolled out to the far end and back-taxied onto the
+  // strip: a runway incursion in the 60-min soak) and no Lear
+  aiTypes: ['c172', 'c172', 'tiger', 'bathtub', 'cub', 'pitts'],
   patternAlt: 250,
   runways: [
     { id: '07/25', ends: ['07', '25'], center: [0, 0, 0], heading: H(90), length: 620, width: 18, surface: 'grass', departures: true, closed: false, markings: 'grass' },

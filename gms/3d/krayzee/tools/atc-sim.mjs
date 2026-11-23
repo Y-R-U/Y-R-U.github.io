@@ -1298,6 +1298,44 @@ async function refusedGA() {
     `refused ${JSON.stringify(W.refused.map((e) => ({ seq: e.seq, reason: e.reason, ap: e.apReason })))} ignored ${JSON.stringify(ig.map((e) => e.data))} td ${P.ac.onGround}`);
 }
 
+// AIRLINERS (V1 A5): (1) an A320 queued behind a Bathtub departure waits until the Bathtub is past the far end + 900 m
+// or 600 m off the centreline (it caught slow departures on the climb-out), then nobody loses separation;
+// (2) an A320 on a long straight-in final 8 km behind a Cub is not sent round until inside 2.5 km (sent round 9 km out it
+// went straight back onto the final: "ignored" the go-around), and lands or goes round without an infraction.
+async function airliners() {
+  const { Aircraft, Autopilot, Traffic, R, linkTraffic } = await flightLib();
+  const { T: TT } = await import('../js/atc/rules.js');
+  const world = () => {
+    const env = { groundHeightAt: () => 0, surfaceAt: (x, z) => Gm.surfaceAt([x, z]), colliders: [] };
+    const tr = new Traffic(env, {}), atc = createATC({ wind: { from: 270, kt: 8 }, detectCollisions: false }), link = linkTraffic(atc, tr, { rnd: seeded(5) });
+    const evs = [], ins = []; atc.on('event', (e) => evs.push(e)); atc.on('instruction', (e) => ins.push(e));
+    const add = (type, kind, o = {}) => { const ac = new Aircraft({ type }); const plan = R.aiSpawn(kind, '27', { ...o, rnd: seeded(9), type, claimStand: () => tr.claimStand(ac) }); ac.place(plan.place, env); const e = tr.add({ aircraft: ac, ap: new Autopilot(ac), name: `${kind}-${type}` }); e.ap.setRoute(plan.route); return e; };
+    let t = 0; const step = (secs, stop) => { for (const t1 = t + secs; t < t1; t += 1 / 60) { tr.update(1 / 60); link.update(1 / 60); if (stop && stop(t)) return true; } return false; };
+    return { tr, atc, link, evs, ins, add, step, get t() { return t; } };
+  };
+  const bad = (W) => W.evs.filter((e) => !e.isPlayer && ['separation_loss', 'near_miss', 'collision', 'ignored_instruction', 'forced_goaround', 'cut_in_final'].includes(e.type));
+  {
+    const W = world(), e27 = R.runwayEnd('27');
+    const slow = W.add('bathtub', 'holding');
+    W.step(120, () => slow.ap.phase === 'TAKEOFF ROLL');
+    const jet = W.add('a320', 'holding'), id = W.link.idOf(jet);
+    let at = null;
+    W.step(600, () => { if (at == null && W.ins.some((i) => i.to === W.link.idOf(jet) && i.cmd.type === 'clearedTakeoff')) { const q = R.toRunway(e27, slow.ac.pos.x, slow.ac.pos.z); at = { a: q.s, c: Math.abs(q.l), air: !slow.ac.onGround }; } return at && W.t > 420; });
+    const ok = at && at.air && (at.a > e27.len + TT.depSpacingFast - 60 || at.c > TT.depSideFast - 60);
+    check('airliners: an A320 is cleared behind a Bathtub departure only once it is past the far end + 900 m or 600 m off the centreline', !!ok && !bad(W).length,
+      at ? `bathtub ${at.a.toFixed(0)} m down the runway axis, ${at.c.toFixed(0)} m off it, airborne ${at.air} (runway ${e27.len} m); ${bad(W).map((e) => e.type).join(', ') || 'no infractions'}` : 'A320 never rolled');
+  }
+  {
+    const W = world();
+    const cub = W.add('cub', 'final', { dist: 3000 }), jet = W.add('a320', 'final', { dist: 8000 });
+    const ga = () => W.ins.filter((i) => i.cmd.type === 'goAround' && i.to === W.link.idOf(jet)).map((i) => Math.round(R.toRunway(R.runwayEnd('27'), jet.ac.pos.x, jet.ac.pos.z).s));
+    let gaAt = null;
+    W.step(500, () => { if (gaAt == null && ga().length) gaAt = ga()[0]; return jet.ac.onGround && jet.ac.speed < 20; });
+    check('airliners: no spacing go-around for an A320 on a long final until inside 2.5 km; lands or goes round, no infractions', (gaAt == null || gaAt > -TT.spacingGaDist.a320 - 100) && !bad(W).length,
+      `go-around ${gaAt == null ? 'none' : 'at ' + gaAt + ' m'}; landed ${jet.ac.onGround}; ${bad(W).map((e) => `${e.type}:${e.actor}`).join(', ') || 'no infractions'}`);
+  }
+}
+
 const SCEN = { circuits: () => aiCircuits(), cutin: cutIn, corner: cutInCorner, blocked: blockedRunway, overtake, outofturn: outOfTurn, buzz: towerBuzz, crossing, crimes, online: serialization };
 if (XF) SCEN.circuits09 = () => aiCircuits('09');
 // royal-frame scripts flown by the real autopilot: not translated for test airports (their soaks fly natively)
@@ -1305,7 +1343,7 @@ if (!XF) { SCEN.flightcut = flightCutIn; SCEN.gameplay = gameplay; SCEN.avoid = 
 SCEN.flight = flightSoak;
 // after the soaks: aircraft ids are global, and the soaks' see-and-avoid tie-breaks (higher id gives way) depend on them
 if (!XF) Object.assign(SCEN, { landseq: landSeq, placed: placedLineUp, closedx: closedCrossing, uturn, refusedga: refusedGA, jetland: jetLand });   // jetland last: it adds planes (global ids)
-if (!XF) Object.assign(SCEN, { farmland: farmLand, headon: headOn, edgeflap: edgeFlap });
+if (!XF) Object.assign(SCEN, { farmland: farmLand, headon: headOn, edgeflap: edgeFlap, airliners });
 for (const [name, fn] of Object.entries(SCEN)) {
   if (args.only && args.only !== name) continue;
   const t0 = Date.now();
@@ -1357,6 +1395,8 @@ function falsify() {
     ['refused go-around noted', 'js/atc/bridge.js', "if (last?.type === 'goaroundrefused') atc.noteGoAroundRefused?.(id, last.reason);", '', 'refusedga', 'LAND refuses'],
     // FLIGHTFIX7: a wrong-way LAND (09) against AI on 27
     ['no departure into a reciprocal lander (release + cancel)', 'js/atc/index.js', ['&& !traffic && oppositeRem(end, first) > T.oppositeBlock;', "|| (oppositeRem(end, id) < T.oppositeBlock * 0.6 ? 'opposite' : null);"], ['&& !traffic;', ';'], 'headon', 'LAND onto the reciprocal'],
+    ['AIRLINERS: a fast departure waits for a slow one', 'js/atc/index.js', "else if (D[id].s?.intent === 'depart' && fastBehind(s, D[id].s) && ", 'else if (false && ', 'airliners', 'airliners: an A320 is cleared'],
+    ['AIRLINERS: no spacing go-around far out on a long final', 'js/atc/rules.js', 'spacingGaDist: { dash8: 2500, a320: 2500 },', 'spacingGaDist: {},', 'airliners', 'airliners: no spacing go-around'],
     ['AI landers yield to a reciprocal lander', 'js/atc/index.js', "|| (opp < Math.min(T.oppositeBlock, (s.rem ?? 1e9) + 3000) ? 'opposite' : null);", ';', 'headon', 'LAND onto the reciprocal'],
   ];
   const files = ['js/atc/index.js', 'js/atc/geometry.js', 'js/atc/rules.js', 'js/atc/outrage.js', 'js/atc/bridge.js', 'js/world/layout.js', 'js/flight/routes.js', 'data/aircraft.js', 'data/rules.js', ...fs.readdirSync(path.join(ROOT, 'data/airports')).map((f) => `data/airports/${f}`)];

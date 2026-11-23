@@ -104,6 +104,20 @@ export class Autopilot {
 
   _emit(type, data) { this.events.push({ type, ...data }); if (this.events.length > 30) this.events.shift(); }
 
+  // AIRLINERS: an AI departure turns out the other way from a departure still in the air ahead of it (a jet or the
+  // Spitfire caught slower ones on the same outbound heading); only when it is the faster one (light types keep their side)
+  _rollOut(e) {
+    this._emit('takeoffroll', { end: e.id });
+    const legs = this.route?.legs || [], dep = legs.map((l, j) => (j > this.i && l.kind === 'fly' && l.label === 'DEPARTING' ? j : -1)).filter((j) => j >= 0);
+    if (this.isPlayer || !dep.length || FALSIFY.departSide) return;
+    const side = (to) => Math.sign(toRunway(e, to[0], to[2]).l), mine = side(legs[dep[dep.length - 1]].to);
+    const ahead = (this.traffic?.list || []).filter((o) => o.ap && o.ap !== this && !o.ac.onGround && /DEPARTING|CLIMB OUT/.test(o.ap.leg?.label || '') && this.ac.P.vcruise > o.ac.P.vcruise * 1.25 && Math.hypot(o.ac.pos.x - this.ac.pos.x, o.ac.pos.z - this.ac.pos.z) < 10000)
+      .map((o) => { const l = o.ap.route.legs.filter((x) => x.label === 'DEPARTING').pop(); return l ? side(l.to) : 0; });
+    if (!ahead.includes(mine) || ahead.includes(-mine)) return;
+    const flip = (to) => { const p = toRunway(e, to[0], to[2]), [x, z] = fromRunway(e, p.s, -p.l); return [x, to[1], z]; };
+    this.route = { ...this.route, legs: legs.map((l, j) => (dep.includes(j) ? { ...l, to: flip(l.to) } : l)) };
+  }
+
   _next() {
     this.override = null;
     if (++this.i >= this.route.legs.length) {
@@ -815,7 +829,7 @@ export class Autopilot {
     if (this.sub === 'ready') {
       this._setPhase('LINED UP');
       this._groundStop(t);
-      if (this._mayEnterRunway(e, true)) { this.sub = 'roll'; this._emit('takeoffroll', { end: e.id }); }
+      if (this._mayEnterRunway(e, true)) { this.sub = 'roll'; this._rollOut(e); }
       return;
     }
     if (this.sub === 'lineup') {
@@ -826,7 +840,7 @@ export class Autopilot {
       if ((this.demand || e.virtual) && herrL > 20 && ac.speed > tip + 0.5) { t.gHeading = ac.heading; t.thr = 0; t.brakeOverride = 0.8; }   // brake straight (firmly: it once rolled on at 3 m/s for a minute), then turn
       if ((this.demand || e.virtual) && herrL > 20) t.gSpeed = Math.min(t.gSpeed, tip, e.virtual && herrL > 25 ? 4 * this._gnd.turn : 3.5 * Math.max(this._gnd.turn, 0.6));   // field: turn round tight onto the run
       const p = toRunway(e, ac.pos.x, ac.pos.z), k = this.demand ? (ac.time - (this._luT ?? ac.time) > 20 ? 4 : 2.5) : 1;   // DEMAND: a rolling start (looser after 20 s: never fiddle for a minute)
-      if (Math.abs(p.l) < 2.5 * k && Math.abs(wrap180(e.hdg - ac.heading)) < 6 * k) { this.sub = this._mayEnterRunway(e, true) ? 'roll' : 'ready'; this.cur.k = 0; if (this.sub === 'roll') this._emit('takeoffroll', { end: e.id }); }
+      if (Math.abs(p.l) < 2.5 * k && Math.abs(wrap180(e.hdg - ac.heading)) < 6 * k) { this.sub = this._mayEnterRunway(e, true) ? 'roll' : 'ready'; this.cur.k = 0; if (this.sub === 'roll') this._rollOut(e); }
       return;
     }
     const pr = this._pursue(this.cur.line, Math.max(30, ac.speed * 2.6));

@@ -19,12 +19,13 @@ export const T = {
   spacingTG: 45,                   // seconds at the threshold behind a touch-and-go
   spacingFull: 60,                 // behind a full-stop lander (rollout + vacate)
   // slow types float and roll past the first exit: touchdown-to-clear measured 30 s C172, 72 s Tiger, 62 s bathtub
-  spacingFullType: { tiger: 85, bathtub: 75, jumbo: 95, herc: 70, f35: 65 },
+  spacingFullType: { tiger: 85, bathtub: 75, jumbo: 95, herc: 70, f35: 65, dash8: 70, a320: 85 },
   // JETCORE: extra seconds behind a heavy's wake for anything of another type (arcade: the jumbo's wake is 'super')
-  wakeSpacing: { jumbo: 40, herc: 15 },
-  committedGs: { jumbo: 5, herc: 8, f35: 8 },   // m/s: past this on the takeoff roll a cleared jet is not cancelled
+  wakeSpacing: { jumbo: 40, herc: 15, a320: 20 },
+  committedGs: { jumbo: 5, herc: 8, f35: 8, dash8: 8, a320: 6 },   // m/s: past this on the takeoff roll a cleared jet is not cancelled
   spacingPlayer: 65,               // behind a human (who knows)
   minFinalGap: 22,                 // seconds; on final with less than this behind the leader = go around
+  spacingGaDist: { dash8: 2500, a320: 2500 },   // AIRLINERS: ...once inside this (an airliner sent round 9 km out on its long final went straight back onto it)
   maxExtend: 5000,
   rwChangeMax: 180,                // s a runway change waits for the old runway to go quiet
   clearLandDist: 2600,             // landing clearance offered inside this remaining distance
@@ -43,6 +44,11 @@ export const T = {
   vacateSpeed: 7, vacateTurn: 8,   // m/s and s: how runwayBusyFor projects a lander rolling/taxiing off the runway
   depAfterFree: 85,                // ...and at least this long after the runway is projected free of rolling/vacating landers
   depSpacing: 1500,                // previous departure/touch-and-go this far down the runway before the next roll
+  // AIRLINERS: a faster class rolling behind a slower departure caught it on the climb-out; it waits until that one is
+  // this far past the runway's far end or off the extended centreline
+  depKt: { c172: 100, tiger: 80, bathtub: 60, cub: 70, pitts: 100, spitfire: 120, herc: 150, dash8: 160, a320: 190, bizjet: 200, f35: 210, jumbo: 210 },   // climb-out pace
+  depFastRatio: 1.6,
+  depSpacingFast: 900, depSideFast: 600,
   mutexRelease: 60,                // past the intersection by this many metres (or above mutexAlt)
   mutexAlt: 150,
   placeGrace: 60,                  // s after the game places a plane during which it is never the cause of a go-around

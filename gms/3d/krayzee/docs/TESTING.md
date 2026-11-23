@@ -18,6 +18,7 @@ node tools/test-loop.mjs --jets                                  # jumbo / herc 
 node tools/test-loop.mjs --roster                                # cub / pitts / throne, 18 cases
 node tools/test-loop.mjs --roster2                               # spitfire / bizjet (ROSTER2), 12 cases
 node tools/test-loop.mjs --cases=tiger:medium:landscape,c172:hard:portrait
+node tools/test-loop.mjs --cases=a320:medium:portrait          # AIRLINERS: the A320 (King) flies as a jet; not in any matrix
 node tools/test-loop.mjs --soak[=30]                             # 30 sim-minute Free Flight soak (C172 Easy portrait)
 node tools/test-loop.mjs --falsify=freeze,error,cover,deadbutton    # prove the detectors fire (one fresh run per fault)
 node tools/test-loop.mjs --falsify=stuck --stuck=40                 # STUCK separately: a short --stuck would trip the long AP legs in the others

@@ -3,8 +3,8 @@ import { RANKS, titleFor } from './ranks.js';
 import { career } from './career.js';
 
 // Flyable in Free Flight (model + flight model). Order = Hangar card order.
-export const HANGAR = ['c172', 'cub', 'tiger', 'pitts', 'bathtub', 'herc', 'bizjet', 'f35', 'spitfire', 'jumbo', 'throne'];
-export const SHORT = { c172: 'Runabout', tiger: 'Moth', bathtub: 'Bathtub', herc: 'Wardrobe', f35: 'Tantrum', jumbo: 'Jumbo', cub: 'Cub', pitts: 'Show-Off', throne: 'Throne', spitfire: 'Teatime', bizjet: 'Lear' };
+export const HANGAR = ['c172', 'cub', 'tiger', 'pitts', 'bathtub', 'herc', 'bizjet', 'f35', 'spitfire', 'a320', 'jumbo', 'throne'];
+export const SHORT = { c172: 'Runabout', tiger: 'Moth', bathtub: 'Bathtub', herc: 'Wardrobe', f35: 'Tantrum', jumbo: 'Jumbo', cub: 'Cub', pitts: 'Show-Off', throne: 'Throne', spitfire: 'Teatime', bizjet: 'Lear', a320: 'Peasant' };
 // ?allplanes: every Hangar plane unlocked, for testing
 const ALL = typeof location !== 'undefined' && new URLSearchParams(location.search).has('allplanes');
 const BLURB = {
@@ -19,6 +19,7 @@ const BLURB = {
   throne: 'A throne with a jet pack. Hovers. Handles like a shopping trolley.',
   spitfire: 'Elliptical wings, a Merlin and no view over the nose. Takes its tea at 300 knots.',
   bizjet: 'The royal monogram on the tail, champagne in the back. Runways only, and long ones.',
+  a320: 'A whole airliner of commoners, and you at the front. Wake like a hurricane. Long runways only.',
 };
 
 // null when unlocked, else { text } (DESIGN §4: unlockRank per type; 'story' = finish the campaign).
