@@ -237,7 +237,7 @@ export function finPlan(y) {
 
 export function buildHercExterior(quality, mats, ctx) {
   const T = tess(quality);
-  const body = new Builder(), trim = new Builder(), lights = new Builder(), beaconB = new Builder(), gear = new Builder(), rampB = new Builder();
+  const body = new Builder(), trim = new Builder(), lights = new Builder(), beaconB = new Builder(), gear = new Builder(), rampB = new Builder(), crateB = new Builder();
   const sideUV = (p, right) => uvSide(right ? REG.fusR : REG.fusL, p[2], p[1]);
 
   // ---------- fuselage: three lofts so the rear ramp can be its own hinged piece ----------
@@ -272,9 +272,10 @@ export function buildHercExterior(quality, mats, ctx) {
     fan(trim, ring(16.5, 0, 2 * Math.PI, 24).slice(0, -1).map((p) => [p[0] * 0.95, FUS(16.5).yc + (p[1] - FUS(16.5).yc) * 0.95, 16.5]), [0, 0, 1], RM.cloth, COL.holdDark);
     trim.addGeo(new THREE.BoxGeometry(3.1, 0.06, 2.3), M4(0, 1.02, 17.6), RM.rubber, COL.floor);
     // the royal cargo: a crate with a crown on it
-    trim.addGeo(new THREE.BoxGeometry(1.6, 1.3, 1.6), M4(0, 1.7, 17.3), RM.wood, COL.crate);
-    trim.addGeo(new THREE.CylinderGeometry(0.35, 0.3, 0.3, 10, 1, true), M4(0, 2.5, 17.3), RM.gold, COL.gold);
-    trim.addGeo(new THREE.SphereGeometry(0.3, 10, 4, 0, Math.PI * 2, 0, Math.PI / 2), M4(0, 2.6, 17.3, 1, 0.7, 1), RM.cloth, srgb('#8c1020'));
+    // (its own mesh, origin at the crate's floor centre: STAIRS slides it out of the ramp, js/world/cargodrop.js)
+    crateB.addGeo(new THREE.BoxGeometry(1.6, 1.3, 1.6), M4(0, 0.65, 0), RM.wood, COL.crate);
+    crateB.addGeo(new THREE.CylinderGeometry(0.35, 0.3, 0.3, 10, 1, true), M4(0, 1.45, 0), RM.gold, COL.gold);
+    crateB.addGeo(new THREE.SphereGeometry(0.3, 10, 4, 0, Math.PI * 2, 0, Math.PI / 2), M4(0, 1.55, 0, 1, 0.7, 1), RM.cloth, srgb('#8c1020'));
   }
 
   // cockpit glass
@@ -449,6 +450,8 @@ export function buildHercExterior(quality, mats, ctx) {
   for (const [name, pc] of Object.entries(pieces)) hinges[name] = hinge(group, name, pc.B, mats.paint, pc.a, pc.b);
   // the ramp hinges at its forward bottom edge (rotation.x > 0 lowers it)
   const ramp = hinge(group, 'ramp', rampB, mats.paint, [-1, hingeY, RAMP.s0], [1, hingeY, RAMP.s0]);
+  let crate = null;
+  if (crateB.count) { crate = mkMesh('crate', crateB, mats.trim); crate.position.set(0, 1.05, 17.3); crate.userData.home = crate.position.clone(); group.add(crate); }
   const gearPivot = new THREE.Group();
   gearPivot.name = 'gear-pivot';
   gearPivot.position.y = 1.7;
@@ -468,7 +471,7 @@ export function buildHercExterior(quality, mats, ctx) {
     Object.defineProperty(propMesh, 'visible', { get: () => blades.visible, set() { blades.visible = true; } });
     Object.defineProperty(disc, 'visible', { get: () => discMesh.visible, set() { discMesh.visible = (ctx.discBlur ?? 0) > 0.01; } });
   }
-  return { group, meshes, hinges, propGroup, propMesh, disc, lightPts, gearPivot, ramp, rampMax: 0.52, blades, discMesh };
+  return { group, meshes, hinges, propGroup, propMesh, disc, lightPts, gearPivot, ramp, rampMax: 0.52, blades, discMesh, crate, hingeY };
 }
 
 const D2R = Math.PI / 180;

@@ -110,11 +110,12 @@ export function createLandButton({ container, onPress, onContext, stickRight = f
     if (sig === ctxSig) return;
     ctxSig = sig; ctx = c || null;
     if (!c) {
-      delete el.dataset.ctx; ico.innerHTML = ICON; now.innerHTML = NOW_HTML; el.setAttribute('aria-label', 'Land ahead');
+      delete el.dataset.ctx; delete el.dataset.kind; ico.innerHTML = ICON; now.innerHTML = NOW_HTML; el.setAttribute('aria-label', 'Land ahead');
       const s0 = state, r0 = reason; state = ''; setState(s0, r0);
       return;
     }
     el.dataset.ctx = c.key; el.dataset.state = c.state;
+    if (c.kind) el.dataset.kind = c.kind; else delete el.dataset.kind;   // STAIRS: 'cargo' = the Herc's ramp drop (its own hint)
     ico.innerHTML = CTX_ICONS[c.key] || ICON;
     b.textContent = c.label; small.textContent = c.sub || '';
     el.setAttribute('aria-label', c.label.replace('…', '').toLowerCase());

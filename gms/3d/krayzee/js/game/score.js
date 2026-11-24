@@ -72,7 +72,7 @@ export function createScore(opts = {}) {
     comboStep: -1, comboLeft: 0, frozen: 0,
     protectionMode: mode.protection, protection: mode.protection === 'partial' ? mode.partialStart : mode.protection === 'rubber' ? 100 : 0,
     rankIndex: opts.rankIndex ?? 0, aircraft: opts.aircraft || 'c172', ppScale: 1,
-    airborne: false, landed: false, stopT: 0, gsKt: 0, impeccableDone: false, gag: 0, t: 0, closeAt: {}, sheepAt: {}, touchWait: null, gaIgnoredAt: -1e9,
+    airborne: false, landed: false, stopT: 0, gsKt: 0, impeccableDone: false, gag: 0, t: 0, closeAt: {}, sheepAt: {}, cargoAt: -1e9, touchWait: null, gaIgnoredAt: -1e9,
     stats: { infractions: 0, bestCombo: 1, bounces: 0, crashes: 0, scandals: 0, sorties: 0, ripostes: 0 },
   };
 
@@ -185,6 +185,29 @@ export function createScore(opts = {}) {
     return amount;
   }
 
+  // D39 Royal Picnic: the Herc's hamper came down on the Palace Lawn. Same multipliers and combo rule as D38.
+  function cargoDrop(ev) {
+    const r = BONUSES.cargo_drop, d = ev.data || ev;
+    if (!(d.dist <= r.radius)) return null;
+    if (S.t - S.cargoAt < r.cooldown) return null;
+    S.cargoAt = S.t;
+    const frozen = S.frozen > 0;
+    const parts = {
+      base: r.pp,
+      combo: S.comboLeft > 0 ? comboMult(Math.max(0, S.comboStep)) : 1,
+      audacity: 1,
+      heat: heatMult(S.outrage),
+      aircraft: AIRCRAFT[S.aircraft]?.ppMult ?? 1,
+      scale: mode.ppRate * S.ppScale,
+    };
+    addOutrage(r.outrage, 'cargo_drop');
+    const mult = parts.combo * parts.heat * parts.aircraft * parts.scale;
+    const amount = frozen ? 0 : round10(r.pp * mult);
+    const text = frozen ? `${r.name.toUpperCase()} — the press are watching` : `${r.name.toUpperCase()}! +${amount}${Math.abs(mult - 1) > 0.005 ? ' ' + fmt(mult) : ''}`;
+    gain(amount, { id: 'cargo_drop', name: r.name, text, mult, parts, frozen, combo: parts.combo, dist: Math.round(d.dist), target: d.target ?? null });
+    return amount;
+  }
+
   function banter(b) {
     if (b.source !== 'response' || S.frozen > 0) return;
     let amount = BANTER.riposte, name = 'Riposte';
@@ -229,6 +252,7 @@ export function createScore(opts = {}) {
 
     if (ev.type === 'barked') banter(ev);
     else if (id === 'sheep_scatter') { if (mine(ev)) sheepScatter(ev); }
+    else if (id === 'cargo_drop') { if (mine(ev)) cargoDrop(ev); }
     else if (id === 'impeccable' && mine(ev)) impeccable();
     else if (ev.type === 'landed' && mine(ev)) { S.landed = true; if (ev.impeccable) impeccable(); }
     else if (ev.type === 'goaroundrefused' && (ev.actor == null || mine(ev))) ignoredGoAround(ev, true);

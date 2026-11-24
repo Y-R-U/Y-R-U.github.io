@@ -30,6 +30,9 @@ import { createKingdom, bootAirport } from './map/index.js'; // MAP (D29 Kingdom
 import { aiPool } from './world/aipool.js'; // WORLD
 import { createAutoButton } from './flight/autobtn.js'; // CONTROLS (D37)
 import { createMouseAim, fromBody } from './flight/mouseaim.js'; // CONTROLS
+import { createBoarding } from './world/boarding.js'; // STAIRS (A6)
+import { createCargoDrops } from './world/cargodrop.js'; // STAIRS (A6 / D39)
+import { cargoContext } from './flight/cargo.js'; // STAIRS
 const AUTO_COUNTDOWN = 10; // CONTROLS (D37): the player's AUTO countdown (s) after letting go of the stick; AI keep OVERRIDE.wait 1.5 s
 
 const AUTO = params.get('auto') === '1';
@@ -39,6 +42,7 @@ const S = { mode: 'boot', paused: false, view: 'chase', player: null, log: [], r
 let R, scene, camera, world, env, traffic, attract, controls, hud, ghud, markers, land, fcam, sunFollow, gov, wiring, career, engine = null, fx = null, story = null, SET = null, toCoach = null;
 let kingdom = null; // MAP
 let autoBtn = null, mouseAim = null; // CONTROLS
+let boarding = null, cargo = null; // STAIRS
 // settings are read every frame; ui.getSettings() parses localStorage, so keep a copy (refreshed in onSettings)
 const settings = () => (SET ||= ui.getSettings());
 const aiVoices = new Map(), errSeen = new Set();
@@ -117,7 +121,8 @@ async function boot() {
   const st0 = ui.getSettings();
   markers = createMarkers({ container: overlay, camera, units: st0.units, traffic: st0.trafficMarkers !== false, getOrigin: () => S.player?.ac.pos ?? camera.position,
     avoid: ['.krz-r-btn', '.krz-r-tower', '.krz-land', '.krz-autobtn', '.krz-top-l', '.krz-top-r', '.krz-prompt', '.krz-finish', '.krz-gbtn'] });
-  land = createLandButton({ container: overlay, stickRight: st0.stickRight, onPress: onLandPress, onContext: onStovlPress });
+  land = createLandButton({ container: overlay, stickRight: st0.stickRight, onPress: onLandPress, onContext: (k, st) => (S.player?.ac.P.stovl ? onStovlPress(k, st) : onCargoPress(k, st)) }); // STAIRS: + the Herc's drop
+  boarding = createBoarding(); cargo = createCargoDrops({ scene }); // STAIRS
   markers.setVisible(false); land.setVisible(false);
   autoBtn = createAutoButton({ root: overlay, onTap: onAutoTap }); autoBtn.setSide(!!st0.stickRight); // CONTROLS (D37)
   fcam = createFlightCamera(camera, env);
@@ -492,6 +497,7 @@ function frame(dt) {
   if (session) try { ghud.online.sync(session, net); } catch (e) { /* */ }
 
   world.update?.(dt, camera);
+  try { updateStairs(S.paused ? 0 : dt * (S.simK || 1), P); } catch (e) { /* */ } // STAIRS
   if (world.sheep) try { world.sheep.update(S.paused ? 0 : dt * (S.simK || 1), traffic.list, camera.position, { audio, radio: wiring.radio, story: !!story?.mission, game: wiring.game }); } catch (e) { /* */ } // INTROSHEEP: C5 sheep scatter; SHEEP2: + game (D38 bonus)
   const focus = P ? P.rig.root.position : camera.position.clone().add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(60));
   sunFollow(focus);
@@ -599,6 +605,7 @@ function updateLand(dt, P) {
   const air = !P.ac.onGround && !P.ac.crashed;
   P.ac.stovlLevel = wiring.difficulty;
   const stovl = !!P.ac.P.stovl && updateStovl(dt, P);
+  if (!P.ac.P.stovl) updateCargoCtx(dt, P); // STAIRS
   land.setVisible(!SHOT && !AUTO && (air || land.state === 'active' || stovl));
   // landscape: the action slot (prompt card) steps clear of LAND (css/game.css html.krz-land-on)
   const lon = !land.el.hidden, de = document.documentElement;
@@ -659,6 +666,32 @@ function onStovlPress(key, state) {
   } else if (key === 'flyon') ap.flyOn();
   // (no flash: the button itself now says what is happening; D32 keeps the screen clear)
   updateStovl(0, P);
+}
+// ---- STAIRS (A6): the Jumbo's boarding moment, and the Herc's ramp drop on the LAND slot's second pill (D39) ----
+function updateStairs(dt, P) {
+  const flash = (t) => hud.flash(t, 'info', 2);
+  boarding?.update(dt, traffic.list, layout.STANDS, { audio, flash: story?.mission ? null : flash });
+  cargo?.update(dt, S.mode === 'play' ? P : null, { ground: env.groundHeightAt, worldId: world.airport, wind: world.wind, story: !!story?.mission, game: wiring.game, audio, flash, landActive: land?.state === 'active' });
+}
+function updateCargoCtx(dt, P) {
+  if (P.rig.type !== 'herc' || !cargo) { if (S.cargoCtx) { S.cargoCtx = false; land.setContext(null); } return; }
+  if ((S.cargoT = (S.cargoT || 0) - dt) > 0) return;
+  S.cargoT = 0.25;
+  const c = cargoContext({ offered: !SHOT && !AUTO && cargo.offered(P, { story: !!story?.mission }), phase: cargo.phase, landActive: land.state === 'active', landPlan: S.landPlan, hint: cargo.hint });
+  S.cargoCtx = !!c;
+  land.setContext(c);
+}
+function onCargoPress(key, state) {
+  const P = S.player; if (!P) return;
+  log('cargo', { key, state });
+  S.cargoT = 0;
+  if (key === 'landrw') {
+    if (state === 'unavailable') { const why = land.context?.sub; if (why) hud.flash(`CAN'T LAND · ${why}`.toUpperCase(), 'warn', 2); return; }
+    land.setContext(null);
+    return onLandPress('idle');
+  }
+  if (key === 'ramp' || key === 'drop') cargo.press(key, P, { story: !!story?.mission, audio });
+  updateCargoCtx(0, P);
 }
 // ---- CONTROLS (D37): the AUTO button, and the mouse-aim reticle ----
 function onAutoTap(state) {
@@ -984,6 +1017,7 @@ window.__game = {
   get traffic() { return traffic; }, get renderer() { return R; }, get camera() { return camera; },
   get hud() { return ghud && { score: ghud.score.state, prompts: ghud.prompts.state, coach: ghud.coach.state, takeoffCoach: toCoach?.state || null, target: S.oppTarget || null }; },
   get wiring() { return wiring; }, get ghud() { return ghud; }, get world() { return world; },
+  get boarding() { return boarding; }, get cargo() { return cargo; }, // STAIRS
   get quality() { return { tier: R?.quality, auto: gov?.auto, fps: gov ? +gov.fps.toFixed(1) : 0, history: gov?.history || [] }; },
 };
 

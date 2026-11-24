@@ -255,7 +255,10 @@ model (tail-strike angles computed from the section tables against the rearmost 
   shown position (0..1). Gear telescopes into the belly / sponsons and is hidden (0 calls) when up. Far LODs carry their
   own unmerged gear so AI traffic on approach still shows wheels. `createPlane({ ..., gear: 0 })` starts it up.
 - `rig.setStairs(bool)` (jumbo) — the royal airstair with a red carpet at the L1 door (left, station 9.3). Off by default.
-- `rig.setRamp(0..1)` (herc) — lowers the cargo ramp (≈ 5 s, 30°) onto the royal crate in the hold.
+  STAIRS: the ground carpet is its own child mesh `carpet` (unrolled by `scale.x`) and `stairs.userData.anchor` gives the
+  door / top step / foot positions (js/world/boarding.js builds the door, the figures and the walk from them).
+- `rig.setRamp(0..1)` (herc) — lowers the cargo ramp (≈ 5 s, 30°) onto the royal crate in the hold. STAIRS: the crate
+  is its own mesh `rig._ext.crate` (origin at its floor centre, `userData.home`) so the ramp drop can roll it out.
 - `rpm`: **jumbo = N1 %** (JETCORE's convention, idle 22 .. 100); values above 120 are taken as fan rpm (÷ 33). Fans spin
   visibly at 0.5–6 rev/s across N1 15–100 and the EICAS shows the same N1. **Herc = prop rpm** (735 idle .. 1020): the blades
   are always drawn and spin at a readable 0.6–3.2 rev/s (a true 17 rev/s 4-blade prop strobes at 60 fps); a blur disc
@@ -668,3 +671,18 @@ matrix) 1/1 green; `node tools/test-map.mjs --cases=jumbo` 18/18 with the airlin
 Shots (`docs/shots/airliners/`): `a320_dirkair`, `a320_fizzair`, `a320_cockpit`, `dash8_dirkair`, `dash8_sconeair` (jetview), and
 in the game at Much Snoring: `game_a320_takeoff_airbase`, `game_ai_a320_final_airbase` (an AI A320 on final beside the
 player's: "number two, behind the heavy"), `game_ai_dash8_climbout_airbase`.
+
+## STAIRS (V1 A6, 2026-11-24): the Jumbo's stairs and the Herc's ramp in play (D39)
+| file | what |
+|---|---|
+| `js/world/stairs.js` | the boarding moment's state machine (pure): idle → roll 0.9 s → door 0.5 → parade 3.6 → close 0.4 → away 0.9 → done; moving off (> 0.3 m/s, off the stand, airborne, wrecked) = away in 0.35 s |
+| `js/world/boarding.js` | the moment's visuals: stairs slide in 7 m, carpet unrolls, a door panel + dark opening at L1, a corgi, the King and a footman (one vertex-coloured material, built on first use) walk the carpet → truck → steps → door; AI Jumbos parked 3 s on a stand get static stairs |
+| `js/flight/cargo.js` | the drop (pure): when it is offered, the hamper's fall (chute from 0.9 s, full at 1.6 s, 6.5 m/s sink, exact exponential drag), the landing predictor, the lawn target, the button hint and the LAND-slot context |
+| `js/world/cargodrop.js` | the drop's flow and visuals: OPEN RAMP → (5.2 s) → DROP HAMPER → the crate rolls out (1.1 s) → a hamper with a purple-and-gold canopy (2 meshes, ≤ 3 alive, cleared 25 s after landing) → `cargo_drop` score event; reload after 2 s stopped on the ground |
+| `js/audio/index.js` | `playRampWhine` (lowpassed hydraulic whine; also the stair truck at pitch 0.6), `playChutePop`, `playFanfare` (soft triangle notes ≤ 660 Hz); rows in tools/sounds.html |
+| `js/main.js` (`// STAIRS`) | `updateStairs` once a frame, `updateCargoCtx` in `updateLand` for the Herc (4 Hz), `onCargoPress` for the slot's keys, `__game.boarding` / `__game.cargo` |
+
+Cost: the moment adds 6 draw calls (door panel, opening, 3 figures, the carpet) only while it plays; a parked AI Jumbo's stairs are 2 calls;
+the Herc's crate is +1 call near; a falling hamper is 2 calls. The predictor runs 4× a second only with the ramp open (≈ 150–300 coarse steps).
+Shots: `docs/shots/stairs/` (`jumbo_boarding_0..2`, `jumbo_boarding_hud_portrait`, `jumbo_taxi_after`, `herc_pill_landscape`,
+`herc_ramp_open`, `herc_hamper_chute_0..1`, `herc_hamper_on_lawn`). Tests: docs/TESTING.md "STAIRS".

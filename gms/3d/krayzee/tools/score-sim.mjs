@@ -435,6 +435,30 @@ section('D38 Woolly Jumper: sheep scatter bonus (SHEEP2)');
 }
 function sh2(flock) { return { type: 'sheep_scatter', actor: 'player', flock, n: 6, air: true }; }
 
+section('D39 Royal Picnic: Herc hamper on the Palace Lawn (STAIRS)');
+{
+  const cd = (dist, extra = {}) => ({ type: 'cargo_drop', actor: 'player', target: 'palace_lawn', dist, ...extra });
+  const pays = []; const g = game({ autoBank: false }); g.on('pp', (e) => pays.push(e));
+  g.handleEvent(cd(25));
+  ok(pays.length === 1 && pays[0].id === 'cargo_drop' && pays[0].amount === 60 && pays[0].name === 'Royal Picnic', `hamper 25 m from the lawn centre pays Royal Picnic +60 (got ${pays[0]?.name} ${pays[0]?.amount})`);
+  ok(g.state().outrage === 2, `+2 outrage (${g.state().outrage})`);
+  ok(g.state().stats.infractions === 0 && g.state().comboLeft === 0, 'a bonus: no rule break, no combo started');
+  g.update(61, {}); g.handleEvent(cd(61));
+  ok(pays.length === 1, 'a hamper 61 m out: nothing');
+  g.handleEvent(cd(59.5));
+  ok(pays.length === 2, 'just inside 60 m pays');
+  g.update(20, {}); g.handleEvent(cd(5));
+  ok(pays.length === 2, 'another inside 60 s: cooldown');
+  g.update(41, {}); g.handleEvent(cd(5, { actor: 'ai3' })); g.handleEvent({ type: 'cargo_drop', actor: 'player', target: 'palace_lawn' });
+  ok(pays.length === 2, 'an AI hamper, or one with no distance: nothing');
+  g.handleEvent(cd(5));
+  ok(pays.length === 3, 'after the cooldown it pays again');
+  const st = memStore(); const c = G.loadCareer({ storage: st });
+  const g5 = G.createGame({ mode: 'free', career: c, rng: seeded(7), autoBank: false });
+  g5.handleEvent(cd(10)); g5.handleEvent(inf('low_pass', { outrage: 0 })); landAndStop(g5); g5.demand({ ok: true });
+  ok(c.stats.infractions === 1, `career counts the low pass, not the picnic (${c.stats.infractions})`);
+}
+
 section('career: D2 / D3');
 {
   const st = memStore(); let t = 1000;
@@ -606,6 +630,10 @@ function falsify() {
     { name: 'D38 sheep feeds the combo (as a rule break)', file: 'js/game/score.js', from: "else if (id === 'sheep_scatter') { if (mine(ev)) sheepScatter(ev); }", to: "else if (id === 'sheep_scatter') { if (mine(ev)) { INFRACTIONS.sheep_scatter = { ...BONUSES.sheep_scatter }; infraction('sheep_scatter', ev, true); } }" },
     { name: 'D38 sheep never pays', file: 'data/rules.js', from: "name: 'Woolly Jumper', pp: 30,", to: "name: 'Woolly Jumper', pp: 0," },
     { name: 'D38 AI scatters pay', file: 'js/game/score.js', from: "{ if (mine(ev)) sheepScatter(ev); }", to: '{ sheepScatter(ev); }' },
+    { name: 'D39 picnic radius ignored', file: 'js/game/score.js', from: 'if (!(d.dist <= r.radius)) return null;', to: '' },
+    { name: 'D39 picnic cooldown dropped', file: 'js/game/score.js', from: 'if (S.t - S.cargoAt < r.cooldown) return null;', to: '' },
+    { name: 'D39 AI hampers pay', file: 'js/game/score.js', from: "{ if (mine(ev)) cargoDrop(ev); }", to: '{ cargoDrop(ev); }' },
+    { name: 'D39 picnic counted as a rule break', file: 'js/game/index.js', from: " && e.id !== 'cargo_drop'", to: '' },
     { name: 'D19 hard accepts runways', file: 'js/game/finish.js', from: 'const ok = atSpot || (onApron(x, z) && nearStand(x, z));', to: 'const ok = true;' },
   ];
   let allCaught = true;

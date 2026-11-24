@@ -11,7 +11,9 @@ const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
 const write = (v) => { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { /* storage blocked */ } };
 
 const HINTS = [
-  { id: 'ctx', sel: '.krz-land[data-ctx]', text: () => '<b>One button for the F-35.</b> It changes as you fly: <b>VERTICAL TAKEOFF</b>, <b>HOVER</b>, <b>LAND HERE</b>.' },
+  { id: 'ctx', sel: '.krz-land[data-ctx]:not([data-kind="cargo"])', text: () => '<b>One button for the F-35.</b> It changes as you fly: <b>VERTICAL TAKEOFF</b>, <b>HOVER</b>, <b>LAND HERE</b>.' },
+  // STAIRS (D39): the Herc's ramp drop on the LAND slot's second pill
+  { id: 'ramp', sel: '.krz-land[data-kind="cargo"]', text: () => '<b>The Royal Wardrobe drops hampers.</b> Tap <b>OPEN RAMP</b>, then <b>DROP HAMPER</b>. Land one on the Palace Lawn for the King\'s picnic.' },
   { id: 'map', sel: '.krz-map-chip', text: () => '<b>MAP:</b> the whole Kingdom. Pick an airfield and fly there.' },
   // CONTROLS (D37): the AUTO button, the first time it counts down; desktop mouse aim's keys, the first time it is on
   { id: 'auto', sel: '.krz-autobtn[data-state="count"]', text: () => '<b>AUTO</b> takes back over when this reaches 0. Tap it to hand back now. Tap it while the autopilot flies for <b>AUTO OFF</b>.' },

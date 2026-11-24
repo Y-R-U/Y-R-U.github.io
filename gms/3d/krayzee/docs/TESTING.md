@@ -268,3 +268,16 @@ The findings with repro steps and owners are in the LOOPTEST report to the manag
 
 ## Full regression (manager gate)
 `tools/verify-all.sh [port] > verify.log 2>&1`, then `grep -E "^== |passed|green;|✗|FAIL|GREEN" verify.log`. Every node gate, then each browser suite one at a time on one Chrome (missions 1–10 Easy + M2 Medium, the map tour, test-loop quick/jets/roster/roster2/full). Several hours: run it once per round in the background; lanes run only the targeted tests for what they changed.
+
+## STAIRS (V1 A6, 2026-11-24): Jumbo boarding moment + Herc ramp drop (D39)
+- `node tools/stairs-sim.mjs [--falsify=moving|chute|radius|ctx]` (39 checks, < 1 s): the stairs state machine (starts after 1.5 s stopped
+  on a stand, whole moment 4–8 s, once per stop, never off a stand / airborne / wrecked; moving off during any phase at 1 m/s² clears the
+  stairs by < 0.75 m/s), when the drop is offered, the hamper's fall (chute, 6.5 m/s sink, downrange, wind drift, the 0.1 s predictor
+  within 10 m of the 60 Hz fall, stops on a hill), the lawn target / hints, and the LAND-slot context. Each falsify goes red.
+- `node tools/score-sim.mjs` section "D39 Royal Picnic" (radius, cooldown, AI hampers, not a rule break); `--falsify` has 4 D39 breaks.
+- Browser: `node tools/test-stairs.mjs [--port=9721] [--only=jumbo,herc] [--falsify=noboard|nobonus|noramp]` (19 checks, ≈ 2 min):
+  Jumbo (portrait) parked by the autopilot's PARKED leg on the stand farthest from AI traffic: the moment runs, 3 figures, the plane
+  never moves, then a real touch on DEMAND TAKEOFF mid-moment: the stairs are gone before it has rolled 1.5 m. Herc (landscape) flown
+  upwind at the lawn under AUTO OFF: real touches on the pill (OPEN RAMP, then DROP HAMPER when the hint says ON TARGET), the chute
+  opens, it lands within 60 m and Royal Picnic pays, then the ramp shuts and the slot is plain LAND. Each falsify goes red (4/8, 10/11, 4/11).
+  Both are in tools/verify-all.sh.

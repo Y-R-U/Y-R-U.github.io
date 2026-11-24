@@ -351,6 +351,33 @@ export function createAudioSystem(ctx, opts = {}) {
     osc.start(t); lfo.start(t); osc.stop(t + dur + 0.05); lfo.stop(t + dur + 0.05);
     burst(buf.white, t, 0.12, { filter: filt('bandpass', 1200, 1.2), gain: 0.06, attack: 0.02, out });
   };
+  // A6 (STAIRS): the Herc ramp's hydraulics / the Jumbo's airstair truck: a low motor whine that rises and settles,
+  // lowpassed (D23: nothing piercing). o.dur seconds, o.pitch scales it (the stairs truck runs lower).
+  S.playRampWhine = (o = {}) => {
+    const t = now() + (o.delay || 0), out = oneShotOut(o, o.gain ?? 0.5), p = o.pitch ?? 1, dur = o.dur ?? 2.5;
+    const osc = ctx.createOscillator(); osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150 * p, t); osc.frequency.linearRampToValueAtTime(240 * p, t + Math.min(0.6, dur * 0.3));
+    osc.frequency.linearRampToValueAtTime(215 * p, t + dur);
+    const lp = filt('lowpass', 900, 1.5), e = g(0);
+    e.gain.setValueAtTime(0, t); e.gain.linearRampToValueAtTime(0.35, t + 0.15);
+    e.gain.setValueAtTime(0.35, t + dur - 0.25); e.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    chain(osc, lp, e, out); osc.start(t); osc.stop(t + dur + 0.05);
+    tone('sine', 60 * p, 55 * p, t, dur, 0.25, out, 0.1);
+    burst(buf.white, t + dur - 0.1, 0.08, { filter: filt('lowpass', 1500), gain: 0.3, out });
+  };
+  // the hamper's canopy snapping open: a cloth whump and a flutter
+  S.playChutePop = (o = {}) => {
+    const t = now() + (o.delay || 0), out = oneShotOut(o, o.gain ?? 0.7);
+    burst(buf.white, t, 0.18, { filter: filt('bandpass', 420, 1.2), gain: 1, attack: 0.004, out });
+    tone('sine', 140, 55, t, 0.2, 0.7, out);
+    for (let k = 1; k < 6; k++) burst(buf.white, t + 0.12 + k * 0.07, 0.05, { filter: filt('bandpass', 700, 2), gain: 0.25 / k, out });
+  };
+  // the King steps onto the red carpet: three soft brass-ish notes (triangle through a lowpass, no high partials)
+  S.playFanfare = (o = {}) => {
+    const t = now() + (o.delay || 0), out = oneShotOut(o, o.gain ?? 0.45), lp = filt('lowpass', 1800, 0.7);
+    lp.connect(out);
+    [[392, 0, 0.16], [523, 0.17, 0.16], [659, 0.34, 0.5]].forEach(([f, d, len]) => { tone('triangle', f, f, t + d, len, 0.5, lp, 0.02); tone('sawtooth', f / 2, f / 2, t + d, len, 0.08, lp, 0.02); });
+  };
   S.playUI = (kind = 'click') => {
     const t = now(), out = oneShotOut({}, 0.5);
     if (kind === 'confirm') { tone('sine', 660, 660, t, 0.12, 0.4, out); tone('sine', 990, 990, t + 0.08, 0.2, 0.35, out); }
@@ -584,6 +611,9 @@ export const playGearThump = call('playGearThump');
 export const playCrash = call('playCrash');
 export const playBoing = call('playBoing');
 export const playBleat = call('playBleat');
+export const playRampWhine = call('playRampWhine');
+export const playChutePop = call('playChutePop');
+export const playFanfare = call('playFanfare');
 export const playUI = call('playUI');
 export const playSquelch = call('playSquelch');
 export const playRadio = (src, o) => { const s = getAudio(); return s ? s.playRadio(src, o) : Promise.resolve({ played: false }); };

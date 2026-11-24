@@ -46,6 +46,9 @@ export const INFRACTION_COOLDOWN = 30;
 // Rides the live combo/heat/aircraft multipliers but never starts or extends a combo; once per flock per cooldown.
 export const BONUSES = {
   sheep_scatter: { name: 'Woolly Jumper', pp: 30, outrage: 3, cooldownPerFlock: 60, minSheep: 3, airOnly: true, comboFeed: false, voice: 'sheep_scatter', detect: 'player airborne below 60 m AGL scares >= 3 sheep of one flock (flock.js onScatter)' },
+  // D39 (STAIRS): the Herc's ramp drop. A hamper whose chute brings it down within `radius` m of the Palace Lawn's
+  // centre (js/flight/cargo.js TARGETS) pays; elsewhere it just lands. One hamper per sortie (reload on the ground).
+  cargo_drop: { name: 'Royal Picnic', pp: 60, outrage: 2, radius: 60, cooldown: 60, comboFeed: false, detect: 'player Herc hamper lands within 60 m of the Palace Lawn centre (js/world/cargodrop.js)' },
 };
 // D30: one window per pair across every close call, touch or miss.
 export const CLOSE_CALL = { ids: ['near_miss', 'light_touch', 'formation'], pairCooldown: 60 };

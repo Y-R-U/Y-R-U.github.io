@@ -522,10 +522,16 @@ export function buildJumboExterior(quality, mats, ctx) {
     }
     sb.addGeo(new THREE.BoxGeometry(3.4, 0.9, 2.2), M4(x1 + 0.4, 0.75, sd), RM.paint, srgb(ROYAL.purple));
     for (const dx of [-1.1, 1.1]) for (const dz of [-0.9, 0.9]) wheel(sb, [x1 + 0.4 + dx, 0.3, sd + dz], 0.3, 0.22, 10, { tire: COL.tire, hub: COL.hub }, RM);
-    // a red carpet rolled out on the ground from the foot of the stairs
-    sb.addGeo(new THREE.BoxGeometry(9, 0.02, w * 0.75), M4(x1 - 4.5, 0.012, sd), RM.cloth, COL.carpet);
     stairs = mkMesh('stairs', sb, mats.trim);
     stairs.visible = false;
+    // a red carpet rolled out on the ground from the foot of the stairs (its own mesh: STAIRS unrolls it, scale.x)
+    const cb = new Builder();
+    cb.addGeo(new THREE.BoxGeometry(9, 0.02, w * 0.75), M4(-4.5, 0, 0), RM.cloth, COL.carpet);
+    const carpet = mkMesh('carpet', cb, mats.trim);
+    carpet.position.set(x1, 0.012, sd);
+    stairs.add(carpet);
+    // STAIRS (js/world/boarding.js): where the door, the top step and the foot are, in this frame
+    stairs.userData.anchor = { door: [-secR(FUS(sd), Math.PI / 2), sill, sd], top: [xs - 1.2, sill, sd], foot: [x1, 0, sd], w };
   }
 
   // ---------- assemble ----------

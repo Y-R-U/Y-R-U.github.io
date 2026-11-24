@@ -3,8 +3,8 @@
 #   tools/verify-all.sh [port] > verify.log 2>&1    then: grep -E '^== |passed|green;|✗|FAIL|GREEN' verify.log
 cd "${0:A:h}/.."
 P=${1:-9641}
-run() { echo "== $*"; node "$@" 2>&1 | tail -6; }
-for t in tools/flight-sim.mjs tools/atc-sim.mjs tools/score-sim.mjs js/assist/test/landahead.test.mjs tools/tasks-sim.mjs tools/stovl-sim.mjs tools/airport-check.mjs tools/loop/freeze-test.mjs tools/controls-sim.mjs tools/sheep-sim.mjs; do run $t; done
+run() { echo "== $*"; node "$@" 2>&1 | tail -12; }
+for t in tools/flight-sim.mjs tools/atc-sim.mjs tools/score-sim.mjs js/assist/test/landahead.test.mjs tools/tasks-sim.mjs tools/stovl-sim.mjs tools/airport-check.mjs tools/loop/freeze-test.mjs tools/controls-sim.mjs tools/sheep-sim.mjs tools/stairs-sim.mjs; do run $t; done
 run data/barks/check_towers.mjs --audio
 echo "== go test"; (cd server && go test ./... 2>&1 | tail -3)
 for p in 9711 9712; do ~/.claude/bin/cdp start --port $p --idle 7200 --max 21600 -- --use-angle=metal >/dev/null 2>&1; done
@@ -12,7 +12,7 @@ for p in 9711 9712; do ~/.claude/bin/cdp start --port $p --idle 7200 --max 21600
 for t in test-stovl test-map test-palace; do run tools/$t.mjs --port=$P; done
 run tools/test-map.mjs --cases=tour --orient=portrait --port=$P
 run tools/test-access.mjs
-for t in test-hud4 test-controls test-sheep; do run tools/$t.mjs --port=$P; done
+for t in test-hud4 test-controls test-sheep test-stairs; do run tools/$t.mjs --port=$P; done
 run tools/story/test-intro.mjs --port=$P
 run js/radio/test/tower-audio.mjs --airport=farm --port=$P
 run tools/test-tasks.mjs --port=$P
